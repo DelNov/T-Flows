@@ -25,7 +25,7 @@
 !---------------------------------[Calling]------------------------------------!
   real :: Correct_Velocity
 !----------------------------------[Locals]------------------------------------!
-  integer           :: i, m, n, us, c
+  integer           :: m, n, us
   real              :: mass_res, wall_time_start, wall_time_current
   character(len=80) :: name_save
   logical           :: restart, save_now, exit_now

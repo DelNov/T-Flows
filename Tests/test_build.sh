@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# it is an useful script to automatically build and run most cases in T-Flows.
+# it is an useful script in debug perposus to automatically build and run most 
+# cases in T-Flows
 
 # put your compilers here
 FCOMP="gnu"; # or ifort/gfortran/mpif90/mpifort/mpiifort
@@ -81,9 +82,9 @@ function generator_tests {
 #------------------------------------------------------------------------------#
 function convert_tests {
   # unpacking geometry
-  cd $TEST_DIR/Rans/Channel_Re_Tau_590;                 tar -zxvf    chan.tar.gz
-  cd $TEST_DIR/Rans/Impinging_Jet_2d_Distant_Re_23000;  tar -zxvf     jet.tar.gz
-  cd $TEST_DIR/Rans/Fuel_Bundle;                        tar -zxvf subflow.tar.gz
+  cd $TEST_DIR/Rans/Channel_Re_Tau_590;                tar -zxvf    chan.neu.tgz
+  cd $TEST_DIR/Rans/Impinging_Jet_2d_Distant_Re_23000; tar -zxvf     jet.neu.tgz
+  cd $TEST_DIR/Rans/Fuel_Bundle;                       tar -zxvf subflow.neu.tgz
 
   #-- seq, no cgns
   cd $CONV_DIR; make clean
@@ -159,27 +160,28 @@ function backup_test {
   #----------------------------------#
   # np=2, MPI=yes, backup=(from np=1)
   #----------------------------------#
+  nproc_in_div=$(tail -n2  divide.scr | head -n1)
   echo "np=2, MPI=yes, backup=(from np=1)"
-  mpirun -np 2 $PROC_EXE
+  mpirun -np $nproc_in_div $PROC_EXE
   #----------------------------------#
   # np=2, MPI=yes, backup=(from np=2)
   #----------------------------------#
   echo "np=2, MPI=yes, backup=(from np=2)"
   line="$(grep -ni "BACKUP_SAVE_INTERVAL"  .control.tmp | cut -d: -f1)"
   awk -v var="$line" 'NR==var {$2=2}1'    .control.tmp > control
-  mpirun -np 2 $PROC_EXE
+  mpirun -np $nproc_in_div $PROC_EXE
   #----------------------------------#
   # np=2, MPI=yes, backup=no
   #----------------------------------#
   echo "np=2, MPI=yes, backup=no"
   sed -e  's/LOAD_BACKUP_NAME/#LOAD_BACKUP_NAME/g' .control.tmp > control
-  mpirun -np 2 $PROC_EXE
+  mpirun -np $nproc_in_div $PROC_EXE
   #----------------------------------#
   # np=2, MPI=yes, backup=(from np=2)
   #----------------------------------#
   echo "np=2, MPI=yes, backup=(from np=2)"
   sed -e  's/#LOAD_BACKUP_NAME/LOAD_BACKUP_NAME/g' .control.tmp > control
-  mpirun -np 2 $PROC_EXE
+  mpirun -np $nproc_in_div $PROC_EXE
   #----------------------------------#
   # np=1, MPI=no, backup=(from np=2)
   #----------------------------------#
@@ -199,9 +201,13 @@ function processor_tests {
   #-- Backstep_Orthogonal
   backup_test no  $TEST_DIR/Laminar/Backstep_Orthogonal
   backup_test yes $TEST_DIR/Laminar/Backstep_Orthogonal
-  #-- Backstep_Orthogonal
+  #-- Channel_Re_Tau_590
   backup_test no  $TEST_DIR/Rans/Channel_Re_Tau_590
   backup_test yes $TEST_DIR/Rans/Channel_Re_Tau_590
+  #-- Fuel_Bundle
+  #backup_test no  $TEST_DIR/Rans/Fuel_Bundle
+  #backup_test yes $TEST_DIR/Rans/Fuel_Bundle
+
 }
 #------------------------------------------------------------------------------#
 # actual script
