@@ -457,6 +457,9 @@
       call User_Mod_Save_Results(grid, name_save)
     end if
 
+    ! Just before the end of time step
+    call User_Mod_End_Of_Time_Step(grid, n, time)
+
     if(save_now) then
       open (9, file='save_now', status='old')
       close(9, status='delete')
@@ -465,10 +468,8 @@
     if(exit_now) then
       open (9, file='exit_now', status='old')
       close(9, status='delete')
+      goto 2
     end if
-
-    ! Just before the end of time step
-    call User_Mod_End_Of_Time_Step(grid, n, time)
 
   end do ! n, number of time steps
 
@@ -477,7 +478,7 @@
     close(9)
   end if
 
-  if(this_proc  < 2) print *, '# Exiting !'
+2 if(this_proc  < 2) print *, '# Exiting !'
 
   ! Close monitoring files
   call Monitor_Mod_Finalize
