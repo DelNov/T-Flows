@@ -1,0 +1,19 @@
+#---------------------#
+# Phisical properties #
+#---------------------#
+  1
+  air  fluid  0.01  1.00  
+
+#---------------------#
+# Boundary conditions #
+#---------------------#
+   3 
+   static_wall   wall      0.0      0.0   0.0
+   moving_wall   inflow    1.0      0.0   0.0
+   symmetry      symmetry  0.0      0.0   0.0
+
+#--------------------#
+# Initial conditions #
+#--------------------#
+   1
+   1   1.0   0.0   0.0
