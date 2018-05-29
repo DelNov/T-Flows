@@ -71,8 +71,9 @@
     integer, allocatable :: faces_n(:,:)
     integer, allocatable :: faces_c(:,:)
 
-    ! Face surface areas (si) and distances between cells (di)
-    real, allocatable :: sx(:), sy(:), sz(:)
+    ! Face surface areas (si), total surface (s) 
+    ! and distances between cells (di)
+    real, allocatable :: sx(:), sy(:), sz(:), s(:)
     real, allocatable :: dx(:), dy(:), dz(:)
 
     ! Face coordinates 

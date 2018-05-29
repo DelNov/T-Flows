@@ -18,9 +18,12 @@
   allocate(grid % faces_n(4, nf+ns));  grid % faces_n = 0
   allocate(grid % faces_c(2, nf+ns));  grid % faces_c = 0
 
-  ! Face surface areas (si) and distances between cells (di)
+  ! Face surface areas (si), total surface (s) 
+  ! and distances between cells (di)
   allocate(grid % sx(nf+ns));  grid % sx = 0.0
   allocate(grid % sy(nf+ns));  grid % sy = 0.0
+  allocate(grid % sz(nf+ns));  grid % sz = 0.0
+
   allocate(grid % sz(nf+ns));  grid % sz = 0.0
 
   allocate(grid % dx(nf+ns));  grid % dx = 0.0

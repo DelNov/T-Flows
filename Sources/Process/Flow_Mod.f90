@@ -58,4 +58,7 @@
   ! Reference temperature
   real :: t_ref, t_inf
 
+  ! Heat and heat flux to the domain
+  real :: heat, heat_flux
+
   end module
