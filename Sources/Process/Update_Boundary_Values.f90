@@ -237,7 +237,7 @@
           uw  % n(c2) = uw  % n(grid % bnd_cond % copy_c(c2))
           vw  % n(c2) = vw  % n(grid % bnd_cond % copy_c(c2))
           kin % n(c2) = kin % n(grid % bnd_cond % copy_c(c2))
-          eps % n(c2) = eps % n(grid % bnd_cond % copy_c(c2))
+          !eps % n(c2) = done in Sources/Process/Turbulence/Sources_*.f90
           if(turbulence_model .eq. REYNOLDS_STRESS)  &
             f22 % n(c2) = f22 % n(grid % bnd_cond % copy_c(c2))
         end if
