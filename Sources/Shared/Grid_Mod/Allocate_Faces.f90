@@ -24,7 +24,7 @@
   allocate(grid % sy(nf+ns));  grid % sy = 0.0
   allocate(grid % sz(nf+ns));  grid % sz = 0.0
 
-  allocate(grid % sz(nf+ns));  grid % sz = 0.0
+  allocate(grid % s (nf+ns));  grid % s  = 0.0
 
   allocate(grid % dx(nf+ns));  grid % dx = 0.0
   allocate(grid % dy(nf+ns));  grid % dy = 0.0
