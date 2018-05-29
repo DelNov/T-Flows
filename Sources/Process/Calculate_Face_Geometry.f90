@@ -19,6 +19,9 @@
   !   Calculate total surface of the cell face   ! 
   !----------------------------------------------!
   do s = 1, grid % n_faces
+    grid % s(s) = sqrt(  grid % sx(s)*grid % sx(s)  &
+                       + grid % sy(s)*grid % sy(s)  &
+                       + grid % sz(s)*grid % sz(s) )  
     f_coef(s) = (  grid % sx(s)*grid % sx(s)  &
                  + grid % sy(s)*grid % sy(s)  &
                  + grid % sz(s)*grid % sz(s) )  
