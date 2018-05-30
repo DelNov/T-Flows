@@ -34,25 +34,49 @@ trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
 trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT
 
 #------------------------------------------------------------------------------#
+# clean_compile
+#------------------------------------------------------------------------------#
+function clean_compile {
+  # $1 = dir 
+  # $2 = CGNS_HDF5 = yes/no
+  # $3 = MPI = yes/no
+  # $4 = CGNS_ADF5 = yes/no
+
+  cd $1
+  make clean
+  echo "make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS_HDF5=$2 MPI=$3 CGNS_ADF5=$4"
+  make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS_HDF5=$2 MPI=$3 CGNS_ADF5=$4
+}
+#------------------------------------------------------------------------------#
 # make links
 #------------------------------------------------------------------------------#
 function make_links {
-  ln -rsf $BINA_DIR/* $TEST_DIR/Laminar/Backstep_Orthogonal/;
-  ln -rsf $BINA_DIR/* $TEST_DIR/Laminar/Backstep_Nonorthogonal/;
-  ln -rsf $BINA_DIR/* $TEST_DIR/Rans/Backstep_Re_26000_Rsm/;
-  ln -rsf $BINA_DIR/* $TEST_DIR/Rans/Backstep_Re_28000/;
-  ln -rsf $BINA_DIR/* $TEST_DIR/Rans/Channel_Re_Tau_590_Wall_Function/;
-  ln -rsf $BINA_DIR/* $TEST_DIR/Rans/Channel_Re_Tau_590/;
-  ln -rsf $BINA_DIR/* $TEST_DIR/Rans/Impinging_Jet_2d_Distant_Re_23000/;
-  ln -rsf $BINA_DIR/* $TEST_DIR/Rans/Fuel_Bundle/;
+  cd $TEST_DIR/Laminar/Backstep_Orthogonal/;
+  ln -rsf $GENE_EXE $CONV_EXE $DIVI_EXE $PROC_EXE .
+  cd $TEST_DIR/Laminar/Backstep_Orthogonal/;
+  ln -rsf $GENE_EXE $CONV_EXE $DIVI_EXE $PROC_EXE .
+  cd $TEST_DIR/Laminar/Backstep_Nonorthogonal/;
+  ln -rsf $GENE_EXE $CONV_EXE $DIVI_EXE $PROC_EXE .
+  cd $TEST_DIR/Rans/Backstep_Re_26000_Rsm/;
+  ln -rsf $GENE_EXE $CONV_EXE $DIVI_EXE $PROC_EXE .
+  cd $TEST_DIR/Rans/Backstep_Re_28000/;
+  ln -rsf $GENE_EXE $CONV_EXE $DIVI_EXE $PROC_EXE .
+  cd $TEST_DIR/Rans/Channel_Re_Tau_590_Wall_Function/;
+  ln -rsf $GENE_EXE $CONV_EXE $DIVI_EXE $PROC_EXE .
+  cd $TEST_DIR/Rans/Channel_Re_Tau_590/;
+  ln -rsf $GENE_EXE $CONV_EXE $DIVI_EXE $PROC_EXE .
+  cd $TEST_DIR/Rans/Impinging_Jet_2d_Distant_Re_23000/;
+  ln -rsf $GENE_EXE $CONV_EXE $DIVI_EXE $PROC_EXE .
+  cd $TEST_DIR/Rans/Fuel_Bundle/;
+  ln -rsf $GENE_EXE $CONV_EXE $DIVI_EXE $PROC_EXE .
 }
 #------------------------------------------------------------------------------#
 # generator tests
 #------------------------------------------------------------------------------#
 function generator_tests {
   #-- seq, no cgns
-  cd $GENE_DIR; make clean
-  make FORTRAN=$FCOMP DEBUG=$DEBUG
+  clean_compile $GENE_DIR no no yes # dir CGNS_HDF5 MPI CGNS_ADF5
+
   cd $TEST_DIR/Laminar/Backstep_Orthogonal;             $GENE_EXE < generate.scr
   cd $TEST_DIR/Laminar/Backstep_Nonorthogonal;          $GENE_EXE < generate.scr
   cd $TEST_DIR/Rans/Backstep_Re_26000_Rsm;              $GENE_EXE < generate.scr
@@ -60,8 +84,7 @@ function generator_tests {
   cd $TEST_DIR/Rans/Channel_Re_Tau_590_Wall_Function;   $GENE_EXE < generate.scr
 
   #-- seq, cgns(adf5)
-  cd $GENE_DIR; make clean
-  make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS_ADF5=yes
+  clean_compile $GENE_DIR no no yes # dir CGNS_HDF5 MPI CGNS_ADF5
   cd $TEST_DIR/Laminar/Backstep_Orthogonal;             $GENE_EXE < generate.scr
   cd $TEST_DIR/Laminar/Backstep_Nonorthogonal;          $GENE_EXE < generate.scr
   cd $TEST_DIR/Rans/Backstep_Re_26000_Rsm;              $GENE_EXE < generate.scr
@@ -69,8 +92,7 @@ function generator_tests {
   cd $TEST_DIR/Rans/Channel_Re_Tau_590_Wall_Function;   $GENE_EXE < generate.scr
 
   #-- seq, cgns(hdf5)
-  cd $GENE_DIR; make clean
-  make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS_HDF5=yes
+  clean_compile $GENE_DIR yes no no # dir CGNS_HDF5 MPI CGNS_ADF5
   cd $TEST_DIR/Laminar/Backstep_Orthogonal;             $GENE_EXE < generate.scr
   cd $TEST_DIR/Laminar/Backstep_Nonorthogonal;          $GENE_EXE < generate.scr
   cd $TEST_DIR/Rans/Backstep_Re_26000_Rsm;              $GENE_EXE < generate.scr
@@ -87,22 +109,19 @@ function convert_tests {
   cd $TEST_DIR/Rans/Fuel_Bundle;                       tar -zxvf subflow.neu.tgz
 
   #-- seq, no cgns
-  cd $CONV_DIR; make clean
-  make FORTRAN=$FCOMP DEBUG=$DEBUG
+  clean_compile $CONV_DIR no no yes # dir CGNS_HDF5 MPI CGNS_ADF5
   cd $TEST_DIR/Rans/Channel_Re_Tau_590;                  $CONV_EXE < convert.scr
   cd $TEST_DIR/Rans/Impinging_Jet_2d_Distant_Re_23000;   $CONV_EXE < convert.scr
   cd $TEST_DIR/Rans/Fuel_Bundle;                         $CONV_EXE < convert.scr
 
   #-- seq, cgns (adf5)
-  cd $CONV_DIR; make clean
-  make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS_ADF5=yes
+  clean_compile $CONV_DIR no no yes # dir CGNS_HDF5 MPI CGNS_ADF5
   cd $TEST_DIR/Rans/Channel_Re_Tau_590;                  $CONV_EXE < convert.scr
   cd $TEST_DIR/Rans/Impinging_Jet_2d_Distant_Re_23000;   $CONV_EXE < convert.scr
   cd $TEST_DIR/Rans/Fuel_Bundle;                         $CONV_EXE < convert.scr
 
   #-- seq, cgns (hdf5)
-  cd $CONV_DIR; make clean
-  make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS_HDF5=yes
+  clean_compile $CONV_DIR yes no no # dir CGNS_HDF5 MPI CGNS_ADF5
   cd $TEST_DIR/Rans/Channel_Re_Tau_590;                  $CONV_EXE < convert.scr
   cd $TEST_DIR/Rans/Impinging_Jet_2d_Distant_Re_23000;   $CONV_EXE < convert.scr
   cd $TEST_DIR/Rans/Fuel_Bundle;                         $CONV_EXE < convert.scr
@@ -112,8 +131,7 @@ function convert_tests {
 #------------------------------------------------------------------------------#
 function divide_tests {
   #-- seq
-  cd $DIVI_DIR; make clean
-  make FORTRAN=$FCOMP DEBUG=$DEBUG
+  clean_compile $DIVI_DIR no no no # dir CGNS_HDF5 MPI CGNS_ADF5
   cd $TEST_DIR/Laminar/Backstep_Orthogonal;               $DIVI_EXE < divide.scr
   cd $TEST_DIR/Laminar/Backstep_Nonorthogonal;            $DIVI_EXE < divide.scr
   cd $TEST_DIR/Rans/Backstep_Re_26000_Rsm;                $DIVI_EXE < divide.scr
@@ -124,7 +142,7 @@ function divide_tests {
   cd $TEST_DIR/Rans/Fuel_Bundle;                          $DIVI_EXE < divide.scr
 }
 #------------------------------------------------------------------------------#
-# backup test
+# processor: backup test
 #------------------------------------------------------------------------------#
 function backup_test {
   # $1 = CGNS_HDF5 = yes
@@ -134,8 +152,7 @@ function backup_test {
   # np=1, MPI=no, backup=no
   #----------------------------------#
   echo "np=1, MPI=no, backup=no"
-  cd $PROC_DIR; make clean
-  make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS_HDF5=$1 MPI=no
+  clean_compile $PROC_DIR $1 no no # dir CGNS_HDF5 MPI CGNS_ADF5
   cd $2;
   cp control control.backup
   line="$(grep -ni "NUMBER_OF_TIME_STEPS"       control | cut -d: -f1)"
@@ -153,8 +170,7 @@ function backup_test {
   # np=1, MPI=yes, backup=(from np=1)
   #----------------------------------#
   echo "np=1, MPI=yes, backup=(from np=1)"
-  cd $PROC_DIR; make clean
-  make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS_HDF5=$1 MPI=yes
+  clean_compile $PROC_DIR $1 yes no # dir CGNS_HDF5 MPI CGNS_ADF5
   cd $2;
   mpirun -np 1 $PROC_EXE
   #----------------------------------#
@@ -186,8 +202,7 @@ function backup_test {
   # np=1, MPI=no, backup=(from np=2)
   #----------------------------------#
   echo "np=1, MPI=yes, backup=(from np=2)"
-  cd $PROC_DIR; make clean
-  make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS_HDF5=$1 MPI=no
+  clean_compile $PROC_DIR $1 no no # dir CGNS_HDF5 MPI CGNS_ADF5
   cd $2;
   $PROC_EXE
 
@@ -195,18 +210,72 @@ function backup_test {
   rm control.backup .control.tmp
 }
 #------------------------------------------------------------------------------#
-# backup tests
+# processor: save_now / exit_now test
+#------------------------------------------------------------------------------#
+function save_exit_now_test {
+  # $1 = CGNS_HDF5 = yes
+  # $2 = test_dir
+
+  #---------------#
+  # np=1, MPI=no
+  #---------------#
+  echo "np=1, MPI=no"
+  clean_compile $PROC_DIR $1 no no # dir CGNS_HDF5 MPI CGNS_ADF5
+  cd $2;
+  echo  save_now
+  touch save_now
+  if $PROC_EXE | grep -q "chan-ts000001"; then # exit if match is found
+    echo  exit_now
+    touch exit_now
+    $PROC_EXE | grep -q "# Exiting !"
+    echo save_exit_now_test was successfull
+  fi
+  #---------------#
+  # np=1, MPI=yes
+  #---------------#
+  echo "np=1, MPI=yes"
+  clean_compile $PROC_DIR $1 yes no # dir CGNS_HDF5 MPI CGNS_ADF5
+  cd $2;
+  echo  save_now
+  touch save_now
+  if mpirun -np 1 $PROC_EXE | grep -q "chan-ts000001"; then
+    echo  exit_now
+    touch exit_now
+    mpirun -np 1 $PROC_EXE | grep -q "# Exiting !"
+    echo save_exit_now_test was successfull
+  fi
+  #---------------#
+  # np=2, MPI=yes
+  #---------------#
+  nproc_in_div=$(tail -n2  divide.scr | head -n1)
+  echo $nproc_in_div
+  echo "np=2, MPI=yes"
+  echo  save_now
+  touch save_now
+  if mpirun -np $nproc_in_div $PROC_EXE | grep -q "chan-ts000001"; then
+    echo  exit_now
+    touch exit_now
+    mpirun -np $nproc_in_div $PROC_EXE | grep -q "# Exiting !"
+    echo save_exit_now_test was successfull
+  fi
+}
+#------------------------------------------------------------------------------#
+# processor tests
 #------------------------------------------------------------------------------#
 function processor_tests {
+#-- backup tests
   #-- Backstep_Orthogonal
   backup_test no  $TEST_DIR/Laminar/Backstep_Orthogonal
   backup_test yes $TEST_DIR/Laminar/Backstep_Orthogonal
   #-- Channel_Re_Tau_590
   backup_test no  $TEST_DIR/Rans/Channel_Re_Tau_590
   backup_test yes $TEST_DIR/Rans/Channel_Re_Tau_590
-  #-- Fuel_Bundle
+  ##-- Fuel_Bundle
   #backup_test no  $TEST_DIR/Rans/Fuel_Bundle
   #backup_test yes $TEST_DIR/Rans/Fuel_Bundle
+#-- save_now/exit_now tests
+  save_exit_now_test no  $TEST_DIR/Rans/Channel_Re_Tau_590
+  save_exit_now_test yes $TEST_DIR/Rans/Channel_Re_Tau_590
 
 }
 #------------------------------------------------------------------------------#
