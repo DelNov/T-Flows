@@ -43,6 +43,10 @@
   character(len=80) :: coupling    ! pressure velocity coupling
 !==============================================================================!
 
+PRINT '(i2)', .true.
+PRINT '(i2)', .false.
+STOP
+
   ! Get starting time
   call cpu_time(wall_time_start)
   time =  0.
