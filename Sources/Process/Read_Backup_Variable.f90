@@ -33,12 +33,13 @@
       if(this_proc < 2) print *, '# Reading variable: ', trim(vn)
       call Comm_Mod_Read_Cell_Real(fh, var1 % n(1:nc_s),   disp_loop)
       call Comm_Mod_Read_Bnd_Real (fh, var1 % n(-nb_s:-1), disp_loop)
-      call Comm_Mod_Read_Cell_Real(fh, var1 % o  (1:nc_s), disp)
-      call Comm_Mod_Read_Cell_Real(fh, var1 % a  (1:nc_s), disp)
-      call Comm_Mod_Read_Cell_Real(fh, var1 % a_o(1:nc_s), disp)
-      call Comm_Mod_Read_Cell_Real(fh, var1 % c  (1:nc_s), disp)
-      call Comm_Mod_Read_Cell_Real(fh, var1 % c_o(1:nc_s), disp)
-      call Comm_Mod_Read_Cell_Real(fh, var1 % d_o(1:nc_s), disp)
+      call Comm_Mod_Read_Bnd_Real (fh, var1 % q(-nb_s:-1), disp_loop)
+      call Comm_Mod_Read_Cell_Real(fh, var1 % o  (1:nc_s), disp_loop)
+      call Comm_Mod_Read_Cell_Real(fh, var1 % a  (1:nc_s), disp_loop)
+      call Comm_Mod_Read_Cell_Real(fh, var1 % a_o(1:nc_s), disp_loop)
+      call Comm_Mod_Read_Cell_Real(fh, var1 % c  (1:nc_s), disp_loop)
+      call Comm_Mod_Read_Cell_Real(fh, var1 % c_o(1:nc_s), disp_loop)
+      call Comm_Mod_Read_Cell_Real(fh, var1 % d_o(1:nc_s), disp_loop)
       disp = disp_loop
       return
 
