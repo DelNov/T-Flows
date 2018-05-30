@@ -3,7 +3,7 @@
 # it is an useful script in debug perposus to automatically build and run most 
 # cases in T-Flows
 
-# put your clean_compilers here
+# put your compilers here
 FCOMP="gnu"; # or ifort/gfortran/mpif90/mpifort/mpiifort
 DEBUG="yes"; # run tests in debug mode
 
