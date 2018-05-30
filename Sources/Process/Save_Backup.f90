@@ -55,6 +55,14 @@
   ! Number of processors
   call Write_Backup_Int(fh, d, 'n_proc', n_proc)
 
+  ! Bulk flows and pressure drops in each direction
+  call Write_Backup_Real(fh, d, 'bulk_flux_x',   bulk(1) % flux_x)
+  call Write_Backup_Real(fh, d, 'bulk_flux_y',   bulk(1) % flux_y)
+  call Write_Backup_Real(fh, d, 'bulk_flux_z',   bulk(1) % flux_z)
+  call Write_Backup_Real(fh, d, 'bulk_p_drop_x', bulk(1) % p_drop_x)
+  call Write_Backup_Real(fh, d, 'bulk_p_drop_y', bulk(1) % p_drop_y)
+  call Write_Backup_Real(fh, d, 'bulk_p_drop_z', bulk(1) % p_drop_z)
+
   !--------------!
   !   Velocity   !
   !--------------!

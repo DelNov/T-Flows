@@ -58,6 +58,14 @@
   ! Time step
   call Read_Backup_Int(fh, d, 'time_step', time_step)
 
+  ! Bulk flows and pressure drops in each direction
+  call Read_Backup_Real(fh, d, 'bulk_flux_x',   bulk(1) % flux_x)
+  call Read_Backup_Real(fh, d, 'bulk_flux_y',   bulk(1) % flux_y)
+  call Read_Backup_Real(fh, d, 'bulk_flux_z',   bulk(1) % flux_z)
+  call Read_Backup_Real(fh, d, 'bulk_p_drop_x', bulk(1) % p_drop_x)
+  call Read_Backup_Real(fh, d, 'bulk_p_drop_y', bulk(1) % p_drop_y)
+  call Read_Backup_Real(fh, d, 'bulk_p_drop_z', bulk(1) % p_drop_z)
+
   !--------------!
   !   Velocity   !
   !--------------!
