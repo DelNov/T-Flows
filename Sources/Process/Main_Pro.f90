@@ -461,13 +461,17 @@
     call User_Mod_End_Of_Time_Step(grid, n, time)
 
     if(save_now) then
-      open (9, file='save_now', status='old')
-      close(9, status='delete')
+      if(this_proc < 2) then
+        open (9, file='save_now', status='old')
+        close(9, status='delete')
+      end if
     end if
 
     if(exit_now) then
-      open (9, file='exit_now', status='old')
-      close(9, status='delete')
+      if(this_proc < 2) then
+        open (9, file='exit_now', status='old')
+        close(9, status='delete')
+      end if
       goto 2
     end if
 
