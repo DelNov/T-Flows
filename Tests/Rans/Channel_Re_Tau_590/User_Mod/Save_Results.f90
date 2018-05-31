@@ -31,7 +31,7 @@
                          ind(:),                    & 
                          wall_p(:), u_tau_p(:)
   integer,allocatable :: n_p(:), n_count(:)
-  real                :: l_scale, t_wall, t_tau, d_wall, nu_max, u_tau_max
+  real                :: length_scale, t_wall, t_tau, d_wall, nu_max, u_tau_max
   logical             :: there
 !==============================================================================!
 
@@ -66,7 +66,6 @@
     return
   end if
 
-  if(this_proc < 2)  write(6, *) '# Now reading the file:', coord_name
   open(9, file=coord_name)
 
   ! Write the number of searching intervals 
@@ -109,21 +108,21 @@
     allocate(wt_p(n_prob));  wt_p = 0.0
   end if  
 
-  l_scale = 0.0
+  length_scale = 0.0
 
   !-------------------------!
   !   Average the results   !
   !-------------------------!
   do i = 1, n_prob-1
     do c=1, grid % n_cells
-      l_scale = max(l_scale, grid % wall_dist(c))
-      if(grid % yc(c) > (z_p(i)) .and.  &
-         grid % yc(c) < (z_p(i+1))) then
-        if(ROT == YES) then
-          wall_p(i) = wall_p(i) + grid % yc(c) 
-        else
+      length_scale = max(length_scale, grid % wall_dist(c))
+      if(grid % zc(c) > (z_p(i)) .and.  &
+         grid % zc(c) < (z_p(i+1))) then
+!        if(ROT == YES) then
+!          wall_p(i) = wall_p(i) + grid % yc(c) 
+!        else
           wall_p(i) = wall_p(i) + grid % wall_dist(c) 
-        end if 
+!        end if 
         if(turbulence_model == LES      .or.  &
            turbulence_model == DNS      .or.  &
            turbulence_model == HYBRID_K_EPS_ZETA_F .or.  &
@@ -272,7 +271,7 @@
 
     call Comm_Mod_Wait
 
-    if(Qflux> 0.0) then
+    if(heat_flux> 0.0) then
       call Comm_Mod_Global_Min_Real(t_inf)
     else
       call Comm_Mod_Global_Max_Real(t_inf)
@@ -374,7 +373,7 @@
   do i = 1, n_prob
     u_tau_max = max(u_tau_p(i), u_tau_max)
   end do
-  t_tau = Qflux / (density * capacity * u_tau_max)
+  t_tau = heat_flux / (density * capacity * u_tau_max)
 
   if(u_tau_max == 0.0) then
     if(this_proc < 2) then
@@ -389,8 +388,8 @@
   do i = 3, 4
   write(i,'(A1,2(A8,F12.5, 3X))') '#', 'Utau = ', &
   u_tau_max, 'Re_tau = ', u_tau_max/viscosity
-  if(heat_transfer == YES) write(i,'(A1,3(A10, F10.5, 2X))') '#', 'Qflux = ', abs(Qflux), &
-  'K+ = q/Uf =', abs(Qflux)/u_tau_max*(viscosity/conductivity)**ONE_THIRD,'Nu max = ', &
+  if(heat_transfer == YES) write(i,'(A1,3(A10, F10.5, 2X))') '#', 'heat_flux = ', abs(heat_flux), &
+  'K+ = q/Uf =', abs(heat_flux)/u_tau_max*(viscosity/conductivity)**ONE_THIRD,'Nu max = ', &
   nu_max
   if(turbulence_model == DNS                 .or.  &
      turbulence_model == LES                 .or.  &
@@ -632,6 +631,8 @@
     deallocate(vt_p)
     deallocate(wt_p)
   end if
+
+  if(this_proc < 2)  write(6, *) '# Finished with User_Mod_Save_Results.f90.'
 
   ! Restore the name
   problem_name = store_name
