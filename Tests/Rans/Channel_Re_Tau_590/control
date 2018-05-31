@@ -1,11 +1,11 @@
  PROBLEM_NAME    chan
  PROBLEM_TYPE    channel
  HEAT_TRANSFER    yes
- NUMBER_OF_TIME_STEPS 4000
+ NUMBER_OF_TIME_STEPS 2100
  RESULTS_SAVE_INTERVAL    500
  BACKUP_SAVE_INTERVAL 100
  STARTING_TIME_STEP_FOR_STATISTICS    2000000
-#LOAD_BACKUP_NAME   chan-ts000001.backup
+# LOAD_BACKUP_NAME   chan-ts002000.backup
 
 #-------------------
 # Monitoring points 
@@ -29,8 +29,8 @@
  DYNAMIC_VISCOSITY      1.0e-4
  HEAT_CAPACITY          1.0
 
- TURBULENCE_MODEL       k_eps
- #TURBULENCE_MODEL       k_eps_zeta_f
+# TURBULENCE_MODEL       k_eps
+ TURBULENCE_MODEL       k_eps_zeta_f
 
 #----------------------
 # Numerical parameters
