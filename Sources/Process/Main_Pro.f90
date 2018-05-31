@@ -482,6 +482,9 @@
     close(9)
   end if
 
+  ! Write results in user-customized format
+  call User_Mod_Save_Results(grid, name_save)
+
 2 if(this_proc  < 2) print *, '# Exiting !'
 
   ! Close monitoring files
