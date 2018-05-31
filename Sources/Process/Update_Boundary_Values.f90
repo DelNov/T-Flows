@@ -164,37 +164,28 @@
                        / (y_pl * pr * exp(-1.0 * ebf)  &
                        + (u_plus + beta) * pr_t * exp(-1.0 / ebf) + TINY)
           if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
-            t % n(c2) = t % n(c1) + pr_t / capacity  &
-                      * (  qx * grid % dx(s)         &
-                         + qy * grid % dy(s)         &
-                         + qz * grid % dz(s))        &
-                      / con_wall(c1)
+            t % n(c2) = t % n(c1) + t % q(c2)       &
+                         / (con_wall(c1) * capacity)
             heat_flux = heat_flux + t % q(c2) * s_tot
             if(abs(t % q(c2)) > TINY) heated_area = heated_area + s_tot
           else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) then
-            t % q(c2) = ( t % n(c2) - t % n(c1) ) * con_t  &
-                      / (  nx * grid % dx(s)               &
-                         + ny * grid % dy(s)               &
-                         + nz * grid % dz(s) )
-            heat_flux = heat_flux + t % q(c2)
+            t % q(c2) = ( t % n(c2) - t % n(c1) ) * con_wall(c1)  &
+                      / grid % wall_dist(c1)  
+            heat_flux = heat_flux + t % q(c2) * s_tot
             if(abs(t % q(c2)) > TINY) heated_area = heated_area + s_tot
           end if
 
         ! Wall temperature or heat fluxes for other trubulence models
         else
           if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
-            t % n(c2) = t % n(c1) + pr_t / (con_t + TINY)   &
-                      * (  qx * grid % dx(s)                &
-                         + qy * grid % dy(s)                &
-                         + qz * grid % dz(s) )
+            t % n(c2) = t % n(c1) + t % q(c2)                &
+                       /(conductivity * capacity)
             heat_flux = heat_flux + t % q(c2) * s_tot
             if(abs(t % q(c2)) > TINY) heated_area = heated_area + s_tot
           else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) then
             t % q(c2) = ( t % n(c2) - t % n(c1) ) * con_t  &
-                      / (  nx * grid % dx(s)               &
-                         + ny * grid % dy(s)               &
-                         + nz * grid % dz(s) )
-            heat_flux = heat_flux + t % q(c2)
+                      / grid % wall_dist(c1)
+            heat_flux = heat_flux + t % q(c2) * s_tot
             if(abs(t % q(c2)) > TINY) heated_area = heated_area + s_tot
           end if
         end if
