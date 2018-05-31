@@ -109,14 +109,14 @@
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW .or.  &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT .or.  &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE) then
+          uu  % n(c2) = uu  % n(c1)
+          vv  % n(c2) = vv  % n(c1)
+          ww  % n(c2) = ww  % n(c1)
+          uv  % n(c2) = uv  % n(c1)
+          uw  % n(c2) = uw  % n(c1)
+          vw  % n(c2) = vw  % n(c1)
           kin % n(c2) = kin % n(c1)
           eps % n(c2) = eps % n(c1)
-          uu % n(c2) = uu % n(c1)
-          vv % n(c2) = vv % n(c1)
-          ww % n(c2) = ww % n(c1)
-          uv % n(c2) = uv % n(c1)
-          uw % n(c2) = uw % n(c1)
-          vw % n(c2) = vw % n(c1)
           if(turbulence_model .eq. REYNOLDS_STRESS) f22 % n(c2) = f22 % n(c1)
         end if
       end if
