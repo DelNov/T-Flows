@@ -119,6 +119,29 @@
     call Write_Backup_Cell_Bnd(fh, d, 'l_scale',  l_scale(-nb_s:nc_s))
   end if 
 
+  if(turbulence_model .eq. REYNOLDS_STRESS .or.  &                          
+     turbulence_model .eq. HANJALIC_JAKIRLIC) then                          
+
+    ! Reynolds stresses
+    call Write_Backup_Variable(fh, d, 'uu',  uu)
+    call Write_Backup_Variable(fh, d, 'vv',  vv)
+    call Write_Backup_Variable(fh, d, 'ww',  ww)
+    call Write_Backup_Variable(fh, d, 'uv',  uv)
+    call Write_Backup_Variable(fh, d, 'uw',  uw)
+    call Write_Backup_Variable(fh, d, 'vw',  vw)
+
+    ! K and epsilon
+    call Write_Backup_Variable(fh, d, 'kin', kin)
+    call Write_Backup_Variable(fh, d, 'eps', eps)
+
+    ! F22
+    if(turbulence_model .eq. HANJALIC_JAKIRLIC) then
+      call Write_Backup_Variable(fh, d, 'f22',  f22)
+    end if
+
+    ! Other turbulent quantities ?
+  end if 
+
   ! Close backup file
   call Comm_Mod_Close_File(fh)
 
