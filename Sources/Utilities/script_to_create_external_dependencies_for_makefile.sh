@@ -8,6 +8,8 @@
 # Therefore, you need to type "make clean; make ..." everytime you make changes
 # It is allowed to specify such dependencies yourself.
 # This script does it for you.
+#
+# known weak spots: 's%Turbulence/%%g'
 
 # folder structure
 TEST_DIR=$PWD                      # Sources/Utilities
@@ -40,18 +42,19 @@ function module_list() {
   # $1 - dir
 
   cd $1
-  # find file |
-  # with _Mod |
-  # remove ^./ |
-  # not ^. |
-  # turn _Mod.f90$ to _Mod |
-  # turn /abc/ to #/ |
-  # turn /#abc.f90$ to #/.f90 |
-  # turn /abc.f90$ to /*.f90 |
-  # turn # to /* |
-  # turn Mod.f90 to Mod.o |
-  # turn _Mod$ to _Mod.f90 |
+  # find file
+  # with _Mod
+  # remove ^./
+  # not ^.
+  # turn _Mod.f90$ to _Mod
+  # turn /abc/ to #/
+  # turn /#abc.f90$ to #/.f90
+  # turn /abc.f90$ to /*.f90
+  # turn # to /*
+  # turn Mod.f90 to Mod.o
+  # turn _Mod$ to _Mod.f90
   # sort reverse unique
+  # delete empty line
   local result=$(find . -type f -print \
                | grep -i '_Mod' \
                | sed  -e 's%^\.\/%%' \
@@ -62,7 +65,8 @@ function module_list() {
                | sed  -e 's%\#/.*f90$%#/*.f90%g' \
                | sed  -e 's%/.*.f90$%/*.f90%g' \
                | sed  -e 's%\#%/*%g' \
-               | sort -ur)
+               | sort -ur \
+               | sed '/^\s*$/d')
 
   echo "$result"
 }
@@ -119,57 +123,66 @@ function make_file_explicit_dependencies() {
       # dependencies of modules with "module_name/subroutines.f90" structure
       #---------------------------------------------------------------------
       mod_included_this=$(grep -ie "include " $f90_file \
-           | grep -v "^!" \
+           | cut -d"!" -f1 \
            | sed "s%'%%g" \
            | sed 's%"%%g' \
            | grep -viI '.h"$\|.h$' \
            | tr -s ' ' \
            | cut -d' ' -f3- \
-           | sort -ur)
-      # with include |
-      # not ^! |
-      # remove ' |
-      # remove " |
-      # not .h" or .h' |
+           | sort -ur \
+           | sed '/^\s*$/d')
+      # with include
+      # ignore commented
+      # remove '
+      # remove "
+      # not .h" or .h'
       # unite delimiter
       # print from 3rd column
       # unique
+      # delete empty line
+
 
       if [ ! -z "$mod_included_this" ]; then
         while read -r mod_included_this_line; do # line of mod_included_this
           dependencies=$(echo -e "$dependencies\n$(\
               grep -ie "use .*Mod" $mod_included_this_line \
-            | grep -v "^!" \
+            | cut -d"!" -f1 \
             | sed 's/\,.*$//' \
             | tr -s ' ' \
             | cut -d' ' -f3 \
-            | sort -ur)")
-          # with use and Mod |
-          # not ^! |
-          # remove anything after , |
+            | sort -ur \
+            | sed '/^\s*$/d')")
+          # with use and Mod
+          # ignore commented
+          # remove anything after ,
           # unite delimiter
           # print 3rd column
           # unique
+          # delete empty line
+
         done <<< "$mod_included_this"
       fi
       #------------------------------------------
       # dependencies of functions and subroutines
       #------------------------------------------
       file_included_this=$(grep -ie "use .*Mod" $f90_file \
-        | grep -v "^!" \
+        | cut -d"!" -f1 \
         | sed 's/\,.*$//' \
         | sed 's%\/.*$%%' \
         | sed "s%'%%g" \
         | tr -s ' ' \
         | cut -d' ' -f3 \
-        | sort -ur)
-        # with use and Mod |
-        # not ^! |
-        # remove anything after , |
-        # remove anything after / |
+        | sort -ur \
+        | sed '/^\s*$/d')
+        # with use and Mod
+        # ignore commented
+        # remove anything after ,
+        # remove anything after /
         # unite delimiter
         # print 3rd column
         # unique
+        # delete empty line
+
 
       if [ ! -z "$file_included_this" ]; then #if non-empty
         if [ ! -z "$dependencies" ]; then #if non-empty
@@ -180,7 +193,8 @@ function make_file_explicit_dependencies() {
       fi
 
       if [ ! -z "$dependencies" ]; then
-        dependencies=$(echo "$dependencies" | sort -ur)
+        dependencies=$(echo "$dependencies" | sort -ur \
+        | sed '/^\s*$/d')
         #echo -e "$(basename -- "${f90_file%.*}")"" depends on\n""$dependencies"
       fi
 
