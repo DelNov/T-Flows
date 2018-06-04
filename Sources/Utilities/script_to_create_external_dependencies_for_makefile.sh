@@ -1,28 +1,25 @@
 #!/bin/bash
 
-# it is an useful script in debug perposus to automatically build and run most 
-# cases in T-Flows
-
-# put your compilers here
-FCOMP="gnu"; # or ifort/gfortran/mpif90/mpifort/mpiifort
-DEBUG="yes"; # run tests in debug mode
+# it is an useful script to create "makefile_explicit_dependencies"
+# reason why you may wnat to use this:
+# when you edit some file in Sources/, all dependent functions/subroutines must
+# be updated to link program later.
+# program make by default does not track dependencies.
+# Therefore, you need to type "make clean; make ..." everytime you make changes
+# It is allowed to specify such dependencies yourself.
+# This script does it for you.
 
 # folder structure
-TEST_DIR=$PWD                      # dir with tests
-GENE_DIR=$PWD/../Generate  # Generate src folder
-CONV_DIR=$PWD/../Convert   # Convert  src folder
-DIVI_DIR=$PWD/../Divide    # Divide   src folder
-PROC_DIR=$PWD/../Process   # Process  src folder
-SHAR_DIR=$PWD/../Shared   # Process  src folder
-BINA_DIR=$PWD/../../Binaries/         # binaries folder
+TEST_DIR=$PWD                      # Sources/Utilities
+GENE_DIR=$PWD/../Generate          # Generate src folder
+CONV_DIR=$PWD/../Convert           # Convert  src folder
+DIVI_DIR=$PWD/../Divide            # Divide   src folder
+PROC_DIR=$PWD/../Process           # Process  src folder
+SHAR_DIR=$PWD/../Shared            # Process  src folder
+BINA_DIR=$PWD/../../Binaries/      # binaries folder
 
-# executables
-GENE_EXE=$BINA_DIR/Generate        # Generate ex
-CONV_EXE=$BINA_DIR/Convert         # Convert  ex
-DIVI_EXE=$BINA_DIR/Divide          # Divide   ex
-PROC_EXE=$BINA_DIR/Process         # Process  ex
-
-cd $PROC_DIR; cp /dev/null  tmp
+# tmp file name and location
+tmp_file=$BINA_DIR/tmp
 
 #-------------------------------------------------#
 #---------   READ ABOVE UP TO THIS ROW   ---------#
@@ -59,14 +56,14 @@ function module_list() {
                | grep -i '_Mod' \
                | sed  -e 's%^\.\/%%' \
                | grep -v '^\.' \
-               | sed  -e 's%_Mod.f90$%_Mod%g' \
+               | sed  -e 's%Turbulence/%%g' \
+               | sed  -e 's%_Mod.f90$%_Mod.o%g' \
                | sed  -e 's%/.*/%#/%g' \
                | sed  -e 's%\#/.*f90$%#/*.f90%g' \
                | sed  -e 's%/.*.f90$%/*.f90%g' \
                | sed  -e 's%\#%/*%g' \
-               | sed  -e 's%_Mod.f90%_Mod.o%g' \
-               | sed -e 's%_Mod$%_Mod.o%g' \
                | sort -ur)
+
   echo "$result"
 }
 
@@ -75,15 +72,15 @@ function module_list() {
 #------------------------------------------------------------------------------#
 function search_string_in_list() {
   # $1 - string
-  # $2 - line_of_list
+  # $2 - list
   # $3 - text to append in front
 
   while read -r line_of_list; do # read $2 line by line
-    if [[ $line_of_list == *"$1"* ]]; then # string 1 contain string 2
-      if [[ $line_of_list == *"\*"* ]]; then
-        echo "$line_of_list" \\
-      else
+    if [[ $line_of_list == *"$1"* ]]; then # if string 1 contains string 2
+      if [[ $line_of_list == *"/*"* ]]; then
         echo "$3""$line_of_list" \\
+      elif [ "${line_of_list:(-5)}" == "Mod.o" ]; then
+        echo "\$(DIR_OBJECT)/""$line_of_list" \\
       fi
     fi
   done <<< "$2"
@@ -91,78 +88,148 @@ function search_string_in_list() {
 #------------------------------------------------------------------------------#
 # make file explicit dependencies constructor
 #------------------------------------------------------------------------------#
-function make_file_explicit_dependencies_constructor() {
+function make_file_explicit_dependencies() {
+  # $1 - folder to create makefile list (Generate, Divide, Process, ..)
+
+  # create empty file or remove all content
+  cd $1; cp /dev/null $tmp_file
 
   #--------------------
   # search for Modules
   #--------------------
 
-  proc_mods=$(module_list $PROC_DIR)
-  echo "$proc_mods"
+  proc_mods=$(module_list $1)
+  #echo -e "$proc_mods"
 
   shared_mods=$(module_list $SHAR_DIR)
-  echo "$shared_mods"
-#  sleep 10
+  #echo -e "$shared_mods"
 
-  cd $PROC_DIR
-  for f90_file in $(find . -print | grep -i .f90); do
-  # with _Mod and use |
-  # not ^! |
-  # remove ,* |
-  # usite delimiter
-  # print 3 column
-    echo '#-- '$f90_file >> tmp
+  for folder in "$1" "$SHAR_DIR"; do
+    cd "$folder"
 
-    deps=$(grep -ie "use .*Mod" $f90_file \
-         | grep -v "^!" \
-         | sed 's/\,.*$//' \
-         | tr -s ' ' \
-         | cut -d' ' -f3)
+    for f90_file in $(find . -print | grep -i .f90); do
 
-    if [ ! -z "$deps" ]; then #if non-empty
+      #---------------------------
+      # determine deps of f90 file
+      #---------------------------
 
-      echo "\$(DIR_OBJECT)/"$(basename -- "${f90_file%.*}").o: \\>> tmp
+      dependencies='' # all deps for $f90_file are store in this var
 
-      while read -r line; do # line of current.f90
+      #---------------------------------------------------------------------
+      # dependencies of modules with "module_name/subroutines.f90" structure
+      #---------------------------------------------------------------------
+      mod_included_this=$(grep -ie "include " $f90_file \
+           | grep -v "^!" \
+           | sed "s%'%%g" \
+           | sed 's%"%%g' \
+           | grep -viI '.h"$\|.h$' \
+           | tr -s ' ' \
+           | cut -d' ' -f3- \
+           | sort -ur)
+      # with include |
+      # not ^! |
+      # remove ' |
+      # remove " |
+      # not .h" or .h' |
+      # unite delimiter
+      # print from 3rd column
+      # unique
 
-        #--------------------
-        res=$(search_string_in_list "$line" "$proc_mods" "\$(DIR_OBJECT)/")
-        if [ ! -z "$res" ]; then echo "$res" >> tmp; fi
+      if [ ! -z "$mod_included_this" ]; then
+        while read -r mod_included_this_line; do # line of mod_included_this
+          dependencies=$(echo -e "$dependencies\n$(\
+              grep -ie "use .*Mod" $mod_included_this_line \
+            | grep -v "^!" \
+            | sed 's/\,.*$//' \
+            | tr -s ' ' \
+            | cut -d' ' -f3 \
+            | sort -ur)")
+          # with use and Mod |
+          # not ^! |
+          # remove anything after , |
+          # unite delimiter
+          # print 3rd column
+          # unique
+        done <<< "$mod_included_this"
+      fi
+      #------------------------------------------
+      # dependencies of functions and subroutines
+      #------------------------------------------
+      file_included_this=$(grep -ie "use .*Mod" $f90_file \
+        | grep -v "^!" \
+        | sed 's/\,.*$//' \
+        | sed 's%\/.*$%%' \
+        | sed "s%'%%g" \
+        | tr -s ' ' \
+        | cut -d' ' -f3 \
+        | sort -ur)
+        # with use and Mod |
+        # not ^! |
+        # remove anything after , |
+        # remove anything after / |
+        # unite delimiter
+        # print 3rd column
+        # unique
 
-        #--------------------
-        res=$(search_string_in_list "$line" "$shared_mods" "\$(DIR_SHARED)/")
-        if [ ! -z "$res" ]; then echo "$res" >> tmp; fi
+      if [ ! -z "$file_included_this" ]; then #if non-empty
+        if [ ! -z "$dependencies" ]; then #if non-empty
+          dependencies=$(echo -e "$dependencies\n$file_included_this")
+        else
+          dependencies="$file_included_this"
+        fi
+      fi
 
-      done <<< "$deps"
-      sed -i '$ s/.$//' tmp
-      echo '' >> tmp
+      if [ ! -z "$dependencies" ]; then
+        dependencies=$(echo "$dependencies" | sort -ur)
+        #echo -e "$(basename -- "${f90_file%.*}")"" depends on\n""$dependencies"
+      fi
 
-     fi
-  done #for
+      #-------------------------------------------------
+      # search for deps in list proc_mods and shar_mods
+      # if found : add them to $tmp_file
+      #-------------------------------------------------
+      echo '#-- '$f90_file >> $tmp_file
+
+      if [ ! -z "$dependencies" ]; then #if non-empty
+
+        echo "\$(DIR_OBJECT)/"$(basename -- "${f90_file%.*}").o:\\ >> $tmp_file
+
+        while read -r line_of_deps_list; do # line of current.f90
+
+          # $1 deps
+          dep_list=$(search_string_in_list \
+            "$line_of_deps_list" "$proc_mods" "")
+          if [ ! -z "$dep_list" ]; then
+            echo "$dep_list" >> $tmp_file
+          fi
+
+          # Shared deps
+          dep_list=$(search_string_in_list \
+            "$line_of_deps_list" "$shared_mods" "\$(DIR_SHARED)/")
+          if [ ! -z "$dep_list" ]; then
+            echo "$dep_list" >> $tmp_file
+          fi
+
+        done <<< "$dependencies"
+        sed -i '$ s/.$//' $tmp_file
+        echo '' >> $tmp_file
+
+       fi
+    done #for f90_file
+
+  done #for folder
+
+  cd $1; mv $tmp_file makefile_explicit_dependencies
 }
-
-make_file_explicit_dependencies_constructor
-mv tmp makefile_explicit_dependencies
-
-
-#    res=''
-#    if [ ! -z "$deps" ]; then #if non-empty
-#
-#      res=$(echo "\$(DIR_OBJECT)/"$(basename -- "${f90_file%.*}").o: \\)
-#
-#      while read -r line; do # line of current.f90
-#
-#        #--------------------
-#        res=$res$(search_str_in_list "$line" "$proc_mods" "\$(DIR_OBJECT)/")
-#        if [ ! -z "$res" ]; then echo "$res"; fi
-#
-#        #--------------------
-#        res=$res$(search_str_in_list "$line" "$shared_mods" "\$(DIR_SHARED)/")
-#        if [ ! -z "$res" ]; then echo "$res"; fi
-#
-#      done <<< "$deps"
-#      echo "$res"
-#      echo '----------------'
-#
-#     fi
-#  done #for
+#------------------------------------------------------------------------------#
+# actual script
+#------------------------------------------------------------------------------#
+echo creating makefile_explicit_dependencies in Generete
+make_file_explicit_dependencies $GENE_DIR
+echo creating makefile_explicit_dependencies in Convert
+make_file_explicit_dependencies $CONV_DIR
+echo creating makefile_explicit_dependencies in Divide
+make_file_explicit_dependencies $DIVI_DIR
+echo creating makefile_explicit_dependencies in Processor
+make_file_explicit_dependencies $PROC_DIR
+echo done
