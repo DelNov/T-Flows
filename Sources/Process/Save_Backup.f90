@@ -130,8 +130,7 @@
     call Write_Backup_Variable(fh, d, 'uw',  uw)
     call Write_Backup_Variable(fh, d, 'vw',  vw)
 
-    ! K and epsilon
-    call Write_Backup_Variable(fh, d, 'kin', kin)
+    ! Epsilon
     call Write_Backup_Variable(fh, d, 'eps', eps)
 
     ! F22
