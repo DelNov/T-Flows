@@ -92,8 +92,7 @@
   !   Turbulence models   !
   !-----------------------!
   if(turbulence_model .eq. K_EPS    .or.  &
-     turbulence_model .eq. K_EPS_ZETA_F     .or.  &
-     turbulence_model .eq. HYBRID_K_EPS_ZETA_F) then
+     turbulence_model .eq. K_EPS_ZETA_F) then
 
     ! K and epsilon
     call Write_Backup_Variable(fh, d, 'kin', kin)
@@ -107,8 +106,7 @@
     call Write_Backup_Cell    (fh, d, 'tau_wall', tau_wall  (1:nc_s))
   end if
 
-  if(turbulence_model .eq. K_EPS_ZETA_F     .or.  &
-     turbulence_model .eq. HYBRID_K_EPS_ZETA_F) then
+  if(turbulence_model .eq. K_EPS_ZETA_F) then
 
     ! Zeta and f22
     call Write_Backup_Variable(fh, d, 'zeta', zeta)
@@ -148,10 +146,3 @@
 
   end subroutine
 
-!TEST  ! Test face buffers
-!TEST  do s = 1, grid % n_faces
-!TEST    flux(s) = 1000000.0 * grid % xf(s) +  &
-!TEST                 1000.0 * grid % yf(s) +  &
-!TEST                    1.0 * grid % zf(s)
-!TEST    print '(a6,i4.4,a4,f18.3)', ' flux(', s, ') = ', flux(s)
-!TEST  end do

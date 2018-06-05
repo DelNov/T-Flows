@@ -95,9 +95,8 @@
   !-----------------------!
   !   Turbulence models   !
   !-----------------------!
-  if(turbulence_model == K_EPS    .or.  &
-     turbulence_model == K_EPS_ZETA_F     .or.  &
-     turbulence_model == HYBRID_K_EPS_ZETA_F) then
+  if(turbulence_model == K_EPS .or.  &
+     turbulence_model == K_EPS_ZETA_F) then
 
     ! K and epsilon
     call Read_Backup_Variable(fh, d, 'kin', kin)
@@ -111,8 +110,7 @@
     call Read_Backup_Cell    (fh, d, 'tau_wall', tau_wall  (1:nc_s)  )
   end if
 
-  if(turbulence_model == K_EPS_ZETA_F     .or.  &
-     turbulence_model == HYBRID_K_EPS_ZETA_F) then
+  if(turbulence_model == K_EPS_ZETA_F) then
 
     ! Zeta and f22
     call Read_Backup_Variable(fh, d, 'zeta', zeta)
@@ -149,11 +147,4 @@
   call Comm_Mod_Close_File(fh)
 
   end subroutine
-
-!TEST  do s = 1, nf_s
-!TEST    print '(a6,i4.4,a4,f18.3)', ' flux(', face_map(s)+1, ') = ', flux(s)
-!TEST  end do
-!TEST  do s = 1, nbf_s
-!TEST    print '(a6,i4.4,a4,f18.3)', ' flux(', buf_face_map(buf_face_ord(s))+1, ') = ', flux(nf_s+s)
-!TEST  end do
 
