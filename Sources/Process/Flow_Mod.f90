@@ -41,9 +41,6 @@
   type(Matrix_Type) :: a  ! system matrix for all variables
   real, allocatable :: b(:)
 
-  ! For advection schemes
-  real, allocatable :: phi_max(:), phi_min(:) 
-
   ! Mass fluxes, bulk velocities and pressure drops
   type(Bulk_Type) :: bulk(100)
 
@@ -58,5 +55,8 @@
 
   ! Heat and heat flux to the domain
   real :: heat, heat_flux
+
+  ! Gravity
+  real :: grav_x, grav_y, grav_z
 
   end module
