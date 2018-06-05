@@ -359,6 +359,8 @@ $(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_OBJECT)/Var_Mod.o \
 Var_Mod/*.f90 \
 User_Mod_Vtu.f90 \
+User_Mod/*.f90 \
+User_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Solvers_Mod.o \
 Solvers_Mod/*.f90 \
 $(DIR_OBJECT)/Rans_Mod.o \
@@ -1116,6 +1118,8 @@ $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_OBJECT)/Var_Mod.o \
 Var_Mod/*.f90 \
+User_Mod_Vtu.f90 \
+User_Mod/*.f90 \
 User_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Solvers_Mod.o \
 Solvers_Mod/*.f90 \
@@ -1798,7 +1802,9 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 $(DIR_OBJECT)/Comm_Mod_Seq.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 
+$(DIR_SHARED)/Comm_Mod_Seq.f90 \
+$(DIR_SHARED)/Comm_Mod_Par.f90 \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 
 
 #-- ./Sort2.f90
 #-- ./Save_Cgns_Cells_Void.f90
@@ -1968,7 +1974,11 @@ $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 \
-$(DIR_SHARED)/Cgns_Mod_Par.f90 
+$(DIR_SHARED)/Cgns_Mod_Void.f90 \
+$(DIR_SHARED)/Cgns_Mod_Seq.f90 \
+$(DIR_SHARED)/Cgns_Mod_Par.f90 \
+$(DIR_SHARED)/Cgns_Mod/*.f90 \
+$(DIR_SHARED)/Cgns_Mod/*/*.f90 
 
 #-- ./Approx.f90
 #-- ./Name_Mod.f90
@@ -1992,7 +2002,9 @@ $(DIR_OBJECT)/Tokenizer_Mod.o \
 $(DIR_SHARED)/Tokenizer_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 
+$(DIR_SHARED)/Comm_Mod_Seq.f90 \
+$(DIR_SHARED)/Comm_Mod_Par.f90 \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 
 
 #-- ./Sort_Real_By_Index.f90
 #-- ./Sort_Short_Carry_Short.f90
@@ -2021,7 +2033,11 @@ $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 \
-$(DIR_SHARED)/Cgns_Mod_Seq.f90 
+$(DIR_SHARED)/Cgns_Mod_Void.f90 \
+$(DIR_SHARED)/Cgns_Mod_Seq.f90 \
+$(DIR_SHARED)/Cgns_Mod_Par.f90 \
+$(DIR_SHARED)/Cgns_Mod/*.f90 \
+$(DIR_SHARED)/Cgns_Mod/*/*.f90 
 
 #-- ./Work_Mod.f90
 $(DIR_OBJECT)/Work_Mod.o:\

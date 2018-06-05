@@ -80,13 +80,14 @@ function search_string_in_list() {
   # $3 - f90_file name without extension
   # $4 - text to append in front
 
+  # to deal with "Comm_Mod_Par" and "Cgns_Mod_Par"
+  str=$(echo "$1" | sed 's%Mod_.*$%Mod%g')
   while read -r line_of_list; do # read $2 line by line
-    # if string 1 contains string 2
-    if [[ $line_of_list == *"$1"* ]]; then 
+    if [[ $line_of_list == *"$str"* ]]; then # if string 1 contains string 2
       if [[ $line_of_list == *"/*"* ]]; then
         echo "$4""$line_of_list" \\
       elif [ "${line_of_list:(-5)}" == "Mod.o" ]; then
-        if [ "$1" != "$3" ]; then
+        if [ "$str" != "$3" ]; then
           echo "\$(DIR_OBJECT)/""$line_of_list" \\
         fi
       else
