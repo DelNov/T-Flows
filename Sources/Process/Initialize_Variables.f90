@@ -265,8 +265,7 @@
             y_plus(c) = 30.0
           end if
     
-          if(turbulence_model .eq. K_EPS_ZETA_F  .or.  & 
-             turbulence_model .eq. HYBRID_K_EPS_ZETA_F) then
+          if(turbulence_model .eq. K_EPS_ZETA_F) then
             vals(0) = kin_def;  kin  % n(c) = vals(Key_Ind('KIN',  keys, nks))
             vals(0) = eps_def;  eps  % n(c) = vals(Key_Ind('EPS',  keys, nks))
             vals(0) = zeta_def; zeta % n(c) = vals(Key_Ind('ZETA', keys, nks))
