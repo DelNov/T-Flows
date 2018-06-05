@@ -24,15 +24,10 @@
   e_log  =  8.342
   c_l    =  0.36
   c_t    =  6.0
-  Cni    = 85.0
+  c_nu   = 85.0
   alpha  =  0.012
   c_f1   =  1.4
   c_f2   =  0.3
-
-  ! These are never used, I guess they are remnants from k-eps-vv-f
-  ! cf1    =  0.697
-  ! cf2    =  4.4
-  ! cf3    =  1.6
 
   kin  % sigma = 1.0
   eps  % sigma = 1.3
