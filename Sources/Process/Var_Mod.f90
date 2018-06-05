@@ -21,8 +21,6 @@
     real, allocatable    :: d_o(:), d_oo(:)       ! difussion fluxes
     real, allocatable    :: c(:), c_o(:), c_oo(:) ! cross-difusion
     real, allocatable    :: mean(:)               ! time average
-    real, allocatable    :: filt(:)               ! filtered quantity
-    real, allocatable    :: fluc(:)               ! fluctuating value
     real, allocatable    :: x(:), y(:), z(:)      ! gradient components
     real, allocatable    :: q(:)                  ! flux of a variable
     real                 :: sigma                 ! sigma
