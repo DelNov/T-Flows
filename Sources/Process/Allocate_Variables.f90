@@ -18,10 +18,10 @@
   type(Grid_Type)   :: grid
 !==============================================================================!
 
-  call Control_Mod_Buoyancy                (verbose = .true.)
-  call Control_Mod_Turbulence_Model        (verbose = .true.)
-  call Control_Mod_Turbulence_Model_Variant(verbose = .true.)
-  call Control_Mod_Turbulence_Statistics   (verbose = .true.)
+  call Control_Mod_Buoyancy                 (verbose = .true.)
+  call Control_Mod_Turbulence_Model         (verbose = .true.)
+  call Control_Mod_Turbulence_Wall_Treatment(verbose = .true.)
+  call Control_Mod_Turbulence_Statistics    (verbose = .true.)
 
   !---------------------------!
   !   Basic flow quantities   !

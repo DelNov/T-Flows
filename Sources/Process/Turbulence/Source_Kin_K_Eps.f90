@@ -46,7 +46,7 @@
   !-----------------------------------------------!
   !  Compute the sources in the near wall cells   !
   !-----------------------------------------------!
-  if(turbulence_model_variant .eq. HIGH_RE) then
+  if(turbulence_wall_treatment .eq. HIGH_RE) then
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
@@ -114,7 +114,7 @@
       end if
 
       ! Dissipation:
-      A % val(A % dia(c)) = A % val(A % dia(c)) + &
+      a % val(a % dia(c)) = a % val(a % dia(c)) + &
           density * eps % n(c)/(kin % n(c)+TINY)*grid % vol(c)
     end do
   end if ! end if mode = wf
@@ -123,7 +123,7 @@
   !--------------------------------------------------------!
   !   Jones-Launder model and Launder-Sharma + Yap model   !
   !--------------------------------------------------------!
-  if(turbulence_model_variant .eq. LOW_RE) then
+  if(turbulence_wall_treatment .eq. LOW_RE) then
 
     do c = 1, grid % n_cells
       p_kin(c) = vis_t(c)/density * shear(c)**2
@@ -131,7 +131,7 @@
       b(c) = b(c) + density * p_kin(c) * grid % vol(c)
 
       ! Dissipation:
-      A % val(A % dia(c)) = A % val(A % dia(c)) + &
+      a % val(a % dia(c)) = a % val(a % dia(c)) + &
         density * eps % n(c)/(kin % n(c)+TINY)*grid % vol(c)
     end do
 
@@ -141,7 +141,7 @@
 
     do c = 1, grid % n_cells
 
-      A % val(A % dia(c)) = A % val(A % dia(c))                &
+      a % val(a % dia(c)) = a % val(a % dia(c))                &
                           + 2.0 * viscosity*(  kin_x(c)**2     &
                                              + kin_y(c)**2     &
                                              + kin_z(c)**2 )   &

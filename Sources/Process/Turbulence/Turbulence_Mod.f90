@@ -9,35 +9,30 @@
   implicit none
 !==============================================================================!
 
-  ! Varibale holing the turbulence model
+  ! Variable holding the turbulence model; its variant and statistics
   integer :: turbulence_model
+  integer :: turbulence_wall_treatment
+  integer :: turbulence_statistics     ! can be YES or NO
 
   ! Parameters describing turbulence model choice
-  integer, parameter :: K_EPS               = 30011
-  integer, parameter :: K_EPS_ZETA_F        = 30013
-  integer, parameter :: HYBRID_K_EPS_ZETA_F = 30029
-  integer, parameter :: LES                 = 30047
-  integer, parameter :: DNS                 = 30059
-  integer, parameter :: DES_SPALART         = 30071
-  integer, parameter :: SPALART_ALLMARAS    = 30089  
-  integer, parameter :: HANJALIC_JAKIRLIC   = 30091
-  integer, parameter :: REYNOLDS_STRESS     = 30097
-
-  ! Variable holding turbulence model variant
-  integer :: turbulence_model_variant
+  integer, parameter :: NONE              = 30011
+  integer, parameter :: DNS               = 30013
+  integer, parameter :: WALE              = 30029
+  integer, parameter :: DYNAMIC           = 30047
+  integer, parameter :: SMAGORINSKY       = 30059
+  integer, parameter :: K_EPS             = 30071
+  integer, parameter :: K_EPS_ZETA_F      = 30089
+  integer, parameter :: DES_SPALART       = 30091
+  integer, parameter :: SPALART_ALLMARAS  = 30097  
+  integer, parameter :: HANJALIC_JAKIRLIC = 30103
+  integer, parameter :: REYNOLDS_STRESS   = 30109
 
   integer :: rough_walls
 
-  ! Turbulence model variants
-  integer, parameter :: NONE        = 30113
-  integer, parameter :: HYBRID      = 30119
-  integer, parameter :: PURE        = 30133
-  integer, parameter :: URANS       = 30137
-  integer, parameter :: LOW_RE      = 30139
-  integer, parameter :: HIGH_RE     = 30161
-  integer, parameter :: WALE        = 30169
-  integer, parameter :: DYNAMIC     = 30181
-  integer, parameter :: SMAGORINSKY = 30187
+  ! Turbulence wall treatment 
+  integer, parameter :: LOW_RE      = 30509
+  integer, parameter :: HIGH_RE     = 30517
+  integer, parameter :: COMPOUND    = 30529
 
   ! Reynolds stresses
   type(Var_Type) :: uu
@@ -55,7 +50,7 @@
  
   ! Shear and wall stress are used in a number of turbulence models
   real, allocatable :: shear(:)
-  real, allocatable :: tau_wall(:)
+  real, allocatable :: vort(:)
 
   ! Turbulent viscosity
   real,allocatable :: vis_t(:)
@@ -67,9 +62,9 @@
   ! Non-dimensional distance
   real, allocatable :: y_plus(:)
  
-  ! Friction velocity and its time-average
-  real,allocatable :: u_tau(:)
-  real,allocatable :: u_tau_mean(:)
+  ! Friction at the wall and velocity
+  real, allocatable :: u_tau(:)
+  real, allocatable :: tau_wall(:)
 
   ! Turbulent Prandtl and Schmidt numbers
   real :: pr_t, sc_t
