@@ -7,20 +7,18 @@
 !   What if the nearest wall cell is in another processor?                     !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Flow_Mod
+  use Const_Mod, only: HUGE
   use Les_Mod
-  use Comm_Mod
-  use Rans_Mod
+  use Comm_Mod, only: this_proc
   use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer          :: k,  c, nearest_cell  
-  real             :: new_distance, old_distance
-  real             :: Distance
+  integer :: k,  c, nearest_cell  
+  real    :: new_distance, old_distance
+  real    :: Distance
 !==============================================================================!  
 
   if(this_proc  < 2)  &
