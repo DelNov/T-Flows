@@ -21,7 +21,7 @@
   real :: c_1e, c_2e, c_3e, c_mu, c_mu25, c_mu75, kappa, e_log, Zo
  
   ! Constants for the k-eps-v2f model:
-  real :: c_mu_d, c_l, c_t, alpha, Cni, c_f1, c_f2
+  real :: c_mu_d, c_l, c_t, alpha, c_nu, c_f1, c_f2
   real :: g1, g1_star, g2, g3, g3_star, g4, g5 
 
   ! Constants for the Spalart-Allmaras model:
@@ -30,12 +30,9 @@
   ! Total dissipation in 'HJ' model
   real,allocatable :: eps_tot(:)
 
-  ! Vorticity
-  real,allocatable :: vort(:)
-  real,allocatable :: vort_mean(:)
-
   ! Effective turbulent viscosity
-  real,allocatable :: vis_t_eff(:)
+  real, allocatable :: vis_t_eff(:)
+  real, allocatable :: vis_t_sgs(:)
  
   ! Lenght and Time Scales
   real,allocatable :: l_scale(:)
@@ -50,7 +47,4 @@
   real,allocatable :: buoy_beta(:)
   real,allocatable :: p_buoy(:)
  
-  ! Gravity
-  real :: grav_x, grav_y, grav_z
-
   end module 
