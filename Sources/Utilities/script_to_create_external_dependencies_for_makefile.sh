@@ -77,14 +77,20 @@ function module_list() {
 function search_string_in_list() {
   # $1 - string
   # $2 - list
-  # $3 - text to append in front
+  # $3 - f90_file name without extension
+  # $4 - text to append in front
 
   while read -r line_of_list; do # read $2 line by line
-    if [[ $line_of_list == *"$1"* ]]; then # if string 1 contains string 2
+    # if string 1 contains string 2
+    if [[ $line_of_list == *"$1"* ]]; then 
       if [[ $line_of_list == *"/*"* ]]; then
-        echo "$3""$line_of_list" \\
+        echo "$4""$line_of_list" \\
       elif [ "${line_of_list:(-5)}" == "Mod.o" ]; then
-        echo "\$(DIR_OBJECT)/""$line_of_list" \\
+        if [ "$1" != "$3" ]; then
+          echo "\$(DIR_OBJECT)/""$line_of_list" \\
+        fi
+      else
+        echo "$4""$line_of_list" \\
       fi
     fi
   done <<< "$2"
@@ -112,6 +118,8 @@ function make_file_explicit_dependencies() {
     cd "$folder"
 
     for f90_file in $(find . -print | grep -i .f90); do
+
+      base_name=$(basename -- "${f90_file%.*}") #f90_file name without extension
 
       #---------------------------
       # determine deps of f90 file
@@ -161,6 +169,9 @@ function make_file_explicit_dependencies() {
           # delete empty line
 
         done <<< "$mod_included_this"
+        #echo "$f90_file"
+        #echo "$f90_file" | sed 's%.f90%%g' | sed 's%./%%g'
+        dependencies=$(echo -e "$dependencies\n$(echo "$f90_file" | sed 's%.f90%%g' | sed 's%./%%g')")
       fi
       #------------------------------------------
       # dependencies of functions and subroutines
@@ -206,20 +217,20 @@ function make_file_explicit_dependencies() {
 
       if [ ! -z "$dependencies" ]; then #if non-empty
 
-        echo "\$(DIR_OBJECT)/"$(basename -- "${f90_file%.*}").o:\\ >> $tmp_file
+        echo "\$(DIR_OBJECT)/""$base_name".o:\\ >> $tmp_file
 
         while read -r line_of_deps_list; do # line of current.f90
 
           # $1 deps
           dep_list=$(search_string_in_list \
-            "$line_of_deps_list" "$proc_mods" "")
+            "$line_of_deps_list" "$proc_mods" "$base_name" "")
           if [ ! -z "$dep_list" ]; then
             echo "$dep_list" >> $tmp_file
           fi
 
           # Shared deps
           dep_list=$(search_string_in_list \
-            "$line_of_deps_list" "$shared_mods" "\$(DIR_SHARED)/")
+            "$line_of_deps_list" "$shared_mods" "$base_name" "\$(DIR_SHARED)/")
           if [ ! -z "$dep_list" ]; then
             echo "$dep_list" >> $tmp_file
           fi
