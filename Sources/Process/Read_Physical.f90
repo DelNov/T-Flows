@@ -38,8 +38,7 @@
     call Constants_Hanjalic_Jakirlic()
   endif
 
-  if(turbulence_model == K_EPS_ZETA_F .or.  &
-     turbulence_model == HYBRID_K_EPS_ZETA_F) then
+  if(turbulence_model == K_EPS_ZETA_F) then
     call Constants_K_Eps_Zeta_F()
   endif
 
