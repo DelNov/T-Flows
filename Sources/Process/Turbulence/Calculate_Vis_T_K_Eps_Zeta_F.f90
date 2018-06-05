@@ -39,12 +39,14 @@
   call Time_And_Length_Scale(grid)
 
   ! c = 1, grid % n_cells
-  if(turbulence_model .eq. K_EPS_ZETA_F) then
+  if(turbulence_model      .eq. K_EPS_ZETA_F .and.  &
+     turbulence_statistics .eq. NO) then
     do c = -grid % n_bnd_cells, grid % n_cells
       vis_t(c) = c_mu_d * density * zeta % n(c) * kin % n(c) * t_scale(c)
     end do
 
-  else if(turbulence_model .eq. HYBRID_K_EPS_ZETA_F) then
+  else if(turbulence_model      .eq. K_EPS_ZETA_F .and.  &
+          turbulence_statistics .eq. YES) then
     do c = -grid % n_bnd_cells, grid % n_cells
       vis_t(c)     = c_mu_d * zeta % n(c) * kin % n(c) * t_scale(c)
       vis_t_eff(c) = max(vis_t(c), vis_t_sgs(c))
