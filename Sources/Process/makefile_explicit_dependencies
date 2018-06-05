@@ -365,6 +365,7 @@ $(DIR_OBJECT)/Solvers_Mod.o \
 Solvers_Mod/*.f90 \
 $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Numerics_Mod.o \
+$(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Matrix_Mod.o \
 Matrix_Mod/*.f90 \
 $(DIR_OBJECT)/Les_Mod.o \
@@ -753,10 +754,15 @@ $(DIR_OBJECT)/Flow_Mod.o
 
 #-- ./User_Mod/Save_Results.f90
 $(DIR_OBJECT)/Save_Results.o:\
-$(DIR_OBJECT)/Var_Mod.o \
-Var_Mod/*.f90 \
+$(DIR_OBJECT)/Rans_Mod.o \
+$(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Flow_Mod.o \
+$(DIR_OBJECT)/Const_Mod.o \
+$(DIR_SHARED)/Comm_Mod_Seq.f90 \
+$(DIR_SHARED)/Comm_Mod_Par.f90 \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 
 
 #-- ./User_Mod/Save_Cgns_Results.f90
 $(DIR_OBJECT)/Save_Cgns_Results.o:\
@@ -1125,6 +1131,7 @@ $(DIR_OBJECT)/Solvers_Mod.o \
 Solvers_Mod/*.f90 \
 $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Numerics_Mod.o \
+$(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Matrix_Mod.o \
 Matrix_Mod/*.f90 \
 $(DIR_OBJECT)/Les_Mod.o \

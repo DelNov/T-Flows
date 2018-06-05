@@ -8,8 +8,6 @@
 # Therefore, you need to type "make clean; make ..." everytime you make changes
 # It is allowed to specify such dependencies yourself.
 # This script does it for you.
-#
-# known weak spots: 's%Turbulence/%%g'
 
 # folder structure
 TEST_DIR=$PWD                      # Sources/Utilities
@@ -27,8 +25,10 @@ tmp_file=$BINA_DIR/tmp
 #---------   READ ABOVE UP TO THIS ROW   ---------#
 #-------------------------------------------------#
 
-# exit when any command fails
-set -e
+set -e # exit when any command fails
+#set -v #Prints shell input lines as they are read.
+#set -x #Print command traces before executing command.
+#set +x #disable previous line
 
 # keep track of the last executed command
 trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
@@ -46,31 +46,34 @@ function module_list() {
   # with _Mod
   # remove ^./
   # not ^.
-  # turn _Mod.f90$ to _Mod
-  # turn /abc/ to #/
-  # turn /#abc.f90$ to #/.f90
-  # turn /abc.f90$ to /*.f90
-  # turn # to /*
-  # turn Mod.f90 to Mod.o
-  # turn _Mod$ to _Mod.f90
+  # turn _Mod.f90$ to _Mod.o
+  # turn _Mod/ to #
+  # turn #abc/ to ?
+  # turn ?abc.f90$ to ?*.f90
+  # remove ^abc/
+  # turn #abc.f90$ to #*.f90$
+  # turn # to _Mod
+  # turn ? to _Mod/*/
   # sort reverse unique
   # delete empty line
   local result=$(find . -type f -print \
                | grep -i '_Mod' \
                | sed  -e 's%^\.\/%%' \
                | grep -v '^\.' \
-               | sed  -e 's%Turbulence/%%g' \
                | sed  -e 's%_Mod.f90$%_Mod.o%g' \
-               | sed  -e 's%/.*/%#/%g' \
-               | sed  -e 's%\#/.*f90$%#/*.f90%g' \
-               | sed  -e 's%/.*.f90$%/*.f90%g' \
-               | sed  -e 's%\#%/*%g' \
+               | sed  -e 's%_Mod/%#%' \
+               | sed  -e 's%#.*/%?%g' \
+               | sed  -e 's%\?.*f90$%?*.f90%g' \
+               | sed  -e 's%^.*/%%g' \
+               | sed  -e 's%\#.*.f90$%#*.f90%g' \
+               | sed  -e 's%\#%_Mod/%g' \
+               | sed  -e 's%\?%_Mod/*/%g'  \
                | sort -ur \
                | sed '/^\s*$/d')
 
+
   echo "$result"
 }
-
 #------------------------------------------------------------------------------#
 # produces correct module structure
 #------------------------------------------------------------------------------#
