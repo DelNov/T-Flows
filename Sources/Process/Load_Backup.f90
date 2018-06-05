@@ -134,8 +134,7 @@
     call Read_Backup_Variable(fh, d, 'uw',  uw)
     call Read_Backup_Variable(fh, d, 'vw',  vw)
 
-    ! K and epsilon
-    call Read_Backup_Variable(fh, d, 'kin', kin)
+    ! Epsilon
     call Read_Backup_Variable(fh, d, 'eps', eps)
 
     ! F22
