@@ -26,7 +26,7 @@
   type(Var_Type) :: pp
 
   ! Mass fluxes throught cell faces
-  real,allocatable :: flux(:) 
+  real, allocatable :: flux(:) 
 
   ! Variables determining if we are dealing with heat transfer and buoyancy
   ! (both can be either YES or NO)
@@ -40,8 +40,6 @@
   ! Right hand side for velocity and pressure equations 
   type(Matrix_Type) :: a  ! system matrix for all variables
   real, allocatable :: b(:)
-
-  real,allocatable :: phi_face(:)
 
   ! For advection schemes
   real, allocatable :: phi_max(:), phi_min(:) 
