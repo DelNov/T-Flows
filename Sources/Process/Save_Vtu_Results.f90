@@ -232,9 +232,8 @@
   !--------------------------!
 
   ! Save kin and eps
-  if(turbulence_model .eq. K_EPS                  .or.  &
-     turbulence_model .eq. K_EPS_ZETA_F           .or.  &
-     turbulence_model .eq. HYBRID_K_EPS_ZETA_F    .or.  &
+  if(turbulence_model .eq. K_EPS            .or.  &
+     turbulence_model .eq. K_EPS_ZETA_F     .or.  &
      turbulence_model .eq. REYNOLDS_STRESS  .or.  &
      turbulence_model .eq. HANJALIC_JAKIRLIC  ) then
     call Save_Vtu_Scalar(grid, IN_4, IN_5, kin % name, kin % n(1))
@@ -243,8 +242,7 @@
   end if
 
   ! Save zeta and f22
-  if(turbulence_model .eq. K_EPS_ZETA_F  .or.  &
-     turbulence_model .eq. HYBRID_K_EPS_ZETA_F) then
+  if(turbulence_model .eq. K_EPS_ZETA_F) then
     do c = 1, grid % n_cells
       v2_calc(c) = kin % n(c) * zeta % n(c)
     end do
@@ -259,14 +257,7 @@
     call Save_Vtu_Scalar(grid, IN_4, IN_5, vis % name, vis % n(1))
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "VORT", vort(1))
   end if
-  if(turbulence_model .eq. K_EPS                  .or.  &
-     turbulence_model .eq. K_EPS_ZETA_F           .or.  &
-     turbulence_model .eq. HYBRID_K_EPS_ZETA_F    .or.  &
-     turbulence_model .eq. REYNOLDS_STRESS  .or.  &
-     turbulence_model .eq. HANJALIC_JAKIRLIC      .or.  &
-     turbulence_model .eq. LES                    .or.  &
-     turbulence_model .eq. DES_SPALART            .or.  &
-     turbulence_model .eq. SPALART_ALLMARAS) then
+  if(turbulence_model .ne. NONE) then                      
     kin_vis_t(1:grid % n_cells) = vis_t(1:grid % n_cells)/viscosity
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "VIS_T_to_VIS", &
       kin_vis_t(1))
@@ -284,7 +275,10 @@
   end if
 
   ! Statistics for large-scale simulations of turbulence
-  if(turbulence_model .eq. LES .or.  &
+  if(turbulence_model .eq. SMAGORINSKY .or.  &
+     turbulence_model .eq. DYNAMIC     .or.  &
+     turbulence_model .eq. WALE        .or.  &
+     turbulence_model .eq. DNS         .or.  &
      turbulence_model .eq. DES_SPALART) then
     call Save_Vtu_Vector(grid, IN_4, IN_5, "UVW_MEAN",  &
                                 u % mean(1), v % mean(1), w % mean(1))

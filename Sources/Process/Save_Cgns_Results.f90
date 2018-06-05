@@ -154,7 +154,6 @@
   ! Kin and Eps
   if(turbulence_model .eq. K_EPS                 .or.  &
      turbulence_model .eq. K_EPS_ZETA_F          .or.  &
-     turbulence_model .eq. HYBRID_K_EPS_ZETA_F   .or.  &
      turbulence_model .eq. REYNOLDS_STRESS .or.  &
      turbulence_model .eq. HANJALIC_JAKIRLIC  ) then
 
@@ -167,8 +166,7 @@
   end if
 
   ! zeta, v2 and f22
-  if(turbulence_model .eq. K_EPS_ZETA_F   .or.  &
-     turbulence_model .eq. HYBRID_K_EPS_ZETA_F) then
+  if(turbulence_model .eq. K_EPS_ZETA_F) then
     do c = 1, grid % n_cells
       v2_calc(c) = kin % n(c) * zeta % n(c)
     end do
@@ -192,14 +190,7 @@
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               vort(1),"VorticityMagnitude")
   end if
-  if(turbulence_model .eq. K_EPS                 .or.  &
-     turbulence_model .eq. K_EPS_ZETA_F          .or.  &
-     turbulence_model .eq. HYBRID_K_EPS_ZETA_F   .or.  &
-     turbulence_model .eq. REYNOLDS_STRESS .or.  &
-     turbulence_model .eq. HANJALIC_JAKIRLIC     .or.  &
-     turbulence_model .eq. LES                   .or.  &
-     turbulence_model .eq. DES_SPALART           .or.  &
-     turbulence_model .eq. SPALART_ALLMARAS) then
+  if(turbulence_model .ne. NONE) then                  
     kin_vis_t(1:grid % n_cells) = vis_t(1:grid % n_cells)/viscosity
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               kin_vis_t(1),"EddyOverMolecularViscosity")
@@ -223,7 +214,10 @@
   end if
 
   ! Statistics for large-scale simulations of turbulence
-  if(turbulence_model .eq. LES .or.  &
+  if(turbulence_model .eq. SMAGORINSKY .or.  &
+     turbulence_model .eq. DYNAMIC     .or.  &
+     turbulence_model .eq. WALE        .or.  &
+     turbulence_model .eq. DNS         .or.  &
      turbulence_model .eq. DES_SPALART) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               u % n(1),"MeanVelocityX")
