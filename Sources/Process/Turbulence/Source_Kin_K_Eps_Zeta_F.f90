@@ -18,10 +18,10 @@
 !--------------------------------[Arguments]-----------------------------------!
   type(Grid_Type) :: grid
 !----------------------------------[Locals]------------------------------------!
-  integer           :: c, c1, c2, s
-  real              :: u_tan, u_nor_sq, u_nor, u_tot_sq
-  real              :: lf
-  real              :: alpha1, l_rans, l_sgs
+  integer :: c, c1, c2, s
+  real    :: u_tan, u_nor_sq, u_nor, u_tot_sq
+  real    :: lf
+  real    :: alpha1, l_rans, l_sgs
 !==============================================================================!
 !   Dimensions:                                                                !
 !   Production    p_kin    [m^2/s^3]   | Rate-of-strain  shear     [1/s]       !
@@ -41,7 +41,8 @@
     b(c)     = b(c) + density * p_kin(c) * grid % vol(c)
   end do
 
-  if(turbulence_model .eq. HYBRID_K_EPS_ZETA_F) then
+  if(turbulence_model .eq. K_EPS_ZETA_F .and.  &
+     turbulence_statistics .eq. YES) then
     do c = 1, grid % n_cells
       lf = grid % vol(c)**ONE_THIRD
       l_sgs  = 0.8*lf
@@ -49,10 +50,10 @@
       alpha1 = max(1.0,l_rans/l_sgs)
 
       if(alpha1 < 1.05) then
-        A % val(A % dia(c)) = A % val(A % dia(c)) + &
+        a % val(a % dia(c)) = a % val(a % dia(c)) + &
              density * eps % n(c)/(kin % n(c) + TINY) * grid % vol(c)
       else
-        A % val(A % dia(c)) = A % val(A % dia(c)) +  &
+        a % val(a % dia(c)) = a % val(a % dia(c)) +  &
           density *  min(alpha1**1.45 * eps % n(c), kin % n(c)**1.5  &
           / (lf*0.01)) / (kin % n(c) + TINY) * grid % vol(c)
       end if
@@ -60,7 +61,7 @@
   else
     do c = 1, grid % n_cells
 
-      A % val(A % dia(c)) = A % val(A % dia(c)) + &
+      a % val(a % dia(c)) = a % val(a % dia(c)) + &
            density * eps % n(c)/(kin % n(c) + TINY) * grid % vol(c)
 
       if (buoyancy .eq. YES) then
@@ -69,7 +70,7 @@
                                      grav_y * vt % n(c) +  &
                                      grav_z * wt % n(c)) * density
         b(c) = b(c) + max(0.0, g_buoy(c) * grid % vol(c))
-        A % val(A % dia(c)) = A % val(A % dia(c))  &
+        a % val(a % dia(c)) = a % val(a % dia(c))  &
                   + max(0.0,-g_buoy(c) * grid % vol(c) / (kin % n(c) + TINY))
       end if
     end do

@@ -17,8 +17,8 @@
   type(Grid_Type) :: grid
 !----------------------------------[Locals]------------------------------------!
   integer :: c, s, c1, c2,j 
-  real    :: Esor, c_11e, EBF
-  real    :: EpsWall, EpsHom
+  real    :: e_sor, c_11e, ebf
+  real    :: eps_wall, eps_hom
   real    :: y_plu
 !==============================================================================!
 !   In dissipation of turbulent kinetic energy equation exist two              !
@@ -43,17 +43,17 @@
 !   p_kin = 2*vis_t / density S_ij S_ij                                        !
 !   shear = sqrt(2 S_ij S_ij)                                                  !
 !------------------------------------------------------------------------------!
+
   call Time_And_Length_Scale(grid)
 
-  if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
-     turbulence_model .eq. HYBRID_K_EPS_ZETA_F) then
+  if(turbulence_model .eq. K_EPS_ZETA_F) then
     do c = 1, grid % n_cells 
-      Esor = grid % vol(c)/(t_scale(c)+TINY)
+      e_sor = grid % vol(c)/(t_scale(c)+TINY)
       c_11e = c_1e*(1.0 + alpha * ( 1.0/(zeta % n(c)+TINY) ))    
-      b(c) = b(c) + c_11e * density * Esor * p_kin(c)
+      b(c) = b(c) + c_11e * density * e_sor * p_kin(c)
  
       ! Fill in a diagonal of coefficient matrix
-      A % val(A % dia(c)) =  A % val(A % dia(c)) + c_2e * Esor * density
+      A % val(A % dia(c)) =  A % val(A % dia(c)) + c_2e * e_sor * density
     end do                   
   end if
 
@@ -69,14 +69,14 @@
       if( Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
           Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
 
-        EpsWall = 2.0*viscosity/density * kin % n(c1) / grid % wall_dist(c1)**2
-        EpsHom = c_mu75 * kin % n(c1)**1.5 / (grid % wall_dist(c1) * kappa)
+        eps_wall = 2.0*viscosity/density * kin % n(c1) / grid % wall_dist(c1)**2
+        eps_hom = c_mu75 * kin % n(c1)**1.5 / (grid % wall_dist(c1) * kappa)
         u_tau(c1) = c_mu25 * kin % n(c1)**0.5
 
         y_plu = c_mu25 * sqrt(kin % n(c1)) * grid % wall_dist(c1) / &
           (viscosity/density) ! standard
-        EBF = 0.001*y_plu**4.0/(1.0 + y_plu)
-        eps % n(c1) = EpsWall * exp(-1.0 * EBF) + EpsHom * exp(-1.0 / EBF)
+        ebf = 0.001*y_plu**4.0/(1.0 + y_plu)
+        eps % n(c1) = eps_wall * exp(-1.0 * ebf) + eps_hom * exp(-1.0 / ebf)
         
         if(rough_walls .eq. YES) then
           eps % n(c1) = c_mu75*kin % n(c1)**1.5 / (grid % wall_dist(c1) * kappa)

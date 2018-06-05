@@ -15,9 +15,9 @@
 !--------------------------------[Arguments]-----------------------------------!
   type(Grid_Type) :: grid
 !----------------------------------[Locals]------------------------------------!
-  integer           :: s, c, c1, c2
-  real              :: sor_11, f22hg
-  real              :: A0
+  integer :: s, c, c1, c2
+  real    :: sor_11, f22hg
+  real    :: a0
 !==============================================================================!
 !                                                                              !
 !  The form of source terms are :                                              !
@@ -44,8 +44,7 @@
   call Time_And_Length_Scale(grid)
 
  ! Source term f22hg
- if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
-    turbulence_model .eq. HYBRID_K_EPS_ZETA_F) then 
+ if(turbulence_model .eq. K_EPS_ZETA_F) then
    do c = 1, grid % n_cells
      f22hg = (1.0 - c_f1 - 0.65 * p_kin(c)  &
            / (eps  % n(c) + TINY))          &
@@ -58,7 +57,7 @@
    ! Source term f22hg
    do c = 1, grid % n_cells
      sor_11 = grid % vol(c)/(l_scale(c)**2 + TINY)
-     A % val(A % dia(c)) = A % val(A % dia(c)) + sor_11 
+     a % val(a % dia(c)) = a % val(a % dia(c)) + sor_11 
    end do
 
    ! Imposing boundary condition for f22 on the wall
@@ -76,8 +75,8 @@
 
         ! Linearization of the near wall terms helps to get more  
          ! stable solution, especially for small wall distance.
-         A0 = f_coef(s)
-         b(c1) = b(c1) + A0 * f22 % n(c2)
+         a0 = f_coef(s)
+         b(c1) = b(c1) + a0 * f22 % n(c2)
        end if   ! end if of BC=wall
      end if    ! end if of c2<0
    end do
