@@ -130,22 +130,22 @@
   !   Velocity   !
   !--------------!
   call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                            u % n(1),"VelocityX")
+                            u % n(1), "VelocityX")
   call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                            v % n(1),"VelocityY")
+                            v % n(1), "VelocityY")
   call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                            w % n(1),"VelocityZ")
+                            w % n(1), "VelocityZ")
   !--------------!
   !   Pressure   !
   !--------------!
   call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                            p % n(1),"Pressure")
+                            p % n(1), "Pressure")
   !-----------------!
   !   Temperature   !
   !-----------------!
   if(heat_transfer .eq. YES) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              t % n(1),"Temperature")
+                              t % n(1), "Temperature")
   end if
   !--------------------------!
   !   Turbulent quantities   !
@@ -158,11 +158,11 @@
      turbulence_model .eq. HANJALIC_JAKIRLIC  ) then
 
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              kin % n(1),"TurbulentEnergyKinetic")
+                              kin % n(1), "TurbulentKineticEnergy")
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              eps % n(1),"TurbulentDissipation")
+                              eps % n(1), "TurbulentDissipation")
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              p_kin(1),"TurbulentEnergyKineticProduction")
+                              p_kin(1), "TurbulentKineticEnergyProduction")
   end if
 
   ! zeta, v2 and f22
@@ -245,7 +245,7 @@
                               vw_mean(1),"ReynoldsStressYZ")
     if(heat_transfer .eq. YES) then
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                               t % mean(1), "MeanTemperature")
+                               t % mean(1), "TemperatureMean")
       tt_mean = tt % mean(c) - t % mean(c) * t % mean(c)
       ut_mean = ut % mean(c) - u % mean(c) * t % mean(c)
       vt_mean = vt % mean(c) - v % mean(c) * t % mean(c)
