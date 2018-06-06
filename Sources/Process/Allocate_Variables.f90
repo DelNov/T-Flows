@@ -23,9 +23,14 @@
   call Control_Mod_Turbulence_Wall_Treatment(verbose = .true.)
   call Control_Mod_Turbulence_Statistics    (verbose = .true.)
 
-  !---------------------------!
-  !   Basic flow quantities   !
-  !---------------------------!
+  ! Gradient matrices are always needed
+  call Grad_Mod_Allocate_Memory(grid)
+
+  !----------------------------!
+  !                            !
+  !   Navier-Stokes equation   !
+  !                            !
+  !----------------------------!
 
   ! Allocate memory for velocity components ...
   call Var_Mod_Allocate_Solution('U', u, grid)
@@ -47,23 +52,26 @@
   ! Mass flow rates at cell faces are always needed
   allocate(flux(grid % n_faces));  flux = 0.
 
-  ! Gradient matrices are always needed
-  call Grad_Mod_Allocate_Memory(grid)
-
-  allocate(nearest_wall_cell(-grid % n_bnd_cells:grid % n_cells))
-  nearest_wall_cell = 0
-
-  ! For solution of temperature
+  !-----------------------------------------!
+  !                                         !
+  !   Enthalpy conservation (temperature)   !
+  !                                         !
+  !-----------------------------------------!
   call Control_Mod_Heat_Transfer(verbose = .true.)
   if(heat_transfer .eq. YES) then
     call Var_Mod_Allocate_Solution('T',  t,  grid)
     allocate(con_wall(-grid % n_bnd_cells:grid % n_cells)); con_wall = 0.
 
+    call Var_Mod_Allocate_New_Only('UT', ut, grid)
+    call Var_Mod_Allocate_New_Only('VT', vt, grid)
+    call Var_Mod_Allocate_New_Only('WT', wt, grid)
   end if
 
 
   !-----------------------!
+  !                       !
   !   Turbulence models   !
+  !                       !
   !-----------------------!
 
   ! Arrayes needed by all models, or almost all
@@ -76,7 +84,9 @@
     allocate(y_plus  (-grid % n_bnd_cells:grid % n_cells));  y_plus   = 0.
   end if
 
-  ! K-eps model
+  !-----------------!
+  !   K-eps model   !
+  !-----------------!
   if(turbulence_model .eq. K_EPS) then
 
     ! K and epsilon
@@ -94,37 +104,9 @@
     end if
   end if
 
-  ! Reynolds stress models
-  if(turbulence_model .eq. REYNOLDS_STRESS .or.  &
-     turbulence_model .eq. HANJALIC_JAKIRLIC) then
-
-    ! Reynolds stresses
-    call Var_Mod_Allocate_Solution('UU', uu, grid)
-    call Var_Mod_Allocate_Solution('VV', vv, grid)
-    call Var_Mod_Allocate_Solution('WW', ww, grid)
-    call Var_Mod_Allocate_Solution('UV', uv, grid)
-    call Var_Mod_Allocate_Solution('UW', uw, grid)
-    call Var_Mod_Allocate_Solution('VW', vw, grid)
-
-    call Var_Mod_Allocate_New_Only('KIN', kin, grid)
-    call Var_Mod_Allocate_Solution('EPS', eps, grid)
-
-    if(turbulence_model .eq. REYNOLDS_STRESS) then
-      call Var_Mod_Allocate_Solution('F22', f22, grid)
-      call Var_Mod_Allocate_Gradients(f22)
-    end if
-
-    ! Other variables such as time scale, length scale and production
-    allocate(t_scale(-grid % n_bnd_cells:grid % n_cells));  t_scale = 0.
-    allocate(l_scale(-grid % n_bnd_cells:grid % n_cells));  l_scale = 0.
-    allocate(p_kin  (-grid % n_bnd_cells:grid % n_cells));  p_kin   = 0.
-    if(turbulence_model .eq. HANJALIC_JAKIRLIC) then
-      allocate(eps_tot(-grid % n_bnd_cells:grid % n_cells)); eps_tot = 0.
-    end if
-
-  end if
-
-  ! K-eps-zeta-f
+  !------------------!
+  !   K-eps-zeta-f   !
+  !------------------!
   if(turbulence_model .eq. K_EPS_ZETA_F) then
 
     ! Main model's variables
@@ -159,7 +141,41 @@
 
   end if
 
-  ! Spalart Allmaras
+  !----------------------------!
+  !   Reynolds stress models   !
+  !----------------------------!
+  if(turbulence_model .eq. REYNOLDS_STRESS .or.  &
+     turbulence_model .eq. HANJALIC_JAKIRLIC) then
+
+    ! Reynolds stresses
+    call Var_Mod_Allocate_Solution('UU', uu, grid)
+    call Var_Mod_Allocate_Solution('VV', vv, grid)
+    call Var_Mod_Allocate_Solution('WW', ww, grid)
+    call Var_Mod_Allocate_Solution('UV', uv, grid)
+    call Var_Mod_Allocate_Solution('UW', uw, grid)
+    call Var_Mod_Allocate_Solution('VW', vw, grid)
+
+    call Var_Mod_Allocate_New_Only('KIN', kin, grid)
+    call Var_Mod_Allocate_Solution('EPS', eps, grid)
+
+    if(turbulence_model .eq. REYNOLDS_STRESS) then
+      call Var_Mod_Allocate_Solution('F22', f22, grid)
+      call Var_Mod_Allocate_Gradients(f22)
+    end if
+
+    ! Other variables such as time scale, length scale and production
+    allocate(t_scale(-grid % n_bnd_cells:grid % n_cells));  t_scale = 0.
+    allocate(l_scale(-grid % n_bnd_cells:grid % n_cells));  l_scale = 0.
+    allocate(p_kin  (-grid % n_bnd_cells:grid % n_cells));  p_kin   = 0.
+    if(turbulence_model .eq. HANJALIC_JAKIRLIC) then
+      allocate(eps_tot(-grid % n_bnd_cells:grid % n_cells)); eps_tot = 0.
+    end if
+
+  end if
+
+  !----------------------!
+  !   Spalart Allmaras   !
+  !----------------------!
   if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
      turbulence_model .eq. DES_SPALART) then
     call Var_Mod_Allocate_Solution('VIS', vis, grid)
@@ -169,16 +185,33 @@
     end if
   end if
 
-  ! Wale model
+  !-----------------------!
+  !   Smagorinsky model   !
+  !-----------------------!
+  if(turbulence_model .eq. SMAGORINSKY) then
+    allocate(nearest_wall_cell(-grid % n_bnd_cells:grid % n_cells))
+    nearest_wall_cell = 0
+  end if
+
+  !----------------!
+  !   Wale model   !
+  !----------------!
   if(turbulence_model .eq. WALE) then
     allocate(wale_v(-grid % n_bnd_cells:grid % n_cells));  wale_v = 0.
   end if
 
-  ! Dynamic model
+  !-------------------!
+  !   Dynamic model   !
+  !-------------------!
   if(turbulence_model .eq. DYNAMIC) then
     allocate(c_dyn(-grid % n_bnd_cells:grid % n_cells));  c_dyn = 0.
   end if
 
+  !-----------------------------------------!
+  !                                         !
+  !   Turbulent statistics for all models   !
+  !                                         !
+  !-----------------------------------------!
   if(turbulence_statistics .eq. YES) then
 
     ! First moments
@@ -201,19 +234,20 @@
       call Var_Mod_Allocate_Statistics(t)
 
       call Var_Mod_Allocate_New_Only('TT', tt, grid)
-      call Var_Mod_Allocate_New_Only('UT', ut, grid)
-      call Var_Mod_Allocate_New_Only('VT', vt, grid)
-      call Var_Mod_Allocate_New_Only('WT', wt, grid)
-
       call Var_Mod_Allocate_Statistics(tt)
+
+      ! Remember that ut, vt and wt are allocated above
       call Var_Mod_Allocate_Statistics(ut)
       call Var_Mod_Allocate_Statistics(vt)
       call Var_Mod_Allocate_Statistics(wt)
     end if
   end if
 
-
-  ! User scalars and arrays
+  !-----------------------------!
+  !                             !
+  !   User scalars and arrays   !
+  !                             !
+  !-----------------------------!
   call Control_Mod_Number_Of_User_Scalars(n_user_scalars, verbose = .true.)
   call Control_Mod_Number_Of_User_Arrays (n_user_arrays,  verbose = .true.)
   call User_Mod_Allocate(grid)
