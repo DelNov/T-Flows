@@ -16,12 +16,8 @@
   integer :: m
 !==============================================================================!
 
-  if(this_proc < 2) &
-    print *, 'Calling for gravitationa vector'
   call Control_Mod_Gravitational_Vector(grav_x, grav_y, grav_z)
 
-  if(this_proc < 2) &
-    print *, 'Calling for turbulence model'
   call Control_Mod_Turbulence_Model(.true.)
 
   call Control_Mod_Rough_Walls(.true.)
