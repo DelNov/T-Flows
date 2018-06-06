@@ -50,7 +50,6 @@
 
   ! Found the section with initial conditions
   if (found .eq. YES) then
-    if(this_proc < 2) print *, 'FOUND "INITIAL_CONDITION"'
 
     call Control_Mod_Read_Strings_On('VARIABLES', keys, nks, .true.)
 
@@ -204,9 +203,11 @@
       do n = 1, grid % n_materials
         do c = 1, grid % n_cells
 
-          u % mean(c) = 0.0
-          v % mean(c) = 0.0
-          w % mean(c) = 0.0
+          if(turbulence_statistics .eq. YES) then
+            u % mean(c) = 0.0
+            v % mean(c) = 0.0
+            w % mean(c) = 0.0
+          end if
 
           vals(0) = u_def;  u % n(c) = vals(Key_Ind('U', keys, nks))
           vals(0) = v_def;  v % n(c) = vals(Key_Ind('V', keys, nks))
