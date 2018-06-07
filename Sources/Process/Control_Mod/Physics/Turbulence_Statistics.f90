@@ -1,9 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Buoyancy(verbose)
+  subroutine Control_Mod_Turbulence_Statistics(verbose)
+!------------------------------------------------------------------------------!
+!   Reading turbulence statistics from the control file                        !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod, only: YES, NO
-  use Flow_Mod,  only: buoyancy
+  use Turbulence_Mod, only: turbulence_statistics
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -12,21 +14,20 @@
   character(len=80) :: val
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('BUOYANCY', 'no',  &
+  call Control_Mod_Read_Char_Item('TURBULENCE_STATISTICS', 'no',  &
                                    val, verbose)
   call To_Upper_Case(val)
 
-  if( val .eq. 'YES' ) then
-    buoyancy = YES
+  if     (val .eq. 'YES') then
+    turbulence_statistics = YES  
 
-  else if( val .eq. 'NO' ) then
-    buoyancy = NO
+  else if(val .eq. 'NO') then
+    turbulence_statistics = NO
 
   else
-    print *, '# Unknown state for buoyancy: ', trim(val)
+    print *, '# Unknown optoin for turbuelnce statistics: ', trim(val)
     print *, '# Exiting!'
-    stop
-
+    stop 
   end if
 
   end subroutine

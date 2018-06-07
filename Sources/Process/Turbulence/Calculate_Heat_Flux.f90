@@ -35,9 +35,8 @@
   pr   = 0.71  ! bad, hard coded
   beta = 1.0
 
-  if(turbulence_model .eq. K_EPS               .or.  &
-     turbulence_model .eq. K_EPS_ZETA_F        .or.  &
-     turbulence_model .eq. HYBRID_K_EPS_ZETA_F .or.  &
+  if(turbulence_model .eq. K_EPS        .or.  &
+     turbulence_model .eq. K_EPS_ZETA_F .or.  &
      turbulence_model .eq. DES_SPALART) then
 
     do c = 1, grid % n_cells

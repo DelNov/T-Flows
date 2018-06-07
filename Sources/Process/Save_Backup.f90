@@ -63,6 +63,12 @@
   call Write_Backup_Real(fh, d, 'bulk_p_drop_y', bulk(1) % p_drop_y)
   call Write_Backup_Real(fh, d, 'bulk_p_drop_z', bulk(1) % p_drop_z)
 
+  !----------------------------!
+  !                            !
+  !   Navier-Stokes equation   !
+  !                            !
+  !----------------------------!
+
   !--------------!
   !   Velocity   !
   !--------------!
@@ -82,18 +88,24 @@
   call Write_Backup_Face(fh, d, 'mass_flow_rate', flux(1:nf_s+nbf_s))
 
   !--------------!
+  !              !
   !   Etnhalpy   !
+  !              !
   !--------------!
   if(heat_transfer .eq. YES) then
     call Write_Backup_Variable(fh, d, 'temp', t)
   end if
 
   !-----------------------!
+  !                       !
   !   Turbulence models   !
+  !                       !
   !-----------------------!
-  if(turbulence_model .eq. K_EPS    .or.  &
-     turbulence_model .eq. K_EPS_ZETA_F     .or.  &
-     turbulence_model .eq. HYBRID_K_EPS_ZETA_F) then
+
+  !-----------------!
+  !   K-eps model   !
+  !-----------------!
+  if(turbulence_model .eq. K_EPS) then
 
     ! K and epsilon
     call Write_Backup_Variable(fh, d, 'kin', kin)
@@ -107,18 +119,30 @@
     call Write_Backup_Cell    (fh, d, 'tau_wall', tau_wall  (1:nc_s))
   end if
 
-  if(turbulence_model .eq. K_EPS_ZETA_F     .or.  &
-     turbulence_model .eq. HYBRID_K_EPS_ZETA_F) then
+  !------------------------!
+  !   K-eps-zeta-f model   !
+  !------------------------!
+  if(turbulence_model .eq. K_EPS_ZETA_F) then
 
-    ! Zeta and f22
+    ! K, eps, zeta and f22
+    call Write_Backup_Variable(fh, d, 'kin',  kin)
+    call Write_Backup_Variable(fh, d, 'eps',  eps)
     call Write_Backup_Variable(fh, d, 'zeta', zeta)
     call Write_Backup_Variable(fh, d, 'f22',  f22)
 
     ! Other turbulent quantities
+    call Write_Backup_Cell_Bnd(fh, d, 'p_kin',    p_kin   (-nb_s:nc_s))
+    call Write_Backup_Cell_Bnd(fh, d, 'u_tau',    u_tau   (-nb_s:nc_s))
+    call Write_Backup_Cell_Bnd(fh, d, 'y_plus',   y_plus  (-nb_s:nc_s))
+    call Write_Backup_Cell_Bnd(fh, d, 'vis_wall', vis_wall(-nb_s:nc_s))
+    call Write_Backup_Cell    (fh, d, 'tau_wall', tau_wall  (1:nc_s))
     call Write_Backup_Cell_Bnd(fh, d, 't_scale',  t_scale(-nb_s:nc_s))
     call Write_Backup_Cell_Bnd(fh, d, 'l_scale',  l_scale(-nb_s:nc_s))
   end if 
 
+  !----------------------------!
+  !   Reynolds stress models   !
+  !----------------------------!
   if(turbulence_model .eq. REYNOLDS_STRESS .or.  &                          
      turbulence_model .eq. HANJALIC_JAKIRLIC) then                          
 
@@ -141,6 +165,38 @@
     ! Other turbulent quantities ?
   end if 
 
+  !-----------------------------------------!
+  !                                         !
+  !   Turbulent statistics for all models   !
+  !                                         !
+  !-----------------------------------------!
+  if(turbulence_statistics .eq. YES) then
+    call Write_Backup_Variable_Mean(fh, d, 'u_mean', u)
+    call Write_Backup_Variable_Mean(fh, d, 'v_mean', v)
+    call Write_Backup_Variable_Mean(fh, d, 'w_mean', w)
+
+    call Write_Backup_Variable_Mean(fh, d, 'uu_mean', uu)
+    call Write_Backup_Variable_Mean(fh, d, 'vv_mean', vv)
+    call Write_Backup_Variable_Mean(fh, d, 'ww_mean', ww)
+    call Write_Backup_Variable_Mean(fh, d, 'uv_mean', uv)
+    call Write_Backup_Variable_Mean(fh, d, 'uw_mean', uw)
+    call Write_Backup_Variable_Mean(fh, d, 'vw_mean', vw)
+
+    if(heat_transfer .eq. YES) then
+      call Write_Backup_Variable_Mean(fh, d, 't_mean',  t)
+      call Write_Backup_Variable_Mean(fh, d, 'tt_mean', tt)
+      call Write_Backup_Variable_Mean(fh, d, 'ut_mean', ut)
+      call Write_Backup_Variable_Mean(fh, d, 'vt_mean', vt)
+      call Write_Backup_Variable_Mean(fh, d, 'wt_mean', wt)
+    end if
+  end if
+
+  !------------------------------!
+  !                              !
+  !   User scalars are missing   !
+  !                              !
+  !------------------------------!
+
   ! Close backup file
   call Comm_Mod_Close_File(fh)
 
@@ -148,10 +204,3 @@
 
   end subroutine
 
-!TEST  ! Test face buffers
-!TEST  do s = 1, grid % n_faces
-!TEST    flux(s) = 1000000.0 * grid % xf(s) +  &
-!TEST                 1000.0 * grid % yf(s) +  &
-!TEST                    1.0 * grid % zf(s)
-!TEST    print '(a6,i4.4,a4,f18.3)', ' flux(', s, ') = ', flux(s)
-!TEST  end do

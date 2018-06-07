@@ -8,8 +8,8 @@
                             NONE,                  &
                             K_EPS,                 &
                             K_EPS_ZETA_F,          &
-                            HYBRID_K_EPS_ZETA_F,   &
-                            LES,                   &
+!                           HYBRID_K_EPS_ZETA_F,   &
+!                           LES,                   &
                             DNS,                   &
                             DES_SPALART,           &
                             SPALART_ALLMARAS,      &
@@ -35,15 +35,15 @@
       turbulence_model = K_EPS
     case('K_EPS_ZETA_F')          
       turbulence_model = K_EPS_ZETA_F
-    case('HYBRID_K_EPS_ZETA_F')   
-      turbulence_model = HYBRID_K_EPS_ZETA_F
-    case('LES')                   
-      turbulence_model = LES
+!   case('HYBRID_K_EPS_ZETA_F')   
+!     turbulence_model = HYBRID_K_EPS_ZETA_F
+!   case('LES')                   
+!     turbulence_model = LES
     case('DNS')                   
       turbulence_model = DNS
     case('DES_SPALART')           
       turbulence_model = DES_SPALART
-    case('SPALART_ALLMAR AS')     
+    case('SPALART_ALLMARAS')     
       turbulence_model = SPALART_ALLMARAS
     case('HANJALIC_JAKIRLIC')     
       turbulence_model = HANJALIC_JAKIRLIC

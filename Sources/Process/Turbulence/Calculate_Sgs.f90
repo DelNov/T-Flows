@@ -43,7 +43,7 @@
     call Grad_Mod_For_Phi(grid, t % n, 3, t_z, .true.)  ! dT/dz
   end if 
  
-  if(turbulence_model_variant .eq. SMAGORINSKY) then
+  if(turbulence_model .eq. SMAGORINSKY) then
     do c = 1, grid % n_cells
       lf = grid % vol(c)**ONE_THIRD
 
@@ -67,7 +67,7 @@
               * shear(c) 
     end do
 
-  else if(turbulence_model_variant .eq. DYNAMIC) then
+  else if(turbulence_model .eq. DYNAMIC) then
     if(buoyancy .eq. YES) then  
       do c = 1, grid % n_cells
         lf = grid % vol(c)**ONE_THIRD  
@@ -87,7 +87,7 @@
       end do
     end if     
 
-  else if(turbulence_model_variant .eq. WALE) then
+  else if(turbulence_model .eq. WALE) then
     do c = 1, grid % n_cells
       lf = grid % vol(c)**ONE_THIRD    
       vis_t(c) = density           &

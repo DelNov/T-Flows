@@ -213,18 +213,19 @@
   !--------------!
   !   Velocity   !
   !--------------!
-  call Save_Vtu_Vector(grid, IN_4, IN_5, "UVW", u % n(1), v % n(1), w % n(1))
+  call Save_Vtu_Vector(grid, IN_4, IN_5, "Velocity",  &
+                       u % n(1), v % n(1), w % n(1))
 
   !--------------!
   !   Pressure   !
   !--------------!
-  call Save_Vtu_Scalar(grid, IN_4, IN_5, p % name, p % n(1))
+  call Save_Vtu_Scalar(grid, IN_4, IN_5, "Pressure", p % n(1))
 
   !-----------------!
   !   Temperature   !
   !-----------------!
   if(heat_transfer .eq. YES) then
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, t % name, t % n(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "Temperature", t % n(1))
   end if
 
   !--------------------------!
@@ -232,61 +233,59 @@
   !--------------------------!
 
   ! Save kin and eps
-  if(turbulence_model .eq. K_EPS                  .or.  &
-     turbulence_model .eq. K_EPS_ZETA_F           .or.  &
-     turbulence_model .eq. HYBRID_K_EPS_ZETA_F    .or.  &
+  if(turbulence_model .eq. K_EPS            .or.  &
+     turbulence_model .eq. K_EPS_ZETA_F     .or.  &
      turbulence_model .eq. REYNOLDS_STRESS  .or.  &
      turbulence_model .eq. HANJALIC_JAKIRLIC  ) then
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, kin % name, kin % n(1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, eps % name, eps % n(1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "P_KIN", p_kin(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentEnergyKinetic", kin % n(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentDissipation",   eps % n(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentKineticEnergyProduction", &
+                                           p_kin(1))
   end if
 
   ! Save zeta and f22
-  if(turbulence_model .eq. K_EPS_ZETA_F  .or.  &
-     turbulence_model .eq. HYBRID_K_EPS_ZETA_F) then
+  if(turbulence_model .eq. K_EPS_ZETA_F) then
     do c = 1, grid % n_cells
       v2_calc(c) = kin % n(c) * zeta % n(c)
     end do
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "V^2",       v2_calc (1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, zeta % name, zeta % n(1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, f22  % name, f22  % n(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentQuantityV2",   v2_calc (1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentQuantityZeta", zeta % n(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentQuantityF22",  f22  % n(1))
+  end if
+  if(turbulence_model .eq. REYNOLDS_STRESS) then
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentQuantityF22",  f22  % n(1))
   end if
 
   ! Save vis and vis_t
   if(turbulence_model .eq. DES_SPALART .or.  &
      turbulence_model .eq. SPALART_ALLMARAS) then
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, vis % name, vis % n(1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "VORT", vort(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentViscosity", vis % n(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "VorticityMagnitude", vort(1))
   end if
-  if(turbulence_model .eq. K_EPS                  .or.  &
-     turbulence_model .eq. K_EPS_ZETA_F           .or.  &
-     turbulence_model .eq. HYBRID_K_EPS_ZETA_F    .or.  &
-     turbulence_model .eq. REYNOLDS_STRESS  .or.  &
-     turbulence_model .eq. HANJALIC_JAKIRLIC      .or.  &
-     turbulence_model .eq. LES                    .or.  &
-     turbulence_model .eq. DES_SPALART            .or.  &
-     turbulence_model .eq. SPALART_ALLMARAS) then
+  if(turbulence_model .ne. NONE) then                      
     kin_vis_t(1:grid % n_cells) = vis_t(1:grid % n_cells)/viscosity
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "VIS_T_to_VIS", &
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "EddyOverMolecularViscosity", &
       kin_vis_t(1))
   end if
 
   ! Reynolds stress models
   if(turbulence_model .eq. REYNOLDS_STRESS .or.  &
      turbulence_model .eq. HANJALIC_JAKIRLIC) then
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, uu % name, uu % n(1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, vv % name, vv % n(1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, ww % name, ww % n(1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, uv % name, uv % n(1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, uw % name, uw % n(1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, vw % name, vw % n(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressXX", uu % n(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressYY", vv % n(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressZZ", ww % n(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressXY", uv % n(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressXZ", uw % n(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressYZ", vw % n(1))
   end if
 
   ! Statistics for large-scale simulations of turbulence
-  if(turbulence_model .eq. LES .or.  &
+  if(turbulence_model .eq. SMAGORINSKY .or.  &
+     turbulence_model .eq. DYNAMIC     .or.  &
+     turbulence_model .eq. WALE        .or.  &
+     turbulence_model .eq. DNS         .or.  &
      turbulence_model .eq. DES_SPALART) then
-    call Save_Vtu_Vector(grid, IN_4, IN_5, "UVW_MEAN",  &
+    call Save_Vtu_Vector(grid, IN_4, IN_5, "MeanVelocity",  &
                                 u % mean(1), v % mean(1), w % mean(1))
     uu_mean = uu % mean(c) - u % mean(c) * u % mean(c)
     vv_mean = vv % mean(c) - v % mean(c) * v % mean(c)
@@ -294,33 +293,34 @@
     uv_mean = uv % mean(c) - u % mean(c) * v % mean(c)
     uw_mean = uw % mean(c) - u % mean(c) * w % mean(c)
     vw_mean = vw % mean(c) - v % mean(c) * w % mean(c)
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "UU_MEAN", uu_mean(1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "VV_MEAN", uu_mean(1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "WW_MEAN", uu_mean(1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "UV_MEAN", uv_mean(1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "UW_MEAN", uw_mean(1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "VW_MEAN", vw_mean(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressXX", uu_mean(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressYY", uu_mean(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressZZ", uu_mean(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressXY", uv_mean(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressXZ", uw_mean(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressYZ", vw_mean(1))
     if(heat_transfer .eq. YES) then
-      call Save_Vtu_Scalar(grid, IN_4, IN_5, "T_MEAN", t % mean(1))
+      call Save_Vtu_Scalar(grid, IN_4, IN_5, "TemperatureMean", t % mean(1))
       tt_mean = tt % mean(c) - t % mean(c) * t % mean(c)
       ut_mean = ut % mean(c) - u % mean(c) * t % mean(c)
       vt_mean = vt % mean(c) - v % mean(c) * t % mean(c)
       wt_mean = wt % mean(c) - w % mean(c) * t % mean(c)
-      call Save_Vtu_Scalar(grid, IN_4, IN_5, "TT_MEAN", uu_mean(1))
-      call Save_Vtu_Scalar(grid, IN_4, IN_5, "UT_MEAN", ut_mean(1))
-      call Save_Vtu_Scalar(grid, IN_4, IN_5, "VT_MEAN", vt_mean(1))
-      call Save_Vtu_Scalar(grid, IN_4, IN_5, "WT_MEAN", wt_mean(1))
+      call Save_Vtu_Scalar(grid, IN_4, IN_5, "TemperatureFluctuations",  &
+                                 tt_mean(1))
+      call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxX", ut_mean(1))
+      call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxY", vt_mean(1))
+      call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxZ", wt_mean(1))
     end if
   end if
 
   ! Save y+ for all turbulence models
   if(turbulence_model .ne. NONE) then
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "Y_PLUS", y_plus(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentQuantityYplus", y_plus(1))
   end if
 
   ! Wall distance and delta, important for all models
-  call Save_Vtu_Scalar(grid, IN_4, IN_5, "WALL_DIST",  grid % wall_dist(1))
-  call Save_Vtu_Scalar(grid, IN_4, IN_5, "CELL_DELTA", grid % delta(1))
+  call Save_Vtu_Scalar(grid, IN_4, IN_5, "WallDistance", grid % wall_dist(1))
+  call Save_Vtu_Scalar(grid, IN_4, IN_5, "CellDelta",    grid % delta(1))
 
   !-----------------------!
   !   Save user scalars   !

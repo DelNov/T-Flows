@@ -41,7 +41,7 @@
 !   shear = sqrt(2 S_ij S_ij)                                                  !
 !------------------------------------------------------------------------------!
 
-  if(turbulence_model_variant .eq. HIGH_RE) then
+  if(turbulence_wall_treatment .eq. HIGH_RE) then
     do c = 1, grid % n_cells
       ! Positive contribution:
       b(c) = b(c) + &
@@ -85,15 +85,15 @@
     end do
   end if        ! end if mode = wf
 
-  if(turbulence_model_variant .eq. LOW_RE) then
+  if(turbulence_wall_treatment .eq. LOW_RE) then
   !-------------------------!
   !   Jones-Launder model   !
   !-------------------------!
 
-   call Calculate_Shear_And_Vorticity(grid)
-   call Grad_Mod_For_Phi(grid, shear, 1, shear_x, .true.)  ! dU/dx
-   call Grad_Mod_For_Phi(grid, shear, 2, shear_y, .true.)  ! dW/dy
-   call Grad_Mod_For_Phi(grid, shear, 3, shear_z, .true.)  ! dV/dz
+    call Calculate_Shear_And_Vorticity(grid)
+    call Grad_Mod_For_Phi(grid, shear, 1, shear_x, .true.)  ! dU/dx
+    call Grad_Mod_For_Phi(grid, shear, 2, shear_y, .true.)  ! dW/dy
+    call Grad_Mod_For_Phi(grid, shear, 3, shear_z, .true.)  ! dV/dz
 
     do c = 1, grid % n_cells
       ! Positive contribution:

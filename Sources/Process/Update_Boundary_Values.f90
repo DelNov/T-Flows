@@ -76,8 +76,7 @@
       end if
 
       ! k-epsilon-zeta-f
-      if(turbulence_model .eq. K_EPS_ZETA_F     .or.  &
-         turbulence_model .eq. HYBRID_K_EPS_ZETA_F) then
+      if(turbulence_model .eq. K_EPS_ZETA_F) then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW  .or.   &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT  .or.   &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE .or.   &
@@ -128,7 +127,9 @@
         call Control_Mod_Turbulent_Prandtl_Number(pr_t)
 
         ! If not DNS or LES, compute Prandtl number 
-        if(turbulence_model .ne. LES .or.  &
+        if(turbulence_model .ne. SMAGORINSKY .or.  &
+           turbulence_model .ne. DYNAMIC     .or.  &
+           turbulence_model .ne. WALE        .or.  &
            turbulence_model .ne. DNS) then
           pr_t = Turbulent_Prandtl_Number(grid, c1)
         end if
@@ -151,9 +152,9 @@
         ! and high-re k-eps models
         if(turbulence_model .eq. K_EPS_ZETA_F .or.      &
             (turbulence_model         .eq. K_EPS .and.  &
-             turbulence_model_variant .eq. HIGH_RE) ) then
-          y_pl = max(c_mu25 * sqrt(kin % n(c1)) * grid % wall_dist(c1) / &
-            viscosity, 0.12)
+             turbulence_wall_treatment .eq. HIGH_RE) ) then
+          y_pl = max(c_mu25 * sqrt(kin % n(c1)) * grid % wall_dist(c1)  &
+               / viscosity, 0.12)
           u_plus = log(y_pl * e_log) / kappa + TINY
           pr = viscosity * capacity / conductivity
           beta = 9.24 * ((pr/pr_t)**0.75 - 1.0)  &
@@ -206,8 +207,7 @@
            turbulence_model .eq. DES_SPALART)           &
           vis % n(c2) = vis % n(grid % bnd_cond % copy_c(c2))
 
-        if(turbulence_model .eq. K_EPS_ZETA_F     .or.  &
-           turbulence_model .eq. HYBRID_K_EPS_ZETA_F) then
+        if(turbulence_model .eq. K_EPS_ZETA_F) then
           kin  % n(c2) = kin  % n(grid % bnd_cond % copy_c(c2))
           eps  % n(c2) = eps  % n(grid % bnd_cond % copy_c(c2))
           zeta % n(c2) = zeta % n(grid % bnd_cond % copy_c(c2))

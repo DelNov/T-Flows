@@ -62,7 +62,7 @@
   end do
 
   ! Low-Re varaint
-  if(turbulence_model_variant .eq. LOW_RE) then
+  if(turbulence_wall_treatment .eq. LOW_RE) then
     do c = 1, grid % n_cells
       re_t(c) = kin % n(c)**2. / (kin_visc * eps % n(c) + TINY)
       f_mu(c) = exp(-3.4/(1.0 + 0.02*re_t(c))**2)

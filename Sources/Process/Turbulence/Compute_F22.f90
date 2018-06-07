@@ -54,13 +54,13 @@
 !     Lsc            [m]                                                       !
 !------------------------------------------------------------------------------!
 
-  A % val = 0.0
+  a % val = 0.0
 
   b = 0.0
 
   ! This is important for "copy" boundary conditions. Find out why !
   do c = -grid % n_bnd_cells, -1
-    A % bou(c) = 0.0
+    a % bou(c) = 0.0
   end do
 
   !-------------------------------------! 
@@ -161,21 +161,21 @@
 
       ! Fill the system matrix
       if(c2  > 0) then
-        A % val(A % pos(1,s)) = A % val(A % pos(1,s)) - a12
-        A % val(A % dia(c1))  = A % val(A % dia(c1))  + a12
-        A % val(A % pos(2,s)) = A % val(A % pos(2,s)) - a21
-        A % val(A % dia(c2))  = A % val(A % dia(c2))  + a21
+        a % val(a % pos(1,s)) = a % val(a % pos(1,s)) - a12
+        a % val(a % dia(c1))  = a % val(a % dia(c1))  + a12
+        a % val(a % pos(2,s)) = a % val(a % pos(2,s)) - a21
+        a % val(a % dia(c2))  = a % val(a % dia(c2))  + a21
       else if(c2  < 0) then
         ! Outflow is not included because it was causing problems  
         if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW)) then                    
-          A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
+          a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
           b(c1) = b(c1) + a12 * phi % n(c2)
 
         else
 
         if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL).or.                          &
             (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) ) then
-          A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
+          a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
           !---------------------------------------------------------------!
           !   Source coefficient is filled in SourceF22.f90 in order to   !
           !   get updated values of f22 on the wall.  Otherwise f22       !
@@ -183,8 +183,8 @@
           !   b(c1) = b(c1) + a12 * phi % n(c2)                           !
           !---------------------------------------------------------------!
         else if( Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER ) then  
-          A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
-          A % bou(c2) = - a12  ! cool parallel stuff
+          a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
+          a % bou(c2) = - a12  ! cool parallel stuff
         endif
       end if     
      end if
@@ -259,8 +259,8 @@
   call Control_Mod_Simple_Underrelaxation_For_Turbulence(urf)
 
   do c = 1, grid % n_cells
-    b(c) = b(c) + A % val(A % dia(c)) * (1.0 - urf)*phi % n(c) / urf
-    A % val(A % dia(c)) = A % val(A % dia(c)) / urf
+    b(c) = b(c) + a % val(a % dia(c)) * (1.0 - urf)*phi % n(c) / urf
+    a % val(a % dia(c)) = a % val(a % dia(c)) / urf
   end do 
 
   ! Get tolerance for linear solver
@@ -275,7 +275,7 @@
   ! Over-ride if specified in control file
   call Control_Mod_Max_Iterations_For_Turbulence_Solver(niter)
 
-  call Cg(A, phi % n, b, precond, niter, tol, ini_res, phi % res)
+  call Cg(a, phi % n, b, precond, niter, tol, ini_res, phi % res)
   
   call Info_Mod_Iter_Fill_At(3, 4, phi % name, niter, phi % res)    
 

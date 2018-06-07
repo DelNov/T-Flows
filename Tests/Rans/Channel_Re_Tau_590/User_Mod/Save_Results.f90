@@ -100,7 +100,7 @@
 
   allocate(n_count(n_prob)); n_count=0
   count = 0
-  if(heat_transfer == YES) then
+  if(heat_transfer .eq. YES) then
     allocate(tm_p(n_prob));  tm_p = 0.0
     allocate(tt_p(n_prob));  tt_p = 0.0
     allocate(ut_p(n_prob));  ut_p = 0.0
@@ -118,15 +118,12 @@
       length_scale = max(length_scale, grid % wall_dist(c))
       if(grid % zc(c) > (z_p(i)) .and.  &
          grid % zc(c) < (z_p(i+1))) then
-!        if(ROT == YES) then
+!        if(ROT .eq. YES) then
 !          wall_p(i) = wall_p(i) + grid % yc(c) 
 !        else
           wall_p(i) = wall_p(i) + grid % wall_dist(c) 
 !        end if 
-        if(turbulence_model == LES      .or.  &
-           turbulence_model == DNS      .or.  &
-           turbulence_model == HYBRID_K_EPS_ZETA_F .or.  &
-           turbulence_model == DES_SPALART) then       
+        if(turbulence_statistics .eq. YES) then          
           um_p(i)   = um_p(i) + u % mean(c)
           vm_p(i)   = vm_p(i) + v % mean(c)
           wm_p(i)   = wm_p(i) + w % mean(c)
@@ -136,8 +133,8 @@
           wm_p(i)   = wm_p(i) + w % n(c)
         end if
 
-        if(turbulence_model == K_EPS_ZETA_F .or.  &
-           turbulence_model == K_EPS) then
+        if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
+           turbulence_model .eq. K_EPS) then
           if(grid % cell_near_wall(c)) then
             if(y_plus(c) > 5.0) then        
               u_tau_p(i) = u_tau_p(i) +                       &
@@ -159,13 +156,13 @@
           uv_p(i) = uv_p(i) + vis_t(c) / viscosity
         end if
 
-        if(turbulence_model == K_EPS_ZETA_F) then
+        if(turbulence_model .eq. K_EPS_ZETA_F) then
           uw_p(i) = uw_p(i) + f22  % n(c)
           vw_p(i) = vw_p(i) + zeta % n(c) 
         end if
 
-        if(turbulence_model == REYNOLDS_STRESS .or.  &
-           turbulence_model == HANJALIC_JAKIRLIC) then
+        if(turbulence_model .eq. REYNOLDS_STRESS .or.  &
+           turbulence_model .eq. HANJALIC_JAKIRLIC) then
           uu_p(i) = uu_p(i) + uu % n(c) 
           vv_p(i) = vv_p(i) + vv % n(c) 
           ww_p(i) = ww_p(i) + ww % n(c)
@@ -174,7 +171,7 @@
           vw_p(i) = vw_p(i) + vw % n(c)
           v1_p(i) = v1_p(i) + kin % n(c)
           v2_p(i) = v2_p(i) + eps % n(c)
-          if(turbulence_model == REYNOLDS_STRESS)  &
+          if(turbulence_model .eq. REYNOLDS_STRESS)  &
             v3_p(i) = v3_p(i) + f22 % n(c) 
 
           if(grid % cell_near_wall(c)) then
@@ -187,7 +184,7 @@
           end if
         end if 
 
-        if(turbulence_model == SPALART_ALLMARAS) then
+        if(turbulence_model .eq. SPALART_ALLMARAS) then
           uu_p(i) = uu_p(i) + 2.0*vis_t(c)*u % x(c) 
           vv_p(i) = vv_p(i) + 2.0*vis_t(c)*v % y(c)
           ww_p(i) = ww_p(i) + 2.0*vis_t(c)*w % z(c)
@@ -205,9 +202,11 @@
           end if 
         end if
 
-        if(turbulence_model == LES         .or.  &
-           turbulence_model == DES_SPALART .or.  &
-           turbulence_model == DNS) then
+        if(turbulence_model .eq. SMAGORINSKY .or.  &
+           turbulence_model .eq. DYNAMIC     .or.  &
+           turbulence_model .eq. WALE        .or.  &
+           turbulence_model .eq. DES_SPALART .or.  &
+           turbulence_model .eq. DNS) then
           uu_p(i)   = uu_p(i) + (uu % mean(c)- u % mean(c) * u % mean(c))
           vv_p(i)   = vv_p(i) + (vv % mean(c)- v % mean(c) * v % mean(c))
           ww_p(i)   = ww_p(i) + (ww % mean(c)- w % mean(c) * w % mean(c))
@@ -224,7 +223,8 @@
           end if 
         end if
 
-        if(turbulence_model == HYBRID_K_EPS_ZETA_F) then
+        if(turbulence_model      .eq. K_EPS_ZETA_F .and.  &
+           turbulence_statistics .eq. YES) then
           v1_p(i) = v1_p(i) + kin % n(c) 
           v2_p(i) = v2_p(i) + eps % n(c) !vis_t(c)/viscosity 
           v3_p(i) = v3_p(i) + vis_t_eff(c)/viscosity 
@@ -238,11 +238,8 @@
           end if 
         end if 
  
-        if(heat_transfer == YES) then
-          if(turbulence_model == LES         .or.  &
-             turbulence_model == DES_SPALART .or.  &
-             turbulence_model == DNS         .or.  &
-             turbulence_model == HYBRID_K_EPS_ZETA_F) then
+        if(heat_transfer .eq. YES) then
+          if(turbulence_statistics .eq. YES) then             
             tm_p(i)   = tm_p(i) + t % mean(c)
             tt_p(i)   = tt_p(i) + (tt % mean(c) - t % mean(c) * t % mean(c))
             ut_p(i)   = ut_p(i) + (ut % mean(c) - u % mean(c) * t % mean(c))
@@ -260,7 +257,7 @@
     end do 
   end do 
 
-  if(heat_transfer == YES) then
+  if(heat_transfer .eq. YES) then
     d_wall = 0.0
     do c = 1, grid % n_cells
       if(grid % wall_dist(c) > d_wall) then
@@ -281,8 +278,8 @@
       c1=grid % faces_c(1,s)
       c2=grid % faces_c(2,s)
       if(c2  < 0) then
-        if( Grid_Mod_Bnd_Cond_Type(grid, c2) == WALL .or.  &
-            Grid_Mod_Bnd_Cond_Type(grid, c2) == WALLFL) then
+        if( Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. WALL .or.  &
+            Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. WALLFL) then
           t_wall = t % n(c2) 
           nu_max = t % q(c2)/(conductivity*(t_wall-t_inf))
         end if
@@ -315,7 +312,7 @@
 
     count =  count + n_count(pl) 
 
-    if(heat_transfer == YES) then
+    if(heat_transfer .eq. YES) then
       call Comm_Mod_Global_Sum_Real(tm_p(pl))
       call Comm_Mod_Global_Sum_Real(tt_p(pl))
       call Comm_Mod_Global_Sum_Real(ut_p(pl))
@@ -342,7 +339,7 @@
       v2_p(i)    = v2_p(i)/n_count(i)
       v3_p(i)    = v3_p(i)/n_count(i)
       u_tau_p(i) = u_tau_p(i)/n_count(i)
-      if(heat_transfer == YES) then
+      if(heat_transfer .eq. YES) then
         tm_p(i) = tm_p(i)/n_count(i)
         tt_p(i) = tt_p(i)/n_count(i)
         ut_p(i) = ut_p(i)/n_count(i)
@@ -352,9 +349,11 @@
     end if
   end do 
 
-  if(turbulence_model == LES         .or.  &
-     turbulence_model == DES_SPALART .or.  &
-     turbulence_model == DNS) then
+  if(turbulence_model .eq. SMAGORINSKY .or.  &
+     turbulence_model .eq. DYNAMIC     .or.  &
+     turbulence_model .eq. WALE        .or.  &
+     turbulence_model .eq. DES_SPALART .or.  &
+     turbulence_model .eq. DNS) then
     do i = 1, (n_prob-1)/2
       um_p(i)    = (um_p(i)+um_p(n_prob-i))/2.0
       vm_p(i)    = (vm_p(i)+vm_p(n_prob-i))/2.0 
@@ -375,7 +374,7 @@
   end do
   t_tau = heat_flux / (density * capacity * u_tau_max)
 
-  if(u_tau_max == 0.0) then
+  if(u_tau_max .eq. 0.0) then
     if(this_proc < 2) then
       write(*,*) 'Friction velocity is zero in User_Channel_profiles.f90 !'
     end if
@@ -386,82 +385,86 @@
   open(4, file = res_name_plus)
 
   do i = 3, 4
-  write(i,'(A1,2(A8,F12.5, 3X))') '#', 'Utau = ', &
-  u_tau_max, 'Re_tau = ', u_tau_max/viscosity
-  if(heat_transfer == YES) write(i,'(A1,3(A10, F10.5, 2X))') '#', 'heat_flux = ', abs(heat_flux), &
-  'K+ = q/Uf =', abs(heat_flux)/u_tau_max*(viscosity/conductivity)**ONE_THIRD,'Nu max = ', &
-  nu_max
-  if(turbulence_model == DNS                 .or.  &
-     turbulence_model == LES                 .or.  &
-     turbulence_model == HYBRID_K_EPS_ZETA_F .or.  &
-     turbulence_model == DES_SPALART) then
-    if(heat_transfer == YES) then 
-      write(i,'(A1,2X,A100)') '#', ' 1:Xrad, '                    //  &
-                                   ' 2:u,    3:v,   4:w,  5:t, '  //  &    
-                                   ' 6:uu,   7:vv,  8:ww, '       //  &
-                                   ' 9:uv,  10:uw,  11:vw, '      //  &
-                                   '12:tt,  '                     //  &
-                                   '13:ut,  14:vt, 15:wt, '       //  &
-                                   '16:kin, 17:vis_t/viscosity' 
-    else
-      write(i,'(A1,2X,A64)')  '#', ' 1:Xrad, '                    //  &
-                                   ' 2:u,   3:v,    4:w, '        //  &
-                                   ' 5:uu,  6:vv,   7:ww, '       //  &
-                                   ' 8:uv,  9:uw,  10:vw, '       //  &
-                                   '11:kin 12:vis_t/viscosity' 
-    end if
-  else if(turbulence_model == K_EPS) then
-    if(heat_transfer == YES) then 
-      write(i,'(A1,2X,A100)') '#', ' 1:Xrad, '                    //  &
-                                   ' 2:u,   3:v,    4:w,   5:t, ' //  &
-                                   ' 6:kin  7:eps,  8:uw, '       //  &
-                                   ' 9:vis_t/viscosity, '         //  &
-                                   '10:ut, 11:vt,  12:wt, '       //  &
-                                   '13:vis_t/viscosity'
-    else
-      write(i,'(A1,2X,A70)')  '#', ' 1:Xrad, '                    //  &
-                                   ' 2:u,   3:v,   4:w, '         //  &
-                                   ' 5:kin, 6:eps, 7:uw, 8:vis_t/viscosity' 
-    end if
-  else if(turbulence_model == K_EPS_ZETA_F) then
-    if(heat_transfer == YES) then 
-      write(i,'(A1,2X,A100)') '#', ' 1:Xrad, '                    //  &
-                                   ' 2:u,   3:v,    4:w,   5:t, ' //  &
-                                   ' 6:kin, 7:eps,  8:uw, '       //  &
-                                   ' 9:vis_t/viscosity, '         //  &
-                                   '10:f22, 11:v2, '              //  &
-                                   '12:ut,  13:vt, 14:wt ' 
-    else
-      write(i,'(A1,2X,A64)') '#', ' 1:Xrad, '                     //  & 
-                                  ' 2:u,    3:v,    4:w, '        //  &
-                                  ' 5:kin,  6:eps,  7:uw, '       //  &
-                                  ' 8:vis_t/viscosity, '          //  &
-                                  ' 9:f22, 10:v2' 
-    end if
-  else if(turbulence_model == HANJALIC_JAKIRLIC .or.  &
-          turbulence_model == REYNOLDS_STRESS) then
-    if(heat_transfer == YES) then 
-      write(i,'(A1,2X,A100)') '#', ' 1:Xrad, '                    //  &
-                                   ' 2:u,    3:v,   4:w,  5:t, '  //  &
-                                   ' 6:uu,   7:vv,  8:ww, '       //  &
-                                   ' 9:uv,  10:uw, 11:vw, '       //  &
-                                   '12:ut,  13:vt, 14:wt, '       //  &
-                                   '15:kin, 16:vis_t/viscosity' 
-    else
-      write(i,'(A1,2X,A64)') '#', ' 1:Xrad, '                     //  &
-                                  ' 2:u,    3:v,    4:w, '        //  &
-                                  ' 5:uu,   6:vv,   7:ww, '       //  &
-                                  ' 8:uv,   9:uw,  10:vw, '       //  &
-                                  '11:kin' 
-    end if
-  end if
-  end do ! end i
 
-  if(heat_transfer == YES) then
-    if(turbulence_model == LES         .or.  &
-       turbulence_model == DES_SPALART .or.  &
-       turbulence_model == DNS         .or.  &
-       turbulence_model == HYBRID_K_EPS_ZETA_F) then
+    write(i,'(A1,2(A8,F12.5, 3X))') '#', 'Utau = ', &
+    u_tau_max, 'Re_tau = ', u_tau_max/viscosity
+    if(heat_transfer .eq. YES) then 
+      write(i,'(A2,3(A10, F10.5, 2X))')                                      &
+              ' #',                                                          &
+              'heat_flux = ',                                                &
+              abs(heat_flux),                                                &
+              'K+ = q/Uf =',                                                 &
+              abs(heat_flux)/u_tau_max*(viscosity/conductivity)**ONE_THIRD,  &
+              'Nu max = ',                                                   &
+              nu_max
+    end if
+
+    if(turbulence_statistics .eq. YES) then                 
+      if(heat_transfer .eq. YES) then 
+        write(i,'(A1,2X,A100)') '#', ' 1:Xrad, '                    //  &
+                                     ' 2:u,    3:v,   4:w,  5:t, '  //  &    
+                                     ' 6:uu,   7:vv,  8:ww, '       //  &
+                                     ' 9:uv,  10:uw,  11:vw, '      //  &
+                                     '12:tt,  '                     //  &
+                                     '13:ut,  14:vt, 15:wt, '       //  &
+                                     '16:kin, 17:vis_t/viscosity' 
+      else
+        write(i,'(A1,2X,A64)')  '#', ' 1:Xrad, '                    //  &
+                                     ' 2:u,   3:v,    4:w, '        //  &
+                                     ' 5:uu,  6:vv,   7:ww, '       //  &
+                                     ' 8:uv,  9:uw,  10:vw, '       //  &
+                                     '11:kin 12:vis_t/viscosity' 
+      end if
+    else if(turbulence_model .eq. K_EPS) then
+      if(heat_transfer .eq. YES) then 
+        write(i,'(A1,2X,A100)') '#', ' 1:Xrad, '                    //  &
+                                     ' 2:u,   3:v,    4:w,   5:t, ' //  &
+                                     ' 6:kin  7:eps,  8:uw, '       //  &
+                                     ' 9:vis_t/viscosity, '         //  &
+                                     '10:ut, 11:vt,  12:wt, '       //  &
+                                     '13:vis_t/viscosity'
+      else
+        write(i,'(A1,2X,A70)')  '#', ' 1:Xrad, '                    //  &
+                                     ' 2:u,   3:v,   4:w, '         //  &
+                                     ' 5:kin, 6:eps, 7:uw, 8:vis_t/viscosity' 
+      end if
+    else if(turbulence_model .eq. K_EPS_ZETA_F) then
+      if(heat_transfer .eq. YES) then 
+        write(i,'(A1,2X,A100)') '#', ' 1:Xrad, '                    //  &
+                                     ' 2:u,   3:v,    4:w,   5:t, ' //  &
+                                     ' 6:kin, 7:eps,  8:uw, '       //  &
+                                     ' 9:vis_t/viscosity, '         //  &
+                                     '10:f22, 11:v2, '              //  &
+                                     '12:ut,  13:vt, 14:wt ' 
+      else
+        write(i,'(A1,2X,A64)') '#', ' 1:Xrad, '                     //  & 
+                                    ' 2:u,    3:v,    4:w, '        //  &
+                                    ' 5:kin,  6:eps,  7:uw, '       //  &
+                                    ' 8:vis_t/viscosity, '          //  &
+                                    ' 9:f22, 10:v2' 
+      end if 
+    else if(turbulence_model .eq. HANJALIC_JAKIRLIC .or.  &
+            turbulence_model .eq. REYNOLDS_STRESS) then
+      if(heat_transfer .eq. YES) then 
+        write(i,'(A1,2X,A100)') '#', ' 1:Xrad, '                    //  &
+                                     ' 2:u,    3:v,   4:w,  5:t, '  //  &
+                                     ' 6:uu,   7:vv,  8:ww, '       //  &
+                                     ' 9:uv,  10:uw, 11:vw, '       //  &
+                                     '12:ut,  13:vt, 14:wt, '       //  &
+                                     '15:kin, 16:vis_t/viscosity' 
+      else  
+        write(i,'(A1,2X,A64)') '#', ' 1:Xrad, '                     //  &
+                                    ' 2:u,    3:v,    4:w, '        //  &
+                                    ' 5:uu,   6:vv,   7:ww, '       //  &
+                                    ' 8:uv,   9:uw,  10:vw, '       //  &
+                                    '11:kin' 
+      end if 
+    end if
+
+  end do 
+
+  if(heat_transfer .eq. YES) then
+    if(turbulence_statistics .eq. YES) then             
       do i = 1, n_prob
         if(n_count(i) /= 0) then
           write(3,'(18e15.7)') wall_p(i),                           &
@@ -504,20 +507,19 @@
     vm_p(i) = vm_p(i)/u_tau_max 
     wm_p(i) = wm_p(i)/u_tau_max 
 
-    if(turbulence_model == K_EPS_ZETA_F .or.  &
-       turbulence_model == K_EPS        .or.  &
-       turbulence_model == HYBRID_K_EPS_ZETA_F) then
+    if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
+       turbulence_model .eq. K_EPS) then
       uu_p(i) = uu_p(i)/u_tau_max**2              ! kin%n(c)
       vv_p(i) = vv_p(i)*viscosity/u_tau_max**4.0  ! eps%n(c)
       ww_p(i) = ww_p(i)/u_tau_max**2              ! vis_t(c)*(u%z(c)+w%x(c)) 
       uv_p(i) = uv_p(i)                           ! vis_t(c)/viscosity
 
-    else if(turbulence_model == K_EPS_ZETA_F) then
+    else if(turbulence_model .eq. K_EPS_ZETA_F) then
       uw_p(i) = uw_p(i)*viscosity/u_tau_max**2.0   ! f22%n(c)
       vw_p(i) = vw_p(i)                   ! v_2%n(c) 
 
-    else if(turbulence_model == REYNOLDS_STRESS .or.  &
-            turbulence_model == HANJALIC_JAKIRLIC) then
+    else if(turbulence_model .eq. REYNOLDS_STRESS .or.  &
+            turbulence_model .eq. HANJALIC_JAKIRLIC) then
       uu_p(i) = uu_p(i)/u_tau_max**2             ! uu%n(c) 
       vv_p(i) = vv_p(i)/u_tau_max**2             ! vv%n(c) 
       ww_p(i) = ww_p(i)/u_tau_max**2             ! ww%n(c)
@@ -536,10 +538,7 @@
       vw_p(i) = vw_p(i)/u_tau_max**2  ! vis_t(c)*(v % z(c) + w % y(c))
       v1_p(i) = v1_p(i)               ! vis_t(c)/viscosity
 
-    else if(turbulence_model == LES         .or. &
-            turbulence_model == DES_SPALART .or. &
-            turbulence_model == DNS         .or. &
-            turbulence_model == HYBRID_K_EPS_ZETA_F) then
+    else if(turbulence_statistics .eq. YES) then             
       uu_p(i) = uu_p(i)/u_tau_max**2  !(uu%mean(c)-u%mean(c)*u%mean(c))
       vv_p(i) = vv_p(i)/u_tau_max**2  !(vv%mean(c)-v%mean(c)*v%mean(c))
       ww_p(i) = ww_p(i)/u_tau_max**2  !(ww%mean(c)-w%mean(c)*w%mean(c))
@@ -547,17 +546,15 @@
       uw_p(i) = uw_p(i)/u_tau_max**2  !(uw%mean(c)-u%mean(c)*w%mean(c))
       vw_p(i) = vw_p(i)/u_tau_max**2  !(vw%mean(c)-v%mean(c)*w%mean(c))
 
-    else if(turbulence_model == HYBRID_K_EPS_ZETA_F) then
+    else if(turbulence_model      .eq. K_EPS_ZETA_F .and.  &
+            turbulence_statistics .eq. YES) then
       v1_p(i) = v1_p(i)/u_tau_max**2    ! kin % n(c) 
       v2_p(i) = v2_p(i)                 ! vis_t(c)/viscosity 
       v3_p(i) = v3_p(i)                 ! vis_t_sgs(c)/viscosity 
     end if 
  
-    if(heat_transfer == YES) then
-      if(turbulence_model == LES         .or.  &
-         turbulence_model == DES_SPALART .or.  &
-         turbulence_model == DNS         .or.  &
-         turbulence_model == HYBRID_K_EPS_ZETA_F) then
+    if(heat_transfer .eq. YES) then
+      if(turbulence_statistics .eq. YES) then 
         tm_p(i) = (t_wall - tm_p(i))/t_tau   ! t % mean(c)
         tt_p(i) = tt_p(i)/t_tau**2           !(tt%mean(c)-t%mean(c)*t%mean(c))
         ut_p(i) = ut_p(i)/(u_tau_max*t_tau)  !(ut%mean(c)-u%mean(c)*t%mean(c))
@@ -572,11 +569,8 @@
     end if
   end do 
 
-  if(heat_transfer == YES) then
-    if(turbulence_model == LES         .or.  &
-       turbulence_model == DES_SPALART .or.  &
-       turbulence_model == DNS         .or.  &
-       turbulence_model == HYBRID_K_EPS_ZETA_F) then
+  if(heat_transfer .eq. YES) then
+    if(turbulence_statistics .eq. YES) then 
       do i = 1, n_prob
         if(n_count(i) /= 0) then
           write(4,'(18e15.7)') wall_p(i),                           &
@@ -624,7 +618,7 @@
   deallocate(uv_p)
   deallocate(uw_p)
   deallocate(vw_p)
-  if(heat_transfer == YES) then
+  if(heat_transfer .eq. YES) then
     deallocate(tm_p)
     deallocate(tt_p)
     deallocate(ut_p)

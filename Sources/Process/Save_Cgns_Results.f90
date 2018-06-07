@@ -130,22 +130,22 @@
   !   Velocity   !
   !--------------!
   call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                            u % n(1),"VelocityX")
+                            u % n(1), "VelocityX")
   call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                            v % n(1),"VelocityY")
+                            v % n(1), "VelocityY")
   call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                            w % n(1),"VelocityZ")
+                            w % n(1), "VelocityZ")
   !--------------!
   !   Pressure   !
   !--------------!
   call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                            p % n(1),"Pressure")
+                            p % n(1), "Pressure")
   !-----------------!
   !   Temperature   !
   !-----------------!
   if(heat_transfer .eq. YES) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              t % n(1),"Temperature")
+                              t % n(1), "Temperature")
   end if
   !--------------------------!
   !   Turbulent quantities   !
@@ -154,21 +154,19 @@
   ! Kin and Eps
   if(turbulence_model .eq. K_EPS                 .or.  &
      turbulence_model .eq. K_EPS_ZETA_F          .or.  &
-     turbulence_model .eq. HYBRID_K_EPS_ZETA_F   .or.  &
      turbulence_model .eq. REYNOLDS_STRESS .or.  &
      turbulence_model .eq. HANJALIC_JAKIRLIC  ) then
 
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              kin % n(1),"TurbulentEnergyKinetic")
+                              kin % n(1), "TurbulentKineticEnergy")
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              eps % n(1),"TurbulentDissipation")
+                              eps % n(1), "TurbulentDissipation")
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              p_kin(1),"TurbulentEnergyKineticProduction")
+                              p_kin(1), "TurbulentKineticEnergyProduction")
   end if
 
   ! zeta, v2 and f22
-  if(turbulence_model .eq. K_EPS_ZETA_F   .or.  &
-     turbulence_model .eq. HYBRID_K_EPS_ZETA_F) then
+  if(turbulence_model .eq. K_EPS_ZETA_F) then
     do c = 1, grid % n_cells
       v2_calc(c) = kin % n(c) * zeta % n(c)
     end do
@@ -192,14 +190,7 @@
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               vort(1),"VorticityMagnitude")
   end if
-  if(turbulence_model .eq. K_EPS                 .or.  &
-     turbulence_model .eq. K_EPS_ZETA_F          .or.  &
-     turbulence_model .eq. HYBRID_K_EPS_ZETA_F   .or.  &
-     turbulence_model .eq. REYNOLDS_STRESS .or.  &
-     turbulence_model .eq. HANJALIC_JAKIRLIC     .or.  &
-     turbulence_model .eq. LES                   .or.  &
-     turbulence_model .eq. DES_SPALART           .or.  &
-     turbulence_model .eq. SPALART_ALLMARAS) then
+  if(turbulence_model .ne. NONE) then                  
     kin_vis_t(1:grid % n_cells) = vis_t(1:grid % n_cells)/viscosity
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               kin_vis_t(1),"EddyOverMolecularViscosity")
@@ -223,7 +214,10 @@
   end if
 
   ! Statistics for large-scale simulations of turbulence
-  if(turbulence_model .eq. LES .or.  &
+  if(turbulence_model .eq. SMAGORINSKY .or.  &
+     turbulence_model .eq. DYNAMIC     .or.  &
+     turbulence_model .eq. WALE        .or.  &
+     turbulence_model .eq. DNS         .or.  &
      turbulence_model .eq. DES_SPALART) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               u % n(1),"MeanVelocityX")
@@ -251,7 +245,7 @@
                               vw_mean(1),"ReynoldsStressYZ")
     if(heat_transfer .eq. YES) then
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                               t % mean(1), "MeanTemperature")
+                               t % mean(1), "TemperatureMean")
       tt_mean = tt % mean(c) - t % mean(c) * t % mean(c)
       ut_mean = ut % mean(c) - u % mean(c) * t % mean(c)
       vt_mean = vt % mean(c) - v % mean(c) * t % mean(c)

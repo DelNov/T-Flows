@@ -5,6 +5,7 @@
 !   'EBM' and 'HJ' are calling this subroutine.                                !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
+  use Const_Mod, only: YES, NO
   use Flow_Mod
   use Les_Mod
   use Rans_Mod
@@ -19,12 +20,14 @@
   use Work_Mod,    only: phi_x       => r_cell_01,  &
                          phi_y       => r_cell_02,  &
                          phi_z       => r_cell_03,  &
-                         u1uj_phij   => r_cell_04,  &
-                         u2uj_phij   => r_cell_05,  &
-                         u3uj_phij   => r_cell_06,  &
-                         u1uj_phij_x => r_cell_07,  &
-                         u2uj_phij_y => r_cell_08,  &
-                         u3uj_phij_z => r_cell_09    
+                         phi_min     => r_cell_04,  &
+                         phi_max     => r_cell_05,  &
+                         u1uj_phij   => r_cell_06,  &
+                         u2uj_phij   => r_cell_07,  &
+                         u3uj_phij   => r_cell_08,  &
+                         u1uj_phij_x => r_cell_09,  &
+                         u2uj_phij_y => r_cell_10,  &
+                         u3uj_phij_z => r_cell_11    
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -40,9 +43,9 @@
   real              :: ini_res, tol
   real              :: vis_eff
   real              :: phix_f, phiy_f, phiz_f
-  real              :: vis_tS
+  real              :: vis_t_f
   character(len=80) :: precond
-  integer           :: adv_scheme  ! space discratization advection (scheme)
+  integer           :: adv_scheme    ! space discratization advection (scheme)
   real              :: blend         ! blending coeff (1.0 central; 0. upwind)
   integer           :: td_inertia    ! time-disretization for inerita  
   integer           :: td_advection  ! time-disretization for advection
@@ -111,7 +114,7 @@
   ! Compute phimax and phimin
   do mat = 1, grid % n_materials
     if(adv_scheme .ne. CENTRAL) then
-      call Calculate_Minimum_Maximum(grid, phi % n)  ! or phi % o ???
+      call Calculate_Minimum_Maximum(grid, phi % n, phi_min, phi_max)
       goto 1
     end if
   end do
@@ -138,9 +141,9 @@
 
       ! Compute phis with desired advection scheme
       if(adv_scheme .ne. CENTRAL) then
-        call Advection_Scheme(grid, phis, s, phi % n,           &
-                              phi_x, phi_y, phi_z,              &
-                              grid % dx, grid % dy, grid % dz,  &
+        call Advection_Scheme(grid, phis, s, phi % n, phi_min, phi_max,  &
+                              phi_x, phi_y, phi_z,                       &
+                              grid % dx, grid % dy, grid % dz,           &
                               adv_scheme, blend) 
       end if 
 
@@ -221,21 +224,13 @@
 
     ! vis_tur is used to make diaginal element more dominant.
     ! This contribution is later substracted.
-    vis_tS = fw(s)*vis_t(c1) + (1.0-fw(s))*vis_t(c2)
+    vis_t_f = fw(s)*vis_t(c1) + (1.0-fw(s))*vis_t(c2)
 
-    if(turbulence_model .eq. REYNOLDS_STRESS) then
-      vis_eff = viscosity + vis_tS 
-    else if(turbulence_model .eq. HANJALIC_JAKIRLIC .and.  &
-            turbulence_model_variant .ne. HYBRID) then
-      vis_eff = 1.5*viscosity 
-    else if(turbulence_model .eq. HANJALIC_JAKIRLIC .and.  &
-            turbulence_model_variant .eq. HYBRID) then
-      vis_eff = viscosity 
-    end if
+    vis_eff = viscosity + vis_t_f
 
     if(turbulence_model .eq. HANJALIC_JAKIRLIC) then
-      if(turbulence_model_variant .eq. HYBRID) then
-        vis_eff = vis_eff + vis_tS
+      if(turbulence_model_variant .ne. STABILIZED) then
+        vis_eff = 1.5*viscosity 
       end if
     end if
 
@@ -304,9 +299,9 @@
         ! Outflow is not included because it was causing problems     
         ! Convect is commented because for turbulent scalars convect 
         ! outflow is treated as classic outflow.
-        if((Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW).or.                     &
-           (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL).or.                       &
-!!!        (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT).or.                    &
+        if((Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW).or.                   &
+           (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL).or.                     &
+!!!        (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT).or.                  &
            (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) ) then                                
           a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
           b(c1) = b(c1) + a12 * phi % n(c2)
@@ -323,7 +318,7 @@
   !------------------------------!
   !   Turbulent diffusion term   !
   !------------------------------!
-  if(turbulence_model_variant .ne. HYBRID) then
+  if(turbulence_model_variant .ne. STABILIZED) then
     if(phi % name .eq. 'EPS') then
       c_mu_d = 0.18        
     else
@@ -381,7 +376,7 @@
     !   Here we clean up transport equation from the false diffusion   !
     !------------------------------------------------------------------!
     if(turbulence_model .eq. REYNOLDS_STRESS .and.  &
-       turbulence_model_variant .ne. HYBRID) then
+       turbulence_model_variant .ne. STABILIZED) then
       do s = 1, grid % n_faces
 
         c1 = grid % faces_c(1,s)

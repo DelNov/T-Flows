@@ -17,7 +17,7 @@
   type(Grid_Type) :: grid
   integer         :: n_step
 !----------------------------------[Locals]------------------------------------!
-  integer         :: c
+  integer :: c
 !==============================================================================!
 !   In transport equation for zeta two source terms exist which have form:     !
 !                                                                              !
@@ -29,8 +29,7 @@
 !   in order to increase stability of solver                                   !
 !------------------------------------------------------------------------------!
 
-  if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
-     turbulence_model .eq. HYBRID_K_EPS_ZETA_F) then
+  if(turbulence_model .eq. K_EPS_ZETA_F) then
 
     ! Positive source term 
     ! The first option in treating the source is making computation very 
@@ -42,11 +41,11 @@
         b(c) = b(c) + f22 % n(c) * grid % vol(c) * density
       else
         b(c) = b(c) + max(0.0, f22 % n(c)*grid % vol(c)) * density
-        A % val(A % dia(c)) = A % val(A % dia(c))                  &
+        a % val(a % dia(c)) = a % val(a % dia(c))                  &
                             + max(0.0, -f22 % n(c) * grid % vol(c) &
                             / (zeta % n(c) + TINY)) * density
       end if      
-      A % val(A % dia(c)) =  A % val(A % dia(c))      &
+      a % val(a % dia(c)) =  a % val(a % dia(c))      &
                           + grid % vol(c) * p_kin(c)  &
                           / (kin % n(c) + TINY) * density
     end do

@@ -1,10 +1,24 @@
- PROBLEM_NAME    chan
- PROBLEM_TYPE    channel
- HEAT_TRANSFER    yes
- NUMBER_OF_TIME_STEPS 2100
+#--------------------
+# Problem definition
+#--------------------
+
+ PROBLEM_NAME            chan
+ PROBLEM_TYPE            channel
+
+ HEAT_TRANSFER           yes
+
+ PRESSURE_DROPS         0.0036  0.0  0.0
+ MASS_FLOW_RATES        1.16    0.0  0.0
+
+#---------------
+# Time stepping
+#---------------
+
+ TIME_STEP                  0.6
+ NUMBER_OF_TIME_STEPS    4000
  RESULTS_SAVE_INTERVAL    500
- BACKUP_SAVE_INTERVAL 100
- STARTING_TIME_STEP_FOR_STATISTICS    2000000
+ BACKUP_SAVE_INTERVAL     100
+
 # LOAD_BACKUP_NAME   chan-ts002000.backup
 
 #-------------------
@@ -62,9 +76,6 @@
  TOLERANCE_FOR_TURBULENCE_SOLVER    1.e-7
  TOLERANCE_FOR_ENERGY_SOLVER        1.e-7
  TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-5
- TIME_STEP    0.6
- PRESSURE_DROPS     0.0036  0.0  0.0
- MASS_FLOW_RATES    1.16    0.0  0.0
 
 #--------------------
 # Initial conditions

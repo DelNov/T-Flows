@@ -11,19 +11,22 @@
   use Rans_Mod
   use Grid_Mod
   use Grad_Mod
-  use Work_Mod, only: uu_f       => r_cell_01,  &
-                      vv_f       => r_cell_02,  &
-                      ww_f       => r_cell_03,  &
-                      uv_f       => r_cell_04,  &
-                      uw_f       => r_cell_05,  &
-                      vw_f       => r_cell_06,  &
-                      m_11_f     => r_cell_07,  &
-                      m_22_f     => r_cell_08,  &
-                      m_33_f     => r_cell_09,  &
-                      m_12_f     => r_cell_10,  &
-                      m_13_f     => r_cell_11,  &
-                      m_23_f     => r_cell_12,  &
-                      shear_test => r_cell_13   
+  use Work_Mod, only: u_f        => r_cell_01,  &
+                      v_f        => r_cell_02,  &  
+                      w_f        => r_cell_03,  &  
+                      uu_f       => r_cell_04,  &
+                      vv_f       => r_cell_05,  &
+                      ww_f       => r_cell_06,  &
+                      uv_f       => r_cell_07,  &
+                      uw_f       => r_cell_08,  &
+                      vw_f       => r_cell_09,  &
+                      m_11_f     => r_cell_10,  &
+                      m_22_f     => r_cell_11,  &
+                      m_33_f     => r_cell_12,  &
+                      m_12_f     => r_cell_13,  &
+                      m_13_f     => r_cell_14,  &
+                      m_23_f     => r_cell_15,  &
+                      shear_test => r_cell_16   
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -138,9 +141,9 @@
     m_23_a = m_23_a + grid % vol(c) * shear(c) * 0.5 * ( v % z(c) + w % y(c) )
     
     ! Now calculating test values
-    u % filt(c) = u_a / vol_e
-    v % filt(c) = v_a / vol_e
-    w % filt(c) = w_a / vol_e
+    u_f(c) = u_a / vol_e
+    v_f(c) = v_a / vol_e
+    w_f(c) = w_a / vol_e
 
     uu_f(c)  = uu_a / vol_e
     vv_f(c)  = vv_a / vol_e
@@ -157,15 +160,15 @@
     m_23_f(c) = m_23_a / vol_e 
   end do
 
-  call Grad_Mod_For_Phi(grid, u % filt, 1, u % x, .true.)  ! dU/dx
-  call Grad_Mod_For_Phi(grid, u % filt, 2, u % y, .true.)  ! dU/dy
-  call Grad_Mod_For_Phi(grid, u % filt, 3, u % z, .true.)  ! dU/dz
-  call Grad_Mod_For_Phi(grid, v % filt, 1, v % x, .true.)  ! dV/dx
-  call Grad_Mod_For_Phi(grid, v % filt, 2, v % y, .true.)  ! dV/dy
-  call Grad_Mod_For_Phi(grid, v % filt, 3, v % z, .true.)  ! dV/dz
-  call Grad_Mod_For_Phi(grid, w % filt, 1, w % x, .true.)  ! dW/dx
-  call Grad_Mod_For_Phi(grid, w % filt, 2, w % y, .true.)  ! dW/dy
-  call Grad_Mod_For_Phi(grid, w % filt, 3, w % z, .true.)  ! dW/dz
+  call Grad_Mod_For_Phi(grid, u_f, 1, u % x, .true.)  ! dU/dx
+  call Grad_Mod_For_Phi(grid, u_f, 2, u % y, .true.)  ! dU/dy
+  call Grad_Mod_For_Phi(grid, u_f, 3, u % z, .true.)  ! dU/dz
+  call Grad_Mod_For_Phi(grid, v_f, 1, v % x, .true.)  ! dV/dx
+  call Grad_Mod_For_Phi(grid, v_f, 2, v % y, .true.)  ! dV/dy
+  call Grad_Mod_For_Phi(grid, v_f, 3, v % z, .true.)  ! dV/dz
+  call Grad_Mod_For_Phi(grid, w_f, 1, w % x, .true.)  ! dW/dx
+  call Grad_Mod_For_Phi(grid, w_f, 2, w % y, .true.)  ! dW/dy
+  call Grad_Mod_For_Phi(grid, w_f, 3, w % z, .true.)  ! dW/dz
 
   do c = 1, grid % n_cells
     l_g  = grid % vol(c)**ONE_THIRD
@@ -178,12 +181,12 @@
                          0.5*(u % z(c) + w % x(c))*(u % z(c) + w % x(c)) +   &
                          0.5*(v % x(c) + u % y(c))*(v % x(c) + u % y(c))))
 
-    l_11 = uu_f(c) - u % filt(c) * u % filt(c) 
-    l_22 = vv_f(c) - v % filt(c) * v % filt(c) 
-    l_33 = ww_f(c) - w % filt(c) * w % filt(c) 
-    l_12 = uv_f(c) - u % filt(c) * v % filt(c) 
-    l_13 = uw_f(c) - u % filt(c) * w % filt(c) 
-    l_23 = vw_f(c) - v % filt(c) * w % filt(c) 
+    l_11 = uu_f(c) - u_f(c) * u_f(c) 
+    l_22 = vv_f(c) - v_f(c) * v_f(c) 
+    l_33 = ww_f(c) - w_f(c) * w_f(c) 
+    l_12 = uv_f(c) - u_f(c) * v_f(c) 
+    l_13 = uw_f(c) - u_f(c) * w_f(c) 
+    l_23 = vw_f(c) - v_f(c) * w_f(c) 
 
     m_11 = l_f**2 * shear_test(c) * u % x(c) - l_g**2 * m_11_f(c) 
     m_22 = l_f**2 * shear_test(c) * v % y(c) - l_g**2 * m_22_f(c) 

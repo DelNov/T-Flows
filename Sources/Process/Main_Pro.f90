@@ -119,10 +119,9 @@
   call Bulk_Mod_Monitoring_Planes_Areas(grid, bulk)
   call Grad_Mod_Find_Bad_Cells         (grid)
 
-  if(turbulence_model .eq. LES                 .and.  &
-     turbulence_model_variant .eq. SMAGORINSKY .and.  &
-     .not. restart)                                  &
-     call Find_Nearest_Wall_Cell(grid)
+  if(turbulence_model .eq. SMAGORINSKY .and. .not. restart) then
+    call Find_Nearest_Wall_Cell(grid)
+  end if
 
   ! Prepare the gradient matrix for velocities
   call Compute_Gradient_Matrix(grid, .true.)
@@ -178,14 +177,17 @@
       call Calculate_Vorticity (grid)
     end if
 
-    if(turbulence_model .eq. LES) then
+    if(turbulence_model .eq. SMAGORINSKY .or.  &
+       turbulence_model .eq. DYNAMIC     .or.  &
+       turbulence_model .eq. WALE) then
       call Calculate_Shear_And_Vorticity(grid)
-      if(turbulence_model_variant .eq. DYNAMIC) call Calculate_Sgs_Dynamic(grid)
-      if(turbulence_model_variant .eq. WALE)    call Calculate_Sgs_Wale(grid)
+      if(turbulence_model .eq. DYNAMIC) call Calculate_Sgs_Dynamic(grid)
+      if(turbulence_model .eq. WALE)    call Calculate_Sgs_Wale(grid)
       call Calculate_Sgs(grid)
     end if
 
-    If(turbulence_model .eq. HYBRID_K_EPS_ZETA_F) then
+    If(turbulence_model .eq. K_EPS_ZETA_F .and.  &
+       turbulence_statistics .eq. YES) then
       call Calculate_Sgs_Dynamic(grid)
       call Calculate_Sgs_Hybrid(grid)
     end if
@@ -288,8 +290,7 @@
         end if
       end if
 
-      if(turbulence_model .eq. K_EPS_ZETA_F     .or.  &
-         turbulence_model .eq. HYBRID_K_EPS_ZETA_F) then
+      if(turbulence_model .eq. K_EPS_ZETA_F) then
         call Calculate_Shear_And_Vorticity(grid)
 
         call Compute_Turbulent(grid, dt, ini, kin, n)

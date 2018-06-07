@@ -42,11 +42,10 @@
     t2(c) = c_t*sqrt(kin_vis/eps_l(c))
 
     l1(c) = kin % n(c)**1.5/eps_l(c)
-    l2(c) = Cni*(kin_vis**3./eps_l(c))**0.25
+    l2(c) = c_nu * (kin_vis**3 / eps_l(c))**0.25
   end do
     
-  if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
-     turbulence_model .eq. HYBRID_K_EPS_ZETA_F) then
+  if(turbulence_model .eq. K_EPS_ZETA_F) then
 
     if(rough_walls .eq. YES) then
       do c = 1, grid % n_cells

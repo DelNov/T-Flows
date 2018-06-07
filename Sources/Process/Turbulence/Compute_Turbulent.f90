@@ -5,6 +5,7 @@
 !   variables.                                                                 !
 !------------------------------------------------------------------------------!
 !---------------------------------[Modules]------------------------------------!
+  use Const_Mod, only: YES, NO
   use Flow_Mod
   use Les_Mod
   use Rans_Mod
@@ -16,9 +17,11 @@
   use Numerics_Mod
   use Solvers_Mod, only: Bicg, Cg, Cgs
   use Control_Mod
-  use Work_Mod,    only: phi_x => r_cell_01,  &
-                         phi_y => r_cell_02,  &
-                         phi_z => r_cell_03
+  use Work_Mod,    only: phi_x   => r_cell_01,  &
+                         phi_y   => r_cell_02,  &
+                         phi_z   => r_cell_03,  &
+                         phi_min => r_cell_04,  &
+                         phi_max => r_cell_05
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
@@ -104,7 +107,7 @@
   ! Compute phimax and phimin
   do mat = 1, grid % n_materials
     if(adv_scheme .ne. CENTRAL) then
-      call Calculate_Minimum_Maximum(grid, phi % n)  ! or phi % o ???
+      call Calculate_Minimum_Maximum(grid, phi % n, phi_min, phi_max)
       goto 1
     end if
   end do
@@ -131,9 +134,9 @@
 
       ! Compute phis with desired advection scheme
       if(adv_scheme .ne. CENTRAL) then
-        call Advection_Scheme(grid, phis, s, phi % n,           &
-                              phi_x, phi_y, phi_z,              &
-                              grid % dx, grid % dy, grid % dz,  &
+        call Advection_Scheme(grid, phis, s, phi % n, phi_min, phi_max,  &
+                              phi_x, phi_y, phi_z,                       &
+                              grid % dx, grid % dy, grid % dz,           &
                               adv_scheme, blend)
       end if
 
@@ -212,24 +215,27 @@
     c2=grid % faces_c(2,s)
 
     vis_eff = viscosity + (fw(s)*vis_t(c1) + &
-      (1.0-fw(s))*vis_t(c2)) / phi % Sigma
+      (1.0-fw(s))*vis_t(c2)) / phi % sigma
 
     if(turbulence_model .eq. SPALART_ALLMARAS .or.                      &
        turbulence_model .eq. DES_SPALART)                               &
-      vis_eff = viscosity+(fw(s)*VIS % n(c1)+(1.0-fw(s))*VIS % n(c2)) &
-             / phi % Sigma
+      vis_eff = viscosity                                    &
+              + (fw(s)*vis % n(c1)+(1.0-fw(s))*vis % n(c2))  &
+              / phi % sigma
 
-    if(turbulence_model .eq. HYBRID_K_EPS_ZETA_F)                               &
-      vis_eff = viscosity + (fw(s)*vis_t_eff(c1) + (1.0-fw(s))*vis_t_eff(c2)) &
-             / phi % Sigma
-
+    if(turbulence_model .eq. K_EPS_ZETA_F .and.  &
+       turbulence_statistics .eq. YES) then  
+      vis_eff = viscosity                                          &
+              + (fw(s)*vis_t_eff(c1) + (1.0-fw(s))*vis_t_eff(c2))  &
+              / phi % sigma
+    end if
     phi_x_f = fw(s)*phi_x(c1) + (1.0-fw(s))*phi_x(c2)
     phi_y_f = fw(s)*phi_y(c1) + (1.0-fw(s))*phi_y(c2)
     phi_z_f = fw(s)*phi_z(c1) + (1.0-fw(s))*phi_z(c2)
 
     ! This implements zero gradient for k
     if(turbulence_model .eq. K_EPS .and.  &
-       turbulence_model_variant .eq. HIGH_RE) then
+       turbulence_wall_treatment .eq. HIGH_RE) then
       if(c2 < 0 .and. phi % name .eq. 'KIN') then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or. &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
@@ -241,8 +247,7 @@
       end if
     end if
 
-    if(turbulence_model .eq. K_EPS_ZETA_F     .or.  &
-       turbulence_model .eq. HYBRID_K_EPS_ZETA_F) then
+    if(turbulence_model .eq. K_EPS_ZETA_F) then
       if(c2 < 0 .and. phi % name .eq. 'KIN') then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
@@ -410,8 +415,7 @@
     if(phi % name .eq. 'EPS') call Source_Eps_K_Eps(grid)
   end if
 
-  if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
-     turbulence_model .eq. HYBRID_K_EPS_ZETA_F) then
+  if(turbulence_model .eq. K_EPS_ZETA_F) then
     if(phi % name .eq. 'KIN')  call Source_Kin_K_Eps_Zeta_F(grid)
     if(phi % name .eq. 'EPS')  call Source_Eps_K_Eps_Zeta_F(grid)
     if(phi % name .eq. 'ZETA') call Source_Zeta_K_Eps_Zeta_F(grid, n_step)
@@ -456,8 +460,7 @@
   end do
 
   if(turbulence_model .eq. K_EPS        .or.  &
-     turbulence_model .eq. K_EPS_ZETA_F .or.  &
-     turbulence_model .eq. HYBRID_K_EPS_ZETA_F) then
+     turbulence_model .eq. K_EPS_ZETA_F) then
     if(phi % name .eq. 'KIN')  &
       call Info_Mod_Iter_Fill_At(3, 1, phi % name, niter, phi % res)
     if(phi % name .eq. 'EPS')  &
