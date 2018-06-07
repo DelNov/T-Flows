@@ -5,7 +5,7 @@ Prologue
 
 Time stepping 
 
- NUMBER_OF_TIME_STEPS    2
+ NUMBER_OF_TIME_STEPS    1000
  TIME_STEP               1.e-1
 
  RESULTS_SAVE_INTERVAL   100
