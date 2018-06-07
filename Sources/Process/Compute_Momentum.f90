@@ -305,7 +305,7 @@
     ! Add influence of Re stresses
     if(turbulence_model .eq. REYNOLDS_STRESS .or.  &
        turbulence_model .eq. HANJALIC_JAKIRLIC) then
-      if(turbulence_statistics .eq. NO) then
+      if(turbulence_model_variant .ne. STABILIZED) then
         if(ui % name .eq. 'U') then
           uu_f = fw(s) * uu % n(c1) + (1.0-fw(s)) * uu % n(c2)
           uv_f = fw(s) * uv % n(c1) + (1.0-fw(s)) * uv % n(c2)
@@ -448,7 +448,7 @@
   ! Here we clean up momentum from the false diffusion
   if(turbulence_model .eq. REYNOLDS_STRESS .or.  &
      turbulence_model .eq. HANJALIC_JAKIRLIC) then
-    if(turbulence_statistics .eq. NO) then
+    if(turbulence_model_variant .ne. STABILIZED) then
       do s = 1, grid % n_faces
         c1 = grid % faces_c(1,s)
         c2 = grid % faces_c(2,s)

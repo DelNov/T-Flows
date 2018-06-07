@@ -5,7 +5,7 @@ Prologue
 
 Time stepping 
 
- NUMBER_OF_TIME_STEPS    1000
+ NUMBER_OF_TIME_STEPS    2
  TIME_STEP               1.e-1
 
  RESULTS_SAVE_INTERVAL   100
@@ -32,7 +32,7 @@ Physical models
 
 #TURBULENCE_MODEL            hanjalic_jakirlic
  TURBULENCE_MODEL            reynolds_stress
- TURBULENCE_MODEL_VARIANT    hybrid
+ TURBULENCE_MODEL_VARIANT    stabilized
 
 units: [kg/s]
  MASS_FLOW_RATES      0.0   0.0   0.0020975

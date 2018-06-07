@@ -493,7 +493,7 @@
 
   if(turbulence_model .eq. REYNOLDS_STRESS .or.  &
      turbulence_model .eq. HANJALIC_JAKIRLIC) then
-    if(turbulence_statistics .eq. NO) then
+    if(turbulence_model_variant .ne. STABILIZED) then
       do c = 1, grid % n_cells
         u1uj_phij(c) = -0.22*t_scale(c) *&
                    (uu%n(c)*phi_x(c)+uv%n(c)*phi_y(c)+uw%n(c)*phi_z(c))

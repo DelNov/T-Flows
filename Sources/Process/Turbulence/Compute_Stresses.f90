@@ -226,19 +226,12 @@
     ! This contribution is later substracted.
     vis_t_f = fw(s)*vis_t(c1) + (1.0-fw(s))*vis_t(c2)
 
-    if(turbulence_model .eq. REYNOLDS_STRESS) then
-      vis_eff = viscosity + vis_t_f 
-    else if(turbulence_model .eq. HANJALIC_JAKIRLIC .and.  &
-            turbulence_statistics .eq. NO) then
-      vis_eff = 1.5*viscosity 
-    else if(turbulence_model .eq. HANJALIC_JAKIRLIC .and.  &
-            turbulence_statistics .eq. YES) then
-      vis_eff = viscosity 
-    end if
+    vis_eff = viscosity + vis_t_f
 
-    if(turbulence_model .eq. HANJALIC_JAKIRLIC .and.  &
-       turbulence_statistics .eq. YES) then
-      vis_eff = vis_eff + vis_t_f
+    if(turbulence_model .eq. HANJALIC_JAKIRLIC) then
+      if(turbulence_model_variant .ne. STABILIZED) then
+        vis_eff = 1.5*viscosity 
+      end if
     end if
 
     phix_f = fw(s) *phi_x(c1) + (1.0 - fw(s)) * phi_x(c2)
@@ -306,9 +299,9 @@
         ! Outflow is not included because it was causing problems     
         ! Convect is commented because for turbulent scalars convect 
         ! outflow is treated as classic outflow.
-        if((Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW).or.                     &
-           (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL).or.                       &
-!!!        (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT).or.                    &
+        if((Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW).or.                   &
+           (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL).or.                     &
+!!!        (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT).or.                  &
            (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) ) then                                
           a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
           b(c1) = b(c1) + a12 * phi % n(c2)
@@ -325,7 +318,7 @@
   !------------------------------!
   !   Turbulent diffusion term   !
   !------------------------------!
-  if(turbulence_statistics .eq. NO) then
+  if(turbulence_model_variant .ne. STABILIZED) then
     if(phi % name .eq. 'EPS') then
       c_mu_d = 0.18        
     else
@@ -383,7 +376,7 @@
     !   Here we clean up transport equation from the false diffusion   !
     !------------------------------------------------------------------!
     if(turbulence_model .eq. REYNOLDS_STRESS .and.  &
-       turbulence_statistics .eq. NO) then
+       turbulence_model_variant .ne. STABILIZED) then
       do s = 1, grid % n_faces
 
         c1 = grid % faces_c(1,s)

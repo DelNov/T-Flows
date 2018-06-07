@@ -20,6 +20,8 @@
 
   call Control_Mod_Turbulence_Model(.true.)
 
+  call Control_Mod_Turbulence_Model_Variant(.true.)
+
   call Control_Mod_Rough_Walls(.true.)
 
   if(turbulence_model == K_EPS) then

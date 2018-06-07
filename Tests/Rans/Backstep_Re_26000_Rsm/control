@@ -34,7 +34,7 @@ Physical part
  DYNAMIC_VISCOSITY      1.43e-5
 
  TURBULENCE_MODEL            reynolds_stress
- TURBULENCE_MODEL_VARIANT    hybrid
+ TURBULENCE_MODEL_VARIANT    stabilized
 
 
 Numerical part

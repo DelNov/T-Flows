@@ -11,8 +11,9 @@
 
   ! Variable holding the turbulence model; its variant and statistics
   integer :: turbulence_model
-  integer :: turbulence_wall_treatment
-  integer :: turbulence_statistics     ! can be YES or NO
+  integer :: turbulence_model_variant   ! STABILIZED or NONE
+  integer :: turbulence_statistics      ! can be YES or NO
+  integer :: turbulence_wall_treatment  ! HIGH_RE, LOW_RE, COMPOUND
 
   ! Parameters describing turbulence model choice
   integer, parameter :: NONE              = 30011
@@ -27,12 +28,15 @@
   integer, parameter :: HANJALIC_JAKIRLIC = 30103
   integer, parameter :: REYNOLDS_STRESS   = 30109
 
-  integer :: rough_walls
+  ! Turbulence wall treatment 
+  integer, parameter :: STABILIZED = 30113
 
   ! Turbulence wall treatment 
-  integer, parameter :: LOW_RE      = 30509
-  integer, parameter :: HIGH_RE     = 30517
-  integer, parameter :: COMPOUND    = 30529
+  integer, parameter :: LOW_RE   = 30119
+  integer, parameter :: HIGH_RE  = 30133
+  integer, parameter :: COMPOUND = 30137
+
+  integer :: rough_walls
 
   ! Reynolds stresses
   type(Var_Type) :: uu
