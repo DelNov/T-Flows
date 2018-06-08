@@ -26,7 +26,7 @@
   character(len=80) :: keys(128)
   character(len=80) :: keys_file(128)
   real              :: vals(0:128) ! Note that they start from zero!
-  real              :: s_tot, area
+  real              :: area
 
   integer           :: n_points, k
   real, allocatable :: prof(:,:), x(:), y(:), z(:), dist(:)
@@ -324,10 +324,7 @@
           if(grid % material(c1) .eq. m) then
             bulk(m) % mass_in = bulk(m) % mass_in - flux(s) 
           end if
-          s_tot = sqrt(  grid % sx(s)**2  &
-                       + grid % sy(s)**2  &
-                       + grid % sz(s)**2)
-          area = area  + s_tot
+          area = area  + grid % s(s)
         endif
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL)      &
           n_wall        = n_wall        + 1 

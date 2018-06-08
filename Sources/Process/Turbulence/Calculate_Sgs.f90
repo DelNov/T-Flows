@@ -27,7 +27,7 @@
   integer :: c, s, c1, c2 
   real    :: nx, ny, nz
   real    :: cs
-  real    :: s_tot, lf, u_tau_l, u_f 
+  real    :: lf, u_tau_l, u_f 
   real    :: u_tot, u_nor, u_tan, a_pow, b_pow, nu, dely
   real    :: nc2
 !==============================================================================!
@@ -131,13 +131,9 @@
 
     if(c2  < 0) then 
 
-      s_tot = sqrt(grid % sx(s)*grid % sx(s) +  &
-                  grid % sy(s)*grid % sy(s) +  &
-                  grid % sz(s)*grid % sz(s))
-
-      nx = grid % sx(s) / s_tot 
-      ny = grid % sy(s) / s_tot 
-      nz = grid % sz(s) / s_tot 
+      nx = grid % sx(s) / grid % s(s)
+      ny = grid % sy(s) / grid % s(s)
+      nz = grid % sz(s) / grid % s(s)
 
       if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
          Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
