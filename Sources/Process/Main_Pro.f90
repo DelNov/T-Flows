@@ -69,7 +69,8 @@
   call Load_Cns(grid, this_proc)
 
   call Allocate_Memory(grid)
-  call Load_Geo       (grid, this_proc)
+  call Load_Geo(grid, this_proc)
+  call Calculate_Face_Geometry(grid)
   call Comm_Mod_Load_Buffers
   call Comm_Mod_Load_Maps(grid)
 
@@ -115,7 +116,6 @@
   end do
 
   ! Prepare ...
-  call Calculate_Face_Geometry(grid)
   call Bulk_Mod_Monitoring_Planes_Areas(grid, bulk)
   call Grad_Mod_Find_Bad_Cells         (grid)
 

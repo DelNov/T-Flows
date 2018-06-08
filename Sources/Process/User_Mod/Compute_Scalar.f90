@@ -42,7 +42,7 @@
   real              :: ini_res, tol, ns
   real              :: con_eff1, f_ex1, f_im1, phixS1, phiyS1, phizS1
   real              :: con_eff2, f_ex2, f_im2, phixS2, phiyS2, phizS2
-  real              :: s_tot, phis, pr_t1, pr_t2
+  real              :: phis, pr_t1, pr_t2
   character(len=80) :: coupling   ! pressure-momentum coupling
   character(len=80) :: precond    ! preconditioner
   integer           :: adv_scheme  ! space-discretiztion of advection scheme)
@@ -402,10 +402,7 @@
 
         ! In case of wallflux 
         else if(Var_Mod_Bnd_Cell_Type(phi,c2) .eq. WALLFL) then
-          s_tot  = sqrt(  grid % sx(s)*grid % sx(s)  &
-                        + grid % sy(s)*grid % sy(s)  &
-                        + grid % sz(s)*grid % sz(s))
-          b(c1) = b(c1) + s_tot * phi % q(c2)
+          b(c1) = b(c1) + grid % s(s) * phi % q(c2)
         endif 
       end if
 
