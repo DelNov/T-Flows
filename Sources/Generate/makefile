@@ -199,22 +199,7 @@ $(PROGRAM_FILE): $(OBJ)
 #   These should be inserted by 
 #   hand for tuning of dependencies.
 #---------------------------------------
-# Block_Mod.o is just one file, doesn't need explicit dependencies
-# Const_Mod.o is just one file, doesn't need explicit dependencies
-$(DIR_OBJECT)/Domain_Mod.o:	$(DIR_OBJECT)/Point_Mod.o		\
-  				$(DIR_OBJECT)/Line_Mod.o		\
-  				$(DIR_OBJECT)/Block_Mod.o		\
-  				$(DIR_OBJECT)/Region_Mod.o		\
-				Domain_Mod/*.f90
-# gen_mod.o is just one file, doesn't need explicit dependencies
-$(DIR_OBJECT)/Grid_Mod.o:	$(DIR_OBJECT)/Bnd_Cond_Mod.o		\
-				$(DIR_OBJECT)/Material_Mod.o		\
-				$(DIR_SHARED)/Grid_Mod/*.f90
-# Line_Mod.o is just one file, doesn't need explicit dependencies
-# Name_Mod.o is just one file, doesn't need explicit dependencies
-# Point_Mod.o is just one file, doesn't need explicit dependencies
-# Region_Mod.o is just one file, doesn't need explicit dependencies
-$(DIR_OBJECT)/Tokenizer_Mod.o:	$(DIR_SHARED)/Tokenizer_Mod/*.f90	\
+include makefile_explicit_dependencies
 
 #---------------------
 #   Explicit target.
