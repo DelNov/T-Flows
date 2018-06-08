@@ -287,12 +287,14 @@
      turbulence_model .eq. DES_SPALART) then
     call Save_Vtu_Vector(grid, IN_4, IN_5, "MeanVelocity",  &
                                 u % mean(1), v % mean(1), w % mean(1))
-    uu_mean = uu % mean(c) - u % mean(c) * u % mean(c)
-    vv_mean = vv % mean(c) - v % mean(c) * v % mean(c)
-    ww_mean = ww % mean(c) - w % mean(c) * w % mean(c)
-    uv_mean = uv % mean(c) - u % mean(c) * v % mean(c)
-    uw_mean = uw % mean(c) - u % mean(c) * w % mean(c)
-    vw_mean = vw % mean(c) - v % mean(c) * w % mean(c)
+    do c = 1, grid % n_cells
+      uu_mean(c) = uu % mean(c) - u % mean(c) * u % mean(c)
+      vv_mean(c) = vv % mean(c) - v % mean(c) * v % mean(c)
+      ww_mean(c) = ww % mean(c) - w % mean(c) * w % mean(c)
+      uv_mean(c) = uv % mean(c) - u % mean(c) * v % mean(c)
+      uw_mean(c) = uw % mean(c) - u % mean(c) * w % mean(c)
+      vw_mean(c) = vw % mean(c) - v % mean(c) * w % mean(c)
+    end do
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressXX", uu_mean(1))
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressYY", uu_mean(1))
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressZZ", uu_mean(1))
@@ -301,10 +303,12 @@
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressYZ", vw_mean(1))
     if(heat_transfer .eq. YES) then
       call Save_Vtu_Scalar(grid, IN_4, IN_5, "TemperatureMean", t % mean(1))
-      tt_mean = tt % mean(c) - t % mean(c) * t % mean(c)
-      ut_mean = ut % mean(c) - u % mean(c) * t % mean(c)
-      vt_mean = vt % mean(c) - v % mean(c) * t % mean(c)
-      wt_mean = wt % mean(c) - w % mean(c) * t % mean(c)
+      do c = 1, grid % n_cells
+        tt_mean(c) = tt % mean(c) - t % mean(c) * t % mean(c)
+        ut_mean(c) = ut % mean(c) - u % mean(c) * t % mean(c)
+        vt_mean(c) = vt % mean(c) - v % mean(c) * t % mean(c)
+        wt_mean(c) = wt % mean(c) - w % mean(c) * t % mean(c)
+      end do
       call Save_Vtu_Scalar(grid, IN_4, IN_5, "TemperatureFluctuations",  &
                                  tt_mean(1))
       call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxX", ut_mean(1))

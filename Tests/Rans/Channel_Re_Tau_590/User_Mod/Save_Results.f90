@@ -376,7 +376,7 @@
 
   if(u_tau_max .eq. 0.0) then
     if(this_proc < 2) then
-      write(*,*) 'Friction velocity is zero in User_Channel_profiles.f90 !'
+      write(*,*) '# Friction velocity is zero in User_Channel_Profiles.f90 !'
     end if
     return
   end if
