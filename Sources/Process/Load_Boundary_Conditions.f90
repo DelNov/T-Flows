@@ -83,6 +83,10 @@
       end if
 
       goto 1
+    else
+      print *, '# Boundary conditions are not specified in control file!'
+      print *, '# Exiting the program.'
+      stop
     end if
 
 2 continue 
