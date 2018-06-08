@@ -19,9 +19,9 @@
 !==============================================================================!
 
   call Control_Mod_Buoyancy                 (verbose = .true.)
+  call Control_Mod_Turbulence_Statistics    (verbose = .true.)
   call Control_Mod_Turbulence_Model         (verbose = .true.)
   call Control_Mod_Turbulence_Wall_Treatment(verbose = .true.)
-  call Control_Mod_Turbulence_Statistics    (verbose = .true.)
 
   ! Gradient matrices are always needed
   call Grad_Mod_Allocate_Memory(grid)
@@ -62,9 +62,18 @@
     call Var_Mod_Allocate_Solution('T',  t,  grid)
     allocate(con_wall(-grid % n_bnd_cells:grid % n_cells)); con_wall = 0.
 
+    call Var_Mod_Allocate_New_Only('TT', tt, grid)
     call Var_Mod_Allocate_New_Only('UT', ut, grid)
     call Var_Mod_Allocate_New_Only('VT', vt, grid)
     call Var_Mod_Allocate_New_Only('WT', wt, grid)
+
+    if(turbulence_statistics .eq. YES) then
+      call Var_Mod_Allocate_Statistics(t)
+      call Var_Mod_Allocate_Statistics(tt)
+      call Var_Mod_Allocate_Statistics(ut)
+      call Var_Mod_Allocate_Statistics(vt)
+      call Var_Mod_Allocate_Statistics(wt)
+    end if
   end if
 
 
@@ -158,9 +167,24 @@
     call Var_Mod_Allocate_New_Only('KIN', kin, grid)
     call Var_Mod_Allocate_Solution('EPS', eps, grid)
 
+    if(turbulence_statistics .eq. YES) then
+      call Var_Mod_Allocate_Statistics(uu)
+      call Var_Mod_Allocate_Statistics(vv)
+      call Var_Mod_Allocate_Statistics(ww)
+      call Var_Mod_Allocate_Statistics(uv)
+      call Var_Mod_Allocate_Statistics(uw)
+      call Var_Mod_Allocate_Statistics(vw)
+      call Var_Mod_Allocate_Statistics(kin)
+      call Var_Mod_Allocate_Statistics(eps)
+    end if
+
     if(turbulence_model .eq. REYNOLDS_STRESS) then
       call Var_Mod_Allocate_Solution('F22', f22, grid)
       call Var_Mod_Allocate_Gradients(f22)
+
+      if(turbulence_statistics .eq. YES) then
+        call Var_Mod_Allocate_Statistics(f22)
+      end if
     end if
 
     ! Other variables such as time scale, length scale and production
@@ -207,40 +231,39 @@
     allocate(c_dyn(-grid % n_bnd_cells:grid % n_cells));  c_dyn = 0.
   end if
 
-  !-----------------------------------------!
-  !                                         !
-  !   Turbulent statistics for all models   !
-  !                                         !
-  !-----------------------------------------!
+  !-----------------------------------------------------------------------!
+  !                                                                       !
+  !   Turbulent statistics for all models except second moment closures   !
+  !                                                                       !
+  !-----------------------------------------------------------------------!
   if(turbulence_statistics .eq. YES) then
 
-    ! First moments
-    call Var_Mod_Allocate_Statistics(u)
-    call Var_Mod_Allocate_Statistics(v)
-    call Var_Mod_Allocate_Statistics(w)
-    call Var_Mod_Allocate_Statistics(p)
+    ! For second moment closures, memory for statistics was allocated above
+    if(turbulence_model .ne. HANJALIC_JAKIRLIC .and.  &
+       turbulence_model .ne. REYNOLDS_STRESS) then
 
-    ! Second moments
-    call Var_Mod_Allocate_Statistics(uu)
-    call Var_Mod_Allocate_Statistics(vv)
-    call Var_Mod_Allocate_Statistics(ww)
-    call Var_Mod_Allocate_Statistics(uv)
-    call Var_Mod_Allocate_Statistics(uw)
-    call Var_Mod_Allocate_Statistics(vw)
-    call Var_Mod_Allocate_Statistics(kin)
+      ! First moments
+      call Var_Mod_Allocate_Statistics(u)
+      call Var_Mod_Allocate_Statistics(v)
+      call Var_Mod_Allocate_Statistics(w)
+      call Var_Mod_Allocate_Statistics(p)
 
-    ! First and second moments for temperature
-    if(heat_transfer .eq. YES) then
-      call Var_Mod_Allocate_Statistics(t)
+      ! Second moments
+      call Var_Mod_Allocate_New_Only('UU', uu, grid)
+      call Var_Mod_Allocate_New_Only('VV', vv, grid)
+      call Var_Mod_Allocate_New_Only('WW', ww, grid)
+      call Var_Mod_Allocate_New_Only('UV', uv, grid)
+      call Var_Mod_Allocate_New_Only('UW', uw, grid)
+      call Var_Mod_Allocate_New_Only('VW', vw, grid)
+      call Var_Mod_Allocate_Statistics(uu)
+      call Var_Mod_Allocate_Statistics(vv)
+      call Var_Mod_Allocate_Statistics(ww)
+      call Var_Mod_Allocate_Statistics(uv)
+      call Var_Mod_Allocate_Statistics(uw)
+      call Var_Mod_Allocate_Statistics(vw)
 
-      call Var_Mod_Allocate_New_Only('TT', tt, grid)
-      call Var_Mod_Allocate_Statistics(tt)
-
-      ! Remember that ut, vt and wt are allocated above
-      call Var_Mod_Allocate_Statistics(ut)
-      call Var_Mod_Allocate_Statistics(vt)
-      call Var_Mod_Allocate_Statistics(wt)
     end if
+
   end if
 
   !-----------------------------!
