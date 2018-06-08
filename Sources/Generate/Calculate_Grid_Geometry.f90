@@ -538,8 +538,12 @@
     grid % wall_dist = 1.0
     print *, '# Distance to the wall set to 1.0 everywhere !'
   else 
-    do b = 1, n_wall_colors
-      do c1=1, grid % n_cells 
+    do c1=1, grid % n_cells 
+      if(mod(c1,10000) .eq. 0) then
+        write(*,'(a2, f5.0, a14)') ' #', (100.*c1/(1.*grid % n_cells)),  &
+                                   ' % complete...'
+      endif
+      do b = 1, n_wall_colors
         do s = WallFacFst, WallFacLst      ! 1, grid % n_faces
           c2 = grid % faces_c(2,s)
           if(c2 < 0) then
