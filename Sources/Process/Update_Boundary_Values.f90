@@ -162,7 +162,7 @@
                        / (y_pl * pr * exp(-1.0 * ebf)  &
                        + (u_plus + beta) * pr_t * exp(-1.0 / ebf) + TINY)
           if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
-            t % n(c2) = t % n(c1) + t % q(c2)       &
+            t % n(c2) = t % n(c1) + t % q(c2) * grid % wall_dist(c1)  &
                          / (con_wall(c1) * capacity)
             heat_flux = heat_flux + t % q(c2) * grid % s(s)
             if(abs(t % q(c2)) > TINY) heated_area = heated_area + grid % s(s)
