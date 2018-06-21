@@ -20,7 +20,7 @@
   !   Create shadow file   !
   !                        !
   !------------------------!
-  if(sub /= 0) return
+  if(sub .ne. 0) return
 
   call Name_File(sub, name_out, '.shadow')
   open(9, file=name_out)
