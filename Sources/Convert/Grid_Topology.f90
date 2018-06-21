@@ -23,7 +23,7 @@
   grid % n_faces  = 0
   do i = 1, grid % n_cells
     do j = 1, 6
-      if(grid % cells_bnd_color(j,i) /= 0) then
+      if(grid % cells_bnd_color(j,i) .ne. 0) then
 
         grid % n_bnd_cells = grid % n_bnd_cells + 1 
 
