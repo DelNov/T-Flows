@@ -54,7 +54,7 @@
   write(9,'(a,a)') IN_4, '<DataArray type="Float32" NumberOfComponents' //  &
                          '="3" format="ascii">'
   do n = 1, grid % n_nodes
-    if(new_n(n) /= 0) write(9, '(a,1pe15.7,1pe15.7,1pe15.7)')                &
+    if(new_n(n) .ne. 0) write(9, '(a,1pe15.7,1pe15.7,1pe15.7)')                &
                                 IN_5, grid % xn(n), grid % yn(n), grid % zn(n)
   end do
   write(9,'(a,a)') IN_4, '</DataArray>'
@@ -70,7 +70,7 @@
                          ' format="ascii">'
 
   do c = 1, grid % n_cells
-    if(new_c(c) /= 0) then
+    if(new_c(c) .ne. 0) then
 
       ! Hexahedral
       if(grid % cells_n_nodes(c) .eq. 8) then
@@ -117,7 +117,7 @@
   write(9,'(a,a)') IN_4, '<DataArray type="Int32" Name="offsets" format="ascii">'
   offset = 0
   do c = 1, grid % n_cells
-    if(new_c(c) /= 0) then
+    if(new_c(c) .ne. 0) then
       offset = offset + grid % cells_n_nodes(c)
       write(9,'(a,i9)') IN_5, offset
     end if
@@ -127,7 +127,7 @@
   ! Now write all cells' types
   write(9,'(a,a)') IN_4, '<DataArray type="UInt8" Name="types" format="ascii">'
   do c = 1, grid % n_cells
-    if(new_c(c) /= 0) then
+    if(new_c(c) .ne. 0) then
       if(grid % cells_n_nodes(c) .eq. 4) write(9,'(a,i9)') IN_5, VTK_TETRA
       if(grid % cells_n_nodes(c) .eq. 8) write(9,'(a,i9)') IN_5, VTK_HEXAHEDRON
       if(grid % cells_n_nodes(c) .eq. 6) write(9,'(a,i9)') IN_5, VTK_WEDGE
@@ -145,7 +145,7 @@
   ! Materials
   write(9,'(a,a)') IN_4, '<DataArray type="UInt8" Name="materials" format="ascii">'
   do c = 1, grid % n_cells
-    if(new_c(c) /= 0) then
+    if(new_c(c) .ne. 0) then
       write(9,'(a,i9)') IN_5, grid % material(c)
     end if
   end do
@@ -154,7 +154,7 @@
   ! Wall distance
   write(9,'(a,a)') IN_4, '<DataArray type="Float32" Name="wall distance" format="ascii">'
   do c = 1, grid % n_cells
-    if(new_c(c) /= 0) then
+    if(new_c(c) .ne. 0) then
       write(9,'(a,1pe15.7)') IN_5, grid % wall_dist(c)
     end if
   end do

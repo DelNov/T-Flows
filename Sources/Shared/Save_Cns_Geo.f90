@@ -84,7 +84,7 @@
   ! Number of nodes for each cell
   count=0
   do c = 1, grid % n_cells
-    if(new_c(c) /= 0) then
+    if(new_c(c) .ne. 0) then
       count=count+1
       iwork(count,1) = grid % cells_n_nodes(c)
     end if
@@ -94,7 +94,7 @@
   ! Cells' nodes
   count=0
   do c = 1, grid % n_cells
-    if(new_c(c) /= 0) then
+    if(new_c(c) .ne. 0) then
       do n = 1, grid % cells_n_nodes(c)
         count=count+1
         iwork(count,1) = new_n(grid % cells_n(n,c))
@@ -106,7 +106,7 @@
   ! Cells' materials inside the domain
   count=0
   do c = 1, grid % n_cells
-    if(new_c(c) /= 0) then
+    if(new_c(c) .ne. 0) then
       count=count+1
       iwork(count,1) = grid % material(c)
     end if
@@ -116,7 +116,7 @@
   ! Materials on physicall boundary cells
   count=0
   do c = -1,-grid % n_bnd_cells, -1
-    if(new_c(c) /= 0) then
+    if(new_c(c) .ne. 0) then
       count=count+1
       iwork(count,1) = grid % material(c)
     end if
@@ -136,7 +136,7 @@
   ! Number of nodes for each face
   count=0
   do s = 1, grid % n_faces
-    if(new_f(s) /= 0) then
+    if(new_f(s) .ne. 0) then
       count=count+1
       iwork(count,1) = grid % faces_n_nodes(s)
     end if
@@ -146,7 +146,7 @@
   ! Faces' nodes
   count=0
   do s = 1, grid % n_faces
-    if(new_f(s) /= 0) then
+    if(new_f(s) .ne. 0) then
       do n = 1, grid % faces_n_nodes(s)
         count=count+1
         iwork(count,1) = new_n(grid % faces_n(n,s))
@@ -188,13 +188,13 @@
 
   ! n_bnd_cells_sub physical boundary cells
   do c = -1,-grid % n_bnd_cells,-1  ! OK, later chooses just cells with new_c
-    if(new_c(c) /= 0) then
+    if(new_c(c) .ne. 0) then
       count=count-1 
       ! nekad bio i: new_c(c)
       iwork(count,1) = grid % bnd_cond % color(c)   
       iwork(count,2) = new_c(grid % bnd_cond % copy_c(c)) 
-      if(grid % bnd_cond % copy_c(c) /= 0) then
-        if(proces(grid % bnd_cond % copy_c(c)) /= sub) then
+      if(grid % bnd_cond % copy_c(c) .ne. 0) then
+        if(proces(grid % bnd_cond % copy_c(c)) .ne. sub) then
           do b=1,n_buf_cells_sub
             if(buf_recv_ind(b) .eq. grid % bnd_cond % copy_c(c)) then
               print *, buf_pos(b) 
@@ -285,7 +285,7 @@
   do var = 1, 3
     count=0
     do c = -1, -grid % n_bnd_cells, -1
-      if(new_c(c) /= 0) then
+      if(new_c(c) .ne. 0) then
         count=count+1
         if(var .eq. 1) work(count) = grid % xc(c)
         if(var .eq. 2) work(count) = grid % yc(c)

@@ -19,7 +19,7 @@
   real :: Distance_Squared    
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, c1, c2, n, s, ss, cc2, c_max, nnn, hh, mm, b
-  integer              :: c11, c12, c21, c22, s1, s2, bou_cen
+  integer              :: c11, c12, c21, c22, s1, s2, bou_cen, count
   integer              :: new_face_1, new_face_2
   integer              :: color_per, n_per, number_sides, dir, option
   integer              :: rot_dir, n_wall_colors
@@ -637,6 +637,37 @@
 
   n_per = c/2
   print *, '# Phase I: periodic cells: ', n_per
+
+  !---------------------------------!
+  !   Compress all boundary cells   !
+  !---------------------------------!
+  count = 0
+  new_c = 0
+  do c = -1,-grid % n_bnd_cells,-1
+    if(grid % bnd_cond % color(c) .ne. color_per) then
+      count = count + 1
+      new_c(c) = -count
+    end if
+  end do
+
+  do c = -1,-grid % n_bnd_cells,-1
+    if(new_c(c) .ne. 0) then
+      grid % xc(new_c(c)) = grid % xc(c)
+      grid % yc(new_c(c)) = grid % yc(c)
+      grid % zc(new_c(c)) = grid % zc(c)
+     grid % bnd_cond % color(new_c(c)) = grid % bnd_cond % color(c)
+    end if
+  end do
+
+  do s = 1, grid % n_faces
+    c1 = grid % faces_c(1,s)
+    c2 = grid % faces_c(2,s)
+    if(new_c(c2) .ne. 0) then
+      grid % faces_c(2,s) = new_c(c2)
+    end if
+  end do
+
+  grid % n_bnd_cells = count
 
   !--------------------------------------------------------------------!
   !   Remove boundary condition with color_per and compress the rest   !
