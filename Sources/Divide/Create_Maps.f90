@@ -73,15 +73,15 @@
           n_faces_sub=n_faces_sub+1
           global_face_all(n_faces_sub) = s  ! map to global cell number
 
-          n_bnd_cells_sub =  n_bnd_cells_sub + 1  ! increase n. of bnd. cells
+          n_bnd_cells_sub = n_bnd_cells_sub + 1  ! increase n. of bnd. cells
           global_cell_bnd(-n_bnd_cells_sub) = c2  ! map to global cell number
         end if
       end if 
     end do
 
     ! Faces 3/3: buffer faces; browse in the same was as for buffers!!!
-    do subo=1,n_sub
-      if(subo /= sub) then
+    do subo = 1, n_sub
+      if(subo .ne. sub) then
 
         do s = 1, grid % n_faces
           c1 = grid % faces_c(1,s)  

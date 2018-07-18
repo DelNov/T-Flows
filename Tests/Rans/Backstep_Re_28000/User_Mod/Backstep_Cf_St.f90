@@ -64,7 +64,7 @@
   allocate(n_count(n_prob)); n_count = 0
   count = 0
 
-  if(heat_transfer == YES) then
+  if(heat_transfer .eq. YES) then
     allocate(tm_p(n_prob));  tm_p = 0.0
     allocate(tt_p(n_prob));  tt_p = 0.0
     allocate(ut_p(n_prob));  ut_p = 0.0
@@ -77,9 +77,9 @@
   !-------------------------!
   do i = 1, n_prob-1
     do s = 1, grid % n_faces
-      c1=grid % faces_c(1,s)
-      c2=grid % faces_c(2,s)
-      if(c2 < 0 .and. Grid_Mod_Bnd_Cond_Type(grid,c2) /= BUFFER) then
+      c1 = grid % faces_c(1,s)
+      c2 = grid % faces_c(2,s)
+      if(c2 < 0 .and. Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. BUFFER) then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2).eq.WALLFL.and.t % q(c2) > 1.e-8) then
           if(grid % xc(c1) > z_p(i) .and. grid % xc(c1) < z_p(i+1)) then
             um_p(i)   = um_p(i) + U % n(c1)
@@ -118,7 +118,7 @@
 
     count =  count + n_count(pl) 
 
-    if(heat_transfer == YES) then
+    if(heat_transfer .eq. YES) then
       call Comm_Mod_Global_Sum_Real(tm_p(pl))
       call Comm_Mod_Global_Sum_Real(tt_p(pl))
       call Comm_Mod_Global_Sum_Real(ut_p(pl))
@@ -135,7 +135,7 @@
 
   write(3,*) '# x, Cf, St, U, T, yPlus'
   do i = 1, n_prob
-    if(n_count(i) /= 0) then
+    if(n_count(i) .ne. 0) then
       wm_p(i) = wm_p(i) / n_count(i)
       um_p(i) = um_p(i) / n_count(i)
       vm_p(i) = vm_p(i) / n_count(i)
@@ -178,7 +178,7 @@
   deallocate(v4_p)
   deallocate(v5_p)
   deallocate(n_count)
-  if(heat_transfer == YES) then
+  if(heat_transfer .eq. YES) then
     deallocate(tm_p)
     deallocate(tt_p)
     deallocate(ut_p)

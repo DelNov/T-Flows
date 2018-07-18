@@ -29,7 +29,7 @@
     call Comm_Mod_Read_Int (fh, vs, disp_loop)  ! variable size  
 
     ! If variable is found, read it and retrun
-    if(vn == var_name) then
+    if(vn .eq. var_name) then
       if(this_proc < 2) print *, '# Reading variable: ', trim(vn)
       call Comm_Mod_Read_Face_Real(fh, fcom1(1:nf_s+nbf_s), disp_loop)
       disp = disp_loop

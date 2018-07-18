@@ -13,7 +13,7 @@
   Key_Ind = 0
 
   do i = 1, n_keys
-    if(key == key_to_values(i)) then
+    if(key .eq. key_to_values(i)) then
       Key_Ind = i
       return
     end if

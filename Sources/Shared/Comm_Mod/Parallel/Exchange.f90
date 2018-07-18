@@ -44,7 +44,7 @@
                                 status,                &
                                 error)
 
-    end if  !  nbb_e(sub)  /=  nbb_s(sub)
+    end if  !  nbb_e(sub)  .ne.  nbb_s(sub)
   end do
 
   end subroutine

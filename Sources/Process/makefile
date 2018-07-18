@@ -304,4 +304,5 @@ include makefile_explicit_dependencies
 #   Explicit target.
 #---------------------
 clean:
-	rm -f $(DIR_OBJECT)/*.o $(DIR_MODULE)/*.mod $(PROGRAM_FILE)
+	$(shell for i in $(DIR_USER)/*.f90; do if [ -L $$i ]; then unlink $$i ; fi; done) \
+  rm -f $(DIR_OBJECT)/*.o $(DIR_MODULE)/*.mod $(PROGRAM_FILE)

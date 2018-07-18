@@ -19,7 +19,7 @@
   matrix % pnt_grid => grid
                   
   ! Memory allocation
-  allocate(stencw(grid % n_cells)); stencw=1
+  allocate(stencw(grid % n_cells)); stencw = 1
 
   if(this_proc < 2) print *, '# Determining matrix topology.'
 
@@ -31,8 +31,8 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
     if(c2  > 0) then
-      stencw(c1)=stencw(c1)+1
-      stencw(c2)=stencw(c2)+1
+      stencw(c1) = stencw(c1)+1
+      stencw(c2) = stencw(c2)+1
     end if      
   end do
 
@@ -61,8 +61,8 @@
     if(c2  > 0) then
       matrix % col(matrix % row(c1)+stencw(c1)) = c2
       matrix % col(matrix % row(c2)+stencw(c2)) = c1
-      stencw(c1)=stencw(c1)+1
-      stencw(c2)=stencw(c2)+1
+      stencw(c1) = stencw(c1)+1
+      stencw(c2) = stencw(c2)+1
     end if      
   end do
 
@@ -72,8 +72,8 @@
     call Sort_Int_Carry_Int(matrix % col(matrix % row(c)),  &
                             matrix % col(matrix % row(c)),  &
                             stencw(c), 1)
-    do pos=matrix % row(c),matrix % row(c+1)-1
-      if(matrix % col(pos) .eq. c) matrix % dia(c)=pos
+    do pos = matrix % row(c),matrix % row(c+1)-1
+      if(matrix % col(pos) .eq. c) matrix % dia(c) = pos
     end do
   end do 
 
@@ -105,13 +105,13 @@
     if(c2  > 0) then
 
       ! Where is matrix(c1,c2) and ...
-      do c=matrix % row(c1),matrix % row(c1+1)-1 
-        if(matrix % col(c)  .eq.  c2) matrix % pos(1,s)=c
+      do c = matrix % row(c1), matrix % row(c1+1)-1 
+        if(matrix % col(c)  .eq.  c2) matrix % pos(1, s) = c
       end do
 
       ! Where is matrix(c2,c1) and ...
       do c=matrix % row(c2),matrix % row(c2+1)-1 
-        if(matrix % col(c)  .eq.  c1) matrix % pos(2,s)=c
+        if(matrix % col(c)  .eq.  c1) matrix % pos(2, s) = c
       end do
     end if
   end do

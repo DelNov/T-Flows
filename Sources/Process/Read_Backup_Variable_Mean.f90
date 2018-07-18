@@ -29,7 +29,7 @@
     call Comm_Mod_Read_Int (fh, vs, disp_loop)  ! variable size  
 
     ! If variable is found, read it and retrun
-    if(vn == var_name) then
+    if(vn .eq. var_name) then
       if(this_proc < 2) print *, '# Reading variable: ', trim(vn)
       call Comm_Mod_Read_Cell_Real(fh, var1 % mean(1:nc_s),   disp_loop)
       call Comm_Mod_Read_Bnd_Real (fh, var1 % mean(-nb_s:-1), disp_loop)

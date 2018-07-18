@@ -41,14 +41,14 @@
   read(line % whole,*) n_bnd_cells_sub
 
   ! Initialize 
-  do sub=0,n_proc
+  do sub = 0, n_proc
     nbb_s(sub) = -(n_bnd_cells_sub) 
     nbb_e(sub) = -(n_bnd_cells_sub)
   end do
 
   ! Fill the indexes and the buffers
-  do sub=1,n_proc
-    if(sub  /=  this_proc) then
+  do sub = 1, n_proc
+    if(sub .ne. this_proc) then
 
       ! Connections with subdomain          
       call Tokenizer_Mod_Read_Line(9)
@@ -61,7 +61,7 @@
       nbb_s(sub) = nbb_e(sub-1) - 1  
       nbb_e(sub) = nbb_s(sub) - nbb_e(sub) + 1
 
-      do c=nbb_s(sub),nbb_e(sub),-1
+      do c = nbb_s(sub), nbb_e(sub), -1
         call Tokenizer_Mod_Read_Line(9)
         read(line % whole,*) dummy, buffer_index(c) 
       end do 
@@ -74,7 +74,7 @@
   close(9)
 
   ! Correct the "sloppy" indexes
-  do sub=1,n_proc
+  do sub = 1, n_proc
     if(nbb_e(sub)  > nbb_s(sub)) then  
       nbb_s(sub) = -1 
       nbb_e(sub) = 0 

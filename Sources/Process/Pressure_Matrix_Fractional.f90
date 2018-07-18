@@ -37,7 +37,7 @@
       a % val(a % dia(c2)) =                                            &
       a % val(a % dia(c2)) +  a12
     else
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) == BUFFER) then
+      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER) then
         a12 = dt * f_coef(s)
         a % val(a % dia(c1)) =                                          &
         a % val(a % dia(c1)) +  a12
