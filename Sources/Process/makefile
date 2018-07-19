@@ -311,11 +311,12 @@ include makefile_explicit_dependencies
 #   Explicit target.
 #---------------------
 clean:
-	for i in $(DIR_USER)/*.f90; do \
+	@echo -n Removing objects and modules..
+	@for i in $(DIR_USER)/*.f90; do \
 		if [ -L $$i ]; then \
 			unlink $$i ; \
-			echo cp $(DIR_USER)/.$${i##*/} $(DIR_USER)/$${i##*/} ; \
-			cp $(DIR_USER)/.$${i##*/} $(DIR_USER)/$${i##*/} ; \
+			mv $(DIR_USER)/.$${i##*/} $(DIR_USER)/$${i##*/} ; \
 		fi ; \
 	done
-	rm -f $(DIR_OBJECT)/*.o $(DIR_MODULE)/*.mod $(PROGRAM_FILE)
+	@rm -f $(DIR_OBJECT)/*.o $(DIR_MODULE)/*.mod $(PROGRAM_FILE)
+	@echo done
