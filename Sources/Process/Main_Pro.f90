@@ -46,7 +46,7 @@
   ! Get starting time
   call cpu_time(wall_time_start)
   time =  0.
-  restart = .false.
+  restart = .true.
 
   !------------------------------!
   !   Start parallel execution   !
@@ -87,6 +87,10 @@
 
   call Allocate_Variables(grid)
 
+  ! First time step is one, unless read from restart otherwise
+  first_dt = 0
+  call Load_Backup(grid, first_dt, restart) ! -> restart=.false.
+
   if(.not. restart) then
     call Load_Boundary_Conditions(grid, .true.)
   else
@@ -94,10 +98,6 @@
   end if
   call Calculate_Face_Geometry(grid)
   call Load_Physical_Properties(grid)
-
-  ! First time step is one, unless read from restart otherwise
-  first_dt = 0
-  call Load_Backup(grid, first_dt, restart)
 
   ! Read physical models from control file
   call Read_Physical(grid, restart)

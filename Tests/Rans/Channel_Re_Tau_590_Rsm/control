@@ -17,7 +17,7 @@
  RESULTS_SAVE_INTERVAL              500
  BACKUP_SAVE_INTERVAL               100
 
-# LOAD_BACKUP_NAME  chan-ts002000.backup
+ #LOAD_BACKUP_NAME  chan_full-ts000100.backup
 
 #-------------------
 # Monitoring points 
