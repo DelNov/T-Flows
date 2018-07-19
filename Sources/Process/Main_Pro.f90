@@ -46,6 +46,7 @@
   ! Get starting time
   call cpu_time(wall_time_start)
   time =  0.
+  restart = .false.
 
   !------------------------------!
   !   Start parallel execution   !
