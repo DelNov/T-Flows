@@ -159,7 +159,7 @@ ifneq ($(DIR_CASE), no)
       SRC_USR = $(patsubst %.f90, ../%.f90, $(STEP_A))
 
       #for each file in DIR_CASE save a copy of existing black user file
-      ifneq ("$(wildcard $(DIR_CASE)/$(STEP_B))","")
+      ifneq ("$(wildcard $(STEP_A))","")
         value = $(shell for i in $(STEP_B); do echo cp $(DIR_USER)/$$i $(DIR_USER)/.$$i; cp $(DIR_USER)/$$i $(DIR_USER)/.$$i; done)
         $(info $(value))
 
