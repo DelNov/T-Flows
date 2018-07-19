@@ -1,48 +1,92 @@
- PROBLEM_NAME		chan_full
- PROBLEM_TYPE		channel
- HEAT_TRANSFER		yes
+#--------------------
+# Problem definition
+#--------------------
 
- TIME_STEP				0.1
- NUMBER_OF_TIME_STEPS			2000
- STARTING_TIME_STEP_FOR_STATISTICS	900000000
+ PROBLEM_NAME   chan_full
+ PROBLEM_TYPE   channel
 
- NUMBER_OF_MONITORING_POINTS               1
- 	MONITORING_POINT_001  	0.5	0.5	0.0
- POINT_FOR_MONITORING_PLANES	0.5	0.5	0.5
+ HEAT_TRANSFER  yes
 
- TURBULENCE_MODEL		reynolds_stress
- TURBULENCE_MODEL_VARIANT	pure
+#---------------
+# Time stepping
+#---------------
 
- PRESSURE_MOMENTUM_COUPLING		simple
- SIMPLE_UNDERRELAXATION_FOR_MOMENTUM	0.4
- SIMPLE_UNDERRELAXATION_FOR_PRESSURE	0.4
- SIMPLE_UNDERRELAXATION_FOR_ENERGY	0.4
- SIMPLE_UNDERRELAXATION_FOR_TURBULENCE	0.4
+ TIME_STEP                          0.6
+ NUMBER_OF_TIME_STEPS               4000
+ STARTING_TIME_STEP_FOR_STATISTICS  900000000
+ RESULTS_SAVE_INTERVAL              500
+ BACKUP_SAVE_INTERVAL               100
 
- TIME_INTEGRATION_FOR_INERTIA		linear
- TIME_INTEGRATION_FOR_ADVECTION		fully_implicit
- TIME_INTEGRATION_FOR_DIFFUSION		fully_implicit
- TIME_INTEGRATION_FOR_CROSS_DIFFUSION	fully_implicit
+# LOAD_BACKUP_NAME  chan-ts002000.backup
 
- ADVECTION_SCHEME_FOR_MOMENTUM		minmod
- ADVECTION_SCHEME_FOR_ENERGY		minmod
- ADVECTION_SCHEME_FOR_TURBULENCE	minmod
+#-------------------
+# Monitoring points 
+#-------------------
 
- PRECONDITIONER_FOR_SYSTEM_MATRIX	incomplete_cholesky
- TOLERANCE_FOR_MOMENTUM_SOLVER		1.e-7
- TOLERANCE_FOR_PRESSURE_SOLVER		1.e-7
- TOLERANCE_FOR_TURBULENCE_SOLVER	1.e-6
- TOLERANCE_FOR_ENERGY_SOLVER		1.e-6
- TOLERANCE_FOR_SIMPLE_ALGORITHM		1.e-5
+ NUMBER_OF_MONITORING_POINTS    1
+  MONITORING_POINT_001          0.5 0.5 0.0
 
- PRESSURE_DROPS		0.0036	0.0	0.0
- MASS_FLOW_RATES	2.32	0.0	0.0
+ POINT_FOR_MONITORING_PLANES    0.5 0.5 0.5
+
+#-----------------
+# Physical models
+#-----------------
+
+ MASS_DENSITY         1.0
+ THERMAL_CONDUCTIVITY 1.4080e-4
+ DYNAMIC_VISCOSITY    1.0e-4
+ HEAT_CAPACITY        1.0
+
+ TURBULENCE_MODEL         reynolds_stress
+ TURBULENCE_MODEL_VARIANT stabilized
+
+#----------------------
+# Numerical parameters
+#----------------------
+
+ PRESSURE_MOMENTUM_COUPLING           simple
+
+ SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.4
+ SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.4
+ SIMPLE_UNDERRELAXATION_FOR_ENERGY      0.4
+ SIMPLE_UNDERRELAXATION_FOR_TURBULENCE  0.4
+
+ TIME_INTEGRATION_FOR_INERTIA         linear
+ TIME_INTEGRATION_FOR_ADVECTION       fully_implicit
+ TIME_INTEGRATION_FOR_DIFFUSION       fully_implicit
+ TIME_INTEGRATION_FOR_CROSS_DIFFUSION fully_implicit
+
+ ADVECTION_SCHEME_FOR_MOMENTUM    minmod
+ ADVECTION_SCHEME_FOR_ENERGY      superbee
+ ADVECTION_SCHEME_FOR_TURBULENCE  smart
+
+#------------------------
+# Linear solver settings
+#------------------------
+
+ PRECONDITIONER_FOR_SYSTEM_MATRIX incomplete_cholesky
+ TOLERANCE_FOR_MOMENTUM_SOLVER    1.e-7
+ TOLERANCE_FOR_PRESSURE_SOLVER    1.e-7
+ TOLERANCE_FOR_TURBULENCE_SOLVER  1.e-7
+ TOLERANCE_FOR_ENERGY_SOLVER      1.e-7
+ TOLERANCE_FOR_SIMPLE_ALGORITHM   1.e-5
+
+ PRESSURE_DROPS   0.0036  0.0 0.0
+ MASS_FLOW_RATES  4.64    0.0 0.0
+
+#--------------------
+# Initial conditions
+#--------------------
 
  INITIAL_CONDITION
-	VARIABLES	u     v     w     kin     eps     uu     vv     ww     f22
-	VALUES		1.0   0.0   0.0   0.006   0.002   0.001  0.001  0.001  0.0001
+  VARIABLES u   v   w   kin   eps   uu    vv    ww    f22
+  VALUES    1.0 0.0 0.0 0.006 0.002 0.001 0.001 0.001 0.0001
 
- BOUNDARY_CONDITION	lower_wall
-	TYPE		wall_flux
-	VARIABLES	u     v     w     q     uu    vv    ww    uv    uw    vw    eps   f22    
-	VALUES		0.0   0.0   0.0   0.1   0.0   0.0   0.0   0.0   0.0   0.0   0.0   0.0	
+#---------------------
+# Boundary conditions
+#---------------------
+
+ BOUNDARY_CONDITION   lower_wall
+  TYPE    wall_flux
+  VARIABLES u   v   w   q   uu    vv    ww    uv    uw    vw    eps   f22
+  VALUES    0.0 0.0 0.0 0.1 0.0   0.0   0.0   0.0   0.0   0.0   0.0   0.0
