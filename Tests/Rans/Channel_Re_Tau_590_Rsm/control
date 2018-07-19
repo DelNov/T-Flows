@@ -44,5 +44,5 @@
 
  BOUNDARY_CONDITION	lower_wall
 	TYPE		wall_flux
-	VARIABLES	u     v     w     t     uu    vv    ww    uv    uw    vw    eps   f22    
+	VARIABLES	u     v     w     q     uu    vv    ww    uv    uw    vw    eps   f22    
 	VALUES		0.0   0.0   0.0   0.1   0.0   0.0   0.0   0.0   0.0   0.0   0.0   0.0	

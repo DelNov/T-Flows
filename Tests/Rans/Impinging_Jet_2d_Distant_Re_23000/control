@@ -88,7 +88,7 @@
     VALUES              0.0   0.0   0.0   0.0   1.0e-3   0.0   0.0
 
     TYPE                wall_flux
-    VARIABLES           t
+    VARIABLES           q
     VALUES              0.0
 
   BOUNDARY_CONDITION    symmetry_plane
