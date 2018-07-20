@@ -5,7 +5,6 @@
 !   'EBM' and 'HJ' are calling this subroutine.                                !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod, only: YES, NO
   use Flow_Mod
   use Les_Mod
   use Rans_Mod

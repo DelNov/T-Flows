@@ -31,12 +31,12 @@
       if(c2 > 0) then
         if( (grid % material(c1) .eq. m) .and.  &
             (grid % material(c1) .eq. grid % material(c2)) ) then
-          xc1=grid % xc(c1) 
-          yc1=grid % yc(c1) 
-          zc1=grid % zc(c1) 
-          xc2=grid % xc(c1) + grid % dx(s) 
-          yc2=grid % yc(c1) + grid % dy(s) 
-          zc2=grid % zc(c1) + grid % dz(s)
+          xc1 = grid % xc(c1) 
+          yc1 = grid % yc(c1) 
+          zc1 = grid % zc(c1) 
+          xc2 = grid % xc(c1) + grid % dx(s) 
+          yc2 = grid % yc(c1) + grid % dy(s) 
+          zc2 = grid % zc(c1) + grid % dz(s)
 
           if((xc1 <= bulk(m) % xp).and.(xc2 > bulk(m) % xp))  &
             bulk(m) % flux_x = bulk(m) % flux_x + flux(s)
@@ -60,12 +60,12 @@
       else if(c2 < 0 .and. Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. BUFFER) then
         if( (grid % material(c1) .eq. m) .and.  &
             (grid % material(c1) .eq. grid % material(c2)) ) then
-          xc1=grid % xc(c1) 
-          yc1=grid % yc(c1) 
-          zc1=grid % zc(c1) 
-          xc2=grid % xc(c1) + grid % dx(s) 
-          yc2=grid % yc(c1) + grid % dy(s) 
-          zc2=grid % zc(c1) + grid % dz(s)
+          xc1 = grid % xc(c1) 
+          yc1 = grid % yc(c1) 
+          zc1 = grid % zc(c1) 
+          xc2 = grid % xc(c1) + grid % dx(s) 
+          yc2 = grid % yc(c1) + grid % dy(s) 
+          zc2 = grid % zc(c1) + grid % dz(s)
 
           if((xc1 <= bulk(m) % xp).and.(xc2 > bulk(m) % xp))  &
             bulk(m) % flux_x = bulk(m) % flux_x + .5*flux(s)

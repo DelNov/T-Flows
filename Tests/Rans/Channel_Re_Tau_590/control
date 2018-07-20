@@ -89,7 +89,7 @@
 #---------------------
   BOUNDARY_CONDITION    lower_face
     TYPE                wall_flux
-    VARIABLES           u     v     w     t     kin   eps      zeta  f22
+    VARIABLES           u     v     w     q     kin   eps      zeta  f22
     VALUES              0.0   0.0   0.0   0.1   0.0   1.0e-3   0.0   0.0
 
   BOUNDARY_CONDITION    upper_face

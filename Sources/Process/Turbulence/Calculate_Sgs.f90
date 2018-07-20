@@ -47,10 +47,10 @@
     do c = 1, grid % n_cells
       lf = grid % vol(c)**ONE_THIRD
 
-      ! if(nearest_wall_cell(c) /= 0) is needed for parallel version
+      ! if(nearest_wall_cell(c) .ne. 0) is needed for parallel version
       ! since the subdomains which do not "touch" wall
       ! has nearest_wall_cell(c) = 0. 
-      if(nearest_wall_cell(c) /= 0) then
+      if(nearest_wall_cell(c) .ne. 0) then
         u_f = sqrt( viscosity  &
                     * sqrt(  u % n(nearest_wall_cell(c)) ** 2   & 
                            + v % n(nearest_wall_cell(c)) ** 2   &
@@ -126,8 +126,8 @@
   !   only if wall function approach is used.   !
   !----------------.----------------------------! 
   do s = 1, grid % n_faces
-    c1=grid % faces_c(1,s)
-    c2=grid % faces_c(2,s)
+    c1 = grid % faces_c(1,s)
+    c2 = grid % faces_c(2,s)
 
     if(c2  < 0) then 
 

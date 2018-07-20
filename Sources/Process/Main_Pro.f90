@@ -46,6 +46,7 @@
   ! Get starting time
   call cpu_time(wall_time_start)
   time =  0.
+  restart = .true.
 
   !------------------------------!
   !   Start parallel execution   !
@@ -70,7 +71,6 @@
 
   call Allocate_Memory(grid)
   call Load_Geo(grid, this_proc)
-  call Calculate_Face_Geometry(grid)
   call Comm_Mod_Load_Buffers
   call Comm_Mod_Load_Maps(grid)
 
@@ -84,23 +84,26 @@
   ! Get the number of time steps from the control file
   call Control_Mod_Number_Of_Time_Steps(last_dt, verbose=.true.)
   call Control_Mod_Starting_Time_Step_For_Statistics(n_stat, verbose=.true.)
- 
-  call Allocate_Variables(grid)
 
-  call Load_Boundary_Conditions(grid, .false.)
-  call Load_Physical_Properties(grid)
+  call Allocate_Variables(grid)
 
   ! First time step is one, unless read from restart otherwise
   first_dt = 0
-  call Load_Backup(grid, first_dt, restart)
+  call Load_Backup(grid, first_dt, restart) ! -> restart=.false.
+
+  if(.not. restart) then
+    call Load_Boundary_Conditions(grid, .true.)
+  else
+    call Load_Boundary_Conditions(grid, .false.)
+  end if
+  call Calculate_Face_Geometry(grid)
+  call Load_Physical_Properties(grid)
 
   ! Read physical models from control file
   call Read_Physical(grid, restart)
 
   ! Initialize variables
   if(.not. restart) then
-    call Load_Boundary_Conditions(grid, .true.)
-    call Load_Physical_Properties(grid)
     call Initialize_Variables(grid)
     call Comm_Mod_Wait
   end if
@@ -151,7 +154,7 @@
   call Control_Mod_Backup_Save_Interval(bsi, verbose=.true.)
   call Control_Mod_Results_Save_Interval(rsi, verbose=.true.)
 
-  ! It will save results in .vtk or .cgns file format, 
+  ! It will save results in .vtk or .cgns file format,
   ! depending on how the code was compiled
   call Save_Results(grid, problem_name)
 
@@ -388,12 +391,12 @@
     else
       call Monitor_Mod_Write_5_Vars(n, u, v, w, t, p)
     end if
- 
+
     ! Calculate mean values
-    call Calculate_Mean(grid, n_stat, n) 
+    call Calculate_Mean(grid, n_stat, n)
 
     call User_Mod_Calculate_Mean(grid, n_stat, n)
-    
+
     !-----------------------------------------------------!
     !   Recalculate the pressure drop                     !
     !   to keep the constant mass flux                    !

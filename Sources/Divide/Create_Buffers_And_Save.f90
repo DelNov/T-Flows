@@ -57,7 +57,7 @@
     ! Cells
     n_cells_sub = 0     ! number of cells in subdomain
     do c = 1, grid % n_cells
-      new_c(c)=0
+      new_c(c) = 0
     end do
     do c = 1, grid % n_cells
       if(proces(c) .eq. sub) then
@@ -69,19 +69,19 @@
     ! Nodes
     n_nodes_sub = 0     ! number of cells in subdomain
     do n = 1, grid % n_nodes
-      new_n(n)=0
+      new_n(n) = 0
     end do
     do c = 1, grid % n_cells
       if(proces(c) .eq. sub) then
         do ln = 1, grid % cells_n_nodes(c)
-          new_n(grid % cells_n(ln,c))=-1
+          new_n(grid % cells_n(ln,c)) = -1
         end do
       end if
     end do
     do n = 1, grid % n_nodes
       if(new_n(n) .eq. -1) then
-        n_nodes_sub=n_nodes_sub+1
-        new_n(n)=n_nodes_sub
+        n_nodes_sub = n_nodes_sub+1
+        new_n(n) = n_nodes_sub
       end if
     end do
 
@@ -90,10 +90,10 @@
     n_bnd_cells_sub = 0  ! number of real boundary cells in subdomain
     NCSsub = 0
     do s = 1, grid % n_faces
-      new_f(s)=0
+      new_f(s) = 0
     end do
-    do c=-grid % n_bnd_cells,-1
-      new_c(c)=0
+    do c = -grid % n_bnd_cells, -1
+      new_c(c) = 0
     end do
 
     ! Faces step 1/2: inside the domain
@@ -102,8 +102,8 @@
       c2 = grid % faces_c(2,s) 
       if(c2 > 0) then
         if( (proces(c1) .eq. sub) .and. (proces(c2) .eq. sub) ) then
-          n_faces_sub=n_faces_sub+1
-          new_f(s)=n_faces_sub
+          n_faces_sub = n_faces_sub+1
+          new_f(s) = n_faces_sub
         end if
       end if 
     end do
@@ -114,8 +114,8 @@
       c2 = grid % faces_c(2,s) 
       if(c2 < 0) then
         if( proces(c1) .eq. sub )  then
-          n_faces_sub=n_faces_sub+1
-          new_f(s)=n_faces_sub
+          n_faces_sub = n_faces_sub+1
+          new_f(s) = n_faces_sub
 
           n_bnd_cells_sub =  n_bnd_cells_sub + 1  ! increase n. of bnd. cells
           new_c(c2)       = -n_bnd_cells_sub      ! new loc. number of bnd. cell
@@ -124,10 +124,10 @@
     end do
 
     do s = 1, grid % n_copy
-      c1=grid % bnd_cond % copy_s(1,s)
-      c2=grid % bnd_cond % copy_s(2,s)
+      c1 = grid % bnd_cond % copy_s(1,s)
+      c2 = grid % bnd_cond % copy_s(2,s)
       if( (proces(c1) .eq. sub).and.(proces(c2) .eq. sub) ) then
-        NCSsub=NCSsub+1
+        NCSsub = NCSsub+1
       end if
     end do
 
@@ -144,9 +144,9 @@
     n_copy_sub = 0
     write(9,'(A30)') '# Number of physical boundary cells:'
     write(9,'(I8)')  n_bnd_cells_sub   
-    do subo=1,n_sub
-      if(subo /= sub) then
-        nbb_s(subo)=n_buff_sub+1
+    do subo = 1, n_sub
+      if(subo .ne. sub) then
+        nbb_s(subo) = n_buff_sub+1
 
         ! Faces inside the domain
         do s = 1, grid % n_faces
@@ -155,43 +155,43 @@
           if(c2  > 0) then
             if( (proces(c1) .eq. sub).and.(proces(c2) .eq. subo) ) then
               n_buff_sub = n_buff_sub+1
-              buf_send_ind(n_buff_sub)=new_c(c1)  ! buffer send index 
-              buf_recv_ind(n_buff_sub)=c2         ! important for coordinate
-              buf_pos(n_buff_sub)=-n_bnd_cells_sub-n_buff_sub
+              buf_send_ind(n_buff_sub) = new_c(c1)  ! buffer send index 
+              buf_recv_ind(n_buff_sub) = c2         ! important for coordinate
+              buf_pos(n_buff_sub) = -n_bnd_cells_sub-n_buff_sub
 
-              new_f(s)=n_faces_sub+n_buff_sub
+              new_f(s) = n_faces_sub+n_buff_sub
             end if
             if( (proces(c2) .eq. sub).and.(proces(c1) .eq. subo) ) then
               n_buff_sub = n_buff_sub+1
-              buf_send_ind(n_buff_sub)=new_c(c2)  ! buffer send index
-              buf_recv_ind(n_buff_sub)=c1         ! important for coordinate
-              buf_pos(n_buff_sub)=-n_bnd_cells_sub-n_buff_sub
+              buf_send_ind(n_buff_sub) = new_c(c2)  ! buffer send index
+              buf_recv_ind(n_buff_sub) = c1         ! important for coordinate
+              buf_pos(n_buff_sub) = -n_bnd_cells_sub-n_buff_sub
 
-              new_f(s)=n_faces_sub+n_buff_sub
+              new_f(s) = n_faces_sub+n_buff_sub
             end if
           end if  ! c2 > 0
         end do    ! through sides
 
         ! Faces on the "copy" boundary
         do s = 1, grid % n_copy
-          c1=grid % bnd_cond % copy_s(1,s)  
-          c2=grid % bnd_cond % copy_s(2,s) 
+          c1 = grid % bnd_cond % copy_s(1,s)  
+          c2 = grid % bnd_cond % copy_s(2,s) 
           if( (proces(c1) .eq. sub).and.(proces(c2) .eq. subo) ) then
             n_buff_sub = n_buff_sub+1
             n_copy_sub = n_copy_sub+1
-            buf_send_ind(n_buff_sub)=new_c(c1) ! buffer send index 
-            buf_recv_ind(n_buff_sub)=c2 
+            buf_send_ind(n_buff_sub) = new_c(c1) ! buffer send index 
+            buf_recv_ind(n_buff_sub) = c2 
             buf_pos(n_buff_sub)= -(-n_bnd_cells_sub-n_buff_sub) ! watch the sign
           end if
           if( (proces(c2) .eq. sub).and.(proces(c1) .eq. subo) ) then
             n_buff_sub = n_buff_sub+1
             n_copy_sub = n_copy_sub+1
-            buf_send_ind(n_buff_sub)=new_c(c2) ! buffer send index
-            buf_recv_ind(n_buff_sub)=c1 
+            buf_send_ind(n_buff_sub) = new_c(c2) ! buffer send index
+            buf_recv_ind(n_buff_sub) = c1 
             buf_pos(n_buff_sub)= -(-n_bnd_cells_sub-n_buff_sub) ! watch the sign
           end if
         end do    ! through sides
-        nbb_e(subo)=n_buff_sub
+        nbb_e(subo) = n_buff_sub
 
         ! Write to buffer file
         write(9,'(A33)') '#-------------------------------#' 
@@ -242,8 +242,8 @@
     print *, '#=====================================' 
     print *, '# Subdomain   ', sub
     print *, '# Buffer size ', n_buff_sub
-    do subo=1,n_sub
-      if(subo /= sub) then
+    do subo = 1, n_sub
+      if(subo .ne. sub) then
         print '(a,i9,a,3i9)', ' # Connections with ', subo ,' : ',  &
           nbb_e(subo)-nbb_s(subo)+1,                                &
           n_bnd_cells_sub+nbb_s(subo),                              &
@@ -265,18 +265,18 @@
     new_n(n)=n
   end do
   do c = 1, grid % n_cells
-    new_c(c)=0
+    new_c(c) = 0
   end do
   do s = 1, grid % n_faces
-    new_f(s)=0
+    new_f(s) = 0
   end do
 
   n_cells_sub = 0     ! number of cells renumbered
   do sub = 1, n_sub
     do c = 1, grid % n_cells
       if(proces(c) .eq. sub) then
-        n_cells_sub=n_cells_sub+1
-        new_c(c)=n_cells_sub
+        n_cells_sub = n_cells_sub+1
+        new_c(c) = n_cells_sub
       end if
     end do
   end do
@@ -287,8 +287,8 @@
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
       if(proces(c1) .eq. sub) then
-        n_faces_sub=n_faces_sub+1
-        new_f(s)=n_faces_sub
+        n_faces_sub = n_faces_sub+1
+        new_f(s) = n_faces_sub
       end if
     end do
   end do

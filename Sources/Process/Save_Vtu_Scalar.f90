@@ -18,7 +18,7 @@
 !==============================================================================!
 
   ! Header
-  if(n_proc > 1 .and. this_proc == 1) then
+  if(n_proc > 1 .and. this_proc .eq. 1) then
     write(8,'(4a)') in_1,                                 & 
                     '<PDataArray type="Float32" Name="',  &
                     trim(var_name),                       &

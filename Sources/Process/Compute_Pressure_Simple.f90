@@ -69,7 +69,7 @@
     fs = grid % f(s)
 
     ! Face is inside the domain
-    if(c2  > 0 .or. c2  < 0 .and. Grid_Mod_Bnd_Cond_Type(grid,c2) == BUFFER) then
+    if(c2  > 0 .or. c2  < 0 .and. Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER) then
 
       smdpn = (  grid % sx(s)*grid % sx(s)   &
                + grid % sy(s)*grid % sy(s)   &
@@ -118,7 +118,7 @@
     ! Side is on the boundary
     else ! (c2 < 0)
 
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) == INFLOW) then 
+      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then 
         u_f = u % n(c2)
         v_f = v % n(c2)
         w_f = w % n(c2)
@@ -126,8 +126,8 @@
                              + v_f * grid % sy(s)  &
                              + w_f * grid % sz(s) )
         b(c1) = b(c1)-flux(s)
-      else if(Grid_Mod_Bnd_Cond_Type(grid,c2) == OUTFLOW .or.   &
-              Grid_Mod_Bnd_Cond_Type(grid,c2) == CONVECT) then 
+      else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW .or.   &
+              Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) then 
         u_f = u % n(c2)
         v_f = v % n(c2)
         w_f = w % n(c2)
@@ -143,7 +143,7 @@
                  + grid % sz(s) * grid % dz(s) )  
         a12 = density * smdpn * grid % vol(c1) / a % sav(c1)
         a % val(a % dia(c1)) = a % val(a % dia(c1)) +  a12
-      else if(Grid_Mod_Bnd_Cond_Type(grid,c2) == PRESSURE) then
+      else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE) then
         u_f = u % n(c1)
         v_f = v % n(c1)
         w_f = w % n(c1)
@@ -180,7 +180,7 @@
   call Control_Mod_Preconditioner_For_System_Matrix(precond)
 
   ! Set the default value for number of iterations
-  niter =  40
+  niter = 40
 
   ! Over-ride if specified in control file
   call Control_Mod_Max_Iterations_For_Pressure_Solver(niter)

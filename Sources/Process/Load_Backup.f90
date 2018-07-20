@@ -27,7 +27,7 @@
 
   answer = name_in
   call To_Upper_Case(answer)
-  if(answer == 'SKIP') then
+  if(answer .eq. 'SKIP') then
     restart = .false.
     return 
   end if
@@ -96,7 +96,7 @@
   !   Etnhalpy   !
   !              !
   !--------------!
-  if(heat_transfer == YES) then
+  if(heat_transfer .eq. YES) then
     call Read_Backup_Variable(fh, d, 'temp', t)
   end if
 
@@ -109,7 +109,7 @@
   !-----------------!
   !   K-eps model   !
   !-----------------!
-  if(turbulence_model == K_EPS) then
+  if(turbulence_model .eq. K_EPS) then
 
     ! K and epsilon
     call Read_Backup_Variable(fh, d, 'kin', kin)
@@ -126,7 +126,7 @@
   !------------------------!
   !   K-eps-zeta-f model   !
   !------------------------!
-  if(turbulence_model == K_EPS_ZETA_F) then
+  if(turbulence_model .eq. K_EPS_ZETA_F) then
 
     ! K, eps, zeta and f22
     call Read_Backup_Variable(fh, d, 'kin',  kin)
@@ -205,4 +205,3 @@
   call Comm_Mod_Close_File(fh)
 
   end subroutine
-

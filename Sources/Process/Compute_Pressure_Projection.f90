@@ -65,7 +65,7 @@
 
     ! Face is inside the domain
     if( c2 > 0 .or.  &
-        c2 < 0 .and. Grid_Mod_Bnd_Cond_Type(grid,c2) == BUFFER) then 
+        c2 < 0 .and. Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER) then 
 
       ! Extract the "centred" pressure terms from cell velocities
       u_f = fs*      (u % n(c1) + p % x(c1)*grid % vol(c1)/a % sav(c1))       &

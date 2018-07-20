@@ -105,8 +105,8 @@
   !----------------------------!
   do s = 1, grid % n_faces       
 
-    c1=grid % faces_c(1,s)
-    c2=grid % faces_c(2,s)   
+    c1 = grid % faces_c(1,s)
+    c2 = grid % faces_c(2,s)   
 
     phi_x_f = fw(s) * phi_x(c1) + (1.0 - fw(s)) * phi_x(c2)
     phi_y_f = fw(s) * phi_y(c1) + (1.0 - fw(s)) * phi_y(c2)
@@ -133,7 +133,7 @@
         phi % d_o(c1) = phi % d_o(c1) + (phi % n(c2)-phi % n(c1))*a0   
         phi % d_o(c2) = phi % d_o(c2) - (phi % n(c2)-phi % n(c1))*a0    
       else
-        if(Grid_Mod_Bnd_Cond_Type(grid,c2) /= SYMMETRY) then
+        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. SYMMETRY) then
           phi % d_o(c1) = phi % d_o(c1) + (phi % n(c2)-phi % n(c1))*a0   
         end if 
       end if 

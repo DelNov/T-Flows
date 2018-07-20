@@ -5,7 +5,7 @@
 !   variables.                                                                 !
 !------------------------------------------------------------------------------!
 !---------------------------------[Modules]------------------------------------!
-  use Const_Mod, only: YES, NO
+  use Const_Mod, only: YES
   use Flow_Mod
   use Les_Mod
   use Rans_Mod
@@ -123,8 +123,8 @@
   !----------------------------!
   do s = 1, grid % n_faces
 
-    c1=grid % faces_c(1,s)
-    c2=grid % faces_c(2,s)
+    c1 = grid % faces_c(1,s)
+    c2 = grid % faces_c(2,s)
 
     ! Velocities on "orthogonal" cell centers
     if(c2 > 0 .or.  &
@@ -211,23 +211,21 @@
   !----------------------------!
   do s = 1, grid % n_faces
 
-    c1=grid % faces_c(1,s)
-    c2=grid % faces_c(2,s)
+    c1 = grid % faces_c(1,s)
+    c2 = grid % faces_c(2,s)
 
     vis_eff = viscosity + (fw(s)*vis_t(c1) + &
       (1.0-fw(s))*vis_t(c2)) / phi % sigma
 
-    if(turbulence_model .eq. SPALART_ALLMARAS .or.                      &
-       turbulence_model .eq. DES_SPALART)                               &
+    if(turbulence_model .eq. SPALART_ALLMARAS .or.           &
+       turbulence_model .eq. DES_SPALART)                    &
       vis_eff = viscosity                                    &
-              + (fw(s)*vis % n(c1)+(1.0-fw(s))*vis % n(c2))  &
-              / phi % sigma
+              + (fw(s)*vis % n(c1)+(1.0-fw(s))*vis % n(c2)) / phi % sigma
 
     if(turbulence_model .eq. K_EPS_ZETA_F .and.  &
-       turbulence_statistics .eq. YES) then  
+       turbulence_statistics .eq. YES) then
       vis_eff = viscosity                                          &
-              + (fw(s)*vis_t_eff(c1) + (1.0-fw(s))*vis_t_eff(c2))  &
-              / phi % sigma
+              + (fw(s)*vis_t_eff(c1) + (1.0-fw(s))*vis_t_eff(c2)) / phi % sigma
     end if
     phi_x_f = fw(s)*phi_x(c1) + (1.0-fw(s))*phi_x(c2)
     phi_y_f = fw(s)*phi_y(c1) + (1.0-fw(s))*phi_y(c2)

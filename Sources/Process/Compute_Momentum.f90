@@ -139,7 +139,7 @@
   call Control_Mod_Time_Integration_For_Cross_Diffusion(td_cross_diff)
 
   ! Old values (o) and older than old (oo)
-  if(ini == 1) then
+  if(ini .eq. 1) then
     do c = 1, grid % n_cells
       ui % oo(c)   = ui % o(c)
       ui % o (c)   = ui % n(c)

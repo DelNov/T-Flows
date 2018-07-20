@@ -24,30 +24,30 @@
 
   call Control_Mod_Rough_Walls(.true.)
 
-  if(turbulence_model == K_EPS) then
+  if(turbulence_model .eq. K_EPS) then
     call Constants_K_Eps()
   endif
 
-  if(turbulence_model == REYNOLDS_STRESS) then
+  if(turbulence_model .eq. REYNOLDS_STRESS) then
     call Constants_Reynolds_Stress()
   endif
 
-  if(turbulence_model == HANJALIC_JAKIRLIC) then
+  if(turbulence_model .eq. HANJALIC_JAKIRLIC) then
     call Constants_Hanjalic_Jakirlic()
   endif
 
-  if(turbulence_model == K_EPS_ZETA_F) then
+  if(turbulence_model .eq. K_EPS_ZETA_F) then
     call Constants_K_Eps_Zeta_F()
   endif
 
-  if(turbulence_model == SPALART_ALLMARAS .or.  &
-     turbulence_model == DES_SPALART) then
+  if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
+     turbulence_model .eq. DES_SPALART) then
     call Constants_Spalart_Allmaras()
   end if
 
   ! Wall velocity
   if(.not. restar) then
-    do m=1,grid % n_materials
+    do m = 1, grid % n_materials
       call Control_Mod_Mass_Flow_Rates(bulk(m) % p_drop_x,  &
                                        bulk(m) % p_drop_y,  &
                                        bulk(m) % p_drop_z)
@@ -56,7 +56,7 @@
 
   ! Mass fluxes
   if(.not. restar) then
-    do m=1,grid % n_materials
+    do m = 1, grid % n_materials
       call Control_Mod_Mass_Flow_Rates(bulk(m) % flux_x_o,  &
                                        bulk(m) % flux_y_o,  &
                                        bulk(m) % flux_z_o)

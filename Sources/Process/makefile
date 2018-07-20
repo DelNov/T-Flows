@@ -61,19 +61,18 @@ ifeq ($(FORTRAN), gnu)
   FC = gfortran
   ifeq ($(DEBUG),yes)
     OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8 -fdefault-integer-8 -O0 -g \
-			         -ffixed-line-length-80 -fcheck=all -fwhole-file -fbacktrace \
-			         -ffpe-trap=invalid \
-			         -fimplicit-none -finit-real=nan \
-			         -Wall -Wextra -Waliasing -Wampersand -Warray-temporaries \
-			         -Wc-binding-type -Wcharacter-truncation -Wline-truncation \
-			         -Wconversion -Wconversion-extra -Wintrinsics-std \
-			         -Wreal-q-constant -Wsurprising -Wtabs -Wunderflow \
-			         -Wintrinsic-shadow -Wunused-parameter -Walign-commons \
-			         -Wfunction-elimination -Wrealloc-lhs -Wrealloc-lhs-all \
-			         -Wcompare-reals -Wtarget-lifetime -Wpedantic -fstack-check \
-			         #-std=f2003 -Wimplicit-procedure -Wimplicit-interface
+               -ffixed-line-length-80 -fcheck=all -fwhole-file -fbacktrace \
+               -ffpe-trap=invalid \
+               -fimplicit-none -finit-real=nan \
+               -Wall -Wextra -Waliasing -Wampersand -Warray-temporaries \
+               -Wc-binding-type -Wcharacter-truncation -Wline-truncation \
+               -Wconversion -Wconversion-extra -Wintrinsics-std \
+               -Wreal-q-constant -Wsurprising -Wtabs -Wunderflow \
+               -Wintrinsic-shadow -Wunused-parameter -Walign-commons \
+               -Wfunction-elimination -Wrealloc-lhs -Wrealloc-lhs-all \
+               -Wcompare-reals -Wtarget-lifetime -Wpedantic -fstack-check \
+               #-std=f2003 -Wimplicit-procedure -Wimplicit-interface
 
-			   
   else
     OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8 -fdefault-integer-8 -O3
   endif
@@ -154,12 +153,20 @@ ifneq ($(DIR_CASE), no)
 
       # Fetch all user functions from the case directory
       STEP_A  = $(shell ls -1 $(DIR_CASE)/$(DIR_USER)/*.f90)
+      STEP_B  = $(notdir  $(STEP_A))
 
       # Append "../" to each of the file names
       SRC_USR = $(patsubst %.f90, ../%.f90, $(STEP_A))
 
-      # Make soft links
-      $(shell ln -f -s $(SRC_USR) $(DIR_USER))
+      #for each file in DIR_CASE save a copy of existing black user file
+      ifneq ("$(wildcard $(STEP_A))","")
+        value = $(shell for i in $(STEP_B); do echo cp $(DIR_USER)/$$i $(DIR_USER)/.$$i; cp $(DIR_USER)/$$i $(DIR_USER)/.$$i; done)
+        $(info $(value))
+
+        # Make soft links
+        $(shell ln -f -s $(SRC_USR) $(DIR_USER))
+      endif
+
     endif
   endif
 endif
@@ -169,11 +176,11 @@ endif
 #-------------
 
 # Modules in shared directory
-SRC_MOD = Const_Mod.f90		\
-          Grid_Mod.f90		\
-          Work_Mod.f90		\
-          Name_Mod.f90		\
-          Tokenizer_Mod.f90	\
+SRC_MOD = Const_Mod.f90 \
+          Grid_Mod.f90 \
+          Work_Mod.f90 \
+          Name_Mod.f90 \
+          Tokenizer_Mod.f90 \
           Material_Mod.f90
 
 # Conditional support for MPI communication
@@ -186,22 +193,22 @@ else
 endif
 
 # Sources for modules in the local directory
-SRC_MOD += Info_Mod.f90		\
-           Bulk_Mod.f90		\
-           Var_Mod.f90		\
-           Matrix_Mod.f90	\
-           Numerics_Mod.f90	\
-           Solvers_Mod.f90	\
-           Flow_Mod.f90		\
+SRC_MOD += Info_Mod.f90 \
+           Bulk_Mod.f90 \
+           Var_Mod.f90 \
+           Matrix_Mod.f90 \
+           Numerics_Mod.f90 \
+           Solvers_Mod.f90 \
+           Flow_Mod.f90 \
            Grad_Mod.f90
 
 # Sources for modules in sub-directories
-SRC_MOD += Turbulence_Mod.f90	\
-           Les_Mod.f90		\
-           Rans_Mod.f90		\
+SRC_MOD += Turbulence_Mod.f90 \
+           Les_Mod.f90 \
+           Rans_Mod.f90 \
 
 # Control_Mod should come because it reads Turbulence, Flow and Numerics
-SRC_MOD += Control_Mod.f90	\
+SRC_MOD += Control_Mod.f90 \
            Monitor_Mod.f90
 
 #---------------
@@ -212,15 +219,15 @@ SRC_MOD += Control_Mod.f90	\
 SRC_FUN =  $(shell ls -1 *.f90 | grep -v -i _Mod | grep -v -i Save_Cgns | grep -v -i Save_Vtu_Results)
 SRC_FUN += $(shell ls -1 $(DIR_MODELS)/*.f90 | xargs -n1 basename | grep -v -i _Mod)
 
-SRC_FUN += Distance.f90 		\
-           Load_Geo.f90 		\
-           Name_File.f90		\
-           Sort_Int_Carry_Int.f90	\
-           Sort_Short_Carry_Short.f90	\
-           Sort_Real_Carry_Int.f90	\
-           Sort_Short_By_Index.f90	\
-           Approx.f90			\
-           Swap_Int.f90			\
+SRC_FUN += Distance.f90 \
+           Load_Geo.f90 \
+           Name_File.f90 \
+           Sort_Int_Carry_Int.f90 \
+           Sort_Short_Carry_Short.f90 \
+           Sort_Real_Carry_Int.f90 \
+           Sort_Short_By_Index.f90 \
+           Approx.f90 \
+           Swap_Int.f90 \
            To_Upper_Case.f90
 
 #-------------------------------------------
@@ -228,8 +235,8 @@ SRC_FUN += Distance.f90 		\
 #-------------------------------------------
 ifeq ($(CGNS_ADF5), $(CGNS_HDF5))  # meaning both are "no"
   SRC_MOD += Cgns_Mod_Void.f90
-  SRC_FUN += Save_Cgns_Results_Void.f90	\
-             Save_Cgns_Cells_Void.f90   \
+  SRC_FUN += Save_Cgns_Results_Void.f90 \
+             Save_Cgns_Cells_Void.f90 \
              Save_Vtu_Results.f90
 else
   ifeq ($(MPI), yes)
@@ -237,7 +244,7 @@ else
   else
     SRC_MOD += Cgns_Mod_Seq.f90
   endif
-  SRC_FUN += Save_Cgns_Results.f90	\
+  SRC_FUN += Save_Cgns_Results.f90 \
              Save_Cgns_Cells.f90
 endif
 
@@ -304,4 +311,12 @@ include makefile_explicit_dependencies
 #   Explicit target.
 #---------------------
 clean:
-	rm -f $(DIR_OBJECT)/*.o $(DIR_MODULE)/*.mod $(PROGRAM_FILE)
+	@echo -n Removing objects and modules..
+	@for i in $(DIR_USER)/*.f90; do \
+		if [ -L $$i ]; then \
+			unlink $$i ; \
+			mv $(DIR_USER)/.$${i##*/} $(DIR_USER)/$${i##*/} ; \
+		fi ; \
+	done
+	@rm -f $(DIR_OBJECT)/*.o $(DIR_MODULE)/*.mod $(PROGRAM_FILE)
+	@echo done

@@ -35,12 +35,12 @@
       end if
       if( (grid % material(c1) .eq. m) .and.  &
           (grid % material(c1) .eq. grid % material(c2)) ) then
-        xc1=grid % xc(c1)
-        yc1=grid % yc(c1)
-        zc1=grid % zc(c1)
-        xc2=grid % xc(c1) + grid % dx(s)
-        yc2=grid % yc(c1) + grid % dy(s)
-        zc2=grid % zc(c1) + grid % dz(s)
+        xc1 = grid % xc(c1)
+        yc1 = grid % yc(c1)
+        zc1 = grid % zc(c1)
+        xc2 = grid % xc(c1) + grid % dx(s)
+        yc2 = grid % yc(c1) + grid % dy(s)
+        zc2 = grid % zc(c1) + grid % dz(s)
 
         ax_t = abs(grid % sx(s))
         ay_t = abs(grid % sy(s))

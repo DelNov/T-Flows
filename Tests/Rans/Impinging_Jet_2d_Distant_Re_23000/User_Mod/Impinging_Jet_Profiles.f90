@@ -82,7 +82,7 @@
   allocate(n_count(n_prob)); n_count=0
   count = 0
 
-  if(heat_transfer == YES) then
+  if(heat_transfer .eq. YES) then
     allocate(tm_p(n_prob));   tm_p = 0.0
   end if  
 
@@ -90,31 +90,31 @@
   !   Average the results   !
   !-------------------------!
   do k = 0, 6
-    if(k == 0) then
+    if(k .eq. 0) then
       r1 = 0.0
       r2 = 0.04   
       lnum = 0.0
-    else if(k == 1) then
+    else if(k .eq. 1) then
       r1 = 0.992  
       r2 = 1.0    
       lnum = 0.5
-    else if(k == 2) then
+    else if(k .eq. 2) then
       r1 = 2.0 
       r2 = 2.1500 
       lnum = 1.0
-    else if(k == 3) then
+    else if(k .eq. 3) then
       r1 = 2.9744
       r2 = 3.0684
       lnum = 1.5
-    else if(k == 4) then
+    else if(k .eq. 4) then
       r1 = 3.9098
       r2 = 4.1433 
       lnum = 2.0
-    else if(k == 5) then
+    else if(k .eq. 5) then
       r1 = 0.4803200E+01 
       r2 = 0.5347000E+01 
       lnum = 2.5
-    else if(k == 6) then
+    else if(k .eq. 6) then
       r1 = 0.5876600E+01
       r2 = 0.6000000E+01
       lnum = 3.0
@@ -136,13 +136,13 @@
             vm_p(i)   = um_p(i) + u_rad
             wm_p(i)   = wm_p(i) + w % n(c)
 
-            if(turbulence_model == K_EPS) then 
+            if(turbulence_model .eq. K_EPS) then 
               v1_p(i) = v1_p(i) + kin % n(c)  
               v2_p(i) = v2_p(i) + eps % n(c)
               v3_p(i) = v3_p(i) + vis_t(c)/viscosity
             end if
 
-            if(turbulence_model == K_EPS_ZETA_F) then  
+            if(turbulence_model .eq. K_EPS_ZETA_F) then  
               v1_p(i)   = v1_p(i) + kin % n(c)  
               v2_p(i)   = v2_p(i) + eps % n(c)
               v3_p(i)   = v3_p(i) + vis_t(c)/viscosity
@@ -150,7 +150,7 @@
               v5_p(i)   = v5_p(i) + f22 % n(c)
             end if
 
-            if(heat_transfer == YES) then
+            if(heat_transfer .eq. YES) then
               tm_p(i)   = tm_p(i) + T % n(c)
             end if
      
@@ -178,13 +178,13 @@
 
       count = count + n_count(pl) 
 
-      if(heat_transfer == YES) then
+      if(heat_transfer .eq. YES) then
         call Comm_Mod_Global_Sum_Real(tm_p(pl))
       end if
     end do
 
     do i = 1, n_prob
-      if(n_count(i) /= 0) then
+      if(n_count(i) .ne. 0) then
         wm_p(i) = wm_p(i)/n_count(i)
         um_p(i) = um_p(i)/n_count(i)
         vm_p(i) = vm_p(i)/n_count(i)
@@ -218,7 +218,7 @@
                                  '10:f22   '  
 
     do i = 1, n_prob
-      if(n_count(i) /= 0) then
+      if(n_count(i) .ne. 0) then
         write(3,'(9e11.3)') (z_p(i)+z_p(i+1))/4.0,  &
                              um_p(i)/u_aver,        &
                              vm_p(i)/u_aver,        &
@@ -261,7 +261,7 @@
   deallocate(v5_p)
   deallocate(rm_p)
   deallocate(n_count)
-  if(heat_transfer == YES) then
+  if(heat_transfer .eq. YES) then
     deallocate(tm_p)
   end if
 

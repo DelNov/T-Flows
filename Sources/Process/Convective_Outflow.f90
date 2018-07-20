@@ -31,7 +31,7 @@
 
     ! On the boundary perform the extrapolation
     if(c2  < 0) then
-      if( (Grid_Mod_Bnd_Cond_Type(grid,c2) == CONVECT) ) then
+      if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) ) then
         u % n(c2) = u % n(c2)   &
                   - ( bulk(grid % material(c1)) % u * u % x(c1)         & 
                     + bulk(grid % material(c1)) % v * u % y(c1)         &
@@ -48,7 +48,7 @@
     end if
   end do
 
-  if(heat_transfer == YES) then
+  if(heat_transfer .eq. YES) then
     call Grad_Mod_For_Phi(grid, t % n, 1, t_x, .true.)     ! dT/dx
     call Grad_Mod_For_Phi(grid, t % n, 2, t_y, .true.)     ! dT/dy
     call Grad_Mod_For_Phi(grid, t % n, 3, t_z, .true.)     ! dT/dz
@@ -58,7 +58,7 @@
 
       ! On the boundary perform the extrapolation
       if(c2  < 0) then
-        if( (Grid_Mod_Bnd_Cond_Type(grid,c2) == CONVECT) ) then
+        if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) ) then
           t % n(c2) = t % n(c2)   &
                     - ( bulk(grid % material(c1)) % u * t_x(c1)        & 
                       + bulk(grid % material(c1)) % v * t_y(c1)        &

@@ -89,7 +89,7 @@
       !---------------------------------!
       !   Temperature and heat fluxes   !
       !---------------------------------!
-      if(heat_transfer == YES) then
+      if(heat_transfer .eq. YES) then
         t  % mean(c) = (t % mean(c) * (1.*n) + t % n(c) ) / (1.*(n+1))
         tt % mean(c) = (tt % mean(c)*(1.*n) + t % n(c) * t % n(c) ) / (1.*(n+1))
         ut % mean(c) = (ut % mean(c)*(1.*n) + u % n(c) * t % n(c) ) / (1.*(n+1))

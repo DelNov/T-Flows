@@ -88,7 +88,7 @@
   
     do j = a % row(c), a % row(c + 1) - 1
       cj = a % col(j) 
-      if(cj /= c) then
+      if(cj .ne. c) then
 
         ! Test velocities
         u_a = u_a + grid % vol(cj) * u % n(cj)

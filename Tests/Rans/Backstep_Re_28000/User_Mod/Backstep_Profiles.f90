@@ -185,7 +185,7 @@
 
     open(3,file=result_name)
     do i = 1, n_prob
-      if(n_count(i) /= 0) then
+      if(n_count(i) .ne. 0) then
         wm_p(i) = wm_p(i) / n_count(i)
         um_p(i) = um_p(i) / n_count(i)
         vm_p(i) = vm_p(i) / n_count(i)
