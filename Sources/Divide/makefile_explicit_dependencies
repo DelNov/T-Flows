@@ -236,6 +236,12 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 
 #-- ./Swap_Real.f90
 #-- ./To_Upper_Case.f90
+#-- ./Cgns_Mod/Write_Link_To_Field.f90
+$(DIR_OBJECT)/Write_Link_To_Field.o:\
+$(DIR_SHARED)/Comm_Mod_Seq.f90 \
+$(DIR_SHARED)/Comm_Mod_Par.f90 \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 
+
 #-- ./Cgns_Mod/Read_Base_Info.f90
 #-- ./Cgns_Mod/Write_Dimensions_Info.f90
 #-- ./Cgns_Mod/Read_Bnd_Conds_Info.f90

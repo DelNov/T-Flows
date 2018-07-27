@@ -98,7 +98,7 @@
   cgns_base(base) % block(block) % coord_name(coord) = "CoordinateZ"
 
   ! actually write grid coordinates in DB
-  if (.not. mesh_was_written) then
+  if (.not. mesh_written) then
     do coord = 1, cgns_base(base) % cell_dim
       call Cgns_Mod_Write_Coordinate_Array(base, block, coord, grid)
     end do
@@ -139,14 +139,14 @@
   cgns_base(base) % block(block) % section(sect) % last_cell = cnt_tet
   
   ! actually write grid connections in DB
-  if (.not. mesh_was_written) then 
+  if (.not. mesh_written) then 
 
     do sect = 1, cgns_base(base) % block(block) % n_sects
       call Cgns_Mod_Write_Section_Connections(base, block, sect, grid)
     end do
 
     ! at this moment mesh is considered to be written successfully
-    mesh_was_written = .true.
+    mesh_written = .true.
     file_with_mesh = trim(name_out)
 
   else ! write an link to actual mesh inside a different DB file

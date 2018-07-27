@@ -23,8 +23,9 @@
   block_id = block
   sol_id   = solution
 
-  sol_name = trim(cgns_base(base_id)%block(block_id)%solution(sol_id)%name)
-  sol_type = cgns_base(base_id)%block(block_id)%solution(sol_id)%sol_type
+  sol_name = trim(cgns_base(base_id) % block(block_id) % &
+             solution(sol_id) % name)
+  sol_type = cgns_base(base_id) % block(block_id) % solution(sol_id) % sol_type
 
   ! Create a FlowSolution_t node 
   call Cg_Sol_Write_F(file_id,   & !(in )

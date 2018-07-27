@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Save_Results(grid, name_save)
 !------------------------------------------------------------------------------!
-!   Adds fields to existing grid cgns file.                                    !
+!   Creates save file and adds fields to existing grid cgns                    !
 !------------------------------------------------------------------------------!
 !---------------------------------[Modules]------------------------------------!
   use Name_Mod, only: problem_name
@@ -268,10 +268,17 @@
   end if
 
   ! Wall distance and delta
-  call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                            grid % wall_dist(1),"WallDistance")
-  call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                            grid % delta(1),"CellDelta")
+  if (.not. permanent_fields_written) then ! [actual write]
+
+    call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
+                              grid % wall_dist(1),"WallDistance")
+    call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
+                              grid % delta(1),"CellDelta")
+    permanent_fields_written = .true.
+  else ! [link]
+    call Write_Link_To_Field(base, block, solution, "WallDistance")
+    call Write_Link_To_Field(base, block, solution, "CellDelta")
+  end if
 
   !-----------------------!
   !   Save user scalars   !
@@ -283,11 +290,10 @@
   !----------------------------!
   call Write_Dimensions_Info(base, block)
 
-
   ! Close DB
   call Cgns_Mod_Close_File
 
-  if (this_proc .lt. 2) &
+  if (this_proc < 2) &
     print *, "# Added fields to ", trim(name_out)
 
   deallocate(cgns_base)

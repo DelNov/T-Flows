@@ -108,17 +108,14 @@
   integer :: cnt_qua
   integer :: cnt_tri
 
-  integer :: cnt_x
-  integer :: cnt_y
-  integer :: cnt_z
-
   ! Block-wise counter of boundary cells
-  integer :: cnt_block_bnd_cells  ! probably not needed
-  integer :: cnt_bnd_conds
+  integer           :: cnt_block_bnd_cells  ! probably not needed
+  integer           :: cnt_bnd_conds
   character(len=80) :: bnd_cond_names(1024)
 
   ! if an actual grid was written, further saves have just a link to that grid
-  logical           :: mesh_was_written = .false.
+  logical           :: mesh_written = .false.
+  logical           :: permanent_fields_written = .false. ! like "WallDistance"
   character(len=80) :: file_with_mesh
 
   contains
@@ -126,6 +123,7 @@
   include 'Cgns_Mod/Initialize_Counters.f90'
 
   include 'Cgns_Mod/Write_Link_To_Mesh_In_File.f90'
+  include 'Cgns_Mod/Write_Link_To_Field.f90'
   include 'Cgns_Mod/Write_Dimensions_Info.f90'
 
   ! Seq only
