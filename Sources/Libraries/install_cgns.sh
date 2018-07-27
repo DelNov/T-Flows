@@ -30,7 +30,7 @@ BUILD_MPI=true
 CGNS_TOOLS=true
 
 # build latest cgns lib, overwise build 3.2.1 version
-BUILD_LATEST_CGNS=true
+BUILD_LATEST_CGNS=false
 
 # folder structure
 CGNS_DIR=$PWD                     # this is top dir for this lib

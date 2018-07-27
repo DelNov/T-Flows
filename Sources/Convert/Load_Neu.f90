@@ -38,10 +38,10 @@
   read(line % tokens(3),*) n_blocks
   read(line % tokens(4),*) n_bnd_sect
 
-  print '(a38,i7)', '# Total number of nodes:             ', grid % n_nodes
-  print '(a38,i7)', '# Total number of cells:             ', grid % n_cells
-  print '(a38,i7)', '# Total number of blocks:            ', n_blocks
-  print '(a38,i7)', '# Total number of boundary sections: ', n_bnd_sect
+  print '(a38,i9)', '# Total number of nodes:             ', grid % n_nodes
+  print '(a38,i9)', '# Total number of cells:             ', grid % n_cells
+  print '(a38,i9)', '# Total number of blocks:            ', n_blocks
+  print '(a38,i9)', '# Total number of boundary sections: ', n_bnd_sect
 
   !------------------------------!
   !   Count the boundary cells   !

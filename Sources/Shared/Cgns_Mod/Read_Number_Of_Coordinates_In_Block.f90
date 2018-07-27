@@ -18,11 +18,11 @@
   block_id = block
 
   ! Get number of coordinate arrays (1 for unstructure, 3 for structured)
-  call Cg_Ncoords_F(file_id,         & 
-                    base_id,         & 
-                    block_id,        &
-                    block_n_coords,  &
-                    error)
+  call Cg_Ncoords_F(file_id,         & !(in )
+                    base_id,         & !(in )
+                    block_id,        & !(in )
+                    block_n_coords,  & !(out)
+                    error)             !(out)
 
   if (error .ne. 0) then
     print *, "# Failed to get number of coordinate arrays"

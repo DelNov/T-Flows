@@ -143,6 +143,7 @@
   include 'Cgns_Mod/Read_Coordinate_Array.f90'
   include 'Cgns_Mod/Read_Section_Connections.f90'
   include 'Cgns_Mod/Merge_Nodes.f90'
+  include 'Cgns_Mod/Merge_Blocks.f90'
 
   ! Par only
   include 'Cgns_Mod/Parallel/Get_Arrays_Dimensions.f90'

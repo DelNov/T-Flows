@@ -26,18 +26,17 @@
   sect_id  = sect
 
   ! Get info for an element section
-  ! Recieves sect_name, first_cell: last_cell, n_bnd and cell_type
-  call Cg_Section_Read_F(file_id,       &
-                         base_id,       &
-                         block_id,      &
-                         sect_id,       &
-                         sect_name,     &
-                         cell_type,     &
-                         first_cell,    &
-                         last_cell,     &
-                         n_bnd,         &
-                         parent_flag,   &
-                         error)
+  call Cg_Section_Read_F(file_id,       & !(in )
+                         base_id,       & !(in )
+                         block_id,      & !(in )
+                         sect_id,       & !(in )
+                         sect_name,     & !(out)
+                         cell_type,     & !(out)
+                         first_cell,    & !(out)
+                         last_cell,     & !(out)
+                         n_bnd,         & !(out)
+                         parent_flag,   & !(out)
+                         error)           !(out)
   if (error.ne.0) then
     print *, '# Failed to read section ', sect, ' info'
     call Cg_Error_Exit_F()
@@ -55,7 +54,7 @@
 
   ! Consider boundary conditions defined in this block
   do bc = 1, cgns_base(base) % block(block) % n_bnd_conds
-    if(sect_name .eq. cgns_base(base) % block(block) % bnd_cond(bc) % name) then
+    if(index(trim(sect_name), trim(cgns_base(base) % block(block) % bnd_cond(bc) % name), back = .true.) .ne. 0) then
 
       if(verbose) then
         print *, '#         ---------------------------------'

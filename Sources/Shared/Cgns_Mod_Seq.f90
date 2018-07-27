@@ -143,6 +143,7 @@
   include 'Cgns_Mod/Read_Coordinate_Array.f90'
   include 'Cgns_Mod/Read_Section_Connections.f90'
   include 'Cgns_Mod/Merge_Nodes.f90'
+  include 'Cgns_Mod/Merge_Blocks.f90'
   include 'Cgns_Mod/Sequential/Open_File.f90'
   include 'Cgns_Mod/Sequential/Close_File.f90'
   include 'Cgns_Mod/Sequential/Write_Base_Info.f90'

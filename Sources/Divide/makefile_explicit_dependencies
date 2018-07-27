@@ -298,6 +298,11 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 
 #-- ./Cgns_Mod/Read_Number_Of_Element_Sections.f90
 #-- ./Cgns_Mod/Read_Section_Info.f90
+#-- ./Cgns_Mod/Merge_Blocks.f90
+$(DIR_OBJECT)/Merge_Blocks.o:\
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 
+
 #-- ./Cgns_Mod/Initialize_Counters.f90
 #-- ./Cgns_Mod/Read_Number_Of_Blocks_In_Base.f90
 #-- ./Cgns_Mod/Read_Block_Type.f90
@@ -430,6 +435,7 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 
 #-- ./Sort_Real_By_Index.f90
 #-- ./Sort_Short_Carry_Short.f90
+#-- ./Sort_Real_Carry_Int_Heapsort.f90
 #-- ./Save_Cns_Geo.f90
 $(DIR_OBJECT)/Save_Cns_Geo.o:\
 $(DIR_OBJECT)/Grid_Mod.o \

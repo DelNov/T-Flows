@@ -1,26 +1,21 @@
 !==============================================================================!
   subroutine Cgns_Mod_Initialize_Counters
 !------------------------------------------------------------------------------!
-!   Initiallizes counters used while CGNS file is being read.                  !
+!   Initializes counters used while CGNS file is being read.                   !
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
 
-  cnt_nodes     = 0
-  cnt_cells     = 0
-  cnt_blocks    = 0
-  cnt_bnd_conds = 0
-  cnt_bnd_conds = 0
+  cnt_nodes     = 0 ! number of nodes
+  cnt_cells     = 0 ! number of cells (except boundary)
+  cnt_blocks    = 0 ! number of block
+  cnt_bnd_conds = 0 ! number of boundary cells
 
-  cnt_hex = 0
-  cnt_pyr = 0
-  cnt_wed = 0
-  cnt_tet = 0
-  cnt_tri = 0
-  cnt_qua = 0
-
-  cnt_x = 0
-  cnt_y = 0
-  cnt_z = 0
+  cnt_hex = 0 ! number of hexahedral  cells
+  cnt_pyr = 0 ! number of pyramid     cells
+  cnt_wed = 0 ! number of wedge/prism cells
+  cnt_tet = 0 ! number of tetrahedral cells
+  cnt_tri = 0 ! number of triangles
+  cnt_qua = 0 ! number of quads
 
   end subroutine

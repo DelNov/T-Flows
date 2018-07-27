@@ -7,7 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   integer :: base, block
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: base_id   ! base index number    
+  integer :: base_id   ! base index number
   integer :: block_id  ! block index number
   integer :: n_sects   ! number of element sections in a block
   integer :: error
@@ -18,11 +18,11 @@
   block_id = block
 
   ! Get number of element sections
-  call Cg_Nsections_F(file_id,   &
-                      base_id,   &
-                      block_id,  &
-                      n_sects,   &
-                      error)
+  call Cg_Nsections_F(file_id,   & !(in )
+                      base_id,   & !(in )
+                      block_id,  & !(in )
+                      n_sects,   & !(out)
+                      error)       !(out)
 
   if (error.ne.0) then
     print *, "# Failed to read number of elements"

@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Cgns_Mod_Write_Coordinate_Array(base, block, coord, grid)
 !------------------------------------------------------------------------------!
-!   Writes grid coordinates (RealDouble) [parallel vesion]                     !
+!   Writes grid coordinates (RealDouble) [parallel version]                    !
 !------------------------------------------------------------------------------!
 !   Array structures in current function are strictly followings:              !
 !                                                                              !
