@@ -304,8 +304,8 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 
 #-- ./Cgns_Mod/Read_Number_Of_Element_Sections.f90
 #-- ./Cgns_Mod/Read_Section_Info.f90
-#-- ./Cgns_Mod/Merge_Blocks.f90
-$(DIR_OBJECT)/Merge_Blocks.o:\
+#-- ./Cgns_Mod/Merge_Nodes_Old.f90
+$(DIR_OBJECT)/Merge_Nodes_Old.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
@@ -330,12 +330,12 @@ $(DIR_OBJECT)/Read_Section_Connections.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
-#-- ./Cgns_Mod/Merge_Nodes.f90
-$(DIR_OBJECT)/Merge_Nodes.o:\
+#-- ./Cgns_Mod/Read_Number_Of_Bnd_Conds_In_Block.f90
+#-- ./Cgns_Mod/Merge_Nodes_New.f90
+$(DIR_OBJECT)/Merge_Nodes_New.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
-#-- ./Cgns_Mod/Read_Number_Of_Bnd_Conds_In_Block.f90
 #-- ./Cgns_Mod/Read_Grid_Location.f90
 #-- ./Cgns_Mod/Read_Number_Of_Coordinates_In_Block.f90
 #-- ./Cgns_Mod/Sequential/Write_Block_Info.f90

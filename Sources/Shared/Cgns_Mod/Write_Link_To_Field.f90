@@ -53,9 +53,7 @@
   endif
 
   !------------------!
-  !                  !
-  !   write a link   !
-  !                  !
+  !   Write a link   !
   !------------------!
 
   node_name = trim(input_name)
@@ -75,7 +73,7 @@
 
   ! Print some info
   if(verbose .and. this_proc < 2) then
-    print *, "#     ", trim(node_name), " linked to : ",  &
+    print *, "# ", trim(node_name), " linked to : ",  &
       trim(file), ":", trim(name_in_file)
   end if
 

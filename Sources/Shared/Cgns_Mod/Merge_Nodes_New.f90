@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Cgns_Mod_Merge_Blocks(grid)
+  subroutine Cgns_Mod_Merge_Nodes_New(grid)
 !------------------------------------------------------------------------------!
 !  Merges blocks by merging common surface without changing structure of node  !
 !  and cells connection  tables                                                !
@@ -12,7 +12,7 @@
 !------------------------------------------------------------------------------!
   include "../Shared/Approx.int"
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: c, n, i, m, k, cnt_node
+  integer              :: c, n, i, m, k, v, cnt_node
   real,    allocatable :: criterion(:) ! sorting criterion
   integer, allocatable :: old_seq(:)
   real,    allocatable :: x_new(:), y_new(:), z_new(:)
@@ -91,35 +91,38 @@
   print *, '# ... done!'
 
   if (verbose) then
-    print *, '# cells before function(sample)'
+    print *, '# Cells before Cgns_Mod_Merge_Nodes_New function (sample)'
     do c = 1, 6
       print *, (grid % cells_n(i,c), i = 1, grid % cells_n_nodes(c))
     end do
   end if
+
   !----------------------------------------------------------------------------!
   !   old_seq now became:                                                      !
   !   16 12--8  4 14  6--10 2 15   7--11   3  13   5--9   1                    !
   !   "--" means that criterion has same value for these elements              !
   !----------------------------------------------------------------------------!
   cnt_node = 1
-  if (verbose) print *,'Uniting nodes:'
+  if (verbose) print *,'# Uniting nodes (sample):'
 
   n = 1
+  v = 1 ! related to verbose output
+
   do while ( n < grid % n_nodes )
     m = n + 1
 
-    ! if node is unique
+    ! If node is unique
     if( .not. Approx(criterion(n), criterion(n+1), SMALL) ) then
       cnt_node = cnt_node + 1
     else ! if node is duplicated
 
-      ! check next nodes on the list by criterion
+      ! Check next nodes on the list by criterion
       do while (Approx(criterion(m), criterion(m+1), SMALL))
         m = m + 1
       end do
       ! [n : m] are duplicated
 
-      ! substitute dup. nodes to the lowest id
+      ! Substitute dup. nodes to the lowest id
       do c = 1, grid % n_cells
         do i = 1, grid % cells_n_nodes(c)
 
@@ -133,24 +136,25 @@
         end do
       end do
 
-      ! mark node to remove
+      ! Mark node to remove
       do k = n, m
         if ( old_seq(k) .ne. minval(old_seq(n:m)) ) then
           nodes_to_remove(old_seq(k)) = .true.
         end if
       end do
 
-      if (verbose) then
-        print *,'----------------------'
-        print '(a,i14,a,i14)','n: ',  minval(old_seq(n:m)), '<-', &
-                                      maxval(old_seq(n:m))
-        print '(a,es14.7,a,es14.7)','c: ', criterion(n), ' -', criterion(m)
-        print '(a,es14.7,a,es14.7)','x: ', grid % xn(old_seq(n)), ' -', &
-                                           grid % xn(old_seq(m))
-        print '(a,es14.7,a,es14.7)','y: ', grid % yn(old_seq(n)), ' -', &
-                                           grid % yn(old_seq(m))
-        print '(a,es14.7,a,es14.7)','z: ', grid % zn(old_seq(n)), ' -', &
-                                           grid % zn(old_seq(m))
+      if (verbose .and. v < 7) then
+        print *,'# ---------------------------------'
+        print '(a,i14,a,i14)',' # n: ',  minval(old_seq(n:m)), '<-', &
+                                         maxval(old_seq(n:m))
+        print '(a,es14.7,a,es14.7)',' # c: ', criterion(n), ' -', criterion(m)
+        print '(a,es14.7,a,es14.7)',' # x: ', grid % xn(old_seq(n)), ' -', &
+                                              grid % xn(old_seq(m))
+        print '(a,es14.7,a,es14.7)',' # y: ', grid % yn(old_seq(n)), ' -', &
+                                              grid % yn(old_seq(m))
+        print '(a,es14.7,a,es14.7)',' # z: ', grid % zn(old_seq(n)), ' -', &
+                                              grid % zn(old_seq(m))
+        v = v + 1
 
       end if
 
@@ -193,9 +197,9 @@
   cnt_node = cnt_node - 1
 
   if (verbose) then
-    print *, '# cells after function(sample)'
+    print *, '# Cells after Cgns_Mod_Merge_Nodes_New function (sample)'
     do c = 1, 6
-      print *, (grid % cells_n(i,c), i = 1, grid % cells_n_nodes(c))
+      print *, '#', (grid % cells_n(i,c), i = 1, grid % cells_n_nodes(c))
     end do
   end if
 

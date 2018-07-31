@@ -209,8 +209,8 @@
   !   Merge the nodes   !
   !---------------------!
   if(cnt_blocks .gt. 1) then
-    !call Cgns_Mod_Merge_Nodes(grid) ! del 
-    call Cgns_Mod_Merge_Blocks(grid)
+    !call Cgns_Mod_Merge_Nodes_Old(grid)
+    call Cgns_Mod_Merge_Nodes_New(grid)
   end if
 
   !---------------------------------!

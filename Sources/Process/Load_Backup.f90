@@ -35,9 +35,7 @@
   inquire(file=trim(name_in), exist=present )
   if(.not.present) then
     if(this_proc < 2) then
-      print *, "=========================================================="
-      print *, "backup file ", trim(name_in)," was not found"
-      print *, "=========================================================="
+      print *, "# Backup file ", trim(name_in)," was not found.  Exiting!"
     end if
     stop
   end if
