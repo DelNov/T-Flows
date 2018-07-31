@@ -11,8 +11,8 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   integer                 :: n
-  real,    intent(in out) :: a(1: n)
-  integer, intent(in out) :: b(1: n)
+  real,    intent(in out) :: a(n)
+  integer, intent(in out) :: b(n)
 !-----------------------------------[Locals]-----------------------------------!
   integer                 :: start, bottom
 !==============================================================================!
