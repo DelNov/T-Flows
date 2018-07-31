@@ -13,11 +13,12 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: base_id         ! base index number
   integer           :: block_id        ! block index number
-  character(len=80) :: coord_name      
+  character(len=80) :: coord_name
   integer           :: i               ! lower range index
   integer           :: j               ! upper range index
   real, allocatable :: coordinates(:)  ! array of coordinate values
   integer           :: error           ! error status
+  integer           :: n
 !==============================================================================!
 
   ! Set input parameters
@@ -31,20 +32,30 @@
   allocate(coordinates(i:j))
 
   ! Read grid x coordinates
-  call Cg_Coord_Read_F(file_id,      &
-                       base,         &
-                       block,        &
-                       coord_name,   &
-                       RealDouble,   &
-                       i,            &
-                       j,            &
-                       coordinates,  &
-                       error)
+  call Cg_Coord_Read_F(file_id,      & !(in )
+                       base,         & !(in )
+                       block,        & !(in )
+                       coord_name,   & !(in )
+                       RealDouble,   & !(in )
+                       i,            & !(in )
+                       j,            & !(in )
+                       coordinates,  & !(out)
+                       error)          !(out)
 
   if (error.ne.0) then
     print *, "# Failed to read DoubleReal Coord", coord_name
     call Cg_Error_Exit_F()
   endif
+
+  if(verbose) then
+    print *, '#  ---------------------------------'
+    print *, '#  Coordinate name:  ', coord_name
+    print *, '#  ---------------------------------'
+    print *, "#  Coordinate table sample: "
+      do n = 1, 6
+        print '(1f24.20)', coordinates(n)
+      end do
+  end if
 
   ! Fetch received parameters
   select case (coord)

@@ -46,7 +46,7 @@
   ! Get starting time
   call cpu_time(wall_time_start)
   time =  0.
-  restart = .true.
+  restart = .true. ! can turn in restart=.false. in Load_Backup
 
   !------------------------------!
   !   Start parallel execution   !
@@ -89,7 +89,7 @@
 
   ! First time step is one, unless read from restart otherwise
   first_dt = 0
-  call Load_Backup(grid, first_dt, restart) ! -> restart=.false.
+  call Load_Backup(grid, first_dt, restart)
 
   if(.not. restart) then
     call Load_Boundary_Conditions(grid, .true.)

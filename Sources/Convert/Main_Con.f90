@@ -2,9 +2,9 @@
   program Convert
 !----------------------------------[Modules]-----------------------------------!
   use Name_Mod, only: problem_name
-  use gen_mod 
+  use gen_mod
   use Grid_Mod
-!------------------------------------------------------------------------------! 
+!------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type)   :: grid     ! grid to be converted
@@ -24,7 +24,7 @@
   !-----------------------------------------------------!
   file_name_up = file_name
   call To_Upper_Case(file_name_up)
- 
+
   l = len_trim(file_name)
   print *, '#==================================' // &
            '==================================='
@@ -58,18 +58,18 @@
   call Grid_Topology     (grid)
   call Find_Faces        (grid)
   call Calculate_Geometry(grid)
-  call Connect_Domains (grid)
+  call Connect_Domains   (grid)
 
   ! Prepare for saving
-  do n=1,grid % n_nodes
-    new_n(n) = n 
-  end do  
-  do c=-grid % n_bnd_cells,grid % n_cells
-    new_c(c) = c 
-  end do  
-  do s=1,grid % n_faces 
+  do n = 1, grid % n_nodes
+    new_n(n) = n
+  end do
+  do c = - grid % n_bnd_cells, grid % n_cells
+    new_c(c) = c
+  end do
+  do s = 1, grid % n_faces
     new_f(s) = s
-  end do  
+  end do
 
   !-------------------------------!
   !   Save files for processing   !
@@ -79,7 +79,7 @@
                       grid % n_cells,      &
                       grid % n_faces,      &
                       grid % n_bnd_cells,  &
-                      0, 0) 
+                      0, 0)
 
   !-----------------------------------------------------!
   !   Save grid for visualisation and post-processing   !
@@ -102,7 +102,7 @@
   ! I believe these are needed for Fluent only
   call Save_Shadows(grid, 0)
 
-  ! Create 1D file (used for channel or pipe flow) 
+  ! Create 1D file (used for channel or pipe flow)
   call Probe_1D_Nodes(grid)
 
   end program

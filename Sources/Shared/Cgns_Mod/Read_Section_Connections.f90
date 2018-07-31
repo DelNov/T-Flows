@@ -32,7 +32,7 @@
   block_id = block
   sect_id  = sect
 
-  ! Introduce some abbraviations 
+  ! Introduce some abbraviations
   sect_name   = cgns_base(base) % block(block) % section(sect) % name
   cell_type   = cgns_base(base) % block(block) % section(sect) % cell_type
   first_cell  = cgns_base(base) % block(block) % section(sect) % first_cell
@@ -42,15 +42,18 @@
   ! Number of cells in this section
   cnt = last_cell - first_cell + 1 ! cells in this sections
 
-  if(parent_flag .eq. 1) then
-    allocate(parent_data(2*cnt,2))
+  if(parent_flag .eq. 1) then ! parent data was provided in Read_Section_Info
+    !"For faces on the boundary of the domain, the second parent is set to zero"
+    allocate(parent_data(2*cnt, 2))
   end if
 
   !--------------------------------------------------------!
   !   Consider boundary conditions defined in this block   !
   !--------------------------------------------------------!
   do bc = 1, cgns_base(base) % block(block) % n_bnd_conds
-    if(sect_name .eq. cgns_base(base) % block(block) % bnd_cond(bc) % name) then
+    if(index(trim(sect_name), &
+      trim(cgns_base(base) % block(block) % bnd_cond(bc) % name), &
+      back = .true.) .ne. 0) then
 
       if(verbose) then
         print *, '#         ---------------------------------'
@@ -64,8 +67,8 @@
       end if
 
       ! Count boundary cells
-      if ( ElementTypeName(cell_type) .eq. 'QUAD_4') cnt_qua = cnt_qua + cnt
-      if ( ElementTypeName(cell_type) .eq. 'TRI_3' ) cnt_tri = cnt_tri + cnt
+      if ( ElementTypeName(cell_type) .eq. 'QUAD_4') cnt_qua = cnt_qua + cnt!del
+      if ( ElementTypeName(cell_type) .eq. 'TRI_3' ) cnt_tri = cnt_tri + cnt!del
 
       ! Update numer of boundary cells in the block
       cnt_block_bnd_cells = cnt_block_bnd_cells + cnt
@@ -75,27 +78,29 @@
       if ( ElementTypeName(cell_type) .eq. 'TRI_3' ) n_nodes = 3
       allocate(face_n(n_nodes, cnt))
 
-      call Cg_Elements_Read_F(file_id,       & 
-                              base_id,       &
-                              block_id,      &
-                              sect_id,       &
-                              face_n(1,1),   &
-                              parent_data,   &
-                              error)          
+      call Cg_Elements_Read_F(file_id,      & !(in )
+                              base_id,      & !(in )
+                              block_id,     & !(in )
+                              sect_id,      & !(in )
+                              face_n(1,1),  & !(out)
+                              parent_data,  & !(out)
+                              error)          !(out)
       ! Fetch the data
-      do loc=1,cnt  ! I have no clue why the size has to be 2*cnt
-        cell = parent_data(loc,1) + cnt_cells
-        dir  = parent_data(loc,2)
+      do loc = 1, cnt
+        cell = parent_data(loc, 1) + cnt_cells
+        dir  = parent_data(loc, 2)
         grid % cells_bnd_color(dir,cell) =  &
              cgns_base(base) % block(block) % bnd_cond(bc) % color
       end do
-     
+
       if(verbose) then
-        do loc = 1,min(8,cnt)
-          print '(4i7)', (face_n(n,loc), n = 1, n_nodes)
+        print *, "#         Connection table sample: "
+        do loc = 1, min(8, cnt)
+          print '(a8,4i7)', " ", (face_n(n,loc), n = 1, n_nodes)
         end do
-        do loc = 1,min(8,cnt)
-          print '(a2,3i7)', 'loc=', loc, parent_data(loc,1), parent_data(loc,2)
+        print *, "#         Parent data sample: "
+        do loc = 1, min(8, cnt)
+          print '(a10,2i7)', " ", parent_data(loc, 1), parent_data(loc, 2)
         end do
       end if
 
@@ -142,14 +147,14 @@
     if ( ElementTypeName(cell_type) .eq. 'TETRA_4') n_nodes = 4
     allocate(cell_n(n_nodes, cnt))
 
-    call Cg_Elements_Read_F(file_id,       & 
-                            base_id,       &
-                            block_id,      &
-                            sect_id,       &
-                            cell_n(1,1),   &
-                            parent_datum,  &
-                            error)          
-    
+    call Cg_Elements_Read_F(file_id,       & !(in )
+                            base_id,       & !(in )
+                            block_id,      & !(in )
+                            sect_id,       & !(in )
+                            cell_n(1,1),   & !(out)
+                            parent_datum,  & !(out)
+                            error)           !(out)
+
     ! Fetch received parameters
     do loc = 1, cnt
 
@@ -178,11 +183,12 @@
     end do
 
     if(verbose) then
-      do loc = 1, min(8,cnt)
-        print '(8i7)', (cell_n(n,loc), n = 1, n_nodes)
+        print *, "#         Connection table sample: "
+      do loc = 1, min(8, cnt)
+        print '(a9,8i7)', " ", (cell_n(n,loc), n = 1, n_nodes)
       end do
     end if
- 
+
     deallocate(cell_n)
   end if
 

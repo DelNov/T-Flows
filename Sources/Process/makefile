@@ -60,18 +60,18 @@ $(info #-----------------------------------------------------------------------)
 ifeq ($(FORTRAN), gnu)
   FC = gfortran
   ifeq ($(DEBUG),yes)
-    OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8 -fdefault-integer-8 -O0 -g \
-               -ffixed-line-length-80 -fcheck=all -fwhole-file -fbacktrace \
-               -ffpe-trap=invalid \
-               -fimplicit-none -finit-real=nan \
-               -Wall -Wextra -Waliasing -Wampersand -Warray-temporaries \
-               -Wc-binding-type -Wcharacter-truncation -Wline-truncation \
-               -Wconversion -Wconversion-extra -Wintrinsics-std \
-               -Wreal-q-constant -Wsurprising -Wtabs -Wunderflow \
-               -Wintrinsic-shadow -Wunused-parameter -Walign-commons \
-               -Wfunction-elimination -Wrealloc-lhs -Wrealloc-lhs-all \
-               -Wcompare-reals -Wtarget-lifetime -Wpedantic -fstack-check \
-               #-std=f2003 -Wimplicit-procedure -Wimplicit-interface
+    OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8 -fdefault-integer-8 -O0 -g\
+                   -ffixed-line-length-80 -fcheck=all -fwhole-file -fbacktrace \
+                   -ffpe-trap=invalid \
+                   -fimplicit-none -finit-real=nan \
+                   -Wall -Wextra -Waliasing -Wampersand -Warray-temporaries \
+                   -Wc-binding-type -Wcharacter-truncation -Wline-truncation \
+                   -Wconversion -Wconversion-extra -Wintrinsics-std \
+                   -Wreal-q-constant -Wsurprising -Wtabs -Wunderflow \
+                   -Wintrinsic-shadow -Wunused-parameter -Walign-commons \
+                   -Wfunction-elimination -Wrealloc-lhs -Wrealloc-lhs-all \
+                   -Wcompare-reals -Wtarget-lifetime -Wpedantic -fstack-check \
+                   #-std=f2003 -Wimplicit-procedure -Wimplicit-interface
 
   else
     OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8 -fdefault-integer-8 -O3
@@ -84,7 +84,7 @@ ifeq ($(FORTRAN), intel)
   FC = ifort
   ifeq ($(DEBUG),yes)
     OPT_COMP = -module $(DIR_MODULE) -r8 -i8 -O0 -g -warn all -check all \
-               -debug all -fpe-all=0 -traceback
+                   -debug all -fpe-all=0 -traceback
   else
     OPT_COMP = -module $(DIR_MODULE) -r8 -i8 -O3
   endif
@@ -184,7 +184,7 @@ SRC_MOD = Const_Mod.f90 \
           Material_Mod.f90
 
 # Conditional support for MPI communication
-ifeq ($(MPI), yes) 
+ifeq ($(MPI), yes)
   SRC_MOD += Comm_Mod_Par.f90
   COMM_OBJ = Comm_Mod_Par.o
 else
@@ -212,7 +212,7 @@ SRC_MOD += Control_Mod.f90 \
            Monitor_Mod.f90
 
 #---------------
-#   Functions   
+#   Functions
 #---------------
 
 # Sources for all functions are obtained by a shell command
@@ -225,13 +225,15 @@ SRC_FUN += Distance.f90 \
            Sort_Int_Carry_Int.f90 \
            Sort_Short_Carry_Short.f90 \
            Sort_Real_Carry_Int.f90 \
+           Sort_Real_Carry_Int_Heapsort.f90 \
            Sort_Short_By_Index.f90 \
            Approx.f90 \
            Swap_Int.f90 \
+           Swap_Real.f90      \
            To_Upper_Case.f90
 
 #-------------------------------------------
-#   Conditional inclusion of CGNS support 
+#   Conditional inclusion of CGNS support
 #-------------------------------------------
 ifeq ($(CGNS_ADF5), $(CGNS_HDF5))  # meaning both are "no"
   SRC_MOD += Cgns_Mod_Void.f90

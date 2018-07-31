@@ -15,7 +15,7 @@
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
   character(len=80) :: name_in
-  integer           :: c, cs, ce, i, j, bc, base, block, sect, coord, mode
+  integer           :: c, i, j, bc, base, block, sect, coord, mode
   integer           :: cgns_1, cgns_2, cgns_3, cgns_4, cgns_5, cell_type
 !==============================================================================!
 
@@ -55,6 +55,7 @@
     !   Browse through all blocks in the base   !
     !-------------------------------------------!
     call Cgns_Mod_Read_Number_Of_Blocks_In_Base(base)
+
     do block = 1, cgns_base(base) % n_blocks
 
       ! Read block information 
@@ -66,9 +67,10 @@
       call Cgns_Mod_Read_Block_Type(base, block)
 
       ! Browse through all boundary conditions
-      ! Gives b.c. names and colors
       call Cgns_Mod_Read_Number_Of_Bnd_Conds_In_Block(base, block)
+
       do bc = 1, cgns_base(base) % block(block) % n_bnd_conds
+        ! Gives b.c. names and colours
         call Cgns_Mod_Read_Bnd_Conds_Info(base, block, bc)
       end do
 
@@ -76,9 +78,10 @@
       !   Browse through all element sections   !
       !-----------------------------------------!
       call Cgns_Mod_Read_Number_Of_Element_Sections(base, block)
+
       do sect = 1, cgns_base(base) % block(block) % n_sects
 
-        ! Read info for an element section 
+        ! Read info for an element section  (including b.c.)
         ! Gives: cell_type, first_cell, last_cell
         call Cgns_Mod_Read_Section_Info(base, block, sect)
 
@@ -106,8 +109,8 @@
       print *, '# No boundary faces were found !'
       stop
     end if
-    print *, '# - number of bounary conditions faces: ', cnt_qua + cnt_tri
-    print *, '# - number of bounary conditions: ', cnt_bnd_conds
+    print *, '# - number of boundary conditions faces: ', cnt_qua + cnt_tri
+    print *, '# - number of boundary conditions: ',       cnt_bnd_conds
   end if
 
   !--------------------------------------------!
@@ -206,7 +209,8 @@
   !   Merge the nodes   !
   !---------------------!
   if(cnt_blocks .gt. 1) then
-    call Cgns_Mod_Merge_Nodes(grid)
+    !call Cgns_Mod_Merge_Nodes_Old(grid)
+    call Cgns_Mod_Merge_Nodes_New(grid)
   end if
 
   !---------------------------------!
@@ -228,10 +232,9 @@
         cell_type   = cgns_base(base) % block(block) % section(sect) % cell_type
 
         if ( ElementTypeName(cell_type) .eq. 'HEXA_8' ) then
-          cs = cgns_base(base) % block(block) % section(sect) % first_cell
-          ce = cgns_base(base) % block(block) % section(sect) % last_cell
 
-          do c = cs, ce
+          do c = cgns_base(base) % block(block) % section(sect) % first_cell,  &
+                 cgns_base(base) % block(block) % section(sect) % last_cell
             cgns_1 = grid % cells_bnd_color(1,c)
             cgns_2 = grid % cells_bnd_color(2,c)
             cgns_3 = grid % cells_bnd_color(3,c)
@@ -247,15 +250,15 @@
               if( grid % cells_bnd_color(j,c) .ne. 0 ) then 
                 cnt_bnd_cells = cnt_bnd_cells + 1
               end if
-            end do 
-          end do 
+            end do
 
+          end do ! ElementTypeName(cell_type) .eq. 'HEXA_8'
         end if
 
       end do ! elements sections
     end do ! blocks
   end do ! bases
-  print *, '# - number of boundary cells:', cnt_bnd_cells
+  print *, '# - number of corrected hex boundary cells:', cnt_bnd_cells
 
   call Grid_Mod_Print_Bnd_Cond_List(grid)
 

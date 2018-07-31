@@ -5,7 +5,7 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use gen_mod 
+  use gen_mod
   use Grid_Mod
   use Tokenizer_Mod
 !------------------------------------------------------------------------------!
@@ -16,7 +16,7 @@
   include "../Shared/Approx.int"
 !----------------------------------[Calling]-----------------------------------!
   real :: Distance
-  real :: Distance_Squared    
+  real :: Distance_Squared
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, c1, c2, n, s, ss, cc2, c_max, nnn, hh, mm, b
   integer              :: c11, c12, c21, c22, s1, s2, bou_cen, count
@@ -28,26 +28,28 @@
   real                 :: x_c, y_c, z_c, Det
   real                 :: ab_i, ab_j, ab_k, ac_i, ac_j, ac_k, p_i, p_j, p_k
   real                 :: dsc1, dsc2, per_min, per_max
-  real                 :: t, sur_tot, angle 
-  real                 :: xc1, yc1, zc1, xc2, yc2, zc2 
+  real                 :: t, sur_tot, angle
+  real                 :: xc1, yc1, zc1, xc2, yc2, zc2
   real                 :: max_dis, tot_vol, min_vol, max_vol
-  real                 :: xmin, xmax, ymin, ymax, zmin, zmax 
+  real                 :: xmin, xmax, ymin, ymax, zmin, zmax
   real, allocatable    :: xspr(:), yspr(:), zspr(:)
   real, allocatable    :: b_coor(:), phi_face(:)
   integer, allocatable :: b_face(:), face_copy(:)
   integer, allocatable :: wall_colors(:)
-  character(len=80)    :: answer  
+  character(len=80)    :: answer
+  real,    parameter   :: BIG   = 104651.    ! prime number
+  real,    parameter   :: SMALL = 1.0e-6     ! initial precision
 !==============================================================================!
 !
-!                                n3 
+!                                n3
 !                 +---------------!---------------+
 !                /|              /|              /|
 !               / |             / |             / |
 !              /  |          n2/  |            /  |
 !             +---------------!---------------+   |
 !             |   |           |   |           |   |
-!             |   |     o---- | s-------o     |   |      
-!             |   +---- c1 ---|   !---- c2 ---|   +       
+!             |   |     o---- | s-------o     |   |
+!             |   +---- c1 ---|   !---- c2 ---|   +
 !             |  /            |  /n4          |  /
 !             | /             | /             | /
 !             |/              |/              |/
@@ -55,13 +57,13 @@
 !                            n1
 !
 !   Notes:
-! 
-!     ! side s is oriented from cell center c1 to cell center c2     
+!
+!     ! side s is oriented from cell center c1 to cell center c2
 !     ! c2 is greater then c1 inside the domain or smaller then 0
 !       on the boundary
 !     ! nodes are denoted with n1 - n4
 !
-!            c3           
+!            c3
 !             \  4-----3
 !              \/ \  . |
 !              /   \  +---c2
@@ -72,8 +74,8 @@
 !                   |
 !                   c1
 !
-!                                n3 
-!                 +---------------!-------+         
+!                                n3
+!                 +---------------!-------+
 !                /|            n2/|      /|
 !               / |             !-------+ |
 !              /  |            /|s|  c2 | |
@@ -83,10 +85,10 @@
 !             |   +-----------|n1 +
 !             |  /            |  /
 !             | /             | /
-!             |/              |/ 
+!             |/              |/
 !             +---------------+
 !                            n1
-! 
+!
 !------------------------------------------------------------------------------!
 !   Generaly:
 !
@@ -103,21 +105,21 @@
 !     x_node = xc(c1) + t*(xc(c2)-xc(c1)) = xc(c1) + t*rx
 !     y_node = yc(c1) + t*(yc(c2)-yc(c1)) = yc(c1) + t*ry
 !     z_node = zc(c1) + t*(zc(c2)-zc(c1)) = zc(c1) + t*rz
-!    
 !
-!     plane is a cell face: 
 !
-!     Sx * x_node + Sy * y_node + Sz * z_node = 
+!     plane is a cell face:
+!
+!     Sx * x_node + Sy * y_node + Sz * z_node =
 !     Sx * xsp(s) + Sy * ysp(s) + Sz * zsp(s)
-!  
+!
 !     and the intersection is at:
-!  
-!         Sx*(xsp(s)-xc(c1)) + Sy*(ysp(s)-yc(c1) + Sz*(zsp(s)-zc(c1)) 
+!
+!         Sx*(xsp(s)-xc(c1)) + Sy*(ysp(s)-yc(c1) + Sz*(zsp(s)-zc(c1))
 !     t = -----------------------------------------------------------
 !                           rx*Sx + ry*Sy + rz*Sz
-!  
+!
 !------------------------------------------------------------------------------!
- 
+
   !-----------------------------------------!
   !   Calculate the cell centers            !
   !-----------------------------------------!
@@ -138,7 +140,7 @@
   print *, '# Cell centers calculated !'
 
   !-----------------------------------------------------!
-  !   Calculate:                                        ! 
+  !   Calculate:                                        !
   !      components of cell sides, cell side centers.   !
   !-----------------------------------------------------!
   !   => depends on: x_node,y_node,z_node               !
@@ -146,10 +148,10 @@
   !-----------------------------------------------------!
   do s = 1, grid % n_faces
     do n = 1, grid % faces_n_nodes(s)    ! for quadrilateral an triangular faces
-      xt(n)=grid % xn(grid % faces_n(n,s))
-      yt(n)=grid % yn(grid % faces_n(n,s))
-      zt(n)=grid % zn(grid % faces_n(n,s))
-    end do                       
+      xt(n) = grid % xn(grid % faces_n(n,s))
+      yt(n) = grid % yn(grid % faces_n(n,s))
+      zt(n) = grid % zn(grid % faces_n(n,s))
+    end do
 
     ! Cell side components
     if( grid % faces_n_nodes(s) .eq. 4 ) then
@@ -161,19 +163,19 @@
                            +(zt(3)-zt(2))*(xt(2)+xt(3))   &
                            +(zt(4)-zt(3))*(xt(3)+xt(4))   &
                            +(zt(1)-zt(4))*(xt(4)+xt(1)) )
-      grid % sz(s)= 0.5 * ( (xt(2)-xt(1))*(yt(2)+yt(1))   & 
+      grid % sz(s)= 0.5 * ( (xt(2)-xt(1))*(yt(2)+yt(1))   &
                            +(xt(3)-xt(2))*(yt(2)+yt(3))   &
                            +(xt(4)-xt(3))*(yt(3)+yt(4))   &
                            +(xt(1)-xt(4))*(yt(4)+yt(1)) )
-    else if( grid % faces_n_nodes(s) .eq. 3 ) then 
-      grid % sx(s)= 0.5 * ( (yt(2)-yt(1))*(zt(2)+zt(1))   & 
+    else if( grid % faces_n_nodes(s) .eq. 3 ) then
+      grid % sx(s)= 0.5 * ( (yt(2)-yt(1))*(zt(2)+zt(1))   &
                            +(yt(3)-yt(2))*(zt(2)+zt(3))   &
                            +(yt(1)-yt(3))*(zt(3)+zt(1)) )
       grid % sy(s)= 0.5 * ( (zt(2)-zt(1))*(xt(2)+xt(1))   &
-                           +(zt(3)-zt(2))*(xt(2)+xt(3))   & 
+                           +(zt(3)-zt(2))*(xt(2)+xt(3))   &
                            +(zt(1)-zt(3))*(xt(3)+xt(1)) )
       grid % sz(s)= 0.5 * ( (xt(2)-xt(1))*(yt(2)+yt(1))   &
-                           +(xt(3)-xt(2))*(yt(2)+yt(3))   & 
+                           +(xt(3)-xt(2))*(yt(2)+yt(3))   &
                            +(xt(1)-xt(3))*(yt(3)+yt(1)) )
     else
       print *, 'calc4: something horrible has happened !'
@@ -181,15 +183,15 @@
     end if
 
     ! Barycenters
-    if(grid % faces_n_nodes(s) .eq. 4) then  
+    if(grid % faces_n_nodes(s) .eq. 4) then
       grid % xf(s) = (xt(1)+xt(2)+xt(3)+xt(4))/4.0
       grid % yf(s) = (yt(1)+yt(2)+yt(3)+yt(4))/4.0
       grid % zf(s) = (zt(1)+zt(2)+zt(3)+zt(4))/4.0
-    else if(grid % faces_n_nodes(s) .eq. 3) then  
+    else if(grid % faces_n_nodes(s) .eq. 3) then
       grid % xf(s) = (xt(1)+xt(2)+xt(3))/3.0
       grid % yf(s) = (yt(1)+yt(2)+yt(3))/3.0
       grid % zf(s) = (zt(1)+zt(2)+zt(3))/3.0
-    end if 
+    end if
 
   end do ! through sides
 
@@ -199,7 +201,7 @@
   !   Calculate boundary cell centers    !
   !--------------------------------------!
   !   => depends on: xc,yc,zc,Sx,Sy,Sz   !
-  !   <= gives:      xc,yc,zc for c<0    !   
+  !   <= gives:      xc,yc,zc for c<0    !
   !--------------------------------------!
   print *, '#===================================='
   print *, '# Position the boundary cell centres:'
@@ -207,15 +209,15 @@
   print *, '# Type 1 for barycentric placement'
   print *, '# Type 2 for orthogonal placement'
   print *, '#------------------------------------'
-  read(*,*) bou_cen 
+  read(*,*) bou_cen
 
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
     sur_tot = sqrt(  grid % sx(s)*grid % sx(s)  &
-                  + grid % sy(s)*grid % sy(s)  &
-                  + grid % sz(s)*grid % sz(s) )
+                   + grid % sy(s)*grid % sy(s)  &
+                   + grid % sz(s)*grid % sz(s) )
 
     if(c2  < 0) then
       t = (   grid % sx(s)*(grid % xf(s) - grid % xc(c1))        &
@@ -229,7 +231,7 @@
         grid % yc(c2) = grid % yf(s)
         grid % zc(c2) = grid % zf(s)
       end if
-    endif 
+    endif
   end do ! through sides
 
   !---------------------------------------------------------------!
@@ -250,7 +252,7 @@
       grid % dx(c2) = max( grid % dx(c2), abs( grid % xc(c2) - grid % xc(c1) ) )
       grid % dy(c2) = max( grid % dy(c2), abs( grid % yc(c2) - grid % yc(c1) ) )
       grid % dz(c2) = max( grid % dz(c2), abs( grid % zc(c2) - grid % zc(c1) ) )
-    end if 
+    end if
   end do ! through sides
 
   do s = 1, grid % n_faces
@@ -258,13 +260,13 @@
     c2 = grid % faces_c(2,s)
 
     if(c2 < 0) then
-      if( Approx(grid % dx(c1), 0.0, 1.e-6) )  &
-        grid % xc(c1) = 0.75*grid % xc(c1) + 0.25*grid % xc(c2) 
-      if( Approx(grid % dy(c1), 0.0, 1.e-6) )  &
-        grid % yc(c1) = 0.75*grid % yc(c1) + 0.25*grid % yc(c2) 
-      if( Approx(grid % dz(c1), 0.0, 1.e-6) )  &
-        grid % zc(c1) = 0.75*grid % zc(c1) + 0.25*grid % zc(c2) 
-    end if 
+      if( Approx(grid % dx(c1), 0.0, SMALL) )  &
+        grid % xc(c1) = 0.75*grid % xc(c1) + 0.25*grid % xc(c2)
+      if( Approx(grid % dy(c1), 0.0, SMALL) )  &
+        grid % yc(c1) = 0.75*grid % yc(c1) + 0.25*grid % yc(c2)
+      if( Approx(grid % dz(c1), 0.0, SMALL) )  &
+        grid % zc(c1) = 0.75*grid % zc(c1) + 0.25*grid % zc(c2)
+    end if
   end do ! through sides
 
   ! Why are the following three lines needed?
@@ -278,8 +280,8 @@
   !   => depends on: xc,yc,zc,Sx,Sy,Sz         !
   !   <= gives:      Dx,Dy,Dz                  !
   !--------------------------------------------!
-  allocate(b_coor(grid % n_faces)); b_coor=0.0
-  allocate(b_face(grid % n_faces)); b_face=0
+  allocate(b_coor(grid % n_faces)); b_coor = 0.0
+  allocate(b_face(grid % n_faces)); b_face = 0
 
   !--------------------------------------------------------!
   !                                                        !
@@ -287,11 +289,11 @@
   !                                                        !
   !--------------------------------------------------------!
 
-  allocate(face_copy(grid % n_faces)); face_copy=0
+  allocate(face_copy(grid % n_faces)); face_copy = 0
 
 2 continue
   call Grid_Mod_Print_Bnd_Cond_List(grid)
-  n_per = 0 
+  n_per = 0
   print *, '#============================================================='
   print *, '# Enter the periodic-boundary-condition number (see it above)'
   print *, '# Type skip if there is none !'
@@ -301,7 +303,7 @@
   call To_Upper_Case(answer)
   if( answer .eq. 'SKIP' ) then
     color_per = 0
-    goto 1  
+    goto 1
   end if
   read(line % tokens(1),*) color_per
   if( color_per > grid % n_bnd_cond ) then
@@ -313,11 +315,11 @@
   print *, '#========================================================'
   print *, '# Insert the periodic direction (1 -> x, 2 -> y, 3 -> z)'
   print *, '#--------------------------------------------------------'
-  read(*,*) dir 
+  read(*,*) dir
 
   print *, '#==============================================================='
   print *, '# For axisymmetric problems with periodic boundary conditions:  '
-  print *, '# enter angle (in degrees) for rotation of the periodic boundary' 
+  print *, '# enter angle (in degrees) for rotation of the periodic boundary'
   print *, '# followed by rotation axis (1 -> x, 2 -> y, 3 -> z)            '
   print *, '#'
   print *, '# Type skip if you don''t deal with such a problem'
@@ -348,49 +350,49 @@
     if(dir .eq. 1) then
       x_a = 0.0
       y_a = 0.0
-      z_a = 0.0       
+      z_a = 0.0
       x_b = 0.0
       y_b = 1.0
-      z_b = 0.0       
+      z_b = 0.0
       x_c = 0.0
       y_c = 0.0
-      z_c = 1.0       
+      z_c = 1.0
     else if(dir .eq. 2) then
       x_a = 0.0
       y_a = 0.0
-      z_a = 0.0       
+      z_a = 0.0
       x_b = 1.0
       y_b = 0.0
-      z_b = 0.0       
+      z_b = 0.0
       x_c = 0.0
       y_c = 0.0
-      z_c = 1.0       
+      z_c = 1.0
     else if(dir .eq. 3) then
       x_a = 0.0
       y_a = 0.0
-      z_a = 0.0       
+      z_a = 0.0
       x_b = 1.0
       y_b = 0.0
-      z_b = 0.0       
+      z_b = 0.0
       x_c = 0.0
       y_c = 1.0
-      z_c = 0.0       
-    end if        
+      z_c = 0.0
+    end if
 
-    ab_i = x_b - x_a 
-    ab_j = y_b - y_a 
-    ab_k = z_b - z_a 
+    ab_i = x_b - x_a
+    ab_j = y_b - y_a
+    ab_k = z_b - z_a
 
-    ac_i = x_c - x_a 
-    ac_j = y_c - y_a 
+    ac_i = x_c - x_a
+    ac_j = y_c - y_a
     ac_k = z_c - z_a
 
-    p_i =  ab_j*ac_k - ac_j*ab_k 
-    p_j = -ab_i*ac_k + ac_i*ab_k 
+    p_i =  ab_j*ac_k - ac_j*ab_k
+    p_j = -ab_i*ac_k + ac_i*ab_k
     p_k =  ab_i*ac_j - ac_i*ab_j
 
     angle_face = angle_face * PI / 180.0
- 
+
     allocate(phi_face(grid % n_faces)); phi_face=0.0
     allocate(xspr(grid % n_faces)); xspr=0.0
     allocate(yspr(grid % n_faces)); yspr=0.0
@@ -400,19 +402,19 @@
       c2 = grid % faces_c(2,s)
       if(c2 < 0) then
         if(grid % bnd_cond % color(c2) .eq. color_per) then
-          if( Approx(angle, 0.0, 1.e-6) ) then
-            xspr(s) = grid % xf(s)  
-            yspr(s) = grid % yf(s)  
-            zspr(s) = grid % zf(s)  
-          else 
+          if( Approx(angle, 0.0, SMALL) ) then
+            xspr(s) = grid % xf(s)
+            yspr(s) = grid % yf(s)
+            zspr(s) = grid % zf(s)
+          else
             if(rot_dir .eq. 3) then
-              xspr(s) = grid % xf(s)*cos(angle) + grid % yf(s)*sin(angle) 
+              xspr(s) = grid % xf(s)*cos(angle) + grid % yf(s)*sin(angle)
               yspr(s) =-grid % xf(s)*sin(angle) + grid % yf(s)*cos(angle)
             else if(rot_dir .eq. 2) then
-              xspr(s) = grid % xf(s)*cos(angle) + grid % zf(s)*sin(angle) 
+              xspr(s) = grid % xf(s)*cos(angle) + grid % zf(s)*sin(angle)
               zspr(s) =-grid % xf(s)*sin(angle) + grid % zf(s)*cos(angle)
             else if(rot_dir .eq. 1) then
-              yspr(s) = grid % yf(s)*cos(angle) + grid % zf(s)*sin(angle) 
+              yspr(s) = grid % yf(s)*cos(angle) + grid % zf(s)*sin(angle)
               zspr(s) =-grid % yf(s)*sin(angle) + grid % zf(s)*cos(angle)
             end if
           end if
@@ -428,62 +430,63 @@
   ymax = -HUGE
   zmax = -HUGE
 
-  b_coor=0.0
-  b_face=0
+  b_coor = 0.
+  b_face = 0
 
   c = 0
 
   !-----------------!
   !   No rotation   !
   !-----------------!
-  if(option .eq. 1) then 
-    do s=1,grid % n_faces
+  if(option .eq. 1) then
+    do s = 1, grid % n_faces
       c2 = grid % faces_c(2,s)
       if(c2 < 0) then
         if(grid % bnd_cond % color(c2) .eq. color_per) then
           c = c + 1
-          if(dir .eq. 1) b_coor(c) = grid % xf(s)*100000000.0  &
-                                   + grid % yf(s)*10000.0      &
+          if(dir .eq. 1) b_coor(c) = grid % xf(s)*BIG     &
+                                   + grid % yf(s)*BIG**2  &
                                    + grid % zf(s)
-          if(dir .eq. 2) b_coor(c) = grid % yf(s)*100000000.0  &
-                                   + grid % xf(s)*10000.0      &
+          if(dir .eq. 2) b_coor(c) = grid % yf(s)*BIG     &
+                                   + grid % xf(s)*BIG**2  &
                                    + grid % zf(s)
-          if(dir .eq. 3) b_coor(c) = grid % zf(s)*100000000.0  & 
-                                   + grid % xf(s)*10000.0      &
+          if(dir .eq. 3) b_coor(c) = grid % zf(s)*BIG     &
+                                   + grid % xf(s)*BIG**2  &
                                    + grid % yf(s)
           b_face(c) = s
         end if
       end if
     end do
-    call Sort_Real_Carry_Int(b_coor, b_face, c, 2)
+    !call Sort_Real_Carry_Int(b_coor, b_face, c, 2)
+    call Sort_Real_Carry_Int_Heapsort(b_coor, b_face, c)
   end if
 
   !-------------------!
   !   With rotation   !
   !-------------------!
-  if(option .eq. 2) then 
+  if(option .eq. 2) then
     c_max = 0
-    do s=1,grid % n_faces
+    do s = 1, grid % n_faces
       c2 = grid % faces_c(2,s)
       if(c2 < 0) then
         if(grid % bnd_cond % color(c2) .eq. color_per) then
           c_max = c_max + 1
-        end if 
-      end if 
+        end if
+      end if
     end do
-    tol = 0.0001 
-    
+    tol = SMALL
+
 10 continue
 
     nnn = 0
-    hh = 0 
-    mm = 0 
+    hh = 0
+    mm = 0
     c = 0
-  
-    per_max = -HUGE
-    per_min =  HUGE 
 
-    do s=1,grid % n_faces
+    per_max = -HUGE
+    per_min =  HUGE
+
+    do s = 1, grid % n_faces
       c2 = grid % faces_c(2,s)
       if(c2 < 0) then
         if(grid % bnd_cond % color(c2) .eq. color_per) then
@@ -491,14 +494,14 @@
                  + p_j*(grid % yf(s))  &
                  + p_k*(grid % zf(s)))  &
               / sqrt(p_i*p_i + p_j*p_j + p_k*p_k)
-          per_min = min(per_min, Det)          
-          per_max = max(per_max, Det)          
+          per_min = min(per_min, Det)
+          per_max = max(per_max, Det)
         end if
       end if
     end do
     per_max = 0.5*(per_max + per_min)
 
-    do s=1,grid % n_faces
+    do s = 1, grid % n_faces
 
       c2 = grid % faces_c(2,s)
       if(c2 < 0) then
@@ -514,10 +517,10 @@
               hh = hh + 1
               b_coor(hh) = hh
               b_face(hh) = s
-              do ss=1,grid % n_faces
+              do ss = 1, grid % n_faces
                 cc2 = grid % faces_c(2,ss)
                 if(cc2 < 0) then
-                  if(grid % bnd_cond % color(cc2) .eq. color_per) then 
+                  if(grid % bnd_cond % color(cc2) .eq. color_per) then
                     Det = (  p_i * (grid % xf(ss))   &
                            + p_j * (grid % yf(ss))   &
                            + p_k * (grid % zf(ss)))  &
@@ -525,16 +528,16 @@
                     if((Det) > (per_max)) then
                       if((abs(grid % zf(ss)  - grid % zf(s))) < tol .and.   &
                          (abs(yspr(ss) - yspr(s))) < tol) then
-                         mm = hh + c_max/2 
+                         mm = hh + c_max/2
                          b_coor(mm) = mm
                          b_face(mm) = ss
                          nnn = nnn + 1
-                      end if 
-                    end if 
+                      end if
+                    end if
                   end if
-                end if  
+                end if
               end do
-            end if          
+            end if
           end if
 
           if(dir .eq. 2) then
@@ -542,10 +545,10 @@
               hh = hh + 1
               b_coor(hh) = hh
               b_face(hh) = s
-              do ss=1,grid % n_faces
+              do ss = 1, grid % n_faces
                 cc2 = grid % faces_c(2,ss)
                 if(cc2 < 0) then
-                  if(grid % bnd_cond % color(cc2) .eq. color_per) then 
+                  if(grid % bnd_cond % color(cc2) .eq. color_per) then
 
                     Det = (  p_i * (grid % xf(ss))  &
                            + p_j * (grid % yf(ss))  &
@@ -555,17 +558,17 @@
                     if((Det) > (per_max)) then
                       if(abs((grid % zf(ss)  - grid % zf(s))) < tol .and.  &
                          abs((xspr(ss) - xspr(s))) < tol) then
-                        mm = hh + c_max/2 
+                        mm = hh + c_max/2
                         b_coor(mm) = mm
                         b_face(mm) = ss
                         nnn = nnn + 1
-                      end if 
-                    end if 
+                      end if
+                    end if
 
                   end if
-                end if  
+                end if
               end do
-            end if          
+            end if
           end if
 
           if(dir .eq. 3) then
@@ -573,35 +576,35 @@
               hh = hh + 1
               b_coor(hh) = hh
               b_face(hh) = s
-              do ss=1,grid % n_faces
+              do ss = 1, grid % n_faces
                 cc2 = grid % faces_c(2,ss)
                 if(cc2 < 0) then
                   if(grid % bnd_cond % color(cc2) .eq. color_per) then
-                    Det = (  p_i*(grid % xf(ss))  &
-                           + p_j*(grid % yf(ss))  &
+                    Det = (  p_i*(grid % xf(ss))   &
+                           + p_j*(grid % yf(ss))   &
                            + p_k*(grid % zf(ss)))  &
                         / sqrt(p_i*p_i + p_j*p_j + p_k*p_k)
                     if((Det) > (per_max)) then
                       print *, '# Warning!  Potentially a bug in ...'
                       print *, '# ... Compute_Geometry, line 580'
                       print *, '# Contact developers, and if you ... '
-                      print *, '# ... are one of them, fix it!'   
+                      print *, '# ... are one of them, fix it!'
                       if(abs((grid % xf(ss) - grid % xf(s))) < tol .and.  &
                          abs((grid % yf(ss) - grid % yf(s))) < tol) then
-                        mm = hh + c_max/2 
+                        mm = hh + c_max/2
                         b_coor(mm) = mm
                         b_face(mm) = ss
                         nnn = nnn + 1
-                      end if 
-                    end if 
+                      end if
+                    end if
                   end if
-                end if  
+                end if
               end do
-            end if          
+            end if
           end if
 
-        end if 
-      end if 
+        end if
+      end if
     end do
 
     print *,'Iterating search for periodic cells: ',  &
@@ -610,7 +613,7 @@
     if(nnn .eq. c_max/2) then
       continue
     else
-      tol = tol*0.5 
+      tol = tol*0.5
       goto 10
     end if
 
@@ -619,7 +622,8 @@
     deallocate(yspr)
     deallocate(zspr)
 
-    call Sort_Real_Carry_Int(b_coor, b_face, c, 2)
+    !call Sort_Real_Carry_Int(b_coor, b_face, c, 2)
+    call Sort_Real_Carry_Int_Heapsort(b_coor, b_face, c)
   end if  ! for option .eq. 2
 
   do s = 1, c/2
@@ -629,10 +633,10 @@
     c21 = grid % faces_c(2,s1)  ! cell 2 for cell 1
     c12 = grid % faces_c(1,s2)  ! cell 1 for side 2
     c22 = grid % faces_c(2,s2)  ! cell 2 for side 2
-    face_copy(s1) = s2   ! just to remember where it was coppied from
-    grid % faces_c(2,s1) = c12 
-    grid % faces_c(1,s2) = 0    ! c21 
-    grid % faces_c(2,s2) = 0    ! c21 
+    face_copy(s1) = s2          ! just to remember where it was coppied from
+    grid % faces_c(2,s1) = c12
+    grid % faces_c(1,s2) = 0    ! c21
+    grid % faces_c(2,s2) = 0    ! c21
   end do
 
   n_per = c/2
@@ -643,14 +647,14 @@
   !---------------------------------!
   count = 0
   new_c = 0
-  do c = -1,-grid % n_bnd_cells,-1
+  do c = -1, -grid % n_bnd_cells, -1
     if(grid % bnd_cond % color(c) .ne. color_per) then
       count = count + 1
       new_c(c) = -count
     end if
   end do
 
-  do c = -1,-grid % n_bnd_cells,-1
+  do c = -1, -grid % n_bnd_cells, -1
     if(new_c(c) .ne. 0) then
       grid % xc(new_c(c)) = grid % xc(c)
       grid % yc(new_c(c)) = grid % yc(c)
@@ -675,7 +679,7 @@
   if(color_per < grid % n_bnd_cond) then
 
     ! Set the color of boundary selected to be periodic to zero
-    do c = -1,-grid % n_bnd_cells,-1
+    do c = -1, -grid % n_bnd_cells, -1
       if(grid % bnd_cond % color(c) .eq. color_per) then
         grid % bnd_cond % color(c) = 0
       end if
@@ -683,13 +687,13 @@
 
     ! Shift the rest of the boundary cells
     do b = 1, grid % n_bnd_cond - 1
-      if(b .ge. color_per) then 
+      if(b .ge. color_per) then
 
         ! Correct the names
         grid % bnd_cond % name(b) = grid % bnd_cond % name (b+1)
 
         ! Correct all boundary colors too
-        do c = -1,-grid % n_bnd_cells,-1
+        do c = -1, -grid % n_bnd_cells, -1
           if(grid % bnd_cond % color(c) .eq. (b+1)) then
             grid % bnd_cond % color(c) = b
           end if
@@ -709,7 +713,7 @@
   !   Phase II  ->  similar to the loop in Generator   !
   !                                                    !
   !----------------------------------------------------!
-1 continue 
+1 continue
   grid % n_sh = 0
   do s = 1, grid % n_faces
 
@@ -725,7 +729,7 @@
       ! Scalar product of the side with line c1-c2 is good criteria
       if( (grid % sx(s) * (grid % xc(c2)-grid % xc(c1) )+                  &
            grid % sy(s) * (grid % yc(c2)-grid % yc(c1) )+                  &
-           grid % sz(s) * (grid % zc(c2)-grid % zc(c1) ))  < 0.0 ) then
+           grid % sz(s) * (grid % zc(c2)-grid % zc(c1) )) < 0.0 ) then
 
         grid % n_sh = grid % n_sh + 2
 
@@ -733,13 +737,13 @@
         if(grid % faces_n_nodes(s) .eq. 4) then
 
           ! Coordinates of the shadow face
-          xs2=grid % xf(face_copy(s))
-          ys2=grid % yf(face_copy(s))
-          zs2=grid % zf(face_copy(s))
+          xs2 = grid % xf(face_copy(s))
+          ys2 = grid % yf(face_copy(s))
+          zs2 = grid % zf(face_copy(s))
 
           ! Add shadow faces
           new_face_1 = grid % n_faces+grid % n_sh-1
-          new_face_2 = grid % n_faces+grid % n_sh  
+          new_face_2 = grid % n_faces+grid % n_sh
           grid % faces_n_nodes(new_face_1) = 4
           grid % faces_c(1, new_face_1) = c1
           grid % faces_c(2, new_face_1) = -grid % n_bnd_cells-1
@@ -772,10 +776,10 @@
           xs2=grid % xf(face_copy(s))
           ys2=grid % yf(face_copy(s))
           zs2=grid % zf(face_copy(s))
- 
+
           ! Add shadow faces
           new_face_1 = grid % n_faces+grid % n_sh-1
-          new_face_2 = grid % n_faces+grid % n_sh  
+          new_face_2 = grid % n_faces+grid % n_sh
           grid % faces_n_nodes(new_face_1) = 3
           grid % faces_c(1, new_face_1) = c1
           grid % faces_c(2, new_face_1) = -grid % n_bnd_cells-1
@@ -791,7 +795,7 @@
           grid % faces_n_nodes(new_face_2) = 3
           grid % faces_c(1, new_face_2) = c2
           grid % faces_c(2, new_face_2) = -grid % n_bnd_cells-1
-          grid % faces_n(1, new_face_2) = grid % faces_n(1,face_copy(s)) 
+          grid % faces_n(1, new_face_2) = grid % faces_n(1,face_copy(s))
           grid % faces_n(2, new_face_2) = grid % faces_n(2,face_copy(s))
           grid % faces_n(3, new_face_2) = grid % faces_n(3,face_copy(s))
           grid % sx(new_face_2) = grid % sx(s)
@@ -803,7 +807,7 @@
         end if
 
         grid % dx(s) = grid % xf(s) - xs2  !
-        grid % dy(s) = grid % yf(s) - ys2  ! later: xc2 = xc2 + Dx  
+        grid % dy(s) = grid % yf(s) - ys2  ! later: xc2 = xc2 + Dx
         grid % dz(s) = grid % zf(s) - zs2  !
 
       endif !  S*(c2-c1) < 0.0
@@ -824,7 +828,7 @@
     c2 = grid % faces_c(2,s)
     if(c1 > 0) then
       number_sides = number_sides  + 1
-      new_f(s) = number_sides 
+      new_f(s) = number_sides
     else
       new_f(s) = -1
     end if
@@ -833,7 +837,7 @@
                           grid % n_faces, grid % n_faces
   write(*,'(A27,I9,Z9)') ' # New number of sides:      ', &
                           number_sides-grid % n_sh,number_sides-grid % n_sh
-  
+
   !--------------------------------------!
   !                                      !
   !   Phase IV  ->  compress the sides   !
@@ -841,7 +845,7 @@
   !--------------------------------------!
   do s = 1, grid % n_faces+grid % n_sh
     if(new_f(s) > 0) then
-      grid % faces_c(1,new_f(s)) = grid % faces_c(1,s) 
+      grid % faces_c(1,new_f(s)) = grid % faces_c(1,s)
       grid % faces_c(2,new_f(s)) = grid % faces_c(2,s)
       grid % faces_n_nodes(new_f(s)) = grid % faces_n_nodes(s)
       grid % faces_n(1,new_f(s)) = grid % faces_n(1,s)
@@ -858,13 +862,13 @@
       grid % dy(new_f(s)) = grid % dy(s)
       grid % dz(new_f(s)) = grid % dz(s)
     end if
-  end do 
+  end do
   grid % n_faces = number_sides-grid % n_sh
 
   !-----------------------------------!
   !   Check the periodic boundaries   !
   !-----------------------------------!
-  max_dis = 0.0 
+  max_dis = 0.0
   do s = 1, grid % n_faces-grid % n_sh
     max_dis = max(max_dis, (  grid % dx(s)*grid % dx(s)  &
                             + grid % dy(s)*grid % dy(s)  &
@@ -882,7 +886,7 @@
   !----------------------------------!
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)   
+    c2 = grid % faces_c(2,s)
 
     grid % vol(c1) = grid % vol(c1)               &
                    + grid % xf(s) * grid % sx(s)  &
@@ -915,8 +919,8 @@
     print *, '# Negative volume occured! Slower, algoritham should be run !'
     print *, '# Execution will halt now! '
     stop
-  end if 
- 
+  end if
+
   deallocate(b_coor)
   deallocate(b_face)
 
@@ -927,7 +931,7 @@
   !     <= gives:      delta                 !
   !------------------------------------------!
   do c = 1, grid % n_cells
-    grid % delta(c)=0.0
+    grid % delta(c) = 0.0
     xmin = +HUGE
     ymin = +HUGE
     zmin = +HUGE
@@ -967,7 +971,7 @@
   do b = 1, n_wall_colors
     read(line % tokens(b), *) wall_colors(b)
   end do
- 
+
   if( (n_wall_colors .eq. 1) .and. (wall_colors(1) .eq. 0) ) then
     grid % wall_dist = 1.0
     print *, '# Distance to the wall set to 1.0 everywhere !'
@@ -978,9 +982,9 @@
                                    ' % complete...'
       endif
       do b = 1, n_wall_colors
-        do c2=-1,-grid % n_bnd_cells,-1
+        do c2 = -1, -grid % n_bnd_cells, -1
           if(grid % bnd_cond % color(c2) .eq. wall_colors(b)) then
-            grid % wall_dist(c1)=min(grid % wall_dist(c1),                                      &
+            grid % wall_dist(c1) = min(grid % wall_dist(c1),                &
             Distance_Squared(grid % xc(c1), grid % yc(c1), grid % zc(c1),   &
                              grid % xc(c2), grid % yc(c2), grid % zc(c2)))
           end if
@@ -1017,7 +1021,7 @@
 
     ! Interpolation factor
     grid % f(s) = dsc2 / (dsc1 + dsc2)
-  end do 
+  end do
 
   print *, '# Interpolation factors calculated !'
 

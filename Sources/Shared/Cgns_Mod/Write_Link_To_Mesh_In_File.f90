@@ -11,14 +11,14 @@
   character(len=*) :: input_name
   integer          :: base, block
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: base_id        ! base index number
-  integer           :: block_id       ! block index number
-  integer           :: sect_id
-  character(len=80) :: file     ! name of the FlowSolution_t node
-  character(len=80) :: base_name          ! name of the block
-  character(len=80) :: block_name          ! name of the block
+  integer           :: base_id      ! base index number
+  integer           :: block_id     ! block index number
+  integer           :: sect_id      ! section id
+  character(len=80) :: file         ! name of the file to be linked with
+  character(len=80) :: base_name    ! name of the base
+  character(len=80) :: block_name   ! name of the block
   character(len=80) :: name_in_file
-  character(len=80) :: nodename
+  character(len=80) :: node_name
   integer           :: cnt
   integer           :: error
 !==============================================================================!
@@ -53,12 +53,12 @@
   !                       !
   !-----------------------!
 
-  nodename = "GridCoordinates"
+  node_name = "GridCoordinates"
   name_in_file = "/"//trim(base_name)//"/"&
-    //trim(block_name)//"/"//trim(nodename)
+    //trim(block_name)//"/"//trim(node_name)
 
-  ! Create a link in 'file' to 'name_in_file' and name it 'nodename'
-  call Cg_Link_Write_F(trim(nodename),      & ! (in )
+  ! Create a link in 'file' to 'name_in_file' and name it 'node_name'
+  call Cg_Link_Write_F(trim(node_name),     & ! (in )
                        trim(file),          & ! (in )
                        trim(name_in_file),  & ! (in )
                        error)                 ! (out)
@@ -87,13 +87,13 @@
     if (sect_id.eq.4) cnt = cnt_tet
 
     ! if section is not empty
-    if (cnt.ne.0) then
-      nodename = cgns_base(base_id)%block(block_id)%section(sect_id)%name
+    if (cnt .ne. 0) then
+      node_name = cgns_base(base_id) % block(block_id) % section(sect_id) % name
       name_in_file = "/"//trim(base_name)//"/" &
-        //trim(block_name)//"/"//trim(nodename)
+        //trim(block_name)//"/"//trim(node_name)
 
-      ! Create a link in 'file' to 'name_in_file' and name it 'nodename'
-      call Cg_Link_Write_F(trim(nodename),      & ! (in )
+      ! Create a link in 'file' to 'name_in_file' and name it 'node_name'
+      call Cg_Link_Write_F(trim(node_name),      & ! (in )
                            trim(file),          & ! (in )
                            trim(name_in_file),  & ! (in )
                            error)                 ! (out)

@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Cgns_Mod_Read_Number_Of_Bnd_Conds_In_Block(base, block)
 !------------------------------------------------------------------------------!
-!   Opens name_in file and return file index                                   !
+!   Reads n_bnd_conds from for block file                                      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -18,11 +18,12 @@
   block_id = block
 
   ! Get number of boundary condition in block
-  call Cg_Nbocos_F(file_id,      &
-                   base_id,      &
-                   block_id,     &
-                   n_bnd_conds,  &
-                   error)   
+  call Cg_Nbocos_F(file_id,      & !(in )
+                   base_id,      & !(in )
+                   block_id,     & !(in )
+                   n_bnd_conds,  & !(out)
+                   error)          !(out)
+
   if (error.ne.0) then
     print *,"# Failed to obtain number of boundary conditions"
     call Cg_Error_Exit_F()
@@ -35,7 +36,7 @@
     print *, "#     Number of boundary conditions in the block:  ",  &
              cgns_base(base) % block(block) % n_bnd_conds
   end if
- 
+
   allocate( cgns_base(base) % block(block) % bnd_cond(n_bnd_conds) )
 
   end subroutine

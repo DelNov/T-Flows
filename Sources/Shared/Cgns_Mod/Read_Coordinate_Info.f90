@@ -9,8 +9,8 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: base_id          ! base index number
   integer           :: block_id         ! block index number
-  integer           :: coord_id            
-  integer           :: coord_data_type     
+  integer           :: coord_id
+  integer           :: coord_data_type
   character(len=80) :: coord_name
   integer           :: error            ! error status
 !==============================================================================!
@@ -19,15 +19,15 @@
   base_id  = base
   block_id = block
   coord_id = coord
- 
+
   ! Get info about coordinate coord_id
-  call Cg_Coord_Info_F(file_id,          &
-                       base_id,          &
-                       block_id,         &
-                       coord_id,         &
-                       coord_data_type,  &
-                       coord_name,       &
-                       error)             
+  call Cg_Coord_Info_F(file_id,          & !(in )
+                       base_id,          & !(in )
+                       block_id,         & !(in )
+                       coord_id,         & !(in )
+                       coord_data_type,  & !(out)
+                       coord_name,       & !(out)
+                       error)              !(out)
   if (error .ne. 0) then
     print *, "# Failed to get info in for coord_id"
     call Cg_Error_Exit_F()

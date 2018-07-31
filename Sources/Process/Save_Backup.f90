@@ -24,7 +24,7 @@
 
   problem_name = name_save
 
-  ! Name backup file 
+  ! Name backup file
   call Name_File(0, name_out, '.backup')
 
   ! Open backup file
@@ -38,7 +38,7 @@
 
   !-----------------------------------------------------------------------!
   !   Save cell-centre coordinates.  Could be useful for interpolations   !
-  !-----------------------------------------------------------------------! 
+  !-----------------------------------------------------------------------!
   call Write_Backup_Cell_Bnd(fh, d, 'x_coordinates', grid % xc(-nb_s:nc_s))
   call Write_Backup_Cell_Bnd(fh, d, 'y_coordinates', grid % yc(-nb_s:nc_s))
   call Write_Backup_Cell_Bnd(fh, d, 'z_coordinates', grid % zc(-nb_s:nc_s))
@@ -47,7 +47,7 @@
   !               !
   !   Save data   !
   !               !
-  !---------------! 
+  !---------------!
 
   ! Time step
   call Write_Backup_Int(fh, d, 'time_step', time_step)
@@ -138,13 +138,13 @@
     call Write_Backup_Cell    (fh, d, 'tau_wall', tau_wall  (1:nc_s))
     call Write_Backup_Cell_Bnd(fh, d, 't_scale',  t_scale(-nb_s:nc_s))
     call Write_Backup_Cell_Bnd(fh, d, 'l_scale',  l_scale(-nb_s:nc_s))
-  end if 
+  end if
 
   !----------------------------!
   !   Reynolds stress models   !
   !----------------------------!
-  if(turbulence_model .eq. REYNOLDS_STRESS .or.  &                          
-     turbulence_model .eq. HANJALIC_JAKIRLIC) then                          
+  if(turbulence_model .eq. REYNOLDS_STRESS .or.  &
+     turbulence_model .eq. HANJALIC_JAKIRLIC) then
 
     ! Reynolds stresses
     call Write_Backup_Variable(fh, d, 'uu',  uu)
@@ -163,7 +163,7 @@
     end if
 
     ! Other turbulent quantities ?
-  end if 
+  end if
 
   !-----------------------------------------!
   !                                         !
@@ -203,4 +203,3 @@
   problem_name = store_name
 
   end subroutine
-

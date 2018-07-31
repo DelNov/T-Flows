@@ -16,7 +16,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
   integer         :: time_step
-  logical         :: restart 
+  logical         :: restart, present
 !-----------------------------------[Locals]-----------------------------------!
   character(len=80) :: name_in, answer
   integer           :: fh, d
@@ -29,7 +29,15 @@
   call To_Upper_Case(answer)
   if(answer .eq. 'SKIP') then
     restart = .false.
-    return 
+    return
+  end if
+
+  inquire(file=trim(name_in), exist=present )
+  if(.not.present) then
+    if(this_proc < 2) then
+      print *, "# Backup file ", trim(name_in)," was not found.  Exiting!"
+    end if
+    stop
   end if
 
   ! Open backup file
@@ -43,7 +51,7 @@
 
   !-----------------------------------------------!
   !   Skip three coordinates for the time being   !
-  !-----------------------------------------------! 
+  !-----------------------------------------------!
   ! call Read_Backup_3_Cell_Bnd(fh, d, 'coordinates',   &
   !                             grid % xc(-nb_s:nc_s),  &
   !                             grid % yc(-nb_s:nc_s),  &
@@ -53,7 +61,7 @@
   !               !
   !   Load data   !
   !               !
-  !---------------! 
+  !---------------!
 
   ! Time step
   call Read_Backup_Int(fh, d, 'time_step', time_step)
@@ -142,13 +150,13 @@
     call Read_Backup_Cell    (fh, d, 'tau_wall', tau_wall  (1:nc_s)  )
     call Read_Backup_Cell_Bnd(fh, d, 't_scale',  t_scale (-nb_s:nc_s))
     call Read_Backup_Cell_Bnd(fh, d, 'l_scale',  l_scale (-nb_s:nc_s))
-  end if 
+  end if
 
   !----------------------------!
   !   Reynolds stress models   !
   !----------------------------!
-  if(turbulence_model .eq. REYNOLDS_STRESS .or.  &                          
-     turbulence_model .eq. HANJALIC_JAKIRLIC) then                          
+  if(turbulence_model .eq. REYNOLDS_STRESS .or.  &
+     turbulence_model .eq. HANJALIC_JAKIRLIC) then
 
     ! Reynolds stresses
     call Read_Backup_Variable(fh, d, 'uu',  uu)
@@ -162,12 +170,12 @@
     call Read_Backup_Variable(fh, d, 'eps', eps)
 
     ! F22
-    if(turbulence_model .eq. HANJALIC_JAKIRLIC) then
+    if(turbulence_model .eq. REYNOLDS_STRESS) then
       call Read_Backup_Variable(fh, d, 'f22',  f22)
     end if
 
     ! Other turbulent quantities ?
-  end if 
+  end if
 
   !-----------------------------------------!
   !                                         !

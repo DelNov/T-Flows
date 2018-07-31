@@ -31,7 +31,7 @@
   integer           :: n_points, k
   real, allocatable :: prof(:,:), x(:), y(:), z(:), dist(:)
 
-  ! Default values for initial conditions 
+  ! Default values for initial conditions
   real, parameter   :: u_def   = 0.0,  v_def   = 0.0,  w_def    = 0.0
   real, parameter   :: t_def   = 0.0
   real, parameter   :: kin_def = 0.0,  eps_def = 0.0,  f22_def  = 0.0
@@ -99,7 +99,7 @@
       ! A plane is defined
       if (keys(1) .eq. 'X' .and. keys(2) .eq. 'Y' .or.  &
           keys(1) .eq. 'X' .and. keys(2) .eq. 'Z' .or.  &
-          keys(1) .eq. 'Y' .and. keys(2) .eq. 'Z') then    
+          keys(1) .eq. 'Y' .and. keys(2) .eq. 'Z') then
 
         ! Set the closest point
         do c = 1, grid % n_cells
@@ -144,16 +144,19 @@
             i=Key_Ind('VIS',keys,nks); prof(k,0)=vis_def; vis%n(c)=prof(k,i)
           end if
 
-          if(turbulence_model .eq. REYNOLDS_STRESS) then
+          if(turbulence_model .eq. REYNOLDS_STRESS .or. &
+             turbulence_model .eq. HANJALIC_JAKIRLIC) then
             i=Key_Ind('UU', keys,nks);prof(k,0)=uu_def; uu %n(c)=prof(k,i)
             i=Key_Ind('VV', keys,nks);prof(k,0)=vv_def; vv %n(c)=prof(k,i)
             i=Key_Ind('WW', keys,nks);prof(k,0)=ww_def; ww %n(c)=prof(k,i)
             i=Key_Ind('UV', keys,nks);prof(k,0)=uv_def; uv %n(c)=prof(k,i)
             i=Key_Ind('UW', keys,nks);prof(k,0)=uw_def; uw %n(c)=prof(k,i)
             i=Key_Ind('VW', keys,nks);prof(k,0)=vw_def; vw %n(c)=prof(k,i)
-            i=Key_Ind('F22',keys,nks);prof(k,0)=f22_def;f22%n(c)=prof(k,i)
             i=Key_Ind('EPS',keys,nks);prof(k,0)=eps_def;eps%n(c)=prof(k,i)
-          end if        
+            if (turbulence_model .eq. REYNOLDS_STRESS) then
+              i=Key_Ind('F22',keys,nks);prof(k,0)=f22_def;f22%n(c)=prof(k,i)
+            end if
+          end if
 
         end do ! c = 1, grid % n_cells
 
@@ -186,15 +189,15 @@
       ! Check validity of the input
       if(nks .eq. 0 .or. nvs .eq. 0 .and. this_proc < 2) then
         print '(2a)', '# Critical, for initial condition: ',        &
-                      ' no values or variables have been provided' 
+                      ' no values or variables have been provided'
         stop
       end if
       if(nks .ne. nvs .and. this_proc < 2) then
         print '(2a)', '# Critical for initial conditions, number of values ',  &
-                      ' is not the same as number of provided variable names' 
+                      ' is not the same as number of provided variable names'
         stop
       end if
-   
+
       ! Input is valid, turn keys to upper case
       do i = 1, nks
         call To_Upper_Case(keys(i))
@@ -225,7 +228,7 @@
             t % o(c)  = t % n(c)
             t % oo(c) = t % n(c)
             t_inf     = t % n(c)
-          end if 
+          end if
 
           if(turbulence_model .eq. REYNOLDS_STRESS .or.  &
              turbulence_model .eq. HANJALIC_JAKIRLIC) then
@@ -254,7 +257,7 @@
               f22 % oo(c) = f22 % n(c)
             end if
           end if
-    
+
         if(turbulence_model .eq. K_EPS) then
             vals(0) = kin_def; kin % n(c) = vals(Key_Ind('KIN', keys, nks))
             vals(0) = eps_def; eps % n(c) = vals(Key_Ind('EPS', keys, nks))
@@ -265,7 +268,7 @@
             u_tau(c)  = 0.047
             y_plus(c) = 30.0
           end if
-    
+
           if(turbulence_model .eq. K_EPS_ZETA_F) then
             vals(0) = kin_def;  kin  % n(c) = vals(Key_Ind('KIN',  keys, nks))
             vals(0) = eps_def;  eps  % n(c) = vals(Key_Ind('EPS',  keys, nks))
@@ -282,9 +285,9 @@
             u_tau(c)  = 0.047
             y_plus(c) = 30.0
           end if
-    
+
           if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
-             turbulence_model .eq. DES_SPALART) then      
+             turbulence_model .eq. DES_SPALART) then
             vals(0) = vis_def; vis % n(c) = vals(Key_Ind('VIS', keys, nks))
             vis % o(c)  = vis % n(c)
             vis % oo(c) = vis % n(c)
@@ -301,7 +304,7 @@
 
   !---------------------------------!
   !      Calculate the inflow       !
-  !   and initializes the flux(s)   ! 
+  !   and initializes the flux(s)   !
   !   at both inflow and outflow    !
   !---------------------------------!
   n_wall        = 0
@@ -315,31 +318,31 @@
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
-      if(c2  < 0) then 
+      if(c2  < 0) then
         flux(s) = density*( u % n(c2) * grid % sx(s) + &
                             v % n(c2) * grid % sy(s) + &
                             w % n(c2) * grid % sz(s) )
-                                       
+
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
           if(grid % material(c1) .eq. m) then
-            bulk(m) % mass_in = bulk(m) % mass_in - flux(s) 
+            bulk(m) % mass_in = bulk(m) % mass_in - flux(s)
           end if
           area = area  + grid % s(s)
         endif
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL)      &
-          n_wall        = n_wall        + 1 
+          n_wall        = n_wall        + 1
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW)    &
-          n_inflow      = n_inflow      + 1  
+          n_inflow      = n_inflow      + 1
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW)   &
-          n_outflow     = n_outflow     + 1 
+          n_outflow     = n_outflow     + 1
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. SYMMETRY)  &
-          n_symmetry    = n_symmetry    + 1 
+          n_symmetry    = n_symmetry    + 1
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL)    &
-          n_heated_wall = n_heated_wall + 1 
+          n_heated_wall = n_heated_wall + 1
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT)   &
-          n_convect     = n_convect     + 1 
+          n_convect     = n_convect     + 1
       else
-        flux(s) = 0.0 
+        flux(s) = 0.0
       end if
     end do
     call Comm_Mod_Global_Sum_Int(n_wall)
@@ -350,10 +353,10 @@
     call Comm_Mod_Global_Sum_Int(n_convect)
     call Comm_Mod_Global_Sum_Real(bulk(m) % mass_in)
     call Comm_Mod_Global_Sum_Real(area)
-  end do                  
+  end do
 
   !----------------------!
-  !   Initializes time   ! 
+  !   Initializes time   !
   !----------------------!
   if(this_proc  < 2) then
     if(n_inflow .gt. 0) then

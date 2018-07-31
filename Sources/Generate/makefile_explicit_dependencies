@@ -323,6 +323,12 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 
 #-- ./Swap_Real.f90
 #-- ./To_Upper_Case.f90
+#-- ./Cgns_Mod/Write_Link_To_Field.f90
+$(DIR_OBJECT)/Write_Link_To_Field.o:\
+$(DIR_SHARED)/Comm_Mod_Seq.f90 \
+$(DIR_SHARED)/Comm_Mod_Par.f90 \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 
+
 #-- ./Cgns_Mod/Read_Base_Info.f90
 #-- ./Cgns_Mod/Write_Dimensions_Info.f90
 #-- ./Cgns_Mod/Read_Bnd_Conds_Info.f90
@@ -385,6 +391,11 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 
 #-- ./Cgns_Mod/Read_Number_Of_Element_Sections.f90
 #-- ./Cgns_Mod/Read_Section_Info.f90
+#-- ./Cgns_Mod/Merge_Nodes_Old.f90
+$(DIR_OBJECT)/Merge_Nodes_Old.o:\
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 
+
 #-- ./Cgns_Mod/Initialize_Counters.f90
 #-- ./Cgns_Mod/Read_Number_Of_Blocks_In_Base.f90
 #-- ./Cgns_Mod/Read_Block_Type.f90
@@ -406,12 +417,12 @@ $(DIR_OBJECT)/Read_Section_Connections.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
-#-- ./Cgns_Mod/Merge_Nodes.f90
-$(DIR_OBJECT)/Merge_Nodes.o:\
+#-- ./Cgns_Mod/Read_Number_Of_Bnd_Conds_In_Block.f90
+#-- ./Cgns_Mod/Merge_Nodes_New.f90
+$(DIR_OBJECT)/Merge_Nodes_New.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
-#-- ./Cgns_Mod/Read_Number_Of_Bnd_Conds_In_Block.f90
 #-- ./Cgns_Mod/Read_Grid_Location.f90
 #-- ./Cgns_Mod/Read_Number_Of_Coordinates_In_Block.f90
 #-- ./Cgns_Mod/Sequential/Write_Block_Info.f90
@@ -517,6 +528,7 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 
 #-- ./Sort_Real_By_Index.f90
 #-- ./Sort_Short_Carry_Short.f90
+#-- ./Sort_Real_Carry_Int_Heapsort.f90
 #-- ./Save_Cns_Geo.f90
 $(DIR_OBJECT)/Save_Cns_Geo.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
