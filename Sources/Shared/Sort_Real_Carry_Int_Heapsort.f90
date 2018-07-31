@@ -33,7 +33,7 @@
     subroutine Sift_Down(a, start, bottom)
   !----------------------------------------------------------------------------!
   !--------------------------------[Arguments]---------------------------------!
-    real, intent(in out) :: a(1:)
+    real, intent(in out) :: a(:)
     integer, intent(in)  :: start, bottom
   !----------------------------------[Locals]----------------------------------!
     integer              :: child, root
