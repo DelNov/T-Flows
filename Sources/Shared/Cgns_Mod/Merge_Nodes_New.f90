@@ -13,7 +13,7 @@
 !------------------------------------------------------------------------------!
   include "../Shared/Approx.int"
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: c, n, i, m, k, v, cnt_node, min, max, target
+  integer              :: c, n, i, m, k, v, cnt_node, min, max
   real,    allocatable :: criterion(:) ! sorting criterion
   integer, allocatable :: old_seq(:), new_seq(:)
   real,    allocatable :: x_new(:), y_new(:), z_new(:)
@@ -39,7 +39,7 @@
     criterion(n) = grid % xn(n) + grid % yn(n) * BIG + grid % zn(n) * BIG ** 2
     old_seq(n) = n
   end do
-  new_seq = old_seq
+  new_seq(:) = old_seq(:)
 
   !----------------------------------------------------------------------------!
   !   Original block structure with duplicate nodes:                           !
