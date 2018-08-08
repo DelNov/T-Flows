@@ -782,20 +782,10 @@ $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Flow_Mod.o 
 
-#-- ./User_Mod/.Backstep_Profiles.f90
-$(DIR_OBJECT)/.Backstep_Profiles.o:\
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Name_Mod.o \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Flow_Mod.o \
-$(DIR_OBJECT)/Const_Mod.o \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
 #-- ./User_Mod/Save_Results.f90
 $(DIR_OBJECT)/Save_Results.o:\
+$(DIR_OBJECT)/Var_Mod.o \
+Var_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
@@ -840,18 +830,6 @@ $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
 
-#-- ./User_Mod/.Backstep_Cf_St.f90
-$(DIR_OBJECT)/.Backstep_Cf_St.o:\
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Name_Mod.o \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Flow_Mod.o \
-$(DIR_OBJECT)/Const_Mod.o \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
 #-- ./User_Mod/End_Of_Time_Step.f90
 $(DIR_OBJECT)/End_Of_Time_Step.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
@@ -870,18 +848,6 @@ Var_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
-#-- ./User_Mod/Backstep_Profiles.f90
-$(DIR_OBJECT)/Backstep_Profiles.o:\
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Name_Mod.o \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Flow_Mod.o \
-$(DIR_OBJECT)/Const_Mod.o \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
 #-- ./User_Mod/Source.f90
 $(DIR_OBJECT)/Source.o:\
 $(DIR_OBJECT)/Var_Mod.o \
@@ -896,29 +862,12 @@ $(DIR_OBJECT)/Initialize.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
-#-- ./User_Mod/Backstep_Cf_St.f90
-$(DIR_OBJECT)/Backstep_Cf_St.o:\
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Name_Mod.o \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Flow_Mod.o \
-$(DIR_OBJECT)/Const_Mod.o \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
 #-- ./User_Mod/Force.f90
 $(DIR_OBJECT)/Force.o:\
 $(DIR_OBJECT)/Var_Mod.o \
 Var_Mod/*.f90 \
 $(DIR_OBJECT)/Matrix_Mod.o \
 Matrix_Mod/*.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#-- ./User_Mod/.Save_Results.f90
-$(DIR_OBJECT)/.Save_Results.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
@@ -1455,18 +1404,6 @@ $(DIR_OBJECT)/Constants_Reynolds_Stress.o:\
 $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 
-
-#-- ./Turbulence/Source_Hanjalic_Jakirlic_2007.f90
-$(DIR_OBJECT)/Source_Hanjalic_Jakirlic_2007.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Grad_Mod.o \
-Grad_Mod/*.f90 \
-$(DIR_OBJECT)/Flow_Mod.o \
-$(DIR_OBJECT)/Const_Mod.o 
 
 #-- ./Turbulence/Source_F22_Ebm.f90
 $(DIR_OBJECT)/Source_F22_Ebm.o:\
