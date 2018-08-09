@@ -476,7 +476,7 @@
     end do
     tol = SMALL
 
-10 continue
+3   continue
 
     nnn = 0
     hh = 0
@@ -614,7 +614,7 @@
       continue
     else
       tol = tol*0.5
-      goto 10
+      goto 3  
     end if
 
     deallocate(phi_face)
