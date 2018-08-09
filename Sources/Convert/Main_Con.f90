@@ -99,9 +99,6 @@
                       grid % n_bnd_cells,  &
                       0)
 
-  ! I believe these are needed for Fluent only
-  call Save_Shadows(grid, 0)
-
   ! Create 1D file (used for channel or pipe flow)
   call Probe_1D_Nodes(grid)
 
