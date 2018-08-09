@@ -143,7 +143,6 @@ SRC_FUN = Approx.f90      \
           Save_Vtu_Cells.f90    \
           Save_Vtu_Faces.f90    \
           Save_Vtu_Links.f90    \
-          Save_Shadows.f90    \
           Sort_Real_Carry_Int.f90 \
           Sort_Real_Carry_Int_Heapsort.f90  \
           Sort2.f90     \
