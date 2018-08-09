@@ -1,0 +1,14 @@
+Case which demonstrates how infitintelly thin plate can be used in simulations.
+
+The directory contains two cases:
+
+with_plate
+
+without_plate
+
+The computational domain is the same in both cases except that one is with
+and one withut plate (names clearly say which is which)
+
+Pointwise glyph scripts are included for both cases, so that one can see
+what is the difference between them.  Important to note is that plate, when
+present, has to be defined for both blocks around it.

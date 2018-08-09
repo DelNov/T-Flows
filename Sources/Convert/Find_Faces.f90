@@ -148,6 +148,6 @@
     end if
   end do    ! do n3
 
-  print '(a38,i7)', '# Number of faces:                   ', grid % n_faces
+  print '(a38,i9)', '# Number of faces:                   ', grid % n_faces
 
   end subroutine

@@ -123,6 +123,6 @@
     end do
   end do
 
-  print '(a38,i7)', '# Number of boundary cells:          ', grid % n_bnd_cells
+  print '(a38,i9)', '# Number of boundary cells:          ', grid % n_bnd_cells
 
   end subroutine

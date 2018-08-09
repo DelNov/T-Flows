@@ -26,7 +26,6 @@
     integer :: n_materials  ! ... materials
     integer :: n_bnd_cond   ! ... boundary conditions
     integer :: n_copy       ! ... copy cells and faces
-    integer :: n_sh         ! ... shadow faces           
 
     !-------------------------!
     !  Cell-based variables   !
@@ -106,6 +105,7 @@
   include 'Grid_Mod/Allocate_Faces.f90'
   include 'Grid_Mod/Allocate_Nodes.f90'
   include 'Grid_Mod/Bnd_Cond_Type.f90'
+  include 'Grid_Mod/Estimate_Big_And_Small.f90'
   include 'Grid_Mod/Print_Bnd_Cond_Info.f90'
   include 'Grid_Mod/Sort_Cells_By_Index.f90'
   include 'Grid_Mod/Sort_Faces_By_Index.f90'

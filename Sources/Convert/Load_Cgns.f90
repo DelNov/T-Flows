@@ -199,11 +199,11 @@
     end do ! blocks
   end do ! bases
 
-  print *, '# Total number of nodes:  ',            cnt_nodes
-  print *, '# Total number of cells:  ',            cnt_cells
-  print *, '# Total number of blocks: ',            cnt_blocks
-  print *, '# Total number of boundary sections: ', grid % n_bnd_cond
-  print *, '# Total number of boundary cells:    ', grid % n_bnd_cells
+  print '(a38,i9)', ' # Total number of nodes:             ', cnt_nodes
+  print '(a38,i9)', ' # Total number of cells:             ', cnt_cells
+  print '(a38,i9)', ' # Total number of blocks:            ', cnt_blocks
+  print '(a38,i9)', ' # Total number of boundary sections: ', grid % n_bnd_cond
+  print '(a38,i9)', ' # Total number of boundary cells:    ', grid % n_bnd_cells
 
   !---------------------!
   !   Merge the nodes   !
@@ -258,7 +258,7 @@
       end do ! elements sections
     end do ! blocks
   end do ! bases
-  print *, '# - number of corrected hex boundary cells:', cnt_bnd_cells
+  print '(a38,i9)', ' # Corrected hex boundary cells:      ', cnt_bnd_cells
 
   call Grid_Mod_Print_Bnd_Cond_List(grid)
 

@@ -33,7 +33,6 @@
   call Load_Cns           (grid, 0)
   call Allocate_Additional(grid)
   call Load_Geo           (grid, 0)
-  call Load_Shadow_Faces  (grid)
 
   ! Initialize processor numbers
   do c = 1, grid % n_cells
@@ -112,7 +111,6 @@
   call Create_Buffers_And_Save(grid)
 
   call Save_Com
-  call Save_Scripts
   
   call cpu_time(finish)
   print '(a10,f14.3,a9)', ' # Time = ', finish-start, ' seconds.'

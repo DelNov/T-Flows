@@ -19,8 +19,7 @@
   real :: Distance_Squared
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, c1, c2, n, s, ss, cc2, c_max, nnn, hh, mm, b
-  integer              :: c11, c12, c21, c22, s1, s2, bou_cen, count
-  integer              :: new_face_1, new_face_2
+  integer              :: c11, c12, c21, c22, s1, s2, bou_cen, cnt_bnd, cnt_per
   integer              :: color_per, n_per, number_sides, dir, option
   integer              :: rot_dir, n_wall_colors
   real                 :: xt(4), yt(4), zt(4), angle_face, tol
@@ -37,8 +36,7 @@
   integer, allocatable :: b_face(:), face_copy(:)
   integer, allocatable :: wall_colors(:)
   character(len=80)    :: answer
-  real,    parameter   :: BIG   = 104651.    ! prime number
-  real,    parameter   :: SMALL = 1.0e-6     ! initial precision
+  real                 :: big, small
 !==============================================================================!
 !
 !                                n3
@@ -119,6 +117,9 @@
 !                           rx*Sx + ry*Sy + rz*Sz
 !
 !------------------------------------------------------------------------------!
+
+  ! Estimate big and small
+  call Grid_Mod_Estimate_Big_And_Small(grid, big, small)
 
   !-----------------------------------------!
   !   Calculate the cell centers            !
@@ -433,7 +434,7 @@
   b_coor = 0.
   b_face = 0
 
-  c = 0
+  cnt_per = 0
 
   !-----------------!
   !   No rotation   !
@@ -443,22 +444,22 @@
       c2 = grid % faces_c(2,s)
       if(c2 < 0) then
         if(grid % bnd_cond % color(c2) .eq. color_per) then
-          c = c + 1
-          if(dir .eq. 1) b_coor(c) = grid % xf(s)*BIG     &
-                                   + grid % yf(s)*BIG**2  &
-                                   + grid % zf(s)
-          if(dir .eq. 2) b_coor(c) = grid % yf(s)*BIG     &
-                                   + grid % xf(s)*BIG**2  &
-                                   + grid % zf(s)
-          if(dir .eq. 3) b_coor(c) = grid % zf(s)*BIG     &
-                                   + grid % xf(s)*BIG**2  &
-                                   + grid % yf(s)
-          b_face(c) = s
+          cnt_per = cnt_per + 1
+          if(dir .eq. 1) b_coor(cnt_per) = grid % xf(s)*big**2  &
+                                         + grid % yf(s)*big     &
+                                         + grid % zf(s)
+          if(dir .eq. 2) b_coor(cnt_per) = grid % xf(s)         &
+                                         + grid % yf(s)*big**2  &
+                                         + grid % zf(s)*big
+          if(dir .eq. 3) b_coor(cnt_per) = grid % xf(s)*big     &
+                                         + grid % yf(s)         &
+                                         + grid % zf(s)*big**2
+          b_face(cnt_per) = s
         end if
       end if
     end do
-    !call Sort_Real_Carry_Int(b_coor, b_face, c, 2)
-    call Sort_Real_Carry_Int_Heapsort(b_coor, b_face, c)
+    !call Sort_Real_Carry_Int(b_coor, b_face, cnt_per, 2)
+    call Sort_Real_Carry_Int_Heapsort(b_coor, b_face, cnt_per)
   end if
 
   !-------------------!
@@ -476,12 +477,12 @@
     end do
     tol = SMALL
 
-10 continue
+3   continue
 
     nnn = 0
     hh = 0
     mm = 0
-    c = 0
+    cnt_per = 0
 
     per_max = -HUGE
     per_min =  HUGE
@@ -506,7 +507,7 @@
       c2 = grid % faces_c(2,s)
       if(c2 < 0) then
         if(grid % bnd_cond % color(c2) .eq. color_per) then
-          c = c + 1
+          cnt_per = cnt_per + 1
           Det = (  p_i*(grid % xf(s))   &
                  + p_j*(grid % yf(s))   &
                  + p_k*(grid % zf(s)))  &
@@ -614,7 +615,7 @@
       continue
     else
       tol = tol*0.5
-      goto 10
+      goto 3  
     end if
 
     deallocate(phi_face)
@@ -622,13 +623,13 @@
     deallocate(yspr)
     deallocate(zspr)
 
-    !call Sort_Real_Carry_Int(b_coor, b_face, c, 2)
-    call Sort_Real_Carry_Int_Heapsort(b_coor, b_face, c)
+    !call Sort_Real_Carry_Int(b_coor, b_face, cnt_per, 2)
+    call Sort_Real_Carry_Int_Heapsort(b_coor, b_face, cnt_per)
   end if  ! for option .eq. 2
 
-  do s = 1, c/2
+  do s = 1, cnt_per/2
     s1 = b_face(s)
-    s2 = b_face(s+c/2)
+    s2 = b_face(s+cnt_per/2)
     c11 = grid % faces_c(1,s1)  ! cell 1 for side 1
     c21 = grid % faces_c(2,s1)  ! cell 2 for cell 1
     c12 = grid % faces_c(1,s2)  ! cell 1 for side 2
@@ -639,18 +640,18 @@
     grid % faces_c(2,s2) = 0    ! c21
   end do
 
-  n_per = c/2
+  n_per = cnt_per/2
   print *, '# Phase I: periodic cells: ', n_per
 
   !---------------------------------!
   !   Compress all boundary cells   !
   !---------------------------------!
-  count = 0
+  cnt_bnd = 0
   new_c = 0
   do c = -1, -grid % n_bnd_cells, -1
     if(grid % bnd_cond % color(c) .ne. color_per) then
-      count = count + 1
-      new_c(c) = -count
+      cnt_bnd = cnt_bnd + 1
+      new_c(c) = -cnt_bnd
     end if
   end do
 
@@ -671,7 +672,7 @@
     end if
   end do
 
-  grid % n_bnd_cells = count
+  grid % n_bnd_cells = cnt_bnd
 
   !--------------------------------------------------------------------!
   !   Remove boundary condition with color_per and compress the rest   !
@@ -714,7 +715,7 @@
   !                                                    !
   !----------------------------------------------------!
 1 continue
-  grid % n_sh = 0
+  n_per = 0
   do s = 1, grid % n_faces
 
     ! Initialize
@@ -731,7 +732,7 @@
            grid % sy(s) * (grid % yc(c2)-grid % yc(c1) )+                  &
            grid % sz(s) * (grid % zc(c2)-grid % zc(c1) )) < 0.0 ) then
 
-        grid % n_sh = grid % n_sh + 2
+        n_per = n_per + 1
 
         ! Find the coordinates of ...
         if(grid % faces_n_nodes(s) .eq. 4) then
@@ -741,69 +742,13 @@
           ys2 = grid % yf(face_copy(s))
           zs2 = grid % zf(face_copy(s))
 
-          ! Add shadow faces
-          new_face_1 = grid % n_faces+grid % n_sh-1
-          new_face_2 = grid % n_faces+grid % n_sh
-          grid % faces_n_nodes(new_face_1) = 4
-          grid % faces_c(1, new_face_1) = c1
-          grid % faces_c(2, new_face_1) = -grid % n_bnd_cells-1
-          grid % faces_n(1, new_face_1) = grid % faces_n(1,s)
-          grid % faces_n(2, new_face_1) = grid % faces_n(2,s)
-          grid % faces_n(3, new_face_1) = grid % faces_n(3,s)
-          grid % faces_n(4, new_face_1) = grid % faces_n(4,s)
-          grid % sx(new_face_1) = grid % sx(s)
-          grid % sy(new_face_1) = grid % sy(s)
-          grid % sz(new_face_1) = grid % sz(s)
-          grid % xf(new_face_1) = grid % xf(s)
-          grid % yf(new_face_1) = grid % yf(s)
-          grid % zf(new_face_1) = grid % zf(s)
-          grid % faces_n_nodes(new_face_2) = 4
-          grid % faces_c(1, new_face_2) = c2
-          grid % faces_c(2, new_face_2) = -grid % n_bnd_cells-1
-          grid % faces_n(1, new_face_2) = grid % faces_n(1,face_copy(s))
-          grid % faces_n(2, new_face_2) = grid % faces_n(2,face_copy(s))
-          grid % faces_n(3, new_face_2) = grid % faces_n(3,face_copy(s))
-          grid % faces_n(4, new_face_2) = grid % faces_n(4,face_copy(s))
-          grid % sx(new_face_2) = grid % sx(s)
-          grid % sy(new_face_2) = grid % sy(s)
-          grid % sz(new_face_2) = grid % sz(s)
-          grid % xf(new_face_2) = xs2
-          grid % yf(new_face_2) = ys2
-          grid % zf(new_face_2) = zs2
         else if(grid % faces_n_nodes(s) .eq. 3) then
 
           ! Coordinates of the shadow face
-          xs2=grid % xf(face_copy(s))
-          ys2=grid % yf(face_copy(s))
-          zs2=grid % zf(face_copy(s))
+          xs2 = grid % xf(face_copy(s))
+          ys2 = grid % yf(face_copy(s))
+          zs2 = grid % zf(face_copy(s))
 
-          ! Add shadow faces
-          new_face_1 = grid % n_faces+grid % n_sh-1
-          new_face_2 = grid % n_faces+grid % n_sh
-          grid % faces_n_nodes(new_face_1) = 3
-          grid % faces_c(1, new_face_1) = c1
-          grid % faces_c(2, new_face_1) = -grid % n_bnd_cells-1
-          grid % faces_n(1, new_face_1) = grid % faces_n(1,s)
-          grid % faces_n(2, new_face_1) = grid % faces_n(2,s)
-          grid % faces_n(3, new_face_1) = grid % faces_n(3,s)
-          grid % sx(new_face_1) = grid % sx(s)
-          grid % sy(new_face_1) = grid % sy(s)
-          grid % sz(new_face_1) = grid % sz(s)
-          grid % xf(new_face_1) = grid % xf(s)
-          grid % yf(new_face_1) = grid % yf(s)
-          grid % zf(new_face_1) = grid % zf(s)
-          grid % faces_n_nodes(new_face_2) = 3
-          grid % faces_c(1, new_face_2) = c2
-          grid % faces_c(2, new_face_2) = -grid % n_bnd_cells-1
-          grid % faces_n(1, new_face_2) = grid % faces_n(1,face_copy(s))
-          grid % faces_n(2, new_face_2) = grid % faces_n(2,face_copy(s))
-          grid % faces_n(3, new_face_2) = grid % faces_n(3,face_copy(s))
-          grid % sx(new_face_2) = grid % sx(s)
-          grid % sy(new_face_2) = grid % sy(s)
-          grid % sz(new_face_2) = grid % sz(s)
-          grid % xf(new_face_2) = xs2
-          grid % yf(new_face_2) = ys2
-          grid % zf(new_face_2) = zs2
         end if
 
         grid % dx(s) = grid % xf(s) - xs2  !
@@ -813,7 +758,7 @@
       endif !  S*(c2-c1) < 0.0
     end if  !  c2 > 0
   end do    !  sides
-  print '(a38,i7)', ' # Phase II: number of shadow faces:  ', grid % n_sh
+  print '(a38,i9)', ' # Phase II: number of shadow faces:  ', n_per
 
   deallocate(face_copy)
 
@@ -823,7 +768,7 @@
   !                                                       !
   !-------------------------------------------------------!
   number_sides = 0
-  do s = 1, grid % n_faces+grid % n_sh
+  do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
     if(c1 > 0) then
@@ -833,17 +778,15 @@
       new_f(s) = -1
     end if
   end do
-  write(*,'(A27,I9,Z9)') ' # Old number of sides:      ', &
-                          grid % n_faces, grid % n_faces
-  write(*,'(A27,I9,Z9)') ' # New number of sides:      ', &
-                          number_sides-grid % n_sh,number_sides-grid % n_sh
+  print '(a38,i9)', ' # Old number of faces:               ',  grid % n_faces
+  print '(a38,i9)', ' # New number of faces:               ',  number_sides
 
   !--------------------------------------!
   !                                      !
   !   Phase IV  ->  compress the sides   !
   !                                      !
   !--------------------------------------!
-  do s = 1, grid % n_faces+grid % n_sh
+  do s = 1, grid % n_faces
     if(new_f(s) > 0) then
       grid % faces_c(1,new_f(s)) = grid % faces_c(1,s)
       grid % faces_c(2,new_f(s)) = grid % faces_c(2,s)
@@ -863,18 +806,19 @@
       grid % dz(new_f(s)) = grid % dz(s)
     end if
   end do
-  grid % n_faces = number_sides-grid % n_sh
+  grid % n_faces = number_sides
 
   !-----------------------------------!
   !   Check the periodic boundaries   !
   !-----------------------------------!
   max_dis = 0.0
-  do s = 1, grid % n_faces-grid % n_sh
+  do s = 1, grid % n_faces
     max_dis = max(max_dis, (  grid % dx(s)*grid % dx(s)  &
                             + grid % dy(s)*grid % dy(s)  &
                             + grid % dz(s)*grid % dz(s) ) )
   end do
-  print *, '# Maximal distance of periodic boundary is:', sqrt(max_dis)
+  print '(a45,e12.5)', ' # Maximal distance of periodic boundary is: ',  &
+                       sqrt(max_dis)
 
   !----------------------------------!
   !   Calculate the cell volumes     !
@@ -910,15 +854,15 @@
     min_vol = min(min_vol, grid % vol(c))
     max_vol = max(max_vol, grid % vol(c))
   end do
-  print *, '# Minimal cell volume is: ', min_vol
-  print *, '# Maximal cell volume is: ', max_vol
-  print *, '# Total domain volume is: ', tot_vol
+  print '(a45,es12.5)', ' # Minimal cell volume is:                   ', min_vol
+  print '(a45,es12.5)', ' # Maximal cell volume is:                   ', max_vol
+  print '(a45,es12.5)', ' # Total domain volume is:                   ', tot_vol
   print *, '# Cell volumes calculated !'
 
   if(min_vol < 0.0) then
     print *, '# Negative volume occured! Slower, algoritham should be run !'
     print *, '# Execution will halt now! '
-    stop
+!    stop
   end if
 
   deallocate(b_coor)
