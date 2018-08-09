@@ -26,7 +26,7 @@
 
   print *, '# Merging blocks since they have duplicating nodes '
   print *, '# Hint: Join blocks in mesh builder to avoid any problems'
-  print *, '# Old number of nodes: ', grid % n_nodes
+  print '(a38,i9)', ' # Old number of nodes:               ', grid % n_nodes
 
   ! Allocate memory
   allocate(criterion      (grid % n_nodes));  criterion       = 0.
@@ -186,7 +186,7 @@
     end if
   end do ! n
 
-  print *, '# New number of nodes: ', cnt_node - 1
+  print '(a38,i9)', ' # New number of nodes:               ', cnt_node - 1
 
   !----------------------------------------------------------------------------!
   !   new_seq now became:                                                      !
