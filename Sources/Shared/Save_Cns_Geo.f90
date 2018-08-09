@@ -59,7 +59,6 @@
   write(9) n_cells_sub
   write(9) n_bnd_cells_sub + n_buf_cells_sub 
   write(9) n_faces_sub + n_buf_cells_sub-NCFsub
-  write(9) grid % n_sh  ! not sure how meaningful this is
   write(9) grid % n_materials
   write(9) grid % n_bnd_cond
 
