@@ -121,7 +121,6 @@ SRC_FUN = Approx.f90			\
           Save_Vtu_Cells.f90		\
           Save_Vtu_Faces.f90		\
           Save_Vtu_Links.f90		\
-          Save_Shadows.f90		\
           Sort_Real_Carry_Int.f90	\
           Sort_Int_By_Index.f90		\
           Sort_Real_By_Index.f90	\
@@ -137,11 +136,9 @@ SRC_FUN += Allocate_Additional.f90	\
            Factorize_Number.f90		\
            Inertia.f90			\
            Load_Cns.f90			\
-           Load_Shadow_Faces.f90	\
            Logo_Div.f90			\
            Main_Div.f90			\
            Save_Com.f90			\
-           Save_Scripts.f90		\
            Split_Subdomain.f90
 
 #----------------------------------------------------------------------
