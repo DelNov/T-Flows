@@ -1,7 +1,8 @@
 !==============================================================================!
   subroutine Cgns_Mod_Merge_Nodes_Old(grid)
 !------------------------------------------------------------------------------!
-!  Merges nodes from different blocks                                          !
+!   Merges nodes from different blocks.                                        !
+!------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod
 !------------------------------------------------------------------------------!
@@ -17,8 +18,7 @@
   integer, allocatable :: old_number(:)
   integer, allocatable :: new_number(:)
   integer, allocatable :: compressed(:)
-  real,    parameter   :: BIG   = 1.0e+4  ! 1.0e+4, 1.0e+5, 1.0e+6 was OK
-  real,    parameter   :: SMALL = 1.0e-8  
+  real                 :: big, small
 !==============================================================================!
 
   print *, '# Old number of nodes: ', grid % n_nodes
@@ -32,6 +32,9 @@
   allocate(y_old(grid % n_nodes))
   allocate(z_old(grid % n_nodes))
   
+  ! Estimate big and small
+  call Grid_Mod_Estimate_Big_And_Small(grid, big, small)
+
   !---------------------------!
   !   Store old coordinates   !
   !---------------------------!
@@ -45,7 +48,7 @@
   !   Prescribe some sorting criterion   !
   !--------------------------------------!
   do n = 1, grid % n_nodes
-    criter(n) = grid % xn(n) + grid % yn(n) * BIG + grid % zn(n) * BIG * BIG
+    criter(n) = grid % xn(n) + grid % yn(n) * big + grid % zn(n) * big * big
     old_number(n) = n
   end do
 
