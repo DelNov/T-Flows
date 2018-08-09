@@ -1,11 +1,14 @@
 !==============================================================================!
   subroutine Cgns_Mod_Merge_Nodes_New(grid)
 !------------------------------------------------------------------------------!
-!  Merges blocks by merging common surface without changing structure of node  !
-!  and cells connection  tables                                                !
-!  To do: put this procedure after reading block                               !
+!   Merges blocks by merging common surface without changing structure of      !
+!   node and cells connection  tables                                          !
+!                                                                              !
+!   To do: put this procedure after reading block                              !
+!------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod
+  use Const_Mod, only: HUGE, PI
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -13,13 +16,12 @@
 !------------------------------------------------------------------------------!
   include "../Shared/Approx.int"
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: c, n, i, m, k, v, cnt_node, min, max
+  integer              :: c, n, i, m, k, v, cnt_node, mn, mx
   real,    allocatable :: criterion(:) ! sorting criterion
   integer, allocatable :: old_seq(:), new_seq(:)
   real,    allocatable :: x_new(:), y_new(:), z_new(:)
   logical, allocatable :: nodes_to_remove(:) ! marked duplicated nodes to remove
-  real,    parameter   :: BIG   = 104651.    ! prime number
-  real,    parameter   :: SMALL = 1.e-6      ! precision for sorted criterion
+  real                 :: big, small
 !==============================================================================!
 
   print *, '# Merging blocks since they have duplicating nodes '
@@ -31,6 +33,9 @@
   allocate(old_seq        (grid % n_nodes));  old_seq         = 0
   allocate(new_seq        (grid % n_nodes));  new_seq         = 0
   allocate(nodes_to_remove(grid % n_nodes));  nodes_to_remove = .false.
+
+  ! Estimate big and small
+  call Grid_Mod_Estimate_Big_And_Small(grid, big, small)
 
   !--------------------------------------!
   !   Prescribe some sorting criterion   !
@@ -123,15 +128,15 @@
       end do
       ! [n : m] are duplicated
 
-      min = minval(old_seq(n:m))
-      max = maxval(old_seq(n:m))
+      mn = minval(old_seq(n:m))
+      mx = maxval(old_seq(n:m))
 
       ! Mark node to remove
       do k = n, m
-        if ( old_seq(k) .ne. min ) then
+        if ( old_seq(k) .ne. mn ) then
           nodes_to_remove(old_seq(k)) = .true.
           ! New sequence (stage 1) : substitute duplicated modes unique
-          new_seq(old_seq(k)) = min
+          new_seq(old_seq(k)) = mn
         end if
       end do
 
