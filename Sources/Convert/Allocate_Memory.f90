@@ -16,7 +16,7 @@
   ! =--> carefull: there is no checking!
   call Grid_Mod_Allocate_Nodes(grid, grid % n_nodes) 
   call Grid_Mod_Allocate_Cells(grid, grid % n_cells,   grid % n_bnd_cells) 
-  call Grid_Mod_Allocate_Faces(grid, grid % n_cells*5, 0) 
+  call Grid_Mod_Allocate_Faces(grid, grid % n_cells*5) 
 
   allocate(grid % bnd_cond % color(-grid % n_bnd_cells:-1))
   grid % bnd_cond % color=0
