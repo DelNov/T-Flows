@@ -31,7 +31,10 @@
 
   ! Take big to be largest of all dimensions, times roughly 10 (PI**2)
   big = max(max_x-min_x, max_y-min_y, max_z-min_z) * PI**2
-  
+
+  ! One more correction; it did help in some cases
+  big = max(big, 1e+6)
+
   !-------------------------------------------------!
   !   Try to work out a reasonable "small" number   !
   !-------------------------------------------------!
@@ -50,5 +53,8 @@
 
   ! Make small roughly ten times smaller
   small = small / PI**2
+
+!  ! One more correction; it did help in some cases
+!  small = min(small, 1e-6)
 
   end subroutine
