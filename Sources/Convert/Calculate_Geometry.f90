@@ -19,8 +19,7 @@
   real :: Distance_Squared
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, c1, c2, n, s, ss, cc2, c_max, nnn, hh, mm, b
-  integer              :: c11, c12, c21, c22, s1, s2, bou_cen, count
-  integer              :: new_face_1, new_face_2
+  integer              :: c11, c12, c21, c22, s1, s2, bou_cen, cnt_bnd, cnt_per
   integer              :: color_per, n_per, number_sides, dir, option
   integer              :: rot_dir, n_wall_colors
   real                 :: xt(4), yt(4), zt(4), angle_face, tol
@@ -435,7 +434,7 @@
   b_coor = 0.
   b_face = 0
 
-  c = 0
+  cnt_per = 0
 
   !-----------------!
   !   No rotation   !
@@ -445,22 +444,22 @@
       c2 = grid % faces_c(2,s)
       if(c2 < 0) then
         if(grid % bnd_cond % color(c2) .eq. color_per) then
-          c = c + 1
-          if(dir .eq. 1) b_coor(c) = grid % xf(s)*big     &
-                                   + grid % yf(s)*big**2  &
-                                   + grid % zf(s)
-          if(dir .eq. 2) b_coor(c) = grid % yf(s)*big     &
-                                   + grid % xf(s)*big**2  &
-                                   + grid % zf(s)
-          if(dir .eq. 3) b_coor(c) = grid % zf(s)*big     &
-                                   + grid % xf(s)*big**2  &
-                                   + grid % yf(s)
-          b_face(c) = s
+          cnt_per = cnt_per + 1
+          if(dir .eq. 1) b_coor(cnt_per) = grid % xf(s)*big**2  &
+                                         + grid % yf(s)*big     &
+                                         + grid % zf(s)
+          if(dir .eq. 2) b_coor(cnt_per) = grid % xf(s)         &
+                                         + grid % yf(s)*big**2  &
+                                         + grid % zf(s)*big
+          if(dir .eq. 3) b_coor(cnt_per) = grid % xf(s)*big     &
+                                         + grid % yf(s)         &
+                                         + grid % zf(s)*big**2
+          b_face(cnt_per) = s
         end if
       end if
     end do
-    !call Sort_Real_Carry_Int(b_coor, b_face, c, 2)
-    call Sort_Real_Carry_Int_Heapsort(b_coor, b_face, c)
+    !call Sort_Real_Carry_Int(b_coor, b_face, cnt_per, 2)
+    call Sort_Real_Carry_Int_Heapsort(b_coor, b_face, cnt_per)
   end if
 
   !-------------------!
@@ -483,7 +482,7 @@
     nnn = 0
     hh = 0
     mm = 0
-    c = 0
+    cnt_per = 0
 
     per_max = -HUGE
     per_min =  HUGE
@@ -508,7 +507,7 @@
       c2 = grid % faces_c(2,s)
       if(c2 < 0) then
         if(grid % bnd_cond % color(c2) .eq. color_per) then
-          c = c + 1
+          cnt_per = cnt_per + 1
           Det = (  p_i*(grid % xf(s))   &
                  + p_j*(grid % yf(s))   &
                  + p_k*(grid % zf(s)))  &
@@ -624,13 +623,13 @@
     deallocate(yspr)
     deallocate(zspr)
 
-    !call Sort_Real_Carry_Int(b_coor, b_face, c, 2)
-    call Sort_Real_Carry_Int_Heapsort(b_coor, b_face, c)
+    !call Sort_Real_Carry_Int(b_coor, b_face, cnt_per, 2)
+    call Sort_Real_Carry_Int_Heapsort(b_coor, b_face, cnt_per)
   end if  ! for option .eq. 2
 
-  do s = 1, c/2
+  do s = 1, cnt_per/2
     s1 = b_face(s)
-    s2 = b_face(s+c/2)
+    s2 = b_face(s+cnt_per/2)
     c11 = grid % faces_c(1,s1)  ! cell 1 for side 1
     c21 = grid % faces_c(2,s1)  ! cell 2 for cell 1
     c12 = grid % faces_c(1,s2)  ! cell 1 for side 2
@@ -641,18 +640,18 @@
     grid % faces_c(2,s2) = 0    ! c21
   end do
 
-  n_per = c/2
+  n_per = cnt_per/2
   print *, '# Phase I: periodic cells: ', n_per
 
   !---------------------------------!
   !   Compress all boundary cells   !
   !---------------------------------!
-  count = 0
+  cnt_bnd = 0
   new_c = 0
   do c = -1, -grid % n_bnd_cells, -1
     if(grid % bnd_cond % color(c) .ne. color_per) then
-      count = count + 1
-      new_c(c) = -count
+      cnt_bnd = cnt_bnd + 1
+      new_c(c) = -cnt_bnd
     end if
   end do
 
@@ -673,7 +672,7 @@
     end if
   end do
 
-  grid % n_bnd_cells = count
+  grid % n_bnd_cells = cnt_bnd
 
   !--------------------------------------------------------------------!
   !   Remove boundary condition with color_per and compress the rest   !
@@ -863,7 +862,7 @@
   if(min_vol < 0.0) then
     print *, '# Negative volume occured! Slower, algoritham should be run !'
     print *, '# Execution will halt now! '
-    stop
+!    stop
   end if
 
   deallocate(b_coor)
