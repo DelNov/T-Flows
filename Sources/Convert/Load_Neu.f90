@@ -60,7 +60,7 @@
         end do
         call Tokenizer_Mod_Read_Line(9)         ! ENDOFSECTION
       end do
-      print '(a38,i7)', '# Total number of boundary cells:    ',  &
+      print '(a38,i9)', '# Total number of boundary cells:    ',  &
             grid % n_bnd_cells
       go to 1
     end if
