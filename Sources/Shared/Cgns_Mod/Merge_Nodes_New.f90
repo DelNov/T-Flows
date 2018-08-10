@@ -28,6 +28,15 @@
   print *, '# Hint: Join blocks in mesh builder to avoid any problems'
   print '(a38,i9)', ' # Old number of nodes:               ', grid % n_nodes
 
+
+  ! new feature:
+
+   !cnt_interface_cells is number of nodes on inderfaces, counted from both sides
+   !thus, target numbder of nodes to deleted is cnt_interface_cells/2
+   !duplicated_nodes is logical array of grid % n_nodes size which has this duplicted nodes
+
+   !choose from them and delete others
+
   ! Allocate memory
   allocate(criterion      (grid % n_nodes));  criterion       = 0.
   allocate(old_seq        (grid % n_nodes));  old_seq         = 0

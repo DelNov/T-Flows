@@ -17,7 +17,7 @@
   integer           :: n_bnd         ! index of last boundary element
   integer           :: parent_flag   ! are the parent cells stored (I guess)
   integer           :: error
-  integer           :: cnt, bc
+  integer           :: cnt, bc, int
 !==============================================================================!
 
   ! Set input parameters
@@ -52,15 +52,19 @@
   ! Number of cells in this section
   cnt = last_cell - first_cell + 1 ! cells in this sections
 
-  ! Consider boundary conditions defined in this block
+  !--------------------------------------------------------!
+  !   Consider boundary conditions defined in this block   !
+  !--------------------------------------------------------!
   do bc = 1, cgns_base(base) % block(block) % n_bnd_conds
-    if(index(trim(sect_name), trim(cgns_base(base) % block(block) % bnd_cond(bc) % name), back = .true.) .ne. 0) then
+    if(index(trim(sect_name), &
+        trim(cgns_base(base) % block(block) % bnd_cond(bc) % name), &
+        back = .true.) .ne. 0) then
 
       if(verbose) then
         print *, '#         ---------------------------------'
         print *, '#         Bnd section name:  ', trim(sect_name)
         print *, '#         ---------------------------------'
-        print *, '#         Bnd section index: ', sect
+        print *, '#         Bnd section index ', sect
         print *, '#         Bnd section type:  ', ElementTypeName(cell_type)
         print *, '#         First cell:        ',  &
                  cgns_base(base) % block(block) % section(sect) % first_cell
@@ -69,8 +73,44 @@
       end if
 
       ! Count boundary cells
-      if ( ElementTypeName(cell_type) .eq. 'QUAD_4') cnt_qua = cnt_qua + cnt
-      if ( ElementTypeName(cell_type) .eq. 'TRI_3' ) cnt_tri = cnt_tri + cnt
+      if ( ElementTypeName(cell_type) .eq. 'QUAD_4') then
+        cnt_bnd_qua = cnt_bnd_qua + cnt
+      end if
+      if ( ElementTypeName(cell_type) .eq. 'TRI_3' ) then
+        cnt_bnd_tri = cnt_bnd_tri + cnt
+      end if
+
+    end if
+  end do
+
+  !----------------------------------------------!
+  !   Consider interface defined in this block   !
+  !----------------------------------------------!
+  do int = 1, cgns_base(base) % block(block) % n_interfaces
+ 
+    if(index(trim(sect_name), &
+        trim(cgns_base(base) % block(block) % interface(int) % name), &
+        back = .true.) .ne. 0) then
+
+      if(verbose) then
+        print *, '#         ---------------------------------'
+        print *, '#         Interface name:  ', trim(sect_name)
+        print *, '#         ---------------------------------'
+        print *, '#         Interface section index: ', sect
+        print *, '#         Interface type:  ', ElementTypeName(cell_type)
+        print *, '#         First cell:        ',  &
+                 cgns_base(base) % block(block) % section(sect) % first_cell
+        print *, '#         Last cell:         ',  &
+                 cgns_base(base) % block(block) % section(sect) % last_cell
+      end if
+
+      ! Count interface cells
+      if ( ElementTypeName(cell_type) .eq. 'QUAD_4') then
+        cnt_int_qua = cnt_int_qua + cnt
+      end if
+      if ( ElementTypeName(cell_type) .eq. 'TRI_3' ) then
+        cnt_int_tri = cnt_int_tri + cnt
+      end if
 
     end if
   end do

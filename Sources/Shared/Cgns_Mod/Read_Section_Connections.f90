@@ -20,9 +20,10 @@
   integer              :: last_cell     ! index of last element
   integer              :: parent_flag
   integer              :: error
-  integer              :: n_nodes, loc, c, n, cell, dir, cnt, bc
+  integer              :: n_nodes, loc, c, n, cell, dir, cnt, bc, int
   integer, allocatable :: cell_n(:,:)
   integer, allocatable :: face_n(:,:)
+  integer, allocatable :: interface_n(:,:)
   integer, allocatable :: parent_data(:,:)
   integer              :: parent_datum = 0  ! for cells there are no parents
 !==============================================================================!
@@ -32,7 +33,7 @@
   block_id = block
   sect_id  = sect
 
-  ! Introduce some abbraviations
+  ! Introduce some abbreviations
   sect_name   = cgns_base(base) % block(block) % section(sect) % name
   cell_type   = cgns_base(base) % block(block) % section(sect) % cell_type
   first_cell  = cgns_base(base) % block(block) % section(sect) % first_cell
@@ -67,10 +68,10 @@
       end if
 
       ! Count boundary cells
-      if ( ElementTypeName(cell_type) .eq. 'QUAD_4') cnt_qua = cnt_qua + cnt!del
-      if ( ElementTypeName(cell_type) .eq. 'TRI_3' ) cnt_tri = cnt_tri + cnt!del
+    !if ( ElementTypeName(cell_type) .eq. 'QUAD_4') cnt_qua = cnt_qua + cnt!del
+    !if ( ElementTypeName(cell_type) .eq. 'TRI_3' ) cnt_tri = cnt_tri + cnt!del
 
-      ! Update numer of boundary cells in the block
+      ! Update number of boundary cells in the block
       cnt_block_bnd_cells = cnt_block_bnd_cells + cnt
 
       ! Allocate memory
@@ -94,17 +95,69 @@
       end do
 
       if(verbose) then
-        print *, "#         Connection table sample: "
+        print *, "#         Connection table (sample): "
         do loc = 1, min(8, cnt)
           print '(a8,4i7)', " ", (face_n(n,loc), n = 1, n_nodes)
         end do
-        print *, "#         Parent data sample: "
+        print *, "#         Parent data (sample): "
         do loc = 1, min(8, cnt)
           print '(a10,2i7)', " ", parent_data(loc, 1), parent_data(loc, 2)
         end do
       end if
 
       deallocate(face_n)
+
+    end if
+  end do
+
+  !----------------------------------------------!
+  !   Consider interface defined in this block   !
+  !----------------------------------------------!
+  do int = 1, cgns_base(base) % block(block) % n_interfaces
+    if(index(trim(sect_name), &
+        trim(cgns_base(base) % block(block) % interface(int) % name), &
+        back = .true.) .ne. 0) then
+
+      if(verbose) then
+        print *, '#         ---------------------------------'
+        print *, '#         Interface name:  ', trim(sect_name)
+        print *, '#         ---------------------------------'
+        print *, '#         Interface section index: ', sect
+        print *, '#         Interface type:  ', ElementTypeName(cell_type)
+      end if
+
+      ! Update number of boundary cells in the block
+      !cnt_interface_cells = cnt_interface_cells + cnt
+
+      ! Allocate memory
+      if ( ElementTypeName(cell_type) .eq. 'QUAD_4') n_nodes = 4
+      if ( ElementTypeName(cell_type) .eq. 'TRI_3' ) n_nodes = 3
+      allocate(interface_n(n_nodes, cnt))  
+
+      call Cg_Elements_Read_F(file_id,           & !(in )
+                              base_id,           & !(in )
+                              block_id,          & !(in )
+                              sect_id,           & !(in )
+                              interface_n(1,1),  & !(out)
+                              parent_data,       & !(out)
+                              error)               !(out)
+
+      if(verbose) then
+        print *, "#         Interface cells connection table (sample): "
+        do loc = 1, min(8, cnt)
+          print '(a9,8i7)', " ", (interface_n(n,loc), n = 1, n_nodes)
+        end do
+      end if
+
+      do loc = 1, cnt
+        ! Do I need this?
+        ! print *, ' # Interface Parent', parent_data(loc, 1) + cnt_cells
+        do n = 1, n_nodes
+          duplicated_nodes(interface_n(n, loc) + cnt_nodes) = .true.
+        end do
+      end do
+
+      deallocate(interface_n)
 
     end if
   end do
@@ -183,7 +236,7 @@
     end do
 
     if(verbose) then
-        print *, "#         Connection table sample: "
+        print *, "#         Connection table (sample): "
       do loc = 1, min(8, cnt)
         print '(a9,8i7)', " ", (cell_n(n,loc), n = 1, n_nodes)
       end do

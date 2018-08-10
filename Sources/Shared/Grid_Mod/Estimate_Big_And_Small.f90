@@ -45,8 +45,8 @@
       do l2  = l1+1, grid % cells_n_nodes(c)
         n2 = grid % cells_n(l2, c)
         small = min(small, sqrt(   (grid % xn(n1) - grid % xn(n2))**2  &
-                                 + (grid % yn(n1) - grid % yn(n2))**2  &  
-                                 + (grid % zn(n1) - grid % zn(n2))**2 ))  
+                                 + (grid % yn(n1) - grid % yn(n2))**2  &
+                                 + (grid % zn(n1) - grid % zn(n2))**2 ))
       end do
     end do
   end do
