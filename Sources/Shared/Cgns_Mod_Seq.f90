@@ -111,7 +111,8 @@
   integer :: cnt_cells
   integer :: cnt_blocks     ! probably not needed
   integer :: cnt_bnd_cells
-  logical, allocatable :: duplicated_nodes(:)
+  logical, allocatable :: duplicated_nodes(:), cells_with_diplicated_nodes(:)
+
 
   ! Cells (3d)
   integer :: cnt_hex
@@ -164,6 +165,7 @@
   include 'Cgns_Mod/Read_Section_Connections.f90'
   include 'Cgns_Mod/Merge_Nodes_Old.f90'
   include 'Cgns_Mod/Merge_Nodes_New.f90'
+  include 'Cgns_Mod/Merge_Nodes_Newest.f90'
   include 'Cgns_Mod/Sequential/Open_File.f90'
   include 'Cgns_Mod/Sequential/Close_File.f90'
   include 'Cgns_Mod/Sequential/Write_Base_Info.f90'

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Cgns_Mod_Merge_Nodes_New(grid)
+  subroutine Cgns_Mod_Merge_Nodes_Newest(grid)
 !------------------------------------------------------------------------------!
 !   Merges blocks by merging common surface without changing structure of      !
 !   node and cells connection  tables                                          !
@@ -17,34 +17,39 @@
   include "../Shared/Approx.int"
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, n, i, m, k, v, cnt_node, mn, mx
+  
   real,    allocatable :: criterion(:) ! sorting criterion
   integer, allocatable :: old_seq(:), new_seq(:)
   real,    allocatable :: x_new(:), y_new(:), z_new(:)
   logical, allocatable :: nodes_to_remove(:) ! marked duplicated nodes to remove
   real                 :: big, small
+
+
+  integer              :: base, block, int
 !==============================================================================!
 
   print *, '# Merging blocks since they have duplicating nodes '
   print *, '# Hint: Join blocks in mesh builder to avoid any problems'
   print '(a38,i9)', ' # Old number of nodes:               ', grid % n_nodes
 
-  ! Allocate memory
-  allocate(criterion      (grid % n_nodes));  criterion       = 0.
-  allocate(old_seq        (grid % n_nodes));  old_seq         = 0
-  allocate(new_seq        (grid % n_nodes));  new_seq         = 0
-  allocate(nodes_to_remove(grid % n_nodes));  nodes_to_remove = .false.
+  do base = 1, n_bases
 
-  ! Estimate big and small
-  call Grid_Mod_Estimate_Big_And_Small(grid, big, small)
+    do block = 1, cgns_base(base) % n_blocks
 
-  !--------------------------------------!
-  !   Prescribe some sorting criterion   !
-  !--------------------------------------!
-  do n = 1, grid % n_nodes
-    criterion(n) = grid % xn(n) + grid % yn(n) * BIG + grid % zn(n) * BIG ** 2
-    old_seq(n) = n
+      do int = 1, cgns_base(base) % block(block) % n_interfaces
+
+      end do
+
+    end do
+
   end do
-  new_seq(:) = old_seq(:)
+
+  print *, 'cells with dups:'
+  do c = 1, grid % n_cells
+    if (cells_with_diplicated_nodes(c)) then
+      print *, c
+    end if
+  end do
 
   !----------------------------------------------------------------------------!
   !   Original block structure with duplicate nodes:                           !

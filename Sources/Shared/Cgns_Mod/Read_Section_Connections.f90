@@ -150,10 +150,10 @@
       end if
 
       do loc = 1, cnt
-        ! Do I need this?
-        ! print *, ' # Interface Parent', parent_data(loc, 1) + cnt_cells
+        cells_with_diplicated_nodes(parent_data(loc, 1) + cnt_cells, &
+          trim(cgns_base(base) % block(block) % interface(int) % name)) = .true.
         do n = 1, n_nodes
-          duplicated_nodes(interface_n(n, loc) + cnt_nodes) = .true.
+          duplicated_nodes(interface_n(n, loc) + cnt_nodes, trim(cgns_base(base) % block(block) % interface(int) % name)) = .true.
         end do
       end do
 

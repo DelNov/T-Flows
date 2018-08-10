@@ -146,7 +146,10 @@
 
   ! Interface
   cnt_interface_nodes = cnt_int_tri * 3 + cnt_int_qua * 4
-  allocate(duplicated_nodes(cnt_nodes)); duplicated_nodes = .false.
+  allocate(duplicated_nodes(cnt_nodes));
+  allocate(cells_with_diplicated_nodes(cnt_cells)); 
+  duplicated_nodes = .false. 
+  cells_with_diplicated_nodes = .false.
 
   call Allocate_Memory(grid)
 
@@ -226,7 +229,8 @@
   !---------------------!
   if(cnt_blocks .gt. 1) then
     !call Cgns_Mod_Merge_Nodes_Old(grid)
-    call Cgns_Mod_Merge_Nodes_New(grid)
+    !call Cgns_Mod_Merge_Nodes_New(grid)
+    call Cgns_Mod_Merge_Nodes_Newest(grid)
   end if
 
   !---------------------------------!
