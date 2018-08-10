@@ -1,7 +1,15 @@
 !==============================================================================!
   subroutine Find_Faces(grid)
 !------------------------------------------------------------------------------!
-!  Creates the "SideC structure"                                               !
+!   Find faces inside the domain.  To be more specific, it determines:         !
+!                                                                              !
+!   grid % n_faces       - final number of faces (boundary + inside)           !
+!   grid % faces_n_nodes - number of nodes for each face                       !
+!   grid % faces_n       - nodes of each face                                  !
+!   grid % faces_c       - pair of cells surrounding each face                 !
+!                                                                              !
+!   Note: boundary faces have been determined in "Grid_Topology"               !
+!------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
   use gen_mod 
