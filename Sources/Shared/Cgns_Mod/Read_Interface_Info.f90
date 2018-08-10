@@ -76,7 +76,7 @@
   end if
 
   ! Fetch received parameters
-  cgns_base(base) % block(block) % interface(interface_id) % name =  &
+  cgns_base(base_id) % block(block_id) % interface(interface_id) % name =  &
     trim(interface_name_short)
 
   end subroutine

@@ -72,7 +72,7 @@
       do int = 1, cgns_base(base) % block(block) % n_interfaces
         ! Reads info on interfaces
         call Cgns_Mod_Read_Interface_Info(base, block, int)
-      end do
+      end do ! interfaces
 
       ! Browse through all boundary conditions
       call Cgns_Mod_Read_Number_Of_Bnd_Conds_In_Block(base, block)
@@ -115,14 +115,13 @@
     print *, '# - number of quads faces on boundary: ',     cnt_bnd_qua
     print *, '# - number of triangles faces on interface: ', cnt_int_tri 
     print *, '# - number of quads faces on interface: ',     cnt_int_qua
-    print *, '# - number of nodes on interface: ', cnt_int_tri*3 + cnt_int_qua*4
+    print *, '# - number of boundary conditions faces: ',cnt_bnd_tri+cnt_bnd_qua
+    print *, '# - number of boundary conditions: ',      cnt_bnd_conds
     if (cnt_bnd_tri + cnt_bnd_qua .eq. 0) then
       print *, '# No boundary faces were found !'
       stop
     end if
-    print *, '# - number of boundary conditions faces: ', &
-      cnt_bnd_tri + cnt_bnd_qua
-    print *, '# - number of boundary conditions: ',       cnt_bnd_conds
+    print *, '# - number of nodes on interfaces: ',cnt_int_tri*3 + cnt_int_qua*4
   end if
 
   !--------------------------------------------!
@@ -144,12 +143,16 @@
     grid % bnd_cond % name(i) = bnd_cond_names(i)
   end do
 
-  ! Interface
-  cnt_interface_nodes = cnt_int_tri * 3 + cnt_int_qua * 4
-  allocate(duplicated_nodes(cnt_nodes));
-  allocate(cells_with_diplicated_nodes(cnt_cells)); 
-  duplicated_nodes = .false. 
-  cells_with_diplicated_nodes = .false.
+  !----------------!
+  !   Interfaces   !
+  !----------------!
+  allocate(interface_nodes(cnt_nodes, cnt_int)); interface_nodes = .true.
+  allocate(interface_cells(cnt_cells, cnt_int)); interface_cells = .true.
+
+!  allocate(interface_nodes((cnt_int_tri*3+cnt_int_qua*4)/2, cnt_int))
+!  interface_nodes = .true.
+!  allocate(interface_cells((cnt_int_tri + cnt_int_qua)/2, cnt_int))
+!  interface_cells = .true.  
 
   call Allocate_Memory(grid)
 

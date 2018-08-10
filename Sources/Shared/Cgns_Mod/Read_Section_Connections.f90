@@ -15,6 +15,7 @@
   integer              :: block_id      ! block index number
   integer              :: sect_id       ! element section index
   character(len=80)    :: sect_name     ! name of the Elements_t node
+  character(len=80)    :: int_name      ! name of the interface
   integer              :: cell_type     ! types of elements in the section
   integer              :: first_cell    ! index of first element
   integer              :: last_cell     ! index of last element
@@ -96,11 +97,11 @@
 
       if(verbose) then
         print *, "#         Connection table (sample): "
-        do loc = 1, min(8, cnt)
+        do loc = 1, min(6, cnt)
           print '(a8,4i7)', " ", (face_n(n,loc), n = 1, n_nodes)
         end do
         print *, "#         Parent data (sample): "
-        do loc = 1, min(8, cnt)
+        do loc = 1, min(6, cnt)
           print '(a10,2i7)', " ", parent_data(loc, 1), parent_data(loc, 2)
         end do
       end if
@@ -110,13 +111,14 @@
     end if
   end do
 
-  !----------------------------------------------!
-  !   Consider interface defined in this block   !
-  !----------------------------------------------!
+  !-----------------------------------------------!
+  !   Consider interfaces defined in this block   !
+  !-----------------------------------------------!
   do int = 1, cgns_base(base) % block(block) % n_interfaces
-    if(index(trim(sect_name), &
-        trim(cgns_base(base) % block(block) % interface(int) % name), &
-        back = .true.) .ne. 0) then
+
+    int_name = trim(cgns_base(base) % block(block) % interface(int) % name)
+
+    if(index(trim(sect_name), trim(int_name), back = .true.) .ne. 0) then
 
       if(verbose) then
         print *, '#         ---------------------------------'
@@ -124,10 +126,9 @@
         print *, '#         ---------------------------------'
         print *, '#         Interface section index: ', sect
         print *, '#         Interface type:  ', ElementTypeName(cell_type)
+        print *, '#         Marked for deletion:  ', cgns_base(base) % &
+          block(block) % interface(int) % marked_for_deletion
       end if
-
-      ! Update number of boundary cells in the block
-      !cnt_interface_cells = cnt_interface_cells + cnt
 
       ! Allocate memory
       if ( ElementTypeName(cell_type) .eq. 'QUAD_4') n_nodes = 4
@@ -144,18 +145,25 @@
 
       if(verbose) then
         print *, "#         Interface cells connection table (sample): "
-        do loc = 1, min(8, cnt)
+        do loc = 1, min(6, cnt)
           print '(a9,8i7)', " ", (interface_n(n,loc), n = 1, n_nodes)
         end do
       end if
 
-      do loc = 1, cnt
-        cells_with_diplicated_nodes(parent_data(loc, 1) + cnt_cells, &
-          trim(cgns_base(base) % block(block) % interface(int) % name)) = .true.
-        do n = 1, n_nodes
-          duplicated_nodes(interface_n(n, loc) + cnt_nodes, trim(cgns_base(base) % block(block) % interface(int) % name)) = .true.
+      ! Mark nodes to delete, cells to change connections inside
+      if (cgns_base(base) % &
+          block(block) % interface(int) % marked_for_deletion) then
+        do loc = 1, cnt
+        ! not sure ???
+          interface_cells(parent_data(loc, 1)+cnt_cells, cnt_int) = .false.
+          do n = 1, n_nodes
+            interface_nodes(interface_n(n, loc) + cnt_nodes, cnt_int) = .false.
+          end do
         end do
-      end do
+      else
+        ! Otherwise add unique interface
+        cnt_int = cnt_int + 1
+      end if
 
       deallocate(interface_n)
 
@@ -237,7 +245,7 @@
 
     if(verbose) then
         print *, "#         Connection table (sample): "
-      do loc = 1, min(8, cnt)
+      do loc = 1, min(6, cnt)
         print '(a9,8i7)', " ", (cell_n(n,loc), n = 1, n_nodes)
       end do
     end if

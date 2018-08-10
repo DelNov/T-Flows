@@ -20,36 +20,17 @@
   
   real,    allocatable :: criterion(:) ! sorting criterion
   integer, allocatable :: old_seq(:), new_seq(:)
+  integer, allocatable :: nodes_to_sift(:)
   real,    allocatable :: x_new(:), y_new(:), z_new(:)
   logical, allocatable :: nodes_to_remove(:) ! marked duplicated nodes to remove
   real                 :: big, small
 
-
-  integer              :: base, block, int
+  integer              :: int, cnt_nodes_to_remove
 !==============================================================================!
 
   print *, '# Merging blocks since they have duplicating nodes '
   print *, '# Hint: Join blocks in mesh builder to avoid any problems'
   print '(a38,i9)', ' # Old number of nodes:               ', grid % n_nodes
-
-  do base = 1, n_bases
-
-    do block = 1, cgns_base(base) % n_blocks
-
-      do int = 1, cgns_base(base) % block(block) % n_interfaces
-
-      end do
-
-    end do
-
-  end do
-
-  print *, 'cells with dups:'
-  do c = 1, grid % n_cells
-    if (cells_with_diplicated_nodes(c)) then
-      print *, c
-    end if
-  end do
 
   !----------------------------------------------------------------------------!
   !   Original block structure with duplicate nodes:                           !
@@ -92,89 +73,53 @@
   !   cell 1: 1  2  3  4   5   6   7   8                                       !
   !   cell 2: 5  6  7  8   9  10  11  12                                       !
   !                                                                            !
-  !   old_seq:                                                                 !
-  !    1  2  3  4  5  6  7  8  9  10  11  12  13  14  15  16                   !
   !----------------------------------------------------------------------------!
 
-  !----------------------------------!
-  !   Sort nodes by this criterion   !
-  !----------------------------------!
-  call Sort_Real_Carry_Int_Heapsort(criterion(1), old_seq(1), grid % n_nodes)
-
-  if (verbose) then
-    print *, '# Cells before Cgns_Mod_Merge_Nodes_New function (sample)'
-    do c = 1, 6
-      print *, '#', (grid % cells_n(i,c), i = 1, grid % cells_n_nodes(c))
-    end do
-  end if
-
-  !----------------------------------------------------------------------------!
-  !   old_seq is now:                                                          !
-  !   16 12--8  4 14  6--10 2 15   7--11   3  13   5--9   1                    !
-  !   "--" means that criterion has same value for these elements              !
-  !----------------------------------------------------------------------------!
-  cnt_node = 1
-  if (verbose) print *,'# Uniting nodes (sample):'
-
-  n = 1
-  v = 1 ! related to verbose output
-
-  do while ( n < grid % n_nodes )
-    m = n + 1
-
-    ! If node is unique
-    if( .not. Approx(criterion(n), criterion(n+1), SMALL) ) then
-      cnt_node = cnt_node + 1
-    else ! if node is duplicated
-
-      ! Check next nodes on the list by criterion
-      do while (Approx(criterion(m), criterion(m+1), SMALL))
-        m = m + 1
-      end do
-      ! [n : m] are duplicated
-
-      mn = minval(old_seq(n:m))
-      mx = maxval(old_seq(n:m))
-
-      ! Mark node to remove
-      do k = n, m
-        if ( old_seq(k) .ne. mn ) then
-          nodes_to_remove(old_seq(k)) = .true.
-          ! New sequence (stage 1) : substitute duplicated modes unique
-          new_seq(old_seq(k)) = mn
-        end if
-      end do
-
-      if (verbose .and. v < 7) then
-        write (*, '(a)', advance='no')' # '
-        print '(100a15)',('---------------', k = n, m)
-        write (*, '(a)', advance='no')' # n: '
-        print '(100i14)', (old_seq(k), k = n, m)
-        write (*, '(a)', advance='no')' # c: '
-        print '(100es14.7)', (criterion(k), k = n, m)
-        v = v + 1
+  print *, 'cells with dups:'
+  do int = 1, cnt_int
+    do c = 1, grid % n_cells
+      if (.not. interface_cells(c,int)) then
+        print *, 'int=', int, c
       end if
-
-    end if
-    n = m
+    end do
   end do
 
-  !----------------------------------------------------------------------------!
-  !   new_seq now became:                                                      !
-  !   1  2  3  4  5  6  7  8  5  6  7  8  13  14  15  16                       !
-  !----------------------------------------------------------------------------!
+  print *, 'nodes to delete:'
+  do int = 1, cnt_int
+    do n = 1, grid % n_nodes
+      if (.not. interface_nodes(n,int)) then
+        print *, 'int=', int, n
+      end if
+    end do
+  end do
+
+  ! Count nodes to delete
+  i = 1
+  do int = 1, cnt_int ! for each unique interface
+
+    do n = 1, grid % n_nodes
+      if (interface_nodes(n,int)) then ! for each duplicated node
+        i = i + 1
+      end if
+    end do
+
+  end do
+
+  cnt_nodes_to_remove = i - 1
+  print *, 'nodes to delete:', cnt_nodes_to_remove
 
   !--------------------------------------------!
   !   Reconstruct new nodes and cells arrays   !
   !--------------------------------------------!
+  cnt_node = grid % n_nodes - cnt_nodes_to_remove
 
-  allocate(x_new(1:cnt_node))
-  allocate(y_new(1:cnt_node))
-  allocate(z_new(1:cnt_node))
+  allocate(x_new(cnt_node))
+  allocate(y_new(cnt_node))
+  allocate(z_new(cnt_node))
 
   cnt_node = 1
   do n = 1, grid % n_nodes
-    if (.not. nodes_to_remove(n)) then ! if node is unique
+    if (.not. interface_nodes(n,int)) then ! if node is unique
 
       x_new(cnt_node) = grid % xn(n)
       y_new(cnt_node) = grid % yn(n)
@@ -182,7 +127,7 @@
 
       cnt_node = cnt_node + 1
     else
-      ! New sequence (stage 2) : shift all non-unique nodes in increasing order
+      ! New sequence: shift all non-unique nodes in decreasing order
       do c = cnt_node, grid % n_nodes
         if (new_seq(c) > cnt_node) then
           new_seq(c) = new_seq(c) -1
@@ -192,6 +137,7 @@
   end do ! n
 
   print '(a38,i9)', ' # New number of nodes:               ', cnt_node - 1
+  stop
 
   !----------------------------------------------------------------------------!
   !   new_seq now became:                                                      !

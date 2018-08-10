@@ -60,6 +60,7 @@
   ! Interface section
   type Cgns_Interface_Type
     character(len=80)    :: name
+    logical              :: marked_for_deletion
   end type
 
   ! Element section
@@ -111,8 +112,6 @@
   integer :: cnt_cells
   integer :: cnt_blocks     ! probably not needed
   integer :: cnt_bnd_cells
-  logical, allocatable :: duplicated_nodes(:), cells_with_diplicated_nodes(:)
-
 
   ! Cells (3d)
   integer :: cnt_hex
@@ -125,9 +124,12 @@
   integer :: cnt_bnd_tri
 
   ! Interface cells (2d)
-  integer :: cnt_int_qua
-  integer :: cnt_int_tri
-  integer :: cnt_interface_nodes
+  integer              :: cnt_int_qua
+  integer              :: cnt_int_tri
+  integer              :: cnt_int
+  character(len=80)    :: interface_names(1024)
+  logical, allocatable :: interface_nodes(:,:) ! .true. mean leave them
+  logical, allocatable :: interface_cells(:,:) ! .true. mean leave them
 
   ! Block-wise counter of boundary cells
   integer           :: cnt_block_bnd_cells  ! probably not needed

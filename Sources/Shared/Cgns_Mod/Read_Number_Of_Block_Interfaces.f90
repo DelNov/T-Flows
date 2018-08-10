@@ -37,5 +37,7 @@
   cgns_base(base) % block(block) % n_interfaces = number_of_interfaces
 
   allocate( cgns_base(base) % block(block) % interface(number_of_interfaces) )
+  cgns_base(base) % block(block) % interface(1:number_of_interfaces) % &
+    marked_for_deletion = .false.
 
   end subroutine
