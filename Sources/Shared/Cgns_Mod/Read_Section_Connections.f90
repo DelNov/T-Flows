@@ -120,6 +120,8 @@
 
     if(index(trim(sect_name), trim(int_name), back = .true.) .ne. 0) then
 
+      
+      
       if(verbose) then
         print *, '#         ---------------------------------'
         print *, '#         Interface name:  ', trim(sect_name)
@@ -129,7 +131,7 @@
         print *, '#         Marked for deletion:  ', cgns_base(base) % &
           block(block) % interface(int) % marked_for_deletion
       end if
-
+        
       ! Allocate memory
       if ( ElementTypeName(cell_type) .eq. 'QUAD_4') n_nodes = 4
       if ( ElementTypeName(cell_type) .eq. 'TRI_3' ) n_nodes = 3
@@ -150,19 +152,25 @@
         end do
       end if
 
-      ! Mark nodes to delete, cells to change connections inside
-      if (cgns_base(base) % &
-          block(block) % interface(int) % marked_for_deletion) then
+      ! If interface is not marked for deletion
+      if ( .not. cgns_base(base) % &
+      block(block) % interface(int) % marked_for_deletion) then
+        ! Add unique interface
+        cnt_int = cnt_int + 1
+
+        ! Mark nodes and cells to leave them at interface
         do loc = 1, cnt
-        ! not sure ???
-          interface_cells(parent_data(loc, 1)+cnt_cells, cnt_int) = .false.
           do n = 1, n_nodes
-            interface_nodes(interface_n(n, loc) + cnt_nodes, cnt_int) = .false.
+            interface_nodes(interface_n(n, loc) + cnt_nodes, cnt_int) = 1
           end do
         end do
       else
-        ! Otherwise add unique interface
-        cnt_int = cnt_int + 1
+        ! Mark nodes to delete from interface and cells to renumber
+        do loc = 1, cnt
+          do n = 1, n_nodes
+            interface_nodes(interface_n(n, loc) + cnt_nodes, cnt_int) = -1
+          end do
+        end do
       end if
 
       deallocate(interface_n)

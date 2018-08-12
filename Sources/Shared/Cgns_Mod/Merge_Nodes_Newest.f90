@@ -8,7 +8,6 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod
-  use Const_Mod, only: HUGE, PI
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -16,22 +15,27 @@
 !------------------------------------------------------------------------------!
   include "../Shared/Approx.int"
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: c, n, i, m, k, v, cnt_node, mn, mx
+  integer              :: c, n, i, j, k, v
   
   real,    allocatable :: criterion(:) ! sorting criterion
   integer, allocatable :: old_seq(:), new_seq(:)
-  integer, allocatable :: nodes_to_sift(:)
   real,    allocatable :: x_new(:), y_new(:), z_new(:)
-  logical, allocatable :: nodes_to_remove(:) ! marked duplicated nodes to remove
   real                 :: big, small
-
-  integer              :: int, cnt_nodes_to_remove
+  integer              :: int, cnt_nodes_on_interface
 !==============================================================================!
 
   print *, '# Merging blocks since they have duplicating nodes '
   print *, '# Hint: Join blocks in mesh builder to avoid any problems'
   print '(a38,i9)', ' # Old number of nodes:               ', grid % n_nodes
-
+  
+  !----------------------------------------------------------------------------!
+  !   At this point number of interfaces cnt_int is known.                     !
+  !   Nodes on interfaces are marked by interface_nodes .ne. 0                 !
+  !   Value -1 of interface_nodes means this node has to be removed as         !
+  !   duplicated, cell connection - renumbered.                                !
+  !   Unfortunately coordinates of two nodes on same interface                 !
+  !   do not match, because they originated from different blocks.             !
+  !----------------------------------------------------------------------------!
   !----------------------------------------------------------------------------!
   !   Original block structure with duplicate nodes:                           !
   !        x  y  z                                                             !
@@ -75,101 +79,190 @@
   !                                                                            !
   !----------------------------------------------------------------------------!
 
-  print *, 'cells with dups:'
+! Estimate big and small
+  call Grid_Mod_Estimate_Big_And_Small(grid, big, small)
+  !small = 1e-6
+  !big = 17
+
+  if (verbose) then
+    print *, '# Cells before Cgns_Mod_Merge_Nodes_New function (sample)'
+    do c = 1, min(6, grid % n_cells)
+      print *, '#', (grid % cells_n(i,c), i = 1, grid % cells_n_nodes(c))
+    end do
+  end if
+
+  ! new_seq is a map for nodes "n -> new_seq(n)"
+  allocate(new_seq (grid % n_nodes)); new_seq = 0
+
+  print *, '# Nodes at interface:'
   do int = 1, cnt_int
-    do c = 1, grid % n_cells
-      if (.not. interface_cells(c,int)) then
-        print *, 'int=', int, c
+    i = 1
+    j = 1
+    do n = 1, grid % n_nodes
+      if ( interface_nodes(n, int) .eq. -1 ) then
+        i = i + 1
+        !print *, 'int=', int, ' n = ', n, 'del=true'
+      else if ( interface_nodes(n, int) .eq. 1 ) then
+        j = j + 1
+        !print *, 'int=', int, ' n = ', n, 'del=false'
       end if
     end do
+    print *, '# Interface', int, ', Nodes to remove:', i - 1, 'Nodes to keep:', j - 1
   end do
+  stop
 
-  print *, 'nodes to delete:'
+  ! For each unique interface
   do int = 1, cnt_int
-    do n = 1, grid % n_nodes
-      if (.not. interface_nodes(n,int)) then
-        print *, 'int=', int, n
-      end if
-    end do
-  end do
 
-  ! Count nodes to delete
-  i = 1
-  do int = 1, cnt_int ! for each unique interface
-
+    ! Count nodes on interface
+    i = 1
     do n = 1, grid % n_nodes
-      if (interface_nodes(n,int)) then ! for each duplicated node
+      if (interface_nodes(n, int) .ne. 0) then
         i = i + 1
       end if
     end do
+    cnt_nodes_on_interface = i - 1
+    
+    !----------------------------------------------!
+    !   Sind nodes until target value is reached   !
+    !----------------------------------------------!
+    print *, "Sind until n:", cnt_nodes_on_interface/2
+    
+    n = 1
+    do while ( n .ne. cnt_nodes_on_interface/2 )
 
-  end do
+      ! Allocate memory
+      allocate(criterion (cnt_nodes_on_interface)); criterion = 0.
+      allocate(old_seq   (cnt_nodes_on_interface)); old_seq = 0
+      
+      !--------------------------------------!
+      !   Prescribe some sorting criterion   !
+      !--------------------------------------!
 
-  cnt_nodes_to_remove = i - 1
-  print *, 'nodes to delete:', cnt_nodes_to_remove
-
-  !--------------------------------------------!
-  !   Reconstruct new nodes and cells arrays   !
-  !--------------------------------------------!
-  cnt_node = grid % n_nodes - cnt_nodes_to_remove
-
-  allocate(x_new(cnt_node))
-  allocate(y_new(cnt_node))
-  allocate(z_new(cnt_node))
-
-  cnt_node = 1
-  do n = 1, grid % n_nodes
-    if (.not. interface_nodes(n,int)) then ! if node is unique
-
-      x_new(cnt_node) = grid % xn(n)
-      y_new(cnt_node) = grid % yn(n)
-      z_new(cnt_node) = grid % zn(n)
-
-      cnt_node = cnt_node + 1
-    else
-      ! New sequence: shift all non-unique nodes in decreasing order
-      do c = cnt_node, grid % n_nodes
-        if (new_seq(c) > cnt_node) then
-          new_seq(c) = new_seq(c) -1
+      i = 1
+      do n = 1, grid % n_nodes
+        new_seq(n) = n
+        if (interface_nodes(n, int) .ne. 0) then
+          old_seq(i) = n
+          criterion(i) = grid % xn(n) + grid % yn(n)*big + grid % zn(n)*big**2
+          i = i + 1
         end if
-      end do ! c
-    end if
-  end do ! n
+      end do
+      
+      ! Sort nodes by this criterion
+      call Sort_Real_Carry_Int_Heapsort(criterion(1), old_seq(1), &
+      cnt_nodes_on_interface)
+      
+      ! Count grouped nodes after sorting
+      n = 1
+      v = 1 ! related to verbose output
+      do i = 2, cnt_nodes_on_interface
+        ! If node is unique
+        if( .not. Approx(criterion(i-1), criterion(i), small) ) then
+          n = n + 1
+        else ! nodes old_seq(i) and old_seq(i-1) are duplicated
 
-  print '(a38,i9)', ' # New number of nodes:               ', cnt_node - 1
-  stop
+          ! Construct new sequence [stage 1]
+          if (interface_nodes(old_seq(i-1), int) .eq. -1) then
+            new_seq(old_seq(i-1)) = new_seq(old_seq(i))
+          else
+            new_seq(old_seq(i)) = new_seq(old_seq(i-1))
+          end if
+
+          !new_seq(old_seq(i)  ) = minval(old_seq(i-1:i))
+          !new_seq(old_seq(i-1)) = minval(old_seq(i-1:i))
+
+          if (verbose .and. v <= min(6, grid % n_nodes)) then
+            write (*, '(a)', advance='no')' # '
+            print '(100a15)',('---------------', k = i-1, i)
+            write (*, '(a)', advance='no')' # n: '
+            !print '(i13,a,i13)', minval(old_seq(i-1:i)), '<-', maxval(old_seq(i-1:i))
+            print '(100i14)', (old_seq(k), k = i-1, i)
+            !print *, 'new_seq(',old_seq(i-1), ')=', new_seq(old_seq(i-1)), '<-', 'new_seq(',old_seq(i), ')=', new_seq(old_seq(i))
+            write (*, '(a)', advance='no')' # c: '
+            print '(100es14.7)', (criterion(k), k = i-1, i)
+            v = v + 1
+          end if
+        end if
+
+      end do
+
+      print *, '# Interface', int, ', Reached n:', n
+      if (n < cnt_nodes_on_interface/2) then
+        small = small / 2
+        deallocate(criterion)
+        deallocate(old_seq  )
+      elseif (n > cnt_nodes_on_interface/2) then
+        small = small * 2
+        deallocate(criterion)
+        deallocate(old_seq  )
+      end if
+
+    end do ! sind
+
+  !----------------------------------------------------------------------------!
+  !   new_seq now became:                                                      !
+  !   1  2  3  4  5  6  7  8  5  6  7  8  13  14  15  16                       !
+  !----------------------------------------------------------------------------!
+
+    !--------------------------------------------!
+    !   Reconstruct new nodes and cells arrays   !
+    !--------------------------------------------!
+    i = grid % n_nodes - cnt_nodes_on_interface/2
+  
+    allocate(x_new(i))
+    allocate(y_new(i))
+    allocate(z_new(i))
+
+    i = 1
+    do n = 1, grid % n_nodes
+      if (interface_nodes(n, int) > -1) then
+
+        x_new(i) = grid % xn(n)
+        y_new(i) = grid % yn(n)
+        z_new(i) = grid % zn(n)
+
+        i = i + 1
+      else
+        do c = i, grid % n_nodes
+          if (new_seq(c) > i) then
+            new_seq(c) = new_seq(c) - 1
+          end if
+        end do ! c
+      end if
+    end do ! n
 
   !----------------------------------------------------------------------------!
   !   new_seq now became:                                                      !
   !   1  2  3  4  5  6  7  8  5  6  7  8  9  10  11  12                        !
   !----------------------------------------------------------------------------!
 
-  ! Remap nodes in cells according to new_seq
-  do c = 1, grid % n_cells
-    do i = 1, grid % cells_n_nodes(c)
-      grid % cells_n(i,c) = new_seq(grid % cells_n(i,c))
-    end do ! i
-  end do ! c
+    ! Remap nodes at interface cells according to new_seq
+    do c = 1, grid % n_cells
+      do j = 1, grid % cells_n_nodes(c)
+        grid % cells_n(j,c) = new_seq(grid % cells_n(j,c))
+      end do ! j
+    end do ! c
+
+  end do ! interfaces
 
   if (verbose) then
     print *, '# Cells after Cgns_Mod_Merge_Nodes_New function (sample)'
-    do c = 1, 6
-      print *, '#', (grid % cells_n(i,c), i = 1, grid % cells_n_nodes(c))
+    do c = 1, min(6, grid % n_cells)
+      print *, '#', (grid % cells_n(j,c), j = 1, grid % cells_n_nodes(c))
     end do
   end if
-
-  cnt_node = cnt_node - 1
-
-  !-----------------------!
-  !   Reinitialize nodes  !
-  !-----------------------!
-  grid % n_nodes = cnt_node
+  
+  !------------------------!
+  !   Reinitialize nodes   !
+  !------------------------!
+  print '(a38,i9)', ' # New number of nodes:               ', i - 1
 
   deallocate(grid % xn)
   deallocate(grid % yn)
   deallocate(grid % zn)
 
-  call Grid_Mod_Allocate_Nodes(grid, grid % n_nodes)
+  call Grid_Mod_Allocate_Nodes(grid, i - 1) ! -> grid % n_nodes
 
   grid % xn(1: grid % n_nodes) = x_new(1: grid % n_nodes)
   grid % yn(1: grid % n_nodes) = y_new(1: grid % n_nodes)
@@ -182,6 +275,5 @@
   deallocate(criterion)
   deallocate(old_seq)
   deallocate(new_seq)
-  deallocate(nodes_to_remove)
 
   end subroutine

@@ -69,9 +69,9 @@
         print *, '#         Bnd section index ', sect
         print *, '#         Bnd section type:  ', ElementTypeName(cell_type)
         print *, '#         First cell:        ',  &
-                 cgns_base(base) % block(block) % section(sect) % first_cell
+          cgns_base(base) % block(block) % section(sect) % first_cell
         print *, '#         Last cell:         ',  &
-                 cgns_base(base) % block(block) % section(sect) % last_cell
+          cgns_base(base) % block(block) % section(sect) % last_cell
       end if
 
       ! Count boundary cells
@@ -109,7 +109,7 @@
       else
         ! This interface name was already added, mark for deletion
         cgns_base(base) % block(block) %  &
-             interface(int) % marked_for_deletion = .true.
+          interface(int) % marked_for_deletion = .true.
       end if
 
       if(verbose) then
@@ -119,9 +119,9 @@
         print *, '#         Interface section index: ', sect
         print *, '#         Interface type:  ', ElementTypeName(cell_type)
         print *, '#         First cell:        ',  &
-                 cgns_base(base) % block(block) % section(sect) % first_cell
+          cgns_base(base) % block(block) % section(sect) % first_cell
         print *, '#         Last cell:         ',  &
-                 cgns_base(base) % block(block) % section(sect) % last_cell
+          cgns_base(base) % block(block) % section(sect) % last_cell
         print *, '#         Marked for deletion:     ', cgns_base(base) % &
           block(block) % interface(int) % marked_for_deletion
       end if
@@ -152,9 +152,9 @@
       print *, '#         Cell section idx:  ', sect
       print *, '#         Cell section type: ', ElementTypeName(cell_type)
       print *, '#         First cell:        ',  &
-               cgns_base(base) % block(block) % section(sect) % first_cell
+        cgns_base(base) % block(block) % section(sect) % first_cell
       print *, '#         Last cell:         ',  &
-               cgns_base(base) % block(block) % section(sect) % last_cell
+        cgns_base(base) % block(block) % section(sect) % last_cell
     end if
 
     ! Count cells in sect

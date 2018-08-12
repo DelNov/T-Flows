@@ -128,8 +128,7 @@
   integer              :: cnt_int_tri
   integer              :: cnt_int
   character(len=80)    :: interface_names(1024)
-  logical, allocatable :: interface_nodes(:,:) ! .true. mean leave them
-  logical, allocatable :: interface_cells(:,:) ! .true. mean leave them
+  integer, allocatable :: interface_nodes(:,:) ! -1, 0, 1
 
   ! Block-wise counter of boundary cells
   integer           :: cnt_block_bnd_cells  ! probably not needed

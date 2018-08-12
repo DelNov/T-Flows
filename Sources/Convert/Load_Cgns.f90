@@ -146,13 +146,8 @@
   !----------------!
   !   Interfaces   !
   !----------------!
-  allocate(interface_nodes(cnt_nodes, cnt_int)); interface_nodes = .true.
-  allocate(interface_cells(cnt_cells, cnt_int)); interface_cells = .true.
-
-!  allocate(interface_nodes((cnt_int_tri*3+cnt_int_qua*4)/2, cnt_int))
-!  interface_nodes = .true.
-!  allocate(interface_cells((cnt_int_tri + cnt_int_qua)/2, cnt_int))
-!  interface_cells = .true.  
+  ! 0 means node/cell does not belong to interface, 1 - leave it, -1 - delete it
+  allocate(interface_nodes(cnt_nodes, cnt_int)); interface_nodes = 0
 
   call Allocate_Memory(grid)
 
