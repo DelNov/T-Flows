@@ -21,7 +21,7 @@
   integer              :: last_cell     ! index of last element
   integer              :: parent_flag
   integer              :: error
-  integer              :: n_nodes, loc, c, n, cell, dir, cnt, bc, int
+  integer              :: n_nodes, loc, c, n, cell, dir, cnt, bc, int, int_id
   integer, allocatable :: cell_n(:,:)
   integer, allocatable :: face_n(:,:)
   integer, allocatable :: interface_n(:,:)
@@ -117,21 +117,10 @@
   do int = 1, cgns_base(base) % block(block) % n_interfaces
 
     int_name = trim(cgns_base(base) % block(block) % interface(int) % name)
+    int_id = cgns_base(base) % block(block) % interface(int) % id
 
     if(index(trim(sect_name), trim(int_name), back = .true.) .ne. 0) then
 
-      
-      
-      if(verbose) then
-        print *, '#         ---------------------------------'
-        print *, '#         Interface name:  ', trim(sect_name)
-        print *, '#         ---------------------------------'
-        print *, '#         Interface section index: ', sect
-        print *, '#         Interface type:  ', ElementTypeName(cell_type)
-        print *, '#         Marked for deletion:  ', cgns_base(base) % &
-          block(block) % interface(int) % marked_for_deletion
-      end if
-        
       ! Allocate memory
       if ( ElementTypeName(cell_type) .eq. 'QUAD_4') n_nodes = 4
       if ( ElementTypeName(cell_type) .eq. 'TRI_3' ) n_nodes = 3
@@ -145,36 +134,45 @@
                               parent_data,       & !(out)
                               error)               !(out)
 
-      if(verbose) then
-        print *, "#         Interface cells connection table (sample): "
-        do loc = 1, min(6, cnt)
-          print '(a9,8i7)', " ", (interface_n(n,loc), n = 1, n_nodes)
-        end do
-      end if
-
       ! If interface is not marked for deletion
       if ( .not. cgns_base(base) % &
-      block(block) % interface(int) % marked_for_deletion) then
+        block(block) % interface(int) % marked_for_deletion) then
+
         ! Add unique interface
         cnt_int = cnt_int + 1
 
         ! Mark nodes and cells to leave them at interface
         do loc = 1, cnt
           do n = 1, n_nodes
-            interface_nodes(interface_n(n, loc) + cnt_nodes, cnt_int) = 1
+            interface_nodes(interface_n(n, loc) + cnt_nodes, int_id) = 1
           end do
         end do
       else
         ! Mark nodes to delete from interface and cells to renumber
         do loc = 1, cnt
           do n = 1, n_nodes
-            interface_nodes(interface_n(n, loc) + cnt_nodes, cnt_int) = -1
+            interface_nodes(interface_n(n, loc) + cnt_nodes, int_id) = -1
           end do
         end do
       end if
 
-      deallocate(interface_n)
+      if(verbose) then
+        print *, '#         ---------------------------------'
+        print *, '#         Interface name:  ', trim(sect_name)
+        print *, '#         ---------------------------------'
+        print *, '#         Interface index: ', cgns_base(base) % &
+        block(block) % interface(int) % id
+        print *, '#         Section index: ', sect
+        print *, '#         Interface type:  ', ElementTypeName(cell_type)
+        print *, '#         Marked for deletion:  ', cgns_base(base) % &
+        block(block) % interface(int) % marked_for_deletion
+          print *, "#         Interface cells connection table (sample): "
+          do loc = 1, min(6, cnt)
+            print '(a9,8i7)', " ", (interface_n(n,loc), n = 1, n_nodes)
+          end do
+        end if
 
+        deallocate(interface_n)
     end if
   end do
 

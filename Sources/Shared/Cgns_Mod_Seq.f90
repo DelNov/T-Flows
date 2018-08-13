@@ -61,6 +61,7 @@
   type Cgns_Interface_Type
     character(len=80)    :: name
     logical              :: marked_for_deletion
+    integer              :: id
   end type
 
   ! Element section

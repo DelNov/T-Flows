@@ -106,10 +106,17 @@
         ! Increase number of interfaces
         cnt_int = cnt_int + 1
         interface_names(cnt_int) = trim(int_name)
+        cgns_base(base) % block(block) % interface(int) % id = cnt_int
       else
         ! This interface name was already added, mark for deletion
         cgns_base(base) % block(block) %  &
           interface(int) % marked_for_deletion = .true.
+        ! Retrive unique id of that interface
+        do i = 1, cnt_int
+          if (trim(int_name) .eq. trim(interface_names(i))) then
+            cgns_base(base) % block(block) % interface(int) % id = i
+          end if
+        end do
       end if
 
       if(verbose) then
