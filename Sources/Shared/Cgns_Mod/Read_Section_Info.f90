@@ -11,16 +11,16 @@
   integer           :: block_id      ! block index number
   integer           :: sect_id       ! element section index
   character(len=80) :: sect_name     ! name of the Elements_t node
-  character(len=80) :: sect_type     ! type of the Elements_t node
   character(len=80) :: int_name      ! name of the interface
-  character(len=80) :: int_type      ! type of the interface
+  integer           :: int_type      ! type of interface.  1-quad, 2-tri, 3-mix
+  integer           :: loc_type      ! type of interface.  1-quad, 2-tri, 3-mix
   integer           :: cell_type     ! types of elements in the section
   integer           :: first_cell    ! index of first element
   integer           :: last_cell     ! index of last element
   integer           :: n_bnd         ! index of last boundary element
   integer           :: parent_flag   ! are the parent cells stored (I guess)
   integer           :: error
-  integer           :: cnt, bc, int, i
+  integer           :: cnt, bc, int, i, pos_in_list
   logical           :: found_in_list
 !==============================================================================!
 
@@ -96,53 +96,45 @@
 
     if(index(trim(sect_name), trim(int_name), back = .true.) .ne. 0) then
 
-      int_type = trim(cgns_base(base) % block(block) % interface(int) % type_c)
+      int_type = cgns_base(base) % block(block) % interface(int) % int_type
 
       ! Count interface cells
       if ( ElementTypeName(cell_type) .eq. 'QUAD_4') then
         cnt_int_qua = cnt_int_qua + cnt
-        sect_type = 'QUAD_4'
+        loc_type = 1
       end if
       if ( ElementTypeName(cell_type) .eq. 'TRI_3' ) then
         cnt_int_tri = cnt_int_tri + cnt
-        sect_type = 'TRI_3'
+        loc_type = 2
       end if
 
       ! Add new interface name, if unique
       found_in_list = .false.
       do i = 1, cnt_int
         if (trim(int_name) .eq. trim(interface_names(i))) then
+          pos_in_list = i
           found_in_list = .true.
         end if
       end do
 
       if (.not. found_in_list) then
-        ! Increase number of interfaces
+        ! Increase number of unique interfaces
         cnt_int = cnt_int + 1
         interface_names(cnt_int) = trim(int_name)
         cgns_base(base) % block(block) % interface(int) % id = cnt_int
-        cgns_base(base) % block(block) % interface(int) % type_c = &
-          trim(sect_type)
-      elseif (trim(int_type) .ne. trim(sect_type)) then
+        cgns_base(base) % block(block) % interface(int) % int_type = loc_type
+      else
+
+        if (loc_type .eq. int_type .and. int_type < 3) then
+          cgns_base(base) % block(block) % interface(int) % int_type = 3 ! mix
+        else
+          ! This interface name was already added, mark for deletion
+          cgns_base(base) % block(block) %  &
+            interface(int) % marked_for_deletion = .true.
+        end if
 
         ! Retrive unique id of that interface
-        do i = 1, cnt_int
-          if (trim(int_name) .ne. trim(interface_names(i))) then
-            cgns_base(base) % block(block) % interface(int) % id = i
-          end if
-        end do
-        cgns_base(base) % block(block) % interface(int) % type_c = &
-          trim(sect_type)
-      else
-        ! This interface name was already added, mark for deletion
-        cgns_base(base) % block(block) %  &
-          interface(int) % marked_for_deletion = .true.
-        ! Retrive unique id of that interface
-        do i = 1, cnt_int
-          if (trim(int_name) .eq. trim(interface_names(i))) then
-            cgns_base(base) % block(block) % interface(int) % id = i
-          end if
-        end do
+        cgns_base(base) % block(block) % interface(int) % id = pos_in_list
       end if
 
       if(verbose) then
@@ -158,8 +150,8 @@
         print *, '#         Marked for deletion:     ', cgns_base(base) % &
           block(block) % interface(int) % marked_for_deletion
           
-        print *, '#         sect_type ', trim(sect_type)
-        print *, '#         int_type ', trim(int_type)
+        print *, '#         loc_type ', loc_type
+        print *, '#         int_type ', int_type
       end if
 
     end if

@@ -59,10 +59,10 @@
 
   ! Interface section
   type Cgns_Interface_Type
-    character(len=80)    :: name
-    logical              :: marked_for_deletion
-    integer              :: id
-    character(len=80)    :: type_c
+    character(len=80) :: name
+    logical           :: marked_for_deletion
+    integer           :: id
+    integer           :: int_type ! 0 - uninit, 1 -quad, 2 -tri, 3 - mix
   end type
 
   ! Element section
