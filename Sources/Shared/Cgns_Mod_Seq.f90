@@ -62,6 +62,7 @@
     character(len=80)    :: name
     logical              :: marked_for_deletion
     integer              :: id
+    character(len=80)    :: type_c
   end type
 
   ! Element section
@@ -129,7 +130,9 @@
   integer              :: cnt_int_tri
   integer              :: cnt_int
   character(len=80)    :: interface_names(1024)
-  integer, allocatable :: interface_nodes(:,:) ! -1, 0, 1
+  integer, allocatable :: interface_cells(:,:,:,:)
+  integer              :: cnt_int_cells
+
 
   ! Block-wise counter of boundary cells
   integer           :: cnt_block_bnd_cells  ! probably not needed

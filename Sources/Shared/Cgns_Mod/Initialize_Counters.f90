@@ -22,5 +22,6 @@
   cnt_int     = 0 ! number of unique interfaces
   cnt_int_tri = 0 ! number of triangles defining block interface
   cnt_int_qua = 0 ! number of quads     defining block interface
+  cnt_int_cells = 0 ! 
 
   end subroutine

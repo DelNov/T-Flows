@@ -124,6 +124,8 @@
     print *, '# - number of nodes on interfaces: ',cnt_int_tri*3 + cnt_int_qua*4
   end if
 
+  stop
+
   !--------------------------------------------!
   !                                            !
   !   Allocate memory for Grid_Mod variables   !
@@ -146,8 +148,9 @@
   !----------------!
   !   Interfaces   !
   !----------------!
-  ! 0 means node/cell does not belong to interface, 1 - leave it, -1 - delete it
-  allocate(interface_nodes(cnt_nodes, cnt_int)); interface_nodes = 0
+  ! Explained in Cgns_Mod_Merge_Nodes
+  allocate(interface_cells(1:2, cnt_int_qua + cnt_int_tri, 1:4, cnt_int));
+  interface_cells = -1
 
   call Allocate_Memory(grid)
 

@@ -19,7 +19,12 @@
   integer, allocatable :: old_seq(:), new_seq(:), interface_tmp(:,:)
   real,    allocatable :: x_new(:), y_new(:), z_new(:)
   real                 :: big, small
-  integer              :: int, cnt_nodes_on_interface
+  integer              :: int
+  integer              :: cnt_nodes_on_int_to_keep, cnt_nodes_on_int_to_rem
+  integer              :: cnt_nodes_on_int_total
+  integer              :: n1, n2
+  logical, allocatable :: nodes_to_remove(:) ! marked duplicated nodes to remove
+
 !==============================================================================!
 
   print *, '# Merging blocks since they have common interfaces'
@@ -96,105 +101,104 @@
   
     ! Array new_seq is a map for nodes "n -> new_seq(n)"
     allocate(new_seq (grid % n_nodes)); new_seq = 0
+    allocate(nodes_to_remove(grid % n_nodes));  nodes_to_remove = .false.
+
     do n = 1, grid % n_nodes
       new_seq(n) = n
-    end do
+    end do ! n
     !--------------------------------------------------------------------------!
     !   new_seq map now is:                                                    !
     !   1  2  3  4  5  6  7  8  9  10  11  12  13  14  15  16                  !
     !--------------------------------------------------------------------------!
 
     if (verbose) then
-      i = 1
-      k = 1
-      do n = 1, grid % n_nodes
-        if ( interface_nodes(n, int) .eq. -1 ) then
-          i = i + 1
-          !print *, 'int=', int, ' n = ', n, 'del=true'
-        else if ( interface_nodes(n, int) .eq. 1 ) then
-          k = k + 1
-          !print *, 'int=', int, ' n = ', n, 'del=false'
+      print *, '# Interface to keep:', int
+      do c = 1, min(6, cnt_int_cells)
+        if (interface_cells(1, c, 1, int) > 0) then
+          print *, 'c =', interface_cells(1, c, 1:4, int)
         end if
       end do
-      print *, '# Interface', int, ', Nodes to remove:', i - 1, &
-        'Nodes to keep:', k - 1
+      print *, '# Interface to remove:', int
+      do c = 1, min(6, cnt_int_cells)
+        if (interface_cells(2, c, 1, int) > 0) then
+          print *, 'c =', interface_cells(2, c, 1:4, int)
+        end if
+      end do
     end if
 
+    do n = 1, min(6, grid % n_nodes)
+      print *, '# n', n, grid % xn(n), grid % yn(n), grid % zn(n)
+    end do ! n
+
+    do c = 1, min(6, grid % n_cells)
+        print *, "conn ", c, (grid % cells_n(i,c), i = 1, grid % cells_n_nodes(c))
+    end do ! c
+
     ! Count nodes on interface
-    cnt_node = 1
-    do n = 1, grid % n_nodes
-      if (interface_nodes(n, int) .ne. 0) then
-        cnt_node = cnt_node + 1
-      end if
-    end do
-    cnt_nodes_on_interface = cnt_node - 1
-    
-    !----------------------------------------------!
-    !   Sind nodes until target value is reached   !
-    !----------------------------------------------!
-    if (verbose) print *, "Sind until n:", cnt_nodes_on_interface/2
-    
-    do while ( cnt_node .ne. cnt_nodes_on_interface/2 )
-      cnt_node = 1
+    cnt_nodes_on_int_to_keep = 0
+    cnt_nodes_on_int_to_rem  = 0
 
-      ! Allocate memory
-      allocate(criterion (cnt_nodes_on_interface)); criterion = 0.
-      allocate(old_seq   (cnt_nodes_on_interface)); old_seq = 0
-      
-      !--------------------------------------!
-      !   Prescribe some sorting criterion   !
-      !--------------------------------------!
+    do c = 1, cnt_int_cells
+      do k = 1, 4
+        n1 = interface_cells(1, c, k, int)
+        n2 = interface_cells(2, c, k, int)
 
-      i = 1
-      do n = 1, grid % n_nodes
-        if (interface_nodes(n, int) .ne. 0) then
+        if (n1 > 0) cnt_nodes_on_int_to_keep = cnt_nodes_on_int_to_keep + 1
+        if (n2 > 0) cnt_nodes_on_int_to_rem  = cnt_nodes_on_int_to_rem  + 1
+
+      end do ! k
+    end do ! c
+
+    ! Allocate memory
+    cnt_nodes_on_int_total = cnt_nodes_on_int_to_rem + cnt_nodes_on_int_to_keep
+    allocate(criterion (cnt_nodes_on_int_total)); criterion = 0.
+    allocate(old_seq   (cnt_nodes_on_int_total)); old_seq = 0
+    
+    !--------------------------------------!
+    !   Prescribe some sorting criterion   !
+    !--------------------------------------!
+    cnt_node = 1 ! count grouped nodes to keep
+
+    i = 1
+    do c = 1, cnt_int_cells
+      do k = 1, 4
+        n = 0
+        n1 = interface_cells(1, c, k, int)
+        n2 = interface_cells(2, c, k, int)
+        if (n1 > 0) n = n1
+        if (n2 > 0) n = n2
+        if (n > 0) then
           old_seq(i) = n
           criterion(i) = grid % xn(n) + grid % yn(n)*big + grid % zn(n)*big**2
           i = i + 1
         end if
-      end do
-      
-      ! Sort nodes by this criterion
-      call Sort_Real_Carry_Int_Heapsort(criterion(1), old_seq(1), &
-      cnt_nodes_on_interface)
-      
-      ! Count grouped nodes after sorting
-      v = 1 ! related to verbose output
-      do i = 2, cnt_nodes_on_interface
-        ! If node is unique
-        if( .not. Approx(criterion(i-1), criterion(i), small) ) then
-          cnt_node = cnt_node + 1
-        end if
-      end do ! i
+      end do ! k
+    end do ! n
 
-      if (verbose) print *, '# Interface', int, ', Reached n:', cnt_node
-      if (cnt_node < cnt_nodes_on_interface/2) then
-        small = small / 2
-        deallocate(criterion)
-        deallocate(old_seq  )
-      elseif (cnt_node > cnt_nodes_on_interface/2) then
-        small = small * 2
-        deallocate(criterion)
-        deallocate(old_seq  )
+    ! Sort nodes by this criterion
+    call Sort_Real_Carry_Int_Heapsort(criterion(1), old_seq(1), &
+      cnt_nodes_on_int_total)
+    
+    ! Count grouped nodes after sorting
+    v = 1 ! related to verbose output
+    do i = 2, cnt_nodes_on_int_total
+      ! If node is unique
+      if( .not. Approx(criterion(i-1), criterion(i), small) ) then
+        cnt_node = cnt_node + 1
       end if
-
-    end do ! sind
-    ! Now target value of nodes on interface is reached
+    end do ! i
 
     v = 1 ! related to verbose output
-    do i = 2, cnt_nodes_on_interface
+    do i = 2, cnt_nodes_on_int_total
       ! If node is duplicated
       if( Approx(criterion(i-1), criterion(i), small) ) then
 
-        ! Duplicated nodes must be assinged their lowest node id
-        !if (interface_nodes(old_seq(i-1), int) .eq. -1) then
-        !  new_seq(old_seq(i-1)) = new_seq(old_seq(i))
-        !else
-        !  new_seq(old_seq(i)) = new_seq(old_seq(i-1))
-        !end if
+        if (old_seq(i-1) .ne. old_seq(i)) then
+          new_seq(old_seq(i)  ) = minval(old_seq(i-1:i))
+          new_seq(old_seq(i-1)) = minval(old_seq(i-1:i))
 
-        new_seq(old_seq(i)  ) = minval(old_seq(i-1:i))
-        new_seq(old_seq(i-1)) = minval(old_seq(i-1:i))
+          nodes_to_remove(maxval(old_seq(i-1:i))) = .true.
+        end if
 
         if (verbose .and. v <= min(6, grid % n_nodes)) then
           write (*, '(a)', advance='no')' # '
@@ -217,7 +221,11 @@
     !--------------------------------------------!
     !   Reconstruct new nodes and cells arrays   !
     !--------------------------------------------!
-    cnt_node = grid % n_nodes - cnt_nodes_on_interface/2
+    cnt_node = 0
+    do n = 1, grid % n_nodes
+      if (nodes_to_remove(n)) cnt_node = cnt_node + 1
+    end do
+    cnt_node = grid % n_nodes - cnt_node
   
     allocate(x_new(cnt_node))
     allocate(y_new(cnt_node))
@@ -225,39 +233,23 @@
 
     cnt_node = 1
     do n = 1, grid % n_nodes
-      if (interface_nodes(n, int) > -1) then
-
+      if (.not. nodes_to_remove(n)) then ! if node is unique
+!print *, 'n ', n, 'cnt_node ', cnt_node, 'keep'
         x_new(cnt_node) = grid % xn(n)
         y_new(cnt_node) = grid % yn(n)
         z_new(cnt_node) = grid % zn(n)
 
         cnt_node = cnt_node + 1
       else
+!print *, 'n ', n, 'cnt_node ', cnt_node, 'kill'
+        ! New sequence: shift all non-unique nodes in increasing order
         do c = cnt_node, grid % n_nodes
           if (new_seq(c) > cnt_node) then
-            new_seq(c) = new_seq(c) - 1
+            new_seq(c) = new_seq(c) -1
           end if
         end do ! c
       end if
     end do ! n
-
-    ! If not last interface, remap interfaces as well
-    if (int < cnt_int) then
-
-      allocate(interface_tmp(cnt_node - 1, cnt_node)); interface_tmp = 0
-
-      do k = int + 1, cnt_int
-
-        cnt_node = 1
-        do n = 1, grid % n_nodes
-            if (interface_nodes(n, int) > -1) then
-              interface_tmp(cnt_node, k) = interface_nodes(n, k)
-              cnt_node = cnt_node + 1
-            end if
-        end do ! k
-      end do ! n
-    end if ! if not last interface
-
     !--------------------------------------------------------------------------!
     !   new_seq map now is:                                                    !
     !   1  2  3  4  5  6  7  8  5  6  7  8  9  10  11  12                      !
@@ -292,24 +284,28 @@
     deallocate(y_new)
     deallocate(z_new)
 
-    !-----------------------------!
-    !   Reinitialize interfaces   !
-    !-----------------------------!
+    !----------------------!
+    !   Remap interfaces   !
+    !----------------------!
 
     ! If not last interface, remap interfaces as well
     if (int < cnt_int) then
-      deallocate(interface_nodes)
-      allocate(interface_nodes(1:grid % n_nodes, cnt_int)); interface_nodes = 0
 
-      do k = int + 1, cnt_int
-        interface_nodes(1: grid % n_nodes, k) =  &
-          interface_tmp(1: grid % n_nodes, k)
-      end do ! k
+      do n = int + 1, cnt_int
+        do c = 1, cnt_int_cells
+          do k = 1, 4
+            n1 = interface_cells(1, c, k, n)
+            n2 = interface_cells(2, c, k, n)
+            if (n1 > 0) interface_cells(1, c, k, n) = new_seq(n1)
+            if (n2 > 0) interface_cells(2, c, k, n) = new_seq(n2)
+          end do ! k
+        end do ! c
+      end do ! n
 
-      deallocate(interface_tmp)
     end if
 
     deallocate(new_seq)
+    deallocate(nodes_to_remove)
 
   end do ! interfaces
 

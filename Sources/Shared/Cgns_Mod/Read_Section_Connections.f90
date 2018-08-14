@@ -141,20 +141,28 @@
         ! Add unique interface
         cnt_int = cnt_int + 1
 
-        ! Mark nodes and cells to leave them at interface
+        ! Fetch first interface
         do loc = 1, cnt
           do n = 1, n_nodes
-            interface_nodes(interface_n(n, loc) + cnt_nodes, int_id) = 1
-          end do
-        end do
+          interface_cells(1, loc + cnt_int_cells, n, int_id) = &
+            interface_n(n, loc) + cnt_nodes
+          end do ! n
+        end do ! loc
+
       else
-        ! Mark nodes to delete from interface and cells to renumber
+
+        ! Fetch second interface
         do loc = 1, cnt
           do n = 1, n_nodes
-            interface_nodes(interface_n(n, loc) + cnt_nodes, int_id) = -1
-          end do
-        end do
+          interface_cells(2, loc + cnt_int_cells, n, int_id) = &
+            interface_n(n, loc) + cnt_nodes
+          end do ! n
+        end do ! loc
+
       end if
+
+      ! Fetch received parameters
+      cnt_int_cells = cnt_int_cells + cnt
 
       if(verbose) then
         print *, '#         ---------------------------------'
@@ -166,11 +174,15 @@
         print *, '#         Interface type:  ', ElementTypeName(cell_type)
         print *, '#         Marked for deletion:  ', cgns_base(base) % &
         block(block) % interface(int) % marked_for_deletion
-          print *, "#         Interface cells connection table (sample): "
-          do loc = 1, min(6, cnt)
-            print '(a9,8i7)', " ", (interface_n(n,loc), n = 1, n_nodes)
-          end do
-        end if
+        print *, "#         Interface cells connection table (sample): "
+        do loc = 1, min(6, cnt)
+          print '(a9,8i7)', " ", (interface_n(n,loc), n = 1, n_nodes)
+        end do
+        do loc = 1, min(6, cnt)
+          print *, "#         Interface parent data (sample): ", &
+            parent_data(loc, 1)
+        end do
+      end if
 
         deallocate(interface_n)
     end if

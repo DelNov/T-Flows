@@ -11,7 +11,9 @@
   integer           :: block_id      ! block index number
   integer           :: sect_id       ! element section index
   character(len=80) :: sect_name     ! name of the Elements_t node
+  character(len=80) :: sect_type     ! type of the Elements_t node
   character(len=80) :: int_name      ! name of the interface
+  character(len=80) :: int_type      ! type of the interface
   integer           :: cell_type     ! types of elements in the section
   integer           :: first_cell    ! index of first element
   integer           :: last_cell     ! index of last element
@@ -94,6 +96,18 @@
 
     if(index(trim(sect_name), trim(int_name), back = .true.) .ne. 0) then
 
+      int_type = trim(cgns_base(base) % block(block) % interface(int) % type_c)
+
+      ! Count interface cells
+      if ( ElementTypeName(cell_type) .eq. 'QUAD_4') then
+        cnt_int_qua = cnt_int_qua + cnt
+        sect_type = 'QUAD_4'
+      end if
+      if ( ElementTypeName(cell_type) .eq. 'TRI_3' ) then
+        cnt_int_tri = cnt_int_tri + cnt
+        sect_type = 'TRI_3'
+      end if
+
       ! Add new interface name, if unique
       found_in_list = .false.
       do i = 1, cnt_int
@@ -107,6 +121,18 @@
         cnt_int = cnt_int + 1
         interface_names(cnt_int) = trim(int_name)
         cgns_base(base) % block(block) % interface(int) % id = cnt_int
+        cgns_base(base) % block(block) % interface(int) % type_c = &
+          trim(sect_type)
+      elseif (trim(int_type) .ne. trim(sect_type)) then
+
+        ! Retrive unique id of that interface
+        do i = 1, cnt_int
+          if (trim(int_name) .ne. trim(interface_names(i))) then
+            cgns_base(base) % block(block) % interface(int) % id = i
+          end if
+        end do
+        cgns_base(base) % block(block) % interface(int) % type_c = &
+          trim(sect_type)
       else
         ! This interface name was already added, mark for deletion
         cgns_base(base) % block(block) %  &
@@ -131,14 +157,9 @@
           cgns_base(base) % block(block) % section(sect) % last_cell
         print *, '#         Marked for deletion:     ', cgns_base(base) % &
           block(block) % interface(int) % marked_for_deletion
-      end if
-
-      ! Count interface cells
-      if ( ElementTypeName(cell_type) .eq. 'QUAD_4') then
-        cnt_int_qua = cnt_int_qua + cnt
-      end if
-      if ( ElementTypeName(cell_type) .eq. 'TRI_3' ) then
-        cnt_int_tri = cnt_int_tri + cnt
+          
+        print *, '#         sect_type ', trim(sect_type)
+        print *, '#         int_type ', trim(int_type)
       end if
 
     end if
