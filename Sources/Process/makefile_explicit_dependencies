@@ -1911,6 +1911,7 @@ $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
 
+#-- ./Cgns_Mod/Read_Interface_Info.f90
 #-- ./Cgns_Mod/Read_Number_Of_Element_Sections.f90
 #-- ./Cgns_Mod/Read_Section_Info.f90
 #-- ./Cgns_Mod/Merge_Nodes_Old.f90
@@ -1939,9 +1940,21 @@ $(DIR_OBJECT)/Read_Section_Connections.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
+#-- ./Cgns_Mod/Merge_Nodes_Newest.f90
+$(DIR_OBJECT)/Merge_Nodes_Newest.o:\
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 
+
+#-- ./Cgns_Mod/Read_Number_Of_Block_Interfaces.f90
 #-- ./Cgns_Mod/Read_Number_Of_Bnd_Conds_In_Block.f90
 #-- ./Cgns_Mod/Merge_Nodes_New.f90
 $(DIR_OBJECT)/Merge_Nodes_New.o:\
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o 
+
+#-- ./Cgns_Mod/Merge_Nodes_Newest_v0.f90
+$(DIR_OBJECT)/Merge_Nodes_Newest_v0.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
@@ -1980,12 +1993,6 @@ $(DIR_SHARED)/gen_mod.f90
 #-- ./gen_mod.f90
 #-- ./Tokenizer_Mod/Read_Line.f90
 #-- ./Distance_Squared.f90
-#-- ./Save_Shadows.f90
-$(DIR_OBJECT)/Save_Shadows.o:\
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/gen_mod.f90 
-
 #-- ./To_Lower_Case.f90
 #-- ./Sort_Int_By_Index.f90
 #-- ./Save_Vtu_Faces.f90
@@ -2013,6 +2020,7 @@ $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 \
@@ -2028,6 +2036,10 @@ $(DIR_SHARED)/Cgns_Mod/*/*.f90
 #-- ./Grid_Mod/Print_Bnd_Cond_Info.f90
 #-- ./Grid_Mod/Allocate_Nodes.f90
 #-- ./Grid_Mod/Allocate_Cells.f90
+#-- ./Grid_Mod/Estimate_Big_And_Small.f90
+$(DIR_OBJECT)/Estimate_Big_And_Small.o:\
+$(DIR_OBJECT)/Const_Mod.o 
+
 #-- ./Grid_Mod/Sort_Cells_By_Index.f90
 #-- ./Grid_Mod/Allocate_Faces.f90
 #-- ./Grid_Mod/Sort_Faces_By_Index.f90
@@ -2073,6 +2085,7 @@ $(DIR_OBJECT)/Name_Mod.o
 $(DIR_OBJECT)/Cgns_Mod_Seq.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 \
@@ -2110,5 +2123,6 @@ $(DIR_OBJECT)/Div_Mod.o
 $(DIR_OBJECT)/Grid_Mod.o:\
 $(DIR_OBJECT)/Material_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o \
 $(DIR_OBJECT)/Bnd_Cond_Mod.o 
 
