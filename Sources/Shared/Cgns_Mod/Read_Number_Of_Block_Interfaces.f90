@@ -47,4 +47,5 @@
   cgns_base(base) % block(block) % interface(1:number_of_interfaces) % &
     int_type = 0
 
+
   end subroutine

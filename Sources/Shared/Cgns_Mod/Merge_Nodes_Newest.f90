@@ -96,6 +96,9 @@
     end do
   end if
 
+  print *, "cnt_int ", cnt_int
+  stop
+
   ! For each unique interface
   do int = 1, cnt_int
   

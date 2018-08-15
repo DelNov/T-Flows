@@ -139,7 +139,7 @@
         block(block) % interface(int) % marked_for_deletion) then
 
         ! Add unique interface
-        cnt_int = cnt_int + 1
+        ! cnt_int = cnt_int + 1
 
         ! Fetch first interface
         do loc = 1, cnt
@@ -178,9 +178,9 @@
         do loc = 1, min(6, cnt)
           print '(a9,8i7)', " ", (interface_n(n,loc), n = 1, n_nodes)
         end do
+        print *, "#         Interface parent data (sample): "
         do loc = 1, min(6, cnt)
-          print *, "#         Interface parent data (sample): ", &
-            parent_data(loc, 1)
+            print '(a9,8i7)', " ",parent_data(loc, 1)
         end do
       end if
 

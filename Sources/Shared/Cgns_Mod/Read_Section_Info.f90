@@ -93,10 +93,9 @@
   do int = 1, cgns_base(base) % block(block) % n_interfaces
  
     int_name = trim(cgns_base(base) % block(block) % interface(int) % name)
+    int_type = cgns_base(base) % block(block) % interface(int) % int_type
 
     if(index(trim(sect_name), trim(int_name), back = .true.) .ne. 0) then
-
-      int_type = cgns_base(base) % block(block) % interface(int) % int_type
 
       ! Count interface cells
       if ( ElementTypeName(cell_type) .eq. 'QUAD_4') then
@@ -124,8 +123,8 @@
         cgns_base(base) % block(block) % interface(int) % id = cnt_int
         cgns_base(base) % block(block) % interface(int) % int_type = loc_type
       else
-
-        if (loc_type .eq. int_type .and. int_type < 3) then
+        ! If this interfaces in a list, but defined with different type
+        if (loc_type .ne. int_type .and. int_type > 0 .and. int_type < 3) then
           cgns_base(base) % block(block) % interface(int) % int_type = 3 ! mix
         else
           ! This interface name was already added, mark for deletion
@@ -148,10 +147,7 @@
         print *, '#         Last cell:         ',  &
           cgns_base(base) % block(block) % section(sect) % last_cell
         print *, '#         Marked for deletion:     ', cgns_base(base) % &
-          block(block) % interface(int) % marked_for_deletion
-          
-        print *, '#         loc_type ', loc_type
-        print *, '#         int_type ', int_type
+          block(block) % interface(int) % marked_for_deletion          
       end if
 
     end if
