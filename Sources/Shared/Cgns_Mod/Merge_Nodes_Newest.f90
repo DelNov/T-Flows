@@ -14,7 +14,6 @@
   include "../Shared/Approx.int"
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, cnt_node, n, i, k, v
-  
   real,    allocatable :: criterion(:) ! sorting criterion
   integer, allocatable :: old_seq(:), new_seq(:), interface_tmp(:,:)
   real,    allocatable :: x_new(:), y_new(:), z_new(:)
@@ -43,8 +42,8 @@
   !   Third index is node id for a cell. -1 mean this node is not specified    !
   !   Last index tells to which unique interface this cell belongs.            !
   !                                                                            !
-  !   Unfortunately coordinates of cell nodes inside domains 
-  !   interface_cells(1,...) and interface_cells
+  !   Unfortunately coordinates of cell nodes inside domains                   !
+  !   interface_cells(1,...) and interface_cells                               !
   !   interface_nodes(n, int) = 1 and interface_nodes(n, int) = -1             !
   !   do not match, because they originated from different blocks.             !
   !   That is why sorting is required by some criterion to group them.         !
@@ -60,7 +59,7 @@
   !    7:  0 -1  1      | /       |/      <->   |/       |/                    !
   !    8:  0 -1  0      16--------12      <->   8--------4                     !
   !    9:  0  1  1                                                             !
-  !   10:  0  1  0        cell 2                    cell 1                     !
+  !   10:  0  1  0        block 2                    block 1                   !
   !   11:  0 -1  1    y                                                        !
   !   12:  0 -1  0    ^                                                        !
   !   13: -1  1  1    |   ^ z                                                  !
@@ -68,8 +67,8 @@
   !   15: -1 -1  1    | /                                                      !
   !   16: -1 -1  0    --------> x                                              !
   !                                                                            !
-  !   cell 1: 1   2   3   4   5   6   7   8                                    !
-  !   cell 2: 9  10  11  12  13  14  15  16                                    !
+  !   block 1: 1   2   3   4   5   6   7   8                                   !
+  !   block 2: 9  10  11  12  13  14  15  16                                   !
   !                                                                            !
   !   after function:                                                          !
   !        x  y  z                                                             !
@@ -82,12 +81,12 @@
   !    7:  0 -1  1    | /        |/     <->   |/       |/                      !
   !    8:  0 -1  0    12---------8      <->   8--------4                       !
   !    9: -1  1  1                                                             !
-  !   10: -1  1  0    cell 2                    cell 1                         !
+  !   10: -1  1  0    block 2                    block 1                       !
   !   11: -1 -1  1                                                             !
   !   12: -1 -1  0                                                             !
   !                                                                            !
-  !   cell 1: 1  2  3  4   5   6   7   8                                       !
-  !   cell 2: 5  6  7  8   9  10  11  12                                       !
+  !   block 1: 1  2  3  4   5   6   7   8                                      !
+  !   block 2: 5  6  7  8   9  10  11  12                                      !
   !                                                                            !
   !----------------------------------------------------------------------------!
 
@@ -104,7 +103,7 @@
 
   ! For each unique interface
   do int = 1, cnt_int
-  
+
     ! Array new_seq is a map for nodes "n -> new_seq(n)"
     allocate(new_seq (grid % n_nodes)); new_seq = 0
     allocate(nodes_to_remove(grid % n_nodes));  nodes_to_remove = .false.
@@ -151,7 +150,7 @@
     cnt_nodes_on_int_total = cnt_nodes_on_int_to_rem + cnt_nodes_on_int_to_keep
     allocate(criterion (cnt_nodes_on_int_total)); criterion = 0.
     allocate(old_seq   (cnt_nodes_on_int_total)); old_seq = 0
-    
+
     !--------------------------------------!
     !   Prescribe some sorting criterion   !
     !--------------------------------------!
@@ -176,7 +175,7 @@
     ! Sort nodes by this criterion
     call Sort_Real_Carry_Int_Heapsort(criterion(1), old_seq(1), &
       cnt_nodes_on_int_total)
-    
+
     ! Count grouped nodes after sorting
     v = 1 ! related to verbose output
     do i = 2, cnt_nodes_on_int_total
@@ -224,7 +223,7 @@
       if (nodes_to_remove(n)) cnt_node = cnt_node + 1
     end do
     cnt_node = grid % n_nodes - cnt_node
-  
+
     allocate(x_new(cnt_node))
     allocate(y_new(cnt_node))
     allocate(z_new(cnt_node))
@@ -232,14 +231,12 @@
     cnt_node = 1
     do n = 1, grid % n_nodes
       if (.not. nodes_to_remove(n)) then ! if node is unique
-!print *, 'n ', n, 'cnt_node ', cnt_node, 'keep'
         x_new(cnt_node) = grid % xn(n)
         y_new(cnt_node) = grid % yn(n)
         z_new(cnt_node) = grid % zn(n)
 
         cnt_node = cnt_node + 1
       else
-!print *, 'n ', n, 'cnt_node ', cnt_node, 'kill'
         ! New sequence: shift all non-unique nodes in increasing order
         do c = cnt_node, grid % n_nodes
           if (new_seq(c) > cnt_node) then
@@ -262,7 +259,7 @@
 
     deallocate(criterion)
     deallocate(old_seq  )
-    
+
     !------------------------!
     !   Reinitialize nodes   !
     !------------------------!
