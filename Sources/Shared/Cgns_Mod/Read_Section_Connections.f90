@@ -16,6 +16,7 @@
   integer              :: sect_id       ! element section index
   character(len=80)    :: sect_name     ! name of the Elements_t node
   character(len=80)    :: int_name      ! name of the interface
+  integer              :: int_type      ! type of interface 1-quad, 2-tri, 3-mix
   integer              :: cell_type     ! types of elements in the section
   integer              :: first_cell    ! index of first element
   integer              :: last_cell     ! index of last element
@@ -118,6 +119,7 @@
 
     int_name = trim(cgns_base(base) % block(block) % interface(int) % name)
     int_id = cgns_base(base) % block(block) % interface(int) % id
+    int_type = cgns_base(base) % block(block) % interface(int) % int_type
 
     if(index(trim(sect_name), trim(int_name), back = .true.) .ne. 0) then
 
@@ -138,8 +140,9 @@
       if ( .not. cgns_base(base) % &
         block(block) % interface(int) % marked_for_deletion) then
 
-        ! Add unique interface
-        ! cnt_int = cnt_int + 1
+        ! Add unique interface (considering mixed)
+        if (int_type <    3) cnt_int = cnt_int + 2
+        if (int_type .eq. 3) cnt_int = cnt_int + 1
 
         ! Fetch first interface
         do loc = 1, cnt

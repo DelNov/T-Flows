@@ -148,8 +148,6 @@
   !----------------!
   ! Explained in Cgns_Mod_Merge_Nodes
   allocate(interface_cells(1:2, cnt_int_qua + cnt_int_tri, 1:4, cnt_int));
-  print *, "cnt_int", cnt_int
-  stop
   interface_cells = -1
 
   call Allocate_Memory(grid)

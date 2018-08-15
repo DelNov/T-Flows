@@ -19,9 +19,9 @@
   cnt_bnd_tri = 0 ! number of triangles defining boundary conditions
   cnt_bnd_qua = 0 ! number of quads     defining boundary conditions
 
-  cnt_int     = 0 ! number of unique interfaces
-  cnt_int_tri = 0 ! number of triangles defining block interface
-  cnt_int_qua = 0 ! number of quads     defining block interface
-  cnt_int_cells = 0 ! 
+  cnt_int     = 0   ! number of unique interfaces
+  cnt_int_tri = 0   ! number of triangles defining block interface
+  cnt_int_qua = 0   ! number of quads     defining block interface
+  cnt_int_cells = 0 ! number of cells of interfaces
 
   end subroutine

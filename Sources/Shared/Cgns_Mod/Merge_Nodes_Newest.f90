@@ -30,19 +30,24 @@
   print *, '# Merging blocks since they have common interfaces'
   print *, '# Hint: Join blocks in mesh builder to avoid any problems'
   print '(a38,i9)', ' # Old number of nodes:               ', grid % n_nodes
-  
+  ! "/2" because mixed interface type had weight 1, while quad and tri had 1
+  cnt_int = cnt_int / 2
+
   !----------------------------------------------------------------------------!
   !   At this point number of interfaces cnt_int is known.                     !
-  !   Nodes on interfaces are marked by interface_nodes .ne. 0                 !
-  !   Value -1 of interface_nodes means this node has to be removed as         !
-  !   duplicated, cell connection - renumbered.                                !
-  !   Unfortunately coordinates of two nodes on same interface                 !
+  !   Cells on interfaces are in interface_cells                               !
+  !   Array interface_cells has 4 indices: (1:2, cnt_int_cells, 1:4, cnt_int)  !
+  !   Each interface has two domains from 2 different blocks                   !
+  !   First index denotes this first and second part of a interface            !
+  !   Second index is interface cell id                                        !
+  !   Third index is node id for a cell. -1 mean this node is not specified    !
+  !   Last index tells to which unique interface this cell belongs.            !
+  !                                                                            !
+  !   Unfortunately coordinates of cell nodes inside domains 
+  !   interface_cells(1,...) and interface_cells
   !   interface_nodes(n, int) = 1 and interface_nodes(n, int) = -1             !
   !   do not match, because they originated from different blocks.             !
   !   That is why sorting is required by some criterion to group them.         !
-  !   Fortunately value of unique nodes on each interface is known and         !
-  !   determined by interface_nodes .eq. 1 or .eq. -1 .                        !
-  !----------------------------------------------------------------------------!
   !----------------------------------------------------------------------------!
   !   Original block structure with duplicate nodes:                           !
   !        x  y  z                                                             !
@@ -86,6 +91,7 @@
   !                                                                            !
   !----------------------------------------------------------------------------!
 
+
   ! Estimate big and small
   call Grid_Mod_Estimate_Big_And_Small(grid, big, small)
 
@@ -95,9 +101,6 @@
       print *, '#', (grid % cells_n(i,c), i = 1, grid % cells_n_nodes(c))
     end do
   end if
-
-  print *, "cnt_int ", cnt_int
-  stop
 
   ! For each unique interface
   do int = 1, cnt_int
@@ -128,14 +131,6 @@
         end if
       end do
     end if
-
-    do n = 1, min(6, grid % n_nodes)
-      print *, '# n', n, grid % xn(n), grid % yn(n), grid % zn(n)
-    end do ! n
-
-    do c = 1, min(6, grid % n_cells)
-        print *, "conn ", c, (grid % cells_n(i,c), i = 1, grid % cells_n_nodes(c))
-    end do ! c
 
     ! Count nodes on interface
     cnt_nodes_on_int_to_keep = 0

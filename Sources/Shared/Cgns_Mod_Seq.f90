@@ -49,7 +49,7 @@
   integer           :: file_id
   character(len=80) :: file_name
   integer           :: file_mode
-  logical           :: verbose = .true.
+  logical           :: verbose = .false.
 
   ! Solution section
   type Cgns_Solution_Type
@@ -132,7 +132,6 @@
   character(len=80)    :: interface_names(1024)
   integer, allocatable :: interface_cells(:,:,:,:)
   integer              :: cnt_int_cells
-
 
   ! Block-wise counter of boundary cells
   integer           :: cnt_block_bnd_cells  ! probably not needed
