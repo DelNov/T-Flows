@@ -2,6 +2,16 @@
   subroutine Grid_Topology(grid)
 !------------------------------------------------------------------------------!
 !   Determines the topology of the grid.                                       !
+!
+!   To be more specific, it determines:
+!                                                                              !
+!   grid % n_bnd_cells   - number of boundary cells                            !
+!   grid % cells_n_nodes - number of nodes for each cell                       !
+!   grid % cells_n       - list of each cell's nodes                           !
+!   grid % n_faces       - number of faces on the boundary                     !
+!   grid % faces_n_nodes - number of nodes for each face on the boundary       !
+!   grid % faces_n       - list of each boundary face's nodes                  !
+!   grid % faces_c       - a pair of cells surrounding each boundary face      !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use gen_mod
@@ -124,5 +134,6 @@
   end do
 
   print '(a38,i9)', '# Number of boundary cells:          ', grid % n_bnd_cells
+  print '(a38,i9)', '# Number of faces on the boundary:   ', grid % n_faces
 
   end subroutine

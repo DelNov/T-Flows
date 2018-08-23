@@ -271,7 +271,12 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
-    vis_eff = fw(s)*vis_t(c1)+(1.0-fw(s))*vis_t(c2) + viscosity
+    vis_eff = viscosity
+
+    if(turbulence_model .ne. NONE .and.  &
+       turbulence_model .ne. DNS) then
+      vis_eff = vis_eff + fw(s)*vis_t(c1)+(1.0-fw(s))*vis_t(c2)
+    end if
 
     if(turbulence_model .eq. K_EPS_ZETA_F .and.  &
        turbulence_statistics .eq. YES) then
