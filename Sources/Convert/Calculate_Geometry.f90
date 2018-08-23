@@ -446,14 +446,14 @@
       if(c2 < 0) then
         if(grid % bnd_cond % color(c2) .eq. color_per) then
           c = c + 1
-          if(dir .eq. 1) b_coor(c) = grid % xf(s)*big     &
-                                   + grid % yf(s)*big**2  &
+          if(dir .eq. 1) b_coor(c) = grid % xf(s)*big**2  &
+                                   + grid % yf(s)*big     &
                                    + grid % zf(s)
-          if(dir .eq. 2) b_coor(c) = grid % yf(s)*big     &
-                                   + grid % xf(s)*big**2  &
+          if(dir .eq. 2) b_coor(c) = grid % yf(s)*big**2  &
+                                   + grid % xf(s)*big     &
                                    + grid % zf(s)
-          if(dir .eq. 3) b_coor(c) = grid % zf(s)*big     &
-                                   + grid % xf(s)*big**2  &
+          if(dir .eq. 3) b_coor(c) = grid % zf(s)*big**2  &
+                                   + grid % xf(s)*big     &
                                    + grid % yf(s)
           b_face(c) = s
         end if
