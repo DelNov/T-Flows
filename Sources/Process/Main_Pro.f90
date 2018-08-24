@@ -229,25 +229,25 @@
       call Grad_Mod_For_Phi(grid, w % n, 3, w % z, .true.)
 
       ! u velocity component
-      call Compute_Momentum(grid, dt, ini, u,          &
-                  u % x,   u % y,   u % z,             &
-                  grid % sx,   grid % sy,   grid % sz, &
-                  grid % dx,   grid % dy,   grid % dz, &
-                  p % x,   v % x,   w % x)      ! dP/dx, dV/dx, dW/dx
+      call Compute_Momentum(grid, dt, ini, u,      &
+                  u % x,     u % y,     u % z,     &
+                  grid % sx, grid % sy, grid % sz, &
+                  grid % dx, grid % dy, grid % dz, &
+                  p % x,     v % x,     w % x)     ! dp/dx, dv/dx, dw/dx
 
       ! v velocity component
-      call Compute_Momentum(grid, dt, ini, v,          &
-                  v % y,   v % x,   v % z,             &
-                  grid % sy,   grid % sx,   grid % sz, &
-                  grid % dy,   grid % dx,   grid % dz, &
-                  p % y,   u % y,   w % y)      ! dP/dy, dU/dy, dW/dy
+      call Compute_Momentum(grid, dt, ini, v,      &
+                  v % y,     v % x,     v % z,     &
+                  grid % sy, grid % sx, grid % sz, &
+                  grid % dy, grid % dx, grid % dz, &
+                  p % y,     u % y,     w % y)     ! dp/dy, du/dy, dw/dy
 
       ! w velocity component
-      call Compute_Momentum(grid, dt, ini, w,          &
-                  w % z,   w % x,   w % y,             &
-                  grid % sz,   grid % sx,   grid % sy, &
-                  grid % dz,   grid % dx,   grid % dy, &
-                  p % z,   u % z,   v % z)      ! dP/dz, dU/dz, dV/dz
+      call Compute_Momentum(grid, dt, ini, w,      &
+                  w % z,     w % x,     w % y,     &
+                  grid % sz, grid % sx, grid % sy, &
+                  grid % dz, grid % dx, grid % dy, &
+                  p % z,     u % z,     v % z)     ! dp/dz, du/dz, dv/dz
 
       if(coupling .eq. 'PROJECTION') then
         call Comm_Mod_Exchange(grid, a % sav)
@@ -448,12 +448,12 @@
                     len_trim(problem_name)+9), '(i6.6)') n
 
     ! Is it time to save the restart file?
-    if(save_now .or. exit_now .or. mod(n,bsi) .eq. 0) then
+    if(save_now .or. exit_now .or. mod(n, bsi) .eq. 0) then
       call Save_Backup (grid, n, name_save)
     end if
 
     ! Is it time to save results for post-processing
-    if(save_now .or. exit_now .or. mod(n,rsi) .eq. 0) then
+    if(save_now .or. exit_now .or. mod(n, rsi) .eq. 0) then
       call Comm_Mod_Wait
       call Save_Results(grid, name_save)
 
