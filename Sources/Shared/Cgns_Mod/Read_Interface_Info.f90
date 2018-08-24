@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Cgns_Mod_Read_Interface_Info(base, block, interface)
 !------------------------------------------------------------------------------!
-! Reads general interface info
+!   Reads general interface info                                               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -60,23 +60,10 @@
     print '(2a)', ' #     Interface name: ', interface_name
     print '(2a)', ' #     Shortened to:   ', interface_name_short
     print '(2a)', ' #     Donor name:     ', donor_name
-
-    ! Useless info:
-    !print '(a,i9)', ' #     Common cells: ', interface_n_nodes
-    ! print '(2a)', ' #     Placed at : ', GridLocationName(interface_location)
-    ! print '(2a)', ' #     Interface type : ', &
-    !   GridConnectivityTypeName(interface_type)
-    ! print '(2a)', ' #     Point set type : ', &
-    !   PointSetTypeName(interface_ptset_type)
-    ! print '(2a)', ' #     Donor block type: ', ZoneTypeName(donor_block_type)
-    ! print '(2a)', ' #     Donor point set type : ', &
-    !   PointSetTypeName(donor_ptset_type)
-    ! print '(2a)', ' #     Donor data type: ', ZoneTypeName(donor_data_type)
-    ! print '(a,i9)', ' #     Common donor cells: ', donor_n_nodes
   end if
 
   ! Fetch received parameters
-  cgns_base(base_id) % block(block_id) % interface(interface_id) % name =  &
+  cgns_base(base_id) % block(block_id) % interface(interface_id) % name = &
     trim(interface_name_short)
 
   end subroutine

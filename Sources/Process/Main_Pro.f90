@@ -233,21 +233,21 @@
                   u % x,     u % y,     u % z,     &
                   grid % sx, grid % sy, grid % sz, &
                   grid % dx, grid % dy, grid % dz, &
-                  p % x,     v % x,     w % x)     ! dP/dx, dV/dx, dW/dx
+                  p % x,     v % x,     w % x)     ! dp/dx, dv/dx, dw/dx
 
       ! v velocity component
       call Compute_Momentum(grid, dt, ini, v,      &
                   v % y,     v % x,     v % z,     &
                   grid % sy, grid % sx, grid % sz, &
                   grid % dy, grid % dx, grid % dz, &
-                  p % y,     u % y,     w % y)     ! dP/dy, dU/dy, dW/dy
+                  p % y,     u % y,     w % y)     ! dp/dy, du/dy, dw/dy
 
       ! w velocity component
       call Compute_Momentum(grid, dt, ini, w,      &
                   w % z,     w % x,     w % y,     &
                   grid % sz, grid % sx, grid % sy, &
                   grid % dz, grid % dx, grid % dy, &
-                  p % z,     u % z,     v % z)     ! dP/dz, dU/dz, dV/dz
+                  p % z,     u % z,     v % z)     ! dp/dz, du/dz, dv/dz
 
       if(coupling .eq. 'PROJECTION') then
         call Comm_Mod_Exchange(grid, a % sav)

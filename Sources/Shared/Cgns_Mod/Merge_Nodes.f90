@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Cgns_Mod_Merge_Nodes_Newest(grid)
+  subroutine Cgns_Mod_Merge_Nodes(grid)
 !------------------------------------------------------------------------------!
 !   For each interface in geometry merges nodes on interfaces and remaps       !
 !   cell_connections.                                                          !

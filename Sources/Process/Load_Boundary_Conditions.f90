@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Load_Boundary_Conditions(grid, in_out)
 !------------------------------------------------------------------------------!
-!   Reads: .bnd file                                                           !
+!   Reads boundary condition from control file                                 !
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
   use Flow_Mod

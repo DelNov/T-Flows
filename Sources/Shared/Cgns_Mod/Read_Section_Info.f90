@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Cgns_Mod_Read_Section_Info(base, block, sect)
 !------------------------------------------------------------------------------!
-!   Read elements connection info for current sect
+!   Read elements connection info for current sect                             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

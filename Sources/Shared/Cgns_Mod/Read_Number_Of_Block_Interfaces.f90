@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Cgns_Mod_Read_Number_Of_Block_Interfaces(base, block)
 !------------------------------------------------------------------------------!
-! Reads number of interfaces in block -> n_interfaces
+!   Reads number of interfaces in block -> n_interfaces                        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -46,6 +46,5 @@
 
   cgns_base(base) % block(block) % interface(1:number_of_interfaces) % &
     int_type = 0
-
 
   end subroutine

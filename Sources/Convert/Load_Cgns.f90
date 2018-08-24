@@ -105,23 +105,23 @@
   !------------------------!
   if(verbose) then
     print *, '# First run finished!'
-    print *, '# - number of nodes: ',           cnt_nodes
-    print *, '# - number of cells: ',           cnt_cells
-    print *, '# - number of hex cells: ',       cnt_hex
-    print *, '# - number of pyramids cells: ',  cnt_pyr
-    print *, '# - number of prism cells: ',     cnt_wed
-    print *, '# - number of tetra cells: ',     cnt_tet
-    print *, '# - number of triangles faces on boundary: ', cnt_bnd_tri 
-    print *, '# - number of quads faces on boundary: ',     cnt_bnd_qua
+    print *, '# - number of nodes: ',                        cnt_nodes
+    print *, '# - number of cells: ',                        cnt_cells
+    print *, '# - number of hex cells: ',                    cnt_hex
+    print *, '# - number of pyramids cells: ',               cnt_pyr
+    print *, '# - number of prism cells: ',                  cnt_wed
+    print *, '# - number of tetra cells: ',                  cnt_tet
+    print *, '# - number of triangles faces on boundary: ',  cnt_bnd_tri 
+    print *, '# - number of quads faces on boundary: ',      cnt_bnd_qua
     print *, '# - number of triangles faces on interface: ', cnt_int_tri 
     print *, '# - number of quads faces on interface: ',     cnt_int_qua
-    print *, '# - number of boundary conditions faces: ',cnt_bnd_tri+cnt_bnd_qua
-    print *, '# - number of boundary conditions: ',      cnt_bnd_conds
+    print *, '# - number of boundary conditions faces: ',    cnt_bnd_tri + &
+                                                             cnt_bnd_qua
+    print *, '# - number of boundary conditions: ',          cnt_bnd_conds
     if (cnt_bnd_tri + cnt_bnd_qua .eq. 0) then
       print *, '# No boundary faces were found !'
       stop
     end if
-    print *, '# - number of nodes on interfaces: ',cnt_int_tri*3 + cnt_int_qua*4
   end if
 
   !--------------------------------------------!
@@ -147,7 +147,7 @@
   !   Interfaces   !
   !----------------!
   ! Explained in Cgns_Mod_Merge_Nodes
-  allocate(interface_cells(1:2, cnt_int_qua + cnt_int_tri, 1:4, cnt_int));
+  allocate(interface_cells(2, cnt_int_qua + cnt_int_tri, 4, cnt_int))
   interface_cells = -1
 
   call Allocate_Memory(grid)
@@ -178,9 +178,9 @@
       ! Count block, just for information
       cnt_blocks = cnt_blocks + 1
 
-      !---------------------------!
-      !   Read coordinates block  !
-      !---------------------------!
+      !----------------------------!
+      !   Read coordinates block   !
+      !----------------------------!
 
       ! Reads number of coordinates arrays from block
       ! Essentially, reads number 3
@@ -197,9 +197,9 @@
 
       end do ! coordinates
 
-      !---------------------!
-      !   Read cells block  !
-      !---------------------!
+      !----------------------!
+      !   Read cells block   !
+      !----------------------!
       cnt_block_bnd_cells = 0
 
       ! Browse through all sections to read elements
@@ -227,9 +227,7 @@
   !   Merge the nodes   !
   !---------------------!
   if(cnt_blocks .gt. 1) then
-    !call Cgns_Mod_Merge_Nodes_Old(grid)
-    !call Cgns_Mod_Merge_Nodes_New(grid)
-    call Cgns_Mod_Merge_Nodes_Newest(grid)
+    call Cgns_Mod_Merge_Nodes(grid)
   end if
 
   !---------------------------------!

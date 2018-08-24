@@ -164,9 +164,7 @@
   include 'Cgns_Mod/Read_Coordinate_Info.f90'
   include 'Cgns_Mod/Read_Coordinate_Array.f90'
   include 'Cgns_Mod/Read_Section_Connections.f90'
-  include 'Cgns_Mod/Merge_Nodes_Old.f90'
-  include 'Cgns_Mod/Merge_Nodes_New.f90'
-  include 'Cgns_Mod/Merge_Nodes_Newest.f90'
+  include 'Cgns_Mod/Merge_Nodes.f90'
 
   ! Par only
   include 'Cgns_Mod/Parallel/Get_Arrays_Dimensions.f90'
