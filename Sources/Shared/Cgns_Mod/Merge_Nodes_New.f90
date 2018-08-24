@@ -98,7 +98,7 @@
 
   if (verbose) then
     print *, '# Cells before Cgns_Mod_Merge_Nodes_New function (sample)'
-    do c = 1, 6
+    do c = 1, min (6, grid % n_cells)
       print *, '#', (grid % cells_n(i,c), i = 1, grid % cells_n_nodes(c))
     end do
   end if
@@ -202,7 +202,7 @@
 
   if (verbose) then
     print *, '# Cells after Cgns_Mod_Merge_Nodes_New function (sample)'
-    do c = 1, 6
+    do c = 1, min (6, grid % n_cells)
       print *, '#', (grid % cells_n(i,c), i = 1, grid % cells_n_nodes(c))
     end do
   end if

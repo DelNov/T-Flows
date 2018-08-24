@@ -15,7 +15,7 @@
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
   character(len=80) :: name_in
-  integer           :: c, i, j, bc, base, block, sect, coord, mode
+  integer           :: c, i, j, bc, base, block, sect, int, coord, mode
   integer           :: cgns_1, cgns_2, cgns_3, cgns_4, cgns_5, cell_type
 !==============================================================================!
 
@@ -66,6 +66,14 @@
       ! Tells if structured or unstructured
       call Cgns_Mod_Read_Block_Type(base, block)
 
+      ! Read number of interfacafical domains in block
+      call Cgns_Mod_Read_Number_Of_Block_Interfaces(base, block)
+
+      do int = 1, cgns_base(base) % block(block) % n_interfaces
+        ! Reads info on interfaces
+        call Cgns_Mod_Read_Interface_Info(base, block, int)
+      end do ! interfaces
+
       ! Browse through all boundary conditions
       call Cgns_Mod_Read_Number_Of_Bnd_Conds_In_Block(base, block)
 
@@ -103,14 +111,17 @@
     print *, '# - number of pyramids cells: ',  cnt_pyr
     print *, '# - number of prism cells: ',     cnt_wed
     print *, '# - number of tetra cells: ',     cnt_tet
-    print *, '# - number of triangles faces: ', cnt_tri 
-    print *, '# - number of quads faces: ',     cnt_qua
-    if (cnt_qua + cnt_tri .eq. 0) then
+    print *, '# - number of triangles faces on boundary: ', cnt_bnd_tri 
+    print *, '# - number of quads faces on boundary: ',     cnt_bnd_qua
+    print *, '# - number of triangles faces on interface: ', cnt_int_tri 
+    print *, '# - number of quads faces on interface: ',     cnt_int_qua
+    print *, '# - number of boundary conditions faces: ',cnt_bnd_tri+cnt_bnd_qua
+    print *, '# - number of boundary conditions: ',      cnt_bnd_conds
+    if (cnt_bnd_tri + cnt_bnd_qua .eq. 0) then
       print *, '# No boundary faces were found !'
       stop
     end if
-    print *, '# - number of boundary conditions faces: ', cnt_qua + cnt_tri
-    print *, '# - number of boundary conditions: ',       cnt_bnd_conds
+    print *, '# - number of nodes on interfaces: ',cnt_int_tri*3 + cnt_int_qua*4
   end if
 
   !--------------------------------------------!
@@ -120,7 +131,7 @@
   !--------------------------------------------!
   grid % n_nodes     = cnt_nodes
   grid % n_cells     = cnt_cells
-  grid % n_bnd_cells = cnt_tri + cnt_qua
+  grid % n_bnd_cells = cnt_bnd_tri + cnt_bnd_qua
 
   !-------------------------!
   !   Boundary conditions   !
@@ -130,7 +141,14 @@
   do i = 1, cnt_bnd_conds
     call To_Upper_Case( bnd_cond_names(i) )
     grid % bnd_cond % name(i) = bnd_cond_names(i)
-  end do 
+  end do
+
+  !----------------!
+  !   Interfaces   !
+  !----------------!
+  ! Explained in Cgns_Mod_Merge_Nodes
+  allocate(interface_cells(1:2, cnt_int_qua + cnt_int_tri, 1:4, cnt_int));
+  interface_cells = -1
 
   call Allocate_Memory(grid)
 
@@ -210,7 +228,8 @@
   !---------------------!
   if(cnt_blocks .gt. 1) then
     !call Cgns_Mod_Merge_Nodes_Old(grid)
-    call Cgns_Mod_Merge_Nodes_New(grid)
+    !call Cgns_Mod_Merge_Nodes_New(grid)
+    call Cgns_Mod_Merge_Nodes_Newest(grid)
   end if
 
   !---------------------------------!

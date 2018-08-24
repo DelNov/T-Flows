@@ -15,14 +15,17 @@
   integer              :: block_id      ! block index number
   integer              :: sect_id       ! element section index
   character(len=80)    :: sect_name     ! name of the Elements_t node
+  character(len=80)    :: int_name      ! name of the interface
+  integer              :: int_type      ! type of interface 1-quad, 2-tri, 3-mix
   integer              :: cell_type     ! types of elements in the section
   integer              :: first_cell    ! index of first element
   integer              :: last_cell     ! index of last element
   integer              :: parent_flag
   integer              :: error
-  integer              :: n_nodes, loc, c, n, cell, dir, cnt, bc
+  integer              :: n_nodes, loc, c, n, cell, dir, cnt, bc, int, int_id
   integer, allocatable :: cell_n(:,:)
   integer, allocatable :: face_n(:,:)
+  integer, allocatable :: interface_n(:,:)
   integer, allocatable :: parent_data(:,:)
   integer              :: parent_datum = 0  ! for cells there are no parents
 !==============================================================================!
@@ -32,7 +35,7 @@
   block_id = block
   sect_id  = sect
 
-  ! Introduce some abbraviations
+  ! Introduce some abbreviations
   sect_name   = cgns_base(base) % block(block) % section(sect) % name
   cell_type   = cgns_base(base) % block(block) % section(sect) % cell_type
   first_cell  = cgns_base(base) % block(block) % section(sect) % first_cell
@@ -67,10 +70,10 @@
       end if
 
       ! Count boundary cells
-      if ( ElementTypeName(cell_type) .eq. 'QUAD_4') cnt_qua = cnt_qua + cnt!del
-      if ( ElementTypeName(cell_type) .eq. 'TRI_3' ) cnt_tri = cnt_tri + cnt!del
+    !if ( ElementTypeName(cell_type) .eq. 'QUAD_4') cnt_qua = cnt_qua + cnt!del
+    !if ( ElementTypeName(cell_type) .eq. 'TRI_3' ) cnt_tri = cnt_tri + cnt!del
 
-      ! Update numer of boundary cells in the block
+      ! Update number of boundary cells in the block
       cnt_block_bnd_cells = cnt_block_bnd_cells + cnt
 
       ! Allocate memory
@@ -94,18 +97,97 @@
       end do
 
       if(verbose) then
-        print *, "#         Connection table sample: "
-        do loc = 1, min(8, cnt)
+        print *, "#         Connection table (sample): "
+        do loc = 1, min(6, cnt)
           print '(a8,4i7)', " ", (face_n(n,loc), n = 1, n_nodes)
         end do
-        print *, "#         Parent data sample: "
-        do loc = 1, min(8, cnt)
+        print *, "#         Parent data (sample): "
+        do loc = 1, min(6, cnt)
           print '(a10,2i7)', " ", parent_data(loc, 1), parent_data(loc, 2)
         end do
       end if
 
       deallocate(face_n)
 
+    end if
+  end do
+
+  !-----------------------------------------------!
+  !   Consider interfaces defined in this block   !
+  !-----------------------------------------------!
+  do int = 1, cgns_base(base) % block(block) % n_interfaces
+
+    int_name = trim(cgns_base(base) % block(block) % interface(int) % name)
+    int_id = cgns_base(base) % block(block) % interface(int) % id
+    int_type = cgns_base(base) % block(block) % interface(int) % int_type
+
+    if(index(trim(sect_name), trim(int_name), back = .true.) .ne. 0) then
+
+      ! Allocate memory
+      if ( ElementTypeName(cell_type) .eq. 'QUAD_4') n_nodes = 4
+      if ( ElementTypeName(cell_type) .eq. 'TRI_3' ) n_nodes = 3
+      allocate(interface_n(n_nodes, cnt))  
+
+      call Cg_Elements_Read_F(file_id,           & !(in )
+                              base_id,           & !(in )
+                              block_id,          & !(in )
+                              sect_id,           & !(in )
+                              interface_n(1,1),  & !(out)
+                              parent_data,       & !(out)
+                              error)               !(out)
+
+      ! If interface is not marked for deletion
+      if ( .not. cgns_base(base) % &
+        block(block) % interface(int) % marked_for_deletion) then
+
+        ! Add unique interface (considering mixed)
+        if (int_type <    3) cnt_int = cnt_int + 2
+        if (int_type .eq. 3) cnt_int = cnt_int + 1
+
+        ! Fetch first interface
+        do loc = 1, cnt
+          do n = 1, n_nodes
+          interface_cells(1, loc + cnt_int_cells, n, int_id) = &
+            interface_n(n, loc) + cnt_nodes
+          end do ! n
+        end do ! loc
+
+      else
+
+        ! Fetch second interface
+        do loc = 1, cnt
+          do n = 1, n_nodes
+          interface_cells(2, loc + cnt_int_cells, n, int_id) = &
+            interface_n(n, loc) + cnt_nodes
+          end do ! n
+        end do ! loc
+
+      end if
+
+      ! Fetch received parameters
+      cnt_int_cells = cnt_int_cells + cnt
+
+      if(verbose) then
+        print *, '#         ---------------------------------'
+        print *, '#         Interface name:  ', trim(sect_name)
+        print *, '#         ---------------------------------'
+        print *, '#         Interface index: ', cgns_base(base) % &
+        block(block) % interface(int) % id
+        print *, '#         Section index: ', sect
+        print *, '#         Interface type:  ', ElementTypeName(cell_type)
+        print *, '#         Marked for deletion:  ', cgns_base(base) % &
+        block(block) % interface(int) % marked_for_deletion
+        print *, "#         Interface cells connection table (sample): "
+        do loc = 1, min(6, cnt)
+          print '(a9,8i7)', " ", (interface_n(n,loc), n = 1, n_nodes)
+        end do
+        print *, "#         Interface parent data (sample): "
+        do loc = 1, min(6, cnt)
+            print '(a9,8i7)', " ",parent_data(loc, 1)
+        end do
+      end if
+
+        deallocate(interface_n)
     end if
   end do
 
@@ -183,8 +265,8 @@
     end do
 
     if(verbose) then
-        print *, "#         Connection table sample: "
-      do loc = 1, min(8, cnt)
+        print *, "#         Connection table (sample): "
+      do loc = 1, min(6, cnt)
         print '(a9,8i7)', " ", (cell_n(n,loc), n = 1, n_nodes)
       end do
     end if
