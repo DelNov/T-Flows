@@ -75,8 +75,7 @@
                                grid % max_n_bnd_cells) 
 
   call Grid_Mod_Allocate_Faces(grid,                &
-                               grid % max_n_faces,  &
-                               0)                      ! no shadow faces
+                               grid % max_n_faces)
 
   ! Variables declared in gen_mod.h90:
   allocate (face_c_to_c(grid % max_n_faces,2))
