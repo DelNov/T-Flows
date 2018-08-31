@@ -613,6 +613,6 @@
 
   call Info_Mod_Iter_Fill_User_At(row, col, phi % name, niter, phi % res)
  
-  call Comm_Mod_Exchange(grid, phi % n)
+  call Comm_Mod_Exchange_Real(grid, phi % n)
 
   end subroutine
