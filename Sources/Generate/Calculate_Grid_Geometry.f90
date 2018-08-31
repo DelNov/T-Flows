@@ -467,9 +467,8 @@
   else            
     print *, '# Computing the distance to the walls (1/2)'           
   end if 
-  print *, '# Type the list of boundary colors which represent walls,        '
-  print *, '# separated by spaces.  These will be used for computation       '
-  print *, '# of distance to the wall needed by some turbulence models.      '
+  print *, '# Type the wall boundary conditions indices separated by spaces  '
+  print *, '# (These will be used for calculation of wall distance.)' 
   print *, '#----------------------------------------------------------------'
   call Tokenizer_Mod_Read_Line(5)
   n_wall_colors = line % n_tokens
