@@ -9,11 +9,13 @@
   !--------------!
   !   Var type   !
   !--------------!
-  type Var_Type         
+  type Var_Type
 
     type(Grid_Type), pointer :: pnt_grid  ! grid for which it is defined
 
-    character(len=4)     :: name                  ! variable name, always  
+    character(len=4)     :: name                  ! variable name, always
+                                                  ! uppercase and very short
+    character(len=4)     :: flux_name             ! variable flux name, always
                                                   ! uppercase and very short
     real, allocatable    :: n(:)                  ! new value
     real, allocatable    :: o(:), oo(:)           ! old and older then old
@@ -25,7 +27,7 @@
     real, allocatable    :: q(:)                  ! flux of a variable
     real                 :: sigma                 ! sigma
     real                 :: res                   ! residual after lin. solver
-    real                 :: units(5)              ! mass, length, time, 
+    real                 :: units(5)              ! mass, length, time,
                                                   ! temperature, angle
     ! Boundary cell type (important for scalars, since they
     ! can have different boundary conditions at the walls)
@@ -41,4 +43,4 @@
   include 'Var_Mod/Allocate_Gradients.f90'
   include 'Var_Mod/Bnd_Cell_Type.f90'
 
-  end module 
+  end module
