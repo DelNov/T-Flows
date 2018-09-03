@@ -272,8 +272,6 @@ $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 \
-Backup_Mod/Write_Face.f90-00 \
-Backup_Mod/Read_Face.f90-00 \
 Backup_Mod/*.f90 
 
 #-- ./Pressure_Matrix_Fractional.f90
@@ -307,14 +305,6 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 #-- ./Monitor_Mod/Finalize.f90
 #-- ./Save_Debug_Vtu_Scalar.f90
 $(DIR_OBJECT)/Save_Debug_Vtu_Scalar.o:\
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Backup_Mod/Write_Face.f90-00
-$(DIR_OBJECT)/Write_Face.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
@@ -442,14 +432,6 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 
 #-- ./Backup_Mod/Write_Bnd.f90
 $(DIR_OBJECT)/Write_Bnd.o:\
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Backup_Mod/Read_Face.f90-00
-$(DIR_OBJECT)/Read_Face.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
@@ -843,8 +825,6 @@ $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 \
 $(DIR_OBJECT)/Bulk_Mod.o \
 Bulk_Mod/*.f90 \
-Backup_Mod/Write_Face.f90-00 \
-Backup_Mod/Read_Face.f90-00 \
 $(DIR_OBJECT)/Backup_Mod.o \
 Backup_Mod/*.f90 
 
