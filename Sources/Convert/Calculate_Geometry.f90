@@ -232,7 +232,7 @@
         grid % yc(c2) = grid % yf(s)
         grid % zc(c2) = grid % zf(s)
       end if
-    endif
+    end if
   end do ! through sides
 
   !---------------------------------------------------------------!
@@ -755,7 +755,7 @@
         grid % dy(s) = grid % yf(s) - ys2  ! later: xc2 = xc2 + Dx
         grid % dz(s) = grid % zf(s) - zs2  !
 
-      endif !  S*(c2-c1) < 0.0
+      end if !  S*(c2-c1) < 0.0
     end if  !  c2 > 0
   end do    !  sides
   print '(a38,i9)', ' # Phase II: number of shadow faces:  ', n_per
@@ -924,7 +924,7 @@
       if(mod(c1,10000) .eq. 0) then
         write(*,'(a2, f5.0, a14)') ' #', (100.*c1/(1.*grid % n_cells)),  &
                                    ' % complete...'
-      endif
+      end if
       do b = 1, n_wall_colors
         do c2 = -1, -grid % n_bnd_cells, -1
           if(grid % bnd_cond % color(c2) .eq. wall_colors(b)) then
