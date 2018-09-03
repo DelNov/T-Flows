@@ -16,6 +16,7 @@
   real, allocatable           :: user_array(:,:)
 
   character(len=4)            :: c_name = 'C_00'
+  character(len=4)            :: q_name = 'Q_00'
 
   contains
 
