@@ -99,12 +99,12 @@
   !-----------!
   if(n_proc > 1 .and. this_proc .eq. 1)  then
     write(8,'(a,a)') IN_3, '<PPoints>'
-    write(8,'(a,a)') IN_4, '<PDataArray type="Float32" NumberOfComponents=' // &
+    write(8,'(a,a)') IN_4, '<PDataArray type="Float64" NumberOfComponents=' // &
                            '"3" format="ascii"/>'
     write(8,'(a,a)') IN_3, '</PPoints>'
   end if
   write(9,'(a,a)') IN_3, '<Points>'
-  write(9,'(a,a)') IN_4, '<DataArray type="Float32" NumberOfComponents' //  &
+  write(9,'(a,a)') IN_4, '<DataArray type="Float64" NumberOfComponents' //  &
                          '="3" format="ascii">'
   do n = 1, grid % n_nodes
     write(9, '(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')                &
@@ -119,7 +119,7 @@
   write(9,'(a,a)') IN_3, '<Cells>'
 
   ! First write all cells' nodes
-  write(9,'(a,a)') IN_4, '<DataArray type="Int32" Name="connectivity"' //  &
+  write(9,'(a,a)') IN_4, '<DataArray type="Int64" Name="connectivity"' //  &
                          ' format="ascii">'
 
   do c = 1, grid % n_cells
@@ -157,7 +157,7 @@
   write(9,'(a,a)') IN_4, '</DataArray>'
 
   ! Now write all cells' offsets
-  write(9,'(a,a)') IN_4, '<DataArray type="Int32" Name="offsets" format="ascii">'
+  write(9,'(a,a)') IN_4, '<DataArray type="Int64" Name="offsets" format="ascii">'
   offset = 0
   do c = 1, grid % n_cells
     offset = offset + grid % cells_n_nodes(c)
@@ -200,10 +200,10 @@
   !   Materials   !
   !---------------!
   if(n_proc > 1 .and. this_proc .eq. 1)  then
-    write(8,'(a,a)') IN_3, '<PDataArray type="UInt8" Name="materials"' //  &
+    write(8,'(a,a)') IN_3, '<PDataArray type="UInt8" Name="Materials"' //  &
                            ' format="ascii"/>'
   end if
-  write(9,'(a,a)') IN_4, '<DataArray type="UInt8" Name="materials"' //  &
+  write(9,'(a,a)') IN_4, '<DataArray type="UInt8" Name="Materials"' //  &
                          ' format="ascii">'
   do c = 1, grid % n_cells
     write(9,'(a,i9)') IN_5, grid % material(c)

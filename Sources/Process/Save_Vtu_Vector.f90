@@ -22,12 +22,12 @@
   ! Header
   if(n_proc > 1 .and. this_proc .eq. 1) then
     write(8,'(4a)') in_1,                                       & 
-                    '<DataArray type="Float32" Name="',         &
+                    '<DataArray type="Float64" Name="',         &
                     trim(var_name),                             &
                     '" NumberOfComponents="3" format="ascii"/>'
   end if
   write(9,'(4a)') in_1,                                       & 
-                  '<DataArray type="Float32" Name="',         &
+                  '<DataArray type="Float64" Name="',         &
                   trim(var_name),                             &
                   '" NumberOfComponents="3" format="ascii">'
   ! Data
