@@ -21,7 +21,7 @@
                       v_z => r_cell_06,  &
                       w_x => r_cell_07,  &
                       w_y => r_cell_08,  &
-                      w_z => r_cell_09           
+                      w_z => r_cell_09
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -30,9 +30,9 @@
   integer :: c
 !==============================================================================!
 
-  call Comm_Mod_Exchange(grid, u % n)
-  call Comm_Mod_Exchange(grid, v % n)
-  call Comm_Mod_Exchange(grid, w % n)
+  call Comm_Mod_Exchange_Real(grid, u % n)
+  call Comm_Mod_Exchange_Real(grid, v % n)
+  call Comm_Mod_Exchange_Real(grid, w % n)
 
   call Grad_Mod_For_Phi(grid, u % n, 1, u_x, .true.)  ! du/dx
   call Grad_Mod_For_Phi(grid, u % n, 2, u_y, .true.)  ! du/dy
