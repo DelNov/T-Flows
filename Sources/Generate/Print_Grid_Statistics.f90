@@ -4,7 +4,7 @@
 !   Prints some statistical data about the grid on the standard output.        !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use gen_mod
+  use Gen_Mod
   use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -56,7 +56,7 @@
     end do
     if(numb .ne. 0) then
       print 6, '# Number of cells with ', j, ' neighbours: ', numb
-    endif
+    end if
   end do
 
   ! Twins
@@ -67,7 +67,7 @@
     end do
     if(numb .ne. 0) then
       print 6, '# Number of nodes with ', j, ' twins     : ', numb
-    endif 
+    end if 
   end do
 6 format (a24, i3, a13, i8)
 

@@ -4,9 +4,9 @@
 !   Mark the region of the domain for local refinement and refine the grid!    !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use gen_mod
+  use Gen_Mod
   use Grid_Mod
-!------------------------------------------------------------------------------! 
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
@@ -63,11 +63,11 @@
               (y1  < y0) .and. (y0  < y8) .and.                     &
               (z1  < z0) .and. (z0  < z8) ) then
             cell_marked(c) = .true.
-          endif
+          end if
         else if(refined_regions(lev,reg,0) .eq. PLANE) then 
           if( (x0-x1)*x8+(y0-y1)*y8+(z0-z1)*z8   >  0.0 ) then
             cell_marked(c) = .true.
-          endif
+          end if
         end if 
       end do   ! cells
 

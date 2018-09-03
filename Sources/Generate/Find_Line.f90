@@ -5,7 +5,7 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Domain_Mod
-!------------------------------------------------------------------------------! 
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Domain_Type)    :: dom
@@ -20,14 +20,14 @@
       do l2 = 1, 8
         if( (dom % blocks(b) % corners(l1) .eq. n1) .and. &
             (dom % blocks(b) % corners(l2) .eq. n2) ) then
-          if( iabs(l2-l1) .eq. 1 ) res = dom % blocks(b) % resolutions(1) 
-          if( iabs(l2-l1) .eq. 2 ) res = dom % blocks(b) % resolutions(2) 
-          if( iabs(l2-l1) .eq. 4 ) res = dom % blocks(b) % resolutions(3) 
+          if( iabs(l2-l1) .eq. 1 ) res = dom % blocks(b) % resolutions(1)
+          if( iabs(l2-l1) .eq. 2 ) res = dom % blocks(b) % resolutions(2)
+          if( iabs(l2-l1) .eq. 4 ) res = dom % blocks(b) % resolutions(3)
           goto 1
-        end if 
+        end if
       end do
-    end do     
-  end do 
+    end do
+  end do
 
   print *, '# Error message form Generator'
   print *, '# You tried to define the line', n1, n2, ' but it'

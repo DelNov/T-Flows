@@ -5,10 +5,10 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use gen_mod
+  use Gen_Mod
   use Domain_Mod
   use Grid_Mod
-!------------------------------------------------------------------------------! 
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Domain_Type) :: dom
@@ -121,12 +121,12 @@
             trans(2,1) =1
           else                         
             trans(2,1) =dom % blocks(b) % resolutions(2)
-          endif
+          end if
           if( (l1 .eq. 1).or.(l1 .eq. 3) ) then
             trans(3,1) =1
           else                         
             trans(3,1) =dom % blocks(b) % resolutions(3)
-          endif
+          end if
 
         ! Line is defined in the -i direction
         else if( (l2-l1) .eq. -1 ) then
@@ -138,12 +138,12 @@
             trans(2,1) =1
           else                         
             trans(2,1) =dom % blocks(b) % resolutions(2)
-          endif
+          end if
           if( (l1 .eq. 2).or.(l1 .eq. 4) ) then
             trans(3,1) =1
           else                         
             trans(3,1) =dom % blocks(b) % resolutions(3)
-          endif
+          end if
 
         ! Line is defined in the +j direction
         else if( (l2-l1) .eq. +2 ) then
@@ -155,12 +155,12 @@
             trans(1,1) =1
           else                         
             trans(1,1) =dom % blocks(b) % resolutions(1)
-          endif
+          end if
           if( (l1 .eq. 1).or.(l1 .eq. 2) ) then
             trans(3,1) =1
           else                         
             trans(3,1) =dom % blocks(b) % resolutions(3)
-          endif
+          end if
 
         ! Line is defined in the -j direction
         else if( (l2-l1) .eq. -2 ) then
@@ -172,12 +172,12 @@
             trans(1,1) =1
           else                         
             trans(1,1) =dom % blocks(b) % resolutions(1)
-          endif
+          end if
           if( (l1 .eq. 3).or.(l1 .eq. 4) ) then
             trans(3,1) =1
           else                         
             trans(3,1) =dom % blocks(b) % resolutions(3)
-          endif
+          end if
 
         ! Line is defined in the +k direction
         else if( (l2-l1) .eq. +4 ) then
@@ -194,7 +194,7 @@
             trans(2,1) =1
           else                         
             trans(2,1) =dom % blocks(b) % resolutions(2)
-          endif
+          end if
 
         ! Line is defined in the -k direction
         else if( (l2-l1) .eq. -4 ) then
@@ -206,14 +206,14 @@
             trans(1,1) =1
           else                         
             trans(1,1) =dom % blocks(b) % resolutions(1)
-          endif
+          end if
           if( (l1 .eq. 5).or.(l1 .eq. 6) ) then
             trans(2,1) =1
           else                         
             trans(2,1) =dom % blocks(b) % resolutions(2)
-          endif
+          end if
 
-        endif ! l1-l2
+        end if ! l1-l2
 
         ! Line is defined point by point
         if( Approx( dom % lines(l) % weight, 0.0) ) then
@@ -242,9 +242,9 @@
           call Distribute_Nodes(dom, grid,                   &
                                 b, dom % lines(l) % weight,  &
                                 is, js, ks, ie, je, ke)
-        endif  
+        end if  
 
-      endif ! if the block contains
+      end if ! if the block contains
 
     end do ! for the dom % lines
 
@@ -272,12 +272,12 @@
       end do
     end do
 
-    !------------------------------------------------------------!
-    !   Surfaces...                                              !
-    !                                                            !
-    !   I think this is the propper way to calculate surfaces:   !
-    !   it spans the dom % lines in the direction of higher weigh      !
-    !------------------------------------------------------------!
+    !---------------------------------------------------------------!
+    !   Surfaces...                                                 !
+    !                                                               !
+    !   I think this is the propper way to calculate surfaces:      !
+    !   it spans the dom % lines in the direction of higher weigh   !
+    !---------------------------------------------------------------!
 
     ! I (k=1) 
     fc = 1   ! face index
@@ -294,7 +294,7 @@
                               b, dom % blocks(b) % face_weights(fc,2),  &
                               i,1,k,i,nj,k)
       end do
-    endif
+    end if
 
     ! VI (k=nk)
     fc = 6   ! face index
@@ -311,7 +311,7 @@
                               b, dom % blocks(b) % face_weights(fc,2),  &
                               i,1,k,i,nj,k)
       end do
-    endif
+    end if
 
     ! V (i=1)
     fc = 5   ! face index
@@ -362,7 +362,7 @@
                               b, dom % blocks(b) % face_weights(fc,1),  &
                               1,j,k,ni,j,k)
       end do
-    endif
+    end if
 
     ! IV (j=nj)       
     fc = 4   ! face index
@@ -379,7 +379,7 @@
                               b, dom % blocks(b) % face_weights(fc,1),  &
                               1,j,k,ni,j,k)
       end do
-    endif
+    end if
 
     !-------------!
     !   Volumes   !
@@ -418,7 +418,7 @@
           end do
         end do
       end do
-    endif
+    end if
 
     !-----------------------------------------!
     !   Set the control volume nodes (CellN)  !

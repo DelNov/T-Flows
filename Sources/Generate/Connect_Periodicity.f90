@@ -4,10 +4,10 @@
 !   Solve the cell connectivity for periodic boundary conditions.              !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use gen_mod
+  use Gen_Mod
   use Domain_Mod
   use Grid_Mod
-!------------------------------------------------------------------------------! 
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Domain_Type) :: dom
@@ -118,7 +118,7 @@
                 nig = dom % blocks(b1) % resolutions(3)       ! nk from block 1
                 trans1(3,1)=nig
                 trans1(3,2)=-1
-              endif
+              end if
 
               ! Direction jg, block 1 
               if((l12-l11) .eq. +1) then 
@@ -142,7 +142,7 @@
                 njg = dom % blocks(b1) % resolutions(3)       ! nk from block 1
                 trans1(3,1)=njg
                 trans1(3,3)=-1
-              endif
+              end if
 
               ! Direction ig, block 2
               if((l24-l21) .eq. +1) then
@@ -166,7 +166,7 @@
                 nig = dom % blocks(b2) % resolutions(3)       ! nk from block 2
                 trans2(3,1)=nig
                 trans2(3,2)=-1
-              endif
+              end if
 
               ! Direction jg, block 2 
               if((l22-l21) .eq. +1) then 
@@ -190,7 +190,7 @@
                 njg = dom % blocks(b2) % resolutions(3)       ! nk from block 2
                 trans2(3,1)=njg
                 trans2(3,3)=-1
-              endif
+              end if
 
               ! Set the constant directions
               if(f1 .eq. 1) trans1(3,1)=1
@@ -263,7 +263,7 @@
 
                   ! Check if they are already connected
                   do n=1, twin_n(n1,0)
-                    if(Are_Nodes_Twins(n1,n2)) goto 10
+                    if(Are_Nodes_Twins(n1,n2)) goto 1
                   end do
 
                   ! If they were not, connect them
@@ -272,7 +272,7 @@
                   twin_n(n2,0)=twin_n(n2,0)+1
                   twin_n(n2,twin_n(n2,0))=n1
 
-10                end do       ! jg
+1                 end do       ! jg
               end do    ! ig
 
             end if  ! are they connected ? 
@@ -291,7 +291,7 @@
     do i1=1,twin_n(n1,0)
       n2=twin_n(n1,i1) 
       do i2=1,twin_n(n2,0)
-        n3=twin_n(n2,i2)   ! blizanci od n2
+        n3=twin_n(n2,i2)   ! twins from n2
         new=n3
         do i3=1,twin_n(n1,0)  
           if( (twin_n(n1,i3) .eq. n3) .or. (n3 .eq. n1) ) new=0 

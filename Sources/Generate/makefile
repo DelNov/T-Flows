@@ -1,7 +1,7 @@
 #===============================================================================
-# 
-#   Generate Makefile   
-#   
+#
+#   Generate Makefile
+#
 #-------------------------------------------------------------------------------
 
 #--------------------------
@@ -48,17 +48,16 @@ ifeq ($(FORTRAN), gnu)
   FC = gfortran
   ifeq ($(DEBUG),yes)
     OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8 -fdefault-integer-8 -O0 -g \
-			   -ffixed-line-length-80 -fcheck=all -fwhole-file -fbacktrace \
-			   -ffpe-trap=invalid,zero,overflow \
-			   -fimplicit-none -finit-real=nan \
-			   -Wall -Wextra -Waliasing -Wampersand -Warray-temporaries \
-			   -Wc-binding-type -Wcharacter-truncation -Wline-truncation \
-			   -Wconversion -Wconversion-extra -Wintrinsics-std \
-			   -Wreal-q-constant -Wsurprising -Wtabs -Wunderflow \
-			   -Wintrinsic-shadow -Wunused-parameter -Walign-commons \
-			   -Wfunction-elimination -Wrealloc-lhs -Wrealloc-lhs-all \
-			   -Wcompare-reals -Wtarget-lifetime -Wpedantic -fstack-check \
-			   #-std=f2003 -Wimplicit-procedure -Wimplicit-interface
+               -ffixed-line-length-80 -fcheck=all -fwhole-file -fbacktrace  \
+               -ffpe-trap=invalid,zero,overflow                             \
+               -fimplicit-none -finit-real=nan                              \
+               -Wall -Wextra -Waliasing -Wampersand -Warray-temporaries     \
+               -Wc-binding-type -Wcharacter-truncation -Wline-truncation    \
+               -Wconversion -Wconversion-extra -Wintrinsics-std             \
+               -Wreal-q-constant -Wsurprising -Wtabs -Wunderflow            \
+               -Wintrinsic-shadow -Wunused-parameter -Walign-commons        \
+               -Wfunction-elimination -Wrealloc-lhs -Wrealloc-lhs-all       \
+               -Wcompare-reals -Wtarget-lifetime -Wpedantic -fstack-check
   else
     OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8 -fdefault-integer-8 -O3
   endif 
@@ -102,6 +101,9 @@ ifeq ($(CGNS_HDF5), yes)
 endif
 OPT_COMP += $(addprefix -I, $(DIR_CGNS_H))
 
+# METIS library
+METIS_LIB = ../Libraries/Metis_5.1.0_Linux_64/libmetis.a
+
 #------------------------------------------------------
 #   List of sources for modules and functions
 #------------------------------------------------------
@@ -117,12 +119,14 @@ OPT_COMP += $(addprefix -I, $(DIR_CGNS_H))
 
 # Modules in shared directories
 SRC_MOD = Const_Mod.f90			\
-          gen_mod.f90			\
+          Gen_Mod.f90			\
           Div_Mod.f90			\
           Name_Mod.f90			\
           Tokenizer_Mod.f90		\
           Material_Mod.f90		\
+          Metis_Options_Mod.f90		\
           Bnd_Cond_Mod.f90		\
+          Sort_Mod.f90			\
           Grid_Mod.f90			\
           Comm_Mod_Seq.f90
 
@@ -191,7 +195,7 @@ $(DIR_OBJECT)/%.o: %.f90
 #-----------------------------------
 $(PROGRAM_FILE): $(OBJ) 
 	@echo Linking "\033[0;32m $(PROGRAM_FILE) \033[0m"
-	@$(FC) $(OPT_LINK) -o $(PROGRAM_FILE) $(OBJ) $(CGNS_LIB)
+	@$(FC) $(OPT_LINK) -o $(PROGRAM_FILE) $(OBJ) $(CGNS_LIB) $(METIS_LIB)
 
 #---------------------------------------
 #   Explicit dependencies for modules

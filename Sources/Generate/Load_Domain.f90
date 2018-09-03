@@ -4,7 +4,7 @@
 !   Reads: .dom file                                                           !
 !----------------------------------[Modules]-----------------------------------!
   use Name_Mod, only: problem_name
-  use gen_mod
+  use Gen_Mod
   use Tokenizer_Mod
   use Domain_Mod
   use Grid_Mod
@@ -58,7 +58,7 @@
   print *, '#', grid % max_n_bnd_cells, ' boundary cells'         
   print *, '#', grid % max_n_faces,     ' cell faces' 
 
-  allocate (grid % bnd_cond % copy_c(-grid % max_n_bnd_cells:grid % max_n_nodes))
+  allocate (grid % bnd_cond % copy_c(-grid%max_n_bnd_cells:grid%max_n_nodes))
   grid % bnd_cond % copy_c = 0
   allocate (grid % bnd_cond % copy_s(2,grid % max_n_bnd_cells))
   grid % bnd_cond % copy_s = 0    
@@ -77,7 +77,7 @@
   call Grid_Mod_Allocate_Faces(grid,                &
                                grid % max_n_faces)
 
-  ! Variables declared in gen_mod.h90:
+  ! Variables declared in Gen_Mod.h90:
   allocate (face_c_to_c(grid % max_n_faces,2))
   face_c_to_c=0 
 
@@ -162,16 +162,16 @@
     if(Tet_Volume( xt(2),yt(2),zt(2), xt(5),yt(5),zt(5),  &
                    xt(3),yt(3),zt(3), xt(1),yt(1),zt(1) )  < 0) then
       dom % blocks(b) % corners(0)=-1            !  It's nor properly oriented
-      call Swap_Integers(dom % blocks(b) % corners(2),  &
-                         dom % blocks(b) % corners(3))
-      call Swap_Integers(dom % blocks(b) % corners(6),  &
-                         dom % blocks(b) % corners(7))
-      call Swap_Reals(dom % blocks(b) % weights(1),  &
-                      dom % blocks(b) % weights(2))
+      call Swap_Int(dom % blocks(b) % corners(2),  &
+                    dom % blocks(b) % corners(3))
+      call Swap_Int(dom % blocks(b) % corners(6),  &
+                    dom % blocks(b) % corners(7))
+      call Swap_Real(dom % blocks(b) % weights(1),  &
+                     dom % blocks(b) % weights(2))
       dom % blocks(b) % weights(1) = 1.0 / dom % blocks(b) % weights(1)
       dom % blocks(b) % weights(2) = 1.0 / dom % blocks(b) % weights(2)
-      call Swap_Integers(dom % blocks(b) % resolutions(1),  &
-                         dom % blocks(b) % resolutions(2))
+      call Swap_Int(dom % blocks(b) % resolutions(1),  &
+                    dom % blocks(b) % resolutions(2))
       print *, 'Warning: Block ',b,' was not properly oriented'
     end if
   end do                 ! through dom % blocks
@@ -230,7 +230,7 @@
     else
       call Tokenizer_Mod_Read_Line(9)
       read(line % tokens(1), *) dom % lines(l) % weight
-    endif 
+    end if
 
   end do
 
@@ -307,7 +307,7 @@
   !   Boundary conditions and materials   !
   !---------------------------------------!
   call Tokenizer_Mod_Read_Line(9)
-  read(line % tokens(1), *) dom % n_regions  ! number of regions (can be boundary 
+  read(line % tokens(1), *) dom % n_regions  ! number of regions (can be bnd.
                                              ! conditions or materials)
 
   call Domain_Mod_Allocate_Regions(dom, dom % n_regions)
@@ -317,28 +317,28 @@
 
     call Tokenizer_Mod_Read_Line(9)
     if(line % n_tokens .eq. 7) then
-      read(line % whole,*)  dum,            &  
+      read(line % whole,*)  dum,            &
                    dom % regions(n) % is,   &
                    dom % regions(n) % js,   &
                    dom % regions(n) % ks,   & 
                    dom % regions(n) % ie,   &
                    dom % regions(n) % je,   &
-                   dom % regions(n) % ke   
+                   dom % regions(n) % ke
     else if(line % n_tokens .eq. 2) then
-      read(line % tokens(1),*)       dum           
+      read(line % tokens(1),*)       dum
       read(line % tokens(2),'(A4)')  & 
            dom % regions(n) % face
-      call To_Upper_Case(dom % regions(n) % face)           
+      call To_Upper_Case(dom % regions(n) % face)
     end if
 
     call Tokenizer_Mod_Read_Line(9)
     read(line % tokens(1), *) dom % regions(n) % block
-    read(line % tokens(2), *) dom % regions(n) % name    
-    call To_Upper_Case(dom % regions(n) % name)           
+    read(line % tokens(2), *) dom % regions(n) % name
+    call To_Upper_Case(dom % regions(n) % name)
 
     ! if( dom % blocks(b_cond(n,7)) % points(0) .eq. -1 ) then
-    !   call Swap_Integers( dom % regions(n) % is,dom % regions(n) % js )
-    !   call Swap_Integers( dom % regions(n) % ie,dom % regions(n) % je )
+    !   call Swap_Int( dom % regions(n) % is,dom % regions(n) % js )
+    !   call Swap_Int( dom % regions(n) % ie,dom % regions(n) % je )
     ! end if
 
   end do
@@ -394,7 +394,7 @@
   do l=1,n_refine_levels
     print *, 'Level: ', l
     call Tokenizer_Mod_Read_Line(9)
-    read(line % tokens(2), *) n_refined_regions(l)  
+    read(line % tokens(2), *) n_refined_regions(l)
 
     ! Browse through regions in level "l"
     do n = 1, n_refined_regions(l)
@@ -408,15 +408,15 @@
       elseif(answer .eq. 'PLANE') then
         refined_regions(l,n,0) = PLANE
       else
-        print *, 'Error in input file: ', answer 
+        print *, 'Error in input file: ', answer
         stop
-      endif 
+      end if
 
       call Tokenizer_Mod_Read_Line(9)
       read(line % whole, *)                                       &
                 refined_regions(l,n,1),refined_regions(l,n,2),    &
                 refined_regions(l,n,3),refined_regions(l,n,4),    &
-                refined_regions(l,n,5),refined_regions(l,n,6)   
+                refined_regions(l,n,5),refined_regions(l,n,6)
     end do
   end do
 
@@ -424,7 +424,7 @@
   !   Smoothing regions   !
   !-----------------------!
   call Tokenizer_Mod_Read_Line(9)
-  read(line % tokens(1), *) n_smoothing_regions  ! number of smoothing regions 
+  read(line % tokens(1), *) n_smoothing_regions  ! number of smoothing regions
 
   print '(a38,i7)', '# Number of (non)smoothing regions:  ', n_smoothing_regions
 
@@ -440,7 +440,7 @@
     smooth_in_y(n) = .false.
     smooth_in_z(n) = .false.
     call Tokenizer_Mod_Read_Line(9)
-    read(line % tokens(1), *) smooth_regions(n,0)  
+    read(line % tokens(1), *) smooth_regions(n,0)
     if(line % n_tokens .eq. 4) then   ! smoothing in three directions
       smooth_in_x(n) = .true.
       smooth_in_y(n) = .true.
@@ -479,7 +479,7 @@
                           smooth_regions(n,3),  &
                           smooth_regions(n,4),  &
                           smooth_regions(n,5),  &
-                          smooth_regions(n,6)   
+                          smooth_regions(n,6)
   end do
 
   close(9)

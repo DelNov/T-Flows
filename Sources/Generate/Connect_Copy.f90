@@ -4,10 +4,10 @@
 !   Solve the cell connectivity for copy boundary conditions.                  !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use gen_mod
+  use Gen_Mod
   use Domain_Mod
   use Grid_Mod
-!------------------------------------------------------------------------------! 
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Domain_Type) :: dom
@@ -29,7 +29,7 @@
   !-----------------------------------------------------!
   !   Search through all block and all of their faces   !
   !-----------------------------------------------------!
-  n_cop = 0       
+  n_cop = 0
 
   do p = 1, n_copy_cond    
     do b2 = 1, size(dom % blocks)
@@ -37,7 +37,7 @@
         do f2 = 1, 6    ! faces of the second block
           do f1 = 1, 6  ! faces of the first block
 
-            ! Initialize the transformation matrixes             
+            ! Initialize the transformation matrices
             do i=1,3
               do j=1,3
                 trans1(i,j)=0
@@ -110,9 +110,9 @@
                 nig = dom % blocks(b1) % resolutions(3)       ! nk from block 1
                 trans1(3,1)=nig
                 trans1(3,2)=-1
-              endif
+              end if
 
-              ! Direction jg, block 1 
+              ! Direction jg, block 1
               if((l12-l11) .eq. +1) then 
                 njg = dom % blocks(b1) % resolutions(1)       ! ni from block 1
                 trans1(1,3)=+1
@@ -134,7 +134,7 @@
                 njg = dom % blocks(b1) % resolutions(3)       ! nk from block 1
                 trans1(3,1)=njg
                 trans1(3,3)=-1
-              endif
+              end if
 
               ! Direction ig, block 2
               if((l24-l21) .eq. +1) then
@@ -158,7 +158,7 @@
                 nig = dom % blocks(b2) % resolutions(3)       ! nk from block 2
                 trans2(3,1)=nig
                 trans2(3,2)=-1
-              endif
+              end if
 
               ! Direction jg, block 2 
               if((l22-l21) .eq. +1) then 
@@ -182,7 +182,7 @@
                 njg = dom % blocks(b2) % resolutions(3)       ! nk from block 2
                 trans2(3,1)=njg
                 trans2(3,3)=-1
-              endif
+              end if
 
               ! Set the constant directions
               if(f1 .eq. 1) trans1(3,1)=1

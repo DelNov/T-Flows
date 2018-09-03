@@ -5,18 +5,18 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use gen_mod
+  use Gen_Mod
   use Grid_Mod
   use Tokenizer_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type)     :: grid
-  logical, intent(in) :: rrun     
+  logical, intent(in) :: rrun
 !----------------------------------[Calling]-----------------------------------!
-  real :: Tet_Volume        
-  real :: Distance       
-  real :: Distance_Squared       
+  real :: Tet_Volume
+  real :: Distance
+  real :: Distance_Squared
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, c1, c2, m, n, s, n_per
   integer              :: b, n_wall_colors
@@ -205,17 +205,17 @@
                            * (loc_x_node(3)+loc_x_node(4))  &
                            + (loc_z_node(1)-loc_z_node(4))  &
                            * (loc_x_node(4)+loc_x_node(1)) )
-        grid % sz(s)= 0.5 * ((loc_x_node(2)-loc_x_node(1))  & 
-                           * (loc_y_node(2)+loc_y_node(1))  & 
-                           + (loc_x_node(3)-loc_x_node(2))  & 
+        grid % sz(s)= 0.5 * ((loc_x_node(2)-loc_x_node(1))  &
+                           * (loc_y_node(2)+loc_y_node(1))  &
+                           + (loc_x_node(3)-loc_x_node(2))  &
                            * (loc_y_node(2)+loc_y_node(3))  &
-                           + (loc_x_node(4)-loc_x_node(3))  & 
+                           + (loc_x_node(4)-loc_x_node(3))  &
                            * (loc_y_node(3)+loc_y_node(4))  &
-                           + (loc_x_node(1)-loc_x_node(4))  & 
+                           + (loc_x_node(1)-loc_x_node(4))  &
                            * (loc_y_node(4)+loc_y_node(1)) )
       else if( grid % faces_n_nodes(s) .eq. 3 ) then 
         grid % sx(s)= 0.5 * ((loc_y_node(2)-loc_y_node(1))  &
-                           * (loc_z_node(2)+loc_z_node(1))  & 
+                           * (loc_z_node(2)+loc_z_node(1))  &
                            + (loc_y_node(3)-loc_y_node(2))  &
                            * (loc_z_node(2)+loc_z_node(3))  &
                            + (loc_y_node(1)-loc_y_node(3))  &
@@ -223,14 +223,14 @@
         grid % sy(s)= 0.5 * ((loc_z_node(2)-loc_z_node(1))  &
                            * (loc_x_node(2)+loc_x_node(1))  &
                            + (loc_z_node(3)-loc_z_node(2))  &
-                           * (loc_x_node(2)+loc_x_node(3))  & 
+                           * (loc_x_node(2)+loc_x_node(3))  &
                            + (loc_z_node(1)-loc_z_node(3))  &
                            * (loc_x_node(3)+loc_x_node(1)) )
         grid % sz(s)= 0.5 * ((loc_x_node(2)-loc_x_node(1))  &
                            * (loc_y_node(2)+loc_y_node(1))  &
-                           + (loc_x_node(3)-loc_x_node(2))  & 
-                           * (loc_y_node(2)+loc_y_node(3))  & 
-                           + (loc_x_node(1)-loc_x_node(3))  & 
+                           + (loc_x_node(3)-loc_x_node(2))  &
+                           * (loc_y_node(2)+loc_y_node(3))  &
+                           + (loc_x_node(1)-loc_x_node(3))  &
                            * (loc_y_node(3)+loc_y_node(1)) )
       else
         print *, '# Compute_Grid_Geometry: something horrible has happened !'
@@ -274,7 +274,7 @@
         grid % xc(c2) = grid % xc(c1) + grid % sx(s)*t / tot_surf
         grid % yc(c2) = grid % yc(c1) + grid % sy(s)*t / tot_surf
         grid % zc(c2) = grid % zc(c1) + grid % sz(s)*t / tot_surf
-      endif 
+      end if 
     end do ! through sides
 
     !---------------------------------------------!
@@ -345,7 +345,7 @@
           grid % dy(s) = grid % yf(s) - ys2  ! later: xc2 = xc2 + Dx  !
           grid % dz(s) = grid % zf(s) - zs2  !------------------------!
 
-        endif !  S*(c2-c1) < 0.0
+        end if !  S*(c2-c1) < 0.0
       end if  !  c2 > 0
     end do    !  sides  
     print '(a38,i7)', '# Number of periodic faces:          ', n_per
@@ -443,9 +443,9 @@
                            loc_x_node(3),loc_y_node(3),loc_z_node(3),      &
                            loc_x_node(1),loc_y_node(1),loc_z_node(1),      &
                            x_cell_tmp,y_cell_tmp,z_cell_tmp)
-        end if  
-      else        
-        dsc2=0.0
+        end if
+      else
+        dsc2 = 0.0
       end if
 
     end do
@@ -463,12 +463,14 @@
   call Grid_Mod_Print_Bnd_Cond_List(grid)
   print *, '#================================================================'
   if(rrun) then
-    print *, '# Computing the distance to the walls (2/2)'           
-  else            
-    print *, '# Computing the distance to the walls (1/2)'           
+    print *, '# Computing the distance to the walls (2/2)'
+  else
+    print *, '# Computing the distance to the walls (1/2)'
   end if 
-  print *, '# Type the wall boundary conditions indices separated by spaces  '
-  print *, '# (These will be used for calculation of wall distance.)' 
+  print *, '# Type the list of boundary colors which represent walls,        '
+  print *, '# separated by spaces.  These will be used for computation       '
+  print *, '# of distance to the wall needed by some turbulence models.      '
+  print *, '# Type simply a zero to skip this step.                          '
   print *, '#----------------------------------------------------------------'
   call Tokenizer_Mod_Read_Line(5)
   n_wall_colors = line % n_tokens
@@ -485,9 +487,9 @@
       if(mod(c1,10000) .eq. 0) then
         write(*,'(a2, f5.0, a14)') ' #', (100.*c1/(1.*grid % n_cells)),  &
                                    ' % complete...'
-      endif
+      end if
       do b = 1, n_wall_colors
-        do s = WallFacFst, WallFacLst      ! 1, grid % n_faces
+        do s = first_wall_face, last_wall_face      ! 1, grid % n_faces
           c2 = grid % faces_c(2,s)
           if(c2 < 0) then
             if(grid % bnd_cond % color(c2) .eq. wall_colors(b)) then
@@ -521,7 +523,7 @@
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
-  
+
       ! First cell
       xc1 = grid % xc(c1)
       yc1 = grid % yc(c1)
@@ -533,10 +535,10 @@
       yc2 = grid % yc(c2) + grid % dy(s)
       zc2 = grid % zc(c2) + grid % dz(s)
       dsc2=Distance(xc2, yc2, zc2, grid % xf(s), grid % yf(s), grid % zf(s))
-  
+
       ! Interpolation factor
       grid % f(s) = dsc2 / (dsc1 + dsc2)
-    end do 
-  end if 
+    end do
+  end if
 
   end subroutine

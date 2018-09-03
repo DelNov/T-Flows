@@ -4,10 +4,10 @@
 !   Solve the cell connectivity after block by block grid generation           !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use gen_mod
+  use Gen_Mod
   use Domain_Mod
   use Grid_Mod
-!------------------------------------------------------------------------------! 
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Domain_Type) :: dom
@@ -113,7 +113,7 @@
               nig = dom % blocks(b1) % resolutions(3)       ! nk from block 1
               trans1(3,1)=nig
               trans1(3,2)=-1
-            endif
+            end if
 
             ! Direction jg, block 1 
             if((l12-l11) .eq. +1) then 
@@ -137,7 +137,7 @@
               njg = dom % blocks(b1) % resolutions(3)       ! nk from block 1
               trans1(3,1)=njg
               trans1(3,3)=-1
-            endif
+            end if
 
             ! Direction ig, block 2
             if((l24-l21) .eq. +1) then
@@ -161,7 +161,7 @@
               nig = dom % blocks(b2) % resolutions(3)       ! nk from block 2
               trans2(3,1)=nig
               trans2(3,2)=-1
-            endif
+            end if
 
             ! Direction jg, block 2 
             if((l22-l21) .eq. +1) then 
@@ -185,7 +185,7 @@
               njg = dom % blocks(b2) % resolutions(3)       ! nk from block 2
               trans2(3,1)=njg
               trans2(3,3)=-1
-            endif
+            end if
 
             ! Set the constant directions
             if(f1 .eq. 1) trans1(3,1)=1

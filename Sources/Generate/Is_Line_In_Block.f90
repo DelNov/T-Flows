@@ -5,7 +5,7 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Domain_Mod
-!------------------------------------------------------------------------------! 
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Domain_Type) :: dom
@@ -19,14 +19,14 @@
       if( (dom % blocks(b) % corners(l1) .eq. n1) .and.   &
           (dom % blocks(b) % corners(l2) .eq. n2) ) then
            goto 1
-      end if 
+      end if
     end do
-  end do     
+  end do
 
-  Is_Line_In_Block=0
+  Is_Line_In_Block = 0
   return
 
-1 Is_Line_In_Block=b
+1 Is_Line_In_Block = b
   return
 
   end function

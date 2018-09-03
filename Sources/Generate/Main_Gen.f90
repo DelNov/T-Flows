@@ -4,10 +4,10 @@
 !   Block structured mesh generation and unstructured cell refinement.         !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use gen_mod
+  use Gen_Mod
   use Domain_Mod  ! domain as defined in ".dom" file.
   use Grid_Mod
-!------------------------------------------------------------------------------! 
+!------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Locals]-----------------------------------!
   type(Domain_Type) :: dom    ! domain to be used
@@ -44,6 +44,9 @@
     new_f(s)=s
   end do
 
+  ! Coarsen the grid with METIS
+  ! Not implemented yet: call Grid_Mod_Coarsen(grid)
+
   !------------------------------!
   !   Save data for processing   !
   !------------------------------!
@@ -76,7 +79,7 @@
   call Save_Cgns_Cells(grid, 0) 
 
   ! Save the 1d probe (good for the channel flow)
-  call Probe_1d_Nodes_Gen(grid)
+  call Probe_1d_Nodes(grid)
 
   ! Save the 2d probe
   call Probe_2d(grid)

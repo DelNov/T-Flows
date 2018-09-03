@@ -5,9 +5,9 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use gen_mod
+  use Gen_Mod
   use Grid_Mod
-!------------------------------------------------------------------------------! 
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
@@ -74,12 +74,12 @@
   y_min=+HUGE
   z_min=+HUGE
   do n = 1, grid % n_nodes
-    x_max=max(grid % xn(n), x_max) 
-    y_max=max(grid % yn(n), y_max) 
-    z_max=max(grid % zn(n), z_max) 
-    x_min=min(grid % xn(n), x_min) 
-    y_min=min(grid % yn(n), y_min) 
-    z_min=min(grid % zn(n), z_min) 
+    x_max=max(grid % xn(n), x_max)
+    y_max=max(grid % yn(n), y_max)
+    z_max=max(grid % zn(n), z_max)
+    x_min=min(grid % xn(n), x_min)
+    y_min=min(grid % yn(n), y_min)
+    z_min=min(grid % zn(n), z_min)
   end do 
 
   !-----------------------!
@@ -92,7 +92,7 @@
         m = grid % cells_n(j,c)    ! second cell 
         if(n .ne.  m) then 
           do k=1,node_to_nodes(n,0)
-            if(node_to_nodes(n,k) .eq. m) goto 10            
+            if(node_to_nodes(n,k) .eq. m) goto 10
           end do
           node_to_nodes(n,0)=node_to_nodes(n,0)+1
           node_to_nodes(n,node_to_nodes(n,0)) = m
@@ -119,7 +119,7 @@
             (y1<=grid % yn(n)) .and. (grid % yn(n)<=y8) .and. &
             (z1<=grid % zn(n)) .and. (grid % zn(n)<=z8) ) then
           node_to_nodes(n,0) = 0
-        endif
+        end if
       end do
     end if
   end do
@@ -166,12 +166,12 @@
       do n = 1, grid % n_nodes
         if(node_to_nodes(n,0)   >  0) then
 
-          x1=smooth_regions(reg,1)
-          y1=smooth_regions(reg,2)
-          z1=smooth_regions(reg,3)
-          x8=smooth_regions(reg,4)
-          y8=smooth_regions(reg,5)
-          z8=smooth_regions(reg,6)
+          x1 = smooth_regions(reg,1)
+          y1 = smooth_regions(reg,2)
+          z1 = smooth_regions(reg,3)
+          x8 = smooth_regions(reg,4)
+          y8 = smooth_regions(reg,5)
+          z8 = smooth_regions(reg,6)
 
           if( (x1 <= grid % xn(n)) .and.  &
               (grid % xn(n) <= x8) .and.  &

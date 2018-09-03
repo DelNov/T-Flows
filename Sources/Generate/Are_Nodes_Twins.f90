@@ -4,8 +4,8 @@
 !   Checks if the nodes are twins, i.e. are they shared on periodicity         !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use gen_mod, only: twin_n
-!------------------------------------------------------------------------------! 
+  use Gen_Mod, only: twin_n
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   integer :: n1, n2
@@ -32,6 +32,6 @@
   else
     print *, '# Are_Nodes_Twins:   Major trouble !    Stopping !'
     stop
-  endif
+  end if
 
   end function Are_Nodes_Twins

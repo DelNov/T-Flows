@@ -5,10 +5,10 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use gen_mod
+  use Gen_Mod
   use Domain_Mod
   use Grid_Mod
-!------------------------------------------------------------------------------! 
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Domain_Type)   :: dom
@@ -52,7 +52,7 @@
               grid % xn(node) = x0 + t*delx
               grid % yn(node) = y0 + t*dely
               grid % zn(node) = z0 + t*delz
-            endif
+            end if
           end if 
           if( je .ne. js ) then
             dt=1.0/(1.0*n)+(1.0*j-0.5*(1.0*n+1)) * ddt
@@ -62,7 +62,7 @@
               grid % xn(node) = x0 + t*delx
               grid % yn(node) = y0 + t*dely
               grid % zn(node) = z0 + t*delz
-            endif
+            end if
           end if 
           if( ke .ne. ks ) then
             dt=1.0/(1.0*n)+(1.0*k-0.5*(1.0*n+1)) * ddt
@@ -72,7 +72,7 @@
               grid % xn(node) = x0 + t*delx
               grid % yn(node) = y0 + t*dely
               grid % zn(node) = z0 + t*delz
-            endif
+            end if
           end if 
         end do
       end do
@@ -84,15 +84,15 @@
   else
     case = 0
     if     ((w  >  -0.5).and.(w <=  -0.25)) then
-      pr = 1.0 - abs(0.5 - abs(w))    
+      pr = 1.0 - abs(0.5 - abs(w))
       case = 1
     else if((w >=  -0.75).and.(w  <  -0.5)) then
-      pr = 1.0 - abs(0.5 - abs(w))            
+      pr = 1.0 - abs(0.5 - abs(w))
       case = 2
     else
       pr = -w
       case = 3 
-    endif
+    end if
 
     do i=is,ie
       do j=js,je
@@ -121,8 +121,8 @@
                                 + 0.5*(1.0+tanh(xi*atanh(pr))/pr)*dely
                 grid % zn(node) = z0  &
                                 + 0.5*(1.0+tanh(xi*atanh(pr))/pr)*delz
-              endif 
-            endif
+              end if 
+            end if
           end if 
           if( je .ne. js ) then
             if(case .eq. 1) xi = -1.0*(1.0*j)/(1.0*n)
@@ -148,9 +148,9 @@
                                 + 0.5*(1.0+tanh(xi*atanh(pr))/pr)*dely
                 grid % zn(node) = z0  &
                                 + 0.5*(1.0+tanh(xi*atanh(pr))/pr)*delz
-              endif 
-            endif
-          end if 
+              end if
+            end if
+          end if
           if( ke .ne. ks ) then
             if(case .eq. 1) xi = -1.0*(1.0*k)/(1.0*n)
             if(case .eq. 2) xi =  1.0 - 1.0*(1.0*k)/(1.0*n)
@@ -175,13 +175,13 @@
                                 + 0.5*(1.0+tanh(xi*atanh(pr))/pr)*dely
                 grid % zn(node) = z0  &
                                 + 0.5*(1.0+tanh(xi*atanh(pr))/pr)*delz
-              endif 
-            endif
-          end if 
+              end if
+            end if
+          end if
         end do
       end do
     end do
 
-  endif
+  end if
 
   end subroutine

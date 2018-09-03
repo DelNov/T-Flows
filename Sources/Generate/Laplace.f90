@@ -1,16 +1,16 @@
 !==============================================================================!
-  subroutine Laplace(dom, grid, b,i,j,k, wx16,wx24,wx35,  &
-                                         wy16,wy24,wy35,  &
-                                         wz16,wz24,wz35)
+  subroutine Laplace(dom, grid, b,i,j,k, wx16, wx24, wx35,  &
+                                         wy16, wy24, wy35,  &
+                                         wz16, wz24, wz35)
 !------------------------------------------------------------------------------!
 !   Places the nodes inside the block using Laplace-like function              !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use gen_mod
+  use Gen_Mod
   use Domain_Mod
   use Grid_Mod
-!------------------------------------------------------------------------------! 
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Domain_Type) :: dom
@@ -70,7 +70,7 @@
     xf6 = grid % xn(n6)
     yf6 = grid % yn(n6)
     zf6 = grid % zn(n6)
-  endif
+  end if
 
   ! Face III
   if(grid % xn(n3) .eq. HUGE) then
@@ -84,7 +84,7 @@
     xf3 = grid % xn(n3)
     yf3 = grid % yn(n3)
     zf3 = grid % zn(n3)
-  endif
+  end if
 
   ! Face V
   if(grid % xn(n5) .eq. HUGE) then
@@ -98,7 +98,7 @@
     xf5 = grid % xn(n5)
     yf5 = grid % yn(n5)
     zf5 = grid % zn(n5)
-  endif
+  end if
 
   ! Face II
   if(grid % xn(n2) .eq. HUGE) then
@@ -112,7 +112,7 @@
     xf2 = grid % xn(n2)
     yf2 = grid % yn(n2)
     zf2 = grid % zn(n2)
-  endif
+  end if
 
   ! Face IV
   if(grid % xn(n4) .eq. HUGE) then
@@ -126,20 +126,20 @@
     xf4 = grid % xn(n4)
     yf4 = grid % yn(n4)
     zf4 = grid % zn(n4)
-  endif
+  end if
 
   if( grid % xn(n) .eq. HUGE ) then
     grid % xn(n) = ( xf1*(nk-k) + xf6*(k-1) ) * wx16 / (nk-1)        &
                  + ( xf2*(ni-i) + xf4*(i-1) ) * wx24 / (ni-1)        &
-                 + ( xf3*(nj-j) + xf5*(j-1) ) * wx35 / (nj-1) 
+                 + ( xf3*(nj-j) + xf5*(j-1) ) * wx35 / (nj-1)
 
     grid % yn(n) = ( yf1*(nk-k) + yf6*(k-1) ) * wy16 / (nk-1)        &
                  + ( yf2*(ni-i) + yf4*(i-1) ) * wy24 / (ni-1)        &
-                 + ( yf3*(nj-j) + yf5*(j-1) ) * wy35 / (nj-1) 
+                 + ( yf3*(nj-j) + yf5*(j-1) ) * wy35 / (nj-1)
 
     grid % zn(n) = ( zf1*(nk-k) + zf6*(k-1) ) * wz16 / (nk-1)        &
                  + ( zf2*(ni-i) + zf4*(i-1) ) * wz24 / (ni-1)        &
-                 + ( zf3*(nj-j) + zf5*(j-1) ) * wz35 / (nj-1) 
+                 + ( zf3*(nj-j) + zf5*(j-1) ) * wz35 / (nj-1)
   end if
 
   end subroutine

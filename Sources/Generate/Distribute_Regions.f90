@@ -5,10 +5,10 @@
 !   boundary conditions.                                                       !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use gen_mod
+  use Gen_Mod
   use Domain_Mod
   use Grid_Mod
-!------------------------------------------------------------------------------! 
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Domain_Type) :: dom
@@ -17,7 +17,7 @@
   include "../Shared/Approx.int"
 !-----------------------------------[Locals]-----------------------------------!
   integer :: b, i, j, k, n, c, r
-  integer :: n_mat, n_bnd         ! number of materials and boundary conditions   
+  integer :: n_mat, n_bnd         ! number of materials and boundary conditions
   integer :: is, js, ks, ie, je, ke, face 
   integer :: ci, cj, ck
   logical :: found
