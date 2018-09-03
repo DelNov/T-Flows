@@ -5,7 +5,7 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use gen_mod
+  use Gen_Mod
   use Grid_Mod
   use Tokenizer_Mod
 !------------------------------------------------------------------------------!
@@ -458,8 +458,8 @@
         end if
       end if
     end do
-    !call Sort_Real_Carry_Int(b_coor, b_face, cnt_per, 2)
-    call Sort_Real_Carry_Int_Heapsort(b_coor, b_face, cnt_per)
+    call Sort_Mod_Real_Carry_Int(b_coor(1:cnt_per),  &
+                                 b_face(1:cnt_per))
   end if
 
   !-------------------!
@@ -623,8 +623,8 @@
     deallocate(yspr)
     deallocate(zspr)
 
-    !call Sort_Real_Carry_Int(b_coor, b_face, cnt_per, 2)
-    call Sort_Real_Carry_Int_Heapsort(b_coor, b_face, cnt_per)
+    call Sort_Mod_Real_Carry_Int(b_coor(1:cnt_per),  &
+                                 b_face(1:cnt_per))
   end if  ! for option .eq. 2
 
   do s = 1, cnt_per/2

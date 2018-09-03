@@ -1,8 +1,9 @@
 !==============================================================================!
   program Convert
+!------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Name_Mod, only: problem_name
-  use gen_mod
+  use Gen_Mod
   use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -71,6 +72,9 @@
     new_f(s) = s
   end do
 
+  ! Decompose/coarsen the grid with METIS
+  ! Not yet implemented: call Grid_Mod_Coarsen(grid)
+
   !-------------------------------!
   !   Save files for processing   !
   !-------------------------------!
@@ -100,6 +104,6 @@
                       0)
 
   ! Create 1D file (used for channel or pipe flow)
-  call Probe_1D_Nodes(grid)
+  call Probe_1d_Nodes(grid)
 
   end program

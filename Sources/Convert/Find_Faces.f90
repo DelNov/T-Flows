@@ -12,8 +12,9 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use gen_mod 
+  use Gen_Mod 
   use Grid_Mod
+  use Sort_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -77,7 +78,8 @@
   !--------------------------------------------------!
   !   Sort the cell faces according to coordinares   !
   !--------------------------------------------------!
-  call Sort_Real_Carry_Int(face_coor, face_cell, grid % n_cells*6, 2)
+  call Sort_Mod_Real_Carry_Int(face_coor(1:grid % n_cells*6),  & 
+                               face_cell(1:grid % n_cells*6))
 
   !------------------------------------------------!
   !   Anotate cell faces with same coordinates     !
@@ -91,7 +93,13 @@
       cnt = cnt + 1
       starts(cnt) = c
       ends(cnt-1) = c-1
+      call Sort_Mod_Int_Carry_Int(face_cell(starts(cnt-1):ends(cnt-1)),  & 
+                                  face_cell(starts(cnt-1):ends(cnt-1)))
     end if
+  end do
+
+  do c=1, grid % n_cells*6
+    write(1,*) face_coor(c), face_cell(c)
   end do
 
   !-------------------------------------------!
