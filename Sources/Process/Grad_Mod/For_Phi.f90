@@ -19,7 +19,7 @@
   real    :: dphi1, dphi2, dx_c1, dy_c1, dz_c1, dx_c2, dy_c2, dz_c2 
 !==============================================================================!
 
-  call Comm_Mod_Exchange(grid, phi)
+  call Comm_Mod_Exchange_Real(grid, phi)
 
   phii(1:grid % n_cells) = 0.
 
@@ -161,7 +161,7 @@
     end do
   end if
 
-  call Comm_Mod_Exchange(grid, phii)
+  call Comm_Mod_Exchange_Real(grid, phii)
 
   if(.not. boundary) call Grad_Mod_Correct_Bad_Cells(grid, phii)
 

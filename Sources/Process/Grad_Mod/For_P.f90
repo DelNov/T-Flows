@@ -20,7 +20,7 @@
   integer :: s, c, c1, c2, iter
 !==============================================================================!
  
-  call Comm_Mod_Exchange(grid, phi)
+  call Comm_Mod_Exchange_Real(grid, phi)
 
   do c = 1, grid % n_cells
     phi_x(c)=0.0
