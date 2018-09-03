@@ -149,6 +149,6 @@
     end do
   end if
 
-  call Comm_Mod_Exchange(grid, kin % n)
+  call Comm_Mod_Exchange_Real(grid, kin % n)
 
   end subroutine

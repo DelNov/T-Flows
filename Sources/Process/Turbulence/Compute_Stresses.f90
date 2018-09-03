@@ -153,26 +153,26 @@
           phi % a_o(c2) = phi % a_o(c2) + flux(s)*phis
         else
           phi % a_o(c1) = phi % a_o(c1) - flux(s)*phis
-        endif 
+        end if 
       end if
       if(c2  > 0) then
         phi % a(c1) = phi % a(c1) - flux(s)*phis
         phi % a(c2) = phi % a(c2) + flux(s)*phis
       else
         phi % a(c1) = phi % a(c1) - flux(s)*phis
-      endif 
+      end if 
 
       ! Store upwinded part of the advection term in "c"
       if(flux(s)  < 0) then   ! from c2 to c1
         phi % c(c1)=phi % c(c1) - flux(s) * phi % n(c2)
         if(c2  > 0) then
           phi % c(c2)=phi % c(c2) + flux(s) * phi % n(c2)
-        endif
+        end if
       else 
         phi % c(c1)=phi % c(c1) - flux(s) * phi % n(c1)
         if(c2  > 0) then
           phi % c(c2)=phi % c(c2) + flux(s) * phi % n(c1)
-        endif
+        end if
       end if
     end if     ! c2 > 0 
   end do    ! through sides
@@ -186,14 +186,14 @@
     do c = 1, grid % n_cells
       b(c) = b(c) + (1.5 * phi % a_o(c) - 0.5 * phi % a_oo(c) - phi % c(c))
     end do  
-  endif
+  end if
 
   ! Crank-Nicholson scheeme for convective fluxes
   if(td_advection .eq. CRANK_NICOLSON) then
     do c = 1, grid % n_cells
       b(c) = b(c) + (0.5 * ( phi % a(c) + phi % a_o(c) ) - phi % c(c))
     end do  
-  endif
+  end if
 
   ! Fully implicit treatment of convective fluxes 
   if(td_advection .eq. FULLY_IMPLICIT) then
@@ -307,7 +307,7 @@
         else if( Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER ) then  
           a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
           a % bou(c2) = - a12  ! cool parallel stuff
-        endif
+        end if
       end if     
 
     end if
@@ -546,6 +546,6 @@
     end do
   end if
 
-  call Comm_Mod_Exchange(grid, phi % n)
+  call Comm_Mod_Exchange_Real(grid, phi % n)
 
   end subroutine

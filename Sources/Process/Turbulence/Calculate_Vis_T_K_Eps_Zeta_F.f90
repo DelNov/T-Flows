@@ -51,7 +51,7 @@
       vis_t(c)     = c_mu_d * zeta % n(c) * kin % n(c) * t_scale(c)
       vis_t_eff(c) = max(vis_t(c), vis_t_sgs(c))
     end do
-    call Comm_Mod_Exchange(grid, vis_t_eff)
+    call Comm_Mod_Exchange_Real(grid, vis_t_eff)
 
   end if
 
@@ -106,7 +106,7 @@
     end if    ! c2 < 0
   end do
 
-  call Comm_Mod_Exchange(grid, vis_t)
-  call Comm_Mod_Exchange(grid, vis_wall)
+  call Comm_Mod_Exchange_Real(grid, vis_t)
+  call Comm_Mod_Exchange_Real(grid, vis_wall)
 
   end subroutine

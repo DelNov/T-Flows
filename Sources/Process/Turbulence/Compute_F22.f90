@@ -185,7 +185,7 @@
         else if( Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER ) then  
           a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
           a % bou(c2) = - a12  ! cool parallel stuff
-        endif
+        end if
       end if     
      end if
     end if
@@ -279,6 +279,6 @@
   
   call Info_Mod_Iter_Fill_At(3, 4, phi % name, niter, phi % res)    
 
-  call Comm_Mod_Exchange(grid, phi % n)
+  call Comm_Mod_Exchange_Real(grid, phi % n)
 
   end subroutine

@@ -61,10 +61,10 @@
 !                                                                              !
 !------------------------------------------------------------------------------!
 
-  call Comm_Mod_Exchange(grid, u % n)
-  call Comm_Mod_Exchange(grid, v % n)
-  call Comm_Mod_Exchange(grid, w % n)
-  call Comm_Mod_Exchange(grid, shear)
+  call Comm_Mod_Exchange_Real(grid, u % n)
+  call Comm_Mod_Exchange_Real(grid, v % n)
+  call Comm_Mod_Exchange_Real(grid, w % n)
+  call Comm_Mod_Exchange_Real(grid, shear)
 
   do c =1, grid % n_cells
     u_a   = 0.0

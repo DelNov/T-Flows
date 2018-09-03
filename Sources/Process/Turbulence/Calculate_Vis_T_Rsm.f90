@@ -68,6 +68,6 @@
     end do
   end if
 
-  call Comm_Mod_Exchange(grid, vis_t)  
+  call Comm_Mod_Exchange_Real(grid, vis_t)  
 
   end subroutine

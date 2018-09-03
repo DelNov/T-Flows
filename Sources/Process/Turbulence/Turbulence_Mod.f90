@@ -16,17 +16,17 @@
   integer :: turbulence_wall_treatment  ! HIGH_RE, LOW_RE, COMPOUND
 
   ! Parameters describing turbulence model choice
-  integer, parameter :: NONE              = 30011
-  integer, parameter :: DNS               = 30013
-  integer, parameter :: WALE              = 30029
-  integer, parameter :: DYNAMIC           = 30047
-  integer, parameter :: SMAGORINSKY       = 30059
-  integer, parameter :: K_EPS             = 30071
-  integer, parameter :: K_EPS_ZETA_F      = 30089
-  integer, parameter :: DES_SPALART       = 30091
-  integer, parameter :: SPALART_ALLMARAS  = 30097  
-  integer, parameter :: HANJALIC_JAKIRLIC = 30103
-  integer, parameter :: REYNOLDS_STRESS   = 30109
+  integer, parameter :: NONE                  = 30011
+  integer, parameter :: DNS                   = 30013
+  integer, parameter :: WALE                  = 30029
+  integer, parameter :: DYNAMIC               = 30047
+  integer, parameter :: SMAGORINSKY           = 30059
+  integer, parameter :: K_EPS                 = 30071
+  integer, parameter :: K_EPS_ZETA_F          = 30089
+  integer, parameter :: DES_SPALART           = 30091
+  integer, parameter :: SPALART_ALLMARAS      = 30097  
+  integer, parameter :: HANJALIC_JAKIRLIC     = 30103
+  integer, parameter :: REYNOLDS_STRESS       = 30109
 
   ! Turbulence wall treatment 
   integer, parameter :: STABILIZED = 30113
@@ -57,7 +57,7 @@
   real, allocatable :: vort(:)
 
   ! Turbulent viscosity
-  real,allocatable :: vis_t(:)
+  real, allocatable :: vis_t(:)
 
   ! Wall viscosity (wall function approuch)
   real, allocatable :: vis_wall(:)

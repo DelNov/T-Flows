@@ -33,6 +33,6 @@
                  * shear(c)      
   end do
 
-  call Comm_Mod_Exchange(grid, vis_t_sgs)
+  call Comm_Mod_Exchange_Real(grid, vis_t_sgs)
 
   end subroutine

@@ -171,12 +171,12 @@
           vis_wall(c1) = density*u_tau_l*u_tau_l*dely/abs(u_tan) 
         else 
           vis_wall(c1) = viscosity + fw(s)*vis_t(c1)+(1.0-fw(s))*vis_t(c2)
-        endif
+        end if
       end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL or WALLFL
     end if    ! c2 < 0
   end do
 
-  call Comm_Mod_Exchange(grid, vis_t)
-  call Comm_Mod_Exchange(grid, vis_wall)
+  call Comm_Mod_Exchange_Real(grid, vis_t)
+  call Comm_Mod_Exchange_Real(grid, vis_wall)
 
   end subroutine
