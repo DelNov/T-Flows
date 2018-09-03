@@ -38,7 +38,7 @@
 
   end do
 
-  call Comm_Mod_Exchange(grid, phi_min)
-  call Comm_Mod_Exchange(grid, phi_max)
+  call Comm_Mod_Exchange_Real(grid, phi_min)
+  call Comm_Mod_Exchange_Real(grid, phi_max)
 
   end subroutine
