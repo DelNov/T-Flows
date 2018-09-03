@@ -1,8 +1,8 @@
 !==============================================================================!
-  subroutine Probe_1D(grid)
+  subroutine Probe_1d_Cells(grid)
 !------------------------------------------------------------------------------!
 !   This subroutine finds the coordinate of cell-centers in non-homogeneous    !
-!   direction and write them in file called "name.1D"                          !
+!   direction and write them in file called "name.1d"                          !
 !------------------------------------------------------------------------------!
   use Name_Mod, only: problem_name
   use Grid_Mod
@@ -15,7 +15,7 @@
   include "Approx.int"
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: n_prob, p, c
-  real              :: zp(1000)
+  real              :: zp(1028)
   character(len=80) :: name_prob
   character(len=80) :: answer
 !==============================================================================!
@@ -53,7 +53,7 @@
     if(answer .eq. 'Y') zp(n_prob) = grid % yc(c)
     if(answer .eq. 'Z') zp(n_prob) = grid % zc(c)
 
-    if(n_prob .eq. 1000) then
+    if(n_prob .eq. 1028) then
       print *, '# Probe 1D: Not a 1D (channel flow) problem.'
       isit = .false.
       return
@@ -66,16 +66,16 @@
   !   Create 1D file   !
   !--------------------!
   name_prob = problem_name
-  name_prob(len_trim(problem_name)+1:len_trim(problem_name)+4) = '.1Dc'
+  name_prob(len_trim(problem_name)+1:len_trim(problem_name)+3) = '.1d'
   print *, '# Creating the file: ', trim(name_prob)
   open(9, file=name_prob)
 
   ! Write the number of probes 
-  write(9,'(I8)') n_prob
+  write(9,'(i8)') n_prob
 
   ! Write the probe coordinates out
   do p=1,n_prob
-    write(9,'(I8,1PE17.8)') p, zp(p)
+    write(9,'(i8,1pe17.8)') p, zp(p)
   end do
 
   close(9)
