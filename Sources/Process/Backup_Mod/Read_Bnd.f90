@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Read_Backup_Cell(fh, disp, var_name, com1)
+  subroutine Backup_Mod_Read_Bnd(fh, disp, var_name, array)
 !------------------------------------------------------------------------------!
 !   Reads a vector variable with boundary cells from a backup file.            !
 !------------------------------------------------------------------------------!
@@ -11,7 +11,7 @@
 !---------------------------------[Arguments]----------------------------------!
   integer          :: fh, disp
   character(len=*) :: var_name
-  real             :: com1(1:nc_s)
+  real             :: array(-nb_s:-1)
 !-----------------------------------[Locals]-----------------------------------!
   character(len=80) :: vn
   integer           :: vs, disp_loop
@@ -30,7 +30,7 @@
     ! If variable is found, read it and retrun
     if(vn .eq. var_name) then
       if(this_proc < 2) print *, '# Reading variable: ', trim(vn)
-      call Comm_Mod_Read_Cell_Real(fh, com1(1:nc_s),   disp_loop)
+      call Comm_Mod_Read_Bnd_Real (fh, array(-nb_s:-1), disp_loop)
       disp = disp_loop
       return
 

@@ -1,7 +1,8 @@
 !==============================================================================!
-  subroutine Write_Backup_Int(fh, disp, var_name, var_value)
+  subroutine Backup_Mod_Write_Bnd(fh, disp, var_name, array)
 !------------------------------------------------------------------------------!
-!   Writes a single named integer variable to backup file.                     !
+!   Writes a vector variable with boundary cells to backup file.               !
+!------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Comm_Mod
   use Grid_Mod
@@ -10,7 +11,7 @@
 !---------------------------------[Arguments]----------------------------------!
   integer          :: fh, disp
   character(len=*) :: var_name
-  integer          :: var_value
+  real             :: array(-nb_s:-1)
 !-----------------------------------[Locals]-----------------------------------!
   character(len=80) :: vn
   integer           :: vs  ! variable size
@@ -18,10 +19,10 @@
 
   if(this_proc < 2) print *, '# Writing variable: ', trim(var_name)
 
-  ! Just store one named integer
-  vn = var_name;  call Comm_Mod_Write_Text(fh, vn, disp)
-  vs = SIZE_INT;  call Comm_Mod_Write_Int (fh, vs, disp)
+  ! Vector with boundaries
+  vn = var_name;         call Comm_Mod_Write_Text(fh, vn, disp)
+  vs = nb_t * SIZE_REAL; call Comm_Mod_Write_Int (fh, vs, disp)
 
-  call Comm_Mod_Write_Int (fh, var_value, disp)
+  call Comm_Mod_Write_Bnd_Real (fh, array(-nb_s:-1), disp)
 
   end subroutine

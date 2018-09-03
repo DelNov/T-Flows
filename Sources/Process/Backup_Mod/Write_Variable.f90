@@ -1,7 +1,7 @@
 !==============================================================================!
-  subroutine Write_Backup_Variable(fh, disp, var_name, var1)
+  subroutine Backup_Mod_Write_Variable(fh, disp, var_name, var)
 !------------------------------------------------------------------------------!
-!   Writes a whole variable cells to backup file.                              !
+!   Writes a whole variable to backup file.                                    !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Comm_Mod
@@ -12,7 +12,7 @@
 !---------------------------------[Arguments]----------------------------------!
   integer          :: fh, disp
   character(len=*) :: var_name
-  type(Var_Type)   :: var1
+  type(Var_Type)   :: var
 !-----------------------------------[Locals]-----------------------------------!
   character(len=80) :: vn
   integer           :: vs  ! variable size
@@ -24,14 +24,14 @@
   vn = var_name;                      call Comm_Mod_Write_Text(fh, vn, disp)
   vs = (7*nc_t + 2*nb_t) * SIZE_REAL; call Comm_Mod_Write_Int (fh, vs, disp)
 
-  call Comm_Mod_Write_Cell_Real(fh, var1 % n(1:nc_s),   disp)
-  call Comm_Mod_Write_Bnd_Real (fh, var1 % n(-nb_s:-1), disp)
-  call Comm_Mod_Write_Bnd_Real (fh, var1 % q(-nb_s:-1), disp)
-  call Comm_Mod_Write_Cell_Real(fh, var1 % o  (1:nc_s), disp)
-  call Comm_Mod_Write_Cell_Real(fh, var1 % a  (1:nc_s), disp)
-  call Comm_Mod_Write_Cell_Real(fh, var1 % a_o(1:nc_s), disp)
-  call Comm_Mod_Write_Cell_Real(fh, var1 % c  (1:nc_s), disp)
-  call Comm_Mod_Write_Cell_Real(fh, var1 % c_o(1:nc_s), disp)
-  call Comm_Mod_Write_Cell_Real(fh, var1 % d_o(1:nc_s), disp)
+  call Comm_Mod_Write_Cell_Real(fh, var % n(1:nc_s),   disp)
+  call Comm_Mod_Write_Bnd_Real (fh, var % n(-nb_s:-1), disp)
+  call Comm_Mod_Write_Bnd_Real (fh, var % q(-nb_s:-1), disp)
+  call Comm_Mod_Write_Cell_Real(fh, var % o  (1:nc_s), disp)
+  call Comm_Mod_Write_Cell_Real(fh, var % a  (1:nc_s), disp)
+  call Comm_Mod_Write_Cell_Real(fh, var % a_o(1:nc_s), disp)
+  call Comm_Mod_Write_Cell_Real(fh, var % c  (1:nc_s), disp)
+  call Comm_Mod_Write_Cell_Real(fh, var % c_o(1:nc_s), disp)
+  call Comm_Mod_Write_Cell_Real(fh, var % d_o(1:nc_s), disp)
 
   end subroutine

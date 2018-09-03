@@ -1,18 +1,17 @@
 !==============================================================================!
-  subroutine Write_Backup_Variable_Mean(fh, disp, var_name, var1)
+  subroutine Backup_Mod_Write_Int(fh, disp, var_name, var_value)
 !------------------------------------------------------------------------------!
-!   Writes variable's mean with boundary cells from a backup file.             !
+!   Writes a single named integer variable to backup file.                     !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Comm_Mod
   use Grid_Mod
-  use Var_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   integer          :: fh, disp
   character(len=*) :: var_name
-  type(Var_Type)   :: var1
+  integer          :: var_value
 !-----------------------------------[Locals]-----------------------------------!
   character(len=80) :: vn
   integer           :: vs  ! variable size
@@ -20,11 +19,10 @@
 
   if(this_proc < 2) print *, '# Writing variable: ', trim(var_name)
 
-  ! Vector without boundaries
-  vn = var_name;                  call Comm_Mod_Write_Text(fh, vn, disp)
-  vs = (nc_t + nb_t) * SIZE_REAL; call Comm_Mod_Write_Int (fh, vs, disp)
+  ! Just store one named integer
+  vn = var_name;  call Comm_Mod_Write_Text(fh, vn, disp)
+  vs = SIZE_INT;  call Comm_Mod_Write_Int (fh, vs, disp)
 
-  call Comm_Mod_Write_Cell_Real(fh, var1 % mean(1:nc_s),   disp)
-  call Comm_Mod_Write_Bnd_Real (fh, var1 % mean(-nb_s:-1), disp)
+  call Comm_Mod_Write_Int (fh, var_value, disp)
 
   end subroutine

@@ -1,7 +1,7 @@
 !==============================================================================!
-  subroutine Read_Backup_Variable(fh, disp, var_name, var1)
+  subroutine Backup_Mod_Read_Variable(fh, disp, var_name, var)
 !------------------------------------------------------------------------------!
-!   Reads a vector variable with boundary cells from a backup file.            !
+!   Reads a whole variable from backup file.                                   !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Comm_Mod
@@ -12,7 +12,7 @@
 !---------------------------------[Arguments]----------------------------------!
   integer          :: fh, disp
   character(len=*) :: var_name
-  type(Var_Type)   :: var1
+  type(Var_Type)   :: var
 !-----------------------------------[Locals]-----------------------------------!
   character(len=80) :: vn
   integer           :: vs, disp_loop
@@ -31,15 +31,15 @@
     ! If variable is found, read it and retrun
     if(vn .eq. var_name) then
       if(this_proc < 2) print *, '# Reading variable: ', trim(vn)
-      call Comm_Mod_Read_Cell_Real(fh, var1 % n(1:nc_s),   disp_loop)
-      call Comm_Mod_Read_Bnd_Real (fh, var1 % n(-nb_s:-1), disp_loop)
-      call Comm_Mod_Read_Bnd_Real (fh, var1 % q(-nb_s:-1), disp_loop)
-      call Comm_Mod_Read_Cell_Real(fh, var1 % o  (1:nc_s), disp_loop)
-      call Comm_Mod_Read_Cell_Real(fh, var1 % a  (1:nc_s), disp_loop)
-      call Comm_Mod_Read_Cell_Real(fh, var1 % a_o(1:nc_s), disp_loop)
-      call Comm_Mod_Read_Cell_Real(fh, var1 % c  (1:nc_s), disp_loop)
-      call Comm_Mod_Read_Cell_Real(fh, var1 % c_o(1:nc_s), disp_loop)
-      call Comm_Mod_Read_Cell_Real(fh, var1 % d_o(1:nc_s), disp_loop)
+      call Comm_Mod_Read_Cell_Real(fh, var % n(1:nc_s),   disp_loop)
+      call Comm_Mod_Read_Bnd_Real (fh, var % n(-nb_s:-1), disp_loop)
+      call Comm_Mod_Read_Bnd_Real (fh, var % q(-nb_s:-1), disp_loop)
+      call Comm_Mod_Read_Cell_Real(fh, var % o  (1:nc_s), disp_loop)
+      call Comm_Mod_Read_Cell_Real(fh, var % a  (1:nc_s), disp_loop)
+      call Comm_Mod_Read_Cell_Real(fh, var % a_o(1:nc_s), disp_loop)
+      call Comm_Mod_Read_Cell_Real(fh, var % c  (1:nc_s), disp_loop)
+      call Comm_Mod_Read_Cell_Real(fh, var % c_o(1:nc_s), disp_loop)
+      call Comm_Mod_Read_Cell_Real(fh, var % d_o(1:nc_s), disp_loop)
       disp = disp_loop
       return
 

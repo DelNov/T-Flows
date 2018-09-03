@@ -1,17 +1,18 @@
 !==============================================================================!
-  subroutine Read_Backup_Bnd(fh, disp, var_name, com1)
+  subroutine Backup_Mod_Read_Variable_Mean(fh, disp, var_name, var)
 !------------------------------------------------------------------------------!
-!   Reads a vector variable with boundary cells from a backup file.            !
+!   Reads variable's mean with boundary cells from a backup file.              !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Comm_Mod
   use Grid_Mod
+  use Var_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   integer          :: fh, disp
   character(len=*) :: var_name
-  real             :: com1(-nb_s:-1)
+  type(Var_Type)   :: var
 !-----------------------------------[Locals]-----------------------------------!
   character(len=80) :: vn
   integer           :: vs, disp_loop
@@ -30,7 +31,8 @@
     ! If variable is found, read it and retrun
     if(vn .eq. var_name) then
       if(this_proc < 2) print *, '# Reading variable: ', trim(vn)
-      call Comm_Mod_Read_Bnd_Real (fh, com1(-nb_s:-1), disp_loop)
+      call Comm_Mod_Read_Cell_Real(fh, var % mean(1:nc_s),   disp_loop)
+      call Comm_Mod_Read_Bnd_Real (fh, var % mean(-nb_s:-1), disp_loop)
       disp = disp_loop
       return
 
