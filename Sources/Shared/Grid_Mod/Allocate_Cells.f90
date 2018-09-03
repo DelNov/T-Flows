@@ -36,4 +36,7 @@
   ! Allocate material markers for all cells
   allocate(grid % material(-nb:nc))
 
+  ! Allocate processor i.d.
+  allocate(grid % comm % proces(-nb:nc)); grid % comm % proces = 1
+
   end subroutine
