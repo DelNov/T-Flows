@@ -29,9 +29,11 @@
 ! call exchange(x) 
 
   do sub = 1, n_proc
-    if(nbb_e(sub)  <=  nbb_s(sub)) then
-      do k = nbb_s(sub), nbb_e(sub), -1
-        i = buffer_index(k)
+    if(mat_a % pnt_grid % comm % nbb_e(sub)  <=  &
+       mat_a % pnt_grid % comm % nbb_s(sub)) then
+      do k = mat_a % pnt_grid % comm % nbb_s(sub),  &
+             mat_a % pnt_grid % comm % nbb_e(sub), -1
+        i = mat_a % pnt_grid % comm % buffer_index(k)
         r1(i) = r1(i) - mat_a % bou(k) * x(k)
       end do
     end if

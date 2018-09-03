@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Cgs(mat_a, x, r1, prec, niter, tol, ini_res, fin_res)
+  subroutine Cgs(mat_a, x, r1, prec, niter, tol, ini_res, fin_res, norm) 
 !------------------------------------------------------------------------------!
 !   Solves the linear systems of equations by a precond. CGS Method.           !
 !------------------------------------------------------------------------------!
@@ -26,13 +26,15 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Matrix_Type) :: mat_a           
-  real    :: x(-mat_a % pnt_grid % n_bnd_cells : mat_a % pnt_grid % n_cells)
-  real    :: r1(mat_a % pnt_grid % n_cells)    !  [A]{x}={r1}
-  integer :: niter              ! number of iterations
-  real    :: tol                ! tolerance
-  real    :: ini_res, fin_res   ! residual
-  character(len=80) :: prec     ! preconditioner
+  type(Matrix_Type) :: mat_a
+  real              :: x(-mat_a % pnt_grid % n_bnd_cells :  &
+                          mat_a % pnt_grid % n_cells)
+  real              :: r1(mat_a % pnt_grid % n_cells)    ! [A]{x}={r1}
+  character(len=80) :: prec                              ! preconditioner
+  integer           :: niter                             ! number of iterations
+  real              :: tol                               ! tolerance
+  real              :: ini_res, fin_res                  ! residual
+  real, optional    :: norm                              ! normalization
 !-----------------------------------[Locals]-----------------------------------!
   integer :: n, nb
   real    :: alfa, beta, rho, rho_old, bnrm2, error
@@ -47,11 +49,15 @@
   !---------------------!
   call Prec_Form(mat_a, prec)    
 
-  !???????????????????????????????????!
+  !-----------------------------------!
   !    This is quite tricky point.    !
   !   What if bnrm2 is very small ?   !
-  !???????????????????????????????????!
-  bnrm2 = Normalized_Residual(n, nb, mat_a, x, r1)
+  !-----------------------------------!
+  if(.not. present(norm)) then
+    bnrm2 = Normalized_Residual(n, nb, mat_a, x, r1)
+  else
+    bnrm2 = Normalized_Residual(n, nb, mat_a, x, r1, norm)
+  end if
 
   if(bnrm2 < tol) then 
     iter=0
@@ -130,11 +136,13 @@
       end do
       alfa=alfa+r2(i)*v2(i)
     end do
-    call Comm_Mod_Exchange(mat_a % pnt_grid, p2)
+    call Comm_Mod_Exchange_Real(mat_a % pnt_grid, p2)
     do sub=1,n_proc
-      if(nbb_e(sub)  <=  nbb_s(sub)) then
-        do k=nbb_s(sub),nbb_e(sub),-1
-          i=buffer_index(k)
+      if(mat_a % pnt_grid % comm % nbb_e(sub)  <=   &
+         mat_a % pnt_grid % comm % nbb_s(sub)) then
+        do k = mat_a % pnt_grid % comm % nbb_s(sub),  &
+               mat_a % pnt_grid % comm % nbb_e(sub), -1
+          i = mat_a % pnt_grid % comm % buffer_index(k)
           v2(i) = v2(i) + mat_a % bou(k)*p2(k)
         end do
       end if
@@ -182,11 +190,13 @@
         q2(i) = q2(i) + mat_a % val(j) * p1(k)
       end do
     end do
-    call Comm_Mod_Exchange(mat_a % pnt_grid, p1)
+    call Comm_Mod_Exchange_Real(mat_a % pnt_grid, p1)
     do sub=1,n_proc
-      if(nbb_e(sub)  <=  nbb_s(sub)) then
-        do k=nbb_s(sub),nbb_e(sub),-1
-          i=buffer_index(k)
+      if(mat_a % pnt_grid % comm % nbb_e(sub)  <=  &
+         mat_a % pnt_grid % comm % nbb_s(sub)) then
+        do k = mat_a % pnt_grid % comm % nbb_s(sub),  &
+               mat_a % pnt_grid % comm % nbb_e(sub),-1
+          i = mat_a % pnt_grid % comm % buffer_index(k)
           q2(i) = q2(i) + mat_a % bou(k)*p1(k)
         end do
       end if
@@ -199,10 +209,14 @@
       r1(i)=r1(i) - alfa*q2(i)
     end do
 
-    !???????????????????????!
+    !-----------------------!
     !   Check convergence   !
-    !???????????????????????!
-    error = Normalized_Residual(n, nb, mat_a, x, r1)
+    !-----------------------!
+    if(.not. present(norm)) then
+      error = Normalized_Residual(n, nb, mat_a, x, r1)
+    else
+      error = Normalized_Residual(n, nb, mat_a, x, r1, norm)
+    end if
 
     if(error < tol) goto 1
 

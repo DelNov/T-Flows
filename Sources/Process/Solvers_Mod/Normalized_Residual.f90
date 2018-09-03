@@ -1,5 +1,5 @@
 !==============================================================================!
-  real function Normalized_Residual(n, nb, mat_a, x, r1) 
+  real function Normalized_Residual(n, nb, mat_a, x, r1, norm) 
 !------------------------------------------------------------------------------!
 !   Calculates normalized residuals.                                           !
 !------------------------------------------------------------------------------!
@@ -13,6 +13,7 @@
   integer           :: n, nb
   type(Matrix_Type) :: mat_a
   real              :: x(-nb:n), r1(n)  !  [A]{x}={r1}
+  real, optional    :: norm             !  optional number for normalization
 !-----------------------------------[Locals]-----------------------------------!
   real    :: error, x_max, x_min
   integer :: i
@@ -27,8 +28,13 @@
   error = sqrt(error)
 
   ! Normalize it with absolute values of the unknown
-  x_min = minval(x(1:n))
-  x_max = maxval(x(1:n))
+  if(.not. present(norm)) then
+    x_min = minval(x(1:n))
+    x_max = maxval(x(1:n))
+  else
+    x_min = 0.0
+    x_max = norm
+  endif
   call Comm_Mod_Global_Min_Real(x_min)
   call Comm_Mod_Global_Max_Real(x_max)
 
