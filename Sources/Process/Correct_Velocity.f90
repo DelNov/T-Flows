@@ -87,7 +87,7 @@
         flux(s)=flux(s)+(pp % n(c2) - pp % n(c1))*a % val(a % pos(1,s))
       else 
         flux(s)=flux(s)+(pp % n(c2) - pp % n(c1))*a % bou(c2)
-      endif
+      end if
     end if             !                                          !
   end do               !<---------- this is correction ---------->!
 
