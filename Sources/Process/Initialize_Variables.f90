@@ -48,7 +48,11 @@
                                        found,               &
                                        .true.)
 
-  ! Found the section with initial conditions
+  !-----------------------------------------------!
+  !                                               !
+  !   Found the section with initial conditions   !
+  !                                               !
+  !-----------------------------------------------!
   if (found .eq. YES) then
 
     call Control_Mod_Read_Strings_On('VARIABLES', keys, nks, .true.)
@@ -61,14 +65,13 @@
     ! Check if there is file specified
     call Control_Mod_Read_Strings_On('FILE', keys_file, nvs, .true.)
 
+    !-----------------------------------------------!
+    !   Initial conditions is prescribed in a file  !
+    !-----------------------------------------------!
     if (nvs .eq. 1) then ! word 'file' was specified
 
       if (this_proc < 2) &
         print *, '# Values specified in the file: ', trim(keys_file(nvs))
-
-      !-----------------------------------------------!
-      !   Initial conditions is prescribed in a file  !
-      !-----------------------------------------------!
 
       open(9, file = keys_file(1))
       if (this_proc < 2) print *, '# Reading the file: ', trim(keys_file(1))
@@ -134,10 +137,10 @@
           end if
 
           if(turbulence_model .eq. K_EPS_ZETA_F) then
-            i=Key_Ind('KIN', keys,nks);prof(k,0)=kin_def; kin%n(c)=prof(k,i)
-            i=Key_Ind('EPS', keys,nks);prof(k,0)=eps_def; eps%n(c)=prof(k,i)
+            i=Key_Ind('KIN', keys,nks);prof(k,0)=kin_def; kin%n(c) =prof(k,i)
+            i=Key_Ind('EPS', keys,nks);prof(k,0)=eps_def; eps%n(c) =prof(k,i)
             i=Key_Ind('ZETA',keys,nks);prof(k,0)=zeta_def;zeta%n(c)=prof(k,i)
-            i=Key_Ind('F22', keys,nks);prof(k,0)=f22_def; f22%n(c)=prof(k,i)
+            i=Key_Ind('F22', keys,nks);prof(k,0)=f22_def; f22%n(c) =prof(k,i)
           end if
 
           if(turbulence_model .eq. DES_SPALART) then
@@ -168,8 +171,10 @@
         deallocate(dist)
 
       end if
-    !--------------------------------------------------------------------------
-    ! 'file' was not specified
+
+    !---------------------------------------------------!
+    !   Initial conditions is not prescribed in a file  !
+    !---------------------------------------------------!
     else
 
       ! Go back to key and read again
@@ -266,7 +271,7 @@
             eps % o(c)  = eps % n(c)
             eps % oo(c) = eps % n(c)
             u_tau(c)  = 0.047
-            y_plus(c) = 30.0
+            y_plus(c) = 1.1
           end if
 
           if(turbulence_model .eq. K_EPS_ZETA_F) then
@@ -283,7 +288,7 @@
             f22  % o(c)  = f22  % n(c)
             f22  % oo(c) = f22  % n(c)
             u_tau(c)  = 0.047
-            y_plus(c) = 30.0
+            y_plus(c) = 1.1
           end if
 
           if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
@@ -328,7 +333,7 @@
             bulk(m) % mass_in = bulk(m) % mass_in - flux(s)
           end if
           area = area  + grid % s(s)
-        endif
+        end if
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL)      &
           n_wall        = n_wall        + 1
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW)    &
@@ -363,12 +368,12 @@
       print *, '# Mass inflow =', bulk(1) % mass_in
       print *, '# Average inflow velocity =', bulk(1) % mass_in / area
     end if
-    print *, '# number of faces on the wall        : ', n_wall
-    print *, '# number of inflow faces             : ', n_inflow
-    print *, '# number of outflow faces            : ', n_outflow
-    print *, '# number of symetry faces            : ', n_symmetry
-    print *, '# number of faces on the heated wall : ', n_heated_wall
-    print *, '# number of convective outflow faces : ', n_convect
+    print *, '# Number of faces on the wall        : ', n_wall
+    print *, '# Number of inflow faces             : ', n_inflow
+    print *, '# Number of outflow faces            : ', n_outflow
+    print *, '# Number of symetry faces            : ', n_symmetry
+    print *, '# Number of faces on the heated wall : ', n_heated_wall
+    print *, '# Number of convective outflow faces : ', n_convect
     print *, '# Variables initialized !'
   end if
 
