@@ -1,12 +1,10 @@
-!+++++++++++++++++++++++++++++++++++++!
-!                                     !
-!     Global variable definitions     !
-!       for the mesh generator        !
-!                                     !
-!+++++++++++++++++++++++++++++++++++++!
-module gen_mod
-
+!==============================================================================!
+  module Gen_Mod
+!------------------------------------------------------------------------------!
+!   Global variable definitions for the mesh generator.                        !
+!------------------------------------------------------------------------------!
   implicit none
+!==============================================================================!
 
   ! Twin nodes
   integer, allocatable :: twin_n(:,:)
@@ -42,6 +40,8 @@ module gen_mod
   integer              :: n_periodic_cond,      n_copy_cond
   integer, allocatable ::   periodic_cond(:,:),   copy_cond(:,:)
 
-  integer :: WallFacFst, WallFacLst 
+  ! First and last wall face - should speed up the cal-
+  ! culation of distance to walls to a certain degree
+  integer :: first_wall_face, last_wall_face
 
 end module
