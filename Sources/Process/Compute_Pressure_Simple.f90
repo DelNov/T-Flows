@@ -6,6 +6,7 @@
 !----------------------------------[Modules]-----------------------------------!
   use Flow_Mod
   use Comm_Mod
+  use Const_Mod
   use Grid_Mod,     only: Grid_Type
   use Info_Mod
   use Solvers_Mod,  only: Bicg, Cg, Cgs
@@ -22,9 +23,11 @@
   real              :: u_f, v_f, w_f, a12, fs
   real              :: ini_res, tol, mass_err
   real              :: smdpn
-  real              :: dPxi, dPyi, dPzi
+  real              :: px_f, py_f, pz_f
   character(len=80) :: precond
   real              :: urf           ! under-relaxation factor                 
+  real              :: min_b, max_b
+  real              :: p_max, p_min, p_nor
 !==============================================================================!
 !     
 !   The form of equations which I am solving:    
@@ -51,9 +54,22 @@
   ! User function
   call User_Mod_Beginning_Of_Compute_Pressure(grid, dt, ini)
 
+  ! Calculate velocity magnitude
+  p_max = -HUGE
+  p_min = +HUGE
+  do c = 1, grid % n_cells
+    p_max = max(p_max, p % n(c))
+    p_min = min(p_min, p % n(c))
+  end do
+  call Comm_Mod_Global_Max_Real(p_max)
+  call Comm_Mod_Global_Min_Real(p_min)
+  p_nor = max( (p_max-p_min), MICRO, abs(bulk(1) % p_drop_x),  &
+                                     abs(bulk(1) % p_drop_y),  &
+                                     abs(bulk(1) % p_drop_z) )
+
   ! Initialize matrix and right hand side
+  b       = 0.0 
   a % val = 0.0
-  b = 0.0 
 
   !-----------------------------------------!
   !   Initialize the pressure corrections   !
@@ -69,7 +85,8 @@
     fs = grid % f(s)
 
     ! Face is inside the domain
-    if(c2  > 0 .or. c2  < 0 .and. Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER) then
+    if(c2  > 0 .or.  &
+       c2  < 0 .and. Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER) then
 
       smdpn = (  grid % sx(s)*grid % sx(s)   &
                + grid % sy(s)*grid % sy(s)   &
@@ -85,32 +102,32 @@
 
       ! Calculate coeficients for the system matrix
       if(c2  > 0) then 
-        a12 = 0.5 * density * smdpn *           &
+        a12 = 0.5 * density * smdpn *            &
            (  grid % vol(c1) / a % sav(c1)       &
-            + grid % vol(c2) / a % sav(c2) )  
+            + grid % vol(c2) / a % sav(c2) )
         a % val(a % pos(1,s))  = -a12
         a % val(a % pos(2,s))  = -a12
         a % val(a % dia(c1)) = a % val(a % dia(c1)) +  a12
         a % val(a % dia(c2)) = a % val(a % dia(c2)) +  a12
       else 
-        a12 = 0.5 * density * smdpn *           &
+        a12 = 0.5 * density * smdpn *            &
              (  grid % vol(c1) / a % sav(c1)     &
-              + grid % vol(c2) / a % sav(c2) )  
+              + grid % vol(c2) / a % sav(c2) )
         a % bou(c2)  = -a12
         a % val(a % dia(c1)) = a % val(a % dia(c1)) +  a12
       end if 
 
       ! Interpolate pressure gradients
-      dPxi=.5*( p % x(c1) + p % x(c2) )*grid % dx(s)
-      dPyi=.5*( p % y(c1) + p % y(c2) )*grid % dy(s)
-      dPzi=.5*( p % z(c1) + p % z(c2) )*grid % dz(s)
+      px_f = 0.5*( p % x(c1) + p % x(c2) ) * grid % dx(s)
+      py_f = 0.5*( p % y(c1) + p % y(c2) ) * grid % dy(s)
+      pz_f = 0.5*( p % z(c1) + p % z(c2) ) * grid % dz(s)
 
       ! Calculate flux through cell face
       flux(s) = density * (  u_f*grid % sx(s)       &
                            + v_f*grid % sy(s)       &
                            + w_f*grid % sz(s) )     &
-              + a12 * (p % n(c1) - p % n(c2))   &
-              + a12 * (dPxi + dPyi + dPzi)                            
+              + a12 * (p % n(c1) - p % n(c2))       &
+              + a12 * (px_f + py_f + pz_f)
 
       b(c1)=b(c1)-flux(s)
       if(c2  > 0) b(c2)=b(c2)+flux(s)
@@ -118,7 +135,7 @@
     ! Side is on the boundary
     else ! (c2 < 0)
 
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then 
+      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
         u_f = u % n(c2)
         v_f = v % n(c2)
         w_f = w % n(c2)
@@ -127,7 +144,7 @@
                              + w_f * grid % sz(s) )
         b(c1) = b(c1)-flux(s)
       else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW .or.   &
-              Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) then 
+              Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) then
         u_f = u % n(c2)
         v_f = v % n(c2)
         w_f = w % n(c2)
@@ -185,9 +202,17 @@
   ! Over-ride if specified in control file
   call Control_Mod_Max_Iterations_For_Pressure_Solver(niter)
 
-  call Bicg(a, pp % n, b, precond, niter, tol, ini_res, pp % res)
+  call Bicg(a,         &
+            pp % n,    &
+            b,         &
+            precond,   &
+            niter,     &
+            tol,       &
+            ini_res,   &
+            pp % res,  &
+            norm = p_nor)    ! last argument: number for normalisation
 
-  call Info_Mod_Iter_Fill_At(1, 3, pp % name, niter, pp % res)   
+  call Info_Mod_Iter_Fill_At(1, 3, pp % name, niter, pp % res)
 
   !-------------------------------!
   !   Update the pressure field   !
@@ -202,13 +227,13 @@
   !------------------------------------!
   ! p_max  = maxval(p % n(1:grid % n_cells))
   ! p_min  = minval(p % n(1:grid % n_cells))
- 
+
   ! call Comm_Mod_Global_Max_Real(p_max)
   ! call Comm_Mod_Global_Min_Real(p_min)
- 
+
   ! p % n = p % n - 0.5*(p_max+p_min)
- 
-  call Comm_Mod_Exchange(grid, pp % n)
+
+  call Comm_Mod_Exchange_Real(grid, pp % n)
 
   ! User function
   call User_Mod_End_Of_Compute_Pressure(grid, dt, ini)
