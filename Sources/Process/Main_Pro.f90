@@ -1,7 +1,7 @@
 !==============================================================================!
   program Processor
 !------------------------------------------------------------------------------!
-!   Unstructured Finite Volume 'LES'/RANS solver.                              !
+!   Unstructured finite volume 'LES'/RANS solver.                              !
 !------------------------------------------------------------------------------!
 !---------------------------------[Modules]------------------------------------!
   use Name_Mod, only: problem_name
@@ -10,7 +10,6 @@
   use Les_Mod
   use Comm_Mod
   use Rans_Mod
-  use Tokenizer_Mod
   use Grid_Mod
   use Grad_Mod
   use Bulk_Mod
@@ -20,6 +19,7 @@
   use User_Mod
   use Control_Mod
   use Monitor_Mod
+  use Backup_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Calling]------------------------------------!
@@ -28,7 +28,7 @@
   integer           :: m, n, us
   real              :: mass_res, wall_time_start, wall_time_current
   character(len=80) :: name_save
-  logical           :: restart, save_now, exit_now
+  logical           :: backup, save_now, exit_now
   type(Grid_Type)   :: grid        ! grid used in computations
   real              :: time        ! physical time
   real              :: dt          ! time step
@@ -46,7 +46,7 @@
   ! Get starting time
   call cpu_time(wall_time_start)
   time =  0.
-  restart = .true. ! can turn in restart=.false. in Load_Backup
+  backup = .false.  ! can turn .true. in Load_Backup
 
   !------------------------------!
   !   Start parallel execution   !
@@ -58,7 +58,7 @@
   !--------------------------------!
   if(this_proc  < 2) then
     call Logo_Pro
-  endif
+  end if
 
   !---------------------------------------------!
   !   Open control file and read problem name   !
@@ -71,10 +71,12 @@
 
   call Allocate_Memory(grid)
   call Load_Geo(grid, this_proc)
-  call Comm_Mod_Load_Buffers
+  call Comm_Mod_Load_Buffers(grid)
+  call Comm_Mod_Set_Buffer_Color(grid)
   call Comm_Mod_Load_Maps(grid)
 
-  call Comm_Mod_Exchange(grid, grid % vol(-grid % n_bnd_cells))
+  ! This is actually pretty bad - this command should be in Load_Geo
+  call Comm_Mod_Exchange_Real(grid, grid % vol(-grid % n_bnd_cells))
 
   call Matrix_Mod_Topology(grid, a)
   call Matrix_Mod_Topology(grid, d)
@@ -87,42 +89,39 @@
 
   call Allocate_Variables(grid)
 
-  ! First time step is one, unless read from restart otherwise
-  first_dt = 0
-  call Load_Backup(grid, first_dt, restart)
-
-  if(.not. restart) then
-    call Load_Boundary_Conditions(grid, .true.)
-  else
-    call Load_Boundary_Conditions(grid, .false.)
-  end if
   call Calculate_Face_Geometry(grid)
   call Load_Physical_Properties(grid)
 
+  call Load_Boundary_Conditions(grid, backup)
+
+  ! First time step is one, unless read from backup otherwise
+  first_dt = 0
+  call Backup_Mod_Load(grid, first_dt, backup)  ! value of "backup" can change
+
   ! Read physical models from control file
-  call Read_Physical(grid, restart)
+  call Read_Physical(grid, backup)
 
   ! Initialize variables
-  if(.not. restart) then
+  if(.not. backup) then
     call Initialize_Variables(grid)
     call Comm_Mod_Wait
   end if
 
   ! Initialize monitor
-  call Monitor_Mod_Initialize(grid, restart)
+  call Monitor_Mod_Initialize(grid, backup)
 
   ! Plane for calcution of overall mass fluxes
   do m = 1, grid % n_materials
-    call Control_Mod_Point_For_Monitoring_Plane(bulk(m) % xp,  &
-                                                bulk(m) % yp,  &
-                                                bulk(m) % zp)
+    call Control_Mod_Point_For_Monitoring_Planes(bulk(m) % xp,  &
+                                                 bulk(m) % yp,  &
+                                                 bulk(m) % zp)
   end do
 
   ! Prepare ...
   call Bulk_Mod_Monitoring_Planes_Areas(grid, bulk)
   call Grad_Mod_Find_Bad_Cells         (grid)
 
-  if(turbulence_model .eq. SMAGORINSKY .and. .not. restart) then
+  if(turbulence_model .eq. SMAGORINSKY .and. .not. backup) then
     call Find_Nearest_Wall_Cell(grid)
   end if
 
@@ -153,6 +152,14 @@
   call Control_Mod_Time_Step(dt, verbose=.true.)
   call Control_Mod_Backup_Save_Interval(bsi, verbose=.true.)
   call Control_Mod_Results_Save_Interval(rsi, verbose=.true.)
+
+  ! Form the file name before the time, in case ...
+  ! ... user just wants to save files from backup
+  name_save = problem_name
+  write(name_save(len_trim(problem_name)+1:                    &
+                  len_trim(problem_name)+3), '(a3)')   '-ts'
+  write(name_save(len_trim(problem_name)+4:                    &
+                  len_trim(problem_name)+9), '(i6.6)') first_dt
 
   ! It will save results in .vtk or .cgns file format,
   ! depending on how the code was compiled
@@ -249,14 +256,14 @@
                   grid % dz, grid % dx, grid % dy, &
                   p % z,     u % z,     v % z)     ! dp/dz, du/dz, dv/dz
 
+      ! Refresh buffers for a % sav before discretizing for pressure
+      call Comm_Mod_Exchange_Real(grid, a % sav)
+
+      call Balance_Mass(grid)
       if(coupling .eq. 'PROJECTION') then
-        call Comm_Mod_Exchange(grid, a % sav)
-        call Balance_Mass(grid)
         call Compute_Pressure_Fractional(grid, dt, ini)
-      endif
+      end if
       if(coupling .eq. 'SIMPLE') then
-        call Comm_Mod_Exchange(grid, a % sav)
-        call Balance_Mass(grid)
         call Compute_Pressure_Simple(grid, dt, ini)
       end if
 
@@ -378,8 +385,8 @@
               v  % res <= simple_tol .and.  &
               w  % res <= simple_tol .and.  &
               mass_res <= simple_tol ) goto 1
-        endif
-      endif
+        end if
+      end if
     end do
 
     ! End of the current time step
@@ -447,9 +454,9 @@
     write(name_save(len_trim(problem_name)+4:                    &
                     len_trim(problem_name)+9), '(i6.6)') n
 
-    ! Is it time to save the restart file?
+    ! Is it time to save the backup file?
     if(save_now .or. exit_now .or. mod(n, bsi) .eq. 0) then
-      call Save_Backup (grid, n, name_save)
+      call Backup_Mod_Save(grid, n, name_save)
     end if
 
     ! Is it time to save results for post-processing
@@ -460,7 +467,7 @@
       ! Write results in user-customized format
       call User_Mod_Save_Results(grid, name_save)
     end if
-
+   
     ! Just before the end of time step
     call User_Mod_End_Of_Time_Step(grid, n, time)
 
@@ -481,13 +488,19 @@
 
   end do ! n, number of time steps
 
+  ! After the time loop, decrease "n" since ...
+  ! ... it is one above the loop boundaries here
+  n = n - 1
+
+  ! Save backup and post-processing files at exit
+!@#  call Comm_Mod_Wait
+!@#  call Save_Results(grid, name_save)
+!@#  call Save_Backup (grid, n, name_save)
+
   if(this_proc < 2) then
     open(9, file='stop')
     close(9)
   end if
-
-  ! Write results in user-customized format
-  call User_Mod_Save_Results(grid, name_save)
 
 2 if(this_proc  < 2) print *, '# Exiting !'
 
