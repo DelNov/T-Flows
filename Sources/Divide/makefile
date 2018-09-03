@@ -43,17 +43,16 @@ ifeq ($(FORTRAN), gnu)
   FC = gfortran
   ifeq ($(DEBUG),yes)
     OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8 -fdefault-integer-8 -O0 -g \
-			         -ffixed-line-length-80 -fcheck=all -fwhole-file -fbacktrace \
-			         -ffpe-trap=invalid,zero,overflow \
-			         -fimplicit-none -finit-real=nan \
-			         -Wall -Wextra -Waliasing -Wampersand -Warray-temporaries \
-			         -Wc-binding-type -Wcharacter-truncation -Wline-truncation \
-			         -Wconversion -Wconversion-extra -Wintrinsics-std \
-			         -Wreal-q-constant -Wsurprising -Wtabs -Wunderflow \
-			         -Wintrinsic-shadow -Wunused-parameter -Walign-commons \
-			         -Wfunction-elimination -Wrealloc-lhs -Wrealloc-lhs-all \
-			         -Wcompare-reals -Wtarget-lifetime -Wpedantic -fstack-check \
-			         #-std=f2003 -Wimplicit-procedure -Wimplicit-interface
+               -ffixed-line-length-80 -fcheck=all -fwhole-file -fbacktrace  \
+               -ffpe-trap=invalid,zero,overflow                             \
+               -fimplicit-none -finit-real=nan                              \
+               -Wall -Wextra -Waliasing -Wampersand -Warray-temporaries     \
+               -Wc-binding-type -Wcharacter-truncation -Wline-truncation    \
+               -Wconversion -Wconversion-extra -Wintrinsics-std             \
+               -Wreal-q-constant -Wsurprising -Wtabs -Wunderflow            \
+               -Wintrinsic-shadow -Wunused-parameter -Walign-commons        \
+               -Wfunction-elimination -Wrealloc-lhs -Wrealloc-lhs-all       \
+               -Wcompare-reals -Wtarget-lifetime -Wpedantic -fstack-check
   else
     OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8 -fdefault-integer-8 -O3
   endif 
@@ -83,6 +82,9 @@ ifeq ($(FORTRAN), portland)
   OPT_LINK = $(OPT_COMP)
 endif 
 
+# METIS library
+METIS_LIB = ../Libraries/Metis_5.1.0_Linux_64/libmetis.a
+
 #------------------------------------------------------
 #   List of sources for modules and functions
 #------------------------------------------------------
@@ -98,11 +100,13 @@ endif
 
 # Modules in shared directories
 SRC_MOD =  Const_Mod.f90		\
-           gen_mod.f90			\
+           Gen_Mod.f90			\
            Div_Mod.f90			\
            Tokenizer_Mod.f90		\
            Material_Mod.f90		\
+           Metis_Options_Mod.f90	\
            Bnd_Cond_Mod.f90		\
+           Sort_Mod.f90			\
            Grid_Mod.f90			\
            Name_Mod.f90			\
            Comm_Mod_Seq.f90
@@ -121,25 +125,16 @@ SRC_FUN = Approx.f90			\
           Save_Vtu_Cells.f90		\
           Save_Vtu_Faces.f90		\
           Save_Vtu_Links.f90		\
-          Sort_Real_Carry_Int.f90	\
-          Sort_Int_By_Index.f90		\
-          Sort_Real_By_Index.f90	\
-          Sort2.f90			\
           Swap_Int.f90			\
           To_Upper_Case.f90
 
 # Local functions are added one by one ...
 SRC_FUN += Allocate_Additional.f90	\
-           Compute_Eigenvalues.f90	\
            Create_Buffers_And_Save.f90	\
            Create_Maps.f90		\
-           Factorize_Number.f90		\
-           Inertia.f90			\
            Load_Cns.f90			\
            Logo_Div.f90			\
-           Main_Div.f90			\
-           Save_Com.f90			\
-           Split_Subdomain.f90
+           Main_Div.f90
 
 #----------------------------------------------------------------------
 #   List of objects generated from the list of modules and functions  
@@ -181,7 +176,7 @@ $(DIR_OBJECT)/%.o: %.f90
 #-----------------------------------
 $(PROGRAM_FILE): $(OBJ) 
 	@echo Linking "\033[0;32m $(PROGRAM_FILE) \033[0m"
-	@$(FC) $(OPT_LINK) -o $(PROGRAM_FILE) $(OBJ)
+	@$(FC) $(OPT_LINK) -o $(PROGRAM_FILE) $(OBJ) $(METIS_LIB) 
 
 #---------------------------------------
 #   Explicit dependencies for modules

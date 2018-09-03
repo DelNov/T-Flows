@@ -1,14 +1,22 @@
+#-- ./Load_Shadow_Faces.f90
+$(DIR_OBJECT)/Load_Shadow_Faces.o:\
+$(DIR_OBJECT)/Name_Mod.o \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_SHARED)/Gen_Mod.f90 \
+$(DIR_OBJECT)/Div_Mod.o 
+
 #-- ./Split_Subdomain.f90
 $(DIR_OBJECT)/Split_Subdomain.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/gen_mod.f90 \
+$(DIR_SHARED)/Gen_Mod.f90 \
 $(DIR_OBJECT)/Div_Mod.o \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #-- ./Save_Com.f90
 $(DIR_OBJECT)/Save_Com.o:\
-$(DIR_SHARED)/gen_mod.f90 \
+$(DIR_SHARED)/Gen_Mod.f90 \
 $(DIR_OBJECT)/Div_Mod.o 
 
 #-- ./Logo_Div.f90
@@ -21,14 +29,14 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 $(DIR_OBJECT)/Inertia.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/gen_mod.f90 \
+$(DIR_SHARED)/Gen_Mod.f90 \
 $(DIR_OBJECT)/Div_Mod.o 
 
 #-- ./Create_Buffers_And_Save.f90
 $(DIR_OBJECT)/Create_Buffers_And_Save.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/gen_mod.f90 \
+$(DIR_SHARED)/Gen_Mod.f90 \
 $(DIR_OBJECT)/Div_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
@@ -38,7 +46,7 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 $(DIR_OBJECT)/Create_Maps.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/gen_mod.f90 \
+$(DIR_SHARED)/Gen_Mod.f90 \
 $(DIR_OBJECT)/Div_Mod.o 
 
 #-- ./Main_Div.f90
@@ -48,16 +56,21 @@ $(DIR_SHARED)/Tokenizer_Mod/*.f90 \
 $(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/gen_mod.f90 \
+$(DIR_SHARED)/Gen_Mod.f90 \
 $(DIR_OBJECT)/Div_Mod.o 
 
 #-- ./Compute_Eigenvalues.f90
 #-- ./Factorize_Number.f90
+#-- ./Save_Scripts.f90
+$(DIR_OBJECT)/Save_Scripts.o:\
+$(DIR_SHARED)/Gen_Mod.f90 \
+$(DIR_OBJECT)/Div_Mod.o 
+
 #-- ./Allocate_Additional.f90
 $(DIR_OBJECT)/Allocate_Additional.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/gen_mod.f90 \
+$(DIR_SHARED)/Gen_Mod.f90 \
 $(DIR_OBJECT)/Div_Mod.o 
 
 #-- ./Save_Cgns_Cells.f90
@@ -289,9 +302,13 @@ $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
 
-#-- ./Cgns_Mod/Read_Interface_Info.f90
 #-- ./Cgns_Mod/Read_Number_Of_Element_Sections.f90
 #-- ./Cgns_Mod/Read_Section_Info.f90
+#-- ./Cgns_Mod/Merge_Nodes_Old.f90
+$(DIR_OBJECT)/Merge_Nodes_Old.o:\
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 
+
 #-- ./Cgns_Mod/Initialize_Counters.f90
 #-- ./Cgns_Mod/Read_Number_Of_Blocks_In_Base.f90
 #-- ./Cgns_Mod/Read_Block_Type.f90
@@ -313,13 +330,12 @@ $(DIR_OBJECT)/Read_Section_Connections.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
-#-- ./Cgns_Mod/Read_Number_Of_Block_Interfaces.f90
-#-- ./Cgns_Mod/Merge_Nodes.f90
-$(DIR_OBJECT)/Merge_Nodes.o:\
+#-- ./Cgns_Mod/Read_Number_Of_Bnd_Conds_In_Block.f90
+#-- ./Cgns_Mod/Merge_Nodes_New.f90
+$(DIR_OBJECT)/Merge_Nodes_New.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
-#-- ./Cgns_Mod/Read_Number_Of_Bnd_Conds_In_Block.f90
 #-- ./Cgns_Mod/Read_Grid_Location.f90
 #-- ./Cgns_Mod/Read_Number_Of_Coordinates_In_Block.f90
 #-- ./Cgns_Mod/Sequential/Write_Block_Info.f90
@@ -348,13 +364,19 @@ $(DIR_OBJECT)/Probe_1d_Nodes_Gen.o:\
 $(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/gen_mod.f90 
+$(DIR_SHARED)/Gen_Mod.f90 
 
 #-- ./Swap_Int.f90
 #-- ./Div_Mod.f90
-#-- ./gen_mod.f90
+#-- ./Gen_Mod.f90
 #-- ./Tokenizer_Mod/Read_Line.f90
 #-- ./Distance_Squared.f90
+#-- ./Save_Shadows.f90
+$(DIR_OBJECT)/Save_Shadows.o:\
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_SHARED)/Gen_Mod.f90 
+
 #-- ./To_Lower_Case.f90
 #-- ./Sort_Int_By_Index.f90
 #-- ./Save_Vtu_Faces.f90
@@ -366,7 +388,7 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 $(DIR_OBJECT)/Save_Vtu_Cells.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/gen_mod.f90 \
+$(DIR_SHARED)/Gen_Mod.f90 \
 $(DIR_OBJECT)/Div_Mod.o 
 
 #-- ./Probe_1d.f90
@@ -397,10 +419,6 @@ $(DIR_SHARED)/Cgns_Mod/*/*.f90
 #-- ./Grid_Mod/Print_Bnd_Cond_Info.f90
 #-- ./Grid_Mod/Allocate_Nodes.f90
 #-- ./Grid_Mod/Allocate_Cells.f90
-#-- ./Grid_Mod/Estimate_Big_And_Small.f90
-$(DIR_OBJECT)/Estimate_Big_And_Small.o:\
-$(DIR_OBJECT)/Const_Mod.o 
-
 #-- ./Grid_Mod/Sort_Cells_By_Index.f90
 #-- ./Grid_Mod/Allocate_Faces.f90
 #-- ./Grid_Mod/Sort_Faces_By_Index.f90
@@ -428,7 +446,7 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 $(DIR_OBJECT)/Save_Cns_Geo.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/gen_mod.f90 \
+$(DIR_SHARED)/Gen_Mod.f90 \
 $(DIR_OBJECT)/Div_Mod.o 
 
 #-- ./Distance.f90
@@ -466,7 +484,7 @@ $(DIR_OBJECT)/Probe_1d_Nodes.o:\
 $(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/gen_mod.f90 
+$(DIR_SHARED)/Gen_Mod.f90 
 
 #-- ./Tet_Volume.f90
 #-- ./Sort_Real_Carry_Int.f90
@@ -475,7 +493,7 @@ $(DIR_OBJECT)/Save_Vtu_Links.o:\
 $(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/gen_mod.f90 \
+$(DIR_SHARED)/Gen_Mod.f90 \
 $(DIR_OBJECT)/Div_Mod.o 
 
 #-- ./Sort_Short_By_Index.f90
@@ -483,6 +501,5 @@ $(DIR_OBJECT)/Div_Mod.o
 $(DIR_OBJECT)/Grid_Mod.o:\
 $(DIR_OBJECT)/Material_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o \
 $(DIR_OBJECT)/Bnd_Cond_Mod.o 
 
