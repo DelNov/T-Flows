@@ -14,6 +14,15 @@
   integer           :: c, s         
   character(len=80) :: name_in
 !==============================================================================!
+!   There is an issue with this procedure, but it's more related to MPI/IO     !
+!   functions than T-Flows.  In cases a subdomain has no physical boundary     !
+!   cells, variable "nb_s" turns out to be zero.  This, per se, should not     !
+!   be an issue if MPI/IO functions could handle calls to:                     !
+!   "Mpi_Type_Create_Indexed_Block(...)" and "Mpi_File_Write(...)" with zero   !
+!   length.  But they don't.  Therefore, I avoid allocation with zero size     !
+!   (max(nb_s,1)) here and creation of new types with zero size in             !
+!   "Comm_Mod_Create_New_Types".  It is a bit of a dirty trick :-(             !
+!------------------------------------------------------------------------------!
 
   !------------------------------------------------------------------------!
   !                                                                        !
@@ -24,35 +33,35 @@
 
     nc_s  = grid % n_cells
     nb_s  = grid % n_bnd_cells
-    nf_s  = grid % n_faces
-    nbf_s = 0
     nc_t  = nc_s
     nb_t  = nb_s
-    nf_t  = nf_s
 
-    allocate(cell_map    (nc_s))
-    allocate(bnd_cell_map(nb_s))
-    allocate(face_map    (nf_s))
-    allocate(face_ord    (nf_s))
-    allocate(face_val    (nf_s))
-    allocate(buf_face_map(nbf_s))
+    !-------------------------------------!
+    !   Global cell numbers for T-Flows   !
+    !-------------------------------------!
+    allocate(grid % comm % cell_glo(-nb_s:nc_s)) 
+
+    ! Fill up global cell numbers
+    do c = -nb_t, nc_t
+      grid % comm % cell_glo(c) = c
+    end do
+  
+    !-----------------------------------------!
+    !   Global cell numbers for MPI mapping   !
+    !-----------------------------------------!
+    allocate(grid % comm % cell_map    (nc_s))  
+    allocate(grid % comm % bnd_cell_map(nb_s))
 
     ! -1 is to start from zero, as needed by MPI functions
     do c = 1, nc_t
-      cell_map(c) = c - 1
+      grid % comm % cell_map(c) = c - 1
     end do
   
     ! -1 is to start from zero, as needed by MPI functions
     do c = 1, nb_t
-      bnd_cell_map(c) = c - 1
+      grid % comm % bnd_cell_map(c) = c - 1
     end do
 
-    ! -1 is to start from zero, as needed by MPI functions
-    do s = 1, nf_t
-      face_map(s) = s - 1
-      face_ord(s) = s
-    end do
-  
   !-------------------------------------------------!
   !                                                 !
   !   For parallel runs, you need to read the map   !
@@ -65,86 +74,54 @@
     if(this_proc < 2) print *, '# Now reading the file:', name_in
 
     ! Read map sizes
-    read(9, '(4i9)') nc_s, nb_s, nf_s, nbf_s
+    read(9, '(4i9)') nc_s, nb_s
 
     nc_t  = nc_s
     nb_t  = nb_s
-    nf_t  = nf_s
     call Comm_Mod_Global_Sum_Int(nc_t)
     call Comm_Mod_Global_Sum_Int(nb_t)
-    call Comm_Mod_Global_Sum_Int(nf_t)
 
-    allocate(cell_map    (nc_s));   cell_map     = 0       
-    allocate(bnd_cell_map(nb_s));   bnd_cell_map = 0
-    allocate(face_map    (nf_s));   face_map     = 0
-    allocate(face_ord    (nf_s));   face_ord     = 0
-    allocate(face_val    (nf_s));   face_val     = 0.0
-    allocate(buf_face_map(nbf_s));  buf_face_map = 0 
-    allocate(buf_face_ord(nbf_s));  buf_face_ord = 0
-    allocate(buf_face_val(nbf_s));  buf_face_val = 0.0
-    allocate(buf_face_sgn(nbf_s));  buf_face_sgn = 0.0
+    !-------------------------------------!
+    !   Global cell numbers for T-Flows   !
+    !-------------------------------------!
+    allocate(grid % comm % cell_glo(-grid % n_bnd_cells : grid % n_cells))
+    grid % comm % cell_glo(:) = 0
+
+    !-----------------------------------------!
+    !   Global cell numbers for MPI mapping   !
+    !-----------------------------------------!
+    allocate(grid % comm % cell_map    (nc_s))   
+    allocate(grid % comm % bnd_cell_map(max(nb_s,1)))  ! avoid zero allocation   
+    grid % comm % cell_map(:)     = 0       
+    grid % comm % bnd_cell_map(:) = 0
 
     !-------------------!
     !   Read cell map   !
     !-------------------!
     do c = 1, nc_s
-      read(9, '(i9)') cell_map(c)
-    end do
+      read(9, '(i9)') grid % comm % cell_glo(c)
 
-    ! Correct cell mapping to start from zero
-    cell_map = cell_map - 1
+      ! Take cell mapping to be the same as global cell numbers but start from 0
+      grid % comm % cell_map(c) = grid % comm % cell_glo(c) - 1
+    end do
 
     !----------------------------!
     !   Read boundary cell map   !
     !----------------------------!
-    do c = 1, nb_s
-      read(9, '(i9)') bnd_cell_map(c)
+    do c = -nb_s, -1
+      read(9, '(i9)') grid % comm % cell_glo(c)
+
+      ! Correct boundary cell mapping.  
+      ! - First it is in positive range, so insted of -nb_s to -1, it goes from 
+      !   1 to nb_s.  (Therefore the "c+nb_s+1")
+      ! - Second, mapping must be positive and start from zero.  (The "+ nb_t")
+      grid % comm % bnd_cell_map(c+nb_s+1) = grid % comm % cell_glo(c) + nb_t
     end do
     
-    ! Correct boundary cell mapping to be positive and start from zero
-    bnd_cell_map = bnd_cell_map + nb_t
-
-    !-------------------!
-    !   Read face map   !
-    !-------------------!
-    do s = 1, nf_s
-      read(9, '(i9)') face_map(s)
-    end do
-
-    ! Correct cell mapping to start from zero
-    face_map = face_map - 1
-
-    ! Sort face map - important for MPI call, it can't 
-    ! handle maps which are not in increasing order :-(
-    do s = 1, nf_s
-      face_ord(s) = s
-    end do
-
-    call Sort_Short_Carry_Short(face_map, face_ord, nf_s, 2)
-
-    !--------------------------!
-    !   Read buffer face map   !
-    !--------------------------!
-    do s = 1, nbf_s
-      read(9, '(i9)') buf_face_map(s)
-      if(buf_face_map(s) < 0) then
-        buf_face_sgn(s) = -1.0
-        buf_face_map(s) = -buf_face_map(s)
-      else
-        buf_face_sgn(s) =  1.0
-      end if
-    end do
-
-    ! Correct cell mapping to start from zero
-    buf_face_map = buf_face_map - 1
-
-    ! Sort buffer face map - important for MPI call, it can't 
-    ! handle maps which are not in increasing order :-(
-    do s = 1, nbf_s
-      buf_face_ord(s) = s
-    end do
-
-    call Sort_Short_Carry_Short(buf_face_map, buf_face_ord, nbf_s, 2)
+    !---------------------------------------------!
+    !   Refresh buffers for global cell numbers   !
+    !---------------------------------------------!
+    call Comm_Mod_Exchange_Int(grid, grid % comm % cell_glo)
 
     close(9)
 
