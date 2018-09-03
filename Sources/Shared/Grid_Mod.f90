@@ -4,11 +4,67 @@
 !   Grids module is used throughout all programs                               !
 !   (that means in "Generate", "Divide", "Convert", "Process".                 !
 !------------------------------------------------------------------------------!
+!----------------------------------[Modules]-----------------------------------!
   use Material_Mod
   use Bnd_Cond_Mod
+  use Metis_Options_Mod
+  use Sort_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
+
+  !-----------------------------------------!
+  !   Maximum number of multi-grid levels   !
+  !-----------------------------------------!
+  integer, parameter :: MAX_MG_LEV = 8
+
+  !-----------------------!
+  !                       !
+  !   Coarser grid type   !
+  !                       !
+  !-----------------------!
+  type Coarser_Grid_Type
+
+    ! Number of cells and faces at each level
+    integer :: n_cells
+    integer :: n_faces
+
+    ! Cell and face numbers from current to coarser levels
+    integer, allocatable :: cell(:)
+    integer, allocatable :: face(:)
+
+    ! Cell and face at coarser level
+    integer, allocatable :: cell_at_coarser(:)
+    integer, allocatable :: face_at_coarser(:)
+
+    ! Faces' neigboring (surrounding) cells
+    integer, allocatable :: faces_c(:,:)
+
+  end type
+
+  !---------------!
+  !               !
+  !   Comm type   ! 
+  !               !
+  !---------------!
+  type Comm_Type    ! only used inside the Grid_Type) 
+
+    ! Processor i.d. defined for each cell
+    integer, allocatable :: proces(:)  
+
+    ! These names are ugly but mean number of buffer boundaries start and end
+    integer, allocatable :: nbb_s(:), nbb_e(:)
+
+    ! Buffer index
+    integer, allocatable :: buffer_index(:)
+
+    ! Global cell numbers
+    integer, allocatable :: cell_glo(:)
+
+    ! (kind=4) coud not be avoided here :-(
+    integer(kind=4), allocatable :: cell_map(:)
+    integer(kind=4), allocatable :: bnd_cell_map(:)
+  end type
 
   !---------------!
   !               !
@@ -26,6 +82,7 @@
     integer :: n_materials  ! ... materials
     integer :: n_bnd_cond   ! ... boundary conditions
     integer :: n_copy       ! ... copy cells and faces
+    integer :: n_levels     ! ... multigrid levels
 
     !-------------------------!
     !  Cell-based variables   !
@@ -58,6 +115,9 @@
 
     ! Material for each cell 
     integer, allocatable :: material(:)
+
+    ! Coarser levels for the grid
+    type(Coarser_Grid_Type) :: level(0:MAX_MG_LEV)
 
     !-------------------------!
     !  Face-based variables   !
@@ -96,6 +156,11 @@
     integer :: max_n_nodes
     integer :: max_n_bnd_cells
     integer :: max_n_faces
+ 
+    !------------------------------------------!
+    !   Variables important for parallel run   ! 
+    !------------------------------------------!
+    type(Comm_Type) :: comm
 
   end type
 
@@ -105,6 +170,7 @@
   include 'Grid_Mod/Allocate_Faces.f90'
   include 'Grid_Mod/Allocate_Nodes.f90'
   include 'Grid_Mod/Bnd_Cond_Type.f90'
+  include 'Grid_Mod/Decompose.f90'
   include 'Grid_Mod/Estimate_Big_And_Small.f90'
   include 'Grid_Mod/Print_Bnd_Cond_Info.f90'
   include 'Grid_Mod/Sort_Cells_By_Index.f90'
