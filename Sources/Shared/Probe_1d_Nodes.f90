@@ -1,12 +1,13 @@
 !==============================================================================!
   subroutine Probe_1d_Nodes(grid)
 !------------------------------------------------------------------------------!
-!   This subroutine finds the coordinate of cell-centers in non-homogeneous    !
-!   direction and write them in file called "name.1d"                          !
+!   This subroutine finds the coordinate of nodes in non-homogeneous           !
+!   direction and write them in file name.1d                                   !
 !------------------------------------------------------------------------------!
   use Name_Mod, only: problem_name
-  use gen_mod
+! use Gen_Mod
   use Grid_Mod
+  use Sort_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -14,8 +15,8 @@
 !----------------------------------[Calling]-----------------------------------! 
   include "Approx.int"
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: n_prob, p, c, n
-  real              :: n_p(10000)
+  integer           :: n_prob, p, n
+  real              :: zp(16384)
   character(len=80) :: name_prob
   character(len=80) :: answer
   logical           :: isit
@@ -33,57 +34,52 @@
   if(answer .eq. 'SKIP') return
  
   n_prob = 0
-  n_p   = 0.0
+  zp    = 0.0
 
   !-----------------------------!
-  !   Browse through all cells  !
+  !   Browse through all nodes  !
   !-----------------------------!
-  do c = -grid % n_bnd_cells, grid % n_cells
-    do n = 1, grid % cells_n_nodes(c)
+  do n = 1, grid % n_nodes 
 
-      ! Try to find the cell among the probes
-      do p=1,n_prob
-        if(answer .eq. 'X') then
-          if( Approx(grid % xn(grid % cells_n(n,c)), n_p(p)) ) go to 1
-        else if(answer .eq. 'Y') then
-          if( Approx(grid % yn(grid % cells_n(n,c)), n_p(p)) ) go to 1
-        else if(answer .eq. 'Z') then
-          if( Approx(grid % zn(grid % cells_n(n,c)), n_p(p)) ) go to 1
-        else if(answer .eq. 'RX') then
-          if( Approx( (grid % zn(grid % cells_n(n,c))**2 +   &
-                       grid % yn(grid % cells_n(n,c))**2)**.5, n_p(p)) ) go to 1
-        else if(answer .eq. 'RY') then
-          if( Approx( (grid % xn(grid % cells_n(n,c))**2 +   &
-                       grid % zn(grid % cells_n(n,c))**2)**.5, n_p(p)) ) go to 1
-        else if(answer .eq. 'RZ') then
-          if( Approx( (grid % xn(grid % cells_n(n,c))**2 +   &
-                       grid % yn(grid % cells_n(n,c))**2)**.5, n_p(p)) ) go to 1
-        end if
-      end do 
-  
-      ! Couldn't find a cell among the probes, add a new one
-      n_prob = n_prob+1
-      if(answer .eq. 'X') n_p(n_prob) = grid % xn(grid % cells_n(n,c))
-      if(answer .eq. 'Y') n_p(n_prob) = grid % yn(grid % cells_n(n,c))
-      if(answer .eq. 'Z') n_p(n_prob) = grid % zn(grid % cells_n(n,c))
-
-      if(answer .eq. 'RX') n_p(n_prob) =                           &
-                         (grid % zn(grid % cells_n(n,c))**2 +      &
-                          grid % yn(grid % cells_n(n,c))**2)**0.5
-      if(answer .eq. 'RY') n_p(n_prob) =                           &
-                         (grid % xn(grid % cells_n(n,c))**2 +      &
-                          grid % zn(grid % cells_n(n,c))**2)**0.5
-      if(answer .eq. 'RZ') n_p(n_prob) =                           &
-                         (grid % xn(grid % cells_n(n,c))**2 +      &
-                          grid % yn(grid % cells_n(n,c))**2)**0.5
-
-      if(n_prob .eq. 10000) then
-        print *, '# Probe 1d: Not a 1d (channel flow) problem.'
-        isit = .false.
-        return
+    ! Try to find the cell among the probes
+    do p=1,n_prob
+      if(answer .eq. 'X') then
+        if( Approx(grid % xn(n), zp(p)) ) go to 1
+      else if(answer .eq. 'Y') then
+        if( Approx(grid % yn(n), zp(p)) ) go to 1
+      else if(answer .eq. 'Z') then
+        if( Approx(grid % zn(n), zp(p)) ) go to 1
+      else if(answer .eq. 'RX') then
+        if( Approx( (grid % zn(n)**2 +   &
+                     grid % yn(n)**2)**.5, zp(p)) ) go to 1
+      else if(answer .eq. 'RY') then
+        if( Approx( (grid % xn(n)**2 +   &
+                     grid % zn(n)**2)**.5, zp(p)) ) go to 1
+      else if(answer .eq. 'RZ') then
+        if( Approx( (grid % xn(n)**2 +   &
+                     grid % yn(n)**2)**.5, zp(p)) ) go to 1
       end if
-    end do
-1 end do
+    end do 
+  
+    ! Couldn't find a cell among the probes, add a new one
+    n_prob = n_prob+1
+    if(answer .eq. 'X') zp(n_prob)= grid % xn(n)
+    if(answer .eq. 'Y') zp(n_prob)= grid % yn(n)
+    if(answer .eq. 'Z') zp(n_prob)= grid % zn(n)
+
+    if(answer .eq. 'RX') zp(n_prob)= (grid % zn(n)**2 +      &
+                                   grid % yn(n)**2)**0.5
+    if(answer .eq. 'RY') zp(n_prob)= (grid % xn(n)**2 +      &
+                                   grid % zn(n)**2)**0.5
+    if(answer .eq. 'RZ') zp(n_prob)= (grid % xn(n)**2 +      &
+                                   grid % yn(n)**2)**0.5
+
+    if(n_prob .eq. 16384) then
+      print *, '# Probe 1d: Not a 1d (channel flow) problem.'
+      isit = .false.
+      return
+    end if
+1  end do
 
   isit = .true.
 
@@ -92,17 +88,16 @@
   !--------------------!
   name_prob = problem_name
   name_prob(len_trim(problem_name)+1:len_trim(problem_name)+3) = '.1d'
-  print *, '# Creating the file: ', trim(name_prob)
+  print *, 'Now creating the file: ', trim(name_prob)
   open(9, file=name_prob)
-
   ! Write the number of probes 
-  write(9,'(I8)') n_prob
+  write(9,'(i8)') n_prob
 
-  call Sort2(n_p, n_prob*2, n_prob)
+  call Sort_Mod_Real(zp(1:n_prob))
 
   ! Write the probe coordinates out
   do p=1, n_prob
-    write(9,'(I8,1E17.8)') p, n_p(p)
+    write(9,'(i8,1e17.8)') p, zp(p)
   end do
 
   close(9)

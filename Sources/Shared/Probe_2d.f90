@@ -14,7 +14,7 @@
   include "Approx.int"
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: n_prob, p, c
-  real              :: yp(20000), zp(20000)
+  real              :: yp(32768), zp(32768)
   character(len=80) :: name_prob
   character(len=80) :: answer
 !==============================================================================!
@@ -65,7 +65,7 @@
       zp(n_prob)=grid % yc(c)
     end if 
 
-    if(n_prob .eq. 20000) then
+    if(n_prob .eq. 32768) then
       print *, '# Probe 2D: Not a 2D problem.'
       return
     end if
@@ -75,16 +75,16 @@
   !   Create 2D file   !
   !--------------------!
   name_prob = problem_name
-  name_prob(len_trim(problem_name)+1:len_trim(problem_name)+3) = '.2D'
+  name_prob(len_trim(problem_name)+1:len_trim(problem_name)+3) = '.2d'
   print *, '# Creating the file: ', trim(name_prob)
   open(9, file=name_prob)
 
   ! Write the number of probes 
-  write(9,'(I8)') n_prob
+  write(9,'(i8)') n_prob
 
   ! Write the probe coordinates out
-  do p=1,n_prob
-    write(9,'(I8,1PE17.8,1PE17.8)') p, yp(p), zp(p)
+  do p=1, n_prob
+    write(9,'(i8,1pe17.8,1pe17.8)') p, yp(p), zp(p)
   end do
 
   close(9)
