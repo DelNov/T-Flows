@@ -19,9 +19,9 @@
   type(Grid_Type) :: grid
 !==============================================================================!
   
-  call Comm_Mod_Exchange(grid, u % n)
-  call Comm_Mod_Exchange(grid, v % n)
-  call Comm_Mod_Exchange(grid, w % n)
+  call Comm_Mod_Exchange_Real(grid, u % n)
+  call Comm_Mod_Exchange_Real(grid, v % n)
+  call Comm_Mod_Exchange_Real(grid, w % n)
 
   !---------------!
   !   SGS terms   !
@@ -36,16 +36,16 @@
   call Grad_Mod_For_Phi(grid, w % n, 2, w % y, .true.)  ! dw/dy
   call Grad_Mod_For_Phi(grid, w % n, 3, w % z, .true.)  ! dw/dz
 
-  shear(:) =  u % x(:)**2.                    &
-            + v % y(:)**2.                    &
-            + w % z(:)**2.                    &
-            + 0.5 * (v % z(:) + w % y(:))**2. & 
-            + 0.5 * (u % z(:) + w % x(:))**2. & 
-            + 0.5 * (v % x(:) + u % y(:))**2.
+  shear(:) =  u % x(:)**2                     &
+            + v % y(:)**2                     &
+            + w % z(:)**2                     &
+            + 0.5 * (v % z(:) + w % y(:))**2  &
+            + 0.5 * (u % z(:) + w % x(:))**2  &
+            + 0.5 * (v % x(:) + u % y(:))**2
 
-  vort(:) = - (   0.5*(v % z(:) - w % y(:))**2. &
-                + 0.5*(u % z(:) - w % x(:))**2. &
-                + 0.5*(v % x(:) - u % y(:))**2.)
+  vort(:) = - (   0.5*(v % z(:) - w % y(:))**2  &
+                + 0.5*(u % z(:) - w % x(:))**2  &
+                + 0.5*(v % x(:) - u % y(:))**2 )
 
   shear(:) = sqrt(2.0 * shear(:))
   vort(:)  = sqrt(2.0 * abs(vort(:)))
