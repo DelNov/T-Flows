@@ -10,7 +10,7 @@
 !------------------------------------------------------------------------------!
 !   Writes: name.cns, name.geo                                                 !
 !----------------------------------[Modules]-----------------------------------!
-  use gen_mod
+  use Gen_Mod
   use Div_Mod
   use Grid_Mod
 !------------------------------------------------------------------------------!
@@ -56,8 +56,8 @@
   !   Number of cells, boundary cells ans sides   !
   !-----------------------------------------------!
   write(9) n_nodes_sub
-  write(9) n_cells_sub
-  write(9) n_bnd_cells_sub + n_buf_cells_sub 
+  write(9) n_cells_sub + n_buf_cells_sub
+  write(9) n_bnd_cells_sub 
   write(9) n_faces_sub + n_buf_cells_sub-NCFsub
   write(9) grid % n_materials
   write(9) grid % n_bnd_cond
@@ -193,7 +193,7 @@
       iwork(count,1) = grid % bnd_cond % color(c)
       iwork(count,2) = new_c(grid % bnd_cond % copy_c(c))
       if(grid % bnd_cond % copy_c(c) .ne. 0) then
-        if(proces(grid % bnd_cond % copy_c(c)) .ne. sub) then
+        if(grid % comm % proces(grid % bnd_cond % copy_c(c)) .ne. sub) then
           do b=1,n_buf_cells_sub
             if(buf_recv_ind(b) .eq. grid % bnd_cond % copy_c(c)) then
               print *, buf_pos(b) 
@@ -364,14 +364,15 @@
 
   ! From n_faces_sub+1 to n_faces_sub + n_buf_cells_sub
   ! (think: are they in right order ?)
-  do subo = 1, n_sub
+  do subo = 1, maxval(grid % comm % proces(:))
     do s = 1, grid % n_faces
       if(new_f(s) > n_faces_sub .and.  &
          new_f(s) <= n_faces_sub + n_buf_cells_sub) then
         c1 = grid % faces_c(1,s)
         c2 = grid % faces_c(2,s)
         if(c2 > 0) then
-          if( (proces(c1) .eq. sub) .and. (proces(c2) .eq. subo) ) then
+          if( (grid % comm % proces(c1) .eq. sub) .and.  &
+              (grid % comm % proces(c2) .eq. subo) ) then
             count = count + 1
             if(var .eq.  1)  work(count) = grid % sx(s)
             if(var .eq.  2)  work(count) = grid % sy(s)
@@ -384,7 +385,8 @@
             if(var .eq.  9)  work(count) = grid % yf(s)
             if(var .eq. 10)  work(count) = grid % zf(s)
           end if  
-          if( (proces(c2) .eq. sub) .and. (proces(c1) .eq. subo) ) then
+          if( (grid % comm % proces(c2) .eq. sub) .and.   &
+              (grid % comm % proces(c1) .eq. subo) ) then
             count = count + 1
             if(var .eq.  1)  work(count) = -grid % sx(s)
             if(var .eq.  2)  work(count) = -grid % sy(s)
