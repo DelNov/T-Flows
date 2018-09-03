@@ -34,7 +34,7 @@
           if(grid % material(c1) .eq. m) then 
             bulk(m) % mass_in = bulk(m) % mass_in - flux(s)
           end if
-        endif
+        end if
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE .and. flux(s)<0.) then
           if(grid % material(c1) .eq. m) then
             bulk(m) % mass_in = bulk(m) % mass_in - flux(s)
@@ -88,9 +88,9 @@
           if(grid % material(c1) .eq. m) then
             bulk(m) % mass_out = bulk(m) % mass_out + flux(s)
           end if
-        endif
+        end if
 
-      endif
+      end if
     end do
     call Comm_Mod_Global_Sum_Real(bulk(m) % mass_out)  ! not checked
   end do
@@ -113,9 +113,9 @@
             w % n(c2) = w % n(c2) * fac(m)
             flux(s) = flux(s)*fac(m) 
             bulk(m) % mass_out = bulk(m) % mass_out + flux(s)
-          endif
-        endif
-      endif
+          end if
+        end if
+      end if
     end do
   end do
 
