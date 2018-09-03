@@ -44,10 +44,10 @@ $(info #        <CGNS_ADF5=yes/no> <CGNS_HDF5=yes/no>                          )
 $(info #        <DIR_CASE=relative_path_to_case>                               )
 $(info #                                                                       )
 $(info # Examples:                                                             )
-$(info # make                       for sequential version with gnu compiler   )
-$(info # make MPI=yes               for parallel version with gnu compiler     )
-$(info # make FORTRAN=intel MPI=yes for parallel version with intel compiler   )
-$(info # make MPI=yes CGNS_HDF5=yes for parallel version with CGNS/ADF5 support)
+$(info #   make                       - sequential version with gnu compiler   )
+$(info #   make MPI=yes               - parallel version with gnu compiler     )
+$(info #   make FORTRAN=intel MPI=yes - parallel version with intel compiler   )
+$(info #   make MPI=yes CGNS_HDF5=yes - parallel version with CGNS/ADF5 support)
 $(info #-----------------------------------------------------------------------)
 
 #-------------------------------------------------------------------------------
@@ -60,19 +60,17 @@ $(info #-----------------------------------------------------------------------)
 ifeq ($(FORTRAN), gnu)
   FC = gfortran
   ifeq ($(DEBUG),yes)
-    OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8 -fdefault-integer-8 -O0 -g\
-                   -ffixed-line-length-80 -fcheck=all -fwhole-file -fbacktrace \
-                   -ffpe-trap=invalid \
-                   -fimplicit-none -finit-real=nan \
-                   -Wall -Wextra -Waliasing -Wampersand -Warray-temporaries \
-                   -Wc-binding-type -Wcharacter-truncation -Wline-truncation \
-                   -Wconversion -Wconversion-extra -Wintrinsics-std \
-                   -Wreal-q-constant -Wsurprising -Wtabs -Wunderflow \
-                   -Wintrinsic-shadow -Wunused-parameter -Walign-commons \
-                   -Wfunction-elimination -Wrealloc-lhs -Wrealloc-lhs-all \
-                   -Wcompare-reals -Wtarget-lifetime -Wpedantic -fstack-check \
-                   #-std=f2003 -Wimplicit-procedure -Wimplicit-interface
-
+    OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8 -fdefault-integer-8 -O0 -g \
+               -ffixed-line-length-80 -fcheck=all -fwhole-file -fbacktrace  \
+               -ffpe-trap=invalid,zero,overflow                             \
+               -fimplicit-none -finit-real=nan                              \
+               -Wall -Wextra -Waliasing -Wampersand -Warray-temporaries     \
+               -Wc-binding-type -Wcharacter-truncation -Wline-truncation    \
+               -Wconversion -Wconversion-extra -Wintrinsics-std             \
+               -Wreal-q-constant -Wsurprising -Wtabs -Wunderflow            \
+               -Wintrinsic-shadow -Wunused-parameter -Walign-commons        \
+               -Wfunction-elimination -Wrealloc-lhs -Wrealloc-lhs-all       \
+               -Wcompare-reals -Wtarget-lifetime -Wpedantic -fstack-check
   else
     OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8 -fdefault-integer-8 -O3
   endif
@@ -129,6 +127,9 @@ ifeq ($(CGNS_HDF5), yes)
 endif
 OPT_COMP += $(addprefix -I, $(DIR_CGNS_H))
 
+# METIS library
+METIS_LIB = ../Libraries/Metis_5.1.0_Linux_64/libmetis.a
+
 #------------------------------------------------------
 #   List of sources for modules and functions
 #------------------------------------------------------
@@ -176,12 +177,14 @@ endif
 #-------------
 
 # Modules in shared directory
-SRC_MOD = Const_Mod.f90 \
-          Grid_Mod.f90 \
-          Work_Mod.f90 \
-          Name_Mod.f90 \
-          Tokenizer_Mod.f90 \
-          Material_Mod.f90
+SRC_MOD = Const_Mod.f90		\
+          Sort_Mod.f90		\
+          Grid_Mod.f90		\
+          Work_Mod.f90		\
+          Name_Mod.f90		\
+          Tokenizer_Mod.f90	\
+          Material_Mod.f90	\
+          Metis_Options_Mod.f90
 
 # Conditional support for MPI communication
 ifeq ($(MPI), yes)
@@ -193,22 +196,23 @@ else
 endif
 
 # Sources for modules in the local directory
-SRC_MOD += Info_Mod.f90 \
-           Bulk_Mod.f90 \
-           Var_Mod.f90 \
-           Matrix_Mod.f90 \
-           Numerics_Mod.f90 \
-           Solvers_Mod.f90 \
-           Flow_Mod.f90 \
+SRC_MOD += Info_Mod.f90		\
+           Bulk_Mod.f90		\
+           Var_Mod.f90		\
+           Matrix_Mod.f90	\
+           Numerics_Mod.f90	\
+           Solvers_Mod.f90	\
+           Flow_Mod.f90		\
            Grad_Mod.f90
 
 # Sources for modules in sub-directories
-SRC_MOD += Turbulence_Mod.f90 \
-           Les_Mod.f90 \
-           Rans_Mod.f90 \
+SRC_MOD += Turbulence_Mod.f90	\
+           Les_Mod.f90		\
+           Rans_Mod.f90
 
 # Control_Mod should come because it reads Turbulence, Flow and Numerics
-SRC_MOD += Control_Mod.f90 \
+SRC_MOD += Control_Mod.f90 	\
+           Backup_Mod.f90	\
            Monitor_Mod.f90
 
 #---------------
@@ -219,17 +223,12 @@ SRC_MOD += Control_Mod.f90 \
 SRC_FUN =  $(shell ls -1 *.f90 | grep -v -i _Mod | grep -v -i Save_Cgns | grep -v -i Save_Vtu_Results)
 SRC_FUN += $(shell ls -1 $(DIR_MODELS)/*.f90 | xargs -n1 basename | grep -v -i _Mod)
 
-SRC_FUN += Distance.f90 \
-           Load_Geo.f90 \
-           Name_File.f90 \
-           Sort_Int_Carry_Int.f90 \
-           Sort_Short_Carry_Short.f90 \
-           Sort_Real_Carry_Int.f90 \
-           Sort_Real_Carry_Int_Heapsort.f90 \
-           Sort_Short_By_Index.f90 \
-           Approx.f90 \
-           Swap_Int.f90 \
-           Swap_Real.f90      \
+SRC_FUN += Distance.f90		\
+           Load_Geo.f90		\
+           Name_File.f90	\
+           Approx.f90		\
+           Swap_Int.f90		\
+           Swap_Real.f90	\
            To_Upper_Case.f90
 
 #-------------------------------------------
@@ -237,8 +236,8 @@ SRC_FUN += Distance.f90 \
 #-------------------------------------------
 ifeq ($(CGNS_ADF5), $(CGNS_HDF5))  # meaning both are "no"
   SRC_MOD += Cgns_Mod_Void.f90
-  SRC_FUN += Save_Cgns_Results_Void.f90 \
-             Save_Cgns_Cells_Void.f90 \
+  SRC_FUN += Save_Cgns_Results_Void.f90	\
+             Save_Cgns_Cells_Void.f90	\
              Save_Vtu_Results.f90
 else
   ifeq ($(MPI), yes)
@@ -246,7 +245,7 @@ else
   else
     SRC_MOD += Cgns_Mod_Seq.f90
   endif
-  SRC_FUN += Save_Cgns_Results.f90 \
+  SRC_FUN += Save_Cgns_Results.f90	\
              Save_Cgns_Cells.f90
 endif
 
@@ -297,7 +296,7 @@ $(DIR_OBJECT)/%.o: %.f90
 #-----------------------------------
 $(PROGRAM_FILE): $(OBJ)
 	@echo Linking "\033[0;32m $(PROGRAM_FILE) \033[0m"
-	@$(FC) $(OPT_LINK) -o $(PROGRAM_FILE) $(OBJ) $(CGNS_LIB)
+	@$(FC) $(OPT_LINK) -o $(PROGRAM_FILE) $(OBJ) $(CGNS_LIB) $(METIS_LIB)
 
 #---------------------------------------
 #   Explicit dependencies for modules
@@ -313,12 +312,12 @@ include makefile_explicit_dependencies
 #   Explicit target.
 #---------------------
 clean:
-	@echo -n Removing objects and modules..
-	@for i in $(DIR_USER)/*.f90; do \
-		if [ -L $$i ]; then \
-			unlink $$i ; \
-			mv $(DIR_USER)/.$${i##*/} $(DIR_USER)/$${i##*/} ; \
-		fi ; \
-	done
+	@echo -n Removing objects and modules ... 
 	@rm -f $(DIR_OBJECT)/*.o $(DIR_MODULE)/*.mod $(PROGRAM_FILE)
+	@echo done
+	@echo -n Removing links to sources in case directory ... 
+	@rm -f $(DIR_USER)/*.f90
+	@echo done
+	@echo -n Retreiving default user functions from git repository ... 
+	@git checkout $(DIR_USER)/*.f90
 	@echo done
