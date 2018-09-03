@@ -56,7 +56,6 @@
                       bc_data_type,    & !(out)
                       bc_n_datasets,   & !(out)
                       error)             !(out)
-
   if (error .ne. 0) then
     print *,"# Failed to read boundary conditions info"
     call Cg_Error_Exit_F()
