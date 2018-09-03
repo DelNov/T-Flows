@@ -1,0 +1,4 @@
+  Compile with:
+
+  gfortran -fdefault-real-8 -fdefault-integer-8 -o Test_Metis_01 Test_Metis_01.f90 libmetis.a
+  gfortran -fdefault-real-8 -fdefault-integer-8 -o Test_Metis_02 Test_Metis_02.f90 libmetis.a
