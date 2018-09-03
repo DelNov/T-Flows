@@ -14,15 +14,14 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: b, c, n, s, c1, c2, sub, subo, ln
   integer              :: n_nodes_sub, n_cells_sub, n_faces_sub,  &
-                          n_bnd_cells_sub, n_buf_sub,             &
-                          n_copy_sub, n_copy_buf_sub
+                          n_bnd_cells_sub, n_buff_sub, NCSsub, n_copy_sub
   character(len=80)    :: name_buf
   integer, allocatable :: side_cell(:,:)
 !==============================================================================!
 !   Each subdomain needs two buffers: a send buffer and a receive buffer.      !
-!   A receive buffer will be stored as aditional cells for each subdomain.     !
-!   So each subdomain will have grid % n_cells physical cells and              !
-!   grid % n_buf_cells additional buffer cells.                                !
+!   A receive buffer will be stored as aditional boundary cells for each       !
+!   subdomain. So each subdomain will have grid % n_bnd_cells physical         !
+!   boundary faces and nbb_C-grid % n_bnd_cells buffer bounndary cells.        !
 !   It is handy to do it that way, because most of the algorythms can remain   !
 !   the same as they are now.  They won't even "know" that they use values     !
 !   from other processors.  On the other hand, a sending buffer has to be      !
@@ -88,7 +87,7 @@
     ! Faces & real boundary cells
     n_faces_sub     = 0  ! number of sides in subdomain
     n_bnd_cells_sub = 0  ! number of real boundary cells in subdomain
-    n_copy_sub = 0
+    NCSsub = 0
     do s = 1, grid % n_faces
       new_f(s) = 0
     end do
@@ -96,7 +95,20 @@
       new_c(c) = 0
     end do
 
-    ! Faces step 1/2: on the boundaries + bundary cells
+    ! Faces step 1/2: inside the domain
+    do s = 1, grid % n_faces
+      c1 = grid % faces_c(1,s)  
+      c2 = grid % faces_c(2,s) 
+      if(c2 > 0) then
+        if( (grid % comm % proces(c1) .eq. sub) .and.  &
+            (grid % comm % proces(c2) .eq. sub) ) then
+          n_faces_sub = n_faces_sub+1
+          new_f(s) = n_faces_sub
+        end if
+      end if 
+    end do
+
+    ! Faces step 2/2: on the boundaries + bundary cells
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)  
       c2 = grid % faces_c(2,s) 
@@ -111,26 +123,12 @@
       end if 
     end do
 
-    ! Faces step 2/2: inside the domain
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)  
-      c2 = grid % faces_c(2,s) 
-      if(c2 > 0) then
-        if( (grid % comm % proces(c1) .eq. sub) .and.  &
-            (grid % comm % proces(c2) .eq. sub) ) then
-          n_faces_sub = n_faces_sub+1
-          new_f(s) = n_faces_sub
-        end if
-      end if 
-    end do
-
-    ! Copy cells
     do s = 1, grid % n_copy
       c1 = grid % bnd_cond % copy_s(1,s)
       c2 = grid % bnd_cond % copy_s(2,s)
       if( (grid % comm % proces(c1) .eq. sub) .and.  &
           (grid % comm % proces(c2) .eq. sub) ) then
-        n_copy_sub = n_copy_sub + 1
+        NCSsub = NCSsub+1
       end if
     end do
 
@@ -143,36 +141,36 @@
     !--------------------!
     !   Create buffers   !
     !--------------------!
-    n_buf_sub = 0
-    n_copy_buf_sub = 0
+    n_buff_sub = 0
+    n_copy_sub = 0
     write(9,'(A30)') '# Number of physical boundary cells:'
     write(9,'(I8)')  n_bnd_cells_sub   
     do subo = 1, maxval(grid % comm % proces(:))
       if(subo .ne. sub) then
-        grid % comm % nbb_s(subo) = n_buf_sub + 1
+        grid % comm % nbb_s(subo) = n_buff_sub + 1
 
         ! Faces inside the domain
         do s = 1, grid % n_faces
           c1 = grid % faces_c(1,s)  
           c2 = grid % faces_c(2,s) 
-          if(c2 > 0) then
+          if(c2  > 0) then
             if( (grid % comm % proces(c1) .eq. sub) .and.  &
                 (grid % comm % proces(c2) .eq. subo) ) then
-              n_buf_sub = n_buf_sub + 1          
-              buf_send_ind(n_buf_sub) = new_c(c1)  ! buffer send index 
-              buf_recv_ind(n_buf_sub) = c2         ! important for coordinate
-              buf_pos(n_buf_sub) = n_cells_sub + n_buf_sub
+              n_buff_sub = n_buff_sub+1
+              buf_send_ind(n_buff_sub) = new_c(c1)  ! buffer send index 
+              buf_recv_ind(n_buff_sub) = c2         ! important for coordinate
+              buf_pos(n_buff_sub) = -n_bnd_cells_sub-n_buff_sub
 
-              new_f(s) = n_faces_sub + n_buf_sub
+              new_f(s) = n_faces_sub+n_buff_sub
             end if
             if( (grid % comm % proces(c2) .eq. sub) .and.  &
                 (grid % comm % proces(c1) .eq. subo) ) then
-              n_buf_sub = n_buf_sub + 1
-              buf_send_ind(n_buf_sub) = new_c(c2)  ! buffer send index
-              buf_recv_ind(n_buf_sub) = c1         ! important for coordinate
-              buf_pos(n_buf_sub) = n_cells_sub + n_buf_sub
+              n_buff_sub = n_buff_sub+1
+              buf_send_ind(n_buff_sub) = new_c(c2)  ! buffer send index
+              buf_recv_ind(n_buff_sub) = c1         ! important for coordinate
+              buf_pos(n_buff_sub) = -n_bnd_cells_sub-n_buff_sub
 
-              new_f(s) = n_faces_sub + n_buf_sub
+              new_f(s) = n_faces_sub+n_buff_sub
             end if
           end if  ! c2 > 0
         end do    ! through sides
@@ -183,22 +181,22 @@
           c2 = grid % bnd_cond % copy_s(2,s) 
           if( (grid % comm % proces(c1) .eq. sub) .and.  &
               (grid % comm % proces(c2) .eq. subo) ) then
-            n_buf_sub = n_buf_sub + 1
-            n_copy_buf_sub = n_copy_buf_sub + 1
-            buf_send_ind(n_buf_sub) = new_c(c1) ! buffer send index 
-            buf_recv_ind(n_buf_sub) = c2 
-            buf_pos(n_buf_sub)= -(-n_bnd_cells_sub-n_buf_sub) ! watch the sign
+            n_buff_sub = n_buff_sub+1
+            n_copy_sub = n_copy_sub+1
+            buf_send_ind(n_buff_sub) = new_c(c1) ! buffer send index 
+            buf_recv_ind(n_buff_sub) = c2 
+            buf_pos(n_buff_sub)= -(-n_bnd_cells_sub-n_buff_sub) ! watch the sign
           end if
           if( (grid % comm % proces(c2) .eq. sub) .and.  &
               (grid % comm % proces(c1) .eq. subo) ) then
-            n_buf_sub = n_buf_sub + 1
-            n_copy_buf_sub = n_copy_buf_sub + 1
-            buf_send_ind(n_buf_sub) = new_c(c2) ! buffer send index
-            buf_recv_ind(n_buf_sub) = c1 
-            buf_pos(n_buf_sub)= -(-n_bnd_cells_sub-n_buf_sub) ! watch the sign
+            n_buff_sub = n_buff_sub+1
+            n_copy_sub = n_copy_sub+1
+            buf_send_ind(n_buff_sub) = new_c(c2) ! buffer send index
+            buf_recv_ind(n_buff_sub) = c1 
+            buf_pos(n_buff_sub)= -(-n_bnd_cells_sub-n_buff_sub) ! watch the sign
           end if
         end do    ! through sides
-        grid % comm % nbb_e(subo) = n_buf_sub
+        grid % comm % nbb_e(subo) = n_buff_sub
 
         ! Write to buffer file
         write(9,'(A33)') '#-------------------------------#' 
@@ -223,7 +221,7 @@
                       n_cells_sub,       &
                       n_faces_sub,       &
                       n_bnd_cells_sub,   &
-                      n_buf_sub,        &
+                      n_buff_sub,        &
                       n_copy_sub)
 
     call Save_Vtu_Cells(grid,         &
@@ -237,7 +235,7 @@
                         n_cells_sub,      &
                         n_faces_sub,      &
                         n_bnd_cells_sub,  &
-                        n_buf_sub)
+                        n_buff_sub)
 
     print *, '# Test:'
     print *, '# n_nodes_sub     =', n_nodes_sub
@@ -247,7 +245,7 @@
 
     print *, '#=====================================' 
     print *, '# Subdomain   ', sub
-    print *, '# Buffer size ', n_buf_sub
+    print *, '# Buffer size ', n_buff_sub
     do subo = 1, maxval(grid % comm % proces(:))
       if(subo .ne. sub) then
         print '(a,i9,a,3i9)', ' # Connections with ', subo ,' : ',  &
@@ -269,7 +267,7 @@
   !                                                  !
   !--------------------------------------------------!
   do n = 1, grid % n_nodes
-    new_n(n) = n
+    new_n(n)=n
   end do
   do c = 1, grid % n_cells
     new_c(c) = 0
