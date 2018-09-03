@@ -1,14 +1,14 @@
 !==============================================================================!
-  subroutine Sort_Short_By_Index(x, indx, n)
+  subroutine Sort_Mod_Int_By_Index(x, indx, n)
 !------------------------------------------------------------------------------!
-!   Sorts short integer array x according to indx.                             !
+!   Sorts int. array x according to indx.                                      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer(kind=4) :: n, x(n), indx(n)
+  integer :: n, x(n), indx(n)
 !-----------------------------------[Locals]-----------------------------------!
-  integer(kind=4)              :: i
-  integer(kind=4), allocatable :: work(:)
+  integer             :: i
+  integer,allocatable :: work(:)
 !==============================================================================!
 
   allocate(work(n)); work = 0
@@ -18,7 +18,7 @@
   end do
 
   do i = 1, n
-    x(i)=work(i)
+    x(i) = work(i)
   end do
 
   deallocate(work)
