@@ -33,6 +33,6 @@
     end if
   end do
 
-  call Comm_Mod_Exchange(grid, phii)
+  call Comm_Mod_Exchange_Real(grid, phii)
 
   end subroutine
