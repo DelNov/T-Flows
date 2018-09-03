@@ -103,7 +103,7 @@
       else
         a % bou(c2) = -a12
         a % val(a % dia(c1)) = a % val(a % dia(c1)) +  a12
-      endif
+      end if
 
       b(c1)=b(c1)-flux(s)
       if(c2  > 0) b(c2)=b(c2)+flux(s)
@@ -174,7 +174,7 @@
 
   p % n(:)   =  p % n(:)   -  0.5 * (p_max + p_min)
 
-  call Comm_Mod_Exchange(grid, pp % n) 
+  call Comm_Mod_Exchange_Real(grid, pp % n) 
 
   ! User function
   call User_Mod_End_Of_Compute_Pressure(grid, dt, ini)
