@@ -31,10 +31,6 @@
         !   Boundary conditions   !
         !-------------------------!
         !
-        !----------------!
-        !   Interfaces   !
-        !----------------!
-        !
         !----------------------!
         !   Solution section   !
         !----------------------!
@@ -57,14 +53,6 @@
     integer           :: sol_type
   end type
 
-  ! Interface section
-  type Cgns_Interface_Type
-    character(len=80) :: name
-    logical           :: marked_for_deletion
-    integer           :: id
-    integer           :: int_type ! 0 - uninit, 1 -quad, 2 -tri, 3 - mix
-  end type
-
   ! Element section
   type Cgns_Section_Type
     character(len=80)    :: name
@@ -83,19 +71,17 @@
 
   ! Blocks
   type Cgns_Block_Type
-    character(len=80)                       :: name
-    integer                                 :: type
-    integer                                 :: mesh_info(3)
-    integer                                 :: n_sects
-    type(Cgns_Section_Type), allocatable    :: section(:)
-    integer                                 :: n_bnd_conds
-    type(Cgns_Bnd_Cond_Type), allocatable   :: bnd_cond(:)
-    integer                                 :: n_coords
-    character(len=80)                       :: coord_name(3)
-    integer                                 :: n_interfaces
-    type(Cgns_Interface_Type), allocatable  :: interface(:)
-    integer                                 :: n_solutions
-    type(Cgns_Solution_Type), allocatable   :: solution(:)
+    character(len=80)                     :: name
+    integer                               :: type
+    integer                               :: mesh_info(3)
+    integer                               :: n_sects
+    type(Cgns_Section_Type), allocatable  :: section(:)
+    integer                               :: n_bnd_conds
+    type(Cgns_Bnd_Cond_Type), allocatable :: bnd_cond(:)
+    integer                               :: n_coords
+    character(len=80)                     :: coord_name(3)
+    integer                               :: n_solutions
+    type(Cgns_Solution_Type), allocatable :: solution(:)
   end type
 
   ! Base
@@ -115,23 +101,12 @@
   integer :: cnt_blocks     ! probably not needed
   integer :: cnt_bnd_cells
 
-  ! Cells (3d)
   integer :: cnt_hex
   integer :: cnt_pyr
   integer :: cnt_wed
   integer :: cnt_tet
-
-  ! Boundary condition cells (2d)
-  integer :: cnt_bnd_qua
-  integer :: cnt_bnd_tri
-
-  ! Interface cells (2d)
-  integer              :: cnt_int_qua
-  integer              :: cnt_int_tri
-  integer              :: cnt_int
-  character(len=80)    :: interface_names(1024)
-  integer, allocatable :: interface_cells(:,:,:,:)
-  integer              :: cnt_int_cells
+  integer :: cnt_qua
+  integer :: cnt_tri
 
   ! Block-wise counter of boundary cells
   integer           :: cnt_block_bnd_cells  ! probably not needed
@@ -151,6 +126,7 @@
   include 'Cgns_Mod/Write_Link_To_Field.f90'
   include 'Cgns_Mod/Write_Dimensions_Info.f90'
 
+  include 'Cgns_Mod/Merge_Nodes.f90'
   include 'Cgns_Mod/Read_Base_Info.f90'
   include 'Cgns_Mod/Read_Number_Of_Bases_In_File.f90'
   include 'Cgns_Mod/Read_Number_Of_Blocks_In_Base.f90'
@@ -164,9 +140,8 @@
   include 'Cgns_Mod/Read_Coordinate_Info.f90'
   include 'Cgns_Mod/Read_Coordinate_Array.f90'
   include 'Cgns_Mod/Read_Section_Connections.f90'
-  include 'Cgns_Mod/Merge_Nodes.f90'
 
-  ! Par only
+  ! Parallel only
   include 'Cgns_Mod/Parallel/Get_Arrays_Dimensions.f90'
   include 'Cgns_Mod/Parallel/Open_File.f90'
   include 'Cgns_Mod/Parallel/Close_File.f90'
