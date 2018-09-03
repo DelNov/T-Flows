@@ -3,14 +3,13 @@
 !------------------------------------------------------------------------------!
 ! Writes: name.vtu, name.faces.vtu, name.shadow.vtu                            !
 !----------------------------------[Modules]-----------------------------------!
-  use gen_mod, only: new_n, new_c
-  use Div_Mod, only: n_sub
+  use Gen_Mod, only: new_n, new_c
   use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
-  integer         :: sub, n_nodes_sub, n_cells_sub
+  integer         :: sub, n_nodes_sub, n_cells_sub, lev
 !-----------------------------------[Locals]-----------------------------------!
   integer            :: c, n, offset
   character(len=80)  :: name_out
@@ -51,7 +50,7 @@
   !   Nodes   !
   !-----------!
   write(9,'(a,a)') IN_3, '<Points>'
-  write(9,'(a,a)') IN_4, '<DataArray type="Float32" NumberOfComponents' //  &
+  write(9,'(a,a)') IN_4, '<DataArray type="Float64" NumberOfComponents' //  &
                          '="3" format="ascii">'
   do n = 1, grid % n_nodes
     if(new_n(n) .ne. 0) write(9, '(a,1pe15.7,1pe15.7,1pe15.7)')                &
@@ -66,7 +65,7 @@
   write(9,'(a,a)') IN_3, '<Cells>'
 
   ! First write all cells' nodes
-  write(9,'(a,a)') IN_4, '<DataArray type="Int32" Name="connectivity"' //  &
+  write(9,'(a,a)') IN_4, '<DataArray type="Int64" Name="connectivity"' //  &
                          ' format="ascii">'
 
   do c = 1, grid % n_cells
@@ -74,8 +73,8 @@
 
       ! Hexahedral
       if(grid % cells_n_nodes(c) .eq. 8) then
-        write(9,'(a,8i9)')                                           &
-          IN_5,                                                      &
+        write(9,'(a,8i9)')                                             &
+          IN_5,                                                        &
           new_n(grid % cells_n(1,c))-1, new_n(grid % cells_n(2,c))-1,  &
           new_n(grid % cells_n(4,c))-1, new_n(grid % cells_n(3,c))-1,  &
           new_n(grid % cells_n(5,c))-1, new_n(grid % cells_n(6,c))-1,  &
@@ -83,23 +82,23 @@
 
       ! Wedge       
       else if(grid % cells_n_nodes(c) .eq. 6) then
-        write(9,'(a,6i9)')                                           &
-          IN_5,                                                      &
+        write(9,'(a,6i9)')                                             &
+          IN_5,                                                        &
           new_n(grid % cells_n(1,c))-1, new_n(grid % cells_n(2,c))-1,  &
           new_n(grid % cells_n(3,c))-1, new_n(grid % cells_n(4,c))-1,  &
           new_n(grid % cells_n(5,c))-1, new_n(grid % cells_n(6,c))-1
 
       ! Tetrahedra  
       else if(grid % cells_n_nodes(c) .eq. 4) then
-        write(9,'(a,4i9)')                                           &
-          IN_5,                                                      &
+        write(9,'(a,4i9)')                                             &
+          IN_5,                                                        &
           new_n(grid % cells_n(1,c))-1, new_n(grid % cells_n(2,c))-1,  &
           new_n(grid % cells_n(3,c))-1, new_n(grid % cells_n(4,c))-1
 
       ! Pyramid     
       else if(grid % cells_n_nodes(c) .eq. 5) then
-        write(9,'(a,5i9)')                                           &
-          IN_5,                                                      &
+        write(9,'(a,5i9)')                                             &
+          IN_5,                                                        &
           new_n(grid % cells_n(1,c))-1, new_n(grid % cells_n(2,c))-1,  &
           new_n(grid % cells_n(4,c))-1, new_n(grid % cells_n(3,c))-1,  &
           new_n(grid % cells_n(5,c))-1
@@ -114,7 +113,8 @@
   write(9,'(a,a)') IN_4, '</DataArray>'
 
   ! Now write all cells' offsets
-  write(9,'(a,a)') IN_4, '<DataArray type="Int32" Name="offsets" format="ascii">'
+  write(9,'(a,a)') IN_4, '<DataArray type="Int64" ' //  &
+                         'Name="offsets" format="ascii">'
   offset = 0
   do c = 1, grid % n_cells
     if(new_c(c) .ne. 0) then
@@ -125,7 +125,7 @@
   write(9,'(a,a)') IN_4, '</DataArray>'
  
   ! Now write all cells' types
-  write(9,'(a,a)') IN_4, '<DataArray type="UInt8" Name="types" format="ascii">'
+  write(9,'(a,a)') IN_4, '<DataArray type="Int64" Name="types" format="ascii">'
   do c = 1, grid % n_cells
     if(new_c(c) .ne. 0) then
       if(grid % cells_n_nodes(c) .eq. 4) write(9,'(a,i9)') IN_5, VTK_TETRA
@@ -143,7 +143,8 @@
   write(9,'(a,a)') IN_3, '<CellData Scalars="scalars" vectors="velocity">'
 
   ! Materials
-  write(9,'(a,a)') IN_4, '<DataArray type="UInt8" Name="materials" format="ascii">'
+  write(9,'(a,a)') IN_4, '<DataArray type="Int64" ' //  &
+                         'Name="Materials" format="ascii">'
   do c = 1, grid % n_cells
     if(new_c(c) .ne. 0) then
       write(9,'(a,i9)') IN_5, grid % material(c)
@@ -151,8 +152,31 @@
   end do
   write(9,'(a,a)') IN_4, '</DataArray>'
 
+  ! Processor i.d.
+  write(9,'(a,a)') IN_4, '<DataArray type="Int64" ' //  &
+                         'Name="Processor" format="ascii">'
+  do c = 1, grid % n_cells
+    if(new_c(c) .ne. 0) then
+      write(9,'(a,i9)') IN_5, grid % comm % proces(c)
+    end if
+  end do
+  write(9,'(a,a)') IN_4, '</DataArray>'
+
+  ! Coarser grid levels
+  do lev = 1, grid % n_levels
+    write(9,'(a,a,i2.2,a)') IN_4, '<DataArray type="Int64" ' // &
+                                  'Name="GridLevel', lev, '" format="ascii">'
+    do c = 1, grid % n_cells
+      if(new_c(c) .ne. 0) then
+        write(9,'(a,i9)') IN_5, grid % level(lev) % cell(c)
+      end if
+    end do
+    write(9,'(a,a)') IN_4, '</DataArray>'
+  end do
+
   ! Wall distance
-  write(9,'(a,a)') IN_4, '<DataArray type="Float32" Name="wall distance" format="ascii">'
+  write(9,'(a,a)') IN_4, '<DataArray type="Float64" ' //  &
+                         'Name="WallDistance" format="ascii">'
   do c = 1, grid % n_cells
     if(new_c(c) .ne. 0) then
       write(9,'(a,1pe15.7)') IN_5, grid % wall_dist(c)
@@ -177,7 +201,7 @@
   !-----------------------!
 
   ! Create it only from subdomain 1, when decomposed
-  if(n_sub > 1 .and. sub .eq. 1) then
+  if(maxval(grid % comm % proces(:)) > 1 .and. sub .eq. 1) then
 
     call Name_File(0, name_out, '.pvtu')
     print *, '# Creating the file: ', trim(name_out)
@@ -190,18 +214,18 @@
 
     ! This section must be present
     write(9,'(a,a)') IN_2, '<PPoints>'
-    write(9,'(a,a)') IN_3, '<PDataArray type="Float32" NumberOfComponents=' // &
+    write(9,'(a,a)') IN_3, '<PDataArray type="Float64" NumberOfComponents=' // &
                            '"3" format="ascii"/>'
     write(9,'(a,a)') IN_2, '</PPoints>'
 
     ! Data section is not mandatory, but very useful
     write(9,'(a,a)') IN_2, '<PCellData Scalars="scalars" vectors="velocity">'
-    write(9,'(a,a)') IN_3, '<PDataArray type="UInt8" Name="materials"' // &
+    write(9,'(a,a)') IN_3, '<PDataArray type="Int64" Name="materials"' // &
                            ' format="ascii"/>'
     write(9,'(a,a)') IN_2, '</PCellData>'
 
     ! Write out the names of all the pieces
-    do n = 1, n_sub
+    do n = 1, maxval(grid % comm % proces(:))
       call Name_File(n, name_out, '.vtu')
       write(9, '(a,a,a,a)') IN_2, '<Piece Source="', trim(name_out), '"/>'
     end do

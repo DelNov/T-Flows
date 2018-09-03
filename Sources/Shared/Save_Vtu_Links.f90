@@ -17,7 +17,7 @@
 !----------------------------------[Modules]-----------------------------------!
   use Name_Mod, only: problem_name
   use Div_Mod,  only: buf_send_ind, buf_recv_ind
-  use gen_mod,  only: new_n, new_c, new_f
+  use Gen_Mod,  only: new_n, new_c, new_f
   use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -71,7 +71,7 @@
   !   Nodes   !
   !-----------!
   write(9,'(a,a)') IN_3, '<Points>'
-  write(9,'(a,a)') IN_4, '<DataArray type="Float32" NumberOfComponents' //  &
+  write(9,'(a,a)') IN_4, '<DataArray type="Float64" NumberOfComponents' //  &
                          '="3" format="ascii">'
   do n = 1, grid % n_nodes
     if(new_n(n) .ne. 0) write(9, '(a,1pe15.7,1pe15.7,1pe15.7)')                &
@@ -100,7 +100,7 @@
   write(9,'(a,a)') IN_3, '<Cells>'
 
   ! First write all cells' nodes
-  write(9,'(a,a)') IN_4, '<DataArray type="Int32" Name="connectivity"' //  &
+  write(9,'(a,a)') IN_4, '<DataArray type="Int64" Name="connectivity"' //  &
                          ' format="ascii">'
 
   do c = 1, grid % n_cells
@@ -216,7 +216,7 @@
   print '(a38,i9)', '# Inter-processor links :            ', n_buf_cells_sub
 
   ! Now write all cells' offsets
-  write(9,'(a,a)') IN_4, '<DataArray type="Int32" Name="offsets" ' // & 
+  write(9,'(a,a)') IN_4, '<DataArray type="Int64" Name="offsets" ' // & 
                          'format="ascii">'
   offset = 0
   do c = 1, grid % n_cells
@@ -241,7 +241,7 @@
   write(9,'(a,a)') IN_4, '</DataArray>'
  
   ! Now write all cells' types
-  write(9,'(a,a)') IN_4, '<DataArray type="UInt8" Name="types" format="ascii">'
+  write(9,'(a,a)') IN_4, '<DataArray type="Int64" Name="types" format="ascii">'
   do c = 1, grid % n_cells
     if(new_c(c) .ne. 0) then
       if(grid % cells_n_nodes(c) .eq. 4) write(9,'(a,i9)') IN_5, VTK_TETRA
@@ -266,7 +266,7 @@
   !   Link types   !
   !----------------!
   write(9,'(a,a)') IN_3, '<CellData Scalars="scalars" vectors="velocity">'
-  write(9,'(a,a)') IN_4, '<DataArray type="UInt8" ' // & 
+  write(9,'(a,a)') IN_4, '<DataArray type="Int64" ' // & 
                          'Name="link type" format="ascii">'
   do c = 1, grid % n_cells
     if(new_c(c) .ne. 0) then

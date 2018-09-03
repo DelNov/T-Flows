@@ -45,7 +45,7 @@
   !   Nodes   !
   !-----------!
   write(9,'(a,a)') IN_3, '<Points>'
-  write(9,'(a,a)') IN_4, '<DataArray type="Float32" NumberOfComponents=' //  &
+  write(9,'(a,a)') IN_4, '<DataArray type="Float64" NumberOfComponents=' //  &
                  '"3" format="ascii">'
   do n = 1, grid % n_nodes
     write(9, '(a,1PE15.7,1PE15.7,1PE15.7)')                &
@@ -60,7 +60,7 @@
   write(9,'(a,a)') IN_3, '<Cells>'
 
   ! First write all faces' nodes
-  write(9,'(a,a)') IN_4, '<DataArray type="Int32" Name="connectivity"' //  &
+  write(9,'(a,a)') IN_4, '<DataArray type="Int64" Name="connectivity"' //  &
                          ' format="ascii">'
   do s = 1, grid % n_faces
     if(grid % faces_n_nodes(s) .eq. 4) then
@@ -83,7 +83,7 @@
   write(9,'(a,a)') IN_4, '</DataArray>'
 
   ! Then write all faces' offsets
-  write(9,'(a,a)') IN_4, '<DataArray type="Int32" Name="offsets" format="ascii">'
+  write(9,'(a,a)') IN_4, '<DataArray type="Int64" Name="offsets" format="ascii">'
   offset = 0
   do s = 1, grid % n_faces
     offset = offset + grid % faces_n_nodes(s)
@@ -92,7 +92,7 @@
   write(9,'(a,a)') IN_4, '</DataArray>'
  
   ! Now write all cells' types
-  write(9,'(a,a)') IN_4, '<DataArray type="UInt8" Name="types" format="ascii">'
+  write(9,'(a,a)') IN_4, '<DataArray type="Int64" Name="types" format="ascii">'
   do s = 1, grid % n_faces
     if(grid % faces_n_nodes(s) .eq. 4) write(9,'(a,i9)') IN_5, VTK_QUAD
     if(grid % faces_n_nodes(s) .eq. 3) write(9,'(a,i9)') IN_5, VTK_TRIANGLE
@@ -106,7 +106,7 @@
   write(9,'(a,a)') IN_3, '<CellData Scalars="scalars" vectors="velocity">'
 
   ! Boundary conditions
-  write(9,'(a,a)') IN_4, '<DataArray type="UInt8" Name="boundary conditions" ' //  & 
+  write(9,'(a,a)') IN_4, '<DataArray type="Int64" Name="boundary conditions" ' //  & 
                  'format="ascii">'
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
