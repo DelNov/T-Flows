@@ -26,31 +26,31 @@
 
   if(turbulence_model .eq. K_EPS) then
     call Constants_K_Eps()
-  endif
+  end if
 
   if(turbulence_model .eq. REYNOLDS_STRESS) then
     call Constants_Reynolds_Stress()
-  endif
+  end if
 
   if(turbulence_model .eq. HANJALIC_JAKIRLIC) then
     call Constants_Hanjalic_Jakirlic()
-  endif
+  end if
 
   if(turbulence_model .eq. K_EPS_ZETA_F) then
     call Constants_K_Eps_Zeta_F()
-  endif
+  end if
 
   if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
      turbulence_model .eq. DES_SPALART) then
     call Constants_Spalart_Allmaras()
   end if
 
-  ! Wall velocity
+  ! Pressure drops
   if(.not. restar) then
     do m = 1, grid % n_materials
-      call Control_Mod_Mass_Flow_Rates(bulk(m) % p_drop_x,  &
-                                       bulk(m) % p_drop_y,  &
-                                       bulk(m) % p_drop_z)
+      call Control_Mod_Pressure_Drops(bulk(m) % p_drop_x,  &
+                                      bulk(m) % p_drop_y,  &
+                                      bulk(m) % p_drop_z)
     end do
   end if
 
