@@ -21,8 +21,8 @@
   use Solvers_Mod, only: Bicg, Cg, Cgs
   use Control_Mod
   use User_Mod
-  use Work_Mod,    only: ui_min => r_cell_01,  &
-                         ui_max => r_cell_02
+  use Work_Mod,    only: ui_min  => r_cell_01,  &
+                         ui_max  => r_cell_02
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -46,7 +46,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: s, c, c1, c2, niter, mat
   real              :: f_ex, f_im, f_stress
-  real              :: uis
+  real              :: uis, vel_max
   real              :: a0, a12, a21
   real              :: ini_res, tol
   real              :: vis_eff, vis_tS
@@ -120,8 +120,16 @@
   ! User function
   call User_Mod_Beginning_Of_Compute_Momentum(grid, dt, ini)
 
-  b = 0.0
-  a % val = 0.0
+  ! Calculate velocity magnitude for normalization
+  vel_max = 0.0
+  do c = 1, grid % n_cells
+    vel_max = max(vel_max, sqrt(u % n(c)**2 + v % n(c)**2 + w % n(c)**2))
+  end do
+  call Comm_Mod_Global_Max_Real(vel_max)
+
+  ! Initialize matrix and right hand side
+  b        = 0.0
+  a % val  = 0.0
   f_stress = 0.0
 
   ! This is important for "copy" boundary conditions. Find out why !
@@ -616,7 +624,15 @@
   ! Over-ride if specified in control file
   call Control_Mod_Max_Iterations_For_Momentum_Solver(niter)
 
-  call Cg(a, ui % n, b, precond, niter, tol, ini_res, ui % res)
+  call Cg(a,        &
+          ui % n,   &
+          b,        &
+          precond,  &
+          niter,    &
+          tol,      &
+          ini_res,  &
+          ui % res, &
+          norm = vel_max)
 
   if(ui % name .eq. 'U') then
     call Info_Mod_Iter_Fill_At(2, 1, ui % name, niter, ui % res)
@@ -628,7 +644,7 @@
     call Info_Mod_Iter_Fill_At(2, 3, ui % name, niter, ui % res)
   end if
 
-  call Comm_Mod_Exchange(grid, ui % n)
+  call Comm_Mod_Exchange_Real(grid, ui % n)
 
   ! User function
   call User_Mod_End_Of_Compute_Momentum(grid, dt, ini)
