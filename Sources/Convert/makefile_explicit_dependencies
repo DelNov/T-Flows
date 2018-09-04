@@ -96,7 +96,6 @@ $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Tokenizer_Mod/Read_Line.f90
-#-- ./SSort.f90
 #-- ./Gen_Mod.f90
 #-- ./Swap_Int.f90
 #-- ./Comm_Mod_Seq.f90
