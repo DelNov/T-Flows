@@ -137,8 +137,8 @@
   !---------------!
 
   ! Retreive advection scheme and blending coefficient
-  call Control_Mod_Advection_Scheme_For_Energy(adv_scheme)
-  call Control_Mod_Blending_Coefficient_Energy(blend)
+  call Control_Mod_Advection_Scheme_For_User_Scalar(adv_scheme)
+  call Control_Mod_Blending_Coefficient_For_User_Scalar(blend)
   
   ! Compute phimax and phimin
   do mat = 1, grid % n_materials
