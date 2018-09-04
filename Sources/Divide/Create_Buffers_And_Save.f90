@@ -17,6 +17,7 @@
                           n_bnd_cells_sub, n_buff_sub, NCSsub, n_copy_sub
   character(len=80)    :: name_buf
   integer, allocatable :: side_cell(:,:)
+  logical, parameter   :: verbose = .false.
 !==============================================================================!
 !   Each subdomain needs two buffers: a send buffer and a receive buffer.      !
 !   A receive buffer will be stored as aditional boundary cells for each       !
@@ -132,19 +133,21 @@
       end if
     end do
 
+    print '(a,i5,a)', ' #============================================='
     print '(a,i5,a)', ' # Saving subdomain ', sub, ' with:'
     print '(a,i9,a)', ' # ', n_cells_sub, ' cells'
     print '(a,i9,a)', ' # ', n_nodes_sub, ' nodes' 
     print '(a,i9,a)', ' # ', n_faces_sub, ' sides' 
     print '(a,i9,a)', ' # ', n_bnd_cells_sub, ' physical boundary cells' 
+    print '(a,i5,a)', ' #---------------------------------------------'
 
     !--------------------!
     !   Create buffers   !
     !--------------------!
     n_buff_sub = 0
     n_copy_sub = 0
-    write(9,'(A30)') '# Number of physical boundary cells:'
-    write(9,'(I8)')  n_bnd_cells_sub   
+    write(9,'(a30)') '# Number of physical boundary cells:'
+    write(9,'(i8)')  n_bnd_cells_sub   
     do subo = 1, maxval(grid % comm % proces(:))
       if(subo .ne. sub) then
         grid % comm % nbb_s(subo) = n_buff_sub + 1
@@ -237,25 +240,27 @@
                         n_bnd_cells_sub,  &
                         n_buff_sub)
 
-    print *, '# Test:'
-    print *, '# n_nodes_sub     =', n_nodes_sub
-    print *, '# n_cells_sub     =', n_cells_sub
-    print *, '# n_faces_sub     =', n_faces_sub
-    print *, '# n_bnd_cells_sub =', n_bnd_cells_sub
+    if(verbose) then
+      print '(a)',    ' # Test:'
+      print '(a,i9)', ' # n_nodes_sub     :', n_nodes_sub
+      print '(a,i9)', ' # n_cells_sub     :', n_cells_sub
+      print '(a,i9)', ' # n_faces_sub     :', n_faces_sub
+      print '(a,i9)', ' # n_bnd_cells_sub :', n_bnd_cells_sub
 
-    print *, '#=====================================' 
-    print *, '# Subdomain   ', sub
-    print *, '# Buffer size ', n_buff_sub
-    do subo = 1, maxval(grid % comm % proces(:))
-      if(subo .ne. sub) then
-        print '(a,i9,a,3i9)', ' # Connections with ', subo ,' : ',  &
-          grid % comm % nbb_e(subo) -                               &
-          grid % comm % nbb_s(subo)+1,                              &
-          n_bnd_cells_sub + grid % comm % nbb_s(subo),              &
-          n_bnd_cells_sub + grid % comm % nbb_e(subo)
-      end if 
-    end do ! for subo
-    print *, '#-----------------------------------' 
+      print '(a)',    ' #==============================================='
+      print '(a,i9)', ' # Subdomain   ', sub
+      print '(a,i9)', ' # Buffer size ', n_buff_sub
+      do subo = 1, maxval(grid % comm % proces(:))
+        if(subo .ne. sub) then
+          print '(a,i9,a,3i9)', ' # Connections with ', subo ,' : ',  &
+            grid % comm % nbb_e(subo) -                               &
+            grid % comm % nbb_s(subo)+1,                              &
+            n_bnd_cells_sub + grid % comm % nbb_s(subo),              &
+            n_bnd_cells_sub + grid % comm % nbb_e(subo)
+        end if 
+      end do ! for subo
+      print '(a)',    ' #-----------------------------------------------'
+    end if
 
   end do   ! through subdomains
 
@@ -297,7 +302,7 @@
       end if
     end do
   end do
-  print *, '# Number of faces: ', grid % n_faces, n_faces_sub
+  print '(a,2i9)', ' # Number of faces: ', grid % n_faces, n_faces_sub
 
   ! It is not sorting nodes ... is it good?  I doubt
   call Grid_Mod_Sort_Cells_By_Index(grid, new_c(1), grid % n_cells)
