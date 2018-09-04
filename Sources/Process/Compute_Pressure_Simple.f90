@@ -63,9 +63,9 @@
   end do
   call Comm_Mod_Global_Max_Real(p_max)
   call Comm_Mod_Global_Min_Real(p_min)
-  p_nor = max( (p_max-p_min), MICRO, abs(bulk(1) % p_drop_x),  &
-                                     abs(bulk(1) % p_drop_y),  &
-                                     abs(bulk(1) % p_drop_z) )
+  p_nor = max( (p_max-p_min), MICRO, abs(bulk % p_drop_x),  &
+                                     abs(bulk % p_drop_y),  &
+                                     abs(bulk % p_drop_z) )
 
   ! Initialize matrix and right hand side
   b       = 0.0 

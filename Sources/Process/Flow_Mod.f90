@@ -42,7 +42,7 @@
   real, allocatable :: b(:)
 
   ! Mass fluxes, bulk velocities and pressure drops
-  type(Bulk_Type) :: bulk(100)
+  type(Bulk_Type) :: bulk
 
   ! Physical properties
   real :: viscosity, density, conductivity, diffusivity, capacity

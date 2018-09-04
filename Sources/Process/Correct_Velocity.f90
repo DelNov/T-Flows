@@ -20,8 +20,8 @@
   real            :: dt
   integer         :: ini
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: c, c1, c2, s, m
-  real              :: cfl_max(256), pe_max(256)
+  integer           :: c, c1, c2, s
+  real              :: cfl_max, pe_max
   real              :: cfl_t, pe_t, mass_err
   character(len=80) :: coupling
 !==============================================================================!
@@ -125,39 +125,35 @@
   !   Calculate the CFL number   !
   !     and the Peclet number    !
   !------------------------------!
-  m = 1
-  cfl_max(m) = 0.0
-  pe_max(m)  = 0.0
+  cfl_max = 0.0
+  pe_max  = 0.0
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
-    if( (grid % material(c1) .eq. m) .or.  &
-        (grid % material(c2) .eq. m) ) then
-      if(c2 > 0 .or.   &
-         c2 < 0.and.Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER) then
-        cfl_t = abs( dt * flux(s) / density /      &
-                     ( f_coef(s) *                 &
-                     (  grid % dx(s)*grid % dx(s)  &
-                      + grid % dy(s)*grid % dy(s)  &
-                      + grid % dz(s)*grid % dz(s)) ) )
-        pe_t  = abs( flux(s) / f_coef(s) / (viscosity / density + TINY) )
-        cfl_max(m) = max( cfl_max(m), cfl_t ) 
-        pe_max(m)  = max( pe_max(m),  pe_t  ) 
-      end if
+    if(c2 > 0 .or.   &
+       c2 < 0.and.Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER) then
+      cfl_t = abs( dt * flux(s) / density /      &
+                   ( f_coef(s) *                 &
+                   (  grid % dx(s)*grid % dx(s)  &
+                    + grid % dy(s)*grid % dy(s)  &
+                    + grid % dz(s)*grid % dz(s)) ) )
+      pe_t  = abs( flux(s) / f_coef(s) / (viscosity / density + TINY) )
+      cfl_max = max( cfl_max, cfl_t ) 
+      pe_max  = max( pe_max,  pe_t  ) 
     end if
   end do
-  call Comm_Mod_Global_Max_Real(cfl_max(m))
-  call Comm_Mod_Global_Max_Real(pe_max(m))
+  call Comm_Mod_Global_Max_Real(cfl_max)
+  call Comm_Mod_Global_Max_Real(pe_max)
 
   call Info_Mod_Iter_Fill_At(1, 2, 'dum', -1, mass_err)
-  call Info_Mod_Bulk_Fill(cfl_max(m),          &
-                          pe_max(m),           &                            
-                          bulk(m) % flux_x,    &
-                          bulk(m) % flux_y,    &
-                          bulk(m) % flux_z,    &
-                          bulk(m) % p_drop_x,  &
-                          bulk(m) % p_drop_y,  &
-                          bulk(m) % p_drop_z)
+  call Info_Mod_Bulk_Fill(cfl_max,          &
+                          pe_max,           &                            
+                          bulk % flux_x,    &
+                          bulk % flux_y,    &
+                          bulk % flux_z,    &
+                          bulk % p_drop_x,  &
+                          bulk % p_drop_y,  &
+                          bulk % p_drop_z)
 
   Correct_Velocity = mass_err ! /(velmax+TINY)
 

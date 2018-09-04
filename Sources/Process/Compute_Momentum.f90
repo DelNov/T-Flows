@@ -567,15 +567,15 @@
   !--------------------------!
   if(ui % name .eq. 'U') then
     do c = 1, grid % n_cells
-      b(c) = b(c) + bulk(grid % material(c)) % p_drop_x * grid % vol(c)
+      b(c) = b(c) + bulk % p_drop_x * grid % vol(c)
     end do
   else if(ui % name .eq. 'V') then
     do c = 1, grid % n_cells
-      b(c) = b(c) + bulk(grid % material(c)) % p_drop_y * grid % vol(c)
+      b(c) = b(c) + bulk % p_drop_y * grid % vol(c)
     end do
   else if(ui % name .eq. 'W') then
     do c = 1, grid % n_cells
-      b(c) = b(c) + bulk(grid % material(c)) % p_drop_z * grid % vol(c)
+      b(c) = b(c) + bulk % p_drop_z * grid % vol(c)
     end do
   end if
 

@@ -108,17 +108,15 @@
   end if
 
   ! Retreive information about monitoring points from control file
-  call Control_Mod_Monitoring_Points()
+  call Control_Mod_Monitoring_Points(.true.)
 
   ! Initialize monitoring points
   call Monitor_Mod_Initialize(grid, backup)
 
   ! Plane for calcution of overall mass fluxes
-  do m = 1, grid % n_materials
-    call Control_Mod_Point_For_Monitoring_Planes(bulk(m) % xp,  &
-                                                 bulk(m) % yp,  &
-                                                 bulk(m) % zp)
-  end do
+  call Control_Mod_Point_For_Monitoring_Planes(bulk % xp,  &
+                                               bulk % yp,  &
+                                               bulk % zp)
 
   ! Prepare ...
   call Bulk_Mod_Monitoring_Planes_Areas(grid, bulk)
@@ -139,11 +137,9 @@
 
   ! Print the areas of monitoring planes
   if(this_proc < 2) then
-    do m = 1, grid % n_materials
-      write(*,'(a6,i1,a3,es12.5)') ' # Ax(',m,') :', bulk(m) % area_x
-      write(*,'(a6,i1,a3,es12.5)') ' # Ay(',m,') :', bulk(m) % area_y
-      write(*,'(a6,i1,a3,es12.5)') ' # Az(',m,') :', bulk(m) % area_z
-    end do
+    write(*,'(a7,es12.5)') ' # Ax :', bulk % area_x
+    write(*,'(a7,es12.5)') ' # Ay :', bulk % area_y
+    write(*,'(a7,es12.5)') ' # Az :', bulk % area_z
   end if
 
   !---------------!
@@ -429,20 +425,18 @@
     !                                                     !
     !   Pdrop = dFlux/dt/A                                !
     !-----------------------------------------------------!
-    do m = 1, grid % n_materials
-      if( abs(bulk(m) % flux_x_o) >= TINY ) then
-        bulk(m) % p_drop_x = (bulk(m) % flux_x_o - bulk(m) % flux_x)  &
-                           / (dt * bulk(m) % area_x + TINY)
-      end if
-      if( abs(bulk(m) % flux_y_o) >= TINY ) then
-        bulk(m) % p_drop_y = (bulk(m) % flux_y_o - bulk(m) % flux_y)  &
-                           / (dt * bulk(m) % area_y + TINY)
-      end if
-      if( abs(bulk(m) % flux_z_o) >= TINY ) then
-        bulk(m) % p_drop_z = (bulk(m) % flux_z_o - bulk(m) % flux_z)  &
-                           / (dt * bulk(m) % area_z + TINY)
-      end if
-    end do
+    if( abs(bulk % flux_x_o) >= TINY ) then
+      bulk % p_drop_x = (bulk % flux_x_o - bulk % flux_x)  &
+                         / (dt * bulk % area_x + TINY)
+    end if
+    if( abs(bulk % flux_y_o) >= TINY ) then
+      bulk % p_drop_y = (bulk % flux_y_o - bulk % flux_y)  &
+                         / (dt * bulk % area_y + TINY)
+    end if
+    if( abs(bulk % flux_z_o) >= TINY ) then
+      bulk % p_drop_z = (bulk % flux_z_o - bulk % flux_z)  &
+                         / (dt * bulk % area_z + TINY)
+    end if
 
     !----------------------!
     !   Save the results   !

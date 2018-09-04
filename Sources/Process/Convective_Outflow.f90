@@ -33,17 +33,17 @@
     if(c2  < 0) then
       if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) ) then
         u % n(c2) = u % n(c2)   &
-                  - ( bulk(grid % material(c1)) % u * u % x(c1)         & 
-                    + bulk(grid % material(c1)) % v * u % y(c1)         &
-                    + bulk(grid % material(c1)) % w * u % z(c1) ) * dt
+                  - ( bulk % u * u % x(c1)         & 
+                    + bulk % v * u % y(c1)         &
+                    + bulk % w * u % z(c1) ) * dt
         v % n(c2) = v % n(c2)  &
-                  - ( bulk(grid % material(c1)) % u * v % x(c1)         & 
-                    + bulk(grid % material(c1)) % v * v % y(c1)         &
-                    + bulk(grid % material(c1)) % w * v % z(c1) ) * dt
+                  - ( bulk % u * v % x(c1)         & 
+                    + bulk % v * v % y(c1)         &
+                    + bulk % w * v % z(c1) ) * dt
         w % n(c2) = w % n(c2)  &
-                  - ( bulk(grid % material(c1)) % u * w % x(c1)         & 
-                    + bulk(grid % material(c1)) % v * w % y(c1)         &
-                    + bulk(grid % material(c1)) % w * w % z(c1) ) * dt
+                  - ( bulk % u * w % x(c1)         & 
+                    + bulk % v * w % y(c1)         &
+                    + bulk % w * w % z(c1) ) * dt
       end if
     end if
   end do
@@ -60,9 +60,9 @@
       if(c2  < 0) then
         if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) ) then
           t % n(c2) = t % n(c2)   &
-                    - ( bulk(grid % material(c1)) % u * t_x(c1)        & 
-                      + bulk(grid % material(c1)) % v * t_y(c1)        &
-                      + bulk(grid % material(c1)) % w * t_z(c1) ) * dt
+                    - ( bulk % u * t_x(c1)        & 
+                      + bulk % v * t_y(c1)        &
+                      + bulk % w * t_z(c1) ) * dt
         end if
       end if
     end do

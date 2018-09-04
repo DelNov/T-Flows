@@ -25,7 +25,7 @@
                        n_convect
   character(len=80) :: keys(128)
   character(len=80) :: keys_file(128)
-  real              :: vals(0:128) ! Note that they start from zero!
+  real              :: vals(0:128)   ! note that they start from zero!
   real              :: area
 
   integer           :: n_points, k
@@ -41,7 +41,7 @@
 !==============================================================================!
 
   area  = 0.0
-  if (this_proc < 2) print *, 'grid % n_materials: ', grid % n_materials
+  if (this_proc < 2) print *, '# grid % n_materials: ', grid % n_materials
 
   ! Found the line where boundary condition definition is defined
   call Control_Mod_Position_At_One_Key('INITIAL_CONDITION', &
@@ -208,98 +208,96 @@
         call To_Upper_Case(keys(i))
       end do
 
-      do n = 1, grid % n_materials
-        do c = 1, grid % n_cells
+      do c = 1, grid % n_cells
 
-          if(turbulence_statistics .eq. YES) then
-            u % mean(c) = 0.0
-            v % mean(c) = 0.0
-            w % mean(c) = 0.0
+        if(turbulence_statistics .eq. YES) then
+          u % mean(c) = 0.0
+          v % mean(c) = 0.0
+          w % mean(c) = 0.0
+        end if
+
+        vals(0) = u_def;  u % n(c) = vals(Key_Ind('U', keys, nks))
+        vals(0) = v_def;  v % n(c) = vals(Key_Ind('V', keys, nks))
+        vals(0) = w_def;  w % n(c) = vals(Key_Ind('W', keys, nks))
+
+        u % o(c)  = u % n(c)
+        u % oo(c) = u % n(c)
+        v % o(c)  = v % n(c)
+        v % oo(c) = v % n(c)
+        w % o(c)  = w % n(c)
+        w % oo(c) = w % n(c)
+
+        if(heat_transfer .eq. YES) then
+          vals(0) = t_def;  t % n(c) = vals(Key_Ind('T', keys, nks))
+          t % o(c)  = t % n(c)
+          t % oo(c) = t % n(c)
+          t_inf     = t % n(c)
+        end if
+
+        if(turbulence_model .eq. REYNOLDS_STRESS .or.  &
+           turbulence_model .eq. HANJALIC_JAKIRLIC) then
+          vals(0) = uu_def;  uu  % n(c) = vals(Key_Ind('UU',  keys, nks))
+          vals(0) = vv_def;  vv  % n(c) = vals(Key_Ind('VV',  keys, nks))
+          vals(0) = ww_def;  ww  % n(c) = vals(Key_Ind('WW',  keys, nks))
+          vals(0) = uv_def;  uv  % n(c) = vals(Key_Ind('UV',  keys, nks))
+          vals(0) = uw_def;  uw  % n(c) = vals(Key_Ind('UW',  keys, nks))
+          vals(0) = vw_def;  vw  % n(c) = vals(Key_Ind('VW',  keys, nks))
+          vals(0) = eps_def; eps % n(c) = vals(Key_Ind('EPS', keys, nks))
+          uu % o(c)  = uu % n(c)
+          uu % oo(c) = uu % n(c)
+          vv % o(c)  = vv % n(c)
+          vv % oo(c) = vv % n(c)
+          ww % o(c)  = ww % n(c)
+          ww % oo(c) = ww % n(c)
+          uv % o(c)  = uv % n(c)
+          uv % oo(c) = uv % n(c)
+          uw % o(c)  = uw % n(c)
+          uw % oo(c) = uw % n(c)
+          vw % o(c)  = vw % n(c)
+          vw % oo(c) = vw % n(c)
+          if(turbulence_model .eq. REYNOLDS_STRESS) then
+            vals(0) = f22_def; f22 % n(c) = vals(Key_Ind('F22', keys, nks))
+            f22 % o(c)  = f22 % n(c)
+            f22 % oo(c) = f22 % n(c)
           end if
-
-          vals(0) = u_def;  u % n(c) = vals(Key_Ind('U', keys, nks))
-          vals(0) = v_def;  v % n(c) = vals(Key_Ind('V', keys, nks))
-          vals(0) = w_def;  w % n(c) = vals(Key_Ind('W', keys, nks))
-
-          u % o(c)  = u % n(c)
-          u % oo(c) = u % n(c)
-          v % o(c)  = v % n(c)
-          v % oo(c) = v % n(c)
-          w % o(c)  = w % n(c)
-          w % oo(c) = w % n(c)
-
-          if(heat_transfer .eq. YES) then
-            vals(0) = t_def;  t % n(c) = vals(Key_Ind('T', keys, nks))
-            t % o(c)  = t % n(c)
-            t % oo(c) = t % n(c)
-            t_inf     = t % n(c)
-          end if
-
-          if(turbulence_model .eq. REYNOLDS_STRESS .or.  &
-             turbulence_model .eq. HANJALIC_JAKIRLIC) then
-            vals(0) = uu_def;  uu  % n(c) = vals(Key_Ind('UU',  keys, nks))
-            vals(0) = vv_def;  vv  % n(c) = vals(Key_Ind('VV',  keys, nks))
-            vals(0) = ww_def;  ww  % n(c) = vals(Key_Ind('WW',  keys, nks))
-            vals(0) = uv_def;  uv  % n(c) = vals(Key_Ind('UV',  keys, nks))
-            vals(0) = uw_def;  uw  % n(c) = vals(Key_Ind('UW',  keys, nks))
-            vals(0) = vw_def;  vw  % n(c) = vals(Key_Ind('VW',  keys, nks))
-            vals(0) = eps_def; eps % n(c) = vals(Key_Ind('EPS', keys, nks))
-            uu % o(c)  = uu % n(c)
-            uu % oo(c) = uu % n(c)
-            vv % o(c)  = vv % n(c)
-            vv % oo(c) = vv % n(c)
-            ww % o(c)  = ww % n(c)
-            ww % oo(c) = ww % n(c)
-            uv % o(c)  = uv % n(c)
-            uv % oo(c) = uv % n(c)
-            uw % o(c)  = uw % n(c)
-            uw % oo(c) = uw % n(c)
-            vw % o(c)  = vw % n(c)
-            vw % oo(c) = vw % n(c)
-            if(turbulence_model .eq. REYNOLDS_STRESS) then
-              vals(0) = f22_def; f22 % n(c) = vals(Key_Ind('F22', keys, nks))
-              f22 % o(c)  = f22 % n(c)
-              f22 % oo(c) = f22 % n(c)
-            end if
-          end if
+        end if
 
         if(turbulence_model .eq. K_EPS) then
-            vals(0) = kin_def; kin % n(c) = vals(Key_Ind('KIN', keys, nks))
-            vals(0) = eps_def; eps % n(c) = vals(Key_Ind('EPS', keys, nks))
-            kin % o(c)  = kin % n(c)
-            kin % oo(c) = kin % n(c)
-            eps % o(c)  = eps % n(c)
-            eps % oo(c) = eps % n(c)
-            u_tau(c)  = 0.047
-            y_plus(c) = 1.1
-          end if
+          vals(0) = kin_def; kin % n(c) = vals(Key_Ind('KIN', keys, nks))
+          vals(0) = eps_def; eps % n(c) = vals(Key_Ind('EPS', keys, nks))
+          kin % o(c)  = kin % n(c)
+          kin % oo(c) = kin % n(c)
+          eps % o(c)  = eps % n(c)
+          eps % oo(c) = eps % n(c)
+          u_tau(c)  = 0.047
+          y_plus(c) = 1.1
+        end if
 
-          if(turbulence_model .eq. K_EPS_ZETA_F) then
-            vals(0) = kin_def;  kin  % n(c) = vals(Key_Ind('KIN',  keys, nks))
-            vals(0) = eps_def;  eps  % n(c) = vals(Key_Ind('EPS',  keys, nks))
-            vals(0) = zeta_def; zeta % n(c) = vals(Key_Ind('ZETA', keys, nks))
-            vals(0) = f22_def;  f22  % n(c) = vals(Key_Ind('F22',  keys, nks))
-            kin  % o(c)  = kin  % n(c)
-            kin  % oo(c) = kin  % n(c)
-            eps  % o(c)  = eps  % n(c)
-            eps  % oo(c) = eps  % n(c)
-            zeta % o(c)  = zeta % n(c)
-            zeta % oo(c) = zeta % n(c)
-            f22  % o(c)  = f22  % n(c)
-            f22  % oo(c) = f22  % n(c)
-            u_tau(c)  = 0.047
-            y_plus(c) = 1.1
-          end if
+        if(turbulence_model .eq. K_EPS_ZETA_F) then
+          vals(0) = kin_def;  kin  % n(c) = vals(Key_Ind('KIN',  keys, nks))
+          vals(0) = eps_def;  eps  % n(c) = vals(Key_Ind('EPS',  keys, nks))
+          vals(0) = zeta_def; zeta % n(c) = vals(Key_Ind('ZETA', keys, nks))
+          vals(0) = f22_def;  f22  % n(c) = vals(Key_Ind('F22',  keys, nks))
+          kin  % o(c)  = kin  % n(c)
+          kin  % oo(c) = kin  % n(c)
+          eps  % o(c)  = eps  % n(c)
+          eps  % oo(c) = eps  % n(c)
+          zeta % o(c)  = zeta % n(c)
+          zeta % oo(c) = zeta % n(c)
+          f22  % o(c)  = f22  % n(c)
+          f22  % oo(c) = f22  % n(c)
+          u_tau(c)  = 0.047
+          y_plus(c) = 1.1
+        end if
 
-          if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
-             turbulence_model .eq. DES_SPALART) then
-            vals(0) = vis_def; vis % n(c) = vals(Key_Ind('VIS', keys, nks))
-            vis % o(c)  = vis % n(c)
-            vis % oo(c) = vis % n(c)
-          end if
+        if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
+           turbulence_model .eq. DES_SPALART) then
+          vals(0) = vis_def; vis % n(c) = vals(Key_Ind('VIS', keys, nks))
+          vis % o(c)  = vis % n(c)
+          vis % oo(c) = vis % n(c)
+        end if
 
-        end do ! through cells
-      end do ! end do n = 1,grid % n_materials
+      end do ! through cells
 
     end if
 
@@ -318,55 +316,52 @@
   n_symmetry    = 0
   n_heated_wall = 0
   n_convect     = 0
-  do m = 1, grid % n_materials
-    bulk(m) % mass_in = 0.0
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
-      if(c2  < 0) then
-        flux(s) = density*( u % n(c2) * grid % sx(s) + &
-                            v % n(c2) * grid % sy(s) + &
-                            w % n(c2) * grid % sz(s) )
 
-        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
-          if(grid % material(c1) .eq. m) then
-            bulk(m) % mass_in = bulk(m) % mass_in - flux(s)
-          end if
-          area = area  + grid % s(s)
-        end if
-        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL)      &
-          n_wall        = n_wall        + 1
-        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW)    &
-          n_inflow      = n_inflow      + 1
-        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW)   &
-          n_outflow     = n_outflow     + 1
-        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. SYMMETRY)  &
-          n_symmetry    = n_symmetry    + 1
-        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL)    &
-          n_heated_wall = n_heated_wall + 1
-        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT)   &
-          n_convect     = n_convect     + 1
-      else
-        flux(s) = 0.0
+  bulk % mass_in = 0.0
+  do s = 1, grid % n_faces
+    c1 = grid % faces_c(1,s)
+    c2 = grid % faces_c(2,s)
+    if(c2  < 0) then
+      flux(s) = density*( u % n(c2) * grid % sx(s) + &
+                          v % n(c2) * grid % sy(s) + &
+                          w % n(c2) * grid % sz(s) )
+
+      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
+        bulk % mass_in = bulk % mass_in - flux(s)
+        area = area  + grid % s(s)
       end if
-    end do
-    call Comm_Mod_Global_Sum_Int(n_wall)
-    call Comm_Mod_Global_Sum_Int(n_inflow)
-    call Comm_Mod_Global_Sum_Int(n_outflow)
-    call Comm_Mod_Global_Sum_Int(n_symmetry)
-    call Comm_Mod_Global_Sum_Int(n_heated_wall)
-    call Comm_Mod_Global_Sum_Int(n_convect)
-    call Comm_Mod_Global_Sum_Real(bulk(m) % mass_in)
-    call Comm_Mod_Global_Sum_Real(area)
+      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL)      &
+        n_wall        = n_wall        + 1
+      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW)    &
+        n_inflow      = n_inflow      + 1
+      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW)   &
+        n_outflow     = n_outflow     + 1
+      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. SYMMETRY)  &
+        n_symmetry    = n_symmetry    + 1
+      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL)    &
+        n_heated_wall = n_heated_wall + 1
+      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT)   &
+        n_convect     = n_convect     + 1
+    else
+      flux(s) = 0.0
+    end if
   end do
+  call Comm_Mod_Global_Sum_Int(n_wall)
+  call Comm_Mod_Global_Sum_Int(n_inflow)
+  call Comm_Mod_Global_Sum_Int(n_outflow)
+  call Comm_Mod_Global_Sum_Int(n_symmetry)
+  call Comm_Mod_Global_Sum_Int(n_heated_wall)
+  call Comm_Mod_Global_Sum_Int(n_convect)
+  call Comm_Mod_Global_Sum_Real(bulk % mass_in)
+  call Comm_Mod_Global_Sum_Real(area)
 
   !----------------------!
   !   Initializes time   !
   !----------------------!
   if(this_proc  < 2) then
     if(n_inflow .gt. 0) then
-      print '(a31,es12.5)', ' # Mass inflow             : ', bulk(1) % mass_in
-      print '(a31,es12.5)', ' # Average inflow velocity : ', bulk(1) % mass_in &
+      print '(a29,es12.5)', ' # Mass inflow             : ', bulk % mass_in
+      print '(a29,es12.5)', ' # Average inflow velocity : ', bulk % mass_in &
                                                              / area
     end if
     print *, '# Number of faces on the wall        : ', n_wall

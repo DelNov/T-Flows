@@ -75,12 +75,12 @@
   call Backup_Mod_Read_Int(fh, d, 'time_step', time_step)
 
   ! Bulk flows and pressure drops in each direction
-  call Backup_Mod_Read_Real(fh, d, 'bulk_flux_x',   bulk(1) % flux_x)
-  call Backup_Mod_Read_Real(fh, d, 'bulk_flux_y',   bulk(1) % flux_y)
-  call Backup_Mod_Read_Real(fh, d, 'bulk_flux_z',   bulk(1) % flux_z)
-  call Backup_Mod_Read_Real(fh, d, 'bulk_p_drop_x', bulk(1) % p_drop_x)
-  call Backup_Mod_Read_Real(fh, d, 'bulk_p_drop_y', bulk(1) % p_drop_y)
-  call Backup_Mod_Read_Real(fh, d, 'bulk_p_drop_z', bulk(1) % p_drop_z)
+  call Backup_Mod_Read_Real(fh, d, 'bulk_flux_x',   bulk % flux_x)
+  call Backup_Mod_Read_Real(fh, d, 'bulk_flux_y',   bulk % flux_y)
+  call Backup_Mod_Read_Real(fh, d, 'bulk_flux_z',   bulk % flux_z)
+  call Backup_Mod_Read_Real(fh, d, 'bulk_p_drop_x', bulk % p_drop_x)
+  call Backup_Mod_Read_Real(fh, d, 'bulk_p_drop_y', bulk % p_drop_y)
+  call Backup_Mod_Read_Real(fh, d, 'bulk_p_drop_z', bulk % p_drop_z)
 
   !----------------------------!
   !                            !

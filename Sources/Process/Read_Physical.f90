@@ -47,20 +47,16 @@
 
   ! Pressure drops
   if(.not. restar) then
-    do m = 1, grid % n_materials
-      call Control_Mod_Pressure_Drops(bulk(m) % p_drop_x,  &
-                                      bulk(m) % p_drop_y,  &
-                                      bulk(m) % p_drop_z)
-    end do
+    call Control_Mod_Pressure_Drops(bulk % p_drop_x,  &
+                                    bulk % p_drop_y,  &
+                                    bulk % p_drop_z)
   end if
 
   ! Mass fluxes
   if(.not. restar) then
-    do m = 1, grid % n_materials
-      call Control_Mod_Mass_Flow_Rates(bulk(m) % flux_x_o,  &
-                                       bulk(m) % flux_y_o,  &
-                                       bulk(m) % flux_z_o)
-    end do
+    call Control_Mod_Mass_Flow_Rates(bulk % flux_x_o,  &
+                                     bulk % flux_y_o,  &
+                                     bulk % flux_z_o)
   end if
 
   end subroutine
