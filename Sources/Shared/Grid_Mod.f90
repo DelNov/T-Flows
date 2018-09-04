@@ -137,17 +137,17 @@
 
     ! Face coordinates 
     real, allocatable :: xf(:), yf(:), zf(:)
-    
+
     ! Face weight-factor
     real, allocatable :: f(:)
-    
+
     !-------------------------!
     !  Node-based variables   !
     !-------------------------!
 
     ! Node coordinates
     real, allocatable :: xn(:), yn(:), zn(:)
-    
+
     type(Material_Type), allocatable :: materials(:)
     type(Bnd_Cond_Type)              :: bnd_cond
 
@@ -156,7 +156,7 @@
     integer :: max_n_nodes
     integer :: max_n_bnd_cells
     integer :: max_n_faces
- 
+
     !------------------------------------------!
     !   Variables important for parallel run   ! 
     !------------------------------------------!
@@ -165,7 +165,7 @@
   end type
 
   contains
- 
+
   include 'Grid_Mod/Allocate_Cells.f90'
   include 'Grid_Mod/Allocate_Faces.f90'
   include 'Grid_Mod/Allocate_Nodes.f90'
