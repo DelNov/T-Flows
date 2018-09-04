@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Control_Mod_Blending_Coefficient_Momentum(val, verbose)
+  subroutine Control_Mod_Normalization_For_Turbulence_Solver(val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -7,7 +7,7 @@
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Real_Item('BLENDING_COEFFICIENT_MOMENTUM', 1.0,  &
-                                   val, verbose)
+  call Control_Mod_Read_Real_Item('NORMALIZATION_FOR_TURBULENCE_SOLVER',  &
+                                   1.0e-6, val, verbose)
 
   end subroutine

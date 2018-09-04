@@ -6,8 +6,10 @@
   implicit none
 !==============================================================================!
 
-  character(len=80)  :: control_file_name = 'control'
-  integer, parameter :: CONTROL_FILE_UNIT = 10
+  character(len=80), parameter  :: CONTROL_FILE_NAME = 'control'
+  integer, parameter            :: CONTROL_FILE_UNIT = 10
+  ! This include file will define  ALL_CONTROL_KEYWORDS
+  include 'Control_Mod/All_Keywords.f90'
 
   contains
 
@@ -78,9 +80,16 @@
     ! Species    
     include 'Control_Mod/Physics/Number_Of_Species.f90'
 
-    ! User scalars
+    ! User scalars (inluding numerical parameters)
+    include 'Control_Mod/User/Advection_Scheme_For_User_Scalars.f90'
+    include 'Control_Mod/User/Blending_Coefficient_For_User_Scalars.f90'
+    include 'Control_Mod/User/Max_Iterations_For_User_Scalars_Solver.f90'
+    include 'Control_Mod/User/Normalization_For_User_Scalars_Solver.f90'
     include 'Control_Mod/User/Number_Of_User_Scalars.f90'
     include 'Control_Mod/User/Number_Of_User_Arrays.f90'
+    include 'Control_Mod/User/Simple_Underrelaxation_For_User_Scalars.f90'
+    include 'Control_Mod/User/Solver_For_User_Scalars.f90'
+    include 'Control_Mod/User/Tolerance_For_User_Scalars_Solver.f90'
 
   !--------------!
   !   Numerics   !
@@ -96,9 +105,9 @@
     include 'Control_Mod/Numerics/Advection_Scheme_For_Energy.f90'
     include 'Control_Mod/Numerics/Advection_Scheme_For_Momentum.f90'
     include 'Control_Mod/Numerics/Advection_Scheme_For_Turbulence.f90'
-    include 'Control_Mod/Numerics/Blending_Coefficient_Energy.f90'
-    include 'Control_Mod/Numerics/Blending_Coefficient_Momentum.f90'
-    include 'Control_Mod/Numerics/Blending_Coefficient_Turbulence.f90'
+    include 'Control_Mod/Numerics/Blending_Coefficient_For_Energy.f90'
+    include 'Control_Mod/Numerics/Blending_Coefficient_For_Momentum.f90'
+    include 'Control_Mod/Numerics/Blending_Coefficient_For_Turbulence.f90'
     include 'Control_Mod/Numerics/Max_Simple_Iterations.f90'
     include 'Control_Mod/Numerics/Min_Simple_Iterations.f90'
     include 'Control_Mod/Numerics/Simple_Underrelaxation_For_Momentum.f90'
@@ -111,14 +120,19 @@
     include 'Control_Mod/Numerics/Time_Integration_For_Cross_Diffusion.f90'
 
     ! Linear solvers
+    include 'Control_Mod/Numerics/Solver_For_Energy.f90'
     include 'Control_Mod/Numerics/Solver_For_Momentum.f90'
     include 'Control_Mod/Numerics/Solver_For_Pressure.f90'
-    include 'Control_Mod/Numerics/Solver_For_Energy.f90'
     include 'Control_Mod/Numerics/Solver_For_Turbulence.f90'
+    include 'Control_Mod/Numerics/Max_Iterations_For_Energy_Solver.f90'
     include 'Control_Mod/Numerics/Max_Iterations_For_Momentum_Solver.f90'
     include 'Control_Mod/Numerics/Max_Iterations_For_Presssure_Solver.f90'
-    include 'Control_Mod/Numerics/Max_Iterations_For_Energy_Solver.f90'
     include 'Control_Mod/Numerics/Max_Iterations_For_Turbulence_Solver.f90'
+    include 'Control_Mod/Numerics/Normalization_For_Momentum_Solver.f90'
+    include 'Control_Mod/Numerics/Normalization_For_Pressure_Solver.f90'
+    include 'Control_Mod/Numerics/Normalization_For_Energy_Solver.f90'
+    include 'Control_Mod/Numerics/Normalization_For_Turbulence_Solver.f90'
+    include 'Control_Mod/Numerics/Normalization_For_Simple_Algorithm.f90'
     include 'Control_Mod/Numerics/Tolerance_For_Momentum_Solver.f90'
     include 'Control_Mod/Numerics/Tolerance_For_Pressure_Solver.f90'
     include 'Control_Mod/Numerics/Tolerance_For_Energy_Solver.f90'

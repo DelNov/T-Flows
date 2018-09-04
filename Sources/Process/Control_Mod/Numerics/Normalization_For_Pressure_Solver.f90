@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Control_Mod_Blending_Coefficient_Energy(val, verbose)
+  subroutine Control_Mod_Normalization_For_Pressure_Solver(val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -7,7 +7,7 @@
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Real_Item('BLENDING_COEFFICIENT_ENERGY', 1.0,  &
-                                   val, verbose)
+  call Control_Mod_Read_Real_Item('NORMALIZATION_FOR_PRESSURE_SOLVER',  &
+                                   1.0e-6, val, verbose)
 
   end subroutine

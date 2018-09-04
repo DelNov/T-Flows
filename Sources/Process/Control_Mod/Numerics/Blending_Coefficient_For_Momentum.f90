@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Control_Mod_Tolerance_For_Momentum_Solver(val, verbose)
+  subroutine Control_Mod_Blending_Coefficient_For_Momentum(val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -7,7 +7,7 @@
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Real_Item('TOLERANCE_FOR_MOMENTUM_SOLVER',  &
-                                   1.0e-6, val, verbose)
+  call Control_Mod_Read_Real_Item('BLENDING_COEFFICIENT_FOR_MOMENTUM', 1.0,  &
+                                   val, verbose)
 
   end subroutine

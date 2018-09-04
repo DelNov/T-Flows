@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Control_Mod_Tolerance_For_Momentum_Solver(val, verbose)
+  subroutine Control_Mod_Normalization_For_Simple_Algorithm(val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -7,7 +7,7 @@
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Real_Item('TOLERANCE_FOR_MOMENTUM_SOLVER',  &
-                                   1.0e-6, val, verbose)
+  call Control_Mod_Read_Real_Item('NORMALIZATION_FOR_SIMPLE_ALGORITHM',  &
+                                   1.0, val, verbose)
 
   end subroutine

@@ -275,9 +275,9 @@
       call Bulk_Mod_Compute_Fluxes(grid, bulk, flux)
       mass_res = Correct_Velocity(grid, dt, ini) !  project the velocities
 
-      ! Temperature
+      ! Energy (practically temperature)
       if(heat_transfer .eq. YES) then
-        call Compute_Temperature(grid, dt, ini, t)
+        call Compute_Energy(grid, dt, ini, t)
       end if
 
       ! User scalars

@@ -4,6 +4,8 @@
   implicit none
 !==============================================================================!
 
-  open(unit=CONTROL_FILE_UNIT, file=control_file_name, action='read')
+  open(unit   = CONTROL_FILE_UNIT,  &
+       file   = CONTROL_FILE_NAME,  &
+       action = 'read')
 
   end subroutine

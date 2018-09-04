@@ -102,7 +102,7 @@
 
   ! Retreive advection scheme and blending coefficient
   call Control_Mod_Advection_Scheme_For_Turbulence(adv_scheme)
-  call Control_Mod_Blending_Coefficient_Turbulence(blend)
+  call Control_Mod_Blending_Coefficient_For_Turbulence(blend)
 
   ! Compute phimax and phimin
   do mat = 1, grid % n_materials
