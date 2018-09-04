@@ -11,8 +11,9 @@
   !------------------!
   type Monitor_Type
 
-    integer              :: count
+    integer              :: n_points
     integer, allocatable :: cell(:)
+    real,    allocatable :: x(:), y(:), z(:)
  
   end type
 

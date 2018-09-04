@@ -14,7 +14,7 @@
   integer :: m
 !==============================================================================!
 
-  do m = 1, monitor % count  
+  do m = 1, monitor % n_points
     if(monitor % cell(m) > 0) then
       write(10+m,'(i9,5e16.6)')  n,  var1 % n(monitor % cell(m)),  &
                                      var2 % n(monitor % cell(m)),  &

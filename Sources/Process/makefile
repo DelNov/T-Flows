@@ -203,7 +203,8 @@ SRC_MOD += Info_Mod.f90		\
            Numerics_Mod.f90	\
            Solvers_Mod.f90	\
            Flow_Mod.f90		\
-           Grad_Mod.f90
+           Grad_Mod.f90		\
+           Monitor_Mod.f90
 
 # Sources for modules in sub-directories
 SRC_MOD += Turbulence_Mod.f90	\
@@ -212,8 +213,7 @@ SRC_MOD += Turbulence_Mod.f90	\
 
 # Control_Mod should come because it reads Turbulence, Flow and Numerics
 SRC_MOD += Control_Mod.f90 	\
-           Backup_Mod.f90	\
-           Monitor_Mod.f90
+           Backup_Mod.f90
 
 #---------------
 #   Functions

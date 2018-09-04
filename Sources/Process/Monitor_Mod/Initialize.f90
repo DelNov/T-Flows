@@ -8,7 +8,6 @@
   use Comm_Mod
   use Name_Mod
   use Grid_Mod
-  use Control_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -20,15 +19,12 @@
   integer           :: c, m, l
   real              :: curr_dist, min_dist_all
   character(len=80) :: mon_file_name
-  real, allocatable :: min_dist(:), xm(:), ym(:), zm(:)
+  real, allocatable :: min_dist(:)
 !==============================================================================!
 
-  ! Retreive monitoring points
-  call Control_Mod_Monitoring_Points(monitor % count, xm, ym, zm)
-
   ! Allocate memory accordingly
-  allocate(monitor % cell(monitor % count))
-  allocate(min_dist      (monitor % count))
+  allocate(monitor % cell(monitor % n_points))
+  allocate(min_dist      (monitor % n_points))
 
   !--------------------------------------------!
   !   Set the names for all monitoring files   !
@@ -41,16 +37,16 @@
   !-------------------------------!
   !   Find the monitoring cells   !
   !-------------------------------!
-  do m = 1, monitor % count
+  do m = 1, monitor % n_points
 
     min_dist(m) = HUGE
 
     do c = 1, grid % n_cells
-      curr_dist = Distance( xm(m),         &
-                            ym(m),         &
-                            zm(m),         &
-                            grid % xc(c),  &
-                            grid % yc(c),  &
+      curr_dist = Distance( monitor % x(m),  &
+                            monitor % y(m),  &
+                            monitor % z(m),  &
+                            grid % xc(c),    &
+                            grid % yc(c),    &
                             grid % zc(c))
       ! Current distance is smaller than the stored one 
       if(curr_dist < min_dist(m)) then
@@ -66,7 +62,7 @@
 
       ! If there is, erase monitoring point at this_proc 
       if(abs(min_dist_all - min_dist(m)) >= TINY) then 
-        monitor % cell(m) = 0         
+        monitor % cell(m) = 0
       end if
     end if
   end do
@@ -74,7 +70,7 @@
   !----------------------------------------------!
   !   Write first line in the monitoring files   !
   !----------------------------------------------!
-  do m = 1, monitor % count
+  do m = 1, monitor % n_points
 
     if(monitor % cell(m) > 0) then
 

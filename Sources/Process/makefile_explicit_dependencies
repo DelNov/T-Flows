@@ -295,8 +295,6 @@ $(DIR_OBJECT)/Initialize.o:\
 $(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Control_Mod.o \
-Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
@@ -552,8 +550,6 @@ $(DIR_OBJECT)/Name_Mod.o \
 Monitor_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Control_Mod.o \
-Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
@@ -1037,6 +1033,8 @@ $(DIR_OBJECT)/Const_Mod.o
 #-- ./Control_Mod/Input_Output/Results_Save_Interval.f90
 #-- ./Control_Mod/Input_Output/Load_Initial_Solution_Name.f90
 #-- ./Control_Mod/Input_Output/Monitoring_Points.f90
+$(DIR_OBJECT)/Monitoring_Points.o:
+
 #-- ./Numerics_Mod.f90
 #-- ./Load_Cns.f90
 $(DIR_OBJECT)/Load_Cns.o:\
@@ -1736,7 +1734,6 @@ $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Tokenizer_Mod/Read_Line.f90
-#-- ./SSort.f90
 #-- ./Gen_Mod.f90
 #-- ./Swap_Int.f90
 #-- ./Comm_Mod_Seq.f90

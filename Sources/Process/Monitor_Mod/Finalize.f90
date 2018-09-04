@@ -11,7 +11,7 @@
   !--------------------------------!
   !   Close the monitoring files   !
   !--------------------------------!
-  do m = 1, monitor % count
+  do m = 1, monitor % n_points
     if(monitor % cell(m) > 0) close(10 + m)
   end do
 

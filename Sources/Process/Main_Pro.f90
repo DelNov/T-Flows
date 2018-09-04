@@ -14,7 +14,7 @@
   use Grad_Mod
   use Bulk_Mod
   use Var_Mod
-  use Solvers_Mod, only: D
+  use Solvers_Mod, only: d
   use Info_Mod
   use User_Mod
   use Control_Mod
@@ -107,7 +107,10 @@
     call Comm_Mod_Wait
   end if
 
-  ! Initialize monitor
+  ! Retreive information about monitoring points from control file
+  call Control_Mod_Monitoring_Points()
+
+  ! Initialize monitoring points
   call Monitor_Mod_Initialize(grid, backup)
 
   ! Plane for calcution of overall mass fluxes
@@ -137,9 +140,9 @@
   ! Print the areas of monitoring planes
   if(this_proc < 2) then
     do m = 1, grid % n_materials
-      write(*,'(a6,i2,a2,1pe12.3)') ' # Ax(',m,')=', bulk(m) % area_x
-      write(*,'(a6,i2,a2,1pe12.3)') ' # Ay(',m,')=', bulk(m) % area_y
-      write(*,'(a6,i2,a2,1pe12.3)') ' # Az(',m,')=', bulk(m) % area_z
+      write(*,'(a6,i1,a3,es12.5)') ' # Ax(',m,') :', bulk(m) % area_x
+      write(*,'(a6,i1,a3,es12.5)') ' # Ay(',m,') :', bulk(m) % area_y
+      write(*,'(a6,i1,a3,es12.5)') ' # Az(',m,') :', bulk(m) % area_z
     end do
   end if
 

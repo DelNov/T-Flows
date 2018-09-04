@@ -365,8 +365,9 @@
   !----------------------!
   if(this_proc  < 2) then
     if(n_inflow .gt. 0) then
-      print *, '# Mass inflow =', bulk(1) % mass_in
-      print *, '# Average inflow velocity =', bulk(1) % mass_in / area
+      print '(a31,es12.5)', ' # Mass inflow             : ', bulk(1) % mass_in
+      print '(a31,es12.5)', ' # Average inflow velocity : ', bulk(1) % mass_in &
+                                                             / area
     end if
     print *, '# Number of faces on the wall        : ', n_wall
     print *, '# Number of inflow faces             : ', n_inflow
