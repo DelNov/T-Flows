@@ -17,7 +17,7 @@
   ! For each face, which neighbours are to each other cells which meet there
   ! The name derives from "face cell to cell"
   integer, allocatable :: face_c_to_c(:,:)
-                                                
+
   ! Variables for refinement
   integer, parameter   :: ELIPSOID  = 3
   integer, parameter   :: RECTANGLE = 4
