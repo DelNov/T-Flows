@@ -15,7 +15,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !------------------------------------------------------------------------------!
-  include "../Shared/Approx.int"
+  include '../Shared/Approx_Real.int'
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, n, i, m, k, v, cnt_node, mn, mx
   real,    allocatable :: criterion(:) ! sorting criterion
@@ -120,12 +120,12 @@
     m = n + 1
 
     ! If node is unique
-    if( .not. Approx(criterion(n), criterion(n+1), SMALL) ) then
+    if( .not. Approx_Real(criterion(n), criterion(n+1), SMALL) ) then
       cnt_node = cnt_node + 1
     else ! if node is duplicated
 
       ! Check next nodes on the list by criterion
-      do while (Approx(criterion(m), criterion(m+1), SMALL))
+      do while (Approx_Real(criterion(m), criterion(m+1), SMALL))
         m = m + 1
       end do
       ! [n : m] are duplicated

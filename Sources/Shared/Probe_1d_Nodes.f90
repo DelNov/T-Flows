@@ -13,7 +13,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !----------------------------------[Calling]-----------------------------------! 
-  include "Approx.int"
+  include "Approx_Real.int"
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: n_prob, p, n
   real              :: zp(16384)
@@ -44,20 +44,20 @@
     ! Try to find the cell among the probes
     do p=1,n_prob
       if(answer .eq. 'X') then
-        if( Approx(grid % xn(n), zp(p)) ) go to 1
+        if( Approx_Real(grid % xn(n), zp(p)) ) go to 1
       else if(answer .eq. 'Y') then
-        if( Approx(grid % yn(n), zp(p)) ) go to 1
+        if( Approx_Real(grid % yn(n), zp(p)) ) go to 1
       else if(answer .eq. 'Z') then
-        if( Approx(grid % zn(n), zp(p)) ) go to 1
+        if( Approx_Real(grid % zn(n), zp(p)) ) go to 1
       else if(answer .eq. 'RX') then
-        if( Approx( (grid % zn(n)**2 +   &
-                     grid % yn(n)**2)**.5, zp(p)) ) go to 1
+        if( Approx_Real( sqrt(grid % zn(n)**2 +   &
+                              grid % yn(n)**2), zp(p)) ) go to 1
       else if(answer .eq. 'RY') then
-        if( Approx( (grid % xn(n)**2 +   &
-                     grid % zn(n)**2)**.5, zp(p)) ) go to 1
+        if( Approx_Real( sqrt(grid % xn(n)**2 +   &
+                              grid % zn(n)**2), zp(p)) ) go to 1
       else if(answer .eq. 'RZ') then
-        if( Approx( (grid % xn(n)**2 +   &
-                     grid % yn(n)**2)**.5, zp(p)) ) go to 1
+        if( Approx_Real( sqrt(grid % xn(n)**2 +   &
+                              grid % yn(n)**2), zp(p)) ) go to 1
       end if
     end do 
   
@@ -67,12 +67,9 @@
     if(answer .eq. 'Y') zp(n_prob)= grid % yn(n)
     if(answer .eq. 'Z') zp(n_prob)= grid % zn(n)
 
-    if(answer .eq. 'RX') zp(n_prob)= (grid % zn(n)**2 +      &
-                                   grid % yn(n)**2)**0.5
-    if(answer .eq. 'RY') zp(n_prob)= (grid % xn(n)**2 +      &
-                                   grid % zn(n)**2)**0.5
-    if(answer .eq. 'RZ') zp(n_prob)= (grid % xn(n)**2 +      &
-                                   grid % yn(n)**2)**0.5
+    if(answer .eq. 'RX') zp(n_prob)= sqrt(grid % zn(n)**2 + grid % yn(n)**2)
+    if(answer .eq. 'RY') zp(n_prob)= sqrt(grid % xn(n)**2 + grid % zn(n)**2)
+    if(answer .eq. 'RZ') zp(n_prob)= sqrt(grid % xn(n)**2 + grid % yn(n)**2)
 
     if(n_prob .eq. 16384) then
       print *, '# Probe 1d: Not a 1d (channel flow) problem.'

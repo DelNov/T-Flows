@@ -4,7 +4,8 @@
 !   This subroutine finds the coordinate of cell-centers in non-homogeneous    !
 !   direction and write them in file called "name.1d"                          !
 !------------------------------------------------------------------------------!
-  use Name_Mod, only: problem_name
+  use Name_Mod,  only: problem_name
+  use Const_Mod, only: NANO          ! 1.0e-9
   use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -12,10 +13,10 @@
   type(Grid_Type) :: grid
   logical :: isit
 !----------------------------------[Calling]-----------------------------------! 
-  include "Approx.int"
+  include "Approx_Real.int"
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: n_prob, p, c
-  real              :: zp(1028)
+  real              :: zp(16384)
   character(len=80) :: name_prob
   character(len=80) :: answer
 !==============================================================================!
@@ -29,7 +30,7 @@
   if(answer .eq. 'SKIP') return
 
   n_prob = 0
-  zp=0.0
+  zp(:)  = 0.0
 
   !-----------------------------!
   !   Browse through all cells  !
@@ -39,13 +40,13 @@
     ! Try to find the cell among the probes
     do p=1,n_prob
       if(answer .eq. 'X') then
-        if( Approx(grid % xc(c), zp(p), 1.0e-9)) go to 1
+        if( Approx_Real(grid % xc(c), zp(p), NANO)) go to 1
       else if(answer .eq. 'Y') then
-        if( Approx(grid % yc(c), zp(p), 1.0e-9)) go to 1
+        if( Approx_Real(grid % yc(c), zp(p), NANO)) go to 1
       else if(answer .eq. 'Z') then
-        if( Approx(grid % zc(c), zp(p), 1.0e-9)) go to 1
+        if( Approx_Real(grid % zc(c), zp(p), NANO)) go to 1
       end if
-    end do 
+    end do
 
     ! Couldn't find a cell among the probes, add a new one
     n_prob = n_prob + 1
@@ -53,7 +54,7 @@
     if(answer .eq. 'Y') zp(n_prob) = grid % yc(c)
     if(answer .eq. 'Z') zp(n_prob) = grid % zc(c)
 
-    if(n_prob .eq. 1028) then
+    if(n_prob .eq. 16384) then
       print *, '# Probe 1D: Not a 1D (channel flow) problem.'
       isit = .false.
       return

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Probe_2D(grid) 
+  subroutine Probe_2D(grid)
 !------------------------------------------------------------------------------!
 ! Finds coordinates of all the planes for the channel flow.                    !
 ! It assumes that homogeneous directions of the flow are x and y.              !
@@ -11,7 +11,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !----------------------------------[Calling]-----------------------------------! 
-  include "Approx.int"
+  include "Approx_Real.int"
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: n_prob, p, c
   real              :: yp(32768), zp(32768)
@@ -30,8 +30,8 @@
   if(answer .eq. 'SKIP') return
 
   n_prob = 0
-  zp=0.0
-  yp=0.0
+  zp(:)  = 0.0
+  yp(:)  = 0.0
 
   !-----------------------------!
   !   Browse through all cells  !
@@ -41,14 +41,14 @@
     ! Try to find the cell among the probes
     do p=1,n_prob
       if(answer .eq. 'YZ') then
-        if( Approx(grid % yc(c), yp(p)) .and. &  
-            Approx(grid % zc(c), zp(p)) ) go to 1
+        if( Approx_Real(grid % yc(c), yp(p)) .and.      &
+            Approx_Real(grid % zc(c), zp(p)) ) go to 1
       else if(answer .eq. 'ZX') then
-        if( Approx(grid % xc(c), yp(p)) .and. &  
-            Approx(grid % zc(c), zp(p)) ) go to 1
+        if( Approx_Real(grid % xc(c), yp(p)) .and.      &
+            Approx_Real(grid % zc(c), zp(p)) ) go to 1
       else if(answer .eq. 'XY') then
-        if( Approx(grid % xc(c), yp(p)) .and. &  
-            Approx(grid % yc(c), zp(p)) ) go to 1
+        if( Approx_Real(grid % xc(c), yp(p)) .and.      &
+            Approx_Real(grid % yc(c), zp(p)) ) go to 1
       end if
     end do 
 

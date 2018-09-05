@@ -12,7 +12,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !----------------------------------[Calling]-----------------------------------! 
-  include "Approx.int"
+  include "Approx_Real.int"
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: n_prob, p, c, n
   real              :: zp(16384)
@@ -33,7 +33,7 @@
   if(answer .eq. 'SKIP') return
  
   n_prob = 0
-  zp   = 0.0
+  zp(:)  = 0.0
 
   !-----------------------------!
   !   Browse through all cells  !
@@ -44,38 +44,41 @@
       ! Try to find the cell among the probes
       do p=1, n_prob
         if(answer .eq. 'X') then
-          if( Approx(grid % xn(grid % cells_n(n,c)), zp(p)) ) go to 1
+          if( Approx_Real(grid % xn(grid % cells_n(n,c)), zp(p)) ) go to 1
         else if(answer .eq. 'Y') then
-          if( Approx(grid % yn(grid % cells_n(n,c)), zp(p)) ) go to 1
+          if( Approx_Real(grid % yn(grid % cells_n(n,c)), zp(p)) ) go to 1
         else if(answer .eq. 'Z') then
-          if( Approx(grid % zn(grid % cells_n(n,c)), zp(p)) ) go to 1
+          if( Approx_Real(grid % zn(grid % cells_n(n,c)), zp(p)) ) go to 1
         else if(answer .eq. 'RX') then
-          if( Approx( (grid % zn(grid % cells_n(n,c))**2 +   &
-                       grid % yn(grid % cells_n(n,c))**2)**.5, zp(p)) ) go to 1
+          if( Approx_Real( sqrt(grid % zn(grid % cells_n(n,c))**2 +           &
+                                grid % yn(grid % cells_n(n,c))**2), zp(p)) )  &
+            go to 1
         else if(answer .eq. 'RY') then
-          if( Approx( (grid % xn(grid % cells_n(n,c))**2 +   &
-                       grid % zn(grid % cells_n(n,c))**2)**.5, zp(p)) ) go to 1
+          if( Approx_Real( sqrt(grid % xn(grid % cells_n(n,c))**2 +           &
+                                grid % zn(grid % cells_n(n,c))**2), zp(p)) )  &
+            go to 1
         else if(answer .eq. 'RZ') then
-          if( Approx( (grid % xn(grid % cells_n(n,c))**2 +   &
-                       grid % yn(grid % cells_n(n,c))**2)**.5, zp(p)) ) go to 1
+          if( Approx_Real( sqrt(grid % xn(grid % cells_n(n,c))**2 +           &
+                                grid % yn(grid % cells_n(n,c))**2), zp(p)) )  &
+            go to 1
         end if
-      end do 
-  
+      end do
+
       ! Couldn't find a cell among the probes, add a new one
       n_prob = n_prob + 1
       if(answer .eq. 'X') zp(n_prob) = grid % xn(grid % cells_n(n,c))
       if(answer .eq. 'Y') zp(n_prob) = grid % yn(grid % cells_n(n,c))
       if(answer .eq. 'Z') zp(n_prob) = grid % zn(grid % cells_n(n,c))
 
-      if(answer .eq. 'RX') zp(n_prob) =                       &
-                         (grid % zn(grid % cells_n(n,c))**2 +      &
-                          grid % yn(grid % cells_n(n,c))**2)**0.5
-      if(answer .eq. 'RY') zp(n_prob) =                       &
-                         (grid % xn(grid % cells_n(n,c))**2 +      &
-                          grid % zn(grid % cells_n(n,c))**2)**0.5
-      if(answer .eq. 'RZ') zp(n_prob) =                       &
-                         (grid % xn(grid % cells_n(n,c))**2 +      &
-                          grid % yn(grid % cells_n(n,c))**2)**0.5
+      if(answer .eq. 'RX') zp(n_prob) =                                  &
+                           sqrt(grid % zn(grid % cells_n(n,c))**2 +      &
+                                grid % yn(grid % cells_n(n,c))**2)
+      if(answer .eq. 'RY') zp(n_prob) =                                  &
+                           sqrt(grid % xn(grid % cells_n(n,c))**2 +      &
+                                grid % zn(grid % cells_n(n,c))**2)
+      if(answer .eq. 'RZ') zp(n_prob) =                                  &
+                           sqrt(grid % xn(grid % cells_n(n,c))**2 +      &
+                                grid % yn(grid % cells_n(n,c))**2)
 
       if(n_prob .eq. 16384) then
         print *, '# Probe 1d: Not a 1d (channel flow) problem.'
