@@ -35,7 +35,6 @@
   real            :: dt
   type(Var_Type)  :: phi
 !----------------------------------[Calling]-----------------------------------!
-  include "../Shared/Approx.int"
   real :: Turbulent_Prandtl_Number
 !-----------------------------------[Locals]-----------------------------------! 
   integer           :: n, c, s, c1, c2, niter, mat
