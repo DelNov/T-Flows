@@ -38,7 +38,7 @@
 !   Wall shear s. tau_wall [kg/(m*s^2)]| Dyn visc.       viscosity [kg/(m*s)]  !
 !   Density       density  [kg/m^3]    | Turb. kin en.   kin % n   [m^2/s^2]   !
 !   Cell volume   vol      [m^3]       | Length          lf        [m]         !
-!   left hand s.  A        [kg/s]      | right hand s.   b         [kg*m^2/s^4]!
+!   left hand s.  a        [kg/s]      | right hand s.   b         [kg*m^2/s^4]!
 !------------------------------------------------------------------------------!
 !   p_kin = 2*vis_t / density S_ij S_ij                                        !
 !   shear = sqrt(2 S_ij S_ij)                                                  !
@@ -53,7 +53,7 @@
       b(c) = b(c) + c_11e * density * e_sor * p_kin(c)
  
       ! Fill in a diagonal of coefficient matrix
-      A % val(A % dia(c)) =  A % val(A % dia(c)) + c_2e * e_sor * density
+      a % val(a % dia(c)) =  a % val(a % dia(c)) + c_2e * e_sor * density
     end do                   
   end if
 
@@ -77,18 +77,18 @@
           (viscosity/density) ! standard
         ebf = 0.001*y_plu**4.0/(1.0 + y_plu)
         eps % n(c1) = eps_wall * exp(-1.0 * ebf) + eps_hom * exp(-1.0 / ebf)
-        
-        if(rough_walls .eq. YES) then
+
+        if(rough_walls) then
           eps % n(c1) = c_mu75*kin % n(c1)**1.5 / (grid % wall_dist(c1) * kappa)
         end if
 
         ! Adjusting coefficient to fix eps value in near wall calls
-        do j = A % row(c1), A % row(c1 + 1) - 1
-          A % val(j) = 0.0
+        do j = a % row(c1), a % row(c1 + 1) - 1
+          a % val(j) = 0.0
         end do
 
         b(c1) = eps % n(c1) * density
-        A % val(A % dia(c1)) = 1.0 * density
+        a % val(a % dia(c1)) = 1.0 * density
       end if
     end if
   end do  

@@ -12,6 +12,7 @@
   use Bulk_Mod
   use Info_Mod
   use Control_Mod
+  use Numerics_Mod
   use User_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -20,16 +21,15 @@
   real            :: dt
   integer         :: ini
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: c, c1, c2, s
-  real              :: cfl_max, pe_max
-  real              :: cfl_t, pe_t, mass_err
-  character(len=80) :: coupling
+  integer :: c, c1, c2, s
+  real    :: cfl_max, pe_max
+  real    :: cfl_t, pe_t, mass_err
 !==============================================================================!
 
   ! User function
   call User_Mod_Beginning_Of_Correct_Velocity(grid, dt, ini)
 
-  call Control_Mod_Pressure_Momentum_Coupling(coupling)
+  call Control_Mod_Pressure_Momentum_Coupling()
 
   !-----------------------------------------!
   !   Correct velocities and fluxes with    !
@@ -40,13 +40,13 @@
   !   so this loop will not correct SOLID   !
   !   velocities.                           !
   !-----------------------------------------!
-  if(coupling .eq. 'PROJECTION') then
+  if(pressure_momentum_coupling .eq. PROJECTION) then
     do c = 1, grid % n_cells
       u % n(c) = u % n(c) - p % x(c) * grid % vol(c) / a % sav(c)
       v % n(c) = v % n(c) - p % y(c) * grid % vol(c) / a % sav(c)
       w % n(c) = w % n(c) - p % z(c) * grid % vol(c) / a % sav(c)
     end do 
-  else ! coupling is 'SIMPLE'
+  else ! pressure_momentum_coupling is SIMPLE
     do c = 1, grid % n_cells
       u % n(c) = u % n(c) - p % x(c) * grid % vol(c) / a % sav(c)
       v % n(c) = v % n(c) - p % y(c) * grid % vol(c) / a % sav(c)

@@ -42,7 +42,7 @@
   end do
 
   if(turbulence_model .eq. K_EPS_ZETA_F .and.  &
-     turbulence_statistics .eq. YES) then
+     turbulence_statistics) then
     do c = 1, grid % n_cells
       lf = grid % vol(c)**ONE_THIRD
       l_sgs  = 0.8*lf
@@ -64,7 +64,7 @@
       a % val(a % dia(c)) = a % val(a % dia(c)) + &
            density * eps % n(c)/(kin % n(c) + TINY) * grid % vol(c)
 
-      if (buoyancy .eq. YES) then
+      if(buoyancy) then
         buoy_beta(c) = 1.0
         g_buoy(c) = -buoy_beta(c) * (grav_x * ut % n(c) +  &
                                      grav_y * vt % n(c) +  &
@@ -103,13 +103,13 @@
         end if
 
         if(y_plus(c1) > 3.0) then
-          if(rough_walls .eq. NO) then
+          if(.not. rough_walls) then
             ! Wall shear s.
             tau_wall(c1) = density*kappa*u_tau(c1)*u_tan / &
               (log(e_log*y_plus(c1)))
             p_kin(c1) = tau_wall(c1)/density * u_tau(c1) / &
               (kappa*grid % wall_dist(c1))
-          else if (rough_walls .eq. YES) then
+          else if (rough_walls) then
             tau_wall(c1) = density*kappa*u_tau(c1)*u_tan  &
                            /(log((grid % wall_dist(c1)+Zo)/Zo))
             p_kin(c1) = tau_wall(c1)/density * u_tau(c1) / &

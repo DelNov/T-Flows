@@ -40,13 +40,13 @@
 
   ! c = 1, grid % n_cells
   if(turbulence_model      .eq. K_EPS_ZETA_F .and.  &
-     turbulence_statistics .eq. NO) then
+     .not. turbulence_statistics) then
     do c = -grid % n_bnd_cells, grid % n_cells
       vis_t(c) = c_mu_d * density * zeta % n(c) * kin % n(c) * t_scale(c)
     end do
 
   else if(turbulence_model      .eq. K_EPS_ZETA_F .and.  &
-          turbulence_statistics .eq. YES) then
+          turbulence_statistics) then
     do c = -grid % n_bnd_cells, grid % n_cells
       vis_t(c)     = c_mu_d * zeta % n(c) * kin % n(c) * t_scale(c)
       vis_t_eff(c) = max(vis_t(c), vis_t_sgs(c))
@@ -68,9 +68,9 @@
 
         u_tau(c1)  = c_mu**0.25 * kin % n(c1)**0.5
 
-        if(rough_walls .eq. YES) then
+        if(rough_walls) then
           y_plus(c1) = (grid % wall_dist(c1)+Zo)*u_tau(c1)/kin_vis
-        else if(rough_walls .eq. NO) then
+        else if(.not. rough_walls) then
           y_plus(c1) = grid % wall_dist(c1)*u_tau(c1)/kin_vis
         end if
 
@@ -86,19 +86,19 @@
             (y_pl*exp(-1.0*g_blend) + u_plus*exp(-1.0/g_blend) + TINY)
         end if
 
-        if(rough_walls .eq. YES) then
+        if(rough_walls) then
           u_plus = log((grid % wall_dist(c1)+Zo)/Zo)/(kappa + TINY) + TINY
           vis_wall(c1) = min(y_pl*viscosity*kappa/ &
-            log((grid % wall_dist(c1)+Zo)/Zo),1.0e+6*kin_vis)
+            log((grid % wall_dist(c1)+Zo)/Zo), MEGA*kin_vis)
         end if
 
-        if(heat_transfer .eq. YES) then
+        if(heat_transfer) then
           pr_t = Turbulent_Prandtl_Number(grid, c1)
           pr = viscosity * capacity / conductivity
           beta = 9.24 * ((pr/pr_t)**0.75 - 1.0) * &
             (1.0 + 0.28 * exp(-0.007*pr/pr_t))
-          ebf = 0.01 * (pr*y_pl)**4.0 / &
-            ((1.0 + 5.0 * pr**3.0 * y_pl) + TINY)
+          ebf = 0.01 * (pr*y_pl)**4 / &
+            ((1.0 + 5.0 * pr**3 * y_pl) + TINY)
           con_wall(c1) = y_pl*viscosity*capacity/(y_pl*pr* &
             exp(-1.0 * ebf) + (u_plus + beta)*pr_t*exp(-1.0/ebf) + TINY)
         end if

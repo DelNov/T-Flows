@@ -111,7 +111,7 @@
   !   Etnhalpy   !
   !              !
   !--------------!
-  if(heat_transfer .eq. YES) then
+  if(heat_transfer) then
     call Backup_Mod_Read_Variable(fh, d, 'temp', t)
   end if
 
@@ -192,7 +192,7 @@
   !   Turbulent statistics for all models   !
   !                                         !
   !-----------------------------------------!
-  if(turbulence_statistics .eq. YES) then
+  if(turbulence_statistics) then
     call Backup_Mod_Read_Variable_Mean(fh, d, 'u_mean', u)
     call Backup_Mod_Read_Variable_Mean(fh, d, 'v_mean', v)
     call Backup_Mod_Read_Variable_Mean(fh, d, 'w_mean', w)
@@ -204,7 +204,7 @@
     call Backup_Mod_Read_Variable_Mean(fh, d, 'uw_mean', uw)
     call Backup_Mod_Read_Variable_Mean(fh, d, 'vw_mean', vw)
 
-    if(heat_transfer .eq. YES) then
+    if(heat_transfer) then
       call Backup_Mod_Read_Variable_Mean(fh, d, 't_mean',  t)
       call Backup_Mod_Read_Variable_Mean(fh, d, 'tt_mean', tt)
       call Backup_Mod_Read_Variable_Mean(fh, d, 'ut_mean', ut)

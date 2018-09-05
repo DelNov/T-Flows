@@ -35,7 +35,7 @@
 !   Wall shear s. tau_wall [kg/(m*s^2)]| Dyn visc.       viscosity [kg/(m*s)]  !
 !   Density       density  [kg/m^3]    | Turb. kin en.   kin % n   [m^2/s^2]   !
 !   Cell volume   vol      [m^3]       | Length          lf        [m]         !
-!   left hand s.  A        [kg/s]      | right hand s.   b         [kg*m^2/s^4]!
+!   left hand s.  a        [kg/s]      | right hand s.   b         [kg*m^2/s^4]!
 !------------------------------------------------------------------------------!
 !   p_kin = 2*vis_t / density S_ij S_ij                                        !
 !   shear = sqrt(2 S_ij S_ij)                                                  !
@@ -48,7 +48,7 @@
         c_1e * density * eps % n(c) / kin % n(c) * p_kin(c) * grid % vol(c)
 
       ! Negative contribution:
-      A % val(A % dia(c)) = A % val(A % dia(c)) &
+      a % val(a % dia(c)) = a % val(a % dia(c)) &
            + c_2e * density * eps % n(c) / kin % n(c) * grid % vol(c)
     end do
 
@@ -65,19 +65,19 @@
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
 
           ! This will fix the value of eps in the first cell
-          if(rough_walls .eq. NO) then
+          if(.not. rough_walls) then
             eps % n(c1) = c_mu75 * (kin % n(c1))**1.5   &
                         / (kappa*grid % wall_dist(c1))
-          else if(rough_walls .eq. YES) then
+          else if(rough_walls) then
             eps % n(c1) = c_mu75*(kin % n(c1))**1.5  &
                         / (kappa*(grid % wall_dist(c1)+Zo))
           end if
 
-          do j = A % row(c1), A % row(c1+1) -1
-            A % val(j) = 0.0
+          do j = a % row(c1), a % row(c1+1) -1
+            a % val(j) = 0.0
           end do
 
-          A % val(A % dia(c1)) = 1.0 * density
+          a % val(a % dia(c1)) = 1.0 * density
           b(c1) = density * eps % n(c1) * grid % vol(c1)
 
         end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL or WALLFL
@@ -100,19 +100,19 @@
       b(c) = b(c) + &
         c_1e * density * eps % n(c) / kin % n(c) * p_kin(c) * grid % vol(c) &
         + 2.0 * viscosity * vis_t(c) / density * &
-           (shear_x(c)**2. + shear_y(c)**2. + shear_z(c)**2.) * grid % vol(c)
+           (shear_x(c)**2 + shear_y(c)**2 + shear_z(c)**2) * grid % vol(c)
 
       ! Negative contribution:
       re_t = kin % n(c)**2./((viscosity/density)*eps % n(c))
-      f_mu = 1.0 - 0.3*exp(-(re_t**2.))
-      A % val(A % dia(c)) = A % val(A % dia(c)) &
+      f_mu = 1.0 - 0.3*exp(-(re_t**2))
+      a % val(a % dia(c)) = a % val(a % dia(c)) &
         + f_mu * c_2e * density * eps % n(c) / kin % n(c) * grid % vol(c)
 
        ! Yap correction
        l1 = kin % n(c)**1.5/eps % n(c)
        l2 = 2.55 * grid % wall_dist(c)
-       yap = 0.83 * eps % n(c)**2./kin % n(c)  &
-                  * max((l1/l2 - 1.0) * (l1/l2)**2., 0.0)
+       yap = 0.83 * eps % n(c)**2/kin % n(c)  &
+                  * max((l1/l2 - 1.0) * (l1/l2)**2, 0.0)
        b(c) = b(c) + yap * density* grid % vol(c)
     end do
 

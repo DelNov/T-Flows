@@ -143,10 +143,11 @@
   !-----------------!
   !   Temperature   !
   !-----------------!
-  if(heat_transfer .eq. YES) then
+  if(heat_transfer) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               t % n(1), "Temperature")
   end if
+
   !--------------------------!
   !   Turbulent quantities   !
   !--------------------------!
@@ -243,7 +244,7 @@
                               uw_mean(1),"ReynoldsStressXZ")
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               vw_mean(1),"ReynoldsStressYZ")
-    if(heat_transfer .eq. YES) then
+    if(heat_transfer) then
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                                t % mean(1), "TemperatureMean")
       tt_mean = tt % mean(c) - t % mean(c) * t % mean(c)

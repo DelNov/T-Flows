@@ -1,23 +1,38 @@
 !==============================================================================!
-  subroutine Control_Mod_Pressure_Momentum_Coupling(val, verbose)
+  subroutine Control_Mod_Pressure_Momentum_Coupling(verbose)
+!------------------------------------------------------------------------------!
+!----------------------------------[Modules]-----------------------------------!
+  use Numerics_Mod, only: pressure_momentum_coupling, SIMPLE, PROJECTION
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(len=80) :: val
   logical, optional :: verbose
+!-----------------------------------[Locals]-----------------------------------!
+  character(len=80) :: val
 !==============================================================================!
+
+  ! Set a default value
+  pressure_momentum_coupling = SIMPLE
 
   call Control_Mod_Read_Char_Item('PRESSURE_MOMENTUM_COUPLING', 'simple',  &
                                    val, verbose)
   call To_Upper_Case(val)
 
-  if(val .ne. 'SIMPLE'.and.  &
-     val .ne. 'PROJECTION') then
+  !----------------------------!
+  !   Select coupling method   !
+  !----------------------------!
+  select case(val)
 
-    print *, '# Unknown pressure-momentum coupling: ', trim(val)
-    print *, '# Exiting!'
-    stop 
+    case('SIMPLE')
+      pressure_momentum_coupling = SIMPLE
+    case('PROJECTION')
+      pressure_momentum_coupling = PROJECTION
 
-  end if
+    case default
+      print *, '# Unknown pressure-momentum coupling: ', trim(val)
+      print *, '# Exiting!'
+      stop
+
+  end select
 
   end subroutine

@@ -128,7 +128,7 @@
           i=Key_Ind('V',keys,nks);prof(k,0)=v_def;v%n(c)=prof(k,i)
           i=Key_Ind('W',keys,nks);prof(k,0)=w_def;w%n(c)=prof(k,i)
 
-          if(heat_transfer .eq. YES) then
+          if(heat_transfer) then
             i=Key_Ind('T',keys,nks);prof(k,0)=t_def;t%n(c)=prof(k,i)
           end if
 
@@ -211,7 +211,7 @@
 
       do c = 1, grid % n_cells
 
-        if(turbulence_statistics .eq. YES) then
+        if(turbulence_statistics) then
           u % mean(c) = 0.0
           v % mean(c) = 0.0
           w % mean(c) = 0.0
@@ -228,7 +228,7 @@
         w % o(c)  = w % n(c)
         w % oo(c) = w % n(c)
 
-        if(heat_transfer .eq. YES) then
+        if(heat_transfer) then
           vals(0) = t_def;  t % n(c) = vals(Key_Ind('T', keys, nks))
           t % o(c)  = t % n(c)
           t % oo(c) = t % n(c)

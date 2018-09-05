@@ -2,7 +2,6 @@
   subroutine Control_Mod_Buoyancy(verbose)
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod, only: YES, NO
   use Flow_Mod,  only: buoyancy
 !------------------------------------------------------------------------------!
   implicit none
@@ -17,10 +16,10 @@
   call To_Upper_Case(val)
 
   if( val .eq. 'YES' ) then
-    buoyancy = YES
+    buoyancy = .true.
 
   else if( val .eq. 'NO' ) then
-    buoyancy = NO
+    buoyancy = .false.
 
   else
     print *, '# Unknown state for buoyancy: ', trim(val)

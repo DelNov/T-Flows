@@ -4,7 +4,6 @@
 !   Reading turbulence model from the control file.                            !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod,      only: YES, NO
   use Turbulence_Mod, only: rough_walls
 !------------------------------------------------------------------------------!
   implicit none
@@ -21,10 +20,10 @@
   select case(val)
 
     case('YES') 
-      rough_walls = YES           
+      rough_walls = .true.
 
-    case('NO')                    
-      rough_walls = NO        
+    case('NO')
+      rough_walls = .false.
 
     case default
       print *, '# Unknown wall roughness state :', trim(val)

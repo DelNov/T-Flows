@@ -63,7 +63,7 @@
     end do
   end if
 
-  if(buoyancy .eq. YES) then 
+  if(buoyancy) then
     ut % n(c) = min( 0.01 * t_ref, ut % n(c))
     ut % n(c) = max(-0.01 * t_ref, ut % n(c))
     vt % n(c) = min( 0.01 * t_ref, vt % n(c))

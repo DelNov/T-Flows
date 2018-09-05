@@ -4,7 +4,6 @@
 !   Reading turbulence statistics from the control file                        !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod, only: YES, NO
   use Turbulence_Mod, only: turbulence_statistics
 !------------------------------------------------------------------------------!
   implicit none
@@ -19,10 +18,10 @@
   call To_Upper_Case(val)
 
   if     (val .eq. 'YES') then
-    turbulence_statistics = YES  
+    turbulence_statistics = .true.
 
   else if(val .eq. 'NO') then
-    turbulence_statistics = NO
+    turbulence_statistics = .false.
 
   else
     print *, '# Unknown optoin for turbuelnce statistics: ', trim(val)

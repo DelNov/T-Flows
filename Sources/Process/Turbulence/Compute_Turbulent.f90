@@ -5,7 +5,6 @@
 !   variables.                                                                 !
 !------------------------------------------------------------------------------!
 !---------------------------------[Modules]------------------------------------!
-  use Const_Mod, only: YES
   use Flow_Mod
   use Les_Mod
   use Rans_Mod
@@ -223,7 +222,7 @@
               + (fw(s)*vis % n(c1)+(1.0-fw(s))*vis % n(c2)) / phi % sigma
 
     if(turbulence_model .eq. K_EPS_ZETA_F .and.  &
-       turbulence_statistics .eq. YES) then
+       turbulence_statistics) then
       vis_eff = viscosity                                          &
               + (fw(s)*vis_t_eff(c1) + (1.0-fw(s))*vis_t_eff(c2)) / phi % sigma
     end if

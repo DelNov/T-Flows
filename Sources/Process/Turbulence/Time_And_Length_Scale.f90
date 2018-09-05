@@ -44,10 +44,10 @@
     l1(c) = kin % n(c)**1.5/eps_l(c)
     l2(c) = c_nu * (kin_vis**3 / eps_l(c))**0.25
   end do
-    
+
   if(turbulence_model .eq. K_EPS_ZETA_F) then
 
-    if(rough_walls .eq. YES) then
+    if(rough_walls) then
       do c = 1, grid % n_cells
         t_scale(c) =     max(t1(c),t2(c))
         l_scale(c) = c_l*max(l1(c),l2(c))

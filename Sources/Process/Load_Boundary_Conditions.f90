@@ -187,7 +187,7 @@
           if(grid % bnd_cond % color(c) .eq. n) then
 
             ! Temperature
-            if(heat_transfer .eq. YES) then
+            if(heat_transfer) then
               i = Key_Ind('T', keys, nks)
               if(i > 0) t % bnd_cell_type(c) = bc_type_tag
               i = Key_Ind('Q', keys, nks)
@@ -218,7 +218,7 @@
             i = Key_Ind('P', keys, nks); if(i > 0) p % n(c) = vals(i)
 
             ! Temperature
-            if(heat_transfer .eq. YES) then
+            if(heat_transfer) then
               i = Key_Ind('T', keys, nks)
               if(i > 0) t % n(c) = vals(i)
               i = Key_Ind('Q', keys, nks)
@@ -312,7 +312,7 @@
             if(grid % bnd_cond % color(c) .eq. n) then
 
               ! For temperature
-              if(heat_transfer .eq. YES) then
+              if(heat_transfer) then
                 i = Key_Ind('T', keys, nks)
                 if(i > 0) t % bnd_cell_type(c) = bc_type_tag
                 i = Key_Ind('Q', keys, nks)
@@ -369,7 +369,7 @@
               i = Key_Ind('P', keys, nks); if(i > 0) p % n(c) = prof(k,i)
 
               ! For temperature
-              if(heat_transfer .eq. YES) then
+              if(heat_transfer) then
                 i = Key_Ind('T', keys, nks)
                 if(i > 0) t % n(c) = prof(k,i)
                 i = Key_Ind('Q', keys, nks)
@@ -474,7 +474,7 @@
                 if(here) then
 
                   ! For temperature
-                  if(heat_transfer .eq. YES) then
+                  if(heat_transfer) then
                     i = Key_Ind('T',keys,nks)
                     if(i > 0) t % bnd_cell_type(c) = bc_type_tag
                     i = Key_Ind('Q',keys,nks)
@@ -552,7 +552,7 @@
                   if(i > 0) p % n(c) = wi*prof(m, i) + (1.-wi)*prof(m+1, i)
 
                   ! For temperature
-                  if(heat_transfer .eq. YES) then
+                  if(heat_transfer) then
                     i = Key_Ind('T',keys,nks)
                     if(i > 0) t % n(c) = wi*prof(m, i) + (1.-wi)*prof(m+1, i)
                     if(i > 0) t % bnd_cell_type(c) = bc_type_tag

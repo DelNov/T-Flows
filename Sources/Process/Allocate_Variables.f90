@@ -58,7 +58,7 @@
   !                                         !
   !-----------------------------------------!
   call Control_Mod_Heat_Transfer(verbose = .true.)
-  if(heat_transfer .eq. YES) then
+  if(heat_transfer) then
     call Var_Mod_Allocate_Solution('T',  t,  grid)
     allocate(con_wall(-grid % n_bnd_cells:grid % n_cells)); con_wall = 0.
 
@@ -67,7 +67,7 @@
     call Var_Mod_Allocate_New_Only('VT', vt, grid)
     call Var_Mod_Allocate_New_Only('WT', wt, grid)
 
-    if(turbulence_statistics .eq. YES) then
+    if(turbulence_statistics) then
       call Var_Mod_Allocate_Statistics(t)
       call Var_Mod_Allocate_Statistics(tt)
       call Var_Mod_Allocate_Statistics(ut)
@@ -107,7 +107,7 @@
     allocate(p_kin(-grid % n_bnd_cells:grid % n_cells));  p_kin      = 0.
 
     ! Turbulent statistics; if needed
-    if(turbulence_statistics .eq. YES) then
+    if(turbulence_statistics) then
       call Var_Mod_Allocate_Statistics(kin)               
       call Var_Mod_Allocate_Statistics(eps)               
     end if
@@ -125,13 +125,13 @@
     call Var_Mod_Allocate_Solution('F22',  f22,  grid)
 
     ! Other variables such as time scale, length scale and production
-    allocate(t_scale   (-grid % n_bnd_cells:grid % n_cells));  t_scale    = 0.
-    allocate(l_scale   (-grid % n_bnd_cells:grid % n_cells));  l_scale    = 0.
-    allocate(u_tau     (-grid % n_bnd_cells:grid % n_cells));  u_tau      = 0.
-    allocate(p_kin     (-grid % n_bnd_cells:grid % n_cells));  p_kin      = 0.
+    allocate(t_scale(-grid % n_bnd_cells:grid % n_cells));  t_scale = 0.
+    allocate(l_scale(-grid % n_bnd_cells:grid % n_cells));  l_scale = 0.
+    allocate(u_tau  (-grid % n_bnd_cells:grid % n_cells));  u_tau   = 0.
+    allocate(p_kin  (-grid % n_bnd_cells:grid % n_cells));  p_kin   = 0.
 
     ! Turbulent statistics; if needed
-    if(turbulence_statistics .eq. YES) then
+    if(turbulence_statistics) then
       call Var_Mod_Allocate_Statistics(kin)
       call Var_Mod_Allocate_Statistics(eps)
       call Var_Mod_Allocate_Statistics(zeta)
@@ -140,12 +140,12 @@
       allocate(vis_t_sgs(-grid % n_bnd_cells:grid % n_cells));  vis_t_sgs = 0.
     end if
 
-    if(buoyancy .eq. YES) then
+    if(buoyancy) then
       call Var_Mod_Allocate_Solution('TT', tt, grid)
       call Var_Mod_Allocate_Statistics(tt)
-      allocate(g_buoy   (-grid % n_bnd_cells:grid % n_cells));  g_buoy     = 0.
-      allocate(buoy_beta(-grid % n_bnd_cells:grid % n_cells));  buoy_beta  = 0.
-      allocate(p_buoy   (-grid % n_bnd_cells:grid % n_cells));  p_buoy     = 0.
+      allocate(g_buoy   (-grid % n_bnd_cells:grid % n_cells));  g_buoy    = 0.
+      allocate(buoy_beta(-grid % n_bnd_cells:grid % n_cells));  buoy_beta = 0.
+      allocate(p_buoy   (-grid % n_bnd_cells:grid % n_cells));  p_buoy    = 0.
     end if
 
   end if
@@ -167,7 +167,7 @@
     call Var_Mod_Allocate_New_Only('KIN', kin, grid)
     call Var_Mod_Allocate_Solution('EPS', eps, grid)
 
-    if(turbulence_statistics .eq. YES) then
+    if(turbulence_statistics) then
       call Var_Mod_Allocate_Statistics(uu)
       call Var_Mod_Allocate_Statistics(vv)
       call Var_Mod_Allocate_Statistics(ww)
@@ -182,7 +182,7 @@
       call Var_Mod_Allocate_Solution('F22', f22, grid)
       call Var_Mod_Allocate_Gradients(f22)
 
-      if(turbulence_statistics .eq. YES) then
+      if(turbulence_statistics) then
         call Var_Mod_Allocate_Statistics(f22)
       end if
     end if
@@ -204,7 +204,7 @@
      turbulence_model .eq. DES_SPALART) then
     call Var_Mod_Allocate_Solution('VIS', vis, grid)
 
-    if(turbulence_statistics .eq. YES) then
+    if(turbulence_statistics) then
       call Var_Mod_Allocate_Statistics(vis)
     end if
   end if
@@ -236,7 +236,7 @@
   !   Turbulent statistics for all models except second moment closures   !
   !                                                                       !
   !-----------------------------------------------------------------------!
-  if(turbulence_statistics .eq. YES) then
+  if(turbulence_statistics) then
 
     ! For second moment closures, memory for statistics was allocated above
     if(turbulence_model .ne. HANJALIC_JAKIRLIC .and.  &

@@ -20,6 +20,7 @@
   use Control_Mod
   use Monitor_Mod
   use Backup_Mod
+  use Numerics_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Calling]------------------------------------!
@@ -40,7 +41,6 @@
   integer           :: ini         ! inner iteration counter
   integer           :: bsi, rsi    ! backup and results save interval
   real              :: simple_tol  ! tolerance for SIMPLE algorithm
-  character(len=80) :: coupling    ! pressure velocity coupling
 !==============================================================================!
 
   ! Get starting time
@@ -130,8 +130,8 @@
   call Compute_Gradient_Matrix(grid, .true.)
 
   ! Prepare matrix for fractional step method
-  call Control_Mod_Pressure_Momentum_Coupling(coupling)
-  if(coupling .eq. 'PROJECTION') then
+  call Control_Mod_Pressure_Momentum_Coupling()
+  if(pressure_momentum_coupling .eq. PROJECTION) then
     call Pressure_Matrix_Fractional(grid, dt)
   end if
 
@@ -196,7 +196,7 @@
     end if
 
     If(turbulence_model .eq. K_EPS_ZETA_F .and.  &
-       turbulence_statistics .eq. YES) then
+       turbulence_statistics) then
       call Calculate_Sgs_Dynamic(grid)
       call Calculate_Sgs_Hybrid(grid)
     end if
@@ -210,7 +210,7 @@
     !--------------------------!
     !   Inner-iteration loop   !
     !--------------------------!
-    if(coupling .eq. 'PROJECTION') then
+    if(pressure_momentum_coupling .eq. PROJECTION) then
       max_ini = 1
     else
       call Control_Mod_Max_Simple_Iterations(max_ini)
@@ -259,10 +259,10 @@
       call Comm_Mod_Exchange_Real(grid, a % sav)
 
       call Balance_Mass(grid)
-      if(coupling .eq. 'PROJECTION') then
+      if(pressure_momentum_coupling .eq. PROJECTION) then
         call Compute_Pressure_Fractional(grid, dt, ini)
       end if
-      if(coupling .eq. 'SIMPLE') then
+      if(pressure_momentum_coupling .eq. SIMPLE) then
         call Compute_Pressure_Simple(grid, dt, ini)
       end if
 
@@ -272,7 +272,7 @@
       mass_res = Correct_Velocity(grid, dt, ini) !  project the velocities
 
       ! Energy (practically temperature)
-      if(heat_transfer .eq. YES) then
+      if(heat_transfer) then
         call Compute_Energy(grid, dt, ini, t)
       end if
 
@@ -294,7 +294,7 @@
 
         call Calculate_Vis_T_K_Eps(grid)
 
-        if(heat_transfer .eq. YES) then
+        if(heat_transfer) then
           call Calculate_Heat_Flux(grid)
         end if
       end if
@@ -311,7 +311,7 @@
 
         call Calculate_Vis_T_K_Eps_Zeta_F(grid)
 
-        if(heat_transfer .eq. YES) then
+        if(heat_transfer) then
           call Calculate_Heat_Flux(grid)
         end if
       end if
@@ -354,7 +354,7 @@
 
         call Calculate_Vis_T_Rsm(grid)
 
-        if(heat_transfer .eq. YES) then
+        if(heat_transfer) then
           call Calculate_Heat_Flux(grid)
         end if
       end if
@@ -378,7 +378,7 @@
       call Info_Mod_Iter_Print()
 
       if(ini >= min_ini) then
-        if(coupling .eq. 'SIMPLE') then
+        if(pressure_momentum_coupling .eq. SIMPLE) then
           call Control_Mod_Tolerance_For_Simple_Algorithm(simple_tol)
           if( u  % res <= simple_tol .and.  &
               v  % res <= simple_tol .and.  &
@@ -392,7 +392,7 @@
 1   call Info_Mod_Bulk_Print()
 
     ! Write the values in monitoring points
-    if(heat_transfer .eq. NO) then
+    if(.not. heat_transfer) then
       call Monitor_Mod_Write_4_Vars(n, u, v, w, p)
     else
       call Monitor_Mod_Write_5_Vars(n, u, v, w, t, p)

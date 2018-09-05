@@ -224,7 +224,7 @@
   !-----------------!
   !   Temperature   !
   !-----------------!
-  if(heat_transfer .eq. YES) then
+  if(heat_transfer) then
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "Temperature", t % n(1))
   end if
 
@@ -301,7 +301,7 @@
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressXY", uv_mean(1))
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressXZ", uw_mean(1))
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressYZ", vw_mean(1))
-    if(heat_transfer .eq. YES) then
+    if(heat_transfer) then
       call Save_Vtu_Scalar(grid, IN_4, IN_5, "TemperatureMean", t % mean(1))
       do c = 1, grid % n_cells
         tt_mean(c) = tt % mean(c) - t % mean(c) * t % mean(c)

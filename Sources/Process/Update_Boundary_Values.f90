@@ -45,7 +45,7 @@
         u % n(c2) = u % n(c1)
         v % n(c2) = v % n(c1)
         w % n(c2) = w % n(c1)
-        if(heat_transfer .eq. YES) t % n(c2) = t % n(c1)
+        if(heat_transfer) t % n(c2) = t % n(c1)
       end if
 
       ! Spalart Allmaras
@@ -121,7 +121,7 @@
       end if
 
       ! Is this good in general case, when q <> 0 ??? Check it.
-      if(heat_transfer .eq. YES) then
+      if(heat_transfer) then
 
         ! Take (default) turbulent Prandtl number from control file
         call Control_Mod_Turbulent_Prandtl_Number(pr_t)
@@ -197,7 +197,7 @@
         v % n(c2) = v % n(grid % bnd_cond % copy_c(c2))
         w % n(c2) = w % n(grid % bnd_cond % copy_c(c2))
 
-        if(heat_transfer .eq. YES)  &
+        if(heat_transfer)  &
           t % n(c2) = t % n(grid % bnd_cond % copy_c(c2))
 
         if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
@@ -233,7 +233,7 @@
     end if
   end do
 
-  if(heat_transfer .eq. YES) then
+  if(heat_transfer) then
     call Comm_Mod_Global_Sum_Real(heat_flux)
     call Comm_Mod_Global_Sum_Real(heated_area)
     heat_flux = heat_flux / heated_area

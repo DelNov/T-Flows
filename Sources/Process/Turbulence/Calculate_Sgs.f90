@@ -37,7 +37,7 @@
   !   SGS terms   !
   !               !
   !---------------!
-  if(buoyancy .eq. YES) then
+  if(buoyancy) then
     call Grad_Mod_For_Phi(grid, t % n, 1, t_x, .true.)  ! dT/dx
     call Grad_Mod_For_Phi(grid, t % n, 2, t_y, .true.)  ! dT/dy
     call Grad_Mod_For_Phi(grid, t % n, 3, t_z, .true.)  ! dT/dz
@@ -68,7 +68,7 @@
     end do
 
   else if(turbulence_model .eq. DYNAMIC) then
-    if(buoyancy .eq. YES) then  
+    if(buoyancy) then  
       do c = 1, grid % n_cells
         lf = grid % vol(c)**ONE_THIRD  
         vis_t(c) = density            &
@@ -77,7 +77,7 @@
                 * shear(c) 
       end do
     else
-      ! lf IS NOT INITIALIZED HERE
+      ! lf is not initialized here
       do c = 1, grid % n_cells
         vis_t(c) = density                &
                 * (lf*lf)                 &          ! delta^2 
@@ -97,7 +97,7 @@
     end do
   end if
 
-  if(buoyancy .eq. YES) then
+  if(buoyancy) then
     do c = 1, grid % n_cells
       nc2 = -(  grav_x * t_x(c)   &
               + grav_y * t_y(c)   &

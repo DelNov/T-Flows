@@ -31,7 +31,7 @@
 !   Wall shear s. tau_wall [kg/(m*s^2)]| Dyn visc.       viscosity [kg/(m*s)]  !
 !   Density       density  [kg/m^3]    | Turb. kin en.   kin % n   [m^2/s^2]   !
 !   Cell volume   vol      [m^3]       | Length          lf        [m]         !
-!   left hand s.  A        [kg/s]      | right hand s.   b         [kg*m^2/s^3]!
+!   left hand s.  a        [kg/s]      | right hand s.   b         [kg*m^2/s^3]!
 !------------------------------------------------------------------------------!
 !   p_kin = 2*vis_t / density S_ij S_ij                                        !
 !   shear = sqrt(2 S_ij S_ij)                                                  !
@@ -74,7 +74,7 @@
           end if
 
           ! Compute nondimensional wall distance and wall-shear stress
-          if(rough_walls .eq. NO) then
+          if(.not. rough_walls) then
             y_plus(c1) = c_mu25 * kin_sq(c1) * grid % wall_dist(c1)  &
                     / kin_vis
             tau_wall(c1) = abs(c_mu25*kappa*density* kin_sq(c1) * u_tan  &
@@ -84,7 +84,7 @@
             p_kin(c1) = c_mu25*tau_wall(c1)/density * kin_sq(c1)  &
                       / (kappa*grid % wall_dist(c1))
 
-          else if(rough_walls .eq. YES) then
+          else if(rough_walls) then
             y_plus(c1) = c_mu25*kin_sq(c1) * (grid % wall_dist(c1)+Zo)  &
              / kin_vis
             tau_wall(c1) = abs(c_mu25*kappa*density * kin_sq(c1) * u_tan  &

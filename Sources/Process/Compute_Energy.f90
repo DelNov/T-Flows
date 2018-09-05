@@ -43,7 +43,6 @@
   real              :: con_eff1, f_ex1, f_im1, phix_f1, phiy_f1, phiz_f1
   real              :: con_eff2, f_ex2, f_im2, phix_f2, phiy_f2, phiz_f2
   real              :: phis, pr_t1, pr_t2
-  character(len=80) :: coupling      ! pressure-momentum coupling
   character(len=80) :: precond       ! preconditioner
   integer           :: adv_scheme    ! space-discretiztion of advection scheme)
   real              :: blend         ! blending coeff (1.0 central; 0.0 upwind)
@@ -184,7 +183,7 @@
     end if
 
     ! Store upwinded part of the advection term in "c"
-    if(coupling .ne. 'PROJECTION') then
+    if(pressure_momentum_coupling .ne. PROJECTION) then
       if(flux(s).lt.0) then   ! from c2 to c1
         phi % c(c1) = phi % c(c1)-flux(s)*phi % n(c2) * capacity
         if(c2.gt.0) then
@@ -367,11 +366,11 @@
         end if
       end if
 
-      if(coupling .ne. 'PROJECTION') then
+      if(pressure_momentum_coupling .ne. PROJECTION) then
         a12 = a12  - min(flux(s), 0.0) * capacity
         a21 = a21  + max(flux(s), 0.0) * capacity
       end if
-                
+
       ! Fill the system matrix
       if(c2.gt.0) then
         a % val(a % dia(c1))  = a % val(a % dia(c1)) + a12
@@ -570,11 +569,11 @@
   !---------------------------------!
 
   ! Type of coupling is important
-  call Control_Mod_Pressure_Momentum_Coupling(coupling)
+  call Control_Mod_Pressure_Momentum_Coupling()
 
   ! Set under-relaxation factor
   urf = 1.0
-  if(coupling .eq. 'SIMPLE')   &
+  if(pressure_momentum_coupling .eq. SIMPLE)   &
     call Control_Mod_Simple_Underrelaxation_For_Energy(urf)
 
   do c = 1, grid % n_cells
@@ -590,8 +589,8 @@
   call Control_Mod_Preconditioner_For_System_Matrix(precond)
 
   ! Set number of iterations based on coupling scheme
-  if(coupling .eq. 'PROJECTION') niter = 10
-  if(coupling .eq. 'SIMPLE')     niter =  5
+  if(pressure_momentum_coupling .eq. PROJECTION) niter = 10
+  if(pressure_momentum_coupling .eq. SIMPLE)     niter =  5
 
   ! Over-ride if specified in control file
   call Control_Mod_Max_Iterations_For_Energy_Solver(niter)

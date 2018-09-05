@@ -22,16 +22,15 @@
   type(Var_Type) :: t
 
   ! Pressure 
-  type(Var_Type) :: p  
+  type(Var_Type) :: p
   type(Var_Type) :: pp
 
   ! Mass fluxes throught cell faces
-  real, allocatable :: flux(:) 
+  real, allocatable :: flux(:)
 
   ! Variables determining if we are dealing with heat transfer and buoyancy
-  ! (both can be either YES or NO)
-  integer :: heat_transfer
-  integer :: buoyancy
+  logical :: heat_transfer
+  logical :: buoyancy
 
   ! Geometrical staff 
   real,allocatable :: f_coef(:)  ! face coefficient

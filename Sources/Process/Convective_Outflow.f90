@@ -48,7 +48,7 @@
     end if
   end do
 
-  if(heat_transfer .eq. YES) then
+  if(heat_transfer) then
     call Grad_Mod_For_Phi(grid, t % n, 1, t_x, .true.)     ! dT/dx
     call Grad_Mod_For_Phi(grid, t % n, 2, t_y, .true.)     ! dT/dy
     call Grad_Mod_For_Phi(grid, t % n, 3, t_z, .true.)     ! dT/dz

@@ -51,7 +51,6 @@
   real              :: ini_res, tol
   real              :: vis_eff, vis_tS
   real              :: ui_i_f,ui_j_f,ui_k_f,uj_i_f,uk_i_f
-  character(len=80) :: coupling
   character(len=80) :: precond
   integer           :: adv_scheme    ! space disretization of advection (scheme)
   real              :: blend         ! blending coeff (1.0 central; 0.0 upwind)
@@ -220,7 +219,7 @@
     end if
 
     ! Store upwinded part of the advection term in "c"
-    if(coupling .ne. 'PROJECTION') then
+    if(pressure_momentum_coupling .ne. PROJECTION) then
       if(flux(s)  < 0) then   ! from c2 to c1
         ui % c(c1) = ui % c(c1) - flux(s)*ui % n(c2)
         if(c2  > 0) then
@@ -287,7 +286,7 @@
     end if
 
     if(turbulence_model .eq. K_EPS_ZETA_F .and.  &
-       turbulence_statistics .eq. YES) then
+       turbulence_statistics) then
       vis_eff = fw(s)*vis_t_eff(c1)+(1.0-fw(s))*vis_t_eff(c2) + viscosity
     end if
 
@@ -395,7 +394,7 @@
         a21 = a0
       end if
 
-      if(coupling .ne. 'PROJECTION') then
+      if(pressure_momentum_coupling .ne. PROJECTION) then
         a12 = a12  - min(flux(s), real(0.0))
         a21 = a21  + max(flux(s), real(0.0))
       end if
@@ -598,11 +597,11 @@
   !-----------------------------------!
 
   ! Type of coupling is important
-  call Control_Mod_Pressure_Momentum_Coupling(coupling)
+  call Control_Mod_Pressure_Momentum_Coupling()
 
   ! Set under-relaxation factor
   urf = 1.0
-  if(coupling .eq. 'SIMPLE')  &
+  if(pressure_momentum_coupling .eq. SIMPLE)  &
     call Control_Mod_simple_Underrelaxation_For_Momentum(urf)
 
   do c = 1, grid % n_cells
@@ -618,8 +617,8 @@
   call Control_Mod_Preconditioner_For_System_Matrix(precond)
 
   ! Set number of solver iterations on coupling method
-  if(coupling .eq. 'PROJECTION') niter = 10
-  if(coupling .eq. 'SIMPLE')     niter =  5
+  if(pressure_momentum_coupling .eq. PROJECTION) niter = 10
+  if(pressure_momentum_coupling .eq. SIMPLE)     niter =  5
 
   ! Over-ride if specified in control file
   call Control_Mod_Max_Iterations_For_Momentum_Solver(niter)

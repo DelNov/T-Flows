@@ -19,7 +19,7 @@
   integer :: c, n
 !==============================================================================!
 
-  if(turbulence_statistics .eq. NO) return
+  if(.not. turbulence_statistics) return
 
   n = n1 - n0
 
@@ -72,7 +72,7 @@
       !   Reynolds stress models   !
       !----------------------------!
       if(turbulence_model .eq. HANJALIC_JAKIRLIC .or.  &
-         turbulence_model .eq. REYNOLDS_STRESS) then           
+         turbulence_model .eq. REYNOLDS_STRESS) then
         uu  % mean(c) = (uu  % mean(c) * (1.*n) + uu  % n(c)) / (1.*(n+1))
         vv  % mean(c) = (vv  % mean(c) * (1.*n) + vv  % n(c)) / (1.*(n+1))
         ww  % mean(c) = (ww  % mean(c) * (1.*n) + ww  % n(c)) / (1.*(n+1))
@@ -89,8 +89,8 @@
       !---------------------------------!
       !   Temperature and heat fluxes   !
       !---------------------------------!
-      if(heat_transfer .eq. YES) then
-        t  % mean(c) = (t % mean(c) * (1.*n) + t % n(c) ) / (1.*(n+1))
+      if(heat_transfer) then
+        t  % mean(c) = (t % mean(c) *(1.*n) + t % n(c) ) / (1.*(n+1))
         tt % mean(c) = (tt % mean(c)*(1.*n) + t % n(c) * t % n(c) ) / (1.*(n+1))
         ut % mean(c) = (ut % mean(c)*(1.*n) + u % n(c) * t % n(c) ) / (1.*(n+1))
         vt % mean(c) = (vt % mean(c)*(1.*n) + v % n(c) * t % n(c) ) / (1.*(n+1))

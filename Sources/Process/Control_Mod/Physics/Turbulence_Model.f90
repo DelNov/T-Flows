@@ -4,7 +4,6 @@
 !   Reading turbulence model from the control file.                            !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod,      only: YES
   use Turbulence_Mod, only: turbulence_model,          &
                             turbulence_statistics,     &
                             NONE,                      &
@@ -37,25 +36,25 @@
 
     case('NONE')
       turbulence_model = NONE
-    case('K_EPS')                 
+    case('K_EPS')
       turbulence_model = K_EPS
-    case('K_EPS_ZETA_F')          
+    case('K_EPS_ZETA_F')
       turbulence_model = K_EPS_ZETA_F
-    case('SMAGORINSKY')   
+    case('SMAGORINSKY')
       turbulence_model = SMAGORINSKY
-    case('DYNAMIC')                   
+    case('DYNAMIC')
       turbulence_model = DYNAMIC
-    case('WALE')                   
+    case('WALE')
       turbulence_model = WALE
-    case('DNS')                   
+    case('DNS')
       turbulence_model = DNS
-    case('DES_SPALART')           
+    case('DES_SPALART')
       turbulence_model = DES_SPALART
-    case('SPALART_ALLMARAS')     
+    case('SPALART_ALLMARAS')
       turbulence_model = SPALART_ALLMARAS
-    case('HANJALIC_JAKIRLIC')     
+    case('HANJALIC_JAKIRLIC')
       turbulence_model = HANJALIC_JAKIRLIC
-    case('REYNOLDS_STRESS') 
+    case('REYNOLDS_STRESS')
       turbulence_model = REYNOLDS_STRESS
 
     case default
@@ -77,7 +76,7 @@
     print *, '# Scale resolving simulation used; ' // &
              'turbulence statistics engaged!'
 
-    turbulence_statistics = YES
-  end if 
+    turbulence_statistics = .true.
+  end if
 
   end subroutine

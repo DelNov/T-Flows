@@ -49,7 +49,7 @@
   call Name_File(this_proc, name_out, ext)
   open(9,file=name_out)
   do c = 1, grid % n_cells
-    write(9,'(7E18.8)') U % n(c), U % o(c), U % a(c), U % a_o(c),  &
+    write(9,'(7e18.8)') U % n(c), U % o(c), U % a(c), U % a_o(c),  &
                         U % d_o(c), U % c(c), U % c_o(c)
   end do    ! through centers 
   close(9)
@@ -58,7 +58,7 @@
   call Name_File(this_proc, name_out, ext)
   open(9,file=name_out)
   do c = 1, grid % n_cells
-    write(9,'(7E18.8)') V % n(c), V % o(c), V % a(c), V % a_o(c),  &
+    write(9,'(7e18.8)') V % n(c), V % o(c), V % a(c), V % a_o(c),  &
                         V % d_o(c), V % c(c), V % c_o(c)
   end do    ! through centers 
   close(9)
@@ -67,7 +67,7 @@
   call Name_File(this_proc, name_out, ext)
   open(9,file=name_out)
   do c = 1, grid % n_cells
-    write(9,'(7E18.8)') W % n(c), W % o(c), W % a(c), W % a_o(c),  &
+    write(9,'(7e18.8)') W % n(c), W % o(c), W % a(c), W % a_o(c),  &
                         W % d_o(c), W % c(c), W % c_o(c)
   end do    ! through centers 
   close(9)
@@ -80,12 +80,12 @@
   end do    ! through centers 
   close(9)
  
-  if(heat_transfer .eq. YES) then 
+  if(heat_transfer) then 
     ext(2:4) = t % name
     call Name_File(this_proc, name_out, ext)
     open(9,file=name_out)
     do c = 1, grid % n_cells
-      write(9,'(7E18.8)') T % n(c), T % o(c), T % a(c), T % a_o(c),  &
+      write(9,'(7e18.8)') T % n(c), T % o(c), T % a(c), T % a_o(c),  &
                           T % d_o(c), T % c(c), T % c_o(c)
     end do    ! through centers 
     close(9)
@@ -96,7 +96,7 @@
     call Name_File(this_proc, name_out, ext)
     open(9,file=name_out)
     do c = 1, grid % n_cells
-      write(9,'(7E18.8)') kin % n(c), kin % o(c), kin % a(c), kin % a_o(c),  &
+      write(9,'(7e18.8)') kin % n(c), kin % o(c), kin % a(c), kin % a_o(c),  &
                           kin % d_o(c), kin % c(c), kin % c_o(c)
     end do    ! through centers 
     close(9)
@@ -105,7 +105,7 @@
     call Name_File(this_proc, name_out, ext)
     open(9,file=name_out)
     do c = 1, grid % n_cells
-      write(9,'(7E18.8)') eps % n(c), eps % o(c), eps % a(c), eps % a_o(c),  &
+      write(9,'(7e18.8)') eps % n(c), eps % o(c), eps % a(c), eps % a_o(c),  &
                           eps % d_o(c), eps % c(c), eps % c_o(c)
     end do    ! through centers 
     close(9)
@@ -114,7 +114,7 @@
     call Name_File(this_proc, name_out, ext)
     open(9,file=name_out)
     do c = 1, grid % n_cells
-      write(9,'(7E18.8)') zeta % n(c), zeta % o(c), zeta % a(c), zeta % a_o(c),  &
+      write(9,'(7e18.8)') zeta % n(c), zeta % o(c), zeta % a(c), zeta % a_o(c),  &
                           zeta % d_o(c), zeta % c(c), zeta % c_o(c)
     end do    ! through centers 
     close(9)
@@ -123,7 +123,7 @@
     call Name_File(this_proc, name_out, ext)
     open(9,file=name_out)
     do c = 1, grid % n_cells
-      write(9,'(7E18.8)') f22 % n(c), f22 % o(c),  &
+      write(9,'(7e18.8)') f22 % n(c), f22 % o(c),  &
                           f22 % d_o(c), f22 % c(c), f22 % c_o(c)
     end do    ! through centers 
     close(9)
@@ -134,7 +134,7 @@
     call Name_File(this_proc, name_out, ext)
     open(9,file=name_out)
     do c = 1, grid % n_cells
-      write(9,'(7E18.8)') kin % n(c), kin % o(c), kin % a(c), kin % a_o(c),  &
+      write(9,'(7e18.8)') kin % n(c), kin % o(c), kin % a(c), kin % a_o(c),  &
                           kin % d_o(c), kin % c(c), kin % c_o(c)
     end do    ! through centers 
     close(9)
@@ -143,7 +143,7 @@
     call Name_File(this_proc, name_out, ext)
     open(9,file=name_out)
     do c = 1, grid % n_cells
-      write(9,'(7E18.8)') eps % n(c), eps % o(c), eps % a(c), eps % a_o(c),  &
+      write(9,'(7e18.8)') eps % n(c), eps % o(c), eps % a(c), eps % a_o(c),  &
                           eps % d_o(c), eps % c(c), eps % c_o(c)
     end do    ! through centers 
     close(9)
