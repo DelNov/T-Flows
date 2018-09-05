@@ -168,6 +168,7 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90 \
 $(DIR_SHARED)/Cgns_Mod_Void.f90 \
 $(DIR_SHARED)/Cgns_Mod_Seq.f90 \
 $(DIR_SHARED)/Cgns_Mod_Par.f90 \
+$(DIR_SHARED)/Cgns_Mod/Merge_Nodes_Stuff.tgz \
 $(DIR_SHARED)/Cgns_Mod/*.f90 \
 $(DIR_SHARED)/Cgns_Mod/*/*.f90 
 
@@ -196,7 +197,6 @@ $(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
-#-- ./Approx.f90
 #-- ./Tet_Volume.f90
 #-- ./To_Upper_Case.f90
 #-- ./Sort_Mod.f90
@@ -217,6 +217,7 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90 \
 $(DIR_SHARED)/Cgns_Mod_Void.f90 \
 $(DIR_SHARED)/Cgns_Mod_Seq.f90 \
 $(DIR_SHARED)/Cgns_Mod_Par.f90 \
+$(DIR_SHARED)/Cgns_Mod/Merge_Nodes_Stuff.tgz \
 $(DIR_SHARED)/Cgns_Mod/*.f90 \
 $(DIR_SHARED)/Cgns_Mod/*/*.f90 
 
@@ -224,7 +225,8 @@ $(DIR_SHARED)/Cgns_Mod/*/*.f90
 $(DIR_OBJECT)/Probe_1d_Cells.o:\
 $(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o 
 
 #-- ./Probe_1d_Cells_Nodes.f90
 $(DIR_OBJECT)/Probe_1d_Cells_Nodes.o:\
@@ -322,26 +324,6 @@ $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
 
-#-- ./Cgns_Mod/Merge_Nodes_Stuff/Merge_Nodes_Old.f90
-$(DIR_OBJECT)/Merge_Nodes_Old.o:\
-$(DIR_OBJECT)/Sort_Mod.o \
-$(DIR_SHARED)/Sort_Mod/*.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#-- ./Cgns_Mod/Merge_Nodes_Stuff/Merge_Nodes.f90
-$(DIR_OBJECT)/Merge_Nodes.o:\
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#-- ./Cgns_Mod/Merge_Nodes_Stuff/Merge_Nodes_New.f90
-$(DIR_OBJECT)/Merge_Nodes_New.o:\
-$(DIR_OBJECT)/Sort_Mod.o \
-$(DIR_SHARED)/Sort_Mod/*.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
-
 #-- ./Cgns_Mod/Read_Block_Type.f90
 #-- ./Cgns_Mod/Write_Link_To_Mesh_In_File.f90
 $(DIR_OBJECT)/Write_Link_To_Mesh_In_File.o:\
@@ -423,6 +405,7 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90 \
 $(DIR_SHARED)/Cgns_Mod_Void.f90 \
 $(DIR_SHARED)/Cgns_Mod_Seq.f90 \
 $(DIR_SHARED)/Cgns_Mod_Par.f90 \
+$(DIR_SHARED)/Cgns_Mod/Merge_Nodes_Stuff.tgz \
 $(DIR_SHARED)/Cgns_Mod/*.f90 \
 $(DIR_SHARED)/Cgns_Mod/*/*.f90 
 
@@ -595,6 +578,7 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 
 #-- ./Const_Mod.f90
 #-- ./Swap_Real.f90
+#-- ./Approx_String.f90
 #-- ./To_Lower_Case.f90
 #-- ./Grid_Mod/Sort_Faces_By_Index.f90
 #-- ./Grid_Mod/Estimate_Big_And_Small.f90
@@ -646,6 +630,7 @@ $(DIR_OBJECT)/Save_Cgns_Cells_Void.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
+#-- ./Approx_Real.f90
 #-- ./Div_Mod.f90
 #-- ./Material_Mod.f90
 #-- ./Save_Vtu_Links.f90

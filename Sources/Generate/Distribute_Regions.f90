@@ -13,8 +13,6 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Domain_Type) :: dom
   type(Grid_Type)   :: grid
-!---------------------------------[Interface]----------------------------------!
-  include "../Shared/Approx.int"
 !-----------------------------------[Locals]-----------------------------------!
   integer :: b, i, j, k, n, c, r
   integer :: n_mat, n_bnd         ! number of materials and boundary conditions
