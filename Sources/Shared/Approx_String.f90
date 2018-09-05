@@ -52,7 +52,7 @@
     end do
   end do
 
-  if( d(m,n) <= tolerance ) then
+  if( d(m,n) > 0 .and. d(m,n) <= tolerance ) then
     Approx_String = .true.
   else
     Approx_String = .false.
