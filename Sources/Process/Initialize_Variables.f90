@@ -20,7 +20,7 @@
 !----------------------------------[Calling]-----------------------------------!
   integer :: Key_Ind
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: i, c, c1, c2, m, s, n, found, nks, nvs
+  integer           :: i, c, c1, c2, m, s, n, nks, nvs
   integer           :: n_wall, n_inflow, n_outflow, n_symmetry, n_heated_wall, &
                        n_convect
   character(len=80) :: keys(128)
@@ -30,6 +30,7 @@
 
   integer           :: n_points, k
   real, allocatable :: prof(:,:), x(:), y(:), z(:), dist(:)
+  logical           :: found
 
   ! Default values for initial conditions
   real, parameter   :: u_def   = 0.0,  v_def   = 0.0,  w_def    = 0.0
@@ -53,7 +54,7 @@
   !   Found the section with initial conditions   !
   !                                               !
   !-----------------------------------------------!
-  if (found .eq. YES) then
+  if (found) then
 
     call Control_Mod_Read_Strings_On('VARIABLES', keys, nks, .true.)
 

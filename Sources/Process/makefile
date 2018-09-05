@@ -226,7 +226,8 @@ SRC_FUN += $(shell ls -1 $(DIR_MODELS)/*.f90 | xargs -n1 basename | grep -v -i _
 SRC_FUN += Distance.f90		\
            Load_Geo.f90		\
            Name_File.f90	\
-           Approx.f90		\
+           Approx_Real.f90	\
+           Approx_String.f90	\
            Swap_Int.f90		\
            Swap_Real.f90	\
            To_Upper_Case.f90

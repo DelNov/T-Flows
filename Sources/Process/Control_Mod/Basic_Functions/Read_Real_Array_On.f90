@@ -22,21 +22,33 @@
   ! Set default values
   values = 0.0
 
-  ! Read one line only to see if you get expected output
+  !---------------------------------------------------------!
+  !   Read one line from command file to find the keyword   !
+  !---------------------------------------------------------!
   call Tokenizer_Mod_Read_Line(CONTROL_FILE_UNIT, reached_end)
   if(reached_end) goto 1
+
+  ! Found the correct keyword
   if(line % tokens(1) .eq. trim(keyword)) then
 
     do i=2, line % n_tokens
       read(line % tokens(i), *) values(i-1)
     end do
     n = line % n_tokens - 1
-    return 
+    return
+
+  ! Keyword not found, try to see if there is similar, maybe it was a typo
+  else
+    call Control_Mod_Similar_Warning( keyword, trim(line % tokens(1)) )
   end if
 
+  !--------------------------------------------!
+  !   Keyword was not found; issue a warning   !
+  !--------------------------------------------!
 1 if(present(verbose)) then
      if(verbose .and. this_proc < 2) then
-      print '(a,a,a)', ' # Could not find the keyword: ', keyword, '.'
+      print '(2a)', ' # NOTE! Could not find the keyword: ',  &
+                      trim(keyword)
     end if
   end if
   n = 0

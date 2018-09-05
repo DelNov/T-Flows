@@ -21,7 +21,7 @@
   real    :: Distance
   integer :: Key_Ind
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: c, m, l, k, i, n, n_points, nks, nvs, found, us
+  integer           :: c, m, l, k, i, n, n_points, nks, nvs, us
   character(len=80) :: name_prof(128), answer, name_in
   real              :: wi, dist_min, x, y, z, xp, dist
   real, allocatable :: prof(:,:)
@@ -34,6 +34,7 @@
   character(len=80) :: types_names(128)      ! name of each type
   logical           :: types_file(128)       ! type specified in a file?
   integer           :: c_types               ! counter types
+  logical           :: found
 !==============================================================================!
 
   !-----------------------------------------!
@@ -65,7 +66,7 @@
                                           grid % bnd_cond % name(n),  &
                                           found,                      &
                                           .false.)
-    if(found .eq. YES) then
+    if(found) then
 1     continue
 
       ! Try to read next 'TYPE' in the control file

@@ -11,7 +11,7 @@
 !---------------------------------[Arguments]----------------------------------!
   character(len=*)  :: keyword_1
   character(len=*)  :: keyword_2
-  integer           :: found
+  logical           :: found
   logical, optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   logical :: reached_end
@@ -19,8 +19,10 @@
 
   rewind(CONTROL_FILE_UNIT)
 
-  ! Browse through command file to find two keywords in one file
-  found = NO
+  !------------------------------------------------------------------!
+  !   Browse through command file to find two keywords in one file   !
+  !------------------------------------------------------------------!
+  found = .false.
   do
     call Tokenizer_Mod_Read_Line(CONTROL_FILE_UNIT, reached_end)
     if(reached_end) goto 1
@@ -31,9 +33,10 @@
     ! ... second is boundary condition name
     if(line % tokens(1) .eq. trim(keyword_1) .and.  &
        line % tokens(2) .eq. trim(keyword_2)) then
-      found = YES
-      return 
+      found = .true.
+      return
 
+    ! Keywords not found, try to see if there is similar, maybe there was a typo
     else
       call Control_Mod_Similar_Warning(trim(keyword_1),         &
                                        trim(line % tokens(1)))
@@ -43,10 +46,13 @@
     end if
   end do
 
-1 if(found .eq. NO) then
+  !--------------------------------------------!
+  !   Keyword was not found; issue a warning   !
+  !--------------------------------------------!
+1 if(.not. found) then
     if(present(verbose)) then
       if(verbose) then
-        print '(5a)', ' # Could not find the line with keywords: ',  &
+        print '(5a)', ' # NOTE! Could not find the line with keywords: ',  &
                       keyword_1, ', ', trim(keyword_2), '!'
       end if
     end if

@@ -6,10 +6,12 @@
   implicit none
 !==============================================================================!
 
-  character(len=80), parameter  :: CONTROL_FILE_NAME = 'control'
-  integer, parameter            :: CONTROL_FILE_UNIT = 10
-  ! This include file will define  ALL_CONTROL_KEYWORDS
-  include 'Control_Mod/All_Keywords.f90'
+  character(len=80), parameter :: CONTROL_FILE_NAME = 'control'
+  integer, parameter           :: CONTROL_FILE_UNIT = 10
+
+  ! Number of presumably misstyped keywords followed by their list
+  integer           :: n_similar =  0
+  character(len=40) :: similar(128)
 
   contains
 
@@ -19,6 +21,8 @@
 
     ! Basic functionality
     include 'Control_Mod/Basic_Functions/Open_File.f90'
+    include 'Control_Mod/Basic_Functions/Position_At_One_Key.f90'
+    include 'Control_Mod/Basic_Functions/Position_At_Two_Keys.f90'
     include 'Control_Mod/Basic_Functions/Read_Char_Item.f90'
     include 'Control_Mod/Basic_Functions/Read_Char_Item_On.f90'
     include 'Control_Mod/Basic_Functions/Read_Strings_On.f90'
@@ -26,8 +30,7 @@
     include 'Control_Mod/Basic_Functions/Read_Real_Item.f90'
     include 'Control_Mod/Basic_Functions/Read_Real_Array.f90'
     include 'Control_Mod/Basic_Functions/Read_Real_Array_On.f90'
-    include 'Control_Mod/Basic_Functions/Position_At_One_Key.f90'
-    include 'Control_Mod/Basic_Functions/Position_At_Two_Keys.f90'
+    include 'Control_Mod/Basic_Functions/Similar_Warning.f90'
     include 'Control_Mod/Basic_Functions/Write_File.f90'
 
     ! Load

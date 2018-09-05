@@ -150,6 +150,8 @@ $(DIR_OBJECT)/Turbulence_Mod.o \
 $(DIR_OBJECT)/Tokenizer_Mod.o \
 $(DIR_SHARED)/Tokenizer_Mod/*.f90 \
 $(DIR_OBJECT)/Numerics_Mod.o \
+$(DIR_OBJECT)/Monitor_Mod.o \
+Monitor_Mod/*.f90 \
 $(DIR_OBJECT)/Flow_Mod.o \
 Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
@@ -171,33 +173,6 @@ $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Flow_Mod.o \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Compute_Temperature.f90
-$(DIR_OBJECT)/Compute_Temperature.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 \
-$(DIR_OBJECT)/Var_Mod.o \
-Var_Mod/*.f90 \
-User_Mod_Vtu.f90 \
-User_Mod/*.f90 \
-User_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Solvers_Mod.o \
-Solvers_Mod/*.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Numerics_Mod.o \
-$(DIR_OBJECT)/Info_Mod.o \
-Info_Mod/*.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Grad_Mod.o \
-Grad_Mod/*.f90 \
-$(DIR_OBJECT)/Flow_Mod.o \
-$(DIR_OBJECT)/Control_Mod.o \
-Control_Mod/*/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -228,6 +203,33 @@ $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
 
 #-- ./Key_Ind.f90
+#-- ./Compute_Energy.f90
+$(DIR_OBJECT)/Compute_Energy.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*.f90 \
+$(DIR_OBJECT)/Var_Mod.o \
+Var_Mod/*.f90 \
+User_Mod_Vtu.f90 \
+User_Mod/*.f90 \
+User_Mod_Cgns.f90 \
+$(DIR_OBJECT)/Solvers_Mod.o \
+Solvers_Mod/*.f90 \
+$(DIR_OBJECT)/Rans_Mod.o \
+$(DIR_OBJECT)/Numerics_Mod.o \
+$(DIR_OBJECT)/Info_Mod.o \
+Info_Mod/*.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Grad_Mod.o \
+Grad_Mod/*.f90 \
+$(DIR_OBJECT)/Flow_Mod.o \
+$(DIR_OBJECT)/Control_Mod.o \
+Control_Mod/*/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o \
+$(DIR_SHARED)/Comm_Mod_Seq.f90 \
+$(DIR_SHARED)/Comm_Mod_Par.f90 \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 
+
 #-- ./Compute_Pressure_Simple.f90
 $(DIR_OBJECT)/Compute_Pressure_Simple.o:\
 User_Mod_Vtu.f90 \
@@ -614,6 +616,7 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90 \
 $(DIR_SHARED)/Cgns_Mod_Void.f90 \
 $(DIR_SHARED)/Cgns_Mod_Seq.f90 \
 $(DIR_SHARED)/Cgns_Mod_Par.f90 \
+$(DIR_SHARED)/Cgns_Mod/Merge_Nodes_Stuff.tgz \
 $(DIR_SHARED)/Cgns_Mod/*.f90 \
 $(DIR_SHARED)/Cgns_Mod/*/*.f90 
 
@@ -687,6 +690,7 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90 \
 $(DIR_SHARED)/Cgns_Mod_Void.f90 \
 $(DIR_SHARED)/Cgns_Mod_Seq.f90 \
 $(DIR_SHARED)/Cgns_Mod_Par.f90 \
+$(DIR_SHARED)/Cgns_Mod/Merge_Nodes_Stuff.tgz \
 $(DIR_SHARED)/Cgns_Mod/*.f90 \
 $(DIR_SHARED)/Cgns_Mod/*/*.f90 
 
@@ -869,6 +873,7 @@ $(DIR_OBJECT)/Bulk_Mod.o \
 Bulk_Mod/*.f90 
 
 #-- ./Control_Mod/Numerics/Pressure_Momentum_Coupling.f90
+#-- ./Control_Mod/Numerics/Blending_Coefficient_For_Turbulence.f90
 #-- ./Control_Mod/Numerics/Max_Simple_Iterations.f90
 #-- ./Control_Mod/Numerics/Min_Simple_Iterations.f90
 #-- ./Control_Mod/Numerics/Time_Integration_For_Advection.f90
@@ -881,13 +886,18 @@ $(DIR_OBJECT)/Numerics_Mod.o
 
 #-- ./Control_Mod/Numerics/Tolerance_For_Momentum_Solver.f90
 #-- ./Control_Mod/Numerics/Solver_For_Energy.f90
-#-- ./Control_Mod/Numerics/Blending_Coefficient_Energy.f90
+#-- ./Control_Mod/Numerics/Normalization_For_Turbulence_Solver.f90
+#-- ./Control_Mod/Numerics/Normalization_For_Momentum_Solver.f90
 #-- ./Control_Mod/Numerics/Solver_For_Momentum.f90
+#-- ./Control_Mod/Numerics/Normalization_For_Energy_Solver.f90
+#-- ./Control_Mod/Numerics/Normalization_For_Pressure_Solver.f90
 #-- ./Control_Mod/Numerics/Number_Of_Time_Steps.f90
+#-- ./Control_Mod/Numerics/Normalization_For_Simple_Algorithm.f90
 #-- ./Control_Mod/Numerics/Time_Integration_For_Inertia.f90
 $(DIR_OBJECT)/Time_Integration_For_Inertia.o:\
 $(DIR_OBJECT)/Numerics_Mod.o 
 
+#-- ./Control_Mod/Numerics/Blending_Coefficient_For_Momentum.f90
 #-- ./Control_Mod/Numerics/Simple_Underrelaxation_For_Energy.f90
 #-- ./Control_Mod/Numerics/Tolerance_For_Simple_Algorithm.f90
 #-- ./Control_Mod/Numerics/Tolerance_For_Energy_Solver.f90
@@ -898,10 +908,9 @@ $(DIR_OBJECT)/Numerics_Mod.o
 #-- ./Control_Mod/Numerics/Tolerance_For_Turbulence_Solver.f90
 #-- ./Control_Mod/Numerics/Simple_Underrelaxation_For_Turbulence.f90
 #-- ./Control_Mod/Numerics/Time_Step.f90
-#-- ./Control_Mod/Numerics/Blending_Coefficient_Turbulence.f90
+#-- ./Control_Mod/Numerics/Blending_Coefficient_For_Energy.f90
 #-- ./Control_Mod/Numerics/Max_Iterations_For_Energy_Solver.f90
 #-- ./Control_Mod/Numerics/Preconditioner_For_System_Matrix.f90
-#-- ./Control_Mod/Numerics/Blending_Coefficient_Momentum.f90
 #-- ./Control_Mod/Numerics/Solver_For_Pressure.f90
 #-- ./Control_Mod/Numerics/Max_Iterations_For_Turbulence_Solver.f90
 #-- ./Control_Mod/Numerics/Time_Integration_For_Cross_Diffusion.f90
@@ -971,8 +980,18 @@ $(DIR_OBJECT)/Flow_Mod.o \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #-- ./Control_Mod/Physics/Gravitational_Vector.f90
+#-- ./Control_Mod/User/Max_Iterations_For_User_Scalars_Solver.f90
 #-- ./Control_Mod/User/Number_Of_User_Arrays.f90
+#-- ./Control_Mod/User/Solver_For_User_Scalars.f90
 #-- ./Control_Mod/User/Number_Of_User_Scalars.f90
+#-- ./Control_Mod/User/Tolerance_For_User_Scalars_Solver.f90
+#-- ./Control_Mod/User/Simple_Underrelaxation_For_User_Scalars.f90
+#-- ./Control_Mod/User/Advection_Scheme_For_User_Scalars.f90
+$(DIR_OBJECT)/Advection_Scheme_For_User_Scalars.o:\
+$(DIR_OBJECT)/Numerics_Mod.o 
+
+#-- ./Control_Mod/User/Blending_Coefficient_For_User_Scalars.f90
+#-- ./Control_Mod/User/Normalization_For_User_Scalars_Solver.f90
 #-- ./Control_Mod/Basic_Functions/Read_Strings_On.f90
 $(DIR_OBJECT)/Read_Strings_On.o:\
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
@@ -989,6 +1008,12 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 #-- ./Control_Mod/Basic_Functions/Position_At_Two_Keys.f90
 $(DIR_OBJECT)/Position_At_Two_Keys.o:\
 $(DIR_OBJECT)/Const_Mod.o 
+
+#-- ./Control_Mod/Basic_Functions/Similar_Warning.f90
+$(DIR_OBJECT)/Similar_Warning.o:\
+$(DIR_SHARED)/Comm_Mod_Seq.f90 \
+$(DIR_SHARED)/Comm_Mod_Par.f90 \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 
 
 #-- ./Control_Mod/Basic_Functions/Read_Real_Item.f90
 $(DIR_OBJECT)/Read_Real_Item.o:\
@@ -1022,9 +1047,6 @@ $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
 
 #-- ./Control_Mod/Basic_Functions/Position_At_One_Key.f90
-$(DIR_OBJECT)/Position_At_One_Key.o:\
-$(DIR_OBJECT)/Const_Mod.o 
-
 #-- ./Control_Mod/Input_Output/Save_Backup_Name.f90
 #-- ./Control_Mod/Input_Output/Backup_Save_Interval.f90
 #-- ./Control_Mod/Input_Output/Load_Backup_Name.f90
@@ -1033,7 +1055,9 @@ $(DIR_OBJECT)/Const_Mod.o
 #-- ./Control_Mod/Input_Output/Results_Save_Interval.f90
 #-- ./Control_Mod/Input_Output/Load_Initial_Solution_Name.f90
 #-- ./Control_Mod/Input_Output/Monitoring_Points.f90
-$(DIR_OBJECT)/Monitoring_Points.o:
+$(DIR_OBJECT)/Monitoring_Points.o:\
+$(DIR_OBJECT)/Monitor_Mod.o \
+Monitor_Mod/*.f90 
 
 #-- ./Numerics_Mod.f90
 #-- ./Load_Cns.f90
@@ -1185,6 +1209,7 @@ $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_SHARED)/Cgns_Mod_Void.f90 \
 $(DIR_SHARED)/Cgns_Mod_Seq.f90 \
 $(DIR_SHARED)/Cgns_Mod_Par.f90 \
+$(DIR_SHARED)/Cgns_Mod/Merge_Nodes_Stuff.tgz \
 $(DIR_SHARED)/Cgns_Mod/*.f90 \
 $(DIR_SHARED)/Cgns_Mod/*/*.f90 
 
@@ -1724,6 +1749,7 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90 \
 $(DIR_SHARED)/Cgns_Mod_Void.f90 \
 $(DIR_SHARED)/Cgns_Mod_Seq.f90 \
 $(DIR_SHARED)/Cgns_Mod_Par.f90 \
+$(DIR_SHARED)/Cgns_Mod/Merge_Nodes_Stuff.tgz \
 $(DIR_SHARED)/Cgns_Mod/*.f90 \
 $(DIR_SHARED)/Cgns_Mod/*/*.f90 
 
@@ -1752,7 +1778,6 @@ $(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
-#-- ./Approx.f90
 #-- ./Tet_Volume.f90
 #-- ./To_Upper_Case.f90
 #-- ./Sort_Mod.f90
@@ -1773,6 +1798,7 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90 \
 $(DIR_SHARED)/Cgns_Mod_Void.f90 \
 $(DIR_SHARED)/Cgns_Mod_Seq.f90 \
 $(DIR_SHARED)/Cgns_Mod_Par.f90 \
+$(DIR_SHARED)/Cgns_Mod/Merge_Nodes_Stuff.tgz \
 $(DIR_SHARED)/Cgns_Mod/*.f90 \
 $(DIR_SHARED)/Cgns_Mod/*/*.f90 
 
@@ -1780,7 +1806,8 @@ $(DIR_SHARED)/Cgns_Mod/*/*.f90
 $(DIR_OBJECT)/Probe_1d_Cells.o:\
 $(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o 
 
 #-- ./Probe_1d_Cells_Nodes.f90
 $(DIR_OBJECT)/Probe_1d_Cells_Nodes.o:\
@@ -1878,26 +1905,6 @@ $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
 
-#-- ./Cgns_Mod/Merge_Nodes_Stuff/Merge_Nodes_Old.f90
-$(DIR_OBJECT)/Merge_Nodes_Old.o:\
-$(DIR_OBJECT)/Sort_Mod.o \
-$(DIR_SHARED)/Sort_Mod/*.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#-- ./Cgns_Mod/Merge_Nodes_Stuff/Merge_Nodes.f90
-$(DIR_OBJECT)/Merge_Nodes.o:\
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#-- ./Cgns_Mod/Merge_Nodes_Stuff/Merge_Nodes_New.f90
-$(DIR_OBJECT)/Merge_Nodes_New.o:\
-$(DIR_OBJECT)/Sort_Mod.o \
-$(DIR_SHARED)/Sort_Mod/*.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
-
 #-- ./Cgns_Mod/Read_Block_Type.f90
 #-- ./Cgns_Mod/Write_Link_To_Mesh_In_File.f90
 $(DIR_OBJECT)/Write_Link_To_Mesh_In_File.o:\
@@ -1979,6 +1986,7 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90 \
 $(DIR_SHARED)/Cgns_Mod_Void.f90 \
 $(DIR_SHARED)/Cgns_Mod_Seq.f90 \
 $(DIR_SHARED)/Cgns_Mod_Par.f90 \
+$(DIR_SHARED)/Cgns_Mod/Merge_Nodes_Stuff.tgz \
 $(DIR_SHARED)/Cgns_Mod/*.f90 \
 $(DIR_SHARED)/Cgns_Mod/*/*.f90 
 
@@ -2151,6 +2159,7 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 
 #-- ./Const_Mod.f90
 #-- ./Swap_Real.f90
+#-- ./Approx_String.f90
 #-- ./To_Lower_Case.f90
 #-- ./Grid_Mod/Sort_Faces_By_Index.f90
 #-- ./Grid_Mod/Estimate_Big_And_Small.f90
@@ -2202,6 +2211,7 @@ $(DIR_OBJECT)/Save_Cgns_Cells_Void.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
+#-- ./Approx_Real.f90
 #-- ./Div_Mod.f90
 #-- ./Material_Mod.f90
 #-- ./Save_Vtu_Links.f90
