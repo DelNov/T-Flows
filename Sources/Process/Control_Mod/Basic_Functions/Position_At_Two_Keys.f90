@@ -27,10 +27,19 @@
 
     call To_Upper_Case(line % tokens(2))
 
+    ! First keyword is "BOUNDARY_CONDITION", ...
+    ! ... second is boundary condition name
     if(line % tokens(1) .eq. trim(keyword_1) .and.  &
        line % tokens(2) .eq. trim(keyword_2)) then
       found = YES
       return 
+
+    else
+      call Control_Mod_Similar_Warning(trim(keyword_1),         &
+                                       trim(line % tokens(1)))
+      call Control_Mod_Similar_Warning(trim(keyword_2),         &
+                                       trim(line % tokens(2)),  &
+                                       key_type='boundary condition')
     end if
   end do
 
