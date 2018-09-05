@@ -27,12 +27,16 @@
   do
     call Tokenizer_Mod_Read_Line(CONTROL_FILE_UNIT, reached_end)
     if(reached_end) goto 1
+
     if(line % tokens(1) .eq. trim(keyword)) then
       read(line % tokens(2), *) val
-      return 
+      return
+    else
+      call Control_Mod_Similar_Warning( keyword, trim(line % tokens(1)) )
     end if
   end do
 
+  ! Item has not been found, print a warning message
 1 if(present(verbose)) then
     if(verbose .and. this_proc < 2) then
       print '(a,a,a)', ' # Could not find the keyword: ', keyword, '.'
