@@ -20,8 +20,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !------------------------------------------------------------------------------!
-  include "../Shared/Approx.int"
-  include "Cell_Numbering_Neu.f90"
+  include 'Cell_Numbering_Neu.f90'
 !-----------------------------------[Locals]-----------------------------------!
   integer             :: c, c1, c2, n1, n2, n3, f_nod(4), n_f_nod
   integer             :: n_match, j, match_nodes(-1:8) 

@@ -138,7 +138,7 @@ SRC_MOD = Const_Mod.f90			\
 #---------------
 
 # Sources for all shared functions
-SRC_FUN = Approx.f90			\
+SRC_FUN = Approx_Real.f90		\
           Distance.f90			\
           Distance_Squared.f90		\
           Name_File.f90			\

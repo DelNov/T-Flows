@@ -13,7 +13,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !------------------------------------------------------------------------------!
-  include "../Shared/Approx.int"
+  include '../Shared/Approx_Real.int'
 !----------------------------------[Calling]-----------------------------------!
   real :: Distance
   real :: Distance_Squared
@@ -24,7 +24,7 @@
   integer              :: rot_dir, n_wall_colors
   real                 :: xt(4), yt(4), zt(4), angle_face, tol
   real                 :: xs2, ys2, zs2, x_a, y_a, z_a, x_b, y_b, z_b
-  real                 :: x_c, y_c, z_c, Det
+  real                 :: x_c, y_c, z_c, det
   real                 :: ab_i, ab_j, ab_k, ac_i, ac_j, ac_k, p_i, p_j, p_k
   real                 :: dsc1, dsc2, per_min, per_max
   real                 :: t, sur_tot, angle
@@ -261,11 +261,11 @@
     c2 = grid % faces_c(2,s)
 
     if(c2 < 0) then
-      if( Approx(grid % dx(c1), 0.0, SMALL) )  &
+      if( Approx_Real(grid % dx(c1), 0.0, small) )  &
         grid % xc(c1) = 0.75*grid % xc(c1) + 0.25*grid % xc(c2)
-      if( Approx(grid % dy(c1), 0.0, SMALL) )  &
+      if( Approx_Real(grid % dy(c1), 0.0, small) )  &
         grid % yc(c1) = 0.75*grid % yc(c1) + 0.25*grid % yc(c2)
-      if( Approx(grid % dz(c1), 0.0, SMALL) )  &
+      if( Approx_Real(grid % dz(c1), 0.0, small) )  &
         grid % zc(c1) = 0.75*grid % zc(c1) + 0.25*grid % zc(c2)
     end if
   end do ! through sides
@@ -403,7 +403,7 @@
       c2 = grid % faces_c(2,s)
       if(c2 < 0) then
         if(grid % bnd_cond % color(c2) .eq. color_per) then
-          if( Approx(angle, 0.0, SMALL) ) then
+          if( Approx_Real(angle, 0.0, small) ) then
             xspr(s) = grid % xf(s)
             yspr(s) = grid % yf(s)
             zspr(s) = grid % zf(s)
@@ -475,7 +475,7 @@
         end if
       end if
     end do
-    tol = SMALL
+    tol = small
 
 3   continue
 
@@ -491,12 +491,12 @@
       c2 = grid % faces_c(2,s)
       if(c2 < 0) then
         if(grid % bnd_cond % color(c2) .eq. color_per) then
-          Det = (  p_i*(grid % xf(s))  &
+          det = (  p_i*(grid % xf(s))  &
                  + p_j*(grid % yf(s))  &
                  + p_k*(grid % zf(s)))  &
               / sqrt(p_i*p_i + p_j*p_j + p_k*p_k)
-          per_min = min(per_min, Det)
-          per_max = max(per_max, Det)
+          per_min = min(per_min, det)
+          per_max = max(per_max, det)
         end if
       end if
     end do
@@ -508,13 +508,13 @@
       if(c2 < 0) then
         if(grid % bnd_cond % color(c2) .eq. color_per) then
           cnt_per = cnt_per + 1
-          Det = (  p_i*(grid % xf(s))   &
+          det = (  p_i*(grid % xf(s))   &
                  + p_j*(grid % yf(s))   &
                  + p_k*(grid % zf(s)))  &
               / sqrt(p_i*p_i + p_j*p_j + p_k*p_k)
 
           if(dir .eq. 1) then
-            if((Det) < (per_max)) then
+            if((det) < (per_max)) then
               hh = hh + 1
               b_coor(hh) = hh
               b_face(hh) = s
@@ -522,11 +522,11 @@
                 cc2 = grid % faces_c(2,ss)
                 if(cc2 < 0) then
                   if(grid % bnd_cond % color(cc2) .eq. color_per) then
-                    Det = (  p_i * (grid % xf(ss))   &
+                    det = (  p_i * (grid % xf(ss))   &
                            + p_j * (grid % yf(ss))   &
                            + p_k * (grid % zf(ss)))  &
                         / sqrt(p_i*p_i + p_j*p_j + p_k*p_k)
-                    if((Det) > (per_max)) then
+                    if((det) > (per_max)) then
                       if((abs(grid % zf(ss)  - grid % zf(s))) < tol .and.   &
                          (abs(yspr(ss) - yspr(s))) < tol) then
                          mm = hh + c_max/2
@@ -542,7 +542,7 @@
           end if
 
           if(dir .eq. 2) then
-            if((Det) < (per_max)) then
+            if((det) < (per_max)) then
               hh = hh + 1
               b_coor(hh) = hh
               b_face(hh) = s
@@ -551,12 +551,12 @@
                 if(cc2 < 0) then
                   if(grid % bnd_cond % color(cc2) .eq. color_per) then
 
-                    Det = (  p_i * (grid % xf(ss))  &
+                    det = (  p_i * (grid % xf(ss))  &
                            + p_j * (grid % yf(ss))  &
                            + p_k * (grid % zf(ss))) &
                         / sqrt(p_i*p_i + p_j*p_j + p_k*p_k)
 
-                    if((Det) > (per_max)) then
+                    if((det) > (per_max)) then
                       if(abs((grid % zf(ss)  - grid % zf(s))) < tol .and.  &
                          abs((xspr(ss) - xspr(s))) < tol) then
                         mm = hh + c_max/2
@@ -573,7 +573,7 @@
           end if
 
           if(dir .eq. 3) then
-            if((Det) < (per_max)) then
+            if((det) < (per_max)) then
               hh = hh + 1
               b_coor(hh) = hh
               b_face(hh) = s
@@ -581,11 +581,11 @@
                 cc2 = grid % faces_c(2,ss)
                 if(cc2 < 0) then
                   if(grid % bnd_cond % color(cc2) .eq. color_per) then
-                    Det = (  p_i*(grid % xf(ss))   &
+                    det = (  p_i*(grid % xf(ss))   &
                            + p_j*(grid % yf(ss))   &
                            + p_k*(grid % zf(ss)))  &
                         / sqrt(p_i*p_i + p_j*p_j + p_k*p_k)
-                    if((Det) > (per_max)) then
+                    if((det) > (per_max)) then
                       print *, '# Warning!  Potentially a bug in ...'
                       print *, '# ... Compute_Geometry, line 580'
                       print *, '# Contact developers, and if you ... '
