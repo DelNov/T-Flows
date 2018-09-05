@@ -1,5 +1,5 @@
 !==============================================================================!
-  logical function Approx(a, b, tol)
+  logical function Approx_Real(a, b, tol)
 !------------------------------------------------------------------------------!
 !   Returns .true. if a is approximatelly equal to "b", .false. otherwise.     !
 !                                                                              !
@@ -20,10 +20,10 @@
     tolerance = tol
   end if
 
-  if( (a < (b + tolerance)) .and. (a > (b - tolerance)) ) then
-    approx = .true.
+  if( abs(a - b) <= tolerance ) then
+    Approx_Real = .true.
   else
-    approx = .false.
+    Approx_Real = .false.
   end if
 
-  end function Approx
+  end function
