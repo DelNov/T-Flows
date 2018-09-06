@@ -17,7 +17,6 @@
   integer, parameter :: WALLFL   = 10067
   integer, parameter :: PRESSURE = 10069
   integer, parameter :: PERIODIC = 10079
-  integer, parameter :: BUFFER   = 10091
 
   !-------------------!
   !   Bnd_Cond type   !

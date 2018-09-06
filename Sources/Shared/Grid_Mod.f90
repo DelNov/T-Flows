@@ -49,8 +49,10 @@
   !---------------!
   type Comm_Type    ! only used inside the Grid_Type) 
 
+    integer :: n_buff_cells
+
     ! Processor i.d. defined for each cell
-    integer, allocatable :: proces(:)  
+    integer, allocatable :: proces(:)
 
     ! These names are ugly but mean number of buffer boundaries start and end
     integer, allocatable :: nbb_s(:), nbb_e(:)
@@ -79,7 +81,6 @@
     integer :: n_faces      ! ... faces
     integer :: n_bnd_cells  ! ... boundary cells
     integer :: n_per_faces  ! ... periodic faces (shadows)
-    integer :: n_materials  ! ... materials
     integer :: n_bnd_cond   ! ... boundary conditions
     integer :: n_copy       ! ... copy cells and faces
     integer :: n_levels     ! ... multigrid levels
@@ -113,9 +114,6 @@
     ! For each cell; type of the boundary condition in a given direction
     integer, allocatable :: cells_bnd_color(:,:)
 
-    ! Material for each cell 
-    integer, allocatable :: material(:)
-
     ! Coarser levels for the grid
     type(Coarser_Grid_Type) :: level(0:MAX_MG_LEV)
 
@@ -148,8 +146,8 @@
     ! Node coordinates
     real, allocatable :: xn(:), yn(:), zn(:)
 
-    type(Material_Type), allocatable :: materials(:)
-    type(Bnd_Cond_Type)              :: bnd_cond
+    type(Material_Type) :: material
+    type(Bnd_Cond_Type) :: bnd_cond
 
     !  Maximum number of cells, boundary cells and faces
     ! (Used for tentative memory allocation in Generator)

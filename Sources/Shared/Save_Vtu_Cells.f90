@@ -142,16 +142,6 @@
   !---------------!
   write(9,'(a,a)') IN_3, '<CellData Scalars="scalars" vectors="velocity">'
 
-  ! Materials
-  write(9,'(a,a)') IN_4, '<DataArray type="Int64" ' //  &
-                         'Name="Materials" format="ascii">'
-  do c = 1, grid % n_cells
-    if(new_c(c) .ne. 0) then
-      write(9,'(a,i9)') IN_5, grid % material(c)
-    end if
-  end do
-  write(9,'(a,a)') IN_4, '</DataArray>'
-
   ! Processor i.d.
   write(9,'(a,a)') IN_4, '<DataArray type="Int64" ' //  &
                          'Name="Processor" format="ascii">'

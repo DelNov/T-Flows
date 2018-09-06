@@ -26,39 +26,34 @@
 
   ! Number of cells, boundary cells and sides
   read(9) grid % n_nodes
-  read(9) grid % n_cells
-  read(9) grid % n_bnd_cells
-  read(9) grid % n_faces
+  read(9) grid % n_cells              ! number of cells including buffer
+  read(9) grid % n_bnd_cells          ! number of boundary cells
+  read(9) grid % n_faces              ! number of faces (with buffer faces)
+  read(9) grid % comm % n_buff_cells  ! number of buffer faces/cells
+  read(9) grid % n_bnd_cond           ! number of boundary conditions
 
   ! Allocate memory =--> carefull, there is no checking!
   call Grid_Mod_Allocate_Nodes(grid, grid % n_nodes)
   call Grid_Mod_Allocate_Cells(grid, grid % n_cells, grid % n_bnd_cells) 
   call Grid_Mod_Allocate_Faces(grid, grid % n_faces) 
 
-  ! Number of materials and boundary conditions
-  read(9) grid % n_materials
-  read(9) grid % n_bnd_cond
-
-  allocate(grid % materials(grid % n_materials))
+  ! Boundary conditions' keys
   allocate(grid % bnd_cond % name(grid % n_bnd_cond))
-
-  ! Materials' and boundary conditions' keys
-  do n = 1, grid % n_materials
-    read(9) grid % materials(n) % name
-  end do
+  allocate(grid % bnd_cond % type(grid % n_bnd_cond))
+  read(9) grid % material % name
   do n = 1, grid % n_bnd_cond
     read(9) grid % bnd_cond % name(n)
   end do
 
-  ! Cells 
+  ! Cells
   read(9) (grid % cells_n_nodes(c), c = 1, grid % n_cells)
   read(9) ((grid % cells_n(n,c),              &
             n = 1, grid % cells_n_nodes(c)),  &
             c = 1, grid % n_cells)
 
-  ! Cells' materials
-  read(9) (grid % material(c), c =  1, grid % n_cells)
-  read(9) (grid % material(c), c = -1,-grid % n_bnd_cells,-1)
+  ! Cells' processor ids
+  read(9) (grid % comm % proces(c), c =  1, grid % n_cells)
+  read(9) (grid % comm % proces(c), c = -1,-grid % n_bnd_cells,-1)
 
   ! Faces
   read(9) (grid % faces_n_nodes(s), s = 1, grid % n_faces)
@@ -75,7 +70,7 @@
   ! Boundary copy cells
   allocate (grid % bnd_cond % copy_c(-grid % n_bnd_cells:-1))
   read(9) (grid % bnd_cond % copy_c(c), c = -1,-grid % n_bnd_cells, -1)
- 
+
   read(9) grid % n_copy
   print *, '# Number of copy cells/faces: ', grid % n_copy
   allocate (grid % bnd_cond % copy_s(2,grid % n_copy))

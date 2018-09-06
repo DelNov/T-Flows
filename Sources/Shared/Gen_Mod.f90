@@ -23,7 +23,7 @@
   integer, parameter   :: RECTANGLE = 4
   integer, parameter   :: PLANE     = 5
   integer              :: n_refine_levels
-  integer, allocatable :: level(:)                ! refinement level
+  integer, allocatable :: ref_level(:)            ! refinement level
   integer, allocatable :: n_refined_regions(:)    ! number of refin. regions
   real,    allocatable :: refined_regions(:,:,:)  ! levels, regions
   logical, allocatable :: cell_marked(:)          ! true if cell markered 
