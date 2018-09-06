@@ -25,8 +25,7 @@
   real              :: smdpn
   real              :: px_f, py_f, pz_f
   character(len=80) :: precond
-  real              :: urf           ! under-relaxation factor                 
-  real              :: min_b, max_b
+  real              :: urf           ! under-relaxation factor
   real              :: p_max, p_min, p_nor
 !==============================================================================!
 !     
@@ -85,8 +84,7 @@
     fs = grid % f(s)
 
     ! Face is inside the domain
-    if(c2  > 0 .or.  &
-       c2  < 0 .and. Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER) then
+    if(c2 > 0) then
 
       smdpn = (  grid % sx(s)*grid % sx(s)   &
                + grid % sy(s)*grid % sy(s)   &
@@ -101,20 +99,20 @@
       w_f = fs * w % n(c1) + (1.0-fs) * w % n(c2)
 
       ! Calculate coeficients for the system matrix
-      if(c2  > 0) then 
+      if(c2 > 0) then
         a12 = 0.5 * density * smdpn *            &
            (  grid % vol(c1) / a % sav(c1)       &
             + grid % vol(c2) / a % sav(c2) )
-        a % val(a % pos(1,s))  = -a12
-        a % val(a % pos(2,s))  = -a12
-        a % val(a % dia(c1)) = a % val(a % dia(c1)) +  a12
-        a % val(a % dia(c2)) = a % val(a % dia(c2)) +  a12
-      else 
+        a % val(a % pos(1,s)) = -a12
+        a % val(a % pos(2,s)) = -a12
+        a % val(a % dia(c1))  = a % val(a % dia(c1)) +  a12
+        a % val(a % dia(c2))  = a % val(a % dia(c2)) +  a12
+      else  ! I am somewhat surprised this part is here
         a12 = 0.5 * density * smdpn *            &
              (  grid % vol(c1) / a % sav(c1)     &
               + grid % vol(c2) / a % sav(c2) )
-        a % bou(c2)  = -a12
-        a % val(a % dia(c1)) = a % val(a % dia(c1)) +  a12
+        a % val(a % pos(1,s)) = -a12
+        a % val(a % dia(c1))  = a % val(a % dia(c1)) +  a12
       end if 
 
       ! Interpolate pressure gradients

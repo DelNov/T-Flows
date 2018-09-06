@@ -64,8 +64,7 @@
     fs = grid % f(s)
 
     ! Face is inside the domain
-    if( c2 > 0 .or.  &
-        c2 < 0 .and. Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER) then 
+    if( c2 > 0) then
 
       ! Extract the "centred" pressure terms from cell velocities
       u_f = fs*      (u % n(c1) + p % x(c1)*grid % vol(c1)/a % sav(c1))       &
@@ -95,14 +94,14 @@
                        + grid % sz(s) * grid % sz(s))
       a12 = a12 * (fs/a % sav(c1) + (1.-fs)/a % sav(c2))
 
-      if(c2  > 0) then 
+      if(c2 > 0) then 
         a % val(a % pos(1,s)) = -a12
         a % val(a % pos(2,s)) = -a12
         a % val(a % dia(c1))  = a % val(a % dia(c1)) +  a12
         a % val(a % dia(c2))  = a % val(a % dia(c2)) +  a12
-      else
-        a % bou(c2) = -a12
-        a % val(a % dia(c1)) = a % val(a % dia(c1)) +  a12
+      else  ! I am somewhat surprised this part is here
+        a % val(a % pos(1,s)) = -a12
+        a % val(a % dia(c1))  = a % val(a % dia(c1)) +  a12
       end if
 
       b(c1)=b(c1)-flux(s)
@@ -152,7 +151,14 @@
   ! Over-ride if specified in control file
   call Control_Mod_Max_Iterations_For_Pressure_Solver(niter)
 
-  call Cg(a, pp % n, b, precond, niter, tol, ini_res, pp % res)
+  call Cg(a,        &
+          pp % n,   &
+          b,        &
+          precond,  &
+          niter,    &
+          tol,      &
+          ini_res,  &
+          pp % res)
 
   call Info_Mod_Iter_Fill_At(1, 3, pp % name, niter, pp % res)   
 
@@ -161,7 +167,7 @@
   !-------------------------------!
   urf = 1.0
 
-  p % n(:)  =  p % n(:)   +  urf  *  pp % n(:) 
+  p % n(:)  =  p % n(:)   +  urf  *  pp % n(:)
 
   !----------------------------------!
   !   Normalize the pressure field   !
