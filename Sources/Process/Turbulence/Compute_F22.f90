@@ -180,7 +180,6 @@
           !---------------------------------------------------------------!
         end if
       end if
-     end if
     end if
 
   end do  ! through faces
