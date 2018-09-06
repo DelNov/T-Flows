@@ -93,13 +93,6 @@
 
   b(:) = 0.0
 
-  ! This is important for "copy" boundary conditions. Find out why !
-  ! (I just coppied this from NewUVW.f90. I don't have a clue if it
-  ! is of any importance at all. Anyway, I presume it can do no harm.)
-  do c = -grid % n_bnd_cells,-1
-    a % bou(c)=0.0
-  end do
-
   !-------------------------------------! 
   !   Initialize variables and fluxes   !
   !-------------------------------------! 
@@ -176,14 +169,14 @@
         phi % a_o(c2) = phi % a_o(c2)+flux(s)*phis*capacity
       else
         phi % a_o(c1) = phi % a_o(c1)-flux(s)*phis*capacity
-      endif
+      end if
     end if
     if(c2.gt.0) then
       phi % a(c1) = phi % a(c1)-flux(s)*phis*capacity
       phi % a(c2) = phi % a(c2)+flux(s)*phis*capacity
     else
       phi % a(c1) = phi % a(c1)-flux(s)*phis*capacity
-    endif
+    end if
 
     ! Store upwinded part of the advection term in "c"
     if(pressure_momentum_coupling .ne. PROJECTION) then
@@ -191,12 +184,12 @@
         phi % c(c1) = phi % c(c1)-flux(s)*phi % n(c2) * capacity
         if(c2.gt.0) then
           phi % c(c2) = phi % c(c2)+flux(s)*phi % n(c2) * capacity
-        endif
+        end if
       else
         phi % c(c1) = phi % c(c1)-flux(s)*phi % n(c1) * capacity
         if(c2.gt.0) then
           phi % c(c2) = phi % c(c2)+flux(s)*phi % n(c1) * capacity
-        endif
+        end if
       end if
     end if  
 
@@ -214,14 +207,14 @@
     do c = 1, grid % n_cells
       b(c) = b(c) + 1.5*phi % a_o(c) - 0.5*phi % a_oo(c) - phi % c(c)
     end do
-  endif
+  end if
 
   ! Crank-Nicholson scheeme for advection fluxes
   if(td_advection .eq. CRANK_NICOLSON) then
     do c = 1, grid % n_cells
       b(c) = b(c) + 0.5 * (phi % a(c) + phi % a_o(c)) - phi % c(c)
     end do
-  endif
+  end if
 
   ! Fully implicit treatment of advection fluxes
   if(td_advection .eq. FULLY_IMPLICIT) then
@@ -261,8 +254,7 @@
     end if
 
     ! Gradients on the cell face 
-    if(c2 > 0 .or.  &
-       c2 < 0 .and. Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER) then
+    if(c2 > 0) then
       phix_f1 = fw(s)*phi_x(c1) + (1.0-fw(s))*phi_x(c2) 
       phiy_f1 = fw(s)*phi_y(c1) + (1.0-fw(s))*phi_y(c2)
       phiz_f1 = fw(s)*phi_z(c1) + (1.0-fw(s))*phi_z(c2)
@@ -281,12 +273,12 @@
       phiz_f2 = phiz_f1 
       con_eff1 = conductivity + capacity * vis_t(c1) / pr_t   
       con_eff2 = con_eff1 
-    endif
+    end if
 
 
     if(turbulence_model .eq. K_EPS .or.  &
        turbulence_model .eq. K_EPS_ZETA_F) then 
-      if(c2 < 0 .and. Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. BUFFER) then
+      if(c2 < 0) then
         if(Var_Mod_Bnd_Cell_Type(phi,c2) .eq. WALL .or.  &
            Var_Mod_Bnd_Cell_Type(phi,c2) .eq. WALLFL) then
           con_eff1 = con_wall(c1)
@@ -315,7 +307,7 @@
 
     ! Straight diffusion part 
     if(ini .lt. 2) then
-      if(c2 .gt. 0) then
+      if(c2 > 0) then
         phi % d_o(c1) = phi % d_o(c1)  &
                       + con_eff1*f_coef(s)*(phi % n(c2) - phi % n(c1)) 
         phi % d_o(c2) = phi % d_o(c2)  &
@@ -351,15 +343,15 @@
       if(pressure_momentum_coupling .ne. PROJECTION) then
         a12 = a12  - min(flux(s), 0.0) * capacity
         a21 = a21  + max(flux(s), 0.0) * capacity
-      endif
+      end if
 
       ! Fill the system matrix
-      if(c2 .gt. 0) then
+      if(c2 > 0) then
         a % val(a % dia(c1))  = a % val(a % dia(c1)) + a12
         a % val(a % dia(c2))  = a % val(a % dia(c2)) + a21
         a % val(a % pos(1,s)) = a % val(a % pos(1,s)) - a12
         a % val(a % pos(2,s)) = a % val(a % pos(2,s)) - a21
-      else if(c2 .lt. 0) then
+      else if(c2 < 0) then
 
         ! Outflow is included because of the flux 
         ! corrections which also affects velocities
@@ -369,16 +361,10 @@
           a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
           b(c1)  = b(c1)  + a12 * phi % n(c2)
 
-        ! Buffer: System matrix and parts belonging 
-        ! to other subdomains are filled here.
-        else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER) then
-          a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
-          a % bou(c2) = -a12  ! cool parallel stuff
-
         ! In case of wallflux 
         else if(Var_Mod_Bnd_Cell_Type(phi,c2) .eq. WALLFL) then
           b(c1) = b(c1) + grid % s(s) * phi % q(c2)
-        endif 
+        end if 
       end if
 
     end if
@@ -495,8 +481,7 @@
         pr_t2 = Turbulent_Prandtl_Number(grid, c2)
         pr_t  = fw(s) * pr_t1 + (1.0 - fw(s)) * pr_t2
 
-        if(c2 > 0 .or.  &
-           c2 < 0 .and. Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER) then
+        if(c2 > 0) then
           phix_f1 = fw(s)*phi_x(c1) + (1.0-fw(s))*phi_x(c2) 
           phiy_f1 = fw(s)*phi_y(c1) + (1.0-fw(s))*phi_y(c2)
           phiz_f1 = fw(s)*phi_z(c1) + (1.0-fw(s))*phi_z(c2)
@@ -515,7 +500,7 @@
           phiz_f2 = phiz_f1 
           con_eff1 = capacity*vis_t(c1)/pr_t   
           con_eff2 = con_eff1 
-        endif
+        end if
 
         ! Total (exact) diffusive flux
         f_ex1 = con_eff1 * (  phix_f1 * grid % sx(s)  &
