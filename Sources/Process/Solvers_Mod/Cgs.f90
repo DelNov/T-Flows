@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Cgs(mat_a, x, r1, prec, niter, tol, ini_res, fin_res, norm) 
+  subroutine Cgs(mat_a, x, r1, prec, niter, tol, ini_res, fin_res, norm)
 !------------------------------------------------------------------------------!
 !   Solves the linear systems of equations by a precond. CGS Method.           !
 !------------------------------------------------------------------------------!
@@ -40,8 +40,10 @@
   real    :: alfa, beta, rho, rho_old, bnrm2, error
   integer :: i, j, k, iter, sub
 !==============================================================================!
-           
-  n  = mat_a % pnt_grid % n_cells
+
+  error = 0.
+
+  n  = mat_a % pnt_grid % n_cells - mat_a % pnt_grid % comm % n_buff_cells
   nb = mat_a % pnt_grid % n_bnd_cells
 
   !---------------------!
@@ -128,24 +130,14 @@
     !--------------!
     !   v2 = Ap2   !  
     !--------------!
+    call Comm_Mod_Exchange_Real(mat_a % pnt_grid, p2)
     do i=1,n
-      v2(i) = 0.0                    
-      do j=mat_a % row(i), mat_a % row(i+1)-1   
-        k=mat_a % col(j)                  
-        v2(i) = v2(i) + mat_a % val(j) * p2(k)   
+      v2(i) = 0.0
+      do j=mat_a % row(i), mat_a % row(i+1)-1
+        k=mat_a % col(j)
+        v2(i) = v2(i) + mat_a % val(j) * p2(k)
       end do
       alfa=alfa+r2(i)*v2(i)
-    end do
-    call Comm_Mod_Exchange_Real(mat_a % pnt_grid, p2)
-    do sub=1,n_proc
-      if(mat_a % pnt_grid % comm % nbb_e(sub)  <=   &
-         mat_a % pnt_grid % comm % nbb_s(sub)) then
-        do k = mat_a % pnt_grid % comm % nbb_s(sub),  &
-               mat_a % pnt_grid % comm % nbb_e(sub), -1
-          i = mat_a % pnt_grid % comm % buffer_index(k)
-          v2(i) = v2(i) + mat_a % bou(k)*p2(k)
-        end do
-      end if
     end do
 
     !------------------------!
@@ -181,25 +173,15 @@
     end do
 
     !---------------!
-    !   q2 = A p1   !     
+    !   q2 = A p1   !
     !---------------!
+    call Comm_Mod_Exchange_Real(mat_a % pnt_grid, p1)
     do i=1,n
       q2(i) = 0.0
       do j=mat_a % row(i), mat_a % row(i+1)-1
         k=mat_a % col(j)
         q2(i) = q2(i) + mat_a % val(j) * p1(k)
       end do
-    end do
-    call Comm_Mod_Exchange_Real(mat_a % pnt_grid, p1)
-    do sub=1,n_proc
-      if(mat_a % pnt_grid % comm % nbb_e(sub)  <=  &
-         mat_a % pnt_grid % comm % nbb_s(sub)) then
-        do k = mat_a % pnt_grid % comm % nbb_s(sub),  &
-               mat_a % pnt_grid % comm % nbb_e(sub),-1
-          i = mat_a % pnt_grid % comm % buffer_index(k)
-          q2(i) = q2(i) + mat_a % bou(k)*p1(k)
-        end do
-      end if
     end do
 
     !---------------------!

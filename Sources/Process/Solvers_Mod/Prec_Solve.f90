@@ -23,12 +23,11 @@
   real              :: b( a % pnt_grid % n_cells)
   character(len=80) :: prec  ! preconditioner
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: i, j, k, n, nb
+  integer :: i, j, k, n
   real    :: sum1
 !==============================================================================!
            
-  n  = a % pnt_grid % n_cells
-  nb = a % pnt_grid % n_bnd_cells
+  n  = a % pnt_grid % n_cells - a % pnt_grid % comm % n_buff_cells
 
   !---------------------------------! 
   !   1) diagonal preconditioning   !

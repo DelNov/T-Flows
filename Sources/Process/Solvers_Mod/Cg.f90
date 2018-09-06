@@ -36,7 +36,7 @@
 
   error = 0.
 
-  n  = mat_a % pnt_grid % n_cells
+  n  = mat_a % pnt_grid % n_cells - mat_a % pnt_grid % comm % n_buff_cells
   nb = mat_a % pnt_grid % n_bnd_cells
 
   !---------------------!
@@ -122,23 +122,13 @@
     !------------!
     !   q = Ap   !
     !------------!
+    call Comm_Mod_Exchange_Real(mat_a % pnt_grid, p1)
     do i = 1, n
       q1(i) = 0.
       do j = mat_a % row(i), mat_a % row(i+1)-1
         k = mat_a % col(j)
         q1(i) = q1(i) + mat_a % val(j) * p1(k)
       end do
-    end do
-    call Comm_Mod_Exchange_Real(mat_a % pnt_grid, p1)
-    do sub = 1, n_proc
-      if(mat_a % pnt_grid % comm % nbb_e(sub)  <=  &
-         mat_a % pnt_grid % comm % nbb_s(sub)) then
-        do k = mat_a % pnt_grid % comm % nbb_s(sub),  &
-               mat_a % pnt_grid % comm % nbb_e(sub),-1
-          i = mat_a % pnt_grid % comm % buffer_index(k)
-          q1(i) = q1(i) + mat_a % bou(k)*p1(k)
-        end do
-      end if
     end do
 
     !------------------------!

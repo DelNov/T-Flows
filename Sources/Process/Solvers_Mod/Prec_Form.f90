@@ -16,7 +16,7 @@
   integer  :: i, j, k, n
 !==============================================================================!
                  
-  n = a % pnt_grid % n_cells
+  n = a % pnt_grid % n_cells - a % pnt_grid % comm % n_buff_cells
 
   !---------------------------------! 
   !   1) diagonal preconditioning   !

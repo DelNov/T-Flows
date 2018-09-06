@@ -39,7 +39,7 @@
 
   error = 0.
 
-  n  = mat_a % pnt_grid % n_cells
+  n  = mat_a % pnt_grid % n_cells - mat_a % pnt_grid % comm % n_buff_cells
   nb = mat_a % pnt_grid % n_bnd_cells
 
   !---------------------!
@@ -130,6 +130,8 @@
     !   q = A p   !
     !   q~= A p~  !
     !-------------!
+    call Comm_Mod_Exchange_Real(mat_a % pnt_grid, p1)
+    call Comm_Mod_Exchange_Real(mat_a % pnt_grid, p2)
     do i = 1, n
       q1(i) = 0.
       q2(i) = 0.
@@ -138,19 +140,6 @@
         q1(i) = q1(i) + mat_a % val(j) * p1(k)
         q2(i) = q2(i) + mat_a % val(j) * p2(k)
       end do
-    end do
-    call Comm_Mod_Exchange_Real(mat_a % pnt_grid, p1)
-    call Comm_Mod_Exchange_Real(mat_a % pnt_grid, p2)
-    do sub = 1, n_proc
-      if(mat_a % pnt_grid % comm % nbb_e(sub)  <=   &
-         mat_a % pnt_grid % comm % nbb_s(sub)) then
-        do k = mat_a % pnt_grid % comm % nbb_s(sub),  &
-               mat_a % pnt_grid % comm % nbb_e(sub), -1
-          i = mat_a % pnt_grid % comm % buffer_index(k)
-          q1(i) = q1(i) + mat_a % bou(k)*p1(k)
-          q2(i) = q2(i) + mat_a % bou(k)*p2(k)
-        end do
-      end if
     end do
 
     !------------------------!
