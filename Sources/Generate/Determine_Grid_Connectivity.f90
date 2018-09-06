@@ -38,38 +38,26 @@
         ! Remember the boundary color, take positive value for color
         grid % bnd_cond % color(-grid % n_bnd_cells) =  -grid % cells_c(m,c)
 
-        ! Put new boundary cell into place  
+        ! Put new boundary cell into place
         grid % cells_c(m,c)  = -grid % n_bnd_cells
-
-        ! Material color
-        grid % material(-grid % n_bnd_cells) = grid % material(c)
-
-      end if 
+      end if
     end do
-  end do 
+  end do
 
   !---------------------------!
   !   Create the array with   ! 
   !   information on faces    !
   !---------------------------!
   grid % n_faces = 0     ! initialize the number of sides
-  do pass = 1,3
+  do pass = 1, 2
 
     if(pass .eq. 2) first_wall_face = grid % n_faces+1
 
     do c1 = 1, grid % n_cells
       do m = 1, 24 ! through all the neighbouring cells
         c2 = grid % cells_c(m, c1)
-        if( (pass .eq. 1) .and.                             &
-            (c2>c1)     .and.                               &
-            (grid % material(c1) .eq. grid % material(c2))  &
-            .or.                                            &
-            (pass .eq. 2) .and.                             &
-            (c2>c1)     .and.                               &
-            (grid % material(c1) .ne. grid % material(c2))  &
-            .or.                                            &
-            (pass.eq.3) .and.                               &
-            (c2<0) ) then
+        if( (pass .eq. 1) .and. (c2 > c1)  .or.  &
+            (pass .eq. 2) .and. (c2 < 0) ) then
           grid % n_faces = grid % n_faces + 1
 
           ! Which volumes are connected with side grid % n_faces
@@ -91,7 +79,7 @@
 
           ! Nodes of a side grid % n_faces
           if(c2  > 0) then
-            if(level(c2)  > level(c1)) then
+            if(ref_level(c2) > ref_level(c1)) then
               grid % faces_n(1,grid % n_faces) =  &
                 grid % cells_n( lfn(face_c_to_c(grid % n_faces,2),4), c2 )
               grid % faces_n(2,grid % n_faces) =  &

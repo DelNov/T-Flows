@@ -46,7 +46,7 @@
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
-    if(c2 < 0 .or. grid % material(c1) .ne. grid % material(c2)) then 
+    if(c2 < 0) then
       do n = 1, grid % faces_n_nodes(s)  ! for quadrilateral an triangular faces
         walln(grid % faces_n(n,s)) = 0.0
       end do

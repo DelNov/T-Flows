@@ -82,20 +82,13 @@
   face_c_to_c=0 
 
   ! Variables for renumbering
-  allocate (new_n(-grid % max_n_bnd_cells:grid % max_n_nodes))
-  new_n=0
-  allocate (new_c(-grid % max_n_bnd_cells:grid % max_n_nodes))
-  new_c=0
-  allocate (new_f( grid % max_n_faces))
-  new_f=0
-  allocate (cell_marked(-grid % max_n_bnd_cells:grid % max_n_nodes))
-  cell_marked = .false.
-
-  allocate (twin_n(grid % max_n_nodes,0:8))
-  twin_n=0
-
-  allocate (level(grid % max_n_nodes))
-  level=0
+  allocate (new_n(-grid % max_n_bnd_cells:grid % max_n_nodes));  new_n(:) = 0
+  allocate (new_c(-grid % max_n_bnd_cells:grid % max_n_nodes));  new_c(:) = 0
+  allocate (new_f( grid % max_n_faces));                         new_f(:) = 0
+  allocate (cell_marked(-grid % max_n_bnd_cells :  &
+                         grid % max_n_nodes));       cell_marked(:) = .false.
+  allocate (twin_n(grid % max_n_nodes,0:8));  twin_n (:,:) = 0
+  allocate (ref_level(grid % max_n_nodes));   ref_level(:) = 0
 
   print *, '# Allocation successfull !'
 

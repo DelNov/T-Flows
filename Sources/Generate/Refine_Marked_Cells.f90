@@ -18,15 +18,15 @@
   integer :: c, n_cells_old, c1, c2, c3, c4, c5, c6
   integer :: cr1, cr2, cr3, cr4, cr5, cr6, cr7, cr8
   integer :: n, n_nodes_old, n1, n2, n3, n4, n5, n6, n7, n8
-  integer :: n12,n13,n24,n34,n15,n26,n37,n48,n56,n57,n68,n78
+  integer :: n12, n13, n24, n34, n15, n26, n37, n48, n56, n57, n68, n78
   integer :: nf1, nf2, nf3, nf4, nf5, nf6, n0
   integer :: del   ! number of deleted nodes 
   integer :: na, na0, na1, na2, nb, nb0, nb1, nb2
   integer :: nn_2, nn_4, nn_8
-  integer, allocatable :: node_n2(:,:)    
-  integer, allocatable :: node_n4(:,:)  
-  integer, allocatable :: node_n8(:,:)    
-  integer, allocatable :: cell_points_to(:)    
+  integer, allocatable :: node_n2(:,:)
+  integer, allocatable :: node_n4(:,:)
+  integer, allocatable :: node_n8(:,:)
+  integer, allocatable :: cell_points_to(:)
 !==============================================================================!
 !                                                                              !
 !                               c6      c3                                     !
@@ -115,15 +115,6 @@
       cr7 = cell_points_to(c) - 1
       cr8 = cell_points_to(c)
 
-      grid % material(cr1) = grid % material(c) 
-      grid % material(cr2) = grid % material(c) 
-      grid % material(cr3) = grid % material(c) 
-      grid % material(cr4) = grid % material(c) 
-      grid % material(cr5) = grid % material(c) 
-      grid % material(cr6) = grid % material(c) 
-      grid % material(cr7) = grid % material(c) 
-      grid % material(cr8) = grid % material(c) 
-
       !-----------------------------------------------!
       !   Internal links do not depend on neighbors   !
       !-----------------------------------------------!
@@ -167,14 +158,14 @@
       !-------------------------!
       !   Level of refinement   !
       !-------------------------!
-      level(cr1) = lev
-      level(cr2) = lev
-      level(cr3) = lev
-      level(cr4) = lev
-      level(cr5) = lev
-      level(cr6) = lev
-      level(cr7) = lev
-      level(cr8) = lev
+      ref_level(cr1) = lev
+      ref_level(cr2) = lev
+      ref_level(cr3) = lev
+      ref_level(cr4) = lev
+      ref_level(cr5) = lev
+      ref_level(cr6) = lev
+      ref_level(cr7) = lev
+      ref_level(cr8) = lev
 
       !----------------------------------------!         
       !   External links depend on neighbors   !
@@ -189,7 +180,7 @@
         grid % cells_c(1,cr2) = cell_points_to(c1) - 8 + Which_Node(grid, c1,n2)
         grid % cells_c(1,cr3) = cell_points_to(c1) - 8 + Which_Node(grid, c1,n3)
         grid % cells_c(1,cr4) = cell_points_to(c1) - 8 + Which_Node(grid, c1,n4)
-      end if           
+      end if
 
       if(.not. cell_marked(c2)) then  ! neighbor 2 not refined
         grid % cells_c(2,cr1) = c2
@@ -932,8 +923,7 @@
         grid % cells_n( n, new_n(c) ) = grid % cells_n( n, c )
       end do
 
-      grid % material( new_n(c) ) = grid % material( c )  ! -> never checked !
-      level( new_n(c) )    = level( c )                   ! -> never checked !
+      ref_level(new_n(c)) = ref_level(c)  ! -> never checked !
     end if
   end do
 

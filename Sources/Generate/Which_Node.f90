@@ -43,7 +43,7 @@
   print *, '# x, y, z = ', grid % xn(n),  &
                            grid % yn(n),  &
                            grid % zn(n)
-  print *, '# cell    = ', c, level(c)
+  print *, '# cell    = ', c, ref_level(c)
   return
 
 1 Which_Node = i

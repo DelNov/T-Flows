@@ -1,8 +1,7 @@
 !==============================================================================!
   subroutine Distribute_Regions(dom, grid)
 !------------------------------------------------------------------------------!
-!   Distribute regions (which are defined in .dom file) to materials and       !
-!   boundary conditions.                                                       !
+!   Distribute regions (defined in .dom file) to boundary conditions           !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Gen_Mod
@@ -26,20 +25,14 @@
   !        and materials information        !
   !-----------------------------------------!
 
-  ! Initialize all the material markers to 1 
-  do c = 1, grid % n_cells
-    grid % material(c) = 1
-  end do
-
   ! This is too much memory but that's OK 
   !  (+1 is to store the default values)
-  allocate(grid % materials      (dom % n_regions + 1))
   allocate(grid % bnd_cond % name(dom % n_regions + 1))
 
   ! Set the bare bones - one material minimum, and call it "AIR"
   n_bnd = 0
   n_mat = 1
-  grid % materials(n_mat) % name = "AIR"
+  grid % material % name = "AIR"
 
   do n = 1, dom % n_regions
 
@@ -78,7 +71,7 @@
       ks=ck
       face = 6
 
-    ! Boundary conditions (materials) prescribed explicitly
+    ! Boundary conditions  prescribed explicitly
     !  (error prone and difficult, but might be usefull)
     else   
       is = dom % regions(n) % is
@@ -118,34 +111,11 @@
         end do
       end do
 
-     ! Store material
-     else 
-
-      found = .false. 
-      do r=1,n_mat
-        if(grid % materials(r) % name .eq.  &
-           dom % regions(n) % name) found = .true.
-      end do
-      if( .not. found) then
-        n_mat = n_mat + 1
-        grid % materials(n_mat) % name = dom % regions(n) % name
-      end if
-
-      do i=is,ie
-        do j=js,je
-          do k=ks,ke
-            c = dom % blocks(b) % n_cells + (k-1)*ci*cj + (j-1)*ci + i   
-            grid % material(c) = n_mat
-          end do
-        end do
-      end do
-
-    end if 
+    end if
 
   end do  !  n_regions
 
-  ! Store the number of materials and boundary conditions
-  grid % n_materials = n_mat
+  ! Store the number of boundary conditions
   grid % n_bnd_cond  = n_bnd
 
   print *, '#==================================================='
@@ -153,14 +123,6 @@
   print *, '#---------------------------------------------------'
   do n = 1, grid % n_bnd_cond
     print *, '# ', trim(grid % bnd_cond % name(n))
-  end do
-  print *, '#---------------------------------------------------'
-
-  print *, '#==================================================='
-  print *, '# Found following materials:'
-  print *, '#---------------------------------------------------'
-  do n = 1, grid % n_materials
-    print *, '# ', trim(grid % materials(n) % name)
   end do
   print *, '#---------------------------------------------------'
 
