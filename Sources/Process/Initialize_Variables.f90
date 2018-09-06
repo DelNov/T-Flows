@@ -20,7 +20,7 @@
 !----------------------------------[Calling]-----------------------------------!
   integer :: Key_Ind
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: i, c, c1, c2, m, s, n, nks, nvs
+  integer           :: i, c, c1, c2, m, s, nks, nvs
   integer           :: n_wall, n_inflow, n_outflow, n_symmetry, n_heated_wall, &
                        n_convect
   character(len=80) :: keys(128)
@@ -42,7 +42,7 @@
 !==============================================================================!
 
   area  = 0.0
-  if (this_proc < 2) print *, '# grid % n_materials: ', grid % n_materials
+  if (this_proc < 2) print *, '# Grid material: ', grid % material % name
 
   ! Found the line where boundary condition definition is defined
   call Control_Mod_Position_At_One_Key('INITIAL_CONDITION', &
@@ -138,10 +138,10 @@
           end if
 
           if(turbulence_model .eq. K_EPS_ZETA_F) then
-            i=Key_Ind('KIN', keys,nks);prof(k,0)=kin_def; kin%n(c) =prof(k,i)
-            i=Key_Ind('EPS', keys,nks);prof(k,0)=eps_def; eps%n(c) =prof(k,i)
+            i=Key_Ind('KIN', keys,nks);prof(k,0)=kin_def; kin %n(c)=prof(k,i)
+            i=Key_Ind('EPS', keys,nks);prof(k,0)=eps_def; eps %n(c)=prof(k,i)
             i=Key_Ind('ZETA',keys,nks);prof(k,0)=zeta_def;zeta%n(c)=prof(k,i)
-            i=Key_Ind('F22', keys,nks);prof(k,0)=f22_def; f22%n(c) =prof(k,i)
+            i=Key_Ind('F22', keys,nks);prof(k,0)=f22_def; f22 %n(c)=prof(k,i)
           end if
 
           if(turbulence_model .eq. DES_SPALART) then
