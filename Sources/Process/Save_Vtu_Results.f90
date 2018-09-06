@@ -196,17 +196,17 @@
   end if
   write(9,'(a,a)') IN_3, '<CellData Scalars="scalars" vectors="velocity">'
 
-  !---------------!
-  !   Materials   !
-  !---------------!
+  !--------------------!
+  !   Processor i.d.   !
+  !--------------------!
   if(n_proc > 1 .and. this_proc .eq. 1)  then
-    write(8,'(a,a)') IN_3, '<PDataArray type="UInt8" Name="Materials"' //  &
+    write(8,'(a,a)') IN_3, '<PDataArray type="UInt8" Name="Processor"' //  &
                            ' format="ascii"/>'
   end if
-  write(9,'(a,a)') IN_4, '<DataArray type="UInt8" Name="Materials"' //  &
+  write(9,'(a,a)') IN_4, '<DataArray type="UInt8" Name="Processor"' //  &
                          ' format="ascii">'
   do c = 1, grid % n_cells
-    write(9,'(a,i9)') IN_5, grid % material(c)
+    write(9,'(a,i9)') IN_5, grid % comm % proces(c)
   end do
   write(9,'(a,a)') IN_4, '</DataArray>'
 
