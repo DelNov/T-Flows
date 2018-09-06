@@ -32,39 +32,35 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
     if(c2 < 0) then
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. BUFFER) then
-        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. PRESSURE) then  
-          phi(c2) = phi(c1)
-        end if
+      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. PRESSURE) then  
+        phi(c2) = phi(c1)
       end if
-    end if  
+    end if
   end do
 
   call Grad_Mod_For_Phi(grid, phi, 1, phi_x, .true.)  ! dp/dx
   call Grad_Mod_For_Phi(grid, phi, 2, phi_y, .true.)  ! dp/dy
-  call Grad_Mod_For_Phi(grid, phi, 3, phi_z, .true.)  ! dp/dz    
+  call Grad_Mod_For_Phi(grid, phi, 3, phi_z, .true.)  ! dp/dz
 
-  do iter=1,1 
- 
+  do iter=1, 1
+
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
       if(c2 < 0) then
-        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. BUFFER) then
-          if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. PRESSURE) then                  
-            phi(c2) = phi(c1) + 1.2*( phi_x(c1) * (grid % xc(c2)-grid % xc(c1))&
-                              +       phi_y(c1) * (grid % yc(c2)-grid % yc(c1))&
-                              +       phi_z(c1) * (grid % zc(c2)-grid % zc(c1))&
-                              )   
-          end if  
+        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. PRESSURE) then
+          phi(c2) = phi(c1) + 1.2*( phi_x(c1) * (grid % xc(c2)-grid % xc(c1))&
+                            +       phi_y(c1) * (grid % yc(c2)-grid % yc(c1))&
+                            +       phi_z(c1) * (grid % zc(c2)-grid % zc(c1))&
+                            )
         end if
-      end if  
+      end if
     end do
- 
+
     call Grad_Mod_For_Phi(grid, phi, 1, phi_x, .true.)  ! dp/dx
     call Grad_Mod_For_Phi(grid, phi, 2, phi_y, .true.)  ! dp/dy
     call Grad_Mod_For_Phi(grid, phi, 3, phi_z, .true.)  ! dp/dz 
- 
+
   end do
 
   end subroutine

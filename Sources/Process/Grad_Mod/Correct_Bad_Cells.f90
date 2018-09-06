@@ -25,11 +25,10 @@
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
-     
-    if(c2 > 0 .or.  &
-       c2 < 0 .and. Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER) then
-      if(bad_cells(c1)) phii(c1) = phii(c1) + 0.5*phii(c2) 
-      if(bad_cells(c2)) phii(c2) = phii(c2) + 0.5*phii(c1) 
+
+    if(c2 > 0) then
+      if(bad_cells(c1)) phii(c1) = phii(c1) + 0.5*phii(c2)
+      if(bad_cells(c2)) phii(c2) = phii(c2) + 0.5*phii(c1)
     end if
   end do
 

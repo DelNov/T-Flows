@@ -35,6 +35,7 @@
       dz_c2 = grid % dz(s)
       dphi1 = phi(c2)-phi(c1)
       dphi2 = phi(c2)-phi(c1)
+
       if(c2 < 0) then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. SYMMETRY) then
           dphi1 = 0.
@@ -43,9 +44,9 @@
       end if
 
       if(boundary) then
-          phii(c1) = phii(c1) + dphi1*(g(1,c1)*dx_c1  &
-                                     + g(4,c1)*dy_c1  &
-                                     + g(5,c1)*dz_c1) 
+        phii(c1) = phii(c1) + dphi1*(g(1,c1)*dx_c1  &
+                                   + g(4,c1)*dy_c1  &
+                                   + g(5,c1)*dz_c1) 
         if(c2 > 0) then
           phii(c2) = phii(c2) + dphi2*(g(1,c2)*dx_c2  &
                                      + g(4,c2)*dy_c2  &
@@ -53,19 +54,14 @@
         end if
       else
         if(c2 > 0) then
+          phii(c1) = phii(c1) + dphi1*(g(1,c1)*dx_c1  &
+                                     + g(4,c1)*dy_c1  &
+                                     + g(5,c1)*dz_c1) 
           phii(c2) = phii(c2) + dphi2*(g(1,c2)*dx_c2  &
                                      + g(4,c2)*dy_c2  &
                                      + g(5,c2)*dz_c2)
         end if
-        if(c2 < 0) then
-          if (Grid_Mod_Bnd_Cond_Type(grid, c2) .ne. BUFFER) then
-            cycle ! skip current surface
-          end if
-        end if
-          phii(c1) = phii(c1) + dphi1*(g(1,c1)*dx_c1  &
-                                     + g(4,c1)*dy_c1  &
-                                     + g(5,c1)*dz_c1)
-      end if ! boundary
+      end if
     end do
   end if
 
@@ -81,6 +77,7 @@
       dz_c2 = grid % dz(s)
       dphi1 = phi(c2)-phi(c1)
       dphi2 = phi(c2)-phi(c1)
+
       if(c2 < 0) then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. SYMMETRY) then
           dphi1 = 0.
@@ -89,29 +86,24 @@
       end if
 
       if(boundary) then
-          phii(c1) = phii(c1) + dphi1*(g(4,c1)*dx_c1 +  &
-                                       g(2,c1)*dy_c1 +  &
-                                       g(6,c1)*dz_c1)
+        phii(c1) = phii(c1) + dphi1*(g(4,c1)*dx_c1 +  &
+                                     g(2,c1)*dy_c1 +  &
+                                     g(6,c1)*dz_c1)
         if(c2  > 0) then
           phii(c2) = phii(c2) + dphi2*(g(4,c2)*dx_c2 +  &
                                        g(2,c2)*dy_c2 +  &
                                        g(6,c2)*dz_c2)
         end if
       else
-        if(c2 > 0) then
-          phii(c2) = phii(c2) + dphi2*(  g(4,c2)*dx_c2  &
-                                       + g(2,c2)*dy_c2  &
-                                       + g(6,c2)*dz_c2)
+        if(c2  > 0) then
+          phii(c1) = phii(c1) + dphi1*(g(4,c1)*dx_c1 +  &
+                                       g(2,c1)*dy_c1 +  &
+                                       g(6,c1)*dz_c1)
+          phii(c2) = phii(c2) + dphi2*(g(4,c2)*dx_c2 +  &
+                                       g(2,c2)*dy_c2 +  &
+                                       g(6,c2)*dz_c2)
         end if
-        if(c2 < 0) then
-          if (Grid_Mod_Bnd_Cond_Type(grid, c2) .ne. BUFFER) then
-            cycle ! skip current surface
-          end if
-        end if
-          phii(c1) = phii(c1) + dphi1*(  g(4,c1)*dx_c1  &
-                                       + g(2,c1)*dy_c1  &
-                                       + g(6,c1)*dz_c1) 
-      end if ! boundary
+      end if
     end do
   end if
 
@@ -127,6 +119,7 @@
       dz_c2 = grid % dz(s)
       dphi1 = phi(c2)-phi(c1)
       dphi2 = phi(c2)-phi(c1)
+
       if(c2 < 0) then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. SYMMETRY) then
           dphi1 = 0.  
@@ -135,9 +128,9 @@
       end if
 
       if(boundary) then
-          phii(c1) = phii(c1) + dphi1*(g(5,c1)*dx_c1  &
-                                     + g(6,c1)*dy_c1  &
-                                     + g(3,c1)*dz_c1)
+        phii(c1) = phii(c1) + dphi1*(g(5,c1)*dx_c1  &
+                                   + g(6,c1)*dy_c1  &
+                                   + g(3,c1)*dz_c1)
         if(c2 > 0) then
           phii(c2) = phii(c2) + dphi2*(g(5,c2)*dx_c2  &
                                      + g(6,c2)*dy_c2  &
@@ -145,19 +138,14 @@
         end if
       else
         if(c2 > 0) then
-          phii(c2) = phii(c2) + dphi2 * (  g(5,c2)*dx_c2  &
-                                         + g(6,c2)*dy_c2  &
-                                         + g(3,c2)*dz_c2)
+          phii(c1) = phii(c1) + dphi1*(g(5,c1)*dx_c1  &
+                                     + g(6,c1)*dy_c1  &
+                                     + g(3,c1)*dz_c1)
+          phii(c2) = phii(c2) + dphi2*(g(5,c2)*dx_c2  &
+                                     + g(6,c2)*dy_c2  &
+                                     + g(3,c2)*dz_c2)
         end if
-        if(c2 < 0) then
-          if (Grid_Mod_Bnd_Cond_Type(grid, c2) .ne. BUFFER) then
-            cycle ! skip current surface
-          end if
-        end if
-          phii(c1) = phii(c1) + dphi1 * (  g(5,c1)*dx_c1  &
-                                         + g(6,c1)*dy_c1  &
-                                         + g(3,c1)*dz_c1 )
-      end if ! boundary
+      end if
     end do
   end if
 

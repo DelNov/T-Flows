@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Pressure_Matrix_Fractional(grid, dt)
+  subroutine Pressure_Matrix_Projection(grid, dt)
 !------------------------------------------------------------------------------!
 !   Forms the pressure system matrix for the fractional step method.           !
 !------------------------------------------------------------------------------!
@@ -23,27 +23,20 @@
   !-----------------------------!
   !   Calculate system matrix   ! 
   !-----------------------------!
-  do s = 1, grid % n_faces    
+  do s = 1, grid % n_faces
 
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
-    if(c2  > 0) then
-      a12 = dt * f_coef(s) 
+    if(c2 > 0) then
+      a12 = dt * f_coef(s)
       a % val(a % pos(1,s)) = -a12
       a % val(a % pos(2,s)) = -a12
-      a % val(a % dia(c1)) =                                            &
-      a % val(a % dia(c1)) +  a12
-      a % val(a % dia(c2)) =                                            &
-      a % val(a % dia(c2)) +  a12
-    else
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER) then
-        a12 = dt * f_coef(s)
-        a % val(a % dia(c1)) =                                          &
-        a % val(a % dia(c1)) +  a12
-        a % bou(c2) = -a12
-      end if
-    end if 
+      a % val(a % dia(c1))  =              &
+      a % val(a % dia(c1))  +  a12
+      a % val(a % dia(c2))  =              &
+      a % val(a % dia(c2))  +  a12
+    end if
 
   end do ! through faces
 

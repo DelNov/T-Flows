@@ -26,7 +26,7 @@
 !---------------------------------[Calling]------------------------------------!
   real :: Correct_Velocity
 !----------------------------------[Locals]------------------------------------!
-  integer           :: m, n, us
+  integer           :: n, us
   real              :: mass_res, wall_time_start, wall_time_current
   character(len=80) :: name_save
   logical           :: backup, save_now, exit_now
@@ -72,8 +72,7 @@
   call Allocate_Memory(grid)
   call Load_Geo(grid, this_proc)
   call Comm_Mod_Load_Buffers(grid)
-  call Comm_Mod_Set_Buffer_Color(grid)
-  call Comm_Mod_Load_Maps(grid)
+  call Comm_Mod_Load_Maps(grid)     ! Maps should move to .cns file soon
 
   ! This is actually pretty bad - this command should be in Load_Geo
   call Comm_Mod_Exchange_Real(grid, grid % vol(-grid % n_bnd_cells))
@@ -132,7 +131,7 @@
   ! Prepare matrix for fractional step method
   call Control_Mod_Pressure_Momentum_Coupling()
   if(pressure_momentum_coupling .eq. PROJECTION) then
-    call Pressure_Matrix_Fractional(grid, dt)
+    call Pressure_Matrix_Projection(grid, dt)
   end if
 
   ! Print the areas of monitoring planes

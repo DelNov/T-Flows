@@ -45,7 +45,7 @@
       g(4,c1)=g(4,c1) + dx_c1*dy_c1    ! 1,2  &  2,1
       g(5,c1)=g(5,c1) + dx_c1*dz_c1    ! 1,3  &  3,1
       g(6,c1)=g(6,c1) + dy_c1*dz_c1    ! 2,3  &  3,2
-      if(c2  > 0) then  ! this is enough even for parallel
+      if(c2 > 0) then  ! this is enough even for parallel
         g(1,c2)=g(1,c2) + dx_c2*dx_c2  ! 1,1
         g(2,c2)=g(2,c2) + dy_c2*dy_c2  ! 2,2
         g(3,c2)=g(3,c2) + dz_c2*dz_c2  ! 3,3
@@ -56,16 +56,14 @@
 
     ! Without boundary cells => pressure
     else ! Don't use boundary
-      if(c2 > 0 .or.  &
-         c2 < 0 .and. Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER) then  
+      if(c2 > 0) then
         g(1,c1)=g(1,c1) + dx_c1*dx_c1  ! 1,1
         g(2,c1)=g(2,c1) + dy_c1*dy_c1  ! 2,2
         g(3,c1)=g(3,c1) + dz_c1*dz_c1  ! 3,3
         g(4,c1)=g(4,c1) + dx_c1*dy_c1  ! 1,2  &  2,1
         g(5,c1)=g(5,c1) + dx_c1*dz_c1  ! 1,3  &  3,1
         g(6,c1)=g(6,c1) + dy_c1*dz_c1  ! 2,3  &  3,2
-      end if
-      if(c2 > 0) then
+
         g(1,c2)=g(1,c2) + dx_c2*dx_c2  ! 1,1
         g(2,c2)=g(2,c2) + dy_c2*dy_c2  ! 2,2
         g(3,c2)=g(3,c2) + dz_c2*dz_c2  ! 3,3
