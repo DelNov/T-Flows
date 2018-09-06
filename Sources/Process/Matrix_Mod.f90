@@ -40,8 +40,7 @@
 
     integer                  :: nonzeros  ! number of nonzero entries
     real,    allocatable     :: val(:)    ! value
-    real,    allocatable     :: sav(:)    ! saved value
-    real,    allocatable     :: bou(:)    ! boundary value
+    real,    allocatable     :: sav(:)    ! saved momentum diag. value
     integer, allocatable     :: col(:)    ! beginning of each row   
     integer, allocatable     :: row(:)    ! column positions
     integer, allocatable     :: dia(:)    ! diagonal positions 
