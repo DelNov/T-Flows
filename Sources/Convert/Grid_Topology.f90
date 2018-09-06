@@ -40,10 +40,6 @@
         ! grid % bnd_cond % color
         grid % bnd_cond % color(-grid % n_bnd_cells) =   &
                                                     grid % cells_bnd_color(j,i)
-
-        ! Material:
-        grid % material(-grid % n_bnd_cells) = grid % material(i)
-
         ! Faces
         grid % n_faces = grid % n_faces  + 1
         grid % faces_c(1,grid % n_faces) = i

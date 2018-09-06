@@ -110,29 +110,19 @@
   end do
   call Tokenizer_Mod_Read_Line(9)          ! ENDOFSECTION
 
-  !---------------------------------!
-  !   Read block (material?) data   !
-  !---------------------------------!
-  allocate(grid % materials(n_blocks))
-  if(n_blocks .gt. 1) then
-    print *, '# Multiple materials from .neu file not been implemented yet!'
-    print *, '# Exiting!'
-  end if
-
-  grid % n_materials = 1
-  grid % materials(1) % name = "AIR"
+  !-----------------------!
+  !   Set material name   !
+  !-----------------------!
+  grid % material % name = "AIR"
 
   do j = 1, n_blocks
-    call Tokenizer_Mod_Read_Line(9)        ! ELEMENT GROUP
+    call Tokenizer_Mod_Read_Line(9)          ! ELEMENT GROUP
     call Tokenizer_Mod_Read_Line(9)
-    read(line % tokens(4),'(I10)') dum1  
-    call Tokenizer_Mod_Read_Line(9)        ! block*
-    call Tokenizer_Mod_Read_Line(9)        ! 0
-    read(9,'(10I8)') (temp(i), i = 1, dum1)
-    do i = 1, dum1
-      grid % material(temp(i)) = j
-    end do
-    call Tokenizer_Mod_Read_Line(9)        ! ENDOFSECTION
+    read(line % tokens(4),'(I10)') dum1      ! number of cells in this group
+    call Tokenizer_Mod_Read_Line(9)          ! block*
+    call Tokenizer_Mod_Read_Line(9)          ! 0
+    read(9,'(10I8)') (temp(i), i = 1, dum1)  ! read all cells in the group
+    call Tokenizer_Mod_Read_Line(9)          ! ENDOFSECTION
   end do
 
   !-------------------------!
