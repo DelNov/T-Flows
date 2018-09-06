@@ -24,12 +24,6 @@
     c1 = grid % faces_c(1, s)
     c2 = grid % faces_c(2, s)
 
-    if(c2  < 0) then
-      if (Grid_Mod_Bnd_Cond_Type(grid, c2) .ne. BUFFER) then
-        cycle ! skip current surface
-      end if
-    end if
-      
     phi_min(c1) = min(phi_min(c1), phi(c2))
     phi_min(c2) = min(phi_min(c2), phi(c1))
 
