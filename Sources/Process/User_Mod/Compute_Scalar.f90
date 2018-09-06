@@ -39,8 +39,8 @@
   integer           :: n, c, s, c1, c2, niter, mat, row, col
   real              :: a0, a12, a21
   real              :: ini_res, tol, ns
-  real              :: con_eff1, f_ex1, f_im1, phixS1, phiyS1, phizS1
-  real              :: con_eff2, f_ex2, f_im2, phixS2, phiyS2, phizS2
+  real              :: con_eff1, f_ex1, f_im1, phix_f1, phiy_f1, phiz_f1
+  real              :: con_eff2, f_ex2, f_im2, phix_f2, phiy_f2, phiz_f2
   real              :: phis, pr_t1, pr_t2
   character(len=80) :: precond    ! preconditioner
   integer           :: adv_scheme  ! space-discretiztion of advection scheme)
@@ -137,14 +137,12 @@
   ! Retreive advection scheme and blending coefficient
   call Control_Mod_Advection_Scheme_For_User_Scalars(adv_scheme)
   call Control_Mod_Blending_Coefficient_For_User_Scalars(blend)
-  
+
   ! Compute phimax and phimin
-  do mat = 1, grid % n_materials
-    if(adv_scheme .ne. CENTRAL) then
-      call Calculate_Minimum_Maximum(grid, phi % n, phi_min, phi_max)
-      goto 1  ! why this???
-    end if
-  end do
+  if(adv_scheme .ne. CENTRAL) then
+    call Calculate_Minimum_Maximum(grid, phi % n, phi_min, phi_max)
+    goto 1  ! why this???
+  end if
 
   ! New values
 1 do c = 1, grid % n_cells
@@ -265,33 +263,22 @@
     ! Gradients on the cell face 
     if(c2 > 0 .or.  &
        c2 < 0 .and. Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER) then
-      if(grid % material(c1) .eq. grid % material(c2)) then
-        phixS1 = fw(s)*phi_x(c1) + (1.0-fw(s))*phi_x(c2) 
-        phiyS1 = fw(s)*phi_y(c1) + (1.0-fw(s))*phi_y(c2)
-        phizS1 = fw(s)*phi_z(c1) + (1.0-fw(s))*phi_z(c2)
-        phixS2 = phixS1 
-        phiyS2 = phiyS1 
-        phizS2 = phizS1 
-        con_eff1 =     grid % f(s)  * (conductivity+capacity*vis_t(c1)/pr_t)  &
-                 + (1.-grid % f(s)) * (conductivity+capacity*vis_t(c2)/pr_t)
-        con_eff2 = con_eff1 
-      else 
-        phixS1 = phi_x(c1) 
-        phiyS1 = phi_y(c1) 
-        phizS1 = phi_z(c1) 
-        phixS2 = phi_x(c2) 
-        phiyS2 = phi_y(c2) 
-        phizS2 = phi_z(c2) 
-        con_eff1 = conductivity + capacity * vis_t(c1) / pr_t   
-        con_eff2 = conductivity + capacity * vis_t(c2) / pr_t   
-      end if
+      phix_f1 = fw(s)*phi_x(c1) + (1.0-fw(s))*phi_x(c2) 
+      phiy_f1 = fw(s)*phi_y(c1) + (1.0-fw(s))*phi_y(c2)
+      phiz_f1 = fw(s)*phi_z(c1) + (1.0-fw(s))*phi_z(c2)
+      phix_f2 = phix_f1 
+      phiy_f2 = phiy_f1 
+      phiz_f2 = phiz_f1 
+      con_eff1 =     grid % f(s)  * (conductivity+capacity*vis_t(c1)/pr_t)  &
+               + (1.-grid % f(s)) * (conductivity+capacity*vis_t(c2)/pr_t)
+      con_eff2 = con_eff1 
     else
-      phixS1 = phi_x(c1) 
-      phiyS1 = phi_y(c1) 
-      phizS1 = phi_z(c1) 
-      phixS2 = phixS1 
-      phiyS2 = phiyS1 
-      phizS2 = phizS1 
+      phix_f1 = phi_x(c1) 
+      phiy_f1 = phi_y(c1) 
+      phiz_f1 = phi_z(c1) 
+      phix_f2 = phix_f1 
+      phiy_f2 = phiy_f1 
+      phiz_f2 = phiz_f1 
       con_eff1 = conductivity + capacity * vis_t(c1) / pr_t   
       con_eff2 = con_eff1 
     endif
@@ -309,22 +296,22 @@
     end if  
 
     ! Total (exact) diffusive flux
-    f_ex1 = con_eff1 * (  phixS1 * grid % sx(s)  &
-                        + phiyS1 * grid % sy(s)  &
-                        + phizS1 * grid % sz(s))
-    f_ex2 = con_eff2 * (  phixS2 * grid % sx(s)  &
-                        + phiyS2 * grid % sy(s)  &
-                        + phizS2 * grid % sz(s))
+    f_ex1 = con_eff1 * (  phix_f1 * grid % sx(s)  &
+                        + phiy_f1 * grid % sy(s)  &
+                        + phiz_f1 * grid % sz(s))
+    f_ex2 = con_eff2 * (  phix_f2 * grid % sx(s)  &
+                        + phiy_f2 * grid % sy(s)  &
+                        + phiz_f2 * grid % sz(s))
 
     ! Implicit diffusive flux
     f_im1 = con_eff1 * f_coef(s)          &
-          * (  phixS1 * grid % dx(s)      &
-             + phiyS1 * grid % dy(s)      &
-             + phizS1 * grid % dz(s) )
+          * (  phix_f1 * grid % dx(s)      &
+             + phiy_f1 * grid % dy(s)      &
+             + phiz_f1 * grid % dz(s) )
     f_im2 = con_eff2 * f_coef(s)          &
-          * (  phixS2 * grid % dx(s)      &
-             + phiyS2 * grid % dy(s)      &
-             + phizS2 * grid % dz(s) )
+          * (  phix_f2 * grid % dx(s)      &
+             + phiy_f2 * grid % dy(s)      &
+             + phiz_f2 * grid % dz(s) )
 
     ! Straight diffusion part 
     if(ini .lt. 2) then
@@ -352,30 +339,20 @@
         (td_diffusion .eq. FULLY_IMPLICIT) ) then
 
       if(td_diffusion .eq. CRANK_NICOLSON) then 
-        if(grid % material(c1) .eq. grid % material(c2)) then
-          a12 = .5 * con_eff1 * f_coef(s)  
-          a21 = .5 * con_eff2 * f_coef(s)  
-        else
-          a12 = conductivity * f_coef(s)  
-          a21 = conductivity * f_coef(s)  
-        end if
+        a12 = .5 * con_eff1 * f_coef(s)
+        a21 = .5 * con_eff2 * f_coef(s)
       end if
 
       if(td_diffusion .eq. FULLY_IMPLICIT) then 
-        if(grid % material(c1) .eq. grid % material(c2)) then
-          a12 = con_eff1 * f_coef(s)  
-          a21 = con_eff2 * f_coef(s)  
-        else
-          a12 = 2. * conductivity * f_coef(s)  
-          a21 = 2. * conductivity * f_coef(s)  
-        end if
+        a12 = con_eff1 * f_coef(s)
+        a21 = con_eff2 * f_coef(s)
       end if
 
       if(pressure_momentum_coupling .ne. PROJECTION) then
         a12 = a12  - min(flux(s), 0.0) * capacity
         a21 = a21  + max(flux(s), 0.0) * capacity
       endif
-                
+
       ! Fill the system matrix
       if(c2 .gt. 0) then
         a % val(a % dia(c1))  = a % val(a % dia(c1)) + a12
@@ -520,43 +497,43 @@
 
         if(c2 > 0 .or.  &
            c2 < 0 .and. Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER) then
-          phixS1 = fw(s)*phi_x(c1) + (1.0-fw(s))*phi_x(c2) 
-          phiyS1 = fw(s)*phi_y(c1) + (1.0-fw(s))*phi_y(c2)
-          phizS1 = fw(s)*phi_z(c1) + (1.0-fw(s))*phi_z(c2)
-          phixS2 = phixS1 
-          phiyS2 = phiyS1 
-          phizS2 = phizS1 
+          phix_f1 = fw(s)*phi_x(c1) + (1.0-fw(s))*phi_x(c2) 
+          phiy_f1 = fw(s)*phi_y(c1) + (1.0-fw(s))*phi_y(c2)
+          phiz_f1 = fw(s)*phi_z(c1) + (1.0-fw(s))*phi_z(c2)
+          phix_f2 = phix_f1 
+          phiy_f2 = phiy_f1 
+          phiz_f2 = phiz_f1 
           con_eff1 =      grid % f(s)  * (capacity*vis_t(c1)/pr_t )  &
                   + (1. - grid % f(s)) * (capacity*vis_t(c2)/pr_t )
           con_eff2 = con_eff1 
         else
-          phixS1 = phi_x(c1) 
-          phiyS1 = phi_y(c1) 
-          phizS1 = phi_z(c1) 
-          phixS2 = phixS1 
-          phiyS2 = phiyS1 
-          phizS2 = phizS1 
+          phix_f1 = phi_x(c1) 
+          phiy_f1 = phi_y(c1) 
+          phiz_f1 = phi_z(c1) 
+          phix_f2 = phix_f1 
+          phiy_f2 = phiy_f1 
+          phiz_f2 = phiz_f1 
           con_eff1 = capacity*vis_t(c1)/pr_t   
           con_eff2 = con_eff1 
         endif
 
         ! Total (exact) diffusive flux
-        f_ex1 = con_eff1 * (  phixS1*grid % sx(s)  &
-                           + phiyS1*grid % sy(s)  &
-                           + phizS1*grid % sz(s))
-        f_ex2 = con_eff2 * (  phixS2*grid % sx(s)  &
-                           + phiyS2*grid % sy(s)  &
-                           + phizS2*grid % sz(s))
+        f_ex1 = con_eff1 * (  phix_f1 * grid % sx(s)  &
+                            + phiy_f1 * grid % sy(s)  &
+                            + phiz_f1 * grid % sz(s))
+        f_ex2 = con_eff2 * (  phix_f2 * grid % sx(s)  &
+                            + phiy_f2 * grid % sy(s)  &
+                            + phiz_f2 * grid % sz(s))
 
         ! Implicit diffusive flux
-        f_im1 = con_eff1*f_coef(s)*    &
-                (  phixS1*grid % dx(s)      &
-                 + phiyS1*grid % dy(s)      &
-                 + phizS1*grid % dz(s) )
-        f_im2 = con_eff2*f_coef(s)*    &
-                (  phixS2*grid % dx(s)      &
-                 + phiyS2*grid % dy(s)      &
-                 + phizS2*grid % dz(s) )
+        f_im1 = con_eff1 * f_coef(s) *         &
+                (  phix_f1 * grid % dx(s)      &
+                 + phiy_f1 * grid % dy(s)      &
+                 + phiz_f1 * grid % dz(s) )
+        f_im2 = con_eff2 * f_coef(s) *         &
+                (  phix_f2 * grid % dx(s)      &
+                 + phiy_f2 * grid % dy(s)      &
+                 + phiz_f2 * grid % dz(s) )
 
         b(c1) = b(c1) - con_eff1 * (phi % n(c2) - phi % n(c1)) * f_coef(s)  &
               - f_ex1 + f_im1
