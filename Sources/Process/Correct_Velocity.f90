@@ -73,23 +73,14 @@
   !   formed from the coefficients of the velocity matrix.            !
   !   Moreover, it should also be clear that pressure correction      !
   !   matrix must be formed from underrelaxed velocity coefficients   !
-  !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  !
-  !   Note that for FLUID-SOLID interaction, FLUX correctin is zero   !
-  !   because a % val(a % pos(1,s)) is also zero.                     !  
-  !   What will happen with parallel version ... only god knows.      !
   !-------------------------------------------------------------------!
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
-    if(c2 > 0 .or.  &
-       c2 < 0 .and. Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER) then
-      if(c2  > 0) then
-        flux(s)=flux(s)+(pp % n(c2) - pp % n(c1))*a % val(a % pos(1,s))
-      else 
-        flux(s)=flux(s)+(pp % n(c2) - pp % n(c1))*a % bou(c2)
-      end if
-    end if             !                                          !
-  end do               !<---------- this is correction ---------->!
+    if(c2 > 0) then
+      flux(s) = flux(s) + (pp % n(c2) - pp % n(c1))*a % val(a % pos(1,s))
+    end if               !                                               !
+  end do                 !<------------ this is correction ------------->!
 
   !-------------------------------------!
   !    Calculate the max mass error     !
@@ -102,12 +93,10 @@
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
-    if(c2 > 0 .or.  &
-       c2 < 0 .and. Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER) then
-      b(c1)=b(c1)-flux(s)
-      if(c2  > 0) b(c2)=b(c2)+flux(s)
-    else
-      b(c1) = b(c1)-flux(s)
+
+    b(c1) = b(c1) - flux(s)
+    if(c2 > 0) then
+      b(c2) = b(c2) + flux(s)
     end if
   end do
 
@@ -115,9 +104,9 @@
     b(c) = b(c) / (grid % vol(c) * density / dt)
   end do
 
-  mass_err=0.0
-  do c = 1, grid % n_cells
-    mass_err=max(mass_err, abs(b(c)))
+  mass_err = 0.0
+  do c = 1, grid % n_cells - grid % comm % n_buff_cells
+    mass_err = max(mass_err, abs(b(c)))
   end do
   call Comm_Mod_Global_Max_Real(mass_err)
 
@@ -130,8 +119,7 @@
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
-    if(c2 > 0 .or.   &
-       c2 < 0.and.Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER) then
+    if(c2 > 0) then
       cfl_t = abs( dt * flux(s) / density /      &
                    ( f_coef(s) *                 &
                    (  grid % dx(s)*grid % dx(s)  &
@@ -147,7 +135,7 @@
 
   call Info_Mod_Iter_Fill_At(1, 2, 'dum', -1, mass_err)
   call Info_Mod_Bulk_Fill(cfl_max,          &
-                          pe_max,           &                            
+                          pe_max,           &
                           bulk % flux_x,    &
                           bulk % flux_y,    &
                           bulk % flux_z,    &

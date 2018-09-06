@@ -37,7 +37,7 @@
 !----------------------------------[Calling]-----------------------------------!
   real :: Turbulent_Prandtl_Number
 !-----------------------------------[Locals]-----------------------------------! 
-  integer           :: n, c, s, c1, c2, niter, mat
+  integer           :: n, c, s, c1, c2, niter
   real              :: a0, a12, a21
   real              :: ini_res, tol
   real              :: con_eff1, f_ex1, f_im1, phix_f1, phiy_f1, phiz_f1
@@ -88,12 +88,6 @@
 
   b(:) = 0.0
 
-  ! This is important for "copy" boundary conditions. Find out why !
-  ! (I just coppied this from NewUVW.f90. I don't have a clue if it
-  ! is of any importance at all. Anyway, I presume it can do no harm.)
-  do c = -grid % n_bnd_cells,-1
-    a % bou(c)=0.0
-  end do
 
   !-------------------------------------! 
   !   Initialize variables and fluxes   !
@@ -134,12 +128,10 @@
   call Control_Mod_Blending_Coefficient_For_Energy(blend)
 
   ! Compute phimax and phimin
-  do mat = 1, grid % n_materials
-    if(adv_scheme .ne. CENTRAL) then
-      call Calculate_Minimum_Maximum(grid, phi % n, phi_min, phi_max)
-      goto 1  ! why this???
-    end if
-  end do
+  if(adv_scheme .ne. CENTRAL) then
+    call Calculate_Minimum_Maximum(grid, phi % n, phi_min, phi_max)
+    goto 1  ! why this???
+  end if
 
   ! New values
 1 do c = 1, grid % n_cells
@@ -257,44 +249,20 @@
       pr_t  = fw(s) * pr_t1 + (1.0 - fw(s)) * pr_t2
     end if
 
-    ! Gradients on the cell face 
-    if(c2 > 0 .or.  &
-       c2 < 0 .and. Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER) then
-      if(grid % material(c1) .eq. grid % material(c2)) then
-        phix_f1 = fw(s)*phi_x(c1) + (1.0-fw(s))*phi_x(c2) 
-        phiy_f1 = fw(s)*phi_y(c1) + (1.0-fw(s))*phi_y(c2)
-        phiz_f1 = fw(s)*phi_z(c1) + (1.0-fw(s))*phi_z(c2)
-        phix_f2 = phix_f1 
-        phiy_f2 = phiy_f1 
-        phiz_f2 = phiz_f1 
-        con_eff1 =     grid % f(s)  * (conductivity+capacity*vis_t(c1)/pr_t)  &
-                 + (1.-grid % f(s)) * (conductivity+capacity*vis_t(c2)/pr_t)
-        con_eff2 = con_eff1 
-      else 
-        phix_f1 = phi_x(c1) 
-        phiy_f1 = phi_y(c1) 
-        phiz_f1 = phi_z(c1) 
-        phix_f2 = phi_x(c2) 
-        phiy_f2 = phi_y(c2) 
-        phiz_f2 = phi_z(c2) 
-        con_eff1 = conductivity + capacity * vis_t(c1) / pr_t   
-        con_eff2 = conductivity + capacity * vis_t(c2) / pr_t   
-      end if
-    else
-      phix_f1 = phi_x(c1) 
-      phiy_f1 = phi_y(c1) 
-      phiz_f1 = phi_z(c1) 
-      phix_f2 = phix_f1 
-      phiy_f2 = phiy_f1 
-      phiz_f2 = phiz_f1 
-      con_eff1 = conductivity + capacity * vis_t(c1) / pr_t   
-      con_eff2 = con_eff1 
-    end if
-
+    ! Gradients on the cell face (fw corrects situation close to the wall)
+    phix_f1 = fw(s)*phi_x(c1) + (1.0-fw(s))*phi_x(c2) 
+    phiy_f1 = fw(s)*phi_y(c1) + (1.0-fw(s))*phi_y(c2)
+    phiz_f1 = fw(s)*phi_z(c1) + (1.0-fw(s))*phi_z(c2)
+    phix_f2 = phix_f1
+    phiy_f2 = phiy_f1
+    phiz_f2 = phiz_f1
+    con_eff1 =        fw(s)  * (conductivity+capacity*vis_t(c1)/pr_t)  &
+             + (1.0 - fw(s)) * (conductivity+capacity*vis_t(c2)/pr_t)
+    con_eff2 = con_eff1 
 
     if(turbulence_model .eq. K_EPS .or.  &
        turbulence_model .eq. K_EPS_ZETA_F) then
-      if(c2 < 0 .and. Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. BUFFER) then
+      if(c2 < 0) then
         if(Var_Mod_Bnd_Cell_Type(phi, c2) .eq. WALL .or.  &
            Var_Mod_Bnd_Cell_Type(phi, c2) .eq. WALLFL) then
           con_eff1 = con_wall(c1)
@@ -347,23 +315,13 @@
         (td_diffusion .eq. FULLY_IMPLICIT) ) then
 
       if(td_diffusion .eq. CRANK_NICOLSON) then
-        if(grid % material(c1) .eq. grid % material(c2)) then
-          a12 = .5 * con_eff1 * f_coef(s)
-          a21 = .5 * con_eff2 * f_coef(s)
-        else
-          a12 = conductivity * f_coef(s)
-          a21 = conductivity * f_coef(s)
-        end if
+        a12 = .5 * con_eff1 * f_coef(s)
+        a21 = .5 * con_eff2 * f_coef(s)
       end if
 
       if(td_diffusion .eq. FULLY_IMPLICIT) then 
-        if(grid % material(c1) .eq. grid % material(c2)) then
-          a12 = con_eff1 * f_coef(s)
-          a21 = con_eff2 * f_coef(s)
-        else
-          a12 = 2. * conductivity * f_coef(s)
-          a21 = 2. * conductivity * f_coef(s)
-        end if
+        a12 = con_eff1 * f_coef(s)
+        a21 = con_eff2 * f_coef(s)
       end if
 
       if(pressure_momentum_coupling .ne. PROJECTION) then
@@ -385,11 +343,6 @@
             (Var_Mod_Bnd_Cell_Type(phi, c2) .eq. CONVECT) ) then
           a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
           b(c1)  = b(c1)  + a12 * phi % n(c2)
-        ! Buffer: System matrix and parts belonging 
-        ! to other subdomains are filled here.
-        else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER) then
-          a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
-          a % bou(c2) = -a12  ! cool parallel stuff
         ! In case of wallflux 
         else if(Var_Mod_Bnd_Cell_Type(phi, c2) .eq. WALLFL) then
           b(c1) = b(c1) + grid % s(s) * phi % q(c2)
@@ -510,8 +463,7 @@
         pr_t2 = Turbulent_Prandtl_Number(grid, c2)
         pr_t  = fw(s) * pr_t1 + (1.0 - fw(s)) * pr_t2
 
-        if(c2 > 0 .or.  &
-           c2 < 0 .and. Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER) then
+        if(c2 > 0) then
           phix_f1 = fw(s)*phi_x(c1) + (1.0-fw(s))*phi_x(c2)
           phiy_f1 = fw(s)*phi_y(c1) + (1.0-fw(s))*phi_y(c2)
           phiz_f1 = fw(s)*phi_z(c1) + (1.0-fw(s))*phi_z(c2)

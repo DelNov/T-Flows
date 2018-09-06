@@ -44,7 +44,7 @@
                      uk_i(-grid % n_bnd_cells:grid % n_cells)
   real            :: uu_f, vv_f, ww_f, uv_f, uw_f, vw_f
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: s, c, c1, c2, niter, mat
+  integer           :: s, c, c1, c2, niter
   real              :: f_ex, f_im, f_stress
   real              :: uis, vel_max
   real              :: a0, a12, a21
@@ -131,11 +131,6 @@
   a % val  = 0.0
   f_stress = 0.0
 
-  ! This is important for "copy" boundary conditions. Find out why !
-  do c = -grid % n_bnd_cells, -1
-    a % bou(c) = 0.0
-  end do
-
   !-------------------------------------!
   !   Initialize variables and fluxes   !
   !-------------------------------------!
@@ -170,12 +165,10 @@
   call Control_Mod_Blending_Coefficient_For_Momentum(blend)
 
   ! Compute phimax and phimin
-  do mat = 1, grid % n_materials
-    if(adv_scheme .ne. CENTRAL) then
-      call Calculate_Minimum_Maximum(grid, ui % n, ui_min, ui_max) ! or ui % o ?
-      goto 1  ! why on Earth this?
-    end if
-  end do
+  if(adv_scheme .ne. CENTRAL) then
+    call Calculate_Minimum_Maximum(grid, ui % n, ui_min, ui_max) ! or ui % o ?
+    goto 1  ! why on Earth this?
+  end if
 
   ! New values
 1 do c = 1, grid % n_cells
@@ -305,11 +298,9 @@
        (turbulence_model .eq. K_EPS .and.            &
         turbulence_wall_treatment .eq. HIGH_RE) ) then
       if(c2 < 0) then
-        if (Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. BUFFER) then
-          if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
-             Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
-            vis_eff = vis_wall(c1)
-          end if
+        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
+           Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
+          vis_eff = vis_wall(c1)
         end if
       end if
     end if
@@ -357,8 +348,6 @@
     a0 = vis_eff * f_coef(s)
 
     ! Implicit viscous stress
-    ! this is a very crude approximation: f_coef is not
-    ! corrected at interface between materials
     f_im = (   ui_i_f*di(s)                &
              + ui_j_f*dj(s)                &
              + ui_k_f*dk(s))*a0
@@ -400,13 +389,12 @@
       end if
 
       ! Fill the system matrix
-      if(c2  > 0) then
+      if(c2 > 0) then
         a % val(a % pos(1,s)) = a % val(a % pos(1,s)) - a12
         a % val(a % dia(c1))  = a % val(a % dia(c1))  + a12
         a % val(a % pos(2,s)) = a % val(a % pos(2,s)) - a21
         a % val(a % dia(c2))  = a % val(a % dia(c2))  + a21
       else if(c2  < 0) then
-
         ! Outflow is not included because it was causing problems
         if((Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW)  .or.  &
            (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL)    .or.  &
@@ -415,9 +403,6 @@
            ! (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) ) then
           a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
           b(c1) = b(c1) + a12 * ui % n(c2)
-        else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER) then
-          a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
-          a % bou(c2) = -a12  ! cool parallel stuff
         end if
       end if
     end if
