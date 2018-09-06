@@ -178,6 +178,7 @@ endif
 
 # Modules in shared directory
 SRC_MOD = Const_Mod.f90		\
+          Load_Cns.f90		\
           Sort_Mod.f90		\
           Grid_Mod.f90		\
           Work_Mod.f90		\
