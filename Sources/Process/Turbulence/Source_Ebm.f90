@@ -319,7 +319,7 @@
       c2 = grid % faces_c(2,s)
 
       ! Calculate values of dissipation on wall
-      if(c2 < 0 .and. Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. BUFFER ) then
+      if(c2 < 0) then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
           eps % n(c2) = (viscosity/density)*&
