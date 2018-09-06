@@ -12,7 +12,7 @@
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: c, dummy 
-  integer           :: sub, subo, n_bnd_cells_sub
+  integer           :: sub, subo, n_cells_sub
   character(len=80) :: name_in
 !==============================================================================!
 !   Each subdomain needs two buffers: a send buffer and a receive buffer.
@@ -37,17 +37,17 @@
   open(9, file=name_in)
   if(this_proc < 2) print *, '# Now reading the file:', name_in
 
-  allocate (grid % comm % nbb_s(0:n_proc))
+  allocate (grid % comm % nbb_s(0:n_proc))  ! why from zero?
   allocate (grid % comm % nbb_e(0:n_proc))
 
   ! Number of physical boundary cells
   call Tokenizer_Mod_Read_Line(9)
-  read(line % whole,*) n_bnd_cells_sub
+  read(line % whole,*) n_cells_sub
 
-  ! Initialize 
+  ! Initialize
   do sub = 0, n_proc
-    grid % comm % nbb_s(sub) = -(n_bnd_cells_sub) 
-    grid % comm % nbb_e(sub) = -(n_bnd_cells_sub)
+    grid % comm % nbb_s(sub) = n_cells_sub
+    grid % comm % nbb_e(sub) = n_cells_sub
   end do
 
   ! Fill the indexes and the buffers
@@ -56,24 +56,22 @@
 
       ! Connections with subdomain          
       call Tokenizer_Mod_Read_Line(9)
-      read(line % whole,*) subo 
+      read(line % whole,*) subo
 
       ! Number of local connections with subdomain sub 
       call Tokenizer_Mod_Read_Line(9)
-      read(line % whole,*) grid % comm % nbb_e(sub)
+      read(line % whole,*) grid % comm % nbb_e(sub)  ! holds size for a moment
 
-      grid % comm % nbb_s(sub) = grid % comm % nbb_e(sub-1) &
-                               - 1  
-      grid % comm % nbb_e(sub) = grid % comm % nbb_s(sub)   &
-                               - grid % comm % nbb_e(sub) + 1
-
-      do c = grid % comm % nbb_s(sub), grid % comm % nbb_e(sub), -1
+      grid % comm % nbb_s(sub) = grid % comm % nbb_e(sub-1) + 1
+      grid % comm % nbb_e(sub) = grid % comm % nbb_s(sub)     &
+                               + grid % comm % nbb_e(sub) - 1
+      do c = grid % comm % nbb_s(sub), grid % comm % nbb_e(sub)
         call Tokenizer_Mod_Read_Line(9)
-        read(line % whole,*) dummy, grid % comm % buffer_index(c) 
+        read(line % whole,*) dummy, grid % comm % buffer_index(c)
       end do 
     else
       ! Just to become "sloppy" 
-      grid % comm % nbb_s(sub) = grid % comm % nbb_e(sub-1) - 1
+      grid % comm % nbb_s(sub) = grid % comm % nbb_e(sub-1) + 1
 
       ! This_proc will be needed for next 
       grid % comm % nbb_e(sub) = grid % comm % nbb_e(sub-1)
@@ -84,11 +82,11 @@
 
   ! Correct the "sloppy" indexes
   do sub = 1, n_proc
-    if(grid % comm % nbb_e(sub) > grid % comm % nbb_s(sub)) then  
-      grid % comm % nbb_s(sub) = -1 
-      grid % comm % nbb_e(sub) = 0 
+    if(grid % comm % nbb_e(sub) < grid % comm % nbb_s(sub)) then
+      grid % comm % nbb_s(sub) =  0
+      grid % comm % nbb_e(sub) = -1
     end if
-  end do 
+  end do
 
   call Comm_Mod_Wait
 

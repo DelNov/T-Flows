@@ -39,13 +39,13 @@
     !-------------------------------------!
     !   Global cell numbers for T-Flows   !
     !-------------------------------------!
-    allocate(grid % comm % cell_glo(-nb_s:nc_s)) 
+    allocate(grid % comm % cell_glo(-nb_s:nc_s))
 
     ! Fill up global cell numbers
     do c = -nb_t, nc_t
       grid % comm % cell_glo(c) = c
     end do
-  
+
     !-----------------------------------------!
     !   Global cell numbers for MPI mapping   !
     !-----------------------------------------!
