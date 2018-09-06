@@ -65,9 +65,7 @@
     ! Close to the wall, however, there is inversion. It takes
     ! the value from inside as the representative for the face.
     if(c2 < 0) then
-      if (Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. BUFFER) then
-        fw(s) = 1.
-      end if
+      fw(s) = 1.
     end if
   end do
 
