@@ -82,7 +82,7 @@
   !---------------------------------------------!
   do mc = 1, max_cnt
     values(:) = 0.0
-    write(cf_name(11:12), '(i2.2)'), mc  ! set name of the backup variable
+    write(cf_name(11:12), '(i2.2)') mc  ! set name of the backup variable
     call Backup_Mod_Read_Cell(fh, d, cf_name, values(1:nc_s))
     do c = 1, grid % n_cells            
       if( cells_cg(mc, c) .ne. 0 ) then
