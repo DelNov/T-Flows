@@ -1,3 +1,10 @@
+#-- ./Create_Buffers_And_Save.f90-new-names-compiled
+$(DIR_OBJECT)/Create_Buffers_And_Save.o:\
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Gen_Mod.o \
+$(DIR_OBJECT)/Div_Mod.o 
+
 #-- ./Main_Div.f90
 $(DIR_OBJECT)/Main_Div.o:\
 $(DIR_OBJECT)/Tokenizer_Mod.o \
@@ -21,11 +28,6 @@ $(DIR_OBJECT)/Create_Maps.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Div_Mod.o 
-
-#-- ./Load_Cns.f90
-$(DIR_OBJECT)/Load_Cns.o:\
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Allocate_Additional.f90
 $(DIR_OBJECT)/Allocate_Additional.o:\
@@ -453,6 +455,11 @@ $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
 
 #-- ./Const_Mod.f90
+#-- ./Load_Cns.f90
+$(DIR_OBJECT)/Load_Cns.o:\
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 
+
 #-- ./Swap_Real.f90
 #-- ./Approx_String.f90
 #-- ./To_Lower_Case.f90
