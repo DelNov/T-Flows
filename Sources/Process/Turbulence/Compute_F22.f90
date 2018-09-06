@@ -40,9 +40,9 @@
 !                                                                              !
 !   The form of equations which are solved:                                    !
 !                                                                              !
-!     (   df22      f22 dV     f22hg dV )                                      !
-!  int( - ---- dS + ------  =  -------- )                                      !
-!     (    dy        Lsc^2      Lsc^2   )                                      !
+!       (   df22      f22 dV     f22hg dV )                                      !
+!  int  ( - ---- dS + ------  =  -------- )                                      !
+!       (    dy        Lsc^2      Lsc^2   )                                      !
 !                                                                              !
 !   Dimension of the system under consideration                                !
 !                                                                              !
@@ -57,11 +57,6 @@
   a % val = 0.0
 
   b = 0.0
-
-  ! This is important for "copy" boundary conditions. Find out why !
-  do c = -grid % n_bnd_cells, -1
-    a % bou(c) = 0.0
-  end do
 
   !-------------------------------------! 
   !   Initialize variables and fluxes   !
@@ -166,14 +161,15 @@
         a % val(a % pos(2,s)) = a % val(a % pos(2,s)) - a21
         a % val(a % dia(c2))  = a % val(a % dia(c2))  + a21
       else if(c2  < 0) then
-        ! Outflow is not included because it was causing problems  
-        if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW)) then                    
+
+        ! Inflow
+        if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW)) then
           a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
           b(c1) = b(c1) + a12 * phi % n(c2)
+        end if
 
-        else
-
-        if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL).or.                          &
+        ! Wall and wall flux; solid walls in any case
+        if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL).or.       &
             (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) ) then
           a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
           !---------------------------------------------------------------!
@@ -182,11 +178,8 @@
           !   equation does not converge very well                        !
           !   b(c1) = b(c1) + a12 * phi % n(c2)                           !
           !---------------------------------------------------------------!
-        else if( Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER ) then  
-          a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
-          a % bou(c2) = - a12  ! cool parallel stuff
         end if
-      end if     
+      end if
      end if
     end if
 

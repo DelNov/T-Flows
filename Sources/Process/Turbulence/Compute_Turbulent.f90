@@ -30,8 +30,8 @@
   type(Var_Type)  :: phi
   integer         :: n_step
 !----------------------------------[Locals]------------------------------------!
-  integer           :: s, c, c1, c2, niter, mat
-  real              :: Fex, Fim
+  integer           :: s, c, c1, c2, niter
+  real              :: f_ex, f_im
   real              :: phis
   real              :: a0, a12, a21
   real              :: ini_res, tol
@@ -59,11 +59,6 @@
   a % val = 0.0
 
   b = 0.0
-
-  ! This is important for "copy" boundary conditions. Find out why !
-  do c = -grid % n_bnd_cells, -1
-    a % bou(c) = 0.0
-  end do
 
   !-------------------------------------!
   !   Initialize variables and fluxes   !
@@ -104,12 +99,10 @@
   call Control_Mod_Blending_Coefficient_For_Turbulence(blend)
 
   ! Compute phimax and phimin
-  do mat = 1, grid % n_materials
-    if(adv_scheme .ne. CENTRAL) then
-      call Calculate_Minimum_Maximum(grid, phi % n, phi_min, phi_max)
-      goto 1
-    end if
-  end do
+  if(adv_scheme .ne. CENTRAL) then
+    call Calculate_Minimum_Maximum(grid, phi % n, phi_min, phi_max)
+    goto 1
+  end if
 
   ! New values
 1 do c = 1, grid % n_cells
@@ -126,8 +119,7 @@
     c2 = grid % faces_c(2,s)
 
     ! Velocities on "orthogonal" cell centers
-    if(c2 > 0 .or.  &
-       c2 < 0.and.Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER) then
+    if(c2 > 0) then
       phis =        grid % f(s)  * phi % n(c1)  &
            + (1.0 - grid % f(s)) * phi % n(c2)
 
@@ -262,7 +254,7 @@
     end if
 
     ! Total (exact) diffusive flux
-    Fex = vis_eff * (  phi_x_f * grid % sx(s)  &
+    f_ex = vis_eff * (  phi_x_f * grid % sx(s)  &
                      + phi_y_f * grid % sy(s)  &
                      + phi_z_f * grid % sz(s) )
 
@@ -271,7 +263,7 @@
     ! Implicit diffusive flux
     ! (this is a very crude approximation: f_coef is
     !  not corrected at interface between materials)
-    Fim = (  phi_x_f * grid % dx(s)                      &
+    f_im = (  phi_x_f * grid % dx(s)                      &
            + phi_y_f * grid % dy(s)                      &
            + phi_z_f * grid % dz(s) ) * a0
 
@@ -288,9 +280,9 @@
     end if
 
     ! Cross diffusion part
-    phi % c(c1) = phi % c(c1) + Fex - Fim
+    phi % c(c1) = phi % c(c1) + f_ex - f_im
     if(c2  > 0) then
-      phi % c(c2) = phi % c(c2) - Fex + Fim
+      phi % c(c2) = phi % c(c2) - f_ex + f_im
     end if
 
     ! Compute coefficients for the sysytem matrix
@@ -326,9 +318,6 @@
            (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) ) then
           a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
           b(c1) = b(c1) + a12 * phi % n(c2)
-        else if( Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER ) then
-          a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
-          a % bou(c2) = - a12  ! cool parallel stuff
         end if
       end if
     end if

@@ -35,8 +35,8 @@
   integer         :: ini
   type(Var_Type)  :: phi
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: s, c, c1, c2, niter, mat
-  real              :: Fex, Fim
+  integer           :: s, c, c1, c2, niter
+  real              :: f_ex, f_im
   real              :: phis
   real              :: a0, a12, a21
   real              :: ini_res, tol
@@ -66,11 +66,6 @@
   a % val = 0.
 
   b(:) = 0.
-
-  ! This is important for "copy" boundary conditions. Find out why !
-  do c = -grid % n_bnd_cells,-1
-    a % bou(c) = 0.
-  end do
 
   !-------------------------------------! 
   !   Initialize variables and fluxes   !
@@ -109,14 +104,12 @@
   ! Retreive advection scheme and blending coefficient
   call Control_Mod_Advection_Scheme_For_Turbulence(adv_scheme)
   call Control_Mod_Blending_Coefficient_For_Turbulence(blend)
-  
+
   ! Compute phimax and phimin
-  do mat = 1, grid % n_materials
-    if(adv_scheme .ne. CENTRAL) then
-      call Calculate_Minimum_Maximum(grid, phi % n, phi_min, phi_max)
-      goto 1
-    end if
-  end do
+  if(adv_scheme .ne. CENTRAL) then
+    call Calculate_Minimum_Maximum(grid, phi % n, phi_min, phi_max)
+    goto 1
+  end if
 
   ! New values
 1 do c = 1, grid % n_cells
@@ -133,8 +126,7 @@
     c2 = grid % faces_c(2,s) 
 
     ! Velocities on "orthogonal" cell centers 
-    if(c2 > 0 .or.  &
-       c2 < 0.and.Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER) then
+    if(c2 > 0) then
       phis =        grid % f(s)  * phi % n(c1)   &
            + (1.0 - grid % f(s)) * phi % n(c2)
 
@@ -239,7 +231,7 @@
 
 
     ! Total (exact) diffusive flux plus turb. diffusion
-    Fex = vis_eff * (  phix_f * grid % sx(s)  &
+    f_ex = vis_eff * (  phix_f * grid % sx(s)  &
                     + phiy_f * grid % sy(s)  &
                     + phiz_f * grid % sz(s) ) 
 
@@ -248,7 +240,7 @@
     ! Implicit diffusive flux
     ! (this is a very crude approximation: f_coef is
     !  not corrected at interface between materials)
-    Fim=( phix_f*grid % dx(s)                      &
+    f_im=( phix_f*grid % dx(s)                      &
          +phiy_f*grid % dy(s)                      &
          +phiz_f*grid % dz(s))*a0
 
@@ -265,9 +257,9 @@
     end if
 
     ! Cross diffusion part
-    phi % c(c1) = phi % c(c1) + Fex - Fim 
+    phi % c(c1) = phi % c(c1) + f_ex - f_im 
     if(c2  > 0) then
-      phi % c(c2) = phi % c(c2) - Fex + Fim 
+      phi % c(c2) = phi % c(c2) - f_ex + f_im 
     end if 
 
     ! Compute coefficients for the sysytem matrix
@@ -298,15 +290,12 @@
         ! Outflow is not included because it was causing problems     
         ! Convect is commented because for turbulent scalars convect 
         ! outflow is treated as classic outflow.
-        if((Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW).or.                   &
-           (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL).or.                     &
-!!!        (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT).or.                  &
-           (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) ) then                                
+        if((Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW).or.     &
+           (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL).or.       &
+!!!        (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT).or.    &
+           (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) ) then
           a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
           b(c1) = b(c1) + a12 * phi % n(c2)
-        else if( Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. BUFFER ) then  
-          a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
-          a % bou(c2) = - a12  ! cool parallel stuff
         end if
       end if     
 
@@ -386,21 +375,21 @@
         phix_f = fw(s)*phi_x(c1) + (1.0-fw(s))*phi_x(c2)
         phiy_f = fw(s)*phi_y(c1) + (1.0-fw(s))*phi_y(c2)
         phiz_f = fw(s)*phi_z(c1) + (1.0-fw(s))*phi_z(c2)
-        Fex = vis_eff * (  phix_f * grid % sx(s)  &
+        f_ex = vis_eff * (  phix_f * grid % sx(s)  &
                          + phiy_f * grid % sy(s)  &
                          + phiz_f * grid % sz(s))
         a0 = vis_eff * f_coef(s)
-        Fim = (   phix_f * grid % dx(s)      &
+        f_im = (   phix_f * grid % dx(s)      &
                 + phiy_f * grid % dy(s)      &
                 + phiz_f * grid % dz(s)) * a0
 
         b(c1) = b(c1)                                            &
               - vis_eff * (phi % n(c2) - phi%n(c1)) * f_coef(s)  &
-              - Fex + Fim
+              - f_ex + f_im
         if(c2  > 0) then
           b(c2) = b(c2)                                            &
                 + vis_eff * (phi % n(c2) - phi%n(c1)) * f_coef(s)  &
-                + Fex - Fim
+                + f_ex - f_im
         end if
       end do
     end if
