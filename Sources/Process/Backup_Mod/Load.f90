@@ -19,14 +19,8 @@
   integer         :: time_step
   logical         :: backup, present
 !-----------------------------------[Locals]-----------------------------------!
-  character(len=80)    :: name_in, answer
-  integer              :: fh, d
-  integer              :: s, c, c1, c2, cm1, cm2, mc, max_cnt
-  integer, allocatable :: cell_map(:)
-  integer, allocatable :: face_cnt(:)
-  integer, allocatable :: face_pnt(:,:)
-  real,    allocatable :: cell_flx(:)
-  character(len=12)    :: cf_name = 'cell_flux_00'
+  character(len=80) :: name_in, answer
+  integer           :: fh, d
 !==============================================================================!
 
   ! Full name is specified in control file

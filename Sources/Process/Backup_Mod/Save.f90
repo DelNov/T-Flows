@@ -17,14 +17,8 @@
   integer          :: time_step
   character(len=*) :: name_save
 !-----------------------------------[Locals]-----------------------------------!
-  character(len=80)    :: name_out, store_name
-  integer              :: fh, d
-  integer              :: s, c, c1, c2, cm1, cm2, mc, max_cnt
-  integer, allocatable :: cell_map(:)
-  integer, allocatable :: face_cnt(:)
-  integer, allocatable :: face_pnt(:,:)
-  real,    allocatable :: cell_flx(:)
-  character(len=12)    :: cf_name = 'cell_flux_00'
+  character(len=80) :: name_out, store_name
+  integer           :: fh, d
 !==============================================================================!
 
   store_name = problem_name
