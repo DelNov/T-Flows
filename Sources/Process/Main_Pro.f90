@@ -71,7 +71,7 @@
 
   call Allocate_Memory(grid)
   call Load_Geo(grid, this_proc)
-  call Comm_Mod_Load_Buffers(grid)
+  call Comm_Mod_Create_Buffers(grid)
   call Comm_Mod_Load_Maps(grid)     ! Maps should move to .cns file soon
 
   ! This is actually pretty bad - this command should be in Load_Geo

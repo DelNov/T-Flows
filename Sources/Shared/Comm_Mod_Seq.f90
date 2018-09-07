@@ -25,6 +25,7 @@
 
   include 'Comm_Mod/Sequential/Allocate_Memory.f90'
   include 'Comm_Mod/Sequential/Close_File.f90'
+  include 'Comm_Mod/Sequential/Create_Buffers.f90'
   include 'Comm_Mod/Sequential/Create_New_Types.f90'
   include 'Comm_Mod/Sequential/End.f90'
   include 'Comm_Mod/Sequential/Exchange_Int.f90'
@@ -36,7 +37,6 @@
   include 'Comm_Mod/Sequential/Global_Sum_Int_Array.f90'
   include 'Comm_Mod/Sequential/Global_Sum_Int.f90'
   include 'Comm_Mod/Sequential/Global_Sum_Real.f90'
-  include 'Comm_Mod/Sequential/Load_Buffers.f90'
   include 'Comm_Mod/Sequential/Load_Maps.f90'
   include 'Comm_Mod/Sequential/Open_File_Read.f90'
   include 'Comm_Mod/Sequential/Open_File_Write.f90'

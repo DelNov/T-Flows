@@ -28,6 +28,7 @@
 
   include 'Comm_Mod/Parallel/Allocate_Memory.f90'
   include 'Comm_Mod/Parallel/Close_File.f90'
+  include 'Comm_Mod/Parallel/Create_Buffers.f90'
   include 'Comm_Mod/Parallel/Create_New_Types.f90'
   include 'Comm_Mod/Parallel/End.f90'
   include 'Comm_Mod/Parallel/Exchange_Int.f90'
@@ -39,7 +40,6 @@
   include 'Comm_Mod/Parallel/Global_Sum_Int_Array.f90'
   include 'Comm_Mod/Parallel/Global_Sum_Int.f90'
   include 'Comm_Mod/Parallel/Global_Sum_Real.f90'
-  include 'Comm_Mod/Parallel/Load_Buffers.f90'
   include 'Comm_Mod/Parallel/Load_Maps.f90'
   include 'Comm_Mod/Parallel/Open_File_Read.f90'
   include 'Comm_Mod/Parallel/Open_File_Write.f90'
