@@ -44,13 +44,17 @@
   !-------------------------------!
   do sub = 1, maxval(grid % comm % proces(:))
 
-    call Name_File(sub, name_buf, '.buf')
-    open(9, file=name_buf)
-    print *, '# Creating files: ', trim(name_buf)
+    if(verbose) then
+      call Name_File(sub, name_buf, '.buf')
+      open(9, file=name_buf)
+      print *, '# Creating files: ', trim(name_buf)
 
-    write(9,'(a22)') '#--------------------#'
-    write(9,'(a22)') '#   Buffer indexes   #'
-    write(9,'(a22)') '#--------------------#'
+      write(9,'(a22)') '#--------------------#'
+      write(9,'(a22)') '#   Buffer indexes   #'
+      write(9,'(a22)') '#--------------------#'
+    else
+      print *, '# Creating buffers '
+    end if
 
     !-----------!
     !   Cells   !
@@ -124,8 +128,12 @@
     !--------------------!
     nbf_sub   = 0
     nbfcc_sub = 0
-    write(9,'(a30)') '# Number of physical cells:'
-    write(9,'(i8)')  nc_sub
+
+    if(verbose) then
+      write(9,'(a30)') '# Number of physical cells:'
+      write(9,'(i8)')  nc_sub
+    end if
+
     do subo = 1, maxval(grid % comm % proces(:))
       if(subo .ne. sub) then
         grid % comm % nbb_s(subo) = nbf_sub + 1
@@ -183,19 +191,21 @@
         grid % comm % nbb_e(subo) = nbf_sub
 
         ! Write to buffer file
-        write(9,'(a33)') '#-------------------------------#' 
-        write(9,'(a33)') '#   Conections with subdomain:  #' 
-        write(9,'(a33)') '#-------------------------------#' 
-        write(9,'(i8)')  subo
-        write(9,'(a30)') '# Number of local connections:'
-        write(9,'(i8)')  grid % comm % nbb_e(subo) -  &
-                         grid % comm % nbb_s(subo)+1 
-        write(9,'(a37)') '# Local number in a buffer and index:'
-        do b = grid % comm % nbb_s(subo),  &
-               grid % comm % nbb_e(subo)
-          write(9,'(2i8)') b - grid % comm % nbb_s(subo) + 1, buf_send_ind(b)
-        end do
-      end if 
+        if(verbose) then
+          write(9,'(a33)') '#-------------------------------#' 
+          write(9,'(a33)') '#   Conections with subdomain:  #' 
+          write(9,'(a33)') '#-------------------------------#' 
+          write(9,'(i8)')  subo
+          write(9,'(a30)') '# Number of local connections:'
+          write(9,'(i8)')  grid % comm % nbb_e(subo) -  &
+                           grid % comm % nbb_s(subo)+1 
+          write(9,'(a37)') '# Local number in a buffer and index:'
+          do b = grid % comm % nbb_s(subo),  &
+                 grid % comm % nbb_e(subo)
+            write(9,'(2i8)') b - grid % comm % nbb_s(subo) + 1, buf_send_ind(b)
+          end do
+        end if
+      end if
 
     end do ! for subo
 
@@ -286,7 +296,9 @@
 
   end do   ! through subdomains
 
-  close(9)
+  if(verbose) then
+    close(9)
+  end if
 
   !--------------------------------------------------!
   !                                                  !
