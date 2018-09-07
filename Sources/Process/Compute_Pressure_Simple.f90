@@ -28,19 +28,19 @@
   real              :: urf           ! under-relaxation factor
   real              :: p_max, p_min, p_nor
 !==============================================================================!
-!     
+!
 !   The form of equations which I am solving:    
-!     
-!      /               /            
-!     |               |             
+!
+!      /               /
+!     |               |
 !     | rho u dS = dt | GRAD pp dS
-!     |               |             
-!    /               /              
+!     |               |
+!    /               /
 !
 !   Dimension of the system under consideration
-!   
+!
 !     [App] {pp} = {bpp}               [kg/s]
-!   
+!
 !   Dimensions of certain variables
 !
 !     app            [ms]
