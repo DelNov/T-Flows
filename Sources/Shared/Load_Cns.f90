@@ -72,7 +72,6 @@
   read(9) (grid % bnd_cond % copy_c(c), c = -1,-grid % n_bnd_cells, -1)
 
   read(9) grid % n_copy
-  print *, '# Number of copy cells/faces: ', grid % n_copy
   allocate (grid % bnd_cond % copy_s(2,grid % n_copy))
   read(9) (grid % bnd_cond % copy_s(1,s), s = 1,grid % n_copy)
   read(9) (grid % bnd_cond % copy_s(2,s), s = 1,grid % n_copy)

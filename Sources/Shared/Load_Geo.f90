@@ -19,7 +19,7 @@
   !   geometrical quantities   !
   !----------------------------!
   call Name_File(this_proc, name_in, '.geo') 
-  open(9, file=name_in, FORM='unformatted')
+  open(9, file=name_in, form='unformatted')
   if(this_proc < 2) print *, '# Reading the file: ', name_in
 
   read(9) (grid % xn(n), n = 1, grid % n_nodes)
