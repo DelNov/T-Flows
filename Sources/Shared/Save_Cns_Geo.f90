@@ -211,14 +211,6 @@
     end if
   end do 
 
-  ! nbf_sub buffer cells
-  do c = 1, nbf_sub
-    count=count-1 
-    ! nekad bio i: -nbc_sub-c,
-    iwork(count,1) = BUFFER
-    iwork(count,2) = 0        ! hmm ? unused ? hmm ?
-  end do 
-
   write(9) (iwork(c,1), c = -1, count, -1)
   write(9) (iwork(c,2), c = -1, count, -1)
 
