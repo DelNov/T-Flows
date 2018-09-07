@@ -3,7 +3,7 @@
                               ui_i, ui_j, ui_k,   &
                               si, sj, sk,         &
                               di, dj, dk,         &
-                              Hi, uj_i, uk_i)
+                              h_i, uj_i, uk_i)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves momentum conservation equations                     !
 !------------------------------------------------------------------------------!
@@ -39,7 +39,7 @@
   real            :: di(grid % n_faces),  &
                      dj(grid % n_faces),  &
                      dk(grid % n_faces)
-  real            :: Hi  (-grid % n_bnd_cells:grid % n_cells),  &
+  real            :: h_i (-grid % n_bnd_cells:grid % n_cells),  &
                      uj_i(-grid % n_bnd_cells:grid % n_cells),  &
                      uk_i(-grid % n_bnd_cells:grid % n_cells)
   real            :: uu_f, vv_f, ww_f, uv_f, uw_f, vw_f
@@ -121,7 +121,7 @@
 
   ! Calculate velocity magnitude for normalization
   vel_max = 0.0
-  do c = 1, grid % n_cells
+  do c = -grid % n_bnd_cells, grid % n_cells
     vel_max = max(vel_max, sqrt(u % n(c)**2 + v % n(c)**2 + w % n(c)**2))
   end do
   call Comm_Mod_Global_Max_Real(vel_max)
@@ -567,7 +567,7 @@
   !   Local pressure distribution   !
   !---------------------------------!
   do c = 1, grid % n_cells
-    b(c) = b(c) - Hi(c) * grid % vol(c)
+    b(c) = b(c) - h_i(c) * grid % vol(c)
   end do
 
   !----------------------------------------!
