@@ -2,42 +2,42 @@
 
 # If you do no have any local copy of remote git repository with T-Flows, then
 
-git clone https://github.com/DelNov/T-Flows/ <NAME_OF_LOCAL_BRANCH>
+git clone https://github.com/DelNov/T-Flows/ <Name_Of_Local_Folder>
 
 #----------------------#       #-------------------#
 # local copy           #  <--  # remote repository #
 #----------------------#  <--  #-------------------#
 # branch:              #  <--  # branch:           #
-# NAME_OF_LOCAL_BRANCH #  <--  # release_branch    #
+# release_branch       #  <--  # release_branch    #
 #----------------------#       #-------------------#
 
-# If argument NAME_OF_LOCAL_BRANCH was not supplied, then 
-# NAME_OF_LOCAL_BRANCH = release_branch
+# If argument Name_Of_Local_Branch was not supplied, then 
+# Name_Of_Local_Folder = T-Flows
 
 #--------------------------------------------------#
 
-# Whenever you have a local copy of remote repository type:
+# Whenever you have a local copy of remote repository, type:
 
 git remote -v
 
 # to display list of remote repositories, which local git knows.
 
-# <REMOTE_NAME> <URL> (fetch)
-# <REMOTE_NAME> <URL> (push)
+# <Remote_Name>  <Url>  (fetch)
+# <Remote_Name>  <Url>  (push)
 
 # Those are actually pointers to url of remote repository.
 
 # Thus:
-# <REMOTE_NAME> -> <URL>
+# <Remote_Name> -> <Url>
 
 # After you have created this pointer, 
 # you address remote repository only by
-# this pointer REMOTE_NAME and not actual URL
+# this pointer <Remote_Name> and not actual URL
 
-# By default REMOTE_NAME is "origin"
+# By default <Remote_Name> is "origin"
 
 # You can rename any pointer to repository by:
-git remote rename <OLD_NAME> <NEW_NAME>
+git remote rename <Old_Name> <New_Name>
 
 #--------------------------------------------------#
 
@@ -49,13 +49,13 @@ git remote rename <OLD_NAME> <NEW_NAME>
 
 # Let local git know your fork url you want to push to by:
 
-git remote add <FORK_NAME> <URL>
+git remote add <Fork_Name> <Url>
 
 #--------------------------------------------------#
 
 # If you want to pull the latest version from remote repository,
-# which is known to local git by pointer with name REMOTE_NAME, then
-git pull <REMOTE_NAME> <REMOTE_BRANCH_NAME>
+# which is known to local git by pointer with name <Remote_Name>, then
+git pull <Remote_Name> <Remote_Branch_Name>
 
 #--------------------------------------------------#
 
@@ -65,13 +65,13 @@ git pull <REMOTE_NAME> <REMOTE_BRANCH_NAME>
 git status
 
 # To prepare file for commit
-git add <FILENAME>
+git add <Filename>
 
 # To cancel changes to a file
-git checkout <FILENAME>
+git checkout <Filename>
 
 # To see a difference between file and its previous committed version 
-git diff <FILENAME>
+git diff <Filename>
 
 # To submit a commit:
 git commit
@@ -80,16 +80,16 @@ git commit
 
 # If you made some commits you can make a push to your fork by:
 
-git push <FORK_NAME> <NAME_OF_LOCAL_BRANCH>:<NAME_OF_REMOTE_BRANCH>
+git push <Fork_Name> <Name_Of_Local_Branch>:<Name_Of_Remote_Branch>
 
-# If NAME_OF_REMOTE_BRANCH does not exist, git will create it
+# If Name_Of_Remote_Branch does not exist, git will create it
 
 #----------------------#       #---------------------------#
 # local copy           #  -->  # fork of remote repository #
-#                      #  -->  # known as FORK_NAME        #
+#                      #  -->  # known as Fork_Name        #
 #----------------------#  -->  #---------------------------#
 # branch:              #  -->  # branch:                   #
-# NAME_OF_LOCAL_BRANCH #  -->  # NAME_OF_REMOTE_BRANCH     #
+# Name_Of_Local_Branch #  -->  # Name_Of_Remote_Branch     #
 #----------------------#       #---------------------------#
 
 #--------------------------------------------------#
