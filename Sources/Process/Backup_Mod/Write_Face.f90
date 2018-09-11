@@ -7,7 +7,8 @@
   use Grid_Mod
   use Comm_Mod
   use Work_Mod, only: cells_nf => i_cell_01,  &  ! cells' number of faces
-                      values   => r_cell_01      ! work array for values
+                      ivalues  => i_cell_02,  &  ! work array for int. values
+                      rvalues  => r_cell_01      ! work array for real values
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -16,23 +17,19 @@
   integer         :: fh, d
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: s, c, c1, c2, cg1, cg2, mc, max_cnt
-  integer, allocatable :: cells_cg(:,:)
-  real,    allocatable :: cell_flux(:,:)
+  integer, allocatable :: cells_cg(:,:)   ! cells' cells
+  integer, allocatable :: cells_fc(:,:)   ! cells' faces
   character(len=12)    :: cf_name = 'cell_flux_00'
 !==============================================================================!
 
   allocate(cells_cg (24, grid % n_cells));  cells_cg  = 0
-  allocate(cell_flux(24, grid % n_cells));  cell_flux = 0.0
+  allocate(cells_fc (24, grid % n_cells));  cells_fc  = 0
 
   cells_nf(:) = 0
 
   !---------------------------------------! 
   !   Browse through all faces to form:   !
-  !   cells_nf, cells_cg and cell_flux.   !
-  !                                       !
-  !   Keep in mind that, at this point,   !
-  !   each cell has fluxes defined at     !
-  !   all of the faces surrounding it.    !
+  !   cells_nf, cells_cg and cells_fc.    !
   !---------------------------------------! 
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1, s)
@@ -45,24 +42,15 @@
 
     ! Store flux to "c1" no matter what
     cells_nf(c1) = cells_nf(c1) + 1
-    cells_cg (cells_nf(c1), c1) = cg2
-    cell_flux(cells_nf(c1), c1) = flux(s)  ! store flux
+    cells_cg(cells_nf(c1), c1) = cg2
+    cells_fc(cells_nf(c1), c1) = s   ! store face number
 
     ! Store flux to "c2" only if it is a non-boundary cell (real boundary)
-    if(c2 > 0) then
+    if(c2 > 0 .and. c2 <= grid % n_cells - grid % comm % n_buff_cells) then
       cells_nf(c2) = cells_nf(c2) + 1
-      cells_cg (cells_nf(c2), c2) = cg1
-      cell_flux(cells_nf(c2), c2) = flux(s)  ! store flux (sign???)
+      cells_cg(cells_nf(c2), c2) = cg1
+      cells_fc(cells_nf(c2), c2) = s   ! store face number
     end if
-  end do
-
-  !--------------------------------------!
-  !     Sort fluxes for each cell by     !
-  !   global numbers of its neighbours   !
-  !--------------------------------------!
-  do c = 1, grid % n_cells
-    call Sort_Mod_Int_Carry_Real(cells_cg (1:cells_nf(c), c),  &
-                                 cell_flux(1:cells_nf(c), c))   
   end do
 
   !------------------------------------!
@@ -75,6 +63,35 @@
   end do
   call Comm_Mod_Global_Max_Int(max_cnt)
 
+  !-------------------------------------------------!
+  !   Update neighbour information in the buffers   !
+  !-------------------------------------------------!
+
+  ! Gather information on all neighbours in buffers, one by one
+  do mc = 1, max_cnt
+
+    ! Exchange neighbour information at level "mc"
+    do c = 1, grid % n_cells
+      ivalues(c) = cells_cg(mc,c)
+    end do
+    call Comm_Mod_Exchange_Int(grid, ivalues)
+
+    ! Update buffer cells with neighbors
+    do c = grid % n_cells - grid % comm % n_buff_cells + 1, grid % n_cells
+      cells_nf(c) = cells_nf(c) + 1
+      cells_cg(cells_nf(c), c) = ivalues(c) 
+    end do
+  end do
+
+  !--------------------------------------!
+  !     Sort fluxes for each cell by     !
+  !   global numbers of its neighbours   !
+  !--------------------------------------!
+  do c = 1, grid % n_cells
+    call Sort_Mod_Int_Carry_Int(cells_cg(1:cells_nf(c), c),  &
+                                cells_fc(1:cells_nf(c), c))
+  end do
+
   !--------------------------------------------!
   !   Write cell-based fluxes to backup file   !
   !                                            !
@@ -85,16 +102,16 @@
   !--------------------------------------------!
   do mc = 1, max_cnt
     write(cf_name(11:12), '(i2.2)') mc  ! set name of the backup variable
-    values(:) = 0.0
-    do c = 1, grid % n_cells            
+    rvalues(:) = 0.0
+    do c = 1, grid % n_cells
       if( cells_cg(mc, c) .ne. 0 ) then
-        values(c) = cell_flux(mc, c)
-      end if                                  
-    end do                                    
-    call Backup_Mod_Write_Cell(fh, d, cf_name, values(1:nc_s))
+        rvalues(c) = flux( cells_fc(mc,c) )
+      end if
+    end do
+    call Backup_Mod_Write_Cell(fh, d, cf_name, rvalues(1:nc_s))
   end do
 
   deallocate(cells_cg)
-  deallocate(cell_flux)
+  deallocate(cells_fc)
 
   end subroutine
