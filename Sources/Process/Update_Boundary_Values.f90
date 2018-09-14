@@ -127,9 +127,10 @@
         call Control_Mod_Turbulent_Prandtl_Number(pr_t)
 
         ! If not DNS or LES, compute Prandtl number 
-        if(turbulence_model .ne. SMAGORINSKY .or.  &
-           turbulence_model .ne. DYNAMIC     .or.  &
-           turbulence_model .ne. WALE        .or.  &
+        if(turbulence_model .ne. SMAGORINSKY .and.  &
+           turbulence_model .ne. DYNAMIC     .and.  &
+           turbulence_model .ne. WALE        .and.  &
+           turbulence_model .ne. NONE        .and.  &
            turbulence_model .ne. DNS) then
           pr_t = Turbulent_Prandtl_Number(grid, c1)
         end if
@@ -142,8 +143,13 @@
         qz = t % q(c2) * nz
 
         ! Turbulent conductivity from Reynolds analogy 
-        con_t = conductivity                 &
-              + capacity*vis_t(c1) / pr_t
+        if(turbulence_model .ne. NONE .and.  &
+           turbulence_model .ne. DNS) then
+          con_t = conductivity                 &
+                + capacity*vis_t(c1) / pr_t
+        else
+          con_t = conductivity
+        end if
 
         ! Wall temperature or heat fluxes for k-eps-zeta-f
         ! and high-re k-eps models
