@@ -77,7 +77,7 @@
       print *, '# Unsupported cell type ',       &
                  grid % faces_n_nodes(s), ' nodes.'
       print *, '# Exiting'
-      stop 
+      stop
     end if
   end do  
   write(9,'(a,a)') IN_4, '</DataArray>'
@@ -90,7 +90,7 @@
     write(9,'(a,i9)') IN_5, offset
   end do
   write(9,'(a,a)') IN_4, '</DataArray>'
- 
+
   ! Now write all cells' types
   write(9,'(a,a)') IN_4, '<DataArray type="Int64" Name="types" format="ascii">'
   do s = 1, grid % n_faces
@@ -99,7 +99,7 @@
   end do
   write(9,'(a,a)') IN_4, '</DataArray>'
   write(9,'(a,a)') IN_3, '</Cells>'
- 
+
   !---------------!
   !   Cell data   !
   !---------------!
@@ -111,9 +111,9 @@
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
-   
+
     ! If boundary 
-    if( c2 < 0 ) then 
+    if( c2 < 0 ) then
       write(9,'(a,i9)') IN_5, grid % bnd_cond % color(c2)
 
     ! If inside 
