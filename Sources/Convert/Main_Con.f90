@@ -65,7 +65,7 @@
   do n = 1, grid % n_nodes
     new_n(n) = n
   end do
-  do c = - grid % n_bnd_cells, grid % n_cells
+  do c = -grid % n_bnd_cells, grid % n_cells
     new_c(c) = c
   end do
   do s = 1, grid % n_faces
