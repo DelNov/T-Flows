@@ -2,7 +2,7 @@
   recursive subroutine Sort_Mod_Real_Carry_Int(a, b)
 !------------------------------------------------------------------------------!
 !   Quick sort one real array and carry an integer arral along                 !
-!                                                                              ! 
+!                                                                              !
 !   Adapted from: https://gist.github.com/1AdAstra1  (good work Olga)          !
 !------------------------------------------------------------------------------!
   implicit none
@@ -10,8 +10,7 @@
   real    :: a(:)
   integer :: b(:)
 !-----------------------------------[Locals]-----------------------------------!
-  real    :: x, at
-  integer :: bt
+  real    :: x
   integer :: i, j, n
 !------------------------------------------------------------------------------!
 
@@ -19,7 +18,7 @@
   x = a( (1+n) / 2 )
   i = 1
   j = n
-  
+
   do
     do while (a(i) < x)
       i = i + 1
@@ -29,15 +28,14 @@
     end do
     if (i >= j) exit
 
-    ! Swap values in a and b  
-    at   = a(i);  bt   = b(i)  
-    a(i) = a(j);  b(i) = b(j)
-    a(j) = at;    b(j) = bt
+    ! Swap values in a and b
+    call Swap_Real(a(i), a(j))
+    call Swap_Int (b(i), b(j))
 
     i = i + 1
     j = j - 1
   end do
-  
+
   if (1 < i - 1) call Sort_Mod_Real_Carry_Int(a(1:i-1), b(1:i-1))
   if (j + 1 < n) call Sort_Mod_Real_Carry_Int(a(j+1:n), b(j+1:n))
 

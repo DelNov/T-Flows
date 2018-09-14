@@ -6,7 +6,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   integer :: n, indx(n)
-    real    :: x(n)
+  real    :: x(n)
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: i
   real, allocatable :: work(:)

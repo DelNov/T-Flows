@@ -9,7 +9,7 @@
 !---------------------------------[Arguments]----------------------------------!
   integer :: a(:)
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: x, at
+  integer :: x
   integer :: i, j, n
 !------------------------------------------------------------------------------!
 
@@ -17,7 +17,7 @@
   x = a( (1+n) / 2 )
   i = 1
   j = n
-  
+
   do
     do while (a(i) < x)
       i = i + 1
@@ -28,14 +28,12 @@
     if (i >= j) exit
 
     ! Swap values in a
-    at   = a(i)
-    a(i) = a(j)
-    a(j) = at
+    call Swap_Int(a(i), a(j))
 
     i = i + 1
     j = j - 1
   end do
-  
+
   if (1 < i - 1) call Sort_Mod_Int(a(1:i-1))
   if (j + 1 < n) call Sort_Mod_Int(a(j+1:n))
 
