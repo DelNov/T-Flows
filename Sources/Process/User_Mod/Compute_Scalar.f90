@@ -80,7 +80,7 @@
 ! 
 !==============================================================================!
 
-!  if(turbulence_model .eq. REYNOLDS_STRESS) then
+!  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
 !    TDC = 1.0         
 !  else
 !    TDC = 1.0       
@@ -449,8 +449,8 @@
     end do
   end if
 
-  if(turbulence_model .eq. REYNOLDS_STRESS .or.  &
-     turbulence_model .eq. HANJALIC_JAKIRLIC) then
+  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
+     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
     if(turbulence_model_variant .ne. STABILIZED) then
       do c = 1, grid % n_cells
         u1uj_phij(c) = -0.22*t_scale(c) *&
