@@ -233,16 +233,20 @@
   !----------------------------!
   !   Spatial discretization   !
   !----------------------------!
-  call Control_Mod_Turbulent_Prandtl_Number(pr_t)  ! get default pr_t (0.9)
+  if(turbulence_model .ne. NONE .and.  &
+     turbulence_model .ne. DNS) then
+    call Control_Mod_Turbulent_Prandtl_Number(pr_t)  ! get default pr_t (0.9)
+  end if
 
   do s = 1, grid % n_faces
 
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
-    if(turbulence_model .ne. SMAGORINSKY .or.  &
-       turbulence_model .ne. DYNAMIC     .or.  &
-       turbulence_model .ne. WALE        .or.  &
+    if(turbulence_model .ne. SMAGORINSKY .and.  &
+       turbulence_model .ne. DYNAMIC     .and.  &
+       turbulence_model .ne. WALE        .and.  &
+       turbulence_model .ne. NONE        .and.  &
        turbulence_model .ne. DNS) then
       pr_t1 = Turbulent_Prandtl_Number(grid, c1)
       pr_t2 = Turbulent_Prandtl_Number(grid, c2)
@@ -256,8 +260,14 @@
     phix_f2 = phix_f1
     phiy_f2 = phiy_f1
     phiz_f2 = phiz_f1
-    con_eff1 =        fw(s)  * (conductivity+capacity*vis_t(c1)/pr_t)  &
-             + (1.0 - fw(s)) * (conductivity+capacity*vis_t(c2)/pr_t)
+    if(turbulence_model .ne. NONE .and.  &
+       turbulence_model .ne. DNS) then
+      con_eff1 =        fw(s)  * (conductivity+capacity*vis_t(c1)/pr_t)  &
+               + (1.0 - fw(s)) * (conductivity+capacity*vis_t(c2)/pr_t)
+    else
+      con_eff1 = conductivity
+    end if
+
     con_eff2 = con_eff1 
 
     if(turbulence_model .eq. K_EPS .or.  &
@@ -459,9 +469,12 @@
         c1 = grid % faces_c(1,s)
         c2 = grid % faces_c(2,s)
 
-        pr_t1 = Turbulent_Prandtl_Number(grid, c1)
-        pr_t2 = Turbulent_Prandtl_Number(grid, c2)
-        pr_t  = fw(s) * pr_t1 + (1.0 - fw(s)) * pr_t2
+        if(turbulence_model .ne. NONE .and.  &
+           turbulence_model .ne. DNS) then
+          pr_t1 = Turbulent_Prandtl_Number(grid, c1)
+          pr_t2 = Turbulent_Prandtl_Number(grid, c2)
+          pr_t  = fw(s) * pr_t1 + (1.0 - fw(s)) * pr_t2
+        end if
 
         if(c2 > 0) then
           phix_f1 = fw(s)*phi_x(c1) + (1.0-fw(s))*phi_x(c2)
