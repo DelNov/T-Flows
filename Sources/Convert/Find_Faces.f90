@@ -26,8 +26,8 @@
   integer             :: n_match, j, match_nodes(-1:8) 
   integer             :: i1, i2, k, cnt
   integer             :: fn(6,4)
-  real   ,allocatable :: face_coor(:) 
-  integer,allocatable :: face_cell(:), starts(:), ends(:) 
+  real   ,allocatable :: face_coor(:)
+  integer,allocatable :: face_cell(:), starts(:), ends(:)
   real                :: very_big
 !==============================================================================!
 
@@ -92,13 +92,7 @@
       cnt = cnt + 1
       starts(cnt) = c
       ends(cnt-1) = c-1
-      call Sort_Mod_Int_Carry_Int(face_cell(starts(cnt-1):ends(cnt-1)),  & 
-                                  face_cell(starts(cnt-1):ends(cnt-1)))
     end if
-  end do
-
-  do c=1, grid % n_cells*6
-    write(1,*) face_coor(c), face_cell(c)
   end do
 
   !-------------------------------------------!
