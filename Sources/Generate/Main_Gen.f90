@@ -30,18 +30,18 @@
   call Calculate_Grid_Geometry    (grid, .false.)
   call Smooth_Grid                (grid)
   call Refine_Grid                (grid)
-  call Determine_Grid_Connectivity(grid, .true.) ! real run
+  call Determine_Grid_Connectivity(grid, .true.)   ! real run
   call Calculate_Grid_Geometry    (grid, .true.)
 
   ! Prepare for saving
-  do n = 1,grid % n_nodes
-    new_n(n)=n
+  do n = 1, grid % n_nodes
+    new_n(n) = n
   end do
-  do c = -grid % n_bnd_cells,grid % n_cells
-    new_c(c)=c
+  do c = -grid % n_bnd_cells, grid % n_cells
+    new_c(c) = c
   end do
-  do s = 1,grid % n_faces
-    new_f(s)=s
+  do s = 1, grid % n_faces
+    new_f(s) = s
   end do
 
   ! Coarsen the grid with METIS
