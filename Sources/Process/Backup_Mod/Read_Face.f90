@@ -89,7 +89,7 @@
   !--------------------------------------!
   do c = 1, grid % n_cells
     call Sort_Mod_Int_Carry_Int(cells_cg(1:cells_nf(c), c),  &
-                                cells_fc(1:cells_nf(c), c))   
+                                cells_fc(1:cells_nf(c), c))
   end do
 
   !---------------------------------------------!
@@ -109,6 +109,21 @@
         flux( cells_fc(mc, c) ) = rvalues(c)
       end if
     end do
+  end do
+
+  !--------------------------------------------!
+  !        Correct the signs of fluxes         !
+  !   (Remember, they are defined to be pos-   !
+  !    itive from cg1 to cg2; and cg2 > cg1)   !
+  !--------------------------------------------!
+  do s = 1, grid % n_faces
+    c1  = grid % faces_c(1,s)
+    c2  = grid % faces_c(2,s)
+    cg1 = grid % comm % cell_glo(c1)
+    cg2 = grid % comm % cell_glo(c2)
+    if(cg2 > 0 .and. cg2 < cg1) then
+      flux(s) = -flux(s)
+    end if
   end do
 
   deallocate(cells_cg)
