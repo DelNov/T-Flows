@@ -11,7 +11,7 @@
   type(Grid_Type) :: grid
   integer         :: this_proc  ! needed if called from Processor
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: c, n, s
+  integer           :: c, n, s, color
   character(len=80) :: name_in
 !==============================================================================!
 
@@ -66,6 +66,8 @@
   ! Boundary cells
   allocate (grid % bnd_cond % color(-grid % n_bnd_cells-1:-1))
   read(9) (grid % bnd_cond % color(c), c = -1,-grid % n_bnd_cells, -1)
+
+  call Grid_Mod_Bnd_Cond_Ranges(grid)
 
   ! Boundary copy cells
   allocate (grid % bnd_cond % copy_c(-grid % n_bnd_cells:-1))
