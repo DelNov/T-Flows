@@ -20,15 +20,17 @@
 !----------------------------------[Locals]------------------------------------!
   integer :: c, c1, c2, s
   real    :: u_tan, u_nor_sq, u_nor, u_tot_sq
-  real    :: lf
-  real    :: alpha1, l_rans, l_sgs
+  real    :: lf, ebf, p_kin_int, p_kin_wf
+  real    :: alpha1, l_rans, l_sgs, kin_vis
+  real    :: u_tau_new 
 !==============================================================================!
 !   Dimensions:                                                                !
-!   Production    p_kin    [m^2/s^3]   | Rate-of-strain  shear     [1/s]       !
-!   Dissipation   eps % n  [m^2/s^3]   | Turb. visc.     vis_t     [kg/(m*s)]  !
-!   Wall shear s. tau_wall [kg/(m*s^2)]| Dyn visc.       viscosity [kg/(m*s)]  !
-!   Density       density  [kg/m^3]    | Turb. kin en.   kin % n   [m^2/s^2]   !
-!   Cell volume   vol      [m^3]       | Length          lf        [m]         !
+!                                                                              !
+!   production    p_kin    [m^2/s^3]   | rate-of-strain  shear     [1/s]       !
+!   dissipation   eps % n  [m^2/s^3]   | turb. visc.     vis_t     [kg/(m*s)]  !
+!   wall shear s. tau_wall [kg/(m*s^2)]| dyn visc.       viscosity [kg/(m*s)]  !
+!   density       density  [kg/m^3]    | turb. kin en.   kin % n   [m^2/s^2]   !
+!   cell volume   vol      [m^3]       | length          lf        [m]         !
 !   left hand s.  A        [kg/s]      | right hand s.   b         [kg*m^2/s^3]!
 !------------------------------------------------------------------------------!
 !   p_kin = 2*vis_t / density S_ij S_ij                                        !
@@ -76,6 +78,9 @@
     end do
   end if
 
+  ! Kinematic viscosities
+  kin_vis = viscosity / density
+
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
@@ -102,24 +107,27 @@
           u_tan = TINY
         end if
 
-        if(y_plus(c1) > 3.0) then
-          if(.not. rough_walls) then
-            ! Wall shear s.
-            tau_wall(c1) = density*kappa*u_tau(c1)*u_tan / &
-              (log(e_log*y_plus(c1)))
-            p_kin(c1) = tau_wall(c1)/density * u_tau(c1) / &
-              (kappa*grid % wall_dist(c1))
-          else if (rough_walls) then
-            tau_wall(c1) = density*kappa*u_tau(c1)*u_tan  &
-                           /(log((grid % wall_dist(c1)+Zo)/Zo))
-            p_kin(c1) = tau_wall(c1)/density * u_tau(c1) / &
-                        (kappa*(grid % wall_dist(c1)+Zo))
-            kin % n(c2) = (tau_wall(c1)/density) / 0.09**0.5
-          end if
+        u_tau(c1) = c_mu25 * sqrt(kin % n(c1))
+        y_plus(c1) = u_tau(c1) * grid % wall_dist(c1) / kin_vis
 
-          b(c1) = b(c1) + &
-            ( density*p_kin(c1) - vis_t(c1)*shear(c1)**2 ) * grid % vol(c1)
-        end if
+        tau_wall(c1) = density*kappa*u_tau(c1)*u_tan / &
+                       log(e_log*max(y_plus(c1),1.05))
+
+        u_tau_new = sqrt(tau_wall(c1)/density)
+        y_plus(c1) = u_tau_new * grid % wall_dist(c1) / kin_vis
+
+        ebf = 0.01 * y_plus(c1)**4.0 / (1.0 + 5.0*y_plus(c1))
+
+        p_kin_wf  = tau_wall(c1) * 0.07**0.25 * sqrt(kin % n(c1))  &
+                  / (grid % wall_dist(c1) * kappa)
+
+        p_kin_int = vis_t(c1) * shear(c1)**2
+
+
+        p_kin(c1) = p_kin_int * exp(-1.0 * ebf) + p_kin_wf *  &
+                    exp(-1.0 / ebf) 
+        b(c1)     = b(c1) + (p_kin(c1) - p_kin_int) * grid % vol(c1) 
+
       end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2).eq.WALL or WALLFL
     end if    ! c2 < 0
   end do

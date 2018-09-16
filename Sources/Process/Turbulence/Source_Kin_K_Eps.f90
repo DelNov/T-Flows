@@ -12,10 +12,6 @@
   use Grid_Mod
   use Grad_Mod
   use Control_Mod
-  use Work_Mod, only: kin_x => r_cell_01,  &
-                      kin_y => r_cell_02,  &
-                      kin_z => r_cell_03,  &
-                      kin_sq=> r_cell_04
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -24,21 +20,41 @@
   integer :: c, c1, c2, s
   real    :: u_tot2, u_nor, u_nor2, u_tan
   real    :: kin_vis ![m^2/s]
+  real    :: ebf, p_kin_int, p_kin_wf, u_tau_new
 !==============================================================================!
 !   Dimensions:                                                                !
-!   Production    p_kin    [m^2/s^3]   | Rate-of-strain  shear     [1/s]       !
-!   Dissipation   eps % n  [m^2/s^3]   | Turb. visc.     vis_t     [kg/(m*s)]  !
-!   Wall shear s. tau_wall [kg/(m*s^2)]| Dyn visc.       viscosity [kg/(m*s)]  !
-!   Density       density  [kg/m^3]    | Turb. kin en.   kin % n   [m^2/s^2]   !
-!   Cell volume   vol      [m^3]       | Length          lf        [m]         !
+!                                                                              !
+!   production    p_kin    [m^2/s^3]   | rate-of-strain  shear     [1/s]       !
+!   dissipation   eps % n  [m^2/s^3]   | turb. visc.     vis_t     [kg/(m*s)]  !
+!   wall shear s. tau_wall [kg/(m*s^2)]| dyn visc.       viscosity [kg/(m*s)]  !
+!   density       density  [kg/m^3]    | turb. kin en.   kin % n   [m^2/s^2]   !
+!   cell volume   vol      [m^3]       | length          lf        [m]         !
 !   left hand s.  a        [kg/s]      | right hand s.   b         [kg*m^2/s^3]!
 !------------------------------------------------------------------------------!
 !   p_kin = 2*vis_t / density S_ij S_ij                                        !
 !   shear = sqrt(2 S_ij S_ij)                                                  !
 !------------------------------------------------------------------------------!
 
+  !-----------------------------------------!
+  !   Compute the sources in the interior   !
+  !-----------------------------------------!
+  ! Production source:
   do c = 1, grid % n_cells
-    kin_sq(c) = sqrt(kin % n(c))
+    p_kin(c) = vis_t(c)/density * shear(c)**2
+    b(c)     = b(c) + density * p_kin(c) * grid % vol(c)
+
+    a % val(a % dia(c)) = a % val(a % dia(c)) + &
+         density * eps % n(c)/(kin % n(c) + TINY) * grid % vol(c)
+
+    if (buoyancy) then
+      buoy_beta(c) = 1.0
+      g_buoy(c) = -buoy_beta(c) * (grav_x * ut % n(c) +  &
+                                   grav_y * vt % n(c) +  &
+                                   grav_z * wt % n(c)) * density
+      b(c) = b(c) + max(0.0, g_buoy(c) * grid % vol(c))
+      a % val(a % dia(c)) = a % val(a % dia(c))  &
+                + max(0.0,-g_buoy(c) * grid % vol(c) / (kin % n(c) + TINY))
+    end if
   end do
 
   kin_vis = viscosity / density
@@ -46,108 +62,56 @@
   !-----------------------------------------------!
   !  Compute the sources in the near wall cells   !
   !-----------------------------------------------!
-  if(turbulence_wall_treatment .eq. HIGH_RE) then
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
+  do s = 1, grid % n_faces
+    c1 = grid % faces_c(1,s)
+    c2 = grid % faces_c(2,s)
 
-      if(c2 < 0) then
-        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
-           Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
+    if(c2 < 0) then
+      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
+         Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
 
-          ! Compute tangential velocity component
-          u_tot2 = u % n(c1) **2  &
-                 + v % n(c1) **2  &
-                 + w % n(c1) **2
-          u_nor = ( u % n(c1) * grid % sx(s)     &
-                  + v % n(c1) * grid % sy(s)     &
-                  + w % n(c1) * grid % sz(s) )   &
-                       / sqrt(  grid % sx(s)**2  &
-                              + grid % sy(s)**2  &
-                              + grid % sz(s)**2 )
-          u_nor2 = u_nor*u_nor
+        ! Compute tangential velocity component
+        u_tot2 = u % n(c1) **2  &
+               + v % n(c1) **2  &
+               + w % n(c1) **2
+        u_nor = ( u % n(c1) * grid % sx(s)     &
+                + v % n(c1) * grid % sy(s)     &
+                + w % n(c1) * grid % sz(s) )   &
+                     / sqrt(  grid % sx(s)**2  &
+                            + grid % sy(s)**2  &
+                            + grid % sz(s)**2 )
+        u_nor2 = u_nor*u_nor
 
-          if(u_tot2  >  u_nor2) then
-            u_tan = sqrt(u_tot2 - u_nor2)
-          else
-            u_tan = TINY
-          end if
+        if(u_tot2  >  u_nor2) then
+          u_tan = sqrt(u_tot2 - u_nor2)
+        else
+          u_tan = TINY
+        end if
 
-          ! Compute nondimensional wall distance and wall-shear stress
-          if(.not. rough_walls) then
-            y_plus(c1) = c_mu25 * kin_sq(c1) * grid % wall_dist(c1)  &
-                    / kin_vis
-            tau_wall(c1) = abs(c_mu25*kappa*density* kin_sq(c1) * u_tan  &
-                         / (log(e_log*y_plus(c1))))
+        u_tau(c1) = c_mu25 * sqrt(kin % n(c1))
+        y_plus(c1) = u_tau(c1) * grid % wall_dist(c1) / kin_vis
 
-            ! Production:
-            p_kin(c1) = c_mu25*tau_wall(c1)/density * kin_sq(c1)  &
-                      / (kappa*grid % wall_dist(c1))
+        tau_wall(c1) = density*kappa*u_tau(c1)*u_tan / &
+                       log(e_log*max(y_plus(c1),1.05))
 
-          else if(rough_walls) then
-            y_plus(c1) = c_mu25*kin_sq(c1) * (grid % wall_dist(c1)+Zo)  &
-             / kin_vis
-            tau_wall(c1) = abs(c_mu25*kappa*density * kin_sq(c1) * u_tan  &
-                         / (log((grid % wall_dist(c1)+Zo)/Zo)))
+        u_tau_new = sqrt(tau_wall(c1)/density)
+        y_plus(c1) = u_tau_new * grid % wall_dist(c1) / kin_vis
 
-            p_kin(c1) = tau_wall(c1)/density * c_mu25 * kin_sq(c1)  &
-                      / (kappa*(grid % wall_dist(c1)+Zo))
-            kin % n(c2) = (tau_wall(c1)/density)/0.09**0.5
-          end if
+        ebf = 0.01 * y_plus(c1)**4.0 / (1.0 + 5.0*y_plus(c1))
 
-          ! Filling up the source term
-          b(c1) = b(c1) + density * p_kin(c1) * grid % vol(c1)
-        end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL or WALLFL
-      end if    ! c2 < 0
-    end do
+        p_kin_wf    = tau_wall(c1) * 0.07**0.25 * sqrt(kin % n(c1))&
+                     / (grid % wall_dist(c1) * kappa)
 
-    !-----------------------------------------!
-    !   Compute the sources in the interior   !
-    !-----------------------------------------!
-    do c = 1, grid % n_cells
-      ! grid % cell_near_wall ensures not to put p_kin twice into &
-      ! the near wall cells
-      if(.not. grid % cell_near_wall(c)) then
-        ! Production:
-        p_kin(c)= vis_t(c)/density * shear(c)**2
-        b(c) = b(c) + density * p_kin(c) * grid % vol(c)
-      end if
-
-      ! Dissipation:
-      a % val(a % dia(c)) = a % val(a % dia(c)) + &
-          density * eps % n(c)/(kin % n(c)+TINY)*grid % vol(c)
-    end do
-  end if ! end if mode = wf
+        p_kin_int  = vis_t(c1) * shear(c1)**2
 
 
-  !--------------------------------------------------------!
-  !   Jones-Launder model and Launder-Sharma + Yap model   !
-  !--------------------------------------------------------!
-  if(turbulence_wall_treatment .eq. LOW_RE) then
+        p_kin(c1) = p_kin_int * exp(-1.0 * ebf) + p_kin_wf * &
+                    exp(-1.0 / ebf)
+        b(c1)     = b(c1) + (p_kin(c1) - p_kin_int) * grid % vol(c1)
 
-    do c = 1, grid % n_cells
-      p_kin(c) = vis_t(c)/density * shear(c)**2
-      ! Production:
-      b(c) = b(c) + density * p_kin(c) * grid % vol(c)
-
-      ! Dissipation:
-      a % val(a % dia(c)) = a % val(a % dia(c)) + &
-        density * eps % n(c)/(kin % n(c)+TINY)*grid % vol(c)
-    end do
-
-    call Grad_Mod_For_Phi(grid, kin_sq, 1, kin_x, .true.)  ! dk/dx
-    call Grad_Mod_For_Phi(grid, kin_sq, 2, kin_y, .true.)  ! dk/dy
-    call Grad_Mod_For_Phi(grid, kin_sq, 3, kin_z, .true.)  ! dk/dz
-
-    do c = 1, grid % n_cells
-
-      a % val(a % dia(c)) = a % val(a % dia(c))                &
-                          + 2.0 * viscosity*(  kin_x(c)**2     &
-                                             + kin_y(c)**2     &
-                                             + kin_z(c)**2 )   &
-                           * grid % vol(c) / (kin % n(c) + TINY)
-    end do
-  end if
+      end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL or WALLFL
+    end if    ! c2 < 0
+  end do
 
   call Comm_Mod_Exchange_Real(grid, kin % n)
 

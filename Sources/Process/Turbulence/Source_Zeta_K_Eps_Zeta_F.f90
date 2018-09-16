@@ -23,7 +23,7 @@
 !                                                                              !
 !   int( f22 * kin * dV  - ( eps / zeta) * dV )                                !
 !                                                                              !
-!   First term can appire as pozitiv and as negative as well so depend of      !
+!   First term can appear as positive and as negative as well so depend of     !
 !   sign of term , it is placed on left or right hand side.  Second, negative  !
 !   source term is added to main diagonal left hand side coefficient matrix    !
 !   in order to increase stability of solver                                   !
