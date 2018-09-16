@@ -18,7 +18,6 @@
   real                 :: x1, y1, z1, x8, y8, z8, maxdis
   integer              :: reg
   real, allocatable    :: x_node_new(:), y_node_new(:), z_node_new(:) 
-  real, allocatable    :: walln(:)           ! node distance from the wall 
   integer, allocatable :: node_to_nodes(:,:)
 !==============================================================================!
 
@@ -27,40 +26,8 @@
   allocate(y_node_new(grid % max_n_nodes));         y_node_new    = 0.
   allocate(z_node_new(grid % max_n_nodes));         z_node_new    = 0.
   allocate(node_to_nodes(grid % max_n_nodes,0:40)); node_to_nodes = 0
-  allocate(walln(grid % max_n_nodes));              walln         = 0.
 
   print *, '# Now smoothing the cells. This may take a while !' 
-
-  ! First compute distance to the wall for nodes
-  do n = 1, grid % n_nodes
-    walln(n)=HUGE
-  end do
-
-  do c = 1, grid % n_cells
-    do n = 1, grid % cells_n_nodes(c)
-      walln(grid % cells_n(n,c)) = min(grid % wall_dist(c),  &
-                                       walln(grid % cells_n(n,c)))
-    end do
-  end do
-
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
-    if(c2 < 0) then
-      do n = 1, grid % faces_n_nodes(s)  ! for quadrilateral an triangular faces
-        walln(grid % faces_n(n,s)) = 0.0
-      end do
-    end if
-  end do 
-
-  maxdis=0.0 
-  do n = 1, grid % n_nodes
-    maxdis = max(walln(n), maxdis)
-  end do
-
-  do n = 1, grid % n_nodes
-    walln(n) = walln(n) / maxdis
-  end do
 
   ! Node connectivity
   do n = 1, grid % n_nodes
@@ -149,16 +116,16 @@
           z_new_tmp = z_new_tmp / (1.0*node_to_nodes(n,0)) 
           if(grid % xn(n) > 0.001*x_min .and.  &
              grid % xn(n) < 0.999*x_max)       &
-          x_node_new(n) = (1.0-smooth_relax(reg)*walln(n))*grid % xn(n) &
-                        +      smooth_relax(reg)*walln(n) *x_new_tmp
+          x_node_new(n) = (1.0-smooth_relax(reg))*grid % xn(n) &
+                        +      smooth_relax(reg) *x_new_tmp
           if(grid % yn(n) > 0.001*y_min .and.  &
              grid % yn(n) < 0.999*y_max)       &
-          y_node_new(n) = (1.0-smooth_relax(reg)*walln(n))*grid % yn(n) &
-                        +      smooth_relax(reg)*walln(n) *y_new_tmp
+          y_node_new(n) = (1.0-smooth_relax(reg))*grid % yn(n) &
+                        +      smooth_relax(reg) *y_new_tmp
           if(grid % zn(n) > 0.001*z_min .and.  &
              grid % zn(n) < 0.999*z_max)       &
-          z_node_new(n) = (1.0-smooth_relax(reg)*walln(n))*grid % zn(n) &
-                        +      smooth_relax(reg)*walln(n)* z_new_tmp
+          z_node_new(n) = (1.0-smooth_relax(reg))*grid % zn(n) &
+                        +      smooth_relax(reg)* z_new_tmp
         end if
       end do
 
