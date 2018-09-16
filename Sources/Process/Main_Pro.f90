@@ -489,10 +489,12 @@
   n = n - 1
 
   ! Save backup and post-processing files at exit
-!@#  call Comm_Mod_Wait
-!@#  call Save_Results(grid, name_save)
-!@#  call Save_Backup (grid, n, name_save)
+  call Comm_Mod_Wait
+  call Save_Results(grid, name_save)
+  call Backup_Mod_Save(grid, n, name_save)
 
+  ! Write results in user-customized format
+  call User_Mod_Save_Results(grid, name_save)
   if(this_proc < 2) then
     open(9, file='stop')
     close(9)
