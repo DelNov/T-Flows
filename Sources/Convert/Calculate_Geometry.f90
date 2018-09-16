@@ -16,12 +16,11 @@
   include '../Shared/Approx_Real.int'
 !----------------------------------[Calling]-----------------------------------!
   real :: Distance
-  real :: Distance_Squared
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, c1, c2, n, s, ss, cc2, c_max, nnn, hh, mm, b
   integer              :: c11, c12, c21, c22, s1, s2, bou_cen, cnt_bnd, cnt_per
   integer              :: color_per, n_per, number_sides, dir, option
-  integer              :: rot_dir, n_wall_colors
+  integer              :: rot_dir
   real                 :: xt(4), yt(4), zt(4), angle_face, tol
   real                 :: xs2, ys2, zs2, x_a, y_a, z_a, x_b, y_b, z_b
   real                 :: x_c, y_c, z_c, det
@@ -34,7 +33,6 @@
   real, allocatable    :: xspr(:), yspr(:), zspr(:)
   real, allocatable    :: b_coor(:), phi_face(:)
   integer, allocatable :: b_face(:), face_copy(:)
-  integer, allocatable :: wall_colors(:)
   character(len=80)    :: answer
   real                 :: big, small
 !==============================================================================!
@@ -844,7 +842,7 @@
                      - (grid % zf(s) - grid % dz(s)) * grid % sz(s)
     end if
   end do
-  grid % vol = grid % vol * ONE_THIRD
+  grid % vol(:) = grid % vol(:) * ONE_THIRD
   c1 = 0
   min_vol =  HUGE
   max_vol = -HUGE
@@ -894,53 +892,6 @@
     grid % delta(c) = max(grid % delta(c), (ymax-ymin))
     grid % delta(c) = max(grid % delta(c), (zmax-zmin))
   end do
-
-  !------------------------------------------------------------------!
-  !   Calculate distance from the cell center to the nearest wall.   !
-  !------------------------------------------------------------------!
-  !     => depends on: xc,yc,zc inside and on the boundary.          !
-  !     <= gives:      wall_dist                                     !
-  !------------------------------------------------------------------!
-  grid % wall_dist = HUGE
-
-  call Grid_Mod_Print_Bnd_Cond_List(grid)
-  print *, '#================================================================'
-  print *, '# Type the list of boundary colors which represent walls,        '
-  print *, '# separated by spaces.  These will be used for computation       '
-  print *, '# of distance to the wall needed by some turbulence models.      '
-  print *, '#----------------------------------------------------------------'
-  call Tokenizer_Mod_Read_Line(5)
-  n_wall_colors = line % n_tokens
-  allocate(wall_colors(n_wall_colors))
-  do b = 1, n_wall_colors
-    read(line % tokens(b), *) wall_colors(b)
-  end do
-
-  if( (n_wall_colors .eq. 1) .and. (wall_colors(1) .eq. 0) ) then
-    grid % wall_dist = 1.0
-    print *, '# Distance to the wall set to 1.0 everywhere !'
-  else
-    do c1 = 1, grid % n_cells
-      if(mod(c1,10000) .eq. 0) then
-        write(*,'(a2, f5.0, a14)') ' #', (100.*c1/(1.*grid % n_cells)),  &
-                                   ' % complete...'
-      end if
-      do b = 1, n_wall_colors
-        do c2 = -1, -grid % n_bnd_cells, -1
-          if(grid % bnd_cond % color(c2) .eq. wall_colors(b)) then
-            grid % wall_dist(c1) = min(grid % wall_dist(c1),                &
-            Distance_Squared(grid % xc(c1), grid % yc(c1), grid % zc(c1),   &
-                             grid % xc(c2), grid % yc(c2), grid % zc(c2)))
-          end if
-        end do
-      end do
-    end do
-
-    grid % wall_dist = sqrt(grid % wall_dist)
-
-    print *, '# Distance to the wall calculated !'
-  end if
-  deallocate(wall_colors)
 
   !------------------------------------------------------------!
   !   Calculate the interpolation factors for the cell sides   !

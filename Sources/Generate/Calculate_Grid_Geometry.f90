@@ -16,10 +16,8 @@
 !----------------------------------[Calling]-----------------------------------!
   real :: Tet_Volume
   real :: Distance
-  real :: Distance_Squared
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, c1, c2, m, n, s, n_per
-  integer              :: b, n_wall_colors
   real                 :: loc_x_node(4), loc_y_node(4), loc_z_node(4)
   real                 :: x_cell_tmp, y_cell_tmp, z_cell_tmp    
   real                 :: xs2, ys2, zs2
@@ -29,7 +27,6 @@
   real                 :: x_min, x_max, y_min, y_max, z_min, z_max
   integer              :: f4n(6,4)
   integer              :: f3n(4,3)
-  integer, allocatable :: wall_colors(:)
 !==============================================================================!
 !
 !                                n3 
@@ -449,71 +446,6 @@
       end if
 
     end do
-  end if
-
-  !----------------------------------------------------------!
-  !   Calculate:                                             ! 
-  !      distance from the cell center to the nearest wall   !
-  !----------------------------------------------------------!
-  !   => depends on: xc,yc,zc inside and on the boundary     !
-  !   <= gives:      wall_dist                               !
-  !----------------------------------------------------------!
-  grid % wall_dist = HUGE 
-
-  call Grid_Mod_Print_Bnd_Cond_List(grid)
-  print *, '#================================================================'
-  if(rrun) then
-    print *, '# Computing the distance to the walls (2/2)'
-  else
-    print *, '# Computing the distance to the walls (1/2)'
-  end if 
-  print *, '# Type the list of boundary colors which represent walls,        '
-  print *, '# separated by spaces.  These will be used for computation       '
-  print *, '# of distance to the wall needed by some turbulence models.      '
-  print *, '# Type simply a zero to skip this step.                          '
-  print *, '#----------------------------------------------------------------'
-  call Tokenizer_Mod_Read_Line(5)
-  n_wall_colors = line % n_tokens
-  allocate(wall_colors(n_wall_colors))
-  do b = 1, n_wall_colors
-    read(line % tokens(b), *) wall_colors(b)
-  end do
- 
-  if( (n_wall_colors .eq. 1) .and. (wall_colors(1) .eq. 0) ) then
-    grid % wall_dist = 1.0
-    print *, '# Distance to the wall set to 1.0 everywhere !'
-  else 
-    do c1=1, grid % n_cells 
-      if(mod(c1,10000) .eq. 0) then
-        write(*,'(a2, f5.0, a14)') ' #', (100.*c1/(1.*grid % n_cells)),  &
-                                   ' % complete...'
-      end if
-      do b = 1, n_wall_colors
-        do s = first_wall_face, last_wall_face      ! 1, grid % n_faces
-          c2 = grid % faces_c(2,s)
-          if(c2 < 0) then
-            if(grid % bnd_cond % color(c2) .eq. wall_colors(b)) then
-              grid % wall_dist(c1)=min(grid % wall_dist(c1), &
-              Distance_Squared(grid % xc(c1),  &
-                               grid % yc(c1),  &
-                               grid % zc(c1),  &
-                               grid % xf(s),   &
-                               grid % yf(s),   &
-                               grid % zf(s)))
-            end if
-          end if 
-        end do
-      end do
-    end do
-
-    do c = 1, grid % n_cells
-      grid % wall_dist(c) = sqrt(grid % wall_dist(c))
-    end do
-
-    print *, '# Maximal distance to the wall: ',  &
-                  maxval(grid % wall_dist(1:grid % n_cells))
-    print *, '# Minimal distance to the wall: ',  &
-                  minval(grid % wall_dist(1:grid % n_cells))
   end if
 
   !------------------------------------------------------------!
