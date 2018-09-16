@@ -154,8 +154,7 @@
         ! Wall temperature or heat fluxes for k-eps-zeta-f
         ! and high-re k-eps models
         if(turbulence_model .eq. K_EPS_ZETA_F .or.      &
-            (turbulence_model         .eq. K_EPS .and.  &
-             turbulence_wall_treatment .eq. HIGH_RE) ) then
+           turbulence_model .eq. K_EPS) then
           y_pl = max(c_mu25 * sqrt(kin % n(c1)) * grid % wall_dist(c1)  &
                / viscosity, 0.12)
           u_plus = log(y_pl * e_log) / kappa + TINY

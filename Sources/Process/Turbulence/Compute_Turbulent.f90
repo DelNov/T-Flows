@@ -222,26 +222,12 @@
     phi_y_f = fw(s)*phi_y(c1) + (1.0-fw(s))*phi_y(c2)
     phi_z_f = fw(s)*phi_z(c1) + (1.0-fw(s))*phi_z(c2)
 
-    ! This implements zero gradient for k
-    if(turbulence_model .eq. K_EPS .and.  &
-       turbulence_wall_treatment .eq. HIGH_RE) then
-      if(c2 < 0 .and. phi % name .eq. 'KIN') then
-        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or. &
-           Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
-          phi_x_f = 0.0
-          phi_y_f = 0.0
-          phi_z_f = 0.0
-          vis_eff = 0.0
-        end if
-      end if
-    end if
-
-    if(turbulence_model .eq. K_EPS_ZETA_F) then
+    if(turbulence_model .eq. K_EPS_ZETA_F .or. &
+       turbulence_model .eq. K_EPS) then
       if(c2 < 0 .and. phi % name .eq. 'KIN') then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
-          if(sqrt(tau_wall(c1)/density)*grid % wall_dist(c1)/ &
-            (viscosity/density) > 2.0) then ! if y+ > 2
+          if(y_plus(c1) > 4) then
 
             phi_x_f = 0.0
             phi_y_f = 0.0

@@ -88,27 +88,38 @@
           u_tan = TINY
         end if
 
-        u_tau(c1) = c_mu25 * sqrt(kin % n(c1))
-        y_plus(c1) = u_tau(c1) * grid % wall_dist(c1) / kin_vis
+        if(rough_walls) then
+          u_tau(c1) = c_mu25 * sqrt(kin % n(c1))
+          y_plus(c1) = u_tau(c1) * (grid % wall_dist(c1) + z_o) &
+                       / kin_vis
 
-        tau_wall(c1) = density*kappa*u_tau(c1)*u_tan / &
-                       log(e_log*max(y_plus(c1),1.05))
+          tau_wall(c1) = density*kappa*u_tau(c1)*u_tan / & 
+                         log(max(((grid % wall_dist(c1)+z_o)/z_o),1.05))
 
-        u_tau_new = sqrt(tau_wall(c1)/density)
-        y_plus(c1) = u_tau_new * grid % wall_dist(c1) / kin_vis
+          p_kin(c1) = tau_wall(c1) * c_mu25 * sqrt(kin % n(c1)) &
+                      / (kappa*(grid % wall_dist(c1)+z_o))
+          b(c1)     = b(c1) + (p_kin(c1) - density * p_kin(c1)) * grid % vol(c1)
+        else
+          u_tau(c1) = c_mu25 * sqrt(kin % n(c1))
+          y_plus(c1) = u_tau(c1) * grid % wall_dist(c1) / kin_vis
 
-        ebf = 0.01 * y_plus(c1)**4.0 / (1.0 + 5.0*y_plus(c1))
+          tau_wall(c1) = density*kappa*u_tau(c1)*u_tan / & 
+                         log(e_log*max(y_plus(c1),1.05))
 
-        p_kin_wf    = tau_wall(c1) * 0.07**0.25 * sqrt(kin % n(c1))&
-                     / (grid % wall_dist(c1) * kappa)
+          u_tau_new = sqrt(tau_wall(c1)/density)
+          y_plus(c1) = u_tau_new * grid % wall_dist(c1) / kin_vis
 
-        p_kin_int  = vis_t(c1) * shear(c1)**2
+          ebf = 0.01 * y_plus(c1)**4.0 / (1.0 + 5.0*y_plus(c1))
 
+          p_kin_wf    = tau_wall(c1) * 0.07**0.25 * sqrt(kin % n(c1))&
+                       / (grid % wall_dist(c1) * kappa)
 
-        p_kin(c1) = p_kin_int * exp(-1.0 * ebf) + p_kin_wf * &
-                    exp(-1.0 / ebf)
-        b(c1)     = b(c1) + (p_kin(c1) - p_kin_int) * grid % vol(c1)
+          p_kin_int  = vis_t(c1) * shear(c1)**2
 
+          p_kin(c1) = p_kin_int * exp(-1.0 * ebf) + p_kin_wf * &
+                      exp(-1.0 / ebf)
+          b(c1)     = b(c1) + (p_kin(c1) - p_kin_int) * grid % vol(c1)
+        end if! rough_walls
       end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL or WALLFL
     end if    ! c2 < 0
   end do

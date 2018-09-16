@@ -85,40 +85,49 @@
         else
           u_tan = TINY
         end if
-
-        u_tau(c1) = c_mu25 * sqrt(kin % n(c1))
-        y_plus(c1) = u_tau(c1) * grid % wall_dist(c1) / kin_vis
-
-        tau_wall(c1) = density*kappa*u_tau(c1)*u_tan / &
-                       log(e_log*max(y_plus(c1),1.05))
-
-        u_tau_new = sqrt(tau_wall(c1)/density)
-        y_plus(c1) = u_tau_new * grid % wall_dist(c1) / kin_vis
-        ebf = 0.01 * y_plus(c1)**4.0 / (1.0 + 5.0*y_plus(c1))
-
-        eps_int = 2.0*viscosity/density * kin % n(c1) / grid % wall_dist(c1)**2
-        eps_wf  = c_mu75 * kin % n(c1)**1.5 / (grid % wall_dist(c1) * kappa)
-
-        if(y_plus(c1) > 4) then
-          fa = min(u_tau_new**3.0/(kappa*grid % wall_dist(c1)*p_kin(c1)),1.0)
-          Eps%n(c1) = (1.0-fa)*eps_int + fa*eps_wf
-
-          if(rough_walls) then
-            eps % n(c1) = c_mu75*kin % n(c1)**1.5 / (grid % wall_dist(c1)*kappa)
-          end if
+ 
+        if(rough_walls) then 
+          Eps % n(c1) = c_mu75 * kin % n(c1)**1.5 / & 
+                      ((grid % wall_dist(c1) + z_o) * kappa)
 
           ! Adjusting coefficient to fix eps value in near wall calls
-          do j = a % row(c1), a % row(c1 + 1) - 1
-            a % val(j) = 0.0
+          do j = a % row(c1), a % row(c1 + 1) - 1 
+            a % val(j) = 0.0 
           end do
 
           b(c1) = eps % n(c1) * density
           a % val(a % dia(c1)) = 1.0 * density
         else
-          eps % n(c2) = eps_int
-        end if
-      end if
-    end if
+          u_tau(c1) = c_mu25 * sqrt(kin % n(c1))
+          y_plus(c1) = u_tau(c1) * grid % wall_dist(c1) / kin_vis
+  
+          tau_wall(c1) = density*kappa*u_tau(c1)*u_tan / & 
+                         log(e_log*max(y_plus(c1),1.05))
+
+          u_tau_new = sqrt(tau_wall(c1)/density)
+          y_plus(c1) = u_tau_new * grid % wall_dist(c1) / kin_vis
+          ebf = 0.01 * y_plus(c1)**4.0 / (1.0 + 5.0*y_plus(c1))
+
+          eps_int = 2.0*viscosity/density * kin % n(c1) / grid % wall_dist(c1)**2
+          eps_wf  = c_mu75 * kin % n(c1)**1.5 / (grid % wall_dist(c1) * kappa)
+
+          if(y_plus(c1) > 4) then
+            fa = min(u_tau_new**3.0/(kappa*grid % wall_dist(c1)*p_kin(c1)),1.0)
+            Eps%n(c1) = (1.0-fa)*eps_int + fa*eps_wf
+
+            ! Adjusting coefficient to fix eps value in near wall calls
+            do j = a % row(c1), a % row(c1 + 1) - 1
+              a % val(j) = 0.0
+            end do
+
+            b(c1) = eps % n(c1) * density
+            a % val(a % dia(c1)) = 1.0 * density
+          else
+            eps % n(c2) = eps_int
+          end if ! y_plus > 4
+        end if   ! rough_walls
+      end if     ! wall or wall_flux
+    end if       ! c2 < 0
   end do
 
   end subroutine

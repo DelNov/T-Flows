@@ -18,7 +18,7 @@
   type(Var_Type) :: vis
 
   ! Constants for the k-eps model:
-  real :: c_1e, c_2e, c_3e, c_mu, c_mu25, c_mu75, kappa, e_log, Zo
+  real :: c_1e, c_2e, c_3e, c_mu, c_mu25, c_mu75, kappa, e_log, z_o
  
   ! Constants for the k-eps-v2f model:
   real :: c_mu_d, c_l, c_t, alpha, c_nu, c_f1, c_f2

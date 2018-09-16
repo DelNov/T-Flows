@@ -102,10 +102,6 @@
         y_plus(c1) = u_tau_new * grid % wall_dist(c1) / kin_vis
         ebf = 0.01 * y_plus(c1)**4.0 / (1.0 + 5.0*y_plus(c1))
 
-        if(rough_walls) then
-          y_plus(c1) = (grid % wall_dist(c1)+Zo)*u_tau(c1)/kin_vis
-        end if
-
         u_plus = log(max(y_plus(c1),1.05)*e_log)/kappa
 
         if(y_plus(c1) < 3.0) then
@@ -117,13 +113,14 @@
         end if
 
         if(rough_walls) then
-          u_plus = log(max((grid % wall_dist(c1)+Zo)/Zo,1.05))/(kappa + TINY) + TINY
+          y_plus(c1) = (grid % wall_dist(c1)+z_o)*u_tau(c1)/kin_vis
+          u_plus = log((grid % wall_dist(c1)+z_o))/(kappa + TINY) + TINY
           vis_wall(c1) = y_plus(c1) * viscosity * kappa / & 
-                         log(max((grid % wall_dist(c1)+Zo)/Zo,1.05))
+                         log((grid % wall_dist(c1)+z_o)/z_o)
         end if
 
         if(heat_transfer) then
-          pr_t = 0.9!Turbulent_Prandtl_Number(grid, c1) 
+          call Control_Mod_Turbulent_Prandtl_Number(pr_t)
           pr = viscosity * capacity / conductivity
           beta = 9.24 * ((pr/pr_t)**0.75 - 1.0) * & 
             (1.0 + 0.28 * exp(-0.007*pr/pr_t))

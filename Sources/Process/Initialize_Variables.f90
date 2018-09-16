@@ -271,7 +271,7 @@
           eps % o(c)  = eps % n(c)
           eps % oo(c) = eps % n(c)
           u_tau(c)  = 0.047
-          y_plus(c) = 1.1
+          y_plus(c) = 0.001
         end if
 
         if(turbulence_model .eq. K_EPS_ZETA_F) then
@@ -288,7 +288,7 @@
           f22  % o(c)  = f22  % n(c)
           f22  % oo(c) = f22  % n(c)
           u_tau(c)  = 0.047
-          y_plus(c) = 1.1
+          y_plus(c) = 0.001
         end if
 
         if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
