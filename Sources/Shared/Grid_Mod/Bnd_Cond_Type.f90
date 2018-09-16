@@ -6,8 +6,8 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
-  integer         :: bnd_cell  
-!------------------------------------------------------------------------------!
+  integer         :: bnd_cell
+!==============================================================================!
 
   Grid_Mod_Bnd_Cond_Type =  &
        grid % bnd_cond % type(grid % bnd_cond % color(bnd_cell))
