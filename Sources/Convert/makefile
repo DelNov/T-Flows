@@ -149,6 +149,7 @@ SRC_FUN = Approx_Real.f90		\
           Save_Vtu_Links.f90		\
           Swap_Int.f90			\
           Swap_Real.f90			\
+          Swap_Short.f90		\
           To_Upper_Case.f90
 
 # Local functions are added one by one ...

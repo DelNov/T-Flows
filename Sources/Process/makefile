@@ -180,10 +180,10 @@ endif
 SRC_MOD = Const_Mod.f90		\
           Load_Cns.f90		\
           Sort_Mod.f90		\
+          Tokenizer_Mod.f90	\
           Grid_Mod.f90		\
           Work_Mod.f90		\
           Name_Mod.f90		\
-          Tokenizer_Mod.f90	\
           Material_Mod.f90	\
           Metis_Options_Mod.f90
 
@@ -225,12 +225,14 @@ SRC_FUN =  $(shell ls -1 *.f90 | grep -v -i _Mod | grep -v -i Save_Cgns | grep -
 SRC_FUN += $(shell ls -1 $(DIR_MODELS)/*.f90 | xargs -n1 basename | grep -v -i _Mod)
 
 SRC_FUN += Distance.f90		\
+           Distance_Squared.f90	\
            Load_Geo.f90		\
            Name_File.f90	\
            Approx_Real.f90	\
            Approx_String.f90	\
            Swap_Int.f90		\
            Swap_Real.f90	\
+           Swap_Short.f90	\
            To_Upper_Case.f90
 
 #-------------------------------------------
