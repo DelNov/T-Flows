@@ -25,8 +25,8 @@
   integer, parameter :: K_EPS_ZETA_F          = 30089
   integer, parameter :: DES_SPALART           = 30091
   integer, parameter :: SPALART_ALLMARAS      = 30097
-  integer, parameter :: HANJALIC_JAKIRLIC     = 30103
-  integer, parameter :: REYNOLDS_STRESS       = 30109
+  integer, parameter :: RSM_HANJALIC_JAKIRLIC     = 30103
+  integer, parameter :: RSM_MANCEAU_HANJALIC       = 30109
 
   ! Turbulence wall treatment 
   integer, parameter :: STABILIZED = 30113

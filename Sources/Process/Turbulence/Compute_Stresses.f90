@@ -219,7 +219,7 @@
 
     vis_eff = viscosity + vis_t_f
 
-    if(turbulence_model .eq. HANJALIC_JAKIRLIC) then
+    if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
       if(turbulence_model_variant .ne. STABILIZED) then
         vis_eff = 1.5*viscosity 
       end if
@@ -312,7 +312,7 @@
     else
       c_mu_d = 0.22
     end if 
-    if(turbulence_model .eq. HANJALIC_JAKIRLIC) then        
+    if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then        
       do c = 1, grid % n_cells
         u1uj_phij(c) = c_mu_d / phi % sigma * kin % n(c) / eps % n(c)  &
                      * (  uu % n(c) * phi_x(c)                         &
@@ -332,7 +332,7 @@
                         + ww % n(c) * phi_z(c))                        &
                      - viscosity * phi_z(c)
       end do
-    else if(turbulence_model .eq. REYNOLDS_STRESS) then
+    else if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
       do c = 1, grid % n_cells
         u1uj_phij(c) = c_mu_d / phi % sigma * t_scale(c)  &
                      * (  uu % n(c) * phi_x(c)            &
@@ -363,7 +363,7 @@
     !------------------------------------------------------------------!
     !   Here we clean up transport equation from the false diffusion   !
     !------------------------------------------------------------------!
-    if(turbulence_model .eq. REYNOLDS_STRESS .and.  &
+    if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .and.  &
        turbulence_model_variant .ne. STABILIZED) then
       do s = 1, grid % n_faces
 
@@ -461,7 +461,7 @@
     end do
   end if
 
-  if(turbulence_model .eq. REYNOLDS_STRESS) then 
+  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then 
     call Grad_Mod_For_Phi(grid, f22 % n, 1, f22 % x, .true.) ! df22/dx
     call Grad_Mod_For_Phi(grid, f22 % n, 2, f22 % y, .true.) ! df22/dy
     call Grad_Mod_For_Phi(grid, f22 % n, 3, f22 % z, .true.) ! df22/dz

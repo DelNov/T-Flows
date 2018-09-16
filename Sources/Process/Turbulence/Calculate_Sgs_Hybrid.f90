@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Calculate_Sgs_Hybrid(grid)
 !------------------------------------------------------------------------------!
-!   Calculates SGS stresses and turbulent viscosity for 'LES'.                   !
+!   Calculates SGS stresses and turbulent viscosity for 'LES'.                 !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
@@ -11,11 +11,11 @@
   use Rans_Mod
   use Grid_Mod
 !------------------------------------------------------------------------------!
-! near(c) is the number of corresponding cell on the nearest wall.
-! In case that, in parallel executions, the subdomain does not have 
-! any nearwall cells, the near(c) is zero.
-! near(c) is calculated in NearWallCells.f90, only ones in the beginig
-! of a simulation.
+!   near(c) is the number of corresponding cell on the nearest wall.
+!   In case that, in parallel executions, the subdomain does not have 
+!   any nearwall cells, the near(c) is zero.
+!   near(c) is calculated in NearWallCells.f90, only ones in the beginig
+!   of a simulation.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

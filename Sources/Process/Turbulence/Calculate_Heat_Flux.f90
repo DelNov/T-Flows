@@ -46,8 +46,8 @@
       wt % n(c) = -vis_t(c) / pr_t * t_z(c)
     end do
 
-  else if(turbulence_model .eq. REYNOLDS_STRESS .or.  &
-          turbulence_model .eq. HANJALIC_JAKIRLIC) then
+  else if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
+          turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
     do c = 1, grid % n_cells
 
       ut % n(c) =  -0.22*t_scale(c) * (uu % n(c) * t_x(c) +  &

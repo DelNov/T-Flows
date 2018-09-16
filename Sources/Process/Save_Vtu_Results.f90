@@ -235,8 +235,8 @@
   ! Save kin and eps
   if(turbulence_model .eq. K_EPS            .or.  &
      turbulence_model .eq. K_EPS_ZETA_F     .or.  &
-     turbulence_model .eq. REYNOLDS_STRESS  .or.  &
-     turbulence_model .eq. HANJALIC_JAKIRLIC  ) then
+     turbulence_model .eq. RSM_MANCEAU_HANJALIC  .or.  &
+     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC  ) then
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentEnergyKinetic", kin % n(1))
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentDissipation",   eps % n(1))
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentKineticEnergyProduction", &
@@ -252,7 +252,7 @@
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentQuantityZeta", zeta % n(1))
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentQuantityF22",  f22  % n(1))
   end if
-  if(turbulence_model .eq. REYNOLDS_STRESS) then
+  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentQuantityF22",  f22  % n(1))
   end if
 
@@ -269,8 +269,8 @@
   end if
 
   ! Reynolds stress models
-  if(turbulence_model .eq. REYNOLDS_STRESS .or.  &
-     turbulence_model .eq. HANJALIC_JAKIRLIC) then
+  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
+     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressXX", uu % n(1))
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressYY", vv % n(1))
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressZZ", ww % n(1))

@@ -153,8 +153,8 @@
   !----------------------------!
   !   Reynolds stress models   !
   !----------------------------!
-  if(turbulence_model .eq. REYNOLDS_STRESS .or.  &
-     turbulence_model .eq. HANJALIC_JAKIRLIC) then
+  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
+     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
 
     ! Reynolds stresses
     call Var_Mod_Allocate_Solution('UU', uu, grid)
@@ -178,7 +178,7 @@
       call Var_Mod_Allocate_Statistics(eps)
     end if
 
-    if(turbulence_model .eq. REYNOLDS_STRESS) then
+    if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
       call Var_Mod_Allocate_Solution('F22', f22, grid)
       call Var_Mod_Allocate_Gradients(f22)
 
@@ -191,7 +191,7 @@
     allocate(t_scale(-grid % n_bnd_cells:grid % n_cells));  t_scale = 0.
     allocate(l_scale(-grid % n_bnd_cells:grid % n_cells));  l_scale = 0.
     allocate(p_kin  (-grid % n_bnd_cells:grid % n_cells));  p_kin   = 0.
-    if(turbulence_model .eq. HANJALIC_JAKIRLIC) then
+    if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
       allocate(eps_tot(-grid % n_bnd_cells:grid % n_cells)); eps_tot = 0.
     end if
 
@@ -239,8 +239,8 @@
   if(turbulence_statistics) then
 
     ! For second moment closures, memory for statistics was allocated above
-    if(turbulence_model .ne. HANJALIC_JAKIRLIC .and.  &
-       turbulence_model .ne. REYNOLDS_STRESS) then
+    if(turbulence_model .ne. RSM_HANJALIC_JAKIRLIC .and.  &
+       turbulence_model .ne. RSM_MANCEAU_HANJALIC) then
 
       ! First moments
       call Var_Mod_Allocate_Statistics(u)

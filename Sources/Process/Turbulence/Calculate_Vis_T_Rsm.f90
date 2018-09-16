@@ -23,19 +23,20 @@
   real              :: cmu_mod                                        
 !==============================================================================!
 !   Dimensions:                                                                !
-!   Production    p_kin    [m^2/s^3]   | Rate-of-strain  shear     [1/s]       !
-!   Dissipation   eps % n  [m^2/s^3]   | Turb. visc.     vis_t     [kg/(m*s)]  !
-!   Wall shear s. tau_wall [kg/(m*s^2)]| Dyn visc.       viscosity [kg/(m*s)]  !
-!   Density       density  [kg/m^3]    | Turb. kin en.   kin % n   [m^2/s^2]   !
-!   Cell volume   vol      [m^3]       | Length          lf        [m]         !
+!                                                                              !
+!   production    p_kin    [m^2/s^3]   | rate-of-strain  shear     [1/s]       !
+!   dissipation   eps % n  [m^2/s^3]   | turb. visc.     vis_t     [kg/(m*s)]  !
+!   wall shear s. tau_wall [kg/(m*s^2)]| dyn visc.       viscosity [kg/(m*s)]  !
+!   density       density  [kg/m^3]    | turb. kin en.   kin % n   [m^2/s^2]   !
+!   cell volume   vol      [m^3]       | length          lf        [m]         !
 !   left hand s.  A        [kg/s]      | right hand s.   b         [kg*m^2/s^3]!
-!   Wall visc.    vis_wall [kg/(m*s)]  |                                       !
-!   Thermal cap.  capacity[m^2/(s^2*K)]| Therm. conductivity     [kg*m/(s^3*K)]!
+!   wall visc.    vis_wall [kg/(m*s)]  | kinematic viscosity       [m^2/s]     !
+!   thermal cap.  capacity[m^2/(s^2*K)]| therm. conductivity     [kg*m/(s^3*K)]!
 !------------------------------------------------------------------------------!
 
   call Calculate_shear_And_Vorticity(grid)
 
-  if(turbulence_model .eq. HANJALIC_JAKIRLIC) then
+  if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
     do c = 1, grid % n_cells
       kin % n(c) = 0.5*max(uu % n(c) + vv % n(c) + ww % n(c), TINY)
 
@@ -50,7 +51,7 @@
       cmu_mod = min(0.12, cmu_mod) 
       vis_t(c) = cmu_mod * density * kin % n(c)**2. / ( eps_tot(c) + TINY)
     end do 
-  else if(turbulence_model .eq. REYNOLDS_STRESS) then
+  else if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
     do c = 1, grid % n_cells
       kin % n(c) = 0.5*max(uu % n(c) + vv % n(c) + ww % n(c), TINY)
 

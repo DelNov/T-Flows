@@ -234,8 +234,8 @@
             end do
 
             ! For turbulence models
-            if(turbulence_model .eq. REYNOLDS_STRESS .or.  &
-               turbulence_model .eq. HANJALIC_JAKIRLIC) then
+            if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
+               turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
               i = Key_Ind('UU',  keys, nks); if(i > 0) uu  % n(c) = vals(i)
               i = Key_Ind('VV',  keys, nks); if(i > 0) vv  % n(c) = vals(i)
               i = Key_Ind('WW',  keys, nks); if(i > 0) ww  % n(c) = vals(i)
@@ -244,7 +244,7 @@
               i = Key_Ind('VW',  keys, nks); if(i > 0) vw  % n(c) = vals(i)
               i = Key_Ind('EPS', keys, nks); if(i > 0) eps % n(c) = vals(i)
 
-              if(turbulence_model .eq. REYNOLDS_STRESS) then
+              if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
                 i = Key_Ind('F22', keys, nks); if(i > 0) f22 % n(c) = vals(i)
               end if
             end if
@@ -402,8 +402,8 @@
                 i = Key_Ind('VIS', keys, nks); if(i > 0) vis % n(c) = prof(k,i)
               end if
 
-              if(turbulence_model .eq. REYNOLDS_STRESS .or.  &
-                 turbulence_model .eq. HANJALIC_JAKIRLIC) then
+              if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
+                 turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
                 i = Key_Ind('UU', keys, nks); if(i > 0) uu  % n(c) = prof(k,i)
                 i = Key_Ind('VV', keys, nks); if(i > 0) vv  % n(c) = prof(k,i)
                 i = Key_Ind('WW', keys, nks); if(i > 0) ww  % n(c) = prof(k,i)
@@ -412,7 +412,7 @@
                 i = Key_Ind('VW', keys, nks); if(i > 0) vw  % n(c) = prof(k,i)
                 i = Key_Ind('EPS',keys, nks); if(i > 0) eps % n(c) = prof(k,i)
 
-                if(turbulence_model .eq. REYNOLDS_STRESS) then
+                if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
                   i = Key_Ind('F22', keys, nks); if(i>0) f22 % n(c) = prof(k,i)
                 end if
               end if
@@ -596,8 +596,8 @@
                     if(i > 0) f22 % n(c) = wi*prof(m, i) + (1.-wi)*prof(m+1, i)
                   end if
 
-                  if(turbulence_model .eq. REYNOLDS_STRESS .or.  &
-                     turbulence_model .eq. HANJALIC_JAKIRLIC) then
+                  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
+                     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
 
                     i = Key_Ind('UU', keys, nks)
                     if(i > 0) uu % n(c) = wi*prof(m, i) + (1.-wi)*prof(m+1, i)
@@ -620,7 +620,7 @@
                     i = Key_Ind('EPS', keys, nks)
                     if(i > 0) eps % n(c) = wi*prof(m, i) + (1.-wi)*prof(m+1, i)
 
-                    if(turbulence_model .eq. REYNOLDS_STRESS) then
+                    if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
                       i = Key_Ind('F22', keys, nks)
                       if(i > 0)f22 % n(c) = wi*prof(m, i) + (1.-wi)*prof(m+1, i)
                     end if

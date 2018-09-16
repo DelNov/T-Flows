@@ -234,7 +234,7 @@
   !    before the under relaxation ?)   !
   !                                     !
   !-------------------------------------!
-  if(turbulence_model .eq. REYNOLDS_STRESS) then
+  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
     call Source_F22_Ebm(grid)
   else
     call Source_F22_K_Eps_Zeta_F(grid)

@@ -155,8 +155,8 @@
   ! Kin and Eps
   if(turbulence_model .eq. K_EPS                 .or.  &
      turbulence_model .eq. K_EPS_ZETA_F          .or.  &
-     turbulence_model .eq. REYNOLDS_STRESS .or.  &
-     turbulence_model .eq. HANJALIC_JAKIRLIC  ) then
+     turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
+     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC  ) then
 
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               kin % n(1), "TurbulentKineticEnergy")
@@ -178,7 +178,7 @@
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               f22 % n(1),  "TurbulentQuantityF22")
   end if
-  if(turbulence_model .eq. REYNOLDS_STRESS) then
+  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               f22 % n(1),  "TurbulentQuantityF22")
   end if
@@ -198,8 +198,8 @@
   end if
 
   ! Reynolds stress models
-  if(turbulence_model .eq. REYNOLDS_STRESS .or.  &
-     turbulence_model .eq. HANJALIC_JAKIRLIC) then
+  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
+     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               uu % n(1),"ReynoldsStressXX")
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &

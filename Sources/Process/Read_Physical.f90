@@ -26,11 +26,11 @@
     call Constants_K_Eps()
   end if
 
-  if(turbulence_model .eq. REYNOLDS_STRESS) then
+  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
     call Constants_Reynolds_Stress()
   end if
 
-  if(turbulence_model .eq. HANJALIC_JAKIRLIC) then
+  if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
     call Constants_Hanjalic_Jakirlic()
   end if
 

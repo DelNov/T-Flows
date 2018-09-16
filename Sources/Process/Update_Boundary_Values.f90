@@ -60,8 +60,8 @@
       end if
 
       ! Reynolds stress models
-      if(turbulence_model .eq. REYNOLDS_STRESS .or.  &
-         turbulence_model .eq. HANJALIC_JAKIRLIC) then
+      if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
+         turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
           uu  % n(c2) = 0.0
@@ -71,7 +71,7 @@
           uw  % n(c2) = 0.0
           vw  % n(c2) = 0.0
           kin % n(c2) = 0.0
-          if(turbulence_model .eq. REYNOLDS_STRESS) f22 % n(c2) = 0.0
+          if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) f22 % n(c2) = 0.0
         end if
       end if
 
@@ -103,8 +103,8 @@
         end if
       end if
 
-      if(turbulence_model .eq. REYNOLDS_STRESS .or.  &
-         turbulence_model .eq. HANJALIC_JAKIRLIC) then
+      if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
+         turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW .or.  &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT .or.  &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE) then
@@ -116,7 +116,7 @@
           vw  % n(c2) = vw  % n(c1)
           kin % n(c2) = kin % n(c1)
           eps % n(c2) = eps % n(c1)
-          if(turbulence_model .eq. REYNOLDS_STRESS) f22 % n(c2) = f22 % n(c1)
+          if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) f22 % n(c2) = f22 % n(c1)
         end if
       end if
 
@@ -222,8 +222,8 @@
           eps % n(c2) = eps % n(grid % bnd_cond % copy_c(c2))
         end if
 
-        if(turbulence_model .eq. REYNOLDS_STRESS .or.  &
-           turbulence_model .eq. HANJALIC_JAKIRLIC) then
+        if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
+           turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
           uu  % n(c2) = uu  % n(grid % bnd_cond % copy_c(c2))
           vv  % n(c2) = vv  % n(grid % bnd_cond % copy_c(c2))
           ww  % n(c2) = ww  % n(grid % bnd_cond % copy_c(c2))
@@ -232,7 +232,7 @@
           vw  % n(c2) = vw  % n(grid % bnd_cond % copy_c(c2))
           kin % n(c2) = kin % n(grid % bnd_cond % copy_c(c2))
           eps % n(c2) = eps % n(grid % bnd_cond % copy_c(c2))
-          if(turbulence_model .eq. REYNOLDS_STRESS)  &
+          if(turbulence_model .eq. RSM_MANCEAU_HANJALIC)  &
             f22 % n(c2) = f22 % n(grid % bnd_cond % copy_c(c2))
         end if
       end if

@@ -306,8 +306,8 @@
     end if
 
     ! Add influence of Re stresses
-    if(turbulence_model .eq. REYNOLDS_STRESS .or.  &
-       turbulence_model .eq. HANJALIC_JAKIRLIC) then
+    if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
+       turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
       if(turbulence_model_variant .ne. STABILIZED) then
         if(ui % name .eq. 'U') then
           uu_f = fw(s) * uu % n(c1) + (1.0-fw(s)) * uu % n(c2)
@@ -417,8 +417,8 @@
   ! Add Re stress influence on momentum
   ! This is an alternative way to implement RSM
   !
-  !  if(turbulence_model .eq. REYNOLDS_STRESS .or.  &
-  !     turbulence_model .eq. HANJALIC_JAKIRLIC) then
+  !  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
+  !     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
   !    if(ui % name .eq. 'U') then
   !      call GraPhi(uu%n,1,VAR2x,.TRUE.)
   !      call GraPhi(uv%n,2,VAR2y,.TRUE.)
@@ -443,8 +443,8 @@
   !    end if
 
   ! Here we clean up momentum from the false diffusion
-  if(turbulence_model .eq. REYNOLDS_STRESS .or.  &
-     turbulence_model .eq. HANJALIC_JAKIRLIC) then
+  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
+     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
     if(turbulence_model_variant .ne. STABILIZED) then
       do s = 1, grid % n_faces
         c1 = grid % faces_c(1,s)

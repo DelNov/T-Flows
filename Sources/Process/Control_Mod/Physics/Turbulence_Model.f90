@@ -15,8 +15,8 @@
                             DNS,                       &
                             DES_SPALART,               &
                             SPALART_ALLMARAS,          &
-                            HANJALIC_JAKIRLIC,         &
-                            REYNOLDS_STRESS
+                            RSM_HANJALIC_JAKIRLIC,         &
+                            RSM_MANCEAU_HANJALIC
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -52,10 +52,10 @@
       turbulence_model = DES_SPALART
     case('SPALART_ALLMARAS')
       turbulence_model = SPALART_ALLMARAS
-    case('HANJALIC_JAKIRLIC')
-      turbulence_model = HANJALIC_JAKIRLIC
-    case('REYNOLDS_STRESS')
-      turbulence_model = REYNOLDS_STRESS
+    case('RSM_HANJALIC_JAKIRLIC')
+      turbulence_model = RSM_HANJALIC_JAKIRLIC
+    case('RSM_MANCEAU_HANJALIC')
+      turbulence_model = RSM_MANCEAU_HANJALIC
 
     case default
       print *, '# Unknown turbulence model :', trim(val)

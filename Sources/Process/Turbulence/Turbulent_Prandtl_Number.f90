@@ -18,7 +18,7 @@
   Turbulent_Prandtl_Number =                                                  &
     1.0 / (   0.5882                                                          &
             + 0.228  * (vis_t(c) / (viscosity + TINY))                        &
-            - 0.0441 * (vis_t(c) / (viscosity + TINY))**2                     & 
+            - 0.0441 * (vis_t(c) / (viscosity + TINY))**2                     &
                      * (1.0 - exp(-5.165*( viscosity / (vis_t(c) + TINY) )))  &
           )
 

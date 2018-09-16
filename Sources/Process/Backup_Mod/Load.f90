@@ -158,8 +158,8 @@
   !----------------------------!
   !   Reynolds stress models   !
   !----------------------------!
-  if(turbulence_model .eq. REYNOLDS_STRESS .or.  &
-     turbulence_model .eq. HANJALIC_JAKIRLIC) then
+  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
+     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
 
     ! Reynolds stresses
     call Backup_Mod_Read_Variable(fh, d, 'uu',  uu)
@@ -173,7 +173,7 @@
     call Backup_Mod_Read_Variable(fh, d, 'eps', eps)
 
     ! F22
-    if(turbulence_model .eq. REYNOLDS_STRESS) then
+    if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
       call Backup_Mod_Read_Variable(fh, d, 'f22',  f22)
     end if
 

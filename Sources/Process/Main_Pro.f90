@@ -201,8 +201,8 @@
     end if
 
     call Convective_Outflow(grid, dt)
-    if(turbulence_model .eq. REYNOLDS_STRESS .or.  &
-       turbulence_model .eq. HANJALIC_JAKIRLIC) then
+    if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
+       turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
       call Calculate_Vis_T_Rsm(grid)
     end if
 
@@ -315,13 +315,13 @@
         end if
       end if
 
-      if(turbulence_model .eq. REYNOLDS_STRESS .or.  &
-         turbulence_model .eq. HANJALIC_JAKIRLIC) then
+      if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
+         turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
 
         ! Update the values at boundaries
         call Update_Boundary_Values(grid)
 
-        if(turbulence_model .eq. REYNOLDS_STRESS) then
+        if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
           call Time_And_Length_Scale(grid)
         end if
 
@@ -345,7 +345,7 @@
         call Compute_Stresses(grid, dt, ini, uw)
         call Compute_Stresses(grid, dt, ini, vw)
 
-        if(turbulence_model .eq. REYNOLDS_STRESS) then
+        if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
           call Compute_F22(grid, ini, f22)
         end if
 

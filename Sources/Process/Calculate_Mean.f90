@@ -71,8 +71,8 @@
       !----------------------------!
       !   Reynolds stress models   !
       !----------------------------!
-      if(turbulence_model .eq. HANJALIC_JAKIRLIC .or.  &
-         turbulence_model .eq. REYNOLDS_STRESS) then
+      if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
+         turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
         uu  % mean(c) = (uu  % mean(c) * (1.*n) + uu  % n(c)) / (1.*(n+1))
         vv  % mean(c) = (vv  % mean(c) * (1.*n) + vv  % n(c)) / (1.*(n+1))
         ww  % mean(c) = (ww  % mean(c) * (1.*n) + ww  % n(c)) / (1.*(n+1))
@@ -81,7 +81,7 @@
         vw  % mean(c) = (vw  % mean(c) * (1.*n) + vw  % n(c)) / (1.*(n+1))
         kin % mean(c) = (kin % mean(c) * (1.*n) + kin % n(c)) / (1.*(n+1))
         eps % mean(c) = (eps % mean(c) * (1.*n) + eps % n(c)) / (1.*(n+1))
-        if(turbulence_model .eq. REYNOLDS_STRESS) then
+        if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
           f22  % mean(c) = (f22  % mean(c) * (1.*n) + f22  % n(c)) / (1.*(n+1))
         end if
       end if
