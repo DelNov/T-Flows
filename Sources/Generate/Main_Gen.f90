@@ -33,6 +33,9 @@
   call Determine_Grid_Connectivity(grid, .true.)   ! real run
   call Calculate_Grid_Geometry    (grid, .true.)
 
+  call Grid_Mod_Sort_Faces_Smart(grid)
+  call Grid_Mod_Calculate_Wall_Distance(grid)
+
   ! Prepare for saving
   do n = 1, grid % n_nodes
     new_n(n) = n

@@ -9,7 +9,7 @@
   implicit none
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type)   :: grid     ! grid to be converted
-  integer           :: c, n, s, l
+  integer           :: c, n, s, l, color
   character(len=80) :: file_name, file_name_up, extension
 !==============================================================================!
 
@@ -60,6 +60,9 @@
   call Find_Faces        (grid)
   call Calculate_Geometry(grid)
   call Connect_Domains   (grid)
+
+  call Grid_Mod_Sort_Faces_Smart       (grid)
+  call Grid_Mod_Calculate_Wall_Distance(grid)
 
   ! Prepare for saving
   do n = 1, grid % n_nodes
