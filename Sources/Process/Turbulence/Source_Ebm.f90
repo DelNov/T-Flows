@@ -32,16 +32,17 @@
   real    :: b_kl_b_kl_sq, b_lm_s_lm, u_k_u_l_n_k_n_l, term_c3_1
 !==============================================================================!
 !   Dimensions:                                                                !
-!   Production P_ujj, p_kin  [m^2/s^3] | Rate-of-strain  sij       [1/s]       !
-!   Dissipation   eps % n    [m^2/s^3] | Turb. visc.     vis_t     [kg/(m*s)]  !
-!   Vel.-Pres. cor. phi      [m^2/s^3] | Dyn visc.       viscosity [kg/(m*s)]  !
-!   Density       density    [kg/m^3]  | Turb. kin en.   kin % n   [m^2/s^2]   !
-!   Cell volume   vol        [m^3]     | Length          lf        [m]         !
-!   left hand s.  A          [kg/s]    |                                       !
+!                                                                              !
+!   production P_ujj, p_kin  [m^2/s^3] | rate-of-strain  sij       [1/s]       !
+!   dissipation   eps % n    [m^2/s^3] | turb. visc.     vis_t     [kg/(m*s)]  !
+!   vel.-Pres. cor. phi      [m^2/s^3] | dyn visc.       viscosity [kg/(m*s)]  !
+!   density       density    [kg/m^3]  | turb. kin en.   kin % n   [m^2/s^2]   !
+!   cell volume   vol        [m^3]     | length          lf        [m]         !
+!   left hand s.  A          [kg/s]    | kinematic viscosity       [m^2/s]     !
 !   right hand s. for u_iu_j [m^2/s^3] | right hand s. for eps  b  [kg*m^2/s^4]!
 !------------------------------------------------------------------------------!
-!   Production : P_ij = - <u_i u_k> dU_j/dx_k - <u_j u_k> dU_j/dx_k            !
-!   Coriolis:    G_ij = - 2 omega_k ( eps_ikm <u_j u_m> - eps_jkm <u_i u_m> )  !
+!   production : P_ij = - <u_i u_k> dU_j/dx_k - <u_j u_k> dU_j/dx_k            !
+!   coriolis:    G_ij = - 2 omega_k ( eps_ikm <u_j u_m> - eps_jkm <u_i u_m> )  !
 !------------------------------------------------------------------------------!
 
   call Time_And_Length_Scale(grid)
