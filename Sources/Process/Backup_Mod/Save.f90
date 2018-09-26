@@ -60,6 +60,9 @@
   call Backup_Mod_Write_Real(fh, d, 'bulk_flux_x',   bulk % flux_x)
   call Backup_Mod_Write_Real(fh, d, 'bulk_flux_y',   bulk % flux_y)
   call Backup_Mod_Write_Real(fh, d, 'bulk_flux_z',   bulk % flux_z)
+  call Backup_Mod_Write_Real(fh, d, 'bulk_flux_x_o', bulk % flux_x_o)
+  call Backup_Mod_Write_Real(fh, d, 'bulk_flux_y_o', bulk % flux_y_o)
+  call Backup_Mod_Write_Real(fh, d, 'bulk_flux_z_o', bulk % flux_z_o)
   call Backup_Mod_Write_Real(fh, d, 'bulk_p_drop_x', bulk % p_drop_x)
   call Backup_Mod_Write_Real(fh, d, 'bulk_p_drop_y', bulk % p_drop_y)
   call Backup_Mod_Write_Real(fh, d, 'bulk_p_drop_z', bulk % p_drop_z)
@@ -161,7 +164,7 @@
     call Backup_Mod_Write_Variable(fh, d, 'eps', eps)
 
     ! F22
-    if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
+    if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
       call Backup_Mod_Write_Variable(fh, d, 'f22',  f22)
     end if
 
