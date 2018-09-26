@@ -466,9 +466,9 @@
     call Grad_Mod_For_Phi(grid, f22 % n, 2, f22 % y, .true.) ! df22/dy
     call Grad_Mod_For_Phi(grid, f22 % n, 3, f22 % z, .true.) ! df22/dz
 
-    call Source_EBM              (grid, phi % name)
-  else
-    call Source_Hanjalic_Jakirlic(grid, phi % name)        
+    call Sources_Rsm_Manceau_Hanjalic(grid, phi % name)
+  else if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
+    call Sources_Rsm_Hanjalic_Jakirlic(grid, phi % name)        
   end if                
 
   !---------------------------------!
