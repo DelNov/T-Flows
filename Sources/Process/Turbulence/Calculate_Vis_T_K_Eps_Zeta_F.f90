@@ -41,16 +41,17 @@
   call Time_And_Length_Scale(grid)
 
   ! c = 1, grid % n_cells
-  if(turbulence_model      .eq. K_EPS_ZETA_F .and.  &
+  if(turbulence_model .eq. K_EPS_ZETA_F .and.  &
      .not. turbulence_statistics) then
     do c = -grid % n_bnd_cells, grid % n_cells
       vis_t(c) = c_mu_d * density * zeta % n(c) * kin % n(c) * t_scale(c)
     end do
 
-  else if(turbulence_model      .eq. K_EPS_ZETA_F .and.  &
+  else if(turbulence_model .eq. K_EPS_ZETA_F .and.  &
           turbulence_statistics) then
     do c = -grid % n_bnd_cells, grid % n_cells
-      vis_t(c)     = c_mu_d * zeta % n(c) * kin % n(c) * t_scale(c)
+      vis_t(c)     = c_mu_d * density * zeta % n(c)  &
+                   * kin % n(c) * t_scale(c)
       vis_t_eff(c) = max(vis_t(c), vis_t_sgs(c))
     end do
     call Comm_Mod_Exchange_Real(grid, vis_t_eff)
@@ -77,7 +78,7 @@
                  / sqrt(  grid % sx(s)*grid % sx(s)  &
                         + grid % sy(s)*grid % sy(s)  &
                         + grid % sz(s)*grid % sz(s))
-        u_nor_sq = u_nor*u_nor
+        u_nor_sq = u_nor**2
 
         if( u_tot_sq  > u_nor_sq) then
           u_tan = sqrt(u_tot_sq - u_nor_sq)
@@ -88,28 +89,28 @@
         u_tau(c1) = c_mu25 * sqrt(kin % n(c1))
         y_plus(c1) = u_tau(c1) * grid % wall_dist(c1) / kin_vis
 
-        tau_wall(c1) = density*kappa*u_tau(c1)*u_tan / & 
-                       log(e_log*max(y_plus(c1),1.05))
+        tau_wall(c1) = density*kappa*u_tau(c1)*u_tan    &
+                     / log(e_log*max(y_plus(c1),1.05))
 
         u_tau_new = sqrt(tau_wall(c1)/density)
         y_plus(c1) = u_tau_new * grid % wall_dist(c1) / kin_vis
         ebf = 0.01 * y_plus(c1)**4.0 / (1.0 + 5.0*y_plus(c1))
 
-        u_plus = log(max(y_plus(c1),1.05)*e_log)/kappa
+        u_plus = log(max(y_plus(c1),1.05)*e_log) / kappa
 
         if(y_plus(c1) < 3.0) then
           vis_wall(c1) = vis_t(c1) + viscosity
         else
-          vis_wall(c1) = y_plus(c1) * viscosity / &
-                        (y_plus(c1) * exp(-1.0*ebf) + &
-                         u_plus * exp(-1.0/ebf) + TINY)
+          vis_wall(c1) = y_plus(c1) * viscosity         &
+                       / (  y_plus(c1) * exp(-1.0*ebf)  &
+                          + u_plus     * exp(-1.0/ebf) + TINY)
         end if
 
         if(rough_walls) then
           y_plus(c1) = (grid % wall_dist(c1)+z_o)*u_tau(c1)/kin_vis
           u_plus = log((grid % wall_dist(c1)+z_o)/z_o)/(kappa + TINY) + TINY
-          vis_wall(c1) = y_plus(c1) * viscosity * kappa / &
-                         log((grid % wall_dist(c1)+z_o)/z_o)
+          vis_wall(c1) = y_plus(c1) * viscosity * kappa  &
+                       / log((grid % wall_dist(c1)+z_o)/z_o)
         end if
 
         if(heat_transfer) then
@@ -119,8 +120,9 @@
             (1.0 + 0.28 * exp(-0.007*pr/pr_t))
           ebf = 0.01 * (pr*y_plus(c1))**4 / &
             ((1.0 + 5.0 * pr**3 * y_plus(c1)) + TINY)
-          con_wall(c1) = y_plus(c1)*viscosity*capacity/(y_plus(c1)*pr* &
-            exp(-1.0 * ebf) + (u_plus + beta)*pr_t*exp(-1.0/ebf) + TINY)
+          con_wall(c1) =    y_plus(c1) * viscosity * capacity          &
+                       / (  y_plus(c1) * pr        * exp(-1.0 * ebf)   &
+                          +(u_plus + beta) * pr_t  * exp(-1.0/ebf) + TINY)
         end if
       end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2).eq.WALL or WALLFL
     end if    ! c2 < 0

@@ -47,7 +47,7 @@
       end if      
       a % val(a % dia(c)) =  a % val(a % dia(c))      &
                           + grid % vol(c) * p_kin(c)  &
-                          / (kin % n(c) + TINY) * density
+                          / (kin % n(c) + TINY) 
     end do
 
   end if

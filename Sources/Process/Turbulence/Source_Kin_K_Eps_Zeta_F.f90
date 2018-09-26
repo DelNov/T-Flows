@@ -39,8 +39,8 @@
 
   ! Production source:
   do c = 1, grid % n_cells
-    p_kin(c) = vis_t(c)/density * shear(c)**2.
-    b(c)     = b(c) + density * p_kin(c) * grid % vol(c)
+    p_kin(c) = vis_t(c) * shear(c)**2
+    b(c)     = b(c) + p_kin(c) * grid % vol(c)
   end do
 
   if(turbulence_model .eq. K_EPS_ZETA_F .and.  &
@@ -62,7 +62,6 @@
     end do
   else
     do c = 1, grid % n_cells
-
       a % val(a % dia(c)) = a % val(a % dia(c)) + &
            density * eps % n(c)/(kin % n(c) + TINY) * grid % vol(c)
 
@@ -99,7 +98,7 @@
                  / sqrt(  grid % sx(s)*grid % sx(s)  &
                         + grid % sy(s)*grid % sy(s)  &
                         + grid % sz(s)*grid % sz(s))
-        u_nor_sq = u_nor*u_nor
+        u_nor_sq = u_nor**2
 
         if( u_tot_sq  > u_nor_sq) then
           u_tan = sqrt(u_tot_sq - u_nor_sq)
