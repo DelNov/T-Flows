@@ -142,8 +142,8 @@
         qy = t % q(c2) * ny
         qz = t % q(c2) * nz
 
-        ! Turbulent conductivity from Reynolds analogy 
-        if(turbulence_model .ne. NONE .and.  &
+        ! Turbulent conductivity from Reynolds analogy
+        if(turbulence_model .ne. NONE .and.    &
            turbulence_model .ne. DNS) then
           con_t = conductivity                 &
                 + capacity*vis_t(c1) / pr_t
@@ -155,25 +155,23 @@
         ! and high-re k-eps models
         if(turbulence_model .eq. K_EPS_ZETA_F .or.      &
            turbulence_model .eq. K_EPS) then
-          y_pl = max(c_mu25 * sqrt(kin % n(c1)) * grid % wall_dist(c1)  &
-               / viscosity, 0.12)
-          u_plus = log(y_pl * e_log) / kappa + TINY
+          u_plus = log(max(y_plus(c1),1.05)*e_log) / kappa
           pr = viscosity * capacity / conductivity
-          beta = 9.24 * ((pr/pr_t)**0.75 - 1.0)  &
-                      * (1.0 + 0.28 * exp(-0.007*pr/pr_t))
-          ebf = 0.01 * (pr*y_pl)**4            &
-                     / (1.0 + 5.0 * pr**3 * y_pl) + TINY
-          con_wall(c1) = y_pl * viscosity * capacity   &
-                       / (y_pl * pr * exp(-1.0 * ebf)  &
-                       + (u_plus + beta) * pr_t * exp(-1.0 / ebf) + TINY)
+          beta = 9.24 * ((pr/pr_t)**0.75 - 1.0)      &
+               * (1.0 + 0.28 * exp(-0.007*pr/pr_t))
+          ebf = 0.01 * (pr*y_plus(c1))**4            &
+              / ((1.0 + 5.0 * pr**3 * y_plus(c1)) + TINY)
+          con_wall(c1) =  y_plus(c1)*viscosity*capacity  &
+                       / (   y_plus(c1)     * pr   * exp(-1.0 * ebf)   &
+                          + (u_plus + beta) * pr_t * exp(-1.0 / ebf) + TINY)
           if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
             t % n(c2) = t % n(c1) + t % q(c2) * grid % wall_dist(c1)  &
-                         / (con_wall(c1) * capacity)
+                      / (con_wall(c1))
             heat_flux = heat_flux + t % q(c2) * grid % s(s)
             if(abs(t % q(c2)) > TINY) heated_area = heated_area + grid % s(s)
           else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) then
             t % q(c2) = ( t % n(c2) - t % n(c1) ) * con_wall(c1)  &
-                      / grid % wall_dist(c1)  
+                      / grid % wall_dist(c1)
             heat_flux = heat_flux + t % q(c2) * grid % s(s)
             if(abs(t % q(c2)) > TINY) heated_area = heated_area + grid % s(s)
           end if
@@ -181,12 +179,12 @@
         ! Wall temperature or heat fluxes for other trubulence models
         else
           if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
-            t % n(c2) = t % n(c1) + t % q(c2)                &
-                       /(conductivity * capacity)
+            t % n(c2) = t % n(c1) + t % q(c2) * grid % wall_dist(c1)  &
+                       /conductivity
             heat_flux = heat_flux + t % q(c2) * grid % s(s)
             if(abs(t % q(c2)) > TINY) heated_area = heated_area + grid % s(s)
           else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) then
-            t % q(c2) = ( t % n(c2) - t % n(c1) ) * con_t  &
+            t % q(c2) = ( t % n(c2) - t % n(c1) ) * conductivity  &
                       / grid % wall_dist(c1)
             heat_flux = heat_flux + t % q(c2) * grid % s(s)
             if(abs(t % q(c2)) > TINY) heated_area = heated_area + grid % s(s)

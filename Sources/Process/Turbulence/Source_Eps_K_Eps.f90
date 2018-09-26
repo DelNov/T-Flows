@@ -41,24 +41,25 @@
 !   shear = sqrt(2 S_ij S_ij)                                                  !
 !------------------------------------------------------------------------------!
 
+  kin_vis = viscosity/density
+
   do c = 1, grid % n_cells
     ! Positive contribution:
     b(c) = b(c) + &
-            c_1e * density * p_kin(c) * eps % n(c)/kin % n(c) * grid % vol(c)
+            c_1e * p_kin(c) * eps % n(c)/kin % n(c) * grid % vol(c)
 
     ! Negative contribution:
-    re_t = kin % n(c)*kin % n(c)/(viscosity*eps % n(c))
-    y_star = sqrt(sqrt(viscosity * eps % n(c))) * grid % wall_dist(c)/viscosity
+    re_t = kin % n(c)*kin % n(c)/(kin_vis*eps % n(c))
+    y_star = sqrt(sqrt(kin_vis * eps % n(c))) *     &
+             grid % wall_dist(c)/kin_vis
     f_mu = (1.0 - exp(-y_star/3.1))**2              &
          * (1.0 - 0.3*exp(-(re_t/6.5)*(re_t/6.5)))
 
     f_mu = min(f_mu,1.0)
 
     a % val(a % dia(c)) = a % val(a % dia(c)) &
-     + f_mu* c_2e * density * eps % n(c) / kin % n(c) * grid % vol(c)
+     + density * f_mu* c_2e * eps % n(c) / kin % n(c) * grid % vol(c)
   end do
-
-  kin_vis = viscosity / density
 
   ! Imposing a boundary condition on wall for eps
   do s = 1, grid % n_faces
@@ -78,7 +79,7 @@
                  / sqrt(  grid % sx(s)*grid % sx(s)  &
                         + grid % sy(s)*grid % sy(s)  &
                         + grid % sz(s)*grid % sz(s))
-        u_nor_sq = u_nor*u_nor
+        u_nor_sq = u_nor**2
 
         if( u_tot_sq  > u_nor_sq) then
           u_tan = sqrt(u_tot_sq - u_nor_sq)
@@ -87,11 +88,11 @@
         end if
  
         if(rough_walls) then 
-          Eps % n(c1) = c_mu75 * kin % n(c1)**1.5 / & 
-                      ((grid % wall_dist(c1) + z_o) * kappa)
+          eps % n(c1) = c_mu75 * kin % n(c1)**1.5  &
+                      / ((grid % wall_dist(c1) + z_o) * kappa)
 
           ! Adjusting coefficient to fix eps value in near wall calls
-          do j = a % row(c1), a % row(c1 + 1) - 1 
+          do j = a % row(c1), a % row(c1 + 1) - 1
             a % val(j) = 0.0 
           end do
 
@@ -101,27 +102,31 @@
           u_tau(c1) = c_mu25 * sqrt(kin % n(c1))
           y_plus(c1) = u_tau(c1) * grid % wall_dist(c1) / kin_vis
   
-          tau_wall(c1) = density*kappa*u_tau(c1)*u_tan / & 
-                         log(e_log*max(y_plus(c1),1.05))
+          tau_wall(c1) = density*kappa*u_tau(c1)*u_tan   &
+                       / log(e_log*max(y_plus(c1),1.05))
 
           u_tau_new = sqrt(tau_wall(c1)/density)
           y_plus(c1) = u_tau_new * grid % wall_dist(c1) / kin_vis
           ebf = 0.01 * y_plus(c1)**4.0 / (1.0 + 5.0*y_plus(c1))
 
-          eps_int = 2.0*viscosity/density * kin % n(c1) / grid % wall_dist(c1)**2
-          eps_wf  = c_mu75 * kin % n(c1)**1.5 / (grid % wall_dist(c1) * kappa)
+          eps_int = 2.0*viscosity/density * kin % n(c1)    &
+                  / grid % wall_dist(c1)**2
+          eps_wf  = c_mu75 * kin % n(c1)**1.5              &
+                  / (grid % wall_dist(c1) * kappa)
 
           if(y_plus(c1) > 4) then
-            fa = min(u_tau_new**3.0/(kappa*grid % wall_dist(c1)*p_kin(c1)),1.0)
-            Eps%n(c1) = (1.0-fa)*eps_int + fa*eps_wf
+            fa = min(density*u_tau_new**3  &
+               / (kappa*grid % wall_dist(c1)*p_kin(c1)),1.0)
+
+            eps % n(c1) = (1.0-fa)*eps_int + fa*eps_wf
 
             ! Adjusting coefficient to fix eps value in near wall calls
             do j = a % row(c1), a % row(c1 + 1) - 1
               a % val(j) = 0.0
             end do
 
-            b(c1) = eps % n(c1) * density
-            a % val(a % dia(c1)) = 1.0 * density
+            b(c1) = eps % n(c1)
+            a % val(a % dia(c1)) = 1.0
           else
             eps % n(c2) = eps_int
           end if ! y_plus > 4
