@@ -43,6 +43,7 @@
   real              :: con_eff1, f_ex1, f_im1, phix_f1, phiy_f1, phiz_f1
   real              :: con_eff2, f_ex2, f_im2, phix_f2, phiy_f2, phiz_f2
   real              :: phis, pr_t1, pr_t2
+  real              :: ut_s, vt_s, wt_s, t_stress, con_t
   character(len=80) :: precond       ! preconditioner
   integer           :: adv_scheme    ! space-discretiztion of advection scheme)
   real              :: blend         ! blending coeff (1.0 central; 0.0 upwind)
@@ -264,6 +265,8 @@
        turbulence_model .ne. DNS) then
       con_eff1 =        fw(s)  * (conductivity+capacity*vis_t(c1)/pr_t)  &
                + (1.0 - fw(s)) * (conductivity+capacity*vis_t(c2)/pr_t)
+      con_t    = fw(s) * capacity*vis_t(c1)/pr_t &
+               + (1.0 - fw(s)) * capacity*vis_t(c2)/pr_t
     else
       con_eff1 = conductivity
     end if
@@ -312,6 +315,24 @@
                         + con_eff1*f_coef(s)*(phi % n(c2) - phi % n(c1))
         end if
       end if
+    end if
+
+    ! Turbulent heat fluxes according to GGDH scheme
+    ! (first line is GGDH, second line is SGDH substratced 
+    if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
+       turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+      ut_s =  (     grid % f(s)  * ut % n(c1)  &
+           +  (1. - grid % f(s)) * ut % n(c2))
+      vt_s =  (     grid % f(s)  * vt % n(c1)  &
+           +  (1. - grid % f(s)) * vt % n(c2))
+      wt_s =  (     grid % f(s)  * wt % n(c1)  &
+           +  (1. - grid % f(s)) * wt % n(c2))
+      t_stress = - (  ut_s * grid % sx(s)                    &
+                    + vt_s * grid % sy(s)                    &
+                    + wt_s * grid % sz(s) )                  &
+                    - (con_t * (  phix_f1 * grid % sx(s)     &
+                                + phiy_f1 * grid % sy(s)     &
+                                + phiz_f1 * grid % sz(s)) )
     end if
 
     ! Cross diffusion part
@@ -439,90 +460,6 @@
       a % val(a % dia(c)) = a % val(a % dia(c)) + 1.5 * a0
       b(c)  = b(c) + 2.0 * a0 * phi % o(c) - 0.5 * a0 * phi % oo(c)
     end do
-  end if
-
-  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
-     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
-    if(turbulence_model_variant .ne. STABILIZED) then
-      do c = 1, grid % n_cells
-        u1uj_phij(c) = -0.22*t_scale(c) *&
-                   (uu%n(c)*phi_x(c)+uv%n(c)*phi_y(c)+uw%n(c)*phi_z(c))
-        u2uj_phij(c) = -0.22*t_scale(c)*&
-                   (uv%n(c)*phi_x(c)+vv%n(c)*phi_y(c)+vw%n(c)*phi_z(c))
-        u3uj_phij(c) = -0.22*t_scale(c)*&
-                   (uw%n(c)*phi_x(c)+vw%n(c)*phi_y(c)+ww%n(c)*phi_z(c))
-      end do
-      call Grad_Mod_For_Phi(grid, u1uj_phij, 1, u1uj_phij_x, .true.)
-      call Grad_Mod_For_Phi(grid, u2uj_phij, 2, u2uj_phij_y, .true.)
-      call Grad_Mod_For_Phi(grid, u3uj_phij, 3, u3uj_phij_z, .true.)
-      do c = 1, grid % n_cells
-        b(c) = b(c) - (  u1uj_phij_x(c)  &
-                       + u2uj_phij_y(c)  &
-                       + u3uj_phij_z(c) ) * grid % vol(c)
-      end do
-
-      !------------------------------------------------------------------!
-      !   Here we clean up transport equation from the false diffusion   !
-      !------------------------------------------------------------------!
-      do s = 1, grid % n_faces
-
-        c1 = grid % faces_c(1,s)
-        c2 = grid % faces_c(2,s)
-
-        if(turbulence_model .ne. NONE .and.  &
-           turbulence_model .ne. DNS) then
-          pr_t1 = Turbulent_Prandtl_Number(grid, c1)
-          pr_t2 = Turbulent_Prandtl_Number(grid, c2)
-          pr_t  = fw(s) * pr_t1 + (1.0 - fw(s)) * pr_t2
-        end if
-
-        if(c2 > 0) then
-          phix_f1 = fw(s)*phi_x(c1) + (1.0-fw(s))*phi_x(c2)
-          phiy_f1 = fw(s)*phi_y(c1) + (1.0-fw(s))*phi_y(c2)
-          phiz_f1 = fw(s)*phi_z(c1) + (1.0-fw(s))*phi_z(c2)
-          phix_f2 = phix_f1
-          phiy_f2 = phiy_f1
-          phiz_f2 = phiz_f1
-          con_eff1 =      grid % f(s)  * (capacity*vis_t(c1)/pr_t )  &
-                  + (1. - grid % f(s)) * (capacity*vis_t(c2)/pr_t )
-          con_eff2 = con_eff1 
-        else
-          phix_f1 = phi_x(c1)
-          phiy_f1 = phi_y(c1)
-          phiz_f1 = phi_z(c1)
-          phix_f2 = phix_f1
-          phiy_f2 = phiy_f1
-          phiz_f2 = phiz_f1
-          con_eff1 = capacity*vis_t(c1) / pr_t
-          con_eff2 = con_eff1
-        end if
-
-        ! Total (exact) diffusive flux
-        f_ex1 = con_eff1 * (  phix_f1*grid % sx(s)   &
-                            + phiy_f1*grid % sy(s)   &
-                            + phiz_f1*grid % sz(s))
-        f_ex2 = con_eff2 * (  phix_f2*grid % sx(s)   &
-                            + phiy_f2*grid % sy(s)   &
-                            + phiz_f2*grid % sz(s))
-
-        ! Implicit diffusive flux
-        f_im1 = con_eff1*f_coef(s)*          &
-                (  phix_f1*grid % dx(s)      &
-                 + phiy_f1*grid % dy(s)      &
-                 + phiz_f1*grid % dz(s) )
-        f_im2 = con_eff2*f_coef(s)*          &
-                (  phix_f2*grid % dx(s)      &
-                 + phiy_f2*grid % dy(s)      &
-                 + phiz_f2*grid % dz(s) )
-
-        b(c1) = b(c1) - con_eff1 * (phi % n(c2) - phi % n(c1)) * f_coef(s)  &
-              - f_ex1 + f_im1
-        if(c2  > 0) then
-          b(c2) = b(c2) + con_eff1 * (phi % n(c2) - phi % n(c1)) * f_coef(s)  &
-                + f_ex2 - f_im2
-        end if
-      end do
-    end if
   end if
 
   call User_Mod_Source(grid, phi, a, b)
