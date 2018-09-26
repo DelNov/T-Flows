@@ -21,7 +21,7 @@
   real    :: Distance
   integer :: Key_Ind
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: c, m, l, k, i, n, n_points, nks, nvs, us
+  integer           :: c, m, l, k, i, n, n_points, nks, nvs, us, c1, c2, s
   character(len=80) :: name_prof(128), answer, name_in
   real              :: wi, dist_min, x, y, z, xp, dist
   real, allocatable :: prof(:,:)
@@ -642,5 +642,23 @@
     end do
 
   end do
+
+  !------------------------------!
+  !   Find the near-wall cells   !
+  !------------------------------!
+  grid % cell_near_wall = .false.
+
+  do s = 1, grid % n_faces
+    c1 = grid % faces_c(1,s)
+    c2 = grid % faces_c(2,s)
+
+    if(c2 < 0) then
+      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
+         Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
+        grid % cell_near_wall(c1) = .true.
+      end if
+    end if
+
+  end do  ! faces
 
   end subroutine
