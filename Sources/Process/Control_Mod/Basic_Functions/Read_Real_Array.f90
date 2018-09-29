@@ -51,7 +51,7 @@
   !--------------------------------------------!
 1 if(present(verbose)) then
     if(verbose .and. this_proc < 2) then
-      print '(3a,se11.3)', ' # NOTE! Could not find the keyword: ',  &
+      print '(3a,1pe9.3)', ' # NOTE! Could not find the keyword: ',  &
                             trim(keyword), '. Using the default: ', def
     end if
   end if
