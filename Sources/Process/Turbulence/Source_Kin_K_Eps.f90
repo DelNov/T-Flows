@@ -96,9 +96,9 @@
           tau_wall(c1) = density*kappa*u_tau(c1)*u_tan  &
                        / log(max(((grid % wall_dist(c1)+z_o)/z_o), 1.05))
 
-          p_kin(c1) = tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))   &
+          p_kin(c1) = density * tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))   &
                     / (kappa*(grid % wall_dist(c1) + z_o))
-          b(c1)     = b(c1) + (p_kin(c1) - density * p_kin(c1))   &
+          b(c1)     = b(c1) + (p_kin(c1) - p_kin(c1))   &
                     * grid % vol(c1)
         else
           u_tau(c1) = c_mu25 * sqrt(kin % n(c1))

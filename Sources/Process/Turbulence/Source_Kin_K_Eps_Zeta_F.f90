@@ -52,18 +52,21 @@
       alpha1 = max(1.0,l_rans/l_sgs)
 
       if(alpha1 < 1.05) then
-        a % val(a % dia(c)) = a % val(a % dia(c)) + &
-             density * eps % n(c)/(kin % n(c) + TINY) * grid % vol(c)
+        a % val(a % dia(c)) = a % val(a % dia(c))   &
+                            + density * eps % n(c)  &
+                            / (kin % n(c) + TINY) * grid % vol(c)
       else
-        a % val(a % dia(c)) = a % val(a % dia(c)) +  &
-          density *  min(alpha1**1.45 * eps % n(c), kin % n(c)**1.5  &
-          / (lf*0.01)) / (kin % n(c) + TINY) * grid % vol(c)
+        a % val(a % dia(c)) = a % val(a % dia(c))   &
+          + density                                 &
+          * min(alpha1**1.45 * eps % n(c), kin % n(c)**1.5 / (lf*0.01))  &
+          / (kin % n(c) + TINY) * grid % vol(c)
       end if
     end do
   else
     do c = 1, grid % n_cells
-      a % val(a % dia(c)) = a % val(a % dia(c)) + &
-           density * eps % n(c)/(kin % n(c) + TINY) * grid % vol(c)
+      a % val(a % dia(c)) = a % val(a % dia(c))   &
+                          + density * eps % n(c)  &
+                          / (kin % n(c) + TINY) * grid % vol(c)
 
       if(buoyancy) then
         buoy_beta(c) = 1.0
@@ -106,38 +109,37 @@
           u_tan = TINY
         end if
 
-        if(rough_walls) then 
+        if(rough_walls) then
           u_tau(c1) = c_mu25 * sqrt(kin % n(c1))
-          y_plus(c1) = u_tau(c1) * (grid % wall_dist(c1) + z_o) &
-                       / kin_vis
+          y_plus(c1) = u_tau(c1) * (grid % wall_dist(c1) + z_o) / kin_vis
 
-          tau_wall(c1) = density*kappa*u_tau(c1)*u_tan / & 
-                         log(((grid % wall_dist(c1)+z_o)/z_o))
+          tau_wall(c1) = density*kappa*u_tau(c1)*u_tan  &
+                       / log(((grid % wall_dist(c1)+z_o) / z_o))
 
           p_kin(c1) = tau_wall(c1) * c_mu25 * sqrt(kin % n(c1)) &
                       / (kappa*(grid % wall_dist(c1)+z_o))
-          b(c1)     = b(c1) + (p_kin(c1) - & 
-                      vis_t(c1)/density * shear(c1)**2) * grid % vol(c1)
+          b(c1)     = b(c1) + (p_kin(c1)  &
+                    - vis_t(c1) * shear(c1)**2) * grid % vol(c1)
         else
           u_tau(c1) = c_mu25 * sqrt(kin % n(c1))
           y_plus(c1) = u_tau(c1) * grid % wall_dist(c1) / kin_vis
 
-          tau_wall(c1) = density*kappa*u_tau(c1)*u_tan / &
-                         log(e_log*max(y_plus(c1),1.05))
+          tau_wall(c1) = density*kappa*u_tau(c1)*u_tan  &
+                       / log(e_log*max(y_plus(c1),1.05))
 
           u_tau_new = sqrt(tau_wall(c1)/density)
           y_plus(c1) = u_tau_new * grid % wall_dist(c1) / kin_vis
 
-          ebf = 0.01 * y_plus(c1)**4.0 / (1.0 + 5.0*y_plus(c1))
+          ebf = 0.01 * y_plus(c1)**4 / (1.0 + 5.0*y_plus(c1))
 
           p_kin_wf  = tau_wall(c1) * 0.07**0.25 * sqrt(kin % n(c1))  &
                     / (grid % wall_dist(c1) * kappa)
 
           p_kin_int = vis_t(c1) * shear(c1)**2
 
-          p_kin(c1) = p_kin_int * exp(-1.0 * ebf) + p_kin_wf *  &
-                      exp(-1.0 / ebf) 
-          b(c1)     = b(c1) + (p_kin(c1) - p_kin_int) * grid % vol(c1) 
+          p_kin(c1) = p_kin_int * exp(-1.0 * ebf) + p_kin_wf  &
+                    * exp(-1.0 / ebf)
+          b(c1)     = b(c1) + (p_kin(c1) - p_kin_int) * grid % vol(c1)
         end if! rough_walls
       end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2).eq.WALL or WALLFL
     end if    ! c2 < 0
