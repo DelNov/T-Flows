@@ -26,7 +26,7 @@
   real              :: px_f, py_f, pz_f
   character(len=80) :: precond
   real              :: urf           ! under-relaxation factor
-  real              :: p_max, p_min, p_nor
+  real              :: p_max, p_min, p_nor, p_nor_c
 !==============================================================================!
 !
 !   The form of equations which I am solving:    
@@ -53,7 +53,14 @@
   ! User function
   call User_Mod_Beginning_Of_Compute_Pressure(grid, dt, ini)
 
-  ! Calculate velocity magnitude
+  !--------------------------------------------------!
+  !   Find the value for normalization of pressure   !
+  !--------------------------------------------------!
+
+  ! From control file
+  call Control_Mod_Normalization_For_Pressure_Solver(p_nor_c)
+
+  ! Calculate pressure magnitude for normalization of pressure solution
   p_max = -HUGE
   p_min = +HUGE
   do c = 1, grid % n_cells
@@ -62,9 +69,12 @@
   end do
   call Comm_Mod_Global_Max_Real(p_max)
   call Comm_Mod_Global_Min_Real(p_min)
-  p_nor = max( (p_max-p_min), MICRO, abs(bulk % p_drop_x),  &
-                                     abs(bulk % p_drop_y),  &
-                                     abs(bulk % p_drop_z) )
+
+  ! Normalize pressure with the maximum of pressure difference, 
+  ! value defined in control file and pressure drops.
+  p_nor = max( (p_max-p_min), p_nor_c, abs(bulk % p_drop_x),  &
+                                       abs(bulk % p_drop_y),  &
+                                       abs(bulk % p_drop_z) )
 
   ! Initialize matrix and right hand side
   b       = 0.0 
