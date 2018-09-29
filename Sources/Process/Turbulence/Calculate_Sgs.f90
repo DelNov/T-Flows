@@ -14,7 +14,7 @@
   use Control_Mod
   use Work_Mod, only: t_x => r_cell_01,  &
                       t_y => r_cell_02,  &
-                      t_z => r_cell_03           
+                      t_z => r_cell_03
 !------------------------------------------------------------------------------!
 !   Near(c) is the number of corresponding cell on the nearest wall.           !
 !   In case that, in parallel executions, the subdomain does not have          !
@@ -43,7 +43,7 @@
     call Grad_Mod_For_Phi(grid, t % n, 3, t_z, .true.)  ! dT/dz
   end if 
  
-  if(turbulence_model .eq. SMAGORINSKY) then
+  if(turbulence_model .eq. LES_SMAGORINSKY) then
     do c = 1, grid % n_cells
       lf = grid % vol(c)**ONE_THIRD
 
@@ -67,7 +67,7 @@
               * shear(c) 
     end do
 
-  else if(turbulence_model .eq. DYNAMIC) then
+  else if(turbulence_model .eq. LES_DYNAMIC) then
     if(buoyancy) then  
       do c = 1, grid % n_cells
         lf = grid % vol(c)**ONE_THIRD  
@@ -85,11 +85,11 @@
                 * sqrt(shear(c)*shear(c)  &
                 + 2.5*(grav_x*t_x(c) + grav_y*t_y(c) + grav_z*t_z(c)))  
       end do
-    end if     
+    end if
 
-  else if(turbulence_model .eq. WALE) then
+  else if(turbulence_model .eq. LES_WALE) then
     do c = 1, grid % n_cells
-      lf = grid % vol(c)**ONE_THIRD    
+      lf = grid % vol(c)**ONE_THIRD
       vis_t(c) = density           &
               * (lf*lf)            &          ! delta^2 
               * (0.5*0.5)          &          ! cs^2   

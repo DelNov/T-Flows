@@ -121,7 +121,7 @@
   call Bulk_Mod_Monitoring_Planes_Areas(grid, bulk)
   call Grad_Mod_Find_Bad_Cells         (grid)
 
-  if(turbulence_model .eq. SMAGORINSKY .and. .not. backup) then
+  if(turbulence_model .eq. LES_SMAGORINSKY .and. .not. backup) then
     call Find_Nearest_Wall_Cell(grid)
   end if
 
@@ -185,12 +185,12 @@
       call Calculate_Vorticity (grid)
     end if
 
-    if(turbulence_model .eq. SMAGORINSKY .or.  &
-       turbulence_model .eq. DYNAMIC     .or.  &
-       turbulence_model .eq. WALE) then
+    if(turbulence_model .eq. LES_SMAGORINSKY .or.  &
+       turbulence_model .eq. LES_DYNAMIC     .or.  &
+       turbulence_model .eq. LES_WALE) then
       call Calculate_Shear_And_Vorticity(grid)
-      if(turbulence_model .eq. DYNAMIC) call Calculate_Sgs_Dynamic(grid)
-      if(turbulence_model .eq. WALE)    call Calculate_Sgs_Wale(grid)
+      if(turbulence_model .eq. LES_DYNAMIC) call Calculate_Sgs_Dynamic(grid)
+      if(turbulence_model .eq. LES_WALE)    call Calculate_Sgs_Wale(grid)
       call Calculate_Sgs(grid)
     end if
 

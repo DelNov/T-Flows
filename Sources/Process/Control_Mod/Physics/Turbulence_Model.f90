@@ -9,13 +9,13 @@
                             NONE,                      &
                             K_EPS,                     &
                             K_EPS_ZETA_F,              &
-                            SMAGORINSKY,               &
-                            DYNAMIC,                   &
-                            WALE,                      &
+                            LES_SMAGORINSKY,           &
+                            LES_DYNAMIC,               &
+                            LES_WALE,                  &
                             DNS,                       &
                             DES_SPALART,               &
                             SPALART_ALLMARAS,          &
-                            RSM_HANJALIC_JAKIRLIC,         &
+                            RSM_HANJALIC_JAKIRLIC,     &
                             RSM_MANCEAU_HANJALIC
 !------------------------------------------------------------------------------!
   implicit none
@@ -40,12 +40,12 @@
       turbulence_model = K_EPS
     case('K_EPS_ZETA_F')
       turbulence_model = K_EPS_ZETA_F
-    case('SMAGORINSKY')
-      turbulence_model = SMAGORINSKY
-    case('DYNAMIC')
-      turbulence_model = DYNAMIC
-    case('WALE')
-      turbulence_model = WALE
+    case('LES_SMAGORINSKY')
+      turbulence_model = LES_SMAGORINSKY
+    case('LES_DYNAMIC')
+      turbulence_model = LES_DYNAMIC
+    case('LES_WALE')
+      turbulence_model = LES_WALE
     case('DNS')
       turbulence_model = DNS
     case('DES_SPALART')
@@ -67,10 +67,10 @@
   !-------------------------------------------------------------------!
   !   For scale-resolving simulations, engage turbulence statistics   !
   !-------------------------------------------------------------------!
-  if(turbulence_model .eq. SMAGORINSKY .or.  &
-     turbulence_model .eq. DYNAMIC     .or.  &
-     turbulence_model .eq. WALE        .or.  &
-     turbulence_model .eq. DNS         .or.  &
+  if(turbulence_model .eq. LES_SMAGORINSKY .or.  &
+     turbulence_model .eq. LES_DYNAMIC     .or.  &
+     turbulence_model .eq. LES_WALE        .or.  &
+     turbulence_model .eq. DNS             .or.  &
      turbulence_model .eq. DES_SPALART) then
 
     print *, '# Scale resolving simulation used; ' // &

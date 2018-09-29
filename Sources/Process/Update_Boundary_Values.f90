@@ -127,10 +127,10 @@
         call Control_Mod_Turbulent_Prandtl_Number(pr_t)
 
         ! If not DNS or LES, compute Prandtl number 
-        if(turbulence_model .ne. SMAGORINSKY .and.  &
-           turbulence_model .ne. DYNAMIC     .and.  &
-           turbulence_model .ne. WALE        .and.  &
-           turbulence_model .ne. NONE        .and.  &
+        if(turbulence_model .ne. LES_SMAGORINSKY .and.  &
+           turbulence_model .ne. LES_DYNAMIC     .and.  &
+           turbulence_model .ne. LES_WALE        .and.  &
+           turbulence_model .ne. NONE            .and.  &
            turbulence_model .ne. DNS) then
           pr_t = Turbulent_Prandtl_Number(grid, c1)
         end if

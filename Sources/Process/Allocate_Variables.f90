@@ -212,7 +212,7 @@
   !-----------------------!
   !   Smagorinsky model   !
   !-----------------------!
-  if(turbulence_model .eq. SMAGORINSKY) then
+  if(turbulence_model .eq. LES_SMAGORINSKY) then
     allocate(nearest_wall_cell(-grid % n_bnd_cells:grid % n_cells))
     nearest_wall_cell = 0
   end if
@@ -220,14 +220,14 @@
   !----------------!
   !   Wale model   !
   !----------------!
-  if(turbulence_model .eq. WALE) then
+  if(turbulence_model .eq. LES_WALE) then
     allocate(wale_v(-grid % n_bnd_cells:grid % n_cells));  wale_v = 0.
   end if
 
   !-------------------!
   !   Dynamic model   !
   !-------------------!
-  if(turbulence_model .eq. DYNAMIC) then
+  if(turbulence_model .eq. LES_DYNAMIC) then
     allocate(c_dyn(-grid % n_bnd_cells:grid % n_cells));  c_dyn = 0.
   end if
 

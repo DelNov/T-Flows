@@ -25,7 +25,7 @@
                          u3uj_phij   => r_cell_08,  &
                          u1uj_phij_x => r_cell_09,  &
                          u2uj_phij_y => r_cell_10,  &
-                         u3uj_phij_z => r_cell_11    
+                         u3uj_phij_z => r_cell_11
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
@@ -243,10 +243,10 @@
 
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
-     
-    if(turbulence_model .ne. SMAGORINSKY .or.  &
-       turbulence_model .ne. DYNAMIC     .or.  &
-       turbulence_model .ne. WALE        .or.  &
+
+    if(turbulence_model .ne. LES_SMAGORINSKY .or.  &
+       turbulence_model .ne. LES_DYNAMIC     .or.  &
+       turbulence_model .ne. LES_WALE        .or.  &
        turbulence_model .ne. DNS) then
       pr_t1 = Turbulent_Prandtl_Number(grid, c1)
       pr_t2 = Turbulent_Prandtl_Number(grid, c2)

@@ -18,15 +18,15 @@
   ! Parameters describing turbulence model choice
   integer, parameter :: NONE                  = 30011
   integer, parameter :: DNS                   = 30013
-  integer, parameter :: WALE                  = 30029
-  integer, parameter :: DYNAMIC               = 30047
-  integer, parameter :: SMAGORINSKY           = 30059
+  integer, parameter :: LES_WALE              = 30029
+  integer, parameter :: LES_DYNAMIC           = 30047
+  integer, parameter :: LES_SMAGORINSKY       = 30059
   integer, parameter :: K_EPS                 = 30071
   integer, parameter :: K_EPS_ZETA_F          = 30089
   integer, parameter :: DES_SPALART           = 30091
   integer, parameter :: SPALART_ALLMARAS      = 30097
-  integer, parameter :: RSM_HANJALIC_JAKIRLIC     = 30103
-  integer, parameter :: RSM_MANCEAU_HANJALIC       = 30109
+  integer, parameter :: RSM_HANJALIC_JAKIRLIC = 30103
+  integer, parameter :: RSM_MANCEAU_HANJALIC  = 30109
 
   ! Turbulence wall treatment 
   integer, parameter :: STABILIZED = 30113

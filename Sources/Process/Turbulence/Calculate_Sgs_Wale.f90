@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Calculate_Sgs_Wale(grid)
 !------------------------------------------------------------------------------!
-!  Compute SGS viscosity for 'LES' by using WALE model.  
+!  Compute SGS viscosity for 'LES' by using LES_WALE model.  
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod, only: ONE_THIRD, TINY

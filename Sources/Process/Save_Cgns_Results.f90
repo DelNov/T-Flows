@@ -215,10 +215,10 @@
   end if
 
   ! Statistics for large-scale simulations of turbulence
-  if(turbulence_model .eq. SMAGORINSKY .or.  &
-     turbulence_model .eq. DYNAMIC     .or.  &
-     turbulence_model .eq. WALE        .or.  &
-     turbulence_model .eq. DNS         .or.  &
+  if(turbulence_model .eq. LES_SMAGORINSKY .or.  &
+     turbulence_model .eq. LES_DYNAMIC     .or.  &
+     turbulence_model .eq. LES_WALE        .or.  &
+     turbulence_model .eq. DNS             .or.  &
      turbulence_model .eq. DES_SPALART) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               u % n(1),"MeanVelocityX")
