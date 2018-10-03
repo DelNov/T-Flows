@@ -36,14 +36,15 @@
   real              :: ini_res, fin_res                  ! residual
   real, optional    :: norm                              ! normalization
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: n, nb
+  integer :: nt, ni, nb
   real    :: alfa, beta, rho, rho_old, bnrm2, error
   integer :: i, j, k, iter, sub
 !==============================================================================!
 
   error = 0.
 
-  n  = mat_a % pnt_grid % n_cells - mat_a % pnt_grid % comm % n_buff_cells
+  nt = mat_a % pnt_grid % n_cells
+  ni = mat_a % pnt_grid % n_cells - mat_a % pnt_grid % comm % n_buff_cells
   nb = mat_a % pnt_grid % n_bnd_cells
 
   !---------------------!
@@ -56,9 +57,9 @@
   !   What if bnrm2 is very small ?   !
   !-----------------------------------!
   if(.not. present(norm)) then
-    bnrm2 = Normalized_Residual(n, nb, mat_a, x, r1)
+    bnrm2 = Normalized_Residual(ni, mat_a, x(1:nt), r1(1:ni))
   else
-    bnrm2 = Normalized_Residual(n, nb, mat_a, x, r1, norm)
+    bnrm2 = Normalized_Residual(ni, mat_a, x(1:nt), r1(1:ni), norm)
   end if
 
   if(bnrm2 < tol) then 
@@ -69,19 +70,19 @@
   !-----------------!
   !   r1 = b - Ax   !
   !-----------------!
-  call Residual_Vector(n, nb, mat_a, x, r1) 
+  call Residual_Vector(ni, mat_a, x(1:nt), r1(1:ni)) 
 
   !-------------!
   !   r2 = r1   !
   !-------------!
-  do i=1,n
+  do i=1,ni
     r2(i)=r1(i) 
   end do
 
   !--------------------------------!
   !   Calculate initial residual   !
   !--------------------------------!
-  error = Normalized_Residual(n, nb, mat_a, x, r1)
+  error = Normalized_Residual(ni, mat_a, x(1:nt), r1(1:ni))
 
   !---------------------------------------------------------------!
   !   Residual after the correction and before the new solution   !
@@ -104,19 +105,19 @@
     !   rho = (r2,z1)   !
     !-------------------!
     rho=0.0
-    do i=1,n
+    do i=1,ni
       rho=rho+r1(i)*r2(i)
     end do
     call Comm_Mod_Global_Sum_Real(rho)
 
     if(iter .eq. 1) then
-      do i=1,n
+      do i=1,ni
         u1(i) = r1(i)
         u2(i) = u1(i)
       end do        
     else
       beta=rho/rho_old
-      do i=1,n
+      do i=1,ni
         u1(i) = r1(i) + beta*q1(i) 
         u2(i) = u1(i) + beta*(q1(i) + beta*u2(i)) 
       end do
@@ -131,7 +132,7 @@
     !   v2 = Ap2   !  
     !--------------!
     call Comm_Mod_Exchange_Real(mat_a % pnt_grid, p2)
-    do i=1,n
+    do i=1,ni
       v2(i) = 0.0
       do j=mat_a % row(i), mat_a % row(i+1)-1
         k=mat_a % col(j)
@@ -144,7 +145,7 @@
     !   alfa = rho/(r2,v2)   !
     !------------------------!
     alfa=0.0
-    do i=1,n
+    do i=1,ni
       alfa=alfa+r2(i)*v2(i)
     end do
     call Comm_Mod_Global_Sum_Real(alfa) 
@@ -153,14 +154,14 @@
     !-------------------------!
     !   q1 = u1 - alfa * v2   !
     !-------------------------!
-    do i=1,n
+    do i=1,ni
       q1(i) = u1(i) - alfa*v2(i)
     end do
            
     !-------------------------------!
     !   solve Mp1 = u1(i) + q1(i)   !
     !-------------------------------!
-    do i=1,n
+    do i=1,ni
       u1_plus_q1(i) = u1(i) + q1(i)
     end do
     call Prec_Solve(mat_a, p1, u1_plus_q1(1), prec) 
@@ -168,7 +169,7 @@
     !---------------------!
     !   x = x + alfa p1   !
     !---------------------!
-    do i=1,n
+    do i=1,ni
       x(i)=x(i) + alfa*p1(i)
     end do
 
@@ -176,7 +177,7 @@
     !   q2 = A p1   !
     !---------------!
     call Comm_Mod_Exchange_Real(mat_a % pnt_grid, p1)
-    do i=1,n
+    do i=1,ni
       q2(i) = 0.0
       do j=mat_a % row(i), mat_a % row(i+1)-1
         k=mat_a % col(j)
@@ -187,7 +188,7 @@
     !---------------------!
     !   r = r - alfa q2   !
     !---------------------!
-    do i=1,n
+    do i=1,ni
       r1(i)=r1(i) - alfa*q2(i)
     end do
 
@@ -195,9 +196,9 @@
     !   Check convergence   !
     !-----------------------!
     if(.not. present(norm)) then
-      error = Normalized_Residual(n, nb, mat_a, x, r1)
+      error = Normalized_Residual(ni, mat_a, x(1:nt), r1(1:ni))
     else
-      error = Normalized_Residual(n, nb, mat_a, x, r1, norm)
+      error = Normalized_Residual(ni, mat_a, x(1:nt), r1(1:ni), norm)
     end if
 
     if(error < tol) goto 1

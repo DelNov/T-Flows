@@ -1,5 +1,5 @@
 !==============================================================================!
-  real function Normalized_Residual(n, nb, mat_a, x, r1, norm) 
+  real function Normalized_Residual(ni, mat_a, x, r, norm) 
 !------------------------------------------------------------------------------!
 !   Calculates normalized residuals.                                           !
 !------------------------------------------------------------------------------!
@@ -10,10 +10,10 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer           :: n, nb
+  integer           :: ni
   type(Matrix_Type) :: mat_a
-  real              :: x(-nb:n), r1(n)  !  [A]{x}={r1}
-  real, optional    :: norm             !  optional number for normalization
+  real              :: x(:), r(:)  !  [A]{x}={r}
+  real, optional    :: norm        !  optional number for normalization
 !-----------------------------------[Locals]-----------------------------------!
   real    :: error, x_max, x_min
   integer :: i
@@ -21,16 +21,16 @@
 
   ! Compute error normalizing it with main diagonal in the system matrix
   error = 0.0
-  do i = 1, n
-    error = error + r1(i)**2 / mat_a % val(mat_a % dia(i))**2
+  do i = 1, ni
+    error = error + r(i)**2 / mat_a % val(mat_a % dia(i))**2
   end do  
   call Comm_Mod_Global_Sum_Real(error)
   error = sqrt(error)
 
   ! Normalize it with absolute values of the unknown
   if(.not. present(norm)) then
-    x_min = minval(x(1:n))
-    x_max = maxval(x(1:n))
+    x_min = minval(x(1:ni))
+    x_max = maxval(x(1:ni))
   else
     x_min = 0.0
     x_max = norm
