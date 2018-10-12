@@ -497,7 +497,14 @@
   ! Over-ride if specified in control file
   call Control_Mod_Max_Iterations_For_Energy_Solver(niter)
 
-  call Bicg(a, phi % n, b, precond, niter, tol, ini_res, phi % res)
+  call Bicg(a,        &
+            phi % n,  &
+            b,        &
+            precond,  &
+            niter,    &
+            tol,      &
+            ini_res,  &
+            phi % res)
 
   call Info_Mod_Iter_Fill_At(2, 4, phi % name, niter, phi % res)
 
