@@ -210,15 +210,15 @@
   ! Over-ride if specified in control file
   call Control_Mod_Max_Iterations_For_Pressure_Solver(niter)
 
-  call Bicg(a,         &
-            pp % n,    &
-            b,         &
-            precond,   &
-            niter,     &
-            tol,       &
-            ini_res,   &
-            pp % res,  &
-            norm = p_nor)    ! last argument: number for normalisation
+  call Cg(a,         &
+          pp % n,    &
+          b,         &
+          precond,   &
+          niter,     &
+          tol,       &
+          ini_res,   &
+          pp % res,  &
+          norm = p_nor)    ! last argument: number for normalisation
 
   call Info_Mod_Iter_Fill_At(1, 3, pp % name, niter, pp % res)
 
@@ -233,13 +233,13 @@
   !------------------------------------!
   !   Normalize the pressure field     !
   !------------------------------------!
-  ! p_max  = maxval(p % n(1:grid % n_cells))
-  ! p_min  = minval(p % n(1:grid % n_cells))
+  p_max  = maxval(p % n(1:grid % n_cells))
+  p_min  = minval(p % n(1:grid % n_cells))
 
-  ! call Comm_Mod_Global_Max_Real(p_max)
-  ! call Comm_Mod_Global_Min_Real(p_min)
+  call Comm_Mod_Global_Max_Real(p_max)
+  call Comm_Mod_Global_Min_Real(p_min)
 
-  ! p % n = p % n - 0.5*(p_max+p_min)
+  p % n = p % n - 0.5*(p_max+p_min)
 
   call Comm_Mod_Exchange_Real(grid, pp % n)
 
