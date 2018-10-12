@@ -85,8 +85,9 @@
   write(9,'(a,a)') IN_1, '<UnstructuredGrid>'
 
   write(9,'(a,a,i0.0,a,i0.0,a)')   &
-                   IN_2, '<Piece NumberOfPoints="', grid % n_nodes,      &
-                              '" NumberOfCells ="', grid % n_cells, '">'
+               IN_2, '<Piece NumberOfPoints="', grid % n_nodes,      &
+                          '" NumberOfCells ="', grid % n_cells -     &
+                                                grid % comm % n_buff_cells, '">'
 
   !----------!
   !          !
@@ -122,7 +123,7 @@
   write(9,'(a,a)') IN_4, '<DataArray type="Int64" Name="connectivity"' //  &
                          ' format="ascii">'
 
-  do c = 1, grid % n_cells
+  do c = 1, grid % n_cells - grid % comm % n_buff_cells
     if(grid % cells_n_nodes(c) .eq. 8) then
       write(9,'(a,8i9)')                                &
         IN_5,                                           &
@@ -159,7 +160,7 @@
   ! Now write all cells' offsets
   write(9,'(a,a)') IN_4, '<DataArray type="Int64" Name="offsets" format="ascii">'
   offset = 0
-  do c = 1, grid % n_cells
+  do c = 1, grid % n_cells - grid % comm % n_buff_cells
     offset = offset + grid % cells_n_nodes(c)
     write(9,'(a,i9)') IN_5, offset
   end do
@@ -167,7 +168,7 @@
 
   ! Now write all cells' types
   write(9,'(a,a)') IN_4, '<DataArray type="UInt8" Name="types" format="ascii">'
-  do c = 1, grid % n_cells
+  do c = 1, grid % n_cells - grid % comm % n_buff_cells
     if(grid % cells_n_nodes(c) .eq. 8) then
       write(9,'(a,i9)') IN_5, VTK_HEXAHEDRON
     else if(grid % cells_n_nodes(c) .eq. 6) then
@@ -205,7 +206,7 @@
   end if
   write(9,'(a,a)') IN_4, '<DataArray type="UInt8" Name="Processor"' //  &
                          ' format="ascii">'
-  do c = 1, grid % n_cells
+  do c = 1, grid % n_cells - grid % comm % n_buff_cells
     write(9,'(a,i9)') IN_5, grid % comm % proces(c)
   end do
   write(9,'(a,a)') IN_4, '</DataArray>'
@@ -296,8 +297,8 @@
       vw_mean(c) = vw % mean(c) - v % mean(c) * w % mean(c)
     end do
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressXX", uu_mean(1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressYY", uu_mean(1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressZZ", uu_mean(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressYY", vv_mean(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressZZ", ww_mean(1))
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressXY", uv_mean(1))
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressXZ", uw_mean(1))
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressYZ", vw_mean(1))

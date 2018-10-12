@@ -10,7 +10,7 @@
   implicit none
 
   integer                     :: n_user_scalars
-  integer                     :: n_user_arrays  
+  integer                     :: n_user_arrays
 
   type(Var_Type), allocatable :: user_scalar(:)
   real, allocatable           :: user_array(:,:)
