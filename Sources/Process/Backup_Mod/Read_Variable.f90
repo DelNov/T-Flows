@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Backup_Mod_Read_Variable(fh, disp, var_name, var)
+  subroutine Backup_Mod_Read_Variable(fh, disp, var_name, grid, var)
 !------------------------------------------------------------------------------!
 !   Reads a whole variable from backup file.                                   !
 !------------------------------------------------------------------------------!
@@ -12,6 +12,7 @@
 !---------------------------------[Arguments]----------------------------------!
   integer          :: fh, disp
   character(len=*) :: var_name
+  type(Grid_Type)  :: grid
   type(Var_Type)   :: var
 !-----------------------------------[Locals]-----------------------------------!
   character(len=80) :: vn
@@ -51,5 +52,14 @@
   end do
 
   if(this_proc < 2) print *, '# Variable: ', trim(vn), ' not found!'
+
+  ! Refresh buffers
+  call Comm_Mod_Exchange_Real(grid, var % n)
+  call Comm_Mod_Exchange_Real(grid, var % o)
+  call Comm_Mod_Exchange_Real(grid, var % a)
+  call Comm_Mod_Exchange_Real(grid, var % a_o)
+  call Comm_Mod_Exchange_Real(grid, var % c)
+  call Comm_Mod_Exchange_Real(grid, var % c_o)
+  call Comm_Mod_Exchange_Real(grid, var % d_o)
 
   end subroutine

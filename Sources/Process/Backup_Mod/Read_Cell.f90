@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Backup_Mod_Read_Cell(fh, disp, var_name, array)
+  subroutine Backup_Mod_Read_Cell(fh, disp, var_name, grid, array)
 !------------------------------------------------------------------------------!
 !   Reads a vector variable with boundary cells from a backup file.            !
 !------------------------------------------------------------------------------!
@@ -11,6 +11,7 @@
 !---------------------------------[Arguments]----------------------------------!
   integer          :: fh, disp
   character(len=*) :: var_name
+  type(Grid_Type)  :: grid
   real             :: array(1:nc_s)
 !-----------------------------------[Locals]-----------------------------------!
   character(len=80) :: vn
@@ -42,5 +43,8 @@
   end do
 
   if(this_proc < 2) print *, '# Variable: ', trim(vn), ' not found!'
+
+  ! Refresh buffers
+  call Comm_Mod_Exchange_Real(grid, array)
 
   end subroutine
