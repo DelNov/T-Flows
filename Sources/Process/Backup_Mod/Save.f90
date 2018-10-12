@@ -89,7 +89,7 @@
   !----------------------!
   !   Mass flow raters   !
   !----------------------!
-  call Backup_Mod_Write_Face(grid, flux, fh, d) 
+  call Backup_Mod_Write_Face(fh, d, grid, flux)
 
   !--------------!
   !              !

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Backup_Mod_Write_Face(grid, flux, fh, d)
+  subroutine Backup_Mod_Write_Face(fh, d, grid, flux)
 !------------------------------------------------------------------------------!
 !   Writes backup files. name.backup                                           !
 !------------------------------------------------------------------------------!
@@ -12,9 +12,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  integer         :: fh, d
   type(Grid_Type) :: grid
   real            :: flux(grid % n_faces)
-  integer         :: fh, d
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: s, c, c1, c2, cg1, cg2, mc, max_cnt
   integer, allocatable :: cells_cg(:,:)   ! cells' cells
