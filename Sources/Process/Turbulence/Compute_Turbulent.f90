@@ -48,6 +48,7 @@
 !==============================================================================!
 !                                                                              !
 !  The form of equations which are solved:                                     !
+!                                                                              !
 !     /               /                /                     /                 !
 !    |     dphi      |                | mu_eff              |                  !
 !    | rho ---- dV + | rho u phi dS = | ------ DIV phi dS + | G dV             !
@@ -425,7 +426,14 @@
   ! Over-ride if specified in control file
   call Control_Mod_Max_Iterations_For_Turbulence_Solver(niter)
 
-  call Cg(a, phi % n, b, precond, niter, tol, ini_res, phi % res)
+  call Bicg(a,        &
+            phi % n,  &
+            b,        &
+            precond,  &
+            niter,    &
+            tol,      &
+            ini_res,  &
+            phi % res)
 
   do c = 1, grid % n_cells
     if( phi % n(c) < 0.0 ) phi % n(c) = phi % o(c)
