@@ -364,9 +364,9 @@
     end if
 
     ! Cross diffusion part
-    ui % c(c1) = ui % c(c1) + f_ex - f_im + f_stress
+    ui % c(c1) = ui % c(c1) + f_ex - f_im + f_stress * density
     if(c2  > 0) then
-      ui % c(c2) = ui % c(c2) - f_ex + f_im - f_stress
+      ui % c(c2) = ui % c(c2) - f_ex + f_im - f_stress * density
     end if
 
     ! Compute the coefficients for the sysytem matrix
@@ -607,15 +607,15 @@
   ! Over-ride if specified in control file
   call Control_Mod_Max_Iterations_For_Momentum_Solver(niter)
 
-  call Cg(a,        &
-          ui % n,   &
-          b,        &
-          precond,  &
-          niter,    &
-          tol,      &
-          ini_res,  &
-          ui % res, &
-          norm = vel_max)
+  call Bicg(a,        &
+            ui % n,   &
+            b,        &
+            precond,  &
+            niter,    &
+            tol,      &
+            ini_res,  &
+            ui % res, &
+            norm = vel_max)
 
   if(ui % name .eq. 'U') then
     call Info_Mod_Iter_Fill_At(2, 1, ui % name, niter, ui % res)
