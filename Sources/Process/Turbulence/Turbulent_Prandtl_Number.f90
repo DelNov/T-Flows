@@ -21,7 +21,7 @@
 
   pr = viscosity * capacity / conductivity
   pr_t_inf = 0.85
-  pe_t     = pr * vis_t(c) / viscosity
+  pe_t     = max(pr * vis_t(c) / viscosity, TINY)
 
   Turbulent_Prandtl_Number =                                            &
     1.0 / (   1.0/(2.0*pr_t_inf)                                        &
