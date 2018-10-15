@@ -337,19 +337,19 @@
         call Grad_Mod_For_Phi(grid, w % n, 2, w % y,.true.)    ! dW/dy
         call Grad_Mod_For_Phi(grid, w % n, 3, w % z,.true.)    ! dW/dz
 
-        call Compute_Stresses(grid, dt, ini, uu)
-        call Compute_Stresses(grid, dt, ini, vv)
-        call Compute_Stresses(grid, dt, ini, ww)
+        call Compute_Stresses(grid, dt, ini, uu, n)
+        call Compute_Stresses(grid, dt, ini, vv, n)
+        call Compute_Stresses(grid, dt, ini, ww, n)
 
-        call Compute_Stresses(grid, dt, ini, uv)
-        call Compute_Stresses(grid, dt, ini, uw)
-        call Compute_Stresses(grid, dt, ini, vw)
+        call Compute_Stresses(grid, dt, ini, uv, n)
+        call Compute_Stresses(grid, dt, ini, uw, n)
+        call Compute_Stresses(grid, dt, ini, vw, n)
 
         if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
           call Compute_F22(grid, ini, f22)
         end if
 
-        call Compute_Stresses(grid, dt, ini, eps)
+        call Compute_Stresses(grid, dt, ini, eps, n)
 
         call Calculate_Vis_T_Rsm(grid)
 
