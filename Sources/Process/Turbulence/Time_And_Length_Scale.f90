@@ -11,13 +11,13 @@
   use Rans_Mod
   use Grid_Mod
   use Control_Mod
-  use Work_Mod, only: t1    => r_cell_01,  &  ! [s]
-                      t2    => r_cell_02,  &  ! [s]
-                      t3    => r_cell_03,  &  ! [s]
-                      l1    => r_cell_04,  &  ! [m]
-                      l2    => r_cell_05,  &  ! [m]
-                      l3    => r_cell_06,  &  ! [m]
-                      eps_l => r_cell_07      ! [m]
+  use Work_Mod, only: t1    => r_cell_12,  &  ! [s]
+                      t2    => r_cell_13,  &  ! [s]
+                      t3    => r_cell_14,  &  ! [s]
+                      l1    => r_cell_15,  &  ! [m]
+                      l2    => r_cell_16,  &  ! [m]
+                      l3    => r_cell_17,  &  ! [m]
+                      eps_l => r_cell_18      ! [m]
 !------------------------------------------------------------------------------!
   implicit none
   type(Grid_Type) :: grid
@@ -35,8 +35,10 @@
 !   left hand s.  A        [kg/s]      | right hand s.   b         [kg*m^2/s^4]!
 !------------------------------------------------------------------------------!
 
-  kin_vis = viscosity/density
-  eps_l(1:grid % n_cells) = eps % n(1:grid % n_cells) + TINY ! limited eps % n
+  kin_vis = viscosity / density
+  do c = 1, grid % n_cells
+    eps_l(c) = eps % n(c) + TINY ! limited eps % n
+  end do
 
   do c = 1, grid % n_cells
     t1(c) = kin % n(c)/eps_l(c)
@@ -59,16 +61,16 @@
         l3(c) = sqrt(kin % n(c)/3.0)/(c_mu_d * zeta % n(c) * shear(c) + TINY)
       end do
       do c = 1, grid % n_cells
-        t_scale(c) =     max(min(t1(c),t3(c)),t2(c))
-        l_scale(c) = c_l*max(min(l1(c),l3(c)),l2(c))
+        t_scale(c) =       max( min(t1(c), t3(c)), t2(c) )
+        l_scale(c) = c_l * max( min(l1(c), l3(c)), l2(c) )
       end do
     end if
 
   else if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
     do c = 1, grid % n_cells
       kin % n(c) = max(0.5*(uu % n(c) + vv % n(c) + ww % n(c)), TINY)
-      t_scale(c) =     max(t1(c),t2(c))
-      l_scale(c) = c_l*max(l1(c),l2(c))
+      t_scale(c) =       max( t1(c), t2(c) )
+      l_scale(c) = c_l * max( l1(c), l2(c) )
     end do
   end if
 
