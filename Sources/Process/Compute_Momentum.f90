@@ -569,6 +569,29 @@
     b(c) = b(c) - h_i(c) * grid % vol(c)
   end do
 
+  !--------------------------!
+  !   Buoyancy force         !
+  !--------------------------!
+  if(buoyancy) then
+    if(ui % name .eq. 'U') then
+      do c = 1, grid % n_cells
+        b(c) = b(c) - density * grav_x * (t % n(c) - t_ref)  &
+             * grid % vol(c)
+      end do
+    else if(ui % name .eq. 'V') then
+      do c = 1, grid % n_cells
+        b(c) = b(c) - density * grav_y * (t % n(c) - t_ref)  &
+             * grid % vol(c)
+      end do
+    else if(ui % name .eq. 'W') then
+      do c = 1, grid % n_cells
+        b(c) = b(c) - density * grav_z * (t % n(c) - t_ref)  &
+             * grid % vol(c)
+      end do
+    end if
+  end if
+
+  !---------------------------------!
   !----------------------------------------!
   !   All other terms defined by the user  !
   !----------------------------------------!
