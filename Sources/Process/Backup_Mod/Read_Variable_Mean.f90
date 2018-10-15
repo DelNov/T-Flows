@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Backup_Mod_Read_Variable_Mean(fh, disp, var_name, grid, var)
+  subroutine Backup_Mod_Read_Variable_Mean(fh, disp, vc, var_name, var)
 !------------------------------------------------------------------------------!
 !   Reads variable's mean with boundary cells from a backup file.              !
 !------------------------------------------------------------------------------!
@@ -10,15 +10,15 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer          :: fh, disp
+  integer          :: fh, disp, vc
   character(len=*) :: var_name
-  type(Grid_Type)  :: grid
   type(Var_Type)   :: var
 !-----------------------------------[Locals]-----------------------------------!
   character(len=80) :: vn
-  integer           :: vs, disp_loop
+  integer           :: vs, disp_loop, cnt_loop
 !==============================================================================!
 
+  cnt_loop  = 0
   disp_loop = 0
 
   !--------------------------------------------------------!
@@ -42,11 +42,12 @@
       disp_loop = disp_loop + vs
     end if
 
+    ! Check if variable is in the file
+    cnt_loop = cnt_loop + 1
+    if(cnt_loop > vc) goto 1
+
   end do
 
-  if(this_proc < 2) print *, '# Variable: ', trim(vn), ' not found!'
-
-  ! Refresh buffers
-  call Comm_Mod_Exchange_Real(grid, var % mean)
+1 if(this_proc < 2) print *, '# Variable: ', trim(vn), ' not found!'
 
   end subroutine

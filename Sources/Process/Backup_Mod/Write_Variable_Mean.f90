@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Backup_Mod_Write_Variable_Mean(fh, disp, var_name, var)
+  subroutine Backup_Mod_Write_Variable_Mean(fh, disp, vc, var_name, var)
 !------------------------------------------------------------------------------!
 !   Writes variable's mean with boundary cells from a backup file.             !
 !------------------------------------------------------------------------------!
@@ -10,7 +10,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer          :: fh, disp
+  integer          :: fh, disp, vc
   character(len=*) :: var_name
   type(Var_Type)   :: var
 !-----------------------------------[Locals]-----------------------------------!
@@ -19,6 +19,9 @@
 !==============================================================================!
 
   if(this_proc < 2) print *, '# Writing variable: ', trim(var_name)
+
+  ! Increase variable count
+  vc = vc + 1
 
   ! Vector without boundaries
   vn = var_name;                  call Comm_Mod_Write_Text(fh, vn, disp)

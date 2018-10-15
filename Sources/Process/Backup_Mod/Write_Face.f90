@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Backup_Mod_Write_Face(fh, d, grid, flux)
+  subroutine Backup_Mod_Write_Face(fh, d, vc, grid, flux)
 !------------------------------------------------------------------------------!
 !   Writes backup files. name.backup                                           !
 !------------------------------------------------------------------------------!
@@ -12,7 +12,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer         :: fh, d
+  integer         :: fh, d, vc
   type(Grid_Type) :: grid
   real            :: flux(grid % n_faces)
 !-----------------------------------[Locals]-----------------------------------!
@@ -123,7 +123,7 @@
         rvalues(c) = flux( cells_fc(mc,c) )
       end if
     end do
-    call Backup_Mod_Write_Cell(fh, d, cf_name, rvalues(1:nc_s))
+    call Backup_Mod_Write_Cell(fh, d, vc, cf_name, rvalues(1:nc_s))
   end do
 
   deallocate(cells_cg)

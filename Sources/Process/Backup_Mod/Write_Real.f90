@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Backup_Mod_Write_Real(fh, disp, var_name, var_value)
+  subroutine Backup_Mod_Write_Real(fh, disp, vc, var_name, var_value)
 !------------------------------------------------------------------------------!
 !   Writes a single named real variable to backup file.                        !
 !------------------------------------------------------------------------------!
@@ -9,7 +9,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer          :: fh, disp
+  integer          :: fh, disp, vc
   character(len=*) :: var_name
   real             :: var_value
 !-----------------------------------[Locals]-----------------------------------!
@@ -18,6 +18,9 @@
 !==============================================================================!
 
   if(this_proc < 2) print *, '# Writing variable: ', trim(var_name)
+
+  ! Increase variable count
+  vc = vc + 1
 
   ! Just store one named real number
   vn = var_name;  call Comm_Mod_Write_Text(fh, vn, disp)

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Backup_Mod_Read_Face(fh, d, grid, flux)
+  subroutine Backup_Mod_Read_Face(fh, disp, vc, grid, flux)
 !------------------------------------------------------------------------------!
 !   Reads face-based variable (flux) using cell-based arrays.                  !
 !------------------------------------------------------------------------------!
@@ -12,7 +12,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer         :: fh, d
+  integer         :: fh, disp, vc
   type(Grid_Type) :: grid
   real            :: flux(grid % n_faces)
 !-----------------------------------[Locals]-----------------------------------!
@@ -102,7 +102,7 @@
   do mc = 1, max_cnt
     rvalues(:) = 0.0
     write(cf_name(11:12), '(i2.2)') mc  ! set name of the backup variable
-    call Backup_Mod_Read_Cell(fh, d, cf_name, grid, rvalues(1:nc_s))
+    call Backup_Mod_Read_Cell(fh, disp, vc, cf_name, rvalues(1:nc_s))
     call Comm_Mod_Exchange_Real(grid, rvalues)
     do c = 1, grid % n_cells
       if( cells_cg(mc, c) .ne. 0 ) then

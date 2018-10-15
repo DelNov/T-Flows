@@ -18,7 +18,7 @@
   character(len=*) :: name_save
 !-----------------------------------[Locals]-----------------------------------!
   character(len=80) :: name_out, store_name
-  integer           :: fh, d
+  integer           :: fh, d, vc
 !==============================================================================!
 
   store_name = problem_name
@@ -37,12 +37,15 @@
   ! Initialize displacement
   d = 0
 
+  ! Intialize number of stored variables
+  vc = 0
+
   !-----------------------------------------------------------------------!
   !   Save cell-centre coordinates.  Could be useful for interpolations   !
   !-----------------------------------------------------------------------!
-  call Backup_Mod_Write_Cell_Bnd(fh, d, 'x_coordinates', grid % xc(-nb_s:nc_s))
-  call Backup_Mod_Write_Cell_Bnd(fh, d, 'y_coordinates', grid % yc(-nb_s:nc_s))
-  call Backup_Mod_Write_Cell_Bnd(fh, d, 'z_coordinates', grid % zc(-nb_s:nc_s))
+  call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'x_coords', grid % xc(-nb_s:nc_s))
+  call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'y_coords', grid % yc(-nb_s:nc_s))
+  call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'z_coords', grid % zc(-nb_s:nc_s))
 
   !---------------!
   !               !
@@ -51,21 +54,21 @@
   !---------------!
 
   ! Time step
-  call Backup_Mod_Write_Int(fh, d, 'time_step', time_step)
+  call Backup_Mod_Write_Int(fh, d, vc, 'time_step', time_step)
 
   ! Number of processors
-  call Backup_Mod_Write_Int(fh, d, 'n_proc', n_proc)
+  call Backup_Mod_Write_Int(fh, d, vc, 'n_proc', n_proc)
 
   ! Bulk flows and pressure drops in each direction
-  call Backup_Mod_Write_Real(fh, d, 'bulk_flux_x',   bulk % flux_x)
-  call Backup_Mod_Write_Real(fh, d, 'bulk_flux_y',   bulk % flux_y)
-  call Backup_Mod_Write_Real(fh, d, 'bulk_flux_z',   bulk % flux_z)
-  call Backup_Mod_Write_Real(fh, d, 'bulk_flux_x_o', bulk % flux_x_o)
-  call Backup_Mod_Write_Real(fh, d, 'bulk_flux_y_o', bulk % flux_y_o)
-  call Backup_Mod_Write_Real(fh, d, 'bulk_flux_z_o', bulk % flux_z_o)
-  call Backup_Mod_Write_Real(fh, d, 'bulk_p_drop_x', bulk % p_drop_x)
-  call Backup_Mod_Write_Real(fh, d, 'bulk_p_drop_y', bulk % p_drop_y)
-  call Backup_Mod_Write_Real(fh, d, 'bulk_p_drop_z', bulk % p_drop_z)
+  call Backup_Mod_Write_Real(fh, d, vc, 'bulk_flux_x',   bulk % flux_x)
+  call Backup_Mod_Write_Real(fh, d, vc, 'bulk_flux_y',   bulk % flux_y)
+  call Backup_Mod_Write_Real(fh, d, vc, 'bulk_flux_z',   bulk % flux_z)
+  call Backup_Mod_Write_Real(fh, d, vc, 'bulk_flux_x_o', bulk % flux_x_o)
+  call Backup_Mod_Write_Real(fh, d, vc, 'bulk_flux_y_o', bulk % flux_y_o)
+  call Backup_Mod_Write_Real(fh, d, vc, 'bulk_flux_z_o', bulk % flux_z_o)
+  call Backup_Mod_Write_Real(fh, d, vc, 'bulk_p_drop_x', bulk % p_drop_x)
+  call Backup_Mod_Write_Real(fh, d, vc, 'bulk_p_drop_y', bulk % p_drop_y)
+  call Backup_Mod_Write_Real(fh, d, vc, 'bulk_p_drop_z', bulk % p_drop_z)
 
   !----------------------------!
   !                            !
@@ -76,20 +79,20 @@
   !--------------!
   !   Velocity   !
   !--------------!
-  call Backup_Mod_Write_Variable(fh, d, 'u_velocity', u)
-  call Backup_Mod_Write_Variable(fh, d, 'v_velocity', v)
-  call Backup_Mod_Write_Variable(fh, d, 'w_velocity', w)
+  call Backup_Mod_Write_Variable(fh, d, vc, 'u_velocity', u)
+  call Backup_Mod_Write_Variable(fh, d, vc, 'v_velocity', v)
+  call Backup_Mod_Write_Variable(fh, d, vc, 'w_velocity', w)
 
   !--------------------------------------!
   !   Pressure and pressure correction   !
   !--------------------------------------!
-  call Backup_Mod_Write_Cell_Bnd(fh, d, 'press',      p % n(-nb_s:nc_s))
-  call Backup_Mod_Write_Cell_Bnd(fh, d, 'press_corr',pp % n(-nb_s:nc_s))
+  call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'press',      p % n(-nb_s:nc_s))
+  call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'press_corr',pp % n(-nb_s:nc_s))
 
   !----------------------!
   !   Mass flow raters   !
   !----------------------!
-  call Backup_Mod_Write_Face(fh, d, grid, flux)
+  call Backup_Mod_Write_Face(fh, d, vc, grid, flux)
 
   !--------------!
   !              !
@@ -97,7 +100,7 @@
   !              !
   !--------------!
   if(heat_transfer) then
-    call Backup_Mod_Write_Variable(fh, d, 'temp', t)
+    call Backup_Mod_Write_Variable(fh, d, vc, 'temp', t)
   end if
 
   !-----------------------!
@@ -112,16 +115,16 @@
   if(turbulence_model .eq. K_EPS) then
 
     ! K and epsilon
-    call Backup_Mod_Write_Variable(fh, d, 'kin', kin)
-    call Backup_Mod_Write_Variable(fh, d, 'eps', eps)
+    call Backup_Mod_Write_Variable(fh, d, vc, 'kin', kin)
+    call Backup_Mod_Write_Variable(fh, d, vc, 'eps', eps)
 
     ! Other turbulent quantities
-    call Backup_Mod_Write_Cell_Bnd(fh, d, 'p_kin',    p_kin   (-nb_s:nc_s))
-    call Backup_Mod_Write_Cell_Bnd(fh, d, 'u_tau',    u_tau   (-nb_s:nc_s))
-    call Backup_Mod_Write_Cell_Bnd(fh, d, 'y_plus',   y_plus  (-nb_s:nc_s))
-    call Backup_Mod_Write_Cell_Bnd(fh, d, 'vis_t',    vis_t   (-nb_s:nc_s))
-    call Backup_Mod_Write_Cell_Bnd(fh, d, 'vis_wall', vis_wall(-nb_s:nc_s))
-    call Backup_Mod_Write_Cell    (fh, d, 'tau_wall', tau_wall  (1:nc_s))
+    call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'p_kin',    p_kin   (-nb_s:nc_s))
+    call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'u_tau',    u_tau   (-nb_s:nc_s))
+    call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'y_plus',   y_plus  (-nb_s:nc_s))
+    call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'vis_t',    vis_t   (-nb_s:nc_s))
+    call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'vis_wall', vis_wall(-nb_s:nc_s))
+    call Backup_Mod_Write_Cell    (fh, d, vc, 'tau_wall', tau_wall  (1:nc_s))
   end if
 
   !------------------------!
@@ -130,20 +133,20 @@
   if(turbulence_model .eq. K_EPS_ZETA_F) then
 
     ! K, eps, zeta and f22
-    call Backup_Mod_Write_Variable(fh, d, 'kin',  kin)
-    call Backup_Mod_Write_Variable(fh, d, 'eps',  eps)
-    call Backup_Mod_Write_Variable(fh, d, 'zeta', zeta)
-    call Backup_Mod_Write_Variable(fh, d, 'f22',  f22)
+    call Backup_Mod_Write_Variable(fh, d, vc, 'kin',  kin)
+    call Backup_Mod_Write_Variable(fh, d, vc, 'eps',  eps)
+    call Backup_Mod_Write_Variable(fh, d, vc, 'zeta', zeta)
+    call Backup_Mod_Write_Variable(fh, d, vc, 'f22',  f22)
 
     ! Other turbulent quantities
-    call Backup_Mod_Write_Cell_Bnd(fh, d, 'p_kin',    p_kin   (-nb_s:nc_s))
-    call Backup_Mod_Write_Cell_Bnd(fh, d, 'u_tau',    u_tau   (-nb_s:nc_s))
-    call Backup_Mod_Write_Cell_Bnd(fh, d, 'y_plus',   y_plus  (-nb_s:nc_s))
-    call Backup_Mod_Write_Cell_Bnd(fh, d, 'vis_t',    vis_t   (-nb_s:nc_s))
-    call Backup_Mod_Write_Cell_Bnd(fh, d, 'vis_wall', vis_wall(-nb_s:nc_s))
-    call Backup_Mod_Write_Cell    (fh, d, 'tau_wall', tau_wall  (1:nc_s))
-    call Backup_Mod_Write_Cell_Bnd(fh, d, 't_scale',  t_scale(-nb_s:nc_s))
-    call Backup_Mod_Write_Cell_Bnd(fh, d, 'l_scale',  l_scale(-nb_s:nc_s))
+    call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'p_kin',    p_kin   (-nb_s:nc_s))
+    call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'u_tau',    u_tau   (-nb_s:nc_s))
+    call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'y_plus',   y_plus  (-nb_s:nc_s))
+    call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'vis_t',    vis_t   (-nb_s:nc_s))
+    call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'vis_wall', vis_wall(-nb_s:nc_s))
+    call Backup_Mod_Write_Cell    (fh, d, vc, 'tau_wall', tau_wall  (1:nc_s))
+    call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 't_scale',  t_scale(-nb_s:nc_s))
+    call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'l_scale',  l_scale(-nb_s:nc_s))
   end if
 
   !----------------------------!
@@ -153,23 +156,23 @@
      turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
 
     ! Reynolds stresses
-    call Backup_Mod_Write_Variable(fh, d, 'uu',  uu)
-    call Backup_Mod_Write_Variable(fh, d, 'vv',  vv)
-    call Backup_Mod_Write_Variable(fh, d, 'ww',  ww)
-    call Backup_Mod_Write_Variable(fh, d, 'uv',  uv)
-    call Backup_Mod_Write_Variable(fh, d, 'uw',  uw)
-    call Backup_Mod_Write_Variable(fh, d, 'vw',  vw)
+    call Backup_Mod_Write_Variable(fh, d, vc, 'uu',  uu)
+    call Backup_Mod_Write_Variable(fh, d, vc, 'vv',  vv)
+    call Backup_Mod_Write_Variable(fh, d, vc, 'ww',  ww)
+    call Backup_Mod_Write_Variable(fh, d, vc, 'uv',  uv)
+    call Backup_Mod_Write_Variable(fh, d, vc, 'uw',  uw)
+    call Backup_Mod_Write_Variable(fh, d, vc, 'vw',  vw)
 
     ! Epsilon
-    call Backup_Mod_Write_Variable(fh, d, 'eps', eps)
+    call Backup_Mod_Write_Variable(fh, d, vc, 'eps', eps)
 
     ! F22
     if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
-      call Backup_Mod_Write_Variable(fh, d, 'f22',  f22)
+      call Backup_Mod_Write_Variable(fh, d, vc, 'f22',  f22)
     end if
 
     ! Other turbulent quantities 
-    call Backup_Mod_Write_Cell_Bnd(fh, d, 'vis_t', vis_t(-nb_s:nc_s))
+    call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'vis_t', vis_t(-nb_s:nc_s))
   end if
 
   !-----------------------------------------!
@@ -178,23 +181,23 @@
   !                                         !
   !-----------------------------------------!
   if(turbulence_statistics) then
-    call Backup_Mod_Write_Variable_Mean(fh, d, 'u_mean', u)
-    call Backup_Mod_Write_Variable_Mean(fh, d, 'v_mean', v)
-    call Backup_Mod_Write_Variable_Mean(fh, d, 'w_mean', w)
+    call Backup_Mod_Write_Variable_Mean(fh, d, vc, 'u_mean', u)
+    call Backup_Mod_Write_Variable_Mean(fh, d, vc, 'v_mean', v)
+    call Backup_Mod_Write_Variable_Mean(fh, d, vc, 'w_mean', w)
 
-    call Backup_Mod_Write_Variable_Mean(fh, d, 'uu_mean', uu)
-    call Backup_Mod_Write_Variable_Mean(fh, d, 'vv_mean', vv)
-    call Backup_Mod_Write_Variable_Mean(fh, d, 'ww_mean', ww)
-    call Backup_Mod_Write_Variable_Mean(fh, d, 'uv_mean', uv)
-    call Backup_Mod_Write_Variable_Mean(fh, d, 'uw_mean', uw)
-    call Backup_Mod_Write_Variable_Mean(fh, d, 'vw_mean', vw)
+    call Backup_Mod_Write_Variable_Mean(fh, d, vc, 'uu_mean', uu)
+    call Backup_Mod_Write_Variable_Mean(fh, d, vc, 'vv_mean', vv)
+    call Backup_Mod_Write_Variable_Mean(fh, d, vc, 'ww_mean', ww)
+    call Backup_Mod_Write_Variable_Mean(fh, d, vc, 'uv_mean', uv)
+    call Backup_Mod_Write_Variable_Mean(fh, d, vc, 'uw_mean', uw)
+    call Backup_Mod_Write_Variable_Mean(fh, d, vc, 'vw_mean', vw)
 
     if(heat_transfer) then
-      call Backup_Mod_Write_Variable_Mean(fh, d, 't_mean',  t)
-      call Backup_Mod_Write_Variable_Mean(fh, d, 'tt_mean', tt)
-      call Backup_Mod_Write_Variable_Mean(fh, d, 'ut_mean', ut)
-      call Backup_Mod_Write_Variable_Mean(fh, d, 'vt_mean', vt)
-      call Backup_Mod_Write_Variable_Mean(fh, d, 'wt_mean', wt)
+      call Backup_Mod_Write_Variable_Mean(fh, d, vc, 't_mean',  t)
+      call Backup_Mod_Write_Variable_Mean(fh, d, vc, 'tt_mean', tt)
+      call Backup_Mod_Write_Variable_Mean(fh, d, vc, 'ut_mean', ut)
+      call Backup_Mod_Write_Variable_Mean(fh, d, vc, 'vt_mean', vt)
+      call Backup_Mod_Write_Variable_Mean(fh, d, vc, 'wt_mean', wt)
     end if
   end if
 
@@ -203,6 +206,13 @@
   !   User scalars are missing   !
   !                              !
   !------------------------------!
+
+  ! Variable count (store +1 to count its own self)
+  call Backup_Mod_Write_Int(fh, d, vc, 'variable_count', vc + 1)
+
+  if(this_proc < 2) then
+    print *, '# Wrote ', vc, ' variables!'
+  end if
 
   ! Close backup file
   call Comm_Mod_Close_File(fh)
