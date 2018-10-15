@@ -20,7 +20,7 @@
   integer :: c, c1, c2, s
   real    :: u_tan, u_nor_sq, u_nor, u_tot_sq
   real    :: beta, pr
-  real    :: u_plus, ebf
+  real    :: u_plus, ebf, y_pl
   real    :: kin_vis, u_tau_new
 !==============================================================================!
 !   Dimensions:                                                                !
@@ -94,7 +94,7 @@
 
         u_tau_new = sqrt(tau_wall(c1)/density)
         y_plus(c1) = u_tau_new * grid % wall_dist(c1) / kin_vis
-        ebf = 0.01 * y_plus(c1)**4.0 / (1.0 + 5.0*y_plus(c1))
+        ebf = 0.01 * y_plus(c1)**4 / (1.0 + 5.0*y_plus(c1))
 
         u_plus = log(max(y_plus(c1),1.05)*e_log) / kappa
 
@@ -114,14 +114,15 @@
         end if
 
         if(heat_transfer) then
+          y_pl = u_tau(c1) * grid % wall_dist(c1) / kin_vis
           pr_t = Turbulent_Prandtl_Number(grid, c1)
           pr = viscosity * capacity / conductivity
           beta = 9.24 * ((pr/pr_t)**0.75 - 1.0) * &
             (1.0 + 0.28 * exp(-0.007*pr/pr_t))
-          ebf = 0.01 * (pr*y_plus(c1))**4 / &
-            ((1.0 + 5.0 * pr**3 * y_plus(c1)) + TINY)
-          con_wall(c1) =    y_plus(c1) * viscosity * capacity          &
-                       / (  y_plus(c1) * pr        * exp(-1.0 * ebf)   &
+          ebf = 0.01 * (pr*y_pl**4 / &
+            ((1.0 + 5.0 * pr**3 * y_pl) + TINY))
+          con_wall(c1) =    y_pl * viscosity * capacity          &
+                       / (  y_pl * pr        * exp(-1.0 * ebf)   &
                           +(u_plus + beta) * pr_t  * exp(-1.0/ebf) + TINY)
         end if
       end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2).eq.WALL or WALLFL
@@ -130,5 +131,6 @@
 
   call Comm_Mod_Exchange_Real(grid, vis_t)
   call Comm_Mod_Exchange_Real(grid, vis_wall)
+  call Comm_Mod_Exchange_Real(grid, con_wall)
 
   end subroutine
