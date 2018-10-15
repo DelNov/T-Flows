@@ -107,14 +107,14 @@
 
           u_tau_new = sqrt(tau_wall(c1)/density)
           y_plus(c1) = u_tau_new * grid % wall_dist(c1) / kin_vis
-          ebf = 0.01 * y_plus(c1)**4.0 / (1.0 + 5.0*y_plus(c1))
+          ebf = 0.01 * y_plus(c1)**4 / (1.0 + 5.0*y_plus(c1))
 
           eps_int = 2.0*viscosity/density * kin % n(c1)    &
                   / grid % wall_dist(c1)**2
           eps_wf  = c_mu75 * kin % n(c1)**1.5              &
                   / (grid % wall_dist(c1) * kappa)
 
-          if(y_plus(c1) > 4) then
+          if(y_plus(c1) > 3) then
             fa = min(density*u_tau_new**3  &
                / (kappa*grid % wall_dist(c1)*p_kin(c1)),1.0)
 
