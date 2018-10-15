@@ -28,13 +28,13 @@
   real    :: diss_wall, diss_hom, r23, kin_vis
 !==============================================================================!
 
+  call Time_And_Length_Scale()
+
   kin_vis = viscosity / density
 
   call Grad_Mod_For_Phi(grid, f22 % n, 1, f22_x,.true.)  ! df22/dx
   call Grad_Mod_For_Phi(grid, f22 % n, 2, f22_y,.true.)  ! df22/dy
   call Grad_Mod_For_Phi(grid, f22 % n, 3, f22_z,.true.)  ! df22/dz
-
-  call Time_And_Length_Scale()
 
   do  c = 1, grid % n_cells 
     kin % n(c) = max(0.5*(  uu % n(c)  &
@@ -338,9 +338,9 @@
 
       a % val(a % dia(c)) =  a % val(a % dia(c))                             &
         + density * ((1.0 - f22 % n(c)**2) * 6.0 * eps % n(c) / kin % n(c)   &
-                + f22 % n(c)**2  *(  g1 * eps % n(c) / (2.0 * kin % n(c))    &
-                                   + g1_star*p_kin(c) / (2.0 * kin % n(c)))  &
-          ) * grid % vol(c)
+        + f22 % n(c)**2  *(  g1 * eps % n(c) / (2.0 * kin % n(c))    &
+                           + g1_star*p_kin(c) / (2.0 * kin % n(c)))  &
+                     ) * grid % vol(c)
 
     !----------------------!
     !   Epsilon equation   !
@@ -365,8 +365,8 @@
       if(c2 < 0) then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or. &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
-          eps%n(c2) = kin_vis*(uu % n(c1) + vv % n(c1) + ww % n(c1))&
-                     /grid % wall_dist(c1)**2
+          eps % n(c2) = kin_vis*(uu % n(c1) + vv % n(c1) + ww % n(c1))&
+                      / grid % wall_dist(c1)**2
         end if   ! end if of BC=wall
       end if    ! end if of c2<0
     end do
