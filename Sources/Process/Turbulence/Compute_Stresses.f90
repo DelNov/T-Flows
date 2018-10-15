@@ -26,7 +26,7 @@
                          u3uj_phij   => r_cell_08,  &
                          u1uj_phij_x => r_cell_09,  &
                          u2uj_phij_y => r_cell_10,  &
-                         u3uj_phij_z => r_cell_11    
+                         u3uj_phij_z => r_cell_11
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -469,8 +469,8 @@
 
     call Sources_Rsm_Manceau_Hanjalic(grid, phi % name)
   else if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
-    call Sources_Rsm_Hanjalic_Jakirlic(grid, phi % name, n_time_step)        
-  end if                
+    call Sources_Rsm_Hanjalic_Jakirlic(grid, phi % name, n_time_step)
+  end if
 
   !---------------------------------!
   !                                 !
@@ -485,7 +485,6 @@
   do c = 1, grid % n_cells
     b(c) = b(c) + a % val(a % dia(c)) * (1.0 - urf)*phi % n(c) / urf
     a % val(a % dia(c)) = a % val(a % dia(c)) / urf
-!?????? Asave(c) = a % val(a % dia(c)) ??????
   end do
 
   call Control_Mod_Tolerance_For_Turbulence_Solver(tol)
