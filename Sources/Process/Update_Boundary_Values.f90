@@ -18,12 +18,13 @@
   real :: Turbulent_Prandtl_Number
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c1, c2, s
-  real    :: qx, qy, qz, nx, ny, nz, con_t, ebf, y_pl
-  real    :: pr, beta, u_plus, heated_area
+  real    :: qx, qy, qz, nx, ny, nz, con_t, ebf 
+  real    :: pr, beta, u_plus, heated_area, y_pl, kin_vis
 !==============================================================================!
 
   heat_flux   = 0.0
   heated_area = 0.0
+  kin_vis     = viscosity / density
 
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
@@ -155,14 +156,15 @@
         ! and high-re k-eps models
         if(turbulence_model .eq. K_EPS_ZETA_F .or.      &
            turbulence_model .eq. K_EPS) then
-          u_plus = log(max(y_plus(c1),1.05)*e_log) / kappa
+          y_pl   = u_tau(c1) * grid % wall_dist(c1) / kin_vis
+          u_plus = log(max(y_pl,1.05)*e_log) / kappa
           pr = viscosity * capacity / conductivity
           beta = 9.24 * ((pr/pr_t)**0.75 - 1.0)      &
                * (1.0 + 0.28 * exp(-0.007*pr/pr_t))
-          ebf = 0.01 * (pr*y_plus(c1))**4            &
-              / ((1.0 + 5.0 * pr**3 * y_plus(c1)) + TINY)
-          con_wall(c1) =  y_plus(c1)*viscosity*capacity  &
-                       / (   y_plus(c1)     * pr   * exp(-1.0 * ebf)   &
+          ebf = 0.01 * (pr*y_pl**4            &
+              / ((1.0 + 5.0 * pr**3 * y_pl) + TINY))
+          con_wall(c1) =  y_pl*viscosity*capacity  &
+                       / (   y_pl     * pr   * exp(-1.0 * ebf)   &
                           + (u_plus + beta) * pr_t * exp(-1.0 / ebf) + TINY)
           if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
             t % n(c2) = t % n(c1) + t % q(c2) * grid % wall_dist(c1)  &
