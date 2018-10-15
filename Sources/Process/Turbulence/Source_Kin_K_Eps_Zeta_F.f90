@@ -130,7 +130,7 @@
           u_tau_new = sqrt(tau_wall(c1)/density)
           y_plus(c1) = u_tau_new * grid % wall_dist(c1) / kin_vis
 
-          ebf = 0.01 * y_plus(c1)**4 / (1.0 + 5.0*y_plus(c1))
+          ebf = max(0.01 * y_plus(c1)**4 / (1.0 + 5.0*y_plus(c1)),tiny)
 
           p_kin_wf  = tau_wall(c1) * 0.07**0.25 * sqrt(kin % n(c1))  &
                     / (grid % wall_dist(c1) * kappa)
