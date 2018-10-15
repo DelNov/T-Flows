@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Sources_Rsm_Hanjalic_Jakirlic(grid, name_phi)
+  subroutine Sources_Rsm_Hanjalic_Jakirlic(grid, name_phi, n_time_step)
 !------------------------------------------------------------------------------!
 !   Calculate source terms for transport equations for Re stresses and         !
 !   dissipation for Hanjalic-Jakirlic model.                                   !  
@@ -35,6 +35,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type)  :: grid
   character(len=*) :: name_phi
+  integer          :: n_time_step 
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c, s, c1, c2, i, icont
   real    :: mag
@@ -54,7 +55,7 @@
   real    :: var1_11, var1_22, var1_33, var1_12, var1_13, var1_23
   real    :: var2_11, var2_22, var2_33, var2_12, var2_13, var2_23
   real    :: p11, p22, p33, p12, p13, p23, eps_1, eps_2
-  real    :: ff5, tkolm
+  real    :: ff5, tkolm, kin_vis
 !==============================================================================!
 !   Dimensions:                                                                !
 !                                                                              !
@@ -74,8 +75,10 @@
   ee = 0.5
   aa = 0.5
 
+  kin_vis = viscosity / density
+
   do c = 1, grid % n_cells
-    kin % n(c) = max(0.5*(uu % n(c) + vv % n(c) + ww % n(c)), 1.0e-7)
+    kin % n(c) = max(0.5*(uu % n(c) + vv % n(c) + ww % n(c)), tiny)
     l_scale(c)=  (kin % n(c))**1.5/eps % n(c)
     t_scale(c)=  kin % n(c)/eps % n(c)
   end do
@@ -88,10 +91,16 @@
   call Grad_Mod_For_Phi(grid, kin_y, 2, kin_yy, .true.)  ! d^2 K / dy^2
   call Grad_Mod_For_Phi(grid, kin_z, 3, kin_zz, .true.)  ! d^2 K / dz^2
 
-  do c = 1, grid % n_cells
-    eps_tot(c) = eps % n(c)  &
-               + 0.5 * viscosity * (kin_xx(c) + kin_yy(c) + kin_zz(c))
-  end do
+  if(n_time_step < 300) then
+    do c = 1, grid % n_cells
+      eps_tot(c) = eps % n(c)  
+    end do
+  else
+    do c = 1, grid % n_cells
+      eps_tot(c) = eps % n(c)  &
+                 + 0.5 * kin_vis * (kin_xx(c) + kin_yy(c) + kin_zz(c))
+    end do
+  end if
 
 ! !---------------------------------------------------!
 ! !   Below is one of versions of Hanjalic-Jakirlic   !
@@ -230,107 +239,107 @@
 !                           duw_dx*dwdx  + dvw_dx*dwdy  + dww_dx*dwdz ) + &
 !                 wyz    * (duv_dz*dwdx  + dvv_dz*dwdy  + dvw_dz*dwdz   + &
 !                           duw_dy*dwdx  + dvw_dy*dwdy  + dww_dy*dwdz ))  
-!     diss1(c) =  -2.0 * viscosity * diss1(c)
+!     diss1(c) =  -2.0 * kin_vis * diss1(c)
 !   end do
 ! end if
 
   if(name_phi == 'EPS') then
-  do i=1,3
-    if(i == 1) then
-      call Grad_Mod_For_Phi(grid, u % x, 1, ui_xx, .true.)  ! d2u/dxdx
-      call Grad_Mod_For_Phi(grid, u % x, 2, ui_xy, .true.)  ! d2u/dxdy
-      call Grad_Mod_For_Phi(grid, u % x, 3, ui_xz, .true.)  ! d2u/dxdz
-      call Grad_Mod_For_Phi(grid, u % y, 2, ui_yy, .true.)  ! d2u/dydy
-      call Grad_Mod_For_Phi(grid, u % y, 3, ui_yz, .true.)  ! d2u/dydz
-      call Grad_Mod_For_Phi(grid, u % z, 3, ui_zz, .true.)  ! d2u/dzdz
-    end if
-    if(i == 2) then
-      call Grad_Mod_For_Phi(grid, v % x, 1, ui_xx, .true.)  ! d2v/dxdx
-      call Grad_Mod_For_Phi(grid, v % x, 2, ui_xy, .true.)  ! d2v/dxdy
-      call Grad_Mod_For_Phi(grid, v % x, 3, ui_xz, .true.)  ! d2v/dxdz
-      call Grad_Mod_For_Phi(grid, v % y, 2, ui_yy, .true.)  ! d2v/dydy
-      call Grad_Mod_For_Phi(grid, v % y, 3, ui_yz, .true.)  ! d2v/dydz
-      call Grad_Mod_For_Phi(grid, v % z, 3, ui_zz, .true.)  ! d2v/dzdz
-    end if
-    if(i == 3) then
-      call Grad_Mod_For_Phi(grid, w % x, 1, ui_xx, .true.)  ! d2w/dxdx
-      call Grad_Mod_For_Phi(grid, w % x, 2, ui_xy, .true.)  ! d2w/dxdy
-      call Grad_Mod_For_Phi(grid, w % x, 3, ui_xz, .true.)  ! d2w/dxdz
-      call Grad_Mod_For_Phi(grid, w % y, 2, ui_yy, .true.)  ! d2w/dydy
-      call Grad_Mod_For_Phi(grid, w % y, 3, ui_yz, .true.)  ! d2w/dydz
-      call Grad_Mod_For_Phi(grid, w % z, 3, ui_zz, .true.)  ! d2w/dzdz
-    end if
-
-    do c = 1, grid % n_cells
+    do i=1,3
       if(i == 1) then
-        uxx = ui_xx(c)
-        uxy = ui_xy(c)
-        uyx = uxy
-        uxz = ui_xz(c)
-        uzx = uxz
-        uyy = ui_yy(c)
-        uyz = ui_yz(c)
-        uzy = uyz
-        uzz = ui_zz(c)
-        diss1(c) =                                    &
-                2.0*0.25*viscosity*kin%n(c)/eps_tot(c)  *  &
-               (uu % n(c)*(uxx*uxx+uxy*uxy+uxz*uxz)+  &
-                uv % n(c)*(uxx*uyx+uxy*uyy+uxz*uyz)+  &
-                uw % n(c)*(uxx*uzx+uxy*uzy+uxz*uzz)+  &
-                uv % n(c)*(uyx*uxx+uyy*uxy+uyz*uxz)+  &
-                vv % n(c)*(uyx*uyx+uyy*uyy+uyz*uyz)+  &
-                vw % n(c)*(uyx*uzx+uyy*uzy+uyz*uzz)+  &
-                uw % n(c)*(uzx*uxx+uzy*uxy+uzz*uxz)+  &
-                vw % n(c)*(uzx*uyx+uzy*uyy+uzz*uyz)+  &
-                ww % n(c)*(uzx*uzx+uzy*uzy+uzz*uzz))
+        call Grad_Mod_For_Phi(grid, u % x, 1, ui_xx, .true.)  ! d2u/dxdx
+        call Grad_Mod_For_Phi(grid, u % x, 2, ui_xy, .true.)  ! d2u/dxdy
+        call Grad_Mod_For_Phi(grid, u % x, 3, ui_xz, .true.)  ! d2u/dxdz
+        call Grad_Mod_For_Phi(grid, u % y, 2, ui_yy, .true.)  ! d2u/dydy
+        call Grad_Mod_For_Phi(grid, u % y, 3, ui_yz, .true.)  ! d2u/dydz
+        call Grad_Mod_For_Phi(grid, u % z, 3, ui_zz, .true.)  ! d2u/dzdz
       end if
       if(i == 2) then
-        uxx = ui_xx(c)
-        uxy = ui_xy(c)
-        uyx = uxy
-        uxz = ui_xz(c)
-        uzx = uxz
-        uyy = ui_yy(c)
-        uyz = ui_yz(c)
-        uzy = uyz
-        uzz = ui_zz(c)
-        diss1(c) = diss1(c) +                         &
-                2.0*0.25*viscosity*kin%n(c)/eps_tot(c)  *  &
-               (uu % n(c)*(uxx*uxx+uxy*uxy+uxz*uxz)+  &
-                uv % n(c)*(uxx*uyx+uxy*uyy+uxz*uyz)+  &
-                uw % n(c)*(uxx*uzx+uxy*uzy+uxz*uzz)+  &
-                uv % n(c)*(uyx*uxx+uyy*uxy+uyz*uxz)+  &
-                vv % n(c)*(uyx*uyx+uyy*uyy+uyz*uyz)+  &
-                vw % n(c)*(uyx*uzx+uyy*uzy+uyz*uzz)+  &
-                uw % n(c)*(uzx*uxx+uzy*uxy+uzz*uxz)+  &
-                vw % n(c)*(uzx*uyx+uzy*uyy+uzz*uyz)+  &
-                ww % n(c)*(uzx*uzx+uzy*uzy+uzz*uzz))
+        call Grad_Mod_For_Phi(grid, v % x, 1, ui_xx, .true.)  ! d2v/dxdx
+        call Grad_Mod_For_Phi(grid, v % x, 2, ui_xy, .true.)  ! d2v/dxdy
+        call Grad_Mod_For_Phi(grid, v % x, 3, ui_xz, .true.)  ! d2v/dxdz
+        call Grad_Mod_For_Phi(grid, v % y, 2, ui_yy, .true.)  ! d2v/dydy
+        call Grad_Mod_For_Phi(grid, v % y, 3, ui_yz, .true.)  ! d2v/dydz
+        call Grad_Mod_For_Phi(grid, v % z, 3, ui_zz, .true.)  ! d2v/dzdz
       end if
       if(i == 3) then
-        uxx = ui_xx(c)
-        uxy = ui_xy(c)
-        uyx = uxy
-        uxz = ui_xz(c)
-        uzx = uxz
-        uyy = ui_yy(c)
-        uyz = ui_yz(c)
-        uzy = uyz
-        uzz = ui_zz(c)
-        diss1(c) = diss1(c) +                         &
-                2.0*0.25*viscosity*kin%n(c)/eps_tot(c)  *  &
-               (uu % n(c)*(uxx*uxx+uxy*uxy+uxz*uxz)+  &
-                uv % n(c)*(uxx*uyx+uxy*uyy+uxz*uyz)+  &
-                uw % n(c)*(uxx*uzx+uxy*uzy+uxz*uzz)+  &
-                uv % n(c)*(uyx*uxx+uyy*uxy+uyz*uxz)+  &
-                vv % n(c)*(uyx*uyx+uyy*uyy+uyz*uyz)+  &
-                vw % n(c)*(uyx*uzx+uyy*uzy+uyz*uzz)+  &
-                uw % n(c)*(uzx*uxx+uzy*uxy+uzz*uxz)+  &
-                vw % n(c)*(uzx*uyx+uzy*uyy+uzz*uyz)+  &
-                ww % n(c)*(uzx*uzx+uzy*uzy+uzz*uzz))
+        call Grad_Mod_For_Phi(grid, w % x, 1, ui_xx, .true.)  ! d2w/dxdx
+        call Grad_Mod_For_Phi(grid, w % x, 2, ui_xy, .true.)  ! d2w/dxdy
+        call Grad_Mod_For_Phi(grid, w % x, 3, ui_xz, .true.)  ! d2w/dxdz
+        call Grad_Mod_For_Phi(grid, w % y, 2, ui_yy, .true.)  ! d2w/dydy
+        call Grad_Mod_For_Phi(grid, w % y, 3, ui_yz, .true.)  ! d2w/dydz
+        call Grad_Mod_For_Phi(grid, w % z, 3, ui_zz, .true.)  ! d2w/dzdz
       end if
-    end do
-  end do  ! i
-  end if                               
+
+      do c = 1, grid % n_cells
+        if(i == 1) then
+          uxx = ui_xx(c)
+          uxy = ui_xy(c)
+          uyx = uxy
+          uxz = ui_xz(c)
+          uzx = uxz
+          uyy = ui_yy(c)
+          uyz = ui_yz(c)
+          uzy = uyz
+          uzz = ui_zz(c)
+          diss1(c) =                                    &
+                  2.0*0.25*kin_vis*kin%n(c)/eps_tot(c)  *  &
+                 (uu % n(c)*(uxx*uxx+uxy*uxy+uxz*uxz)+  &
+                  uv % n(c)*(uxx*uyx+uxy*uyy+uxz*uyz)+  &
+                  uw % n(c)*(uxx*uzx+uxy*uzy+uxz*uzz)+  &
+                  uv % n(c)*(uyx*uxx+uyy*uxy+uyz*uxz)+  &
+                  vv % n(c)*(uyx*uyx+uyy*uyy+uyz*uyz)+  &
+                  vw % n(c)*(uyx*uzx+uyy*uzy+uyz*uzz)+  &
+                  uw % n(c)*(uzx*uxx+uzy*uxy+uzz*uxz)+  &
+                  vw % n(c)*(uzx*uyx+uzy*uyy+uzz*uyz)+  &
+                  ww % n(c)*(uzx*uzx+uzy*uzy+uzz*uzz))
+        end if
+        if(i == 2) then
+          uxx = ui_xx(c)
+          uxy = ui_xy(c)
+          uyx = uxy
+          uxz = ui_xz(c)
+          uzx = uxz
+          uyy = ui_yy(c)
+          uyz = ui_yz(c)
+          uzy = uyz
+          uzz = ui_zz(c)
+          diss1(c) = diss1(c) +                         &
+                  2.0*0.25*kin_vis*kin%n(c)/eps_tot(c)  *  &
+                 (uu % n(c)*(uxx*uxx+uxy*uxy+uxz*uxz)+  &
+                  uv % n(c)*(uxx*uyx+uxy*uyy+uxz*uyz)+  &
+                  uw % n(c)*(uxx*uzx+uxy*uzy+uxz*uzz)+  &
+                  uv % n(c)*(uyx*uxx+uyy*uxy+uyz*uxz)+  &
+                  vv % n(c)*(uyx*uyx+uyy*uyy+uyz*uyz)+  &
+                  vw % n(c)*(uyx*uzx+uyy*uzy+uyz*uzz)+  &
+                  uw % n(c)*(uzx*uxx+uzy*uxy+uzz*uxz)+  &
+                  vw % n(c)*(uzx*uyx+uzy*uyy+uzz*uyz)+  &
+                  ww % n(c)*(uzx*uzx+uzy*uzy+uzz*uzz))
+        end if
+        if(i == 3) then
+          uxx = ui_xx(c)
+          uxy = ui_xy(c)
+          uyx = uxy
+          uxz = ui_xz(c)
+          uzx = uxz
+          uyy = ui_yy(c)
+          uyz = ui_yz(c)
+          uzy = uyz
+          uzz = ui_zz(c)
+          diss1(c) = diss1(c) +                         &
+                  2.0*0.25*kin_vis*kin%n(c)/eps_tot(c)  *  &
+                 (uu % n(c)*(uxx*uxx+uxy*uxy+uxz*uxz)+  &
+                  uv % n(c)*(uxx*uyx+uxy*uyy+uxz*uyz)+  &
+                  uw % n(c)*(uxx*uzx+uxy*uzy+uxz*uzz)+  &
+                  uv % n(c)*(uyx*uxx+uyy*uxy+uyz*uxz)+  &
+                  vv % n(c)*(uyx*uyx+uyy*uyy+uyz*uyz)+  &
+                  vw % n(c)*(uyx*uzx+uyy*uzy+uyz*uzz)+  &
+                  uw % n(c)*(uzx*uxx+uzy*uxy+uzz*uxz)+  &
+                  vw % n(c)*(uzx*uyx+uzy*uyy+uzz*uyz)+  &
+                  ww % n(c)*(uzx*uzx+uzy*uzy+uzz*uzz))
+        end if
+      end do
+    end do  ! i
+  end if    ! end if EPS == yes                              
 
   call Grad_Mod_For_Phi(grid, l_scale, 1, l_sc_x,.true.) 
   call Grad_Mod_For_Phi(grid, l_scale, 2, l_sc_y,.true.) 
@@ -345,7 +354,7 @@
              + uw % n(c)*w % x(c) + vw % n(c)*w % y(c) + ww % n(c)*w % z(c)),  &
                1.0e-10)
   
-    mag = max(0.0, sqrt(l_sc_x(c)**2 + l_sc_y(c)**2 + l_sc_z(c)**2), 1.0e-10)       
+    mag = max(0.0, sqrt(l_sc_x(c)**2 + l_sc_y(c)**2 + l_sc_z(c)**2), tiny)       
 
     n1 = l_sc_x(c) / mag 
     n2 = l_sc_y(c) / mag
@@ -389,46 +398,14 @@
     a_mn_a_mn = a11*a11 + a22*a22 + a33*a33 + 2.0*(a12*a12+a13*a13+a23*a23)
     a_lk_s_lk = a11*S11 + a22*S22 + a33*S33 + 2.0*(a12*s12+a13*s13+a23*s23)
 
-    re_t= (kin % n(c)**2)/(viscosity*eps_tot(c)+tiny)
+    re_t= (kin % n(c)**2)/(kin_vis*eps_tot(c)+tiny)
     ff5 = min(aa2, (1.0-exp(-re_t/150))**3)
-    tkolm = (viscosity/eps_tot(c))**0.5
+    tkolm = (kin_vis/eps_tot(c))**0.5
 
     ee=aa
     fss=1.0-(sqrt(aa) * ee**2)
 
-!    do icont=1,6
-!      eps11= (1.0 - fss)*r23*eps %n(c) + fss * uu%n(c)/kin%n(c) * eps%n(c)
-!      eps22= (1.0 - fss)*r23*eps %n(c) + fss * vv%n(c)/kin%n(c) * eps%n(c)
-!      eps33= (1.0 - fss)*r23*eps %n(c) + fss * ww%n(c)/kin%n(c) * eps%n(c)
-!      eps12= fss * uv%n(c)/kin%n(c) * eps%n(c)
-!      eps13= fss * uw%n(c)/kin%n(c) * eps%n(c)
-!      eps23= fss * vw%n(c)/kin%n(c) * eps%n(c) 
-!      eps21= eps12
-!      eps31= eps13
-!      eps32= eps23
-
-!      e11= eps11/eps%n(c) - r23
-!      e22= eps22/eps%n(c) - r23
-!      e33= eps33/eps%n(c) - r23
-!      e12= eps12/eps%n(c)
-!      e13= eps13/eps%n(c)
-!      e23= eps23/eps%n(c)
-!      e21= e12
-!      e31= e13
-!      e32= e23
-!      e2=(e11**2)+(e22**2)+(e33**2)+2*((e12**2)+(e13**2)+(e23**2))
-
-!      e3= e11**3 + e22**3 + e33**3 + &
-!         3*e12**2*(e11+e22) + 3*e13**2*(e11+e33) +&
-!         3*e23**2*(e22+e33) + 6*e12*e13*e23
-
-!      ee=1.0 - (9.0/8.0)*(e2-e3)
-
-!      ee=max(ee,0.0)
-!      ee=min(ee,1.0)
-!      fss=1.0-(aa**0.5*ee**2.0)
-!    end do
-    do icont=1,7
+    do icont=1,5
       eps11 = ((1.0 - fss)*r23 + fss*uu % n(c) / kin % n(c)  &
             + 2.0*ff5*S11*tkolm)*eps%n(c)
       eps22 = ((1.0 - fss)*r23 + fss*vv % n(c) / kin % n(c)  &
@@ -466,7 +443,7 @@
       fss=1.0-(aa**0.5*ee**2)
     end do
 
-    re_t  = (kin % n(c)*kin % n(c)) / (viscosity*eps_tot(c) + tiny)
+    re_t  = (kin % n(c)*kin % n(c)) / (kin_vis*eps_tot(c) + tiny)
     f_eps = 1.0 - ((c_2e-1.4)/c_2e)*exp(-(re_t/6.0)**2)
     ff2   = (re_t/150.0)**1.5
     ff2   = min(ff2,1.0)
@@ -615,74 +592,74 @@
     !---------------!
     if(name_phi == 'UU') then
 
-      b(c) = b(c) + (  max(p11,0.0)            &
+      b(c) = b(c) + density * (  max(p11,0.0)  &
                      + cc1 * eps % n(c) * r23  &
                      + max(var2_11, 0.0)       &
                      + max(var1w_11,0.0)       &
                      + max(var2w_11,0.0))*grid % vol(c) 
       A % val(A % dia(c)) = A % val(A % dia(c))                               &
-                          + (  cc1 * eps % n(c) / kin % n(c)                  &
+                + density * (  cc1 * eps % n(c) / kin % n(c)                  &
                              + c1w * f_w * eps % n(c) / kin % n(c)*3.0*n1*n1  &
                              + fss * eps % n(c) / kin % n(c))*grid % vol(c)
       A % val(A % dia(c)) = A % val(A % dia(c))               &
-                          + (  max(-p11,     0.0)             &
+                + density * (  max(-p11,     0.0)             &
                              + max(-var2_11, 0.0)             &
                              + max(-var1w_11,0.0)             &
                              + max(-var2w_11,0.0)             &
                              + (1.0-fss) * r23 * eps % n(c))  &
-                            / max(uu%n(c), 1.0e-10) * grid % vol(c)
+                            / max(uu%n(c), tiny) * grid % vol(c)
 
     !---------------!
     !   VV stress   !
     !---------------!
     else if(name_phi == 'VV') then
 
-      b(c) = b(c) + (  max(p22,0.0)            &
+      b(c) = b(c) + density * (  max(p22,0.0)  &
                      + cc1 * eps % n(c) * r23  &
                      + max(var2_22, 0.0)       &
                      + max(var1w_22,0.0)       &
                      + max(var2w_22,0.0))*grid % vol(c) 
       A % val(A % dia(c)) = A % val(A % dia(c))                               &
-                          + (  cc1 * eps % n(c) / kin % n(c)                  &
+                + density * (  cc1 * eps % n(c) / kin % n(c)                  &
                              + c1w * f_w * eps % n(c) / kin % n(c)*3.0*n2*n2  &
                              + fss * eps % n(c) / kin % n(c))*grid % vol(c)
       A % val(A % dia(c)) = A % val(A % dia(c))               &
-                          + (  max(-p22,     0.0)             &
+                + density * (  max(-p22,     0.0)             &
                              + max(-var2_22, 0.0)             &
                              + max(-var1w_22,0.0)             &
                              + max(-var2w_22,0.0)             &
                              + (1.0-fss) * r23 * eps % n(c))  &
-                            / max(vv%n(c), 1.0e-10) * grid % vol(c)
+                            / max(vv%n(c), tiny) * grid % vol(c)
 
     !---------------!
     !   WW stress   !
     !---------------!
     else if(name_phi == 'WW') then
 
-      b(c) = b(c) + (  max(p33,0.0)            &
+      b(c) = b(c) + density * (  max(p33,0.0)  &
                      + cc1 * eps % n(c) * r23  &
                      + max(var2_33, 0.0)       &
                      + max(var1w_33,0.0)       &
                      + max(var2w_33,0.0))*grid % vol(c) 
       A % val(A % dia(c)) = A % val(A % dia(c))                               &
-                          + (  cc1 * eps % n(c) / kin % n(c)                  &
+                + density * (  cc1 * eps % n(c) / kin % n(c)                  &
                              + c1w * f_w * eps % n(c) / kin % n(c)*3.0*n3*n3  &
                              + fss * eps % n(c) / kin % n(c))*grid % vol(c)
       A % val(A % dia(c)) = A % val(A % dia(c))               &
-                          + (  max(-p33,     0.0)             &
+                + density * (  max(-p33,     0.0)             &
                              + max(-var2_33, 0.0)             &
                              + max(-var1w_33,0.0)             &
                              + max(-var2w_33,0.0)             &
                              + (1.0-fss) * r23 * eps % n(c))  &
-                            / max(ww%n(c), 1.0e-10) * grid % vol(c)
+                            / max(ww%n(c), tiny) * grid % vol(c)
 
     !---------------!
     !   UV stress   !
     !---------------!
     else if(name_phi == 'UV') then
-      b(c) = b(c) + (p12 + var2_12 + var1w_12 + var2w_12)*grid % vol(c)
+      b(c) = b(c) + density * (p12 + var2_12 + var1w_12 + var2w_12)*grid % vol(c)
       A % val(A % dia(c)) = A % val(A % dia(c))                             &
-            + (  cc1 * eps % n(c) / kin % n(c)                              &
+            + density * (  cc1 * eps % n(c) / kin % n(c)                    &
                + c1w * f_w * eps % n(c) / kin % n(c) * 1.5*(n1*n1 + n2*n2)  &
                + fss * eps % n(c) / kin % n(c) ) * grid % vol(c)
 
@@ -690,9 +667,9 @@
     !   UW stress   !
     !---------------!
     else if(name_phi == 'UW') then
-      b(c) = b(c) + (p13 + var2_13 + var1w_13 + var2w_13)*grid % vol(c)
+      b(c) = b(c) + density * (p13 + var2_13 + var1w_13 + var2w_13)*grid % vol(c)
       A % val(A % dia(c)) = A % val(A % dia(c))                             &
-            + (  cc1 * eps % n(c) / kin % n(c)                              &
+            + density * (  cc1 * eps % n(c) / kin % n(c)                    &
                + c1w * f_w * eps % n(c) / kin % n(c) * 1.5*(n1*n1 + n3*n3)  &
                + fss * eps % n(c) / kin % n(c) ) * grid % vol(c)
 
@@ -700,9 +677,9 @@
     !   VW stress   !
     !---------------!
     else if(name_phi == 'VW') then
-      b(c) = b(c) + (p23 + var2_23 + var1w_23 + var2w_23)*grid % vol(c)
+      b(c) = b(c) + density * (p23 + var2_23 + var1w_23 + var2w_23)*grid % vol(c)
       A % val(A % dia(c)) = A % val(A % dia(c))                             &
-            + (  cc1 * eps % n(c) / kin % n(c)                              &
+            + density * (  cc1 * eps % n(c) / kin % n(c)                    &
                + c1w * f_w * eps % n(c) / kin % n(c) * 1.5*(n2*n2 + n3*n3)  &
                + fss * eps % n(c) / kin % n(c) ) * grid % vol(c)
 
@@ -713,9 +690,9 @@
       f_eps = 1.0 - ((c_2e-1.4)/c_2e) * exp(-(re_t/6.0)**2)
       eps_1 = 1.44 * p_kin(c) * eps % n(c) / kin % n(c)
       eps_2 = c_2e * f_eps * eps % n(c) / kin % n(c)
-      b(c) = b(c) + max(eps_1 + diss1(c),0.0) * grid % vol(c)
+      b(c) = b(c) + density * (eps_1 + diss1(c)) * grid % vol(c)
 
-      A % val(A % dia(c)) =  A % val(A % dia(c)) + eps_2 * grid % vol(c)
+      A % val(A % dia(c)) =  A % val(A % dia(c)) + density * eps_2 * grid % vol(c)
     end if
   end do
 
@@ -728,12 +705,12 @@
     call Grad_Mod_For_Phi(grid, kin_e, 2, kin_e_y, .true.)   ! dk/dy
     call Grad_Mod_For_Phi(grid, kin_e, 3, kin_e_z, .true.)   ! dk/dz
     do c = 1, grid % n_cells
-      re_t  = (kin % n(c)**2) / (viscosity*eps % n(c) + TINY)
+      re_t  = (kin % n(c)**2) / (kin_vis*eps % n(c) + TINY)
       f_eps = 1.0 - ((c_2e-1.4)/c_2e) * exp(-(re_t/6.0)**2)
-      b(c) = b(c) + (c_2e * f_eps * eps % n(c) / kin % n(c)  &
-                     * (viscosity *(  kin_e_x(c)**2          &
-                                    + kin_e_y(c)**2          &
-                                    + kin_e_z(c)**2)))       &
+      b(c) = b(c) + density * (c_2e * f_eps * eps % n(c) / kin % n(c)  &
+                     * (kin_vis *(  kin_e_x(c)**2          &
+                                  + kin_e_y(c)**2          &
+                                  + kin_e_z(c)**2)))       &
                      * grid % vol(c)
     end do
   end if
@@ -748,9 +725,9 @@
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
 
-          eps % n(c2) = viscosity * (  kin_x(c1)**2  &
-                                     + kin_y(c1)**2  &
-                                     + kin_z(c1)**2)
+          eps % n(c2) = kin_vis * (  kin_e_x(c1)**2  &
+                                   + kin_e_y(c1)**2  &
+                                   + kin_e_z(c1)**2)
 
         end if   ! end if of BC=wall
       end if    ! end if of c2<0

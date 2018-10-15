@@ -113,9 +113,9 @@
 
         if(rough_walls) then
           y_plus(c1) = (grid % wall_dist(c1)+z_o)*u_tau(c1)/kin_vis
-          u_plus = log((grid % wall_dist(c1)+z_o))/(kappa + TINY) + TINY
+          u_plus = log((grid % wall_dist(c1)+z_o)/z_o)/(kappa + TINY) + TINY
           vis_wall(c1) = y_plus(c1) * viscosity * kappa  &
-                       / log((grid % wall_dist(c1)+z_o) / z_o)
+                       / log((grid % wall_dist(c1)+z_o)/z_o)
         end if
 
         if(heat_transfer) then

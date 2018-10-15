@@ -40,9 +40,11 @@
 !                                                                              !
 !   The form of equations which are solved:                                    !
 !                                                                              !
-!       (   df22      f22 dV     f22hg dV )                                      !
-!  int  ( - ---- dS + ------  =  -------- )                                      !
-!       (    dy        Lsc^2      Lsc^2   )                                      !
+!        /             /              /                                        !
+!       |   df22      |   f22        |  f22hg                                  !
+!       | - ---- dS + | ------ dV  = | ------- dV                              !
+!       |    dy       |  Lsc^2       |  Lsc^2                                  !
+!      /             /              /                                          !
 !                                                                              !
 !   Dimension of the system under consideration                                !
 !                                                                              !
@@ -228,7 +230,7 @@
   end if
 
   !-------------------------------------!
-  !                                     !  
+  !                                     !
   !   Source terms and wall function    !
   !   (Check if it is good to call it   !
   !    before the under relaxation ?)   !
@@ -243,7 +245,7 @@
   !---------------------------------!
   !                                 !
   !   Solve the equations for phi   !
-  !                                 !    
+  !                                 !
   !---------------------------------!
 
   ! Set under-relaxation factor
@@ -268,8 +270,8 @@
   call Control_Mod_Max_Iterations_For_Turbulence_Solver(niter)
 
   call Cg(a, phi % n, b, precond, niter, tol, ini_res, phi % res)
-  
-  call Info_Mod_Iter_Fill_At(3, 4, phi % name, niter, phi % res)    
+
+  call Info_Mod_Iter_Fill_At(3, 4, phi % name, niter, phi % res)
 
   call Comm_Mod_Exchange_Real(grid, phi % n)
 

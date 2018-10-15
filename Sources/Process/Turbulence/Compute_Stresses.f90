@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Stresses(grid, dt, ini, phi)
+  subroutine Compute_Stresses(grid, dt, ini, phi, n_time_step)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves transport equation for Re stresses for RSM.         !
 !   'EBM' and 'HJ' are calling this subroutine.                                !
@@ -34,6 +34,7 @@
   real            :: dt
   integer         :: ini
   type(Var_Type)  :: phi
+  integer         :: n_time_step
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: s, c, c1, c2, niter
   real              :: f_ex, f_im
@@ -52,8 +53,8 @@
   integer           :: td_cross_diff ! time-disretization for cross-difusion
   real              :: urf           ! under-relaxation factor                 
 !==============================================================================!
-!                                                                              ! 
-!   The form of equations which are being solved:                              !   
+!                                                                              !
+!   The form of equations which are being solved:                              !
 !                                                                              !
 !     /               /                /                     /                 !
 !    |     dphi      |                | mu_eff              |                  !
@@ -221,7 +222,7 @@
 
     if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
       if(turbulence_model_variant .ne. STABILIZED) then
-        vis_eff = 1.5*viscosity 
+        vis_eff = 1.5*viscosity + vis_t_f
       end if
     end if
 
@@ -306,27 +307,28 @@
   !------------------------------!
   !   Turbulent diffusion term   !
   !------------------------------!
+  if(phi % name .eq. 'EPS') then
+    c_mu_d = 0.18        
+  else
+    c_mu_d = 0.22
+  end if 
+
   if(turbulence_model_variant .ne. STABILIZED) then
-    if(phi % name .eq. 'EPS') then
-      c_mu_d = 0.18        
-    else
-      c_mu_d = 0.22
-    end if 
     if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then        
       do c = 1, grid % n_cells
-        u1uj_phij(c) = c_mu_d / phi % sigma * kin % n(c) / eps % n(c)  &
+        u1uj_phij(c) = density * c_mu_d / phi % sigma * kin % n(c) / eps % n(c)  &
                      * (  uu % n(c) * phi_x(c)                         &
                         + uv % n(c) * phi_y(c)                         &
                         + uw % n(c) * phi_z(c))                        &
                      - viscosity * phi_x(c)
 
-        u2uj_phij(c) = c_mu_d / phi % sigma * kin % n(c) / eps % n(c)  &
+        u2uj_phij(c) = density * c_mu_d / phi % sigma * kin % n(c) / eps % n(c)  &
                      * (  uv % n(c) * phi_x(c)                         &
                         + vv % n(c) * phi_y(c)                         &
                         + vw % n(c) * phi_z(c))                        &
                      - viscosity * phi_y(c)
 
-        u3uj_phij(c) = c_mu_d / phi % sigma * kin % n(c) / eps % n(c)  &
+        u3uj_phij(c) = density * c_mu_d / phi % sigma * kin % n(c) / eps % n(c)  &
                      * (  uw % n(c) * phi_x(c)                         &
                         + vw % n(c) * phi_y(c)                         &
                         + ww % n(c) * phi_z(c))                        &
@@ -334,17 +336,17 @@
       end do
     else if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
       do c = 1, grid % n_cells
-        u1uj_phij(c) = c_mu_d / phi % sigma * t_scale(c)  &
+        u1uj_phij(c) = density * c_mu_d / phi % sigma * t_scale(c)  &
                      * (  uu % n(c) * phi_x(c)            &
                         + uv % n(c) * phi_y(c)            &
                         + uw % n(c) * phi_z(c)) 
 
-        u2uj_phij(c) = c_mu_d / phi % sigma * t_scale(c)  &
+        u2uj_phij(c) = density * c_mu_d / phi % sigma * t_scale(c)  &
                      * (  uv % n(c) * phi_x(c)            &
                         + vv % n(c) * phi_y(c)            &
                         + vw % n(c) * phi_z(c)) 
 
-        u3uj_phij(c) = c_mu_d / phi % sigma * t_scale(c)  &
+        u3uj_phij(c) = density * c_mu_d / phi % sigma * t_scale(c)  &
                      * (  uw % n(c) * phi_x(c)            &
                         + vw % n(c) * phi_y(c)            &
                         + ww % n(c) * phi_z(c)) 
@@ -359,40 +361,39 @@
                      + u2uj_phij_y(c)  &
                      + u3uj_phij_z(c) ) * grid % vol(c)
     end do
+  end if
 
-    !------------------------------------------------------------------!
-    !   Here we clean up transport equation from the false diffusion   !
-    !------------------------------------------------------------------!
-    if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .and.  &
-       turbulence_model_variant .ne. STABILIZED) then
-      do s = 1, grid % n_faces
+  !------------------------------------------------------------------!
+  !   Here we clean up transport equation from the false diffusion   !
+  !------------------------------------------------------------------!
+  if(turbulence_model_variant .ne. STABILIZED) then
+    do s = 1, grid % n_faces
 
-        c1 = grid % faces_c(1,s)
-        c2 = grid % faces_c(2,s)
+      c1 = grid % faces_c(1,s)
+      c2 = grid % faces_c(2,s)
 
-        vis_eff = (fw(s)*vis_t(c1)+(1.0-fw(s))*vis_t(c2)) 
+      vis_eff = (fw(s)*vis_t(c1)+(1.0-fw(s))*vis_t(c2)) 
 
-        phix_f = fw(s)*phi_x(c1) + (1.0-fw(s))*phi_x(c2)
-        phiy_f = fw(s)*phi_y(c1) + (1.0-fw(s))*phi_y(c2)
-        phiz_f = fw(s)*phi_z(c1) + (1.0-fw(s))*phi_z(c2)
-        f_ex = vis_eff * (  phix_f * grid % sx(s)  &
-                         + phiy_f * grid % sy(s)  &
-                         + phiz_f * grid % sz(s))
-        a0 = vis_eff * f_coef(s)
-        f_im = (   phix_f * grid % dx(s)      &
-                + phiy_f * grid % dy(s)      &
-                + phiz_f * grid % dz(s)) * a0
+      phix_f = fw(s)*phi_x(c1) + (1.0-fw(s))*phi_x(c2)
+      phiy_f = fw(s)*phi_y(c1) + (1.0-fw(s))*phi_y(c2)
+      phiz_f = fw(s)*phi_z(c1) + (1.0-fw(s))*phi_z(c2)
+      f_ex = vis_eff * (  phix_f * grid % sx(s)  &
+                        + phiy_f * grid % sy(s)  &
+                        + phiz_f * grid % sz(s))
+      a0 = vis_eff * f_coef(s)
+      f_im = (   phix_f * grid % dx(s)      &
+               + phiy_f * grid % dy(s)      &
+               + phiz_f * grid % dz(s)) * a0
 
-        b(c1) = b(c1)                                            &
-              - vis_eff * (phi % n(c2) - phi%n(c1)) * f_coef(s)  &
-              - f_ex + f_im
-        if(c2  > 0) then
-          b(c2) = b(c2)                                            &
-                + vis_eff * (phi % n(c2) - phi%n(c1)) * f_coef(s)  &
-                + f_ex - f_im
-        end if
-      end do
-    end if
+      b(c1) = b(c1)                                            &
+             - vis_eff * (phi % n(c2) - phi%n(c1)) * f_coef(s)  &
+             - f_ex + f_im
+      if(c2  > 0) then
+        b(c2) = b(c2)                                            &
+              + vis_eff * (phi % n(c2) - phi%n(c1)) * f_coef(s)  &
+              + f_ex - f_im
+      end if
+    end do
   end if
 
   !---------------------------------!
@@ -468,7 +469,7 @@
 
     call Sources_Rsm_Manceau_Hanjalic(grid, phi % name)
   else if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
-    call Sources_Rsm_Hanjalic_Jakirlic(grid, phi % name)        
+    call Sources_Rsm_Hanjalic_Jakirlic(grid, phi % name, n_time_step)        
   end if                
 
   !---------------------------------!
@@ -498,7 +499,14 @@
   ! Over-ride if specified in control file
   call Control_Mod_Max_Iterations_For_Turbulence_Solver(niter)
 
-  call Cg(a, phi % n, b, precond, niter, tol, ini_res, phi % res)
+  call Bicg(a,        &
+            phi % n,  &
+            b,        &
+            precond,  &
+            niter,    &
+            tol,      &
+            ini_res,  &
+            phi % res)
 
   if( phi % name .eq. 'UU' )   &
     call Info_Mod_Iter_Fill_At(3, 1, phi % name, niter, phi % res)
