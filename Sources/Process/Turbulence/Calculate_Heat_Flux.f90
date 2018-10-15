@@ -40,7 +40,7 @@
      turbulence_model .eq. DES_SPALART) then
 
     do c = 1, grid % n_cells
-      pr_t = Turbulent_Prandtl_Number(grid, c)
+      pr_t = max(Turbulent_Prandtl_Number(grid, c), TINY)
       ut % n(c) = -vis_t(c) / pr_t * t_x(c)
       vt % n(c) = -vis_t(c) / pr_t * t_y(c)
       wt % n(c) = -vis_t(c) / pr_t * t_z(c)
@@ -64,16 +64,18 @@
   end if
 
   if(buoyancy) then
-    ut % n(c) = min( 0.01 * t_ref, ut % n(c))
-    ut % n(c) = max(-0.01 * t_ref, ut % n(c))
-    vt % n(c) = min( 0.01 * t_ref, vt % n(c))
-    vt % n(c) = max(-0.01 * t_ref, vt % n(c))
-    wt % n(c) = min( 0.01 * t_ref, wt % n(c))
-    wt % n(c) = max(-0.01 * t_ref, wt % n(c))
-    p_buoy(c) = -beta*(  grav_x * ut % n(c)  &
-                       + grav_y * vt % n(c)  &
-                       + grav_z * wt % n(c))
-    p_buoy(c) = max(p_buoy(c),0.0)
+    do c = 1, grid % n_cells
+      ut % n(c) = min( 0.01 * t_ref, ut % n(c))
+      ut % n(c) = max(-0.01 * t_ref, ut % n(c))
+      vt % n(c) = min( 0.01 * t_ref, vt % n(c))
+      vt % n(c) = max(-0.01 * t_ref, vt % n(c))
+      wt % n(c) = min( 0.01 * t_ref, wt % n(c))
+      wt % n(c) = max(-0.01 * t_ref, wt % n(c))
+      p_buoy(c) = -beta*(  grav_x * ut % n(c)  &
+                         + grav_y * vt % n(c)  &
+                         + grav_z * wt % n(c))
+      p_buoy(c) = max(p_buoy(c),0.0)
+    end do
   end if
 
   end subroutine
