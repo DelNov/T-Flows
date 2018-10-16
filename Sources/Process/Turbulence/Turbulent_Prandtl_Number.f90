@@ -4,7 +4,6 @@
 !   Computes turbulent Prandtl number according to Kays, W. M. and             !
 !   Crawford, M. E., Convective Heat and Mass Transfer,                        !
 !   3rd edn. McGraw-Hill, New York, 1993.                                      !
-!                                                                              !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod,      only: TINY
