@@ -118,7 +118,7 @@
   do mc = 1, max_cnt
     write(cf_name(11:12), '(i2.2)') mc  ! set name of the backup variable
     rvalues(:) = 0.0
-    do c = 1, grid % n_cells
+    do c = 1, grid % n_cells - grid % comm % n_buff_cells
       if( cells_cg(mc, c) .ne. 0 ) then
         rvalues(c) = flux( cells_fc(mc,c) )
       end if

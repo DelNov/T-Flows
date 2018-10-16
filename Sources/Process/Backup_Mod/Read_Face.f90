@@ -104,7 +104,7 @@
     write(cf_name(11:12), '(i2.2)') mc  ! set name of the backup variable
     call Backup_Mod_Read_Cell(fh, disp, vc, cf_name, rvalues(1:nc_s))
     call Comm_Mod_Exchange_Real(grid, rvalues)
-    do c = 1, grid % n_cells
+    do c = 1, grid % n_cells - grid % comm % n_buff_cells
       if( cells_cg(mc, c) .ne. 0 ) then
         flux( cells_fc(mc, c) ) = rvalues(c)
       end if
