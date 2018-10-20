@@ -18,10 +18,8 @@
   type(Grid_Type)   :: grid
 !==============================================================================!
 
-  call Control_Mod_Buoyancy                 (verbose = .true.)
-  call Control_Mod_Turbulence_Statistics    (verbose = .true.)
-  call Control_Mod_Turbulence_Model         (verbose = .true.)
-  call Control_Mod_Turbulence_Wall_Treatment(verbose = .true.)
+  call Control_Mod_Buoyancy        (verbose = .true.)
+  call Control_Mod_Turbulence_Model(verbose = .true.)
 
   ! Gradient matrices are always needed
   call Grad_Mod_Allocate_Memory(grid)
