@@ -7,7 +7,7 @@
   use Const_Mod
   use Flow_Mod
   use Rans_Mod
-  use Comm_Mod, only: this_proc
+  use Comm_Mod, only: this_proc, Comm_Mod_End
   use Tokenizer_Mod
   use Grid_Mod
   use User_Mod
@@ -91,9 +91,11 @@
 
       goto 1
     else
-      print *, '# Boundary conditions are not specified in control file!'
-      print *, '# Exiting the program.'
-      stop
+      if(this_proc < 2) then
+        print *, '# ERROR!  Boundary conditions not specified in control file!'
+        print *, '# Exiting the program.'
+      end if
+      call Comm_Mod_End
     end if
 
 2 continue
@@ -153,10 +155,10 @@
         grid % bnd_cond % type(n) = PRESSURE
       else
         if(this_proc < 2)  &
-          print *, '# Load_Boundary_Conditions: '//        &
+          print *, '# ERROR!  Load_Boundary_Conditions: '//        &
                    '# Unknown boundary condition type: ',  &
                    bc_type_name
-        stop
+        call Comm_Mod_End
       end if
 
       !----------------------------------------------!
