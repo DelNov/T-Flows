@@ -22,6 +22,8 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
+!---------------------------------[Calling]------------------------------------!
+  real :: Y_Plus_Low_Re
 !-----------------------------------[Locals]-----------------------------------!
   integer :: s, c, c1, c2, j
   real    :: u_tan, u_nor_sq, u_nor, u_tot_sq
@@ -100,13 +102,13 @@
           a % val(a % dia(c1)) = 1.0 * density
         else
           u_tau(c1) = c_mu25 * sqrt(kin % n(c1))
-          y_plus(c1) = u_tau(c1) * grid % wall_dist(c1) / kin_vis
-  
+          y_plus(c1) = Y_Plus_Low_Re(u_tau(c1), grid % wall_dist(c1), kin_vis)
+
           tau_wall(c1) = density*kappa*u_tau(c1)*u_tan   &
-                       / log(e_log*max(y_plus(c1),1.05))
+                       / log(e_log * max(y_plus(c1), 1.05))
 
           u_tau_new = sqrt(tau_wall(c1)/density)
-          y_plus(c1) = u_tau_new * grid % wall_dist(c1) / kin_vis
+          y_plus(c1) = Y_Plus_Low_Re(u_tau_new, grid % wall_dist(c1), kin_vis)
           ebf = 0.01 * y_plus(c1)**4 / (1.0 + 5.0*y_plus(c1))
 
           eps_int = 2.0*viscosity/density * kin % n(c1)    &

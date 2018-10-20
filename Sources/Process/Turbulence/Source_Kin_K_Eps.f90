@@ -16,10 +16,12 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
+!---------------------------------[Calling]------------------------------------!
+  real :: Y_Plus_Low_Re
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c, c1, c2, s
   real    :: u_tot2, u_nor, u_nor2, u_tan
-  real    :: kin_vis ![m^2/s]
+  real    :: kin_vis  ! [m^2/s]
   real    :: ebf, p_kin_int, p_kin_wf, u_tau_new
 !==============================================================================!
 !   Dimensions:                                                                !
@@ -102,13 +104,13 @@
                     * grid % vol(c1)
         else
           u_tau(c1) = c_mu25 * sqrt(kin % n(c1))
-          y_plus(c1) = u_tau(c1) * grid % wall_dist(c1) / kin_vis
+          y_plus(c1) = Y_Plus_Low_Re(u_tau(c1), grid % wall_dist(c1), kin_vis)
 
           tau_wall(c1) = density*kappa*u_tau(c1)*u_tan   &
-                       / log(e_log*max(y_plus(c1),1.05))
+                       / log(e_log * max(y_plus(c1), 1.05))
 
           u_tau_new = sqrt(tau_wall(c1)/density)
-          y_plus(c1) = u_tau_new * grid % wall_dist(c1) / kin_vis
+          y_plus(c1) = Y_Plus_Low_Re(u_tau_new, grid % wall_dist(c1), kin_vis)
 
           ebf = 0.01 * y_plus(c1)**4 / (1.0 + 5.0*y_plus(c1))
 

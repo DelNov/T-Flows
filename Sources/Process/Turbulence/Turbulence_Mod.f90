@@ -27,14 +27,10 @@
   integer, parameter :: SPALART_ALLMARAS      = 30097
   integer, parameter :: RSM_HANJALIC_JAKIRLIC = 30103
   integer, parameter :: RSM_MANCEAU_HANJALIC  = 30109
+  integer, parameter :: HYBRID_LES_RANS       = 30113
 
-  ! Turbulence wall treatment 
-  integer, parameter :: STABILIZED = 30113
-
-  ! Turbulence wall treatment 
-  integer, parameter :: LOW_RE   = 30119
-  integer, parameter :: HIGH_RE  = 30133
-  integer, parameter :: COMPOUND = 30137
+  ! Turbulence wall treatment
+  integer, parameter :: STABILIZED = 30119
 
   logical :: rough_walls
 

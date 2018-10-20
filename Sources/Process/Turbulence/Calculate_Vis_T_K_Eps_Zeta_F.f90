@@ -16,6 +16,10 @@
   type(Grid_Type) :: grid
 !---------------------------------[Calling]------------------------------------!
   real :: Turbulent_Prandtl_Number
+  real :: U_Plus_Log_Law
+  real :: U_Plus_Rough_Walls
+  real :: Y_Plus_Low_Re
+  real :: Y_Plus_Rough_Walls
 !----------------------------------[Locals]------------------------------------!
   integer :: c, c1, c2, s
   real    :: u_tan, u_nor_sq, u_nor, u_tot_sq
@@ -87,16 +91,16 @@
         end if
 
         u_tau(c1) = c_mu25 * sqrt(kin % n(c1))
-        y_plus(c1) = u_tau(c1) * grid % wall_dist(c1) / kin_vis
+        y_plus(c1) = Y_Plus_Low_Re(u_tau(c1), grid % wall_dist(c1), kin_vis)
 
         tau_wall(c1) = density*kappa*u_tau(c1)*u_tan    &
                      / log(e_log*max(y_plus(c1),1.05))
 
         u_tau_new = sqrt(tau_wall(c1)/density)
-        y_plus(c1) = u_tau_new * grid % wall_dist(c1) / kin_vis
+        y_plus(c1) = Y_Plus_Low_Re(u_tau_new, grid % wall_dist(c1), kin_vis)
         ebf = 0.01 * y_plus(c1)**4 / (1.0 + 5.0*y_plus(c1))
 
-        u_plus = log(max(y_plus(c1),1.05)*e_log) / kappa
+        u_plus = U_Plus_Log_Law(y_plus(c1))
 
         if(y_plus(c1) < 3.0) then
           vis_wall(c1) = vis_t(c1) + viscosity
@@ -107,14 +111,16 @@
         end if
 
         if(rough_walls) then
-          y_plus(c1) = (grid % wall_dist(c1)+z_o)*u_tau(c1)/kin_vis
-          u_plus = log((grid % wall_dist(c1)+z_o)/z_o)/(kappa + TINY) + TINY
+          y_plus(c1) = Y_Plus_Rough_Walls(u_tau(c1),             &
+                                          grid % wall_dist(c1),  &
+                                          kin_vis)
+          u_plus     = U_Plus_Rough_Walls(grid % wall_dist(c1))
           vis_wall(c1) = y_plus(c1) * viscosity * kappa  &
-                       / log((grid % wall_dist(c1)+z_o)/z_o)
+                       / log((grid % wall_dist(c1)+z_o)/z_o)  ! is this U+?
         end if
 
         if(heat_transfer) then
-          y_pl = u_tau(c1) * grid % wall_dist(c1) / kin_vis
+          y_plus(c1) = Y_Plus_Low_Re(u_tau(c1), grid % wall_dist(c1), kin_vis)
           pr_t = Turbulent_Prandtl_Number(grid, c1)
           pr = viscosity * capacity / conductivity
           beta = 9.24 * ((pr/pr_t)**0.75 - 1.0) * &

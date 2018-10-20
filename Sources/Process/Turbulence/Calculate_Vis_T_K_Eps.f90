@@ -22,18 +22,22 @@
   use Les_Mod
   use Rans_Mod
   use Grid_Mod
-!  use Work_Mod, only: re_t => r_cell_01,  &
-!                      f_mu => r_cell_02
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
+!---------------------------------[Calling]------------------------------------!
+  real :: Turbulent_Prandtl_Number
+  real :: U_Plus_Log_Law
+  real :: U_Plus_Rough_Walls
+  real :: Y_Plus_Low_Re
+  real :: Y_Plus_Rough_Walls
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c1, c2, s, c
   real    :: pr, beta, ebf
   real    :: u_tan, u_nor_sq, u_nor, u_tot_sq, u_tau_new
   real    :: kin_vis 
-  real    :: u_plus, y_star, re_t, f_mu
+  real    :: u_plus, y_star, re_t, f_mu, y_pl
 !==============================================================================!
 !   Dimensions:                                                                !
 !                                                                              !
@@ -92,16 +96,16 @@
         end if
 
         u_tau(c1) = c_mu25 * sqrt(kin % n(c1))
-        y_plus(c1) = u_tau(c1) * grid % wall_dist(c1) / kin_vis
+        y_plus(c1) = Y_Plus_Low_Re(u_tau(c1), grid % wall_dist(c1), kin_vis)
 
         tau_wall(c1) = density*kappa*u_tau(c1)*u_tan   &
                      / log(e_log*max(y_plus(c1),1.05))
 
         u_tau_new = sqrt(tau_wall(c1)/density)
-        y_plus(c1) = u_tau_new * grid % wall_dist(c1) / kin_vis
+        y_plus(c1) = Y_Plus_Low_Re(u_tau_new, grid % wall_dist(c1), kin_vis)
         ebf = 0.01 * y_plus(c1)**4 / (1.0 + 5.0*y_plus(c1))
 
-        u_plus = log(max(y_plus(c1),1.05)*e_log)/kappa
+        u_plus = U_Plus_Log_Law(y_plus(c1))
 
         if(y_plus(c1) < 3.0) then
           vis_wall(c1) = vis_t(c1) + viscosity
@@ -112,22 +116,25 @@
         end if
 
         if(rough_walls) then
-          y_plus(c1) = (grid % wall_dist(c1)+z_o)*u_tau(c1)/kin_vis
-          u_plus = log((grid % wall_dist(c1)+z_o)/z_o)/(kappa + TINY) + TINY
+          y_plus(c1) = Y_Plus_Rough_Walls(u_tau(c1),             &
+                                          grid % wall_dist(c1),  &
+                                          kin_vis)
+          u_plus     = U_Plus_Rough_Walls(grid % wall_dist(c1))
           vis_wall(c1) = y_plus(c1) * viscosity * kappa  &
-                       / log((grid % wall_dist(c1)+z_o)/z_o)
+                       / log((grid % wall_dist(c1)+z_o)/z_o)  ! is this U+?
         end if
 
         if(heat_transfer) then
-          call Control_Mod_Turbulent_Prandtl_Number(pr_t)
           pr = viscosity * capacity / conductivity
+          y_pl = Y_Plus_Low_Re(u_tau(c1), grid % wall_dist(c1), kin_vis)
+          pr_t = Turbulent_Prandtl_Number(grid, c1)
           beta = 9.24 * ((pr/pr_t)**0.75 - 1.0)  &
                * (1.0 + 0.28 * exp(-0.007*pr/pr_t))
-          ebf = 0.01 * (pr*y_plus(c1))**4  &
-              / ((1.0 + 5.0 * pr**3 * y_plus(c1)) + TINY)
-          con_wall(c1) =  y_plus(c1)*viscosity*capacity   &
-                       / (y_plus(c1)*pr*exp(-1.0 * ebf)   &
-                       + (u_plus + beta)*pr_t*exp(-1.0/ebf) + TINY)
+          ebf = 0.01 * (pr*y_pl**4  &
+              / ((1.0 + 5.0 * pr**3 * y_pl) + TINY))
+          con_wall(c1) =    y_pl * viscosity * capacity          &   
+                       / (  y_pl * pr        * exp(-1.0 * ebf)   &   
+                          +(u_plus + beta) * pr_t  * exp(-1.0/ebf) + TINY)
         end if
       end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2).eq.WALL or WALLFL
     end if    ! c2 < 0
