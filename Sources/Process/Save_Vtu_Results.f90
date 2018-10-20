@@ -149,10 +149,10 @@
         grid % cells_n(2,c)-1, grid % cells_n(4,c)-1,   &
         grid % cells_n(3,c)-1
     else
-      print *, '# Unsupported cell type with ',  &
+      print *, '# EERROR!  Unsupported cell type with ',  &
                   grid % cells_n_nodes(c), ' nodes.'
       print *, '# Exiting'
-      stop
+      call Comm_Mod_End
     end if
   end do
   write(9,'(a,a)') IN_4, '</DataArray>'
@@ -178,10 +178,10 @@
     else if(grid % cells_n_nodes(c) .eq. 5) then
       write(9,'(a,i9)') IN_5, VTK_PYRAMID
     else
-      print *, '# Unsupported cell type with ',  &
+      print *, '# ERROR!  Unsupported cell type with ',  &
                   grid % cells_n_nodes(c), ' nodes.'
       print *, '# Exiting'
-      stop
+      call Comm_Mod_End
     end if
   end do
   write(9,'(a,a)') IN_4, '</DataArray>'
