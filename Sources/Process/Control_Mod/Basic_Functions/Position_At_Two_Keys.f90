@@ -5,7 +5,9 @@
 !   Position yourself within the file at the line specified with two keys.     !
 !   It is intended to be used to find the boundary condition specifications.   !
 !------------------------------------------------------------------------------!
+!---------------------------------[Modules]------------------------------------!
   use Const_Mod
+  use Comm_Mod, only: this_proc
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -51,11 +53,11 @@
   !--------------------------------------------!
 1 if(.not. found) then
     if(present(verbose)) then
-      if(verbose) then
+      if(verbose .and. this_proc < 2) then
         print '(5a)', ' # NOTE! Could not find the line with keywords: ',  &
                       keyword_1, ', ', trim(keyword_2), '!'
       end if
     end if
-  end if 
+  end if
 
   end subroutine

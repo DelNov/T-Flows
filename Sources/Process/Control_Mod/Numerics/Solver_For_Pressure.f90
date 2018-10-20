@@ -1,6 +1,9 @@
 !==============================================================================!
   subroutine Control_Mod_Solver_For_Pressure(val, verbose)
 !------------------------------------------------------------------------------!
+!----------------------------------[Modules]-----------------------------------!
+  use Comm_Mod, only: this_proc, Comm_Mod_End
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   character(len=80) :: val
@@ -11,10 +14,12 @@
                                    val, verbose)
   call To_Upper_Case(val)
 
-  if( val.ne.'BICG' .and. val.ne.'CGS'  .and. val.ne.'CG') then
-    print *, '# Unknown linear solver for pressure: ', trim(val)
-    print *, '# Exiting!'
-    stop 
+  if( val.ne.'BICG' .and. val.ne.'CGS' .and. val.ne.'CG') then
+    if(this_proc < 2) then
+      print *, '# ERROR!  Unknown linear solver for pressure: ', trim(val)
+      print *, '# Exiting!'
+    end if
+    call Comm_Mod_End
   end if
 
   end subroutine

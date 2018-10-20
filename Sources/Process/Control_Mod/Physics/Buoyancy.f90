@@ -2,7 +2,8 @@
   subroutine Control_Mod_Buoyancy(verbose)
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Flow_Mod,  only: buoyancy
+  use Comm_Mod, only: this_proc, Comm_Mod_End
+  use Flow_Mod, only: buoyancy
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -22,9 +23,11 @@
     buoyancy = .false.
 
   else
-    print *, '# Unknown state for buoyancy: ', trim(val)
-    print *, '# Exiting!'
-    stop
+    if(this_proc < 2) then
+      print *, '# ERROR!  Unknown state for buoyancy: ', trim(val)
+      print *, '# Exiting!'
+    end if
+    call Comm_Mod_End
 
   end if
 

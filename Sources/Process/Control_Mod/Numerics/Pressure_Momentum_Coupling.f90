@@ -2,6 +2,7 @@
   subroutine Control_Mod_Pressure_Momentum_Coupling(verbose)
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
+  use Comm_Mod, only: this_proc, Comm_Mod_End
   use Numerics_Mod, only: pressure_momentum_coupling, SIMPLE, PROJECTION
 !------------------------------------------------------------------------------!
   implicit none
@@ -29,9 +30,11 @@
       pressure_momentum_coupling = PROJECTION
 
     case default
-      print *, '# Unknown pressure-momentum coupling: ', trim(val)
-      print *, '# Exiting!'
-      stop
+      if(this_proc < 2) then
+        print *, '# ERROR!  Unknown pressure-momentum coupling: ', trim(val)
+        print *, '# Exiting!'
+      end if
+      call Comm_Mod_End
 
   end select
 

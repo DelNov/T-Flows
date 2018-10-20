@@ -4,6 +4,7 @@
 !   Reading turbulence model from the control file.                            !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
+  use Comm_Mod,       only: this_proc, Comm_Mod_End
   use Turbulence_Mod, only: turbulence_model,          &
                             turbulence_statistics,     &
                             NONE,                      &
@@ -16,7 +17,8 @@
                             DES_SPALART,               &
                             SPALART_ALLMARAS,          &
                             RSM_HANJALIC_JAKIRLIC,     &
-                            RSM_MANCEAU_HANJALIC
+                            RSM_MANCEAU_HANJALIC,      &
+                            HYBRID_LES_RANS
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -56,11 +58,15 @@
       turbulence_model = RSM_HANJALIC_JAKIRLIC
     case('RSM_MANCEAU_HANJALIC')
       turbulence_model = RSM_MANCEAU_HANJALIC
+    case('HYBRID_LES_RANS')
+      turbulence_model = HYBRID_LES_RANS
 
     case default
-      print *, '# Unknown turbulence model :', trim(val)
-      print *, '# Exiting!'
-      stop 
+      if(this_proc < 2) then
+        print *, '# ERROR!  Unknown turbulence model :', trim(val)
+        print *, '# Exiting!'
+      end if
+      call Comm_Mod_End
 
   end select
 
@@ -71,10 +77,13 @@
      turbulence_model .eq. LES_DYNAMIC     .or.  &
      turbulence_model .eq. LES_WALE        .or.  &
      turbulence_model .eq. DNS             .or.  &
-     turbulence_model .eq. DES_SPALART) then
+     turbulence_model .eq. DES_SPALART     .or.  &
+     turbulence_model .eq. HYBRID_LES_RANS) then
 
-    print *, '# Scale resolving simulation used; ' // &
-             'turbulence statistics engaged!'
+    if(this_proc < 2) then
+      print *, '# Scale resolving simulation used; ' // &
+               'turbulence statistics engaged!'
+    end if
 
     turbulence_statistics = .true.
   end if

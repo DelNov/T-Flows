@@ -4,6 +4,7 @@
 !   Reading turbulence model from the control file.                            !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
+  use Comm_Mod, only: this_proc, Comm_Mod_End
   use Numerics_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -20,30 +21,33 @@
 
   select case(val)
 
-    case('UPWIND')                 
+    case('UPWIND')
       scheme = UPWIND
-    case('CENTRAL')              
+    case('CENTRAL')
       scheme = CENTRAL
-    case('LUDS')          
+    case('LUDS')
       scheme = LUDS
-    case('QUICK')   
+    case('QUICK')
       scheme = QUICK
-    case('SMART')           
+    case('SMART')
       scheme = SMART
-    case('GAMMA')                   
+    case('GAMMA')
       scheme = GAMMA
-    case('MINMOD')                   
+    case('MINMOD')
       scheme = MINMOD
-    case('BLENDED')           
+    case('BLENDED')
       scheme = BLENDED
-    case('SUPERBEE')     
+    case('SUPERBEE')
       scheme = SUPERBEE
-    case('AVL_SMART')     
+    case('AVL_SMART')
       scheme = AVL_SMART
 
     case default
-      print *, '# Exiting!'
-      stop 
+      if(this_proc < 2) then
+        print *, '# ERROR!  Advection scheme for turbulence not found.  ' //  &
+                 'Exiting!'
+      end if
+      call Comm_Mod_End
 
   end select
 

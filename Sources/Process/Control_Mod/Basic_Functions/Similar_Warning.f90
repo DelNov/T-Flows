@@ -39,19 +39,21 @@
   if( Approx_String(keyword, item, 1) ) then
 
     ! Print a warning message
-    print '(a)',  ' #============================================='//        &
+    if(this_proc < 2) then
+      print '(a)',  ' #============================================='//      &
                     '============================================='
-    if(.not. present(key_type)) then
-      print '(4a)', ' # WARNING! Could not find the keyword: ', keyword,     &
-                    ', but found similar: ', item
-    else
-      print '(6a)', ' # WARNING! Could not find the ',key_type,': ',keyword, &
-                    ', but found similar: ', item
+      if(.not. present(key_type)) then
+        print '(4a)', ' # NOTE! Could not find the keyword: ', keyword,      &
+                      ', but found similar: ', item
+      else
+        print '(6a)', ' # NOTE! Could not find the ',key_type,': ',keyword,  &
+                      ', but found similar: ', item
+      end if
+      print '(a)', ' #          Are you sure it is not a typing error'//     &
+                   ' in the control file?'
+      print '(a)',  ' #---------------------------------------------'//      &
+                      '---------------------------------------------'
     end if
-    print '(a)', ' #          Are you sure it is not a typing error'//       &
-                 ' in the control file?'
-    print '(a)',  ' #---------------------------------------------'//        &
-                    '---------------------------------------------'
 
     ! Store similar item in the list of similar items
     found = .false.

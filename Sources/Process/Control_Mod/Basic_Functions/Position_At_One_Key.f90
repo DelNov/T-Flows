@@ -4,6 +4,9 @@
 !   Position yourself within the file at the line specified with one key.      !
 !   It is intended to be used to find the initial condition specifications.    !
 !------------------------------------------------------------------------------!
+!---------------------------------[Modules]------------------------------------!
+  use Comm_Mod, only: this_proc
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   character(len=*)  :: keyword
@@ -41,8 +44,8 @@
   !--------------------------------------------!
 1 if(.not. found) then
     if(present(verbose)) then
-      if(verbose) then
-        print '(3a)', ' # Could not find the line with keyword: ',  &
+      if(verbose .and. this_proc < 2) then
+        print '(3a)', ' # WARING!  Could not find the line with keyword: ',  &
                       keyword, '!'
       end if
     end if

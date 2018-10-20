@@ -2,6 +2,7 @@
   subroutine Control_Mod_Time_Integration_For_Inertia(scheme, verbose)
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
+  use Comm_Mod, only: this_proc, Comm_Mod_End
   use Numerics_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -18,15 +19,18 @@
 
   select case(val)
 
-    case('LINEAR')                 
+    case('LINEAR')
       scheme = LINEAR
-    case('PARABOLIC')              
+    case('PARABOLIC')
       scheme = PARABOLIC
 
     case default
-      print *, '# Unknown time-integration scheme for inertia: ', trim(val)
-      print *, '# Exiting!'
-      stop 
+      if(this_proc < 2) then
+        print *, '# ERROR!  Unknown time-integration scheme for inertia: ',  &
+                 trim(val)
+        print *, '# Exiting!'
+      end if
+      call Comm_Mod_End
 
   end select
 

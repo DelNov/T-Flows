@@ -4,9 +4,10 @@
 !   Reading turbulence model variant from the control file                     !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
+  use Comm_Mod,       only: this_proc, Comm_Mod_End
   use Turbulence_Mod, only: turbulence_model_variant,  &
                             NONE,                      &
-                            STABILIZED                   
+                            STABILIZED
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -26,9 +27,11 @@
     turbulence_model_variant = STABILIZED
 
   else
-    print *, '# Unknown turbulence model variant: ', trim(val)
-    print *, '# Exiting!'
-    stop 
+    if(this_proc < 2) then
+      print *, '# Unknown turbulence model variant: ', trim(val)
+      print *, '# Exiting!'
+    end if
+    call Comm_Mod_End
   end if
 
   end subroutine
