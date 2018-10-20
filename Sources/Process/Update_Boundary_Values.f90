@@ -156,7 +156,8 @@
         ! and high-re k-eps models
         if(turbulence_model .eq. K_EPS_ZETA_F .or.      &
            turbulence_model .eq. K_EPS) then
-          y_pl   = u_tau(c1) * grid % wall_dist(c1) / kin_vis
+          y_pl   = max(c_mu25 * kin % n(c1) &
+                 * grid % wall_dist(c1) / kin_vis, TINY)
           u_plus = log(max(y_pl,1.05)*e_log) / kappa
           pr = viscosity * capacity / conductivity
           beta = 9.24 * ((pr/pr_t)**0.75 - 1.0)      &
