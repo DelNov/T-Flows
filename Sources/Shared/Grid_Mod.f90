@@ -44,7 +44,7 @@
 
   !---------------!
   !               !
-  !   Comm type   ! 
+  !   Comm type   !
   !               !
   !---------------!
   type Comm_Type    ! only used inside the Grid_Type) 
@@ -94,18 +94,18 @@
 
     ! Cell volumes
     real, allocatable :: vol(:)
-  
+
     ! General cell size (max(dx,dy,dz) or maybe volume/area?)
     real, allocatable :: delta(:)
-    
+
     ! Wall distance - distance from the nearest wall
     real, allocatable :: wall_dist(:)
 
     ! True if cell is near wall.  Used in Process for some turblence models.
     logical, allocatable :: cell_near_wall(:)
-    
+
     ! Cells' nodes and neigboring cells
-    integer, allocatable :: cells_n(:,:)      
+    integer, allocatable :: cells_n(:,:)
     integer, allocatable :: cells_c(:,:)
 
     ! Number of nodes at each cell (determines cell's shape really)
