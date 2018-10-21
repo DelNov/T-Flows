@@ -102,7 +102,6 @@
     include 'Control_Mod/Numerics/Starting_Time_Step_For_Statistics.f90'
 
     ! Discretization
-    include 'Control_Mod/Numerics/Pressure_Momentum_Coupling.f90'
     include 'Control_Mod/Numerics/Advection_Scheme_For_Energy.f90'
     include 'Control_Mod/Numerics/Advection_Scheme_For_Momentum.f90'
     include 'Control_Mod/Numerics/Advection_Scheme_For_Turbulence.f90'
@@ -115,10 +114,7 @@
     include 'Control_Mod/Numerics/Simple_Underrelaxation_For_Pressure.f90'
     include 'Control_Mod/Numerics/Simple_Underrelaxation_For_Energy.f90'
     include 'Control_Mod/Numerics/Simple_Underrelaxation_For_Turbulence.f90'
-    include 'Control_Mod/Numerics/Time_Integration_For_Inertia.f90'
-    include 'Control_Mod/Numerics/Time_Integration_For_Advection.f90'
-    include 'Control_Mod/Numerics/Time_Integration_For_Diffusion.f90'
-    include 'Control_Mod/Numerics/Time_Integration_For_Cross_Diffusion.f90'
+    include 'Control_Mod/Numerics/Time_Integration_Scheme.f90'
 
     ! Linear solvers
     include 'Control_Mod/Numerics/Solver_For_Energy.f90'
