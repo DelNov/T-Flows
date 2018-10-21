@@ -12,7 +12,7 @@
   type(Var_Type)          :: phi
   type(Grid_Type), target :: grid
 !==============================================================================!
-  
+
   ! Store variable name
   phi % name = name_phi
 
@@ -25,18 +25,10 @@
   allocate (phi % oo(-grid % n_bnd_cells: grid % n_cells));  phi % oo = 0.
 
   ! Advection terms
-  allocate (phi % a   (grid % n_cells));  phi % a    = 0.
-  allocate (phi % a_o (grid % n_cells));  phi % a_o  = 0.
-  allocate (phi % a_oo(grid % n_cells));  phi % a_oo = 0.
-
-  ! Diffusion terms
-  allocate (phi % d_o (grid % n_cells));  phi % d_o  = 0.
-  allocate (phi % d_oo(grid % n_cells));  phi % d_oo = 0.
+  allocate (phi % a(grid % n_cells));  phi % a = 0.
 
   ! Cross diffusion terms
-  allocate (phi % c  (grid % n_cells));   phi % c    = 0.
-  allocate (phi % c_o (grid % n_cells));  phi % c_o  = 0.
-  allocate (phi % c_oo(grid % n_cells));  phi % c_oo = 0.
+  allocate (phi % c(grid % n_cells));   phi % c = 0.
 
   ! Variable's boundary flux
   allocate (phi % q(-grid % n_bnd_cells: -1));  phi % q  = 0.
