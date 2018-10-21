@@ -15,19 +15,19 @@
   leng = len(text_in)
 
   ! Set it at position disp (same as in Write counterpart)
-  call Mpi_File_Set_View(fh,                 &   
-                         disp,               &   
-                         MPI_CHARACTER,      &
-                         MPI_CHARACTER,      &   
-                         'native',           &   
-                         MPI_INFO_NULL,      &
+  call Mpi_File_Set_View(fh,             &
+                         disp,           &
+                         MPI_CHARACTER,  &
+                         MPI_CHARACTER,  &
+                         'native',       &
+                         MPI_INFO_NULL,  &
                          error)
 
   ! Read the string
   call Mpi_File_Read(fh,                 &
                      text_in,            &
                      leng,               &
-                     MPI_CHARACTER,      &   
+                     MPI_CHARACTER,      &
                      MPI_STATUS_IGNORE,  &
                      error) 
 
