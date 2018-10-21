@@ -35,12 +35,7 @@
       call Comm_Mod_Read_Cell_Real(fh, var % n(1:nc_s),   disp_loop)
       call Comm_Mod_Read_Bnd_Real (fh, var % n(-nb_s:-1), disp_loop)
       call Comm_Mod_Read_Bnd_Real (fh, var % q(-nb_s:-1), disp_loop)
-      call Comm_Mod_Read_Cell_Real(fh, var % o  (1:nc_s), disp_loop)
-      call Comm_Mod_Read_Cell_Real(fh, var % a  (1:nc_s), disp_loop)
-      call Comm_Mod_Read_Cell_Real(fh, var % a_o(1:nc_s), disp_loop)
-      call Comm_Mod_Read_Cell_Real(fh, var % c  (1:nc_s), disp_loop)
-      call Comm_Mod_Read_Cell_Real(fh, var % c_o(1:nc_s), disp_loop)
-      call Comm_Mod_Read_Cell_Real(fh, var % d_o(1:nc_s), disp_loop)
+      call Comm_Mod_Read_Cell_Real(fh, var % o(1:nc_s),   disp_loop)
       disp = disp_loop
       return
 
