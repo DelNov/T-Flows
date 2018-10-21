@@ -54,10 +54,10 @@
   character(len=80) :: precond
   integer           :: adv_scheme    ! space disretization of advection (scheme)
   real              :: blend         ! blending coeff (1.0 central; 0.0 upwind)
-  integer           :: td_inertia    ! time-disretization for inerita
+  integer           :: td_scheme     ! time-disretization for inerita
   integer           :: td_advection  ! time-disretization for advection
   integer           :: td_diffusion  ! time-disretization for diffusion
-  integer           :: td_cross_diff ! time-disretization for cross-difusion
+  integer           :: td_cross_diff ! time-disretization for cross-diffusion
   real              :: urf           ! under-relaxation factor
 !------------------------------------------------------------------------------!
 !
@@ -131,26 +131,11 @@
   a % val  = 0.0
   f_stress = 0.0
 
-  !-------------------------------------!
-  !   Initialize variables and fluxes   !
-  !-------------------------------------!
-
-  call Control_Mod_Time_Integration_For_Inertia(td_inertia)
-  call Control_Mod_Time_Integration_For_Advection(td_advection)
-  call Control_Mod_Time_Integration_For_Diffusion(td_diffusion)
-  call Control_Mod_Time_Integration_For_Cross_Diffusion(td_cross_diff)
-
   ! Old values (o) and older than old (oo)
   if(ini .eq. 1) then
     do c = 1, grid % n_cells
-      ui % oo(c)   = ui % o(c)
-      ui % o (c)   = ui % n(c)
-      ui % a_oo(c) = ui % a_o(c)
-      ui % a_o (c) = 0.0
-      ui % d_oo(c) = ui % d_o(c)
-      ui % d_o (c) = 0.0
-      ui % c_oo(c) = ui % c_o(c)
-      ui % c_o (c) = ui % c(c)
+      ui % oo(c) = ui % o(c)
+      ui % o (c) = ui % n(c)
     end do
   end if
 
@@ -172,8 +157,8 @@
 
   ! New values
 1 do c = 1, grid % n_cells
-    ui % a(c)    = 0.0
-    ui % c(c)    = 0.0
+    ui % a(c) = 0.0
+    ui % c(c) = 0.0
   end do
 
   !----------------------------!
@@ -195,15 +180,6 @@
     end if
 
     ! Compute advection term
-    if(ini .eq. 1) then
-      if(c2  > 0) then
-        ui % a_o(c1) = ui % a_o(c1) - flux(s) * uis
-        ui % a_o(c2) = ui % a_o(c2) + flux(s) * uis
-      else
-        ui % a_o(c1) = ui % a_o(c1) - flux(s) * uis
-      end if
-    end if
-
     if(c2  > 0) then
       ui % a(c1) = ui % a(c1) - flux(s) * uis
       ui % a(c2) = ui % a(c2) + flux(s) * uis
@@ -212,49 +188,26 @@
     end if
 
     ! Store upwinded part of the advection term in "c"
-    if(pressure_momentum_coupling .ne. PROJECTION) then
-      if(flux(s)  < 0) then   ! from c2 to c1
-        ui % c(c1) = ui % c(c1) - flux(s)*ui % n(c2)
-        if(c2  > 0) then
-          ui % c(c2) = ui % c(c2) + flux(s)*ui % n(c2)
-        end if
-      else
-        ui % c(c1) = ui % c(c1) - flux(s)*ui % n(c1)
-        if(c2  > 0) then
-          ui % c(c2) = ui % c(c2) + flux(s)*ui % n(c1)
-        end if
+    if(flux(s)  < 0) then   ! from c2 to c1
+      ui % c(c1) = ui % c(c1) - flux(s)*ui % n(c2)
+      if(c2  > 0) then
+        ui % c(c2) = ui % c(c2) + flux(s)*ui % n(c2)
+      end if
+    else
+      ui % c(c1) = ui % c(c1) - flux(s)*ui % n(c1)
+      if(c2  > 0) then
+        ui % c(c2) = ui % c(c2) + flux(s)*ui % n(c1)
       end if
     end if
+
   end do ! through faces
 
-  !-----------------------------!
-  !   Temporal discretization   !
-  !-----------------------------!
-
-  ! Adams-Bashforth scheeme for convective fluxes
-  if(td_advection .eq. ADAMS_BASHFORTH) then
-    do c = 1, grid % n_cells
-      b(c) = b(c) + (1.5*ui % a_o(c) - 0.5*ui % a_oo(c) - ui % c(c))
-    end do
-  end if
-
-  ! Crank-Nicholson scheeme for convective fluxes
-  if(td_advection .eq. CRANK_NICOLSON) then
-    do c = 1, grid % n_cells
-      b(c) = b(c) + (0.5 * ( ui % a(c) + ui % a_o(c) ) - ui % c(c))
-    end do
-  end if
-
-  ! Fully implicit treatment of convective fluxes
-  if(td_advection .eq. FULLY_IMPLICIT) then
-    do c = 1, grid % n_cells
-      b(c) = b(c) + (ui % a(c) - ui % c(c))
-    end do
-  end if
-
-  ! New values
+  !------------------------------------------------!
+  !   Source term contains difference between      !
+  !   explicity and implicitly treated advection   !
+  !------------------------------------------------!
   do c = 1, grid % n_cells
-    ui % c(c) = 0.0
+    b(c) = b(c) + (ui % a(c) - ui % c(c))
   end do
 
   !---------------!
@@ -262,6 +215,11 @@
   !   Diffusion   !
   !               !
   !---------------!
+
+  ! Set c terms back to zero
+  do c = 1, grid % n_cells
+    ui % c(c) = 0.0
+  end do
 
   !----------------------------!
   !   Spatial discretization   !
@@ -339,7 +297,7 @@
     uj_i_f = fw(s)*uj_i(c1) + (1.0-fw(s))*uj_i(c2)
     uk_i_f = fw(s)*uk_i(c1) + (1.0-fw(s))*uk_i(c2)
 
-    ! total (exact) viscous stress
+    ! Total (exact) viscous stress
     f_ex = vis_eff*(      2.0*ui_i_f  * si(s)      &
                     + (ui_j_f+uj_i_f) * sj(s)      &
                     + (ui_k_f+uk_i_f) * sk(s) )
@@ -351,18 +309,6 @@
              + ui_j_f*dj(s)                &
              + ui_k_f*dk(s))*a0
 
-    ! Straight diffusion part
-    if(ini .eq. 1) then
-      if(c2  > 0) then
-        ui % d_o(c1) = ui % d_o(c1) + (ui % n(c2)-ui % n(c1))*a0
-        ui % d_o(c2) = ui % d_o(c2) - (ui % n(c2)-ui % n(c1))*a0
-      else
-        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. SYMMETRY) then
-          ui % d_o(c1) = ui % d_o(c1) + (ui % n(c2)-ui % n(c1))*a0
-        end if
-      end if
-    end if
-
     ! Cross diffusion part
     ui % c(c1) = ui % c(c1) + f_ex - f_im + f_stress * density
     if(c2  > 0) then
@@ -370,76 +316,31 @@
     end if
 
     ! Compute the coefficients for the sysytem matrix
-    if( (td_diffusion .eq. CRANK_NICOLSON) .or.  &
-        (td_diffusion .eq. FULLY_IMPLICIT) ) then
-      if(td_diffusion .eq. CRANK_NICOLSON) then
-        a12 = 0.5 * a0
-        a21 = 0.5 * a0
-      end if
+    a12 = a0
+    a21 = a0
 
-      if(td_diffusion .eq. FULLY_IMPLICIT) then
-        a12 = a0
-        a21 = a0
-      end if
+    a12 = a12  - min(flux(s), real(0.0))
+    a21 = a21  + max(flux(s), real(0.0))
 
-      if(pressure_momentum_coupling .ne. PROJECTION) then
-        a12 = a12  - min(flux(s), real(0.0))
-        a21 = a21  + max(flux(s), real(0.0))
-      end if
-
-      ! Fill the system matrix
-      if(c2 > 0) then
-        a % val(a % pos(1,s)) = a % val(a % pos(1,s)) - a12
-        a % val(a % dia(c1))  = a % val(a % dia(c1))  + a12
-        a % val(a % pos(2,s)) = a % val(a % pos(2,s)) - a21
-        a % val(a % dia(c2))  = a % val(a % dia(c2))  + a21
-      else if(c2  < 0) then
-        ! Outflow is not included because it was causing problems
-        if((Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW)  .or.  &
-           (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL)    .or.  &
-           (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) .or.  &
-           (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL)) then
-           ! (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) ) then
-          a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
-          b(c1) = b(c1) + a12 * ui % n(c2)
-        end if
+    ! Fill the system matrix
+    if(c2 > 0) then
+      a % val(a % pos(1,s)) = a % val(a % pos(1,s)) - a12
+      a % val(a % dia(c1))  = a % val(a % dia(c1))  + a12
+      a % val(a % pos(2,s)) = a % val(a % pos(2,s)) - a21
+      a % val(a % dia(c2))  = a % val(a % dia(c2))  + a21
+    else if(c2  < 0) then
+      ! Outflow is not included because it was causing problems
+      if((Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW)  .or.  &
+         (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL)    .or.  &
+         (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) .or.  &
+         (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL)) then
+         ! (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) ) then
+        a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
+        b(c1) = b(c1) + a12 * ui % n(c2)
       end if
     end if
+
   end do  ! through faces
-
-  !-----------------------------!
-  !   Temporal discretization   !
-  !-----------------------------!
-
-  !---------------------------------!
-  !
-  ! Add Re stress influence on momentum
-  ! This is an alternative way to implement RSM
-  !
-  !  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
-  !     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
-  !    if(ui % name .eq. 'U') then
-  !      call GraPhi(uu%n,1,VAR2x,.TRUE.)
-  !      call GraPhi(uv%n,2,VAR2y,.TRUE.)
-  !      call GraPhi(uw%n,3,VAR2z,.TRUE.)
-  !      do c = 1, grid % n_cells
-  !        b(c) = b(c) - (VAR2x(c)+VAR2y(c)+VAR2z(c))*grid % vol(c)
-  !      end do
-  !    else if(ui % name .eq. 'V') then
-  !      call GraPhi(uv%n,1,VAR2x,.TRUE.)
-  !      call GraPhi(vv%n,2,VAR2y,.TRUE.)
-  !      call GraPhi(vw%n,3,VAR2z,.TRUE.)
-  !      do c = 1, grid % n_cells
-  !        b(c) = b(c) - (VAR2x(c)+VAR2y(c)+VAR2z(c))*grid % vol(c)
-  !      end do
-  !    else if(ui % name .eq. 'W') then
-  !      call GraPhi(uw%n,1,VAR2x,.TRUE.)
-  !      call GraPhi(vw%n,2,VAR2y,.TRUE.)
-  !      call GraPhi(ww%n,3,VAR2z,.TRUE.)
-  !      do c = 1, grid % n_cells
-  !        b(c) = b(c) - (VAR2x(c)+VAR2y(c)+VAR2z(c))*grid % vol(c)
-  !      end do
-  !    end if
 
   ! Here we clean up momentum from the false diffusion
   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
@@ -477,43 +378,10 @@
     end if
   end if
 
-  ! Adams-Bashfort scheeme for diffusion fluxes
-  if(td_diffusion .eq. ADAMS_BASHFORTH) then
-    do c = 1, grid % n_cells
-      b(c) = b(c) + 1.5 * ui % d_o(c) - 0.5 * ui % d_oo(c)
-    end do
-  end if
-
-  ! Crank-Nicholson scheme for difusive terms
-  if(td_diffusion .eq. CRANK_NICOLSON) then
-    do c = 1, grid % n_cells
-      b(c) = b(c) + 0.5 * ui % d_o(c)
-    end do
-  end if
-
-  ! Fully implicit treatment for difusive terms
-  ! is handled via the linear system of equations
-
-  ! Adams-Bashfort scheeme for cross diffusion
-  if(td_cross_diff .eq. ADAMS_BASHFORTH) then
-    do c = 1, grid % n_cells
-      b(c) = b(c) + 1.5 * ui % c_o(c) - 0.5 * ui % c_oo(c)
-    end do
-  end if
-
-  ! Crank-Nicholson scheme for cross difusive terms
-  if(td_cross_diff .eq. CRANK_NICOLSON) then
-    do c = 1, grid % n_cells
-      b(c) = b(c) + 0.5 * ui % c(c) + 0.5 * ui % c_o(c)
-    end do
-  end if
-
-  ! Fully implicit treatment for cross difusive terms
-  if(td_cross_diff .eq. FULLY_IMPLICIT) then
-    do c = 1, grid % n_cells
-      b(c) = b(c) + ui % c(c)
-    end do
-  end if
+  ! Fully implicit treatment for cross diffusion terms
+  do c = 1, grid % n_cells
+    b(c) = b(c) + ui % c(c)
+  end do
 
   !--------------------!
   !                    !
@@ -521,8 +389,10 @@
   !                    !
   !--------------------!
 
+  call Control_Mod_Time_Integration_Scheme(td_scheme)
+
   ! Two time levels; linear interpolation
-  if(td_inertia .eq. LINEAR) then
+  if(td_scheme .eq. LINEAR) then
     do c = 1, grid % n_cells
       a0 = density * grid % vol(c) / dt
       a % val(a % dia(c)) = a % val(a % dia(c)) + a0
@@ -531,7 +401,7 @@
   end if
 
   ! Three time levels; parabolic interpolation
-  if(td_inertia .eq. PARABOLIC) then
+  if(td_scheme .eq. PARABOLIC) then
     do c = 1, grid % n_cells
       a0 = density * grid % vol(c) / dt
       a % val(a % dia(c)) = a % val(a % dia(c)) + 1.5 * a0
@@ -569,9 +439,9 @@
     b(c) = b(c) - h_i(c) * grid % vol(c)
   end do
 
-  !--------------------------!
-  !   Buoyancy force         !
-  !--------------------------!
+  !--------------------!
+  !   Buoyancy force   !
+  !--------------------!
   if(buoyancy) then
     if(ui % name .eq. 'U') then
       do c = 1, grid % n_cells
@@ -591,7 +461,6 @@
     end if
   end if
 
-  !---------------------------------!
   !----------------------------------------!
   !   All other terms defined by the user  !
   !----------------------------------------!
@@ -603,13 +472,9 @@
   !                                   !
   !-----------------------------------!
 
-  ! Type of coupling is important
-  call Control_Mod_Pressure_Momentum_Coupling()
-
-  ! Set under-relaxation factor
-  urf = 1.0
-  if(pressure_momentum_coupling .eq. SIMPLE)  &
-    call Control_Mod_simple_Underrelaxation_For_Momentum(urf)
+  ! Set under-relaxation factor then overwrite with conrol file if specified
+  urf = 0.8
+  call Control_Mod_simple_Underrelaxation_For_Momentum(urf)
 
   do c = 1, grid % n_cells
     a % sav(c) = a % val(a % dia(c))
@@ -623,11 +488,8 @@
   ! Get matrix precondioner
   call Control_Mod_Preconditioner_For_System_Matrix(precond)
 
-  ! Set number of solver iterations on coupling method
-  if(pressure_momentum_coupling .eq. PROJECTION) niter = 10
-  if(pressure_momentum_coupling .eq. SIMPLE)     niter =  5
-
-  ! Over-ride if specified in control file
+  ! Set number of iterations then overwrite with conrol file if specified
+  niter =  5
   call Control_Mod_Max_Iterations_For_Momentum_Solver(niter)
 
   call Bicg(a,        &
