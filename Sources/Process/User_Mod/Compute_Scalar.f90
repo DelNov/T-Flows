@@ -279,13 +279,7 @@
     end if 
 
     ! Calculate the coefficients for the sysytem matrix
-    if( (td_diffusion .eq. CRANK_NICOLSON) .or.  &
-        (td_diffusion .eq. FULLY_IMPLICIT) ) then
-
-      if(td_diffusion .eq. CRANK_NICOLSON) then 
-        a12 = .5 * con_eff1 * f_coef(s)
-        a21 = .5 * con_eff2 * f_coef(s)
-      end if
+    if( td_diffusion .eq. FULLY_IMPLICIT ) then
 
       if(td_diffusion .eq. FULLY_IMPLICIT) then 
         a12 = con_eff1 * f_coef(s)
