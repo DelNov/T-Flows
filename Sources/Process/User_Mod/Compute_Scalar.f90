@@ -175,17 +175,11 @@
   end do  ! through sides
 
   !-----------------------------!
-  !                             !
   !   Temporal discretization   !
-  !                             !
   !-----------------------------!
-
-  ! Fully implicit treatment of advection fluxes
-  if(td_advection .eq. FULLY_IMPLICIT) then
-    do c = 1, grid % n_cells
-      b(c) = b(c) + phi % a(c) - phi % c(c)
-    end do
-  end if
+  do c = 1, grid % n_cells
+    b(c) = b(c) + phi % a(c) - phi % c(c)
+  end do
 
   !--------------!
   !              !
@@ -276,36 +270,32 @@
     end if 
 
     ! Calculate the coefficients for the sysytem matrix
-    if( td_diffusion .eq. FULLY_IMPLICIT ) then
 
-      if(td_diffusion .eq. FULLY_IMPLICIT) then 
-        a12 = con_eff1 * f_coef(s)
-        a21 = con_eff2 * f_coef(s)
-      end if
+    a12 = con_eff1 * f_coef(s)
+    a21 = con_eff2 * f_coef(s)
 
-      a12 = a12  - min(flux(s), 0.0) * capacity
-      a21 = a21  + max(flux(s), 0.0) * capacity
+    a12 = a12  - min(flux(s), 0.0) * capacity
+    a21 = a21  + max(flux(s), 0.0) * capacity
 
-      ! Fill the system matrix
-      if(c2 > 0) then
-        a % val(a % dia(c1))  = a % val(a % dia(c1)) + a12
-        a % val(a % dia(c2))  = a % val(a % dia(c2)) + a21
-        a % val(a % pos(1,s)) = a % val(a % pos(1,s)) - a12
-        a % val(a % pos(2,s)) = a % val(a % pos(2,s)) - a21
-      else if(c2 < 0) then
+    ! Fill the system matrix
+    if(c2 > 0) then
+      a % val(a % dia(c1))  = a % val(a % dia(c1)) + a12
+      a % val(a % dia(c2))  = a % val(a % dia(c2)) + a21
+      a % val(a % pos(1,s)) = a % val(a % pos(1,s)) - a12
+      a % val(a % pos(2,s)) = a % val(a % pos(2,s)) - a21
+    else if(c2 < 0) then
 
-        ! Outflow is included because of the flux 
-        ! corrections which also affects velocities
-        if( (Var_Mod_Bnd_Cell_Type(phi,c2) .eq. INFLOW) .or.  &
-            (Var_Mod_Bnd_Cell_Type(phi,c2) .eq. WALL)   .or.  &
-            (Var_Mod_Bnd_Cell_Type(phi,c2) .eq. CONVECT) ) then    
-          a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
-          b(c1)  = b(c1)  + a12 * phi % n(c2)
+      ! Outflow is included because of the flux 
+      ! corrections which also affects velocities
+      if( (Var_Mod_Bnd_Cell_Type(phi,c2) .eq. INFLOW) .or.  &
+          (Var_Mod_Bnd_Cell_Type(phi,c2) .eq. WALL)   .or.  &
+          (Var_Mod_Bnd_Cell_Type(phi,c2) .eq. CONVECT) ) then    
+        a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
+        b(c1)  = b(c1)  + a12 * phi % n(c2)
 
-        ! In case of wallflux 
-        else if(Var_Mod_Bnd_Cell_Type(phi,c2) .eq. WALLFL) then
-          b(c1) = b(c1) + grid % s(s) * phi % q(c2)
-        end if 
+      ! In case of wallflux 
+      else if(Var_Mod_Bnd_Cell_Type(phi,c2) .eq. WALLFL) then
+        b(c1) = b(c1) + grid % s(s) * phi % q(c2)
       end if
 
     end if
@@ -320,16 +310,14 @@
   ! is handled via the linear system of equations 
 
   ! Fully implicit treatment for cross difusive terms
-  if(td_cross_diff .eq. FULLY_IMPLICIT) then
-    do c = 1, grid % n_cells
-      if(phi % c(c) >= 0) then
-        b(c)  = b(c) + phi % c(c)
-      else
-        a % val(a % dia(c)) = a % val(a % dia(c))  &
-                            - phi % c(c)/(phi % n(c)+1.e-6)
-      end if
-    end do
-  end if
+  do c = 1, grid % n_cells
+    if(phi % c(c) >= 0) then
+      b(c)  = b(c) + phi % c(c)
+    else
+      a % val(a % dia(c)) = a % val(a % dia(c))  &
+                          - phi % c(c)/(phi % n(c)+1.e-6)
+    end if
+  end do
 
   !--------------------!
   !                    !
