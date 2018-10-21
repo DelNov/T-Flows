@@ -57,6 +57,7 @@
   !-----------------------------------------!
   call Control_Mod_Heat_Transfer(verbose = .true.)
   if(heat_transfer) then
+
     call Var_Mod_Allocate_Solution('T',  t,  grid)
     allocate(con_wall(-grid % n_bnd_cells:grid % n_cells)); con_wall = 0.
 
@@ -114,7 +115,8 @@
   !------------------!
   !   K-eps-zeta-f   !
   !------------------!
-  if(turbulence_model .eq. K_EPS_ZETA_F) then
+  if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
+     turbulence_model .eq. HYBRID_LES_RANS) then
 
     ! Main model's variables
     call Var_Mod_Allocate_Solution('KIN',  kin,  grid)
@@ -129,7 +131,7 @@
     allocate(p_kin  (-grid % n_bnd_cells:grid % n_cells));  p_kin   = 0.
 
     ! Turbulent statistics; if needed
-    if(turbulence_statistics) then
+    if(turbulence_model .eq. HYBRID_LES_RANS) then
       call Var_Mod_Allocate_Statistics(kin)
       call Var_Mod_Allocate_Statistics(eps)
       call Var_Mod_Allocate_Statistics(zeta)
@@ -174,6 +176,19 @@
       call Var_Mod_Allocate_Statistics(vw)
       call Var_Mod_Allocate_Statistics(kin)
       call Var_Mod_Allocate_Statistics(eps)
+
+      if(heat_transfer) then
+        call Var_Mod_Allocate_Statistics(t)
+        call Var_Mod_Allocate_New_Only('TT', tt, grid)
+        call Var_Mod_Allocate_New_Only('UT', ut, grid)
+        call Var_Mod_Allocate_New_Only('VT', vt, grid)
+        call Var_Mod_Allocate_New_Only('WT', wt, grid)
+        call Var_Mod_Allocate_Statistics(tt)
+        call Var_Mod_Allocate_Statistics(ut)
+        call Var_Mod_Allocate_Statistics(vt)
+        call Var_Mod_Allocate_Statistics(wt)
+      end if
+
     end if
 
     if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
@@ -225,7 +240,8 @@
   !-------------------!
   !   Dynamic model   !
   !-------------------!
-  if(turbulence_model .eq. LES_DYNAMIC) then
+  if(turbulence_model .eq. LES_DYNAMIC .or.  &
+     turbulence_model .eq. HYBRID_LES_RANS) then
     allocate(c_dyn(-grid % n_bnd_cells:grid % n_cells));  c_dyn = 0.
   end if
 
@@ -259,6 +275,18 @@
       call Var_Mod_Allocate_Statistics(uv)
       call Var_Mod_Allocate_Statistics(uw)
       call Var_Mod_Allocate_Statistics(vw)
+
+      if(heat_transfer) then
+        call Var_Mod_Allocate_Statistics(t)
+        call Var_Mod_Allocate_New_Only('TT', tt, grid)
+        call Var_Mod_Allocate_New_Only('UT', ut, grid)
+        call Var_Mod_Allocate_New_Only('VT', vt, grid)
+        call Var_Mod_Allocate_New_Only('WT', wt, grid)
+        call Var_Mod_Allocate_Statistics(tt)
+        call Var_Mod_Allocate_Statistics(ut)
+        call Var_Mod_Allocate_Statistics(vt)
+        call Var_Mod_Allocate_Statistics(wt)
+      end if
 
     end if
 

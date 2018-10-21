@@ -50,22 +50,20 @@
 
   call Time_And_Length_Scale(grid)
 
-  if(turbulence_model .eq. K_EPS_ZETA_F) then
-    do c = 1, grid % n_cells 
-      e_sor = grid % vol(c)/(t_scale(c)+TINY)
-      c_11e = c_1e*(1.0 + alpha * ( 1.0/(zeta % n(c)+TINY) ))
-      b(c) = b(c) + c_11e * e_sor * p_kin(c)
+  do c = 1, grid % n_cells 
+    e_sor = grid % vol(c)/(t_scale(c)+TINY)
+    c_11e = c_1e*(1.0 + alpha * ( 1.0/(zeta % n(c)+TINY) ))
+    b(c) = b(c) + c_11e * e_sor * p_kin(c)
 
-      ! Fill in a diagonal of coefficient matrix
-      a % val(a % dia(c)) =  a % val(a % dia(c)) + c_2e * e_sor * density
-    end do
-  end if
+    ! Fill in a diagonal of coefficient matrix
+    a % val(a % dia(c)) =  a % val(a % dia(c)) + c_2e * e_sor * density
+  end do
 
   !-------------------------------------------------------!
   !   Following block shows density dependent behaviour   !
   !-------------------------------------------------------!
 
-  kin_vis = viscosity / density 
+  kin_vis = viscosity / density
 
   ! Imposing a boundary condition on wall for eps
   do s = 1, grid % n_faces

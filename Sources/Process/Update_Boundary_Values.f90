@@ -77,7 +77,8 @@
       end if
 
       ! k-epsilon-zeta-f
-      if(turbulence_model .eq. K_EPS_ZETA_F) then
+      if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
+         turbulence_model .eq. HYBRID_LES_RANS) then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW  .or.   &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT  .or.   &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE .or.   &
@@ -154,7 +155,8 @@
 
         ! Wall temperature or heat fluxes for k-eps-zeta-f
         ! and high-re k-eps models
-        if(turbulence_model .eq. K_EPS_ZETA_F .or.      &
+        if(turbulence_model .eq. K_EPS_ZETA_F    .or.  &
+           turbulence_model .eq. HYBRID_LES_RANS .or.  &
            turbulence_model .eq. K_EPS) then
           y_pl   = max(c_mu25 * kin % n(c1) &
                  * grid % wall_dist(c1) / kin_vis, TINY)
@@ -210,7 +212,8 @@
            turbulence_model .eq. DES_SPALART)           &
           vis % n(c2) = vis % n(grid % bnd_cond % copy_c(c2))
 
-        if(turbulence_model .eq. K_EPS_ZETA_F) then
+        if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
+           turbulence_model .eq. HYBRID_LES_RANS) then
           kin  % n(c2) = kin  % n(grid % bnd_cond % copy_c(c2))
           eps  % n(c2) = eps  % n(grid % bnd_cond % copy_c(c2))
           zeta % n(c2) = zeta % n(grid % bnd_cond % copy_c(c2))

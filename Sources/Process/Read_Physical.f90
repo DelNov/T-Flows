@@ -34,7 +34,8 @@
     call Constants_Hanjalic_Jakirlic()
   end if
 
-  if(turbulence_model .eq. K_EPS_ZETA_F) then
+  if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
+     turbulence_model .eq. HYBRID_LES_RANS) then
     call Constants_K_Eps_Zeta_F()
   end if
 

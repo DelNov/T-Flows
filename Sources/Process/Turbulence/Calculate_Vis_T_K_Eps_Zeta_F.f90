@@ -44,15 +44,14 @@
 
   call Time_And_Length_Scale(grid)
 
-  ! c = 1, grid % n_cells
-  if(turbulence_model .eq. K_EPS_ZETA_F .and.  &
-     .not. turbulence_statistics) then
+  ! Pure k-eps-zeta-f
+  if(turbulence_model .eq. K_EPS_ZETA_F) then
     do c = -grid % n_bnd_cells, grid % n_cells
       vis_t(c) = c_mu_d * density * zeta % n(c) * kin % n(c) * t_scale(c)
     end do
 
-  else if(turbulence_model .eq. K_EPS_ZETA_F .and.  &
-          turbulence_statistics) then
+  ! Hybrid between k-eps-zeta-f and dynamic SGS model
+  else if(turbulence_model .eq. HYBRID_LES_RANS) then
     do c = -grid % n_bnd_cells, grid % n_cells
       vis_t(c)     = c_mu_d * density * zeta % n(c)  &
                    * kin % n(c) * t_scale(c)
@@ -137,6 +136,8 @@
 
   call Comm_Mod_Exchange_Real(grid, vis_t)
   call Comm_Mod_Exchange_Real(grid, vis_wall)
-  call Comm_Mod_Exchange_Real(grid, con_wall)
+  if(heat_transfer) then
+    call Comm_Mod_Exchange_Real(grid, con_wall)
+  end if
 
   end subroutine

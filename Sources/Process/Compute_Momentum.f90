@@ -278,8 +278,7 @@
       vis_eff = vis_eff + fw(s)*vis_t(c1)+(1.0-fw(s))*vis_t(c2)
     end if
 
-    if(turbulence_model .eq. K_EPS_ZETA_F .and.  &
-       turbulence_statistics) then
+    if(turbulence_model .eq. HYBRID_LES_RANS) then
       vis_eff = fw(s)*vis_t_eff(c1)+(1.0-fw(s))*vis_t_eff(c2) + viscosity
     end if
 
@@ -295,6 +294,7 @@
     end if
 
     if( turbulence_model .eq. K_EPS_ZETA_F     .or.  &
+        turbulence_model .eq. HYBRID_LES_RANS  .or.  &
         turbulence_model .eq. K_EPS) then 
       if(c2 < 0) then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &

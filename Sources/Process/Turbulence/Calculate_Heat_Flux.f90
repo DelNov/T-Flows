@@ -12,7 +12,7 @@
   use Rans_Mod
   use Work_Mod, only: t_x => r_cell_01,  &
                       t_y => r_cell_02,  &
-                      t_z => r_cell_03    
+                      t_z => r_cell_03
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -37,7 +37,8 @@
 
   if(turbulence_model .eq. K_EPS        .or.  &
      turbulence_model .eq. K_EPS_ZETA_F .or.  &
-     turbulence_model .eq. DES_SPALART) then
+     turbulence_model .eq. DES_SPALART  .or.  &
+     turbulence_model .eq. HYBRID_LES_RANS) then
 
     do c = 1, grid % n_cells
       pr_t = max(Turbulent_Prandtl_Number(grid, c), TINY)

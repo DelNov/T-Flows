@@ -95,7 +95,7 @@
 
   ! First time step is one, unless read from backup otherwise
   first_dt = 0
-  call Backup_Mod_Load(grid, first_dt, backup)  ! value of "backup" can change
+  call Backup_Mod_Load(grid, first_dt, n_stat, backup)  ! "backup" can change
 
   ! Read physical models from control file
   call Read_Physical(grid, backup)
@@ -194,8 +194,7 @@
       call Calculate_Sgs(grid)
     end if
 
-    If(turbulence_model .eq. K_EPS_ZETA_F .and.  &
-       turbulence_statistics) then
+    If(turbulence_model .eq. HYBRID_LES_RANS) then
       call Calculate_Sgs_Dynamic(grid)
       call Calculate_Sgs_Hybrid(grid)
     end if
@@ -298,7 +297,8 @@
         end if
       end if
 
-      if(turbulence_model .eq. K_EPS_ZETA_F) then
+      if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
+         turbulence_model .eq. HYBRID_LES_RANS) then
         call Calculate_Shear_And_Vorticity(grid)
 
         call Compute_Turbulent(grid, dt, ini, kin, n)
@@ -452,7 +452,7 @@
 
     ! Is it time to save the backup file?
     if(save_now .or. exit_now .or. mod(n, bsi) .eq. 0) then
-      call Backup_Mod_Save(grid, n, name_save)
+      call Backup_Mod_Save(grid, n, n_stat, name_save)
     end if
 
     ! Is it time to save results for post-processing
@@ -491,7 +491,7 @@
   ! Save backup and post-processing files at exit
   call Comm_Mod_Wait
   call Save_Results(grid, name_save)
-  call Backup_Mod_Save(grid, n, name_save)
+  call Backup_Mod_Save(grid, n, n_stat, name_save)
 
   ! Write results in user-customized format
   call User_Mod_Save_Results(grid, name_save)

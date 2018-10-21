@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Backup_Mod_Load(grid, time_step, backup)
+  subroutine Backup_Mod_Load(grid, time_step, time_step_stat, backup)
 !------------------------------------------------------------------------------!
 !   Loads backup files name.backup                                             !
 !------------------------------------------------------------------------------!
@@ -16,7 +16,8 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
-  integer         :: time_step
+  integer         :: time_step       ! current time step
+  integer         :: time_step_stat  ! starting step for statistics
   logical         :: backup, present
 !-----------------------------------[Locals]-----------------------------------!
   character(len=80) :: name_in, answer
@@ -151,7 +152,8 @@
   !------------------------!
   !   K-eps-zeta-f model   !
   !------------------------!
-  if(turbulence_model .eq. K_EPS_ZETA_F) then
+  if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
+     turbulence_model .eq. HYBRID_LES_RANS) then
 
     ! K, eps, zeta and f22
     call Backup_Mod_Read_Variable(fh, d, vc, 'kin',  kin)
@@ -201,7 +203,9 @@
   !   Turbulent statistics for all models   !
   !                                         !
   !-----------------------------------------!
-  if(turbulence_statistics) then
+  if(turbulence_statistics .and.  &
+     time_step > time_step_stat) then
+
     call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'u_mean', u)
     call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'v_mean', v)
     call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'w_mean', w)

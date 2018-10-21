@@ -38,7 +38,7 @@
   real              :: vis_eff
   real              :: phi_x_f, phi_y_f, phi_z_f
   character(len=80) :: precond
-  integer           :: adv_scheme  ! advection scheme
+  integer           :: adv_scheme    ! advection scheme
   real              :: blend         ! blending coeff (1.0 central; 0.0 upwind)
   integer           :: td_inertia    ! time-disretization for inerita
   integer           :: td_advection  ! time-disretization for advection
@@ -214,16 +214,17 @@
       vis_eff = viscosity                                    &
               + (fw(s)*vis % n(c1)+(1.0-fw(s))*vis % n(c2)) / phi % sigma
 
-    if(turbulence_model .eq. K_EPS_ZETA_F .and.  &
-       turbulence_statistics) then
+    if(turbulence_model .eq. HYBRID_LES_RANS) then
       vis_eff = viscosity                                          &
-              + (fw(s)*vis_t_eff(c1) + (1.0-fw(s))*vis_t_eff(c2)) / phi % sigma
+              + (fw(s)*vis_t_eff(c1) + (1.0-fw(s))*vis_t_eff(c2))  &
+              / phi % sigma
     end if
     phi_x_f = fw(s)*phi_x(c1) + (1.0-fw(s))*phi_x(c2)
     phi_y_f = fw(s)*phi_y(c1) + (1.0-fw(s))*phi_y(c2)
     phi_z_f = fw(s)*phi_z(c1) + (1.0-fw(s))*phi_z(c2)
 
-    if(turbulence_model .eq. K_EPS_ZETA_F .or. &
+    if(turbulence_model .eq. K_EPS_ZETA_F    .or.  &
+       turbulence_model .eq. HYBRID_LES_RANS .or.  &
        turbulence_model .eq. K_EPS) then
       if(c2 < 0 .and. phi % name .eq. 'KIN') then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
@@ -388,7 +389,8 @@
     if(phi % name .eq. 'EPS') call Source_Eps_K_Eps(grid)
   end if
 
-  if(turbulence_model .eq. K_EPS_ZETA_F) then
+  if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
+     turbulence_model .eq. HYBRID_LES_RANS) then
     if(phi % name .eq. 'KIN')  call Source_Kin_K_Eps_Zeta_F(grid)
     if(phi % name .eq. 'EPS')  call Source_Eps_K_Eps_Zeta_F(grid)
     if(phi % name .eq. 'ZETA') call Source_Zeta_K_Eps_Zeta_F(grid, n_step)
@@ -440,7 +442,8 @@
   end do
 
   if(turbulence_model .eq. K_EPS        .or.  &
-     turbulence_model .eq. K_EPS_ZETA_F) then
+     turbulence_model .eq. K_EPS_ZETA_F .or.  &
+     turbulence_model .eq. HYBRID_LES_RANS) then
     if(phi % name .eq. 'KIN')  &
       call Info_Mod_Iter_Fill_At(3, 1, phi % name, niter, phi % res)
     if(phi % name .eq. 'EPS')  &

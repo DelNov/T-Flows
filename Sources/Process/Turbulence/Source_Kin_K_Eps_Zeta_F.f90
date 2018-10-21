@@ -45,8 +45,7 @@
     b(c)     = b(c) + p_kin(c) * grid % vol(c)
   end do
 
-  if(turbulence_model .eq. K_EPS_ZETA_F .and.  &
-     turbulence_statistics) then
+  if(turbulence_model .eq. HYBRID_LES_RANS) then
     do c = 1, grid % n_cells
       lf = grid % vol(c)**ONE_THIRD
       l_sgs  = 0.8*lf
@@ -64,7 +63,7 @@
           / (kin % n(c) + TINY) * grid % vol(c)
       end if
     end do
-  else
+  else  ! turbuence model will be K_EPS_ZETA_F
     do c = 1, grid % n_cells
       a % val(a % dia(c)) = a % val(a % dia(c))   &
                           + density * eps % n(c)  &

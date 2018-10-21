@@ -91,7 +91,8 @@
     close(9)
   end if 
  
-  if(turbulence_model .eq. K_EPS_ZETA_F) then
+  if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
+     turbulence_model .eq. HYBRID_LES_RANS) then
     ext(2:4) = kin % name
     call Name_File(this_proc, name_out, ext)
     open(9,file=name_out)

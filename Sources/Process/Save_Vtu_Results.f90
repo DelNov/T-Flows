@@ -234,18 +234,20 @@
   !--------------------------!
 
   ! Save kin and eps
-  if(turbulence_model .eq. K_EPS            .or.  &
-     turbulence_model .eq. K_EPS_ZETA_F     .or.  &
+  if(turbulence_model .eq. K_EPS                 .or.  &
+     turbulence_model .eq. K_EPS_ZETA_F          .or.  &
+     turbulence_model .eq. HYBRID_LES_RANS       .or.  &
      turbulence_model .eq. RSM_MANCEAU_HANJALIC  .or.  &
      turbulence_model .eq. RSM_HANJALIC_JAKIRLIC  ) then
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentEnergyKinetic", kin % n(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentKineticEnergy", kin % n(1))
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentDissipation",   eps % n(1))
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentKineticEnergyProduction", &
                                            p_kin(1))
   end if
 
   ! Save zeta and f22
-  if(turbulence_model .eq. K_EPS_ZETA_F) then
+  if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
+     turbulence_model .eq. HYBRID_LES_RANS) then
     do c = 1, grid % n_cells
       v2_calc(c) = kin % n(c) * zeta % n(c)
     end do
@@ -285,7 +287,8 @@
      turbulence_model .eq. LES_DYNAMIC     .or.  &
      turbulence_model .eq. LES_WALE        .or.  &
      turbulence_model .eq. DNS             .or.  &
-     turbulence_model .eq. DES_SPALART) then
+     turbulence_model .eq. DES_SPALART     .or.  &
+     turbulence_model .eq. HYBRID_LES_RANS) then
     call Save_Vtu_Vector(grid, IN_4, IN_5, "MeanVelocity",  &
                                 u % mean(1), v % mean(1), w % mean(1))
     do c = 1, grid % n_cells

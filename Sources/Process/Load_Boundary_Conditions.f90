@@ -258,7 +258,8 @@
               y_plus(c) = 1.1
             end if
 
-            if(turbulence_model .eq. K_EPS_ZETA_F) then
+            if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
+               turbulence_model .eq. HYBRID_LES_RANS) then
               i = Key_Ind('KIN',  keys, nks); if(i > 0) kin  % n(c) = vals(i)
               i = Key_Ind('EPS',  keys, nks); if(i > 0) eps  % n(c) = vals(i)
               i = Key_Ind('ZETA', keys, nks); if(i > 0) zeta % n(c) = vals(i)
@@ -392,7 +393,8 @@
                 i = Key_Ind('EPS', keys, nks); if(i > 0) eps % n(c) = prof(k,i)
               end if
 
-              if(turbulence_model .eq. K_EPS_ZETA_F) then
+              if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
+                 turbulence_model .eq. HYBRID_LES_RANS) then
                 i = Key_Ind('KIN',  keys, nks); if(i>0) kin  % n(c) = prof(k,i)
                 i = Key_Ind('EPS',  keys, nks); if(i>0) eps  % n(c) = prof(k,i)
                 i = Key_Ind('ZETA', keys, nks); if(i>0) zeta % n(c) = prof(k,i)
@@ -583,7 +585,8 @@
                     if(i > 0) eps % n(c) = wi*prof(m, i) + (1.-wi)*prof(m+1, i)
                   end if
 
-                  if(turbulence_model .eq. K_EPS_ZETA_F) then
+                  if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
+                     turbulence_model .eq. HYBRID_LES_RANS) then
 
                     i = Key_Ind('KIN',keys,nks)
                     if(i > 0) kin % n(c) = wi*prof(m, i) + (1.-wi)*prof(m+1, i)

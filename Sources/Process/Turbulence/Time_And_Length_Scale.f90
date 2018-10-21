@@ -48,7 +48,8 @@
     l2(c) = c_nu * (kin_vis**3 / eps_l(c))**0.25
   end do
 
-  if(turbulence_model .eq. K_EPS_ZETA_F) then
+  if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
+     turbulence_model .eq. HYBRID_LES_RANS) then
 
     if(rough_walls) then
       do c = 1, grid % n_cells
