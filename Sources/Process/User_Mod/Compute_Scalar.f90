@@ -152,7 +152,7 @@
     end if
 
     ! Compute advection term
-    if(c2.gt.0) then
+    if(c2 > 0) then
       phi % a(c1) = phi % a(c1)-flux(s)*phis*capacity
       phi % a(c2) = phi % a(c2)+flux(s)*phis*capacity
     else
@@ -160,21 +160,18 @@
     end if
 
     ! Store upwinded part of the advection term in "c"
-    if(pressure_momentum_coupling .ne. PROJECTION) then
-      if(flux(s).lt.0) then   ! from c2 to c1
-        phi % c(c1) = phi % c(c1)-flux(s)*phi % n(c2) * capacity
-        if(c2.gt.0) then
-          phi % c(c2) = phi % c(c2)+flux(s)*phi % n(c2) * capacity
-        end if
-      else
-        phi % c(c1) = phi % c(c1)-flux(s)*phi % n(c1) * capacity
-        if(c2.gt.0) then
-          phi % c(c2) = phi % c(c2)+flux(s)*phi % n(c1) * capacity
-        end if
+    if(flux(s) < 0.0) then   ! from c2 to c1
+      phi % c(c1) = phi % c(c1)-flux(s)*phi % n(c2) * capacity
+      if(c2 > 0) then
+        phi % c(c2) = phi % c(c2)+flux(s)*phi % n(c2) * capacity
       end if
-    end if  
+    else
+      phi % c(c1) = phi % c(c1)-flux(s)*phi % n(c1) * capacity
+      if(c2 > 0) then
+        phi % c(c2) = phi % c(c2)+flux(s)*phi % n(c1) * capacity
+      end if
+    end if
 
- 
   end do  ! through sides
 
   !-----------------------------!
@@ -286,10 +283,8 @@
         a21 = con_eff2 * f_coef(s)
       end if
 
-      if(pressure_momentum_coupling .ne. PROJECTION) then
-        a12 = a12  - min(flux(s), 0.0) * capacity
-        a21 = a21  + max(flux(s), 0.0) * capacity
-      end if
+      a12 = a12  - min(flux(s), 0.0) * capacity
+      a21 = a21  + max(flux(s), 0.0) * capacity
 
       ! Fill the system matrix
       if(c2 > 0) then
