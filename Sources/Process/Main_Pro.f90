@@ -128,12 +128,6 @@
   ! Prepare the gradient matrix for velocities
   call Compute_Gradient_Matrix(grid, .true.)
 
-  ! Prepare matrix for fractional step method
-  call Control_Mod_Pressure_Momentum_Coupling()
-  if(pressure_momentum_coupling .eq. PROJECTION) then
-    call Pressure_Matrix_Projection(grid, dt)
-  end if
-
   ! Print the areas of monitoring planes
   if(this_proc < 2) then
     write(*,'(a7,es12.5)') ' # Ax :', bulk % area_x
@@ -208,14 +202,10 @@
     !--------------------------!
     !   Inner-iteration loop   !
     !--------------------------!
-    if(pressure_momentum_coupling .eq. PROJECTION) then
-      max_ini = 1
-    else
-      call Control_Mod_Max_Simple_Iterations(max_ini)
-      call Control_Mod_Min_Simple_Iterations(min_ini)
-    end if
+    call Control_Mod_Max_Simple_Iterations(max_ini)
+    call Control_Mod_Min_Simple_Iterations(min_ini)
 
-    do ini = 1, max_ini  !  PROJECTION & SIMPLE
+    do ini = 1, max_ini
 
       call Info_Mod_Iter_Fill(ini)
 
@@ -257,12 +247,7 @@
       call Comm_Mod_Exchange_Real(grid, a % sav)
 
       call Balance_Mass(grid)
-      if(pressure_momentum_coupling .eq. PROJECTION) then
-        call Compute_Pressure_Fractional(grid, dt, ini)
-      end if
-      if(pressure_momentum_coupling .eq. SIMPLE) then
-        call Compute_Pressure_Simple(grid, dt, ini)
-      end if
+      call Compute_Pressure_Simple(grid, dt, ini)
 
       call Grad_Mod_For_P(grid,  pp % n, p % x, p % y, p % z)
 
@@ -377,14 +362,13 @@
       call Info_Mod_Iter_Print()
 
       if(ini >= min_ini) then
-        if(pressure_momentum_coupling .eq. SIMPLE) then
-          call Control_Mod_Tolerance_For_Simple_Algorithm(simple_tol)
-          if( u  % res <= simple_tol .and.  &
-              v  % res <= simple_tol .and.  &
-              w  % res <= simple_tol .and.  &
-              mass_res <= simple_tol ) goto 1
-        end if
+        call Control_Mod_Tolerance_For_Simple_Algorithm(simple_tol)
+        if( u  % res <= simple_tol .and.  &
+            v  % res <= simple_tol .and.  &
+            w  % res <= simple_tol .and.  &
+            mass_res <= simple_tol ) goto 1
       end if
+
     end do
 
     ! End of the current time step
