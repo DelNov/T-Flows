@@ -21,23 +21,10 @@
   integer, parameter :: AVL_SMART = 40111
 
   ! Variable holding time integration scheme
-  integer :: time_innertial
-  integer :: time_advection
-  integer :: time_diffusion
-  integer :: time_cross_diff
+  integer :: time_scheme
 
   ! Time integration parameters
-  integer, parameter :: FULLY_IMPLICIT  = 50021
-  integer, parameter :: ADAMS_BASHFORTH = 50023
-  integer, parameter :: CRANK_NICOLSON  = 50033
-  integer, parameter :: LINEAR          = 50047
-  integer, parameter :: PARABOLIC       = 50051
-
-  ! Variable holding time integration scheme
-  integer :: pressure_momentum_coupling
-
-  ! Parameters describing pressure velocity coupling
-  integer, parameter :: SIMPLE     = 60013
-  integer, parameter :: PROJECTION = 60017
+  integer, parameter :: LINEAR    = 40123
+  integer, parameter :: PARABOLIC = 40127
 
   end module
