@@ -93,26 +93,15 @@
 
   b(:) = 0.0
 
-  !-------------------------------------! 
+  !-------------------------------------!
   !   Initialize variables and fluxes   !
-  !-------------------------------------! 
-
-  call Control_Mod_Time_Integration_For_Inertia(td_inertia)
-  call Control_Mod_Time_Integration_For_Advection(td_advection)
-  call Control_Mod_Time_Integration_For_Diffusion(td_diffusion)
-  call Control_Mod_Time_Integration_For_Cross_Diffusion(td_cross_diff)
+  !-------------------------------------!
 
   ! Old values (o and oo)
   if(ini.lt.2) then
     do c = 1, grid % n_cells
-      phi % oo(c)   = phi % o(c)
-      phi % o (c)   = phi % n(c)
-      phi % a_oo(c) = phi % a_o(c)
-      phi % a_o (c) = 0.0
-      phi % d_oo(c) = phi % d_o(c)
-      phi % d_o (c) = 0.0 
-      phi % c_oo(c) = phi % c_o(c)
-      phi % c_o (c) = phi % c(c) 
+      phi % oo(c) = phi % o(c)
+      phi % o (c) = phi % n(c)
     end do
   end if
 
@@ -163,14 +152,6 @@
     end if
 
     ! Compute advection term
-    if(ini.eq.1) then
-      if(c2.gt.0) then
-        phi % a_o(c1) = phi % a_o(c1)-flux(s)*phis*capacity
-        phi % a_o(c2) = phi % a_o(c2)+flux(s)*phis*capacity
-      else
-        phi % a_o(c1) = phi % a_o(c1)-flux(s)*phis*capacity
-      end if
-    end if
     if(c2.gt.0) then
       phi % a(c1) = phi % a(c1)-flux(s)*phis*capacity
       phi % a(c2) = phi % a(c2)+flux(s)*phis*capacity
@@ -201,20 +182,6 @@
   !   Temporal discretization   !
   !                             !
   !-----------------------------!
-   
-  ! Adams-Bashforth scheeme for advection fluxes
-  if(td_advection .eq. ADAMS_BASHFORTH) then
-    do c = 1, grid % n_cells
-      b(c) = b(c) + 1.5*phi % a_o(c) - 0.5*phi % a_oo(c) - phi % c(c)
-    end do
-  end if
-
-  ! Crank-Nicholson scheeme for advection fluxes
-  if(td_advection .eq. CRANK_NICOLSON) then
-    do c = 1, grid % n_cells
-      b(c) = b(c) + 0.5 * (phi % a(c) + phi % a_o(c)) - phi % c(c)
-    end do
-  end if
 
   ! Fully implicit treatment of advection fluxes
   if(td_advection .eq. FULLY_IMPLICIT) then
@@ -305,21 +272,6 @@
              + phiy_f2 * grid % dy(s)      &
              + phiz_f2 * grid % dz(s) )
 
-    ! Straight diffusion part 
-    if(ini .lt. 2) then
-      if(c2 > 0) then
-        phi % d_o(c1) = phi % d_o(c1)  &
-                      + con_eff1*f_coef(s)*(phi % n(c2) - phi % n(c1)) 
-        phi % d_o(c2) = phi % d_o(c2)  &
-                      - con_eff2*f_coef(s)*(phi % n(c2) - phi % n(c1))   
-      else
-        if(Var_Mod_Bnd_Cell_Type(phi,c2) .ne. SYMMETRY) then 
-          phi % d_o(c1) = phi % d_o(c1)  &
-                        + con_eff1*f_coef(s)*(phi % n(c2) - phi % n(c1))   
-        end if
-      end if 
-    end if
-
     ! Cross diffusion part
     phi % c(c1) = phi % c(c1) + f_ex1 - f_im1 
     if(c2 .gt. 0) then
@@ -372,47 +324,12 @@
   end do  ! through sides
 
   !-----------------------------!
-  !                             !
   !   Temporal discretization   !
-  !                             !
   !-----------------------------!
-   
-  ! Adams-Bashfort scheeme for diffusion fluxes
-  if(td_diffusion .eq. ADAMS_BASHFORTH) then 
-    do c = 1, grid % n_cells
-      b(c)  = b(c) + 1.5*phi % d_o(c) - 0.5*phi % d_oo(c)
-    end do  
-  end if
-
-  ! Crank-Nicholson scheme for difusive terms
-  if(td_diffusion .eq. CRANK_NICOLSON) then 
-    do c = 1, grid % n_cells
-      b(c)  = b(c) + 0.5*phi % d_o(c)
-    end do  
-  end if
 
   ! Fully implicit treatment for difusive terms
   ! is handled via the linear system of equations 
 
-  ! Adams-Bashfort scheeme for cross diffusion 
-  if(td_cross_diff .eq. ADAMS_BASHFORTH) then
-    do c = 1, grid % n_cells
-      b(c)  = b(c) + 1.5*phi % c_o(c) - 0.5*phi % c_oo(c)
-    end do 
-  end if
-
-  ! Crank-Nicholson scheme for cross difusive terms
-  if(td_cross_diff .eq. CRANK_NICOLSON) then
-    do c = 1, grid % n_cells
-      if( (phi % c(c)+phi % c_o(c))  >= 0) then
-        b(c)  = b(c) + 0.5*(phi % c(c) + phi % c_o(c))
-      else
-        a % val(a % dia(c)) = a % val(a % dia(c)) &
-             - 0.5 * (phi % c(c) + phi % c_o(c)) / (phi % n(c)+1.e-6)
-      end if
-    end do
-  end if
- 
   ! Fully implicit treatment for cross difusive terms
   if(td_cross_diff .eq. FULLY_IMPLICIT) then
     do c = 1, grid % n_cells
@@ -431,10 +348,12 @@
   !                    !
   !--------------------!
 
+  call Control_Mod_Time_Integration_Scheme(td_inertia)
+
   ! Two time levels; Linear interpolation
   if(td_inertia .eq. LINEAR) then
     do c = 1, grid % n_cells
-      a0 = capacity * density * grid % vol(c)/dt
+      a0 = capacity * density * grid % vol(c) / dt
       a % val(a % dia(c)) = a % val(a % dia(c)) + a0
       b(c)  = b(c) + a0 * phi % o(c)
     end do
@@ -443,7 +362,7 @@
   ! Three time levels; parabolic interpolation
   if(td_inertia .eq. PARABOLIC) then
     do c = 1, grid % n_cells
-      a0 = capacity * density * grid % vol(c)/dt
+      a0 = capacity * density * grid % vol(c) / dt
       a % val(a % dia(c)) = a % val(a % dia(c)) + 1.5 * a0
       b(c)  = b(c) + 2.0 * a0 * phi % o(c) - 0.5 * a0 * phi % oo(c)
     end do
@@ -538,19 +457,15 @@
   !                                 !    
   !---------------------------------!
 
-  ! Type of coupling is important
-  call Control_Mod_Pressure_Momentum_Coupling()
-
   ! Set under-relaxation factor
-  urf = 1.0
-  if(pressure_momentum_coupling .eq. SIMPLE)   &
-    call Control_Mod_Simple_Underrelaxation_For_Energy(urf)
+  urf = 0.7
+  call Control_Mod_Simple_Underrelaxation_For_Energy(urf)
 
   do c = 1, grid % n_cells
     b(c) = b(c) + a % val(a % dia(c)) * (1.0 - urf) * phi % n(c)  &
                                       / urf
     a % val(a % dia(c)) = a % val(a % dia(c)) / urf
-  end do  
+  end do
 
   ! Get solver tolerance
   call Control_Mod_Tolerance_For_Energy_Solver(tol)
@@ -558,11 +473,8 @@
   ! Get matrix precondioner
   call Control_Mod_Preconditioner_For_System_Matrix(precond)
 
-  ! Set number of iterations based on coupling scheme
-  if(pressure_momentum_coupling .eq. PROJECTION) niter = 10
-  if(pressure_momentum_coupling .eq. SIMPLE)     niter =  5
-
-  ! Over-ride if specified in control file
+  ! Set number of iterations
+  niter =  5
   call Control_Mod_Max_Iterations_For_Energy_Solver(niter)
 
   call Bicg(a, phi % n, b, precond, niter, tol, ini_res, phi % res)
