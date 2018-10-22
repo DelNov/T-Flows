@@ -17,7 +17,7 @@
 !---------------------------------[Arguments]----------------------------------!
   integer          :: base, block, solution, field
   type(Grid_Type)  :: grid
-  real             :: input_array(grid % n_cells)
+  real             :: input_array(grid % n_cells - grid % comm % n_buff_cells)
   character(len=*) :: input_name
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: base_id        ! base index number
@@ -27,7 +27,8 @@
   character(len=80) :: field_name     ! name of the FlowSolution_t node
   integer           :: sect_id
   integer           :: cnt            ! cells of sect_id
-  real              :: field_array(grid % n_cells) ! field array
+                       ! field array
+  real              :: field_array(grid % n_cells - grid % comm % n_buff_cells)
   integer           :: i, j, k, c
   integer           :: error
 !==============================================================================!
@@ -80,7 +81,7 @@
 
       ! copy input array to field_array
       k = 1
-      do c = 1, grid % n_cells
+      do c = 1, grid % n_cells - grid % comm % n_buff_cells
         if     (sect_id.eq.1 .and. grid % cells_n_nodes(c).eq.8) then
           field_array(k) = input_array(c)
           k = k + 1

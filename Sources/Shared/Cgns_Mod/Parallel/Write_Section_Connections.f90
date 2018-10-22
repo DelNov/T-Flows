@@ -100,7 +100,7 @@
 
     ! Convert T-FlowS -> CGNS [same as VTK]
     i = 1
-    do c = 1, grid % n_cells
+    do c = 1, grid % n_cells - grid % comm % n_buff_cells
       if (grid % cells_n_nodes(c).eq.8 .and. n_nodes.eq.8 ) then ! hex
         cell_n (1, i) = grid % cells_n(1, c)
         cell_n (2, i) = grid % cells_n(2, c)

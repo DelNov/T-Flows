@@ -64,7 +64,7 @@
   call Cgns_Mod_Initialize_Counters
 
   ! Count number of 3d cell type elements
-  do c = 1, grid % n_cells
+  do c = 1, grid % n_cells - grid % comm % n_buff_cells
     if(grid % cells_n_nodes(c) .eq. 8) cnt_hex = cnt_hex + 1
     if(grid % cells_n_nodes(c) .eq. 6) cnt_wed = cnt_wed + 1
     if(grid % cells_n_nodes(c) .eq. 5) cnt_pyr = cnt_pyr + 1
@@ -96,7 +96,8 @@
   block = 1
   cgns_base(base) % block(block) % name = "Zone 1"
   cgns_base(base) % block(block) % mesh_info(1) = grid % n_nodes
-  cgns_base(base) % block(block) % mesh_info(2) = grid % n_cells
+  cgns_base(base) % block(block) % mesh_info(2) = grid % n_cells - &
+                                                  grid % comm % n_buff_cells
   cgns_base(base) % block(block) % mesh_info(3) = 0
 
   !--------------------!
@@ -156,8 +157,8 @@
   if(turbulence_model .eq. K_EPS                 .or.  &
      turbulence_model .eq. K_EPS_ZETA_F          .or.  &
      turbulence_model .eq. HYBRID_LES_RANS       .or.  &
-     turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
-     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC  ) then
+     turbulence_model .eq. RSM_MANCEAU_HANJALIC  .or.  &
+     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC       ) then
 
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               kin % n(1), "TurbulentKineticEnergy")
@@ -170,7 +171,7 @@
   ! zeta, v2 and f22
   if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
      turbulence_model .eq. HYBRID_LES_RANS) then
-    do c = 1, grid % n_cells
+    do c = 1, grid % n_cells - grid % comm % n_buff_cells
       v2_calc(c) = kin % n(c) * zeta % n(c)
     end do
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
@@ -194,7 +195,7 @@
                               vort(1),"VorticityMagnitude")
   end if
   if(turbulence_model .ne. NONE) then                  
-    kin_vis_t(1:grid % n_cells) = vis_t(1:grid % n_cells)/viscosity
+    kin_vis_t(1) = vis_t(1)/viscosity
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               kin_vis_t(1),"EddyOverMolecularViscosity")
   end if
@@ -223,11 +224,11 @@
      turbulence_model .eq. DNS             .or.  &
      turbulence_model .eq. DES_SPALART) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              u % n(1),"MeanVelocityX")
+                              u % mean(1),"MeanVelocityX")
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              v % n(1),"MeanVelocityY")
+                              v % mean(1),"MeanVelocityY")
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              w % n(1),"MeanVelocityZ")
+                              w % mean(1),"MeanVelocityZ")
     uu_mean = uu % mean(c) - u % mean(c) * u % mean(c)
     vv_mean = vv % mean(c) - v % mean(c) * v % mean(c)
     ww_mean = ww % mean(c) - w % mean(c) * w % mean(c)

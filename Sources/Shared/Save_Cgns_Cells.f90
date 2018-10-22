@@ -38,7 +38,7 @@
   call Cgns_Mod_Initialize_Counters
 
   ! Count number of 3d cell type elements
-  do c = 1, grid % n_cells
+  do c = 1, grid % n_cells - grid % comm % n_buff_cells
     if(grid % cells_n_nodes(c) .eq. 8) cnt_hex = cnt_hex + 1
     if(grid % cells_n_nodes(c) .eq. 6) cnt_wed = cnt_wed + 1
     if(grid % cells_n_nodes(c) .eq. 5) cnt_pyr = cnt_pyr + 1
@@ -74,7 +74,7 @@
   c = grid % n_nodes
   call Comm_Mod_Global_Sum_Int(c)
   cgns_base(base) % block(block) % mesh_info(1) = c
-  c = grid % n_cells
+  c = grid % n_cells - grid % comm % n_buff_cells
   call Comm_Mod_Global_Sum_Int(c)
   cgns_base(base) % block(block) % mesh_info(2) = c
   cgns_base(base) % block(block) % mesh_info(3) = 0

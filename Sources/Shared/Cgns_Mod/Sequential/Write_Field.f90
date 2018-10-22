@@ -58,7 +58,7 @@
 
       ! copy input array to field_array
       k = 1
-      do c = 1, grid % n_cells
+      do c = 1, grid % n_cells - grid % comm % n_buff_cells
         if     (sect_id.eq.1 .and. grid % cells_n_nodes(c).eq.8) then
           field_array(k) = input_array(c)
           k = k + 1
