@@ -33,6 +33,12 @@ $(info # Compiling $(PROGRAM_NAME) with compiler $(FORTRAN))
 $(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
 $(info #   make <FORTRAN=gnu/intel/portland> <DEBUG=yes/no> <CGNS_HDF5=yes/no> )
+$(info #                                                                       )
+$(info # Examples:                                                             )
+$(info #   make               - compile with gnu compiler                      )
+$(info #   make FORTAN=intel  - compile with intel compiler                    )
+$(info #   make DEBUG=yes     - compile with gnu compiler in debug mode        )
+$(info #   make CGNS_HDF5=yes - compile with gnu compiler and CGNS_HDF5 support)
 $(info #-----------------------------------------------------------------------)
 
 #-------------------------------------------------------------------------------
