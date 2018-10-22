@@ -15,7 +15,6 @@ FORTRAN = gnu
 DEBUG = no
 
 # Link with CGNS ("yes" or "no")
-CGNS_ADF5 = no
 CGNS_HDF5 = no
 
 # Directories for objects and modules. (No need to change.)
@@ -33,8 +32,7 @@ $(info #=======================================================================)
 $(info # Compiling $(PROGRAM_NAME) with compiler $(FORTRAN))
 $(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
-$(info #   make <FORTRAN=gnu/intel/portland> <DEBUG=yes/no>                    )
-$(info #        <CGNS_ADF5=yes/no> <CGNS_HDF5=yes/no>                          )
+$(info #   make <FORTRAN=gnu/intel/portland> <DEBUG=yes/no> <CGNS_HDF5=yes/no> )
 $(info #-----------------------------------------------------------------------)
 
 #-------------------------------------------------------------------------------
@@ -88,11 +86,6 @@ ifeq ($(FORTRAN), portland)
 endif 
 
 # If compiling with CGNS, add path to include directory
-ifeq ($(CGNS_ADF5), yes)
-  DIR_CGNS_H  = ../Libraries/Cgnslib_3.2.1_Linux_64_Adf5_Seq/Include
-  CGNS_LIB    = ../Libraries/Cgnslib_3.2.1_Linux_64_Adf5_Seq/Lib/libcgns.a
-endif
-
 ifeq ($(CGNS_HDF5), yes)
   DIR_CGNS_H  = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Seq/Include
   CGNS_LIB    = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Seq/Lib/libcgns.a \
@@ -147,7 +140,7 @@ SRC_FUN = $(shell ls -1 $(DIR_SHARED)/*.f90 *.f90 | xargs -n1 basename | grep -v
 #-------------------------------------------
 #   Conditional inclusion of CGNS support 
 #-------------------------------------------
-ifeq ($(CGNS_ADF5), $(CGNS_HDF5))  # meaning both are "no"
+ifeq ($(CGNS_HDF5), no)
   SRC_MOD += Cgns_Mod_Void.f90
   SRC_FUN += Save_Cgns_Cells_Void.f90
 else

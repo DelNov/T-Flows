@@ -1,4 +1,3 @@
-#===============================================================================
 #
 #   Process Makefile
 #
@@ -18,7 +17,6 @@ DEBUG = no
 MPI = no
 
 # Link with CGNS ("yes" or "no")
-CGNS_ADF5 = no
 CGNS_HDF5 = no
 
 # Directories for objects and modules. (No need to change.)
@@ -40,14 +38,13 @@ $(info # Compiling $(PROGRAM_NAME) with compiler $(FORTRAN)                    )
 $(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
 $(info #   make <FORTRAN=gnu/intel/portland> <DEBUG=yes/no> <MPI=yes/no>       )
-$(info #        <CGNS_ADF5=yes/no> <CGNS_HDF5=yes/no>                          )
-$(info #        <DIR_CASE=relative_path_to_case>                               )
+$(info #        <CGNS_HDF5=yes/no> <DIR_CASE=relative_path_to_case>            )
 $(info #                                                                       )
 $(info # Examples:                                                             )
 $(info #   make                       - sequential version with gnu compiler   )
 $(info #   make MPI=yes               - parallel version with gnu compiler     )
 $(info #   make FORTRAN=intel MPI=yes - parallel version with intel compiler   )
-$(info #   make MPI=yes CGNS_HDF5=yes - parallel version with CGNS/ADF5 support)
+$(info #   make MPI=yes CGNS_HDF5=yes - parallel version with CGNS/HDF5 support)
 $(info #-----------------------------------------------------------------------)
 
 #-------------------------------------------------------------------------------
@@ -107,11 +104,6 @@ ifeq ($(MPI), yes)
 endif
 
 # If compiling with CGNS, add path to include directory
-ifeq ($(CGNS_ADF5), yes)
-  DIR_CGNS_H  = ../Libraries/Cgnslib_3.2.1_Linux_64_Adf5_Seq/Include
-  CGNS_LIB    = ../Libraries/Cgnslib_3.2.1_Linux_64_Adf5_Seq/Lib/libcgns.a
-endif
-
 ifeq ($(CGNS_HDF5), yes)
   ifeq ($(MPI), yes)
     DIR_CGNS_H  = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Par/Include
@@ -238,7 +230,7 @@ SRC_FUN += Distance.f90		\
 #-------------------------------------------
 #   Conditional inclusion of CGNS support
 #-------------------------------------------
-ifeq ($(CGNS_ADF5), $(CGNS_HDF5))  # meaning both are "no"
+ifeq ($(CGNS_HDF5), no)
   SRC_MOD += Cgns_Mod_Void.f90
   SRC_FUN += Save_Cgns_Results_Void.f90	\
              Save_Cgns_Cells_Void.f90	\
@@ -254,7 +246,7 @@ else
 endif
 
 # Conditional CGNS support is needed for user functions too
-ifeq ($(CGNS_ADF5), $(CGNS_HDF5))  # meaning both are "no"
+ifeq ($(CGNS_HDF5), no)
   SRC_MOD += User_Mod_Vtu.f90
 else
   SRC_MOD += User_Mod_Cgns.f90
