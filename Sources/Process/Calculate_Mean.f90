@@ -68,8 +68,7 @@
       !------------------!
       !   K-eps-zeta-f   !
       !------------------!
-      if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
-         turbulence_model .eq. HYBRID_LES_RANS) then
+      if(turbulence_model .eq. K_EPS_ZETA_F) then
 
         u % mean(c) = (u % mean(c) * (1.*n) + u % n(c)) / (1.*(n+1))
         v % mean(c) = (v % mean(c) * (1.*n) + v % n(c)) / (1.*(n+1))
