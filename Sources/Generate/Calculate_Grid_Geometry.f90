@@ -17,16 +17,16 @@
   real :: Tet_Volume
   real :: Distance
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: c, c1, c2, m, n, s, n_per
-  real                 :: loc_x_node(4), loc_y_node(4), loc_z_node(4)
-  real                 :: x_cell_tmp, y_cell_tmp, z_cell_tmp    
-  real                 :: xs2, ys2, zs2
-  real                 :: dsc1, dsc2          !  for the interpolation factors
-  real                 :: t, tot_surf 
-  real                 :: xc1, yc1, zc1, xc2, yc2, zc2 
-  real                 :: x_min, x_max, y_min, y_max, z_min, z_max
-  integer              :: f4n(6,4)
-  integer              :: f3n(4,3)
+  integer :: c, c1, c2, m, n, s, n_per
+  real    :: loc_x_node(4), loc_y_node(4), loc_z_node(4)
+  real    :: x_cell_tmp, y_cell_tmp, z_cell_tmp    
+  real    :: xs2, ys2, zs2
+  real    :: dsc1, dsc2          !  for the interpolation factors
+  real    :: t, tot_surf 
+  real    :: xc1, yc1, zc1, xc2, yc2, zc2 
+  real    :: x_min, x_max, y_min, y_max, z_min, z_max
+  integer :: f4n(6,4)
+  integer :: f3n(4,3)
 !==============================================================================!
 !
 !                                n3 
