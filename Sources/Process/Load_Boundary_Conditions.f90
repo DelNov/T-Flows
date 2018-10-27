@@ -92,7 +92,9 @@
       goto 1
     else
       if(this_proc < 2) then
-        print *, '# ERROR!  Boundary conditions not specified in control file!'
+        print *, '# ERROR!  Boundary conditions for ',  &
+                 trim(grid % bnd_cond % name(n)),       &
+                 ' not specified in the control file!'
         print *, '# Exiting the program.'
       end if
       call Comm_Mod_End
