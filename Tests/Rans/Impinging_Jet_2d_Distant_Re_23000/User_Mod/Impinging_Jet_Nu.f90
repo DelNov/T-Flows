@@ -34,17 +34,17 @@
   inquire( file='rad_coordinate.dat', exist=there ) 
   if(.not.there) then
     if(this_proc < 2) then
-      print *, "========================================================="
-      print *, "In order to extract Nusselt number profile               "
-      print *, "an ascii file with cell-faces coordinates has to be read."
-      print *, "The name of the file is rad_coordinate.dat.              "
-      print *, "The file format should be as follows:                    "
-      print *, "10  ! number of cells + 1                                "
-      print *, "0.0                                                      "
-      print *, "0.1                                                      "
-      print *, "0.2                                                      "
-      print *, "...                                                      "
-      print *, "---------------------------------------------------------"
+      print *, "#=========================================================="
+      print *, "# In order to extract Nusselt number profile               "
+      print *, "# an ascii file with cell-faces coordinates has to be read."
+      print *, "# The name of the file is rad_coordinate.dat.              "
+      print *, "# The file format should be as follows:                    "
+      print *, "# 10  ! number of cells + 1                                "
+      print *, "# 0.0                                                      "
+      print *, "# 0.1                                                      "
+      print *, "# 0.2                                                      "
+      print *, "# ...                                                      "
+      print *, "#----------------------------------------------------------"
     end if
     return
   end if
@@ -79,7 +79,7 @@
 
   count = 0
 
-  if(heat_transfer .eq. YES) then
+  if(heat_transfer) then
     allocate(tm_p(n_prob));   tm_p=0.0
   end if  
 
@@ -195,7 +195,7 @@
   deallocate(rad_1)
   deallocate(n_count)
 
-  if(heat_transfer .eq. YES) then
+  if(heat_transfer) then
     deallocate(tm_p)
   end if
 

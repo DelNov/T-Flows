@@ -45,16 +45,16 @@
 %  Blocks  %
 %----------%
 3
-   1   41      4          51
-       -0.48   1.0       -0.998
+   1   21      5          31
+       -0.49   1.0       -0.995
        1  2  6  7 11 12 14 15             
 
-   2   171     4          51 
-      -0.503   1.0       -0.998
+   2   151     5          31 
+      -0.505   1.0       -0.995
        2  5  7 10 12 13 15 16 
 
-   3   171     4          61 
-      -0.503   1.0       -0.985 
+   3   151     5          31 
+      -0.505   1.0        -0.98 
        3  4  8  9  2  5  7 10 
 
 %--------%
@@ -69,22 +69,22 @@
 %  Boundary conditions                     %
 %------------------------------------------%
    8
-    1  Imax
-       2    outlet_face
-    2  Imax
-       3    outlet_face
-    3  Imin
+    1  Kmax
+       1    adiabatic_wall
+    2  Kmin
+       1    adiabatic_wall
+    3  Kmax
+       2    adiabatic_wall
+    4  Imin
+       3    adiabatic_wall
+    5  Kmin
+       3    heated_wall
+    6  Imin
        1    inlet_face
-    4  Kmin
-       1    lower_wall
-    5  Kmax
-       1    upper_wall
-    6  Kmax
-       2    upper_wall
-    7  Kmin
-       3    lower_wall
-    8  Imin
-       3    lower_wall
+    7  Imax
+       3    outlet_face
+    8  Imax
+       2    outlet_face
 
 %-----------------------%
 %  Periodic boundaries  %

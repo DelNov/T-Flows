@@ -97,7 +97,7 @@
     read(9,*) idumm, z_p(pl)
   end do
   close(9)
-
+  
   allocate(n_p(n_prob));     n_p     = 0 
   allocate(um_p(n_prob));    um_p    = 0.0
   allocate(vm_p(n_prob));    vm_p    = 0.0
@@ -116,7 +116,7 @@
   allocate(n_count(n_prob)); n_count = 0
   count = 0
 
-  if(heat_transfer == YES) then
+  if(heat_transfer) then
     allocate(tm_p(n_prob));   tm_p = 0.0
     allocate(tt_p(n_prob));   tt_p = 0.0
     allocate(ut_p(n_prob));   ut_p = 0.0
@@ -138,7 +138,7 @@
             wm_p(i) = wm_p(i) + w % n(c)
             uu_p(i) = uu_p(i) + kin % n(c)
             vv_p(i) = vv_p(i) + eps % n(c)
-            v1_p(i) = v1_p(i) + tau_wall(c)/11.3**2 
+            v1_p(i) = v1_p(i) + vis_t(c)*(U % y(c) + V % x(c))/11.3**2 
             v2_p(i) = v2_p(i) + t % n(c) - 20.0
             n_count(i) = n_count(i) + 1
             if(turbulence_model == K_EPS_ZETA_F) then      
@@ -170,7 +170,7 @@
 
       count =  count + n_count(pl) 
 
-      if(heat_transfer == YES) then
+      if(heat_transfer) then
         call Comm_Mod_Global_Sum_Real(tm_p(pl))
         call Comm_Mod_Global_Sum_Real(tt_p(pl))
         call Comm_Mod_Global_Sum_Real(ut_p(pl))
@@ -184,6 +184,8 @@
     write(result_name(l+1:l+14),'(a5,f4.2,a5)') '-prof', lnum(k), 'h.dat'
 
     open(3,file=result_name)
+    write(3,*) '# z, U, TKE, EPS, zeta, f, uv, T'
+    write(3,*) '# all data are normalized by Ub = 11.3 and step height h = 0.038'
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
         wm_p(i) = wm_p(i) / n_count(i)
@@ -247,7 +249,7 @@
   deallocate(v4_p)
   deallocate(v5_p)
   deallocate(n_count)
-  if(heat_transfer == YES) then
+  if(heat_transfer) then
     deallocate(tm_p)
     deallocate(tt_p)
     deallocate(ut_p)

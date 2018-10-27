@@ -75,11 +75,7 @@ Linear solver settings
  SIMPLE_UNDERRELAXATION_FOR_PRESSURE   0.6
  SIMPLE_UNDERRELAXATION_FOR_TURBULENCE 0.4
 
-
- TIME_INTEGRATION_FOR_INERTIA            linear
- TIME_INTEGRATION_FOR_ADVECTION          fully_implicit
- TIME_INTEGRATION_FOR_DIFFUSION          fully_implicit
- TIME_INTEGRATION_FOR_CROSS_DIFFUSION    fully_implicit
+ TIME_INTEGRATION_SCHEME  linear
 
  # after initialization from file you can use these schemes
  #ADVECTION_SCHEME_FOR_MOMENTUM      minmod

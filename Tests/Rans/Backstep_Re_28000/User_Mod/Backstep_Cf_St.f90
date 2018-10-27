@@ -64,7 +64,7 @@
   allocate(n_count(n_prob)); n_count = 0
   count = 0
 
-  if(heat_transfer .eq. YES) then
+  if(heat_transfer) then
     allocate(tm_p(n_prob));  tm_p = 0.0
     allocate(tt_p(n_prob));  tt_p = 0.0
     allocate(ut_p(n_prob));  ut_p = 0.0
@@ -79,17 +79,20 @@
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
-      if(c2 < 0 .and. Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. BUFFER) then
+      if(c2 < 0) then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2).eq.WALLFL.and.t % q(c2) > 1.e-8) then
           if(grid % xc(c1) > z_p(i) .and. grid % xc(c1) < z_p(i+1)) then
             um_p(i)   = um_p(i) + U % n(c1)
             vm_p(i)   = vm_p(i) + V % n(c1)
             wm_p(i)   = wm_p(i) + W % n(c1)
-            v1_p(i) = v1_p(i) + 2.0 * (viscosity*U % n(c1)  & 
-                              / grid % wall_dist(c1)) / 11.3**2 
-            v2_p(i) = v2_p(i) + sqrt(   abs(u % n(c1))  &
-                                      * grid % wall_dist(c1) /viscosity )
-            v3_p(i) = v3_p(i) + 0.1 / ((t % n(c2) - 20) * 11.3) 
+            if(y_plus(c1) < 4.0) then
+              v1_p(i) = v1_p(i) + (2.0*viscosity*U%n(c1)/grid % wall_dist(c1)) &
+                        / (density * 11.3**2) 
+            else
+              v1_p(i) = v1_p(i) + 0.015663 * tau_wall(c1)*U%n(c1)/abs(U%n(c1)) 
+            end if
+            v2_p(i) = v2_p(i) + y_plus(c1)
+            v3_p(i) = v3_p(i) + t % q(c2) / (density * capacity * (t % n(c2) - 20) * 11.3) 
             v5_p(i) = v5_p(i) + t % n(c2) 
             n_count(i) = n_count(i) + 1
           end if
@@ -118,7 +121,7 @@
 
     count =  count + n_count(pl) 
 
-    if(heat_transfer .eq. YES) then
+    if(heat_transfer) then
       call Comm_Mod_Global_Sum_Real(tm_p(pl))
       call Comm_Mod_Global_Sum_Real(tt_p(pl))
       call Comm_Mod_Global_Sum_Real(ut_p(pl))
@@ -178,7 +181,7 @@
   deallocate(v4_p)
   deallocate(v5_p)
   deallocate(n_count)
-  if(heat_transfer .eq. YES) then
+  if(heat_transfer) then
     deallocate(tm_p)
     deallocate(tt_p)
     deallocate(ut_p)

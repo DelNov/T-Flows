@@ -2,16 +2,17 @@
  PROBLEM_TYPE    other
 
  TIME_STEP                            0.05
- NUMBER_OF_TIME_STEPS                 100
- STARTING_TIME_STEP_FOR_STATISTICS    10000
+ NUMBER_OF_TIME_STEPS               200
 
  NUMBER_OF_USER_SCALARS               0
 
 #------------------
 # Saving intervals
 #------------------
- RESULTS_SAVE_INTERVAL   20
- BACKUP_SAVE_INTERVAL    50
+ RESULTS_SAVE_INTERVAL  20
+ BACKUP_SAVE_INTERVAL   100
+
+# LOAD_BACKUP_NAME  cavity-ts000100.backup
 
 #-----------------------------
 # Monitoring points and plane
@@ -21,7 +22,7 @@
 
  POINT_FOR_MONITORING_PLANES   0.2  0.2  0.2
 
- TURBULENCE_MODEL    dns
+ TURBULENCE_MODEL    none
  PERTURB_MOMENTUM    no
 
 #----------------------
@@ -31,80 +32,31 @@
  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.7
  SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.2
 
- TIME_INTEGRATION_FOR_INERTIA            linear
- TIME_INTEGRATION_FOR_ADVECTION          fully_implicit
- TIME_INTEGRATION_FOR_DIFFUSION          fully_implicit
- TIME_INTEGRATION_FOR_CROSS_DIFFUSION    fully_implicit
+ TIME_INTEGRATION_SCHEME  linear
 
 #------------------------
 # Linear solver settings
 #------------------------
  PRECONDITIONER_FOR_SYSTEM_MATRIX    incomplete_cholesky
- TOLERANCE_FOR_MOMENTUM_SOLVER       1.e-6
- TOLERANCE_FOR_PRESSURE_SOLVER       1.e-6
- TOLERANCE_FOR_SIMPLE_ALGORITHM      1.e-4
+ TOLERANCE_FOR_MOMENTUM_SOLVER         1.e-8
+ TOLERANCE_FOR_PRESSURE_SOLVER         1.e-12
+ MAX_ITERATIONS_FOR_PRESSURE_SOLVER  120
 
- PRESSURE_DROPS    0  0  0
- MASS_FLOW_RATES   0  0  0
+ TOLERANCE_FOR_SIMPLE_ALGORITHM        1.e-4
+ MAX_SIMPLE_ITERATIONS                 20
 
 #---------------------
 # Boundary conditions
 #---------------------
-  BOUNDARY_CONDITION    static_wall_imin
-
+  BOUNDARY_CONDITION    static_wall
     TYPE                wall
     VARIABLES           u     v     w
     VALUES              0.0   0.0   0.0
 
-    TYPE                wall
-    VARIABLES           c_01  c_04
-    VALUES              1.1   4.4
-
-    TYPE                wall_flux
-    VARIABLES           c_02  c_03
-    VALUES              0.0   0.0     
-
-  BOUNDARY_CONDITION    static_wall_imax
-    TYPE                wall
-    VARIABLES           u     v     w
-    VALUES              0.0   0.0   0.0
-
-    TYPE                wall
-    VARIABLES           c_02  c_01
-    VALUES              2.2   1.1
-
-    TYPE                wall_flux
-    VARIABLES           c_03  c_04
-    VALUES              0.0   0.0     
-
-
-  BOUNDARY_CONDITION    static_wall_kmin
-    TYPE                wall
-    VARIABLES           u     v     w
-    VALUES              0.0   0.0   0.0
-
-    TYPE                wall
-    VARIABLES           c_03  c_02
-    VALUES              3.3   2.2
-
-    TYPE                wall_flux
-    VARIABLES           c_04  c_01
-    VALUES              0.0   0.0     
-
-
-  BOUNDARY_CONDITION    moving_wall_kmax
+  BOUNDARY_CONDITION    moving_wall
     TYPE                inflow
     VARIABLES           u     v     w
     VALUES              1.0   0.0   0.0
-
-    TYPE                wall
-    VARIABLES           c_04  c_03
-    VALUES              4.4   3.3
-
-    TYPE                wall_flux
-    VARIABLES           c_01  c_02
-    VALUES              1.1   2.2     
-
 
   BOUNDARY_CONDITION    symmetry
     TYPE                symmetry

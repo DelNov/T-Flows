@@ -11,6 +11,7 @@
   use Comm_Mod                       ! parallel stuff
   use Name_Mod,  only: problem_name
   use Const_Mod                      ! constants
+  use Sort_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -23,10 +24,10 @@
                          um_p(:), vm_p(:), wm_p(:), tm_p(:),  &
                          v1_p(:), v2_p(:), v3_p(:),           &
                          v4_p(:), v5_p(:), v6_p(:),           &
-                         rm_p(:), rad_1(:),                   &
+                         zm_p(:), rad_1(:),                   &
                          ind(:)
   integer,allocatable :: n_p(:), n_count(:)
-  real                :: r, r1, r2, u_aver, u_rad, u_tan, Rad_2, lnum
+  real                :: r, r1, r2, u_aver, u_rad, u_tan, lnum
   logical             :: there
 !==============================================================================!
 
@@ -35,17 +36,17 @@
   inquire(file='rad_coordinate.dat', exist=there ) 
   if(.not.there) then
     if(this_proc < 2) then
-      print *, "=========================================================="
-      print *, "In order to extract profiles and write them in ascii files"
-      print *, "the code has to read cell-faces coordinates "
-      print *, "in wall-normal direction in the ascii file 'case_name'.1D."
-      print *, "The file format should be as follows:"
-      print *, "10  ! number of cells + 1"
-      print *, "1 0.0"
-      print *, "2 0.1"
-      print *, "3 0.2"
-      print *, "... "
-      print *, "=========================================================="
+      print *, "#==========================================================="
+      print *, "# In order to extract profiles and write them in ascii files"
+      print *, "# the code has to read cell-faces coordinates "
+      print *, "# in wall-normal direction in the ascii file 'case_name'.1D."
+      print *, "# The file format should be as follows:"
+      print *, "# 10  ! number of cells + 1"
+      print *, "# 1 0.0"
+      print *, "# 2 0.1"
+      print *, "# 3 0.2"
+      print *, "# ... "
+      print *, "#-----------------------------------------------------------"
     end if
     return
   end if
@@ -66,7 +67,7 @@
     read(9,*) ind(pl), z_p(pl)
   end do
   close(9)
-  call Sort_Real_Carry_Int(z_p, ind, n_prob, 2)
+!  call Sort_Mod_Real_Carry_Int(z_p(1:n_prob), ind(1:n_prob))
 
   allocate(n_p(n_prob));   n_p  = 0 
   allocate(um_p(n_prob));  um_p = 0.0
@@ -77,12 +78,12 @@
   allocate(v3_p(n_prob));  v3_p = 0.0
   allocate(v4_p(n_prob));  v4_p = 0.0
   allocate(v5_p(n_prob));  v5_p = 0.0
-  allocate(rm_p(n_prob));  rm_p = 0.0
+  allocate(zm_p(n_prob));  zm_p = 0.0
 
   allocate(n_count(n_prob)); n_count=0
   count = 0
 
-  if(heat_transfer .eq. YES) then
+  if(heat_transfer) then
     allocate(tm_p(n_prob));   tm_p = 0.0
   end if  
 
@@ -130,10 +131,10 @@
                         v % n(c)*grid % yc(c)/r)
             u_tan   = (-u % n(c)*grid % yc(c)/r  + &
                         v % n(c)*grid % xc(c)/r) 
-            um_p(i)   = vm_p(i) + sqrt(  u % n(c)**2   &
+            um_p(i)   = um_p(i) + sqrt(  u % n(c)**2   &
                                        + v % n(c)**2   &
                                        + w % n(c)**2) 
-            vm_p(i)   = um_p(i) + u_rad
+            vm_p(i)   = vm_p(i) + u_rad
             wm_p(i)   = wm_p(i) + w % n(c)
 
             if(turbulence_model .eq. K_EPS) then 
@@ -150,11 +151,11 @@
               v5_p(i)   = v5_p(i) + f22 % n(c)
             end if
 
-            if(heat_transfer .eq. YES) then
+            if(heat_transfer) then
               tm_p(i)   = tm_p(i) + T % n(c)
             end if
      
-            rm_p(i) = rm_p(i) + r
+            zm_p(i) = zm_p(i) + grid % zc(c)
             n_count(i) = n_count(i) + 1
           end if
         end if
@@ -168,7 +169,7 @@
       call Comm_Mod_Global_Sum_Real(um_p(pl))
       call Comm_Mod_Global_Sum_Real(vm_p(pl))
       call Comm_Mod_Global_Sum_Real(wm_p(pl))
-      call Comm_Mod_Global_Sum_Real(rm_p(pl))
+      call Comm_Mod_Global_Sum_Real(zm_p(pl))
 
       call Comm_Mod_Global_Sum_Real(v1_p(pl))
       call Comm_Mod_Global_Sum_Real(v2_p(pl))
@@ -178,7 +179,7 @@
 
       count = count + n_count(pl) 
 
-      if(heat_transfer .eq. YES) then
+      if(heat_transfer) then
         call Comm_Mod_Global_Sum_Real(tm_p(pl))
       end if
     end do
@@ -194,7 +195,7 @@
         v4_p(i) = v4_p(i)/n_count(i)
         v5_p(i) = v5_p(i)/n_count(i)
         tm_p(i) = tm_p(i)/n_count(i)
-        rm_p(i) = rm_p(i)/n_count(i)
+        zm_p(i) = zm_p(i)/n_count(i)
       end if
     end do
 
@@ -219,7 +220,7 @@
 
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(3,'(9e11.3)') (z_p(i)+z_p(i+1))/4.0,  &
+        write(3,'(10e11.3)') zm_p(i)/2.0,           &
                              um_p(i)/u_aver,        &
                              vm_p(i)/u_aver,        &
                              wm_p(i)/u_aver,        &
@@ -244,7 +245,7 @@
       v4_p(i)    = 0.0 
       v5_p(i)    = 0.0 
       tm_p(i)    = 0.0 
-      rm_p(i)    = 0.0
+      zm_p(i)    = 0.0
     end do
     if(this_proc < 2) print *, 'Finished with profile r/D =  ', lnum
   end do   ! end number of radius
@@ -259,9 +260,9 @@
   deallocate(v3_p)
   deallocate(v4_p)
   deallocate(v5_p)
-  deallocate(rm_p)
+  deallocate(zm_p)
   deallocate(n_count)
-  if(heat_transfer .eq. YES) then
+  if(heat_transfer) then
     deallocate(tm_p)
   end if
 
