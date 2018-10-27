@@ -19,7 +19,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, c1, c2, n, s, ss, cc2, c_max, nnn, hh, mm, b
   integer              :: c11, c12, c21, c22, s1, s2, bou_cen, cnt_bnd, cnt_per
-  integer              :: color_per, n_per, number_sides, dir, option
+  integer              :: color_per, n_per, number_sides, option
   integer              :: rot_dir
   real                 :: xt(4), yt(4), zt(4), angle_face, tol
   real                 :: xs2, ys2, zs2, x_a, y_a, z_a, x_b, y_b, z_b
@@ -33,7 +33,7 @@
   real, allocatable    :: xspr(:), yspr(:), zspr(:)
   real, allocatable    :: b_coor(:), phi_face(:)
   integer, allocatable :: b_face(:), face_copy(:)
-  character(len=80)    :: answer
+  character(len=80)    :: answer, dir
   real                 :: big, small
 !==============================================================================!
 !
@@ -311,10 +311,16 @@
     print *, '# Exiting! '
     stop
   end if
-  print *, '#========================================================'
-  print *, '# Insert the periodic direction (1 -> x, 2 -> y, 3 -> z)'
-  print *, '#--------------------------------------------------------'
+  print *, '#=========================================='
+  print *, '# Insert the periodic direction (x, y or z)'
+  print *, '#------------------------------------------'
   read(*,*) dir
+  call To_Upper_Case(dir)
+  if(dir .ne. 'X' .and. dir .ne. 'Y' .and. dir .ne. 'Z') then
+    print *, '# Critical error: direction is neither x, y nor z!'
+    print *, '# Exiting! '
+    stop
+  end if
 
   print *, '#==============================================================='
   print *, '# For axisymmetric problems with periodic boundary conditions:  '
@@ -346,7 +352,7 @@
 
     angle = angle * PI / 180.0
 
-    if(dir .eq. 1) then
+    if(dir .eq. 'X') then
       x_a = 0.0
       y_a = 0.0
       z_a = 0.0
@@ -356,7 +362,7 @@
       x_c = 0.0
       y_c = 0.0
       z_c = 1.0
-    else if(dir .eq. 2) then
+    else if(dir .eq. 'Y') then
       x_a = 0.0
       y_a = 0.0
       z_a = 0.0
@@ -366,7 +372,7 @@
       x_c = 0.0
       y_c = 0.0
       z_c = 1.0
-    else if(dir .eq. 3) then
+    else if(dir .eq. 'Z') then
       x_a = 0.0
       y_a = 0.0
       z_a = 0.0
@@ -443,15 +449,15 @@
       if(c2 < 0) then
         if(grid % bnd_cond % color(c2) .eq. color_per) then
           cnt_per = cnt_per + 1
-          if(dir .eq. 1) b_coor(cnt_per) = grid % xf(s)*big**2  &
-                                         + grid % yf(s)*big     &
-                                         + grid % zf(s)
-          if(dir .eq. 2) b_coor(cnt_per) = grid % xf(s)         &
-                                         + grid % yf(s)*big**2  &
-                                         + grid % zf(s)*big
-          if(dir .eq. 3) b_coor(cnt_per) = grid % xf(s)*big     &
-                                         + grid % yf(s)         &
-                                         + grid % zf(s)*big**2
+          if(dir .eq. 'X') b_coor(cnt_per) = grid % xf(s)*big**2  &
+                                           + grid % yf(s)*big     &
+                                           + grid % zf(s)
+          if(dir .eq. 'Y') b_coor(cnt_per) = grid % xf(s)         &
+                                           + grid % yf(s)*big**2  &
+                                           + grid % zf(s)*big
+          if(dir .eq. 'Z') b_coor(cnt_per) = grid % xf(s)*big     &
+                                           + grid % yf(s)         &
+                                           + grid % zf(s)*big**2
           b_face(cnt_per) = s
         end if
       end if
@@ -511,7 +517,7 @@
                  + p_k*(grid % zf(s)))  &
               / sqrt(p_i*p_i + p_j*p_j + p_k*p_k)
 
-          if(dir .eq. 1) then
+          if(dir .eq. 'X') then
             if((det) < (per_max)) then
               hh = hh + 1
               b_coor(hh) = hh
@@ -539,7 +545,7 @@
             end if
           end if
 
-          if(dir .eq. 2) then
+          if(dir .eq. 'Y') then
             if((det) < (per_max)) then
               hh = hh + 1
               b_coor(hh) = hh
@@ -570,7 +576,7 @@
             end if
           end if
 
-          if(dir .eq. 3) then
+          if(dir .eq. 'Z') then
             if((det) < (per_max)) then
               hh = hh + 1
               b_coor(hh) = hh
