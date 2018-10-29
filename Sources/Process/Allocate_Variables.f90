@@ -65,16 +65,7 @@
     call Var_Mod_Allocate_New_Only('UT', ut, grid)
     call Var_Mod_Allocate_New_Only('VT', vt, grid)
     call Var_Mod_Allocate_New_Only('WT', wt, grid)
-
-    if(turbulence_statistics) then
-      call Var_Mod_Allocate_Statistics(t)
-      call Var_Mod_Allocate_Statistics(tt)
-      call Var_Mod_Allocate_Statistics(ut)
-      call Var_Mod_Allocate_Statistics(vt)
-      call Var_Mod_Allocate_Statistics(wt)
-    end if
   end if
-
 
   !-----------------------!
   !                       !
@@ -107,8 +98,8 @@
 
     ! Turbulent statistics; if needed
     if(turbulence_statistics) then
-      call Var_Mod_Allocate_Statistics(kin)               
-      call Var_Mod_Allocate_Statistics(eps)               
+      call Var_Mod_Allocate_Statistics(kin)
+      call Var_Mod_Allocate_Statistics(eps)
     end if
   end if
 
