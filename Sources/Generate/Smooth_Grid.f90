@@ -68,9 +68,9 @@
     end do
   end do 
 
-  !----------------------------!
-  !   Browse through regions   !
-  !----------------------------!
+  !-----------------------------------------!
+  !   Exclude nodes which should not move   !
+  !-----------------------------------------!
   do reg = 1, n_smoothing_regions
     if( ( .not. smooth_in_x(reg) ) .and.  &
         ( .not. smooth_in_y(reg) ) .and.  &
@@ -87,6 +87,16 @@
             (z1<=grid % zn(n)) .and. (grid % zn(n)<=z8) ) then
           node_to_nodes(n,0) = 0
         end if
+      end do
+    end if
+  end do
+
+  do s = 1, grid % n_faces               ! boundary through faces
+    c2 = grid % faces_c(2, s)
+    if(c2 < 0) then
+      do i = 1, grid % faces_n_nodes(s)  ! through nodes of a face
+        n = grid % faces_n(i, s)
+        node_to_nodes(n,0) = 0
       end do
     end if
   end do
