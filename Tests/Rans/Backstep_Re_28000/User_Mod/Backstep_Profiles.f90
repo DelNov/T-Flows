@@ -21,10 +21,10 @@
                           um_p(:), vm_p(:), wm_p(:), & 
                           uu_p(:), vv_p(:), ww_p(:), &
                           uv_p(:), uw_p(:), vw_p(:), &
-                          tm_p(:), tt_p(:),         &
+                          tm_p(:), tt_p(:),          &
                           ut_p(:), vt_p(:), wt_p(:), &
                           v1_p(:), v2_p(:), v3_p(:), &
-                          v4_p(:), v5_p(:)  
+                          v4_p(:), v5_p(:)
   integer, allocatable :: n_p(:), n_count(:)
   real                 :: z_coor
   logical              :: there
@@ -37,18 +37,19 @@
 
   if(.not.there) then
     if(this_proc < 2) then
-      print *, "==================================================================="
-      print *, "In order to extract profiles and write them in ascii files         "
-      print *, "the code has to read ascii file in which positions of the profiles "
-      print *, "extraction are defined. Name of file is 'horizontal_positions.dat.'"
-      print *, "The file format should be as follows:                              "
-      print *, "1  ! number of positions                                           "
-      print *, "0.013938 0.01298  0.35 first two numbers defined the range in the  "
-      print *, "                       streamwise direction in which the profile   "
-      print *, "                       will be extracted and the last number       "
-      print *, "                       represents x/h, where h = 0.038, which will "
-      print *, "                       appears in the file name.                   "
-      print *, "==================================================================="
+      print *, "#============================================================"
+      print *, "# In order to extract profiles and write them in ascii files "
+      print *, "# the code has to read ascii file in which positions of the  "
+      print *, "# profiles extraction are defined. Name of file is           "
+      print *, "# 'horizontal_positions.dat.'                                "
+      print *, "# The file format should be as follows:                      "
+      print *, "# 1  ! number of positions                                   "
+      print *, "# 0.03 0.02 0.35 first two numbers defined the range in the  "
+      print *, "#                streamwise direction in which the profile   "
+      print *, "#                will be extracted and the last number       "
+      print *, "#                represents x/h, where h = 0.038, which will "
+      print *, "#                appears in the file name.                   "
+      print *, "#------------------------------------------------------------"
     end if
     return
   end if

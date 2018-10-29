@@ -105,7 +105,7 @@
   allocate(n_count(n_prob)); n_count=0
   count = 0
   if(heat_transfer) then
-    allocate(t_p(n_prob));  t_p = 0.0
+    allocate(t_p (n_prob));  t_p  = 0.0
     allocate(tt_p(n_prob));  tt_p = 0.0
     allocate(ut_p(n_prob));  ut_p = 0.0
     allocate(vt_p(n_prob));  vt_p = 0.0
@@ -121,24 +121,24 @@
          grid % zc(c) < (z_p(i+1))) then
 
         wall_p(i) = wall_p(i) + grid % wall_dist(c)
-        u_p(i)    = u_p(i) + u % mean(c)
-        v_p(i)    = v_p(i) + v % mean(c)
-        w_p(i)    = w_p(i) + w % mean(c)
+        u_p   (i) = u_p   (i) + u % mean(c)
+        v_p   (i) = v_p   (i) + v % mean(c)
+        w_p   (i) = w_p   (i) + w % mean(c)
 
         uu_p(i)   = uu_p(i) + uu % mean(c) - u % mean(c) * u % mean(c)
         vv_p(i)   = vv_p(i) + vv % mean(c) - v % mean(c) * v % mean(c)
         ww_p(i)   = ww_p(i) + ww % mean(c) - w % mean(c) * w % mean(c)
         uw_p(i)   = uw_p(i) + uw % mean(c) - u % mean(c) * w % mean(c)
 
-        kin_p(i)    = kin_p(i)     + kin % mean(c) 
-        eps_p(i)    = eps_p(i)    + eps % mean(c) 
+        kin_p   (i) = kin_p   (i) + kin % mean(c) 
+        eps_p   (i) = eps_p   (i) + eps % mean(c) 
         uw_mod_p(i) = uw_mod_p(i) + vis_t_eff(c)*(u % y(c) + v % x(c))
-        vis_t_p(i)  = vis_t_p(i)  + vis_t(c) / viscosity
-        y_plus_p(i) = y_plus_p(i) + y_plus(c) 
+        vis_t_p (i) = vis_t_p (i) + vis_t(c) / viscosity
+        y_plus_p(i) = y_plus_p(i) + y_plus(c)
 
         if(heat_transfer) then
           t_p (i) = t_p (i) + t % mean(c)
-          tt_p(i) = tt_p(i) + tt % n(c) - t % mean(c) * t % mean(c)
+          tt_p(i) = tt_p(i) + tt % mean(c) - t % mean(c) * t % mean(c)
           ut_p(i) = ut_p(i) + ut % mean(c) - u % mean(c) * t % mean(c)
           vt_p(i) = vt_p(i) + vt % mean(c) - v % mean(c) * t % mean(c)
           wt_p(i) = wt_p(i) + wt % mean(c) - w % mean(c) * t % mean(c)
@@ -183,26 +183,26 @@
 
   do i = 1, n_prob-1
     if(n_count(i) .ne. 0) then
-      wall_p(i) = wall_p(i)/n_count(i)
-      u_p   (i) = u_p   (i)/n_count(i)
-      v_p   (i) = v_p   (i)/n_count(i)
-      w_p   (i) = w_p   (i)/n_count(i)
-      uu_p  (i) = uu_p  (i)/n_count(i)
-      vv_p  (i) = vv_p  (i)/n_count(i)
-      ww_p  (i) = ww_p  (i)/n_count(i)
-      uw_p  (i) = uw_p  (i)/n_count(i)
+      wall_p(i) = wall_p(i) / n_count(i)
+      u_p   (i) = u_p   (i) / n_count(i)
+      v_p   (i) = v_p   (i) / n_count(i)
+      w_p   (i) = w_p   (i) / n_count(i)
+      uu_p  (i) = uu_p  (i) / n_count(i)
+      vv_p  (i) = vv_p  (i) / n_count(i)
+      ww_p  (i) = ww_p  (i) / n_count(i)
+      uw_p  (i) = uw_p  (i) / n_count(i)
 
-      uw_mod_p(i) = uw_mod_p(i)/n_count(i)
-      kin_p   (i) = kin_p   (i)/n_count(i)
-      eps_p   (i) = eps_p   (i)/n_count(i)
-      vis_t_p (i) = vis_t_p (i)/n_count(i)
-      y_plus_p(i) = y_plus_p(i)/n_count(i)
+      uw_mod_p(i) = uw_mod_p(i) / n_count(i)
+      kin_p   (i) = kin_p   (i) / n_count(i)
+      eps_p   (i) = eps_p   (i) / n_count(i)
+      vis_t_p (i) = vis_t_p (i) / n_count(i)
+      y_plus_p(i) = y_plus_p(i) / n_count(i)
       if(heat_transfer) then
-        t_p(i)  = t_p(i)/n_count(i)
-        tt_p(i) = tt_p(i)/n_count(i)
-        ut_p(i) = ut_p(i)/n_count(i)
-        vt_p(i) = vt_p(i)/n_count(i)
-        wt_p(i) = wt_p(i)/n_count(i)
+        t_p (i) = t_p (i) / n_count(i)
+        tt_p(i) = tt_p(i) / n_count(i)
+        ut_p(i) = ut_p(i) / n_count(i)
+        vt_p(i) = vt_p(i) / n_count(i)
+        wt_p(i) = wt_p(i) / n_count(i)
       end if
     end if
   end do
@@ -353,25 +353,25 @@
   end if
 
   do i = 1, n_prob-1
-    wall_p(i)= density * wall_p(i)*u_tau_p/viscosity
-    u_p   (i) = u_p(i)/u_tau_p
-    v_p   (i) = v_p(i)/u_tau_p
-    w_p   (i) = w_p(i)/u_tau_p
+    wall_p(i)= density * wall_p(i)*u_tau_p / viscosity
+    u_p   (i) = u_p(i) / u_tau_p
+    v_p   (i) = v_p(i) / u_tau_p
+    w_p   (i) = w_p(i) / u_tau_p
 
-    kin_p   (i) = kin_p(i)/u_tau_p**2                       ! kin%n(c)
-    eps_p   (i) = eps_p(i)*viscosity/(u_tau_p**4*density)   ! eps%n(c)
-    uu_p    (i) = uu_p (i)/(u_tau_p**2)
-    vv_p    (i) = vv_p (i)/(u_tau_p**2)
-    ww_p    (i) = ww_p (i)/(u_tau_p**2)
-    uw_p    (i) = uw_p (i)/(u_tau_p**2)
-    uw_mod_p(i) = uw_p (i)/(u_tau_p**2)
+    kin_p   (i) = kin_p(i) / u_tau_p**2                       ! kin%n(c)
+    eps_p   (i) = eps_p(i)*viscosity / (u_tau_p**4*density)   ! eps%n(c)
+    uu_p    (i) = uu_p (i) / (u_tau_p**2)
+    vv_p    (i) = vv_p (i) / (u_tau_p**2)
+    ww_p    (i) = ww_p (i) / (u_tau_p**2)
+    uw_p    (i) = uw_p (i) / (u_tau_p**2)
+    uw_mod_p(i) = uw_p (i) / (u_tau_p**2)
 
     if(heat_transfer) then
-      t_p(i) = (t_wall - t_p(i))/t_tau   ! t % n(c)
-      tt_p(i) = tt_p(i)/(t_tau*t_tau)  ! ut % n(c)
-      ut_p(i) = ut_p(i)/(u_tau_p*t_tau)  ! ut % n(c)
-      vt_p(i) = vt_p(i)/(u_tau_p*t_tau)  ! vt % n(c)
-      wt_p(i) = wt_p(i)/(u_tau_p*t_tau)  ! wt % n(c)
+      t_p (i) = (t_wall - t_p(i)) / t_tau  ! t % n(c)
+      tt_p(i) = tt_p(i) / (t_tau*t_tau)    ! ut % n(c)
+      ut_p(i) = ut_p(i) / (u_tau_p*t_tau)  ! ut % n(c)
+      vt_p(i) = vt_p(i) / (u_tau_p*t_tau)  ! vt % n(c)
+      wt_p(i) = wt_p(i) / (u_tau_p*t_tau)  ! wt % n(c)
     end if
   end do
 

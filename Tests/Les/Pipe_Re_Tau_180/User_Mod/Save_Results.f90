@@ -112,24 +112,24 @@
          grid % zc(c) < (z_p(i+1))) then
 
         wall_p(i) = wall_p(i) + grid % wall_dist(c)
-        u_p(i)   = u_p(i) + u % mean(c)
-        v_p(i)   = v_p(i) + v % mean(c)
-        w_p(i)   = w_p(i) + w % mean(c)
+        u_p   (i) = u_p   (i) + u % mean(c)
+        v_p   (i) = v_p   (i) + v % mean(c)
+        w_p   (i) = w_p   (i) + w % mean(c)
 
-        uu_p(i) = uu_p(i) + uu % mean(c) - u % mean(c) * u % mean(c) 
-        vv_p(i) = vv_p(i) + vv % mean(c) - v % mean(c) * v % mean(c) 
-        ww_p(i) = ww_p(i) + ww % mean(c) - w % mean(c) * w % mean(c) 
-        uw_p(i) = uw_p(i) + uw % mean(c) - u % mean(c) * w % mean(c) 
+        uu_p(i) = uu_p(i) + uu % mean(c) - u % mean(c) * u % mean(c)
+        vv_p(i) = vv_p(i) + vv % mean(c) - v % mean(c) * v % mean(c)
+        ww_p(i) = ww_p(i) + ww % mean(c) - w % mean(c) * w % mean(c)
+        uw_p(i) = uw_p(i) + uw % mean(c) - u % mean(c) * w % mean(c)
 
         if(heat_transfer) then
           t_p(i)  = t_p(i)  + t % mean(c)
-          tt_p(i) = tt_p(i) + tt % n(c)    - t % mean(c) * t % mean(c)
+          tt_p(i) = tt_p(i) + tt % mean(c) - t % mean(c) * t % mean(c)
           ut_p(i) = ut_p(i) + ut % mean(c) - u % mean(c) * t % mean(c)
           vt_p(i) = vt_p(i) + vt % mean(c) - v % mean(c) * t % mean(c)
           wt_p(i) = wt_p(i) + wt % mean(c) - w % mean(c) * t % mean(c)
         end if
         n_count(i) = n_count(i) + 1
-      end if 
+      end if
     end do
   end do
 
@@ -164,31 +164,31 @@
 
   do i = 1, n_prob-1
     if(n_count(i) .ne. 0) then
-      wall_p(i) = wall_p(i)/n_count(i)
-      u_p   (i) = u_p   (i)/n_count(i)
-      v_p   (i) = v_p   (i)/n_count(i)
-      w_p   (i) = w_p   (i)/n_count(i)
+      wall_p(i) = wall_p(i) / n_count(i)
+      u_p   (i) = u_p   (i) / n_count(i)
+      v_p   (i) = v_p   (i) / n_count(i)
+      w_p   (i) = w_p   (i) / n_count(i)
 
-      uu_p(i) = uu_p(i)/n_count(i)
-      vv_p(i) = vv_p(i)/n_count(i)
-      ww_p(i) = ww_p(i)/n_count(i)
-      uw_p(i) = uw_p(i)/n_count(i)
+      uu_p(i) = uu_p(i) / n_count(i)
+      vv_p(i) = vv_p(i) / n_count(i)
+      ww_p(i) = ww_p(i) / n_count(i)
+      uw_p(i) = uw_p(i) / n_count(i)
 
       if(heat_transfer) then
-        t_p (i) = t_p (i)/n_count(i)
-        tt_p(i) = tt_p(i)/n_count(i)
-        ut_p(i) = ut_p(i)/n_count(i)
-        vt_p(i) = vt_p(i)/n_count(i)
-        wt_p(i) = wt_p(i)/n_count(i)
+        t_p (i) = t_p (i) / n_count(i)
+        tt_p(i) = tt_p(i) / n_count(i)
+        ut_p(i) = ut_p(i) / n_count(i)
+        vt_p(i) = vt_p(i) / n_count(i)
+        wt_p(i) = wt_p(i) / n_count(i)
       end if
     end if
   end do
 
   ! Calculating friction velocity and friction temperature
-    u_tau_p = sqrt( (viscosity*sqrt(u_p(1)**2 +        &
-                                    v_p(1)**2 +        &
-                                    w_p(1)**2)  &
-                                    / wall_p(1))          &
+    u_tau_p = sqrt( (viscosity*sqrt(u_p(1)**2 +   &
+                                    v_p(1)**2 +   &
+                                    w_p(1)**2)    &
+                                    / wall_p(1))  &
                                     / density)
   if(u_tau_p .eq. 0.0) then
     if(this_proc < 2) then
@@ -261,24 +261,24 @@
     '#', 'cf       = ', 2.0*(u_tau_p/ubulk)**2
     write(i,'(a1,(a12,f12.6))')  &
     '#', 'Utau     = ', u_tau_p 
-    write(i,'(a1,(a12,f12.6,A2,A22))') & 
+    write(i,'(a1,(a12,f12.6,a2,a22))') & 
     '#', 'Cf_error = ', error, ' %', 'Dean formula is used.'
     if(heat_transfer) then
       write(i,'(a1,(a12, f12.6))')'#', 'Nu number =', nu_max 
-      write(i,'(a1,(a12, f12.6,A2,A39))')'#', 'Nu_error  =',  &
+      write(i,'(a1,(a12, f12.6,a2,a39))')'#', 'Nu_error  =',  &
             abs(0.023*0.5*re**0.8*pr**0.4 - nu_max)           &
             / (0.023*0.5*re**0.8*pr**0.4) * 100.0, ' %',      &
             'correlation of Dittus-Boelter is used.' 
     end if
 
     if(heat_transfer) then
-      write(i,'(a1,2X,a60)') '#',  ' z,'                    //  &
+      write(i,'(a1,2x,a60)') '#',  ' z,'                    //  &
                                    ' u,'                    //  &
                                    ' uu, vv, ww, uw'        //  &
                                    ' kin'                   //  &
                                    ' t, ut, vt, wt,'   
     else
-      write(i,'(a1,2X,A50)') '#',  ' z,'                    //  &
+      write(i,'(a1,2x,a50)') '#',  ' z,'                    //  &
                                    ' u,'                    //  &
                                    ' uu, vv, ww, uw'        //  &
                                    ' kin'  
@@ -317,24 +317,24 @@
   end if
 
   do i = 1, n_prob-1
-    wall_p(i)= density * wall_p(i)*u_tau_p/viscosity
-    u_p(i) = u_p(i)/u_tau_p
-    v_p(i) = v_p(i)/u_tau_p
-    w_p(i) = w_p(i)/u_tau_p
+    wall_p(i) = density * wall_p(i)*u_tau_p/viscosity
+    u_p   (i) = u_p(i) / u_tau_p
+    v_p   (i) = v_p(i) / u_tau_p
+    w_p   (i) = w_p(i) / u_tau_p
 
-    kin_p(i) = kin_p(i)/u_tau_p**2                      ! kin%n(c)
-    eps_p(i) = eps_p(i)*viscosity/(u_tau_p**4.0*density)! eps%n(c)
-    uu_p(i) = uu_p(i)/(u_tau_p**2)
-    vv_p(i) = vv_p(i)/(u_tau_p**2)
-    ww_p(i) = ww_p(i)/(u_tau_p**2)
-    uw_p(i) = uw_p(i)/(u_tau_p**2)
+    kin_p(i) = kin_p(i) / u_tau_p**2                      ! kin%n(c)
+    eps_p(i) = eps_p(i)*viscosity / (u_tau_p**4*density)  ! eps%n(c)
+    uu_p (i) = uu_p (i) / (u_tau_p**2)
+    vv_p (i) = vv_p (i) / (u_tau_p**2)
+    ww_p (i) = ww_p (i) / (u_tau_p**2)
+    uw_p (i) = uw_p (i) / (u_tau_p**2)
 
     if(heat_transfer) then
-      t_p(i) = (t_wall - t_p(i))/t_tau   ! t % n(c)
-      tt_p(i) = tt_p(i)/(t_tau*t_tau)  ! ut % n(c)
-      ut_p(i) = ut_p(i)/(u_tau_p*t_tau)  ! ut % n(c)
-      vt_p(i) = vt_p(i)/(u_tau_p*t_tau)  ! vt % n(c)
-      wt_p(i) = wt_p(i)/(u_tau_p*t_tau)  ! wt % n(c)
+      t_p (i) = (t_wall - t_p(i)) / t_tau  ! t % n(c)
+      tt_p(i) = tt_p(i) / (t_tau*t_tau)    ! ut % n(c)
+      ut_p(i) = ut_p(i) / (u_tau_p*t_tau)  ! ut % n(c)
+      vt_p(i) = vt_p(i) / (u_tau_p*t_tau)  ! vt % n(c)
+      wt_p(i) = wt_p(i) / (u_tau_p*t_tau)  ! wt % n(c)
     end if
   end do
 
@@ -358,7 +358,7 @@
   else
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(3,'(7e15.7)')  wall_p(i),                       &
+        write(4,'(7e15.7)')  wall_p(i),                       &
                              u_p(i),                          &
                              uu_p(i),                         &
                              vv_p(i),                         &

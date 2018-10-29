@@ -169,23 +169,23 @@
 
   do i = 1, n_prob-1
     if(n_count(i) .ne. 0) then
-      wall_p(i) = wall_p(i)/n_count(i)
-      u_p   (i) = u_p   (i)/n_count(i)
-      v_p   (i) = v_p   (i)/n_count(i)
-      w_p   (i) = w_p   (i)/n_count(i)
+      wall_p(i) = wall_p(i) / n_count(i)
+      u_p   (i) = u_p   (i) / n_count(i)
+      v_p   (i) = v_p   (i) / n_count(i)
+      w_p   (i) = w_p   (i) / n_count(i)
 
-      kin_p(i) = kin_p(i)/n_count(i)
-      eps_p(i) = eps_p(i)/n_count(i)
-      uu_p (i) = uu_p (i)/n_count(i)
-      vv_p (i) = vv_p (i)/n_count(i)
-      ww_p (i) = ww_p (i)/n_count(i)
-      uw_p (i) = uw_p (i)/n_count(i)
+      kin_p(i) = kin_p(i) / n_count(i)
+      eps_p(i) = eps_p(i) / n_count(i)
+      uu_p (i) = uu_p (i) / n_count(i)
+      vv_p (i) = vv_p (i) / n_count(i)
+      ww_p (i) = ww_p (i) / n_count(i)
+      uw_p (i) = uw_p (i) / n_count(i)
       if(heat_transfer) then
-        t_p (i) = t_p (i)/n_count(i)
-        tt_p(i) = tt_p(i)/n_count(i)
-        ut_p(i) = ut_p(i)/n_count(i)
-        vt_p(i) = vt_p(i)/n_count(i)
-        wt_p(i) = wt_p(i)/n_count(i)
+        t_p (i) = t_p (i) / n_count(i)
+        tt_p(i) = tt_p(i) / n_count(i)
+        ut_p(i) = ut_p(i) / n_count(i)
+        vt_p(i) = vt_p(i) / n_count(i)
+        wt_p(i) = wt_p(i) / n_count(i)
       end if
     end if
   end do
@@ -284,7 +284,7 @@
                                    ' kin, eps,'             //  &
                                    ' t, ut, vt, wt,'   
     else
-      write(i,'(a1,2X,A50)') '#',  ' z,'                    //  &
+      write(i,'(a1,2X,a50)') '#',  ' z,'                    //  &
                                    ' u,'                    //  &
                                    ' uu, vv, ww, uw'        //  &
                                    ' kin, eps'  
@@ -294,62 +294,84 @@
   if(heat_transfer) then
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(3,'(12e15.7)') wall_p(i),                       &
-                             u_p(i),                          &
-                             uu_p(i), vv_p(i), ww_p(i),       &
-                             uw_p(i), kin_p(i), eps_p(i),     &
-                             t_p(i), ut_p(i), vt_p(i), wt_p(i)
+        write(3,'(12e15.7)') wall_p(i),  &
+                             u_p(i),     &
+                             uu_p(i),    &
+                             vv_p(i),    &
+                             ww_p(i),    &
+                             uw_p(i),    &
+                             kin_p(i),   &
+                             eps_p(i),   &
+                             t_p(i),     &
+                             ut_p(i),    &
+                             vt_p(i),    &
+                             wt_p(i)
       end if
     end do
   else
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(3,'(8e15.7)')  wall_p(i),                       &
-                             u_p(i),                          &
-                             uu_p(i), vv_p(i), ww_p(i),       &
-                             uw_p(i), kin_p(i), eps_p(i)
+        write(3,'(8e15.7)')  wall_p(i),  &
+                             u_p(i),     &
+                             uu_p(i),    &
+                             vv_p(i),    &
+                             ww_p(i),    &
+                             uw_p(i),    &
+                             kin_p(i),   &
+                             eps_p(i)
       end if
     end do
   end if
 
   do i = 1, n_prob-1
-    wall_p(i)= density * wall_p(i)*u_tau_p/viscosity
-    u_p(i) = u_p(i)/u_tau_p
-    v_p(i) = v_p(i)/u_tau_p
-    w_p(i) = w_p(i)/u_tau_p
+    wall_p(i) = density * wall_p(i) * u_tau_p / viscosity
+    u_p   (i) = u_p(i) / u_tau_p
+    v_p   (i) = v_p(i) / u_tau_p
+    w_p   (i) = w_p(i) / u_tau_p
 
-    kin_p(i) = kin_p(i)/u_tau_p**2                      ! kin%n(c)
-    eps_p(i) = eps_p(i)*viscosity/(u_tau_p**4*density)  ! eps%n(c)
-    uu_p (i) = uu_p (i)/(u_tau_p**2)
-    vv_p (i) = vv_p (i)/(u_tau_p**2)
-    ww_p (i) = ww_p (i)/(u_tau_p**2)
-    uw_p (i) = uw_p (i)/(u_tau_p**2)
+    kin_p(i) = kin_p(i) / u_tau_p**2                      ! kin%n(c)
+    eps_p(i) = eps_p(i)*viscosity / (u_tau_p**4*density)  ! eps%n(c)
+    uu_p (i) = uu_p (i) / (u_tau_p**2)
+    vv_p (i) = vv_p (i) / (u_tau_p**2)
+    ww_p (i) = ww_p (i) / (u_tau_p**2)
+    uw_p (i) = uw_p (i) / (u_tau_p**2)
 
     if(heat_transfer) then
-      t_p (i) = (t_wall - t_p(i))/t_tau  ! t % n(c)
-      ut_p(i) = ut_p(i)/(u_tau_p*t_tau)  ! ut % n(c)
-      vt_p(i) = vt_p(i)/(u_tau_p*t_tau)  ! vt % n(c)
-      wt_p(i) = wt_p(i)/(u_tau_p*t_tau)  ! wt % n(c)
+      t_p (i) = (t_wall - t_p(i)) / t_tau  ! t % n(c)
+      ut_p(i) = ut_p(i) / (u_tau_p*t_tau)  ! ut % n(c)
+      vt_p(i) = vt_p(i) / (u_tau_p*t_tau)  ! vt % n(c)
+      wt_p(i) = wt_p(i) / (u_tau_p*t_tau)  ! wt % n(c)
     end if
   end do
 
   if(heat_transfer) then
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(4,'(12e15.7)') wall_p(i),                       &
-                             u_p(i),                          &
-                             uu_p(i), vv_p(i), ww_p(i),       &
-                             uw_p(i), kin_p(i), eps_p(i),     &
-                             t_p(i), ut_p(i), vt_p(i), wt_p(i)
+        write(4,'(12e15.7)') wall_p(i),  &
+                             u_p(i),     &
+                             uu_p(i),    &
+                             vv_p(i),    &
+                             ww_p(i),    &
+                             uw_p(i),    &
+                             kin_p(i),   &
+                             eps_p(i),   &
+                             t_p(i),     &
+                             ut_p(i),    &
+                             vt_p(i),    &
+                             wt_p(i)
       end if
     end do
   else
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(4,'(8e15.7)')  wall_p(i),                       &
-                             u_p(i),                          &
-                             uu_p(i), vv_p(i), ww_p(i),       &
-                             uw_p(i), kin_p(i), eps_p(i)
+        write(4,'(8e15.7)')  wall_p(i),  &
+                             u_p(i),     &
+                             uu_p(i),    &
+                             vv_p(i),    &
+                             ww_p(i),    &
+                             uw_p(i),    &
+                             kin_p(i),   &
+                             eps_p(i)
       end if
     end do
   end if

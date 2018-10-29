@@ -92,7 +92,8 @@
               v1_p(i) = v1_p(i) + 0.015663 * tau_wall(c1)*U%n(c1)/abs(U%n(c1)) 
             end if
             v2_p(i) = v2_p(i) + y_plus(c1)
-            v3_p(i) = v3_p(i) + t % q(c2) / (density * capacity * (t % n(c2) - 20) * 11.3) 
+            v3_p(i) = v3_p(i) + t % q(c2)  &
+                    / (density * capacity * (t % n(c2) - 20) * 11.3) 
             v5_p(i) = v5_p(i) + t % n(c2) 
             n_count(i) = n_count(i) + 1
           end if
@@ -163,7 +164,7 @@
     end if
   end do 
   close(3)
- 
+
   deallocate(n_p)
   deallocate(z_p)
   deallocate(um_p)
