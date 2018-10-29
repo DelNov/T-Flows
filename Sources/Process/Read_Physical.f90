@@ -14,14 +14,23 @@
   logical         :: restar
 !==============================================================================!
 
-  call Control_Mod_Gravitational_Vector(grav_x, grav_y, grav_z)
+  !-------------------------!
+  !   Related to bouyancy   !
+  !-------------------------!
+  call Control_Mod_Gravitational_Vector(.true.)
+  call Control_Mod_Buoyancy(.true.)
+  call Control_Mod_Reference_Temperature(.true.)
 
+  !---------------------------!
+  !   Related to turbulence   !
+  !---------------------------!
   call Control_Mod_Turbulence_Model(.true.)
-
   call Control_Mod_Turbulence_Model_Variant(.true.)
-
   call Control_Mod_Rough_Walls(.true.)
 
+  !-------------------------------------------------------------------------!
+  !   Initialization of model constants depending on the turbulence model   !
+  !-------------------------------------------------------------------------!
   if(turbulence_model .eq. K_EPS) then
     call Constants_K_Eps()
   end if
@@ -44,18 +53,14 @@
     call Constants_Spalart_Allmaras()
   end if
 
-  ! Pressure drops
+  !------------------------------------!
+  !   Pressure drops and mass fluxes   !
+  !------------------------------------!
   if(.not. restar) then
-    call Control_Mod_Pressure_Drops(bulk % p_drop_x,  &
-                                    bulk % p_drop_y,  &
-                                    bulk % p_drop_z)
+    call Control_Mod_Pressure_Drops()
   end if
-
-  ! Mass fluxes
   if(.not. restar) then
-    call Control_Mod_Mass_Flow_Rates(bulk % flux_x_o,  &
-                                     bulk % flux_y_o,  &
-                                     bulk % flux_z_o)
+    call Control_Mod_Mass_Flow_Rates()
   end if
 
   end subroutine
