@@ -5,6 +5,7 @@
 !   'EBM' and 'HJ' are calling this subroutine.                                !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
+  use Const_Mod, only: TINY
   use Flow_Mod
   use Les_Mod
   use Rans_Mod
@@ -249,21 +250,21 @@
     if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
       do c = 1, grid % n_cells
         u1uj_phij(c) = density * c_mu_d / phi % sigma * kin % n(c)     &
-                     / eps % n(c)                                      &
+                     / max(eps % n(c), TINY)                           &
                      * (  uu % n(c) * phi_x(c)                         &
                         + uv % n(c) * phi_y(c)                         &
                         + uw % n(c) * phi_z(c))                        &
                      - viscosity * phi_x(c)
 
         u2uj_phij(c) = density * c_mu_d / phi % sigma * kin % n(c)     &
-                     / eps % n(c)                                      &
+                     / max(eps % n(c), TINY)                           &
                      * (  uv % n(c) * phi_x(c)                         &
                         + vv % n(c) * phi_y(c)                         &
                         + vw % n(c) * phi_z(c))                        &
                      - viscosity * phi_y(c)
 
         u3uj_phij(c) = density * c_mu_d / phi % sigma * kin % n(c)     &
-                     / eps % n(c)                                      &
+                     / max(eps % n(c), TINY)                           &
                      * (  uw % n(c) * phi_x(c)                         &
                         + vw % n(c) * phi_y(c)                         &
                         + ww % n(c) * phi_z(c))                        &

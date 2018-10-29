@@ -102,7 +102,7 @@
       nc2 = -(  grav_x * t_x(c)   &
               + grav_y * t_y(c)   &
               + grav_z * t_z(c))  &
-          / t_ref
+          / max(t_ref, TINY)
       nc2 = max(0.0, nc2) 
       vis_t(c) = vis_t(c) * sqrt(1.0 - min(2.5*nc2/(shear(c)**2), 1.0))
     end do

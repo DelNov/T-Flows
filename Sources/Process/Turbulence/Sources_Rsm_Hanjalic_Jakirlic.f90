@@ -78,9 +78,9 @@
   kin_vis = viscosity / density
 
   do c = 1, grid % n_cells
-    kin % n(c) = max(0.5*(uu % n(c) + vv % n(c) + ww % n(c)), tiny)
-    l_scale(c)=  (kin % n(c))**1.5/eps % n(c)
-    t_scale(c)=  kin % n(c)/eps % n(c)
+    kin % n(c) = max(0.5*(uu % n(c) + vv % n(c) + ww % n(c)), TINY)
+    l_scale(c)=  (kin % n(c))**1.5 / max(eps % n(c), TINY)
+    t_scale(c)=   kin % n(c)       / max(eps % n(c), TINY)
   end do
 
   call Grad_Mod_For_Phi(grid, kin % n, 1, kin_x, .true.)  ! dK/dx
@@ -281,17 +281,17 @@
           uyz = ui_yz(c)
           uzy = uyz
           uzz = ui_zz(c)
-          diss1(c) =                                    &
-                  2.0*0.25*kin_vis*kin%n(c)/eps_tot(c)  *  &
-                 (uu % n(c)*(uxx*uxx+uxy*uxy+uxz*uxz)+  &
-                  uv % n(c)*(uxx*uyx+uxy*uyy+uxz*uyz)+  &
-                  uw % n(c)*(uxx*uzx+uxy*uzy+uxz*uzz)+  &
-                  uv % n(c)*(uyx*uxx+uyy*uxy+uyz*uxz)+  &
-                  vv % n(c)*(uyx*uyx+uyy*uyy+uyz*uyz)+  &
-                  vw % n(c)*(uyx*uzx+uyy*uzy+uyz*uzz)+  &
-                  uw % n(c)*(uzx*uxx+uzy*uxy+uzz*uxz)+  &
-                  vw % n(c)*(uzx*uyx+uzy*uyy+uzz*uyz)+  &
-                  ww % n(c)*(uzx*uzx+uzy*uzy+uzz*uzz))
+          diss1(c) =                                                           &
+                  2.0 * 0.25 * kin_vis * kin % n(c) / max(eps_tot(c), TINY)    &
+                  * (  uu % n(c)*(uxx*uxx+uxy*uxy+uxz*uxz)                     &
+                     + uv % n(c)*(uxx*uyx+uxy*uyy+uxz*uyz)                     &
+                     + uw % n(c)*(uxx*uzx+uxy*uzy+uxz*uzz)                     &
+                     + uv % n(c)*(uyx*uxx+uyy*uxy+uyz*uxz)                     &
+                     + vv % n(c)*(uyx*uyx+uyy*uyy+uyz*uyz)                     &
+                     + vw % n(c)*(uyx*uzx+uyy*uzy+uyz*uzz)                     &
+                     + uw % n(c)*(uzx*uxx+uzy*uxy+uzz*uxz)                     &
+                     + vw % n(c)*(uzx*uyx+uzy*uyy+uzz*uyz)                     &
+                     + ww % n(c)*(uzx*uzx+uzy*uzy+uzz*uzz)  )
         end if
         if(i == 2) then
           uxx = ui_xx(c)
@@ -400,7 +400,7 @@
 
     re_t= (kin % n(c)**2)/(kin_vis*eps_tot(c)+tiny)
     ff5 = min(aa2, (1.0-exp(-re_t/150))**3)
-    tkolm = (kin_vis/eps_tot(c))**0.5
+    tkolm = sqrt( kin_vis / max(eps_tot(c), TINY) )
 
     ee=aa
     fss=1.0-(sqrt(aa) * ee**2)
@@ -419,15 +419,15 @@
       eps31 = eps13
       eps32 = eps23
 
-      e11 = eps11/eps%n(c) - r23 
-      e22 = eps22/eps%n(c) - r23 
-      e33 = eps33/eps%n(c) - r23 
-      e12 = eps12/eps%n(c)
-      e13 = eps13/eps%n(c)
-      e23 = eps23/eps%n(c)
-      e21 = e12 
-      e31 = e13 
-      e32 = e23 
+      e11 = eps11 / max(eps % n(c), TINY) - r23
+      e22 = eps22 / max(eps % n(c), TINY) - r23
+      e33 = eps33 / max(eps % n(c), TINY) - r23
+      e12 = eps12 / max(eps % n(c), TINY)
+      e13 = eps13 / max(eps % n(c), TINY)
+      e23 = eps23 / max(eps % n(c), TINY)
+      e21 = e12
+      e31 = e13
+      e32 = e23
       e2 = (e11**2)+(e22**2)+(e33**2)+2*((e12**2)+(e13**2)+(e23**2))
 
       e3 =   e11**3 + e22**3 + e33**3  &
@@ -454,52 +454,54 @@
     cc2   = 0.8*SQRT(aa)
     c1w   = max((1.0 - 0.7*cc), 0.3)
     c2w   = min(aa,0.3)
-    f_w   = min((kin % n(c)**1.5)/(2.5*eps_tot(c)*grid % wall_dist(c)),1.4)
+    f_w   = min( kin % n(c)**1.5                                         &
+                 / (2.5 * max(eps_tot(c), TINY) * grid % wall_dist(c)),  &
+                 1.4)
 
-    p11 = - 2.0*(  uu % n(c) * u % x(c)     &
-                 + uv % n(c) * u % y(c)     &
-                 + uw % n(c) * u % z(c))    &
+    p11 = - 2.0*(  uu % n(c) * u % x(c)      &
+                 + uv % n(c) * u % y(c)      &
+                 + uw % n(c) * u % z(c))     &
           - 2.0 * omega_y * 2.0 * uw % n(c)  &
           + 2.0 * omega_z * 2.0 * uv % n(c) 
 
-    p22 = - 2.0*(  uv % n(c) * v % x(c)     &
-                 + vv % n(c) * v % y(c)     &
-                 + vw % n(c) * v % z(c))    &
+    p22 = - 2.0*(  uv % n(c) * v % x(c)      &
+                 + vv % n(c) * v % y(c)      &
+                 + vw % n(c) * v % z(c))     &
           + 2.0 * omega_x * 2.0 * vw % n(c)  &
           - 2.0 * omega_z * 2.0 * uw % n(c) 
 
-    p33 = - 2.0*(  uw % n(c) * w % x(c)     &
-                 + vw % n(c) * w % y(c)     &
-                 + ww % n(c) * w % z(c))    &
+    p33 = - 2.0*(  uw % n(c) * w % x(c)      &
+                 + vw % n(c) * w % y(c)      &
+                 + ww % n(c) * w % z(c))     &
           - 2.0 * omega_x * 2.0 * vw % n(c)  &
           + 2.0 * omega_y * 2.0 * uw % n(c) 
 
-    p12 = -(  uu % n(c) * v % x(c)      &
-            + uv % n(c) * v % y(c)      &
-            + uw % n(c) * v % z(c)      &
-            + uv % n(c) * u % x(c)      &
-            + vv % n(c) * u % y(c)      &
-            + vw % n(c) * u % z(c))     &
+    p12 = -(  uu % n(c) * v % x(c)       &
+            + uv % n(c) * v % y(c)       &
+            + uw % n(c) * v % z(c)       &
+            + uv % n(c) * u % x(c)       &
+            + vv % n(c) * u % y(c)       &
+            + vw % n(c) * u % z(c))      &
             + 2.0 * omega_x * uw % n(c)  &
             - 2.0 * omega_y * vw % n(c)  &
             + 2.0 * omega_z * (vv % n(c) - uu % n(c)) 
 
-    p13 = -(  uw % n(c)*u % x(c)                      &
-            + vw % n(c)*u % y(c)                      &
-            + ww % n(c)*u % z(c)                      &
-            + uu % n(c)*w % x(c)                      &
-            + uv % n(c)*w % y(c)                      &
-            + uw % n(c)*w % z(c))                     &
+    p13 = -(  uw % n(c)*u % x(c)                       &
+            + vw % n(c)*u % y(c)                       &
+            + ww % n(c)*u % z(c)                       &
+            + uu % n(c)*w % x(c)                       &
+            + uv % n(c)*w % y(c)                       &
+            + uw % n(c)*w % z(c))                      &
             - 2.0 * omega_x * uv % n(c)                &
             - 2.0 * omega_y * (ww % n(c) - uu % n(c))  &
             + 2.0 * omega_z * vw % n(c) 
 
-    p23 = -(  uv % n(c) * w % x(c)                    &
-            + vv % n(c) * w % y(c)                    &
-            + vw % n(c) * w % z(c)                    &
-            + uw % n(c) * v % x(c)                    &
-            + vw % n(c) * v % y(c)                    &
-            + ww % n(c) * v % z(c))                   &
+    p23 = -(  uv % n(c) * w % x(c)                     &
+            + vv % n(c) * w % y(c)                     &
+            + vw % n(c) * w % z(c)                     &
+            + uw % n(c) * v % x(c)                     &
+            + vw % n(c) * v % y(c)                     &
+            + ww % n(c) * v % z(c))                    &
             - 2.0 * omega_x * (vw % n(c) - ww % n(c))  &
             + 2.0 * omega_y * uv % n(c)                &
             - 2.0 * omega_z * uw % n(c) 
