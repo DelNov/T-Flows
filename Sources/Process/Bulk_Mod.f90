@@ -15,8 +15,8 @@
     real :: area_y
     real :: area_z
 
-    real :: mass_in  
-    real :: mass_out 
+    real :: mass_in
+    real :: mass_out
 
     ! Fluxes in x, y and z direction
     real :: flux_x
