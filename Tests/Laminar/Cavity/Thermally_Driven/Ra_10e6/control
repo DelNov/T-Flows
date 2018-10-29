@@ -1,3 +1,6 @@
+#----------
+# Prologue
+#----------
  PROBLEM_NAME     cavity
  HEAT_TRANSFER    yes
  BUOYANCY         yes

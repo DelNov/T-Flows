@@ -72,8 +72,6 @@
  TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
  MAX_SIMPLE_ITERATIONS                  6
 
- MAX_ITERATIONS_FOR_PRESSURE_SOLVER   120
-
 #--------------------
 # Initial conditions
 #--------------------

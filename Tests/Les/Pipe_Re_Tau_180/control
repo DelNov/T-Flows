@@ -7,7 +7,7 @@
  HEAT_TRANSFER   no
 
  TIME_STEP                             0.02
- NUMBER_OF_TIME_STEPS                 360 #00
+ NUMBER_OF_TIME_STEPS                 36000
  STARTING_TIME_STEP_FOR_STATISTICS    12000
 
  RESULTS_SAVE_INTERVAL       50

@@ -1,4 +1,6 @@
-Prologue
+#-----------
+# Prologue
+#-----------
 
  PROBLEM_NAME    rb_conv
 
@@ -7,9 +9,11 @@ Prologue
  TIME_STEP                            0.05
  NUMBER_OF_TIME_STEPS                 4230
  STARTING_TIME_STEP_FOR_STATISTICS    4222
+
 # LOAD_BACKUP_NAME   rb_conv-ts004220.backup 
- RESULTS_SAVE_INTERVAL     1000 
- BACKUP_SAVE_INTERVAL      1000
+ RESULTS_SAVE_INTERVAL     1200
+ BACKUP_SAVE_INTERVAL      1200
+
 #-------------------
 # Monitoring points 
 #-------------------
