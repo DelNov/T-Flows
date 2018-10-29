@@ -1,13 +1,19 @@
 !==============================================================================!
-  subroutine Control_Mod_Reference_Temperature(val, verbose)
+  subroutine Control_Mod_Reference_Temperature(verbose)
+!------------------------------------------------------------------------------!
+!----------------------------------[Modules]-----------------------------------!
+  use Flow_Mod, only: t_ref
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real              :: val
   logical, optional :: verbose
+!-----------------------------------[Locals]-----------------------------------!
+  real :: def
 !==============================================================================!
 
-  call Control_Mod_Read_Real_Item('REFERENCE_TEMPERATURE', 0.0,  &
-                                   val, verbose)
+  def = 20.0
+
+  call Control_Mod_Read_Real_Item('REFERENCE_TEMPERATURE', def,  &
+                                   t_ref, verbose)
 
   end subroutine

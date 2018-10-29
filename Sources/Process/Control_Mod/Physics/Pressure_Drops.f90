@@ -1,9 +1,12 @@
 !==============================================================================!
-  subroutine Control_Mod_Pressure_Drops(p_x, p_y, p_z, verbose)
+  subroutine Control_Mod_Pressure_Drops(verbose)
+!------------------------------------------------------------------------------!
+!----------------------------------[Modules]-----------------------------------!
+  use Bulk_Mod, only: Bulk_Type
+  use Flow_Mod, only: bulk
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real              :: p_x, p_y, p_z
   logical, optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   real :: def(3)
@@ -15,8 +18,8 @@
   call Control_Mod_Read_Real_Array('PRESSURE_DROPS', 3, def,  &
                                     val, verbose)
 
-  p_x = val(1)
-  p_y = val(2)
-  p_z = val(3)
+  bulk % p_drop_x = val(1)
+  bulk % p_drop_y = val(2)
+  bulk % p_drop_z = val(3)
 
   end subroutine

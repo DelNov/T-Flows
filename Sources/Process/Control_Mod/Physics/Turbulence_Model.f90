@@ -81,7 +81,7 @@
      turbulence_model .eq. HYBRID_LES_RANS) then
 
     if(this_proc < 2) then
-      print *, '# Scale resolving simulation used; ' // &
+      print *, '# NOTE! Scale resolving simulation used; ' // &
                'turbulence statistics engaged!'
     end if
 

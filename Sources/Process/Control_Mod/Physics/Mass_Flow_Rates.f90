@@ -1,9 +1,12 @@
 !==============================================================================!
-  subroutine Control_Mod_Mass_Flow_Rates(m_x, m_y, m_z, verbose)
+  subroutine Control_Mod_Mass_Flow_Rates(verbose)
+!------------------------------------------------------------------------------!
+!----------------------------------[Modules]-----------------------------------!
+  use Bulk_Mod, only: Bulk_Type
+  use Flow_Mod, only: bulk
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real              :: m_x, m_y, m_z
   logical, optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   real :: def(3)
@@ -15,8 +18,8 @@
   call Control_Mod_Read_Real_Array('MASS_FLOW_RATES', 3, def,  &
                                     val, verbose)
 
-  m_x = val(1)
-  m_y = val(2)
-  m_z = val(3)
+  bulk % flux_x = val(1)
+  bulk % flux_y = val(2)
+  bulk % flux_z = val(3)
 
   end subroutine

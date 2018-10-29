@@ -6,7 +6,8 @@
 !   vaue specified in argument "def" is used.
 !------------------------------------------------------------------------------!
 !---------------------------------[Modules]------------------------------------!
-  use Comm_Mod, only: this_proc
+  use Const_Mod, only: HUGE_INT
+  use Comm_Mod,  only: this_proc
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -46,8 +47,13 @@
   !--------------------------------------------!
 1 if(present(verbose)) then
     if(verbose .and. this_proc < 2) then
-      print '(3a,i9)', ' # NOTE! Could not find the keyword: ',  &
-                        trim(keyword), '. Using the default: ', def
+      if(def .eq. HUGE_INT) then
+        print '(3a,i9)', ' # NOTE! Could not find the keyword: ',  &
+                          trim(keyword), '. Using the default HUGE_INT value'
+      else
+        print '(3a,i9)', ' # NOTE! Could not find the keyword: ',  &
+                          trim(keyword), '. Using the default: ', def
+      end if
     end if
   end if
 

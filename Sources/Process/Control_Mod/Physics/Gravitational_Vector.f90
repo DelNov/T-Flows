@@ -1,9 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Gravitational_Vector(v_x, v_y, v_z, verbose)
+  subroutine Control_Mod_Gravitational_Vector(verbose)
+!------------------------------------------------------------------------------!
+!----------------------------------[Modules]-----------------------------------!
+  use Flow_Mod, only: grav_x, grav_y, grav_z
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real              :: v_x, v_y, v_z
   logical, optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   real :: def(3)
@@ -15,8 +17,8 @@
   call Control_Mod_Read_Real_Array('GRAVITATIONAL_VECTOR', 3, def,  &
                                     val, verbose)
 
-  v_x = val(1)
-  v_y = val(2)
-  v_z = val(3)
+  grav_x = val(1)
+  grav_y = val(2)
+  grav_z = val(3)
 
   end subroutine
