@@ -46,7 +46,7 @@
                       + uv % n(c) * (v % x(c) + u % y(c))  &
                       + uw % n(c) * (u % z(c) + w % x(c))  &
                       + vw % n(c) * (v % z(c) + w % y(c))) &
-        / max(kin % n(c)**2 / (max(eps_tot(c), TINY) * shear(c)**2, TINY), 0.0)
+        / max(kin % n(c)**2 / max(eps_tot(c), TINY) * shear(c)**2, TINY), 0.0)
 
       cmu_mod = min(0.12, cmu_mod)
       vis_t(c) = cmu_mod * density * kin % n(c)**2 / max(eps_tot(c), TINY)
@@ -57,13 +57,14 @@
       kin % n(c) = 0.5*max(uu % n(c) + vv % n(c) + ww % n(c), TINY)
 
       ! Pk/ (k^2/eps * S^2)
-      cmu_mod = max(-(  uu % n(c) * u % x(c)  &
-                      + vv % n(c) * v % y(c)  &
-                      + ww % n(c) * w % z(c)  &
-                      + uv % n(c) * (v % x(c) + u % y(c))  &
-                      + uw % n(c) * (u % z(c) + w % x(c))  &
-                      + vw % n(c) * (v % z(c) + w % y(c))) &
-               / max(kin % n(c)**2 / eps % n(c) * shear(c)**2, TINY), 0.0)
+      cmu_mod = max(-(  uu % n(c) * u % x(c)                         &
+                      + vv % n(c) * v % y(c)                         &
+                      + ww % n(c) * w % z(c)                         &
+                      + uv % n(c) * (v % x(c) + u % y(c))            &
+                      + uw % n(c) * (u % z(c) + w % x(c))            &
+                      + vw % n(c) * (v % z(c) + w % y(c)))           &
+                      / max(  kin % n(c)**2 / max(eps % n(c), TINY)  &
+                              * shear(c)**2, TINY), 0.0)
 
       cmu_mod = min(0.12,cmu_mod)
       vis_t(c) = cmu_mod * density * kin % n(c)**2 / max(eps % n(c), TINY)
@@ -71,6 +72,6 @@
     end do
   end if
 
-  call Comm_Mod_Exchange_Real(grid, vis_t)  
+  call Comm_Mod_Exchange_Real(grid, vis_t)
 
   end subroutine
