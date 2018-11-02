@@ -10,6 +10,8 @@ rm -f */*/Generate
 rm -f */*/Convert
 rm -f */*/Divide
 rm -f */*/Process
+rm -f */*/out_test
+gzip */*/*.neu
 
 rm -f */*/*/*.cns
 rm -f */*/*/*.geo
@@ -23,6 +25,7 @@ rm -f */*/*/Generate
 rm -f */*/*/Convert
 rm -f */*/*/Divide
 rm -f */*/*/Process
+rm -f */*/*/out_test
 
 rm -f */*/*/*/*.cns
 rm -f */*/*/*/*.geo
@@ -36,6 +39,7 @@ rm -f */*/*/*/Generate
 rm -f */*/*/*/Convert
 rm -f */*/*/*/Divide
 rm -f */*/*/*/Process
+rm -f */*/*/*/out_test
 
 rm -f */*/*/*/*/*.cns
 rm -f */*/*/*/*/*.geo
@@ -49,3 +53,4 @@ rm -f */*/*/*/*/Generate
 rm -f */*/*/*/*/Convert
 rm -f */*/*/*/*/Divide
 rm -f */*/*/*/*/Process
+rm -f */*/*/*/*/out_test
