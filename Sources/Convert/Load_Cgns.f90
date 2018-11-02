@@ -3,12 +3,12 @@
 !------------------------------------------------------------------------------!
 !   https://cgns.github.io/CGNS_docs_current/midlevel/structural.html          !
 !   |-> mesh_info                                                              !
+!------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Name_Mod, only: problem_name
-  use gen_mod
-  use Grid_Mod
-  use Tokenizer_Mod
-  use Cgns_Mod
+  use Name_Mod,  only: problem_name
+  use Grid_Mod,  only: Grid_Type,                    &
+                       Grid_Mod_Print_Bnd_Cond_List
+  use Cgns_Mod   ! plenty of functions are used
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

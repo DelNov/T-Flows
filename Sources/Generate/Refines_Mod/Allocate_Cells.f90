@@ -1,18 +1,16 @@
 !==============================================================================!
-  subroutine Load_Cgns(grid)
-!------------------------------------------------------------------------------!
-!   Dummy function in case the code is not linked with CGNS support            !
+  subroutine Refines_Mod_Allocate_Cells(ref, nb, nc)
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Grid_Mod, only: Grid_Type
+  use Const_Mod, only: HUGE
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Refines_Type) :: ref     ! smoothing regions
+  integer            :: nb, nc  ! number of boundary cells and cells
 !==============================================================================!
 
-  print *, '# This version of the code is not compiled with CGNS support!'
-  print *, '# Exiting'
-  stop
+  allocate (ref % cell_marked(-nb:nc));  ref % cell_marked(:) = .false.
+  allocate (ref % cell_level (    nc));  ref % cell_level (:) = 0
 
   end subroutine

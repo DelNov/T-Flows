@@ -12,13 +12,12 @@
   !------------------------------!
   type Tokenizer_Type
     character(len=300) :: whole              ! whole string
-    character(len=300) :: tokens(300)        ! tokens             
-    integer            :: n_tokens           ! number of tokens 
+    character(len=300) :: tokens(300)        ! tokens
+    integer            :: n_tokens           ! number of tokens
     integer            :: s(300), e(300)     ! tokens starts and ends
   end type
 
-  type(Tokenizer_Type) :: line 
-  integer              :: cmn_line_count     ! command line count
+  type(Tokenizer_Type) :: line
 
   contains
 

@@ -4,9 +4,8 @@
 !   Distribute regions (defined in .dom file) to boundary conditions           !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Gen_Mod
-  use Domain_Mod
-  use Grid_Mod
+  use Domain_Mod, only: Domain_Type
+  use Grid_Mod,   only: Grid_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

@@ -159,8 +159,7 @@ SRC_FUN += Allocate_Memory.f90		\
            Grid_Topology.f90		\
            Load_Neu.f90			\
            Logo_Con.f90			\
-           Main_Con.f90			\
-           Read_Line.f90
+           Main_Con.f90
 
 #-------------------------------------------
 #   Conditional inclusion of CGNS support

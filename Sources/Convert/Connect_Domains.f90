@@ -22,10 +22,9 @@
 !   First domain must be the channel-like, periodic in streamwise direction.   !
 !                                                                              !
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Gen_Mod 
-  use Tokenizer_Mod
-  use Grid_Mod
+  use Const_Mod,     only: ONE_THIRD, TWO_THIRDS
+  use Tokenizer_Mod, only: Tokenizer_Mod_Read_Line, line
+  use Grid_Mod,      only: Grid_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

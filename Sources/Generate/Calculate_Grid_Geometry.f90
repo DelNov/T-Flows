@@ -4,10 +4,9 @@
 !   Calculates geometrical quantities of the grid.                             !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Gen_Mod
-  use Grid_Mod
-  use Tokenizer_Mod
+  use Const_Mod, only: HUGE, ONE_THIRD
+  use Gen_Mod,   only: face_c_to_c
+  use Grid_Mod,  only: Grid_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

@@ -1,33 +1,35 @@
 !==============================================================================!
-  subroutine Refine_Grid(grid)
+  subroutine Refine_Grid(ref, grid)
 !------------------------------------------------------------------------------!
 !   Mark the region of the domain for local refinement and refine the grid!    !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Gen_Mod
-  use Grid_Mod
+  use Refines_Mod, only: ELIPSOID, PLANE, RECTANGLE,   &
+                         Refines_Type
+  use Grid_Mod,    only: Grid_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Refines_Type) :: ref
+  type(Grid_Type)    :: grid
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c, lev, reg, n1, n2, n3, n4, n5, n6, n7, n8
   real    :: x1, y1, z1, x8, y8, z8, x0, y0, z0
 !==============================================================================!
 
   ! Set no cell for refinement, intially
-  cell_marked = .false.
+  ref % cell_marked(:) = .false.
 
-  do lev = 1,n_refine_levels
+  do lev = 1, ref % n_levels
 
-    do reg = 1,n_refined_regions(lev) 
+    do reg = 1, ref % n_regions(lev) 
 
-      x1=refined_regions(lev,reg,1)
-      y1=refined_regions(lev,reg,2)
-      z1=refined_regions(lev,reg,3)
-      x8=refined_regions(lev,reg,4)
-      y8=refined_regions(lev,reg,5)
-      z8=refined_regions(lev,reg,6)
+      x1 = ref % region(lev,reg,1)
+      y1 = ref % region(lev,reg,2)
+      z1 = ref % region(lev,reg,3)
+      x8 = ref % region(lev,reg,4)
+      y8 = ref % region(lev,reg,5)
+      z8 = ref % region(lev,reg,6)
 
       do c = 1, grid % n_cells
         n1 = grid % cells_n(1,c)
@@ -52,30 +54,30 @@
                     grid % zn(n5) + grid % zn(n6) +   &
                     grid % zn(n7) + grid % zn(n8))
 
-        if(refined_regions(lev,reg,0) .eq. ELIPSOID) then
+        if(ref % region(lev,reg,0) .eq. ELIPSOID) then
           if(  ( ((x1-x0)/x8)**2 +                                  &
                  ((y1-y0)/y8)**2 +                                  &
                  ((z1-z0)/z8)**2)  < 1.0 ) then
-            cell_marked(c) = .true.
+            ref % cell_marked(c) = .true.
           end if
-        else if(refined_regions(lev,reg,0) .eq. RECTANGLE) then 
-          if( (x1  < x0) .and. (x0  < x8) .and.                     &
-              (y1  < y0) .and. (y0  < y8) .and.                     &
-              (z1  < z0) .and. (z0  < z8) ) then
-            cell_marked(c) = .true.
+        else if(ref % region(lev,reg,0) .eq. RECTANGLE) then 
+          if( (x1 < x0) .and. (x0 < x8) .and.                     &
+              (y1 < y0) .and. (y0 < y8) .and.                     &
+              (z1 < z0) .and. (z0 < z8) ) then
+            ref % cell_marked(c) = .true.
           end if
-        else if(refined_regions(lev,reg,0) .eq. PLANE) then 
+        else if(ref % region(lev,reg,0) .eq. PLANE) then 
           if( (x0-x1)*x8+(y0-y1)*y8+(z0-z1)*z8   >  0.0 ) then
-            cell_marked(c) = .true.
+            ref % cell_marked(c) = .true.
           end if
         end if 
       end do   ! cells
 
     end do   ! reg
 
-    call Refine_Marked_Cells(grid, lev)
+    call Refine_Marked_Cells(ref, grid, lev)
 
-    cell_marked = .false.
+    ref % cell_marked(:) = .false.
 
   end do  ! lev
 

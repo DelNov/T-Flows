@@ -10,7 +10,6 @@
 !------------------------------------------------------------------------------!
 !   Writes: name.cns, name.geo                                                 !
 !----------------------------------[Modules]-----------------------------------!
-  use Gen_Mod
   use Div_Mod
   use Grid_Mod
 !------------------------------------------------------------------------------!
@@ -81,7 +80,7 @@
   ! Number of nodes for each cell
   count = 0
   do c = 1, grid % n_cells
-    if(new_c(c) .ne. 0) then
+    if(grid % new_c(c) .ne. 0) then
       count = count + 1
       iwork(count,1) = grid % cells_n_nodes(c)
     end if
@@ -95,17 +94,17 @@
   ! Cells' nodes
   count = 0
   do c = 1, grid % n_cells
-    if(new_c(c) .ne. 0) then
+    if(grid % new_c(c) .ne. 0) then
       do n = 1, grid % cells_n_nodes(c)
         count = count + 1
-        iwork(count,1) = new_n(grid % cells_n(n,c))
+        iwork(count,1) = grid % new_n(grid % cells_n(n,c))
       end do
     end if
   end do
   do s = 1, nbf_sub
     do n = 1, grid % cells_n_nodes(buf_recv_ind(s))
       count = count + 1
-      iwork(count,1) = new_n(grid % cells_n(n,buf_recv_ind(s)))
+      iwork(count,1) = grid % new_n(grid % cells_n(n,buf_recv_ind(s)))
     end do
   end do
   write(9) (iwork(c,1), c = 1, count)
@@ -113,7 +112,7 @@
   ! Cells' processor ids
   count = 0
   do c = 1, grid % n_cells
-    if(new_c(c) .ne. 0) then
+    if(grid % new_c(c) .ne. 0) then
       count = count + 1
       iwork(count,1) = grid % comm % proces(c)
     end if
@@ -127,7 +126,7 @@
   ! Materials on boundary cells
   count = 0
   do c = -1, -grid % n_bnd_cells, -1
-    if(new_c(c) .ne. 0) then
+    if(grid % new_c(c) .ne. 0) then
       count = count + 1
       iwork(count,1) = grid % comm % proces(c)
     end if
@@ -141,7 +140,7 @@
   ! Number of nodes for each face
   count = 0
   do s = 1, grid % n_faces
-    if(new_f(s) .ne. 0) then
+    if(grid % new_f(s) .ne. 0) then
       count = count + 1
       iwork(count,1) = grid % faces_n_nodes(s)
     end if
@@ -151,10 +150,10 @@
   ! Faces' nodes
   count = 0
   do s = 1, grid % n_faces
-    if(new_f(s) .ne. 0) then
+    if(grid % new_f(s) .ne. 0) then
       do n = 1, grid % faces_n_nodes(s)
         count = count + 1
-        iwork(count,1) = new_n(grid % faces_n(n,s))
+        iwork(count,1) = grid % new_n(grid % faces_n(n,s))
       end do
     end if
   end do
@@ -163,11 +162,11 @@
   count = 0
 
   ! nf_sub physical faces
-  do s = 1, grid % n_faces  ! OK, later chooses just faces with new_f
-    if( new_f(s) > 0  .and.  new_f(s) <= nf_sub ) then
+  do s = 1, grid % n_faces  ! OK, later chooses just faces with grid % new_f
+    if( grid % new_f(s) > 0  .and.  grid % new_f(s) <= nf_sub ) then
       count = count + 1
-      iwork(count,1) = new_c(grid % faces_c(1,s))
-      iwork(count,2) = new_c(grid % faces_c(2,s))
+      iwork(count,1) = grid % new_c(grid % faces_c(1,s))
+      iwork(count,2) = grid % new_c(grid % faces_c(2,s))
     end if
   end do
 
@@ -189,12 +188,12 @@
   count = 0 ! count goes to negative
 
   ! nbc_sub physical boundary cells
-  do c = -1, -grid % n_bnd_cells, -1  ! OK, later chooses just cells with new_c
-    if(new_c(c) .ne. 0) then
+  do c = -1, -grid % n_bnd_cells, -1  ! OK, later chooses just cells with grid % new_c
+    if(grid % new_c(c) .ne. 0) then
       count=count-1
-      ! nekad bio i: new_c(c)
+      ! nekad bio i: grid % new_c(c)
       iwork(count,1) = grid % bnd_cond % color(c)
-      iwork(count,2) = new_c(grid % bnd_cond % copy_c(c))
+      iwork(count,2) = grid % new_c(grid % bnd_cond % copy_c(c))
       if(grid % bnd_cond % copy_c(c) .ne. 0) then
         if(grid % comm % proces(grid % bnd_cond % copy_c(c)) .ne. sub) then
           do b=1,nbf_sub
@@ -245,7 +244,7 @@
   do var = 1, 3
     count = 0
     do n=1,grid % n_nodes
-      if(new_n(n) > 0) then
+      if(grid % new_n(n) > 0) then
         count = count + 1
         if(var .eq. 1) work(count) = grid % xn(n)
         if(var .eq. 2) work(count) = grid % yn(n)
@@ -261,7 +260,7 @@
   do var = 1, 3
     count = 0
     do c = 1, grid % n_cells
-      if(new_c(c) > 0) then
+      if(grid % new_c(c) > 0) then
         count = count + 1
         if(var .eq. 1) work(count) = grid % xc(c)
         if(var .eq. 2) work(count) = grid % yc(c)
@@ -284,7 +283,7 @@
   do var = 1, 3
     count = 0
     do c = -1, -grid % n_bnd_cells, -1
-      if(new_c(c) .ne. 0) then
+      if(grid % new_c(c) .ne. 0) then
         count = count + 1
         if(var .eq. 1) work(count) = grid % xc(c)
         if(var .eq. 2) work(count) = grid % yc(c)
@@ -299,7 +298,7 @@
   !------------------!
   count = 0
   do c = 1, grid % n_cells
-    if(new_c(c) > 0) then
+    if(grid % new_c(c) > 0) then
       count = count + 1
       work(count) = grid % vol(c)
     end if
@@ -315,7 +314,7 @@
   !----------------!
   count = 0
   do c = 1, grid % n_cells
-    if(new_c(c) > 0) then
+    if(grid % new_c(c) > 0) then
       count = count + 1
       work(count) = grid % delta(c)
     end if
@@ -331,7 +330,7 @@
   !-------------------!
   count = 0
   do c = 1, grid % n_cells
-    if(new_c(c) > 0) then
+    if(grid % new_c(c) > 0) then
       count = count + 1
       work(count) = grid % wall_dist(c)
     end if
@@ -352,7 +351,7 @@
   count = 0
 
   do s = 1, grid % n_faces
-    if(new_f(s) > 0 .and. new_f(s) <= nf_sub) then
+    if(grid % new_f(s) > 0 .and. grid % new_f(s) <= nf_sub) then
       count = count + 1
       if(var .eq.  1)  work(count) = grid % sx(s)
       if(var .eq.  2)  work(count) = grid % sy(s)
@@ -371,8 +370,8 @@
   ! (think: are they in right order ?)
   do subo = 1, maxval(grid % comm % proces(:))
     do s = 1, grid % n_faces
-      if(new_f(s) > nf_sub .and.  &
-         new_f(s) <= nf_sub + nbf_sub) then
+      if(grid % new_f(s) > nf_sub .and.  &
+         grid % new_f(s) <= nf_sub + nbf_sub) then
         c1 = grid % faces_c(1,s)
         c2 = grid % faces_c(2,s)
         if(c2 > 0) then

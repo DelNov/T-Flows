@@ -4,10 +4,9 @@
 !   Calculate node coordinates inside the domain, block by block.              !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Gen_Mod
-  use Domain_Mod
-  use Grid_Mod
+  use Const_Mod,  only: HUGE, ONE_THIRD
+  use Domain_Mod, only: Domain_Type
+  use Grid_Mod,   only: Grid_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

@@ -4,8 +4,11 @@
 !   Allocates memory for the convertor.                                        !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Gen_Mod
-  use Grid_Mod
+  use Grid_Mod, only: Grid_Type,                &
+                      Grid_Mod_Allocate_Nodes,  &
+                      Grid_Mod_Allocate_Cells,  &
+                      Grid_Mod_Allocate_Faces,  &
+                      Grid_Mod_Allocate_New_Numbers
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -17,6 +20,11 @@
   call Grid_Mod_Allocate_Nodes(grid, grid % n_nodes) 
   call Grid_Mod_Allocate_Cells(grid, grid % n_cells,   grid % n_bnd_cells) 
   call Grid_Mod_Allocate_Faces(grid, grid % n_cells*5) 
+  call Grid_Mod_Allocate_New_Numbers(grid,                &
+                                     grid % n_nodes,      &
+                                     grid % n_bnd_cells,  &
+                                     grid % n_cells,      &
+                                     grid % n_faces)
 
   allocate(grid % bnd_cond % color(-grid % n_bnd_cells:-1))
   grid % bnd_cond % color=0
@@ -26,9 +34,5 @@
   grid % bnd_cond % copy_c = 0
   allocate(grid % bnd_cond % copy_s(2,grid % n_copy))
   grid % bnd_cond % copy_s=0
-
-  allocate(new_n( grid % n_nodes));                      new_n=0  
-  allocate(new_c(-grid % n_bnd_cells-1:grid % n_cells)); new_c=0  
-  allocate(new_f( grid % n_cells*5));                    new_f=0  
 
   end subroutine

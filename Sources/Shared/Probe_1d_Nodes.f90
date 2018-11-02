@@ -5,8 +5,7 @@
 !   direction and write them in file name.1d                                   !
 !------------------------------------------------------------------------------!
   use Name_Mod, only: problem_name
-! use Gen_Mod
-  use Grid_Mod
+  use Grid_Mod, only: Grid_Type
   use Sort_Mod
 !------------------------------------------------------------------------------!
   implicit none

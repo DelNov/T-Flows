@@ -4,47 +4,52 @@
 !   Block structured mesh generation and unstructured cell refinement.         !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Gen_Mod
-  use Domain_Mod  ! domain as defined in ".dom" file.
-  use Grid_Mod
+  use Domain_Mod,  only: Domain_Type
+  use Grid_Mod,    only: Grid_Type,                  &
+                         Grid_Mod_Sort_Faces_Smart,  &
+                         Grid_Mod_Calculate_Wall_Distance
+  use Smooths_Mod, only: Smooths_Type
+  use Refines_Mod, only: Refines_Type
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Locals]-----------------------------------!
-  type(Domain_Type) :: dom    ! domain to be used
-  type(Grid_Type)   :: grid   ! grid which will be generated
-  integer           :: c, s, n
+  type(Domain_Type)  :: dom       ! domain to be used
+  type(Grid_Type)    :: grid      ! grid which will be generated
+  type(Smooths_Type) :: smooths   ! smoothing regions
+  type(Refines_Type) :: refines   ! refinement regions and levels
+  integer            :: c, s, n
 !==============================================================================!
 
   ! Open with a logo
   call Logo_Gen
 
-  call Load_Domain               (dom, grid)
+  call Load_Domain               (dom, smooths, refines, grid)
   call Calculate_Node_Coordinates(dom, grid)
   call Distribute_Regions        (dom, grid)
   call Connect_Blocks            (dom, grid)
   call Connect_Periodicity       (dom, grid)
   call Connect_Copy              (dom, grid)
 
-  ! From this point on, domain is not used anymore
-  call Determine_Grid_Connectivity(grid, .false.)  ! trial run 
+  ! From this point on, domain should not be used anymore
+  call Determine_Grid_Connectivity(refines, grid, .false.)  ! trial run 
   call Calculate_Grid_Geometry    (grid, .false.)
-  call Smooth_Grid                (grid)
-  call Refine_Grid                (grid)
-  call Determine_Grid_Connectivity(grid, .true.)   ! real run
+  call Smooth_Grid                (smooths, grid)
+  call Refine_Grid                (refines, grid)
+  call Determine_Grid_Connectivity(refines, grid, .true.)   ! real run
   call Calculate_Grid_Geometry    (grid, .true.)
 
-  call Grid_Mod_Sort_Faces_Smart(grid)
+  call Grid_Mod_Sort_Faces_Smart       (grid)
   call Grid_Mod_Calculate_Wall_Distance(grid)
 
   ! Prepare for saving
   do n = 1, grid % n_nodes
-    new_n(n) = n
+    grid % new_n(n) = n
   end do
   do c = -grid % n_bnd_cells, grid % n_cells
-    new_c(c) = c
+    grid % new_c(c) = c
   end do
   do s = 1, grid % n_faces
-    new_f(s) = s
+    grid % new_f(s) = s
   end do
 
   ! Coarsen the grid with METIS

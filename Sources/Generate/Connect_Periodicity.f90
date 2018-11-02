@@ -4,9 +4,9 @@
 !   Solve the cell connectivity for periodic boundary conditions.              !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Gen_Mod
-  use Domain_Mod
-  use Grid_Mod
+  use Gen_Mod,    only: n_periodic_cond, periodic_cond, twin_n
+  use Domain_Mod, only: Domain_Type
+  use Grid_Mod,   only: Grid_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -258,8 +258,8 @@
                      + (k1-1)*ni1*nj1 + (j1-1)*ni1 + i1
                   n2 = dom % blocks(b2) % n_nodes  &
                      + (k2-1)*ni2*nj2 + (j2-1)*ni2 + i2
-                  n1 = new_n(n1)
-                  n2 = new_n(n2)
+                  n1 = grid % new_n(n1)
+                  n2 = grid % new_n(n2)
 
                   ! Check if they are already connected
                   do n=1, twin_n(n1,0)

@@ -4,7 +4,7 @@
 !   Searches for a block where the surface defined by n1, n2, n3, n4 is.       !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Domain_Mod
+  use Domain_Mod, only: Domain_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -25,10 +25,10 @@
           ((p1 .eq. n4).and.(p3 .eq. n2)) .or.  &
           ((p1 .eq. n3).and.(p3 .eq. n1)) .or.  &
           ((p1 .eq. n2).and.(p3 .eq. n4)) ) goto 1
-    end do     
+    end do
   end do 
 
-  print *, '# Error message from Generator'
+  print *, '# ERROR!'
   print *, '# You tried to define the surface', n1, n2, n3, n4
   print *, '# but it doesn''t exists in the block specifications.'
   print *, '# Exiting !'

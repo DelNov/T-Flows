@@ -4,10 +4,10 @@
 !   Reads the Fluents (Gambits) neutral file format.                           !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Name_Mod, only: problem_name
-  use Gen_Mod 
-  use Grid_Mod
-  use Tokenizer_Mod
+  use Name_Mod,      only: problem_name
+  use Grid_Mod,      only: Grid_Type,  &
+                           Grid_Mod_Print_Bnd_Cond_List
+  use Tokenizer_Mod  ! it's too small for "only" to be meaningful
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -33,7 +33,7 @@
   ! Read the line which contains usefull information  
   call Tokenizer_Mod_Read_Line(9)
 
-  read(line % tokens(1),*) grid % n_nodes  
+  read(line % tokens(1),*) grid % n_nodes
   read(line % tokens(2),*) grid % n_cells
   read(line % tokens(3),*) n_blocks
   read(line % tokens(4),*) n_bnd_sect
@@ -47,7 +47,7 @@
   !   Count the boundary cells   !
   !------------------------------!
   grid % n_bnd_cells = 0
-  do 
+  do
     call Tokenizer_Mod_Read_Line(9)
     if( line % tokens(1) .eq. 'BOUNDARY' ) then
       do j = 1, n_bnd_sect
@@ -64,7 +64,7 @@
             grid % n_bnd_cells
       go to 1
     end if
-  end do 
+  end do
 
 1 rewind(9)
 

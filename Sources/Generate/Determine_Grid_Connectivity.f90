@@ -1,16 +1,18 @@
 !==============================================================================!
-  subroutine Determine_Grid_Connectivity(grid, rrun) 
+  subroutine Determine_Grid_Connectivity(ref, grid, rrun)
 !------------------------------------------------------------------------------!
 !   Determines the topology of the cells, faces and boundary cells.            !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Gen_Mod
-  use Grid_Mod
+  use Gen_Mod,     only: face_c_to_c, copy_cond
+  use Refines_Mod, only: Refines_Type
+  use Grid_Mod,    only: Grid_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
-  logical         :: rrun
+  type(Refines_Type) :: ref
+  type(Grid_Type)    :: grid
+  logical            :: rrun
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c, s
   integer :: c1, c2, m, pass
@@ -51,8 +53,6 @@
   grid % n_faces = 0     ! initialize the number of sides
   do pass = 1, 2
 
-    if(pass .eq. 2) first_wall_face = grid % n_faces+1
-
     do c1 = 1, grid % n_cells
       do m = 1, 24 ! through all the neighbouring cells
         c2 = grid % cells_c(m, c1)
@@ -79,7 +79,7 @@
 
           ! Nodes of a side grid % n_faces
           if(c2  > 0) then
-            if(ref_level(c2) > ref_level(c1)) then
+            if(ref % cell_level(c2) > ref % cell_level(c1)) then
               grid % faces_n(1,grid % n_faces) =  &
                 grid % cells_n( lfn(face_c_to_c(grid % n_faces,2),4), c2 )
               grid % faces_n(2,grid % n_faces) =  &
@@ -105,10 +105,6 @@
       end do   ! m
     end do     ! c1
   end do       ! pass
-  last_wall_face = grid % n_faces
-
-  print '(a38,i7)', '# Wall and interface faces start at: ', first_wall_face 
-  print '(a38,i7)', '# Wall and interface faces end at  : ', last_wall_face
 
   if(.not. rrun) then
     grid % n_bnd_cells = 0

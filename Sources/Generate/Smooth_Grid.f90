@@ -1,16 +1,17 @@
 !==============================================================================!
-  subroutine Smooth_Grid(grid)
+  subroutine Smooth_Grid(smr, grid)
 !------------------------------------------------------------------------------!
 !   Smooths the grid lines by a Laplacian-like algorythm.                      !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Gen_Mod
-  use Grid_Mod
+  use Const_Mod,   only: HUGE
+  use Smooths_Mod, only: Smooths_Type
+  use Grid_Mod,    only: Grid_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Smooths_Type) :: smr
+  type(Grid_Type)    :: grid
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, n, s, c1, c2, i, j, k, m
   real                 :: x_new_tmp, y_new_tmp, z_new_tmp    
@@ -71,20 +72,20 @@
   !-----------------------------------------!
   !   Exclude nodes which should not move   !
   !-----------------------------------------!
-  do reg = 1, n_smoothing_regions
-    if( ( .not. smooth_in_x(reg) ) .and.  &
-        ( .not. smooth_in_y(reg) ) .and.  &
-        ( .not. smooth_in_z(reg) ) ) then
+  do reg = 1, smr % n_smooths
+    if( ( .not. smr % in_x(reg) ) .and.  &
+        ( .not. smr % in_y(reg) ) .and.  &
+        ( .not. smr % in_z(reg) ) ) then
       do n = 1, grid % n_nodes
-        x1=smooth_regions(reg,1)
-        y1=smooth_regions(reg,2)
-        z1=smooth_regions(reg,3)
-        x8=smooth_regions(reg,4)
-        y8=smooth_regions(reg,5)
-        z8=smooth_regions(reg,6)
-        if( (x1<=grid % xn(n)) .and. (grid % xn(n)<=x8) .and. &
-            (y1<=grid % yn(n)) .and. (grid % yn(n)<=y8) .and. &
-            (z1<=grid % zn(n)) .and. (grid % zn(n)<=z8) ) then
+        x1 = smr % x_min(reg)
+        y1 = smr % y_min(reg)
+        z1 = smr % z_min(reg)
+        x8 = smr % x_max(reg)
+        y8 = smr % y_max(reg)
+        z8 = smr % z_max(reg)
+        if( (x1 <= grid % xn(reg)) .and. (grid % xn(reg) <= x8) .and. &
+            (y1 <= grid % yn(reg)) .and. (grid % yn(reg) <= y8) .and. &
+            (z1 <= grid % zn(reg)) .and. (grid % zn(reg) <= z8) ) then
           node_to_nodes(n,0) = 0
         end if
       end do
@@ -104,15 +105,15 @@
   !---------------------!
   !   Smooth the grid   !
   !---------------------!
-  do reg = 1, n_smoothing_regions
+  do reg = 1, smr % n_smooths
     print *, '# Now smoothing region ',reg,' with:',              &
-                smooth_iters(reg), ' iterations.'
+                smr % iters(reg), ' iterations.'
 
-    do j = 1, smooth_iters(reg)         
+    do j = 1, smr % iters(reg)
 
       ! Calculate new coordinates using the old values 
       do n = 1, grid % n_nodes
-        if(node_to_nodes(n,0)   >  0) then
+        if(node_to_nodes(n,0) > 0) then
           x_new_tmp=0.0
           y_new_tmp=0.0
           z_new_tmp=0.0
@@ -121,55 +122,52 @@
             y_new_tmp = y_new_tmp + grid % yn(node_to_nodes(n,i))
             z_new_tmp = z_new_tmp + grid % zn(node_to_nodes(n,i))
           end do
-          x_new_tmp = x_new_tmp / (1.0*node_to_nodes(n,0)) 
-          y_new_tmp = y_new_tmp / (1.0*node_to_nodes(n,0)) 
-          z_new_tmp = z_new_tmp / (1.0*node_to_nodes(n,0)) 
-          if(grid % xn(n) > 0.001*x_min .and.  &
-             grid % xn(n) < 0.999*x_max)       &
-          x_node_new(n) = (1.0-smooth_relax(reg))*grid % xn(n) &
-                        +      smooth_relax(reg) *x_new_tmp
-          if(grid % yn(n) > 0.001*y_min .and.  &
-             grid % yn(n) < 0.999*y_max)       &
-          y_node_new(n) = (1.0-smooth_relax(reg))*grid % yn(n) &
-                        +      smooth_relax(reg) *y_new_tmp
-          if(grid % zn(n) > 0.001*z_min .and.  &
-             grid % zn(n) < 0.999*z_max)       &
-          z_node_new(n) = (1.0-smooth_relax(reg))*grid % zn(n) &
-                        +      smooth_relax(reg)* z_new_tmp
+          x_new_tmp = x_new_tmp / (1.0*node_to_nodes(n,0))
+          y_new_tmp = y_new_tmp / (1.0*node_to_nodes(n,0))
+          z_new_tmp = z_new_tmp / (1.0*node_to_nodes(n,0))
+          if(grid % xn(n) > 0.001*x_min .and.                            &
+             grid % xn(n) < 0.999*x_max)                                 &
+          x_node_new(n) = (1.0-smr % relax(reg))*grid % xn(n)  &
+                        +      smr % relax(reg) *x_new_tmp
+          if(grid % yn(n) > 0.001*y_min .and.                            &
+             grid % yn(n) < 0.999*y_max)                                 &
+          y_node_new(n) = (1.0-smr % relax(reg))*grid % yn(n)  &
+                        +      smr % relax(reg) *y_new_tmp
+          if(grid % zn(n) > 0.001*z_min .and.                            &
+             grid % zn(n) < 0.999*z_max)                                 &
+          z_node_new(n) = (1.0-smr % relax(reg))*grid % zn(n)  &
+                        +      smr % relax(reg)* z_new_tmp
         end if
-      end do
+      end do  ! through nodes
 
       ! Update coordinates
       do n = 1, grid % n_nodes
         if(node_to_nodes(n,0)   >  0) then
 
-          x1 = smooth_regions(reg,1)
-          y1 = smooth_regions(reg,2)
-          z1 = smooth_regions(reg,3)
-          x8 = smooth_regions(reg,4)
-          y8 = smooth_regions(reg,5)
-          z8 = smooth_regions(reg,6)
+          x1 = smr % x_min(reg)
+          y1 = smr % y_min(reg)
+          z1 = smr % z_min(reg)
+          x8 = smr % x_max(reg)
+          y8 = smr % y_max(reg)
+          z8 = smr % z_max(reg)
 
-          if( (x1 <= grid % xn(n)) .and.  &
-              (grid % xn(n) <= x8) .and.  &
-              (y1 <= grid % yn(n)) .and.  &
-              (grid % yn(n) <= y8) .and.  &
-              (z1 <= grid % zn(n)) .and.  &
-              (grid % zn(n) <= z8) ) then
+          if( (x1 <= grid % xn(n)) .and. (grid % xn(n) <= x8) .and.  &
+              (y1 <= grid % yn(n)) .and. (grid % yn(n) <= y8) .and.  &
+              (z1 <= grid % zn(n)) .and. (grid % zn(n) <= z8) ) then
 
-            if(smooth_in_x(reg)) then
+            if(smr % in_x(reg)) then
               if(grid % xn(n) > 0.001*x_min .and. &
                  grid % xn(n) < 0.999*x_max)  &
               grid % xn(n)=x_node_new(n)
             end if
 
-            if(smooth_in_y(reg)) then
+            if(smr % in_y(reg)) then
               if(grid % yn(n) > 0.001*y_min .and.  &
                  grid % yn(n) < 0.999*y_max)  &
               grid % yn(n)=y_node_new(n)
             end if 
 
-            if(smooth_in_z(reg)) then
+            if(smr % in_z(reg)) then
               if(grid % zn(n) > 0.001*z_min .and.  &
                  grid % zn(n) < 0.999*z_max)  &
               grid % zn(n)=z_node_new(n)

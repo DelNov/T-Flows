@@ -3,10 +3,10 @@
 !------------------------------------------------------------------------------!
 !   Domain as the one used in "Generator"                                      !
 !------------------------------------------------------------------------------!
-  use Point_Mod
-  use Line_Mod
-  use Block_Mod
-  use Region_Mod  ! to store boundary conditions or materials
+  use Point_Mod,  only: Point_Type
+  use Line_Mod,   only: Line_Type
+  use Block_Mod,  only: Block_Type
+  use Region_Mod, only: Region_Type  ! to store boundary conditions
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -20,6 +20,7 @@
     integer :: n_blocks
     integer :: n_lines
     integer :: n_regions
+    integer :: n_smooths
 
     type(Point_Type),  allocatable :: points(:)
     type(Block_Type),  allocatable :: blocks(:)

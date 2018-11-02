@@ -1,18 +1,18 @@
 !==============================================================================!
-  subroutine Load_Cgns(grid)
-!------------------------------------------------------------------------------!
-!   Dummy function in case the code is not linked with CGNS support            !
+  subroutine Refines_Mod_Allocate_Levels(ref, nl)
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Grid_Mod, only: Grid_Type
+  use Const_Mod, only: HUGE
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Refines_Type) :: ref  ! smoothing regions
+  integer            :: nl   ! number of levels
 !==============================================================================!
 
-  print *, '# This version of the code is not compiled with CGNS support!'
-  print *, '# Exiting'
-  stop
+  ref % n_levels  = nl
+
+  allocate(ref % n_regions(nl))
+  allocate(ref % region(nl, 1024, 0:6))
 
   end subroutine

@@ -4,9 +4,8 @@
 !   Solve the cell connectivity after block by block grid generation           !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Gen_Mod
-  use Domain_Mod
-  use Grid_Mod
+  use Domain_Mod, only: Domain_Type
+  use Grid_Mod,   only: Grid_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -31,7 +30,7 @@
 
   ! Initialize the new_n array
   do n = 1, grid % n_nodes
-    new_n(n)=n
+    grid % new_n(n) = n
   end do
 
   ! If number of dom % blocks is equal to one, there is nothing to do
@@ -253,7 +252,7 @@
                    + (k1-1)*ni1*nj1 + (j1-1)*ni1 + i1
                 n2 = dom % blocks(b2) % n_nodes  &
                    + (k2-1)*ni2*nj2 + (j2-1)*ni2 + i2
-                new_n(n2) = new_n(n1)
+                grid % new_n(n2) = grid % new_n(n1)
               end do
             end do
 
@@ -264,18 +263,19 @@
     end do        ! b1
 
     ! Update node numbers
-    do n=dom % blocks(b2) % n_nodes+1, dom % blocks(b2) % n_nodes+ni2*nj2*nk2
-      if(new_n(n) .ne. n) del=del+1
-      if(new_n(n) .eq. n) new_n(n)=new_n(n)-del
+    do n = dom % blocks(b2) % n_nodes + 1,  &
+           dom % blocks(b2) % n_nodes + ni2*nj2*nk2
+      if(grid % new_n(n) .ne. n) del = del + 1
+      if(grid % new_n(n) .eq. n) grid % new_n(n) = grid % new_n(n) - del
     end do 
 
   end do          ! b2 
 
 
   do n = 1, grid % n_nodes
-    grid % xn(new_n(n)) = grid % xn(n)
-    grid % yn(new_n(n)) = grid % yn(n)
-    grid % zn(new_n(n)) = grid % zn(n)
+    grid % xn(grid % new_n(n)) = grid % xn(n)
+    grid % yn(grid % new_n(n)) = grid % yn(n)
+    grid % zn(grid % new_n(n)) = grid % zn(n)
   end do
 
   grid % n_nodes = grid % n_nodes - del
@@ -283,7 +283,7 @@
   ! Skip the merged points in the node() structure
   do i = 1, grid % n_cells
     do n = 1, 8
-      grid % cells_n(n,i) = new_n(grid % cells_n(n, i))
+      grid % cells_n(n,i) = grid % new_n(grid % cells_n(n, i))
     end do
   end do
 

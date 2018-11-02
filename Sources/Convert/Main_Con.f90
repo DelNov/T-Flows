@@ -3,8 +3,9 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Name_Mod, only: problem_name
-  use Gen_Mod
-  use Grid_Mod
+  use Grid_Mod, only: Grid_Type,                        &
+                      Grid_Mod_Sort_Faces_Smart,        &
+                      Grid_Mod_Calculate_Wall_Distance
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Locals]-----------------------------------!
@@ -66,13 +67,13 @@
 
   ! Prepare for saving
   do n = 1, grid % n_nodes
-    new_n(n) = n
+    grid % new_n(n) = n
   end do
   do c = -grid % n_bnd_cells, grid % n_cells
-    new_c(c) = c
+    grid % new_c(c) = c
   end do
   do s = 1, grid % n_faces
-    new_f(s) = s
+    grid % new_f(s) = s
   end do
 
   ! Decompose/coarsen the grid with METIS

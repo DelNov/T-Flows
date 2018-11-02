@@ -1,22 +1,38 @@
 !==============================================================================!
-  subroutine Load_Domain(dom, grid)
+  subroutine Load_Domain(dom, smr, ref, grid)
 !------------------------------------------------------------------------------!
 !   Reads: .dom file                                                           !
 !----------------------------------[Modules]-----------------------------------!
-  use Name_Mod, only: problem_name
+  use Name_Mod,    only: problem_name
   use Gen_Mod
-  use Tokenizer_Mod
-  use Domain_Mod
-  use Grid_Mod
+  use Domain_Mod,  only: Domain_Type,                  &
+                         Domain_Mod_Allocate_Points,   &
+                         Domain_Mod_Allocate_Blocks,   &
+                         Domain_Mod_Allocate_Lines,    &
+                         Domain_Mod_Allocate_Regions
+  use Smooths_Mod, only: Smooths_Type,                 &
+                         Smooths_Mod_Allocate_Smooths
+  use Refines_Mod, only: ELIPSOID, PLANE, RECTANGLE,   &
+                         Refines_Type,                 &
+                         Refines_Mod_Allocate_Cells,   &
+                         Refines_Mod_Allocate_Levels
+  use Grid_Mod,    only: Grid_Type,                    &
+                         Grid_Mod_Allocate_Nodes,      &
+                         Grid_Mod_Allocate_Cells,      &
+                         Grid_Mod_Allocate_Faces,      &
+                         Grid_Mod_Allocate_New_Numbers
+  use Tokenizer_Mod  ! it's too small for "only" to be meaningful
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Domain_Type) :: dom
-  type(Grid_Type)   :: grid
+  type(Domain_Type)  :: dom
+  type(Smooths_Type) :: smr
+  type(Refines_Type) :: ref
+  type(Grid_Type)    :: grid
 !----------------------------------[Calling]-----------------------------------!
-  real :: Tet_Volume   
+  real :: Tet_Volume
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: b, i, l, s, fc, n, n1,n2,n3,n4
+  integer           :: b, i, l, s, fc, n, n1, n2, n3, n4, dumi
   integer           :: n_faces_check, n_nodes_check
   integer           :: ni, nj, nk, npnt, nsurf
   character(len=12) :: dum
@@ -72,23 +88,27 @@
 
   call Grid_Mod_Allocate_Cells(grid,                    &
                                grid % max_n_nodes,      &
-                               grid % max_n_bnd_cells) 
+                               grid % max_n_bnd_cells)
 
-  call Grid_Mod_Allocate_Faces(grid,                &
+  call Grid_Mod_Allocate_Faces(grid,                    &
                                grid % max_n_faces)
 
-  ! Variables declared in Gen_Mod.h90:
+  ! Variables for renumbering
+  call Grid_Mod_Allocate_New_Numbers(grid,                    &
+                                     grid % max_n_nodes,      &
+                                     grid % max_n_bnd_cells,  &
+                                     grid % max_n_nodes,      &
+                                     grid % max_n_faces)
+
+  call Refines_Mod_Allocate_Cells(ref,                     &
+                                  grid % max_n_bnd_cells,  &
+                                  grid % max_n_nodes)
+
+  ! Variables still declared in Gen_Mod.h90:
   allocate (face_c_to_c(grid % max_n_faces,2))
   face_c_to_c=0 
-
-  ! Variables for renumbering
-  allocate (new_n(-grid % max_n_bnd_cells:grid % max_n_nodes));  new_n(:) = 0
-  allocate (new_c(-grid % max_n_bnd_cells:grid % max_n_nodes));  new_c(:) = 0
-  allocate (new_f( grid % max_n_faces));                         new_f(:) = 0
-  allocate (cell_marked(-grid % max_n_bnd_cells :  &
-                         grid % max_n_nodes));       cell_marked(:) = .false.
-  allocate (twin_n(grid % max_n_nodes,0:8));  twin_n (:,:) = 0
-  allocate (ref_level(grid % max_n_nodes));   ref_level(:) = 0
+  allocate (twin_n(grid % max_n_nodes,0:8));  
+  twin_n (:,:) = 0
 
   print *, '# Allocation successfull !'
 
@@ -378,38 +398,35 @@
   !   Refinement levels and regions   !
   !-----------------------------------!
   call Tokenizer_Mod_Read_Line(9)
-  read(line % tokens(1), *) n_refine_levels ! number of refinement levels
-  print '(a38,i7)', '# Number of refinement levels:       ', n_refine_levels
+  read(line % tokens(1), *) ref % n_levels     ! number of refinement levels
+  print '(a38,i7)', '# Number of refinement levels:       ', ref % n_levels
 
-  allocate (refined_regions(n_refine_levels, 1024, 0:6))
-  allocate (n_refined_regions(n_refine_levels))
+  call Refines_Mod_Allocate_Levels(ref, ref % n_levels)
 
-  do l=1,n_refine_levels
+  do l = 1, ref % n_levels
     print *, 'Level: ', l
     call Tokenizer_Mod_Read_Line(9)
-    read(line % tokens(2), *) n_refined_regions(l)
+    read(line % tokens(2), *) ref % n_regions(l)
 
     ! Browse through regions in level "l"
-    do n = 1, n_refined_regions(l)
+    do n = 1, ref % n_regions(l)
       call Tokenizer_Mod_Read_Line(9)
       read(line % tokens(3),*) answer
       call To_Upper_Case(answer)
-      if(answer .eq. 'RECTANGLE') then
-        refined_regions(l,n,0) = RECTANGLE
-      elseif(answer .eq. 'ELIPSOID') then
-        refined_regions(l,n,0) = ELIPSOID 
-      elseif(answer .eq. 'PLANE') then
-        refined_regions(l,n,0) = PLANE
-      else
-        print *, 'Error in input file: ', answer
+      ref % region(l,n,0) = -1
+      if(answer .eq. 'RECTANGLE') ref % region(l,n,0) = RECTANGLE
+      if(answer .eq. 'ELIPSOID')  ref % region(l,n,0) = ELIPSOID 
+      if(answer .eq. 'PLANE')     ref % region(l,n,0) = PLANE
+      if(ref % region(l,n,0) .eq. -1) then
+        print *, 'ERROR!  Refinement shape not specified well by: ', answer
         stop
       end if
 
       call Tokenizer_Mod_Read_Line(9)
-      read(line % whole, *)                                       &
-                refined_regions(l,n,1),refined_regions(l,n,2),    &
-                refined_regions(l,n,3),refined_regions(l,n,4),    &
-                refined_regions(l,n,5),refined_regions(l,n,6)
+      read(line % whole, *)                                  &
+                ref % region(l,n,1), ref % region(l,n,2),    &
+                ref % region(l,n,3), ref % region(l,n,4),    &
+                ref % region(l,n,5), ref % region(l,n,6)
     end do
   end do
 
@@ -417,62 +434,50 @@
   !   Smoothing regions   !
   !-----------------------!
   call Tokenizer_Mod_Read_Line(9)
-  read(line % tokens(1), *) n_smoothing_regions  ! number of smoothing regions
+  read(line % tokens(1), *) smr % n_smooths  ! number of smoothing regions
 
-  print '(a38,i7)', '# Number of (non)smoothing regions:  ', n_smoothing_regions
+  print '(a38,i7)', '# Number of (non)smoothing regions:  ', smr % n_smooths
 
-  allocate (smooth_in_x   (n_smoothing_regions))
-  allocate (smooth_in_y   (n_smoothing_regions))
-  allocate (smooth_in_z   (n_smoothing_regions))
-  allocate (smooth_iters  (n_smoothing_regions))
-  allocate (smooth_relax  (n_smoothing_regions))
-  allocate (smooth_regions(n_smoothing_regions, 0:6))
+  call Smooths_Mod_Allocate_Smooths(smr, smr % n_smooths)
 
-  do n=1, n_smoothing_regions
-    smooth_in_x(n) = .false.
-    smooth_in_y(n) = .false.
-    smooth_in_z(n) = .false.
+  do n = 1, smr % n_smooths
+    smr % in_x(n) = .false.
+    smr % in_y(n) = .false.
+    smr % in_z(n) = .false.
     call Tokenizer_Mod_Read_Line(9)
-    read(line % tokens(1), *) smooth_regions(n,0)
+    read(line % tokens(1), *) dumi    ! this line is probably not needed
     if(line % n_tokens .eq. 4) then   ! smoothing in three directions
-      smooth_in_x(n) = .true.
-      smooth_in_y(n) = .true.
-      smooth_in_z(n) = .true.
+      smr % in_x(n) = .true.
+      smr % in_y(n) = .true.
+      smr % in_z(n) = .true.
     else if(line % n_tokens .eq. 3) then
       call To_Upper_Case(line % tokens(2))
       call To_Upper_Case(line % tokens(3))
-      if( line % tokens(2) .eq. 'X' )  &
-          smooth_in_x(n) = .true.
-      if( line % tokens(3) .eq. 'X' )  &
-          smooth_in_x(n) = .true.
-      if( line % tokens(2) .eq. 'Y' )  &
-          smooth_in_y(n) = .true.
-      if( line % tokens(3) .eq. 'Y' )  &
-          smooth_in_y(n) = .true.
-      if( line % tokens(2) .eq. 'Z' )  &
-          smooth_in_z(n) = .true.
-      if( line % tokens(3) .eq. 'Z' )  &
-          smooth_in_z(n) = .true.
+      if( line % tokens(2) .eq. 'X' )  smr % in_x(n) = .true.
+      if( line % tokens(3) .eq. 'X' )  smr % in_x(n) = .true.
+      if( line % tokens(2) .eq. 'Y' )  smr % in_y(n) = .true.
+      if( line % tokens(3) .eq. 'Y' )  smr % in_y(n) = .true.
+      if( line % tokens(2) .eq. 'Z' )  smr % in_z(n) = .true.
+      if( line % tokens(3) .eq. 'Z' )  smr % in_z(n) = .true.
     else if(line % n_tokens .eq. 2) then
       call To_Upper_Case(line % tokens(2))
-      if( line % tokens(2) .eq. 'X' )  &
-          smooth_in_x(n) = .true.
-      if( line % tokens(2) .eq. 'Y' )  &
-          smooth_in_y(n) = .true.
-      if( line % tokens(2) .eq. 'Z' )  &
-          smooth_in_z(n) = .true.
+      if( line % tokens(2) .eq. 'X' )  smr % in_x(n) = .true.
+      if( line % tokens(2) .eq. 'Y' )  smr % in_y(n) = .true.
+      if( line % tokens(2) .eq. 'Z' )  smr % in_z(n) = .true.
     end if 
 
     ! Read the coordinates of the (non)smoothed region
     call Tokenizer_Mod_Read_Line(9)
-    read(line % whole, *) smooth_iters(n), smooth_relax(n)
+    read(line % whole, *) smr % iters(n),  &
+                          smr % relax(n)
+
     call Tokenizer_Mod_Read_Line(9)
-    read(line % whole, *) smooth_regions(n,1),  &
-                          smooth_regions(n,2),  &
-                          smooth_regions(n,3),  &
-                          smooth_regions(n,4),  &
-                          smooth_regions(n,5),  &
-                          smooth_regions(n,6)
+    read(line % whole, *) smr % x_min(n),   &
+                          smr % y_min(n),   &
+                          smr % z_min(n),   &
+                          smr % x_max(n),   &
+                          smr % y_max(n),   &
+                          smr % z_max(n)
   end do
 
   close(9)

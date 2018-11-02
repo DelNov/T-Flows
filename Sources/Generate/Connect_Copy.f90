@@ -4,9 +4,9 @@
 !   Solve the cell connectivity for copy boundary conditions.                  !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Gen_Mod
-  use Domain_Mod
-  use Grid_Mod
+  use Gen_Mod,    only: n_copy_cond, copy_cond
+  use Domain_Mod, only: Domain_Type
+  use Grid_Mod,   only: Grid_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -31,7 +31,7 @@
   !-----------------------------------------------------!
   n_cop = 0
 
-  do p = 1, n_copy_cond    
+  do p = 1, n_copy_cond
     do b2 = 1, size(dom % blocks)
       do b1 = 1, size(dom % blocks)
         do f2 = 1, 6    ! faces of the second block
@@ -54,14 +54,14 @@
             n23 = dom % blocks(b2) % faces(f2, 3)
             n24 = dom % blocks(b2) % faces(f2, 4)
 
-            p11=copy_cond(p, 1)
-            p12=copy_cond(p, 2)
-            p13=copy_cond(p, 3)
-            p14=copy_cond(p, 4) 
-            p21=copy_cond(p, 5)
-            p22=copy_cond(p, 6)
-            p23=copy_cond(p, 7)
-            p24=copy_cond(p, 8)
+            p11 = copy_cond(p, 1)
+            p12 = copy_cond(p, 2)
+            p13 = copy_cond(p, 3)
+            p14 = copy_cond(p, 4) 
+            p21 = copy_cond(p, 5)
+            p22 = copy_cond(p, 6)
+            p23 = copy_cond(p, 7)
+            p24 = copy_cond(p, 8)
 
           ! Check if they are connected 
           if( ( ((n11 .eq. p11).and.(n13 .eq. p13)) .or.                &
@@ -185,31 +185,31 @@
               end if
 
               ! Set the constant directions
-              if(f1 .eq. 1) trans1(3,1)=1
-              if(f1 .eq. 2) trans1(2,1)=1
-              if(f1 .eq. 3) trans1(1,1)=dom % blocks(b1) % resolutions(1)-1
-              if(f1 .eq. 4) trans1(2,1)=dom % blocks(b1) % resolutions(2)-1
-              if(f1 .eq. 5) trans1(1,1)=1
-              if(f1 .eq. 6) trans1(3,1)=dom % blocks(b1) % resolutions(3)-1
+              if(f1 .eq. 1) trans1(3,1) = 1
+              if(f1 .eq. 2) trans1(2,1) = 1
+              if(f1 .eq. 3) trans1(1,1) = dom % blocks(b1) % resolutions(1)-1
+              if(f1 .eq. 4) trans1(2,1) = dom % blocks(b1) % resolutions(2)-1
+              if(f1 .eq. 5) trans1(1,1) = 1
+              if(f1 .eq. 6) trans1(3,1) = dom % blocks(b1) % resolutions(3)-1
 
-              if(f2 .eq. 1) trans2(3,1)=1
-              if(f2 .eq. 2) trans2(2,1)=1
-              if(f2 .eq. 3) trans2(1,1)=dom % blocks(b2) % resolutions(1)-1
-              if(f2 .eq. 4) trans2(2,1)=dom % blocks(b2) % resolutions(2)-1
-              if(f2 .eq. 5) trans2(1,1)=1
-              if(f2 .eq. 6) trans2(3,1)=dom % blocks(b2) % resolutions(3)-1 
+              if(f2 .eq. 1) trans2(3,1) = 1
+              if(f2 .eq. 2) trans2(2,1) = 1
+              if(f2 .eq. 3) trans2(1,1) = dom % blocks(b2) % resolutions(1)-1
+              if(f2 .eq. 4) trans2(2,1) = dom % blocks(b2) % resolutions(2)-1
+              if(f2 .eq. 5) trans2(1,1) = 1
+              if(f2 .eq. 6) trans2(3,1) = dom % blocks(b2) % resolutions(3)-1 
 
               ! Finally conect the two copy boundaries
               ! now, connect the cells in the interior
               do jg=1,njg-1              ! through volumes only
                 do ig=1,nig-1            ! through volumes only
                   n_cop = n_cop + 1
-                  ci1=dom % blocks(b1) % resolutions(1)-1
-                  cj1=dom % blocks(b1) % resolutions(2)-1
-                  ck1=dom % blocks(b1) % resolutions(3)-1
-                  ci2=dom % blocks(b2) % resolutions(1)-1
-                  cj2=dom % blocks(b2) % resolutions(2)-1
-                  ck2=dom % blocks(b2) % resolutions(3)-1
+                  ci1 = dom % blocks(b1) % resolutions(1)-1
+                  cj1 = dom % blocks(b1) % resolutions(2)-1
+                  ck1 = dom % blocks(b1) % resolutions(3)-1
+                  ci2 = dom % blocks(b2) % resolutions(1)-1
+                  cj2 = dom % blocks(b2) % resolutions(2)-1
+                  ck2 = dom % blocks(b2) % resolutions(3)-1
                   i1 = trans1(1,1)+trans1(1,2)*ig+trans1(1,3)*jg
                   j1 = trans1(2,1)+trans1(2,2)*ig+trans1(2,3)*jg
                   k1 = trans1(3,1)+trans1(3,2)*ig+trans1(3,3)*jg 
@@ -224,7 +224,7 @@
                   grid % bnd_cond % copy_s(1, n_cop) = c1
                   grid % bnd_cond % copy_s(2, n_cop) = c2
                 end do
-              end do        
+              end do
 
             end if  ! are they connected ? 
 

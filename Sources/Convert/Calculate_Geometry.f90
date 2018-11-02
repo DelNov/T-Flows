@@ -4,10 +4,12 @@
 !   Calculates geometrical quantities of the grid.                             !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Gen_Mod
-  use Grid_Mod
-  use Tokenizer_Mod
+  use Const_Mod, only: HUGE, PI, ONE_THIRD
+  use Grid_Mod,  only: Grid_Type,                        &
+                       Grid_Mod_Estimate_Big_And_Small,  &
+                       Grid_Mod_Print_Bnd_Cond_List
+  use Sort_Mod       ! it's a collection of subroutines, no need for "only"
+  use Tokenizer_Mod  ! it's too small for "only" to be meaningful
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -19,7 +21,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, c1, c2, n, s, ss, cc2, c_max, nnn, hh, mm, b
   integer              :: c11, c12, c21, c22, s1, s2, bou_cen, cnt_bnd, cnt_per
-  integer              :: color_per, n_per, number_sides, option
+  integer              :: color_per, n_per, number_faces, option
   integer              :: rot_dir
   real                 :: xt(4), yt(4), zt(4), angle_face, tol
   real                 :: xs2, ys2, zs2, x_a, y_a, z_a, x_b, y_b, z_b
@@ -651,28 +653,28 @@
   !   Compress all boundary cells   !
   !---------------------------------!
   cnt_bnd = 0
-  new_c = 0
+  grid % new_c = 0
   do c = -1, -grid % n_bnd_cells, -1
     if(grid % bnd_cond % color(c) .ne. color_per) then
       cnt_bnd = cnt_bnd + 1
-      new_c(c) = -cnt_bnd
+      grid % new_c(c) = -cnt_bnd
     end if
   end do
 
   do c = -1, -grid % n_bnd_cells, -1
-    if(new_c(c) .ne. 0) then
-      grid % xc(new_c(c)) = grid % xc(c)
-      grid % yc(new_c(c)) = grid % yc(c)
-      grid % zc(new_c(c)) = grid % zc(c)
-     grid % bnd_cond % color(new_c(c)) = grid % bnd_cond % color(c)
+    if(grid % new_c(c) .ne. 0) then
+      grid % xc(grid % new_c(c)) = grid % xc(c)
+      grid % yc(grid % new_c(c)) = grid % yc(c)
+      grid % zc(grid % new_c(c)) = grid % zc(c)
+     grid % bnd_cond % color(grid % new_c(c)) = grid % bnd_cond % color(c)
     end if
   end do
 
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
-    if(new_c(c2) .ne. 0) then
-      grid % faces_c(2,s) = new_c(c2)
+    if(grid % new_c(c2) .ne. 0) then
+      grid % faces_c(2,s) = grid % new_c(c2)
     end if
   end do
 
@@ -771,19 +773,19 @@
   !   Phase III  ->  find the new numbers of cell faces   !
   !                                                       !
   !-------------------------------------------------------!
-  number_sides = 0
+  number_faces = 0
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
     if(c1 > 0) then
-      number_sides = number_sides  + 1
-      new_f(s) = number_sides
+      number_faces = number_faces  + 1
+      grid % new_f(s) = number_faces
     else
-      new_f(s) = -1
+      grid % new_f(s) = -1
     end if
   end do
   print '(a38,i9)', ' # Old number of faces:               ',  grid % n_faces
-  print '(a38,i9)', ' # New number of faces:               ',  number_sides
+  print '(a38,i9)', ' # New number of faces:               ',  number_faces
 
   !--------------------------------------!
   !                                      !
@@ -791,26 +793,26 @@
   !                                      !
   !--------------------------------------!
   do s = 1, grid % n_faces
-    if(new_f(s) > 0) then
-      grid % faces_c(1,new_f(s)) = grid % faces_c(1,s)
-      grid % faces_c(2,new_f(s)) = grid % faces_c(2,s)
-      grid % faces_n_nodes(new_f(s)) = grid % faces_n_nodes(s)
-      grid % faces_n(1,new_f(s)) = grid % faces_n(1,s)
-      grid % faces_n(2,new_f(s)) = grid % faces_n(2,s)
-      grid % faces_n(3,new_f(s)) = grid % faces_n(3,s)
-      grid % faces_n(4,new_f(s)) = grid % faces_n(4,s)
-      grid % xf(new_f(s)) = grid % xf(s)
-      grid % yf(new_f(s)) = grid % yf(s)
-      grid % zf(new_f(s)) = grid % zf(s)
-      grid % sx(new_f(s)) = grid % sx(s)
-      grid % sy(new_f(s)) = grid % sy(s)
-      grid % sz(new_f(s)) = grid % sz(s)
-      grid % dx(new_f(s)) = grid % dx(s)
-      grid % dy(new_f(s)) = grid % dy(s)
-      grid % dz(new_f(s)) = grid % dz(s)
+    if(grid % new_f(s) > 0) then
+      grid % faces_c(1,grid % new_f(s)) = grid % faces_c(1,s)
+      grid % faces_c(2,grid % new_f(s)) = grid % faces_c(2,s)
+      grid % faces_n_nodes(grid % new_f(s)) = grid % faces_n_nodes(s)
+      grid % faces_n(1,grid % new_f(s)) = grid % faces_n(1,s)
+      grid % faces_n(2,grid % new_f(s)) = grid % faces_n(2,s)
+      grid % faces_n(3,grid % new_f(s)) = grid % faces_n(3,s)
+      grid % faces_n(4,grid % new_f(s)) = grid % faces_n(4,s)
+      grid % xf(grid % new_f(s)) = grid % xf(s)
+      grid % yf(grid % new_f(s)) = grid % yf(s)
+      grid % zf(grid % new_f(s)) = grid % zf(s)
+      grid % sx(grid % new_f(s)) = grid % sx(s)
+      grid % sy(grid % new_f(s)) = grid % sy(s)
+      grid % sz(grid % new_f(s)) = grid % sz(s)
+      grid % dx(grid % new_f(s)) = grid % dx(s)
+      grid % dy(grid % new_f(s)) = grid % dy(s)
+      grid % dz(grid % new_f(s)) = grid % dz(s)
     end if
   end do
-  grid % n_faces = number_sides
+  grid % n_faces = number_faces
 
   !-----------------------------------!
   !   Check the periodic boundaries   !

@@ -4,10 +4,9 @@
 !   Places the nodes on the line defined with local block position             !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Gen_Mod
-  use Domain_Mod
-  use Grid_Mod
+  use Const_Mod,  only: HUGE
+  use Domain_Mod, only: Domain_Type
+  use Grid_Mod,   only: Grid_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -24,7 +23,7 @@
 
   ni = dom % blocks(b) % resolutions(1)
   nj = dom % blocks(b) % resolutions(2)
-  nk = dom % blocks(b) % resolutions(3)   
+  nk = dom % blocks(b) % resolutions(3)
 
   x0   = grid % xn(grid % n_nodes+(ks-1)*ni*nj+(js-1)*ni+is)
   y0   = grid % yn(grid % n_nodes+(ks-1)*ni*nj+(js-1)*ni+is)

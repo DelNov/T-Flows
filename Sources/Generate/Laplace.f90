@@ -6,10 +6,9 @@
 !   Places the nodes inside the block using Laplace-like function              !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Gen_Mod
-  use Domain_Mod
-  use Grid_Mod
+  use Const_Mod,  only: HUGE
+  use Domain_Mod, only: Domain_Type
+  use Grid_Mod,   only: Grid_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

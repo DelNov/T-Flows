@@ -11,10 +11,9 @@
 !   Note: boundary faces have been determined in "Grid_Topology"               !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Gen_Mod 
-  use Grid_Mod
-  use Sort_Mod
+  use Const_Mod, only: HUGE
+  use Grid_Mod,  only: Grid_Type
+  use Sort_Mod   ! it's a collection of subroutines, no need for "only"
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

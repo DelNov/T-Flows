@@ -134,6 +134,8 @@ SRC_MOD += Point_Mod.f90		\
            Line_Mod.f90			\
            Block_Mod.f90		\
            Region_Mod.f90		\
+           Smooths_Mod.f90		\
+           Refines_Mod.f90		\
            Domain_Mod.f90
 
 #---------------
