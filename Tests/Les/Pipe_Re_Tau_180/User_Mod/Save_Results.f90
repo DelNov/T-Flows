@@ -24,15 +24,16 @@
   real,allocatable    :: z_p(:), u_p(:), v_p(:), w_p(:), t_p(:), y_plus_p(:),  &
                          ind(:),  wall_p(:), kin_p(:), eps_p(:),               &
                          uw_p(:), uu_p(:), vv_p(:), ww_p(:),                   &
-                         tt_p(:), ut_p(:), vt_p(:), wt_p(:),                   &
+                         tt_p(:), ut_p(:), vt_p(:), wt_p(:)
   integer,allocatable :: n_p(:), n_count(:)
-  real                :: t_wall, t_tau, d_wall, nu_max 
+  real                :: t_wall, t_tau, d_wall, nu_max, b11, b12, b22, b21 
   real                :: ubulk, error, re, cf_dean, cf, pr, u_tau_p
+  real                :: uu_c, vv_c, ww_c, uv_c, uw_c, vw_c, r, rad
   logical             :: there
 !==============================================================================!
 
   ! Set the name for coordinate file
-  call Name_File(0, coord_name, ".1d")
+  call Name_File(0, coord_name, ".1r")
 
   ! Store the name
   store_name = problem_name
@@ -65,7 +66,7 @@
     return
   end if
 
-  ubulk = bulk % flux_x / (density*bulk % area_x)
+  ubulk = abs(bulk % flux_z / (density*bulk % area_z))
   t_wall = 0.0
   nu_max = 0.0
   n_points = 0
@@ -107,19 +108,34 @@
   !   Average the results   !
   !-------------------------!
   do i = 1, n_prob-1
-    do c = 1, grid % n_cells - grid % comm % n_buff_cells 
-      if(grid % zc(c) > (z_p(i)) .and.  &
-         grid % zc(c) < (z_p(i+1))) then
+    do c = 1, grid % n_cells - grid % comm % n_buff_cells
+      rad = 1.0 - grid % wall_dist(c)
+      if( rad < (z_p(i)) .and.  &
+          rad > (z_p(i+1))) then
+        r = sqrt(grid % xc(c)**2 + grid % yc(c)**2)
+        b11 =  grid % xc(c) / r
+        b12 =  grid % yc(c) / r
+        b21 = -grid % yc(c) / r
+        b22 =  b11
 
         wall_p(i) = wall_p(i) + grid % wall_dist(c)
         u_p   (i) = u_p   (i) + u % mean(c)
         v_p   (i) = v_p   (i) + v % mean(c)
-        w_p   (i) = w_p   (i) + w % mean(c)
+        w_p   (i) = w_p   (i) + abs(w % mean(c))
 
-        uu_p(i) = uu_p(i) + uu % mean(c) - u % mean(c) * u % mean(c)
-        vv_p(i) = vv_p(i) + vv % mean(c) - v % mean(c) * v % mean(c)
-        ww_p(i) = ww_p(i) + ww % mean(c) - w % mean(c) * w % mean(c)
-        uw_p(i) = uw_p(i) + uw % mean(c) - u % mean(c) * w % mean(c)
+        uu_c    = uu % mean(c) - u % mean(c) * u % mean(c)
+        vv_c    = vv % mean(c) - v % mean(c) * v % mean(c)
+        ww_c    = ww % mean(c) - w % mean(c) * w % mean(c)
+        uv_c    = uv % mean(c) - u % mean(c) * v % mean(c)
+        uw_c    = uw % mean(c) - u % mean(c) * w % mean(c)
+        vw_c    = vw % mean(c) - v % mean(c) * w % mean(c)
+
+        uu_p(i) = uu_p(i) + b11*b11*uu_c + b11*b12*uv_c &
+                          + b12*b11*uv_c + b12*b12*vv_c
+        vv_p(i) = vv_p(i) + b21*b21*uu_c + b21*b22*uv_c &
+                          + b22*b21*uv_c + b22*b22*vv_c
+        ww_p(i) = ww_p(i) + ww % n(c)
+        uw_p(i) = uw_p(i) + abs(b11*uw_c + b12*vw_c)
 
         if(heat_transfer) then
           t_p(i)  = t_p(i)  + t % mean(c)
@@ -132,7 +148,6 @@
       end if
     end do
   end do
-
 
   ! Average over all processors
   do pl=1, n_prob-1
@@ -185,11 +200,11 @@
   end do
 
   ! Calculating friction velocity and friction temperature
-    u_tau_p = sqrt( (viscosity*sqrt(u_p(1)**2 +   &
-                                    v_p(1)**2 +   &
-                                    w_p(1)**2)    &
-                                    / wall_p(1))  &
-                                    / density)
+  u_tau_p = sqrt( (viscosity*sqrt(u_p(1)**2 +   &
+                                  v_p(1)**2 +   &
+                                  w_p(1)**2)    &
+                                  / wall_p(1))  &
+                                  / density)
   if(u_tau_p .eq. 0.0) then
     if(this_proc < 2) then
       write(*,*) '# Friction velocity is zero in Save_Results.f90!'
@@ -200,8 +215,8 @@
     return
   end if
 
-  if(heat_transfer) then 
-    d_wall = 0.0 
+  if(heat_transfer) then
+    d_wall = 0.0
     do c = 1, grid % n_cells
       if(grid % wall_dist(c) > d_wall) then
         d_wall = grid % wall_dist(c)
@@ -244,7 +259,7 @@
 
   open(3, file = res_name)
   open(4, file = res_name_plus)
-  
+
   do i = 3, 4
     pr = viscosity * capacity / conductivity
     re = density * ubulk * 2.0/viscosity
@@ -289,7 +304,7 @@
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
         write(3,'(12e15.7)') wall_p(i),                       &
-                             u_p(i),                          &
+                             w_p(i),                          &
                              uu_p(i),                         &
                              vv_p(i),                         &
                              ww_p(i),                         &
@@ -306,7 +321,7 @@
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
         write(3,'(7e15.7)')  wall_p(i),                       &
-                             u_p(i),                          &
+                             w_p(i),                          &
                              uu_p(i),                         &
                              vv_p(i),                         &
                              ww_p(i),                         &
@@ -322,8 +337,6 @@
     v_p   (i) = v_p(i) / u_tau_p
     w_p   (i) = w_p(i) / u_tau_p
 
-    kin_p(i) = kin_p(i) / u_tau_p**2                      ! kin%n(c)
-    eps_p(i) = eps_p(i)*viscosity / (u_tau_p**4*density)  ! eps%n(c)
     uu_p (i) = uu_p (i) / (u_tau_p**2)
     vv_p (i) = vv_p (i) / (u_tau_p**2)
     ww_p (i) = ww_p (i) / (u_tau_p**2)
@@ -342,7 +355,7 @@
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
         write(4,'(12e15.7)') wall_p(i),                       &
-                             u_p(i),                          &
+                             w_p(i),                          &
                              uu_p(i),                         &
                              vv_p(i),                         &
                              ww_p(i),                         &
@@ -359,7 +372,7 @@
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
         write(4,'(7e15.7)')  wall_p(i),                       &
-                             u_p(i),                          &
+                             w_p(i),                          &
                              uu_p(i),                         &
                              vv_p(i),                         &
                              ww_p(i),                         &
@@ -381,6 +394,7 @@
   deallocate(vv_p)
   deallocate(ww_p)
   deallocate(uw_p)
+  deallocate(wall_p)
   if(heat_transfer) then
     deallocate(t_p)
     deallocate(tt_p)
