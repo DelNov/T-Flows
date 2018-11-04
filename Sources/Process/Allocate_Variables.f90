@@ -269,10 +269,6 @@
 
       if(heat_transfer) then
         call Var_Mod_Allocate_Statistics(t)
-        call Var_Mod_Allocate_New_Only('TT', tt, grid)
-        call Var_Mod_Allocate_New_Only('UT', ut, grid)
-        call Var_Mod_Allocate_New_Only('VT', vt, grid)
-        call Var_Mod_Allocate_New_Only('WT', wt, grid)
         call Var_Mod_Allocate_Statistics(tt)
         call Var_Mod_Allocate_Statistics(ut)
         call Var_Mod_Allocate_Statistics(vt)
