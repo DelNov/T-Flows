@@ -34,13 +34,13 @@
   !-------------------------------!
   !  Set source for temperature   !
   !-------------------------------!
-  if( phi % name .eq. 'T' ) then
+  if( phi % name .eq. 'T' ) then  
     do c = 1, grid % n_cells
-      b(c) = b(c) -   2.0 * heat_flux * u % n(c)  &
-           / bulk % flux_x * grid % vol(c)
+      b(c) = b(c) -   2.0 * heat_flux * u % n(c) &
+      / bulk % flux_x * grid % vol(c)
     end do
   end if
-
+  
   !---------------------------------------------!
   !  Set source for turbulent kintetic energy   !
   !---------------------------------------------!
