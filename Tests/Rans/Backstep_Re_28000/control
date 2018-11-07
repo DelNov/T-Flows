@@ -2,8 +2,8 @@ Problem
  PROBLEM_NAME    backstep
 
 Time integration
- NUMBER_OF_TIME_STEPS                 2001
- TIME_STEP                            0.051
+ NUMBER_OF_TIME_STEPS                 2400
+ TIME_STEP                            0.05
 
 Saving intervals
  RESULTS_SAVE_INTERVAL   300

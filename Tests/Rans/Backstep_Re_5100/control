@@ -13,7 +13,7 @@ Problem name (this line is a comment)
 Time resolution
 
  TIME_STEP                            0.01
- NUMBER_OF_TIME_STEPS                 1000
+ NUMBER_OF_TIME_STEPS                 1200
 
 Monitoring
 
