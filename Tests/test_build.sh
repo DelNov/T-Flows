@@ -6,7 +6,7 @@
 # compilation flags
 FCOMP="gnu"
 # conduct tests with DEBUG=yes
-DEBUG="no"
+DEBUG="yes"
 # repeat tests with CGNS_HDF5=yes
 CGNS="yes"
 
@@ -32,7 +32,7 @@ LAMINAR_BACKSTEP_NON_ORTH_DIR=$TEST_DIR/Laminar/Backstep/Nonorthogonal
 LES_CAVITY_LID_DRIVEN_DIR=$TEST_DIR/Laminar/Cavity/Lid_Driven/Re_1000
 LES_CAVITY_THERM_DRIVEN_DIR=$TEST_DIR/Laminar/Cavity/Thermally_Driven/Ra_10e6
 
-RANS_BACKSTEP_26000_DIR=$TEST_DIR/Rans/Backstep_Re_26000_Rsm
+RANS_BACKSTEP_5100_DIR=$TEST_DIR/Rans/Backstep_Re_5100
 RANS_BACKSTEP_28000_DIR=$TEST_DIR/Rans/Backstep_Re_28000
 
 RANS_CHANNEL_LR_LONG_DIR=$TEST_DIR/Rans/Channel_Re_Tau_590/Long_Domain
@@ -202,7 +202,7 @@ function generator_tests {
   make_links $LES_CAVITY_LID_DRIVEN_DIR;      launch_generate
   make_links $LES_CAVITY_THERM_DRIVEN_DIR;    launch_generate
 
-  make_links $RANS_BACKSTEP_26000_DIR;        launch_generate
+  make_links $RANS_BACKSTEP_5100_DIR;         launch_generate
   make_links $RANS_BACKSTEP_28000_DIR;        launch_generate
 
   make_links $RANS_CHANNEL_LR_LONG_DIR;       launch_generate
@@ -223,7 +223,7 @@ function generator_tests {
     make_links $LES_CAVITY_LID_DRIVEN_DIR;      launch_generate
     make_links $LES_CAVITY_THERM_DRIVEN_DIR;    launch_generate
 
-    make_links $RANS_BACKSTEP_26000_DIR;        launch_generate
+    make_links $RANS_BACKSTEP_5100_DIR;         launch_generate
     make_links $RANS_BACKSTEP_28000_DIR;        launch_generate
 
     make_links $RANS_CHANNEL_LR_LONG_DIR;       launch_generate
@@ -321,7 +321,7 @@ function divide_tests {
   cd $LAMINAR_BACKSTEP_NON_ORTH_DIR;  launch_divide
   cd $LES_CAVITY_LID_DRIVEN_DIR;      launch_divide
   cd $LES_CAVITY_THERM_DRIVEN_DIR;    launch_divide
-  cd $RANS_BACKSTEP_26000_DIR;        launch_divide
+  cd $RANS_BACKSTEP_5100_DIR;         launch_divide
   cd $RANS_BACKSTEP_28000_DIR;        launch_divide
   cd $RANS_CHANNEL_LR_LONG_DIR;       launch_divide
   cd $RANS_CHANNEL_LR_RSM_DIR;        launch_divide
