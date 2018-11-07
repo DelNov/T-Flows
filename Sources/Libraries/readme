@@ -1,9 +1,8 @@
 This is directory for third party libraries.
 
 At the moment, it contains CGNS libraries, version 3.2.1,
-with ADF5 and HDF5 support:
+with HDF5 support:
 
-Cgnslib_3.2.1_Linux_64_Adf5_Seq
 Cgnslib_3.2.1_Linux_64_Hdf5_Seq
 
 In addition, there is HDF5 library, if needed:

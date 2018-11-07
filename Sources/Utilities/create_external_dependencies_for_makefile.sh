@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # it is an useful script to create "makefile_explicit_dependencies"
-# reason why you may wnat to use this:
+# reason why you may want to use this:
 # when you edit some file in Sources/, all dependent functions/subroutines must
 # be updated to link program later.
 # program make by default does not track dependencies.
@@ -10,20 +10,15 @@
 # This script does it for you.
 
 # folder structure
-TEST_DIR=$PWD                      # Sources/Utilities
-GENE_DIR=$PWD/../Generate          # Generate src folder
-CONV_DIR=$PWD/../Convert           # Convert  src folder
-DIVI_DIR=$PWD/../Divide            # Divide   src folder
-PROC_DIR=$PWD/../Process           # Process  src folder
+CURR_DIR=$PWD                      # Generate/, Convert/, Divide/, Process/
 SHAR_DIR=$PWD/../Shared            # Process  src folder
-BINA_DIR=$PWD/../../Binaries/      # binaries folder
 
 # tmp file name and location
-tmp_file=$BINA_DIR/tmp
+tmp_file=$CURR_DIR/tmp_makefile_explicit_dependencies
 
-#-------------------------------------------------#
-#---------   READ ABOVE UP TO THIS ROW   ---------#
-#-------------------------------------------------#
+#--------------------------#
+#   Read above this line   #
+#--------------------------#
 
 set -e # exit when any command fails
 #set -v #Prints shell input lines as they are read.
@@ -35,9 +30,9 @@ trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
 # echo an error message before exiting
 trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT
 
-#------------------------------------------------------------------------------#
-# produces correct module structure
-#------------------------------------------------------------------------------#
+#---------------------------------------#
+#   Produces correct module structure   #
+#---------------------------------------#
 function module_list() {
   # $1 - dir
 
@@ -74,9 +69,9 @@ function module_list() {
 
   echo "$result"
 }
-#------------------------------------------------------------------------------#
-# produces correct module structure
-#------------------------------------------------------------------------------#
+#---------------------------------------#
+#   Produces correct module structure   #
+#---------------------------------------#
 function search_string_in_list() {
   # $1 - string
   # $2 - list
@@ -99,18 +94,18 @@ function search_string_in_list() {
     fi
   done <<< "$2"
 }
-#------------------------------------------------------------------------------#
-# make file explicit dependencies constructor
-#------------------------------------------------------------------------------#
+#-------------------------------------------------#
+#   Make file explicit dependencies constructor   #
+#-------------------------------------------------#
 function make_file_explicit_dependencies() {
   # $1 - folder to create makefile list (Generate, Divide, Process, ..)
 
   # create empty file or remove all content
   cd $1; cp /dev/null $tmp_file
 
-  #--------------------
-  # search for Modules
-  #--------------------
+  #------------------------#
+  #   Search for modules   #
+  #------------------------#
 
   proc_mods=$(module_list $1)
   #echo -e "$proc_mods"
@@ -125,15 +120,15 @@ function make_file_explicit_dependencies() {
 
       base_name=$(basename -- "${f90_file%.*}") #f90_file name without extension
 
-      #---------------------------
-      # determine deps of f90 file
-      #---------------------------
+      #--------------------------------#
+      #   Determine deps of f90 file   #
+      #--------------------------------#
 
       dependencies='' # all deps for $f90_file are store in this var
 
-      #---------------------------------------------------------------------
-      # dependencies of modules with "module_name/subroutines.f90" structure
-      #---------------------------------------------------------------------
+      #-----------------------------------------------------------------------#
+      #   Dependencies of modules with "mod_name/subroutines.f90" structure   #
+      #-----------------------------------------------------------------------#
       mod_included_this=$(grep -ie "include " $f90_file \
            | cut -d"!" -f1 \
            | sed "s%'%%g" \
@@ -250,15 +245,35 @@ function make_file_explicit_dependencies() {
 
   cd $1; mv $tmp_file makefile_explicit_dependencies
 }
-#------------------------------------------------------------------------------#
-# actual script
-#------------------------------------------------------------------------------#
-echo creating makefile_explicit_dependencies in Generete
-make_file_explicit_dependencies $GENE_DIR
-echo creating makefile_explicit_dependencies in Convert
-make_file_explicit_dependencies $CONV_DIR
-echo creating makefile_explicit_dependencies in Divide
-make_file_explicit_dependencies $DIVI_DIR
-echo creating makefile_explicit_dependencies in Processor
-make_file_explicit_dependencies $PROC_DIR
+#------------------------------------#
+#   Check T-Flows folder structure   #
+#------------------------------------#
+function check_if_lauched_in_correct_folder() {
+  stop_execution=false
+
+  case "${CURR_DIR##*/}" in
+    "Process"|"Divide"|"Convert"|"Generate")
+    parent_dir="$(dirname "$CURR_DIR")"
+    if [ ! "${parent_dir##*/}" == "Sources" ]; then
+      echo "$parent_dir"
+      stop_execution=true
+    fi
+    ;;
+    *)
+      stop_execution=true
+    ;;
+  esac
+
+  if [ $stop_execution == true ]; then
+    echo This script can only be launched from Generate/, Convert/, Divide/, Process/ folders of T-Flows
+    echo Launch it this way: bash ../Utilities/create_makefile_dependencies.sh
+    exit 3
+  fi
+}
+#-------------------#
+#   Actual script   #
+#-------------------#
+check_if_lauched_in_correct_folder
+echo creating makefile_explicit_dependencies in $CURR_DIR
+make_file_explicit_dependencies $CURR_DIR
 echo done
