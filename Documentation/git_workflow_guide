@@ -1,0 +1,98 @@
+# Usual git workflow:
+
+# If you do no have any local copy of remote git repository with T-Flows, then
+
+git clone https://github.com/DelNov/T-Flows/ <NAME_OF_LOCAL_BRANCH>
+
+#----------------------#       #-------------------#
+# local copy           #  <--  # remote repository #
+#----------------------#  <--  #-------------------#
+# branch:              #  <--  # branch:           #
+# NAME_OF_LOCAL_BRANCH #  <--  # release_branch    #
+#----------------------#       #-------------------#
+
+# If argument NAME_OF_LOCAL_BRANCH was not supplied, then 
+# NAME_OF_LOCAL_BRANCH = release_branch
+
+#------------------------------------------------------------------------------#
+
+# Whenever you have a local copy of remote repository type:
+
+git remote -v
+
+# to display list of remote repositories, which local git knows.
+
+# <REMOTE_NAME> <URL> (fetch)
+# <REMOTE_NAME> <URL> (push)
+
+# Those are actually pointers to url of remote repository.
+
+# Thus:
+# <REMOTE_NAME> -> <URL>
+
+# After you have created this pointer, 
+# you address remote repository only by
+# this pointer REMOTE_NAME and not actual URL
+
+# By default REMOTE_NAME is "origin"
+
+# You can rename any pointer to repository by:
+git remote rename <OLD_NAME> <NEW_NAME>
+
+#------------------------------------------------------------------------------#
+
+# Since you can not push directly to https://github.com/DelNov/T-Flows/,
+# you have to fork it first through git website.
+
+# list of existing forks:
+# https://github.com/DelNov/T-Flows/network/members
+
+# Let local git know your fork url you want to push to by:
+
+git remote add <FORK_NAME> <URL>
+
+#------------------------------------------------------------------------------#
+
+# If you want to pull the latest version from remote repository,
+# which is known to local git by pointer with name REMOTE_NAME, then
+git pull <REMOTE_NAME> <REMOTE_BRANCH_NAME>
+
+#------------------------------------------------------------------------------#
+
+# During editing use following commands frequently:
+
+# To check status of local branch:
+git status
+
+# To prepare file for commit
+git add <FILENAME>
+
+# To cancel changes to a file
+git checkout <FILENAME>
+
+# To see a difference between file and its previous committed version 
+git diff <FILENAME>
+
+# To submit a commit:
+git commit
+
+#------------------------------------------------------------------------------#
+
+# If you made some commits you can make a push to your fork by:
+
+git push <FORK_NAME> <NAME_OF_LOCAL_BRANCH>:<NAME_OF_REMOTE_BRANCH>
+
+# If NAME_OF_REMOTE_BRANCH does not exist, git will create it
+
+#----------------------#       #---------------------------#
+# local copy           #  -->  # fork of remote repository #
+#                      #  -->  # known as FORK_NAME        #
+#----------------------#  -->  #---------------------------#
+# branch:              #  -->  # branch:                   #
+# NAME_OF_LOCAL_BRANCH #  -->  # NAME_OF_REMOTE_BRANCH     #
+#----------------------#       #---------------------------#
+
+#------------------------------------------------------------------------------#
+
+# After commits are pushed, you can create a pull request from git website
+# page with branch you just pushed to

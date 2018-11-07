@@ -15,6 +15,9 @@ DEBUG = no
 
 # Compile for MPI ("yes" or "no")
 MPI = no
+# MPI implementation ("openmpi" or "mpich")
+# Warning: change line "FC = mpif90" to your compiler
+MPI_TYPE = openmpi
 
 # Link with CGNS ("yes" or "no")
 CGNS_HDF5 = no
@@ -37,14 +40,16 @@ $(info #=======================================================================)
 $(info # Compiling $(PROGRAM_NAME) with compiler $(FORTRAN)                    )
 $(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
-$(info #   make <FORTRAN=gnu/intel/portland> <DEBUG=yes/no> <MPI=yes/no>       )
-$(info #        <CGNS_HDF5=yes/no> <DIR_CASE=relative_path_to_case>            )
+$(info #   make <FORTRAN=gnu/intel/portland> <DEBUG=yes/no>                    )
+$(info #        <MPI=yes/no> <MPI_TYPE=openmpi/mpich>                          )
+$(info #        <DIR_CASE=relative_path_to_case>                               )
 $(info #                                                                       )
 $(info # Examples:                                                             )
 $(info #   make                       - sequential version with gnu compiler   )
 $(info #   make MPI=yes               - parallel version with gnu compiler     )
 $(info #   make FORTRAN=intel MPI=yes - parallel version with intel compiler   )
 $(info #   make MPI=yes CGNS_HDF5=yes - parallel version with CGNS/HDF5 support)
+$(info #   make MPI=yes MPI_TYPE=mpich- parallel version with MPICH/OpenMPI mpi)
 $(info #-----------------------------------------------------------------------)
 
 #-------------------------------------------------------------------------------
@@ -79,7 +84,7 @@ ifeq ($(FORTRAN), intel)
   FC = ifort
   ifeq ($(DEBUG),yes)
     OPT_COMP = -module $(DIR_MODULE) -r8 -i8 -O0 -g -warn all -check all \
-                   -debug all -fpe-all=0 -traceback
+               -debug all -fpe-all=0 -traceback
   else
     OPT_COMP = -module $(DIR_MODULE) -r8 -i8 -O3
   endif
@@ -97,8 +102,7 @@ ifeq ($(FORTRAN), portland)
   OPT_LINK = $(OPT_COMP)
 endif
 
-# It seems that for all supported compilers ("gnu", "intel"
-# or "portland") command to compile in parallel is "mpif90"
+# Use here your command 
 ifeq ($(MPI), yes)
   FC = mpif90
 endif
@@ -106,16 +110,25 @@ endif
 # If compiling with CGNS, add path to include directory
 ifeq ($(CGNS_HDF5), yes)
   ifeq ($(MPI), yes)
-    DIR_CGNS_H  = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Par/Include
-    CGNS_LIB    = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Par/Lib/libcgns.a \
-                  ../Libraries/Hdf5_Par/Lib/libhdf5.a \
-                  -Wl,--no-as-needed -ldl -lz
+    ifeq ($(MPI_TYPE), openmpi)
+      value = $(shell echo using Cgns library built on OpenMPI MPI implementation)
+      DIR_CGNS_H  = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Par_Openmpi/Include
+      CGNS_LIB    = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Par_Openmpi/Lib/libcgns.a \
+                    ../Libraries/Hdf5_Par_Openmpi/Lib/libhdf5.a -ldl
+    endif
+    ifeq ($(MPI_TYPE), mpich)
+      value = $(shell echo using Cgns library built on MPICH MPI implementation)
+      DIR_CGNS_H  = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Par_Mpich/Include
+      CGNS_LIB    = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Par_Mpich/Lib/libcgns.a \
+                    ../Libraries/Hdf5_Par_Mpich/Lib/libhdf5.a -ldl
+    endif
   else
+    value = $(shell echo using Cgns library built sequentially)
     DIR_CGNS_H  = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Seq/Include
     CGNS_LIB    = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Seq/Lib/libcgns.a \
-                  ../Libraries/Hdf5_Seq/Lib/libhdf5.a \
-                  -Wl,--no-as-needed -ldl -lz
+                  ../Libraries/Hdf5_Seq/Lib/libhdf5.a -ldl
   endif
+  $(info $(value))
 endif
 OPT_COMP += $(addprefix -I, $(DIR_CGNS_H))
 
@@ -307,6 +320,7 @@ include makefile_explicit_dependencies
 #---------------------
 #   Explicit target.
 #---------------------
+# TO DO: DO NOT USE GIT
 clean:
 	@echo -n Removing objects and modules ... 
 	@rm -f $(DIR_OBJECT)/*.o $(DIR_MODULE)/*.mod $(PROGRAM_FILE)
