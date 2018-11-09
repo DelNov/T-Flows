@@ -157,8 +157,11 @@ ifneq ($(DIR_CASE), no)
     else
       $(info Linking user functions from directory $(DIR_CASE)/$(DIR_USER))
 
+      # relalite path to #DIR_CASE from ./
+      rel_dir=$(shell realpath --relative-to="./" "$(DIR_CASE)")
+
       # Fetch all user functions from the case directory
-      STEP_A  = $(shell ls -1 $(DIR_CASE)/$(DIR_USER)/*.f90)
+      STEP_A  = $(shell ls -1 $(rel_dir)/$(DIR_USER)/*.f90)
       STEP_B  = $(notdir  $(STEP_A))
 
       # Append "../" to each of the file names

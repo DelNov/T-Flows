@@ -681,15 +681,18 @@ function processor_full_length_test {
 
   launch_process par $nproc_in_div
 
-  # extract essential data from produced .dat files
-  last_results_plus_dat_file=$(realpath --relative-to="$3" \
-    $(ls -tr1 *-res-plus.dat | tail -n1))
+  if [ -f *-res-plus.dat ];then
 
-  echo "results are:"
-  echo "$(head -n9 $(ls -tr1 *-res-plus.dat | tail -n1))"
+    # extract essential data from produced .dat files
+    last_results_plus_dat_file=$(realpath --relative-to="$3" \
+      $(ls -tr1 *-res-plus.dat | tail -n1))
 
-  launch_gnuplot "$3" gnuplot_script_template.sh \
-    "$last_results_plus_dat_file" "result_plus_"$2""
+    echo "results are:"
+    echo "$(head -n9 $(ls -tr1 *-res-plus.dat | tail -n1))"
+
+    launch_gnuplot "$3" gnuplot_script_template.sh \
+      "$last_results_plus_dat_file" "result_plus_"$2""
+  fi
 }
 #------------------------------------------------------------------------------#
 # processor tests for Channel
@@ -766,8 +769,6 @@ function processor_full_length_tests {
 generator_tests
 convert_tests
 divide_tests
-
-# below this line tests depend on generator_tests, convert_tests, divide_tests
 processor_backup_tests
 #process_save_exit_now_tests
 processor_full_length_tests
