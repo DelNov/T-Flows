@@ -1,3 +1,20 @@
-# T-Flows
+# T-Flows - Fortran 90 CFD cell-centered 2-nd order accuracy code for incompressible fluids.
 
+Code has 4 sub-programs at the moment and uses meshes in internal .geo format.
+Generate - to generate mesh from ASCII .dom to .geo.
+Convert - to convert mesh from .neu, .cgns format to .geo.
+Divide - to divide .geo in pieces.
+Process - to solve discretized Navier-Stokes equations.
 
+Build tested on:
+ld >= 2.24
+gfortran >= 4.8
+mpich >= 3.0.4
+openmpi >= 1.6.5
+make >= 3.81
+
+To download current version of the code use:
+git clone https://github.com/DelNov/T-Flows/
+
+Compiled programs are in Binaries/ folder.
+Sources are in Sources/Generate/, Sources/Convert/, Sources/Divide/, Sources/Process/ .
