@@ -102,7 +102,7 @@ ifeq ($(FORTRAN), portland)
   OPT_LINK = $(OPT_COMP)
 endif
 
-# Use here your command 
+# Use here your command for mpi fortran compiler:
 ifeq ($(MPI), yes)
   FC = mpif90
 endif
@@ -157,18 +157,18 @@ ifneq ($(DIR_CASE), no)
     else
       $(info Linking user functions from directory $(DIR_CASE)/$(DIR_USER))
 
+      # Relative path to $DIR_CASE from ./
+      REL_DIR=$(shell realpath --relative-to="./" "$(DIR_CASE)")
+
       # Fetch all user functions from the case directory
-      STEP_A  = $(shell ls -1 $(DIR_CASE)/$(DIR_USER)/*.f90)
-      STEP_B  = $(notdir  $(STEP_A))
+      STEP_A  = $(shell ls -1 $(REL_DIR)/$(DIR_USER)/*.f90)
+      STEP_B  = $(notdir $(STEP_A))
 
       # Append "../" to each of the file names
       SRC_USR = $(patsubst %.f90, ../%.f90, $(STEP_A))
+      $(info  $(SRC_USR))
 
-      #for each file in DIR_CASE save a copy of existing black user file
       ifneq ("$(wildcard $(STEP_A))","")
-        VALUE = $(shell for i in $(STEP_B); do echo cp $(DIR_USER)/$$i $(DIR_USER)/.$$i; cp $(DIR_USER)/$$i $(DIR_USER)/.$$i; done)
-        $(info $(VALUE))
-
         # Make soft links
         $(shell ln -f -s $(SRC_USR) $(DIR_USER))
       endif
@@ -320,7 +320,6 @@ include makefile_explicit_dependencies
 #---------------------
 #   Explicit target.
 #---------------------
-# TO DO: DO NOT USE GIT
 clean:
 	@echo -n Removing objects and modules ... 
 	@rm -f $(DIR_OBJECT)/*.o $(DIR_MODULE)/*.mod $(PROGRAM_FILE)

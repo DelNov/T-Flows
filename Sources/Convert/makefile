@@ -98,8 +98,7 @@ endif
 ifeq ($(CGNS_HDF5), yes)
   DIR_CGNS_H  = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Seq/Include
   CGNS_LIB    = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Seq/Lib/libcgns.a \
-                ../Libraries/Hdf5_Seq/Lib/libhdf5.a                        \
-                -Wl,--no-as-needed -ldl -lz
+                ../Libraries/Hdf5_Seq/Lib/libhdf5.a -ldl
 endif
 OPT_COMP += $(addprefix -I, $(DIR_CGNS_H))
 
