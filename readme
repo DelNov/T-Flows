@@ -6,12 +6,16 @@ Convert - to convert mesh from .neu, .cgns format to .geo.
 Divide - to divide .geo in pieces.
 Process - to solve discretized Navier-Stokes equations.
 
+Build depends on:
+ld, make, gfortran, git and mpi (only for parallel execution).
+
 Build tested on:
 ld >= 2.24
 gfortran >= 4.8
 mpich >= 3.0.4
 openmpi >= 1.6.5
 make >= 3.81
+git >= 1.91
 
 To download current version of the code use:
 git clone https://github.com/DelNov/T-Flows/
