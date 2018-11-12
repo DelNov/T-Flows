@@ -40,7 +40,7 @@ $(info #=======================================================================)
 $(info # Compiling $(PROGRAM_NAME) with compiler $(FORTRAN)                    )
 $(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
-$(info #   make <FORTRAN=gnu/intel/portland> <DEBUG=yes/no>                    )
+$(info #   make <FORTRAN=gnu/intel/portland> <DEBUG=yes/no> <CGNS_HDF5=yes/no> )
 $(info #        <MPI=yes/no> <MPI_TYPE=openmpi/mpich>                          )
 $(info #        <DIR_CASE=relative_path_to_case>                               )
 $(info #                                                                       )
@@ -111,24 +111,24 @@ endif
 ifeq ($(CGNS_HDF5), yes)
   ifeq ($(MPI), yes)
     ifeq ($(MPI_TYPE), openmpi)
-      value = $(shell echo using Cgns library built on OpenMPI MPI implementation)
+      VALUE = $(shell echo using Cgns library built on OpenMPI MPI implementation)
       DIR_CGNS_H  = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Par_Openmpi/Include
       CGNS_LIB    = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Par_Openmpi/Lib/libcgns.a \
                     ../Libraries/Hdf5_Par_Openmpi/Lib/libhdf5.a -ldl
     endif
     ifeq ($(MPI_TYPE), mpich)
-      value = $(shell echo using Cgns library built on MPICH MPI implementation)
+      VALUE = $(shell echo using Cgns library built on MPICH MPI implementation)
       DIR_CGNS_H  = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Par_Mpich/Include
       CGNS_LIB    = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Par_Mpich/Lib/libcgns.a \
                     ../Libraries/Hdf5_Par_Mpich/Lib/libhdf5.a -ldl
     endif
   else
-    value = $(shell echo using Cgns library built sequentially)
+    VALUE = $(shell echo using Cgns library built sequentially)
     DIR_CGNS_H  = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Seq/Include
     CGNS_LIB    = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Seq/Lib/libcgns.a \
                   ../Libraries/Hdf5_Seq/Lib/libhdf5.a -ldl
   endif
-  $(info $(value))
+  $(info $(VALUE))
 endif
 OPT_COMP += $(addprefix -I, $(DIR_CGNS_H))
 
@@ -166,8 +166,8 @@ ifneq ($(DIR_CASE), no)
 
       #for each file in DIR_CASE save a copy of existing black user file
       ifneq ("$(wildcard $(STEP_A))","")
-        value = $(shell for i in $(STEP_B); do echo cp $(DIR_USER)/$$i $(DIR_USER)/.$$i; cp $(DIR_USER)/$$i $(DIR_USER)/.$$i; done)
-        $(info $(value))
+        VALUE = $(shell for i in $(STEP_B); do echo cp $(DIR_USER)/$$i $(DIR_USER)/.$$i; cp $(DIR_USER)/$$i $(DIR_USER)/.$$i; done)
+        $(info $(VALUE))
 
         # Make soft links
         $(shell ln -f -s $(SRC_USR) $(DIR_USER))
