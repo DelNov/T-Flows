@@ -5,7 +5,7 @@ k-eps, zeta-f, Reynolds stress Manceau-Hanjalic and Jakirlic-Hanjalic models
 LES method uses dynamic subgrid scale Smagorinsky model,
 and DNS, Hybrid URANS/LES methods.
 
-Code has 4 sub-programs at the moment and uses own proprietary format for computational grids (.geo, .cns).
+Code has four sub-programs at the moment and uses own proprietary format for computational grids (.geo, .cns).
 Generate - to generate mesh from ASCII .dom to own format.
 Convert - to convert mesh from .neu, .cgns to own format.
 Divide - to divide mesh to pieces.
