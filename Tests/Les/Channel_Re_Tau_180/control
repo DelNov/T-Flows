@@ -2,7 +2,7 @@ Prologue
 
  PROBLEM_NAME    chan
 
- HEAT_TRANSFER   no
+ HEAT_TRANSFER   yes
 
  TIME_STEP                            0.025
  NUMBER_OF_TIME_STEPS                 18000
@@ -48,7 +48,6 @@ Prologue
  ADVECTION_SCHEME_FOR_ENERGY      smart
 
  PRECONDITIONER_FOR_SYSTEM_MATRIX    incomplete_cholesky
-# PRECONDITIONER_FOR_SYSTEM_MATRIX    diagonal
 
  TOLERANCE_FOR_MOMENTUM_SOLVER     5.e-4
  TOLERANCE_FOR_PRESSURE_SOLVER     5.e-4
