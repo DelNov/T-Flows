@@ -1,3 +1,31 @@
-# T-Flows
+T-Flows (stands for Turbulent Flows) - Fortran 90 CFD cell-centered 2-nd order accuracy code to simulate incompressible fluids via discretized Navier-Stokes equations.
 
+At the moment a few URANS models were implemented:
+k-eps, zeta-f, Reynolds stress Manceau-Hanjalic and Jakirlic-Hanjalic models
+LES method uses dynamic subgrid scale Smagorinsky model,
+and DNS, Hybrid URANS/LES methods.
 
+Code has four sub-programs at the moment and uses own proprietary format for computational grids (.geo, .cns).
+Generate - to generate mesh from ASCII .dom to own format.
+Convert - to convert mesh from .neu, .cgns to own format.
+Divide - to divide mesh to pieces.
+Process - to solve discretized Navier-Stokes equations.
+
+Build depends on:
+ld, make, gfortran, git and mpi (only for parallel execution).
+
+Build tested on:
+ld >= 2.24
+gfortran >= 4.8
+mpich >= 3.0.4
+openmpi >= 1.6.5
+make >= 3.81
+git >= 1.91
+
+To download current version of the code use:
+git clone https://github.com/DelNov/T-Flows/
+
+Compiled programs are in Binaries/ folder.
+Sources are in Sources/Generate/, Sources/Convert/, Sources/Divide/, Sources/Process/ .
+
+Tests/ folder contains a few cases for RANS, LES and Hybrid methods.

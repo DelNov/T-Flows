@@ -62,6 +62,8 @@
   call Calculate_Geometry(grid)
   call Connect_Domains   (grid)
 
+  ! Keep in mind that Grid_Mod_Calculate_Wall_Distance is ...
+  ! ... faster if it is called after Grid_Mod_Sort_Faces_Smart
   call Grid_Mod_Sort_Faces_Smart       (grid)
   call Grid_Mod_Calculate_Wall_Distance(grid)
 
@@ -82,12 +84,12 @@
   !-------------------------------!
   !   Save files for processing   !
   !-------------------------------!
-  call Save_Cns_Geo  (grid, 0,             &
-                      grid % n_nodes,      &
-                      grid % n_cells,      &
-                      grid % n_faces,      &
-                      grid % n_bnd_cells,  &
-                      0, 0)
+  call Save_Cns_Geo(grid, 0,             &
+                    grid % n_nodes,      &
+                    grid % n_cells,      &
+                    grid % n_faces,      &
+                    grid % n_bnd_cells,  &
+                    0, 0)
 
   !-----------------------------------------------------!
   !   Save grid for visualisation and post-processing   !

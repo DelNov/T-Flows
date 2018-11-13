@@ -106,18 +106,18 @@
   write(9,'(a,a)') IN_3, '<CellData Scalars="scalars" vectors="velocity">'
 
   ! Boundary conditions
-  write(9,'(a,a)') IN_4, '<DataArray type="Int64" Name="boundary conditions" ' //  & 
-                 'format="ascii">'
+  write(9,'(a,a)') IN_4, '<DataArray type="Int64" ' // &
+                   'Name="BoundaryConditions" format="ascii">'
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
-    ! If boundary 
+    ! If boundary
     if( c2 < 0 ) then
       write(9,'(a,i9)') IN_5, grid % bnd_cond % color(c2)
 
-    ! If inside 
-    else 
+    ! If inside
+    else
       write(9,'(a,i9)') IN_5, 0
     end if
   end do
