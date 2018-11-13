@@ -1,19 +1,19 @@
 #!/bin/bash
 # Requires: C, C++, Fortran compilers
-# Requires: libx11-dev from debian/ubuntu repository if BUILD_CGNS_TOOLS=true
+# If you want cgnstools(graphical tools to view .cgns files) then install:
+# libx11-dev libxmu-headers libxmu-dev packages for debian/ubuntu,
+# libX11-devel for openSUSE,
+# xorg-x11-devel for Fedora
 
 # This script will automatically build cgns lib in several releases:
 # 1) with hdf5 and parallel   access (optional)
 # 2) with hdf5 and sequential access + cgnstools (optional)
 # (parallel cgns lib can only be based on hdf5, not adf5)
-#
-# Some grid meshing software(like pointwise) use hdf5, therefore it is not
-# possible to use Convert on mesh with adf5
 
 # Hdf5_Par lib most likely can not be built with your current mpif90
 # therefore script builds mpif90 first to compile Hdf5_Par later
 
-# you can optionally build cgnstools to view/edit .cgns files
+# You can optionally build cgnstools to view/edit .cgns files
 # https://cgns.github.io/CGNS_docs_current/cgnstools/cgnsview/index.html
 # if this case script will download and compile dependencies: tcl, tk libs
 
@@ -26,11 +26,11 @@
 # https://cgns.github.io/FAQs.html
 
 # build mpich, otherwise Hdf5_Par can not be built
-BUILD_MPI=true
+BUILD_MPI=false
 
 # build cgnstools, which contains cgnsview - small program to view .cgns files
 # https://cgns.github.io/CGNS_docs_current/cgnstools/cgnsview/index.html
-BUILD_CGNS_TOOLS=false
+BUILD_CGNS_TOOLS=true
 
 # build latest cgns lib, otherwise build 3.2.1 version
 BUILD_LATEST_CGNS=false
@@ -39,7 +39,7 @@ BUILD_LATEST_CGNS=false
 CGNS_DIR=$PWD                     # this is top dir for this lib
 INSTALL_DIR=$CGNS_DIR/install_dir # this dir contains Cgns/ Hdf5/ Mpich/
 SRC_DIR=$CGNS_DIR/src_dir         # this dir contains downloaded sources
-rm -r $INSTALL_DIR $SRC_DIR
+rm -rf $INSTALL_DIR $SRC_DIR
 
 # script temp dir
 TEMP_DIR=`mktemp -d 2>/dev/null || mktemp -d -t 'TEMP_DIR'`
@@ -294,6 +294,7 @@ function build_hdf5_lib {
     --enable-shared=no \
     --enable-production \
     --enable-parallel \
+    --with-zlib=no \
     >> $LOG_FILE 2>&1
 
     echo '    Building'
@@ -322,6 +323,7 @@ function build_hdf5_lib {
     --enable-shared=no \
     --enable-production \
     --enable-parallel \
+    --with-zlib=no \
     >> $LOG_FILE 2>&1
 
     echo '    Building'
@@ -345,7 +347,9 @@ function build_hdf5_lib {
 
   echo '    Configuring installation'
   cd $SRC_DIR/Hdf5/; rm -rf .git
-  make clean >> $LOG_FILE 2>&1
+  if [ $BUILD_MPI == true ]; then
+    make clean >> $LOG_FILE 2>&1
+  fi
 
   ./configure \
   --prefix=$HDF5_SEQ_DIR \
@@ -353,6 +357,7 @@ function build_hdf5_lib {
   --disable-hl \
   --enable-shared=no \
   --enable-production \
+  --with-zlib=no \
   >> $LOG_FILE 2>&1
 
   echo '    Building'
@@ -646,7 +651,6 @@ function build_cgns_lib_3.2.1 {
     echo '  Working with sequential version + HDF5 + cgnstools:'
 
     echo '    Configuring installation'
-    make clean >> $LOG_FILE 2>&1
 
     FLIBS="-Wl,--no-as-needed -ldl" \
     LIBS="-Wl,--no-as-needed -ldl" \
@@ -667,7 +671,9 @@ function build_cgns_lib_3.2.1 {
     echo '  Working with sequential version + HDF5:'
 
     echo '    Configuring installation'
-    make clean >> $LOG_FILE 2>&1
+    if [ $BUILD_MPI == true ]; then
+      make clean >> $LOG_FILE 2>&1
+    fi
 
     FLIBS="-Wl,--no-as-needed -ldl" \
     LIBS="-Wl,--no-as-needed -ldl" \
