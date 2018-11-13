@@ -24,7 +24,7 @@
   real,allocatable    :: z_p(:), u_p(:), v_p(:), w_p(:), t_p(:), y_plus_p(:),  &
                          ind(:),  wall_p(:), kin_p(:), eps_p(:),               &
                          uw_p(:), uu_p(:), vv_p(:), ww_p(:),                   &
-                         tt_p(:), ut_p(:), vt_p(:), wt_p(:),                   &
+                         tt_p(:), ut_p(:), vt_p(:), wt_p(:)                   
   integer,allocatable :: n_p(:), n_count(:)
   real                :: t_wall, t_tau, d_wall, nu_max 
   real                :: ubulk, error, re, cf_dean, cf, pr, u_tau_p
@@ -322,8 +322,6 @@
     v_p   (i) = v_p(i) / u_tau_p
     w_p   (i) = w_p(i) / u_tau_p
 
-    kin_p(i) = kin_p(i) / u_tau_p**2                      ! kin%n(c)
-    eps_p(i) = eps_p(i)*viscosity / (u_tau_p**4*density)  ! eps%n(c)
     uu_p (i) = uu_p (i) / (u_tau_p**2)
     vv_p (i) = vv_p (i) / (u_tau_p**2)
     ww_p (i) = ww_p (i) / (u_tau_p**2)
