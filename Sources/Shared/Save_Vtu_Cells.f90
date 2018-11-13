@@ -146,7 +146,7 @@
   end do
   write(9,'(a,a)') IN_4, '</DataArray>'
   write(9,'(a,a)') IN_3, '</Cells>'
- 
+
   !---------------!
   !   Cell data   !
   !---------------!
@@ -184,6 +184,16 @@
   end do
   write(9,'(a,a)') IN_4, '</DataArray>'
 
+  ! Cell delta
+  write(9,'(a,a)') IN_4, '<DataArray type="Float64" ' //  &
+                         'Name="CellDelta" format="ascii">'
+  do c = 1, grid % n_cells
+    if(grid % new_c(c) .ne. 0) then
+      write(9,'(a,1pe15.7)') IN_5, grid % delta(c)
+    end if
+  end do
+  write(9,'(a,a)') IN_4, '</DataArray>'
+
   !------------!
   !   Footer   !
   !------------!
@@ -206,7 +216,7 @@
     call Name_File(0, name_out, '.pvtu')
     print *, '# Creating the file: ', trim(name_out)
     open(9, file = name_out)
-  
+
     ! Header
     write(9,'(a,a)') IN_0, '<?xml version="1.0"?>'
     write(9,'(a,a)') IN_0, '<VTKFile type="PUnstructuredGrid">'
@@ -220,7 +230,11 @@
 
     ! Data section is not mandatory, but very useful
     write(9,'(a,a)') IN_2, '<PCellData Scalars="scalars" vectors="velocity">'
-    write(9,'(a,a)') IN_3, '<PDataArray type="Int64" Name="materials"' // &
+    write(9,'(a,a)') IN_3, '<PDataArray type="Int64" Name="Processor"' // &
+                           ' format="ascii"/>'
+    write(9,'(a,a)') IN_3, '<PDataArray type="Float64" Name="WallDistance"' // &
+                           ' format="ascii"/>'
+    write(9,'(a,a)') IN_3, '<PDataArray type="Float64" Name="CellDelta"' // &
                            ' format="ascii"/>'
     write(9,'(a,a)') IN_2, '</PCellData>'
 
@@ -231,8 +245,8 @@
     end do
 
     ! Footer
-    write(9, '(a)') IN_1, '</PUnstructuredGrid>'
-    write(9, '(a)') IN_0, '</VTKFile>'
+    write(9, '(a,a)') IN_1, '</PUnstructuredGrid>'
+    write(9, '(a,a)') IN_0, '</VTKFile>'
 
     close(9)
 
