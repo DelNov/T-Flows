@@ -76,7 +76,7 @@
 #--------------------
 
  INITIAL_CONDITION
-  VARIABLES u     v   w   T    uu     vv     ww     uv    uw     vw    eps     f22 
+  VARIABLES u     v   w   t    uu     vv     ww     uv    uw     vw    eps     f22 
   VALUES    0.001 0.0 0.0 20.0 0.0001 0.0001 0.0001 0.00  0.0001 0.0   0.0002  0.1
 
 #---------------------
@@ -85,10 +85,10 @@
 
  BOUNDARY_CONDITION   top_wall
   TYPE    wall
-  VARIABLES u   v   w   T   uu    vv    ww    uv    uw    vw    eps   f22
+  VARIABLES u   v   w   t   uu    vv    ww    uv    uw    vw    eps   f22
   VALUES    0.0 0.0 0.0 22  0.0   0.0   0.0   0.0   0.0   0.0   0.0   0.0
 
  BOUNDARY_CONDITION   bottom_wall
   TYPE    wall
-  VARIABLES u   v   w   T   uu    vv    ww    uv    uw    vw    eps   f22
+  VARIABLES u   v   w   t   uu    vv    ww    uv    uw    vw    eps   f22
   VALUES    0.0 0.0 0.0 22  0.0   0.0   0.0   0.0   0.0   0.0   0.0   0.0
