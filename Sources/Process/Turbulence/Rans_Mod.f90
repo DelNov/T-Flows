@@ -45,6 +45,6 @@
   ! (bouy_beta is only set to 1 and used as such.  Is it needed?)
   real,allocatable :: g_buoy(:)
   real,allocatable :: buoy_beta(:)
-  real,allocatable :: p_buoy(:)
+  real,allocatable :: g_kin(:)
  
   end module 
