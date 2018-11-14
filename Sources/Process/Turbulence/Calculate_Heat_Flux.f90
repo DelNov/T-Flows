@@ -72,10 +72,10 @@
       vt % n(c) = max(-0.01 * t_ref, vt % n(c))
       wt % n(c) = min( 0.01 * t_ref, wt % n(c))
       wt % n(c) = max(-0.01 * t_ref, wt % n(c))
-      p_buoy(c) = -beta*(  grav_x * ut % n(c)  &
-                         + grav_y * vt % n(c)  &
-                         + grav_z * wt % n(c))
-      p_buoy(c) = max(p_buoy(c),0.0)
+      g_kin(c) = -beta*(  grav_x * ut % n(c)  &
+                        + grav_y * vt % n(c)  &
+                        + grav_z * wt % n(c))
+      g_kin(c) = max(g_kin(c),0.0)
     end do
   end if
 
