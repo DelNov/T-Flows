@@ -18,8 +18,8 @@
   call Control_Mod_Read_Real_Array('MASS_FLOW_RATES', 3, def,  &
                                     val, verbose)
 
-  bulk % flux_x = val(1)
-  bulk % flux_y = val(2)
-  bulk % flux_z = val(3)
+  bulk % flux_x_o = val(1)
+  bulk % flux_y_o = val(2)
+  bulk % flux_z_o = val(3)
 
   end subroutine
