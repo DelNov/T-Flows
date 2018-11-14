@@ -315,6 +315,9 @@
     grid % new_f(s) = 0
   end do
 
+  !------------------------!
+  !   Assign new numbers   !
+  !------------------------!
   nc_sub = 0     ! number of cells renumbered
   do sub = 1, maxval(grid % comm % proces(:))
     do c = 1, grid % n_cells
@@ -338,21 +341,28 @@
   end do
   print '(a,2i9)', ' # Number of faces: ', grid % n_faces, nf_sub
 
-  ! It is not sorting nodes ... is it good?  I doubt
+  !----------------------------------!
+  !   Sort what needs to be sorted   !
+  !----------------------------------!
+
+  ! Sort cell and face connectivities
   call Grid_Mod_Sort_Cells_By_Index(grid,             &
                                     grid % new_c(1),  &
                                     grid % n_cells)
   call Grid_Mod_Sort_Faces_By_Index(grid, grid % new_f(1), grid % n_faces)
 
+  ! Sort cell-based values to be plotted
   call Sort_Mod_Int_By_Index(grid % comm % proces(1),  &
                              grid % new_c(1),          &
                              grid % n_cells)
+  call Sort_Mod_Real_By_Index(grid % wall_dist(1),   &
+                              grid % new_c(1),       &
+                              grid % n_cells)
+  call Sort_Mod_Real_By_Index(grid % delta(1),       &
+                              grid % new_c(1),       &
+                              grid % n_cells)
 
-  ! This is important for plotting the grid with EpsPar()
-  call Sort_Mod_Real_By_Index(grid % dx(1), grid % new_f(1), grid % n_faces)
-  call Sort_Mod_Real_By_Index(grid % dy(1), grid % new_f(1), grid % n_faces)
-  call Sort_Mod_Real_By_Index(grid % dz(1), grid % new_f(1), grid % n_faces)
-
+  ! Sort face-cell connectivity
   allocate(side_cell(grid % n_faces, 2))
   do s = 1, grid % n_faces
     side_cell(s,1) = grid % faces_c(1,s)
@@ -366,6 +376,9 @@
   end do
   deallocate(side_cell)
 
+  !----------------------!
+  !   And finally save   !
+  !----------------------!
   call Save_Vtu_Cells(grid, 0, grid % n_nodes, grid % n_cells)
   call Save_Vtu_Faces(grid)
 

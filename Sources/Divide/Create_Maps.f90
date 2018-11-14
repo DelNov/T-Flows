@@ -61,7 +61,7 @@
     !-----------------------!
     !   Save cell mapping   !
     !-----------------------!
-    
+
     ! First line are the number of boundary cells and cells
     write(9, '(4i9)') n_cells_sub, n_bnd_cells_sub
 
