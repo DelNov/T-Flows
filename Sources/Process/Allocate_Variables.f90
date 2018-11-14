@@ -30,7 +30,7 @@
   !                            !
   !----------------------------!
 
-  ! Allocate memory for velocity components ...
+  ! Allocate memory for velocity components
   call Var_Mod_Allocate_Solution('U', u, grid)
   call Var_Mod_Allocate_Solution('V', v, grid)
   call Var_Mod_Allocate_Solution('W', w, grid)
@@ -58,12 +58,12 @@
   call Control_Mod_Heat_Transfer(verbose = .true.)
   if(heat_transfer) then
     call Var_Mod_Allocate_Solution('T', t, grid)
-  end if
+  end if ! heat_transfer
 
   !-----------------!
   !   K-eps model   !
   !-----------------!
-  if(turbulence_model .eq. K_EPS) then   
+  if(turbulence_model .eq. K_EPS) then
 
     ! Variables we solve for: k and epsilon
     call Var_Mod_Allocate_Solution('KIN', kin, grid)
@@ -80,11 +80,13 @@
     allocate(y_plus  (-grid % n_bnd_cells:grid % n_cells));  y_plus   = 0.
 
     if(heat_transfer) then
+
       call Var_Mod_Allocate_New_Only('UT', ut, grid)
       call Var_Mod_Allocate_New_Only('VT', vt, grid)
       call Var_Mod_Allocate_New_Only('WT', wt, grid)
-      allocate(con_wall(-grid % n_bnd_cells:grid % n_cells)); con_wall = 0.  
-    end if 
+      allocate(con_wall(-grid % n_bnd_cells:grid % n_cells)); con_wall = 0.
+
+    end if ! heat_transfer
 
     ! Turbulent statistics; if needed
     if(turbulence_statistics) then
@@ -115,16 +117,19 @@
 
       ! Heat transfer & statistics
       if(heat_transfer) then
+
         call Var_Mod_Allocate_Statistics(t)   ! new value allocated above
         call Var_Mod_Allocate_Statistics(ut)  ! new value allocated above
         call Var_Mod_Allocate_Statistics(vt)  ! new value allocated above
         call Var_Mod_Allocate_Statistics(wt)  ! new value allocated above
         call Var_Mod_Allocate_New_Only('TT', tt,  grid)
         call Var_Mod_Allocate_Statistics(tt)
-      end if
-    end if
-  
-  end if
+
+      end if ! heat_transfer
+
+    end if ! turbulence_statistics
+
+  end if ! K_EPS
 
   !------------------!
   !   K-eps-zeta-f   !
@@ -150,20 +155,22 @@
     allocate(y_plus  (-grid % n_bnd_cells:grid % n_cells));  y_plus   = 0.
 
     if(heat_transfer) then
+
       call Var_Mod_Allocate_New_Only('UT', ut, grid)
       call Var_Mod_Allocate_New_Only('VT', vt, grid)
       call Var_Mod_Allocate_New_Only('WT', wt, grid)
-      allocate(con_wall(-grid % n_bnd_cells:grid % n_cells)); con_wall = 0.  
-    end if 
+      allocate(con_wall(-grid % n_bnd_cells:grid % n_cells)); con_wall = 0.
+
+    end if ! heat_transfer
 
     if(turbulence_statistics) then
-      
+
       ! First moments
       call Var_Mod_Allocate_Statistics(u)
       call Var_Mod_Allocate_Statistics(v)
       call Var_Mod_Allocate_Statistics(w)
       call Var_Mod_Allocate_Statistics(p)
-      
+
       ! Second moments
       call Var_Mod_Allocate_New_Only('UU', uu, grid)
       call Var_Mod_Allocate_New_Only('VV', vv, grid)
@@ -177,28 +184,32 @@
       call Var_Mod_Allocate_Statistics(uv)
       call Var_Mod_Allocate_Statistics(uw)
       call Var_Mod_Allocate_Statistics(vw)
-      
+
       ! Heat transfer & statistics
       if(heat_transfer) then
+
         call Var_Mod_Allocate_Statistics(t)   ! new value allocated above
         call Var_Mod_Allocate_Statistics(ut)  ! new value allocated above
         call Var_Mod_Allocate_Statistics(vt)  ! new value allocated above
         call Var_Mod_Allocate_Statistics(wt)  ! new value allocated above
         call Var_Mod_Allocate_New_Only('TT', tt,  grid)
         call Var_Mod_Allocate_Statistics(tt)
-      end if
-    
-    end if
+
+      end if ! heat_transfer
+
+    end if ! turbulence_statistics
 
     if(buoyancy) then
+
       call Var_Mod_Allocate_Solution('TT', tt, grid)
       call Var_Mod_Allocate_Statistics(tt)
       allocate(g_buoy   (-grid % n_bnd_cells:grid % n_cells));  g_buoy    = 0.
       allocate(buoy_beta(-grid % n_bnd_cells:grid % n_cells));  buoy_beta = 0.
       allocate(p_buoy   (-grid % n_bnd_cells:grid % n_cells));  p_buoy    = 0.
-    end if
 
-  end if
+    end if ! buoyancy
+
+  end if ! K_EPS_ZETA_F
 
   !----------------------------!
   !   Reynolds stress models   !
@@ -228,15 +239,18 @@
 
     call Var_Mod_Allocate_New_Only('KIN', kin, grid)
     call Var_Mod_Allocate_Solution('EPS', eps, grid)
-    
+
     if(heat_transfer) then
+
       call Var_Mod_Allocate_New_Only('UT', ut, grid)
       call Var_Mod_Allocate_New_Only('VT', vt, grid)
       call Var_Mod_Allocate_New_Only('WT', wt, grid)
-      allocate(con_wall(-grid % n_bnd_cells:grid % n_cells)); con_wall = 0.  
-    end if 
+      allocate(con_wall(-grid % n_bnd_cells:grid % n_cells)); con_wall = 0.
+
+    end if ! heat_transfer
 
     if(turbulence_statistics) then
+
       call Var_Mod_Allocate_Statistics(uu)
       call Var_Mod_Allocate_Statistics(vv)
       call Var_Mod_Allocate_Statistics(ww)
@@ -247,36 +261,41 @@
       call Var_Mod_Allocate_Statistics(eps)
 
       if(heat_transfer) then
+
         call Var_Mod_Allocate_Statistics(t)   ! new value allocated above
         call Var_Mod_Allocate_Statistics(ut)  ! new value allocated above
         call Var_Mod_Allocate_Statistics(vt)  ! new value allocated above
         call Var_Mod_Allocate_Statistics(wt)  ! new value allocated above
         call Var_Mod_Allocate_New_Only('TT', tt,  grid)
         call Var_Mod_Allocate_Statistics(tt)
-      end if
 
-    end if
+      end if ! heat_transfer
+
+    end if ! turbulence_statistics
 
     if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+
       call Var_Mod_Allocate_Solution('F22', f22, grid)
       call Var_Mod_Allocate_Gradients(f22)
 
       if(turbulence_statistics) then
         call Var_Mod_Allocate_Statistics(f22)
-      end if
-    end if
+      end if ! turbulence_statistics
+
+    end if ! RSM_MANCEAU_HANJALIC
 
     if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
       allocate(eps_tot(-grid % n_bnd_cells:grid % n_cells)); eps_tot = 0.
-    end if
+    end if ! RSM_HANJALIC_JAKIRLIC
 
-  end if
+  end if ! RSM_MANCEAU_HANJALIC & RSM_HANJALIC_JAKIRLIC
 
   !----------------------!
   !   Spalart Allmaras   !
   !----------------------!
   if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
      turbulence_model .eq. DES_SPALART) then
+
     call Var_Mod_Allocate_Solution('VIS', vis, grid)
 
     ! Other variables such as time scale, length scale and production
@@ -292,14 +311,17 @@
     allocate(y_plus  (-grid % n_bnd_cells:grid % n_cells));  y_plus   = 0.
 
     if(heat_transfer) then
+
       call Var_Mod_Allocate_New_Only('UT', ut, grid)
       call Var_Mod_Allocate_New_Only('VT', vt, grid)
       call Var_Mod_Allocate_New_Only('WT', wt, grid)
-      allocate(con_wall(-grid % n_bnd_cells:grid % n_cells)); con_wall = 0.  
-    end if 
-    
+      allocate(con_wall(-grid % n_bnd_cells:grid % n_cells)); con_wall = 0.
+
+    end if ! heat_transfer
+
     ! Turbulence statistics, if needed
     if(turbulence_statistics) then
+
       call Var_Mod_Allocate_Statistics(vis)
 
       ! First moments
@@ -324,21 +346,25 @@
 
       ! Heat transfer & statistics
       if(heat_transfer) then
+
         call Var_Mod_Allocate_Statistics(t)   ! new value allocated above
         call Var_Mod_Allocate_Statistics(ut)  ! new value allocated above
         call Var_Mod_Allocate_Statistics(vt)  ! new value allocated above
         call Var_Mod_Allocate_Statistics(wt)  ! new value allocated above
         call Var_Mod_Allocate_New_Only('TT', tt,  grid)
         call Var_Mod_Allocate_Statistics(tt)
-      end if
-    end if
 
-  end if
+      end if ! heat_transfer
+
+    end if ! turbulence_statistics
+
+  end if ! SPALART_ALLMARAS & DES_SPALART
 
   !-----------------------!
   !   Smagorinsky model   !
   !-----------------------!
   if(turbulence_model .eq. LES_SMAGORINSKY) then
+
     allocate(nearest_wall_cell(-grid % n_bnd_cells:grid % n_cells))
     nearest_wall_cell = 0
 
@@ -355,13 +381,16 @@
     allocate(y_plus  (-grid % n_bnd_cells:grid % n_cells));  y_plus   = 0.
 
     if(heat_transfer) then
+
       call Var_Mod_Allocate_New_Only('UT', ut, grid)
       call Var_Mod_Allocate_New_Only('VT', vt, grid)
       call Var_Mod_Allocate_New_Only('WT', wt, grid)
-      allocate(con_wall(-grid % n_bnd_cells:grid % n_cells)); con_wall = 0.  
-    end if 
+      allocate(con_wall(-grid % n_bnd_cells:grid % n_cells)); con_wall = 0.
+
+    end if ! heat_transfer
 
     if(turbulence_statistics) then
+
       ! First moments
       call Var_Mod_Allocate_Statistics(u)
       call Var_Mod_Allocate_Statistics(v)
@@ -380,26 +409,31 @@
       call Var_Mod_Allocate_Statistics(uv)
       call Var_Mod_Allocate_Statistics(uw)
       call Var_Mod_Allocate_Statistics(vw)
+
       ! Heat transfer & statistics
       if(heat_transfer) then
+
         call Var_Mod_Allocate_Statistics(t)   ! new value allocated above
         call Var_Mod_Allocate_Statistics(ut)  ! new value allocated above
         call Var_Mod_Allocate_Statistics(vt)  ! new value allocated above
         call Var_Mod_Allocate_Statistics(wt)  ! new value allocated above
         call Var_Mod_Allocate_New_Only('TT', tt,  grid)
         call Var_Mod_Allocate_Statistics(tt)
-      end if
-    end if
 
-  end if
+      end if ! heat_transfer
+
+    end if ! turbulence_statistics
+
+  end if ! LES_SMAGORINSKY
 
   !----------------!
   !   Wale model   !
   !----------------!
   if(turbulence_model .eq. LES_WALE) then
+
     allocate(wale_v(-grid % n_bnd_cells:grid % n_cells));  wale_v = 0.
 
-  ! Other variables such as time scale, length scale and production
+    ! Other variables such as time scale, length scale and production
     allocate(t_scale (-grid % n_bnd_cells:grid % n_cells));  t_scale  = 0.
     allocate(l_scale (-grid % n_bnd_cells:grid % n_cells));  l_scale  = 0.
     allocate(u_tau   (-grid % n_bnd_cells:grid % n_cells));  u_tau    = 0.
@@ -412,13 +446,15 @@
     allocate(y_plus  (-grid % n_bnd_cells:grid % n_cells));  y_plus   = 0.
 
     if(heat_transfer) then
+
       call Var_Mod_Allocate_New_Only('UT', ut, grid)
       call Var_Mod_Allocate_New_Only('VT', vt, grid)
       call Var_Mod_Allocate_New_Only('WT', wt, grid)
-      allocate(con_wall(-grid % n_bnd_cells:grid % n_cells)); con_wall = 0.  
-    end if 
+      allocate(con_wall(-grid % n_bnd_cells:grid % n_cells)); con_wall = 0.
 
-   if(turbulence_statistics) then
+    end if ! heat_transfer
+
+    if(turbulence_statistics) then
 
       ! First moments
       call Var_Mod_Allocate_Statistics(u)
@@ -442,21 +478,25 @@
 
       ! Heat transfer & statistics
       if(heat_transfer) then
+
         call Var_Mod_Allocate_Statistics(t)   ! new value allocated above
         call Var_Mod_Allocate_Statistics(ut)  ! new value allocated above
         call Var_Mod_Allocate_Statistics(vt)  ! new value allocated above
         call Var_Mod_Allocate_Statistics(wt)  ! new value allocated above
         call Var_Mod_Allocate_New_Only('TT', tt,  grid)
         call Var_Mod_Allocate_Statistics(tt)
-      end if
-    end if
 
-  end if
+      end if ! heat_transfer
+
+    end if ! turbulence_statistics
+
+  end if ! LES_WALE
 
   !-------------------!
   !   Dynamic model   !
   !-------------------!
   if(turbulence_model .eq. LES_DYNAMIC) then
+
     allocate(c_dyn(-grid % n_bnd_cells:grid % n_cells));  c_dyn = 0.
 
     ! Other variables such as time scale, length scale and production
@@ -472,11 +512,13 @@
     allocate(y_plus  (-grid % n_bnd_cells:grid % n_cells));  y_plus   = 0.
 
     if(heat_transfer) then
+
       call Var_Mod_Allocate_New_Only('UT', ut, grid)
       call Var_Mod_Allocate_New_Only('VT', vt, grid)
       call Var_Mod_Allocate_New_Only('WT', wt, grid)
-      allocate(con_wall(-grid % n_bnd_cells:grid % n_cells)); con_wall = 0.  
-    end if 
+      allocate(con_wall(-grid % n_bnd_cells:grid % n_cells)); con_wall = 0.
+
+    end if ! heat_transfer
 
     if(turbulence_statistics) then
 
@@ -502,21 +544,24 @@
 
       ! Heat transfer & statistics
       if(heat_transfer) then
+
         call Var_Mod_Allocate_Statistics(t)   ! new value allocated above
         call Var_Mod_Allocate_Statistics(ut)  ! new value allocated above
         call Var_Mod_Allocate_Statistics(vt)  ! new value allocated above
         call Var_Mod_Allocate_Statistics(wt)  ! new value allocated above
         call Var_Mod_Allocate_New_Only('TT', tt,  grid)
         call Var_Mod_Allocate_Statistics(tt)
-      end if
-    end if
 
-  end if
+      end if ! heat_transfer
+
+    end if ! turbulence_statistics
+
+  end if ! LES_DYNAMIC
 
   !-------------------!
   !   Hybrid model    !
   !-------------------!
-  if(turbulence_model .eq. HYBRID_LES_RANS) then 
+  if(turbulence_model .eq. HYBRID_LES_RANS) then
 
     ! Main model's variables (for RANS part)
     call Var_Mod_Allocate_Solution('KIN',  kin,  grid)
@@ -546,12 +591,14 @@
     allocate(y_plus   (-grid % n_bnd_cells:grid % n_cells));  y_plus    = 0.
 
     if(heat_transfer) then
+
       call Var_Mod_Allocate_New_Only('UT', ut, grid)
       call Var_Mod_Allocate_New_Only('VT', vt, grid)
       call Var_Mod_Allocate_New_Only('WT', wt, grid)
-      allocate(con_wall(-grid % n_bnd_cells:grid % n_cells)); con_wall = 0.  
-    end if 
-   
+      allocate(con_wall(-grid % n_bnd_cells:grid % n_cells)); con_wall = 0.
+
+    end if ! heat_transfer
+
     if(turbulence_statistics) then
 
       ! First moments
@@ -576,24 +623,29 @@
 
       ! Heat transfer & statistics
       if(heat_transfer) then
+
         call Var_Mod_Allocate_Statistics(t)   ! new value allocated above
         call Var_Mod_Allocate_Statistics(ut)  ! new value allocated above
         call Var_Mod_Allocate_Statistics(vt)  ! new value allocated above
         call Var_Mod_Allocate_Statistics(wt)  ! new value allocated above
         call Var_Mod_Allocate_New_Only('TT', tt,  grid)
         call Var_Mod_Allocate_Statistics(tt)
-      end if
-    end if
+
+      end if ! heat_transfer
+
+    end if ! turbulence_statistics
 
     if(buoyancy) then
+
       call Var_Mod_Allocate_Solution('TT', tt, grid)
       call Var_Mod_Allocate_Statistics(tt)
       allocate(g_buoy   (-grid % n_bnd_cells:grid % n_cells));  g_buoy    = 0.
       allocate(buoy_beta(-grid % n_bnd_cells:grid % n_cells));  buoy_beta = 0.
       allocate(p_buoy   (-grid % n_bnd_cells:grid % n_cells));  p_buoy    = 0.
-    end if
 
-  end if
+    end if ! buoyancy
+
+  end if ! HYBRID_LES_RANS
 
   !-----------------------------!
   !                             !
