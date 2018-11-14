@@ -30,7 +30,8 @@ LAMINAR_BACKSTEP_ORTH_DIR=$TEST_DIR/Laminar/Backstep/Orthogonal
 LAMINAR_BACKSTEP_NON_ORTH_DIR=$TEST_DIR/Laminar/Backstep/Nonorthogonal
 
 LES_CAVITY_LID_DRIVEN_DIR=$TEST_DIR/Laminar/Cavity/Lid_Driven/Re_1000
-LES_CAVITY_THERM_DRIVEN_DIR=$TEST_DIR/Laminar/Cavity/Thermally_Driven/Ra_10e6
+LES_CAVITY_THERM_DRIVEN_DIR_106=$TEST_DIR/Laminar/Cavity/Thermally_Driven/Ra_10e6
+LES_CAVITY_THERM_DRIVEN_DIR_108=$TEST_DIR/Laminar/Cavity/Thermally_Driven/Ra_10e8
 
 RANS_BACKSTEP_5100_DIR=$TEST_DIR/Rans/Backstep_Re_5100
 RANS_BACKSTEP_28000_DIR=$TEST_DIR/Rans/Backstep_Re_28000
@@ -196,43 +197,45 @@ function generator_tests {
   #-- seq, no cgns
   clean_compile $GENE_DIR  no  no  # dir CGNS_HDF5 MPI
 
-  make_links $LAMINAR_BACKSTEP_ORTH_DIR;      launch_generate
-  make_links $LAMINAR_BACKSTEP_NON_ORTH_DIR;  launch_generate
+  make_links $LAMINAR_BACKSTEP_ORTH_DIR;        launch_generate
+  make_links $LAMINAR_BACKSTEP_NON_ORTH_DIR;    launch_generate
 
-  make_links $LES_CAVITY_LID_DRIVEN_DIR;      launch_generate
-  make_links $LES_CAVITY_THERM_DRIVEN_DIR;    launch_generate
+  make_links $LES_CAVITY_LID_DRIVEN_DIR;        launch_generate
+  make_links $LES_CAVITY_THERM_DRIVEN_DIR_106;  launch_generate
+  make_links $LES_CAVITY_THERM_DRIVEN_DIR_108;  launch_generate
 
-  make_links $RANS_BACKSTEP_5100_DIR;         launch_generate
-  make_links $RANS_BACKSTEP_28000_DIR;        launch_generate
+  make_links $RANS_BACKSTEP_5100_DIR;           launch_generate
+  make_links $RANS_BACKSTEP_28000_DIR;          launch_generate
 
-  make_links $RANS_CHANNEL_LR_LONG_DIR;       launch_generate
-  make_links $RANS_CHANNEL_LR_RSM_DIR;        launch_generate
-  make_links $RANS_CHANNEL_LR_STRETCHED_DIR;  launch_generate
-  make_links $RANS_CHANNEL_LR_UNIFORM_DIR;    launch_generate
+  make_links $RANS_CHANNEL_LR_LONG_DIR;         launch_generate
+  make_links $RANS_CHANNEL_LR_RSM_DIR;          launch_generate
+  make_links $RANS_CHANNEL_LR_STRETCHED_DIR;    launch_generate
+  make_links $RANS_CHANNEL_LR_UNIFORM_DIR;      launch_generate
 
-  make_links $HYB_CHANNEL_HR_STRETCHED_DIR;   launch_generate
-  make_links $HYB_CHANNEL_HR_UNIFORM_DIR;     launch_generate
+  make_links $HYB_CHANNEL_HR_STRETCHED_DIR;     launch_generate
+  make_links $HYB_CHANNEL_HR_UNIFORM_DIR;       launch_generate
 
   #-- seq, cgns(hdf5)
   if [ "$CGNS" = "yes" ]; then
     clean_compile $GENE_DIR  yes  no  # dir CGNS_HDF5 MPI
 
-    make_links $LAMINAR_BACKSTEP_ORTH_DIR;      launch_generate
-    make_links $LAMINAR_BACKSTEP_NON_ORTH_DIR;  launch_generate
+    make_links $LAMINAR_BACKSTEP_ORTH_DIR;        launch_generate
+    make_links $LAMINAR_BACKSTEP_NON_ORTH_DIR;    launch_generate
 
-    make_links $LES_CAVITY_LID_DRIVEN_DIR;      launch_generate
-    make_links $LES_CAVITY_THERM_DRIVEN_DIR;    launch_generate
+    make_links $LES_CAVITY_LID_DRIVEN_DIR;        launch_generate
+    make_links $LES_CAVITY_THERM_DRIVEN_DIR_106;  launch_generate
+    make_links $LES_CAVITY_THERM_DRIVEN_DIR_108;  launch_generate
 
-    make_links $RANS_BACKSTEP_5100_DIR;         launch_generate
-    make_links $RANS_BACKSTEP_28000_DIR;        launch_generate
+    make_links $RANS_BACKSTEP_5100_DIR;           launch_generate
+    make_links $RANS_BACKSTEP_28000_DIR;          launch_generate
 
-    make_links $RANS_CHANNEL_LR_LONG_DIR;       launch_generate
-    make_links $RANS_CHANNEL_LR_RSM_DIR;        launch_generate
-    make_links $RANS_CHANNEL_LR_STRETCHED_DIR;  launch_generate
-    make_links $RANS_CHANNEL_LR_UNIFORM_DIR;    launch_generate
+    make_links $RANS_CHANNEL_LR_LONG_DIR;         launch_generate
+    make_links $RANS_CHANNEL_LR_RSM_DIR;          launch_generate
+    make_links $RANS_CHANNEL_LR_STRETCHED_DIR;    launch_generate
+    make_links $RANS_CHANNEL_LR_UNIFORM_DIR;      launch_generate
 
-    make_links $HYB_CHANNEL_HR_STRETCHED_DIR;   launch_generate
-    make_links $HYB_CHANNEL_HR_UNIFORM_DIR;     launch_generate
+    make_links $HYB_CHANNEL_HR_STRETCHED_DIR;     launch_generate
+    make_links $HYB_CHANNEL_HR_UNIFORM_DIR;       launch_generate
   fi
 }
 #------------------------------------------------------------------------------#
@@ -317,21 +320,22 @@ function divide_tests {
 
   #-- seq
   clean_compile $DIVI_DIR no no no # dir CGNS_HDF5 MPI
-  cd $LAMINAR_BACKSTEP_ORTH_DIR;      launch_divide
-  cd $LAMINAR_BACKSTEP_NON_ORTH_DIR;  launch_divide
-  cd $LES_CAVITY_LID_DRIVEN_DIR;      launch_divide
-  cd $LES_CAVITY_THERM_DRIVEN_DIR;    launch_divide
-  cd $RANS_BACKSTEP_5100_DIR;         launch_divide
-  cd $RANS_BACKSTEP_28000_DIR;        launch_divide
-  cd $RANS_CHANNEL_LR_LONG_DIR;       launch_divide
-  cd $RANS_CHANNEL_LR_RSM_DIR;        launch_divide
-  cd $RANS_CHANNEL_LR_STRETCHED_DIR;  launch_divide
-  cd $RANS_CHANNEL_LR_UNIFORM_DIR;    launch_divide
-  cd $RANS_IMPINGING_JET_DIR;         launch_divide
-  cd $RANS_FUEL_BUNDLE_DIR;           launch_divide
-  cd $HYB_CHANNEL_HR_STRETCHED_DIR;   launch_divide
-  cd $HYB_CHANNEL_HR_UNIFORM_DIR;     launch_divide
-  cd $LES_PIPE_DIR;                   launch_divide
+  cd $LAMINAR_BACKSTEP_ORTH_DIR;        launch_divide
+  cd $LAMINAR_BACKSTEP_NON_ORTH_DIR;    launch_divide
+  cd $LES_CAVITY_LID_DRIVEN_DIR;        launch_divide
+  cd $LES_CAVITY_THERM_DRIVEN_DIR_106;  launch_divide
+  cd $LES_CAVITY_THERM_DRIVEN_DIR_108;  launch_divide
+  cd $RANS_BACKSTEP_5100_DIR;           launch_divide
+  cd $RANS_BACKSTEP_28000_DIR;          launch_divide
+  cd $RANS_CHANNEL_LR_LONG_DIR;         launch_divide
+  cd $RANS_CHANNEL_LR_RSM_DIR;          launch_divide
+  cd $RANS_CHANNEL_LR_STRETCHED_DIR;    launch_divide
+  cd $RANS_CHANNEL_LR_UNIFORM_DIR;      launch_divide
+  cd $RANS_IMPINGING_JET_DIR;           launch_divide
+  cd $RANS_FUEL_BUNDLE_DIR;             launch_divide
+  cd $HYB_CHANNEL_HR_STRETCHED_DIR;     launch_divide
+  cd $HYB_CHANNEL_HR_UNIFORM_DIR;       launch_divide
+  cd $LES_PIPE_DIR;                     launch_divide
 
 }
 #------------------------------------------------------------------------------#
@@ -492,12 +496,11 @@ function processor_backup_tests {
     process_backup_test yes $RANS_CHANNEL_LR_RSM_DIR
   fi
 
-  # Issue: pipe does not work after Divide
   #-- Pipe_Re_Tau_180 [les_dynamic]
-#  process_backup_test no  $LES_PIPE_DIR
-#  if [ "$CGNS" = "yes" ]; then
-#    process_backup_test yes $LES_PIPE_DIR
-#  fi
+  process_backup_test no  $LES_PIPE_DIR
+  if [ "$CGNS" = "yes" ]; then
+    process_backup_test yes $LES_PIPE_DIR
+  fi
 
   #-- Cavity_Lid_Driven_Re_1000 [none]
   process_backup_test no  $LES_CAVITY_LID_DRIVEN_DIR
@@ -717,9 +720,15 @@ function processor_full_length_tests {
 
   # no User_Mod/ dir !!!
   processor_full_length_test \
-    "$LES_CAVITY_THERM_DRIVEN_DIR" \
+    "$LES_CAVITY_THERM_DRIVEN_DIR_106" \
     "none" \
-    "$LES_CAVITY_THERM_DRIVEN_DIR/Xmgrace"
+    "$LES_CAVITY_THERM_DRIVEN_DIR_106/Xmgrace"
+
+  # no User_Mod/ dir !!!
+  processor_full_length_test \
+    "$LES_CAVITY_THERM_DRIVEN_DIR_108" \
+    "none" \
+    "$LES_CAVITY_THERM_DRIVEN_DIR_108/Xmgrace"
 
   # [~2 min test]
   processor_full_length_test \
@@ -757,7 +766,7 @@ function processor_full_length_tests {
     "hybrid_les_rans" \
     "$HYB_CHANNEL_HR_STRETCHED_DIR/Xmgrace"
 
-#  # Issue: pipe does not work
+#  # Issue: pipe does not pass processor_backup_tests
 #  processor_full_length_test \
 #    "$LES_PIPE_DIR" \
 #    "les_dynamic" \
