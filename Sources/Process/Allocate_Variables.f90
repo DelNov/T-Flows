@@ -205,7 +205,7 @@
       call Var_Mod_Allocate_Statistics(tt)
       allocate(g_buoy   (-grid % n_bnd_cells:grid % n_cells));  g_buoy    = 0.
       allocate(buoy_beta(-grid % n_bnd_cells:grid % n_cells));  buoy_beta = 0.
-      allocate(g_kin    (-grid % n_bnd_cells:grid % n_cells));  g_kin    = 0.
+      allocate(g_kin    (-grid % n_bnd_cells:grid % n_cells));  g_kin     = 0.
 
     end if ! buoyancy
 
@@ -641,7 +641,7 @@
       call Var_Mod_Allocate_Statistics(tt)
       allocate(g_buoy   (-grid % n_bnd_cells:grid % n_cells));  g_buoy    = 0.
       allocate(buoy_beta(-grid % n_bnd_cells:grid % n_cells));  buoy_beta = 0.
-      allocate(g_kin    (-grid % n_bnd_cells:grid % n_cells));  g_kin    = 0.
+      allocate(g_kin    (-grid % n_bnd_cells:grid % n_cells));  g_kin     = 0.
 
     end if ! buoyancy
 
