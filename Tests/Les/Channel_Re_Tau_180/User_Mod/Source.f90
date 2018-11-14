@@ -8,11 +8,11 @@
 !   system for always positive variables, for example.                         !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
+  use Const_Mod, only: PI
   use Grid_Mod
   use Var_Mod
   use Matrix_Mod
   use Flow_Mod
-  use Const_Mod, only: PI
 !------------------------------------------------------------------------------!
   implicit none
 !----------------------------------[Locals]------------------------------------!
@@ -26,33 +26,30 @@
 
   !-----------------------------------------------------! 
   !                                                     !
-  !   Set source depending on which variable you have   !
+  !   Set source for temperature of the form:           ! 
   !                                                     !
-  !-----------------------------------------------------! 
-  ! 
-  !
-  !  /
-  ! |
-  ! |dT/dx * Ux * volume 
-  ! |
-  !/
-  ! dT/dx is derived from condition that there is no
-  ! change of energy in the system. It means
-  ! mass_flux * cp * dT - Q * Area = 0, Area = B*dx*Nwall,
-  !  dT/dx = Q*B*Nwall/(mass_flux*cp),
-  ! where Q is heat flux through the wall, B is
-  ! channel width and Nwall is number of heated walls.  
-
-  !-------------------------------!
-  !  Set source for temperature   !
-  !-------------------------------!
+  !    /                                                ! 
+  !   |                                                 !
+  !   | dT/dx * Ux * dV                                 !
+  !   |                                                 !
+  !  /                                                  !
+  !                                                     !
+  ! dT/dx is derived from condition that there is no    !
+  ! change of energy in the system. It means            !
+  !   mass_flux * cp * dT - Q * Area = 0,               ! 
+  !   Area = B*dx*Nwall,                                !  
+  !   dT/dx = Q*B*Nwall/(mass_flux*cp),                 !
+  ! where Q is heat flux through the wall, B is         ! 
+  ! channel width and Nwall is number of heated walls.  ! 
+  !                                                     !
+  !-----------------------------------------------------!
   if( phi % name .eq. 'T' ) then  
     do c = 1, grid % n_cells
       
       b_vector(c) = b_vector(c)                    &
-                  - PI * 2 * heat_flux * u % n(c)  &
-      / (bulk % flux_x * capacity) * grid % vol(c)
+                  - PI * 2* heat_flux * u % n(c)   &
+                  / (bulk % flux_x * capacity) * grid % vol(c)
     end do
   end if
 
-  end subroutine  ! fourth level comments
+  end subroutine
