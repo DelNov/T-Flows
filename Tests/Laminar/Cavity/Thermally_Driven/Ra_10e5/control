@@ -2,18 +2,21 @@
  HEAT_TRANSFER    yes
  BUOYANCY         yes
 
- NUMBER_OF_TIME_STEPS   1200
+ NUMBER_OF_TIME_STEPS     600
 
- RESULTS_SAVE_INTERVAL    50
- BACKUP_SAVE_INTERVAL    100
+ RESULTS_SAVE_INTERVAL    300
+ BACKUP_SAVE_INTERVAL     300
 
  TIME_STEP               1.0
 
 #-------------------
 # Monitoring points 
 #-------------------
- NUMBER_OF_MONITORING_POINTS    1
-   MONITORING_POINT_001         0.5  0.1  0.75
+ NUMBER_OF_MONITORING_POINTS    4
+   MONITORING_POINT_001         0.5  0.1  0.95
+   MONITORING_POINT_002         0.5  0.1  0.85
+   MONITORING_POINT_003         0.5  0.1  0.75
+   MONITORING_POINT_004         0.5  0.1  0.65
 
  POINT_FOR_MONITORING_PLANES    0.5  0.1  0.75
 
@@ -25,7 +28,7 @@
 
  # Properties based on Pr and Ra numbers:
  # Pr = 0.71
- # Ra = 10e3
+ # Ra = 10e5
  # mu     = 1.0 / sqrt(Pr * Ra) = 0.00375293312
  # lambda = sqrt(Pr / Ra)       = 0.00266458251
  MASS_DENSITY           1.0
@@ -56,8 +59,12 @@
  PRECONDITIONER_FOR_SYSTEM_MATRIX   incomplete_cholesky
  TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-3
  TOLERANCE_FOR_ENERGY_SOLVER        1.e-3
- TOLERANCE_FOR_PRESSURE_SOLVER      1.e-5
+ TOLERANCE_FOR_PRESSURE_SOLVER      1.e-7
  TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
+
+ MAX_ITERATIONS_FOR_PRESSURE_SOLVER   120
+
+ REFERENCE_TEMPERATURE                  0.5
 
 #--------------------
 # Initial conditions
