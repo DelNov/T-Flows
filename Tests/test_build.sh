@@ -766,11 +766,11 @@ function processor_full_length_tests {
     "hybrid_les_rans" \
     "$HYB_CHANNEL_HR_STRETCHED_DIR/Xmgrace"
 
-#  # Issue: pipe does not work
-#  processor_full_length_test \
-#    "$LES_PIPE_DIR" \
-#    "les_dynamic" \
-#    "$LES_PIPE_DIR/Xmgrace"
+  # Issue: pipe does not pass processor_backup_tests
+  processor_full_length_test \
+    "$LES_PIPE_DIR" \
+    "les_dynamic" \
+    "$LES_PIPE_DIR/Xmgrace"
 }
 #------------------------------------------------------------------------------#
 # actual script
