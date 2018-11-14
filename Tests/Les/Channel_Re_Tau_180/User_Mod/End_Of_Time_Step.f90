@@ -24,7 +24,7 @@
   if(mod(n-33, 1500) .ne. 0) return
 
   ! If too late to disturb, get out too
-  if(n > 6000) return
+  if(n > 3000) return
 
   ! Print a message
   if(this_proc < 2) then
