@@ -229,12 +229,15 @@
                               v % mean(1),"MeanVelocityY")
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               w % mean(1),"MeanVelocityZ")
-    uu_mean = uu % mean(c) - u % mean(c) * u % mean(c)
-    vv_mean = vv % mean(c) - v % mean(c) * v % mean(c)
-    ww_mean = ww % mean(c) - w % mean(c) * w % mean(c)
-    uv_mean = uv % mean(c) - u % mean(c) * v % mean(c)
-    uw_mean = uw % mean(c) - u % mean(c) * w % mean(c)
-    vw_mean = vw % mean(c) - v % mean(c) * w % mean(c)
+    do c = 1, grid % n_cells
+      uu_mean(c) = uu % mean(c) - u % mean(c) * u % mean(c)
+      vv_mean(c) = vv % mean(c) - v % mean(c) * v % mean(c)
+      ww_mean(c) = ww % mean(c) - w % mean(c) * w % mean(c)
+      uv_mean(c) = uv % mean(c) - u % mean(c) * v % mean(c)
+      uw_mean(c) = uw % mean(c) - u % mean(c) * w % mean(c)
+      vw_mean(c) = vw % mean(c) - v % mean(c) * w % mean(c)
+    end do
+
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               uu_mean(1),"ReynoldsStressXX")
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
@@ -250,10 +253,13 @@
     if(heat_transfer) then
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                                t % mean(1), "TemperatureMean")
-      tt_mean = tt % mean(c) - t % mean(c) * t % mean(c)
-      ut_mean = ut % mean(c) - u % mean(c) * t % mean(c)
-      vt_mean = vt % mean(c) - v % mean(c) * t % mean(c)
-      wt_mean = wt % mean(c) - w % mean(c) * t % mean(c)
+      do c = 1, grid % n_cells
+        tt_mean(c) = tt % mean(c) - t % mean(c) * t % mean(c)
+        ut_mean(c) = ut % mean(c) - u % mean(c) * t % mean(c)
+        vt_mean(c) = vt % mean(c) - v % mean(c) * t % mean(c)
+        wt_mean(c) = wt % mean(c) - w % mean(c) * t % mean(c)
+      end do
+
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                                 tt_mean(1),"TemperatureFluctuations")
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
