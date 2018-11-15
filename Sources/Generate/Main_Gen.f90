@@ -5,9 +5,10 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Domain_Mod,  only: Domain_Type
-  use Grid_Mod,    only: Grid_Type,                  &
-                         Grid_Mod_Sort_Faces_Smart,  &
-                         Grid_Mod_Calculate_Wall_Distance
+  use Grid_Mod,    only: Grid_Type,                         &
+                         Grid_Mod_Sort_Faces_Smart,         &
+                         Grid_Mod_Calculate_Wall_Distance,  &
+                         Grid_Mod_Coarsen
   use Smooths_Mod, only: Smooths_Type
   use Refines_Mod, only: Refines_Type
 !------------------------------------------------------------------------------!
@@ -53,7 +54,7 @@
   end do
 
   ! Coarsen the grid with METIS
-  ! Not implemented yet: call Grid_Mod_Coarsen(grid)
+  call Grid_Mod_Coarsen(grid)
 
   !------------------------------!
   !   Save data for processing   !
