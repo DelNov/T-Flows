@@ -1,4 +1,4 @@
-#T-Flows 
+# T-Flows 
 
 T-Flows (stands for Turbulent Flows) is a Computational Fluid Dynamics (CFD) program featuring second order accurate finite volume discretization of incompressible Navier-Stokes equations with heat transfer and species transport.  It is written in Fortran 90 and uses Message Passing Interface (MPI) for parallel execution.
 
@@ -36,7 +36,7 @@ Build tested with following tools and versions:
 
 To download current version of the code use:
 
-git clone https://github.com/DelNov/T-Flows/
+` git clone https://github.com/DelNov/T-Flows/ `
 
 Compiled programs are in Binaries/ folder.
 Sources are in Sources/Generate/, Sources/Convert/, Sources/Divide/, Sources/Process/ .
