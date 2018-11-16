@@ -49,7 +49,7 @@
   integer           :: file_id
   character(len=80) :: file_name
   integer           :: file_mode
-  logical           :: verbose = .false.
+  logical           :: verbose = .true.
 
   ! Solution section
   type Cgns_Solution_Type
@@ -79,6 +79,8 @@
     character(len=80)    :: name
     integer              :: color
     integer              :: n_nodes
+    integer, allocatable :: point_list(:)
+    integer, allocatable :: belongs_to_sect(:)
   end type
 
   ! Blocks
