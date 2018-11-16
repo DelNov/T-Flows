@@ -141,7 +141,7 @@
         end if
 
         if(heat_transfer) then
-          t_p(i)   = t_p(i) + t % n(c)
+          t_p(i)    = t_p(i)  + t % n(c)
           ut_p(i)   = ut_p(i) + ut % n(c)
           vt_p(i)   = vt_p(i) + vt % n(c)
           wt_p(i)   = wt_p(i) + wt % n(c)
@@ -234,7 +234,7 @@
 
   if(heat_transfer) then 
     d_wall = 0.0
-    do c = 1, grid % n_cells
+    do c = 1, grid % n_cells - grid % comm % n_buff_cells
       if(grid % wall_dist(c) > d_wall) then
         d_wall = grid % wall_dist(c)
         t_inf  = t % n(c)
@@ -265,6 +265,7 @@
 
     call Comm_Mod_Global_Sum_Real(t_wall)
     call Comm_Mod_Global_Sum_Real(nu_max)
+    call Comm_Mod_Global_Sum_Int(n_points)
 
     call Comm_Mod_Wait
 
