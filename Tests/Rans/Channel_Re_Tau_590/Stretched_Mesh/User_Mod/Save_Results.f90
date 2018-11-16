@@ -255,6 +255,7 @@
 
     call Comm_Mod_Global_Sum_Real(t_wall)
     call Comm_Mod_Global_Sum_Real(nu_max)
+    call Comm_Mod_Global_Sum_Int(n_points)
 
     call Comm_Mod_Wait
 
