@@ -12,6 +12,7 @@
   use Var_Mod
   use Matrix_Mod
   use Flow_Mod
+  use Const_Mod, only: PI
 !------------------------------------------------------------------------------!
   implicit none
 !----------------------------------[Locals]------------------------------------!
@@ -34,8 +35,9 @@
   !-------------------------------!
   if( phi % name .eq. 'T' ) then  
     do c = 1, grid % n_cells
-      b_vector(c) = b_vector(c)   &
-                  - heat_flux * w % n(c) / bulk % flux_z * grid % vol(c)
+      b_vector(c) = b_vector(c)                      &
+                  - 2.0 * pi * heat_flux * w % n(c)  &
+                  / bulk % flux_z * grid % vol(c)
     end do
   end if
 

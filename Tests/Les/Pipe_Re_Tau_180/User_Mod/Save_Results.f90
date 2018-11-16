@@ -134,14 +134,16 @@
                           + b12*b11*uv_c + b12*b12*vv_c
         vv_p(i) = vv_p(i) + b21*b21*uu_c + b21*b22*uv_c &
                           + b22*b21*uv_c + b22*b22*vv_c
-        ww_p(i) = ww_p(i) + ww % n(c)
+        ww_p(i) = ww_p(i) + ww_c
         uw_p(i) = uw_p(i) + abs(b11*uw_c + b12*vw_c)
 
         if(heat_transfer) then
           t_p(i)  = t_p(i)  + t % mean(c)
           tt_p(i) = tt_p(i) + tt % mean(c) - t % mean(c) * t % mean(c)
-          ut_p(i) = ut_p(i) + ut % mean(c) - u % mean(c) * t % mean(c)
-          vt_p(i) = vt_p(i) + vt % mean(c) - v % mean(c) * t % mean(c)
+          ut_p(i) = ut_p(i) + ut % mean(c) - (u % mean(c) * b11 &
+                                  + v % mean(c) * b12) * t % mean(c)
+          vt_p(i) = vt_p(i) + vt % mean(c) - (-v % mean(c) * b12 &
+                                  + v % mean(c) * b11) * t % mean(c)
           wt_p(i) = wt_p(i) + wt % mean(c) - w % mean(c) * t % mean(c)
         end if
         n_count(i) = n_count(i) + 1

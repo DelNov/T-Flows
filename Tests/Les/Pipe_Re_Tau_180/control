@@ -4,15 +4,15 @@
 
  PROBLEM_NAME    pipe
 
- HEAT_TRANSFER   no
+ HEAT_TRANSFER   yes
 
  TIME_STEP                             0.02
- NUMBER_OF_TIME_STEPS                 36000
- STARTING_TIME_STEP_FOR_STATISTICS    12000
+ NUMBER_OF_TIME_STEPS                 18000
+ STARTING_TIME_STEP_FOR_STATISTICS    9000 
 
- RESULTS_SAVE_INTERVAL       50
- BACKUP_SAVE_INTERVAL      1000
-
+ RESULTS_SAVE_INTERVAL     1200  
+ BACKUP_SAVE_INTERVAL      1200
+#LOAD_BACKUP_NAME   pipe-ts009000.backup 
 #-------------------
 # Monitoring points 
 #-------------------
@@ -24,7 +24,7 @@
 # Physical models
 #-----------------
  MASS_DENSITY           1.0
- THERMAL_CONDUCTIVITY   1.408e-4
+ THERMAL_CONDUCTIVITY   4.694e-4
  DYNAMIC_VISCOSITY      3.33333e-4
  HEAT_CAPACITY          1.0
 
@@ -53,7 +53,7 @@
  TOLERANCE_FOR_MOMENTUM_SOLVER     1.e-3
  TOLERANCE_FOR_PRESSURE_SOLVER     1.e-3
  TOLERANCE_FOR_ENERGY_SOLVER       1.e-3
- TOLERANCE_FOR_SIMPLE_ALGORITHM    1.e-4
+ TOLERANCE_FOR_SIMPLE_ALGORITHM    5.e-4
 
  MAX_ITERATIONS_FOR_PRESSURE_SOLVER   240
 
@@ -69,6 +69,6 @@
 #---------------------
   BOUNDARY_CONDITION    cylinder
 
-    TYPE                wall
+    TYPE                wall_flux
     VARIABLES           u     v     w     q
     VALUES              0.0   0.0   0.0   0.1

@@ -2,34 +2,34 @@
 # Problem definition
 #--------------------
 
- PROBLEM_NAME            pipe_full
+ PROBLEM_NAME           pipe_full
 
- HEAT_TRANSFER          no 
+ HEAT_TRANSFER          yes
 
  PRESSURE_DROPS         0.0   0.0   0.0036  
- MASS_FLOW_RATES        0.0   0.0   3.4
+ MASS_FLOW_RATES        0.0   0.0   11.5
 
 #---------------
 # Time stepping
 #---------------
 
- TIME_STEP                  0.1
- NUMBER_OF_TIME_STEPS     9001
- RESULTS_SAVE_INTERVAL    1000
- BACKUP_SAVE_INTERVAL     1000
+ TIME_STEP                  0.3
+ NUMBER_OF_TIME_STEPS     3600
+ RESULTS_SAVE_INTERVAL    600
+ BACKUP_SAVE_INTERVAL     600
 
-# LOAD_BACKUP_NAME  pipe_full-ts009000.backup 
+# LOAD_BACKUP_NAME  pipe_full-ts000600.backup 
 
 #-------------------
 # Monitoring points 
 #-------------------
 
- NUMBER_OF_MONITORING_POINTS               5
- MONITORING_POINT_001  0.05  0.5  1.0
- MONITORING_POINT_002  0.05  0.5  0.001
- MONITORING_POINT_003  0.05  0.5  0.01
- MONITORING_POINT_004  0.05  0.5  0.1
- MONITORING_POINT_005  0.05  0.5  0.2
+ NUMBER_OF_MONITORING_POINTS        5
+ MONITORING_POINT_001  0.0  0.99  0.5
+ MONITORING_POINT_002  0.0  0.8   0.5
+ MONITORING_POINT_003  0.0  0.7   0.5
+ MONITORING_POINT_004  0.0  0.2   0.5
+ MONITORING_POINT_005  0.0  0.0   0.5
 
  POINT_FOR_MONITORING_PLANES    0.05  0.05  0.514
 
@@ -38,14 +38,12 @@
 #-----------------
 
  MASS_DENSITY           1.0
- THERMAL_CONDUCTIVITY   1.4e-5
+ THERMAL_CONDUCTIVITY   1.4e-4
  DYNAMIC_VISCOSITY      1.0e-4
  HEAT_CAPACITY          1.0
 
  TURBULENCE_MODEL       k_eps_zeta_f
-# TURBULENCE_MODEL       k_eps
-# TURBULENCE_MODEL       rsm_manceau_hanjalic
-# TURBULENCE_MODEL_VARIANT stabilized
+
 #----------------------
 # Numerical parameters
 #----------------------
@@ -89,9 +87,3 @@
     TYPE                wall_flux
     VARIABLES           u     v     w     q     kin   eps      zeta  f22
     VALUES              0.0   0.0   0.0   0.1   0.0   1.0e-3   0.0   0.0
-
-  BOUNDARY_CONDITION    symmetry 
-    TYPE                symmetry
-    VARIABLES           u     v     w     t      kin      eps      zeta     f22
-    VALUES              0.0   0.0   0.0   20.0   1.0E-2   1.0E-3   6.6E-2   1.0e-3
-
