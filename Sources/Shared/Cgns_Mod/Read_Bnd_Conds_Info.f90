@@ -68,7 +68,6 @@
   ! "For a ptset_type of PointRange, npnts is always two"
   ! "For a ptset_type of PointList, npnts is the number of points or elements 
   !  in the list"
-  cgns_base(base) % block(block) % bnd_cond(bc) % n_nodes = bc_n_nodes
 
   ! Fill up the boundary condition names
   color = 0
@@ -104,6 +103,9 @@
 
   ! Copy b.c. point list to Cgns_Block_Type structure
   if (trim(PointSetTypeName(bc_ptset_type)) .eq. 'PointList') then
+
+    cgns_base(base) % block(block) % bnd_cond(bc) % n_nodes = bc_n_nodes
+
     allocate( cgns_base(base) % block(block) % bnd_cond(bc) % point_list( &
         bc_n_nodes ) )
     allocate( cgns_base(base) % block(block) % bnd_cond(bc) % belongs_to_sect( &
@@ -116,6 +118,9 @@
     first_point = min(point_list(1), point_list(2))
     last_point  = max(point_list(1), point_list(2))
 
+    cgns_base(base) % block(block) % bnd_cond(bc) % n_nodes = &
+      last_point - first_point + 1
+
     allocate( cgns_base(base) % block(block) % bnd_cond(bc) % point_list( &
         last_point - first_point + 1 ) )
     allocate( cgns_base(base) % block(block) % bnd_cond(bc) % belongs_to_sect( &
@@ -124,7 +129,7 @@
     do i = first_point, last_point
       cgns_base(base) % block(block) % bnd_cond(bc) % point_list( &
         i - first_point +1) = i
-    enddo
+    end do
 
   end if
 

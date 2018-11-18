@@ -20,7 +20,7 @@
   integer           :: n_bnd         ! index of last boundary element
   integer           :: parent_flag   ! are the parent cells stored (I guess)
   integer           :: error
-  integer           :: cnt, bc, int, i, pos_in_list
+  integer           :: cnt, bc, int, pos_in_list, i, j, k
   logical           :: found_in_list
 !==============================================================================!
 
@@ -59,32 +59,47 @@
   !-----------------------------------------------------!
   !   Consider only boundary conditions in this block   !
   !-----------------------------------------------------!
+
   do bc = 1, cgns_base(base) % block(block) % n_bnd_conds
-    if(index(trim(sect_name), &
-        trim(cgns_base(base) % block(block) % bnd_cond(bc) % name), &
-        back = .true.) .ne. 0) then
 
-      if(verbose) then
-        print *, '#         ---------------------------------'
-        print *, '#         Bnd section name:  ', trim(sect_name)
-        print *, '#         ---------------------------------'
-        print *, '#         Bnd section index ', sect
-        print *, '#         Bnd section type:  ', ElementTypeName(cell_type)
-        print *, '#         First cell:        ',  &
-          cgns_base(base) % block(block) % section(sect) % first_cell
-        print *, '#         Last cell:         ',  &
-          cgns_base(base) % block(block) % section(sect) % last_cell
-      end if
+    ! If point of b.c. is inside this section -> this section is b.c.
+    k = 0
+    do i = first_cell, last_cell
+      do j = 1, cgns_base(base) % block(block) % bnd_cond(bc) % n_nodes
 
-      ! Count boundary cells
-      if ( ElementTypeName(cell_type) .eq. 'QUAD_4') then
-        cnt_bnd_qua = cnt_bnd_qua + cnt
-      end if
-      if ( ElementTypeName(cell_type) .eq. 'TRI_3' ) then
-        cnt_bnd_tri = cnt_bnd_tri + cnt
-      end if
+        if( i .eq. &
+          cgns_base(base) % block(block) % bnd_cond(bc) % point_list(j) ) then
+          cgns_base(base) % block(block) % bnd_cond(bc) % belongs_to_sect(j) = &
+            sect_id
+          k = k + 1
+        end if
 
+      end do
+    end do
+
+    if(verbose .and. k .ne. 0) then
+      print *, '#         ---------------------------------'
+      print *, '#         Bnd section name:  ', trim(sect_name)
+      print *, '#         ---------------------------------'
+      print *, '#         Bnd section index ', sect
+      print *, '#         Bnd section type:  ', ElementTypeName(cell_type)
+      print *, '#         Bnd section has:   ', k, ' boundary faces, '
+      print *, '#         They belong to ', &
+        trim(cgns_base(base) % block(block) % bnd_cond(bc) % name), ' b.c.'
+      !print *, '#         First cell:        ',  &
+      !  cgns_base(base) % block(block) % section(sect) % first_cell
+      !print *, '#         Last cell:         ',  &
+      !  cgns_base(base) % block(block) % section(sect) % last_cell
     end if
+
+    ! Count boundary cells
+    if ( ElementTypeName(cell_type) .eq. 'QUAD_4') then
+      cnt_bnd_qua = cnt_bnd_qua + k
+    end if
+    if ( ElementTypeName(cell_type) .eq. 'TRI_3' ) then
+      cnt_bnd_tri = cnt_bnd_tri + k
+    end if
+
   end do
 
   !--------------------------------------------!
