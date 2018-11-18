@@ -246,7 +246,8 @@
             Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. WALLFL) then
 
           t_wall = t_wall + t % n(c2)
-          nu_max = nu_max + t % q(c2)/(conductivity*(t % n(c2) - t_inf))
+          nu_max = nu_max + t % q(c2)/(conductivity   &
+                   *(t % n(c2) - t_inf + TINY))
           n_points = n_points + 1
         end if
       end if
@@ -254,6 +255,7 @@
 
     call Comm_Mod_Global_Sum_Real(t_wall)
     call Comm_Mod_Global_Sum_Real(nu_max)
+    call Comm_Mod_Global_Sum_Int(n_points)
 
     call Comm_Mod_Wait
 
@@ -272,13 +274,13 @@
     cf      = u_tau_p**2/(0.5*ubulk**2)
     error   = abs(cf_dean - cf)/cf_dean * 100.0
     write(i,'(a1,(a12,e12.6))')  &
-    '#', 'ubulk    = ', ubulk 
+    '#', 'Ubulk    = ', ubulk 
     write(i,'(a1,(a12,e12.6))')  &
-    '#', 're       = ', density * ubulk * 2.0/viscosity
+    '#', 'Re       = ', density * ubulk * 2.0/viscosity
     write(i,'(a1,(a12,e12.6))')  &
     '#', 'Re_tau   = ', density*u_tau_p/viscosity
     write(i,'(a1,(a12,e12.6))')  &
-    '#', 'cf       = ', 2.0*(u_tau_p/ubulk)**2
+    '#', 'Cf       = ', 2.0*(u_tau_p/ubulk)**2
     write(i,'(a1,(a12,f12.6))')  &
     '#', 'Utau     = ', u_tau_p 
     write(i,'(a1,(a12,f12.6,a2,a22))') & 
@@ -308,14 +310,14 @@
         write(i,'(a1,2x,a60)') '#',  ' z,'                    //  &
                                      ' u,'                    //  &
                                      ' kin, eps, uw,'         //  &
-                                     ' f22, v2,'              //  &
+                                     ' f22, zeta,'            //  &
                                      ' vis_t/viscosity,'      //  &
                                      ' t, ut, vt, wt'
       else
         write(i,'(a1,2x,a54)') '#', ' z,'                     //  &
                                     ' u,'                     //  &
                                     ' kin, eps, uw,'          //  &
-                                    ' f22, v2'                //  &
+                                    ' f22, zeta'              //  &
                                     ' vis_t/viscosity,'
       end if
     end if

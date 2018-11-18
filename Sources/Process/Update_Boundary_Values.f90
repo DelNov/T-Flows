@@ -245,7 +245,7 @@
   if(heat_transfer) then
     call Comm_Mod_Global_Sum_Real(heat_flux)
     call Comm_Mod_Global_Sum_Real(heated_area)
-    heat_flux = heat_flux / heated_area
+    heat_flux = heat_flux / (heated_area + TINY)
     heat      = heat_flux * heated_area
   end if
 

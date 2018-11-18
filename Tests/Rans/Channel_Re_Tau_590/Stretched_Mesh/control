@@ -42,7 +42,6 @@
  DYNAMIC_VISCOSITY      1.0e-4
  HEAT_CAPACITY          1.0
 
-# TURBULENCE_MODEL       k_eps
  TURBULENCE_MODEL       k_eps_zeta_f
 
 #----------------------

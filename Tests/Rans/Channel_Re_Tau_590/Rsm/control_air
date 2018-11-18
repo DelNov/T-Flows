@@ -1,26 +1,22 @@
 #--------------------
 # Problem definition
 #--------------------
-
- PROBLEM_NAME   chan_full
- PROBLEM_TYPE   channel
-
- HEAT_TRANSFER yes 
-
+ PROBLEM_NAME   chan
+ HEAT_TRANSFER  yes
 
  PRESSURE_DROPS   0.0036  0.0 0.0
  MASS_FLOW_RATES  2.32    0.0 0.0
+
 #---------------
 # Time stepping
 #---------------
 
- TIME_STEP                          0.3
- NUMBER_OF_TIME_STEPS               3501
- RESULTS_SAVE_INTERVAL              500
- BACKUP_SAVE_INTERVAL               500
+ TIME_STEP                  0.5
+ NUMBER_OF_TIME_STEPS      3000
+ RESULTS_SAVE_INTERVAL      600
+ BACKUP_SAVE_INTERVAL       600
 
-# LOAD_BACKUP_NAME  chan_full-ts004000.backup
-
+# LOAD_BACKUP_NAME  chan-ts003000.backup
 
 #-------------------
 # Monitoring points 
@@ -36,13 +32,13 @@
 #-----------------
 
  MASS_DENSITY         1.0
- THERMAL_CONDUCTIVITY 1.4080e-4
+ THERMAL_CONDUCTIVITY 1.4e-4
  DYNAMIC_VISCOSITY    1.0e-4
  HEAT_CAPACITY        1.0
 
  TURBULENCE_MODEL         rsm_manceau_hanjalic
 # TURBULENCE_MODEL         rsm_hanjalic_jakirlic
-# TURBULENCE_MODEL          k_eps
+
  TURBULENCE_MODEL_VARIANT none
 # TURBULENCE_MODEL_VARIANT stabilized
 
@@ -52,15 +48,12 @@
 
  PRESSURE_MOMENTUM_COUPLING           simple
 
- SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.4
+ SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.6
  SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.4
  SIMPLE_UNDERRELAXATION_FOR_ENERGY      0.4
  SIMPLE_UNDERRELAXATION_FOR_TURBULENCE  0.4
 
- TIME_INTEGRATION_FOR_INERTIA         linear
- TIME_INTEGRATION_FOR_ADVECTION       fully_implicit
- TIME_INTEGRATION_FOR_DIFFUSION       fully_implicit
- TIME_INTEGRATION_FOR_CROSS_DIFFUSION fully_implicit
+ TIME_INTEGRATION_SCHEME  linear
 
  ADVECTION_SCHEME_FOR_MOMENTUM    minmod
  ADVECTION_SCHEME_FOR_ENERGY      superbee
@@ -71,11 +64,11 @@
 #------------------------
 
  PRECONDITIONER_FOR_SYSTEM_MATRIX incomplete_cholesky
- TOLERANCE_FOR_MOMENTUM_SOLVER    1.e-7
- TOLERANCE_FOR_PRESSURE_SOLVER    1.e-7
- TOLERANCE_FOR_TURBULENCE_SOLVER  1.e-7
- TOLERANCE_FOR_ENERGY_SOLVER      1.e-7
- TOLERANCE_FOR_SIMPLE_ALGORITHM   1.e-6
+ TOLERANCE_FOR_MOMENTUM_SOLVER    1.e-5
+ TOLERANCE_FOR_PRESSURE_SOLVER    1.e-5
+ TOLERANCE_FOR_TURBULENCE_SOLVER  1.e-5
+ TOLERANCE_FOR_ENERGY_SOLVER      1.e-5
+ TOLERANCE_FOR_SIMPLE_ALGORITHM   1.e-3
 
 
 #--------------------
@@ -83,15 +76,19 @@
 #--------------------
 
  INITIAL_CONDITION
-  VARIABLES u   v   w   T    uu    vv    ww    uv    uw    vw    eps    kin  zeta  f22 
-  VALUES    0.01 0.0 0.0 20.0 0.006 0.002 0.004 0.00  0.001 0.0   0.001 0.01 0.02  0.1
-#  VALUES    0.01 0.0 0.0 20.0 0.006 0.002 0.004 0.00  0.001 0.0   0.001 
+  VARIABLES u     v   w   t    uu     vv     ww     uv    uw     vw    eps     f22 
+  VALUES    0.001 0.0 0.0 20.0 0.0001 0.0001 0.0001 0.00  0.0001 0.0   0.0002  0.1
 
 #---------------------
 # Boundary conditions
 #---------------------
 
- BOUNDARY_CONDITION   lower_wall
-  TYPE    wall_flux
-  VARIABLES u   v   w   q   uu    vv    ww    uv    uw    vw    eps   f22
-  VALUES    0.0 0.0 0.0 0.1  0.0   0.0   0.0   0.0   0.0   0.0   0.0   0.0
+ BOUNDARY_CONDITION   top_wall
+  TYPE    wall
+  VARIABLES u   v   w   t   uu    vv    ww    uv    uw    vw    eps   f22
+  VALUES    0.0 0.0 0.0 22  0.0   0.0   0.0   0.0   0.0   0.0   0.0   0.0
+
+ BOUNDARY_CONDITION   bottom_wall
+  TYPE    wall
+  VARIABLES u   v   w   t   uu    vv    ww    uv    uw    vw    eps   f22
+  VALUES    0.0 0.0 0.0 22  0.0   0.0   0.0   0.0   0.0   0.0   0.0   0.0

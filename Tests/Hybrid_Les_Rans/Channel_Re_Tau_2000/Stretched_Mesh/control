@@ -4,7 +4,7 @@
 
  PROBLEM_NAME    chan
 
- HEAT_TRANSFER   no
+ HEAT_TRANSFER   yes
 
  TIME_STEP                            0.01
  NUMBER_OF_TIME_STEPS                 18000

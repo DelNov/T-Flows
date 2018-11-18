@@ -43,7 +43,6 @@
  HEAT_CAPACITY          1.0
 
  TURBULENCE_MODEL       k_eps_zeta_f
-# TURBULENCE_MODEL       k_eps
 
 #----------------------
 # Numerical parameters

@@ -1,8 +1,10 @@
 Problem name (this line is a comment)
 
  PROBLEM_NAME    backstep
- PROBLEM_TYPE    backstep
- BACKUP_SAVE_INTERVAL 1000
+
+ BACKUP_SAVE_INTERVAL 600
+ RESULT_SAVE_INTERVAL 600
+
 # LOAD_BACKUP_NAME   backstep-ts000001.backup 
 
   This line is a comment too, just like any which doesn't start with a keyword.
@@ -13,7 +15,7 @@ Problem name (this line is a comment)
 Time resolution
 
  TIME_STEP                            0.01
- NUMBER_OF_TIME_STEPS                 1200
+ NUMBER_OF_TIME_STEPS                 1800
 
 Monitoring
 
@@ -41,13 +43,13 @@ Numerical part
  SIMPLE_UNDERRELAXATION_FOR_TURBULENCE   0.3
  TIME_INTEGRATION_SCHEME  linear
 
- ADVECTION_SCHEME_FOR_MOMENTUM       upwind
- ADVECTION_SCHEME_FOR_TURBULENCE     upwind
+ ADVECTION_SCHEME_FOR_MOMENTUM       smart
+ ADVECTION_SCHEME_FOR_TURBULENCE     smart
  PRECONDITIONER_FOR_SYSTEM_MATRIX    incomplete_cholesky
- TOLERANCE_FOR_MOMENTUM_SOLVER       1.e-7
- TOLERANCE_FOR_PRESSURE_SOLVER       1.e-7
- TOLERANCE_FOR_TURBULENCE_SOLVER     1.e-7
- TOLERANCE_FOR_SIMPLE_ALGORITHM      1.e-5
+ TOLERANCE_FOR_MOMENTUM_SOLVER       1.e-4
+ TOLERANCE_FOR_PRESSURE_SOLVER       1.e-4
+ TOLERANCE_FOR_TURBULENCE_SOLVER     1.e-4
+ TOLERANCE_FOR_SIMPLE_ALGORITHM      5.e-3
 
 Initial values
 

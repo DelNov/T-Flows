@@ -232,7 +232,8 @@
             Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. WALLFL) then
 
           t_wall = t_wall + t % n(c2)
-          nu_max = nu_max + t % q(c2)/(conductivity*(t % n(c2) - t_inf))
+          nu_max = nu_max + t % q(c2)/(conductivity   &
+                   *(t % n(c2) - t_inf + TINY))
           n_points = n_points + 1
         end if
       end if
@@ -259,9 +260,9 @@
     cf      = u_tau_p**2/(0.5*ubulk**2)
     error   = abs(cf_dean - cf)/cf_dean * 100.0
     write(i,'(a1,(a12,e12.6))')  &
-    '#', 'ubulk    = ', ubulk 
+    '#', 'Ubulk    = ', ubulk 
     write(i,'(a1,(a12,e12.6))')  &
-    '#', 're       = ', density * ubulk * 2.0/viscosity
+    '#', 'Re       = ', density * ubulk * 2.0/viscosity
     write(i,'(a1,(a12,e12.6))')  &
     '#', 'Re_tau   = ', density*u_tau_p/viscosity
     write(i,'(a1,(a12,e12.6))')  &

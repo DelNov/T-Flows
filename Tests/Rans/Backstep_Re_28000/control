@@ -6,8 +6,8 @@ Time integration
  TIME_STEP                            0.05
 
 Saving intervals
- RESULTS_SAVE_INTERVAL   300
- BACKUP_SAVE_INTERVAL    300
+ RESULTS_SAVE_INTERVAL   600
+ BACKUP_SAVE_INTERVAL    600
 # LOAD_BACKUP_NAME   backstep-ts000647.backup
 
 

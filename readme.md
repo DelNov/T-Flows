@@ -36,7 +36,7 @@ Build tested with following tools and versions:
 
 To download current version of the code use:
 
-git clone https://github.com/DelNov/T-Flows/
+` git clone https://github.com/DelNov/T-Flows/ `
 
 Compiled programs are in Binaries/ folder.
 Sources are in Sources/Generate/, Sources/Convert/, Sources/Divide/, Sources/Process/ .
