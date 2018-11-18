@@ -158,17 +158,6 @@
         if(turbulence_model .eq. K_EPS_ZETA_F    .or.  &
            turbulence_model .eq. HYBRID_LES_RANS .or.  &
            turbulence_model .eq. K_EPS) then
-          y_pl   = max(c_mu25 * kin % n(c1) &
-                 * grid % wall_dist(c1) / kin_vis, TINY)
-          u_plus = log(max(y_pl,1.05)*e_log) / kappa
-          pr = viscosity * capacity / conductivity
-          beta = 9.24 * ((pr/pr_t)**0.75 - 1.0)      &
-               * (1.0 + 0.28 * exp(-0.007*pr/pr_t))
-          ebf = 0.01 * (pr*y_pl**4            &
-              / ((1.0 + 5.0 * pr**3 * y_pl) + TINY))
-          con_wall(c1) =  y_pl*viscosity*capacity  &
-                       / (   y_pl     * pr   * exp(-1.0 * ebf)   &
-                          + (u_plus + beta) * pr_t * exp(-1.0 / ebf) + TINY)
           if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
             t % n(c2) = t % n(c1) + t % q(c2) * grid % wall_dist(c1)  &
                       / (con_wall(c1))
