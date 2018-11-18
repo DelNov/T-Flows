@@ -122,6 +122,11 @@ $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_OBJECT)/Bnd_Cond_Mod.o 
 
 #-- ./Cgns_Mod/Read_Interface_Info.f90
+#-- ./Cgns_Mod/Read_3d_Section_Connections.f90
+$(DIR_OBJECT)/Read_3d_Section_Connections.o:\
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 
+
 #-- ./Cgns_Mod/Initialize_Counters.f90
 #-- ./Cgns_Mod/Read_Number_Of_Element_Sections.f90
 #-- ./Cgns_Mod/Read_Bnd_Conds_Info.f90
@@ -149,6 +154,11 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 #-- ./Cgns_Mod/Sequential/Write_Base_Info.f90
 #-- ./Cgns_Mod/Sequential/Write_Section_Connections.f90
 $(DIR_OBJECT)/Write_Section_Connections.o:\
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 
+
+#-- ./Cgns_Mod/Read_2d_Section_Connections.f90
+$(DIR_OBJECT)/Read_2d_Section_Connections.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
