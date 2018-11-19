@@ -68,9 +68,25 @@
   allocate(vert_data   (n_verts))
   allocate(part_weight (n_parts * n_constrains))
 
+  !---------------------------------------------------------!
+  !   Initialize arrays for level zero and coarser levels   !
+  !---------------------------------------------------------!
+
+  ! Cells on level 0
+  grid % level(0) % n_cells = grid % n_cells
   do c = 1, grid % n_cells
     grid % level(0) % cell(c) = c
   end do
+
+  ! Faces on level 0
+  grid % level(0) % n_faces = grid % n_faces
+  do s = 1, grid % n_faces
+    grid % level(0) % face(s) = s
+    grid % level(0) % faces_c(1, s) = grid % faces_c(1, s)
+    grid % level(0) % faces_c(2, s) = grid % faces_c(2, s)
+  end do
+
+  ! Cells and faces on other levels
   do lev = 1, MAX_MG_LEV
     do c = 1, grid % n_cells
       grid % level(lev) % cell(c) = 1
@@ -78,7 +94,7 @@
     do s = 1, grid % n_faces
       grid % level(lev) % face(s) = 1
     end do
-  end do 
+  end do
 
   ! Find out the number of effective levels
   do lev = 1, MAX_MG_LEV
