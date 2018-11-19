@@ -18,7 +18,7 @@
   type(Grid_Type)    :: grid      ! grid which will be generated
   type(Smooths_Type) :: smooths   ! smoothing regions
   type(Refines_Type) :: refines   ! refinement regions and levels
-  integer            :: c, s, n
+  integer            :: c, s, n, lev
 !==============================================================================!
 
   ! Open with a logo
@@ -74,7 +74,12 @@
   call Save_Vtu_Cells(grid, 0,         &
                       grid % n_nodes,  &
                       grid % n_cells)
-  call Save_Vtu_Faces(grid)
+
+  ! Save all grid levels for visual inspection
+  do lev = 0, grid % n_levels
+    call Save_Vtu_Faces(grid, lev)
+  end do
+
 
   ! Save links for checking
   call Save_Vtu_Links(grid, 0,             &
