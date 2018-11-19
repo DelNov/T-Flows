@@ -380,6 +380,6 @@
   !   And finally save   !
   !----------------------!
   call Save_Vtu_Cells(grid, 0, grid % n_nodes, grid % n_cells)
-  call Save_Vtu_Faces(grid)
+  call Save_Vtu_Faces(grid, 0)
 
   end subroutine
