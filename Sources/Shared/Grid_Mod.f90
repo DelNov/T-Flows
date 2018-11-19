@@ -5,6 +5,7 @@
 !   (that means in "Generate", "Divide", "Convert", "Process".                 !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
+  use Grid_Level_Mod
   use Material_Mod
   use Bnd_Cond_Mod
   use Metis_Options_Mod
@@ -17,30 +18,6 @@
   !   Maximum number of multi-grid levels   !
   !-----------------------------------------!
   integer, parameter :: MAX_MG_LEV = 8
-
-  !-----------------------!
-  !                       !
-  !   Coarser grid type   !
-  !                       !
-  !-----------------------!
-  type Coarser_Grid_Type
-
-    ! Number of cells and faces at each level
-    integer :: n_cells
-    integer :: n_faces
-
-    ! Cell and face numbers from current to coarser levels
-    integer, allocatable :: cell(:)
-    integer, allocatable :: face(:)
-
-    ! Cell and face at coarser level
-    integer, allocatable :: cell_at_coarser(:)
-    integer, allocatable :: face_at_coarser(:)
-
-    ! Faces' neigboring (surrounding) cells
-    integer, allocatable :: faces_c(:,:)
-
-  end type
 
   !---------------!
   !               !
@@ -115,7 +92,7 @@
     integer, allocatable :: cells_bnd_color(:,:)
 
     ! Coarser levels for the grid
-    type(Coarser_Grid_Type) :: level(0:MAX_MG_LEV)
+    type(Grid_Level_Type) :: level(0:MAX_MG_LEV)
 
     !-------------------------!
     !  Face-based variables   !

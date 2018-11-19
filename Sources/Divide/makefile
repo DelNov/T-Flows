@@ -112,6 +112,7 @@ SRC_MOD =  Const_Mod.f90		\
            Metis_Options_Mod.f90	\
            Bnd_Cond_Mod.f90		\
            Sort_Mod.f90			\
+           Grid_Level_Mod.f90		\
            Grid_Mod.f90			\
            Name_Mod.f90			\
            Comm_Mod_Seq.f90
@@ -123,6 +124,7 @@ SRC_MOD =  Const_Mod.f90		\
 # Sources for all shared functions
 SRC_FUN = Distance.f90			\
           Distance_Squared.f90		\
+          Get_C1_And_C2_At_Level.f90	\
           Name_File.f90			\
           Load_Geo.f90			\
           Save_Cns_Geo.f90		\

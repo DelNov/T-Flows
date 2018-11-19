@@ -125,6 +125,7 @@ SRC_MOD = Const_Mod.f90			\
           Metis_Options_Mod.f90		\
           Bnd_Cond_Mod.f90		\
           Sort_Mod.f90			\
+          Grid_Level_Mod.f90		\
           Grid_Mod.f90			\
           Comm_Mod_Seq.f90
 
@@ -138,7 +139,7 @@ SRC_MOD += Point_Mod.f90		\
            Domain_Mod.f90
 
 #---------------
-#   Functions   
+#   Functions
 #---------------
 
 # Sources for all functions are obtained by a shell command
