@@ -1,16 +1,17 @@
 !==============================================================================!
-  subroutine Save_Vtu_Faces(grid)
+  subroutine Save_Vtu_Faces(grid, level)
 !------------------------------------------------------------------------------!
-! Writes .faces.vtu file.                                                      !
+!   Writes .mg00.faces.vtu file.                                               !
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
+  integer         :: level
 !-----------------------------------[Locals]-----------------------------------!
-  integer             :: c1, c2, n, s, offset
-  character(len=80)  :: name_out
+  integer            :: c1, c2, n, s, offset, level_n_faces
+  character(len=80)  :: extension, name_out
 !------------------------------[Local parameters]------------------------------!
   integer,           parameter :: VTK_TRIANGLE = 5  ! cell shapes in VTK format
   integer,           parameter :: VTK_QUAD     = 9
@@ -22,12 +23,21 @@
   character(len=10), parameter :: IN_5 = '          '
 !==============================================================================!
 
-  !-----------------------------------------!
-  !                                         !
-  !   Create boundary condition .vtu file   !
-  !                                         !
-  !-----------------------------------------!
-  call Name_File(0, name_out, '.faces.vtu')
+  !------------------------------------------------------!
+  !   Count number of faces for plotting on this level   !
+  !------------------------------------------------------!
+  level_n_faces = 0
+  do s = 1, grid % n_faces
+    call Get_C1_And_C2_At_Level(grid, level, s, c1, c2)
+    if(c1 .ne. c2) level_n_faces = level_n_faces + 1
+  end do
+
+  !----------------------!
+  !   Create .vtu file   !
+  !----------------------!
+  extension = '.mg00.faces.vtu'
+  write(extension(4:5), '(i2.2)') level
+  call Name_File(0, name_out, trim(extension))
   open(9, file=name_out)
   print *, '# Creating the file: ', trim(name_out)
 
@@ -39,8 +49,11 @@
                          'byte_order="LittleEndian">'
   write(9,'(a,a)') IN_1, '<UnstructuredGrid>'
   write(9,'(a,a,i0.0,a,i0.0,a)')   &
-                   IN_2, '<Piece NumberOfPoints="', grid % n_nodes, &
-                              '" NumberOfCells ="', grid % n_faces, '">'
+                   IN_2, '<Piece NumberOfPoints="',  &
+                         grid % n_nodes,             &
+                         '" NumberOfCells ="',       &
+                         level_n_faces,              &
+                         '">'
   !-----------!
   !   Nodes   !
   !-----------!
@@ -63,45 +76,69 @@
   write(9,'(a,a)') IN_4, '<DataArray type="Int64" Name="connectivity"' //  &
                          ' format="ascii">'
   do s = 1, grid % n_faces
-    if(grid % faces_n_nodes(s) .eq. 4) then
-      write(9,'(a,4I9)')                               &
-        IN_5,                                          &
-        grid % faces_n(1,s)-1, grid % faces_n(2,s)-1,  &
-        grid % faces_n(3,s)-1, grid % faces_n(4,s)-1
-    else if(grid % faces_n_nodes(s) .eq. 3) then
-      write(9,'(a,3I9)')                               &
-        IN_5,                                          &
-        grid % faces_n(1,s)-1, grid % faces_n(2,s)-1,  &
-        grid % faces_n(3,s)-1
-    else
-      print *, '# Unsupported cell type ',       &
-                 grid % faces_n_nodes(s), ' nodes.'
-      print *, '# Exiting'
-      stop
+
+    call Get_C1_And_C2_At_Level(grid, level, s, c1, c2)
+
+    ! Either boundary on the finest level,
+    ! ... or inter-cell face on any level.
+    if(c1 .ne. c2) then
+      if(grid % faces_n_nodes(s) .eq. 4) then
+        write(9,'(a,4I9)')                               &
+          IN_5,                                          &
+          grid % faces_n(1,s)-1, grid % faces_n(2,s)-1,  &
+          grid % faces_n(3,s)-1, grid % faces_n(4,s)-1
+      else if(grid % faces_n_nodes(s) .eq. 3) then
+        write(9,'(a,3I9)')                               &
+          IN_5,                                          &
+          grid % faces_n(1,s)-1, grid % faces_n(2,s)-1,  &
+          grid % faces_n(3,s)-1
+      else
+        print *, '# Unsupported cell type ',       &
+                   grid % faces_n_nodes(s), ' nodes.'
+        print *, '# Exiting'
+        stop
+      end if
     end if
-  end do  
+
+  end do
   write(9,'(a,a)') IN_4, '</DataArray>'
 
   ! Then write all faces' offsets
   write(9,'(a,a)') IN_4, '<DataArray type="Int64" Name="offsets" format="ascii">'
   offset = 0
   do s = 1, grid % n_faces
-    offset = offset + grid % faces_n_nodes(s)
-    write(9,'(a,i9)') IN_5, offset
+
+    call Get_C1_And_C2_At_Level(grid, level, s, c1, c2)
+
+    ! Either boundary on the finest level,
+    ! ... or inter-cell face on any level.
+    if(c1 .ne. c2) then
+      offset = offset + grid % faces_n_nodes(s)
+      write(9,'(a,i9)') IN_5, offset
+    end if
+
   end do
   write(9,'(a,a)') IN_4, '</DataArray>'
 
   ! Now write all cells' types
   write(9,'(a,a)') IN_4, '<DataArray type="Int64" Name="types" format="ascii">'
   do s = 1, grid % n_faces
-    if(grid % faces_n_nodes(s) .eq. 4) write(9,'(a,i9)') IN_5, VTK_QUAD
-    if(grid % faces_n_nodes(s) .eq. 3) write(9,'(a,i9)') IN_5, VTK_TRIANGLE
+
+    call Get_C1_And_C2_At_Level(grid, level, s, c1, c2)
+
+    ! Either boundary on the finest level,
+    ! ... or inter-cell face on any level.
+    if(c1 .ne. c2) then
+      if(grid % faces_n_nodes(s) .eq. 4) write(9,'(a,i9)') IN_5, VTK_QUAD
+      if(grid % faces_n_nodes(s) .eq. 3) write(9,'(a,i9)') IN_5, VTK_TRIANGLE
+    end if
+
   end do
   write(9,'(a,a)') IN_4, '</DataArray>'
   write(9,'(a,a)') IN_3, '</Cells>'
 
   !---------------!
-  !   Cell data   !
+  !   Face data   !
   !---------------!
   write(9,'(a,a)') IN_3, '<CellData Scalars="scalars" vectors="velocity">'
 
@@ -109,8 +146,8 @@
   write(9,'(a,a)') IN_4, '<DataArray type="Int64" ' // &
                    'Name="BoundaryConditions" format="ascii">'
   do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+
+    call Get_C1_And_C2_At_Level(grid, level, s, c1, c2)
 
     ! If boundary
     if( c2 < 0 ) then
@@ -118,7 +155,9 @@
 
     ! If inside
     else
-      write(9,'(a,i9)') IN_5, 0
+      if(c1 .ne. c2) then
+        write(9,'(a,i9)') IN_5, 0
+      end if
     end if
   end do
 
