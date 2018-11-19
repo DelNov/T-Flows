@@ -11,7 +11,7 @@
   type(Grid_Type) :: grid
   integer         :: this_proc  ! needed if called from Processor
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: c, n, s, color
+  integer           :: c, n, s
   character(len=80) :: name_in
 !==============================================================================!
 
