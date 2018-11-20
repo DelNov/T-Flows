@@ -8,8 +8,6 @@ $(DIR_SHARED)/Tokenizer_Mod/*.f90 \
 $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
@@ -29,8 +27,6 @@ $(DIR_OBJECT)/Info_Mod.o \
 Info_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
@@ -49,8 +45,6 @@ $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Flow_Mod.o \
@@ -82,8 +76,6 @@ $(DIR_OBJECT)/Info_Mod.o \
 Info_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Flow_Mod.o \
@@ -98,8 +90,6 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 $(DIR_OBJECT)/Save_Vtu_Vector.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -132,8 +122,6 @@ $(DIR_OBJECT)/Initialize.o:\
 $(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
@@ -157,8 +145,6 @@ $(DIR_OBJECT)/Info_Mod.o \
 Info_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
@@ -180,8 +166,6 @@ $(DIR_OBJECT)/Info_Mod.o \
 Info_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
@@ -196,8 +180,6 @@ Bulk_Mod/*.f90
 $(DIR_OBJECT)/Beginning_Of_Correct_Velocity.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o 
 
 #-- ./User_Mod/Source.f90
@@ -207,16 +189,12 @@ Var_Mod/*.f90 \
 $(DIR_OBJECT)/Matrix_Mod.o \
 Matrix_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./User_Mod/Beginning_Of_Compute_Momentum.f90
 $(DIR_OBJECT)/Beginning_Of_Compute_Momentum.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o 
 
 #-- ./User_Mod/Calculate_Mean.f90
@@ -225,8 +203,6 @@ $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
@@ -236,8 +212,6 @@ $(DIR_OBJECT)/Const_Mod.o
 $(DIR_OBJECT)/End_Of_Compute_Pressure.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o 
 
 #-- ./User_Mod/Save_Vtu_Results.f90
@@ -245,9 +219,7 @@ $(DIR_OBJECT)/Save_Vtu_Results.o:\
 $(DIR_OBJECT)/Var_Mod.o \
 Var_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./User_Mod/Save_Cgns_Results.f90
 $(DIR_OBJECT)/Save_Cgns_Results.o:\
@@ -255,8 +227,6 @@ $(DIR_OBJECT)/Var_Mod.o \
 Var_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Cgns_Mod_Void.f90 \
 $(DIR_SHARED)/Cgns_Mod_Seq.f90 \
 $(DIR_SHARED)/Cgns_Mod_Par.f90 \
@@ -267,16 +237,12 @@ $(DIR_SHARED)/Cgns_Mod/*/*.f90
 $(DIR_OBJECT)/End_Of_Compute_Momentum.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o 
 
 #-- ./User_Mod/Beginning_Of_Time_Step.f90
 $(DIR_OBJECT)/Beginning_Of_Time_Step.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./User_Mod/Compute_Scalar.f90
 $(DIR_OBJECT)/Compute_Scalar.o:\
@@ -292,8 +258,6 @@ $(DIR_OBJECT)/Info_Mod.o \
 Info_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Flow_Mod.o \
@@ -307,54 +271,40 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 #-- ./User_Mod/End_Of_Time_Step.f90
 $(DIR_OBJECT)/End_Of_Time_Step.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./User_Mod/Initialize.f90
 $(DIR_OBJECT)/Initialize.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./User_Mod/Save_Results.f90
 $(DIR_OBJECT)/Save_Results.o:\
 $(DIR_OBJECT)/Var_Mod.o \
 Var_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./User_Mod/End_Of_Correct_Velocity.f90
 $(DIR_OBJECT)/End_Of_Correct_Velocity.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o 
 
 #-- ./User_Mod/Before_Exit.f90
 $(DIR_OBJECT)/Before_Exit.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./User_Mod/Allocate.f90
 $(DIR_OBJECT)/Allocate.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./User_Mod/Beginning_Of_Compute_Pressure.f90
 $(DIR_OBJECT)/Beginning_Of_Compute_Pressure.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o 
 
 #-- ./User_Mod/Force.f90
@@ -364,17 +314,13 @@ Var_Mod/*.f90 \
 $(DIR_OBJECT)/Matrix_Mod.o \
 Matrix_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Logo_Pro.f90
 #-- ./Calculate_Mass_Flow_Rate.f90
 $(DIR_OBJECT)/Calculate_Mass_Flow_Rate.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o 
 
 #-- ./Var_Mod/Allocate_Gradients.f90
@@ -386,8 +332,6 @@ $(DIR_OBJECT)/Flow_Mod.o
 $(DIR_OBJECT)/Save_Debug_Vtu_Scalar.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -396,8 +340,6 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 $(DIR_OBJECT)/Save_Cgns_Results_Void.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -413,8 +355,6 @@ $(DIR_OBJECT)/Info_Mod.o \
 Info_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
@@ -427,8 +367,6 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 $(DIR_OBJECT)/Balance_Mass.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
@@ -505,8 +443,6 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 $(DIR_OBJECT)/For_P.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -515,8 +451,6 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 $(DIR_OBJECT)/Correct_Bad_Cells.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -527,8 +461,6 @@ $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -537,8 +469,6 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 $(DIR_OBJECT)/For_Phi.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -547,23 +477,17 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 $(DIR_OBJECT)/Calculate_Matrix.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #-- ./Grad_Mod/Allocate_Memory.f90
 $(DIR_OBJECT)/Allocate_Memory.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Bulk_Mod/Monitoring_Planes_Areas.f90
 $(DIR_OBJECT)/Monitoring_Planes_Areas.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -572,8 +496,6 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 $(DIR_OBJECT)/Compute_Fluxes.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
@@ -586,8 +508,6 @@ $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Flow_Mod.o \
@@ -633,8 +553,6 @@ $(DIR_OBJECT)/Info_Mod.o \
 Info_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Flow_Mod.o \
@@ -719,8 +637,6 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 $(DIR_OBJECT)/Write_Cell.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -729,8 +645,6 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 $(DIR_OBJECT)/Read_Int.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -739,8 +653,6 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 $(DIR_OBJECT)/Write_Int.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -751,8 +663,6 @@ $(DIR_OBJECT)/Var_Mod.o \
 Var_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -761,8 +671,6 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 $(DIR_OBJECT)/Read_Cell.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -773,8 +681,6 @@ $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -785,8 +691,6 @@ $(DIR_OBJECT)/Var_Mod.o \
 Var_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -795,8 +699,6 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 $(DIR_OBJECT)/Read_Real.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -805,8 +707,6 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 $(DIR_OBJECT)/Write_Bnd.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -815,8 +715,6 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 $(DIR_OBJECT)/Write_Real.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -827,8 +725,6 @@ $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
@@ -841,8 +737,6 @@ $(DIR_OBJECT)/Var_Mod.o \
 Var_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -851,8 +745,6 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 $(DIR_OBJECT)/Write_Cell_Bnd.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -862,8 +754,6 @@ $(DIR_OBJECT)/Load.o:\
 $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Flow_Mod.o \
@@ -878,8 +768,6 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 $(DIR_OBJECT)/Read_Bnd.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -888,8 +776,6 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 $(DIR_OBJECT)/Read_Cell_Bnd.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -900,8 +786,6 @@ $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -912,8 +796,6 @@ $(DIR_OBJECT)/Var_Mod.o \
 Var_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -926,8 +808,6 @@ $(DIR_OBJECT)/Name_Mod.o \
 Monitor_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
@@ -939,8 +819,6 @@ $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
@@ -954,8 +832,6 @@ $(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Flow_Mod.o \
@@ -969,8 +845,6 @@ $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
@@ -986,8 +860,6 @@ $(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Flow_Mod.o \
@@ -1012,8 +884,6 @@ $(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o \
 $(DIR_OBJECT)/Const_Mod.o 
 
@@ -1032,8 +902,6 @@ $(DIR_OBJECT)/Info_Mod.o \
 Info_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Flow_Mod.o \
@@ -1049,8 +917,6 @@ $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 
@@ -1063,8 +929,6 @@ $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Flow_Mod.o \
@@ -1085,8 +949,6 @@ $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
@@ -1102,8 +964,6 @@ $(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Flow_Mod.o \
@@ -1123,8 +983,6 @@ $(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Flow_Mod.o \
@@ -1135,8 +993,6 @@ $(DIR_OBJECT)/Source_F22_K_Eps_Zeta_F.o:\
 $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
@@ -1147,8 +1003,6 @@ $(DIR_OBJECT)/Turbulent_Prandtl_Number.o:\
 $(DIR_OBJECT)/Turbulence_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o \
 $(DIR_OBJECT)/Const_Mod.o 
 
@@ -1158,8 +1012,6 @@ $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
@@ -1180,8 +1032,6 @@ $(DIR_OBJECT)/Info_Mod.o \
 Info_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Flow_Mod.o \
@@ -1213,8 +1063,6 @@ $(DIR_OBJECT)/Info_Mod.o \
 Info_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Flow_Mod.o \
@@ -1236,8 +1084,6 @@ $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Flow_Mod.o \
@@ -1263,8 +1109,6 @@ $(DIR_OBJECT)/Find_Nearest_Wall_Cell.o:\
 $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
@@ -1276,8 +1120,6 @@ $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
@@ -1301,8 +1143,6 @@ $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
@@ -1315,8 +1155,6 @@ $(DIR_OBJECT)/Roughness_Coefficient.o:\
 $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #-- ./Turbulence/Constants_Hanjalic_Jakirlic.f90
@@ -1331,8 +1169,6 @@ $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
@@ -1346,8 +1182,6 @@ $(DIR_OBJECT)/Source_Zeta_K_Eps_Zeta_F.o:\
 $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
@@ -1363,8 +1197,6 @@ $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Flow_Mod.o \
@@ -1377,8 +1209,6 @@ $(DIR_OBJECT)/Source_F22_Rsm_Manceau_Hanjalic.o:\
 $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o 
 
 #-- ./Turbulence/Time_And_Length_Scale.f90
@@ -1389,8 +1219,6 @@ $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
@@ -1400,8 +1228,6 @@ $(DIR_OBJECT)/Const_Mod.o
 $(DIR_OBJECT)/Calculate_Minimum_Maximum.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -1430,8 +1256,6 @@ $(DIR_OBJECT)/Info_Mod.o \
 Info_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Flow_Mod.o \
@@ -1451,8 +1275,6 @@ $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Flow_Mod.o \
@@ -1480,8 +1302,6 @@ $(DIR_OBJECT)/Info_Mod.o \
 Info_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Flow_Mod.o \
@@ -1503,8 +1323,6 @@ $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
@@ -1520,8 +1338,6 @@ $(DIR_OBJECT)/Matrix_Mod.o \
 Matrix_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
@@ -1780,8 +1596,6 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 $(DIR_OBJECT)/Pressure_Matrix_Projection.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o 
 
 #-- ./Save_Vtu_Results.f90
@@ -1797,8 +1611,6 @@ $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
@@ -1820,8 +1632,6 @@ $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
@@ -1838,8 +1648,6 @@ $(DIR_OBJECT)/Update_Boundary_Values.o:\
 $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
@@ -1857,8 +1665,6 @@ $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
@@ -1890,8 +1696,6 @@ $(DIR_OBJECT)/Matrix_Mod.o:\
 Matrix_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -1903,8 +1707,6 @@ $(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Flow_Mod.o \
@@ -1920,8 +1722,6 @@ $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
@@ -1932,8 +1732,6 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 $(DIR_OBJECT)/Bulk_Mod.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
@@ -1947,8 +1745,6 @@ $(DIR_OBJECT)/Advection_Scheme.o:\
 $(DIR_OBJECT)/Numerics_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o 
 
 #-- ./Load_Physical_Properties.f90
@@ -1956,8 +1752,6 @@ $(DIR_OBJECT)/Load_Physical_Properties.o:\
 $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 
@@ -1970,8 +1764,6 @@ $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Flow_Mod.o \
@@ -1983,24 +1775,18 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 $(DIR_OBJECT)/Var_Mod.o:\
 Var_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Calculate_Face_Geometry.f90
 $(DIR_OBJECT)/Calculate_Face_Geometry.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Flow_Mod.o 
 
 #-- ./Save_Vtu_Scalar.f90
 $(DIR_OBJECT)/Save_Vtu_Scalar.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -2008,9 +1794,7 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 #-- ./Load_Cns.f90
 $(DIR_OBJECT)/Load_Cns.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Tet_Volume.f90
 #-- ./Probe_1d_Nodes.f90
@@ -2019,9 +1803,7 @@ $(DIR_OBJECT)/Sort_Mod.o \
 $(DIR_SHARED)/Sort_Mod/*.f90 \
 $(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Bnd_Cond_Mod.f90
 #-- ./Name_File.f90
@@ -2034,16 +1816,12 @@ $(DIR_OBJECT)/Probe_1d_Cells.o:\
 $(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #-- ./Save_Cgns_Cells.f90
 $(DIR_OBJECT)/Save_Cgns_Cells.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 \
@@ -2057,8 +1835,6 @@ $(DIR_SHARED)/Cgns_Mod/*/*.f90
 $(DIR_OBJECT)/Comm_Mod_Seq.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -2068,37 +1844,27 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 #-- ./Work_Mod/Allocate_Integer_Faces.f90
 $(DIR_OBJECT)/Allocate_Integer_Faces.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Work_Mod/Allocate_Real_Faces.f90
 $(DIR_OBJECT)/Allocate_Real_Faces.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Work_Mod/Allocate_Real_Cells.f90
 $(DIR_OBJECT)/Allocate_Real_Cells.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Work_Mod/Allocate_Integer_Cells.f90
 $(DIR_OBJECT)/Allocate_Integer_Cells.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Work_Mod/Allocate_Real_Nodes.f90
 $(DIR_OBJECT)/Allocate_Real_Nodes.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Name_Mod.f90
 #-- ./Approx_String.f90
@@ -2109,9 +1875,7 @@ $(DIR_OBJECT)/Sort_Mod.o \
 $(DIR_SHARED)/Sort_Mod/*.f90 \
 $(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Cgns_Mod_Seq.f90
 $(DIR_OBJECT)/Cgns_Mod_Seq.o:\
@@ -2119,8 +1883,6 @@ $(DIR_OBJECT)/Sort_Mod.o \
 $(DIR_SHARED)/Sort_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 \
@@ -2135,8 +1897,6 @@ $(DIR_OBJECT)/Save_Vtu_Links.o:\
 $(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Div_Mod.o 
 
 #-- ./Swap_Int.f90
@@ -2144,8 +1904,6 @@ $(DIR_OBJECT)/Div_Mod.o
 $(DIR_OBJECT)/Save_Cns_Geo.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Div_Mod.o 
 
 #-- ./Tokenizer_Mod.f90
@@ -2168,8 +1926,6 @@ $(DIR_OBJECT)/Sort_Mod.o \
 $(DIR_SHARED)/Sort_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 \
@@ -2210,16 +1966,12 @@ $(DIR_SHARED)/Cgns_Mod/*/*.f90
 #-- ./Cgns_Mod/Read_Section_Connections.f90
 $(DIR_OBJECT)/Read_Section_Connections.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Cgns_Mod/Read_Coordinate_Array.f90
 $(DIR_OBJECT)/Read_Coordinate_Array.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Cgns_Mod/Write_Link_To_Mesh_In_File.f90
 $(DIR_OBJECT)/Write_Link_To_Mesh_In_File.o:\
@@ -2233,9 +1985,7 @@ $(DIR_OBJECT)/Merge_Nodes.o:\
 $(DIR_OBJECT)/Sort_Mod.o \
 $(DIR_SHARED)/Sort_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Cgns_Mod/Write_Link_To_Field.f90
 $(DIR_OBJECT)/Write_Link_To_Field.o:\
@@ -2247,27 +1997,21 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 #-- ./Cgns_Mod/Sequential/Write_Section_Connections.f90
 $(DIR_OBJECT)/Write_Section_Connections.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Cgns_Mod/Sequential/Close_File.f90
 #-- ./Cgns_Mod/Sequential/Write_Solution_Info.f90
 #-- ./Cgns_Mod/Sequential/Write_Field.f90
 $(DIR_OBJECT)/Write_Field.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Cgns_Mod/Sequential/Write_Base_Info.f90
 #-- ./Cgns_Mod/Sequential/Write_Block_Info.f90
 #-- ./Cgns_Mod/Sequential/Write_Coordinate_Array.f90
 $(DIR_OBJECT)/Write_Coordinate_Array.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Cgns_Mod/Sequential/Open_File.f90
 #-- ./Cgns_Mod/Read_Section_Info.f90
@@ -2283,8 +2027,6 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 $(DIR_OBJECT)/Write_Section_Connections.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -2300,8 +2042,6 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 $(DIR_OBJECT)/Write_Field.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -2324,8 +2064,6 @@ $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -2339,7 +2077,6 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 #-- ./Cgns_Mod/Read_Base_Info.f90
 #-- ./Cgns_Mod/Read_Interface_Info.f90
 #-- ./Grid_Mod/Sort_Cells_By_Index.f90
-#-- ./Grid_Mod/Coarsen.f90-new-and-cool
 #-- ./Grid_Mod/Sort_Faces_Smart.f90
 #-- ./Grid_Mod/Allocate_Bnd_Cond.f90
 #-- ./Grid_Mod/Bnd_Cond_Ranges.f90
@@ -2357,7 +2094,6 @@ $(DIR_OBJECT)/Tokenizer_Mod.o \
 $(DIR_SHARED)/Tokenizer_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
-#-- ./Grid_Mod/Coarsen.f90-old-and-lame
 #-- ./Grid_Mod/Allocate_New_Numbers.f90
 #-- ./Grid_Mod/Sort_Faces_By_Index.f90
 #-- ./Grid_Mod/Decompose.f90
@@ -2368,31 +2104,23 @@ $(DIR_OBJECT)/Const_Mod.o
 $(DIR_OBJECT)/Probe_2d.o:\
 $(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Tokenizer_Mod/Read_Line.f90
 #-- ./Save_Vtu_Cells.f90
 $(DIR_OBJECT)/Save_Vtu_Cells.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Get_C1_And_C2_At_Level.f90
 $(DIR_OBJECT)/Get_C1_And_C2_At_Level.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Load_Geo.f90
 $(DIR_OBJECT)/Load_Geo.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Distance.f90
 #-- ./Comm_Mod/Sequential/Read_Int.f90
@@ -2404,9 +2132,7 @@ $(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool
 #-- ./Comm_Mod/Sequential/Create_New_Types.f90
 $(DIR_OBJECT)/Create_New_Types.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Comm_Mod/Sequential/Close_File.f90
 #-- ./Comm_Mod/Sequential/Write_Bnd_Real.f90
@@ -2417,31 +2143,23 @@ $(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool
 #-- ./Comm_Mod/Sequential/Load_Maps.f90
 $(DIR_OBJECT)/Load_Maps.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Comm_Mod/Sequential/Read_Real.f90
 #-- ./Comm_Mod/Sequential/Allocate_Memory.f90
 $(DIR_OBJECT)/Allocate_Memory.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Comm_Mod/Sequential/Exchange_Real.f90
 $(DIR_OBJECT)/Exchange_Real.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Comm_Mod/Sequential/Create_Buffers.f90
 $(DIR_OBJECT)/Create_Buffers.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Comm_Mod/Sequential/Wait.f90
 #-- ./Comm_Mod/Sequential/Old/GloMax.f90
@@ -2449,9 +2167,7 @@ $(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool
 #-- ./Comm_Mod/Sequential/Old/Exchange.f90
 $(DIR_OBJECT)/Exchange.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Comm_Mod/Sequential/Old/IGlSum.f90
 #-- ./Comm_Mod/Sequential/Old/Wait.f90
@@ -2467,18 +2183,14 @@ $(DIR_OBJECT)/StaPar.o:
 #-- ./Comm_Mod/Sequential/Exchange_Int.f90
 $(DIR_OBJECT)/Exchange_Int.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Comm_Mod/Sequential/Global_Max_Real.f90
 #-- ./Comm_Mod/Sequential/Write_Real.f90
 #-- ./Comm_Mod/Sequential/Set_Buffer_Color.f90
 $(DIR_OBJECT)/Set_Buffer_Color.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Comm_Mod/Sequential/Global_Sum_Int.f90
 #-- ./Comm_Mod/Sequential/Read_Bnd_Real.f90
@@ -2494,9 +2206,7 @@ $(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool
 #-- ./Comm_Mod/Parallel/Create_New_Types.f90
 $(DIR_OBJECT)/Create_New_Types.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Comm_Mod/Parallel/Close_File.f90
 #-- ./Comm_Mod/Parallel/Write_Bnd_Real.f90
@@ -2509,33 +2219,25 @@ $(DIR_OBJECT)/Load_Maps.o:\
 $(DIR_OBJECT)/Tokenizer_Mod.o \
 $(DIR_SHARED)/Tokenizer_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Comm_Mod/Parallel/Read_Real.f90
 #-- ./Comm_Mod/Parallel/Allocate_Memory.f90
 $(DIR_OBJECT)/Allocate_Memory.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Comm_Mod/Parallel/Exchange_Real.f90
 $(DIR_OBJECT)/Exchange_Real.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Comm_Mod/Parallel/Create_Buffers.f90
 $(DIR_OBJECT)/Create_Buffers.o:\
 $(DIR_OBJECT)/Tokenizer_Mod.o \
 $(DIR_SHARED)/Tokenizer_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Comm_Mod/Parallel/Wait.f90
 #-- ./Comm_Mod/Parallel/Global_Sum_Int_Array.f90
@@ -2543,18 +2245,14 @@ $(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool
 #-- ./Comm_Mod/Parallel/Exchange_Int.f90
 $(DIR_OBJECT)/Exchange_Int.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Comm_Mod/Parallel/Global_Max_Real.f90
 #-- ./Comm_Mod/Parallel/Write_Real.f90
 #-- ./Comm_Mod/Parallel/Set_Buffer_Color.f90
 $(DIR_OBJECT)/Set_Buffer_Color.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Comm_Mod/Parallel/Global_Sum_Int.f90
 #-- ./Comm_Mod/Parallel/Read_Bnd_Real.f90
@@ -2565,9 +2263,7 @@ $(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool
 $(DIR_OBJECT)/Work_Mod.o:\
 $(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Comm_Mod_Par.f90
 $(DIR_OBJECT)/Comm_Mod_Par.o:\
@@ -2575,8 +2271,6 @@ $(DIR_OBJECT)/Tokenizer_Mod.o \
 $(DIR_SHARED)/Tokenizer_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -2584,25 +2278,19 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 #-- ./Save_Vtu_Grid_Levels.f90
 $(DIR_OBJECT)/Save_Vtu_Grid_Levels.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Material_Mod.f90
 #-- ./Grid_Level_Mod.f90
 #-- ./Save_Vtu_Faces.f90
 $(DIR_OBJECT)/Save_Vtu_Faces.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Save_Cgns_Cells_Void.f90
 $(DIR_OBJECT)/Save_Cgns_Cells_Void.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Grid_Mod.f90
 $(DIR_OBJECT)/Grid_Mod.o:\
@@ -2613,8 +2301,6 @@ $(DIR_SHARED)/Sort_Mod/*.f90 \
 $(DIR_OBJECT)/Metis_Options_Mod.o \
 $(DIR_OBJECT)/Material_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-old-and-lame \
-$(DIR_SHARED)/Grid_Mod/Coarsen.f90-new-and-cool \
 $(DIR_OBJECT)/Grid_Level_Mod.o \
 $(DIR_OBJECT)/Grid_Level_Mod.o \
 $(DIR_OBJECT)/Const_Mod.o \
