@@ -1,16 +1,15 @@
 !==============================================================================!
-  recursive subroutine Sort_Mod_3_Int_Carry_Int(a1, a2, a3, b)
+  recursive subroutine Sort_Mod_3_Real(a1, a2, a3)
 !------------------------------------------------------------------------------!
-!   Quick sort three integer arrays and carry an integer arral along           !
+!   Quick sort three real arrays (think of three coordinates)                  !
 !                                                                              !
 !   Adapted from: https://gist.github.com/1AdAstra1  (good work Olga)          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer :: a1(:), a2(:), a3(:)
-  integer :: b(:)
+  real    :: a1(:), a2(:), a3(:)
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: x1, x2, x3
+  real    :: x1, x2, x3
   integer :: i, j, n
 !------------------------------------------------------------------------------!
 
@@ -35,22 +34,19 @@
     if (i >= j) exit
 
     ! Swap values in a and b
-    call Swap_Int(a1(i), a1(j))
-    call Swap_Int(a2(i), a2(j))
-    call Swap_Int(a3(i), a3(j))
-    call Swap_Int(b(i),  b(j))
+    call Swap_Real(a1(i), a1(j))
+    call Swap_Real(a2(i), a2(j))
+    call Swap_Real(a3(i), a3(j))
 
     i = i + 1
     j = j - 1
   end do
 
-  if (1 < i - 1) call Sort_Mod_3_Int_Carry_Int(a1(1:i-1),  &
-                                               a2(1:i-1),  &
-                                               a3(1:i-1),  &
-                                               b (1:i-1))
-  if (j + 1 < n) call Sort_Mod_3_Int_Carry_Int(a1(j+1:n),  &
-                                               a2(j+1:n),  &
-                                               a3(j+1:n),  &
-                                               b (j+1:n))
+  if (1 < i - 1) call Sort_Mod_3_Real(a1(1:i-1),  &
+                                      a2(1:i-1),  &
+                                      a3(1:i-1))
+  if (j + 1 < n) call Sort_Mod_3_Real(a1(j+1:n),  &
+                                      a2(j+1:n),  &
+                                      a3(j+1:n))
 
   end subroutine 
