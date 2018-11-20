@@ -8,11 +8,10 @@
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, c1, c2, nc, nc1, nc2, s, sl, lp, i, lev, lev_parts
-  integer              :: n_verts, n_edges, n_parts, arr_s, arr_e, val_1, val_2
-  integer, allocatable :: arr_1(:), arr_2(:)
-  integer, allocatable :: star(:,:), star_size(:),   &
-                          edges_v(:,:), edges_c(:),  &
-                          new_c(:), old_c(:),        &
+  integer              :: n_cells, n_faces, n_parts, arr_s, arr_e, val_1, val_2
+  integer, allocatable :: c1_arr(:), c2_arr(:)
+  integer, allocatable :: cells_c(:,:), cells_n_cells(:), faces_c(:,:),  &
+                          new_c(:), old_c(:),                            &
                           cell_mapping(:,:)
 
 ! Variabes for call to METIS
@@ -20,8 +19,8 @@
                           return_val            ! return value from METIS
   integer, allocatable :: row(:),            &  ! incidency matrix in ...
                           col(:),            &  ! compresser row format
-                          vert_weights(:),   &  ! weights of vertices
-                          edge_weights(:),   &  ! weights of edges
+                          cell_weights(:),   &  ! weights of vertices
+                          face_weights(:),   &  ! weights of edges
                           vert_data(:),      &  ! amount of data for vertices
                           part(:)               ! result of partitioning
   real, allocatable    :: part_weight(:),    &
@@ -39,33 +38,33 @@
   allocate(new_c(grid % n_cells))
   allocate(old_c(grid % n_cells))
 
-  ! Number of vertices and number of edges for first level 
-  n_verts = grid % n_cells
-  n_edges = 0
+  ! Number of cells (vertices for METIS) and number of faces ...
+  ! ... inside the grid (edges for METIS) for the first level
+  n_cells = grid % n_cells
+  n_faces = 0
   do s = 1, grid % n_faces
     c2 = grid % faces_c(2,s)
-    if(grid % faces_c(2,s) > 0) n_edges = n_edges + 1
+    if(grid % faces_c(2,s) > 0) n_faces = n_faces + 1
   end do
 
-  ! Once n_verts(1) and n_edegs(1) are known, allocate memory
-  allocate(edges_v  ( 2,n_edges));  edges_v  (:,:) = 0
-  allocate(edges_c  (   n_edges));  edges_c  (:)   = 0
-  allocate(star_size(   n_verts));  star_size(:)   = 0
-  allocate(star     (24,n_verts));  star     (:,:) = 0
-  allocate(part     (   n_verts));  part     (:)   = 1
-  allocate(row      ( 1+n_verts))
-  allocate(col      ( 2*n_edges))
+  ! Once n_cells and n_faces are known, allocate memory
+  allocate(faces_c      ( 2,n_faces));  faces_c      (:,:) = 0
+  allocate(cells_n_cells(   n_cells));  cells_n_cells(:)   = 0
+  allocate(cells_c      (24,n_cells));  cells_c      (:,:) = 0
+  allocate(part         (   n_cells));  part         (:)   = 1
+  allocate(row          ( 1+n_cells))
+  allocate(col          ( 2*n_faces))
 
-  allocate(arr_1(n_edges))
-  allocate(arr_2(n_edges))
+  allocate(c1_arr(n_faces))
+  allocate(c2_arr(n_faces))
 
   ! Allocate memory for control parameters for METIS
   n_constrains = 1
   n_parts      = 4   ! how many partitions at each level
   allocate(imbalance   (n_constrains))
-  allocate(vert_weights(n_verts * n_constrains))
-  allocate(edge_weights(n_edges + n_edges))
-  allocate(vert_data   (n_verts))
+  allocate(cell_weights(n_cells * n_constrains))
+  allocate(face_weights(n_faces + n_faces))
+  allocate(vert_data   (n_cells))
   allocate(part_weight (n_parts * n_constrains))
 
   !---------------------------------------------------------!
@@ -105,7 +104,7 @@
     end if
   end do
   grid % n_levels = MAX_MG_LEV
-1 continue  
+1 continue
 
   print '(a29,i2,a8)', ' # Will perform coarsening in',  &
                        grid % n_levels, ' levels.'
@@ -139,10 +138,11 @@
           old_c(i) = c
         end if
       end do
-      n_verts = i
+      n_cells = i
 
-      ! Form edge connectivity in current partition at current level
-      edges_v(:,:) = 0
+      ! Form face (edge for METIS) connectivity in ...
+      ! ... current partition at current level
+      faces_c(:,:) = 0
       i = 0
       do s = 1, grid % n_faces
         c1 = grid % faces_c(1, s)
@@ -152,45 +152,44 @@
           if(grid % level(sl+1) % cell(c1) .eq. lp .and.  &
              grid % level(sl+1) % cell(c2) .eq. lp) then
             i = i + 1
-            edges_v(1,i) = new_c(c1)
-            edges_v(2,i) = new_c(c2)
+            faces_c(1,i) = new_c(c1)
+            faces_c(2,i) = new_c(c2)
           end if
         end if
       end do
-      n_edges = i
+      n_faces = i
 
-      ! Form stars (cell to cell connectivity) for partition and level
-      star_size(:) = 0
-      star   (:,:) = 0
-      do s = 1, n_edges
-        nc1 = edges_v(1,s)
-        nc2 = edges_v(2,s)
+      ! Form cell to cell connectivity for partition and level
+      cells_n_cells(:) = 0
+      cells_c   (:,:) = 0
+      do s = 1, n_faces
+        nc1 = faces_c(1,s)
+        nc2 = faces_c(2,s)
 
-        star_size(nc1) = star_size(nc1) + 1
-        star_size(nc2) = star_size(nc2) + 1
+        cells_n_cells(nc1) = cells_n_cells(nc1) + 1
+        cells_n_cells(nc2) = cells_n_cells(nc2) + 1
 
-        star(star_size(nc1), nc1) = nc2
-        star(star_size(nc2), nc2) = nc1
+        cells_c(cells_n_cells(nc1), nc1) = nc2
+        cells_c(cells_n_cells(nc2), nc2) = nc1
       end do
 
       ! Fill-up the structures needed to call METIS (row and col)
-
       row(:) = 0
       row(1) = 0
-      do nc = 1, n_verts
-        row(nc+1) = row(nc) + star_size(nc)
+      do nc = 1, n_cells
+        row(nc+1) = row(nc) + cells_n_cells(nc)
       end do
 
       col(:) = 0
-      do nc = 1, n_verts
-        do i = 1, star_size(nc)
-          col(row(nc) + i) = star(i, nc) - 1  ! -1, METIS works from 0
+      do nc = 1, n_cells
+        do i = 1, cells_n_cells(nc)
+          col(row(nc) + i) = cells_c(i, nc) - 1  ! -1, METIS works from 0
         end do
       end do
 
       imbalance(:)    = 1.001
-      vert_weights(:) = 1
-      edge_weights(:) = 1
+      cell_weights(:) = 1
+      face_weights(:) = 1
       vert_data(:)    = 1
       part_weight(:)  = 1.0 / real(n_parts)
 
@@ -202,13 +201,13 @@
       metis_options(METIS_OPTION_DBGLVL) = 0
       metis_options(METIS_OPTION_CONTIG) = 1
 
-      call METIS_PartGraphRecursive(n_verts,       &  !  1. (in), int
+      call METIS_PartGraphRecursive(n_cells,       &  !  1. (in), int
                                     n_constrains,  &  !  2. (in), int
                                     row,           &  !  3. (in), int(:)
                                     col,           &  !  4. (in), int(:)
-                                    vert_weights,  &  !  5. (in), int(:)
+                                    cell_weights,  &  !  5. (in), int(:)
                                     vert_data,     &  !  6. (in), int(:)
-                                    edge_weights,  &  !  7. (in), int(:)
+                                    face_weights,  &  !  7. (in), int(:)
                                     n_parts,       &  !  8. (in), int(:)
                                     part_weight,   &  !  9. (in), real(:)
                                     imbalance,     &  ! 10. (in), real(:)
@@ -216,17 +215,17 @@
                                     return_val,    &  ! 12. (out) int(:)
                                     part(:))          ! 13. (out) int(:)
 
-      part(1:n_verts) = part(1:n_verts) + 1  ! +1, METIS works from zero
+      part(1:n_cells) = part(1:n_cells) + 1  ! +1, METIS works from zero
 
       !-----------------------------------------------------!
       !   Save the result from the call to METIS function   !
       !-----------------------------------------------------!
       if(lev .eq. 1) then
-        do c = 1, n_verts
+        do c = 1, n_cells
           grid % level(sl) % cell(c) = part(c)
         end do
       else
-        do nc = 1, n_verts
+        do nc = 1, n_cells
           c = old_c(nc)
           grid % level(sl) % cell(c) =   &
            (grid % level(sl+1) % cell(c)-1) * n_parts + part(nc)
@@ -275,57 +274,37 @@
   do lev = 0, grid % n_levels
 
     ! Store face information into spare arrays
-    arr_1(:) = 0
-    arr_2(:) = 0
+    c1_arr(:) = 0
+    c2_arr(:) = 0
     do s = 1, grid % level(lev) % n_faces
-      arr_1(s) = grid % level(lev) % faces_c(1, s)
-      arr_2(s) = grid % level(lev) % faces_c(2, s)
+      c1_arr(s) = grid % level(lev) % faces_c(1, s)
+      c2_arr(s) = grid % level(lev) % faces_c(2, s)
     end do
 
-    ! Sort faces by first cell index
-    call Sort_Mod_Int_Carry_Int(arr_1(1:grid % level(lev) % n_faces),  &
-                                arr_2(1:grid % level(lev) % n_faces))
-
-    write(lev+100,*), 'Level: ', lev, 'after sorting faces by first index'
-    do s = 1, grid % level(lev) % n_faces
-      write(lev+100,'(3i6)'), s, arr_1(s), arr_2(s)
-    end do
-
-    ! Sort faces by second cell index
-    arr_s = 1
-    val_1 = arr_1(arr_s)
-    do s = 2, grid % level(lev) % n_faces
-      if(arr_1(s) .ne. val_1) then
-        arr_e = s - 1
-        if(arr_e > arr_s) then
-          call Sort_Mod_Int_Carry_Int(arr_1(arr_s:arr_e),  &
-                                      arr_2(arr_s:arr_e))
-        end if
-        arr_s = arr_e + 1
-        val_1 = arr_1(arr_s)
-      end if
-    end do
+    ! Sort faces by both indexes
+    call Sort_Mod_2_Int(c1_arr(1:grid % level(lev) % n_faces),  &
+                        c2_arr(1:grid % level(lev) % n_faces))
 
     write(lev+200,*), 'Level: ', lev, 'after sorting faces by second index'
     do s = 1, grid % level(lev) % n_faces
-      write(lev+200,'(3i6)'), s, arr_1(s), arr_2(s)
+      write(lev+200,'(3i6)'), s, c1_arr(s), c2_arr(s)
     end do
 
     ! Selece faces by both cell indices
     i     = 1
-    val_1 = arr_1(1)
-    val_2 = arr_2(1)
+    val_1 = c1_arr(1)
+    val_2 = c2_arr(1)
     grid % level(lev) % faces_c(1, i) = val_1
     grid % level(lev) % faces_c(2, i) = val_2
 
     do s = 2, grid % level(lev) % n_faces
-      if(arr_1(s) .ne. val_1 .or.  &
-         arr_2(s) .ne. val_2) then
+      if(c1_arr(s) .ne. val_1 .or.  &
+         c2_arr(s) .ne. val_2) then
         i = i + 1
-        grid % level(lev) % faces_c(1, i) = arr_1(s)
-        grid % level(lev) % faces_c(2, i) = arr_2(s)
-        val_1 = arr_1(s)
-        val_2 = arr_2(s)
+        grid % level(lev) % faces_c(1, i) = c1_arr(s)
+        grid % level(lev) % faces_c(2, i) = c2_arr(s)
+        val_1 = c1_arr(s)
+        val_2 = c2_arr(s)
       end if
     end do
     grid % level(lev) % n_faces = i
@@ -387,8 +366,8 @@
   deallocate(row)
   deallocate(part_weight)
   deallocate(vert_data)
-  deallocate(edge_weights)
-  deallocate(vert_weights)
+  deallocate(face_weights)
+  deallocate(cell_weights)
   deallocate(imbalance)
   deallocate(old_c)
   deallocate(new_c)
