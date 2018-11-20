@@ -9,6 +9,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, c1, c2, nc, nc1, nc2, s, sl, lp, i, lev, lev_parts
   integer              :: n_cells, n_faces, n_parts, arr_s, arr_e, val_1, val_2
+  integer              :: c_lev
   integer, allocatable :: c1_arr(:), c2_arr(:)
   integer, allocatable :: cells_c(:,:), cells_n_cells(:), faces_c(:,:),  &
                           new_c(:), old_c(:),                            &
@@ -360,6 +361,42 @@
       end do
     end do
 
+  end do
+
+  !------------------------------------------------!
+  !   Compute cell coordinates at coarser levels   !
+  !------------------------------------------------!
+  do lev = 0, grid % n_levels
+
+    print *, ' level n_cells = ', grid % level(lev) % n_cells
+
+    grid % level(lev) % xc(:) = 0
+    grid % level(lev) % yc(:) = 0
+    grid % level(lev) % zc(:) = 0
+    grid % level(lev) % n_finest_cells(:) = 0
+
+    do c = 1, grid % n_cells
+
+      c_lev = grid % level(lev) % cell(c)
+      grid % level(lev) % xc(c_lev) = grid % level(lev) % xc(c_lev)  &
+                                    + grid % xc(c)
+      grid % level(lev) % yc(c_lev) = grid % level(lev) % yc(c_lev)  &
+                                    + grid % yc(c)
+      grid % level(lev) % zc(c_lev) = grid % level(lev) % zc(c_lev)  &
+                                    + grid % zc(c)
+
+      grid % level(lev) % n_finest_cells(c_lev) =    &
+      grid % level(lev) % n_finest_cells(c_lev) + 1
+    end do
+
+    do c_lev = 1, grid % level(lev) % n_cells
+      grid % level(lev) % xc(c_lev) = grid % level(lev) % xc(c_lev)  &
+                                    / grid % level(lev) % n_finest_cells(c_lev)
+      grid % level(lev) % yc(c_lev) = grid % level(lev) % yc(c_lev)  &
+                                    / grid % level(lev) % n_finest_cells(c_lev)
+      grid % level(lev) % zc(c_lev) = grid % level(lev) % zc(c_lev)  &
+                                    / grid % level(lev) % n_finest_cells(c_lev)
+    end do
   end do
 
   deallocate(col)
