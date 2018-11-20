@@ -8,8 +8,14 @@
 
   contains
 
+  include 'Sort_Mod/2_Int_Carry_Int.f90'
+  include 'Sort_Mod/2_Int.f90'
+  include 'Sort_Mod/2_Real_Carry_Int.f90'
+  include 'Sort_Mod/2_Real.f90'
   include 'Sort_Mod/3_Int_Carry_Int.f90'
+  include 'Sort_Mod/3_Int.f90'
   include 'Sort_Mod/3_Real_Carry_Int.f90'
+  include 'Sort_Mod/3_Real.f90'
   include 'Sort_Mod/Int_By_Index.f90'
   include 'Sort_Mod/Int_Carry_Int.f90'
   include 'Sort_Mod/Int_Carry_Real.f90'
