@@ -74,10 +74,11 @@
   call Save_Vtu_Cells(grid, 0,         &
                       grid % n_nodes,  &
                       grid % n_cells)
+  call Save_Vtu_Faces(grid)
 
   ! Save all grid levels for visual inspection
   do lev = 0, grid % n_levels
-    call Save_Vtu_Faces(grid, lev)
+    call Save_Vtu_Grid_Levels(grid, lev)
   end do
 
 
