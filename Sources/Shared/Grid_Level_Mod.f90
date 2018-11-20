@@ -21,13 +21,17 @@
     integer, allocatable :: cell(:)
     integer, allocatable :: face(:)
 
+    integer, allocatable :: n_finest_cells(:)
+
     ! Cell and face at coarser level
-    integer, allocatable :: cell_at_coarser(:)
-    integer, allocatable :: face_at_coarser(:)
+!   integer, allocatable :: cell_at_coarser(:)
+!   integer, allocatable :: face_at_coarser(:)
 
     ! Faces' neigboring (surrounding) cells
     integer, allocatable :: faces_c(:,:)
 
+    ! Cell coordinates
+    real, allocatable :: xc(:), yc(:), zc(:)
   end type
 
 ! contains
