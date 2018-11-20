@@ -13,6 +13,10 @@
     allocate(grid % level(lev) % cell(grid % n_cells))
     allocate(grid % level(lev) % face(grid % n_faces))
     allocate(grid % level(lev) % faces_c(2, grid % n_faces))
+    allocate(grid % level(lev) % n_finest_cells(grid % n_cells))
+    allocate(grid % level(lev) % xc(grid % n_cells))
+    allocate(grid % level(lev) % yc(grid % n_cells))
+    allocate(grid % level(lev) % zc(grid % n_cells))
   end do
 
   end subroutine
