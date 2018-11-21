@@ -7,7 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: c, c1, c2, nc, nc1, nc2, s, sl, lp, i, lev, lev_parts
+  integer              :: c, c1, c2, nc, nc1, nc2, s, lp, i, lev, lev_parts
   integer              :: n_cells, n_faces, n_parts, arr_s, arr_e, val_1, val_2
   integer              :: c_lev
   integer, allocatable :: c1_arr(:), c2_arr(:)
@@ -115,13 +115,12 @@
   !   Browse through levels   !
   !                           !
   !---------------------------!
-  do lev = 1, grid % n_levels
+  do lev = grid % n_levels, 1, -1  ! goes from the coarsest (highest number)
+                                   ! to the finest (lower number and zero)
 
-    lev_parts = n_parts ** (lev-1)
+    lev_parts = n_parts ** (grid % n_levels - lev)
 
-    ! Where to store this level (sl)
-    sl = grid % n_levels - lev + 1
-    print '(a19,i2)', ' # Working on level', sl
+    print '(a19,i2)', ' # Working on level', lev
 
     !---------------------------------------------!
     !   Through exising partitions on level lev   !
@@ -133,7 +132,7 @@
       ! Mark cells in current partition
       i = 0
       do c = 1, grid % n_cells
-        if(grid % level(sl+1) % cell(c) .eq. lp) then
+        if(grid % level(lev+1) % cell(c) .eq. lp) then
           i = i + 1
           new_c(c) = i
           old_c(i) = c
@@ -150,8 +149,8 @@
         c2 = grid % faces_c(2, s)
 
         if(c2 > 0) then
-          if(grid % level(sl+1) % cell(c1) .eq. lp .and.  &
-             grid % level(sl+1) % cell(c2) .eq. lp) then
+          if(grid % level(lev+1) % cell(c1) .eq. lp .and.  &
+             grid % level(lev+1) % cell(c2) .eq. lp) then
             i = i + 1
             faces_c(1,i) = new_c(c1)
             faces_c(2,i) = new_c(c2)
@@ -223,8 +222,8 @@
       !-----------------------------------------------------!
       do nc = 1, n_cells
         c = old_c(nc)
-        grid % level(sl) % cell(c) =   &
-         (grid % level(sl+1) % cell(c)-1) * n_parts + part(nc)
+        grid % level(lev) % cell(c) = &
+         (grid % level(lev+1) % cell(c)-1) * n_parts + part(nc)
       end do
     end do
   end do
