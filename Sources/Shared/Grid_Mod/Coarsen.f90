@@ -221,17 +221,11 @@
       !-----------------------------------------------------!
       !   Save the result from the call to METIS function   !
       !-----------------------------------------------------!
-      if(lev .eq. 1) then
-        do c = 1, n_cells
-          grid % level(sl) % cell(c) = part(c)
-        end do
-      else
-        do nc = 1, n_cells
-          c = old_c(nc)
-          grid % level(sl) % cell(c) =   &
-           (grid % level(sl+1) % cell(c)-1) * n_parts + part(nc)
-        end do
-      end if
+      do nc = 1, n_cells
+        c = old_c(nc)
+        grid % level(sl) % cell(c) =   &
+         (grid % level(sl+1) % cell(c)-1) * n_parts + part(nc)
+      end do
     end do
   end do
 
