@@ -5,18 +5,18 @@
  HEAT_TRANSFER  yes
 
  PRESSURE_DROPS   0.0036  0.0 0.0
- MASS_FLOW_RATES  20.32    0.0 0.0
+ MASS_FLOW_RATES  2.32    0.0 0.0
 
 #---------------
 # Time stepping
 #---------------
 
- TIME_STEP                  3.5
- NUMBER_OF_TIME_STEPS      3000
+ TIME_STEP                  0.5
+ NUMBER_OF_TIME_STEPS      5001
  RESULTS_SAVE_INTERVAL      600
  BACKUP_SAVE_INTERVAL       600
 
-# LOAD_BACKUP_NAME  chan-ts003000.backup
+# LOAD_BACKUP_NAME  chan-ts004000.backup
 
 #-------------------
 # Monitoring points 
@@ -31,13 +31,13 @@
 # Physical models
 #-----------------
 
- MASS_DENSITY         998.0
- THERMAL_CONDUCTIVITY 0.587
- DYNAMIC_VISCOSITY    1.0e-3
- HEAT_CAPACITY        4187.0
+ MASS_DENSITY         1.0
+ THERMAL_CONDUCTIVITY 1.4e-4
+ DYNAMIC_VISCOSITY    1.0e-4
+ HEAT_CAPACITY        1.0
 
- TURBULENCE_MODEL         rsm_manceau_hanjalic
-# TURBULENCE_MODEL         rsm_hanjalic_jakirlic
+# TURBULENCE_MODEL         rsm_manceau_hanjalic
+ TURBULENCE_MODEL         rsm_hanjalic_jakirlic
 
  TURBULENCE_MODEL_VARIANT none
 # TURBULENCE_MODEL_VARIANT stabilized
@@ -56,7 +56,7 @@
  TIME_INTEGRATION_SCHEME  linear
 
  ADVECTION_SCHEME_FOR_MOMENTUM    minmod
- ADVECTION_SCHEME_FOR_ENERGY      superbee
+ ADVECTION_SCHEME_FOR_ENERGY      smart
  ADVECTION_SCHEME_FOR_TURBULENCE  smart
 
 #------------------------
@@ -67,8 +67,8 @@
  TOLERANCE_FOR_MOMENTUM_SOLVER    1.e-5
  TOLERANCE_FOR_PRESSURE_SOLVER    1.e-5
  TOLERANCE_FOR_TURBULENCE_SOLVER  1.e-5
- TOLERANCE_FOR_ENERGY_SOLVER      1.e-5
- TOLERANCE_FOR_SIMPLE_ALGORITHM   1.e-3
+ TOLERANCE_FOR_ENERGY_SOLVER      1.e-7
+ TOLERANCE_FOR_SIMPLE_ALGORITHM   1.e-4
 
 
 #--------------------
@@ -76,8 +76,8 @@
 #--------------------
 
  INITIAL_CONDITION
-  VARIABLES u     v   w   t    uu     vv     ww     uv    uw     vw    eps     f22 
-  VALUES    0.001 0.0 0.0 20.0 0.0001 0.0001 0.0001 0.00  0.0001 0.0   0.0002  0.1
+  VARIABLES u     v    w     t    uu     vv     ww     uv    uw     vw   eps    f22 
+  VALUES    0.1   0.0  0.0   20.0 0.005  0.005  0.005  0.00  0.001 0.0   0.002  0.1
 
 #---------------------
 # Boundary conditions
