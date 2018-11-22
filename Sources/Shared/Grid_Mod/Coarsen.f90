@@ -35,7 +35,12 @@
   print *, '# Coarsening the grid for multigrid '
   print *, '#-----------------------------------'
 
-  ! Allocate memory
+  !---------------------!
+  !                     !
+  !   Allocate memory   !
+  !                     !
+  !---------------------!
+
   allocate(new_c(grid % n_cells))
   allocate(old_c(grid % n_cells))
 
@@ -48,7 +53,9 @@
     if(grid % faces_c(2,s) > 0) n_faces = n_faces + 1
   end do
 
-  ! Once n_cells and n_faces are known, allocate memory
+  !---------------------------------------------------------!
+  !   Once n_cells and n_faces are known, allocate memory   !
+  !---------------------------------------------------------!
   allocate(faces_c      ( 2,n_faces));  faces_c      (:,:) = 0
   allocate(cells_n_cells(   n_cells));  cells_n_cells(:)   = 0
   allocate(cells_c      (24,n_cells));  cells_c      (:,:) = 0
@@ -60,7 +67,9 @@
   allocate(c2_arr(n_faces))
   allocate(sf_arr(n_faces))
 
-  ! Allocate memory for control parameters for METIS
+  !------------------------------------------------------!
+  !   Allocate memory for control parameters for METIS   !
+  !------------------------------------------------------!
   n_constrains = 1
   n_parts      = 4   ! how many partitions at each level
   allocate(imbalance   (n_constrains))
@@ -70,16 +79,22 @@
   allocate(part_weight (n_parts * n_constrains))
 
   !---------------------------------------------------------!
+  !                                                         !
   !   Initialize arrays for level zero and coarser levels   !
+  !                                                         !
   !---------------------------------------------------------!
 
-  ! Cells on level 0
+  !--------------------------------!
+  !   Cells and faces on level 0   !
+  !--------------------------------!
+
+  ! Cells
   grid % level(0) % n_cells = grid % n_cells
   do c = 1, grid % n_cells
     grid % level(0) % cell(c) = c
   end do
 
-  ! Faces on level 0
+  ! Faces
   grid % level(0) % n_faces = grid % n_faces
   do s = 1, grid % n_faces
     grid % level(0) % face(s) = s
@@ -87,7 +102,9 @@
     grid % level(0) % faces_c(2, s) = grid % faces_c(2, s)
   end do
 
-  ! Cells and faces on other levels
+  !-------------------------------------!
+  !   Cells and faces on other levels   !
+  !-------------------------------------!
   do lev = 1, MAX_MG_LEV
     do c = 1, grid % n_cells
       grid % level(lev) % cell(c) = 1
@@ -97,7 +114,17 @@
     end do
   end do
 
-  ! Find out the number of effective levels
+  !---------------------------!
+  !                           !
+  !                           !
+  !   Browse through levels   !
+  !                           !
+  !                           !
+  !---------------------------!
+
+  !---------------------------------------------!
+  !   Find out the number of effective levels   !
+  !---------------------------------------------!
   do lev = 1, MAX_MG_LEV
     lev_parts = n_parts ** (lev-1)
     if(n_parts**lev > grid % n_cells/27) then
@@ -111,11 +138,11 @@
   print '(a29,i2,a8)', ' # Will perform coarsening in',  &
                        grid % n_levels, ' levels.'
 
-  !---------------------------!
-  !                           !
-  !   Browse through levels   !
-  !                           !
-  !---------------------------!
+  !--------------------!
+  !                    !
+  !   Start the loop   !
+  !                    !
+  !--------------------!
   do lev = grid % n_levels, 1, -1  ! goes from the coarsest (highest number)
                                    ! to the finest (lower number and zero)
 
@@ -197,7 +224,6 @@
       !-----------------------------------------!
       !   Exectute the call to METIS function   !
       !-----------------------------------------!
-
       metis_options = -1                       ! Initialize all to default
       metis_options(METIS_OPTION_DBGLVL) = 0
       metis_options(METIS_OPTION_CONTIG) = 1
@@ -231,13 +257,17 @@
 
   !-------------------------------------------------!
   !                                                 !
+  !                                                 !
   !   Do the necessary book-keeping on all levels   !
+  !                                                 !
   !                                                 !
   !-------------------------------------------------!
 
   !---------------------------------------------!
+  !                                             !
   !     Find cells around faces and and ...     !
   !   ... count number of faces at each level   !
+  !                                             !
   !---------------------------------------------!
   do lev = 0, grid % n_levels
     grid % level(lev) % face(:) = 0
@@ -264,11 +294,15 @@
   end do
 
   !-------------------------------!
+  !                               !
   !   Compress face information   !
+  !                               !
   !-------------------------------!
   do lev = 0, grid % n_levels
 
-    ! Store face information into spare arrays
+    !----------------------------------------------!
+    !   Store face information into spare arrays   !
+    !----------------------------------------------!
     c1_arr(:) = 0
     c2_arr(:) = 0
     sf_arr(:) = 0  ! finest face numbers
@@ -279,22 +313,17 @@
     end do
     grid % level(lev) % face(:) = 0
 
-    write(lev+20,*), 'Level: ', lev, 'before sorting faces by second index'
-    do s_lev = 1, grid % level(lev) % n_faces
-      write(lev+20,'(3i6)') sf_arr(s_lev), c1_arr(s_lev), c2_arr(s_lev)
-    end do
-
-    ! Sort faces by both indexes
+    !----------------------------------------------!
+    !   Sort faces by both indexes and carry ...   !
+    !    ... information on finest face around     !
+    !----------------------------------------------!
     call Sort_Mod_2_Int_Carry_Int(c1_arr(1:grid % level(lev) % n_faces),  &
                                   c2_arr(1:grid % level(lev) % n_faces),  &
                                   sf_arr(1:grid % level(lev) % n_faces))
 
-    write(lev+200,*), 'Level: ', lev, 'after sorting faces by second index'
-    do s_lev = 1, grid % level(lev) % n_faces
-      write(lev+200,'(3i6)') sf_arr(s_lev), c1_arr(s_lev), c2_arr(s_lev)
-    end do
-
-    ! Select faces by both cell indices
+    !---------------------------------------!
+    !   Select faces by both cell indices   !
+    !---------------------------------------!
     i     = 1
     val_1 = c1_arr(i)
     val_2 = c2_arr(i)
@@ -316,18 +345,12 @@
     grid % level(lev) % n_faces = i
     print *, '# Compressed number of faces at level ',  &
              lev, '=', grid % level(lev) % n_faces
-
-    write(lev+300,*), 'Level: ', lev, 'after compressing faces'
-    do s_lev = 1, grid % level(lev) % n_faces
-      write(lev+300,'(3i6)'), s_lev,                                  &
-                              grid % level(lev) % faces_c(1, s_lev),  &
-                              grid % level(lev) % faces_c(2, s_lev)
-    end do
-
   end do
 
   !-----------------------------------------!
+  !                                         !
   !   Count number of cells at each level   !
+  !                                         !
   !-----------------------------------------!
   grid % level(0) % n_cells = grid % n_cells  ! level 0 is the non-coarsen one
   do lev = 1, grid % n_levels
@@ -336,9 +359,17 @@
 
   !-------------------------------------!
   !                                     !
+  !                                     !
   !   Check sanity of the grid levels   !
   !                                     !
+  !                                     !
   !-------------------------------------!
+
+  !--------------------!
+  !                    !
+  !   Sanity check 1   !
+  !                    !
+  !--------------------!
   i = 0
   do lev = 1, grid % n_levels
     i = max(i, grid % level(lev) % n_cells)
@@ -359,18 +390,21 @@
             if(cell_mapping(lev, lp) .ne. grid % level(lev+1) % cell(c)) then
               print *, '# Mapping failed at level ', lev
               print *, '# Stopping the program!   '
-              exit
+              stop
             end if
           end if
         end if
       end do
     end do
 
-  end do
+  end do  ! lev
 
+  !--------------------!
+  !                    !
+  !   Sanity check 2   !
+  !                    !
+  !--------------------!
   do lev = 1, grid % n_levels
-    write(lev+400, *) 'n_faces = ',  grid % level(lev) % n_faces
-    write(lev+400, *) 'n_cells = ',  grid % level(lev) % n_cells
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1, s)
       c2 = grid % faces_c(2, s)
@@ -381,24 +415,28 @@
         s_lev  = grid % level(lev) % face(s)
 
         if(s_lev > 0) then
-          WRITE(lev+400, '(6i6)')  s,                                     &
-                                   s_lev,                                 &
-                                   grid % level(lev) % faces_c(1,s_lev),  &
-                                   grid % level(lev) % faces_c(2,s_lev),  &
-                                   min(c1_lev, c2_lev),                   &
-                                   max(c2_lev, c1_lev)
+          if(grid % level(lev) % faces_c(1,s_lev) .ne.  &
+             min(c1_lev, c2_lev) .or.                   &
+             grid % level(lev) % faces_c(2,s_lev) .ne.  &
+             max(c1_lev, c2_lev)) then
+            print *, '# Cell-face mapping failed at level ', lev
+            print *, '# Stopping the program!   '
+            stop
+          end if
         end if
-
       end if
+
     end do
   end do
 
   !------------------------------------------------!
+  !                                                !
+  !                                                !
   !   Compute cell coordinates at coarser levels   !
+  !                                                !
+  !                                                !
   !------------------------------------------------!
   do lev = 0, grid % n_levels
-
-    print *, ' level n_cells = ', grid % level(lev) % n_cells
 
     grid % level(lev) % xc(:) = 0
     grid % level(lev) % yc(:) = 0
