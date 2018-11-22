@@ -10,7 +10,7 @@
   integer              :: c, c1, c2, nc, nc1, nc2, s, lp, i, lev, lev_parts
   integer              :: n_cells, n_faces, n_parts, arr_s, arr_e, val_1, val_2
   integer              :: c_lev, c1_lev, c2_lev, s_lev
-  integer, allocatable :: c1_arr(:), c2_arr(:)
+  integer, allocatable :: c1_arr(:), c2_arr(:), sf_arr(:)
   integer, allocatable :: cells_c(:,:), cells_n_cells(:), faces_c(:,:),  &
                           new_c(:), old_c(:),                            &
                           cell_mapping(:,:)
@@ -58,6 +58,7 @@
 
   allocate(c1_arr(n_faces))
   allocate(c2_arr(n_faces))
+  allocate(sf_arr(n_faces))
 
   ! Allocate memory for control parameters for METIS
   n_constrains = 1
@@ -92,7 +93,7 @@
       grid % level(lev) % cell(c) = 1
     end do
     do s = 1, grid % n_faces
-      grid % level(lev) % face(s) = 1
+      grid % level(lev) % face(s) = 0
     end do
   end do
 
@@ -238,13 +239,13 @@
   !     Find cells around faces and and ...     !
   !   ... count number of faces at each level   !
   !---------------------------------------------!
-
   do lev = 0, grid % n_levels
+    grid % level(lev) % face(:) = 0
     i = 0
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1, s)
       c2 = grid % faces_c(2, s)
- 
+
       if(c2 > 0) then
         c1_lev = grid % level(lev) % cell(c1)
         c2_lev = grid % level(lev) % cell(c2)
@@ -253,6 +254,7 @@
           i = i + 1
           grid % level(lev) % faces_c(1, i) = min(c1_lev, c2_lev)
           grid % level(lev) % faces_c(2, i) = max(c1_lev, c2_lev)
+          grid % level(lev) % face(i) = s  ! store finest cell number
         end if
       end if
     end do
@@ -264,32 +266,41 @@
   !-------------------------------!
   !   Compress face information   !
   !-------------------------------!
-
   do lev = 0, grid % n_levels
 
     ! Store face information into spare arrays
     c1_arr(:) = 0
     c2_arr(:) = 0
+    sf_arr(:) = 0  ! finest face numbers
     do s_lev = 1, grid % level(lev) % n_faces
       c1_arr(s_lev) = grid % level(lev) % faces_c(1, s_lev)
       c2_arr(s_lev) = grid % level(lev) % faces_c(2, s_lev)
+      sf_arr(s_lev) = grid % level(lev) % face   (   s_lev)
+    end do
+    grid % level(lev) % face(:) = 0
+
+    write(lev+20,*), 'Level: ', lev, 'before sorting faces by second index'
+    do s_lev = 1, grid % level(lev) % n_faces
+      write(lev+20,'(3i6)') sf_arr(s_lev), c1_arr(s_lev), c2_arr(s_lev)
     end do
 
     ! Sort faces by both indexes
-    call Sort_Mod_2_Int(c1_arr(1:grid % level(lev) % n_faces),  &
-                        c2_arr(1:grid % level(lev) % n_faces))
+    call Sort_Mod_2_Int_Carry_Int(c1_arr(1:grid % level(lev) % n_faces),  &
+                                  c2_arr(1:grid % level(lev) % n_faces),  &
+                                  sf_arr(1:grid % level(lev) % n_faces))
 
     write(lev+200,*), 'Level: ', lev, 'after sorting faces by second index'
     do s_lev = 1, grid % level(lev) % n_faces
-      write(lev+200,'(3i6)'), s_lev, c1_arr(s_lev), c2_arr(s_lev)
+      write(lev+200,'(3i6)') sf_arr(s_lev), c1_arr(s_lev), c2_arr(s_lev)
     end do
 
-    ! Selece faces by both cell indices
+    ! Select faces by both cell indices
     i     = 1
-    val_1 = c1_arr(1)
-    val_2 = c2_arr(1)
+    val_1 = c1_arr(i)
+    val_2 = c2_arr(i)
     grid % level(lev) % faces_c(1, i) = val_1
     grid % level(lev) % faces_c(2, i) = val_2
+    grid % level(lev) % face( sf_arr(i) ) = i
 
     do s_lev = 2, grid % level(lev) % n_faces
       if(c1_arr(s_lev) .ne. val_1 .or.  &
@@ -300,6 +311,7 @@
         val_1 = c1_arr(s_lev)
         val_2 = c2_arr(s_lev)
       end if
+      grid % level(lev) % face( sf_arr(s_lev) ) = i
     end do
     grid % level(lev) % n_faces = i
     print *, '# Compressed number of faces at level ',  &
@@ -354,6 +366,31 @@
       end do
     end do
 
+  end do
+
+  do lev = 1, grid % n_levels
+    write(lev+400, *) 'n_faces = ',  grid % level(lev) % n_faces
+    write(lev+400, *) 'n_cells = ',  grid % level(lev) % n_cells
+    do s = 1, grid % n_faces
+      c1 = grid % faces_c(1, s)
+      c2 = grid % faces_c(2, s)
+
+      if(c2 > 0) then
+        c1_lev = grid % level(lev) % cell(c1)
+        c2_lev = grid % level(lev) % cell(c2)
+        s_lev  = grid % level(lev) % face(s)
+
+        if(s_lev > 0) then
+          WRITE(lev+400, '(6i6)')  s,                                     &
+                                   s_lev,                                 &
+                                   grid % level(lev) % faces_c(1,s_lev),  &
+                                   grid % level(lev) % faces_c(2,s_lev),  &
+                                   min(c1_lev, c2_lev),                   &
+                                   max(c2_lev, c1_lev)
+        end if
+
+      end if
+    end do
   end do
 
   !------------------------------------------------!
