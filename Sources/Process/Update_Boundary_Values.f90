@@ -72,6 +72,8 @@
           uw  % n(c2) = 0.0
           vw  % n(c2) = 0.0
           kin % n(c2) = 0.0
+          y_plus(c1)  = sqrt(grid % wall_dist(c1) * sqrt(u % n(c1)**2 &
+                        + v % n(c1)**2 + w % n(c1)**2) / viscosity)
           if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) f22 % n(c2) = 0.0
         end if
       end if
