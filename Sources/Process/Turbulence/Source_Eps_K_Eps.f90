@@ -24,6 +24,7 @@
   type(Grid_Type) :: grid
 !---------------------------------[Calling]------------------------------------!
   real :: Y_Plus_Low_Re
+  real :: Roughness_Coefficient 
 !-----------------------------------[Locals]-----------------------------------!
   integer :: s, c, c1, c2, j
   real    :: u_tan, u_nor_sq, u_nor, u_tot_sq
@@ -90,6 +91,7 @@
         end if
  
         if(rough_walls) then 
+          z_o = Roughness_Coefficient(grid, c1)       
           eps % n(c1) = c_mu75 * kin % n(c1)**1.5  &
                       / ((grid % wall_dist(c1) + z_o) * kappa)
 
