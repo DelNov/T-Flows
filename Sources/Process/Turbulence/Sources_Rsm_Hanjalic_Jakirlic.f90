@@ -79,8 +79,6 @@
 
   do c = 1, grid % n_cells
     kin % n(c) = max(0.5*(uu % n(c) + vv % n(c) + ww % n(c)), TINY)
-    l_scale(c)=  (kin % n(c))**1.5 / max(eps % n(c), TINY)
-    t_scale(c)=   kin % n(c)       / max(eps % n(c), TINY)
   end do
 
   call Grad_Mod_For_Phi(grid, kin % n, 1, kin_x, .true.)  ! dK/dx
@@ -94,11 +92,15 @@
   if(n_time_step < 300) then
     do c = 1, grid % n_cells
       eps_tot(c) = eps % n(c)  
+      t_scale(c)=   kin % n(c)       / max(eps_tot(c), TINY)
+      l_scale(c)=  (kin % n(c))**1.5 / max(eps_tot(c), TINY)
     end do
   else
     do c = 1, grid % n_cells
       eps_tot(c) = eps % n(c)  &
                  + 0.5 * kin_vis * (kin_xx(c) + kin_yy(c) + kin_zz(c))
+      t_scale(c)=   kin % n(c)       / max(eps_tot(c), TINY)
+      l_scale(c)=  (kin % n(c))**1.5 / max(eps_tot(c), TINY)
     end do
   end if
 
@@ -282,7 +284,7 @@
           uzy = uyz
           uzz = ui_zz(c)
           diss1(c) =                                                           &
-                  2.0 * 0.25 * kin_vis * kin % n(c) / max(eps_tot(c), TINY)    &
+                  2.0 * 0.25 * kin_vis * kin % n(c) / max(eps % n(c), TINY)    &
                   * (  uu % n(c)*(uxx*uxx+uxy*uxy+uxz*uxz)                     &
                      + uv % n(c)*(uxx*uyx+uxy*uyy+uxz*uyz)                     &
                      + uw % n(c)*(uxx*uzx+uxy*uzy+uxz*uzz)                     &
@@ -304,7 +306,7 @@
           uzy = uyz
           uzz = ui_zz(c)
           diss1(c) = diss1(c) +                         &
-                  2.0*0.25*kin_vis*kin%n(c)/eps_tot(c)  *  &
+                  2.0*0.25*kin_vis*kin%n(c)/eps % n(c)  *  &
                  (uu % n(c)*(uxx*uxx+uxy*uxy+uxz*uxz)+  &
                   uv % n(c)*(uxx*uyx+uxy*uyy+uxz*uyz)+  &
                   uw % n(c)*(uxx*uzx+uxy*uzy+uxz*uzz)+  &
@@ -326,7 +328,7 @@
           uzy = uyz
           uzz = ui_zz(c)
           diss1(c) = diss1(c) +                         &
-                  2.0*0.25*kin_vis*kin%n(c)/eps_tot(c)  *  &
+                  2.0*0.25*kin_vis*kin%n(c)/eps % n(c)  *  &
                  (uu % n(c)*(uxx*uxx+uxy*uxy+uxz*uxz)+  &
                   uv % n(c)*(uxx*uyx+uxy*uyy+uxz*uyz)+  &
                   uw % n(c)*(uxx*uzx+uxy*uzy+uxz*uzz)+  &
@@ -455,7 +457,7 @@
     c1w   = max((1.0 - 0.7*cc), 0.3)
     c2w   = min(aa,0.3)
     f_w   = min( kin % n(c)**1.5                                         &
-                 / (2.5 * max(eps_tot(c), TINY) * grid % wall_dist(c)),  &
+                 / (2.5 * max(eps % n(c), TINY) * grid % wall_dist(c)),  &
                  1.4)
 
     p11 = - 2.0*(  uu % n(c) * u % x(c)      &
