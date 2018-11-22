@@ -9,7 +9,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, c1, c2, nc, nc1, nc2, s, lp, i, lev, lev_parts
   integer              :: n_cells, n_faces, n_parts, arr_s, arr_e, val_1, val_2
-  integer              :: c_lev
+  integer              :: c_lev, c1_lev, c2_lev, s_lev
   integer, allocatable :: c1_arr(:), c2_arr(:)
   integer, allocatable :: cells_c(:,:), cells_n_cells(:), faces_c(:,:),  &
                           new_c(:), old_c(:),                            &
@@ -246,13 +246,13 @@
       c2 = grid % faces_c(2, s)
  
       if(c2 > 0) then
-        c1 = grid % level(lev) % cell(c1)
-        c2 = grid % level(lev) % cell(c2)
+        c1_lev = grid % level(lev) % cell(c1)
+        c2_lev = grid % level(lev) % cell(c2)
 
-        if(c1 .ne. c2) then
+        if(c1_lev .ne. c2_lev) then
           i = i + 1
-          grid % level(lev) % faces_c(1, i) = min(c1, c2)
-          grid % level(lev) % faces_c(2, i) = max(c1, c2)
+          grid % level(lev) % faces_c(1, i) = min(c1_lev, c2_lev)
+          grid % level(lev) % faces_c(2, i) = max(c1_lev, c2_lev)
         end if
       end if
     end do
@@ -270,9 +270,9 @@
     ! Store face information into spare arrays
     c1_arr(:) = 0
     c2_arr(:) = 0
-    do s = 1, grid % level(lev) % n_faces
-      c1_arr(s) = grid % level(lev) % faces_c(1, s)
-      c2_arr(s) = grid % level(lev) % faces_c(2, s)
+    do s_lev = 1, grid % level(lev) % n_faces
+      c1_arr(s_lev) = grid % level(lev) % faces_c(1, s_lev)
+      c2_arr(s_lev) = grid % level(lev) % faces_c(2, s_lev)
     end do
 
     ! Sort faces by both indexes
@@ -280,8 +280,8 @@
                         c2_arr(1:grid % level(lev) % n_faces))
 
     write(lev+200,*), 'Level: ', lev, 'after sorting faces by second index'
-    do s = 1, grid % level(lev) % n_faces
-      write(lev+200,'(3i6)'), s, c1_arr(s), c2_arr(s)
+    do s_lev = 1, grid % level(lev) % n_faces
+      write(lev+200,'(3i6)'), s_lev, c1_arr(s_lev), c2_arr(s_lev)
     end do
 
     ! Selece faces by both cell indices
@@ -291,14 +291,14 @@
     grid % level(lev) % faces_c(1, i) = val_1
     grid % level(lev) % faces_c(2, i) = val_2
 
-    do s = 2, grid % level(lev) % n_faces
-      if(c1_arr(s) .ne. val_1 .or.  &
-         c2_arr(s) .ne. val_2) then
+    do s_lev = 2, grid % level(lev) % n_faces
+      if(c1_arr(s_lev) .ne. val_1 .or.  &
+         c2_arr(s_lev) .ne. val_2) then
         i = i + 1
-        grid % level(lev) % faces_c(1, i) = c1_arr(s)
-        grid % level(lev) % faces_c(2, i) = c2_arr(s)
-        val_1 = c1_arr(s)
-        val_2 = c2_arr(s)
+        grid % level(lev) % faces_c(1, i) = c1_arr(s_lev)
+        grid % level(lev) % faces_c(2, i) = c2_arr(s_lev)
+        val_1 = c1_arr(s_lev)
+        val_2 = c2_arr(s_lev)
       end if
     end do
     grid % level(lev) % n_faces = i
@@ -306,10 +306,10 @@
              lev, '=', grid % level(lev) % n_faces
 
     write(lev+300,*), 'Level: ', lev, 'after compressing faces'
-    do s = 1, grid % level(lev) % n_faces
-      write(lev+300,'(3i6)'), s,                                  &
-                              grid % level(lev) % faces_c(1, s),  &
-                              grid % level(lev) % faces_c(2, s)
+    do s_lev = 1, grid % level(lev) % n_faces
+      write(lev+300,'(3i6)'), s_lev,                                  &
+                              grid % level(lev) % faces_c(1, s_lev),  &
+                              grid % level(lev) % faces_c(2, s_lev)
     end do
 
   end do
