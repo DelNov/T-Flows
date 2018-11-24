@@ -3,6 +3,8 @@
 #--------------------
  PROBLEM_NAME   chan
  HEAT_TRANSFER  yes
+ TURBULENT_HEAT_FLUX_MODEL  GGDH
+
 
  PRESSURE_DROPS   0.0036  0.0 0.0
  MASS_FLOW_RATES  2.32    0.0 0.0
@@ -12,11 +14,11 @@
 #---------------
 
  TIME_STEP                  0.5
- NUMBER_OF_TIME_STEPS      5001
+ NUMBER_OF_TIME_STEPS      2400
  RESULTS_SAVE_INTERVAL      600
  BACKUP_SAVE_INTERVAL       600
 
-# LOAD_BACKUP_NAME  chan-ts004000.backup
+# LOAD_BACKUP_NAME  chan-ts001800.backup
 
 #-------------------
 # Monitoring points 
