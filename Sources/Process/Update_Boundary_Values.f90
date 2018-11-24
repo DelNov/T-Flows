@@ -16,6 +16,7 @@
   type(Grid_Type) :: grid
 !---------------------------------[Calling]------------------------------------!
   real :: Turbulent_Prandtl_Number
+  real :: Y_Plus_Low_Re
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c1, c2, s
   real    :: qx, qy, qz, nx, ny, nz, con_t, ebf 
@@ -72,8 +73,11 @@
           uw  % n(c2) = 0.0
           vw  % n(c2) = 0.0
           kin % n(c2) = 0.0
-          y_plus(c1)  = sqrt(grid % wall_dist(c1) * sqrt(u % n(c1)**2 &
-                        + v % n(c1)**2 + w % n(c1)**2) / viscosity)
+          u_tau(c1)   = kin_vis * sqrt(u % n(c1)**2      &
+                        + v % n(c1)**2 + w % n(c1)**2)   &
+                        / grid % wall_dist(c1)
+          y_plus(c1)  = Y_Plus_Low_Re(u_tau(c1),         &
+                        grid % wall_dist(c1), kin_vis) 
           if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) f22 % n(c2) = 0.0
         end if
       end if
