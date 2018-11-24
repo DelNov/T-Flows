@@ -19,6 +19,7 @@
   type(Grid_Type) :: grid
 !---------------------------------[Calling]------------------------------------!
   real :: Y_Plus_Low_Re
+  real :: Y_Plus_Rough_Walls
   real :: Roughness_Coefficient
 !----------------------------------[Locals]------------------------------------!
   integer :: c, c1, c2, s
@@ -113,8 +114,9 @@
 
         if(rough_walls) then
           z_o = Roughness_Coefficient(grid, c1)       
-          u_tau(c1) = c_mu25 * sqrt(kin % n(c1))
-          y_plus(c1) = u_tau(c1) * (grid % wall_dist(c1) + z_o) / kin_vis
+          u_tau(c1)  = c_mu25 * sqrt(kin % n(c1))
+          y_plus(c1) = Y_Plus_Rough_Walls(u_tau(c1), &
+                       grid % wall_dist(c1), kin_vis) 
 
           tau_wall(c1) = density*kappa*u_tau(c1)*u_tan  &
                        / log(((grid % wall_dist(c1)+z_o) / z_o))
