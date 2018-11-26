@@ -14,6 +14,7 @@
   integer :: turbulence_model_variant   ! STABILIZED or NONE
   integer :: turbulence_wall_treatment  ! HIGH_RE, LOW_RE, COMPOUND
   logical :: turbulence_statistics
+  integer :: turbulent_heat_flux_model
 
   ! Parameters describing turbulence model choice
   integer, parameter :: NONE                  = 30011
@@ -31,6 +32,11 @@
 
   ! Turbulence wall treatment
   integer, parameter :: STABILIZED = 30119
+
+  ! Turbulent heat flux scheme
+  integer, parameter :: SGDH = 30121
+  integer, parameter :: GGDH = 30123
+  integer, parameter :: AFM  = 30125
 
   logical :: rough_walls
 

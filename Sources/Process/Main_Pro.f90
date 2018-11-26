@@ -277,9 +277,6 @@
 
         call Calculate_Vis_T_K_Eps(grid)
 
-        if(heat_transfer) then
-          call Calculate_Heat_Flux(grid)
-        end if
       end if
 
       if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
@@ -295,9 +292,6 @@
 
         call Calculate_Vis_T_K_Eps_Zeta_F(grid)
 
-        if(heat_transfer) then
-          call Calculate_Heat_Flux(grid)
-        end if
       end if
 
       if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
