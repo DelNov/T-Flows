@@ -6,6 +6,12 @@
   implicit none
 !==============================================================================!
 
+  !-----------------------------------------!
+  !   Maximum number of multi-grid levels   !
+  !-----------------------------------------!
+  integer, parameter :: MAX_MG_LEVELS   = 12
+  integer, parameter :: NUMBER_MG_PARTS =  4
+
   !---------------------!
   !                     !
   !   Grid level type   !
@@ -17,15 +23,11 @@
     integer :: n_cells
     integer :: n_faces
 
-    ! Cell and face numbers from current to coarser levels
+    ! Cell and face numbers from finest (1) to coarser levels (.gt. 1)
     integer, allocatable :: cell(:)
     integer, allocatable :: face(:)
 
     integer, allocatable :: n_finest_cells(:)
-
-    ! Cell and face at coarser level
-!   integer, allocatable :: cell_at_coarser(:)
-!   integer, allocatable :: face_at_coarser(:)
 
     ! Faces' neigboring (surrounding) cells
     integer, allocatable :: faces_c(:,:)
@@ -35,7 +37,7 @@
   end type
 
 ! contains
-
-! include 'Grid_Mod/Allocate_Levels.f90'
+!
+! include 'Grid_Level_Mod/Allocate.f90'
 
   end module
