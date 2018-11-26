@@ -14,11 +14,6 @@
   implicit none
 !==============================================================================!
 
-  !-----------------------------------------!
-  !   Maximum number of multi-grid levels   !
-  !-----------------------------------------!
-  integer, parameter :: MAX_MG_LEV = 8
-
   !---------------!
   !               !
   !   Comm type   !
@@ -92,7 +87,7 @@
     integer, allocatable :: cells_bnd_color(:,:)
 
     ! Coarser levels for the grid
-    type(Grid_Level_Type) :: level(0:MAX_MG_LEV)
+    type(Grid_Level_Type) :: level(MAX_MG_LEVELS)
 
     !-------------------------!
     !  Face-based variables   !
