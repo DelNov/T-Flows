@@ -7,7 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: c, c1, c2, nc, nc1, nc2, s, lp, i, lev, lev_parts
+  integer              :: c, c1, c2, nc, nc1, nc2, s, i, lev, lev_parts
   integer              :: n_cells, n_faces, arr_s, arr_e, val_1, val_2
   integer              :: c_lev, c1_lev, c2_lev, s_lev
   integer, allocatable :: c1_arr(:), c2_arr(:), sf_arr(:)
@@ -81,7 +81,6 @@
 
   ! Count levels and cells
   do lev = 2, MAX_MG_LEVELS
-    lev_parts = NUMBER_MG_PARTS ** (lev-1)
     if(NUMBER_MG_PARTS**(lev-1) > grid % n_cells/NUMBER_MG_PARTS) then
       grid % n_levels = lev
       goto 1
@@ -115,12 +114,12 @@
     !---------------------------------------------!
     new_c(:) = 0
     old_c(:) = 0
-    do lp = 1, lev_parts
+    do c_lev = 1, lev_parts
 
       ! Mark cells in current partition
       i = 0
       do c = 1, grid % n_cells
-        if(grid % level(lev+1) % cell(c) .eq. lp) then
+        if(grid % level(lev+1) % cell(c) .eq. c_lev) then
           i = i + 1
           new_c(c) = i
           old_c(i) = c
@@ -137,8 +136,8 @@
         c2 = grid % faces_c(2, s)
 
         if(c2 > 0) then
-          if(grid % level(lev+1) % cell(c1) .eq. lp .and.  &
-             grid % level(lev+1) % cell(c2) .eq. lp) then
+          if(grid % level(lev+1) % cell(c1) .eq. c_lev .and.  &
+             grid % level(lev+1) % cell(c2) .eq. c_lev) then
             i = i + 1
             faces_c(1,i) = new_c(c1)
             faces_c(2,i) = new_c(c2)
@@ -341,13 +340,13 @@
     print '(a,i2,a,i2)', ' # Checking levels', lev, ' and', lev+1
 
     ! Browse through parts of this level
-    do lp = 1, n_cells
+    do c_lev = 1, n_cells
       do c = 1, grid % n_cells
-        if(grid % level(lev) % cell(c) == lp) then
-          if(cell_mapping(lev, lp) .eq. 0) then
-            cell_mapping(lev, lp) = grid % level(lev+1) % cell(c)
+        if(grid % level(lev) % cell(c) == c_lev) then
+          if(cell_mapping(lev, c_lev) .eq. 0) then
+            cell_mapping(lev, c_lev) = grid % level(lev+1) % cell(c)
           else
-            if(cell_mapping(lev, lp) .ne. grid % level(lev+1) % cell(c)) then
+            if(cell_mapping(lev, c_lev) .ne. grid % level(lev+1) % cell(c)) then
               print *, '# Mapping failed at level ', lev
               print *, '# Stopping the program!   '
               stop
