@@ -207,6 +207,7 @@ SRC_MOD += Info_Mod.f90		\
            Bulk_Mod.f90		\
            Var_Mod.f90		\
            Matrix_Mod.f90	\
+           Vector_Mod.f90	\
            Numerics_Mod.f90	\
            Solvers_Mod.f90	\
            Flow_Mod.f90		\
