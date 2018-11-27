@@ -250,14 +250,18 @@
     print '(a,i9,a)', ' # ', ncc_sub,           ' copy cell pairs'
     print '(a,i5,a)', ' #---------------------------------------------'
 
-    call Save_Cns_Geo(grid,         &
-                      sub,          &
-                      nn_sub,       &
-                      nc_sub,       &
-                      nf_sub,       &
-                      nbc_sub,      &
-                      nbf_sub,      &
-                      nbfcc_sub)
+    call Save_Cns(grid,         &
+                  sub,          &
+                  nn_sub,       &
+                  nc_sub,       &
+                  nf_sub,       &
+                  nbc_sub,      &
+                  nbf_sub)
+
+    call Save_Geo(grid,         &
+                  sub,          &
+                  nf_sub,       &
+                  nbf_sub)
 
     call Save_Vtu_Cells(grid,       &
                         sub,        &
