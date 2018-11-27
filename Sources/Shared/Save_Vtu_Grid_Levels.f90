@@ -30,7 +30,7 @@
   level_n_faces = 0
   do s = 1, grid % n_faces
     call Get_C1_And_C2_At_Level(grid, mg_lev, s, c1, c2)
-    if(c1 .ne. c2) level_n_faces = level_n_faces + 1
+    if(c1 .ne. c2 .and. c2 > 0) level_n_faces = level_n_faces + 1
   end do
 
   !----------------------!
@@ -107,7 +107,7 @@
 
     ! Either boundary on the finest mg_lev,
     ! ... or inter-cell face on any mg_lev.
-    if(c1 .ne. c2) then
+    if(c1 .ne. c2 .and. c2 > 0) then
       if(grid % faces_n_nodes(s) .eq. 4) then
         write(9,'(a,4i9)')                               &
           IN_5,                                          &
@@ -156,7 +156,7 @@
 
     ! Either boundary on the finest mg_lev,
     ! ... or inter-cell face on any mg_lev.
-    if(c1 .ne. c2) then
+    if(c1 .ne. c2 .and. c2 > 0) then
       offset = offset + grid % faces_n_nodes(s)
       write(9,'(a,i9)') IN_5, offset
     end if
@@ -189,7 +189,7 @@
 
     ! Either boundary on the finest mg_lev,
     ! ... or inter-cell face on any mg_lev.
-    if(c1 .ne. c2) then
+    if(c1 .ne. c2 .and. c2 > 0) then
       if(grid % faces_n_nodes(s) .eq. 4) write(9,'(a,i9)') IN_5, VTK_QUAD
       if(grid % faces_n_nodes(s) .eq. 3) write(9,'(a,i9)') IN_5, VTK_TRIANGLE
     end if
@@ -214,21 +214,14 @@
   write(9,'(a,a)') IN_3, '<CellData Scalars="scalars" vectors="velocity">'
 
   ! Boundary conditions
-  write(9,'(a,a)') IN_4, '<DataArray type="Int64" ' // &
-                   'Name="BoundaryConditions" format="ascii">'
+  write(9,'(a,a)') IN_4, '<DataArray type="Int64" '   // &
+                   'Name="CellType" format="ascii">'
   do s = 1, grid % n_faces
 
     call Get_C1_And_C2_At_Level(grid, mg_lev, s, c1, c2)
 
-    ! If boundary
-    if( c2 < 0 ) then
-      write(9,'(a,i9)') IN_5, grid % bnd_cond % color(c2)
-
-    ! If inside
-    else
-      if(c1 .ne. c2) then
-        write(9,'(a,i9)') IN_5, 0
-      end if
+    if(c1 .ne. c2 .and. c2 > 0) then
+      write(9,'(a,i9)') IN_5, 0
     end if
   end do
 
