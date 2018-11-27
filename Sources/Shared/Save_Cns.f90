@@ -18,10 +18,10 @@
   integer         :: sub, nn_sub, nc_sub, nf_sub,  &
                      nbc_sub,  nbf_sub
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: b, c, s, n, c1, c2, count, var, lev
-  integer              :: lower_bound, upper_bound
-  character(len=80)    :: name_out
-  integer, allocatable :: iwork(:,:)
+  integer           :: b, c, s, n, c1, c2, count, var, lev
+  integer           :: lower_bound, upper_bound
+  character(len=80) :: name_out
+  integer           :: item
 !==============================================================================!
 !   The files name.cns and name.geo should merge into one file in some         !
 !   of the future releases.                                                    !
@@ -36,8 +36,6 @@
 
   lower_bound = min(-nbf_sub, -grid % n_bnd_cells)
   upper_bound = max(grid % n_cells*8, grid % n_faces*4)
-
-  allocate(iwork(lower_bound:upper_bound, 0:2));  iwork = 0
 
   !----------------------!
   !                      !
@@ -134,7 +132,7 @@
     end if
   end do
 
-  ! nf_sub physical faces
+  ! Faces' cells
   do s = 1, grid % n_faces  ! OK, later chooses just faces with grid % new_f
     if( grid % new_f(s) > 0  .and.  grid % new_f(s) <= nf_sub ) then
       write(9) grid % new_c(grid % faces_c(1,s)),  &
@@ -153,15 +151,18 @@
   !--------------!
   !   Boundary   !
   !--------------!
-  count = 0 ! count goes to negative
 
-  ! nbc_sub physical boundary cells
-  do c = -1, -grid % n_bnd_cells, -1  ! OK, later chooses just cells with grid % new_c
+  ! Physical boundary cells
+  do c = -1, -grid % n_bnd_cells, -1
     if(grid % new_c(c) .ne. 0) then
-      count=count-1
-      ! nekad bio i: grid % new_c(c)
-      iwork(count,1) = grid % bnd_cond % color(c)
-      iwork(count,2) = grid % new_c(grid % bnd_cond % copy_c(c))
+      write(9) grid % bnd_cond % color(c)
+    end if
+  end do
+
+  ! Boundary copy cells (this is a complete mess)
+  do c = -1, -grid % n_bnd_cells, -1  ! OK, later chooses just ...
+    if(grid % new_c(c) .ne. 0) then   ! ... cells with grid % new_c
+      item = grid % new_c(grid % bnd_cond % copy_c(c))
       if(grid % bnd_cond % copy_c(c) .ne. 0) then
         if(grid % comm % proces(grid % bnd_cond % copy_c(c)) .ne. sub) then
           do b=1,nbf_sub
@@ -170,30 +171,20 @@
               print *, grid % xc(grid % bnd_cond % copy_c(c)),  &
                        grid % yc(grid % bnd_cond % copy_c(c)),  &
                        grid % zc(grid % bnd_cond % copy_c(c))
-              iwork(count,2)=-buf_pos(b) ! - sign, copy buffer
+              item = -buf_pos(b) ! - sign, copy buffer
             end if
           end do
         endif
       endif
+      write(9) item
     end if
-  end do 
-
-  write(9) (iwork(c,1), c = -1, count, -1)
-  write(9) (iwork(c,2), c = -1, count, -1)
+  end do
 
   !----------!
   !   Copy   !
   !----------!
-  count = 0
-  do s = 1, grid % n_copy
-    count = count + 1
-    iwork(count,1) = grid % bnd_cond % copy_s(1,s)
-    iwork(count,2) = grid % bnd_cond % copy_s(2,s)
-  end do
-
-  write(9) count 
-  write(9) (iwork(c,1), c = 1, count)
-  write(9) (iwork(c,2), c = 1, count)
+  write(9) grid % n_copy
+  write(9) ((grid % bnd_cond % copy_s(c,s), c = 1, 2), s = 1, grid % n_copy)
 
   !----------------------!
   !   Multigrid levels   !
@@ -208,8 +199,7 @@
     write(9) (grid % level(lev) % faces_c(1,s), s=1,grid % level(lev) % n_faces)
     write(9) (grid % level(lev) % faces_c(2,s), s=1,grid % level(lev) % n_faces)
   end do
-  close(9)
 
-  deallocate (iwork)
+  close(9)
 
   end subroutine

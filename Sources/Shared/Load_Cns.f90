@@ -24,7 +24,9 @@
   open(9, file=name_in,form='unformatted', access='stream')
   if(this_proc < 2) print *, '# Reading the file: ', name_in
 
-  ! Number of cells, boundary cells and sides
+  !-----------------------------------------------!
+  !   Number of cells, boundary cells and faces   !
+  !-----------------------------------------------!
   read(9) grid % n_nodes
   read(9) grid % n_cells              ! number of cells including buffer
   read(9) grid % n_bnd_cells          ! number of boundary cells
@@ -41,13 +43,27 @@
   ! Boundary conditions' keys
   allocate(grid % bnd_cond % name(grid % n_bnd_cond))
   allocate(grid % bnd_cond % type(grid % n_bnd_cond))
+
+  !-------------------!
+  !   Material name   !
+  !-------------------!
   read(9) grid % material % name
+
+  !------------------------------!
+  !   Boundary conditions list   !
+  !------------------------------!
   do n = 1, grid % n_bnd_cond
     read(9) grid % bnd_cond % name(n)
   end do
 
-  ! Cells
+  !-----------!
+  !   Cells   !  (including buffer cells)
+  !-----------!
+
+  ! Number of nodes for each cell
   read(9) (grid % cells_n_nodes(c), c = 1, grid % n_cells)
+
+  ! Cells' nodes
   read(9) ((grid % cells_n(n,c),              &
             n = 1, grid % cells_n_nodes(c)),  &
             c = 1, grid % n_cells)
@@ -56,14 +72,26 @@
   read(9) (grid % comm % proces(c), c =  1, grid % n_cells)
   read(9) (grid % comm % proces(c), c = -1,-grid % n_bnd_cells,-1)
 
-  ! Faces
+  !-----------!
+  !   Faces   !
+  !-----------!
+
+  ! Number of nodes for each face
   read(9) (grid % faces_n_nodes(s), s = 1, grid % n_faces)
+
+  ! Faces' nodes
   read(9) ((grid % faces_n(n,s),              &
             n = 1, grid % faces_n_nodes(s)),  &
             s = 1, grid % n_faces)
+
+  ! Faces' cells
   read(9) ((grid % faces_c(c,s), c = 1, 2), s = 1, grid % n_faces)
 
-  ! Boundary cells
+  !--------------!
+  !   Boundary   !
+  !--------------!
+
+  ! Physical boundary cells
   allocate (grid % bnd_cond % color(-grid % n_bnd_cells-1:-1))
   read(9) (grid % bnd_cond % color(c), c = -1,-grid % n_bnd_cells, -1)
 
@@ -73,12 +101,16 @@
   allocate (grid % bnd_cond % copy_c(-grid % n_bnd_cells:-1))
   read(9) (grid % bnd_cond % copy_c(c), c = -1,-grid % n_bnd_cells, -1)
 
+  !----------!
+  !   Copy   !
+  !----------!
   read(9) grid % n_copy
   allocate (grid % bnd_cond % copy_s(2,grid % n_copy))
-  read(9) (grid % bnd_cond % copy_s(1,s), s = 1,grid % n_copy)
-  read(9) (grid % bnd_cond % copy_s(2,s), s = 1,grid % n_copy)
+  read(9) ((grid % bnd_cond % copy_s(c,s), c = 1, 2), s = 1, grid % n_copy)
 
-  ! Multigrid levels
+  !----------------------!
+  !   Multigrid levels   !
+  !----------------------!
   do lev = 1, grid % n_levels
     read(9)  grid % level(lev) % n_cells
     read(9)  grid % level(lev) % n_faces
