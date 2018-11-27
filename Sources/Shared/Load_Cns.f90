@@ -61,8 +61,7 @@
   read(9) ((grid % faces_n(n,s),              &
             n = 1, grid % faces_n_nodes(s)),  &
             s = 1, grid % n_faces)
-  read(9) (grid % faces_c(1,s), s = 1, grid % n_faces)
-  read(9) (grid % faces_c(2,s), s = 1, grid % n_faces)
+  read(9) ((grid % faces_c(c,s), c = 1, 2), s = 1, grid % n_faces)
 
   ! Boundary cells
   allocate (grid % bnd_cond % color(-grid % n_bnd_cells-1:-1))
@@ -83,8 +82,6 @@
   do lev = 1, grid % n_levels
     read(9)  grid % level(lev) % n_cells
     read(9)  grid % level(lev) % n_faces
-    print *, 'Cells in level ', lev, ':', grid % level(lev) % n_cells
-    print *, 'Faces in level ', lev, ':', grid % level(lev) % n_faces
   end do
   call Grid_Mod_Allocate_Levels(grid)
   do lev = 1, grid % n_levels
