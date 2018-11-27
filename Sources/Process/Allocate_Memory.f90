@@ -15,18 +15,11 @@
   type(Grid_Type) :: grid
 !==============================================================================!
 
-  ! Variables defined in all.h90:
-  allocate (fw(grid % n_faces));  fw = 0.0  
-
-  ! Variables defined in Solvers_Mod
-  call Matrix_Mod_Allocate(grid, D)
-
-  ! Variables defined in Flow_Mod.h90:
-  call Matrix_Mod_Allocate(grid, a)
-  allocate (b(grid % n_cells));  b=0.
+  ! This fw somehow left hanging here, it should be somewhere else
+  allocate (fw(grid % n_faces));  fw = 0.0
 
   ! Working arrays
-  call Work_Mod_Allocate_Real_Cells(grid, 30)
+  call Work_Mod_Allocate_Real_Cells(grid, 32)
   call Work_Mod_Allocate_Real_Faces(grid,  1)
   call Work_Mod_Allocate_Real_Nodes(grid,  1)
 
