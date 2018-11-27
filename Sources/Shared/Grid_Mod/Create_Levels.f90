@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Grid_Mod_Allocate_And_Initialize_Levels(grid)
+  subroutine Grid_Mod_Create_Levels(grid)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -18,7 +18,7 @@
   do lev = grid % n_levels + 1, 1, -1
 
     ! Tentative number of cells and faces
-    n_cells = NUMBER_MG_PARTS ** (grid % n_levels + 1 - lev)
+    n_cells = N_MG_PARTS ** (grid % n_levels + 1 - lev)
     n_faces = grid % n_faces
 
     if(lev .eq. 1) then

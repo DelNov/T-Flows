@@ -29,9 +29,9 @@
   integer              :: metis_options(41)     ! options passed to METIS
 !==============================================================================!
 
-  print *, '#==================================='
-  print *, '# Coarsening the grid for multigrid '
-  print *, '#-----------------------------------'
+  print *, '#=========================================='
+  print *, '# Coarsening the grid for multigrid solver '
+  print *, '#------------------------------------------'
 
   !---------------------!
   !                     !
@@ -73,7 +73,7 @@
   allocate(cell_weights(n_cells * n_constrains))
   allocate(face_weights(n_faces + n_faces))
   allocate(vert_data   (n_cells))
-  allocate(part_weight (NUMBER_MG_PARTS * n_constrains))
+  allocate(part_weight (N_MG_PARTS * n_constrains))
 
   !--------------------------------------------------------!
   !   Allocate memory and initialize data for all levels   !
@@ -81,7 +81,7 @@
 
   ! Count levels and cells
   do lev = 2, MAX_MG_LEVELS
-    if(NUMBER_MG_PARTS**(lev-1) > grid % n_cells/NUMBER_MG_PARTS) then
+    if(N_MG_PARTS**(lev-1) > grid % n_cells/N_MG_PARTS) then
       grid % n_levels = lev
       goto 1
     end if
@@ -90,7 +90,7 @@
 1 continue
 
   ! Perform allocation and initialization
-  call Grid_Mod_Allocate_And_Initialize_Levels(grid)
+  call Grid_Mod_Create_Levels(grid)
 
   print '(a29,i2,a8)', ' # Will perform coarsening in',  &
                        grid % n_levels, ' levels.'
@@ -105,9 +105,13 @@
   do lev = grid % n_levels, 2, -1  ! goes from the coarsest (highest number)
                                    ! to the finest (lower number and zero)
 
-    lev_parts = NUMBER_MG_PARTS ** (grid % n_levels - lev)
+    lev_parts = N_MG_PARTS ** (grid % n_levels - lev)
 
-    print '(a19,i2)', ' # Working on level', lev
+    print '(a19,i2,a7,i7,a7)', ' # Working on level',                      &
+                               lev,                                        &
+                               ' with  ',                                  &
+                               N_MG_PARTS ** (grid % n_levels - lev + 1),  &
+                               ' cells.'
 
     !---------------------------------------------!
     !   Through exising partitions on level lev   !
@@ -178,7 +182,7 @@
       cell_weights(:) = 1
       face_weights(:) = 1
       vert_data(:)    = 1
-      part_weight(:)  = 1.0 / real(NUMBER_MG_PARTS)
+      part_weight(:)  = 1.0 / real(N_MG_PARTS)
 
       !-----------------------------------------!
       !   Exectute the call to METIS function   !
@@ -194,7 +198,7 @@
                                     cell_weights,  &  !  5. (in), int(:)
                                     vert_data,     &  !  6. (in), int(:)
                                     face_weights,  &  !  7. (in), int(:)
-                                    NUMBER_MG_PARTS,       &  !  8. (in), int(:)
+                                    N_MG_PARTS,    &  !  8. (in), int(:)
                                     part_weight,   &  !  9. (in), real(:)
                                     imbalance,     &  ! 10. (in), real(:)
                                     metis_options, &  ! 11. (in), int(:)
@@ -209,10 +213,11 @@
       do nc = 1, n_cells
         c = old_c(nc)
         grid % level(lev) % cell(c) = &
-         (grid % level(lev+1) % cell(c)-1) * NUMBER_MG_PARTS + part(nc)
+         (grid % level(lev+1) % cell(c)-1) * N_MG_PARTS + part(nc)
       end do
     end do
   end do
+  print '(a28,i7,a7)', ' # Finest level 1 contains  ', grid % n_cells, ' cells.'
 
   !-------------------------------------------------!
   !                                                 !
@@ -248,8 +253,6 @@
       end if
     end do
     grid % level(lev) % n_faces = i
-    print *, '# Non-compressed number of faces at level ',  &
-             lev, '=', grid % level(lev) % n_faces
   end do
 
   !-------------------------------!
@@ -257,7 +260,7 @@
   !   Compress face information   !
   !                               !
   !-------------------------------!
-  do lev = 1, grid % n_levels
+  do lev = grid % n_levels, 1, -1
 
     !----------------------------------------------!
     !   Store face information into spare arrays   !
@@ -302,8 +305,11 @@
       grid % level(lev) % face( sf_arr(s_lev) ) = i
     end do
     grid % level(lev) % n_faces = i
-    print *, '# Compressed number of faces at level ',  &
-             lev, '=', grid % level(lev) % n_faces
+    print '(a16,i2,a10,i7,a7)', ' # Coarse level ',           &
+                                lev,                          &
+                                ' contains ',                 &
+                                grid % level(lev) % n_faces,  &
+                                ' faces.'
   end do
 
   !-----------------------------------------!
@@ -330,12 +336,12 @@
   !                    !
   !--------------------!
   i = 0
-  do lev = 2, grid % n_levels
+  do lev = 1, grid % n_levels
     i = max(i, grid % level(lev) % n_cells)
   end do
   allocate(cell_mapping(MAX_MG_LEVELS, i)); cell_mapping = 0
 
-  do lev = 2, grid % n_levels - 1
+  do lev = 1, grid % n_levels - 1
     n_cells = maxval(grid % level(lev) % cell(:))
     print '(a,i2,a,i2)', ' # Checking levels', lev, ' and', lev+1
 
@@ -363,7 +369,7 @@
   !   Sanity check 2   !
   !                    !
   !--------------------!
-  do lev = 2, grid % n_levels
+  do lev = 1, grid % n_levels
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1, s)
       c2 = grid % faces_c(2, s)
