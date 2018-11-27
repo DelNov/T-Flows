@@ -11,7 +11,7 @@
   type(Grid_Type) :: grid
   integer         :: this_proc  ! needed if called from Processor
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: c, n, s
+  integer           :: c, n, s, lev
   character(len=80) :: name_in
 !==============================================================================!
 
@@ -31,6 +31,7 @@
   read(9) grid % n_faces              ! number of faces (with buffer faces)
   read(9) grid % comm % n_buff_cells  ! number of buffer faces/cells
   read(9) grid % n_bnd_cond           ! number of boundary conditions
+  read(9) grid % n_levels             ! number of multigrid levels
 
   ! Allocate memory =--> carefull, there is no checking!
   call Grid_Mod_Allocate_Nodes(grid, grid % n_nodes)
@@ -77,6 +78,22 @@
   allocate (grid % bnd_cond % copy_s(2,grid % n_copy))
   read(9) (grid % bnd_cond % copy_s(1,s), s = 1,grid % n_copy)
   read(9) (grid % bnd_cond % copy_s(2,s), s = 1,grid % n_copy)
+
+  ! Multigrid levels
+  do lev = 1, grid % n_levels
+    read(9)  grid % level(lev) % n_cells
+    read(9)  grid % level(lev) % n_faces
+    print *, 'Cells in level ', lev, ':', grid % level(lev) % n_cells
+    print *, 'Faces in level ', lev, ':', grid % level(lev) % n_faces
+  end do
+  call Grid_Mod_Allocate_Levels(grid)
+  do lev = 1, grid % n_levels
+    read(9) (grid % level(lev) % cell(c),      c=1,grid % n_cells)
+    read(9) (grid % level(lev) % face(s),      s=1,grid % n_faces)
+    read(9) (grid % level(lev) % faces_c(1,s), s=1,grid % level(lev) % n_faces)
+    read(9) (grid % level(lev) % faces_c(2,s), s=1,grid % level(lev) % n_faces)
+  end do
+  call Grid_Mod_Check_Levels(grid)
 
   close(9)
 

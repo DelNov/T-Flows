@@ -18,7 +18,7 @@
   integer         :: sub, nn_sub, nc_sub, nf_sub,  &
                      nbc_sub,  nbf_sub
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: b, c, s, n, c1, c2, count, var, subo 
+  integer              :: b, c, s, n, c1, c2, count, var, lev
   integer              :: lower_bound, upper_bound
   character(len=80)    :: name_out
   integer, allocatable :: iwork(:,:)
@@ -59,6 +59,7 @@
   write(9) nf_sub + nbf_sub
   write(9) nbf_sub            ! number of buffer faces/cells
   write(9) grid % n_bnd_cond  ! number of bounary conditions
+  write(9) grid % n_levels    ! number of multigrid levels
 
   !-------------------!
   !   Material name   !
@@ -226,6 +227,19 @@
   write(9) (iwork(c,1), c = 1, count)
   write(9) (iwork(c,2), c = 1, count)
 
+  !----------------------!
+  !   Multigrid levels   !
+  !----------------------!
+  do lev = 1, grid % n_levels
+    write(9) grid % level(lev) % n_cells
+    write(9) grid % level(lev) % n_faces
+  end do
+  do lev = 1, grid % n_levels
+    write(9) (grid % level(lev) % cell(c),      c=1,grid % n_cells)
+    write(9) (grid % level(lev) % face(s),      s=1,grid % n_faces)
+    write(9) (grid % level(lev) % faces_c(1,s), s=1,grid % level(lev) % n_faces)
+    write(9) (grid % level(lev) % faces_c(2,s), s=1,grid % level(lev) % n_faces)
+  end do
   close(9)
 
   deallocate (iwork)
