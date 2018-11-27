@@ -4,12 +4,19 @@
 !   Module used for native linear solvers.                                     !
 !------------------------------------------------------------------------------!
   use Matrix_Mod
+  use Vector_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
 
-  ! Preconditioning "matrix" (D)
-  type(Matrix_Type) :: D  ! preconditioning "matrix"
+  ! Preconditioning "matrix" for single grid methods
+  type(Matrix_Type) :: d  ! preconditioning "matrix"
+
+  ! Hierarchy of linear systems for multigrid methods
+  type(Matrix_Type), allocatable :: a_lev(:)  ! system matrix
+  type(Matrix_Type), allocatable :: d_lev(:)  ! preconditiong matrix
+  type(Vector_Type), allocatable :: x_lev(:)  ! unknown vector
+  type(Vector_Type), allocatable :: b_lev(:)  ! right hand side
 
   contains
 
