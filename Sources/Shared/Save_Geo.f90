@@ -37,7 +37,7 @@
   !                      !
   !----------------------!
   call Name_File( sub, name_out, '.geo' )
-  open(9, file=name_out, form='unformatted')
+  open(9, file=name_out, form='unformatted', access='stream')
   write(*, *) '# Creating the file: ', trim(name_out)
 
   !----------------------!

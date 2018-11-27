@@ -21,7 +21,7 @@
   !-------------------------------!
   call Name_File(this_proc, name_in, '.cns')  
 
-  open(9, file=name_in,form='unformatted')
+  open(9, file=name_in,form='unformatted', access='stream')
   if(this_proc < 2) print *, '# Reading the file: ', name_in
 
   ! Number of cells, boundary cells and sides
