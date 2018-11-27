@@ -77,8 +77,10 @@
   ! This is actually pretty bad - this command should be in Load_Geo
   call Comm_Mod_Exchange_Real(grid, grid % vol(-grid % n_bnd_cells))
 
-  call Matrix_Mod_Topology(grid, a)
-  call Matrix_Mod_Topology(grid, d)
+  ! Allocate memory for linear systems of equations
+  call Matrix_Mod_Create(grid, d)
+  call Matrix_Mod_Create(grid, a)
+  allocate (b(grid % n_cells));  b=0.
 
   call Comm_Mod_Wait
 
