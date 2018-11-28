@@ -44,7 +44,7 @@
 
   ! Take aliases
   a => sol % a
-  b => sol % b
+  b => sol % b % val
 
   !-----------------------------------------!
   !   Compute the sources in the interior   !

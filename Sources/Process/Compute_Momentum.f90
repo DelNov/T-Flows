@@ -109,7 +109,7 @@
   ! Take aliases
 ! grid => ui % pnt_grid
   a    => sol % a
-  b    => sol % b
+  b    => sol % b % val
 
   if(i .eq. 1) then
     ui_i => ui % x;     ui_j => ui % y;     ui_k => ui % z

@@ -67,7 +67,7 @@
 
   ! Take aliases
   a => sol % a
-  b => sol % b
+  b => sol % b % val
 
   ! Initialize matrix and right hand side
   a % val(:) = 0.0

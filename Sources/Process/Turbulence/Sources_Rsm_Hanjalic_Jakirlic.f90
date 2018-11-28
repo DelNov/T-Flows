@@ -77,7 +77,7 @@
 
   ! Take aliases
   a => sol % a
-  b => sol % b
+  b => sol % b % val
 
   diss1 = 0.0
 

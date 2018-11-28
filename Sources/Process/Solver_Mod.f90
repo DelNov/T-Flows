@@ -3,9 +3,10 @@
 !------------------------------------------------------------------------------!
 !   Module used for native linear solvers.                                     !
 !------------------------------------------------------------------------------!
+  use Comm_Mod,   only: this_proc
   use Grid_Mod,   only: Grid_Type
-  use Matrix_Mod, only: Matrix_Type, Matrix_Mod_Create
-  use Vector_Mod, only: Vector_Type
+  use Matrix_Mod, only: Matrix_Type, Matrix_Mod_Create, Matrix_Mod_Create_Level
+  use Vector_Mod, only: Vector_Type, Vector_Mod_Allocate
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -20,7 +21,7 @@
     ! Preconditioning "matrix" for single grid methods
     type(Matrix_Type) :: a     ! system matrix for all variables
     type(Matrix_Type) :: d     ! preconditioning "matrix"
-    real, allocatable :: b(:)
+    type(Vector_Type) :: b
 
     ! Hierarchy of linear systems for multigrid methods
     type(Matrix_Type), allocatable :: a_lev(:)  ! system matrix

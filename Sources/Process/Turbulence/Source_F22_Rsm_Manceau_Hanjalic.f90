@@ -52,7 +52,7 @@
 
   ! Take aliases
   a => sol % a
-  b => sol % b
+  b => sol % b % val
 
   call Time_And_Length_Scale(grid)
 

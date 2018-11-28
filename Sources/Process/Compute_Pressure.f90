@@ -56,7 +56,7 @@
 
   ! Take aliases
   a => sol % a
-  b => sol % b
+  b => sol % b % val
 
   ! User function
   call User_Mod_Beginning_Of_Compute_Pressure(grid, dt, ini)

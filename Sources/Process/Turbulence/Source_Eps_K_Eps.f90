@@ -50,7 +50,7 @@
 
   ! Take aliases
   a => sol % a
-  b => sol % b
+  b => sol % b % val
 
   kin_vis = viscosity/density
 

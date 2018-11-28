@@ -47,7 +47,7 @@
 
   ! Take aliases
   a => sol % a
-  b => sol % b
+  b => sol % b % val
 
   ! Production source:
   do c = 1, grid % n_cells

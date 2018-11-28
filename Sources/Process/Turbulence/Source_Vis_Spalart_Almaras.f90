@@ -28,7 +28,7 @@
 
   ! Take aliases
   a => sol % a
-  b => sol % b
+  b => sol % b % val
 
   if(turbulence_model .eq. SPALART_ALLMARAS) then
 

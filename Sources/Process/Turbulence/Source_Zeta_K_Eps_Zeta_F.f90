@@ -39,7 +39,7 @@
 
   ! Take aliases
   a => sol % a
-  b => sol % b
+  b => sol % b % val
 
   ! Positive source term 
   ! The first option in treating the source is making computation very 
