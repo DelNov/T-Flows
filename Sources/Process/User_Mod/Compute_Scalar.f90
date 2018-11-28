@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Compute_Scalar(grid, dt, ini, phi)
+  subroutine User_Mod_Compute_Scalar(grid, sol, dt, ini, phi)
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for use scalar.                          !
 !------------------------------------------------------------------------------!
@@ -12,30 +12,33 @@
   use Grid_Mod
   use Grad_Mod
   use Info_Mod
-  use Numerics_Mod
-  use Solvers_Mod, only: Bicg, Cg, Cgs
+  use Numerics_Mod, only: CENTRAL, LINEAR, PARABOLIC
+  use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
   use Control_Mod
-  use Work_Mod,    only: phi_x       => r_cell_01,  &
-                         phi_y       => r_cell_02,  &
-                         phi_z       => r_cell_03,  &
-                         phi_min     => r_cell_04,  &
-                         phi_max     => r_cell_05,  &
-                         u1uj_phij   => r_cell_06,  &
-                         u2uj_phij   => r_cell_07,  &
-                         u3uj_phij   => r_cell_08,  &
-                         u1uj_phij_x => r_cell_09,  &
-                         u2uj_phij_y => r_cell_10,  &
-                         u3uj_phij_z => r_cell_11
+  use Work_Mod,     only: phi_x       => r_cell_01,  &
+                          phi_y       => r_cell_02,  &
+                          phi_z       => r_cell_03,  &
+                          phi_min     => r_cell_04,  &
+                          phi_max     => r_cell_05,  &
+                          u1uj_phij   => r_cell_06,  &
+                          u2uj_phij   => r_cell_07,  &
+                          u3uj_phij   => r_cell_08,  &
+                          u1uj_phij_x => r_cell_09,  &
+                          u2uj_phij_y => r_cell_10,  &
+                          u3uj_phij_z => r_cell_11
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
-  type(Grid_Type) :: grid
+  type(Grid_Type)   :: grid
+  type(Solver_Type), target :: sol
   integer         :: ini
   real            :: dt
   type(Var_Type)  :: phi
 !----------------------------------[Calling]-----------------------------------!
   real :: Turbulent_Prandtl_Number
 !-----------------------------------[Locals]-----------------------------------! 
+  type(Matrix_Type), pointer :: a
+  real,              pointer :: b(:)
   integer           :: n, c, s, c1, c2, niter, mat, row, col
   real              :: a0, a12, a21
   real              :: ini_res, tol, ns
@@ -51,14 +54,14 @@
   integer           :: td_cross_diff ! time-disretization for cross-difusion
   real              :: urf           ! under-relaxation factor                 
 !------------------------------------------------------------------------------!
-!     
-!  The form of equations which are solved:    
-!     
-!     /                /                 /            
-!    |        dT      |                 |             
-!    | rho Cp -- dV   | rho u Cp T dS = | lambda  DIV T dS 
-!    |        dt      |                 |             
-!   /                /                 /              
+!
+!  The form of equations which are solved:
+!
+!     /                /                 /
+!    |        dT      |                 |
+!    | rho Cp -- dV   | rho u Cp T dS = | lambda  DIV T dS
+!    |        dt      |                 |
+!   /                /                 /
 !
 !
 !  Dimension of the system under consideration
@@ -80,11 +83,9 @@
 ! 
 !==============================================================================!
 
-!  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
-!    TDC = 1.0         
-!  else
-!    TDC = 1.0       
-!  end if        
+  ! Take aliases
+  a => sol % a
+  b => sol % b
 
   do n = 1, a % row(grid % n_cells+1) ! to je broj nonzero + 1
     a % val(n) = 0.0
@@ -454,7 +455,7 @@
   niter =  5
   call Control_Mod_Max_Iterations_For_Energy_Solver(niter)
 
-  call Bicg(a, phi % n, b, precond, niter, tol, ini_res, phi % res)
+  call Bicg(sol, phi % n, b, precond, niter, tol, ini_res, phi % res)
 
   read(phi % name(3:4), *) ns  ! reterive the number of scalar 
   row = ceiling(ns/4)          ! will be 1 (scal. 1-4), 2 (scal. 5-8), etc.
