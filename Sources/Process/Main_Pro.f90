@@ -231,10 +231,10 @@
 
       ! v velocity component
       call Compute_Momentum(grid, sol, dt, ini, v,  &
-                  v % y,     v % x,     v % z,      &
-                  grid % sy, grid % sx, grid % sz,  &
-                  grid % dy, grid % dx, grid % dz,  &
-                  p % y,     u % y,     w % y)      ! dp/dy, du/dy, dw/dy
+                  v % y,     v % z,     v % x,      &
+                  grid % sy, grid % sz, grid % sx,  &
+                  grid % dy, grid % dz, grid % dx,  &
+                  p % y,     w % y,     u % y)      ! dp/dy, dw/dy, du/dy
 
       ! w velocity component
       call Compute_Momentum(grid, sol, dt, ini, w,  &
