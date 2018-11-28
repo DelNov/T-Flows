@@ -15,6 +15,7 @@
   use Info_Mod,     only: Info_Mod_Iter_Fill_At
   use Numerics_Mod, only: CENTRAL, LINEAR, PARABOLIC
   use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
+  use Matrix_Mod,   only: Matrix_Type
   use Control_Mod
   use Work_Mod,     only: phi_x       => r_cell_01,  &
                           phi_y       => r_cell_02,  &

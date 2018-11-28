@@ -10,6 +10,7 @@
   use Rans_Mod
   use Grid_Mod,   only: Grid_Type
   use Solver_Mod, only: Solver_Type
+  use Matrix_Mod, only: Matrix_Type
   use Grad_Mod
   use Work_Mod,   only: l_sc_x => r_cell_01,  &
                         l_sc_y => r_cell_02,  &
@@ -609,11 +610,11 @@
                      + max(var2_11, 0.0)       &
                      + max(var1w_11,0.0)       &
                      + max(var2w_11,0.0))*grid % vol(c) 
-      A % val(A % dia(c)) = A % val(A % dia(c))                               &
+      a % val(a % dia(c)) = a % val(a % dia(c))                               &
                 + density * (  cc1 * eps % n(c) / kin % n(c)                  &
                              + c1w * f_w * eps % n(c) / kin % n(c)*3.0*n1*n1  &
                              + fss * eps % n(c) / kin % n(c))*grid % vol(c)
-      A % val(A % dia(c)) = A % val(A % dia(c))               &
+      a % val(a % dia(c)) = a % val(a % dia(c))               &
                 + density * (  max(-p11,     0.0)             &
                              + max(-var2_11, 0.0)             &
                              + max(-var1w_11,0.0)             &
@@ -631,11 +632,11 @@
                      + max(var2_22, 0.0)       &
                      + max(var1w_22,0.0)       &
                      + max(var2w_22,0.0))*grid % vol(c) 
-      A % val(A % dia(c)) = A % val(A % dia(c))                               &
+      a % val(a % dia(c)) = a % val(a % dia(c))                               &
                 + density * (  cc1 * eps % n(c) / kin % n(c)                  &
                              + c1w * f_w * eps % n(c) / kin % n(c)*3.0*n2*n2  &
                              + fss * eps % n(c) / kin % n(c))*grid % vol(c)
-      A % val(A % dia(c)) = A % val(A % dia(c))               &
+      a % val(a % dia(c)) = a % val(a % dia(c))               &
                 + density * (  max(-p22,     0.0)             &
                              + max(-var2_22, 0.0)             &
                              + max(-var1w_22,0.0)             &
@@ -653,11 +654,11 @@
                      + max(var2_33, 0.0)       &
                      + max(var1w_33,0.0)       &
                      + max(var2w_33,0.0))*grid % vol(c) 
-      A % val(A % dia(c)) = A % val(A % dia(c))                               &
+      a % val(a % dia(c)) = a % val(a % dia(c))                               &
                 + density * (  cc1 * eps % n(c) / kin % n(c)                  &
                              + c1w * f_w * eps % n(c) / kin % n(c)*3.0*n3*n3  &
                              + fss * eps % n(c) / kin % n(c))*grid % vol(c)
-      A % val(A % dia(c)) = A % val(A % dia(c))               &
+      a % val(a % dia(c)) = a % val(a % dia(c))               &
                 + density * (  max(-p33,     0.0)             &
                              + max(-var2_33, 0.0)             &
                              + max(-var1w_33,0.0)             &
@@ -670,7 +671,7 @@
     !---------------!
     else if(name_phi == 'UV') then
       b(c) = b(c) + density * (p12 + var2_12 + var1w_12 + var2w_12)*grid % vol(c)
-      A % val(A % dia(c)) = A % val(A % dia(c))                             &
+      a % val(a % dia(c)) = a % val(a % dia(c))                             &
             + density * (  cc1 * eps % n(c) / kin % n(c)                    &
                + c1w * f_w * eps % n(c) / kin % n(c) * 1.5*(n1*n1 + n2*n2)  &
                + fss * eps % n(c) / kin % n(c) ) * grid % vol(c)
@@ -680,7 +681,7 @@
     !---------------!
     else if(name_phi == 'UW') then
       b(c) = b(c) + density * (p13 + var2_13 + var1w_13 + var2w_13)*grid % vol(c)
-      A % val(A % dia(c)) = A % val(A % dia(c))                             &
+      a % val(a % dia(c)) = a % val(a % dia(c))                             &
             + density * (  cc1 * eps % n(c) / kin % n(c)                    &
                + c1w * f_w * eps % n(c) / kin % n(c) * 1.5*(n1*n1 + n3*n3)  &
                + fss * eps % n(c) / kin % n(c) ) * grid % vol(c)
@@ -690,7 +691,7 @@
     !---------------!
     else if(name_phi == 'VW') then
       b(c) = b(c) + density * (p23 + var2_23 + var1w_23 + var2w_23)*grid % vol(c)
-      A % val(A % dia(c)) = A % val(A % dia(c))                             &
+      a % val(a % dia(c)) = a % val(a % dia(c))                             &
             + density * (  cc1 * eps % n(c) / kin % n(c)                    &
                + c1w * f_w * eps % n(c) / kin % n(c) * 1.5*(n2*n2 + n3*n3)  &
                + fss * eps % n(c) / kin % n(c) ) * grid % vol(c)
@@ -704,7 +705,7 @@
       eps_2 = c_2e * f_eps * eps % n(c) / kin % n(c)
       b(c) = b(c) + density * (eps_1 + diss1(c)) * grid % vol(c)
 
-      A % val(A % dia(c)) =  A % val(A % dia(c)) + density * eps_2 * grid % vol(c)
+      a % val(a % dia(c)) =  a % val(a % dia(c)) + density * eps_2 * grid % vol(c)
     end if
   end do
 

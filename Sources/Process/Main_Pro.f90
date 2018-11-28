@@ -248,7 +248,7 @@
       call Comm_Mod_Exchange_Real(grid, sol % a % sav)
 
       call Balance_Mass(grid)
-      call Compute_Pressure_Simple(grid, sol, dt, ini)
+      call Compute_Pressure(grid, sol, dt, ini)
 
       call Grad_Mod_For_P(grid,  pp % n, p % x, p % y, p % z)
 

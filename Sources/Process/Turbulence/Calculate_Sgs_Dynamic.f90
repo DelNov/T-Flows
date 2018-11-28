@@ -11,6 +11,7 @@
   use Rans_Mod
   use Grid_Mod,   only: Grid_Type
   use Solver_Mod, only: Solver_Type
+  use Matrix_Mod, only: Matrix_Type
   use Grad_Mod
   use Work_Mod,   only: u_f        => r_cell_01,  &
                         v_f        => r_cell_02,  &  

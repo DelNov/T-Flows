@@ -12,6 +12,7 @@
   use Bulk_Mod
   use Info_Mod
   use Solver_Mod,   only: Solver_Type
+  use Matrix_Mod,   only: Matrix_Type
   use Control_Mod
   use Numerics_Mod
   use User_Mod

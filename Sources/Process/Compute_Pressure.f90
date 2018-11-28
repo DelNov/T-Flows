@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Pressure_Simple(grid, sol, dt, ini)
+  subroutine Compute_Pressure(grid, sol, dt, ini)
 !------------------------------------------------------------------------------!
 !   Forms and solves pressure equation for the SIMPLE method.                  !
 !------------------------------------------------------------------------------!
@@ -10,6 +10,7 @@
   use Grid_Mod,    only: Grid_Type
   use Info_Mod
   use Solver_Mod,  only: Solver_Type, Bicg, Cg, Cgs
+  use Matrix_Mod,  only: Matrix_Type
   use Control_Mod
   use User_Mod
 !------------------------------------------------------------------------------!

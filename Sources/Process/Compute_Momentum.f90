@@ -19,6 +19,7 @@
   use Info_Mod,     only: Info_Mod_Iter_Fill_At
   use Numerics_Mod, only: CENTRAL, LINEAR, PARABOLIC
   use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
+  use Matrix_Mod,   only: Matrix_Type
   use Control_Mod
   use User_Mod
   use Work_Mod,      only: ui_min  => r_cell_01,  &

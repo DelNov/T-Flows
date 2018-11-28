@@ -9,6 +9,7 @@
   use Rans_Mod
   use Grid_Mod,   only: Grid_Type
   use Solver_Mod, only: Solver_Type
+  use Matrix_Mod, only: Matrix_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -50,7 +51,7 @@
       gg     = r + c_w2*(r**6 - r)
       f_w    = gg*((1.0 + c_w3**6)/(gg**6 + c_w3**6))**(1.0/6.0)
       dist_v = c_w1* density * f_w * (vis % n(c)/grid % wall_dist(c)**2)
-      A % val(A % dia(c)) = A % val(A % dia(c)) + dist_v * grid % vol(c)
+      a % val(a % dia(c)) = a % val(a % dia(c)) + dist_v * grid % vol(c)
  
       !--------------------------------------------!
       !   Compute the first-order diffusion term   !
@@ -85,7 +86,7 @@
       gg     = r + c_w2*(r**6 - r)
       f_w    = gg*((1.0 + c_w3**6)/(gg**6 + c_w3**6))**(1.0/6.0)
       dist_v = c_w1* density * f_w * (vis % n(c)/dist**2)
-      A % val(A % dia(c)) = A % val(A % dia(c)) + dist_v * grid % vol(c)
+      a % val(a % dia(c)) = a % val(a % dia(c)) + dist_v * grid % vol(c)
 
       !--------------------------------------------!
       !   Compute the first-order diffusion term   !
