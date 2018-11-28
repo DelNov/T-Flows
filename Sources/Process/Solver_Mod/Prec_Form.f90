@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Prec_Form(a, prec) 
+  subroutine Prec_Form(sol, prec) 
 !------------------------------------------------------------------------------!
 !   Forms preconditioning matrix "d" from provided matrix "a".                 !
 !------------------------------------------------------------------------------!
@@ -9,13 +9,18 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Matrix_Type) :: a
-  character(len=80) :: prec  ! preconditioner
+  type(Solver_Type), target :: sol
+  character(len=80)         :: prec  ! preconditioner
 !-----------------------------------[Locals]-----------------------------------!
-  real     :: sum1
-  integer  :: i, j, k, n
+  type(Matrix_Type), pointer :: a
+  type(Matrix_Type), pointer :: d
+  real                       :: sum1
+  integer                    :: i, j, k, n
 !==============================================================================!
 
+  ! Take some aliases
+  a => sol % a
+  d => sol % d
   n = a % pnt_grid % n_cells - a % pnt_grid % comm % n_buff_cells
 
   !---------------------------------! 

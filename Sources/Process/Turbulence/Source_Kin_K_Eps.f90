@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Source_Kin_K_Eps(grid)
+  subroutine Source_Kin_K_Eps(grid, sol)
 !------------------------------------------------------------------------------!
 !   Computes the source terms in kin transport equation for k-epsilon model    !
 !------------------------------------------------------------------------------!
@@ -9,21 +9,24 @@
   use Comm_Mod
   use Les_Mod
   use Rans_Mod
-  use Grid_Mod
   use Grad_Mod
-  use Control_Mod
+  use Grid_Mod,   only: Grid_Type
+  use Solver_Mod, only: Solver_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Grid_Type)           :: grid
+  type(Solver_Type), target :: sol
 !---------------------------------[Calling]------------------------------------!
   real :: Y_Plus_Low_Re
   real :: Roughness_Coefficient
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, c1, c2, s
-  real    :: u_tot2, u_nor, u_nor2, u_tan
-  real    :: kin_vis  ! [m^2/s]
-  real    :: ebf, p_kin_int, p_kin_wf, u_tau_new
+  type(Matrix_Type), pointer :: a
+  real,              pointer :: b(:)
+  integer                    :: c, c1, c2, s
+  real                       :: u_tot2, u_nor, u_nor2, u_tan
+  real                       :: kin_vis  ! [m^2/s]
+  real                       :: ebf, p_kin_int, p_kin_wf, u_tau_new
 !==============================================================================!
 !   Dimensions:                                                                !
 !                                                                              !
@@ -37,6 +40,10 @@
 !   p_kin = 2*vis_t / density S_ij S_ij                                        !
 !   shear = sqrt(2 S_ij S_ij)                                                  !
 !------------------------------------------------------------------------------!
+
+  ! Take aliases
+  a => sol % a
+  b => sol % b
 
   !-----------------------------------------!
   !   Compute the sources in the interior   !

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_F22(grid, ini, phi)
+  subroutine Compute_F22(grid, sol, ini, phi)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves eliptic relaxation equations for f22.               !
 !------------------------------------------------------------------------------!
@@ -8,30 +8,32 @@
   use Les_Mod
   use Rans_Mod
   use Comm_Mod
-  use Var_Mod
-  use Grid_Mod
+  use Var_Mod,     only: Var_Type
+  use Grid_Mod,    only: Grid_Type
   use Grad_Mod
-  use Info_Mod
-  use Numerics_Mod
-  use Solvers_Mod, only: Bicg, Cg, Cgs
+  use Info_Mod,    only: Info_Mod_Iter_Fill_At
+  use Solver_Mod,  only: Solver_Type, Bicg, Cg, Cgs
   use Control_Mod
   use Work_Mod,    only: phi_x => r_cell_01,  &
                          phi_y => r_cell_02,  &
-                         phi_z => r_cell_03           
+                         phi_z => r_cell_03
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Grid_Type) :: grid
-  integer         :: ini
-  type(Var_Type)  :: phi
+  type(Grid_Type)           :: grid
+  type(Solver_Type), target :: sol
+  integer                   :: ini
+  type(Var_Type)            :: phi
 !----------------------------------[Locals]------------------------------------!
-  integer           :: s, c, c1, c2, niter
-  real              :: f_ex, f_im 
-  real              :: a0, a12, a21
-  real              :: ini_res, tol
-  real              :: phi_x_f, phi_y_f, phi_z_f
-  character(len=80) :: precond
-  real              :: urf           ! under-relaxation factor
+  type(Matrix_Type), pointer :: a
+  real,              pointer :: b(:)
+  integer                    :: s, c, c1, c2, niter
+  real                       :: f_ex, f_im 
+  real                       :: a0, a12, a21
+  real                       :: ini_res, tol
+  real                       :: phi_x_f, phi_y_f, phi_z_f
+  character(len=80)          :: precond
+  real                       :: urf           ! under-relaxation factor
 !==============================================================================!
 !                                                                              !
 !   The form of equations which are solved:                                    !
@@ -52,9 +54,13 @@
 !     Lsc            [m]                                                       !
 !------------------------------------------------------------------------------!
 
-  a % val = 0.0
+  ! Take aliases
+  a => sol % a
+  b => sol % b
 
-  b = 0.0
+  ! Initialize matrix and right hand side
+  a % val(:) = 0.0
+  b      (:) = 0.0
 
   ! Old values (o) and older than old (oo)
   if(ini .eq. 1) then
@@ -157,9 +163,9 @@
   !                                     !
   !-------------------------------------!
   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
-    call Source_F22_Rsm_Manceau_Hanjalic(grid)
+    call Source_F22_Rsm_Manceau_Hanjalic(grid, sol)
   else
-    call Source_F22_K_Eps_Zeta_F(grid)
+    call Source_F22_K_Eps_Zeta_F(grid, sol)
   end if
 
   !---------------------------------!
@@ -187,7 +193,14 @@
   niter = 6
   call Control_Mod_Max_Iterations_For_Turbulence_Solver(niter)
 
-  call Cg(a, phi % n, b, precond, niter, tol, ini_res, phi % res)
+  call Cg(sol,      &
+          phi % n,  &
+          b,        &
+          precond,  &
+          niter,    &
+          tol,      &
+          ini_res,  &
+          phi % res)
 
   call Info_Mod_Iter_Fill_At(3, 4, phi % name, niter, phi % res)
 

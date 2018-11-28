@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Turbulent(grid, dt, ini, phi, n_step)
+  subroutine Compute_Turbulent(grid, sol, dt, ini, phi, n_step)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves transport equations for different turbulent         !
 !   variables.                                                                 !
@@ -9,27 +9,30 @@
   use Les_Mod
   use Rans_Mod
   use Comm_Mod
-  use Var_Mod
-  use Grid_Mod
+  use Var_Mod,      only: Var_Type
+  use Grid_Mod,     only: Grid_Type
   use Grad_Mod
-  use Info_Mod
-  use Numerics_Mod
-  use Solvers_Mod, only: Bicg, Cg, Cgs
+  use Info_Mod,     only: Info_Mod_Iter_Fill_At
   use Control_Mod
-  use Work_Mod,    only: phi_x   => r_cell_01,  &
-                         phi_y   => r_cell_02,  &
-                         phi_z   => r_cell_03,  &
-                         phi_min => r_cell_04,  &
-                         phi_max => r_cell_05
+  use Numerics_Mod, only: CENTRAL, LINEAR, PARABOLIC
+  use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
+  use Work_Mod,     only: phi_x   => r_cell_01,  &
+                          phi_y   => r_cell_02,  &
+                          phi_z   => r_cell_03,  &
+                          phi_min => r_cell_04,  &
+                          phi_max => r_cell_05
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Grid_Type) :: grid
-  real            :: dt
-  integer         :: ini
-  type(Var_Type)  :: phi
-  integer         :: n_step
+  type(Grid_Type)           :: grid
+  type(Solver_Type), target :: sol
+  real                      :: dt
+  integer                   :: ini
+  type(Var_Type)            :: phi
+  integer                   :: n_step
 !----------------------------------[Locals]------------------------------------!
+  type(Matrix_Type), pointer :: a
+  real,              pointer :: b(:)
   integer           :: s, c, c1, c2, niter
   real              :: f_ex, f_im
   real              :: phis
@@ -54,9 +57,13 @@
 !                                                                              !
 !------------------------------------------------------------------------------!
 
-  a % val = 0.0
+  ! Take aliases
+  a => sol % a
+  b => sol % b
 
-  b = 0.0
+  ! Initialize matrix and right hand side
+  a % val(:) = 0.0
+  b      (:) = 0.0
 
   ! Old values (o) and older than old (oo)
   if(ini .eq. 1) then
@@ -286,20 +293,20 @@
   !                                     !
   !-------------------------------------!
   if(turbulence_model .eq. K_EPS) then
-    if(phi % name .eq. 'KIN') call Source_Kin_K_Eps(grid)
-    if(phi % name .eq. 'EPS') call Source_Eps_K_Eps(grid)
+    if(phi % name .eq. 'KIN') call Source_Kin_K_Eps(grid, sol)
+    if(phi % name .eq. 'EPS') call Source_Eps_K_Eps(grid, sol)
   end if
 
   if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
      turbulence_model .eq. HYBRID_LES_RANS) then
-    if(phi % name .eq. 'KIN')  call Source_Kin_K_Eps_Zeta_F(grid)
-    if(phi % name .eq. 'EPS')  call Source_Eps_K_Eps_Zeta_F(grid)
-    if(phi % name .eq. 'ZETA') call Source_Zeta_K_Eps_Zeta_F(grid, n_step)
+    if(phi % name .eq. 'KIN')  call Source_Kin_K_Eps_Zeta_F(grid, sol)
+    if(phi % name .eq. 'EPS')  call Source_Eps_K_Eps_Zeta_F(grid, sol)
+    if(phi % name .eq. 'ZETA') call Source_Zeta_K_Eps_Zeta_F(grid, sol, n_step)
   end if
 
   if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
      turbulence_model .eq. DES_SPALART) then
-    call Source_Vis_Spalart_Almaras(grid, phi_x, phi_y, phi_z)
+    call Source_Vis_Spalart_Almaras(grid, sol, phi_x, phi_y, phi_z)
   end if
 
   !---------------------------------!
@@ -327,7 +334,7 @@
   niter = 6
   call Control_Mod_Max_Iterations_For_Turbulence_Solver(niter)
 
-  call Bicg(a,        &
+  call Bicg(sol,      &
             phi % n,  &
             b,        &
             precond,  &

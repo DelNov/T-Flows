@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Source_Eps_K_Eps_Zeta_F(grid)
+  subroutine Source_Eps_K_Eps_Zeta_F(grid, sol)
 !------------------------------------------------------------------------------!
 !   Calculates source terms in equation of dissipation of turbulent energy     !
 !   and imposes boundary condition                                             !
@@ -9,21 +9,24 @@
   use Flow_Mod
   use Les_Mod
   use Rans_Mod
-  use Grid_Mod
-  use Control_Mod
+  use Grid_Mod,   only: Grid_Type
+  use Solver_Mod, only: Solver_Type
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Grid_Type) :: grid
+  type(Grid_Type)           :: grid
+  type(Solver_Type), target :: sol
 !---------------------------------[Calling]------------------------------------!
   real :: Y_Plus_Low_Re
   real :: Roughness_Coefficient
 !----------------------------------[Locals]------------------------------------!
-  integer :: c, s, c1, c2, j
-  real    :: u_tan, u_nor_sq, u_nor, u_tot_sq
-  real    :: e_sor, c_11e, ebf
-  real    :: eps_wf, eps_int
-  real    :: fa, u_tau_new, kin_vis
+  type(Matrix_Type), pointer :: a
+  real,              pointer :: b(:)
+  integer                    :: c, s, c1, c2, j
+  real                       :: u_tan, u_nor_sq, u_nor, u_tot_sq
+  real                       :: e_sor, c_11e, ebf
+  real                       :: eps_wf, eps_int
+  real                       :: fa, u_tau_new, kin_vis
 !==============================================================================!
 !   In dissipation of turbulent kinetic energy equation exist two              !
 !   source terms which have form:                                              !
@@ -48,6 +51,10 @@
 !   p_kin = 2*vis_t / density S_ij S_ij                                        !
 !   shear = sqrt(2 S_ij S_ij)                                                  !
 !------------------------------------------------------------------------------!
+
+  ! Take aliases
+  a => sol % a
+  b => sol % b
 
   call Time_And_Length_Scale(grid)
 

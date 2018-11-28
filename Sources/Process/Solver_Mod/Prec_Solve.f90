@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Prec_Solve(a, x, b, prec) 
+  subroutine Prec_Solve(sol, x, b, prec) 
 !------------------------------------------------------------------------------!
 ! Solves the preconditioning system [d]{x}={b}                                 !
 !------------------------------------------------------------------------------!
@@ -18,15 +18,21 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Matrix_Type) :: a
-  real              :: x(-a % pnt_grid % n_bnd_cells : a % pnt_grid % n_cells)
-  real              :: b( a % pnt_grid % n_cells)
-  character(len=80) :: prec  ! preconditioner
+  type(Solver_Type), target :: sol
+  real                      :: x(-sol % pnt_grid % n_bnd_cells :  &
+                                  sol % pnt_grid % n_cells)
+  real                      :: b( sol % pnt_grid % n_cells)
+  character(len=80)         :: prec  ! preconditioner
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: i, j, k, n
-  real    :: sum1
+  type(Matrix_Type), pointer :: a
+  type(Matrix_Type), pointer :: d
+  integer                    :: i, j, k, n
+  real                       :: sum1
 !==============================================================================!
 
+  ! Take some aliases
+  a => sol % a
+  d => sol % d
   n  = a % pnt_grid % n_cells - a % pnt_grid % comm % n_buff_cells
 
   !---------------------------------!

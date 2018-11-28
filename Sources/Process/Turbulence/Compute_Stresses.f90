@@ -1,42 +1,44 @@
 !==============================================================================!
-  subroutine Compute_Stresses(grid, dt, ini, phi, n_time_step)
+  subroutine Compute_Stresses(grid, sol, dt, ini, phi, n_time_step)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves transport equation for Re stresses for RSM.         !
-!   'EBM' and 'HJ' are calling this subroutine.                                !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod, only: TINY
+  use Const_Mod
   use Flow_Mod
   use Les_Mod
   use Rans_Mod
   use Comm_Mod
-  use Var_Mod
-  use Grid_Mod
+  use Var_Mod,      only: Var_Type
+  use Grid_Mod,     only: Grid_Type
   use Grad_Mod
-  use Info_Mod
-  use Numerics_Mod
-  use Solvers_Mod, only: Bicg, Cg, Cgs
+  use Info_Mod,     only: Info_Mod_Iter_Fill_At
+  use Numerics_Mod, only: CENTRAL, LINEAR, PARABOLIC
+  use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
   use Control_Mod
-  use Work_Mod,    only: phi_x       => r_cell_01,  &
-                         phi_y       => r_cell_02,  &
-                         phi_z       => r_cell_03,  &
-                         phi_min     => r_cell_04,  &
-                         phi_max     => r_cell_05,  &
-                         u1uj_phij   => r_cell_06,  &
-                         u2uj_phij   => r_cell_07,  &
-                         u3uj_phij   => r_cell_08,  &
-                         u1uj_phij_x => r_cell_09,  &
-                         u2uj_phij_y => r_cell_10,  &
-                         u3uj_phij_z => r_cell_11
+  use Work_Mod,     only: phi_x       => r_cell_01,  &
+                          phi_y       => r_cell_02,  &
+                          phi_z       => r_cell_03,  &
+                          phi_min     => r_cell_04,  &
+                          phi_max     => r_cell_05,  &
+                          u1uj_phij   => r_cell_06,  &
+                          u2uj_phij   => r_cell_07,  &
+                          u3uj_phij   => r_cell_08,  &
+                          u1uj_phij_x => r_cell_09,  &
+                          u2uj_phij_y => r_cell_10,  &
+                          u3uj_phij_z => r_cell_11
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
-  real            :: dt
-  integer         :: ini
-  type(Var_Type)  :: phi
-  integer         :: n_time_step
+  type(Grid_Type)           :: grid
+  type(Solver_Type), target :: sol
+  real                      :: dt
+  integer                   :: ini
+  type(Var_Type)            :: phi
+  integer                   :: n_time_step
 !-----------------------------------[Locals]-----------------------------------!
+  type(Matrix_Type), pointer :: a
+  real,              pointer :: b(:)
   integer           :: s, c, c1, c2, niter
   real              :: f_ex, f_im
   real              :: phis
@@ -62,9 +64,13 @@
 !                                                                              !
 !------------------------------------------------------------------------------!
 
-  a % val = 0.
+  ! Take aliases
+  a => sol % a
+  b => sol % b
 
-  b(:) = 0.
+  ! Initialize matrix and right hand side
+  a % val(:) = 0.0
+  b      (:) = 0.0
 
   ! Old values (o) and older than old (oo)
   if(ini .eq. 1) then
@@ -372,9 +378,9 @@
     call Grad_Mod_For_Phi(grid, f22 % n, 2, f22 % y, .true.) ! df22/dy
     call Grad_Mod_For_Phi(grid, f22 % n, 3, f22 % z, .true.) ! df22/dz
 
-    call Sources_Rsm_Manceau_Hanjalic(grid, phi % name)
+    call Sources_Rsm_Manceau_Hanjalic(grid, sol, phi % name)
   else if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
-    call Sources_Rsm_Hanjalic_Jakirlic(grid, phi % name, n_time_step)
+    call Sources_Rsm_Hanjalic_Jakirlic(grid, sol, phi % name, n_time_step)
   end if
 
   !---------------------------------!
@@ -401,7 +407,7 @@
   niter = 6
   call Control_Mod_Max_Iterations_For_Turbulence_Solver(niter)
 
-  call Bicg(a,        &
+  call Bicg(sol,      &
             phi % n,  &
             b,        &
             precond,  &

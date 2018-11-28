@@ -1,24 +1,27 @@
 !==============================================================================!
-  subroutine Compute_Pressure_Simple(grid, dt, ini)
+  subroutine Compute_Pressure_Simple(grid, sol, dt, ini)
 !------------------------------------------------------------------------------!
-!   Forms and solves pressure equation for the S.I.M.p.L.E. method.            !
+!   Forms and solves pressure equation for the SIMPLE method.                  !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Flow_Mod
   use Comm_Mod
   use Const_Mod
-  use Grid_Mod,     only: Grid_Type
+  use Grid_Mod,    only: Grid_Type
   use Info_Mod
-  use Solvers_Mod,  only: Bicg, Cg, Cgs
+  use Solver_Mod,  only: Solver_Type, Bicg, Cg, Cgs
   use Control_Mod
   use User_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Grid_Type)   :: grid
+  type(Solver_Type), target :: sol
   real            :: dt
   integer         :: ini
 !-----------------------------------[Locals]-----------------------------------!
+  type(Matrix_Type), pointer :: a
+  real,              pointer :: b(:)
   integer           :: s, c, c1, c2, niter
   real              :: u_f, v_f, w_f, a12, fs
   real              :: ini_res, tol, mass_err
@@ -49,6 +52,10 @@
 !     flux           [kg/s]
 !   
 !------------------------------------------------------------------------------!
+
+  ! Take aliases
+  a => sol % a
+  b => sol % b
 
   ! User function
   call User_Mod_Beginning_Of_Compute_Pressure(grid, dt, ini)
@@ -210,7 +217,7 @@
   ! Over-ride if specified in control file
   call Control_Mod_Max_Iterations_For_Pressure_Solver(niter)
 
-  call Cg(a,         &
+  call Cg(sol,       &
           pp % n,    &
           b,         &
           precond,   &

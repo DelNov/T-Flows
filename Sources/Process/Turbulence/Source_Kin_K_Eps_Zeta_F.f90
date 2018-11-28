@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Source_Kin_K_Eps_Zeta_F(grid)
+  subroutine Source_Kin_K_Eps_Zeta_F(grid, sol)
 !------------------------------------------------------------------------------!
 !   Computes the source terms in kin transport equation.                       !
 !------------------------------------------------------------------------------!
@@ -11,22 +11,25 @@
   use Flow_Mod
   use Les_Mod
   use Rans_Mod
-  use Grid_Mod
-  use Control_Mod
+  use Grid_Mod,   only: Grid_Type
+  use Solver_Mod, only: Solver_Type
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Grid_Type) :: grid
+  type(Grid_Type)           :: grid
+  type(Solver_Type), target :: sol
 !---------------------------------[Calling]------------------------------------!
   real :: Y_Plus_Low_Re
   real :: Y_Plus_Rough_Walls
   real :: Roughness_Coefficient
 !----------------------------------[Locals]------------------------------------!
-  integer :: c, c1, c2, s
-  real    :: u_tan, u_nor_sq, u_nor, u_tot_sq
-  real    :: lf, ebf, p_kin_int, p_kin_wf
-  real    :: alpha1, l_rans, l_sgs, kin_vis
-  real    :: u_tau_new 
+  type(Matrix_Type), pointer :: a
+  real,              pointer :: b(:)
+  integer                    :: c, c1, c2, s
+  real                       :: u_tan, u_nor_sq, u_nor, u_tot_sq
+  real                       :: lf, ebf, p_kin_int, p_kin_wf
+  real                       :: alpha1, l_rans, l_sgs, kin_vis
+  real                       :: u_tau_new 
 !==============================================================================!
 !   Dimensions:                                                                !
 !                                                                              !
@@ -40,6 +43,10 @@
 !   p_kin = 2*vis_t / density S_ij S_ij                                        !
 !   shear = sqrt(2 S_ij S_ij)                                                  !
 !------------------------------------------------------------------------------!
+
+  ! Take aliases
+  a => sol % a
+  b => sol % b
 
   ! Production source:
   do c = 1, grid % n_cells

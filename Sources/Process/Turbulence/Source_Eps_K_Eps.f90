@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Source_Eps_K_Eps(grid)
+  subroutine Source_Eps_K_Eps(grid, sol)
 !------------------------------------------------------------------------------!
 !   Computes the source terms in the eps transport equation,                   !
 !   wall shear stress (wall function approuch)                                 !
@@ -15,21 +15,24 @@
   use Flow_Mod
   use Les_Mod
   use Rans_Mod
-  use Grid_Mod
+  use Grid_Mod,   only: Grid_Type
+  use Solver_Mod, only: Solver_Type
   use Grad_Mod
-  use Control_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Grid_Type)           :: grid
+  type(Solver_Type), target :: sol
 !---------------------------------[Calling]------------------------------------!
   real :: Y_Plus_Low_Re
-  real :: Roughness_Coefficient 
+  real :: Roughness_Coefficient
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: s, c, c1, c2, j
-  real    :: u_tan, u_nor_sq, u_nor, u_tot_sq
-  real    :: re_t, f_mu
-  real    :: eps_wf, eps_int, ebf, y_star, u_tau_new, fa, kin_vis
+  type(Matrix_Type), pointer :: a
+  real,              pointer :: b(:)
+  integer                    :: s, c, c1, c2, j
+  real                       :: u_tan, u_nor_sq, u_nor, u_tot_sq
+  real                       :: re_t, f_mu, u_tau_new, fa, kin_vis
+  real                       :: eps_wf, eps_int, ebf, y_star
 !==============================================================================!
 !   Dimensions:                                                                !
 !                                                                              !
@@ -43,6 +46,10 @@
 !   p_kin = 2*vis_t / density S_ij S_ij                                        !
 !   shear = sqrt(2 S_ij S_ij)                                                  !
 !------------------------------------------------------------------------------!
+
+  ! Take aliases
+  a => sol % a
+  b => sol % b
 
   kin_vis = viscosity/density
 

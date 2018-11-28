@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Sources_Rsm_Hanjalic_Jakirlic(grid, name_phi, n_time_step)
+  subroutine Sources_Rsm_Hanjalic_Jakirlic(grid, sol, name_phi, n_time_step)
 !------------------------------------------------------------------------------!
 !   Calculate source terms for transport equations for Re stresses and         !
 !   dissipation for Hanjalic-Jakirlic model.                                   !  
@@ -8,35 +8,39 @@
   use Const_Mod
   use Flow_Mod
   use Rans_Mod
-  use Grid_Mod
+  use Grid_Mod,   only: Grid_Type
+  use Solver_Mod, only: Solver_Type
   use Grad_Mod
-  use Work_Mod, only: l_sc_x => r_cell_01,  &
-                      l_sc_y => r_cell_02,  &
-                      l_sc_z => r_cell_03,  &
-                      kin_x  => r_cell_04,  &
-                      kin_y  => r_cell_05,  &
-                      kin_z  => r_cell_06,  &
-                      kin_xx => r_cell_07,  &
-                      kin_yy => r_cell_08,  &
-                      kin_zz => r_cell_09,  &
-                      ui_xx  => r_cell_10,  &
-                      ui_yy  => r_cell_11,  &
-                      ui_zz  => r_cell_12,  &
-                      ui_xy  => r_cell_13,  &
-                      ui_xz  => r_cell_14,  &
-                      ui_yz  => r_cell_15,  &
-                      kin_e  => r_cell_16,  &
-                      kin_e_x=> r_cell_17,  &
-                      kin_e_y=> r_cell_18,  &
-                      kin_e_z=> r_cell_19,  &
-                      diss1  => r_cell_20
+  use Work_Mod,   only: l_sc_x => r_cell_01,  &
+                        l_sc_y => r_cell_02,  &
+                        l_sc_z => r_cell_03,  &
+                        kin_x  => r_cell_04,  &
+                        kin_y  => r_cell_05,  &
+                        kin_z  => r_cell_06,  &
+                        kin_xx => r_cell_07,  &
+                        kin_yy => r_cell_08,  &
+                        kin_zz => r_cell_09,  &
+                        ui_xx  => r_cell_10,  &
+                        ui_yy  => r_cell_11,  &
+                        ui_zz  => r_cell_12,  &
+                        ui_xy  => r_cell_13,  &
+                        ui_xz  => r_cell_14,  &
+                        ui_yz  => r_cell_15,  &
+                        kin_e  => r_cell_16,  &
+                        kin_e_x=> r_cell_17,  &
+                        kin_e_y=> r_cell_18,  &
+                        kin_e_z=> r_cell_19,  &
+                        diss1  => r_cell_20
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)  :: grid
-  character(len=*) :: name_phi
-  integer          :: n_time_step 
+  type(Grid_Type)           :: grid
+  type(Solver_Type), target :: sol
+  character(len=*)          :: name_phi
+  integer                   :: n_time_step 
 !-----------------------------------[Locals]-----------------------------------!
+  type(Matrix_Type), pointer :: a
+  real,              pointer :: b(:)
   integer :: c, s, c1, c2, i, icont
   real    :: mag
   real    :: a11, a22, a33, a12, a13, a23
@@ -69,6 +73,10 @@
 !   thermal cap.  capacity[m^2/(s^2*K)]| therm. conductivity     [kg*m/(s^3*K)]!
 !------------------------------------------------------------------------------!
 ! but dens > 1 mod. not applied here yet
+
+  ! Take aliases
+  a => sol % a
+  b => sol % b
 
   diss1 = 0.0
 

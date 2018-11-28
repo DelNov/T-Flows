@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Sources_Rsm_Manceau_Hanjalic(grid, name_phi)
+  subroutine Sources_Rsm_Manceau_Hanjalic(grid, sol, name_phi)
 !------------------------------------------------------------------------------!
 !   Calculate source terms for Re stresses and dissipation for 
 !   RSM_MANCEAU_HANJALIC model                                                 !
@@ -8,7 +8,8 @@
   use Const_Mod
   use Flow_Mod
   use Rans_Mod
-  use Grid_Mod
+  use Grid_Mod,   only: Grid_Type
+  use Solver_Mod, only: Solver_Type
   use Grad_Mod
   use Work_Mod, only: f22_x  => r_cell_23,  &
                       f22_y  => r_cell_24,  &
@@ -16,17 +17,24 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)  :: grid
-  character(len=*) :: name_phi
+  type(Grid_Type)           :: grid
+  type(Solver_Type), target :: sol
+  character(len=*)          :: name_phi
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, s, c1, c2, i, var
-  real    :: prod, diss, phi_hom, phi_wall, mag, phi_tot, esor
-  real    :: b11, b22, b33, b12, b13, b21, b31, b23, b32
-  real    :: s11, s22, s33, s12, s13, s21, s31, s23, s32
-  real    :: v11, v22, v33, v12, v13, v21, v31, v23, v32
-  real    :: n1, n2, n3, b_mn_b_mn, b_lk_s_lk, uiujn, ce_11, uu_nn 
-  real    :: diss_wall, diss_hom, r23, kin_vis
+  type(Matrix_Type), pointer :: a
+  real,              pointer :: b(:)
+  integer                    :: c, s, c1, c2, i, var
+  real                       :: prod, diss, phi_hom, phi_wall, mag, phi_tot
+  real                       :: b11, b22, b33, b12, b13, b21, b31, b23, b32
+  real                       :: s11, s22, s33, s12, s13, s21, s31, s23, s32
+  real                       :: v11, v22, v33, v12, v13, v21, v31, v23, v32
+  real                       :: n1, n2, n3, b_mn_b_mn, b_lk_s_lk, uiujn, ce_11
+  real                       :: uu_nn, esor, diss_wall, diss_hom, r23, kin_vis
 !==============================================================================!
+
+  ! Take aliases
+  a => sol % a
+  b => sol % b
 
   call Time_And_Length_Scale()
 

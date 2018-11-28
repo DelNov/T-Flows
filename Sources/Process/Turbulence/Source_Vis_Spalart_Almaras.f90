@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Source_Vis_Spalart_Almaras(grid, phi_x, phi_y, phi_z)
+  subroutine Source_Vis_Spalart_Almaras(grid, sol, phi_x, phi_y, phi_z)
 !------------------------------------------------------------------------------!
 !   Computes the source terms in vis transport equation.                       !
 !------------------------------------------------------------------------------!
@@ -7,22 +7,30 @@
   use Flow_Mod
   use Les_Mod
   use Rans_Mod
-  use Grid_Mod
-  use Control_Mod
+  use Grid_Mod,   only: Grid_Type
+  use Solver_Mod, only: Solver_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Grid_Type)           :: grid
+  type(Solver_Type), target :: sol
+  real                      :: phi_x(-grid % n_bnd_cells:grid % n_cells),  &
+                               phi_y(-grid % n_bnd_cells:grid % n_cells),  &
+                               phi_z(-grid % n_bnd_cells:grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: c 
-  real              :: x_rat, f_v1, f_v2, f_w, ss, dist_v, prod_v, r, gg, Dif
-  real              :: dist
-  real              :: phi_x(-grid % n_bnd_cells:grid % n_cells),  &
-                       phi_y(-grid % n_bnd_cells:grid % n_cells),  &
-                       phi_z(-grid % n_bnd_cells:grid % n_cells)
+  type(Matrix_Type), pointer :: a
+  real,              pointer :: b(:)
+  integer                    :: c
+  real                       :: x_rat, f_v1, f_v2, f_w, ss
+  real                       :: dist_v, prod_v, r, gg, dif, dist
 !==============================================================================!
 
+  ! Take aliases
+  a => sol % a
+  b => sol % b
+
   if(turbulence_model .eq. SPALART_ALLMARAS) then
+
     do c = 1, grid % n_cells
 
       !---------------------------------!
@@ -47,11 +55,11 @@
       !--------------------------------------------!
       !   Compute the first-order diffusion term   !
       !--------------------------------------------!
-      Dif   = c_b2                                 &
+      dif   = c_b2                                 &
             * density                              &
             * (phi_x(c) + phi_y(c) + phi_z(c))**2  &
             / vis % sigma
-      b(c)  = b(c) + Dif * grid % vol(c)
+      b(c)  = b(c) + dif * grid % vol(c)
     end do
 
   else if(turbulence_model .eq. DES_SPALART) then
@@ -69,7 +77,7 @@
       ss     = vort(c) + vis % n(c)*f_v2/(kappa**2*dist**2)
       prod_v = c_b1 * density * ss * vis % n(c)
       b(c)   = b(c) + prod_v * grid % vol(c)
-      
+
       !-----------------------------------!
       !   Compute the destruction  term   !
       !-----------------------------------!
@@ -82,12 +90,12 @@
       !--------------------------------------------!
       !   Compute the first-order diffusion term   !
       !--------------------------------------------!
-      Dif   = c_b2                                 &
+      dif   = c_b2                                 &
             * density                              &
             * (phi_x(c) + phi_y(c) + phi_z(c))**2  &
             / vis % sigma
-      b(c)  = b(c) + Dif * grid % vol(c)
-    end do 
+      b(c)  = b(c) + dif * grid % vol(c)
+    end do
   end if
 
   end subroutine

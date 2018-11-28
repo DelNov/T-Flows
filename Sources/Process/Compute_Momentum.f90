@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Momentum(grid, dt, ini, ui,  &
+  subroutine Compute_Momentum(grid, sol, dt, ini, ui,  &
                               ui_i, ui_j, ui_k,   &
                               si, sj, sk,         &
                               di, dj, dk,         &
@@ -13,20 +13,21 @@
   use Les_Mod
   use Rans_Mod
   use Comm_Mod
-  use Var_Mod
-  use Grid_Mod
+  use Var_Mod,      only: Var_Type
+  use Grid_Mod,     only: Grid_Type
   use Bulk_Mod
-  use Info_Mod
-  use Numerics_Mod
-  use Solvers_Mod, only: Bicg, Cg, Cgs
+  use Info_Mod,     only: Info_Mod_Iter_Fill_At
+  use Numerics_Mod, only: CENTRAL, LINEAR, PARABOLIC
+  use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
   use Control_Mod
   use User_Mod
-  use Work_Mod,    only: ui_min  => r_cell_01,  &
-                         ui_max  => r_cell_02
+  use Work_Mod,      only: ui_min  => r_cell_01,  &
+                           ui_max  => r_cell_02
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Grid_Type)   :: grid
+  type(Solver_Type), target :: sol
   real            :: dt
   integer         :: ini
   type(Var_Type)  :: ui
@@ -44,6 +45,8 @@
                      uk_i(-grid % n_bnd_cells:grid % n_cells)
   real            :: uu_f, vv_f, ww_f, uv_f, uw_f, vw_f
 !-----------------------------------[Locals]-----------------------------------!
+  type(Matrix_Type), pointer :: a
+  real,              pointer :: b(:)
   integer           :: s, c, c1, c2, niter
   real              :: f_ex, f_im, f_stress
   real              :: uis, vel_max
@@ -55,9 +58,6 @@
   integer           :: adv_scheme    ! space disretization of advection (scheme)
   real              :: blend         ! blending coeff (1.0 central; 0.0 upwind)
   integer           :: td_scheme     ! time-disretization for inerita
-  integer           :: td_advection  ! time-disretization for advection
-  integer           :: td_diffusion  ! time-disretization for diffusion
-  integer           :: td_cross_diff ! time-disretization for cross-diffusion
   real              :: urf           ! under-relaxation factor
 !------------------------------------------------------------------------------!
 !
@@ -116,6 +116,15 @@
 !     Wall visc.      vis_wall [kg/(m*s)]
 !==============================================================================!
 
+  ! Take aliases
+  a => sol % a
+  b => sol % b
+
+  ! Initialize matrix and right hand side
+  a % val(:) = 0.0
+  b      (:) = 0.0
+  f_stress   = 0.0
+
   ! User function
   call User_Mod_Beginning_Of_Compute_Momentum(grid, dt, ini)
 
@@ -125,11 +134,6 @@
     vel_max = max(vel_max, sqrt(u % n(c)**2 + v % n(c)**2 + w % n(c)**2))
   end do
   call Comm_Mod_Global_Max_Real(vel_max)
-
-  ! Initialize matrix and right hand side
-  b        = 0.0
-  a % val  = 0.0
-  f_stress = 0.0
 
   ! Old values (o) and older than old (oo)
   if(ini .eq. 1) then
@@ -492,7 +496,7 @@
   niter =  5
   call Control_Mod_Max_Iterations_For_Momentum_Solver(niter)
 
-  call Bicg(a,        &
+  call Bicg(sol,      &
             ui % n,   &
             b,        &
             precond,  &

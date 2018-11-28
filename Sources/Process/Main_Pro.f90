@@ -14,13 +14,12 @@
   use Grad_Mod
   use Bulk_Mod
   use Var_Mod
-  use Solvers_Mod, only: d
+  use Solver_Mod
   use Info_Mod
   use User_Mod
   use Control_Mod
   use Monitor_Mod
   use Backup_Mod
-  use Numerics_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Calling]------------------------------------!
@@ -31,6 +30,7 @@
   character(len=80) :: name_save
   logical           :: backup, save_now, exit_now
   type(Grid_Type)   :: grid        ! grid used in computations
+  type(Solver_Type) :: sol         ! linear solvers
   real              :: time        ! physical time
   real              :: dt          ! time step
   integer           :: first_dt    ! first time step in this run
@@ -78,9 +78,7 @@
   call Comm_Mod_Exchange_Real(grid, grid % vol(-grid % n_bnd_cells))
 
   ! Allocate memory for linear systems of equations
-  call Matrix_Mod_Create(grid, d)
-  call Matrix_Mod_Create(grid, a)
-  allocate (b(grid % n_cells));  b=0.
+  call Solver_Mod_Allocate(sol, grid)
 
   call Comm_Mod_Wait
 
@@ -185,13 +183,13 @@
        turbulence_model .eq. LES_DYNAMIC     .or.  &
        turbulence_model .eq. LES_WALE) then
       call Calculate_Shear_And_Vorticity(grid)
-      if(turbulence_model .eq. LES_DYNAMIC) call Calculate_Sgs_Dynamic(grid)
+      if(turbulence_model .eq. LES_DYNAMIC) call Calculate_Sgs_Dynamic(grid,sol)
       if(turbulence_model .eq. LES_WALE)    call Calculate_Sgs_Wale(grid)
       call Calculate_Sgs(grid)
     end if
 
     If(turbulence_model .eq. HYBRID_LES_RANS) then
-      call Calculate_Sgs_Dynamic(grid)
+      call Calculate_Sgs_Dynamic(grid,sol)
       call Calculate_Sgs_Hybrid(grid)
     end if
 
@@ -225,45 +223,46 @@
       call Grad_Mod_For_Phi(grid, w % n, 3, w % z, .true.)
 
       ! u velocity component
-      call Compute_Momentum(grid, dt, ini, u,      &
-                  u % x,     u % y,     u % z,     &
-                  grid % sx, grid % sy, grid % sz, &
-                  grid % dx, grid % dy, grid % dz, &
-                  p % x,     v % x,     w % x)     ! dp/dx, dv/dx, dw/dx
+      call Compute_Momentum(grid, sol, dt, ini, u,  &
+                  u % x,     u % y,     u % z,      &
+                  grid % sx, grid % sy, grid % sz,  &
+                  grid % dx, grid % dy, grid % dz,  &
+                  p % x,     v % x,     w % x)      ! dp/dx, dv/dx, dw/dx
 
       ! v velocity component
-      call Compute_Momentum(grid, dt, ini, v,      &
-                  v % y,     v % x,     v % z,     &
-                  grid % sy, grid % sx, grid % sz, &
-                  grid % dy, grid % dx, grid % dz, &
-                  p % y,     u % y,     w % y)     ! dp/dy, du/dy, dw/dy
+      call Compute_Momentum(grid, sol, dt, ini, v,  &
+                  v % y,     v % x,     v % z,      &
+                  grid % sy, grid % sx, grid % sz,  &
+                  grid % dy, grid % dx, grid % dz,  &
+                  p % y,     u % y,     w % y)      ! dp/dy, du/dy, dw/dy
 
       ! w velocity component
-      call Compute_Momentum(grid, dt, ini, w,      &
-                  w % z,     w % x,     w % y,     &
-                  grid % sz, grid % sx, grid % sy, &
-                  grid % dz, grid % dx, grid % dy, &
-                  p % z,     u % z,     v % z)     ! dp/dz, du/dz, dv/dz
+      call Compute_Momentum(grid, sol, dt, ini, w,  &
+                  w % z,     w % x,     w % y,      &
+                  grid % sz, grid % sx, grid % sy,  &
+                  grid % dz, grid % dx, grid % dy,  &
+                  p % z,     u % z,     v % z)      ! dp/dz, du/dz, dv/dz
 
       ! Refresh buffers for a % sav before discretizing for pressure
-      call Comm_Mod_Exchange_Real(grid, a % sav)
+      ! (Can this call be somewhere in Compute Pressure?)
+      call Comm_Mod_Exchange_Real(grid, sol % a % sav)
 
       call Balance_Mass(grid)
-      call Compute_Pressure_Simple(grid, dt, ini)
+      call Compute_Pressure_Simple(grid, sol, dt, ini)
 
       call Grad_Mod_For_P(grid,  pp % n, p % x, p % y, p % z)
 
       call Bulk_Mod_Compute_Fluxes(grid, bulk, flux)
-      mass_res = Correct_Velocity(grid, dt, ini) !  project the velocities
+      mass_res = Correct_Velocity(grid, sol, dt, ini) !  project the velocities
 
       ! Energy (practically temperature)
       if(heat_transfer) then
-        call Compute_Energy(grid, dt, ini, t)
+        call Compute_Energy(grid, sol, dt, ini, t)
       end if
 
       ! User scalars
       do us = 1, n_user_scalars
-        call User_Mod_Compute_Scalar(grid, dt, ini, user_scalar(us))
+        call User_Mod_Compute_Scalar(grid, sol, dt, ini, user_scalar(us))
       end do
 
       ! Rans models
@@ -274,8 +273,8 @@
 
         call Calculate_Shear_And_Vorticity(grid)
 
-        call Compute_Turbulent(grid, dt, ini, kin, n)
-        call Compute_Turbulent(grid, dt, ini, eps, n)
+        call Compute_Turbulent(grid, sol, dt, ini, kin, n)
+        call Compute_Turbulent(grid, sol, dt, ini, eps, n)
 
         call Calculate_Vis_T_K_Eps(grid)
 
@@ -285,12 +284,12 @@
          turbulence_model .eq. HYBRID_LES_RANS) then
         call Calculate_Shear_And_Vorticity(grid)
 
-        call Compute_Turbulent(grid, dt, ini, kin, n)
-        call Compute_Turbulent(grid, dt, ini, eps, n)
+        call Compute_Turbulent(grid, sol, dt, ini, kin, n)
+        call Compute_Turbulent(grid, sol, dt, ini, eps, n)
         call Update_Boundary_Values(grid)
 
-        call Compute_F22(grid, ini, f22)
-        call Compute_Turbulent(grid, dt, ini, zeta, n)
+        call Compute_F22(grid, sol, ini, f22)
+        call Compute_Turbulent(grid, sol, dt, ini, zeta, n)
 
         call Calculate_Vis_T_K_Eps_Zeta_F(grid)
 
@@ -318,19 +317,19 @@
         call Grad_Mod_For_Phi(grid, w % n, 2, w % y,.true.)    ! dW/dy
         call Grad_Mod_For_Phi(grid, w % n, 3, w % z,.true.)    ! dW/dz
 
-        call Compute_Stresses(grid, dt, ini, uu, n)
-        call Compute_Stresses(grid, dt, ini, vv, n)
-        call Compute_Stresses(grid, dt, ini, ww, n)
+        call Compute_Stresses(grid, sol, dt, ini, uu, n)
+        call Compute_Stresses(grid, sol, dt, ini, vv, n)
+        call Compute_Stresses(grid, sol, dt, ini, ww, n)
 
-        call Compute_Stresses(grid, dt, ini, uv, n)
-        call Compute_Stresses(grid, dt, ini, uw, n)
-        call Compute_Stresses(grid, dt, ini, vw, n)
+        call Compute_Stresses(grid, sol, dt, ini, uv, n)
+        call Compute_Stresses(grid, sol, dt, ini, uw, n)
+        call Compute_Stresses(grid, sol, dt, ini, vw, n)
 
         if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
-          call Compute_F22(grid, ini, f22)
+          call Compute_F22(grid, sol, ini, f22)
         end if
 
-        call Compute_Stresses(grid, dt, ini, eps, n)
+        call Compute_Stresses(grid, sol, dt, ini, eps, n)
 
         call Calculate_Vis_T_Rsm(grid)
 
@@ -347,7 +346,7 @@
         ! Update the values at boundaries
         call Update_Boundary_Values(grid)
 
-        call Compute_Turbulent(grid, dt, ini, vis, n)
+        call Compute_Turbulent(grid, sol, dt, ini, vis, n)
         call Calculate_Vis_T_Spalart_Allmaras(grid)
       end if
 

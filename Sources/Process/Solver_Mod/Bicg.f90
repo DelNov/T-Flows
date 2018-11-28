@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Bicg(mat_a, x, r1, prec, niter, tol, ini_res, fin_res, norm) 
+  subroutine Bicg(sol, x, r1, prec, niter, tol, ini_res, fin_res, norm) 
 !------------------------------------------------------------------------------!
 !   Solves the linear systems of equations by a precond. BiCG Method.          !
 !------------------------------------------------------------------------------!
@@ -22,40 +22,43 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Matrix_Type) :: mat_a
-  real              :: x(-mat_a % pnt_grid % n_bnd_cells :  &
-                          mat_a % pnt_grid % n_cells)
-  real              :: r1(mat_a % pnt_grid % n_cells)    ! [A]{x}={r1}
+  type(Solver_Type), target :: sol
+  real              :: x(-sol % pnt_grid % n_bnd_cells :  &
+                          sol % pnt_grid % n_cells)
+  real              :: r1(sol % pnt_grid % n_cells)      ! [A]{x}={r1}
   character(len=80) :: prec                              ! preconditioner
   integer           :: niter                             ! number of iterations
   real              :: tol                               ! tolerance
   real              :: ini_res, fin_res                  ! residual
   real, optional    :: norm                              ! normalization
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: nt, ni, nb
-  real    :: alfa, beta, rho, rho_old, bnrm2, error
-  integer :: i, j, k, iter, sub
+  type(Matrix_Type), pointer :: a
+  integer                    :: nt, ni, nb
+  real                       :: alfa, beta, rho, rho_old, bnrm2, error
+  integer                    :: i, j, k, iter, sub
 !==============================================================================!
 
-  error = 0.
+  ! Take some aliases
+  a => sol % a
+  nt = a % pnt_grid % n_cells
+  ni = a % pnt_grid % n_cells - a % pnt_grid % comm % n_buff_cells
+  nb = a % pnt_grid % n_bnd_cells
 
-  nt = mat_a % pnt_grid % n_cells
-  ni = mat_a % pnt_grid % n_cells - mat_a % pnt_grid % comm % n_buff_cells
-  nb = mat_a % pnt_grid % n_bnd_cells
+  error = 0.0
 
   !---------------------!
   !   Preconditioning   !
   !---------------------!
-  call Prec_Form(mat_a, prec)
+  call Prec_Form(sol, prec)
 
   !-----------------------------------!
   !    This is quite tricky point.    !
   !   What if bnrm2 is very small ?   !
   !-----------------------------------!
   if(.not. present(norm)) then
-    bnrm2 = Normalized_Residual(ni, mat_a, x(1:nt), r1(1:ni))
+    bnrm2 = Normalized_Residual(ni, a, x(1:nt), r1(1:ni))
   else
-    bnrm2 = Normalized_Residual(ni, mat_a, x(1:nt), r1(1:ni), norm)
+    bnrm2 = Normalized_Residual(ni, a, x(1:nt), r1(1:ni), norm)
   end if
 
   if(bnrm2 < tol) then
@@ -66,12 +69,12 @@
   !----------------!
   !   r = b - Ax   !
   !----------------!
-  call Residual_Vector(ni, mat_a, x(1:nt), r1(1:ni))
+  call Residual_Vector(ni, a, x(1:nt), r1(1:ni))
 
   !--------------------------------!
   !   Calculate initial residual   !
   !--------------------------------!
-  error = Normalized_Residual(ni, mat_a, x(1:nt), r1(1:ni))
+  error = Normalized_Residual(ni, a, x(1:nt), r1(1:ni))
 
   !---------------------------------------------------------------!
   !   Residual after the correction and before the new solution   !
@@ -102,8 +105,8 @@
     !    solve Mz = r      !
     !   (q instead of z)   !
     !----------------------!
-    call Prec_Solve(mat_a, q1, r1(1), prec)
-    call Prec_Solve(mat_a, q2, r2(1), prec)
+    call Prec_Solve(sol, q1, r1(1), prec)
+    call Prec_Solve(sol, q2, r2(1), prec)
 
     !-----------------!
     !   rho = (z,r)   !
@@ -131,15 +134,15 @@
     !   q = A p   !
     !   q~= A p~  !
     !-------------!
-    call Comm_Mod_Exchange_Real(mat_a % pnt_grid, p1)
-    call Comm_Mod_Exchange_Real(mat_a % pnt_grid, p2)
+    call Comm_Mod_Exchange_Real(a % pnt_grid, p1)
+    call Comm_Mod_Exchange_Real(a % pnt_grid, p2)
     do i = 1, ni
       q1(i) = 0.
       q2(i) = 0.
-      do j = mat_a % row(i), mat_a % row(i+1)-1
-        k = mat_a % col(j)
-        q1(i) = q1(i) + mat_a % val(j) * p1(k)
-        q2(i) = q2(i) + mat_a % val(j) * p2(k)
+      do j = a % row(i), a % row(i+1)-1
+        k = a % col(j)
+        q1(i) = q1(i) + a % val(j) * p1(k)
+        q2(i) = q2(i) + a % val(j) * p2(k)
       end do
     end do
 
@@ -167,9 +170,9 @@
     !   Check convergence   !
     !-----------------------!
     if(.not. present(norm)) then
-      error = Normalized_Residual(ni, mat_a, x(1:nt), r1(1:ni))
+      error = Normalized_Residual(ni, a, x(1:nt), r1(1:ni))
     else
-      error = Normalized_Residual(ni, mat_a, x(1:nt), r1(1:ni), norm)
+      error = Normalized_Residual(ni, a, x(1:nt), r1(1:ni), norm)
     end if
 
     if(error < tol) goto 1

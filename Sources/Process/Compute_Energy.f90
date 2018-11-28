@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Energy(grid, dt, ini, phi)
+  subroutine Compute_Energy(grid, sol, dt, ini, phi)
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for scalar (such as temperature)         !
 !------------------------------------------------------------------------------!
@@ -8,35 +8,38 @@
   use Flow_Mod
   use Rans_Mod
   use Comm_Mod
-  use Var_Mod
-  use Grid_Mod
+  use Var_Mod,      only: Var_Type
+  use Grid_Mod,     only: Grid_Type
   use Grad_Mod
   use Info_Mod
-  use Numerics_Mod
-  use Solvers_Mod, only: Bicg, Cg, Cgs
+  use Numerics_Mod, only: CENTRAL, LINEAR, PARABOLIC
+  use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
   use Control_Mod
-  use Work_Mod,    only: phi_x       => r_cell_01,  &
-                         phi_y       => r_cell_02,  &
-                         phi_z       => r_cell_03,  &
-                         phi_min     => r_cell_04,  &
-                         phi_max     => r_cell_05,  &
-                         u1uj_phij   => r_cell_06,  &
-                         u2uj_phij   => r_cell_07,  &
-                         u3uj_phij   => r_cell_08,  &
-                         u1uj_phij_x => r_cell_09,  &
-                         u2uj_phij_y => r_cell_10,  &
-                         u3uj_phij_z => r_cell_11
+  use Work_Mod,     only: phi_x       => r_cell_01,  &
+                          phi_y       => r_cell_02,  &
+                          phi_z       => r_cell_03,  &
+                          phi_min     => r_cell_04,  &
+                          phi_max     => r_cell_05,  &
+                          u1uj_phij   => r_cell_06,  &
+                          u2uj_phij   => r_cell_07,  &
+                          u3uj_phij   => r_cell_08,  &
+                          u1uj_phij_x => r_cell_09,  &
+                          u2uj_phij_y => r_cell_10,  &
+                          u3uj_phij_z => r_cell_11
   use User_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
-  type(Grid_Type) :: grid
-  integer         :: ini
-  real            :: dt
-  type(Var_Type)  :: phi
+  type(Grid_Type)           :: grid
+  type(Solver_Type), target :: sol
+  integer                   :: ini
+  real                      :: dt
+  type(Var_Type)            :: phi
 !----------------------------------[Calling]-----------------------------------!
   real :: Turbulent_Prandtl_Number
 !-----------------------------------[Locals]-----------------------------------! 
+  type(Matrix_Type), pointer :: a
+  real,              pointer :: b(:)
   integer           :: n, c, s, c1, c2, niter
   real              :: a0, a12, a21
   real              :: ini_res, tol
@@ -78,6 +81,10 @@
 !     XT*,   [kg K/s]
 ! 
 !==============================================================================!
+
+  ! Take aliases
+  a => sol % a
+  b => sol % b
 
   do n = 1, a % row(grid % n_cells+1)  ! this is number of non-zeros plus 1
     a % val(n) = 0.0
@@ -382,7 +389,7 @@
   niter =  5
   call Control_Mod_Max_Iterations_For_Energy_Solver(niter)
 
-  call Bicg(a,        &
+  call Bicg(sol,      &
             phi % n,  &
             b,        &
             precond,  &

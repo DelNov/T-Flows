@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Calculate_Sgs_Dynamic(grid)
+  subroutine Calculate_Sgs_Dynamic(grid, sol)
 !------------------------------------------------------------------------------!
 !   Calculates Smagorinsky constant with dynamic procedure                     !
 !------------------------------------------------------------------------------!
@@ -9,29 +9,32 @@
   use Comm_Mod
   use Les_Mod
   use Rans_Mod
-  use Grid_Mod
+  use Grid_Mod,   only: Grid_Type
+  use Solver_Mod, only: Solver_Type
   use Grad_Mod
-  use Work_Mod, only: u_f        => r_cell_01,  &
-                      v_f        => r_cell_02,  &  
-                      w_f        => r_cell_03,  &  
-                      uu_f       => r_cell_04,  &
-                      vv_f       => r_cell_05,  &
-                      ww_f       => r_cell_06,  &
-                      uv_f       => r_cell_07,  &
-                      uw_f       => r_cell_08,  &
-                      vw_f       => r_cell_09,  &
-                      m_11_f     => r_cell_10,  &
-                      m_22_f     => r_cell_11,  &
-                      m_33_f     => r_cell_12,  &
-                      m_12_f     => r_cell_13,  &
-                      m_13_f     => r_cell_14,  &
-                      m_23_f     => r_cell_15,  &
-                      shear_test => r_cell_16   
+  use Work_Mod,   only: u_f        => r_cell_01,  &
+                        v_f        => r_cell_02,  &  
+                        w_f        => r_cell_03,  &  
+                        uu_f       => r_cell_04,  &
+                        vv_f       => r_cell_05,  &
+                        ww_f       => r_cell_06,  &
+                        uv_f       => r_cell_07,  &
+                        uw_f       => r_cell_08,  &
+                        vw_f       => r_cell_09,  &
+                        m_11_f     => r_cell_10,  &
+                        m_22_f     => r_cell_11,  &
+                        m_33_f     => r_cell_12,  &
+                        m_12_f     => r_cell_13,  &
+                        m_13_f     => r_cell_14,  &
+                        m_23_f     => r_cell_15,  &
+                        shear_test => r_cell_16
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
+  type(Solver_Type), target :: sol
 !-----------------------------------[Locals]-----------------------------------!
+  type(Matrix_Type), pointer :: a
   integer :: c, j, cj
   real    :: u_a, v_a, w_a, uu_a, vv_a, ww_a, uv_a, uw_a, vw_a, vol_e
   real    :: m_11_a, m_22_a, m_33_a, m_12_a, m_13_a, m_23_a      
@@ -60,6 +63,9 @@
 !             + 2.0 * A12 * B12 + 2.0 A13 * B13 + 2.0 * A23 * B23              !   
 !                                                                              !
 !------------------------------------------------------------------------------!
+
+  ! Take aliases
+  a => sol % a
 
   call Comm_Mod_Exchange_Real(grid, u % n)
   call Comm_Mod_Exchange_Real(grid, v % n)

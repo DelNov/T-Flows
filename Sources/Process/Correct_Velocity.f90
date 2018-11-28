@@ -1,5 +1,5 @@
 !==============================================================================!
-  real function Correct_Velocity(grid, dt, ini)
+  real function Correct_Velocity(grid, sol, dt, ini)
 !------------------------------------------------------------------------------!
 !   Corrects the velocities, and mass fluxes on the cell faces.                !
 !------------------------------------------------------------------------------!
@@ -11,20 +11,28 @@
   use Grid_Mod,     only: Grid_Type
   use Bulk_Mod
   use Info_Mod
+  use Solver_Mod,   only: Solver_Type
   use Control_Mod
   use Numerics_Mod
   use User_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Grid_Type)   :: grid
+  type(Solver_Type), target :: sol
   real            :: dt
   integer         :: ini
 !-----------------------------------[Locals]-----------------------------------!
+  type(Matrix_Type), pointer :: a
+  real,              pointer :: b(:)
   integer :: c, c1, c2, s
   real    :: cfl_max, pe_max
   real    :: cfl_t, pe_t, mass_err
 !==============================================================================!
+
+  ! Take aliases
+  a => sol % a
+  b => sol % b
 
   ! User function
   call User_Mod_Beginning_Of_Correct_Velocity(grid, dt, ini)

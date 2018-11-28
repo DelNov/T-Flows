@@ -36,10 +36,6 @@
   real,allocatable :: f_coef(:)  ! face coefficient
   real,allocatable :: fw(:)      ! weight factors for the fluid phase
 
-  ! Right hand side for velocity and pressure equations 
-  type(Matrix_Type) :: a  ! system matrix for all variables
-  real, allocatable :: b(:)
-
   ! Mass fluxes, bulk velocities and pressure drops
   type(Bulk_Type) :: bulk
 
