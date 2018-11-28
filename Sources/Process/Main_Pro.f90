@@ -222,26 +222,10 @@
       call Grad_Mod_For_Phi(grid, w % n, 2, w % y, .true.)
       call Grad_Mod_For_Phi(grid, w % n, 3, w % z, .true.)
 
-      ! u velocity component
-      call Compute_Momentum(grid, sol, dt, ini, u,  &
-                  u % x,     u % y,     u % z,      &
-                  grid % sx, grid % sy, grid % sz,  &
-                  grid % dx, grid % dy, grid % dz,  &
-                  p % x,     v % x,     w % x)      ! dp/dx, dv/dx, dw/dx
-
-      ! v velocity component
-      call Compute_Momentum(grid, sol, dt, ini, v,  &
-                  v % y,     v % z,     v % x,      &
-                  grid % sy, grid % sz, grid % sx,  &
-                  grid % dy, grid % dz, grid % dx,  &
-                  p % y,     w % y,     u % y)      ! dp/dy, dw/dy, du/dy
-
-      ! w velocity component
-      call Compute_Momentum(grid, sol, dt, ini, w,  &
-                  w % z,     w % x,     w % y,      &
-                  grid % sz, grid % sx, grid % sy,  &
-                  grid % dz, grid % dx, grid % dy,  &
-                  p % z,     u % z,     v % z)      ! dp/dz, du/dz, dv/dz
+      ! All velocity components one after another
+      call Compute_Momentum(grid, u,v,w,1, sol, dt, ini, p)
+      call Compute_Momentum(grid, v,w,u,2, sol, dt, ini, p)
+      call Compute_Momentum(grid, w,u,v,3, sol, dt, ini, p)
 
       ! Refresh buffers for a % sav before discretizing for pressure
       ! (Can this call be somewhere in Compute Pressure?)

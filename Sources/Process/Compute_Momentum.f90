@@ -1,9 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Momentum(grid, sol, dt, ini, ui,  &
-                              ui_i, ui_j, ui_k,   &
-                              si, sj, sk,         &
-                              di, dj, dk,         &
-                              h_i, uj_i, uk_i)
+  subroutine Compute_Momentum(grid, ui,uj,uk, i, sol, dt, ini, h)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves momentum conservation equations                     !
 !------------------------------------------------------------------------------!
@@ -22,39 +18,32 @@
   use Matrix_Mod,   only: Matrix_Type
   use Control_Mod
   use User_Mod
-  use Work_Mod,      only: ui_min  => r_cell_01,  &
-                           ui_max  => r_cell_02
+  use Work_Mod,     only: ui_min  => r_cell_01,  &
+                          ui_max  => r_cell_02
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)   :: grid
+  type(Grid_Type),   target :: grid
+  type(Var_Type),    target :: ui, uj, uk
+  integer                   :: i           ! component
   type(Solver_Type), target :: sol
-  real            :: dt
-  integer         :: ini
-  type(Var_Type)  :: ui
-  real            :: ui_i(-grid % n_bnd_cells:grid % n_cells),  &
-                     ui_j(-grid % n_bnd_cells:grid % n_cells),  &
-                     ui_k(-grid % n_bnd_cells:grid % n_cells)
-  real            :: si(grid % n_faces),  &
-                     sj(grid % n_faces),  &
-                     sk(grid % n_faces)
-  real            :: di(grid % n_faces),  &
-                     dj(grid % n_faces),  &
-                     dk(grid % n_faces)
-  real            :: h_i (-grid % n_bnd_cells:grid % n_cells),  &
-                     uj_i(-grid % n_bnd_cells:grid % n_cells),  &
-                     uk_i(-grid % n_bnd_cells:grid % n_cells)
-  real            :: uu_f, vv_f, ww_f, uv_f, uw_f, vw_f
+  real                      :: dt
+  integer                   :: ini
+  type(Var_Type),    target :: h           ! pressure
 !-----------------------------------[Locals]-----------------------------------!
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
+  real,              pointer :: ui_i(:), ui_j(:), ui_k(:), uj_i(:), uk_i(:)
+  real,              pointer :: si(:), sj(:), sk(:), di(:), dj(:), dk(:)
+  real,              pointer :: h_i(:)
   integer           :: s, c, c1, c2, niter
   real              :: f_ex, f_im, f_stress
   real              :: uis, vel_max
   real              :: a0, a12, a21
   real              :: ini_res, tol
   real              :: vis_eff, vis_tS
-  real              :: ui_i_f,ui_j_f,ui_k_f,uj_i_f,uk_i_f
+  real              :: ui_i_f, ui_j_f, ui_k_f, uj_i_f, uk_i_f
+  real              :: uu_f, vv_f, ww_f, uv_f, uw_f, vw_f
   character(len=80) :: precond
   integer           :: adv_scheme    ! space disretization of advection (scheme)
   real              :: blend         ! blending coeff (1.0 central; 0.0 upwind)
@@ -118,8 +107,28 @@
 !==============================================================================!
 
   ! Take aliases
-  a => sol % a
-  b => sol % b
+! grid => ui % pnt_grid
+  a    => sol % a
+  b    => sol % b
+
+  if(i .eq. 1) then
+    ui_i => ui % x;     ui_j => ui % y;     ui_k => ui % z
+    si   => grid % sx;  sj   => grid % sy;  sk   => grid % sz
+    di   => grid % dx;  dj   => grid % dy;  dk   => grid % dz
+    h_i  => h % x;      uj_i => uj % x;     uk_i => uk % x
+  end if
+  if(i .eq. 2) then
+    ui_i => ui % y;     ui_j => ui % z;     ui_k => ui % x
+    si   => grid % sy;  sj   => grid % sz;  sk   => grid % sx
+    di   => grid % dy;  dj   => grid % dz;  dk   => grid % dx
+    h_i  => h % y;      uj_i => uj % y;     uk_i => uk % y
+  end if
+  if(i .eq. 3) then
+    ui_i => ui % z;     ui_j => ui % x;     ui_k => ui % y
+    si   => grid % sz;  sj   => grid % sx;  sk   => grid % sy
+    di   => grid % dz;  dj   => grid % dx;  dk   => grid % dy
+    h_i  => h % z;      uj_i => uj % z;     uk_i => uk % z
+  end if
 
   ! Initialize matrix and right hand side
   a % val(:) = 0.0
