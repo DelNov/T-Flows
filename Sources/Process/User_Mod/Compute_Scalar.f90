@@ -86,7 +86,7 @@
 
   ! Take aliases
   a => sol % a
-  b => sol % b
+  b => sol % b % val
 
   do n = 1, a % row(grid % n_cells+1) ! to je broj nonzero + 1
     a % val(n) = 0.0
