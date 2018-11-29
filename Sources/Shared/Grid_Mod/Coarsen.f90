@@ -9,7 +9,8 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, c1, c2, nc, nc1, nc2, s, i, lev, lev_parts
   integer              :: n_cells, n_faces, arr_s, arr_e, val_1, val_2
-  integer              :: c_lev, c1_lev, c2_lev, s_lev
+  integer              :: c_lev, s_lev
+  integer              :: c1_lev_c, c2_lev_c, c1_lev_f, c2_lev_f
   integer, allocatable :: c1_arr(:), c2_arr(:), sf_arr(:)
   integer, allocatable :: cells_c(:,:), cells_n_cells(:), faces_c(:,:),  &
                           new_c(:), old_c(:),                            &
@@ -234,25 +235,23 @@
   !                                             !
   !---------------------------------------------!
   do lev = 1, grid % n_levels
-    grid % level(lev) % face(:) = 0
     i = 0
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1, s)
       c2 = grid % faces_c(2, s)
 
       if(c2 > 0) then
-        c1_lev = grid % level(lev) % cell(c1)
-        c2_lev = grid % level(lev) % cell(c2)
+        c1_lev_c = grid % level(lev) % cell(c1)
+        c2_lev_c = grid % level(lev) % cell(c2)
 
-        if(c1_lev .ne. c2_lev) then
+        if(c1_lev_c .ne. c2_lev_c) then
           i = i + 1
-          grid % level(lev) % faces_c(1, i) = min(c1_lev, c2_lev)
-          grid % level(lev) % faces_c(2, i) = max(c1_lev, c2_lev)
-          grid % level(lev) % face(i) = s  ! store finest cell number
+          grid % level(lev) % faces_c(1, i) = min(c1_lev_c, c2_lev_c)
+          grid % level(lev) % faces_c(2, i) = max(c1_lev_c, c2_lev_c)
         end if
       end if
     end do
-    grid % level(lev) % n_faces = i
+    grid % level(lev) % n_faces = i  ! uncompressed number of faces
   end do
 
   !-------------------------------!
@@ -267,21 +266,17 @@
     !----------------------------------------------!
     c1_arr(:) = 0
     c2_arr(:) = 0
-    sf_arr(:) = 0  ! finest face numbers
-    do s_lev = 1, grid % level(lev) % n_faces
+    do s_lev = 1, grid % level(lev) % n_faces  ! uncompressed number of faces
       c1_arr(s_lev) = grid % level(lev) % faces_c(1, s_lev)
       c2_arr(s_lev) = grid % level(lev) % faces_c(2, s_lev)
-      sf_arr(s_lev) = grid % level(lev) % face   (   s_lev)
     end do
-    grid % level(lev) % face(:) = 0
 
     !----------------------------------------------!
     !   Sort faces by both indexes and carry ...   !
     !    ... information on finest face around     !
     !----------------------------------------------!
-    call Sort_Mod_2_Int_Carry_Int(c1_arr(1:grid % level(lev) % n_faces),  &
-                                  c2_arr(1:grid % level(lev) % n_faces),  &
-                                  sf_arr(1:grid % level(lev) % n_faces))
+    call Sort_Mod_2_Int(c1_arr(1:grid % level(lev) % n_faces),  &
+                        c2_arr(1:grid % level(lev) % n_faces))
 
     !---------------------------------------!
     !   Select faces by both cell indices   !
@@ -291,7 +286,6 @@
     val_2 = c2_arr(i)
     grid % level(lev) % faces_c(1, i) = val_1
     grid % level(lev) % faces_c(2, i) = val_2
-    grid % level(lev) % face( sf_arr(i) ) = i
 
     do s_lev = 2, grid % level(lev) % n_faces
       if(c1_arr(s_lev) .ne. val_1 .or.  &
@@ -302,7 +296,6 @@
         val_1 = c1_arr(s_lev)
         val_2 = c2_arr(s_lev)
       end if
-      grid % level(lev) % face( sf_arr(s_lev) ) = i
     end do
     grid % level(lev) % n_faces = i
     print '(a16,i2,a10,i7,a7)', ' # Coarse level ',           &
@@ -310,6 +303,44 @@
                                 ' contains ',                 &
                                 grid % level(lev) % n_faces,  &
                                 ' faces.'
+  end do
+
+  !---------------------------!
+  !                           !
+  !   Determine face maping   !
+  !                           !
+  !---------------------------!
+  print *, '# Using slow algorithm for face mapping '
+
+  do lev = 1, grid % n_levels
+    if(lev .eq. 1) then
+      do s = 1, grid % level(1) % n_faces
+        grid % level(lev) % face(s) = s
+      end do
+    else
+      grid % level(lev) % face(:) = 0
+    end if
+  end do
+
+  do lev = 2, grid % n_levels
+    do s_lev = 1, grid % level(lev) % n_faces
+      c1_lev_f = grid % level(lev) % faces_c(1, s_lev)
+      c2_lev_f = grid % level(lev) % faces_c(2, s_lev)
+
+      do s = 1, grid % level(1) % n_faces
+        c1 = grid % level(1) % faces_c(1, s)
+        c2 = grid % level(1) % faces_c(2, s)
+
+        c1_lev_c = min(grid % level(lev) % cell(c1),  &
+                       grid % level(lev) % cell(c2))
+        c2_lev_c = max(grid % level(lev) % cell(c1),  &
+                       grid % level(lev) % cell(c2))
+
+        if(c1_lev_f .eq. c1_lev_c .and. c2_lev_f .eq. c2_lev_c) then
+          grid % level(lev) % face(s) = s_lev
+        end if
+      end do
+    end do
   end do
 
   !-----------------------------------------!
