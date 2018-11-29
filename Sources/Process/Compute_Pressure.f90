@@ -9,7 +9,7 @@
   use Const_Mod
   use Grid_Mod,    only: Grid_Type
   use Info_Mod
-  use Solver_Mod,  only: Solver_Type, Bicg, Cg, Cgs
+  use Solver_Mod,  only: Solver_Type, Bicg, Cg, Cgs, Acm
   use Matrix_Mod,  only: Matrix_Type
   use Control_Mod
   use User_Mod
@@ -217,6 +217,16 @@
 
   ! Over-ride if specified in control file
   call Control_Mod_Max_Iterations_For_Pressure_Solver(niter)
+
+! call Acm(sol,       &
+!          pp % n,    &
+!          b,         &
+!          precond,   &
+!          niter,     &
+!          tol,       &
+!          ini_res,   &
+!          pp % res,  &
+!          norm = p_nor)    ! last argument: number for normalisation
 
   call Cg(sol,       &
           pp % n,    &
