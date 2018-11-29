@@ -312,6 +312,8 @@
   !---------------------------!
   print *, '# Using slow algorithm for face mapping '
 
+  call cpu_time(t_start)
+
   do lev = 1, grid % n_levels
     if(lev .eq. 1) then
       do s = 1, grid % level(1) % n_faces
@@ -322,27 +324,29 @@
     end if
   end do
 
-  call cpu_time(t_start)
-  do lev = 2, grid % n_levels
-    do s_lev = 1, grid % level(lev) % n_faces
-      c1_lev_f = grid % level(lev) % faces_c(1, s_lev)
-      c2_lev_f = grid % level(lev) % faces_c(2, s_lev)
+  do s = 1, grid % level(1) % n_faces
+    c1 = grid % level(1) % faces_c(1, s)
+    c2 = grid % level(1) % faces_c(2, s)
 
-      do s = 1, grid % level(1) % n_faces
-        c1 = grid % level(1) % faces_c(1, s)
-        c2 = grid % level(1) % faces_c(2, s)
+    do lev = 2, grid % n_levels
+      c1_lev_c = min(grid % level(lev) % cell(c1),  &
+                     grid % level(lev) % cell(c2))
+      c2_lev_c = max(grid % level(lev) % cell(c1),  &
+                     grid % level(lev) % cell(c2))
 
-        c1_lev_c = min(grid % level(lev) % cell(c1),  &
-                       grid % level(lev) % cell(c2))
-        c2_lev_c = max(grid % level(lev) % cell(c1),  &
-                       grid % level(lev) % cell(c2))
+      do s_lev = 1, grid % level(lev) % n_faces
+        c1_lev_f = grid % level(lev) % faces_c(1, s_lev)
+        c2_lev_f = grid % level(lev) % faces_c(2, s_lev)
 
         if(c1_lev_f .eq. c1_lev_c .and. c2_lev_f .eq. c2_lev_c) then
           grid % level(lev) % face(s) = s_lev
+          goto 2
         end if
       end do
+2     continue
     end do
   end do
+
   call cpu_time(t_end)
   print '(a,f8.3,a)', ' # Spent ', t_end-t_start, ' [s] in slow algorithm.'
 
