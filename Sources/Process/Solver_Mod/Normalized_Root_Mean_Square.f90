@@ -1,7 +1,8 @@
 !==============================================================================!
-  real function Normalized_Residual(ni, mat_a, x, r, norm) 
+  real function Normalized_Root_Mean_Square(ni, r, a, x, norm)
 !------------------------------------------------------------------------------!
-!   Calculates normalized residuals.                                           !
+!   Calculates root means square of vector r, normalizing it with entries      !
+!   in the system matrix (a), values of unknown (x) and optional norm.     !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
@@ -11,8 +12,9 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   integer           :: ni
-  type(Matrix_Type) :: mat_a
-  real              :: x(:), r(:)  !  [A]{x}={r}
+  real              :: r(:)
+  type(Matrix_Type) :: a
+  real              :: x(:)
   real, optional    :: norm        !  optional number for normalization
 !-----------------------------------[Locals]-----------------------------------!
   real    :: error, x_max, x_min
@@ -22,8 +24,8 @@
   ! Compute error normalizing it with main diagonal in the system matrix
   error = 0.0
   do i = 1, ni
-    error = error + r(i)**2 / mat_a % val(mat_a % dia(i))**2
-  end do  
+    error = error + r(i)**2 / a % val(a % dia(i))**2
+  end do
   call Comm_Mod_Global_Sum_Real(error)
   error = sqrt(error)
 
@@ -45,6 +47,6 @@
     error = error / (x_max - x_min + TINY)
   end if
 
-  Normalized_Residual = error
+  Normalized_Root_Mean_Square = error
 
   end function

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Cg_Level(a, d, x, r1, lev, niter, tol, ini_res, fin_res, norm) 
+  subroutine Cg_Level(lev, a, d, x, r1, niter, tol, ini_res, fin_res)
 !------------------------------------------------------------------------------!
 !   Conjugate gradient method for one level of the multigrid.                  !
 !------------------------------------------------------------------------------!
@@ -11,20 +11,20 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  integer           :: lev
   type(Matrix_Type) :: a
   type(Matrix_Type) :: d
-  real              :: x (a % pnt_grid % n_cells)
+  real              :: x (a % pnt_grid % level(lev) % n_cells)
 ! real              :: x(-a % pnt_grid % n_bnd_cells :  &
 !                         a % pnt_grid % n_cells)
-  real              :: r1(a % pnt_grid % n_cells)        ! [A]{x}={r1}
-  integer           :: lev                               ! level
+  real              :: r1(a % pnt_grid % level(lev) % n_cells)  ! [A]{x}={r1}
   integer           :: niter                             ! number of iterations
   real              :: tol                               ! tolerance
-  real              :: ini_res, fin_res                  ! residual
-  real, optional    :: norm                              ! normalization
+  real              :: ini_res                           ! initial residual
+  real              :: fin_res                           ! final residual
 !-----------------------------------[Locals]-----------------------------------!
   integer                    :: nt, ni
-  real                       :: alfa, beta, rho, rho_old, bnrm2, error
+  real                       :: alfa, beta, rho, rho_old, bnrm2, res
   integer                    :: i, j, k, iter, sub
 !==============================================================================!
 
@@ -32,7 +32,7 @@
   nt = a % pnt_grid % level(lev) % n_cells
   ni = a % pnt_grid % level(lev) % n_cells ! - a % pnt_grid % comm % n_buff_cells
 
-  error = 0.0
+  res = 0.0
 
   !------------------------------!
   !   Diagonal preconditioning   !
@@ -45,11 +45,7 @@
   !    This is quite tricky point.    !
   !   What if bnrm2 is very small ?   !
   !-----------------------------------!
-  if(.not. present(norm)) then
-    bnrm2 = Normalized_Residual(ni, a, x(1:nt), r1(1:ni))
-  else
-    bnrm2 = Normalized_Residual(ni, a, x(1:nt), r1(1:ni), norm)
-  end if
+  bnrm2 = Normalized_Root_Mean_Square(ni, r1(1:ni), a, x(1:nt))
 
   if(bnrm2 < tol) then
     iter = 0
@@ -61,27 +57,22 @@
   !----------------!
   call Residual_Vector(ni, a, x(1:nt), r1(1:ni))
 
+  !--------------------------------!
+  !   Calculate initial residual   !
+  !--------------------------------!
+  res = Normalized_Root_Mean_Square(ni, r1(1:ni), a, x(1:nt))
+
+  if(res < tol) then
+    iter = 0
+    goto 1
+  end if
+
   !-----------!
   !   p = r   !
   !-----------!
   do i = 1, ni
     p1(i) = r1(i)
   end do
-
-  !--------------------------------!
-  !   Calculate initial residual   !
-  !--------------------------------!
-  error = Normalized_Residual(ni, a, x(1:nt), r1(1:ni))
-
-  !---------------------------------------------------------------!
-  !   Residual after the correction and before the new solution   !
-  !---------------------------------------------------------------!
-  ini_res = error
-
-  if(error < tol) then
-    iter = 0
-    goto 1
-  end if
 
   !---------------!
   !               !
@@ -152,19 +143,21 @@
     !-----------------------!
     !   Check convergence   !
     !-----------------------!
-    if(.not. present(norm)) then
-      error = Normalized_Residual(ni, a, x(1:nt), r1(1:ni))
-    else
-      error = Normalized_Residual(ni, a, x(1:nt), r1(1:ni), norm)
+    res = Normalized_Root_Mean_Square(ni, r1(1:ni), a, x(1:nt))
+    if(iter .eq. 1) then
+      ini_res = res
     end if
+PRINT *, 'ERROR = ', res
 
-    if(error < tol) goto 1
+    if(res         < tol) goto 1
+    if(res/ini_res < 0.1) goto 1
 
     rho_old = rho
 
   end do ! iter
 
-1 fin_res = error
+1 continue
+  fin_res = res
   niter = iter
 
   end subroutine

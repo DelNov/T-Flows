@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Residual_Vector(ni, mat_a, x, r) 
+  subroutine Residual_Vector(ni, a, x, r) 
 !------------------------------------------------------------------------------!
 !   Calculates residual vector.                                                !
 !------------------------------------------------------------------------------!
@@ -10,7 +10,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   integer           :: ni          ! number of cells inside (i)
-  type(Matrix_Type) :: mat_a
+  type(Matrix_Type) :: a
   real              :: x(:), r(:)  !  [A]{x}={r}
 !-----------------------------------[Locals]-----------------------------------!
   integer  :: i, j, k, sub
@@ -21,9 +21,9 @@
   !----------------!
   ! Why not callig this: call exchange(x) ???
   do i = 1, ni
-    do j = mat_a % row(i), mat_a % row(i+1) - 1
-      k = mat_a % col(j)
-      r(i) = r(i) - mat_a % val(j) * x(k)
+    do j = a % row(i), a % row(i+1) - 1
+      k = a % col(j)
+      r(i) = r(i) - a % val(j) * x(k)
     end do
   end do
 

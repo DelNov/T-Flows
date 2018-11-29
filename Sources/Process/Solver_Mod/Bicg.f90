@@ -56,9 +56,9 @@
   !   What if bnrm2 is very small ?   !
   !-----------------------------------!
   if(.not. present(norm)) then
-    bnrm2 = Normalized_Residual(ni, a, x(1:nt), r1(1:ni))
+    bnrm2 = Normalized_Root_Mean_Square(ni, r1(1:ni), a, x(1:nt))
   else
-    bnrm2 = Normalized_Residual(ni, a, x(1:nt), r1(1:ni), norm)
+    bnrm2 = Normalized_Root_Mean_Square(ni, r1(1:ni), a, x(1:nt), norm)
   end if
 
   if(bnrm2 < tol) then
@@ -74,7 +74,7 @@
   !--------------------------------!
   !   Calculate initial residual   !
   !--------------------------------!
-  error = Normalized_Residual(ni, a, x(1:nt), r1(1:ni))
+  error = Normalized_Root_Mean_Square(ni, r1(1:ni), a, x(1:nt))
 
   !---------------------------------------------------------------!
   !   Residual after the correction and before the new solution   !
@@ -170,9 +170,9 @@
     !   Check convergence   !
     !-----------------------!
     if(.not. present(norm)) then
-      error = Normalized_Residual(ni, a, x(1:nt), r1(1:ni))
+      error = Normalized_Root_Mean_Square(ni, r1(1:ni), a, x(1:nt))
     else
-      error = Normalized_Residual(ni, a, x(1:nt), r1(1:ni), norm)
+      error = Normalized_Root_Mean_Square(ni, r1(1:ni), a, x(1:nt), norm)
     end if
 
     if(error < tol) goto 1
