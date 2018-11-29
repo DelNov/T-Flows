@@ -218,15 +218,18 @@
   ! Over-ride if specified in control file
   call Control_Mod_Max_Iterations_For_Pressure_Solver(niter)
 
-! call Acm(sol,       &
-!          pp % n,    &
-!          b,         &
-!          precond,   &
-!          niter,     &
-!          tol,       &
-!          ini_res,   &
-!          pp % res,  &
-!          norm = p_nor)    ! last argument: number for normalisation
+  goto 1
+  call Acm(sol,       &
+           pp % n,    &
+           b,         &
+           precond,   &
+           niter,     &
+           tol,       &
+           ini_res,   &
+           pp % res,  &
+           norm = p_nor)    ! last argument: number for normalisation
+  stop
+1 continue
 
   call Cg(sol,       &
           pp % n,    &
