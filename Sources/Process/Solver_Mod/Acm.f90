@@ -56,6 +56,15 @@
                 tol,               &  ! tolerance
                 ini_res,           &  ! initial residual (unused)
                 fin_res)              ! final residual
+  call Cg_Level(lev,               &  ! level
+                a_lev(lev),        &  ! system matrix
+                d_lev(lev),        &  ! preconditioning matrix
+                x_lev(lev) % val,  &  ! solution
+                b_lev(lev) % val,  &  ! right hand side
+                niter,             &  ! niter (for now)
+                tol,               &  ! tolerance
+                ini_res,           &  ! initial residual (unused)
+                fin_res)              ! final residual
 STOP
 
   end subroutine

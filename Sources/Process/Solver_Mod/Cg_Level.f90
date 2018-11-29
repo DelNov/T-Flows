@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Cg_Level(lev, a, d, x, r1, niter, tol, ini_res, fin_res)
+  subroutine Cg_Level(lev, a, d, x, b, niter, tol, ini_res, fin_res)
 !------------------------------------------------------------------------------!
 !   Conjugate gradient method for one level of the multigrid.                  !
 !------------------------------------------------------------------------------!
@@ -7,7 +7,8 @@
   use Comm_Mod
   use Matrix_Mod
   use Work_Mod, only: p1 => r_cell_01,  &
-                      q1 => r_cell_02
+                      q1 => r_cell_02,  &
+                      r1 => r_cell_03
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -15,9 +16,7 @@
   type(Matrix_Type) :: a
   type(Matrix_Type) :: d
   real              :: x (a % pnt_grid % level(lev) % n_cells)
-! real              :: x(-a % pnt_grid % n_bnd_cells :  &
-!                         a % pnt_grid % n_cells)
-  real              :: r1(a % pnt_grid % level(lev) % n_cells)  ! [A]{x}={r1}
+  real              :: b (a % pnt_grid % level(lev) % n_cells)  ! [A]{x}={b}
   integer           :: niter                             ! number of iterations
   real              :: tol                               ! tolerance
   real              :: ini_res                           ! initial residual
@@ -45,7 +44,8 @@
   !    This is quite tricky point.    !
   !   What if bnrm2 is very small ?   !
   !-----------------------------------!
-  bnrm2 = Normalized_Root_Mean_Square(ni, r1(1:ni), a, x(1:nt))
+  bnrm2 = Normalized_Root_Mean_Square(ni, b(1:nt), a, x(1:nt))
+PRINT *, ' INITIAL BNRM2 = ', bnrm2
 
   if(bnrm2 < tol) then
     iter = 0
@@ -55,12 +55,14 @@
   !----------------!
   !   r = b - Ax   !
   !----------------!
-  call Residual_Vector(ni, r1(1:ni), r1(1:ni), a, x(1:nt))
+  r1(1:nt) = b(1:nt)
+  call Residual_Vector(ni, r1(1:nt), r1(1:nt), a, x(1:nt))
 
   !--------------------------------!
   !   Calculate initial residual   !
   !--------------------------------!
-  res = Normalized_Root_Mean_Square(ni, r1(1:ni), a, x(1:nt))
+  res = Normalized_Root_Mean_Square(ni, r1(1:nt), a, x(1:nt))
+PRINT *, ' INITIAL ERROR = ', res
 
   if(res < tol) then
     iter = 0
@@ -143,11 +145,11 @@
     !-----------------------!
     !   Check convergence   !
     !-----------------------!
-    res = Normalized_Root_Mean_Square(ni, r1(1:ni), a, x(1:nt))
+    res = Normalized_Root_Mean_Square(ni, r1(1:nt), a, x(1:nt))
     if(iter .eq. 1) then
       ini_res = res
     end if
-PRINT *, 'ERROR = ', res
+PRINT *, ' CURRENT ERROR = ', res
 
     if(res         < tol) goto 1
     if(res/ini_res < 0.1) goto 1

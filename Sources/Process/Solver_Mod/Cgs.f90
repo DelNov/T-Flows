@@ -50,8 +50,6 @@
   nb = a % pnt_grid % n_bnd_cells
 
   error = 0.0
-  r1(:) = 0
-  r1(1:) = b(1:)
 
   !---------------------!
   !   Preconditioning   !
@@ -63,9 +61,9 @@
   !   What if bnrm2 is very small ?   !
   !-----------------------------------!
   if(.not. present(norm)) then
-    bnrm2 = Normalized_Root_Mean_Square(ni, r1(1:), a, x(1:))
+    bnrm2 = Normalized_Root_Mean_Square(ni, b(1:nt), a, x(1:nt))
   else
-    bnrm2 = Normalized_Root_Mean_Square(ni, r1(1:), a, x(1:), norm)
+    bnrm2 = Normalized_Root_Mean_Square(ni, b(1:nt), a, x(1:nt), norm)
   end if
 
   if(bnrm2 < tol) then 
@@ -76,19 +74,13 @@
   !-----------------!
   !   r1 = b - Ax   !
   !-----------------!
-  call Residual_Vector(ni, r1(1:), r1(1:), a, x(1:))
-
-  !-------------!
-  !   r2 = r1   !
-  !-------------!
-  do i=1,ni
-    r2(i)=r1(i) 
-  end do
+  r1(1:nt) = b(1:nt)
+  call Residual_Vector(ni, r1(1:nt), r1(1:nt), a, x(1:nt))
 
   !--------------------------------!
   !   Calculate initial residual   !
   !--------------------------------!
-  error = Normalized_Root_Mean_Square(ni, r1(1:), a, x(1:))
+  error = Normalized_Root_Mean_Square(ni, r1(1:nt), a, x(1:nt))
 
   !---------------------------------------------------------------!
   !   Residual after the correction and before the new solution   !
@@ -98,7 +90,14 @@
   if(error < tol) then
     iter=0
     goto 1
-  end if  
+  end if
+
+  !-------------!
+  !   r2 = r1   !
+  !-------------!
+  do i=1,ni
+    r2(i)=r1(i)
+  end do
 
   !---------------!
   !               !
@@ -132,7 +131,7 @@
     !---------------------!
     !   Solve M p2 = u2   !
     !---------------------!
-    call Prec_Solve(sol, p2, u2(1), prec) 
+    call Prec_Solve(sol, p2(1:nt), u2(1:nt), prec) 
 
     !--------------!
     !   v2 = Ap2   !  
@@ -170,7 +169,7 @@
     do i=1,ni
       u1_plus_q1(i) = u1(i) + q1(i)
     end do
-    call Prec_Solve(sol, p1, u1_plus_q1(1), prec) 
+    call Prec_Solve(sol, p1(1:nt), u1_plus_q1(1:nt), prec) 
 
     !---------------------!
     !   x = x + alfa p1   !
@@ -202,9 +201,9 @@
     !   Check convergence   !
     !-----------------------!
     if(.not. present(norm)) then
-      error = Normalized_Root_Mean_Square(ni, r1(1:), a, x(1:))
+      error = Normalized_Root_Mean_Square(ni, r1(1:nt), a, x(1:nt))
     else
-      error = Normalized_Root_Mean_Square(ni, r1(1:), a, x(1:), norm)
+      error = Normalized_Root_Mean_Square(ni, r1(1:nt), a, x(1:nt), norm)
     end if
 
     if(error < tol) goto 1
