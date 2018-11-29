@@ -70,8 +70,7 @@
   !----------------!
   !   r = b - Ax   !
   !----------------!
-  r1(1:nt) = b(1:nt)
-  call Residual_Vector(ni, r1(1:nt), r1(1:nt), a, x(1:nt))
+  call Residual_Vector(ni, r1(1:nt), b(1:nt), a, x(1:nt))
 
   !--------------------------------!
   !   Calculate initial residual   !
