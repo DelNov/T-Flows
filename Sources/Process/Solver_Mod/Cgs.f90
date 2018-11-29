@@ -160,7 +160,7 @@
     do i=1,ni
       q1(i) = u1(i) - alfa*v2(i)
     end do
-           
+
     !-------------------------------!
     !   solve Mp1 = u1(i) + q1(i)   !
     !-------------------------------!
@@ -211,6 +211,6 @@
   end do                ! iter 
 
 1 fin_res = error
-  Niter  = iter
+  niter  = iter
 
   end subroutine
