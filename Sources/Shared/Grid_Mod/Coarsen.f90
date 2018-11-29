@@ -13,8 +13,8 @@
   integer              :: c1_lev_c, c2_lev_c, c1_lev_f, c2_lev_f
   integer, allocatable :: c1_arr(:), c2_arr(:), sf_arr(:)
   integer, allocatable :: cells_c(:,:), cells_n_cells(:), faces_c(:,:),  &
-                          new_c(:), old_c(:),                            &
-                          cell_mapping(:,:)
+                          new_c(:), old_c(:), cell_mapping(:,:)
+  real                 :: t_start, t_end
 
 ! Variabes for call to METIS
   integer              :: n_constrains,      &  ! number of constraints
@@ -322,6 +322,7 @@
     end if
   end do
 
+  call cpu_time(t_start)
   do lev = 2, grid % n_levels
     do s_lev = 1, grid % level(lev) % n_faces
       c1_lev_f = grid % level(lev) % faces_c(1, s_lev)
@@ -342,6 +343,8 @@
       end do
     end do
   end do
+  call cpu_time(t_end)
+  print '(a,f8.3,a)', ' # Spent ', t_end-t_start, ' [s] in slow algorithm.'
 
   !-----------------------------------------!
   !                                         !
