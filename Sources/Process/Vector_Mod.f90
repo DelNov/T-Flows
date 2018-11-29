@@ -20,5 +20,6 @@
   contains
 
   include 'Vector_Mod/Allocate.f90'
+  include 'Vector_Mod/Allocate_Level.f90'
 
   end module 
