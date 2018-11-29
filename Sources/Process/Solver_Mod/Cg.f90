@@ -44,7 +44,7 @@
 
   error = 0.0
   r1(:) = 0
-  r1(1:nt) = b(1:nt)
+  r1(1:) = b(1:)
 
   !---------------------!
   !   Preconditioning   !
@@ -56,9 +56,9 @@
   !   What if bnrm2 is very small ?   !
   !-----------------------------------!
   if(.not. present(norm)) then
-    bnrm2 = Normalized_Root_Mean_Square(ni, r1(1:ni), a, x(1:nt))
+    bnrm2 = Normalized_Root_Mean_Square(ni, r1(1:), a, x(1:))
   else
-    bnrm2 = Normalized_Root_Mean_Square(ni, r1(1:ni), a, x(1:nt), norm)
+    bnrm2 = Normalized_Root_Mean_Square(ni, r1(1:), a, x(1:), norm)
   end if
 
   if(bnrm2 < tol) then
@@ -69,7 +69,7 @@
   !----------------!
   !   r = b - Ax   !
   !----------------!
-  call Residual_Vector(ni, r1(1:ni), r1(1:ni), a, x(1:nt))
+  call Residual_Vector(ni, r1(1:), r1(1:), a, x(1:))
 
   !-----------!
   !   p = r   !
@@ -81,7 +81,7 @@
   !--------------------------------!
   !   Calculate initial residual   !
   !--------------------------------!
-  error = Normalized_Root_Mean_Square(ni, r1(1:ni), a, x(1:nt))
+  error = Normalized_Root_Mean_Square(ni, r1(1:), a, x(1:))
 
   !---------------------------------------------------------------!
   !   Residual after the correction and before the new solution   !
@@ -161,9 +161,9 @@
     !   Check convergence   !
     !-----------------------!
     if(.not. present(norm)) then
-      error = Normalized_Root_Mean_Square(ni, r1(1:ni), a, x(1:nt))
+      error = Normalized_Root_Mean_Square(ni, r1(1:), a, x(1:))
     else
-      error = Normalized_Root_Mean_Square(ni, r1(1:ni), a, x(1:nt), norm)
+      error = Normalized_Root_Mean_Square(ni, r1(1:), a, x(1:), norm)
     end if
 
     if(error < tol) goto 1
