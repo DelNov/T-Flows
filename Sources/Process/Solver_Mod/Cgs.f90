@@ -39,7 +39,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Matrix_Type), pointer :: a
   integer :: nt, ni, nb
-  real    :: alfa, beta, rho, rho_old, bnrm2, error
+  real    :: alfa, beta, rho, rho_old, bnrm2, res
   integer :: i, j, k, iter, sub
 !==============================================================================!
 
@@ -49,7 +49,7 @@
   ni = a % pnt_grid % n_cells - a % pnt_grid % comm % n_buff_cells
   nb = a % pnt_grid % n_bnd_cells
 
-  error = 0.0
+  res = 0.0
 
   !---------------------!
   !   Preconditioning   !
@@ -79,14 +79,14 @@
   !--------------------------------!
   !   Calculate initial residual   !
   !--------------------------------!
-  error = Normalized_Root_Mean_Square(ni, r1(1:nt), a, x(1:nt))
+  res = Normalized_Root_Mean_Square(ni, r1(1:nt), a, x(1:nt))
 
   !---------------------------------------------------------------!
   !   Residual after the correction and before the new solution   !
   !---------------------------------------------------------------!
-  ini_res = error  
+  ini_res = res  
 
-  if(error < tol) then
+  if(res < tol) then
     iter=0
     goto 1
   end if
@@ -94,9 +94,7 @@
   !-------------!
   !   r2 = r1   !
   !-------------!
-  do i=1,ni
-    r2(i)=r1(i)
-  end do
+  r2(1:ni) = r1(1:ni)
 
   !---------------!
   !               !
@@ -108,23 +106,16 @@
     !-------------------!
     !   rho = (r2,z1)   !
     !-------------------!
-    rho=0.0
-    do i=1,ni
-      rho=rho+r1(i)*r2(i)
-    end do
+    rho = dot_product(r1(1:ni), r2(1:ni))
     call Comm_Mod_Global_Sum_Real(rho)
 
     if(iter .eq. 1) then
-      do i=1,ni
-        u1(i) = r1(i)
-        u2(i) = u1(i)
-      end do        
+      u1(1:ni) = r1(1:ni)
+      u2(1:ni) = u1(1:ni)
     else
-      beta=rho/rho_old
-      do i=1,ni
-        u1(i) = r1(i) + beta*q1(i) 
-        u2(i) = u1(i) + beta*(q1(i) + beta*u2(i)) 
-      end do
+      beta = rho / rho_old
+      u1(1:ni) = r1(1:ni) + beta *  q1(1:ni)
+      u2(1:ni) = u1(1:ni) + beta * (q1(1:ni) + beta*u2(1:ni))
     end if
 
     !---------------------!
@@ -133,58 +124,49 @@
     call Prec_Solve(sol, p2(1:nt), u2(1:nt), prec) 
 
     !--------------!
-    !   v2 = Ap2   !  
+    !   v2 = Ap2   !
     !--------------!
     call Comm_Mod_Exchange_Real(a % pnt_grid, p2)
-    do i=1,ni
+    do i = 1, ni
       v2(i) = 0.0
-      do j=a % row(i), a % row(i+1)-1
-        k=a % col(j)
+      do j = a % row(i), a % row(i+1)-1
+        k = a % col(j)
         v2(i) = v2(i) + a % val(j) * p2(k)
       end do
-      alfa=alfa+r2(i)*v2(i)
+      alfa = alfa + r2(i) * v2(i)
     end do
 
     !------------------------!
     !   alfa = rho/(r2,v2)   !
     !------------------------!
-    alfa=0.0
-    do i=1,ni
-      alfa=alfa+r2(i)*v2(i)
-    end do
-    call Comm_Mod_Global_Sum_Real(alfa) 
-    alfa=rho/alfa
+    alfa = dot_product(r2(1:ni), v2(1:ni))
+    call Comm_Mod_Global_Sum_Real(alfa)
+    alfa=rho / alfa
 
     !-------------------------!
     !   q1 = u1 - alfa * v2   !
     !-------------------------!
-    do i=1,ni
-      q1(i) = u1(i) - alfa*v2(i)
-    end do
+    q1(1:ni) = u1(1:ni) - alfa * v2(1:ni)
 
     !-------------------------------!
-    !   solve Mp1 = u1(i) + q1(i)   !
+    !   solve Mp1 = u1(1:ni) + q1(1:ni)   !
     !-------------------------------!
-    do i=1,ni
-      u1_plus_q1(i) = u1(i) + q1(i)
-    end do
+    u1_plus_q1(1:ni) = u1(1:ni) + q1(1:ni)
     call Prec_Solve(sol, p1(1:nt), u1_plus_q1(1:nt), prec) 
 
     !---------------------!
     !   x = x + alfa p1   !
     !---------------------!
-    do i=1,ni
-      x(i)=x(i) + alfa*p1(i)
-    end do
+    x(1:ni) = x(1:ni) + alfa * p1(1:ni)
 
     !---------------!
     !   q2 = A p1   !
     !---------------!
     call Comm_Mod_Exchange_Real(a % pnt_grid, p1)
-    do i=1,ni
+    do i = 1, ni
       q2(i) = 0.0
-      do j=a % row(i), a % row(i+1)-1
-        k=a % col(j)
+      do j = a % row(i), a % row(i+1)-1
+        k = a % col(j)
         q2(i) = q2(i) + a % val(j) * p1(k)
       end do
     end do
@@ -192,26 +174,24 @@
     !---------------------!
     !   r = r - alfa q2   !
     !---------------------!
-    do i=1,ni
-      r1(i)=r1(i) - alfa*q2(i)
-    end do
+    r1(1:ni) = r1(1:ni) - alfa * q2(1:ni)
 
     !-----------------------!
     !   Check convergence   !
     !-----------------------!
     if(.not. present(norm)) then
-      error = Normalized_Root_Mean_Square(ni, r1(1:nt), a, x(1:nt))
+      res = Normalized_Root_Mean_Square(ni, r1(1:nt), a, x(1:nt))
     else
-      error = Normalized_Root_Mean_Square(ni, r1(1:nt), a, x(1:nt), norm)
+      res = Normalized_Root_Mean_Square(ni, r1(1:nt), a, x(1:nt), norm)
     end if
 
-    if(error < tol) goto 1
+    if(res < tol) goto 1
 
     rho_old=rho
 
-  end do                ! iter 
+  end do                ! iter
 
-1 fin_res = error
+1 fin_res = res
   niter  = iter
 
   end subroutine

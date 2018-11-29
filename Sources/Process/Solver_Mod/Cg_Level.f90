@@ -36,9 +36,7 @@
   !------------------------------!
   !   Diagonal preconditioning   !
   !------------------------------!
-  do i = 1, ni
-    d % val(d % dia(i)) = a % val(a % dia(i))
-  end do
+  d % val(d % dia(1:ni)) = a % val(a % dia(1:ni))
 
   !-----------------------------------!
   !    This is quite tricky point.    !
@@ -71,9 +69,7 @@ PRINT *, ' INITIAL ERROR = ', res
   !-----------!
   !   p = r   !
   !-----------!
-  do i = 1, ni
-    p1(i) = r1(i)
-  end do
+  p1(1:ni) = r1(1:ni)
 
   !---------------!
   !               !
@@ -86,28 +82,19 @@ PRINT *, ' INITIAL ERROR = ', res
     !     solve Mz = r     !
     !   (q instead of z)   !
     !----------------------!
-    do i = 1, ni
-      q1(i) = r1(i) / d % val(d % dia(i))
-    end do
+    q1(1:ni) = r1(1:ni) / d % val(d % dia(1:ni))
 
     !-----------------!
     !   rho = (r,z)   !
     !-----------------!
-    rho = 0.
-    do i = 1, ni
-      rho = rho + r1(i)*q1(i)
-    end do
+    rho = dot_product(r1(1:ni), q1(1:ni))
     call Comm_Mod_Global_Sum_Real(rho)
 
     if(iter .eq. 1) then
-      do i = 1, ni
-        p1(i) = q1(i)
-      end do
+      p1(1:ni) = q1(1:ni)
     else
-      beta = rho/rho_old
-      do i = 1, ni
-        p1(i) = q1(i) + beta*p1(i)
-      end do
+      beta = rho / rho_old
+      p1(1:ni) = q1(1:ni) + beta * p1(1:ni)
     end if
 
     !------------!
@@ -115,7 +102,7 @@ PRINT *, ' INITIAL ERROR = ', res
     !------------!
     call Comm_Mod_Exchange_Real(a % pnt_grid, p1)
     do i = 1, ni
-      q1(i) = 0.
+      q1(i) = 0.0
       do j = a % row(i), a % row(i+1)-1
         k = a % col(j)
         q1(i) = q1(i) + a % val(j) * p1(k)
@@ -125,10 +112,7 @@ PRINT *, ' INITIAL ERROR = ', res
     !------------------------!
     !   alfa = (r,z)/(p,q)   !
     !------------------------!
-    alfa = 0.
-    do i = 1, ni
-      alfa = alfa + p1(i)*q1(i)
-    end do
+    alfa = dot_product(p1(1:ni), q1(1:ni))
     call Comm_Mod_Global_Sum_Real(alfa)
     alfa = rho/alfa
 
@@ -136,10 +120,8 @@ PRINT *, ' INITIAL ERROR = ', res
     !   x = x + alfa p    !
     !   r = r - alfa Ap   !
     !---------------------!
-    do i = 1, ni
-      x(i)  = x(i)  + alfa*p1(i)
-      r1(i) = r1(i) - alfa*q1(i)
-    end do
+    x (1:ni) = x (1:ni) + alfa * p1(1:ni)
+    r1(1:ni) = r1(1:ni) - alfa * q1(1:ni)
 
     !-----------------------!
     !   Check convergence   !
