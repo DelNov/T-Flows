@@ -73,7 +73,7 @@
   !-----------------!
   !   r1 = b - Ax   !
   !-----------------!
-  call Residual_Vector(ni, a, x(1:nt), r1(1:ni)) 
+  call Residual_Vector(ni, r1(1:ni), r1(1:ni), a, x(1:nt))
 
   !-------------!
   !   r2 = r1   !
