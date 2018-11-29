@@ -10,10 +10,10 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   integer           :: ni
-  real              :: r(:)
-  real              :: b(:)
+  real              :: r(1:)  ! this might be only for inner cells
+  real              :: b(1:)  ! this might be only for inner cells
   type(Matrix_Type) :: a
-  real              :: x(:)
+  real              :: x(1:)  ! this may incude buffer cells
 !-----------------------------------[Locals]-----------------------------------!
   integer  :: i, j, k, sub
 !==============================================================================!

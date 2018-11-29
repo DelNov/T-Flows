@@ -12,10 +12,10 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   integer           :: ni
-  real              :: r(:)
+  real              :: r(1:)  ! this may be only in inner cells
   type(Matrix_Type) :: a
-  real              :: x(:)
-  real, optional    :: norm        !  optional number for normalization
+  real              :: x(1:)  ! presumably, this goes to buffer cells
+  real, optional    :: norm   ! optional number for normalization
 !-----------------------------------[Locals]-----------------------------------!
   real    :: error, x_max, x_min
   integer :: i

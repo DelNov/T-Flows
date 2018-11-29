@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Cgs(sol, x, r1, prec, niter, tol, ini_res, fin_res, norm)
+  subroutine Cgs(sol, x, b, prec, niter, tol, ini_res, fin_res, norm)
 !------------------------------------------------------------------------------!
 !   Solves the linear systems of equations by a precond. CGS Method.           !
 !------------------------------------------------------------------------------!
@@ -18,18 +18,19 @@
                       p2         => r_cell_02,  &
                       q1         => r_cell_03,  &
                       q2         => r_cell_04,  &
-                      r2         => r_cell_05,  &
-                      u1         => r_cell_06,  &
-                      u2         => r_cell_07,  &
-                      v2         => r_cell_08,  &   
-                      u1_plus_q1 => r_cell_09
+                      r1         => r_cell_06,  &
+                      r2         => r_cell_07,  &
+                      u1         => r_cell_08,  &
+                      u2         => r_cell_09,  &
+                      v2         => r_cell_10,  &
+                      u1_plus_q1 => r_cell_11
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Solver_Type), target :: sol
   real              :: x(-sol % pnt_grid % n_bnd_cells :  &
                           sol % pnt_grid % n_cells)
-  real              :: r1(sol % pnt_grid % n_cells)      ! [A]{x}={r1}
+  real              :: b( sol % pnt_grid % n_cells)      ! [A]{x}={b}
   character(len=80) :: prec                              ! preconditioner
   integer           :: niter                             ! number of iterations
   real              :: tol                               ! tolerance
@@ -49,6 +50,8 @@
   nb = a % pnt_grid % n_bnd_cells
 
   error = 0.0
+  r1(:) = 0
+  r1(1:nt) = b(1:nt)
 
   !---------------------!
   !   Preconditioning   !
