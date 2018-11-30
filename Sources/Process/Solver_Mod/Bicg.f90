@@ -78,10 +78,6 @@
   !   Calculate initial residual   !
   !--------------------------------!
   res = Normalized_Root_Mean_Square(ni, r1(1:nt), a, x(1:nt))
-
-  !---------------------------------------------------------------!
-  !   Residual after the correction and before the new solution   !
-  !---------------------------------------------------------------!
   ini_res = res
 
   if(res < tol) then
