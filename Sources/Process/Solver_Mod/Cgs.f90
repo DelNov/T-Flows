@@ -189,7 +189,13 @@
 
   end do                ! iter
 
-1 fin_res = res
+  !----------------------------------!
+  !                                  !
+  !   Convergence has been reached   !
+  !                                  !
+  !----------------------------------!
+1 continue
+  fin_res = res
   niter  = iter
 
   end subroutine
