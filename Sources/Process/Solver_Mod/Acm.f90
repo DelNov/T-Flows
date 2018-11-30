@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Acm(sol, x, r1, prec, niter, tol, ini_res, fin_res, norm)
+  subroutine Acm(sol, x, b, prec, niter, tol, ini_res, fin_res, norm)
 !------------------------------------------------------------------------------!
 !   This is the nucleus of the Additive Correction Multigrid method.           !
 !------------------------------------------------------------------------------!
@@ -12,7 +12,7 @@
   type(Solver_Type), target :: sol
   real              :: x(-sol % pnt_grid % n_bnd_cells :  &
                           sol % pnt_grid % n_cells)
-  real              :: r1(sol % pnt_grid % n_cells)      ! [A]{x}={r1}
+  real              :: b( sol % pnt_grid % n_cells)      ! [A]{x}={b}
   character(len=80) :: prec                              ! preconditioner
   integer           :: niter                             ! number of iterations
   real              :: tol                               ! tolerance
@@ -25,7 +25,8 @@
   type(Matrix_Type), pointer :: d_lev(:)
   type(Vector_Type), pointer :: x_lev(:)
   type(Vector_Type), pointer :: b_lev(:)
-  integer                    :: lev
+  integer                    :: lev, c, c_lev
+  real                       :: summ
 !==============================================================================!
 
   grid  => sol % pnt_grid
@@ -44,7 +45,7 @@
   !   Simply copy the first level   !
   !---------------------------------!
   x_lev(1) % val(1:) = x(1:)
-  b_lev(1) % val(1:) = r1(1:)
+  b_lev(1) % val(1:) = b(1:)
 
   lev = 1
   call Cg_Level(lev,               &  ! level
@@ -52,15 +53,42 @@
                 d_lev(lev),        &  ! preconditioning matrix
                 x_lev(lev) % val,  &  ! solution
                 b_lev(lev) % val,  &  ! right hand side
+                prec,              &  ! preconditioner
                 niter,             &  ! niter (for now)
                 tol,               &  ! tolerance
                 ini_res,           &  ! initial residual (unused)
                 fin_res)              ! final residual
+
+  !---------------------------------------------------------------!
+  !   Compute residual {b} = {b} - [A]{x} and store it in b_lev   !
+  !    (b_lev which was holding r.h.s. will be over-written))     !
+  !---------------------------------------------------------------!
+  call Residual_Vector(grid % level(lev) % n_cells,  &
+                       b_lev(lev) % val,             &
+                       b_lev(lev) % val,             &
+                       a_lev(lev),                   &
+                       x_lev(lev) % val)
+
+  ! Check RHS
+  summ = 0.0
+  do c = 1, grid % level(lev) % n_cells
+    summ = summ + b_lev(lev) % val(c)
+  end do
+  PRINT '(a,i2,es15.3)', 'SUMM @ ', lev, summ
+
+  lev = 2
+  b_lev(lev) % val(:) = 0.0
+  do c = 1, grid % level(1) % n_cells
+    c_lev = grid % level(lev) % cell(c)
+    b_lev(lev) % val(c_lev) = b_lev(lev) % val(c_lev) + b_lev(1) % val(c)
+  end do
+
   call Cg_Level(lev,               &  ! level
                 a_lev(lev),        &  ! system matrix
                 d_lev(lev),        &  ! preconditioning matrix
                 x_lev(lev) % val,  &  ! solution
                 b_lev(lev) % val,  &  ! right hand side
+                prec,              &  ! preconditioner
                 niter,             &  ! niter (for now)
                 tol,               &  ! tolerance
                 ini_res,           &  ! initial residual (unused)

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Prec_Form(sol, prec) 
+  subroutine Prec_Form(ni, a, d, prec)
 !------------------------------------------------------------------------------!
 !   Forms preconditioning matrix "d" from provided matrix "a".                 !
 !------------------------------------------------------------------------------!
@@ -9,25 +9,20 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Solver_Type), target :: sol
-  character(len=80)         :: prec  ! preconditioner
+  integer           :: ni
+  type(Matrix_Type) :: a
+  type(Matrix_Type) :: d
+  character(len=80) :: prec  ! preconditioner
 !-----------------------------------[Locals]-----------------------------------!
-  type(Matrix_Type), pointer :: a
-  type(Matrix_Type), pointer :: d
-  real                       :: sum1
-  integer                    :: i, j, k, n
+  real    :: sum1
+  integer :: i, j, k
 !==============================================================================!
-
-  ! Take some aliases
-  a => sol % a
-  d => sol % d
-  n = a % pnt_grid % n_cells - a % pnt_grid % comm % n_buff_cells
 
   !---------------------------------! 
   !   1) diagonal preconditioning   !
   !---------------------------------!
   if(prec .eq. 'DIAGONAL') then
-    do i = 1, n
+    do i = 1, ni
       d % val(d % dia(i)) = a % val(a % dia(i))
     end do
 
@@ -35,7 +30,7 @@
   !   2) incomplete cholesky preconditioning   !
   !--------------------------------------------!
   else if(prec .eq. 'INCOMPLETE_CHOLESKY') then
-    do i = 1,n
+    do i = 1, ni
       sum1 = a % val(a % dia(i))       ! take diaginal entry   
       do j = a % row(i), a % dia(i)-1  ! only lower traingular
         k = a % col(j)
@@ -48,7 +43,7 @@
   !   .) no preconditioning   !
   !---------------------------!
   else
-    do i = 1, n
+    do i = 1, ni
       d % val(d % dia(i)) = 1.0
     end do
   end if

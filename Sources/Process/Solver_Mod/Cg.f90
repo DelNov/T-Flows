@@ -31,13 +31,15 @@
   real, optional    :: norm                              ! normalization
 !-----------------------------------[Locals]-----------------------------------!
   type(Matrix_Type), pointer :: a
-  integer :: nt, ni, nb
-  real    :: alfa, beta, rho, rho_old, bnrm2, res
-  integer :: i, j, k, iter, sub
+  type(Matrix_Type), pointer :: d
+  integer                    :: nt, ni, nb
+  real                       :: alfa, beta, rho, rho_old, bnrm2, res
+  integer                    :: i, j, k, iter, sub
 !==============================================================================!
 
   ! Take some aliases
   a => sol % a
+  d => sol % d
   nt = a % pnt_grid % n_cells
   ni = a % pnt_grid % n_cells - a % pnt_grid % comm % n_buff_cells
   nb = a % pnt_grid % n_bnd_cells
@@ -47,7 +49,7 @@
   !---------------------!
   !   Preconditioning   !
   !---------------------!
-  call Prec_Form(sol, prec)
+  call Prec_Form(ni, a, d, prec)
 
   !-----------------------------------!
   !    This is quite tricky point.    !
@@ -100,7 +102,7 @@
     !     solve Mz = r     !
     !   (q instead of z)   !
     !----------------------!
-    call Prec_Solve(sol, q1(1:nt), r1(1:nt), prec)
+    call Prec_Solve(ni, a, d, q1(1:nt), r1(1:nt), prec)
 
     !-----------------!
     !   rho = (r,z)   !

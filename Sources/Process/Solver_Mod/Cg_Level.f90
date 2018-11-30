@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Cg_Level(lev, a, d, x, b, niter, tol, ini_res, fin_res)
+  subroutine Cg_Level(lev, a, d, x, b, prec, niter, tol, ini_res, fin_res)
 !------------------------------------------------------------------------------!
 !   Conjugate gradient method for one level of the multigrid.                  !
 !------------------------------------------------------------------------------!
@@ -17,6 +17,7 @@
   type(Matrix_Type) :: d
   real              :: x (a % pnt_grid % level(lev) % n_cells)
   real              :: b (a % pnt_grid % level(lev) % n_cells)  ! [A]{x}={b}
+  character(len=80) :: prec                              ! preconditioner
   integer           :: niter                             ! number of iterations
   real              :: tol                               ! tolerance
   real              :: ini_res                           ! initial residual
@@ -33,16 +34,17 @@
 
   res = 0.0
 
-  !------------------------------!
-  !   Diagonal preconditioning   !
-  !------------------------------!
-  d % val(d % dia(1:ni)) = a % val(a % dia(1:ni))
+  !---------------------!
+  !   Preconditioning   !
+  !---------------------!
+  call Prec_Form(ni, a, d, prec)
 
   !-----------------------------------!
   !    This is quite tricky point.    !
   !   What if bnrm2 is very small ?   !
   !-----------------------------------!
-  bnrm2 = Normalized_Root_Mean_Square(ni, b(1:nt), a, x(1:nt))
+  ! bnrm2 = Normalized_Root_Mean_Square(ni, b(1:nt), a, x(1:nt))
+  bnrm2 = Root_Mean_Square(ni, b(1:nt))
 PRINT *, ' INITIAL BNRM2 = ', bnrm2
 
   if(bnrm2 < tol) then
@@ -58,7 +60,8 @@ PRINT *, ' INITIAL BNRM2 = ', bnrm2
   !--------------------------------!
   !   Calculate initial residual   !
   !--------------------------------!
-  res = Normalized_Root_Mean_Square(ni, r1(1:nt), a, x(1:nt))
+  ! res = Normalized_Root_Mean_Square(ni, r1(1:nt), a, x(1:nt))
+  res = Root_Mean_Square(ni, r1(1:nt))
 PRINT *, ' INITIAL ERROR = ', res
 
   if(res < tol) then
@@ -82,7 +85,7 @@ PRINT *, ' INITIAL ERROR = ', res
     !     solve Mz = r     !
     !   (q instead of z)   !
     !----------------------!
-    q1(1:ni) = r1(1:ni) / d % val(d % dia(1:ni))
+    call Prec_Solve(ni, a, d, q1(1:nt), r1(1:nt), prec)
 
     !-----------------!
     !   rho = (r,z)   !
@@ -126,7 +129,8 @@ PRINT *, ' INITIAL ERROR = ', res
     !-----------------------!
     !   Check convergence   !
     !-----------------------!
-    res = Normalized_Root_Mean_Square(ni, r1(1:nt), a, x(1:nt))
+    !res = Normalized_Root_Mean_Square(ni, r1(1:nt), a, x(1:nt))
+    res = Root_Mean_Square(ni, r1(1:nt))
     if(iter .eq. 1) then
       ini_res = res
     end if

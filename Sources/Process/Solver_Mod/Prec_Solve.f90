@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Prec_Solve(sol, x, b, prec)
+  subroutine Prec_Solve(ni, a, d, x, b, prec)
 !------------------------------------------------------------------------------!
 ! Solves the preconditioning system [d]{x}={b}                                 !
 !------------------------------------------------------------------------------!
@@ -18,27 +18,22 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Solver_Type), target :: sol
-  real                      :: x(:)
-  real                      :: b(:)
-  character(len=80)         :: prec  ! preconditioner
+  integer           :: ni
+  type(Matrix_Type) :: a
+  type(Matrix_Type) :: d
+  real              :: x(:)
+  real              :: b(:)
+  character(len=80) :: prec  ! preconditioner
 !-----------------------------------[Locals]-----------------------------------!
-  type(Matrix_Type), pointer :: a
-  type(Matrix_Type), pointer :: d
-  integer                    :: i, j, k, n
-  real                       :: sum1
+  integer :: i, j, k
+  real    :: sum1
 !==============================================================================!
-
-  ! Take some aliases
-  a => sol % a
-  d => sol % d
-  n  = a % pnt_grid % n_cells - a % pnt_grid % comm % n_buff_cells
 
   !---------------------------------!
   !   1) diagonal preconditioning   !
   !---------------------------------!
   if(prec .eq. 'DIAGONAL') then
-    do i=1,n
+    do i = 1, ni
       x(i) = b(i)/d % val(d % dia(i))
     end do
 
@@ -48,7 +43,7 @@
   else if(prec .eq. 'INCOMPLETE_CHOLESKY') then
 
     ! Forward substitutionn
-    do i = 1, n
+    do i = 1, ni
       sum1 = b(i)
       do j = a % row(i),a % dia(i)-1     ! only the lower triangular
         k = a % col(j)
@@ -57,16 +52,16 @@
       x(i) = sum1 * d % val(d % dia(i))  ! BUG ?
     end do
 
-    do i = 1, n
+    do i = 1, ni
       x(i) = x(i) / ( d % val(d % dia(i)) + TINY )
     end do
 
     ! Backward substitution
-    do i = n, 1, -1
+    do i = ni, 1, -1
       sum1 = x(i)
       do j = a % dia(i)+1, a % row(i+1)-1        ! upper triangular 
         k = a % col(j)
-        if(k <= n) sum1 = sum1 - a % val(j)*x(k)  ! avoid buffer entries
+        if(k <= ni) sum1 = sum1 - a % val(j)*x(k)  ! avoid buffer entries
       end do
       x(i) = sum1* d % val(d % dia(i))           ! BUG ?
     end do
@@ -75,7 +70,7 @@
   !   .) no preconditioning   !
   !---------------------------!
   else
-    do i = 1, n
+    do i = 1, ni
       x(i) = b(i)
     end do
   end if
