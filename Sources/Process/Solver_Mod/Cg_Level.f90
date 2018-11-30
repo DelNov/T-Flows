@@ -61,7 +61,9 @@
   !--------------------------------!
   res = Root_Mean_Square(ni, r1(1:nt))
   ini_res = res
-  PRINT '(a,i2,a,es12.3)', ' LEVEL ', lev, ' INITIAL ERROR = ', res
+  PRINT '(a,i2.2,a,i3.3,a,es12.3)', ' LEVEL_',    lev,   &
+                                    '; ITER_',    0,     &
+                                    '; ERROR = ', res
 
   if(res < tol) then
     iter = 0
@@ -129,7 +131,9 @@
     !   Check convergence   !
     !-----------------------!
     res = Root_Mean_Square(ni, r1(1:nt))
-    PRINT '(a,i2,a,es12.3)', ' LEVEL ', lev, ' CURRENT ERROR = ', res
+    PRINT '(a,i2.2,a,i3.3,a,es12.3)', ' LEVEL_',    lev,   &
+                                      '; ITER_',     iter,  &
+                                      '; ERROR = ', res
 
     if(res         < tol)     goto 1
     if(res/ini_res < res_rat) goto 1
