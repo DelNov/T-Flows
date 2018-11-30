@@ -40,7 +40,9 @@
   r_lev => sol % r_lev
 
   !-------------------------------------------!
+  !                                           !
   !   Coarsen system matrix over all levels   !
+  !                                           !
   !-------------------------------------------!
   call Acm_Coarsen_Matrix(sol)
 
@@ -51,26 +53,21 @@
   b_lev(1) % val(1:) = b(1:)
 
   lev = 1
+  !---------------------------------!
+  !   Solve    [A]{x} = b and       !
+  !   compute  {r} = {b} - [A]{x}   !
+  !---------------------------------!
   call Cg_Level(lev,               &  ! level
                 a_lev(lev),        &  ! system matrix
                 d_lev(lev),        &  ! preconditioning matrix
                 x_lev(lev) % val,  &  ! solution
                 b_lev(lev) % val,  &  ! right hand side
+                r_lev(lev) % val,  &  ! residual vector
                 prec,              &  ! preconditioner
-                niter,             &  ! niter (for now)
+                20,                &  ! max iterations
                 tol,               &  ! tolerance
                 0.1,               &  ! residual ratio
                 fin_res)              ! final residual
-
-  !---------------------------------------------------------------!
-  !   Compute residual {b} = {b} - [A]{x} and store it in b_lev   !
-  !    (b_lev which was holding r.h.s. will be over-written))     !
-  !---------------------------------------------------------------!
-  call Residual_Vector(grid % level(lev) % n_cells,  &
-                       r_lev(lev) % val,             &
-                       b_lev(lev) % val,             &
-                       a_lev(lev),                   &
-                       x_lev(lev) % val)
 
   ! Check RHS
   summ = 0.0
@@ -79,32 +76,60 @@
   end do
   PRINT '(a,i2,es15.3)', 'SUMM @ ', lev, summ
 
-  lev = 2
-  b_lev(lev) % val(:) = 0.0
-  do c = 1, grid % level(lev-1) % n_cells       ! through finer cells
-    c_lev = grid % level(lev-1) % coarser_c(c)  ! get coarse cell
-    b_lev(lev) % val(c_lev) = b_lev(lev) % val(c_lev) + r_lev(lev-1) % val(c)
+  !-------------------------!
+  !                         !
+  !   Go down the V cycle   !
+  !                         !
+  !-------------------------!
+  do lev = 2, 5
+
+    !-----------------+
+    !   Restriction   !                    !
+    !-----------------+--------------------!
+    !     +---+---+          +-------+     !
+    !     |   |   |          |       |     !
+    !     +---+---+   =-->   |       |     !
+    !     |   |   |          |       |     !
+    !     +---+---+          +-------+     !
+    !       lev-1               lev        !
+    !--------------------------------------!
+    b_lev(lev) % val(:) = 0.0
+    do c = 1, grid % level(lev-1) % n_cells       ! through finer cells
+      c_lev = grid % level(lev-1) % coarser_c(c)  ! get coarse cell
+      b_lev(lev) % val(c_lev) = b_lev(lev) % val(c_lev) + r_lev(lev-1) % val(c)
+    end do
+
+    !---------------------------------!
+    !   Solve    [A]{x} = b and       !
+    !   compute  {r} = {b} - [A]{x}   !
+    !---------------------------------!
+    call Cg_Level(lev,               &  ! level
+                  a_lev(lev),        &  ! system matrix
+                  d_lev(lev),        &  ! preconditioning matrix
+                  x_lev(lev) % val,  &  ! solution
+                  b_lev(lev) % val,  &  ! right hand side
+                  r_lev(lev) % val,  &  ! residual vector
+                  prec,              &  ! preconditioner
+                  20,                &  ! max iterations
+                  tol,               &  ! tolerance
+                  0.1,               &  ! residual ratio
+                  fin_res)              ! final residual
+
   end do
 
-  call Cg_Level(lev,               &  ! level
-                a_lev(lev),        &  ! system matrix
-                d_lev(lev),        &  ! preconditioning matrix
-                x_lev(lev) % val,  &  ! solution
-                b_lev(lev) % val,  &  ! right hand side
-                prec,              &  ! preconditioner
-                niter,             &  ! niter (for now)
-                tol,               &  ! tolerance
-                0.1,               &  ! residual ratio
-                fin_res)              ! final residual
-
   lev = 1
+  !---------------------------------!
+  !   Solve    [A]{x} = b and       !
+  !   compute  {r} = {b} - [A]{x}   !
+  !---------------------------------!
   call Cg_Level(lev,               &  ! level
                 a_lev(lev),        &  ! system matrix
                 d_lev(lev),        &  ! preconditioning matrix
                 x_lev(lev) % val,  &  ! solution
                 b_lev(lev) % val,  &  ! right hand side
+                r_lev(lev) % val,  &  ! residual vector
                 prec,              &  ! preconditioner
-                niter,             &  ! niter (for now)
+                20,                &  ! niter (for now)
                 tol,               &  ! tolerance
                 0.1,               &  ! residual ratio
                 fin_res)              ! final residual

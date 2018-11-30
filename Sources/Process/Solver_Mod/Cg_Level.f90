@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Cg_Level(lev, a, d, x, b, prec, niter, tol, res_rat, fin_res)
+  subroutine Cg_Level(lev, a, d, x, b, r, prec, niter, tol, res_rat, fin_res)
 !------------------------------------------------------------------------------!
 !   Conjugate gradient method for one level of the multigrid.                  !
 !------------------------------------------------------------------------------!
@@ -17,6 +17,7 @@
   type(Matrix_Type) :: d
   real              :: x (a % pnt_grid % level(lev) % n_cells)
   real              :: b (a % pnt_grid % level(lev) % n_cells)  ! [A]{x}={b}
+  real              :: r (a % pnt_grid % level(lev) % n_cells)  ! {r}={b}-[A]{x}
   character(len=80) :: prec                              ! preconditioner
   integer           :: niter                             ! number of iterations
   real              :: tol                               ! tolerance
@@ -137,8 +138,17 @@
 
   end do ! iter
 
+  !----------------------------------!
+  !                                  !
+  !   Convergence has been reached   !
+  !                                  !
+  !----------------------------------!
 1 continue
   fin_res = res
-  niter = iter
+
+  !---------------------------------!
+  !   Compute: {r} = {b} - [A]{x}   !
+  !---------------------------------!
+  call Residual_Vector(ni, r(1:nt), b(1:nt), a, x(1:nt))
 
   end subroutine
