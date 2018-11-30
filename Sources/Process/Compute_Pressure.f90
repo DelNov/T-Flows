@@ -219,11 +219,12 @@
   call Control_Mod_Max_Iterations_For_Pressure_Solver(niter)
 
   goto 1
+  niter = 10
   call Acm(sol,       &
            pp % n,    &
            b,         &
            precond,   &
-           niter,     &
+           niter,     &     ! number of V cycles
            tol,       &
            ini_res,   &
            pp % res,  &
