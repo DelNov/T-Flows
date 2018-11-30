@@ -29,6 +29,10 @@
     grid % level(lev) % cell(:) = 0
     grid % level(lev) % face(:) = 0
 
+    ! Connectivity with coarser grid
+    allocate(grid % level(lev) % coarser_c(n_cells))
+    grid % level(lev) % coarser_c(:) = 0
+
     ! Intra-level connectivity and geometry
     allocate(grid % level(lev) % faces_c(2, n_faces))
     allocate(grid % level(lev) % n_finest_cells(n_cells))

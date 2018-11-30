@@ -14,7 +14,7 @@
   type(Grid_Type) :: grid
   integer         :: sub, nf_sub, nbf_sub
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: c, s, n, c1, c2, count, var, subo
+  integer              :: c, s, n, c1, c2, var, subo
   character(len=80)    :: name_out
 !==============================================================================!
 !   sub     - subdomain number                                                 !

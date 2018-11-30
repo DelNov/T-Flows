@@ -8,12 +8,12 @@
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, c1, c2, nc, nc1, nc2, s, i, lev, lev_parts
-  integer              :: n_cells, n_faces, arr_s, arr_e, val_1, val_2
+  integer              :: n_cells, n_faces, val_1, val_2
   integer              :: c_lev, s_lev
   integer              :: c1_lev_c, c2_lev_c, c1_lev_f, c2_lev_f
   integer, allocatable :: c1_arr(:), c2_arr(:), sf_arr(:)
   integer, allocatable :: cells_c(:,:), cells_n_cells(:), faces_c(:,:),  &
-                          new_c(:), old_c(:), cell_mapping(:,:)
+                          new_c(:), old_c(:)
   real                 :: t_start, t_end
 
 ! Variabes for call to METIS
@@ -360,6 +360,44 @@
     grid % level(lev) % n_cells = maxval(grid % level(lev) % cell(:))
   end do
 
+  !--------------------!
+  !                    !
+  !   Sanity check 1   !
+  !                    !
+  !--------------------!
+  print *, '# Connecting levels '
+
+  do lev = 1, grid % n_levels - 1
+
+    allocate(grid % level(lev) % coarser_c(grid % level(lev) % n_cells));
+    grid % level(lev) % coarser_c = 0
+    print '(a,i2,a,i2)', ' # ... levels', lev, ' and', lev+1
+
+    ! Browse through parts of this level
+    do c_lev = 1, grid % level(lev) % n_cells
+      do c = 1, grid % n_cells
+        if(grid % level(lev) % cell(c) .eq. c_lev) then
+          if(grid % level(lev) % coarser_c(c_lev) .eq. 0) then
+            grid % level(lev)   % coarser_c(c_lev) =   &
+            grid % level(lev+1) % cell(c)
+          else
+            if(grid % level(lev)   % coarser_c(c_lev) .ne.  &
+               grid % level(lev+1) % cell(c)) then
+              print *, '# Mapping failed at level ', lev
+              print *, '# Stopping the program!   '
+              stop
+            end if
+          end if
+        end if
+      end do
+    end do
+
+  end do  ! lev
+
+  ! Allocate the finest level just for saving and bookkeeping
+  allocate(grid % level(lev) % coarser_c(grid % level(lev) % n_cells));
+  grid % level(lev) % coarser_c = 0
+
   !-------------------------------------!
   !                                     !
   !                                     !
@@ -378,9 +416,9 @@
   !------------------------------------------------!
   do lev = 1, grid % n_levels
 
-    grid % level(lev) % xc(:) = 0
-    grid % level(lev) % yc(:) = 0
-    grid % level(lev) % zc(:) = 0
+    grid % level(lev) % xc(:) = 0.0
+    grid % level(lev) % yc(:) = 0.0
+    grid % level(lev) % zc(:) = 0.0
     grid % level(lev) % n_finest_cells(:) = 0
 
     do c = 1, grid % n_cells

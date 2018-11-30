@@ -7,10 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: c, c1, c2, nc, nc1, nc2, s, i, lev, lev_parts
-  integer              :: arr_s, arr_e, val_1, val_2
-  integer              :: c_lev, c1_lev_c, c2_lev_c, s_lev
-  integer, allocatable :: cell_mapping(:,:)
+  integer              :: c1, c2, s, lev, c_lev, c1_lev_c, c2_lev_c, s_lev
   integer, allocatable :: face_hits(:)
 !==============================================================================!
 
@@ -24,40 +21,6 @@
   !                    !
   !--------------------!
   print *, '# Sanity check 1 '
-  i = 0
-  do lev = 1, grid % n_levels
-    i = max(i, grid % level(lev) % n_cells)
-  end do
-  allocate(cell_mapping(MAX_MG_LEVELS, i)); cell_mapping = 0
-
-  do lev = 1, grid % n_levels - 1
-    print '(a,i2,a,i2)', ' # ... levels', lev, ' and', lev+1
-
-    ! Browse through parts of this level
-    do c_lev = 1, grid % level(lev) % n_cells
-      do c = 1, grid % n_cells
-        if(grid % level(lev) % cell(c) == c_lev) then
-          if(cell_mapping(lev, c_lev) .eq. 0) then
-            cell_mapping(lev, c_lev) = grid % level(lev+1) % cell(c)
-          else
-            if(cell_mapping(lev, c_lev) .ne. grid % level(lev+1) % cell(c)) then
-              print *, '# Mapping failed at level ', lev
-              print *, '# Stopping the program!   '
-              stop
-            end if
-          end if
-        end if
-      end do
-    end do
-
-  end do  ! lev
-
-  !--------------------!
-  !                    !
-  !   Sanity check 2   !
-  !                    !
-  !--------------------!
-  print *, '# Sanity check 2 '
   do lev = 1, grid % n_levels
     do s = 1, grid % level(lev) % n_faces
       c1 = grid % level(1) % faces_c(1, s)
@@ -84,10 +47,10 @@
 
   !--------------------!
   !                    !
-  !   Sanity check 3   !
+  !   Sanity check 2   !
   !                    !
   !--------------------!
-  print *, '# Sanity check 3 '
+  print *, '# Sanity check 2 '
   do lev = 1, grid % n_levels
     do c_lev = 1, grid % level(lev) % n_cells
       do s_lev = 1, grid % level(lev) % n_faces
@@ -106,10 +69,10 @@
 
   !--------------------!
   !                    !
-  !   Sanity check 4   !
+  !   Sanity check 3   !
   !                    !
   !--------------------!
-  print *, '# Sanity check 4 '
+  print *, '# Sanity check 3 '
   do lev = 1, grid % n_levels
     allocate(face_hits(grid % level(lev) % n_faces))
     face_hits(:) = 0

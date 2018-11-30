@@ -18,10 +18,8 @@
   integer         :: sub, nn_sub, nc_sub, nf_sub,  &
                      nbc_sub,  nbf_sub
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: b, c, s, n, c1, c2, count, var, lev
-  integer           :: lower_bound, upper_bound
+  integer           :: b, c, s, n, lev, item
   character(len=80) :: name_out
-  integer           :: item
 !==============================================================================!
 !   The files name.cns and name.geo should merge into one file in some         !
 !   of the future releases.                                                    !
@@ -33,9 +31,6 @@
 !   nbc_sub - number of physicall boundary cells in subdomain                  !
 !   nbf_sub - number of buffer boundary faces in subdomain                     !
 !------------------------------------------------------------------------------!
-
-  lower_bound = min(-nbf_sub, -grid % n_bnd_cells)
-  upper_bound = max(grid % n_cells*8, grid % n_faces*4)
 
   !----------------------!
   !                      !
@@ -196,6 +191,7 @@
   do lev = 1, grid % n_levels
     write(9) (grid % level(lev) % cell(c),      c=1,grid % n_cells)
     write(9) (grid % level(lev) % face(s),      s=1,grid % n_faces)
+    write(9) (grid % level(lev) % coarser_c(c), c=1,grid % level(lev) % n_cells)
     write(9) (grid % level(lev) % faces_c(1,s), s=1,grid % level(lev) % n_faces)
     write(9) (grid % level(lev) % faces_c(2,s), s=1,grid % level(lev) % n_faces)
   end do

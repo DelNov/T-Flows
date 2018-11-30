@@ -119,6 +119,7 @@
   do lev = 1, grid % n_levels
     read(9) (grid % level(lev) % cell(c),      c=1,grid % n_cells)
     read(9) (grid % level(lev) % face(s),      s=1,grid % n_faces)
+    read(9) (grid % level(lev) % coarser_c(c), c=1,grid % level(lev) % n_cells)
     read(9) (grid % level(lev) % faces_c(1,s), s=1,grid % level(lev) % n_faces)
     read(9) (grid % level(lev) % faces_c(2,s), s=1,grid % level(lev) % n_faces)
   end do

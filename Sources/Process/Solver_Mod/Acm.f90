@@ -81,9 +81,9 @@
 
   lev = 2
   b_lev(lev) % val(:) = 0.0
-  do c = 1, grid % level(1) % n_cells
-    c_lev = grid % level(lev) % cell(c)
-    b_lev(lev) % val(c_lev) = b_lev(lev) % val(c_lev) + r_lev(1) % val(c)
+  do c = 1, grid % level(lev-1) % n_cells       ! through finer cells
+    c_lev = grid % level(lev-1) % coarser_c(c)  ! get coarse cell
+    b_lev(lev) % val(c_lev) = b_lev(lev) % val(c_lev) + r_lev(lev-1) % val(c)
   end do
 
   call Cg_Level(lev,               &  ! level

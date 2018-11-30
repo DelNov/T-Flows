@@ -27,6 +27,9 @@
     integer, allocatable :: cell(:)
     integer, allocatable :: face(:)
 
+    ! Cell at coarser level
+    integer, allocatable :: coarser_c(:)
+
     integer, allocatable :: n_finest_cells(:)
 
     ! Faces' neigboring (surrounding) cells
