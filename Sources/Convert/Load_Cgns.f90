@@ -86,7 +86,6 @@
       !   Browse through all element sections   !
       !-----------------------------------------!
       call Cgns_Mod_Read_Number_Of_Element_Sections(base, block)
-
       do sect = 1, cgns_base(base) % block(block) % n_sects
 
         ! Read info for an element section  (including b.c.)
@@ -143,6 +142,7 @@
     grid % bnd_cond % name(i) = bnd_cond_names(i)
   end do
 
+
   !----------------!
   !   Interfaces   !
   !----------------!
@@ -177,6 +177,8 @@
 
       ! Count block, just for information
       cnt_blocks = cnt_blocks + 1
+      ! Set number of 3d cells in current block as 0
+      cells_3d_in_block = 0
 
       !----------------------------!
       !   Read coordinates block   !
@@ -202,13 +204,13 @@
       !----------------------!
       cnt_block_bnd_cells = 0
 
-      ! Browse through all sections to read elements
+      ! Browse through all 3d sections to read elements and assign B.C.
       do sect = 1, cgns_base(base) % block(block) % n_sects
 
-        ! Read element data (count HEXA_8/PYRA_5/PENTA_6/TETRA_4/QUAD_4/TRI_3)
+        ! Read element data (count HEXA_8/PYRA_5/PENTA_6/TETRA_4/)
         call Cgns_Mod_Read_Section_Connections(base, block, sect, grid)
 
-      end do ! elements sections
+      end do ! 3d elements sections
 
       cnt_nodes = cnt_nodes + cgns_base(base) % block(block) % mesh_info(1)
       cnt_cells = cnt_cells + cgns_base(base) % block(block) % mesh_info(2)
@@ -234,6 +236,8 @@
   !   Read block (material?) data   !
   !---------------------------------!
   grid % material % name = "AIR"
+
+  stop
 
   !-----------------------------------------------------------------!
   !   Correct boundary conditions directions for hexahedral cells   !

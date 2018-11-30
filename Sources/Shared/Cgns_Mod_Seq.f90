@@ -116,6 +116,7 @@
   integer :: cnt_cells
   integer :: cnt_blocks     ! probably not needed
   integer :: cnt_bnd_cells
+  integer :: cells_3d_in_block
 
   ! Cells (3d)
   integer :: cnt_hex
@@ -169,6 +170,7 @@
   include 'Cgns_Mod/Read_Coordinate_Info.f90'
   include 'Cgns_Mod/Read_Coordinate_Array.f90'
   include 'Cgns_Mod/Read_Section_Connections.f90'
+  include 'Cgns_Mod/Read_2d_Section_Connections_And_Assign_BC.f90'
   include 'Cgns_Mod/Merge_Nodes.f90'
 
   include 'Cgns_Mod/Sequential/Open_File.f90'

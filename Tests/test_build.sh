@@ -464,49 +464,49 @@ function processor_backup_tests {
 
   # Grasp/embrace as many different model combinations as you can
 
-  #-- Channel_Re_Tau_590 [k_eps model + T]
-  replace_line_with_first_occurence_in_file "TURBULENCE_MODEL" \
-    "TURBULENCE_MODEL k_eps" $RANS_CHANNEL_LR_UNIFORM_DIR/control
-  process_backup_test no  $RANS_CHANNEL_LR_UNIFORM_DIR
-  if [ "$CGNS" = "yes" ]; then
-    process_backup_test yes $RANS_CHANNEL_LR_UNIFORM_DIR
-  fi
-
-  #-- Channel_Re_Tau_590 [k_eps_zeta_f model + T]
-  replace_line_with_first_occurence_in_file "TURBULENCE_MODEL" \
-    "TURBULENCE_MODEL k_eps_zeta_f" $RANS_CHANNEL_LR_UNIFORM_DIR/control
-  process_backup_test no  $RANS_CHANNEL_LR_UNIFORM_DIR
-  if [ "$CGNS" = "yes" ]; then
-    process_backup_test yes $RANS_CHANNEL_LR_UNIFORM_DIR
-  fi
-
-  #-- Channel_Re_Tau_590_Rsm [rsm_hanjalic_jakirlic model + T]
-  replace_line_with_first_occurence_in_file "TURBULENCE_MODEL" \
-    "TURBULENCE_MODEL rsm_hanjalic_jakirlic" $RANS_CHANNEL_LR_RSM_DIR/control
-  process_backup_test no  $RANS_CHANNEL_LR_RSM_DIR
-  if [ "$CGNS" = "yes" ]; then
-    process_backup_test yes $RANS_CHANNEL_LR_RSM_DIR
-  fi
-
-  #-- Channel_Re_Tau_590_Rsm [rsm_manceau_hanjalic model + T]
-  replace_line_with_first_occurence_in_file "TURBULENCE_MODEL" \
-    "TURBULENCE_MODEL rsm_manceau_hanjalic" $RANS_CHANNEL_LR_RSM_DIR/control
-  process_backup_test no  $RANS_CHANNEL_LR_RSM_DIR
-  if [ "$CGNS" = "yes" ]; then
-    process_backup_test yes $RANS_CHANNEL_LR_RSM_DIR
-  fi
-
+#  #-- Channel_Re_Tau_590 [k_eps model + T]
+#  replace_line_with_first_occurence_in_file "TURBULENCE_MODEL" \
+#    "TURBULENCE_MODEL k_eps" $RANS_CHANNEL_LR_UNIFORM_DIR/control
+#  process_backup_test no  $RANS_CHANNEL_LR_UNIFORM_DIR
+#  if [ "$CGNS" = "yes" ]; then
+#    process_backup_test yes $RANS_CHANNEL_LR_UNIFORM_DIR
+#  fi
+#
+#  #-- Channel_Re_Tau_590 [k_eps_zeta_f model + T]
+#  replace_line_with_first_occurence_in_file "TURBULENCE_MODEL" \
+#    "TURBULENCE_MODEL k_eps_zeta_f" $RANS_CHANNEL_LR_UNIFORM_DIR/control
+#  process_backup_test no  $RANS_CHANNEL_LR_UNIFORM_DIR
+#  if [ "$CGNS" = "yes" ]; then
+#    process_backup_test yes $RANS_CHANNEL_LR_UNIFORM_DIR
+#  fi
+#
+#  #-- Channel_Re_Tau_590_Rsm [rsm_hanjalic_jakirlic model + T]
+#  replace_line_with_first_occurence_in_file "TURBULENCE_MODEL" \
+#    "TURBULENCE_MODEL rsm_hanjalic_jakirlic" $RANS_CHANNEL_LR_RSM_DIR/control
+#  process_backup_test no  $RANS_CHANNEL_LR_RSM_DIR
+#  if [ "$CGNS" = "yes" ]; then
+#    process_backup_test yes $RANS_CHANNEL_LR_RSM_DIR
+#  fi
+#
+#  #-- Channel_Re_Tau_590_Rsm [rsm_manceau_hanjalic model + T]
+#  replace_line_with_first_occurence_in_file "TURBULENCE_MODEL" \
+#    "TURBULENCE_MODEL rsm_manceau_hanjalic" $RANS_CHANNEL_LR_RSM_DIR/control
+#  process_backup_test no  $RANS_CHANNEL_LR_RSM_DIR
+#  if [ "$CGNS" = "yes" ]; then
+#    process_backup_test yes $RANS_CHANNEL_LR_RSM_DIR
+#  fi
+#
   #-- Pipe_Re_Tau_180 [les_dynamic]
   process_backup_test no  $LES_PIPE_DIR
   if [ "$CGNS" = "yes" ]; then
     process_backup_test yes $LES_PIPE_DIR
   fi
-
-  #-- Cavity_Lid_Driven_Re_1000 [none]
-  process_backup_test no  $LES_CAVITY_LID_DRIVEN_DIR
-  if [ "$CGNS" = "yes" ]; then
-    process_backup_test yes $LES_CAVITY_LID_DRIVEN_DIR
-  fi
+#
+#  #-- Cavity_Lid_Driven_Re_1000 [none]
+#  process_backup_test no  $LES_CAVITY_LID_DRIVEN_DIR
+#  if [ "$CGNS" = "yes" ]; then
+#    process_backup_test yes $LES_CAVITY_LID_DRIVEN_DIR
+#  fi
 
 }
 #------------------------------------------------------------------------------#
@@ -712,72 +712,72 @@ function processor_full_length_tests {
   echo "  !!"
   echo "  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 
-  # no User_Mod/ dir !!!
-  processor_full_length_test \
-    "$LES_CAVITY_LID_DRIVEN_DIR" \
-    "none" \
-    "$LES_CAVITY_LID_DRIVEN_DIR/Xmgrace"
-
-  # no User_Mod/ dir !!!
-  processor_full_length_test \
-    "$LES_CAVITY_THERM_DRIVEN_DIR_106" \
-    "none" \
-    "$LES_CAVITY_THERM_DRIVEN_DIR_106/Xmgrace"
-
-  # no User_Mod/ dir !!!
-  processor_full_length_test \
-    "$LES_CAVITY_THERM_DRIVEN_DIR_108" \
-    "none" \
-    "$LES_CAVITY_THERM_DRIVEN_DIR_108/Xmgrace"
-
-  # [~2 min test]
-  processor_full_length_test \
-    "$RANS_CHANNEL_LR_UNIFORM_DIR" \
-    "k_eps" \
-    "$RANS_CHANNEL_LR_UNIFORM_DIR/Xmgrace"
-
-  # [~2 min test]
-  processor_full_length_test \
-    "$RANS_CHANNEL_LR_STRETCHED_DIR" \
-    "k_eps_zeta_f" \
-    "$RANS_CHANNEL_LR_STRETCHED_DIR/Xmgrace"
-
-  # [~5 min test]
-  processor_full_length_test \
-    "$RANS_CHANNEL_LR_RSM_DIR" \
-    "rsm_manceau_hanjalic" \
-    "$RANS_CHANNEL_LR_RSM_DIR/Xmgrace"
-
-  # [~5 min test]
-  processor_full_length_test \
-    "$RANS_CHANNEL_LR_RSM_DIR" \
-    "rsm_hanjalic_jakirlic" \
-    "$RANS_CHANNEL_LR_RSM_DIR/Xmgrace"
-
-  # [~12 HOURS test]
-  processor_full_length_test \
-    "$HYB_CHANNEL_HR_UNIFORM_DIR" \
-    "hybrid_les_rans" \
-    "$HYB_CHANNEL_HR_UNIFORM_DIR/Xmgrace"
-
-  # [~12 HOURS test]
-  processor_full_length_test \
-    "$HYB_CHANNEL_HR_STRETCHED_DIR" \
-    "hybrid_les_rans" \
-    "$HYB_CHANNEL_HR_STRETCHED_DIR/Xmgrace"
-
-#  # Issue: pipe does not pass processor_backup_tests
+#  # no User_Mod/ dir !!!
 #  processor_full_length_test \
-#    "$LES_PIPE_DIR" \
-#    "les_dynamic" \
-#    "$LES_PIPE_DIR/Xmgrace"
+#    "$LES_CAVITY_LID_DRIVEN_DIR" \
+#    "none" \
+#    "$LES_CAVITY_LID_DRIVEN_DIR/Xmgrace"
+#
+#  # no User_Mod/ dir !!!
+#  processor_full_length_test \
+#    "$LES_CAVITY_THERM_DRIVEN_DIR_106" \
+#    "none" \
+#    "$LES_CAVITY_THERM_DRIVEN_DIR_106/Xmgrace"
+#
+#  # no User_Mod/ dir !!!
+#  processor_full_length_test \
+#    "$LES_CAVITY_THERM_DRIVEN_DIR_108" \
+#    "none" \
+#    "$LES_CAVITY_THERM_DRIVEN_DIR_108/Xmgrace"
+#
+#  # [~2 min test]
+#  processor_full_length_test \
+#    "$RANS_CHANNEL_LR_UNIFORM_DIR" \
+#    "k_eps" \
+#    "$RANS_CHANNEL_LR_UNIFORM_DIR/Xmgrace"
+#
+#  # [~2 min test]
+#  processor_full_length_test \
+#    "$RANS_CHANNEL_LR_STRETCHED_DIR" \
+#    "k_eps_zeta_f" \
+#    "$RANS_CHANNEL_LR_STRETCHED_DIR/Xmgrace"
+#
+#  # [~5 min test]
+#  processor_full_length_test \
+#    "$RANS_CHANNEL_LR_RSM_DIR" \
+#    "rsm_manceau_hanjalic" \
+#    "$RANS_CHANNEL_LR_RSM_DIR/Xmgrace"
+#
+#  # [~5 min test]
+#  processor_full_length_test \
+#    "$RANS_CHANNEL_LR_RSM_DIR" \
+#    "rsm_hanjalic_jakirlic" \
+#    "$RANS_CHANNEL_LR_RSM_DIR/Xmgrace"
+#
+#  # [~12 HOURS test]
+#  processor_full_length_test \
+#    "$HYB_CHANNEL_HR_UNIFORM_DIR" \
+#    "hybrid_les_rans" \
+#    "$HYB_CHANNEL_HR_UNIFORM_DIR/Xmgrace"
+#
+#  # [~12 HOURS test]
+#  processor_full_length_test \
+#    "$HYB_CHANNEL_HR_STRETCHED_DIR" \
+#    "hybrid_les_rans" \
+#    "$HYB_CHANNEL_HR_STRETCHED_DIR/Xmgrace"
+
+  # Issue: pipe does not pass processor_backup_tests
+  processor_full_length_test \
+    "$LES_PIPE_DIR" \
+    "les_dynamic" \
+    "$LES_PIPE_DIR/Xmgrace"
 }
 #------------------------------------------------------------------------------#
 # actual script
 #------------------------------------------------------------------------------#
-generator_tests
-convert_tests
-divide_tests
+#generator_tests
+#convert_tests
+#divide_tests
 processor_backup_tests
 #process_save_exit_now_tests
 processor_full_length_tests

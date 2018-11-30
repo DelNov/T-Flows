@@ -1,15 +1,20 @@
 !==============================================================================!
-  subroutine Cgns_Mod_Read_2d_Section_Connections(base, block, sect, grid)
+  subroutine Cgns_Mod_Read_2d_Section_Connections_And_Assign_BC(  &
+    base, block, sect, grid, cell_n)
 !------------------------------------------------------------------------------!
-!   Read elements connection info for current sect
+!   Read 2d elements connection info for current sect
+!   Apply b.c. and handle interfaces be searching 2d cell inside 3d cell
+!   Prerequisites: all 3d cells in this block are already in grid structure
+!   https://cgns.github.io/CGNS_docs_current/sids/conv.html
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer         :: base, block, sect
-  type(Grid_Type) :: grid
+  integer             :: base, block, sect
+  integer, intent(in) :: cell_n(:,:)
+  type(Grid_Type)     :: grid
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: base_id       ! base index number
   integer              :: block_id      ! block index number
@@ -24,12 +29,42 @@
   integer              :: error
   integer              :: n_nodes, loc, c, n, cell, dir, cnt, bc, int, int_id
   integer              :: i, j, k
-  integer, allocatable :: cell_n(:,:)
-  !integer(kind=4), allocatable :: face_n(:,:)
+  !!integer(kind=4), allocatable :: face_n(:,:)
   integer, allocatable :: face_n(:,:)
   integer, allocatable :: interface_n(:,:)
   integer, allocatable :: parent_data(:,:)
-  integer              :: parent_datum = 0  ! for cells there are no parents
+  integer              :: face_quad(4)
+  integer              :: face_tri(3)
+  ! cgns HEXA_8 cell faces nodal connections
+  integer, parameter, dimension(6, 4) :: face_hexa_8 =                                     reshape( (/ 1, 4, 3, 2,  &
+                                                     1, 2, 6, 5,  &
+                                                     2, 3, 7, 6,  &
+                                                     3, 4, 8, 7,  &
+                                                     1, 5, 8, 4,  &
+                                                     5, 6, 7, 8  /), (/6, 4/) )
+  ! cgns PYRA_5 cell faces nodal connections
+  integer, parameter, dimension(6, 4) :: face_pyra_5 =                                     reshape( (/ 1, 4, 3, 2,  &
+                                                     1, 2, 5,-1,  &
+                                                     2, 3, 5,-1,  &
+                                                     3, 4, 5,-1,  &
+                                                     4, 1, 5,-1,  &
+                                                    -1,-1,-1,-1  /), (/6, 4/) )
+  ! cgns PENTA_6 cell faces nodal connections
+  integer, parameter, dimension(6, 4) :: face_penta_6 =                                     reshape( (/ 1, 2, 5, 4,  &
+                                                     2, 3, 6, 5,  &
+                                                     3, 1, 4, 6,  &
+                                                     1, 3, 2,-1,  &
+                                                     4, 5, 6,-1,  &
+                                                    -1,-1,-1,-1  /), (/6, 4/) )
+  ! cgns TETRA_4 cell faces nodal connections
+  integer, parameter, dimension(6, 4) :: face_tetra_4 =                                     reshape( (/ 1, 3, 2,-1,  &
+                                                     1, 2, 4,-1,  &
+                                                     2, 3, 4,-1,  &
+                                                     3, 1, 4,-1,  &
+                                                    -1,-1,-1,-1,  &
+                                                    -1,-1,-1,-1  /), (/6, 4/) )
+  !integer :: face (6,4)
+  integer, allocatable :: bc_face(:)
 !==============================================================================!
 
   ! Set input parameters
@@ -54,24 +89,32 @@
     !--------------------------------------------------------!
     do bc = 1, cgns_base(base) % block(block) % n_bnd_conds
 
+        print *, "trim(sect_name) ",trim(sect_name)
+        print *, "is inside"
+        print *, "trim(cgns_base(base) % block(block) % bnd_cond(bc) % name ", &
+        trim(cgns_base(base) % block(block) % bnd_cond(bc) % name)
+
       ! Allocate memory
       if ( ElementTypeName(cell_type) .eq. 'QUAD_4') n_nodes = 4
       if ( ElementTypeName(cell_type) .eq. 'TRI_3' ) n_nodes = 3
 
-      ! If ParentElements node is present
+      ! Array to store 2d cells connections
+      allocate(face_n(n_nodes, cnt))
+
+      ! If ParentElements node is present (provided in Read_Section_Info)
       if(parent_flag .eq. 1) then
 
-      !"For faces on the boundary of the domain, the second parent is set to zero"
-        allocate(parent_data(2*cnt, 2)) ! provided in Read_Section_Info
-        allocate(face_n(n_nodes, cnt))
+        !"For faces on the boundary of the domain,
+        ! the second parent is set to zero"
+        allocate(parent_data(2*cnt, 2))
 
         ! Read element data
         call Cg_Elements_Read_F(file_id,      & !(in )
                                 base_id,      & !(in )
                                 block_id,     & !(in )
                                 sect_id,      & !(in )
-                                face_n,  & !(out)
-                                parent_data,  & !parent data
+                                face_n,       & !(out)
+                                parent_data,  & !(out)
                                 error)          !(out)
 
         ! Fetch the data
@@ -94,9 +137,9 @@
         end if
 
         deallocate(face_n)
-      else
 
-        allocate(face_n(n_nodes, cnt))
+     ! no Parent Data is present
+      else
 
         ! Read element data
         call Cg_Elements_Read_F(file_id,  & !(in )
@@ -107,58 +150,73 @@
                                 NULL,     & !parent data
                                 error)      !(out)
 
-      ! If point of b.c. is inside this section -> this section is b.c.
-      k = 0
-      do j = 1, cgns_base(base) % block(block) % bnd_cond(bc) % n_nodes
-        ! Fetch received parameters
-        do loc = 1, cnt
-          if (loc .eq. &
-            cgns_base(base) % block(block) % bnd_cond(bc) % point_list(j)) then
+        ! If point of b.c. is inside this section -> this section is b.c.
+        k = 0
+        do i = first_cell, last_cell
+          do j = 1, cgns_base(base) % block(block) % bnd_cond(bc) % n_nodes
 
-            ! Set the number of nodes for this cell
-            cgns_base(base) % block(block) % bnd_cond(bc) % cells_n_nodes(j) = &
-              n_nodes
+            if( i .eq. &
+              cgns_base(base)%block(block) % bnd_cond(bc) % point_list(j) ) then
+              ! this b.c. cells belongs to section:
+            end if
 
-            ! Copy individual nodes beloning to this cell
-            do n = 1, n_nodes
-              cgns_base(base) % block(block) % bnd_cond(bc) % cells_n_nodes(j) = face_n(n, loc) + cnt_nodes
-          end if
+          end do
         end do
-      end do
 
-      if(verbose .and. k .ne. 0) then
-        print *, '#         ---------------------------------'
-        print *, '#         Bnd section name:  ', trim(sect_name)
-        print *, '#         ---------------------------------'
-        print *, '#         Bnd section index: ', sect
-        print *, '#         Bnd section type: ', ElementTypeName(cell_type)
-        print *, '#         Bnd condition color: ',   &
-                 cgns_base(base) % block(block) % bnd_cond(bc) % color
-        print *, '#         Number of faces: ', k
-        print *, '#         They belong to b.c.: ', &
-          trim(cgns_base(base) % block(block) % bnd_cond(bc) % name)
-      end if
+        allocate(bc_face(n_nodes))
 
-      print *, "n_nodes", n_nodes
-      print *, "cnt", cnt
-      print *, "face_n:"
-      do loc = 1, min(6, cnt)
-        print '(a8,4i7)', " ", (face_n(n,loc), n = 1, n_nodes)
-      end do
-
-      ! Update number of boundary cells in the block
-      cnt_block_bnd_cells = cnt_block_bnd_cells + k
-
-        ! Fetch the data
-        do loc = 1, cnt
-          cell = parent_data(loc, 1) + cnt_cells
-          dir  = parent_data(loc, 2)
-          grid % cells_bnd_color(dir, cell) =  &
-               cgns_base(base) % block(block) % bnd_cond(bc) % color
+        do i = 1, n_nodes ! from 1 to n_faces
+         bc_face(:) = face_n(:, i)
+          do j = 1, size(cell_n, 2) ! from 1 to n_cells
+            if     ( size(cell_n, 1) .eq. 8 ) then ! HEXA_8
+              print *, '! hex: '
+            elseif ( size(cell_n, 1) .eq. 5 ) then ! PYRA_5
+              print *, '! pyra: '
+            elseif ( size(cell_n, 1) .eq. 6 ) then ! PENTA_6
+              print *, '! penta: '
+            elseif ( size(cell_n, 1) .eq. 4 ) then ! TETRA_4
+              print *, '! tetra: '
+            end if
+          end do
         end do
+
+        if(verbose .and. k .ne. 0) then
+          print *, '#         ---------------------------------'
+          print *, '#         Bnd section name:  ', trim(sect_name)
+          print *, '#         ---------------------------------'
+          print *, '#         Bnd section index: ', sect
+          print *, '#         Bnd section type: ', ElementTypeName(cell_type)
+          print *, '#         Bnd condition color: ',   &
+                   cgns_base(base) % block(block) % bnd_cond(bc) % color
+          print *, '#         Number of faces: ', k
+          print *, '#         They belong to b.c.: ', &
+            trim(cgns_base(base) % block(block) % bnd_cond(bc) % name)
+        end if
+
+        print *, "face_n:"
+        do loc = 1, min(6, cnt)
+          print '(a8,4i7)', " ", (face_n(n,loc), n = 1, n_nodes)
+
+        end do
+
+        print *, "cell_n:"
+        do loc = 1, min(6, cnt)
+          print '(a9,8i7)', " ", (cell_n(n,loc), n = 1, size(cell_n, 1))
+
+        end do
+
+        stop
+
+
+        if(verbose .and. k .ne. 0) then
+          !do loc = 1, grid % cells_n_nodes(c)
+            !grid % cells_n(n, c)
+          !end do
+          
+        end if
 
         deallocate(face_n)
-        stop
+
       end if ! parent_flag .eq. 1
 
     end do ! bc

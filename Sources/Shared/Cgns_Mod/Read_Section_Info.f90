@@ -162,7 +162,7 @@
         print *, '#         Last cell:         ',  &
           cgns_base(base) % block(block) % section(sect) % last_cell
         print *, '#         Marked for deletion:     ', cgns_base(base) % &
-          block(block) % interface(int) % marked_for_deletion          
+          block(block) % interface(int) % marked_for_deletion
       end if
 
     end if

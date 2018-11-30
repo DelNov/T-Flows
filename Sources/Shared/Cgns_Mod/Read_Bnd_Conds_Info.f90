@@ -96,10 +96,10 @@
                       NormalList(:),  & ! (out)
                       error)            ! (out)
 
-    if (error .ne. 0) then
-      print *,"# Failed to read boundary conditions PointList"
-      call Cg_Error_Exit_F()
-    endif
+  if (error .ne. 0) then
+    print *,"# Failed to read boundary conditions PointList"
+    call Cg_Error_Exit_F()
+  endif
 
   ! Copy b.c. point list to Cgns_Block_Type structure
   if (trim(PointSetTypeName(bc_ptset_type)) .eq. 'PointList') then
