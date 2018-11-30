@@ -29,6 +29,7 @@
     type(Matrix_Type), allocatable :: d_lev(:)  ! preconditiong matrix
     type(Vector_Type), allocatable :: x_lev(:)  ! unknown vector
     type(Vector_Type), allocatable :: b_lev(:)  ! right hand side
+    type(Vector_Type), allocatable :: r_lev(:)  ! residual
 
   end type
 
@@ -45,5 +46,6 @@
   include 'Solver_Mod/Prec_Form.f90'
   include 'Solver_Mod/Prec_Solve.f90'
   include 'Solver_Mod/Residual_Vector.f90'
+  include 'Solver_Mod/Root_Mean_Square.f90'
 
   end module 
