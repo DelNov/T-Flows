@@ -8,7 +8,7 @@
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, c1, c2, nc, nc1, nc2, s, i, lev, lev_parts
-  integer              :: n_cells, arr_s, arr_e, val_1, val_2
+  integer              :: arr_s, arr_e, val_1, val_2
   integer              :: c_lev, c1_lev_c, c2_lev_c, s_lev
   integer, allocatable :: cell_mapping(:,:)
   integer, allocatable :: face_hits(:)
@@ -31,11 +31,10 @@
   allocate(cell_mapping(MAX_MG_LEVELS, i)); cell_mapping = 0
 
   do lev = 1, grid % n_levels - 1
-    n_cells = maxval(grid % level(lev) % cell(:))
     print '(a,i2,a,i2)', ' # ... levels', lev, ' and', lev+1
 
     ! Browse through parts of this level
-    do c_lev = 1, n_cells
+    do c_lev = 1, grid % level(lev) % n_cells
       do c = 1, grid % n_cells
         if(grid % level(lev) % cell(c) == c_lev) then
           if(cell_mapping(lev, c_lev) .eq. 0) then
