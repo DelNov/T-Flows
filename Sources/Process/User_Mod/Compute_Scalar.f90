@@ -210,14 +210,14 @@
        turbulence_model .ne. DNS) then
       pr_t1 = Turbulent_Prandtl_Number(grid, c1)
       pr_t2 = Turbulent_Prandtl_Number(grid, c2)
-      pr_t  = fw(s) * pr_t1 + (1.0 - fw(s)) * pr_t2
+      pr_t  = grid % fw(s) * pr_t1 + (1.0-grid % fw(s)) * pr_t2
     end if
 
     ! Gradients on the cell face 
     if(c2 > 0) then
-      phix_f1 = fw(s)*phi_x(c1) + (1.0-fw(s))*phi_x(c2) 
-      phiy_f1 = fw(s)*phi_y(c1) + (1.0-fw(s))*phi_y(c2)
-      phiz_f1 = fw(s)*phi_z(c1) + (1.0-fw(s))*phi_z(c2)
+      phix_f1 = grid % fw(s)*phi_x(c1) + (1.0-grid % fw(s))*phi_x(c2)
+      phiy_f1 = grid % fw(s)*phi_y(c1) + (1.0-grid % fw(s))*phi_y(c2)
+      phiz_f1 = grid % fw(s)*phi_z(c1) + (1.0-grid % fw(s))*phi_z(c2)
       phix_f2 = phix_f1 
       phiy_f2 = phiy_f1 
       phiz_f2 = phiz_f1 
@@ -377,12 +377,12 @@
 
         pr_t1 = Turbulent_Prandtl_Number(grid, c1)
         pr_t2 = Turbulent_Prandtl_Number(grid, c2)
-        pr_t  = fw(s) * pr_t1 + (1.0 - fw(s)) * pr_t2
+        pr_t  = grid % fw(s) * pr_t1 + (1.0-grid % fw(s)) * pr_t2
 
         if(c2 > 0) then
-          phix_f1 = fw(s)*phi_x(c1) + (1.0-fw(s))*phi_x(c2) 
-          phiy_f1 = fw(s)*phi_y(c1) + (1.0-fw(s))*phi_y(c2)
-          phiz_f1 = fw(s)*phi_z(c1) + (1.0-fw(s))*phi_z(c2)
+          phix_f1 = grid % fw(s)*phi_x(c1) + (1.0-grid % fw(s))*phi_x(c2)
+          phiy_f1 = grid % fw(s)*phi_y(c1) + (1.0-grid % fw(s))*phi_y(c2)
+          phiz_f1 = grid % fw(s)*phi_z(c1) + (1.0-grid % fw(s))*phi_z(c2)
           phix_f2 = phix_f1 
           phiy_f2 = phiy_f1 
           phiz_f2 = phiz_f1 
@@ -390,13 +390,13 @@
                   + (1. - grid % f(s)) * (capacity*vis_t(c2)/pr_t )
           con_eff2 = con_eff1 
         else
-          phix_f1 = phi_x(c1) 
-          phiy_f1 = phi_y(c1) 
-          phiz_f1 = phi_z(c1) 
+          phix_f1 = phi_x(c1)
+          phiy_f1 = phi_y(c1)
+          phiz_f1 = phi_z(c1)
           phix_f2 = phix_f1 
           phiy_f2 = phiy_f1 
           phiz_f2 = phiz_f1 
-          con_eff1 = capacity*vis_t(c1)/pr_t   
+          con_eff1 = capacity * vis_t(c1) / pr_t
           con_eff2 = con_eff1 
         end if
 
