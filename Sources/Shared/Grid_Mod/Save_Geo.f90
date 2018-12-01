@@ -1,13 +1,12 @@
 !==============================================================================!
-  subroutine Save_Geo(grid,        &
-                      sub,         &  ! subdomain
-                      nf_sub,      &  ! number of faces in the sub.
-                      nbf_sub)        ! number of buffer cells in sub.
+  subroutine Grid_Mod_Save_Geo(grid,        &
+                               sub,         &  ! subdomain
+                               nf_sub,      &  ! number of faces in the sub.
+                               nbf_sub)        ! number of buffer cells in sub.
 !------------------------------------------------------------------------------!
 !   Writes: name.geo                                                           !
 !----------------------------------[Modules]-----------------------------------!
   use Div_Mod
-  use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -17,10 +16,6 @@
   integer              :: c, s, n, c1, c2, var, subo
   character(len=80)    :: name_out
 !==============================================================================!
-!   sub     - subdomain number                                                 !
-!   nf_sub  - number of faces in subdomain, but without faces on buffer        !
-!   nbf_sub - number of buffer boundary faces in subdomain                     !
-!------------------------------------------------------------------------------!
 
   !----------------------!
   !                      !

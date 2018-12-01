@@ -3,9 +3,11 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Name_Mod, only: problem_name
-  use Grid_Mod, only: Grid_Type,                        &
-                      Grid_Mod_Sort_Faces_Smart,        &
-                      Grid_Mod_Calculate_Wall_Distance
+  use Grid_Mod, only: Grid_Type,                         &
+                      Grid_Mod_Sort_Faces_Smart,         &
+                      Grid_Mod_Calculate_Wall_Distance,  &
+                      Grid_Mod_Save_Cns,                 &
+                      Grid_Mod_Save_Geo
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Locals]-----------------------------------!
@@ -84,16 +86,16 @@
   !-------------------------------!
   !   Save files for processing   !
   !-------------------------------!
-  call Save_Cns(grid, 0,             &
-                grid % n_nodes,      &
-                grid % n_cells,      &
-                grid % n_faces,      &
-                grid % n_bnd_cells,  &
-                0)
+  call Grid_Mod_Save_Cns(grid, 0,             &
+                         grid % n_nodes,      &
+                         grid % n_cells,      &
+                         grid % n_faces,      &
+                         grid % n_bnd_cells,  &
+                         0)
 
-  call Save_Geo(grid, 0,         &
-                grid % n_faces,  &
-                0)
+  call Grid_Mod_Save_Geo(grid, 0,         &
+                         grid % n_faces,  &
+                         0)
 
   !-----------------------------------------------------!
   !   Save grid for visualisation and post-processing   !

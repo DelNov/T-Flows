@@ -68,18 +68,15 @@
   call Control_Mod_Problem_Name(problem_name)
 
   ! Load the finite volume grid
-  call Load_Cns(grid, this_proc)
+  call Grid_Mod_Load_Cns(grid, this_proc)
 
   ! Allocate memory for working arrays and comm.
   call Work_Mod_Allocate(grid, 30, 1, 1, 4)
   call Comm_Mod_Allocate(grid)
 
-  call Load_Geo(grid, this_proc)
+  call Grid_Mod_Load_Geo(grid, this_proc)
   call Comm_Mod_Create_Buffers(grid)
   call Comm_Mod_Load_Maps(grid)       ! maps should move to .cns file soon
-
-  ! This is actually pretty bad - this command should be in Load_Geo
-  call Comm_Mod_Exchange_Real(grid, grid % vol(-grid % n_bnd_cells))
 
   call Comm_Mod_Wait
 
@@ -122,7 +119,6 @@
   call Control_Mod_Point_For_Monitoring_Planes(bulk % xp,  &
                                                bulk % yp,  &
                                                bulk % zp)
-
   ! Prepare ...
   call Bulk_Mod_Monitoring_Planes_Areas(grid, bulk)
   call Grad_Mod_Find_Bad_Cells         (grid)

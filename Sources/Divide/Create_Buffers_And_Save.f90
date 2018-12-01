@@ -7,7 +7,9 @@
   use Div_Mod
   use Grid_Mod, only: Grid_Type,                     &
                       Grid_Mod_Sort_Cells_By_Index,  &
-                      Grid_Mod_Sort_Faces_By_Index
+                      Grid_Mod_Sort_Faces_By_Index,  &
+                      Grid_Mod_Save_Cns,             &
+                      Grid_Mod_Save_Geo
   use Sort_Mod  ! it's a collection of subroutines, no need for "only"
 !------------------------------------------------------------------------------!
   implicit none
@@ -250,18 +252,18 @@
     print '(a,i9,a)', ' # ', ncc_sub,           ' copy cell pairs'
     print '(a,i5,a)', ' #---------------------------------------------'
 
-    call Save_Cns(grid,         &
-                  sub,          &
-                  nn_sub,       &
-                  nc_sub,       &
-                  nf_sub,       &
-                  nbc_sub,      &
-                  nbf_sub)
+    call Grid_Mod_Save_Cns(grid,         &
+                           sub,          &
+                           nn_sub,       &
+                           nc_sub,       &
+                           nf_sub,       &
+                           nbc_sub,      &
+                           nbf_sub)
 
-    call Save_Geo(grid,         &
-                  sub,          &
-                  nf_sub,       &
-                  nbf_sub)
+    call Grid_Mod_Save_Geo(grid,         &
+                           sub,          &
+                           nf_sub,       &
+                           nbf_sub)
 
     call Save_Vtu_Cells(grid,       &
                         sub,        &

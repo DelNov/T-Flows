@@ -1,16 +1,15 @@
 !==============================================================================!
-  subroutine Save_Cns(grid,        &
-                      sub,         &  ! subdomain
-                      nn_sub,      &  ! number of nodes in the sub. 
-                      nc_sub,      &  ! number of cells in the sub. 
-                      nf_sub,      &  ! number of faces in the sub.
-                      nbc_sub,     &  ! number of bnd. cells in sub
-                      nbf_sub)        ! number of buffer cells in sub.
+  subroutine Grid_Mod_Save_Cns(grid,        &
+                               sub,         &  ! subdomain
+                               nn_sub,      &  ! number of nodes in the sub. 
+                               nc_sub,      &  ! number of cells in the sub. 
+                               nf_sub,      &  ! number of faces in the sub.
+                               nbc_sub,     &  ! number of bnd. cells in sub
+                               nbf_sub)        ! number of buffer cells in sub.
 !------------------------------------------------------------------------------!
 !   Writes: name.cns                                                           !
 !----------------------------------[Modules]-----------------------------------!
   use Div_Mod
-  use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -21,16 +20,6 @@
   integer           :: b, c, s, n, lev, item
   character(len=80) :: name_out
 !==============================================================================!
-!   The files name.cns and name.geo should merge into one file in some         !
-!   of the future releases.                                                    !
-!                                                                              !
-!   sub     - subdomain number                                                 !
-!   nn_sub  - number of nodes in subdomain                                     !
-!   nc_sub  - number of cells in subdomain                                     !
-!   nf_sub  - number of faces in subdomain, but without faces on buffer        !
-!   nbc_sub - number of physicall boundary cells in subdomain                  !
-!   nbf_sub - number of buffer boundary faces in subdomain                     !
-!------------------------------------------------------------------------------!
 
   !----------------------!
   !                      !

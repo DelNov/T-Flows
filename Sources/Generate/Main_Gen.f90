@@ -8,7 +8,9 @@
   use Grid_Mod,    only: Grid_Type,                         &
                          Grid_Mod_Sort_Faces_Smart,         &
                          Grid_Mod_Calculate_Wall_Distance,  &
-                         Grid_Mod_Coarsen
+                         Grid_Mod_Coarsen,                  &
+                         Grid_Mod_Save_Cns,                 &
+                         Grid_Mod_Save_Geo
   use Smooths_Mod, only: Smooths_Type
   use Refines_Mod, only: Refines_Type
 !------------------------------------------------------------------------------!
@@ -59,16 +61,17 @@
   !------------------------------!
   !   Save data for processing   !
   !------------------------------!
-  call Save_Cns(grid, 0,             &
-                grid % n_nodes,      &
-                grid % n_cells,      &
-                grid % n_faces,      &
-                grid % n_bnd_cells,  &
-                0)
+  call Grid_Mod_Save_Cns(grid, 0,             &
+                         grid % n_nodes,      &
+                         grid % n_cells,      &
+                         grid % n_faces,      &
+                         grid % n_bnd_cells,  &
+                         0)
 
-  call Save_Geo(grid, 0,             &
-                grid % n_faces,      &
-                0)
+  call Grid_Mod_Save_Geo(grid, 0,             &
+                         grid % n_faces,      &
+                         0)
+
   !-----------------------------------------------------!
   !   Save grid for visualisation and post-processing   !
   !-----------------------------------------------------!
@@ -83,7 +86,6 @@
   do lev = 1, grid % n_levels
     call Save_Vtu_Grid_Levels(grid, lev)
   end do
-
 
   ! Save links for checking
   call Save_Vtu_Links(grid, 0,             &
