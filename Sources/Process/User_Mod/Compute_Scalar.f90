@@ -256,11 +256,11 @@
                         + phiz_f2 * grid % sz(s))
 
     ! Implicit diffusive flux
-    f_im1 = con_eff1 * f_coef(s)          &
+    f_im1 = con_eff1 * a % fc(s)          &
           * (  phix_f1 * grid % dx(s)      &
              + phiy_f1 * grid % dy(s)      &
              + phiz_f1 * grid % dz(s) )
-    f_im2 = con_eff2 * f_coef(s)          &
+    f_im2 = con_eff2 * a % fc(s)          &
           * (  phix_f2 * grid % dx(s)      &
              + phiy_f2 * grid % dy(s)      &
              + phiz_f2 * grid % dz(s) )
@@ -273,8 +273,8 @@
 
     ! Calculate the coefficients for the sysytem matrix
 
-    a12 = con_eff1 * f_coef(s)
-    a21 = con_eff2 * f_coef(s)
+    a12 = con_eff1 * a % fc(s)
+    a21 = con_eff2 * a % fc(s)
 
     a12 = a12  - min(flux(s), 0.0) * capacity
     a21 = a21  + max(flux(s), 0.0) * capacity
@@ -409,19 +409,19 @@
                             + phiz_f2 * grid % sz(s))
 
         ! Implicit diffusive flux
-        f_im1 = con_eff1 * f_coef(s) *         &
+        f_im1 = con_eff1 * a % fc(s) *         &
                 (  phix_f1 * grid % dx(s)      &
                  + phiy_f1 * grid % dy(s)      &
                  + phiz_f1 * grid % dz(s) )
-        f_im2 = con_eff2 * f_coef(s) *         &
+        f_im2 = con_eff2 * a % fc(s) *         &
                 (  phix_f2 * grid % dx(s)      &
                  + phiy_f2 * grid % dy(s)      &
                  + phiz_f2 * grid % dz(s) )
 
-        b(c1) = b(c1) - con_eff1 * (phi % n(c2) - phi % n(c1)) * f_coef(s)  &
+        b(c1) = b(c1) - con_eff1 * (phi % n(c2) - phi % n(c1)) * a % fc(s)  &
               - f_ex1 + f_im1
         if(c2  > 0) then
-          b(c2) = b(c2) + con_eff1 * (phi % n(c2) - phi % n(c1)) * f_coef(s)  &
+          b(c2) = b(c2) + con_eff1 * (phi % n(c2) - phi % n(c1)) * a % fc(s)  &
                 + f_ex2 - f_im2
         end if
       end do
