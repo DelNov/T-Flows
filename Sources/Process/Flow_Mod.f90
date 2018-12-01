@@ -44,7 +44,7 @@
   real :: omega_x, omega_y, omega_z, omega
 
   ! Reference temperature
-  real :: t_ref, t_inf
+  real :: t_ref
 
   ! Heat and heat flux to the domain
   real :: heat, heat_flux

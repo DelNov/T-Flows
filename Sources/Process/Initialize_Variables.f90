@@ -233,7 +233,6 @@
           vals(0) = t_def;  t % n(c) = vals(Key_Ind('T', keys, nks))
           t % o(c)  = t % n(c)
           t % oo(c) = t % n(c)
-          t_inf     = t % n(c)
         end if
 
         if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
