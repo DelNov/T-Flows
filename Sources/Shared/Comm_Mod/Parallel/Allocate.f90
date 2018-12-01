@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Comm_Mod_Allocate_Memory(grid)
+  subroutine Comm_Mod_Allocate(grid)
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod
@@ -9,7 +9,7 @@
   type(Grid_Type) :: grid
 !==============================================================================!
 
-  allocate (grid % comm % buffer_index(grid % n_cells:-1))
+  allocate (grid % comm % buffer_index(grid % n_cells))
 
   grid % comm % buffer_index = 0
 

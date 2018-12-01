@@ -16,6 +16,7 @@
   use Var_Mod
   use Solver_Mod
   use Info_Mod
+  use Work_Mod, only: Work_Mod_Allocate
   use User_Mod
   use Control_Mod
   use Monitor_Mod
@@ -69,7 +70,10 @@
   ! Load the finite volume grid
   call Load_Cns(grid, this_proc)
 
-  call Allocate_Memory(grid)          ! memory for working arrays and comm.
+  ! Allocate memory for working arrays and comm.
+  call Work_Mod_Allocate(grid, 30, 1, 1, 4)
+  call Comm_Mod_Allocate(grid)
+
   call Load_Geo(grid, this_proc)
   call Comm_Mod_Create_Buffers(grid)
   call Comm_Mod_Load_Maps(grid)       ! maps should move to .cns file soon

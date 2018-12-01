@@ -240,19 +240,6 @@ $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
 
-#-- ./Allocate_Memory.f90
-$(DIR_OBJECT)/Allocate_Memory.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 \
-$(DIR_OBJECT)/Matrix_Mod.o \
-Matrix_Mod/*.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Flow_Mod.o \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
 #-- ./Matrix_Mod/Create_Level.f90
 #-- ./Matrix_Mod/Create.f90
 #-- ./Info_Mod/Bulk_Start.f90
@@ -1162,7 +1149,6 @@ $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
 
-#-- ./Solver_Mod/Allocate.f90
 #-- ./Solver_Mod/Bicg.f90
 $(DIR_OBJECT)/Bicg.o:\
 $(DIR_OBJECT)/Work_Mod.o \
@@ -1204,6 +1190,16 @@ $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_OBJECT)/Matrix_Mod.o \
 Matrix_Mod/*.f90 \
+$(DIR_SHARED)/Comm_Mod_Seq.f90 \
+$(DIR_SHARED)/Comm_Mod_Par.f90 \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 
+
+#-- ./Solver_Mod/Create.f90
+#-- ./Solver_Mod/Root_Mean_Square.f90
+$(DIR_OBJECT)/Root_Mean_Square.o:\
+$(DIR_OBJECT)/Matrix_Mod.o \
+Matrix_Mod/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -2172,6 +2168,11 @@ $(DIR_OBJECT)/Allocate_Integer_Cells.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
+#-- ./Work_Mod/Allocate.f90
+$(DIR_OBJECT)/Allocate.o:\
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 
+
 #-- ./Work_Mod/Allocate_Integer_Faces.f90
 $(DIR_OBJECT)/Allocate_Integer_Faces.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
@@ -2272,12 +2273,12 @@ $(DIR_OBJECT)/Exchange_Real.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
-#-- ./Comm_Mod/Sequential/Global_Max_Int.f90
-#-- ./Comm_Mod/Sequential/Allocate_Memory.f90
-$(DIR_OBJECT)/Allocate_Memory.o:\
+#-- ./Comm_Mod/Sequential/Allocate.f90
+$(DIR_OBJECT)/Allocate.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
+#-- ./Comm_Mod/Sequential/Global_Max_Int.f90
 #-- ./Comm_Mod/Sequential/Create_New_Types.f90
 $(DIR_OBJECT)/Create_New_Types.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
@@ -2330,12 +2331,12 @@ $(DIR_OBJECT)/Exchange_Real.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
-#-- ./Comm_Mod/Parallel/Global_Max_Int.f90
-#-- ./Comm_Mod/Parallel/Allocate_Memory.f90
-$(DIR_OBJECT)/Allocate_Memory.o:\
+#-- ./Comm_Mod/Parallel/Allocate.f90
+$(DIR_OBJECT)/Allocate.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
+#-- ./Comm_Mod/Parallel/Global_Max_Int.f90
 #-- ./Comm_Mod/Parallel/Create_New_Types.f90
 $(DIR_OBJECT)/Create_New_Types.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
