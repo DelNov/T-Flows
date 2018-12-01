@@ -14,9 +14,6 @@
   type(Grid_Type) :: grid
 !==============================================================================!
 
-  ! This fw somehow left hanging here, it should be somewhere else
-  allocate (fw(grid % n_faces));  fw = 0.0
-
   ! Working arrays
   call Work_Mod_Allocate_Real_Cells(grid, 32)
   call Work_Mod_Allocate_Real_Faces(grid,  1)

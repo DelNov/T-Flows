@@ -172,22 +172,24 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
-    vis_eff = viscosity + (fw(s)*vis_t(c1) + &
-      (1.0-fw(s))*vis_t(c2)) / phi % sigma
+    vis_eff = viscosity + (    grid % fw(s)  * vis_t(c1)         &
+                        + (1.0-grid % fw(s)) * vis_t(c2))        &
+                        / phi % sigma
 
-    if(turbulence_model .eq. SPALART_ALLMARAS .or.           &
-       turbulence_model .eq. DES_SPALART)                    &
-      vis_eff = viscosity                                    &
-              + (fw(s)*vis % n(c1)+(1.0-fw(s))*vis % n(c2)) / phi % sigma
+    if(turbulence_model .eq. SPALART_ALLMARAS .or.               &
+       turbulence_model .eq. DES_SPALART)                        &
+      vis_eff = viscosity + (    grid % fw(s)  * vis % n(c1)     &
+                          + (1.0-grid % fw(s)) * vis % n(c2))    &
+                          / phi % sigma
 
     if(turbulence_model .eq. HYBRID_LES_RANS) then
-      vis_eff = viscosity                                          &
-              + (fw(s)*vis_t_eff(c1) + (1.0-fw(s))*vis_t_eff(c2))  &
-              / phi % sigma
+      vis_eff = viscosity + (    grid % fw(s)  * vis_t_eff(c1)   &
+                          + (1.0-grid % fw(s)) * vis_t_eff(c2))  &
+                          / phi % sigma
     end if
-    phi_x_f = fw(s)*phi_x(c1) + (1.0-fw(s))*phi_x(c2)
-    phi_y_f = fw(s)*phi_y(c1) + (1.0-fw(s))*phi_y(c2)
-    phi_z_f = fw(s)*phi_z(c1) + (1.0-fw(s))*phi_z(c2)
+    phi_x_f = grid % fw(s) * phi_x(c1) + (1.0-grid % fw(s)) * phi_x(c2)
+    phi_y_f = grid % fw(s) * phi_y(c1) + (1.0-grid % fw(s)) * phi_y(c2)
+    phi_z_f = grid % fw(s) * phi_z(c1) + (1.0-grid % fw(s)) * phi_z(c2)
 
     if(turbulence_model .eq. K_EPS_ZETA_F    .or.  &
        turbulence_model .eq. HYBRID_LES_RANS .or.  &

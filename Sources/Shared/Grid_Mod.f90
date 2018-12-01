@@ -108,8 +108,10 @@
     ! Face coordinates 
     real, allocatable :: xf(:), yf(:), zf(:)
 
-    ! Face weight-factor
+    ! Face weight-factors: purely geometrical (f) and
+    ! adapted to near wall cells in the fluid phase (fw)
     real, allocatable :: f(:)
+    real, allocatable :: fw(:)
 
     !-------------------------!
     !  Node-based variables   !

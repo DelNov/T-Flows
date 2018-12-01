@@ -95,10 +95,9 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
-    phi_x_f = fw(s) * phi_x(c1) + (1.0 - fw(s)) * phi_x(c2)
-    phi_y_f = fw(s) * phi_y(c1) + (1.0 - fw(s)) * phi_y(c2)
-    phi_z_f = fw(s) * phi_z(c1) + (1.0 - fw(s)) * phi_z(c2)
-
+    phi_x_f = grid % fw(s) * phi_x(c1) + (1.0-grid % fw(s)) * phi_x(c2)
+    phi_y_f = grid % fw(s) * phi_y(c1) + (1.0-grid % fw(s)) * phi_y(c2)
+    phi_z_f = grid % fw(s) * phi_z(c1) + (1.0-grid % fw(s)) * phi_z(c2)
 
     ! Total (exact) diffusive flux
     f_ex = (  phi_x_f * grid % sx(s)   &

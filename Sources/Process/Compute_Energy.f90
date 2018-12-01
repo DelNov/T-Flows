@@ -209,22 +209,22 @@
        turbulence_model .ne. DNS) then
       pr_t1 = Turbulent_Prandtl_Number(grid, c1)
       pr_t2 = Turbulent_Prandtl_Number(grid, c2)
-      pr_t  = fw(s) * pr_t1 + (1.0 - fw(s)) * pr_t2
+      pr_t  = grid % fw(s) * pr_t1 + (1.0-grid % fw(s)) * pr_t2
     end if
 
     ! Gradients on the cell face (fw corrects situation close to the wall)
-    phix_f1 = fw(s)*phi_x(c1) + (1.0-fw(s))*phi_x(c2) 
-    phiy_f1 = fw(s)*phi_y(c1) + (1.0-fw(s))*phi_y(c2)
-    phiz_f1 = fw(s)*phi_z(c1) + (1.0-fw(s))*phi_z(c2)
+    phix_f1 = grid % fw(s)*phi_x(c1) + (1.0-grid % fw(s))*phi_x(c2) 
+    phiy_f1 = grid % fw(s)*phi_y(c1) + (1.0-grid % fw(s))*phi_y(c2)
+    phiz_f1 = grid % fw(s)*phi_z(c1) + (1.0-grid % fw(s))*phi_z(c2)
     phix_f2 = phix_f1
     phiy_f2 = phiy_f1
     phiz_f2 = phiz_f1
     if(turbulence_model .ne. NONE .and.  &
        turbulence_model .ne. DNS) then
-      con_eff1 =        fw(s)  * (conductivity+capacity*vis_t(c1)/pr_t)  &
-               + (1.0 - fw(s)) * (conductivity+capacity*vis_t(c2)/pr_t)
-      con_t    = fw(s) * capacity*vis_t(c1)/pr_t &
-               + (1.0 - fw(s)) * capacity*vis_t(c2)/pr_t
+      con_eff1 =      grid % fw(s)  * (conductivity+capacity*vis_t(c1)/pr_t)  &
+               + (1.0-grid % fw(s)) * (conductivity+capacity*vis_t(c2)/pr_t)
+      con_t    =      grid % fw(s)  * capacity*vis_t(c1)/pr_t &
+               + (1.0-grid % fw(s)) * capacity*vis_t(c2)/pr_t
     else
       con_eff1 = conductivity
     end if
@@ -277,12 +277,12 @@
 
       ! Turbulent heat fluxes according to GGDH scheme
       ! (first line is GGDH, second line is SGDH substratced 
-      ut_s =  (     fw(s)  * ut % n(c1)  &
-           +  (1. - fw(s)) * ut % n(c2))
-      vt_s =  (     fw(s)  * vt % n(c1)  &
-           +  (1. - fw(s)) * vt % n(c2))
-      wt_s =  (     fw(s)  * wt % n(c1)  &
-           +  (1. - fw(s)) * wt % n(c2))
+      ut_s =  (    grid % fw(s)  * ut % n(c1)   &
+           +  (1.0-grid % fw(s)) * ut % n(c2))
+      vt_s =  (    grid % fw(s)  * vt % n(c1)   &
+           +  (1.0-grid % fw(s)) * vt % n(c2))
+      wt_s =  (    grid % fw(s)  * wt % n(c1)   &
+           +  (1.0-grid % fw(s)) * wt % n(c2))
       t_stress = - (  ut_s * grid % sx(s)                    &
                     + vt_s * grid % sy(s)                    &
                     + wt_s * grid % sz(s) )                  &

@@ -247,11 +247,12 @@
 
     if(turbulence_model .ne. NONE .and.  &
        turbulence_model .ne. DNS) then
-      vis_eff = vis_eff + fw(s)*vis_t(c1)+(1.0-fw(s))*vis_t(c2)
+      vis_eff = vis_eff + grid % fw(s)*vis_t(c1)+(1.0-grid % fw(s))*vis_t(c2)
     end if
 
     if(turbulence_model .eq. HYBRID_LES_RANS) then
-      vis_eff = fw(s)*vis_t_eff(c1)+(1.0-fw(s))*vis_t_eff(c2) + viscosity
+      vis_eff =      grid % fw(s)  * vis_t_eff(c1)   &
+              + (1.0-grid % fw(s)) * vis_t_eff(c2) + viscosity
     end if
 
     if(c2 < 0) then
@@ -281,23 +282,23 @@
        turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
       if(turbulence_model_variant .ne. STABILIZED) then
         if(ui % name .eq. 'U') then
-          uu_f = fw(s) * uu % n(c1) + (1.0-fw(s)) * uu % n(c2)
-          uv_f = fw(s) * uv % n(c1) + (1.0-fw(s)) * uv % n(c2)
-          uw_f = fw(s) * uw % n(c1) + (1.0-fw(s)) * uw % n(c2)
+          uu_f = grid % fw(s) * uu % n(c1) + (1.0-grid % fw(s)) * uu % n(c2)
+          uv_f = grid % fw(s) * uv % n(c1) + (1.0-grid % fw(s)) * uv % n(c2)
+          uw_f = grid % fw(s) * uw % n(c1) + (1.0-grid % fw(s)) * uw % n(c2)
           f_stress = - (  uu_f * grid % sx(s)  &
                         + uv_f * grid % sy(s)  &
                         + uw_f * grid % sz(s) )
         else if(ui % name .eq. 'V') then
-          uv_f = fw(s) * uv % n(c1) + (1.0-fw(s)) * uv % n(c2)
-          vv_f = fw(s) * vv % n(c1) + (1.0-fw(s)) * vv % n(c2)
-          vw_f = fw(s) * vw % n(c1) + (1.0-fw(s)) * vw % n(c2)
+          uv_f = grid % fw(s) * uv % n(c1) + (1.0-grid % fw(s)) * uv % n(c2)
+          vv_f = grid % fw(s) * vv % n(c1) + (1.0-grid % fw(s)) * vv % n(c2)
+          vw_f = grid % fw(s) * vw % n(c1) + (1.0-grid % fw(s)) * vw % n(c2)
           f_stress =  - (  uv_f * grid % sx(s)  &
                          + vv_f * grid % sy(s)  &
                          + vw_f * grid % sz(s) )
         else if(ui % name .eq. 'W') then
-          uw_f = fw(s) * uw % n(c1) + (1.0-fw(s)) * uw % n(c2)
-          vw_f = fw(s) * vw % n(c1) + (1.0-fw(s)) * vw % n(c2)
-          ww_f = fw(s) * ww % n(c1) + (1.0-fw(s)) * ww % n(c2)
+          uw_f = grid % fw(s) * uw % n(c1) + (1.0-grid % fw(s)) * uw % n(c2)
+          vw_f = grid % fw(s) * vw % n(c1) + (1.0-grid % fw(s)) * vw % n(c2)
+          ww_f = grid % fw(s) * ww % n(c1) + (1.0-grid % fw(s)) * ww % n(c2)
           f_stress =  - (  uw_f * grid % sx(s)  &
                          + vw_f * grid % sy(s)  &
                          + ww_f * grid % sz(s) )
@@ -305,11 +306,11 @@
       end if
     end if
 
-    ui_i_f = fw(s)*ui_i(c1) + (1.0-fw(s))*ui_i(c2)
-    ui_j_f = fw(s)*ui_j(c1) + (1.0-fw(s))*ui_j(c2)
-    ui_k_f = fw(s)*ui_k(c1) + (1.0-fw(s))*ui_k(c2)
-    uj_i_f = fw(s)*uj_i(c1) + (1.0-fw(s))*uj_i(c2)
-    uk_i_f = fw(s)*uk_i(c1) + (1.0-fw(s))*uk_i(c2)
+    ui_i_f = grid % fw(s)*ui_i(c1) + (1.0-grid % fw(s))*ui_i(c2)
+    ui_j_f = grid % fw(s)*ui_j(c1) + (1.0-grid % fw(s))*ui_j(c2)
+    ui_k_f = grid % fw(s)*ui_k(c1) + (1.0-grid % fw(s))*ui_k(c2)
+    uj_i_f = grid % fw(s)*uj_i(c1) + (1.0-grid % fw(s))*uj_i(c2)
+    uk_i_f = grid % fw(s)*uk_i(c1) + (1.0-grid % fw(s))*uk_i(c2)
 
     ! Total (exact) viscous stress
     f_ex = vis_eff*(      2.0*ui_i_f  * si(s)      &
@@ -364,15 +365,15 @@
         c1 = grid % faces_c(1,s)
         c2 = grid % faces_c(2,s)
 
-        vis_tS = (fw(s)*vis_t(c1)+(1.0-fw(s))*vis_t(c2))
+        vis_tS = (grid % fw(s)*vis_t(c1)+(1.0-grid % fw(s))*vis_t(c2))
         a0 = f_coef(s)*vis_tS
         vis_eff = vis_tS
 
-        ui_i_f = fw(s) * ui_i(c1) + (1.0-fw(s)) * ui_i(c2)
-        ui_j_f = fw(s) * ui_j(c1) + (1.0-fw(s)) * ui_j(c2)
-        ui_k_f = fw(s) * ui_k(c1) + (1.0-fw(s)) * ui_k(c2)
-        uj_i_f = fw(s) * uj_i(c1) + (1.0-fw(s)) * uj_i(c2)
-        uk_i_f = fw(s) * uk_i(c1) + (1.0-fw(s)) * uk_i(c2)
+        ui_i_f = grid % fw(s) * ui_i(c1) + (1.0-grid % fw(s)) * ui_i(c2)
+        ui_j_f = grid % fw(s) * ui_j(c1) + (1.0-grid % fw(s)) * ui_j(c2)
+        ui_k_f = grid % fw(s) * ui_k(c1) + (1.0-grid % fw(s)) * ui_k(c2)
+        uj_i_f = grid % fw(s) * uj_i(c1) + (1.0-grid % fw(s)) * uj_i(c2)
+        uk_i_f = grid % fw(s) * uk_i(c1) + (1.0-grid % fw(s)) * uk_i(c2)
 
         f_ex = vis_eff*( 2.0*ui_i_f         * si(s) &
                           + (ui_j_f+uj_i_f) * sj(s) &

@@ -167,7 +167,9 @@
           ! This one is effective viscosity
           vis_wall(c1) = density*u_tau_l*u_tau_l*dely/abs(u_tan)
         else 
-          vis_wall(c1) = viscosity + fw(s)*vis_t(c1)+(1.0-fw(s))*vis_t(c2)
+          vis_wall(c1) = viscosity                      &
+                        +      grid % fw(s) *vis_t(c1)  &
+                        + (1.0-grid % fw(s))*vis_t(c2)
         end if
       end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL or WALLFL
     end if    ! c2 < 0

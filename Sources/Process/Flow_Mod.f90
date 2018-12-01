@@ -32,8 +32,7 @@
   logical :: buoyancy
 
   ! Geometrical staff 
-  real,allocatable :: f_coef(:)  ! face coefficient
-  real,allocatable :: fw(:)      ! weight factors for the fluid phase
+  real, allocatable :: f_coef(:)  ! face coefficient
 
   ! Mass fluxes, bulk velocities and pressure drops
   type(Bulk_Type) :: bulk
