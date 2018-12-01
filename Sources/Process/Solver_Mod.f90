@@ -37,11 +37,11 @@
 
   include 'Solver_Mod/Acm.f90'                  ! additive correction mg
   include 'Solver_Mod/Acm_Coarsen_Matrix.f90'   ! coarsen system matrix
-  include 'Solver_Mod/Allocate.f90'             ! memory allocation
   include 'Solver_Mod/Bicg.f90'                 ! bicg solver
   include 'Solver_Mod/Cg.f90'                   ! cg solver
   include 'Solver_Mod/Cg_Level.f90'             ! cg smoother for acm
   include 'Solver_Mod/Cgs.f90'                  ! cgs solver
+  include 'Solver_Mod/Create.f90'               ! memory all. and creation
   include 'Solver_Mod/Normalized_Root_Mean_Square.f90'
   include 'Solver_Mod/Prec_Form.f90'
   include 'Solver_Mod/Prec_Solve.f90'

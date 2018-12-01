@@ -200,7 +200,7 @@
                     + phiy_f * grid % sy(s)  &
                     + phiz_f * grid % sz(s) ) 
 
-    a0 = vis_eff * f_coef(s)
+    a0 = vis_eff * a % fc(s)
 
     ! Implicit diffusive flux
     ! (this is a very crude approximation: f_coef is
@@ -324,17 +324,17 @@
       f_ex = vis_eff * (  phix_f * grid % sx(s)  &
                         + phiy_f * grid % sy(s)  &
                         + phiz_f * grid % sz(s))
-      a0 = vis_eff * f_coef(s)
-      f_im = (   phix_f * grid % dx(s)      &
-               + phiy_f * grid % dy(s)      &
+      a0 = vis_eff * a % fc(s)
+      f_im = (   phix_f * grid % dx(s)        &
+               + phiy_f * grid % dy(s)        &
                + phiz_f * grid % dz(s)) * a0
 
-      b(c1) = b(c1)                                            &
-             - vis_eff * (phi % n(c2) - phi%n(c1)) * f_coef(s)  &
+      b(c1) = b(c1)                                             &
+             - vis_eff * (phi % n(c2) - phi%n(c1)) * a % fc(s)  &
              - f_ex + f_im
       if(c2  > 0) then
         b(c2) = b(c2)                                            &
-              + vis_eff * (phi % n(c2) - phi%n(c1)) * f_coef(s)  &
+              + vis_eff * (phi % n(c2) - phi%n(c1)) * a % fc(s)  &
               + f_ex - f_im
       end if
     end do

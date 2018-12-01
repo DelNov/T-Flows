@@ -40,6 +40,7 @@
 
     integer                  :: nonzeros  ! number of nonzero entries
     real,    allocatable     :: val(:)    ! value
+    real,    allocatable     :: fc (:)    ! bare matrix entry for face
     real,    allocatable     :: sav(:)    ! saved momentum diag. value
     integer, allocatable     :: col(:)    ! beginning of each row   
     integer, allocatable     :: row(:)    ! column positions

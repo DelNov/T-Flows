@@ -22,9 +22,6 @@
     grid % s(s) = sqrt(  grid % sx(s)*grid % sx(s)  &
                        + grid % sy(s)*grid % sy(s)  &
                        + grid % sz(s)*grid % sz(s) )
-    f_coef(s) = (  grid % sx(s)*grid % sx(s)  &
-                 + grid % sy(s)*grid % sy(s)  &
-                 + grid % sz(s)*grid % sz(s) )
   end do
 
   !-------------------------------------------------------!
@@ -45,11 +42,6 @@
     grid % dx(s) = xc2-xc1
     grid % dy(s) = yc2-yc1
     grid % dz(s) = zc2-zc1
-
-    f_coef(s) = f_coef(s)                    &
-             / (  grid % dx(s)*grid % sx(s)  &
-                + grid % dy(s)*grid % sy(s)  &
-                + grid % dz(s)*grid % sz(s))
   end do  ! faces 
 
   !--------------------------------------------!

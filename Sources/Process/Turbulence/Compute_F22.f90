@@ -104,7 +104,7 @@
             + phi_y_f * grid % sy(s)   &
             + phi_z_f * grid % sz(s) )
 
-    a0 = f_coef(s)
+    a0 = a % fc(s)
 
     ! Implicit diffusive flux
     f_im=(   phi_x_f * grid % dx(s)        &

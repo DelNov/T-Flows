@@ -69,16 +69,13 @@
   ! Load the finite volume grid
   call Load_Cns(grid, this_proc)
 
-  call Allocate_Memory(grid)
+  call Allocate_Memory(grid)          ! memory for working arrays and comm.
   call Load_Geo(grid, this_proc)
   call Comm_Mod_Create_Buffers(grid)
-  call Comm_Mod_Load_Maps(grid)     ! Maps should move to .cns file soon
+  call Comm_Mod_Load_Maps(grid)       ! maps should move to .cns file soon
 
   ! This is actually pretty bad - this command should be in Load_Geo
   call Comm_Mod_Exchange_Real(grid, grid % vol(-grid % n_bnd_cells))
-
-  ! Allocate memory for linear systems of equations
-  call Solver_Mod_Allocate(sol, grid)
 
   call Comm_Mod_Wait
 
@@ -89,6 +86,11 @@
   call Allocate_Variables(grid)
 
   call Calculate_Face_Geometry(grid)
+
+  ! Allocate memory for linear systems of equations
+  ! (You need face geomtry for this step)
+  call Solver_Mod_Create(sol, grid)
+
   call Load_Physical_Properties(grid)
 
   call Load_Boundary_Conditions(grid, backup)

@@ -214,7 +214,7 @@
                      + phi_y_f * grid % sy(s)  &
                      + phi_z_f * grid % sz(s) )
 
-    a0 = vis_eff * f_coef(s)
+    a0 = vis_eff * a % fc(s)
 
     ! Implicit diffusive flux
     ! (this is a very crude approximation: f_coef is

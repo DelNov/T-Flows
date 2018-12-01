@@ -120,11 +120,11 @@
     c2 = grid % faces_c(2,s)
     if(c2 > 0) then
       cfl_t = abs( dt * flux(s) / density /      &
-                   ( f_coef(s) *                 &
+                   ( a % fc(s) *                 &
                    (  grid % dx(s)*grid % dx(s)  &
                     + grid % dy(s)*grid % dy(s)  &
                     + grid % dz(s)*grid % dz(s)) ) )
-      pe_t  = abs( flux(s) / f_coef(s) / (viscosity / density + TINY) )
+      pe_t    = abs( flux(s) / a % fc(s) / (viscosity / density + TINY) )
       cfl_max = max( cfl_max, cfl_t ) 
       pe_max  = max( pe_max,  pe_t  ) 
     end if

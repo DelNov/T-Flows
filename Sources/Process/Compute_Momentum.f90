@@ -317,12 +317,12 @@
                     + (ui_j_f+uj_i_f) * sj(s)      &
                     + (ui_k_f+uk_i_f) * sk(s) )
 
-    a0 = vis_eff * f_coef(s)
+    a0 = vis_eff * a % fc(s)
 
     ! Implicit viscous stress
     f_im = (   ui_i_f*di(s)                &
              + ui_j_f*dj(s)                &
-             + ui_k_f*dk(s))*a0
+             + ui_k_f*dk(s)) * a0
 
     ! Cross diffusion part
     ui % c(c1) = ui % c(c1) + f_ex - f_im + f_stress * density
@@ -366,7 +366,7 @@
         c2 = grid % faces_c(2,s)
 
         vis_tS = (grid % fw(s)*vis_t(c1)+(1.0-grid % fw(s))*vis_t(c2))
-        a0 = f_coef(s)*vis_tS
+        a0 = a % fc(s)*vis_tS
         vis_eff = vis_tS
 
         ui_i_f = grid % fw(s) * ui_i(c1) + (1.0-grid % fw(s)) * ui_i(c2)
@@ -381,12 +381,12 @@
 
         f_im = (  ui_i_f * di(s)  &
                 + ui_j_f * dj(s)  &
-                + ui_k_f * dk(s)) * vis_eff * f_coef(s)
+                + ui_k_f * dk(s)) * vis_eff * a % fc(s)
 
-        b(c1) = b(c1) - vis_eff * (ui % n(c2) -ui % n(c1)) * f_coef(s)  &
+        b(c1) = b(c1) - vis_eff * (ui % n(c2) -ui % n(c1)) * a % fc(s)  &
               - f_ex + f_im
         if(c2  > 0) then
-          b(c2) = b(c2) + vis_eff * (ui % n(c2) -ui % n(c1)) * f_coef(s)  &
+          b(c2) = b(c2) + vis_eff * (ui % n(c2) -ui % n(c1)) * a % fc(s)  &
                 + f_ex - f_im
         end if
       end do

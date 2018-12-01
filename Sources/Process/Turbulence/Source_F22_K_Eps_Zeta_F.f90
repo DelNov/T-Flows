@@ -21,7 +21,6 @@
   real,              pointer :: b(:)
   integer                    :: s, c, c1, c2
   real                       :: sor_11, f22hg
-  real                       :: a0
 !==============================================================================!
 !                                                                              !
 !  The form of source terms are :                                              !
@@ -82,8 +81,7 @@
 
       ! Linearization of the near wall terms helps to get more  
        ! stable solution, especially for small wall distance.
-       a0 = f_coef(s)
-       b(c1) = b(c1) + a0 * f22 % n(c2)
+       b(c1) = b(c1) + a % fc(s) * f22 % n(c2)
      end if   ! end if of BC=wall
    end if    ! end if of c2<0
  end do

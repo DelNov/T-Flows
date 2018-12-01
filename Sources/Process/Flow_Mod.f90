@@ -31,9 +31,6 @@
   logical :: heat_transfer
   logical :: buoyancy
 
-  ! Geometrical staff 
-  real, allocatable :: f_coef(:)  ! face coefficient
-
   ! Mass fluxes, bulk velocities and pressure drops
   type(Bulk_Type) :: bulk
 

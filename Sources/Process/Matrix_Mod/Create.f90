@@ -21,6 +21,7 @@
   ! Allocate memory for matrix
   allocate(matrix % row(  grid % n_cells + 1));                matrix % row=0
   allocate(matrix % dia(  grid % n_cells));                    matrix % dia=0
+  allocate(matrix % fc (  grid % n_faces));                    matrix % fc =0.0
   allocate(matrix % sav( -grid % n_bnd_cells:grid % n_cells)); matrix % sav=0.0
   allocate(matrix % pos(2,grid % n_faces));                    matrix % pos=0
 
@@ -109,14 +110,24 @@
 
       ! Where is matrix(c1,c2) and ...
       do c = matrix % row(c1), matrix % row(c1+1)-1 
-        if(matrix % col(c)  .eq.  c2) matrix % pos(1, s) = c
+        if(matrix % col(c) .eq. c2) matrix % pos(1, s) = c
       end do
 
       ! Where is matrix(c2,c1) and ...
       do c=matrix % row(c2),matrix % row(c2+1)-1 
-        if(matrix % col(c)  .eq.  c1) matrix % pos(2, s) = c
+        if(matrix % col(c) .eq. c1) matrix % pos(2, s) = c
       end do
     end if
+  end do
+
+  ! Compute bare-bone coefficients for system matrix
+  do s = 1, grid % n_faces
+    matrix % fc(s) = (  grid % sx(s)*grid % sx(s)    &
+                      + grid % sy(s)*grid % sy(s)    &
+                      + grid % sz(s)*grid % sz(s) )  &
+                   / (  grid % dx(s)*grid % sx(s)    &
+                      + grid % dy(s)*grid % sy(s)    &
+                      + grid % dz(s)*grid % sz(s) )
   end do
 
   deallocate(stencw)
