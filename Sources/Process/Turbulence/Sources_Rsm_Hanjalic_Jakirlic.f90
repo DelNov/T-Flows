@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Sources_Rsm_Hanjalic_Jakirlic(grid, sol, name_phi, n_time_step)
+  subroutine Sources_Rsm_Hanjalic_Jakirlic(flow, sol, name_phi, n_time_step)
 !------------------------------------------------------------------------------!
 !   Calculate source terms for transport equations for Re stresses and         !
 !   dissipation for Hanjalic-Jakirlic model.                                   !  
@@ -35,32 +35,39 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)           :: grid
+  type(Field_Type),  target :: flow
   type(Solver_Type), target :: sol
   character(len=*)          :: name_phi
   integer                   :: n_time_step 
 !-----------------------------------[Locals]-----------------------------------!
+  type(Grid_Type),   pointer :: grid
+  type(Var_Type),    pointer :: u, v, w
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
-  integer :: c, s, c1, c2, i, icont
-  real    :: mag
-  real    :: a11, a22, a33, a12, a13, a23
-  real    :: s11, s22, s33, s12, s13, s23
-  real    :: v11, v22, v33, v12, v13, v23
-  real    :: n1,n2,n3,aa2,aa3,aa,re_t,ff2,fd,ff1,cc,c1w,c2w,f_w,uu_nn
-  real    :: e11,e12,e13,e21,e22,e23,e31,e32,e33
-  real    :: eps11,eps12,eps13,eps21,eps22,eps23,eps31,eps32,eps33
-  real    :: f_eps, phi2_nn, eps_over_kin
-  real    :: fss,e2,e3,ee,cc1,cc2
-  real    :: uxx, uyy, uzz, uxy, uxz, uyz, uyx, uzx, uzy
-  real    :: r13, r23
-  real    :: a_lk_s_lk, a_mn_a_mn
-  real    :: var1w_11, var1w_22, var1w_33, var1w_12, var1w_13, var1w_23
-  real    :: var2w_11, var2w_22, var2w_33, var2w_12, var2w_13, var2w_23
-  real    :: var1_11, var1_22, var1_33, var1_12, var1_13, var1_23
-  real    :: var2_11, var2_22, var2_33, var2_12, var2_13, var2_23
-  real    :: p11, p22, p33, p12, p13, p23, eps_1, eps_2
-  real    :: ff5, tkolm, kin_vis
+  integer                    :: c, s, c1, c2, i, icont
+  real                       :: mag
+  real                       :: a11, a22, a33, a12, a13, a23
+  real                       :: s11, s22, s33, s12, s13, s23
+  real                       :: v11, v22, v33, v12, v13, v23
+  real                       :: n1, n2, n3, aa2, aa3, aa, re_t
+  real                       :: ff2, fd, ff1, cc, c1w, c2w, f_w, uu_nn
+  real                       :: e11, e12, e13, e21, e22, e23, e31, e32, e33
+  real                       :: eps11, eps12, eps13
+  real                       :: eps21, eps22, eps23
+  real                       :: eps31, eps32, eps33
+  real                       :: f_eps, phi2_nn
+  real                       :: fss,e2,e3,ee,cc1,cc2
+  real                       :: uxx, uyy, uzz, uxy, uxz, uyz, uyx, uzx, uzy
+  real                       :: r13, r23
+  real                       :: a_lk_s_lk, a_mn_a_mn
+  real                       :: var1w_11, var1w_22, var1w_33
+  real                       :: var1w_12, var1w_13, var1w_23
+  real                       :: var2w_11, var2w_22, var2w_33
+  real                       :: var2w_12, var2w_13, var2w_23
+  real                       :: var1_11,var1_22,var1_33,var1_12,var1_13,var1_23
+  real                       :: var2_11,var2_22,var2_33,var2_12,var2_13,var2_23
+  real                       :: p11, p22, p33, p12, p13, p23, eps_1, eps_2
+  real                       :: ff5, tkolm, kin_vis
 !==============================================================================!
 !   Dimensions:                                                                !
 !                                                                              !
@@ -76,8 +83,12 @@
 ! but dens > 1 mod. not applied here yet
 
   ! Take aliases
-  a => sol % a
-  b => sol % b % val
+  grid => flow % pnt_grid
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+  a    => sol % a
+  b    => sol % b % val
 
   diss1 = 0.0
 
