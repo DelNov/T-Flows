@@ -1,23 +1,33 @@
 !==============================================================================!
-  subroutine Calculate_Mean(grid, n0, n1)
+  subroutine Calculate_Mean(flow, n0, n1)
 !------------------------------------------------------------------------------!
 !   Calculates time averaged velocity and velocity fluctuations.               !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Field_Mod
   use Les_Mod
   use Rans_Mod
-  use Grid_Mod
-  use Control_Mod
+  use Field_Mod, only: Field_Type, heat_transfer
+  use Grid_Mod,  only: Grid_Type
+  use Var_Mod,   only: Var_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
-  integer         :: n0, n1
+  type(Field_Type), target :: flow
+  integer                  :: n0, n1
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, n
+  type(Grid_Type), pointer :: grid
+  type(Var_Type),  pointer :: u, v, w, p, t
+  integer                  :: c, n
 !==============================================================================!
+
+  ! Take aliases
+  grid => flow % pnt_grid
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+  p    => flow % p
+  t    => flow % t
 
   if(.not. turbulence_statistics) return
 
