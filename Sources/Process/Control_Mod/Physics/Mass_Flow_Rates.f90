@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Control_Mod_Mass_Flow_Rates(verbose)
+  subroutine Control_Mod_Mass_Flow_Rates(bulk, verbose)
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Bulk_Mod,  only: Bulk_Type
-  use Field_Mod, only: bulk
+  use Bulk_Mod, only: Bulk_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  type(Bulk_Type)   :: bulk
   logical, optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   real :: def(3)

@@ -1,11 +1,12 @@
 !==============================================================================!
-  subroutine Control_Mod_Reference_Temperature(verbose)
+  subroutine Control_Mod_Reference_Temperature(field, verbose)
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Field_Mod, only: t_ref
+  use Field_Mod, only: Field_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  type(Field_Type)  :: field
   logical, optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   real :: def
@@ -14,6 +15,6 @@
   def = 20.0
 
   call Control_Mod_Read_Real_Item('REFERENCE_TEMPERATURE', def,  &
-                                   t_ref, verbose)
+                                   field % t_ref, verbose)
 
   end subroutine
