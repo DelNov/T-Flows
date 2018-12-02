@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Source_Kin_K_Eps(grid, sol)
+  subroutine Source_Kin_K_Eps(flow, sol)
 !------------------------------------------------------------------------------!
 !   Computes the source terms in kin transport equation for k-epsilon model    !
 !------------------------------------------------------------------------------!
@@ -16,18 +16,20 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)           :: grid
+  type(Field_Type),  target :: flow
   type(Solver_Type), target :: sol
 !---------------------------------[Calling]------------------------------------!
   real :: Y_Plus_Low_Re
   real :: Roughness_Coefficient
 !-----------------------------------[Locals]-----------------------------------!
+  type(Grid_Type),   pointer :: grid
+  type(Var_Type),    pointer :: u, v, w
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: c, c1, c2, s
   real                       :: u_tot2, u_nor, u_nor2, u_tan
   real                       :: kin_vis  ! [m^2/s]
-  real                       :: ebf, p_kin_int, p_kin_wf, u_tau_new
+  real                       :: ebf, p_kin_int, p_kin_wf
 !==============================================================================!
 !   Dimensions:                                                                !
 !                                                                              !
@@ -43,8 +45,12 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
-  a => sol % a
-  b => sol % b % val
+  grid => flow % pnt_grid
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+  a    => sol % a
+  b    => sol % b % val
 
   !-----------------------------------------!
   !   Compute the sources in the interior   !
