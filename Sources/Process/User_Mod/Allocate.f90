@@ -4,7 +4,8 @@
 !   This function allocates memory for user-defined variables.                 !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Grid_Mod
+  use Grid_Mod,   only: Grid_Type
+  use Control_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -12,6 +13,12 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer :: us, ua
 !==============================================================================!
+
+  !-----------------------------!
+  !   User scalars and arrays   !
+  !-----------------------------!
+  call Control_Mod_Number_Of_User_Scalars(n_user_scalars, verbose = .true.)
+  call Control_Mod_Number_Of_User_Arrays (n_user_arrays,  verbose = .true.)
 
   !--------------------------------------!
   !   Allocate memory for user scalars   !

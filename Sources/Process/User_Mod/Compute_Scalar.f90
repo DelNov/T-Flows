@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine User_Mod_Compute_Scalar(grid, sol, dt, ini, phi)
+  subroutine User_Mod_Compute_Scalar(flow, sol, dt, ini, phi)
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for use scalar.                          !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Field_Mod
+  use Field_Mod,    only: Field_Type, conductivity, capacity, density
   use Rans_Mod
   use Comm_Mod
   use Var_Mod
@@ -30,16 +30,18 @@
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
-  type(Grid_Type)   :: grid
+  type(Field_Type),  target :: flow
   type(Solver_Type), target :: sol
-  integer         :: ini
-  real            :: dt
-  type(Var_Type)  :: phi
+  integer                   :: ini
+  real                      :: dt
+  type(Var_Type)            :: phi
 !----------------------------------[Calling]-----------------------------------!
   real :: Turbulent_Prandtl_Number
 !-----------------------------------[Locals]-----------------------------------! 
+  type(Grid_Type),   pointer :: grid
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
+  real,              pointer :: flux(:)
   integer           :: n, c, s, c1, c2, niter, mat, row, col
   real              :: a0, a12, a21
   real              :: ini_res, tol, ns
@@ -85,8 +87,10 @@
 !==============================================================================!
 
   ! Take aliases
-  a => sol % a
-  b => sol % b % val
+  grid => flow % pnt_grid
+  flux => flow % flux
+  a    => sol % a
+  b    => sol % b % val
 
   do n = 1, a % row(grid % n_cells+1) ! to je broj nonzero + 1
     a % val(n) = 0.0
