@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Calculate_Shear_And_Vorticity(grid)
+  subroutine Calculate_Shear_And_Vorticity(flow)
 !------------------------------------------------------------------------------!
 !   Computes the magnitude of the shear stress.                                !
 !------------------------------------------------------------------------------!
@@ -7,18 +7,28 @@
 !   Sij = 1/2 ( dUi/dXj + dUj/dXi )                                            !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Field_Mod
   use Comm_Mod
   use Les_Mod
   use Rans_Mod
   use Grad_Mod
-  use Grid_Mod
+  use Field_Mod, only: Field_Type
+  use Grid_Mod,  only: Grid_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Field_Type), target :: flow
+!-----------------------------------[Locals]-----------------------------------!
+  type(Grid_Type), pointer :: grid
+  type(Var_Type),  pointer :: u, v, w
 !==============================================================================!
-  
+
+  ! Take aliases
+  grid => flow % pnt_grid
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+
+  ! Refresh buffers (probably an overkill)
   call Comm_Mod_Exchange_Real(grid, u % n)
   call Comm_Mod_Exchange_Real(grid, v % n)
   call Comm_Mod_Exchange_Real(grid, w % n)

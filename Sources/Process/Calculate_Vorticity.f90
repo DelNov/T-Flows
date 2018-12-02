@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Calculate_Vorticity(grid)
+  subroutine Calculate_Vorticity(flow)
 !------------------------------------------------------------------------------!
 !  Computes the magnitude of the vorticity                                     !
 !------------------------------------------------------------------------------!
@@ -13,43 +13,42 @@
   use Rans_Mod
   use Grid_Mod
   use Grad_Mod
-  use Work_Mod, only: u_x => r_cell_01,  &
-                      u_y => r_cell_02,  &
-                      u_z => r_cell_03,  &
-                      v_x => r_cell_04,  &
-                      v_y => r_cell_05,  &
-                      v_z => r_cell_06,  &
-                      w_x => r_cell_07,  &
-                      w_y => r_cell_08,  &
-                      w_z => r_cell_09
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Field_Type), target :: flow
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c
+  type(Grid_Type), pointer :: grid
+  type(Var_Type),  pointer :: u, v, w
+  integer                  :: c
 !==============================================================================!
+
+  ! Take aliases
+  grid => flow % pnt_grid
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
 
   call Comm_Mod_Exchange_Real(grid, u % n)
   call Comm_Mod_Exchange_Real(grid, v % n)
   call Comm_Mod_Exchange_Real(grid, w % n)
 
-  call Grad_Mod_For_Phi(grid, u % n, 1, u_x, .true.)  ! du/dx
-  call Grad_Mod_For_Phi(grid, u % n, 2, u_y, .true.)  ! du/dy
-  call Grad_Mod_For_Phi(grid, u % n, 3, u_z, .true.)  ! du/dz
+  call Grad_Mod_For_Phi(grid, u % n, 1, u % x, .true.)  ! du/dx
+  call Grad_Mod_For_Phi(grid, u % n, 2, u % y, .true.)  ! du/dy
+  call Grad_Mod_For_Phi(grid, u % n, 3, u % z, .true.)  ! du/dz
 
-  call Grad_Mod_For_Phi(grid, v % n, 1, v_x, .true.)  ! dv/dx
-  call Grad_Mod_For_Phi(grid, v % n, 2, v_y, .true.)  ! dv/dy
-  call Grad_Mod_For_Phi(grid, v % n, 3, v_z, .true.)  ! dv/dz
+  call Grad_Mod_For_Phi(grid, v % n, 1, v % x, .true.)  ! dv/dx
+  call Grad_Mod_For_Phi(grid, v % n, 2, v % y, .true.)  ! dv/dy
+  call Grad_Mod_For_Phi(grid, v % n, 3, v % z, .true.)  ! dv/dz
 
-  call Grad_Mod_For_Phi(grid, w % n, 1, w_x, .true.)  ! dw/dx
-  call Grad_Mod_For_Phi(grid, w % n, 2, w_y, .true.)  ! dw/dy
-  call Grad_Mod_For_Phi(grid, w % n, 3, w_z, .true.)  ! dw/dz
+  call Grad_Mod_For_Phi(grid, w % n, 1, w % x, .true.)  ! dw/dx
+  call Grad_Mod_For_Phi(grid, w % n, 2, w % y, .true.)  ! dw/dy
+  call Grad_Mod_For_Phi(grid, w % n, 3, w % z, .true.)  ! dw/dz
 
   do c = 1, grid % n_cells
-    vort(c) = 2.0 * (0.5 * (w_y(c) - v_z(c)))**2  &
-            + 2.0 * (0.5 * (w_x(c) - u_z(c)))**2  &
-            + 2.0 * (0.5 * (v_x(c) - u_y(c)))**2
+    vort(c) = 2.0 * (0.5 * (w % y(c) - v % z(c)))**2  &
+            + 2.0 * (0.5 * (w % x(c) - u % z(c)))**2  &
+            + 2.0 * (0.5 * (v % x(c) - u % y(c)))**2
 
     vort(c) = sqrt(abs(2.0 * vort(c)))
   end do
