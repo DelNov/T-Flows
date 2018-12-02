@@ -1,27 +1,40 @@
 !==============================================================================!
-  subroutine Convective_Outflow(grid, dt)
+  subroutine Convective_Outflow(flow, bulk, dt)
 !------------------------------------------------------------------------------!
 !   Extrapoloate variables on the boundaries where needed.                     !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Field_Mod
+  use Field_Mod, only: Field_Type, heat_transfer, density
   use Rans_Mod
-  use Grid_Mod
+  use Grid_Mod,  only: Grid_Type
+  use Bulk_Mod,  only: Bulk_Type
   use Grad_Mod
   use Bulk_Mod
   use Control_Mod
-  use Work_Mod, only: t_x => r_cell_01,  &
-                      t_y => r_cell_02,  &
-                      t_z => r_cell_03           
+  use Work_Mod,  only: t_x => r_cell_01,  &
+                       t_y => r_cell_02,  &
+                       t_z => r_cell_03
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
-  real            :: dt
+  type(Field_Type), target :: flow
+  type(Bulk_Type)          :: bulk
+  real                     :: dt
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c1, c2, s
+  type(Grid_Type), pointer :: grid
+  type(Var_Type),  pointer :: u, v, w, t
+  real,            pointer :: flux(:)
+  integer                  :: c1, c2, s
 !==============================================================================!
+
+  ! Take aliases
+  grid => flow % pnt_grid
+  flux => flow % flux
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+  t    => flow % t
 
   call Bulk_Mod_Compute_Fluxes(grid, bulk, flux)
 

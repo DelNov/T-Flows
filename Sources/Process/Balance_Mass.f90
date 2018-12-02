@@ -1,22 +1,35 @@
 !==============================================================================!
-  subroutine Balance_Mass(grid)
+  subroutine Balance_Mass(flow, bulk)
 !------------------------------------------------------------------------------!
 !   Modifies the fluxes at outflow boundaries to conserve the mass.            ! 
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Field_Mod
   use Comm_Mod
-  use Grid_Mod
-  use Bulk_Mod
+  use Grid_Mod,  only: Grid_Type, Grid_Mod_Bnd_Cond_Type,  &
+                       INFLOW, OUTFLOW, CONVECT, PRESSURE
+  use Field_Mod, only: Field_Type, density
+  use Var_Mod,   only: Var_Type
+  use Bulk_Mod,  only: Bulk_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Field_Type), target :: flow
+  type(Bulk_Type)          :: bulk
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: s, c1, c2
-  real    :: fac
+  type(Grid_Type), pointer :: grid
+  type(Var_Type),  pointer :: u, v, w
+  real,            pointer :: flux(:)
+  integer                  :: s, c1, c2
+  real                     :: fac
 !==============================================================================!
+
+  ! Take aliases
+  grid => flow % pnt_grid
+  flux => flow % flux
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
 
   !--------------------------------------!
   !   Calculate the inflow mass fluxes   !
