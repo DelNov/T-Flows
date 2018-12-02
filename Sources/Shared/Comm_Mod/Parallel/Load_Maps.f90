@@ -11,7 +11,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: c, s         
+  integer           :: c
   character(len=80) :: name_in
 !==============================================================================!
 !   There is an issue with this procedure, but it's more related to MPI/IO     !
