@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Turbulent(grid, sol, dt, ini, phi, n_step)
+  subroutine Compute_Turbulent(flow, sol, dt, ini, phi, n_step)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves transport equations for different turbulent         !
 !   variables.                                                                 !
@@ -25,27 +25,30 @@
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Grid_Type)           :: grid
+  type(Field_Type),  target :: flow
   type(Solver_Type), target :: sol
   real                      :: dt
   integer                   :: ini
   type(Var_Type)            :: phi
   integer                   :: n_step
 !----------------------------------[Locals]------------------------------------!
+  type(Grid_Type),   pointer :: grid
+  type(Var_Type),    pointer :: u, v, w
+  real,              pointer :: flux(:)
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
-  integer           :: s, c, c1, c2, niter
-  real              :: f_ex, f_im
-  real              :: phis
-  real              :: a0, a12, a21
-  real              :: ini_res, tol
-  real              :: vis_eff
-  real              :: phi_x_f, phi_y_f, phi_z_f
-  character(len=80) :: precond
-  integer           :: adv_scheme   ! advection scheme
-  real              :: blend        ! blending coeff (1.0 central; 0.0 upwind)
-  integer           :: td_scheme    ! time-disretization for inerita
-  real              :: urf          ! under-relaxation factor
+  integer                    :: s, c, c1, c2, niter
+  real                       :: f_ex, f_im
+  real                       :: phis
+  real                       :: a0, a12, a21
+  real                       :: ini_res, tol
+  real                       :: vis_eff
+  real                       :: phi_x_f, phi_y_f, phi_z_f
+  character(len=80)          :: precond
+  integer                    :: adv_scheme  ! advection scheme
+  real                       :: blend       ! blending (1.0 central; 0.0 upwind)
+  integer                    :: td_scheme   ! time-disretization for inerita
+  real                       :: urf         ! under-relaxation factor
 !==============================================================================!
 !                                                                              !
 !  The form of equations which are solved:                                     !
@@ -59,8 +62,13 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
-  a => sol % a
-  b => sol % b % val
+  grid => flow % pnt_grid
+  flux => flow % flux
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+  a    => sol  % a
+  b    => sol  % b % val
 
   ! Initialize matrix and right hand side
   a % val(:) = 0.0
@@ -116,7 +124,7 @@
 
       ! Compute phis with desired advection scheme
       if(adv_scheme .ne. CENTRAL) then
-        call Advection_Scheme(grid, phis, s, phi % n, phi_min, phi_max,  &
+        call Advection_Scheme(flow, phis, s, phi % n, phi_min, phi_max,  &
                               phi_x, phi_y, phi_z,                       &
                               grid % dx, grid % dy, grid % dz,           &
                               adv_scheme, blend)
@@ -296,14 +304,14 @@
   !                                     !
   !-------------------------------------!
   if(turbulence_model .eq. K_EPS) then
-    if(phi % name .eq. 'KIN') call Source_Kin_K_Eps(grid, sol)
-    if(phi % name .eq. 'EPS') call Source_Eps_K_Eps(grid, sol)
+    if(phi % name .eq. 'KIN') call Source_Kin_K_Eps(flow, sol)
+    if(phi % name .eq. 'EPS') call Source_Eps_K_Eps(flow, sol)
   end if
 
   if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
      turbulence_model .eq. HYBRID_LES_RANS) then
-    if(phi % name .eq. 'KIN')  call Source_Kin_K_Eps_Zeta_F(grid, sol)
-    if(phi % name .eq. 'EPS')  call Source_Eps_K_Eps_Zeta_F(grid, sol)
+    if(phi % name .eq. 'KIN')  call Source_Kin_K_Eps_Zeta_F(flow, sol)
+    if(phi % name .eq. 'EPS')  call Source_Eps_K_Eps_Zeta_F(flow, sol)
     if(phi % name .eq. 'ZETA') call Source_Zeta_K_Eps_Zeta_F(grid, sol, n_step)
   end if
 
