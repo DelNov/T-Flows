@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Results(grid, name_save)
+  subroutine Save_Results(flow, name_save)
 !------------------------------------------------------------------------------!
 !   Writes results in VTU file format (for VisIt and Paraview)                 !
 !------------------------------------------------------------------------------!
@@ -28,11 +28,12 @@
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Grid_Type)  :: grid
-  character(len=*) :: name_save
+  type(Field_Type), target :: flow
+  character(len=*)         :: name_save
 !----------------------------------[Locals]------------------------------------!
-  integer           :: c, n, offset
-  character(len=80) :: name_out_8, name_out_9, store_name
+  type(Grid_Type), pointer :: grid
+  integer                  :: c, n, offset
+  character(len=80)        :: name_out_8, name_out_9, store_name
 !-----------------------------[Local parameters]-------------------------------!
   integer, parameter :: VTK_TETRA      = 10  ! cell shapes in VTK format
   integer, parameter :: VTK_HEXAHEDRON = 12
@@ -45,6 +46,9 @@
   character(len= 8)  :: IN_4 = '        '
   character(len=10)  :: IN_5 = '          '
 !==============================================================================!
+
+  ! Take aliases
+  grid => flow % pnt_grid
 
   ! Store the name
   store_name = problem_name
@@ -215,18 +219,18 @@
   !   Velocity   !
   !--------------!
   call Save_Vtu_Vector(grid, IN_4, IN_5, "Velocity",  &
-                       u % n(1), v % n(1), w % n(1))
+                       flow % u % n(1), flow % v % n(1), flow % w % n(1))
 
   !--------------!
   !   Pressure   !
   !--------------!
-  call Save_Vtu_Scalar(grid, IN_4, IN_5, "Pressure", p % n(1))
+  call Save_Vtu_Scalar(grid, IN_4, IN_5, "Pressure", flow % p % n(1))
 
   !-----------------!
   !   Temperature   !
   !-----------------!
   if(heat_transfer) then
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "Temperature", t % n(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "Temperature", flow % t % n(1))
   end if
 
   !--------------------------!
@@ -290,14 +294,16 @@
      turbulence_model .eq. DES_SPALART     .or.  &
      turbulence_model .eq. HYBRID_LES_RANS) then
     call Save_Vtu_Vector(grid, IN_4, IN_5, "MeanVelocity",  &
-                                u % mean(1), v % mean(1), w % mean(1))
+                                           flow % u % mean(1),  &
+                                           flow % v % mean(1),  &
+                                           flow % w % mean(1))
     do c = 1, grid % n_cells
-      uu_mean(c) = uu % mean(c) - u % mean(c) * u % mean(c)
-      vv_mean(c) = vv % mean(c) - v % mean(c) * v % mean(c)
-      ww_mean(c) = ww % mean(c) - w % mean(c) * w % mean(c)
-      uv_mean(c) = uv % mean(c) - u % mean(c) * v % mean(c)
-      uw_mean(c) = uw % mean(c) - u % mean(c) * w % mean(c)
-      vw_mean(c) = vw % mean(c) - v % mean(c) * w % mean(c)
+      uu_mean(c) = uu % mean(c) - flow % u % mean(c) * flow % u % mean(c)
+      vv_mean(c) = vv % mean(c) - flow % v % mean(c) * flow % v % mean(c)
+      ww_mean(c) = ww % mean(c) - flow % w % mean(c) * flow % w % mean(c)
+      uv_mean(c) = uv % mean(c) - flow % u % mean(c) * flow % v % mean(c)
+      uw_mean(c) = uw % mean(c) - flow % u % mean(c) * flow % w % mean(c)
+      vw_mean(c) = vw % mean(c) - flow % v % mean(c) * flow % w % mean(c)
     end do
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressXX", uu_mean(1))
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressYY", vv_mean(1))
@@ -306,12 +312,13 @@
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressXZ", uw_mean(1))
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressYZ", vw_mean(1))
     if(heat_transfer) then
-      call Save_Vtu_Scalar(grid, IN_4, IN_5, "TemperatureMean", t % mean(1))
+      call Save_Vtu_Scalar(grid, IN_4, IN_5, "TemperatureMean",  &
+                                             flow % t % mean(1))
       do c = 1, grid % n_cells
-        tt_mean(c) = tt % mean(c) - t % mean(c) * t % mean(c)
-        ut_mean(c) = ut % mean(c) - u % mean(c) * t % mean(c)
-        vt_mean(c) = vt % mean(c) - v % mean(c) * t % mean(c)
-        wt_mean(c) = wt % mean(c) - w % mean(c) * t % mean(c)
+        tt_mean(c) = tt % mean(c) - flow % t % mean(c) * flow % t % mean(c)
+        ut_mean(c) = ut % mean(c) - flow % u % mean(c) * flow % t % mean(c)
+        vt_mean(c) = vt % mean(c) - flow % v % mean(c) * flow % t % mean(c)
+        wt_mean(c) = wt % mean(c) - flow % w % mean(c) * flow % t % mean(c)
       end do
       call Save_Vtu_Scalar(grid, IN_4, IN_5, "TemperatureFluctuations",  &
                                  tt_mean(1))

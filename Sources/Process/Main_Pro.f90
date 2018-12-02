@@ -4,19 +4,20 @@
 !   Unstructured finite volume 'LES'/RANS solver.                              !
 !------------------------------------------------------------------------------!
 !---------------------------------[Modules]------------------------------------!
-  use Name_Mod, only: problem_name
   use Const_Mod
-  use Field_Mod
-  use Les_Mod
   use Comm_Mod
+  use Name_Mod,   only: problem_name
+  use Field_Mod,  only: Field_Type, Field_Mod_Allocate, heat_transfer
+  use Les_Mod
   use Rans_Mod
   use Grid_Mod
   use Grad_Mod
-  use Bulk_Mod
-  use Var_Mod
+  use Bulk_Mod,   only: Bulk_Type, Bulk_Mod_Compute_Fluxes,  &
+                        Bulk_Mod_Monitoring_Planes_Areas
+  use Var_Mod,    only: Var_Type
   use Solver_Mod
   use Info_Mod
-  use Work_Mod, only: Work_Mod_Allocate
+  use Work_Mod,   only: Work_Mod_Allocate
   use User_Mod
   use Control_Mod
   use Monitor_Mod
@@ -31,6 +32,8 @@
   character(len=80) :: name_save
   logical           :: backup, save_now, exit_now
   type(Grid_Type)   :: grid        ! grid used in computations
+  type(Bulk_Type)   :: bulk        ! bulk velocities, pressure drops, etc.
+  type(Field_Type)  :: flow        ! flow field we will be solving for
   type(Solver_Type) :: sol         ! linear solvers
   real              :: time        ! physical time
   real              :: dt          ! time step
@@ -84,7 +87,12 @@
   call Control_Mod_Number_Of_Time_Steps(last_dt, verbose=.true.)
   call Control_Mod_Starting_Time_Step_For_Statistics(n_stat, verbose=.true.)
 
-  call Allocate_Variables(grid)
+  ! Allocate memory for all variables
+  call Control_Mod_Heat_Transfer(verbose = .true.)
+  call Field_Mod_Allocate(flow, grid)
+  call Grad_Mod_Allocate(grid)
+  call Turbulence_Allocate(flow)
+  call User_Mod_Allocate(grid)
 
   call Calculate_Face_Geometry(grid)
 
@@ -94,18 +102,20 @@
 
   call Load_Physical_Properties(grid)
 
-  call Load_Boundary_Conditions(grid, backup)
+  call Load_Boundary_Conditions(flow, backup)
 
   ! First time step is one, unless read from backup otherwise
   first_dt = 0
-  call Backup_Mod_Load(grid, first_dt, n_stat, backup)  ! "backup" can change
+
+  ! Read backup file if directed so, and set the "backup" to .true. or .false.
+  call Backup_Mod_Load(flow, bulk, first_dt, n_stat, backup) 
 
   ! Read physical models from control file
-  call Read_Physical(grid, backup)
+  call Read_Physical(flow, bulk, backup)
 
   ! Initialize variables
   if(.not. backup) then
-    call Initialize_Variables(grid)
+    call Initialize_Variables(flow, bulk)
     call Comm_Mod_Wait
   end if
 
@@ -116,9 +126,8 @@
   call Monitor_Mod_Initialize(grid, backup)
 
   ! Plane for calcution of overall mass fluxes
-  call Control_Mod_Point_For_Monitoring_Planes(bulk % xp,  &
-                                               bulk % yp,  &
-                                               bulk % zp)
+  call Control_Mod_Point_For_Monitoring_Planes(bulk)
+
   ! Prepare ...
   call Bulk_Mod_Monitoring_Planes_Areas(grid, bulk)
   call Grad_Mod_Find_Bad_Cells         (grid)
@@ -157,14 +166,14 @@
 
   ! It will save results in .vtk or .cgns file format,
   ! depending on how the code was compiled
-  call Save_Results(grid, problem_name)
+  call Save_Results(flow, problem_name)
 
   do n = first_dt + 1, last_dt
 
     time = time + dt
 
     ! Beginning of time steo
-    call User_Mod_Beginning_Of_Time_Step(grid, n, time)
+    call User_Mod_Beginning_Of_Time_Step(flow, n, time)
 
     ! Start info boxes.
     call Info_Mod_Time_Start()
@@ -177,28 +186,28 @@
     call Info_Mod_Time_Print()
 
     if(turbulence_model .eq. DES_SPALART) then
-      call Calculate_Shear_And_Vorticity(grid)
-      call Calculate_Vorticity (grid)
+      call Calculate_Shear_And_Vorticity(flow)
+      call Calculate_Vorticity (flow)
     end if
 
     if(turbulence_model .eq. LES_SMAGORINSKY .or.  &
        turbulence_model .eq. LES_DYNAMIC     .or.  &
        turbulence_model .eq. LES_WALE) then
-      call Calculate_Shear_And_Vorticity(grid)
-      if(turbulence_model .eq. LES_DYNAMIC) call Calculate_Sgs_Dynamic(grid,sol)
-      if(turbulence_model .eq. LES_WALE)    call Calculate_Sgs_Wale(grid)
-      call Calculate_Sgs(grid)
+      call Calculate_Shear_And_Vorticity(flow)
+      if(turbulence_model .eq. LES_DYNAMIC) call Calculate_Sgs_Dynamic(flow,sol)
+      if(turbulence_model .eq. LES_WALE)    call Calculate_Sgs_Wale(flow)
+      call Calculate_Sgs(flow)
     end if
 
     If(turbulence_model .eq. HYBRID_LES_RANS) then
-      call Calculate_Sgs_Dynamic(grid,sol)
+      call Calculate_Sgs_Dynamic(flow,sol)
       call Calculate_Sgs_Hybrid(grid)
     end if
 
-    call Convective_Outflow(grid, dt)
+    call Convective_Outflow(flow, bulk, dt)
     if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
        turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
-      call Calculate_Vis_T_Rsm(grid)
+      call Calculate_Vis_T_Rsm(flow)
     end if
 
     !--------------------------!
@@ -211,73 +220,79 @@
 
       call Info_Mod_Iter_Fill(ini)
 
-      call Grad_Mod_For_P(grid, p % n, p % x, p % y, p % z)
+      call Grad_Mod_For_P(grid, flow % p % n,  &
+                                flow % p % x,  &
+                                flow % p % y,  &
+                                flow % p % z)
 
       ! Compute velocity gradients
-      call Grad_Mod_For_Phi(grid, u % n, 1, u % x, .true.)
-      call Grad_Mod_For_Phi(grid, u % n, 2, u % y, .true.)
-      call Grad_Mod_For_Phi(grid, u % n, 3, u % z, .true.)
-      call Grad_Mod_For_Phi(grid, v % n, 1, v % x, .true.)
-      call Grad_Mod_For_Phi(grid, v % n, 2, v % y, .true.)
-      call Grad_Mod_For_Phi(grid, v % n, 3, v % z, .true.)
-      call Grad_Mod_For_Phi(grid, w % n, 1, w % x, .true.)
-      call Grad_Mod_For_Phi(grid, w % n, 2, w % y, .true.)
-      call Grad_Mod_For_Phi(grid, w % n, 3, w % z, .true.)
+      call Grad_Mod_For_Phi(grid, flow % u % n, 1, flow % u % x, .true.)
+      call Grad_Mod_For_Phi(grid, flow % u % n, 2, flow % u % y, .true.)
+      call Grad_Mod_For_Phi(grid, flow % u % n, 3, flow % u % z, .true.)
+      call Grad_Mod_For_Phi(grid, flow % v % n, 1, flow % v % x, .true.)
+      call Grad_Mod_For_Phi(grid, flow % v % n, 2, flow % v % y, .true.)
+      call Grad_Mod_For_Phi(grid, flow % v % n, 3, flow % v % z, .true.)
+      call Grad_Mod_For_Phi(grid, flow % w % n, 1, flow % w % x, .true.)
+      call Grad_Mod_For_Phi(grid, flow % w % n, 2, flow % w % y, .true.)
+      call Grad_Mod_For_Phi(grid, flow % w % n, 3, flow % w % z, .true.)
 
       ! All velocity components one after another
-      call Compute_Momentum(grid, u,v,w,1, sol, dt, ini, p)
-      call Compute_Momentum(grid, v,w,u,2, sol, dt, ini, p)
-      call Compute_Momentum(grid, w,u,v,3, sol, dt, ini, p)
+      call Compute_Momentum(flow, bulk, 1, sol, dt, ini)
+      call Compute_Momentum(flow, bulk, 2, sol, dt, ini)
+      call Compute_Momentum(flow, bulk, 3, sol, dt, ini)
 
       ! Refresh buffers for a % sav before discretizing for pressure
       ! (Can this call be somewhere in Compute Pressure?)
       call Comm_Mod_Exchange_Real(grid, sol % a % sav)
 
-      call Balance_Mass(grid)
-      call Compute_Pressure(grid, sol, dt, ini)
+      call Balance_Mass(flow, bulk)
+      call Compute_Pressure(flow, bulk, sol, dt, ini)
 
-      call Grad_Mod_For_P(grid,  pp % n, p % x, p % y, p % z)
+      call Grad_Mod_For_P(grid, flow % pp % n,  &
+                                flow % p % x,   &
+                                flow % p % y,   &
+                                flow % p % z)
 
-      call Bulk_Mod_Compute_Fluxes(grid, bulk, flux)
-      mass_res = Correct_Velocity(grid, sol, dt, ini) !  project the velocities
+      call Bulk_Mod_Compute_Fluxes(grid, bulk, flow % flux)
+      mass_res = Correct_Velocity(flow, bulk, sol, dt, ini)
 
       ! Energy (practically temperature)
       if(heat_transfer) then
-        call Compute_Energy(grid, sol, dt, ini, t)
+        call Compute_Energy(flow, sol, dt, ini)
       end if
 
       ! User scalars
       do us = 1, n_user_scalars
-        call User_Mod_Compute_Scalar(grid, sol, dt, ini, user_scalar(us))
+        call User_Mod_Compute_Scalar(flow, sol, dt, ini, user_scalar(us))
       end do
 
       ! Rans models
       if(turbulence_model .eq. K_EPS) then
 
         ! Update the values at boundaries
-        call Update_Boundary_Values(grid)
+        call Update_Boundary_Values(flow)
 
-        call Calculate_Shear_And_Vorticity(grid)
+        call Calculate_Shear_And_Vorticity(flow)
 
-        call Compute_Turbulent(grid, sol, dt, ini, kin, n)
-        call Compute_Turbulent(grid, sol, dt, ini, eps, n)
+        call Compute_Turbulent(flow, sol, dt, ini, kin, n)
+        call Compute_Turbulent(flow, sol, dt, ini, eps, n)
 
-        call Calculate_Vis_T_K_Eps(grid)
+        call Calculate_Vis_T_K_Eps(flow)
 
       end if
 
       if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
          turbulence_model .eq. HYBRID_LES_RANS) then
-        call Calculate_Shear_And_Vorticity(grid)
+        call Calculate_Shear_And_Vorticity(flow)
 
-        call Compute_Turbulent(grid, sol, dt, ini, kin, n)
-        call Compute_Turbulent(grid, sol, dt, ini, eps, n)
-        call Update_Boundary_Values(grid)
+        call Compute_Turbulent(flow, sol, dt, ini, kin, n)
+        call Compute_Turbulent(flow, sol, dt, ini, eps, n)
+        call Update_Boundary_Values(flow)
 
         call Compute_F22(grid, sol, ini, f22)
-        call Compute_Turbulent(grid, sol, dt, ini, zeta, n)
+        call Compute_Turbulent(flow, sol, dt, ini, zeta, n)
 
-        call Calculate_Vis_T_K_Eps_Zeta_F(grid)
+        call Calculate_Vis_T_K_Eps_Zeta_F(flow)
 
       end if
 
@@ -285,69 +300,69 @@
          turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
 
         ! Update the values at boundaries
-        call Update_Boundary_Values(grid)
+        call Update_Boundary_Values(flow)
 
         if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
           call Time_And_Length_Scale(grid)
         end if
 
-        call Grad_Mod_For_Phi(grid, u % n, 1, u % x,.true.)    ! dU/dx
-        call Grad_Mod_For_Phi(grid, u % n, 2, u % y,.true.)    ! dU/dy
-        call Grad_Mod_For_Phi(grid, u % n, 3, u % z,.true.)    ! dU/dz
+        call Grad_Mod_For_Phi(grid, flow % u % n, 1, flow % u % x,.true.)    ! dU/dx
+        call Grad_Mod_For_Phi(grid, flow % u % n, 2, flow % u % y,.true.)    ! dU/dy
+        call Grad_Mod_For_Phi(grid, flow % u % n, 3, flow % u % z,.true.)    ! dU/dz
 
-        call Grad_Mod_For_Phi(grid, v % n, 1, v % x,.true.)    ! dV/dx
-        call Grad_Mod_For_Phi(grid, v % n, 2, v % y,.true.)    ! dV/dy
-        call Grad_Mod_For_Phi(grid, v % n, 3, v % z,.true.)    ! dV/dz
+        call Grad_Mod_For_Phi(grid, flow % v % n, 1, flow % v % x,.true.)    ! dV/dx
+        call Grad_Mod_For_Phi(grid, flow % v % n, 2, flow % v % y,.true.)    ! dV/dy
+        call Grad_Mod_For_Phi(grid, flow % v % n, 3, flow % v % z,.true.)    ! dV/dz
 
-        call Grad_Mod_For_Phi(grid, w % n, 1, w % x,.true.)    ! dW/dx
-        call Grad_Mod_For_Phi(grid, w % n, 2, w % y,.true.)    ! dW/dy
-        call Grad_Mod_For_Phi(grid, w % n, 3, w % z,.true.)    ! dW/dz
+        call Grad_Mod_For_Phi(grid, flow % w % n, 1, flow % w % x,.true.)    ! dW/dx
+        call Grad_Mod_For_Phi(grid, flow % w % n, 2, flow % w % y,.true.)    ! dW/dy
+        call Grad_Mod_For_Phi(grid, flow % w % n, 3, flow % w % z,.true.)    ! dW/dz
 
-        call Compute_Stresses(grid, sol, dt, ini, uu, n)
-        call Compute_Stresses(grid, sol, dt, ini, vv, n)
-        call Compute_Stresses(grid, sol, dt, ini, ww, n)
+        call Compute_Stresses(flow, sol, dt, ini, uu, n)
+        call Compute_Stresses(flow, sol, dt, ini, vv, n)
+        call Compute_Stresses(flow, sol, dt, ini, ww, n)
 
-        call Compute_Stresses(grid, sol, dt, ini, uv, n)
-        call Compute_Stresses(grid, sol, dt, ini, uw, n)
-        call Compute_Stresses(grid, sol, dt, ini, vw, n)
+        call Compute_Stresses(flow, sol, dt, ini, uv, n)
+        call Compute_Stresses(flow, sol, dt, ini, uw, n)
+        call Compute_Stresses(flow, sol, dt, ini, vw, n)
 
         if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
           call Compute_F22(grid, sol, ini, f22)
         end if
 
-        call Compute_Stresses(grid, sol, dt, ini, eps, n)
+        call Compute_Stresses(flow, sol, dt, ini, eps, n)
 
-        call Calculate_Vis_T_Rsm(grid)
+        call Calculate_Vis_T_Rsm(flow)
 
         if(heat_transfer) then
-          call Calculate_Heat_Flux(grid)
+          call Calculate_Heat_Flux(flow)
         end if
       end if
 
       if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
          turbulence_model .eq. DES_SPALART) then
-        call Calculate_Shear_And_Vorticity(grid)
-        call Calculate_Vorticity(grid)
+        call Calculate_Shear_And_Vorticity(flow)
+        call Calculate_Vorticity(flow)
 
         ! Update the values at boundaries
-        call Update_Boundary_Values(grid)
+        call Update_Boundary_Values(flow)
 
-        call Compute_Turbulent(grid, sol, dt, ini, vis, n)
-        call Calculate_Vis_T_Spalart_Allmaras(grid)
+        call Compute_Turbulent(flow, sol, dt, ini, vis, n)
+        call Calculate_Vis_T_Spalart_Allmaras(flow)
       end if
 
       ! Update the values at boundaries
-      call Update_Boundary_Values(grid)
+      call Update_Boundary_Values(flow)
 
       ! End of the current iteration
       call Info_Mod_Iter_Print()
 
       if(ini >= min_ini) then
         call Control_Mod_Tolerance_For_Simple_Algorithm(simple_tol)
-        if( u  % res <= simple_tol .and.  &
-            v  % res <= simple_tol .and.  &
-            w  % res <= simple_tol .and.  &
-            mass_res <= simple_tol ) goto 1
+        if( flow % u  % res <= simple_tol .and.  &
+            flow % v  % res <= simple_tol .and.  &
+            flow % w  % res <= simple_tol .and.  &
+            mass_res        <= simple_tol ) goto 1
       end if
 
     end do
@@ -357,15 +372,14 @@
 
     ! Write the values in monitoring points
     if(.not. heat_transfer) then
-      call Monitor_Mod_Write_4_Vars(n, u, v, w, p)
+      call Monitor_Mod_Write_4_Vars(n, flow)
     else
-      call Monitor_Mod_Write_5_Vars(n, u, v, w, t, p)
+      call Monitor_Mod_Write_5_Vars(n, flow)
     end if
 
     ! Calculate mean values
-    call Calculate_Mean(grid, n_stat, n)
-
-    call User_Mod_Calculate_Mean(grid, n_stat, n)
+    call Calculate_Mean         (flow, n_stat, n)
+    call User_Mod_Calculate_Mean(flow, n_stat, n)
 
     !-----------------------------------------------------!
     !   Recalculate the pressure drop                     !
@@ -390,15 +404,15 @@
     !   Pdrop = dFlux/dt/A                                !
     !-----------------------------------------------------!
     if( abs(bulk % flux_x_o) >= TINY ) then
-      bulk % p_drop_x = (bulk % flux_x_o - bulk % flux_x)  &
+      bulk % p_drop_x = (bulk % flux_x_o - bulk % flux_x) &
                          / (dt * bulk % area_x + TINY)
     end if
     if( abs(bulk % flux_y_o) >= TINY ) then
-      bulk % p_drop_y = (bulk % flux_y_o - bulk % flux_y)  &
+      bulk % p_drop_y = (bulk % flux_y_o - bulk % flux_y) &
                          / (dt * bulk % area_y + TINY)
     end if
     if( abs(bulk % flux_z_o) >= TINY ) then
-      bulk % p_drop_z = (bulk % flux_z_o - bulk % flux_z)  &
+      bulk % p_drop_z = (bulk % flux_z_o - bulk % flux_z) &
                          / (dt * bulk % area_z + TINY)
     end if
 
@@ -417,20 +431,20 @@
 
     ! Is it time to save the backup file?
     if(save_now .or. exit_now .or. mod(n, bsi) .eq. 0) then
-      call Backup_Mod_Save(grid, n, n_stat, name_save)
+      call Backup_Mod_Save(flow, bulk, n, n_stat, name_save)
     end if
 
     ! Is it time to save results for post-processing
     if(save_now .or. exit_now .or. mod(n, rsi) .eq. 0) then
       call Comm_Mod_Wait
-      call Save_Results(grid, name_save)
+      call Save_Results(flow, name_save)
 
       ! Write results in user-customized format
       call User_Mod_Save_Results(grid, name_save)
     end if
-   
+
     ! Just before the end of time step
-    call User_Mod_End_Of_Time_Step(grid, n, time)
+    call User_Mod_End_Of_Time_Step(flow, n, time)
 
     if(save_now) then
       if(this_proc < 2) then
@@ -455,8 +469,8 @@
 
   ! Save backup and post-processing files at exit
   call Comm_Mod_Wait
-  call Save_Results(grid, name_save)
-  call Backup_Mod_Save(grid, n, n_stat, name_save)
+  call Save_Results(flow, name_save)
+  call Backup_Mod_Save(flow, bulk, n, n_stat, name_save)
 
   ! Write results in user-customized format
   call User_Mod_Save_Results(grid, name_save)
