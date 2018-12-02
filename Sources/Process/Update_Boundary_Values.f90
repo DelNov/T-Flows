@@ -1,28 +1,39 @@
 !==============================================================================!
-  subroutine Update_Boundary_Values(grid)
+  subroutine Update_Boundary_Values(flow)
 !------------------------------------------------------------------------------!
 !   Update variables on the boundaries (boundary cells) where needed.          !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Field_Mod
+  use Comm_Mod
+  use Field_Mod, only: Field_Type, heat_transfer,  &
+                       density, viscosity, capacity, conductivity
   use Rans_Mod
   use Grid_Mod
-  use Comm_Mod
   use Control_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Field_Type), target :: flow
 !---------------------------------[Calling]------------------------------------!
   real :: Turbulent_Prandtl_Number
   real :: Y_Plus_Low_Re
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c1, c2, s
-  real    :: qx, qy, qz, nx, ny, nz, con_t, ebf 
-  real    :: pr, beta, u_plus, heated_area, y_pl, kin_vis
+  type(Grid_Type), pointer :: grid
+  type(Var_Type),  pointer :: u, v, w, t
+  integer                  :: c1, c2, s
+  real                     :: qx, qy, qz, nx, ny, nz, con_t
+  real                     :: pr, heat, heat_flux, heated_area, kin_vis
 !==============================================================================!
 
+  ! Take aliases
+  grid => flow % pnt_grid
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+  t    => flow % t
+
+  heat        = 0.0
   heat_flux   = 0.0
   heated_area = 0.0
   kin_vis     = viscosity / density
