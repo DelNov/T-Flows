@@ -1,27 +1,32 @@
 !==============================================================================!
-  subroutine Backup_Mod_Load(grid, time_step, time_step_stat, backup)
+  subroutine Backup_Mod_Load(fld, bulk, time_step, time_step_stat, backup)
 !------------------------------------------------------------------------------!
 !   Loads backup files name.backup                                             !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Field_Mod
   use Comm_Mod
   use Rans_Mod
-  use Grid_Mod
-  use Grad_Mod
+  use Field_Mod, only: Field_Type, heat_transfer
+  use Grid_Mod,  only: Grid_Type
+  use Bulk_Mod,  only: Bulk_Type
   use Control_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
-  integer         :: time_step       ! current time step
-  integer         :: time_step_stat  ! starting step for statistics
-  logical         :: backup, present
+  type(Field_Type), target :: fld
+  type(Bulk_Type)          :: bulk
+  integer                  :: time_step       ! current time step
+  integer                  :: time_step_stat  ! starting step for statistics
+  logical                  :: backup, present
 !-----------------------------------[Locals]-----------------------------------!
-  character(len=80) :: name_in, answer
-  integer           :: fh, d, vc
+  type(Grid_Type), pointer :: grid
+  character(len=80)        :: name_in, answer
+  integer                  :: fh, d, vc
 !==============================================================================!
+
+  ! Take aliases
+  grid => fld % pnt_grid
 
   ! Full name is specified in control file
   call Control_Mod_Load_Backup_Name(name_in)
@@ -100,20 +105,20 @@
   !--------------!
   !   Velocity   !
   !--------------!
-  call Backup_Mod_Read_Variable(fh, d, vc, 'u_velocity', u)
-  call Backup_Mod_Read_Variable(fh, d, vc, 'v_velocity', v)
-  call Backup_Mod_Read_Variable(fh, d, vc, 'w_velocity', w)
+  call Backup_Mod_Read_Variable(fh, d, vc, 'u_velocity', fld % u)
+  call Backup_Mod_Read_Variable(fh, d, vc, 'v_velocity', fld % v)
+  call Backup_Mod_Read_Variable(fh, d, vc, 'w_velocity', fld % w)
 
   !--------------------------------------!
   !   Pressure and pressure correction   !
   !--------------------------------------!
-  call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'press',       p % n(-nb_s:nc_s))
-  call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'press_corr', pp % n(-nb_s:nc_s))
+  call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'press',      fld % p % n(-nb_s:nc_s))
+  call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'press_corr', fld %pp % n(-nb_s:nc_s))
 
   !----------------------!
   !   Mass flow raters   !
   !----------------------!
-  call Backup_Mod_Read_Face(fh, d, vc, grid, flux)
+  call Backup_Mod_Read_Face(fh, d, vc, grid, fld % flux)
 
   !--------------!
   !              !
@@ -121,7 +126,7 @@
   !              !
   !--------------!
   if(heat_transfer) then
-    call Backup_Mod_Read_Variable(fh, d, vc, 'temp', t)
+    call Backup_Mod_Read_Variable(fh, d, vc, 'temp', fld % t)
   end if
 
   !-----------------------!
@@ -220,9 +225,9 @@
   if(turbulence_statistics .and.  &
      time_step > time_step_stat) then
 
-    call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'u_mean', u)
-    call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'v_mean', v)
-    call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'w_mean', w)
+    call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'u_mean', fld % u)
+    call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'v_mean', fld % v)
+    call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'w_mean', fld % w)
 
     call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'uu_mean', uu)
     call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'vv_mean', vv)
@@ -232,7 +237,7 @@
     call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'vw_mean', vw)
 
     if(heat_transfer) then
-      call Backup_Mod_Read_Variable_Mean(fh, d, vc, 't_mean',  t)
+      call Backup_Mod_Read_Variable_Mean(fh, d, vc, 't_mean',  fld % t)
       call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'tt_mean', tt)
       call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'ut_mean', ut)
       call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'vt_mean', vt)
