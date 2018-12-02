@@ -1,5 +1,5 @@
 !==============================================================================!
-  module Flow_Mod
+  module Field_Mod
 !------------------------------------------------------------------------------!
 !   Module for basic flow field plus temperature.                              !
 !   It is a bit of a mumbo-jumbo at this moment, it will furhter have to       !

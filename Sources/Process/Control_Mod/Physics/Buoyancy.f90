@@ -2,8 +2,8 @@
   subroutine Control_Mod_Buoyancy(verbose)
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Comm_Mod, only: this_proc, Comm_Mod_End
-  use Flow_Mod, only: buoyancy
+  use Comm_Mod,  only: this_proc, Comm_Mod_End
+  use Field_Mod, only: buoyancy
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

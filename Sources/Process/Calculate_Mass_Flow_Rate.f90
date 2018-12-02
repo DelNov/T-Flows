@@ -1,9 +1,9 @@
 !==============================================================================!
-  subroutine Calculate_Mass_Flow_Rate(grid)
+  subroutine Calculate_Mass_Field_Rate(grid)
 !------------------------------------------------------------------------------!
 !   Calculate mass flow rate at cell faces based on velocities only.           !
 !----------------------------------[Modules]-----------------------------------!
-  use Flow_Mod
+  use Field_Mod
   use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none

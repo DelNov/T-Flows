@@ -4,7 +4,7 @@
 !   Computes the turbulent viscosity for RANS models.                          !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Flow_Mod
+  use Field_Mod
   use Comm_Mod
   use Les_Mod
   use Rans_Mod

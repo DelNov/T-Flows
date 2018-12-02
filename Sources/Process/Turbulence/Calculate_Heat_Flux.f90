@@ -8,7 +8,7 @@
   use Control_Mod
   use Grid_Mod
   use Grad_Mod
-  use Flow_Mod 
+  use Field_Mod
   use Rans_Mod
   use Work_Mod, only: t_x => r_cell_01,  &
                       t_y => r_cell_02,  &
@@ -34,7 +34,7 @@
   call Control_Mod_Turbulent_Prandtl_Number(pr_t)
 
   if(turbulent_heat_flux_model .eq. SGDH) then
-    
+
     do c = 1, grid % n_cells
       pr_t = max(Turbulent_Prandtl_Number(grid, c), TINY)
       ut % n(c) = -vis_t(c) / pr_t * t_x(c)

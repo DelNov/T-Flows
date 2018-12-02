@@ -2,8 +2,8 @@
   subroutine Control_Mod_Mass_Flow_Rates(verbose)
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Bulk_Mod, only: Bulk_Type
-  use Flow_Mod, only: bulk
+  use Bulk_Mod,  only: Bulk_Type
+  use Field_Mod, only: bulk
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

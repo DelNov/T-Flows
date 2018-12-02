@@ -5,7 +5,7 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Flow_Mod
+  use Field_Mod
   use Les_Mod
   use Rans_Mod
   use Comm_Mod
@@ -40,19 +40,19 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
-  integer           :: s, c, c1, c2, niter
-  real              :: f_ex, f_im
-  real              :: phis
-  real              :: a0, a12, a21
-  real              :: ini_res, tol
-  real              :: vis_eff
-  real              :: phix_f, phiy_f, phiz_f
-  real              :: vis_t_f
-  character(len=80) :: precond
-  integer           :: adv_scheme   ! space discratization advection (scheme)
-  real              :: blend        ! blending coeff (1.0 central; 0. upwind)
-  integer           :: td_scheme    ! time-disretization for inerita
-  real              :: urf          ! under-relaxation factor
+  integer                    :: s, c, c1, c2, niter
+  real                       :: f_ex, f_im
+  real                       :: phis
+  real                       :: a0, a12, a21
+  real                       :: ini_res, tol
+  real                       :: vis_eff
+  real                       :: phix_f, phiy_f, phiz_f
+  real                       :: vis_t_f
+  character(len=80)          :: precond
+  integer                    :: adv_scheme   ! advection scheme
+  real                       :: blend        ! blending (1.0 central; 0. upwind)
+  integer                    :: td_scheme    ! time-disretization for inerita
+  real                       :: urf          ! under-relaxation factor
 !==============================================================================!
 !                                                                              !
 !   The form of equations which are being solved:                              !
