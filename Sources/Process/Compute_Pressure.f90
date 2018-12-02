@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Pressure(grid, sol, dt, ini)
+  subroutine Compute_Pressure(flow, bulk, sol, dt, ini)
 !------------------------------------------------------------------------------!
 !   Forms and solves pressure equation for the SIMPLE method.                  !
 !------------------------------------------------------------------------------!
@@ -8,7 +8,8 @@
   use Comm_Mod
   use Const_Mod
   use Grid_Mod,    only: Grid_Type
-  use Info_Mod
+  use Bulk_Mod,    only: Bulk_Type
+  use Info_Mod,    only: Info_Mod_Iter_Fill_At
   use Solver_Mod,  only: Solver_Type, Bicg, Cg, Cgs, Acm
   use Matrix_Mod,  only: Matrix_Type
   use Control_Mod
@@ -16,24 +17,28 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)   :: grid
+  type(Field_Type),  target :: flow
+  type(Bulk_Type)           :: bulk
   type(Solver_Type), target :: sol
-  real            :: dt
-  integer         :: ini
+  real                      :: dt
+  integer                   :: ini
 !-----------------------------------[Locals]-----------------------------------!
+  type(Grid_Type),   pointer :: grid
+  type(Var_Type),    pointer :: u, v, w, p, pp
+  real,              pointer :: flux(:)
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
-  integer           :: s, c, c1, c2, niter
-  real              :: u_f, v_f, w_f, a12, fs
-  real              :: ini_res, tol, mass_err
-  real              :: smdpn
-  real              :: px_f, py_f, pz_f
-  character(len=80) :: precond
-  real              :: urf           ! under-relaxation factor
-  real              :: p_max, p_min, p_nor, p_nor_c
+  integer                    :: s, c, c1, c2, niter
+  real                       :: u_f, v_f, w_f, a12, fs
+  real                       :: ini_res, tol, mass_err
+  real                       :: smdpn         ! not needed, stored in a % fc
+  real                       :: px_f, py_f, pz_f
+  character(len=80)          :: precond
+  real                       :: urf           ! under-relaxation factor
+  real                       :: p_max, p_min, p_nor, p_nor_c
 !==============================================================================!
 !
-!   The form of equations which I am solving:    
+!   The form of equations which I am solving:
 !
 !      /               /
 !     |               |
@@ -51,15 +56,22 @@
 !     pp             [kg/ms^2]
 !     b              [kg/s]
 !     flux           [kg/s]
-!   
+!
 !------------------------------------------------------------------------------!
 
   ! Take aliases
-  a => sol % a
-  b => sol % b % val
+  grid => flow % pnt_grid
+  flux => flow % flux
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+  p    => flow % p
+  pp   => flow % pp
+  a    => sol % a
+  b    => sol % b % val
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Pressure(grid, dt, ini)
+  call User_Mod_Beginning_Of_Compute_Pressure(flow, dt, ini)
 
   !--------------------------------------------------!
   !   Find the value for normalization of pressure   !
@@ -261,11 +273,11 @@
   call Comm_Mod_Global_Max_Real(p_max)
   call Comm_Mod_Global_Min_Real(p_min)
 
-  p % n = p % n - 0.5*(p_max+p_min)
+  p % n(:) = p % n(:) - 0.5*(p_max+p_min)
 
   call Comm_Mod_Exchange_Real(grid, pp % n)
 
   ! User function
-  call User_Mod_End_Of_Compute_Pressure(grid, dt, ini)
+  call User_Mod_End_Of_Compute_Pressure(flow, dt, ini)
 
   end subroutine

@@ -1,17 +1,18 @@
 !==============================================================================!
-  subroutine Compute_Momentum(grid, ui,uj,uk, i, sol, dt, ini, h)
+  subroutine Compute_Momentum(flow, bulk, i, sol, dt, ini)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves momentum conservation equations                     !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Field_Mod
+  use Comm_Mod
+  use Field_Mod,    only: Field_Type, buoyancy, grav_x, grav_y, grav_z,  &
+                          density, viscosity
   use Les_Mod
   use Rans_Mod
-  use Comm_Mod
   use Var_Mod,      only: Var_Type
   use Grid_Mod,     only: Grid_Type
-  use Bulk_Mod
+  use Bulk_Mod,     only: Bulk_Type
   use Info_Mod,     only: Info_Mod_Iter_Fill_At
   use Numerics_Mod, only: CENTRAL, LINEAR, PARABOLIC
   use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
@@ -23,32 +24,34 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type),   target :: grid
-  type(Var_Type),    target :: ui, uj, uk
+  type(Field_Type),  target :: flow
+  type(Bulk_Type)           :: bulk
   integer                   :: i           ! component
   type(Solver_Type), target :: sol
   real                      :: dt
   integer                   :: ini
-  type(Var_Type),    target :: h           ! pressure
 !-----------------------------------[Locals]-----------------------------------!
+  type(Grid_Type),   pointer :: grid
   type(Matrix_Type), pointer :: a
+  type(Var_Type),    pointer :: ui, uj, uk, t, p
+  real,              pointer :: flux(:)
   real,              pointer :: b(:)
   real,              pointer :: ui_i(:), ui_j(:), ui_k(:), uj_i(:), uk_i(:)
   real,              pointer :: si(:), sj(:), sk(:), di(:), dj(:), dk(:)
   real,              pointer :: h_i(:)
-  integer           :: s, c, c1, c2, niter
-  real              :: f_ex, f_im, f_stress
-  real              :: uis, vel_max
-  real              :: a0, a12, a21
-  real              :: ini_res, tol
-  real              :: vis_eff, vis_tS
-  real              :: ui_i_f, ui_j_f, ui_k_f, uj_i_f, uk_i_f
-  real              :: uu_f, vv_f, ww_f, uv_f, uw_f, vw_f
-  character(len=80) :: precond
-  integer           :: adv_scheme    ! space disretization of advection (scheme)
-  real              :: blend         ! blending coeff (1.0 central; 0.0 upwind)
-  integer           :: td_scheme     ! time-disretization for inerita
-  real              :: urf           ! under-relaxation factor
+  integer                    :: s, c, c1, c2, niter
+  real                       :: f_ex, f_im, f_stress
+  real                       :: uis, vel_max
+  real                       :: a0, a12, a21
+  real                       :: ini_res, tol
+  real                       :: vis_eff, vis_tS
+  real                       :: ui_i_f, ui_j_f, ui_k_f, uj_i_f, uk_i_f
+  real                       :: uu_f, vv_f, ww_f, uv_f, uw_f, vw_f
+  character(len=80)          :: precond
+  integer                    :: adv_scheme  ! advection scheme
+  real                       :: blend       ! blending (1.0 central; 0.0 upwind)
+  integer                    :: td_scheme   ! time-disretization
+  real                       :: urf         ! under-relaxation factor
 !------------------------------------------------------------------------------!
 !
 !  Stress tensor on the face s:
@@ -107,27 +110,33 @@
 !==============================================================================!
 
   ! Take aliases
-! grid => ui % pnt_grid
+  grid => flow % pnt_grid
+  flux => flow % flux
+  t    => flow % t
+  p    => flow % p
   a    => sol % a
   b    => sol % b % val
 
   if(i .eq. 1) then
+    ui   => flow % u;   uj   => flow % v;   uk   => flow % w
     ui_i => ui % x;     ui_j => ui % y;     ui_k => ui % z
     si   => grid % sx;  sj   => grid % sy;  sk   => grid % sz
     di   => grid % dx;  dj   => grid % dy;  dk   => grid % dz
-    h_i  => h % x;      uj_i => uj % x;     uk_i => uk % x
+    h_i  => p % x;      uj_i => uj % x;     uk_i => uk % x
   end if
   if(i .eq. 2) then
+    ui   => flow % v;   uj   => flow % w;   uk   => flow % u
     ui_i => ui % y;     ui_j => ui % z;     ui_k => ui % x
     si   => grid % sy;  sj   => grid % sz;  sk   => grid % sx
     di   => grid % dy;  dj   => grid % dz;  dk   => grid % dx
-    h_i  => h % y;      uj_i => uj % y;     uk_i => uk % y
+    h_i  => p % y;      uj_i => uj % y;     uk_i => uk % y
   end if
   if(i .eq. 3) then
+    ui   => flow % w;   uj   => flow % u;   uk   => flow % v
     ui_i => ui % z;     ui_j => ui % x;     ui_k => ui % y
     si   => grid % sz;  sj   => grid % sx;  sk   => grid % sy
     di   => grid % dz;  dj   => grid % dx;  dk   => grid % dy
-    h_i  => h % z;      uj_i => uj % z;     uk_i => uk % z
+    h_i  => p % z;      uj_i => uj % z;     uk_i => uk % z
   end if
 
   ! Initialize matrix and right hand side
@@ -136,12 +145,12 @@
   f_stress   = 0.0
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Momentum(grid, dt, ini)
+  call User_Mod_Beginning_Of_Compute_Momentum(flow, dt, ini)
 
   ! Calculate velocity magnitude for normalization
   vel_max = 0.0
   do c = -grid % n_bnd_cells, grid % n_cells
-    vel_max = max(vel_max, sqrt(u % n(c)**2 + v % n(c)**2 + w % n(c)**2))
+    vel_max = max(vel_max, sqrt(ui % n(c)**2 + uj % n(c)**2 + uk % n(c)**2))
   end do
   call Comm_Mod_Global_Max_Real(vel_max)
 
@@ -187,7 +196,7 @@
     uis = grid % f(s) * ui % n(c1) + (1.0 - grid % f(s)) * ui % n(c2)
 
     if(adv_scheme .ne. CENTRAL) then
-      call Advection_Scheme(grid, uis, s, ui % n, ui_min, ui_max,  &
+      call Advection_Scheme(flow, uis, s, ui % n, ui_min, ui_max,  &
                             ui_i, ui_j, ui_k,                      &
                             di, dj, dk,                            &
                             adv_scheme, blend)
@@ -460,17 +469,17 @@
   if(buoyancy) then
     if(ui % name .eq. 'U') then
       do c = 1, grid % n_cells
-        b(c) = b(c) - density * grav_x * (t % n(c) - t_ref)  &
+        b(c) = b(c) - density * grav_x * (t % n(c) - flow % t_ref)  &
              * grid % vol(c)
       end do
     else if(ui % name .eq. 'V') then
       do c = 1, grid % n_cells
-        b(c) = b(c) - density * grav_y * (t % n(c) - t_ref)  &
+        b(c) = b(c) - density * grav_y * (t % n(c) - flow % t_ref)  &
              * grid % vol(c)
       end do
     else if(ui % name .eq. 'W') then
       do c = 1, grid % n_cells
-        b(c) = b(c) - density * grav_z * (t % n(c) - t_ref)  &
+        b(c) = b(c) - density * grav_z * (t % n(c) - flow % t_ref)  &
              * grid % vol(c)
       end do
     end if
@@ -530,6 +539,6 @@
   call Comm_Mod_Exchange_Real(grid, ui % n)
 
   ! User function
-  call User_Mod_End_Of_Compute_Momentum(grid, dt, ini)
+  call User_Mod_End_Of_Compute_Momentum(flow, dt, ini)
 
   end subroutine
