@@ -151,7 +151,7 @@
 
     ! Compute phis with desired advection scheme
     if(adv_scheme .ne. CENTRAL) then
-      call Advection_Scheme(grid, phis, s, phi % n, phi_min, phi_max,  &
+      call Advection_Scheme(flow, phis, s, phi % n, phi_min, phi_max,  &
                             phi_x, phi_y, phi_z,                       &
                             grid % dx, grid % dy, grid % dz,           &
                             adv_scheme, blend) 
