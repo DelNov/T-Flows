@@ -1,16 +1,17 @@
 !==============================================================================!
-  subroutine User_Mod_Beginning_Of_Time_Step(grid, n, time)
+  subroutine User_Mod_Beginning_Of_Time_Step(flow, n, time)
 !------------------------------------------------------------------------------!
 !   This function is called at the beginning of time step.                     !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod
+  use Field_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
-  integer         :: n     ! time step
-  real            :: time  ! physical time
+  type(Field_Type) :: flow
+  integer          :: n     ! time step
+  real             :: time  ! physical time
 !==============================================================================!
 
   end subroutine

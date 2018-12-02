@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Compute_Pressure(grid, dt, ini)
+  subroutine User_Mod_End_Of_Compute_Pressure(flow, dt, ini)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of time step.                           !
 !------------------------------------------------------------------------------!
@@ -9,9 +9,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
-  real            :: dt    ! time step    
-  integer         :: ini   ! iner itteration
+  type(Field_Type) :: flow
+  real             :: dt    ! time step
+  integer          :: ini   ! iner itteration
 !==============================================================================!
 
   end subroutine
