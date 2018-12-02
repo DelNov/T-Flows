@@ -7,32 +7,40 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Var_Mod
-  use Bulk_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
 
-  ! Velocity components
-  type(Var_Type) :: u
-  type(Var_Type) :: v
-  type(Var_Type) :: w
+  !----------------!
+  !   Field type   !
+  !----------------!
+  type Field_Type
 
-  ! Temperature
-  type(Var_Type) :: t
+    type(Grid_Type), pointer :: pnt_grid  ! grid for which it is defined
 
-  ! Pressure 
-  type(Var_Type) :: p
-  type(Var_Type) :: pp
+    ! Velocity components
+    type(Var_Type) :: u
+    type(Var_Type) :: v
+    type(Var_Type) :: w
 
-  ! Mass fluxes throught cell faces
-  real, allocatable :: flux(:)
+    ! Temperature
+    type(Var_Type) :: t
+
+    ! Pressure 
+    type(Var_Type) :: p
+    type(Var_Type) :: pp
+
+    ! Mass fluxes throught cell faces
+    real, allocatable :: flux(:)
+
+    ! Reference temperature
+    real :: t_ref
+
+  end type
 
   ! Variables determining if we are dealing with heat transfer and buoyancy
   logical :: heat_transfer
   logical :: buoyancy
-
-  ! Mass fluxes, bulk velocities and pressure drops
-  type(Bulk_Type) :: bulk
 
   ! Physical properties
   real :: viscosity, density, conductivity, diffusivity, capacity
@@ -40,13 +48,11 @@
   ! Angular velocity 
   real :: omega_x, omega_y, omega_z, omega
 
-  ! Reference temperature
-  real :: t_ref
-
-  ! Heat and heat flux to the domain
-  real :: heat, heat_flux
-
   ! Gravity
   real :: grav_x, grav_y, grav_z
+
+  contains
+
+  include 'Field_Mod/Allocate.f90'
 
   end module
