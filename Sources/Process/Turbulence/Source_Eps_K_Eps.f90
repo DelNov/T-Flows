@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Source_Eps_K_Eps(grid, sol)
+  subroutine Source_Eps_K_Eps(flow, sol)
 !------------------------------------------------------------------------------!
 !   Computes the source terms in the eps transport equation,                   !
 !   wall shear stress (wall function approuch)                                 !
@@ -12,22 +12,24 @@
 !                                                                              !
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Field_Mod
-  use Les_Mod
-  use Rans_Mod
   use Grid_Mod,   only: Grid_Type
+  use Field_Mod,  only: Field_Type, viscosity, density
   use Solver_Mod, only: Solver_Type
   use Matrix_Mod, only: Matrix_Type
+  use Les_Mod
+  use Rans_Mod
   use Grad_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)           :: grid
+  type(Field_Type),  target :: flow
   type(Solver_Type), target :: sol
 !---------------------------------[Calling]------------------------------------!
   real :: Y_Plus_Low_Re
   real :: Roughness_Coefficient
 !-----------------------------------[Locals]-----------------------------------!
+  type(Grid_Type),   pointer :: grid
+  type(Var_Type),    pointer :: u, v, w
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: s, c, c1, c2, j
@@ -49,8 +51,12 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
-  a => sol % a
-  b => sol % b % val
+  grid => flow % pnt_grid
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+  a    => sol  % a
+  b    => sol  % b % val
 
   kin_vis = viscosity/density
 
