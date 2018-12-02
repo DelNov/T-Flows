@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Calculate_Vis_T_Spalart_Allmaras(grid) 
+  subroutine Calculate_Vis_T_Spalart_Allmaras(flow)
 !------------------------------------------------------------------------------!
 !   Computes the turbulent viscosity for RANS models.                          !
 !------------------------------------------------------------------------------!
@@ -13,11 +13,19 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Field_Type), target :: flow
 !-----------------------------------[Locals]-----------------------------------!
-  integer         :: c
-  real            :: x_rat, f_v1
+  type(Grid_Type), pointer :: grid
+  type(Var_Type),  pointer :: u, v, w
+  integer                  :: c
+  real                     :: x_rat, f_v1
 !==============================================================================!
+
+  ! Take aliases
+  grid => flow % pnt_grid
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
 
   if(turbulence_model .eq. DES_SPALART) then
     do c = 1, grid % n_cells
