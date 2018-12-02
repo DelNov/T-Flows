@@ -34,7 +34,7 @@
   type(Matrix_Type), pointer :: d
   integer                    :: nt, ni, nb
   real                       :: alfa, beta, rho, rho_old, bnrm2, res
-  integer                    :: i, j, k, iter, sub
+  integer                    :: i, j, k, iter
 !==============================================================================!
 
   ! Take some aliases

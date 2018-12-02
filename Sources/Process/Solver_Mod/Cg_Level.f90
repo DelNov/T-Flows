@@ -24,7 +24,7 @@
   real              :: res_rat                           ! residual ratio
   real              :: fin_res                           ! final residual
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: nt, ni, i, j, k, iter, sub
+  integer :: nt, ni, i, j, k, iter
   real    :: alfa, beta, rho, rho_old, bnrm2, ini_res, res
 !==============================================================================!
 
