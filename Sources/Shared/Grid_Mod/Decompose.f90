@@ -8,7 +8,7 @@
   type(Grid_Type) :: grid
   integer         :: n_parts
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: c, c1, c2, p1, p2, s, z, i, n_inter
+  integer              :: c, c1, c2, s, z, i
   integer              :: n_verts, n_edges
   integer, allocatable :: star(:,:), star_size(:),  &
                           edges_v(:,:), edges_c(:)
