@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Calculate_Sgs_Dynamic(grid, sol)
+  subroutine Calculate_Sgs_Dynamic(flow, sol)
 !------------------------------------------------------------------------------!
 !   Calculates Smagorinsky constant with dynamic procedure                     !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Field_Mod
+  use Field_Mod,  only: Field_Type
   use Comm_Mod
   use Les_Mod
   use Rans_Mod
@@ -14,8 +14,8 @@
   use Matrix_Mod, only: Matrix_Type
   use Grad_Mod
   use Work_Mod,   only: u_f        => r_cell_01,  &
-                        v_f        => r_cell_02,  &  
-                        w_f        => r_cell_03,  &  
+                        v_f        => r_cell_02,  &
+                        w_f        => r_cell_03,  &
                         uu_f       => r_cell_04,  &
                         vv_f       => r_cell_05,  &
                         ww_f       => r_cell_06,  &
@@ -32,16 +32,19 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Field_Type),  target :: flow
   type(Solver_Type), target :: sol
 !-----------------------------------[Locals]-----------------------------------!
+  type(Grid_Type),   pointer :: grid
   type(Matrix_Type), pointer :: a
-  integer :: c, j, cj
-  real    :: u_a, v_a, w_a, uu_a, vv_a, ww_a, uv_a, uw_a, vw_a, vol_e
-  real    :: m_11_a, m_22_a, m_33_a, m_12_a, m_13_a, m_23_a      
-  real    :: l_11, l_22, l_33, l_12, l_13, l_23      
-  real    :: m_11, m_22, m_33, m_12, m_13, m_23      
-  real    :: m_dot_m, l_dot_m, l_g, l_f 
+  type(Var_Type),    pointer :: u, v, w
+  integer                    :: c, j, cj
+  real                       :: u_a, v_a, w_a
+  real                       :: uu_a, vv_a, ww_a, uv_a, uw_a, vw_a
+  real                       :: m_11_a, m_22_a, m_33_a, m_12_a, m_13_a, m_23_a
+  real                       :: l_11, l_22, l_33, l_12, l_13, l_23
+  real                       :: m_11, m_22, m_33, m_12, m_13, m_23
+  real                       :: m_dot_m, l_dot_m, l_g, l_f, vol_e
 !==============================================================================!
 !                                                                              !
 !   C is derived from:    Lij_res = Lij_mod                                    !
@@ -66,7 +69,11 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
-  a => sol % a
+  grid => flow % pnt_grid
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+  a    => sol % a
 
   call Comm_Mod_Exchange_Real(grid, u % n)
   call Comm_Mod_Exchange_Real(grid, v % n)

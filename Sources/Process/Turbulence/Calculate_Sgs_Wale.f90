@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Calculate_Sgs_Wale(grid)
+  subroutine Calculate_Sgs_Wale(flow)
 !------------------------------------------------------------------------------!
-!  Compute SGS viscosity for 'LES' by using LES_WALE model.  
+!  Compute SGS viscosity for 'LES' by using LES_WALE model.                    !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod, only: ONE_THIRD, TINY
-  use Field_Mod
+  use Field_Mod, only: Field_Type
   use Les_Mod
   use Grid_Mod
   use Work_Mod, only: sijd_sijd => r_cell_01,  &
@@ -14,13 +14,21 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Field_Type), target :: flow
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c
-  real    :: s11,  s22,  s33,  s12,  s13,  s23,  s21,  s31,  s32
-  real    :: s11d, s22d, s33d, s12d, s13d, s23d, s21d, s31d, s32d
-  real    :: v11,  v22,  v33,  v12,  v13,  v23,  v21,  v31,  v32
+  type(Grid_Type), pointer :: grid
+  type(Var_Type),  pointer :: u, v, w
+  integer                  :: c
+  real                     :: s11, s22, s33,  s12, s13, s23,  s21, s31, s32
+  real                     :: s11d,s22d,s33d, s12d,s13d,s23d, s21d,s31d,s32d
+  real                     :: v11, v22, v33,  v12, v13, v23,  v21, v31, v32
 !==============================================================================!
+
+  ! Take aliases
+  grid => flow % pnt_grid
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
 
   !---------------!
   !               !

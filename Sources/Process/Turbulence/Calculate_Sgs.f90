@@ -1,18 +1,16 @@
 !==============================================================================!
-  subroutine Calculate_Sgs(grid)
+  subroutine Calculate_Sgs(flow)
 !------------------------------------------------------------------------------!
 !   Calculates SGS stresses and turbulent viscosity for 'LES'.                 !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Field_Mod
+  use Comm_Mod,  only: Comm_Mod_Exchange_Real
+  use Field_Mod, only: Field_Type, density, viscosity, buoyancy,  &
+                       grav_x, grav_y, grav_z
   use Les_Mod
-  use Comm_Mod, only: Comm_Mod_Exchange_Real
-  use Grid_Mod, only: Grid_Type
-  use Grad_Mod, only: Grad_Mod_For_Phi
-  use Work_Mod, only: t_x => r_cell_01,  &
-                      t_y => r_cell_02,  &
-                      t_z => r_cell_03
+  use Grid_Mod,  only: Grid_Type
+  use Grad_Mod,  only: Grad_Mod_For_Phi
 !------------------------------------------------------------------------------!
 !   Near(c) is the number of corresponding cell on the nearest wall.           !
 !   In case that, in parallel executions, the subdomain does not have          !
@@ -20,15 +18,22 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Field_Type), target :: flow
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, s, c1, c2
-  real    :: nx, ny, nz
-  real    :: cs
-  real    :: lf, u_tau_l, u_f 
-  real    :: u_tot, u_nor, u_tan, a_pow, b_pow, nu, dely
-  real    :: nc2
+  type(Grid_Type), pointer :: grid
+  type(Var_Type),  pointer :: u, v, w, t
+  integer                  :: c, s, c1, c2
+  real                     :: nx, ny, nz
+  real                     :: cs, lf, u_tau_l, u_f, nc2
+  real                     :: u_tot, u_nor, u_tan, a_pow, b_pow, nu, dely
 !==============================================================================!
+
+  ! Take aliases
+  grid => flow % pnt_grid
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+  t    => flow % t
 
   !---------------!
   !               !
@@ -36,9 +41,9 @@
   !               !
   !---------------!
   if(buoyancy) then
-    call Grad_Mod_For_Phi(grid, t % n, 1, t_x, .true.)  ! dT/dx
-    call Grad_Mod_For_Phi(grid, t % n, 2, t_y, .true.)  ! dT/dy
-    call Grad_Mod_For_Phi(grid, t % n, 3, t_z, .true.)  ! dT/dz
+    call Grad_Mod_For_Phi(grid, t % n, 1, t % x, .true.)  ! dT/dx
+    call Grad_Mod_For_Phi(grid, t % n, 2, t % y, .true.)  ! dT/dy
+    call Grad_Mod_For_Phi(grid, t % n, 3, t % z, .true.)  ! dT/dz
   end if
 
   if(turbulence_model .eq. LES_SMAGORINSKY) then
@@ -81,7 +86,7 @@
                 * (lf*lf)                 &  ! delta^2
                 * c_dyn(c)                &  ! c_dynamic
                 * sqrt(shear(c)*shear(c)  &
-                + 2.5*(grav_x*t_x(c) + grav_y*t_y(c) + grav_z*t_z(c)))  
+                + 2.5*(grav_x*t % x(c) + grav_y*t % y(c) + grav_z*t % z(c)))
       end do
     end if
 
@@ -97,11 +102,11 @@
 
   if(buoyancy) then
     do c = 1, grid % n_cells
-      nc2 = -(  grav_x * t_x(c)   &
-              + grav_y * t_y(c)   &
-              + grav_z * t_z(c))  &
-          / max(t_ref, TINY)
-      nc2 = max(0.0, nc2) 
+      nc2 = -(  grav_x * t % x(c)   &
+              + grav_y * t % y(c)   &
+              + grav_z * t % z(c))  &
+          / max(flow % t_ref, TINY)
+      nc2 = max(0.0, nc2)
       vis_t(c) = vis_t(c) * sqrt(1.0 - min(2.5*nc2/(shear(c)**2), 1.0))
     end do
   end if
