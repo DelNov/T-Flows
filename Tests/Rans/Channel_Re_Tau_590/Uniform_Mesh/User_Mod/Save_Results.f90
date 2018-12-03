@@ -9,7 +9,8 @@
   use Const_Mod                      ! constants
   use Comm_Mod                       ! parallel stuff
   use Grid_Mod,  only: Grid_Type
-  use Field_Mod, only: Field_Type
+  use Field_Mod, only: Field_Type, heat_transfer, heat_flux,  &
+                       density, viscosity, capacity, conductivity
   use Bulk_Mod,  only: Bulk_Type
   use Var_Mod,   only: Var_Type
   use Name_Mod,  only: problem_name
@@ -23,6 +24,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: u, v, w, t
+  real,            pointer :: flux(:)
   integer                  :: n_prob, pl, c, i, count, s, c1, c2, n_points
   character(len=80)        :: coord_name, res_name, res_name_plus
   character(len=80)        :: store_name
@@ -31,7 +33,7 @@
                               uw_p(:), tt_p(:), ut_p(:), vt_p(:), wt_p(:),  &
                               y_plus_p(:),  vis_t_p(:), ind(:), wall_p(:)
   integer, allocatable     :: n_p(:), n_count(:)
-  real                     :: t_wall, t_tau, d_wall, nu_max 
+  real                     :: t_wall, t_tau, d_wall, nu_max, t_inf
   real                     :: ubulk, error, re, cf_dean, cf, pr, u_tau_p
   logical                  :: there
 !==============================================================================!
@@ -258,8 +260,8 @@
             Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. WALLFL) then
 
           t_wall = t_wall + t % n(c2)
-          nu_max = nu_max + t % q(c2)/(conductivity     &
-                   *(t % n(c2) - t_inf + TINY))
+          nu_max = nu_max + t % q(c2)  &
+                 / (conductivity * (t % n(c2) - t_inf + TINY))
           n_points = n_points + 1
         end if
       end if
