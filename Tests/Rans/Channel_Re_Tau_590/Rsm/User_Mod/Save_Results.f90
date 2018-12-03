@@ -29,9 +29,9 @@
   character(len=80)        :: coord_name, res_name, res_name_plus
   character(len=80)        :: store_name
   real, allocatable        :: z_p(:), u_p(:), v_p(:), w_p(:), t_p(:),       &
-                              uu_p(:), vv_p(:), ww_p(:)
                               kin_p(:), eps_p(:), f22_p(:), zeta_p(:),      &
-                              uw_p(:), tt_p(:), ut_p(:), vt_p(:), wt_p(:),  &
+                              uu_p(:), vv_p(:), ww_p(:), uw_p(:),           &
+                              tt_p(:), ut_p(:), vt_p(:), wt_p(:),           &
                               y_plus_p(:),  vis_t_p(:), ind(:), wall_p(:)
   integer,allocatable      :: n_p(:), n_count(:)
   real                     :: t_wall, t_tau, d_wall, nu_max 
