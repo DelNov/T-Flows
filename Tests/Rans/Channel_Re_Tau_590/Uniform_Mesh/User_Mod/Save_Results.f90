@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(flow, bulk, save_name)
+  subroutine User_Mod_Save_Results(flow, save_name)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
@@ -19,10 +19,10 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
-  type(Bulk_Type)          :: bulk
   character(len=*)         :: save_name
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
+  type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u, v, w, t
   real,            pointer :: flux(:)
   integer                  :: n_prob, pl, c, i, count, s, c1, c2, n_points
@@ -40,6 +40,7 @@
 
   ! Take aliases
   grid => flow % pnt_grid
+  bulk => flow % bulk
   u    => flow % u
   v    => flow % v
   w    => flow % w

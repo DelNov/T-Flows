@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Source(flow, bulk, phi, a_matrix, b_vector)
+  subroutine User_Mod_Source(flow, phi, a_matrix, b_vector)
 !------------------------------------------------------------------------------!
 !   This is a prototype of a function for customized source for scalar.        !
 !   It is called from "Compute_Scalar" function, just before calling the       !
@@ -17,12 +17,12 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
-  type(Bulk_Type),  target :: bulk
   type(Var_Type),   target :: phi
   type(Matrix_Type)        :: a_matrix
   real, dimension(:)       :: b_vector
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: grid
+  type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u, v, w, t
   real,            pointer :: flux(:)
   integer                  :: c
@@ -31,6 +31,7 @@
   ! Take aliases
   grid => flow % pnt_grid
   flux => flow % flux
+  bulk => flow % bulk
   u    => flow % u
   v    => flow % v
   w    => flow % w
