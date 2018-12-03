@@ -10,7 +10,7 @@
   use Comm_Mod
   use Var_Mod,     only: Var_Type
   use Grid_Mod,    only: Grid_Type
-  use Grad_Mod
+  use Grad_Mod,    only: Grad_Mod_Variable
   use Info_Mod,    only: Info_Mod_Iter_Fill_At
   use Solver_Mod,  only: Solver_Type, Bicg, Cg, Cgs
   use Matrix_Mod,  only: Matrix_Type
@@ -77,9 +77,7 @@
   end do
 
   ! Gradients
-  call Grad_Mod_For_Phi(grid, phi % n, 1, phi_x, .true.)
-  call Grad_Mod_For_Phi(grid, phi % n, 2, phi_y, .true.)
-  call Grad_Mod_For_Phi(grid, phi % n, 3, phi_z, .true.)
+  call Grad_Mod_Variable(phi, .true.)
 
   !------------------!
   !                  !

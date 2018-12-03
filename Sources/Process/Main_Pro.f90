@@ -220,21 +220,15 @@
 
       call Info_Mod_Iter_Fill(ini)
 
-      call Grad_Mod_For_P(grid, flow % p % n,  &
-                                flow % p % x,  &
-                                flow % p % y,  &
-                                flow % p % z)
+      call Grad_Mod_Pressure(grid, flow % p % n,  &
+                                   flow % p % x,  &
+                                   flow % p % y,  &
+                                   flow % p % z)
 
       ! Compute velocity gradients
-      call Grad_Mod_For_Phi(grid, flow % u % n, 1, flow % u % x, .true.)
-      call Grad_Mod_For_Phi(grid, flow % u % n, 2, flow % u % y, .true.)
-      call Grad_Mod_For_Phi(grid, flow % u % n, 3, flow % u % z, .true.)
-      call Grad_Mod_For_Phi(grid, flow % v % n, 1, flow % v % x, .true.)
-      call Grad_Mod_For_Phi(grid, flow % v % n, 2, flow % v % y, .true.)
-      call Grad_Mod_For_Phi(grid, flow % v % n, 3, flow % v % z, .true.)
-      call Grad_Mod_For_Phi(grid, flow % w % n, 1, flow % w % x, .true.)
-      call Grad_Mod_For_Phi(grid, flow % w % n, 2, flow % w % y, .true.)
-      call Grad_Mod_For_Phi(grid, flow % w % n, 3, flow % w % z, .true.)
+      call Grad_Mod_Variable(flow % u, .true.)
+      call Grad_Mod_Variable(flow % v, .true.)
+      call Grad_Mod_Variable(flow % w, .true.)
 
       ! All velocity components one after another
       call Compute_Momentum(flow, bulk, 1, sol, dt, ini)
@@ -248,10 +242,10 @@
       call Balance_Mass(flow, bulk)
       call Compute_Pressure(flow, bulk, sol, dt, ini)
 
-      call Grad_Mod_For_P(grid, flow % pp % n,  &
-                                flow % p % x,   &
-                                flow % p % y,   &
-                                flow % p % z)
+      call Grad_Mod_Pressure(grid, flow % pp % n,  &
+                                   flow % p % x,   &
+                                   flow % p % y,   &
+                                   flow % p % z)
 
       call Bulk_Mod_Compute_Fluxes(grid, bulk, flow % flux)
       mass_res = Correct_Velocity(flow, bulk, sol, dt, ini)
@@ -306,17 +300,9 @@
           call Time_And_Length_Scale(grid)
         end if
 
-        call Grad_Mod_For_Phi(grid, flow % u % n, 1, flow % u % x,.true.)    ! dU/dx
-        call Grad_Mod_For_Phi(grid, flow % u % n, 2, flow % u % y,.true.)    ! dU/dy
-        call Grad_Mod_For_Phi(grid, flow % u % n, 3, flow % u % z,.true.)    ! dU/dz
-
-        call Grad_Mod_For_Phi(grid, flow % v % n, 1, flow % v % x,.true.)    ! dV/dx
-        call Grad_Mod_For_Phi(grid, flow % v % n, 2, flow % v % y,.true.)    ! dV/dy
-        call Grad_Mod_For_Phi(grid, flow % v % n, 3, flow % v % z,.true.)    ! dV/dz
-
-        call Grad_Mod_For_Phi(grid, flow % w % n, 1, flow % w % x,.true.)    ! dW/dx
-        call Grad_Mod_For_Phi(grid, flow % w % n, 2, flow % w % y,.true.)    ! dW/dy
-        call Grad_Mod_For_Phi(grid, flow % w % n, 3, flow % w % z,.true.)    ! dW/dz
+        call Grad_Mod_Variable(flow % u, .true.)
+        call Grad_Mod_Variable(flow % v, .true.)
+        call Grad_Mod_Variable(flow % w, .true.)
 
         call Compute_Stresses(flow, sol, dt, ini, uu, n)
         call Compute_Stresses(flow, sol, dt, ini, vv, n)

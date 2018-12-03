@@ -10,7 +10,7 @@
                        grav_x, grav_y, grav_z
   use Les_Mod
   use Grid_Mod,  only: Grid_Type
-  use Grad_Mod,  only: Grad_Mod_For_Phi
+  use Grad_Mod,  only: Grad_Mod_Array
 !------------------------------------------------------------------------------!
 !   Near(c) is the number of corresponding cell on the nearest wall.           !
 !   In case that, in parallel executions, the subdomain does not have          !
@@ -41,9 +41,7 @@
   !               !
   !---------------!
   if(buoyancy) then
-    call Grad_Mod_For_Phi(grid, t % n, 1, t % x, .true.)  ! dT/dx
-    call Grad_Mod_For_Phi(grid, t % n, 2, t % y, .true.)  ! dT/dy
-    call Grad_Mod_For_Phi(grid, t % n, 3, t % z, .true.)  ! dT/dz
+    call Grad_Mod_Array(grid, t % n, t % x, t % y, t % z, .true.)
   end if
 
   if(turbulence_model .eq. LES_SMAGORINSKY) then

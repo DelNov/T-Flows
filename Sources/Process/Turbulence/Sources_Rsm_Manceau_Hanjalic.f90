@@ -47,9 +47,9 @@
 
   kin_vis = viscosity / density
 
-  call Grad_Mod_For_Phi(grid, f22 % n, 1, f22_x,.true.)  ! df22/dx
-  call Grad_Mod_For_Phi(grid, f22 % n, 2, f22_y,.true.)  ! df22/dy
-  call Grad_Mod_For_Phi(grid, f22 % n, 3, f22_z,.true.)  ! df22/dz
+  call Grad_Mod_Component(grid, f22 % n, 1, f22_x,.true.)  ! df22/dx
+  call Grad_Mod_Component(grid, f22 % n, 2, f22_y,.true.)  ! df22/dy
+  call Grad_Mod_Component(grid, f22 % n, 3, f22_z,.true.)  ! df22/dz
 
   do  c = 1, grid % n_cells 
     kin % n(c) = max(0.5*(  uu % n(c)  &

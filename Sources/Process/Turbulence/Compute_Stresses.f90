@@ -90,9 +90,9 @@
   end if
 
   ! Gradients
-  call Grad_Mod_For_Phi(grid, phi % n, 1, phi_x, .true.)
-  call Grad_Mod_For_Phi(grid, phi % n, 2, phi_y, .true.)
-  call Grad_Mod_For_Phi(grid, phi % n, 3, phi_z, .true.)
+  call Grad_Mod_Component(grid, phi % n, 1, phi_x, .true.)
+  call Grad_Mod_Component(grid, phi % n, 2, phi_y, .true.)
+  call Grad_Mod_Component(grid, phi % n, 3, phi_z, .true.)
 
   !---------------!
   !               !
@@ -304,9 +304,9 @@
       end do
     end if
 
-    call Grad_Mod_For_Phi(grid, u1uj_phij, 1, u1uj_phij_x, .true.)
-    call Grad_Mod_For_Phi(grid, u2uj_phij, 2, u2uj_phij_y, .true.)
-    call Grad_Mod_For_Phi(grid, u3uj_phij, 3, u3uj_phij_z, .true.)
+    call Grad_Mod_Component(grid, u1uj_phij, 1, u1uj_phij_x, .true.)
+    call Grad_Mod_Component(grid, u2uj_phij, 2, u2uj_phij_y, .true.)
+    call Grad_Mod_Component(grid, u3uj_phij, 3, u3uj_phij_z, .true.)
 
     do c = 1, grid % n_cells
       b(c) = b(c) + (  u1uj_phij_x(c)  &
@@ -383,9 +383,9 @@
   end if
 
   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then 
-    call Grad_Mod_For_Phi(grid, f22 % n, 1, f22 % x, .true.) ! df22/dx
-    call Grad_Mod_For_Phi(grid, f22 % n, 2, f22 % y, .true.) ! df22/dy
-    call Grad_Mod_For_Phi(grid, f22 % n, 3, f22 % z, .true.) ! df22/dz
+    call Grad_Mod_Component(grid, f22 % n, 1, f22 % x, .true.) ! df22/dx
+    call Grad_Mod_Component(grid, f22 % n, 2, f22 % y, .true.) ! df22/dy
+    call Grad_Mod_Component(grid, f22 % n, 3, f22 % z, .true.) ! df22/dz
 
     call Sources_Rsm_Manceau_Hanjalic(flow, sol, phi % name)
   else if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then

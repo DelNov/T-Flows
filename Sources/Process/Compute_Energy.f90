@@ -102,9 +102,7 @@
   end if
 
   ! Gradients
-  call Grad_Mod_For_Phi(grid, t % n, 1, t % x, .true.)
-  call Grad_Mod_For_Phi(grid, t % n, 2, t % y, .true.)
-  call Grad_Mod_For_Phi(grid, t % n, 3, t % z, .true.)
+  call Grad_Mod_Variable(t, .true.)
 
   !---------------!
   !               !

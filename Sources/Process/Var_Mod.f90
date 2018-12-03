@@ -39,7 +39,6 @@
   include 'Var_Mod/Allocate_New_Only.f90'
   include 'Var_Mod/Allocate_Solution.f90'
   include 'Var_Mod/Allocate_Statistics.f90'
-  include 'Var_Mod/Allocate_Gradients.f90'
   include 'Var_Mod/Bnd_Cell_Type.f90'
 
   end module

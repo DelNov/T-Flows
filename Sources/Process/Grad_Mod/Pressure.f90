@@ -1,9 +1,7 @@
 !==============================================================================!
-  subroutine Grad_Mod_For_P(grid, phi, phi_x, phi_y, phi_z)
+  subroutine Grad_Mod_Pressure(grid, phi, phi_x, phi_y, phi_z)
 !------------------------------------------------------------------------------!
-!   Calculates gradient of generic variable phi. phi may stand either          !
-!   for pressure (P) or pressure corrections (PP). This procedure also         !
-!   handles different materials.                                               ! 
+!   Calculates gradient of pressure of pressure correction.
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Comm_Mod
@@ -38,9 +36,9 @@
     end if
   end do
 
-  call Grad_Mod_For_Phi(grid, phi, 1, phi_x, .true.)  ! dp/dx
-  call Grad_Mod_For_Phi(grid, phi, 2, phi_y, .true.)  ! dp/dy
-  call Grad_Mod_For_Phi(grid, phi, 3, phi_z, .true.)  ! dp/dz
+  call Grad_Mod_Component(grid, phi, 1, phi_x, .true.)  ! dp/dx
+  call Grad_Mod_Component(grid, phi, 2, phi_y, .true.)  ! dp/dy
+  call Grad_Mod_Component(grid, phi, 3, phi_z, .true.)  ! dp/dz
 
   do iter=1, 1
 
@@ -49,17 +47,17 @@
       c2 = grid % faces_c(2,s)
       if(c2 < 0) then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. PRESSURE) then
-          phi(c2) = phi(c1) + 1.2*( phi_x(c1) * (grid % xc(c2)-grid % xc(c1))&
-                            +       phi_y(c1) * (grid % yc(c2)-grid % yc(c1))&
-                            +       phi_z(c1) * (grid % zc(c2)-grid % zc(c1))&
+          phi(c2) = phi(c1) + 1.2*( phi_x(c1) * (grid % xc(c2)-grid % xc(c1))  &
+                            +       phi_y(c1) * (grid % yc(c2)-grid % yc(c1))  &
+                            +       phi_z(c1) * (grid % zc(c2)-grid % zc(c1))  &
                             )
         end if
       end if
     end do
 
-    call Grad_Mod_For_Phi(grid, phi, 1, phi_x, .true.)  ! dp/dx
-    call Grad_Mod_For_Phi(grid, phi, 2, phi_y, .true.)  ! dp/dy
-    call Grad_Mod_For_Phi(grid, phi, 3, phi_z, .true.)  ! dp/dz 
+    call Grad_Mod_Component(grid, phi, 1, phi_x, .true.)  ! dp/dx
+    call Grad_Mod_Component(grid, phi, 2, phi_y, .true.)  ! dp/dy
+    call Grad_Mod_Component(grid, phi, 3, phi_z, .true.)  ! dp/dz 
 
   end do
 

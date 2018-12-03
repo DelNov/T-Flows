@@ -20,6 +20,11 @@
   phi % pnt_grid => grid
 
   ! Values in the new (n) time step
-  allocate (phi % n (-grid % n_bnd_cells : grid % n_cells));   phi % n = 0.
+  allocate (phi % n(-grid % n_bnd_cells : grid % n_cells));  phi % n = 0.0
+
+  ! Gradients
+  allocate (phi % x(-grid % n_bnd_cells : grid % n_cells));  phi % x = 0.0
+  allocate (phi % y(-grid % n_bnd_cells : grid % n_cells));  phi % y = 0.0
+  allocate (phi % z(-grid % n_bnd_cells : grid % n_cells));  phi % z = 0.0
 
   end subroutine

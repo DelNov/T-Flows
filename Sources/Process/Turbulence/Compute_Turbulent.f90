@@ -11,16 +11,13 @@
   use Comm_Mod
   use Var_Mod,      only: Var_Type
   use Grid_Mod,     only: Grid_Type
-  use Grad_Mod
+  use Grad_Mod,     only: Grad_Mod_Variable
   use Info_Mod,     only: Info_Mod_Iter_Fill_At
   use Control_Mod
   use Numerics_Mod, only: CENTRAL, LINEAR, PARABOLIC
   use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
   use Matrix_Mod,   only: Matrix_Type
-  use Work_Mod,     only: phi_x   => r_cell_01,  &
-                          phi_y   => r_cell_02,  &
-                          phi_z   => r_cell_03,  &
-                          phi_min => r_cell_04,  &
+  use Work_Mod,     only: phi_min => r_cell_04,  &
                           phi_max => r_cell_05
 !------------------------------------------------------------------------------!
   implicit none
@@ -83,9 +80,7 @@
   end if
 
   ! Gradients
-  call Grad_Mod_For_Phi(grid, phi % n, 1, phi_x, .true.)
-  call Grad_Mod_For_Phi(grid, phi % n, 2, phi_y, .true.)
-  call Grad_Mod_For_Phi(grid, phi % n, 3, phi_z, .true.)
+  call Grad_Mod_Variable(phi, .true.)
 
   !---------------!
   !               !
@@ -125,7 +120,7 @@
       ! Compute phis with desired advection scheme
       if(adv_scheme .ne. CENTRAL) then
         call Advection_Scheme(flow, phis, s, phi % n, phi_min, phi_max,  &
-                              phi_x, phi_y, phi_z,                       &
+                              phi % x, phi % y, phi % z,                       &
                               grid % dx, grid % dy, grid % dz,           &
                               adv_scheme, blend)
       end if
@@ -195,9 +190,9 @@
                           + (1.0-grid % fw(s)) * vis_t_eff(c2))  &
                           / phi % sigma
     end if
-    phi_x_f = grid % fw(s) * phi_x(c1) + (1.0-grid % fw(s)) * phi_x(c2)
-    phi_y_f = grid % fw(s) * phi_y(c1) + (1.0-grid % fw(s)) * phi_y(c2)
-    phi_z_f = grid % fw(s) * phi_z(c1) + (1.0-grid % fw(s)) * phi_z(c2)
+    phi_x_f = grid % fw(s) * phi % x(c1) + (1.0-grid % fw(s)) * phi % x(c2)
+    phi_y_f = grid % fw(s) * phi % y(c1) + (1.0-grid % fw(s)) * phi % y(c2)
+    phi_z_f = grid % fw(s) * phi % z(c1) + (1.0-grid % fw(s)) * phi % z(c2)
 
     if(turbulence_model .eq. K_EPS_ZETA_F    .or.  &
        turbulence_model .eq. HYBRID_LES_RANS .or.  &
@@ -317,7 +312,7 @@
 
   if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
      turbulence_model .eq. DES_SPALART) then
-    call Source_Vis_Spalart_Almaras(grid, sol, phi_x, phi_y, phi_z)
+    call Source_Vis_Spalart_Almaras(grid, sol, phi % x, phi % y, phi % z)
   end if
 
   !---------------------------------!

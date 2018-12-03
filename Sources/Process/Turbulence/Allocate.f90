@@ -246,7 +246,6 @@
     if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
 
       call Var_Mod_Allocate_Solution('F22', f22, grid)
-      call Var_Mod_Allocate_Gradients(f22)
 
       if(turbulence_statistics) then
         call Var_Mod_Allocate_Statistics(f22)

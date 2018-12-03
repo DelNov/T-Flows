@@ -15,10 +15,12 @@
   contains
 
   include 'Grad_Mod/Allocate.f90'
+  include 'Grad_Mod/Array.f90'
   include 'Grad_Mod/Calculate_Matrix.f90'
   include 'Grad_Mod/Correct_Bad_Cells.f90'
   include 'Grad_Mod/Find_Bad_Cells.f90'
-  include 'Grad_Mod/For_P.f90'
-  include 'Grad_Mod/For_Phi.f90'
+  include 'Grad_Mod/Pressure.f90'
+  include 'Grad_Mod/Component.f90'
+  include 'Grad_Mod/Variable.f90'
 
   end module 

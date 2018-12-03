@@ -24,17 +24,9 @@
   call Var_Mod_Allocate_Solution('V', flow % v, grid)
   call Var_Mod_Allocate_Solution('W', flow % w, grid)
 
-  ! ... and their gradients
-  call Var_Mod_Allocate_Gradients(flow % u)
-  call Var_Mod_Allocate_Gradients(flow % v)
-  call Var_Mod_Allocate_Gradients(flow % w)
-
   ! Allocate memory for pressure correction and pressure
   call Var_Mod_Allocate_New_Only('PP', flow % pp, grid)
   call Var_Mod_Allocate_New_Only('P',  flow % p,  grid)
-
-  ! Pressure gradients are needed too
-  call Var_Mod_Allocate_Gradients(flow % p)
 
   ! Mass flow rates at cell faces are always needed
   allocate(flow % flux(grid % n_faces));  flow % flux = 0.

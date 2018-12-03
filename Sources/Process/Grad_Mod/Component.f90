@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Grad_Mod_For_Phi(grid, phi, i, phii, boundary)
+  subroutine Grad_Mod_Component(grid, phi, i, phii, boundary)
 !------------------------------------------------------------------------------!
 !   Calculates gradient of generic variable phi by a least squares method.     !
 !------------------------------------------------------------------------------!
