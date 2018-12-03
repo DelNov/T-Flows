@@ -432,7 +432,7 @@
     end if  
   end if  
 
-  call User_Mod_Source(grid, phi, a, b)
+  call User_Mod_Source(flow, phi, a, b)
 
   !---------------------------------!
   !                                 !
