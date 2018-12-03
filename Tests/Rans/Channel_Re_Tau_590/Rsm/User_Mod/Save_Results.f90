@@ -34,7 +34,7 @@
                               tt_p(:), ut_p(:), vt_p(:), wt_p(:),           &
                               y_plus_p(:),  vis_t_p(:), ind(:), wall_p(:)
   integer,allocatable      :: n_p(:), n_count(:)
-  real                     :: t_wall, t_tau, d_wall, nu_max 
+  real                     :: t_wall, t_tau, d_wall, nu_max, t_inf
   real                     :: ubulk, error, re, cf_dean, cf, pr, u_tau_p
   logical                  :: there
 !==============================================================================!
@@ -233,7 +233,7 @@
 
     call Comm_Mod_Wait
 
-    if(heat_flux> 0.0) then
+    if(heat_flux > 0.0) then
       call Comm_Mod_Global_Min_Real(t_inf)
     else
       call Comm_Mod_Global_Max_Real(t_inf)
