@@ -673,7 +673,7 @@ function processor_compilation_tests {
 
   echo "  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   echo "  !!"
-  echo "  !!    Running Processor full simulation tests"
+  echo "  !!    Running Processor compilation tests"
   echo "  !!"
   echo "  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 
@@ -885,10 +885,10 @@ function processor_full_length_tests {
 #------------------------------------------------------------------------------#
 # actual script
 #------------------------------------------------------------------------------#
-#generator_tests
-#convert_tests
-#divide_tests
+generator_tests
+convert_tests
+divide_tests
 processor_compilation_tests
-#processor_backup_tests
-#process_save_exit_now_tests
-#processor_full_length_tests
+processor_backup_tests
+process_save_exit_now_tests
+processor_full_length_tests
