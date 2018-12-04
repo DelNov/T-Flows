@@ -6,6 +6,7 @@
 !----------------------------------[Modules]-----------------------------------!
   use Domain_Mod,  only: Domain_Type
   use Grid_Mod,    only: Grid_Type,                         &
+                         Grid_Mod_Sort_Cells_Smart,         &
                          Grid_Mod_Sort_Faces_Smart,         &
                          Grid_Mod_Calculate_Wall_Distance,  &
                          Grid_Mod_Coarsen,                  &
@@ -41,6 +42,7 @@
   call Determine_Grid_Connectivity(refines, grid, .true.)   ! real run
   call Calculate_Grid_Geometry    (grid, .true.)
 
+  call Grid_Mod_Sort_Cells_Smart       (grid)
   call Grid_Mod_Sort_Faces_Smart       (grid)
   call Grid_Mod_Calculate_Wall_Distance(grid)
 
