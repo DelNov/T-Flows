@@ -23,7 +23,7 @@
   integer                   :: ini
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
-  type(Bulk_Type), pointer :: bulk
+  type(Bulk_Type),   pointer :: bulk
   type(Var_Type),    pointer :: u, v, w, p, pp
   real,              pointer :: flux(:)
   type(Matrix_Type), pointer :: a
@@ -31,7 +31,6 @@
   integer                    :: s, c, c1, c2, niter
   real                       :: u_f, v_f, w_f, a12, fs
   real                       :: ini_res, tol, mass_err
-  real                       :: smdpn         ! not needed, stored in a % fc
   real                       :: px_f, py_f, pz_f
   character(len=80)          :: precond
   real                       :: urf           ! under-relaxation factor
@@ -117,13 +116,6 @@
     ! Face is inside the domain
     if(c2 > 0) then
 
-      smdpn = (  grid % sx(s)*grid % sx(s)   &
-               + grid % sy(s)*grid % sy(s)   &
-               + grid % sz(s)*grid % sz(s) ) &
-            / (  grid % sx(s)*grid % dx(s)   & 
-               + grid % sy(s)*grid % dy(s)   &
-               + grid % sz(s)*grid % dz(s) )  
-
       ! Interpolate velocity 
       u_f = fs * u % n(c1) + (1.0-fs) * u % n(c2)
       v_f = fs * v % n(c1) + (1.0-fs) * v % n(c2)
@@ -131,7 +123,7 @@
 
       ! Calculate coeficients for the system matrix
       if(c2 > 0) then
-        a12 = 0.5 * density * smdpn *            &
+        a12 = 0.5 * density * a % fc(s) *        &
            (  grid % vol(c1) / a % sav(c1)       &
             + grid % vol(c2) / a % sav(c2) )
         a % val(a % pos(1,s)) = -a12
@@ -139,7 +131,7 @@
         a % val(a % dia(c1))  = a % val(a % dia(c1)) +  a12
         a % val(a % dia(c2))  = a % val(a % dia(c2)) +  a12
       else  ! I am somewhat surprised this part is here
-        a12 = 0.5 * density * smdpn *            &
+        a12 = 0.5 * density * a % fc(s) *        &
              (  grid % vol(c1) / a % sav(c1)     &
               + grid % vol(c2) / a % sav(c2) )
         a % val(a % pos(1,s)) = -a12
@@ -181,14 +173,10 @@
                              + v_f*grid % sy(s)  &
                              + w_f*grid % sz(s) )
         b(c1) = b(c1)-flux(s)
-        smdpn = (  grid % sx(s) * grid % sx(s)   &
-                 + grid % sy(s) * grid % sy(s)   &
-                 + grid % sz(s) * grid % sz(s) ) &
-              / (  grid % sx(s) * grid % dx(s)   &
-                 + grid % sy(s) * grid % dy(s)   &
-                 + grid % sz(s) * grid % dz(s) )  
-        a12 = density * smdpn * grid % vol(c1) / a % sav(c1)
-        a % val(a % dia(c1)) = a % val(a % dia(c1)) +  a12
+
+        a12 = density * a % fc(s) * grid % vol(c1) / a % sav(c1)
+        a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
+
       else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE) then
         u_f = u % n(c1)
         v_f = v % n(c1)
@@ -197,14 +185,10 @@
                              + v_f * grid % sy(s)  &
                              + w_f * grid % sz(s) )
         b(c1) = b(c1)-flux(s)
-        smdpn = ( grid % sx(s) * grid % sx(s)   &
-                + grid % sy(s) * grid % sy(s)   &
-                + grid % sz(s) * grid % sz(s) ) &
-              / ( grid % sx(s) * grid % dx(s)   &
-                + grid % sy(s) * grid % dy(s)   &
-                + grid % sz(s) * grid % dz(s) )
-        a12 = density * smdpn * grid % vol(c1) / a % sav(c1)
-        a % val(a % dia(c1)) = a % val(a % dia(c1)) +  a12
+
+        a12 = density * a % fc(s) * grid % vol(c1) / a % sav(c1)
+        a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
+
       else  ! it is SYMMETRY
         flux(s) = 0.0
       end if
