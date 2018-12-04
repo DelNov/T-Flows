@@ -1,17 +1,18 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(grid, name_save)
+  subroutine User_Mod_Save_Results(flow, name_save)
 !------------------------------------------------------------------------------!
 !   This is a prototype of customized saving functions.  All cases which       !
 !   require special procedures when saving results (1d or 2d profiles, non-    !
 !   standard save formats, and alike) should be done here, case-based.         !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
+  use Field_Mod
   use Grid_Mod
   use Var_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)  :: grid
+  type(Field_Type) :: flow
   character(len=*) :: name_save
 !==============================================================================!
 

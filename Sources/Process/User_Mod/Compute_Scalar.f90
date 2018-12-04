@@ -429,10 +429,10 @@
                 + f_ex2 - f_im2
         end if
       end do
-    end if  
-  end if  
+    end if
+  end if
 
-  call User_Mod_Source(grid, phi, a, b)
+  call User_Mod_Source(flow, phi, a, b)
 
   !---------------------------------!
   !                                 !
