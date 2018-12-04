@@ -82,7 +82,7 @@
 
   ! Count levels and cells
   do lev = 2, MAX_MG_LEVELS
-    if(N_MG_PARTS**(lev-1) > grid % n_cells/N_MG_PARTS) then
+    if(N_MG_PARTS**lev > grid % n_cells/N_MG_PARTS) then
       grid % n_levels = lev
       goto 1
     end if
