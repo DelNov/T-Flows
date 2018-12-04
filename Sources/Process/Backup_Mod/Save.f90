@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Backup_Mod_Save(fld, bulk, time_step, time_step_stat, name_save)
+  subroutine Backup_Mod_Save(fld, time_step, time_step_stat, name_save)
 !------------------------------------------------------------------------------!
 !   Saves backup files name.backup                                             !
 !------------------------------------------------------------------------------!
@@ -15,18 +15,19 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: fld
-  type(Bulk_Type)          :: bulk
   integer                  :: time_step       ! current time step
   integer                  :: time_step_stat  ! starting step for statistics
   character(len=*)         :: name_save
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
+  type(Bulk_Type), pointer :: bulk
   character(len=80)        :: name_out, store_name
   integer                  :: fh, d, vc
 !==============================================================================!
 
   ! Take aliases
   grid => fld % pnt_grid
+  bulk => fld % bulk
 
   store_name = problem_name
 

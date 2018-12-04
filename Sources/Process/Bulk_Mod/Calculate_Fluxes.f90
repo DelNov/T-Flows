@@ -1,7 +1,7 @@
 !==============================================================================!
-  subroutine Bulk_Mod_Compute_Fluxes(grid, bulk, flux)
+  subroutine Bulk_Mod_Calculate_Fluxes(grid, bulk, flux)
 !------------------------------------------------------------------------------!
-!   Compute mass fluxes through whole domain.                                  !
+!   Calculate mass fluxes through whole domain.                                  !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod

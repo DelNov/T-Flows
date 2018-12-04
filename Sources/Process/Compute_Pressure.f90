@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Pressure(flow, bulk, sol, dt, ini)
+  subroutine Compute_Pressure(flow, sol, dt, ini)
 !------------------------------------------------------------------------------!
 !   Forms and solves pressure equation for the SIMPLE method.                  !
 !------------------------------------------------------------------------------!
@@ -18,12 +18,12 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),  target :: flow
-  type(Bulk_Type)           :: bulk
   type(Solver_Type), target :: sol
   real                      :: dt
   integer                   :: ini
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
+  type(Bulk_Type), pointer :: bulk
   type(Var_Type),    pointer :: u, v, w, p, pp
   real,              pointer :: flux(:)
   type(Matrix_Type), pointer :: a
@@ -61,6 +61,7 @@
 
   ! Take aliases
   grid => flow % pnt_grid
+  bulk => flow % bulk
   flux => flow % flux
   u    => flow % u
   v    => flow % v

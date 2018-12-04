@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Initialize_Variables(flow, bulk)
+  subroutine Initialize_Variables(flow)
 !------------------------------------------------------------------------------!
 !   Initialize dependent variables.  (It is a bit of a mess still)             !
 !------------------------------------------------------------------------------!
@@ -17,11 +17,11 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
-  type(Bulk_Type)          :: bulk
 !----------------------------------[Calling]-----------------------------------!
   integer :: Key_Ind
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
+  type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u, v, w, t
   real,            pointer :: flux(:)
   integer                  :: i, c, c1, c2, m, s, nks, nvs
@@ -47,6 +47,7 @@
 
   ! Take aliases
   grid => flow % pnt_grid
+  bulk => flow % bulk
   flux => flow % flux
   u    => flow % u
   v    => flow % v

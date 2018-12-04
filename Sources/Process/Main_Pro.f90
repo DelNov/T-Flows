@@ -12,8 +12,7 @@
   use Rans_Mod
   use Grid_Mod
   use Grad_Mod
-  use Bulk_Mod,   only: Bulk_Type, Bulk_Mod_Compute_Fluxes,  &
-                        Bulk_Mod_Monitoring_Planes_Areas
+  use Bulk_Mod
   use Var_Mod,    only: Var_Type
   use Solver_Mod
   use Info_Mod
@@ -32,7 +31,6 @@
   character(len=80) :: name_save
   logical           :: backup, save_now, exit_now
   type(Grid_Type)   :: grid        ! grid used in computations
-  type(Bulk_Type)   :: bulk        ! bulk velocities, pressure drops, etc.
   type(Field_Type)  :: flow        ! flow field we will be solving for
   type(Solver_Type) :: sol         ! linear solvers
   real              :: time        ! physical time
@@ -108,14 +106,14 @@
   first_dt = 0
 
   ! Read backup file if directed so, and set the "backup" to .true. or .false.
-  call Backup_Mod_Load(flow, bulk, first_dt, n_stat, backup) 
+  call Backup_Mod_Load(flow, first_dt, n_stat, backup) 
 
   ! Read physical models from control file
-  call Read_Physical(flow, bulk, backup)
+  call Read_Physical(flow, backup)
 
   ! Initialize variables
   if(.not. backup) then
-    call Initialize_Variables(flow, bulk)
+    call Initialize_Variables(flow)
     call Comm_Mod_Wait
   end if
 
@@ -126,10 +124,10 @@
   call Monitor_Mod_Initialize(grid, backup)
 
   ! Plane for calcution of overall mass fluxes
-  call Control_Mod_Point_For_Monitoring_Planes(bulk)
+  call Control_Mod_Point_For_Monitoring_Planes(flow % bulk)
 
   ! Prepare ...
-  call Bulk_Mod_Monitoring_Planes_Areas(grid, bulk)
+  call Bulk_Mod_Monitoring_Planes_Areas(flow % bulk, grid)
   call Grad_Mod_Find_Bad_Cells         (grid)
 
   if(turbulence_model .eq. LES_SMAGORINSKY .and. .not. backup) then
@@ -140,11 +138,7 @@
   call Compute_Gradient_Matrix(grid, .true.)
 
   ! Print the areas of monitoring planes
-  if(this_proc < 2) then
-    write(*,'(a7,es12.5)') ' # Ax :', bulk % area_x
-    write(*,'(a7,es12.5)') ' # Ay :', bulk % area_y
-    write(*,'(a7,es12.5)') ' # Az :', bulk % area_z
-  end if
+  call Bulk_Mod_Print_Areas(flow % bulk)
 
   !---------------!
   !               !
@@ -204,7 +198,7 @@
       call Calculate_Sgs_Hybrid(grid)
     end if
 
-    call Convective_Outflow(flow, bulk, dt)
+    call Convective_Outflow(flow, dt)
     if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
        turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
       call Calculate_Vis_T_Rsm(flow)
@@ -231,24 +225,24 @@
       call Grad_Mod_Variable(flow % w, .true.)
 
       ! All velocity components one after another
-      call Compute_Momentum(flow, bulk, 1, sol, dt, ini)
-      call Compute_Momentum(flow, bulk, 2, sol, dt, ini)
-      call Compute_Momentum(flow, bulk, 3, sol, dt, ini)
+      call Compute_Momentum(flow, 1, sol, dt, ini)
+      call Compute_Momentum(flow, 2, sol, dt, ini)
+      call Compute_Momentum(flow, 3, sol, dt, ini)
 
       ! Refresh buffers for a % sav before discretizing for pressure
       ! (Can this call be somewhere in Compute Pressure?)
       call Comm_Mod_Exchange_Real(grid, sol % a % sav)
 
-      call Balance_Mass(flow, bulk)
-      call Compute_Pressure(flow, bulk, sol, dt, ini)
+      call Balance_Mass(flow)
+      call Compute_Pressure(flow, sol, dt, ini)
 
       call Grad_Mod_Pressure(grid, flow % pp % n,  &
-                                   flow % p % x,   &
-                                   flow % p % y,   &
-                                   flow % p % z)
+                                   flow % pp % x,   &
+                                   flow % pp % y,   &
+                                   flow % pp % z)
 
-      call Bulk_Mod_Compute_Fluxes(grid, bulk, flow % flux)
-      mass_res = Correct_Velocity(flow, bulk, sol, dt, ini)
+      call Bulk_Mod_Calculate_Fluxes(grid, flow % bulk, flow % flux)
+      mass_res = Correct_Velocity(flow, sol, dt, ini)
 
       ! Energy (practically temperature)
       if(heat_transfer) then
@@ -367,40 +361,8 @@
     call Calculate_Mean         (flow, n_stat, n)
     call User_Mod_Calculate_Mean(flow, n_stat, n)
 
-    !-----------------------------------------------------!
-    !   Recalculate the pressure drop                     !
-    !   to keep the constant mass flux                    !
-    !                                                     !
-    !   First Newtons law:                                !
-    !                                                     !
-    !   F = m * a                                         !
-    !                                                     !
-    !   where:                                            !
-    !                                                     !
-    !   a = dv / dt = dFlux / dt * 1 / (A * rho)          !
-    !   m = rho * v                                       !
-    !   F = Pdrop * l * A = Pdrop * v                     !
-    !                                                     !
-    !   finally:                                          !
-    !                                                     !
-    !   Pdrop * v = rho * v * dFlux / dt * 1 / (A * rho)  !
-    !                                                     !
-    !   after cancelling: v and rho, it yields:           !
-    !                                                     !
-    !   Pdrop = dFlux/dt/A                                !
-    !-----------------------------------------------------!
-    if( abs(bulk % flux_x_o) >= TINY ) then
-      bulk % p_drop_x = (bulk % flux_x_o - bulk % flux_x) &
-                         / (dt * bulk % area_x + TINY)
-    end if
-    if( abs(bulk % flux_y_o) >= TINY ) then
-      bulk % p_drop_y = (bulk % flux_y_o - bulk % flux_y) &
-                         / (dt * bulk % area_y + TINY)
-    end if
-    if( abs(bulk % flux_z_o) >= TINY ) then
-      bulk % p_drop_z = (bulk % flux_z_o - bulk % flux_z) &
-                         / (dt * bulk % area_z + TINY)
-    end if
+    ! Adjust pressure drops to keep the mass fluxes constant
+    call Bulk_Mod_Adjust_P_Drops(flow % bulk, dt)
 
     !----------------------!
     !   Save the results   !
@@ -417,7 +379,7 @@
 
     ! Is it time to save the backup file?
     if(save_now .or. exit_now .or. mod(n, bsi) .eq. 0) then
-      call Backup_Mod_Save(flow, bulk, n, n_stat, name_save)
+      call Backup_Mod_Save(flow, n, n_stat, name_save)
     end if
 
     ! Is it time to save results for post-processing
@@ -426,7 +388,7 @@
       call Save_Results(flow, name_save)
 
       ! Write results in user-customized format
-      call User_Mod_Save_Results(grid, name_save)
+      call User_Mod_Save_Results(flow, name_save)
     end if
 
     ! Just before the end of time step
@@ -456,10 +418,10 @@
   ! Save backup and post-processing files at exit
   call Comm_Mod_Wait
   call Save_Results(flow, name_save)
-  call Backup_Mod_Save(flow, bulk, n, n_stat, name_save)
+  call Backup_Mod_Save(flow, n, n_stat, name_save)
 
   ! Write results in user-customized format
-  call User_Mod_Save_Results(grid, name_save)
+  call User_Mod_Save_Results(flow, name_save)
   if(this_proc < 2) then
     open(9, file='stop')
     close(9)

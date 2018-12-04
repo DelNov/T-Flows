@@ -359,7 +359,7 @@
     end do
   end if
 
-  call User_Mod_Source(grid, t, a, b)
+  call User_Mod_Source(flow, t, a, b)
 
   !---------------------------------!
   !                                 !

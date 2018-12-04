@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Backup_Mod_Load(fld, bulk, time_step, time_step_stat, backup)
+  subroutine Backup_Mod_Load(fld, time_step, time_step_stat, backup)
 !------------------------------------------------------------------------------!
 !   Loads backup files name.backup                                             !
 !------------------------------------------------------------------------------!
@@ -15,18 +15,19 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: fld
-  type(Bulk_Type)          :: bulk
   integer                  :: time_step       ! current time step
   integer                  :: time_step_stat  ! starting step for statistics
   logical                  :: backup, present
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
+  type(Bulk_Type), pointer :: bulk
   character(len=80)        :: name_in, answer
   integer                  :: fh, d, vc
 !==============================================================================!
 
   ! Take aliases
   grid => fld % pnt_grid
+  bulk => fld % bulk
 
   ! Full name is specified in control file
   call Control_Mod_Load_Backup_Name(name_in)

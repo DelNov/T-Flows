@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Read_Physical(flow, bulk, restar)
+  subroutine Read_Physical(flow, backup)
 !------------------------------------------------------------------------------!
 !   Reads details about physial models.                                        !
 !------------------------------------------------------------------------------!
@@ -11,10 +11,14 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type) :: flow
-  type(Bulk_Type)  :: bulk
-  logical          :: restar
+  type(Field_Type), target :: flow
+  logical                  :: backup
+!----------------------------------[Locals]------------------------------------!
+  type(Bulk_Type), pointer :: bulk
 !==============================================================================!
+
+  ! Take aliases
+  bulk => flow % bulk
 
   !-------------------------!
   !   Related to bouyancy   !
@@ -59,7 +63,7 @@
   !------------------------------------!
   !   Pressure drops and mass fluxes   !
   !------------------------------------!
-  if(.not. restar) then
+  if(.not. backup) then
     call Control_Mod_Pressure_Drops(bulk)
     call Control_Mod_Mass_Flow_Rates(bulk)
   end if

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Balance_Mass(flow, bulk)
+  subroutine Balance_Mass(flow)
 !------------------------------------------------------------------------------!
 !   Modifies the fluxes at outflow boundaries to conserve the mass.            ! 
 !------------------------------------------------------------------------------!
@@ -15,9 +15,9 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
-  type(Bulk_Type)          :: bulk
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
+  type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u, v, w
   real,            pointer :: flux(:)
   integer                  :: s, c1, c2
@@ -26,6 +26,7 @@
 
   ! Take aliases
   grid => flow % pnt_grid
+  bulk => flow % bulk
   flux => flow % flux
   u    => flow % u
   v    => flow % v

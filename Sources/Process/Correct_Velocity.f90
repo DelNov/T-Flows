@@ -1,5 +1,5 @@
 !==============================================================================!
-  real function Correct_Velocity(flow, bulk, sol, dt, ini)
+  real function Correct_Velocity(flow, sol, dt, ini)
 !------------------------------------------------------------------------------!
 !   Corrects the velocities, and mass fluxes on the cell faces.                !
 !------------------------------------------------------------------------------!
@@ -20,12 +20,12 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),  target :: flow
-  type(Bulk_Type)           :: bulk
   type(Solver_Type), target :: sol
   real                      :: dt
   integer                   :: ini
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
+  type(Bulk_Type),   pointer :: bulk
   type(Var_Type),    pointer :: u, v, w, p, pp
   real,              pointer :: flux(:)
   type(Matrix_Type), pointer :: a
@@ -37,6 +37,7 @@
 
   ! Take aliases
   grid => flow % pnt_grid
+  bulk => flow % bulk
   flux => flow % flux
   u    => flow % u
   v    => flow % v
@@ -59,9 +60,9 @@
   !   velocities.                           !
   !-----------------------------------------!
   do c = 1, grid % n_cells
-    u % n(c) = u % n(c) - p % x(c) * grid % vol(c) / a % sav(c)
-    v % n(c) = v % n(c) - p % y(c) * grid % vol(c) / a % sav(c)
-    w % n(c) = w % n(c) - p % z(c) * grid % vol(c) / a % sav(c)
+    u % n(c) = u % n(c) - pp % x(c) * grid % vol(c) / a % sav(c)
+    v % n(c) = v % n(c) - pp % y(c) * grid % vol(c) / a % sav(c)
+    w % n(c) = w % n(c) - pp % z(c) * grid % vol(c) / a % sav(c)
   end do
 
   do s = 1, grid % n_faces

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Momentum(flow, bulk, i, sol, dt, ini)
+  subroutine Compute_Momentum(flow, i, sol, dt, ini)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves momentum conservation equations                     !
 !------------------------------------------------------------------------------!
@@ -25,13 +25,13 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),  target :: flow
-  type(Bulk_Type)           :: bulk
   integer                   :: i           ! component
   type(Solver_Type), target :: sol
   real                      :: dt
   integer                   :: ini
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
+  type(Bulk_Type),   pointer :: bulk
   type(Matrix_Type), pointer :: a
   type(Var_Type),    pointer :: ui, uj, uk, t, p
   real,              pointer :: flux(:)
@@ -111,6 +111,7 @@
 
   ! Take aliases
   grid => flow % pnt_grid
+  bulk => flow % bulk
   flux => flow % flux
   t    => flow % t
   p    => flow % p

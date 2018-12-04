@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Convective_Outflow(flow, bulk, dt)
+  subroutine Convective_Outflow(flow, dt)
 !------------------------------------------------------------------------------!
 !   Extrapoloate variables on the boundaries where needed.                     !
 !------------------------------------------------------------------------------!
@@ -16,10 +16,10 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
-  type(Bulk_Type)          :: bulk
   real                     :: dt
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
+  type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u, v, w, t
   real,            pointer :: flux(:)
   integer                  :: c1, c2, s
@@ -27,13 +27,14 @@
 
   ! Take aliases
   grid => flow % pnt_grid
+  bulk => flow % bulk
   flux => flow % flux
   u    => flow % u
   v    => flow % v
   w    => flow % w
   t    => flow % t
 
-  call Bulk_Mod_Compute_Fluxes(grid, bulk, flux)
+  call Bulk_Mod_Calculate_Fluxes(grid, bulk, flux)
 
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)

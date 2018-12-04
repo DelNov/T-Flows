@@ -7,6 +7,8 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Var_Mod
+  use Grid_Mod, only: Grid_Type
+  use Bulk_Mod, only: Bulk_Type
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -33,6 +35,9 @@
     ! Mass fluxes throught cell faces
     real, allocatable :: flux(:)
 
+    ! Bulk velocities, pressure drops, etc.
+    type(Bulk_Type) :: bulk
+
     ! Reference temperature
     real :: t_ref
 
@@ -41,6 +46,9 @@
   ! Variables determining if we are dealing with heat transfer and buoyancy
   logical :: heat_transfer
   logical :: buoyancy
+
+  ! Heat flux to the domain (important for periodic case with heat transfer)
+  real :: heat_flux
 
   ! Physical properties
   real :: viscosity, density, conductivity, diffusivity, capacity
