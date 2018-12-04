@@ -92,7 +92,7 @@
   call Turbulence_Allocate(flow)
   call User_Mod_Allocate(grid)
 
-  call Calculate_Face_Geometry(grid)
+  call Grid_Mod_Calculate_Face_Geometry(grid)
 
   ! Allocate memory for linear systems of equations
   ! (You need face geomtry for this step)
