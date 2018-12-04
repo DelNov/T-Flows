@@ -154,6 +154,7 @@
   include 'Grid_Mod/Bnd_Cond_Ranges.f90'
   include 'Grid_Mod/Decompose.f90'
   include 'Grid_Mod/Coarsen.f90'
+  include 'Grid_Mod/Calculate_Face_Geometry.f90'
   include 'Grid_Mod/Calculate_Wall_Distance.f90'
   include 'Grid_Mod/Estimate_Big_And_Small.f90'
   include 'Grid_Mod/Load_Cns.f90'
