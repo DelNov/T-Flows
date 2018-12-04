@@ -56,7 +56,7 @@
   end do
 
   ! Coarsen the grid with METIS
-  call Grid_Mod_Coarsen(grid)
+  ! call Grid_Mod_Coarsen(grid)
 
   !------------------------------!
   !   Save data for processing   !
