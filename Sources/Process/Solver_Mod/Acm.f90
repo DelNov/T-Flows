@@ -175,6 +175,4 @@
     end do
   end do
 
-STOP
-
   end subroutine
