@@ -29,6 +29,7 @@
     type(Matrix_Type), allocatable :: d_lev(:)  ! preconditiong matrix
     type(Vector_Type), allocatable :: x_lev(:)  ! unknown vector
     type(Vector_Type), allocatable :: b_lev(:)  ! right hand side
+    type(Vector_Type), allocatable :: p_lev(:)  ! one of the CG vectors
     type(Vector_Type), allocatable :: r_lev(:)  ! residual
 
   end type
