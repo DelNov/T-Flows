@@ -26,20 +26,29 @@
   type(Matrix_Type), pointer :: d_lev(:)
   type(Vector_Type), pointer :: x_lev(:)
   type(Vector_Type), pointer :: b_lev(:)
+  type(Vector_Type), pointer :: p_lev(:)
   type(Vector_Type), pointer :: r_lev(:)
   integer                    :: lev, c, c_lev, lev_max, cyc
-  real                       :: summ
+  integer                    :: n_iter, p_iter  ! requested and performed iters
 !==============================================================================!
 
-  lev_max = 3
-
+  ! Take aliases first
   grid  => sol % pnt_grid
   a     => sol % a
   a_lev => sol % a_lev
   d_lev => sol % d_lev
   x_lev => sol % x_lev
   b_lev => sol % b_lev
+  p_lev => sol % p_lev
   r_lev => sol % r_lev
+
+  lev_max = grid % n_levels
+  lev_max = 1
+
+  !----------------------------------------!
+  !   Set number of smoothing iterations   !
+  !----------------------------------------!
+  n_iter = 10  ! 10 seems to work the best for IC preconditioner
 
   !-------------------------------------------!
   !                                           !
@@ -53,6 +62,7 @@
   !---------------------------------!
   x_lev(1) % val(1:) = x(1:)
   b_lev(1) % val(1:) = b(1:)
+  r_lev(1) % val(1:) = 0.0
 
   !------------------------------------!
   !                                    !
@@ -64,17 +74,22 @@
   !                                    !
   !                                    !
   !------------------------------------!
-  call Cg_Level(lev,               &  ! level
-                a_lev(lev),        &  ! system matrix
-                d_lev(lev),        &  ! preconditioning matrix
-                x_lev(lev) % val,  &  ! solution
-                b_lev(lev) % val,  &  ! right hand side
-                r_lev(lev) % val,  &  ! residual vector
-                prec,              &  ! preconditioner
-                5,                 &  ! max iterations
-                tol,               &  ! tolerance
-                0.1,               &  ! residual ratio
-                fin_res)              ! final residual
+  do cyc = 1, n_cycles
+  call Cg_Level(1,               &  ! level
+                a_lev(1),        &  ! system matrix
+                d_lev(1),        &  ! preconditioning matrix
+                x_lev(1) % val,  &  ! solution
+                b_lev(1) % val,  &  ! right hand side
+                p_lev(1) % val,  &  ! p1 vector from cg algorith
+                r_lev(1) % val,  &  ! residual vector
+                prec,            &  ! preconditioner
+                cyc,             &  ! cycle
+                n_iter,          &  ! max iterations
+                p_iter,          &  ! performed iterations
+                tol,             &  ! tolerance
+                0.0001,          &  ! residual ratio
+                fin_res)            ! final residual
+  end do
 
   !--------------------!
   !                    !
@@ -102,12 +117,14 @@
       !     +---+---+          +-------+     !
       !       lev-1               lev        !
       !--------------------------------------!
-      b_lev(lev) % val(:) = 0.0
-      do c = 1, grid % level(lev-1) % n_cells       ! through finer cells
-        c_lev = grid % level(lev-1) % coarser_c(c)  ! get coarse cell
-        b_lev(lev) % val(c_lev) =  &
-        b_lev(lev) % val(c_lev) + r_lev(lev-1) % val(c)
-      end do
+      if(p_iter > 0) then  ! restriction only if it did something in the solver
+        b_lev(lev) % val(:) = 0.0
+        do c = 1, grid % level(lev-1) % n_cells       ! through finer cells
+          c_lev = grid % level(lev-1) % coarser_c(c)  ! get coarse cell
+          b_lev(lev) % val(c_lev) =  &
+          b_lev(lev) % val(c_lev) + r_lev(lev-1) % val(c)
+        end do
+      end if
 
       !---------------------------------!
       !   Solve    [A]{x} = b and       !
@@ -118,11 +135,14 @@
                     d_lev(lev),        &  ! preconditioning matrix
                     x_lev(lev) % val,  &  ! solution
                     b_lev(lev) % val,  &  ! right hand side
+                    p_lev(lev) % val,  &  ! p1 vector from cg algorith
                     r_lev(lev) % val,  &  ! residual vector
                     prec,              &  ! preconditioner
-                    10,                &  ! max iterations
+                    cyc,               &
+                    n_iter,            &  ! max iterations
+                    p_iter,            &  ! performed iterations
                     tol,               &  ! tolerance
-                    0.1,               &  ! residual ratio
+                    0.0001,            &  ! residual ratio
                     fin_res)              ! final residual
 
     end do  ! end of going down
@@ -151,11 +171,13 @@
       !     +-------+          +---+---+     !
       !       lev+1               lev        !
       !--------------------------------------!
-      do c = 1, grid % level(lev) % n_cells       ! through finer cells
-        c_lev = grid % level(lev) % coarser_c(c)  ! get coarse cell
-        x_lev(lev) % val(c) =  &
-        x_lev(lev) % val(c) + x_lev(lev+1) % val(c_lev)
-      end do
+      if(p_iter > 0) then  ! prolongation only if it did something in the solver
+        do c = 1, grid % level(lev) % n_cells       ! through finer cells
+          c_lev = grid % level(lev) % coarser_c(c)  ! get coarse cell
+          x_lev(lev) % val(c) =  &
+          x_lev(lev) % val(c) + x_lev(lev+1) % val(c_lev)
+        end do
+      end if
 
       !---------------------------------!
       !   Solve    [A]{x} = b and       !
@@ -166,11 +188,14 @@
                     d_lev(lev),        &  ! preconditioning matrix
                     x_lev(lev) % val,  &  ! solution
                     b_lev(lev) % val,  &  ! right hand side
+                    p_lev(lev) % val,  &  ! p1 vector from cg algorith
                     r_lev(lev) % val,  &  ! residual vector
                     prec,              &  ! preconditioner
-                    10,                &  ! max iterations
+                    2,                 &  ! cycle
+                    n_iter,            &  ! max iterations
+                    p_iter,            &  ! performed iterations
                     tol,               &  ! tolerance
-                    0.01,              &  ! residual ratio
+                    0.0001,            &  ! residual ratio
                     fin_res)              ! final residual
     end do
   end do

@@ -1,13 +1,14 @@
 !==============================================================================!
-  subroutine Cg_Level(lev, a, d, x, b, r, prec, niter, tol, res_rat, fin_res)
+  subroutine Cg_Level(lev, a, d, x, b, p, r, prec,    &
+                           cyc, max_iter, act_iter,         &
+                           tol, res_rat, fin_res)
 !------------------------------------------------------------------------------!
 !   Conjugate gradient method for one level of the multigrid.                  !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Comm_Mod
   use Matrix_Mod
-  use Work_Mod, only: p1 => r_cell_01,  &
-                      q1 => r_cell_02,  &
+  use Work_Mod, only: z => r_cell_02,  &
                       r1 => r_cell_03
 !------------------------------------------------------------------------------!
   implicit none
@@ -15,14 +16,17 @@
   integer           :: lev
   type(Matrix_Type) :: a
   type(Matrix_Type) :: d
-  real              :: x (a % pnt_grid % level(lev) % n_cells)
-  real              :: b (a % pnt_grid % level(lev) % n_cells)  ! [A]{x}={b}
-  real              :: r (a % pnt_grid % level(lev) % n_cells)  ! {r}={b}-[A]{x}
-  character(len=80) :: prec                              ! preconditioner
-  integer           :: niter                             ! number of iterations
-  real              :: tol                               ! tolerance
-  real              :: res_rat                           ! residual ratio
-  real              :: fin_res                           ! final residual
+  real              :: x(a % pnt_grid % level(lev) % n_cells)
+  real              :: b(a % pnt_grid % level(lev) % n_cells)  ! [A]{x}={b}
+  real              :: p(a % pnt_grid % level(lev) % n_cells)
+  real              :: r(a % pnt_grid % level(lev) % n_cells)  ! {r}={b}-[A]{x}
+  character(len=80) :: prec                     ! preconditioner
+  integer           :: cyc                      ! current cycle
+  integer           :: max_iter                 ! maximum number of iterations
+  integer           :: act_iter                 ! actual number of iterations
+  real              :: tol                      ! tolerance
+  real              :: res_rat                  ! residual ratio
+  real              :: fin_res                  ! final residual
 !-----------------------------------[Locals]-----------------------------------!
   integer :: nt, ni, i, j, k, iter
   real    :: alfa, beta, rho, rho_old, bnrm2, ini_res, res
@@ -70,53 +74,48 @@
     goto 1
   end if
 
-  !-----------!
-  !   p = r   !
-  !-----------!
-  p1(1:ni) = r1(1:ni)
-
   !---------------!
   !               !
   !   Main loop   !
   !               !
   !---------------!
-  do iter = 1, niter
+  do iter = 1, max_iter
 
     !----------------------!
     !     solve Mz = r     !
     !   (q instead of z)   !
     !----------------------!
-    call Prec_Solve(ni, a, d, q1(1:nt), r1(1:nt), prec)
+    call Prec_Solve(ni, a, d, z(1:nt), r1(1:nt), prec)
 
     !-----------------!
     !   rho = (r,z)   !
     !-----------------!
-    rho = dot_product(r1(1:ni), q1(1:ni))
+    rho = dot_product(r1(1:ni), z(1:ni))
     call Comm_Mod_Global_Sum_Real(rho)
 
-    if(iter .eq. 1) then
-      p1(1:ni) = q1(1:ni)
+    if(iter .eq. 1 .and. cyc .eq. 1) then
+      p(1:ni) = z(1:ni)
     else
       beta = rho / rho_old
-      p1(1:ni) = q1(1:ni) + beta * p1(1:ni)
+      p(1:ni) = z(1:ni) + beta * p(1:ni)
     end if
 
     !------------!
     !   q = Ap   !
     !------------!
-    call Comm_Mod_Exchange_Real(a % pnt_grid, p1)
+    call Comm_Mod_Exchange_Real(a % pnt_grid, p)
     do i = 1, ni
-      q1(i) = 0.0
+      z(i) = 0.0
       do j = a % row(i), a % row(i+1)-1
         k = a % col(j)
-        q1(i) = q1(i) + a % val(j) * p1(k)
+        z(i) = z(i) + a % val(j) * p(k)
       end do
     end do
 
     !------------------------!
     !   alfa = (r,z)/(p,q)   !
     !------------------------!
-    alfa = dot_product(p1(1:ni), q1(1:ni))
+    alfa = dot_product(p(1:ni), z(1:ni))
     call Comm_Mod_Global_Sum_Real(alfa)
     alfa = rho/alfa
 
@@ -124,8 +123,8 @@
     !   x = x + alfa p    !
     !   r = r - alfa Ap   !
     !---------------------!
-    x (1:ni) = x (1:ni) + alfa * p1(1:ni)
-    r1(1:ni) = r1(1:ni) - alfa * q1(1:ni)
+    x (1:ni) = x (1:ni) + alfa * p(1:ni)
+    r1(1:ni) = r1(1:ni) - alfa * z(1:ni)
 
     !-----------------------!
     !   Check convergence   !
@@ -148,7 +147,8 @@
   !                                  !
   !----------------------------------!
 1 continue
-  fin_res = res
+  act_iter = iter
+  fin_res  = res
 
   !---------------------------------!
   !   Compute: {r} = {b} - [A]{x}   !
