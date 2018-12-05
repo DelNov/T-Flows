@@ -217,6 +217,7 @@
 
   goto 1
   niter = 10
+  tol   = PICO
   call Acm(sol,       &
            pp % n,    &
            b,         &
