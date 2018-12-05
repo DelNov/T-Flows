@@ -10,7 +10,6 @@
   !   Maximum number of multi-grid levels   !
   !-----------------------------------------!
   integer, parameter :: MAX_MG_LEVELS = 12
-  integer, parameter :: N_MG_PARTS    =  4
 
   !---------------------!
   !                     !
