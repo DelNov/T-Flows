@@ -18,8 +18,8 @@
   do lev = grid % n_levels + 1, 1, -1
 
     ! Tentative number of cells and faces
-    n_cells = N_MG_PARTS ** (grid % n_levels + 1 - lev)
-    n_faces = grid % n_faces
+    n_cells = grid % level(lev) % n_cells
+    n_faces = grid % n_faces  ! could be cells times a factor
 
     if(lev .eq. 1) then
       n_cells = grid % n_cells
