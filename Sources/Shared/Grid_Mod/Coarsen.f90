@@ -1,14 +1,16 @@
 !==============================================================================!
-  subroutine Grid_Mod_Coarsen(grid)
+  subroutine Grid_Mod_Coarsen(grid, n_cells_coarsest, n_parts)
 !------------------------------------------------------------------------------!
 !   Coarsens the grid with METIS library.                                      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  integer         :: n_cells_coarsest  ! number of cells at coarsest level
+  integer         :: n_parts           ! partitioning of finer levels
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, c1, c2, nc, nc1, nc2, s, i, lev, lev_parts
-  integer              :: n_cells, n_faces, val_1, val_2
+  integer              :: n_cells, n_faces, val_1, val_2, n_parts_here
   integer              :: c_lev, s_lev
   integer              :: c1_lev_c, c2_lev_c, c1_lev_f, c2_lev_f
   integer, allocatable :: c1_arr(:), c2_arr(:), sf_arr(:)
@@ -74,21 +76,38 @@
   allocate(cell_weights(n_cells * n_constrains))
   allocate(face_weights(n_faces + n_faces))
   allocate(vert_data   (n_cells))
-  allocate(part_weight (N_MG_PARTS * n_constrains))
+  allocate(part_weight (n_cells_coarsest * n_constrains))
 
   !--------------------------------------------------------!
   !   Allocate memory and initialize data for all levels   !
   !--------------------------------------------------------!
 
   ! Count levels and cells
+  i = n_cells_coarsest
   do lev = 2, MAX_MG_LEVELS
-    if(N_MG_PARTS**lev > grid % n_cells/N_MG_PARTS) then
+    i = n_cells_coarsest * n_parts ** (lev-1)
+
+    ! Check if next level would be too fine; if so get out
+    if(i + n_cells_coarsest * lev * n_parts > grid % n_cells) then
       grid % n_levels = lev
       goto 1
     end if
   end do
   grid % n_levels = MAX_MG_LEVELS
 1 continue
+
+  ! Estimate number of cells at each level
+  grid % level(grid % n_levels + 1) % n_cells = 1
+  grid % level(grid % n_levels    ) % n_cells = n_cells_coarsest
+  do lev = grid % n_levels-1, 2, -1
+    grid % level(lev) % n_cells = grid % level(lev+1) % n_cells * n_parts
+  end do
+  grid % level(1) % n_cells = grid % n_cells
+
+  do lev = 1, grid % n_levels
+    print '(a, i2, a, i9)', ' # Number of cells at level ',  &
+                             lev, ' is ', grid % level(lev) % n_cells
+  end do
 
   ! Perform allocation and initialization
   call Grid_Mod_Create_Levels(grid)
@@ -106,12 +125,13 @@
   do lev = grid % n_levels, 2, -1  ! goes from the coarsest (highest number)
                                    ! to the finest (lower number and zero)
 
-    lev_parts = N_MG_PARTS ** (grid % n_levels - lev)
+    ! Number of partitions (cells) at coarser level
+    lev_parts = grid % level(lev+1) % n_cells
 
-    print '(a19,i2,a7,i7,a7)', ' # Working on level',                      &
-                               lev,                                        &
-                               ' with  ',                                  &
-                               N_MG_PARTS ** (grid % n_levels - lev + 1),  &
+    print '(a19,i2,a7,i7,a7)', ' # Working on level',        &
+                               lev,                          &
+                               ' with  ',                    &
+                               grid % level(lev) % n_cells,  &
                                ' cells.'
 
     !---------------------------------------------!
@@ -179,11 +199,14 @@
         end do
       end do
 
+      n_parts_here = n_parts
+      if(lev .eq. grid % n_levels) n_parts_here = n_cells_coarsest
+
       imbalance(:)    = 1.001
       cell_weights(:) = 1
       face_weights(:) = 1
       vert_data(:)    = 1
-      part_weight(:)  = 1.0 / real(N_MG_PARTS)
+      part_weight(:)  = 1.0 / real(n_parts_here)
 
       !-----------------------------------------!
       !   Exectute the call to METIS function   !
@@ -199,7 +222,7 @@
                                     cell_weights,  &  !  5. (in), int(:)
                                     vert_data,     &  !  6. (in), int(:)
                                     face_weights,  &  !  7. (in), int(:)
-                                    N_MG_PARTS,    &  !  8. (in), int(:)
+                                    n_parts_here,  &  !  8. (in), int(:)
                                     part_weight,   &  !  9. (in), real(:)
                                     imbalance,     &  ! 10. (in), real(:)
                                     metis_options, &  ! 11. (in), int(:)
@@ -214,7 +237,7 @@
       do nc = 1, n_cells
         c = old_c(nc)
         grid % level(lev) % cell(c) = &
-         (grid % level(lev+1) % cell(c)-1) * N_MG_PARTS + part(nc)
+         (grid % level(lev+1) % cell(c)-1) * n_parts_here + part(nc)
       end do
     end do
   end do
