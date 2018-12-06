@@ -44,7 +44,9 @@
   p_lev => sol % p_lev
   r_lev => sol % r_lev
 
-  lev_max = grid % n_levels
+  ! Set maximum number of levels to perform
+  call Control_Mod_V_Cycle_Max_Grid_Levels(lev_max)
+  lev_max = min(lev_max, grid % n_levels)
 
   ! Set number of smoothing iterations
   n_iter = 10  ! 10 seems to work the best for IC preconditioner
