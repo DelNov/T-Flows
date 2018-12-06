@@ -43,7 +43,6 @@
   r_lev => sol % r_lev
 
   lev_max = grid % n_levels
-  lev_max = 1
 
   !----------------------------------------!
   !   Set number of smoothing iterations   !
@@ -83,7 +82,7 @@
                 p_lev(1) % val,  &  ! p1 vector from cg algorith
                 r_lev(1) % val,  &  ! residual vector
                 prec,            &  ! preconditioner
-                cyc,             &  ! cycle
+                1,               &  ! cycle
                 n_iter,          &  ! max iterations
                 p_iter,          &  ! performed iterations
                 tol,             &  ! tolerance
@@ -138,7 +137,7 @@
                     p_lev(lev) % val,  &  ! p1 vector from cg algorith
                     r_lev(lev) % val,  &  ! residual vector
                     prec,              &  ! preconditioner
-                    cyc,               &
+                    1,                 &
                     n_iter,            &  ! max iterations
                     p_iter,            &  ! performed iterations
                     tol,               &  ! tolerance
@@ -191,7 +190,7 @@
                     p_lev(lev) % val,  &  ! p1 vector from cg algorith
                     r_lev(lev) % val,  &  ! residual vector
                     prec,              &  ! preconditioner
-                    2,                 &  ! cycle
+                    1,                 &  ! cycle
                     n_iter,            &  ! max iterations
                     p_iter,            &  ! performed iterations
                     tol,               &  ! tolerance
