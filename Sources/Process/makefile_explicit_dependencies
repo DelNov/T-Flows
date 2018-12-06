@@ -6,10 +6,22 @@ $(DIR_OBJECT)/Name_Mod.o \
 Monitor_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
+
+#-- ./Field_Mod.f90
+$(DIR_OBJECT)/Field_Mod.o:\
+$(DIR_OBJECT)/Var_Mod.o \
+Var_Mod/*.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+Field_Mod/*.f90 \
+$(DIR_OBJECT)/Bulk_Mod.o \
+Bulk_Mod/*.f90 
 
 #-- ./Monitor_Mod/Initialize.f90
 $(DIR_OBJECT)/Initialize.o:\
@@ -24,12 +36,16 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 #-- ./Monitor_Mod/Write_4_Vars.f90
 $(DIR_OBJECT)/Write_4_Vars.o:\
 $(DIR_OBJECT)/Var_Mod.o \
-Var_Mod/*.f90 
+Var_Mod/*.f90 \
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 
 
 #-- ./Monitor_Mod/Write_5_Vars.f90
 $(DIR_OBJECT)/Write_5_Vars.o:\
 $(DIR_OBJECT)/Var_Mod.o \
-Var_Mod/*.f90 
+Var_Mod/*.f90 \
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 
 
 #-- ./Monitor_Mod/Finalize.f90
 #-- ./Initialize_Variables.f90
@@ -42,6 +58,7 @@ $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
@@ -67,6 +84,7 @@ Info_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
@@ -85,6 +103,7 @@ $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -95,6 +114,7 @@ $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 
 
@@ -107,6 +127,7 @@ $(DIR_OBJECT)/Numerics_Mod.o \
 $(DIR_OBJECT)/Monitor_Mod.o \
 Monitor_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
@@ -117,13 +138,14 @@ Bulk_Mod/*.f90
 
 #-- ./Calculate_Mean.f90
 $(DIR_OBJECT)/Calculate_Mean.o:\
+$(DIR_OBJECT)/Var_Mod.o \
+Var_Mod/*.f90 \
 $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
-$(DIR_OBJECT)/Control_Mod.o \
-Control_Mod/*/*.f90 \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #-- ./Numerics_Mod.f90
@@ -131,8 +153,11 @@ $(DIR_OBJECT)/Const_Mod.o
 $(DIR_OBJECT)/Read_Physical.o:\
 $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
-Control_Mod/*/*.f90 
+Control_Mod/*/*.f90 \
+$(DIR_OBJECT)/Bulk_Mod.o \
+Bulk_Mod/*.f90 
 
 #-- ./Update_Boundary_Values.f90
 $(DIR_OBJECT)/Update_Boundary_Values.o:\
@@ -140,6 +165,7 @@ $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
@@ -168,6 +194,7 @@ Info_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
@@ -177,16 +204,21 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90 \
 $(DIR_OBJECT)/Bulk_Mod.o \
 Bulk_Mod/*.f90 
 
-#-- ./Calculate_Mass_Field_Rate.f90
-$(DIR_OBJECT)/Calculate_Mass_Field_Rate.o:\
+#-- ./Calculate_Mass_Flow_Rate.f90
+$(DIR_OBJECT)/Calculate_Mass_Flow_Rate.o:\
+$(DIR_OBJECT)/Var_Mod.o \
+Var_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o 
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 
 
 #-- ./Grad_Mod.f90
 $(DIR_OBJECT)/Grad_Mod.o:\
 $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 \
+$(DIR_OBJECT)/Var_Mod.o \
+Var_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 Grad_Mod/*.f90 \
@@ -225,6 +257,7 @@ $(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
@@ -308,11 +341,10 @@ $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
 
-#-- ./Calculate_Face_Geometry.f90
-$(DIR_OBJECT)/Calculate_Face_Geometry.o:\
+#-- ./Field_Mod/Allocate.f90
+$(DIR_OBJECT)/Allocate.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Bulk_Mod/Monitoring_Planes_Areas.f90
 $(DIR_OBJECT)/Monitoring_Planes_Areas.o:\
@@ -322,8 +354,18 @@ $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
 
-#-- ./Bulk_Mod/Compute_Fluxes.f90
-$(DIR_OBJECT)/Compute_Fluxes.o:\
+#-- ./Bulk_Mod/Adjust_P_Drops.f90
+$(DIR_OBJECT)/Adjust_P_Drops.o:\
+$(DIR_OBJECT)/Const_Mod.o 
+
+#-- ./Bulk_Mod/Print_Areas.f90
+$(DIR_OBJECT)/Print_Areas.o:\
+$(DIR_SHARED)/Comm_Mod_Seq.f90 \
+$(DIR_SHARED)/Comm_Mod_Par.f90 \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 
+
+#-- ./Bulk_Mod/Calculate_Fluxes.f90
+$(DIR_OBJECT)/Calculate_Fluxes.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
@@ -336,6 +378,7 @@ $(DIR_OBJECT)/Bnd_Cond_Mod.o
 #-- ./Control_Mod/Numerics/Normalization_For_Momentum_Solver.f90
 #-- ./Control_Mod/Numerics/Tolerance_For_Pressure_Solver.f90
 #-- ./Control_Mod/Numerics/Max_Iterations_For_Presssure_Solver.f90
+#-- ./Control_Mod/Numerics/V_Cycle_Max_Grid_Levels.f90
 #-- ./Control_Mod/Numerics/Tolerance_For_Turbulence_Solver.f90
 #-- ./Control_Mod/Numerics/Advection_Scheme_For_Momentum.f90
 $(DIR_OBJECT)/Advection_Scheme_For_Momentum.o:\
@@ -393,6 +436,7 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 
 #-- ./Control_Mod/Numerics/Blending_Coefficient_For_Turbulence.f90
 #-- ./Control_Mod/Numerics/Min_Simple_Iterations.f90
+#-- ./Control_Mod/Numerics/V_Cycle_Number_Of_Smoothing_Iterations.f90
 #-- ./Control_Mod/Numerics/Normalization_For_Simple_Algorithm.f90
 #-- ./Control_Mod/Numerics/Normalization_For_Energy_Solver.f90
 #-- ./Control_Mod/Numerics/Normalization_For_Pressure_Solver.f90
@@ -418,6 +462,7 @@ $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
 
+#-- ./Control_Mod/Numerics/V_Cycle_Residual_Ratio.f90
 #-- ./Control_Mod/Numerics/Max_Simple_Iterations.f90
 #-- ./Control_Mod/User/Blending_Coefficient_For_User_Scalars.f90
 #-- ./Control_Mod/User/Tolerance_For_User_Scalars_Solver.f90
@@ -523,6 +568,7 @@ Monitor_Mod/*.f90
 #-- ./Control_Mod/Physics/Heat_Transfer.f90
 $(DIR_OBJECT)/Heat_Transfer.o:\
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -530,7 +576,8 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 #-- ./Control_Mod/Physics/Angular_Velocity_Vector.f90
 #-- ./Control_Mod/Physics/Gravitational_Vector.f90
 $(DIR_OBJECT)/Gravitational_Vector.o:\
-$(DIR_OBJECT)/Field_Mod.o 
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 
 
 #-- ./Control_Mod/Physics/Turbulence_Model.f90
 $(DIR_OBJECT)/Turbulence_Model.o:\
@@ -541,7 +588,6 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 
 #-- ./Control_Mod/Physics/Pressure_Drops.f90
 $(DIR_OBJECT)/Pressure_Drops.o:\
-$(DIR_OBJECT)/Field_Mod.o \
 $(DIR_OBJECT)/Bulk_Mod.o \
 Bulk_Mod/*.f90 
 
@@ -563,7 +609,8 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 #-- ./Control_Mod/Physics/Turbulent_Schmidt_Number.f90
 #-- ./Control_Mod/Physics/Reference_Temperature.f90
 $(DIR_OBJECT)/Reference_Temperature.o:\
-$(DIR_OBJECT)/Field_Mod.o 
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 
 
 #-- ./Control_Mod/Physics/Turbulent_Heat_Flux_Model.f90
 $(DIR_OBJECT)/Turbulent_Heat_Flux_Model.o:\
@@ -572,18 +619,22 @@ $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
 
-#-- ./Control_Mod/Physics/Mass_Field_Rates.f90
-$(DIR_OBJECT)/Mass_Field_Rates.o:\
-$(DIR_OBJECT)/Field_Mod.o \
+#-- ./Control_Mod/Physics/Mass_Flow_Rates.f90
+$(DIR_OBJECT)/Mass_Flow_Rates.o:\
 $(DIR_OBJECT)/Bulk_Mod.o \
 Bulk_Mod/*.f90 
 
 #-- ./Control_Mod/Physics/Point_For_Monitoring_Planes.f90
+$(DIR_OBJECT)/Point_For_Monitoring_Planes.o:\
+$(DIR_OBJECT)/Bulk_Mod.o \
+Bulk_Mod/*.f90 
+
 #-- ./Control_Mod/Physics/Thermal_Conductivity.f90
 #-- ./Control_Mod/Physics/Roughness_Coefficient.f90
 #-- ./Control_Mod/Physics/Buoyancy.f90
 $(DIR_OBJECT)/Buoyancy.o:\
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -603,13 +654,6 @@ $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
 
-#-- ./Field_Mod.f90
-$(DIR_OBJECT)/Field_Mod.o:\
-$(DIR_OBJECT)/Var_Mod.o \
-Var_Mod/*.f90 \
-$(DIR_OBJECT)/Bulk_Mod.o \
-Bulk_Mod/*.f90 
-
 #-- ./Save_Cgns_Results.f90
 $(DIR_OBJECT)/Save_Cgns_Results.o:\
 $(DIR_OBJECT)/Work_Mod.o \
@@ -624,6 +668,7 @@ $(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
@@ -641,7 +686,18 @@ Var_Mod/*.f90 \
 $(DIR_OBJECT)/Matrix_Mod.o \
 Matrix_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
+$(DIR_OBJECT)/Bulk_Mod.o \
+Bulk_Mod/*.f90 
+
+#-- ./User_Mod/Beginning_Of_Compute_Energy.f90
+$(DIR_OBJECT)/Beginning_Of_Compute_Energy.o:\
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 
 
 #-- ./User_Mod/Calculate_Mean.f90
 $(DIR_OBJECT)/Calculate_Mean.o:\
@@ -650,6 +706,7 @@ $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
@@ -658,12 +715,15 @@ $(DIR_OBJECT)/Const_Mod.o
 $(DIR_OBJECT)/End_Of_Compute_Momentum.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o 
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 
 
 #-- ./User_Mod/Beginning_Of_Time_Step.f90
 $(DIR_OBJECT)/Beginning_Of_Time_Step.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 
 
 #-- ./User_Mod/Initialize.f90
 $(DIR_OBJECT)/Initialize.o:\
@@ -673,7 +733,9 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 #-- ./User_Mod/Allocate.f90
 $(DIR_OBJECT)/Allocate.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Control_Mod.o \
+Control_Mod/*/*.f90 
 
 #-- ./User_Mod/Save_Vtu_Results.f90
 $(DIR_OBJECT)/Save_Vtu_Results.o:\
@@ -691,24 +753,43 @@ Matrix_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
+#-- ./User_Mod/End_Of_Compute_Energy.f90
+$(DIR_OBJECT)/End_Of_Compute_Energy.o:\
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 
+
 #-- ./User_Mod/End_Of_Correct_Velocity.f90
 $(DIR_OBJECT)/End_Of_Correct_Velocity.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o 
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 
 
 #-- ./User_Mod/Beginning_Of_Correct_Velocity.f90
 $(DIR_OBJECT)/Beginning_Of_Correct_Velocity.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o 
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 
 
 #-- ./User_Mod/Save_Results.f90
 $(DIR_OBJECT)/Save_Results.o:\
 $(DIR_OBJECT)/Var_Mod.o \
 Var_Mod/*.f90 \
+$(DIR_OBJECT)/Rans_Mod.o \
+$(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o \
+$(DIR_SHARED)/Comm_Mod_Seq.f90 \
+$(DIR_SHARED)/Comm_Mod_Par.f90 \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 \
+$(DIR_OBJECT)/Bulk_Mod.o \
+Bulk_Mod/*.f90 
 
 #-- ./User_Mod/Save_Cgns_Results.f90
 $(DIR_OBJECT)/Save_Cgns_Results.o:\
@@ -741,6 +822,7 @@ $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
@@ -750,14 +832,23 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 
 #-- ./User_Mod/End_Of_Time_Step.f90
 $(DIR_OBJECT)/End_Of_Time_Step.o:\
+$(DIR_OBJECT)/Var_Mod.o \
+Var_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o \
+$(DIR_SHARED)/Comm_Mod_Seq.f90 \
+$(DIR_SHARED)/Comm_Mod_Par.f90 \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 
 
 #-- ./User_Mod/Beginning_Of_Compute_Pressure.f90
 $(DIR_OBJECT)/Beginning_Of_Compute_Pressure.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o 
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 
 
 #-- ./User_Mod/Before_Exit.f90
 $(DIR_OBJECT)/Before_Exit.o:\
@@ -768,29 +859,15 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 $(DIR_OBJECT)/Beginning_Of_Compute_Momentum.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o 
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 
 
 #-- ./User_Mod/End_Of_Compute_Pressure.f90
 $(DIR_OBJECT)/End_Of_Compute_Pressure.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o 
-
-#-- ./Allocate_Variables.f90
-$(DIR_OBJECT)/Allocate_Variables.o:\
-User_Mod_Vtu.f90 \
-User_Mod/*.f90 \
-User_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Les_Mod.o \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Grad_Mod.o \
-Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
-$(DIR_OBJECT)/Control_Mod.o \
-Control_Mod/*/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
+Field_Mod/*.f90 
 
 #-- ./Logo_Pro.f90
 #-- ./Backup_Mod.f90
@@ -803,29 +880,29 @@ $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Grad_Mod.o \
-Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 \
+$(DIR_OBJECT)/Bulk_Mod.o \
+Bulk_Mod/*.f90 \
 Backup_Mod/*.f90 
 
 #-- ./Vector_Mod/Allocate_Level.f90
 #-- ./Vector_Mod/Allocate.f90
 #-- ./Convective_Outflow.f90
 $(DIR_OBJECT)/Convective_Outflow.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
@@ -887,15 +964,16 @@ $(DIR_OBJECT)/Load.o:\
 $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Grad_Mod.o \
-Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
+$(DIR_SHARED)/Comm_Mod/*/*.f90 \
+$(DIR_OBJECT)/Bulk_Mod.o \
+Bulk_Mod/*.f90 
 
 #-- ./Backup_Mod/Read_Variable.f90
 $(DIR_OBJECT)/Read_Variable.o:\
@@ -924,10 +1002,13 @@ $(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
+$(DIR_SHARED)/Comm_Mod/*/*.f90 \
+$(DIR_OBJECT)/Bulk_Mod.o \
+Bulk_Mod/*.f90 
 
 #-- ./Backup_Mod/Read_Real.f90
 $(DIR_OBJECT)/Read_Real.o:\
@@ -1001,6 +1082,8 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 
 #-- ./Load_Boundary_Conditions.f90
 $(DIR_OBJECT)/Load_Boundary_Conditions.o:\
+$(DIR_OBJECT)/Var_Mod.o \
+Var_Mod/*.f90 \
 User_Mod_Vtu.f90 \
 User_Mod/*.f90 \
 User_Mod_Cgns.f90 \
@@ -1010,6 +1093,7 @@ $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
@@ -1019,8 +1103,6 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 
 #-- ./Calculate_Vorticity.f90
 $(DIR_OBJECT)/Calculate_Vorticity.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
@@ -1028,12 +1110,20 @@ $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
 
-#-- ./Grad_Mod/For_Phi.f90
-$(DIR_OBJECT)/For_Phi.o:\
+#-- ./Grad_Mod/Variable.f90
+$(DIR_OBJECT)/Variable.o:\
+$(DIR_OBJECT)/Var_Mod.o \
+Var_Mod/*.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 
+
+#-- ./Grad_Mod/Component.f90
+$(DIR_OBJECT)/Component.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
@@ -1046,10 +1136,26 @@ $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
-#-- ./Grad_Mod/Allocate_Memory.f90
-$(DIR_OBJECT)/Allocate_Memory.o:\
+#-- ./Grad_Mod/Allocate.f90
+$(DIR_OBJECT)/Allocate.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
+
+#-- ./Grad_Mod/Pressure.f90
+$(DIR_OBJECT)/Pressure.o:\
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_SHARED)/Comm_Mod_Seq.f90 \
+$(DIR_SHARED)/Comm_Mod_Par.f90 \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 
+
+#-- ./Grad_Mod/Array.f90
+$(DIR_OBJECT)/Array.o:\
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_SHARED)/Comm_Mod_Seq.f90 \
+$(DIR_SHARED)/Comm_Mod_Par.f90 \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 
 
 #-- ./Grad_Mod/Find_Bad_Cells.f90
 $(DIR_OBJECT)/Find_Bad_Cells.o:\
@@ -1063,14 +1169,6 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 
 #-- ./Grad_Mod/Correct_Bad_Cells.f90
 $(DIR_OBJECT)/Correct_Bad_Cells.o:\
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Grad_Mod/For_P.f90
-$(DIR_OBJECT)/For_P.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
@@ -1100,6 +1198,7 @@ $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
@@ -1116,13 +1215,17 @@ $(DIR_OBJECT)/Advection_Scheme.o:\
 $(DIR_OBJECT)/Numerics_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o 
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 
 
 #-- ./Balance_Mass.f90
 $(DIR_OBJECT)/Balance_Mass.o:\
+$(DIR_OBJECT)/Var_Mod.o \
+Var_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
@@ -1260,12 +1363,15 @@ Info_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
+$(DIR_SHARED)/Comm_Mod/*/*.f90 \
+$(DIR_OBJECT)/Bulk_Mod.o \
+Bulk_Mod/*.f90 
 
 #-- ./User_Mod_Cgns.f90
 $(DIR_OBJECT)/User_Mod_Cgns.o:\
@@ -1280,6 +1386,7 @@ $(DIR_OBJECT)/Solver_Mod.o \
 Solver_Mod/*.f90 \
 $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Numerics_Mod.o \
+$(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Matrix_Mod.o \
 Matrix_Mod/*.f90 \
 $(DIR_OBJECT)/Les_Mod.o \
@@ -1290,6 +1397,7 @@ $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
@@ -1300,7 +1408,9 @@ $(DIR_SHARED)/Cgns_Mod_Void.f90 \
 $(DIR_SHARED)/Cgns_Mod_Seq.f90 \
 $(DIR_SHARED)/Cgns_Mod_Par.f90 \
 $(DIR_SHARED)/Cgns_Mod/*.f90 \
-$(DIR_SHARED)/Cgns_Mod/*/*.f90 
+$(DIR_SHARED)/Cgns_Mod/*/*.f90 \
+$(DIR_OBJECT)/Bulk_Mod.o \
+Bulk_Mod/*.f90 
 
 #-- ./Save_Vtu_Scalar.f90
 $(DIR_OBJECT)/Save_Vtu_Scalar.o:\
@@ -1323,6 +1433,7 @@ $(DIR_OBJECT)/Solver_Mod.o \
 Solver_Mod/*.f90 \
 $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Numerics_Mod.o \
+$(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Matrix_Mod.o \
 Matrix_Mod/*.f90 \
 $(DIR_OBJECT)/Les_Mod.o \
@@ -1333,12 +1444,15 @@ $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
+$(DIR_SHARED)/Comm_Mod/*/*.f90 \
+$(DIR_OBJECT)/Bulk_Mod.o \
+Bulk_Mod/*.f90 
 
 #-- ./Save_Vtu_Vector.f90
 $(DIR_OBJECT)/Save_Vtu_Vector.o:\
@@ -1358,7 +1472,8 @@ Matrix_Mod/*.f90 \
 $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o 
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 
 
 #-- ./Turbulence/Source_Zeta_K_Eps_Zeta_F.f90
 $(DIR_OBJECT)/Source_Zeta_K_Eps_Zeta_F.o:\
@@ -1370,6 +1485,7 @@ Matrix_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #-- ./Turbulence/Calculate_Sgs_Dynamic.f90
@@ -1387,6 +1503,7 @@ $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
@@ -1398,18 +1515,18 @@ $(DIR_OBJECT)/Turbulence_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #-- ./Turbulence/Calculate_Sgs.f90
 $(DIR_OBJECT)/Calculate_Sgs.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
@@ -1433,6 +1550,7 @@ $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #-- ./Turbulence/Rans_Mod.f90
@@ -1451,6 +1569,7 @@ Matrix_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #-- ./Turbulence/Sources_Rsm_Manceau_Hanjalic.f90
@@ -1467,6 +1586,7 @@ $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #-- ./Turbulence/Calculate_Vis_T_Spalart_Allmaras.f90
@@ -1476,6 +1596,7 @@ $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
@@ -1493,6 +1614,7 @@ $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
@@ -1519,6 +1641,7 @@ $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
@@ -1538,6 +1661,7 @@ $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
@@ -1548,6 +1672,18 @@ $(DIR_OBJECT)/Les_Mod.o:\
 $(DIR_OBJECT)/Var_Mod.o \
 Var_Mod/*.f90 \
 $(DIR_OBJECT)/Turbulence_Mod.o 
+
+#-- ./Turbulence/Allocate.f90
+$(DIR_OBJECT)/Allocate.o:\
+$(DIR_OBJECT)/Rans_Mod.o \
+$(DIR_OBJECT)/Les_Mod.o \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
+$(DIR_OBJECT)/Control_Mod.o \
+Control_Mod/*/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o 
 
 #-- ./Turbulence/Constants_K_Eps_Zeta_F.f90
 $(DIR_OBJECT)/Constants_K_Eps_Zeta_F.o:\
@@ -1569,6 +1705,7 @@ $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #-- ./Turbulence/Y_Plus_Rough_Walls.f90
@@ -1583,6 +1720,7 @@ $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #-- ./Turbulence/Constants_K_Eps.f90
@@ -1604,6 +1742,7 @@ $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #-- ./Turbulence/Calculate_Vis_T_Rsm.f90
@@ -1613,6 +1752,7 @@ $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
@@ -1637,14 +1777,13 @@ $(DIR_OBJECT)/Const_Mod.o
 
 #-- ./Turbulence/Calculate_Heat_Flux.f90
 $(DIR_OBJECT)/Calculate_Heat_Flux.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
@@ -1663,7 +1802,8 @@ $(DIR_OBJECT)/Matrix_Mod.o \
 Matrix_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o 
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 
 
 #-- ./Turbulence/Time_And_Length_Scale.f90
 $(DIR_OBJECT)/Time_And_Length_Scale.o:\
@@ -1674,6 +1814,7 @@ $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
@@ -1691,6 +1832,7 @@ $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
@@ -1707,6 +1849,7 @@ $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #-- ./Turbulence/Compute_Turbulent.f90
@@ -1729,6 +1872,7 @@ $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
@@ -1739,8 +1883,7 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 $(DIR_OBJECT)/Roughness_Coefficient.o:\
 $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Turbulence/Constants_Hanjalic_Jakirlic.f90
 $(DIR_OBJECT)/Constants_Hanjalic_Jakirlic.o:\
@@ -1755,6 +1898,7 @@ $(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
@@ -1782,6 +1926,7 @@ $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
@@ -1805,7 +1950,6 @@ Bulk_Mod/*.f90 \
 $(DIR_OBJECT)/Bnd_Cond_Mod.o 
 
 #-- ./Var_Mod/Allocate_Statistics.f90
-#-- ./Var_Mod/Allocate_Gradients.f90
 #-- ./Var_Mod/Bnd_Cell_Type.f90
 #-- ./Var_Mod/Allocate_Solution.f90
 #-- ./Var_Mod/Allocate_New_Only.f90
@@ -1840,6 +1984,7 @@ $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Grad_Mod.o \
 Grad_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
@@ -2095,7 +2240,12 @@ $(DIR_SHARED)/Tokenizer_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #-- ./Grid_Mod/Check_Levels.f90
+#-- ./Grid_Mod/Sort_Cells_Smart.f90
 #-- ./Grid_Mod/Coarsen.f90
+$(DIR_OBJECT)/Coarsen.o:\
+$(DIR_OBJECT)/Tokenizer_Mod.o \
+$(DIR_SHARED)/Tokenizer_Mod/*.f90 
+
 #-- ./Grid_Mod/Allocate_Bnd_Cond.f90
 #-- ./Grid_Mod/Save_Cns.f90
 $(DIR_OBJECT)/Save_Cns.o:\
@@ -2110,6 +2260,7 @@ $(DIR_OBJECT)/Const_Mod.o
 #-- ./Grid_Mod/Sort_Faces_By_Index.f90
 #-- ./Grid_Mod/Allocate_Faces.f90
 #-- ./Grid_Mod/Bnd_Cond_Type.f90
+#-- ./Grid_Mod/Calculate_Face_Geometry.f90
 #-- ./Grid_Mod/Save_Geo.f90
 $(DIR_OBJECT)/Save_Geo.o:\
 $(DIR_OBJECT)/Div_Mod.o 
