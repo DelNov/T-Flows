@@ -10,11 +10,14 @@
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('SOLVER_FOR_PRESSURE', 'bicg',  &
+  call Control_Mod_Read_Char_Item('SOLVER_FOR_PRESSURE', 'cg',  &
                                    val, verbose)
   call To_Upper_Case(val)
 
-  if( val.ne.'BICG' .and. val.ne.'CGS' .and. val.ne.'CG') then
+  if( val .ne. 'ACM'  .and.  &
+      val .ne. 'BICG' .and.  &
+      val .ne. 'CGS'  .and.  &
+      val .ne. 'CG') then
     if(this_proc < 2) then
       print *, '# ERROR!  Unknown linear solver for pressure: ', trim(val)
       print *, '# Exiting!'
