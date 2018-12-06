@@ -32,7 +32,7 @@
   real                       :: u_f, v_f, w_f, a12, fs
   real                       :: ini_res, tol, mass_err
   real                       :: px_f, py_f, pz_f
-  character(len=80)          :: precond
+  character(len=80)          :: solver, precond
   real                       :: urf           ! under-relaxation factor
   real                       :: p_max, p_min, p_nor, p_nor_c
 !==============================================================================!
@@ -206,39 +206,38 @@
   ! Value 1.e-12 keeps the solution stable
   call Control_Mod_Tolerance_For_Pressure_Solver(tol)
 
-  ! Get matrix precondioner
+  ! Get solver and matrix precondioner
+  call Control_Mod_Solver_For_Pressure(solver)
   call Control_Mod_Preconditioner_For_System_Matrix(precond)
 
-  ! Set the default value for number of iterations
+  ! Set the default value for number of iterations / v-cycles
   niter = 40
-
-  ! Over-ride if specified in control file
   call Control_Mod_Max_Iterations_For_Pressure_Solver(niter)
 
-! goto 1
-  niter = 10
-  tol   = PICO
-  call Acm(sol,       &
-           pp % n,    &
-           b,         &
-           precond,   &
-           niter,     &     ! number of V cycles
-           tol,       &
-           ini_res,   &
-           pp % res,  &
-           norm = p_nor)    ! last argument: number for normalisation
-  stop
-1 continue
-
-  call Cg(sol,       &
-          pp % n,    &
-          b,         &
-          precond,   &
-          niter,     &
-          tol,       &
-          ini_res,   &
-          pp % res,  &
-          norm = p_nor)    ! last argument: number for normalisation
+  if(solver .eq. 'ACM') then
+    niter = 10
+    tol   = PICO
+    call Acm(sol,       &
+             pp % n,    &
+             b,         &
+             precond,   &
+             niter,     &     ! number of V cycles
+             tol,       &
+             ini_res,   &
+             pp % res,  &
+             norm = p_nor)    ! last argument: number for normalisation
+    stop
+  else
+    call Cg(sol,       &
+            pp % n,    &
+            b,         &
+            precond,   &
+            niter,     &      ! number of iterations
+            tol,       &
+            ini_res,   &
+            pp % res,  &
+            norm = p_nor)     ! last argument: number for normalisation
+  end if
 
   call Info_Mod_Iter_Fill_At(1, 3, pp % name, niter, pp % res)
 
