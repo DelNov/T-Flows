@@ -215,7 +215,6 @@
   call Control_Mod_Max_Iterations_For_Pressure_Solver(niter)
 
   if(solver .eq. 'ACM') then
-    niter = 10
     tol   = PICO
     call Acm(sol,       &
              pp % n,    &
