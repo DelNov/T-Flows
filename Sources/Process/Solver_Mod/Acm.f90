@@ -31,6 +31,7 @@
   type(Vector_Type), pointer :: r_lev(:)
   integer                    :: lev, c, c_lev, lev_max, cyc
   integer                    :: n_iter, p_iter  ! requested and performed iters
+  real                       :: res_rat         ! requested residual ratio
 !==============================================================================!
 
   ! Take aliases first
@@ -48,6 +49,10 @@
   ! Set number of smoothing iterations
   n_iter = 10  ! 10 seems to work the best for IC preconditioner
   call Control_Mod_V_Cycle_Number_Of_Smoothing_Iterations(n_iter)
+
+  ! Set requested residual ration in the level
+  res_rat = 0.0001
+  call Control_Mod_V_Cycle_Residual_Ratio(res_rat)
 
   !-------------------------------------------!
   !                                           !
@@ -73,7 +78,6 @@
   !                                    !
   !                                    !
   !------------------------------------!
-  do cyc = 1, n_cycles
   call Cg_Level(1,               &  ! level
                 a_lev(1),        &  ! system matrix
                 d_lev(1),        &  ! preconditioning matrix
@@ -86,9 +90,8 @@
                 n_iter,          &  ! max iterations
                 p_iter,          &  ! performed iterations
                 tol,             &  ! tolerance
-                0.0001,          &  ! residual ratio
+                res_rat,         &  ! residual ratio
                 fin_res)            ! final residual
-  end do
 
   !--------------------!
   !                    !
@@ -141,7 +144,7 @@
                     n_iter,            &  ! max iterations
                     p_iter,            &  ! performed iterations
                     tol,               &  ! tolerance
-                    0.0001,            &  ! residual ratio
+                    res_rat,           &  ! residual ratio
                     fin_res)              ! final residual
 
     end do  ! end of going down
@@ -194,7 +197,7 @@
                     n_iter,            &  ! max iterations
                     p_iter,            &  ! performed iterations
                     tol,               &  ! tolerance
-                    0.0001,            &  ! residual ratio
+                    res_rat,           &  ! residual ratio
                     fin_res)              ! final residual
     end do
   end do
