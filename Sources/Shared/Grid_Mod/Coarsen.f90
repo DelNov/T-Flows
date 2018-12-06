@@ -1,12 +1,13 @@
 !==============================================================================!
-  subroutine Grid_Mod_Coarsen(grid, n_cells_coarsest, n_parts)
+  subroutine Grid_Mod_Coarsen(grid)
 !------------------------------------------------------------------------------!
 !   Coarsens the grid with METIS library.                                      !
 !------------------------------------------------------------------------------!
+!----------------------------------[Modules]-----------------------------------!
+  use Tokenizer_Mod
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer         :: n_cells_coarsest  ! number of cells at coarsest level
-  integer         :: n_parts           ! partitioning of finer levels
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, c1, c2, nc, nc1, nc2, s, i, lev, lev_parts
@@ -16,6 +17,9 @@
   integer, allocatable :: c1_arr(:), c2_arr(:), sf_arr(:)
   integer, allocatable :: cells_c(:,:), cells_n_cells(:), faces_c(:,:),  &
                           new_c(:), old_c(:)
+  integer              :: n_coarsest_cells   ! number of cells at coarsest level
+  integer              :: n_parts            ! partitioning of finer levels
+  integer              :: n_entries
   real                 :: t_start, t_end
 
 ! Variabes for call to METIS
@@ -32,9 +36,21 @@
   integer              :: metis_options(41)     ! options passed to METIS
 !==============================================================================!
 
-  print *, '#=========================================='
-  print *, '# Coarsening the grid for multigrid solver '
-  print *, '#------------------------------------------'
+  print *, '#================================================================'
+  print *, '# Coarsening the grid for algebraic multigrid solver             '
+  print *, '#----------------------------------------------------------------'
+  print *, '# Enter number of cells at the coarsest level (say up to 1200)   '
+  print *, '# followed by refinement ration in between other grid levels     '
+  print *, '# (typical values are 4 or 9).  Type 0 to skip this step         '
+  print *, '#----------------------------------------------------------------'
+  call Tokenizer_Mod_Read_Line(5)
+  n_entries = line % n_tokens
+  if(n_entries .eq. 2) then
+    read(line % tokens(1), *) n_coarsest_cells
+    read(line % tokens(2), *) n_parts
+  else
+    return
+  end if
 
   !---------------------!
   !                     !
@@ -76,19 +92,19 @@
   allocate(cell_weights(n_cells * n_constrains))
   allocate(face_weights(n_faces + n_faces))
   allocate(vert_data   (n_cells))
-  allocate(part_weight (n_cells_coarsest * n_constrains))
+  allocate(part_weight (n_coarsest_cells * n_constrains))
 
   !--------------------------------------------------------!
   !   Allocate memory and initialize data for all levels   !
   !--------------------------------------------------------!
 
   ! Count levels and cells
-  i = n_cells_coarsest
+  i = n_coarsest_cells
   do lev = 2, MAX_MG_LEVELS
-    i = n_cells_coarsest * n_parts ** (lev-1)
+    i = n_coarsest_cells * n_parts ** (lev-1)
 
     ! Check if next level would be too fine; if so get out
-    if(i + n_cells_coarsest * lev * n_parts > grid % n_cells) then
+    if(n_coarsest_cells * n_parts ** lev > grid % n_cells) then
       grid % n_levels = lev
       goto 1
     end if
@@ -98,7 +114,7 @@
 
   ! Estimate number of cells at each level
   grid % level(grid % n_levels + 1) % n_cells = 1
-  grid % level(grid % n_levels    ) % n_cells = n_cells_coarsest
+  grid % level(grid % n_levels    ) % n_cells = n_coarsest_cells
   do lev = grid % n_levels-1, 2, -1
     grid % level(lev) % n_cells = grid % level(lev+1) % n_cells * n_parts
   end do
@@ -200,7 +216,7 @@
       end do
 
       n_parts_here = n_parts
-      if(lev .eq. grid % n_levels) n_parts_here = n_cells_coarsest
+      if(lev .eq. grid % n_levels) n_parts_here = n_coarsest_cells
 
       imbalance(:)    = 1.001
       cell_weights(:) = 1
