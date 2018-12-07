@@ -49,7 +49,7 @@
   lev_max = min(lev_max, grid % n_levels)
 
   ! Set number of smoothing iterations
-  n_iter = 10  ! 10 seems to work the best for IC preconditioner
+  n_iter = 12  ! 10 or 12 seems to work the best
   call Control_Mod_V_Cycle_Number_Of_Smoothing_Iterations(n_iter)
 
   ! Set requested residual ration in the level
