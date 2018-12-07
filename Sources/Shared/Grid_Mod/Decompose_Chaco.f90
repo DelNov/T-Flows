@@ -102,7 +102,7 @@
   metis_options = -1                       ! Initialize all to default
   metis_options(METIS_OPTION_DBGLVL) = 0
 
-  call interface_(n_verts,       &  !  1. (in), int
+  call Chaco_Interface(n_verts,       &  !  1. (in), int
                                 n_constrains,  &  !  2. (in), int
                                 row,           &  !  3. (in), int(:)
                                 col,           &  !  4. (in), int(:)
