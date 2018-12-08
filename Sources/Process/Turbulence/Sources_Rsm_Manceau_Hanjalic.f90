@@ -43,7 +43,7 @@
   a    => sol  % a
   b    => sol  % b % val
 
-  call Time_And_Length_Scale()
+  call Time_And_Length_Scale(grid)
 
   kin_vis = viscosity / density
 
