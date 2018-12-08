@@ -42,7 +42,7 @@
   v    => flow % v
   w    => flow % w
 
-  call Calculate_shear_And_Vorticity(grid)
+  call Calculate_shear_And_Vorticity(flow)
 
   if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
     do c = 1, grid % n_cells
