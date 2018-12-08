@@ -13,17 +13,17 @@
 
   if (this_proc < 2) then
 
-    print '(a87)', ' '
-    print '(a87)', time_info % line_lead  
+    print '(a129)', ' '
+    print '(a129)', time_info % line_lead
 
     ! Print only lines which have colon in the first column :-)
     do i=1,6
-      print '(a87)', time_info % lines(i)
+      print '(a129)', time_info % lines(i)
     end do
 
-    print '(a87)', time_info % line_trail  
-    print '(a87)', ' '
+    print '(a129)', time_info % line_trail
+    print '(a129)', ' '
 
   end if
-                 
+
   end subroutine

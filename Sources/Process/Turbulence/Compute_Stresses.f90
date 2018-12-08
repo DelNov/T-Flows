@@ -432,13 +432,13 @@
   if( phi % name .eq. 'WW' )   &
     call Info_Mod_Iter_Fill_At(3, 3, phi % name, niter, phi % res)
   if( phi % name .eq. 'UV' )   &
-    call Info_Mod_Iter_Fill_At(4, 1, phi % name, niter, phi % res)
+    call Info_Mod_Iter_Fill_At(3, 4, phi % name, niter, phi % res)
   if( phi % name .eq. 'UW' )   &
-    call Info_Mod_Iter_Fill_At(4, 2, phi % name, niter, phi % res)
+    call Info_Mod_Iter_Fill_At(3, 5, phi % name, niter, phi % res)
   if( phi % name .eq. 'VW' )   &
-    call Info_Mod_Iter_Fill_At(4, 3, phi % name, niter, phi % res)
+    call Info_Mod_Iter_Fill_At(3, 6, phi % name, niter, phi % res)
   if( phi % name .eq. 'EPS' )  &
-    call Info_Mod_Iter_Fill_At(4, 4, phi % name, niter, phi % res)
+    call Info_Mod_Iter_Fill_At(4, 1, phi % name, niter, phi % res)
 
   if(phi % name .eq. 'EPS') then
     do c= 1, grid % n_cells

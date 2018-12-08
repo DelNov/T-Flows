@@ -238,7 +238,7 @@
             norm = p_nor)     ! last argument: number for normalisation
   end if
 
-  call Info_Mod_Iter_Fill_At(1, 3, pp % name, niter, pp % res)
+  call Info_Mod_Iter_Fill_At(1, 4, pp % name, niter, pp % res)
 
   !-------------------------------!
   !   Update the pressure field   !

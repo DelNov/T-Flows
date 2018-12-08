@@ -528,13 +528,13 @@
             norm = vel_max)
 
   if(ui % name .eq. 'U') then
-    call Info_Mod_Iter_Fill_At(2, 1, ui % name, niter, ui % res)
+    call Info_Mod_Iter_Fill_At(1, 1, ui % name, niter, ui % res)
   end if
   if(ui % name .eq. 'V') then
-    call Info_Mod_Iter_Fill_At(2, 2, ui % name, niter, ui % res)
+    call Info_Mod_Iter_Fill_At(1, 2, ui % name, niter, ui % res)
   end if
   if(ui % name .eq. 'W') then
-    call Info_Mod_Iter_Fill_At(2, 3, ui % name, niter, ui % res)
+    call Info_Mod_Iter_Fill_At(1, 3, ui % name, niter, ui % res)
   end if
 
   call Comm_Mod_Exchange_Real(grid, ui % n)

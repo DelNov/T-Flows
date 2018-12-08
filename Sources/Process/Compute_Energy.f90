@@ -395,7 +395,7 @@
             ini_res,  &
             t % res)
 
-  call Info_Mod_Iter_Fill_At(2, 4, t % name, niter, t % res)
+  call Info_Mod_Iter_Fill_At(1, 6, t % name, niter, t % res)
 
   call Comm_Mod_Exchange_Real(grid, t % n)
 

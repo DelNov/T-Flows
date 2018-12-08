@@ -144,7 +144,7 @@
   call Comm_Mod_Global_Max_Real(cfl_max)
   call Comm_Mod_Global_Max_Real(pe_max)
 
-  call Info_Mod_Iter_Fill_At(1, 2, 'dum', -1, mass_err)
+  call Info_Mod_Iter_Fill_At(1, 5, 'dum', -1, mass_err)
   call Info_Mod_Bulk_Fill(cfl_max,          &
                           pe_max,           &
                           bulk % flux_x,    &

@@ -200,7 +200,11 @@
           ini_res,  &
           phi % res)
 
-  call Info_Mod_Iter_Fill_At(3, 4, phi % name, niter, phi % res)
+  if(turbulence_model .eq. K_EPS_ZETA_F) then
+    call Info_Mod_Iter_Fill_At(3, 4, phi % name, niter, phi % res)
+  else if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+    call Info_Mod_Iter_Fill_At(4, 2, phi % name, niter, phi % res)
+  end if
 
   call Comm_Mod_Exchange_Real(grid, phi % n)
 

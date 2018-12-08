@@ -13,31 +13,34 @@
   real    :: wall_time  ! number of seconds of wall-clock time
 !-----------------------------------[Locals]-----------------------------------!
   integer :: hours, minutes, seconds
+  real    :: miliseconds
 !==============================================================================!
+
+PRINT '(F5.1)',  265.7898953756
 
   if (this_proc < 2) then
 
     ! Write time step number
-    write(time_info % lines(2)(33:43), '(a11)')    'Time step :'
-    write(time_info % lines(2)(45:50),  '(i6)')    n
+    write(time_info % lines(2)(55:65), '(a11)')    'Time step :'
+    write(time_info % lines(2)(67:72),  '(i6)')    n
 
     ! Write simulation time
-    write(time_info % lines(4)(27:43),    '(a17)') 'Simulation time :'
-    write(time_info % lines(4)(45:53), '(1pe9.3)') sim_time
-    write(time_info % lines(4)(55:57),     '(a3)') '[s]'     
+    write(time_info % lines(4)(45:61),    '(a17)')  'Simulation time :'
+    write(time_info % lines(4)(63:71), '(1pe9.3)')  sim_time
+    write(time_info % lines(4)(73:83),     '(a3)')  '[s]'
 
     ! Write wall-clock time
-    write(time_info % lines(5)(27:43), '(a17)') 'Wall-clock time :'
+    write(time_info % lines(5)(45:61), '(a17)') 'Wall-clock time :'
     hours   = floor(  wall_time  / 3600.0 )
     minutes = floor( (wall_time - 3600.0 * hours) / 60.0)
     seconds = floor(  wall_time - 3600.0 * hours - 60.0 * minutes )
-    write(time_info % lines(5)(45:47), '(i3.3)')  hours
-    write(time_info % lines(5)(48:48),   '(a1)')  ':'
-    write(time_info % lines(5)(49:50), '(i2.2)')  minutes
-    write(time_info % lines(5)(51:51),   '(a1)')  ':'
-    write(time_info % lines(5)(52:53), '(i2.2)')  seconds
-    write(time_info % lines(5)(55:61),   '(a7)') '[h:m:s]'     
- 
+    write(time_info % lines(5)(63:65), '(i3.3)')  hours
+    write(time_info % lines(5)(66:66),   '(a1)')  ':'
+    write(time_info % lines(5)(67:69), '(i2.2)')  minutes
+    write(time_info % lines(5)(69:69),   '(a1)')  ':'
+    write(time_info % lines(5)(70:71), '(i2.2)')  seconds
+    write(time_info % lines(5)(73:83),  '(a11)') '[hhh:mm:ss]'
+
   end if
 
   end subroutine
