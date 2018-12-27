@@ -14,6 +14,6 @@
   integer         :: c
 !==============================================================================!
 
-  Roughness_Coefficient = max(0.004*grid % wall_dist(c), z_o)  
+  Roughness_Coefficient = z_o  
 
   end function
