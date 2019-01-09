@@ -62,6 +62,17 @@
 
     a % val(a % dia(c)) = a % val(a % dia(c)) &
      + density * f_mu* c_2e * eps % n(c) / kin % n(c) * grid % vol(c)
+ 
+
+    ! Buoyancy contribution
+    if(buoyancy) then
+      b(c) = b(c) + max(0.0, c_1e * g_buoy(c) &
+                    * eps % n(c) / kin % n(c) * grid % vol(c))
+      a % val(a % dia(c)) = a % val(a % dia(c))  &
+                + max(0.0,(-c_1e * g_buoy(c) &
+                * eps % n(c) / kin % n(c) * grid % vol(c)) / (eps % n(c) + TINY))
+    end if
+
   end do
 
   ! Imposing a boundary condition on wall for eps
