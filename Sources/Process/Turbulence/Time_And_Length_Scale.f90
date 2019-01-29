@@ -38,7 +38,7 @@
   kin_vis = viscosity / density
 
   do c = 1, grid % n_cells
-    eps_l(c) = eps % n(c) + TINY ! limited eps % n
+    eps_l(c) = eps % n(c) + TINY  ! limited eps % n
  
     t1(c) = kin % n(c)/eps_l(c)
     t2(c) = c_t*sqrt(kin_vis/eps_l(c))
