@@ -126,10 +126,12 @@
 
     if(heat_transfer) then
 
+      call Var_Mod_Allocate_Solution('T2', t2, grid)
       call Var_Mod_Allocate_New_Only('UT', ut, grid)
       call Var_Mod_Allocate_New_Only('VT', vt, grid)
       call Var_Mod_Allocate_New_Only('WT', wt, grid)
       allocate(con_wall(-grid % n_bnd_cells:grid % n_cells)); con_wall = 0.
+      allocate(p_t2    (-grid % n_bnd_cells:grid % n_cells)); p_t2     = 0.
 
     end if ! heat_transfer
 
@@ -140,6 +142,10 @@
       call Var_Mod_Allocate_Statistics(v)
       call Var_Mod_Allocate_Statistics(w)
       call Var_Mod_Allocate_Statistics(p)
+      call Var_Mod_Allocate_Statistics(kin)
+      call Var_Mod_Allocate_Statistics(eps)
+      call Var_Mod_Allocate_Statistics(zeta)
+      call Var_Mod_Allocate_Statistics(f22)
 
       ! Second moments
       call Var_Mod_Allocate_New_Only('UU', uu, grid)
@@ -164,6 +170,7 @@
         call Var_Mod_Allocate_Statistics(wt)  ! new value allocated above
         call Var_Mod_Allocate_New_Only('TT', tt,  grid)
         call Var_Mod_Allocate_Statistics(tt)
+        call Var_Mod_Allocate_Statistics(t2)
 
       end if ! heat_transfer
 
@@ -171,11 +178,9 @@
 
     if(buoyancy) then
 
-      call Var_Mod_Allocate_Solution('TT', tt, grid)
-      call Var_Mod_Allocate_Statistics(tt)
-      allocate(g_buoy   (-grid % n_bnd_cells:grid % n_cells));  g_buoy    = 0.
-      allocate(buoy_beta(-grid % n_bnd_cells:grid % n_cells));  buoy_beta = 0.
-      allocate(g_kin    (-grid % n_bnd_cells:grid % n_cells));  g_kin     = 0.
+     allocate(g_buoy   (-grid % n_bnd_cells:grid % n_cells));  g_buoy    = 0.
+     allocate(buoy_beta(-grid % n_bnd_cells:grid % n_cells));  buoy_beta = 0.
+     allocate(g_kin    (-grid % n_bnd_cells:grid % n_cells));  g_kin     = 0.
 
     end if ! buoyancy
 

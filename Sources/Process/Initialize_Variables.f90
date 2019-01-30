@@ -38,7 +38,7 @@
 
   ! Default values for initial conditions
   real, parameter          :: u_def   = 0.0,  v_def    = 0.0,  w_def    = 0.0
-  real, parameter          :: t_def   = 0.0
+  real, parameter          :: t_def   = 0.0,  t2_def   = 0.0
   real, parameter          :: kin_def = 0.0,  eps_def  = 0.0,  f22_def  = 0.0
   real, parameter          :: vis_def = 0.0,  zeta_def = 0.0
   real, parameter          :: uu_def  = 0.0,  vv_def   = 0.0,  ww_def   = 0.0
@@ -156,6 +156,10 @@
             i=Key_Ind('EPS', keys,nks);prof(k,0)=eps_def; eps %n(c)=prof(k,i)
             i=Key_Ind('ZETA',keys,nks);prof(k,0)=zeta_def;zeta%n(c)=prof(k,i)
             i=Key_Ind('F22', keys,nks);prof(k,0)=f22_def; f22 %n(c)=prof(k,i)
+          end if
+
+          if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
+            i=Key_Ind('T2', keys,nks);prof(k,0)=t2_def; t2 %n(c)=prof(k,i)
           end if
 
           if(turbulence_model .eq. DES_SPALART) then
@@ -303,6 +307,13 @@
           f22  % oo(c) = f22  % n(c)
           u_tau(c)  = 0.047
           y_plus(c) = 0.001
+        end if
+
+        if(turbulence_model .eq. K_EPS_ZETA_F .and. &
+           heat_transfer) then
+          vals(0) = t2_def;  t2 % n(c) = vals(Key_Ind('T2',  keys, nks))
+          t2 % o(c)  = t2 % n(c)
+          t2 % oo(c) = t2 % n(c)
         end if
 
         if(turbulence_model .eq. SPALART_ALLMARAS .or.  &

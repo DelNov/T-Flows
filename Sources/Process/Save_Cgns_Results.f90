@@ -185,6 +185,14 @@
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               f22 % n(1),  "TurbulentQuantityF22")
   end if
+
+  if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
+    call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
+                              t2 % n(1),  "TurbulentQuantityT2")
+    call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
+                              p_t2(1),    "TurbulentT2Production")
+  end if
+
   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               f22 % n(1),  "TurbulentQuantityF22")

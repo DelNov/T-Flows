@@ -310,6 +310,10 @@
     if(phi % name .eq. 'ZETA') call Source_Zeta_K_Eps_Zeta_F(grid, sol, n_step)
   end if
 
+  if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
+      if(phi % name .eq. 'T2')  call Source_T2(flow, sol)
+  end if
+
   if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
      turbulence_model .eq. DES_SPALART) then
     call Source_Vis_Spalart_Almaras(grid, sol, phi % x, phi % y, phi % z)
@@ -362,6 +366,11 @@
       call Info_Mod_Iter_Fill_At(3, 2, phi % name, niter, phi % res)
     if(phi % name .eq. 'ZETA')  &
       call Info_Mod_Iter_Fill_At(3, 3, phi % name, niter, phi % res)
+  end if
+
+  if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
+    if(phi % name .eq. 'T2')  &
+      call Info_Mod_Iter_Fill_At(3, 5, phi % name, niter, phi % res)
   end if
 
   call Comm_Mod_Exchange_Real(grid, phi % n)

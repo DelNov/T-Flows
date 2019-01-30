@@ -7,7 +7,7 @@
 !---------------------------------[Modules]------------------------------------!
   use Const_Mod
   use Grid_Mod,   only: Grid_Type
-  use Field_Mod,  only: Field_Type, viscosity, density
+  use Field_Mod,  !only: Field_Type, viscosity, density, buoyancy
   use Solver_Mod, only: Solver_Type
   use Matrix_Mod, only: Matrix_Type
   use Les_Mod
@@ -72,6 +72,18 @@
 
     ! Fill in a diagonal of coefficient matrix
     a % val(a % dia(c)) =  a % val(a % dia(c)) + c_2e * e_sor * density
+
+    ! Add buoyancy (linearly split) to eps equation as required in the t2 model
+    if(buoyancy) then
+        buoy_beta(c) = 1.0
+        g_buoy(c) = -buoy_beta(c) * (grav_x * ut % n(c) +  &
+                                     grav_y * vt % n(c) +  &
+                                     grav_z * wt % n(c)) * density
+        b(c) = b(c) + max(0.0, g_buoy(c) * grid % vol(c))
+        a % val(a % dia(c)) = a % val(a % dia(c))  &
+                  + max(0.0,-g_buoy(c) * grid % vol(c) / (kin % n(c) + TINY))
+    end if
+
   end do
 
   !-------------------------------------------------------!

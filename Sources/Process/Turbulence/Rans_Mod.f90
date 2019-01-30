@@ -16,6 +16,7 @@
   type(Var_Type) :: zeta
   type(Var_Type) :: f22
   type(Var_Type) :: vis
+  type(Var_Type) :: t2
 
   ! Constants for the k-eps model:
   real :: c_1e, c_2e, c_3e, c_mu, c_mu25, c_mu75, kappa, e_log, z_o
@@ -39,7 +40,7 @@
   real,allocatable :: t_scale(:)   
 
   ! Production of turbulent kinetic energy
-  real,allocatable :: p_kin(:)
+  real,allocatable :: p_kin(:), p_t2(:)
 
   ! Buoyancy production for k-eps-zeta-f model
   ! (bouy_beta is only set to 1 and used as such.  Is it needed?)

@@ -3,8 +3,14 @@
 !------------------------------------------------------------------------------!
 !   Computes the source terms in kin transport equation.                       !
 !------------------------------------------------------------------------------!
-!   In kinetic energy eq. there are two source terms:                          !
-!   int( density (p_kin - eps ) )dV                                            !
+!   In kinetic energy equation there are two source terms:                     !
+!                                                                              !
+!     /
+!    |                                                                         !
+!    | (density (p_kin - eps)) dV                                              !
+!    |                                                                         !
+!   /                                                                          !
+!                                                                              !
 !------------------------------------------------------------------------------!
 !---------------------------------[Modules]------------------------------------!
   use Const_Mod

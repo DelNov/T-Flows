@@ -89,6 +89,11 @@
         eps  % mean(c) = (eps  % mean(c) * (1.*n) + eps  % n(c)) / (1.*(n+1))
         zeta % mean(c) = (zeta % mean(c) * (1.*n) + zeta % n(c)) / (1.*(n+1))
         f22  % mean(c) = (f22  % mean(c) * (1.*n) + f22  % n(c)) / (1.*(n+1))
+
+        if (heat_transfer) then
+          t2 % mean(c) = (t2 % mean(c) * (1.*n) + t2 % n(c)) / (1.*(n+1))
+        end if
+
       end if
 
       !----------------------------!
