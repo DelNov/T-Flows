@@ -27,10 +27,11 @@ DIR_BINARY = ../../Binaries
 DIR_SHARED = ../Shared
 DIR_MODULE = .Modules
 DIR_OBJECT = .Objects
-DIR_MODELS = Turbulence
+DIR_TURBUL = Turbulence
+DIR_PARTIC = Particles_Mod
 DIR_USER   = User_Mod
 DIR_CASE   = no
-VPATH = $(DIR_SHARED):$(DIR_MODELS):.
+VPATH = $(DIR_SHARED):$(DIR_TURBUL):$(DIR_PARTIC):.
 
 # Program name (This should hardly change)
 PROGRAM_NAME = Process
@@ -214,10 +215,12 @@ SRC_MOD += Info_Mod.f90		\
            Grad_Mod.f90		\
            Monitor_Mod.f90
 
-# Sources for modules in sub-directories
+# Sources for modules in sub-directories for physical models
 SRC_MOD += Turbulence_Mod.f90	\
            Les_Mod.f90		\
            Rans_Mod.f90
+
+SRC_MOD += Particles_Mod.f90
 
 # Control_Mod should come because it reads Turbulence, Field and Numerics
 SRC_MOD += Control_Mod.f90 	\
@@ -228,8 +231,12 @@ SRC_MOD += Control_Mod.f90 	\
 #---------------
 
 # Sources for all functions are obtained by a shell command
-SRC_FUN =  $(shell ls -1 *.f90 | grep -v -i _Mod | grep -v -i Save_Cgns | grep -v -i Save_Vtu_Results)
-SRC_FUN += $(shell ls -1 $(DIR_MODELS)/*.f90 | xargs -n1 basename | grep -v -i _Mod)
+SRC_FUN =  $(shell ls -1 *.f90 | grep -v -i _Mod 		\
+                               | grep -v -i Save_Cgns		\
+                               | grep -v -i Save_Vtu_Results)
+SRC_FUN += $(shell ls -1 $(DIR_TURBUL)/*.f90		\
+                         | xargs -n1 basename		\
+                         | grep -v -i _Mod)
 
 SRC_FUN += Distance.f90		\
            Distance_Squared.f90	\
