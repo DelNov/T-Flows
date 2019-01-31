@@ -243,14 +243,16 @@
   open(3, file = res_name)
 
   if(heat_transfer) then
-    write(3,'(a1,(a12, f12.6))')'#', 'Nu number = ',  &
-             tz_p(1) / (t_hot - t_cold)
-    write(*,'(a1,(a12, f12.6))')'#', 'Nu number = ',  &
-             0.05*(t_hot-ti_p(1)+ti_p(n_prob-1)-t_cold) / wall_p(1)
+    if(this_proc < 2) then
+      write(3,'(a1,(a12, f12.6))')'#', ' Nu number = ',  &
+               tz_p(1) / (t_hot - t_cold)
+      write(*,'(a1,(a12, f12.6))')'#', ' Nu number = ',  &
+               0.05*(t_hot-ti_p(1)+ti_p(n_prob-1)-t_cold) / wall_p(1)
+    end if
     nu_max = tz_p(1)
   call Comm_Mod_Global_Sum_Real(nu_max)
   end if
-  
+
   write(i,'(a1,2x,a60)') '#', ' z,'                    //  &
                               ' u,'                    //  &
                               ' uu, vv, ww, uw'        //  &
