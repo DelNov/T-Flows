@@ -89,7 +89,6 @@ endif
 
 # METIS library
 METIS_LIB = ../Libraries/Metis_5.1.0_Linux_64/libmetis.a
-CHACO_LIB = ../Libraries/Chaco_2.2_Linux_64/libchaco.a
 
 #------------------------------------------------------
 #   List of sources for modules and functions
@@ -182,7 +181,7 @@ $(DIR_OBJECT)/%.o: %.f90
 #-----------------------------------
 $(PROGRAM_FILE): $(OBJ) 
 	@echo Linking "\033[0;32m $(PROGRAM_FILE) \033[0m"
-	@$(FC) $(OPT_LINK) -o $(PROGRAM_FILE) $(OBJ) $(METIS_LIB) $(CHACO_LIB)
+	@$(FC) $(OPT_LINK) -o $(PROGRAM_FILE) $(OBJ) $(METIS_LIB)
 
 #--------------------------------------------------------------------
 #   Explicit dependencies for modules

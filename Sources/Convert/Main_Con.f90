@@ -81,7 +81,7 @@
   end do
 
   ! Decompose/coarsen the grid with METIS
-  ! Not yet implemented: call Grid_Mod_Coarsen(grid)
+  ! Not quite ready yet: call Grid_Mod_Coarsen(grid)
 
   !-------------------------------!
   !   Save files for processing   !

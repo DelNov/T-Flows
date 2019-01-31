@@ -153,7 +153,6 @@
   include 'Grid_Mod/Bnd_Cond_Type.f90'
   include 'Grid_Mod/Bnd_Cond_Ranges.f90'
   include 'Grid_Mod/Decompose.f90'
-  include 'Grid_Mod/Decompose_Chaco.f90'
   include 'Grid_Mod/Coarsen.f90'
   include 'Grid_Mod/Calculate_Face_Geometry.f90'
   include 'Grid_Mod/Calculate_Wall_Distance.f90'
