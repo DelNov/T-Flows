@@ -374,7 +374,7 @@
 
     call Sources_Rsm_Manceau_Hanjalic(grid, phi % name)
   else if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
-    call Sources_Rsm_Hanjalic_Jakirlic(grid, phi % name, n_time_step)
+    call Sources_Rsm_Hanjalic_Jakirlic(grid, phi % name)
   end if
 
   !---------------------------------!
