@@ -37,7 +37,7 @@
   end if
 
   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
-    call Constants_Reynolds_Stress()
+    call Constants_Manceau_Hanjalic()
   end if
 
   if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
