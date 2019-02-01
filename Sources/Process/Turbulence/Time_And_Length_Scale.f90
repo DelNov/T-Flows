@@ -37,22 +37,20 @@
 
   kin_vis = viscosity / density
 
-  do c = 1, grid % n_cells
-    eps_l(c) = eps % n(c) + TINY  ! limited eps % n
- 
-    t1(c) = kin % n(c)/eps_l(c)
-    t2(c) = c_t*sqrt(kin_vis/eps_l(c))
-    t3(c) = 0.6/(sqrt(3.0)*c_mu_d * zeta % n(c) * shear(c) + TINY)
-
-    l1(c) = kin % n(c)**1.5/eps_l(c)
-    l2(c) = c_nu * (kin_vis**3 / eps_l(c))**0.25
-    l3(c) = sqrt(kin % n(c)/3.0)/(c_mu_d * zeta % n(c) * shear(c) + TINY)
-  end do
-
   if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
      turbulence_model .eq. HYBRID_LES_RANS) then
 
-     do c = 1, grid % n_cells
+    do c = 1, grid % n_cells
+      eps_l(c) = max(eps % n(c),tiny) 
+ 
+      t1(c) = kin % n(c)/eps_l(c)
+      t2(c) = c_t*sqrt(kin_vis/eps_l(c))
+      t3(c) = 0.6/(sqrt(3.0)*c_mu_d * zeta % n(c) * shear(c) + TINY)
+
+      l1(c) = kin % n(c)**1.5/eps_l(c)
+      l2(c) = c_nu * (kin_vis**3 / eps_l(c))**0.25
+      l3(c) = sqrt(kin % n(c)/3.0)/(c_mu_d * zeta % n(c) * shear(c) + TINY)
+     
       t_scale(c) =       max( min(t1(c), t3(c)), t2(c) )
       l_scale(c) = c_l * max( min(l1(c), l3(c)), l2(c) )
     end do
@@ -60,9 +58,31 @@
   else if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
 
     do c = 1, grid % n_cells
+      eps_l(c) = max(eps % n(c),tiny) 
       kin % n(c) = max(0.5*(uu % n(c) + vv % n(c) + ww % n(c)), TINY)
+ 
+      t1(c) = kin % n(c)/eps_l(c)
+      t2(c) = c_t*sqrt(kin_vis/eps_l(c))
+
+      l1(c) = kin % n(c)**1.5/eps_l(c)
+      l2(c) = c_nu * (kin_vis**3 / eps_l(c))**0.25
+
       t_scale(c) =       max( t1(c), t2(c) )
       l_scale(c) = c_l * max( l1(c), l2(c) )
+    end do
+
+  else if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
+
+    do c = 1, grid % n_cells
+      eps_l(c) = max(eps % n(c),tiny) 
+      kin % n(c) = max(0.5*(uu % n(c) + vv % n(c) + ww % n(c)), TINY)
+ 
+      t1(c) = kin % n(c)/eps_l(c)
+
+      l1(c) = kin % n(c)**1.5/eps_l(c)
+
+      t_scale(c) = t1(c)
+      l_scale(c) = l1(c)
     end do
 
   end if
