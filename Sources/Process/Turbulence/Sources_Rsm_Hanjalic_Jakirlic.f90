@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Sources_Rsm_Hanjalic_Jakirlic(grid, name_phi, n_time_step)
+  subroutine Sources_Rsm_Hanjalic_Jakirlic(grid, name_phi)
 !------------------------------------------------------------------------------!
 !   Calculate source terms for transport equations for Re stresses and         !
 !   dissipation for Hanjalic-Jakirlic model.                                   !  
@@ -35,7 +35,6 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type)  :: grid
   character(len=*) :: name_phi
-  integer          :: n_time_step 
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c, s, c1, c2, i, icont
   real    :: mag
@@ -80,29 +79,6 @@
   do c = 1, grid % n_cells
     kin % n(c) = max(0.5*(uu % n(c) + vv % n(c) + ww % n(c)), TINY)
   end do
-
-  call Grad_Mod_For_Phi(grid, kin % n, 1, kin_x, .true.)  ! dK/dx
-  call Grad_Mod_For_Phi(grid, kin % n, 2, kin_y, .true.)  ! dK/dy
-  call Grad_Mod_For_Phi(grid, kin % n, 3, kin_z, .true.)  ! dK/dz
-
-  call Grad_Mod_For_Phi(grid, kin_x, 1, kin_xx, .true.)  ! d^2 K / dx^2
-  call Grad_Mod_For_Phi(grid, kin_y, 2, kin_yy, .true.)  ! d^2 K / dy^2
-  call Grad_Mod_For_Phi(grid, kin_z, 3, kin_zz, .true.)  ! d^2 K / dz^2
-
-  if(n_time_step < 300) then
-    do c = 1, grid % n_cells
-      eps_tot(c) = eps % n(c)  
-      t_scale(c)=   kin % n(c)       / max(eps_tot(c), TINY)
-      l_scale(c)=  (kin % n(c))**1.5 / max(eps_tot(c), TINY)
-    end do
-  else
-    do c = 1, grid % n_cells
-      eps_tot(c) = eps % n(c)  &
-                 + 0.5 * kin_vis * (kin_xx(c) + kin_yy(c) + kin_zz(c))
-      t_scale(c)=   kin % n(c)       / max(eps_tot(c), TINY)
-      l_scale(c)=  (kin % n(c))**1.5 / max(eps_tot(c), TINY)
-    end do
-  end if
 
 ! !---------------------------------------------------!
 ! !   Below is one of versions of Hanjalic-Jakirlic   !
@@ -400,9 +376,9 @@
     a_mn_a_mn = a11*a11 + a22*a22 + a33*a33 + 2.0*(a12*a12+a13*a13+a23*a23)
     a_lk_s_lk = a11*S11 + a22*S22 + a33*S33 + 2.0*(a12*s12+a13*s13+a23*s23)
 
-    re_t= (kin % n(c)**2)/(kin_vis*eps_tot(c)+tiny)
+    re_t= (kin % n(c)**2)/(kin_vis*eps % n(c)+tiny)
     ff5 = min(aa2, (1.0-exp(-re_t/150))**3)
-    tkolm = sqrt( kin_vis / max(eps_tot(c), TINY) )
+    tkolm = sqrt( kin_vis / max(eps % n(c), TINY) )
 
     ee=aa
     fss=1.0-(sqrt(aa) * ee**2)
@@ -445,7 +421,7 @@
       fss=1.0-(aa**0.5*ee**2)
     end do
 
-    re_t  = (kin % n(c)*kin % n(c)) / (kin_vis*eps_tot(c) + tiny)
+    re_t  = (kin % n(c)*kin % n(c)) / (kin_vis*eps % n(c) + tiny)
     f_eps = 1.0 - ((c_2e-1.4)/c_2e)*exp(-(re_t/6.0)**2)
     ff2   = (re_t/150.0)**1.5
     ff2   = min(ff2,1.0)
@@ -692,8 +668,8 @@
     !----------------------!
     else if(name_phi == 'EPS') then 
       f_eps = 1.0 - ((c_2e-1.4)/c_2e) * exp(-(re_t/6.0)**2)
-      eps_1 = 1.44 * p_kin(c) * eps % n(c) / kin % n(c)
-      eps_2 = c_2e * f_eps * eps % n(c) / kin % n(c)
+      eps_1 = 1.44 * p_kin(c) / t_scale(c)
+      eps_2 = c_2e * f_eps  / t_scale(c)
       b(c) = b(c) + density * (eps_1 + diss1(c)) * grid % vol(c)
 
       A % val(A % dia(c)) =  A % val(A % dia(c)) + density * eps_2 * grid % vol(c)
@@ -711,7 +687,7 @@
     do c = 1, grid % n_cells
       re_t  = (kin % n(c)**2) / (kin_vis*eps % n(c) + TINY)
       f_eps = 1.0 - ((c_2e-1.4)/c_2e) * exp(-(re_t/6.0)**2)
-      b(c) = b(c) + density * (c_2e * f_eps * eps % n(c) / kin % n(c)  &
+      b(c) = b(c) + density * (c_2e * f_eps / t_scale(c)  &
                      * (kin_vis *(  kin_e_x(c)**2          &
                                   + kin_e_y(c)**2          &
                                   + kin_e_z(c)**2)))       &
