@@ -284,10 +284,6 @@
 
     end if ! RSM_MANCEAU_HANJALIC
 
-    if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
-      allocate(eps_tot(-grid % n_bnd_cells:grid % n_cells)); eps_tot = 0.
-    end if ! RSM_HANJALIC_JAKIRLIC
-
   end if ! RSM_MANCEAU_HANJALIC & RSM_HANJALIC_JAKIRLIC
 
   !----------------------!

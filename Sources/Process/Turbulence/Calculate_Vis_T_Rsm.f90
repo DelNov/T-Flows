@@ -36,41 +36,21 @@
 
   call Calculate_shear_And_Vorticity(grid)
 
-  if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
-    do c = 1, grid % n_cells
-      kin % n(c) = 0.5*max(uu % n(c) + vv % n(c) + ww % n(c), TINY)
+  do c = 1, grid % n_cells
+    kin % n(c) = 0.5*max(uu % n(c) + vv % n(c) + ww % n(c), TINY)
 
-      cmu_mod = max(-(  uu % n(c) * u % x(c)               &
-                      + vv % n(c) * v % y(c)               &
-                      + ww % n(c) * w % z(c)               &
-                      + uv % n(c) * (v % x(c) + u % y(c))  &
-                      + uw % n(c) * (u % z(c) + w % x(c))  &
-                      + vw % n(c) * (v % z(c) + w % y(c))) &
-        / max(kin % n(c)**2 / max(eps_tot(c), TINY) * shear(c)**2, TINY), 0.0)
+    cmu_mod = max(-(  uu % n(c) * u % x(c)               &
+                    + vv % n(c) * v % y(c)               &
+                    + ww % n(c) * w % z(c)               &
+                    + uv % n(c) * (v % x(c) + u % y(c))  &
+                    + uw % n(c) * (u % z(c) + w % x(c))  &
+                    + vw % n(c) * (v % z(c) + w % y(c))) &
+      / (kin % n(c) * t_scale(c) * shear(c)**2 + TINY), 0.0)
 
-      cmu_mod = min(0.12, cmu_mod)
-      vis_t(c) = cmu_mod * density * kin % n(c)**2 / max(eps_tot(c), TINY)
-      vis_t(c) = max(vis_t(c), TINY)
-    end do
-  else if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
-    do c = 1, grid % n_cells
-      kin % n(c) = 0.5*max(uu % n(c) + vv % n(c) + ww % n(c), TINY)
-
-      ! Pk/ (k^2/eps * S^2)
-      cmu_mod = max(-(  uu % n(c) * u % x(c)                         &
-                      + vv % n(c) * v % y(c)                         &
-                      + ww % n(c) * w % z(c)                         &
-                      + uv % n(c) * (v % x(c) + u % y(c))            &
-                      + uw % n(c) * (u % z(c) + w % x(c))            &
-                      + vw % n(c) * (v % z(c) + w % y(c)))           &
-                      / max(  kin % n(c)**2 / max(eps % n(c), TINY)  &
-                              * shear(c)**2, TINY), 0.0)
-
-      cmu_mod = min(0.12,cmu_mod)
-      vis_t(c) = cmu_mod * density * kin % n(c)**2 / max(eps % n(c), TINY)
-      vis_t(c) = max(vis_t(c), TINY)
-    end do
-  end if
+    cmu_mod = min(0.12, cmu_mod)
+    vis_t(c) = cmu_mod * density * kin % n(c) * t_scale(c) 
+    vis_t(c) = max(vis_t(c), TINY)
+  end do
 
   call Comm_Mod_Exchange_Real(grid, vis_t)
 
