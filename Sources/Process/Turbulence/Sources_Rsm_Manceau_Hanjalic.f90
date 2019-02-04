@@ -1,40 +1,55 @@
 !==============================================================================!
-  subroutine Sources_Rsm_Manceau_Hanjalic(grid, name_phi)
+  subroutine Sources_Rsm_Manceau_Hanjalic(flow, sol, name_phi)
 !------------------------------------------------------------------------------!
 !   Calculate source terms for Re stresses and dissipation for 
 !   RSM_MANCEAU_HANJALIC model                                                 !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Flow_Mod
+  use Field_Mod
   use Rans_Mod
-  use Grid_Mod
+  use Grid_Mod,   only: Grid_Type
+  use Solver_Mod, only: Solver_Type
+  use Matrix_Mod, only: Matrix_Type
   use Grad_Mod
-  use Work_Mod, only: f22_x  => r_cell_23,  &
-                      f22_y  => r_cell_24,  &
-                      f22_z  => r_cell_25
+  use Work_Mod,   only: f22_x  => r_cell_23,  &
+                        f22_y  => r_cell_24,  &
+                        f22_z  => r_cell_25
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)  :: grid
-  character(len=*) :: name_phi
+  type(Field_Type),  target :: flow
+  type(Solver_Type), target :: sol
+  character(len=*)          :: name_phi
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, s, c1, c2, i, var
-  real    :: prod, diss, phi_hom, phi_wall, mag, phi_tot, esor
-  real    :: b11, b22, b33, b12, b13, b21, b31, b23, b32
-  real    :: s11, s22, s33, s12, s13, s21, s31, s23, s32
-  real    :: v11, v22, v33, v12, v13, v21, v31, v23, v32
-  real    :: n1, n2, n3, b_mn_b_mn, b_lk_s_lk, uiujn, ce_11, uu_nn 
-  real    :: diss_wall, diss_hom, r23, kin_vis
+  type(Grid_Type),   pointer :: grid
+  type(Var_Type),    pointer :: u, v, w
+  type(Matrix_Type), pointer :: a
+  real,              pointer :: b(:)
+  integer                    :: c, s, c1, c2, i
+  real                       :: prod, diss, phi_hom, phi_wall, mag, phi_tot
+  real                       :: b11, b22, b33, b12, b13, b21, b31, b23, b32
+  real                       :: s11, s22, s33, s12, s13, s21, s31, s23, s32
+  real                       :: v11, v22, v33, v12, v13, v21, v31, v23, v32
+  real                       :: n1, n2, n3, b_mn_b_mn, b_lk_s_lk, ce_11
+  real                       :: uu_nn, esor, diss_wall, diss_hom, kin_vis
 !==============================================================================!
 
-  call Time_And_Length_Scale()
+  ! Take aliases
+  grid => flow % pnt_grid
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+  a    => sol  % a
+  b    => sol  % b % val
+
+  call Time_And_Length_Scale(grid)
 
   kin_vis = viscosity / density
 
-  call Grad_Mod_For_Phi(grid, f22 % n, 1, f22_x,.true.)  ! df22/dx
-  call Grad_Mod_For_Phi(grid, f22 % n, 2, f22_y,.true.)  ! df22/dy
-  call Grad_Mod_For_Phi(grid, f22 % n, 3, f22_z,.true.)  ! df22/dz
+  call Grad_Mod_Component(grid, f22 % n, 1, f22_x,.true.)  ! df22/dx
+  call Grad_Mod_Component(grid, f22 % n, 2, f22_y,.true.)  ! df22/dy
+  call Grad_Mod_Component(grid, f22 % n, 3, f22_z,.true.)  ! df22/dz
 
   do  c = 1, grid % n_cells 
     kin % n(c) = max(0.5*(  uu % n(c)  &

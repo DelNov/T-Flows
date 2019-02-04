@@ -1,41 +1,47 @@
 !==============================================================================!
-  subroutine User_Mod_Compute_Scalar(grid, dt, ini, phi)
+  subroutine User_Mod_Compute_Scalar(flow, sol, dt, ini, phi)
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for use scalar.                          !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Flow_Mod
+  use Field_Mod,    only: Field_Type, conductivity, capacity, density
   use Rans_Mod
   use Comm_Mod
   use Var_Mod
   use Grid_Mod
   use Grad_Mod
   use Info_Mod
-  use Numerics_Mod
-  use Solvers_Mod, only: Bicg, Cg, Cgs
+  use Numerics_Mod, only: CENTRAL, LINEAR, PARABOLIC
+  use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
+  use Matrix_Mod,   only: Matrix_Type
   use Control_Mod
-  use Work_Mod,    only: phi_x       => r_cell_01,  &
-                         phi_y       => r_cell_02,  &
-                         phi_z       => r_cell_03,  &
-                         phi_min     => r_cell_04,  &
-                         phi_max     => r_cell_05,  &
-                         u1uj_phij   => r_cell_06,  &
-                         u2uj_phij   => r_cell_07,  &
-                         u3uj_phij   => r_cell_08,  &
-                         u1uj_phij_x => r_cell_09,  &
-                         u2uj_phij_y => r_cell_10,  &
-                         u3uj_phij_z => r_cell_11
+  use Work_Mod,     only: phi_x       => r_cell_01,  &
+                          phi_y       => r_cell_02,  &
+                          phi_z       => r_cell_03,  &
+                          phi_min     => r_cell_04,  &
+                          phi_max     => r_cell_05,  &
+                          u1uj_phij   => r_cell_06,  &
+                          u2uj_phij   => r_cell_07,  &
+                          u3uj_phij   => r_cell_08,  &
+                          u1uj_phij_x => r_cell_09,  &
+                          u2uj_phij_y => r_cell_10,  &
+                          u3uj_phij_z => r_cell_11
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
-  type(Grid_Type) :: grid
-  integer         :: ini
-  real            :: dt
-  type(Var_Type)  :: phi
+  type(Field_Type),  target :: flow
+  type(Solver_Type), target :: sol
+  integer                   :: ini
+  real                      :: dt
+  type(Var_Type)            :: phi
 !----------------------------------[Calling]-----------------------------------!
   real :: Turbulent_Prandtl_Number
 !-----------------------------------[Locals]-----------------------------------! 
+  type(Grid_Type),   pointer :: grid
+  type(Matrix_Type), pointer :: a
+  real,              pointer :: b(:)
+  real,              pointer :: flux(:)
   integer           :: n, c, s, c1, c2, niter, mat, row, col
   real              :: a0, a12, a21
   real              :: ini_res, tol, ns
@@ -51,14 +57,14 @@
   integer           :: td_cross_diff ! time-disretization for cross-difusion
   real              :: urf           ! under-relaxation factor                 
 !------------------------------------------------------------------------------!
-!     
-!  The form of equations which are solved:    
-!     
-!     /                /                 /            
-!    |        dT      |                 |             
-!    | rho Cp -- dV   | rho u Cp T dS = | lambda  DIV T dS 
-!    |        dt      |                 |             
-!   /                /                 /              
+!
+!  The form of equations which are solved:
+!
+!     /                /                 /
+!    |        dT      |                 |
+!    | rho Cp -- dV   | rho u Cp T dS = | lambda  DIV T dS
+!    |        dt      |                 |
+!   /                /                 /
 !
 !
 !  Dimension of the system under consideration
@@ -80,11 +86,11 @@
 ! 
 !==============================================================================!
 
-!  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
-!    TDC = 1.0         
-!  else
-!    TDC = 1.0       
-!  end if        
+  ! Take aliases
+  grid => flow % pnt_grid
+  flux => flow % flux
+  a    => sol % a
+  b    => sol % b % val
 
   do n = 1, a % row(grid % n_cells+1) ! to je broj nonzero + 1
     a % val(n) = 0.0
@@ -106,9 +112,9 @@
   end if
 
   ! Gradients
-  call Grad_Mod_For_Phi(grid, phi % n, 1, phi_x, .true.)
-  call Grad_Mod_For_Phi(grid, phi % n, 2, phi_y, .true.)
-  call Grad_Mod_For_Phi(grid, phi % n, 3, phi_z, .true.)
+  call Grad_Mod_Component(grid, phi % n, 1, phi_x, .true.)
+  call Grad_Mod_Component(grid, phi % n, 2, phi_y, .true.)
+  call Grad_Mod_Component(grid, phi % n, 3, phi_z, .true.)
 
   !---------------!
   !               !
@@ -145,7 +151,7 @@
 
     ! Compute phis with desired advection scheme
     if(adv_scheme .ne. CENTRAL) then
-      call Advection_Scheme(grid, phis, s, phi % n, phi_min, phi_max,  &
+      call Advection_Scheme(flow, phis, s, phi % n, phi_min, phi_max,  &
                             phi_x, phi_y, phi_z,                       &
                             grid % dx, grid % dy, grid % dz,           &
                             adv_scheme, blend) 
@@ -208,14 +214,14 @@
        turbulence_model .ne. DNS) then
       pr_t1 = Turbulent_Prandtl_Number(grid, c1)
       pr_t2 = Turbulent_Prandtl_Number(grid, c2)
-      pr_t  = fw(s) * pr_t1 + (1.0 - fw(s)) * pr_t2
+      pr_t  = grid % fw(s) * pr_t1 + (1.0-grid % fw(s)) * pr_t2
     end if
 
     ! Gradients on the cell face 
     if(c2 > 0) then
-      phix_f1 = fw(s)*phi_x(c1) + (1.0-fw(s))*phi_x(c2) 
-      phiy_f1 = fw(s)*phi_y(c1) + (1.0-fw(s))*phi_y(c2)
-      phiz_f1 = fw(s)*phi_z(c1) + (1.0-fw(s))*phi_z(c2)
+      phix_f1 = grid % fw(s)*phi_x(c1) + (1.0-grid % fw(s))*phi_x(c2)
+      phiy_f1 = grid % fw(s)*phi_y(c1) + (1.0-grid % fw(s))*phi_y(c2)
+      phiz_f1 = grid % fw(s)*phi_z(c1) + (1.0-grid % fw(s))*phi_z(c2)
       phix_f2 = phix_f1 
       phiy_f2 = phiy_f1 
       phiz_f2 = phiz_f1 
@@ -254,11 +260,11 @@
                         + phiz_f2 * grid % sz(s))
 
     ! Implicit diffusive flux
-    f_im1 = con_eff1 * f_coef(s)          &
+    f_im1 = con_eff1 * a % fc(s)          &
           * (  phix_f1 * grid % dx(s)      &
              + phiy_f1 * grid % dy(s)      &
              + phiz_f1 * grid % dz(s) )
-    f_im2 = con_eff2 * f_coef(s)          &
+    f_im2 = con_eff2 * a % fc(s)          &
           * (  phix_f2 * grid % dx(s)      &
              + phiy_f2 * grid % dy(s)      &
              + phiz_f2 * grid % dz(s) )
@@ -271,8 +277,8 @@
 
     ! Calculate the coefficients for the sysytem matrix
 
-    a12 = con_eff1 * f_coef(s)
-    a21 = con_eff2 * f_coef(s)
+    a12 = con_eff1 * a % fc(s)
+    a21 = con_eff2 * a % fc(s)
 
     a12 = a12  - min(flux(s), 0.0) * capacity
     a21 = a21  + max(flux(s), 0.0) * capacity
@@ -356,9 +362,9 @@
         u3uj_phij(c) = -0.22*t_scale(c)*&
                    (uw%n(c)*phi_x(c)+vw%n(c)*phi_y(c)+ww%n(c)*phi_z(c))
       end do
-      call Grad_Mod_For_Phi(grid, u1uj_phij, 1, u1uj_phij_x, .true.)
-      call Grad_Mod_For_Phi(grid, u2uj_phij, 2, u2uj_phij_y, .true.)
-      call Grad_Mod_For_Phi(grid, u3uj_phij, 3, u3uj_phij_z, .true.)
+      call Grad_Mod_Component(grid, u1uj_phij, 1, u1uj_phij_x, .true.)
+      call Grad_Mod_Component(grid, u2uj_phij, 2, u2uj_phij_y, .true.)
+      call Grad_Mod_Component(grid, u3uj_phij, 3, u3uj_phij_z, .true.)
       do c = 1, grid % n_cells
         b(c) = b(c) - (  u1uj_phij_x(c)  &
                        + u2uj_phij_y(c)  &
@@ -375,12 +381,12 @@
 
         pr_t1 = Turbulent_Prandtl_Number(grid, c1)
         pr_t2 = Turbulent_Prandtl_Number(grid, c2)
-        pr_t  = fw(s) * pr_t1 + (1.0 - fw(s)) * pr_t2
+        pr_t  = grid % fw(s) * pr_t1 + (1.0-grid % fw(s)) * pr_t2
 
         if(c2 > 0) then
-          phix_f1 = fw(s)*phi_x(c1) + (1.0-fw(s))*phi_x(c2) 
-          phiy_f1 = fw(s)*phi_y(c1) + (1.0-fw(s))*phi_y(c2)
-          phiz_f1 = fw(s)*phi_z(c1) + (1.0-fw(s))*phi_z(c2)
+          phix_f1 = grid % fw(s)*phi_x(c1) + (1.0-grid % fw(s))*phi_x(c2)
+          phiy_f1 = grid % fw(s)*phi_y(c1) + (1.0-grid % fw(s))*phi_y(c2)
+          phiz_f1 = grid % fw(s)*phi_z(c1) + (1.0-grid % fw(s))*phi_z(c2)
           phix_f2 = phix_f1 
           phiy_f2 = phiy_f1 
           phiz_f2 = phiz_f1 
@@ -388,13 +394,13 @@
                   + (1. - grid % f(s)) * (capacity*vis_t(c2)/pr_t )
           con_eff2 = con_eff1 
         else
-          phix_f1 = phi_x(c1) 
-          phiy_f1 = phi_y(c1) 
-          phiz_f1 = phi_z(c1) 
+          phix_f1 = phi_x(c1)
+          phiy_f1 = phi_y(c1)
+          phiz_f1 = phi_z(c1)
           phix_f2 = phix_f1 
           phiy_f2 = phiy_f1 
           phiz_f2 = phiz_f1 
-          con_eff1 = capacity*vis_t(c1)/pr_t   
+          con_eff1 = capacity * vis_t(c1) / pr_t
           con_eff2 = con_eff1 
         end if
 
@@ -407,26 +413,26 @@
                             + phiz_f2 * grid % sz(s))
 
         ! Implicit diffusive flux
-        f_im1 = con_eff1 * f_coef(s) *         &
+        f_im1 = con_eff1 * a % fc(s) *         &
                 (  phix_f1 * grid % dx(s)      &
                  + phiy_f1 * grid % dy(s)      &
                  + phiz_f1 * grid % dz(s) )
-        f_im2 = con_eff2 * f_coef(s) *         &
+        f_im2 = con_eff2 * a % fc(s) *         &
                 (  phix_f2 * grid % dx(s)      &
                  + phiy_f2 * grid % dy(s)      &
                  + phiz_f2 * grid % dz(s) )
 
-        b(c1) = b(c1) - con_eff1 * (phi % n(c2) - phi % n(c1)) * f_coef(s)  &
+        b(c1) = b(c1) - con_eff1 * (phi % n(c2) - phi % n(c1)) * a % fc(s)  &
               - f_ex1 + f_im1
         if(c2  > 0) then
-          b(c2) = b(c2) + con_eff1 * (phi % n(c2) - phi % n(c1)) * f_coef(s)  &
+          b(c2) = b(c2) + con_eff1 * (phi % n(c2) - phi % n(c1)) * a % fc(s)  &
                 + f_ex2 - f_im2
         end if
       end do
-    end if  
-  end if  
+    end if
+  end if
 
-  call User_Mod_Source(grid, phi, a, b)
+  call User_Mod_Source(flow, phi, a, b)
 
   !---------------------------------!
   !                                 !
@@ -454,7 +460,7 @@
   niter =  5
   call Control_Mod_Max_Iterations_For_Energy_Solver(niter)
 
-  call Bicg(a, phi % n, b, precond, niter, tol, ini_res, phi % res)
+  call Bicg(sol, phi % n, b, precond, niter, tol, ini_res, phi % res)
 
   read(phi % name(3:4), *) ns  ! reterive the number of scalar 
   row = ceiling(ns/4)          ! will be 1 (scal. 1-4), 2 (scal. 5-8), etc.

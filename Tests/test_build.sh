@@ -6,7 +6,7 @@
 # compilation flags
 FCOMP="gnu"
 # conduct tests with DEBUG=yes
-DEBUG="yes"
+DEBUG="no"
 # repeat tests with CGNS_HDF5=yes
 CGNS="yes"
 
@@ -628,7 +628,117 @@ function launch_gnuplot {
   time_in_seconds
 }
 #------------------------------------------------------------------------------#
-# processor tests for full length
+# Individual processor tests for compilation
+#------------------------------------------------------------------------------#
+function processor_compilation_test {
+  # $1 = dir with test
+  # $2 = model
+  # $3 = dir with results
+
+  if [ -z "${1+xxx}" ]; then 
+    echo "directory is not set at all"
+    exit 1
+  elif [ -z "${2+xxx}" ]; then 
+    echo "model is not set at all"
+    exit 1
+  elif [ -z "${3+xxx}" ]; then 
+    echo "directory with results is not set at all"
+    exit 1
+  fi
+
+  cd "$1"
+  name_in_div=$(head -n1 divide.scr)
+  nproc_in_div=$(head -n2 divide.scr | tail -n1)
+
+  echo "Test:  compilation in " "$1" with "$2" model
+
+  echo "np="$nproc_in_div", MPI=yes"
+  # rel_dir to User_Mod/ from Process/
+  rel_dir=$(realpath --relative-to="$PROC_DIR" "$1")
+
+  if [ "$CGNS" = "yes" ]; then
+    clean_compile $PROC_DIR yes yes $rel_dir # dir CGNS_HDF5 MPI DIR_CASE
+  else
+    clean_compile $PROC_DIR no yes $rel_dir # dir CGNS_HDF5 MPI DIR_CASE
+  fi
+}
+#------------------------------------------------------------------------------#
+# All processor compilation tests
+#------------------------------------------------------------------------------#
+function processor_compilation_tests {
+  # $1 = dir with test
+  # $2 = model
+  # $3 = dir with results
+  # it requires a new file in Xmgrace/ dir called gnuplot_script_template.sh
+
+  echo "  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "  !!"
+  echo "  !!    Running Processor compilation tests"
+  echo "  !!"
+  echo "  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+
+  # no User_Mod/ dir !!!
+  processor_compilation_test \
+    "$LES_CAVITY_LID_DRIVEN_DIR" \
+    "none" \
+    "$LES_CAVITY_LID_DRIVEN_DIR/Xmgrace"
+
+  # no User_Mod/ dir !!!
+  processor_compilation_test \
+    "$LES_CAVITY_THERM_DRIVEN_DIR_106" \
+    "none" \
+    "$LES_CAVITY_THERM_DRIVEN_DIR_106/Xmgrace"
+
+  # no User_Mod/ dir !!!
+  processor_compilation_test \
+    "$LES_CAVITY_THERM_DRIVEN_DIR_108" \
+    "none" \
+    "$LES_CAVITY_THERM_DRIVEN_DIR_108/Xmgrace"
+
+  # [~2 min test]
+  processor_compilation_test \
+    "$RANS_CHANNEL_LR_UNIFORM_DIR" \
+    "k_eps" \
+    "$RANS_CHANNEL_LR_UNIFORM_DIR/Xmgrace"
+
+  # [~2 min test]
+  processor_compilation_test \
+    "$RANS_CHANNEL_LR_STRETCHED_DIR" \
+    "k_eps_zeta_f" \
+    "$RANS_CHANNEL_LR_STRETCHED_DIR/Xmgrace"
+
+  # [~5 min test]
+  processor_compilation_test \
+    "$RANS_CHANNEL_LR_RSM_DIR" \
+    "rsm_manceau_hanjalic" \
+    "$RANS_CHANNEL_LR_RSM_DIR/Xmgrace"
+
+  # [~5 min test]
+  processor_compilation_test \
+    "$RANS_CHANNEL_LR_RSM_DIR" \
+    "rsm_hanjalic_jakirlic" \
+    "$RANS_CHANNEL_LR_RSM_DIR/Xmgrace"
+
+  # [~12 HOURS test]
+  processor_compilation_test \
+    "$HYB_CHANNEL_HR_UNIFORM_DIR" \
+    "hybrid_les_rans" \
+    "$HYB_CHANNEL_HR_UNIFORM_DIR/Xmgrace"
+
+  # [~12 HOURS test]
+  processor_compilation_test \
+    "$HYB_CHANNEL_HR_STRETCHED_DIR" \
+    "hybrid_les_rans" \
+    "$HYB_CHANNEL_HR_STRETCHED_DIR/Xmgrace"
+
+#  # Issue: pipe does not pass processor_backup_tests
+#  processor_full_length_test \
+#    "$LES_PIPE_DIR" \
+#    "les_dynamic" \
+#    "$LES_PIPE_DIR/Xmgrace"
+}
+#------------------------------------------------------------------------------#
+# Individual processor tests for full length
 #------------------------------------------------------------------------------#
 function processor_full_length_test {
   # $1 = dir with test
@@ -698,7 +808,7 @@ function processor_full_length_test {
   fi
 }
 #------------------------------------------------------------------------------#
-# processor tests for Channel
+# All processor tests
 #------------------------------------------------------------------------------#
 function processor_full_length_tests {
   # $1 = dir with test
@@ -778,6 +888,7 @@ function processor_full_length_tests {
 generator_tests
 convert_tests
 divide_tests
+processor_compilation_tests
 processor_backup_tests
-#process_save_exit_now_tests
+process_save_exit_now_tests
 processor_full_length_tests

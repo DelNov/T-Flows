@@ -5,6 +5,7 @@
 !   (that means in "Generate", "Divide", "Convert", "Process".                 !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
+  use Grid_Level_Mod
   use Material_Mod
   use Bnd_Cond_Mod
   use Metis_Options_Mod
@@ -12,35 +13,6 @@
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
-
-  !-----------------------------------------!
-  !   Maximum number of multi-grid levels   !
-  !-----------------------------------------!
-  integer, parameter :: MAX_MG_LEV = 8
-
-  !-----------------------!
-  !                       !
-  !   Coarser grid type   !
-  !                       !
-  !-----------------------!
-  type Coarser_Grid_Type
-
-    ! Number of cells and faces at each level
-    integer :: n_cells
-    integer :: n_faces
-
-    ! Cell and face numbers from current to coarser levels
-    integer, allocatable :: cell(:)
-    integer, allocatable :: face(:)
-
-    ! Cell and face at coarser level
-    integer, allocatable :: cell_at_coarser(:)
-    integer, allocatable :: face_at_coarser(:)
-
-    ! Faces' neigboring (surrounding) cells
-    integer, allocatable :: faces_c(:,:)
-
-  end type
 
   !---------------!
   !               !
@@ -115,7 +87,7 @@
     integer, allocatable :: cells_bnd_color(:,:)
 
     ! Coarser levels for the grid
-    type(Coarser_Grid_Type) :: level(0:MAX_MG_LEV)
+    type(Grid_Level_Type) :: level(MAX_MG_LEVELS)
 
     !-------------------------!
     !  Face-based variables   !
@@ -136,8 +108,10 @@
     ! Face coordinates 
     real, allocatable :: xf(:), yf(:), zf(:)
 
-    ! Face weight-factor
+    ! Face weight-factors: purely geometrical (f) and
+    ! adapted to near wall cells in the fluid phase (fw)
     real, allocatable :: f(:)
+    real, allocatable :: fw(:)
 
     !-------------------------!
     !  Node-based variables   !
@@ -173,13 +147,23 @@
   include 'Grid_Mod/Allocate_Faces.f90'
   include 'Grid_Mod/Allocate_Nodes.f90'
   include 'Grid_Mod/Allocate_New_Numbers.f90'
+  include 'Grid_Mod/Create_Levels.f90'
+  include 'Grid_Mod/Allocate_Levels.f90'
+  include 'Grid_Mod/Check_Levels.f90'
   include 'Grid_Mod/Bnd_Cond_Type.f90'
   include 'Grid_Mod/Bnd_Cond_Ranges.f90'
   include 'Grid_Mod/Decompose.f90'
+  include 'Grid_Mod/Coarsen.f90'
+  include 'Grid_Mod/Calculate_Face_Geometry.f90'
   include 'Grid_Mod/Calculate_Wall_Distance.f90'
   include 'Grid_Mod/Estimate_Big_And_Small.f90'
+  include 'Grid_Mod/Load_Cns.f90'
+  include 'Grid_Mod/Load_Geo.f90'
   include 'Grid_Mod/Print_Bnd_Cond_Info.f90'
+  include 'Grid_Mod/Save_Cns.f90'
+  include 'Grid_Mod/Save_Geo.f90'
   include 'Grid_Mod/Sort_Cells_By_Index.f90'
+  include 'Grid_Mod/Sort_Cells_Smart.f90'
   include 'Grid_Mod/Sort_Faces_By_Index.f90'
   include 'Grid_Mod/Sort_Faces_Smart.f90'
 

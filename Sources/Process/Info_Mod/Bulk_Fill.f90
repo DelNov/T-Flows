@@ -14,25 +14,25 @@
   if (this_proc < 2) then
 
     ! Courant and Peclet numbers
-    write(bulk_info % lines(1)( 6:28),    '(a23)') 'Maximum Courant number:'
-    write(bulk_info % lines(1)(30:38), '(1pe9.3)') courant
+    write(bulk_info % lines(1)( 27: 49),    '(a23)') 'Maximum Courant number:'
+    write(bulk_info % lines(1)( 51: 60), '(1pe9.3)') courant
 
-    write(bulk_info % lines(1)(48:69),    '(a22)') 'Maximum Peclet number:'
-    write(bulk_info % lines(1)(71:79), '(1pe9.3)') peclet 
+    write(bulk_info % lines(1)( 69: 90),    '(a22)') 'Maximum Peclet number:'
+    write(bulk_info % lines(1)( 92:100), '(1pe9.3)') peclet 
 
-    write(bulk_info % lines(2)( 6:13),     '(a8)') 'Flux x :'
-    write(bulk_info % lines(2)(15:23), '(1pe9.2)') fx
-    write(bulk_info % lines(2)(34:41),     '(a8)') 'Flux y :'
-    write(bulk_info % lines(2)(43:51), '(1pe9.2)') fy
-    write(bulk_info % lines(2)(62:69),     '(a8)') 'Flux z :'
-    write(bulk_info % lines(2)(71:79), '(1pe9.2)') fz
+    write(bulk_info % lines(2)( 27: 34),      '(a8)') 'Flux x :'
+    write(bulk_info % lines(2)( 36: 45), '(1pe10.3)') fx
+    write(bulk_info % lines(2)( 55: 62),      '(a8)') 'Flux y :'
+    write(bulk_info % lines(2)( 64: 75), '(1pe10.2)') fy
+    write(bulk_info % lines(2)( 83: 90),      '(a8)') 'Flux z :'
+    write(bulk_info % lines(2)( 92:101), '(1pe10.2)') fz
 
-    write(bulk_info % lines(3)( 6:13),     '(a8)') 'Pdrop x:'
-    write(bulk_info % lines(3)(15:23), '(1pe9.2)') px
-    write(bulk_info % lines(3)(34:41),     '(a8)') 'Pdrop y:'
-    write(bulk_info % lines(3)(43:51), '(1pe9.2)') py
-    write(bulk_info % lines(3)(62:69),     '(a8)') 'Pdrop z:'
-    write(bulk_info % lines(3)(71:79), '(1pe9.2)') pz
+    write(bulk_info % lines(3)( 27: 34),      '(a8)') 'Pdrop x:'
+    write(bulk_info % lines(3)( 36: 45), '(1pe10.3)') px
+    write(bulk_info % lines(3)( 55: 62),      '(a8)') 'Pdrop y:'
+    write(bulk_info % lines(3)( 64: 75), '(1pe10.2)') py
+    write(bulk_info % lines(3)( 83: 90),      '(a8)') 'Pdrop z:'
+    write(bulk_info % lines(3)( 92:101), '(1pe10.2)') pz
 
   end if
 

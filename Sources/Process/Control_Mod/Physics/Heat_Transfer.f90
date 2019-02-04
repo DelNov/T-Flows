@@ -2,8 +2,8 @@
   subroutine Control_Mod_Heat_Transfer(verbose)
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Comm_Mod, only: this_proc, Comm_Mod_End
-  use Flow_Mod, only: heat_transfer
+  use Comm_Mod,  only: this_proc, Comm_Mod_End
+  use Field_Mod, only: heat_transfer
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

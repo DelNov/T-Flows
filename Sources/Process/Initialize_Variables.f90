@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Initialize_Variables(grid)
+  subroutine Initialize_Variables(flow)
 !------------------------------------------------------------------------------!
-!   Initialize dependent variables.                                            !
+!   Initialize dependent variables.  (It is a bit of a mess still)             !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Flow_Mod
+  use Field_Mod, only: Field_Type, heat_transfer, density
   use Les_Mod
   use Comm_Mod
   use Rans_Mod
@@ -16,30 +16,43 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Field_Type), target :: flow
 !----------------------------------[Calling]-----------------------------------!
   integer :: Key_Ind
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: i, c, c1, c2, m, s, nks, nvs
-  integer           :: n_wall, n_inflow, n_outflow, n_symmetry, n_heated_wall, &
-                       n_convect
-  character(len=80) :: keys(128)
-  character(len=80) :: keys_file(128)
-  real              :: vals(0:128)   ! note that they start from zero!
-  real              :: area
+  type(Grid_Type), pointer :: grid
+  type(Bulk_Type), pointer :: bulk
+  type(Var_Type),  pointer :: u, v, w, t
+  real,            pointer :: flux(:)
+  integer                  :: i, c, c1, c2, m, s, nks, nvs
+  integer                  :: n_wall, n_inflow, n_outflow, n_symmetry,  &
+                              n_heated_wall, n_convect
+  character(len=80)        :: keys(128)
+  character(len=80)        :: keys_file(128)
+  real                     :: vals(0:128)   ! note that they start from zero!
+  real                     :: area
 
-  integer           :: n_points, k
-  real, allocatable :: prof(:,:), x(:), y(:), z(:), dist(:)
-  logical           :: found
+  integer                  :: n_points, k
+  real, allocatable        :: prof(:,:), x(:), y(:), z(:), dist(:)
+  logical                  :: found
 
   ! Default values for initial conditions
-  real, parameter   :: u_def   = 0.0,  v_def   = 0.0,  w_def    = 0.0
-  real, parameter   :: t_def   = 0.0
-  real, parameter   :: kin_def = 0.0,  eps_def = 0.0,  f22_def  = 0.0
-  real, parameter   :: vis_def = 0.0,  zeta_def = 0.0
-  real, parameter   :: uu_def  = 0.0,  vv_def  = 0.0,  ww_def   = 0.0
-  real, parameter   :: uv_def  = 0.0,  uw_def  = 0.0,  vw_def   = 0.0
+  real, parameter          :: u_def   = 0.0,  v_def    = 0.0,  w_def    = 0.0
+  real, parameter          :: t_def   = 0.0,  t2_def   = 0.0
+  real, parameter          :: kin_def = 0.0,  eps_def  = 0.0,  f22_def  = 0.0
+  real, parameter          :: vis_def = 0.0,  zeta_def = 0.0
+  real, parameter          :: uu_def  = 0.0,  vv_def   = 0.0,  ww_def   = 0.0
+  real, parameter          :: uv_def  = 0.0,  uw_def   = 0.0,  vw_def   = 0.0
 !==============================================================================!
+
+  ! Take aliases
+  grid => flow % pnt_grid
+  bulk => flow % bulk
+  flux => flow % flux
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+  t    => flow % t
 
   area  = 0.0
   if (this_proc < 2) print *, '# Grid material: ', grid % material % name
@@ -145,6 +158,10 @@
             i=Key_Ind('F22', keys,nks);prof(k,0)=f22_def; f22 %n(c)=prof(k,i)
           end if
 
+          if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
+            i=Key_Ind('T2', keys,nks);prof(k,0)=t2_def; t2 %n(c)=prof(k,i)
+          end if
+
           if(turbulence_model .eq. DES_SPALART) then
             i=Key_Ind('VIS',keys,nks); prof(k,0)=vis_def; vis%n(c)=prof(k,i)
           end if
@@ -233,7 +250,6 @@
           vals(0) = t_def;  t % n(c) = vals(Key_Ind('T', keys, nks))
           t % o(c)  = t % n(c)
           t % oo(c) = t % n(c)
-          t_inf     = t % n(c)
         end if
 
         if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
@@ -291,6 +307,13 @@
           f22  % oo(c) = f22  % n(c)
           u_tau(c)  = 0.047
           y_plus(c) = 0.001
+        end if
+
+        if(turbulence_model .eq. K_EPS_ZETA_F .and. &
+           heat_transfer) then
+          vals(0) = t2_def;  t2 % n(c) = vals(Key_Ind('T2',  keys, nks))
+          t2 % o(c)  = t2 % n(c)
+          t2 % oo(c) = t2 % n(c)
         end if
 
         if(turbulence_model .eq. SPALART_ALLMARAS .or.  &

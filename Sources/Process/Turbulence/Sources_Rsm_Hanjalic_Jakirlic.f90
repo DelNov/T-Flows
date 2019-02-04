@@ -1,60 +1,73 @@
 !==============================================================================!
-  subroutine Sources_Rsm_Hanjalic_Jakirlic(grid, name_phi)
+  subroutine Sources_Rsm_Hanjalic_Jakirlic(flow, sol, name_phi, n_time_step)
 !------------------------------------------------------------------------------!
 !   Calculate source terms for transport equations for Re stresses and         !
 !   dissipation for Hanjalic-Jakirlic model.                                   !  
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Flow_Mod
+  use Field_Mod
   use Rans_Mod
-  use Grid_Mod
+  use Grid_Mod,   only: Grid_Type
+  use Solver_Mod, only: Solver_Type
+  use Matrix_Mod, only: Matrix_Type
   use Grad_Mod
-  use Work_Mod, only: l_sc_x => r_cell_01,  &
-                      l_sc_y => r_cell_02,  &
-                      l_sc_z => r_cell_03,  &
-                      kin_x  => r_cell_04,  &
-                      kin_y  => r_cell_05,  &
-                      kin_z  => r_cell_06,  &
-                      kin_xx => r_cell_07,  &
-                      kin_yy => r_cell_08,  &
-                      kin_zz => r_cell_09,  &
-                      ui_xx  => r_cell_10,  &
-                      ui_yy  => r_cell_11,  &
-                      ui_zz  => r_cell_12,  &
-                      ui_xy  => r_cell_13,  &
-                      ui_xz  => r_cell_14,  &
-                      ui_yz  => r_cell_15,  &
-                      kin_e  => r_cell_16,  &
-                      kin_e_x=> r_cell_17,  &
-                      kin_e_y=> r_cell_18,  &
-                      kin_e_z=> r_cell_19,  &
-                      diss1  => r_cell_20
+  use Work_Mod,   only: l_sc_x => r_cell_01,  &
+                        l_sc_y => r_cell_02,  &
+                        l_sc_z => r_cell_03,  &
+                        kin_x  => r_cell_04,  &
+                        kin_y  => r_cell_05,  &
+                        kin_z  => r_cell_06,  &
+                        kin_xx => r_cell_07,  &
+                        kin_yy => r_cell_08,  &
+                        kin_zz => r_cell_09,  &
+                        ui_xx  => r_cell_10,  &
+                        ui_yy  => r_cell_11,  &
+                        ui_zz  => r_cell_12,  &
+                        ui_xy  => r_cell_13,  &
+                        ui_xz  => r_cell_14,  &
+                        ui_yz  => r_cell_15,  &
+                        kin_e  => r_cell_16,  &
+                        kin_e_x=> r_cell_17,  &
+                        kin_e_y=> r_cell_18,  &
+                        kin_e_z=> r_cell_19,  &
+                        diss1  => r_cell_20
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)  :: grid
-  character(len=*) :: name_phi
+  type(Field_Type),  target :: flow
+  type(Solver_Type), target :: sol
+  character(len=*)          :: name_phi
+  integer                   :: n_time_step
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, s, c1, c2, i, icont
-  real    :: mag
-  real    :: a11, a22, a33, a12, a13, a23
-  real    :: s11, s22, s33, s12, s13, s23
-  real    :: v11, v22, v33, v12, v13, v23
-  real    :: n1,n2,n3,aa2,aa3,aa,re_t,ff2,fd,ff1,cc,c1w,c2w,f_w,uu_nn
-  real    :: e11,e12,e13,e21,e22,e23,e31,e32,e33
-  real    :: eps11,eps12,eps13,eps21,eps22,eps23,eps31,eps32,eps33
-  real    :: f_eps, phi2_nn, eps_over_kin
-  real    :: fss,e2,e3,ee,cc1,cc2
-  real    :: uxx, uyy, uzz, uxy, uxz, uyz, uyx, uzx, uzy
-  real    :: r13, r23
-  real    :: a_lk_s_lk, a_mn_a_mn
-  real    :: var1w_11, var1w_22, var1w_33, var1w_12, var1w_13, var1w_23
-  real    :: var2w_11, var2w_22, var2w_33, var2w_12, var2w_13, var2w_23
-  real    :: var1_11, var1_22, var1_33, var1_12, var1_13, var1_23
-  real    :: var2_11, var2_22, var2_33, var2_12, var2_13, var2_23
-  real    :: p11, p22, p33, p12, p13, p23, eps_1, eps_2
-  real    :: ff5, tkolm, kin_vis
+  type(Grid_Type),   pointer :: grid
+  type(Var_Type),    pointer :: u, v, w
+  type(Matrix_Type), pointer :: a
+  real,              pointer :: b(:)
+  integer                    :: c, s, c1, c2, i, icont
+  real                       :: mag
+  real                       :: a11, a22, a33, a12, a13, a23
+  real                       :: s11, s22, s33, s12, s13, s23
+  real                       :: v11, v22, v33, v12, v13, v23
+  real                       :: n1, n2, n3, aa2, aa3, aa, re_t
+  real                       :: ff2, fd, ff1, cc, c1w, c2w, f_w, uu_nn
+  real                       :: e11, e12, e13, e21, e22, e23, e31, e32, e33
+  real                       :: eps11, eps12, eps13
+  real                       :: eps21, eps22, eps23
+  real                       :: eps31, eps32, eps33
+  real                       :: f_eps, phi2_nn
+  real                       :: fss,e2,e3,ee,cc1,cc2
+  real                       :: uxx, uyy, uzz, uxy, uxz, uyz, uyx, uzx, uzy
+  real                       :: r13, r23
+  real                       :: a_lk_s_lk, a_mn_a_mn
+  real                       :: var1w_11, var1w_22, var1w_33
+  real                       :: var1w_12, var1w_13, var1w_23
+  real                       :: var2w_11, var2w_22, var2w_33
+  real                       :: var2w_12, var2w_13, var2w_23
+  real                       :: var1_11,var1_22,var1_33,var1_12,var1_13,var1_23
+  real                       :: var2_11,var2_22,var2_33,var2_12,var2_13,var2_23
+  real                       :: p11, p22, p33, p12, p13, p23, eps_1, eps_2
+  real                       :: ff5, tkolm, kin_vis
 !==============================================================================!
 !   Dimensions:                                                                !
 !                                                                              !
@@ -68,6 +81,14 @@
 !   thermal cap.  capacity[m^2/(s^2*K)]| therm. conductivity     [kg*m/(s^3*K)]!
 !------------------------------------------------------------------------------!
 ! but dens > 1 mod. not applied here yet
+
+  ! Take aliases
+  grid => flow % pnt_grid
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+  a    => sol % a
+  b    => sol % b % val
 
   diss1 = 0.0
 
@@ -85,50 +106,50 @@
 ! !      model that required much more memory         !
 ! !---------------------------------------------------!
 ! if(name_phi == "23") then
-!   call Grad_Mod_For_Phi(grid, uu % n, 1, var3x, .true.) ! duu/dx  
-!   call Grad_Mod_For_Phi(grid, uu % n, 2, var3y, .true.) ! duu/dy  
-!   call Grad_Mod_For_Phi(grid, uu % n, 3, var3z, .true.) ! duu/dz  
+!   call Grad_Mod_Component(grid, uu % n, 1, var3x, .true.) ! duu/dx  
+!   call Grad_Mod_Component(grid, uu % n, 2, var3y, .true.) ! duu/dy  
+!   call Grad_Mod_Component(grid, uu % n, 3, var3z, .true.) ! duu/dz  
 !
-!   call Grad_Mod_For_Phi(grid, vv % n, 1, var4x, .true.) ! duw/dx  
-!   call Grad_Mod_For_Phi(grid, vv % n, 2, var4y, .true.) ! duw/dy  
-!   call Grad_Mod_For_Phi(grid, vv % n, 3, var4z, .true.) ! duw/dz  
+!   call Grad_Mod_Component(grid, vv % n, 1, var4x, .true.) ! duw/dx  
+!   call Grad_Mod_Component(grid, vv % n, 2, var4y, .true.) ! duw/dy  
+!   call Grad_Mod_Component(grid, vv % n, 3, var4z, .true.) ! duw/dz  
 !
-!   call Grad_Mod_For_Phi(grid, ww % n, 1, var5x, .true.) ! duw/dx  
-!   call Grad_Mod_For_Phi(grid, ww % n, 2, var5y, .true.) ! duw/dy  
-!   call Grad_Mod_For_Phi(grid, ww % n, 3, var5z, .true.) ! duw/dz  
+!   call Grad_Mod_Component(grid, ww % n, 1, var5x, .true.) ! duw/dx  
+!   call Grad_Mod_Component(grid, ww % n, 2, var5y, .true.) ! duw/dy  
+!   call Grad_Mod_Component(grid, ww % n, 3, var5z, .true.) ! duw/dz  
 !
-!   call Grad_Mod_For_Phi(grid, uv % n, 1, var6x, .true.) ! duv/dx  
-!   call Grad_Mod_For_Phi(grid, uv % n, 2, var6y, .true.) ! duv/dy  
-!   call Grad_Mod_For_Phi(grid, uv % n, 3, var6z, .true.) ! duv/dz  
+!   call Grad_Mod_Component(grid, uv % n, 1, var6x, .true.) ! duv/dx  
+!   call Grad_Mod_Component(grid, uv % n, 2, var6y, .true.) ! duv/dy  
+!   call Grad_Mod_Component(grid, uv % n, 3, var6z, .true.) ! duv/dz  
 !
-!   call Grad_Mod_For_Phi(grid, uw % n, 1, kin_x, .true.) ! duw/dx  
-!   call Grad_Mod_For_Phi(grid, uw % n, 2, kin_y, .true.) ! duw/dy  
-!   call Grad_Mod_For_Phi(grid, uw % n, 3, kin_z, .true.) ! duw/dz  
+!   call Grad_Mod_Component(grid, uw % n, 1, kin_x, .true.) ! duw/dx  
+!   call Grad_Mod_Component(grid, uw % n, 2, kin_y, .true.) ! duw/dy  
+!   call Grad_Mod_Component(grid, uw % n, 3, kin_z, .true.) ! duw/dz  
 !
-!   call Grad_Mod_For_Phi(grid, vw % n, 1, var8x, .true.) ! duw/dx  
-!   call Grad_Mod_For_Phi(grid, vw % n, 2, var8y, .true.) ! duw/dy  
-!   call Grad_Mod_For_Phi(grid, vw % n, 3, var8z, .true.) ! duw/dz  
+!   call Grad_Mod_Component(grid, vw % n, 1, var8x, .true.) ! duw/dx  
+!   call Grad_Mod_Component(grid, vw % n, 2, var8y, .true.) ! duw/dy  
+!   call Grad_Mod_Component(grid, vw % n, 3, var8z, .true.) ! duw/dz  
 !
-!   call Grad_Mod_For_Phi(grid, u % x, 1, var1x, .true.)  ! d2U/dxdx
-!   call Grad_Mod_For_Phi(grid, u % y, 2, var1y, .true.)  ! d2U/dydy
-!   call Grad_Mod_For_Phi(grid, u % z, 3, var1z, .true.)  ! d2U/dzdz
-!   call Grad_Mod_For_Phi(grid, u % x, 2, var2x, .true.)  ! d2U/dxdy
-!   call Grad_Mod_For_Phi(grid, u % x, 3, var2y, .true.)  ! d2U/dxdz
-!   call Grad_Mod_For_Phi(grid, u % y, 3, var2z, .true.)  ! d2U/dydz
+!   call Grad_Mod_Component(grid, u % x, 1, var1x, .true.)  ! d2U/dxdx
+!   call Grad_Mod_Component(grid, u % y, 2, var1y, .true.)  ! d2U/dydy
+!   call Grad_Mod_Component(grid, u % z, 3, var1z, .true.)  ! d2U/dzdz
+!   call Grad_Mod_Component(grid, u % x, 2, var2x, .true.)  ! d2U/dxdy
+!   call Grad_Mod_Component(grid, u % x, 3, var2y, .true.)  ! d2U/dxdz
+!   call Grad_Mod_Component(grid, u % y, 3, var2z, .true.)  ! d2U/dydz
 !
-!   call Grad_Mod_For_Phi(grid, v % x, 1, var9x, .true.)  ! d2V/dxdx
-!   call Grad_Mod_For_Phi(grid, v % y, 2, var9y, .true.)  ! d2V/dydy
-!   call Grad_Mod_For_Phi(grid, v % z, 3, var9z, .true.)  ! d2V/dzdz
-!   call Grad_Mod_For_Phi(grid, v % x, 2, var10x, .true.)  ! d2V/dxdy
-!   call Grad_Mod_For_Phi(grid, v % x, 3, var10y, .true.)  ! d2V/dxdz
-!   call Grad_Mod_For_Phi(grid, v % y, 3, var10z, .true.)  ! d2V/dydz
+!   call Grad_Mod_Component(grid, v % x, 1, var9x, .true.)  ! d2V/dxdx
+!   call Grad_Mod_Component(grid, v % y, 2, var9y, .true.)  ! d2V/dydy
+!   call Grad_Mod_Component(grid, v % z, 3, var9z, .true.)  ! d2V/dzdz
+!   call Grad_Mod_Component(grid, v % x, 2, var10x, .true.)  ! d2V/dxdy
+!   call Grad_Mod_Component(grid, v % x, 3, var10y, .true.)  ! d2V/dxdz
+!   call Grad_Mod_Component(grid, v % y, 3, var10z, .true.)  ! d2V/dydz
 !
-!   call Grad_Mod_For_Phi(grid, w % x, 1, var11x, .true.)  ! d2W/dxdx
-!   call Grad_Mod_For_Phi(grid, w % y, 2, var11y, .true.)  ! d2W/dydy
-!   call Grad_Mod_For_Phi(grid, w % z, 3, var11z, .true.)  ! d2W/dzdz
-!   call Grad_Mod_For_Phi(grid, w % x, 2, var12x, .true.)  ! d2W/dxdy
-!   call Grad_Mod_For_Phi(grid, w % x, 3, var12y, .true.)  ! d2W/dxdz
-!   call Grad_Mod_For_Phi(grid, w % y, 3, var12z, .true.)  ! d2W/dydz
+!   call Grad_Mod_Component(grid, w % x, 1, var11x, .true.)  ! d2W/dxdx
+!   call Grad_Mod_Component(grid, w % y, 2, var11y, .true.)  ! d2W/dydy
+!   call Grad_Mod_Component(grid, w % z, 3, var11z, .true.)  ! d2W/dzdz
+!   call Grad_Mod_Component(grid, w % x, 2, var12x, .true.)  ! d2W/dxdy
+!   call Grad_Mod_Component(grid, w % x, 3, var12y, .true.)  ! d2W/dxdz
+!   call Grad_Mod_Component(grid, w % y, 3, var12z, .true.)  ! d2W/dydz
 !
 !   do c = 1, grid % n_cells
 !     uxx = var1x(c)
@@ -224,28 +245,28 @@
   if(name_phi == 'EPS') then
     do i=1,3
       if(i == 1) then
-        call Grad_Mod_For_Phi(grid, u % x, 1, ui_xx, .true.)  ! d2u/dxdx
-        call Grad_Mod_For_Phi(grid, u % x, 2, ui_xy, .true.)  ! d2u/dxdy
-        call Grad_Mod_For_Phi(grid, u % x, 3, ui_xz, .true.)  ! d2u/dxdz
-        call Grad_Mod_For_Phi(grid, u % y, 2, ui_yy, .true.)  ! d2u/dydy
-        call Grad_Mod_For_Phi(grid, u % y, 3, ui_yz, .true.)  ! d2u/dydz
-        call Grad_Mod_For_Phi(grid, u % z, 3, ui_zz, .true.)  ! d2u/dzdz
+        call Grad_Mod_Component(grid, u % x, 1, ui_xx, .true.)  ! d2u/dxdx
+        call Grad_Mod_Component(grid, u % x, 2, ui_xy, .true.)  ! d2u/dxdy
+        call Grad_Mod_Component(grid, u % x, 3, ui_xz, .true.)  ! d2u/dxdz
+        call Grad_Mod_Component(grid, u % y, 2, ui_yy, .true.)  ! d2u/dydy
+        call Grad_Mod_Component(grid, u % y, 3, ui_yz, .true.)  ! d2u/dydz
+        call Grad_Mod_Component(grid, u % z, 3, ui_zz, .true.)  ! d2u/dzdz
       end if
       if(i == 2) then
-        call Grad_Mod_For_Phi(grid, v % x, 1, ui_xx, .true.)  ! d2v/dxdx
-        call Grad_Mod_For_Phi(grid, v % x, 2, ui_xy, .true.)  ! d2v/dxdy
-        call Grad_Mod_For_Phi(grid, v % x, 3, ui_xz, .true.)  ! d2v/dxdz
-        call Grad_Mod_For_Phi(grid, v % y, 2, ui_yy, .true.)  ! d2v/dydy
-        call Grad_Mod_For_Phi(grid, v % y, 3, ui_yz, .true.)  ! d2v/dydz
-        call Grad_Mod_For_Phi(grid, v % z, 3, ui_zz, .true.)  ! d2v/dzdz
+        call Grad_Mod_Component(grid, v % x, 1, ui_xx, .true.)  ! d2v/dxdx
+        call Grad_Mod_Component(grid, v % x, 2, ui_xy, .true.)  ! d2v/dxdy
+        call Grad_Mod_Component(grid, v % x, 3, ui_xz, .true.)  ! d2v/dxdz
+        call Grad_Mod_Component(grid, v % y, 2, ui_yy, .true.)  ! d2v/dydy
+        call Grad_Mod_Component(grid, v % y, 3, ui_yz, .true.)  ! d2v/dydz
+        call Grad_Mod_Component(grid, v % z, 3, ui_zz, .true.)  ! d2v/dzdz
       end if
       if(i == 3) then
-        call Grad_Mod_For_Phi(grid, w % x, 1, ui_xx, .true.)  ! d2w/dxdx
-        call Grad_Mod_For_Phi(grid, w % x, 2, ui_xy, .true.)  ! d2w/dxdy
-        call Grad_Mod_For_Phi(grid, w % x, 3, ui_xz, .true.)  ! d2w/dxdz
-        call Grad_Mod_For_Phi(grid, w % y, 2, ui_yy, .true.)  ! d2w/dydy
-        call Grad_Mod_For_Phi(grid, w % y, 3, ui_yz, .true.)  ! d2w/dydz
-        call Grad_Mod_For_Phi(grid, w % z, 3, ui_zz, .true.)  ! d2w/dzdz
+        call Grad_Mod_Component(grid, w % x, 1, ui_xx, .true.)  ! d2w/dxdx
+        call Grad_Mod_Component(grid, w % x, 2, ui_xy, .true.)  ! d2w/dxdy
+        call Grad_Mod_Component(grid, w % x, 3, ui_xz, .true.)  ! d2w/dxdz
+        call Grad_Mod_Component(grid, w % y, 2, ui_yy, .true.)  ! d2w/dydy
+        call Grad_Mod_Component(grid, w % y, 3, ui_yz, .true.)  ! d2w/dydz
+        call Grad_Mod_Component(grid, w % z, 3, ui_zz, .true.)  ! d2w/dzdz
       end if
 
       do c = 1, grid % n_cells
@@ -319,9 +340,9 @@
     end do  ! i
   end if    ! end if EPS == yes                              
 
-  call Grad_Mod_For_Phi(grid, l_scale, 1, l_sc_x,.true.) 
-  call Grad_Mod_For_Phi(grid, l_scale, 2, l_sc_y,.true.) 
-  call Grad_Mod_For_Phi(grid, l_scale, 3, l_sc_z,.true.) 
+  call Grad_Mod_Component(grid, l_scale, 1, l_sc_x,.true.) 
+  call Grad_Mod_Component(grid, l_scale, 2, l_sc_y,.true.) 
+  call Grad_Mod_Component(grid, l_scale, 3, l_sc_z,.true.) 
 
   r13 = ONE_THIRD
   r23 = TWO_THIRDS
@@ -577,11 +598,11 @@
                      + max(var2_11, 0.0)       &
                      + max(var1w_11,0.0)       &
                      + max(var2w_11,0.0))*grid % vol(c) 
-      A % val(A % dia(c)) = A % val(A % dia(c))                               &
+      a % val(a % dia(c)) = a % val(a % dia(c))                               &
                 + density * (  cc1 * eps % n(c) / kin % n(c)                  &
                              + c1w * f_w * eps % n(c) / kin % n(c)*3.0*n1*n1  &
                              + fss * eps % n(c) / kin % n(c))*grid % vol(c)
-      A % val(A % dia(c)) = A % val(A % dia(c))               &
+      a % val(a % dia(c)) = a % val(a % dia(c))               &
                 + density * (  max(-p11,     0.0)             &
                              + max(-var2_11, 0.0)             &
                              + max(-var1w_11,0.0)             &
@@ -599,11 +620,11 @@
                      + max(var2_22, 0.0)       &
                      + max(var1w_22,0.0)       &
                      + max(var2w_22,0.0))*grid % vol(c) 
-      A % val(A % dia(c)) = A % val(A % dia(c))                               &
+      a % val(a % dia(c)) = a % val(a % dia(c))                               &
                 + density * (  cc1 * eps % n(c) / kin % n(c)                  &
                              + c1w * f_w * eps % n(c) / kin % n(c)*3.0*n2*n2  &
                              + fss * eps % n(c) / kin % n(c))*grid % vol(c)
-      A % val(A % dia(c)) = A % val(A % dia(c))               &
+      a % val(a % dia(c)) = a % val(a % dia(c))               &
                 + density * (  max(-p22,     0.0)             &
                              + max(-var2_22, 0.0)             &
                              + max(-var1w_22,0.0)             &
@@ -621,11 +642,11 @@
                      + max(var2_33, 0.0)       &
                      + max(var1w_33,0.0)       &
                      + max(var2w_33,0.0))*grid % vol(c) 
-      A % val(A % dia(c)) = A % val(A % dia(c))                               &
+      a % val(a % dia(c)) = a % val(a % dia(c))                               &
                 + density * (  cc1 * eps % n(c) / kin % n(c)                  &
                              + c1w * f_w * eps % n(c) / kin % n(c)*3.0*n3*n3  &
                              + fss * eps % n(c) / kin % n(c))*grid % vol(c)
-      A % val(A % dia(c)) = A % val(A % dia(c))               &
+      a % val(a % dia(c)) = a % val(a % dia(c))               &
                 + density * (  max(-p33,     0.0)             &
                              + max(-var2_33, 0.0)             &
                              + max(-var1w_33,0.0)             &
@@ -638,7 +659,7 @@
     !---------------!
     else if(name_phi == 'UV') then
       b(c) = b(c) + density * (p12 + var2_12 + var1w_12 + var2w_12)*grid % vol(c)
-      A % val(A % dia(c)) = A % val(A % dia(c))                             &
+      a % val(a % dia(c)) = a % val(a % dia(c))                             &
             + density * (  cc1 * eps % n(c) / kin % n(c)                    &
                + c1w * f_w * eps % n(c) / kin % n(c) * 1.5*(n1*n1 + n2*n2)  &
                + fss * eps % n(c) / kin % n(c) ) * grid % vol(c)
@@ -648,7 +669,7 @@
     !---------------!
     else if(name_phi == 'UW') then
       b(c) = b(c) + density * (p13 + var2_13 + var1w_13 + var2w_13)*grid % vol(c)
-      A % val(A % dia(c)) = A % val(A % dia(c))                             &
+      a % val(a % dia(c)) = a % val(a % dia(c))                             &
             + density * (  cc1 * eps % n(c) / kin % n(c)                    &
                + c1w * f_w * eps % n(c) / kin % n(c) * 1.5*(n1*n1 + n3*n3)  &
                + fss * eps % n(c) / kin % n(c) ) * grid % vol(c)
@@ -658,7 +679,7 @@
     !---------------!
     else if(name_phi == 'VW') then
       b(c) = b(c) + density * (p23 + var2_23 + var1w_23 + var2w_23)*grid % vol(c)
-      A % val(A % dia(c)) = A % val(A % dia(c))                             &
+      a % val(a % dia(c)) = a % val(a % dia(c))                             &
             + density * (  cc1 * eps % n(c) / kin % n(c)                    &
                + c1w * f_w * eps % n(c) / kin % n(c) * 1.5*(n2*n2 + n3*n3)  &
                + fss * eps % n(c) / kin % n(c) ) * grid % vol(c)
@@ -672,7 +693,7 @@
       eps_2 = c_2e * f_eps  / t_scale(c)
       b(c) = b(c) + density * (eps_1 + diss1(c)) * grid % vol(c)
 
-      A % val(A % dia(c)) =  A % val(A % dia(c)) + density * eps_2 * grid % vol(c)
+      a % val(a % dia(c)) =  a % val(a % dia(c)) + density * eps_2 * grid % vol(c)
     end if
   end do
 
@@ -681,9 +702,9 @@
   end do
 
   if(name_phi == 'EPS') then
-    call Grad_Mod_For_Phi(grid, kin_e, 1, kin_e_x, .true.)   ! dk/dx
-    call Grad_Mod_For_Phi(grid, kin_e, 2, kin_e_y, .true.)   ! dk/dy
-    call Grad_Mod_For_Phi(grid, kin_e, 3, kin_e_z, .true.)   ! dk/dz
+    call Grad_Mod_Component(grid, kin_e, 1, kin_e_x, .true.)   ! dk/dx
+    call Grad_Mod_Component(grid, kin_e, 2, kin_e_y, .true.)   ! dk/dy
+    call Grad_Mod_Component(grid, kin_e, 3, kin_e_z, .true.)   ! dk/dz
     do c = 1, grid % n_cells
       re_t  = (kin % n(c)**2) / (kin_vis*eps % n(c) + TINY)
       f_eps = 1.0 - ((c_2e-1.4)/c_2e) * exp(-(re_t/6.0)**2)

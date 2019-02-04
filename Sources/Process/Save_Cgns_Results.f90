@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Save_Results(grid, name_save)
+  subroutine Save_Results(flow, name_save)
 !------------------------------------------------------------------------------!
 !   Creates save file and adds fields to existing grid cgns                    !
 !------------------------------------------------------------------------------!
 !---------------------------------[Modules]------------------------------------!
   use Name_Mod, only: problem_name
   use Const_Mod
-  use Flow_Mod
+  use Field_Mod
   use Rans_Mod
   use Comm_Mod, only: this_proc
   use Tokenizer_Mod
@@ -28,16 +28,20 @@
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Grid_Type)  :: grid
-  character(len=*) :: name_save
+  type(Field_Type), target :: flow
+  character(len=*)         :: name_save
 !----------------------------------[Locals]------------------------------------!
-  character(len=80) :: store_name, name_out
-  integer           :: base
-  integer           :: block
-  integer           :: solution
-  integer           :: field
-  integer           :: c
+  type(Grid_Type), pointer :: grid
+  character(len=80)        :: store_name, name_out
+  integer                  :: base
+  integer                  :: block
+  integer                  :: solution
+  integer                  :: field
+  integer                  :: c
 !==============================================================================!
+
+  ! Take aliases
+  grid => flow % pnt_grid
 
   ! Store the name
   store_name = problem_name
@@ -131,22 +135,22 @@
   !   Velocity   !
   !--------------!
   call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                            u % n(1), "VelocityX")
+                            flow % u % n(1), "VelocityX")
   call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                            v % n(1), "VelocityY")
+                            flow % v % n(1), "VelocityY")
   call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                            w % n(1), "VelocityZ")
+                            flow % w % n(1), "VelocityZ")
   !--------------!
   !   Pressure   !
   !--------------!
   call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                            p % n(1), "Pressure")
+                            flow % p % n(1), "Pressure")
   !-----------------!
   !   Temperature   !
   !-----------------!
   if(heat_transfer) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              t % n(1), "Temperature")
+                              flow % t % n(1), "Temperature")
   end if
 
   !--------------------------!
@@ -181,6 +185,14 @@
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               f22 % n(1),  "TurbulentQuantityF22")
   end if
+
+  if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
+    call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
+                              t2 % n(1),  "TurbulentQuantityT2")
+    call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
+                              p_t2(1),    "TurbulentT2Production")
+  end if
+
   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               f22 % n(1),  "TurbulentQuantityF22")
@@ -224,18 +236,18 @@
      turbulence_model .eq. DNS             .or.  &
      turbulence_model .eq. DES_SPALART) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              u % mean(1),"MeanVelocityX")
+                              flow % u % mean(1),"MeanVelocityX")
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              v % mean(1),"MeanVelocityY")
+                              flow % v % mean(1),"MeanVelocityY")
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              w % mean(1),"MeanVelocityZ")
+                              flow % w % mean(1),"MeanVelocityZ")
     do c = 1, grid % n_cells
-      uu_mean(c) = uu % mean(c) - u % mean(c) * u % mean(c)
-      vv_mean(c) = vv % mean(c) - v % mean(c) * v % mean(c)
-      ww_mean(c) = ww % mean(c) - w % mean(c) * w % mean(c)
-      uv_mean(c) = uv % mean(c) - u % mean(c) * v % mean(c)
-      uw_mean(c) = uw % mean(c) - u % mean(c) * w % mean(c)
-      vw_mean(c) = vw % mean(c) - v % mean(c) * w % mean(c)
+      uu_mean(c) = uu % mean(c) - flow % u % mean(c) * flow % u % mean(c)
+      vv_mean(c) = vv % mean(c) - flow % v % mean(c) * flow % v % mean(c)
+      ww_mean(c) = ww % mean(c) - flow % w % mean(c) * flow % w % mean(c)
+      uv_mean(c) = uv % mean(c) - flow % u % mean(c) * flow % v % mean(c)
+      uw_mean(c) = uw % mean(c) - flow % u % mean(c) * flow % w % mean(c)
+      vw_mean(c) = vw % mean(c) - flow % v % mean(c) * flow % w % mean(c)
     end do
 
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
@@ -252,12 +264,12 @@
                               vw_mean(1),"ReynoldsStressYZ")
     if(heat_transfer) then
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                               t % mean(1), "TemperatureMean")
+                               flow % t % mean(1), "TemperatureMean")
       do c = 1, grid % n_cells
-        tt_mean(c) = tt % mean(c) - t % mean(c) * t % mean(c)
-        ut_mean(c) = ut % mean(c) - u % mean(c) * t % mean(c)
-        vt_mean(c) = vt % mean(c) - v % mean(c) * t % mean(c)
-        wt_mean(c) = wt % mean(c) - w % mean(c) * t % mean(c)
+        tt_mean(c) = tt % mean(c) - flow % t % mean(c) * flow % t % mean(c)
+        ut_mean(c) = ut % mean(c) - flow % u % mean(c) * flow % t % mean(c)
+        vt_mean(c) = vt % mean(c) - flow % v % mean(c) * flow % t % mean(c)
+        wt_mean(c) = wt % mean(c) - flow % w % mean(c) * flow % t % mean(c)
       end do
 
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &

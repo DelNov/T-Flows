@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Bulk_Mod_Monitoring_Planes_Areas(grid, bulk)
+  subroutine Bulk_Mod_Monitoring_Planes_Areas(bulk, grid)
 !------------------------------------------------------------------------------!
 !   Calculate total surface of the monitoring plane                            !
 !------------------------------------------------------------------------------!
@@ -9,8 +9,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
   type(Bulk_Type) :: bulk
+  type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c1, c2, s, m
   real    :: xc1, yc1, zc1, xc2, yc2, zc2, ax_t, ay_t, az_t, wgt

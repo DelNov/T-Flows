@@ -1,28 +1,39 @@
 !==============================================================================!
-  subroutine Update_Boundary_Values(grid)
+  subroutine Update_Boundary_Values(flow)
 !------------------------------------------------------------------------------!
 !   Update variables on the boundaries (boundary cells) where needed.          !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Flow_Mod
+  use Comm_Mod
+  use Field_Mod, only: Field_Type, heat_transfer,  &
+                       density, viscosity, capacity, conductivity
   use Rans_Mod
   use Grid_Mod
-  use Comm_Mod
   use Control_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Field_Type), target :: flow
 !---------------------------------[Calling]------------------------------------!
   real :: Turbulent_Prandtl_Number
   real :: Y_Plus_Low_Re
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c1, c2, s
-  real    :: qx, qy, qz, nx, ny, nz, con_t, ebf 
-  real    :: pr, beta, u_plus, heated_area, y_pl, kin_vis
+  type(Grid_Type), pointer :: grid
+  type(Var_Type),  pointer :: u, v, w, t
+  integer                  :: c1, c2, s
+  real                     :: qx, qy, qz, nx, ny, nz, con_t
+  real                     :: pr, heat, heat_flux, heated_area, kin_vis
 !==============================================================================!
 
+  ! Take aliases
+  grid => flow % pnt_grid
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+  t    => flow % t
+
+  heat        = 0.0
   heat_flux   = 0.0
   heated_area = 0.0
   kin_vis     = viscosity / density
@@ -94,10 +105,15 @@
           zeta % n(c2) = zeta % n(c1)
           f22  % n(c2) = f22  % n(c1)
         end if
+      end if
 
-        !  if (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
-        !    f22 % n(c2) = f22 % n(c1)
-        !  end if
+      if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
+        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW  .or.   &
+           Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT  .or.   &
+           Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE .or.   &
+           Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. SYMMETRY) then
+          t2  % n(c2) = t2  % n(c1)
+        end if
       end if
 
       ! k-epsilon
@@ -124,7 +140,8 @@
           vw  % n(c2) = vw  % n(c1)
           kin % n(c2) = kin % n(c1)
           eps % n(c2) = eps % n(c1)
-          if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) f22 % n(c2) = f22 % n(c1)
+          if(turbulence_model .eq. RSM_MANCEAU_HANJALIC)  &
+            f22 % n(c2) = f22 % n(c1)
         end if
       end if
 
@@ -160,7 +177,7 @@
         end if
 
         ! Wall temperature or heat fluxes for k-eps-zeta-f
-        ! and high-re k-eps models
+        ! and high-re k-eps models. 
         if(turbulence_model .eq. K_EPS_ZETA_F    .or.  &
            turbulence_model .eq. HYBRID_LES_RANS .or.  &
            turbulence_model .eq. K_EPS) then
@@ -213,6 +230,11 @@
           eps  % n(c2) = eps  % n(grid % bnd_cond % copy_c(c2))
           zeta % n(c2) = zeta % n(grid % bnd_cond % copy_c(c2))
           f22  % n(c2) = f22  % n(grid % bnd_cond % copy_c(c2))
+        end if
+
+        if(turbulence_model .eq. K_EPS_ZETA_F .and. &
+           heat_transfer) then 
+          t2 % n(c2) = t2 % n(grid % bnd_cond % copy_c(c2))
         end if
 
         if(turbulence_model .eq. K_EPS) then

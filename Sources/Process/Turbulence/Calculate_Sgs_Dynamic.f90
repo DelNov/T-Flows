@@ -1,43 +1,50 @@
 !==============================================================================!
-  subroutine Calculate_Sgs_Dynamic(grid)
+  subroutine Calculate_Sgs_Dynamic(flow, sol)
 !------------------------------------------------------------------------------!
 !   Calculates Smagorinsky constant with dynamic procedure                     !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Flow_Mod
+  use Field_Mod,  only: Field_Type
   use Comm_Mod
   use Les_Mod
   use Rans_Mod
-  use Grid_Mod
+  use Grid_Mod,   only: Grid_Type
+  use Solver_Mod, only: Solver_Type
+  use Matrix_Mod, only: Matrix_Type
   use Grad_Mod
-  use Work_Mod, only: u_f        => r_cell_01,  &
-                      v_f        => r_cell_02,  &  
-                      w_f        => r_cell_03,  &  
-                      uu_f       => r_cell_04,  &
-                      vv_f       => r_cell_05,  &
-                      ww_f       => r_cell_06,  &
-                      uv_f       => r_cell_07,  &
-                      uw_f       => r_cell_08,  &
-                      vw_f       => r_cell_09,  &
-                      m_11_f     => r_cell_10,  &
-                      m_22_f     => r_cell_11,  &
-                      m_33_f     => r_cell_12,  &
-                      m_12_f     => r_cell_13,  &
-                      m_13_f     => r_cell_14,  &
-                      m_23_f     => r_cell_15,  &
-                      shear_test => r_cell_16   
+  use Work_Mod,   only: u_f        => r_cell_01,  &
+                        v_f        => r_cell_02,  &
+                        w_f        => r_cell_03,  &
+                        uu_f       => r_cell_04,  &
+                        vv_f       => r_cell_05,  &
+                        ww_f       => r_cell_06,  &
+                        uv_f       => r_cell_07,  &
+                        uw_f       => r_cell_08,  &
+                        vw_f       => r_cell_09,  &
+                        m_11_f     => r_cell_10,  &
+                        m_22_f     => r_cell_11,  &
+                        m_33_f     => r_cell_12,  &
+                        m_12_f     => r_cell_13,  &
+                        m_13_f     => r_cell_14,  &
+                        m_23_f     => r_cell_15,  &
+                        shear_test => r_cell_16
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Field_Type),  target :: flow
+  type(Solver_Type), target :: sol
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, j, cj
-  real    :: u_a, v_a, w_a, uu_a, vv_a, ww_a, uv_a, uw_a, vw_a, vol_e
-  real    :: m_11_a, m_22_a, m_33_a, m_12_a, m_13_a, m_23_a      
-  real    :: l_11, l_22, l_33, l_12, l_13, l_23      
-  real    :: m_11, m_22, m_33, m_12, m_13, m_23      
-  real    :: m_dot_m, l_dot_m, l_g, l_f 
+  type(Grid_Type),   pointer :: grid
+  type(Matrix_Type), pointer :: a
+  type(Var_Type),    pointer :: u, v, w
+  integer                    :: c, j, cj
+  real                       :: u_a, v_a, w_a
+  real                       :: uu_a, vv_a, ww_a, uv_a, uw_a, vw_a
+  real                       :: m_11_a, m_22_a, m_33_a, m_12_a, m_13_a, m_23_a
+  real                       :: l_11, l_22, l_33, l_12, l_13, l_23
+  real                       :: m_11, m_22, m_33, m_12, m_13, m_23
+  real                       :: m_dot_m, l_dot_m, l_g, l_f, vol_e
 !==============================================================================!
 !                                                                              !
 !   C is derived from:    Lij_res = Lij_mod                                    !
@@ -60,6 +67,13 @@
 !             + 2.0 * A12 * B12 + 2.0 A13 * B13 + 2.0 * A23 * B23              !   
 !                                                                              !
 !------------------------------------------------------------------------------!
+
+  ! Take aliases
+  grid => flow % pnt_grid
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+  a    => sol % a
 
   call Comm_Mod_Exchange_Real(grid, u % n)
   call Comm_Mod_Exchange_Real(grid, v % n)
@@ -139,7 +153,7 @@
     m_12_a = m_12_a + grid % vol(c) * shear(c) * 0.5 * ( u % y(c) + v % x(c) ) 
     m_13_a = m_13_a + grid % vol(c) * shear(c) * 0.5 * ( u % z(c) + w % x(c) )
     m_23_a = m_23_a + grid % vol(c) * shear(c) * 0.5 * ( v % z(c) + w % y(c) )
-    
+
     ! Now calculating test values
     u_f(c) = u_a / vol_e
     v_f(c) = v_a / vol_e
@@ -151,7 +165,7 @@
     uv_f(c)  = uv_a / vol_e
     uw_f(c)  = uw_a / vol_e
     vw_f(c)  = vw_a / vol_e
-  
+
     m_11_f(c) = m_11_a / vol_e 
     m_22_f(c) = m_22_a / vol_e 
     m_33_f(c) = m_33_a / vol_e 
@@ -160,15 +174,15 @@
     m_23_f(c) = m_23_a / vol_e 
   end do
 
-  call Grad_Mod_For_Phi(grid, u_f, 1, u % x, .true.)  ! dU/dx
-  call Grad_Mod_For_Phi(grid, u_f, 2, u % y, .true.)  ! dU/dy
-  call Grad_Mod_For_Phi(grid, u_f, 3, u % z, .true.)  ! dU/dz
-  call Grad_Mod_For_Phi(grid, v_f, 1, v % x, .true.)  ! dV/dx
-  call Grad_Mod_For_Phi(grid, v_f, 2, v % y, .true.)  ! dV/dy
-  call Grad_Mod_For_Phi(grid, v_f, 3, v % z, .true.)  ! dV/dz
-  call Grad_Mod_For_Phi(grid, w_f, 1, w % x, .true.)  ! dW/dx
-  call Grad_Mod_For_Phi(grid, w_f, 2, w % y, .true.)  ! dW/dy
-  call Grad_Mod_For_Phi(grid, w_f, 3, w % z, .true.)  ! dW/dz
+  call Grad_Mod_Component(grid, u_f, 1, u % x, .true.)  ! dU/dx
+  call Grad_Mod_Component(grid, u_f, 2, u % y, .true.)  ! dU/dy
+  call Grad_Mod_Component(grid, u_f, 3, u % z, .true.)  ! dU/dz
+  call Grad_Mod_Component(grid, v_f, 1, v % x, .true.)  ! dV/dx
+  call Grad_Mod_Component(grid, v_f, 2, v % y, .true.)  ! dV/dy
+  call Grad_Mod_Component(grid, v_f, 3, v % z, .true.)  ! dV/dz
+  call Grad_Mod_Component(grid, w_f, 1, w % x, .true.)  ! dW/dx
+  call Grad_Mod_Component(grid, w_f, 2, w % y, .true.)  ! dW/dy
+  call Grad_Mod_Component(grid, w_f, 3, w % z, .true.)  ! dW/dz
 
   do c = 1, grid % n_cells
     l_g  = grid % vol(c)**ONE_THIRD

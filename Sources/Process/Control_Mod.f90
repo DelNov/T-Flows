@@ -118,6 +118,7 @@
     include 'Control_Mod/Numerics/Time_Integration_Scheme.f90'
 
     ! Linear solvers
+    include 'Control_Mod/Numerics/Preconditioner_For_System_Matrix.f90'
     include 'Control_Mod/Numerics/Solver_For_Energy.f90'
     include 'Control_Mod/Numerics/Solver_For_Momentum.f90'
     include 'Control_Mod/Numerics/Solver_For_Pressure.f90'
@@ -136,6 +137,8 @@
     include 'Control_Mod/Numerics/Tolerance_For_Energy_Solver.f90'
     include 'Control_Mod/Numerics/Tolerance_For_Turbulence_Solver.f90'
     include 'Control_Mod/Numerics/Tolerance_For_Simple_Algorithm.f90'
-    include 'Control_Mod/Numerics/Preconditioner_For_System_Matrix.f90'
+    include 'Control_Mod/Numerics/V_Cycle_Max_Grid_Levels.f90'
+    include 'Control_Mod/Numerics/V_Cycle_Number_Of_Smoothing_Iterations.f90'
+    include 'Control_Mod/Numerics/V_Cycle_Residual_Ratio.f90'
  
   end module

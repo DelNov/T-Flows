@@ -1,18 +1,29 @@
 !==============================================================================!
-  subroutine Calculate_Mass_Flow_Rate(grid)
+  subroutine Calculate_Mass_Field_Rate(flow)
 !------------------------------------------------------------------------------!
 !   Calculate mass flow rate at cell faces based on velocities only.           !
 !----------------------------------[Modules]-----------------------------------!
-  use Flow_Mod
-  use Grid_Mod
+  use Grid_Mod,  only: Grid_Type
+  use Field_Mod, only: Field_Type, density
+  use Var_Mod,   only: Var_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Field_Type), target :: flow
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: s, c1, c2  
-  real              :: fs
+  type(Grid_Type), pointer :: grid
+  type(Var_Type),  pointer :: u, v, w
+  real,            pointer :: flux(:)
+  integer                  :: s, c1, c2
+  real                     :: fs
 !==============================================================================!
+
+  ! Take aliases
+  grid => flow % pnt_grid
+  flux => flow % flux
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
 
   !-------------------------------------------------!
   !   Calculate the mass fluxes on the cell faces   !

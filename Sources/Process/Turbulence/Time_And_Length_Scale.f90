@@ -6,17 +6,17 @@
 !------------------------------------------------------------------------------!
 !---------------------------------[Modules]------------------------------------!
   use Const_Mod
-  use Flow_Mod
+  use Field_Mod
   use Les_Mod
   use Rans_Mod
   use Grid_Mod
   use Control_Mod
-  use Work_Mod, only: t1    => r_cell_12,  &  ! [s]
-                      t2    => r_cell_13,  &  ! [s]
-                      t3    => r_cell_14,  &  ! [s]
-                      l1    => r_cell_15,  &  ! [m]
-                      l2    => r_cell_16,  &  ! [m]
-                      l3    => r_cell_17,  &  ! [m]
+  use Work_Mod, only: t_1   => r_cell_12,  &  ! [s]
+                      t_2   => r_cell_13,  &  ! [s]
+                      t_3   => r_cell_14,  &  ! [s]
+                      l_1   => r_cell_15,  &  ! [m]
+                      l_2   => r_cell_16,  &  ! [m]
+                      l_3   => r_cell_17,  &  ! [m]
                       eps_l => r_cell_18      ! [m]
 !------------------------------------------------------------------------------!
   implicit none
@@ -41,48 +41,56 @@
      turbulence_model .eq. HYBRID_LES_RANS) then
 
     do c = 1, grid % n_cells
-      eps_l(c) = max(eps % n(c),tiny) 
+      eps_l(c) = max(eps % n(c), TINY)
  
-      t1(c) = kin % n(c)/eps_l(c)
-      t2(c) = c_t*sqrt(kin_vis/eps_l(c))
-      t3(c) = 0.6/(sqrt(3.0)*c_mu_d * zeta % n(c) * shear(c) + TINY)
+      t_1(c) = kin % n(c)/eps_l(c)
+      t_2(c) = c_t*sqrt(kin_vis/eps_l(c))
 
-      l1(c) = kin % n(c)**1.5/eps_l(c)
-      l2(c) = c_nu * (kin_vis**3 / eps_l(c))**0.25
-      l3(c) = sqrt(kin % n(c)/3.0)/(c_mu_d * zeta % n(c) * shear(c) + TINY)
-     
-      t_scale(c) =       max( min(t1(c), t3(c)), t2(c) )
-      l_scale(c) = c_l * max( min(l1(c), l3(c)), l2(c) )
+      l_1(c) = kin % n(c)**1.5/eps_l(c)
+      l_2(c) = c_nu * (kin_vis**3 / eps_l(c))**0.25
     end do
+
+    if(rough_walls) then
+      do c = 1, grid % n_cells
+        t_scale(c) =     max(t_1(c),t_2(c))
+        l_scale(c) = c_l*max(l_1(c),l_2(c))
+      end do
+    else
+      do c = 1, grid % n_cells
+        t_3(c) = 0.6/(sqrt(3.0)*c_mu_d * zeta % n(c) * shear(c) + TINY)
+        l_3(c) = sqrt(kin % n(c)/3.0)/(c_mu_d * zeta % n(c) * shear(c) + TINY)
+        t_scale(c) =       max( min(t_1(c), t_3(c)), t_2(c) )
+        l_scale(c) = c_l * max( min(l_1(c), l_3(c)), l_2(c) )
+      end do
+    end if
 
   else if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
 
     do c = 1, grid % n_cells
-      eps_l(c) = max(eps % n(c),tiny) 
+      eps_l(c) = max(eps % n(c), TINY)
       kin % n(c) = max(0.5*(uu % n(c) + vv % n(c) + ww % n(c)), TINY)
  
-      t1(c) = kin % n(c)/eps_l(c)
-      t2(c) = c_t*sqrt(kin_vis/eps_l(c))
+      t_1(c) = kin % n(c)/eps_l(c)
+      t_2(c) = c_t*sqrt(kin_vis/eps_l(c))
 
-      l1(c) = kin % n(c)**1.5/eps_l(c)
-      l2(c) = c_nu * (kin_vis**3 / eps_l(c))**0.25
+      l_1(c) = kin % n(c)**1.5/eps_l(c)
+      l_2(c) = c_nu * (kin_vis**3 / eps_l(c))**0.25
 
-      t_scale(c) =       max( t1(c), t2(c) )
-      l_scale(c) = c_l * max( l1(c), l2(c) )
+      t_scale(c) =       max( t_1(c), t_2(c) )
+      l_scale(c) = c_l * max( l_1(c), l_2(c) )
     end do
 
   else if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
 
     do c = 1, grid % n_cells
-      eps_l(c) = max(eps % n(c),tiny) 
+      eps_l(c) = max(eps % n(c), TINY)
       kin % n(c) = max(0.5*(uu % n(c) + vv % n(c) + ww % n(c)), TINY)
  
-      t1(c) = kin % n(c)/eps_l(c)
+      t_1(c) = kin % n(c)/eps_l(c)
+      l_1(c) = kin % n(c)**1.5/eps_l(c)
 
-      l1(c) = kin % n(c)**1.5/eps_l(c)
-
-      t_scale(c) = t1(c)
-      l_scale(c) = l1(c)
+      t_scale(c) = t_1(c)
+      l_scale(c) = l_1(c)
     end do
 
   end if
