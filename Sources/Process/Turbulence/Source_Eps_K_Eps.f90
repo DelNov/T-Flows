@@ -13,7 +13,7 @@
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
   use Grid_Mod,   only: Grid_Type
-  use Field_Mod,  only: Field_Type, viscosity, density
+  use Field_Mod,  only: Field_Type, viscosity, density, buoyancy
   use Solver_Mod, only: Solver_Type
   use Matrix_Mod, only: Matrix_Type
   use Les_Mod

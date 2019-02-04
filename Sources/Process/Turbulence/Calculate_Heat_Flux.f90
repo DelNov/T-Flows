@@ -47,15 +47,15 @@
   else if(turbulent_heat_flux_model .eq. GGDH) then
    
     do c = 1, grid % n_cells
-      ut % n(c) =  -c_theta*t_scale(c) * (uu % n(c) * t_x(c)  +  &
-                                          uv % n(c) * t_y(c)  +  &
-                                          uw % n(c) * t_z(c))
-      vt % n(c) =  -c_theta*t_scale(c) * (uv % n(c) * t_x(c)  +  &
-                                          vv % n(c) * t_y(c)  +  &
-                                          vw % n(c) * t_z(c))
-      wt % n(c) =  -c_theta*t_scale(c) * (uw % n(c) * t_x(c)  +  &
-                                          vw % n(c) * t_y(c)  +  &
-                                          ww % n(c) * t_z(c))
+      ut % n(c) =  -c_theta*t_scale(c) * (uu % n(c) * t % x(c)  +  &
+                                          uv % n(c) * t % y(c)  +  &
+                                          uw % n(c) * t % z(c))
+      vt % n(c) =  -c_theta*t_scale(c) * (uv % n(c) * t % x(c)  +  &
+                                          vv % n(c) * t % y(c)  +  &
+                                          vw % n(c) * t % z(c))
+      wt % n(c) =  -c_theta*t_scale(c) * (uw % n(c) * t % x(c)  +  &
+                                          vw % n(c) * t % y(c)  +  &
+                                          ww % n(c) * t % z(c))
     end do
 
   else if(turbulent_heat_flux_model .eq. AFM) then
