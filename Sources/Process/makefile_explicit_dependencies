@@ -1335,8 +1335,8 @@ $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
 
-#-- ./Turbulence/Constants_Reynolds_Stress.f90
-$(DIR_OBJECT)/Constants_Reynolds_Stress.o:\
+#-- ./Turbulence/Constants_Manceau_Hanjalic.f90
+$(DIR_OBJECT)/Constants_Manceau_Hanjalic.o:\
 $(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Control_Mod.o \
 Control_Mod/*/*.f90 

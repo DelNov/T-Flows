@@ -254,10 +254,40 @@
              + phiz_f2 * grid % dz(s) )
 
     ! Cross diffusion part
-    phi % c(c1) = phi % c(c1) + f_ex1 - f_im1
+    phi % c(c1) = phi % c(c1) + f_ex1 - f_im1 
     if(c2 > 0) then
-      phi % c(c2) = phi % c(c2) - f_ex2 + f_im2
+      phi % c(c2) = phi % c(c2) - f_ex2 + f_im2 
     end if
+
+    !---------------------------!
+    !                           !
+    !   Turbulent heat fluxes   !
+    !                           !
+    !---------------------------!
+    if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
+       turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+
+      ! Turbulent heat fluxes according to GGDH scheme
+      ! (first line is GGDH, second line is SGDH substratced 
+      ut_s =  (     fw(s)  * ut % n(c1)  &
+           +  (1. - fw(s)) * ut % n(c2))
+      vt_s =  (     fw(s)  * vt % n(c1)  &
+           +  (1. - fw(s)) * vt % n(c2))
+      wt_s =  (     fw(s)  * wt % n(c1)  &
+           +  (1. - fw(s)) * wt % n(c2))
+      t_stress = - (  ut_s * grid % sx(s)                    &
+                    + vt_s * grid % sy(s)                    &
+                    + wt_s * grid % sz(s) )                  &
+                    - (con_t * (  phix_f1 * grid % sx(s)     &
+                                + phiy_f1 * grid % sy(s)     &
+                                + phiz_f1 * grid % sz(s)) )
+
+      ! Put the influence of turbulent heat fluxes explicitly in the system
+      b(c1) = b(c1) + t_stress
+      if(c2 > 0) then
+        b(c2) = b(c2) - t_stress
+      end if
+    end if  ! if models are of RSM type
 
     ! Calculate the coefficients for the sysytem matrix
     a12 = con_eff1 * f_coef(s)
@@ -298,42 +328,6 @@
     end if
   end do
 
-  !---------------------------!
-  !                           !
-  !   Turbulent heat fluxes   !
-  !                           !
-  !---------------------------!
-  if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
-     turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
-
-    do s = 1, grid % n_faces
-
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
-
-      ! Turbulent heat fluxes according to GGDH scheme
-      ! (first line is GGDH, second line is SGDH substratced 
-      ut_s =  (     grid % f(s)  * ut % n(c1)  &
-           +  (1. - grid % f(s)) * ut % n(c2))
-      vt_s =  (     grid % f(s)  * vt % n(c1)  &
-           +  (1. - grid % f(s)) * vt % n(c2))
-      wt_s =  (     grid % f(s)  * wt % n(c1)  &
-           +  (1. - grid % f(s)) * wt % n(c2))
-      t_stress = - (  ut_s * grid % sx(s)                    &
-                    + vt_s * grid % sy(s)                    &
-                    + wt_s * grid % sz(s) )                  &
-                    - (con_t * (  phix_f1 * grid % sx(s)     &
-                                + phiy_f1 * grid % sy(s)     &
-                                + phiz_f1 * grid % sz(s)) )
-
-      ! Put the influence of turbulent heat fluxes explicitly in the system
-      b(c1) = b(c1) + t_stress
-      if(c2 > 0) then
-        b(c2) = b(c2) - t_stress
-      end if
-
-    end do  ! through faces
-  end if  ! if models are of RSM type
 
   !--------------------!
   !                    !

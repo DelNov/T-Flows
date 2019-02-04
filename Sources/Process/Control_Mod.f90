@@ -67,6 +67,7 @@
     include 'Control_Mod/Physics/Turbulence_Model_Variant.f90'
     include 'Control_Mod/Physics/Turbulent_Prandtl_Number.f90'
     include 'Control_Mod/Physics/Turbulent_Schmidt_Number.f90'
+    include 'Control_Mod/Physics/Turbulent_Heat_Flux_Model.f90'
 
     ! Other environmental conditions
     include 'Control_Mod/Physics/Angular_Velocity_Vector.f90'

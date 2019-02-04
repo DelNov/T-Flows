@@ -27,6 +27,7 @@
   call Control_Mod_Turbulence_Model(.true.)
   call Control_Mod_Turbulence_Model_Variant(.true.)
   call Control_Mod_Rough_Walls(.true.)
+  call Control_Mod_Turbulent_Heat_Flux_Model(.true.)
 
   !-------------------------------------------------------------------------!
   !   Initialization of model constants depending on the turbulence model   !
@@ -36,7 +37,7 @@
   end if
 
   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
-    call Constants_Reynolds_Stress()
+    call Constants_Manceau_Hanjalic()
   end if
 
   if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then

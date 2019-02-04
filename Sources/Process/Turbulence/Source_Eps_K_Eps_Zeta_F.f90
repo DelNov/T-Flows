@@ -58,6 +58,13 @@
 
     ! Fill in a diagonal of coefficient matrix
     a % val(a % dia(c)) =  a % val(a % dia(c)) + c_2e * e_sor * density
+
+    ! Buoyancy contribution
+    if(buoyancy) then
+      b(c) = b(c) + max(0.0, c_11e * e_sor * g_buoy(c))
+      a % val(a % dia(c)) = a % val(a % dia(c))  &
+                + max(0.0,-c_11e * e_sor * g_buoy(c) / (eps % n(c) + TINY))
+    end if
   end do
 
   !-------------------------------------------------------!

@@ -277,9 +277,6 @@
 
         call Calculate_Vis_T_K_Eps(grid)
 
-        if(heat_transfer) then
-          call Calculate_Heat_Flux(grid)
-        end if
       end if
 
       if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
@@ -295,9 +292,6 @@
 
         call Calculate_Vis_T_K_Eps_Zeta_F(grid)
 
-        if(heat_transfer) then
-          call Calculate_Heat_Flux(grid)
-        end if
       end if
 
       if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
@@ -306,9 +300,7 @@
         ! Update the values at boundaries
         call Update_Boundary_Values(grid)
 
-        if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
-          call Time_And_Length_Scale(grid)
-        end if
+        call Time_And_Length_Scale(grid)
 
         call Grad_Mod_For_Phi(grid, u % n, 1, u % x,.true.)    ! dU/dx
         call Grad_Mod_For_Phi(grid, u % n, 2, u % y,.true.)    ! dU/dy
