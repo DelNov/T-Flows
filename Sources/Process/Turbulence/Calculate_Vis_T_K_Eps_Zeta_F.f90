@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Calculate_Vis_T_K_Eps_Zeta_F(grid)
+  subroutine Calculate_Vis_T_K_Eps_Zeta_F(flow)
 !------------------------------------------------------------------------------!
 !   Computes the turbulent (viscosity/density) for RANS models.                !
 !---------------------------------[Modules]------------------------------------!
   use Const_Mod
   use Control_Mod
-  use Flow_Mod
+  use Field_Mod
   use Comm_Mod
   use Les_Mod
   use Rans_Mod
@@ -13,7 +13,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Grid_Type) :: grid
+  type(Field_Type), target :: flow
 !---------------------------------[Calling]------------------------------------!
   real :: Turbulent_Prandtl_Number
   real :: U_Plus_Log_Law
@@ -22,11 +22,12 @@
   real :: Y_Plus_Rough_Walls
   real :: Roughness_Coefficient
 !----------------------------------[Locals]------------------------------------!
-  integer :: c, c1, c2, s
-  real    :: u_tan, u_nor_sq, u_nor, u_tot_sq
-  real    :: beta, pr
-  real    :: u_plus, ebf, y_pl
-  real    :: kin_vis, u_tau_new
+  type(Grid_Type), pointer :: grid
+  type(Var_Type),  pointer :: u, v, w
+  integer                  :: c, c1, c2, s
+  real                     :: u_tan, u_nor_sq, u_nor, u_tot_sq
+  real                     :: beta, pr
+  real                     :: u_plus, ebf, kin_vis
 !==============================================================================!
 !   Dimensions:                                                                !
 !                                                                              !
@@ -42,6 +43,12 @@
 !   p_kin = 2*vis_t / density S_ij S_ij                                        !
 !   shear = sqrt(2 S_ij S_ij)                                                  !
 !------------------------------------------------------------------------------!
+
+  ! Take aliases
+  grid => flow % pnt_grid
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
 
   call Time_And_Length_Scale(grid)
 

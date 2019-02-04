@@ -5,8 +5,10 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Name_Mod,      only: problem_name
-  use Grid_Mod,      only: Grid_Type,  &
-                           Grid_Mod_Decompose
+  use Grid_Mod,      only: Grid_Type,           &
+                           Grid_Mod_Decompose,  &
+                           Grid_Mod_Load_Cns,   &
+                           Grid_Mod_Load_Geo
   use Tokenizer_Mod  ! it's too small for "only" to be meaningful
 !------------------------------------------------------------------------------!
   implicit none
@@ -25,16 +27,14 @@
   read(line % tokens(1), *)  problem_name
 
   ! Load the finite volume grid
-  call Load_Cns           (grid, 0)
+  call Grid_Mod_Load_Cns  (grid, 0)
   call Allocate_Additional(grid)
-  call Load_Geo           (grid, 0)
+  call Grid_Mod_Load_Geo  (grid, 0)
 
   ! Initialize processor numbers (poor idea to put it here)
   do c = 1, grid % n_cells
     grid % comm % proces(c) = 1
   end do
-
-  call Load_Geo(grid, 0)
 
   print *, '# Number of subdomains:'
   read(*,*)  n_sub

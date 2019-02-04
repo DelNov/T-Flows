@@ -1,8 +1,8 @@
 !==============================================================================!
   recursive subroutine Sort_Mod_Int(a)
 !------------------------------------------------------------------------------!
-!   Quick sort one real array and carry an integer arral along                 !
-!                                                                              ! 
+!   Quick sort one integer array and carry an integer arral along              !
+!                                                                              !
 !   Adapted from: https://gist.github.com/1AdAstra1  (good work Olga)          !
 !------------------------------------------------------------------------------!
   implicit none

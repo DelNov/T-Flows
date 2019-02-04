@@ -1,26 +1,28 @@
 !==============================================================================!
-  subroutine Monitor_Mod_Write_5_Vars(n, var1, var2, var3, var4, var5)
+  subroutine Monitor_Mod_Write_5_Vars(n, flow)
 !------------------------------------------------------------------------------!
 !   This is to set up monitoring points.                                       !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Var_Mod
+  use Field_Mod, only: Field_Type
+  use Var_Mod,   only: Var_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer        :: n
-  type(Var_Type) :: var1, var2, var3, var4, var5
+  type(Field_Type) :: flow
+  integer          :: n
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: m
+  type(Var_Type),  pointer :: u, v, w, p, t
+  integer                  :: m
 !==============================================================================!
 
   do m = 1, monitor % n_points
     if(monitor % cell(m) > 0) then
-      write(10+m,'(i9,5e16.6)')  n,  var1 % n(monitor % cell(m)),  &
-                                     var2 % n(monitor % cell(m)),  &
-                                     var3 % n(monitor % cell(m)),  &
-                                     var4 % n(monitor % cell(m)),  &
-                                     var5 % n(monitor % cell(m))
+      write(10+m,'(i9,5e16.6)')  n,  flow % u % n(monitor % cell(m)),  &
+                                     flow % v % n(monitor % cell(m)),  &
+                                     flow % w % n(monitor % cell(m)),  &
+                                     flow % p % n(monitor % cell(m)),  &
+                                     flow % t % n(monitor % cell(m))
     end if
   end do
 

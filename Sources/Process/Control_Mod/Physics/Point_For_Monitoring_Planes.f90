@@ -1,9 +1,12 @@
 !==============================================================================!
-  subroutine Control_Mod_Point_For_Monitoring_Planes(p_x, p_y, p_z, verbose)
+  subroutine Control_Mod_Point_For_Monitoring_Planes(bulk, verbose)
+!------------------------------------------------------------------------------!
+!----------------------------------[Modules]-----------------------------------!
+  use Bulk_Mod, only: Bulk_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real              :: p_x, p_y, p_z
+  type(Bulk_Type)   :: bulk
   logical, optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   real :: def(3)
@@ -14,9 +17,8 @@
 
   call Control_Mod_Read_Real_Array('POINT_FOR_MONITORING_PLANES', 3, def,  &
                                     val, verbose)
-
-  p_x = val(1)
-  p_y = val(2)
-  p_z = val(3)
+  bulk % xp = val(1)
+  bulk % yp = val(2)
+  bulk % zp = val(3)
 
   end subroutine

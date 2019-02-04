@@ -17,14 +17,14 @@
 
     ! Write basic info
     c = 1  ! a column
-    write(iter_info % lines(1)((c-1)*L_BOX+ 5 :  &
-                               (c-1)*L_BOX+14),  '(a10)') 'Iteration:'
-    write(iter_info % lines(1)((c-1)*L_BOX+15 :  &
-                               (c-1)*L_BOX+17),   '(i3)') n
+    write(iter_info % line_iter((c-1)*L_BOX+58 :  &
+                                (c-1)*L_BOX+67),  '(a10)') 'Iteration:'
+    write(iter_info % line_iter((c-1)*L_BOX+68 :  &
+                                (c-1)*L_BOX+70),   '(i3)') n
 
-    c = 2  ! a column
+    c = 5  ! a column
     write(iter_info % lines(1)((c-1)*L_BOX+3 :  &
-                               (c-1)*L_BOX+7),    '(a5)') 'Mass:'
+                               (c-1)*L_BOX+7),    '(a5)') 'MASS:'
 
   end if
 

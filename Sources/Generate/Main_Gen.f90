@@ -5,9 +5,13 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Domain_Mod,  only: Domain_Type
-  use Grid_Mod,    only: Grid_Type,                  &
-                         Grid_Mod_Sort_Faces_Smart,  &
-                         Grid_Mod_Calculate_Wall_Distance
+  use Grid_Mod,    only: Grid_Type,                         &
+                         Grid_Mod_Sort_Cells_Smart,         &
+                         Grid_Mod_Sort_Faces_Smart,         &
+                         Grid_Mod_Calculate_Wall_Distance,  &
+                         Grid_Mod_Coarsen,                  &
+                         Grid_Mod_Save_Cns,                 &
+                         Grid_Mod_Save_Geo
   use Smooths_Mod, only: Smooths_Type
   use Refines_Mod, only: Refines_Type
 !------------------------------------------------------------------------------!
@@ -17,7 +21,7 @@
   type(Grid_Type)    :: grid      ! grid which will be generated
   type(Smooths_Type) :: smooths   ! smoothing regions
   type(Refines_Type) :: refines   ! refinement regions and levels
-  integer            :: c, s, n
+  integer            :: c, s, n, lev
 !==============================================================================!
 
   ! Open with a logo
@@ -38,6 +42,7 @@
   call Determine_Grid_Connectivity(refines, grid, .true.)   ! real run
   call Calculate_Grid_Geometry    (grid, .true.)
 
+  call Grid_Mod_Sort_Cells_Smart       (grid)
   call Grid_Mod_Sort_Faces_Smart       (grid)
   call Grid_Mod_Calculate_Wall_Distance(grid)
 
@@ -53,17 +58,21 @@
   end do
 
   ! Coarsen the grid with METIS
-  ! Not implemented yet: call Grid_Mod_Coarsen(grid)
+  ! Not quite ready yet: call Grid_Mod_Coarsen(grid)
 
   !------------------------------!
   !   Save data for processing   !
   !------------------------------!
-  call Save_Cns_Geo(grid, 0,             &
-                    grid % n_nodes,      &
-                    grid % n_cells,      &
-                    grid % n_faces,      &
-                    grid % n_bnd_cells,  &
-                    0, 0)  ! saved data for processing
+  call Grid_Mod_Save_Cns(grid, 0,             &
+                         grid % n_nodes,      &
+                         grid % n_cells,      &
+                         grid % n_faces,      &
+                         grid % n_bnd_cells,  &
+                         0)
+
+  call Grid_Mod_Save_Geo(grid, 0,             &
+                         grid % n_faces,      &
+                         0)
 
   !-----------------------------------------------------!
   !   Save grid for visualisation and post-processing   !
@@ -74,6 +83,11 @@
                       grid % n_nodes,  &
                       grid % n_cells)
   call Save_Vtu_Faces(grid)
+
+  ! Save all grid levels for visual inspection
+  do lev = 1, grid % n_levels
+    call Save_Vtu_Grid_Levels(grid, lev)
+  end do
 
   ! Save links for checking
   call Save_Vtu_Links(grid, 0,             &

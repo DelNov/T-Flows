@@ -10,7 +10,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: c, s, c1, c2, sub, subo, n_cells_sub, n_faces_sub,  &
+  integer              :: c, s, c1, c2, sub, n_cells_sub, n_faces_sub,  &
                           n_buf_sub, n_bnd_cells_sub, NCSsub
   character(len=80)    :: name_map
   integer, allocatable :: global_cell_ins(:)

@@ -1,29 +1,35 @@
 !==============================================================================!
-  subroutine Source_Eps_K_Eps_Zeta_F(grid)
+  subroutine Source_Eps_K_Eps_Zeta_F(flow, sol)
 !------------------------------------------------------------------------------!
 !   Calculates source terms in equation of dissipation of turbulent energy     !
 !   and imposes boundary condition                                             !
 !------------------------------------------------------------------------------!
 !---------------------------------[Modules]------------------------------------!
   use Const_Mod
-  use Flow_Mod
+  use Grid_Mod,   only: Grid_Type
+  use Field_Mod,  !only: Field_Type, viscosity, density, buoyancy
+  use Solver_Mod, only: Solver_Type
+  use Matrix_Mod, only: Matrix_Type
   use Les_Mod
   use Rans_Mod
-  use Grid_Mod
-  use Control_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Grid_Type) :: grid
+  type(Field_Type),  target :: flow
+  type(Solver_Type), target :: sol
 !---------------------------------[Calling]------------------------------------!
   real :: Y_Plus_Low_Re
   real :: Roughness_Coefficient
-!----------------------------------[Locals]------------------------------------!
-  integer :: c, s, c1, c2, j
-  real    :: u_tan, u_nor_sq, u_nor, u_tot_sq
-  real    :: e_sor, c_11e, ebf
-  real    :: eps_wf, eps_int
-  real    :: fa, u_tau_new, kin_vis
+!-----------------------------------[Locals]-----------------------------------!
+  type(Grid_Type),   pointer :: grid
+  type(Var_Type),    pointer :: u, v, w
+  type(Matrix_Type), pointer :: a
+  real,              pointer :: b(:)
+  integer                    :: c, s, c1, c2, j
+  real                       :: u_tan, u_nor_sq, u_nor, u_tot_sq
+  real                       :: e_sor, c_11e, ebf
+  real                       :: eps_wf, eps_int
+  real                       :: fa, u_tau_new, kin_vis
 !==============================================================================!
 !   In dissipation of turbulent kinetic energy equation exist two              !
 !   source terms which have form:                                              !
@@ -49,6 +55,14 @@
 !   shear = sqrt(2 S_ij S_ij)                                                  !
 !------------------------------------------------------------------------------!
 
+  ! Take aliases
+  grid => flow % pnt_grid
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+  a    => sol % a
+  b    => sol % b % val
+
   call Time_And_Length_Scale(grid)
 
   do c = 1, grid % n_cells 
@@ -59,12 +73,25 @@
     ! Fill in a diagonal of coefficient matrix
     a % val(a % dia(c)) =  a % val(a % dia(c)) + c_2e * e_sor * density
 
-    ! Buoyancy contribution
+    ! Add buoyancy (linearly split) to eps equation as required in the t2 model
     if(buoyancy) then
-      b(c) = b(c) + max(0.0, c_11e * e_sor * g_buoy(c))
-      a % val(a % dia(c)) = a % val(a % dia(c))  &
-                + max(0.0,-c_11e * e_sor * g_buoy(c) / (eps % n(c) + TINY))
+        buoy_beta(c) = 1.0
+        g_buoy(c) = -buoy_beta(c) * (grav_x * ut % n(c) +  &
+                                     grav_y * vt % n(c) +  &
+                                     grav_z * wt % n(c)) * density
+        b(c) = b(c) + max(0.0, g_buoy(c) * grid % vol(c))
+        a % val(a % dia(c)) = a % val(a % dia(c))  &
+                  + max(0.0,-g_buoy(c) * grid % vol(c) / (kin % n(c) + TINY))
     end if
+! Muhamed wrote the following code recently for boyancy
+! in commit # 329d4ebd3071023ae65f2604da3e1f8a4d3fb24a
+! He gave it some thought, thus ASK him about it before you delete it
+!  if(buoyancy) then
+!    b(c) = b(c) + max(0.0, c_11e * e_sor * g_buoy(c))
+!    a % val(a % dia(c)) = a % val(a % dia(c))  &
+!              + max(0.0,-c_11e * e_sor * g_buoy(c) / (eps % n(c) + TINY))
+!  end if
+
   end do
 
   !-------------------------------------------------------!

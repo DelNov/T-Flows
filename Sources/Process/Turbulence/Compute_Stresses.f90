@@ -1,55 +1,61 @@
 !==============================================================================!
-  subroutine Compute_Stresses(grid, dt, ini, phi, n_time_step)
+  subroutine Compute_Stresses(flow, sol, dt, ini, phi, n_time_step)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves transport equation for Re stresses for RSM.         !
-!   'EBM' and 'HJ' are calling this subroutine.                                !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod, only: TINY
-  use Flow_Mod
+  use Const_Mod
+  use Comm_Mod
   use Les_Mod
   use Rans_Mod
-  use Comm_Mod
-  use Var_Mod
-  use Grid_Mod
+  use Var_Mod,      only: Var_Type
+  use Grid_Mod,     only: Grid_Type
+  use Field_Mod,    only: Field_Type, density, viscosity
   use Grad_Mod
-  use Info_Mod
-  use Numerics_Mod
-  use Solvers_Mod, only: Bicg, Cg, Cgs
+  use Info_Mod,     only: Info_Mod_Iter_Fill_At
+  use Numerics_Mod, only: CENTRAL, LINEAR, PARABOLIC
+  use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
+  use Matrix_Mod,   only: Matrix_Type
   use Control_Mod
-  use Work_Mod,    only: phi_x       => r_cell_01,  &
-                         phi_y       => r_cell_02,  &
-                         phi_z       => r_cell_03,  &
-                         phi_min     => r_cell_04,  &
-                         phi_max     => r_cell_05,  &
-                         u1uj_phij   => r_cell_06,  &
-                         u2uj_phij   => r_cell_07,  &
-                         u3uj_phij   => r_cell_08,  &
-                         u1uj_phij_x => r_cell_09,  &
-                         u2uj_phij_y => r_cell_10,  &
-                         u3uj_phij_z => r_cell_11
+  use Work_Mod,     only: phi_x       => r_cell_01,  &
+                          phi_y       => r_cell_02,  &
+                          phi_z       => r_cell_03,  &
+                          phi_min     => r_cell_04,  &
+                          phi_max     => r_cell_05,  &
+                          u1uj_phij   => r_cell_06,  &
+                          u2uj_phij   => r_cell_07,  &
+                          u3uj_phij   => r_cell_08,  &
+                          u1uj_phij_x => r_cell_09,  &
+                          u2uj_phij_y => r_cell_10,  &
+                          u3uj_phij_z => r_cell_11
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
-  real            :: dt
-  integer         :: ini
-  type(Var_Type)  :: phi
-  integer         :: n_time_step
+  type(Field_Type),  target :: flow
+  type(Solver_Type), target :: sol
+  real                      :: dt
+  integer                   :: ini
+  type(Var_Type)            :: phi
+  integer                   :: n_time_step
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: s, c, c1, c2, niter
-  real              :: f_ex, f_im
-  real              :: phis
-  real              :: a0, a12, a21
-  real              :: ini_res, tol
-  real              :: vis_eff
-  real              :: phix_f, phiy_f, phiz_f
-  real              :: vis_t_f
-  character(len=80) :: precond
-  integer           :: adv_scheme   ! space discratization advection (scheme)
-  real              :: blend        ! blending coeff (1.0 central; 0. upwind)
-  integer           :: td_scheme    ! time-disretization for inerita
-  real              :: urf          ! under-relaxation factor
+  type(Grid_Type),   pointer :: grid
+  type(Var_Type),    pointer :: u, v, w
+  real,              pointer :: flux(:)
+  type(Matrix_Type), pointer :: a
+  real,              pointer :: b(:)
+  integer                    :: s, c, c1, c2, niter
+  real                       :: f_ex, f_im
+  real                       :: phis
+  real                       :: a0, a12, a21
+  real                       :: ini_res, tol
+  real                       :: vis_eff
+  real                       :: phix_f, phiy_f, phiz_f
+  real                       :: vis_t_f
+  character(len=80)          :: precond
+  integer                    :: adv_scheme   ! advection scheme
+  real                       :: blend        ! blending (1.0 central; 0. upwind)
+  integer                    :: td_scheme    ! time-disretization for inerita
+  real                       :: urf          ! under-relaxation factor
 !==============================================================================!
 !                                                                              !
 !   The form of equations which are being solved:                              !
@@ -62,9 +68,18 @@
 !                                                                              !
 !------------------------------------------------------------------------------!
 
-  a % val = 0.
+  ! Take aliases
+  grid => flow % pnt_grid
+  flux => flow % flux
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+  a    => sol  % a
+  b    => sol  % b % val
 
-  b(:) = 0.
+  ! Initialize matrix and right hand side
+  a % val(:) = 0.0
+  b      (:) = 0.0
 
   ! Old values (o) and older than old (oo)
   if(ini .eq. 1) then
@@ -75,9 +90,9 @@
   end if
 
   ! Gradients
-  call Grad_Mod_For_Phi(grid, phi % n, 1, phi_x, .true.)
-  call Grad_Mod_For_Phi(grid, phi % n, 2, phi_y, .true.)
-  call Grad_Mod_For_Phi(grid, phi % n, 3, phi_z, .true.)
+  call Grad_Mod_Component(grid, phi % n, 1, phi_x, .true.)
+  call Grad_Mod_Component(grid, phi % n, 2, phi_y, .true.)
+  call Grad_Mod_Component(grid, phi % n, 3, phi_z, .true.)
 
   !---------------!
   !               !
@@ -115,7 +130,7 @@
 
       ! Compute phis with desired advection scheme
       if(adv_scheme .ne. CENTRAL) then
-        call Advection_Scheme(grid, phis, s, phi % n, phi_min, phi_max,  &
+        call Advection_Scheme(flow, phis, s, phi % n, phi_min, phi_max,  &
                               phi_x, phi_y, phi_z,                       &
                               grid % dx, grid % dy, grid % dz,           &
                               adv_scheme, blend) 
@@ -173,7 +188,7 @@
 
     ! vis_tur is used to make diaginal element more dominant.
     ! This contribution is later substracted.
-    vis_t_f = fw(s)*vis_t(c1) + (1.0-fw(s))*vis_t(c2)
+    vis_t_f = grid % fw(s) * vis_t(c1) + (1.0-grid % fw(s)) * vis_t(c2)
 
     vis_eff = viscosity + vis_t_f
 
@@ -183,9 +198,9 @@
       end if
     end if
 
-    phix_f = fw(s) *phi_x(c1) + (1.0 - fw(s)) * phi_x(c2)
-    phiy_f = fw(s) *phi_y(c1) + (1.0 - fw(s)) * phi_y(c2)
-    phiz_f = fw(s) *phi_z(c1) + (1.0 - fw(s)) * phi_z(c2)
+    phix_f = grid % fw(s) * phi_x(c1) + (1.0-grid % fw(s)) * phi_x(c2)
+    phiy_f = grid % fw(s) * phi_y(c1) + (1.0-grid % fw(s)) * phi_y(c2)
+    phiz_f = grid % fw(s) * phi_z(c1) + (1.0-grid % fw(s)) * phi_z(c2)
 
 
     ! Total (exact) diffusive flux plus turb. diffusion
@@ -193,7 +208,7 @@
                     + phiy_f * grid % sy(s)  &
                     + phiz_f * grid % sz(s) ) 
 
-    a0 = vis_eff * f_coef(s)
+    a0 = vis_eff * a % fc(s)
 
     ! Implicit diffusive flux
     ! (this is a very crude approximation: f_coef is
@@ -289,9 +304,9 @@
       end do
     end if
 
-    call Grad_Mod_For_Phi(grid, u1uj_phij, 1, u1uj_phij_x, .true.)
-    call Grad_Mod_For_Phi(grid, u2uj_phij, 2, u2uj_phij_y, .true.)
-    call Grad_Mod_For_Phi(grid, u3uj_phij, 3, u3uj_phij_z, .true.)
+    call Grad_Mod_Component(grid, u1uj_phij, 1, u1uj_phij_x, .true.)
+    call Grad_Mod_Component(grid, u2uj_phij, 2, u2uj_phij_y, .true.)
+    call Grad_Mod_Component(grid, u3uj_phij, 3, u3uj_phij_z, .true.)
 
     do c = 1, grid % n_cells
       b(c) = b(c) + (  u1uj_phij_x(c)  &
@@ -309,25 +324,25 @@
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
 
-      vis_eff = (fw(s)*vis_t(c1)+(1.0-fw(s))*vis_t(c2)) 
+      vis_eff = (grid % fw(s) * vis_t(c1) + (1.0-grid % fw(s)) * vis_t(c2))
 
-      phix_f = fw(s)*phi_x(c1) + (1.0-fw(s))*phi_x(c2)
-      phiy_f = fw(s)*phi_y(c1) + (1.0-fw(s))*phi_y(c2)
-      phiz_f = fw(s)*phi_z(c1) + (1.0-fw(s))*phi_z(c2)
+      phix_f = grid % fw(s) * phi_x(c1) + (1.0-grid % fw(s)) * phi_x(c2)
+      phiy_f = grid % fw(s) * phi_y(c1) + (1.0-grid % fw(s)) * phi_y(c2)
+      phiz_f = grid % fw(s) * phi_z(c1) + (1.0-grid % fw(s)) * phi_z(c2)
       f_ex = vis_eff * (  phix_f * grid % sx(s)  &
                         + phiy_f * grid % sy(s)  &
                         + phiz_f * grid % sz(s))
-      a0 = vis_eff * f_coef(s)
-      f_im = (   phix_f * grid % dx(s)      &
-               + phiy_f * grid % dy(s)      &
+      a0 = vis_eff * a % fc(s)
+      f_im = (   phix_f * grid % dx(s)        &
+               + phiy_f * grid % dy(s)        &
                + phiz_f * grid % dz(s)) * a0
 
-      b(c1) = b(c1)                                            &
-             - vis_eff * (phi % n(c2) - phi%n(c1)) * f_coef(s)  &
+      b(c1) = b(c1)                                             &
+             - vis_eff * (phi % n(c2) - phi%n(c1)) * a % fc(s)  &
              - f_ex + f_im
       if(c2  > 0) then
         b(c2) = b(c2)                                            &
-              + vis_eff * (phi % n(c2) - phi%n(c1)) * f_coef(s)  &
+              + vis_eff * (phi % n(c2) - phi%n(c1)) * a % fc(s)  &
               + f_ex - f_im
       end if
     end do
@@ -368,13 +383,13 @@
   end if
 
   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then 
-    call Grad_Mod_For_Phi(grid, f22 % n, 1, f22 % x, .true.) ! df22/dx
-    call Grad_Mod_For_Phi(grid, f22 % n, 2, f22 % y, .true.) ! df22/dy
-    call Grad_Mod_For_Phi(grid, f22 % n, 3, f22 % z, .true.) ! df22/dz
+    call Grad_Mod_Component(grid, f22 % n, 1, f22 % x, .true.) ! df22/dx
+    call Grad_Mod_Component(grid, f22 % n, 2, f22 % y, .true.) ! df22/dy
+    call Grad_Mod_Component(grid, f22 % n, 3, f22 % z, .true.) ! df22/dz
 
-    call Sources_Rsm_Manceau_Hanjalic(grid, phi % name)
+    call Sources_Rsm_Manceau_Hanjalic(flow, sol, phi % name)
   else if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
-    call Sources_Rsm_Hanjalic_Jakirlic(grid, phi % name)
+    call Sources_Rsm_Hanjalic_Jakirlic(flow, sol, phi % name, n_time_step)
   end if
 
   !---------------------------------!
@@ -401,7 +416,7 @@
   niter = 6
   call Control_Mod_Max_Iterations_For_Turbulence_Solver(niter)
 
-  call Bicg(a,        &
+  call Bicg(sol,      &
             phi % n,  &
             b,        &
             precond,  &
@@ -417,13 +432,13 @@
   if( phi % name .eq. 'WW' )   &
     call Info_Mod_Iter_Fill_At(3, 3, phi % name, niter, phi % res)
   if( phi % name .eq. 'UV' )   &
-    call Info_Mod_Iter_Fill_At(4, 1, phi % name, niter, phi % res)
+    call Info_Mod_Iter_Fill_At(3, 4, phi % name, niter, phi % res)
   if( phi % name .eq. 'UW' )   &
-    call Info_Mod_Iter_Fill_At(4, 2, phi % name, niter, phi % res)
+    call Info_Mod_Iter_Fill_At(3, 5, phi % name, niter, phi % res)
   if( phi % name .eq. 'VW' )   &
-    call Info_Mod_Iter_Fill_At(4, 3, phi % name, niter, phi % res)
+    call Info_Mod_Iter_Fill_At(3, 6, phi % name, niter, phi % res)
   if( phi % name .eq. 'EPS' )  &
-    call Info_Mod_Iter_Fill_At(4, 4, phi % name, niter, phi % res)
+    call Info_Mod_Iter_Fill_At(4, 1, phi % name, niter, phi % res)
 
   if(phi % name .eq. 'EPS') then
     do c= 1, grid % n_cells

@@ -8,7 +8,7 @@
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod,      only: TINY
   use Grid_Mod,       only: Grid_Type
-  use Flow_Mod,       only: viscosity, conductivity, capacity 
+  use Field_Mod,      only: viscosity, conductivity, capacity 
   use Turbulence_Mod, only: vis_t
 !------------------------------------------------------------------------------!
   implicit none

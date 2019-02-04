@@ -1,25 +1,31 @@
 !==============================================================================!
-  subroutine Read_Physical(grid, restar)
+  subroutine Read_Physical(flow, backup)
 !------------------------------------------------------------------------------!
 !   Reads details about physial models.                                        !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Flow_Mod
+  use Field_Mod,   only: Field_Type
+  use Bulk_Mod,    only: Bulk_Type
   use Rans_Mod
   use Control_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
-  logical         :: restar
+  type(Field_Type), target :: flow
+  logical                  :: backup
+!----------------------------------[Locals]------------------------------------!
+  type(Bulk_Type), pointer :: bulk
 !==============================================================================!
+
+  ! Take aliases
+  bulk => flow % bulk
 
   !-------------------------!
   !   Related to bouyancy   !
   !-------------------------!
   call Control_Mod_Gravitational_Vector(.true.)
   call Control_Mod_Buoyancy(.true.)
-  call Control_Mod_Reference_Temperature(.true.)
+  call Control_Mod_Reference_Temperature(flow, .true.)
 
   !---------------------------!
   !   Related to turbulence   !
@@ -57,11 +63,9 @@
   !------------------------------------!
   !   Pressure drops and mass fluxes   !
   !------------------------------------!
-  if(.not. restar) then
-    call Control_Mod_Pressure_Drops()
-  end if
-  if(.not. restar) then
-    call Control_Mod_Mass_Flow_Rates()
+  if(.not. backup) then
+    call Control_Mod_Pressure_Drops(bulk)
+    call Control_Mod_Mass_Flow_Rates(bulk)
   end if
 
   end subroutine

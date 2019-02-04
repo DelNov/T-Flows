@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Calculate_Vis_T_Rsm(grid) 
+  subroutine Calculate_Vis_T_Rsm(flow)
 !------------------------------------------------------------------------------!
 !   Computes the turbulent viscosity for RSM models ('EBM' and 'HJ').          !
 !   If hybrid option is used turbulent diffusivity is modeled by vis_t.        !
@@ -8,7 +8,7 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Flow_Mod
+  use Field_Mod
   use Comm_Mod
   use Les_Mod
   use Rans_Mod
@@ -17,10 +17,12 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Field_Type), target :: flow
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c
-  real    :: cmu_mod
+  type(Grid_Type), pointer :: grid
+  type(Var_Type),  pointer :: u, v, w
+  integer                  :: c
+  real                     :: cmu_mod
 !==============================================================================!
 !   Dimensions:                                                                !
 !                                                                              !
@@ -34,7 +36,13 @@
 !   thermal cap.  capacity[m^2/(s^2*K)]| therm. conductivity     [kg*m/(s^3*K)]!
 !------------------------------------------------------------------------------!
 
-  call Calculate_shear_And_Vorticity(grid)
+  ! Take aliases
+  grid => flow % pnt_grid
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+
+  call Calculate_shear_And_Vorticity(flow)
 
   do c = 1, grid % n_cells
     kin % n(c) = 0.5*max(uu % n(c) + vv % n(c) + ww % n(c), TINY)

@@ -50,11 +50,11 @@ To download the current version of the code use:
 
 Compiled programs are placed in the Binaries/ folder.
 
-Sources are located in 
+Sources are located in
 Sources/Generate/
 Sources/Convert/
 Sources/Divide/
-Sources/Process/ 
+Sources/Process/
 
 Tests/ folder contains files needed to run several standard benchmark cases for RANS, LES and hybrid methods. Xmgrace sources with referent DNS or experimental data are provided for the most of the test cases, as well as user functions for post-processing of data.
 

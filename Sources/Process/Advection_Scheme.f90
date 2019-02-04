@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Advection_Scheme(grid,                             &
+  subroutine Advection_Scheme(flow,                             &
                               phi_f, s,                         &
                               phi, phi_min, phi_max,            &
                               phi_i, phi_j, phi_k, di, dj, dk,  &
@@ -10,31 +10,39 @@
 !   Przulj's AIAA paper.                                                       !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Flow_Mod,    only: flux
+  use Field_Mod,    only: Field_Type
   use Numerics_Mod
-  use Grid_Mod,    only: Grid_Type
+  use Grid_Mod,     only: Grid_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
-  real            :: phi_f, phi_f_c, phi_f_u
-  integer         :: s
-  real            :: phi    (-grid % n_bnd_cells:grid % n_cells),  &  
-                     phi_min(-grid % n_bnd_cells:grid % n_cells),  &
-                     phi_max(-grid % n_bnd_cells:grid % n_cells)
-  real            :: phi_i(-grid % n_bnd_cells:grid % n_cells),  &
-                     phi_j(-grid % n_bnd_cells:grid % n_cells),  &
-                     phi_k(-grid % n_bnd_cells:grid % n_cells)
-  real            :: di(grid % n_faces),  &
-                     dj(grid % n_faces),  &
-                     dk(grid % n_faces)
-  integer         :: scheme  ! advection scheme
-  real            :: blend
+  type(Field_Type), target :: flow
+  real                     :: phi_f, phi_f_c, phi_f_u
+  integer                  :: s
+  real                     :: phi    (-flow % pnt_grid % n_bnd_cells:  &
+                                       flow % pnt_grid % n_cells),     &
+                              phi_min(-flow % pnt_grid % n_bnd_cells:  &
+                                       flow % pnt_grid % n_cells),     &
+                              phi_max(-flow % pnt_grid % n_bnd_cells:  &
+                                       flow % pnt_grid % n_cells)
+  real                     :: phi_i(-flow % pnt_grid % n_bnd_cells:  &
+                                     flow % pnt_grid % n_cells),     &
+                              phi_j(-flow % pnt_grid % n_bnd_cells:  &
+                                     flow % pnt_grid % n_cells),     &
+                              phi_k(-flow % pnt_grid % n_bnd_cells:  &
+                                     flow % pnt_grid % n_cells)
+  real                     :: di(flow % pnt_grid % n_faces),  &
+                              dj(flow % pnt_grid % n_faces),  &
+                              dk(flow % pnt_grid % n_faces)
+  integer                  :: scheme  ! advection scheme
+  real                     :: blend
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c1, c2, c, d
-  real    :: fj ! flow oriented interpolation factor
-  real    :: g_d, g_u, alfa, beta1, beta2 
-  real    :: phij, phi_u, phi_star, rj, sign, gamma_c, beta
+  type(Grid_Type), pointer :: grid
+  real,            pointer :: flux(:)
+  integer                  :: c1, c2, c, d
+  real                     :: fj ! flow oriented interpolation factor
+  real                     :: g_d, g_u, alfa, beta1, beta2 
+  real                     :: phij, phi_u, phi_star, rj, sign, gamma_c, beta
 !==============================================================================!
 !
 !               Flux > 0
@@ -57,6 +65,10 @@
 !   +---------+---------+---------+---------+   
 !
 !----------------------------------------------------------------------!
+
+  ! Take aliases
+  grid => flow % pnt_grid
+  flux => flow % flux
 
   c1 = grid % faces_c(1,s)
   c2 = grid % faces_c(2,s)

@@ -126,10 +126,7 @@
 
   ! Form the new face numbers from the old face numbers
   do s = 1, grid % n_faces
-    i_work_1(old_f(s)) = s
-  end do
-  do s = 1, grid % n_faces
-    new_f(s) = i_work_1(s)
+    new_f(old_f(s)) = s
   end do
 
   ! Do the actual sorting

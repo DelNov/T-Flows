@@ -35,6 +35,7 @@
   allocate(grid % zf(nf));  grid % zf = 0.0
 
   ! Weight factors
-  allocate(grid % f(nf));   grid % f = 0.0
+  allocate(grid % f (nf));   grid % f  = 0.0
+  allocate(grid % fw(nf));   grid % fw = 0.0
 
   end subroutine

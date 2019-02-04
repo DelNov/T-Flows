@@ -4,6 +4,7 @@
 !   Reading turbulence model from the control file.                            !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
+  use Const_Mod,      only: HUGE_INT
   use Comm_Mod,       only: this_proc, Comm_Mod_End
   use Turbulence_Mod, only: turbulence_model,          &
                             turbulence_statistics,     &
@@ -25,6 +26,7 @@
   logical, optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   character(len=80) :: val
+  integer           :: n_times, n_stat
 !==============================================================================!
 
   call Control_Mod_Read_Char_Item('TURBULENCE_MODEL', 'none',  &
@@ -70,6 +72,11 @@
 
   end select
 
+  ! Does user want to gather statistics?
+  call Control_Mod_Read_Int_Item('NUMBER_OF_TIME_STEPS', 0, n_times, .false.)
+  call Control_Mod_Read_Int_Item('STARTING_TIME_STEP_FOR_STATISTICS',  &
+                                 HUGE_INT, n_stat, verbose)
+
   !-------------------------------------------------------------------!
   !   For scale-resolving simulations, engage turbulence statistics   !
   !-------------------------------------------------------------------!
@@ -78,7 +85,8 @@
      turbulence_model .eq. LES_WALE        .or.  &
      turbulence_model .eq. DNS             .or.  &
      turbulence_model .eq. DES_SPALART     .or.  &
-     turbulence_model .eq. HYBRID_LES_RANS) then
+     turbulence_model .eq. HYBRID_LES_RANS .or.  &
+     n_times > n_stat) then  ! last line covers unsteady RANS models
 
     if(this_proc < 2) then
       print *, '# NOTE! Scale resolving simulation used; ' // &
