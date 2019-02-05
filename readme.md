@@ -8,9 +8,9 @@ T-Flows (stands for Turbulent Flows) is a Computational Fluid Dynamics (CFD) pro
 *	Linear solvers: preconditioned conjugate gradient, bi-conjugate-gradient and conjugate gradient squared
 *	Eddy-viscosity and second moment closure Reynolds-Averaged Navier-Stokes (RANS) models
 *	Large Eddy Simulation (LES) with Smagorinsky, Dynamic and Wall-Adapting Local Eddy viscosity (WALE) models for sub-grid scales (SGS) 
-*	hybrid RANS/LES methods
-*	conventional and advanced treatment of wall boundary conditions (wall integration, wall functions with roughness, compound wall treatment, blending wall function and wall integration approach)
-*	compatibility with several open-source and commercial grid generators
+*	Hybrid RANS/LES methods
+*	Conventional and advanced treatment of wall boundary conditions (wall integration, wall functions with roughness, compound wall treatment, blending wall function and wall integration approach)
+*	Compatibility with several open-source and commercial grid generators
 
 ## Following turbulence models are currently implemented:
 
