@@ -39,19 +39,14 @@
   real,              pointer :: ui_i(:), ui_j(:), ui_k(:), uj_i(:), uk_i(:)
   real,              pointer :: si(:), sj(:), sk(:), di(:), dj(:), dk(:)
   real,              pointer :: h_i(:)
-  integer                    :: s, c, c1, c2, niter
+  integer                    :: s, c, c1, c2
   real                       :: f_ex, f_im, f_stress
   real                       :: uis, vel_max
   real                       :: a0, a12, a21
-  real                       :: ini_res, tol
+  real                       :: ini_res
   real                       :: vis_eff, vis_tS
   real                       :: ui_i_f, ui_j_f, ui_k_f, uj_i_f, uk_i_f
   real                       :: uu_f, vv_f, ww_f, uv_f, uw_f, vw_f
-  character(len=80)          :: precond
-  integer                    :: adv_scheme  ! advection scheme
-  real                       :: blend       ! blending (1.0 central; 0.0 upwind)
-  integer                    :: td_scheme   ! time-disretization
-  real                       :: urf         ! under-relaxation factor
 !------------------------------------------------------------------------------!
 !
 !  Stress tensor on the face s:
@@ -170,11 +165,11 @@
   !---------------!
 
   ! Retreive advection scheme and blending coefficient
-  call Control_Mod_Advection_Scheme_For_Momentum(adv_scheme)
-  call Control_Mod_Blending_Coefficient_For_Momentum(blend)
+  call Control_Mod_Advection_Scheme_For_Momentum(ui % adv_scheme)
+  call Control_Mod_Blending_Coefficient_For_Momentum(ui % blend)
 
   ! Compute phimax and phimin
-  if(adv_scheme .ne. CENTRAL) then
+  if(ui % adv_scheme .ne. CENTRAL) then
     call Calculate_Minimum_Maximum(grid, ui % n, ui_min, ui_max) ! or ui % o ?
     goto 1  ! why on Earth this?
   end if
@@ -196,11 +191,11 @@
     ! Central differencing
     uis = grid % f(s) * ui % n(c1) + (1.0 - grid % f(s)) * ui % n(c2)
 
-    if(adv_scheme .ne. CENTRAL) then
+    if(ui % adv_scheme .ne. CENTRAL) then
       call Advection_Scheme(flow, uis, s, ui % n, ui_min, ui_max,  &
                             ui_i, ui_j, ui_k,                      &
                             di, dj, dk,                            &
-                            adv_scheme, blend)
+                            ui % adv_scheme, ui % blend)
     end if
 
     ! Compute advection term
@@ -414,10 +409,10 @@
   !                    !
   !--------------------!
 
-  call Control_Mod_Time_Integration_Scheme(td_scheme)
+  call Control_Mod_Time_Integration_Scheme(ui % td_scheme)
 
   ! Two time levels; linear interpolation
-  if(td_scheme .eq. LINEAR) then
+  if(ui % td_scheme .eq. LINEAR) then
     do c = 1, grid % n_cells
       a0 = density * grid % vol(c) / dt
       a % val(a % dia(c)) = a % val(a % dia(c)) + a0
@@ -426,7 +421,7 @@
   end if
 
   ! Three time levels; parabolic interpolation
-  if(td_scheme .eq. PARABOLIC) then
+  if(ui % td_scheme .eq. PARABOLIC) then
     do c = 1, grid % n_cells
       a0 = density * grid % vol(c) / dt
       a % val(a % dia(c)) = a % val(a % dia(c)) + 1.5 * a0
@@ -498,43 +493,43 @@
   !-----------------------------------!
 
   ! Set under-relaxation factor then overwrite with conrol file if specified
-  urf = 0.8
-  call Control_Mod_simple_Underrelaxation_For_Momentum(urf)
+  ui % urf = 0.8
+  call Control_Mod_simple_Underrelaxation_For_Momentum(ui % urf)
 
   do c = 1, grid % n_cells
     a % sav(c) = a % val(a % dia(c))
-    b(c) = b(c) + a % val(a % dia(c)) * (1.0 - urf)*ui % n(c) / urf
-    a % val(a % dia(c)) = a % val(a % dia(c)) / urf
+    b(c) = b(c) + a % val(a % dia(c)) * (1.0 - ui % urf)*ui % n(c) / ui % urf
+    a % val(a % dia(c)) = a % val(a % dia(c)) / ui % urf
   end do
 
   ! Get solver tolerance
-  call Control_Mod_Tolerance_For_Momentum_Solver(tol)
+  call Control_Mod_Tolerance_For_Momentum_Solver(ui % tol)
 
   ! Get matrix precondioner
-  call Control_Mod_Preconditioner_For_System_Matrix(precond)
+  call Control_Mod_Preconditioner_For_System_Matrix(ui % precond)
 
   ! Set number of iterations then overwrite with conrol file if specified
-  niter =  5
-  call Control_Mod_Max_Iterations_For_Momentum_Solver(niter)
+  ui % niter =  5
+  call Control_Mod_Max_Iterations_For_Momentum_Solver(ui % niter)
 
-  call Bicg(sol,      &
-            ui % n,   &
-            b,        &
-            precond,  &
-            niter,    &
-            tol,      &
-            ini_res,  &
-            ui % res, &
+  call Bicg(sol,           &
+            ui % n,        &
+            b,             &
+            ui % precond,  &
+            ui % niter,    &
+            ui % tol,      &
+            ini_res,       &
+            ui % res,      &
             norm = vel_max)
 
   if(ui % name .eq. 'U') then
-    call Info_Mod_Iter_Fill_At(1, 1, ui % name, niter, ui % res)
+    call Info_Mod_Iter_Fill_At(1, 1, ui % name, ui % niter, ui % res)
   end if
   if(ui % name .eq. 'V') then
-    call Info_Mod_Iter_Fill_At(1, 2, ui % name, niter, ui % res)
+    call Info_Mod_Iter_Fill_At(1, 2, ui % name, ui % niter, ui % res)
   end if
   if(ui % name .eq. 'W') then
-    call Info_Mod_Iter_Fill_At(1, 3, ui % name, niter, ui % res)
+    call Info_Mod_Iter_Fill_At(1, 3, ui % name, ui % niter, ui % res)
   end if
 
   call Comm_Mod_Exchange_Real(grid, ui % n)

@@ -34,18 +34,13 @@
   real,              pointer :: flux(:)
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
-  integer           :: n, c, s, c1, c2, niter
+  integer           :: n, c, s, c1, c2
   real              :: a0, a12, a21
-  real              :: ini_res, tol
+  real              :: ini_res
   real              :: con_eff1, f_ex1, f_im1, tx_f1, ty_f1, tz_f1
   real              :: con_eff2, f_ex2, f_im2, tx_f2, ty_f2, tz_f2
   real              :: ts, pr_t1, pr_t2
   real              :: ut_s, vt_s, wt_s, t_stress, con_t
-  character(len=80) :: precond       ! preconditioner
-  integer           :: adv_scheme    ! space-discretiztion of advection scheme)
-  real              :: blend         ! blending coeff (1.0 central; 0.0 upwind)
-  integer           :: td_scheme     ! time-disretization for inerita  
-  real              :: urf           ! under-relaxation factor
 !------------------------------------------------------------------------------!
 !
 !  The form of equations which are solved:
@@ -111,11 +106,11 @@
   !---------------!
 
   ! Retreive advection scheme and blending coefficient
-  call Control_Mod_Advection_Scheme_For_Energy(adv_scheme)
-  call Control_Mod_Blending_Coefficient_For_Energy(blend)
+  call Control_Mod_Advection_Scheme_For_Energy(t % adv_scheme)
+  call Control_Mod_Blending_Coefficient_For_Energy(t % blend)
 
   ! Compute tmax and tmin
-  if(adv_scheme .ne. CENTRAL) then
+  if(t % adv_scheme .ne. CENTRAL) then
     call Calculate_Minimum_Maximum(grid, t % n, t_min, t_max)
   end if
 
@@ -137,11 +132,11 @@
        + (1.0-grid % f(s)) * t % n(c2)
 
     ! Compute ts with desired advection scheme
-    if(adv_scheme .ne. CENTRAL) then
+    if(t % adv_scheme .ne. CENTRAL) then
       call Advection_Scheme(flow, ts, s, t % n, t_min, t_max,  &
                             t % x, t % y, t % z,               &
                             grid % dx, grid % dy, grid % dz,   &
-                            adv_scheme, blend) 
+                            t % adv_scheme, t % blend)
     end if
 
     ! Compute advection term
@@ -339,10 +334,10 @@
   !                    !
   !--------------------!
 
-  call Control_Mod_Time_Integration_Scheme(td_scheme)
+  call Control_Mod_Time_Integration_Scheme(t % td_scheme)
 
   ! Two time levels; Linear interpolation
-  if(td_scheme .eq. LINEAR) then
+  if(t % td_scheme .eq. LINEAR) then
     do c = 1, grid % n_cells
       a0 = capacity * density * grid % vol(c)/dt
       a % val(a % dia(c)) = a % val(a % dia(c)) + a0
@@ -351,7 +346,7 @@
   end if
 
   ! Three time levels; parabolic interpolation
-  if(td_scheme .eq. PARABOLIC) then
+  if(t % td_scheme .eq. PARABOLIC) then
     do c = 1, grid % n_cells
       a0 = capacity * density * grid % vol(c)/dt
       a % val(a % dia(c)) = a % val(a % dia(c)) + 1.5 * a0
@@ -361,41 +356,41 @@
 
   call User_Mod_Source(flow, t, a, b)
 
-  !---------------------------------!
-  !                                 !
+  !-------------------------------!
+  !                               !
   !   Solve the equations for t   !
-  !                                 !
-  !---------------------------------!
+  !                               !
+  !-------------------------------!
 
   ! Set under-relaxation factor, then overwrite with control file if specified
-  urf = 0.7
-  call Control_Mod_Simple_Underrelaxation_For_Energy(urf)
+  t % urf = 0.7
+  call Control_Mod_Simple_Underrelaxation_For_Energy(t % urf)
 
   do c = 1, grid % n_cells
-    b(c) = b(c) + a % val(a % dia(c)) * (1.0 - urf) * t % n(c) / urf
-    a % val(a % dia(c)) = a % val(a % dia(c)) / urf
+    b(c) = b(c) + a % val(a % dia(c)) * (1.0 - t % urf) * t % n(c) / t % urf
+    a % val(a % dia(c)) = a % val(a % dia(c)) / t % urf
   end do
 
   ! Get solver tolerance
-  call Control_Mod_Tolerance_For_Energy_Solver(tol)
+  call Control_Mod_Tolerance_For_Energy_Solver(t % tol)
 
   ! Get matrix precondioner
-  call Control_Mod_Preconditioner_For_System_Matrix(precond)
+  call Control_Mod_Preconditioner_For_System_Matrix(t % precond)
 
   ! Set number of iterations then overwrite with control file if specified
-  niter =  5
-  call Control_Mod_Max_Iterations_For_Energy_Solver(niter)
+  t % niter =  5
+  call Control_Mod_Max_Iterations_For_Energy_Solver(t % niter)
 
-  call Bicg(sol,      &
-            t % n,    &
-            b,        &
-            precond,  &
-            niter,    &
-            tol,      &
-            ini_res,  &
+  call Bicg(sol,          &
+            t % n,        &
+            b,            &
+            t % precond,  &
+            t % niter,    &
+            t % tol,      &
+            ini_res,      &
             t % res)
 
-  call Info_Mod_Iter_Fill_At(1, 6, t % name, niter, t % res)
+  call Info_Mod_Iter_Fill_At(1, 6, t % name, t % niter, t % res)
 
   call Comm_Mod_Exchange_Real(grid, t % n)
 
