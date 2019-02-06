@@ -42,20 +42,14 @@
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   real,              pointer :: flux(:)
-  integer           :: n, c, s, c1, c2, niter, mat, row, col
-  real              :: a0, a12, a21
-  real              :: ini_res, tol, ns
-  real              :: con_eff1, f_ex1, f_im1, phix_f1, phiy_f1, phiz_f1
-  real              :: con_eff2, f_ex2, f_im2, phix_f2, phiy_f2, phiz_f2
-  real              :: phis, pr_t1, pr_t2
-  character(len=80) :: precond    ! preconditioner
-  integer           :: adv_scheme  ! space-discretiztion of advection scheme)
-  real              :: blend         ! blending coeff (1.0 central; 0.0 upwind)
-  integer           :: td_inertia    ! time-disretization for inerita  
-  integer           :: td_advection  ! time-disretization for advection
-  integer           :: td_diffusion  ! time-disretization for diffusion 
-  integer           :: td_cross_diff ! time-disretization for cross-difusion
-  real              :: urf           ! under-relaxation factor                 
+  integer                    :: n, c, s, c1, c2, row, col, iter
+  real                       :: a0, a12, a21
+  real                       :: ini_res, ns
+  real                       :: con_eff1, f_ex1, f_im1
+  real                       :: con_eff2, f_ex2, f_im2
+  real                       :: phix_f1, phiy_f1, phiz_f1
+  real                       :: phix_f2, phiy_f2, phiz_f2
+  real                       :: phis, pr_t1, pr_t2
 !------------------------------------------------------------------------------!
 !
 !  The form of equations which are solved:
@@ -123,11 +117,11 @@
   !---------------!
 
   ! Retreive advection scheme and blending coefficient
-  call Control_Mod_Advection_Scheme_For_User_Scalars(adv_scheme)
-  call Control_Mod_Blending_Coefficient_For_User_Scalars(blend)
+  call Control_Mod_Advection_Scheme_For_User_Scalars(phi % adv_scheme)
+  call Control_Mod_Blending_Coefficient_For_User_Scalars(phi % blend)
 
   ! Compute phimax and phimin
-  if(adv_scheme .ne. CENTRAL) then
+  if(phi % adv_scheme .ne. CENTRAL) then
     call Calculate_Minimum_Maximum(grid, phi % n, phi_min, phi_max)
     goto 1  ! why this???
   end if
@@ -150,11 +144,11 @@
          + (1.0-grid % f(s)) * phi % n(c2)
 
     ! Compute phis with desired advection scheme
-    if(adv_scheme .ne. CENTRAL) then
+    if(phi % adv_scheme .ne. CENTRAL) then
       call Advection_Scheme(flow, phis, s, phi % n, phi_min, phi_max,  &
                             phi_x, phi_y, phi_z,                       &
                             grid % dx, grid % dy, grid % dz,           &
-                            adv_scheme, blend) 
+                            phi % adv_scheme, phi % blend)
     end if
 
     ! Compute advection term
@@ -331,10 +325,10 @@
   !                    !
   !--------------------!
 
-  call Control_Mod_Time_Integration_Scheme(td_inertia)
+  call Control_Mod_Time_Integration_Scheme(phi % td_scheme)
 
   ! Two time levels; Linear interpolation
-  if(td_inertia .eq. LINEAR) then
+  if(phi % td_scheme .eq. LINEAR) then
     do c = 1, grid % n_cells
       a0 = capacity * density * grid % vol(c) / dt
       a % val(a % dia(c)) = a % val(a % dia(c)) + a0
@@ -343,7 +337,7 @@
   end if
 
   ! Three time levels; parabolic interpolation
-  if(td_inertia .eq. PARABOLIC) then
+  if(phi % td_scheme .eq. PARABOLIC) then
     do c = 1, grid % n_cells
       a0 = capacity * density * grid % vol(c) / dt
       a % val(a % dia(c)) = a % val(a % dia(c)) + 1.5 * a0
@@ -437,37 +431,44 @@
   !---------------------------------!
   !                                 !
   !   Solve the equations for phi   !
-  !                                 !    
+  !                                 !
   !---------------------------------!
 
   ! Set under-relaxation factor
-  urf = 0.7
-  call Control_Mod_Simple_Underrelaxation_For_Energy(urf)
+  phi % urf = 0.7
+  call Control_Mod_Simple_Underrelaxation_For_Energy(phi % urf)
 
   do c = 1, grid % n_cells
-    b(c) = b(c) + a % val(a % dia(c)) * (1.0 - urf) * phi % n(c)  &
-                                      / urf
-    a % val(a % dia(c)) = a % val(a % dia(c)) / urf
+    b(c) = b(c) + a % val(a % dia(c)) * (1.0 - phi % urf) * phi % n(c)  &
+                                      / phi % urf
+    a % val(a % dia(c)) = a % val(a % dia(c)) / phi % urf
   end do
 
   ! Get solver tolerance
-  call Control_Mod_Tolerance_For_Energy_Solver(tol)
+  call Control_Mod_Tolerance_For_Energy_Solver(phi % tol)
 
   ! Get matrix precondioner
-  call Control_Mod_Preconditioner_For_System_Matrix(precond)
+  call Control_Mod_Preconditioner_For_System_Matrix(phi % precond)
 
   ! Set number of iterations
-  niter =  5
-  call Control_Mod_Max_Iterations_For_Energy_Solver(niter)
+  phi % niter =  5
+  call Control_Mod_Max_Iterations_For_Energy_Solver(phi % niter)
 
-  call Bicg(sol, phi % n, b, precond, niter, tol, ini_res, phi % res)
+  call Bicg(sol,            &
+            phi % n,        &
+            b,              &
+            phi % precond,  &
+            phi % niter,    &
+            phi % tol,      &
+            ini_res,        &
+            phi % res)
 
   read(phi % name(3:4), *) ns  ! reterive the number of scalar 
   row = ceiling(ns/4)          ! will be 1 (scal. 1-4), 2 (scal. 5-8), etc.
   col = ns - (row-1)*4         ! will be in range 1 - 4
 
-  call Info_Mod_Iter_Fill_User_At(row, col, phi % name, niter, phi % res)
- 
+  call Info_Mod_Iter_Fill_User_At(row, col, phi % name, iter, phi % res)
+
   call Comm_Mod_Exchange_Real(grid, phi % n)
 
   end subroutine
