@@ -17,7 +17,6 @@
   use Numerics_Mod, only: CENTRAL, LINEAR, PARABOLIC
   use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
   use Matrix_Mod,   only: Matrix_Type
-  use Control_Mod
   use User_Mod
   use Work_Mod,     only: ui_min  => r_cell_01,  &
                           ui_max  => r_cell_02
@@ -39,11 +38,10 @@
   real,              pointer :: ui_i(:), ui_j(:), ui_k(:), uj_i(:), uk_i(:)
   real,              pointer :: si(:), sj(:), sk(:), di(:), dj(:), dk(:)
   real,              pointer :: h_i(:)
-  integer                    :: s, c, c1, c2
+  integer                    :: s, c, c1, c2, exec_iter
   real                       :: f_ex, f_im, f_stress
   real                       :: uis, vel_max
   real                       :: a0, a12, a21
-  real                       :: ini_res
   real                       :: vis_eff, vis_tS
   real                       :: ui_i_f, ui_j_f, ui_k_f, uj_i_f, uk_i_f
   real                       :: uu_f, vv_f, ww_f, uv_f, uw_f, vw_f
@@ -163,10 +161,6 @@
   !   Advection   !
   !               !
   !---------------!
-
-  ! Retreive advection scheme and blending coefficient
-  call Control_Mod_Advection_Scheme_For_Momentum(ui % adv_scheme)
-  call Control_Mod_Blending_Coefficient_For_Momentum(ui % blend)
 
   ! Compute phimax and phimin
   if(ui % adv_scheme .ne. CENTRAL) then
@@ -409,8 +403,6 @@
   !                    !
   !--------------------!
 
-  call Control_Mod_Time_Integration_Scheme(ui % td_scheme)
-
   ! Two time levels; linear interpolation
   if(ui % td_scheme .eq. LINEAR) then
     do c = 1, grid % n_cells
@@ -492,44 +484,32 @@
   !                                   !
   !-----------------------------------!
 
-  ! Set under-relaxation factor then overwrite with conrol file if specified
-  ui % urf = 0.8
-  call Control_Mod_simple_Underrelaxation_For_Momentum(ui % urf)
-
+  ! Under-relax the equations
   do c = 1, grid % n_cells
     a % sav(c) = a % val(a % dia(c))
     b(c) = b(c) + a % val(a % dia(c)) * (1.0 - ui % urf)*ui % n(c) / ui % urf
     a % val(a % dia(c)) = a % val(a % dia(c)) / ui % urf
   end do
 
-  ! Get solver tolerance
-  call Control_Mod_Tolerance_For_Momentum_Solver(ui % tol)
-
-  ! Get matrix precondioner
-  call Control_Mod_Preconditioner_For_System_Matrix(ui % precond)
-
-  ! Set number of iterations then overwrite with conrol file if specified
-  ui % niter =  5
-  call Control_Mod_Max_Iterations_For_Momentum_Solver(ui % niter)
-
+  ! Call linear solver
   call Bicg(sol,           &
             ui % n,        &
             b,             &
             ui % precond,  &
             ui % niter,    &
+            exec_iter,     &
             ui % tol,      &
-            ini_res,       &
             ui % res,      &
             norm = vel_max)
 
   if(ui % name .eq. 'U') then
-    call Info_Mod_Iter_Fill_At(1, 1, ui % name, ui % niter, ui % res)
+    call Info_Mod_Iter_Fill_At(1, 1, ui % name, exec_iter, ui % res)
   end if
   if(ui % name .eq. 'V') then
-    call Info_Mod_Iter_Fill_At(1, 2, ui % name, ui % niter, ui % res)
+    call Info_Mod_Iter_Fill_At(1, 2, ui % name, exec_iter, ui % res)
   end if
   if(ui % name .eq. 'W') then
-    call Info_Mod_Iter_Fill_At(1, 3, ui % name, ui % niter, ui % res)
+    call Info_Mod_Iter_Fill_At(1, 3, ui % name, exec_iter, ui % res)
   end if
 
   call Comm_Mod_Exchange_Real(grid, ui % n)
