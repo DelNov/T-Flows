@@ -12,8 +12,7 @@
   use Grid_Mod
   use Grad_Mod
   use Info_Mod
-  use Numerics_Mod, only: Numerics_Mod_Advection_Scheme,  &
-                          CENTRAL, LINEAR, PARABOLIC
+  use Numerics_Mod
   use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
   use Matrix_Mod,   only: Matrix_Type
   use Control_Mod
@@ -51,6 +50,7 @@
   real                       :: phix_f1, phiy_f1, phiz_f1
   real                       :: phix_f2, phiy_f2, phiz_f2
   real                       :: phis, pr_t1, pr_t2
+  character(len=80)          :: name
 !------------------------------------------------------------------------------!
 !
 !  The form of equations which are solved:
@@ -118,7 +118,8 @@
   !---------------!
 
   ! Retreive advection scheme and blending coefficient
-  call Control_Mod_Advection_Scheme_For_User_Scalars(phi % adv_scheme)
+  call Control_Mod_Advection_Scheme_For_User_Scalars(name)
+  call Numerics_Mod_Decode_Advection_Scheme         (name, phi % adv_scheme)
   call Control_Mod_Blending_Coefficient_For_User_Scalars(phi % blend)
 
   ! Compute phimax and phimin
@@ -327,7 +328,8 @@
   !                    !
   !--------------------!
 
-  call Control_Mod_Time_Integration_Scheme(phi % td_scheme)
+  call Control_Mod_Time_Integration_Scheme        (name)
+  call Numerics_Mod_Decode_Time_Integration_Scheme(name, phi % td_scheme)
 
   ! Two time levels; Linear interpolation
   if(phi % td_scheme .eq. LINEAR) then
