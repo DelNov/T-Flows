@@ -75,23 +75,10 @@
 
     ! Add buoyancy (linearly split) to eps equation as required in the t2 model
     if(buoyancy) then
-        buoy_beta(c) = 1.0
-        g_buoy(c) = -buoy_beta(c) * (grav_x * ut % n(c) +  &
-                                     grav_y * vt % n(c) +  &
-                                     grav_z * wt % n(c)) * density
-        b(c) = b(c) + max(0.0, g_buoy(c) * grid % vol(c))
-        a % val(a % dia(c)) = a % val(a % dia(c))  &
-                  + max(0.0,-g_buoy(c) * grid % vol(c) / (kin % n(c) + TINY))
+      b(c) = b(c) + max(0.0, c_11e * e_sor * g_buoy(c))
+      a % val(a % dia(c)) = a % val(a % dia(c))  &
+              + max(0.0,-c_11e * e_sor * g_buoy(c) / (eps % n(c) + TINY))
     end if
-! Muhamed wrote the following code recently for boyancy
-! in commit # 329d4ebd3071023ae65f2604da3e1f8a4d3fb24a
-! He gave it some thought, thus ASK him about it before you delete it
-!  if(buoyancy) then
-!    b(c) = b(c) + max(0.0, c_11e * e_sor * g_buoy(c))
-!    a % val(a % dia(c)) = a % val(a % dia(c))  &
-!              + max(0.0,-c_11e * e_sor * g_buoy(c) / (eps % n(c) + TINY))
-!  end if
-
   end do
 
   !-------------------------------------------------------!
