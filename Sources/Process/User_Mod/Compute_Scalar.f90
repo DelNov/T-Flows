@@ -12,7 +12,8 @@
   use Grid_Mod
   use Grad_Mod
   use Info_Mod
-  use Numerics_Mod, only: CENTRAL, LINEAR, PARABOLIC
+  use Numerics_Mod, only: Numerics_Mod_Advection_Scheme,  &
+                          CENTRAL, LINEAR, PARABOLIC
   use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
   use Matrix_Mod,   only: Matrix_Type
   use Control_Mod
@@ -145,10 +146,11 @@
 
     ! Compute phis with desired advection scheme
     if(phi % adv_scheme .ne. CENTRAL) then
-      call Advection_Scheme(flow, phis, s, phi % n, phi_min, phi_max,  &
-                            phi_x, phi_y, phi_z,                       &
-                            grid % dx, grid % dy, grid % dz,           &
-                            phi % adv_scheme, phi % blend)
+      call Numerics_Mod_Advection_Scheme(flow, phis, s,       &
+                                         phi % n, phi_min, phi_max,        &
+                                         phi_x, phi_y, phi_z,              &
+                                         grid % dx, grid % dy, grid % dz,  &
+                                         phi % adv_scheme, phi % blend)
     end if
 
     ! Compute advection term
