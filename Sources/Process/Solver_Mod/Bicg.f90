@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Bicg(sol, x, b, prec, niter, tol, ini_res, fin_res, norm) 
+  subroutine Bicg(sol, x, b, prec, miter, niter, tol, fin_res, norm)
 !------------------------------------------------------------------------------!
 !   Solves the linear systems of equations by a precond. BiCG Method.          !
 !------------------------------------------------------------------------------!
@@ -26,12 +26,13 @@
   type(Solver_Type), target :: sol
   real              :: x(-sol % pnt_grid % n_bnd_cells :  &
                           sol % pnt_grid % n_cells)
-  real              :: b( sol % pnt_grid % n_cells)      ! [A]{x}={b}
-  character(len=80) :: prec                              ! preconditioner
-  integer           :: niter                             ! number of iterations
-  real              :: tol                               ! tolerance
-  real              :: ini_res, fin_res                  ! residual
-  real, optional    :: norm                              ! normalization
+  real              :: b( sol % pnt_grid % n_cells)  ! [A]{x}={b}
+  character(len=80) :: prec                          ! preconditioner
+  integer           :: miter                         ! max and actual ...
+  integer           :: niter                         ! ... num. iterations
+  real              :: tol                           ! tolerance
+  real              :: fin_res                       ! residual
+  real, optional    :: norm                          ! normalization
 !-----------------------------------[Locals]-----------------------------------!
   type(Matrix_Type), pointer :: a
   type(Matrix_Type), pointer :: d
@@ -78,7 +79,6 @@
   !   Calculate initial residual   !
   !--------------------------------!
   res = Normalized_Root_Mean_Square(ni, r1(1:nt), a, x(1:nt))
-  ini_res = res
 
   if(res < tol) then
     iter = 0
@@ -97,7 +97,7 @@
   !   Main loop   !
   !               !
   !---------------!
-  do iter = 1, niter
+  do iter = 1, miter
 
     !------------------------!
     !    solve M   z  = r    !
