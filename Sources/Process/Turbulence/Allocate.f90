@@ -27,9 +27,6 @@
   t    => flow % t
   p    => flow % p
 
-  call Control_Mod_Buoyancy        (verbose = .true.)
-  call Control_Mod_Turbulence_Model(verbose = .true.)
-
   !-----------------!
   !   K-eps model   !
   !-----------------!

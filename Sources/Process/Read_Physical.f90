@@ -4,7 +4,9 @@
 !   Reads details about physial models.                                        !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Field_Mod,   only: Field_Type
+  use Comm_Mod,    only: Comm_Mod_End, this_proc
+  use Field_Mod,   only: Field_Type, buoyancy, heat_transfer,  &
+                         grav_x, grav_y, grav_z
   use Bulk_Mod,    only: Bulk_Type
   use Rans_Mod
   use Control_Mod
@@ -15,25 +17,70 @@
   logical                  :: backup
 !----------------------------------[Locals]------------------------------------!
   type(Bulk_Type), pointer :: bulk
+  character(len=80)        :: name
 !==============================================================================!
 
   ! Take aliases
   bulk => flow % bulk
 
-  !-------------------------!
-  !   Related to bouyancy   !
-  !-------------------------!
-  call Control_Mod_Gravitational_Vector(.true.)
-  call Control_Mod_Buoyancy(.true.)
-  call Control_Mod_Reference_Temperature(flow, .true.)
+  !-------------------------------------------!
+  !                                           !
+  !   Related to heat transfer and bouyancy   !
+  !                                           !
+  !-------------------------------------------!
+  call Control_Mod_Heat_Transfer(heat_transfer, verbose = .true.)
+  call Control_Mod_Gravitational_Vector(grav_x,  &
+                                        grav_y,  &
+                                        grav_z, .true.)
+  call Control_Mod_Buoyancy(buoyancy, .true.)
+  call Control_Mod_Reference_Temperature(flow % t_ref, .true.)
 
   !---------------------------!
+  !                           !
   !   Related to turbulence   !
+  !                           !
   !---------------------------!
   call Control_Mod_Turbulence_Model(.true.)
-  call Control_Mod_Turbulence_Model_Variant(.true.)
-  call Control_Mod_Rough_Walls(.true.)
-  call Control_Mod_Turbulent_Heat_Flux_Model(.true.)
+
+  !------------------------------!
+  !   Turbulence model variant   !
+  !------------------------------!
+  call Control_Mod_Turbulence_Model_Variant(name, .true.)
+  if     (name .eq. 'NONE') then
+    turbulence_model_variant = NONE
+  else if(name .eq. 'STABILIZED') then
+    turbulence_model_variant = STABILIZED
+  else
+    if(this_proc < 2) then
+      print *, '# ERROR!  Unknown turbulence model variant: ', trim(name)
+      print *, '# Exiting!'
+    end if
+    call Comm_Mod_End
+  end if
+
+  !----------------------------!
+  !   Rough or smooth walls?   !
+  !----------------------------!
+  call Control_Mod_Rough_Walls(rough_walls, .true.)
+
+  !-------------------------------!
+  !   Turbulent heat flux model   !
+  !-------------------------------!
+  call Control_Mod_Turbulent_Heat_Flux_Model(name, .true.)
+  select case(name)
+    case('SGDH')
+      turbulent_heat_flux_model = SGDH
+    case('GGDH')
+      turbulent_heat_flux_model = GGDH
+    case('AFM')
+      turbulent_heat_flux_model = AFM
+    case default
+      if(this_proc < 2) then
+        print *, '# ERROR!  Unknown turbulent heat flux model :', trim(name)
+        print *, '# Exiting!'
+      end if
+      call Comm_Mod_End
+  end select
 
   !-------------------------------------------------------------------------!
   !   Initialization of model constants depending on the turbulence model   !
@@ -61,11 +108,17 @@
   end if
 
   !------------------------------------!
+  !                                    !
   !   Pressure drops and mass fluxes   !
+  !                                    !
   !------------------------------------!
   if(.not. backup) then
-    call Control_Mod_Pressure_Drops(bulk)
-    call Control_Mod_Mass_Flow_Rates(bulk)
+    call Control_Mod_Pressure_Drops(bulk % p_drop_x,  &
+                                    bulk % p_drop_y,  &
+                                    bulk % p_drop_z)
+    call Control_Mod_Mass_Flow_Rates(bulk % flux_x_o,  &
+                                     bulk % flux_y_o,  &
+                                     bulk % flux_z_o)
   end if
 
   end subroutine

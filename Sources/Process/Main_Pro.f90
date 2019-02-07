@@ -85,8 +85,10 @@
   call Control_Mod_Number_Of_Time_Steps(last_dt, verbose=.true.)
   call Control_Mod_Starting_Time_Step_For_Statistics(n_stat, verbose=.true.)
 
+  ! Read physical models from control file
+  call Read_Physical(flow, backup)
+
   ! Allocate memory for all variables
-  call Control_Mod_Heat_Transfer(verbose = .true.)
   call Field_Mod_Allocate(flow, grid)
   call Grad_Mod_Allocate(grid)
   call Turbulence_Allocate(flow)
@@ -108,9 +110,6 @@
   ! Read backup file if directed so, and set the "backup" to .true. or .false.
   call Backup_Mod_Load(flow, first_dt, n_stat, backup) 
 
-  ! Read physical models from control file
-  call Read_Physical(flow, backup)
-
   ! Initialize variables
   if(.not. backup) then
     call Initialize_Variables(flow)
@@ -124,7 +123,9 @@
   call Monitor_Mod_Initialize(grid, backup)
 
   ! Plane for calcution of overall mass fluxes
-  call Control_Mod_Point_For_Monitoring_Planes(flow % bulk)
+  call Control_Mod_Point_For_Monitoring_Planes(flow % bulk % xp,  &
+                                               flow % bulk % yp,  &
+                                               flow % bulk % zp)
 
   ! Prepare ...
   call Bulk_Mod_Monitoring_Planes_Areas(flow % bulk, grid)
