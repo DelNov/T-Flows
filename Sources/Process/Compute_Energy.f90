@@ -6,14 +6,14 @@
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
   use Comm_Mod
-  use Control_Mod
   use Field_Mod,    only: Field_Type, conductivity, capacity, density
   use Rans_Mod
   use Var_Mod,      only: Var_Type
   use Grid_Mod,     only: Grid_Type
   use Grad_Mod
   use Info_Mod
-  use Numerics_Mod, only: CENTRAL, LINEAR, PARABOLIC
+  use Numerics_Mod, only: Numerics_Mod_Advection_Scheme,  &
+                          CENTRAL, LINEAR, PARABOLIC
   use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
   use Matrix_Mod,   only: Matrix_Type
   use Work_Mod,     only: t_min => r_cell_04,  &
@@ -34,13 +34,12 @@
   real,              pointer :: flux(:)
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
-  integer           :: n, c, s, c1, c2
-  real              :: a0, a12, a21
-  real              :: ini_res
-  real              :: con_eff1, f_ex1, f_im1, tx_f1, ty_f1, tz_f1
-  real              :: con_eff2, f_ex2, f_im2, tx_f2, ty_f2, tz_f2
-  real              :: ts, pr_t1, pr_t2
-  real              :: ut_s, vt_s, wt_s, t_stress, con_t
+  integer                    :: n, c, s, c1, c2, exec_iter
+  real                       :: a0, a12, a21
+  real                       :: con_eff1, f_ex1, f_im1, tx_f1, ty_f1, tz_f1
+  real                       :: con_eff2, f_ex2, f_im2, tx_f2, ty_f2, tz_f2
+  real                       :: ts, pr_t1, pr_t2, pr_tf
+  real                       :: ut_s, vt_s, wt_s, t_stress, con_t
 !------------------------------------------------------------------------------!
 !
 !  The form of equations which are solved:
@@ -105,10 +104,6 @@
   !               !
   !---------------!
 
-  ! Retreive advection scheme and blending coefficient
-  call Control_Mod_Advection_Scheme_For_Energy(t % adv_scheme)
-  call Control_Mod_Blending_Coefficient_For_Energy(t % blend)
-
   ! Compute tmax and tmin
   if(t % adv_scheme .ne. CENTRAL) then
     call Calculate_Minimum_Maximum(grid, t % n, t_min, t_max)
@@ -133,10 +128,10 @@
 
     ! Compute ts with desired advection scheme
     if(t % adv_scheme .ne. CENTRAL) then
-      call Advection_Scheme(flow, ts, s, t % n, t_min, t_max,  &
-                            t % x, t % y, t % z,               &
-                            grid % dx, grid % dy, grid % dz,   &
-                            t % adv_scheme, t % blend)
+      call Numerics_Mod_Advection_Scheme(flow, ts, s, t % n, t_min, t_max,  &
+                                         t % x, t % y, t % z,               &
+                                         grid % dx, grid % dy, grid % dz,   &
+                                         t % adv_scheme, t % blend)
     end if
 
     ! Compute advection term
@@ -186,7 +181,6 @@
   !----------------------------!
   if(turbulence_model .ne. NONE .and.  &
      turbulence_model .ne. DNS) then
-    call Control_Mod_Turbulent_Prandtl_Number(pr_t)  ! get default pr_t (0.9)
   end if
 
   do s = 1, grid % n_faces
@@ -201,7 +195,7 @@
        turbulence_model .ne. DNS) then
       pr_t1 = Turbulent_Prandtl_Number(grid, c1)
       pr_t2 = Turbulent_Prandtl_Number(grid, c2)
-      pr_t  = grid % fw(s) * pr_t1 + (1.0-grid % fw(s)) * pr_t2
+      pr_tf = grid % fw(s) * pr_t1 + (1.0-grid % fw(s)) * pr_t2
     end if
 
     ! Gradients on the cell face (fw corrects situation close to the wall)
@@ -213,10 +207,10 @@
     tz_f2 = tz_f1
     if(turbulence_model .ne. NONE .and.  &
        turbulence_model .ne. DNS) then
-      con_eff1 =      grid % fw(s)  * (conductivity+capacity*vis_t(c1)/pr_t)  &
-               + (1.0-grid % fw(s)) * (conductivity+capacity*vis_t(c2)/pr_t)
-      con_t    =      grid % fw(s)  * capacity*vis_t(c1)/pr_t &
-               + (1.0-grid % fw(s)) * capacity*vis_t(c2)/pr_t
+      con_eff1 =      grid % fw(s)  * (conductivity+capacity*vis_t(c1)/pr_tf)  &
+               + (1.0-grid % fw(s)) * (conductivity+capacity*vis_t(c2)/pr_tf)
+      con_t    =      grid % fw(s)  * capacity*vis_t(c1)/pr_tf  &
+               + (1.0-grid % fw(s)) * capacity*vis_t(c2)/pr_tf
     else
       con_eff1 = conductivity
     end if
@@ -244,11 +238,11 @@
                         + tz_f2 * grid % sz(s))
 
     ! Implicit diffusion flux
-    f_im1 = con_eff1 * a % fc(s)           &
+    f_im1 = con_eff1 * a % fc(s)         &
           * (  tx_f1 * grid % dx(s)      &
              + ty_f1 * grid % dy(s)      &
              + tz_f1 * grid % dz(s) )
-    f_im2 = con_eff2 * a % fc(s)           &
+    f_im2 = con_eff2 * a % fc(s)         &
           * (  tx_f2 * grid % dx(s)      &
              + ty_f2 * grid % dy(s)      &
              + tz_f2 * grid % dz(s) )
@@ -334,12 +328,10 @@
   !                    !
   !--------------------!
 
-  call Control_Mod_Time_Integration_Scheme(t % td_scheme)
-
   ! Two time levels; Linear interpolation
   if(t % td_scheme .eq. LINEAR) then
     do c = 1, grid % n_cells
-      a0 = capacity * density * grid % vol(c)/dt
+      a0 = capacity * density * grid % vol(c) / dt
       a % val(a % dia(c)) = a % val(a % dia(c)) + a0
       b(c)  = b(c) + a0 * t % o(c)
     end do
@@ -348,7 +340,7 @@
   ! Three time levels; parabolic interpolation
   if(t % td_scheme .eq. PARABOLIC) then
     do c = 1, grid % n_cells
-      a0 = capacity * density * grid % vol(c)/dt
+      a0 = capacity * density * grid % vol(c) / dt
       a % val(a % dia(c)) = a % val(a % dia(c)) + 1.5 * a0
       b(c)  = b(c) + 2.0 * a0 * t % o(c) - 0.5 * a0 * t % oo(c)
     end do
@@ -362,35 +354,24 @@
   !                               !
   !-------------------------------!
 
-  ! Set under-relaxation factor, then overwrite with control file if specified
-  t % urf = 0.7
-  call Control_Mod_Simple_Underrelaxation_For_Energy(t % urf)
-
+  ! Under-relax the equations
   do c = 1, grid % n_cells
     b(c) = b(c) + a % val(a % dia(c)) * (1.0 - t % urf) * t % n(c) / t % urf
     a % val(a % dia(c)) = a % val(a % dia(c)) / t % urf
   end do
 
-  ! Get solver tolerance
-  call Control_Mod_Tolerance_For_Energy_Solver(t % tol)
-
-  ! Get matrix precondioner
-  call Control_Mod_Preconditioner_For_System_Matrix(t % precond)
-
-  ! Set number of iterations then overwrite with control file if specified
-  t % niter =  5
-  call Control_Mod_Max_Iterations_For_Energy_Solver(t % niter)
-
+  ! Call linear solver to solve the equations
   call Bicg(sol,          &
             t % n,        &
             b,            &
             t % precond,  &
             t % niter,    &
+            exec_iter,    &
             t % tol,      &
-            ini_res,      &
             t % res)
 
-  call Info_Mod_Iter_Fill_At(1, 6, t % name, t % niter, t % res)
+  ! Print some info on the screen
+  call Info_Mod_Iter_Fill_At(1, 6, t % name, exec_iter, t % res)
 
   call Comm_Mod_Exchange_Real(grid, t % n)
 
