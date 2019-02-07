@@ -1,18 +1,17 @@
 !==============================================================================!
-  subroutine Advection_Scheme(flow,                             &
-                              phi_f, s,                         &
-                              phi, phi_min, phi_max,            &
-                              phi_i, phi_j, phi_k, di, dj, dk,  &
-                              scheme, blend) 
+  subroutine Numerics_Mod_Advection_Scheme(flow,                             &
+                                           phi_f, s,                         &
+                                           phi, phi_min, phi_max,            &
+                                           phi_i, phi_j, phi_k, di, dj, dk,  &
+                                           scheme, blend)
 !------------------------------------------------------------------------------!
 !   Computes the value at the cell face using different convective  schemes.   !
 !   In this subroutine I try to follow the nomenclature from Basara's and      !
 !   Przulj's AIAA paper.                                                       !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Field_Mod,    only: Field_Type
-  use Numerics_Mod
-  use Grid_Mod,     only: Grid_Type
+  use Field_Mod,  only: Field_Type
+  use Grid_Mod,   only: Grid_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

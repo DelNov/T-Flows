@@ -14,7 +14,8 @@
   use Grid_Mod,     only: Grid_Type
   use Bulk_Mod,     only: Bulk_Type
   use Info_Mod,     only: Info_Mod_Iter_Fill_At
-  use Numerics_Mod, only: CENTRAL, LINEAR, PARABOLIC
+  use Numerics_Mod, only: Numerics_Mod_Advection_Scheme,  &
+                          CENTRAL, LINEAR, PARABOLIC
   use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
   use Matrix_Mod,   only: Matrix_Type
   use User_Mod
@@ -186,10 +187,10 @@
     uis = grid % f(s) * ui % n(c1) + (1.0 - grid % f(s)) * ui % n(c2)
 
     if(ui % adv_scheme .ne. CENTRAL) then
-      call Advection_Scheme(flow, uis, s, ui % n, ui_min, ui_max,  &
-                            ui_i, ui_j, ui_k,                      &
-                            di, dj, dk,                            &
-                            ui % adv_scheme, ui % blend)
+      call Numerics_Mod_Advection_Scheme(flow, uis, s, ui % n, ui_min, ui_max, &
+                                         ui_i, ui_j, ui_k,                     &
+                                         di, dj, dk,                           &
+                                         ui % adv_scheme, ui % blend)
     end if
 
     ! Compute advection term

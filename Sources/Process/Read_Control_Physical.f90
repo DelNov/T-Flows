@@ -36,6 +36,7 @@
                                         grav_z, .true.)
   call Control_Mod_Buoyancy(buoyancy, .true.)
   call Control_Mod_Reference_Temperature(flow % t_ref, .true.)
+  call Control_Mod_Turbulent_Prandtl_Number(pr_t)  ! default is (0.9)
 
   !---------------------------!
   !                           !
