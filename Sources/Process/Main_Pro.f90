@@ -218,10 +218,7 @@
 
       call Info_Mod_Iter_Fill(ini)
 
-      call Grad_Mod_Pressure(grid, flow % p % n,  &
-                                   flow % p % x,  &
-                                   flow % p % y,  &
-                                   flow % p % z)
+      call Grad_Mod_Pressure(flow % p)
 
       ! Compute velocity gradients
       call Grad_Mod_Variable(flow % u, .true.)
@@ -240,10 +237,7 @@
       call Balance_Mass(flow)
       call Compute_Pressure(flow, sol, dt, ini)
 
-      call Grad_Mod_Pressure(grid, flow % pp % n,  &
-                                   flow % pp % x,   &
-                                   flow % pp % y,   &
-                                   flow % pp % z)
+      call Grad_Mod_Pressure(flow % pp)
 
       call Bulk_Mod_Calculate_Fluxes(grid, flow % bulk, flow % flux)
       mass_res = Correct_Velocity(flow, sol, dt, ini)
