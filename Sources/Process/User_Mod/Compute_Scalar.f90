@@ -42,7 +42,7 @@
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   real,              pointer :: flux(:)
-  integer                    :: n, c, s, c1, c2, row, col, iter
+  integer                    :: n, c, s, c1, c2, row, col, exec_iter
   real                       :: a0, a12, a21
   real                       :: ini_res, ns
   real                       :: con_eff1, f_ex1, f_im1
@@ -459,6 +459,7 @@
             b,              &
             phi % precond,  &
             phi % niter,    &
+            exec_iter,      &
             phi % tol,      &
             ini_res,        &
             phi % res)
@@ -467,7 +468,7 @@
   row = ceiling(ns/4)          ! will be 1 (scal. 1-4), 2 (scal. 5-8), etc.
   col = ns - (row-1)*4         ! will be in range 1 - 4
 
-  call Info_Mod_Iter_Fill_User_At(row, col, phi % name, iter, phi % res)
+  call Info_Mod_Iter_Fill_User_At(row, col, phi % name, exec_iter, phi % res)
 
   call Comm_Mod_Exchange_Real(grid, phi % n)
 
