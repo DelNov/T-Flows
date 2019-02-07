@@ -30,5 +30,7 @@
   contains
 
   include 'Numerics_Mod/Advection_Scheme.f90'
+  include 'Numerics_Mod/Decode_Advection_Scheme.f90'
+  include 'Numerics_Mod/Decode_Time_Integration_Scheme.f90'
 
   end module

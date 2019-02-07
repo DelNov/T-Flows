@@ -9,6 +9,7 @@
   use Rans_Mod,       only: kin, eps, zeta, f22, vis, t2
   use Turbulence_Mod, only: uu, vv, ww, uv, uw, vw
   use Control_Mod
+  use Numerics_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -32,9 +33,11 @@
     if(i .eq. 3) ui => flow % w
     ui % urf   = 0.8
     ui % niter = 5
-    call Control_Mod_Advection_Scheme_For_Momentum      (ui % adv_scheme)
+    call Control_Mod_Advection_Scheme_For_Momentum      (name)
+    call Numerics_Mod_Decode_Advection_Scheme           (name, ui % adv_scheme)
+    call Control_Mod_Time_Integration_Scheme            (name)
+    call Numerics_Mod_Decode_Time_Integration_Scheme    (name, ui % td_scheme)
     call Control_Mod_Blending_Coefficient_For_Momentum  (ui % blend)
-    call Control_Mod_Time_Integration_Scheme            (ui % td_scheme)
     call Control_Mod_Simple_Underrelaxation_For_Momentum(ui % urf)
     call Control_Mod_Tolerance_For_Momentum_Solver      (ui % tol)
     call Control_Mod_Preconditioner_For_System_Matrix   (ui % precond)
@@ -56,9 +59,11 @@
   if(heat_transfer) then
     t % urf   = 0.7
     t % niter = 5
-    call Control_Mod_Advection_Scheme_For_Energy      (t % adv_scheme)
+    call Control_Mod_Advection_Scheme_For_Energy      (name)
+    call Numerics_Mod_Decode_Advection_Scheme         (name, t % adv_scheme)
+    call Control_Mod_Time_Integration_Scheme          (name)
+    call Numerics_Mod_Decode_Time_Integration_Scheme  (name, t % td_scheme)
     call Control_Mod_Blending_Coefficient_For_Energy  (t % blend)
-    call Control_Mod_Time_Integration_Scheme          (t % td_scheme)
     call Control_Mod_Simple_Underrelaxation_For_Energy(t % urf)
     call Control_Mod_Tolerance_For_Energy_Solver      (t % tol)
     call Control_Mod_Preconditioner_For_System_Matrix (t % precond)
@@ -83,9 +88,11 @@
     if(i .eq. 12) tq => vw
     tq % urf   = 1.0
     tq % niter = 6
-    call Control_Mod_Advection_Scheme_For_Turbulence      (tq % adv_scheme)
+    call Control_Mod_Advection_Scheme_For_Turbulence      (name)
+    call Numerics_Mod_Decode_Advection_Scheme             (name, tq % adv_scheme)
+    call Control_Mod_Time_Integration_Scheme              (name)
+    call Numerics_Mod_Decode_Time_Integration_Scheme      (name, tq % td_scheme)
     call Control_Mod_Blending_Coefficient_For_Turbulence  (tq % blend)
-    call Control_Mod_Time_Integration_Scheme              (tq % td_scheme)
     call Control_Mod_Simple_Underrelaxation_For_Turbulence(tq % urf)
     call Control_Mod_Tolerance_For_Turbulence_Solver      (tq % tol)
     call Control_Mod_Preconditioner_For_System_Matrix     (tq % precond)
