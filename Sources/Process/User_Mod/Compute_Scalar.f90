@@ -44,7 +44,7 @@
   real,              pointer :: flux(:)
   integer                    :: n, c, s, c1, c2, row, col, exec_iter
   real                       :: a0, a12, a21
-  real                       :: ini_res, ns
+  real                       :: ns
   real                       :: con_eff1, f_ex1, f_im1
   real                       :: con_eff2, f_ex2, f_im2
   real                       :: phix_f1, phiy_f1, phiz_f1
@@ -461,7 +461,6 @@
             phi % niter,    &
             exec_iter,      &
             phi % tol,      &
-            ini_res,        &
             phi % res)
 
   read(phi % name(3:4), *) ns  ! reterive the number of scalar 
