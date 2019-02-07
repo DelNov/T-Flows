@@ -16,7 +16,6 @@
   use Numerics_Mod, only: CENTRAL, LINEAR, PARABOLIC
   use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
   use Matrix_Mod,   only: Matrix_Type
-  use Control_Mod
   use Work_Mod,     only: phi_x       => r_cell_01,  &
                           phi_y       => r_cell_02,  &
                           phi_z       => r_cell_03,  &
@@ -43,11 +42,10 @@
   real,              pointer :: flux(:)
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
-  integer                    :: s, c, c1, c2
+  integer                    :: s, c, c1, c2, exec_iter
   real                       :: f_ex, f_im
   real                       :: phis
   real                       :: a0, a12, a21
-  real                       :: ini_res
   real                       :: vis_eff
   real                       :: phix_f, phiy_f, phiz_f
   real                       :: vis_t_f
@@ -95,10 +93,6 @@
   !               !
   !---------------!
 
-  ! Retreive advection scheme and blending coefficient
-  call Control_Mod_Advection_Scheme_For_Turbulence(phi % adv_scheme)
-  call Control_Mod_Blending_Coefficient_For_Turbulence(phi % blend)
-
   ! Compute phimax and phimin
   if(phi % adv_scheme .ne. CENTRAL) then
     call Calculate_Minimum_Maximum(grid, phi % n, phi_min, phi_max)
@@ -118,7 +112,7 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s) 
 
-    ! Velocities on "orthogonal" cell centers 
+    ! Velocities on "orthogonal" cell centers
     if(c2 > 0) then
       phis =        grid % f(s)  * phi % n(c1)   &
            + (1.0 - grid % f(s)) * phi % n(c2)
@@ -129,7 +123,7 @@
                               phi_x, phi_y, phi_z,                       &
                               grid % dx, grid % dy, grid % dz,           &
                               phi % adv_scheme, phi % blend) 
-      end if 
+      end if
 
       ! Compute advection term
       if(c2  > 0) then
@@ -222,7 +216,7 @@
     a12 = a0
     a21 = a0
 
-    a12 = a12  - min(flux(s), 0.) 
+    a12 = a12  - min(flux(s), 0.)
     a21 = a21  + max(flux(s), 0.)
 
     ! Fill the system matrix
@@ -349,15 +343,13 @@
   !------------------------------------------------!
   do c = 1, grid % n_cells
     b(c) = b(c) + phi % c(c)
-  end do 
+  end do
 
   !--------------------!
   !                    !
   !   Inertial terms   !
   !                    !
   !--------------------!
-
-  call Control_Mod_Time_Integration_Scheme(phi % td_scheme)
 
   ! Two time levels; Linear interpolation
   if(phi % td_scheme .eq. LINEAR) then
@@ -393,52 +385,42 @@
   !                                 !
   !---------------------------------!
 
-  ! Set under-relaxation factor then overwrite with control file if specified
-  phi % urf = 1.0
-  call Control_Mod_Simple_Underrelaxation_For_Turbulence(phi % urf)
-
+  ! Under-relax the equations
   do c = 1, grid % n_cells
     b(c) = b(c) + a % val(a % dia(c)) * (1.0 - phi % urf)*phi % n(c)  &
          / phi % urf
     a % val(a % dia(c)) = a % val(a % dia(c)) / phi % urf
   end do
 
-  call Control_Mod_Tolerance_For_Turbulence_Solver(phi % tol)
-
-  ! Get matrix precondioner
-  call Control_Mod_Preconditioner_For_System_Matrix(phi % precond)
-
-  ! Set the number of iterations then overwrite with control file if specified
-  phi % niter = 6
-  call Control_Mod_Max_Iterations_For_Turbulence_Solver(phi % niter)
-
+  ! Call linear solver to solve the equations
   call Bicg(sol,            &
             phi % n,        &
             b,              &
             phi % precond,  &
             phi % niter,    &
+            exec_iter,      &
             phi % tol,      &
-            ini_res,        &
             phi % res)
 
+  ! Print info on the screen
   if( phi % name .eq. 'UU' )   &
-    call Info_Mod_Iter_Fill_At(3, 1, phi % name, phi % niter, phi % res)
+    call Info_Mod_Iter_Fill_At(3, 1, phi % name, exec_iter, phi % res)
   if( phi % name .eq. 'VV' )   &
-    call Info_Mod_Iter_Fill_At(3, 2, phi % name, phi % niter, phi % res)
+    call Info_Mod_Iter_Fill_At(3, 2, phi % name, exec_iter, phi % res)
   if( phi % name .eq. 'WW' )   &
-    call Info_Mod_Iter_Fill_At(3, 3, phi % name, phi % niter, phi % res)
+    call Info_Mod_Iter_Fill_At(3, 3, phi % name, exec_iter, phi % res)
   if( phi % name .eq. 'UV' )   &
-    call Info_Mod_Iter_Fill_At(3, 4, phi % name, phi % niter, phi % res)
+    call Info_Mod_Iter_Fill_At(3, 4, phi % name, exec_iter, phi % res)
   if( phi % name .eq. 'UW' )   &
-    call Info_Mod_Iter_Fill_At(3, 5, phi % name, phi % niter, phi % res)
+    call Info_Mod_Iter_Fill_At(3, 5, phi % name, exec_iter, phi % res)
   if( phi % name .eq. 'VW' )   &
-    call Info_Mod_Iter_Fill_At(3, 6, phi % name, phi % niter, phi % res)
+    call Info_Mod_Iter_Fill_At(3, 6, phi % name, exec_iter, phi % res)
   if( phi % name .eq. 'EPS' )  &
-    call Info_Mod_Iter_Fill_At(4, 1, phi % name, phi % niter, phi % res)
+    call Info_Mod_Iter_Fill_At(4, 1, phi % name, exec_iter, phi % res)
 
   if(phi % name .eq. 'EPS') then
     do c= 1, grid % n_cells
-      phi % n(c) = phi % n(c) 
+      phi % n(c) = phi % n(c)
      if( phi % n(c) < 0.) then
        phi % n(c) = phi % o(c)
      end if
@@ -449,7 +431,7 @@
      phi % name .eq. 'VV' .or.  &
      phi % name .eq. 'WW') then
     do c = 1, grid % n_cells
-      phi % n(c) = phi % n(c) 
+      phi % n(c) = phi % n(c)
       if(phi % n(c) < 0.) then
         phi % n(c) = phi % o(c)
       end if

@@ -13,7 +13,6 @@
   use Grid_Mod,     only: Grid_Type
   use Grad_Mod,     only: Grad_Mod_Variable
   use Info_Mod,     only: Info_Mod_Iter_Fill_At
-  use Control_Mod
   use Numerics_Mod, only: CENTRAL, LINEAR, PARABOLIC
   use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
   use Matrix_Mod,   only: Matrix_Type
@@ -34,11 +33,10 @@
   real,              pointer :: flux(:)
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
-  integer                    :: s, c, c1, c2
+  integer                    :: s, c, c1, c2, exec_iter
   real                       :: f_ex, f_im
   real                       :: phis
   real                       :: a0, a12, a21
-  real                       :: ini_res
   real                       :: vis_eff
   real                       :: phi_x_f, phi_y_f, phi_z_f
 !==============================================================================!
@@ -82,10 +80,6 @@
   !   Advection   !
   !               !
   !---------------!
-
-  ! Retreive advection scheme and blending coefficient
-  call Control_Mod_Advection_Scheme_For_Turbulence(phi % adv_scheme)
-  call Control_Mod_Blending_Coefficient_For_Turbulence(phi % blend)
 
   ! Compute phimax and phimin
   if(phi % adv_scheme .ne. CENTRAL) then
@@ -266,8 +260,6 @@
   !                    !
   !--------------------!
 
-  call Control_Mod_Time_Integration_Scheme(phi % td_scheme)
-
   ! Two time levels; linear interpolation
   if(phi % td_scheme .eq. LINEAR) then
     do c = 1, grid % n_cells
@@ -320,53 +312,42 @@
   !                                 !
   !---------------------------------!
 
-  ! Set under-relaxation factor then overwrite with control file if specified
-  phi % urf = 1.0
-  call Control_Mod_Simple_Underrelaxation_For_Turbulence(phi % urf)
-
+  ! Under-relax the equations
   do c = 1, grid % n_cells
     b(c) = b(c) + a % val(a % dia(c)) * (1.0 - phi % urf) * phi % n(c)  &
          / phi % urf
     a % val(a % dia(c)) = a % val(a % dia(c)) / phi % urf
   end do
 
-  ! Get phi % tolerance for linear solvers
-  call Control_Mod_Tolerance_For_Turbulence_Solver(phi % tol)
-
-  ! Get matrix precondioner
-  call Control_Mod_Preconditioner_For_System_Matrix(phi % precond)
-
-  ! Set the number of iterations then overwrite with control file if specified
-  phi % niter = 6
-  call Control_Mod_Max_Iterations_For_Turbulence_Solver(phi % niter)
-
+  ! Call linear solver to solve the equations
   call Bicg(sol,            &
             phi % n,        &
             b,              &
             phi % precond,  &
             phi % niter,    &
+            exec_iter,      &
             phi % tol,      &
-            ini_res,        &
             phi % res)
 
   do c = 1, grid % n_cells
     if( phi % n(c) < 0.0 ) phi % n(c) = phi % o(c)
   end do
 
+  ! Print info on the screen
   if(turbulence_model .eq. K_EPS        .or.  &
      turbulence_model .eq. K_EPS_ZETA_F .or.  &
      turbulence_model .eq. HYBRID_LES_RANS) then
     if(phi % name .eq. 'KIN')  &
-      call Info_Mod_Iter_Fill_At(3, 1, phi % name, phi % niter, phi % res)
+      call Info_Mod_Iter_Fill_At(3, 1, phi % name, exec_iter, phi % res)
     if(phi % name .eq. 'EPS')  &
-      call Info_Mod_Iter_Fill_At(3, 2, phi % name, phi % niter, phi % res)
+      call Info_Mod_Iter_Fill_At(3, 2, phi % name, exec_iter, phi % res)
     if(phi % name .eq. 'ZETA')  &
-      call Info_Mod_Iter_Fill_At(3, 3, phi % name, phi % niter, phi % res)
+      call Info_Mod_Iter_Fill_At(3, 3, phi % name, exec_iter, phi % res)
   end if
 
   if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
     if(phi % name .eq. 'T2')  &
-      call Info_Mod_Iter_Fill_At(3, 5, phi % name, phi % niter, phi % res)
+      call Info_Mod_Iter_Fill_At(3, 5, phi % name, exec_iter, phi % res)
   end if
 
   call Comm_Mod_Exchange_Real(grid, phi % n)

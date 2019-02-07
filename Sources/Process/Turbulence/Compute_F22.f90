@@ -14,7 +14,6 @@
   use Info_Mod,    only: Info_Mod_Iter_Fill_At
   use Solver_Mod,  only: Solver_Type, Bicg, Cg, Cgs
   use Matrix_Mod,  only: Matrix_Type
-  use Control_Mod
   use Work_Mod,    only: phi_x => r_cell_01,  &
                          phi_y => r_cell_02,  &
                          phi_z => r_cell_03
@@ -28,13 +27,10 @@
 !----------------------------------[Locals]------------------------------------!
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
-  integer                    :: s, c, c1, c2, niter
-  real                       :: f_ex, f_im 
+  integer                    :: s, c, c1, c2, exec_iter
+  real                       :: f_ex, f_im
   real                       :: a0, a12, a21
-  real                       :: ini_res, tol
   real                       :: phi_x_f, phi_y_f, phi_z_f
-  character(len=80)          :: precond
-  real                       :: urf           ! under-relaxation factor
 !==============================================================================!
 !                                                                              !
 !   The form of equations which are solved:                                    !
@@ -172,38 +168,28 @@
   !                                 !
   !---------------------------------!
 
-  ! Set under-relaxation factor then overwrite with control file if specified
-  urf = 1.0
-  call Control_Mod_Simple_Underrelaxation_For_Turbulence(urf)
-
+  ! Underrelax the equations
   do c = 1, grid % n_cells
-    b(c) = b(c) + a % val(a % dia(c)) * (1.0 - urf)*phi % n(c) / urf
-    a % val(a % dia(c)) = a % val(a % dia(c)) / urf
-  end do 
+    b(c) = b(c) + a % val(a % dia(c)) * (1.0 - phi % urf) * phi % n(c)  &
+         / phi % urf
+    a % val(a % dia(c)) = a % val(a % dia(c)) / phi % urf
+  end do
 
-  ! Get tolerance for linear solver
-  call Control_Mod_Tolerance_For_Turbulence_Solver(tol)
-
-  ! Get matrix precondioner
-  call Control_Mod_Preconditioner_For_System_Matrix(precond)
-
-  ! Set the number of iterations then overwrite with control file if specified
-  niter = 6
-  call Control_Mod_Max_Iterations_For_Turbulence_Solver(niter)
-
-  call Cg(sol,      &
-          phi % n,  &
-          b,        &
-          precond,  &
-          niter,    &
-          tol,      &
-          ini_res,  &
+  ! Call linear solver to solve the equations
+  call Cg(sol,            &
+          phi % n,        &
+          b,              &
+          phi % precond,  &
+          phi % niter,    &
+          exec_iter,      &
+          phi % tol,      &
           phi % res)
 
+  ! Print info on the screen
   if(turbulence_model .eq. K_EPS_ZETA_F) then
-    call Info_Mod_Iter_Fill_At(3, 4, phi % name, niter, phi % res)
+    call Info_Mod_Iter_Fill_At(3, 4, phi % name, exec_iter, phi % res)
   else if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
-    call Info_Mod_Iter_Fill_At(4, 2, phi % name, niter, phi % res)
+    call Info_Mod_Iter_Fill_At(4, 2, phi % name, exec_iter, phi % res)
   end if
 
   call Comm_Mod_Exchange_Real(grid, phi % n)
