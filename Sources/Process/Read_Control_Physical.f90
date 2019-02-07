@@ -1,9 +1,10 @@
 !==============================================================================!
-  subroutine Read_Physical(flow, backup)
+  subroutine Read_Control_Physical(flow, backup)
 !------------------------------------------------------------------------------!
-!   Reads details about physial models.                                        !
+!   Reads details about physial models from control file.                      !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
+  use Const_Mod,   only: HUGE_INT
   use Comm_Mod,    only: Comm_Mod_End, this_proc
   use Field_Mod,   only: Field_Type, buoyancy, heat_transfer,  &
                          grav_x, grav_y, grav_z
@@ -18,6 +19,7 @@
 !----------------------------------[Locals]------------------------------------!
   type(Bulk_Type), pointer :: bulk
   character(len=80)        :: name
+  integer                  :: n_times, n_stat
 !==============================================================================!
 
   ! Take aliases
@@ -40,7 +42,67 @@
   !   Related to turbulence   !
   !                           !
   !---------------------------!
-  call Control_Mod_Turbulence_Model(.true.)
+  call Control_Mod_Turbulence_Model(name, .true.)
+  select case(name)
+
+    case('NONE')
+      turbulence_model = NONE
+    case('K_EPS')
+      turbulence_model = K_EPS
+    case('K_EPS_ZETA_F')
+      turbulence_model = K_EPS_ZETA_F
+    case('LES_SMAGORINSKY')
+      turbulence_model = LES_SMAGORINSKY
+    case('LES_DYNAMIC')
+      turbulence_model = LES_DYNAMIC
+    case('LES_WALE')
+      turbulence_model = LES_WALE
+    case('DNS')
+      turbulence_model = DNS
+    case('DES_SPALART')
+      turbulence_model = DES_SPALART
+    case('SPALART_ALLMARAS')
+      turbulence_model = SPALART_ALLMARAS
+    case('RSM_HANJALIC_JAKIRLIC')
+      turbulence_model = RSM_HANJALIC_JAKIRLIC
+    case('RSM_MANCEAU_HANJALIC')
+      turbulence_model = RSM_MANCEAU_HANJALIC
+    case('HYBRID_LES_RANS')
+      turbulence_model = HYBRID_LES_RANS
+
+    case default
+      if(this_proc < 2) then
+        print *, '# ERROR!  Unknown turbulence model :', trim(name)
+        print *, '# Exiting!'
+      end if
+      call Comm_Mod_End
+
+  end select
+
+  ! Does the user want to gather statistics?
+  call Control_Mod_Read_Int_Item('NUMBER_OF_TIME_STEPS',               &
+                                 0, n_times, .false.)
+  call Control_Mod_Read_Int_Item('STARTING_TIME_STEP_FOR_STATISTICS',  &
+                                 HUGE_INT, n_stat, .false.)
+
+  !-------------------------------------------------------------------!
+  !   For scale-resolving simulations, engage turbulence statistics   !
+  !-------------------------------------------------------------------!
+  if(turbulence_model .eq. LES_SMAGORINSKY .or.  &
+     turbulence_model .eq. LES_DYNAMIC     .or.  &
+     turbulence_model .eq. LES_WALE        .or.  &
+     turbulence_model .eq. DNS             .or.  &
+     turbulence_model .eq. DES_SPALART     .or.  &
+     turbulence_model .eq. HYBRID_LES_RANS .or.  &
+     n_times > n_stat) then  ! last line covers unsteady RANS models
+
+    if(this_proc < 2) then
+      print *, '# NOTE! Scale resolving simulation used; ' // &
+               'turbulence statistics engaged!'
+    end if
+
+    turbulence_statistics = .true.
+  end if
 
   !------------------------------!
   !   Turbulence model variant   !

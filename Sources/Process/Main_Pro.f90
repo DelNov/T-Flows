@@ -86,7 +86,7 @@
   call Control_Mod_Starting_Time_Step_For_Statistics(n_stat, verbose=.true.)
 
   ! Read physical models from control file
-  call Read_Physical(flow, backup)
+  call Read_Control_Physical(flow, backup)
 
   ! Allocate memory for all variables
   call Field_Mod_Allocate(flow, grid)
