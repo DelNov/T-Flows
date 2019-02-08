@@ -40,7 +40,8 @@
     real                 :: tol         ! linear solver tolerance
     real                 :: urf         ! under-relaxation factor
     integer              :: niter       ! number of iterations
-
+    real, allocatable    :: max(:)      ! max and min around a face ...
+    real, allocatable    :: min(:)      ! important for advection schemes
   end type
 
   contains

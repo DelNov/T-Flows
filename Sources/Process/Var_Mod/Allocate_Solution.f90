@@ -45,4 +45,8 @@
   allocate (phi % y(-grid % n_bnd_cells : grid % n_cells));  phi % y = 0.0
   allocate (phi % z(-grid % n_bnd_cells : grid % n_cells));  phi % z = 0.0
 
+  ! Min and max
+  allocate (phi % min(-grid % n_bnd_cells : grid % n_cells));  phi % min = 0.0
+  allocate (phi % max(-grid % n_bnd_cells : grid % n_cells));  phi % max = 0.0
+
   end subroutine

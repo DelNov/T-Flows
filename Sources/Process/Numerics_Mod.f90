@@ -31,6 +31,7 @@
 
   include 'Numerics_Mod/Advection_Scheme.f90'
   include 'Numerics_Mod/Advection_Scheme_Code.f90'
+  include 'Numerics_Mod/Advection_Min_Max.f90'
   include 'Numerics_Mod/Time_Integration_Scheme_Code.f90'
 
   end module

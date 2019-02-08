@@ -12,12 +12,9 @@
   use Grid_Mod,     only: Grid_Type
   use Grad_Mod
   use Info_Mod
-  use Numerics_Mod, only: Numerics_Mod_Advection_Scheme,  &
-                          CENTRAL, LINEAR, PARABOLIC
+  use Numerics_Mod
   use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
   use Matrix_Mod,   only: Matrix_Type
-  use Work_Mod,     only: t_min => r_cell_04,  &
-                          t_max => r_cell_05
   use User_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -106,7 +103,7 @@
 
   ! Compute tmax and tmin
   if(t % adv_scheme .ne. CENTRAL) then
-    call Calculate_Minimum_Maximum(grid, t % n, t_min, t_max)
+    call Numerics_Mod_Advection_Min_Max(t)
   end if
 
   ! New values
@@ -128,10 +125,10 @@
 
     ! Compute ts with desired advection scheme
     if(t % adv_scheme .ne. CENTRAL) then
-      call Numerics_Mod_Advection_Scheme(flow, ts, s, t % n, t_min, t_max,  &
+      call Numerics_Mod_Advection_Scheme(ts, s, t,                          &
                                          t % x, t % y, t % z,               &
                                          grid % dx, grid % dy, grid % dz,   &
-                                         t % adv_scheme, t % blend)
+                                         flux)
     end if
 
     ! Compute advection term

@@ -14,13 +14,10 @@
   use Grid_Mod,     only: Grid_Type
   use Bulk_Mod,     only: Bulk_Type
   use Info_Mod,     only: Info_Mod_Iter_Fill_At
-  use Numerics_Mod, only: Numerics_Mod_Advection_Scheme,  &
-                          CENTRAL, LINEAR, PARABOLIC
+  use Numerics_Mod
   use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
   use Matrix_Mod,   only: Matrix_Type
   use User_Mod
-  use Work_Mod,     only: ui_min  => r_cell_01,  &
-                          ui_max  => r_cell_02
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -165,7 +162,7 @@
 
   ! Compute phimax and phimin
   if(ui % adv_scheme .ne. CENTRAL) then
-    call Calculate_Minimum_Maximum(grid, ui % n, ui_min, ui_max) ! or ui % o ?
+    call Numerics_Mod_Advection_Min_Max(ui)
     goto 1  ! why on Earth this?
   end if
 
@@ -187,10 +184,10 @@
     uis = grid % f(s) * ui % n(c1) + (1.0 - grid % f(s)) * ui % n(c2)
 
     if(ui % adv_scheme .ne. CENTRAL) then
-      call Numerics_Mod_Advection_Scheme(flow, uis, s, ui % n, ui_min, ui_max, &
-                                         ui_i, ui_j, ui_k,                     &
-                                         di, dj, dk,                           &
-                                         ui % adv_scheme, ui % blend)
+      call Numerics_Mod_Advection_Scheme(uis, s, ui,                   &
+                                         ui_i, ui_j, ui_k,             &
+                                         di, dj, dk,                   &
+                                         flux)
     end if
 
     ! Compute advection term

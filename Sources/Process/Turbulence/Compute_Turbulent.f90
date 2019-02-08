@@ -13,12 +13,9 @@
   use Grid_Mod,     only: Grid_Type
   use Grad_Mod,     only: Grad_Mod_Variable
   use Info_Mod,     only: Info_Mod_Iter_Fill_At
-  use Numerics_Mod, only: Numerics_Mod_Advection_Scheme,  &
-                          CENTRAL, LINEAR, PARABOLIC
+  use Numerics_Mod
   use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
   use Matrix_Mod,   only: Matrix_Type
-  use Work_Mod,     only: phi_min => r_cell_04,  &
-                          phi_max => r_cell_05
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
@@ -84,7 +81,7 @@
 
   ! Compute phimax and phimin
   if(phi % adv_scheme .ne. CENTRAL) then
-    call Calculate_Minimum_Maximum(grid, phi % n, phi_min, phi_max)
+    call Numerics_Mod_Advection_Min_Max(phi)
     goto 1
   end if
 
@@ -109,11 +106,11 @@
 
       ! Compute phis with desired advection scheme
       if(phi % adv_scheme .ne. CENTRAL) then
-        call Numerics_Mod_Advection_Scheme(flow, phis, s,                    &
-                                           phi % n, phi_min, phi_max,        &
+        call Numerics_Mod_Advection_Scheme(phis, s,                          &
+                                           phi,                              &
                                            phi % x, phi % y, phi % z,        &
                                            grid % dx, grid % dy, grid % dz,  &
-                                           phi % adv_scheme, phi % blend)
+                                           flux)
       end if
 
       ! Compute advection term
