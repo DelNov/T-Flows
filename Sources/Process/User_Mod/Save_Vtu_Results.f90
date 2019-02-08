@@ -19,24 +19,15 @@
   character(len=10)  :: IN_5 = '          '
 !==============================================================================!
 
-  !-----------------------!
-  !   Save user scalars   !
-  !-----------------------!
-  do us = 1, n_user_scalars
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, user_scalar(us) % name,  &
-                                           user_scalar(us) % n(1))
-  end do
-  
   !----------------------!
   !   Save user arrays   !
   !----------------------!
-  do ua = 1, n_user_arrays  
+  do ua = 1, n_user_arrays
 
     a_name = 'A_00'
     write(a_name(3:4), '(i2.2)') ua
 
     call Save_Vtu_Scalar(grid, IN_4, IN_5, a_name, user_array(ua,1))
   end do
-
 
   end subroutine  ! fourth level comments
