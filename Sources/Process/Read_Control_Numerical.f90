@@ -15,9 +15,9 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
 !----------------------------------[Locals]------------------------------------!
-  type(Var_Type),   pointer :: pp, t, tq, ui
+  type(Var_Type),   pointer :: pp, t, tq, ui, phi
   character(len=80)         :: name
-  integer                   :: i
+  integer                   :: i, sc
 !==============================================================================!
 
   ! Take aliases
@@ -33,15 +33,15 @@
     if(i .eq. 3) ui => flow % w
     ui % urf   = 0.8
     ui % niter = 5
-    call Control_Mod_Advection_Scheme_For_Momentum      (name)
-    call Numerics_Mod_Decode_Advection_Scheme           (name, ui % adv_scheme)
-    call Control_Mod_Time_Integration_Scheme            (name)
-    call Numerics_Mod_Decode_Time_Integration_Scheme    (name, ui % td_scheme)
-    call Control_Mod_Blending_Coefficient_For_Momentum  (ui % blend)
-    call Control_Mod_Simple_Underrelaxation_For_Momentum(ui % urf)
-    call Control_Mod_Tolerance_For_Momentum_Solver      (ui % tol)
-    call Control_Mod_Preconditioner_For_System_Matrix   (ui % precond)
-    call Control_Mod_Max_Iterations_For_Momentum_Solver (ui % niter)
+    call Control_Mod_Advection_Scheme_For_Momentum            (name)
+    ui % adv_scheme = Numerics_Mod_Advection_Scheme_Code      (name)
+    call Control_Mod_Time_Integration_Scheme                  (name)
+    ui % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
+    call Control_Mod_Blending_Coefficient_For_Momentum        (ui % blend)
+    call Control_Mod_Simple_Underrelaxation_For_Momentum      (ui % urf)
+    call Control_Mod_Tolerance_For_Momentum_Solver            (ui % tol)
+    call Control_Mod_Preconditioner_For_System_Matrix         (ui % precond)
+    call Control_Mod_Max_Iterations_For_Momentum_Solver       (ui % niter)
   end do
 
   !-------------------------!
@@ -59,16 +59,34 @@
   if(heat_transfer) then
     t % urf   = 0.7
     t % niter = 5
-    call Control_Mod_Advection_Scheme_For_Energy      (name)
-    call Numerics_Mod_Decode_Advection_Scheme         (name, t % adv_scheme)
-    call Control_Mod_Time_Integration_Scheme          (name)
-    call Numerics_Mod_Decode_Time_Integration_Scheme  (name, t % td_scheme)
-    call Control_Mod_Blending_Coefficient_For_Energy  (t % blend)
-    call Control_Mod_Simple_Underrelaxation_For_Energy(t % urf)
-    call Control_Mod_Tolerance_For_Energy_Solver      (t % tol)
-    call Control_Mod_Preconditioner_For_System_Matrix (t % precond)
-    call Control_Mod_Max_Iterations_For_Energy_Solver (t % niter)
+    call Control_Mod_Advection_Scheme_For_Energy             (name)
+    t % adv_scheme = Numerics_Mod_Advection_Scheme_Code      (name)
+    call Control_Mod_Time_Integration_Scheme                 (name)
+    t % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
+    call Control_Mod_Blending_Coefficient_For_Energy         (t % blend)
+    call Control_Mod_Simple_Underrelaxation_For_Energy       (t % urf)
+    call Control_Mod_Tolerance_For_Energy_Solver             (t % tol)
+    call Control_Mod_Preconditioner_For_System_Matrix        (t % precond)
+    call Control_Mod_Max_Iterations_For_Energy_Solver        (t % niter)
   end if
+
+  !--------------------------------!
+  !   Related to passive scalars   !
+  !--------------------------------!
+  do sc = 1, flow % n_scalars
+    phi => flow % scalar(sc)
+    phi % urf   = 0.7
+    phi % niter = 5
+    call Control_Mod_Advection_Scheme_For_Scalars              (name)
+    phi % adv_scheme = Numerics_Mod_Advection_Scheme_Code      (name)
+    call Control_Mod_Time_Integration_Scheme                   (name)
+    phi % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
+    call Control_Mod_Blending_Coefficient_For_Scalars          (phi % blend)
+    call Control_Mod_Simple_Underrelaxation_For_Scalars        (phi % urf)
+    call Control_Mod_Tolerance_For_Scalars_Solver              (phi % tol)
+    call Control_Mod_Preconditioner_For_System_Matrix          (phi % precond)
+    call Control_Mod_Max_Iterations_For_Scalars_Solver         (phi % niter)
+  end do
 
   !------------------------------!
   !   All turbuelnt quantities   !
@@ -88,15 +106,15 @@
     if(i .eq. 12) tq => vw
     tq % urf   = 1.0
     tq % niter = 6
-    call Control_Mod_Advection_Scheme_For_Turbulence      (name)
-    call Numerics_Mod_Decode_Advection_Scheme             (name, tq % adv_scheme)
-    call Control_Mod_Time_Integration_Scheme              (name)
-    call Numerics_Mod_Decode_Time_Integration_Scheme      (name, tq % td_scheme)
-    call Control_Mod_Blending_Coefficient_For_Turbulence  (tq % blend)
-    call Control_Mod_Simple_Underrelaxation_For_Turbulence(tq % urf)
-    call Control_Mod_Tolerance_For_Turbulence_Solver      (tq % tol)
-    call Control_Mod_Preconditioner_For_System_Matrix     (tq % precond)
-    call Control_Mod_Max_Iterations_For_Turbulence_Solver (tq % niter)
+    call Control_Mod_Advection_Scheme_For_Turbulence          (name)
+    tq % adv_scheme = Numerics_Mod_Advection_Scheme_Code      (name)
+    call Control_Mod_Time_Integration_Scheme                  (name)
+    tq % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
+    call Control_Mod_Blending_Coefficient_For_Turbulence      (tq % blend)
+    call Control_Mod_Simple_Underrelaxation_For_Turbulence    (tq % urf)
+    call Control_Mod_Tolerance_For_Turbulence_Solver          (tq % tol)
+    call Control_Mod_Preconditioner_For_System_Matrix         (tq % precond)
+    call Control_Mod_Max_Iterations_For_Turbulence_Solver     (tq % niter)
   end do
 
   end subroutine

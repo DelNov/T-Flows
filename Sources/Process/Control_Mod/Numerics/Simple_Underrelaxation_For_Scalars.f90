@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine Control_Mod_Max_Iterations_For_User_Scalars_Solver(val, verbose)
+  subroutine Control_Mod_Simple_Underrelaxation_For_Scalars(val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer           :: val
+  real              :: val
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Int_Item('MAX_ITERATIONS_FOR_USER_SCALARS_SOLVER',  &
-                                  val, val, verbose)
+  call Control_Mod_Read_Real_Item('SIMPLE_UNDERRELAXATION_FOR_SCALARS',  &
+                                   0.5, val, verbose)
 
   end subroutine

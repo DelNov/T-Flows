@@ -184,4 +184,11 @@
                                      bulk % flux_z_o)
   end if
 
+  !-------------------------------!
+  !                               !
+  !   Number of passive scalars   !
+  !                               !
+  !-------------------------------!
+  call Control_Mod_Number_Of_Scalars(flow % n_scalars, verbose = .true.)
+
   end subroutine

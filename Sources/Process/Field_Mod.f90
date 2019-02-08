@@ -25,12 +25,16 @@
     type(Var_Type) :: v
     type(Var_Type) :: w
 
+    ! Pressure and pressure correction
+    type(Var_Type) :: p
+    type(Var_Type) :: pp
+
     ! Temperature
     type(Var_Type) :: t
 
-    ! Pressure 
-    type(Var_Type) :: p
-    type(Var_Type) :: pp
+    ! Scalars (like chemical species for example)
+    integer                     :: n_scalars
+    type(Var_Type), allocatable :: scalar(:)
 
     ! Mass fluxes throught cell faces
     real, allocatable :: flux(:)

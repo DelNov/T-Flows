@@ -26,7 +26,7 @@
 !---------------------------------[Calling]------------------------------------!
   real :: Correct_Velocity
 !----------------------------------[Locals]------------------------------------!
-  integer           :: n, us
+  integer           :: n, sc
   real              :: mass_res, wall_time_start, wall_time_current
   character(len=80) :: name_save
   logical           :: backup, save_now, exit_now
@@ -247,9 +247,9 @@
         call Compute_Energy(flow, sol, dt, ini)
       end if
 
-      ! User scalars
-      do us = 1, n_user_scalars
-        call User_Mod_Compute_Scalar(flow, sol, dt, ini, user_scalar(us))
+      ! Passive scalars
+      do sc = 1, flow % n_scalars
+        call Compute_Scalar(flow, sol, dt, ini, sc)
       end do
 
       if(turbulence_model .eq. K_EPS) then

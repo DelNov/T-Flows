@@ -21,7 +21,7 @@
   integer, parameter :: AVL_SMART = 40111
 
   ! Variable holding time integration scheme
-  integer :: time_scheme
+  ! integer :: time_scheme
 
   ! Time integration parameters
   integer, parameter :: LINEAR    = 40123
@@ -30,7 +30,7 @@
   contains
 
   include 'Numerics_Mod/Advection_Scheme.f90'
-  include 'Numerics_Mod/Decode_Advection_Scheme.f90'
-  include 'Numerics_Mod/Decode_Time_Integration_Scheme.f90'
+  include 'Numerics_Mod/Advection_Scheme_Code.f90'
+  include 'Numerics_Mod/Time_Integration_Scheme_Code.f90'
 
   end module

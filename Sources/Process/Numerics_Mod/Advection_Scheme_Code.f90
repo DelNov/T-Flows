@@ -1,7 +1,7 @@
 !==============================================================================!
-  subroutine Numerics_Mod_Decode_Advection_Scheme(scheme_name, scheme_code)
+  integer function Numerics_Mod_Advection_Scheme_Code(scheme_name)
 !------------------------------------------------------------------------------!
-!   Decode the string value on advection scheme_code from control file              !
+!   Decode the string value on advection scheme from control file              !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Comm_Mod, only: this_proc, Comm_Mod_End
@@ -9,38 +9,39 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   character(len=80) :: scheme_name
-  integer           :: scheme_code
 !==============================================================================!
 
   select case(scheme_name)
 
     case('UPWIND')
-      scheme_code = UPWIND
+      Numerics_Mod_Advection_Scheme_Code = UPWIND
     case('CENTRAL')
-      scheme_code = CENTRAL
+      Numerics_Mod_Advection_Scheme_Code = CENTRAL
     case('LUDS')
-      scheme_code = LUDS
+      Numerics_Mod_Advection_Scheme_Code = LUDS
     case('QUICK')
-      scheme_code = QUICK
+      Numerics_Mod_Advection_Scheme_Code = QUICK
     case('SMART')
-      scheme_code = SMART
+      Numerics_Mod_Advection_Scheme_Code = SMART
     case('GAMMA')
-      scheme_code = GAMMA
+      Numerics_Mod_Advection_Scheme_Code = GAMMA
     case('MINMOD')
-      scheme_code = MINMOD
+      Numerics_Mod_Advection_Scheme_Code = MINMOD
     case('BLENDED')
-      scheme_code = BLENDED
+      Numerics_Mod_Advection_Scheme_Code = BLENDED
     case('SUPERBEE')
-      scheme_code = SUPERBEE
+      Numerics_Mod_Advection_Scheme_Code = SUPERBEE
     case('AVL_SMART')
-      scheme_code = AVL_SMART
+      Numerics_Mod_Advection_Scheme_Code = AVL_SMART
 
     case default
       if(this_proc < 2) then
-        print *, '# ERROR!  Advection scheme_code for energy not found.  Exiting!'
+        print *, '# ERROR!  Unknown advection scheme: ',  &
+                 trim(scheme_name)
+        print *, '# Exiting!'
       end if
       call Comm_Mod_End
 
   end select
 
-  end subroutine
+  end function

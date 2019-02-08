@@ -1,13 +1,14 @@
 !==============================================================================!
-  subroutine Control_Mod_Simple_Underrelaxation_For_User_Scalars(val, verbose)
+  subroutine Control_Mod_Number_Of_Scalars(val, verbose)
+!------------------------------------------------------------------------------!
+!   Reading stuff related to passive scalars                                   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real              :: val
+  integer           :: val
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Real_Item('SIMPLE_UNDERRELAXATION_FOR_USER_SCALARS',  &
-                                   0.5, val, verbose)
+  call Control_Mod_Read_Int_Item('NUMBER_OF_SCALARS', 0, val, verbose)
 
   end subroutine
