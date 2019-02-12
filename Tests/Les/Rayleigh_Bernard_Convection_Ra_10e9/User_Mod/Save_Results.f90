@@ -1,13 +1,15 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(grid, save_name) 
+  subroutine User_Mod_Save_Results(flow, save_name)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
 !                                                                              !
 !   The results are then writen in files name_res.dat and name_res_plus.dat    !
 !------------------------------------------------------------------------------!
-  use Grid_Mod
-  use Flow_Mod
+  use Grid_Mod,  only: Grid_Type
+  use Field_Mod
+  use Var_Mod,   only: Var_Type
+  use Bulk_Mod,  only: Bulk_Type
   use Rans_Mod
   use Comm_Mod                       ! parallel stuff
   use Name_Mod,  only: problem_name
@@ -15,21 +17,32 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)  :: grid
-  character(len=*) :: save_name
+  type(Field_Type), target :: flow
+  character(len=*)         :: save_name
 !-----------------------------------[Locals]-----------------------------------!
-  integer             :: n_prob, pl, c, i, count, s, c1, c2, n_points
-  character(len=80)   :: coord_name, res_name, res_name_plus
-  character(len=80)   :: store_name
-  real,allocatable    :: z_p(:), u_p(:), v_p(:), w_p(:), t_p(:), y_plus_p(:),  &
-                         ind(:),  wall_p(:), kin_p(:), eps_p(:),               &
-                         uw_p(:), uu_p(:), vv_p(:), ww_p(:),                   &
-                         tt_p(:), ut_p(:), vt_p(:), wt_p(:),                   &
-  integer,allocatable :: n_p(:), n_count(:)
-  real                :: t_wall, t_tau, d_wall, nu_max 
-  real                :: ubulk, error, re, cf_dean, cf, pr, u_tau_p
-  logical             :: there
+  type(Var_Type),  pointer :: u, v, w, t
+  type(Grid_Type), pointer :: grid
+  type(Bulk_Type), pointer :: bulk
+  integer                  :: n_prob, pl, c, i, count, s, c1, c2, n_points
+  character(len=80)        :: coord_name, res_name, res_name_plus
+  character(len=80)        :: store_name
+  real, allocatable        :: z_p(:), u_p(:), v_p(:), w_p(:), t_p(:),  &
+                              ind(:),  wall_p(:), kin_p(:), eps_p(:),  &
+                              uw_p(:), uu_p(:), vv_p(:), ww_p(:),      &
+                              tt_p(:), ut_p(:), vt_p(:), wt_p(:)
+  integer, allocatable     :: n_p(:), n_count(:)
+  real                     :: t_wall, t_tau, d_wall, nu_max, t_inf
+  real                     :: ubulk, error, re, cf_dean, cf, pr, u_tau_p
+  logical                  :: there
 !==============================================================================!
+
+  ! Take aliases
+  grid => flow % pnt_grid
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+  t    => flow % t
+  bulk => flow % bulk
 
   ! Set the name for coordinate file
   call Name_File(0, coord_name, ".1d")
