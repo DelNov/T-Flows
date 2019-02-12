@@ -1,29 +1,30 @@
 !==============================================================================!
-  subroutine Grad_Mod_Pressure(grid, phi, phi_x, phi_y, phi_z)
+  subroutine Grad_Mod_Pressure(phi)
 !------------------------------------------------------------------------------!
 !   Calculates gradient of pressure of pressure correction.
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Comm_Mod
-  use Grid_Mod
+  use Var_Mod,  only: Var_Type
+  use Grid_Mod, only: Grid_Type, Grid_Mod_Bnd_Cond_Type, PRESSURE
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
-  real            :: phi  (-grid % n_bnd_cells:grid % n_cells),  &
-                     phi_x(-grid % n_bnd_cells:grid % n_cells),  &
-                     phi_y(-grid % n_bnd_cells:grid % n_cells),  &
-                     phi_z(-grid % n_bnd_cells:grid % n_cells)
+  type(Var_Type), target :: phi
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: s, c, c1, c2, iter
+  type(Grid_Type), pointer :: grid
+  integer                  :: s, c, c1, c2, iter
 !==============================================================================!
- 
-  call Comm_Mod_Exchange_Real(grid, phi)
+
+  ! Take aliases
+  grid  => phi % pnt_grid
+
+  call Comm_Mod_Exchange_Real(grid, phi % n)
 
   do c = 1, grid % n_cells
-    phi_x(c)=0.0
-    phi_y(c)=0.0
-    phi_z(c)=0.0
+    phi % x(c) = 0.0
+    phi % y(c) = 0.0
+    phi % z(c) = 0.0
   end do
 
   do s = 1, grid % n_faces
@@ -31,14 +32,14 @@
     c2 = grid % faces_c(2,s)
     if(c2 < 0) then
       if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. PRESSURE) then  
-        phi(c2) = phi(c1)
+        phi % n(c2) = phi % n(c1)
       end if
     end if
   end do
 
-  call Grad_Mod_Component(grid, phi, 1, phi_x, .true.)  ! dp/dx
-  call Grad_Mod_Component(grid, phi, 2, phi_y, .true.)  ! dp/dy
-  call Grad_Mod_Component(grid, phi, 3, phi_z, .true.)  ! dp/dz
+  call Grad_Mod_Component(grid, phi % n, 1, phi % x, .true.)  ! dp/dx
+  call Grad_Mod_Component(grid, phi % n, 2, phi % y, .true.)  ! dp/dy
+  call Grad_Mod_Component(grid, phi % n, 3, phi % z, .true.)  ! dp/dz
 
   do iter=1, 1
 
@@ -47,17 +48,18 @@
       c2 = grid % faces_c(2,s)
       if(c2 < 0) then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. PRESSURE) then
-          phi(c2) = phi(c1) + 1.2*( phi_x(c1) * (grid % xc(c2)-grid % xc(c1))  &
-                            +       phi_y(c1) * (grid % yc(c2)-grid % yc(c1))  &
-                            +       phi_z(c1) * (grid % zc(c2)-grid % zc(c1))  &
+          phi % n(c2) = phi % n(c1)   &
+                      + 1.2*( phi % x(c1) * (grid % xc(c2)-grid % xc(c1))  &
+                      +       phi % y(c1) * (grid % yc(c2)-grid % yc(c1))  &
+                      +       phi % z(c1) * (grid % zc(c2)-grid % zc(c1))  &
                             )
         end if
       end if
     end do
 
-    call Grad_Mod_Component(grid, phi, 1, phi_x, .true.)  ! dp/dx
-    call Grad_Mod_Component(grid, phi, 2, phi_y, .true.)  ! dp/dy
-    call Grad_Mod_Component(grid, phi, 3, phi_z, .true.)  ! dp/dz 
+    call Grad_Mod_Component(grid, phi % n, 1, phi % x, .true.)  ! dp/dx
+    call Grad_Mod_Component(grid, phi % n, 2, phi % y, .true.)  ! dp/dy
+    call Grad_Mod_Component(grid, phi % n, 3, phi % z, .true.)  ! dp/dz
 
   end do
 

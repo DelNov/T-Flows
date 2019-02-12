@@ -1,24 +1,36 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Time_Step(grid, n, time)
+  subroutine User_Mod_End_Of_Time_Step(flow, n, time)
 !------------------------------------------------------------------------------!
 !   This function is called at the beginning of time step.                     !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Grid_Mod
-  use Flow_Mod
+  use Grid_Mod,  only: Grid_Type
+  use Field_Mod, only: Field_Type,  &
+                       viscosity, density, conductivity, heat_transfer
+  use Var_Mod,   only: Var_Type
   use Const_Mod, only: PI
   use Comm_Mod,  only: Comm_Mod_Global_Max_Real, this_proc
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
-  integer         :: n     ! time step
-  real            :: time  ! physical time
+  type(Field_Type), target :: flow
+  integer                  :: n     ! time step
+  real                     :: time  ! physical time
 !----------------------------------[Locals]------------------------------------!
-  integer :: c, e, dir
-  real    :: lo, xo(4), yo(4), zo, ro, xc, yc, zc, vc, wc, sig_x, sig_yz,  &
-             rmin, rmax, sg, lx, ly, lz, vmax
+  type(Var_Type),  pointer :: u, v, w, t
+  type(Grid_Type), pointer :: grid
+  integer                  :: c, e, dir
+  real                     :: lo, xo(4), yo(4),                           &
+                              zo, ro, xc, yc, zc, vc, wc, sig_x, sig_yz,  &
+                              rmin, rmax, sg, lx, ly, lz, vmax
 !==============================================================================!
+
+  ! Take aliases
+  grid => flow % pnt_grid
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+  t    => flow % t
 
   ! If not time for disturbing the velocity field, return
   if(mod(n-33, 1500) .ne. 0) return

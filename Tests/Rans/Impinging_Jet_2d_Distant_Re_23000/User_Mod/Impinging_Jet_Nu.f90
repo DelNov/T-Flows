@@ -1,11 +1,13 @@
 !==============================================================================!
-  subroutine User_Mod_Impinging_Jet_Nu(grid, save_name)     
+  subroutine User_Mod_Impinging_Jet_Nu(flow, save_name)     
 !------------------------------------------------------------------------------!
 !   The subroutine creates ASCII file with Nusselt number averaged             !
-!   in azimuthal direction.                                                    !    
+!   in azimuthal direction.                                                    !
 !------------------------------------------------------------------------------!
-  use Grid_Mod
-  use Flow_Mod
+  use Grid_Mod,  only: Grid_Type
+  use Field_Mod, only: Field_Type,  &
+                       viscosity, density, conductivity, heat_transfer
+  use Var_Mod,   only: Var_Type
   use Rans_Mod
   use Comm_Mod                       ! parallel stuff
   use Name_Mod,  only: problem_name
@@ -13,23 +15,32 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)  :: grid
-  character(len=*) :: save_name
+  type(Field_Type), target :: flow
+  character(len=*)         :: save_name
 !-----------------------------------[Locals]-----------------------------------!
-  integer             :: n_prob, pl, i, count, s, c1, c2
-  character(len=80)   :: res_name, store_name
-  real, allocatable   :: z_p(:),                              &
-                         um_p(:), vm_p(:), wm_p(:), tm_p(:),  &
-                         uu_p(:), vv_p(:), ww_p(:),           &
-                         uv_p(:), uw_p(:), vw_p(:),           &
-                         v1_p(:), v2_p(:), v3_p(:),           &
-                         v4_p(:), v5_p(:), v6_p(:),           &
-                         rm_p(:), rad_1(:),                   &
-                         ind(:)
-  integer,allocatable :: n_p(:), n_count(:)
-  real                :: r
-  logical             :: there
+  type(Var_Type),  pointer :: u, v, w, t
+  type(Grid_Type), pointer :: grid
+  integer                  :: n_prob, pl, i, count, s, c1, c2
+  character(len=80)        :: res_name, store_name
+  real, allocatable        :: z_p(:),                              &
+                              um_p(:), vm_p(:), wm_p(:), tm_p(:),  &
+                              uu_p(:), vv_p(:), ww_p(:),           &
+                              uv_p(:), uw_p(:), vw_p(:),           &
+                              v1_p(:), v2_p(:), v3_p(:),           &
+                              v4_p(:), v5_p(:), v6_p(:),           &
+                              rm_p(:), rad_1(:),                   &
+                              ind(:)
+  integer,allocatable      :: n_p(:), n_count(:)
+  real                     :: r
+  logical                  :: there
 !==============================================================================!
+
+  ! Take aliases
+  grid => flow % pnt_grid
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+  t    => flow % t
 
   inquire( file='rad_coordinate.dat', exist=there ) 
   if(.not.there) then

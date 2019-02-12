@@ -302,9 +302,9 @@
     call Write_Link_To_Field(base, block, solution, "CellDelta")
   end if
 
-  !-----------------------!
-  !   Save user scalars   !
-  !-----------------------!
+  !----------------------!
+  !   Save user arrays   !
+  !----------------------!
   call User_Mod_Save_Cgns_Results(base, block, solution, field, grid)
 
   !----------------------------!

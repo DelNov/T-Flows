@@ -13,12 +13,9 @@
   use Grid_Mod,     only: Grid_Type
   use Grad_Mod,     only: Grad_Mod_Variable
   use Info_Mod,     only: Info_Mod_Iter_Fill_At
-  use Control_Mod
-  use Numerics_Mod, only: CENTRAL, LINEAR, PARABOLIC
+  use Numerics_Mod
   use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
   use Matrix_Mod,   only: Matrix_Type
-  use Work_Mod,     only: phi_min => r_cell_04,  &
-                          phi_max => r_cell_05
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
@@ -34,18 +31,12 @@
   real,              pointer :: flux(:)
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
-  integer                    :: s, c, c1, c2, niter
+  integer                    :: s, c, c1, c2, exec_iter
   real                       :: f_ex, f_im
   real                       :: phis
   real                       :: a0, a12, a21
-  real                       :: ini_res, tol
   real                       :: vis_eff
   real                       :: phi_x_f, phi_y_f, phi_z_f
-  character(len=80)          :: precond
-  integer                    :: adv_scheme  ! advection scheme
-  real                       :: blend       ! blending (1.0 central; 0.0 upwind)
-  integer                    :: td_scheme   ! time-disretization for inerita
-  real                       :: urf         ! under-relaxation factor
 !==============================================================================!
 !                                                                              !
 !  The form of equations which are solved:                                     !
@@ -88,13 +79,9 @@
   !               !
   !---------------!
 
-  ! Retreive advection scheme and blending coefficient
-  call Control_Mod_Advection_Scheme_For_Turbulence(adv_scheme)
-  call Control_Mod_Blending_Coefficient_For_Turbulence(blend)
-
   ! Compute phimax and phimin
-  if(adv_scheme .ne. CENTRAL) then
-    call Calculate_Minimum_Maximum(grid, phi % n, phi_min, phi_max)
+  if(phi % adv_scheme .ne. CENTRAL) then
+    call Numerics_Mod_Advection_Min_Max(phi)
     goto 1
   end if
 
@@ -118,11 +105,12 @@
            + (1.0 - grid % f(s)) * phi % n(c2)
 
       ! Compute phis with desired advection scheme
-      if(adv_scheme .ne. CENTRAL) then
-        call Advection_Scheme(flow, phis, s, phi % n, phi_min, phi_max,  &
-                              phi % x, phi % y, phi % z,                       &
-                              grid % dx, grid % dy, grid % dz,           &
-                              adv_scheme, blend)
+      if(phi % adv_scheme .ne. CENTRAL) then
+        call Numerics_Mod_Advection_Scheme(phis, s,                          &
+                                           phi,                              &
+                                           phi % x, phi % y, phi % z,        &
+                                           grid % dx, grid % dy, grid % dz,  &
+                                           flux)
       end if
 
       ! Compute advection term
@@ -271,10 +259,8 @@
   !                    !
   !--------------------!
 
-  call Control_Mod_Time_Integration_Scheme(td_scheme)
-
   ! Two time levels; linear interpolation
-  if(td_scheme .eq. LINEAR) then
+  if(phi % td_scheme .eq. LINEAR) then
     do c = 1, grid % n_cells
       a0 = density*grid % vol(c)/dt
       a % val(a % dia(c)) = a % val(a % dia(c)) + a0
@@ -283,7 +269,7 @@
   end if
 
   ! Three time levels; parabolic interpolation
-  if(td_scheme .eq. PARABOLIC) then
+  if(phi % td_scheme .eq. PARABOLIC) then
     do c = 1, grid % n_cells
       a0 = density*grid % vol(c)/dt
       a % val(a % dia(c)) = a % val(a % dia(c)) + 1.5 * a0
@@ -325,52 +311,42 @@
   !                                 !
   !---------------------------------!
 
-  ! Set under-relaxation factor then overwrite with control file if specified
-  urf = 1.0
-  call Control_Mod_Simple_Underrelaxation_For_Turbulence(urf)
-
+  ! Under-relax the equations
   do c = 1, grid % n_cells
-    b(c) = b(c) + a % val(a % dia(c)) * (1.0 - urf) * phi % n(c) / urf
-    a % val(a % dia(c)) = a % val(a % dia(c)) / urf
+    b(c) = b(c) + a % val(a % dia(c)) * (1.0 - phi % urf) * phi % n(c)  &
+         / phi % urf
+    a % val(a % dia(c)) = a % val(a % dia(c)) / phi % urf
   end do
 
-  ! Get tolerance for linear solvers
-  call Control_Mod_Tolerance_For_Turbulence_Solver(tol)
-
-  ! Get matrix precondioner
-  call Control_Mod_Preconditioner_For_System_Matrix(precond)
-
-  ! Set the number of iterations then overwrite with control file if specified
-  niter = 6
-  call Control_Mod_Max_Iterations_For_Turbulence_Solver(niter)
-
-  call Bicg(sol,      &
-            phi % n,  &
-            b,        &
-            precond,  &
-            niter,    &
-            tol,      &
-            ini_res,  &
+  ! Call linear solver to solve the equations
+  call Bicg(sol,            &
+            phi % n,        &
+            b,              &
+            phi % precond,  &
+            phi % niter,    &
+            exec_iter,      &
+            phi % tol,      &
             phi % res)
 
   do c = 1, grid % n_cells
     if( phi % n(c) < 0.0 ) phi % n(c) = phi % o(c)
   end do
 
+  ! Print info on the screen
   if(turbulence_model .eq. K_EPS        .or.  &
      turbulence_model .eq. K_EPS_ZETA_F .or.  &
      turbulence_model .eq. HYBRID_LES_RANS) then
     if(phi % name .eq. 'KIN')  &
-      call Info_Mod_Iter_Fill_At(3, 1, phi % name, niter, phi % res)
+      call Info_Mod_Iter_Fill_At(3, 1, phi % name, exec_iter, phi % res)
     if(phi % name .eq. 'EPS')  &
-      call Info_Mod_Iter_Fill_At(3, 2, phi % name, niter, phi % res)
+      call Info_Mod_Iter_Fill_At(3, 2, phi % name, exec_iter, phi % res)
     if(phi % name .eq. 'ZETA')  &
-      call Info_Mod_Iter_Fill_At(3, 3, phi % name, niter, phi % res)
+      call Info_Mod_Iter_Fill_At(3, 3, phi % name, exec_iter, phi % res)
   end if
 
   if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
     if(phi % name .eq. 'T2')  &
-      call Info_Mod_Iter_Fill_At(3, 5, phi % name, niter, phi % res)
+      call Info_Mod_Iter_Fill_At(3, 5, phi % name, exec_iter, phi % res)
   end if
 
   call Comm_Mod_Exchange_Real(grid, phi % n)

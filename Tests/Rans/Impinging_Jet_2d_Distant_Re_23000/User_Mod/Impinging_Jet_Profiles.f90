@@ -1,12 +1,14 @@
 !==============================================================================!
-  subroutine User_Mod_Impinging_Jet_Profiles(grid, save_name) 
+  subroutine User_Mod_Impinging_Jet_Profiles(flow, save_name)
 !------------------------------------------------------------------------------!
 !   Subroutine reads ".1D" file created by the "Generator" or "Convert"        !
 !   and extracts profiles on several locations that corresponds with the       !
 !   experimental measurements.                                                 !
 !------------------------------------------------------------------------------!
-  use Grid_Mod
-  use Flow_Mod
+  use Grid_Mod,  only: Grid_Type
+  use Field_Mod, only: Field_Type,  &
+                       viscosity, density, conductivity, heat_transfer
+  use Var_Mod,   only: Var_Type
   use Rans_Mod
   use Comm_Mod                       ! parallel stuff
   use Name_Mod,  only: problem_name
@@ -15,21 +17,30 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)  :: grid
-  character(len=*) :: save_name
+  type(Field_Type), target :: flow
+  character(len=*)         :: save_name
 !-----------------------------------[Locals]-----------------------------------!
-  integer             :: n_prob, pl, i, count, s, c, idumm, k
-  character(len=80)   :: coord_name, res_name, store_name, ext
-  real, allocatable   :: z_p(:),                              &
-                         um_p(:), vm_p(:), wm_p(:), tm_p(:),  &
-                         v1_p(:), v2_p(:), v3_p(:),           &
-                         v4_p(:), v5_p(:), v6_p(:),           &
-                         zm_p(:), rad_1(:),                   &
-                         ind(:)
-  integer,allocatable :: n_p(:), n_count(:)
-  real                :: r, r1, r2, u_aver, u_rad, u_tan, lnum
-  logical             :: there
+  type(Var_Type),  pointer :: u, v, w, t
+  type(Grid_Type), pointer :: grid
+  integer                  :: n_prob, pl, i, count, s, c, idumm, k
+  character(len=80)        :: coord_name, res_name, store_name, ext
+  real, allocatable        :: z_p(:),                              &
+                              um_p(:), vm_p(:), wm_p(:), tm_p(:),  &
+                              v1_p(:), v2_p(:), v3_p(:),           &
+                              v4_p(:), v5_p(:), v6_p(:),           &
+                              zm_p(:), rad_1(:),                   &
+                              ind(:)
+  integer, allocatable     :: n_p(:), n_count(:)
+  real                     :: r, r1, r2, u_aver, u_rad, u_tan, lnum
+  logical                  :: there
 !==============================================================================!
+
+  ! Take aliases
+  grid => flow % pnt_grid
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+  t    => flow % t
 
   u_aver = 1.14
 

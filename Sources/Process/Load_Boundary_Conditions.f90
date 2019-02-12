@@ -24,7 +24,8 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: u, v, w, t, p
-  integer                  :: c, m, l, k, i, n, n_points, nks, nvs, us, c1, c2, s
+  type(Var_Type),  pointer :: scalar(:)
+  integer                  :: c, m, l, k, i, n, n_points, nks, nvs, sc, c1, c2, s
   character(len=80)        :: name_prof(128), answer, name_in
   real                     :: wi, dist_min, x, y, z, xp, dist
   real, allocatable        :: prof(:,:)
@@ -41,12 +42,13 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => flow % pnt_grid
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
-  t    => flow % t
-  p    => flow % p
+  grid   => flow % pnt_grid
+  u      => flow % u
+  v      => flow % v
+  w      => flow % w
+  t      => flow % t
+  p      => flow % p
+  scalar => flow % scalar
 
   !--------------------------------------------!
   !   Full name is specified in control file   !
@@ -209,12 +211,12 @@
               if(i > 0) t % bnd_cell_type(c) = bc_type_tag
             end if
 
-            ! For user scalars
-            do us = 1, n_user_scalars
-              i = Key_Ind(user_scalar(us) % name, keys, nks)
-              if(i > 0) user_scalar(us) % bnd_cell_type(c) = bc_type_tag
-              i = Key_Ind(user_scalar(us) % flux_name, keys, nks)
-              if(i > 0) user_scalar(us) % bnd_cell_type(c) = bc_type_tag
+            ! For scalars
+            do sc = 1, flow % n_scalars
+              i = Key_Ind(scalar(sc) % name, keys, nks)
+              if(i > 0) scalar(sc) % bnd_cell_type(c) = bc_type_tag
+              i = Key_Ind(scalar(sc) % flux_name, keys, nks)
+              if(i > 0) scalar(sc) % bnd_cell_type(c) = bc_type_tag
             end do
 
           end if  ! bnd_color .eq. n
@@ -240,12 +242,12 @@
               if(i > 0) t % q(c) = vals(i)
             end if
 
-            ! For user scalars
-            do us = 1, n_user_scalars
-              i = Key_Ind(user_scalar(us) % name, keys, nks)
-              if(i > 0) user_scalar(us) % n(c) = vals(i)
-              i = Key_Ind(user_scalar(us) % flux_name, keys, nks)
-              if(i > 0) user_scalar(us) % q(c) = vals(i)
+            ! For scalars
+            do sc = 1, flow % n_scalars
+              i = Key_Ind(scalar(sc) % name, keys, nks)
+              if(i > 0) scalar(sc) % n(c) = vals(i)
+              i = Key_Ind(scalar(sc) % flux_name, keys, nks)
+              if(i > 0) scalar(sc) % q(c) = vals(i)
             end do
 
             ! For turbulence models
@@ -339,12 +341,12 @@
                 if(i > 0) t % bnd_cell_type(c) = bc_type_tag
               end if
 
-              ! For user scalars
-              do us = 1, n_user_scalars
-                i = Key_Ind(user_scalar(us) % name, keys, nks)
-                if(i > 0) user_scalar(us) % bnd_cell_type(c) = bc_type_tag
-                i = Key_Ind(user_scalar(us) % flux_name, keys, nks)
-                if(i > 0) user_scalar(us) % bnd_cell_type(c) = bc_type_tag
+              ! For scalars
+              do sc = 1, flow % n_scalars
+                i = Key_Ind(scalar(sc) % name, keys, nks)
+                if(i > 0) scalar(sc) % bnd_cell_type(c) = bc_type_tag
+                i = Key_Ind(scalar(sc) % flux_name, keys, nks)
+                if(i > 0) scalar(sc) % bnd_cell_type(c) = bc_type_tag
               end do
 
             end if
@@ -396,12 +398,12 @@
                 if(i > 0) t % q(c) = prof(k,i)
               end if
 
-              ! For user scalars
-              do us = 1, n_user_scalars
-                i = Key_Ind(user_scalar(us) % name, keys, nks)
-                if(i > 0) user_scalar(us) % n(c) = prof(k,i)
-                i = Key_Ind(user_scalar(us) % flux_name, keys, nks)
-                if(i > 0) user_scalar(us) % q(c) = prof(k,i)
+              ! For scalars
+              do sc = 1, flow % n_scalars
+                i = Key_Ind(scalar(sc) % name, keys, nks)
+                if(i > 0) scalar(sc) % n(c) = prof(k,i)
+                i = Key_Ind(scalar(sc) % flux_name, keys, nks)
+                if(i > 0) scalar(sc) % q(c) = prof(k,i)
               end do
 
               ! For turbulence models
@@ -506,12 +508,12 @@
                     if(i > 0) t % bnd_cell_type(c) = bc_type_tag
                   end if
 
-                  ! For user scalars
-                  do us = 1, n_user_scalars
-                    i = Key_Ind(user_scalar(us) % name, keys, nks)
-                    if(i > 0) user_scalar(us) % bnd_cell_type(c) = bc_type_tag
-                    i = Key_Ind(user_scalar(us) % flux_name, keys, nks)
-                    if(i > 0) user_scalar(us) % bnd_cell_type(c) = bc_type_tag
+                  ! For scalars
+                  do sc = 1, flow % n_scalars
+                    i = Key_Ind(scalar(sc) % name, keys, nks)
+                    if(i > 0) scalar(sc) % bnd_cell_type(c) = bc_type_tag
+                    i = Key_Ind(scalar(sc) % flux_name, keys, nks)
+                    if(i > 0) scalar(sc) % bnd_cell_type(c) = bc_type_tag
                   end do
 
                 end if  ! here
@@ -586,14 +588,14 @@
                     if(i > 0) t % bnd_cell_type(c) = bc_type_tag
                   end if
 
-                  ! For user scalars
-                  do us = 1, n_user_scalars
-                    i = Key_Ind(user_scalar(us) % name, keys, nks)
+                  ! For scalars
+                  do sc = 1, flow % n_scalars
+                    i = Key_Ind(scalar(sc) % name, keys, nks)
                     if(i > 0) &
-                      user_scalar(us) % n(c)=wi*prof(m,i)+(1.-wi)*prof(m+1,i)
-                    i = Key_Ind(user_scalar(us) % flux_name, keys, nks)
+                      scalar(sc) % n(c)=wi*prof(m,i)+(1.-wi)*prof(m+1,i)
+                    i = Key_Ind(scalar(sc) % flux_name, keys, nks)
                     if(i > 0) &
-                      user_scalar(us) % q(c)=wi*prof(m,i)+(1.-wi)*prof(m+1,i)
+                      scalar(sc) % q(c)=wi*prof(m,i)+(1.-wi)*prof(m+1,i)
                   end do
 
                   ! For turbulence models

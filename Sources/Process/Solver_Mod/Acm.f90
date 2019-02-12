@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Acm(sol, x, b, prec, n_cycles, tol, ini_res, fin_res, norm)
+  subroutine Acm(sol, x, b, prec, n_cycles, tol, fin_res, norm)
 !------------------------------------------------------------------------------!
 !   This is the nucleus of the Additive Correction Multigrid method.           !
 !------------------------------------------------------------------------------!
@@ -17,7 +17,6 @@
   character(len=80) :: prec                              ! preconditioner
   integer           :: n_cycles                          ! number of cycles
   real              :: tol                               ! tolerance
-  real              :: ini_res                           ! (unused)
   real              :: fin_res                           ! final residual
   real, optional    :: norm                              ! normalization
 !-----------------------------------[Locals]-----------------------------------!

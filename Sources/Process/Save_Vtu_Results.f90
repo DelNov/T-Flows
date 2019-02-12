@@ -342,9 +342,9 @@
   call Save_Vtu_Scalar(grid, IN_4, IN_5, "WallDistance", grid % wall_dist(1))
   call Save_Vtu_Scalar(grid, IN_4, IN_5, "CellDelta",    grid % delta(1))
 
-  !-----------------------!
-  !   Save user scalars   !
-  !-----------------------!
+  !----------------------!
+  !   Save user arrays   !
+  !----------------------!
   call User_Mod_Save_Vtu_Results(grid)
 
   !----------------------!

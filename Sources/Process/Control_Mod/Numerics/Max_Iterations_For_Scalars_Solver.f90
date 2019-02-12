@@ -1,14 +1,13 @@
 !==============================================================================!
-  subroutine Control_Mod_Time_Integration_Scheme(scheme_name, verbose)
+  subroutine Control_Mod_Max_Iterations_For_Scalars_Solver(val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(len=80) :: scheme_name
+  integer           :: val
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('TIME_INTEGRATION_SCHEME', 'linear',  &
-                                   scheme_name, verbose)
-  call To_Upper_Case(scheme_name)
+  call Control_Mod_Read_Int_Item('MAX_ITERATIONS_FOR_SCALARS_SOLVER',  &
+                                  val, val, verbose)
 
   end subroutine

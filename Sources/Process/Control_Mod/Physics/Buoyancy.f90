@@ -1,19 +1,18 @@
 !==============================================================================!
-  subroutine Control_Mod_Buoyancy(verbose)
+  subroutine Control_Mod_Buoyancy(buoyancy, verbose)
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Comm_Mod,  only: this_proc, Comm_Mod_End
-  use Field_Mod, only: buoyancy
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  logical           :: buoyancy
   logical, optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   character(len=80) :: val
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('BUOYANCY', 'no',  &
-                                   val, verbose)
+  call Control_Mod_Read_Char_Item('BUOYANCY', 'no', val, verbose)
   call To_Upper_Case(val)
 
   if( val .eq. 'YES' ) then

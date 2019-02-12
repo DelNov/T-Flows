@@ -27,17 +27,14 @@
   t    => flow % t
   p    => flow % p
 
-  call Control_Mod_Buoyancy        (verbose = .true.)
-  call Control_Mod_Turbulence_Model(verbose = .true.)
-
   !-----------------!
   !   K-eps model   !
   !-----------------!
   if(turbulence_model .eq. K_EPS) then
 
     ! Variables we solve for: k and epsilon
-    call Var_Mod_Allocate_Solution('KIN', kin, grid)
-    call Var_Mod_Allocate_Solution('EPS', eps, grid)
+    call Var_Mod_Allocate_Solution('KIN', '', kin, grid)
+    call Var_Mod_Allocate_Solution('EPS', '', eps, grid)
 
     ! Other turbulent quantities
     allocate(u_tau   (-grid % n_bnd_cells:grid % n_cells));  u_tau    = 0.
@@ -107,10 +104,10 @@
   if(turbulence_model .eq. K_EPS_ZETA_F) then
 
     ! Main model's variables
-    call Var_Mod_Allocate_Solution('KIN',  kin,  grid)
-    call Var_Mod_Allocate_Solution('EPS',  eps,  grid)
-    call Var_Mod_Allocate_Solution('ZETA', zeta, grid)
-    call Var_Mod_Allocate_Solution('F22',  f22,  grid)
+    call Var_Mod_Allocate_Solution('KIN',  '', kin,  grid)
+    call Var_Mod_Allocate_Solution('EPS',  '', eps,  grid)
+    call Var_Mod_Allocate_Solution('ZETA', '', zeta, grid)
+    call Var_Mod_Allocate_Solution('F22',  '', f22,  grid)
 
     ! Other variables such as time scale, length scale and production
     allocate(t_scale (-grid % n_bnd_cells:grid % n_cells));  t_scale  = 0.
@@ -126,7 +123,7 @@
 
     if(heat_transfer) then
 
-      call Var_Mod_Allocate_Solution('T2', t2, grid)
+      call Var_Mod_Allocate_Solution('T2', '', t2, grid)
       call Var_Mod_Allocate_New_Only('UT', ut, grid)
       call Var_Mod_Allocate_New_Only('VT', vt, grid)
       call Var_Mod_Allocate_New_Only('WT', wt, grid)
@@ -205,15 +202,15 @@
     allocate(y_plus  (-grid % n_bnd_cells:grid % n_cells));  y_plus   = 0.
 
     ! Reynolds stresses
-    call Var_Mod_Allocate_Solution('UU', uu, grid)
-    call Var_Mod_Allocate_Solution('VV', vv, grid)
-    call Var_Mod_Allocate_Solution('WW', ww, grid)
-    call Var_Mod_Allocate_Solution('UV', uv, grid)
-    call Var_Mod_Allocate_Solution('UW', uw, grid)
-    call Var_Mod_Allocate_Solution('VW', vw, grid)
+    call Var_Mod_Allocate_Solution('UU', '', uu, grid)
+    call Var_Mod_Allocate_Solution('VV', '', vv, grid)
+    call Var_Mod_Allocate_Solution('WW', '', ww, grid)
+    call Var_Mod_Allocate_Solution('UV', '', uv, grid)
+    call Var_Mod_Allocate_Solution('UW', '', uw, grid)
+    call Var_Mod_Allocate_Solution('VW', '', vw, grid)
 
     call Var_Mod_Allocate_New_Only('KIN', kin, grid)
-    call Var_Mod_Allocate_Solution('EPS', eps, grid)
+    call Var_Mod_Allocate_Solution('EPS', '', eps, grid)
 
     if(heat_transfer) then
 
@@ -250,7 +247,7 @@
 
     if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
 
-      call Var_Mod_Allocate_Solution('F22', f22, grid)
+      call Var_Mod_Allocate_Solution('F22', '', f22, grid)
 
       if(turbulence_statistics) then
         call Var_Mod_Allocate_Statistics(f22)
@@ -266,7 +263,7 @@
   if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
      turbulence_model .eq. DES_SPALART) then
 
-    call Var_Mod_Allocate_Solution('VIS', vis, grid)
+    call Var_Mod_Allocate_Solution('VIS', '', vis, grid)
 
     ! Other variables such as time scale, length scale and production
     allocate(t_scale (-grid % n_bnd_cells:grid % n_cells));  t_scale  = 0.
@@ -534,10 +531,10 @@
   if(turbulence_model .eq. HYBRID_LES_RANS) then
 
     ! Main model's variables (for RANS part)
-    call Var_Mod_Allocate_Solution('KIN',  kin,  grid)
-    call Var_Mod_Allocate_Solution('EPS',  eps,  grid)
-    call Var_Mod_Allocate_Solution('ZETA', zeta, grid)
-    call Var_Mod_Allocate_Solution('F22',  f22,  grid)
+    call Var_Mod_Allocate_Solution('KIN',  '', kin,  grid)
+    call Var_Mod_Allocate_Solution('EPS',  '', eps,  grid)
+    call Var_Mod_Allocate_Solution('ZETA', '', zeta, grid)
+    call Var_Mod_Allocate_Solution('F22',  '', f22,  grid)
     call Var_Mod_Allocate_Statistics(kin)
     call Var_Mod_Allocate_Statistics(eps)
     call Var_Mod_Allocate_Statistics(zeta)
@@ -607,7 +604,7 @@
 
     if(buoyancy) then
 
-      call Var_Mod_Allocate_Solution('TT', tt, grid)
+      call Var_Mod_Allocate_Solution('TT', '', tt, grid)
       call Var_Mod_Allocate_Statistics(tt)
       allocate(g_buoy   (-grid % n_bnd_cells:grid % n_cells));  g_buoy    = 0.
       allocate(buoy_beta(-grid % n_bnd_cells:grid % n_cells));  buoy_beta = 0.

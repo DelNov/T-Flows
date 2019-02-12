@@ -32,9 +32,19 @@
     ! can have different boundary conditions at the walls)
     integer, allocatable :: bnd_cell_type(:)
 
+    ! Parameters for numerical solution of the variable
+    character(len=80)    :: precond
+    integer              :: adv_scheme  ! advection scheme
+    real                 :: blend       ! blending (1.0 central; 0.0 upwind)
+    integer              :: td_scheme   ! time-disretization
+    real                 :: tol         ! linear solver tolerance
+    real                 :: urf         ! under-relaxation factor
+    integer              :: niter       ! number of iterations
+    real, allocatable    :: max(:)      ! max and min around a face ...
+    real, allocatable    :: min(:)      ! important for advection schemes
   end type
 
-  contains 
+  contains
 
   include 'Var_Mod/Allocate_New_Only.f90'
   include 'Var_Mod/Allocate_Solution.f90'

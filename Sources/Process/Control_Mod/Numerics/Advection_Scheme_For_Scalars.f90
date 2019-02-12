@@ -1,15 +1,16 @@
 !==============================================================================!
-  subroutine Control_Mod_Number_Of_User_Scalars(val, verbose)
+  subroutine Control_Mod_Advection_Scheme_For_Scalars(scheme_name, verbose)
 !------------------------------------------------------------------------------!
-!   Reading stuff related to user scalars                                      !
+!   Reading turbulence model from the control file.                            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer           :: val
+  character(len=80) :: scheme_name
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Int_Item('NUMBER_OF_USER_SCALARS', 0, &
-                                  val, verbose)
+  call Control_Mod_Read_Char_Item('ADVECTION_SCHEME_FOR_SCALARS',  &
+                                  'upwind', scheme_name, verbose)
+  call To_Upper_Case(scheme_name)
 
   end subroutine

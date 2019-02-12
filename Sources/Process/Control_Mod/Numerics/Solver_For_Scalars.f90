@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Control_Mod_Solver_For_User_Scalars(val, verbose)
+  subroutine Control_Mod_Solver_For_Scalars(val, verbose)
 !------------------------------------------------------------------------------!
 !---------------------------------[Modules]------------------------------------!
   use Comm_Mod, only: this_proc, Comm_Mod_End
@@ -10,7 +10,7 @@
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('SOLVER_FOR_USER_SCALARS', 'cg',  &
+  call Control_Mod_Read_Char_Item('SOLVER_FOR_SCALARS', 'cg',  &
                                    val, verbose)
   call To_Upper_Case(val)
 

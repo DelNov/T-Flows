@@ -18,16 +18,6 @@
   character(len=80) :: a_name, v_name 
 !==============================================================================!
 
-  !-----------------------!
-  !   Save user scalars   !
-  !-----------------------!
-  do us = 1, n_user_scalars
-    v_name = 'UserScalarXXXX'
-    write(v_name(11:14), '(a4)') user_scalar(us) % name
-    call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              user_scalar(us) % n(1), v_name)
-  end do
-  
   !----------------------!
   !   Save user arrays   !
   !----------------------!
@@ -38,4 +28,4 @@
                               user_array(ua,1), a_name)
   end do
 
-  end subroutine 
+  end subroutine

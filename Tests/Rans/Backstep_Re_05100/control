@@ -15,7 +15,7 @@ Problem name (this line is a comment)
 Time resolution
 
  TIME_STEP                            0.01
- NUMBER_OF_TIME_STEPS                 1800
+ NUMBER_OF_TIME_STEPS              1800
 
 Monitoring
 
@@ -41,7 +41,7 @@ Numerical part
  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM     0.4
  SIMPLE_UNDERRELAXATION_FOR_PRESSURE     0.4
  SIMPLE_UNDERRELAXATION_FOR_TURBULENCE   0.3
- TIME_INTEGRATION_SCHEME  linear
+ TIME_INTEGRATION_SCHEME                 linear
 
  ADVECTION_SCHEME_FOR_MOMENTUM       smart
  ADVECTION_SCHEME_FOR_TURBULENCE     smart
@@ -63,12 +63,12 @@ Initial values
 
 Boundary conditions
 
-  Like for initiali conditions, specify only those which are different from zero.
+  Like for initiali conditions, specify only those which are different from zero
   If all are zero, feel free to ommit both variables and values
 
   BOUNDARY_CONDITION    outlet_face
     TYPE                pressure
-    VARIABLES           u     v     w  
+    VARIABLES           u     v     w
     VALUES              0.0   0.0   0.0
 
   BOUNDARY_CONDITION    lower_wall
@@ -81,8 +81,8 @@ Boundary conditions
     VARIABLES           u     uu      vv      ww      uv       eps     f22
     VALUES              1.6   0.005   0.005   0.005   0.0001   0.001   0.01
 
-  For inlet, b.c. are specified in a file.  The list of variables given below must correspond
-  to columns given in input file.  
+  For inlet, b.c. are specified in a file.  The list of variables given 
+  below must correspond to columns given in input file.
 
   BOUNDARY_CONDITION    inlet_face
     TYPE                inflow

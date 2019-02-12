@@ -28,12 +28,11 @@
   real,              pointer :: flux(:)
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
-  integer                    :: s, c, c1, c2, niter
+  integer                    :: s, c, c1, c2, exec_iter
   real                       :: u_f, v_f, w_f, a12, fs
-  real                       :: ini_res, tol, mass_err
+  real                       :: mass_err
   real                       :: px_f, py_f, pz_f
-  character(len=80)          :: solver, precond
-  real                       :: urf           ! under-relaxation factor
+  character(len=80)          :: solver
   real                       :: p_max, p_min, p_nor, p_nor_c
 !==============================================================================!
 !
@@ -97,7 +96,7 @@
                                        abs(bulk % p_drop_z) )
 
   ! Initialize matrix and right hand side
-  b       = 0.0 
+  b       = 0.0
   a % val = 0.0
 
   !-----------------------------------------!
@@ -201,51 +200,39 @@
     mass_err = max(mass_err, abs(b(c)))
   end do
 
-  ! Don't solve the pressure corection too accurate.
-  ! Value 1.e-18 blows the solution.
-  ! Value 1.e-12 keeps the solution stable
-  call Control_Mod_Tolerance_For_Pressure_Solver(tol)
-
-  ! Get solver and matrix precondioner
+  ! Get solver
   call Control_Mod_Solver_For_Pressure(solver)
-  call Control_Mod_Preconditioner_For_System_Matrix(precond)
-
-  ! Set the default value for number of iterations / v-cycles
-  niter = 40
-  call Control_Mod_Max_Iterations_For_Pressure_Solver(niter)
 
   if(solver .eq. 'ACM') then
-    tol   = PICO
-    call Acm(sol,       &
-             pp % n,    &
-             b,         &
-             precond,   &
-             niter,     &     ! number of V cycles
-             tol,       &
-             ini_res,   &
-             pp % res,  &
-             norm = p_nor)    ! last argument: number for normalisation
+    pp % tol   = PICO
+    call Acm(sol,           &
+             pp % n,        &
+             b,             &
+             pp % precond,  &
+             pp % niter,    &     ! number of V cycles
+             pp % tol,      &
+             pp % res,      &
+             norm = p_nor)        ! last argument: number for normalisation
     stop
   else
-    call Cg(sol,       &
-            pp % n,    &
-            b,         &
-            precond,   &
-            niter,     &      ! number of iterations
-            tol,       &
-            ini_res,   &
-            pp % res,  &
-            norm = p_nor)     ! last argument: number for normalisation
+    call Cg(sol,           &
+            pp % n,        &
+            b,             &
+            pp % precond,  &
+            pp % niter,    &      ! max number of iterations
+            exec_iter,     &      ! executed number of iterations
+            pp % tol,      &
+            pp % res,      &
+            norm = p_nor)         ! last argument: number for normalisation
   end if
 
-  call Info_Mod_Iter_Fill_At(1, 4, pp % name, niter, pp % res)
+  call Info_Mod_Iter_Fill_At(1, 4, pp % name, exec_iter, pp % res)
 
   !-------------------------------!
   !   Update the pressure field   !
   !-------------------------------!
-  call Control_Mod_Simple_Underrelaxation_For_Pressure(urf)  ! retreive urf
   do c = 1, grid % n_cells
-    p % n(c)  =  p % n(c)  +  urf  *  pp % n(c)
+    p % n(c) =  p % n(c) + pp % urf * pp % n(c)
   end do
 
   !------------------------------------!
