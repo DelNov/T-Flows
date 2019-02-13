@@ -12,7 +12,7 @@
   real, allocatable :: work(:)
 !==============================================================================!
 
-  allocate(work(n)); work = 0
+  allocate(work(n)); work = 0.0
 
   do i = 1, n
     work(indx(i)) = x(i)

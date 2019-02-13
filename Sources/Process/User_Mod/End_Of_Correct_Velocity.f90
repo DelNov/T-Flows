@@ -1,17 +1,17 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Correct_Velocity(grid, dt, ini)
+  subroutine User_Mod_End_Of_Correct_Velocity(flow, dt, ini)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of Correct_Velocity function.           !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod
-  use Flow_Mod
+  use Field_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
-  real            :: dt    ! time step    
-  integer         :: ini   ! iner itteration
+  type(Field_Type) :: flow
+  real             :: dt    ! time step
+  integer          :: ini   ! iner itteration
 !==============================================================================!
 
   end subroutine

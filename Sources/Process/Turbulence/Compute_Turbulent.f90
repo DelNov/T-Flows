@@ -1,47 +1,42 @@
 !==============================================================================!
-  subroutine Compute_Turbulent(grid, dt, ini, phi, n_step)
+  subroutine Compute_Turbulent(flow, sol, dt, ini, phi, n_step)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves transport equations for different turbulent         !
 !   variables.                                                                 !
 !------------------------------------------------------------------------------!
 !---------------------------------[Modules]------------------------------------!
-  use Flow_Mod
+  use Field_Mod
   use Les_Mod
   use Rans_Mod
   use Comm_Mod
-  use Var_Mod
-  use Grid_Mod
-  use Grad_Mod
-  use Info_Mod
+  use Var_Mod,      only: Var_Type
+  use Grid_Mod,     only: Grid_Type
+  use Grad_Mod,     only: Grad_Mod_Variable
+  use Info_Mod,     only: Info_Mod_Iter_Fill_At
   use Numerics_Mod
-  use Solvers_Mod, only: Bicg, Cg, Cgs
-  use Control_Mod
-  use Work_Mod,    only: phi_x   => r_cell_01,  &
-                         phi_y   => r_cell_02,  &
-                         phi_z   => r_cell_03,  &
-                         phi_min => r_cell_04,  &
-                         phi_max => r_cell_05
+  use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
+  use Matrix_Mod,   only: Matrix_Type
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Grid_Type) :: grid
-  real            :: dt
-  integer         :: ini
-  type(Var_Type)  :: phi
-  integer         :: n_step
+  type(Field_Type),  target :: flow
+  type(Solver_Type), target :: sol
+  real                      :: dt
+  integer                   :: ini
+  type(Var_Type)            :: phi
+  integer                   :: n_step
 !----------------------------------[Locals]------------------------------------!
-  integer           :: s, c, c1, c2, niter
-  real              :: f_ex, f_im
-  real              :: phis
-  real              :: a0, a12, a21
-  real              :: ini_res, tol
-  real              :: vis_eff
-  real              :: phi_x_f, phi_y_f, phi_z_f
-  character(len=80) :: precond
-  integer           :: adv_scheme   ! advection scheme
-  real              :: blend        ! blending coeff (1.0 central; 0.0 upwind)
-  integer           :: td_scheme    ! time-disretization for inerita
-  real              :: urf          ! under-relaxation factor
+  type(Grid_Type),   pointer :: grid
+  type(Var_Type),    pointer :: u, v, w
+  real,              pointer :: flux(:)
+  type(Matrix_Type), pointer :: a
+  real,              pointer :: b(:)
+  integer                    :: s, c, c1, c2, exec_iter
+  real                       :: f_ex, f_im
+  real                       :: phis
+  real                       :: a0, a12, a21
+  real                       :: vis_eff
+  real                       :: phi_x_f, phi_y_f, phi_z_f
 !==============================================================================!
 !                                                                              !
 !  The form of equations which are solved:                                     !
@@ -54,9 +49,18 @@
 !                                                                              !
 !------------------------------------------------------------------------------!
 
-  a % val = 0.0
+  ! Take aliases
+  grid => flow % pnt_grid
+  flux => flow % flux
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+  a    => sol  % a
+  b    => sol  % b % val
 
-  b = 0.0
+  ! Initialize matrix and right hand side
+  a % val(:) = 0.0
+  b      (:) = 0.0
 
   ! Old values (o) and older than old (oo)
   if(ini .eq. 1) then
@@ -67,9 +71,7 @@
   end if
 
   ! Gradients
-  call Grad_Mod_For_Phi(grid, phi % n, 1, phi_x, .true.)
-  call Grad_Mod_For_Phi(grid, phi % n, 2, phi_y, .true.)
-  call Grad_Mod_For_Phi(grid, phi % n, 3, phi_z, .true.)
+  call Grad_Mod_Variable(phi, .true.)
 
   !---------------!
   !               !
@@ -77,13 +79,9 @@
   !               !
   !---------------!
 
-  ! Retreive advection scheme and blending coefficient
-  call Control_Mod_Advection_Scheme_For_Turbulence(adv_scheme)
-  call Control_Mod_Blending_Coefficient_For_Turbulence(blend)
-
   ! Compute phimax and phimin
-  if(adv_scheme .ne. CENTRAL) then
-    call Calculate_Minimum_Maximum(grid, phi % n, phi_min, phi_max)
+  if(phi % adv_scheme .ne. CENTRAL) then
+    call Numerics_Mod_Advection_Min_Max(phi)
     goto 1
   end if
 
@@ -107,11 +105,12 @@
            + (1.0 - grid % f(s)) * phi % n(c2)
 
       ! Compute phis with desired advection scheme
-      if(adv_scheme .ne. CENTRAL) then
-        call Advection_Scheme(grid, phis, s, phi % n, phi_min, phi_max,  &
-                              phi_x, phi_y, phi_z,                       &
-                              grid % dx, grid % dy, grid % dz,           &
-                              adv_scheme, blend)
+      if(phi % adv_scheme .ne. CENTRAL) then
+        call Numerics_Mod_Advection_Scheme(phis, s,                          &
+                                           phi,                              &
+                                           phi % x, phi % y, phi % z,        &
+                                           grid % dx, grid % dy, grid % dz,  &
+                                           flux)
       end if
 
       ! Compute advection term
@@ -164,22 +163,24 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
-    vis_eff = viscosity + (fw(s)*vis_t(c1) + &
-      (1.0-fw(s))*vis_t(c2)) / phi % sigma
+    vis_eff = viscosity + (    grid % fw(s)  * vis_t(c1)         &
+                        + (1.0-grid % fw(s)) * vis_t(c2))        &
+                        / phi % sigma
 
-    if(turbulence_model .eq. SPALART_ALLMARAS .or.           &
-       turbulence_model .eq. DES_SPALART)                    &
-      vis_eff = viscosity                                    &
-              + (fw(s)*vis % n(c1)+(1.0-fw(s))*vis % n(c2)) / phi % sigma
+    if(turbulence_model .eq. SPALART_ALLMARAS .or.               &
+       turbulence_model .eq. DES_SPALART)                        &
+      vis_eff = viscosity + (    grid % fw(s)  * vis % n(c1)     &
+                          + (1.0-grid % fw(s)) * vis % n(c2))    &
+                          / phi % sigma
 
     if(turbulence_model .eq. HYBRID_LES_RANS) then
-      vis_eff = viscosity                                          &
-              + (fw(s)*vis_t_eff(c1) + (1.0-fw(s))*vis_t_eff(c2))  &
-              / phi % sigma
+      vis_eff = viscosity + (    grid % fw(s)  * vis_t_eff(c1)   &
+                          + (1.0-grid % fw(s)) * vis_t_eff(c2))  &
+                          / phi % sigma
     end if
-    phi_x_f = fw(s)*phi_x(c1) + (1.0-fw(s))*phi_x(c2)
-    phi_y_f = fw(s)*phi_y(c1) + (1.0-fw(s))*phi_y(c2)
-    phi_z_f = fw(s)*phi_z(c1) + (1.0-fw(s))*phi_z(c2)
+    phi_x_f = grid % fw(s) * phi % x(c1) + (1.0-grid % fw(s)) * phi % x(c2)
+    phi_y_f = grid % fw(s) * phi % y(c1) + (1.0-grid % fw(s)) * phi % y(c2)
+    phi_z_f = grid % fw(s) * phi % z(c1) + (1.0-grid % fw(s)) * phi % z(c2)
 
     if(turbulence_model .eq. K_EPS_ZETA_F    .or.  &
        turbulence_model .eq. HYBRID_LES_RANS .or.  &
@@ -204,7 +205,7 @@
                      + phi_y_f * grid % sy(s)  &
                      + phi_z_f * grid % sz(s) )
 
-    a0 = vis_eff * f_coef(s)
+    a0 = vis_eff * a % fc(s)
 
     ! Implicit diffusive flux
     ! (this is a very crude approximation: f_coef is
@@ -258,10 +259,8 @@
   !                    !
   !--------------------!
 
-  call Control_Mod_Time_Integration_Scheme(td_scheme)
-
   ! Two time levels; linear interpolation
-  if(td_scheme .eq. LINEAR) then
+  if(phi % td_scheme .eq. LINEAR) then
     do c = 1, grid % n_cells
       a0 = density*grid % vol(c)/dt
       a % val(a % dia(c)) = a % val(a % dia(c)) + a0
@@ -270,7 +269,7 @@
   end if
 
   ! Three time levels; parabolic interpolation
-  if(td_scheme .eq. PARABOLIC) then
+  if(phi % td_scheme .eq. PARABOLIC) then
     do c = 1, grid % n_cells
       a0 = density*grid % vol(c)/dt
       a % val(a % dia(c)) = a % val(a % dia(c)) + 1.5 * a0
@@ -286,20 +285,24 @@
   !                                     !
   !-------------------------------------!
   if(turbulence_model .eq. K_EPS) then
-    if(phi % name .eq. 'KIN') call Source_Kin_K_Eps(grid)
-    if(phi % name .eq. 'EPS') call Source_Eps_K_Eps(grid)
+    if(phi % name .eq. 'KIN') call Source_Kin_K_Eps(flow, sol)
+    if(phi % name .eq. 'EPS') call Source_Eps_K_Eps(flow, sol)
   end if
 
   if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
      turbulence_model .eq. HYBRID_LES_RANS) then
-    if(phi % name .eq. 'KIN')  call Source_Kin_K_Eps_Zeta_F(grid)
-    if(phi % name .eq. 'EPS')  call Source_Eps_K_Eps_Zeta_F(grid)
-    if(phi % name .eq. 'ZETA') call Source_Zeta_K_Eps_Zeta_F(grid, n_step)
+    if(phi % name .eq. 'KIN')  call Source_Kin_K_Eps_Zeta_F(flow, sol)
+    if(phi % name .eq. 'EPS')  call Source_Eps_K_Eps_Zeta_F(flow, sol)
+    if(phi % name .eq. 'ZETA') call Source_Zeta_K_Eps_Zeta_F(grid, sol, n_step)
+  end if
+
+  if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
+      if(phi % name .eq. 'T2')  call Source_T2(flow, sol)
   end if
 
   if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
      turbulence_model .eq. DES_SPALART) then
-    call Source_Vis_Spalart_Almaras(grid, phi_x, phi_y, phi_z)
+    call Source_Vis_Spalart_Almaras(grid, sol, phi % x, phi % y, phi % z)
   end if
 
   !---------------------------------!
@@ -308,47 +311,42 @@
   !                                 !
   !---------------------------------!
 
-  ! Set under-relaxation factor then overwrite with control file if specified
-  urf = 1.0
-  call Control_Mod_Simple_Underrelaxation_For_Turbulence(urf)
-
+  ! Under-relax the equations
   do c = 1, grid % n_cells
-    b(c) = b(c) + a % val(a % dia(c)) * (1.0 - urf) * phi % n(c) / urf
-    a % val(a % dia(c)) = a % val(a % dia(c)) / urf
+    b(c) = b(c) + a % val(a % dia(c)) * (1.0 - phi % urf) * phi % n(c)  &
+         / phi % urf
+    a % val(a % dia(c)) = a % val(a % dia(c)) / phi % urf
   end do
 
-  ! Get tolerance for linear solvers
-  call Control_Mod_Tolerance_For_Turbulence_Solver(tol)
-
-  ! Get matrix precondioner
-  call Control_Mod_Preconditioner_For_System_Matrix(precond)
-
-  ! Set the number of iterations then overwrite with control file if specified
-  niter = 6
-  call Control_Mod_Max_Iterations_For_Turbulence_Solver(niter)
-
-  call Bicg(a,        &
-            phi % n,  &
-            b,        &
-            precond,  &
-            niter,    &
-            tol,      &
-            ini_res,  &
+  ! Call linear solver to solve the equations
+  call Bicg(sol,            &
+            phi % n,        &
+            b,              &
+            phi % precond,  &
+            phi % niter,    &
+            exec_iter,      &
+            phi % tol,      &
             phi % res)
 
   do c = 1, grid % n_cells
     if( phi % n(c) < 0.0 ) phi % n(c) = phi % o(c)
   end do
 
+  ! Print info on the screen
   if(turbulence_model .eq. K_EPS        .or.  &
      turbulence_model .eq. K_EPS_ZETA_F .or.  &
      turbulence_model .eq. HYBRID_LES_RANS) then
     if(phi % name .eq. 'KIN')  &
-      call Info_Mod_Iter_Fill_At(3, 1, phi % name, niter, phi % res)
+      call Info_Mod_Iter_Fill_At(3, 1, phi % name, exec_iter, phi % res)
     if(phi % name .eq. 'EPS')  &
-      call Info_Mod_Iter_Fill_At(3, 2, phi % name, niter, phi % res)
+      call Info_Mod_Iter_Fill_At(3, 2, phi % name, exec_iter, phi % res)
     if(phi % name .eq. 'ZETA')  &
-      call Info_Mod_Iter_Fill_At(3, 3, phi % name, niter, phi % res)
+      call Info_Mod_Iter_Fill_At(3, 3, phi % name, exec_iter, phi % res)
+  end if
+
+  if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
+    if(phi % name .eq. 'T2')  &
+      call Info_Mod_Iter_Fill_At(3, 5, phi % name, exec_iter, phi % res)
   end if
 
   call Comm_Mod_Exchange_Real(grid, phi % n)

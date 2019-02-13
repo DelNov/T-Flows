@@ -1,10 +1,12 @@
 !==============================================================================!
-  subroutine User_Mod_Backstep_Profiles(grid, save_name) 
+  subroutine User_Mod_Backstep_Profiles(flow, save_name) 
 !------------------------------------------------------------------------------!
 !   Description
 !------------------------------------------------------------------------------!
-  use Grid_Mod
-  use Flow_Mod
+  use Grid_Mod,  only: Grid_Type
+  use Field_Mod, only: Field_Type,  &
+                       viscosity, capacity, density, conductivity, heat_transfer
+  use Var_Mod,   only: Var_Type
   use Rans_Mod
   use Comm_Mod                       ! parallel stuff
   use Name_Mod,  only: problem_name
@@ -12,23 +14,33 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)  :: grid
-  character(len=*) :: save_name
+  type(Field_Type), target :: flow
+  character(len=*)         :: save_name
 !----------------------------------[Calling]-----------------------------------!
-  integer              :: n_prob, pl, c, idumm, i, count, k, c1, c2, s, n_hor, l
-  character(len=80)    :: coord_name, result_name
-  real, allocatable    :: x1_p(:), x2_p(:), lnum(:), z_p(:), &
-                          um_p(:), vm_p(:), wm_p(:), & 
-                          uu_p(:), vv_p(:), ww_p(:), &
-                          uv_p(:), uw_p(:), vw_p(:), &
-                          tm_p(:), tt_p(:),          &
-                          ut_p(:), vt_p(:), wt_p(:), &
-                          v1_p(:), v2_p(:), v3_p(:), &
-                          v4_p(:), v5_p(:)
-  integer, allocatable :: n_p(:), n_count(:)
-  real                 :: z_coor
-  logical              :: there
+  type(Var_Type),  pointer :: u, v, w, t
+  type(Grid_Type), pointer :: grid
+  integer                  :: n_prob, pl, c, idumm, i, count,  &
+                              k, c1, c2, s, n_hor, l
+  character(len=80)        :: coord_name, result_name
+  real, allocatable        :: x1_p(:), x2_p(:), lnum(:), z_p(:), &
+                              um_p(:), vm_p(:), wm_p(:), & 
+                              uu_p(:), vv_p(:), ww_p(:), &
+                              uv_p(:), uw_p(:), vw_p(:), &
+                              tm_p(:), tt_p(:),          &
+                              ut_p(:), vt_p(:), wt_p(:), &
+                              v1_p(:), v2_p(:), v3_p(:), &
+                              v4_p(:), v5_p(:)
+  integer, allocatable     :: n_p(:), n_count(:)
+  real                     :: z_coor
+  logical                  :: there
 !==============================================================================!
+
+  ! Take aliases
+  grid => flow % pnt_grid
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+  t    => flow % t
 
   ! Set the name for coordinate file
   call Name_File(0, coord_name, ".1d")

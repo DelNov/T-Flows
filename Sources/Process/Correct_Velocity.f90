@@ -1,33 +1,54 @@
 !==============================================================================!
-  real function Correct_Velocity(grid, dt, ini)
+  real function Correct_Velocity(flow, sol, dt, ini)
 !------------------------------------------------------------------------------!
 !   Corrects the velocities, and mass fluxes on the cell faces.                !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Flow_Mod
+  use Field_Mod,    only: Field_Type, viscosity, density
   use Comm_Mod
   use Les_Mod
   use Grid_Mod,     only: Grid_Type
-  use Bulk_Mod
+  use Bulk_Mod,     only: Bulk_Type
   use Info_Mod
+  use Solver_Mod,   only: Solver_Type
+  use Matrix_Mod,   only: Matrix_Type
   use Control_Mod
   use Numerics_Mod
   use User_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
-  real            :: dt
-  integer         :: ini
+  type(Field_Type),  target :: flow
+  type(Solver_Type), target :: sol
+  real                      :: dt
+  integer                   :: ini
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, c1, c2, s
-  real    :: cfl_max, pe_max
-  real    :: cfl_t, pe_t, mass_err
+  type(Grid_Type),   pointer :: grid
+  type(Bulk_Type),   pointer :: bulk
+  type(Var_Type),    pointer :: u, v, w, p, pp
+  real,              pointer :: flux(:)
+  type(Matrix_Type), pointer :: a
+  real,              pointer :: b(:)
+  integer                    :: c, c1, c2, s
+  real                       :: cfl_max, pe_max
+  real                       :: cfl_t, pe_t, mass_err
 !==============================================================================!
 
+  ! Take aliases
+  grid => flow % pnt_grid
+  bulk => flow % bulk
+  flux => flow % flux
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+  p    => flow % p
+  pp   => flow % pp
+  a    => sol % a
+  b    => sol % b % val
+
   ! User function
-  call User_Mod_Beginning_Of_Correct_Velocity(grid, dt, ini)
+  call User_Mod_Beginning_Of_Correct_Velocity(flow, dt, ini)
 
   !-----------------------------------------!
   !   Correct velocities and fluxes with    !
@@ -39,9 +60,9 @@
   !   velocities.                           !
   !-----------------------------------------!
   do c = 1, grid % n_cells
-    u % n(c) = u % n(c) - p % x(c) * grid % vol(c) / a % sav(c)
-    v % n(c) = v % n(c) - p % y(c) * grid % vol(c) / a % sav(c)
-    w % n(c) = w % n(c) - p % z(c) * grid % vol(c) / a % sav(c)
+    u % n(c) = u % n(c) - pp % x(c) * grid % vol(c) / a % sav(c)
+    v % n(c) = v % n(c) - pp % y(c) * grid % vol(c) / a % sav(c)
+    w % n(c) = w % n(c) - pp % z(c) * grid % vol(c) / a % sav(c)
   end do
 
   do s = 1, grid % n_faces
@@ -111,11 +132,11 @@
     c2 = grid % faces_c(2,s)
     if(c2 > 0) then
       cfl_t = abs( dt * flux(s) / density /      &
-                   ( f_coef(s) *                 &
+                   ( a % fc(s) *                 &
                    (  grid % dx(s)*grid % dx(s)  &
                     + grid % dy(s)*grid % dy(s)  &
                     + grid % dz(s)*grid % dz(s)) ) )
-      pe_t  = abs( flux(s) / f_coef(s) / (viscosity / density + TINY) )
+      pe_t    = abs( flux(s) / a % fc(s) / (viscosity / density + TINY) )
       cfl_max = max( cfl_max, cfl_t ) 
       pe_max  = max( pe_max,  pe_t  ) 
     end if
@@ -123,7 +144,7 @@
   call Comm_Mod_Global_Max_Real(cfl_max)
   call Comm_Mod_Global_Max_Real(pe_max)
 
-  call Info_Mod_Iter_Fill_At(1, 2, 'dum', -1, mass_err)
+  call Info_Mod_Iter_Fill_At(1, 5, 'dum', -1, mass_err)
   call Info_Mod_Bulk_Fill(cfl_max,          &
                           pe_max,           &
                           bulk % flux_x,    &
@@ -136,6 +157,6 @@
   Correct_Velocity = mass_err ! /(velmax+TINY)
 
   ! User function
-  call User_Mod_End_Of_Correct_Velocity(grid, dt, ini)
+  call User_Mod_End_Of_Correct_Velocity(flow, dt, ini)
 
   end function

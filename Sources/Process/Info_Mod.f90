@@ -5,9 +5,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Locals]-----------------------------------!
-  integer, parameter :: L_LINE         =  85
+  integer, parameter :: L_LINE         = 127
   integer, parameter :: L_BOX          =  21
-  integer, parameter :: MAX_USER_LINES = 256  
+  integer, parameter :: MAX_USER_LINES = 256
 !==============================================================================!
 
   !--------------------!
@@ -25,7 +25,8 @@
   type Iter_Info_Type
     integer               :: n_user_lines              = 0
     character(len=L_LINE) :: line_lead                 = ''
-    character(len=L_LINE) :: line_trail                = ''
+    character(len=L_LINE) :: line_sep                  = ''
+    character(len=L_LINE) :: line_iter                 = ''
     character(len=L_LINE) :: lines(4)                  = ''
     character(len=L_LINE) :: lines_user(MAX_USER_LINES) = ''
   end type

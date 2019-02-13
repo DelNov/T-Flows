@@ -23,7 +23,7 @@
 
   contains
 
-  include 'Comm_Mod/Sequential/Allocate_Memory.f90'
+  include 'Comm_Mod/Sequential/Allocate.f90'
   include 'Comm_Mod/Sequential/Close_File.f90'
   include 'Comm_Mod/Sequential/Create_Buffers.f90'
   include 'Comm_Mod/Sequential/Create_New_Types.f90'

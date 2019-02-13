@@ -84,6 +84,7 @@
 
   contains
  
+  include 'Work_Mod/Allocate.f90'
   include 'Work_Mod/Allocate_Real_Cells.f90'
   include 'Work_Mod/Allocate_Real_Faces.f90'
   include 'Work_Mod/Allocate_Real_Nodes.f90'

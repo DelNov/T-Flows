@@ -40,6 +40,7 @@
 
     integer                  :: nonzeros  ! number of nonzero entries
     real,    allocatable     :: val(:)    ! value
+    real,    allocatable     :: fc (:)    ! bare matrix entry for face
     real,    allocatable     :: sav(:)    ! saved momentum diag. value
     integer, allocatable     :: col(:)    ! beginning of each row   
     integer, allocatable     :: row(:)    ! column positions
@@ -50,7 +51,7 @@
 
   contains
 
-  include 'Matrix_Mod/Topology.f90'
-  include 'Matrix_Mod/Allocate.f90'
+  include 'Matrix_Mod/Create.f90'
+  include 'Matrix_Mod/Create_Level.f90'
 
   end module 

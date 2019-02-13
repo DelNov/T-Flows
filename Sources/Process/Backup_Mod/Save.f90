@@ -1,26 +1,33 @@
 !==============================================================================!
-  subroutine Backup_Mod_Save(grid, time_step, time_step_stat, name_save)
+  subroutine Backup_Mod_Save(fld, time_step, time_step_stat, name_save)
 !------------------------------------------------------------------------------!
 !   Saves backup files name.backup                                             !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Name_Mod, only: problem_name
   use Const_Mod
-  use Flow_Mod
   use Comm_Mod
   use Rans_Mod
-  use Grid_Mod
+  use Name_Mod,  only: problem_name
+  use Field_Mod, only: Field_Type, heat_transfer
+  use Grid_Mod,  only: Grid_Type
+  use Bulk_Mod,  only: Bulk_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)  :: grid
-  integer          :: time_step       ! current time step
-  integer          :: time_step_stat  ! starting step for statistics
-  character(len=*) :: name_save
+  type(Field_Type), target :: fld
+  integer                  :: time_step       ! current time step
+  integer                  :: time_step_stat  ! starting step for statistics
+  character(len=*)         :: name_save
 !-----------------------------------[Locals]-----------------------------------!
-  character(len=80) :: name_out, store_name
-  integer           :: fh, d, vc
+  type(Grid_Type), pointer :: grid
+  type(Bulk_Type), pointer :: bulk
+  character(len=80)        :: name_out, store_name
+  integer                  :: fh, d, vc
 !==============================================================================!
+
+  ! Take aliases
+  grid => fld % pnt_grid
+  bulk => fld % bulk
 
   store_name = problem_name
 
@@ -80,20 +87,20 @@
   !--------------!
   !   Velocity   !
   !--------------!
-  call Backup_Mod_Write_Variable(fh, d, vc, 'u_velocity', u)
-  call Backup_Mod_Write_Variable(fh, d, vc, 'v_velocity', v)
-  call Backup_Mod_Write_Variable(fh, d, vc, 'w_velocity', w)
+  call Backup_Mod_Write_Variable(fh, d, vc, 'u_velocity', fld % u)
+  call Backup_Mod_Write_Variable(fh, d, vc, 'v_velocity', fld % v)
+  call Backup_Mod_Write_Variable(fh, d, vc, 'w_velocity', fld % w)
 
   !--------------------------------------!
   !   Pressure and pressure correction   !
   !--------------------------------------!
-  call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'press',      p % n(-nb_s:nc_s))
-  call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'press_corr',pp % n(-nb_s:nc_s))
+  call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'press',     fld %  p % n(-nb_s:nc_s))
+  call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'press_corr',fld % pp % n(-nb_s:nc_s))
 
   !----------------------!
   !   Mass flow raters   !
   !----------------------!
-  call Backup_Mod_Write_Face(fh, d, vc, grid, flux)
+  call Backup_Mod_Write_Face(fh, d, vc, grid, fld % flux)
 
   !--------------!
   !              !
@@ -101,7 +108,7 @@
   !              !
   !--------------!
   if(heat_transfer) then
-    call Backup_Mod_Write_Variable(fh, d, vc, 'temp', t)
+    call Backup_Mod_Write_Variable(fh, d, vc, 'temp', fld % t)
   end if
 
   !-----------------------!
@@ -129,7 +136,7 @@
 
     ! Turbulence quantities connected with heat transfer
     if(heat_transfer) then
-      call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'con_wall', con_wall)
+      call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'con_wall',con_wall(-nb_s:nc_s))
     end if
   end if
 
@@ -154,12 +161,16 @@
     call Backup_Mod_Write_Cell    (fh, d, vc, 'tau_wall', tau_wall  (1:nc_s))
     call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 't_scale',  t_scale(-nb_s:nc_s))
     call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'l_scale',  l_scale(-nb_s:nc_s))
-
-    ! Turbulence quantities connected with heat transfer
-    if(heat_transfer) then
-      call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'con_wall', con_wall)
-    end if
   end if
+
+  if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
+    call Backup_Mod_Write_Variable(fh, d, vc, 't2',       t2)
+    call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'p_t2',     p_t2    (-nb_s:nc_s))
+    call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'con_wall', con_wall(-nb_s:nc_s))
+  else if (heat_transfer .and. turbulence_model .eq. HYBRID_LES_RANS) then
+    call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'con_wall', con_wall(-nb_s:nc_s))
+  end if
+
 
   !----------------------------!
   !   Reynolds stress models   !
@@ -188,7 +199,7 @@
 
     ! Turbulence quantities connected with heat transfer
     if(heat_transfer) then
-      call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'con_wall', con_wall)
+      call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'con_wall',con_wall(-nb_s:nc_s))
     end if
   end if
 
@@ -200,9 +211,9 @@
   if(turbulence_statistics .and.  &
      time_step > time_step_stat) then
 
-    call Backup_Mod_Write_Variable_Mean(fh, d, vc, 'u_mean', u)
-    call Backup_Mod_Write_Variable_Mean(fh, d, vc, 'v_mean', v)
-    call Backup_Mod_Write_Variable_Mean(fh, d, vc, 'w_mean', w)
+    call Backup_Mod_Write_Variable_Mean(fh, d, vc, 'u_mean', fld % u)
+    call Backup_Mod_Write_Variable_Mean(fh, d, vc, 'v_mean', fld % v)
+    call Backup_Mod_Write_Variable_Mean(fh, d, vc, 'w_mean', fld % w)
 
     call Backup_Mod_Write_Variable_Mean(fh, d, vc, 'uu_mean', uu)
     call Backup_Mod_Write_Variable_Mean(fh, d, vc, 'vv_mean', vv)
@@ -212,7 +223,7 @@
     call Backup_Mod_Write_Variable_Mean(fh, d, vc, 'vw_mean', vw)
 
     if(heat_transfer) then
-      call Backup_Mod_Write_Variable_Mean(fh, d, vc, 't_mean',  t)
+      call Backup_Mod_Write_Variable_Mean(fh, d, vc, 't_mean',  fld % t)
       call Backup_Mod_Write_Variable_Mean(fh, d, vc, 'tt_mean', tt)
       call Backup_Mod_Write_Variable_Mean(fh, d, vc, 'ut_mean', ut)
       call Backup_Mod_Write_Variable_Mean(fh, d, vc, 'vt_mean', vt)

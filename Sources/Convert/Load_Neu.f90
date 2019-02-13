@@ -25,12 +25,24 @@
   open(9,file=name_in)
   print *, '# Reading the file: ', trim(name_in)
 
-  ! Skip first 6 lines
-  do i = 1, 6
+  !------------------------!
+  !   Browse over header   !
+  !------------------------!
+  do i = 1, 10
     call Tokenizer_Mod_Read_Line(9)
-  end do 
 
-  ! Read the line which contains usefull information  
+    ! At line containing: "NUMNP NELEM NGRPS NBSETS NDFCD NDFVL" jump out
+    if(line % n_tokens .eq. 6) then
+      if(line % tokens(1) .eq. 'NUMNP') then
+        goto 1
+      end if
+    end if
+  end do
+
+  !--------------------------------------------------!
+  !   Read the first line with usefull information   !
+  !--------------------------------------------------!
+1 continue
   call Tokenizer_Mod_Read_Line(9)
 
   read(line % tokens(1),*) grid % n_nodes
@@ -53,7 +65,7 @@
       do j = 1, n_bnd_sect
         if(j>1) call Tokenizer_Mod_Read_Line(9) ! BOUNDARY CONDITIONS
         call Tokenizer_Mod_Read_Line(9)
-        read(line % tokens(3),*) dum1  
+        read(line % tokens(3),*) dum1
         grid % n_bnd_cells = grid % n_bnd_cells + dum1 
         do i = 1, dum1
           read(9,*) c, dum2, dir
@@ -62,18 +74,27 @@
       end do
       print '(a38,i9)', '# Total number of boundary cells:    ',  &
             grid % n_bnd_cells
-      go to 1
+      goto 2
     end if
   end do
 
-1 rewind(9)
+2 rewind(9)
 
   !------------------------!
-  !   Skip first 7 lines   !
+  !   Browse over header   !
   !------------------------!
-  do i = 1, 7
+  do i = 1, 10
     call Tokenizer_Mod_Read_Line(9)
-  end do 
+
+    ! At line containing: "ENDOFSECTION" jump out
+    if(line % n_tokens .eq. 1) then
+      if(line % tokens(1) .eq. 'ENDOFSECTION') then
+        goto 3
+      end if
+    end if
+  end do
+
+3 continue
 
   !--------------------------------------------!
   !                                            !
@@ -84,16 +105,13 @@
 
   allocate(temp(grid % n_cells)); temp=0
 
-  ! Skip one line 
-  call Tokenizer_Mod_Read_Line(9)
-
   !--------------------------------!
   !   Read the nodal coordinates   !
   !--------------------------------!
   call Tokenizer_Mod_Read_Line(9)          ! NODAL COORDINATES
   do i = 1, grid % n_nodes
     call Tokenizer_Mod_Read_Line(9)
-    read(line % tokens(2),*) grid % xn(i) 
+    read(line % tokens(2),*) grid % xn(i)
     read(line % tokens(3),*) grid % yn(i)
     read(line % tokens(4),*) grid % zn(i)
   end do
@@ -136,7 +154,7 @@
     call Tokenizer_Mod_Read_Line(9)
     call To_Upper_Case(  line % tokens(1)  )
     grid % bnd_cond % name(j) = line % tokens(1)
-    read(line % tokens(3),'(I8)') dum1  
+    read(line % tokens(3),'(I8)') dum1
     do i = 1, dum1
       read(9,*) c, dum2, dir
       grid % cells_bnd_color(dir,c) = j

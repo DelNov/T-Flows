@@ -1,14 +1,14 @@
 !==============================================================================!
-  subroutine Control_Mod_Rough_Walls(verbose)
+  subroutine Control_Mod_Rough_Walls(rough_walls, verbose)
 !------------------------------------------------------------------------------!
 !   Reading wall roughness from the control file.                              !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Comm_Mod,       only: this_proc, Comm_Mod_End
-  use Turbulence_Mod, only: rough_walls
+  use Comm_Mod, only: this_proc, Comm_Mod_End
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  logical           :: rough_walls
   logical, optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   character(len=80) :: val

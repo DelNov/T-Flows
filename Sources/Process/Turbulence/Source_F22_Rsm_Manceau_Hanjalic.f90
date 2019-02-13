@@ -1,20 +1,25 @@
 !==============================================================================!
-  subroutine Source_F22_Rsm_Manceau_Hanjalic(grid)
+  subroutine Source_F22_Rsm_Manceau_Hanjalic(grid, sol)
 !------------------------------------------------------------------------------!
 !   Calculate source terms in eliptic relaxation equation                      !
 !   and imposing  boundary condition forf22                                    !
 !------------------------------------------------------------------------------!
 !----------------------------------[Moules]-----------------------------------!
-  use Flow_Mod
+  use Field_Mod
   use Rans_Mod
-  use Grid_Mod
+  use Grid_Mod,   only: Grid_Type
+  use Solver_Mod, only: Solver_Type
+  use Matrix_Mod, only: Matrix_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Grid_Type)           :: grid
+  type(Solver_Type), target :: sol
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: s, c, c1, c2
-  real    :: Sor11,  f22hg
+  type(Matrix_Type), pointer :: a
+  real,              pointer :: b(:)
+  integer                    :: s, c, c1, c2
+  real                       :: sor11,  f22hg
 !==============================================================================!
 !                                                                              !
 !   The form of source terms are :                                             !
@@ -45,14 +50,18 @@
 !                                                                              !
 !------------------------------------------------------------------------------!
 
+  ! Take aliases
+  a => sol % a
+  b => sol % b % val
+
   call Time_And_Length_Scale(grid)
 
   ! Source term f22hg
   do c = 1, grid % n_cells
     f22hg = 1.
-    Sor11 = grid % vol(c)/l_scale(c)**2.
-    A % val(A % dia(c)) = A % val(A % dia(c)) + Sor11     
-    b(c) = b(c) + f22hg*grid % vol(c)/l_scale(c)**2.
+    sor11 = grid % vol(c) / l_scale(c)**2
+    a % val(a % dia(c)) = a % val(a % dia(c)) + sor11
+    b(c) = b(c) + f22hg*grid % vol(c) / l_scale(c)**2
   end do
 
   ! Source term

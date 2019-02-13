@@ -30,9 +30,12 @@
 
   call Grid_Mod_Print_Bnd_Cond_List(grid)
   print *, '#================================================================'
+  print *, '# Calculating distance from the walls                            '
+  print *, '#----------------------------------------------------------------'
   print *, '# Type the list of boundary colors which represent walls,        '
   print *, '# separated by spaces.  These will be used for computation       '
   print *, '# of distance to the wall needed by some turbulence models.      '
+  print *, '# Type 0 to skip this step and set distance to one everywhere.   '
   print *, '#----------------------------------------------------------------'
   call Tokenizer_Mod_Read_Line(5)
   n_wall_colors = line % n_tokens

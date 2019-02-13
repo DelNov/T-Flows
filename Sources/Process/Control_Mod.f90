@@ -67,6 +67,7 @@
     include 'Control_Mod/Physics/Turbulence_Model_Variant.f90'
     include 'Control_Mod/Physics/Turbulent_Prandtl_Number.f90'
     include 'Control_Mod/Physics/Turbulent_Schmidt_Number.f90'
+    include 'Control_Mod/Physics/Turbulent_Heat_Flux_Model.f90'
 
     ! Other environmental conditions
     include 'Control_Mod/Physics/Angular_Velocity_Vector.f90'
@@ -80,17 +81,10 @@
 
     ! Species    
     include 'Control_Mod/Physics/Number_Of_Species.f90'
+    include 'Control_Mod/Physics/Number_Of_Scalars.f90'
 
-    ! User scalars (inluding numerical parameters)
-    include 'Control_Mod/User/Advection_Scheme_For_User_Scalars.f90'
-    include 'Control_Mod/User/Blending_Coefficient_For_User_Scalars.f90'
-    include 'Control_Mod/User/Max_Iterations_For_User_Scalars_Solver.f90'
-    include 'Control_Mod/User/Normalization_For_User_Scalars_Solver.f90'
-    include 'Control_Mod/User/Number_Of_User_Scalars.f90'
+    ! User arrays (inluding numerical parameters)
     include 'Control_Mod/User/Number_Of_User_Arrays.f90'
-    include 'Control_Mod/User/Simple_Underrelaxation_For_User_Scalars.f90'
-    include 'Control_Mod/User/Solver_For_User_Scalars.f90'
-    include 'Control_Mod/User/Tolerance_For_User_Scalars_Solver.f90'
 
   !--------------!
   !   Numerics   !
@@ -104,37 +98,47 @@
     ! Discretization
     include 'Control_Mod/Numerics/Advection_Scheme_For_Energy.f90'
     include 'Control_Mod/Numerics/Advection_Scheme_For_Momentum.f90'
+    include 'Control_Mod/Numerics/Advection_Scheme_For_Scalars.f90'
     include 'Control_Mod/Numerics/Advection_Scheme_For_Turbulence.f90'
     include 'Control_Mod/Numerics/Blending_Coefficient_For_Energy.f90'
     include 'Control_Mod/Numerics/Blending_Coefficient_For_Momentum.f90'
+    include 'Control_Mod/Numerics/Blending_Coefficient_For_Scalars.f90'
     include 'Control_Mod/Numerics/Blending_Coefficient_For_Turbulence.f90'
     include 'Control_Mod/Numerics/Max_Simple_Iterations.f90'
     include 'Control_Mod/Numerics/Min_Simple_Iterations.f90'
     include 'Control_Mod/Numerics/Simple_Underrelaxation_For_Momentum.f90'
     include 'Control_Mod/Numerics/Simple_Underrelaxation_For_Pressure.f90'
     include 'Control_Mod/Numerics/Simple_Underrelaxation_For_Energy.f90'
+    include 'Control_Mod/Numerics/Simple_Underrelaxation_For_Scalars.f90'
     include 'Control_Mod/Numerics/Simple_Underrelaxation_For_Turbulence.f90'
     include 'Control_Mod/Numerics/Time_Integration_Scheme.f90'
 
     ! Linear solvers
+    include 'Control_Mod/Numerics/Preconditioner_For_System_Matrix.f90'
     include 'Control_Mod/Numerics/Solver_For_Energy.f90'
     include 'Control_Mod/Numerics/Solver_For_Momentum.f90'
     include 'Control_Mod/Numerics/Solver_For_Pressure.f90'
+    include 'Control_Mod/Numerics/Solver_For_Scalars.f90'
     include 'Control_Mod/Numerics/Solver_For_Turbulence.f90'
     include 'Control_Mod/Numerics/Max_Iterations_For_Energy_Solver.f90'
     include 'Control_Mod/Numerics/Max_Iterations_For_Momentum_Solver.f90'
     include 'Control_Mod/Numerics/Max_Iterations_For_Presssure_Solver.f90'
+    include 'Control_Mod/Numerics/Max_Iterations_For_Scalars_Solver.f90'
     include 'Control_Mod/Numerics/Max_Iterations_For_Turbulence_Solver.f90'
     include 'Control_Mod/Numerics/Normalization_For_Momentum_Solver.f90'
     include 'Control_Mod/Numerics/Normalization_For_Pressure_Solver.f90'
     include 'Control_Mod/Numerics/Normalization_For_Energy_Solver.f90'
-    include 'Control_Mod/Numerics/Normalization_For_Turbulence_Solver.f90'
+    include 'Control_Mod/Numerics/Normalization_For_Scalars_Solver.f90'
     include 'Control_Mod/Numerics/Normalization_For_Simple_Algorithm.f90'
+    include 'Control_Mod/Numerics/Normalization_For_Turbulence_Solver.f90'
     include 'Control_Mod/Numerics/Tolerance_For_Momentum_Solver.f90'
     include 'Control_Mod/Numerics/Tolerance_For_Pressure_Solver.f90'
     include 'Control_Mod/Numerics/Tolerance_For_Energy_Solver.f90'
+    include 'Control_Mod/Numerics/Tolerance_For_Scalars_Solver.f90'
     include 'Control_Mod/Numerics/Tolerance_For_Turbulence_Solver.f90'
     include 'Control_Mod/Numerics/Tolerance_For_Simple_Algorithm.f90'
-    include 'Control_Mod/Numerics/Preconditioner_For_System_Matrix.f90'
+    include 'Control_Mod/Numerics/V_Cycle_Max_Grid_Levels.f90'
+    include 'Control_Mod/Numerics/V_Cycle_Number_Of_Smoothing_Iterations.f90'
+    include 'Control_Mod/Numerics/V_Cycle_Residual_Ratio.f90'
  
   end module

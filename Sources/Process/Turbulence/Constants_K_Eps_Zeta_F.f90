@@ -14,10 +14,10 @@
   ! call Control_Mod_Turbulence_Model(.true.)
   ! call Control_Mod_Turbulence_Model_Variant(.true.)
 
-  c_1e    =  1.4
-  c_2e    =  1.9
-  c_mu    =  0.09
-  c_mu_d  =  0.22
+  c_1e   =  1.4
+  c_2e   =  1.9
+  c_mu   =  0.09
+  c_mu_d =  0.22
   c_mu25 = sqrt(sqrt(c_mu))
   c_mu75 = c_mu25**3
   kappa  =  0.41
@@ -32,5 +32,6 @@
   kin  % sigma = 1.0
   eps  % sigma = 1.3
   zeta % sigma = 1.2
+  t2   % sigma = 1.1
 
   end subroutine

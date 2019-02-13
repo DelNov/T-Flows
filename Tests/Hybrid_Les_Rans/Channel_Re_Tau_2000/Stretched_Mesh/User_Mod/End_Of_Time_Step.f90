@@ -1,24 +1,34 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Time_Step(grid, n, time)
+  subroutine User_Mod_End_Of_Time_Step(flow, n, time)
 !------------------------------------------------------------------------------!
-!   This function is called at the beginning of time step.                     !
+!   This function is called at the end of time step.                           !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Grid_Mod
-  use Flow_Mod
+  use Grid_Mod,  only: Grid_Type
+  use Field_Mod, only: Field_Type
   use Const_Mod, only: PI
   use Comm_Mod,  only: Comm_Mod_Global_Max_Real
+  use Var_Mod,   only: Var_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
-  integer         :: n     ! time step
-  real            :: time  ! physical time
+  type(Field_Type), target :: flow
+  integer                  :: n     ! time step
+  real                     :: time  ! physical time
 !----------------------------------[Locals]------------------------------------!
-  integer :: c, e, dir
-  real    :: lo, xo(4), yo(4), zo, ro, xc, yc, zc, vc, wc, sig_x, sig_yz,  &
-             rmin, rmax, sg, lx, ly, lz, vmax
+  type(Grid_Type), pointer :: grid
+  type(Var_Type),  pointer :: u, v, w
+  integer                  :: c, e, dir
+  real                     :: lo, xo(4), yo(4), zo, ro,           &
+                              xc, yc, zc, vc, wc, sig_x, sig_yz,  &
+                              rmin, rmax, sg, lx, ly, lz, vmax
 !==============================================================================!
+
+  ! Take aliases
+  grid => flow % pnt_grid
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
 
   ! If not time for disturbing the velocity field, return
   if(mod(n,100) .ne. 0) return

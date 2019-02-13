@@ -13,10 +13,10 @@
   type(Smooths_Type) :: smr
   type(Grid_Type)    :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: c, n, s, c1, c2, i, j, k, m
+  integer              :: c, n, s, c2, i, j, k, m
   real                 :: x_new_tmp, y_new_tmp, z_new_tmp    
   real                 :: x_max, y_max, z_max, x_min, y_min, z_min 
-  real                 :: x1, y1, z1, x8, y8, z8, maxdis
+  real                 :: x1, y1, z1, x8, y8, z8
   integer              :: reg
   real, allocatable    :: x_node_new(:), y_node_new(:), z_node_new(:) 
   integer, allocatable :: node_to_nodes(:,:)

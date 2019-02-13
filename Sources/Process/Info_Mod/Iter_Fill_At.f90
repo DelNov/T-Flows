@@ -23,9 +23,9 @@
       write(iter_info % lines(r)((c-1)*L_BOX+ 3 :  &
                                  (c-1)*L_BOX+ 6),  '(a4)')  name_var
       write(iter_info % lines(r)((c-1)*L_BOX+ 7 :  &
-                                 (c-1)*L_BOX+ 7),  '(a1)')  ':'         
+                                 (c-1)*L_BOX+ 7),  '(a1)')  ':'
       write(iter_info % lines(r)((c-1)*L_BOX+ 8 :  &
-                                 (c-1)*L_BOX+10),  '(i3)')  n_iter      
+                                 (c-1)*L_BOX+10),  '(i3)')  n_iter
     endif
 
     ! Residual 

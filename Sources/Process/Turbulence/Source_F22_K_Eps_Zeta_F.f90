@@ -1,23 +1,26 @@
 !==============================================================================!
-  subroutine Source_F22_K_Eps_Zeta_F(grid)
+  subroutine Source_F22_K_Eps_Zeta_F(grid, sol)
 !------------------------------------------------------------------------------!
 !   Calculate source terms in eliptic relaxation  equation                     !
 !   for vi2 and imposing  boundary condition for f22                           !
 !------------------------------------------------------------------------------!
 !---------------------------------[Modules]------------------------------------!
   use Const_Mod
-  use Flow_Mod
+  use Field_Mod
   use Rans_Mod
-  use Grid_Mod
-  use Control_Mod
+  use Grid_Mod,   only: Grid_Type
+  use Solver_Mod, only: Solver_Type
+  use Matrix_Mod, only: Matrix_Type
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Grid_Type) :: grid
+  type(Grid_Type)           :: grid
+  type(Solver_Type), target :: sol
 !----------------------------------[Locals]------------------------------------!
-  integer :: s, c, c1, c2
-  real    :: sor_11, f22hg
-  real    :: a0
+  type(Matrix_Type), pointer :: a
+  real,              pointer :: b(:)
+  integer                    :: s, c, c1, c2
+  real                       :: sor_11, f22hg
 !==============================================================================!
 !                                                                              !
 !  The form of source terms are :                                              !
@@ -40,6 +43,10 @@
 !     f22            [-]                                                       !
 !     l_scale        [m]                                                       !
 !------------------------------------------------------------------------------!
+
+  ! Take aliases
+  a => sol % a
+  b => sol % b % val
 
   call Time_And_Length_Scale(grid)
 
@@ -74,8 +81,7 @@
 
       ! Linearization of the near wall terms helps to get more  
        ! stable solution, especially for small wall distance.
-       a0 = f_coef(s)
-       b(c1) = b(c1) + a0 * f22 % n(c2)
+       b(c1) = b(c1) + a % fc(s) * f22 % n(c2)
      end if   ! end if of BC=wall
    end if    ! end if of c2<0
  end do

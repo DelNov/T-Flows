@@ -1,9 +1,10 @@
 !==============================================================================!
-  subroutine Control_Mod_Point_For_Monitoring_Planes(p_x, p_y, p_z, verbose)
+  subroutine Control_Mod_Point_For_Monitoring_Planes(b_xp, b_yp, b_zp,  &
+                                                     verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real              :: p_x, p_y, p_z
+  real              :: b_xp, b_yp, b_zp
   logical, optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   real :: def(3)
@@ -14,9 +15,8 @@
 
   call Control_Mod_Read_Real_Array('POINT_FOR_MONITORING_PLANES', 3, def,  &
                                     val, verbose)
-
-  p_x = val(1)
-  p_y = val(2)
-  p_z = val(3)
+  b_xp = val(1)
+  b_yp = val(2)
+  b_zp = val(3)
 
   end subroutine

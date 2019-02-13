@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Calculate_Vis_T_K_Eps(grid)
+  subroutine Calculate_Vis_T_K_Eps(flow)
 !------------------------------------------------------------------------------!
 !   Computes the turbulent viscosity for RANS models.                          !
 !                                                                              !
@@ -16,16 +16,17 @@
 !   vis_t = CmuD * rho * Tsc  * vv                                             !
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Control_Mod
-  use Flow_Mod
   use Comm_Mod
+  use Control_Mod
+  use Grid_Mod,   only: Grid_Type
+  use Field_Mod,  only: Field_Type, heat_transfer,  &
+                        viscosity, capacity, conductivity, density
   use Les_Mod
   use Rans_Mod
-  use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Field_Type), target :: flow
 !---------------------------------[Calling]------------------------------------!
   real :: Turbulent_Prandtl_Number
   real :: U_Plus_Log_Law
@@ -34,11 +35,12 @@
   real :: Y_Plus_Rough_Walls
   real :: Roughness_Coefficient
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c1, c2, s, c
-  real    :: pr, beta, ebf
-  real    :: u_tan, u_nor_sq, u_nor, u_tot_sq, u_tau_new
-  real    :: kin_vis 
-  real    :: u_plus, y_star, re_t, f_mu, y_pl
+  type(Grid_Type), pointer :: grid
+  type(Var_Type),  pointer :: u, v, w
+  integer                  :: c1, c2, s, c
+  real                     :: pr, beta, ebf
+  real                     :: u_tan, u_nor_sq, u_nor, u_tot_sq
+  real                     :: kin_vis, u_plus, y_star, re_t, f_mu
 !==============================================================================!
 !   Dimensions:                                                                !
 !                                                                              !
@@ -55,7 +57,13 @@
 !   shear = sqrt(2 S_ij S_ij)                                                  !
 !------------------------------------------------------------------------------!
 
-  ! kinematic viscosities
+  ! Take aliases
+  grid => flow % pnt_grid
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+
+  ! Kinematic viscosities
   kin_vis = viscosity/density
 
   do c = 1, grid % n_cells

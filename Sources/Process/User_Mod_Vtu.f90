@@ -9,25 +9,20 @@
 !------------------------------------------------------------------------------!
   implicit none
 
-  integer                     :: n_user_scalars
-  integer                     :: n_user_arrays
-
-  type(Var_Type), allocatable :: user_scalar(:)
-  real, allocatable           :: user_array(:,:)
-
-  character(len=4)            :: c_name = 'C_00'
-  character(len=4)            :: q_name = 'Q_00'
+  integer           :: n_user_arrays
+  real, allocatable :: user_array(:,:)
 
   contains
 
   include 'User_Mod/Allocate.f90'
   include 'User_Mod/Before_Exit.f90'
   include 'User_Mod/Beginning_Of_Time_Step.f90'
+  include 'User_Mod/Beginning_Of_Compute_Energy.f90'
   include 'User_Mod/Beginning_Of_Compute_Momentum.f90'
   include 'User_Mod/Beginning_Of_Compute_Pressure.f90'
   include 'User_Mod/Beginning_Of_Correct_Velocity.f90'
   include 'User_Mod/Calculate_Mean.f90'
-  include 'User_Mod/Compute_Scalar.f90'
+  include 'User_Mod/End_Of_Compute_Energy.f90'
   include 'User_Mod/End_Of_Compute_Momentum.f90'
   include 'User_Mod/End_Of_Compute_Pressure.f90'
   include 'User_Mod/End_Of_Correct_Velocity.f90'

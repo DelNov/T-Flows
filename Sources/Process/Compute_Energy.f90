@@ -1,54 +1,42 @@
 !==============================================================================!
-  subroutine Compute_Energy(grid, dt, ini, phi)
+  subroutine Compute_Energy(flow, sol, dt, ini)
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for scalar (such as temperature)         !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Flow_Mod
-  use Rans_Mod
   use Comm_Mod
-  use Var_Mod
-  use Grid_Mod
+  use Field_Mod,    only: Field_Type, conductivity, capacity, density
+  use Rans_Mod
+  use Var_Mod,      only: Var_Type
+  use Grid_Mod,     only: Grid_Type
   use Grad_Mod
   use Info_Mod
   use Numerics_Mod
-  use Solvers_Mod, only: Bicg, Cg, Cgs
-  use Control_Mod
-  use Work_Mod,    only: phi_x       => r_cell_01,  &
-                         phi_y       => r_cell_02,  &
-                         phi_z       => r_cell_03,  &
-                         phi_min     => r_cell_04,  &
-                         phi_max     => r_cell_05,  &
-                         u1uj_phij   => r_cell_06,  &
-                         u2uj_phij   => r_cell_07,  &
-                         u3uj_phij   => r_cell_08,  &
-                         u1uj_phij_x => r_cell_09,  &
-                         u2uj_phij_y => r_cell_10,  &
-                         u3uj_phij_z => r_cell_11
+  use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
+  use Matrix_Mod,   only: Matrix_Type
   use User_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
-  type(Grid_Type) :: grid
-  integer         :: ini
-  real            :: dt
-  type(Var_Type)  :: phi
+  type(Field_Type),  target :: flow
+  type(Solver_Type), target :: sol
+  integer                   :: ini
+  real                      :: dt
 !----------------------------------[Calling]-----------------------------------!
   real :: Turbulent_Prandtl_Number
 !-----------------------------------[Locals]-----------------------------------! 
-  integer           :: n, c, s, c1, c2, niter
-  real              :: a0, a12, a21
-  real              :: ini_res, tol
-  real              :: con_eff1, f_ex1, f_im1, phix_f1, phiy_f1, phiz_f1
-  real              :: con_eff2, f_ex2, f_im2, phix_f2, phiy_f2, phiz_f2
-  real              :: phis, pr_t1, pr_t2
-  real              :: ut_s, vt_s, wt_s, t_stress, con_t
-  character(len=80) :: precond       ! preconditioner
-  integer           :: adv_scheme    ! space-discretiztion of advection scheme)
-  real              :: blend         ! blending coeff (1.0 central; 0.0 upwind)
-  integer           :: td_scheme     ! time-disretization for inerita  
-  real              :: urf           ! under-relaxation factor
+  type(Grid_Type),   pointer :: grid
+  type(Var_Type),    pointer :: u, v, w, t
+  real,              pointer :: flux(:)
+  type(Matrix_Type), pointer :: a
+  real,              pointer :: b(:)
+  integer                    :: n, c, s, c1, c2, exec_iter
+  real                       :: a0, a12, a21
+  real                       :: con_eff1, f_ex1, f_im1, tx_f1, ty_f1, tz_f1
+  real                       :: con_eff2, f_ex2, f_im2, tx_f2, ty_f2, tz_f2
+  real                       :: ts, pr_t1, pr_t2, pr_tf
+  real                       :: ut_s, vt_s, wt_s, t_stress, con_t
 !------------------------------------------------------------------------------!
 !
 !  The form of equations which are solved:
@@ -79,25 +67,33 @@
 ! 
 !==============================================================================!
 
-  do n = 1, a % row(grid % n_cells+1)  ! this is number of non-zeros plus 1
-    a % val(n) = 0.0
-  end do
-  a % val = 0.0
+  ! Take aliases
+  grid => flow % pnt_grid
+  flux => flow % flux
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+  t    => flow % t
+  a    => sol % a
+  b    => sol % b % val
 
-  b(:) = 0.0
+  ! Initialize matrix and right hand side
+  a % val(:) = 0.0
+  b      (:) = 0.0
+
+  ! User function
+  call User_Mod_Beginning_Of_Compute_Energy(flow, dt, ini)
 
   ! Old values (o and oo)
   if(ini .eq. 1) then
     do c = 1, grid % n_cells
-      phi % oo(c) = phi % o(c)
-      phi % o (c) = phi % n(c)
+      t % oo(c) = t % o(c)
+      t % o (c) = t % n(c)
     end do
   end if
 
   ! Gradients
-  call Grad_Mod_For_Phi(grid, phi % n, 1, phi_x, .true.)
-  call Grad_Mod_For_Phi(grid, phi % n, 2, phi_y, .true.)
-  call Grad_Mod_For_Phi(grid, phi % n, 3, phi_z, .true.)
+  call Grad_Mod_Variable(t, .true.)
 
   !---------------!
   !               !
@@ -105,19 +101,15 @@
   !               !
   !---------------!
 
-  ! Retreive advection scheme and blending coefficient
-  call Control_Mod_Advection_Scheme_For_Energy(adv_scheme)
-  call Control_Mod_Blending_Coefficient_For_Energy(blend)
-
-  ! Compute phimax and phimin
-  if(adv_scheme .ne. CENTRAL) then
-    call Calculate_Minimum_Maximum(grid, phi % n, phi_min, phi_max)
+  ! Compute tmax and tmin
+  if(t % adv_scheme .ne. CENTRAL) then
+    call Numerics_Mod_Advection_Min_Max(t)
   end if
 
   ! New values
   do c = 1, grid % n_cells
-    phi % a(c) = 0.0
-    phi % c(c) = 0.0  ! use phi % c for upwind advective fluxes
+    t % a(c) = 0.0
+    t % c(c) = 0.0  ! use t % c for upwind advective fluxes
   end do
 
   !----------------------------------!
@@ -128,35 +120,35 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
-    phis =      grid % f(s)  * phi % n(c1)   &
-         + (1.0-grid % f(s)) * phi % n(c2)
+    ts =      grid % f(s)  * t % n(c1)   &
+       + (1.0-grid % f(s)) * t % n(c2)
 
-    ! Compute phis with desired advection scheme
-    if(adv_scheme .ne. CENTRAL) then
-      call Advection_Scheme(grid, phis, s, phi % n, phi_min, phi_max,  &
-                            phi_x, phi_y, phi_z,                       &
-                            grid % dx, grid % dy, grid % dz,           &
-                            adv_scheme, blend) 
+    ! Compute ts with desired advection scheme
+    if(t % adv_scheme .ne. CENTRAL) then
+      call Numerics_Mod_Advection_Scheme(ts, s, t,                          &
+                                         t % x, t % y, t % z,               &
+                                         grid % dx, grid % dy, grid % dz,   &
+                                         flux)
     end if
 
     ! Compute advection term
     if(c2 > 0) then
-      phi % a(c1) = phi % a(c1)-flux(s)*phis*capacity
-      phi % a(c2) = phi % a(c2)+flux(s)*phis*capacity
+      t % a(c1) = t % a(c1)-flux(s)*ts*capacity
+      t % a(c2) = t % a(c2)+flux(s)*ts*capacity
     else
-      phi % a(c1) = phi % a(c1)-flux(s)*phis*capacity
+      t % a(c1) = t % a(c1)-flux(s)*ts*capacity
     end if
 
     ! Store upwinded part of the advection term in "c"
     if(flux(s).lt.0) then   ! from c2 to c1
-      phi % c(c1) = phi % c(c1)-flux(s)*phi % n(c2) * capacity
+      t % c(c1) = t % c(c1)-flux(s)*t % n(c2) * capacity
       if(c2 > 0) then
-        phi % c(c2) = phi % c(c2)+flux(s)*phi % n(c2) * capacity
+        t % c(c2) = t % c(c2)+flux(s)*t % n(c2) * capacity
       end if
     else
-      phi % c(c1) = phi % c(c1)-flux(s)*phi % n(c1) * capacity
+      t % c(c1) = t % c(c1)-flux(s)*t % n(c1) * capacity
       if(c2 > 0) then
-        phi % c(c2) = phi % c(c2)+flux(s)*phi % n(c1) * capacity
+        t % c(c2) = t % c(c2)+flux(s)*t % n(c1) * capacity
       end if
     end if
 
@@ -167,7 +159,7 @@
   !   explicity and implicitly treated advection   !
   !------------------------------------------------!
   do c = 1, grid % n_cells
-    b(c) = b(c) + phi % a(c) - phi % c(c)
+    b(c) = b(c) + t % a(c) - t % c(c)
   end do
 
   !--------------!
@@ -176,9 +168,9 @@
   !              !
   !--------------!
 
-  ! Set phi % c back to zero 
+  ! Set t % c back to zero 
   do c = 1, grid % n_cells
-    phi % c(c) = 0.0  
+    t % c(c) = 0.0  
   end do
 
   !----------------------------!
@@ -186,7 +178,6 @@
   !----------------------------!
   if(turbulence_model .ne. NONE .and.  &
      turbulence_model .ne. DNS) then
-    call Control_Mod_Turbulent_Prandtl_Number(pr_t)  ! get default pr_t (0.9)
   end if
 
   do s = 1, grid % n_faces
@@ -201,22 +192,22 @@
        turbulence_model .ne. DNS) then
       pr_t1 = Turbulent_Prandtl_Number(grid, c1)
       pr_t2 = Turbulent_Prandtl_Number(grid, c2)
-      pr_t  = fw(s) * pr_t1 + (1.0 - fw(s)) * pr_t2
+      pr_tf = grid % fw(s) * pr_t1 + (1.0-grid % fw(s)) * pr_t2
     end if
 
     ! Gradients on the cell face (fw corrects situation close to the wall)
-    phix_f1 = fw(s)*phi_x(c1) + (1.0-fw(s))*phi_x(c2) 
-    phiy_f1 = fw(s)*phi_y(c1) + (1.0-fw(s))*phi_y(c2)
-    phiz_f1 = fw(s)*phi_z(c1) + (1.0-fw(s))*phi_z(c2)
-    phix_f2 = phix_f1
-    phiy_f2 = phiy_f1
-    phiz_f2 = phiz_f1
+    tx_f1 = grid % fw(s) * t % x(c1) + (1.0-grid % fw(s)) * t % x(c2) 
+    ty_f1 = grid % fw(s) * t % y(c1) + (1.0-grid % fw(s)) * t % y(c2)
+    tz_f1 = grid % fw(s) * t % z(c1) + (1.0-grid % fw(s)) * t % z(c2)
+    tx_f2 = tx_f1
+    ty_f2 = ty_f1
+    tz_f2 = tz_f1
     if(turbulence_model .ne. NONE .and.  &
        turbulence_model .ne. DNS) then
-      con_eff1 =        fw(s)  * (conductivity+capacity*vis_t(c1)/pr_t)  &
-               + (1.0 - fw(s)) * (conductivity+capacity*vis_t(c2)/pr_t)
-      con_t    = fw(s) * capacity*vis_t(c1)/pr_t &
-               + (1.0 - fw(s)) * capacity*vis_t(c2)/pr_t
+      con_eff1 =      grid % fw(s)  * (conductivity+capacity*vis_t(c1)/pr_tf)  &
+               + (1.0-grid % fw(s)) * (conductivity+capacity*vis_t(c2)/pr_tf)
+      con_t    =      grid % fw(s)  * capacity*vis_t(c1)/pr_tf  &
+               + (1.0-grid % fw(s)) * capacity*vis_t(c2)/pr_tf
     else
       con_eff1 = conductivity
     end if
@@ -227,8 +218,8 @@
        turbulence_model .eq. K_EPS_ZETA_F .or.  &
        turbulence_model .eq. HYBRID_LES_RANS) then
       if(c2 < 0) then
-        if(Var_Mod_Bnd_Cell_Type(phi, c2) .eq. WALL .or.  &
-           Var_Mod_Bnd_Cell_Type(phi, c2) .eq. WALLFL) then
+        if(Var_Mod_Bnd_Cell_Type(t, c2) .eq. WALL .or.  &
+           Var_Mod_Bnd_Cell_Type(t, c2) .eq. WALLFL) then
           con_eff1 = con_wall(c1)
           con_eff2 = con_eff1
         end if
@@ -236,32 +227,62 @@
     end if
 
     ! Total (exact) diffusion flux
-    f_ex1 = con_eff1 * (  phix_f1 * grid % sx(s)   &
-                        + phiy_f1 * grid % sy(s)   &
-                        + phiz_f1 * grid % sz(s))
-    f_ex2 = con_eff2 * (  phix_f2 * grid % sx(s)   &
-                        + phiy_f2 * grid % sy(s)   &
-                        + phiz_f2 * grid % sz(s))
+    f_ex1 = con_eff1 * (  tx_f1 * grid % sx(s)   &
+                        + ty_f1 * grid % sy(s)   &
+                        + tz_f1 * grid % sz(s))
+    f_ex2 = con_eff2 * (  tx_f2 * grid % sx(s)   &
+                        + ty_f2 * grid % sy(s)   &
+                        + tz_f2 * grid % sz(s))
 
     ! Implicit diffusion flux
-    f_im1 = con_eff1 * f_coef(s)           &
-          * (  phix_f1 * grid % dx(s)      &
-             + phiy_f1 * grid % dy(s)      &
-             + phiz_f1 * grid % dz(s) )
-    f_im2 = con_eff2 * f_coef(s)           &
-          * (  phix_f2 * grid % dx(s)      &
-             + phiy_f2 * grid % dy(s)      &
-             + phiz_f2 * grid % dz(s) )
+    f_im1 = con_eff1 * a % fc(s)         &
+          * (  tx_f1 * grid % dx(s)      &
+             + ty_f1 * grid % dy(s)      &
+             + tz_f1 * grid % dz(s) )
+    f_im2 = con_eff2 * a % fc(s)         &
+          * (  tx_f2 * grid % dx(s)      &
+             + ty_f2 * grid % dy(s)      &
+             + tz_f2 * grid % dz(s) )
 
     ! Cross diffusion part
-    phi % c(c1) = phi % c(c1) + f_ex1 - f_im1
+    t % c(c1) = t % c(c1) + f_ex1 - f_im1
     if(c2 > 0) then
-      phi % c(c2) = phi % c(c2) - f_ex2 + f_im2
+      t % c(c2) = t % c(c2) - f_ex2 + f_im2
     end if
 
+    !---------------------------!
+    !                           !
+    !   Turbulent heat fluxes   !
+    !                           !
+    !---------------------------!
+    if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
+       turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+
+      ! Turbulent heat fluxes according to GGDH scheme
+      ! (first line is GGDH, second line is SGDH substratced 
+      ut_s =  (    grid % fw(s)  * ut % n(c1)   &
+           +  (1.0-grid % fw(s)) * ut % n(c2))
+      vt_s =  (    grid % fw(s)  * vt % n(c1)   &
+           +  (1.0-grid % fw(s)) * vt % n(c2))
+      wt_s =  (    grid % fw(s)  * wt % n(c1)   &
+           +  (1.0-grid % fw(s)) * wt % n(c2))
+      t_stress = - (  ut_s * grid % sx(s)                  &
+                    + vt_s * grid % sy(s)                  &
+                    + wt_s * grid % sz(s) )                &
+                    - (con_t * (  tx_f1 * grid % sx(s)     &
+                                + ty_f1 * grid % sy(s)     &
+                                + tz_f1 * grid % sz(s)) )
+
+      ! Put the influence of turbulent heat fluxes explicitly in the system
+      b(c1) = b(c1) + t_stress
+      if(c2 > 0) then
+        b(c2) = b(c2) - t_stress
+      end if
+    end if  ! if models are of RSM type
+
     ! Calculate the coefficients for the sysytem matrix
-    a12 = con_eff1 * f_coef(s)
-    a21 = con_eff2 * f_coef(s)
+    a12 = con_eff1 * a % fc(s)
+    a21 = con_eff2 * a % fc(s)
 
     a12 = a12  - min(flux(s), 0.0) * capacity
     a21 = a21  + max(flux(s), 0.0) * capacity
@@ -275,14 +296,14 @@
     else if(c2.lt.0) then
       ! Outflow is included because of the flux 
       ! corrections which also affects velocities
-      if( (Var_Mod_Bnd_Cell_Type(phi, c2) .eq. INFLOW) .or.  &
-          (Var_Mod_Bnd_Cell_Type(phi, c2) .eq. WALL)   .or.  &
-          (Var_Mod_Bnd_Cell_Type(phi, c2) .eq. CONVECT) ) then
+      if( (Var_Mod_Bnd_Cell_Type(t, c2) .eq. INFLOW) .or.  &
+          (Var_Mod_Bnd_Cell_Type(t, c2) .eq. WALL)   .or.  &
+          (Var_Mod_Bnd_Cell_Type(t, c2) .eq. CONVECT) ) then
         a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
-        b(c1)  = b(c1)  + a12 * phi % n(c2)
+        b(c1)  = b(c1)  + a12 * t % n(c2)
       ! In case of wallflux 
-      else if(Var_Mod_Bnd_Cell_Type(phi, c2) .eq. WALLFL) then
-        b(c1) = b(c1) + grid % s(s) * phi % q(c2)
+      else if(Var_Mod_Bnd_Cell_Type(t, c2) .eq. WALLFL) then
+        b(c1) = b(c1) + grid % s(s) * t % q(c2)
       end if
     end if
 
@@ -290,50 +311,13 @@
 
   ! Cross diffusion terms are treated explicity
   do c = 1, grid % n_cells
-    if(phi % c(c) >= 0) then
-      b(c)  = b(c) + phi % c(c)
+    if(t % c(c) >= 0) then
+      b(c)  = b(c) + t % c(c)
     else
       a % val(a % dia(c)) = a % val(a % dia(c))  &
-                          - phi % c(c) / (phi % n(c) + MICRO)
+                          - t % c(c) / (t % n(c) + MICRO)
     end if
   end do
-
-  !---------------------------!
-  !                           !
-  !   Turbulent heat fluxes   !
-  !                           !
-  !---------------------------!
-  if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
-     turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
-
-    do s = 1, grid % n_faces
-
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
-
-      ! Turbulent heat fluxes according to GGDH scheme
-      ! (first line is GGDH, second line is SGDH substratced 
-      ut_s =  (     grid % f(s)  * ut % n(c1)  &
-           +  (1. - grid % f(s)) * ut % n(c2))
-      vt_s =  (     grid % f(s)  * vt % n(c1)  &
-           +  (1. - grid % f(s)) * vt % n(c2))
-      wt_s =  (     grid % f(s)  * wt % n(c1)  &
-           +  (1. - grid % f(s)) * wt % n(c2))
-      t_stress = - (  ut_s * grid % sx(s)                    &
-                    + vt_s * grid % sy(s)                    &
-                    + wt_s * grid % sz(s) )                  &
-                    - (con_t * (  phix_f1 * grid % sx(s)     &
-                                + phiy_f1 * grid % sy(s)     &
-                                + phiz_f1 * grid % sz(s)) )
-
-      ! Put the influence of turbulent heat fluxes explicitly in the system
-      b(c1) = b(c1) + t_stress
-      if(c2 > 0) then
-        b(c2) = b(c2) - t_stress
-      end if
-
-    end do  ! through faces
-  end if  ! if models are of RSM type
 
   !--------------------!
   !                    !
@@ -341,64 +325,54 @@
   !                    !
   !--------------------!
 
-  call Control_Mod_Time_Integration_Scheme(td_scheme)
-
   ! Two time levels; Linear interpolation
-  if(td_scheme .eq. LINEAR) then
+  if(t % td_scheme .eq. LINEAR) then
     do c = 1, grid % n_cells
-      a0 = capacity * density * grid % vol(c)/dt
+      a0 = capacity * density * grid % vol(c) / dt
       a % val(a % dia(c)) = a % val(a % dia(c)) + a0
-      b(c)  = b(c) + a0 * phi % o(c)
+      b(c)  = b(c) + a0 * t % o(c)
     end do
   end if
 
   ! Three time levels; parabolic interpolation
-  if(td_scheme .eq. PARABOLIC) then
+  if(t % td_scheme .eq. PARABOLIC) then
     do c = 1, grid % n_cells
-      a0 = capacity * density * grid % vol(c)/dt
+      a0 = capacity * density * grid % vol(c) / dt
       a % val(a % dia(c)) = a % val(a % dia(c)) + 1.5 * a0
-      b(c)  = b(c) + 2.0 * a0 * phi % o(c) - 0.5 * a0 * phi % oo(c)
+      b(c)  = b(c) + 2.0 * a0 * t % o(c) - 0.5 * a0 * t % oo(c)
     end do
   end if
 
-  call User_Mod_Source(grid, phi, a, b)
+  call User_Mod_Source(flow, t, a, b)
 
-  !---------------------------------!
-  !                                 !
-  !   Solve the equations for phi   !
-  !                                 !
-  !---------------------------------!
+  !-------------------------------!
+  !                               !
+  !   Solve the equations for t   !
+  !                               !
+  !-------------------------------!
 
-  ! Set under-relaxation factor, then overwrite with control file if specified
-  urf = 0.7
-  call Control_Mod_Simple_Underrelaxation_For_Energy(urf)
-
+  ! Under-relax the equations
   do c = 1, grid % n_cells
-    b(c) = b(c) + a % val(a % dia(c)) * (1.0 - urf) * phi % n(c) / urf
-    a % val(a % dia(c)) = a % val(a % dia(c)) / urf
+    b(c) = b(c) + a % val(a % dia(c)) * (1.0 - t % urf) * t % n(c) / t % urf
+    a % val(a % dia(c)) = a % val(a % dia(c)) / t % urf
   end do
 
-  ! Get solver tolerance
-  call Control_Mod_Tolerance_For_Energy_Solver(tol)
+  ! Call linear solver to solve the equations
+  call Bicg(sol,          &
+            t % n,        &
+            b,            &
+            t % precond,  &
+            t % niter,    &
+            exec_iter,    &
+            t % tol,      &
+            t % res)
 
-  ! Get matrix precondioner
-  call Control_Mod_Preconditioner_For_System_Matrix(precond)
+  ! Print some info on the screen
+  call Info_Mod_Iter_Fill_At(1, 6, t % name, exec_iter, t % res)
 
-  ! Set number of iterations then overwrite with control file if specified
-  niter =  5
-  call Control_Mod_Max_Iterations_For_Energy_Solver(niter)
+  call Comm_Mod_Exchange_Real(grid, t % n)
 
-  call Bicg(a,        &
-            phi % n,  &
-            b,        &
-            precond,  &
-            niter,    &
-            tol,      &
-            ini_res,  &
-            phi % res)
-
-  call Info_Mod_Iter_Fill_At(2, 4, phi % name, niter, phi % res)
-
-  call Comm_Mod_Exchange_Real(grid, phi % n)
+  ! User function
+  call User_Mod_End_Of_Compute_Energy(flow, dt, ini)
 
   end subroutine

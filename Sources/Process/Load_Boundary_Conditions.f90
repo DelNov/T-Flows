@@ -1,56 +1,69 @@
 !==============================================================================!
-  subroutine Load_Boundary_Conditions(grid, restart)
+  subroutine Load_Boundary_Conditions(flow, backup)
 !------------------------------------------------------------------------------!
 !   Reads boundary condition from control file                                 !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Flow_Mod
+  use Comm_Mod,  only: this_proc, Comm_Mod_End
+  use Field_Mod, only: Field_Type, heat_transfer
   use Rans_Mod
-  use Comm_Mod, only: this_proc, Comm_Mod_End
   use Tokenizer_Mod
-  use Grid_Mod
+  use Grid_Mod,  only: Grid_Type
   use User_Mod
   use Control_Mod
+  use Var_Mod,   only: Var_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
-  logical         :: restart
+  type(Field_Type), target :: flow
+  logical                  :: backup
 !----------------------------------[Calling]-----------------------------------!
   real    :: Distance
   integer :: Key_Ind
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: c, m, l, k, i, n, n_points, nks, nvs, us, c1, c2, s
-  character(len=80) :: name_prof(128), answer, name_in
-  real              :: wi, dist_min, x, y, z, xp, dist
-  real, allocatable :: prof(:,:)
-  logical           :: here
-  character(len=80) :: bc_type_name, try_str
-  integer           :: bc_type_tag
-  character(len=80) :: keys(128)
-  real              :: vals(0:128)           ! note that they start from zero!
-  integer           :: types_per_color(128)  ! how many types in each color
-  character(len=80) :: types_names(128)      ! name of each type
-  logical           :: types_file(128)       ! type specified in a file?
-  integer           :: c_types               ! counter types
-  logical           :: found
+  type(Grid_Type), pointer :: grid
+  type(Var_Type),  pointer :: u, v, w, t, p
+  type(Var_Type),  pointer :: scalar(:)
+  integer                  :: c, m, l, k, i, n, n_points, nks, nvs, sc, c1, c2, s
+  character(len=80)        :: name_prof(128), answer, name_in
+  real                     :: wi, dist_min, x, y, z, xp, dist
+  real, allocatable        :: prof(:,:)
+  logical                  :: here
+  character(len=80)        :: bc_type_name, try_str
+  integer                  :: bc_type_tag
+  character(len=80)        :: keys(128)
+  real                     :: vals(0:128)           ! they start from zero!
+  integer                  :: types_per_color(128)  ! how many types in a color
+  character(len=80)        :: types_names(128)      ! name of each type
+  logical                  :: types_file(128)       ! type specified in a file?
+  integer                  :: c_types               ! counter types
+  logical                  :: found
 !==============================================================================!
 
-  !-----------------------------------------!
-  ! Full name is specified in control file  !
-  !-----------------------------------------!
+  ! Take aliases
+  grid   => flow % pnt_grid
+  u      => flow % u
+  v      => flow % v
+  w      => flow % w
+  t      => flow % t
+  p      => flow % p
+  scalar => flow % scalar
+
+  !--------------------------------------------!
+  !   Full name is specified in control file   !
+  !--------------------------------------------!
   call Control_Mod_Load_Backup_Name(name_in)
 
-  !-----------------------------------!
-  ! Check if restart is present       !
-  !-----------------------------------!
+  !--------------------------------!
+  !   Check if backup is present   !
+  !--------------------------------!
   answer = name_in
   call To_Upper_Case(answer)
 
-  restart = .true.
+  backup = .true.
   if(answer .eq. 'SKIP') then
-    restart = .false.
+    backup = .false.
   end if
 
   !----------------------------------------------------------------!
@@ -186,7 +199,7 @@
         !--------------------------------------------------!
 
         ! Distribute b.c. tags only.
-        ! They are distributed if restart or not
+        ! They are distributed if backup or not
         do c = -1, -grid % n_bnd_cells, -1
           if(grid % bnd_cond % color(c) .eq. n) then
 
@@ -198,12 +211,12 @@
               if(i > 0) t % bnd_cell_type(c) = bc_type_tag
             end if
 
-            ! For user scalars
-            do us = 1, n_user_scalars
-              i = Key_Ind(user_scalar(us) % name, keys, nks)
-              if(i > 0) user_scalar(us) % bnd_cell_type(c) = bc_type_tag
-              i = Key_Ind(user_scalar(us) % flux_name, keys, nks)
-              if(i > 0) user_scalar(us) % bnd_cell_type(c) = bc_type_tag
+            ! For scalars
+            do sc = 1, flow % n_scalars
+              i = Key_Ind(scalar(sc) % name, keys, nks)
+              if(i > 0) scalar(sc) % bnd_cell_type(c) = bc_type_tag
+              i = Key_Ind(scalar(sc) % flux_name, keys, nks)
+              if(i > 0) scalar(sc) % bnd_cell_type(c) = bc_type_tag
             end do
 
           end if  ! bnd_color .eq. n
@@ -211,9 +224,9 @@
         end do
 
         ! Distribute b.c. values
-        ! They are distributed only if not restart
+        ! They are distributed only if not backup
         do c = -1, -grid % n_bnd_cells, -1
-          if(grid % bnd_cond % color(c) .eq. n .and. .not. restart) then
+          if(grid % bnd_cond % color(c) .eq. n .and. .not. backup) then
 
             ! For velocity and pressure
             i = Key_Ind('U', keys, nks); if(i > 0) u % n(c) = vals(i)
@@ -229,12 +242,12 @@
               if(i > 0) t % q(c) = vals(i)
             end if
 
-            ! For user scalars
-            do us = 1, n_user_scalars
-              i = Key_Ind(user_scalar(us) % name, keys, nks)
-              if(i > 0) user_scalar(us) % n(c) = vals(i)
-              i = Key_Ind(user_scalar(us) % flux_name, keys, nks)
-              if(i > 0) user_scalar(us) % q(c) = vals(i)
+            ! For scalars
+            do sc = 1, flow % n_scalars
+              i = Key_Ind(scalar(sc) % name, keys, nks)
+              if(i > 0) scalar(sc) % n(c) = vals(i)
+              i = Key_Ind(scalar(sc) % flux_name, keys, nks)
+              if(i > 0) scalar(sc) % q(c) = vals(i)
             end do
 
             ! For turbulence models
@@ -268,11 +281,15 @@
               i = Key_Ind('F22',  keys, nks); if(i > 0) f22  % n(c) = vals(i)
             end if
 
+            if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
+              i = Key_Ind('T2',  keys, nks); if(i > 0) t2  % n(c) = vals(i)
+            end if
+ 
             if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
                turbulence_model .eq. DES_SPALART) then
               i = Key_Ind('VIS',  keys, nks); if(i > 0) vis % n(c) = vals(i)
             end if
-          end if ! restart
+          end if ! backup
         end do
 
       !---------------------------------------------!
@@ -297,7 +314,7 @@
         do m = 1, n_points
           call Tokenizer_Mod_Read_Line(9)
           do i = 1, nks
-            read(line % tokens(i), *) prof(m, i)
+            read(line % tokens(i), *) prof(m,i)
           end do
         end do
         close(9)
@@ -313,7 +330,7 @@
           do c = -1, -grid % n_bnd_cells, -1
 
             ! Distribute b.c. types
-            ! They are distributed only if not restart
+            ! They are distributed only if not backup
             if(grid % bnd_cond % color(c) .eq. n) then
 
               ! For temperature
@@ -324,19 +341,19 @@
                 if(i > 0) t % bnd_cell_type(c) = bc_type_tag
               end if
 
-              ! For user scalars
-              do us = 1, n_user_scalars
-                i = Key_Ind(user_scalar(us) % name, keys, nks)
-                if(i > 0) user_scalar(us) % bnd_cell_type(c) = bc_type_tag
-                i = Key_Ind(user_scalar(us) % flux_name, keys, nks)
-                if(i > 0) user_scalar(us) % bnd_cell_type(c) = bc_type_tag
+              ! For scalars
+              do sc = 1, flow % n_scalars
+                i = Key_Ind(scalar(sc) % name, keys, nks)
+                if(i > 0) scalar(sc) % bnd_cell_type(c) = bc_type_tag
+                i = Key_Ind(scalar(sc) % flux_name, keys, nks)
+                if(i > 0) scalar(sc) % bnd_cell_type(c) = bc_type_tag
               end do
 
             end if
 
             ! Distribute b.c. values
-            ! They are distributed only if not restart
-            if(grid % bnd_cond % color(c) .eq. n .and. .not. restart) then
+            ! They are distributed only if not backup
+            if(grid % bnd_cond % color(c) .eq. n .and. .not. backup) then
 
               dist_min = HUGE
               do m = 1, n_points
@@ -381,12 +398,12 @@
                 if(i > 0) t % q(c) = prof(k,i)
               end if
 
-              ! For user scalars
-              do us = 1, n_user_scalars
-                i = Key_Ind(user_scalar(us) % name, keys, nks)
-                if(i > 0) user_scalar(us) % n(c) = prof(k,i)
-                i = Key_Ind(user_scalar(us) % flux_name, keys, nks)
-                if(i > 0) user_scalar(us) % q(c) = prof(k,i)
+              ! For scalars
+              do sc = 1, flow % n_scalars
+                i = Key_Ind(scalar(sc) % name, keys, nks)
+                if(i > 0) scalar(sc) % n(c) = prof(k,i)
+                i = Key_Ind(scalar(sc) % flux_name, keys, nks)
+                if(i > 0) scalar(sc) % q(c) = prof(k,i)
               end do
 
               ! For turbulence models
@@ -401,6 +418,10 @@
                 i = Key_Ind('EPS',  keys, nks); if(i>0) eps  % n(c) = prof(k,i)
                 i = Key_Ind('ZETA', keys, nks); if(i>0) zeta % n(c) = prof(k,i)
                 i = Key_Ind('F22',  keys, nks); if(i>0) f22  % n(c) = prof(k,i)
+              end if
+
+              if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
+                i = Key_Ind('T2',  keys, nks); if(i>0) t2  % n(c) = prof(k,i)
               end if
 
               if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
@@ -422,7 +443,7 @@
                   i = Key_Ind('F22', keys, nks); if(i>0) f22 % n(c) = prof(k,i)
                 end if
               end if
-            end if      !end if(grid % bnd_cond % color(c) .eq. n .and. restart)
+            end if      !end if(grid % bnd_cond % color(c) .eq. n .and. backup)
           end do        !end do c = -1, -grid % n_bnd_cells, -1
 
         !----------------------------!
@@ -432,7 +453,7 @@
 
           do c = -1, -grid % n_bnd_cells, -1
 
-            ! If restart is set to true, set boundary values,
+            ! If backup is set to true, set boundary values,
             ! otherwise, just the TypeBC remains set.
             if(grid % bnd_cond % color(c) .eq. n) then
 
@@ -487,21 +508,21 @@
                     if(i > 0) t % bnd_cell_type(c) = bc_type_tag
                   end if
 
-                  ! For user scalars
-                  do us = 1, n_user_scalars
-                    i = Key_Ind(user_scalar(us) % name, keys, nks)
-                    if(i > 0) user_scalar(us) % bnd_cell_type(c) = bc_type_tag
-                    i = Key_Ind(user_scalar(us) % flux_name, keys, nks)
-                    if(i > 0) user_scalar(us) % bnd_cell_type(c) = bc_type_tag
+                  ! For scalars
+                  do sc = 1, flow % n_scalars
+                    i = Key_Ind(scalar(sc) % name, keys, nks)
+                    if(i > 0) scalar(sc) % bnd_cell_type(c) = bc_type_tag
+                    i = Key_Ind(scalar(sc) % flux_name, keys, nks)
+                    if(i > 0) scalar(sc) % bnd_cell_type(c) = bc_type_tag
                   end do
 
                 end if  ! here
               end do    ! m, points
             end if      ! bnd_color .eq. n
 
-            ! If restart is set to true, set boundary values,
+            ! If backup is set to true, set boundary values,
             ! otherwise, just the TypeBC remains set.
-            if(grid % bnd_cond % color(c) .eq. n .and. .not. restart) then
+            if(grid % bnd_cond % color(c) .eq. n .and. .not. backup) then
 
               do m = 1, n_points-1
                 here = .false.
@@ -549,99 +570,104 @@
 
                   ! For velocity and pressure
                   i = Key_Ind('U',keys,nks)
-                  if(i > 0) u % n(c) = wi*prof(m, i) + (1.-wi)*prof(m+1, i)
+                  if(i > 0) u % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
                   i = Key_Ind('V',keys,nks)
-                  if(i > 0) v % n(c) = wi*prof(m, i) + (1.-wi)*prof(m+1, i)
+                  if(i > 0) v % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
                   i = Key_Ind('W',keys,nks)
-                  if(i > 0) w % n(c) = wi*prof(m, i) + (1.-wi)*prof(m+1, i)
+                  if(i > 0) w % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
                   i = Key_Ind('P',keys,nks)
-                  if(i > 0) p % n(c) = wi*prof(m, i) + (1.-wi)*prof(m+1, i)
+                  if(i > 0) p % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
 
                   ! For temperature
                   if(heat_transfer) then
                     i = Key_Ind('T',keys,nks)
-                    if(i > 0) t % n(c) = wi*prof(m, i) + (1.-wi)*prof(m+1, i)
+                    if(i > 0) t % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
                     if(i > 0) t % bnd_cell_type(c) = bc_type_tag
                     i = Key_Ind('Q',keys,nks)
-                    if(i > 0) t % q(c) = wi*prof(m, i) + (1.-wi)*prof(m+1, i)
+                    if(i > 0) t % q(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
                     if(i > 0) t % bnd_cell_type(c) = bc_type_tag
                   end if
 
-                  ! For user scalars
-                  do us = 1, n_user_scalars
-                    i = Key_Ind(user_scalar(us) % name, keys, nks)
+                  ! For scalars
+                  do sc = 1, flow % n_scalars
+                    i = Key_Ind(scalar(sc) % name, keys, nks)
                     if(i > 0) &
-                      user_scalar(us) % n(c)=wi*prof(m,i)+(1.-wi)*prof(m+1,i)
-                    i = Key_Ind(user_scalar(us) % flux_name, keys, nks)
+                      scalar(sc) % n(c)=wi*prof(m,i)+(1.-wi)*prof(m+1,i)
+                    i = Key_Ind(scalar(sc) % flux_name, keys, nks)
                     if(i > 0) &
-                      user_scalar(us) % q(c)=wi*prof(m,i)+(1.-wi)*prof(m+1,i)
+                      scalar(sc) % q(c)=wi*prof(m,i)+(1.-wi)*prof(m+1,i)
                   end do
 
                   ! For turbulence models
                   if(turbulence_model .eq. K_EPS) then
 
                     i = Key_Ind('KIN',keys,nks)
-                    if(i > 0) kin % n(c) = wi*prof(m, i) + (1.-wi)*prof(m+1, i)
+                    if(i > 0) kin % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
 
                     i = Key_Ind('EPS',keys,nks)
-                    if(i > 0) eps % n(c) = wi*prof(m, i) + (1.-wi)*prof(m+1, i)
+                    if(i > 0) eps % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
                   end if
 
                   if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
                      turbulence_model .eq. HYBRID_LES_RANS) then
 
                     i = Key_Ind('KIN',keys,nks)
-                    if(i > 0) kin % n(c) = wi*prof(m, i) + (1.-wi)*prof(m+1, i)
+                    if(i > 0) kin % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
 
                     i = Key_Ind('EPS',keys,nks)
-                    if(i > 0) eps % n(c) = wi*prof(m, i) + (1.-wi)*prof(m+1, i)
+                    if(i > 0) eps % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
 
                     i = Key_Ind('ZETA',keys,nks)
-                    if(i > 0) zeta % n(c) = wi*prof(m, i) + (1.-wi)*prof(m+1, i)
+                    if(i > 0) zeta % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
 
                     i = Key_Ind('F22',keys,nks)
-                    if(i > 0) f22 % n(c) = wi*prof(m, i) + (1.-wi)*prof(m+1, i)
+                    if(i > 0) f22 % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
+                  end if
+
+                  if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
+                    i = Key_Ind('T2',keys,nks)
+                    if(i > 0) t2 % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
                   end if
 
                   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
                      turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
 
                     i = Key_Ind('UU', keys, nks)
-                    if(i > 0) uu % n(c) = wi*prof(m, i) + (1.-wi)*prof(m+1, i)
+                    if(i > 0) uu % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
 
                     i = Key_Ind('VV', keys, nks)
-                    if(i > 0) vv % n(c) = wi*prof(m, i) + (1.-wi)*prof(m+1, i)
+                    if(i > 0) vv % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
 
                     i = Key_Ind('WW', keys, nks)
-                    if(i > 0) ww % n(c) = wi*prof(m, i) + (1.-wi)*prof(m+1, i)
+                    if(i > 0) ww % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
 
                     i = Key_Ind('UV', keys, nks)
-                    if(i > 0) uv % n(c) = wi*prof(m, i) + (1.-wi)*prof(m+1, i)
+                    if(i > 0) uv % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
 
                     i = Key_Ind('UW', keys, nks)
-                    if(i > 0) uw % n(c) = wi*prof(m, i) + (1.-wi)*prof(m+1, i)
+                    if(i > 0) uw % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
 
                     i = Key_Ind('VW', keys, nks)
-                    if(i > 0) vw % n(c) = wi*prof(m, i) + (1.-wi)*prof(m+1, i)
+                    if(i > 0) vw % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
 
                     i = Key_Ind('EPS', keys, nks)
-                    if(i > 0) eps % n(c) = wi*prof(m, i) + (1.-wi)*prof(m+1, i)
+                    if(i > 0) eps % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
 
                     if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
                       i = Key_Ind('F22', keys, nks)
-                      if(i > 0)f22 % n(c) = wi*prof(m, i) + (1.-wi)*prof(m+1, i)
+                      if(i > 0)f22 % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
                     end if
                   end if
 
                   if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
                      turbulence_model .eq. DES_SPALART) then
                     i = Key_Ind('VIS',keys,nks)
-                    if(i > 0) vis % n(c) = wi*prof(m, i) + (1.-wi)*prof(m+1, i)
+                    if(i > 0) vis % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
                   end if
 
                 end if  ! (here)
               end do  ! m = 1, n_points-1
-            end if  ! if(restart)
+            end if  ! if(backup)
           end do  ! c = -1, -grid % n_bnd_cells, -1
         end if  ! plane is defined?
         close(9)

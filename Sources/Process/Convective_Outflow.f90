@@ -1,29 +1,40 @@
 !==============================================================================!
-  subroutine Convective_Outflow(grid, dt)
+  subroutine Convective_Outflow(flow, dt)
 !------------------------------------------------------------------------------!
 !   Extrapoloate variables on the boundaries where needed.                     !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Flow_Mod
+  use Field_Mod, only: Field_Type, heat_transfer, density
   use Rans_Mod
-  use Grid_Mod
+  use Grid_Mod,  only: Grid_Type
+  use Bulk_Mod,  only: Bulk_Type
   use Grad_Mod
   use Bulk_Mod
   use Control_Mod
-  use Work_Mod, only: t_x => r_cell_01,  &
-                      t_y => r_cell_02,  &
-                      t_z => r_cell_03           
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
-  real            :: dt
+  type(Field_Type), target :: flow
+  real                     :: dt
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c1, c2, s
+  type(Grid_Type), pointer :: grid
+  type(Bulk_Type), pointer :: bulk
+  type(Var_Type),  pointer :: u, v, w, t
+  real,            pointer :: flux(:)
+  integer                  :: c1, c2, s
 !==============================================================================!
 
-  call Bulk_Mod_Compute_Fluxes(grid, bulk, flux)
+  ! Take aliases
+  grid => flow % pnt_grid
+  bulk => flow % bulk
+  flux => flow % flux
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+  t    => flow % t
+
+  call Bulk_Mod_Calculate_Fluxes(grid, bulk, flux)
 
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
@@ -33,15 +44,15 @@
     if(c2  < 0) then
       if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) ) then
         u % n(c2) = u % n(c2)   &
-                  - ( bulk % u * u % x(c1)         & 
+                  - ( bulk % u * u % x(c1)         &
                     + bulk % v * u % y(c1)         &
                     + bulk % w * u % z(c1) ) * dt
         v % n(c2) = v % n(c2)  &
-                  - ( bulk % u * v % x(c1)         & 
+                  - ( bulk % u * v % x(c1)         &
                     + bulk % v * v % y(c1)         &
                     + bulk % w * v % z(c1) ) * dt
         w % n(c2) = w % n(c2)  &
-                  - ( bulk % u * w % x(c1)         & 
+                  - ( bulk % u * w % x(c1)         &
                     + bulk % v * w % y(c1)         &
                     + bulk % w * w % z(c1) ) * dt
       end if
@@ -49,9 +60,11 @@
   end do
 
   if(heat_transfer) then
-    call Grad_Mod_For_Phi(grid, t % n, 1, t_x, .true.)     ! dT/dx
-    call Grad_Mod_For_Phi(grid, t % n, 2, t_y, .true.)     ! dT/dy
-    call Grad_Mod_For_Phi(grid, t % n, 3, t_z, .true.)     ! dT/dz
+
+    ! Temperature gradients might have been computed and
+    ! stored already in t % x, t % y and t % z, check it
+    call Grad_Mod_Variable(t, .true.)
+
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
@@ -60,9 +73,9 @@
       if(c2  < 0) then
         if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) ) then
           t % n(c2) = t % n(c2)   &
-                    - ( bulk % u * t_x(c1)        & 
-                      + bulk % v * t_y(c1)        &
-                      + bulk % w * t_z(c1) ) * dt
+                    - ( bulk % u * t % x(c1)         &
+                      + bulk % v * t % y(c1)         &
+                      + bulk % w * t % z(c1) ) * dt
         end if
       end if
     end do

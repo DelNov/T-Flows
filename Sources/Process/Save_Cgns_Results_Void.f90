@@ -14,5 +14,5 @@
 !==============================================================================!
 
   if (this_proc .lt. 2) print *, "# Code is not compiled with CGNS support"
-  
+
   end subroutine

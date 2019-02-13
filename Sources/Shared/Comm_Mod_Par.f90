@@ -26,7 +26,7 @@
 
   contains
 
-  include 'Comm_Mod/Parallel/Allocate_Memory.f90'
+  include 'Comm_Mod/Parallel/Allocate.f90'
   include 'Comm_Mod/Parallel/Close_File.f90'
   include 'Comm_Mod/Parallel/Create_Buffers.f90'
   include 'Comm_Mod/Parallel/Create_New_Types.f90'

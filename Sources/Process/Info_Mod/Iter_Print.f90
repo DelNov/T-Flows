@@ -14,15 +14,17 @@
 
   if (this_proc < 2) then
 
-    print '(a87)', iter_info % line_lead  
+    print '(a129)', iter_info % line_lead
+    print '(a129)', iter_info % line_iter
+    print '(a129)', iter_info % line_sep
 
     ! Print only lines which have colon in the first column :-)
-    print '(a87)', iter_info % lines(1)
+    print '(a129)', iter_info % lines(1)
 
     ! First print normal lines
     do i = 2, 4
       tmp = iter_info % lines(i)
-      if( tmp(7:7) .eq. ':') print '(a87)', iter_info % lines(i)
+      if( tmp(7:7) .eq. ':') print '(a129)', iter_info % lines(i)
     end do
 
     ! Then print user lines
@@ -31,9 +33,6 @@
       if( tmp(7:7) .eq. ':') print '(a87)', iter_info % lines_user(i)
     end do
 
-    print '(a87)', iter_info % line_trail  
-    print '(a87)', ' '
-
   end if
-                 
+
   end subroutine

@@ -1,31 +1,43 @@
 !==============================================================================!
-  subroutine Source_Kin_K_Eps_Zeta_F(grid)
+  subroutine Source_Kin_K_Eps_Zeta_F(flow, sol)
 !------------------------------------------------------------------------------!
 !   Computes the source terms in kin transport equation.                       !
 !------------------------------------------------------------------------------!
-!   In kinetic energy eq. there are two source terms:                          !
-!   int( density (p_kin - eps ) )dV                                            !
+!   In kinetic energy equation there are two source terms:                     !
+!                                                                              !
+!     /
+!    |                                                                         !
+!    | (density (p_kin - eps)) dV                                              !
+!    |                                                                         !
+!   /                                                                          !
+!                                                                              !
 !------------------------------------------------------------------------------!
 !---------------------------------[Modules]------------------------------------!
   use Const_Mod
-  use Flow_Mod
+  use Field_Mod
   use Les_Mod
   use Rans_Mod
-  use Grid_Mod
-  use Control_Mod
+  use Grid_Mod,   only: Grid_Type
+  use Solver_Mod, only: Solver_Type
+  use Matrix_Mod, only: Matrix_Type
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Grid_Type) :: grid
+  type(Field_Type),  target :: flow
+  type(Solver_Type), target :: sol
 !---------------------------------[Calling]------------------------------------!
   real :: Y_Plus_Low_Re
+  real :: Y_Plus_Rough_Walls
   real :: Roughness_Coefficient
-!----------------------------------[Locals]------------------------------------!
-  integer :: c, c1, c2, s
-  real    :: u_tan, u_nor_sq, u_nor, u_tot_sq
-  real    :: lf, ebf, p_kin_int, p_kin_wf
-  real    :: alpha1, l_rans, l_sgs, kin_vis
-  real    :: u_tau_new 
+!-----------------------------------[Locals]-----------------------------------!
+  type(Grid_Type),   pointer :: grid
+  type(Var_Type),    pointer :: u, v, w
+  type(Matrix_Type), pointer :: a
+  real,              pointer :: b(:)
+  integer                    :: c, c1, c2, s
+  real                       :: u_tan, u_nor_sq, u_nor, u_tot_sq
+  real                       :: lf, ebf, p_kin_int, p_kin_wf
+  real                       :: alpha1, l_rans, l_sgs, kin_vis
 !==============================================================================!
 !   Dimensions:                                                                !
 !                                                                              !
@@ -39,6 +51,14 @@
 !   p_kin = 2*vis_t / density S_ij S_ij                                        !
 !   shear = sqrt(2 S_ij S_ij)                                                  !
 !------------------------------------------------------------------------------!
+
+  ! Take aliases
+  grid => flow % pnt_grid
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+  a    => sol % a
+  b    => sol % b % val
 
   ! Production source:
   do c = 1, grid % n_cells
@@ -113,8 +133,9 @@
 
         if(rough_walls) then
           z_o = Roughness_Coefficient(grid, c1)       
-          u_tau(c1) = c_mu25 * sqrt(kin % n(c1))
-          y_plus(c1) = u_tau(c1) * (grid % wall_dist(c1) + z_o) / kin_vis
+          u_tau(c1)  = c_mu25 * sqrt(kin % n(c1))
+          y_plus(c1) = Y_Plus_Rough_Walls(u_tau(c1), &
+                       grid % wall_dist(c1), kin_vis) 
 
           tau_wall(c1) = density*kappa*u_tau(c1)*u_tan  &
                        / log(((grid % wall_dist(c1)+z_o) / z_o))

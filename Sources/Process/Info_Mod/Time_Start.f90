@@ -14,25 +14,25 @@
   if (this_proc < 2) then
 
     ! Create a frame
-    time_info % line_lead (L_BOX+1:L_BOX+1) = '#'
-    time_info % lines(1)  (L_BOX+1:L_BOX+1) = '#'
-    time_info % lines(2)  (L_BOX+1:L_BOX+1) = '#'
-    time_info % lines(3)  (L_BOX+1:L_BOX+1) = '#'
-    time_info % lines(4)  (L_BOX+1:L_BOX+1) = '#'
-    time_info % lines(5)  (L_BOX+1:L_BOX+1) = '#'
-    time_info % lines(6)  (L_BOX+1:L_BOX+1) = '#'
-    time_info % line_trail(L_BOX+1:L_BOX+1) = '#'
+    time_info % line_lead (2*L_BOX-2 : 2*L_BOX-2) = '#'
+    time_info % lines(1)  (2*L_BOX-2 : 2*L_BOX-2) = '#'
+    time_info % lines(2)  (2*L_BOX-2 : 2*L_BOX-2) = '#'
+    time_info % lines(3)  (2*L_BOX-2 : 2*L_BOX-2) = '#'
+    time_info % lines(4)  (2*L_BOX-2 : 2*L_BOX-2) = '#'
+    time_info % lines(5)  (2*L_BOX-2 : 2*L_BOX-2) = '#'
+    time_info % lines(6)  (2*L_BOX-2 : 2*L_BOX-2) = '#'
+    time_info % line_trail(2*L_BOX-2 : 2*L_BOX-2) = '#'
 
-    time_info % line_lead (L_LINE-L_BOX:L_LINE-L_BOX) = '#'
-    time_info % lines(1)  (L_LINE-L_BOX:L_LINE-L_BOX) = '#'
-    time_info % lines(2)  (L_LINE-L_BOX:L_LINE-L_BOX) = '#'
-    time_info % lines(3)  (L_LINE-L_BOX:L_LINE-L_BOX) = '#'
-    time_info % lines(4)  (L_LINE-L_BOX:L_LINE-L_BOX) = '#'
-    time_info % lines(5)  (L_LINE-L_BOX:L_LINE-L_BOX) = '#'
-    time_info % lines(6)  (L_LINE-L_BOX:L_LINE-L_BOX) = '#'
-    time_info % line_trail(L_LINE-L_BOX:L_LINE-L_BOX) = '#'
+    time_info % line_lead (4*L_BOX+4 : 4*L_BOX+4) = '#'
+    time_info % lines(1)  (4*L_BOX+4 : 4*L_BOX+4) = '#'
+    time_info % lines(2)  (4*L_BOX+4 : 4*L_BOX+4) = '#'
+    time_info % lines(3)  (4*L_BOX+4 : 4*L_BOX+4) = '#'
+    time_info % lines(4)  (4*L_BOX+4 : 4*L_BOX+4) = '#'
+    time_info % lines(5)  (4*L_BOX+4 : 4*L_BOX+4) = '#'
+    time_info % lines(6)  (4*L_BOX+4 : 4*L_BOX+4) = '#'
+    time_info % line_trail(4*L_BOX+4 : 4*L_BOX+4) = '#'
 
-    do i = L_BOX+2, L_LINE-L_BOX-1
+    do i = 2*L_BOX-1, 4*L_BOX+3
       time_info % line_lead (i:i) = '='
       time_info % line_trail(i:i) = '-'
     end do

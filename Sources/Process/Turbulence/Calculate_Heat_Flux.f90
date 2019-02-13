@@ -1,82 +1,64 @@
 !==============================================================================!
-  subroutine Calculate_Heat_Flux(grid)
+  subroutine Calculate_Heat_Flux(flow)
 !------------------------------------------------------------------------------!
 !   Computes turbulent heat fluxes                                             !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
   use Control_Mod
-  use Grid_Mod
+  use Grid_Mod,  only: Grid_Type
   use Grad_Mod
-  use Flow_Mod 
+  use Field_Mod, only: Field_Type
   use Rans_Mod
-  use Work_Mod, only: t_x => r_cell_01,  &
-                      t_y => r_cell_02,  &
-                      t_z => r_cell_03
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Field_Type), target :: flow
 !---------------------------------[Calling]------------------------------------!
   real :: Turbulent_Prandtl_Number
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c 
-  real    :: beta, pr
+  type(Grid_Type), pointer :: grid
+  type(Var_Type),  pointer :: t
+  integer                  :: c
 !==============================================================================!
 
-  call Grad_Mod_For_Phi(grid, t % n, 1, t_x, .true.)
-  call Grad_Mod_For_Phi(grid, t % n, 2, t_y, .true.)
-  call Grad_Mod_For_Phi(grid, t % n, 3, t_z, .true.)
+  ! Take aliases
+  grid => flow % pnt_grid
+  t    => flow % t
+
+  ! Check if these are already computed somewhere, ...
+  ! ... maybe this call is not needed
+  call Grad_Mod_Array(grid, t % n, t % x, t % y, t % z, .true.)
 
   !-----------------------------------------!
   !   Compute the sources in the interior   !
   !-----------------------------------------!
   call Control_Mod_Turbulent_Prandtl_Number(pr_t)
-  pr   = 0.71  ! bad, hard coded
-  beta = 1.0
 
-  if(turbulence_model .eq. K_EPS        .or.  &
-     turbulence_model .eq. K_EPS_ZETA_F .or.  &
-     turbulence_model .eq. DES_SPALART  .or.  &
-     turbulence_model .eq. HYBRID_LES_RANS) then
+  if(turbulent_heat_flux_model .eq. SGDH) then
 
     do c = 1, grid % n_cells
       pr_t = max(Turbulent_Prandtl_Number(grid, c), TINY)
-      ut % n(c) = -vis_t(c) / pr_t * t_x(c)
-      vt % n(c) = -vis_t(c) / pr_t * t_y(c)
-      wt % n(c) = -vis_t(c) / pr_t * t_z(c)
+      ut % n(c) = -vis_t(c) / pr_t * t % x(c)
+      vt % n(c) = -vis_t(c) / pr_t * t % y(c)
+      wt % n(c) = -vis_t(c) / pr_t * t % z(c)
     end do
 
-  else if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
-          turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
+  else if(turbulent_heat_flux_model .eq. GGDH) then
+   
     do c = 1, grid % n_cells
-
-      ut % n(c) =  -0.22*t_scale(c) * (uu % n(c) * t_x(c) +  &
-                                       uv % n(c) * t_y(c) +  &
-                                       uw % n(c) * t_z(c))
-      vt % n(c) =  -0.22*t_scale(c) * (uv % n(c) * t_x(c) +  &
-                                       vv % n(c) * t_y(c) +  &
-                                       vw % n(c) * t_z(c))
-      wt % n(c) =  -0.22*t_scale(c) * (uw % n(c) * t_x(c) +  &
-                                       vw % n(c) * t_y(c) +  &
-                                       ww % n(c) * t_z(c))
-
+      ut % n(c) =  -c_theta*t_scale(c) * (uu % n(c) * t % x(c)  +  &
+                                          uv % n(c) * t % y(c)  +  &
+                                          uw % n(c) * t % z(c))
+      vt % n(c) =  -c_theta*t_scale(c) * (uv % n(c) * t % x(c)  +  &
+                                          vv % n(c) * t % y(c)  +  &
+                                          vw % n(c) * t % z(c))
+      wt % n(c) =  -c_theta*t_scale(c) * (uw % n(c) * t % x(c)  +  &
+                                          vw % n(c) * t % y(c)  +  &
+                                          ww % n(c) * t % z(c))
     end do
-  end if
 
-  if(buoyancy) then
-    do c = 1, grid % n_cells
-      ut % n(c) = min( 0.01 * t_ref, ut % n(c))
-      ut % n(c) = max(-0.01 * t_ref, ut % n(c))
-      vt % n(c) = min( 0.01 * t_ref, vt % n(c))
-      vt % n(c) = max(-0.01 * t_ref, vt % n(c))
-      wt % n(c) = min( 0.01 * t_ref, wt % n(c))
-      wt % n(c) = max(-0.01 * t_ref, wt % n(c))
-      g_kin(c) = -beta*(  grav_x * ut % n(c)  &
-                        + grav_y * vt % n(c)  &
-                        + grav_z * wt % n(c))
-      g_kin(c) = max(g_kin(c),0.0)
-    end do
+  else if(turbulent_heat_flux_model .eq. AFM) then
   end if
 
   end subroutine

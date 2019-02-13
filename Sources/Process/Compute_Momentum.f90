@@ -1,64 +1,48 @@
 !==============================================================================!
-  subroutine Compute_Momentum(grid, dt, ini, ui,  &
-                              ui_i, ui_j, ui_k,   &
-                              si, sj, sk,         &
-                              di, dj, dk,         &
-                              h_i, uj_i, uk_i)
+  subroutine Compute_Momentum(flow, i, sol, dt, ini)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves momentum conservation equations                     !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Flow_Mod
+  use Comm_Mod
+  use Field_Mod,    only: Field_Type, buoyancy, grav_x, grav_y, grav_z,  &
+                          density, viscosity
   use Les_Mod
   use Rans_Mod
-  use Comm_Mod
-  use Var_Mod
-  use Grid_Mod
-  use Bulk_Mod
-  use Info_Mod
+  use Var_Mod,      only: Var_Type
+  use Grid_Mod,     only: Grid_Type
+  use Bulk_Mod,     only: Bulk_Type
+  use Info_Mod,     only: Info_Mod_Iter_Fill_At
   use Numerics_Mod
-  use Solvers_Mod, only: Bicg, Cg, Cgs
-  use Control_Mod
+  use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
+  use Matrix_Mod,   only: Matrix_Type
   use User_Mod
-  use Work_Mod,    only: ui_min  => r_cell_01,  &
-                         ui_max  => r_cell_02
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
-  real            :: dt
-  integer         :: ini
-  type(Var_Type)  :: ui
-  real            :: ui_i(-grid % n_bnd_cells:grid % n_cells),  &
-                     ui_j(-grid % n_bnd_cells:grid % n_cells),  &
-                     ui_k(-grid % n_bnd_cells:grid % n_cells)
-  real            :: si(grid % n_faces),  &
-                     sj(grid % n_faces),  &
-                     sk(grid % n_faces)
-  real            :: di(grid % n_faces),  &
-                     dj(grid % n_faces),  &
-                     dk(grid % n_faces)
-  real            :: h_i (-grid % n_bnd_cells:grid % n_cells),  &
-                     uj_i(-grid % n_bnd_cells:grid % n_cells),  &
-                     uk_i(-grid % n_bnd_cells:grid % n_cells)
-  real            :: uu_f, vv_f, ww_f, uv_f, uw_f, vw_f
+  type(Field_Type),  target :: flow
+  integer                   :: i           ! component
+  type(Solver_Type), target :: sol
+  real                      :: dt
+  integer                   :: ini
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: s, c, c1, c2, niter
-  real              :: f_ex, f_im, f_stress
-  real              :: uis, vel_max
-  real              :: a0, a12, a21
-  real              :: ini_res, tol
-  real              :: vis_eff, vis_tS
-  real              :: ui_i_f,ui_j_f,ui_k_f,uj_i_f,uk_i_f
-  character(len=80) :: precond
-  integer           :: adv_scheme    ! space disretization of advection (scheme)
-  real              :: blend         ! blending coeff (1.0 central; 0.0 upwind)
-  integer           :: td_scheme     ! time-disretization for inerita
-  integer           :: td_advection  ! time-disretization for advection
-  integer           :: td_diffusion  ! time-disretization for diffusion
-  integer           :: td_cross_diff ! time-disretization for cross-diffusion
-  real              :: urf           ! under-relaxation factor
+  type(Grid_Type),   pointer :: grid
+  type(Bulk_Type),   pointer :: bulk
+  type(Matrix_Type), pointer :: a
+  type(Var_Type),    pointer :: ui, uj, uk, t, p
+  real,              pointer :: flux(:)
+  real,              pointer :: b(:)
+  real,              pointer :: ui_i(:), ui_j(:), ui_k(:), uj_i(:), uk_i(:)
+  real,              pointer :: si(:), sj(:), sk(:), di(:), dj(:), dk(:)
+  real,              pointer :: h_i(:)
+  integer                    :: s, c, c1, c2, exec_iter
+  real                       :: f_ex, f_im, f_stress
+  real                       :: uis, vel_max
+  real                       :: a0, a12, a21
+  real                       :: vis_eff, vis_tS
+  real                       :: ui_i_f, ui_j_f, ui_k_f, uj_i_f, uk_i_f
+  real                       :: uu_f, vv_f, ww_f, uv_f, uw_f, vw_f
 !------------------------------------------------------------------------------!
 !
 !  Stress tensor on the face s:
@@ -116,20 +100,51 @@
 !     Wall visc.      vis_wall [kg/(m*s)]
 !==============================================================================!
 
+  ! Take aliases
+  grid => flow % pnt_grid
+  bulk => flow % bulk
+  flux => flow % flux
+  t    => flow % t
+  p    => flow % p
+  a    => sol % a
+  b    => sol % b % val
+
+  if(i .eq. 1) then
+    ui   => flow % u;   uj   => flow % v;   uk   => flow % w
+    ui_i => ui % x;     ui_j => ui % y;     ui_k => ui % z
+    si   => grid % sx;  sj   => grid % sy;  sk   => grid % sz
+    di   => grid % dx;  dj   => grid % dy;  dk   => grid % dz
+    h_i  => p % x;      uj_i => uj % x;     uk_i => uk % x
+  end if
+  if(i .eq. 2) then
+    ui   => flow % v;   uj   => flow % w;   uk   => flow % u
+    ui_i => ui % y;     ui_j => ui % z;     ui_k => ui % x
+    si   => grid % sy;  sj   => grid % sz;  sk   => grid % sx
+    di   => grid % dy;  dj   => grid % dz;  dk   => grid % dx
+    h_i  => p % y;      uj_i => uj % y;     uk_i => uk % y
+  end if
+  if(i .eq. 3) then
+    ui   => flow % w;   uj   => flow % u;   uk   => flow % v
+    ui_i => ui % z;     ui_j => ui % x;     ui_k => ui % y
+    si   => grid % sz;  sj   => grid % sx;  sk   => grid % sy
+    di   => grid % dz;  dj   => grid % dx;  dk   => grid % dy
+    h_i  => p % z;      uj_i => uj % z;     uk_i => uk % z
+  end if
+
+  ! Initialize matrix and right hand side
+  a % val(:) = 0.0
+  b      (:) = 0.0
+  f_stress   = 0.0
+
   ! User function
-  call User_Mod_Beginning_Of_Compute_Momentum(grid, dt, ini)
+  call User_Mod_Beginning_Of_Compute_Momentum(flow, dt, ini)
 
   ! Calculate velocity magnitude for normalization
   vel_max = 0.0
   do c = -grid % n_bnd_cells, grid % n_cells
-    vel_max = max(vel_max, sqrt(u % n(c)**2 + v % n(c)**2 + w % n(c)**2))
+    vel_max = max(vel_max, sqrt(ui % n(c)**2 + uj % n(c)**2 + uk % n(c)**2))
   end do
   call Comm_Mod_Global_Max_Real(vel_max)
-
-  ! Initialize matrix and right hand side
-  b        = 0.0
-  a % val  = 0.0
-  f_stress = 0.0
 
   ! Old values (o) and older than old (oo)
   if(ini .eq. 1) then
@@ -145,13 +160,9 @@
   !               !
   !---------------!
 
-  ! Retreive advection scheme and blending coefficient
-  call Control_Mod_Advection_Scheme_For_Momentum(adv_scheme)
-  call Control_Mod_Blending_Coefficient_For_Momentum(blend)
-
   ! Compute phimax and phimin
-  if(adv_scheme .ne. CENTRAL) then
-    call Calculate_Minimum_Maximum(grid, ui % n, ui_min, ui_max) ! or ui % o ?
+  if(ui % adv_scheme .ne. CENTRAL) then
+    call Numerics_Mod_Advection_Min_Max(ui)
     goto 1  ! why on Earth this?
   end if
 
@@ -172,11 +183,11 @@
     ! Central differencing
     uis = grid % f(s) * ui % n(c1) + (1.0 - grid % f(s)) * ui % n(c2)
 
-    if(adv_scheme .ne. CENTRAL) then
-      call Advection_Scheme(grid, uis, s, ui % n, ui_min, ui_max,  &
-                            ui_i, ui_j, ui_k,                      &
-                            di, dj, dk,                            &
-                            adv_scheme, blend)
+    if(ui % adv_scheme .ne. CENTRAL) then
+      call Numerics_Mod_Advection_Scheme(uis, s, ui,                   &
+                                         ui_i, ui_j, ui_k,             &
+                                         di, dj, dk,                   &
+                                         flux)
     end if
 
     ! Compute advection term
@@ -233,11 +244,12 @@
 
     if(turbulence_model .ne. NONE .and.  &
        turbulence_model .ne. DNS) then
-      vis_eff = vis_eff + fw(s)*vis_t(c1)+(1.0-fw(s))*vis_t(c2)
+      vis_eff = vis_eff + grid % fw(s)*vis_t(c1)+(1.0-grid % fw(s))*vis_t(c2)
     end if
 
     if(turbulence_model .eq. HYBRID_LES_RANS) then
-      vis_eff = fw(s)*vis_t_eff(c1)+(1.0-fw(s))*vis_t_eff(c2) + viscosity
+      vis_eff =      grid % fw(s)  * vis_t_eff(c1)   &
+              + (1.0-grid % fw(s)) * vis_t_eff(c2) + viscosity
     end if
 
     if(c2 < 0) then
@@ -267,23 +279,23 @@
        turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
       if(turbulence_model_variant .ne. STABILIZED) then
         if(ui % name .eq. 'U') then
-          uu_f = fw(s) * uu % n(c1) + (1.0-fw(s)) * uu % n(c2)
-          uv_f = fw(s) * uv % n(c1) + (1.0-fw(s)) * uv % n(c2)
-          uw_f = fw(s) * uw % n(c1) + (1.0-fw(s)) * uw % n(c2)
+          uu_f = grid % fw(s) * uu % n(c1) + (1.0-grid % fw(s)) * uu % n(c2)
+          uv_f = grid % fw(s) * uv % n(c1) + (1.0-grid % fw(s)) * uv % n(c2)
+          uw_f = grid % fw(s) * uw % n(c1) + (1.0-grid % fw(s)) * uw % n(c2)
           f_stress = - (  uu_f * grid % sx(s)  &
                         + uv_f * grid % sy(s)  &
                         + uw_f * grid % sz(s) )
         else if(ui % name .eq. 'V') then
-          uv_f = fw(s) * uv % n(c1) + (1.0-fw(s)) * uv % n(c2)
-          vv_f = fw(s) * vv % n(c1) + (1.0-fw(s)) * vv % n(c2)
-          vw_f = fw(s) * vw % n(c1) + (1.0-fw(s)) * vw % n(c2)
+          uv_f = grid % fw(s) * uv % n(c1) + (1.0-grid % fw(s)) * uv % n(c2)
+          vv_f = grid % fw(s) * vv % n(c1) + (1.0-grid % fw(s)) * vv % n(c2)
+          vw_f = grid % fw(s) * vw % n(c1) + (1.0-grid % fw(s)) * vw % n(c2)
           f_stress =  - (  uv_f * grid % sx(s)  &
                          + vv_f * grid % sy(s)  &
                          + vw_f * grid % sz(s) )
         else if(ui % name .eq. 'W') then
-          uw_f = fw(s) * uw % n(c1) + (1.0-fw(s)) * uw % n(c2)
-          vw_f = fw(s) * vw % n(c1) + (1.0-fw(s)) * vw % n(c2)
-          ww_f = fw(s) * ww % n(c1) + (1.0-fw(s)) * ww % n(c2)
+          uw_f = grid % fw(s) * uw % n(c1) + (1.0-grid % fw(s)) * uw % n(c2)
+          vw_f = grid % fw(s) * vw % n(c1) + (1.0-grid % fw(s)) * vw % n(c2)
+          ww_f = grid % fw(s) * ww % n(c1) + (1.0-grid % fw(s)) * ww % n(c2)
           f_stress =  - (  uw_f * grid % sx(s)  &
                          + vw_f * grid % sy(s)  &
                          + ww_f * grid % sz(s) )
@@ -291,23 +303,23 @@
       end if
     end if
 
-    ui_i_f = fw(s)*ui_i(c1) + (1.0-fw(s))*ui_i(c2)
-    ui_j_f = fw(s)*ui_j(c1) + (1.0-fw(s))*ui_j(c2)
-    ui_k_f = fw(s)*ui_k(c1) + (1.0-fw(s))*ui_k(c2)
-    uj_i_f = fw(s)*uj_i(c1) + (1.0-fw(s))*uj_i(c2)
-    uk_i_f = fw(s)*uk_i(c1) + (1.0-fw(s))*uk_i(c2)
+    ui_i_f = grid % fw(s)*ui_i(c1) + (1.0-grid % fw(s))*ui_i(c2)
+    ui_j_f = grid % fw(s)*ui_j(c1) + (1.0-grid % fw(s))*ui_j(c2)
+    ui_k_f = grid % fw(s)*ui_k(c1) + (1.0-grid % fw(s))*ui_k(c2)
+    uj_i_f = grid % fw(s)*uj_i(c1) + (1.0-grid % fw(s))*uj_i(c2)
+    uk_i_f = grid % fw(s)*uk_i(c1) + (1.0-grid % fw(s))*uk_i(c2)
 
     ! Total (exact) viscous stress
     f_ex = vis_eff*(      2.0*ui_i_f  * si(s)      &
                     + (ui_j_f+uj_i_f) * sj(s)      &
                     + (ui_k_f+uk_i_f) * sk(s) )
 
-    a0 = vis_eff * f_coef(s)
+    a0 = vis_eff * a % fc(s)
 
     ! Implicit viscous stress
     f_im = (   ui_i_f*di(s)                &
              + ui_j_f*dj(s)                &
-             + ui_k_f*dk(s))*a0
+             + ui_k_f*dk(s)) * a0
 
     ! Cross diffusion part
     ui % c(c1) = ui % c(c1) + f_ex - f_im + f_stress * density
@@ -350,15 +362,15 @@
         c1 = grid % faces_c(1,s)
         c2 = grid % faces_c(2,s)
 
-        vis_tS = (fw(s)*vis_t(c1)+(1.0-fw(s))*vis_t(c2))
-        a0 = f_coef(s)*vis_tS
+        vis_tS = (grid % fw(s)*vis_t(c1)+(1.0-grid % fw(s))*vis_t(c2))
+        a0 = a % fc(s)*vis_tS
         vis_eff = vis_tS
 
-        ui_i_f = fw(s) * ui_i(c1) + (1.0-fw(s)) * ui_i(c2)
-        ui_j_f = fw(s) * ui_j(c1) + (1.0-fw(s)) * ui_j(c2)
-        ui_k_f = fw(s) * ui_k(c1) + (1.0-fw(s)) * ui_k(c2)
-        uj_i_f = fw(s) * uj_i(c1) + (1.0-fw(s)) * uj_i(c2)
-        uk_i_f = fw(s) * uk_i(c1) + (1.0-fw(s)) * uk_i(c2)
+        ui_i_f = grid % fw(s) * ui_i(c1) + (1.0-grid % fw(s)) * ui_i(c2)
+        ui_j_f = grid % fw(s) * ui_j(c1) + (1.0-grid % fw(s)) * ui_j(c2)
+        ui_k_f = grid % fw(s) * ui_k(c1) + (1.0-grid % fw(s)) * ui_k(c2)
+        uj_i_f = grid % fw(s) * uj_i(c1) + (1.0-grid % fw(s)) * uj_i(c2)
+        uk_i_f = grid % fw(s) * uk_i(c1) + (1.0-grid % fw(s)) * uk_i(c2)
 
         f_ex = vis_eff*( 2.0*ui_i_f         * si(s) &
                           + (ui_j_f+uj_i_f) * sj(s) &
@@ -366,12 +378,12 @@
 
         f_im = (  ui_i_f * di(s)  &
                 + ui_j_f * dj(s)  &
-                + ui_k_f * dk(s)) * vis_eff * f_coef(s)
+                + ui_k_f * dk(s)) * vis_eff * a % fc(s)
 
-        b(c1) = b(c1) - vis_eff * (ui % n(c2) -ui % n(c1)) * f_coef(s)  &
+        b(c1) = b(c1) - vis_eff * (ui % n(c2) -ui % n(c1)) * a % fc(s)  &
               - f_ex + f_im
         if(c2  > 0) then
-          b(c2) = b(c2) + vis_eff * (ui % n(c2) -ui % n(c1)) * f_coef(s)  &
+          b(c2) = b(c2) + vis_eff * (ui % n(c2) -ui % n(c1)) * a % fc(s)  &
                 + f_ex - f_im
         end if
       end do
@@ -389,10 +401,8 @@
   !                    !
   !--------------------!
 
-  call Control_Mod_Time_Integration_Scheme(td_scheme)
-
   ! Two time levels; linear interpolation
-  if(td_scheme .eq. LINEAR) then
+  if(ui % td_scheme .eq. LINEAR) then
     do c = 1, grid % n_cells
       a0 = density * grid % vol(c) / dt
       a % val(a % dia(c)) = a % val(a % dia(c)) + a0
@@ -401,7 +411,7 @@
   end if
 
   ! Three time levels; parabolic interpolation
-  if(td_scheme .eq. PARABOLIC) then
+  if(ui % td_scheme .eq. PARABOLIC) then
     do c = 1, grid % n_cells
       a0 = density * grid % vol(c) / dt
       a % val(a % dia(c)) = a % val(a % dia(c)) + 1.5 * a0
@@ -445,17 +455,17 @@
   if(buoyancy) then
     if(ui % name .eq. 'U') then
       do c = 1, grid % n_cells
-        b(c) = b(c) - density * grav_x * (t % n(c) - t_ref)  &
+        b(c) = b(c) - density * grav_x * (t % n(c) - flow % t_ref)  &
              * grid % vol(c)
       end do
     else if(ui % name .eq. 'V') then
       do c = 1, grid % n_cells
-        b(c) = b(c) - density * grav_y * (t % n(c) - t_ref)  &
+        b(c) = b(c) - density * grav_y * (t % n(c) - flow % t_ref)  &
              * grid % vol(c)
       end do
     else if(ui % name .eq. 'W') then
       do c = 1, grid % n_cells
-        b(c) = b(c) - density * grav_z * (t % n(c) - t_ref)  &
+        b(c) = b(c) - density * grav_z * (t % n(c) - flow % t_ref)  &
              * grid % vol(c)
       end do
     end if
@@ -472,49 +482,37 @@
   !                                   !
   !-----------------------------------!
 
-  ! Set under-relaxation factor then overwrite with conrol file if specified
-  urf = 0.8
-  call Control_Mod_simple_Underrelaxation_For_Momentum(urf)
-
+  ! Under-relax the equations
   do c = 1, grid % n_cells
     a % sav(c) = a % val(a % dia(c))
-    b(c) = b(c) + a % val(a % dia(c)) * (1.0 - urf)*ui % n(c) / urf
-    a % val(a % dia(c)) = a % val(a % dia(c)) / urf
+    b(c) = b(c) + a % val(a % dia(c)) * (1.0 - ui % urf)*ui % n(c) / ui % urf
+    a % val(a % dia(c)) = a % val(a % dia(c)) / ui % urf
   end do
 
-  ! Get solver tolerance
-  call Control_Mod_Tolerance_For_Momentum_Solver(tol)
-
-  ! Get matrix precondioner
-  call Control_Mod_Preconditioner_For_System_Matrix(precond)
-
-  ! Set number of iterations then overwrite with conrol file if specified
-  niter =  5
-  call Control_Mod_Max_Iterations_For_Momentum_Solver(niter)
-
-  call Bicg(a,        &
-            ui % n,   &
-            b,        &
-            precond,  &
-            niter,    &
-            tol,      &
-            ini_res,  &
-            ui % res, &
+  ! Call linear solver
+  call Bicg(sol,           &
+            ui % n,        &
+            b,             &
+            ui % precond,  &
+            ui % niter,    &
+            exec_iter,     &
+            ui % tol,      &
+            ui % res,      &
             norm = vel_max)
 
   if(ui % name .eq. 'U') then
-    call Info_Mod_Iter_Fill_At(2, 1, ui % name, niter, ui % res)
+    call Info_Mod_Iter_Fill_At(1, 1, ui % name, exec_iter, ui % res)
   end if
   if(ui % name .eq. 'V') then
-    call Info_Mod_Iter_Fill_At(2, 2, ui % name, niter, ui % res)
+    call Info_Mod_Iter_Fill_At(1, 2, ui % name, exec_iter, ui % res)
   end if
   if(ui % name .eq. 'W') then
-    call Info_Mod_Iter_Fill_At(2, 3, ui % name, niter, ui % res)
+    call Info_Mod_Iter_Fill_At(1, 3, ui % name, exec_iter, ui % res)
   end if
 
   call Comm_Mod_Exchange_Real(grid, ui % n)
 
   ! User function
-  call User_Mod_End_Of_Compute_Momentum(grid, dt, ini)
+  call User_Mod_End_Of_Compute_Momentum(flow, dt, ini)
 
   end subroutine

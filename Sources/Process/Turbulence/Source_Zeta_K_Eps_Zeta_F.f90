@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Source_Zeta_K_Eps_Zeta_F(grid, n_step)
+  subroutine Source_Zeta_K_Eps_Zeta_F(grid, sol, n_step)
 !------------------------------------------------------------------------------!
 !   Calculate source terms in equation for zeta.                               !
 !   Term which is negative is put on left hand side in diagonal of             !
@@ -7,27 +7,39 @@
 !------------------------------------------------------------------------------!
 !---------------------------------[Modules]------------------------------------!
   use Const_Mod
-  use Flow_Mod
+  use Field_Mod
   use Rans_Mod
-  use Grid_Mod
-  use Control_Mod
+  use Grid_Mod,   only: Grid_Type
+  use Solver_Mod, only: Solver_Type
+  use Matrix_Mod, only: Matrix_Type
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Grid_Type) :: grid
-  integer         :: n_step
+  type(Grid_Type)           :: grid
+  type(Solver_Type), target :: sol
+  integer                   :: n_step
 !----------------------------------[Locals]------------------------------------!
-  integer :: c
+  type(Matrix_Type), pointer :: a
+  real,              pointer :: b(:)
+  integer                    :: c
 !==============================================================================!
 !   In transport equation for zeta two source terms exist which have form:     !
 !                                                                              !
-!   int( f22 * kin * dV  - ( eps / zeta) * dV )                                !
+!    /                                                                         !
+!    |                     eps                                                 !
+!    | ( f22 * kin * dV - ---- * dV )                                          !
+!    |                    zeta                                                 !
+!    /                                                                         !
 !                                                                              !
 !   First term can appear as positive and as negative as well so depend of     !
 !   sign of term , it is placed on left or right hand side.  Second, negative  !
 !   source term is added to main diagonal left hand side coefficient matrix    !
 !   in order to increase stability of solver                                   !
 !------------------------------------------------------------------------------!
+
+  ! Take aliases
+  a => sol % a
+  b => sol % b % val
 
   ! Positive source term 
   ! The first option in treating the source is making computation very 

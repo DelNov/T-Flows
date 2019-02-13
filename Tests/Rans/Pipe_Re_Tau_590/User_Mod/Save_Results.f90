@@ -1,13 +1,15 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(grid, save_name) 
+  subroutine User_Mod_Save_Results(flow, save_name)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1r file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
 !                                                                              !
 !   The results are then writen in files name_res.dat and name_res_plus.dat    !
 !------------------------------------------------------------------------------!
-  use Grid_Mod
-  use Flow_Mod
+  use Grid_Mod,  only: Grid_Type
+  use Field_Mod
+  use Var_Mod,   only: Var_Type
+  use Bulk_Mod,  only: Bulk_Type
   use Rans_Mod
   use Comm_Mod                       ! parallel stuff
   use Name_Mod,  only: problem_name
@@ -15,25 +17,33 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)  :: grid
-  character(len=*) :: save_name
+  type(Field_Type), target :: flow
+  character(len=*)         :: save_name
 !-----------------------------------[Locals]-----------------------------------!
-  integer             :: n_prob, pl, c, i, count, s, c1, c2, n_points
-  character(len=80)   :: coord_name, res_name, res_name_plus
-  character(len=80)   :: store_name
-  real,allocatable    :: z_p(:),                              &
-                         u_p(:), v_p(:), w_p(:), y_plus_p(:), &
-                         kin_p(:), eps_p(:), f22_p(:),        & 
-                         vis_t_p(:), uw_p(:), zeta_p(:),      &  
-                         t_p(:), tt_p(:),                    &   
-                         ut_p(:), vt_p(:), wt_p(:), &  
-                         ind(:),                    &
-                         wall_p(:)
-  integer,allocatable :: n_p(:), n_count(:)
-  real                :: t_wall, t_tau, d_wall, nu_max, b11, b12, Rad 
-  real                :: Ubulk, Error, Re, Cf_Dean, Cf, pr, u_tau_p, R
-  logical             :: there
+  type(Grid_Type), pointer :: grid
+  type(Var_Type),  pointer :: u, v, w, t
+  type(Bulk_Type), pointer :: bulk
+  integer                  :: n_prob, pl, c, i, count, s, c1, c2, n_points
+  character(len=80)        :: coord_name, res_name, res_name_plus
+  character(len=80)        :: store_name
+  real, allocatable        :: z_p(:), u_p(:), v_p(:), w_p(:), y_plus_p(:),  &
+                              kin_p(:), eps_p(:), f22_p(:),                 &
+                              vis_t_p(:), uw_p(:), zeta_p(:),               &
+                              t_p(:), tt_p(:), ut_p(:), vt_p(:), wt_p(:),   &
+                              ind(:), wall_p(:)
+  integer,allocatable      :: n_p(:), n_count(:)
+  real                     :: t_wall, t_tau, d_wall, nu_max, b11, b12, rad, r
+  real                     :: ubulk, error, re, cf_dean, cf, pr, u_tau_p, t_inf
+  logical                  :: there
 !==============================================================================!
+
+  ! Take aliases
+  grid => flow % pnt_grid
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+  t    => flow % t
+  bulk => flow % bulk
 
   ! Set the name for coordinate file
   call Name_File(0, coord_name, ".1r")
@@ -69,7 +79,7 @@
     return
   end if
 
-  Ubulk = bulk % flux_z / (density*bulk % area_z)
+  ubulk = bulk % flux_z / (density*bulk % area_z)
   t_wall = 0.0
   nu_max = 0.0
   n_points = 0
@@ -115,12 +125,12 @@
   !-------------------------!
   do i = 1, n_prob-1
     do c = 1, grid % n_cells - grid % comm % n_buff_cells 
-      Rad = 1.0 - grid % wall_dist(c)
-      if( Rad < (z_p(i)) .and.  &
-          Rad > (z_p(i+1))) then
-        R = sqrt(grid % xc(c)**2 + grid % yc(c)**2)
-        b11 = grid % xc(c)/R
-        b12 = grid % yc(c)/R
+      rad = 1.0 - grid % wall_dist(c)
+      if( rad < (z_p(i)) .and.  &
+          rad > (z_p(i+1))) then
+        r = sqrt(grid % xc(c)**2 + grid % yc(c)**2)
+        b11 = grid % xc(c)/r
+        b12 = grid % yc(c)/r
 
         wall_p(i) = wall_p(i) + grid % wall_dist(c)
         u_p(i)   = u_p(i) + u % n(c)
@@ -232,7 +242,7 @@
     return
   end if
 
-  if(heat_transfer) then 
+  if(heat_transfer) then
     d_wall = 0.0
     do c = 1, grid % n_cells - grid % comm % n_buff_cells
       if(grid % wall_dist(c) > d_wall) then
@@ -243,12 +253,12 @@
 
     call Comm_Mod_Wait
 
-    if(heat_flux> 0.0) then
+    if(heat_flux > 0.0) then
       call Comm_Mod_Global_Min_Real(t_inf)
     else
       call Comm_Mod_Global_Max_Real(t_inf)
     end if
-    
+
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
@@ -257,7 +267,7 @@
             Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. WALLFL) then
 
           t_wall = t_wall + t % n(c2)
-          nu_max = nu_max + t % q(c2)/(conductivity*(t % n(c2) - t_inf))
+          nu_max = nu_max + t % q(c2) / (conductivity*(t % n(c2) - t_inf))
           n_points = n_points + 1
         end if
       end if
@@ -276,30 +286,30 @@
 
   open(3, file = res_name)
   open(4, file = res_name_plus)
-  
+
   do i = 3, 4
     pr = viscosity * capacity / conductivity
-    Re = density * Ubulk * 2.0/viscosity
-    Cf_Dean = 0.0791*(Re)**(-0.25)
-    Cf      = u_tau_p**2/(0.5*Ubulk**2)
-    Error   = abs(Cf_Dean - Cf)/Cf_Dean * 100.0
+    re = density * ubulk * 2.0 / viscosity
+    cf_dean = 0.0791*(re)**(-0.25)
+    cf      = u_tau_p**2/(0.5*ubulk**2)
+    error   = abs(cf_dean - cf)/cf_dean * 100.0
     write(i,'(A1,(A12,E12.6))')  &
-    '#', 'Ubulk    = ', Ubulk 
+    '#', 'ubulk    = ', ubulk 
     write(i,'(A1,(A12,E12.6))')  &
-    '#', 'Re       = ', density * Ubulk * 2.0/viscosity
+    '#', 'Re       = ', density * ubulk * 2.0/viscosity
     write(i,'(A1,(A12,E12.6))')  &
     '#', 'Re_tau   = ', density*u_tau_p/viscosity
     write(i,'(A1,(A12,E12.6))')  &
-    '#', 'Cf       = ', 2.0*(u_tau_p/Ubulk)**2
+    '#', 'Cf       = ', 2.0*(u_tau_p/ubulk)**2
     write(i,'(A1,(A12,F12.6))')  &
     '#', 'Utau     = ', u_tau_p 
     write(i,'(A1,(A12,F12.6,A2,A22))') & 
-    '#', 'Cf_error = ', Error, ' %', 'Dean formula is used.'
+    '#', 'Cf_error = ', error, ' %', 'Dean formula is used.'
     if(heat_transfer) then
       write(i,'(A1,(A12, F12.6))')'#', 'Nu number =', nu_max 
       write(i,'(A1,(A12, F12.6,A2,A39))')'#', 'Nu_error  =',  &
-            abs(0.023*0.5*Re**0.8*pr**0.4 - nu_max)           & 
-            / (0.023*0.5*Re**0.8*pr**0.4) * 100.0, ' %',&
+            abs(0.023*0.5*re**0.8*pr**0.4 - nu_max)           & 
+            / (0.023*0.5*re**0.8*pr**0.4) * 100.0, ' %',&
       'correlation of Dittus-Boelter is used.' 
     end if
 

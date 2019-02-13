@@ -8,7 +8,7 @@
   implicit none
 !==============================================================================!
 
-  ! These paramters should not be here but in a new module Numerics_Mod
+  ! Parameters for advection scheme
   integer, parameter :: UPWIND    = 40009
   integer, parameter :: CENTRAL   = 40013
   integer, parameter :: LUDS      = 40031
@@ -21,10 +21,17 @@
   integer, parameter :: AVL_SMART = 40111
 
   ! Variable holding time integration scheme
-  integer :: time_scheme
+  ! integer :: time_scheme
 
   ! Time integration parameters
   integer, parameter :: LINEAR    = 40123
   integer, parameter :: PARABOLIC = 40127
+
+  contains
+
+  include 'Numerics_Mod/Advection_Scheme.f90'
+  include 'Numerics_Mod/Advection_Scheme_Code.f90'
+  include 'Numerics_Mod/Advection_Min_Max.f90'
+  include 'Numerics_Mod/Time_Integration_Scheme_Code.f90'
 
   end module

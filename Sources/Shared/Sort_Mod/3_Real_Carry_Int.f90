@@ -1,8 +1,9 @@
 !==============================================================================!
   recursive subroutine Sort_Mod_3_Real_Carry_Int(a1, a2, a3, b)
 !------------------------------------------------------------------------------!
-!   Quick sort one real array and carry an integer arral along                 !
-!                                                                              ! 
+!   Quick sort three real arrays (think of three coordinates) and carry one    !
+!   integer arral along                                                        !
+!                                                                              !
 !   Adapted from: https://gist.github.com/1AdAstra1  (good work Olga)          !
 !------------------------------------------------------------------------------!
   implicit none
