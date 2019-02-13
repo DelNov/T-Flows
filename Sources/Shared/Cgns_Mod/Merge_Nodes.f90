@@ -27,10 +27,11 @@
 
 !==============================================================================!
 
+  print "(a)", " #=============================================="
   print "(a)", " # Merging blocks since they have common interfaces"
   print "(a)", " # Hint: Join blocks in mesher to avoid issues"
   print "(a,i26)", " # Old number of nodes: ", grid % n_nodes
-  print "(a)", " # ============================================="
+  print "(a)", " #----------------------------------------------"
   ! "/2" because mixed interface type had weight 1, while quad and tri had 2
   cnt_int = cnt_int / 2
 
@@ -285,7 +286,7 @@
     !   Reinitialize nodes   !
     !------------------------!
     print "(a,i7)", " # New number of nodes: ", cnt_node - 1
-    print "(a)", " # =========================================================="
+    print "(a)", " #-----------------------------------------------------------"
 
     deallocate(grid % xn)
     deallocate(grid % yn)
