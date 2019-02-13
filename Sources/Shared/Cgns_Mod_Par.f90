@@ -27,14 +27,6 @@
         !   Element sections   !
         !----------------------!
         !
-        !-------------------------!
-        !   Boundary conditions   !
-        !-------------------------!
-        !
-        !----------------!
-        !   Interfaces   !
-        !----------------!
-        !
         !----------------------!
         !   Solution section   !
         !----------------------!
@@ -59,14 +51,6 @@
     integer           :: sol_type
   end type
 
-  ! Interface section
-  type Cgns_Interface_Type
-    character(len=80) :: name
-    logical           :: marked_for_deletion
-    integer           :: id
-    integer           :: int_type ! 0 - uninit, 1 -quad, 2 -tri, 3 - mix
-  end type
-
   ! Element section
   type Cgns_Section_Type
     character(len=80)    :: name
@@ -76,13 +60,6 @@
     integer              :: parent_flag
   end type
 
-  ! Boundary conditions   ! -> it is similar to Bnd_Cond in ../Share :-(
-  type Cgns_Bnd_Cond_Type
-    character(len=80)    :: name
-    integer              :: color
-    integer              :: n_nodes
-  end type
-
   ! Blocks
   type Cgns_Block_Type
     character(len=80)                       :: name
@@ -90,12 +67,8 @@
     integer                                 :: mesh_info(3)
     integer                                 :: n_sects
     type(Cgns_Section_Type), allocatable    :: section(:)
-    integer                                 :: n_bnd_conds
-    type(Cgns_Bnd_Cond_Type), allocatable   :: bnd_cond(:)
     integer                                 :: n_coords
     character(len=80)                       :: coord_name(3)
-    integer                                 :: n_interfaces
-    type(Cgns_Interface_Type), allocatable  :: interface(:)
     integer                                 :: n_solutions
     type(Cgns_Solution_Type), allocatable   :: solution(:)
   end type
@@ -116,6 +89,7 @@
   integer :: cnt_cells
   integer :: cnt_blocks     ! probably not needed
   integer :: cnt_bnd_cells
+  integer :: pos_of_last_3d_cell
 
   ! Cells (3d)
   integer :: cnt_hex
@@ -153,20 +127,20 @@
   include 'Cgns_Mod/Write_Link_To_Field.f90'
   include 'Cgns_Mod/Write_Dimensions_Info.f90'
 
-  include 'Cgns_Mod/Read_Base_Info.f90'
-  include 'Cgns_Mod/Read_Number_Of_Bases_In_File.f90'
-  include 'Cgns_Mod/Read_Number_Of_Blocks_In_Base.f90'
-  include 'Cgns_Mod/Read_Block_Info.f90'
-  include 'Cgns_Mod/Read_Block_Type.f90'
-  include 'Cgns_Mod/Read_Number_Of_Element_Sections.f90'
-  include 'Cgns_Mod/Read_Section_Info.f90'
-  include 'Cgns_Mod/Read_Number_Of_Bnd_Conds_In_Block.f90'
-  include 'Cgns_Mod/Read_Bnd_Conds_Info.f90'
-  include 'Cgns_Mod/Read_Number_Of_Coordinates_In_Block.f90'
-  include 'Cgns_Mod/Read_Coordinate_Info.f90'
-  include 'Cgns_Mod/Read_Coordinate_Array.f90'
-  include 'Cgns_Mod/Read_Section_Connections.f90'
-  include 'Cgns_Mod/Merge_Nodes.f90'
+  !include 'Cgns_Mod/Read_Base_Info.f90'
+  !include 'Cgns_Mod/Read_Number_Of_Bases_In_File.f90'
+  !include 'Cgns_Mod/Read_Number_Of_Blocks_In_Base.f90'
+  !include 'Cgns_Mod/Read_Block_Info.f90'
+  !include 'Cgns_Mod/Read_Block_Type.f90'
+  !include 'Cgns_Mod/Read_Number_Of_Element_Sections.f90'
+  !include 'Cgns_Mod/Read_Section_Info.f90'
+  !include 'Cgns_Mod/Read_Number_Of_Bnd_Conds_In_Block.f90'
+  !include 'Cgns_Mod/Read_Bnd_Conds_Info.f90'
+  !include 'Cgns_Mod/Read_Number_Of_Coordinates_In_Block.f90'
+  !include 'Cgns_Mod/Read_Coordinate_Info.f90'
+  !include 'Cgns_Mod/Read_Coordinate_Array.f90'
+  !include 'Cgns_Mod/Read_Section_Connections.f90'
+  !include 'Cgns_Mod/Merge_Nodes.f90'
 
   ! Par only
   include 'Cgns_Mod/Parallel/Get_Arrays_Dimensions.f90'
