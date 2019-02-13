@@ -43,7 +43,9 @@
           !   Field section  !
           !------------------!
 
-  ! TO DO : Pack monitoring points in ConvergenceHistory_t
+  ! TO DO : 
+  ! 1) Pack monitoring points in ConvergenceHistory_t
+  ! 2) Deal with Salome test_cases
 
   ! File
   integer           :: file_id

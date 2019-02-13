@@ -29,7 +29,7 @@
   !   Count the boundary cells   !
   !------------------------------!
   grid % n_bnd_cells = 0
-  grid % n_faces  = 0
+  grid % n_faces = 0
   do i = 1, grid % n_cells
     do j = 1, 6
       if(grid % cells_bnd_color(j,i) .ne. 0) then

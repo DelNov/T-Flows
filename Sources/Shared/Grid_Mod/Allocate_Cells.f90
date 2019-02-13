@@ -31,7 +31,7 @@
   allocate(grid % cells_n_nodes(-nb:nc));  grid % cells_n_nodes = 0
 
   ! Boundary condition color in a given direction
-  allocate(grid % cells_bnd_color(6, -nb:nc))
+  allocate(grid % cells_bnd_color(6, -nb:nc));  grid % cells_bnd_color = 0
 
   ! Allocate processor i.d.
   allocate(grid % comm % proces(-nb:nc)); grid % comm % proces = 1

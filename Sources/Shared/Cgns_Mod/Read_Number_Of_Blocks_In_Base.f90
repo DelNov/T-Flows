@@ -16,10 +16,11 @@
   base_id = base
 
  ! Get number of blocks in base
-  call Cg_Nzones_F(file_id,   &
-                   base_id,   &
-                   n_blocks,  &
-                   error)
+  call Cg_Nzones_F(file_id,   & !(in )
+                   base_id,   & !(in )
+                   n_blocks,  & !(out)
+                   error)       !(out)
+
   if (error .ne. 0) then
     print *, "# Failed to get blocks number"
     call Cg_Error_Exit_F()
@@ -30,7 +31,7 @@
 
   ! Print some info
   if(verbose) then
-    print *, "#   Number of blocks:", cgns_base(base) % n_blocks
+    print "(a,i8)", " #   Number of blocks:", cgns_base(base) % n_blocks
   end if
 
   ! Allocate memory for the blocks in current base

@@ -22,6 +22,8 @@
   cnt_int     = 0   ! number of unique interfaces
   cnt_int_tri = 0   ! number of triangles defining block interface
   cnt_int_qua = 0   ! number of quads     defining block interface
-  cnt_int_cells = 0 ! number of cells of interfaces
+  cnt_int_cells = 0 ! number of cells on interfaces
+
+  pos_of_last_3d_cell = 0 ! position of last 3d cell
 
   end subroutine

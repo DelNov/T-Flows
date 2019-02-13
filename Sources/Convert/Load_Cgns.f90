@@ -1,8 +1,11 @@
 !==============================================================================!
   subroutine Load_Cgns(grid)
 !------------------------------------------------------------------------------!
-!   https://cgns.github.io/CGNS_docs_current/midlevel/structural.html          !
-!   |-> mesh_info                                                              !
+!   Reads the Cgns mesh file.                                                  !
+!   This function retrieves data as Load_Neu does, but for .cgns               !
+!   https://cgns.github.io/index.html                                          !
+!   Recomendations for Salome mesher:                                          !
+!   use "group" option during export to .cgns                                  !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Name_Mod,  only: problem_name
@@ -15,7 +18,7 @@
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
   character(len=80) :: name_in
-  integer           :: c, i, j, bc, base, block, sect, int, coord, mode
+  integer           :: c, i, j, n, bc, base, block, sect, int, coord, mode
   integer           :: cgns_1, cgns_2, cgns_3, cgns_4, cgns_5, cell_type
 !==============================================================================!
 
@@ -58,11 +61,11 @@
 
     do block = 1, cgns_base(base) % n_blocks
 
-      ! Read block information 
+      ! Read block information
       ! Gives: n_nodes, n_cells
       call Cgns_Mod_Read_Block_Info(base, block)
 
-      ! Read type of block 
+      ! Read type of block
       ! Tells if structured or unstructured
       call Cgns_Mod_Read_Block_Type(base, block)
 
@@ -88,7 +91,7 @@
       call Cgns_Mod_Read_Number_Of_Element_Sections(base, block)
       do sect = 1, cgns_base(base) % block(block) % n_sects
 
-        ! Read info for an element section  (including b.c.)
+        ! Read info for an element section (including b.c.)
         ! Gives: cell_type, first_cell, last_cell
         call Cgns_Mod_Read_Section_Info(base, block, sect)
 
@@ -103,24 +106,26 @@
   !                        !
   !------------------------!
   if(verbose) then
-    print *, '# First run finished!'
-    print *, '# - number of nodes: ',                        cnt_nodes
-    print *, '# - number of cells: ',                        cnt_cells
-    print *, '# - number of hex cells: ',                    cnt_hex
-    print *, '# - number of pyramids cells: ',               cnt_pyr
-    print *, '# - number of prism cells: ',                  cnt_wed
-    print *, '# - number of tetra cells: ',                  cnt_tet
-    print *, '# - number of triangles faces on boundary: ',  cnt_bnd_tri 
-    print *, '# - number of quads faces on boundary: ',      cnt_bnd_qua
-    print *, '# - number of triangles faces on interface: ', cnt_int_tri 
-    print *, '# - number of quads faces on interface: ',     cnt_int_qua
-    print *, '# - number of boundary conditions faces: ',    cnt_bnd_tri + &
-                                                             cnt_bnd_qua
-    print *, '# - number of boundary conditions: ',          cnt_bnd_conds
+    print "(a)", " # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+    print "(a)", " # First run finished! "
+    print "(a,i35)", " # - number of nodes: ", cnt_nodes
+    print "(a,i35)", " # - number of cells: ", cnt_cells
+    print "(a,i31)", " # - number of hex cells: ", cnt_hex
+    print "(a,i26)", " # - number of pyramids cells: ", cnt_pyr
+    print "(a,i29)", " # - number of prism cells: ", cnt_wed
+    print "(a,i29)", " # - number of tetra cells: ", cnt_tet
+    print "(a,i13)", " # - number of triangles faces on boundary: ", cnt_bnd_tri
+    print "(a,i17)", " # - number of quads faces on boundary: ", cnt_bnd_qua
+    print "(a,i12)", " # - number of triangles faces on interface: ", &
+      cnt_int_tri 
+    print "(a,i16)", " # - number of quads faces on interface: ", &
+      cnt_int_qua
+    print "(a,i21)", " # - number of boundary conditions: ", cnt_bnd_conds
     if (cnt_bnd_tri + cnt_bnd_qua .eq. 0) then
-      print *, '# No boundary faces were found !'
+      print "(a)", " # No boundary faces were found !"
       stop
     end if
+    print "(a)", " # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
   end if
 
   !--------------------------------------------!
@@ -142,7 +147,6 @@
     grid % bnd_cond % name(i) = bnd_cond_names(i)
   end do
 
-
   !----------------!
   !   Interfaces   !
   !----------------!
@@ -161,7 +165,7 @@
   !-------------------------------------!
   call Cgns_Mod_Initialize_Counters
 
-  print *, '# Filling arrays..'
+  print "(a)", " # Filling arrays.."
 
   !------------------------------!
   !                              !
@@ -174,18 +178,17 @@
     !   Browse through all blocks   !
     !-------------------------------!
     do block = 1, cgns_base(base) % n_blocks
+      print "(a,a21)", " # Block name: ",  &
+               trim( cgns_base(base) % block(block) % name)
 
       ! Count block, just for information
       cnt_blocks = cnt_blocks + 1
-      ! Set number of 3d cells in current block as 0
-      cells_3d_in_block = 0
 
       !----------------------------!
       !   Read coordinates block   !
       !----------------------------!
 
-      ! Reads number of coordinates arrays from block
-      ! Essentially, reads number 3
+      ! Reads number of coordinates arrays from block(->n_coords)
       call Cgns_Mod_Read_Number_Of_Coordinates_In_Block(base, block)
 
       ! Read x, y and z coordinates
@@ -204,13 +207,15 @@
       !----------------------!
       cnt_block_bnd_cells = 0
 
-      ! Browse through all 3d sections to read elements and assign B.C.
+      ! Browse through all sections to read elements, assign B.C. and interface
       do sect = 1, cgns_base(base) % block(block) % n_sects
 
-        ! Read element data (count HEXA_8/PYRA_5/PENTA_6/TETRA_4/)
+        ! Read element data (count HEXA_8/PYRA_5/PENTA_6/TETRA_4/QUAD_4/TRI_3)
+        !call Cgns_Mod_Read_3d_Section_Connections(base, block, sect, grid)
         call Cgns_Mod_Read_Section_Connections(base, block, sect, grid)
 
-      end do ! 3d elements sections
+        !call Cgns_Mod_Read_2d_Section_Connections(base, block, sect, grid)
+      end do ! 1, cgns_base(base) % block(block) % n_sects
 
       cnt_nodes = cnt_nodes + cgns_base(base) % block(block) % mesh_info(1)
       cnt_cells = cnt_cells + cgns_base(base) % block(block) % mesh_info(2)
@@ -218,16 +223,18 @@
 
     end do ! blocks
   end do ! bases
-
-  print '(a38,i9)', ' # Total number of nodes:             ', cnt_nodes
-  print '(a38,i9)', ' # Total number of cells:             ', cnt_cells
-  print '(a38,i9)', ' # Total number of blocks:            ', cnt_blocks
-  print '(a38,i9)', ' # Total number of boundary sections: ', grid % n_bnd_cond
-  print '(a38,i9)', ' # Total number of boundary cells:    ', grid % n_bnd_cells
+  print "(a)", " # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+  print "(a,i13)", " # Total number of nodes:             ", cnt_nodes
+  print "(a,i13)", " # Total number of cells:             ", cnt_cells
+  print "(a,i13)", " # Total number of blocks:            ", cnt_blocks
+  print "(a,i13)", " # Total number of boundary sections: ", grid % n_bnd_cond
+  print "(a,i13)", " # Total number of boundary cells:    ", grid % n_bnd_cells
+  print "(a)", " # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
 
   !---------------------!
   !   Merge the nodes   !
   !---------------------!
+  
   if(cnt_blocks .gt. 1) then
     call Cgns_Mod_Merge_Nodes(grid)
   end if
@@ -236,23 +243,28 @@
   !   Read block (material?) data   !
   !---------------------------------!
   grid % material % name = "AIR"
-
-  stop
-
   !-----------------------------------------------------------------!
   !   Correct boundary conditions directions for hexahedral cells   !
   !   (They are not the same in CGNS and Gambit's neutral format.)  !
-  !-----------------------------------------------------------------!
+  !-----------------------------------------------------------------!  
+  if(verbose) then
+    print "(a)", " # HEX_8 colors (sample):"
+    print "(a, 7a7)", " # ", &
+      "c", "bnd_c1", "bnd_c2", "bnd_c3", "bnd_c4", "bnd_c5", "bnd_c6"
+  end if
+
   cnt_bnd_cells = 0
   do base = 1, n_bases
     do block = 1, cgns_base(base) % n_blocks
       do sect = 1, cgns_base(base) % block(block) % n_sects
-        cell_type   = cgns_base(base) % block(block) % section(sect) % cell_type
+
+        cell_type = cgns_base(base) % block(block) % section(sect) % cell_type
 
         if ( ElementTypeName(cell_type) .eq. 'HEXA_8' ) then
 
-          do c = cgns_base(base) % block(block) % section(sect) % first_cell,  &
-                 cgns_base(base) % block(block) % section(sect) % last_cell
+          do c = cgns_base(base) % block(block) % section(sect) % first_cell, &
+            cgns_base(base) % block(block) % section(sect) % last_cell
+
             cgns_1 = grid % cells_bnd_color(1,c)
             cgns_2 = grid % cells_bnd_color(2,c)
             cgns_3 = grid % cells_bnd_color(3,c)
@@ -265,18 +277,22 @@
             grid % cells_bnd_color(5,c) = cgns_1
 
             do j = 1, 6
-              if( grid % cells_bnd_color(j,c) .ne. 0 ) then 
+              if( grid % cells_bnd_color(j,c) .ne. 0 ) then
                 cnt_bnd_cells = cnt_bnd_cells + 1
               end if
             end do
 
-          end do ! ElementTypeName(cell_type) .eq. 'HEXA_8'
-        end if
+            if(verbose .and. c < 7) then
+              print "(a,7i7)", " # ", c, (grid % cells_bnd_color(1,n), n = 1, 6)
+            end if
+
+          end do ! c
+        end if ! ElementTypeName(cell_type) .eq. 'HEXA_8'
 
       end do ! elements sections
     end do ! blocks
   end do ! bases
-  print '(a38,i9)', ' # Corrected hex boundary cells:      ', cnt_bnd_cells
+  print "(a,i18)", " # Corrected hex boundary cells: ", cnt_bnd_cells
 
   call Grid_Mod_Print_Bnd_Cond_List(grid)
 
