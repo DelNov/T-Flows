@@ -84,7 +84,7 @@
 
     if(bc_found .ne. 0) then
       if(verbose) then
-        print "(a)",     " # =============================================="
+        print "(a)",     " #==============================================="
         print "(a,a24)", " # 2d cell section name: ", trim(sect_name)
         print "(a,i28)", ' # Cell section idx: ', sect
         print "(a,a28)", " # Bnd section type: ", &
@@ -95,13 +95,13 @@
           cgns_base(base) % block(block) % bnd_cond(bc) % n_nodes
         print "(a,a25)", " # They belong to b.c.: ", &
           trim(cgns_base(base) % block(block) % bnd_cond(bc) % name)
-        print "(a)", " #   ----------------------------------------------"
-        print "(a)", " #   Connections table (sample): "
+        print "(a)", "   #---------------------------------------------"
+        print "(a)", "   # Connections table (sample): "
         do loc = 1, min(6, cnt)
           print "(a,a16,4i8)", " # "," ", (face_n(n,loc), n = 1, n_nodes)
         end do
-        print "(a)", " #   ----------------------------------------------"
-        print "(a)", " #   Parent data (sample): "
+        print "(a)", "   #---------------------------------------------"
+        print "(a)", "   # Parent data (sample): "
         !do loc = 1, min(6, cnt)
         !  print "(a,a16,4i8)", " # "," ", (parent_data(loc,n), n = 1, 2)
         !end do
