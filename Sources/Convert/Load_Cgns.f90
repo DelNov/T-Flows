@@ -106,7 +106,7 @@
   !                        !
   !------------------------!
   if(verbose) then
-    print "(a)", " # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+    print "(a)", " #======================================================="
     print "(a)", " # First run finished! "
     print "(a,i35)", " # - number of nodes: ", cnt_nodes
     print "(a,i35)", " # - number of cells: ", cnt_cells
@@ -125,7 +125,7 @@
       print "(a)", " # No boundary faces were found !"
       stop
     end if
-    print "(a)", " # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+    print "(a)", " #-------------------------------------------------------"
   end if
 
   !--------------------------------------------!
@@ -223,13 +223,13 @@
 
     end do ! blocks
   end do ! bases
-  print "(a)", " # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+  print "(a)", " #-------------------------------------------------"
   print "(a,i13)", " # Total number of nodes:             ", cnt_nodes
   print "(a,i13)", " # Total number of cells:             ", cnt_cells
   print "(a,i13)", " # Total number of blocks:            ", cnt_blocks
   print "(a,i13)", " # Total number of boundary sections: ", grid % n_bnd_cond
   print "(a,i13)", " # Total number of boundary cells:    ", grid % n_bnd_cells
-  print "(a)", " # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+  print "(a)", " #-------------------------------------------------"
 
   !---------------------!
   !   Merge the nodes   !
