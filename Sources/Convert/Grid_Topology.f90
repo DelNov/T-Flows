@@ -2,8 +2,8 @@
   subroutine Grid_Topology(grid)
 !------------------------------------------------------------------------------!
 !   Determines the topology of the grid.                                       !
-!
-!   To be more specific, it determines:
+!                                                                              !
+!   To be more specific, it determines:                                        !
 !                                                                              !
 !   grid % n_bnd_cells   - number of boundary cells                            !
 !   grid % cells_n_nodes - number of nodes for each cell                       !
