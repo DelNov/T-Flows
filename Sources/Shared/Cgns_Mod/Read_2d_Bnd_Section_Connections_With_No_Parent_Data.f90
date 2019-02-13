@@ -186,13 +186,13 @@
               cgns_base(base) % block(block) % bnd_cond(bc) % n_nodes
             print "(a,a25)", ' #   They belong to b.c.: ', &
               trim(cgns_base(base) % block(block) % bnd_cond(bc) % name)
-            print *, '#   ----------------------------------------------'
-            print "(a)", " #   Connections table (sample): "
+            print *, '   #----------------------------------------------'
+            print "(a)", "   #   Connections table (sample): "
             do loc = 1, min(6, cnt)
-              print "(a,a16,4i8)", " # "," ", (face_n(n,loc), n = 1, n_nodes)
+              print "(a,a16,4i8)", "   # "," ", (face_n(n,loc), n = 1, n_nodes)
             end do
-            print "(a)", " #   ----------------------------------------------"
-            print "(a)", " #   Recovered ParentData table (sample): "
+            print "(a)", "   #----------------------------------------------"
+            print "(a)", "   # Recovered ParentData table (sample): "
           end if
 
           ! This loop should restore ParentData for current b.c. and sect_3d
@@ -233,7 +233,7 @@
 
                   if (equal) then
                     f_found = f_found + 1
-                    !cgns_base(base)% block(block) % bnd_cond(bc) % &
+                    ! cgns_base(base)% block(block) % bnd_cond(bc) % &
                     ! assigned(j) = .true.
                     ! use Parent Data
                     ! like in Read_2d_Bnd_Section_Connections_With_Parent_Data
@@ -255,10 +255,11 @@
 
       !end if ! b.c. point is not assigned
         if(verbose .and. f_found .ne. 0) then
-          print "(a)",     ' #   ----------------------------------------------'
-          print "(a,a22)", ' #   Searching bnd faces in: ', trim(cgns_base(base) % block(block) % section(sect_3d_id) % name)
-          print "(a,i17)", ' #   Found bnd faces in 3d block: ', f_found
-          print "(a)",     ' #   =============================================='
+          print "(a)",     '   #----------------------------------------------'
+          print "(a,a22)", '   # Searching bnd faces in: ', trim(cgns_base(base)  &
+                                        % block(block) % section(sect_3d_id) % name)
+          print "(a,i17)", '   # Found bnd faces in 3d block: ', f_found
+          print "(a)",     '   #=============================================='
         end if ! verbose
 
       end if ! bc_f_found .ne. 0
