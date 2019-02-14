@@ -130,13 +130,13 @@
     deallocate(cell_n)
 
     if(verbose) then
+      print "(a)", " #================================================="
+      print "(a,a26)", " # 3d cell section name: ", trim(sect_name)
       print "(a)", " #-------------------------------------------------"
-      print "(a,a26)", ' # 3d cell section name: ', trim(sect_name)
-      print "(a)", " #-------------------------------------------------"
-      print "(a,i30)", ' # Cell section idx: ', sect
-      print "(a,a29)", ' # Cell section type: ', &
+      print "(a,i30)", " # Cell section idx: ", sect
+      print "(a,a29)", " # Cell section type: ", &
         trim(ElementTypeName(cell_type))
-      print "(a,i31)", ' # Number of cells: ', cnt
+      print "(a,i31)", " # Number of cells: ", cnt
     end if
 
     if(verbose) then

@@ -41,7 +41,7 @@
   cnt_cells = cnt_cells + cgns_base(base) % block(block) % mesh_info(2)
 
   if(verbose) then
-    print "(a)", " #-----------------------------------------------------"
+    print "(a)", " #====================================================="
     print "(a,a36)", " #     Block name: ",  &
              trim( cgns_base(base) % block(block) % name)
     print "(a)", " #-----------------------------------------------------"

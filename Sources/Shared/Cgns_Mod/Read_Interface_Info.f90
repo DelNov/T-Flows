@@ -108,7 +108,7 @@
     trim(int_name_short)
 
   if(verbose) then
-    print "(a)",     " #-------------------------------------------------------"
+    print "(a)",     " #======================================================="
     print "(a, a32)"," #       Interface name: ", trim(int_name)
     print "(a, a32)"," #       Shortened to:   ", trim(int_name_short)
     print "(a, a32)"," #       Donor name:     ", trim(donor_name)

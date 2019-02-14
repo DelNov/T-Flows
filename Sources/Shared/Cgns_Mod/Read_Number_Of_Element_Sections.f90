@@ -33,7 +33,7 @@
   cgns_base(base) % block(block) % n_sects = n_sects
 
   if(verbose) then
-    print "(a)", " #-------------------------------------------------------"
+    print "(a)", " #======================================================="
     print "(a,i14)", " #     Number of sections in this block: ",  &
              cgns_base(base) % block(block) % n_sects
   end if

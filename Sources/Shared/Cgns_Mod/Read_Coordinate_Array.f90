@@ -48,7 +48,7 @@
   endif
 
   if(verbose) then
-    print "(a)", " #----------------------------------"
+    print "(a)", " #=================================="
     print "(a,a16)", " # Coordinate name: ", trim(coord_name)
     print "(a)", " #----------------------------------"
     print "(a)", " #   Data table (sample): "
