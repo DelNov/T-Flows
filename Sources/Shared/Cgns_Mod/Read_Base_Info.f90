@@ -38,9 +38,9 @@
   ! Print some info
   if(verbose) then
     print "(a)", " #============================"
-    print "(a,a9)", ' #   Base name:      ', trim(base_name)
-    print "(a,i9)", ' #   Cell dimension: ', cell_dim
-    print "(a,i9)", ' #   Phys dimension: ', phys_dim
+    print "(a,a9)", " #   Base name:      ", trim(base_name)
+    print "(a,i9)", " #   Cell dimension: ", cell_dim
+    print "(a,i9)", " #   Phys dimension: ", phys_dim
     print "(a)", " #----------------------------"
   end if
 
