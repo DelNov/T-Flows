@@ -1,10 +1,5 @@
 !==============================================================================!
-  subroutine Numerics_Mod_Advection_Min_Max(phi)
-!------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Comm_Mod
-  use Grid_Mod, only: Grid_Type
-  use Var_Mod,  only: Var_Type
+  subroutine Numerics_Mod_Min_Max(phi)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -29,7 +24,6 @@
 
     phi % max(c1) = max(phi % max(c1), phi % n(c2))
     phi % max(c2) = max(phi % max(c2), phi % n(c1))
-
   end do
 
   call Comm_Mod_Exchange_Real(grid, phi % min)

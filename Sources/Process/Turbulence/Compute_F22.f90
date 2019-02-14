@@ -13,6 +13,7 @@
   use Grad_Mod,    only: Grad_Mod_Variable
   use Info_Mod,    only: Info_Mod_Iter_Fill_At
   use Solver_Mod,  only: Solver_Type, Bicg, Cg, Cgs
+  use Numerics_Mod
   use Matrix_Mod,  only: Matrix_Type
   use Work_Mod,    only: phi_x => r_cell_01,  &
                          phi_y => r_cell_02,  &
@@ -109,7 +110,7 @@
     phi % c(c1) = phi % c(c1) + f_ex - f_im
     if(c2  > 0) then
       phi % c(c2) = phi % c(c2) - f_ex + f_im
-    end if 
+    end if
 
     ! Calculate the coefficients for the sysytem matrix
     a12 = a0
@@ -152,8 +153,6 @@
   !-------------------------------------!
   !                                     !
   !   Source terms and wall function    !
-  !   (Check if it is good to call it   !
-  !    before the under relaxation ?)   !
   !                                     !
   !-------------------------------------!
   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
@@ -169,11 +168,7 @@
   !---------------------------------!
 
   ! Underrelax the equations
-  do c = 1, grid % n_cells
-    b(c) = b(c) + a % val(a % dia(c)) * (1.0 - phi % urf) * phi % n(c)  &
-         / phi % urf
-    a % val(a % dia(c)) = a % val(a % dia(c)) / phi % urf
-  end do
+  call Numerics_Mod_Under_Relax(phi, sol)
 
   ! Call linear solver to solve the equations
   call Cg(sol,            &

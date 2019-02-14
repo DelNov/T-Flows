@@ -46,9 +46,10 @@
   y_copy = 0
   z_copy = 0
 
-1 print *, '#======================================'
-  print *, '# Enter the copy color (skip to exit):'
-  print *, '#--------------------------------------'
+1 print *, '#======================================================'
+  print *, '# Type ordinal number(s) of inflow boundary(s) that    '
+  print *, '# will be linked to precursor domain(s) (skip to exit):'
+  print *, '#------------------------------------------------------'
   call Tokenizer_Mod_Read_Line(5)
   read(line % tokens(1), *) answer
   call To_Upper_Case(answer)

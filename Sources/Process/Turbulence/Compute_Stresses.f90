@@ -90,81 +90,19 @@
   !   Advection   !
   !               !
   !---------------!
-
-  ! Compute phimax and phimin
-  if(phi % adv_scheme .ne. CENTRAL) then
-    call Numerics_Mod_Advection_Min_Max(phi)
-  end if
-
-  ! New values
-  do c = 1, grid % n_cells
-    phi % a(c) = 0.
-    phi % c(c) = 0.
-  end do
-
-  !----------------------------!
-  !   Spatial Discretization   !
-  !----------------------------!
-  do s = 1, grid % n_faces
-
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s) 
-
-    ! Velocities on "orthogonal" cell centers
-    if(c2 > 0) then
-      phis =        grid % f(s)  * phi % n(c1)   &
-           + (1.0 - grid % f(s)) * phi % n(c2)
-
-      ! Compute phis with desired advection scheme
-      if(phi % adv_scheme .ne. CENTRAL) then
-        call Numerics_Mod_Advection_Scheme(phis, s,                          &
-                                           phi,                              &
-                                           phi_x, phi_y, phi_z,              &
-                                           grid % dx, grid % dy, grid % dz,  &
-                                           flux)
-      end if
-
-      ! Compute advection term
-      if(c2  > 0) then
-        phi % a(c1) = phi % a(c1) - flux(s)*phis
-        phi % a(c2) = phi % a(c2) + flux(s)*phis
-      else
-        phi % a(c1) = phi % a(c1) - flux(s)*phis
-      end if 
-
-      ! Store upwinded part of the advection term in "c"
-      if(flux(s)  < 0) then   ! from c2 to c1
-        phi % c(c1)=phi % c(c1) - flux(s) * phi % n(c2)
-        if(c2  > 0) then
-          phi % c(c2)=phi % c(c2) + flux(s) * phi % n(c2)
-        end if
-      else
-        phi % c(c1)=phi % c(c1) - flux(s) * phi % n(c1)
-        if(c2  > 0) then
-          phi % c(c2)=phi % c(c2) + flux(s) * phi % n(c1)
-        end if
-      end if
-    end if     ! c2 > 0 
-  end do    ! through sides
-
-  !------------------------------------------------!
-  !   Source term contains difference between      !
-  !   explicity and implicitly treated advection   !
-  !------------------------------------------------!
-  do c = 1, grid % n_cells
-    b(c) = b(c) + (phi % a(c) - phi % c(c))
-  end do
+  call Numerics_Mod_Advection_Term(phi, 1.0, flux, sol,  &
+                                   phi % x,              &
+                                   phi % y,              &
+                                   phi % z,              &
+                                   grid % dx,            &
+                                   grid % dy,            &
+                                   grid % dz)
 
   !------------------!
   !                  !
   !     Difusion     !
   !                  !
   !------------------!
-
-  ! Set c values back to zero
-  do c = 1, grid % n_cells
-    phi % c(c) = 0.
-  end do
 
   !----------------------------!
   !   Spatial discretization   !
@@ -209,7 +147,7 @@
     phi % c(c1) = phi % c(c1) + f_ex - f_im
     if(c2  > 0) then
       phi % c(c2) = phi % c(c2) - f_ex + f_im
-    end if 
+    end if
 
     ! Compute coefficients for the sysytem matrix
     a12 = a0
@@ -247,7 +185,7 @@
     c_mu_d = 0.18
   else
     c_mu_d = 0.22
-  end if 
+  end if
 
   if(turbulence_model_variant .ne. STABILIZED) then
     if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
@@ -349,26 +287,14 @@
   !   Inertial terms   !
   !                    !
   !--------------------!
+  call Numerics_Mod_Inertial_Term(phi, density, sol, dt)
 
-  ! Two time levels; Linear interpolation
-  if(phi % td_scheme .eq. LINEAR) then
-    do c = 1, grid % n_cells
-      a0 = density*grid % vol(c)/dt
-      a % val(a % dia(c)) = a % val(a % dia(c)) + a0
-      b(c) = b(c) + a0 * phi % o(c)
-    end do
-  end if
-
-  ! Three time levels; parabolic interpolation
-  if(phi % td_scheme .eq. PARABOLIC) then
-    do c = 1, grid % n_cells
-      a0 = density*grid % vol(c)/dt
-      a % val(a % dia(c)) = a % val(a % dia(c)) + 1.5 * a0
-      b(c) = b(c) + 2.0*a0 * phi % o(c) - 0.5*a0 * phi % oo(c)
-    end do
-  end if
-
-  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then 
+  !-------------------------------------!
+  !                                     !
+  !   Source terms and wall function    !
+  !                                     !
+  !-------------------------------------!
+  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
     call Grad_Mod_Component(grid, f22 % n, 1, f22 % x, .true.) ! df22/dx
     call Grad_Mod_Component(grid, f22 % n, 2, f22 % y, .true.) ! df22/dy
     call Grad_Mod_Component(grid, f22 % n, 3, f22 % z, .true.) ! df22/dz
@@ -385,11 +311,7 @@
   !---------------------------------!
 
   ! Under-relax the equations
-  do c = 1, grid % n_cells
-    b(c) = b(c) + a % val(a % dia(c)) * (1.0 - phi % urf)*phi % n(c)  &
-         / phi % urf
-    a % val(a % dia(c)) = a % val(a % dia(c)) / phi % urf
-  end do
+  call Numerics_Mod_Under_Relax(phi, sol)
 
   ! Call linear solver to solve the equations
   call Bicg(sol,            &

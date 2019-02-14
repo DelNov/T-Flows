@@ -117,79 +117,19 @@
   !   Advection   !
   !               !
   !---------------!
-
-  ! Compute phimax and phimin
-  if(phi % adv_scheme .ne. CENTRAL) then
-    call Numerics_Mod_Advection_Min_Max(phi)
-    goto 1  ! why this???
-  end if
-
-  ! New values
-1 do c = 1, grid % n_cells
-    phi % a(c) = 0.0
-    phi % c(c) = 0.0  ! use phi % c for upwind advective fluxes
-  end do
-
-  !----------------------------------!
-  !   Browse through all the faces   !
-  !----------------------------------!
-  do s=1,grid % n_faces
-
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
-
-    phis =      grid % f(s)  * phi % n(c1)   &
-         + (1.0-grid % f(s)) * phi % n(c2)
-
-    ! Compute phis with desired advection scheme
-    if(phi % adv_scheme .ne. CENTRAL) then
-      call Numerics_Mod_Advection_Scheme(phis, s,                          &
-                                         phi,                              &
-                                         phi_x, phi_y, phi_z,              &
-                                         grid % dx, grid % dy, grid % dz,  &
-                                         flux)
-    end if
-
-    ! Compute advection term
-    if(c2 > 0) then
-      phi % a(c1) = phi % a(c1)-flux(s)*phis*capacity
-      phi % a(c2) = phi % a(c2)+flux(s)*phis*capacity
-    else
-      phi % a(c1) = phi % a(c1)-flux(s)*phis*capacity
-    end if
-
-    ! Store upwinded part of the advection term in "c"
-    if(flux(s) < 0.0) then   ! from c2 to c1
-      phi % c(c1) = phi % c(c1)-flux(s)*phi % n(c2) * capacity
-      if(c2 > 0) then
-        phi % c(c2) = phi % c(c2)+flux(s)*phi % n(c2) * capacity
-      end if
-    else
-      phi % c(c1) = phi % c(c1)-flux(s)*phi % n(c1) * capacity
-      if(c2 > 0) then
-        phi % c(c2) = phi % c(c2)+flux(s)*phi % n(c1) * capacity
-      end if
-    end if
-
-  end do  ! through sides
-
-  !-----------------------------!
-  !   Temporal discretization   !
-  !-----------------------------!
-  do c = 1, grid % n_cells
-    b(c) = b(c) + phi % a(c) - phi % c(c)
-  end do
+  call Numerics_Mod_Advection_Term(phi, 1.0, flux, sol,  &
+                                   phi % x,              &
+                                   phi % y,              &
+                                   phi % z,              &
+                                   grid % dx,            &
+                                   grid % dy,            &
+                                   grid % dz)
 
   !--------------!
   !              !
   !   Difusion   !
   !              !
   !--------------!
-
-  ! Set phi % c back to zero 
-  do c = 1, grid % n_cells
-    phi % c(c) = 0.0
-  end do
 
   !----------------------------!
   !   Spatial discretization   !
@@ -263,10 +203,10 @@
              + phiz_f2 * grid % dz(s) )
 
     ! Cross diffusion part
-    phi % c(c1) = phi % c(c1) + f_ex1 - f_im1 
+    phi % c(c1) = phi % c(c1) + f_ex1 - f_im1
     if(c2 .gt. 0) then
-      phi % c(c2) = phi % c(c2) - f_ex2 + f_im2 
-    end if 
+      phi % c(c2) = phi % c(c2) - f_ex2 + f_im2
+    end if
 
     ! Calculate the coefficients for the sysytem matrix
 
@@ -301,20 +241,13 @@
 
   end do  ! through sides
 
-  !-----------------------------!
-  !   Temporal discretization   !
-  !-----------------------------!
-
-  ! Fully implicit treatment for difusive terms
-  ! is handled via the linear system of equations 
-
-  ! Fully implicit treatment for cross difusive terms
+  ! Implicit treatment for cross difusive terms
   do c = 1, grid % n_cells
     if(phi % c(c) >= 0) then
       b(c)  = b(c) + phi % c(c)
     else
       a % val(a % dia(c)) = a % val(a % dia(c))  &
-                          - phi % c(c)/(phi % n(c)+1.e-6)
+                          - phi % c(c) / (phi % n(c) + MICRO)
     end if
   end do
 
@@ -323,25 +256,13 @@
   !   Inertial terms   !
   !                    !
   !--------------------!
+  call Numerics_Mod_Inertial_Term(phi, density, sol, dt)
 
-  ! Two time levels; Linear interpolation
-  if(phi % td_scheme .eq. LINEAR) then
-    do c = 1, grid % n_cells
-      a0 = capacity * density * grid % vol(c) / dt
-      a % val(a % dia(c)) = a % val(a % dia(c)) + a0
-      b(c)  = b(c) + a0 * phi % o(c)
-    end do
-  end if
-
-  ! Three time levels; parabolic interpolation
-  if(phi % td_scheme .eq. PARABOLIC) then
-    do c = 1, grid % n_cells
-      a0 = capacity * density * grid % vol(c) / dt
-      a % val(a % dia(c)) = a % val(a % dia(c)) + 1.5 * a0
-      b(c)  = b(c) + 2.0 * a0 * phi % o(c) - 0.5 * a0 * phi % oo(c)
-    end do
-  end if
-
+  !-------------------------------------!
+  !                                     !
+  !   Source terms and wall function    !
+  !                                     !
+  !-------------------------------------!
   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
      turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
     if(turbulence_model_variant .ne. STABILIZED) then
@@ -388,11 +309,11 @@
           phix_f1 = phi_x(c1)
           phiy_f1 = phi_y(c1)
           phiz_f1 = phi_z(c1)
-          phix_f2 = phix_f1 
-          phiy_f2 = phiy_f1 
-          phiz_f2 = phiz_f1 
+          phix_f2 = phix_f1
+          phiy_f2 = phiy_f1
+          phiz_f2 = phiz_f1
           con_eff1 = capacity * vis_t(c1) / pr_t
-          con_eff2 = con_eff1 
+          con_eff2 = con_eff1
         end if
 
         ! Total (exact) diffusive flux
@@ -432,11 +353,7 @@
   !---------------------------------!
 
   ! Under-relax the equations
-  do c = 1, grid % n_cells
-    b(c) = b(c) + a % val(a % dia(c)) * (1.0 - phi % urf) * phi % n(c)  &
-                                      / phi % urf
-    a % val(a % dia(c)) = a % val(a % dia(c)) / phi % urf
-  end do
+  call Numerics_Mod_Under_Relax(phi, sol)
 
   ! Call linear solver to solve them
   call Bicg(sol,            &
