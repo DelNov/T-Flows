@@ -10,10 +10,6 @@
 !   In this subroutine I try to follow the nomenclature from Basara's and      !
 !   Przulj's AIAA paper.                                                       !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Var_Mod,  only: Var_Type
-  use Grid_Mod, only: Grid_Type
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   real           :: phi_f, phi_f_c, phi_f_u

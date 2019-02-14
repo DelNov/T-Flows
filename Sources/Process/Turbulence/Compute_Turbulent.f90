@@ -78,82 +78,19 @@
   !   Advection   !
   !               !
   !---------------!
-
-  ! Compute phimax and phimin
-  if(phi % adv_scheme .ne. CENTRAL) then
-    call Numerics_Mod_Advection_Min_Max(phi)
-    goto 1
-  end if
-
-  ! New values
-1 do c = 1, grid % n_cells
-    phi % a(c) = 0.0
-    phi % c(c) = 0.0
-  end do
-
-  !----------------------------!
-  !   Spatial Discretization   !
-  !----------------------------!
-  do s = 1, grid % n_faces
-
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
-
-    ! Velocities on "orthogonal" cell centers
-    if(c2 > 0) then
-      phis =        grid % f(s)  * phi % n(c1)  &
-           + (1.0 - grid % f(s)) * phi % n(c2)
-
-      ! Compute phis with desired advection scheme
-      if(phi % adv_scheme .ne. CENTRAL) then
-        call Numerics_Mod_Advection_Scheme(phis, s,                          &
-                                           phi,                              &
-                                           phi % x, phi % y, phi % z,        &
-                                           grid % dx, grid % dy, grid % dz,  &
-                                           flux)
-      end if
-
-      ! Compute advection term
-      if(c2  > 0) then
-        phi % a(c1) = phi % a(c1)-flux(s) * phis
-        phi % a(c2) = phi % a(c2)+flux(s) * phis
-      else
-        phi % a(c1) = phi % a(c1)-flux(s) * phis
-      end if
-
-      ! Store upwinded part of the advection term in "c"
-      if(flux(s)  < 0) then   ! from c2 to c1
-      phi % c(c1) = phi % c(c1) - flux(s) * phi % n(c2)
-        if(c2  > 0) then
-          phi % c(c2) = phi % c(c2) + flux(s) * phi % n(c2)
-        end if
-      else
-        phi % c(c1) = phi % c(c1) - flux(s) * phi % n(c1)
-        if(c2  > 0) then
-          phi % c(c2) = phi % c(c2) + flux(s) * phi % n(c1)
-        end if
-      end if
-    end if     ! c2 > 0
-  end do    ! through sides
-
-  !------------------------------------------------!
-  !   Source term contains difference between      !
-  !   explicity and implicitly treated advection   !
-  !------------------------------------------------!
-  do c = 1, grid % n_cells
-    b(c) = b(c) + (phi % a(c) - phi % c(c))
-  end do
+  call Numerics_Mod_Advection_Term(phi, 1.0, flux, sol,  &
+                                   phi % x,              &
+                                   phi % y,              &
+                                   phi % z,              &
+                                   grid % dx,            &
+                                   grid % dy,            &
+                                   grid % dz)
 
   !------------------!
   !                  !
   !     Difusion     !
   !                  !
   !------------------!
-
-  ! Set c terms back to zero
-  do c = 1, grid % n_cells
-    phi % c(c) = 0.0
-  end do
 
   !----------------------------!
   !   Spatial discretization   !
@@ -202,14 +139,12 @@
 
     ! Total (exact) diffusive flux
     f_ex = vis_eff * (  phi_x_f * grid % sx(s)  &
-                     + phi_y_f * grid % sy(s)  &
-                     + phi_z_f * grid % sz(s) )
+                      + phi_y_f * grid % sy(s)  &
+                      + phi_z_f * grid % sz(s) )
 
     a0 = vis_eff * a % fc(s)
 
     ! Implicit diffusive flux
-    ! (this is a very crude approximation: f_coef is
-    !  not corrected at interface between materials)
     f_im = (  phi_x_f * grid % dx(s)                      &
             + phi_y_f * grid % dy(s)                      &
             + phi_z_f * grid % dz(s) ) * a0
@@ -236,10 +171,10 @@
     else if(c2  < 0) then
 
       ! Outflow is not included because it was causing problems
-      if((Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW)  .or.                 &
-         (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL)    .or.                 &
-         (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE).or.                 &
-         (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) .or.                 &
+      if((Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW)  .or.   &
+         (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL)    .or.   &
+         (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE).or.   &
+         (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) .or.   &
          (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) ) then
         a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
         b(c1) = b(c1) + a12 * phi % n(c2)
@@ -258,30 +193,11 @@
   !   Inertial terms   !
   !                    !
   !--------------------!
-
-  ! Two time levels; linear interpolation
-  if(phi % td_scheme .eq. LINEAR) then
-    do c = 1, grid % n_cells
-      a0 = density*grid % vol(c)/dt
-      a % val(a % dia(c)) = a % val(a % dia(c)) + a0
-      b(c) = b(c) + a0 * phi % o(c)
-    end do
-  end if
-
-  ! Three time levels; parabolic interpolation
-  if(phi % td_scheme .eq. PARABOLIC) then
-    do c = 1, grid % n_cells
-      a0 = density*grid % vol(c)/dt
-      a % val(a % dia(c)) = a % val(a % dia(c)) + 1.5 * a0
-      b(c) = b(c) + 2.0*a0 * phi % o(c) - 0.5*a0 * phi % oo(c)
-    end do
-  end if
+  call Numerics_Mod_Inertial_Term(phi, density, sol, dt)
 
   !-------------------------------------!
   !                                     !
   !   Source terms and wall function    !
-  !   (Check if it is good to call it   !
-  !    before the under relaxation ?)   !
   !                                     !
   !-------------------------------------!
   if(turbulence_model .eq. K_EPS) then
@@ -297,7 +213,7 @@
   end if
 
   if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
-      if(phi % name .eq. 'T2')  call Source_T2(flow, sol)
+    if(phi % name .eq. 'T2')  call Source_T2(flow, sol)
   end if
 
   if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
@@ -312,11 +228,7 @@
   !---------------------------------!
 
   ! Under-relax the equations
-  do c = 1, grid % n_cells
-    b(c) = b(c) + a % val(a % dia(c)) * (1.0 - phi % urf) * phi % n(c)  &
-         / phi % urf
-    a % val(a % dia(c)) = a % val(a % dia(c)) / phi % urf
-  end do
+  call Numerics_Mod_Under_Relax(phi, sol)
 
   ! Call linear solver to solve the equations
   call Bicg(sol,            &

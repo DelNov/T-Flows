@@ -159,78 +159,19 @@
   !   Advection   !
   !               !
   !---------------!
-
-  ! Compute phimax and phimin
-  if(ui % adv_scheme .ne. CENTRAL) then
-    call Numerics_Mod_Advection_Min_Max(ui)
-    goto 1  ! why on Earth this?
-  end if
-
-  ! New values
-1 do c = 1, grid % n_cells
-    ui % a(c) = 0.0
-    ui % c(c) = 0.0
-  end do
-
-  !----------------------------!
-  !   Spatial discretization   !
-  !----------------------------!
-  do s = 1, grid % n_faces
-
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
-
-    ! Central differencing
-    uis = grid % f(s) * ui % n(c1) + (1.0 - grid % f(s)) * ui % n(c2)
-
-    if(ui % adv_scheme .ne. CENTRAL) then
-      call Numerics_Mod_Advection_Scheme(uis, s, ui,                   &
-                                         ui_i, ui_j, ui_k,             &
-                                         di, dj, dk,                   &
-                                         flux)
-    end if
-
-    ! Compute advection term
-    if(c2  > 0) then
-      ui % a(c1) = ui % a(c1) - flux(s) * uis
-      ui % a(c2) = ui % a(c2) + flux(s) * uis
-    else
-      ui % a(c1) = ui % a(c1) - flux(s) * uis
-    end if
-
-    ! Store upwinded part of the advection term in "c"
-    if(flux(s)  < 0) then   ! from c2 to c1
-      ui % c(c1) = ui % c(c1) - flux(s)*ui % n(c2)
-      if(c2  > 0) then
-        ui % c(c2) = ui % c(c2) + flux(s)*ui % n(c2)
-      end if
-    else
-      ui % c(c1) = ui % c(c1) - flux(s)*ui % n(c1)
-      if(c2  > 0) then
-        ui % c(c2) = ui % c(c2) + flux(s)*ui % n(c1)
-      end if
-    end if
-
-  end do ! through faces
-
-  !------------------------------------------------!
-  !   Source term contains difference between      !
-  !   explicity and implicitly treated advection   !
-  !------------------------------------------------!
-  do c = 1, grid % n_cells
-    b(c) = b(c) + (ui % a(c) - ui % c(c))
-  end do
+  call Numerics_Mod_Advection_Term(ui, 1.0, flux, sol,  &
+                                   ui_i,                &
+                                   ui_j,                &
+                                   ui_k,                &
+                                   di,                  &
+                                   dj,                  &
+                                   dk)
 
   !---------------!
   !               !
   !   Diffusion   !
   !               !
   !---------------!
-
-  ! Set c terms back to zero
-  do c = 1, grid % n_cells
-    ui % c(c) = 0.0
-  end do
 
   !----------------------------!
   !   Spatial discretization   !
@@ -390,7 +331,7 @@
     end if
   end if
 
-  ! Fully implicit treatment for cross diffusion terms
+  ! Explicit treatment for cross diffusion terms
   do c = 1, grid % n_cells
     b(c) = b(c) + ui % c(c)
   end do
@@ -400,24 +341,7 @@
   !   Inertial terms   !
   !                    !
   !--------------------!
-
-  ! Two time levels; linear interpolation
-  if(ui % td_scheme .eq. LINEAR) then
-    do c = 1, grid % n_cells
-      a0 = density * grid % vol(c) / dt
-      a % val(a % dia(c)) = a % val(a % dia(c)) + a0
-      b(c) = b(c) + a0 * ui % o(c)
-    end do
-  end if
-
-  ! Three time levels; parabolic interpolation
-  if(ui % td_scheme .eq. PARABOLIC) then
-    do c = 1, grid % n_cells
-      a0 = density * grid % vol(c) / dt
-      a % val(a % dia(c)) = a % val(a % dia(c)) + 1.5 * a0
-      b(c) = b(c) + 2.0 * a0 * ui % o(c) - 0.5 * a0 * ui % oo(c)
-    end do
-  end if
+  call Numerics_Mod_Inertial_Term(ui, density, sol, dt)
 
   !---------------------------------!
   !                                 !
@@ -476,6 +400,11 @@
   !----------------------------------------!
   call User_Mod_Force(grid, ui, a, b)
 
+  ! Save the coefficients for pressure equation
+  do c = 1, grid % n_cells
+    a % sav(c) = a % val(a % dia(c))
+  end do
+
   !-----------------------------------!
   !                                   !
   !   Solve the equations for u,v,w   !
@@ -483,11 +412,7 @@
   !-----------------------------------!
 
   ! Under-relax the equations
-  do c = 1, grid % n_cells
-    a % sav(c) = a % val(a % dia(c))
-    b(c) = b(c) + a % val(a % dia(c)) * (1.0 - ui % urf)*ui % n(c) / ui % urf
-    a % val(a % dia(c)) = a % val(a % dia(c)) / ui % urf
-  end do
+  call Numerics_Mod_Under_Relax(ui, sol)
 
   ! Call linear solver
   call Bicg(sol,           &

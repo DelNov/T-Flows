@@ -29,14 +29,15 @@
   grid % wall_dist = HUGE
 
   call Grid_Mod_Print_Bnd_Cond_List(grid)
-  print *, '#================================================================'
-  print *, '# Calculating distance from the walls                            '
-  print *, '#----------------------------------------------------------------'
-  print *, '# Type the list of boundary colors which represent walls,        '
-  print *, '# separated by spaces.  These will be used for computation       '
-  print *, '# of distance to the wall needed by some turbulence models.      '
-  print *, '# Type 0 to skip this step and set distance to one everywhere.   '
-  print *, '#----------------------------------------------------------------'
+  print *, '#=================================================================='
+  print *, '# Calculating distance from the walls                              '
+  print *, '#------------------------------------------------------------------'
+  print *, '# Type ordinal number(s) of wall or wall_flux boundary condition(s)'
+  print *, '# from the boundary condition list (see above) separated by space. '
+  print *, '# Cells'' centers distances to the nearest wall will be calculated '
+  print *, '# for the listed wall boundary(s).                                 '
+  print *, '# This is needed for RANS and HYBRID turbulence models.            '
+  print *, '#------------------------------------------------------------------'
   call Tokenizer_Mod_Read_Line(5)
   n_wall_colors = line % n_tokens
   allocate(wall_colors(n_wall_colors))

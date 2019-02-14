@@ -100,78 +100,19 @@
   !   Advection   !
   !               !
   !---------------!
-
-  ! Compute tmax and tmin
-  if(t % adv_scheme .ne. CENTRAL) then
-    call Numerics_Mod_Advection_Min_Max(t)
-  end if
-
-  ! New values
-  do c = 1, grid % n_cells
-    t % a(c) = 0.0
-    t % c(c) = 0.0  ! use t % c for upwind advective fluxes
-  end do
-
-  !----------------------------------!
-  !   Browse through all the faces   !
-  !----------------------------------!
-  do s=1,grid % n_faces
-
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
-
-    ts =      grid % f(s)  * t % n(c1)   &
-       + (1.0-grid % f(s)) * t % n(c2)
-
-    ! Compute ts with desired advection scheme
-    if(t % adv_scheme .ne. CENTRAL) then
-      call Numerics_Mod_Advection_Scheme(ts, s, t,                          &
-                                         t % x, t % y, t % z,               &
-                                         grid % dx, grid % dy, grid % dz,   &
-                                         flux)
-    end if
-
-    ! Compute advection term
-    if(c2 > 0) then
-      t % a(c1) = t % a(c1)-flux(s)*ts*capacity
-      t % a(c2) = t % a(c2)+flux(s)*ts*capacity
-    else
-      t % a(c1) = t % a(c1)-flux(s)*ts*capacity
-    end if
-
-    ! Store upwinded part of the advection term in "c"
-    if(flux(s).lt.0) then   ! from c2 to c1
-      t % c(c1) = t % c(c1)-flux(s)*t % n(c2) * capacity
-      if(c2 > 0) then
-        t % c(c2) = t % c(c2)+flux(s)*t % n(c2) * capacity
-      end if
-    else
-      t % c(c1) = t % c(c1)-flux(s)*t % n(c1) * capacity
-      if(c2 > 0) then
-        t % c(c2) = t % c(c2)+flux(s)*t % n(c1) * capacity
-      end if
-    end if
-
-  end do  ! through faces
-
-  !------------------------------------------------!
-  !   Source term contains difference between      !
-  !   explicity and implicitly treated advection   !
-  !------------------------------------------------!
-  do c = 1, grid % n_cells
-    b(c) = b(c) + t % a(c) - t % c(c)
-  end do
+  call Numerics_Mod_Advection_Term(t, capacity, flux, sol,  &
+                                   t % x,                   &
+                                   t % y,                   &
+                                   t % z,                   &
+                                   grid % dx,               &
+                                   grid % dy,               &
+                                   grid % dz)
 
   !--------------!
   !              !
   !   Difusion   !
   !              !
   !--------------!
-
-  ! Set t % c back to zero 
-  do c = 1, grid % n_cells
-    t % c(c) = 0.0  
-  end do
 
   !----------------------------!
   !   Spatial discretization   !
@@ -324,25 +265,13 @@
   !   Inertial terms   !
   !                    !
   !--------------------!
+  call Numerics_Mod_Inertial_Term(t, capacity * density, sol, dt)
 
-  ! Two time levels; Linear interpolation
-  if(t % td_scheme .eq. LINEAR) then
-    do c = 1, grid % n_cells
-      a0 = capacity * density * grid % vol(c) / dt
-      a % val(a % dia(c)) = a % val(a % dia(c)) + a0
-      b(c)  = b(c) + a0 * t % o(c)
-    end do
-  end if
-
-  ! Three time levels; parabolic interpolation
-  if(t % td_scheme .eq. PARABOLIC) then
-    do c = 1, grid % n_cells
-      a0 = capacity * density * grid % vol(c) / dt
-      a % val(a % dia(c)) = a % val(a % dia(c)) + 1.5 * a0
-      b(c)  = b(c) + 2.0 * a0 * t % o(c) - 0.5 * a0 * t % oo(c)
-    end do
-  end if
-
+  !--------------------!
+  !                    !
+  !   User source(s)   !
+  !                    !
+  !--------------------!
   call User_Mod_Source(flow, t, a, b)
 
   !-------------------------------!
@@ -352,10 +281,7 @@
   !-------------------------------!
 
   ! Under-relax the equations
-  do c = 1, grid % n_cells
-    b(c) = b(c) + a % val(a % dia(c)) * (1.0 - t % urf) * t % n(c) / t % urf
-    a % val(a % dia(c)) = a % val(a % dia(c)) / t % urf
-  end do
+  call Numerics_Mod_Under_Relax(t, sol)
 
   ! Call linear solver to solve the equations
   call Bicg(sol,          &
