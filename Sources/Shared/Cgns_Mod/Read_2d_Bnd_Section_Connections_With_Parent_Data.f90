@@ -84,7 +84,7 @@
 
     if(bc_found .ne. 0) then
       if(verbose) then
-        print "(a)",     " #==============================================="
+        print "(a)",     " #-----------------------------------------------"
         print "(a,a24)", " # 2d cell section name: ", trim(sect_name)
         print "(a,i28)", ' # Cell section idx: ', sect
         print "(a,a28)", " # Bnd section type: ", &

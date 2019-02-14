@@ -158,7 +158,7 @@
                               error)          !(out)
 
       if (error.ne.0) then
-        print *, '#   Failed to read 2d elements connections from', sect_id
+        print "(a)", " #   Failed to read 2d elements connections from", sect_id
         call Cg_Error_Exit_F()
       endif
 
@@ -177,22 +177,22 @@
         if(bc_found .ne. 0) then
 
           if(verbose) then
-            print "(a,a24)", ' #   2d cell section name: ', trim(sect_name)
-            print "(a,a28)", ' #   Bnd section type: ', &
+            print "(a,a24)", " #   2d cell section name: ", trim(sect_name)
+            print "(a,a28)", " #   Bnd section type: ", &
               trim(ElementTypeName(cell_type))
-            print "(a,i25)", ' #   Bnd condition color: ', &
+            print "(a,i25)", " #   Bnd condition color: ", &
              cgns_base(base) % block(block) % bnd_cond(bc) % color
-            print "(a,i21)", ' #   Bnd section has # faces: ', &
+            print "(a,i21)", " #   Bnd section has # faces: ", &
               cgns_base(base) % block(block) % bnd_cond(bc) % n_nodes
-            print "(a,a25)", ' #   They belong to b.c.: ', &
+            print "(a,a25)", " #   They belong to b.c.: ", &
               trim(cgns_base(base) % block(block) % bnd_cond(bc) % name)
-            print *, '   #----------------------------------------------'
-            print "(a)", "   #   Connections table (sample): "
+            print "(a)", " #-------------------------------------------------"
+            print "(a)", " #     Connections table (sample): "
             do loc = 1, min(6, cnt)
-              print "(a,a16,4i8)", "   # "," ", (face_n(n,loc), n = 1, n_nodes)
+              print "(a,a16,4i8)", " # "," ", (face_n(n,loc), n = 1, n_nodes)
             end do
-            print "(a)", "   #----------------------------------------------"
-            print "(a)", "   # Recovered ParentData table (sample): "
+            print "(a)", " #-------------------------------------------------"
+            print "(a)", " #   Recovered ParentData table (sample): "
           end if
 
           ! This loop should restore ParentData for current b.c. and sect_3d
@@ -255,11 +255,11 @@
 
       !end if ! b.c. point is not assigned
         if(verbose .and. f_found .ne. 0) then
-          print "(a)",     '   #----------------------------------------------'
-          print "(a,a22)", '   # Searching bnd faces in: ', trim(cgns_base(base)  &
-                                        % block(block) % section(sect_3d_id) % name)
-          print "(a,i17)", '   # Found bnd faces in 3d block: ', f_found
-          print "(a)",     '   #=============================================='
+          print "(a)",    " #-------------------------------------------------"
+          print "(a,a22)", " #   Searching bnd faces in: ", &
+            trim(cgns_base(base) % block(block) % section(sect_3d_id) % name)
+          print "(a,i17)", " #   Found bnd faces in 3d block: ", f_found
+          print "(a)",    " #-------------------------------------------------"
         end if ! verbose
 
       end if ! bc_f_found .ne. 0

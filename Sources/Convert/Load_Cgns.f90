@@ -106,7 +106,7 @@
   !                        !
   !------------------------!
   if(verbose) then
-    print "(a)", " #======================================================="
+    print "(a)", " #-------------------------------------------------------"
     print "(a)", " # First run finished! "
     print "(a,i35)", " # - number of nodes: ", cnt_nodes
     print "(a,i35)", " # - number of cells: ", cnt_cells
@@ -292,7 +292,8 @@
       end do ! elements sections
     end do ! blocks
   end do ! bases
-  print "(a,i18)", " # Corrected hex boundary cells: ", cnt_bnd_cells
+  print "(a)", " #--------------------------------------------------"
+  print "(a,i19)", " # Corrected hex boundary cells: ", cnt_bnd_cells
 
   call Grid_Mod_Print_Bnd_Cond_List(grid)
 

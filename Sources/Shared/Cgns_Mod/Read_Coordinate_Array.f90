@@ -48,9 +48,9 @@
   endif
 
   if(verbose) then
-    print "(a)", " # ---------------------------------"
+    print "(a)", " #----------------------------------"
     print "(a,a16)", " # Coordinate name: ", trim(coord_name)
-    print "(a)", " # ---------------------------------"
+    print "(a)", " #----------------------------------"
     print "(a)", " #   Data table (sample): "
       do n = 1, 6
         print "(a,1es15.5)", " # ", coordinates(n)
@@ -71,7 +71,7 @@
       i = cnt_nodes + 1
       j = cnt_nodes + j
       grid % zn(i:j) = coordinates(:)
-        if(verbose) print "(a)", " # ---------------------------------"
+      if(verbose) print "(a)", " #---------------------------------------------"
   end select
 
   deallocate(coordinates)

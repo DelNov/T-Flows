@@ -25,7 +25,7 @@
                    error)                   !(out)
 
   if (error.ne.0) then
-    print "(a,i10)", " # Failed to number of interfaces in block: ", block
+    print "(a,i10)", " #     Failed to number of interfaces in block: ", block
     call Cg_Error_Exit_F()
   endif
 

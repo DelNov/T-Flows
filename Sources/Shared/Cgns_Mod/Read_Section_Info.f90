@@ -132,9 +132,9 @@
         end if
 
         if(verbose) then
-          print "(a)", " #       ----------------------------------------------"
+          print "(a)", " #-----------------------------------------------------"
           print "(a,a28)", " #       Bnd section name: ", trim(sect_name)
-          print "(a)", " #       ----------------------------------------------"
+          print "(a)", " #-----------------------------------------------------"
           print "(a,i28)", " #       Bnd section index ", sect
           print "(a,a28)", &
             " #       Bnd section type: ", trim(ElementTypeName(cell_type))
@@ -207,9 +207,9 @@
         end if ! .not. found_in_global_int_list
 
         if(verbose) then
-         print "(a)",  " #       ----------------------------------------------"
+         print "(a)",  " #-----------------------------------------------------"
           print "(a,a22)", " #       Interface section name: ", trim(sect_name)
-         print "(a)",  " #       ----------------------------------------------"
+         print "(a)",  " #-----------------------------------------------------"
           print "(a,i21)", " #       Interface section index: ", sect
           print "(a,a29)", &
             " #       Interface type:  ", trim(ElementTypeName(cell_type))
@@ -234,9 +234,9 @@
        ( ElementTypeName(cell_type) .eq. 'TETRA_4') ) then
 
     if(verbose) then
-      print "(a)",     " #       ----------------------------------------------"
+      print "(a)",     " #-----------------------------------------------------"
       print "(a,a24)", " #       3d cell section name: ", trim(sect_name)
-      print "(a)",     " #       ----------------------------------------------"
+      print "(a)",     " #-----------------------------------------------------"
       print "(a,i28)", " #       Cell section idx: ", sect
       print "(a,a27)", " #       Cell section type: ", &
         trim(ElementTypeName(cell_type))

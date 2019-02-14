@@ -108,7 +108,7 @@
     trim(int_name_short)
 
   if(verbose) then
-    print "(a)",     " #       ------------------------------------------------"
+    print "(a)",     " #-------------------------------------------------------"
     print "(a, a32)"," #       Interface name: ", trim(int_name)
     print "(a, a32)"," #       Shortened to:   ", trim(int_name_short)
     print "(a, a32)"," #       Donor name:     ", trim(donor_name)
@@ -118,7 +118,7 @@
     print "(a)",     " #       Point list (sample): "
     print "(a,a12,6i7)", " # ", " ", (point_list(i), &
       i = 1, min(6,int_n_nodes))
-    print "(a)",     " #       ------------------------------------------------"
+    print "(a)",     " #-------------------------------------------------------"
   end if
 
   ! Free memory

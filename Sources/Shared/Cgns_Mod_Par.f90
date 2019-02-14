@@ -127,21 +127,6 @@
   include 'Cgns_Mod/Write_Link_To_Field.f90'
   include 'Cgns_Mod/Write_Dimensions_Info.f90'
 
-  !include 'Cgns_Mod/Read_Base_Info.f90'
-  !include 'Cgns_Mod/Read_Number_Of_Bases_In_File.f90'
-  !include 'Cgns_Mod/Read_Number_Of_Blocks_In_Base.f90'
-  !include 'Cgns_Mod/Read_Block_Info.f90'
-  !include 'Cgns_Mod/Read_Block_Type.f90'
-  !include 'Cgns_Mod/Read_Number_Of_Element_Sections.f90'
-  !include 'Cgns_Mod/Read_Section_Info.f90'
-  !include 'Cgns_Mod/Read_Number_Of_Bnd_Conds_In_Block.f90'
-  !include 'Cgns_Mod/Read_Bnd_Conds_Info.f90'
-  !include 'Cgns_Mod/Read_Number_Of_Coordinates_In_Block.f90'
-  !include 'Cgns_Mod/Read_Coordinate_Info.f90'
-  !include 'Cgns_Mod/Read_Coordinate_Array.f90'
-  !include 'Cgns_Mod/Read_Section_Connections.f90'
-  !include 'Cgns_Mod/Merge_Nodes.f90'
-
   ! Par only
   include 'Cgns_Mod/Parallel/Get_Arrays_Dimensions.f90'
   include 'Cgns_Mod/Parallel/Open_File.f90'

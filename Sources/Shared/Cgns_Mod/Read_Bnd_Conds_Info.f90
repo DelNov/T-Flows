@@ -152,10 +152,10 @@
   end if
 
   if(verbose) then
-    print "(a)", " #       ------------------------------------------------"
+    print "(a)", " #-------------------------------------------------------"
     print "(a,a23)", " #       Boundary condition name: ", &
              trim(cgns_base(base) % block(block) % bnd_cond(bc) % name)
-    print "(a,i22)", ' #       ------------------------------------------------'
+    print "(a,i22)", ' #-------------------------------------------------------'
     print "(a,i22)", " #       Boundary condition index: ", bc
     print "(a,i22)", " #       Boundary condition color: ", color
     print "(a,i22)", " #       Boundary condition nodes: ", &

@@ -24,7 +24,7 @@
                       block_type,  &
                       error)
   if (error .ne. 0) then
-    print "(a)", " # Failed to get block type"
+    print "(a)", " #     Failed to get block type"
     call Cg_Error_Exit_F()
   endif
 
@@ -37,7 +37,7 @@
   end if
 
   if (cgns_base(base) % block(block) % type .eq. STRUCTURED) then
-    print "(a)", " # Structured CGNS meshed are unsupported"
+    print "(a)", " #     Structured CGNS meshed are unsupported"
     stop
   endif
 

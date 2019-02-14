@@ -25,7 +25,7 @@
                    error)          !(out)
 
   if (error.ne.0) then
-    print "(a)", " # Failed to obtain number of boundary conditions"
+    print "(a)", " #     Failed to obtain number of boundary conditions"
     call Cg_Error_Exit_F()
   endif
 

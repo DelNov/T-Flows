@@ -81,9 +81,9 @@
       int_type = cgns_base(base) % block(block) % interface(int) % int_type
 
       if(verbose) then
-        print "(a)",     " # ----------------------------------------------"
+        print "(a)",     " #-----------------------------------------------"
         print "(a,a24)", " # 2d cell section name: ", trim(sect_name)
-        print "(a)",     " # ----------------------------------------------"
+        print "(a)",     " #-----------------------------------------------"
         print "(a,a30)", " # Interface name: ", trim(int_name)
         print "(a,i29)", " # Interface index: ", &
           cgns_base(base) % block(block) % interface(int) % id

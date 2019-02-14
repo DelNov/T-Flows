@@ -130,21 +130,21 @@
     deallocate(cell_n)
 
     if(verbose) then
-      print "(a)", " # ----------------------------------------------"
-      print "(a,a24)", ' # 3d cell section name: ', trim(sect_name)
-      print "(a)", " # ----------------------------------------------"
-      print "(a,i28)", ' # Cell section idx: ', sect
-      print "(a,a27)", ' # Cell section type: ', &
+      print "(a)", " #-------------------------------------------------"
+      print "(a,a26)", ' # 3d cell section name: ', trim(sect_name)
+      print "(a)", " #-------------------------------------------------"
+      print "(a,i30)", ' # Cell section idx: ', sect
+      print "(a,a29)", ' # Cell section type: ', &
         trim(ElementTypeName(cell_type))
-      print "(a,i29)", ' # Number of cells: ', cnt
+      print "(a,i31)", ' # Number of cells: ', cnt
     end if
 
     if(verbose) then
-      print "(a,i24)", " # Corrected first cell: ",  &
+      print "(a,i26)", " # Corrected first cell: ",  &
         cgns_base(base) % block(block) % section(sect) % first_cell
-      print "(a,i25)", " # Corrected last cell: ",  &
+      print "(a,i27)", " # Corrected last cell: ",  &
         cgns_base(base) % block(block) % section(sect) % last_cell
-      print "(a)", " # ----------------------------------------------"
+      print "(a)", " #-------------------------------------------------"
     end if ! verbose
 
     ! Count cells in sect
