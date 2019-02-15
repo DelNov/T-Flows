@@ -5,9 +5,6 @@
 !   keyword (argument "keyword") in control file.  If not found, a default     !
 !   vaue specified in argument "def" is used.
 !------------------------------------------------------------------------------!
-!---------------------------------[Modules]------------------------------------!
-  use Comm_Mod, only: this_proc
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   character(len=*)  :: keyword

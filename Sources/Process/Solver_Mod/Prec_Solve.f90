@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Prec_Solve(ni, a, d, x, b, prec)
 !------------------------------------------------------------------------------!
-! Solves the preconditioning system [d]{x}={b}                                 !
+!   Solves the preconditioning system [d]{x}={b}                               !
 !------------------------------------------------------------------------------!
 !   Allows preconditioning of the system by:                                   !
 !     1. Diagonal preconditioning                                              !
@@ -10,11 +10,6 @@
 !   The type of precondtioning is chosen by setting the variable prec to 0     !
 !   (for no preconditioning), 1 (for diagonal preconditioning) or 2 (for       !
 !   incomplete Cholesky preconditioning)                                       !
-!------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Comm_Mod
-  use Matrix_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

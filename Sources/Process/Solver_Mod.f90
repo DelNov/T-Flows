@@ -4,10 +4,11 @@
 !   Module used for native linear solvers.                                     !
 !------------------------------------------------------------------------------!
   use Const_Mod
-  use Comm_Mod,   only: this_proc
-  use Grid_Mod,   only: Grid_Type
+  use Comm_Mod
+  use Grid_Mod,     only: Grid_Type
   use Matrix_Mod
   use Vector_Mod
+  use Control_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!

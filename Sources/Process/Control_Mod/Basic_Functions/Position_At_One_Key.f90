@@ -4,9 +4,6 @@
 !   Position yourself within the file at the line specified with one key.      !
 !   It is intended to be used to find the initial condition specifications.    !
 !------------------------------------------------------------------------------!
-!---------------------------------[Modules]------------------------------------!
-  use Comm_Mod, only: this_proc
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   character(len=*)  :: keyword

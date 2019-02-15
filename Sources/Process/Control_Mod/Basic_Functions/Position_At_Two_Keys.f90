@@ -5,10 +5,6 @@
 !   Position yourself within the file at the line specified with two keys.     !
 !   It is intended to be used to find the boundary condition specifications.   !
 !------------------------------------------------------------------------------!
-!---------------------------------[Modules]------------------------------------!
-  use Const_Mod
-  use Comm_Mod, only: this_proc
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   character(len=*)  :: keyword_1

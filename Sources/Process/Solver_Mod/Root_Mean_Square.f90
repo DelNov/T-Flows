@@ -4,11 +4,6 @@
 !   Calculates root means square of vector r without normalization.            !
 !   This non-normalized variant seems to be better option for ACM.             !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Comm_Mod
-  use Matrix_Mod
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   integer :: ni

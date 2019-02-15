@@ -12,8 +12,6 @@
 !   incomplete Cholesky preconditioning)                                       !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Comm_Mod
-  use Matrix_Mod
   use Work_Mod, only: p1 => r_cell_01,  &
                       q1 => r_cell_02,  &
                       r1 => r_cell_03
