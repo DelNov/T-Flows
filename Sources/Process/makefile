@@ -204,7 +204,8 @@ else
 endif
 
 # Sources for modules in the local directory
-SRC_MOD += Info_Mod.f90		\
+SRC_MOD += Control_Mod.f90	\
+           Info_Mod.f90		\
            Bulk_Mod.f90		\
            Var_Mod.f90		\
            Matrix_Mod.f90	\
@@ -222,9 +223,8 @@ SRC_MOD += Turbulence_Mod.f90	\
 
 SRC_MOD += Particles_Mod.f90
 
-# Control_Mod should come because it reads Turbulence, Field and Numerics
-SRC_MOD += Control_Mod.f90 	\
-           Backup_Mod.f90
+# Backup_Mod should come last because it uses all other modules
+SRC_MOD += Backup_Mod.f90
 
 #---------------
 #   Functions

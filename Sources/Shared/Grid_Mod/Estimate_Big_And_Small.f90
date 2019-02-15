@@ -2,11 +2,7 @@
   subroutine Grid_Mod_Estimate_Big_And_Small(grid, big, small)
 !------------------------------------------------------------------------------!
 !   Estimates "big" and "small" numbers for a given mesh.                      !
-!                                                                              !
-!   They are needed when merging nodes of the mesh.                            !
-!------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Const_Mod, only: HUGE, PI
+!   (They are needed when merging nodes of the mesh.)                          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

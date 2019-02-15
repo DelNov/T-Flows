@@ -1,13 +1,7 @@
 !==============================================================================!
   subroutine Monitor_Mod_Initialize(grid, restart)
 !------------------------------------------------------------------------------!
-!   This is to set up monitoring points.                                       !
-!------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Comm_Mod
-  use Name_Mod
-  use Grid_Mod
+!   This is to read the control file and set up monitoring points.             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -16,15 +10,42 @@
 !----------------------------------[Calling]-----------------------------------!
   real :: Distance
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: c, m, l
+  integer           :: c, m, n, l
   real              :: curr_dist, min_dist_all
   character(len=80) :: mon_file_name
+  character(len=80) :: point_name
   real, allocatable :: min_dist(:)
+  real              :: xyz(3), def(3)
 !==============================================================================!
+
+  ! Read number of monitoring points from control file
+  call Control_Mod_Read_Int_Item('NUMBER_OF_MONITORING_POINTS', 0, &
+                                  monitor % n_points, .true.)
+
+  if(monitor % n_points .eq. 0) return
+
+  ! Allocate memory for points
+  allocate(monitor % x(monitor % n_points))
+  allocate(monitor % y(monitor % n_points))
+  allocate(monitor % z(monitor % n_points))
 
   ! Allocate memory accordingly
   allocate(monitor % cell(monitor % n_points))
   allocate(min_dist      (monitor % n_points))
+
+  !----------------------------------------!
+  !   Read monitoring points coordinates   !
+  !----------------------------------------!
+  do n = 1, monitor % n_points
+    write(point_name, '(a,i3.3)') 'MONITORING_POINT_', n
+
+    def = 0.  ! don't have a better idea what to set
+    call Control_Mod_Read_Real_Array(point_name, 3, def, xyz, .true.)
+
+    monitor % x(n) = xyz(1)
+    monitor % y(n) = xyz(2)
+    monitor % z(n) = xyz(3)
+  end do
 
   !--------------------------------------------!
   !   Set the names for all monitoring files   !

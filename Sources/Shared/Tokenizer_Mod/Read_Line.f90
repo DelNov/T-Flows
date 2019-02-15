@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Tokenizer_Mod_Read_Line(un, reached_end) 
+  subroutine Tokenizer_Mod_Read_Line(un, reached_end)
 !------------------------------------------------------------------------------!
 !  Reads a line from a file (unit 9) and discards if it is comment.            !
 !------------------------------------------------------------------------------!
@@ -20,9 +20,9 @@
   end if
 
   !-----------------------------------!
-  !  Read the whole line into whole  !
+  !  Read the whole line into whole   !
   !-----------------------------------!
-1 read(un,'(A300)', end=2) line % whole
+1 read(un,'(a300)', end=2) line % whole
 
   ! Shift the whole line to the left (remove leading spaces)
   line % whole = adjustl(line % whole)

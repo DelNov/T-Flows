@@ -3,22 +3,17 @@
 !------------------------------------------------------------------------------!
 !   This is the nucleus of the Additive Correction Multigrid method.           !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Comm_Mod
-  use Matrix_Mod
-  use Control_Mod
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Solver_Type), target :: sol
-  real              :: x(-sol % pnt_grid % n_bnd_cells :  &
-                          sol % pnt_grid % n_cells)
-  real              :: b( sol % pnt_grid % n_cells)      ! [A]{x}={b}
-  character(len=80) :: prec                              ! preconditioner
-  integer           :: n_cycles                          ! number of cycles
-  real              :: tol                               ! tolerance
-  real              :: fin_res                           ! final residual
-  real, optional    :: norm                              ! normalization
+  real                      :: x(-sol % pnt_grid % n_bnd_cells :  &
+                                  sol % pnt_grid % n_cells)
+  real                      :: b( sol % pnt_grid % n_cells)  ! [A]{x}={b}
+  character(len=80)         :: prec                          ! preconditioner
+  integer                   :: n_cycles                      ! number of cycles
+  real                      :: tol                           ! tolerance
+  real                      :: fin_res                       ! final residual
+  real, optional            :: norm                          ! normalization
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Matrix_Type), pointer :: a

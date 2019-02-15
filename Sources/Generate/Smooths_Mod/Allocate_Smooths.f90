@@ -1,9 +1,6 @@
 !==============================================================================!
   subroutine Smooths_Mod_Allocate_Smooths(smr, n)
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Const_Mod, only: HUGE
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Smooths_Type) :: smr  ! smoothing regions
@@ -13,9 +10,9 @@
   smr % n_smooths = n     ! number of smoothing regions
 
   allocate(smr % iters(n));  smr % iters = 0
-  allocate(smr % in_x (n));  smr % in_x = .false.
-  allocate(smr % in_y (n));  smr % in_y = .false.
-  allocate(smr % in_z (n));  smr % in_z = .false.
+  allocate(smr % in_x (n));  smr % in_x  = .false.
+  allocate(smr % in_y (n));  smr % in_y  = .false.
+  allocate(smr % in_z (n));  smr % in_z  = .false.
   allocate(smr % x_min(n));  smr % x_min = +HUGE
   allocate(smr % y_min(n));  smr % y_min = +HUGE
   allocate(smr % z_min(n));  smr % z_min = +HUGE

@@ -119,9 +119,6 @@
     call Comm_Mod_Wait
   end if
 
-  ! Retreive information about monitoring points from control file
-  call Control_Mod_Monitoring_Points(.true.)
-
   ! Initialize monitoring points
   call Monitor_Mod_Initialize(grid, backup)
 

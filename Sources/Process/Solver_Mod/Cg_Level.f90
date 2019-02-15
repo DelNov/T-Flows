@@ -6,9 +6,7 @@
 !   Conjugate gradient method for one level of the multigrid.                  !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Comm_Mod
-  use Matrix_Mod
-  use Work_Mod, only: z => r_cell_02,  &
+  use Work_Mod, only: z  => r_cell_02,  &
                       r1 => r_cell_03
 !------------------------------------------------------------------------------!
   implicit none

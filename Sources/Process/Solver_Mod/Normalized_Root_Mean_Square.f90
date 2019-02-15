@@ -4,11 +4,6 @@
 !   Calculates root means square of vector r, normalizing it with entries      !
 !   in the system matrix (a), values of unknown (x) and optional norm.         !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Comm_Mod
-  use Matrix_Mod
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   integer           :: ni

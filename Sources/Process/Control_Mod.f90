@@ -1,7 +1,9 @@
 !==============================================================================!
   module Control_Mod
 !----------------------------------[Modules]-----------------------------------!
+  use Const_Mod
   use Tokenizer_Mod
+  use Comm_Mod,      only: this_proc, Comm_Mod_End
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -43,7 +45,6 @@
     ! Save
     include 'Control_Mod/Input_Output/Backup_Save_Interval.f90'
     include 'Control_Mod/Input_Output/Results_Save_Interval.f90'
-    include 'Control_Mod/Input_Output/Monitoring_Points.f90'
 
   !-------------!
   !   Physics   !
