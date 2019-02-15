@@ -388,7 +388,7 @@
     if(n_inflow .gt. 0) then
       print '(a29,es12.5)', ' # Mass inflow             : ', bulk % mass_in
       print '(a29,es12.5)', ' # Average inflow velocity : ', bulk % mass_in &
-                                                             / area
+                                                             / (density * area)
     end if
     print *, '# Number of faces on the wall        : ', n_wall
     print *, '# Number of inflow faces             : ', n_inflow
