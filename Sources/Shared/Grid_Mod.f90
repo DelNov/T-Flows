@@ -11,8 +11,8 @@
   use Material_Mod
   use Bnd_Cond_Mod
   use Metis_Options_Mod
-  use Sort_Mod           ! a collection of sorting functions
-  use Div_Mod            ! candidate for removal
+  use Sort_Mod
+  use Div_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -65,7 +65,7 @@
     !-------------------------!
 
     ! Cell center coordinates
-    real, allocatable :: xc(:), yc(:), zc(:)  
+    real, allocatable :: xc(:), yc(:), zc(:)
 
     ! Cell volumes
     real, allocatable :: vol(:)
@@ -79,12 +79,12 @@
     ! True if cell is near wall.  Used in Process for some turblence models.
     logical, allocatable :: cell_near_wall(:)
 
+    ! Number of nodes at each cell (determines cell's shape really)
+    integer, allocatable :: cells_n_nodes(:)
+
     ! Cells' nodes and neigboring cells
     integer, allocatable :: cells_n(:,:)
     integer, allocatable :: cells_c(:,:)
-
-    ! Number of nodes at each cell (determines cell's shape really)
-    integer, allocatable :: cells_n_nodes(:)
 
     ! For each cell; type of the boundary condition in a given direction
     integer, allocatable :: cells_bnd_color(:,:)
@@ -137,6 +137,12 @@
     integer, allocatable :: new_c(:)
     integer, allocatable :: new_f(:)
 
+    ! Number of cells surrounding each node
+    integer, allocatable :: nodes_n_cells(:)
+
+    ! List of cells surrounding each node
+    integer, allocatable :: nodes_c(:,:)
+
     !------------------------------------------!
     !   Variables important for parallel run   ! 
     !------------------------------------------!
@@ -160,6 +166,7 @@
   include 'Grid_Mod/Calculate_Face_Geometry.f90'
   include 'Grid_Mod/Calculate_Wall_Distance.f90'
   include 'Grid_Mod/Estimate_Big_And_Small.f90'
+  include 'Grid_Mod/Find_Nodes_Cells.f90'
   include 'Grid_Mod/Load_Cns.f90'
   include 'Grid_Mod/Load_Geo.f90'
   include 'Grid_Mod/Print_Bnd_Cond_Info.f90'
