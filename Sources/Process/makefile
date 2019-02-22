@@ -28,7 +28,7 @@ DIR_SHARED = ../Shared
 DIR_MODULE = .Modules
 DIR_OBJECT = .Objects
 DIR_TURBUL = Turbulence
-DIR_PARTIC = Particles_Mod
+DIR_PARTIC = Swarm_Mod
 DIR_USER   = User_Mod
 DIR_CASE   = no
 VPATH = $(DIR_SHARED):$(DIR_TURBUL):$(DIR_PARTIC):.
@@ -221,7 +221,7 @@ SRC_MOD += Turbulence_Mod.f90	\
            Les_Mod.f90		\
            Rans_Mod.f90
 
-SRC_MOD += Particles_Mod.f90
+SRC_MOD += Swarm_Mod.f90
 
 # Backup_Mod should come last because it uses all other modules
 SRC_MOD += Backup_Mod.f90
