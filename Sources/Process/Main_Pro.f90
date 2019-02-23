@@ -14,7 +14,6 @@
   use Grad_Mod
   use Bulk_Mod
   use Var_Mod,    only: Var_Type
-  use Swarm_Mod
   use Solver_Mod
   use Info_Mod
   use Work_Mod,   only: Work_Mod_Allocate
