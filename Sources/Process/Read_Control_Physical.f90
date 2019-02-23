@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Read_Control_Physical(flow, backup)
+  subroutine Read_Control_Physical(flow, swarm, backup)
 !------------------------------------------------------------------------------!
 !   Reads details about physial models from control file.                      !
 !------------------------------------------------------------------------------!
@@ -8,6 +8,7 @@
   use Comm_Mod,    only: Comm_Mod_End, this_proc
   use Field_Mod,   only: Field_Type, buoyancy, heat_transfer,  &
                          grav_x, grav_y, grav_z
+  use Swarm_Mod,   only: Swarm_Type
   use Bulk_Mod,    only: Bulk_Type
   use Rans_Mod
   use Control_Mod
@@ -15,6 +16,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
+  type(Swarm_Type), target :: swarm
   logical                  :: backup
 !----------------------------------[Locals]------------------------------------!
   type(Bulk_Type), pointer :: bulk
@@ -190,5 +192,14 @@
   !                               !
   !-------------------------------!
   call Control_Mod_Number_Of_Scalars(flow % n_scalars, verbose = .true.)
+
+  !-----------------------!
+  !                       !
+  !   Particle tracking   !
+  !                       !
+  !-----------------------!
+  call Control_Mod_Number_Of_Particles(swarm % n_particles, verbose = .true.)
+  call Control_Mod_Swarm_Density      (swarm % density,     verbose = .true.)
+  call Control_Mod_Swarm_Diameter     (swarm % diameter,    verbose = .true.)
 
   end subroutine
