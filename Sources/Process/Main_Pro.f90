@@ -33,9 +33,9 @@
   logical           :: backup, save_now, exit_now
   type(Grid_Type)   :: grid        ! grid used in computations
   type(Field_Type)  :: flow        ! flow field we will be solving for
+  type(Swarm_Type)  :: swarm       ! swarm of particles
   type(Solver_Type) :: sol         ! linear solvers
-  real              :: time        ! physical time
-  real              :: dt          ! time step
+  real              :: time        ! physical time of the simulation
   integer           :: first_dt    ! first time step in this run
   integer           :: last_dt     ! number of time steps
   integer           :: max_ini     ! max number of inner iterations
@@ -87,7 +87,7 @@
   call Control_Mod_Starting_Time_Step_For_Statistics(n_stat, verbose=.true.)
 
   ! Read physical models from control file
-  call Read_Control_Physical(flow, backup)
+  call Read_Control_Physical(flow, swarm, backup)
 
   ! Read numerical models from control file
   call Read_Control_Numerical(flow)
@@ -99,6 +99,7 @@
   call User_Mod_Allocate(grid)
 
   call Grid_Mod_Calculate_Face_Geometry(grid)
+  call Grid_Mod_Find_Nodes_Cells(grid)         ! for Lagrangian particle track
 
   ! Allocate memory for linear systems of equations
   ! (You need face geomtry for this step)
@@ -148,7 +149,7 @@
   !               !
   !---------------!
 
-  call Control_Mod_Time_Step(dt, verbose=.true.)
+  call Control_Mod_Time_Step(flow % dt, verbose=.true.)
   call Control_Mod_Backup_Save_Interval(bsi, verbose=.true.)
   call Control_Mod_Results_Save_Interval(rsi, verbose=.true.)
 
@@ -166,10 +167,10 @@
 
   do n = first_dt + 1, last_dt
 
-    time = time + dt
+    time = time + flow % dt
 
     ! Beginning of time steo
-    call User_Mod_Beginning_Of_Time_Step(flow, n, time)
+    call User_Mod_Beginning_Of_Time_Step(flow, swarm, n, time)
 
     ! Start info boxes.
     call Info_Mod_Time_Start()
@@ -200,7 +201,7 @@
       call Calculate_Sgs_Hybrid(grid)
     end if
 
-    call Convective_Outflow(flow, dt)
+    call Convective_Outflow(flow, flow % dt)
     if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
        turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
       call Calculate_Vis_T_Rsm(flow)
@@ -224,30 +225,30 @@
       call Grad_Mod_Variable(flow % w, .true.)
 
       ! All velocity components one after another
-      call Compute_Momentum(flow, 1, sol, dt, ini)
-      call Compute_Momentum(flow, 2, sol, dt, ini)
-      call Compute_Momentum(flow, 3, sol, dt, ini)
+      call Compute_Momentum(flow, 1, sol, flow % dt, ini)
+      call Compute_Momentum(flow, 2, sol, flow % dt, ini)
+      call Compute_Momentum(flow, 3, sol, flow % dt, ini)
 
       ! Refresh buffers for a % sav before discretizing for pressure
       ! (Can this call be somewhere in Compute Pressure?)
       call Comm_Mod_Exchange_Real(grid, sol % a % sav)
 
       call Balance_Mass(flow)
-      call Compute_Pressure(flow, sol, dt, ini)
+      call Compute_Pressure(flow, sol, flow % dt, ini)
 
       call Grad_Mod_Pressure(flow % pp)
 
       call Bulk_Mod_Calculate_Fluxes(grid, flow % bulk, flow % flux)
-      mass_res = Correct_Velocity(flow, sol, dt, ini)
+      mass_res = Correct_Velocity(flow, sol, flow % dt, ini)
 
       ! Energy (practically temperature)
       if(heat_transfer) then
-        call Compute_Energy(flow, sol, dt, ini)
+        call Compute_Energy(flow, sol, flow % dt, ini)
       end if
 
       ! Passive scalars
       do sc = 1, flow % n_scalars
-        call Compute_Scalar(flow, sol, dt, ini, sc)
+        call Compute_Scalar(flow, sol, flow % dt, ini, sc)
       end do
 
       if(turbulence_model .eq. K_EPS) then
@@ -257,8 +258,8 @@
 
         call Calculate_Shear_And_Vorticity(flow)
 
-        call Compute_Turbulent(flow, sol, dt, ini, kin, n)
-        call Compute_Turbulent(flow, sol, dt, ini, eps, n)
+        call Compute_Turbulent(flow, sol, flow % dt, ini, kin, n)
+        call Compute_Turbulent(flow, sol, flow % dt, ini, eps, n)
 
         call Calculate_Vis_T_K_Eps(flow)
 
@@ -269,14 +270,14 @@
         call Calculate_Shear_And_Vorticity(flow)
         call Calculate_Heat_Flux(flow)
 
-        call Compute_Turbulent(flow, sol, dt, ini, kin, n)
-        call Compute_Turbulent(flow, sol, dt, ini, eps, n)
-        call Compute_Turbulent(flow, sol, dt, ini, t2,  n)
+        call Compute_Turbulent(flow, sol, flow % dt, ini, kin, n)
+        call Compute_Turbulent(flow, sol, flow % dt, ini, eps, n)
+        call Compute_Turbulent(flow, sol, flow % dt, ini, t2,  n)
 
         call Update_Boundary_Values(flow)
 
         call Compute_F22(grid, sol, ini, f22)
-        call Compute_Turbulent(flow, sol, dt, ini, zeta, n)
+        call Compute_Turbulent(flow, sol, flow % dt, ini, zeta, n)
 
         call Calculate_Vis_T_K_Eps_Zeta_F(flow)
 
@@ -286,12 +287,12 @@
          turbulence_model .eq. HYBRID_LES_RANS) then
         call Calculate_Shear_And_Vorticity(flow)
 
-        call Compute_Turbulent(flow, sol, dt, ini, kin, n)
-        call Compute_Turbulent(flow, sol, dt, ini, eps, n)
+        call Compute_Turbulent(flow, sol, flow % dt, ini, kin, n)
+        call Compute_Turbulent(flow, sol, flow % dt, ini, eps, n)
         call Update_Boundary_Values(flow)
 
         call Compute_F22(grid, sol, ini, f22)
-        call Compute_Turbulent(flow, sol, dt, ini, zeta, n)
+        call Compute_Turbulent(flow, sol, flow % dt, ini, zeta, n)
 
         call Calculate_Vis_T_K_Eps_Zeta_F(flow)
       end if
@@ -308,19 +309,19 @@
         call Grad_Mod_Variable(flow % v, .true.)
         call Grad_Mod_Variable(flow % w, .true.)
 
-        call Compute_Stresses(flow, sol, dt, ini, uu, n)
-        call Compute_Stresses(flow, sol, dt, ini, vv, n)
-        call Compute_Stresses(flow, sol, dt, ini, ww, n)
+        call Compute_Stresses(flow, sol, flow % dt, ini, uu, n)
+        call Compute_Stresses(flow, sol, flow % dt, ini, vv, n)
+        call Compute_Stresses(flow, sol, flow % dt, ini, ww, n)
 
-        call Compute_Stresses(flow, sol, dt, ini, uv, n)
-        call Compute_Stresses(flow, sol, dt, ini, uw, n)
-        call Compute_Stresses(flow, sol, dt, ini, vw, n)
+        call Compute_Stresses(flow, sol, flow % dt, ini, uv, n)
+        call Compute_Stresses(flow, sol, flow % dt, ini, uw, n)
+        call Compute_Stresses(flow, sol, flow % dt, ini, vw, n)
 
         if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
           call Compute_F22(grid, sol, ini, f22)
         end if
 
-        call Compute_Stresses(flow, sol, dt, ini, eps, n)
+        call Compute_Stresses(flow, sol, flow % dt, ini, eps, n)
 
         call Calculate_Vis_T_Rsm(flow)
 
@@ -337,7 +338,7 @@
         ! Update the values at boundaries
         call Update_Boundary_Values(flow)
 
-        call Compute_Turbulent(flow, sol, dt, ini, vis, n)
+        call Compute_Turbulent(flow, sol, flow % dt, ini, vis, n)
         call Calculate_Vis_T_Spalart_Allmaras(flow)
       end if
 
@@ -372,7 +373,7 @@
     call User_Mod_Calculate_Mean(flow, n_stat, n)
 
     ! Adjust pressure drops to keep the mass fluxes constant
-    call Bulk_Mod_Adjust_P_Drops(flow % bulk, dt)
+    call Bulk_Mod_Adjust_P_Drops(flow % bulk, flow % dt)
 
     !----------------------!
     !   Save the results   !
@@ -402,7 +403,7 @@
     end if
 
     ! Just before the end of time step
-    call User_Mod_End_Of_Time_Step(flow, n, time)
+    call User_Mod_End_Of_Time_Step(flow, swarm, n, time)
 
     if(save_now) then
       if(this_proc < 2) then
