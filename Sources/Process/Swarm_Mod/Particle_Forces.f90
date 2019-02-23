@@ -1,29 +1,25 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Particle_Forces(flow, swarm, k)
+  subroutine Swarm_Mod_Particle_Forces(swarm, k)
 !------------------------------------------------------------------------------!
 !                 Computes the forces exerted on the particle                  !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Const_Mod, only: PI, EARTH_G, ONE_SIXTH
-  use Field_Mod, only: Field_Type, density
-  use Grid_Mod,  only: Grid_Type
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
   type(Swarm_Type), target :: swarm
+  integer                  :: k     ! particle number
 !-----------------------------------[Locals]-----------------------------------!
+  type(Field_Type),    pointer :: flow
   type(Particle_Type), pointer :: part
   real                         :: fb      ! buoyant force
   real                         :: fd      ! drag force
   real                         :: ft      ! total force acting on the particle
   real                         :: cd      ! drag coefficient
-  integer                      :: k       ! particle count
   integer                      :: n_part  ! particle(s) number
 !==============================================================================!
 
   ! Take aliases
-  part => swarm % particles(k)
+  flow => swarm % pnt_flow
+  part => swarm % particle(k)
 
   ! Particle surface area (Spherical particle)
   part % area =  PI * (part % d **2)
@@ -41,14 +37,13 @@
   ! ...will be moving upwards as well. Otherwise fb will be -ve and it...
   ! ...will be deducted from the total force.
 
-  part % fb = (density - part % rho)  * EARTH_G * part % vol
+  part % fb = (density - part % density) * EARTH_G * part % vol
 
-  ! compute drag coefficient
+  ! Compute drag coefficient
   if (part % re .ge. 1000.0) then
     cd = 0.43
-
-    else
-      cd = 24.0 / part % Re * (part % f)
+  else
+    cd = 24.0 / part % re * (part % f)
   end if
 
   !-----------------------------------------------------------------!

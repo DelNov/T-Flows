@@ -1,17 +1,12 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Find_Neighboring_Cells(flow, swarm, k)
+  subroutine Swarm_Mod_Find_Neighboring_Cells(swarm, k)
 !------------------------------------------------------------------------------!
 !   Finds a cell closest to a particle.                                        !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Const_Mod, only: HUGE
-  use Field_Mod, only: Field_Type
-  use Grid_Mod,  only: Grid_Type
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),    target :: flow
-  type(Swarm_Type),    target    :: swarm
+  type(Swarm_Type), target :: swarm
+  integer                  :: k      ! particle number
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: grid
   type(Particle_Type), pointer :: part
@@ -19,7 +14,6 @@
   integer                      :: n            ! node counter
   integer                      :: cn           ! closest node
   integer                      :: cc           ! closest sell
-  integer                      :: k            ! particle count 
   integer                      :: n_part       ! number of particles
   real                         :: xn, yn, zn   ! Node coordinates
   real                         :: xc, yc, zc   ! cell center coordinates
@@ -32,12 +26,12 @@
 !==============================================================================!
 
   ! Take aliases
-  grid         => flow % pnt_grid
-  part         => swarm % particles(k)
-  escaped      => part  % escaped
-  deposited    => part  % deposited
-  reflected    => part % reflected
-  trapped      => part % trapped
+  grid      => swarm % pnt_grid
+  part      => swarm % particle(k)
+  escaped   => part  % escaped
+  deposited => part  % deposited
+  reflected => part  % reflected
+  trapped   => part  % trapped
 
   !-------------------------------------------------!
   !   Browse through all cells as another example   !
@@ -81,15 +75,15 @@
 
       ! Calling the nearest node subroutine to find the ...
       ! ... nearest node for each particle and stores it
-      call Swarm_Mod_Find_Nearest_Node(flow, swarm, k)
+      call Swarm_Mod_Find_Nearest_Node(swarm, k)
 
       ! Calling interpolate velocity subroutine ...
       ! ... to update velocity of each particle
-      call Swarm_Mod_Interpolate_Velocity(flow, swarm, k)
+      call Swarm_Mod_Interpolate_Velocity(swarm, k)
 
       ! Calling particle forces subroutine to ...
       ! ... compute the forces on each particle and store it
-      call Swarm_Mod_Particle_Forces(flow, swarm, k)
+      call Swarm_Mod_Particle_Forces(swarm, k)
 
     else
       trapped = .false. ! End because the particle either escaped or deposited
@@ -133,15 +127,15 @@
 
       ! Calling the nearest node subroutine to find the ...
       ! ... nearest node for each particle and stores it
-      call Swarm_Mod_Find_Nearest_Node(flow, swarm, k)
+      call Swarm_Mod_Find_Nearest_Node(swarm, k)
 
       ! Calling interpolate velocity subroutine ...
       ! ... to update velocity of each particle
-      call Swarm_Mod_Interpolate_Velocity(flow, swarm, k)
+      call Swarm_Mod_Interpolate_Velocity(swarm, k)
 
       ! Calling particle forces subroutine to ...
       ! ... compute the forces on each particle and store it
-      call Swarm_Mod_Particle_Forces(flow, swarm, k)
+      call Swarm_Mod_Particle_Forces(swarm, k)
 
     else
       reflected = .false.

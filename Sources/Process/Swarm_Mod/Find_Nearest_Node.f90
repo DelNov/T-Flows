@@ -1,23 +1,18 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Find_Nearest_Node(flow, swarm, k)
+  subroutine Swarm_Mod_Find_Nearest_Node(swarm, k)
 !------------------------------------------------------------------------------!
 !   Finds a cell closest to a particle.                                        !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Const_Mod, only: HUGE
-  use Field_Mod, only: Field_Type
-  use Grid_Mod,  only: Grid_Type
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
   type(Swarm_Type), target :: swarm
+  integer                  :: k      ! particle number
 !-----------------------------------[Locals]-----------------------------------!
+  type(Field_Type),    pointer :: flow
   type(Grid_Type),     pointer :: grid
   type(Particle_Type), pointer :: part
   integer                      :: ln, n        ! local node and node
   integer                      :: cn           ! closest node
-  integer                      :: k            ! particle count 
   integer                      :: n_part       ! number of particles
   real                         :: xn, yn, zn   ! Node coordinates
   real                         :: xc, yc, zc   ! cell center coordinates
@@ -27,8 +22,9 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => flow % pnt_grid
-  part => swarm % particles(k)
+  flow => swarm % pnt_flow
+  grid => swarm % pnt_grid
+  part => swarm % particle(k)
 
   !-------------------------------------------------!
   !   Browse through all cells as another example   !

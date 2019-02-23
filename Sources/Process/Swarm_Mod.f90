@@ -4,8 +4,10 @@
 !   Module for Lagrangian particle tracking                                    !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
+  use Const_Mod, only: HUGE, ONE_SIXTH, EARTH_G, PI
   use Grid_Mod,  only: Grid_Type
-  use Field_Mod, only: Field_Type
+  use Var_Mod,   only: Var_Type
+  use Field_Mod, only: Field_Type, density, viscosity
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -26,7 +28,7 @@
     real :: w
 
     ! Particle's density
-    real :: rho
+    real :: density
 
     ! Particle surface area
     real :: area
@@ -38,7 +40,7 @@
     real :: d
 
     ! Particle time step
-    real :: dtp
+    real :: dt
 
     ! Particle relaxation time
     real :: tau
@@ -101,16 +103,18 @@
     type(Field_Type), pointer :: pnt_flow  ! flow field for which it is defined
 
     integer                          :: n_particles
-    type(Particle_Type), allocatable :: particles(:)
+    type(Particle_Type), allocatable :: particle(:)
 
-    ! Counter for depositing particles
-    integer :: c_d
+    ! Density of this swarm
+    real :: density
 
-    ! Counter for escaping particles
-    integer :: c_e
+    ! (Mean) diameter for this swarm
+    real :: diameter
 
-    ! Counter for reflected particles
-    integer :: c_r
+    ! Counter for depositing (d), escaped (e) and reflected (r) particles
+    integer :: cnt_d
+    integer :: cnt_e
+    integer :: cnt_r
 
   end type
 

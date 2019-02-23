@@ -15,6 +15,6 @@
   swarm % pnt_grid => flow % pnt_grid
 
   ! Allocate memory for all of them
-  allocate(swarm % particles(swarm % n_particles))
+  allocate(swarm % particle(swarm % n_particles))
 
   end subroutine
