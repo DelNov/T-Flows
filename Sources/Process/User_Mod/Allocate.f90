@@ -3,13 +3,9 @@
 !------------------------------------------------------------------------------!
 !   This function allocates memory for user-defined variables.                 !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Grid_Mod,   only: Grid_Type
-  use Control_Mod
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)    :: grid
+  type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
   integer :: us, ua
 !==============================================================================!
@@ -17,7 +13,7 @@
   !-----------------------------!
   !   User scalars and arrays   !
   !-----------------------------!
-  call Control_Mod_Number_Of_User_Arrays (n_user_arrays,  verbose = .true.)
+  call Control_Mod_Number_Of_User_Arrays(n_user_arrays,  verbose = .true.)
 
   !-------------------------------------!
   !   Allocate memory for user arrays   !

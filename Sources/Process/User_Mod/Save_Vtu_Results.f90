@@ -4,10 +4,6 @@
 !   This function is called from Save_Vtu and allows user to save his          !
 !   own arrays in the Vtu file with results.                                   !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Grid_Mod
-  use Var_Mod
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type)  :: grid
