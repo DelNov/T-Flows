@@ -79,6 +79,9 @@
 
     ! Multiphase 
     include 'Control_Mod/Physics/Number_Of_Phases.f90'
+    include 'Control_Mod/Physics/Number_Of_Particles.f90'
+    include 'Control_Mod/Physics/Swarm_Density.f90'
+    include 'Control_Mod/Physics/Swarm_Diameter.f90'
 
     ! Species    
     include 'Control_Mod/Physics/Number_Of_Species.f90'
