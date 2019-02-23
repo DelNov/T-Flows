@@ -42,6 +42,9 @@
     ! Bulk velocities, pressure drops, etc.
     type(Bulk_Type) :: bulk
 
+    ! Time step used in this field
+    real :: dt
+
     ! Reference temperature
     real :: t_ref
 
