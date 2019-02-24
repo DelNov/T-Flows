@@ -15,14 +15,12 @@
   real                         :: xc, yc, zc  ! cell center coordinates
   real                         :: d_sq        ! distance squared
   real                         :: min_d       ! minimum distance computed
-  logical,             pointer :: trapped     ! trap BC type
   logical,             pointer :: reflected   ! reflection BC type
 !==============================================================================!
 
   ! Take aliases
   grid      => swarm % pnt_grid
   part      => swarm % particle(k)
-  trapped   => part  % trapped
   reflected => part  % reflected
 
   !-------------------------------------------------!
@@ -35,7 +33,7 @@
   !-------------!
   !   Trap BC   !
   !-------------!
-  if (trapped) then
+  if (.not. reflected) then
     if(.not. part % escaped .and. .not. part % deposited) then 
 
       do c = 1, grid % n_cells
@@ -64,16 +62,8 @@
       ! ... nearest node for each particle and stores it
       call Swarm_Mod_Find_Nearest_Node(swarm, k)
 
-      ! Calling interpolate velocity subroutine ...
-      ! ... to update velocity of each particle
-      call Swarm_Mod_Interpolate_Velocity(swarm, k)
-
-      ! Calling particle forces subroutine to ...
-      ! ... compute the forces on each particle and store it
-      call Swarm_Mod_Particle_Forces(swarm, k)
-
     else
-      trapped = .false.  ! end because the particle either escaped or deposited
+      reflected = .true.  ! end because the particle either escaped or deposited
     end if
   end if
 
@@ -107,14 +97,6 @@
       ! Calling the nearest node subroutine to find the ...
       ! ... nearest node for each particle and stores it
       call Swarm_Mod_Find_Nearest_Node(swarm, k)
-
-      ! Calling interpolate velocity subroutine ...
-      ! ... to update velocity of each particle
-      call Swarm_Mod_Interpolate_Velocity(swarm, k)
-
-      ! Calling particle forces subroutine to ...
-      ! ... compute the forces on each particle and store it
-      call Swarm_Mod_Particle_Forces(swarm, k)
 
     else
       reflected = .false.
