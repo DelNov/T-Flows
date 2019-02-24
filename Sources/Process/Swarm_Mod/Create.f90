@@ -17,7 +17,9 @@
   swarm % pnt_grid => flow % pnt_grid
 
   ! Allocate memory for all of them
-  allocate(swarm % particle(swarm % n_particles))
+  if(swarm % n_particles > 0) then
+    allocate(swarm % particle(swarm % n_particles))
+  end if
 
   !------------------------------!
   !   Initialize all particles   !
@@ -27,10 +29,6 @@
     ! Take diameter and density from the swarm
     swarm % particle(k) % d       = swarm % diameter
     swarm % particle(k) % density = swarm % density
-
-    ! Define particle behaviour (BC) when it hits a wall
-    ! (very important to set up)
-    swarm % particle(k) % reflected = .false.
 
     ! Set initial velocity to zero
     swarm % particle(k) % u = 0
