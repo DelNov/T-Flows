@@ -4,7 +4,7 @@
 !   Module for Lagrangian particle tracking                                    !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod, only: HUGE, ONE_SIXTH, EARTH_G, PI
+  use Const_Mod
   use Grid_Mod,  only: Grid_Type
   use Var_Mod,   only: Var_Type
   use Field_Mod, only: Field_Type, density, viscosity
@@ -56,9 +56,6 @@
     logical  :: deposited
     logical  :: escaped
 
-    ! Reflection BC type
-    logical :: reflected
-
   end type
 
   !----------------!
@@ -77,6 +74,9 @@
 
     ! (Mean) diameter for this swarm
     real :: diameter
+
+    ! Coefficient of restitution (1.0 - elastic, 0.0 - sticky)
+    real :: rst
 
     ! Time step for the swarm
     real :: dt
