@@ -77,11 +77,12 @@
     include 'Control_Mod/Physics/Pressure_Drops.f90'
     include 'Control_Mod/Physics/Point_For_Monitoring_Planes.f90'
 
-    ! Multiphase 
+    ! Multiphase
     include 'Control_Mod/Physics/Number_Of_Phases.f90'
     include 'Control_Mod/Physics/Number_Of_Particles.f90'
     include 'Control_Mod/Physics/Swarm_Density.f90'
     include 'Control_Mod/Physics/Swarm_Diameter.f90'
+    include 'Control_Mod/Physics/Swarm_Coefficient_Of_Restitution.f90'
 
     ! Species    
     include 'Control_Mod/Physics/Number_Of_Species.f90'

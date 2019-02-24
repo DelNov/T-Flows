@@ -201,5 +201,7 @@
   call Control_Mod_Number_Of_Particles(swarm % n_particles, verbose = .true.)
   call Control_Mod_Swarm_Density      (swarm % density,     verbose = .true.)
   call Control_Mod_Swarm_Diameter     (swarm % diameter,    verbose = .true.)
+  call Control_Mod_Swarm_Coefficient_Of_Restitution(swarm % rst,  &
+                                                    verbose = .true.)
 
   end subroutine
