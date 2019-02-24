@@ -12,53 +12,40 @@
   type(Grid_Type),     pointer :: grid
   type(Var_Type),      pointer :: u, v, w
   type(Particle_Type), pointer :: part
-  integer                  :: c, n                 ! nearest cell and node
-  integer                  :: n_part               ! number of particles
-  real                     :: rx, ry, rz           ! vector connecting paticle and cell
-  real                     :: xc, yc, zc           ! nearest cell coordinates
-  real                     :: xn, yn, zn           ! nearest node coordinates
-  real                     :: x_old, y_old, z_old  ! particle's old coordinates
-  real                     :: dx, dy, dz           ! particle length scale in 3D
-  real                     :: dr                   ! particle distance vectorfor cfl calc.
+  integer                      :: c, n                 ! nearest cell and node
+  real                         :: rx, ry, rz           ! paticle-cell vector
+  real                         :: x_old, y_old, z_old  ! particle's old x,y,z
+  real                         :: dx, dy, dz           ! particle's shift
   real                     :: up, vp, wp           ! velocity at particle position
-  real                     :: u_f                  ! flow velocity magnitude 
-  real                     :: vel_p                ! particle velocity magnitude
-  real                     :: f                    ! drag factor for calculating Cd 
-  real                     :: re                   ! Reynolds number (Particle)
-  real                     :: k1, k2, k3, k4       ! Runge-Kutta coefficients
-  real                     :: test1, test2, test3  ! for debugguing
-  real                     :: st                   ! stokes number
-  real                     :: rst                  ! Coeff. of restitution
-  real                     :: diameter             ! pipe diameter
-  logical,             pointer :: deposited            ! particle deposition flag
-  logical,             pointer:: escaped              ! particle departure  flag
-  logical,             pointer:: trapped              ! trap       BC type
-  logical,             pointer:: reflected            ! reflection BC type
+  real                     :: flow_vel                 ! flow vel. magn.
+  real                         :: k1, k2, k3, k4       ! for Runge-Kutta
+  real                         :: st                   ! stokes number
+  real                         :: rst                  ! coeff. of restitution
+  real                         :: u_diff               ! velocity difference
+  real                         :: pipe_d               ! pipe diameter
+  real                         :: p_tau, p_cfl, p_vel
+  logical,             pointer :: deposited            ! part. deposition flag
+  logical,             pointer :: escaped              ! part. departure  flag
+  logical,             pointer :: reflected            ! reflection BC type
 !==============================================================================!
 
   ! Take aliases
-  flow         => swarm % pnt_flow
-  grid         => swarm % pnt_grid
-  u            => flow % u
-  v            => flow % v
-  w            => flow % w
-  part         => swarm % particle(k)
-  deposited    => part  % deposited
-  escaped      => part  % escaped
-  trapped      => part  % trapped
-  reflected    => part  % reflected
+  flow      => swarm % pnt_flow
+  grid      => swarm % pnt_grid
+  u         => flow % u
+  v         => flow % v
+  w         => flow % w
+  part      => swarm % particle(k)
+  deposited => part  % deposited
+  escaped   => part  % escaped
+  reflected => part  % reflected
 
   c = part % cell ! assigning the index of the closest cell for interpolation
 
-  ! Cell centre coorindates
-  xc = grid % xc(c)
-  yc = grid % yc(c)
-  zc = grid % zc(c)
-
   ! Vector which connects particle position and cell centre
-  rx = part % x - xc
-  ry = part % y - yc
-  rz = part % z - zc
+  rx = part % x - grid % xc(c)
+  ry = part % y - grid % yc(c)
+  rz = part % z - grid % zc(c)
 
   ! Compute velocities at the particle position from velocity gradients
   up = u % n(c)       &  ! u velocity at the new time step (% n)
@@ -77,36 +64,34 @@
      + w % z(c) * rz     ! w % x is gradient dw/dz
 
   ! Compute the magnitude of the interpolated velocity 
-  u_f = sqrt(up**2 + vp**2 + wp**2)
+  flow_vel = sqrt(up**2 + vp**2 + wp**2)
 
   ! Compute the magnitude of the particle's velocity
-  part % vel_p = sqrt(part % u **2 + part % v **2 + part % w **2)
+  p_vel = sqrt(part % u **2 + part % v **2 + part % w **2)
 
   ! Coefficient of restitution (particle reflection)
   rst = 1.0
 
   ! Pipe diameter
-  diameter = 0.01
+  pipe_d = 0.01
 
   ! Particle relaxation time
-  part % tau = part % density * (part % d **2) / 18.0 / viscosity
+  p_tau = part % density * (part % d **2) / 18.0 / viscosity
 
-  ! Compute stokes number
-  st = u_f * part % tau / diameter
+  ! Compute stokes number (but it's never used)
+  st = flow_vel * p_tau / pipe_d
 
   ! Particle time step (division of the global time step)
-  part % dt = flow % dt / 20.0
+  swarm % dt = flow % dt / 20.0
 
   ! Compute particle relative vel. in y-dir for buoyant force calculation
-  part % rel_vv   =  vp - part % v
-  part % rel_vvn  =  abs(vp - part % v)
+  part % rel_vv = vp - part % v
 
   ! Compute Reynolds number for calculating Cd
-  part % rel_vn   = abs(u_f - part % vel_p)
-  part % re = part % density * part % d * (part % rel_vn) / viscosity
+  part % re = part % density * part % d * abs(flow_vel - p_vel) / viscosity
 
   ! Compute the drag factor f
-  part % f = 1.0 + 0.15 *(part % re **0.687)
+  part % f = 1.0 + 0.15 *(part % re ** 0.687)
 
   !------------------------------------------!
   !   Compute the new velocity of particle   !
@@ -116,35 +101,35 @@
   !-------------------------!
   !   Updating x-velocity   !
   !-------------------------!
-  k1 = part % f * (up -  part % u)                     / part % tau
-  k2 = part % f * (up - (part % u + (k1*part%dt)*0.5)) / part % tau
-  k3 = part % f * (up - (part % u + (k2*part%dt)*0.5)) / part % tau
-  k4 = part % f * (up - (part % u +  k3*part%dt))      / part % tau
+  k1 = part % f * (up -  part % u)                        / p_tau
+  k2 = part % f * (up - (part % u + (k1*swarm % dt)*0.5)) / p_tau
+  k3 = part % f * (up - (part % u + (k2*swarm % dt)*0.5)) / p_tau
+  k4 = part % f * (up - (part % u +  k3*swarm % dt))      / p_tau
 
   ! X-velocity calculation
-  part % u = part % u + (ONE_SIXTH) * (k1 + 2.0*(k2+k3) + k4)*part % dt
+  part % u = part % u + (ONE_SIXTH) * (k1 + 2.0*(k2+k3) + k4)*swarm % dt
 
   !-------------------------!
   !   Updating y-velocity   !
   !-------------------------!
-  k1 = (part % f * (vp -  part % v)                     / part % tau) - EARTH_G
-  k2 = (part % f * (vp - (part % v + (k1*part%dt)*0.5)) / part % tau) - EARTH_G
-  k3 = (part % f * (vp - (part % v + (k2*part%dt)*0.5)) / part % tau) - EARTH_G
-  k4 = (part % f * (vp - (part % v +  k3*part%dt))      / part % tau) - EARTH_G
+  k1 = (part % f * (vp -  part % v)                        / p_tau) - EARTH_G
+  k2 = (part % f * (vp - (part % v + (k1*swarm % dt)*0.5)) / p_tau) - EARTH_G
+  k3 = (part % f * (vp - (part % v + (k2*swarm % dt)*0.5)) / p_tau) - EARTH_G
+  k4 = (part % f * (vp - (part % v +  k3*swarm % dt))      / p_tau) - EARTH_G
 
   ! Y-velocity calculation
-  part % v = part % v + (ONE_SIXTH) * (k1 + 2.0*(k2+k3) + k4)*part%dt
+  part % v = part % v + (ONE_SIXTH) * (k1 + 2.0*(k2+k3) + k4)*swarm % dt
 
   !-------------------------!
   !   Updating z-velocity   !
   !-------------------------!
-  k1 = part % f * (wp -   part % w)                     / part % tau
-  k2 = part % f * (wp -  (part % w + (k1*part%dt)*0.5)) / part % tau
-  k3 = part % f * (wp -  (part % w + (k2*part%dt)*0.5)) / part % tau
-  k4 = part % f * (wp -  (part % w +  k3*part%dt))      / part % tau
+  k1 = part % f * (wp -   part % w)                        / p_tau
+  k2 = part % f * (wp -  (part % w + (k1*swarm % dt)*0.5)) / p_tau
+  k3 = part % f * (wp -  (part % w + (k2*swarm % dt)*0.5)) / p_tau
+  k4 = part % f * (wp -  (part % w +  k3*swarm % dt))      / p_tau
 
   ! Z-velocity calculation
-  part % w = part % w + (ONE_SIXTH) * (k1 + 2.0*(k2+k3) + k4)*part%dt
+  part % w = part % w + (ONE_SIXTH) * (k1 + 2.0*(k2+k3) + k4)*swarm % dt
 
   !----------------------------------------!
   !  Compute the new position of particle  !
@@ -161,22 +146,21 @@
   !    Trap condition (deposition)    !
   !-----------------------------------!
 
-  if (trapped) then
+  if (.not. reflected) then
     ! Update the particle position after reflection
-    part % x = part % x + part % u * part%dt
-    part % y = part % y + part % v * part%dt
-    part % z = part % z + part % w * part%dt
+    part % x = part % x + part % u * swarm % dt
+    part % y = part % y + part % v * swarm % dt
+    part % z = part % z + part % w * swarm % dt
 
     ! Calculate cfl number for the particle  (trapped BC for walls)
     dx = abs(part % x - x_old)
     dy = abs(part % y - y_old)
     dz = abs(part % z - z_old)
-    dr = sqrt(dx**2 + dy**2 + dz**2)
-    part % cfl = part %vel_p * part % dt /dr
+    p_cfl = p_vel * swarm % dt / sqrt(dx**2 + dy**2 + dz**2)
 
     ! Printing particle position
     print *,k,'position','(',part%x,  &
-    ',',part%y,',',part%z,')',',',' | cfl =',part % cfl
+    ',',part%y,',',part%z,')',',',' | cfl =',p_cfl
 
     if(part % y .le. 0.0) then    !just for the moment
       deposited = .true.
@@ -190,47 +174,45 @@
   !--------------------------!
   if (reflected) then
     if(part % y .le. 0.0000000000) then    !just for the moment until i make it generic
-      part%y=0.000001
-      part%u=part%u * ( rst)
-      part%v=part%v * (-rst)
-      part%w=part%w * ( rst)
+      part % y = 0.000001
+      part % u = part % u * ( rst)
+      part % v = part % v * (-rst)
+      part % w = part % w * ( rst)
 
       ! Update the particle position after reflection
-      part % x = part % x + part % u * part%dt
-      part % y = part % y + part % v * part%dt
-      part % z = part % z + part % w * part%dt
+      part % x = part % x + part % u * swarm % dt
+      part % y = part % y + part % v * swarm % dt
+      part % z = part % z + part % w * swarm % dt
 
       ! Calculate cfl number for the particle (reflection BC)
       dx = abs(part % x - x_old)
       dy = abs(part % y - y_old)
       dz = abs(part % z - z_old)
-      dr = sqrt(dx**2 + dy**2 + dz**2)
-      part % cfl = part % vel_p * part % dt / dr
+      p_cfl = p_vel * swarm % dt / sqrt(dx**2 + dy**2 + dz**2)
 
       ! Increasing the number of particle reflections
       swarm % cnt_r = swarm % cnt_r + 1   ! to be engineered because ...
                                           ! ... a single particle can ...
                                           ! ... bounce several times.
       print *,k,'Particle is reflected!'
-      print *,k,'position','(',part%x,  &
-      ',',part%y,',',part%z,')',',',' | cfl =',part % cfl
+      print *,k,'position','(',part % x,  &
+      ',',part % y,',',part % z,')',',',' | cfl =',p_cfl
 
       else
         ! If the particle didn't hit the wall, ...
         ! ... just update the position in the normal way
-        part % x = part % x + part % u * part % dt
-        part % y = part % y + part % v * part % dt
-        part % z = part % z + part % w * part % dt
+        part % x = part % x + part % u * swarm % dt
+        part % y = part % y + part % v * swarm % dt
+        part % z = part % z + part % w * swarm % dt
 
         ! Calculate cfl number for the particle (particles escape normally)
         dx = abs(part % x - x_old)
         dy = abs(part % y - y_old)
         dz = abs(part % z - z_old)
-        dr = sqrt(dx**2 + dy**2 + dz**2)
-        part % cfl = (part %vel_p * part % dt) / dr
+        p_cfl = (p_vel * swarm % dt) / sqrt(dx**2 + dy**2 + dz**2)
 
         print *,k,'position','(',part%x,  &
-        ',',part%y,',',part%z,')',',',' | cfl =',part % cfl
+        ',',part%y,',',part%z,')',',',' | cfl =',p_cfl
 
       end if
    end if
