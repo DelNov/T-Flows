@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Swarm_Mod_Interpolate_Velocity(swarm, k)
 !------------------------------------------------------------------------------!
-!               Interpolates velocity at the particle's position               !
+!   Interpolates velocity at the particle's position                           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -16,17 +16,15 @@
   real                         :: rx, ry, rz           ! paticle-cell vector
   real                         :: x_old, y_old, z_old  ! particle's old x,y,z
   real                         :: dx, dy, dz           ! particle's shift
-  real                     :: up, vp, wp           ! velocity at particle position
-  real                     :: flow_vel                 ! flow vel. magn.
+  real                         :: up, vp, wp           ! velocity at particle
+  real                         :: flow_vel             ! flow vel. magn.
   real                         :: k1, k2, k3, k4       ! for Runge-Kutta
   real                         :: st                   ! stokes number
-  real                         :: rst                  ! coeff. of restitution
   real                         :: u_diff               ! velocity difference
   real                         :: pipe_d               ! pipe diameter
-  real                         :: p_tau, p_cfl, p_vel
+  real                         :: part_tau, part_cfl, part_vel
   logical,             pointer :: deposited            ! part. deposition flag
   logical,             pointer :: escaped              ! part. departure  flag
-  logical,             pointer :: reflected            ! reflection BC type
 !==============================================================================!
 
   ! Take aliases
@@ -38,7 +36,6 @@
   part      => swarm % particle(k)
   deposited => part  % deposited
   escaped   => part  % escaped
-  reflected => part  % reflected
 
   c = part % cell ! assigning the index of the closest cell for interpolation
 
@@ -67,19 +64,16 @@
   flow_vel = sqrt(up**2 + vp**2 + wp**2)
 
   ! Compute the magnitude of the particle's velocity
-  p_vel = sqrt(part % u **2 + part % v **2 + part % w **2)
-
-  ! Coefficient of restitution (particle reflection)
-  rst = 1.0
+  part_vel = sqrt(part % u **2 + part % v **2 + part % w **2)
 
   ! Pipe diameter
   pipe_d = 0.01
 
   ! Particle relaxation time
-  p_tau = part % density * (part % d **2) / 18.0 / viscosity
+  part_tau = part % density * (part % d **2) / 18.0 / viscosity
 
   ! Compute stokes number (but it's never used)
-  st = flow_vel * p_tau / pipe_d
+  st = flow_vel * part_tau / pipe_d
 
   ! Particle time step (division of the global time step)
   swarm % dt = flow % dt / 20.0
@@ -88,7 +82,7 @@
   part % rel_vv = vp - part % v
 
   ! Compute Reynolds number for calculating Cd
-  part % re = part % density * part % d * abs(flow_vel - p_vel) / viscosity
+  part % re = part % density * part % d * abs(flow_vel - part_vel) / viscosity
 
   ! Compute the drag factor f
   part % f = 1.0 + 0.15 *(part % re ** 0.687)
@@ -101,10 +95,10 @@
   !-------------------------!
   !   Updating x-velocity   !
   !-------------------------!
-  k1 = part % f * (up -  part % u)                        / p_tau
-  k2 = part % f * (up - (part % u + (k1*swarm % dt)*0.5)) / p_tau
-  k3 = part % f * (up - (part % u + (k2*swarm % dt)*0.5)) / p_tau
-  k4 = part % f * (up - (part % u +  k3*swarm % dt))      / p_tau
+  k1 = part % f * (up -  part % u)                        / part_tau
+  k2 = part % f * (up - (part % u + (k1*swarm % dt)*0.5)) / part_tau
+  k3 = part % f * (up - (part % u + (k2*swarm % dt)*0.5)) / part_tau
+  k4 = part % f * (up - (part % u +  k3*swarm % dt))      / part_tau
 
   ! X-velocity calculation
   part % u = part % u + (ONE_SIXTH) * (k1 + 2.0*(k2+k3) + k4)*swarm % dt
@@ -112,10 +106,10 @@
   !-------------------------!
   !   Updating y-velocity   !
   !-------------------------!
-  k1 = (part % f * (vp -  part % v)                        / p_tau) - EARTH_G
-  k2 = (part % f * (vp - (part % v + (k1*swarm % dt)*0.5)) / p_tau) - EARTH_G
-  k3 = (part % f * (vp - (part % v + (k2*swarm % dt)*0.5)) / p_tau) - EARTH_G
-  k4 = (part % f * (vp - (part % v +  k3*swarm % dt))      / p_tau) - EARTH_G
+  k1 = (part % f * (vp -  part % v)                        / part_tau) - EARTH_G
+  k2 = (part % f * (vp - (part % v + (k1*swarm % dt)*0.5)) / part_tau) - EARTH_G
+  k3 = (part % f * (vp - (part % v + (k2*swarm % dt)*0.5)) / part_tau) - EARTH_G
+  k4 = (part % f * (vp - (part % v +  k3*swarm % dt))      / part_tau) - EARTH_G
 
   ! Y-velocity calculation
   part % v = part % v + (ONE_SIXTH) * (k1 + 2.0*(k2+k3) + k4)*swarm % dt
@@ -123,10 +117,10 @@
   !-------------------------!
   !   Updating z-velocity   !
   !-------------------------!
-  k1 = part % f * (wp -   part % w)                        / p_tau
-  k2 = part % f * (wp -  (part % w + (k1*swarm % dt)*0.5)) / p_tau
-  k3 = part % f * (wp -  (part % w + (k2*swarm % dt)*0.5)) / p_tau
-  k4 = part % f * (wp -  (part % w +  k3*swarm % dt))      / p_tau
+  k1 = part % f * (wp -   part % w)                        / part_tau
+  k2 = part % f * (wp -  (part % w + (k1*swarm % dt)*0.5)) / part_tau
+  k3 = part % f * (wp -  (part % w + (k2*swarm % dt)*0.5)) / part_tau
+  k4 = part % f * (wp -  (part % w +  k3*swarm % dt))      / part_tau
 
   ! Z-velocity calculation
   part % w = part % w + (ONE_SIXTH) * (k1 + 2.0*(k2+k3) + k4)*swarm % dt
@@ -145,8 +139,8 @@
   !-----------------------------------!
   !    Trap condition (deposition)    !
   !-----------------------------------!
+  if(swarm % rst <= TINY .and. .not. deposited) then
 
-  if (.not. reflected) then
     ! Update the particle position after reflection
     part % x = part % x + part % u * swarm % dt
     part % y = part % y + part % v * swarm % dt
@@ -156,11 +150,11 @@
     dx = abs(part % x - x_old)
     dy = abs(part % y - y_old)
     dz = abs(part % z - z_old)
-    p_cfl = p_vel * swarm % dt / sqrt(dx**2 + dy**2 + dz**2)
+    part_cfl = part_vel * swarm % dt / sqrt(dx**2 + dy**2 + dz**2)
 
     ! Printing particle position
     print *,k,'position','(',part%x,  &
-    ',',part%y,',',part%z,')',',',' | cfl =',p_cfl
+    ',',part%y,',',part%z,')',',',' | cfl =',part_cfl
 
     if(part % y .le. 0.0) then    !just for the moment
       deposited = .true.
@@ -172,12 +166,12 @@
   !--------------------------!
   !   Reflection condition   !
   !--------------------------!
-  if (reflected) then
+  if(swarm % rst > TINY) then
     if(part % y .le. 0.0000000000) then    !just for the moment until i make it generic
       part % y = 0.000001
-      part % u = part % u * ( rst)
-      part % v = part % v * (-rst)
-      part % w = part % w * ( rst)
+      part % u = part % u * ( swarm % rst)
+      part % v = part % v * (-swarm % rst)
+      part % w = part % w * ( swarm % rst)
 
       ! Update the particle position after reflection
       part % x = part % x + part % u * swarm % dt
@@ -188,7 +182,7 @@
       dx = abs(part % x - x_old)
       dy = abs(part % y - y_old)
       dz = abs(part % z - z_old)
-      p_cfl = p_vel * swarm % dt / sqrt(dx**2 + dy**2 + dz**2)
+      part_cfl = part_vel * swarm % dt / sqrt(dx**2 + dy**2 + dz**2)
 
       ! Increasing the number of particle reflections
       swarm % cnt_r = swarm % cnt_r + 1   ! to be engineered because ...
@@ -196,7 +190,7 @@
                                           ! ... bounce several times.
       print *,k,'Particle is reflected!'
       print *,k,'position','(',part % x,  &
-      ',',part % y,',',part % z,')',',',' | cfl =',p_cfl
+      ',',part % y,',',part % z,')',',',' | cfl =',part_cfl
 
       else
         ! If the particle didn't hit the wall, ...
@@ -209,10 +203,10 @@
         dx = abs(part % x - x_old)
         dy = abs(part % y - y_old)
         dz = abs(part % z - z_old)
-        p_cfl = (p_vel * swarm % dt) / sqrt(dx**2 + dy**2 + dz**2)
+        part_cfl = (part_vel * swarm % dt) / sqrt(dx**2 + dy**2 + dz**2)
 
         print *,k,'position','(',part%x,  &
-        ',',part%y,',',part%z,')',',',' | cfl =',p_cfl
+        ',',part%y,',',part%z,')',',',' | cfl =',part_cfl
 
       end if
    end if
