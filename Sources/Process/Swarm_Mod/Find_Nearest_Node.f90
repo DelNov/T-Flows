@@ -1,7 +1,8 @@
 !==============================================================================!
   subroutine Swarm_Mod_Find_Nearest_Node(swarm, k)
 !------------------------------------------------------------------------------!
-!   Finds a cell closest to a particle.                                        !
+!   Finds a node closest to a particle.                                        !
+!   Important: it assumes that the closest cell has been found!                !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
