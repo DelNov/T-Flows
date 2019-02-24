@@ -37,8 +37,9 @@
       swarm % particle(k) % y = 0.0599999
       swarm % particle(k) % z = 0.0
 
-      ! Searching for the closest cell to place the moved particle
+      ! Searching for the closest cell and node to place the moved particle
       call Swarm_Mod_Find_Nearest_Cell(swarm, k)
+      call Swarm_Mod_Find_Nearest_Node(swarm, k)
     end do
 
     print *, ""
