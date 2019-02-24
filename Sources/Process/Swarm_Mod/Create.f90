@@ -31,14 +31,19 @@
     swarm % particle(k) % density = swarm % density
 
     ! Set initial velocity to zero
-    swarm % particle(k) % u = 0
-    swarm % particle(k) % v = 0
-    swarm % particle(k) % w = 0
+    swarm % particle(k) % u = 0.0
+    swarm % particle(k) % v = 0.0
+    swarm % particle(k) % w = 0.0
 
     ! Set initial coordinates to zero
-    swarm % particle(k) % x = 0
-    swarm % particle(k) % y = 0
-    swarm % particle(k) % z = 0
+    swarm % particle(k) % x = 0.0
+    swarm % particle(k) % y = 0.0
+    swarm % particle(k) % z = 0.0
+
+    ! Set initial cell, node and boundary cell to zero
+    swarm % particle(k) % cell     = 0
+    swarm % particle(k) % node     = 0
+    swarm % particle(k) % bnd_cell = 0
 
     ! Assume particle is in the domain
     ! (A smarter way could be worked out, depending ...

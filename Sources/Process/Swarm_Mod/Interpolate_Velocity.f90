@@ -12,16 +12,13 @@
   type(Grid_Type),     pointer :: grid
   type(Var_Type),      pointer :: u, v, w
   type(Particle_Type), pointer :: part
-  integer                      :: c, n                 ! nearest cell and node
+  integer                      :: c                    ! nearest cell
   real                         :: rx, ry, rz           ! paticle-cell vector
   real                         :: x_old, y_old, z_old  ! particle's old x,y,z
   real                         :: dx, dy, dz           ! particle's shift
   real                         :: up, vp, wp           ! velocity at particle
   real                         :: flow_vel             ! flow vel. magn.
   real                         :: k1, k2, k3, k4       ! for Runge-Kutta
-  real                         :: st                   ! stokes number
-  real                         :: u_diff               ! velocity difference
-  real                         :: pipe_d               ! pipe diameter
   real                         :: part_tau, part_cfl, part_vel
   logical,             pointer :: deposited            ! part. deposition flag
   logical,             pointer :: escaped              ! part. departure  flag
@@ -66,14 +63,8 @@
   ! Compute the magnitude of the particle's velocity
   part_vel = sqrt(part % u **2 + part % v **2 + part % w **2)
 
-  ! Pipe diameter
-  pipe_d = 0.01
-
   ! Particle relaxation time
   part_tau = part % density * (part % d **2) / 18.0 / viscosity
-
-  ! Compute stokes number (but it's never used)
-  st = flow_vel * part_tau / pipe_d
 
   ! Particle time step (division of the global time step)
   swarm % dt = flow % dt / 20.0
@@ -222,6 +213,3 @@
   end if
 
   end subroutine
-
-
-

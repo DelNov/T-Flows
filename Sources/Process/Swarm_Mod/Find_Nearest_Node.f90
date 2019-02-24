@@ -14,12 +14,9 @@
   type(Particle_Type), pointer :: part
   integer                      :: ln, n        ! local node and node
   integer                      :: cn           ! closest node
-  integer                      :: n_part       ! number of particles
   real                         :: xn, yn, zn   ! Node coordinates
-  real                         :: xc, yc, zc   ! cell center coordinates
   real                         :: dn_sq        ! distance squared
   real                         :: min_dn       ! minimum distance computed
-  real,                pointer :: xp, yp, zp   ! coordinates of particle
 !==============================================================================!
 
   ! Take aliases
