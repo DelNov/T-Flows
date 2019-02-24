@@ -10,8 +10,9 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),    pointer :: flow
   type(Particle_Type), pointer :: part
-  real                         :: cd               ! drag coefficient
-  real                         :: p_vol, p_area
+  real                         :: cd         ! drag coefficient
+  real                         :: part_vol   ! particle volume
+  real                         :: part_area  ! particle area
 !==============================================================================!
 
   ! Take aliases
@@ -19,10 +20,10 @@
   part => swarm % particle(k)
 
   ! Particle surface area (assuming spherical shape)
-  p_area =  PI * (part % d ** 2)
+  part_area =  PI * (part % d ** 2)
 
   ! Particle volume
-  p_vol = ONE_SIXTH * PI * (part % d ** 3)
+  part_vol = ONE_SIXTH * PI * (part % d ** 3)
 
   !----------------------------------------------------!
   !  Compute the buoyancy force (acting in +ve y-dir)  !
@@ -34,7 +35,7 @@
   ! ...will be moving upwards as well. Otherwise fb will be -ve and it...
   ! ...will be deducted from the total force.
 
-  part % fb = (density - part % density) * EARTH_G * p_vol
+  part % fb = (density - part % density) * EARTH_G * part_vol
 
   ! Compute drag coefficient
   if (part % re .ge. 1000.0) then
@@ -46,7 +47,8 @@
   !-------------------------------------------------------------------!
   !   Compute the drag force (acting in particle counter direction)   !
   !-------------------------------------------------------------------!
-  part % fd = .5 * cd * density * p_area  * abs(part % rel_vv) * part % rel_vv
+  part % fd = .5 * cd * density * part_area  &
+            * abs(part % rel_vv) * part % rel_vv
 
   !-----------------------------!
   !   Compute the total force   !
