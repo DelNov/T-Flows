@@ -12,7 +12,7 @@
   real :: Distance_Squared
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: b, c1, c2
-  integer              :: n_wall_colors
+  integer              :: n_wall_colors, n_cells_fraction
   integer, allocatable :: wall_colors(:)
 !==============================================================================!
 
@@ -45,8 +45,9 @@
     grid % wall_dist = 1.0
     print *, '# Distance to the wall set to 1.0 everywhere !'
   else
+    n_cells_fraction = grid % n_cells / 20
     do c1 = 1, grid % n_cells
-      if(mod(c1,10000) .eq. 0) then
+      if(mod(c1,n_cells_fraction) .eq. 0) then
         write(*,'(a2, f5.0, a14)') ' #', (100.*c1/(1.*grid % n_cells)),  &
                                    ' % complete...'
       end if
