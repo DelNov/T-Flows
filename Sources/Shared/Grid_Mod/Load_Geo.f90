@@ -23,20 +23,21 @@
   if(this_proc < 2) print *, '# Reading the file: ', name_in
 
   read(9) (grid % xn(n), n = 1, grid % n_nodes)
-  read(9) (grid % yn(n), n = 1, grid % n_nodes) 
+  read(9) (grid % yn(n), n = 1, grid % n_nodes)
   read(9) (grid % zn(n), n = 1, grid % n_nodes)
 
   read(9) (grid % xc(c), c = 1, grid % n_cells)
-  read(9) (grid % yc(c), c = 1, grid % n_cells) 
+  read(9) (grid % yc(c), c = 1, grid % n_cells)
   read(9) (grid % zc(c), c = 1, grid % n_cells)
 
-  read(9) (grid % xc(c), c=-1,-grid % n_bnd_cells,-1)  
+  read(9) (grid % xc(c), c=-1,-grid % n_bnd_cells,-1)
   read(9) (grid % yc(c), c=-1,-grid % n_bnd_cells,-1)
-  read(9) (grid % zc(c), c=-1,-grid % n_bnd_cells,-1) 
+  read(9) (grid % zc(c), c=-1,-grid % n_bnd_cells,-1)
 
   read(9) (grid % vol  (c),     c = 1, grid % n_cells)
   read(9) (grid % delta(c),     c = 1, grid % n_cells)
   read(9) (grid % wall_dist(c), c = 1, grid % n_cells)
+  read(9) (grid % wall_dist(c), c =-1,-grid % n_bnd_cells,-1)
 
   read(9) (grid % sx(s), s = 1, grid % n_faces)
   read(9) (grid % sy(s), s = 1, grid % n_faces)
@@ -52,6 +53,6 @@
   read(9) (grid % yf(s), s = 1, grid % n_faces)
   read(9) (grid % zf(s), s = 1, grid % n_faces)
 
-  close(9) 
+  close(9)
 
   end subroutine
