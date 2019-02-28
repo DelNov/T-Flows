@@ -103,6 +103,11 @@
   do s = 1, nbf_sub
     write(9) grid % wall_dist(buf_recv_ind(s))
   end do
+  do c = -1, -grid % n_bnd_cells, -1
+    if(grid % new_c(c) .ne. 0) then
+      write(9) grid % wall_dist(c)
+    end if
+  end do
 
   !-----------!
   !   Faces   !

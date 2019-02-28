@@ -496,6 +496,14 @@
                      sqrt(grid % xc(c)**2 + grid % yc(c)**2) <= x) ) then
                   wi = ( xp - sqrt(grid % xc(c)**2 + grid % yc(c)**2) ) / (xp-x)
                   here = .true.
+
+                ! Wall distance too
+                else if( (keys(1) .eq. 'WD'           .and.  &
+                     grid % wall_dist(c) >= min(x,xp) .and.  &
+                     grid % wall_dist(c) <= max(x,xp)) ) then
+                  wi = ( max(x,xp) - grid % wall_dist(c) )   &
+                     / ( max(x,xp) - min(x,xp) )
+                  here = .true.
                 end if
 
                 if(here) then
@@ -562,6 +570,14 @@
                      sqrt(grid % xc(c)**2 + grid % yc(c)**2) >= xp .and.       &
                      sqrt(grid % xc(c)**2 + grid % yc(c)**2) <= x) ) then
                   wi = ( xp - sqrt(grid % xc(c)**2 + grid % yc(c)**2) ) / (xp-x)
+                  here = .true.
+
+                ! Wall distance too
+                else if( (keys(1) .eq. 'WD'           .and.  &
+                     grid % wall_dist(c) >= min(x,xp) .and.  &
+                     grid % wall_dist(c) <= max(x,xp)) ) then
+                  wi = ( max(x,xp) - grid % wall_dist(c) )   &
+                     / ( max(x,xp) - min(x,xp) )
                   here = .true.
                 end if
 
