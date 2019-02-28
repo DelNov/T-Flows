@@ -4,7 +4,7 @@
  PROBLEM_NAME     t_junction
  HEAT_TRANSFER    no
 
- NUMBER_OF_TIME_STEPS    2400
+ NUMBER_OF_TIME_STEPS    3600
 
  RESULTS_SAVE_INTERVAL    120
  BACKUP_SAVE_INTERVAL     600
@@ -24,11 +24,12 @@
 # Physical models
 #-----------------
 
- MASS_DENSITY            1.0
- DYNAMIC_VISCOSITY       1.8e-5
- NUMBER_OF_PARTICLES    16
- SWARM_DENSITY        1000.0
- SWARM_DIAMETER          2.5e-5
+ MASS_DENSITY                         1.0
+ DYNAMIC_VISCOSITY                    1.8e-5
+ NUMBER_OF_PARTICLES                 16
+ SWARM_DENSITY                     1000.0
+ SWARM_DIAMETER                       2.5e-5
+ SWARM_COEFFICIENT_OF_RESTITUTION     0.0
 
  TURBULENCE_MODEL       none
 
