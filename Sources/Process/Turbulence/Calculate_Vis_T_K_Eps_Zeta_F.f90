@@ -118,7 +118,7 @@
         y_plus(c1) = Y_Plus_Low_Re(u_tau(c1), grid % wall_dist(c1), kin_vis)
 
         if(rough_walls) then
-          z_o = Roughness_Coefficient(grid, c1)      
+          z_o = Roughness_Coefficient(grid, z_o_f(c1), c1)      
           y_plus(c1) = Y_Plus_Rough_Walls(u_tau(c1),             &
                                           grid % wall_dist(c1),  &
                                           kin_vis)
