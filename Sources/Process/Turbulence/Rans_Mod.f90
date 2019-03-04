@@ -19,7 +19,7 @@
   type(Var_Type), target :: t2
 
   ! Constants for the k-eps model:
-  real :: c_1e, c_2e, c_3e, c_mu, c_mu25, c_mu75, kappa, e_log, z_o
+  real :: c_1e, c_2e, c_3e, c_mu, c_mu25, c_mu75, kappa, e_log
 
   ! Constants for the k-eps-v2f model:
   real :: c_mu_d, c_l, c_t, alpha, c_nu, c_f1, c_f2
@@ -38,6 +38,10 @@
 
   ! Production of turbulent kinetic energy
   real,allocatable :: p_kin(:), p_t2(:)
+
+  ! Hydraulic roughness (constant and variable)
+  real              :: z_o 
+  real, allocatable :: z_o_f(:)
 
   ! Buoyancy production for k-eps-zeta-f model
   ! (bouy_beta is only set to 1 and used as such.  Is it needed?)
