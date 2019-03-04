@@ -557,6 +557,9 @@
     allocate(tau_wall (grid % n_cells));                      tau_wall  = 0.
     allocate(y_plus   (-grid % n_bnd_cells:grid % n_cells));  y_plus    = 0.
 
+    ! Hydraulic roughness given by formula
+    allocate(z_o_f(-grid % n_bnd_cells:grid % n_cells));  z_o_f   = 0.
+
     if(heat_transfer) then
 
       call Var_Mod_Allocate_New_Only('UT', ut, grid)
