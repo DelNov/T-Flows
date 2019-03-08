@@ -40,7 +40,7 @@
 
       ! Calling interpolate velocity subroutine ...
       ! ... to update velocity of each particle
-      call Swarm_Mod_Interpolate_Velocity(swarm, k)
+      call Swarm_Mod_Move_Particle(swarm, k)
 
       ! Calling particle forces subroutine to ...
       ! ... compute the forces on each particle and store it

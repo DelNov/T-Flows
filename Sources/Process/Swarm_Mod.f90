@@ -92,10 +92,11 @@
   contains
 
   include 'Swarm_Mod/Advance_Particles.f90'
+  include 'Swarm_Mod/Bounce_Particle.f90'
   include 'Swarm_Mod/Create.f90'
   include 'Swarm_Mod/Find_Nearest_Cell.f90'
   include 'Swarm_Mod/Find_Nearest_Node.f90'
-  include 'Swarm_Mod/Interpolate_Velocity.f90'
+  include 'Swarm_Mod/Move_Particle.f90'
   include 'Swarm_Mod/Particle_Forces.f90'
 
   end module

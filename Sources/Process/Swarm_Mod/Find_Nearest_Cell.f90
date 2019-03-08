@@ -110,7 +110,8 @@
   !--------------------------------------!
   part % cell     = cc
   part % bnd_cell = cb
-  part % bnd_face = grid % cells_bnd_face(cb)
+  part % bnd_face =  0
+  if(cb < 0) part % bnd_face = grid % cells_bnd_face(cb)
 
   ! If inside cell is closer than boundary ...
   ! ... cell don't store the boundary cell
