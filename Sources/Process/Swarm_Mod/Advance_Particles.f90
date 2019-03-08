@@ -38,8 +38,8 @@
       ! ... nearest node for each particle and stores it
       call Swarm_Mod_Find_Nearest_Node(swarm, k)
 
-      ! Calling interpolate velocity subroutine ...
-      ! ... to update velocity of each particle
+      ! Compute velocity at the particle, and move it
+      ! (also calls Bounce_Particle)
       call Swarm_Mod_Move_Particle(swarm, k)
 
       ! Calling particle forces subroutine to ...
