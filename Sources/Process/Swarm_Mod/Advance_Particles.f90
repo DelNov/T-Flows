@@ -18,9 +18,7 @@
   grid => swarm % pnt_grid
 
   !----------------------------------!
-  !                                  !
   !   Browse through all particles   !
-  !                                  !
   !----------------------------------!
   do k = 1, swarm % n_particles
 
@@ -29,21 +27,25 @@
     escaped   => part  % escaped
     deposited => part  % deposited
 
-    ! Calling the nearest cell subroutine to find the ...
-    ! ... nearest cell for each particle and stores it
-    call Swarm_Mod_Find_Nearest_Cell(swarm, k)
+    ! If particle is neither deposited nor escped
+    if(.not. deposited .and. .not. escaped) then
 
-    ! Calling the nearest node subroutine to find the ...
-    ! ... nearest node for each particle and stores it
-    call Swarm_Mod_Find_Nearest_Node(swarm, k)
+      ! Calling the nearest cell subroutine to find the ...
+      ! ... nearest cell for each particle and stores it
+      call Swarm_Mod_Find_Nearest_Cell(swarm, k)
 
-    ! Calling interpolate velocity subroutine ...
-    ! ... to update velocity of each particle
-    call Swarm_Mod_Interpolate_Velocity(swarm, k)
+      ! Calling the nearest node subroutine to find the ...
+      ! ... nearest node for each particle and stores it
+      call Swarm_Mod_Find_Nearest_Node(swarm, k)
 
-    ! Calling particle forces subroutine to ...
-    ! ... compute the forces on each particle and store it
-    call Swarm_Mod_Particle_Forces(swarm, k)
+      ! Calling interpolate velocity subroutine ...
+      ! ... to update velocity of each particle
+      call Swarm_Mod_Interpolate_Velocity(swarm, k)
+
+      ! Calling particle forces subroutine to ...
+      ! ... compute the forces on each particle and store it
+      call Swarm_Mod_Particle_Forces(swarm, k)
+    end if
 
   end do
 

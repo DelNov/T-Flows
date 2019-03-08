@@ -17,10 +17,10 @@
   !-------------------!
   type Particle_Type
 
-    ! Particle's coordinates
-    real :: x
-    real :: y
-    real :: z
+    ! Particle's coordinates; new and old
+    real :: x, x_o
+    real :: y, y_o
+    real :: z, z_o
 
     ! Particle's velocity
     real :: u
@@ -37,6 +37,7 @@
     integer :: cell
     integer :: node
     integer :: bnd_cell
+    integer :: bnd_face
 
     ! Particle relative velocity in y-dir (buoyancy force)
     real :: rel_vv
