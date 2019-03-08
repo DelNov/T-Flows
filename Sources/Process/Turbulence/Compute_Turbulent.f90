@@ -242,6 +242,7 @@
 
   do c = 1, grid % n_cells
     if( phi % n(c) < 0.0 ) phi % n(c) = phi % o(c)
+    if(phi % name .eq. 'ZETA')  phi % n(c) = min(phi % n(c), 0.8) 
   end do
 
   ! Print info on the screen
