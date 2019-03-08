@@ -86,6 +86,9 @@
     integer, allocatable :: cells_n(:,:)
     integer, allocatable :: cells_c(:,:)
 
+    ! For boundary cells, store corresponding face
+    integer, allocatable :: cells_bnd_face(:)
+
     ! For each cell; type of the boundary condition in a given direction
     integer, allocatable :: cells_bnd_color(:,:)
 

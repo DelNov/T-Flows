@@ -8,8 +8,8 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: lc, c, ln, n   ! locel cell, cell, local node and node
-  integer :: max_n_cells    ! max number of cells surrounding a node
+  integer :: lc, c, c2, ln, n, s   ! counters
+  integer :: max_n_cells           ! max number of cells surrounding a node
 
 ! Just for checking, erase this later
   real :: xn, xc, yn, yc, zn, zc, max_del, min_del, del
@@ -24,9 +24,25 @@
   !   Find maximum number of cells surrounding each node   !
   !     (use only inside cells at this point in time)      !
   !--------------------------------------------------------!
+
+  ! Inside cells
   do c = 1, grid % n_cells
     do ln = 1, grid % cells_n_nodes(c)  ! local node number
       n = grid % cells_n(ln, c)         ! global node number
+
+      ! Increase number of cells surrounding the this node by one
+      grid % nodes_n_cells(n) = grid % nodes_n_cells(n) + 1
+    end do
+  end do
+
+  ! Boundary cells
+  do s = 1, grid % n_bnd_cells
+    c2 = grid % faces_c(2, s)
+    if(c2 >= 0) then
+      print *, 'PANIC!  Something is very wrong in Find_Nodes_Cells'
+    end if
+    do ln = 1, grid % faces_n_nodes(s)  ! local face number
+      n = grid % faces_n(ln, s)         ! global node number
 
       ! Increase number of cells surrounding the this node by one
       grid % nodes_n_cells(n) = grid % nodes_n_cells(n) + 1
@@ -44,6 +60,7 @@
   !----------------------------------------------------------!
   grid % nodes_n_cells(:) = 0  ! re-initialize the cell count
 
+  ! Inside cells
   do c = 1, grid % n_cells
     do ln = 1, grid % cells_n_nodes(c)  ! local node number
       n = grid % cells_n(ln, c)         ! global node number
@@ -53,6 +70,23 @@
 
       ! ... and store the current cell
       grid % nodes_c(grid % nodes_n_cells(n), n) = c
+    end do
+  end do
+
+  ! Boundary cells
+  do s = 1, grid % n_bnd_cells
+    c2 = grid % faces_c(2,s)
+    do ln = 1, grid % faces_n_nodes(s)  ! local face number
+      n = grid % faces_n(ln, s)         ! global node number
+
+      ! Increase number of cells surrounding the this node by one ...
+      grid % nodes_n_cells(n) = grid % nodes_n_cells(n) + 1
+
+      ! ... and store the current cell
+      grid % nodes_c(grid % nodes_n_cells(n), n) = c2
+
+      ! Also store boundary face for boundary cell
+      grid % cells_bnd_face(c2) = s
     end do
   end do
 

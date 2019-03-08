@@ -27,6 +27,8 @@
   allocate(grid % cells_n( 8, -nb:nc));  grid % cells_n = 0
   allocate(grid % cells_c(24, -nb:nc));  grid % cells_c = 0
 
+  allocate(grid % cells_bnd_face(-nb:-1));  grid % cells_bnd_face = 0
+
   ! Number of nodes at each cell (determines cell's shape really)
   allocate(grid % cells_n_nodes(-nb:nc));  grid % cells_n_nodes = 0
 
