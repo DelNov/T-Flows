@@ -33,9 +33,9 @@
       ! Placing particles (only at the 1st time step)
       dx = 20 * (k - 1)
 
-      swarm % particle(k) % x = -0.00375 + dx * swarm % particle(k) % d
-      swarm % particle(k) % y = 0.0599999
-      swarm % particle(k) % z = 0.0
+      swarm % particle(k) % x_n = -0.00375 + dx * 2.5e-5
+      swarm % particle(k) % y_n = 0.0599999
+      swarm % particle(k) % z_n = 0.0
 
       ! Searching for the closest cell and node to place the moved particle
       call Swarm_Mod_Find_Nearest_Cell(swarm, k)
