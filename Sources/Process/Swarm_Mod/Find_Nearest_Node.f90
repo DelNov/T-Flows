@@ -39,9 +39,9 @@
     zn = grid % zn(n)
 
     ! Distance squared from the particle to cell's node
-    dn_sq = (xn - part % x)**2  &
-          + (yn - part % y)**2  &
-          + (zn - part % z)**2
+    dn_sq = (xn - part % x_n)**2  &
+          + (yn - part % y_n)**2  &
+          + (zn - part % z_n)**2
 
     ! Finding the closest node of those 4 of the closest cell
     if(dn_sq < min_dn) then

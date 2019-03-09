@@ -50,9 +50,9 @@
     rz_nz_o = (grid % zc(c2) - part % z_o) * nz
 
     ! New dot product of rx and nx
-    rx_nx_n = (grid % xc(c2) - part % x) * nx
-    ry_ny_n = (grid % yc(c2) - part % y) * ny
-    rz_nz_n = (grid % zc(c2) - part % z) * nz
+    rx_nx_n = (grid % xc(c2) - part % x_n) * nx
+    ry_ny_n = (grid % yc(c2) - part % y_n) * ny
+    rz_nz_n = (grid % zc(c2) - part % z_n) * nz
 
     !------------------------------------------!
     !                                          !
@@ -77,7 +77,7 @@
 
         ! Reflection condition   !
         if(swarm % rst > TINY) then
-          part % y = -0.004999
+          part % y_n = -0.004999
 
           ! Change the direction of velocity
           part % u = part % u * ( swarm % rst)
@@ -85,9 +85,9 @@
           part % w = part % w * ( swarm % rst)
 
           ! Update the particle position after reflection
-          part % x = part % x + part % u * swarm % dt
-          part % y = part % y + part % v * swarm % dt
-          part % z = part % z + part % w * swarm % dt
+          part % x_n = part % x_n + part % u * swarm % dt
+          part % y_n = part % y_n + part % v * swarm % dt
+          part % z_n = part % z_n + part % w * swarm % dt
 
           ! Increasing the number of particle reflections
           swarm % cnt_r = swarm % cnt_r + 1   ! to be engineered because ...

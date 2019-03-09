@@ -19,9 +19,9 @@
   type Particle_Type
 
     ! Particle's coordinates; new and old
-    real :: x, x_o
-    real :: y, y_o
-    real :: z, z_o
+    real :: x_n, x_o
+    real :: y_n, y_o
+    real :: z_n, z_o
 
     ! Particle's velocity
     real :: u

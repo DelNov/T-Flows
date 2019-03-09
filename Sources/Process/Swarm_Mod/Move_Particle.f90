@@ -32,9 +32,9 @@
   c2 = part % bnd_cell  ! index of the closest boundary cell for reflection
 
   ! Vector which connects particle position and cell centre
-  rx = part % x - grid % xc(c)
-  ry = part % y - grid % yc(c)
-  rz = part % z - grid % zc(c)
+  rx = part % x_n - grid % xc(c)
+  ry = part % y_n - grid % yc(c)
+  rz = part % z_n - grid % zc(c)
 
   ! Compute velocities at the particle position from velocity gradients
   up = u % n(c)       &  ! u velocity at the new time step (% n)
@@ -120,14 +120,14 @@
   !----------------------------------------!
 
   ! storing the old coordinates of particle before getting updated (for cfl)
-  part % x_o = part % x
-  part % y_o = part % y
-  part % z_o = part % z
+  part % x_o = part % x_n
+  part % y_o = part % y_n
+  part % z_o = part % z_n
 
   ! Update the particle position after reflection
-  part % x = part % x + part % u * swarm % dt
-  part % y = part % y + part % v * swarm % dt
-  part % z = part % z + part % w * swarm % dt
+  part % x_n = part % x_n + part % u * swarm % dt
+  part % y_n = part % y_n + part % v * swarm % dt
+  part % z_n = part % z_n + part % w * swarm % dt
 
   ! Calculate cfl number for the particle (this is kind of wrong)
   part_cfl = part_vel * swarm % dt / grid % delta(c)
@@ -143,7 +143,7 @@
   end if
 
   ! Printing particle position
-  print *,k,'position','(',part%x,  &
-  ',',part%y,',',part%z,')',',',' | cfl =',part_cfl
+  print *,k,'position','(',part%x_n,  &
+  ',',part%y_n,',',part%z_n,')',',',' | cfl =',part_cfl
 
   end subroutine

@@ -41,9 +41,9 @@
       zc = grid % zc(c)
 
       ! Distance squared from the particle to cell centre
-      dc_sq = (xc - part % x)**2  &
-            + (yc - part % y)**2  &
-            + (zc - part % z)**2
+      dc_sq = (xc - part % x_n)**2  &
+            + (yc - part % y_n)**2  &
+            + (zc - part % z_n)**2
 
       ! Finding the closest cell of those 8 neighbors
       if(c > 0) then
@@ -80,9 +80,9 @@
         zc = grid % zc(c)
 
         ! Distance squared from the particle to cell centre
-        dc_sq = (xc - part % x)**2  &
-              + (yc - part % y)**2  &
-              + (zc - part % z)**2
+        dc_sq = (xc - part % x_n)**2  &
+              + (yc - part % y_n)**2  &
+              + (zc - part % z_n)**2
 
         if(c > 0) then
           if(dc_sq < min_dc) then

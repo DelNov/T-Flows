@@ -36,9 +36,13 @@
     swarm % particle(k) % w = 0.0
 
     ! Set initial coordinates to zero
-    swarm % particle(k) % x = 0.0
-    swarm % particle(k) % y = 0.0
-    swarm % particle(k) % z = 0.0
+    swarm % particle(k) % x_n = 0.0
+    swarm % particle(k) % y_n = 0.0
+    swarm % particle(k) % z_n = 0.0
+
+    swarm % particle(k) % x_o = 0.0
+    swarm % particle(k) % y_o = 0.0
+    swarm % particle(k) % z_o = 0.0
 
     ! Set initial cell, node and boundary cell to zero
     swarm % particle(k) % cell     = 0
