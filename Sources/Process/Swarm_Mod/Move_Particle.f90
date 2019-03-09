@@ -65,7 +65,12 @@
   swarm % dt = flow % dt / 20.0
 
   ! Compute particle relative vel. in y-dir for buoyant force calculation
-  part % rel_vv = vp - part % v
+  part % rel_u   = up - part % u
+  part % rel_v   = vp - part % v
+  part % rel_w   = wp - part % w
+  part % rel_vel = sqrt(  part % rel_u ** 2  &
+                        + part % rel_v ** 2  &
+                        + part % rel_w ** 2)
 
   ! Compute Reynolds number for calculating Cd
   part % re = part % density * part % d * abs(flow_vel - part_vel) / viscosity
@@ -81,7 +86,7 @@
   !------------------------------------------!
 
   !-------------------------!
-  !    Updating x-velocity   !
+  !   Updating x-velocity   !
   !-------------------------!
   k1 = part % f * (up -  part % u)                        / part_tau
   k2 = part % f * (up - (part % u + (k1*swarm % dt)*0.5)) / part_tau

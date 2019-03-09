@@ -40,8 +40,11 @@
     integer :: bnd_cell
     integer :: bnd_face
 
-    ! Particle relative velocity in y-dir (buoyancy force)
-    real :: rel_vv
+    ! Particle relative velocity components and magnitude
+    real :: rel_u
+    real :: rel_v
+    real :: rel_w
+    real :: rel_vel
 
     ! Particle Reynolds number (computed from relative velocity)
     real :: re
@@ -50,13 +53,13 @@
     real :: f    ! this is not to be confused with the drag coefficient
 
     ! Forces exerted on the particle
-    real :: fd  ! drag force
-    real :: fb  ! buoyant force
-    real :: ft  ! total force
+    real :: fd_x, fd_y, fd_z  ! drag force
+    real :: fb_x, fb_y, fb_z  ! buoyant force
+    real :: ft_x, ft_y, ft_z  ! total force
 
     ! Particle deposition and departure from domain 
-    logical  :: deposited
-    logical  :: escaped
+    logical :: deposited
+    logical :: escaped
 
   end type
 

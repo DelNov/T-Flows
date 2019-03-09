@@ -35,7 +35,9 @@
   ! ...will be moving upwards as well. Otherwise fb will be -ve and it...
   ! ...will be deducted from the total force.
 
-  part % fb = (density - part % density) * EARTH_G * part_vol
+  part % fb_x = 0.0
+  part % fb_y = (density - part % density) * EARTH_G * part_vol
+  part % fb_y = 0.0
 
   ! Compute drag coefficient
   if (part % re .ge. 1000.0) then
@@ -47,12 +49,15 @@
   !-------------------------------------------------------------------!
   !   Compute the drag force (acting in particle counter direction)   !
   !-------------------------------------------------------------------!
-  part % fd = .5 * cd * density * part_area  &
-            * abs(part % rel_vv) * part % rel_vv
+  part % fd_x = .5 * cd * density * part_area * part % rel_vel * part % rel_u
+  part % fd_y = .5 * cd * density * part_area * part % rel_vel * part % rel_v
+  part % fd_z = .5 * cd * density * part_area * part % rel_vel * part % rel_w
 
   !-----------------------------!
   !   Compute the total force   !
   !-----------------------------!
-  part % ft = part % fb + part % fd
+  part % ft_x = part % fb_x + part % fd_x
+  part % ft_y = part % fb_y + part % fd_y
+  part % ft_z = part % fb_z + part % fd_z
 
   end subroutine
