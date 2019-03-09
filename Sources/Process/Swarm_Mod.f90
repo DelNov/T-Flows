@@ -5,7 +5,8 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Grid_Mod,  only: Grid_Type
+  use Grid_Mod,  only: Grid_Type, Grid_Mod_Bnd_Cond_Type,  &
+                       INFLOW, OUTFLOW, CONVECT, PRESSURE, WALL, WALLFL
   use Var_Mod,   only: Var_Type
   use Field_Mod, only: Field_Type, density, viscosity
 !------------------------------------------------------------------------------!
