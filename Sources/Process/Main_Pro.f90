@@ -263,13 +263,14 @@
 
       end if
 
-      if(turbulence_model .eq. K_EPS_ZETA_F .and. &
-        heat_transfer) then
+      if(turbulence_model .eq. K_EPS_ZETA_F .or. &
+         turbulence_model .eq. HYBRID_LES_RANS) then
         call Calculate_Shear_And_Vorticity(flow)
-        call Calculate_Heat_Flux(flow)
+        if(heat_transfer) call Calculate_Heat_Flux(flow)
 
         call Compute_Turbulent(flow, sol, dt, ini, kin, n)
         call Compute_Turbulent(flow, sol, dt, ini, eps, n)
+        if(heat_transfer) &
         call Compute_Turbulent(flow, sol, dt, ini, t2,  n)
 
         call Update_Boundary_Values(flow)
@@ -279,20 +280,6 @@
 
         call Calculate_Vis_T_K_Eps_Zeta_F(flow)
 
-      end if
-
-      if(turbulence_model .eq. K_EPS_ZETA_F .or. &
-         turbulence_model .eq. HYBRID_LES_RANS) then
-        call Calculate_Shear_And_Vorticity(flow)
-
-        call Compute_Turbulent(flow, sol, dt, ini, kin, n)
-        call Compute_Turbulent(flow, sol, dt, ini, eps, n)
-        call Update_Boundary_Values(flow)
-
-        call Compute_F22(grid, sol, ini, f22)
-        call Compute_Turbulent(flow, sol, dt, ini, zeta, n)
-
-        call Calculate_Vis_T_K_Eps_Zeta_F(flow)
       end if
 
       if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
