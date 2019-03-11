@@ -86,6 +86,13 @@
   nu_max = 0.0
   n_points = 0
 
+  if(heat_transfer) then
+    call Comm_Mod_Global_Sum_Real(heat_flux)
+    call Comm_Mod_Global_Sum_Real(heated_area)
+    heat_flux = heat_flux / (heated_area + TINY)
+    heat      = heat_flux * heated_area
+  end if
+
   open(9, file=coord_name)
 
   ! Write the number of searching intervals
