@@ -33,10 +33,15 @@
   w    => flow % w
   t    => flow % t
 
-  heat        = 0.0
-  heat_flux   = 0.0
-  heated_area = 0.0
   kin_vis     = viscosity / density
+
+  if(heat_transfer) then
+    heat        = 0.0
+    heat_flux   = 0.0
+    heated_area = 0.0
+    ! Take (default) turbulent Prandtl number from control file
+    call Control_Mod_Turbulent_Prandtl_Number(pr_t)
+  end if
 
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
@@ -148,8 +153,6 @@
       ! Is this good in general case, when q <> 0 ??? Check it.
       if(heat_transfer) then
 
-        ! Take (default) turbulent Prandtl number from control file
-        call Control_Mod_Turbulent_Prandtl_Number(pr_t)
 
         ! If not DNS or LES, compute Prandtl number 
         if(turbulence_model .ne. LES_SMAGORINSKY .and.  &
@@ -258,12 +261,5 @@
       end if
     end if
   end do
-
-  if(heat_transfer) then
-    call Comm_Mod_Global_Sum_Real(heat_flux)
-    call Comm_Mod_Global_Sum_Real(heated_area)
-    heat_flux = heat_flux / (heated_area + TINY)
-    heat      = heat_flux * heated_area
-  end if
 
   end subroutine
