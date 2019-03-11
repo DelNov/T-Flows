@@ -6,8 +6,9 @@
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
   use Comm_Mod
-  use Field_Mod, only: Field_Type, heat_transfer,  &
-                       density, viscosity, capacity, conductivity
+  use Field_Mod, only: Field_Type, heat_transfer, heated_area,     &
+                       density, viscosity, capacity, conductivity, &
+                       heat_flux, heat
   use Rans_Mod
   use Grid_Mod
   use Control_Mod
@@ -23,7 +24,7 @@
   type(Var_Type),  pointer :: u, v, w, t
   integer                  :: c1, c2, s
   real                     :: qx, qy, qz, nx, ny, nz, con_t
-  real                     :: pr, heat, heat_flux, heated_area, kin_vis
+  real                     :: pr, kin_vis
 !==============================================================================!
 
   ! Take aliases
@@ -261,5 +262,7 @@
       end if
     end if
   end do
+
+  write(*,*) heated_area, heat_flux
 
   end subroutine
