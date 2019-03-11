@@ -263,6 +263,4 @@
     end if
   end do
 
-  write(*,*) heated_area, heat_flux
-
   end subroutine
