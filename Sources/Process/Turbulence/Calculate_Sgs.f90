@@ -69,25 +69,13 @@
     end do
 
   else if(turbulence_model .eq. LES_DYNAMIC) then
-    if(buoyancy) then  
-      do c = 1, grid % n_cells
-        lf = grid % vol(c) ** ONE_THIRD
-        vis_t(c) = density  &
-                * (lf*lf)   &  ! delta^2
-                * c_dyn(c)  &  ! c_dynamic
-                * shear(c)
-      end do
-    else
-      do c = 1, grid % n_cells
-        lf = grid % vol(c)**ONE_THIRD
-        vis_t(c) = density                &
-                * (lf*lf)                 &  ! delta^2
-                * c_dyn(c)                &  ! c_dynamic
-                * sqrt(shear(c)*shear(c)  &
-                + 2.5*(grav_x*t % x(c) + grav_y*t % y(c) + grav_z*t % z(c)))
-      end do
-    end if
-
+    do c = 1, grid % n_cells
+      lf = grid % vol(c) ** ONE_THIRD
+      vis_t(c) = density  &
+              * (lf*lf)   &  ! delta^2
+              * c_dyn(c)  &  ! c_dynamic
+              * shear(c)
+    end do
   else if(turbulence_model .eq. LES_WALE) then
     do c = 1, grid % n_cells
       lf = grid % vol(c)**ONE_THIRD
