@@ -33,7 +33,7 @@
   t    => flow % t
 
   ! If not time for disturbing the velocity field, return
-  if(mod(n-33, 1500) .ne. 0) return
+  if(mod(n, 100) .ne. 0) return
 
   ! If too late to disturb, get out too
   if(n > 3000) return
