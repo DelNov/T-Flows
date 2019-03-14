@@ -134,6 +134,8 @@
       pr_t1 = Turbulent_Prandtl_Number(grid, c1)
       pr_t2 = Turbulent_Prandtl_Number(grid, c2)
       pr_tf = grid % fw(s) * pr_t1 + (1.0-grid % fw(s)) * pr_t2
+    else
+      pr_tf = pr_t      
     end if
 
     ! Gradients on the cell face (fw corrects situation close to the wall)
