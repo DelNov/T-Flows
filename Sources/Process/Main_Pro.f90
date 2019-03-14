@@ -266,12 +266,14 @@
       if(turbulence_model .eq. K_EPS_ZETA_F .or. &
          turbulence_model .eq. HYBRID_LES_RANS) then
         call Calculate_Shear_And_Vorticity(flow)
-        if(heat_transfer) call Calculate_Heat_Flux(flow)
 
         call Compute_Turbulent(flow, sol, dt, ini, kin, n)
         call Compute_Turbulent(flow, sol, dt, ini, eps, n)
-        if(heat_transfer) &
-        call Compute_Turbulent(flow, sol, dt, ini, t2,  n)
+
+        if(heat_transfer) then
+          call Calculate_Heat_Flux(flow)
+          call Compute_Turbulent(flow, sol, dt, ini, t2,  n)
+        end if
 
         call Update_Boundary_Values(flow)
 
