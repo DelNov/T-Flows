@@ -6,8 +6,9 @@
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
   use Comm_Mod
-  use Field_Mod, only: Field_Type, heat_transfer,  &
-                       density, viscosity, capacity, conductivity
+  use Field_Mod, only: Field_Type, heat_transfer, heated_area,     &
+                       density, viscosity, capacity, conductivity, &
+                       heat_flux, heat
   use Rans_Mod
   use Grid_Mod
   use Control_Mod
@@ -23,7 +24,7 @@
   type(Var_Type),  pointer :: u, v, w, t
   integer                  :: c1, c2, s
   real                     :: qx, qy, qz, nx, ny, nz, con_t
-  real                     :: pr, heat, heat_flux, heated_area, kin_vis
+  real                     :: pr, kin_vis
 !==============================================================================!
 
   ! Take aliases
@@ -33,10 +34,15 @@
   w    => flow % w
   t    => flow % t
 
-  heat        = 0.0
-  heat_flux   = 0.0
-  heated_area = 0.0
   kin_vis     = viscosity / density
+
+  if(heat_transfer) then
+    heat        = 0.0
+    heat_flux   = 0.0
+    heated_area = 0.0
+    ! Take (default) turbulent Prandtl number from control file
+    call Control_Mod_Turbulent_Prandtl_Number(pr_t)
+  end if
 
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
@@ -148,8 +154,6 @@
       ! Is this good in general case, when q <> 0 ??? Check it.
       if(heat_transfer) then
 
-        ! Take (default) turbulent Prandtl number from control file
-        call Control_Mod_Turbulent_Prandtl_Number(pr_t)
 
         ! If not DNS or LES, compute Prandtl number 
         if(turbulence_model .ne. LES_SMAGORINSKY .and.  &
@@ -258,12 +262,5 @@
       end if
     end if
   end do
-
-  if(heat_transfer) then
-    call Comm_Mod_Global_Sum_Real(heat_flux)
-    call Comm_Mod_Global_Sum_Real(heated_area)
-    heat_flux = heat_flux / (heated_area + TINY)
-    heat      = heat_flux * heated_area
-  end if
 
   end subroutine

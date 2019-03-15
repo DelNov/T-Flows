@@ -9,8 +9,9 @@
   use Const_Mod                      ! constants
   use Comm_Mod                       ! parallel stuff
   use Grid_Mod,  only: Grid_Type
-  use Field_Mod, only: Field_Type, heat_transfer, heat_flux,  &
-                       density, viscosity, capacity, conductivity
+  use Field_Mod, only: Field_Type, heat_transfer, heat_flux, heat, &
+                       density, viscosity, capacity, conductivity, &
+                       heated_area 
   use Bulk_Mod,  only: Bulk_Type
   use Var_Mod,   only: Var_Type
   use Name_Mod,  only: problem_name
@@ -84,6 +85,13 @@
   t_wall = 0.0
   nu_max = 0.0
   n_points = 0
+
+  if(heat_transfer) then
+    call Comm_Mod_Global_Sum_Real(heat_flux)
+    call Comm_Mod_Global_Sum_Real(heated_area)
+    heat_flux = heat_flux / (heated_area + TINY)
+    heat      = heat_flux * heated_area
+  end if
 
   open(9, file=coord_name)
 

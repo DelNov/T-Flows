@@ -209,7 +209,7 @@
      turbulence_model .eq. HYBRID_LES_RANS) then
     if(phi % name .eq. 'KIN')  call Source_Kin_K_Eps_Zeta_F(flow, sol)
     if(phi % name .eq. 'EPS')  call Source_Eps_K_Eps_Zeta_F(flow, sol)
-    if(phi % name .eq. 'ZETA') call Source_Zeta_K_Eps_Zeta_F(grid, sol, n_step)
+    if(phi % name .eq. 'ZETA') call Source_Zeta_K_Eps_Zeta_F(flow, sol, n_step)
   end if
 
   if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
@@ -242,6 +242,7 @@
 
   do c = 1, grid % n_cells
     if( phi % n(c) < 0.0 ) phi % n(c) = phi % o(c)
+    if(phi % name .eq. 'ZETA')  phi % n(c) = min(phi % n(c), 1.8) 
   end do
 
   ! Print info on the screen
