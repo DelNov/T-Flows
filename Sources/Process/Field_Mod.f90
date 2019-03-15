@@ -55,7 +55,7 @@
   logical :: buoyancy
 
   ! Heat flux to the domain (important for periodic case with heat transfer)
-  real :: heat_flux
+  real :: heat_flux, heated_area, heat
 
   ! Physical properties
   real :: viscosity, density, conductivity, diffusivity, capacity

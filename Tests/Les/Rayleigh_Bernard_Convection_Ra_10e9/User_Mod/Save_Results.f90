@@ -78,6 +78,11 @@
     return
   end if
 
+  call Comm_Mod_Global_Sum_Real(heat_flux)
+  call Comm_Mod_Global_Sum_Real(heated_area)
+  heat_flux = heat_flux / (heated_area + TINY)
+  heat      = heat_flux * heated_area
+
   ubulk = bulk % flux_x / (density*bulk % area_x)
   t_wall = 0.0
   nu_max = 0.0

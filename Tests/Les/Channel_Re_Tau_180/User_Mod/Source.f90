@@ -10,6 +10,7 @@
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod,   only: Grid_Type
   use Field_Mod
+  use Comm_Mod
   use Var_Mod,    only: Var_Type
   use Bulk_Mod,   only: Bulk_Type
   use Const_Mod,  only: PI
@@ -55,7 +56,16 @@
   ! channel width and Nwall is number of heated walls.  ! 
   !                                                     !
   !-----------------------------------------------------!
+
+
+
   if( phi % name .eq. 'T' ) then  
+
+    call Comm_Mod_Global_Sum_Real(heat_flux)
+    call Comm_Mod_Global_Sum_Real(heated_area)
+    heat_flux = heat_flux / (heated_area + TINY)
+    heat      = heat_flux * heated_area
+
     do c = 1, grid % n_cells
       b_vector(c) = b_vector(c)                       &
                   - PI * 2.0 * heat_flux * u % n(c)   &

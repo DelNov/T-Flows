@@ -121,6 +121,11 @@
     allocate(tau_wall(grid % n_cells));                      tau_wall = 0.
     allocate(y_plus  (-grid % n_bnd_cells:grid % n_cells));  y_plus   = 0.
 
+    ! Hydraulic roughness given by formula
+    if(rough_walls) then
+      allocate(z_o_f(-grid % n_bnd_cells:grid % n_cells));  z_o_f   = 0.
+    end if
+
     if(heat_transfer) then
 
       call Var_Mod_Allocate_Solution('T2', '', t2, grid)
@@ -556,6 +561,7 @@
     allocate(vis_wall (-grid % n_bnd_cells:grid % n_cells));  vis_wall  = 0.
     allocate(tau_wall (grid % n_cells));                      tau_wall  = 0.
     allocate(y_plus   (-grid % n_bnd_cells:grid % n_cells));  y_plus    = 0.
+
 
     if(heat_transfer) then
 

@@ -106,7 +106,7 @@
         end if
 
         if(rough_walls) then
-          z_o = Roughness_Coefficient(grid, c1)      
+          z_o = Roughness_Coefficient(grid, z_o_f(c1), c1)      
           u_tau(c1) = c_mu25 * sqrt(kin % n(c1))
           y_plus(c1) = u_tau(c1) * (grid % wall_dist(c1) + z_o) &
                      / kin_vis
