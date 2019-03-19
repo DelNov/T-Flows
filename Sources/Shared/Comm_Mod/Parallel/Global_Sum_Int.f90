@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Comm_Mod_Global_Sum_Int(phi) 
+  subroutine Comm_Mod_Global_Sum_Int(phi)
 !------------------------------------------------------------------------------!
 !   Estimates global summ among all processors.                                !
 !------------------------------------------------------------------------------!
@@ -12,12 +12,12 @@
 !==============================================================================!
 
   call Mpi_Allreduce(phi,             & ! send buffer
-                     phi_new,         & ! recv buffer 
-                     1,               & ! length     
-                     MPI_INTEGER8,    & ! datatype  
-                     MPI_SUM,         & ! operation 
-                     MPI_COMM_WORLD,  &             
-                     error) 
+                     phi_new,         & ! recv buffer
+                     1,               & ! length
+                     MPI_INTEGER8,    & ! datatype
+                     MPI_SUM,         & ! operation
+                     MPI_COMM_WORLD,  &
+                     error)
 
   phi = phi_new
 

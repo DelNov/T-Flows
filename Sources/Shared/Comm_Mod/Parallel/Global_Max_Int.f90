@@ -15,7 +15,7 @@
                      phi_new,         & ! recv buffer
                      1,               & ! length
                      MPI_INTEGER8,    & ! datatype
-                     MPI_MAX,         & ! operation 
+                     MPI_MAX,         & ! operation
                      MPI_COMM_WORLD,  &
                      error)
 

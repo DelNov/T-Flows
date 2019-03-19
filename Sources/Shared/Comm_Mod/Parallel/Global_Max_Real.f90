@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Comm_Mod_Global_Max_Real(phi) 
+  subroutine Comm_Mod_Global_Max_Real(phi)
 !------------------------------------------------------------------------------!
 !   Estimates global maximum among all processors.                             !
 !------------------------------------------------------------------------------!
@@ -12,12 +12,12 @@
 !==============================================================================!
 
   call Mpi_Allreduce(phi,                   & ! send buffer
-                     phi_new,               & ! recv buffer 
-                     1,                     & ! length     
-                     MPI_DOUBLE_PRECISION,  & ! datatype  
-                     MPI_MAX,               & ! operation 
-                     MPI_COMM_WORLD,        &             
-                     error) 
+                     phi_new,               & ! recv buffer
+                     1,                     & ! length
+                     MPI_DOUBLE_PRECISION,  & ! datatype
+                     MPI_MAX,               & ! operation
+                     MPI_COMM_WORLD,        &
+                     error)
 
   phi = phi_new
 
