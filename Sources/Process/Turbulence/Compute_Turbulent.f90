@@ -218,7 +218,7 @@
 
   if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
      turbulence_model .eq. DES_SPALART) then
-    call Source_Vis_Spalart_Almaras(grid, sol, phi % x, phi % y, phi % z)
+    call Source_Vis_Spalart_Almaras(flow, sol)
   end if
 
   !---------------------------------!
