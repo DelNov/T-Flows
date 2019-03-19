@@ -3,9 +3,6 @@
 !------------------------------------------------------------------------------!
 !   Inserts infromation at specified position in the information box.          !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Comm_Mod, only: this_proc    
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   integer          :: r         ! row
@@ -15,7 +12,7 @@
   real             :: res       
 !==============================================================================!
 
-  if (this_proc < 2) then
+  if(this_proc < 2) then
 
     ! Update the number of lines you'll have to print in the end
     iter_info % n_user_lines = max(iter_info % n_user_lines, r)
