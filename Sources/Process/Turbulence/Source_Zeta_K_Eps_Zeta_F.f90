@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Source_Zeta_K_Eps_Zeta_F(grid, sol, n_step)
+  subroutine Source_Zeta_K_Eps_Zeta_F(flow, sol, n_step)
 !------------------------------------------------------------------------------!
 !   Calculate source terms in equation for zeta.                               !
 !   Term which is negative is put on left hand side in diagonal of             !
@@ -15,10 +15,11 @@
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Grid_Type)           :: grid
+  type(Field_Type),  target :: flow
   type(Solver_Type), target :: sol
   integer                   :: n_step
 !----------------------------------[Locals]------------------------------------!
+  type(Grid_Type),   pointer :: grid
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: c
@@ -38,8 +39,9 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
-  a => sol % a
-  b => sol % b % val
+  grid => flow % pnt_grid
+  a    => sol % a
+  b    => sol % b % val
 
   ! Positive source term 
   ! The first option in treating the source is making computation very 
