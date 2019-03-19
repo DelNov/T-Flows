@@ -278,7 +278,7 @@
 
         call Update_Boundary_Values(flow)
 
-        call Compute_F22(grid, sol, ini, f22)
+        call Compute_F22(flow, sol, ini, f22)
         call Compute_Turbulent(flow, sol, flow % dt, ini, zeta, n)
 
         call Calculate_Vis_T_K_Eps_Zeta_F(flow)
@@ -306,7 +306,7 @@
         call Compute_Stresses(flow, sol, flow % dt, ini, vw, n)
 
         if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
-          call Compute_F22(grid, sol, ini, f22)
+          call Compute_F22(flow, sol, ini, f22)
         end if
 
         call Compute_Stresses(flow, sol, flow % dt, ini, eps, n)
