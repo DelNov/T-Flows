@@ -49,7 +49,7 @@
     end do
   end do
 
-  max_n_cells = maxval(grid % cells_n_nodes)
+  max_n_cells = maxval(grid % nodes_n_cells)
 
   ! Allocate memory for cells surrounding each node
   n = grid % n_nodes
