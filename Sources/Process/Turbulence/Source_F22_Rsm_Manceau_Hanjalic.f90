@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Source_F22_Rsm_Manceau_Hanjalic(grid, sol)
+  subroutine Source_F22_Rsm_Manceau_Hanjalic(flow, sol)
 !------------------------------------------------------------------------------!
 !   Calculate source terms in eliptic relaxation equation                      !
 !   and imposing  boundary condition forf22                                    !
@@ -13,9 +13,10 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)           :: grid
+  type(Field_Type),  target :: flow
   type(Solver_Type), target :: sol
 !-----------------------------------[Locals]-----------------------------------!
+  type(Grid_Type),   pointer :: grid
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: s, c, c1, c2
@@ -51,8 +52,9 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
-  a => sol % a
-  b => sol % b % val
+  grid => flow % pnt_grid
+  a    => sol % a
+  b    => sol % b % val
 
   call Time_And_Length_Scale(grid)
 

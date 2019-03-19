@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Source_Vis_Spalart_Almaras(grid, sol, phi_x, phi_y, phi_z)
+  subroutine Source_Vis_Spalart_Almaras(flow, sol)
 !------------------------------------------------------------------------------!
 !   Computes the source terms in vis transport equation.                       !
 !------------------------------------------------------------------------------!
@@ -13,12 +13,10 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)           :: grid
+  type(Field_Type),  target :: flow
   type(Solver_Type), target :: sol
-  real                      :: phi_x(-grid % n_bnd_cells:grid % n_cells),  &
-                               phi_y(-grid % n_bnd_cells:grid % n_cells),  &
-                               phi_z(-grid % n_bnd_cells:grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
+  type(Grid_Type),   pointer :: grid
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: c
@@ -27,8 +25,9 @@
 !==============================================================================!
 
   ! Take aliases
-  a => sol % a
-  b => sol % b % val
+  grid => flow % pnt_grid
+  a    => sol % a
+  b    => sol % b % val
 
   if(turbulence_model .eq. SPALART_ALLMARAS) then
 
@@ -56,9 +55,9 @@
       !--------------------------------------------!
       !   Compute the first-order diffusion term   !
       !--------------------------------------------!
-      dif   = c_b2                                 &
-            * density                              &
-            * (phi_x(c) + phi_y(c) + phi_z(c))**2  &
+      dif   = c_b2                                       &
+            * density                                    &
+            * (vis % x(c) + vis % y(c) + vis % z(c))**2  &
             / vis % sigma
       b(c)  = b(c) + dif * grid % vol(c)
     end do
@@ -91,9 +90,9 @@
       !--------------------------------------------!
       !   Compute the first-order diffusion term   !
       !--------------------------------------------!
-      dif   = c_b2                                 &
-            * density                              &
-            * (phi_x(c) + phi_y(c) + phi_z(c))**2  &
+      dif   = c_b2                                       &
+            * density                                    &
+            * (vis % x(c) + vis % y(c) + vis % z(c))**2  &
             / vis % sigma
       b(c)  = b(c) + dif * grid % vol(c)
     end do
