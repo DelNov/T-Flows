@@ -1,11 +1,12 @@
 !==============================================================================!
-  subroutine Source_F22_K_Eps_Zeta_F(grid, sol)
+  subroutine Source_F22_K_Eps_Zeta_F(flow, sol)
 !------------------------------------------------------------------------------!
 !   Calculate source terms in eliptic relaxation  equation                     !
 !   for vi2 and imposing  boundary condition for f22                           !
 !------------------------------------------------------------------------------!
 !---------------------------------[Modules]------------------------------------!
   use Const_Mod
+  use Grid_Mod,   only: Grid_Type
   use Field_Mod
   use Rans_Mod
   use Grid_Mod,   only: Grid_Type
@@ -14,9 +15,10 @@
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Grid_Type)           :: grid
+  type(Field_Type),  target :: flow
   type(Solver_Type), target :: sol
 !----------------------------------[Locals]------------------------------------!
+  type(Grid_Type),   pointer :: grid
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: s, c, c1, c2
@@ -45,8 +47,9 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
-  a => sol % a
-  b => sol % b % val
+  grid => flow % pnt_grid
+  a    => sol % a
+  b    => sol % b % val
 
   call Time_And_Length_Scale(grid)
 
