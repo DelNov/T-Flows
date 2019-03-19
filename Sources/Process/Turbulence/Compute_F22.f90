@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_F22(grid, sol, ini, phi)
+  subroutine Compute_F22(flow, sol, ini, phi)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves eliptic relaxation equations for f22.               !
 !------------------------------------------------------------------------------!
@@ -21,11 +21,12 @@
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Grid_Type)           :: grid
+  type(Field_Type)          :: flow
   type(Solver_Type), target :: sol
   integer                   :: ini
   type(Var_Type)            :: phi
 !----------------------------------[Locals]------------------------------------!
+  type(Grid_Type),   pointer :: grid
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: s, c, c1, c2, exec_iter
@@ -53,8 +54,9 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
-  a => sol % a
-  b => sol % b % val
+  grid => flow % pnt_grid
+  a    => sol % a
+  b    => sol % b % val
 
   ! Initialize matrix and right hand side
   a % val(:) = 0.0
@@ -156,9 +158,9 @@
   !                                     !
   !-------------------------------------!
   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
-    call Source_F22_Rsm_Manceau_Hanjalic(grid, sol)
+    call Source_F22_Rsm_Manceau_Hanjalic(flow, sol)
   else
-    call Source_F22_K_Eps_Zeta_F(grid, sol)
+    call Source_F22_K_Eps_Zeta_F(flow, sol)
   end if
 
   !---------------------------------!
