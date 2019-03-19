@@ -5,6 +5,9 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
+  use Comm_Mod,  only: this_proc, n_proc,                  &
+                       Comm_Mod_Global_Min_Real,           &
+                       Comm_Mod_Global_Sum_Real_Array
   use Grid_Mod,  only: Grid_Type, Grid_Mod_Bnd_Cond_Type,  &
                        INFLOW, OUTFLOW, CONVECT, PRESSURE, WALL, WALLFL
   use Var_Mod,   only: Var_Type
@@ -34,7 +37,7 @@
     ! Particle's diameter
     real :: d
 
-    ! The closest cell, node and boundary cell
+    ! The closest cell, node, boundary cell and face
     integer :: cell
     integer :: node
     integer :: bnd_cell
@@ -49,6 +52,9 @@
     ! Particle Reynolds number (computed from relative velocity)
     real :: re
 
+    ! Particle Courant number
+    real :: cfl
+
     ! Particle drag factor (from Re_p)
     real :: f    ! this is not to be confused with the drag coefficient
 
@@ -60,6 +66,9 @@
     ! Particle deposition and departure from domain 
     logical :: deposited
     logical :: escaped
+
+    ! Particle inside the subdomain
+    logical :: here
 
   end type
 

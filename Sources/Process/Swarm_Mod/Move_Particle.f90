@@ -17,16 +17,16 @@
   real                         :: up, vp, wp           ! velocity at particle
   real                         :: flow_vel             ! flow vel. magn.
   real                         :: k1, k2, k3, k4       ! for Runge-Kutta
-  real                         :: part_tau, part_cfl, part_vel
+  real                         :: part_tau, part_vel
 !==============================================================================!
 
   ! Take aliases
-  flow      => swarm % pnt_flow
-  grid      => swarm % pnt_grid
-  u         => flow % u
-  v         => flow % v
-  w         => flow % w
-  part      => swarm % particle(k)
+  flow => swarm % pnt_flow
+  grid => swarm % pnt_grid
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+  part => swarm % particle(k)
 
   c  = part % cell      ! index of the closest cell for interpolation
   c2 = part % bnd_cell  ! index of the closest boundary cell for reflection
@@ -118,11 +118,9 @@
   ! Z-velocity calculation
   part % w = part % w + (ONE_SIXTH) * (k1 + 2.0*(k2+k3) + k4)*swarm % dt
 
-  !----------------------------------------!
-  !  Compute the new position of particle  !
-  !            1st order Explicit          !
-  ! This step depends on the wall BC type  !
-  !----------------------------------------!
+  !------------------------------------------------------------------!
+  !   Compute the new position of particle with 1st order explicit   !
+  !------------------------------------------------------------------!
 
   ! storing the old coordinates of particle before getting updated (for cfl)
   part % x_o = part % x_n
@@ -135,7 +133,7 @@
   part % z_n = part % z_n + part % w * swarm % dt
 
   ! Calculate cfl number for the particle (this is kind of wrong)
-  part_cfl = part_vel * swarm % dt / grid % delta(c)
+  part % cfl = part_vel * swarm % dt / grid % delta(c)
 
   !----------------------------------------------!
   !                                              !
@@ -146,9 +144,5 @@
   if(c2 .ne. 0) then
     call Swarm_Mod_Bounce_Particle(swarm, k)
   end if
-
-  ! Printing particle position
-  print *,k,'position','(',part%x_n,  &
-  ',',part%y_n,',',part%z_n,')',',',' | cfl =',part_cfl
 
   end subroutine

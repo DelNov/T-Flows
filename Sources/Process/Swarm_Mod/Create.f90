@@ -48,12 +48,16 @@
     swarm % particle(k) % cell     = 0
     swarm % particle(k) % node     = 0
     swarm % particle(k) % bnd_cell = 0
+    swarm % particle(k) % bnd_face = 0
 
     ! Assume particle is in the domain
     ! (A smarter way could be worked out, depending ...
     ! ... on the result of the call to Find_Nearest_Cell)
     swarm % particle(k) % deposited = .false.
     swarm % particle(k) % escaped   = .false.
+
+    ! Is particle in this processor?
+    swarm % particle(k) % here = .false.
 
   end do
 

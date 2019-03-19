@@ -13,9 +13,11 @@
   integer                      :: c, lc       ! cell, local cell
   integer                      :: cc, cb      ! closest cell and bnd. cell
   real                         :: xc, yc, zc  ! cell center coordinates
-  real                         :: dc_sq       ! distance squared
+  real                         :: d_sq        ! distance squared
   real                         :: min_dc      ! minimum distance cell
   real                         :: min_db      ! minimum distance bnd cell
+  real                         :: min_dc_glob
+  real                         :: min_db_glob
 !==============================================================================!
 
   ! Take aliases
@@ -26,7 +28,10 @@
   cb = 0
 
   !-----------------------------------------------------------!
+  !                                                           !
   !   Closest node is known, browse through cells around it   !
+  !     (You are entering this part during the simulation)    !
+  !                                                           !
   !-----------------------------------------------------------!
   if(part % node .ne. 0) then
 
@@ -41,29 +46,49 @@
       zc = grid % zc(c)
 
       ! Distance squared from the particle to cell centre
-      dc_sq = (xc - part % x_n)**2  &
-            + (yc - part % y_n)**2  &
-            + (zc - part % z_n)**2
+      d_sq = (xc - part % x_n)**2  &
+           + (yc - part % y_n)**2  &
+           + (zc - part % z_n)**2
 
       ! Finding the closest cell of those 8 neighbors
       if(c > 0) then
-        if(dc_sq < min_dc) then
-          min_dc = dc_sq  ! new minimum distance
-          cc = c          ! cc is the closest inside cell index
+        if(d_sq < min_dc) then
+          min_dc = d_sq  ! new minimum distance
+          cc = c         ! cc is the closest inside cell index
         end if
       end if
 
       if(c < 0) then
-        if(dc_sq < min_db) then
-          min_db = dc_sq  ! new minimum distance
-          cb = c          ! cb is the closest boundary cell index
+        if(d_sq < min_db) then
+          min_db = d_sq  ! new minimum distance
+          cb = c         ! cb is the closest boundary cell index
         end if
       end if
 
-    end do
+    end do  ! browse through cells of closest node
+
+    !--------------------------------------!
+    !   Save the last value of cc and cb   !
+    !     (the indices of closest cells)   !
+    !--------------------------------------!
+    part % cell     = cc
+    part % bnd_cell = cb
+    part % bnd_face =  0
+    if(cb < 0) part % bnd_face = grid % cells_bnd_face(cb)
+
+    ! If inside cell is closer than boundary ...
+    ! ... cell don't store the boundary cell
+    if(min_dc < min_db) then
+      part % bnd_cell = 0
+      part % bnd_face = 0
+    end if
 
   !---------------------------------------------------------!
+  !                                                         !
   !   Closest node is not known, browse through all cells   !
+  !             (You will be entering here only             !
+  !             after the particle is introduced)           !
+  !                                                         !
   !---------------------------------------------------------!
   else
 
@@ -80,44 +105,60 @@
         zc = grid % zc(c)
 
         ! Distance squared from the particle to cell centre
-        dc_sq = (xc - part % x_n)**2  &
-              + (yc - part % y_n)**2  &
-              + (zc - part % z_n)**2
+        d_sq = (xc - part % x_n)**2  &
+             + (yc - part % y_n)**2  &
+             + (zc - part % z_n)**2
 
         if(c > 0) then
-          if(dc_sq < min_dc) then
-            min_dc = dc_sq  ! new minimum distance
-            cc = c          ! cc is the closest inside cell index
+          if(d_sq < min_dc) then
+            min_dc = d_sq  ! new minimum distance
+            cc = c         ! cc is the closest inside cell index
           end if
         end if
 
         if(c < 0) then
-          if(dc_sq < min_db) then
-            min_db = dc_sq  ! new minimum distance
-            cb = c          ! cc is the closest boundary cell index
+          if(d_sq < min_db) then
+            min_db = d_sq  ! new minimum distance
+            cb = c         ! cc is the closest boundary cell index
           end if
         end if
 
       end if  ! c .ne. 0
 
-    end do
+    end do  ! browswe through all cells
+
+    !--------------------------------------!
+    !   Save the last value of cc and cb   !
+    !     (the indices of closest cells)   !
+    !--------------------------------------!
+    part % cell     = cc
+    part % bnd_cell = cb
+    part % bnd_face =  0
+    if(cb < 0) part % bnd_face = grid % cells_bnd_face(cb)
+
+    ! If inside cell is closer than boundary ...
+    ! ... cell don't store the boundary cell
+    if(min_dc < min_db) then
+      part % bnd_cell = 0
+      part % bnd_face = 0
+    end if
+
+    !--------------------------------------------!
+    !   Check if particle is in this processor   !
+    !--------------------------------------------!
+    min_dc_glob = min_dc
+    min_db_glob = min_db
+    if(n_proc > 1) then
+      call Comm_Mod_Global_Min_Real(min_dc_glob)
+      call Comm_Mod_Global_Min_Real(min_db_glob)
+    end if
+
+    part % here = .false.
+    if( (min_dc .eq. min_dc_glob) .and.  &
+        (min_db .eq. min_db_glob) ) then
+      part % here = .true.
+    end if
 
   end if  ! closest node is (not) known
-
-  !--------------------------------------!
-  !   Save the last value of cc and cb   !
-  !     (the indices of closest cells)   !
-  !--------------------------------------!
-  part % cell     = cc
-  part % bnd_cell = cb
-  part % bnd_face =  0
-  if(cb < 0) part % bnd_face = grid % cells_bnd_face(cb)
-
-  ! If inside cell is closer than boundary ...
-  ! ... cell don't store the boundary cell
-  if(min_dc < min_db) then
-    part % bnd_cell = 0
-    part % bnd_face = 0
-  end if
 
   end subroutine
