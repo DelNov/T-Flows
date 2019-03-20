@@ -17,7 +17,7 @@
   !-------------------!
   !   1st time step   !
   !-------------------!
-  if (n .eq. 1201) then     ! should be after the flow is developed
+  if(n .eq. 1201) then     ! should be after the flow is developed
 
     ! Initializing both deposition and departure counters
     swarm % cnt_d = 0
@@ -42,24 +42,21 @@
       call Swarm_Mod_Find_Nearest_Node(swarm, k)
     end do
 
-    print *, ""
-    print *, "trapped particles =",swarm % cnt_d,  &
-        ",","escaped particles =",swarm % cnt_e,       &
-        ",","reflected particles =",swarm % cnt_r
   end if
 
   !----------------------!
   !   2nd time step on   !
   !----------------------!
-  if (n .gt. 1201) then     ! should be after the flow is developed
-
+  if(n .gt. 1201) then     ! should be after the flow is developed
     call Swarm_Mod_Advance_Particles(swarm)
+  end if
 
+  call Comm_Mod_Wait
+  if(this_proc < 2) then
     print *, ""
     print *, "trapped particles =",swarm % cnt_d,  &
          ",","escaped particles =",swarm % cnt_e,       &
          ",","reflected particles =",swarm % cnt_r
-
   end if
 
   end subroutine
