@@ -7,6 +7,7 @@
   use Const_Mod
   use Comm_Mod,  only: this_proc, n_proc,                  &
                        Comm_Mod_Global_Min_Real,           &
+                       Comm_Mod_Global_Sum_Int_Array,      &
                        Comm_Mod_Global_Sum_Real_Array
   use Grid_Mod,  only: Grid_Type, Grid_Mod_Bnd_Cond_Type,  &
                        INFLOW, OUTFLOW, CONVECT, PRESSURE, WALL, WALLFL
@@ -68,7 +69,8 @@
     logical :: escaped
 
     ! Particle inside the subdomain
-    logical :: here
+    integer :: proc
+    integer :: buff
 
   end type
 

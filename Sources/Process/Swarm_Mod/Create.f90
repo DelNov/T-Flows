@@ -57,7 +57,8 @@
     swarm % particle(k) % escaped   = .false.
 
     ! Is particle in this processor?
-    swarm % particle(k) % here = .false.
+    swarm % particle(k) % proc = 0
+    swarm % particle(k) % buff = 0
 
   end do
 

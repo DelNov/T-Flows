@@ -83,6 +83,17 @@
       part % bnd_face = 0
     end if
 
+    !-----------------------------------------!
+    !   Detect if particle entered a buffer   !
+    !-----------------------------------------!
+    part % buff = part % proc  ! assume buffer was not entered
+
+    ! If processor number in the cell is differnt than this_proc 
+    ! (and part % proc in this case) you entered the buffer
+    if(grid % comm % proces(cc) .ne. part % proc) then
+      part % buff = grid % comm % proces(cc)  ! store buffer process
+    end if
+
   !---------------------------------------------------------!
   !                                                         !
   !   Closest node is not known, browse through all cells   !
@@ -153,10 +164,10 @@
       call Comm_Mod_Global_Min_Real(min_db_glob)
     end if
 
-    part % here = .false.
+    part % proc = 0
     if( (min_dc .eq. min_dc_glob) .and.  &
         (min_db .eq. min_db_glob) ) then
-      part % here = .true.
+      part % proc = this_proc
     end if
 
   end if  ! closest node is (not) known
