@@ -38,6 +38,7 @@
   include 'Comm_Mod/Sequential/Global_Max_Int.f90'
   include 'Comm_Mod/Sequential/Global_Min_Int.f90'
   include 'Comm_Mod/Sequential/Global_Sum_Int.f90'
+  include 'Comm_Mod/Sequential/Global_Sum_Int_Array.f90'
   include 'Comm_Mod/Sequential/Global_Sum_Real.f90'
   include 'Comm_Mod/Sequential/Global_Sum_Real_Array.f90'
   include 'Comm_Mod/Sequential/Load_Maps.f90'
