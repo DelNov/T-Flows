@@ -21,6 +21,10 @@
     allocate(swarm % particle(swarm % n_particles))
   end if
 
+  ! Allocate memory for working arrays
+  allocate(i_work(swarm % n_particles * N_I_VARS))
+  allocate(r_work(swarm % n_particles * N_R_VARS))
+
   !------------------------------!
   !   Initialize all particles   !
   !------------------------------!

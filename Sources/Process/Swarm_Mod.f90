@@ -104,11 +104,18 @@
 
   end type
 
+  ! Working arrays, buffers for parallel version
+  integer, parameter   :: N_I_VARS =  3
+  integer, parameter   :: N_R_VARS = 16
+  real,    allocatable :: r_work(:)
+  integer, allocatable :: i_work(:)
+
   contains
 
   include 'Swarm_Mod/Advance_Particles.f90'
   include 'Swarm_Mod/Bounce_Particle.f90'
   include 'Swarm_Mod/Create.f90'
+  include 'Swarm_Mod/Exchange_Particles.f90'
   include 'Swarm_Mod/Find_Nearest_Cell.f90'
   include 'Swarm_Mod/Find_Nearest_Node.f90'
   include 'Swarm_Mod/Move_Particle.f90'
