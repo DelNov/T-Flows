@@ -1,18 +1,20 @@
 #!/bin/bash
-OUT="out_08_with_particles"
-cat $OUT | grep ' 1 position'| awk '{print $3 " " $5}' > particle_01_test.dat
-cat $OUT | grep ' 2 position'| awk '{print $3 " " $5}' > particle_02_test.dat
-cat $OUT | grep ' 3 position'| awk '{print $3 " " $5}' > particle_03_test.dat
-cat $OUT | grep ' 4 position'| awk '{print $3 " " $5}' > particle_04_test.dat
-cat $OUT | grep ' 5 position'| awk '{print $3 " " $5}' > particle_05_test.dat
-cat $OUT | grep ' 6 position'| awk '{print $3 " " $5}' > particle_06_test.dat
-cat $OUT | grep ' 7 position'| awk '{print $3 " " $5}' > particle_07_test.dat
-cat $OUT | grep ' 8 position'| awk '{print $3 " " $5}' > particle_08_test.dat
-cat $OUT | grep ' 9 position'| awk '{print $3 " " $5}' > particle_09_test.dat
-cat $OUT | grep '10 position'| awk '{print $3 " " $5}' > particle_10_test.dat
-cat $OUT | grep '11 position'| awk '{print $3 " " $5}' > particle_11_test.dat
-cat $OUT | grep '12 position'| awk '{print $3 " " $5}' > particle_12_test.dat
-cat $OUT | grep '13 position'| awk '{print $3 " " $5}' > particle_13_test.dat
-cat $OUT | grep '14 position'| awk '{print $3 " " $5}' > particle_14_test.dat
-cat $OUT | grep '15 position'| awk '{print $3 " " $5}' > particle_15_test.dat
-cat $OUT | grep '16 position'| awk '{print $3 " " $5}' > particle_16_test.dat
+
+OUT=$1
+
+cat $OUT | grep 'particle:   1' | awk '{print $7 " " $8}' > particle_01_mpi.dat
+cat $OUT | grep 'particle:   2' | awk '{print $7 " " $8}' > particle_02_mpi.dat
+cat $OUT | grep 'particle:   3' | awk '{print $7 " " $8}' > particle_03_mpi.dat
+cat $OUT | grep 'particle:   4' | awk '{print $7 " " $8}' > particle_04_mpi.dat
+cat $OUT | grep 'particle:   5' | awk '{print $7 " " $8}' > particle_05_mpi.dat
+cat $OUT | grep 'particle:   6' | awk '{print $7 " " $8}' > particle_06_mpi.dat
+cat $OUT | grep 'particle:   7' | awk '{print $7 " " $8}' > particle_07_mpi.dat
+cat $OUT | grep 'particle:   8' | awk '{print $7 " " $8}' > particle_08_mpi.dat
+cat $OUT | grep 'particle:   9' | awk '{print $7 " " $8}' > particle_09_mpi.dat
+cat $OUT | grep 'particle:  10' | awk '{print $7 " " $8}' > particle_10_mpi.dat
+cat $OUT | grep 'particle:  11' | awk '{print $7 " " $8}' > particle_11_mpi.dat
+cat $OUT | grep 'particle:  12' | awk '{print $7 " " $8}' > particle_12_mpi.dat
+cat $OUT | grep 'particle:  13' | awk '{print $7 " " $8}' > particle_13_mpi.dat
+cat $OUT | grep 'particle:  14' | awk '{print $7 " " $8}' > particle_14_mpi.dat
+cat $OUT | grep 'particle:  15' | awk '{print $7 " " $8}' > particle_15_mpi.dat
+cat $OUT | grep 'particle:  16' | awk '{print $7 " " $8}' > particle_16_mpi.dat
