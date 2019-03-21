@@ -57,6 +57,11 @@
     end if    ! not deposited or escaped
   end do      ! through particles
 
+  !---------------------------------------------!
+  !                                             !
+  !   Exchange particles for parallel version   !
+  !                                             !
+  !---------------------------------------------!
   call Swarm_Mod_Exchange_Particles(swarm)
 
   !-----------------------------------!
