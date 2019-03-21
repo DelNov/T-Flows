@@ -51,12 +51,11 @@
     call Swarm_Mod_Advance_Particles(swarm)
   end if
 
-  call Comm_Mod_Wait
   if(this_proc < 2) then
-    print *, ""
-    print *, "trapped particles =",swarm % cnt_d,  &
-         ",","escaped particles =",swarm % cnt_e,       &
-         ",","reflected particles =",swarm % cnt_r
+    write(*,'(a,i4,a,i4,a,i4)'),                       &
+             "# trapped particles: ",  swarm % cnt_d,  &
+             " escaped particles: ",   swarm % cnt_e,  &
+             " reflected particles: ", swarm % cnt_r
   end if
 
   end subroutine
