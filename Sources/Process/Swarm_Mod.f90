@@ -105,8 +105,8 @@
   end type
 
   ! Working arrays, buffers for parallel version
-  integer, parameter   :: N_I_VARS =  3
-  integer, parameter   :: N_R_VARS = 16
+  integer, parameter   :: N_I_VARS = 3
+  integer, parameter   :: N_R_VARS = 8
   real,    allocatable :: r_work(:)
   integer, allocatable :: i_work(:)
 

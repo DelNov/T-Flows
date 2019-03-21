@@ -41,19 +41,20 @@
         r_work(i +  1) = part % x_n
         r_work(i +  2) = part % y_n
         r_work(i +  3) = part % z_n
-        r_work(i +  4) = part % x_o
-        r_work(i +  5) = part % y_o
-        r_work(i +  6) = part % z_o
-        r_work(i +  7) = part % u
-        r_work(i +  8) = part % v
-        r_work(i +  9) = part % w
-        r_work(i + 10) = part % density
-        r_work(i + 11) = part % d
-        r_work(i + 12) = part % cfl
-        r_work(i + 13) = part % rel_u
-        r_work(i + 14) = part % rel_v
-        r_work(i + 15) = part % rel_w
-        r_work(i + 16) = part % rel_vel
+        r_work(i +  4) = part % u
+        r_work(i +  5) = part % v
+        r_work(i +  6) = part % w
+        r_work(i +  7) = part % d
+        r_work(i +  8) = part % cfl
+        ! The following data is not really needed, at least not yet:
+        ! r_work(i +  9) = part % density
+        ! r_work(i + 10) = part % x_o
+        ! r_work(i + 11) = part % y_o
+        ! r_work(i + 12) = part % z_o
+        ! r_work(i + 13) = part % rel_u
+        ! r_work(i + 14) = part % rel_v
+        ! r_work(i + 15) = part % rel_w
+        ! r_work(i + 16) = part % rel_vel
       end if
 
     end do    ! through particles
@@ -99,19 +100,20 @@
       part % x_n     = r_work(i +  1)
       part % y_n     = r_work(i +  2)
       part % z_n     = r_work(i +  3)
-      part % x_o     = r_work(i +  4)
-      part % y_o     = r_work(i +  5)
-      part % z_o     = r_work(i +  6)
-      part % u       = r_work(i +  7)
-      part % v       = r_work(i +  8)
-      part % w       = r_work(i +  9)
-      part % density = r_work(i + 10)
-      part % d       = r_work(i + 11)
-      part % cfl     = r_work(i + 12)
-      part % rel_u   = r_work(i + 13)
-      part % rel_v   = r_work(i + 14)
-      part % rel_w   = r_work(i + 15)
-      part % rel_vel = r_work(i + 16)
+      part % u       = r_work(i +  4)
+      part % v       = r_work(i +  5)
+      part % w       = r_work(i +  6)
+      part % d       = r_work(i +  7)
+      part % cfl     = r_work(i +  8)
+      ! The following data is not really needed, at least not yet:
+      ! part % density = r_work(i +  9)
+      ! part % x_o     = r_work(i + 10)
+      ! part % y_o     = r_work(i + 11)
+      ! part % z_o     = r_work(i + 12)
+      ! part % rel_u   = r_work(i + 13)
+      ! part % rel_v   = r_work(i + 14)
+      ! part % rel_w   = r_work(i + 15)
+      ! part % rel_vel = r_work(i + 16)
     end do
 
   end if
