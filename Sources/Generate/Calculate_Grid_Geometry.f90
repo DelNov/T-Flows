@@ -27,83 +27,83 @@
   integer :: f4n(6,4)
   integer :: f3n(4,3)
 !==============================================================================!
-!
-!                                n3 
-!                 +---------------!---------------+
-!                /|              /|              /|
-!               / |             / |             / |
-!              /  |          n2/  |            /  |
-!             +---------------!---------------+   |
-!             |   |           |   |           |   |
-!             |   |     o---- | s-------o     |   |      
-!             |   +---- c1 ---|   !---- c2 ---|   +       
-!             |  /            |  /n4          |  /
-!             | /             | /             | /
-!             |/              |/              |/
-!             +---------------!---------------+
-!                            n1
-!
-!   Notes:
-! 
-!     ! side s is oriented from cell center c1 to cell center c2     
-!     ! c2 is greater then c1 inside the domain or smaller then 0
-!       on the boundary
-!     ! nodes are denoted with n1 - n4
-!
-!            c3           
-!             \  4-----3
-!              \/ \  . |
-!              /   \  +---c2
-!             /  .  \  |
-!            / .     \ |
-!           /.        \|
-!          1-----------2
-!                   |
-!                   c1
-!
-!                                n3 
-!                 +---------------!-------+         
-!                /|            n2/|      /|
-!               / |             !-------+ |
-!              /  |            /|s|  c2 | |
-!             +---------------+ | !-----| +
-!             |   |           | |/n4    |/
-!             |   |     c1    | !-------+
-!             |   +-----------|n1 +
-!             |  /            |  /
-!             | /             | /
-!             |/              |/ 
-!             +---------------+
-!                            n1
-! 
+!                                                                              !
+!                                n3                                            !
+!                 +---------------!---------------+                            !
+!                /|              /|              /|                            !
+!               / |             / |             / |                            !
+!              /  |          n2/  |            /  |                            !
+!             +---------------!---------------+   |                            !
+!             |   |           |   |           |   |                            !
+!             |   |     o---- | s-------o     |   |                            !
+!             |   +---- c1 ---|   !---- c2 ---|   +                            !
+!             |  /            |  /n4          |  /                             !
+!             | /             | /             | /                              !
+!             |/              |/              |/                               !
+!             +---------------!---------------+                                !
+!                            n1                                                !
+!                                                                              !
+!   Notes:                                                                     !
+!                                                                              !
+!     ! side s is oriented from cell center c1 to cell center c2               !
+!     ! c2 is greater then c1 inside the domain or smaller then 0              !
+!       on the boundary                                                        !
+!     ! nodes are denoted with n1 - n4                                         !
+!                                                                              !
+!            c3                                                                !
+!             \  4-----3                                                       !
+!              \/ \  . |                                                       !
+!              /   \  +---c2                                                   !
+!             /  .  \  |                                                       !
+!            / .     \ |                                                       !
+!           /.        \|                                                       !
+!          1-----------2                                                       !
+!                   |                                                          !
+!                   c1                                                         !
+!                                                                              !
+!                                n3                                            !
+!                 +---------------!-------+                                    !
+!                /|            n2/|      /|                                    !
+!               / |             !-------+ |                                    !
+!              /  |            /|s|  c2 | |                                    !
+!             +---------------+ | !-----| +                                    !
+!             |   |           | |/n4    |/                                     !
+!             |   |     c1    | !-------+                                      !
+!             |   +-----------|n1 +                                            !
+!             |  /            |  /                                             !
+!             | /             | /                                              !
+!             |/              |/                                               !
+!             +---------------+                                                !
+!                            n1                                                !
+!                                                                              !
 !------------------------------------------------------------------------------!
-!   Generaly:
-!
-!   the equation of plane reads: A * x + B * y + C * z + D = 0
-!
-!   and the equation of line:  x = x0 + t*rx
-!                              y = y0 + t*ry
-!                              z = z0 + t*rz
-!- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-!   In our case:
-!
-!     line is a connection between the two cell centers:
-!
-!     x = xc(c1) + t*(xc(c2)-xc(c1)) = xc(c1) + t*rx
-!     y = yc(c1) + t*(yc(c2)-yc(c1)) = yc(c1) + t*ry
-!     z = zc(c1) + t*(zc(c2)-zc(c1)) = zc(c1) + t*rz
-!    
-!
-!     plane is a cell face: 
-!
-!     Sx * x + Sy * y + Sz * z = Sx * xsp(s) + Sy * ysp(s) + Sz * zsp(s)
-!  
-!     and the intersection is at:
-!  
-!         Sx*(xsp(s)-xc(c1)) + Sy*(ysp(s)-yc(c1) + Sz*(zsp(s)-zc(c1)) 
-!     t = -----------------------------------------------------------
-!                           rx*Sx + ry*Sy + rz*Sz
-!  
+!   Generaly:                                                                  !
+!                                                                              !
+!   the equation of plane reads: A * x + B * y + C * z + D = 0                 !
+!                                                                              !
+!   and the equation of line:  x = x0 + t*rx                                   !
+!                              y = y0 + t*ry                                   !
+!                              z = z0 + t*rz                                   !
+!- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -       !
+!   In our case:                                                               !
+!                                                                              !
+!     line is a connection between the two cell centers:                       !
+!                                                                              !
+!     x = xc(c1) + t*(xc(c2)-xc(c1)) = xc(c1) + t*rx                           !
+!     y = yc(c1) + t*(yc(c2)-yc(c1)) = yc(c1) + t*ry                           !
+!     z = zc(c1) + t*(zc(c2)-zc(c1)) = zc(c1) + t*rz                           !
+!                                                                              !
+!                                                                              !
+!     plane is a cell face:                                                    !
+!                                                                              !
+!     sx * x + sy * y + Sz * z = sx * xsp(s) + sy * ysp(s) + sz * zsp(s)       !
+!                                                                              !
+!     and the intersection is at:                                              !
+!                                                                              !
+!         sx*(xsp(s)-xc(c1)) + sy*(ysp(s)-yc(c1) + sz*(zsp(s)-zc(c1))          !
+!     t = -----------------------------------------------------------          !
+!                           rx*sx + ry*sy + rz*sz                              !
+!                                                                              !
 !------------------------------------------------------------------------------!
   data    f4n / 1, 1, 2, 4, 3, 5,     &
                 2, 5, 6, 8, 7, 7,     &
@@ -174,14 +174,14 @@
     !      components of cell sides, cell side centers.   !
     !-----------------------------------------------------!
     !   => depends on: x_node,y_node,z_node               ! 
-    !   <= gives:      Sx,Sy,Sz,xsp,yzp,zsp               !
+    !   <= gives:      sx,sy,sz,xsp,yzp,zsp               !
     !-----------------------------------------------------!
     do s = 1, grid % n_faces
       do n = 1, grid % faces_n_nodes(s)  ! for quadrilateral an triangular faces
         loc_x_node(n) = grid % xn(grid % faces_n(n,s))
         loc_y_node(n) = grid % yn(grid % faces_n(n,s))
         loc_z_node(n) = grid % zn(grid % faces_n(n,s))
-      end do                       
+      end do
 
       ! Cell side components
       if( grid % faces_n_nodes(s) .eq. 4 ) then
@@ -252,8 +252,8 @@
     !--------------------------------------!
     !   Calculate boundary cell centers    !
     !--------------------------------------!
-    !   => depends on: xc,yc,zc,Sx,Sy,Sz   !
-    !   <= gives:      xc,yc,zc for c<0    !   
+    !   => depends on: xc,yc,zc,sx,sy,sz   !
+    !   <= gives:      xc,yc,zc for c<0    !
     !--------------------------------------!
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
@@ -277,7 +277,7 @@
     !   Find the sides on the periodic boundary   !
     !---------------------------------------------!
     !   => depends on: xc,yc,zc,Sx,Sy,Sz          !
-    !   <= gives:      Dx,Dy,Dz                   !
+    !   <= gives:      dx,dy,dz                   !
     !---------------------------------------------!
     if(rrun) then
     n_per = 0
@@ -292,7 +292,8 @@
       c2 = grid % faces_c(2, s)
       if(c2   >  0) then
 
-        ! Scalar product of the side with line c1-c2 is a good criterion
+        ! Scalar product of the side with line c1 - c2 is a good ...
+        ! ... criterion to check if face is on periodic boundary
         if( (grid % sx(s) * (grid % xc(c2) - grid % xc(c1) ) +  &
              grid % sy(s) * (grid % yc(c2) - grid % yc(c1) ) +  &
              grid % sz(s) * (grid % zc(c2) - grid % zc(c1) ))  < 0.0 ) then
@@ -338,7 +339,7 @@
           end if 
 
           grid % dx(s) = grid % xf(s) - xs2  !------------------------!
-          grid % dy(s) = grid % yf(s) - ys2  ! later: xc2 = xc2 + Dx  !
+          grid % dy(s) = grid % yf(s) - ys2  ! later: xc2 = xc2 + dx  !
           grid % dz(s) = grid % zf(s) - zs2  !------------------------!
 
         end if !  S*(c2-c1) < 0.0
