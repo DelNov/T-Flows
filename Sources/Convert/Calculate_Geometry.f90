@@ -28,94 +28,92 @@
   real                 :: x_c, y_c, z_c, det
   real                 :: ab_i, ab_j, ab_k, ac_i, ac_j, ac_k, p_i, p_j, p_k
   real                 :: dsc1, dsc2, per_min, per_max
-  real                 :: t, sur_tot, angle
+  real                 :: t, sur_tot, angle, d
   real                 :: xc1, yc1, zc1, xc2, yc2, zc2
   real                 :: max_dis, tot_vol, min_vol, max_vol
-  real                 :: xmin, xmax, ymin, ymax, zmin, zmax
   real, allocatable    :: xspr(:), yspr(:), zspr(:)
   real, allocatable    :: b_coor(:), phi_face(:)
   integer, allocatable :: b_face(:), face_copy(:)
   character(len=80)    :: answer, dir
   real                 :: big, small
 !==============================================================================!
-!
-!                                n3
-!                 +---------------!---------------+
-!                /|              /|              /|
-!               / |             / |             / |
-!              /  |          n2/  |            /  |
-!             +---------------!---------------+   |
-!             |   |           |   |           |   |
-!             |   |     o---- | s-------o     |   |
-!             |   +---- c1 ---|   !---- c2 ---|   +
-!             |  /            |  /n4          |  /
-!             | /             | /             | /
-!             |/              |/              |/
-!             +---------------!---------------+
-!                            n1
-!
-!   Notes:
-!
-!     ! side s is oriented from cell center c1 to cell center c2
-!     ! c2 is greater then c1 inside the domain or smaller then 0
-!       on the boundary
-!     ! nodes are denoted with n1 - n4
-!
-!            c3
-!             \  4-----3
-!              \/ \  . |
-!              /   \  +---c2
-!             /  .  \  |
-!            / .     \ |
-!           /.        \|
-!          1-----------2
-!                   |
-!                   c1
-!
-!                                n3
-!                 +---------------!-------+
-!                /|            n2/|      /|
-!               / |             !-------+ |
-!              /  |            /|s|  c2 | |
-!             +---------------+ | !-----| +
-!             |   |           | |/n4    |/
-!             |   |     c1    | !-------+
-!             |   +-----------|n1 +
-!             |  /            |  /
-!             | /             | /
-!             |/              |/
-!             +---------------+
-!                            n1
-!
+!                                                                              !
+!                                n3                                            !
+!                 +---------------!---------------+                            !
+!                /|              /|              /|                            !
+!               / |             / |             / |                            !
+!              /  |          n2/  |            /  |                            !
+!             +---------------!---------------+   |                            !
+!             |   |           |   |           |   |                            !
+!             |   |     o---- | s-------o     |   |                            !
+!             |   +---- c1 ---|   !---- c2 ---|   +                            !
+!             |  /            |  /n4          |  /                             !
+!             | /             | /             | /                              !
+!             |/              |/              |/                               !
+!             +---------------!---------------+                                !
+!                            n1                                                !
+!                                                                              !
+!   Notes:                                                                     !
+!                                                                              !
+!     ! side s is oriented from cell center c1 to cell center c2               !
+!     ! c2 is greater then c1 inside the domain or smaller then 0              !
+!       on the boundary                                                        !
+!     ! nodes are denoted with n1 - n4                                         !
+!                                                                              !
+!            c3                                                                !
+!             \  4-----3                                                       !
+!              \/ \  . |                                                       !
+!              /   \  +---c2                                                   !
+!             /  .  \  |                                                       !
+!            / .     \ |                                                       !
+!           /.        \|                                                       !
+!          1-----------2                                                       !
+!                   |                                                          !
+!                   c1                                                         !
+!                                                                              !
+!                                n3                                            !
+!                 +---------------!-------+                                    !
+!                /|            n2/|      /|                                    !
+!               / |             !-------+ |                                    !
+!              /  |            /|s|  c2 | |                                    !
+!             +---------------+ | !-----| +                                    !
+!             |   |           | |/n4    |/                                     !
+!             |   |     c1    | !-------+                                      !
+!             |   +-----------|n1 +                                            !
+!             |  /            |  /                                             !
+!             | /             | /                                              !
+!             |/              |/                                               !
+!             +---------------+                                                !
+!                            n1                                                !
+!                                                                              !
 !------------------------------------------------------------------------------!
-!   Generaly:
-!
-!   the equation of plane reads: A*x_node + B*y_node + C*z_node + D = 0
-!
-!   and the equation of line:  x_node = x0 + t*rx
-!                              y_node = y0 + t*ry
-!                              z_node = z0 + t*rz
-!- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-!   In our case:
-!
-!     line is a connection between the two cell centers:
-!
-!     x_node = xc(c1) + t*(xc(c2)-xc(c1)) = xc(c1) + t*rx
-!     y_node = yc(c1) + t*(yc(c2)-yc(c1)) = yc(c1) + t*ry
-!     z_node = zc(c1) + t*(zc(c2)-zc(c1)) = zc(c1) + t*rz
-!
-!
-!     plane is a cell face:
-!
-!     Sx * x_node + Sy * y_node + Sz * z_node =
-!     Sx * xsp(s) + Sy * ysp(s) + Sz * zsp(s)
-!
-!     and the intersection is at:
-!
-!         Sx*(xsp(s)-xc(c1)) + Sy*(ysp(s)-yc(c1) + Sz*(zsp(s)-zc(c1))
-!     t = -----------------------------------------------------------
-!                           rx*Sx + ry*Sy + rz*Sz
-!
+!   Generaly:                                                                  !
+!                                                                              !
+!   the equation of plane reads: A * x + B * y + C * z + D = 0                 !
+!                                                                              !
+!   and the equation of line:  x = x0 + t*rx                                   !
+!                              y = y0 + t*ry                                   !
+!                              z = z0 + t*rz                                   !
+!- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -       !
+!   In our case:                                                               !
+!                                                                              !
+!     line is a connection between the two cell centers:                       !
+!                                                                              !
+!     x = xc(c1) + t*(xc(c2)-xc(c1)) = xc(c1) + t*rx                           !
+!     y = yc(c1) + t*(yc(c2)-yc(c1)) = yc(c1) + t*ry                           !
+!     z = zc(c1) + t*(zc(c2)-zc(c1)) = zc(c1) + t*rz                           !
+!                                                                              !
+!                                                                              !
+!     plane is a cell face:                                                    !
+!                                                                              !
+!     sx * x + sy * y + Sz * z = sx * xsp(s) + sy * ysp(s) + sz * zsp(s)       !
+!                                                                              !
+!     and the intersection is at:                                              !
+!                                                                              !
+!         sx*(xsp(s)-xc(c1)) + sy*(ysp(s)-yc(c1) + sz*(zsp(s)-zc(c1))          !
+!     t = -----------------------------------------------------------          !
+!                           rx*sx + ry*sy + rz*sz                              !
+!                                                                              !
 !------------------------------------------------------------------------------!
 
   ! Estimate big and small
@@ -430,13 +428,6 @@
       end if
     end do
   end if  ! for option .eq. 1
-
-  xmin = +HUGE
-  ymin = +HUGE
-  zmin = +HUGE
-  xmax = -HUGE
-  ymax = -HUGE
-  zmax = -HUGE
 
   b_coor = 0.
   b_face = 0
@@ -831,7 +822,7 @@
   !   Calculate the cell volumes     !
   !----------------------------------!
   !   => depends on: xc,yc,zc,       !
-  !                  Dx,Dy,Dz,       !
+  !                  dx,dy,dz,       !
   !                  xsp, ysp, zsp   !
   !   <= gives:      volume          !
   !----------------------------------!
@@ -875,33 +866,6 @@
   deallocate(b_coor)
   deallocate(b_face)
 
-  !------------------------------------------!
-  !     Calculate delta                      !
-  !------------------------------------------!
-  !     => depends on: x_node,y_node,z_node  !
-  !     <= gives:      delta                 !
-  !------------------------------------------!
-  do c = 1, grid % n_cells
-    grid % delta(c) = 0.0
-    xmin = +HUGE
-    ymin = +HUGE
-    zmin = +HUGE
-    xmax = -HUGE
-    ymax = -HUGE
-    zmax = -HUGE
-    do n = 1, grid % cells_n_nodes(c)
-      xmin = min(xmin, grid % xn(grid % cells_n(n,c)))
-      ymin = min(ymin, grid % yn(grid % cells_n(n,c)))
-      zmin = min(zmin, grid % zn(grid % cells_n(n,c)))
-      xmax = max(xmax, grid % xn(grid % cells_n(n,c)))
-      ymax = max(ymax, grid % yn(grid % cells_n(n,c)))
-      zmax = max(zmax, grid % zn(grid % cells_n(n,c)))
-    end do
-    grid % delta(c) = xmax-xmin
-    grid % delta(c) = max(grid % delta(c), (ymax-ymin))
-    grid % delta(c) = max(grid % delta(c), (zmax-zmin))
-  end do
-
   !------------------------------------------------------------!
   !   Calculate the interpolation factors for the cell sides   !
   !------------------------------------------------------------!
@@ -929,6 +893,37 @@
 
   print *, '# Interpolation factors calculated !'
 
-  return
+  !-------------------------------!
+  !   Calculate delta             !
+  !-------------------------------!
+  !   => depends on: dx,dy,dz,f   !
+  !   <= gives:      delta        !
+  !-------------------------------!
+  grid % delta(:) = -HUGE
+  do s = 1, grid % n_faces
+
+    c1 = grid % faces_c(1,s)
+    c2 = grid % faces_c(2,s)
+
+    ! First cell
+    xc1 = grid % xc(c1)
+    yc1 = grid % yc(c1)
+    zc1 = grid % zc(c1)
+
+    ! Second cell (pls. check if xsi=xc on the boundary)
+    xc2 = grid % xc(c2) + grid % dx(s)
+    yc2 = grid % yc(c2) + grid % dy(s)
+    zc2 = grid % zc(c2) + grid % dz(s)
+
+    ! Distance between cell centers
+    d = Distance(xc1, yc1, zc1, xc2, yc2, zc2)
+
+    ! Cell delta
+    grid % delta(c1) = max(grid % delta(c1), d *        grid % f(s) )
+    grid % delta(c2) = max(grid % delta(c2), d * (1.0 - grid % f(s)))
+  end do
+  do c = 1, grid % n_cells
+    grid % delta(c) = grid % delta(c) * 2.0
+  end do
 
   end subroutine

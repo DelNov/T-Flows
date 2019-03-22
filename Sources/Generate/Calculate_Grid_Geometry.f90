@@ -18,12 +18,12 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c, c1, c2, m, n, s, n_per
   real    :: loc_x_node(4), loc_y_node(4), loc_z_node(4)
-  real    :: x_cell_tmp, y_cell_tmp, z_cell_tmp    
+  real    :: x_cell_tmp, y_cell_tmp, z_cell_tmp
   real    :: xs2, ys2, zs2
   real    :: dsc1, dsc2          !  for the interpolation factors
-  real    :: t, tot_surf 
-  real    :: xc1, yc1, zc1, xc2, yc2, zc2 
-  real    :: x_min, x_max, y_min, y_max, z_min, z_max
+  real    :: t, tot_surf
+  real    :: xc1, yc1, zc1, xc2, yc2, zc2
+  real    :: d
   integer :: f4n(6,4)
   integer :: f3n(4,3)
 !==============================================================================!
@@ -140,33 +140,6 @@
         grid % zc(c) = grid % zc(c) + grid % zn(grid % cells_n(n,c))  &
                      / (1.0*grid % cells_n_nodes(c))
       end do
-    end do
-
-    !-----------------------------------------!
-    !   Calculate delta                       !
-    !-----------------------------------------!
-    !   => depends on: x_node,y_node,z_node   ! 
-    !   <= gives:      delta                  !
-    !-----------------------------------------!
-    do c = 1, grid % n_cells
-      grid % delta(c)=0.0
-      x_min = +HUGE   
-      y_min = +HUGE  
-      z_min = +HUGE  
-      x_max = -HUGE  
-      y_max = -HUGE  
-      z_max = -HUGE  
-      do n = 1, grid % cells_n_nodes(c)
-        x_min = min(x_min, grid % xn(grid % cells_n(n,c)))
-        y_min = min(y_min, grid % yn(grid % cells_n(n,c)))
-        z_min = min(z_min, grid % zn(grid % cells_n(n,c)))
-        x_max = max(x_max, grid % xn(grid % cells_n(n,c)))
-        y_max = max(y_max, grid % yn(grid % cells_n(n,c)))
-        z_max = max(z_max, grid % zn(grid % cells_n(n,c)))
-      end do
-      grid % delta(c) = x_max-x_min
-      grid % delta(c) = max(grid % delta(c), (y_max-y_min))
-      grid % delta(c) = max(grid % delta(c), (z_max-z_min))
     end do
 
     !-----------------------------------------------------!
@@ -460,16 +433,49 @@
       xc1 = grid % xc(c1)
       yc1 = grid % yc(c1)
       zc1 = grid % zc(c1)
-      dsc1=Distance(xc1, yc1, zc1, grid % xf(s), grid % yf(s), grid % zf(s))
+      dsc1 = Distance(xc1, yc1, zc1, grid % xf(s), grid % yf(s), grid % zf(s))
 
       ! Second cell (pls. check if xsi=xc on the boundary)
       xc2 = grid % xc(c2) + grid % dx(s)
       yc2 = grid % yc(c2) + grid % dy(s)
       zc2 = grid % zc(c2) + grid % dz(s)
-      dsc2=Distance(xc2, yc2, zc2, grid % xf(s), grid % yf(s), grid % zf(s))
+      dsc2 = Distance(xc2, yc2, zc2, grid % xf(s), grid % yf(s), grid % zf(s))
 
       ! Interpolation factor
       grid % f(s) = dsc2 / (dsc1 + dsc2)
+    end do
+
+    !-------------------------------!
+    !   Calculate delta             !
+    !-------------------------------!
+    !   => depends on: dx,dy,dz,f   !
+    !   <= gives:      delta        !
+    !-------------------------------!
+    grid % delta(:) = -HUGE
+    do s = 1, grid % n_faces
+
+      c1 = grid % faces_c(1,s)
+      c2 = grid % faces_c(2,s)
+
+      ! First cell
+      xc1 = grid % xc(c1)
+      yc1 = grid % yc(c1)
+      zc1 = grid % zc(c1)
+
+      ! Second cell (pls. check if xsi=xc on the boundary)
+      xc2 = grid % xc(c2) + grid % dx(s)
+      yc2 = grid % yc(c2) + grid % dy(s)
+      zc2 = grid % zc(c2) + grid % dz(s)
+
+      ! Distance between cell centers
+      d = Distance(xc1, yc1, zc1, xc2, yc2, zc2)
+
+      ! Cell delta
+      grid % delta(c1) = max(grid % delta(c1), d *        grid % f(s) )
+      grid % delta(c2) = max(grid % delta(c2), d * (1.0 - grid % f(s)))
+    end do
+    do c = 1, grid % n_cells
+      grid % delta(c) = grid % delta(c) * 2.0
     end do
   end if
 
