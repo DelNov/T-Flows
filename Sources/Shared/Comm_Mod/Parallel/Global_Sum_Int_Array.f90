@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Comm_Mod_Global_Sum_Int_Array(phi, n)
+  subroutine Comm_Mod_Global_Sum_Int_Array(n, phi)
 !------------------------------------------------------------------------------!
 !   Estimates global sum over all processors.                                  !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer :: phi(n)
   integer :: n
+  integer :: phi(n)
 !-----------------------------------[Locals]-----------------------------------!
   integer, allocatable :: phi_res(:)
   integer              :: error

@@ -60,8 +60,8 @@
     end do    ! through particles
 
     ! Exchange the data
-    call Comm_Mod_Global_Sum_Int_Array (i_work, swarm % n_particles * n_i_vars)
-    call Comm_Mod_Global_Sum_Real_Array(r_work, swarm % n_particles * n_r_vars)
+    call Comm_Mod_Global_Sum_Int_Array (swarm % n_particles * n_i_vars, i_work)
+    call Comm_Mod_Global_Sum_Real_Array(swarm % n_particles * n_r_vars, r_work)
 
     ! Distribute global data on particles
     do k = 1, swarm % n_particles
