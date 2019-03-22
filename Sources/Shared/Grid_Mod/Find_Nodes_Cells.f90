@@ -8,11 +8,12 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: lc, c, c2, ln, n, s   ! counters
-  integer :: max_n_cells           ! max number of cells surrounding a node
+  integer :: c, c2, ln, n, s   ! counters
+  integer :: max_n_cells       ! max number of cells surrounding a node
 
 ! Just for checking, erase this later
-  real :: xn, xc, yn, yc, zn, zc, max_del, min_del, del
+! integer :: lc
+! real    :: xn, xc, yn, yc, zn, zc, max_del, min_del, del
 !==============================================================================!
 
   ! Allocate memory for node coordinates
