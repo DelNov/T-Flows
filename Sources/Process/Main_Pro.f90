@@ -142,6 +142,9 @@
   ! Print the areas of monitoring planes
   call Bulk_Mod_Print_Areas(flow % bulk)
 
+  ! Compute deltas for Spalart-Allmaras models
+  call Calculate_Deltas(grid)
+
   !---------------!
   !               !
   !   Time loop   !
