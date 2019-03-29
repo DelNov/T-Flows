@@ -76,6 +76,5 @@
   call Sort_Mod_Real_By_Index(grid % yc   (1), new_c(1), grid % n_cells)
   call Sort_Mod_Real_By_Index(grid % zc   (1), new_c(1), grid % n_cells)
   call Sort_Mod_Real_By_Index(grid % vol  (1), new_c(1), grid % n_cells)
-  call Sort_Mod_Real_By_Index(grid % delta(1), new_c(1), grid % n_cells)
 
   end subroutine
