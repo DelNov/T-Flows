@@ -27,6 +27,11 @@
   t    => flow % t
   p    => flow % p
 
+  ! Allocate deltas
+  allocate(h_max(-grid % n_bnd_cells:grid % n_cells));  h_max = 0.
+  allocate(h_min(-grid % n_bnd_cells:grid % n_cells));  h_min = 0.
+  allocate(h_w  (-grid % n_bnd_cells:grid % n_cells));  h_w   = 0.
+
   !-----------------!
   !   K-eps model   !
   !-----------------!
