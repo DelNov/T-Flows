@@ -70,9 +70,6 @@
     ! Cell volumes
     real, allocatable :: vol(:)
 
-    ! General cell size (max(dx,dy,dz) or maybe volume/area?)
-    real, allocatable :: delta(:)
-
     ! Wall distance - distance from the nearest wall
     real, allocatable :: wall_dist(:)
 
