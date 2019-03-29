@@ -364,9 +364,6 @@
   call Sort_Mod_Real_By_Index(grid % wall_dist(1),   &
                               grid % new_c(1),       &
                               grid % n_cells)
-  call Sort_Mod_Real_By_Index(grid % delta(1),       &
-                              grid % new_c(1),       &
-                              grid % n_cells)
 
   ! Sort face-cell connectivity
   allocate(side_cell(grid % n_faces, 2))
