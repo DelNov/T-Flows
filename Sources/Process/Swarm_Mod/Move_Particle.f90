@@ -133,7 +133,7 @@
   part % z_n = part % z_n + part % w * swarm % dt
 
   ! Calculate cfl number for the particle (this is kind of wrong)
-  part % cfl = part_vel * swarm % dt / grid % delta(c)
+  part % cfl = part_vel * swarm % dt / h_min(c)
 
   !----------------------------------------------!
   !                                              !
