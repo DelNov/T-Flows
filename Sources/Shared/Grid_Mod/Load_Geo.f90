@@ -35,7 +35,6 @@
   read(9) (grid % zc(c), c=-1,-grid % n_bnd_cells,-1)
 
   read(9) (grid % vol  (c),     c = 1, grid % n_cells)
-  read(9) (grid % delta(c),     c = 1, grid % n_cells)
   read(9) (grid % wall_dist(c), c = 1, grid % n_cells)
   read(9) (grid % wall_dist(c), c =-1,-grid % n_bnd_cells,-1)
 

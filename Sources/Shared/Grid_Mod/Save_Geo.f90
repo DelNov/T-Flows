@@ -80,18 +80,6 @@
     write(9) grid % vol(buf_recv_ind(s))
   end do
 
-  !----------------!
-  !   Cell delta   !
-  !----------------!
-  do c = 1, grid % n_cells
-    if(grid % new_c(c) > 0) then
-      write(9) grid % delta(c)
-    end if
-  end do
-  do s = 1, nbf_sub
-    write(9) grid % delta(buf_recv_ind(s))
-  end do
-
   !-------------------!
   !   Wall distance   !
   !-------------------!
