@@ -445,38 +445,6 @@
       grid % f(s) = dsc2 / (dsc1 + dsc2)
     end do
 
-    !-------------------------------!
-    !   Calculate delta             !
-    !-------------------------------!
-    !   => depends on: dx,dy,dz,f   !
-    !   <= gives:      delta        !
-    !-------------------------------!
-    grid % delta(:) = -HUGE
-    do s = 1, grid % n_faces
-
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
-
-      ! First cell
-      xc1 = grid % xc(c1)
-      yc1 = grid % yc(c1)
-      zc1 = grid % zc(c1)
-
-      ! Second cell (pls. check if xsi=xc on the boundary)
-      xc2 = grid % xc(c2) + grid % dx(s)
-      yc2 = grid % yc(c2) + grid % dy(s)
-      zc2 = grid % zc(c2) + grid % dz(s)
-
-      ! Distance between cell centers
-      d = Distance(xc1, yc1, zc1, xc2, yc2, zc2)
-
-      ! Cell delta
-      grid % delta(c1) = max(grid % delta(c1), d *        grid % f(s) )
-      grid % delta(c2) = max(grid % delta(c2), d * (1.0 - grid % f(s)))
-    end do
-    do c = 1, grid % n_cells
-      grid % delta(c) = grid % delta(c) * 2.0
-    end do
   end if
 
   end subroutine
