@@ -19,7 +19,6 @@
 
   ! Memory for cells' volumes, delta and wall distance
   allocate(grid % vol           (-nb:nc));  grid % vol            = 0.0
-  allocate(grid % delta         (-nb:nc));  grid % delta          = 0.0
   allocate(grid % wall_dist     (-nb:nc));  grid % wall_dist      = 0.0
   allocate(grid % cell_near_wall(-nb:nc));  grid % cell_near_wall = .false.
 
