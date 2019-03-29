@@ -185,16 +185,6 @@
   end do
   write(9,'(a,a)') IN_4, '</DataArray>'
 
-  ! Cell delta
-  write(9,'(a,a)') IN_4, '<DataArray type="Float64" ' //  &
-                         'Name="CellDelta" format="ascii">'
-  do c = 1, grid % n_cells
-    if(grid % new_c(c) .ne. 0) then
-      write(9,'(a,1pe15.7)') IN_5, grid % delta(c)
-    end if
-  end do
-  write(9,'(a,a)') IN_4, '</DataArray>'
-
   !------------!
   !   Footer   !
   !------------!
