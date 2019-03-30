@@ -107,9 +107,11 @@
 
   ! Working arrays, buffers for parallel version
   integer, parameter   :: N_I_VARS = 3
+  integer, parameter   :: N_L_VARS = 2
   integer, parameter   :: N_R_VARS = 8
-  real,    allocatable :: r_work(:)
   integer, allocatable :: i_work(:)
+  logical, allocatable :: l_work(:)
+  real,    allocatable :: r_work(:)
 
   contains
 
