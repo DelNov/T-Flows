@@ -24,9 +24,6 @@
     swarm % cnt_e = 0
     swarm % cnt_r = 0
 
-    ! Create the swarm
-    call Swarm_Mod_Create(flow, swarm)
-
     ! Place the particles where you want them
     do k = 1, swarm % n_particles
 
