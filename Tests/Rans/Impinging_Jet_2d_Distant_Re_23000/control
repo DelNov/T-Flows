@@ -4,8 +4,8 @@
  PROBLEM_NAME    jet
  HEAT_TRANSFER   yes
 
- TIME_STEP               0.05
- NUMBER_OF_TIME_STEPS   60
+ TIME_STEP                 0.05
+ NUMBER_OF_TIME_STEPS   6000
 
 #------------------
 # Saving intervals
