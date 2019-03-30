@@ -4,8 +4,6 @@
 !   Writes backup files. name.backup                                           !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Grid_Mod
-  use Comm_Mod
   use Work_Mod, only: cells_nf => i_cell_01,  &  ! cells' number of faces
                       ivalues  => i_cell_02,  &  ! work array for int. values
                       rvalues  => r_cell_01      ! work array for real values

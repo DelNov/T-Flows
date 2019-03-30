@@ -3,15 +3,6 @@
 !------------------------------------------------------------------------------!
 !   Loads backup files name.backup                                             !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Comm_Mod
-  use Rans_Mod
-  use Field_Mod, only: Field_Type, heat_transfer
-  use Grid_Mod,  only: Grid_Type
-  use Bulk_Mod,  only: Bulk_Type
-  use Control_Mod
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: fld

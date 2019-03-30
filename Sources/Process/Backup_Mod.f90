@@ -3,6 +3,17 @@
 !------------------------------------------------------------------------------!
 !   Module containing functions to write and read backup files.                !
 !------------------------------------------------------------------------------!
+!----------------------------------[Modules]-----------------------------------!
+  use Const_Mod
+  use Comm_Mod
+  use Name_Mod,    only: problem_name
+  use Var_Mod
+  use Rans_Mod
+  use Field_Mod,   only: Field_Type, heat_transfer
+  use Grid_Mod,    only: Grid_Type
+  use Bulk_Mod,    only: Bulk_Type
+  use Control_Mod
+!------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
 
