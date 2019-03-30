@@ -1,11 +1,12 @@
 !==============================================================================!
-  subroutine Backup_Mod_Save(fld, time_step, time_step_stat, name_save)
+  subroutine Backup_Mod_Save(fld, swr, time_step, time_step_stat, name_save)
 !------------------------------------------------------------------------------!
 !   Saves backup files name.backup                                             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: fld
+  type(Swarm_Type), target :: swr
   integer                  :: time_step       ! current time step
   integer                  :: time_step_stat  ! starting step for statistics
   character(len=*)         :: name_save
@@ -221,6 +222,13 @@
       call Backup_Mod_Write_Variable_Mean(fh, d, vc, 'wt_mean', wt)
     end if
   end if
+
+  !--------------------------!
+  !                          !
+  !   Swarm (of particles)   !
+  !                          !
+  !--------------------------!
+  call Backup_Mod_Write_Swarm(fh, d, vc, swr)
 
   !------------------------------!
   !                              !

@@ -1,11 +1,12 @@
 !==============================================================================!
-  subroutine Backup_Mod_Load(fld, time_step, time_step_stat, backup)
+  subroutine Backup_Mod_Load(fld, swr, time_step, time_step_stat, backup)
 !------------------------------------------------------------------------------!
 !   Loads backup files name.backup                                             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: fld
+  type(Swarm_Type), target :: swr
   integer                  :: time_step       ! current time step
   integer                  :: time_step_stat  ! starting step for statistics
   logical                  :: backup, present
@@ -241,6 +242,13 @@
       call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'wt_mean', wt)
     end if
   end if
+
+  !--------------------------!
+  !                          !
+  !   Swarm (of particles)   !
+  !                          !
+  !--------------------------!
+  call Backup_Mod_Read_Swarm(fh, d, vc, swr)
 
   !------------------------------!
   !                              !
