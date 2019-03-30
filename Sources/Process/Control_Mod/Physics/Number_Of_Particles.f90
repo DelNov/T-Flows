@@ -7,7 +7,7 @@
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Int_Item('NUMBER_OF_PARTICLES', 16, &
+  call Control_Mod_Read_Int_Item('NUMBER_OF_PARTICLES', 0, &
                                   val, verbose)
 
   end subroutine
