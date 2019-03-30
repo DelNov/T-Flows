@@ -13,6 +13,7 @@
 
   ! Parameters for size of typical variables in bytes
   integer, parameter :: SIZE_INT  = 8
+  integer, parameter :: SIZE_LOG  = 8
   integer, parameter :: SIZE_REAL = 8
 
   integer :: this_proc  ! processor i.d.
@@ -49,6 +50,7 @@
   include 'Comm_Mod/Parallel/Open_File_Write.f90'
   include 'Comm_Mod/Parallel/Read_Int.f90'
   include 'Comm_Mod/Parallel/Read_Int_Array.f90'
+  include 'Comm_Mod/Parallel/Read_Log_Array.f90'
   include 'Comm_Mod/Parallel/Read_Bnd_Real.f90'
   include 'Comm_Mod/Parallel/Read_Cell_Real.f90'
   include 'Comm_Mod/Parallel/Read_Real.f90'
@@ -59,6 +61,7 @@
   include 'Comm_Mod/Parallel/Wait.f90'
   include 'Comm_Mod/Parallel/Write_Int.f90'
   include 'Comm_Mod/Parallel/Write_Int_Array.f90'
+  include 'Comm_Mod/Parallel/Write_Log_Array.f90'
   include 'Comm_Mod/Parallel/Write_Bnd_Real.f90'
   include 'Comm_Mod/Parallel/Write_Cell_Real.f90'
   include 'Comm_Mod/Parallel/Write_Real.f90'
