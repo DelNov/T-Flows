@@ -233,7 +233,8 @@ SRC_MOD += Backup_Mod.f90
 # Sources for all functions are obtained by a shell command
 SRC_FUN =  $(shell ls -1 *.f90 | grep -v -i _Mod 		\
                                | grep -v -i Save_Cgns		\
-                               | grep -v -i Save_Vtu_Results)
+                               | grep -v -i Save_Vtu_Results	\
+                               | grep -v -i Save_Vtu_Swarm)
 SRC_FUN += $(shell ls -1 $(DIR_TURBUL)/*.f90		\
                          | xargs -n1 basename		\
                          | grep -v -i _Mod)
@@ -255,7 +256,8 @@ ifeq ($(CGNS_HDF5), no)
   SRC_MOD += Cgns_Mod_Void.f90
   SRC_FUN += Save_Cgns_Results_Void.f90	\
              Save_Cgns_Cells_Void.f90	\
-             Save_Vtu_Results.f90
+             Save_Vtu_Results.f90	\
+             Save_Vtu_Swarm.f90
 else
   ifeq ($(MPI), yes)
     SRC_MOD += Cgns_Mod_Par.f90
