@@ -95,6 +95,7 @@
   call Field_Mod_Allocate(flow, grid)
   call Grad_Mod_Allocate(grid)
   call Turbulence_Allocate(flow)
+  call Swarm_Mod_Allocate(swarm, flow)
   call User_Mod_Allocate(grid)
 
   call Grid_Mod_Calculate_Face_Geometry(grid)
@@ -112,7 +113,7 @@
   first_dt = 0
 
   ! Read backup file if directed so, and set the "backup" to .true. or .false.
-  call Backup_Mod_Load(flow, first_dt, n_stat, backup) 
+  call Backup_Mod_Load(flow, swarm, first_dt, n_stat, backup) 
 
   ! Initialize variables
   if(.not. backup) then
@@ -382,7 +383,7 @@
 
     ! Is it time to save the backup file?
     if(save_now .or. exit_now .or. mod(n, bsi) .eq. 0) then
-      call Backup_Mod_Save(flow, n, n_stat, name_save)
+      call Backup_Mod_Save(flow, swarm, n, n_stat, name_save)
     end if
 
     ! Is it time to save results for post-processing
@@ -424,7 +425,7 @@
   call Comm_Mod_Wait
   call Save_Results(flow, name_save)
   call Save_Swarm (swarm, name_save)
-  call Backup_Mod_Save(flow, n, n_stat, name_save)
+  call Backup_Mod_Save(flow, swarm, n, n_stat, name_save)
 
   ! Write results in user-customized format
   call User_Mod_Save_Results(flow, name_save)
