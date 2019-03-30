@@ -8,9 +8,9 @@
   type(Swarm_Type), target :: swarm
   integer                  :: k      ! particle number
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),     pointer     :: grid
-  type(Particle_Type), pointer     :: part
-  integer                          :: i, c
+  type(Grid_Type),     pointer :: grid
+  type(Particle_Type), pointer :: part
+  integer                      :: i, c
 !==============================================================================!
 
   ! Take aliases for the swarm
