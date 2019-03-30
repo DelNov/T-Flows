@@ -114,8 +114,8 @@
   contains
 
   include 'Swarm_Mod/Advance_Particles.f90'
+  include 'Swarm_Mod/Allocate.f90'
   include 'Swarm_Mod/Bounce_Particle.f90'
-  include 'Swarm_Mod/Create.f90'
   include 'Swarm_Mod/Exchange_Particles.f90'
   include 'Swarm_Mod/Find_Nearest_Cell.f90'
   include 'Swarm_Mod/Find_Nearest_Node.f90'
