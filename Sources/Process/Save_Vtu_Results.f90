@@ -339,8 +339,10 @@
   end if
 
   ! Wall distance and delta, important for all models
-  call Save_Vtu_Scalar(grid, IN_4, IN_5, "WallDistance", grid % wall_dist(1))
-  call Save_Vtu_Scalar(grid, IN_4, IN_5, "CellDelta",    grid % delta(1))
+  call Save_Vtu_Scalar(grid, IN_4, IN_5, "WallDistance",  grid % wall_dist(1))
+  call Save_Vtu_Scalar(grid, IN_4, IN_5, "CellDeltaMax",  h_max(1))
+  call Save_Vtu_Scalar(grid, IN_4, IN_5, "CellDeltaMin",  h_min(1))
+  call Save_Vtu_Scalar(grid, IN_4, IN_5, "CellDeltaWall", h_w  (1))
 
   !----------------------!
   !   Save user arrays   !
