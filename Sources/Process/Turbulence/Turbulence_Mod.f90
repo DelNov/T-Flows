@@ -72,6 +72,11 @@
   real, allocatable :: u_tau(:)
   real, allocatable :: tau_wall(:)
 
+  ! Related to cell dimensions (cell delta)
+  real, allocatable :: h_max(:)
+  real, allocatable :: h_min(:)
+  real, allocatable :: h_w(:)
+
   ! Turbulent Prandtl and Schmidt numbers
   real :: pr_t, sc_t
 
