@@ -8,8 +8,8 @@ Time stepping
  NUMBER_OF_TIME_STEPS    1000
  TIME_STEP               1.e-1
 
- RESULTS_SAVE_INTERVAL   100
- BACKUP_SAVE_INTERVAL    500
+ RESULTS_SAVE_INTERVAL   120
+ BACKUP_SAVE_INTERVAL    600
 
 
 
@@ -30,8 +30,7 @@ Physical models
  units: [m^2/s]
  DYNAMIC_VISCOSITY    9e-8
 
-#TURBULENCE_MODEL            hanjalic_jakirlic
- TURBULENCE_MODEL            reynolds_stress
+ TURBULENCE_MODEL            rsm_hanjalic_jakirlic
  TURBULENCE_MODEL_VARIANT    stabilized
 
 units: [kg/s]
