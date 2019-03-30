@@ -66,7 +66,7 @@
     do c = 1, grid % n_cells
 
       ! What is 0.65 here?  A ghost number
-      dist = min(grid % wall_dist(c),0.65 * grid % delta(c))
+      dist = min(grid % wall_dist(c),0.65 * h_max(c))
 
       !---------------------------------!
       !   Compute the production term   !
