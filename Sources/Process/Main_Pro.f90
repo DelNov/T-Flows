@@ -166,6 +166,7 @@
   ! It will save results in .vtk or .cgns file format,
   ! depending on how the code was compiled
   call Save_Results(flow, problem_name)
+  call Save_Swarm (swarm, problem_name)
 
   do n = first_dt + 1, last_dt
 
@@ -388,9 +389,11 @@
     if(save_now .or. exit_now .or. mod(n, rsi) .eq. 0) then
       call Comm_Mod_Wait
       call Save_Results(flow, name_save)
+      call Save_Swarm (swarm, name_save)
 
       ! Write results in user-customized format
       call User_Mod_Save_Results(flow, name_save)
+      ! call User_Mod_Save_Swarm(swarm, name_save)  to be done!
     end if
 
     ! Just before the end of time step
@@ -420,10 +423,13 @@
   ! Save backup and post-processing files at exit
   call Comm_Mod_Wait
   call Save_Results(flow, name_save)
+  call Save_Swarm (swarm, name_save)
   call Backup_Mod_Save(flow, n, n_stat, name_save)
 
   ! Write results in user-customized format
   call User_Mod_Save_Results(flow, name_save)
+  ! call User_Mod_Save_Swarm(swarm, name_save)  to be done!
+
   if(this_proc < 2) then
     open(9, file='stop')
     close(9)
