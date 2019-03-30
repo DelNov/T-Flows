@@ -23,6 +23,7 @@
 
   ! Allocate memory for working arrays
   allocate(i_work(swarm % n_particles * N_I_VARS))
+  allocate(l_work(swarm % n_particles * N_L_VARS))
   allocate(r_work(swarm % n_particles * N_R_VARS))
 
   !------------------------------!
