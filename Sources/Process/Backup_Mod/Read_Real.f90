@@ -21,6 +21,9 @@
   !--------------------------------------------------------!
   do
 
+    ! Increase counter
+    cnt_loop = cnt_loop + 1
+
     call Comm_Mod_Read_Text(fh, vn, disp_loop)  ! variable name
     call Comm_Mod_Read_Int (fh, vo, disp_loop)  ! variable offset
 
@@ -37,11 +40,12 @@
     end if
 
     ! Check if variable is in the file
-    cnt_loop = cnt_loop + 1
-    if(cnt_loop > vc) goto 1
+    if(cnt_loop >= vc) goto 1
 
   end do
 
-1 if(this_proc < 2) print *, '# Variable: ', trim(vn), ' not found!'
+1 if(this_proc < 2) print *, '# Variable: ', trim(var_name), ' not found! ',  &
+                             'Setting the value to 0.0!'
+  var_value = 0.0
 
   end subroutine
