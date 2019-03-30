@@ -21,7 +21,7 @@
                          MPI_INFO_NULL,  &
                          error)
 
-  ! Write integer value 
+  ! Write real value 
   call Mpi_File_Write(fh,                 &
                       num,                &
                       1,                  &
