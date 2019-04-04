@@ -17,9 +17,6 @@
   ! For LES you need to know nearest wall cell
   integer, allocatable :: nearest_wall_cell(:)
 
-! real, allocatable :: kin_sgs(:)
-! real, allocatable :: vis_t_sgs(:)
-
   real, allocatable :: wale_v(:)
 
 end module  
