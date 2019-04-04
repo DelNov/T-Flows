@@ -45,8 +45,9 @@
     ! Time step used in this field
     real :: dt
 
-    ! Reference temperature
+    ! Reference temperature and volume expansion coefficient
     real :: t_ref
+    real :: beta
 
   end type
 
