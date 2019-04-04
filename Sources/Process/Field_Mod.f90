@@ -45,8 +45,7 @@
     ! Time step used in this field
     real :: dt
 
-    ! Reference temperature and volume expansion coefficient
-    real :: t_ref
+    ! Volume expansion coefficient
     real :: beta
 
   end type
@@ -61,11 +60,14 @@
   ! Physical properties
   real :: viscosity, density, conductivity, diffusivity, capacity
 
-  ! Angular velocity 
+  ! Angular velocity
   real :: omega_x, omega_y, omega_z, omega
 
   ! Gravity
   real :: grav_x, grav_y, grav_z
+
+  ! Reference temperature
+  real :: t_ref
 
   contains
 

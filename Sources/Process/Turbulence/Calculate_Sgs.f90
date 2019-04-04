@@ -6,7 +6,7 @@
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
   use Comm_Mod,  only: Comm_Mod_Exchange_Real
-  use Field_Mod, only: Field_Type, density, viscosity, buoyancy,  &
+  use Field_Mod, only: Field_Type, density, viscosity, buoyancy, t_ref,  &
                        grav_x, grav_y, grav_z
   use Les_Mod
   use Grid_Mod,  only: Grid_Type
@@ -91,7 +91,7 @@
       nc2 = -(  grav_x * t % x(c)   &
               + grav_y * t % y(c)   &
               + grav_z * t % z(c))  &
-          / max(flow % t_ref, TINY)
+          / max(t_ref, TINY)
       nc2 = max(0.0, nc2)
       vis_t(c) = vis_t(c) * sqrt(1.0 - min(2.5*nc2/(shear(c)**2), 1.0))
     end do

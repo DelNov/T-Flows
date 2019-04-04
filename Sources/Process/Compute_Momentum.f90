@@ -6,7 +6,8 @@
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
   use Comm_Mod
-  use Field_Mod,    only: Field_Type, buoyancy, grav_x, grav_y, grav_z,  &
+  use Field_Mod,    only: Field_Type, buoyancy, t_ref,  &
+                          grav_x, grav_y, grav_z,       &
                           density, viscosity
   use Les_Mod
   use Rans_Mod
@@ -379,18 +380,18 @@
   if(buoyancy) then
     if(ui % name .eq. 'U') then
       do c = 1, grid % n_cells
-        b(c) = b(c) - density * grav_x * (t % n(c) - flow % t_ref)  &
-             * grid % vol(c)
+        b(c) = b(c) - density * grav_x * (t % n(c) - t_ref)  &
+             * flow % beta * grid % vol(c)
       end do
     else if(ui % name .eq. 'V') then
       do c = 1, grid % n_cells
-        b(c) = b(c) - density * grav_y * (t % n(c) - flow % t_ref)  &
-             * grid % vol(c)
+        b(c) = b(c) - density * grav_y * (t % n(c) - t_ref)  &
+             * flow % beta * grid % vol(c)
       end do
     else if(ui % name .eq. 'W') then
       do c = 1, grid % n_cells
-        b(c) = b(c) - density * grav_z * (t % n(c) - flow % t_ref)  &
-             * grid % vol(c)
+        b(c) = b(c) - density * grav_z * (t % n(c) - t_ref)  &
+             * flow % beta * grid % vol(c)
       end do
     end if
   end if
