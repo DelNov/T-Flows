@@ -46,13 +46,9 @@
   ! Take aliases
   flow => turb % pnt_flow
   grid => flow % pnt_grid
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
-  kin  => turb % kin
-  eps  => turb % eps
-  a    => sol  % a
-  b    => sol  % b % val
+  call Field_Mod_Alias_Momentum(flow, u, v, w)
+  call Turb_Mod_Alias_K_Eps    (turb, kin, eps)
+  call Solver_Mod_Alias_System (sol, a, b)
 
   kin_vis = viscosity/density
 

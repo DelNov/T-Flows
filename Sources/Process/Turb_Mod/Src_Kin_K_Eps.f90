@@ -14,7 +14,7 @@
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w
-  type(Var_Type),    pointer :: kin, eps
+  type(Var_Type),    pointer :: kin, eps, ut, vt, wt
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: c, c1, c2, s
@@ -38,20 +38,17 @@
   ! Take aliases
   flow => turb % pnt_flow
   grid => flow % pnt_grid
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
-  kin  => turb % kin
-  eps  => turb % eps
-  a    => sol % a
-  b    => sol % b % val
+  call Field_Mod_Alias_Momentum  (flow, u, v, w)
+  call Turb_Mod_Alias_K_Eps      (turb, kin, eps)
+  call Turb_Mod_Alias_Heat_Fluxes(turb, ut, vt, wt)
+  call Solver_Mod_Alias_System   (sol, a, b)
 
   !-----------------------------------------!
   !   Compute the sources in the interior   !
   !-----------------------------------------!
   ! Production source:
   do c = 1, grid % n_cells
-    p_kin(c) = vis_t(c) * shear(c)**2
+    p_kin(c) = vis_t(c) * flow % shear(c)**2
     b(c)     = b(c) + p_kin(c) * grid % vol(c)
 
     a % val(a % dia(c)) = a % val(a % dia(c)) + &
@@ -124,7 +121,7 @@
           p_kin_wf  = tau_wall(c1) * 0.07**0.25 * sqrt(kin % n(c1))  &
                     / (grid % wall_dist(c1) * kappa)
 
-          p_kin_int = vis_t(c1) * shear(c1)**2
+          p_kin_int = vis_t(c1) * flow % shear(c1)**2
 
           p_kin(c1) = p_kin_int * exp(-1.0 * ebf) + p_kin_wf  &
                     * exp(-1.0 / ebf)

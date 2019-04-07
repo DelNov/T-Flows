@@ -24,9 +24,7 @@
   ! Take aliases
   flow => turb % pnt_flow
   grid => flow % pnt_grid
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
+  call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   !---------------!
   !               !
@@ -44,9 +42,9 @@
     s31 = s13
     s32 = s23
 
-    v11 = 0.0   
-    v22 = 0.0  
-    v33 = 0.0  
+    v11 = 0.0
+    v22 = 0.0
+    v33 = 0.0
     v12 = 0.5*(v % x(c) - u % y(c))
     v13 = 0.5*(u % z(c) - w % x(c))
     v23 = 0.5*(v % y(c) - w % y(c))
@@ -54,8 +52,8 @@
     v31 = -v13
     v32 = -v23
 
-    shear2(c) = 0.5 * shear(c) * shear(c)
-    vort2(c)  = 0.5 * vort(c) * vort(c)
+    shear2(c) = 0.5 * flow % shear(c) * flow % shear(c)
+    vort2(c)  = 0.5 * flow % vort(c) * flow % vort(c)
 
     s11d =  s11*s11 + s12*s12 + s13*s13   &
          - (v11*v11 + v12*v12 + v13*v13)  &

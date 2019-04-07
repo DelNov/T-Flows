@@ -29,6 +29,7 @@
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
   type(Matrix_Type), pointer :: a
+  real,              pointer :: b(:)
   type(Var_Type),    pointer :: u, v, w
   integer                    :: c, j, cj
   real                       :: u_a, v_a, w_a
@@ -63,15 +64,13 @@
   ! Take aliases
   flow => turb % pnt_flow
   grid => flow % pnt_grid
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
-  a    => sol % a
+  call Field_Mod_Alias_Momentum(flow, u, v, w)
+  call Solver_Mod_Alias_System (sol, a, b)
 
   call Comm_Mod_Exchange_Real(grid, u % n)
   call Comm_Mod_Exchange_Real(grid, v % n)
   call Comm_Mod_Exchange_Real(grid, w % n)
-  call Comm_Mod_Exchange_Real(grid, shear)
+  call Comm_Mod_Exchange_Real(grid, flow % shear)
 
   do c =1, grid % n_cells
     u_a   = 0.0
@@ -111,14 +110,14 @@
         vw_a = vw_a + grid % vol(cj) * v % n(cj) * w % n(cj)
 
         ! Test Mija
-        m_11_a = m_11_a + grid % vol(cj) * shear(cj) * u % x(cj)
-        m_22_a = m_22_a + grid % vol(cj) * shear(cj) * v % y(cj)
-        m_33_a = m_33_a + grid % vol(cj) * shear(cj) * w % z(cj)
-        m_12_a = m_12_a + grid % vol(cj) * shear(cj)                &    
-               * 0.5 * ( u % y(cj) + v % x(cj) ) 
-        m_13_a = m_13_a + grid % vol(cj) * shear(cj)                &
-               * 0.5 * ( u % z(cj) + w % x(cj) )     
-        m_23_a = m_23_a + grid % vol(cj) * shear(cj)                &
+        m_11_a = m_11_a + grid % vol(cj) * flow % shear(cj) * u % x(cj)
+        m_22_a = m_22_a + grid % vol(cj) * flow % shear(cj) * v % y(cj)
+        m_33_a = m_33_a + grid % vol(cj) * flow % shear(cj) * w % z(cj)
+        m_12_a = m_12_a + grid % vol(cj) * flow % shear(cj)              &
+               * 0.5 * ( u % y(cj) + v % x(cj) )
+        m_13_a = m_13_a + grid % vol(cj) * flow % shear(cj)              &
+               * 0.5 * ( u % z(cj) + w % x(cj) )
+        m_23_a = m_23_a + grid % vol(cj) * flow % shear(cj)              &
                * 0.5 * ( v % z(cj) + w % y(cj) )
 
         ! Test volume 
@@ -140,12 +139,12 @@
     uw_a = uw_a + grid % vol(c) * u % n(c) * w % n(c)
     vw_a = vw_a + grid % vol(c) * v % n(c) * w % n(c)
 
-    m_11_a = m_11_a + grid % vol(c) * shear(c) * u % x(c)
-    m_22_a = m_22_a + grid % vol(c) * shear(c) * v % y(c)
-    m_33_a = m_33_a + grid % vol(c) * shear(c) * w % z(c)
-    m_12_a = m_12_a + grid % vol(c) * shear(c) * 0.5 * ( u % y(c) + v % x(c) ) 
-    m_13_a = m_13_a + grid % vol(c) * shear(c) * 0.5 * ( u % z(c) + w % x(c) )
-    m_23_a = m_23_a + grid % vol(c) * shear(c) * 0.5 * ( v % z(c) + w % y(c) )
+    m_11_a = m_11_a + grid % vol(c) * flow % shear(c) * u % x(c)
+    m_22_a = m_22_a + grid % vol(c) * flow % shear(c) * v % y(c)
+    m_33_a = m_33_a + grid % vol(c) * flow % shear(c) * w % z(c)
+    m_12_a = m_12_a + grid % vol(c) * flow % shear(c) * .5*(u % y(c) + v % x(c))
+    m_13_a = m_13_a + grid % vol(c) * flow % shear(c) * .5*(u % z(c) + w % x(c))
+    m_23_a = m_23_a + grid % vol(c) * flow % shear(c) * .5*(v % z(c) + w % y(c))
 
     ! Now calculating test values
     u_f(c) = u_a / vol_e

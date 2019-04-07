@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Scalar(flow, sol, dt, ini, sc)
+  subroutine Compute_Scalar(flow, turb, sol, dt, ini, sc)
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for use scalar.                          !
 !------------------------------------------------------------------------------!
@@ -13,7 +13,7 @@
   use Grad_Mod
   use Info_Mod
   use Numerics_Mod
-  use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
+  use Solver_Mod,   only: Solver_Type, Solver_Mod_Alias_System, Bicg, Cg, Cgs
   use Matrix_Mod,   only: Matrix_Type
   use Control_Mod
   use User_Mod
@@ -30,6 +30,7 @@
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
   type(Field_Type),  target :: flow
+  type(Turb_Type),   target :: turb
   type(Solver_Type), target :: sol
   real                      :: dt
   integer                   :: ini
@@ -38,6 +39,7 @@
   real :: Turbulent_Prandtl_Number
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
+  type(Var_Type),    pointer :: uu, vv, ww, uv, uw, vw
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   real,              pointer :: flux(:)
@@ -84,9 +86,9 @@
   ! Take aliases
   grid => flow % pnt_grid
   flux => flow % flux
-  a    => sol % a
-  b    => sol % b % val
   phi  => flow % scalar(sc)
+  call Turb_Mod_Alias_Stresses(turb, uu, vv, ww, uv, uw, vw)
+  call Solver_Mod_Alias_System(sol, a, b)
 
   do n = 1, a % row(grid % n_cells+1) ! to je broj nonzero + 1
     a % val(n) = 0.0
@@ -267,12 +269,18 @@
      turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
     if(turbulence_model_variant .ne. STABILIZED) then
       do c = 1, grid % n_cells
-        u1uj_phij(c) = -0.22*t_scale(c) *&
-                   (uu%n(c)*phi_x(c)+uv%n(c)*phi_y(c)+uw%n(c)*phi_z(c))
-        u2uj_phij(c) = -0.22*t_scale(c)*&
-                   (uv%n(c)*phi_x(c)+vv%n(c)*phi_y(c)+vw%n(c)*phi_z(c))
-        u3uj_phij(c) = -0.22*t_scale(c)*&
-                   (uw%n(c)*phi_x(c)+vw%n(c)*phi_y(c)+ww%n(c)*phi_z(c))
+        u1uj_phij(c) = -0.22 * t_scale(c) *  &
+                   (  uu % n(c) * phi_x(c)   &
+                    + uv % n(c) * phi_y(c)   &
+                    + uw % n(c) * phi_z(c))
+        u2uj_phij(c) = -0.22 * t_scale(c) *  &
+                   (  uv % n(c) * phi_x(c)   &
+                    + vv % n(c) * phi_y(c)   &
+                    + vw % n(c) * phi_z(c))
+        u3uj_phij(c) = -0.22 * t_scale(c) *  &
+                   (  uw % n(c) * phi_x(c)   &
+                    + vw % n(c) * phi_y(c)   &
+                    + ww % n(c) * phi_z(c))
       end do
       call Grad_Mod_Component(grid, u1uj_phij, 1, u1uj_phij_x, .true.)
       call Grad_Mod_Component(grid, u2uj_phij, 2, u2uj_phij_y, .true.)

@@ -61,13 +61,11 @@
   grid => flow % pnt_grid
   bulk => flow % bulk
   flux => flow % flux
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
   p    => flow % p
   pp   => flow % pp
   a    => sol % a
   b    => sol % b % val
+  call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! User function
   call User_Mod_Beginning_Of_Compute_Pressure(flow, dt, ini)

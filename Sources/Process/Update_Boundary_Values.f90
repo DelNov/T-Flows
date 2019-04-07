@@ -24,6 +24,7 @@
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: u, v, w, t
   type(Var_Type),  pointer :: kin, eps, zeta, f22, vis, t2
+  type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   integer                  :: c1, c2, s
   real                     :: qx, qy, qz, nx, ny, nz, con_t
   real                     :: pr, kin_vis
@@ -31,18 +32,14 @@
 
   ! Take aliases
   grid => flow % pnt_grid
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
-  t    => flow % t
-  kin  => turb % kin
-  eps  => turb % eps
-  f22  => turb % f22
-  zeta => turb % zeta
   vis  => turb % vis
-  t2   => turb % t2
+  call Field_Mod_Alias_Momentum   (flow, u, v, w)
+  call Field_Mod_Alias_Energy     (flow, t)
+  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
+  call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
+  call Turb_Mod_Alias_T2          (turb, t2)
 
-  kin_vis     = viscosity / density
+  kin_vis = viscosity / density
 
   if(heat_transfer) then
     heat        = 0.0

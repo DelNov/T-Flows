@@ -38,6 +38,9 @@
     call Var_Mod_Allocate_Solution('T', 'Q', flow % t, grid)
   end if ! heat_transfer
 
+  allocate(flow % vort (-grid % n_bnd_cells:grid % n_cells)); flow % vort  = 0.
+  allocate(flow % shear(-grid % n_bnd_cells:grid % n_cells)); flow % shear = 0.
+
   !--------------------------------------!
   !   Allocate memory for user scalars   !
   !--------------------------------------!

@@ -21,7 +21,6 @@
     real, allocatable    :: o(:), oo(:)           ! old and older then old
     real, allocatable    :: a(:)                  ! advection fluxes
     real, allocatable    :: c(:)                  ! cross-difusion fluxes
-    real, allocatable    :: mean(:)               ! time average
     real, allocatable    :: x(:), y(:), z(:)      ! gradient components
     real, allocatable    :: q(:)                  ! flux of a variable
     real                 :: sigma                 ! sigma
@@ -48,7 +47,6 @@
 
   include 'Var_Mod/Allocate_New_Only.f90'
   include 'Var_Mod/Allocate_Solution.f90'
-  include 'Var_Mod/Allocate_Statistics.f90'
   include 'Var_Mod/Bnd_Cell_Type.f90'
 
   end module

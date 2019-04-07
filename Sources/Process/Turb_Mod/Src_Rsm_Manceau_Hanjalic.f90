@@ -18,7 +18,8 @@
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w
-  type(Var_Type),    pointer :: kin, eps, f22
+  type(Var_Type),    pointer :: kin, eps, zeta, f22
+  type(Var_Type),    pointer :: uu, vv, ww, uv, uw, vw
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: c, s, c1, c2, i
@@ -33,14 +34,10 @@
   ! Take aliases
   flow => turb % pnt_flow
   grid => flow % pnt_grid
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
-  kin  => turb % kin
-  eps  => turb % eps
-  f22  => turb % f22
-  a    => sol  % a
-  b    => sol  % b % val
+  call Field_Mod_Alias_Momentum   (flow, u, v, w)
+  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
+  call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
+  call Solver_Mod_Alias_System    (sol, a, b)
 
   call Time_And_Length_Scale(grid, turb)
 

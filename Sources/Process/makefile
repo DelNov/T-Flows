@@ -236,6 +236,7 @@ SRC_FUN += $(shell ls -1 $(DIR_TURBUL)/*.f90		\
                          | xargs -n1 basename		\
                          | grep -v -i Allocate		\
                          | grep -v -i Compute_		\
+                         | grep -v -i Alias_		\
                          | grep -v -i Const_		\
                          | grep -v -i Vis_T_		\
                          | grep -v -i Src_		\

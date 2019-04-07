@@ -24,6 +24,8 @@
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u, v, w, t
   type(Var_Type),  pointer :: kin, eps, f22, zeta, vis, t2
+  type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
+  real,            pointer :: u_mean(:), v_mean(:), w_mean(:)
   real,            pointer :: flux(:)
   integer                  :: i, c, c1, c2, m, s, nks, nvs
   integer                  :: n_wall, n_inflow, n_outflow, n_symmetry,  &
@@ -50,16 +52,15 @@
   grid => flow % pnt_grid
   bulk => flow % bulk
   flux => flow % flux
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
-  t    => flow % t
-  kin  => turb % kin
-  eps  => turb % eps
-  f22  => turb % f22
-  zeta => turb % zeta
   vis  => turb % vis
-  t2   => turb % t2
+  u_mean => turb % u_mean
+  v_mean => turb % v_mean
+  w_mean => turb % w_mean
+  call Field_Mod_Alias_Momentum   (flow, u, v, w)
+  call Field_Mod_Alias_Energy     (flow, t)
+  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
+  call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
+  call Turb_Mod_Alias_T2          (turb, t2)
 
   area  = 0.0
   if (this_proc < 2) print *, '# Grid material: ', grid % material % name
@@ -237,9 +238,9 @@
       do c = 1, grid % n_cells
 
         if(turbulence_statistics) then
-          u % mean(c) = 0.0
-          v % mean(c) = 0.0
-          w % mean(c) = 0.0
+          u_mean(c) = 0.0
+          v_mean(c) = 0.0
+          w_mean(c) = 0.0
         end if
 
         vals(0) = u_def;  u % n(c) = vals(Key_Ind('U', keys, nks))

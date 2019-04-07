@@ -19,9 +19,7 @@
   flow => turb % pnt_flow
   grid => flow % pnt_grid
   vis  => turb % vis
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
+  call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   if(turbulence_model .eq. DES_SPALART) then
     do c = 1, grid % n_cells

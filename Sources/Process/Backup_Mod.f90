@@ -35,7 +35,6 @@
   include 'Backup_Mod/Read_Real_Array.f90'
   include 'Backup_Mod/Read_Swarm.f90'
   include 'Backup_Mod/Read_Variable.f90'
-  include 'Backup_Mod/Read_Variable_Mean.f90'
   include 'Backup_Mod/Save.f90'
   include 'Backup_Mod/Write_Bnd.f90'
   include 'Backup_Mod/Write_Cell_Bnd.f90'
@@ -48,6 +47,5 @@
   include 'Backup_Mod/Write_Real_Array.f90'
   include 'Backup_Mod/Write_Swarm.f90'
   include 'Backup_Mod/Write_Variable.f90'
-  include 'Backup_Mod/Write_Variable_Mean.f90'
 
   end module

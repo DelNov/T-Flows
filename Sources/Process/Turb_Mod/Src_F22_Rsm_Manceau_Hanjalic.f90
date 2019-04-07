@@ -50,8 +50,7 @@
   flow => turb % pnt_flow
   grid => flow % pnt_grid
   f22  => turb % f22
-  a    => sol % a
-  b    => sol % b % val
+  call Solver_Mod_Alias_System(sol, a, b)
 
   call Time_And_Length_Scale(grid, turb)
 

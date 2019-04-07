@@ -4,7 +4,7 @@
 !   Calculate mass flow rate at cell faces based on velocities only.           !
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod,  only: Grid_Type
-  use Field_Mod, only: Field_Type, density
+  use Field_Mod, only: Field_Type, Field_Mod_Alias_Momentum, density
   use Var_Mod,   only: Var_Type
 !------------------------------------------------------------------------------!
   implicit none
@@ -21,9 +21,7 @@
   ! Take aliases
   grid => flow % pnt_grid
   flux => flow % flux
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
+  call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   !-------------------------------------------------!
   !   Calculate the mass fluxes on the cell faces   !

@@ -22,8 +22,7 @@
   flow => turb % pnt_flow
   grid => flow % pnt_grid
   vis  => turb % vis
-  a    => sol % a
-  b    => sol % b % val
+  call Solver_Mod_Alias_System(sol, a, b)
 
   if(turbulence_model .eq. SPALART_ALLMARAS) then
 
@@ -35,7 +34,8 @@
       x_rat  = vis % n(c)/viscosity
       f_v1   = x_rat**3/(x_rat**3 + c_v1**3)
       f_v2   = 1.0 - x_rat/(1.0 + x_rat*f_v1)
-      ss     = vort(c) + vis % n(c)*f_v2/(kappa**2*grid % wall_dist(c)**2)
+      ss     = flow % vort(c)   &
+             + vis % n(c) * f_v2 / (kappa**2 * grid % wall_dist(c)**2)
       prod_v = c_b1 * density * ss * vis % n(c)
       b(c)   = b(c) + prod_v * grid % vol(c)
 
@@ -70,7 +70,7 @@
       x_rat  = vis % n(c)/viscosity
       f_v1   = x_rat**3/(x_rat**3 + c_v1**3)
       f_v2   = 1.0 - x_rat/(1.0 + x_rat*f_v1)
-      ss     = vort(c) + vis % n(c)*f_v2/(kappa**2*dist**2)
+      ss     = flow % vort(c) + vis % n(c) * f_v2 / (kappa**2 * dist**2)
       prod_v = c_b1 * density * ss * vis % n(c)
       b(c)   = b(c) + prod_v * grid % vol(c)
 

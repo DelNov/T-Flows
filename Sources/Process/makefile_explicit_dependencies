@@ -34,8 +34,8 @@ $(DIR_OBJECT)/Initialize_Variables.o:\
 User_Mod_Vtu.f90 \
 User_Mod/*.f90 \
 User_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Les_Mod.o \
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
@@ -60,7 +60,6 @@ $(DIR_OBJECT)/Numerics_Mod.o \
 Numerics_Mod/*.f90 \
 $(DIR_OBJECT)/Matrix_Mod.o \
 Matrix_Mod/*.f90 \
-$(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Info_Mod.o \
 Info_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
@@ -78,8 +77,8 @@ Bulk_Mod/*.f90
 
 #-- ./Calculate_Shear_And_Vorticity.f90
 $(DIR_OBJECT)/Calculate_Shear_And_Vorticity.o:\
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Les_Mod.o \
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Grad_Mod.o \
@@ -92,7 +91,8 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 
 #-- ./Load_Physical_Properties.f90
 $(DIR_OBJECT)/Load_Physical_Properties.o:\
-$(DIR_OBJECT)/Rans_Mod.o \
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
@@ -125,6 +125,32 @@ $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
 
+#-- ./Turb_Mod.f90
+$(DIR_OBJECT)/Turb_Mod.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*.f90 \
+$(DIR_OBJECT)/Var_Mod.o \
+Var_Mod/*.f90 \
+Turb_Mod/*.f90 \
+$(DIR_OBJECT)/Solver_Mod.o \
+Solver_Mod/*.f90 \
+$(DIR_OBJECT)/Numerics_Mod.o \
+Numerics_Mod/*.f90 \
+$(DIR_OBJECT)/Matrix_Mod.o \
+Matrix_Mod/*.f90 \
+$(DIR_OBJECT)/Info_Mod.o \
+Info_Mod/*.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Grad_Mod.o \
+Grad_Mod/*.f90 \
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o \
+$(DIR_SHARED)/Comm_Mod_Seq.f90 \
+$(DIR_SHARED)/Comm_Mod_Par.f90 \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 
+
 #-- ./Numerics_Mod/Advection_Scheme_Code.f90
 #-- ./Numerics_Mod/Advection_Min_Max.f90
 #-- ./Numerics_Mod/Advection_Term.f90
@@ -134,7 +160,8 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 #-- ./Numerics_Mod/Inertial_Term.f90
 #-- ./Update_Boundary_Values.f90
 $(DIR_OBJECT)/Update_Boundary_Values.o:\
-$(DIR_OBJECT)/Rans_Mod.o \
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
@@ -153,14 +180,14 @@ Var_Mod/*.f90 \
 User_Mod_Vtu.f90 \
 User_Mod/*.f90 \
 User_Mod_Cgns.f90 \
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
 $(DIR_OBJECT)/Solver_Mod.o \
 Solver_Mod/*.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Numerics_Mod.o \
 Numerics_Mod/*.f90 \
 $(DIR_OBJECT)/Matrix_Mod.o \
 Matrix_Mod/*.f90 \
-$(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Info_Mod.o \
 Info_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
@@ -217,9 +244,10 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 
 #-- ./Read_Control_Physical.f90
 $(DIR_OBJECT)/Read_Control_Physical.o:\
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
 $(DIR_OBJECT)/Swarm_Mod.o \
 Swarm_Mod/*.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Field_Mod.o \
 Field_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
@@ -238,9 +266,10 @@ $(DIR_SHARED)/Work_Mod/*.f90 \
 User_Mod_Vtu.f90 \
 User_Mod/*.f90 \
 User_Mod_Cgns.f90 \
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
 $(DIR_OBJECT)/Tokenizer_Mod.o \
 $(DIR_SHARED)/Tokenizer_Mod/*.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
@@ -255,8 +284,10 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 
 #-- ./Save_Cgns_Results_Void.f90
 $(DIR_OBJECT)/Save_Cgns_Results_Void.o:\
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -275,6 +306,8 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 #-- ./Info_Mod/Iter_Start.f90
 #-- ./Info_Mod/Bulk_Fill.f90
 #-- ./Field_Mod/Allocate.f90
+#-- ./Field_Mod/Alias_Momentum.f90
+#-- ./Field_Mod/Alias_Energy.f90
 #-- ./Bulk_Mod/Monitoring_Planes_Areas.f90
 $(DIR_OBJECT)/Monitoring_Planes_Areas.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
@@ -387,6 +420,7 @@ $(DIR_OBJECT)/Similar_Warning.o:
 #-- ./Control_Mod/Physics/Swarm_Diameter.f90
 #-- ./Control_Mod/Physics/Number_Of_Species.f90
 #-- ./Control_Mod/Physics/Rough_Walls.f90
+#-- ./Control_Mod/Physics/Volume_Expansion_Coefficient.f90
 #-- ./Control_Mod/Physics/Turbulent_Schmidt_Number.f90
 #-- ./Control_Mod/Physics/Reference_Temperature.f90
 #-- ./Control_Mod/Physics/Number_Of_Scalars.f90
@@ -400,7 +434,8 @@ $(DIR_OBJECT)/Similar_Warning.o:
 $(DIR_OBJECT)/Swarm_Mod.o:\
 $(DIR_OBJECT)/Var_Mod.o \
 Var_Mod/*.f90 \
-$(DIR_OBJECT)/Turbulence_Mod.o \
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
 Swarm_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
@@ -435,7 +470,6 @@ User_Mod/*.f90 \
 User_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Tokenizer_Mod.o \
 $(DIR_SHARED)/Tokenizer_Mod/*.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
@@ -484,9 +518,10 @@ $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_OBJECT)/Var_Mod.o \
 Var_Mod/*.f90 \
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
 $(DIR_OBJECT)/Swarm_Mod.o \
 Swarm_Mod/*.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
@@ -513,9 +548,10 @@ Var_Mod/*.f90 \
 User_Mod_Vtu.f90 \
 User_Mod/*.f90 \
 User_Mod_Cgns.f90 \
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
 $(DIR_OBJECT)/Solver_Mod.o \
 Solver_Mod/*.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Numerics_Mod.o \
 Numerics_Mod/*.f90 \
 $(DIR_OBJECT)/Matrix_Mod.o \
@@ -537,7 +573,8 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 
 #-- ./Convective_Outflow.f90
 $(DIR_OBJECT)/Convective_Outflow.o:\
-$(DIR_OBJECT)/Rans_Mod.o \
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Grad_Mod.o \
@@ -554,8 +591,8 @@ Bulk_Mod/*.f90
 $(DIR_OBJECT)/Read_Control_Numerical.o:\
 $(DIR_OBJECT)/Var_Mod.o \
 Var_Mod/*.f90 \
-$(DIR_OBJECT)/Turbulence_Mod.o \
-$(DIR_OBJECT)/Rans_Mod.o \
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
 $(DIR_OBJECT)/Numerics_Mod.o \
 Numerics_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
@@ -573,17 +610,18 @@ Control_Mod/*/*.f90
 #-- ./Swarm_Mod/Find_Nearest_Node.f90
 #-- ./Backup_Mod/Write_Cell.f90
 #-- ./Backup_Mod/Write_Bnd.f90
+#-- ./Backup_Mod/Write_Log_Array.f90
 #-- ./Backup_Mod/Read_Int.f90
 #-- ./Backup_Mod/Read_Int_Array.f90
 #-- ./Backup_Mod/Write_Int.f90
 #-- ./Backup_Mod/Write_Swarm.f90
 #-- ./Backup_Mod/Write_Cell_Bnd.f90
-#-- ./Backup_Mod/Write_Variable_Mean.f90
 #-- ./Backup_Mod/Load.f90
 #-- ./Backup_Mod/Write_Int_Array.f90
 #-- ./Backup_Mod/Read_Variable.f90
 #-- ./Backup_Mod/Write_Variable.f90
 #-- ./Backup_Mod/Save.f90
+#-- ./Backup_Mod/Read_Log_Array.f90
 #-- ./Backup_Mod/Read_Swarm.f90
 #-- ./Backup_Mod/Read_Real.f90
 #-- ./Backup_Mod/Write_Real_Array.f90
@@ -602,7 +640,6 @@ $(DIR_OBJECT)/Read_Face.o:\
 $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 
 
-#-- ./Backup_Mod/Read_Variable_Mean.f90
 #-- ./Load_Boundary_Conditions.f90
 $(DIR_OBJECT)/Load_Boundary_Conditions.o:\
 $(DIR_OBJECT)/Var_Mod.o \
@@ -610,9 +647,10 @@ Var_Mod/*.f90 \
 User_Mod_Vtu.f90 \
 User_Mod/*.f90 \
 User_Mod_Cgns.f90 \
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
 $(DIR_OBJECT)/Tokenizer_Mod.o \
 $(DIR_SHARED)/Tokenizer_Mod/*.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
@@ -626,8 +664,8 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 
 #-- ./Calculate_Vorticity.f90
 $(DIR_OBJECT)/Calculate_Vorticity.o:\
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Les_Mod.o \
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Grad_Mod.o \
@@ -709,13 +747,13 @@ Var_Mod/*.f90 \
 User_Mod_Vtu.f90 \
 User_Mod/*.f90 \
 User_Mod_Cgns.f90 \
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
 $(DIR_OBJECT)/Solver_Mod.o \
 Solver_Mod/*.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Monitor_Mod.o \
 Monitor_Mod/*.f90 \
-$(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Info_Mod.o \
 Info_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
@@ -775,6 +813,7 @@ $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 
 
 #-- ./Solver_Mod/Create.f90
+#-- ./Solver_Mod/Alias_System.f90
 #-- ./Solver_Mod/Root_Mean_Square.f90
 #-- ./Solver_Mod/Residual_Vector.f90
 #-- ./Solver_Mod/Prec_Solve.f90
@@ -827,11 +866,9 @@ User_Mod/*.f90 \
 User_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Swarm_Mod.o \
 Swarm_Mod/*.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Matrix_Mod.o \
 Matrix_Mod/*.f90 \
-$(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
@@ -865,13 +902,13 @@ Var_Mod/*.f90 \
 User_Mod_Vtu.f90 \
 User_Mod/*.f90 \
 User_Mod_Cgns.f90 \
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
 $(DIR_OBJECT)/Swarm_Mod.o \
 Swarm_Mod/*.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Name_Mod.o \
 $(DIR_OBJECT)/Matrix_Mod.o \
 Matrix_Mod/*.f90 \
-$(DIR_OBJECT)/Les_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
@@ -904,529 +941,6 @@ $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
 
-#-- ./Turbulence/Source_Vis_Spalart_Almaras.f90
-$(DIR_OBJECT)/Source_Vis_Spalart_Almaras.o:\
-$(DIR_OBJECT)/Solver_Mod.o \
-Solver_Mod/*.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Matrix_Mod.o \
-Matrix_Mod/*.f90 \
-$(DIR_OBJECT)/Les_Mod.o \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 
-
-#-- ./Turbulence/Source_Zeta_K_Eps_Zeta_F.f90
-$(DIR_OBJECT)/Source_Zeta_K_Eps_Zeta_F.o:\
-$(DIR_OBJECT)/Solver_Mod.o \
-Solver_Mod/*.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Matrix_Mod.o \
-Matrix_Mod/*.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
-
-#-- ./Turbulence/Calculate_Sgs_Dynamic.f90
-$(DIR_OBJECT)/Calculate_Sgs_Dynamic.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 \
-$(DIR_OBJECT)/Solver_Mod.o \
-Solver_Mod/*.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Matrix_Mod.o \
-Matrix_Mod/*.f90 \
-$(DIR_OBJECT)/Les_Mod.o \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Grad_Mod.o \
-Grad_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Turbulence/Turbulent_Prandtl_Number.f90
-$(DIR_OBJECT)/Turbulent_Prandtl_Number.o:\
-$(DIR_OBJECT)/Turbulence_Mod.o \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
-
-#-- ./Turbulence/Calculate_Sgs.f90
-$(DIR_OBJECT)/Calculate_Sgs.o:\
-$(DIR_OBJECT)/Les_Mod.o \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Grad_Mod.o \
-Grad_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Turbulence/Calculate_Mean.f90
-$(DIR_OBJECT)/Calculate_Mean.o:\
-$(DIR_OBJECT)/Var_Mod.o \
-Var_Mod/*.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Les_Mod.o \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
-
-#-- ./Turbulence/Constants_Spalart_Allmaras.f90
-$(DIR_OBJECT)/Constants_Spalart_Allmaras.o:\
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Control_Mod.o \
-Control_Mod/*/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
-
-#-- ./Turbulence/Source_Eps_K_Eps_Zeta_F.f90
-$(DIR_OBJECT)/Source_Eps_K_Eps_Zeta_F.o:\
-$(DIR_OBJECT)/Solver_Mod.o \
-Solver_Mod/*.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Matrix_Mod.o \
-Matrix_Mod/*.f90 \
-$(DIR_OBJECT)/Les_Mod.o \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
-
-#-- ./Turbulence/Rans_Mod.f90
-$(DIR_OBJECT)/Rans_Mod.o:\
-$(DIR_OBJECT)/Var_Mod.o \
-Var_Mod/*.f90 \
-$(DIR_OBJECT)/Turbulence_Mod.o 
-
-#-- ./Turbulence/Source_F22_K_Eps_Zeta_F.f90
-$(DIR_OBJECT)/Source_F22_K_Eps_Zeta_F.o:\
-$(DIR_OBJECT)/Solver_Mod.o \
-Solver_Mod/*.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Matrix_Mod.o \
-Matrix_Mod/*.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
-
-#-- ./Turbulence/Sources_Rsm_Manceau_Hanjalic.f90
-$(DIR_OBJECT)/Sources_Rsm_Manceau_Hanjalic.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 \
-$(DIR_OBJECT)/Solver_Mod.o \
-Solver_Mod/*.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Matrix_Mod.o \
-Matrix_Mod/*.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Grad_Mod.o \
-Grad_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
-
-#-- ./Turbulence/Calculate_Vis_T_Spalart_Allmaras.f90
-$(DIR_OBJECT)/Calculate_Vis_T_Spalart_Allmaras.o:\
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Les_Mod.o \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
-$(DIR_OBJECT)/Control_Mod.o \
-Control_Mod/*/*.f90 \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Turbulence/Constants_Manceau_Hanjalic.f90
-$(DIR_OBJECT)/Constants_Manceau_Hanjalic.o:\
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Control_Mod.o \
-Control_Mod/*/*.f90 
-
-#-- ./Turbulence/U_Plus_Log_Law.f90
-$(DIR_OBJECT)/U_Plus_Log_Law.o:\
-$(DIR_OBJECT)/Rans_Mod.o 
-
-#-- ./Turbulence/Calculate_Vis_T_K_Eps_Zeta_F.f90
-$(DIR_OBJECT)/Calculate_Vis_T_K_Eps_Zeta_F.o:\
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Les_Mod.o \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
-$(DIR_OBJECT)/Control_Mod.o \
-Control_Mod/*/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Turbulence/Compute_F22.f90
-$(DIR_OBJECT)/Compute_F22.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 \
-$(DIR_OBJECT)/Var_Mod.o \
-Var_Mod/*.f90 \
-$(DIR_OBJECT)/Solver_Mod.o \
-Solver_Mod/*.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Numerics_Mod.o \
-Numerics_Mod/*.f90 \
-$(DIR_OBJECT)/Matrix_Mod.o \
-Matrix_Mod/*.f90 \
-$(DIR_OBJECT)/Les_Mod.o \
-$(DIR_OBJECT)/Info_Mod.o \
-Info_Mod/*.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Grad_Mod.o \
-Grad_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Turbulence/Source_Kin_K_Eps.f90
-$(DIR_OBJECT)/Source_Kin_K_Eps.o:\
-$(DIR_OBJECT)/Solver_Mod.o \
-Solver_Mod/*.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Matrix_Mod.o \
-Matrix_Mod/*.f90 \
-$(DIR_OBJECT)/Les_Mod.o \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Grad_Mod.o \
-Grad_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Turbulence/Les_Mod.f90
-$(DIR_OBJECT)/Les_Mod.o:\
-$(DIR_OBJECT)/Var_Mod.o \
-Var_Mod/*.f90 \
-$(DIR_OBJECT)/Turbulence_Mod.o 
-
-#-- ./Turbulence/Allocate.f90
-$(DIR_OBJECT)/Allocate.o:\
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Les_Mod.o \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
-$(DIR_OBJECT)/Control_Mod.o \
-Control_Mod/*/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
-
-#-- ./Turbulence/Constants_K_Eps_Zeta_F.f90
-$(DIR_OBJECT)/Constants_K_Eps_Zeta_F.o:\
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Control_Mod.o \
-Control_Mod/*/*.f90 
-
-#-- ./Turbulence/Sources_Rsm_Hanjalic_Jakirlic.f90
-$(DIR_OBJECT)/Sources_Rsm_Hanjalic_Jakirlic.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 \
-$(DIR_OBJECT)/Solver_Mod.o \
-Solver_Mod/*.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Matrix_Mod.o \
-Matrix_Mod/*.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Grad_Mod.o \
-Grad_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
-
-#-- ./Turbulence/Y_Plus_Rough_Walls.f90
-$(DIR_OBJECT)/Y_Plus_Rough_Walls.o:\
-$(DIR_OBJECT)/Rans_Mod.o 
-
-#-- ./Turbulence/Calculate_Sgs_Wale.f90
-$(DIR_OBJECT)/Calculate_Sgs_Wale.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 \
-$(DIR_OBJECT)/Les_Mod.o \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
-
-#-- ./Turbulence/Constants_K_Eps.f90
-$(DIR_OBJECT)/Constants_K_Eps.o:\
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Control_Mod.o \
-Control_Mod/*/*.f90 
-
-#-- ./Turbulence/Source_Eps_K_Eps.f90
-$(DIR_OBJECT)/Source_Eps_K_Eps.o:\
-$(DIR_OBJECT)/Solver_Mod.o \
-Solver_Mod/*.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Matrix_Mod.o \
-Matrix_Mod/*.f90 \
-$(DIR_OBJECT)/Les_Mod.o \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Grad_Mod.o \
-Grad_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
-
-#-- ./Turbulence/Calculate_Vis_T_Rsm.f90
-$(DIR_OBJECT)/Calculate_Vis_T_Rsm.o:\
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Les_Mod.o \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
-$(DIR_OBJECT)/Control_Mod.o \
-Control_Mod/*/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Turbulence/Calculate_Deltas.f90
-$(DIR_OBJECT)/Calculate_Deltas.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 \
-$(DIR_OBJECT)/Turbulence_Mod.o \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Grad_Mod.o \
-Grad_Mod/*.f90 \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Turbulence/Find_Nearest_Wall_Cell.f90
-$(DIR_OBJECT)/Find_Nearest_Wall_Cell.o:\
-$(DIR_OBJECT)/Les_Mod.o \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Turbulence/U_Plus_Rough_Walls.f90
-$(DIR_OBJECT)/U_Plus_Rough_Walls.o:\
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Const_Mod.o 
-
-#-- ./Turbulence/Source_T2.f90
-$(DIR_OBJECT)/Source_T2.o:\
-$(DIR_OBJECT)/Solver_Mod.o \
-Solver_Mod/*.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Matrix_Mod.o \
-Matrix_Mod/*.f90 \
-$(DIR_OBJECT)/Les_Mod.o \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Grad_Mod.o \
-Grad_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Turbulence/Calculate_Heat_Flux.f90
-$(DIR_OBJECT)/Calculate_Heat_Flux.o:\
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Grad_Mod.o \
-Grad_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
-$(DIR_OBJECT)/Control_Mod.o \
-Control_Mod/*/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
-
-#-- ./Turbulence/Turbulence_Mod.f90
-$(DIR_OBJECT)/Turbulence_Mod.o:\
-$(DIR_OBJECT)/Var_Mod.o \
-Var_Mod/*.f90 
-
-#-- ./Turbulence/Source_F22_Rsm_Manceau_Hanjalic.f90
-$(DIR_OBJECT)/Source_F22_Rsm_Manceau_Hanjalic.o:\
-$(DIR_OBJECT)/Solver_Mod.o \
-Solver_Mod/*.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Matrix_Mod.o \
-Matrix_Mod/*.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 
-
-#-- ./Turbulence/Time_And_Length_Scale.f90
-$(DIR_OBJECT)/Time_And_Length_Scale.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Les_Mod.o \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
-$(DIR_OBJECT)/Control_Mod.o \
-Control_Mod/*/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
-
-#-- ./Turbulence/Constants_Reynolds_Stress.f90
-$(DIR_OBJECT)/Constants_Reynolds_Stress.o:\
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Control_Mod.o \
-Control_Mod/*/*.f90 
-
-#-- ./Turbulence/Calculate_Sgs_Hybrid.f90
-$(DIR_OBJECT)/Calculate_Sgs_Hybrid.o:\
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Les_Mod.o \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Turbulence/Source_Kin_K_Eps_Zeta_F.f90
-$(DIR_OBJECT)/Source_Kin_K_Eps_Zeta_F.o:\
-$(DIR_OBJECT)/Solver_Mod.o \
-Solver_Mod/*.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Matrix_Mod.o \
-Matrix_Mod/*.f90 \
-$(DIR_OBJECT)/Les_Mod.o \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
-
-#-- ./Turbulence/Compute_Turbulent.f90
-$(DIR_OBJECT)/Compute_Turbulent.o:\
-$(DIR_OBJECT)/Var_Mod.o \
-Var_Mod/*.f90 \
-$(DIR_OBJECT)/Solver_Mod.o \
-Solver_Mod/*.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Numerics_Mod.o \
-Numerics_Mod/*.f90 \
-$(DIR_OBJECT)/Matrix_Mod.o \
-Matrix_Mod/*.f90 \
-$(DIR_OBJECT)/Les_Mod.o \
-$(DIR_OBJECT)/Info_Mod.o \
-Info_Mod/*.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Grad_Mod.o \
-Grad_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Turbulence/Roughness_Coefficient.f90
-$(DIR_OBJECT)/Roughness_Coefficient.o:\
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
-
-#-- ./Turbulence/Constants_Hanjalic_Jakirlic.f90
-$(DIR_OBJECT)/Constants_Hanjalic_Jakirlic.o:\
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Control_Mod.o \
-Control_Mod/*/*.f90 
-
-#-- ./Turbulence/Calculate_Vis_T_K_Eps.f90
-$(DIR_OBJECT)/Calculate_Vis_T_K_Eps.o:\
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Les_Mod.o \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
-$(DIR_OBJECT)/Control_Mod.o \
-Control_Mod/*/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Turbulence/Compute_Stresses.f90
-$(DIR_OBJECT)/Compute_Stresses.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 \
-$(DIR_OBJECT)/Var_Mod.o \
-Var_Mod/*.f90 \
-$(DIR_OBJECT)/Solver_Mod.o \
-Solver_Mod/*.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
-$(DIR_OBJECT)/Numerics_Mod.o \
-Numerics_Mod/*.f90 \
-$(DIR_OBJECT)/Matrix_Mod.o \
-Matrix_Mod/*.f90 \
-$(DIR_OBJECT)/Les_Mod.o \
-$(DIR_OBJECT)/Info_Mod.o \
-Info_Mod/*.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Grad_Mod.o \
-Grad_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Turbulence/Y_Plus_Low_Re.f90
-$(DIR_OBJECT)/Y_Plus_Low_Re.o:\
-$(DIR_OBJECT)/Const_Mod.o 
-
 #-- ./Bulk_Mod.f90
 $(DIR_OBJECT)/Bulk_Mod.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
@@ -1438,7 +952,6 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90 \
 Bulk_Mod/*.f90 \
 $(DIR_OBJECT)/Bnd_Cond_Mod.o 
 
-#-- ./Var_Mod/Allocate_Statistics.f90
 #-- ./Var_Mod/Bnd_Cell_Type.f90
 #-- ./Var_Mod/Allocate_Solution.f90
 #-- ./Var_Mod/Allocate_New_Only.f90
@@ -1451,6 +964,174 @@ $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
 
+#-- ./Turb_Mod/Src_Kin_K_Eps_Zeta_F.f90
+#-- ./Turb_Mod/Vis_T_K_Eps.f90
+#-- ./Turb_Mod/Turbulent_Prandtl_Number.f90
+$(DIR_OBJECT)/Turbulent_Prandtl_Number.o:\
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o 
+
+#-- ./Turb_Mod/Const_Manceau_Hanjalic.f90
+#-- ./Turb_Mod/Src_Rsm_Manceau_Hanjalic.f90
+$(DIR_OBJECT)/Src_Rsm_Manceau_Hanjalic.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*.f90 
+
+#-- ./Turb_Mod/Vis_T_K_Eps_Zeta_F.f90
+#-- ./Turb_Mod/Alias_T2.f90
+#-- ./Turb_Mod/Calculate_Mean.f90
+$(DIR_OBJECT)/Calculate_Mean.o:\
+$(DIR_OBJECT)/Var_Mod.o \
+Var_Mod/*.f90 \
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o 
+
+#-- ./Turb_Mod/Src_Zeta_K_Eps_Zeta_F.f90
+#-- ./Turb_Mod/Vis_T_Spalart_Allmaras.f90
+#-- ./Turb_Mod/Alias_Stresses.f90
+#-- ./Turb_Mod/U_Plus_Log_Law.f90
+$(DIR_OBJECT)/U_Plus_Log_Law.o:\
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 
+
+#-- ./Turb_Mod/Compute_F22.f90
+$(DIR_OBJECT)/Compute_F22.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*.f90 
+
+#-- ./Turb_Mod/Src_Vis_Spalart_Almaras.f90
+#-- ./Turb_Mod/Allocate.f90
+$(DIR_OBJECT)/Allocate.o:\
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o 
+
+#-- ./Turb_Mod/Y_Plus_Rough_Walls.f90
+$(DIR_OBJECT)/Y_Plus_Rough_Walls.o:\
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 
+
+#-- ./Turb_Mod/Alias_K_Eps_Zeta_F.f90
+#-- ./Turb_Mod/Src_Kin_K_Eps.f90
+#-- ./Turb_Mod/Alias_Heat_Fluxes.f90
+#-- ./Turb_Mod/Calculate_Deltas.f90
+$(DIR_OBJECT)/Calculate_Deltas.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*.f90 \
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Grad_Mod.o \
+Grad_Mod/*.f90 \
+$(DIR_SHARED)/Comm_Mod_Seq.f90 \
+$(DIR_SHARED)/Comm_Mod_Par.f90 \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 
+
+#-- ./Turb_Mod/Vis_T_Rsm.f90
+#-- ./Turb_Mod/Find_Nearest_Wall_Cell.f90
+$(DIR_OBJECT)/Find_Nearest_Wall_Cell.o:\
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o \
+$(DIR_SHARED)/Comm_Mod_Seq.f90 \
+$(DIR_SHARED)/Comm_Mod_Par.f90 \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 
+
+#-- ./Turb_Mod/U_Plus_Rough_Walls.f90
+$(DIR_OBJECT)/U_Plus_Rough_Walls.o:\
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o 
+
+#-- ./Turb_Mod/Calculate_Heat_Flux.f90
+$(DIR_OBJECT)/Calculate_Heat_Flux.o:\
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Grad_Mod.o \
+Grad_Mod/*.f90 \
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
+$(DIR_OBJECT)/Control_Mod.o \
+Control_Mod/*/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o 
+
+#-- ./Turb_Mod/Const_K_Eps.f90
+#-- ./Turb_Mod/Src_T2.f90
+#-- ./Turb_Mod/Alias_K_Eps.f90
+#-- ./Turb_Mod/Vis_T_Dynamic.f90
+$(DIR_OBJECT)/Vis_T_Dynamic.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*.f90 
+
+#-- ./Turb_Mod/Time_And_Length_Scale.f90
+$(DIR_OBJECT)/Time_And_Length_Scale.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*.f90 \
+$(DIR_OBJECT)/Var_Mod.o \
+Var_Mod/*.f90 \
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o 
+
+#-- ./Turb_Mod/Src_Eps_K_Eps_Zeta_F.f90
+#-- ./Turb_Mod/Src_Eps_K_Eps.f90
+#-- ./Turb_Mod/Compute_Turbulent.f90
+#-- ./Turb_Mod/Src_F22_K_Eps_Zeta_F.f90
+#-- ./Turb_Mod/Src_F22_Rsm_Manceau_Hanjalic.f90
+#-- ./Turb_Mod/Const_Hanjalic_Jakirlic.f90
+#-- ./Turb_Mod/Src_Rsm_Hanjalic_Jakirlic.f90
+$(DIR_OBJECT)/Src_Rsm_Hanjalic_Jakirlic.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*.f90 
+
+#-- ./Turb_Mod/Vis_T_Smagorinsky.f90
+#-- ./Turb_Mod/Vis_T_Wale.f90
+$(DIR_OBJECT)/Vis_T_Wale.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*.f90 
+
+#-- ./Turb_Mod/Roughness_Coefficient.f90
+$(DIR_OBJECT)/Roughness_Coefficient.o:\
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o 
+
+#-- ./Turb_Mod/Const_Spalart_Allmaras.f90
+#-- ./Turb_Mod/Const_K_Eps_Zeta_F.f90
+#-- ./Turb_Mod/Vis_T_Hybrid.f90
+#-- ./Turb_Mod/Compute_Stresses.f90
+$(DIR_OBJECT)/Compute_Stresses.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*.f90 
+
+#-- ./Turb_Mod/Const_Reynolds_Stress.f90
+#-- ./Turb_Mod/Y_Plus_Low_Re.f90
+$(DIR_OBJECT)/Y_Plus_Low_Re.o:\
+$(DIR_OBJECT)/Const_Mod.o 
+
 #-- ./Compute_Energy.f90
 $(DIR_OBJECT)/Compute_Energy.o:\
 $(DIR_OBJECT)/Var_Mod.o \
@@ -1458,9 +1139,10 @@ Var_Mod/*.f90 \
 User_Mod_Vtu.f90 \
 User_Mod/*.f90 \
 User_Mod_Cgns.f90 \
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
 $(DIR_OBJECT)/Solver_Mod.o \
 Solver_Mod/*.f90 \
-$(DIR_OBJECT)/Rans_Mod.o \
 $(DIR_OBJECT)/Numerics_Mod.o \
 Numerics_Mod/*.f90 \
 $(DIR_OBJECT)/Matrix_Mod.o \
@@ -1867,6 +1549,7 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 #-- ./Comm_Mod/Sequential/Global_Sum_Int_Array.f90
 #-- ./Comm_Mod/Sequential/Global_Sum_Int.f90
 #-- ./Comm_Mod/Sequential/Set_Buffer_Color.f90
+#-- ./Comm_Mod/Sequential/Write_Log_Array.f90
 #-- ./Comm_Mod/Sequential/Read_Int.f90
 #-- ./Comm_Mod/Sequential/Read_Int_Array.f90
 #-- ./Comm_Mod/Sequential/Write_Int.f90
@@ -1883,6 +1566,7 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 #-- ./Comm_Mod/Sequential/Create_New_Types.f90
 #-- ./Comm_Mod/Sequential/Create_Buffers.f90
 #-- ./Comm_Mod/Sequential/Wait.f90
+#-- ./Comm_Mod/Sequential/Read_Log_Array.f90
 #-- ./Comm_Mod/Sequential/Open_File_Write.f90
 #-- ./Comm_Mod/Sequential/End.f90
 #-- ./Comm_Mod/Sequential/Global_Sum_Real.f90
@@ -1906,6 +1590,7 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 #-- ./Comm_Mod/Parallel/Global_Sum_Int_Array.f90
 #-- ./Comm_Mod/Parallel/Global_Sum_Int.f90
 #-- ./Comm_Mod/Parallel/Set_Buffer_Color.f90
+#-- ./Comm_Mod/Parallel/Write_Log_Array.f90
 #-- ./Comm_Mod/Parallel/Read_Int.f90
 #-- ./Comm_Mod/Parallel/Read_Int_Array.f90
 #-- ./Comm_Mod/Parallel/Write_Int.f90
@@ -1918,6 +1603,7 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 #-- ./Comm_Mod/Parallel/Create_New_Types.f90
 #-- ./Comm_Mod/Parallel/Create_Buffers.f90
 #-- ./Comm_Mod/Parallel/Wait.f90
+#-- ./Comm_Mod/Parallel/Read_Log_Array.f90
 #-- ./Comm_Mod/Parallel/Open_File_Write.f90
 #-- ./Comm_Mod/Parallel/End.f90
 #-- ./Comm_Mod/Parallel/Global_Sum_Real.f90

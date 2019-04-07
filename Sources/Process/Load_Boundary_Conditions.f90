@@ -26,6 +26,7 @@
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: u, v, w, t, p
   type(Var_Type),  pointer :: kin, eps, f22, zeta, vis, t2
+  type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   type(Var_Type),  pointer :: scalar(:)
   integer                  :: c, m, l, k, i, n, n_points, nks, nvs, sc, c1, c2, s
   character(len=80)        :: name_prof(128), answer, name_in
@@ -45,18 +46,14 @@
 
   ! Take aliases
   grid   => flow % pnt_grid
-  u      => flow % u
-  v      => flow % v
-  w      => flow % w
   t      => flow % t
   p      => flow % p
   scalar => flow % scalar
-  kin    => turb % kin
-  eps    => turb % eps
-  f22    => turb % f22
-  zeta   => turb % zeta
   vis    => turb % vis
   t2     => turb % t2
+  call Field_Mod_Alias_Momentum   (flow, u, v, w)
+  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
+  call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
 
   !--------------------------------------------!
   !   Full name is specified in control file   !

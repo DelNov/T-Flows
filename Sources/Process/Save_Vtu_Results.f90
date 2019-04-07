@@ -14,16 +14,16 @@
   use Control_Mod
   use User_Mod
   use Work_Mod,      only: v2_calc   => r_cell_01,  &
-                           uu_mean   => r_cell_02,  &
-                           vv_mean   => r_cell_03,  &
-                           ww_mean   => r_cell_04,  &
-                           uv_mean   => r_cell_05,  &
-                           uw_mean   => r_cell_06,  &
-                           vw_mean   => r_cell_07,  &
-                           tt_mean   => r_cell_08,  &
-                           ut_mean   => r_cell_09,  &
-                           vt_mean   => r_cell_10,  &
-                           wt_mean   => r_cell_11,  &
+                           uu_save   => r_cell_02,  &
+                           vv_save   => r_cell_03,  &
+                           ww_save   => r_cell_04,  &
+                           uv_save   => r_cell_05,  &
+                           uw_save   => r_cell_06,  &
+                           vw_save   => r_cell_07,  &
+                           t2_save   => r_cell_08,  &
+                           ut_save   => r_cell_09,  &
+                           vt_save   => r_cell_10,  &
+                           wt_save   => r_cell_11,  &
                            kin_vis_t => r_cell_12
 !------------------------------------------------------------------------------!
   implicit none
@@ -280,7 +280,7 @@
      turbulence_model .eq. SPALART_ALLMARAS) then
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentViscosity",  &
                                            turb % vis % n(1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "VorticityMagnitude", vort(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "VorticityMagnitude", flow % vort(1))
   end if
   if(turbulence_model .ne. NONE) then
     kin_vis_t(1:grid % n_cells) = vis_t(1:grid % n_cells)/viscosity
@@ -291,12 +291,12 @@
   ! Reynolds stress models
   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
      turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressXX", uu % n(1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressYY", vv % n(1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressZZ", ww % n(1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressXY", uv % n(1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressXZ", uw % n(1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressYZ", vw % n(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressXX", turb % uu % n(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressYY", turb % vv % n(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressZZ", turb % ww % n(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressXY", turb % uv % n(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressXZ", turb % uw % n(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressYZ", turb % vw % n(1))
   end if
 
   ! Statistics for large-scale simulations of turbulence
@@ -307,37 +307,37 @@
      turbulence_model .eq. DES_SPALART     .or.  &
      turbulence_model .eq. HYBRID_LES_RANS) then
     call Save_Vtu_Vector(grid, IN_4, IN_5, "MeanVelocity",  &
-                                           flow % u % mean(1),  &
-                                           flow % v % mean(1),  &
-                                           flow % w % mean(1))
+                                           turb % u_mean(1),  &
+                                           turb % v_mean(1),  &
+                                           turb % w_mean(1))
     do c = 1, grid % n_cells
-      uu_mean(c) = uu % mean(c) - flow % u % mean(c) * flow % u % mean(c)
-      vv_mean(c) = vv % mean(c) - flow % v % mean(c) * flow % v % mean(c)
-      ww_mean(c) = ww % mean(c) - flow % w % mean(c) * flow % w % mean(c)
-      uv_mean(c) = uv % mean(c) - flow % u % mean(c) * flow % v % mean(c)
-      uw_mean(c) = uw % mean(c) - flow % u % mean(c) * flow % w % mean(c)
-      vw_mean(c) = vw % mean(c) - flow % v % mean(c) * flow % w % mean(c)
+      uu_save(c) = turb % uu_res(c) - turb % u_mean(c) * turb % u_mean(c)
+      vv_save(c) = turb % vv_res(c) - turb % v_mean(c) * turb % v_mean(c)
+      ww_save(c) = turb % ww_res(c) - turb % w_mean(c) * turb % w_mean(c)
+      uv_save(c) = turb % uv_res(c) - turb % u_mean(c) * turb % v_mean(c)
+      uw_save(c) = turb % uw_res(c) - turb % u_mean(c) * turb % w_mean(c)
+      vw_save(c) = turb % vw_res(c) - turb % v_mean(c) * turb % w_mean(c)
     end do
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressXX", uu_mean(1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressYY", vv_mean(1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressZZ", ww_mean(1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressXY", uv_mean(1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressXZ", uw_mean(1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressYZ", vw_mean(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressXX", uu_save(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressYY", vv_save(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressZZ", ww_save(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressXY", uv_save(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressXZ", uw_save(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "ReynoldsStressYZ", vw_save(1))
     if(heat_transfer) then
       call Save_Vtu_Scalar(grid, IN_4, IN_5, "TemperatureMean",  &
-                                             flow % t % mean(1))
+                                             turb % t_mean(1))
       do c = 1, grid % n_cells
-        tt_mean(c) = tt % mean(c) - flow % t % mean(c) * flow % t % mean(c)
-        ut_mean(c) = ut % mean(c) - flow % u % mean(c) * flow % t % mean(c)
-        vt_mean(c) = vt % mean(c) - flow % v % mean(c) * flow % t % mean(c)
-        wt_mean(c) = wt % mean(c) - flow % w % mean(c) * flow % t % mean(c)
+        t2_save(c) = turb % t2_res(c) - turb % t_mean(c) * turb % t_mean(c)
+        ut_save(c) = turb % ut_res(c) - turb % u_mean(c) * turb % t_mean(c)
+        vt_save(c) = turb % vt_res(c) - turb % v_mean(c) * turb % t_mean(c)
+        wt_save(c) = turb % wt_res(c) - turb % w_mean(c) * turb % t_mean(c)
       end do
       call Save_Vtu_Scalar(grid, IN_4, IN_5, "TemperatureFluctuations",  &
-                                 tt_mean(1))
-      call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxX", ut_mean(1))
-      call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxY", vt_mean(1))
-      call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxZ", wt_mean(1))
+                                 t2_save(1))
+      call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxX", ut_save(1))
+      call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxY", vt_save(1))
+      call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxZ", wt_save(1))
     end if
   end if
 

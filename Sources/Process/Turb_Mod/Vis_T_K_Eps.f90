@@ -53,11 +53,8 @@
   ! Take aliases
   flow => turb % pnt_flow
   grid => flow % pnt_grid
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
-  kin  => turb % kin
-  eps  => turb % eps
+  call Field_Mod_Alias_Momentum(flow, u, v, w)
+  call Turb_Mod_Alias_K_Eps    (turb, kin, eps)
 
   ! Kinematic viscosities
   kin_vis = viscosity/density

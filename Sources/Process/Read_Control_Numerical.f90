@@ -6,8 +6,7 @@
 !----------------------------------[Modules]-----------------------------------!
   use Field_Mod,    only: Field_Type, heat_transfer
   use Var_Mod,      only: Var_Type
-  use Turb_Mod,     only: Turb_Type,                &
-                          uu, vv, ww, uv, uw, vw
+  use Turb_Mod,     only: Turb_Type
   use Control_Mod
   use Numerics_Mod
 !------------------------------------------------------------------------------!
@@ -16,13 +15,10 @@
   type(Field_Type), target :: flow
   type(Turb_Type),  target :: turb
 !----------------------------------[Locals]------------------------------------!
-  type(Var_Type),   pointer :: t, tq, ui, phi
+  type(Var_Type),   pointer :: tq, ui, phi
   character(len=80)         :: name
   integer                   :: i, sc
 !==============================================================================!
-
-  ! Take aliases
-  t  => flow % t
 
   !-------------------------!
   !   Related to momentum   !
@@ -57,17 +53,17 @@
   !   Related to heat transfer   !
   !------------------------------!
   if(heat_transfer) then
-    t % urf   = 0.7
-    t % niter = 5
-    call Control_Mod_Advection_Scheme_For_Energy             (name)
-    t % adv_scheme = Numerics_Mod_Advection_Scheme_Code      (name)
-    call Control_Mod_Time_Integration_Scheme                 (name)
-    t % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
-    call Control_Mod_Blending_Coefficient_For_Energy         (t % blend)
-    call Control_Mod_Simple_Underrelaxation_For_Energy       (t % urf)
-    call Control_Mod_Tolerance_For_Energy_Solver             (t % tol)
-    call Control_Mod_Preconditioner_For_System_Matrix        (t % precond)
-    call Control_Mod_Max_Iterations_For_Energy_Solver        (t % niter)
+    flow % t % urf   = 0.7
+    flow % t % niter = 5
+    call Control_Mod_Advection_Scheme_For_Energy                    (name)
+    flow % t % adv_scheme = Numerics_Mod_Advection_Scheme_Code      (name)
+    call Control_Mod_Time_Integration_Scheme                        (name)
+    flow % t % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
+    call Control_Mod_Blending_Coefficient_For_Energy     (flow % t % blend)
+    call Control_Mod_Simple_Underrelaxation_For_Energy   (flow % t % urf)
+    call Control_Mod_Tolerance_For_Energy_Solver         (flow % t % tol)
+    call Control_Mod_Preconditioner_For_System_Matrix    (flow % t % precond)
+    call Control_Mod_Max_Iterations_For_Energy_Solver    (flow % t % niter)
   end if
 
   !--------------------------------!
@@ -98,12 +94,12 @@
     if(i .eq.  4) tq => turb % f22
     if(i .eq.  5) tq => turb % vis
     if(i .eq.  6) tq => turb % t2
-    if(i .eq.  7) tq => uu
-    if(i .eq.  8) tq => vv
-    if(i .eq.  9) tq => ww
-    if(i .eq. 10) tq => uv
-    if(i .eq. 11) tq => uw
-    if(i .eq. 12) tq => vw
+    if(i .eq.  7) tq => turb % uu
+    if(i .eq.  8) tq => turb % vv
+    if(i .eq.  9) tq => turb % ww
+    if(i .eq. 10) tq => turb % uv
+    if(i .eq. 11) tq => turb % uw
+    if(i .eq. 12) tq => turb % vw
     tq % urf   = 1.0
     tq % niter = 6
     call Control_Mod_Advection_Scheme_For_Turbulence          (name)

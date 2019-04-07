@@ -233,9 +233,9 @@
       call Grad_Mod_Variable(flow % w, .true.)
 
       ! All velocity components one after another
-      call Compute_Momentum(flow, 1, sol, flow % dt, ini)
-      call Compute_Momentum(flow, 2, sol, flow % dt, ini)
-      call Compute_Momentum(flow, 3, sol, flow % dt, ini)
+      call Compute_Momentum(flow, turb, 1, sol, flow % dt, ini)
+      call Compute_Momentum(flow, turb, 2, sol, flow % dt, ini)
+      call Compute_Momentum(flow, turb, 3, sol, flow % dt, ini)
 
       ! Refresh buffers for a % sav before discretizing for pressure
       ! (Can this call be somewhere in Compute Pressure?)
@@ -251,12 +251,12 @@
 
       ! Energy (practically temperature)
       if(heat_transfer) then
-        call Compute_Energy(flow, sol, flow % dt, ini)
+        call Compute_Energy(flow, turb, sol, flow % dt, ini)
       end if
 
       ! Passive scalars
       do sc = 1, flow % n_scalars
-        call Compute_Scalar(flow, sol, flow % dt, ini, sc)
+        call Compute_Scalar(flow, turb, sol, flow % dt, ini, sc)
       end do
 
       if(turbulence_model .eq. K_EPS) then
@@ -281,7 +281,7 @@
         call Turb_Mod_Compute_Turbulent(turb, sol, ini, turb % eps, n)
 
         if(heat_transfer) then
-          call Calculate_Heat_Flux(flow)
+          call Calculate_Heat_Flux(flow, turb)
           call Turb_Mod_Compute_Turbulent(turb, sol, ini, turb % t2,  n)
         end if
 
@@ -306,13 +306,13 @@
         call Grad_Mod_Variable(flow % v, .true.)
         call Grad_Mod_Variable(flow % w, .true.)
 
-        call Turb_Mod_Compute_Stresses(turb, sol, ini, uu, n)
-        call Turb_Mod_Compute_Stresses(turb, sol, ini, vv, n)
-        call Turb_Mod_Compute_Stresses(turb, sol, ini, ww, n)
+        call Turb_Mod_Compute_Stresses(turb, sol, ini, turb % uu, n)
+        call Turb_Mod_Compute_Stresses(turb, sol, ini, turb % vv, n)
+        call Turb_Mod_Compute_Stresses(turb, sol, ini, turb % ww, n)
 
-        call Turb_Mod_Compute_Stresses(turb, sol, ini, uv, n)
-        call Turb_Mod_Compute_Stresses(turb, sol, ini, uw, n)
-        call Turb_Mod_Compute_Stresses(turb, sol, ini, vw, n)
+        call Turb_Mod_Compute_Stresses(turb, sol, ini, turb % uv, n)
+        call Turb_Mod_Compute_Stresses(turb, sol, ini, turb % uw, n)
+        call Turb_Mod_Compute_Stresses(turb, sol, ini, turb % vw, n)
 
         if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
           call Turb_Mod_Compute_F22(turb, sol, ini, turb % f22)
@@ -323,7 +323,7 @@
         call Turb_Mod_Vis_T_Rsm(turb)
 
         if(heat_transfer) then
-          call Calculate_Heat_Flux(flow)
+          call Calculate_Heat_Flux(flow, turb)
         end if
       end if
 

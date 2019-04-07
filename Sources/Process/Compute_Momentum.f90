@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Momentum(flow, i, sol, dt, ini)
+  subroutine Compute_Momentum(flow, turb, i, sol, dt, ini)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves momentum conservation equations                     !
 !------------------------------------------------------------------------------!
@@ -15,13 +15,14 @@
   use Bulk_Mod,     only: Bulk_Type
   use Info_Mod,     only: Info_Mod_Iter_Fill_At
   use Numerics_Mod
-  use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
+  use Solver_Mod,   only: Solver_Type, Solver_Mod_Alias_System, Bicg, Cg, Cgs
   use Matrix_Mod,   only: Matrix_Type
   use User_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),  target :: flow
+  type(Turb_Type),   target :: turb
   integer                   :: i           ! component
   type(Solver_Type), target :: sol
   real                      :: dt
@@ -31,6 +32,7 @@
   type(Bulk_Type),   pointer :: bulk
   type(Matrix_Type), pointer :: a
   type(Var_Type),    pointer :: ui, uj, uk, t, p
+  type(Var_Type),    pointer :: uu, vv, ww, uv, uw, vw
   real,              pointer :: flux(:)
   real,              pointer :: b(:)
   real,              pointer :: ui_i(:), ui_j(:), ui_k(:), uj_i(:), uk_i(:)
@@ -106,8 +108,8 @@
   flux => flow % flux
   t    => flow % t
   p    => flow % p
-  a    => sol % a
-  b    => sol % b % val
+  call Turb_Mod_Alias_Stresses(turb, uu, vv, ww, uv, uw, vw)
+  call Solver_Mod_Alias_System(sol, a, b)
 
   if(i .eq. 1) then
     ui   => flow % u;   uj   => flow % v;   uk   => flow % w

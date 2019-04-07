@@ -28,7 +28,7 @@
     vis_t_sgs(c) = density                &
                  * (lf*lf)                &          ! delta^2 
                  * c_dyn(c)               &          ! c_dynamic   
-                 * shear(c)
+                 * flow % shear(c)
   end do
 
   call Comm_Mod_Exchange_Real(grid, vis_t_sgs)

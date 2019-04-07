@@ -16,7 +16,7 @@
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
   character(len=80)        :: name_in, answer
-  integer                  :: fh, d, vc
+  integer                  :: fh,d,vc
 !==============================================================================!
 
   ! Take aliases
@@ -73,23 +73,23 @@
   !-----------------------------------------------!
   !   Skip three coordinates for the time being   !
   !-----------------------------------------------!
-  ! call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'x_coords', grid % xc(-nb_s:nc_s))
-  ! call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'y_coords', grid % yc(-nb_s:nc_s))
-  ! call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'z_coords', grid % zc(-nb_s:nc_s))
+  ! call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'x_coords', grid % xc(-nb_s:nc_s))
+  ! call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'y_coords', grid % yc(-nb_s:nc_s))
+  ! call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'z_coords', grid % zc(-nb_s:nc_s))
 
   ! Time step
-  call Backup_Mod_Read_Int(fh, d, vc, 'time_step', time_step)
+  call Backup_Mod_Read_Int(fh,d,vc, 'time_step', time_step)
 
   ! Bulk flows and pressure drops in each direction
-  call Backup_Mod_Read_Real(fh, d, vc, 'bulk_flux_x',   bulk % flux_x)
-  call Backup_Mod_Read_Real(fh, d, vc, 'bulk_flux_y',   bulk % flux_y)
-  call Backup_Mod_Read_Real(fh, d, vc, 'bulk_flux_z',   bulk % flux_z)
-  call Backup_Mod_Read_Real(fh, d, vc, 'bulk_flux_x_o', bulk % flux_x_o)
-  call Backup_Mod_Read_Real(fh, d, vc, 'bulk_flux_y_o', bulk % flux_y_o)
-  call Backup_Mod_Read_Real(fh, d, vc, 'bulk_flux_z_o', bulk % flux_z_o)
-  call Backup_Mod_Read_Real(fh, d, vc, 'bulk_p_drop_x', bulk % p_drop_x)
-  call Backup_Mod_Read_Real(fh, d, vc, 'bulk_p_drop_y', bulk % p_drop_y)
-  call Backup_Mod_Read_Real(fh, d, vc, 'bulk_p_drop_z', bulk % p_drop_z)
+  call Backup_Mod_Read_Real(fh,d,vc, 'bulk_flux_x',   bulk % flux_x)
+  call Backup_Mod_Read_Real(fh,d,vc, 'bulk_flux_y',   bulk % flux_y)
+  call Backup_Mod_Read_Real(fh,d,vc, 'bulk_flux_z',   bulk % flux_z)
+  call Backup_Mod_Read_Real(fh,d,vc, 'bulk_flux_x_o', bulk % flux_x_o)
+  call Backup_Mod_Read_Real(fh,d,vc, 'bulk_flux_y_o', bulk % flux_y_o)
+  call Backup_Mod_Read_Real(fh,d,vc, 'bulk_flux_z_o', bulk % flux_z_o)
+  call Backup_Mod_Read_Real(fh,d,vc, 'bulk_p_drop_x', bulk % p_drop_x)
+  call Backup_Mod_Read_Real(fh,d,vc, 'bulk_p_drop_y', bulk % p_drop_y)
+  call Backup_Mod_Read_Real(fh,d,vc, 'bulk_p_drop_z', bulk % p_drop_z)
 
   !----------------------------!
   !                            !
@@ -100,20 +100,20 @@
   !--------------!
   !   Velocity   !
   !--------------!
-  call Backup_Mod_Read_Variable(fh, d, vc, 'u_velocity', fld % u)
-  call Backup_Mod_Read_Variable(fh, d, vc, 'v_velocity', fld % v)
-  call Backup_Mod_Read_Variable(fh, d, vc, 'w_velocity', fld % w)
+  call Backup_Mod_Read_Variable(fh,d,vc, 'u_velocity', fld % u)
+  call Backup_Mod_Read_Variable(fh,d,vc, 'v_velocity', fld % v)
+  call Backup_Mod_Read_Variable(fh,d,vc, 'w_velocity', fld % w)
 
   !--------------------------------------!
   !   Pressure and pressure correction   !
   !--------------------------------------!
-  call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'press',      fld % p % n(-nb_s:nc_s))
-  call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'press_corr', fld %pp % n(-nb_s:nc_s))
+  call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'press',      fld % p % n(-nb_s:nc_s))
+  call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'press_corr', fld %pp % n(-nb_s:nc_s))
 
   !----------------------!
   !   Mass flow raters   !
   !----------------------!
-  call Backup_Mod_Read_Face(fh, d, vc, grid, fld % flux)
+  call Backup_Mod_Read_Face(fh,d,vc, grid, fld % flux)
 
   !--------------!
   !              !
@@ -121,7 +121,7 @@
   !              !
   !--------------!
   if(heat_transfer) then
-    call Backup_Mod_Read_Variable(fh, d, vc, 'temp', fld % t)
+    call Backup_Mod_Read_Variable(fh,d,vc, 'temp', fld % t)
   end if
 
   !-----------------------!
@@ -136,20 +136,20 @@
   if(turbulence_model .eq. K_EPS) then
 
     ! K and epsilon
-    call Backup_Mod_Read_Variable(fh, d, vc, 'kin', tur % kin)
-    call Backup_Mod_Read_Variable(fh, d, vc, 'eps', tur % eps)
+    call Backup_Mod_Read_Variable(fh,d,vc, 'kin', tur % kin)
+    call Backup_Mod_Read_Variable(fh,d,vc, 'eps', tur % eps)
 
     ! Other turbulent quantities
-    call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'p_kin',    p_kin   (-nb_s:nc_s))
-    call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'u_tau',    u_tau   (-nb_s:nc_s))
-    call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'y_plus',   y_plus  (-nb_s:nc_s))
-    call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'vis_t',    vis_t   (-nb_s:nc_s))
-    call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'vis_wall', vis_wall(-nb_s:nc_s))
-    call Backup_Mod_Read_Cell    (fh, d, vc, 'tau_wall', tau_wall  (1:nc_s)  )
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'p_kin',    p_kin   (-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'u_tau',    u_tau   (-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'y_plus',   y_plus  (-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'vis_t',    vis_t   (-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'vis_wall', vis_wall(-nb_s:nc_s))
+    call Backup_Mod_Read_Cell    (fh,d,vc, 'tau_wall', tau_wall  (1:nc_s)  )
 
     ! Turbulence quantities connected with heat transfer
     if(heat_transfer) then
-      call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'con_wall', con_wall(-nb_s:nc_s))
+      call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'con_wall', con_wall(-nb_s:nc_s))
     end if
   end if
 
@@ -160,30 +160,30 @@
      turbulence_model .eq. HYBRID_LES_RANS) then
 
     ! K, eps, zeta and f22
-    call Backup_Mod_Read_Variable(fh, d, vc, 'kin',  tur % kin)
-    call Backup_Mod_Read_Variable(fh, d, vc, 'eps',  tur % eps)
-    call Backup_Mod_Read_Variable(fh, d, vc, 'zeta', tur % zeta)
-    call Backup_Mod_Read_Variable(fh, d, vc, 'f22',  tur % f22)
+    call Backup_Mod_Read_Variable(fh,d,vc, 'kin',  tur % kin)
+    call Backup_Mod_Read_Variable(fh,d,vc, 'eps',  tur % eps)
+    call Backup_Mod_Read_Variable(fh,d,vc, 'zeta', tur % zeta)
+    call Backup_Mod_Read_Variable(fh,d,vc, 'f22',  tur % f22)
 
     ! Other turbulent quantities
-    call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'p_kin',    p_kin   (-nb_s:nc_s))
-    call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'u_tau',    u_tau   (-nb_s:nc_s))
-    call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'y_plus',   y_plus  (-nb_s:nc_s))
-    call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'vis_t',    vis_t   (-nb_s:nc_s))
-    call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'vis_wall', vis_wall(-nb_s:nc_s))
-    call Backup_Mod_Read_Cell    (fh, d, vc, 'tau_wall', tau_wall  (1:nc_s)  )
-    call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 't_scale',  t_scale (-nb_s:nc_s))
-    call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'l_scale',  l_scale (-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'p_kin',    p_kin   (-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'u_tau',    u_tau   (-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'y_plus',   y_plus  (-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'vis_t',    vis_t   (-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'vis_wall', vis_wall(-nb_s:nc_s))
+    call Backup_Mod_Read_Cell    (fh,d,vc, 'tau_wall', tau_wall  (1:nc_s)  )
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 't_scale',  t_scale (-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'l_scale',  l_scale (-nb_s:nc_s))
 
     ! Turbulence quantities connected with heat transfer
   end if
 
   if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
-    call Backup_Mod_Read_Variable(fh, d, vc, 't2',       tur % t2)
-    call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'p_t2',     p_t2    (-nb_s:nc_s))
-    call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'con_wall', con_wall(-nb_s:nc_s))
+    call Backup_Mod_Read_Variable(fh,d,vc, 't2',       tur % t2)
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'p_t2',     p_t2    (-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'con_wall', con_wall(-nb_s:nc_s))
   else if (turbulence_model .eq. HYBRID_LES_RANS .and. heat_transfer) then
-    call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'con_wall', con_wall(-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'con_wall', con_wall(-nb_s:nc_s))
   end if
 
   !----------------------------!
@@ -193,27 +193,27 @@
      turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
 
     ! Reynolds stresses
-    call Backup_Mod_Read_Variable(fh, d, vc, 'uu',  uu)
-    call Backup_Mod_Read_Variable(fh, d, vc, 'vv',  vv)
-    call Backup_Mod_Read_Variable(fh, d, vc, 'ww',  ww)
-    call Backup_Mod_Read_Variable(fh, d, vc, 'uv',  uv)
-    call Backup_Mod_Read_Variable(fh, d, vc, 'uw',  uw)
-    call Backup_Mod_Read_Variable(fh, d, vc, 'vw',  vw)
+    call Backup_Mod_Read_Variable(fh,d,vc, 'uu',  tur % uu)
+    call Backup_Mod_Read_Variable(fh,d,vc, 'vv',  tur % vv)
+    call Backup_Mod_Read_Variable(fh,d,vc, 'ww',  tur % ww)
+    call Backup_Mod_Read_Variable(fh,d,vc, 'uv',  tur % uv)
+    call Backup_Mod_Read_Variable(fh,d,vc, 'uw',  tur % uw)
+    call Backup_Mod_Read_Variable(fh,d,vc, 'vw',  tur % vw)
 
     ! Epsilon
-    call Backup_Mod_Read_Variable(fh, d, vc, 'eps', tur % eps)
+    call Backup_Mod_Read_Variable(fh,d,vc, 'eps', tur % eps)
 
     ! F22
     if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
-      call Backup_Mod_Read_Variable(fh, d, vc, 'f22',  tur % f22)
+      call Backup_Mod_Read_Variable(fh,d,vc, 'f22',  tur % f22)
     end if
 
     ! Other turbulent quantities ?
-    call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'vis_t', vis_t(-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'vis_t', vis_t(-nb_s:nc_s))
 
     ! Turbulence quantities connected with heat transfer
     if(heat_transfer) then
-      call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'con_wall', con_wall(-nb_s:nc_s))
+      call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'con_wall', con_wall(-nb_s:nc_s))
     end if
   end if
 
@@ -225,24 +225,35 @@
   if(turbulence_statistics .and.  &
      time_step > time_step_stat) then
 
-    call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'u_mean', fld % u)
-    call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'v_mean', fld % v)
-    call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'w_mean', fld % w)
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'u_mean', tur % u_mean(-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'v_mean', tur % v_mean(-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'w_mean', tur % w_mean(-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'p_mean', tur % p_mean(-nb_s:nc_s))
+    if(heat_transfer) then
+      call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 't_mean', tur % t_mean(-nb_s:nc_s))
+    end if
 
-    call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'uu_mean', uu)
-    call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'vv_mean', vv)
-    call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'ww_mean', ww)
-    call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'uv_mean', uv)
-    call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'uw_mean', uw)
-    call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'vw_mean', vw)
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'uu_mean', tur % uu_mean(-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'vv_mean', tur % vv_mean(-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'ww_mean', tur % ww_mean(-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'uv_mean', tur % uv_mean(-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'uw_mean', tur % uw_mean(-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'vw_mean', tur % vw_mean(-nb_s:nc_s))
+
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'uu_res', tur % uu_res(-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'vv_res', tur % vv_res(-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'ww_res', tur % ww_res(-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'uv_res', tur % uv_res(-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'uw_res', tur % uw_res(-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'vw_res', tur % vw_res(-nb_s:nc_s))
 
     if(heat_transfer) then
-      call Backup_Mod_Read_Variable_Mean(fh, d, vc, 't_mean',  fld % t)
-      call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'tt_mean', tt)
-      call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'ut_mean', ut)
-      call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'vt_mean', vt)
-      call Backup_Mod_Read_Variable_Mean(fh, d, vc, 'wt_mean', wt)
+      call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 't2_res', tur % t2_res(-nb_s:nc_s))
+      call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'ut_res', tur % ut_res(-nb_s:nc_s))
+      call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'vt_res', tur % vt_res(-nb_s:nc_s))
+      call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'wt_res', tur % wt_res(-nb_s:nc_s))
     end if
+
   end if
 
   !--------------------------!
@@ -250,7 +261,7 @@
   !   Swarm (of particles)   !
   !                          !
   !--------------------------!
-  call Backup_Mod_Read_Swarm(fh, d, vc, swr)
+  call Backup_Mod_Read_Swarm(fh,d,vc, swr)
 
   !------------------------------!
   !                              !

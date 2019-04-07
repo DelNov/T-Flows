@@ -17,7 +17,7 @@
   type(Field_Type), pointer :: flow
   type(Grid_Type),  pointer :: grid
   type(Var_Type),   pointer :: u, v, w
-  type(Var_Type),   pointer :: kin, zeta
+  type(Var_Type),   pointer :: kin, eps, zeta, f22
   integer                   :: c, c1, c2, s
   real                      :: u_tan, u_nor_sq, u_nor, u_tot_sq
   real                      :: beta, pr
@@ -41,11 +41,8 @@
   ! Take aliases
   flow => turb % pnt_flow
   grid => flow % pnt_grid
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
-  kin  => turb % kin
-  zeta => turb % zeta
+  call Field_Mod_Alias_Momentum   (flow, u, v, w)
+  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
 
   call Time_And_Length_Scale(grid, turb)
 

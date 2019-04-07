@@ -6,7 +6,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type),  target :: turb
+  type(Turb_Type), target :: turb
 !==============================================================================!
 
   c_1e    =  1.44
@@ -19,12 +19,12 @@
 
   turb % kin % sigma = 1.0
   turb % eps % sigma = 1.0 
-  uu  % sigma = 1.0
-  vv  % sigma = 1.0
-  ww  % sigma = 1.0
-  uv  % sigma = 1.0
-  uw  % sigma = 1.0
-  vw  % sigma = 1.0
+  turb % uu  % sigma = 1.0
+  turb % vv  % sigma = 1.0
+  turb % ww  % sigma = 1.0
+  turb % uv  % sigma = 1.0
+  turb % uw  % sigma = 1.0
+  turb % vw  % sigma = 1.0
 
   c_theta = 0.25
 

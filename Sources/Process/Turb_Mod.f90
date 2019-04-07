@@ -9,16 +9,17 @@
   use Info_Mod
   use Var_Mod,    only: Var_Type,                    &
                         Var_Mod_Allocate_New_Only,   &
-                        Var_Mod_Allocate_Solution,   &
-                        Var_Mod_Allocate_Statistics
+                        Var_Mod_Allocate_Solution
   use Grid_Mod
   use Grad_Mod
   use Field_Mod,  only: Field_Type,                                            &
+                        Field_Mod_Alias_Momentum,                              &
+                        Field_Mod_Alias_Energy,                                &
                         viscosity, density, buoyancy, conductivity, capacity,  &
                         grav_x,  grav_y,  grav_z,                              &
                         omega_x, omega_y, omega_z,                             &
                         heat_transfer, t_ref
-  use Solver_Mod, only: Solver_Type, Bicg, Cg, Cgs
+  use Solver_Mod, only: Solver_Type, Solver_Mod_Alias_System, Bicg, Cg, Cgs
   use Matrix_Mod, only: Matrix_Type
   use Numerics_Mod
 !------------------------------------------------------------------------------!
@@ -46,9 +47,12 @@
     type(Var_Type) :: eps
     type(Var_Type) :: zeta
     type(Var_Type) :: f22
-
     type(Var_Type) :: vis
-    type(Var_Type) :: t2
+
+    ! Reynolds stresses and turbulent heat fluxes
+    type(Var_Type) :: uu, vv, ww
+    type(Var_Type) :: uv, uw, vw
+    type(Var_Type) :: ut, vt, wt, t2
 
     !----------------!
     !   Statistics   !
@@ -59,14 +63,20 @@
     real, allocatable :: t_mean(:)
 
     ! Time averaged modeled quantities
+    ! (Time averages of modeled equations)
     real, allocatable :: kin_mean(:), eps_mean(:), zeta_mean(:), f22_mean(:)
+    real, allocatable :: vis_mean(:)
 
     ! Resolved Reynolds stresses and heat fluxes
+    ! (This is what you compute by gathering statistics
+    !  with scale-resolving methods like LES and DES)
     real, allocatable :: uu_res(:), vv_res(:), ww_res(:)
     real, allocatable :: uv_res(:), vw_res(:), uw_res(:)
     real, allocatable :: ut_res(:), vt_res(:), wt_res(:), t2_res(:)
 
     ! Time averaged modelled Reynolds stresses and heat fluxes
+    ! (Time averages of modeled equations for
+    !  individual Reynolds stress components)
     real, allocatable :: uu_mean(:), vv_mean(:), ww_mean(:)
     real, allocatable :: uv_mean(:), vw_mean(:), uw_mean(:)
     real, allocatable :: ut_mean(:), vt_mean(:), wt_mean(:), t2_mean(:)
@@ -111,20 +121,6 @@
   !   Turbulence models variables   !
   !---------------------------------!
 
-  ! Reynolds stresses
-  type(Var_Type), target :: uu
-  type(Var_Type), target :: vv
-  type(Var_Type), target :: ww
-  type(Var_Type), target :: uv
-  type(Var_Type), target :: uw
-  type(Var_Type), target :: vw
-
-  ! Turbulent heat fluxes
-  type(Var_Type), target :: tt
-  type(Var_Type), target :: ut
-  type(Var_Type), target :: vt
-  type(Var_Type), target :: wt
-
   !--------------------------------!
   !   Turbulence model constants   !
   !--------------------------------!
@@ -149,11 +145,6 @@
   !-----------------------------------!
   !   Auxiliary turbulent variables   !
   !-----------------------------------!
-
-  ! Shear and wall stress are used in a number of turbulence models
-  ! (These two would make more sense in the Field_Mod)
-  real, allocatable :: shear(:)
-  real, allocatable :: vort(:)
 
   ! Turbulent viscosity
   real, allocatable :: vis_t(:)
@@ -186,7 +177,7 @@
   real,allocatable :: p_kin(:), p_t2(:)
 
   ! Hydraulic roughness (constant and variable)
-  real              :: z_o 
+  real              :: z_o
   real, allocatable :: z_o_f(:)
 
   ! Buoyancy production for k-eps-zeta-f model
@@ -202,6 +193,12 @@
 
   ! The constructor-like
   include 'Turb_Mod/Allocate.f90'
+
+  include 'Turb_Mod/Alias_K_Eps.f90'
+  include 'Turb_Mod/Alias_K_Eps_Zeta_F.f90'
+  include 'Turb_Mod/Alias_Heat_Fluxes.f90'
+  include 'Turb_Mod/Alias_Stresses.f90'
+  include 'Turb_Mod/Alias_T2.f90'
 
   ! Functions to set turbulence constants
   include 'Turb_Mod/Const_Hanjalic_Jakirlic.f90'

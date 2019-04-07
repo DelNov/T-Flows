@@ -23,27 +23,25 @@
 
   ! Take aliases
   grid => flow % pnt_grid
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
+  call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! Velocity gradients
   call Grad_Mod_Variable(flow % u, .true.)
   call Grad_Mod_Variable(flow % v, .true.)
   call Grad_Mod_Variable(flow % w, .true.)
 
-  shear(:) =  u % x(:)**2                     &
-            + v % y(:)**2                     &
-            + w % z(:)**2                     &
-            + 0.5 * (v % z(:) + w % y(:))**2  &
-            + 0.5 * (u % z(:) + w % x(:))**2  &
-            + 0.5 * (v % x(:) + u % y(:))**2
+  flow % shear(:) = u % x(:)**2                     &
+                  + v % y(:)**2                     &
+                  + w % z(:)**2                     &
+                  + 0.5 * (v % z(:) + w % y(:))**2  &
+                  + 0.5 * (u % z(:) + w % x(:))**2  &
+                  + 0.5 * (v % x(:) + u % y(:))**2
 
-  vort(:) = - (   0.5*(v % z(:) - w % y(:))**2  &
-                + 0.5*(u % z(:) - w % x(:))**2  &
-                + 0.5*(v % x(:) - u % y(:))**2 )
+  flow % vort(:) = - (   0.5 * (v % z(:) - w % y(:))**2  &
+                       + 0.5 * (u % z(:) - w % x(:))**2  &
+                       + 0.5 * (v % x(:) - u % y(:))**2 )
 
-  shear(:) = sqrt(2.0 * shear(:))
-  vort(:)  = sqrt(2.0 * abs(vort(:)))
+  flow % shear(:) = sqrt(2.0 * flow % shear(:))
+  flow % vort(:)  = sqrt(2.0 * abs(flow % vort(:)))
 
   end subroutine

@@ -43,12 +43,9 @@
   grid => flow % pnt_grid
   vis  => turb % vis
   flux => flow % flux
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
   dt   =  flow % dt
-  a    => sol  % a
-  b    => sol  % b % val
+  call Field_Mod_Alias_Momentum(flow, u, v, w)
+  call Solver_Mod_Alias_System (sol, a, b)
 
   ! Initialize matrix and right hand side
   a % val(:) = 0.0

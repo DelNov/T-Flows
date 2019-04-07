@@ -8,7 +8,7 @@
   use Comm_Mod
   use Grid_Mod,  only: Grid_Type, Grid_Mod_Bnd_Cond_Type,  &
                        INFLOW, OUTFLOW, CONVECT, PRESSURE
-  use Field_Mod, only: Field_Type, density
+  use Field_Mod, only: Field_Type, Field_Mod_Alias_Momentum, density
   use Var_Mod,   only: Var_Type
   use Bulk_Mod,  only: Bulk_Type
 !------------------------------------------------------------------------------!
@@ -28,9 +28,7 @@
   grid => flow % pnt_grid
   bulk => flow % bulk
   flux => flow % flux
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
+  call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   !--------------------------------------!
   !   Calculate the inflow mass fluxes   !

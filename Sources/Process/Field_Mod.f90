@@ -32,6 +32,10 @@
     ! Temperature
     type(Var_Type) :: t
 
+    ! Shear and wall stress are used in a number of turbulence models
+    real, allocatable :: shear(:)
+    real, allocatable :: vort(:)
+
     ! Scalars (like chemical species for example)
     integer                     :: n_scalars
     type(Var_Type), allocatable :: scalar(:)
@@ -72,5 +76,7 @@
   contains
 
   include 'Field_Mod/Allocate.f90'
+  include 'Field_Mod/Alias_Energy.f90'
+  include 'Field_Mod/Alias_Momentum.f90'
 
   end module

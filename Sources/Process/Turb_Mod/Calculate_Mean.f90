@@ -19,6 +19,7 @@
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: u, v, w, p, t
   type(Var_Type),  pointer :: kin, eps, f22, zeta, vis, t2
+  type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   integer                  :: c, n
   real,            pointer :: u_mean(:), v_mean(:), w_mean(:),  &
                               p_mean(:), t_mean(:)
@@ -36,17 +37,13 @@
 
   ! Take aliases
   grid => flow % pnt_grid
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
   p    => flow % p
-  t    => flow % t
-  kin  => turb % kin
-  eps  => turb % eps
-  f22  => turb % f22
-  zeta => turb % zeta
   vis  => turb % vis
   t2   => turb % t2
+  call Field_Mod_Alias_Momentum   (flow, u, v, w)
+  call Field_Mod_Alias_Energy     (flow, t)
+  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
+  call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
 
   ! Time averaged momentum and energy equations
   u_mean => turb % u_mean;  v_mean => turb % v_mean;  w_mean => turb % w_mean
@@ -122,7 +119,6 @@
         v_mean(c) = (v_mean(c) * (1.*n) + v % n(c)) / (1.*(n+1))
         w_mean(c) = (w_mean(c) * (1.*n) + w % n(c)) / (1.*(n+1))
         p_mean(c) = (p_mean(c) * (1.*n) + p % n(c)) / (1.*(n+1))
-
         if(heat_transfer) then
           t_mean(c) = (t_mean(c) * (1.*n) + t % n(c)) / (1.*(n+1))
         end if

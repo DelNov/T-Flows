@@ -23,9 +23,7 @@
   ! Take aliases
   flow => turb % pnt_flow
   grid => flow % pnt_grid
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
+  call Field_Mod_Alias_Momentum(flow, u, v, w)
   t    => flow % t
 
   !---------------!
@@ -58,7 +56,7 @@
       vis_t(c) = density  &
               * (lf*lf)   &  ! delta^2
               * (cs*cs)   &  ! cs^2
-              * shear(c)
+              * flow % shear(c)
     end do
 
   else if(turbulence_model .eq. LES_DYNAMIC) then
@@ -67,7 +65,7 @@
       vis_t(c) = density  &
               * (lf*lf)   &  ! delta^2
               * c_dyn(c)  &  ! c_dynamic
-              * shear(c)
+              * flow % shear(c)
     end do
   else if(turbulence_model .eq. LES_WALE) then
     do c = 1, grid % n_cells
@@ -86,7 +84,7 @@
               + grav_z * t % z(c))  &
           / max(t_ref, TINY)
       nc2 = max(0.0, nc2)
-      vis_t(c) = vis_t(c) * sqrt(1.0 - min(2.5*nc2/(shear(c)**2), 1.0))
+      vis_t(c) = vis_t(c) * sqrt(1.0 - min(2.5*nc2/(flow % shear(c)**2), 1.0))
     end do
   end if
 

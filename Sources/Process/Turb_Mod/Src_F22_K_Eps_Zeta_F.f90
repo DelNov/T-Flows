@@ -42,12 +42,8 @@
   ! Take aliases
   flow => turb % pnt_flow
   grid => flow % pnt_grid
-  kin  => turb % kin
-  eps  => turb % eps
-  f22  => turb % f22
-  zeta => turb % zeta
-  a    => sol % a
-  b    => sol % b % val
+  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
+  call Solver_Mod_Alias_System    (sol, a, b)
 
   call Time_And_Length_Scale(grid, turb)
 

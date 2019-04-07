@@ -29,10 +29,8 @@
   grid => flow % pnt_grid
   bulk => flow % bulk
   flux => flow % flux
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
-  t    => flow % t
+  call Field_Mod_Alias_Momentum(flow, u, v, w)
+  call Field_Mod_Alias_Energy  (flow, t)
 
   call Bulk_Mod_Calculate_Fluxes(grid, bulk, flux)
 

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Energy(flow, sol, dt, ini)
+  subroutine Compute_Energy(flow, turb, sol, dt, ini)
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for scalar (such as temperature)         !
 !------------------------------------------------------------------------------!
@@ -13,13 +13,14 @@
   use Grad_Mod
   use Info_Mod
   use Numerics_Mod
-  use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
+  use Solver_Mod,   only: Solver_Type, Solver_Mod_Alias_System, Bicg, Cg, Cgs
   use Matrix_Mod,   only: Matrix_Type
   use User_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
   type(Field_Type),  target :: flow
+  type(Turb_Type),   target :: turb
   type(Solver_Type), target :: sol
   integer                   :: ini
   real                      :: dt
@@ -28,6 +29,7 @@
 !-----------------------------------[Locals]-----------------------------------! 
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w, t
+  type(Var_Type),    pointer :: ut, vt, wt
   real,              pointer :: flux(:)
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
@@ -70,12 +72,10 @@
   ! Take aliases
   grid => flow % pnt_grid
   flux => flow % flux
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
-  t    => flow % t
-  a    => sol % a
-  b    => sol % b % val
+  call Field_Mod_Alias_Momentum  (flow, u, v, w)
+  call Field_Mod_Alias_Energy    (flow, t)
+  call Turb_Mod_Alias_Heat_Fluxes(turb, ut, vt, wt)
+  call Solver_Mod_Alias_System   (sol, a, b)
 
   ! Initialize matrix and right hand side
   a % val(:) = 0.0
