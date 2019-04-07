@@ -1,23 +1,23 @@
 !==============================================================================!
-  subroutine Load_Physical_Properties(grid)
+  subroutine Constants_Spalart_Allmaras()
 !------------------------------------------------------------------------------!
-!   Reads physical properties from control file.                               !
+!   Initializes constants for Spalar-Allmaras and DES turbulence models.       ! 
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Grid_Mod
-  use Field_Mod
-  use Control_Mod
   use Turbulence_Mod
+  use Const_Mod,      only: TWO_THIRDS
 !------------------------------------------------------------------------------!
   implicit none
-!---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
 !==============================================================================!
 
-  call Control_Mod_Dynamic_Viscosity    (viscosity)
-  call Control_Mod_Heat_Capacity        (capacity)
-  call Control_Mod_Mass_Density         (density)
-  call Control_Mod_Thermal_Conductivity (conductivity)
-  call Control_Mod_Roughness_Coefficient(z_o)
+  vis % sigma = TWO_THIRDS
+
+  kappa  = 0.41
+  c_b1   = 0.1355
+  c_b2   = 0.622
+  c_v1   = 7.1
+  c_w1   = c_b1 / kappa**2 + (1 + c_b2) / vis % sigma
+  c_w2   = 0.3
+  c_w3   = 2.0
 
   end subroutine

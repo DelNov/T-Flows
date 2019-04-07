@@ -27,11 +27,11 @@ DIR_BINARY = ../../Binaries
 DIR_SHARED = ../Shared
 DIR_MODULE = .Modules
 DIR_OBJECT = .Objects
-DIR_TURBUL = Turbulence
-DIR_PARTIC = Swarm_Mod
+DIR_TURBUL = Turbulence_Mod
+DIR_SWARM  = Swarm_Mod
 DIR_USER   = User_Mod
 DIR_CASE   = no
-VPATH = $(DIR_SHARED):$(DIR_TURBUL):$(DIR_PARTIC):.
+VPATH = $(DIR_SHARED):$(DIR_TURBUL):$(DIR_SWARM):.
 
 # Program name (This should hardly change)
 PROGRAM_NAME = Process
@@ -217,10 +217,7 @@ SRC_MOD += Control_Mod.f90	\
            Monitor_Mod.f90
 
 # Sources for modules in sub-directories for physical models
-SRC_MOD += Turbulence_Mod.f90	\
-           Les_Mod.f90		\
-           Rans_Mod.f90
-
+SRC_MOD += Turbulence_Mod.f90
 SRC_MOD += Swarm_Mod.f90
 
 # Backup_Mod should come last because it uses all other modules

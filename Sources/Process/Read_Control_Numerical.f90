@@ -6,8 +6,8 @@
 !----------------------------------[Modules]-----------------------------------!
   use Field_Mod,      only: Field_Type, heat_transfer
   use Var_Mod,        only: Var_Type
-  use Rans_Mod,       only: kin, eps, zeta, f22, vis, t2
-  use Turbulence_Mod, only: uu, vv, ww, uv, uw, vw
+  use Turbulence_Mod, only: kin, eps, zeta, f22, vis, t2,  &
+                            uu, vv, ww, uv, uw, vw
   use Control_Mod
   use Numerics_Mod
 !------------------------------------------------------------------------------!

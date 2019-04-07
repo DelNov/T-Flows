@@ -6,10 +6,10 @@
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
   use Comm_Mod
-  use Field_Mod, only: Field_Type, heat_transfer, heated_area,     &
-                       density, viscosity, capacity, conductivity, &
-                       heat_flux, heat
-  use Rans_Mod
+  use Field_Mod,      only: Field_Type, heat_transfer, heated_area,     &
+                            density, viscosity, capacity, conductivity, &
+                            heat_flux, heat
+  use Turbulence_Mod
   use Grid_Mod
   use Control_Mod
 !------------------------------------------------------------------------------!

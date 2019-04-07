@@ -1,23 +1,16 @@
 !==============================================================================!
-  subroutine Load_Physical_Properties(grid)
+  real function U_Plus_Log_Law(y_plus)
 !------------------------------------------------------------------------------!
-!   Reads physical properties from control file.                               !
+!   Calculates U+ from log law.                                                !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Grid_Mod
-  use Field_Mod
-  use Control_Mod
-  use Turbulence_Mod
+  use Turbulence_Mod, only: e_log, kappa
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  real :: y_plus
 !==============================================================================!
 
-  call Control_Mod_Dynamic_Viscosity    (viscosity)
-  call Control_Mod_Heat_Capacity        (capacity)
-  call Control_Mod_Mass_Density         (density)
-  call Control_Mod_Thermal_Conductivity (conductivity)
-  call Control_Mod_Roughness_Coefficient(z_o)
+  U_Plus_Log_Law = log( max(y_plus, 1.05) * e_log ) / kappa
 
-  end subroutine
+  end function

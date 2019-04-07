@@ -1,23 +1,16 @@
 !==============================================================================!
-  subroutine Load_Physical_Properties(grid)
+  real function Y_Plus_Rough_Walls(u_tau, wall_dist, kin_vis)
 !------------------------------------------------------------------------------!
-!   Reads physical properties from control file.                               !
+!   Calculates y+ for rough walls.                                             !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Grid_Mod
-  use Field_Mod
-  use Control_Mod
-  use Turbulence_Mod
+  use Turbulence_Mod,  only: z_o
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  real :: u_tau, wall_dist, kin_vis
 !==============================================================================!
 
-  call Control_Mod_Dynamic_Viscosity    (viscosity)
-  call Control_Mod_Heat_Capacity        (capacity)
-  call Control_Mod_Mass_Density         (density)
-  call Control_Mod_Thermal_Conductivity (conductivity)
-  call Control_Mod_Roughness_Coefficient(z_o)
+  Y_Plus_Rough_Walls = (wall_dist + z_o) * u_tau / kin_vis
 
-  end subroutine
+  end function

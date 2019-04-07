@@ -1,0 +1,226 @@
+!==============================================================================!
+  subroutine Calculate_Sgs_Dynamic(flow, sol)
+!------------------------------------------------------------------------------!
+!   Calculates Smagorinsky constant with dynamic procedure                     !
+!------------------------------------------------------------------------------!
+!----------------------------------[Modules]-----------------------------------!
+  use Const_Mod
+  use Field_Mod,      only: Field_Type
+  use Comm_Mod
+  use Turbulence_Mod
+  use Grid_Mod,       only: Grid_Type
+  use Solver_Mod,     only: Solver_Type
+  use Matrix_Mod,     only: Matrix_Type
+  use Grad_Mod
+  use Work_Mod,       only: u_f        => r_cell_01,  &
+                            v_f        => r_cell_02,  &
+                            w_f        => r_cell_03,  &
+                            uu_f       => r_cell_04,  &
+                            vv_f       => r_cell_05,  &
+                            ww_f       => r_cell_06,  &
+                            uv_f       => r_cell_07,  &
+                            uw_f       => r_cell_08,  &
+                            vw_f       => r_cell_09,  &
+                            m_11_f     => r_cell_10,  &
+                            m_22_f     => r_cell_11,  &
+                            m_33_f     => r_cell_12,  &
+                            m_12_f     => r_cell_13,  &
+                            m_13_f     => r_cell_14,  &
+                            m_23_f     => r_cell_15,  &
+                            shear_test => r_cell_16
+!------------------------------------------------------------------------------!
+  implicit none
+!---------------------------------[Arguments]----------------------------------!
+  type(Field_Type),  target :: flow
+  type(Solver_Type), target :: sol
+!-----------------------------------[Locals]-----------------------------------!
+  type(Grid_Type),   pointer :: grid
+  type(Matrix_Type), pointer :: a
+  type(Var_Type),    pointer :: u, v, w
+  integer                    :: c, j, cj
+  real                       :: u_a, v_a, w_a
+  real                       :: uu_a, vv_a, ww_a, uv_a, uw_a, vw_a
+  real                       :: m_11_a, m_22_a, m_33_a, m_12_a, m_13_a, m_23_a
+  real                       :: l_11, l_22, l_33, l_12, l_13, l_23
+  real                       :: m_11, m_22, m_33, m_12, m_13, m_23
+  real                       :: m_dot_m, l_dot_m, l_g, l_f, vol_e
+!==============================================================================!
+!                                                                              !
+!   C is derived from:    Lij_res = Lij_mod                                    !
+!                                                                              !
+!   res - resolved, mod - modeled                                              ! 
+!                                                                              ! 
+!   Lij_res = <UiUj> - <Ui><Uj>,                                               !
+!                                                                              !
+!   where <> denote test filter                                                !
+!                                                                              !
+!   Lij_mod = 2 * C * Mij, C = Csmag ** 2.0                                    !
+!                                                                              !
+!   where Mij is:  Mij = <delta**2.0>|<Sij>|<Sij> - <delta |Sij| Sij>          !
+!                                                                              ! 
+!   Finaly C is :                                                              ! 
+!                                                                              !
+!   C = 0.5 * Lij:Mij / Mij:Mij                                                !
+!                                                                              !
+!   Aij : Bij = A11 * B11 + A22 * B22 + A33 * B33                              !
+!             + 2.0 * A12 * B12 + 2.0 A13 * B13 + 2.0 * A23 * B23              !   
+!                                                                              !
+!------------------------------------------------------------------------------!
+
+  ! Take aliases
+  grid => flow % pnt_grid
+  u    => flow % u
+  v    => flow % v
+  w    => flow % w
+  a    => sol % a
+
+  call Comm_Mod_Exchange_Real(grid, u % n)
+  call Comm_Mod_Exchange_Real(grid, v % n)
+  call Comm_Mod_Exchange_Real(grid, w % n)
+  call Comm_Mod_Exchange_Real(grid, shear)
+
+  do c =1, grid % n_cells
+    u_a   = 0.0
+    v_a   = 0.0
+    w_a   = 0.0
+    vol_e = 0.0
+
+    uu_a  = 0.0
+    vv_a  = 0.0
+    ww_a  = 0.0
+    uv_a  = 0.0
+    uw_a  = 0.0
+    vw_a  = 0.0
+
+    m_11_a = 0.0
+    m_22_a = 0.0
+    m_33_a = 0.0
+    m_12_a = 0.0
+    m_13_a = 0.0
+    m_23_a = 0.0
+  
+    do j = a % row(c), a % row(c + 1) - 1
+      cj = a % col(j) 
+      if(cj .ne. c) then
+
+        ! Test velocities
+        u_a = u_a + grid % vol(cj) * u % n(cj)
+        v_a = v_a + grid % vol(cj) * v % n(cj)
+        w_a = w_a + grid % vol(cj) * w % n(cj)
+
+        ! Test stresses
+        uu_a = uu_a + grid % vol(cj) * u % n(cj) * u % n(cj)
+        vv_a = vv_a + grid % vol(cj) * v % n(cj) * v % n(cj)
+        ww_a = ww_a + grid % vol(cj) * w % n(cj) * w % n(cj)
+        uv_a = uv_a + grid % vol(cj) * u % n(cj) * v % n(cj)
+        uw_a = uw_a + grid % vol(cj) * u % n(cj) * w % n(cj)
+        vw_a = vw_a + grid % vol(cj) * v % n(cj) * w % n(cj)
+
+        ! Test Mija
+        m_11_a = m_11_a + grid % vol(cj) * shear(cj) * u % x(cj)
+        m_22_a = m_22_a + grid % vol(cj) * shear(cj) * v % y(cj)
+        m_33_a = m_33_a + grid % vol(cj) * shear(cj) * w % z(cj)
+        m_12_a = m_12_a + grid % vol(cj) * shear(cj)                &    
+               * 0.5 * ( u % y(cj) + v % x(cj) ) 
+        m_13_a = m_13_a + grid % vol(cj) * shear(cj)                &
+               * 0.5 * ( u % z(cj) + w % x(cj) )     
+        m_23_a = m_23_a + grid % vol(cj) * shear(cj)                &
+               * 0.5 * ( v % z(cj) + w % y(cj) )
+
+        ! Test volume 
+        vol_e = vol_e + grid % vol(cj) 
+      end if
+    end do
+
+    ! Take into account influence of central cell within test molecule
+    vol_e = vol_e + grid % vol(c)
+
+    u_a = u_a + grid % vol(c) * u % n(c)
+    v_a = v_a + grid % vol(c) * v % n(c)
+    w_a = w_a + grid % vol(c) * w % n(c)
+
+    uu_a = uu_a + grid % vol(c) * u % n(c) * u % n(c)
+    vv_a = vv_a + grid % vol(c) * v % n(c) * v % n(c)
+    ww_a = ww_a + grid % vol(c) * w % n(c) * w % n(c)
+    uv_a = uv_a + grid % vol(c) * u % n(c) * v % n(c)
+    uw_a = uw_a + grid % vol(c) * u % n(c) * w % n(c)
+    vw_a = vw_a + grid % vol(c) * v % n(c) * w % n(c)
+
+    m_11_a = m_11_a + grid % vol(c) * shear(c) * u % x(c)
+    m_22_a = m_22_a + grid % vol(c) * shear(c) * v % y(c)
+    m_33_a = m_33_a + grid % vol(c) * shear(c) * w % z(c)
+    m_12_a = m_12_a + grid % vol(c) * shear(c) * 0.5 * ( u % y(c) + v % x(c) ) 
+    m_13_a = m_13_a + grid % vol(c) * shear(c) * 0.5 * ( u % z(c) + w % x(c) )
+    m_23_a = m_23_a + grid % vol(c) * shear(c) * 0.5 * ( v % z(c) + w % y(c) )
+
+    ! Now calculating test values
+    u_f(c) = u_a / vol_e
+    v_f(c) = v_a / vol_e
+    w_f(c) = w_a / vol_e
+
+    uu_f(c)  = uu_a / vol_e
+    vv_f(c)  = vv_a / vol_e
+    ww_f(c)  = ww_a / vol_e
+    uv_f(c)  = uv_a / vol_e
+    uw_f(c)  = uw_a / vol_e
+    vw_f(c)  = vw_a / vol_e
+
+    m_11_f(c) = m_11_a / vol_e 
+    m_22_f(c) = m_22_a / vol_e 
+    m_33_f(c) = m_33_a / vol_e 
+    m_12_f(c) = m_12_a / vol_e 
+    m_13_f(c) = m_13_a / vol_e 
+    m_23_f(c) = m_23_a / vol_e 
+  end do
+
+  call Grad_Mod_Component(grid, u_f, 1, u % x, .true.)  ! dU/dx
+  call Grad_Mod_Component(grid, u_f, 2, u % y, .true.)  ! dU/dy
+  call Grad_Mod_Component(grid, u_f, 3, u % z, .true.)  ! dU/dz
+  call Grad_Mod_Component(grid, v_f, 1, v % x, .true.)  ! dV/dx
+  call Grad_Mod_Component(grid, v_f, 2, v % y, .true.)  ! dV/dy
+  call Grad_Mod_Component(grid, v_f, 3, v % z, .true.)  ! dV/dz
+  call Grad_Mod_Component(grid, w_f, 1, w % x, .true.)  ! dW/dx
+  call Grad_Mod_Component(grid, w_f, 2, w % y, .true.)  ! dW/dy
+  call Grad_Mod_Component(grid, w_f, 3, w % z, .true.)  ! dW/dz
+
+  do c = 1, grid % n_cells
+    l_g  = grid % vol(c)**ONE_THIRD
+    l_f  = 2.0 * l_g
+
+    shear_test(c) = sqrt(2.0*(  u % x(c)*u % x(c)                            &
+                              + v % y(c)*v % y(c)                            &
+                              + w % z(c)*w % z(c) +                          &
+                         0.5*(v % z(c) + w % y(c))*(v % z(c) + w % y(c)) +   &
+                         0.5*(u % z(c) + w % x(c))*(u % z(c) + w % x(c)) +   &
+                         0.5*(v % x(c) + u % y(c))*(v % x(c) + u % y(c))))
+
+    l_11 = uu_f(c) - u_f(c) * u_f(c) 
+    l_22 = vv_f(c) - v_f(c) * v_f(c) 
+    l_33 = ww_f(c) - w_f(c) * w_f(c) 
+    l_12 = uv_f(c) - u_f(c) * v_f(c) 
+    l_13 = uw_f(c) - u_f(c) * w_f(c) 
+    l_23 = vw_f(c) - v_f(c) * w_f(c) 
+
+    m_11 = l_f**2 * shear_test(c) * u % x(c) - l_g**2 * m_11_f(c) 
+    m_22 = l_f**2 * shear_test(c) * v % y(c) - l_g**2 * m_22_f(c) 
+    m_33 = l_f**2 * shear_test(c) * w % z(c) - l_g**2 * m_33_f(c) 
+
+    m_12 = l_f**2 * shear_test(c) * .5*(u % y(c)+v % x(c)) - l_g**2 * m_12_f(c)
+    m_13 = l_f**2 * shear_test(c) * .5*(u % z(c)+w % x(c)) - l_g**2 * m_13_f(c) 
+    m_23 = l_f**2 * shear_test(c) * .5*(v % z(c)+w % y(c)) - l_g**2 * m_23_f(c)  
+
+    m_dot_m = m_11**2 + m_22**2 + m_33**2 + 2.0 * (m_12**2 + m_13**2 + m_23**2) 
+ 
+    l_dot_m =        l_11 * m_11 + l_22 * m_22 + l_33 * m_33   & 
+            + 2.0 * (l_12 * m_12 + l_13 * m_13 + l_23 * m_23)
+
+    c_dyn(c)  =  -0.5 * l_dot_m / (m_dot_m + TINY) 
+
+    if(c_dyn(c) < 0.0) then
+      c_dyn(c) = 0.0 
+    else if(c_dyn(c) > 0.04) then
+      c_dyn(c) = 0.04
+    end if 
+  end do
+
+  end subroutine

@@ -5,10 +5,10 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Field_Mod, only: Field_Type, heat_transfer, density
-  use Rans_Mod
-  use Grid_Mod,  only: Grid_Type
-  use Bulk_Mod,  only: Bulk_Type
+  use Field_Mod,      only: Field_Type, heat_transfer, density
+  use Turbulence_Mod
+  use Grid_Mod,       only: Grid_Type
+  use Bulk_Mod,       only: Bulk_Type
   use Grad_Mod
   use Bulk_Mod
   use Control_Mod

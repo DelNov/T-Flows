@@ -7,7 +7,6 @@
   use Const_Mod
   use Field_Mod,    only: Field_Type, viscosity, density
   use Comm_Mod
-  use Les_Mod
   use Grid_Mod,     only: Grid_Type
   use Bulk_Mod,     only: Bulk_Type
   use Info_Mod

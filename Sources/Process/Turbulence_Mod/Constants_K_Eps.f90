@@ -1,23 +1,23 @@
 !==============================================================================!
-  subroutine Load_Physical_Properties(grid)
+  subroutine Constants_K_Eps()
 !------------------------------------------------------------------------------!
-!   Reads physical properties from control file.                               !
+!   Initializes constants for k-eps turbulence model.                          ! 
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Grid_Mod
-  use Field_Mod
-  use Control_Mod
   use Turbulence_Mod
 !------------------------------------------------------------------------------!
   implicit none
-!---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
 !==============================================================================!
 
-  call Control_Mod_Dynamic_Viscosity    (viscosity)
-  call Control_Mod_Heat_Capacity        (capacity)
-  call Control_Mod_Mass_Density         (density)
-  call Control_Mod_Thermal_Conductivity (conductivity)
-  call Control_Mod_Roughness_Coefficient(z_o)
+  c_1e   = 1.5
+  c_2e   = 1.9
+  c_mu   = 0.09
+  c_mu25 = sqrt(sqrt(c_mu))
+  c_mu75 = c_mu25**3
+  kappa  = 0.41
+  e_log  = 8.342
+
+  kin % sigma = 1.4
+  eps % sigma = 1.4
 
   end subroutine

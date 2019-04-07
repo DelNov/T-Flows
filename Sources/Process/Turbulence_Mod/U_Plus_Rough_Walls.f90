@@ -1,23 +1,17 @@
 !==============================================================================!
-  subroutine Load_Physical_Properties(grid)
+  real function U_Plus_Rough_Walls(wall_dist)
 !------------------------------------------------------------------------------!
-!   Reads physical properties from control file.                               !
+!   Calculates U+ for rough walls.                                             !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Grid_Mod
-  use Field_Mod
-  use Control_Mod
-  use Turbulence_Mod
+  use Const_Mod,      only: TINY
+  use Turbulence_Mod, only: z_o, kappa
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  real :: wall_dist
 !==============================================================================!
 
-  call Control_Mod_Dynamic_Viscosity    (viscosity)
-  call Control_Mod_Heat_Capacity        (capacity)
-  call Control_Mod_Mass_Density         (density)
-  call Control_Mod_Thermal_Conductivity (conductivity)
-  call Control_Mod_Roughness_Coefficient(z_o)
+  U_Plus_Rough_Walls = log((wall_dist + z_o) / z_o) / (kappa + TINY) + TINY
 
-  end subroutine
+  end function

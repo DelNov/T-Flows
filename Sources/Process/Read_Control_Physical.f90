@@ -4,13 +4,13 @@
 !   Reads details about physial models from control file.                      !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod,   only: HUGE_INT
-  use Comm_Mod,    only: Comm_Mod_End, this_proc
-  use Field_Mod,   only: Field_Type, buoyancy, heat_transfer, t_ref,  &
-                         grav_x, grav_y, grav_z
-  use Swarm_Mod,   only: Swarm_Type
-  use Bulk_Mod,    only: Bulk_Type
-  use Rans_Mod
+  use Const_Mod,      only: HUGE_INT
+  use Comm_Mod,       only: Comm_Mod_End, this_proc
+  use Field_Mod,      only: Field_Type, buoyancy, heat_transfer, t_ref,  &
+                            grav_x, grav_y, grav_z
+  use Swarm_Mod,      only: Swarm_Type
+  use Bulk_Mod,       only: Bulk_Type
+  use Turbulence_Mod
   use Control_Mod
 !------------------------------------------------------------------------------!
   implicit none
