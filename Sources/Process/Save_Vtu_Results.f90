@@ -270,17 +270,19 @@
   end if
 
   if (turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentQuantityT2", t2 % n(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentQuantityT2",  &
+                                           turb % t2 % n(1))
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentT2Production", &
                                            p_t2(1))
   end if
   ! Save vis and vis_t
   if(turbulence_model .eq. DES_SPALART .or.  &
      turbulence_model .eq. SPALART_ALLMARAS) then
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentViscosity", vis % n(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentViscosity",  &
+                                           turb % vis % n(1))
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "VorticityMagnitude", vort(1))
   end if
-  if(turbulence_model .ne. NONE) then                      
+  if(turbulence_model .ne. NONE) then
     kin_vis_t(1:grid % n_cells) = vis_t(1:grid % n_cells)/viscosity
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "EddyOverMolecularViscosity", &
       kin_vis_t(1))

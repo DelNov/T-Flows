@@ -26,22 +26,50 @@
 !==============================================================================!
 
   !---------------------------!
+  !                           !
   !      Turbulence type      !
   !   (variables needed for   !
   !   turbulence modelling)   !
+  !                           !
   !---------------------------!
   type Turb_Type
 
     type(Grid_Type),  pointer :: pnt_grid  ! grid for which it is defined
     type(Field_Type), pointer :: pnt_flow  ! flow field for which it is defined
 
-    ! Variables for single-point closures
-    ! (These are modelled values)
+    !---------------!
+    !   Variables   !
+    !---------------!
+
+    ! Single point closures
     type(Var_Type) :: kin
     type(Var_Type) :: eps
     type(Var_Type) :: zeta
     type(Var_Type) :: f22
 
+    type(Var_Type) :: vis
+    type(Var_Type) :: t2
+
+    !----------------!
+    !   Statistics   !
+    !----------------!
+
+    ! Time averaged momentum and energy equations
+    real, allocatable :: u_mean(:),  v_mean(:),  w_mean(:),  p_mean(:)
+    real, allocatable :: t_mean(:)
+
+    ! Time averaged modeled quantities
+    real, allocatable :: kin_mean(:), eps_mean(:), zeta_mean(:), f22_mean(:)
+
+    ! Resolved Reynolds stresses and heat fluxes
+    real, allocatable :: uu_res(:), vv_res(:), ww_res(:)
+    real, allocatable :: uv_res(:), vw_res(:), uw_res(:)
+    real, allocatable :: ut_res(:), vt_res(:), wt_res(:), t2_res(:)
+
+    ! Time averaged modelled Reynolds stresses and heat fluxes
+    real, allocatable :: uu_mean(:), vv_mean(:), ww_mean(:)
+    real, allocatable :: uv_mean(:), vw_mean(:), uw_mean(:)
+    real, allocatable :: ut_mean(:), vt_mean(:), wt_mean(:), t2_mean(:)
   end type
 
   !--------------------------------------------------------!
@@ -82,10 +110,6 @@
   !---------------------------------!
   !   Turbulence models variables   !
   !---------------------------------!
-
-  ! Variables for single-point closures 
-  type(Var_Type), target :: vis
-  type(Var_Type), target :: t2
 
   ! Reynolds stresses
   type(Var_Type), target :: uu

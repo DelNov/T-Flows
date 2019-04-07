@@ -23,7 +23,7 @@
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u, v, w, t
-  type(Var_Type),  pointer :: kin, eps, f22, zeta
+  type(Var_Type),  pointer :: kin, eps, f22, zeta, vis, t2
   real,            pointer :: flux(:)
   integer                  :: i, c, c1, c2, m, s, nks, nvs
   integer                  :: n_wall, n_inflow, n_outflow, n_symmetry,  &
@@ -58,6 +58,8 @@
   eps  => turb % eps
   f22  => turb % f22
   zeta => turb % zeta
+  vis  => turb % vis
+  t2   => turb % t2
 
   area  = 0.0
   if (this_proc < 2) print *, '# Grid material: ', grid % material % name

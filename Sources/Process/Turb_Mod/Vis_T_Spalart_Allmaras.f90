@@ -10,6 +10,7 @@
   type(Field_Type), pointer :: flow
   type(Grid_Type),  pointer :: grid
   type(Var_Type),   pointer :: u, v, w
+  type(Var_Type),   pointer :: vis
   integer                   :: c
   real                      :: x_rat, f_v1
 !==============================================================================!
@@ -17,6 +18,7 @@
   ! Take aliases
   flow => turb % pnt_flow
   grid => flow % pnt_grid
+  vis  => turb % vis
   u    => flow % u
   v    => flow % v
   w    => flow % w

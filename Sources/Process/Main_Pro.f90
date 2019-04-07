@@ -282,7 +282,7 @@
 
         if(heat_transfer) then
           call Calculate_Heat_Flux(flow)
-          call Turb_Mod_Compute_Turbulent(turb, sol, ini, t2,  n)
+          call Turb_Mod_Compute_Turbulent(turb, sol, ini, turb % t2,  n)
         end if
 
         call Update_Boundary_Values(flow, turb)
@@ -335,7 +335,7 @@
         ! Update the values at boundaries
         call Update_Boundary_Values(flow, turb)
 
-        call Turb_Mod_Compute_Turbulent(turb, sol, ini, vis, n)
+        call Turb_Mod_Compute_Turbulent(turb, sol, ini, turb % vis, n)
         call Turb_Mod_Vis_T_Spalart_Allmaras(turb)
       end if
 

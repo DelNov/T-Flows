@@ -25,7 +25,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: u, v, w, t, p
-  type(Var_Type),  pointer :: kin, eps, f22, zeta
+  type(Var_Type),  pointer :: kin, eps, f22, zeta, vis, t2
   type(Var_Type),  pointer :: scalar(:)
   integer                  :: c, m, l, k, i, n, n_points, nks, nvs, sc, c1, c2, s
   character(len=80)        :: name_prof(128), answer, name_in
@@ -55,6 +55,8 @@
   eps    => turb % eps
   f22    => turb % f22
   zeta   => turb % zeta
+  vis    => turb % vis
+  t2     => turb % t2
 
   !--------------------------------------------!
   !   Full name is specified in control file   !

@@ -7,7 +7,6 @@
   use Field_Mod,    only: Field_Type, heat_transfer
   use Var_Mod,      only: Var_Type
   use Turb_Mod,     only: Turb_Type,                &
-                          vis, t2,                  &
                           uu, vv, ww, uv, uw, vw
   use Control_Mod
   use Numerics_Mod
@@ -97,8 +96,8 @@
     if(i .eq.  2) tq => turb % eps
     if(i .eq.  3) tq => turb % zeta
     if(i .eq.  4) tq => turb % f22
-    if(i .eq.  5) tq => vis
-    if(i .eq.  6) tq => t2
+    if(i .eq.  5) tq => turb % vis
+    if(i .eq.  6) tq => turb % t2
     if(i .eq.  7) tq => uu
     if(i .eq.  8) tq => vv
     if(i .eq.  9) tq => ww

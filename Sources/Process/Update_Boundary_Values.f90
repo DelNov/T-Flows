@@ -23,7 +23,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: u, v, w, t
-  type(Var_Type),  pointer :: kin, eps, zeta, f22
+  type(Var_Type),  pointer :: kin, eps, zeta, f22, vis, t2
   integer                  :: c1, c2, s
   real                     :: qx, qy, qz, nx, ny, nz, con_t
   real                     :: pr, kin_vis
@@ -39,6 +39,8 @@
   eps  => turb % eps
   f22  => turb % f22
   zeta => turb % zeta
+  vis  => turb % vis
+  t2   => turb % t2
 
   kin_vis     = viscosity / density
 

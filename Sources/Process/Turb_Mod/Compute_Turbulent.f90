@@ -15,6 +15,7 @@
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w
+  type(Var_Type),    pointer :: vis
   real,              pointer :: flux(:)
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
@@ -40,6 +41,7 @@
   ! Take aliases
   flow => turb % pnt_flow
   grid => flow % pnt_grid
+  vis  => turb % vis
   flux => flow % flux
   u    => flow % u
   v    => flow % v

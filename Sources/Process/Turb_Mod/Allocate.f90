@@ -15,7 +15,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: u, v, w, t, p
-  type(Var_Type),  pointer :: kin, eps, f22, zeta
+  type(Var_Type),  pointer :: kin, eps, f22, zeta, vis, t2
 !==============================================================================!
 
   turb % pnt_flow => flow
@@ -32,6 +32,8 @@
   eps  => turb % eps
   f22  => turb % f22
   zeta => turb % zeta
+  vis  => turb % vis
+  t2   => turb % t2
 
   ! Allocate deltas
   allocate(h_max(-grid % n_bnd_cells:grid % n_cells));  h_max = 0.

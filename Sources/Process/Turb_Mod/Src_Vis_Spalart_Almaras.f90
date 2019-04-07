@@ -10,6 +10,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
+  type(Var_Type),    pointer :: vis
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: c
@@ -20,6 +21,7 @@
   ! Take aliases
   flow => turb % pnt_flow
   grid => flow % pnt_grid
+  vis  => turb % vis
   a    => sol % a
   b    => sol % b % val
 

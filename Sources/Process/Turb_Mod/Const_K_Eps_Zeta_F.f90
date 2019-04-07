@@ -27,6 +27,6 @@
   turb % kin  % sigma = 1.0
   turb % eps  % sigma = 1.3
   turb % zeta % sigma = 1.2
-  t2   % sigma = 1.1
+  turb % t2   % sigma = 1.1
 
   end subroutine
