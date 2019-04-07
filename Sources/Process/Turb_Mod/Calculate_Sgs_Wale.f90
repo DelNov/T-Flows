@@ -4,13 +4,13 @@
 !  Compute SGS viscosity for 'LES' by using LES_WALE model.                    !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod,      only: ONE_THIRD, TINY
-  use Field_Mod,      only: Field_Type
-  use Turbulence_Mod
+  use Const_Mod, only: ONE_THIRD, TINY
+  use Field_Mod, only: Field_Type
+  use Turb_Mod
   use Grid_Mod
-  use Work_Mod,       only: sijd_sijd => r_cell_01,  &
-                            shear2    => r_cell_02,  &
-                            vort2     => r_cell_03
+  use Work_Mod,  only: sijd_sijd => r_cell_01,  &
+                       shear2    => r_cell_02,  &
+                       vort2     => r_cell_03
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

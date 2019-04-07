@@ -7,10 +7,10 @@
   use Comm_Mod
   use Grid_Mod
   use Grad_Mod
-  use Turbulence_Mod
-  use Work_Mod,       only: h_w_x => r_cell_01,  &
-                            h_w_y => r_cell_02,  &
-                            h_w_z => r_cell_03
+  use Turb_Mod
+  use Work_Mod, only: h_w_x => r_cell_01,  &
+                      h_w_y => r_cell_02,  &
+                      h_w_z => r_cell_03
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

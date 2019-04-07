@@ -4,10 +4,10 @@
 !   Reads details about numerical models from control file.                    !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Field_Mod,      only: Field_Type, heat_transfer
-  use Var_Mod,        only: Var_Type
-  use Turbulence_Mod, only: kin, eps, zeta, f22, vis, t2,  &
-                            uu, vv, ww, uv, uw, vw
+  use Field_Mod,    only: Field_Type, heat_transfer
+  use Var_Mod,      only: Var_Type
+  use Turb_Mod,     only: kin, eps, zeta, f22, vis, t2,  &
+                          uu, vv, ww, uv, uw, vw
   use Control_Mod
   use Numerics_Mod
 !------------------------------------------------------------------------------!

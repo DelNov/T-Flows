@@ -4,10 +4,9 @@
 !   Computes the turbulent (viscosity/density) for RANS models.                !
 !---------------------------------[Modules]------------------------------------!
   use Const_Mod
-  use Control_Mod
   use Field_Mod
   use Comm_Mod
-  use Turbulence_Mod
+  use Turb_Mod
   use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none

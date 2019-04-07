@@ -4,8 +4,8 @@
 !   Initializes constants for Spalar-Allmaras and DES turbulence models.       ! 
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Turbulence_Mod
-  use Const_Mod,      only: TWO_THIRDS
+  use Turb_Mod
+  use Const_Mod, only: TWO_THIRDS
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!

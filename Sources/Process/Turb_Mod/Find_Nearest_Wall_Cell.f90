@@ -7,9 +7,9 @@
 !   What if the nearest wall cell is in another processor?                     !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod,      only: HUGE
-  use Turbulence_Mod
-  use Comm_Mod,       only: this_proc
+  use Const_Mod, only: HUGE
+  use Turb_Mod
+  use Comm_Mod,  only: this_proc
   use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none

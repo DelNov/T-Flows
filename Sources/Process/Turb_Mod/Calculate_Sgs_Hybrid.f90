@@ -7,7 +7,7 @@
   use Const_Mod
   use Field_Mod
   use Comm_Mod
-  use Turbulence_Mod
+  use Turb_Mod
   use Grid_Mod
 !------------------------------------------------------------------------------!
 !   near(c) is the number of corresponding cell on the nearest wall.

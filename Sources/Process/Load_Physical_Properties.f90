@@ -7,7 +7,7 @@
   use Grid_Mod
   use Field_Mod
   use Control_Mod
-  use Turbulence_Mod
+  use Turb_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

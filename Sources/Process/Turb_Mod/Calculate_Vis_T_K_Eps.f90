@@ -17,11 +17,10 @@
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
   use Comm_Mod
-  use Control_Mod
-  use Grid_Mod,       only: Grid_Type
-  use Field_Mod,      only: Field_Type, heat_transfer,  &
-                            viscosity, capacity, conductivity, density
-  use Turbulence_Mod
+  use Grid_Mod,    only: Grid_Type
+  use Field_Mod,   only: Field_Type, heat_transfer,  &
+                         viscosity, capacity, conductivity, density
+  use Turb_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
