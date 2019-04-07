@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Calculate_Mean(flow, n0, n1)
+  subroutine Calculate_Mean(flow, turb, n0, n1)
 !------------------------------------------------------------------------------!
 !   Calculates time averaged velocity and velocity fluctuations.               !
 !------------------------------------------------------------------------------!
@@ -13,10 +13,12 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
+  type(Turb_Type),  target :: turb
   integer                  :: n0, n1
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: u, v, w, p, t
+  type(Var_Type),  pointer :: kin, eps, f22, zeta
   integer                  :: c, n
 !==============================================================================!
 
@@ -27,6 +29,10 @@
   w    => flow % w
   p    => flow % p
   t    => flow % t
+  kin  => turb % kin
+  eps  => turb % eps
+  f22  => turb % f22
+  zeta => turb % zeta
 
   if(.not. turbulence_statistics) return
 

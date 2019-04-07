@@ -1,12 +1,13 @@
 !==============================================================================!
-  subroutine Read_Control_Numerical(flow)
+  subroutine Read_Control_Numerical(flow, turb)
 !------------------------------------------------------------------------------!
 !   Reads details about numerical models from control file.                    !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Field_Mod,    only: Field_Type, heat_transfer
   use Var_Mod,      only: Var_Type
-  use Turb_Mod,     only: kin, eps, zeta, f22, vis, t2,  &
+  use Turb_Mod,     only: Turb_Type,                &
+                          vis, t2,                  &
                           uu, vv, ww, uv, uw, vw
   use Control_Mod
   use Numerics_Mod
@@ -14,14 +15,14 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
+  type(Turb_Type),  target :: turb
 !----------------------------------[Locals]------------------------------------!
-  type(Var_Type),   pointer :: pp, t, tq, ui, phi
+  type(Var_Type),   pointer :: t, tq, ui, phi
   character(len=80)         :: name
   integer                   :: i, sc
 !==============================================================================!
 
   ! Take aliases
-  pp => flow % pp
   t  => flow % t
 
   !-------------------------!
@@ -47,11 +48,11 @@
   !-------------------------!
   !   Related to pressure   !
   !-------------------------!
-  pp % niter = 40
-  call Control_Mod_Tolerance_For_Pressure_Solver      (pp % tol)
-  call Control_Mod_Preconditioner_For_System_Matrix   (pp % precond)
-  call Control_Mod_Max_Iterations_For_Pressure_Solver (pp % niter)
-  call Control_Mod_Simple_Underrelaxation_For_Pressure(pp % urf)
+  flow % pp % niter = 40
+  call Control_Mod_Tolerance_For_Pressure_Solver      (flow % pp % tol)
+  call Control_Mod_Preconditioner_For_System_Matrix   (flow % pp % precond)
+  call Control_Mod_Max_Iterations_For_Pressure_Solver (flow % pp % niter)
+  call Control_Mod_Simple_Underrelaxation_For_Pressure(flow % pp % urf)
 
   !------------------------------!
   !   Related to heat transfer   !
@@ -92,10 +93,10 @@
   !   All turbuelnt quantities   !
   !------------------------------!
   do i = 1, 12
-    if(i .eq.  1) tq => kin
-    if(i .eq.  2) tq => eps
-    if(i .eq.  3) tq => zeta
-    if(i .eq.  4) tq => f22
+    if(i .eq.  1) tq => turb % kin
+    if(i .eq.  2) tq => turb % eps
+    if(i .eq.  3) tq => turb % zeta
+    if(i .eq.  4) tq => turb % f22
     if(i .eq.  5) tq => vis
     if(i .eq.  6) tq => t2
     if(i .eq.  7) tq => uu

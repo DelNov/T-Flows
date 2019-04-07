@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Source_Kin_K_Eps_Zeta_F(flow, sol)
+  subroutine Turb_Mod_Src_Kin_K_Eps_Zeta_F(turb, sol)
 !------------------------------------------------------------------------------!
 !   Computes the source terms in kin transport equation.                       !
 !------------------------------------------------------------------------------!
@@ -12,25 +12,19 @@
 !   /                                                                          !
 !                                                                              !
 !------------------------------------------------------------------------------!
-!---------------------------------[Modules]------------------------------------!
-  use Const_Mod
-  use Field_Mod
-  use Turb_Mod
-  use Grid_Mod,   only: Grid_Type
-  use Solver_Mod, only: Solver_Type
-  use Matrix_Mod, only: Matrix_Type
-!------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Field_Type),  target :: flow
+  type(Turb_Type),   target :: turb
   type(Solver_Type), target :: sol
 !---------------------------------[Calling]------------------------------------!
   real :: Y_Plus_Low_Re
   real :: Y_Plus_Rough_Walls
   real :: Roughness_Coefficient
 !-----------------------------------[Locals]-----------------------------------!
+  type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w
+  type(Var_Type),    pointer :: kin, eps
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: c, c1, c2, s
@@ -52,10 +46,13 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
+  flow => turb % pnt_flow
   grid => flow % pnt_grid
   u    => flow % u
   v    => flow % v
   w    => flow % w
+  kin  => turb % kin
+  eps  => turb % eps
   a    => sol % a
   b    => sol % b % val
 

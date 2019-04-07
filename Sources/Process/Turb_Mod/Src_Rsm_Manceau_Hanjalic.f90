@@ -1,29 +1,24 @@
 !==============================================================================!
-  subroutine Sources_Rsm_Manceau_Hanjalic(flow, sol, name_phi)
+  subroutine Turb_Mod_Src_Rsm_Manceau_Hanjalic(turb, sol, name_phi)
 !------------------------------------------------------------------------------!
 !   Calculate source terms for Re stresses and dissipation for 
 !   RSM_MANCEAU_HANJALIC model                                                 !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Field_Mod
-  use Turb_Mod
-  use Grid_Mod,   only: Grid_Type
-  use Solver_Mod, only: Solver_Type
-  use Matrix_Mod, only: Matrix_Type
-  use Grad_Mod
-  use Work_Mod,   only: f22_x  => r_cell_23,  &
-                        f22_y  => r_cell_24,  &
-                        f22_z  => r_cell_25
+  use Work_Mod, only: f22_x  => r_cell_23,  &
+                      f22_y  => r_cell_24,  &
+                      f22_z  => r_cell_25
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),  target :: flow
+  type(Turb_Type),   target :: turb
   type(Solver_Type), target :: sol
   character(len=*)          :: name_phi
 !-----------------------------------[Locals]-----------------------------------!
+  type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w
+  type(Var_Type),    pointer :: kin, eps, f22
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: c, s, c1, c2, i
@@ -36,14 +31,18 @@
 !==============================================================================!
 
   ! Take aliases
+  flow => turb % pnt_flow
   grid => flow % pnt_grid
   u    => flow % u
   v    => flow % v
   w    => flow % w
+  kin  => turb % kin
+  eps  => turb % eps
+  f22  => turb % f22
   a    => sol  % a
   b    => sol  % b % val
 
-  call Time_And_Length_Scale(grid)
+  call Time_And_Length_Scale(grid, turb)
 
   kin_vis = viscosity / density
 

@@ -1,27 +1,21 @@
 !==============================================================================!
-  subroutine Source_Eps_K_Eps_Zeta_F(flow, sol)
+  subroutine Turb_Mod_Src_Eps_K_Eps_Zeta_F(turb, sol)
 !------------------------------------------------------------------------------!
 !   Calculates source terms in equation of dissipation of turbulent energy     !
 !   and imposes boundary condition                                             !
 !------------------------------------------------------------------------------!
-!---------------------------------[Modules]------------------------------------!
-  use Const_Mod
-  use Grid_Mod,   only: Grid_Type
-  use Field_Mod,  !only: Field_Type, viscosity, density, buoyancy
-  use Solver_Mod, only: Solver_Type
-  use Matrix_Mod, only: Matrix_Type
-  use Turb_Mod
-!------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Field_Type),  target :: flow
+  type(Turb_Type),   target :: turb
   type(Solver_Type), target :: sol
 !---------------------------------[Calling]------------------------------------!
   real :: Y_Plus_Low_Re
   real :: Roughness_Coefficient
 !-----------------------------------[Locals]-----------------------------------!
+  type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w
+  type(Var_Type),    pointer :: kin, eps, zeta
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: c, s, c1, c2, j
@@ -55,14 +49,18 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
+  flow => turb % pnt_flow
   grid => flow % pnt_grid
   u    => flow % u
   v    => flow % v
   w    => flow % w
+  kin  => turb % kin
+  eps  => turb % eps
+  zeta => turb % zeta
   a    => sol % a
   b    => sol % b % val
 
-  call Time_And_Length_Scale(grid)
+  call Time_And_Length_Scale(grid, turb)
 
   do c = 1, grid % n_cells 
     e_sor = grid % vol(c)/(t_scale(c)+TINY)

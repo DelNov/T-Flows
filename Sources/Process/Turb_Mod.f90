@@ -4,10 +4,45 @@
 !   Definition of variables used for all turbulence modelling paradigms.       !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Var_Mod
+  use Const_Mod
+  use Comm_Mod
+  use Info_Mod
+  use Var_Mod,    only: Var_Type,                    &
+                        Var_Mod_Allocate_New_Only,   &
+                        Var_Mod_Allocate_Solution,   &
+                        Var_Mod_Allocate_Statistics
+  use Grid_Mod
+  use Grad_Mod
+  use Field_Mod,  only: Field_Type,                                            &
+                        viscosity, density, buoyancy, conductivity, capacity,  &
+                        grav_x,  grav_y,  grav_z,                              &
+                        omega_x, omega_y, omega_z,                             &
+                        heat_transfer, t_ref
+  use Solver_Mod, only: Solver_Type, Bicg, Cg, Cgs
+  use Matrix_Mod, only: Matrix_Type
+  use Numerics_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
+
+  !---------------------------!
+  !      Turbulence type      !
+  !   (variables needed for   !
+  !   turbulence modelling)   !
+  !---------------------------!
+  type Turb_Type
+
+    type(Grid_Type),  pointer :: pnt_grid  ! grid for which it is defined
+    type(Field_Type), pointer :: pnt_flow  ! flow field for which it is defined
+
+    ! Variables for single-point closures
+    ! (These are modelled values)
+    type(Var_Type) :: kin
+    type(Var_Type) :: eps
+    type(Var_Type) :: zeta
+    type(Var_Type) :: f22
+
+  end type
 
   !--------------------------------------------------------!
   !   Parameters and variables defining turbulence model   !
@@ -49,10 +84,6 @@
   !---------------------------------!
 
   ! Variables for single-point closures 
-  type(Var_Type), target :: kin
-  type(Var_Type), target :: eps
-  type(Var_Type), target :: zeta
-  type(Var_Type), target :: f22
   type(Var_Type), target :: vis
   type(Var_Type), target :: t2
 
@@ -87,9 +118,9 @@
   ! For scale-resolving models
   real              :: c_smag
   real, allocatable :: c_dyn(:)
-  real, allocatable :: h_max(:)                                                 
-  real, allocatable :: h_min(:)                                                 
-  real, allocatable :: h_w(:)                                                   
+  real, allocatable :: h_max(:)
+  real, allocatable :: h_min(:)
+  real, allocatable :: h_w(:)
 
   !-----------------------------------!
   !   Auxiliary turbulent variables   !
@@ -142,5 +173,47 @@
 
   ! Turbulent Prandtl and Schmidt numbers
   real :: pr_t, sc_t
+
+  contains
+
+  ! The constructor-like
+  include 'Turb_Mod/Allocate.f90'
+
+  ! Functions to set turbulence constants
+  include 'Turb_Mod/Const_Hanjalic_Jakirlic.f90'
+  include 'Turb_Mod/Const_K_Eps.f90'
+  include 'Turb_Mod/Const_K_Eps_Zeta_F.f90'
+  include 'Turb_Mod/Const_Manceau_Hanjalic.f90'
+  include 'Turb_Mod/Const_Reynolds_Stress.f90'
+  include 'Turb_Mod/Const_Spalart_Allmaras.f90'
+
+  ! Computation of various turbulent quantities
+  include 'Turb_Mod/Compute_F22.f90'
+  include 'Turb_Mod/Compute_Stresses.f90'
+  include 'Turb_Mod/Compute_Turbulent.f90'
+
+  ! Different sources
+  include 'Turb_Mod/Src_Eps_K_Eps.f90'
+  include 'Turb_Mod/Src_Eps_K_Eps_Zeta_F.f90'
+  include 'Turb_Mod/Src_F22_K_Eps_Zeta_F.f90'
+  include 'Turb_Mod/Src_F22_Rsm_Manceau_Hanjalic.f90'
+  include 'Turb_Mod/Src_Kin_K_Eps.f90'
+  include 'Turb_Mod/Src_Kin_K_Eps_Zeta_F.f90'
+  include 'Turb_Mod/Src_Rsm_Hanjalic_Jakirlic.f90'
+  include 'Turb_Mod/Src_Rsm_Manceau_Hanjalic.f90'
+  include 'Turb_Mod/Src_T2.f90'
+  include 'Turb_Mod/Src_Vis_Spalart_Almaras.f90'
+  include 'Turb_Mod/Src_Zeta_K_Eps_Zeta_F.f90'
+
+  ! Computation of turbulence viscosity
+  include 'Turb_Mod/Vis_T_Dynamic.f90'
+  include 'Turb_Mod/Vis_T_Hybrid.f90'
+  include 'Turb_Mod/Vis_T_K_Eps.f90'
+  include 'Turb_Mod/Vis_T_K_Eps_Zeta_F.f90'
+  include 'Turb_Mod/Vis_T_Rsm.f90'
+  include 'Turb_Mod/Vis_T_Smagorinsky.f90'
+  include 'Turb_Mod/Vis_T_Spalart_Allmaras.f90'
+  include 'Turb_Mod/Vis_T_Wale.f90'
+
 
   end module

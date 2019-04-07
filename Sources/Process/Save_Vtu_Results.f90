@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Results(flow, name_save)
+  subroutine Save_Results(flow, turb, name_save)
 !------------------------------------------------------------------------------!
 !   Writes results in VTU file format (for VisIt and Paraview)                 !
 !------------------------------------------------------------------------------!
@@ -29,6 +29,7 @@
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   type(Field_Type), target :: flow
+  type(Turb_Type),  target :: turb
   character(len=*)         :: name_save
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: grid
@@ -243,8 +244,10 @@
      turbulence_model .eq. HYBRID_LES_RANS       .or.  &
      turbulence_model .eq. RSM_MANCEAU_HANJALIC  .or.  &
      turbulence_model .eq. RSM_HANJALIC_JAKIRLIC  ) then
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentKineticEnergy", kin % n(1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentDissipation",   eps % n(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentKineticEnergy",  &
+                                           turb % kin % n(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentDissipation",    &
+                                           turb % eps % n(1))
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentKineticEnergyProduction", &
                                            p_kin(1))
   end if
@@ -253,14 +256,17 @@
   if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
      turbulence_model .eq. HYBRID_LES_RANS) then
     do c = 1, grid % n_cells
-      v2_calc(c) = kin % n(c) * zeta % n(c)
+      v2_calc(c) = turb % kin % n(c) * turb % zeta % n(c)
     end do
     call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentQuantityV2",   v2_calc (1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentQuantityZeta", zeta % n(1))
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentQuantityF22",  f22  % n(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentQuantityZeta",  &
+                                           turb % zeta % n(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentQuantityF22",   &
+                                           turb % f22  % n(1))
   end if
   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
-    call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentQuantityF22",  f22  % n(1))
+    call Save_Vtu_Scalar(grid, IN_4, IN_5, "TurbulentQuantityF22",   &
+                                           turb % f22 % n(1))
   end if
 
   if (turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then

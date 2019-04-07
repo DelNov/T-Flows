@@ -1,30 +1,18 @@
 !==============================================================================!
-  subroutine Compute_Turbulent(flow, sol, dt, ini, phi, n_step)
+  subroutine Turb_Mod_Compute_Turbulent(turb, sol, ini, phi, n_step)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves transport equations for different turbulent         !
 !   variables.                                                                 !
 !------------------------------------------------------------------------------!
-!---------------------------------[Modules]------------------------------------!
-  use Field_Mod
-  use Turb_Mod
-  use Comm_Mod
-  use Var_Mod,      only: Var_Type
-  use Grid_Mod,     only: Grid_Type
-  use Grad_Mod,     only: Grad_Mod_Variable
-  use Info_Mod,     only: Info_Mod_Iter_Fill_At
-  use Numerics_Mod
-  use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
-  use Matrix_Mod,   only: Matrix_Type
-!------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Field_Type),  target :: flow
+  type(Turb_Type),   target :: turb
   type(Solver_Type), target :: sol
-  real                      :: dt
   integer                   :: ini
   type(Var_Type)            :: phi
   integer                   :: n_step
 !----------------------------------[Locals]------------------------------------!
+  type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w
   real,              pointer :: flux(:)
@@ -36,6 +24,7 @@
   real                       :: a0, a12, a21
   real                       :: vis_eff
   real                       :: phi_x_f, phi_y_f, phi_z_f
+  real                       :: dt
 !==============================================================================!
 !                                                                              !
 !  The form of equations which are solved:                                     !
@@ -49,11 +38,13 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
+  flow => turb % pnt_flow
   grid => flow % pnt_grid
   flux => flow % flux
   u    => flow % u
   v    => flow % v
   w    => flow % w
+  dt   =  flow % dt
   a    => sol  % a
   b    => sol  % b % val
 
@@ -200,24 +191,25 @@
   !                                     !
   !-------------------------------------!
   if(turbulence_model .eq. K_EPS) then
-    if(phi % name .eq. 'KIN') call Source_Kin_K_Eps(flow, sol)
-    if(phi % name .eq. 'EPS') call Source_Eps_K_Eps(flow, sol)
+    if(phi % name .eq. 'KIN') call Turb_Mod_Src_Kin_K_Eps(turb, sol)
+    if(phi % name .eq. 'EPS') call Turb_Mod_Src_Eps_K_Eps(turb, sol)
   end if
 
   if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
      turbulence_model .eq. HYBRID_LES_RANS) then
-    if(phi % name .eq. 'KIN')  call Source_Kin_K_Eps_Zeta_F(flow, sol)
-    if(phi % name .eq. 'EPS')  call Source_Eps_K_Eps_Zeta_F(flow, sol)
-    if(phi % name .eq. 'ZETA') call Source_Zeta_K_Eps_Zeta_F(flow, sol, n_step)
+    if(phi % name .eq. 'KIN')  call Turb_Mod_Src_Kin_K_Eps_Zeta_F(turb, sol)
+    if(phi % name .eq. 'EPS')  call Turb_Mod_Src_Eps_K_Eps_Zeta_F(turb, sol)
+    if(phi % name .eq. 'ZETA')  &
+      call Turb_Mod_Src_Zeta_K_Eps_Zeta_F(turb, sol, n_step)
   end if
 
   if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
-    if(phi % name .eq. 'T2')  call Source_T2(flow, sol)
+    if(phi % name .eq. 'T2')  call Turb_Mod_Src_T2(turb, sol)
   end if
 
   if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
      turbulence_model .eq. DES_SPALART) then
-    call Source_Vis_Spalart_Almaras(flow, sol)
+    call Turb_Mod_Src_Vis_Spalart_Almaras(turb, sol)
   end if
 
   !---------------------------------!

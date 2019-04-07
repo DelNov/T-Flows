@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Load_Boundary_Conditions(flow, backup)
+  subroutine Load_Boundary_Conditions(flow, turb, backup)
 !------------------------------------------------------------------------------!
 !   Reads boundary condition from control file                                 !
 !------------------------------------------------------------------------------!
@@ -17,6 +17,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
+  type(Turb_Type),  target :: turb
   logical                  :: backup
 !----------------------------------[Calling]-----------------------------------!
   real    :: Distance
@@ -24,6 +25,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: u, v, w, t, p
+  type(Var_Type),  pointer :: kin, eps, f22, zeta
   type(Var_Type),  pointer :: scalar(:)
   integer                  :: c, m, l, k, i, n, n_points, nks, nvs, sc, c1, c2, s
   character(len=80)        :: name_prof(128), answer, name_in
@@ -49,6 +51,10 @@
   t      => flow % t
   p      => flow % p
   scalar => flow % scalar
+  kin    => turb % kin
+  eps    => turb % eps
+  f22    => turb % f22
+  zeta   => turb % zeta
 
   !--------------------------------------------!
   !   Full name is specified in control file   !

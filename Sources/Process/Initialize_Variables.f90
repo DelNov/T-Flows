@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Initialize_Variables(flow)
+  subroutine Initialize_Variables(flow, turb)
 !------------------------------------------------------------------------------!
 !   Initialize dependent variables.  (It is a bit of a mess still)             !
 !------------------------------------------------------------------------------!
@@ -16,12 +16,14 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
+  type(Turb_Type),  target :: turb
 !----------------------------------[Calling]-----------------------------------!
   integer :: Key_Ind
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u, v, w, t
+  type(Var_Type),  pointer :: kin, eps, f22, zeta
   real,            pointer :: flux(:)
   integer                  :: i, c, c1, c2, m, s, nks, nvs
   integer                  :: n_wall, n_inflow, n_outflow, n_symmetry,  &
@@ -52,6 +54,10 @@
   v    => flow % v
   w    => flow % w
   t    => flow % t
+  kin  => turb % kin
+  eps  => turb % eps
+  f22  => turb % f22
+  zeta => turb % zeta
 
   area  = 0.0
   if (this_proc < 2) print *, '# Grid material: ', grid % material % name

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Read_Control_Physical(flow, swarm, backup)
+  subroutine Read_Control_Physical(flow, swarm, turb, backup)
 !------------------------------------------------------------------------------!
 !   Reads details about physial models from control file.                      !
 !------------------------------------------------------------------------------!
@@ -17,6 +17,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
   type(Swarm_Type), target :: swarm
+  type(Turb_Type),  target :: turb
   logical                  :: backup
 !----------------------------------[Locals]------------------------------------!
   type(Bulk_Type), pointer :: bulk
@@ -152,25 +153,25 @@
   !   Initialization of model constants depending on the turbulence model   !
   !-------------------------------------------------------------------------!
   if(turbulence_model .eq. K_EPS) then
-    call Constants_K_Eps()
+    call Turb_Mod_Const_K_Eps(turb)
   end if
 
   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
-    call Constants_Manceau_Hanjalic()
+    call Turb_Mod_Const_Manceau_Hanjalic(turb)
   end if
 
   if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
-    call Constants_Hanjalic_Jakirlic()
+    call Turb_Mod_Const_Hanjalic_Jakirlic(turb)
   end if
 
   if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
      turbulence_model .eq. HYBRID_LES_RANS) then
-    call Constants_K_Eps_Zeta_F()
+    call Turb_Mod_Const_K_Eps_Zeta_F(turb)
   end if
 
   if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
      turbulence_model .eq. DES_SPALART) then
-    call Constants_Spalart_Allmaras()
+    call Turb_Mod_Const_Spalart_Allmaras(turb)
   end if
 
   !------------------------------------!

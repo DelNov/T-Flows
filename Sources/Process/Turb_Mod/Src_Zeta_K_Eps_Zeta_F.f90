@@ -1,25 +1,19 @@
 !==============================================================================!
-  subroutine Source_Zeta_K_Eps_Zeta_F(flow, sol, n_step)
+  subroutine Turb_Mod_Src_Zeta_K_Eps_Zeta_F(turb, sol, n_step)
 !------------------------------------------------------------------------------!
 !   Calculate source terms in equation for zeta.                               !
 !   Term which is negative is put on left hand side in diagonal of             !
 !   martix of coefficient                                                      !
 !------------------------------------------------------------------------------!
-!---------------------------------[Modules]------------------------------------!
-  use Const_Mod
-  use Field_Mod
-  use Turb_Mod
-  use Grid_Mod,   only: Grid_Type
-  use Solver_Mod, only: Solver_Type
-  use Matrix_Mod, only: Matrix_Type
-!------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Field_Type),  target :: flow
+  type(Turb_Type),   target :: turb
   type(Solver_Type), target :: sol
   integer                   :: n_step
 !----------------------------------[Locals]------------------------------------!
+  type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
+  type(Var_Type),    pointer :: kin, eps, f22, zeta
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: c
@@ -39,7 +33,12 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
+  flow => turb % pnt_flow
   grid => flow % pnt_grid
+  kin  => turb % kin
+  eps  => turb % eps
+  f22  => turb % f22
+  zeta => turb % zeta
   a    => sol % a
   b    => sol % b % val
 

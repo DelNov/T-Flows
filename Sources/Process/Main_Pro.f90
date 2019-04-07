@@ -32,6 +32,7 @@
   type(Grid_Type)   :: grid        ! grid used in computations
   type(Field_Type)  :: flow        ! flow field we will be solving for
   type(Swarm_Type)  :: swarm       ! swarm of particles
+  type(Turb_Type)   :: turb        ! turbulence modelling
   type(Solver_Type) :: sol         ! linear solvers
   real              :: time        ! physical time of the simulation
   integer           :: first_dt    ! first time step in this run
@@ -85,15 +86,15 @@
   call Control_Mod_Starting_Time_Step_For_Statistics(n_stat, verbose=.true.)
 
   ! Read physical models from control file
-  call Read_Control_Physical(flow, swarm, backup)
+  call Read_Control_Physical(flow, swarm, turb, backup)
 
   ! Read numerical models from control file
-  call Read_Control_Numerical(flow)
+  call Read_Control_Numerical(flow, turb)
 
   ! Allocate memory for all variables
   call Field_Mod_Allocate(flow, grid)
   call Grad_Mod_Allocate(grid)
-  call Turbulence_Allocate(flow)
+  call Turb_Mod_Allocate(turb, flow)
   call Swarm_Mod_Allocate(swarm, flow)
   call User_Mod_Allocate(grid)
 
@@ -106,17 +107,17 @@
 
   call Load_Physical_Properties(grid)
 
-  call Load_Boundary_Conditions(flow, backup)
+  call Load_Boundary_Conditions(flow, turb, backup)
 
   ! First time step is one, unless read from backup otherwise
   first_dt = 0
 
   ! Read backup file if directed so, and set the "backup" to .true. or .false.
-  call Backup_Mod_Load(flow, swarm, first_dt, n_stat, backup) 
+  call Backup_Mod_Load(flow, swarm, turb, first_dt, n_stat, backup) 
 
   ! Initialize variables
   if(.not. backup) then
-    call Initialize_Variables(flow)
+    call Initialize_Variables(flow, turb)
     call Comm_Mod_Wait
   end if
 
@@ -165,7 +166,7 @@
 
   ! It will save results in .vtk or .cgns file format,
   ! depending on how the code was compiled
-  call Save_Results(flow, problem_name)
+  call Save_Results(flow, turb, problem_name)
   call Save_Swarm (swarm, problem_name)
 
   do n = first_dt + 1, last_dt
@@ -194,20 +195,24 @@
        turbulence_model .eq. LES_DYNAMIC     .or.  &
        turbulence_model .eq. LES_WALE) then
       call Calculate_Shear_And_Vorticity(flow)
-      if(turbulence_model .eq. LES_DYNAMIC) call Calculate_Sgs_Dynamic(flow,sol)
-      if(turbulence_model .eq. LES_WALE)    call Calculate_Sgs_Wale(flow)
-      call Calculate_Sgs(flow)
+      if(turbulence_model .eq. LES_DYNAMIC) then
+        call Turb_Mod_Vis_T_Dynamic(turb, sol)
+      end if
+      if(turbulence_model .eq. LES_WALE) then
+        call Turb_Mod_Vis_T_Wale(turb)
+      end if
+      call Turb_Mod_Vis_T_Smagorinsky(turb)
     end if
 
-    If(turbulence_model .eq. HYBRID_LES_RANS) then
-      call Calculate_Sgs_Dynamic(flow,sol)
-      call Calculate_Sgs_Hybrid(grid)
+    if(turbulence_model .eq. HYBRID_LES_RANS) then
+      call Turb_Mod_Vis_T_Dynamic(turb, sol)
+      call Turb_Mod_Vis_T_Hybrid (turb)
     end if
 
     call Convective_Outflow(flow, flow % dt)
     if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
        turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
-      call Calculate_Vis_T_Rsm(flow)
+      call Turb_Mod_Vis_T_Rsm(turb)
     end if
 
     !--------------------------!
@@ -257,14 +262,14 @@
       if(turbulence_model .eq. K_EPS) then
 
         ! Update the values at boundaries
-        call Update_Boundary_Values(flow)
+        call Update_Boundary_Values(flow, turb)
 
         call Calculate_Shear_And_Vorticity(flow)
 
-        call Compute_Turbulent(flow, sol, flow % dt, ini, kin, n)
-        call Compute_Turbulent(flow, sol, flow % dt, ini, eps, n)
+        call Turb_Mod_Compute_Turbulent(turb, sol, ini, turb % kin, n)
+        call Turb_Mod_Compute_Turbulent(turb, sol, ini, turb % eps, n)
 
-        call Calculate_Vis_T_K_Eps(flow)
+        call Turb_Mod_Vis_T_K_Eps(turb)
 
       end if
 
@@ -272,20 +277,20 @@
          turbulence_model .eq. HYBRID_LES_RANS) then
         call Calculate_Shear_And_Vorticity(flow)
 
-        call Compute_Turbulent(flow, sol, flow % dt, ini, kin, n)
-        call Compute_Turbulent(flow, sol, flow % dt, ini, eps, n)
+        call Turb_Mod_Compute_Turbulent(turb, sol, ini, turb % kin, n)
+        call Turb_Mod_Compute_Turbulent(turb, sol, ini, turb % eps, n)
 
         if(heat_transfer) then
           call Calculate_Heat_Flux(flow)
-          call Compute_Turbulent(flow, sol, flow % dt, ini, t2,  n)
+          call Turb_Mod_Compute_Turbulent(turb, sol, ini, t2,  n)
         end if
 
-        call Update_Boundary_Values(flow)
+        call Update_Boundary_Values(flow, turb)
 
-        call Compute_F22(flow, sol, ini, f22)
-        call Compute_Turbulent(flow, sol, flow % dt, ini, zeta, n)
+        call Turb_Mod_Compute_F22(turb, sol, ini, turb % f22)
+        call Turb_Mod_Compute_Turbulent(turb, sol, ini, turb % zeta, n)
 
-        call Calculate_Vis_T_K_Eps_Zeta_F(flow)
+        call Turb_Mod_Vis_T_K_Eps_Zeta_F(turb)
 
       end if
 
@@ -293,29 +298,29 @@
          turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
 
         ! Update the values at boundaries
-        call Update_Boundary_Values(flow)
+        call Update_Boundary_Values(flow, turb)
 
-        call Time_And_Length_Scale(grid)
+        call Time_And_Length_Scale(grid, turb)
 
         call Grad_Mod_Variable(flow % u, .true.)
         call Grad_Mod_Variable(flow % v, .true.)
         call Grad_Mod_Variable(flow % w, .true.)
 
-        call Compute_Stresses(flow, sol, flow % dt, ini, uu, n)
-        call Compute_Stresses(flow, sol, flow % dt, ini, vv, n)
-        call Compute_Stresses(flow, sol, flow % dt, ini, ww, n)
+        call Turb_Mod_Compute_Stresses(turb, sol, ini, uu, n)
+        call Turb_Mod_Compute_Stresses(turb, sol, ini, vv, n)
+        call Turb_Mod_Compute_Stresses(turb, sol, ini, ww, n)
 
-        call Compute_Stresses(flow, sol, flow % dt, ini, uv, n)
-        call Compute_Stresses(flow, sol, flow % dt, ini, uw, n)
-        call Compute_Stresses(flow, sol, flow % dt, ini, vw, n)
+        call Turb_Mod_Compute_Stresses(turb, sol, ini, uv, n)
+        call Turb_Mod_Compute_Stresses(turb, sol, ini, uw, n)
+        call Turb_Mod_Compute_Stresses(turb, sol, ini, vw, n)
 
         if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
-          call Compute_F22(flow, sol, ini, f22)
+          call Turb_Mod_Compute_F22(turb, sol, ini, turb % f22)
         end if
 
-        call Compute_Stresses(flow, sol, flow % dt, ini, eps, n)
+        call Turb_Mod_Compute_Stresses(turb, sol, ini, turb % eps, n)
 
-        call Calculate_Vis_T_Rsm(flow)
+        call Turb_Mod_Vis_T_Rsm(turb)
 
         if(heat_transfer) then
           call Calculate_Heat_Flux(flow)
@@ -328,14 +333,14 @@
         call Calculate_Vorticity(flow)
 
         ! Update the values at boundaries
-        call Update_Boundary_Values(flow)
+        call Update_Boundary_Values(flow, turb)
 
-        call Compute_Turbulent(flow, sol, flow % dt, ini, vis, n)
-        call Calculate_Vis_T_Spalart_Allmaras(flow)
+        call Turb_Mod_Compute_Turbulent(turb, sol, ini, vis, n)
+        call Turb_Mod_Vis_T_Spalart_Allmaras(turb)
       end if
 
       ! Update the values at boundaries
-      call Update_Boundary_Values(flow)
+      call Update_Boundary_Values(flow, turb)
 
       ! End of the current iteration
       call Info_Mod_Iter_Print()
@@ -382,17 +387,17 @@
 
     ! Is it time to save the backup file?
     if(save_now .or. exit_now .or. mod(n, bsi) .eq. 0) then
-      call Backup_Mod_Save(flow, swarm, n, n_stat, name_save)
+      call Backup_Mod_Save(flow, swarm, turb, n, n_stat, name_save)
     end if
 
     ! Is it time to save results for post-processing
     if(save_now .or. exit_now .or. mod(n, rsi) .eq. 0) then
       call Comm_Mod_Wait
-      call Save_Results(flow, name_save)
+      call Save_Results(flow, turb, name_save)
       call Save_Swarm (swarm, name_save)
 
       ! Write results in user-customized format
-      call User_Mod_Save_Results(flow, name_save)
+      call User_Mod_Save_Results(flow, turb, name_save)
       ! call User_Mod_Save_Swarm(swarm, name_save)  to be done!
     end if
 
@@ -422,12 +427,12 @@
 
   ! Save backup and post-processing files at exit
   call Comm_Mod_Wait
-  call Save_Results(flow, name_save)
+  call Save_Results(flow, turb, name_save)
   call Save_Swarm (swarm, name_save)
-  call Backup_Mod_Save(flow, swarm, n, n_stat, name_save)
+  call Backup_Mod_Save(flow, swarm, turb, n, n_stat, name_save)
 
   ! Write results in user-customized format
-  call User_Mod_Save_Results(flow, name_save)
+  call User_Mod_Save_Results(flow, turb, name_save)
   ! call User_Mod_Save_Swarm(swarm, name_save)  to be done!
 
   if(this_proc < 2) then

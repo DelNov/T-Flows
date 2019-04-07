@@ -1,41 +1,31 @@
 !==============================================================================!
-  subroutine Compute_Stresses(flow, sol, dt, ini, phi, n_time_step)
+  subroutine Turb_Mod_Compute_Stresses(turb, sol, ini, phi, n_time_step)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves transport equation for Re stresses for RSM.         !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Comm_Mod
-  use Turb_Mod
-  use Var_Mod,      only: Var_Type
-  use Grid_Mod,     only: Grid_Type
-  use Field_Mod,    only: Field_Type, density, viscosity
-  use Grad_Mod
-  use Info_Mod,     only: Info_Mod_Iter_Fill_At
-  use Numerics_Mod
-  use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
-  use Matrix_Mod,   only: Matrix_Type
-  use Work_Mod,     only: phi_x       => r_cell_01,  &
-                          phi_y       => r_cell_02,  &
-                          phi_z       => r_cell_03,  &
-                          u1uj_phij   => r_cell_06,  &
-                          u2uj_phij   => r_cell_07,  &
-                          u3uj_phij   => r_cell_08,  &
-                          u1uj_phij_x => r_cell_09,  &
-                          u2uj_phij_y => r_cell_10,  &
-                          u3uj_phij_z => r_cell_11
+  use Work_Mod, only: phi_x       => r_cell_01,  &
+                      phi_y       => r_cell_02,  &
+                      phi_z       => r_cell_03,  &
+                      u1uj_phij   => r_cell_06,  &
+                      u2uj_phij   => r_cell_07,  &
+                      u3uj_phij   => r_cell_08,  &
+                      u1uj_phij_x => r_cell_09,  &
+                      u2uj_phij_y => r_cell_10,  &
+                      u3uj_phij_z => r_cell_11
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),  target :: flow
+  type(Turb_Type),   target :: turb
   type(Solver_Type), target :: sol
-  real                      :: dt
   integer                   :: ini
   type(Var_Type)            :: phi
   integer                   :: n_time_step
 !-----------------------------------[Locals]-----------------------------------!
+  type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w
+  type(Var_Type),    pointer :: kin, eps, f22
   real,              pointer :: flux(:)
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
@@ -46,6 +36,7 @@
   real                       :: vis_eff
   real                       :: phix_f, phiy_f, phiz_f
   real                       :: vis_t_f
+  real                       :: dt
 !==============================================================================!
 !                                                                              !
 !   The form of equations which are being solved:                              !
@@ -59,11 +50,15 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
+  flow => turb % pnt_flow
   grid => flow % pnt_grid
-  flux => flow % flux
   u    => flow % u
   v    => flow % v
   w    => flow % w
+  dt   =  flow % dt
+  kin  => turb % kin
+  eps  => turb % eps
+  f22  => turb % f22
   a    => sol  % a
   b    => sol  % b % val
 
@@ -298,9 +293,9 @@
     call Grad_Mod_Component(grid, f22 % n, 2, f22 % y, .true.) ! df22/dy
     call Grad_Mod_Component(grid, f22 % n, 3, f22 % z, .true.) ! df22/dz
 
-    call Sources_Rsm_Manceau_Hanjalic(flow, sol, phi % name)
+    call Turb_Mod_Src_Rsm_Manceau_Hanjalic(turb, sol, phi % name)
   else if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
-    call Sources_Rsm_Hanjalic_Jakirlic(flow, sol, phi % name, n_time_step)
+    call Turb_Mod_Src_Rsm_Hanjalic_Jakirlic(turb, sol, phi % name, n_time_step)
   end if
 
   !---------------------------------!

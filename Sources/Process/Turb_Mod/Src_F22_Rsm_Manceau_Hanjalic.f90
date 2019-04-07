@@ -1,22 +1,17 @@
 !==============================================================================!
-  subroutine Source_F22_Rsm_Manceau_Hanjalic(flow, sol)
+  subroutine Turb_Mod_Src_F22_Rsm_Manceau_Hanjalic(turb, sol)
 !------------------------------------------------------------------------------!
 !   Calculate source terms in eliptic relaxation equation                      !
 !   and imposing  boundary condition forf22                                    !
 !------------------------------------------------------------------------------!
-!----------------------------------[Moules]-----------------------------------!
-  use Field_Mod
-  use Turb_Mod
-  use Grid_Mod,   only: Grid_Type
-  use Solver_Mod, only: Solver_Type
-  use Matrix_Mod, only: Matrix_Type
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),  target :: flow
+  type(Turb_Type),   target :: turb
   type(Solver_Type), target :: sol
 !-----------------------------------[Locals]-----------------------------------!
+  type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
+  type(Var_Type),    pointer :: f22
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: s, c, c1, c2
@@ -52,11 +47,13 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
+  flow => turb % pnt_flow
   grid => flow % pnt_grid
+  f22  => turb % f22
   a    => sol % a
   b    => sol % b % val
 
-  call Time_And_Length_Scale(grid)
+  call Time_And_Length_Scale(grid, turb)
 
   ! Source term f22hg
   do c = 1, grid % n_cells

@@ -1,30 +1,21 @@
 !==============================================================================!
-  subroutine Compute_F22(flow, sol, ini, phi)
+  subroutine Turb_Mod_Compute_F22(turb, sol, ini, phi)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves eliptic relaxation equations for f22.               !
 !------------------------------------------------------------------------------!
 !---------------------------------[Modules]------------------------------------!
-  use Field_Mod
-  use Turb_Mod
-  use Comm_Mod
-  use Var_Mod,      only: Var_Type
-  use Grid_Mod,     only: Grid_Type
-  use Grad_Mod,     only: Grad_Mod_Variable
-  use Info_Mod,     only: Info_Mod_Iter_Fill_At
-  use Solver_Mod,   only: Solver_Type, Bicg, Cg, Cgs
-  use Numerics_Mod
-  use Matrix_Mod,   only: Matrix_Type
-  use Work_Mod,     only: phi_x => r_cell_01,  &
-                          phi_y => r_cell_02,  &
-                          phi_z => r_cell_03
+  use Work_Mod, only: phi_x => r_cell_01,  &
+                      phi_y => r_cell_02,  &
+                      phi_z => r_cell_03
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Field_Type)          :: flow
+  type(Turb_Type)           :: turb
   type(Solver_Type), target :: sol
   integer                   :: ini
   type(Var_Type)            :: phi
 !----------------------------------[Locals]------------------------------------!
+  type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
@@ -53,6 +44,7 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
+  flow => turb % pnt_flow
   grid => flow % pnt_grid
   a    => sol % a
   b    => sol % b % val
@@ -157,9 +149,9 @@
   !                                     !
   !-------------------------------------!
   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
-    call Source_F22_Rsm_Manceau_Hanjalic(flow, sol)
+    call Turb_Mod_Src_F22_Rsm_Manceau_Hanjalic(turb, sol)
   else
-    call Source_F22_K_Eps_Zeta_F(flow, sol)
+    call Turb_Mod_Src_F22_K_Eps_Zeta_F(turb, sol)
   end if
 
   !---------------------------------!

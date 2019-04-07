@@ -1,20 +1,14 @@
 !==============================================================================!
-  subroutine Source_Vis_Spalart_Almaras(flow, sol)
+  subroutine Turb_Mod_Src_Vis_Spalart_Almaras(turb, sol)
 !------------------------------------------------------------------------------!
 !   Computes the source terms in vis transport equation.                       !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Field_Mod
-  use Turb_Mod
-  use Grid_Mod,   only: Grid_Type
-  use Solver_Mod, only: Solver_Type
-  use Matrix_Mod, only: Matrix_Type
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),  target :: flow
+  type(Turb_Type),   target :: turb
   type(Solver_Type), target :: sol
 !-----------------------------------[Locals]-----------------------------------!
+  type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
@@ -24,6 +18,7 @@
 !==============================================================================!
 
   ! Take aliases
+  flow => turb % pnt_flow
   grid => flow % pnt_grid
   a    => sol % a
   b    => sol % b % val

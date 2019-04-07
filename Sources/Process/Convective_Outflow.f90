@@ -7,7 +7,7 @@
   use Const_Mod
   use Field_Mod,   only: Field_Type, heat_transfer, density
   use Turb_Mod
-  use Grid_Mod,    only: Grid_Type
+  use Grid_Mod
   use Bulk_Mod,    only: Bulk_Type
   use Grad_Mod
   use Bulk_Mod

@@ -1,22 +1,25 @@
 !==============================================================================!
-  subroutine Turbulence_Allocate(flow)
+  subroutine Turb_Mod_Allocate(turb, flow)
 !------------------------------------------------------------------------------!
 !   Allocates memory for variables. It is called either from LoaRes            !
 !   or from Processor.                                                         !
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
   use Field_Mod,   only: Field_Type, heat_transfer, buoyancy
-  use Turb_Mod
   use Grid_Mod,    only: Grid_Type
-  use Control_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  type(Turb_Type),  target :: turb
   type(Field_Type), target :: flow
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: u, v, w, t, p
+  type(Var_Type),  pointer :: kin, eps, f22, zeta
 !==============================================================================!
+
+  turb % pnt_flow => flow
+  turb % pnt_grid => flow % pnt_grid
 
   ! Take aliases
   grid => flow % pnt_grid
@@ -25,6 +28,10 @@
   w    => flow % w
   t    => flow % t
   p    => flow % p
+  kin  => turb % kin
+  eps  => turb % eps
+  f22  => turb % f22
+  zeta => turb % zeta
 
   ! Allocate deltas
   allocate(h_max(-grid % n_bnd_cells:grid % n_cells));  h_max = 0.

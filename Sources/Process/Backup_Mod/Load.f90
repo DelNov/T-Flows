@@ -1,5 +1,6 @@
 !==============================================================================!
-  subroutine Backup_Mod_Load(fld, swr, time_step, time_step_stat, backup)
+  subroutine Backup_Mod_Load(fld, swr, tur,  &
+                             time_step, time_step_stat, backup)
 !------------------------------------------------------------------------------!
 !   Loads backup files name.backup                                             !
 !------------------------------------------------------------------------------!
@@ -7,6 +8,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: fld
   type(Swarm_Type), target :: swr
+  type(Turb_Type),  target :: tur
   integer                  :: time_step       ! current time step
   integer                  :: time_step_stat  ! starting step for statistics
   logical                  :: backup, present
@@ -134,8 +136,8 @@
   if(turbulence_model .eq. K_EPS) then
 
     ! K and epsilon
-    call Backup_Mod_Read_Variable(fh, d, vc, 'kin', kin)
-    call Backup_Mod_Read_Variable(fh, d, vc, 'eps', eps)
+    call Backup_Mod_Read_Variable(fh, d, vc, 'kin', tur % kin)
+    call Backup_Mod_Read_Variable(fh, d, vc, 'eps', tur % eps)
 
     ! Other turbulent quantities
     call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'p_kin',    p_kin   (-nb_s:nc_s))
@@ -158,10 +160,10 @@
      turbulence_model .eq. HYBRID_LES_RANS) then
 
     ! K, eps, zeta and f22
-    call Backup_Mod_Read_Variable(fh, d, vc, 'kin',  kin)
-    call Backup_Mod_Read_Variable(fh, d, vc, 'eps',  eps)
-    call Backup_Mod_Read_Variable(fh, d, vc, 'zeta', zeta)
-    call Backup_Mod_Read_Variable(fh, d, vc, 'f22',  f22)
+    call Backup_Mod_Read_Variable(fh, d, vc, 'kin',  tur % kin)
+    call Backup_Mod_Read_Variable(fh, d, vc, 'eps',  tur % eps)
+    call Backup_Mod_Read_Variable(fh, d, vc, 'zeta', tur % zeta)
+    call Backup_Mod_Read_Variable(fh, d, vc, 'f22',  tur % f22)
 
     ! Other turbulent quantities
     call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'p_kin',    p_kin   (-nb_s:nc_s))
@@ -199,11 +201,11 @@
     call Backup_Mod_Read_Variable(fh, d, vc, 'vw',  vw)
 
     ! Epsilon
-    call Backup_Mod_Read_Variable(fh, d, vc, 'eps', eps)
+    call Backup_Mod_Read_Variable(fh, d, vc, 'eps', tur % eps)
 
     ! F22
     if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
-      call Backup_Mod_Read_Variable(fh, d, vc, 'f22',  f22)
+      call Backup_Mod_Read_Variable(fh, d, vc, 'f22',  tur % f22)
     end if
 
     ! Other turbulent quantities ?

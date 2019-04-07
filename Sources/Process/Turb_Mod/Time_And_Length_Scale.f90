@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Time_And_Length_Scale(grid)
+  subroutine Time_And_Length_Scale(grid, turb)
 !------------------------------------------------------------------------------!
 !   Calculates time scale and leght scale in manner to avoid singularity       !
 !   in eps equation.                                                           !
@@ -9,6 +9,7 @@
   use Field_Mod
   use Turb_Mod
   use Grid_Mod
+  use Var_Mod
   use Work_Mod, only: t_1   => r_cell_12,  &  ! [s]
                       t_2   => r_cell_13,  &  ! [s]
                       t_3   => r_cell_14,  &  ! [s]
@@ -18,10 +19,12 @@
                       eps_l => r_cell_18      ! [m]
 !------------------------------------------------------------------------------!
   implicit none
-  type(Grid_Type) :: grid
+  type(Grid_Type), target :: grid
+  type(Turb_Type), target :: turb
 !----------------------------------[Locals]------------------------------------!
-  real    :: kin_vis   ! kinematic viscosity [m^2/s]
-  integer :: c
+  type(Var_Type), pointer :: kin, eps, zeta
+  real                    :: kin_vis   ! kinematic viscosity [m^2/s]
+  integer                 :: c
 !==============================================================================!
 !   Dimensions:                                                                !
 !                                                                              !
@@ -32,6 +35,10 @@
 !   cell volume   vol      [m^3]       | length          lf        [m]         !
 !   left hand s.  A        [kg/s]      | right hand s.   b         [kg*m^2/s^4]!
 !------------------------------------------------------------------------------!
+
+  kin  => turb % kin
+  eps  => turb % eps
+  zeta => turb % zeta
 
   kin_vis = viscosity / density
 

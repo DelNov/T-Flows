@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Update_Boundary_Values(flow)
+  subroutine Update_Boundary_Values(flow, turb)
 !------------------------------------------------------------------------------!
 !   Update variables on the boundaries (boundary cells) where needed.          !
 !------------------------------------------------------------------------------!
@@ -16,12 +16,14 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
+  type(Turb_Type),  target :: turb
 !---------------------------------[Calling]------------------------------------!
   real :: Turbulent_Prandtl_Number
   real :: Y_Plus_Low_Re
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: u, v, w, t
+  type(Var_Type),  pointer :: kin, eps, zeta, f22
   integer                  :: c1, c2, s
   real                     :: qx, qy, qz, nx, ny, nz, con_t
   real                     :: pr, kin_vis
@@ -33,6 +35,10 @@
   v    => flow % v
   w    => flow % w
   t    => flow % t
+  kin  => turb % kin
+  eps  => turb % eps
+  f22  => turb % f22
+  zeta => turb % zeta
 
   kin_vis     = viscosity / density
 

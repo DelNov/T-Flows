@@ -1,47 +1,43 @@
 !==============================================================================!
-  subroutine Sources_Rsm_Hanjalic_Jakirlic(flow, sol, name_phi, n_time_step)
+  subroutine Turb_Mod_Src_Rsm_Hanjalic_Jakirlic(turb, sol,  &
+                                                name_phi, n_time_step)
 !------------------------------------------------------------------------------!
 !   Calculate source terms for transport equations for Re stresses and         !
-!   dissipation for Hanjalic-Jakirlic model.                                   !  
+!   dissipation for Hanjalic-Jakirlic model.                                   !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Field_Mod
-  use Turb_Mod
-  use Grid_Mod,   only: Grid_Type
-  use Solver_Mod, only: Solver_Type
-  use Matrix_Mod, only: Matrix_Type
-  use Grad_Mod
-  use Work_Mod,   only: l_sc_x => r_cell_01,  &
-                        l_sc_y => r_cell_02,  &
-                        l_sc_z => r_cell_03,  &
-                        kin_x  => r_cell_04,  &
-                        kin_y  => r_cell_05,  &
-                        kin_z  => r_cell_06,  &
-                        kin_xx => r_cell_07,  &
-                        kin_yy => r_cell_08,  &
-                        kin_zz => r_cell_09,  &
-                        ui_xx  => r_cell_10,  &
-                        ui_yy  => r_cell_11,  &
-                        ui_zz  => r_cell_12,  &
-                        ui_xy  => r_cell_13,  &
-                        ui_xz  => r_cell_14,  &
-                        ui_yz  => r_cell_15,  &
-                        kin_e  => r_cell_16,  &
-                        kin_e_x=> r_cell_17,  &
-                        kin_e_y=> r_cell_18,  &
-                        kin_e_z=> r_cell_19,  &
-                        diss1  => r_cell_20
+  use Work_Mod, only: l_sc_x => r_cell_01,  &
+                      l_sc_y => r_cell_02,  &
+                      l_sc_z => r_cell_03,  &
+                      kin_x  => r_cell_04,  &
+                      kin_y  => r_cell_05,  &
+                      kin_z  => r_cell_06,  &
+                      kin_xx => r_cell_07,  &
+                      kin_yy => r_cell_08,  &
+                      kin_zz => r_cell_09,  &
+                      ui_xx  => r_cell_10,  &
+                      ui_yy  => r_cell_11,  &
+                      ui_zz  => r_cell_12,  &
+                      ui_xy  => r_cell_13,  &
+                      ui_xz  => r_cell_14,  &
+                      ui_yz  => r_cell_15,  &
+                      kin_e  => r_cell_16,  &
+                      kin_e_x=> r_cell_17,  &
+                      kin_e_y=> r_cell_18,  &
+                      kin_e_z=> r_cell_19,  &
+                      diss1  => r_cell_20
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),  target :: flow
+  type(Turb_Type),   target :: turb
   type(Solver_Type), target :: sol
   character(len=*)          :: name_phi
   integer                   :: n_time_step
 !-----------------------------------[Locals]-----------------------------------!
+  type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w
+  type(Var_Type),    pointer :: kin, eps, f22
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: c, s, c1, c2, i, icont
@@ -83,10 +79,14 @@
 ! but dens > 1 mod. not applied here yet
 
   ! Take aliases
+  flow => turb % pnt_flow
   grid => flow % pnt_grid
   u    => flow % u
   v    => flow % v
   w    => flow % w
+  kin  => turb % kin
+  eps  => turb % eps
+  f22  => turb % f22
   a    => sol % a
   b    => sol % b % val
 
