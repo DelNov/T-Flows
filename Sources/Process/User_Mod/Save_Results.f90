@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(flow, save_name)
+  subroutine User_Mod_Save_Results(flow, turb, save_name)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
@@ -9,6 +9,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
+  type(Turb_Type),  target :: turb
   character(len=*)         :: save_name
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
