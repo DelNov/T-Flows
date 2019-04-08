@@ -20,7 +20,7 @@ MPI = no
 MPI_TYPE = openmpi
 
 # Link with CGNS ("yes" or "no")
-CGNS_HDF5 = no
+CGNS = no
 
 # Directories for objects and modules. (No need to change.)
 DIR_BINARY = ../../Binaries
@@ -41,7 +41,7 @@ $(info #=======================================================================)
 $(info # Compiling $(PROGRAM_NAME) with compiler $(FORTRAN)                    )
 $(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
-$(info #   make <FORTRAN=gnu/intel/portland> <DEBUG=yes/no> <CGNS_HDF5=yes/no> )
+$(info #   make <FORTRAN=gnu/intel/portland> <DEBUG=yes/no> <CGNS=yes/no>      )
 $(info #        <MPI=yes/no> <MPI_TYPE=openmpi/mpich>                          )
 $(info #        <DIR_CASE=relative_path_to_case>                               )
 $(info #                                                                       )
@@ -49,7 +49,7 @@ $(info # Examples:                                                             )
 $(info #   make                       - sequential version with gnu compiler   )
 $(info #   make MPI=yes               - parallel version with gnu compiler     )
 $(info #   make FORTRAN=intel MPI=yes - parallel version with intel compiler   )
-$(info #   make MPI=yes CGNS_HDF5=yes - parallel version with CGNS/HDF5 support)
+$(info #   make MPI=yes CGNS=yes      - parallel version with CGNS/HDF5 support)
 $(info #   make MPI=yes MPI_TYPE=mpich- parallel version with MPICH/OpenMPI mpi)
 $(info #-----------------------------------------------------------------------)
 
@@ -109,7 +109,7 @@ ifeq ($(MPI), yes)
 endif
 
 # If compiling with CGNS, add path to include directory
-ifeq ($(CGNS_HDF5), yes)
+ifeq ($(CGNS), yes)
   ifeq ($(MPI), yes)
     ifeq ($(MPI_TYPE), openmpi)
       VALUE = $(shell echo using Cgns library built on OpenMPI MPI implementation)
@@ -214,11 +214,11 @@ SRC_MOD += Control_Mod.f90	\
            Numerics_Mod.f90	\
            Field_Mod.f90	\
            Grad_Mod.f90		\
-           Monitor_Mod.f90
+           Monitor_Mod.f90	\
+           Turb_Mod.f90		\
+           Swarm_Mod.f90
 
-# Sources for modules in sub-directories for physical models
-SRC_MOD += Turb_Mod.f90
-SRC_MOD += Swarm_Mod.f90
+SRC_MOD += User_Mod.f90
 
 # Backup_Mod should come last because it uses all other modules
 SRC_MOD += Backup_Mod.f90
@@ -252,30 +252,18 @@ SRC_FUN += Distance.f90		\
            Swap_Short.f90	\
            To_Upper_Case.f90
 
-#-------------------------------------------
-#   Conditional inclusion of CGNS support
-#-------------------------------------------
-ifeq ($(CGNS_HDF5), no)
-  SRC_MOD += Cgns_Mod_Void.f90
-  SRC_FUN += Save_Cgns_Results_Void.f90	\
-             Save_Cgns_Cells_Void.f90	\
-             Save_Vtu_Results.f90	\
-             Save_Vtu_Swarm.f90
+# Conditional CGNS support
+ifeq ($(CGNS), no)
+  SRC_MOD += Save_Grid_Mod_Vtu.f90	\
+             Save_Results_Mod_Vtu.f90
 else
   ifeq ($(MPI), yes)
     SRC_MOD += Cgns_Mod_Par.f90
   else
     SRC_MOD += Cgns_Mod_Seq.f90
   endif
-  SRC_FUN += Save_Cgns_Results.f90	\
-             Save_Cgns_Cells.f90
-endif
-
-# Conditional CGNS support is needed for user functions too
-ifeq ($(CGNS_HDF5), no)
-  SRC_MOD += User_Mod_Vtu.f90
-else
-  SRC_MOD += User_Mod_Cgns.f90
+  SRC_MOD += Save_Grid_Mod_Cgns.f90	\
+             Save_Results_Mod_Cgns.f90
 endif
 
 #----------------------------------------------------------------------

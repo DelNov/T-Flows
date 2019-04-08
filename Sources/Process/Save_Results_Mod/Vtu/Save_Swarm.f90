@@ -1,13 +1,7 @@
 !==============================================================================!
   subroutine Save_Swarm(swarm, name_save)
 !------------------------------------------------------------------------------!
-!   Writes results in VTU file format (for VisIt and Paraview)                 !
-!------------------------------------------------------------------------------!
-!---------------------------------[Modules]------------------------------------!
-  use Name_Mod, only: problem_name
-  use Swarm_Mod
-  use Comm_Mod
-  use Tokenizer_Mod
+!   Writes particles in VTU file format (for VisIt and Paraview)               !
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
