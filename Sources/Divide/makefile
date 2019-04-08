@@ -115,20 +115,17 @@ SRC_MOD =  Const_Mod.f90		\
            Grid_Level_Mod.f90		\
            Grid_Mod.f90			\
            Name_Mod.f90			\
-           Comm_Mod_Seq.f90
+           Comm_Mod_Seq.f90		\
+           Save_Grid_Mod_Vtu.f90
 
 #---------------
-#   Functions   
+#   Functions
 #---------------
 
 # Sources for all shared functions
 SRC_FUN = Distance.f90			\
           Distance_Squared.f90		\
-          Get_C1_And_C2_At_Level.f90	\
           Name_File.f90			\
-          Save_Vtu_Cells.f90		\
-          Save_Vtu_Faces.f90		\
-          Save_Vtu_Links.f90		\
           Swap_Int.f90			\
           Swap_Short.f90		\
           Swap_Real.f90			\
@@ -142,7 +139,7 @@ SRC_FUN += Allocate_Additional.f90	\
            Main_Div.f90
 
 #----------------------------------------------------------------------
-#   List of objects generated from the list of modules and functions  
+#   List of objects generated from the list of modules and functions
 #----------------------------------------------------------------------
 #   Note: This doesn't need editing.
 #----------------------------------------------------------------------
