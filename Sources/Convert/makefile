@@ -15,7 +15,7 @@ FORTRAN = gnu
 DEBUG = no
 
 # Link with CGNS ("yes" or "no")
-CGNS_HDF5 = no
+CGNS = no
 
 # Directories for objects and modules. (No need to change.)
 DIR_BINARY = ../../Binaries
@@ -32,13 +32,13 @@ $(info #=======================================================================)
 $(info # Compiling $(PROGRAM_NAME) with compiler $(FORTRAN))
 $(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
-$(info #   make <FORTRAN=gnu/intel/portland> <DEBUG=yes/no> <CGNS_HDF5=yes/no> )
+$(info #   make <FORTRAN=gnu/intel/portland> <DEBUG=yes/no> <CGNS=yes/no>      )
 $(info #                                                                       )
 $(info # Examples:                                                             )
-$(info #   make               - compile with gnu compiler                      )
-$(info #   make FORTAN=intel  - compile with intel compiler                    )
-$(info #   make DEBUG=yes     - compile with gnu compiler in debug mode        )
-$(info #   make CGNS_HDF5=yes - compile with gnu compiler and CGNS_HDF5 support)
+$(info #   make              - compile with gnu compiler                       )
+$(info #   make FORTAN=intel - compile with intel compiler                     )
+$(info #   make DEBUG=yes    - compile with gnu compiler in debug mode         )
+$(info #   make CGNS=yes     - compile with gnu compiler and CGNS support      )
 $(info #-----------------------------------------------------------------------)
 
 #-------------------------------------------------------------------------------
@@ -95,7 +95,7 @@ endif
 # (One day, when you want to work with compressed
 #  files, the following line might still be needed:
 #  CGNS_LIB   += -Wl,--no-as-needed -ldl -lz
-ifeq ($(CGNS_HDF5), yes)
+ifeq ($(CGNS), yes)
   DIR_CGNS_H  = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Seq/Include
   CGNS_LIB    = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Seq/Lib/libcgns.a \
                 ../Libraries/Hdf5_Seq/Lib/libhdf5.a -ldl
@@ -140,12 +140,8 @@ SRC_MOD = Const_Mod.f90			\
 SRC_FUN = Approx_Real.f90		\
           Distance.f90			\
           Distance_Squared.f90		\
-          Get_C1_And_C2_At_Level.f90	\
           Name_File.f90			\
           Probe_1d_Nodes.f90		\
-          Save_Vtu_Cells.f90		\
-          Save_Vtu_Faces.f90		\
-          Save_Vtu_Links.f90		\
           Swap_Int.f90			\
           Swap_Real.f90			\
           Swap_Short.f90		\
@@ -164,14 +160,13 @@ SRC_FUN += Allocate_Memory.f90		\
 #-------------------------------------------
 #   Conditional inclusion of CGNS support
 #-------------------------------------------
-ifeq ($(CGNS_HDF5), no)
-  SRC_MOD += Cgns_Mod_Void.f90
-  SRC_FUN += Load_Cgns_Void.f90		\
-             Save_Cgns_Cells_Void.f90
+ifeq ($(CGNS), no)
+  SRC_MOD += Save_Grid_Mod_Vtu.f90
+  SRC_FUN += Load_Cgns_Void.f90
 else
   SRC_MOD += Cgns_Mod_Seq.f90
-  SRC_FUN += Load_Cgns.f90		\
-             Save_Cgns_Cells.f90
+  SRC_MOD += Save_Grid_Mod_Cgns.f90
+  SRC_FUN += Load_Cgns.f90
 endif
 
 #----------------------------------------------------------------------
