@@ -14,11 +14,6 @@
 !   Material of these links is different than from the cells, so that they     !
 !   can be visualised  more easily in GMV.                                     !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Name_Mod, only: problem_name
-  use Div_Mod,  only: buf_send_ind, buf_recv_ind
-  use Grid_Mod
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid

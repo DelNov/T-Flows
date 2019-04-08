@@ -4,11 +4,6 @@
 !   Writes in 3-D unstructured grid to files 'file_name.cgns'                  !
 !   Valid for both parallel and seqential access                               !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Grid_Mod
-  use Comm_Mod
-  use Cgns_Mod
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid

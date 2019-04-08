@@ -8,7 +8,9 @@
                            Grid_Mod_Calculate_Wall_Distance,  &
                            Grid_Mod_Save_Cns,                 &
                            Grid_Mod_Save_Geo
-  use Save_Grid_Mod
+  use Save_Grid_Mod, only: Save_Vtu_Cells,  &
+                           Save_Vtu_Faces,  &
+                           Save_Vtu_Links
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Locals]-----------------------------------!
