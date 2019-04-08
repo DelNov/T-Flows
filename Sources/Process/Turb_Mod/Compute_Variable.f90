@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Compute_Turbulent(turb, sol, ini, phi, n_step)
+  subroutine Turb_Mod_Compute_Variable(turb, sol, ini, phi, n_step)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves transport equations for different turbulent         !
 !   variables.                                                                 !

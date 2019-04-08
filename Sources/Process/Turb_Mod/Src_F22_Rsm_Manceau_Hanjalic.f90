@@ -56,10 +56,10 @@
 
   ! Source term f22hg
   do c = 1, grid % n_cells
-    f22hg = 1.
-    sor11 = grid % vol(c) / l_scale(c)**2
+    f22hg = 1.0
+    sor11 = grid % vol(c) / turb % l_scale(c)**2
     a % val(a % dia(c)) = a % val(a % dia(c)) + sor11
-    b(c) = b(c) + f22hg*grid % vol(c) / l_scale(c)**2
+    b(c) = b(c) + f22hg * grid % vol(c) / turb % l_scale(c)**2
   end do
 
   ! Source term

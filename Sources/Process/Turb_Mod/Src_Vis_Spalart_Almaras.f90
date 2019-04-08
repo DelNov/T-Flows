@@ -62,13 +62,13 @@
     do c = 1, grid % n_cells
 
       ! What is 0.65 here?  A ghost number
-      dist = min(grid % wall_dist(c),0.65 * h_max(c))
+      dist = min(grid % wall_dist(c), 0.65 * turb % h_max(c))
 
       !---------------------------------!
       !   Compute the production term   !
       !---------------------------------!
-      x_rat  = vis % n(c)/viscosity
-      f_v1   = x_rat**3/(x_rat**3 + c_v1**3)
+      x_rat  = vis % n(c) / viscosity
+      f_v1   = x_rat**3 / (x_rat**3 + c_v1**3)
       f_v2   = 1.0 - x_rat/(1.0 + x_rat*f_v1)
       ss     = flow % vort(c) + vis % n(c) * f_v2 / (kappa**2 * dist**2)
       prod_v = c_b1 * density * ss * vis % n(c)
@@ -77,10 +77,10 @@
       !-----------------------------------!
       !   Compute the destruction  term   !
       !-----------------------------------!
-      r      = vis % n(c)/(ss * kappa**2 * dist**2)
-      gg     = r + c_w2*(r**6 - r)
-      f_w    = gg*((1.0 + c_w3**6)/(gg**6 + c_w3**6))**(1.0/6.0)
-      dist_v = c_w1* density * f_w * (vis % n(c)/dist**2)
+      r      = vis % n(c) / (ss * kappa**2 * dist**2)
+      gg     = r + c_w2 * (r**6 - r)
+      f_w    = gg*((1.0 + c_w3**6) / (gg**6 + c_w3**6))**(1.0/6.0)
+      dist_v = c_w1* density * f_w * (vis % n(c) / dist**2)
       a % val(a % dia(c)) = a % val(a % dia(c)) + dist_v * grid % vol(c)
 
       !--------------------------------------------!

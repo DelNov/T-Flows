@@ -13,7 +13,7 @@
                        INFLOW, OUTFLOW, CONVECT, PRESSURE, WALL, WALLFL
   use Var_Mod,   only: Var_Type
   use Field_Mod, only: Field_Type, density, viscosity
-  use Turb_Mod,  only: h_min
+  use Turb_Mod,  only: Turb_Type
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!

@@ -1,11 +1,12 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Move_Particle(swarm, k)
+  subroutine Swarm_Mod_Move_Particle(swarm, turb, k)
 !------------------------------------------------------------------------------!
 !   Interpolates velocity at the particle's position                           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Swarm_Type), target :: swarm
+  type(Turb_Type),  target :: turb
   integer                  :: k      ! particle number
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),    pointer :: flow
@@ -133,7 +134,7 @@
   part % z_n = part % z_n + part % w * swarm % dt
 
   ! Calculate cfl number for the particle (this is kind of wrong)
-  part % cfl = part_vel * swarm % dt / h_min(c)
+  part % cfl = part_vel * swarm % dt / turb % h_min(c)
 
   !----------------------------------------------!
   !                                              !

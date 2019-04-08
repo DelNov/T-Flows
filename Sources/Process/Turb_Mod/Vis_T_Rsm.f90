@@ -48,10 +48,10 @@
                     + uv % n(c) * (v % x(c) + u % y(c))  &
                     + uw % n(c) * (u % z(c) + w % x(c))  &
                     + vw % n(c) * (v % z(c) + w % y(c))) &
-      / (kin % n(c) * t_scale(c) * flow % shear(c)**2 + TINY), 0.0)
+      / (kin % n(c) * turb % t_scale(c) * flow % shear(c)**2 + TINY), 0.0)
 
     cmu_mod = min(0.12, cmu_mod)
-    vis_t(c) = cmu_mod * density * kin % n(c) * t_scale(c) 
+    vis_t(c) = cmu_mod * density * kin % n(c) * turb % t_scale(c)
     vis_t(c) = max(vis_t(c), TINY)
   end do
 

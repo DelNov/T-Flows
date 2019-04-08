@@ -1,11 +1,12 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Advance_Particles(swarm)
+  subroutine Swarm_Mod_Advance_Particles(swarm, turb)
 !------------------------------------------------------------------------------!
 !   Advances all particles in the swarm.                                       !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Swarm_Type), target :: swarm
+  type(Turb_Type),  target :: turb
   integer                  :: k      ! particle number
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer     :: grid
@@ -47,7 +48,7 @@
 
         ! Compute velocity at the particle, and move it
         ! (also calls Bounce_Particle)
-        call Swarm_Mod_Move_Particle(swarm, k)
+        call Swarm_Mod_Move_Particle(swarm, turb, k)
 
         ! Calling particle forces subroutine to ...
         ! ... compute the forces on each particle and store it

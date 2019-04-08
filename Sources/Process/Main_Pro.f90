@@ -145,7 +145,7 @@
   call Bulk_Mod_Print_Areas(flow % bulk)
 
   ! Compute deltas for Spalart-Allmaras models
-  call Calculate_Deltas(grid)
+  call Turb_Mod_Calculate_Deltas(turb)
 
   !---------------!
   !               !
@@ -267,8 +267,8 @@
 
         call Calculate_Shear_And_Vorticity(flow)
 
-        call Turb_Mod_Compute_Turbulent(turb, sol, ini, turb % kin, n)
-        call Turb_Mod_Compute_Turbulent(turb, sol, ini, turb % eps, n)
+        call Turb_Mod_Compute_Variable(turb, sol, ini, turb % kin, n)
+        call Turb_Mod_Compute_Variable(turb, sol, ini, turb % eps, n)
 
         call Turb_Mod_Vis_T_K_Eps(turb)
 
@@ -278,18 +278,18 @@
          turbulence_model .eq. HYBRID_LES_RANS) then
         call Calculate_Shear_And_Vorticity(flow)
 
-        call Turb_Mod_Compute_Turbulent(turb, sol, ini, turb % kin, n)
-        call Turb_Mod_Compute_Turbulent(turb, sol, ini, turb % eps, n)
+        call Turb_Mod_Compute_Variable(turb, sol, ini, turb % kin, n)
+        call Turb_Mod_Compute_Variable(turb, sol, ini, turb % eps, n)
 
         if(heat_transfer) then
-          call Calculate_Heat_Flux(flow, turb)
-          call Turb_Mod_Compute_Turbulent(turb, sol, ini, turb % t2,  n)
+          call Turb_Mod_Calculate_Heat_Flux(turb)
+          call Turb_Mod_Compute_Variable(turb, sol, ini, turb % t2, n)
         end if
 
         call Update_Boundary_Values(flow, turb)
 
         call Turb_Mod_Compute_F22(turb, sol, ini, turb % f22)
-        call Turb_Mod_Compute_Turbulent(turb, sol, ini, turb % zeta, n)
+        call Turb_Mod_Compute_Variable(turb, sol, ini, turb % zeta, n)
 
         call Turb_Mod_Vis_T_K_Eps_Zeta_F(turb)
 
@@ -307,24 +307,24 @@
         call Grad_Mod_Variable(flow % v, .true.)
         call Grad_Mod_Variable(flow % w, .true.)
 
-        call Turb_Mod_Compute_Stresses(turb, sol, ini, turb % uu, n)
-        call Turb_Mod_Compute_Stresses(turb, sol, ini, turb % vv, n)
-        call Turb_Mod_Compute_Stresses(turb, sol, ini, turb % ww, n)
+        call Turb_Mod_Compute_Stress(turb, sol, ini, turb % uu, n)
+        call Turb_Mod_Compute_Stress(turb, sol, ini, turb % vv, n)
+        call Turb_Mod_Compute_Stress(turb, sol, ini, turb % ww, n)
 
-        call Turb_Mod_Compute_Stresses(turb, sol, ini, turb % uv, n)
-        call Turb_Mod_Compute_Stresses(turb, sol, ini, turb % uw, n)
-        call Turb_Mod_Compute_Stresses(turb, sol, ini, turb % vw, n)
+        call Turb_Mod_Compute_Stress(turb, sol, ini, turb % uv, n)
+        call Turb_Mod_Compute_Stress(turb, sol, ini, turb % uw, n)
+        call Turb_Mod_Compute_Stress(turb, sol, ini, turb % vw, n)
 
         if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
           call Turb_Mod_Compute_F22(turb, sol, ini, turb % f22)
         end if
 
-        call Turb_Mod_Compute_Stresses(turb, sol, ini, turb % eps, n)
+        call Turb_Mod_Compute_Stress(turb, sol, ini, turb % eps, n)
 
         call Turb_Mod_Vis_T_Rsm(turb)
 
         if(heat_transfer) then
-          call Calculate_Heat_Flux(flow, turb)
+          call Turb_Mod_Calculate_Heat_Flux(turb)
         end if
       end if
 
@@ -336,7 +336,7 @@
         ! Update the values at boundaries
         call Update_Boundary_Values(flow, turb)
 
-        call Turb_Mod_Compute_Turbulent(turb, sol, ini, turb % vis, n)
+        call Turb_Mod_Compute_Variable(turb, sol, ini, turb % vis, n)
         call Turb_Mod_Vis_T_Spalart_Allmaras(turb)
       end if
 
@@ -367,7 +367,7 @@
     end if
 
     ! Calculate mean values
-    call Calculate_Mean         (flow, n_stat, n)
+    call Turb_Mod_Calculate_Mean(turb, n_stat, n)
     call User_Mod_Calculate_Mean(flow, n_stat, n)
 
     ! Adjust pressure drops to keep the mass fluxes constant

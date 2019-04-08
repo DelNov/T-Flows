@@ -287,11 +287,11 @@
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               grid % wall_dist(1),"WallDistance")
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              h_max(1),"CellDeltaMax")
+                              turb % h_max(1),"CellDeltaMax")
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              h_min(1),"CellDeltaMin")
+                              turb % h_min(1),"CellDeltaMin")
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              h_w(1),"CellDeltaWall")
+                              turb % h_w(1),"CellDeltaWall")
     permanent_fields_written = .true.
   else ! [link]
     call Write_Link_To_Field(base, block, solution, "WallDistance")

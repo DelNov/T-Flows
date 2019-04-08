@@ -7,20 +7,21 @@
   use Const_Mod
   use Comm_Mod
   use Info_Mod
-  use Var_Mod,    only: Var_Type,                    &
-                        Var_Mod_Allocate_New_Only,   &
-                        Var_Mod_Allocate_Solution
+  use Var_Mod,     only: Var_Type,                    &
+                         Var_Mod_Allocate_New_Only,   &
+                         Var_Mod_Allocate_Solution
   use Grid_Mod
   use Grad_Mod
-  use Field_Mod,  only: Field_Type,                                            &
-                        Field_Mod_Alias_Momentum,                              &
-                        Field_Mod_Alias_Energy,                                &
-                        viscosity, density, buoyancy, conductivity, capacity,  &
-                        grav_x,  grav_y,  grav_z,                              &
-                        omega_x, omega_y, omega_z,                             &
-                        heat_transfer, t_ref
-  use Solver_Mod, only: Solver_Type, Solver_Mod_Alias_System, Bicg, Cg, Cgs
-  use Matrix_Mod, only: Matrix_Type
+  use Field_Mod,   only: Field_Type,                                  &
+                         Field_Mod_Alias_Momentum,                    &
+                         Field_Mod_Alias_Energy,                      &
+                         viscosity, density, conductivity, capacity,  &
+                         grav_x,  grav_y,  grav_z,                    &
+                         omega_x, omega_y, omega_z,                   &
+                         buoyancy, heat_transfer, t_ref
+  use Solver_Mod,  only: Solver_Type, Solver_Mod_Alias_System, Bicg, Cg, Cgs
+  use Matrix_Mod,  only: Matrix_Type
+  use Control_Mod, only: Control_Mod_Turbulent_Prandtl_Number
   use Numerics_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -59,8 +60,7 @@
     !----------------!
 
     ! Time averaged momentum and energy equations
-    real, allocatable :: u_mean(:),  v_mean(:),  w_mean(:),  p_mean(:)
-    real, allocatable :: t_mean(:)
+    real, allocatable :: u_mean(:), v_mean(:), w_mean(:), p_mean(:), t_mean(:)
 
     ! Time averaged modeled quantities
     ! (Time averages of modeled equations)
@@ -80,6 +80,15 @@
     real, allocatable :: uu_mean(:), vv_mean(:), ww_mean(:)
     real, allocatable :: uv_mean(:), vw_mean(:), uw_mean(:)
     real, allocatable :: ut_mean(:), vt_mean(:), wt_mean(:), t2_mean(:)
+
+    ! Turbulent lenght and time Scales
+    real, allocatable :: l_scale(:)
+    real, allocatable :: t_scale(:)
+
+    ! Various cell sizes for Spalart-Allmaras and DES models
+    real, allocatable :: h_max(:)
+    real, allocatable :: h_min(:)
+    real, allocatable :: h_w(:)
   end type
 
   !--------------------------------------------------------!
@@ -138,9 +147,6 @@
   ! For scale-resolving models
   real              :: c_smag
   real, allocatable :: c_dyn(:)
-  real, allocatable :: h_max(:)
-  real, allocatable :: h_min(:)
-  real, allocatable :: h_w(:)
 
   !-----------------------------------!
   !   Auxiliary turbulent variables   !
@@ -169,10 +175,6 @@
   real, allocatable :: vis_t_eff(:)
   real, allocatable :: vis_t_sgs(:)
 
-  ! Lenght and Time Scales
-  real, allocatable :: l_scale(:)
-  real, allocatable :: t_scale(:)
-
   ! Production of turbulent kinetic energy
   real,allocatable :: p_kin(:), p_t2(:)
 
@@ -200,6 +202,10 @@
   include 'Turb_Mod/Alias_Stresses.f90'
   include 'Turb_Mod/Alias_T2.f90'
 
+  include 'Turb_Mod/Calculate_Deltas.f90'
+  include 'Turb_Mod/Calculate_Heat_Flux.f90'
+  include 'Turb_Mod/Calculate_Mean.f90'
+
   ! Functions to set turbulence constants
   include 'Turb_Mod/Const_Hanjalic_Jakirlic.f90'
   include 'Turb_Mod/Const_K_Eps.f90'
@@ -210,8 +216,8 @@
 
   ! Computation of various turbulent quantities
   include 'Turb_Mod/Compute_F22.f90'
-  include 'Turb_Mod/Compute_Stresses.f90'
-  include 'Turb_Mod/Compute_Turbulent.f90'
+  include 'Turb_Mod/Compute_Stress.f90'
+  include 'Turb_Mod/Compute_Variable.f90'
 
   ! Different sources
   include 'Turb_Mod/Src_Eps_K_Eps.f90'

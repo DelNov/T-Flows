@@ -269,17 +269,17 @@
      turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
     if(turbulence_model_variant .ne. STABILIZED) then
       do c = 1, grid % n_cells
-        u1uj_phij(c) = -0.22 * t_scale(c) *  &
-                   (  uu % n(c) * phi_x(c)   &
-                    + uv % n(c) * phi_y(c)   &
+        u1uj_phij(c) = -0.22 * turb % t_scale(c) *  &
+                   (  uu % n(c) * phi_x(c)          &
+                    + uv % n(c) * phi_y(c)          &
                     + uw % n(c) * phi_z(c))
-        u2uj_phij(c) = -0.22 * t_scale(c) *  &
-                   (  uv % n(c) * phi_x(c)   &
-                    + vv % n(c) * phi_y(c)   &
+        u2uj_phij(c) = -0.22 * turb % t_scale(c) *  &
+                   (  uv % n(c) * phi_x(c)          &
+                    + vv % n(c) * phi_y(c)          &
                     + vw % n(c) * phi_z(c))
-        u3uj_phij(c) = -0.22 * t_scale(c) *  &
-                   (  uw % n(c) * phi_x(c)   &
-                    + vw % n(c) * phi_y(c)   &
+        u3uj_phij(c) = -0.22 * turb % t_scale(c) *  &
+                   (  uw % n(c) * phi_x(c)          &
+                    + vw % n(c) * phi_y(c)          &
                     + ww % n(c) * phi_z(c))
       end do
       call Grad_Mod_Component(grid, u1uj_phij, 1, u1uj_phij_x, .true.)

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Compute_Stresses(turb, sol, ini, phi, n_time_step)
+  subroutine Turb_Mod_Compute_Stress(turb, sol, ini, phi, n_time_step)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves transport equation for Re stresses for RSM.         !
 !------------------------------------------------------------------------------!
@@ -205,19 +205,19 @@
       end do
     else if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
       do c = 1, grid % n_cells
-        u1uj_phij(c) = density * c_mu_d / phi % sigma * t_scale(c)  &
-                     * (  uu % n(c) * phi_x(c)                      &
-                        + uv % n(c) * phi_y(c)                      &
+        u1uj_phij(c) = density * c_mu_d / phi % sigma * turb % t_scale(c)  &
+                     * (  uu % n(c) * phi_x(c)                             &
+                        + uv % n(c) * phi_y(c)                             &
                         + uw % n(c) * phi_z(c))
 
-        u2uj_phij(c) = density * c_mu_d / phi % sigma * t_scale(c)  &
-                     * (  uv % n(c) * phi_x(c)                      &
-                        + vv % n(c) * phi_y(c)                      &
+        u2uj_phij(c) = density * c_mu_d / phi % sigma * turb % t_scale(c)  &
+                     * (  uv % n(c) * phi_x(c)                             &
+                        + vv % n(c) * phi_y(c)                             &
                         + vw % n(c) * phi_z(c))
 
-        u3uj_phij(c) = density * c_mu_d / phi % sigma * t_scale(c)  &
-                     * (  uw % n(c) * phi_x(c)                      &
-                        + vw % n(c) * phi_y(c)                      &
+        u3uj_phij(c) = density * c_mu_d / phi % sigma * turb % t_scale(c)  &
+                     * (  uw % n(c) * phi_x(c)                             &
+                        + vw % n(c) * phi_y(c)                             &
                         + ww % n(c) * phi_z(c))
       end do
     end if

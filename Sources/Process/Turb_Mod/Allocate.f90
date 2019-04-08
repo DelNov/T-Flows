@@ -27,9 +27,9 @@
   nc = grid % n_cells
 
   ! Allocate deltas
-  allocate(h_max(-nb:nc));  h_max = 0.
-  allocate(h_min(-nb:nc));  h_min = 0.
-  allocate(h_w  (-nb:nc));  h_w   = 0.
+  allocate(turb % h_max(-nb:nc));  turb % h_max = 0.
+  allocate(turb % h_min(-nb:nc));  turb % h_min = 0.
+  allocate(turb % h_w  (-nb:nc));  turb % h_w   = 0.
 
   !-----------------!
   !   K-eps model   !
@@ -103,8 +103,8 @@
     call Var_Mod_Allocate_Solution('F22',  '', turb % f22,  grid)
 
     ! Other variables such as time scale, length scale and production
-    allocate(t_scale (-nb:nc));  t_scale  = 0.
-    allocate(l_scale (-nb:nc));  l_scale  = 0.
+    allocate(turb % t_scale (-nb:nc));  turb % t_scale  = 0.
+    allocate(turb % l_scale (-nb:nc));  turb % l_scale  = 0.
     allocate(u_tau   (-nb:nc));  u_tau    = 0.
     allocate(p_kin   (-nb:nc));  p_kin    = 0.
     allocate(vis_t   (-nb:nc));  vis_t    = 0.
@@ -176,8 +176,8 @@
      turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
 
     ! Other variables such as time scale, length scale and production
-    allocate(t_scale (-nb:nc));  t_scale  = 0.
-    allocate(l_scale (-nb:nc));  l_scale  = 0.
+    allocate(turb % t_scale (-nb:nc));  turb % t_scale  = 0.
+    allocate(turb % l_scale (-nb:nc));  turb % l_scale  = 0.
     allocate(p_kin   (-nb:nc));  p_kin    = 0.
     allocate(u_tau   (-nb:nc));  u_tau    = 0.
     allocate(vis_t   (-nb:nc));  vis_t    = 0.
@@ -263,8 +263,8 @@
     call Var_Mod_Allocate_Solution('VIS', '', turb % vis, grid)
 
     ! Other variables such as time scale, length scale and production
-    allocate(t_scale (-nb:nc));  t_scale  = 0.
-    allocate(l_scale (-nb:nc));  l_scale  = 0.
+    allocate(turb % t_scale (-nb:nc));  turb % t_scale  = 0.
+    allocate(turb % l_scale (-nb:nc));  turb % l_scale  = 0.
     allocate(u_tau   (-nb:nc));  u_tau    = 0.
     allocate(p_kin   (-nb:nc));  p_kin    = 0.
     allocate(vis_t   (-nb:nc));  vis_t    = 0.
@@ -323,8 +323,8 @@
     nearest_wall_cell = 0
 
     ! Other variables such as time scale, length scale and production
-    allocate(t_scale (-nb:nc));  t_scale  = 0.
-    allocate(l_scale (-nb:nc));  l_scale  = 0.
+    allocate(turb % t_scale (-nb:nc));  turb % t_scale  = 0.
+    allocate(turb % l_scale (-nb:nc));  turb % l_scale  = 0.
     allocate(u_tau   (-nb:nc));  u_tau    = 0.
     allocate(p_kin   (-nb:nc));  p_kin    = 0.
     allocate(vis_t   (-nb:nc));  vis_t    = 0.
@@ -378,8 +378,8 @@
     allocate(wale_v(-nb:nc));  wale_v = 0.
 
     ! Other variables such as time scale, length scale and production
-    allocate(t_scale (-nb:nc));  t_scale  = 0.
-    allocate(l_scale (-nb:nc));  l_scale  = 0.
+    allocate(turb % t_scale (-nb:nc));  turb % t_scale  = 0.
+    allocate(turb % l_scale (-nb:nc));  turb % l_scale  = 0.
     allocate(u_tau   (-nb:nc));  u_tau    = 0.
     allocate(p_kin   (-nb:nc));  p_kin    = 0.
     allocate(vis_t   (-nb:nc));  vis_t    = 0.
@@ -433,8 +433,8 @@
     allocate(c_dyn(-nb:nc));  c_dyn = 0.
 
     ! Other variables such as time scale, length scale and production
-    allocate(t_scale (-nb:nc));  t_scale  = 0.
-    allocate(l_scale (-nb:nc));  l_scale  = 0.
+    allocate(turb % t_scale (-nb:nc));  turb % t_scale  = 0.
+    allocate(turb % l_scale (-nb:nc));  turb % l_scale  = 0.
     allocate(u_tau   (-nb:nc));  u_tau    = 0.
     allocate(p_kin   (-nb:nc));  p_kin    = 0.
     allocate(vis_t   (-nb:nc));  vis_t    = 0.
@@ -499,8 +499,8 @@
     ! Other variables such as time scale, length scale and production
     allocate(vis_t_eff(-nb:nc));  vis_t_eff = 0.
     allocate(vis_t_sgs(-nb:nc));  vis_t_sgs = 0.
-    allocate(t_scale  (-nb:nc));  t_scale   = 0.
-    allocate(l_scale  (-nb:nc));  l_scale   = 0.
+    allocate(turb % t_scale  (-nb:nc));  turb % t_scale   = 0.
+    allocate(turb % l_scale  (-nb:nc));  turb % l_scale   = 0.
     allocate(u_tau    (-nb:nc));  u_tau     = 0.
     allocate(p_kin    (-nb:nc));  p_kin     = 0.
     allocate(vis_t    (-nb:nc));  vis_t     = 0.

@@ -112,19 +112,19 @@ endif
 ifeq ($(CGNS), yes)
   ifeq ($(MPI), yes)
     ifeq ($(MPI_TYPE), openmpi)
-      VALUE = $(shell echo using Cgns library built on OpenMPI MPI implementation)
+      VALUE = $(shell echo Using CGNS library built on OpenMPI MPI implementation)
       DIR_CGNS_H  = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Par_Openmpi/Include
       CGNS_LIB    = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Par_Openmpi/Lib/libcgns.a \
                     ../Libraries/Hdf5_Par_Openmpi/Lib/libhdf5.a -ldl
     endif
     ifeq ($(MPI_TYPE), mpich)
-      VALUE = $(shell echo using Cgns library built on MPICH MPI implementation)
+      VALUE = $(shell echo Using CGNS library built on MPICH MPI implementation)
       DIR_CGNS_H  = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Par_Mpich/Include
       CGNS_LIB    = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Par_Mpich/Lib/libcgns.a \
                     ../Libraries/Hdf5_Par_Mpich/Lib/libhdf5.a -ldl
     endif
   else
-    VALUE = $(shell echo using Cgns library built sequentially)
+    VALUE = $(shell echo Using CGNS library built sequentially)
     DIR_CGNS_H  = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Seq/Include
     CGNS_LIB    = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Seq/Lib/libcgns.a \
                   ../Libraries/Hdf5_Seq/Lib/libhdf5.a -ldl
@@ -235,6 +235,7 @@ SRC_FUN =  $(shell ls -1 *.f90 | grep -v -i _Mod 		\
 SRC_FUN += $(shell ls -1 $(DIR_TURBUL)/*.f90		\
                          | xargs -n1 basename		\
                          | grep -v -i Allocate		\
+                         | grep -v -i Calculate_	\
                          | grep -v -i Compute_		\
                          | grep -v -i Alias_		\
                          | grep -v -i Const_		\

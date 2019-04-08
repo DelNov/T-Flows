@@ -357,7 +357,7 @@
     !   Epsilon equation   !
     !----------------------!
     else if(name_phi == 'EPS') then
-      esor = grid % vol(c)/max(t_scale(c),tiny)
+      esor = grid % vol(c) / max(turb % t_scale(c),tiny)
 
       ce_11 = c_1e*(1.0 + 0.065*(1.0 - f22 % n(c)**3) * p_kin(c) / eps % n(c))
       b(c) = b(c) + density * ce_11 * p_kin(c) * esor

@@ -60,8 +60,8 @@
       l_3(c) = sqrt(kin % n(c)/3.0)  &
              / (c_mu_d * zeta % n(c) * flow % shear(c) + TINY)
 
-      t_scale(c) =       max( min(t_1(c), t_3(c)), t_2(c) )
-      l_scale(c) = c_l * max( min(l_1(c), l_3(c)), l_2(c) )
+      turb % t_scale(c) =       max( min(t_1(c), t_3(c)), t_2(c) )
+      turb % l_scale(c) = c_l * max( min(l_1(c), l_3(c)), l_2(c) )
     end do
 
   else if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
@@ -77,8 +77,8 @@
 
       kin % n(c) = max(0.5*(uu % n(c) + vv % n(c) + ww % n(c)), TINY)
 
-      t_scale(c) =       max( t_1(c), t_2(c) )
-      l_scale(c) = c_l * max( l_1(c), l_2(c) )
+      turb % t_scale(c) =       max( t_1(c), t_2(c) )
+      turb % l_scale(c) = c_l * max( l_1(c), l_2(c) )
     end do
 
   else if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
@@ -88,11 +88,10 @@
 
       t_1(c) = kin % n(c)/eps_l(c)
       l_1(c) = kin % n(c)**1.5/eps_l(c)
-    
-   
+
       kin % n(c) = max(0.5*(uu % n(c) + vv % n(c) + ww % n(c)), TINY)
-      t_scale(c) = t_1(c)
-      l_scale(c) = l_1(c)
+      turb % t_scale(c) = t_1(c)
+      turb % l_scale(c) = l_1(c)
     end do
 
   end if

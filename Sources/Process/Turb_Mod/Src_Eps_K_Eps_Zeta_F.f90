@@ -58,7 +58,7 @@
   call Time_And_Length_Scale(grid, turb)
 
   do c = 1, grid % n_cells 
-    e_sor = grid % vol(c)/(t_scale(c)+TINY)
+    e_sor = grid % vol(c) / (turb % t_scale(c)+TINY)
     c_11e = c_1e*(1.0 + alpha * ( 1.0/(zeta % n(c)+TINY) ))
     b(c) = b(c) + c_11e * e_sor * p_kin(c)
 

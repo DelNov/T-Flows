@@ -279,15 +279,15 @@
           uzz = ui_zz(c)
           diss1(c) =                                                           &
                   2.0 * 0.25 * kin_vis * kin % n(c) / max(eps % n(c), TINY)    &
-                  * (  uu % n(c)*(uxx*uxx+uxy*uxy+uxz*uxz)                     &
-                     + uv % n(c)*(uxx*uyx+uxy*uyy+uxz*uyz)                     &
-                     + uw % n(c)*(uxx*uzx+uxy*uzy+uxz*uzz)                     &
-                     + uv % n(c)*(uyx*uxx+uyy*uxy+uyz*uxz)                     &
-                     + vv % n(c)*(uyx*uyx+uyy*uyy+uyz*uyz)                     &
-                     + vw % n(c)*(uyx*uzx+uyy*uzy+uyz*uzz)                     &
-                     + uw % n(c)*(uzx*uxx+uzy*uxy+uzz*uxz)                     &
-                     + vw % n(c)*(uzx*uyx+uzy*uyy+uzz*uyz)                     &
-                     + ww % n(c)*(uzx*uzx+uzy*uzy+uzz*uzz)  )
+                  * (  uu % n(c)*(uxx*uxx + uxy*uxy + uxz*uxz)                 &
+                     + uv % n(c)*(uxx*uyx + uxy*uyy + uxz*uyz)                 &
+                     + uw % n(c)*(uxx*uzx + uxy*uzy + uxz*uzz)                 &
+                     + uv % n(c)*(uyx*uxx + uyy*uxy + uyz*uxz)                 &
+                     + vv % n(c)*(uyx*uyx + uyy*uyy + uyz*uyz)                 &
+                     + vw % n(c)*(uyx*uzx + uyy*uzy + uyz*uzz)                 &
+                     + uw % n(c)*(uzx*uxx + uzy*uxy + uzz*uxz)                 &
+                     + vw % n(c)*(uzx*uyx + uzy*uyy + uzz*uyz)                 &
+                     + ww % n(c)*(uzx*uzx + uzy*uzy + uzz*uzz))
         end if
         if(i == 2) then
           uxx = ui_xx(c)
@@ -299,17 +299,17 @@
           uyz = ui_yz(c)
           uzy = uyz
           uzz = ui_zz(c)
-          diss1(c) = diss1(c) +                         &
-                  2.0*0.25*kin_vis*kin%n(c)/eps % n(c)  *  &
-                 (uu % n(c)*(uxx*uxx+uxy*uxy+uxz*uxz)+  &
-                  uv % n(c)*(uxx*uyx+uxy*uyy+uxz*uyz)+  &
-                  uw % n(c)*(uxx*uzx+uxy*uzy+uxz*uzz)+  &
-                  uv % n(c)*(uyx*uxx+uyy*uxy+uyz*uxz)+  &
-                  vv % n(c)*(uyx*uyx+uyy*uyy+uyz*uyz)+  &
-                  vw % n(c)*(uyx*uzx+uyy*uzy+uyz*uzz)+  &
-                  uw % n(c)*(uzx*uxx+uzy*uxy+uzz*uxz)+  &
-                  vw % n(c)*(uzx*uyx+uzy*uyy+uzz*uyz)+  &
-                  ww % n(c)*(uzx*uzx+uzy*uzy+uzz*uzz))
+          diss1(c) = diss1(c)                                 &
+               +  2.0*0.25*kin_vis * kin % n(c) / eps % n(c)  &
+               * (  uu % n(c)*(uxx*uxx + uxy*uxy + uxz*uxz)   &
+                  + uv % n(c)*(uxx*uyx + uxy*uyy + uxz*uyz)   &
+                  + uw % n(c)*(uxx*uzx + uxy*uzy + uxz*uzz)   &
+                  + uv % n(c)*(uyx*uxx + uyy*uxy + uyz*uxz)   &
+                  + vv % n(c)*(uyx*uyx + uyy*uyy + uyz*uyz)   &
+                  + vw % n(c)*(uyx*uzx + uyy*uzy + uyz*uzz)   &
+                  + uw % n(c)*(uzx*uxx + uzy*uxy + uzz*uxz)   &
+                  + vw % n(c)*(uzx*uyx + uzy*uyy + uzz*uyz)   &
+                  + ww % n(c)*(uzx*uzx + uzy*uzy + uzz*uzz))
         end if
         if(i == 3) then
           uxx = ui_xx(c)
@@ -321,25 +321,25 @@
           uyz = ui_yz(c)
           uzy = uyz
           uzz = ui_zz(c)
-          diss1(c) = diss1(c) +                         &
-                  2.0*0.25*kin_vis*kin%n(c)/eps % n(c)  *  &
-                 (uu % n(c)*(uxx*uxx+uxy*uxy+uxz*uxz)+  &
-                  uv % n(c)*(uxx*uyx+uxy*uyy+uxz*uyz)+  &
-                  uw % n(c)*(uxx*uzx+uxy*uzy+uxz*uzz)+  &
-                  uv % n(c)*(uyx*uxx+uyy*uxy+uyz*uxz)+  &
-                  vv % n(c)*(uyx*uyx+uyy*uyy+uyz*uyz)+  &
-                  vw % n(c)*(uyx*uzx+uyy*uzy+uyz*uzz)+  &
-                  uw % n(c)*(uzx*uxx+uzy*uxy+uzz*uxz)+  &
-                  vw % n(c)*(uzx*uyx+uzy*uyy+uzz*uyz)+  &
-                  ww % n(c)*(uzx*uzx+uzy*uzy+uzz*uzz))
+          diss1(c) = diss1(c)                                 &
+               +  2.0*0.25*kin_vis * kin % n(c) / eps % n(c)  &
+               * (  uu % n(c)*(uxx*uxx + uxy*uxy + uxz*uxz)   &
+                  + uv % n(c)*(uxx*uyx + uxy*uyy + uxz*uyz)   &
+                  + uw % n(c)*(uxx*uzx + uxy*uzy + uxz*uzz)   &
+                  + uv % n(c)*(uyx*uxx + uyy*uxy + uyz*uxz)   &
+                  + vv % n(c)*(uyx*uyx + uyy*uyy + uyz*uyz)   &
+                  + vw % n(c)*(uyx*uzx + uyy*uzy + uyz*uzz)   &
+                  + uw % n(c)*(uzx*uxx + uzy*uxy + uzz*uxz)   &
+                  + vw % n(c)*(uzx*uyx + uzy*uyy + uzz*uyz)   &
+                  + ww % n(c)*(uzx*uzx + uzy*uzy + uzz*uzz))
         end if
       end do
     end do  ! i
   end if    ! end if EPS == yes                              
 
-  call Grad_Mod_Component(grid, l_scale, 1, l_sc_x,.true.) 
-  call Grad_Mod_Component(grid, l_scale, 2, l_sc_y,.true.) 
-  call Grad_Mod_Component(grid, l_scale, 3, l_sc_z,.true.) 
+  call Grad_Mod_Component(grid, turb % l_scale, 1, l_sc_x,.true.) 
+  call Grad_Mod_Component(grid, turb % l_scale, 2, l_sc_y,.true.) 
+  call Grad_Mod_Component(grid, turb % l_scale, 3, l_sc_z,.true.) 
 
   r13 = ONE_THIRD
   r23 = TWO_THIRDS
@@ -686,8 +686,8 @@
     !----------------------!
     else if(name_phi == 'EPS') then 
       f_eps = 1.0 - ((c_2e-1.4)/c_2e) * exp(-(re_t/6.0)**2)
-      eps_1 = 1.44 * p_kin(c) / t_scale(c)
-      eps_2 = c_2e * f_eps  / t_scale(c)
+      eps_1 = 1.44 * p_kin(c) / turb % t_scale(c)
+      eps_2 = c_2e * f_eps  / turb % t_scale(c)
       b(c) = b(c) + density * (eps_1 + diss1(c)) * grid % vol(c)
 
       a % val(a % dia(c)) =  a % val(a % dia(c)) + density * eps_2 * grid % vol(c)
@@ -705,10 +705,10 @@
     do c = 1, grid % n_cells
       re_t  = (kin % n(c)**2) / (kin_vis*eps % n(c) + TINY)
       f_eps = 1.0 - ((c_2e-1.4)/c_2e) * exp(-(re_t/6.0)**2)
-      b(c) = b(c) + density * (c_2e * f_eps / t_scale(c)  &
-                     * (kin_vis *(  kin_e_x(c)**2          &
-                                  + kin_e_y(c)**2          &
-                                  + kin_e_z(c)**2)))       &
+      b(c) = b(c) + density * (c_2e * f_eps / turb % t_scale(c)  &
+                     * (kin_vis *(  kin_e_x(c)**2                &
+                                  + kin_e_y(c)**2                &
+                                  + kin_e_z(c)**2)))             &
                      * grid % vol(c)
     end do
   end if

@@ -153,8 +153,8 @@
     call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'vis_t',    vis_t   (-nb_s:nc_s))
     call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'vis_wall', vis_wall(-nb_s:nc_s))
     call Backup_Mod_Write_Cell    (fh,d,vc, 'tau_wall', tau_wall  (1:nc_s))
-    call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 't_scale',  t_scale(-nb_s:nc_s))
-    call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'l_scale',  l_scale(-nb_s:nc_s))
+    call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 't_scale',  tur % t_scale(-nb_s:nc_s))
+    call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'l_scale',  tur % l_scale(-nb_s:nc_s))
   end if
 
   if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then

@@ -49,14 +49,14 @@
   ! Pure k-eps-zeta-f
   if(turbulence_model .eq. K_EPS_ZETA_F) then
     do c = -grid % n_bnd_cells, grid % n_cells
-      vis_t(c) = c_mu_d * density * zeta % n(c) * kin % n(c) * t_scale(c)
+      vis_t(c) = c_mu_d * density * zeta % n(c) * kin % n(c) * turb % t_scale(c)
     end do
 
   ! Hybrid between k-eps-zeta-f and dynamic SGS model
   else if(turbulence_model .eq. HYBRID_LES_RANS) then
     do c = -grid % n_bnd_cells, grid % n_cells
       vis_t(c)     = c_mu_d * density * zeta % n(c)  &
-                   * kin % n(c) * t_scale(c)
+                   * kin % n(c) * turb % t_scale(c)
       vis_t_eff(c) = max(vis_t(c), vis_t_sgs(c))
     end do
     call Comm_Mod_Exchange_Real(grid, vis_t_eff)

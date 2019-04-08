@@ -1,41 +1,35 @@
 !==============================================================================!
-  subroutine Calculate_Mean(flow, turb, n0, n1)
+  subroutine Turb_Mod_Calculate_Mean(turb, n0, n1)
 !------------------------------------------------------------------------------!
 !   Calculates time averaged velocity and velocity fluctuations.               !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Turb_Mod
-  use Field_Mod, only: Field_Type, heat_transfer
-  use Grid_Mod,  only: Grid_Type
-  use Var_Mod,   only: Var_Type
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
   type(Turb_Type),  target :: turb
   integer                  :: n0, n1
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
-  type(Var_Type),  pointer :: u, v, w, p, t
-  type(Var_Type),  pointer :: kin, eps, f22, zeta, vis, t2
-  type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
-  integer                  :: c, n
-  real,            pointer :: u_mean(:), v_mean(:), w_mean(:),  &
-                              p_mean(:), t_mean(:)
-  real,            pointer :: kin_mean (:), eps_mean(:),  &
-                              zeta_mean(:), f22_mean(:)
-  real,            pointer :: uu_res(:), vv_res(:), ww_res(:),  &
-                              uv_res(:), vw_res(:), uw_res(:)
-  real,            pointer :: ut_res(:), vt_res(:), wt_res(:), t2_res(:)
-  real,            pointer :: uu_mean(:), vv_mean(:), ww_mean(:)
-  real,            pointer :: uv_mean(:), vw_mean(:), uw_mean(:)
-  real,            pointer :: ut_mean(:), vt_mean(:), wt_mean(:), t2_mean(:)
+  type(Field_Type), pointer :: flow
+  type(Grid_Type),  pointer :: grid
+  type(Var_Type),   pointer :: u, v, w, p, t
+  type(Var_Type),   pointer :: kin, eps, f22, zeta, vis, t2
+  type(Var_Type),   pointer :: uu, vv, ww, uv, uw, vw
+  integer                   :: c, n
+  real,             pointer :: u_mean(:), v_mean(:), w_mean(:),  &
+                               p_mean(:), t_mean(:)
+  real,             pointer :: kin_mean (:), eps_mean(:),  &
+                               zeta_mean(:), f22_mean(:)
+  real,             pointer :: uu_res(:), vv_res(:), ww_res(:),  &
+                               uv_res(:), vw_res(:), uw_res(:)
+  real,             pointer :: ut_res(:), vt_res(:), wt_res(:), t2_res(:)
+  real,             pointer :: uu_mean(:), vv_mean(:), ww_mean(:)
+  real,             pointer :: uv_mean(:), vw_mean(:), uw_mean(:)
+  real,             pointer :: ut_mean(:), vt_mean(:), wt_mean(:), t2_mean(:)
 !==============================================================================!
 
   if(.not. turbulence_statistics) return
 
   ! Take aliases
+  flow => turb % pnt_flow
   grid => flow % pnt_grid
   p    => flow % p
   vis  => turb % vis
