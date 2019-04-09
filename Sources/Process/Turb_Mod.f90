@@ -15,6 +15,7 @@
   use Field_Mod,   only: Field_Type,                                  &
                          Field_Mod_Alias_Momentum,                    &
                          Field_Mod_Alias_Energy,                      &
+                         Field_Mod_U_Tan,                             &
                          viscosity, density, conductivity, capacity,  &
                          grav_x,  grav_y,  grav_z,                    &
                          omega_x, omega_y, omega_z,                   &
