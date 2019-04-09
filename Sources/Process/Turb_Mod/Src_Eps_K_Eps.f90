@@ -26,7 +26,7 @@
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: s, c, c1, c2, j
-  real                       :: u_tan, u_nor_sq, u_nor, u_tot_sq
+  real                       :: u_tan
   real                       :: re_t, f_mu, u_tau_new, fa, kin_vis
   real                       :: eps_wf, eps_int, ebf, y_star
 !==============================================================================!
@@ -90,23 +90,8 @@
           Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
 
         ! Compute tangential velocity component
-        u_tot_sq = u % n(c1) * u % n(c1) &
-                 + v % n(c1) * v % n(c1) &
-                 + w % n(c1) * w % n(c1)
-        u_nor  = ( u % n(c1) * grid % sx(s)     &
-                 + v % n(c1) * grid % sy(s)     &
-                 + w % n(c1) * grid % sz(s) )   &
-                 / sqrt(  grid % sx(s)*grid % sx(s)  &
-                        + grid % sy(s)*grid % sy(s)  &
-                        + grid % sz(s)*grid % sz(s))
-        u_nor_sq = u_nor**2
+        u_tan = Field_Mod_U_Tan(flow, s)
 
-        if( u_tot_sq  > u_nor_sq) then
-          u_tan = sqrt(u_tot_sq - u_nor_sq)
-        else
-          u_tan = TINY
-        end if
- 
         if(rough_walls) then 
           z_o = Roughness_Coefficient(grid, z_o_f(c1), c1)       
           eps % n(c1) = c_mu75 * kin % n(c1)**1.5  &

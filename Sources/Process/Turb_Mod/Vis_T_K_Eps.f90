@@ -32,7 +32,7 @@
   type(Var_Type),   pointer :: kin, eps
   integer                   :: c1, c2, s, c
   real                      :: pr, beta, ebf
-  real                      :: u_tan, u_nor_sq, u_nor, u_tot_sq
+  real                      :: u_tan
   real                      :: kin_vis, u_plus, y_star, re_t, f_mu
 !==============================================================================!
 !   Dimensions:                                                                !
@@ -80,22 +80,7 @@
       if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
          Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
 
-        u_tot_sq = u % n(c1) * u % n(c1) &
-                 + v % n(c1) * v % n(c1) &
-                 + w % n(c1) * w % n(c1)
-        u_nor  = ( u % n(c1) * grid % sx(s)     &
-                 + v % n(c1) * grid % sy(s)     &
-                 + w % n(c1) * grid % sz(s) )   &
-                 / sqrt(  grid % sx(s)*grid % sx(s)  &
-                        + grid % sy(s)*grid % sy(s)  &
-                        + grid % sz(s)*grid % sz(s))
-        u_nor_sq = u_nor**2
-
-        if( u_tot_sq  > u_nor_sq) then
-          u_tan = sqrt(u_tot_sq - u_nor_sq)
-        else
-          u_tan = TINY
-        end if
+        u_tan = Field_Mod_U_Tan(flow, s)
 
         u_tau(c1) = c_mu25 * sqrt(kin % n(c1))
         y_plus(c1) = Y_Plus_Low_Re(u_tau(c1), grid % wall_dist(c1), kin_vis)

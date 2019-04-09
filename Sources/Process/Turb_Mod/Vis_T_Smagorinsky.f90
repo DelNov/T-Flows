@@ -17,7 +17,7 @@
   integer                   :: c, s, c1, c2
   real                      :: nx, ny, nz
   real                      :: cs, lf, u_tau_l, u_f, nc2
-  real                      :: u_tot, u_nor, u_tan, a_pow, b_pow, nu, dely
+  real                      :: u_tan, a_pow, b_pow, nu, dely
 !==============================================================================!
 
   ! Take aliases
@@ -118,19 +118,7 @@
       if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
          Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
 
-        u_tot = sqrt(  u % n(c1) * u % n(c1)     &
-                     + v % n(c1) * v % n(c1)     &
-                     + w % n(c1) * w % n(c1)  )
-
-        u_nor = (   u % n(c1) * nx  &
-                  + v % n(c1) * ny  &
-                  + w % n(c1) * nz )
-
-        if( abs(u_tot) > abs(u_nor) ) then
-          u_tan = sqrt(u_tot * u_tot - u_nor * u_nor)
-        else
-          u_tan = TINY
-        end if
+        u_tan = Field_Mod_U_Tan(flow, s)
 
         a_pow = 8.3
         b_pow = 1.0/7.0
