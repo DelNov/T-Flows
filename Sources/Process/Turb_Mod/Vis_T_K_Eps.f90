@@ -32,7 +32,7 @@
   type(Var_Type),   pointer :: kin, eps
   integer                   :: c1, c2, s, c
   real                      :: pr, beta, ebf
-  real                      :: u_tan
+  real                      :: u_tan, u_tau
   real                      :: kin_vis, u_plus, y_star, re_t, f_mu
 !==============================================================================!
 !   Dimensions:                                                                !
@@ -81,15 +81,10 @@
          Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
 
         u_tan = Field_Mod_U_Tan(flow, s)
-
-        u_tau(c1) = c_mu25 * sqrt(kin % n(c1))
-        y_plus(c1) = Y_Plus_Low_Re(u_tau(c1), grid % wall_dist(c1), kin_vis)
-
-        tau_wall(c1) = density*kappa*u_tau(c1)*u_tan   &
-                     / log(e_log*max(y_plus(c1),1.05))
+        u_tau = c_mu25 * sqrt(kin % n(c1))
+        y_plus(c1) = Y_Plus_Low_Re(u_tau, grid % wall_dist(c1), kin_vis)
 
         ebf = 0.01 * y_plus(c1)**4 / (1.0 + 5.0*y_plus(c1))
-
         u_plus = U_Plus_Log_Law(y_plus(c1))
 
         if(y_plus(c1) < 3.0) then
@@ -100,11 +95,11 @@
                           + u_plus     * exp(-1.0/ebf) + TINY)
         end if
 
-        y_plus(c1) = Y_Plus_Low_Re(u_tau(c1), grid % wall_dist(c1), kin_vis)
+        y_plus(c1) = Y_Plus_Low_Re(u_tau, grid % wall_dist(c1), kin_vis)
 
         if(rough_walls) then
-          z_o = Roughness_Coefficient(grid, z_o_f(c1), c1)  
-          y_plus(c1) = Y_Plus_Rough_Walls(u_tau(c1),             &
+          z_o = Roughness_Coefficient(grid, z_o_f(c1), c1)
+          y_plus(c1) = Y_Plus_Rough_Walls(u_tau,                 &
                                           grid % wall_dist(c1),  &
                                           kin_vis)
           u_plus     = U_Plus_Rough_Walls(grid % wall_dist(c1))
@@ -119,8 +114,8 @@
                * (1.0 + 0.28 * exp(-0.007*pr/pr_t))
           ebf = 0.01 * (pr*y_plus(c1)**4  &
               / ((1.0 + 5.0 * pr**3 * y_plus(c1)) + TINY))
-          con_wall(c1) =    y_plus(c1) * viscosity * capacity          &   
-                       / (  y_plus(c1) * pr        * exp(-1.0 * ebf)   &   
+          con_wall(c1) =    y_plus(c1) * viscosity * capacity          &
+                       / (  y_plus(c1) * pr        * exp(-1.0 * ebf)   &
                           +(u_plus + beta) * pr_t  * exp(-1.0/ebf) + TINY)
         end if
       end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2).eq.WALL or WALLFL

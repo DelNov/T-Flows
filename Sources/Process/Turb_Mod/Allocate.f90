@@ -41,11 +41,9 @@
     call Var_Mod_Allocate_Solution('EPS', '', turb % eps, grid)
 
     ! Other turbulent quantities
-    allocate(u_tau   (-nb:nc));  u_tau    = 0.
     allocate(p_kin   (-nb:nc));  p_kin    = 0.
     allocate(vis_t   (-nb:nc));  vis_t    = 0.
     allocate(vis_wall(-nb:nc));  vis_wall = 0.
-    allocate(tau_wall(nc));                      tau_wall = 0.
     allocate(y_plus  (-nb:nc));  y_plus   = 0.
 
     if(heat_transfer) then
@@ -105,11 +103,9 @@
     ! Other variables such as time scale, length scale and production
     allocate(turb % t_scale (-nb:nc));  turb % t_scale  = 0.
     allocate(turb % l_scale (-nb:nc));  turb % l_scale  = 0.
-    allocate(u_tau   (-nb:nc));  u_tau    = 0.
     allocate(p_kin   (-nb:nc));  p_kin    = 0.
     allocate(vis_t   (-nb:nc));  vis_t    = 0.
     allocate(vis_wall(-nb:nc));  vis_wall = 0.
-    allocate(tau_wall(nc));                      tau_wall = 0.
     allocate(y_plus  (-nb:nc));  y_plus   = 0.
 
     ! Hydraulic roughness given by formula
@@ -179,10 +175,8 @@
     allocate(turb % t_scale (-nb:nc));  turb % t_scale  = 0.
     allocate(turb % l_scale (-nb:nc));  turb % l_scale  = 0.
     allocate(p_kin   (-nb:nc));  p_kin    = 0.
-    allocate(u_tau   (-nb:nc));  u_tau    = 0.
     allocate(vis_t   (-nb:nc));  vis_t    = 0.
     allocate(vis_wall(-nb:nc));  vis_wall = 0.
-    allocate(tau_wall(nc));                      tau_wall = 0.
     allocate(y_plus  (-nb:nc));  y_plus   = 0.
 
     ! Reynolds stresses
@@ -265,11 +259,9 @@
     ! Other variables such as time scale, length scale and production
     allocate(turb % t_scale (-nb:nc));  turb % t_scale  = 0.
     allocate(turb % l_scale (-nb:nc));  turb % l_scale  = 0.
-    allocate(u_tau   (-nb:nc));  u_tau    = 0.
     allocate(p_kin   (-nb:nc));  p_kin    = 0.
     allocate(vis_t   (-nb:nc));  vis_t    = 0.
     allocate(vis_wall(-nb:nc));  vis_wall = 0.
-    allocate(tau_wall(nc));                      tau_wall = 0.
     allocate(y_plus  (-nb:nc));  y_plus   = 0.
 
     if(heat_transfer) then
@@ -325,11 +317,9 @@
     ! Other variables such as time scale, length scale and production
     allocate(turb % t_scale (-nb:nc));  turb % t_scale  = 0.
     allocate(turb % l_scale (-nb:nc));  turb % l_scale  = 0.
-    allocate(u_tau   (-nb:nc));  u_tau    = 0.
     allocate(p_kin   (-nb:nc));  p_kin    = 0.
     allocate(vis_t   (-nb:nc));  vis_t    = 0.
     allocate(vis_wall(-nb:nc));  vis_wall = 0.
-    allocate(tau_wall(nc));                      tau_wall = 0.
     allocate(y_plus  (-nb:nc));  y_plus   = 0.
 
     if(heat_transfer) then
@@ -380,11 +370,9 @@
     ! Other variables such as time scale, length scale and production
     allocate(turb % t_scale (-nb:nc));  turb % t_scale  = 0.
     allocate(turb % l_scale (-nb:nc));  turb % l_scale  = 0.
-    allocate(u_tau   (-nb:nc));  u_tau    = 0.
     allocate(p_kin   (-nb:nc));  p_kin    = 0.
     allocate(vis_t   (-nb:nc));  vis_t    = 0.
     allocate(vis_wall(-nb:nc));  vis_wall = 0.
-    allocate(tau_wall(nc));                      tau_wall = 0.
     allocate(y_plus  (-nb:nc));  y_plus   = 0.
 
     if(heat_transfer) then
@@ -435,11 +423,9 @@
     ! Other variables such as time scale, length scale and production
     allocate(turb % t_scale (-nb:nc));  turb % t_scale  = 0.
     allocate(turb % l_scale (-nb:nc));  turb % l_scale  = 0.
-    allocate(u_tau   (-nb:nc));  u_tau    = 0.
     allocate(p_kin   (-nb:nc));  p_kin    = 0.
     allocate(vis_t   (-nb:nc));  vis_t    = 0.
     allocate(vis_wall(-nb:nc));  vis_wall = 0.
-    allocate(tau_wall(nc));                      tau_wall = 0.
     allocate(y_plus  (-nb:nc));  y_plus   = 0.
 
     if(heat_transfer) then
@@ -501,11 +487,9 @@
     allocate(vis_t_sgs(-nb:nc));  vis_t_sgs = 0.
     allocate(turb % t_scale  (-nb:nc));  turb % t_scale   = 0.
     allocate(turb % l_scale  (-nb:nc));  turb % l_scale   = 0.
-    allocate(u_tau    (-nb:nc));  u_tau     = 0.
     allocate(p_kin    (-nb:nc));  p_kin     = 0.
     allocate(vis_t    (-nb:nc));  vis_t     = 0.
     allocate(vis_wall (-nb:nc));  vis_wall  = 0.
-    allocate(tau_wall (nc));                      tau_wall  = 0.
     allocate(y_plus   (-nb:nc));  y_plus    = 0.
 
     if(heat_transfer) then

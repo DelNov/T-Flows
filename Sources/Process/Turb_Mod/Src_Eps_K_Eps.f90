@@ -26,7 +26,7 @@
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: s, c, c1, c2, j
-  real                       :: u_tan
+  real                       :: u_tan, u_tau, tau_wall
   real                       :: re_t, f_mu, u_tau_new, fa, kin_vis
   real                       :: eps_wf, eps_int, ebf, y_star
 !==============================================================================!
@@ -105,16 +105,14 @@
           b(c1) = eps % n(c1) * density
           a % val(a % dia(c1)) = 1.0 * density
         else
-          u_tau(c1) = c_mu25 * sqrt(kin % n(c1))
-          y_plus(c1) = Y_Plus_Low_Re(u_tau(c1), grid % wall_dist(c1), kin_vis)
-
-          tau_wall(c1) = density*kappa*u_tau(c1)*u_tan   &
-                       / log(e_log * max(y_plus(c1), 1.05))
-
-          u_tau_new = sqrt(tau_wall(c1)/density)
+          u_tau = c_mu25 * sqrt(kin % n(c1))
+          y_plus(c1) = Y_Plus_Low_Re(u_tau, grid % wall_dist(c1), kin_vis)
+          tau_wall = density * kappa * u_tau * u_tan   &
+                   / log(e_log * max(y_plus(c1), 1.05))
+          u_tau_new = sqrt(tau_wall / density)
           y_plus(c1) = Y_Plus_Low_Re(u_tau_new, grid % wall_dist(c1), kin_vis)
-          ebf = 0.01 * y_plus(c1)**4 / (1.0 + 5.0*y_plus(c1))
 
+          ebf = 0.01 * y_plus(c1)**4 / (1.0 + 5.0*y_plus(c1))
           eps_int = 2.0*viscosity/density * kin % n(c1)    &
                   / grid % wall_dist(c1)**2
           eps_wf  = c_mu75 * kin % n(c1)**1.5              &

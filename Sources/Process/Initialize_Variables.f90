@@ -295,7 +295,6 @@
           kin % oo(c) = kin % n(c)
           eps % o(c)  = eps % n(c)
           eps % oo(c) = eps % n(c)
-          u_tau(c)  = 0.047
           y_plus(c) = 0.001
         end if
 
@@ -313,7 +312,6 @@
           zeta % oo(c) = zeta % n(c)
           f22  % o(c)  = f22  % n(c)
           f22  % oo(c) = f22  % n(c)
-          u_tau(c)  = 0.047
           y_plus(c) = 0.001
         end if
 

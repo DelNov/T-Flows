@@ -27,7 +27,7 @@
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   integer                  :: c1, c2, s
   real                     :: qx, qy, qz, nx, ny, nz, con_t
-  real                     :: pr, kin_vis
+  real                     :: pr, kin_vis, u_tau
 !==============================================================================!
 
   ! Take aliases
@@ -95,11 +95,9 @@
           uw  % n(c2) = 0.0
           vw  % n(c2) = 0.0
           kin % n(c2) = 0.0
-          u_tau(c1)   = kin_vis * sqrt(u % n(c1)**2      &
-                        + v % n(c1)**2 + w % n(c1)**2)   &
-                        / grid % wall_dist(c1)
-          y_plus(c1)  = Y_Plus_Low_Re(u_tau(c1),         &
-                        grid % wall_dist(c1), kin_vis) 
+          u_tau = kin_vis * sqrt(u % n(c1)**2 + v % n(c1)**2 + w % n(c1)**2)  &
+                / grid % wall_dist(c1)
+          y_plus(c1) = Y_Plus_Low_Re(u_tau, grid % wall_dist(c1), kin_vis)
           if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) f22 % n(c2) = 0.0
         end if
       end if

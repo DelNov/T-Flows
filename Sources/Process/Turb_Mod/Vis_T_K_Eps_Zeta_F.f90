@@ -19,7 +19,7 @@
   type(Var_Type),   pointer :: u, v, w
   type(Var_Type),   pointer :: kin, eps, zeta, f22
   integer                   :: c, c1, c2, s
-  real                      :: u_tan
+  real                      :: u_tan, u_tau, tau_wall
   real                      :: beta, pr
   real                      :: u_plus, ebf, kin_vis
 !==============================================================================!
@@ -76,11 +76,11 @@
 
         u_tan = Field_Mod_U_Tan(flow, s)
 
-        u_tau(c1) = c_mu25 * sqrt(kin % n(c1))
-        y_plus(c1) = Y_Plus_Low_Re(u_tau(c1), grid % wall_dist(c1), kin_vis)
+        u_tau = c_mu25 * sqrt(kin % n(c1))
+        y_plus(c1) = Y_Plus_Low_Re(u_tau, grid % wall_dist(c1), kin_vis)
 
-        tau_wall(c1) = density*kappa*u_tau(c1)*u_tan    &
-                     / log(e_log*max(y_plus(c1),1.05))
+        tau_wall = density * kappa * u_tau * u_tan    &  ! this is never used
+                 / log(e_log*max(y_plus(c1),1.05))
 
         ebf = 0.01 * y_plus(c1)**4 / (1.0 + 5.0*y_plus(c1))
 
@@ -94,17 +94,17 @@
                           + u_plus     * exp(-1.0/ebf) + TINY)
         end if
 
-        y_plus(c1) = Y_Plus_Low_Re(u_tau(c1), grid % wall_dist(c1), kin_vis)
+        y_plus(c1) = Y_Plus_Low_Re(u_tau, grid % wall_dist(c1), kin_vis)
 
         if(rough_walls) then
           z_o = Roughness_Coefficient(grid, z_o_f(c1), c1)      
-          y_plus(c1) = Y_Plus_Rough_Walls(u_tau(c1),             &
+          y_plus(c1) = Y_Plus_Rough_Walls(u_tau,             &
                                           grid % wall_dist(c1),  &
                                           kin_vis)
           u_plus     = U_Plus_Rough_Walls(grid % wall_dist(c1))
           vis_wall(c1) = y_plus(c1) * viscosity * kappa  &
                        / log((grid % wall_dist(c1)+z_o)/z_o)  ! is this U+?
-        end if  
+        end if
 
         if(heat_transfer) then
           pr_t = Turbulent_Prandtl_Number(grid, c1)

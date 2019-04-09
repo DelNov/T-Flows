@@ -19,7 +19,7 @@
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: c, s, c1, c2, j
-  real                       :: u_tan
+  real                       :: u_tan, u_tau, tau_wall
   real                       :: e_sor, c_11e, ebf
   real                       :: eps_wf, eps_int
   real                       :: fa, u_tau_new, kin_vis
@@ -103,17 +103,14 @@
           b(c1) = eps % n(c1) 
           a % val(a % dia(c1)) = 1.0 
         else
-          u_tau(c1) = c_mu25 * sqrt(kin % n(c1))
-          y_plus(c1) = Y_Plus_Low_Re(u_tau(c1), grid % wall_dist(c1), kin_vis)
-
-          tau_wall(c1) = density * kappa * u_tau(c1) * u_tan  &
-                       / log(e_log * max(y_plus(c1), 1.05))
-
-          u_tau_new = sqrt(tau_wall(c1)/density)
+          u_tau = c_mu25 * sqrt(kin % n(c1))
+          y_plus(c1) = Y_Plus_Low_Re(u_tau, grid % wall_dist(c1), kin_vis)
+          tau_wall = density * kappa * u_tau * u_tan  &
+                   / log(e_log * max(y_plus(c1), 1.05))
+          u_tau_new = sqrt(tau_wall / density)
           y_plus(c1) = Y_Plus_Low_Re(u_tau_new, grid % wall_dist(c1), kin_vis)
 
           ebf = 0.001 * y_plus(c1)**4 / (1.0 + y_plus(c1))
-
           eps_int = 2.0* kin_vis * kin % n(c1)  &
                   / grid % wall_dist(c1)**2
           eps_wf  = c_mu75 * kin % n(c1)**1.5            &
@@ -138,6 +135,6 @@
         end if    ! rough_walls
       end if      ! wall or wall_flux
     end if        ! c2 < 0
-  end do  
+  end do
 
   end subroutine

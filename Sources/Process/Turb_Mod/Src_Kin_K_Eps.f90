@@ -18,7 +18,7 @@
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: c, c1, c2, s
-  real                       :: u_tan
+  real                       :: u_tan, u_tau, tau_wall
   real                       :: kin_vis  ! [m^2/s]
   real                       :: ebf, p_kin_int, p_kin_wf
 !==============================================================================!
@@ -82,35 +82,26 @@
         u_tan = Field_Mod_U_Tan(flow, s)
 
         if(rough_walls) then
-          z_o = Roughness_Coefficient(grid, z_o_f(c1), c1)      
-          u_tau(c1) = c_mu25 * sqrt(kin % n(c1))
-          y_plus(c1) = u_tau(c1) * (grid % wall_dist(c1) + z_o) &
-                     / kin_vis
-
-          tau_wall(c1) = density*kappa*u_tau(c1)*u_tan  &
-                       / log(max(((grid % wall_dist(c1)+z_o)/z_o), 1.05))
-
-          p_kin(c1) = density * tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))   &
+          z_o = Roughness_Coefficient(grid, z_o_f(c1), c1)
+          u_tau = c_mu25 * sqrt(kin % n(c1))
+          y_plus(c1) = u_tau * (grid % wall_dist(c1) + z_o) / kin_vis
+          tau_wall = density * kappa * u_tau * u_tan  &
+                   / log(max(((grid % wall_dist(c1)+z_o)/z_o), 1.05))
+          p_kin(c1) = density * tau_wall * c_mu25 * sqrt(kin % n(c1))   &
                     / (kappa*(grid % wall_dist(c1) + z_o))
-          b(c1)     = b(c1) + (p_kin(c1) - p_kin(c1))   &
-                    * grid % vol(c1)
+          b(c1)     = b(c1) + (p_kin(c1) - p_kin(c1)) * grid % vol(c1)
         else
-          u_tau(c1) = c_mu25 * sqrt(kin % n(c1))
-          y_plus(c1) = Y_Plus_Low_Re(u_tau(c1), grid % wall_dist(c1), kin_vis)
-
-          tau_wall(c1) = density*kappa*u_tau(c1)*u_tan   &
-                       / log(e_log * max(y_plus(c1), 1.05))
+          u_tau = c_mu25 * sqrt(kin % n(c1))
+          y_plus(c1) = Y_Plus_Low_Re(u_tau, grid % wall_dist(c1), kin_vis)
+          tau_wall = density * kappa * u_tau * u_tan   &
+                   / log(e_log * max(y_plus(c1), 1.05))
 
           ebf = 0.01 * y_plus(c1)**4 / (1.0 + 5.0*y_plus(c1))
-
-          p_kin_wf  = tau_wall(c1) * 0.07**0.25 * sqrt(kin % n(c1))  &
-                    / (grid % wall_dist(c1) * kappa)
-
+          p_kin_wf = tau_wall * 0.07**0.25 * sqrt(kin % n(c1))  &
+                   / (grid % wall_dist(c1) * kappa)
           p_kin_int = vis_t(c1) * flow % shear(c1)**2
-
           p_kin(c1) = p_kin_int * exp(-1.0 * ebf) + p_kin_wf  &
                     * exp(-1.0 / ebf)
-
           b(c1) = b(c1) + (p_kin(c1) - p_kin_int) * grid % vol(c1)
         end if  ! rough_walls
       end if    ! Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL or WALLFL

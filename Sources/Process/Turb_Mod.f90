@@ -168,10 +168,6 @@
   ! Non-dimensional distance
   real, allocatable :: y_plus(:)
 
-  ! Friction at the wall and velocity
-  real, allocatable :: u_tau(:)
-  real, allocatable :: tau_wall(:)
-
   ! Effective turbulent viscosity
   real, allocatable :: vis_t_eff(:)
   real, allocatable :: vis_t_sgs(:)

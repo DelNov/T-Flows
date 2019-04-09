@@ -274,7 +274,6 @@
             if(turbulence_model .eq. K_EPS) then
               i = Key_Ind('KIN', keys, nks); if(i > 0) kin % n(c) = vals(i)
               i = Key_Ind('EPS', keys, nks); if(i > 0) eps % n(c) = vals(i)
-              u_tau(c)  = 0.047
               y_plus(c) = 1.1
             end if
 
