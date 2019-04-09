@@ -78,5 +78,6 @@
   include 'Field_Mod/Allocate.f90'
   include 'Field_Mod/Alias_Energy.f90'
   include 'Field_Mod/Alias_Momentum.f90'
+  include 'Field_Mod/U_Tan.f90'
 
   end module
