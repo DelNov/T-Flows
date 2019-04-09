@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Backstep_Cf_St(flow, save_name)
+  subroutine User_Mod_Backstep_Cf_St(flow, turb, save_name)
 !------------------------------------------------------------------------------!
 !   Subroutine extracts skin friction coefficient and Stanton number for       !
 !   backstep case.                                                             !
@@ -8,7 +8,7 @@
   use Field_Mod, only: Field_Type,  &
                        viscosity, capacity, density, conductivity, heat_transfer
   use Var_Mod,   only: Var_Type
-  use Rans_Mod
+  use Turb_Mod
   use Comm_Mod                       ! parallel stuff
   use Name_Mod,  only: problem_name
   use Const_Mod                      ! constants
@@ -16,8 +16,11 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
+  type(Turb_Type),  target :: turb
   character(len=*)         :: save_name
 !----------------------------------[Calling]-----------------------------------!
+  real :: Y_Plus_Low_Re
+!-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
   type(Grid_Type), pointer :: grid
   integer                  :: n_prob, pl, c, dummy, i, count, k, c1, c2, s, l
@@ -31,6 +34,7 @@
                               v1_p(:), v2_p(:), v3_p(:), &
                               v4_p(:), v5_p(:)  
   integer, allocatable     :: n_p(:), n_count(:)
+  real                     :: kin_vis, u_tan, u_tau, tau_wall
 !==============================================================================!
 
   ! Take aliases
@@ -93,18 +97,28 @@
       if(c2 < 0) then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2).eq.WALLFL.and.t % q(c2) > 1.e-8) then
           if(grid % xc(c1) > z_p(i) .and. grid % xc(c1) < z_p(i+1)) then
-            um_p(i)   = um_p(i) + U % n(c1)
-            vm_p(i)   = vm_p(i) + V % n(c1)
-            wm_p(i)   = wm_p(i) + W % n(c1)
+            um_p(i)   = um_p(i) + u % n(c1)
+            vm_p(i)   = vm_p(i) + v % n(c1)
+            wm_p(i)   = wm_p(i) + w % n(c1)
             if(y_plus(c1) < 4.0) then
-              v1_p(i) = v1_p(i) + (2.0*viscosity*U%n(c1)/grid % wall_dist(c1)) &
-                        / (density * 11.3**2) 
+              v1_p(i) = v1_p(i)  &
+                      + (2.0 * viscosity * u % n(c1)   &
+                             / grid % wall_dist(c1))   &
+                      / (density * 11.3**2)
             else
-              v1_p(i) = v1_p(i) + 0.015663 * tau_wall(c1)*U%n(c1)/abs(U%n(c1)) 
+kin_vis = viscosity / density
+u_tan = Field_Mod_U_Tan(flow, s)
+u_tau = c_mu25 * sqrt(turb % kin % n(c1))
+y_plus(c1) = Y_Plus_Low_Re(u_tau, grid % wall_dist(c1), kin_vis)
+tau_wall = density*kappa*u_tau*u_tan    &
+             / log(e_log*max(y_plus(c1),1.05))
+
+              v1_p(i) = v1_p(i)  &
+                      + 0.015663 * tau_wall * u % n(c1) / abs(u % n(c1))
             end if
             v2_p(i) = v2_p(i) + y_plus(c1)
             v3_p(i) = v3_p(i) + t % q(c2)  &
-                    / (density * capacity * (t % n(c2) - 20) * 11.3) 
+                    / (density * capacity * (t % n(c2) - 20) * 11.3)
             v5_p(i) = v5_p(i) + t % n(c2) 
             n_count(i) = n_count(i) + 1
           end if

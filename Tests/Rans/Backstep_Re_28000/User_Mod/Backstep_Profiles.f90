@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Backstep_Profiles(flow, save_name) 
+  subroutine User_Mod_Backstep_Profiles(flow, turb, save_name) 
 !------------------------------------------------------------------------------!
 !   Description
 !------------------------------------------------------------------------------!
@@ -7,7 +7,7 @@
   use Field_Mod, only: Field_Type,  &
                        viscosity, capacity, density, conductivity, heat_transfer
   use Var_Mod,   only: Var_Type
-  use Rans_Mod
+  use Turb_Mod
   use Comm_Mod                       ! parallel stuff
   use Name_Mod,  only: problem_name
   use Const_Mod                      ! constants
@@ -15,13 +15,16 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
+  type(Turb_Type),  target :: turb
   character(len=*)         :: save_name
-!----------------------------------[Calling]-----------------------------------!
+!-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
+  type(Var_Type),  pointer :: kin, eps, zeta, f22
   type(Grid_Type), pointer :: grid
   integer                  :: n_prob, pl, c, idumm, i, count,  &
                               k, c1, c2, s, n_hor, l
   character(len=80)        :: coord_name, result_name
+  real, parameter          :: U_B = 11.3, H = 0.038
   real, allocatable        :: x1_p(:), x2_p(:), lnum(:), z_p(:), &
                               um_p(:), vm_p(:), wm_p(:), & 
                               uu_p(:), vv_p(:), ww_p(:), &
@@ -37,10 +40,9 @@
 
   ! Take aliases
   grid => flow % pnt_grid
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
   t    => flow % t
+  call Field_Mod_Alias_Momentum   (flow, u, v, w)
+  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
 
   ! Set the name for coordinate file
   call Name_File(0, coord_name, ".1d")
@@ -151,10 +153,10 @@
             wm_p(i) = wm_p(i) + w % n(c)
             uu_p(i) = uu_p(i) + kin % n(c)
             vv_p(i) = vv_p(i) + eps % n(c)
-            v1_p(i) = v1_p(i) + vis_t(c)*(U % y(c) + V % x(c))/11.3**2 
+            v1_p(i) = v1_p(i) + vis_t(c)*(u % y(c) + v % x(c))/U_B**2
             v2_p(i) = v2_p(i) + t % n(c) - 20.0
             n_count(i) = n_count(i) + 1
-            if(turbulence_model == K_EPS_ZETA_F) then      
+            if(turbulence_model == K_EPS_ZETA_F) then
               ww_p(i) = ww_p(i) + zeta % n(c)
               uv_p(i) = uv_p(i) + f22 % n(c)
             end if
@@ -197,7 +199,7 @@
     write(result_name(l+1:l+14),'(a5,f4.2,a5)') '-prof', lnum(k), 'h.dat'
 
     open(3,file=result_name)
-    write(3,*) '# z, U, TKE, EPS, zeta, f, uv, T'
+    write(3,*) '# z, u, kin, eps, zeta, f22, uv, T'
     write(3,*) '# all data are normalized by Ub = 11.3 and step height h = 0.038'
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
@@ -216,35 +218,35 @@
         v4_p(i) = v4_p(i) / n_count(i)
         v5_p(i) = v5_p(i) / n_count(i)
 
-        write(3,'(8E15.7)') (z_p(i)+z_p(i+1))/(2.*0.038),  &
-                           um_p(i)/11.3,                   &
-                           uu_p(i)/11.3**2,                &
-                           vv_p(i)*0.038/11.3**3,          &
-                           ww_p(i)/11.3**2,                &
-                           uv_p(i)*0.038/11.3**2,          &
-                           v1_p(i),                        &
-                           v2_p(i) 
+        write(3,'(8E15.7)') (z_p(i)+z_p(i+1))/(2.*H),  &
+                           um_p(i) / U_B,              &
+                           uu_p(i) / U_B**2,           &
+                           vv_p(i) * H / U_B**3,       &
+                           ww_p(i) / U_B**2,           &
+                           uv_p(i) * H / U_B**2,       &
+                           v1_p(i),                    &
+                           v2_p(i)
 
-        wm_p(i)    = 0.0   
-        um_p(i)    = 0.0 
-        vm_p(i)    = 0.0 
-        uu_p(i)    = 0.0 
-        vv_p(i)    = 0.0 
-        ww_p(i)    = 0.0 
-        uv_p(i)    = 0.0 
-        uw_p(i)    = 0.0 
-        vw_p(i)    = 0.0 
-        v1_p(i)    = 0.0 
-        v2_p(i)    = 0.0 
+        wm_p(i)    = 0.0
+        um_p(i)    = 0.0
+        vm_p(i)    = 0.0
+        uu_p(i)    = 0.0
+        vv_p(i)    = 0.0
+        ww_p(i)    = 0.0
+        uv_p(i)    = 0.0
+        uw_p(i)    = 0.0
+        vw_p(i)    = 0.0
+        v1_p(i)    = 0.0
+        v2_p(i)    = 0.0
         v3_p(i)    = 0.0
         v4_p(i)    = 0.0
         v5_p(i)    = 0.0
         n_count(i) = 0
       end if
-    end do 
+    end do
     close(3)
   end do
- 
+
   deallocate(n_p)
   deallocate(z_p)
   deallocate(um_p)
