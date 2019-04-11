@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(flow, save_name)
+  subroutine User_Mod_Save_Results(flow, turb, save_name)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
@@ -15,16 +15,20 @@
   use Bulk_Mod,  only: Bulk_Type
   use Var_Mod,   only: Var_Type
   use Name_Mod,  only: problem_name
-  use Rans_Mod
+  use Turb_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
+  type(Turb_Type),  target :: turb
   character(len=*)         :: save_name
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u, v, w, t
+  type(Var_Type),  pointer :: kin, eps, zeta, f22
+  type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
+  type(Var_Type),  pointer :: ut, vt, wt
   real,            pointer :: flux(:)
   integer                  :: n_prob, pl, c, i, count, s, c1, c2, n_points
   character(len=80)        :: coord_name, res_name, res_name_plus
@@ -43,10 +47,11 @@
   ! Take aliases
   grid => flow % pnt_grid
   bulk => flow % bulk
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
-  t    => flow % t
+  call Field_Mod_Alias_Momentum   (flow, u, v, w)
+  call Field_Mod_Alias_Energy     (flow, t)
+  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
+  call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
+  call Turb_Mod_Alias_Heat_Fluxes (turb, ut, vt, wt)
 
   ! Set the name for coordinate file
   call Name_File(0, coord_name, ".1d")

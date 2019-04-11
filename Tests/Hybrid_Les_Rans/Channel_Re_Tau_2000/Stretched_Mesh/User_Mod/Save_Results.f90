@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(flow, save_name)
+  subroutine User_Mod_Save_Results(flow, turb, save_name)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
@@ -15,11 +15,12 @@
   use Bulk_Mod,  only: Bulk_Type
   use Var_Mod,   only: Var_Type
   use Name_Mod,  only: problem_name
-  use Rans_Mod
+  use Turb_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
+  type(Turb_Type),  target :: turb
   character(len=*)         :: save_name
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
@@ -43,10 +44,8 @@
   ! Take aliases
   grid => flow % pnt_grid
   bulk => flow % bulk
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
-  t    => flow % t
+  call Field_Mod_Alias_Momentum(flow, u, v, w)
+  call Field_Mod_Alias_Energy  (flow, t)
 
   ! Set the name for coordinate file
   call Name_File(0, coord_name, ".1d")
@@ -64,17 +63,17 @@
   inquire(file=coord_name, exist=there)
   if(.not. there) then
     if(this_proc < 2) then
-      print *, '==============================================================='
-      print *, 'In order to extract profiles and write them in ascii files'
-      print *, 'the code has to read cell-faces coordinates '
-      print *, 'in wall-normal direction in the ascii file ''case_name.1d.'''
-      print *, 'The file format should be as follows:'
-      print *, '10  ! number of cells + 1'
-      print *, '1 0.0'
-      print *, '2 0.1'
-      print *, '3 0.2'
-      print *, '... '
-      print *, '==============================================================='
+      print *, '#=============================================================='
+      print *, '# In order to extract profiles and write them in ascii files'
+      print *, '# the code has to read cell-faces coordinates '
+      print *, '# in wall-normal direction in the ascii file ''case_name.1d.'''
+      print *, '# The file format should be as follows:'
+      print *, '# 10  ! number of cells + 1'
+      print *, '# 1 0.0'
+      print *, '# 2 0.1'
+      print *, '# 3 0.2'
+      print *, '# ... '
+      print *, '#=============================================================='
     end if
 
     ! Restore the name and return
@@ -141,27 +140,35 @@
          grid % zc(c) < (z_p(i+1))) then
 
         wall_p(i) = wall_p(i) + grid % wall_dist(c)
-        u_p   (i) = u_p   (i) + u % mean(c)
-        v_p   (i) = v_p   (i) + v % mean(c)
-        w_p   (i) = w_p   (i) + w % mean(c)
+        u_p   (i) = u_p   (i) + turb % u_mean(c)
+        v_p   (i) = v_p   (i) + turb % v_mean(c)
+        w_p   (i) = w_p   (i) + turb % w_mean(c)
 
-        uu_p(i)   = uu_p(i) + uu % mean(c) - u % mean(c) * u % mean(c)
-        vv_p(i)   = vv_p(i) + vv % mean(c) - v % mean(c) * v % mean(c)
-        ww_p(i)   = ww_p(i) + ww % mean(c) - w % mean(c) * w % mean(c)
-        uw_p(i)   = uw_p(i) + uw % mean(c) - u % mean(c) * w % mean(c)
+        uu_p(i) = uu_p(i) + turb % uu_res(c)  &
+                          - turb % u_mean(c) * turb % u_mean(c)
+        vv_p(i) = vv_p(i) + turb % vv_res(c)  &
+                          - turb % v_mean(c) * turb % v_mean(c)
+        ww_p(i) = ww_p(i) + turb % ww_res(c)  &
+                          - turb % w_mean(c) * turb % w_mean(c)
+        uw_p(i) = uw_p(i) + turb % uw_res(c)  &
+                          - turb % u_mean(c) * turb % w_mean(c)
 
-        kin_p   (i) = kin_p   (i) + kin % mean(c) 
-        eps_p   (i) = eps_p   (i) + eps % mean(c) 
+        kin_p   (i) = kin_p   (i) + turb % kin_mean(c)
+        eps_p   (i) = eps_p   (i) + turb % eps_mean(c)
         uw_mod_p(i) = uw_mod_p(i) + vis_t_eff(c)*(u % y(c) + v % x(c))
         vis_t_p (i) = vis_t_p (i) + vis_t(c) / viscosity
         y_plus_p(i) = y_plus_p(i) + y_plus(c)
 
         if(heat_transfer) then
-          t_p (i) = t_p (i) + t % mean(c)
-          tt_p(i) = tt_p(i) + tt % mean(c) - t % mean(c) * t % mean(c)
-          ut_p(i) = ut_p(i) + ut % mean(c) - u % mean(c) * t % mean(c)
-          vt_p(i) = vt_p(i) + vt % mean(c) - v % mean(c) * t % mean(c)
-          wt_p(i) = wt_p(i) + wt % mean(c) - w % mean(c) * t % mean(c)
+          t_p (i) = t_p (i) + turb % t_mean(c)
+          tt_p(i) = tt_p(i) + turb % t2_mean(c)  &
+                            - turb % t_mean(c) * turb % t_mean(c)
+          ut_p(i) = ut_p(i) + turb % ut_res(c)   &
+                            - turb % u_mean(c) * turb % t_mean(c)
+          vt_p(i) = vt_p(i) + turb % vt_res(c)   &
+                            - turb % v_mean(c) * turb % t_mean(c)
+          wt_p(i) = wt_p(i) + turb % wt_res(c)   &
+                            - turb % w_mean(c) * turb % t_mean(c)
         end if
         n_count(i) = n_count(i) + 1
       end if 
@@ -255,7 +262,7 @@
     do c = 1, grid % n_cells
       if(grid % wall_dist(c) > d_wall) then
         d_wall = grid % wall_dist(c)
-        t_inf  = t % mean(c)
+        t_inf  = turb % t_mean(c)
       end if
     end do
 
@@ -274,8 +281,8 @@
         if( Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. WALL .or.  &
             Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. WALLFL) then
 
-          t_wall = t_wall + t % mean(c2)
-          nu_max = nu_max + t % q(c2)/(conductivity*(t % mean(c2) - t_inf))
+          t_wall = t_wall + turb % t_mean(c2)
+          nu_max = nu_max + t % q(c2)/(conductivity*(turb % t_mean(c2) - t_inf))
           n_points = n_points + 1
         end if
       end if
