@@ -20,7 +20,7 @@ CGNS="no"
 #update-alternatives --install /usr/bin/mpirun mpirun /usr/bin/mpirun.mpich   80
 
 # Folder structure
-TEST_DIR=$PWD                      # dir with tests
+TEST_DIR=$PWD/                     # dir with tests
 GENE_DIR=$PWD/../Sources/Generate  # Generate src folder
 CONV_DIR=$PWD/../Sources/Convert   # Convert  src folder
 DIVI_DIR=$PWD/../Sources/Divide    # Divide   src folder
@@ -35,32 +35,30 @@ PROC_EXE=$BINA_DIR/Process         # Process  ex
 
 # Folders with geometry
 # Generator file (.dom)
-LAMINAR_BACKSTEP_ORTH_DIR=$TEST_DIR/Laminar/Backstep/Orthogonal
-LAMINAR_BACKSTEP_NON_ORTH_DIR=$TEST_DIR/Laminar/Backstep/Nonorthogonal
+LAMINAR_BACKSTEP_ORTH_DIR=Laminar/Backstep/Orthogonal
+LAMINAR_BACKSTEP_NON_ORTH_DIR=Laminar/Backstep/Nonorthogonal
 
-LES_CAVITY_LID_DRIVEN_DIR=$TEST_DIR/Laminar/Cavity/Lid_Driven/Re_1000
-LES_CAVITY_THERM_DRIVEN_DIR_106=$TEST_DIR/Laminar/Cavity/Thermally_Driven/Ra_10e6
-LES_CAVITY_THERM_DRIVEN_DIR_108=$TEST_DIR/Laminar/Cavity/Thermally_Driven/Ra_10e8
+LES_CAVITY_LID_DRIVEN_DIR=Laminar/Cavity/Lid_Driven/Re_1000
+LES_CAVITY_THERM_DRIVEN_DIR_106=Laminar/Cavity/Thermally_Driven/Ra_10e6
+LES_CAVITY_THERM_DRIVEN_DIR_108=Laminar/Cavity/Thermally_Driven/Ra_10e8
 
-RANS_BACKSTEP_5100_DIR=$TEST_DIR/Rans/Backstep_Re_05100
-RANS_BACKSTEP_28000_DIR=$TEST_DIR/Rans/Backstep_Re_28000
+RANS_BACKSTEP_5100_DIR=Rans/Backstep_Re_05100
+RANS_BACKSTEP_28000_DIR=Rans/Backstep_Re_28000
 
-RANS_CHANNEL_LR_LONG_DIR=$TEST_DIR/Rans/Channel_Re_Tau_590/Long_Domain
-RANS_CHANNEL_LR_RSM_DIR=$TEST_DIR/Rans/Channel_Re_Tau_590/Rsm
-RANS_CHANNEL_LR_STRETCHED_DIR=$TEST_DIR/Rans/Channel_Re_Tau_590/Stretched_Mesh
-RANS_CHANNEL_LR_UNIFORM_DIR=$TEST_DIR/Rans/Channel_Re_Tau_590/Uniform_Mesh
+RANS_CHANNEL_LR_LONG_DIR=Rans/Channel_Re_Tau_590/Long_Domain
+RANS_CHANNEL_LR_RSM_DIR=Rans/Channel_Re_Tau_590/Rsm
+RANS_CHANNEL_LR_STRETCHED_DIR=Rans/Channel_Re_Tau_590/Stretched_Mesh
+RANS_CHANNEL_LR_UNIFORM_DIR=Rans/Channel_Re_Tau_590/Uniform_Mesh
 
-HYB_CHANNEL_HR_UNIFORM_DIR=\
-$TEST_DIR/Hybrid_Les_Rans/Channel_Re_Tau_2000/Uniform_Mesh
-HYB_CHANNEL_HR_STRETCHED_DIR=\
-$TEST_DIR/Hybrid_Les_Rans/Channel_Re_Tau_2000/Stretched_Mesh
+HYB_CHANNEL_HR_UNIFORM_DIR=Hybrid_Les_Rans/Channel_Re_Tau_2000/Uniform_Mesh
+HYB_CHANNEL_HR_STRETCHED_DIR=Hybrid_Les_Rans/Channel_Re_Tau_2000/Stretched_Mesh
 
 # Mesh file (.cgns/.neu)
-LES_PIPE_DIR=$TEST_DIR/Les/Pipe_Re_Tau_180
+LES_PIPE_DIR=Les/Pipe_Re_Tau_180
 
-RANS_IMPINGING_JET_DIR=$TEST_DIR/Rans/Impinging_Jet_2d_Distant_Re_23000
-RANS_FUEL_BUNDLE_DIR=$TEST_DIR/Rans/Fuel_Bundle
-#RANS_PIPE_DIR=$TEST_DIR/Rans/Pipe_Re_Tau_2000
+RANS_IMPINGING_JET_DIR=Rans/Impinging_Jet_2d_Distant_Re_23000
+RANS_FUEL_BUNDLE_DIR=Rans/Fuel_Bundle
+#RANS_PIPE_DIR=Rans/Pipe_Re_Tau_2000
 #------------------------------------------------------------------------------#
 
 # Start time measurements from this moment
@@ -72,7 +70,7 @@ if [ -f $FULL_LOG ]; then cp /dev/null $FULL_LOG; fi
 echo "Full log is being written in file" "$FULL_LOG"
 
 # exit when any command fails
-set -e
+# set -e
 
 # Keep track of the last executed command
 # trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
@@ -85,11 +83,14 @@ set -e
 function time_in_seconds {
   previous_time=$current_time
   current_time=$(date +%s)
-  echo "time elapsed:" \
+  echo "    time elapsed:" \
   "$(echo ""$current_time" - "$previous_time"" | bc -l)" "seconds"
 }
+
 #------------------------------------------------------------------------------#
 # clean_compile
+#
+# return success
 #------------------------------------------------------------------------------#
 function clean_compile {
   # $1 = dir 
@@ -114,14 +115,24 @@ function clean_compile {
 
   if [ -z "${4+xxx}" ]; then 
     echo "make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS_HDF5=$2 MPI=$3"
-          make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS_HDF5=$2 MPI=$3 >> $FULL_LOG 2>&1
+          make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS_HDF5=$2 MPI=$3 \
+          >> $FULL_LOG 2>&1
+          success=$?
   else
     echo "make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS_HDF5=$2 MPI=$3 DIR_CASE=$4"
           make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS_HDF5=$2 MPI=$3 DIR_CASE=$4 \
           >> $FULL_LOG 2>&1
+          success=$?
   fi
 
   time_in_seconds
+
+  return $success
+  if [ $success -eq 0 ]; then
+    echo "Clean compile passed."
+  else
+    echo "Clean compile in " $1 " failed!"
+  fi
 }
 #------------------------------------------------------------------------------#
 # make links
@@ -131,38 +142,71 @@ function make_links {
   cd $1
   ln -rsf $GENE_EXE $CONV_EXE $DIVI_EXE $PROC_EXE .
 }
+
 #------------------------------------------------------------------------------#
 # launch Generate
+#
+# return success
 #------------------------------------------------------------------------------#
 function launch_generate {
-  echo "launching Generate in: " $PWD
+  # $1 = relative dir
+  make_links $TEST_DIR/$1
+  echo ""
+  echo "    #=================================================================="
+  echo "    #  Generate test:" $1
+  echo "    #------------------------------------------------------------------"
   echo "generate.scr: " >> $FULL_LOG 2>&1
   cat generate.scr >> $FULL_LOG 2>&1
   $GENE_EXE < generate.scr >> $FULL_LOG 2>&1
+  success=$?
   time_in_seconds
+  return $success
 }
+
 #------------------------------------------------------------------------------#
 # launch Divide
+#
+# return success
 #------------------------------------------------------------------------------#
 function launch_divide {
-  echo "launching Divide in: " $PWD
+  # $1 = relative dir
+  make_links $TEST_DIR/$1
+  echo ""
+  echo "    #=================================================================="
+  echo "    #  Divide test:" $1
+  echo "    #------------------------------------------------------------------"
   echo "divide.scr: " >> $FULL_LOG 2>&1
   cat divide.scr >> $FULL_LOG 2>&1
   $DIVI_EXE < divide.scr >> $FULL_LOG 2>&1
+  success=$?
   time_in_seconds
+  return $success
 }
+
 #------------------------------------------------------------------------------#
 # launch Convert
+#
+# returns success
 #------------------------------------------------------------------------------#
 function launch_convert {
-  echo "launching Convert in: " $PWD
+  # $1 = relative dir
+  make_links $TEST_DIR/$1
+  echo ""
+  echo "    #=================================================================="
+  echo "    #  Convert test:" $1
+  echo "    #------------------------------------------------------------------"
   echo "convert.scr: " >> $FULL_LOG 2>&1
   cat convert.scr >> $FULL_LOG 2>&1
   $CONV_EXE < convert.scr >> $FULL_LOG 2>&1
+  success=$?
   time_in_seconds
+  return $success
 }
+
 #------------------------------------------------------------------------------#
 # launch Process
+#
+# return success
 #------------------------------------------------------------------------------#
 function launch_process {
   # $1 - seq/par
@@ -179,9 +223,11 @@ function launch_process {
   if [ "$1" == "seq" ]; then
     echo "launching Process in: " $PWD
     $PROC_EXE >> $FULL_LOG 2>&1
+    success=$?
   elif [ "$1" == "par" ]; then
     echo "launching mpirun -np "$2" Process in: " $PWD
     mpirun -np $2 $PROC_EXE >> $FULL_LOG 2>&1
+    success=$?
   else
     echo "wrong argument in launch_process"
     exit 1
@@ -190,15 +236,17 @@ function launch_process {
   echo "control: " >> $FULL_LOG 2>&1
   cat control >> $FULL_LOG 2>&1
   time_in_seconds
+  return $success
 }
+
 #------------------------------------------------------------------------------#
-# generator tests
+# Generate tests
 #------------------------------------------------------------------------------#
-function generator_tests {
+function generate_tests {
   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   echo "!!"
   echo "!!"
-  echo "!!    Running Generate Tests"
+  echo "!!    Running Generate tests"
   echo "!!"
   echo "!!"
   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
@@ -206,45 +254,88 @@ function generator_tests {
   #-- seq, no cgns
   clean_compile $GENE_DIR  no  no  # dir CGNS_HDF5 MPI
 
-  make_links $LAMINAR_BACKSTEP_ORTH_DIR;        launch_generate
-  make_links $LAMINAR_BACKSTEP_NON_ORTH_DIR;    launch_generate
+  CASE_IN=$LAMINAR_BACKSTEP_ORTH_DIR
+  launch_generate $CASE_IN
 
-  make_links $LES_CAVITY_LID_DRIVEN_DIR;        launch_generate
-  make_links $LES_CAVITY_THERM_DRIVEN_DIR_106;  launch_generate
-  make_links $LES_CAVITY_THERM_DRIVEN_DIR_108;  launch_generate
+  CASE_IN=$LAMINAR_BACKSTEP_NON_ORTH_DIR
+  launch_generate $CASE_IN
 
-  make_links $RANS_BACKSTEP_5100_DIR;           launch_generate
-  make_links $RANS_BACKSTEP_28000_DIR;          launch_generate
+  CASE_IN=$LES_CAVITY_LID_DRIVEN_DIR
+  launch_generate $CASE_IN
 
-  make_links $RANS_CHANNEL_LR_LONG_DIR;         launch_generate
-  make_links $RANS_CHANNEL_LR_RSM_DIR;          launch_generate
-  make_links $RANS_CHANNEL_LR_STRETCHED_DIR;    launch_generate
-  make_links $RANS_CHANNEL_LR_UNIFORM_DIR;      launch_generate
+  CASE_IN=$LES_CAVITY_THERM_DRIVEN_DIR_106
+  launch_generate $CASE_IN
 
-  make_links $HYB_CHANNEL_HR_STRETCHED_DIR;     launch_generate
-  make_links $HYB_CHANNEL_HR_UNIFORM_DIR;       launch_generate
+  CASE_IN=$LES_CAVITY_THERM_DRIVEN_DIR_108
+  launch_generate $CASE_IN
+
+  CASE_IN=$RANS_BACKSTEP_5100_DIR
+  launch_generate $CASE_IN
+
+  CASE_IN=$RANS_BACKSTEP_28000_DIR
+  launch_generate $CASE_IN
+
+  CASE_IN=$RANS_CHANNEL_LR_LONG_DIR
+  launch_generate $CASE_IN
+
+  CASE_IN=$RANS_CHANNEL_LR_RSM_DIR
+  launch_generate $CASE_IN
+
+  CASE_IN=$RANS_CHANNEL_LR_STRETCHED_DIR
+  launch_generate $CASE_IN
+
+  CASE_IN=$RANS_CHANNEL_LR_UNIFORM_DIR
+  launch_generate $CASE_IN
+
+  CASE_IN=$HYB_CHANNEL_HR_STRETCHED_DIR
+  launch_generate $CASE_IN
+
+  CASE_IN=$HYB_CHANNEL_HR_UNIFORM_DIR
+  launch_generate $CASE_IN
 
   #-- seq, cgns(hdf5)
   if [ "$CGNS" = "yes" ]; then
     clean_compile $GENE_DIR  yes  no  # dir CGNS_HDF5 MPI
 
-    make_links $LAMINAR_BACKSTEP_ORTH_DIR;        launch_generate
-    make_links $LAMINAR_BACKSTEP_NON_ORTH_DIR;    launch_generate
+    CASE_IN=$LAMINAR_BACKSTEP_ORTH_DIR
+    launch_generate $CASE_IN
 
-    make_links $LES_CAVITY_LID_DRIVEN_DIR;        launch_generate
-    make_links $LES_CAVITY_THERM_DRIVEN_DIR_106;  launch_generate
-    make_links $LES_CAVITY_THERM_DRIVEN_DIR_108;  launch_generate
+    CASE_IN=$LAMINAR_BACKSTEP_NON_ORTH_DIR
+    launch_generate $CASE_IN
 
-    make_links $RANS_BACKSTEP_5100_DIR;           launch_generate
-    make_links $RANS_BACKSTEP_28000_DIR;          launch_generate
+    CASE_IN=$LES_CAVITY_LID_DRIVEN_DIR
+    launch_generate $CASE_IN
 
-    make_links $RANS_CHANNEL_LR_LONG_DIR;         launch_generate
-    make_links $RANS_CHANNEL_LR_RSM_DIR;          launch_generate
-    make_links $RANS_CHANNEL_LR_STRETCHED_DIR;    launch_generate
-    make_links $RANS_CHANNEL_LR_UNIFORM_DIR;      launch_generate
+    CASE_IN=$LES_CAVITY_THERM_DRIVEN_DIR_106
+    launch_generate $CASE_IN
 
-    make_links $HYB_CHANNEL_HR_STRETCHED_DIR;     launch_generate
-    make_links $HYB_CHANNEL_HR_UNIFORM_DIR;       launch_generate
+    CASE_IN=$LES_CAVITY_THERM_DRIVEN_DIR_108
+    launch_generate $CASE_IN
+
+    CASE_IN=$RANS_BACKSTEP_5100_DIR
+    launch_generate $CASE_IN
+
+    CASE_IN=$RANS_BACKSTEP_28000_DIR
+    launch_generate $CASE_IN
+
+    CASE_IN=$RANS_CHANNEL_LR_LONG_DIR
+    launch_generate $CASE_IN
+
+    CASE_IN=$RANS_CHANNEL_LR_RSM_DIR
+    launch_generate $CASE_IN
+
+    CASE_IN=$RANS_CHANNEL_LR_STRETCHED_DIR
+    launch_generate $CASE_IN
+
+    CASE_IN=$RANS_CHANNEL_LR_UNIFORM_DIR
+    launch_generate $CASE_IN
+
+    CASE_IN=$HYB_CHANNEL_HR_STRETCHED_DIR
+    launch_generate $CASE_IN
+
+    CASE_IN=$HYB_CHANNEL_HR_UNIFORM_DIR
+    launch_generate $CASE_IN
+
   fi
 }
 #------------------------------------------------------------------------------#
@@ -281,72 +372,117 @@ function unpack_neu_mesh {
     exit 1
   fi
 }
+
 #------------------------------------------------------------------------------#
 # convert tests
 #------------------------------------------------------------------------------#
 function convert_tests {
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "!!"
-  echo "!!"
-  echo "!!    Running Convert Tests"
-  echo "!!"
-  echo "!!"
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "#======================================================================"
+  echo "#"
+  echo "#"
+  echo "#   Running Convert tests"
+  echo "#"
+  echo "#"
+  echo "#----------------------------------------------------------------------"
 
-  cd $RANS_IMPINGING_JET_DIR;  unpack_neu_mesh  jet.neu
-  cd $RANS_FUEL_BUNDLE_DIR;    unpack_neu_mesh  subflow.neu.gz
-  cd $LES_PIPE_DIR;            unpack_neu_mesh  pipe.neu.gz
+  cd $TEST_DIR/$RANS_IMPINGING_JET_DIR;  unpack_neu_mesh  jet.neu
+  cd $TEST_DIR/$RANS_FUEL_BUNDLE_DIR;    unpack_neu_mesh  subflow.neu.gz
+  cd $TEST_DIR/$LES_PIPE_DIR;            unpack_neu_mesh  pipe.neu.gz
 
-  #cd $RANS_PIPE_DIR;           unpack_neu_mesh  pipe.neu.gz
+  #cd $TEST_DIR/$RANS_PIPE_DIR;           unpack_neu_mesh  pipe.neu.gz
 
   #-- seq, no cgns
   clean_compile $CONV_DIR no no # dir CGNS_HDF5 MPI
 
-  make_links $RANS_IMPINGING_JET_DIR;  launch_convert
-  make_links $RANS_FUEL_BUNDLE_DIR;    launch_convert
-  make_links $LES_PIPE_DIR;            launch_convert
+  CASE_IN=$RANS_IMPINGING_JET_DIR
+  launch_convert $CASE_IN
+
+  CASE_IN=$RANS_FUEL_BUNDLE_DIR
+  launch_convert $CASE_IN
+
+  CASE_IN=$LES_PIPE_DIR
+  launch_convert $CASE_IN
 
   #-- seq, cgns_hdf5
   if [ "$CGNS" = "yes" ]; then
     clean_compile $CONV_DIR yes no # dir CGNS_HDF5 MPI
 
-    make_links $RANS_IMPINGING_JET_DIR;  launch_convert
-    make_links $RANS_FUEL_BUNDLE_DIR;    launch_convert
-    make_links $LES_PIPE_DIR;            launch_convert
+    CASE_IN=$RANS_IMPINGING_JET_DIR
+    launch_convert $CASE_IN
+
+    CASE_IN=$RANS_FUEL_BUNDLE_DIR
+    launch_convert $CASE_IN
+
+    CASE_IN=$LES_PIPE_DIR
+    launch_convert $CASE_IN
+
   fi
 }
+
 #------------------------------------------------------------------------------#
 # Divide tests
 #------------------------------------------------------------------------------#
 function divide_tests {
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "!!"
-  echo "!!"
-  echo "!!    Running Divide Tests"
-  echo "!!"
-  echo "!!"
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "#======================================================================"
+  echo "#"
+  echo "#"
+  echo "#   Running Divide tests"
+  echo "#"
+  echo "#"
+  echo "#----------------------------------------------------------------------"
 
   #-- seq
   clean_compile $DIVI_DIR no no no # dir CGNS_HDF5 MPI
-  cd $LAMINAR_BACKSTEP_ORTH_DIR;        launch_divide
-  cd $LAMINAR_BACKSTEP_NON_ORTH_DIR;    launch_divide
-  cd $LES_CAVITY_LID_DRIVEN_DIR;        launch_divide
-  cd $LES_CAVITY_THERM_DRIVEN_DIR_106;  launch_divide
-  cd $LES_CAVITY_THERM_DRIVEN_DIR_108;  launch_divide
-  cd $RANS_BACKSTEP_5100_DIR;           launch_divide
-  cd $RANS_BACKSTEP_28000_DIR;          launch_divide
-  cd $RANS_CHANNEL_LR_LONG_DIR;         launch_divide
-  cd $RANS_CHANNEL_LR_RSM_DIR;          launch_divide
-  cd $RANS_CHANNEL_LR_STRETCHED_DIR;    launch_divide
-  cd $RANS_CHANNEL_LR_UNIFORM_DIR;      launch_divide
-  cd $RANS_IMPINGING_JET_DIR;           launch_divide
-  cd $RANS_FUEL_BUNDLE_DIR;             launch_divide
-  cd $HYB_CHANNEL_HR_STRETCHED_DIR;     launch_divide
-  cd $HYB_CHANNEL_HR_UNIFORM_DIR;       launch_divide
-  cd $LES_PIPE_DIR;                     launch_divide
 
+  CASE_IN=$LAMINAR_BACKSTEP_ORTH_DIR
+  launch_divide $CASE_IN
+
+  CASE_IN=$LAMINAR_BACKSTEP_NON_ORTH_DIR
+  launch_divide $CASE_IN
+
+  CASE_IN=$LES_CAVITY_LID_DRIVEN_DIR
+  launch_divide $CASE_IN
+
+  CASE_IN=$LES_CAVITY_THERM_DRIVEN_DIR_106
+  launch_divide $CASE_IN
+
+  CASE_IN=$LES_CAVITY_THERM_DRIVEN_DIR_108
+  launch_divide $CASE_IN
+
+  CASE_IN=$RANS_BACKSTEP_5100_DIR
+  launch_divide $CASE_IN
+
+  CASE_IN=$RANS_BACKSTEP_28000_DIR
+  launch_divide $CASE_IN
+
+  CASE_IN=$RANS_CHANNEL_LR_LONG_DIR
+  launch_divide $CASE_IN
+
+  CASE_IN=$RANS_CHANNEL_LR_RSM_DIR
+  launch_divide $CASE_IN
+
+  CASE_IN=$RANS_CHANNEL_LR_STRETCHED_DIR
+  launch_divide $CASE_IN
+
+  CASE_IN=$RANS_CHANNEL_LR_UNIFORM_DIR
+  launch_divide $CASE_IN
+
+  CASE_IN=$HYB_CHANNEL_HR_STRETCHED_DIR
+  launch_divide $CASE_IN
+
+  CASE_IN=$HYB_CHANNEL_HR_UNIFORM_DIR
+  launch_divide $CASE_IN
+
+  CASE_IN=$RANS_IMPINGING_JET_DIR
+  launch_divide $CASE_IN
+
+  CASE_IN=$RANS_FUEL_BUNDLE_DIR
+  launch_divide $CASE_IN
+
+  CASE_IN=$LES_PIPE_DIR
+  launch_divide $CASE_IN
 }
+
 #------------------------------------------------------------------------------#
 # Replace line with first occurence of string to arg in file
 #------------------------------------------------------------------------------#
@@ -368,6 +504,7 @@ function replace_line_with_first_occurence_in_file {
   # previous approach was with
   # awk -v var="$line" 'NR==var {$2=3}1'  control > .control.tmp
 }
+
 #------------------------------------------------------------------------------#
 # processor: backup test
 #------------------------------------------------------------------------------#
@@ -460,72 +597,99 @@ function process_backup_test {
 
   cp $2/control.backup $2/control
 }
+
 #------------------------------------------------------------------------------#
-# processor backup tests
+# process backup tests
 #------------------------------------------------------------------------------#
-function processor_backup_tests {
+function process_backup_tests {
 
   echo "  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   echo "  !!"
-  echo "  !!    Running Processor Backup Tests"
+  echo "  !!"
+  echo "  !!    Running Processor Backup tests"
+  echo "  !!"
   echo "  !!"
   echo "  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 
   # Grasp/embrace as many different model combinations as you can
 
-  echo "================================= TEST 1 =============================="
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "    !!"
+  echo "    !!    Test 1"
+  echo "    !!"
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   #-- Channel_Re_Tau_590 [k_eps model + T]
   replace_line_with_first_occurence_in_file "TURBULENCE_MODEL" \
-    "TURBULENCE_MODEL k_eps" $RANS_CHANNEL_LR_UNIFORM_DIR/control
-  process_backup_test no  $RANS_CHANNEL_LR_UNIFORM_DIR
+    "TURBULENCE_MODEL k_eps" $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR/control
+  process_backup_test no  $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR
   if [ "$CGNS" = "yes" ]; then
-    process_backup_test yes $RANS_CHANNEL_LR_UNIFORM_DIR
+    process_backup_test yes $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR
   fi
 
-  echo "================================= TEST 2 =============================="
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "    !!"
+  echo "    !!    Test 2"
+  echo "    !!"
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   #-- Channel_Re_Tau_590 [k_eps_zeta_f model + T]
   replace_line_with_first_occurence_in_file "TURBULENCE_MODEL" \
-    "TURBULENCE_MODEL k_eps_zeta_f" $RANS_CHANNEL_LR_UNIFORM_DIR/control
-  process_backup_test no  $RANS_CHANNEL_LR_UNIFORM_DIR
+    "TURBULENCE_MODEL k_eps_zeta_f" $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR/control
+  process_backup_test no  $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR
   if [ "$CGNS" = "yes" ]; then
-    process_backup_test yes $RANS_CHANNEL_LR_UNIFORM_DIR
+    process_backup_test yes $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR
   fi
 
-  echo "================================= TEST 3 =============================="
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "    !!"
+  echo "    !!    Test 3"
+  echo "    !!"
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   #-- Channel_Re_Tau_590_Rsm [rsm_hanjalic_jakirlic model + T]
   replace_line_with_first_occurence_in_file "TURBULENCE_MODEL" \
-    "TURBULENCE_MODEL rsm_hanjalic_jakirlic" $RANS_CHANNEL_LR_RSM_DIR/control
-  process_backup_test no  $RANS_CHANNEL_LR_RSM_DIR
+    "TURBULENCE_MODEL rsm_hanjalic_jakirlic" $TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR/control
+  process_backup_test no  $TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR
   if [ "$CGNS" = "yes" ]; then
-    process_backup_test yes $RANS_CHANNEL_LR_RSM_DIR
+    process_backup_test yes $TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR
   fi
 
-  echo "================================= TEST 4 =============================="
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "    !!"
+  echo "    !!    Test 4"
+  echo "    !!"
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   #-- Channel_Re_Tau_590_Rsm [rsm_manceau_hanjalic model + T]
   replace_line_with_first_occurence_in_file "TURBULENCE_MODEL" \
-    "TURBULENCE_MODEL rsm_manceau_hanjalic" $RANS_CHANNEL_LR_RSM_DIR/control
-  process_backup_test no  $RANS_CHANNEL_LR_RSM_DIR
+    "TURBULENCE_MODEL rsm_manceau_hanjalic" $TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR/control
+  process_backup_test no  $TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR
   if [ "$CGNS" = "yes" ]; then
-    process_backup_test yes $RANS_CHANNEL_LR_RSM_DIR
+    process_backup_test yes $TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR
   fi
 
-  echo "================================= TEST 5 =============================="
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "    !!"
+  echo "    !!    Test 5"
+  echo "    !!"
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   #-- Pipe_Re_Tau_180 [les_dynamic]
-  process_backup_test no  $LES_PIPE_DIR
+  process_backup_test no  $TEST_DIR/$LES_PIPE_DIR
   if [ "$CGNS" = "yes" ]; then
-    process_backup_test yes $LES_PIPE_DIR
+    process_backup_test yes $TEST_DIR/$LES_PIPE_DIR
   fi
 
-  echo "================================= TEST 6 =============================="
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "    !!"
+  echo "    !!    Test 6"
+  echo "    !!"
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   #-- Cavity_Lid_Driven_Re_1000 [none]
-  process_backup_test no  $LES_CAVITY_LID_DRIVEN_DIR
+  process_backup_test no  $TEST_DIR/$LES_CAVITY_LID_DRIVEN_DIR
   if [ "$CGNS" = "yes" ]; then
-    process_backup_test yes $LES_CAVITY_LID_DRIVEN_DIR
+    process_backup_test yes $TEST_DIR/$LES_CAVITY_LID_DRIVEN_DIR
   fi
 
 }
 #------------------------------------------------------------------------------#
-# processor: save_now / exit_now test
+# process: save_now / exit_now test
 #------------------------------------------------------------------------------#
 function process_save_exit_now_test {
   # $1 = CGNS_HDF5 = yes
@@ -553,7 +717,11 @@ function process_save_exit_now_test {
   replace_line_with_first_occurence_in_file "BACKUP_SAVE_INTERVAL" \
     "BACKUP_SAVE_INTERVAL 1" control
 
-  echo "================================= TEST 1 =============================="
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "    !!"
+  echo "    !!    Test 1"
+  echo "    !!"
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   echo "np=1, MPI=no"
   clean_compile $PROC_DIR $1 no # dir CGNS_HDF5 MPI
   cd $2
@@ -568,7 +736,11 @@ function process_save_exit_now_test {
     echo "save_exit_now_test was successfull"
   fi
 
-  echo "================================= TEST 2 =============================="
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "    !!"
+  echo "    !!    Test 2"
+  echo "    !!"
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   echo "np=1, MPI=yes"
   clean_compile $PROC_DIR $1 yes # dir CGNS_HDF5 MPI
   cd $2
@@ -583,7 +755,11 @@ function process_save_exit_now_test {
     echo "save_exit_now_test was successfull"
   fi
 
-  echo "================================= TEST 3 =============================="
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "    !!"
+  echo "    !!    Test 3"
+  echo "    !!"
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   echo "np=2, MPI=yes"
 
   echo "save_now"
@@ -597,19 +773,21 @@ function process_save_exit_now_test {
   fi
 }
 #------------------------------------------------------------------------------#
-# processor save_now / exit_now tests
+# process save_now / exit_now tests
 #------------------------------------------------------------------------------#
 function process_save_exit_now_tests {
 
   echo "  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   echo "  !!"
-  echo "  !!    Running Processor save_now and exit_now Tests"
+  echo "  !!"
+  echo "  !!    Running Processor save_now and exit_now tests"
+  echo "  !!"
   echo "  !!"
   echo "  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 
-  process_save_exit_now_test no  $LAMINAR_BACKSTEP_ORTH_DIR
+  process_save_exit_now_test no  $TEST_DIR/$$LAMINAR_BACKSTEP_ORTH_DIR
   if [ "$CGNS" = "yes" ]; then
-    process_save_exit_now_test yes $LAMINAR_BACKSTEP_ORTH_DIR
+    process_save_exit_now_test yes $TEST_DIR/$$LAMINAR_BACKSTEP_ORTH_DIR
   fi
 
 }
@@ -652,9 +830,9 @@ function launch_gnuplot {
   time_in_seconds
 }
 #------------------------------------------------------------------------------#
-# Individual processor tests for compilation
+# Individual process tests for compilation
 #------------------------------------------------------------------------------#
-function processor_compilation_test {
+function process_compilation_test {
   # $1 = dir with test
   # $2 = model
   # $3 = dir with results
@@ -687,9 +865,9 @@ function processor_compilation_test {
   fi
 }
 #------------------------------------------------------------------------------#
-# All processor compilation tests
+# All process compilation tests
 #------------------------------------------------------------------------------#
-function processor_compilation_tests {
+function process_compilation_tests {
   # $1 = dir with test
   # $2 = model
   # $3 = dir with results
@@ -697,83 +875,121 @@ function processor_compilation_tests {
 
   echo "  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   echo "  !!"
+  echo "  !!"
   echo "  !!    Running Processor compilation tests"
+  echo "  !!"
   echo "  !!"
   echo "  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 
-  echo "================================= TEST 1 =============================="
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "    !!"
+  echo "    !!    Test 1"
+  echo "    !!"
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   # no User_Mod/ dir !!!
-  processor_compilation_test \
-    "$LES_CAVITY_LID_DRIVEN_DIR" \
+  process_compilation_test \
+    "$TEST_DIR/$LES_CAVITY_LID_DRIVEN_DIR" \
     "none" \
-    "$LES_CAVITY_LID_DRIVEN_DIR/Xmgrace"
+    "$TEST_DIR/$LES_CAVITY_LID_DRIVEN_DIR/Xmgrace"
 
-  echo "================================= TEST 2 =============================="
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "    !!"
+  echo "    !!    Test 2"
+  echo "    !!"
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   # no User_Mod/ dir !!!
-  processor_compilation_test \
-    "$LES_CAVITY_THERM_DRIVEN_DIR_106" \
+  process_compilation_test \
+    "$TEST_DIR/$LES_CAVITY_THERM_DRIVEN_DIR_106" \
     "none" \
-    "$LES_CAVITY_THERM_DRIVEN_DIR_106/Xmgrace"
+    "$TEST_DIR/$LES_CAVITY_THERM_DRIVEN_DIR_106/Xmgrace"
 
-  echo "================================= TEST 3 =============================="
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "    !!"
+  echo "    !!    Test 3"
+  echo "    !!"
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   # no User_Mod/ dir !!!
-  processor_compilation_test \
-    "$LES_CAVITY_THERM_DRIVEN_DIR_108" \
+  process_compilation_test \
+    "$TEST_DIR/$LES_CAVITY_THERM_DRIVEN_DIR_108" \
     "none" \
-    "$LES_CAVITY_THERM_DRIVEN_DIR_108/Xmgrace"
+    "$TEST_DIR/$LES_CAVITY_THERM_DRIVEN_DIR_108/Xmgrace"
 
-  echo "================================= TEST 4 =============================="
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "    !!"
+  echo "    !!    Test 4"
+  echo "    !!"
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   # User_Mod/ dir exists
-  processor_compilation_test \
-    "$RANS_CHANNEL_LR_UNIFORM_DIR" \
+  process_compilation_test \
+    "$TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR" \
     "k_eps" \
-    "$RANS_CHANNEL_LR_UNIFORM_DIR/Xmgrace"
+    "$TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR/Xmgrace"
 
-  echo "================================= TEST 5 =============================="
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "    !!"
+  echo "    !!    Test 5"
+  echo "    !!"
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   # User_Mod/ dir exists
-  processor_compilation_test \
-    "$RANS_CHANNEL_LR_STRETCHED_DIR" \
+  process_compilation_test \
+    "$TEST_DIR/$RANS_CHANNEL_LR_STRETCHED_DIR" \
     "k_eps_zeta_f" \
-    "$RANS_CHANNEL_LR_STRETCHED_DIR/Xmgrace"
+    "$TEST_DIR/$RANS_CHANNEL_LR_STRETCHED_DIR/Xmgrace"
 
-  echo "================================= TEST 6 =============================="
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "    !!"
+  echo "    !!    Test 6"
+  echo "    !!"
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   # User_Mod/ dir exists
-  processor_compilation_test \
-    "$RANS_CHANNEL_LR_RSM_DIR" \
+  process_compilation_test \
+    "$TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR" \
     "rsm_manceau_hanjalic" \
-    "$RANS_CHANNEL_LR_RSM_DIR/Xmgrace"
+    "$TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR/Xmgrace"
 
-  echo "================================= TEST 7 =============================="
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "    !!"
+  echo "    !!    Test 7"
+  echo "    !!"
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   # User_Mod/ dir exists
-  processor_compilation_test \
-    "$RANS_CHANNEL_LR_RSM_DIR" \
+  process_compilation_test \
+    "$TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR" \
     "rsm_hanjalic_jakirlic" \
-    "$RANS_CHANNEL_LR_RSM_DIR/Xmgrace"
+    "$TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR/Xmgrace"
 
-  echo "================================= TEST 8 =============================="
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "    !!"
+  echo "    !!    Test 8"
+  echo "    !!"
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   # User_Mod/ dir exists
-  processor_compilation_test \
-    "$HYB_CHANNEL_HR_UNIFORM_DIR" \
+  process_compilation_test \
+    "$TEST_DIR/$HYB_CHANNEL_HR_UNIFORM_DIR" \
     "hybrid_les_rans" \
-    "$HYB_CHANNEL_HR_UNIFORM_DIR/Xmgrace"
+    "$TEST_DIR/$HYB_CHANNEL_HR_UNIFORM_DIR/Xmgrace"
 
-  echo "================================= TEST 9 =============================="
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "    !!"
+  echo "    !!    Test 9"
+  echo "    !!"
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   # User_Mod/ dir exists
-  processor_compilation_test \
-    "$HYB_CHANNEL_HR_STRETCHED_DIR" \
+  process_compilation_test \
+    "$TEST_DIR/$HYB_CHANNEL_HR_STRETCHED_DIR" \
     "hybrid_les_rans" \
-    "$HYB_CHANNEL_HR_STRETCHED_DIR/Xmgrace"
+    "$TEST_DIR/$HYB_CHANNEL_HR_STRETCHED_DIR/Xmgrace"
 
-#  # Issue: pipe does not pass processor_backup_tests
-#  processor_compilation_test \
-#    "$LES_PIPE_DIR" \
+#  # Issue: pipe does not pass process_backup_tests
+#  process_compilation_test \
+#    "$TEST_DIR/$LES_PIPE_DIR" \
 #    "les_dynamic" \
-#    "$LES_PIPE_DIR/Xmgrace"
+#    "$TEST_DIR/$LES_PIPE_DIR/Xmgrace"
 }
 #------------------------------------------------------------------------------#
-# Individual processor tests for full length
+# Individual process tests for full length
 #------------------------------------------------------------------------------#
-function processor_full_length_test {
+function process_full_length_test {
   # $1 = dir with test
   # $2 = model
   # $3 = dir with results
@@ -843,9 +1059,9 @@ function processor_full_length_test {
   fi
 }
 #------------------------------------------------------------------------------#
-# All processor tests
+# All process tests
 #------------------------------------------------------------------------------#
-function processor_full_length_tests {
+function process_full_length_tests {
   # $1 = dir with test
   # $2 = model
   # $3 = dir with results
@@ -853,86 +1069,159 @@ function processor_full_length_tests {
 
   echo "  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   echo "  !!"
+  echo "  !!"
   echo "  !!    Running Processor full simulation tests"
+  echo "  !!"
   echo "  !!"
   echo "  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 
-  echo "================================= TEST 1 =============================="
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "    !!"
+  echo "    !!    Test 1"
+  echo "    !!"
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   # no User_Mod/ dir !!!
-  processor_full_length_test \
-    "$LES_CAVITY_LID_DRIVEN_DIR" \
+  process_full_length_test \
+    "$TEST_DIR/$LES_CAVITY_LID_DRIVEN_DIR" \
     "none" \
-    "$LES_CAVITY_LID_DRIVEN_DIR/Xmgrace"
+    "$TEST_DIR/$LES_CAVITY_LID_DRIVEN_DIR/Xmgrace"
 
-  echo "================================= TEST 2 =============================="
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "    !!"
+  echo "    !!    Test 2"
+  echo "    !!"
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   # no User_Mod/ dir !!!
-  processor_full_length_test \
-    "$LES_CAVITY_THERM_DRIVEN_DIR_106" \
+  process_full_length_test \
+    "$TEST_DIR/$LES_CAVITY_THERM_DRIVEN_DIR_106" \
     "none" \
-    "$LES_CAVITY_THERM_DRIVEN_DIR_106/Xmgrace"
+    "$TEST_DIR/$LES_CAVITY_THERM_DRIVEN_DIR_106/Xmgrace"
 
-  echo "================================= TEST 3 =============================="
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "    !!"
+  echo "    !!    Test 3"
+  echo "    !!"
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   # no User_Mod/ dir !!!
-  processor_full_length_test \
-    "$LES_CAVITY_THERM_DRIVEN_DIR_108" \
+  process_full_length_test \
+    "$TEST_DIR/$LES_CAVITY_THERM_DRIVEN_DIR_108" \
     "none" \
-    "$LES_CAVITY_THERM_DRIVEN_DIR_108/Xmgrace"
+    "$TEST_DIR/$LES_CAVITY_THERM_DRIVEN_DIR_108/Xmgrace"
 
-  echo "================================= TEST 4 =============================="
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "    !!"
+  echo "    !!    Test 4"
+  echo "    !!"
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   # [~2 min test]
-  processor_full_length_test \
-    "$RANS_CHANNEL_LR_UNIFORM_DIR" \
+  process_full_length_test \
+    "$TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR" \
     "k_eps" \
-    "$RANS_CHANNEL_LR_UNIFORM_DIR/Xmgrace"
+    "$TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR/Xmgrace"
 
-  echo "================================= TEST 5 =============================="
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "    !!"
+  echo "    !!    Test 5"
+  echo "    !!"
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   # [~2 min test]
-  processor_full_length_test \
-    "$RANS_CHANNEL_LR_STRETCHED_DIR" \
+  process_full_length_test \
+    "$TEST_DIR/$RANS_CHANNEL_LR_STRETCHED_DIR" \
     "k_eps_zeta_f" \
-    "$RANS_CHANNEL_LR_STRETCHED_DIR/Xmgrace"
+    "$TEST_DIR/$RANS_CHANNEL_LR_STRETCHED_DIR/Xmgrace"
 
-  echo "================================= TEST 6 =============================="
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "    !!"
+  echo "    !!    Test 6"
+  echo "    !!"
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   # [~5 min test]
-  processor_full_length_test \
-    "$RANS_CHANNEL_LR_RSM_DIR" \
+  process_full_length_test \
+    "$TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR" \
     "rsm_manceau_hanjalic" \
-    "$RANS_CHANNEL_LR_RSM_DIR/Xmgrace"
+    "$TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR/Xmgrace"
 
-  echo "================================= TEST 7 =============================="
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "    !!"
+  echo "    !!    Test 7"
+  echo "    !!"
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   # [~5 min test]
-  processor_full_length_test \
-    "$RANS_CHANNEL_LR_RSM_DIR" \
+  process_full_length_test \
+    "$TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR" \
     "rsm_hanjalic_jakirlic" \
-    "$RANS_CHANNEL_LR_RSM_DIR/Xmgrace"
+    "$TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR/Xmgrace"
 
-  echo "================================= TEST 8 =============================="
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "    !!"
+  echo "    !!    Test 8"
+  echo "    !!"
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   # [~4.5 HOURS test]
-  processor_full_length_test \
-    "$HYB_CHANNEL_HR_UNIFORM_DIR" \
+  process_full_length_test \
+    "$TEST_DIR/$HYB_CHANNEL_HR_UNIFORM_DIR" \
     "hybrid_les_rans" \
-    "$HYB_CHANNEL_HR_UNIFORM_DIR/Xmgrace"
+    "$TEST_DIR/$HYB_CHANNEL_HR_UNIFORM_DIR/Xmgrace"
 
-  echo "================================= TEST 9 =============================="
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "    !!"
+  echo "    !!    Test 9"
+  echo "    !!"
+  echo "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   # [~4 HOURS test]
-  processor_full_length_test \
-    "$HYB_CHANNEL_HR_STRETCHED_DIR" \
+  process_full_length_test \
+    "$TEST_DIR/$HYB_CHANNEL_HR_STRETCHED_DIR" \
     "hybrid_les_rans" \
-    "$HYB_CHANNEL_HR_STRETCHED_DIR/Xmgrace"
+    "$TEST_DIR/$HYB_CHANNEL_HR_STRETCHED_DIR/Xmgrace"
 
-#  # Issue: pipe does not pass processor_backup_tests
-#  processor_full_length_test \
-#    "$LES_PIPE_DIR" \
+#  # Issue: pipe does not pass process_backup_tests
+#  process_full_length_test \
+#    "$TEST_DIR/$LES_PIPE_DIR" \
 #    "les_dynamic" \
-#    "$LES_PIPE_DIR/Xmgrace"
+#    "$TEST_DIR/$LES_PIPE_DIR/Xmgrace"
 }
 #------------------------------------------------------------------------------#
 # actual script
 #------------------------------------------------------------------------------#
-# generator_tests
-# convert_tests
-# divide_tests
-processor_compilation_tests
-# processor_backup_tests
-# process_save_exit_now_tests
-# processor_full_length_tests
+while [ 0 -eq 0 ]; do
+  echo ""
+  echo "#======================================================================"
+  echo "#"
+  echo "#"
+  echo "#  T-Flows testing"
+  echo "#"
+  echo "#"
+  echo "#----------------------------------------------------------------------"
+  echo ""
+  echo "  Chose the type of test you want to perform:"
+  echo ""
+  echo "  1. Generate tests"
+  echo "  2. Convert tests"
+  echo "  3. Divide tests"
+  echo "  4. Processor compilation tests"
+  echo "  5. Processor backup tests"
+  echo "  6. Processor save_now/exit_now tests"
+  echo "  7. Processor full lenght tests"
+  echo "  8. Perform all tests"
+  echo "  9. Exit"
+  echo ""
+  read -p "  Enter the desired type of test: " option
+  if [ $option -eq 1 ]; then generate_tests;               fi
+  if [ $option -eq 2 ]; then convert_tests;                fi
+  if [ $option -eq 3 ]; then divide_tests;                 fi
+  if [ $option -eq 4 ]; then process_compilation_tests;    fi
+  if [ $option -eq 5 ]; then process_backup_tests;         fi
+  if [ $option -eq 6 ]; then process_save_exit_now_tests;  fi
+  if [ $option -eq 7 ]; then process_full_length_tests;    fi
+  if [ $option -eq 8 ]; then
+    generate_tests
+    convert_tests
+    divide_tests
+    process_compilation_tests
+    process_backup_tests
+    process_save_exit_now_tests
+    process_full_length_tests
+  fi
+  if [ $option -eq 9 ]; then exit 1;                         fi
+done
+
