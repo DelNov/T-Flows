@@ -316,6 +316,8 @@ function generate_tests {
       launch_generate $CASE_DIR
     done
   fi
+
+  RAN_GENERATE_TESTS=1
 }
 
 #------------------------------------------------------------------------------#
@@ -367,8 +369,6 @@ function convert_tests {
   cd $TEST_DIR/$RANS_FUEL_BUNDLE_DIR;    unpack_neu_mesh  subflow.neu.gz
   cd $TEST_DIR/$LES_PIPE_DIR;            unpack_neu_mesh  pipe.neu.gz
 
-  #cd $TEST_DIR/$RANS_PIPE_DIR;           unpack_neu_mesh  *.neu.gz
-
   #-- seq, no cgns
   clean_compile $CONV_DIR no no # dir CGNS_HDF5 MPI
 
@@ -384,6 +384,8 @@ function convert_tests {
       launch_convert $CASE_DIR
     done
   fi
+
+  RAN_CONVERT_TESTS=1
 }
 
 #------------------------------------------------------------------------------#
@@ -402,6 +404,8 @@ function divide_tests {
   for CASE_DIR in $ALL_DIVIDE_TESTS; do
     launch_divide $CASE_DIR
   done
+
+  RAN_DIVIDE_TESTS=1
 }
 
 #------------------------------------------------------------------------------#
@@ -657,6 +661,7 @@ function process_save_exit_now_test {
     echo "#--------------------------------------------------------------------"
 
     # comment line with LOAD_BACKUP_NAME
+    n1=$(printf "%06d" 1)
     replace_line_with_first_occurence_in_file "LOAD_BACKUP_NAME" \
       "#LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" control
 
@@ -1056,23 +1061,24 @@ while [ 0 -eq 0 ]; do
   echo ""
   read -p "  Enter the desired type of test: " option
   if [ $option -eq 0 ]; then exit 1;                       fi
-  if [ $option -eq 1 ]; then 
+  if [ $option -eq 1 ]; then
     generate_tests
-    RAN_GENERATE_TESTS=1
   fi
   if [ $option -eq 2 ]; then
     convert_tests
-    RAN_CONVERT_TESTS=1
   fi
   if [ $option -eq 3 ]; then
     if [ $RAN_GENERATE_TESTS -eq 0 ]; then generate_tests; fi
-    if [ $RAN_CONVERT_TESTS  -eq 0 ]; then conver_tests;   fi
+    if [ $RAN_CONVERT_TESTS  -eq 0 ]; then convert_tests;  fi
     divide_tests
-    RAN_DIVIDE_TESTS=1
   fi
   if [ $option -eq 4 ]; then process_compilation_tests;    fi
   if [ $option -eq 5 ]; then process_backup_tests;         fi
-  if [ $option -eq 6 ]; then process_save_exit_now_tests;  fi
+  if [ $option -eq 6 ]; then
+    if [ $RAN_GENERATE_TESTS -eq 0 ]; then generate_tests; fi
+    if [ $RAN_DIVIDE_TESTS   -eq 0 ]; then divide_tests; fi
+    process_save_exit_now_tests;
+  fi
   if [ $option -eq 7 ]; then process_full_length_tests;    fi
   if [ $option -eq 8 ]; then
     generate_tests
