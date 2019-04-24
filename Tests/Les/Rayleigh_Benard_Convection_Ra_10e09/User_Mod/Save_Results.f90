@@ -112,7 +112,7 @@
   allocate(ww_p  (n_prob));  ww_p     = 0.0
   allocate(uw_p  (n_prob));  uw_p     = 0.0
 
-  allocate(n_count(n_prob)); n_count=0
+  allocate(n_count(n_prob)); n_count = 0
   count = 0
   if(heat_transfer) then
     allocate(t_p (n_prob));  t_p  = 0.0
@@ -300,46 +300,46 @@
     end if
 
     if(heat_transfer) then
-      write(i,'(a1,2x,a60)') '#',  ' z,'                    //  &
-                                   ' u,'                    //  &
-                                   ' uu, vv, ww, uw'        //  &
-                                   ' kin'                   //  &
-                                   ' t, ut, vt, wt,'   
+      write(i,'(a1,2x,a60)') '#',  ' z,'                    //  &  !  1
+                                   ' u,'                    //  &  !  2
+                                   ' uu, vv, ww, uw'        //  &  !  3 -  6
+                                   ' kin'                   //  &  !  7
+                                   ' t, ut, vt, wt,'               !  8 - 11
     else
-      write(i,'(a1,2x,a50)') '#',  ' z,'                    //  &
-                                   ' u,'                    //  &
-                                   ' uu, vv, ww, uw'        //  &
-                                   ' kin'  
+      write(i,'(a1,2x,a50)') '#',  ' z,'                    //  &  !  1
+                                   ' u,'                    //  &  !  2
+                                   ' uu, vv, ww, uw'        //  &  !  3 -  6
+                                   ' kin'                          !  7
     end if
   end do
 
   if(heat_transfer) then
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(3,'(12e15.7)') wall_p(i),                       &
-                             u_p(i),                          &
-                             uu_p(i),                         &
-                             vv_p(i),                         &
-                             ww_p(i),                         &
-                             uw_p(i),                         &
-                             0.5*(uu_p(i)+vv_p(i)+ww_p(i)),   &
-                             t_p(i),                          &
-                             t2_p(i),                         &
-                             ut_p(i),                         &
-                             vt_p(i),                         &
-                             wt_p(i)
+        write(3,'(12e15.7)') wall_p(i),                       &  !  1
+                             u_p(i),                          &  !  2
+                             uu_p(i),                         &  !  3
+                             vv_p(i),                         &  !  4
+                             ww_p(i),                         &  !  5
+                             uw_p(i),                         &  !  6
+                             0.5*(uu_p(i)+vv_p(i)+ww_p(i)),   &  !  7
+                             t_p(i),                          &  !  8
+                             t2_p(i),                         &  !  9
+                             ut_p(i),                         &  ! 10
+                             vt_p(i),                         &  ! 11
+                             wt_p(i)                             ! 12
       end if
     end do
   else
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(3,'(7e15.7)')  wall_p(i),                       &
-                             u_p(i),                          &
-                             uu_p(i),                         &
-                             vv_p(i),                         &
-                             ww_p(i),                         &
-                             uw_p(i),                         &
-                             0.5*(uu_p(i)+vv_p(i)+ww_p(i))
+        write(3,'(7e15.7)')  wall_p(i),                       &  !  1
+                             u_p(i),                          &  !  2
+                             uu_p(i),                         &  !  3
+                             vv_p(i),                         &  !  4
+                             ww_p(i),                         &  !  5
+                             uw_p(i),                         &  !  6
+                             0.5*(uu_p(i)+vv_p(i)+ww_p(i))       !  7
       end if
     end do
   end if
@@ -369,30 +369,30 @@
   if(heat_transfer) then
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(4,'(12e15.7)') wall_p(i),                       &
-                             u_p(i),                          &
-                             uu_p(i),                         &
-                             vv_p(i),                         &
-                             ww_p(i),                         &
-                             uw_p(i),                         &
-                             0.5*(uu_p(i)+vv_p(i)+ww_p(i)),   &
-                             t_p(i),                          &
-                             t2_p(i),                         &
-                             ut_p(i),                         &
-                             vt_p(i),                         &
-                             wt_p(i)
+        write(4,'(12e15.7)') wall_p(i),                       &  !  1
+                             u_p(i),                          &  !  2
+                             uu_p(i),                         &  !  3
+                             vv_p(i),                         &  !  4
+                             ww_p(i),                         &  !  5
+                             uw_p(i),                         &  !  6
+                             0.5*(uu_p(i)+vv_p(i)+ww_p(i)),   &  !  7
+                             t_p(i),                          &  !  8
+                             t2_p(i),                         &  !  9
+                             ut_p(i),                         &  ! 10
+                             vt_p(i),                         &  ! 11
+                             wt_p(i)                             ! 12
       end if
     end do
   else
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(4,'(7e15.7)')  wall_p(i),                       &
-                             u_p(i),                          &
-                             uu_p(i),                         &
-                             vv_p(i),                         &
-                             ww_p(i),                         &
-                             uw_p(i),                         &
-                             0.5*(uu_p(i)+vv_p(i)+ww_p(i))
+        write(4,'(7e15.7)')  wall_p(i),                       &  !  1
+                             u_p(i),                          &  !  2
+                             uu_p(i),                         &  !  3
+                             vv_p(i),                         &  !  4
+                             ww_p(i),                         &  !  5
+                             uw_p(i),                         &  !  6
+                             0.5*(uu_p(i)+vv_p(i)+ww_p(i))       !  7
       end if
     end do
   end if
@@ -417,7 +417,7 @@
     deallocate(wt_p)
   end if
 
-  if(this_proc < 2)  write(6, *) '# Finished with User_Mod_Save_Results.f90.'
+  if(this_proc < 2)  print *, '# Finished with User_Mod_Save_Results.f90.'
 
   ! Restore the name
   problem_name = store_name

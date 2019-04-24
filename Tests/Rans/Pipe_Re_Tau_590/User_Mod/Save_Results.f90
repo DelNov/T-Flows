@@ -452,7 +452,7 @@
     deallocate(wt_p)
   end if
 
-  if(this_proc < 2)  write(6, *) '# Finished with User_Mod_Save_Results.f90.'
+  if(this_proc < 2)  print *, '# Finished with User_Mod_Save_Results.f90.'
 
   ! Restore the name
   problem_name = store_name

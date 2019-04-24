@@ -107,10 +107,10 @@
   allocate(ww_p  (n_prob));  ww_p     = 0.0
   allocate(uw_p  (n_prob));  uw_p     = 0.0
 
-  allocate(n_count(n_prob)); n_count=0
+  allocate(n_count(n_prob)); n_count = 0
   count = 0
   if(heat_transfer) then
-    allocate(t_p (n_prob));  t_p = 0.0
+    allocate(t_p (n_prob));  t_p  = 0.0
     allocate(t2_p(n_prob));  t2_p = 0.0
     allocate(ut_p(n_prob));  ut_p = 0.0
     allocate(vt_p(n_prob));  vt_p = 0.0
@@ -295,16 +295,16 @@
     end if
 
     if(heat_transfer) then
-      write(i,'(a1,2x,a60)') '#',  ' z,'                    //  &
-                                   ' u,'                    //  &
-                                   ' uu, vv, ww, uw'        //  &
-                                   ' kin'                   //  &
-                                   ' t, ut, vt, wt,'   
+      write(i,'(a1,2x,a60)') '#',  ' z,'                    //  &  !  1
+                                   ' u,'                    //  &  !  2
+                                   ' uu, vv, ww, uw'        //  &  !  3 -  6
+                                   ' kin'                   //  &  !  7
+                                   ' t, ut, vt, wt,'               !  8 - 11
     else
-      write(i,'(a1,2x,a50)') '#',  ' z,'                    //  &
-                                   ' u,'                    //  &
-                                   ' uu, vv, ww, uw'        //  &
-                                   ' kin'  
+      write(i,'(a1,2x,a50)') '#',  ' z,'                    //  &  !  1
+                                   ' u,'                    //  &  !  2
+                                   ' uu, vv, ww, uw'        //  &  !  3 -  6
+                                   ' kin'                          !  7
     end if
   end do
 
@@ -410,7 +410,7 @@
     deallocate(wt_p)
   end if
 
-  if(this_proc < 2)  write(6, *) '# Finished with User_Mod_Save_Results.f90.'
+  if(this_proc < 2)  print *, '# Finished with User_Mod_Save_Results.f90.'
 
   ! Restore the name
   problem_name = store_name
