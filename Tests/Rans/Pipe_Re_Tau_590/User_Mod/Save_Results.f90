@@ -32,7 +32,7 @@
                               t_p(:), tt_p(:), ut_p(:), vt_p(:), wt_p(:),   &
                               ind(:), wall_p(:)
   integer,allocatable      :: n_p(:), n_count(:)
-  real                     :: t_wall, t_tau, d_wall, nu_max, b11, b12, rad, r
+  real                     :: t_wall, t_tau, d_wall, nu_mean, b11, b12, rad, r
   real                     :: ubulk, error, re, cf_dean, cf, pr, u_tau_p, t_inf
   logical                  :: there
 !==============================================================================!
@@ -71,7 +71,7 @@
       print *, '# 2 0.1'
       print *, '# 3 0.2'
       print *, '# ... '
-      print *, '#=============================================================='
+      print *, '#--------------------------------------------------------------'
     end if
 
     ! Restore the name and return
@@ -79,9 +79,9 @@
     return
   end if
 
-  ubulk = bulk % flux_z / (density*bulk % area_z)
-  t_wall = 0.0
-  nu_max = 0.0
+  ubulk    = bulk % flux_z / (density*bulk % area_z)
+  t_wall   = 0.0
+  nu_mean  = 0.0
   n_points = 0
 
   open(9, file=coord_name)
@@ -266,22 +266,22 @@
         if( Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. WALL .or.  &
             Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. WALLFL) then
 
-          t_wall = t_wall + t % n(c2)
-          nu_max = nu_max + t % q(c2) / (conductivity*(t % n(c2) - t_inf))
+          t_wall   = t_wall + t % n(c2)
+          nu_mean  = nu_mean + t % q(c2) / (conductivity*(t % n(c2) - t_inf))
           n_points = n_points + 1
         end if
       end if
     end do
 
     call Comm_Mod_Global_Sum_Real(t_wall)
-    call Comm_Mod_Global_Sum_Real(nu_max)
+    call Comm_Mod_Global_Sum_Real(nu_mean)
     call Comm_Mod_Global_Sum_Int(n_points)
 
     call Comm_Mod_Wait
 
-    t_wall = t_wall / n_points
-    nu_max = nu_max / n_points
-    t_tau  = heat_flux / (density * capacity * u_tau_p)
+    t_wall  = t_wall / n_points
+    nu_mean = nu_mean / n_points
+    t_tau   = heat_flux / (density * capacity * u_tau_p)
   end if
 
   open(3, file = res_name)
@@ -306,39 +306,39 @@
     write(i,'(A1,(A12,F12.6,A2,A22))') & 
     '#', 'Cf_error = ', error, ' %', 'Dean formula is used.'
     if(heat_transfer) then
-      write(i,'(A1,(A12, F12.6))')'#', 'Nu number =', nu_max 
+      write(i,'(A1,(A12, F12.6))')'#', 'Nu number =', nu_mean 
       write(i,'(A1,(A12, F12.6,A2,A39))')'#', 'Nu_error  =',  &
-            abs(0.023*0.5*re**0.8*pr**0.4 - nu_max)           & 
-            / (0.023*0.5*re**0.8*pr**0.4) * 100.0, ' %',&
+            abs(0.023*0.5*re**0.8*pr**0.4 - nu_mean)          & 
+            / (0.023*0.5*re**0.8*pr**0.4) * 100.0, ' %',      &
       'correlation of Dittus-Boelter is used.' 
     end if
 
     if(turbulence_model .eq. K_EPS) then
       if(heat_transfer) then
-        write(i,'(A1,2X,A60)') '#',  ' r,'                    //  &
-                                     ' w,'                    //  &
-                                     ' kin, eps, uw,'         //  &
-                                     ' vis_t/viscosity,'      //  &
-                                     ' t, ut, vt, wt,'   
+        write(i,'(A1,2X,A60)') '#',  ' r,'                    //  &  !  1
+                                     ' w,'                    //  &  !  2
+                                     ' kin, eps, uw,'         //  &  !  3, 4, 5
+                                     ' vis_t/viscosity,'      //  &  !  6
+                                     ' t, ut, vt, wt,'               !  7 - 10
       else
-        write(i,'(A1,2X,A60)')  '#', ' r,'                    //  &
-                                     ' w,'                    //  &
-                                     ' kin, eps, uw, vis_t/viscosity'
+        write(i,'(A1,2X,A60)')  '#', ' r,'                    //  &    !  1
+                                     ' w,'                    //  &    !  2
+                                     ' kin, eps, uw, vis_t/viscosity'  ! 3 - 6
       end if
     else if(turbulence_model .eq. K_EPS_ZETA_F) then
       if(heat_transfer) then
-        write(i,'(A1,2X,A60)') '#',  ' r,'                    //  &
-                                     ' w,'                    //  &
-                                     ' kin, eps, uw,'         //  &
-                                     ' f22, zeta,'            //  &
-                                     ' vis_t/viscosity,'      //  &
+        write(i,'(A1,2X,A60)') '#',  ' r,'                    //  &  !  1
+                                     ' w,'                    //  &  !  2
+                                     ' kin, eps, uw,'         //  &  !  3, 4, 5
+                                     ' f22, zeta,'            //  &  !  6, 7
+                                     ' vis_t/viscosity,'      //  &  !  8 - 11
                                      ' t, ut, vt, wt'
       else
-        write(i,'(A1,2X,A50)') '#', ' r,'                     //  &
-                                    ' w,'                     //  &
-                                    ' kin, eps, uw,'          //  &
-                                    ' f22, zeta'              //  & 
-                                    ' vis_t/viscosity,'       
+        write(i,'(A1,2X,A50)') '#', ' r,'                     //  &  !  1
+                                    ' w,'                     //  &  !  2
+                                    ' kin, eps, uw,'          //  &  !  3, 4, 5
+                                    ' f22, zeta'              //  &  !  6, 7
+                                    ' vis_t/viscosity,'              !  8
       end if
     end if
   end do
@@ -346,33 +346,33 @@
   if(heat_transfer) then
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(3,'(12e15.7,i5)') wall_p(i),   &
-                                w_p(i),      &
-                                kin_p(i),    &
-                                eps_p(i),    &
-                                uw_p(i),     &
-                                f22_p(i),    &
-                                zeta_p(i),   &
-                                vis_t_p(i),  &
-                                t_p(i),      &
-                                ut_p(i),     &
-                                vt_p(i),     &
-                                wt_p(i),     &
-                                n_count(i)
+        write(3,'(12e15.7,i5)') wall_p(i),   &  !  1
+                                w_p(i),      &  !  2
+                                kin_p(i),    &  !  3
+                                eps_p(i),    &  !  4
+                                uw_p(i),     &  !  5
+                                f22_p(i),    &  !  6
+                                zeta_p(i),   &  !  7
+                                vis_t_p(i),  &  !  8
+                                t_p(i),      &  !  9
+                                ut_p(i),     &  ! 10
+                                vt_p(i),     &  ! 11
+                                wt_p(i),     &  ! 12
+                                n_count(i)      ! 13
       end if
     end do
   else
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(3,'(8e15.7,i5)')  wall_p(i),   &
-                                w_p(i),      &
-                                kin_p(i),    &
-                                eps_p(i),    &
-                                uw_p(i),     &
-                                f22_p(i),    &
-                                zeta_p(i),   &
-                                vis_t_p(i),  &
-                                n_count(i)
+        write(3,'(8e15.7,i5)')  wall_p(i),   &  !  1
+                                w_p(i),      &  !  2
+                                kin_p(i),    &  !  3
+                                eps_p(i),    &  !  4
+                                uw_p(i),     &  !  5
+                                f22_p(i),    &  !  6
+                                zeta_p(i),   &  !  7
+                                vis_t_p(i),  &  !  8
+                                n_count(i)      !  9
       end if
     end do
   end if
@@ -401,31 +401,31 @@
   if(heat_transfer) then
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(4,'(12e15.7)') wall_p(i),   &
-                             w_p(i),      &
-                             kin_p(i),    &
-                             eps_p(i),    &
-                             uw_p(i),     &
-                             f22_p(i),    &
-                             zeta_p(i),   &
-                             vis_t_p(i),  &
-                             t_p(i),      &
-                             ut_p(i),     &
-                             vt_p(i),     &
-                             wt_p(i)
+        write(4,'(12e15.7)') wall_p(i),   &  !  1
+                             w_p(i),      &  !  2
+                             kin_p(i),    &  !  3
+                             eps_p(i),    &  !  4
+                             uw_p(i),     &  !  5
+                             f22_p(i),    &  !  6
+                             zeta_p(i),   &  !  7
+                             vis_t_p(i),  &  !  8
+                             t_p(i),      &  !  9
+                             ut_p(i),     &  ! 10
+                             vt_p(i),     &  ! 11
+                             wt_p(i)         ! 12
       end if
     end do
   else
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(4,'(12e15.7)') wall_p(i),   &
-                             w_p(i),      &
-                             kin_p(i),    &
-                             eps_p(i),    &
-                             uw_p(i),     &
-                             f22_p(i),    &
-                             zeta_p(i),   &
-                             vis_t_p(i)
+        write(4,'(12e15.7)') wall_p(i),   &  !  1
+                             w_p(i),      &  !  2
+                             kin_p(i),    &  !  3
+                             eps_p(i),    &  !  4
+                             uw_p(i),     &  !  5
+                             f22_p(i),    &  !  6
+                             zeta_p(i),   &  !  7
+                             vis_t_p(i)      !  8
       end if
     end do
   end if

@@ -33,7 +33,7 @@
                          tt_p(:), ut_p(:), vt_p(:), wt_p(:), tt_mod_p(:),  &
                          ut_mod(:), vt_mod(:), wt_mod(:)
   integer, allocatable :: n_p(:), n_count(:)
-  real                 :: t_wall, t_tau, d_wall, nu_max, t_hot, t_cold, t_diff
+  real                 :: t_wall, t_tau, d_wall, t_hot, t_cold, t_diff
   logical              :: there
 !==============================================================================!
 
@@ -76,17 +76,17 @@
   inquire(file=coord_name, exist=there)
   if(.not. there) then
     if(this_proc < 2) then
-      print *, '==============================================================='
-      print *, 'In order to extract profiles and write them in ascii files'
-      print *, 'the code has to read cell-faces coordinates '
-      print *, 'in wall-normal direction in the ascii file ''case_name.1d.'''
-      print *, 'The file format should be as follows:'
-      print *, '10  ! number of cells + 1'
-      print *, '1 0.0'
-      print *, '2 0.1'
-      print *, '3 0.2'
-      print *, '... '
-      print *, '==============================================================='
+      print *, '#=============================================================='
+      print *, '# In order to extract profiles and write them in ascii files'
+      print *, '# the code has to read cell-faces coordinates '
+      print *, '# in wall-normal direction in the ascii file ''case_name.1d.'''
+      print *, '# The file format should be as follows:'
+      print *, '# 10  ! number of cells + 1'
+      print *, '# 1 0.0'
+      print *, '# 2 0.1'
+      print *, '# 3 0.2'
+      print *, '# ... '
+      print *, '#--------------------------------------------------------------'
     end if
 
     ! Restore the name and return
@@ -94,8 +94,7 @@
     return
   end if
 
-  t_wall = 0.0
-  nu_max = 0.0
+  t_wall   = 0.0
   n_points = 0
 
   open(9, file=coord_name)
@@ -249,8 +248,6 @@
       write(*,'(a1,(a12, f12.6))')'#', ' Nu number = ',  &
                0.05*(t_hot-ti_p(1)+ti_p(n_prob-1)-t_cold) / wall_p(1)
     end if
-    nu_max = tz_p(1)
-  call Comm_Mod_Global_Sum_Real(nu_max)
   end if
 
   write(i,'(a1,2x,a60)') '#', ' z,'                    //  &
@@ -267,27 +264,27 @@
 
   do i = 1, n_prob
     if(n_count(i) .ne. 0) then
-      write(3,'(21e15.7)') wall_p(i),                    &
-                             tz_p(i),                    &
-                             (ti_p(i) - t_cold)/t_diff,  &
-                             w_p(i),                     &
-                             kin_p(i),                   &
-                             kin_mod_p(i),               &
-                             (kin_p(i) + kin_mod_p(i)),  &
-                             uw_p(i),                    &
-                             (t_p(i) - t_cold)/t_diff,   &
-                             tt_p(i),                    &
-                             tt_mod_p(i),                &
-                             (tt_p(i)+tt_mod_p(i)),      &
-                             ut_p(i),                    &
-                             vt_p(i),                    &
-                             wt_p(i),                    &
-                             ut_mod(i),                  &
-                             vt_mod(i),                  &
-                             wt_mod(i),                  &
-                             ut_p(i) + ut_mod(i),        &
-                             vt_p(i) + vt_mod(i),        &
-                             wt_p(i) + wt_mod(i)
+      write(3,'(21e15.7)') wall_p(i),                  &
+                           tz_p(i),                    &
+                           (ti_p(i) - t_cold)/t_diff,  &
+                           w_p(i),                     &
+                           kin_p(i),                   &
+                           kin_mod_p(i),               &
+                           (kin_p(i) + kin_mod_p(i)),  &
+                           uw_p(i),                    &
+                           (t_p(i) - t_cold)/t_diff,   &
+                           tt_p(i),                    &
+                           tt_mod_p(i),                &
+                           (tt_p(i)+tt_mod_p(i)),      &
+                           ut_p(i),                    &
+                           vt_p(i),                    &
+                           wt_p(i),                    &
+                           ut_mod(i),                  &
+                           vt_mod(i),                  &
+                           wt_mod(i),                  &
+                           ut_p(i) + ut_mod(i),        &
+                           vt_p(i) + vt_mod(i),        &
+                           wt_p(i) + wt_mod(i)
     end if
   end do
 

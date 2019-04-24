@@ -39,7 +39,7 @@
                               tt_p(:), ut_p(:), vt_p(:), wt_p(:),           &
                               y_plus_p(:),  vis_t_p(:), ind(:), wall_p(:)
   integer,allocatable      :: n_p(:), n_count(:)
-  real                     :: t_wall, t_tau, d_wall, nu_max, t_inf
+  real                     :: t_wall, t_tau, d_wall, nu_mean, t_inf
   real                     :: ubulk, error, re, cf_dean, cf, pr, u_tau_p
   logical                  :: there
 !==============================================================================!
@@ -69,17 +69,17 @@
   inquire(file=coord_name, exist=there)
   if(.not. there) then
     if(this_proc < 2) then
-      print *, '==============================================================='
-      print *, 'In order to extract profiles and write them in ascii files'
-      print *, 'the code has to read cell-faces coordinates '
-      print *, 'in wall-normal direction in the ascii file ''case_name.1d.'''
-      print *, 'The file format should be as follows:'
-      print *, '10  ! number of cells + 1'
-      print *, '1 0.0'
-      print *, '2 0.1'
-      print *, '3 0.2'
-      print *, '... '
-      print *, '==============================================================='
+      print *, '#=============================================================='
+      print *, '# In order to extract profiles and write them in ascii files'
+      print *, '# the code has to read cell-faces coordinates '
+      print *, '# in wall-normal direction in the ascii file ''case_name.1d.'''
+      print *, '# The file format should be as follows:'
+      print *, '# 10  ! number of cells + 1'
+      print *, '# 1 0.0'
+      print *, '# 2 0.1'
+      print *, '# 3 0.2'
+      print *, '# ... '
+      print *, '#=============================================================='
     end if
 
     ! Restore the name and return
@@ -87,9 +87,9 @@
     return
   end if
 
-  ubulk = bulk % flux_x / (density*bulk % area_x)
-  t_wall = 0.0
-  nu_max = 0.0
+  ubulk    = bulk % flux_x / (density*bulk % area_x)
+  t_wall   = 0.0
+  nu_mean  = 0.0
   n_points = 0
 
   if(heat_transfer) then
@@ -259,23 +259,23 @@
         if( Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. WALL .or.  &
             Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. WALLFL) then
 
-          t_wall = t_wall + t % n(c2)
-          nu_max = nu_max + t % q(c2)/(conductivity   &
-                   *(t % n(c2) - t_inf + TINY))
+          t_wall  = t_wall + t % n(c2)
+          nu_mean = nu_mean + t % q(c2)  &
+                  / (conductivity * (t % n(c2) - t_inf + TINY))
           n_points = n_points + 1
         end if
       end if
     end do
 
     call Comm_Mod_Global_Sum_Real(t_wall)
-    call Comm_Mod_Global_Sum_Real(nu_max)
+    call Comm_Mod_Global_Sum_Real(nu_mean)
     call Comm_Mod_Global_Sum_Int(n_points)
 
     call Comm_Mod_Wait
 
-    t_wall = t_wall / n_points
-    nu_max = nu_max / n_points
-    t_tau  = heat_flux / (density * capacity * u_tau_p)
+    t_wall  = t_wall / n_points
+    nu_mean = nu_mean / n_points
+    t_tau   = heat_flux / (density * capacity * u_tau_p)
   end if
 
   open(3, file = res_name)
@@ -300,9 +300,9 @@
     write(i,'(a1,(a12,f12.6,a2,a22))') & 
     '#', 'Cf_error = ', error, ' %', 'Dean formula is used.'
     if(heat_transfer) then
-      write(i,'(a1,(a12, f12.6))')'#', 'Nu number =', nu_max 
+      write(i,'(a1,(a12, f12.6))')'#', 'Nu number =', nu_mean 
       write(i,'(a1,(a12, f12.6,a2,a39))')'#', 'Nu_error  =', &
-            abs(0.023*0.5*re**0.8*pr**0.4 - nu_max)          &
+            abs(0.023*0.5*re**0.8*pr**0.4 - nu_mean)          &
             / (0.023*0.5*re**0.8*pr**0.4) * 100.0, ' %',     &
             'correlation of Dittus-Boelter is used.' 
     end if
