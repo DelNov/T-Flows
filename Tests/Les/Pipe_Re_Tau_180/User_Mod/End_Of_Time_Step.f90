@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Time_Step(flow, n, time)
+  subroutine User_Mod_End_Of_Time_Step(flow, turb, swarm, n, time)
 !------------------------------------------------------------------------------!
 !   This function is called at the beginning of time step.                     !
 !------------------------------------------------------------------------------!
@@ -10,10 +10,13 @@
   use Var_Mod,   only: Var_Type
   use Const_Mod, only: PI
   use Comm_Mod,  only: Comm_Mod_Global_Max_Real, this_proc
+  use Save_Results_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
+  type(Turb_Type),  target :: turb
+  type(Swarm_Type), target :: swarm
   integer                  :: n     ! time step
   real                     :: time  ! physical time
 !----------------------------------[Locals]------------------------------------!
@@ -131,6 +134,6 @@
   file_name = 'with_random_eddies_000000'
   write(file_name(20:25), '(i6.6)') n
 
-  call Save_Results(grid, file_name)
+  call Save_Results(flow, turb, file_name)
 
   end subroutine

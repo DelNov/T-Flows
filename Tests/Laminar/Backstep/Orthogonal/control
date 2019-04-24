@@ -9,7 +9,7 @@ NUMBER_OF_TIME_STEPS 3
 BACKUP_SAVE_INTERVAL 10
  TIME_STEP               1.0
 
-LOAD_BACKUP_NAME backstep_orthogonal-ts.backup
+#LOAD_BACKUP_NAME backstep_orthogonal-ts.backup
 
 #-------------------
 # Monitoring points 

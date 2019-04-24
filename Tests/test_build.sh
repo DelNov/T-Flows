@@ -5,6 +5,9 @@
 
 # Requires: gnuplot, texlive-base, mpi, gfortran
 
+# exit when any command fails
+set -e
+
 # Compilation flags used in makefiles
 FCOMP="gnu"
 # Conduct tests with DEBUG=yes
@@ -22,37 +25,50 @@ CGNS="no"
 # Folders with test cases
 LAMINAR_BACKSTEP_ORTH_DIR=Laminar/Backstep/Orthogonal
 LAMINAR_BACKSTEP_NON_ORTH_DIR=Laminar/Backstep/Nonorthogonal
+LAMINAR_CAVITY_LID_DRIVEN_DIR=Laminar/Cavity/Lid_Driven/Re_1000
+LAMINAR_CAVITY_THERM_DRIVEN_106_DIR=Laminar/Cavity/Thermally_Driven/Ra_10e6
+LAMINAR_CAVITY_THERM_DRIVEN_108_DIR=Laminar/Cavity/Thermally_Driven/Ra_10e8
+LAMINAR_T_JUNCTION_DIR=Laminar/T_Junction
 
-LES_CAVITY_LID_DRIVEN_DIR=Laminar/Cavity/Lid_Driven/Re_1000
-LES_CAVITY_THERM_DRIVEN_106_DIR=Laminar/Cavity/Thermally_Driven/Ra_10e6
-LES_CAVITY_THERM_DRIVEN_108_DIR=Laminar/Cavity/Thermally_Driven/Ra_10e8
+LES_CHANNEL_180_DIR=Les/Channel_Re_Tau_180
+LES_PIPE_DIR=Les/Pipe_Re_Tau_180
+LES_RB_109_DIR=Les/Rayleigh_Benard_Convection_Ra_10e09
 
-RANS_BACKSTEP_5100_DIR=Rans/Backstep_Re_05100
+RANS_BACKSTEP_05100_DIR=Rans/Backstep_Re_05100
 RANS_BACKSTEP_28000_DIR=Rans/Backstep_Re_28000
-
 RANS_CHANNEL_LR_LONG_DIR=Rans/Channel_Re_Tau_590/Long_Domain
 RANS_CHANNEL_LR_RSM_DIR=Rans/Channel_Re_Tau_590/Rsm
 RANS_CHANNEL_LR_STRETCHED_DIR=Rans/Channel_Re_Tau_590/Stretched_Mesh
 RANS_CHANNEL_LR_UNIFORM_DIR=Rans/Channel_Re_Tau_590/Uniform_Mesh
-
-HYB_CHANNEL_HR_UNIFORM_DIR=Hybrid_Les_Rans/Channel_Re_Tau_2000/Uniform_Mesh
-HYB_CHANNEL_HR_STRETCHED_DIR=Hybrid_Les_Rans/Channel_Re_Tau_2000/Stretched_Mesh
-
-# Mesh file (.cgns/.neu)
-LES_PIPE_DIR=Les/Pipe_Re_Tau_180
-
-RANS_IMPINGING_JET_DIR=Rans/Impinging_Jet_2d_Distant_Re_23000
 RANS_FUEL_BUNDLE_DIR=Rans/Fuel_Bundle
-#RANS_PIPE_DIR=Rans/Pipe_Re_Tau_2000
+RANS_IMPINGING_JET_DIR=Rans/Impinging_Jet_2d_Distant_Re_23000
+
+HYB_CHANNEL_HR_STRETCHED_DIR=Hybrid_Les_Rans/Channel_Re_Tau_2000/Stretched_Mesh
+HYB_CHANNEL_HR_UNIFORM_DIR=Hybrid_Les_Rans/Channel_Re_Tau_2000/Uniform_Mesh
+
+# All compilation tests - would be good to include those with user functions
+ALL_COMPILE_TESTS=("$LAMINAR_CAVITY_LID_DRIVEN_DIR \
+                    $LAMINAR_CAVITY_THERM_DRIVEN_106_DIR \
+                    $LAMINAR_CAVITY_THERM_DRIVEN_108_DIR \
+                    $LAMINAR_T_JUNCTION_DIR \
+                    $LES_CHANNEL_180_DIR \
+                    $LES_PIPE_DIR \
+                    $LES_RB_109_DIR \
+                    $RANS_BACKSTEP_28000_DIR \
+                    $RANS_CHANNEL_LR_UNIFORM_DIR \
+                    $RANS_CHANNEL_LR_STRETCHED_DIR \
+                    $RANS_CHANNEL_LR_RSM_DIR \
+                    $HYB_CHANNEL_HR_UNIFORM_DIR \
+                    $HYB_CHANNEL_HR_STRETCHED_DIR")
 
 # All directories to test Generate
 ALL_GENERATE_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR \
                      $LAMINAR_BACKSTEP_NON_ORTH_DIR \
-                     $LES_CAVITY_LID_DRIVEN_DIR \
-                     $LES_CAVITY_THERM_DRIVEN_106_DIR \
-                     $RANS_BACKSTEP_5100_DIR \
+                     $LAMINAR_CAVITY_LID_DRIVEN_DIR \
+                     $LAMINAR_CAVITY_THERM_DRIVEN_106_DIR \
+                     $LAMINAR_CAVITY_THERM_DRIVEN_108_DIR \
+                     $RANS_BACKSTEP_05100_DIR \
                      $RANS_BACKSTEP_28000_DIR \
-                     $LES_CAVITY_THERM_DRIVEN_108_DIR \
                      $RANS_CHANNEL_LR_LONG_DIR \
                      $RANS_CHANNEL_LR_RSM_DIR \
                      $RANS_CHANNEL_LR_STRETCHED_DIR \
@@ -68,10 +84,10 @@ RAN_CONVERT_TESTS=0
 
 ALL_DIVIDE_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR \
                    $LAMINAR_BACKSTEP_NON_ORTH_DIR \
-                   $LES_CAVITY_LID_DRIVEN_DIR \
-                   $LES_CAVITY_THERM_DRIVEN_106_DIR \
-                   $LES_CAVITY_THERM_DRIVEN_108_DIR \
-                   $RANS_BACKSTEP_5100_DIR \
+                   $LAMINAR_CAVITY_LID_DRIVEN_DIR \
+                   $LAMINAR_CAVITY_THERM_DRIVEN_106_DIR \
+                   $LAMINAR_CAVITY_THERM_DRIVEN_108_DIR \
+                   $RANS_BACKSTEP_05100_DIR \
                    $RANS_BACKSTEP_28000_DIR \
                    $RANS_CHANNEL_LR_LONG_DIR \
                    $RANS_CHANNEL_LR_RSM_DIR \
@@ -83,15 +99,6 @@ ALL_DIVIDE_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR \
                    $RANS_FUEL_BUNDLE_DIR
                    $LES_PIPE_DIR")
 RAN_DIVIDE_TESTS=0
-
-ALL_COMPILE_TESTS=("$LES_CAVITY_LID_DRIVEN_DIR \
-                    $LES_CAVITY_THERM_DRIVEN_106_DIR \
-                    $LES_CAVITY_THERM_DRIVEN_108_DIR \
-                    $RANS_CHANNEL_LR_UNIFORM_DIR \
-                    $RANS_CHANNEL_LR_STRETCHED_DIR \
-                    $RANS_CHANNEL_LR_RSM_DIR \
-                    $HYB_CHANNEL_HR_UNIFORM_DIR \
-                    $HYB_CHANNEL_HR_STRETCHED_DIR")
 
 ALL_SAVE_EXIT_NOW_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR")
 
@@ -116,9 +123,6 @@ current_time=$(date +%s)
 FULL_LOG=$TEST_DIR/test_build.log # logs of current script
 if [ -f $FULL_LOG ]; then cp /dev/null $FULL_LOG; fi
 echo "Full log is being written in file" "$FULL_LOG"
-
-# exit when any command fails
-# set -e
 
 # Keep track of the last executed command
 # trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
@@ -597,9 +601,9 @@ function process_backup_tests {
   echo "!!"
   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   #-- Cavity_Lid_Driven_Re_1000 [none]
-  process_backup_test no  $TEST_DIR/$LES_CAVITY_LID_DRIVEN_DIR
+  process_backup_test no  $TEST_DIR/$LAMINAR_CAVITY_LID_DRIVEN_DIR
   if [ "$CGNS" = "yes" ]; then
-    process_backup_test yes $TEST_DIR/$LES_CAVITY_LID_DRIVEN_DIR
+    process_backup_test yes $TEST_DIR/$LAMINAR_CAVITY_LID_DRIVEN_DIR
   fi
 
 }
@@ -926,9 +930,9 @@ function process_full_length_tests {
   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   # no User_Mod/ dir !!!
   process_full_length_test \
-    "$TEST_DIR/$LES_CAVITY_LID_DRIVEN_DIR" \
+    "$TEST_DIR/$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
     "none" \
-    "$TEST_DIR/$LES_CAVITY_LID_DRIVEN_DIR/Xmgrace"
+    "$TEST_DIR/$LAMINAR_CAVITY_LID_DRIVEN_DIR/Xmgrace"
 
   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   echo "!!"
@@ -937,9 +941,9 @@ function process_full_length_tests {
   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   # no User_Mod/ dir !!!
   process_full_length_test \
-    "$TEST_DIR/$LES_CAVITY_THERM_DRIVEN_106_DIR" \
+    "$TEST_DIR/$LAMINAR_CAVITY_THERM_DRIVEN_106_DIR" \
     "none" \
-    "$TEST_DIR/$LES_CAVITY_THERM_DRIVEN_106_DIR/Xmgrace"
+    "$TEST_DIR/$LAMINAR_CAVITY_THERM_DRIVEN_106_DIR/Xmgrace"
 
   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   echo "!!"
@@ -948,9 +952,9 @@ function process_full_length_tests {
   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   # no User_Mod/ dir !!!
   process_full_length_test \
-    "$TEST_DIR/$LES_CAVITY_THERM_DRIVEN_108_DIR" \
+    "$TEST_DIR/$LAMINAR_CAVITY_THERM_DRIVEN_108_DIR" \
     "none" \
-    "$TEST_DIR/$LES_CAVITY_THERM_DRIVEN_108_DIR/Xmgrace"
+    "$TEST_DIR/$LAMINAR_CAVITY_THERM_DRIVEN_108_DIR/Xmgrace"
 
   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   echo "!!"

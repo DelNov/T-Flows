@@ -218,6 +218,20 @@ SRC_MOD += Control_Mod.f90	\
            Turb_Mod.f90		\
            Swarm_Mod.f90
 
+# Save_Results_Mod - conditional VTU/CGNS support
+ifeq ($(CGNS), no)
+  SRC_MOD += Save_Grid_Mod_Vtu.f90	\
+             Save_Results_Mod_Vtu.f90
+else
+  ifeq ($(MPI), yes)
+    SRC_MOD += Cgns_Mod_Par.f90
+  else
+    SRC_MOD += Cgns_Mod_Seq.f90
+  endif
+  SRC_MOD += Save_Grid_Mod_Cgns.f90	\
+             Save_Results_Mod_Cgns.f90
+endif
+
 SRC_MOD += User_Mod.f90
 
 # Backup_Mod should come last because it uses all other modules
@@ -252,20 +266,6 @@ SRC_FUN += Distance.f90		\
            Swap_Real.f90	\
            Swap_Short.f90	\
            To_Upper_Case.f90
-
-# Conditional CGNS support
-ifeq ($(CGNS), no)
-  SRC_MOD += Save_Grid_Mod_Vtu.f90	\
-             Save_Results_Mod_Vtu.f90
-else
-  ifeq ($(MPI), yes)
-    SRC_MOD += Cgns_Mod_Par.f90
-  else
-    SRC_MOD += Cgns_Mod_Seq.f90
-  endif
-  SRC_MOD += Save_Grid_Mod_Cgns.f90	\
-             Save_Results_Mod_Cgns.f90
-endif
 
 #----------------------------------------------------------------------
 #   List of objects generated from the list of modules and functions

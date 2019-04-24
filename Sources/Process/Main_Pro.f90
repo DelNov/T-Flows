@@ -175,7 +175,7 @@
     time = time + flow % dt
 
     ! Beginning of time steo
-    call User_Mod_Beginning_Of_Time_Step(flow, swarm, n, time)
+    call User_Mod_Beginning_Of_Time_Step(flow, turb, swarm, n, time)
 
     ! Start info boxes.
     call Info_Mod_Time_Start()
@@ -403,7 +403,7 @@
     end if
 
     ! Just before the end of time step
-    call User_Mod_End_Of_Time_Step(flow, swarm, n, time)
+    call User_Mod_End_Of_Time_Step(flow, turb, swarm, n, time)
 
     if(save_now) then
       if(this_proc < 2) then
