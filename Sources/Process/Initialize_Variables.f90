@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Initialize_Variables(flow, turb)
+  subroutine Initialize_Variables(flow, turb, swarm)
 !------------------------------------------------------------------------------!
 !   Initialize dependent variables.  (It is a bit of a mess still)             !
 !------------------------------------------------------------------------------!
@@ -17,6 +17,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
   type(Turb_Type),  target :: turb
+  type(Swarm_Type), target :: swarm
 !----------------------------------[Calling]-----------------------------------!
   integer :: Key_Ind
 !-----------------------------------[Locals]-----------------------------------!
@@ -335,7 +336,7 @@
 
   end if
 
-  call User_Mod_Initialize(grid)
+  call User_Mod_Initialize(flow, turb, swarm)
 
   !---------------------------------!
   !      Calculate the inflow       !

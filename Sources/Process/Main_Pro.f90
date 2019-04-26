@@ -118,7 +118,7 @@
 
   ! Initialize variables
   if(.not. backup) then
-    call Initialize_Variables(flow, turb)
+    call Initialize_Variables(flow, turb, swarm)
     call Comm_Mod_Wait
   end if
 
