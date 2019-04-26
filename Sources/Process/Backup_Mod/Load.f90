@@ -229,12 +229,21 @@
       call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 't_mean', tur % t_mean(-nb_s:nc_s))
     end if
 
-    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'uu_mean', tur % uu_mean(-nb_s:nc_s))
-    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'vv_mean', tur % vv_mean(-nb_s:nc_s))
-    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'ww_mean', tur % ww_mean(-nb_s:nc_s))
-    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'uv_mean', tur % uv_mean(-nb_s:nc_s))
-    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'uw_mean', tur % uw_mean(-nb_s:nc_s))
-    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'vw_mean', tur % vw_mean(-nb_s:nc_s))
+    if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
+       turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
+      call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'uu_mean',  &
+                                          tur % uu_mean(-nb_s:nc_s))
+      call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'vv_mean',  &
+                                          tur % vv_mean(-nb_s:nc_s))
+      call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'ww_mean',  &
+                                          tur % ww_mean(-nb_s:nc_s))
+      call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'uv_mean',  &
+                                          tur % uv_mean(-nb_s:nc_s))
+      call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'uw_mean',  &
+                                          tur % uw_mean(-nb_s:nc_s))
+      call Backup_Mod_Read_Cell_Bnd(fh, d, vc, 'vw_mean',  &
+                                          tur % vw_mean(-nb_s:nc_s))
+    end if
 
     call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'uu_res', tur % uu_res(-nb_s:nc_s))
     call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'vv_res', tur % vv_res(-nb_s:nc_s))
