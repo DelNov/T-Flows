@@ -73,8 +73,7 @@
          turbulence_model .eq. LES_DYNAMIC     .or.  &
          turbulence_model .eq. LES_WALE        .or.  &
          turbulence_model .eq. DES_SPALART     .or.  &
-         turbulence_model .eq. DNS             .or.  &
-         turbulence_model .eq. HYBRID_LES_RANS) then
+         turbulence_model .eq. DNS) then
 
         ! Mean velocities (and temperature)
         u_mean(c) = (u_mean(c) * (1.*n) + u % n(c)) / (1.*(n+1))
@@ -142,7 +141,8 @@
       !------------------!
       !   K-eps-zeta-f   !
       !------------------!
-      if(turbulence_model .eq. K_EPS_ZETA_F) then
+      if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
+         turbulence_model .eq. HYBRID_LES_RANS) then
 
         ! Time-averaged velocities (and temperature)
         u_mean(c) = (u_mean(c) * (1.*n) + u % n(c)) / (1.*(n+1))
