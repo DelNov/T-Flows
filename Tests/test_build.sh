@@ -46,64 +46,101 @@ RANS_IMPINGING_JET_DIR=Rans/Impinging_Jet_2d_Distant_Re_23000
 HYB_CHANNEL_HR_STRETCHED_DIR=Hybrid_Les_Rans/Channel_Re_Tau_2000/Stretched_Mesh
 HYB_CHANNEL_HR_UNIFORM_DIR=Hybrid_Les_Rans/Channel_Re_Tau_2000/Uniform_Mesh
 
+#----------------------------------------------------------------------------
 # All compilation tests - would be good to include those with user functions
-ALL_COMPILE_TESTS=("$LAMINAR_CAVITY_LID_DRIVEN_DIR \
-                    $LAMINAR_CAVITY_THERM_DRIVEN_106_DIR \
-                    $LAMINAR_CAVITY_THERM_DRIVEN_108_DIR \
-                    $LAMINAR_T_JUNCTION_DIR \
-                    $LES_CHANNEL_180_DIR \
-                    $LES_PIPE_DIR \
-                    $LES_RB_109_DIR \
-                    $RANS_BACKSTEP_28000_DIR \
-                    $RANS_CHANNEL_LR_UNIFORM_DIR \
-                    $RANS_CHANNEL_LR_STRETCHED_DIR \
-                    $RANS_CHANNEL_LR_RSM_DIR \
-                    $HYB_CHANNEL_HR_UNIFORM_DIR \
-                    $HYB_CHANNEL_HR_STRETCHED_DIR")
+#----------------------------------------------------------------------------
+ALL_COMPILE_TESTS=("$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
+                   "$LAMINAR_CAVITY_THERM_DRIVEN_106_DIR" \
+                   "$LAMINAR_CAVITY_THERM_DRIVEN_108_DIR" \
+                   "$LAMINAR_T_JUNCTION_DIR" \
+                   "$LES_CHANNEL_180_DIR" \
+                   "$LES_PIPE_DIR" \
+                   "$LES_RB_109_DIR" \
+                   "$RANS_BACKSTEP_28000_DIR" \
+                   "$RANS_CHANNEL_LR_UNIFORM_DIR" \
+                   "$RANS_CHANNEL_LR_STRETCHED_DIR" \
+                   "$RANS_CHANNEL_LR_RSM_DIR" \
+                   "$HYB_CHANNEL_HR_UNIFORM_DIR" \
+                   "$HYB_CHANNEL_HR_STRETCHED_DIR")
+RAN_COMPILE_TESTS=0
 
+#----------------------------------
 # All directories to test Generate
-ALL_GENERATE_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR \
-                     $LAMINAR_BACKSTEP_NON_ORTH_DIR \
-                     $LAMINAR_CAVITY_LID_DRIVEN_DIR \
-                     $LAMINAR_CAVITY_THERM_DRIVEN_106_DIR \
-                     $LAMINAR_CAVITY_THERM_DRIVEN_108_DIR \
-                     $RANS_BACKSTEP_05100_DIR \
-                     $RANS_BACKSTEP_28000_DIR \
-                     $RANS_CHANNEL_LR_LONG_DIR \
-                     $RANS_CHANNEL_LR_RSM_DIR \
-                     $RANS_CHANNEL_LR_STRETCHED_DIR \
-                     $RANS_CHANNEL_LR_UNIFORM_DIR \
-                     $HYB_CHANNEL_HR_UNIFORM_DIR \
-                     $HYB_CHANNEL_HR_STRETCHED_DIR")
+#----------------------------------
+ALL_GENERATE_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR" \
+                    "$LAMINAR_BACKSTEP_NON_ORTH_DIR" \
+                    "$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
+                    "$LAMINAR_CAVITY_THERM_DRIVEN_106_DIR" \
+                    "$LAMINAR_CAVITY_THERM_DRIVEN_108_DIR" \
+                    "$RANS_BACKSTEP_05100_DIR" \
+                    "$RANS_BACKSTEP_28000_DIR" \
+                    "$RANS_CHANNEL_LR_LONG_DIR" \
+                    "$RANS_CHANNEL_LR_RSM_DIR" \
+                    "$RANS_CHANNEL_LR_STRETCHED_DIR" \
+                    "$RANS_CHANNEL_LR_UNIFORM_DIR" \
+                    "$HYB_CHANNEL_HR_UNIFORM_DIR" \
+                    "$HYB_CHANNEL_HR_STRETCHED_DIR")
 RAN_GENERATE_TESTS=0
 
-ALL_CONVERT_TESTS=("$RANS_IMPINGING_JET_DIR \
-                    $RANS_FUEL_BUNDLE_DIR \
-                    $LES_PIPE_DIR")
+#---------------------------------
+# All directories to test Convert
+#---------------------------------
+ALL_CONVERT_TESTS=("$RANS_IMPINGING_JET_DIR" \
+                   "$RANS_FUEL_BUNDLE_DIR" \
+                   "$LES_PIPE_DIR")
 RAN_CONVERT_TESTS=0
 
-ALL_DIVIDE_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR \
-                   $LAMINAR_BACKSTEP_NON_ORTH_DIR \
-                   $LAMINAR_CAVITY_LID_DRIVEN_DIR \
-                   $LAMINAR_CAVITY_THERM_DRIVEN_106_DIR \
-                   $LAMINAR_CAVITY_THERM_DRIVEN_108_DIR \
-                   $RANS_BACKSTEP_05100_DIR \
-                   $RANS_BACKSTEP_28000_DIR \
-                   $RANS_CHANNEL_LR_LONG_DIR \
-                   $RANS_CHANNEL_LR_RSM_DIR \
-                   $RANS_CHANNEL_LR_STRETCHED_DIR \
-                   $RANS_CHANNEL_LR_UNIFORM_DIR \
-                   $HYB_CHANNEL_HR_STRETCHED_DIR \
-                   $HYB_CHANNEL_HR_UNIFORM_DIR \
-                   $RANS_IMPINGING_JET_DIR \
-                   $RANS_FUEL_BUNDLE_DIR
-                   $LES_PIPE_DIR")
+#--------------------------------
+# All directories to test Divide
+#--------------------------------
+ALL_DIVIDE_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR" \
+                  "$LAMINAR_BACKSTEP_NON_ORTH_DIR" \
+                  "$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
+                  "$LAMINAR_CAVITY_THERM_DRIVEN_106_DIR" \
+                  "$LAMINAR_CAVITY_THERM_DRIVEN_108_DIR" \
+                  "$RANS_BACKSTEP_05100_DIR" \
+                  "$RANS_BACKSTEP_28000_DIR" \
+                  "$RANS_CHANNEL_LR_LONG_DIR" \
+                  "$RANS_CHANNEL_LR_RSM_DIR" \
+                  "$RANS_CHANNEL_LR_STRETCHED_DIR" \
+                  "$RANS_CHANNEL_LR_UNIFORM_DIR" \
+                  "$HYB_CHANNEL_HR_STRETCHED_DIR" \
+                  "$HYB_CHANNEL_HR_UNIFORM_DIR" \
+                  "$RANS_IMPINGING_JET_DIR" \
+                  "$RANS_FUEL_BUNDLE_DIR"
+                  "$LES_PIPE_DIR")
 RAN_DIVIDE_TESTS=0
 
+#-----------------------------------------------
+# All directories to test save_now and exit_now
+#-----------------------------------------------
 ALL_SAVE_EXIT_NOW_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR")
 
+#----------------------------------------------------------------
+# All directories to test Process, followed by turbulence models
+#----------------------------------------------------------------
+ALL_PROCESS_TESTS=("$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
+                   "$LAMINAR_CAVITY_THERM_DRIVEN_106_DIR" \
+                   "$LAMINAR_CAVITY_THERM_DRIVEN_108_DIR" \
+                   "$RANS_CHANNEL_LR_UNIFORM_DIR" \
+                   "$RANS_CHANNEL_LR_STRETCHED_DIR" \
+                   "$RANS_CHANNEL_LR_RSM_DIR" \
+                   "$RANS_CHANNEL_LR_RSM_DIR" \
+                   "$HYB_CHANNEL_HR_STRETCHED_DIR" \
+                   "$HYB_CHANNEL_HR_UNIFORM_DIR")
+ALL_PROCESS_MODELS=("none" \
+                    "none" \
+                    "none" \
+                    "k_eps" \
+                    "k_eps_zeta_f" \
+                    "rsm_manceau_hanjalilc" \
+                    "rsm_hanjalic_jakirlic" \
+                    "hybrid_les_rans" \
+                    "hybrid_les_rans")
+RAN_PROCESS_TESTS=0
+
 # Folder structure
-TEST_DIR=$PWD/                     # dir with tests
+TEST_DIR=$PWD                      # dir with tests
 GENE_DIR=$PWD/../Sources/Generate  # Generate src folder
 CONV_DIR=$PWD/../Sources/Convert   # Convert  src folder
 DIVI_DIR=$PWD/../Sources/Divide    # Divide   src folder
@@ -111,10 +148,10 @@ PROC_DIR=$PWD/../Sources/Process   # Process  src folder
 BINA_DIR=$PWD/../Binaries/         # binaries folder
 
 # Executables
-GENE_EXE=$BINA_DIR/Generate        # Generate ex
-CONV_EXE=$BINA_DIR/Convert         # Convert  ex
-DIVI_EXE=$BINA_DIR/Divide          # Divide   ex
-PROC_EXE=$BINA_DIR/Process         # Process  ex
+GENE_EXE=$BINA_DIR/Generate        # Generate executable
+CONV_EXE=$BINA_DIR/Convert         # Convert  executable
+DIVI_EXE=$BINA_DIR/Divide          # Divide   executable
+PROC_EXE=$BINA_DIR/Process         # Process  executable
 
 # Start time measurements from this moment
 current_time=$(date +%s)
@@ -273,11 +310,11 @@ function launch_process {
   fi
 
   if [ "$1" == "seq" ]; then
-    echo "launching Process in: " $PWD
+    echo "launching Process"
     $PROC_EXE >> $FULL_LOG 2>&1
     success=$?
   elif [ "$1" == "par" ]; then
-    echo "launching mpirun -np "$2" Process in: " $PWD
+    echo "launching mpirun -np "$2" Process"
     mpirun -np $2 $PROC_EXE >> $FULL_LOG 2>&1
     success=$?
   else
@@ -304,7 +341,7 @@ function generate_tests {
   #-- seq, no cgns
   clean_compile $GENE_DIR  no  no  # dir CGNS_HDF5 MPI
 
-  for CASE_DIR in $ALL_GENERATE_TESTS; do
+  for CASE_DIR in ${ALL_GENERATE_TESTS[@]}; do
     launch_generate $CASE_DIR
   done
 
@@ -312,7 +349,7 @@ function generate_tests {
   if [ "$CGNS" = "yes" ]; then
     clean_compile $GENE_DIR  yes  no  # dir CGNS_HDF5 MPI
 
-    for CASE_DIR in $ALL_GENERATE_TESTS; do
+    for CASE_DIR in ${ALL_GENERATE_TESTS[@]}; do
       launch_generate $CASE_DIR
     done
   fi
@@ -372,7 +409,7 @@ function convert_tests {
   #-- seq, no cgns
   clean_compile $CONV_DIR no no # dir CGNS_HDF5 MPI
 
-  for CASE_DIR in $ALL_CONVERT_TESTS; do
+  for CASE_DIR in ${ALL_CONVERT_TESTS[@]}; do
     launch_convert $CASE_DIR
   done
 
@@ -380,7 +417,7 @@ function convert_tests {
   if [ "$CGNS" = "yes" ]; then
     clean_compile $CONV_DIR yes no # dir CGNS_HDF5 MPI
 
-    for CASE_DIR in $ALL_CONVERT_TESTS; do
+    for CASE_DIR in ${ALL_CONVERT_TESTS[@]}; do
       launch_convert $CASE_DIR
     done
   fi
@@ -401,7 +438,7 @@ function divide_tests {
   #-- seq
   clean_compile $DIVI_DIR no no no # dir CGNS_HDF5 MPI
 
-  for CASE_DIR in $ALL_DIVIDE_TESTS; do
+  for CASE_DIR in ${ALL_DIVIDE_TESTS[@]}; do
     launch_divide $CASE_DIR
   done
 
@@ -746,12 +783,12 @@ function process_save_exit_now_tests {
   echo "#"
   echo "#----------------------------------------------------------------------"
 
-  for CASE_DIR in $ALL_SAVE_EXIT_NOW_TESTS; do
+  for CASE_DIR in ${ALL_SAVE_EXIT_NOW_TESTS[@]}; do
     process_save_exit_now_test no $CASE_DIR
   done
 
   if [ "$CGNS" = "yes" ]; then
-    for CASE_DIR in $ALL_SAVE_EXIT_NOW_TESTS; do
+    for CASE_DIR in ${ALL_SAVE_EXIT_NOW_TESTS[@]}; do
       process_save_exit_now_test yes $CASE_DIR
     done
   fi
@@ -836,7 +873,7 @@ function process_compilation_tests {
   echo "#"
   echo "#----------------------------------------------------------------------"
 
-  for CASE_DIR in $ALL_COMPILE_TESTS; do
+  for CASE_DIR in ${ALL_COMPILE_TESTS[@]}; do
     process_compilation_test $CASE_DIR
   done
 }
@@ -863,8 +900,6 @@ function process_full_length_test {
   cd "$1"
   name_in_div=$(head -n1 divide.scr)
   nproc_in_div=$(head -n2 divide.scr | tail -n1)
-
-  echo "Test: full length simulation in " "$1" with "$2" model
 
   echo "np="$nproc_in_div", MPI=yes"
   # rel_dir to User_Mod/ from Process/
@@ -922,11 +957,27 @@ function process_full_length_tests {
   # $3 = dir with results
   # it requires a new file in Xmgrace/ dir called gnuplot_script_template.sh
 
-  echo "  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "  !!"
-  echo "  !!    Running Processor full simulation tests"
-  echo "  !!"
-  echo "  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "#======================================================================"
+  echo "#"
+  echo "#   Running Processor full simulation tests"
+  echo "#"
+  echo "#----------------------------------------------------------------------"
+
+  for i in ${!ALL_PROCESS_TESTS[@]}; do
+    CASE_DIR="${ALL_PROCESS_TESTS[$i]}"
+    CASE_TUR="${ALL_PROCESS_MODELS[$i]}"
+    echo ""
+    echo "#===================================================================="
+    echo "#   Process test: "     $CASE_DIR
+    echo "#   with turbulence model: " $CASE_TUR
+    echo "#--------------------------------------------------------------------"
+
+    process_full_length_test \
+      "$TEST_DIR/$CASE_DIR" \
+      "$CASE_TUR" \
+      "$TEST_DIR/$CASE_DIR/Xmgrace"
+  done
+  exit 1
 
   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   echo "!!"
@@ -1058,6 +1109,7 @@ while [ 0 -eq 0 ]; do
   echo "  6. Processor save_now/exit_now tests"
   echo "  7. Processor full lenght tests"
   echo "  8. Perform all tests"
+  echo "  9. Clean all test directories"
   echo ""
   read -p "  Enter the desired type of test: " option
   if [ $option -eq 0 ]; then exit 1;                       fi
@@ -1088,6 +1140,22 @@ while [ 0 -eq 0 ]; do
     process_backup_tests
     process_save_exit_now_tests
     process_full_length_tests
+  fi
+  if [ $option -eq 9 ]; then
+    find . -name \*.cns    -type f -delete
+    find . -name \*.geo    -type f -delete
+    find . -name \*.map    -type f -delete
+    find . -name \*.buf    -type f -delete
+    find . -name \*.neu    -type f -delete
+    find . -name \*.vtu    -type f -delete
+    find . -name \*.pvtu   -type f -delete
+    find . -name \*.cgns   -type f -delete
+    find . -name \*-monit* -type f -delete
+    find . -name \out_test -type f -delete
+    find . -name \Generate -type l -delete
+    find . -name \Convert  -type l -delete
+    find . -name \Divide   -type l -delete
+    find . -name \Process  -type l -delete
   fi
 done
 
