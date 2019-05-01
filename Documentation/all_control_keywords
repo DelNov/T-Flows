@@ -1,4 +1,4 @@
-#
+
 Input-output
 
 	BACKUP_SAVE_INTERVAL				100
@@ -12,6 +12,7 @@ Input-output
 	RESULTS_SAVE_INTERVAL				50
 	SAVE_INITIAL_SOLUTION_NAME			skip
 	SAVE_BACKUP_NAME				skip
+        WALL_TIME_MAX_HOURS				168.0
 
 Numerics
 
