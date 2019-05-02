@@ -139,6 +139,10 @@
     call Find_Nearest_Wall_Cell(grid)
   end if
 
+  if(turbulence_model .eq. HYBRID_LES_PRANDTL .and. .not. backup) then
+    call Find_Nearest_Wall_Cell(grid)
+  end if
+
   ! Prepare the gradient matrix for velocities
   call Compute_Gradient_Matrix(grid, .true.)
 
@@ -210,6 +214,12 @@
 
     if(turbulence_model .eq. HYBRID_LES_RANS) then
       call Turb_Mod_Vis_T_Dynamic(turb, sol)
+      call Turb_Mod_Vis_T_Hybrid (turb)
+    end if
+
+
+    if(turbulence_model .eq. HYBRID_LES_PRANDTL) then
+      call Calculate_Shear_And_Vorticity(flow)
       call Turb_Mod_Vis_T_Hybrid (turb)
     end if
 
