@@ -58,6 +58,8 @@
       turbulence_model = K_EPS_ZETA_F
     case('LES_SMAGORINSKY')
       turbulence_model = LES_SMAGORINSKY
+    case('HYBRID_LES_PRANDTL')
+      turbulence_model = HYBRID_LES_PRANDTL
     case('LES_DYNAMIC')
       turbulence_model = LES_DYNAMIC
     case('LES_WALE')
@@ -93,12 +95,13 @@
   !-------------------------------------------------------------------!
   !   For scale-resolving simulations, engage turbulence statistics   !
   !-------------------------------------------------------------------!
-  if(turbulence_model .eq. LES_SMAGORINSKY .or.  &
-     turbulence_model .eq. LES_DYNAMIC     .or.  &
-     turbulence_model .eq. LES_WALE        .or.  &
-     turbulence_model .eq. DNS             .or.  &
-     turbulence_model .eq. DES_SPALART     .or.  &
-     turbulence_model .eq. HYBRID_LES_RANS .or.  &
+  if(turbulence_model .eq. LES_SMAGORINSKY         .or.  &
+     turbulence_model .eq. LES_DYNAMIC             .or.  &
+     turbulence_model .eq. LES_WALE                .or.  &
+     turbulence_model .eq. DNS                     .or.  &
+     turbulence_model .eq. DES_SPALART             .or.  &
+     turbulence_model .eq. HYBRID_LES_PRANDTL      .or.  &
+     turbulence_model .eq. HYBRID_LES_RANS         .or.  &
      n_times > n_stat) then  ! last line covers unsteady RANS models
 
     if(this_proc < 2) then
@@ -152,6 +155,11 @@
   !-------------------------------------------------------------------------!
   !   Initialization of model constants depending on the turbulence model   !
   !-------------------------------------------------------------------------!
+  if(turbulence_model .eq. LES_SMAGORINSKY .or.  &
+     turbulence_model .eq. HYBRID_LES_PRANDTL) then
+    call Control_Mod_Smagorinsky_Constant(c_smag, .true.)
+  end if
+
   if(turbulence_model .eq. K_EPS) then
     call Turb_Mod_Const_K_Eps(turb)
   end if
