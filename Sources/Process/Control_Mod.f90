@@ -66,6 +66,7 @@
     ! Turbulence
     include 'Control_Mod/Physics/Roughness_Coefficient.f90'
     include 'Control_Mod/Physics/Rough_Walls.f90'
+    include 'Control_Mod/Physics/Smagorinsky_Constant.f90'
     include 'Control_Mod/Physics/Turbulence_Model.f90'
     include 'Control_Mod/Physics/Turbulence_Model_Variant.f90'
     include 'Control_Mod/Physics/Turbulent_Prandtl_Number.f90'
