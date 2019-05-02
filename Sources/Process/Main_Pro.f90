@@ -28,27 +28,30 @@
 !----------------------------------[Locals]------------------------------------!
   integer           :: n, sc
   real              :: mass_res
-  real              :: wall_time_start, wall_time_current, wall_time_max, wtmh
   character(len=80) :: name_save
   logical           :: backup, save_now, exit_now
-  type(Grid_Type)   :: grid        ! grid used in computations
-  type(Field_Type)  :: flow        ! flow field we will be solving for
-  type(Swarm_Type)  :: swarm       ! swarm of particles
-  type(Turb_Type)   :: turb        ! turbulence modelling
-  type(Solver_Type) :: sol         ! linear solvers
-  real              :: time        ! physical time of the simulation
-  integer           :: first_dt    ! first time step in this run
-  integer           :: last_dt     ! number of time steps
-  integer           :: max_ini     ! max number of inner iterations
-  integer           :: min_ini     ! min number of inner iterations
-  integer           :: n_stat      ! starting time step for statistic
-  integer           :: ini         ! inner iteration counter
-  integer           :: bsi, rsi    ! backup and results save interval
-  real              :: simple_tol  ! tolerance for SIMPLE algorithm
+  type(Grid_Type)   :: grid            ! grid used in computations
+  type(Field_Type)  :: flow            ! flow field we will be solving for
+  type(Swarm_Type)  :: swarm           ! swarm of particles
+  type(Turb_Type)   :: turb            ! turbulence modelling
+  type(Solver_Type) :: sol             ! linear solvers
+  real              :: time            ! physical time of the simulation
+  integer           :: first_dt        ! first time step in this run
+  integer           :: last_dt         ! number of time steps
+  integer           :: max_ini         ! max number of inner iterations
+  integer           :: min_ini         ! min number of inner iterations
+  integer           :: n_stat          ! starting time step for statistic
+  integer           :: ini             ! inner iteration counter
+  integer           :: bsi, rsi        ! backup and results save interval
+  real              :: simple_tol      ! tolerance for SIMPLE algorithm
+  integer           :: sc_cr           ! system clock count rate
+  integer           :: sc_ini, sc_cur  ! system clock start and end rate
+  real              :: wt_max
 !==============================================================================!
 
   ! Get starting time
-  call cpu_time(wall_time_start)
+  call system_clock(count_rate=sc_cr)  ! get system clock clock rate
+  call system_clock(sc_ini)            ! get system clock initial count rate
   time =  0.
   backup = .false.  ! can turn .true. in Load_Backup
 
@@ -155,10 +158,10 @@
   !---------------!
 
   call Control_Mod_Time_Step(flow % dt, verbose=.true.)
-  call Control_Mod_Backup_Save_Interval (bsi,  verbose=.true.)
-  call Control_Mod_Results_Save_Interval(rsi,  verbose=.true.)
-  call Control_Mod_Wall_Time_Max_Hours  (wtmh, verbose=.true.)
-  wall_time_max = wtmh * 3600  ! make it in seconda
+  call Control_Mod_Backup_Save_Interval (bsi,    verbose=.true.)
+  call Control_Mod_Results_Save_Interval(rsi,    verbose=.true.)
+  call Control_Mod_Wall_Time_Max_Hours  (wt_max, verbose=.true.)
+  wt_max = wt_max * 3600  ! make it in seconds
 
   ! Form the file name before the time, in case ...
   ! ... user just wants to save files from backup
@@ -186,8 +189,8 @@
     call Info_Mod_Bulk_Start()
 
     ! Initialize and print time info box
-    call cpu_time(wall_time_current)
-    call Info_Mod_Time_Fill( n, time, (wall_time_current-wall_time_start) )
+    call system_clock(sc_cur)
+    call Info_Mod_Time_Fill( n, time, (sc_cur-sc_ini)/real(sc_cr) )
     call Info_Mod_Time_Print()
 
     if(turbulence_model .eq. DES_SPALART) then
@@ -398,7 +401,7 @@
     if(save_now           .or.  &
        exit_now           .or.  &
        mod(n, bsi) .eq. 0 .or.  &
-       (wall_time_current - wall_time_start) > wall_time_max) then
+       (sc_cur-sc_ini)/real(sc_cr) > wt_max) then
       call Backup_Mod_Save(flow, swarm, turb, n, n_stat, name_save)
     end if
 
@@ -406,7 +409,7 @@
     if(save_now           .or.  &
        exit_now           .or.  &
        mod(n, rsi) .eq. 0 .or.  &
-       (wall_time_current - wall_time_start) > wall_time_max) then
+       (sc_cur-sc_ini)/real(sc_cr) > wt_max) then
       call Comm_Mod_Wait
       call Save_Results(flow, turb, name_save)
       call Save_Swarm (swarm, name_save)
@@ -435,7 +438,7 @@
     end if
 
     ! Ran more than a set limit
-    if((wall_time_current - wall_time_start) > wall_time_max) then
+    if((sc_cur-sc_ini)/real(sc_cr) > wt_max) then
       goto 2
     end if
 
