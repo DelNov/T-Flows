@@ -232,7 +232,8 @@
 
   ! Computation of turbulence viscosity
   include 'Turb_Mod/Vis_T_Dynamic.f90'
-  include 'Turb_Mod/Vis_T_Hybrid.f90'
+  include 'Turb_Mod/Vis_T_Hybrid_Les_Prandtl.f90'
+  include 'Turb_Mod/Vis_T_Hybrid_Les_Rans.f90'
   include 'Turb_Mod/Vis_T_K_Eps.f90'
   include 'Turb_Mod/Vis_T_K_Eps_Zeta_F.f90'
   include 'Turb_Mod/Vis_T_Rsm.f90'
