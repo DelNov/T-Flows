@@ -192,6 +192,9 @@
   if(turbulence_model .eq. K_EPS) then
     if(phi % name .eq. 'KIN') call Turb_Mod_Src_Kin_K_Eps(turb, sol)
     if(phi % name .eq. 'EPS') call Turb_Mod_Src_Eps_K_Eps(turb, sol)
+    if(heat_transfer) then
+      if(phi % name .eq. 'T2')  call Turb_Mod_Src_T2(turb, sol)
+    end if
   end if
 
   if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
@@ -200,10 +203,9 @@
     if(phi % name .eq. 'EPS')  call Turb_Mod_Src_Eps_K_Eps_Zeta_F(turb, sol)
     if(phi % name .eq. 'ZETA')  &
       call Turb_Mod_Src_Zeta_K_Eps_Zeta_F(turb, sol, n_step)
-  end if
-
-  if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
-    if(phi % name .eq. 'T2')  call Turb_Mod_Src_T2(turb, sol)
+    if(heat_transfer) then
+      if(phi % name .eq. 'T2')  call Turb_Mod_Src_T2(turb, sol)
+    end if
   end if
 
   if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
@@ -245,11 +247,10 @@
       call Info_Mod_Iter_Fill_At(3, 2, phi % name, exec_iter, phi % res)
     if(phi % name .eq. 'ZETA')  &
       call Info_Mod_Iter_Fill_At(3, 3, phi % name, exec_iter, phi % res)
-  end if
-
-  if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
-    if(phi % name .eq. 'T2')  &
+    if(heat_transfer) then
+      if(phi % name .eq. 'T2')  &
       call Info_Mod_Iter_Fill_At(3, 5, phi % name, exec_iter, phi % res)
+    end if
   end if
 
   call Comm_Mod_Exchange_Real(grid, phi % n)

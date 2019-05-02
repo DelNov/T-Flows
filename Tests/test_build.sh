@@ -22,7 +22,9 @@ CGNS="no"
 #update-alternatives --install /usr/bin/mpirun mpirun /usr/bin/mpirun.openmpi 20
 #update-alternatives --install /usr/bin/mpirun mpirun /usr/bin/mpirun.mpich   80
 
+#-------------------------
 # Folders with test cases
+#-------------------------
 LAMINAR_BACKSTEP_ORTH_DIR=Laminar/Backstep/Orthogonal
 LAMINAR_BACKSTEP_NON_ORTH_DIR=Laminar/Backstep/Nonorthogonal
 LAMINAR_CAVITY_LID_DRIVEN_DIR=Laminar/Cavity/Lid_Driven/Re_1000
@@ -133,7 +135,7 @@ ALL_PROCESS_MODELS=("none" \
                     "none" \
                     "k_eps" \
                     "k_eps_zeta_f" \
-                    "rsm_manceau_hanjalilc" \
+                    "rsm_manceau_hanjalic" \
                     "rsm_hanjalic_jakirlic" \
                     "hybrid_les_rans" \
                     "hybrid_les_rans")
@@ -332,6 +334,8 @@ function launch_process {
 # Generate tests
 #------------------------------------------------------------------------------#
 function generate_tests {
+
+  echo ""
   echo "#======================================================================"
   echo "#"
   echo "#   Running Generate tests"
@@ -396,6 +400,8 @@ function unpack_neu_mesh {
 # convert tests
 #------------------------------------------------------------------------------#
 function convert_tests {
+
+  echo ""
   echo "#======================================================================"
   echo "#"
   echo "#   Running Convert tests"
@@ -429,6 +435,8 @@ function convert_tests {
 # Divide tests
 #------------------------------------------------------------------------------#
 function divide_tests {
+
+  echo ""
   echo "#======================================================================"
   echo "#"
   echo "#   Running Divide tests"
@@ -777,6 +785,7 @@ function process_save_exit_now_test {
 #------------------------------------------------------------------------------#
 function process_save_exit_now_tests {
 
+  echo ""
   echo "#======================================================================"
   echo "#"
   echo "#   Running Processor save_now and exit_now tests"
@@ -867,6 +876,7 @@ function process_compilation_test {
 function process_compilation_tests {
   # $1 = dir with test
 
+  echo ""
   echo "#======================================================================"
   echo "#"
   echo "#   Running Processor compilation tests"
@@ -957,6 +967,7 @@ function process_full_length_tests {
   # $3 = dir with results
   # it requires a new file in Xmgrace/ dir called gnuplot_script_template.sh
 
+  echo ""
   echo "#======================================================================"
   echo "#"
   echo "#   Running Processor full simulation tests"
@@ -977,106 +988,6 @@ function process_full_length_tests {
       "$CASE_TUR" \
       "$TEST_DIR/$CASE_DIR/Xmgrace"
   done
-  exit 1
-
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "!!"
-  echo "!!    Test 1"
-  echo "!!"
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  # no User_Mod/ dir !!!
-  process_full_length_test \
-    "$TEST_DIR/$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
-    "none" \
-    "$TEST_DIR/$LAMINAR_CAVITY_LID_DRIVEN_DIR/Xmgrace"
-
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "!!"
-  echo "!!    Test 2"
-  echo "!!"
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  # no User_Mod/ dir !!!
-  process_full_length_test \
-    "$TEST_DIR/$LAMINAR_CAVITY_THERM_DRIVEN_106_DIR" \
-    "none" \
-    "$TEST_DIR/$LAMINAR_CAVITY_THERM_DRIVEN_106_DIR/Xmgrace"
-
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "!!"
-  echo "!!    Test 3"
-  echo "!!"
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  # no User_Mod/ dir !!!
-  process_full_length_test \
-    "$TEST_DIR/$LAMINAR_CAVITY_THERM_DRIVEN_108_DIR" \
-    "none" \
-    "$TEST_DIR/$LAMINAR_CAVITY_THERM_DRIVEN_108_DIR/Xmgrace"
-
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "!!"
-  echo "!!    Test 4"
-  echo "!!"
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  # [~2 min test]
-  process_full_length_test \
-    "$TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR" \
-    "k_eps" \
-    "$TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR/Xmgrace"
-
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "!!"
-  echo "!!    Test 5"
-  echo "!!"
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  # [~2 min test]
-  process_full_length_test \
-    "$TEST_DIR/$RANS_CHANNEL_LR_STRETCHED_DIR" \
-    "k_eps_zeta_f" \
-    "$TEST_DIR/$RANS_CHANNEL_LR_STRETCHED_DIR/Xmgrace"
-
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "!!"
-  echo "!!    Test 6"
-  echo "!!"
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  # [~5 min test]
-  process_full_length_test \
-    "$TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR" \
-    "rsm_manceau_hanjalic" \
-    "$TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR/Xmgrace"
-
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "!!"
-  echo "!!    Test 7"
-  echo "!!"
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  # [~5 min test]
-  process_full_length_test \
-    "$TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR" \
-    "rsm_hanjalic_jakirlic" \
-    "$TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR/Xmgrace"
-
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "!!"
-  echo "!!    Test 8"
-  echo "!!"
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  # [~4.5 HOURS test]
-  process_full_length_test \
-    "$TEST_DIR/$HYB_CHANNEL_HR_UNIFORM_DIR" \
-    "hybrid_les_rans" \
-    "$TEST_DIR/$HYB_CHANNEL_HR_UNIFORM_DIR/Xmgrace"
-
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "!!"
-  echo "!!    Test 9"
-  echo "!!"
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  # [~4 HOURS test]
-  process_full_length_test \
-    "$TEST_DIR/$HYB_CHANNEL_HR_STRETCHED_DIR" \
-    "hybrid_les_rans" \
-    "$TEST_DIR/$HYB_CHANNEL_HR_STRETCHED_DIR/Xmgrace"
 
 #  # Issue: pipe does not pass process_backup_tests
 #  process_full_length_test \
@@ -1084,6 +995,7 @@ function process_full_length_tests {
 #    "les_dynamic" \
 #    "$TEST_DIR/$LES_PIPE_DIR/Xmgrace"
 }
+
 #------------------------------------------------------------------------------#
 # actual script
 #------------------------------------------------------------------------------#

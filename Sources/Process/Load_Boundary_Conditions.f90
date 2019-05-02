@@ -275,6 +275,9 @@
               i = Key_Ind('KIN', keys, nks); if(i > 0) kin % n(c) = vals(i)
               i = Key_Ind('EPS', keys, nks); if(i > 0) eps % n(c) = vals(i)
               y_plus(c) = 1.1
+              if(heat_transfer) then
+                i = Key_Ind('T2',  keys, nks); if(i > 0) t2  % n(c) = vals(i)
+              end if
             end if
 
             if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
@@ -283,12 +286,11 @@
               i = Key_Ind('EPS',  keys, nks); if(i > 0) eps  % n(c) = vals(i)
               i = Key_Ind('ZETA', keys, nks); if(i > 0) zeta % n(c) = vals(i)
               i = Key_Ind('F22',  keys, nks); if(i > 0) f22  % n(c) = vals(i)
+              if(heat_transfer) then
+                i = Key_Ind('T2',  keys, nks); if(i > 0) t2  % n(c) = vals(i)
+              end if
             end if
 
-            if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
-              i = Key_Ind('T2',  keys, nks); if(i > 0) t2  % n(c) = vals(i)
-            end if
- 
             if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
                turbulence_model .eq. DES_SPALART) then
               i = Key_Ind('VIS',  keys, nks); if(i > 0) vis % n(c) = vals(i)
@@ -414,6 +416,9 @@
               if(turbulence_model .eq. K_EPS) then
                 i = Key_Ind('KIN', keys, nks); if(i > 0) kin % n(c) = prof(k,i)
                 i = Key_Ind('EPS', keys, nks); if(i > 0) eps % n(c) = prof(k,i)
+                if(heat_transfer) then
+                  i = Key_Ind('T2',  keys, nks); if(i>0) t2  % n(c) = prof(k,i)
+                end if
               end if
 
               if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
@@ -422,10 +427,9 @@
                 i = Key_Ind('EPS',  keys, nks); if(i>0) eps  % n(c) = prof(k,i)
                 i = Key_Ind('ZETA', keys, nks); if(i>0) zeta % n(c) = prof(k,i)
                 i = Key_Ind('F22',  keys, nks); if(i>0) f22  % n(c) = prof(k,i)
-              end if
-
-              if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
-                i = Key_Ind('T2',  keys, nks); if(i>0) t2  % n(c) = prof(k,i)
+                if(heat_transfer) then
+                  i = Key_Ind('T2',  keys, nks); if(i>0) t2  % n(c) = prof(k,i)
+                end if
               end if
 
               if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
@@ -626,6 +630,12 @@
 
                     i = Key_Ind('EPS',keys,nks)
                     if(i > 0) eps % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
+                  
+                    if(heat_transfer) then
+                      i = Key_Ind('T2',keys,nks)
+                      if(i > 0) t2 % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
+                    end if
+
                   end if
 
                   if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
@@ -642,11 +652,12 @@
 
                     i = Key_Ind('F22',keys,nks)
                     if(i > 0) f22 % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
-                  end if
+                    
+                    if(heat_transfer) then
+                      i = Key_Ind('T2',keys,nks)
+                      if(i > 0) t2 % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
+                    end if
 
-                  if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
-                    i = Key_Ind('T2',keys,nks)
-                    if(i > 0) t2 % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
                   end if
 
                   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &

@@ -8,6 +8,7 @@
   use Field_Mod,   only: Field_Type, heat_transfer, density
   use Comm_Mod
   use Turb_Mod
+  use Swarm_Mod
   use Grid_Mod
   use Bulk_Mod
   use User_Mod
@@ -157,6 +158,9 @@
           if(turbulence_model .eq. K_EPS) then
             i=Key_Ind('KIN',keys,nks);prof(k,0)=kin_def; kin%n(c)=prof(k,i)
             i=Key_Ind('EPS',keys,nks);prof(k,0)=eps_def; eps%n(c)=prof(k,i)
+            if(heat_transfer) then
+              i=Key_Ind('T2', keys,nks);prof(k,0)=t2_def; t2 %n(c)=prof(k,i)
+            end if
           end if
 
           if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
@@ -165,11 +169,10 @@
             i=Key_Ind('EPS', keys,nks);prof(k,0)=eps_def; eps %n(c)=prof(k,i)
             i=Key_Ind('ZETA',keys,nks);prof(k,0)=zeta_def;zeta%n(c)=prof(k,i)
             i=Key_Ind('F22', keys,nks);prof(k,0)=f22_def; f22 %n(c)=prof(k,i)
-          end if
-
-          if(turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
-            i=Key_Ind('T2', keys,nks);prof(k,0)=t2_def; t2 %n(c)=prof(k,i)
-          end if
+            if(heat_transfer) then
+              i=Key_Ind('T2', keys,nks);prof(k,0)=t2_def; t2 %n(c)=prof(k,i)
+            end if
+           end if
 
           if(turbulence_model .eq. DES_SPALART) then
             i=Key_Ind('VIS',keys,nks); prof(k,0)=vis_def; vis%n(c)=prof(k,i)
@@ -297,6 +300,11 @@
           eps % o(c)  = eps % n(c)
           eps % oo(c) = eps % n(c)
           y_plus(c) = 0.001
+          if(heat_transfer) then
+            vals(0) = t2_def;  t2 % n(c) = vals(Key_Ind('T2',  keys, nks))
+            t2 % o(c)  = t2 % n(c)
+            t2 % oo(c) = t2 % n(c)
+          end if
         end if
 
         if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
@@ -314,13 +322,11 @@
           f22  % o(c)  = f22  % n(c)
           f22  % oo(c) = f22  % n(c)
           y_plus(c) = 0.001
-        end if
-
-        if(turbulence_model .eq. K_EPS_ZETA_F .and. &
-           heat_transfer) then
-          vals(0) = t2_def;  t2 % n(c) = vals(Key_Ind('T2',  keys, nks))
-          t2 % o(c)  = t2 % n(c)
-          t2 % oo(c) = t2 % n(c)
+          if(heat_transfer) then
+            vals(0) = t2_def;  t2 % n(c) = vals(Key_Ind('T2',  keys, nks))
+            t2 % o(c)  = t2 % n(c)
+            t2 % oo(c) = t2 % n(c)
+          end if
         end if
 
         if(turbulence_model .eq. SPALART_ALLMARAS .or.  &

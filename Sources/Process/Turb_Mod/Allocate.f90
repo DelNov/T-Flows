@@ -47,10 +47,12 @@
     allocate(y_plus  (-nb:nc));  y_plus   = 0.
 
     if(heat_transfer) then
+      call Var_Mod_Allocate_Solution('T2', '', turb % t2, grid)
       call Var_Mod_Allocate_New_Only('UT', turb % ut, grid)
       call Var_Mod_Allocate_New_Only('VT', turb % vt, grid)
       call Var_Mod_Allocate_New_Only('WT', turb % wt, grid)
       allocate(con_wall(-nb:nc)); con_wall = 0.
+      allocate(p_t2    (-nb:nc)); p_t2     = 0.
     end if ! heat_transfer
 
     ! Turbulent statistics; if needed
@@ -138,6 +140,9 @@
       allocate(turb % eps_mean (-nb:nc));  turb % eps_mean  = 0.
       allocate(turb % f22_mean (-nb:nc));  turb % f22_mean  = 0.
       allocate(turb % zeta_mean(-nb:nc));  turb % zeta_mean = 0.
+      if(heat_transfer) then
+        allocate(turb % t2_mean(-nb:nc));  turb % t2_mean   = 0.
+      end if
 
       ! Resolved Reynolds stresses
       allocate(turb % uu_res(-nb:nc));  turb % uu_res = 0.
@@ -553,6 +558,7 @@
       call Var_Mod_Allocate_New_Only('VT', turb % vt, grid)
       call Var_Mod_Allocate_New_Only('WT', turb % wt, grid)
       allocate(con_wall(-nb:nc)); con_wall = 0.
+      allocate(p_t2    (-nb:nc)); p_t2     = 0.
     end if ! heat_transfer
 
     if(turbulence_statistics) then
@@ -571,6 +577,9 @@
       allocate(turb % eps_mean (-nb:nc));  turb % eps_mean  = 0.
       allocate(turb % f22_mean (-nb:nc));  turb % f22_mean  = 0.
       allocate(turb % zeta_mean(-nb:nc));  turb % zeta_mean = 0.
+      if(heat_transfer) then
+        allocate(turb % t2_mean(-nb:nc));  turb % t2_mean = 0.
+      end if
 
       ! Resolved Reynolds stresses
       allocate(turb % uu_res(-nb:nc));  turb % uu_res = 0.
