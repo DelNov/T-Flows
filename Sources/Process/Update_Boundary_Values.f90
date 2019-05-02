@@ -157,12 +157,12 @@
       ! Is this good in general case, when q <> 0 ??? Check it.
       if(heat_transfer) then
 
-
         ! If not DNS or LES, compute Prandtl number 
-        if(turbulence_model .ne. LES_SMAGORINSKY .and.  &
-           turbulence_model .ne. LES_DYNAMIC     .and.  &
-           turbulence_model .ne. LES_WALE        .and.  &
-           turbulence_model .ne. NONE            .and.  &
+        if(turbulence_model .ne. LES_SMAGORINSKY     .and.  &
+           turbulence_model .ne. LES_DYNAMIC         .and.  &
+           turbulence_model .ne. LES_WALE            .and.  &
+           turbulence_model .ne. HYBRID_LES_PRANDTL  .and.  &
+           turbulence_model .ne. NONE                .and.  &
            turbulence_model .ne. DNS) then
           pr_t = Turbulent_Prandtl_Number(grid, c1)
         end if
