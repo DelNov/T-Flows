@@ -143,9 +143,10 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
-    if(turbulence_model .ne. LES_SMAGORINSKY .or.  &
-       turbulence_model .ne. LES_DYNAMIC     .or.  &
-       turbulence_model .ne. LES_WALE        .or.  &
+    if(turbulence_model .ne. LES_SMAGORINSKY    .or.  &
+       turbulence_model .ne. LES_DYNAMIC        .or.  &
+       turbulence_model .ne. HYBRID_LES_PRANDTL .or.  &
+       turbulence_model .ne. LES_WALE           .or.  &
        turbulence_model .ne. DNS) then
       pr_t1 = Turbulent_Prandtl_Number(grid, c1)
       pr_t2 = Turbulent_Prandtl_Number(grid, c2)
