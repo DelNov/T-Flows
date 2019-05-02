@@ -118,7 +118,7 @@
 
   ! Initialize variables
   if(.not. backup) then
-    call Initialize_Variables(flow, turb)
+    call Initialize_Variables(flow, turb, swarm)
     call Comm_Mod_Wait
   end if
 
@@ -175,7 +175,7 @@
     time = time + flow % dt
 
     ! Beginning of time steo
-    call User_Mod_Beginning_Of_Time_Step(flow, swarm, n, time)
+    call User_Mod_Beginning_Of_Time_Step(flow, turb, swarm, n, time)
 
     ! Start info boxes.
     call Info_Mod_Time_Start()
@@ -269,6 +269,11 @@
 
         call Turb_Mod_Compute_Variable(turb, sol, ini, turb % kin, n)
         call Turb_Mod_Compute_Variable(turb, sol, ini, turb % eps, n)
+
+        if(heat_transfer) then
+          call Turb_Mod_Calculate_Heat_Flux(turb)
+          call Turb_Mod_Compute_Variable(turb, sol, ini, turb % t2, n)
+        end if
 
         call Turb_Mod_Vis_T_K_Eps(turb)
 
@@ -403,7 +408,7 @@
     end if
 
     ! Just before the end of time step
-    call User_Mod_End_Of_Time_Step(flow, swarm, n, time)
+    call User_Mod_End_Of_Time_Step(flow, turb, swarm, n, time)
 
     if(save_now) then
       if(this_proc < 2) then
