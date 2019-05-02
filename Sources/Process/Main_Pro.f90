@@ -214,13 +214,13 @@
 
     if(turbulence_model .eq. HYBRID_LES_RANS) then
       call Turb_Mod_Vis_T_Dynamic(turb, sol)
-      call Turb_Mod_Vis_T_Hybrid (turb)
+      call Turb_Mod_Vis_T_Hybrid_Les_Rans(turb)
     end if
 
 
     if(turbulence_model .eq. HYBRID_LES_PRANDTL) then
       call Calculate_Shear_And_Vorticity(flow)
-      call Turb_Mod_Vis_T_Hybrid (turb)
+      call Turb_Mod_Vis_T_Hybrid_Les_Prandtl(turb)
     end if
 
     call Convective_Outflow(flow, flow % dt)
