@@ -196,8 +196,9 @@
     end if
 
     if(c2 < 0) then
-      if( turbulence_model .eq. LES_SMAGORINSKY .or.  &
-          turbulence_model .eq. LES_DYNAMIC     .or.  &
+      if( turbulence_model .eq. LES_SMAGORINSKY    .or.  &
+          turbulence_model .eq. LES_DYNAMIC        .or.  &
+          turbulence_model .eq. HYBRID_LES_PRANDTL .or.  &
           turbulence_model .eq. LES_WALE) then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
