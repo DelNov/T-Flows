@@ -69,10 +69,11 @@
       !---------------------------------!
       !   Scale-resolving simulations   ! 
       !---------------------------------!
-      if(turbulence_model .eq. LES_SMAGORINSKY .or.  &
-         turbulence_model .eq. LES_DYNAMIC     .or.  &
-         turbulence_model .eq. LES_WALE        .or.  &
-         turbulence_model .eq. DES_SPALART     .or.  &
+      if(turbulence_model .eq. LES_SMAGORINSKY    .or.  &
+         turbulence_model .eq. LES_DYNAMIC        .or.  &
+         turbulence_model .eq. LES_WALE           .or.  &
+         turbulence_model .eq. HYBRID_LES_PRANDTL .or.  &
+         turbulence_model .eq. DES_SPALART        .or.  &
          turbulence_model .eq. DNS) then
 
         ! Mean velocities (and temperature)
