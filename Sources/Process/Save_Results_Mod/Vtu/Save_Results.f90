@@ -291,11 +291,12 @@
   end if
 
   ! Statistics for large-scale simulations of turbulence
-  if(turbulence_model .eq. LES_SMAGORINSKY .or.  &
-     turbulence_model .eq. LES_DYNAMIC     .or.  &
-     turbulence_model .eq. LES_WALE        .or.  &
-     turbulence_model .eq. DNS             .or.  &
-     turbulence_model .eq. DES_SPALART     .or.  &
+  if(turbulence_model .eq. LES_SMAGORINSKY    .or.  &
+     turbulence_model .eq. LES_DYNAMIC        .or.  &
+     turbulence_model .eq. LES_WALE           .or.  &
+     turbulence_model .eq. DNS                .or.  &
+     turbulence_model .eq. DES_SPALART        .or.  &
+     turbulence_model .eq. HYBRID_LES_PRANDTL .or.  &
      turbulence_model .eq. HYBRID_LES_RANS) then
     call Save_Vector(grid, IN_4, IN_5, "MeanVelocity",  &
                                            turb % u_mean(1),  &

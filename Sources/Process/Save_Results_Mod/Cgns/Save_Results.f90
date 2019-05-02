@@ -150,11 +150,11 @@
   !--------------------------!
 
   ! Kin and Eps
-  if(turbulence_model .eq. K_EPS                 .or.  &
-     turbulence_model .eq. K_EPS_ZETA_F          .or.  &
-     turbulence_model .eq. HYBRID_LES_RANS       .or.  &
-     turbulence_model .eq. RSM_MANCEAU_HANJALIC  .or.  &
-     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC       ) then
+  if(turbulence_model .eq. K_EPS                .or.  &
+     turbulence_model .eq. K_EPS_ZETA_F         .or.  &
+     turbulence_model .eq. HYBRID_LES_RANS      .or.  &
+     turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
+     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
 
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               turb % kin % n(1), "TurbulentKineticEnergy")
@@ -222,11 +222,13 @@
   end if
 
   ! Statistics for large-scale simulations of turbulence
-  if(turbulence_model .eq. LES_SMAGORINSKY .or.  &
-     turbulence_model .eq. LES_DYNAMIC     .or.  &
-     turbulence_model .eq. LES_WALE        .or.  &
-     turbulence_model .eq. DNS             .or.  &
-     turbulence_model .eq. DES_SPALART) then
+  if(turbulence_model .eq. LES_SMAGORINSKY    .or.  &
+     turbulence_model .eq. LES_DYNAMIC        .or.  &
+     turbulence_model .eq. LES_WALE           .or.  &
+     turbulence_model .eq. DNS                .or.  &
+     turbulence_model .eq. DES_SPALART        .or.  &
+     turbulence_model .eq. HYBRID_LES_PRANDTL .or.  &
+     turbulence_model .eq. HYBRID_LES_RANS) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               turb % u_mean(1),"MeanVelocityX")
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
