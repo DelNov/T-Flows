@@ -54,6 +54,7 @@
   flow => turb % pnt_flow
   grid => flow % pnt_grid
   dt   =  flow % dt
+  flux => flow % flux
   call Field_Mod_Alias_Momentum   (flow, u, v, w)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
   call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)

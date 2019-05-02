@@ -33,7 +33,7 @@
                          tt_p(:), ut_p(:), vt_p(:), wt_p(:), tt_mod_p(:),  &
                          ut_mod(:), vt_mod(:), wt_mod(:)
   integer, allocatable :: n_p(:), n_count(:)
-  real                 :: t_wall, t_tau, d_wall, nu_max, t_hot, t_cold, t_diff
+  real                 :: t_wall, t_tau, d_wall, t_hot, t_cold, t_diff
   logical              :: there
 !==============================================================================!
 
@@ -76,17 +76,17 @@
   inquire(file=coord_name, exist=there)
   if(.not. there) then
     if(this_proc < 2) then
-      print *, '==============================================================='
-      print *, 'In order to extract profiles and write them in ascii files'
-      print *, 'the code has to read cell-faces coordinates '
-      print *, 'in wall-normal direction in the ascii file ''case_name.1d.'''
-      print *, 'The file format should be as follows:'
-      print *, '10  ! number of cells + 1'
-      print *, '1 0.0'
-      print *, '2 0.1'
-      print *, '3 0.2'
-      print *, '... '
-      print *, '==============================================================='
+      print *, '#=============================================================='
+      print *, '# In order to extract profiles and write them in ascii files'
+      print *, '# the code has to read cell-faces coordinates '
+      print *, '# in wall-normal direction in the ascii file ''case_name.1d.'''
+      print *, '# The file format should be as follows:'
+      print *, '# 10  ! number of cells + 1'
+      print *, '# 1 0.0'
+      print *, '# 2 0.1'
+      print *, '# 3 0.2'
+      print *, '# ... '
+      print *, '#--------------------------------------------------------------'
     end if
 
     ! Restore the name and return
@@ -94,8 +94,7 @@
     return
   end if
 
-  t_wall = 0.0
-  nu_max = 0.0
+  t_wall   = 0.0
   n_points = 0
 
   open(9, file=coord_name)
@@ -249,45 +248,43 @@
       write(*,'(a1,(a12, f12.6))')'#', ' Nu number = ',  &
                0.05*(t_hot-ti_p(1)+ti_p(n_prob-1)-t_cold) / wall_p(1)
     end if
-    nu_max = tz_p(1)
-  call Comm_Mod_Global_Sum_Real(nu_max)
   end if
 
-  write(i,'(a1,2x,a60)') '#', ' z,'                    //  &
-                              ' u,'                    //  &
-                              ' uu, vv, ww, uw'        //  &
-                              ' kin'                   //  &
-                              ' t, ut, vt, wt'
+  write(i,'(a1,2x,a60)') '#', ' z,'                    //  &  !  1
+                              ' u,'                    //  &  !  2
+                              ' uu, vv, ww, uw'        //  &  !  3 -  6
+                              ' kin'                   //  &  !  7
+                              ' t, ut, vt, wt'                !  8 - 11
 
   do i = 1, n_prob-1
-    t_p (i) = (t_p(i) - t_cold) / t_diff  ! t % n(c)
-    tt_p(i) = tt_p(i) / (t_diff*t_diff)    ! ut % n(c)
+    t_p (i) = (t_p(i) - t_cold) / t_diff           ! t % n(c)
+    tt_p(i) = tt_p(i) / (t_diff*t_diff)            ! ut % n(c)
     tt_mod_p(i) = tt_mod_p(i) / (t_diff*t_diff)    ! ut % n(c)
   end do
 
   do i = 1, n_prob
     if(n_count(i) .ne. 0) then
-      write(3,'(21e15.7)') wall_p(i),                    &
-                             tz_p(i),                    &
-                             (ti_p(i) - t_cold)/t_diff,  &
-                             w_p(i),                     &
-                             kin_p(i),                   &
-                             kin_mod_p(i),               &
-                             (kin_p(i) + kin_mod_p(i)),  &
-                             uw_p(i),                    &
-                             (t_p(i) - t_cold)/t_diff,   &
-                             tt_p(i),                    &
-                             tt_mod_p(i),                &
-                             (tt_p(i)+tt_mod_p(i)),      &
-                             ut_p(i),                    &
-                             vt_p(i),                    &
-                             wt_p(i),                    &
-                             ut_mod(i),                  &
-                             vt_mod(i),                  &
-                             wt_mod(i),                  &
-                             ut_p(i) + ut_mod(i),        &
-                             vt_p(i) + vt_mod(i),        &
-                             wt_p(i) + wt_mod(i)
+      write(3,'(21e15.7)') wall_p(i),                  &  !  1
+                           tz_p(i),                    &  !  2
+                           (ti_p(i) - t_cold)/t_diff,  &  !  3
+                           w_p(i),                     &  !  4
+                           kin_p(i),                   &  !  5
+                           kin_mod_p(i),               &  !  6
+                           (kin_p(i) + kin_mod_p(i)),  &  !  7
+                           uw_p(i),                    &  !  8
+                           (t_p(i) - t_cold)/t_diff,   &  !  9
+                           tt_p(i),                    &  ! 10
+                           tt_mod_p(i),                &  ! 11
+                           (tt_p(i)+tt_mod_p(i)),      &  ! 12
+                           ut_p(i),                    &  ! 13
+                           vt_p(i),                    &  ! 14
+                           wt_p(i),                    &  ! 15
+                           ut_mod(i),                  &  ! 16
+                           vt_mod(i),                  &  ! 17
+                           wt_mod(i),                  &  ! 18
+                           ut_p(i) + ut_mod(i),        &  ! 19
+                           vt_p(i) + vt_mod(i),        &  ! 20
+                           wt_p(i) + wt_mod(i)            ! 21
     end if
   end do
 
@@ -313,7 +310,7 @@
     deallocate(wt_p)
   end if
 
-  if(this_proc < 2)  write(6, *) '# Finished with User_Mod_Save_Results.f90.'
+  if(this_proc < 2)  print *, '# Finished with User_Mod_Save_Results.f90.'
 
   ! Restore the name
   problem_name = store_name

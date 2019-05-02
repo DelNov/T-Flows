@@ -10,7 +10,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: grid
   type(Particle_Type), pointer :: part
-  integer                      :: i, k, c
+  integer                      :: i, k
 !==============================================================================!
 
   ! Take aliases

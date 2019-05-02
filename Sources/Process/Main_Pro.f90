@@ -27,7 +27,8 @@
   real :: Correct_Velocity
 !----------------------------------[Locals]------------------------------------!
   integer           :: n, sc
-  real              :: mass_res, wall_time_start, wall_time_current
+  real              :: mass_res
+  real              :: wall_time_start, wall_time_current, wall_time_max, wtmh
   character(len=80) :: name_save
   logical           :: backup, save_now, exit_now
   type(Grid_Type)   :: grid        ! grid used in computations
@@ -154,8 +155,10 @@
   !---------------!
 
   call Control_Mod_Time_Step(flow % dt, verbose=.true.)
-  call Control_Mod_Backup_Save_Interval(bsi, verbose=.true.)
-  call Control_Mod_Results_Save_Interval(rsi, verbose=.true.)
+  call Control_Mod_Backup_Save_Interval (bsi,  verbose=.true.)
+  call Control_Mod_Results_Save_Interval(rsi,  verbose=.true.)
+  call Control_Mod_Wall_Time_Max_Hours  (wtmh, verbose=.true.)
+  wall_time_max = wtmh * 3600  ! make it in seconda
 
   ! Form the file name before the time, in case ...
   ! ... user just wants to save files from backup
@@ -392,12 +395,18 @@
                     len_trim(problem_name)+9), '(i6.6)') n
 
     ! Is it time to save the backup file?
-    if(save_now .or. exit_now .or. mod(n, bsi) .eq. 0) then
+    if(save_now           .or.  &
+       exit_now           .or.  &
+       mod(n, bsi) .eq. 0 .or.  &
+       (wall_time_current - wall_time_start) > wall_time_max) then
       call Backup_Mod_Save(flow, swarm, turb, n, n_stat, name_save)
     end if
 
     ! Is it time to save results for post-processing
-    if(save_now .or. exit_now .or. mod(n, rsi) .eq. 0) then
+    if(save_now           .or.  &
+       exit_now           .or.  &
+       mod(n, rsi) .eq. 0 .or.  &
+       (wall_time_current - wall_time_start) > wall_time_max) then
       call Comm_Mod_Wait
       call Save_Results(flow, turb, name_save)
       call Save_Swarm (swarm, name_save)
@@ -422,6 +431,11 @@
         open (9, file='exit_now', status='old')
         close(9, status='delete')
       end if
+      goto 2
+    end if
+
+    ! Ran more than a set limit
+    if((wall_time_current - wall_time_start) > wall_time_max) then
       goto 2
     end if
 

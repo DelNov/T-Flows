@@ -1,3 +1,4 @@
+#-------------------------------------------------------------------------------
 #
 #   Process Makefile
 #
@@ -218,42 +219,7 @@ SRC_MOD += Control_Mod.f90	\
            Turb_Mod.f90		\
            Swarm_Mod.f90
 
-SRC_MOD += User_Mod.f90
-
-# Backup_Mod should come last because it uses all other modules
-SRC_MOD += Backup_Mod.f90
-
-#---------------
-#   Functions
-#---------------
-
-# Sources for all functions are obtained by a shell command
-SRC_FUN =  $(shell ls -1 *.f90 | grep -v -i _Mod 		\
-                               | grep -v -i Save_Cgns		\
-                               | grep -v -i Save_Vtu_Results	\
-                               | grep -v -i Save_Vtu_Swarm)
-SRC_FUN += $(shell ls -1 $(DIR_TURBUL)/*.f90		\
-                         | xargs -n1 basename		\
-                         | grep -v -i Allocate		\
-                         | grep -v -i Calculate_	\
-                         | grep -v -i Compute_		\
-                         | grep -v -i Alias_		\
-                         | grep -v -i Const_		\
-                         | grep -v -i Vis_T_		\
-                         | grep -v -i Src_		\
-                         | grep -v -i _Mod)
-
-SRC_FUN += Distance.f90		\
-           Distance_Squared.f90	\
-           Name_File.f90	\
-           Approx_Real.f90	\
-           Approx_String.f90	\
-           Swap_Int.f90		\
-           Swap_Real.f90	\
-           Swap_Short.f90	\
-           To_Upper_Case.f90
-
-# Conditional CGNS support
+# Save_Results_Mod - conditional VTU/CGNS support
 ifeq ($(CGNS), no)
   SRC_MOD += Save_Grid_Mod_Vtu.f90	\
              Save_Results_Mod_Vtu.f90
@@ -266,6 +232,39 @@ else
   SRC_MOD += Save_Grid_Mod_Cgns.f90	\
              Save_Results_Mod_Cgns.f90
 endif
+
+SRC_MOD += User_Mod.f90
+
+# Backup_Mod should come last because it uses all other modules
+SRC_MOD += Backup_Mod.f90
+
+#---------------
+#   Functions
+#---------------
+
+# Sources for all functions in the local ...
+# ... directory are obtained by a shell command
+SRC_FUN =  $(shell ls -1 *.f90 | grep -v -i _Mod)
+
+# Non-member functions still residing in Turb_Mod
+SRC_FUN += Y_Plus_Low_Re.f90		\
+           Y_Plus_Rough_Walls.f90	\
+           U_Plus_Log_Law.f90		\
+           U_Plus_Rough_Walls.f90	\
+           Time_And_Length_Scale.f90	\
+           Find_Nearest_Wall_Cell.f90	\
+           Turbulent_Prandtl_Number.f90	\
+           Roughness_Coefficient.f90
+
+SRC_FUN += Distance.f90		\
+           Distance_Squared.f90	\
+           Name_File.f90	\
+           Approx_Real.f90	\
+           Approx_String.f90	\
+           Swap_Int.f90		\
+           Swap_Real.f90	\
+           Swap_Short.f90	\
+           To_Upper_Case.f90
 
 #----------------------------------------------------------------------
 #   List of objects generated from the list of modules and functions

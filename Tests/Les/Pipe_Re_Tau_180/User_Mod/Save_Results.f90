@@ -1,23 +1,26 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(flow, save_name) 
+  subroutine User_Mod_Save_Results(flow, turb, save_name) 
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
 !                                                                              !
 !   The results are then writen in files name_res.dat and name_res_plus.dat    !
 !------------------------------------------------------------------------------!
-  use Grid_Mod,  only: Grid_Type
-  use Field_Mod
-  use Var_Mod,   only: Var_Type
-  use Bulk_Mod,  only: Bulk_Type
-  use Rans_Mod
-  use Comm_Mod                       ! parallel stuff
-  use Name_Mod,  only: problem_name
   use Const_Mod                      ! constants
+  use Comm_Mod                       ! parallel stuff
+  use Grid_Mod,  only: Grid_Type
+  use Field_Mod, only: Field_Type, heat_transfer, heat_flux, heat, &
+                       density, viscosity, capacity, conductivity, &
+                       heated_area 
+  use Bulk_Mod,  only: Bulk_Type
+  use Var_Mod,   only: Var_Type
+  use Name_Mod,  only: problem_name
+  use Turb_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
+  type(Turb_Type),  target :: turb
   character(len=*)         :: save_name
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
@@ -29,9 +32,10 @@
   real, allocatable        :: z_p(:), u_p(:), v_p(:), w_p(:), t_p(:),  &
                               ind(:),  wall_p(:), kin_p(:), eps_p(:),  &
                               uw_p(:), uu_p(:), vv_p(:), ww_p(:),      &
-                              tt_p(:), ut_p(:), vt_p(:), wt_p(:)
+                              t2_p(:), ut_p(:), vt_p(:), wt_p(:)
   integer, allocatable     :: n_p(:), n_count(:)
-  real                     :: t_wall, t_tau, d_wall, nu_max, b11, b12, b22, b21
+  real                     :: t_wall, t_tau, d_wall, nu_mean
+  real                     :: b11, b12, b22, b21
   real                     :: ubulk, error, re, cf_dean, cf, pr, u_tau_p, t_inf
   real                     :: uu_c, vv_c, ww_c, uv_c, uw_c, vw_c, r, rad
   logical                  :: there
@@ -39,11 +43,9 @@
 
   ! Take aliases
   grid => flow % pnt_grid
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
-  t    => flow % t
   bulk => flow % bulk
+  call Field_Mod_Alias_Momentum(flow, u, v, w)
+  call Field_Mod_Alias_Energy  (flow, t)
 
   ! Set the name for coordinate file
   call Name_File(0, coord_name, ".1r")
@@ -61,17 +63,17 @@
   inquire(file=coord_name, exist=there)
   if(.not. there) then
     if(this_proc < 2) then
-      print *, '==============================================================='
-      print *, 'In order to extract profiles and write them in ascii files'
-      print *, 'the code has to read cell-faces coordinates '
-      print *, 'in wall-normal direction in the ascii file ''case_name.1d.'''
-      print *, 'The file format should be as follows:'
-      print *, '10  ! number of cells + 1'
-      print *, '1 0.0'
-      print *, '2 0.1'
-      print *, '3 0.2'
-      print *, '... '
-      print *, '==============================================================='
+      print *, '#=============================================================='
+      print *, '# In order to extract profiles and write them in ascii files'
+      print *, '# the code has to read cell-faces coordinates '
+      print *, '# in wall-normal direction in the ascii file ''case_name.1d.'''
+      print *, '# The file format should be as follows:'
+      print *, '# 10  ! number of cells + 1'
+      print *, '# 1 0.0'
+      print *, '# 2 0.1'
+      print *, '# 3 0.2'
+      print *, '# ... '
+      print *, '#--------------------------------------------------------------'
     end if
 
     ! Restore the name and return
@@ -79,9 +81,9 @@
     return
   end if
 
-  ubulk = abs(bulk % flux_z / (density*bulk % area_z))
-  t_wall = 0.0
-  nu_max = 0.0
+  ubulk    = abs(bulk % flux_z / (density*bulk % area_z))
+  t_wall   = 0.0
+  nu_mean  = 0.0
   n_points = 0
 
   open(9, file=coord_name)
@@ -107,11 +109,11 @@
   allocate(ww_p  (n_prob));  ww_p     = 0.0
   allocate(uw_p  (n_prob));  uw_p     = 0.0
 
-  allocate(n_count(n_prob)); n_count=0
+  allocate(n_count(n_prob)); n_count = 0
   count = 0
   if(heat_transfer) then
-    allocate(t_p (n_prob));  t_p = 0.0
-    allocate(tt_p(n_prob));  tt_p = 0.0
+    allocate(t_p (n_prob));  t_p  = 0.0
+    allocate(t2_p(n_prob));  t2_p = 0.0
     allocate(ut_p(n_prob));  ut_p = 0.0
     allocate(vt_p(n_prob));  vt_p = 0.0
     allocate(wt_p(n_prob));  wt_p = 0.0
@@ -132,16 +134,16 @@
         b22 =  b11
 
         wall_p(i) = wall_p(i) + grid % wall_dist(c)
-        u_p   (i) = u_p   (i) + u % mean(c)
-        v_p   (i) = v_p   (i) + v % mean(c)
-        w_p   (i) = w_p   (i) + abs(w % mean(c))
+        u_p   (i) = u_p   (i) + turb % u_mean(c)
+        v_p   (i) = v_p   (i) + turb % v_mean(c)
+        w_p   (i) = w_p   (i) + abs(turb % w_mean(c))
 
-        uu_c    = uu % mean(c) - u % mean(c) * u % mean(c)
-        vv_c    = vv % mean(c) - v % mean(c) * v % mean(c)
-        ww_c    = ww % mean(c) - w % mean(c) * w % mean(c)
-        uv_c    = uv % mean(c) - u % mean(c) * v % mean(c)
-        uw_c    = uw % mean(c) - u % mean(c) * w % mean(c)
-        vw_c    = vw % mean(c) - v % mean(c) * w % mean(c)
+        uu_c    = turb % uu_res(c) - turb % u_mean(c) * turb % u_mean(c)
+        vv_c    = turb % vv_res(c) - turb % v_mean(c) * turb % v_mean(c)
+        ww_c    = turb % ww_res(c) - turb % w_mean(c) * turb % w_mean(c)
+        uv_c    = turb % uv_res(c) - turb % u_mean(c) * turb % v_mean(c)
+        uw_c    = turb % uw_res(c) - turb % u_mean(c) * turb % w_mean(c)
+        vw_c    = turb % vw_res(c) - turb % v_mean(c) * turb % w_mean(c)
 
         uu_p(i) = uu_p(i) + b11*b11*uu_c + b11*b12*uv_c &
                           + b12*b11*uv_c + b12*b12*vv_c
@@ -151,13 +153,17 @@
         uw_p(i) = uw_p(i) + abs(b11*uw_c + b12*vw_c)
 
         if(heat_transfer) then
-          t_p(i)  = t_p(i)  + t % mean(c)
-          tt_p(i) = tt_p(i) + tt % mean(c) - t % mean(c) * t % mean(c)
-          ut_p(i) = ut_p(i) + ut % mean(c) - (u % mean(c) * b11 &
-                                  + v % mean(c) * b12) * t % mean(c)
-          vt_p(i) = vt_p(i) + vt % mean(c) - (-v % mean(c) * b12 &
-                                  + v % mean(c) * b11) * t % mean(c)
-          wt_p(i) = wt_p(i) + wt % mean(c) - w % mean(c) * t % mean(c)
+          t_p(i)  = t_p(i)  + turb % t_mean(c)
+          t2_p(i) = t2_p(i) + turb % t2_res(c)  &
+                            - turb % t_mean(c) * turb % t_mean(c)
+          ut_p(i) = ut_p(i) + turb % ut_res(c)           &
+                            - (  turb % u_mean(c) * b11  &
+                               + turb % v_mean(c) * b12) * turb % t_mean(c)
+          vt_p(i) = vt_p(i) + turb % vt_res(c)           &
+                            - (- turb % v_mean(c) * b12  &
+                               + turb % v_mean(c) * b11) * turb % t_mean(c)
+          wt_p(i) = wt_p(i) + turb % wt_res(c)  &
+                            - turb % w_mean(c) * turb % t_mean(c)
         end if
         n_count(i) = n_count(i) + 1
       end if
@@ -183,7 +189,7 @@
 
     if(heat_transfer) then
       call Comm_Mod_Global_Sum_Real(t_p(pl))
-      call Comm_Mod_Global_Sum_Real(tt_p(pl))
+      call Comm_Mod_Global_Sum_Real(t2_p(pl))
       call Comm_Mod_Global_Sum_Real(ut_p(pl))
       call Comm_Mod_Global_Sum_Real(vt_p(pl))
       call Comm_Mod_Global_Sum_Real(wt_p(pl))
@@ -206,7 +212,7 @@
 
       if(heat_transfer) then
         t_p (i) = t_p (i) / n_count(i)
-        tt_p(i) = tt_p(i) / n_count(i)
+        t2_p(i) = t2_p(i) / n_count(i)
         ut_p(i) = ut_p(i) / n_count(i)
         vt_p(i) = vt_p(i) / n_count(i)
         wt_p(i) = wt_p(i) / n_count(i)
@@ -235,7 +241,7 @@
     do c = 1, grid % n_cells
       if(grid % wall_dist(c) > d_wall) then
         d_wall = grid % wall_dist(c)
-        t_inf  = t % mean(c)
+        t_inf  = turb % t_mean(c)
       end if
     end do
 
@@ -254,22 +260,23 @@
         if( Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. WALL .or.  &
             Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. WALLFL) then
 
-          t_wall = t_wall + t % mean(c2)
-          nu_max = nu_max + t % q(c2)/(conductivity*(t % mean(c2) - t_inf))
+          t_wall   = t_wall + turb % t_mean(c2)
+          nu_mean  = nu_mean + t % q(c2)  &
+                             / (conductivity*(turb % t_mean(c2) - t_inf))
           n_points = n_points + 1
         end if
       end if
     end do
 
     call Comm_Mod_Global_Sum_Real(t_wall)
-    call Comm_Mod_Global_Sum_Real(nu_max)
+    call Comm_Mod_Global_Sum_Real(nu_mean)
     call Comm_Mod_Global_Sum_Int(n_points)
 
     call Comm_Mod_Wait
 
-    t_wall = t_wall / n_points
-    nu_max = nu_max / n_points
-    t_tau  = heat_flux / (density * capacity * u_tau_p)
+    t_wall  = t_wall / n_points
+    nu_mean = nu_mean / n_points
+    t_tau   = heat_flux / (density * capacity * u_tau_p)
   end if
 
   open(3, file = res_name)
@@ -294,54 +301,54 @@
     write(i,'(a1,(a12,f12.6,a2,a22))') & 
     '#', 'Cf_error = ', error, ' %', 'Dean formula is used.'
     if(heat_transfer) then
-      write(i,'(a1,(a12, f12.6))')'#', 'Nu number =', nu_max 
+      write(i,'(a1,(a12, f12.6))')'#', 'Nu number =', nu_mean 
       write(i,'(a1,(a12, f12.6,a2,a39))')'#', 'Nu_error  =',  &
-            abs(0.023*0.5*re**0.8*pr**0.4 - nu_max)           &
+            abs(0.023*0.5*re**0.8*pr**0.4 - nu_mean)          &
             / (0.023*0.5*re**0.8*pr**0.4) * 100.0, ' %',      &
             'correlation of Dittus-Boelter is used.' 
     end if
 
     if(heat_transfer) then
-      write(i,'(a1,2x,a60)') '#',  ' z,'                    //  &
-                                   ' u,'                    //  &
-                                   ' uu, vv, ww, uw'        //  &
-                                   ' kin'                   //  &
-                                   ' t, ut, vt, wt,'   
+      write(i,'(a1,2x,a60)') '#',  ' z,'                    //  &  !  1
+                                   ' u,'                    //  &  !  2
+                                   ' uu, vv, ww, uw'        //  &  !  3 -  6
+                                   ' kin'                   //  &  !  7
+                                   ' t, ut, vt, wt,'               !  8 - 11
     else
-      write(i,'(a1,2x,a50)') '#',  ' z,'                    //  &
-                                   ' u,'                    //  &
-                                   ' uu, vv, ww, uw'        //  &
-                                   ' kin'  
+      write(i,'(a1,2x,a50)') '#',  ' z,'                    //  &  !  1
+                                   ' u,'                    //  &  !  2
+                                   ' uu, vv, ww, uw'        //  &  !  3 -  6
+                                   ' kin'                          !  7
     end if
   end do
 
   if(heat_transfer) then
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(3,'(12e15.7)') wall_p(i),                       &
-                             w_p(i),                          &
-                             uu_p(i),                         &
-                             vv_p(i),                         &
-                             ww_p(i),                         &
-                             uw_p(i),                         &
-                             0.5*(uu_p(i)+vv_p(i)+ww_p(i)),   &
-                             t_p(i),                          &
-                             tt_p(i),                         &
-                             ut_p(i),                         &
-                             vt_p(i),                         &
-                             wt_p(i)
+        write(3,'(12e15.7)') wall_p(i),                       &  !  1
+                             w_p(i),                          &  !  2
+                             uu_p(i),                         &  !  3
+                             vv_p(i),                         &  !  4
+                             ww_p(i),                         &  !  5
+                             uw_p(i),                         &  !  6
+                             0.5*(uu_p(i)+vv_p(i)+ww_p(i)),   &  !  7
+                             t_p(i),                          &  !  8
+                             t2_p(i),                         &  !  9
+                             ut_p(i),                         &  ! 10
+                             vt_p(i),                         &  ! 11
+                             wt_p(i)                             ! 12
       end if
     end do
   else
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(3,'(7e15.7)')  wall_p(i),                       &
-                             w_p(i),                          &
-                             uu_p(i),                         &
-                             vv_p(i),                         &
-                             ww_p(i),                         &
-                             uw_p(i),                         &
-                             0.5*(uu_p(i)+vv_p(i)+ww_p(i))
+        write(3,'(7e15.7)')  wall_p(i),                       &  !  1
+                             w_p(i),                          &  !  2
+                             uu_p(i),                         &  !  3
+                             vv_p(i),                         &  !  4
+                             ww_p(i),                         &  !  5
+                             uw_p(i),                         &  !  6
+                             0.5*(uu_p(i)+vv_p(i)+ww_p(i))       !  7
       end if
     end do
   end if
@@ -359,7 +366,7 @@
 
     if(heat_transfer) then
       t_p (i) = (t_wall - t_p(i)) / t_tau  ! t % n(c)
-      tt_p(i) = tt_p(i) / (t_tau*t_tau)    ! ut % n(c)
+      t2_p(i) = t2_p(i) / (t_tau*t_tau)    ! ut % n(c)
       ut_p(i) = ut_p(i) / (u_tau_p*t_tau)  ! ut % n(c)
       vt_p(i) = vt_p(i) / (u_tau_p*t_tau)  ! vt % n(c)
       wt_p(i) = wt_p(i) / (u_tau_p*t_tau)  ! wt % n(c)
@@ -369,30 +376,30 @@
   if(heat_transfer) then
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(4,'(12e15.7)') wall_p(i),                       &
-                             w_p(i),                          &
-                             uu_p(i),                         &
-                             vv_p(i),                         &
-                             ww_p(i),                         &
-                             uw_p(i),                         &
-                             0.5*(uu_p(i)+vv_p(i)+ww_p(i)),   &
-                             t_p(i),                          &
-                             tt_p(i),                         &
-                             ut_p(i),                         &
-                             vt_p(i),                         &
-                             wt_p(i)
+        write(4,'(12e15.7)') wall_p(i),                       &  !  1
+                             w_p(i),                          &  !  2
+                             uu_p(i),                         &  !  3
+                             vv_p(i),                         &  !  4
+                             ww_p(i),                         &  !  5
+                             uw_p(i),                         &  !  6
+                             0.5*(uu_p(i)+vv_p(i)+ww_p(i)),   &  !  7
+                             t_p(i),                          &  !  8
+                             t2_p(i),                         &  !  9
+                             ut_p(i),                         &  ! 10
+                             vt_p(i),                         &  ! 11
+                             wt_p(i)                             ! 12
       end if
     end do
   else
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(4,'(7e15.7)')  wall_p(i),                       &
-                             w_p(i),                          &
-                             uu_p(i),                         &
-                             vv_p(i),                         &
-                             ww_p(i),                         &
-                             uw_p(i),                         &
-                             0.5*(uu_p(i)+vv_p(i)+ww_p(i))
+        write(4,'(7e15.7)')  wall_p(i),                       &  !  1
+                             w_p(i),                          &  !  2
+                             uu_p(i),                         &  !  3
+                             vv_p(i),                         &  !  4
+                             ww_p(i),                         &  !  5
+                             uw_p(i),                         &  !  6
+                             0.5*(uu_p(i)+vv_p(i)+ww_p(i))       !  7
       end if
     end do
   end if
@@ -412,13 +419,13 @@
   deallocate(wall_p)
   if(heat_transfer) then
     deallocate(t_p)
-    deallocate(tt_p)
+    deallocate(t2_p)
     deallocate(ut_p)
     deallocate(vt_p)
     deallocate(wt_p)
   end if
 
-  if(this_proc < 2)  write(6, *) '# Finished with User_Mod_Save_Results.f90.'
+  if(this_proc < 2)  print *, '# Finished with User_Mod_Save_Results.f90.'
 
   ! Restore the name
   problem_name = store_name

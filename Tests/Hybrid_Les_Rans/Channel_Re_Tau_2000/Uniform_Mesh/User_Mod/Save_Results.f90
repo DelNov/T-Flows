@@ -34,9 +34,9 @@
                               u_p(:), v_p(:), w_p(:), y_plus_p(:),       &
                               kin_p(:), eps_p(:), uw_p(:), uw_mod_p(:),  &
                               uu_p(:), vv_p(:), ww_p(:), vis_t_p(:),     &
-                              t_p(:), tt_p(:), ut_p(:), vt_p(:), wt_p(:)
+                              t_p(:), t2_p(:), ut_p(:), vt_p(:), wt_p(:)
   integer,allocatable      :: n_p(:), n_count(:)
-  real                     :: t_wall, t_tau, d_wall, nu_max, t_inf
+  real                     :: t_wall, t_tau, d_wall, nu_mean, t_inf
   real                     :: ubulk, error, re, cf_dean, cf, pr, u_tau_p
   logical                  :: there
 !==============================================================================!
@@ -81,9 +81,9 @@
     return
   end if
 
-  ubulk = bulk % flux_x / (density*bulk % area_x)
-  t_wall = 0.0
-  nu_max = 0.0
+  ubulk   = bulk % flux_x / (density*bulk % area_x)
+  t_wall  = 0.0
+  nu_mean = 0.0
   n_points = 0
 
   if(heat_transfer) then
@@ -125,7 +125,7 @@
   count = 0
   if(heat_transfer) then
     allocate(t_p (n_prob));  t_p  = 0.0
-    allocate(tt_p(n_prob));  tt_p = 0.0
+    allocate(t2_p(n_prob));  t2_p = 0.0
     allocate(ut_p(n_prob));  ut_p = 0.0
     allocate(vt_p(n_prob));  vt_p = 0.0
     allocate(wt_p(n_prob));  wt_p = 0.0
@@ -161,7 +161,7 @@
 
         if(heat_transfer) then
           t_p (i) = t_p (i) + turb % t_mean(c)
-          tt_p(i) = tt_p(i) + turb % t2_mean(c)  &
+          t2_p(i) = t2_p(i) + turb % t2_mean(c)  &
                             - turb % t_mean(c) * turb % t_mean(c)
           ut_p(i) = ut_p(i) + turb % ut_res(c)   &
                             - turb % u_mean(c) * turb % t_mean(c)
@@ -199,7 +199,7 @@
 
     if(heat_transfer) then
       call Comm_Mod_Global_Sum_Real(t_p (pl))
-      call Comm_Mod_Global_Sum_Real(tt_p(pl))
+      call Comm_Mod_Global_Sum_Real(t2_p(pl))
       call Comm_Mod_Global_Sum_Real(ut_p(pl))
       call Comm_Mod_Global_Sum_Real(vt_p(pl))
       call Comm_Mod_Global_Sum_Real(wt_p(pl))
@@ -226,7 +226,7 @@
       y_plus_p(i) = y_plus_p(i) / n_count(i)
       if(heat_transfer) then
         t_p (i) = t_p (i) / n_count(i)
-        tt_p(i) = tt_p(i) / n_count(i)
+        t2_p(i) = t2_p(i) / n_count(i)
         ut_p(i) = ut_p(i) / n_count(i)
         vt_p(i) = vt_p(i) / n_count(i)
         wt_p(i) = wt_p(i) / n_count(i)
@@ -281,22 +281,23 @@
         if( Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. WALL .or.  &
             Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. WALLFL) then
 
-          t_wall = t_wall + turb % t_mean(c2)
-          nu_max = nu_max + t % q(c2)/(conductivity*(turb % t_mean(c2) - t_inf))
+          t_wall   = t_wall + turb % t_mean(c2)
+          nu_mean  = nu_mean + t % q(c2)  &
+                   / (conductivity*(turb % t_mean(c2) - t_inf))
           n_points = n_points + 1
         end if
       end if
     end do
 
     call Comm_Mod_Global_Sum_Real(t_wall)
-    call Comm_Mod_Global_Sum_Real(nu_max)
+    call Comm_Mod_Global_Sum_Real(nu_mean)
     call Comm_Mod_Global_Sum_Int(n_points)
 
     call Comm_Mod_Wait
 
-    t_wall = t_wall / n_points
-    nu_max = nu_max / n_points
-    t_tau  = heat_flux / (density * capacity * u_tau_p)
+    t_wall  = t_wall / n_points
+    nu_mean = nu_mean / n_points
+    t_tau   = heat_flux / (density * capacity * u_tau_p)
   end if
 
   open(3, file = res_name)
@@ -321,9 +322,9 @@
     write(i,'(a1,(a12,f12.6,a2,a22))') & 
     '#', 'Cf_error = ', error, ' %', 'Dean formula is used.'
     if(heat_transfer) then
-      write(i,'(a1,(a12, f12.6))')'#', 'Nu number =', nu_max 
-      write(i,'(a1,(a12, f12.6,a2,A39))')'#', 'Nu_error  =', &
-            abs(0.023*0.5*re**0.8*pr**0.4 - nu_max)          &
+      write(i,'(a1,(a12, f12.6))')'#', 'Nu number =', nu_mean 
+      write(i,'(a1,(a12, f12.6,a2,A39))')'#', 'Nu_error  =',  &
+            abs(0.023*0.5*re**0.8*pr**0.4 - nu_mean)          &
             / (0.023*0.5*re**0.8*pr**0.4) * 100.0, ' %',     &
             'correlation of Dittus-Boelter is used.' 
     end if
@@ -357,7 +358,7 @@
                              (uw_p(i) + uw_mod_p(i)),                     &
                              vis_t_p(i),                                  &
                              t_p(i),                                      &
-                             tt_p(i),                                     &
+                             t2_p(i),                                     &
                              ut_p(i),                                     &
                              vt_p(i),                                     &
                              wt_p(i)
@@ -395,7 +396,7 @@
 
     if(heat_transfer) then
       t_p (i) = (t_wall - t_p(i)) / t_tau  ! t % n(c)
-      tt_p(i) = tt_p(i) / (t_tau*t_tau)    ! ut % n(c)
+      t2_p(i) = t2_p(i) / (t_tau*t_tau)    ! ut % n(c)
       ut_p(i) = ut_p(i) / (u_tau_p*t_tau)  ! ut % n(c)
       vt_p(i) = vt_p(i) / (u_tau_p*t_tau)  ! vt % n(c)
       wt_p(i) = wt_p(i) / (u_tau_p*t_tau)  ! wt % n(c)
@@ -415,7 +416,7 @@
                              (uw_p(i) + uw_mod_p(i)),                     &
                              vis_t_p(i),                                  &
                              t_p(i),                                      &
-                             tt_p(i),                                     &
+                             t2_p(i),                                     &
                              ut_p(i),                                     &
                              vt_p(i),                                     &
                              wt_p(i)
@@ -456,7 +457,7 @@
   deallocate(y_plus_p)
   if(heat_transfer) then
     deallocate(t_p)
-    deallocate(tt_p)
+    deallocate(t2_p)
     deallocate(ut_p)
     deallocate(vt_p)
     deallocate(wt_p)
