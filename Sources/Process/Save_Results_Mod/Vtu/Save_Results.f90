@@ -229,7 +229,7 @@
   !   Turbulent quantities   !
   !--------------------------!
 
-  ! Save kin and eps
+  ! Save kin and eps abd t2 for K_EPS (to improve)
   if(turbulence_model .eq. K_EPS                 .or.  &
      turbulence_model .eq. K_EPS_ZETA_F          .or.  &
      turbulence_model .eq. HYBRID_LES_RANS       .or.  &
@@ -241,6 +241,14 @@
                                            turb % eps % n(1))
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentKineticEnergyProduction", &
                                            p_kin(1))
+      
+    if (turbulence_model .eq. K_EPS .and. heat_transfer) then
+      call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityT2",  &
+                                             turb % t2 % n(1))
+      call Save_Scalar(grid, IN_4, IN_5, "TurbulentT2Production", &
+                                             p_t2(1))
+    end if
+
   end if
 
   ! Save zeta and f22
@@ -254,18 +262,21 @@
                                            turb % zeta % n(1))
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityF22",   &
                                            turb % f22  % n(1))
+    
+    if (heat_transfer) then
+      call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityT2",  &
+                                             turb % t2 % n(1))
+      call Save_Scalar(grid, IN_4, IN_5, "TurbulentT2Production", &
+                                             p_t2(1))
+    end if
+  
   end if
+
   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityF22",   &
                                            turb % f22 % n(1))
   end if
 
-  if (turbulence_model .eq. K_EPS_ZETA_F .and. heat_transfer) then
-    call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityT2",  &
-                                           turb % t2 % n(1))
-    call Save_Scalar(grid, IN_4, IN_5, "TurbulentT2Production", &
-                                           p_t2(1))
-  end if
   ! Save vis and vis_t
   if(turbulence_model .eq. DES_SPALART .or.  &
      turbulence_model .eq. SPALART_ALLMARAS) then
