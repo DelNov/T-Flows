@@ -116,14 +116,15 @@
   integer, parameter :: RSM_HANJALIC_JAKIRLIC = 30103
   integer, parameter :: RSM_MANCEAU_HANJALIC  = 30109
   integer, parameter :: HYBRID_LES_RANS       = 30113
+  integer, parameter :: HYBRID_LES_PRANDTL    = 30119
 
   ! Turbulence wall treatment
-  integer, parameter :: STABILIZED = 30119
+  integer, parameter :: STABILIZED = 30133
 
   ! Turbulent heat flux scheme
-  integer, parameter :: SGDH = 30121
-  integer, parameter :: GGDH = 30123
-  integer, parameter :: AFM  = 30125
+  integer, parameter :: SGDH = 30137
+  integer, parameter :: GGDH = 30139
+  integer, parameter :: AFM  = 30161
 
   logical :: rough_walls
 
