@@ -394,6 +394,9 @@
     ! Adjust pressure drops to keep the mass fluxes constant
     call Bulk_Mod_Adjust_P_Drops(flow % bulk, flow % dt)
 
+    ! Just before the end of time step
+    call User_Mod_End_Of_Time_Step(flow, turb, swarm, n, time)
+
     !----------------------!
     !   Save the results   !
     !----------------------!
@@ -428,9 +431,6 @@
       call User_Mod_Save_Results(flow, turb, name_save)
       ! call User_Mod_Save_Swarm(swarm, name_save)  to be done!
     end if
-
-    ! Just before the end of time step
-    call User_Mod_End_Of_Time_Step(flow, turb, swarm, n, time)
 
     if(save_now) then
       if(this_proc < 2) then
