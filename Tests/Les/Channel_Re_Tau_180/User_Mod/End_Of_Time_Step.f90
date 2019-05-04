@@ -21,11 +21,17 @@
 !----------------------------------[Locals]------------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
   type(Grid_Type), pointer :: grid
-  integer                  :: c, e, dir
+  integer                  :: c, eddy, dir
   real                     :: lo, xo(4), yo(4),                           &
                               zo, ro, xc, yc, zc, vc, wc, sig_x, sig_yz,  &
                               rmin, rmax, sg, lx, ly, lz, vmax
 !==============================================================================!
+
+  ! If not time for disturbing the velocity field, return
+  if(mod(n, 120) .ne. 0) return
+
+  ! If too late to disturb, get out too
+  if(n > 1200) return
 
   ! Take aliases
   grid => flow % pnt_grid
@@ -34,12 +40,6 @@
   w    => flow % w
   t    => flow % t
 
-  ! If not time for disturbing the velocity field, return
-  if(mod(n, 100) .ne. 0) return
-
-  ! If too late to disturb, get out too
-  if(n > 3000) return
-
   ! Print a message
   if(this_proc < 2) then
     print *, '# Superimposing random eddies on top of velocity field!'
@@ -47,15 +47,17 @@
 
   ! Minimum and maximum size of eddies
   rmin = 0.2
-  rmax = 0.4
+  rmax = 0.6
 
   ! Size of the computational domain
-  lx = 2.0 * PI
-  ly = PI
+  lx = 6.28
+  ly = 3.14
   lz = 2.0
 
-  ! Browse through all eddies
-  do e = 1, 80
+  !-------------------------------!
+  !   Browse through all eddies   !
+  !-------------------------------!
+  do eddy = 1, 48
 
     ! Random direction of the vortex
     call random_number(sg);
@@ -81,8 +83,8 @@
     xo(4) = xo(3)
     yo(4) = yo(2)
 
-    ! Length of the eddy is three times 
-    lo = ro * 3.0
+    ! Length of the eddy is six times the diameter
+    lo = ro * 6.0
 
     sig_yz = ro / 2.0
     sig_x  = lo / 2.0
@@ -93,9 +95,25 @@
         xc = grid % xc(c)
         yc = grid % yc(c)
         zc = grid % zc(c)
-        wc = sg * sin( (yc-yo(dir))/ro * PI )
-        vc = sg * sin( (zc-zo)/ro * PI )
+        wc = sg * ( (yc-yo(dir))/ro )
+        vc = sg * ( (zo-zc     )/ro )
 
+        !--------------------------------------------+
+        !   Gaussian distribution:                   !
+        !                                - (x-a)^2   !
+        !                  1           ^ ---------   !
+        !   f(x) = ------------------ e  2 sigma^2   !
+        !          sqrt(2 PI sigma^2)                !
+        !                                            !
+        !                                            !
+        !          exp[-(x-a)^2 / (2 sigma^2)]       !
+        !   f(x) = ---------------------------       !
+        !              sqrt(2 PI sigma^2)            !
+        !                                            !
+        !          exp[-0.5 ((x-a) / sigma)^2]       !
+        !   f(x) = ---------------------------       !
+        !               sigma sqrt(2 PI)             !
+        !--------------------------------------------!
         vc = vc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((yc-yo(dir))/sig_yz)**2)
         vc = vc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((zc-zo)     /sig_yz)**2)
 
@@ -105,8 +123,11 @@
         vc = vc / (sig_x *sqrt(PI+PI))*exp(-0.5*((xc-xo(dir))/sig_x)**2)
         wc = wc / (sig_x *sqrt(PI+PI))*exp(-0.5*((xc-xo(dir))/sig_x)**2)
 
+        ! Superimposed those fluctuations on spanwise and normal velocity comp.
         v % n(c) = v % n(c) + vc
+        v % o(c) = v % o(c) + vc
         w % n(c) = w % n(c) + wc
+        w % o(c) = w % o(c) + wc
       end do
     end do
   end do
@@ -118,8 +139,10 @@
   end do
   call Comm_Mod_Global_Max_Real(vmax)
   do c = 1, grid % n_cells
-    v % n(c) = v % n(c) / vmax / 10.0
-    w % n(c) = w % n(c) / vmax / 10.0
+    v % n(c) = v % n(c) / vmax / 5.0
+    v % o(c) = v % o(c) / vmax / 5.0
+    w % n(c) = w % n(c) / vmax / 5.0
+    w % o(c) = w % o(c) / vmax / 5.0
   end do
 
   end subroutine
