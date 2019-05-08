@@ -34,7 +34,7 @@
                               u_p(:), v_p(:), w_p(:), y_plus_p(:),       &
                               kin_p(:), eps_p(:), uw_p(:), uw_mod_p(:),  &
                               uu_p(:), vv_p(:), ww_p(:), vis_t_p(:),     &
-                              t_p(:), tt_p(:), ut_p(:), vt_p(:), wt_p(:)
+                              t_p(:), t2_p(:), ut_p(:), vt_p(:), wt_p(:)
   integer,allocatable      :: n_p(:), n_count(:)
   real                     :: t_wall, t_tau, d_wall, nu_mean, t_inf
   real                     :: ubulk, error, re, cf_dean, cf, pr, u_tau_p
@@ -125,7 +125,7 @@
   count = 0
   if(heat_transfer) then
     allocate(t_p (n_prob));  t_p  = 0.0
-    allocate(tt_p(n_prob));  tt_p = 0.0
+    allocate(t2_p(n_prob));  t2_p = 0.0
     allocate(ut_p(n_prob));  ut_p = 0.0
     allocate(vt_p(n_prob));  vt_p = 0.0
     allocate(wt_p(n_prob));  wt_p = 0.0
@@ -161,7 +161,7 @@
 
         if(heat_transfer) then
           t_p (i) = t_p (i) + turb % t_mean(c)
-          tt_p(i) = tt_p(i) + turb % t2_mean(c)  &
+          t2_p(i) = t2_p(i) + turb % t2_mean(c)  &
                             - turb % t_mean(c) * turb % t_mean(c)
           ut_p(i) = ut_p(i) + turb % ut_res(c)   &
                             - turb % u_mean(c) * turb % t_mean(c)
@@ -199,7 +199,7 @@
 
     if(heat_transfer) then
       call Comm_Mod_Global_Sum_Real(t_p (pl))
-      call Comm_Mod_Global_Sum_Real(tt_p(pl))
+      call Comm_Mod_Global_Sum_Real(t2_p(pl))
       call Comm_Mod_Global_Sum_Real(ut_p(pl))
       call Comm_Mod_Global_Sum_Real(vt_p(pl))
       call Comm_Mod_Global_Sum_Real(wt_p(pl))
@@ -226,7 +226,7 @@
       y_plus_p(i) = y_plus_p(i) / n_count(i)
       if(heat_transfer) then
         t_p (i) = t_p (i) / n_count(i)
-        tt_p(i) = tt_p(i) / n_count(i)
+        t2_p(i) = t2_p(i) / n_count(i)
         ut_p(i) = ut_p(i) / n_count(i)
         vt_p(i) = vt_p(i) / n_count(i)
         wt_p(i) = wt_p(i) / n_count(i)
@@ -358,7 +358,7 @@
                              (uw_p(i) + uw_mod_p(i)),                     &
                              vis_t_p(i),                                  &
                              t_p(i),                                      &
-                             tt_p(i),                                     &
+                             t2_p(i),                                     &
                              ut_p(i),                                     &
                              vt_p(i),                                     &
                              wt_p(i)
@@ -396,7 +396,7 @@
 
     if(heat_transfer) then
       t_p (i) = (t_wall - t_p(i)) / t_tau  ! t % n(c)
-      tt_p(i) = tt_p(i) / (t_tau*t_tau)    ! ut % n(c)
+      t2_p(i) = t2_p(i) / (t_tau*t_tau)    ! ut % n(c)
       ut_p(i) = ut_p(i) / (u_tau_p*t_tau)  ! ut % n(c)
       vt_p(i) = vt_p(i) / (u_tau_p*t_tau)  ! vt % n(c)
       wt_p(i) = wt_p(i) / (u_tau_p*t_tau)  ! wt % n(c)
@@ -416,7 +416,7 @@
                              (uw_p(i) + uw_mod_p(i)),                     &
                              vis_t_p(i),                                  &
                              t_p(i),                                      &
-                             tt_p(i),                                     &
+                             t2_p(i),                                     &
                              ut_p(i),                                     &
                              vt_p(i),                                     &
                              wt_p(i)
@@ -457,7 +457,7 @@
   deallocate(y_plus_p)
   if(heat_transfer) then
     deallocate(t_p)
-    deallocate(tt_p)
+    deallocate(t2_p)
     deallocate(ut_p)
     deallocate(vt_p)
     deallocate(wt_p)
