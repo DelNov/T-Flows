@@ -210,6 +210,36 @@
       call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 't_mean',tur % t_mean(-nb_s:nc_s))
     end if
 
+    ! K and epsilon
+    if(turbulence_model .eq. K_EPS) then
+      call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'kin_mean',  &
+                                           tur % kin_mean(-nb_s:nc_s))
+      call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'eps_mean',  &
+                                           tur % eps_mean(-nb_s:nc_s))
+      if(heat_transfer) then
+        call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 't2_mean',  &
+                                             tur % t2_mean(-nb_s:nc_s))
+      end if
+    end if
+
+    ! K-eps-zeta-f and the hybrid model
+    if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
+       turbulence_model .eq. HYBRID_LES_RANS) then
+      call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'kin_mean',  &
+                                           tur % kin_mean(-nb_s:nc_s))
+      call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'eps_mean',  &
+                                           tur % eps_mean(-nb_s:nc_s))
+      call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'zeta_mean',  &
+                                           tur % zeta_mean(-nb_s:nc_s))
+      call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'f22_mean',  &
+                                           tur % f22_mean(-nb_s:nc_s))
+      if(heat_transfer) then
+        call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 't2_mean',  &
+                                             tur % t2_mean(-nb_s:nc_s))
+      end if
+    end if
+
+    ! Reynolds stress models
     if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
        turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
       call Backup_Mod_Write_Cell_Bnd(fh, d, vc, 'uu_mean',  &
