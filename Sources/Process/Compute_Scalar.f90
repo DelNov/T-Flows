@@ -5,27 +5,28 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Field_Mod,    only: Field_Type, conductivity, capacity, density
-  use Turb_Mod
   use Comm_Mod
+  use Cpu_Timer_Mod, only: Cpu_Timer_Mod_Start, Cpu_Timer_Mod_Stop
+  use Field_Mod,     only: Field_Type, conductivity, capacity, density
+  use Turb_Mod
   use Var_Mod
   use Grid_Mod
   use Grad_Mod
   use Info_Mod
   use Numerics_Mod
-  use Solver_Mod,   only: Solver_Type, Solver_Mod_Alias_System, Bicg, Cg, Cgs
-  use Matrix_Mod,   only: Matrix_Type
+  use Solver_Mod,    only: Solver_Type, Solver_Mod_Alias_System, Bicg, Cg, Cgs
+  use Matrix_Mod,    only: Matrix_Type
   use Control_Mod
   use User_Mod
-  use Work_Mod,     only: phi_x       => r_cell_01,  &
-                          phi_y       => r_cell_02,  &
-                          phi_z       => r_cell_03,  &
-                          u1uj_phij   => r_cell_06,  &
-                          u2uj_phij   => r_cell_07,  &
-                          u3uj_phij   => r_cell_08,  &
-                          u1uj_phij_x => r_cell_09,  &
-                          u2uj_phij_y => r_cell_10,  &
-                          u3uj_phij_z => r_cell_11
+  use Work_Mod,      only: phi_x       => r_cell_01,  &
+                           phi_y       => r_cell_02,  &
+                           phi_z       => r_cell_03,  &
+                           u1uj_phij   => r_cell_06,  &
+                           u2uj_phij   => r_cell_07,  &
+                           u3uj_phij   => r_cell_08,  &
+                           u1uj_phij_x => r_cell_09,  &
+                           u2uj_phij_y => r_cell_10,  &
+                           u3uj_phij_z => r_cell_11
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
@@ -82,6 +83,8 @@
 !     XT*,   [kg K/s]
 ! 
 !==============================================================================!
+
+  call Cpu_Timer_Mod_Start('Compute_Scalars')
 
   ! Take aliases
   grid => flow % pnt_grid
@@ -365,6 +368,7 @@
   call Numerics_Mod_Under_Relax(phi, sol)
 
   ! Call linear solver to solve them
+  call Cpu_Timer_Mod_Start('Linear_Solver_For_Scalars')
   call Bicg(sol,            &
             phi % n,        &
             b,              &
@@ -373,6 +377,7 @@
             exec_iter,      &
             phi % tol,      &
             phi % res)
+  call Cpu_Timer_Mod_Stop('Linear_Solver_For_Scalars')
 
   read(phi % name(3:4), *) ns  ! reterive the number of scalar
   row = ceiling(ns/4)          ! will be 1 (scal. 1-4), 2 (scal. 5-8), etc.
@@ -381,5 +386,7 @@
   call Info_Mod_Iter_Fill_User_At(row, col, phi % name, exec_iter, phi % res)
 
   call Comm_Mod_Exchange_Real(grid, phi % n)
+
+  call Cpu_Timer_Mod_Stop('Compute_Scalars')
 
   end subroutine

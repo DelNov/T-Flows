@@ -4,14 +4,15 @@
 !   Forms and solves pressure equation for the SIMPLE method.                  !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Field_Mod
   use Comm_Mod
   use Const_Mod
-  use Grid_Mod,    only: Grid_Type
-  use Bulk_Mod,    only: Bulk_Type
-  use Info_Mod,    only: Info_Mod_Iter_Fill_At
-  use Solver_Mod,  only: Solver_Type, Bicg, Cg, Cgs, Acm
-  use Matrix_Mod,  only: Matrix_Type
+  use Cpu_Timer_Mod, only: Cpu_Timer_Mod_Start, Cpu_Timer_Mod_Stop
+  use Field_Mod
+  use Grid_Mod,      only: Grid_Type
+  use Bulk_Mod,      only: Bulk_Type
+  use Info_Mod,      only: Info_Mod_Iter_Fill_At
+  use Solver_Mod,    only: Solver_Type, Bicg, Cg, Cgs, Acm
+  use Matrix_Mod,    only: Matrix_Type
   use Control_Mod
   use User_Mod
 !------------------------------------------------------------------------------!
@@ -56,6 +57,8 @@
 !     flux           [kg/s]
 !
 !------------------------------------------------------------------------------!
+
+  call Cpu_Timer_Mod_Start('Compute_Pressure (without solvers)')
 
   ! Take aliases
   grid => flow % pnt_grid
@@ -201,6 +204,7 @@
   ! Get solver
   call Control_Mod_Solver_For_Pressure(solver)
 
+  call Cpu_Timer_Mod_Start('Linear_Solver_For_Pressure')
   if(solver .eq. 'ACM') then
     pp % tol   = PICO
     call Acm(sol,           &
@@ -223,6 +227,7 @@
             pp % res,      &
             norm = p_nor)         ! last argument: number for normalisation
   end if
+  call Cpu_Timer_Mod_Stop('Linear_Solver_For_Pressure')
 
   call Info_Mod_Iter_Fill_At(1, 4, pp % name, exec_iter, pp % res)
 
@@ -248,5 +253,7 @@
 
   ! User function
   call User_Mod_End_Of_Compute_Pressure(flow, dt, ini)
+
+  call Cpu_Timer_Mod_Stop('Compute_Pressure (without solvers)')
 
   end subroutine

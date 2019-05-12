@@ -5,14 +5,14 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Field_Mod,    only: Field_Type, viscosity, density
   use Comm_Mod
-  use Grid_Mod,     only: Grid_Type
-  use Bulk_Mod,     only: Bulk_Type
+  use Cpu_Timer_Mod, only: Cpu_Timer_Mod_Start, Cpu_Timer_Mod_Stop
+  use Field_Mod,     only: Field_Type, viscosity, density
+  use Grid_Mod,      only: Grid_Type
+  use Bulk_Mod,      only: Bulk_Type
   use Info_Mod
-  use Solver_Mod,   only: Solver_Type
-  use Matrix_Mod,   only: Matrix_Type
-  use Control_Mod
+  use Solver_Mod,    only: Solver_Type
+  use Matrix_Mod,    only: Matrix_Type
   use Numerics_Mod
   use User_Mod
 !------------------------------------------------------------------------------!
@@ -33,6 +33,8 @@
   real                       :: cfl_max, pe_max
   real                       :: cfl_t, pe_t, mass_err
 !==============================================================================!
+
+  call Cpu_Timer_Mod_Start('Correct_Velocity')
 
   ! Take aliases
   grid => flow % pnt_grid
@@ -155,5 +157,7 @@
 
   ! User function
   call User_Mod_End_Of_Correct_Velocity(flow, dt, ini)
+
+  call Cpu_Timer_Mod_Stop('Correct_Velocity')
 
   end function

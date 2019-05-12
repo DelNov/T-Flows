@@ -6,16 +6,17 @@
 !---------------------------------[Modules]------------------------------------!
   use Const_Mod
   use Comm_Mod
-  use Name_Mod,    only: problem_name
-  use Field_Mod,   only: Field_Type, Field_Mod_Allocate, heat_transfer
+  use Cpu_Timer_Mod
+  use Name_Mod,      only: problem_name
+  use Field_Mod,     only: Field_Type, Field_Mod_Allocate, heat_transfer
   use Turb_Mod
   use Grid_Mod
   use Grad_Mod
   use Bulk_Mod
-  use Var_Mod,     only: Var_Type
-  use Solver_Mod,  only: Solver_Mod_Create
+  use Var_Mod,       only: Var_Type
+  use Solver_Mod,    only: Solver_Mod_Create
   use Info_Mod
-  use Work_Mod,    only: Work_Mod_Allocate
+  use Work_Mod,      only: Work_Mod_Allocate
   use User_Mod
   use Save_Results_Mod
   use Control_Mod
@@ -49,9 +50,14 @@
   real              :: wt_max
 !==============================================================================!
 
+  ! Initialize program profler
+  call Cpu_Timer_Mod_Start('Main')
+
   ! Get starting time
   call system_clock(count_rate=sc_cr)  ! get system clock clock rate
   call system_clock(sc_ini)            ! get system clock initial count rate
+
+  ! Initialize variables
   time =  0.
   backup = .false.  ! can turn .true. in Load_Backup
 
@@ -480,6 +486,9 @@
 
   ! Make the final call to user function
   call User_Mod_Before_Exit(grid)
+
+  call Cpu_Timer_Mod_Stop('Main')
+  call Cpu_Timer_Mod_Statistics
 
   !----------------------------!
   !   End parallel execution   !

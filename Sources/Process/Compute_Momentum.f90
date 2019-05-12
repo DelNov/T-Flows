@@ -6,17 +6,18 @@
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
   use Comm_Mod
-  use Field_Mod,    only: Field_Type, buoyancy, t_ref,  &
-                          grav_x, grav_y, grav_z,       &
-                          density, viscosity
+  use Cpu_Timer_Mod, only: Cpu_Timer_Mod_Start, Cpu_Timer_Mod_Stop
+  use Field_Mod,     only: Field_Type, buoyancy, t_ref,  &
+                           grav_x, grav_y, grav_z,       &
+                           density, viscosity
   use Turb_Mod
-  use Var_Mod,      only: Var_Type
-  use Grid_Mod,     only: Grid_Type
-  use Bulk_Mod,     only: Bulk_Type
-  use Info_Mod,     only: Info_Mod_Iter_Fill_At
+  use Var_Mod,       only: Var_Type
+  use Grid_Mod,      only: Grid_Type
+  use Bulk_Mod,      only: Bulk_Type
+  use Info_Mod,      only: Info_Mod_Iter_Fill_At
   use Numerics_Mod
-  use Solver_Mod,   only: Solver_Type, Solver_Mod_Alias_System, Bicg, Cg, Cgs
-  use Matrix_Mod,   only: Matrix_Type
+  use Solver_Mod,    only: Solver_Type, Solver_Mod_Alias_System, Bicg, Cg, Cgs
+  use Matrix_Mod,    only: Matrix_Type
   use User_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -101,6 +102,8 @@
 !     cu*, cv*, cw*  [kgm/s^2]   [N]
 !     Wall visc.      vis_wall [kg/(m*s)]
 !==============================================================================!
+
+  call Cpu_Timer_Mod_Start('Compute_Momentum (without solvers)')
 
   ! Take aliases
   grid => flow % pnt_grid
@@ -418,6 +421,7 @@
   call Numerics_Mod_Under_Relax(ui, sol)
 
   ! Call linear solver
+  call Cpu_Timer_Mod_Start('Linear_Solver_For_Momentum')
   call Bicg(sol,           &
             ui % n,        &
             b,             &
@@ -427,7 +431,9 @@
             ui % tol,      &
             ui % res,      &
             norm = vel_max)
+  call Cpu_Timer_Mod_Stop('Linear_Solver_For_Momentum')
 
+  ! Fill the info screen up
   if(ui % name .eq. 'U') then
     call Info_Mod_Iter_Fill_At(1, 1, ui % name, exec_iter, ui % res)
   end if
@@ -442,5 +448,7 @@
 
   ! User function
   call User_Mod_End_Of_Compute_Momentum(flow, dt, ini)
+
+  call Cpu_Timer_Mod_Stop('Compute_Momentum (without solvers)')
 
   end subroutine

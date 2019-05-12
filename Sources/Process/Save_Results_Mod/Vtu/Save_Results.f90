@@ -39,6 +39,8 @@
   character(len=10)  :: IN_5 = '          '
 !==============================================================================!
 
+  call Cpu_Timer_Mod_Start('Save_Vtu_Results')
+
   ! Take aliases
   grid => flow % pnt_grid
 
@@ -391,5 +393,7 @@
 
   ! Restore the name
   problem_name = store_name
+
+  call Cpu_Timer_Mod_Stop('Save_Vtu_Results')
 
   end subroutine

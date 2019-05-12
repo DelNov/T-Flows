@@ -38,6 +38,8 @@
 !                                                                              !
 !------------------------------------------------------------------------------!
 
+  call Cpu_Timer_Mod_Start('Compute_Turbulence (without solvers)')
+
   ! Take aliases
   flow => turb % pnt_flow
   grid => flow % pnt_grid
@@ -223,6 +225,7 @@
   call Numerics_Mod_Under_Relax(phi, sol)
 
   ! Call linear solver to solve the equations
+  call Cpu_Timer_Mod_Start('Linear_Solver_For_Turbulence')
   call Bicg(sol,            &
             phi % n,        &
             b,              &
@@ -231,6 +234,7 @@
             exec_iter,      &
             phi % tol,      &
             phi % res)
+  call Cpu_Timer_Mod_Stop('Linear_Solver_For_Turbulence')
 
   do c = 1, grid % n_cells
     if( phi % n(c) < 0.0 ) phi % n(c) = phi % o(c)
@@ -254,5 +258,7 @@
   end if
 
   call Comm_Mod_Exchange_Real(grid, phi % n)
+
+  call Cpu_Timer_Mod_Stop('Compute_Turbulence (without solvers)')
 
   end subroutine

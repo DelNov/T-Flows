@@ -185,6 +185,7 @@ endif
 
 # Modules in shared directory
 SRC_MOD = Const_Mod.f90		\
+          Cpu_Timer_Mod.f90	\
           Sort_Mod.f90		\
           Tokenizer_Mod.f90	\
           Div_Mod.f90		\

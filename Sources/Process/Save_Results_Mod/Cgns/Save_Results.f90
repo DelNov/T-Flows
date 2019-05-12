@@ -32,6 +32,8 @@
   integer                  :: c
 !==============================================================================!
 
+  call Cpu_Timer_Mod_Start('Save_Cgns_Results')
+
   ! Take aliases
   grid => flow % pnt_grid
 
@@ -331,5 +333,7 @@
 
   ! Restore the name
   problem_name = store_name
+
+  call Cpu_Timer_Mod_Stop('Save_Cgns_Results')
 
   end subroutine
