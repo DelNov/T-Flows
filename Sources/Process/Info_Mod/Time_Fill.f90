@@ -10,7 +10,6 @@
   real    :: wall_time  ! number of seconds of wall-clock time
 !-----------------------------------[Locals]-----------------------------------!
   integer :: hours, minutes, seconds
-  real    :: miliseconds
 !==============================================================================!
 
   if(this_proc < 2) then
