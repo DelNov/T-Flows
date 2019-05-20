@@ -102,8 +102,8 @@
                           / phi % sigma
 
     if(turbulence_model .eq. HYBRID_LES_RANS) then
-      vis_eff = viscosity + (    grid % fw(s)  * vis_t_eff(c1)   &
-                          + (1.0-grid % fw(s)) * vis_t_eff(c2))  &
+      vis_eff = viscosity + (    grid % fw(s)  * turb % vis_t_eff(c1)   &
+                          + (1.0-grid % fw(s)) * turb % vis_t_eff(c2))  &
                           / phi % sigma
     end if
     phi_x_f = grid % fw(s) * phi % x(c1) + (1.0-grid % fw(s)) * phi % x(c2)

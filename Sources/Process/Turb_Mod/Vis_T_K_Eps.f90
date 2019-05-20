@@ -98,13 +98,15 @@
         y_plus(c1) = Y_Plus_Low_Re(u_tau, grid % wall_dist(c1), kin_vis)
 
         if(rough_walls) then
-          z_o = Roughness_Coefficient(grid, z_o_f(c1), c1)
-          y_plus(c1) = Y_Plus_Rough_Walls(u_tau,                 &
+          turb % z_o = Roughness_Coefficient(turb % z_o, turb % z_o_f(c1), c1)
+          y_plus(c1) = Y_Plus_Rough_Walls(turb,                  &
+                                          u_tau,                 &
                                           grid % wall_dist(c1),  &
                                           kin_vis)
-          u_plus     = U_Plus_Rough_Walls(grid % wall_dist(c1))
+          u_plus     = U_Plus_Rough_Walls(turb,                  &
+                                          grid % wall_dist(c1))
           vis_wall(c1) = y_plus(c1) * viscosity * kappa  &
-                       / log((grid % wall_dist(c1)+z_o)/z_o)  ! is this U+?
+                       / log((grid % wall_dist(c1)+turb % z_o)/turb % z_o)
         end if
 
         if(heat_transfer) then

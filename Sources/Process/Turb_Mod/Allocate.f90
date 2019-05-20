@@ -105,6 +105,7 @@
     ! Other variables such as time scale, length scale and production
     allocate(turb % t_scale (-nb:nc));  turb % t_scale  = 0.
     allocate(turb % l_scale (-nb:nc));  turb % l_scale  = 0.
+    allocate(turb % alpha1  (-nb:nc));  turb % alpha1   = 0.
     allocate(p_kin   (-nb:nc));  p_kin    = 0.
     allocate(vis_t   (-nb:nc));  vis_t    = 0.
     allocate(vis_wall(-nb:nc));  vis_wall = 0.
@@ -112,7 +113,7 @@
 
     ! Hydraulic roughness given by formula
     if(rough_walls) then
-      allocate(z_o_f(-nb:nc));  z_o_f   = 0.
+      allocate(turb % z_o_f(-nb:nc));  turb % z_o_f   = 0.
     end if
 
     if(heat_transfer) then
@@ -543,10 +544,11 @@
     allocate(c_dyn(-nb:nc));  c_dyn = 0.
 
     ! Other variables such as time scale, length scale and production
-    allocate(vis_t_eff(-nb:nc));  vis_t_eff = 0.
-    allocate(vis_t_sgs(-nb:nc));  vis_t_sgs = 0.
+    allocate(turb % vis_t_eff(-nb:nc));  turb % vis_t_eff = 0.
+    allocate(turb % vis_t_sgs(-nb:nc));  turb % vis_t_sgs = 0.
     allocate(turb % t_scale  (-nb:nc));  turb % t_scale   = 0.
     allocate(turb % l_scale  (-nb:nc));  turb % l_scale   = 0.
+    allocate(turb % alpha1   (-nb:nc));  turb % alpha1    = 0.
     allocate(p_kin    (-nb:nc));  p_kin     = 0.
     allocate(vis_t    (-nb:nc));  vis_t     = 0.
     allocate(vis_wall (-nb:nc));  vis_wall  = 0.

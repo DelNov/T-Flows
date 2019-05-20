@@ -194,8 +194,8 @@
     end if
 
     if(turbulence_model .eq. HYBRID_LES_RANS) then
-      vis_eff =      grid % fw(s)  * vis_t_eff(c1)   &
-              + (1.0-grid % fw(s)) * vis_t_eff(c2) + viscosity
+      vis_eff =      grid % fw(s)  * turb % vis_t_eff(c1)   &
+              + (1.0-grid % fw(s)) * turb % vis_t_eff(c2) + viscosity
     end if
 
     if(c2 < 0) then

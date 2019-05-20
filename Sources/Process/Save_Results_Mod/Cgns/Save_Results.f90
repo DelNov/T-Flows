@@ -164,6 +164,8 @@
                               turb % eps % n(1), "TurbulentDissipation")
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               p_kin(1), "TurbulentKineticEnergyProduction")
+    call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
+                              turb % alpha1(1), "TurbulentQauntityAlpha1")
 
     if(heat_transfer .and. turbulence_model .eq. K_EPS) then
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &

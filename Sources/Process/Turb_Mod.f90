@@ -87,10 +87,21 @@
     real, allocatable :: l_scale(:)
     real, allocatable :: t_scale(:)
 
+    ! Effective turbulent viscosity
+    real, allocatable :: vis_t_eff(:)
+    real, allocatable :: vis_t_sgs(:)
+
+    ! Hydraulic roughness (constant and variable)
+    real              :: z_o
+    real, allocatable :: z_o_f(:)
+
     ! Various cell sizes for Spalart-Allmaras and DES models
     real, allocatable :: h_max(:)
     real, allocatable :: h_min(:)
     real, allocatable :: h_w(:)
+
+    ! Variable for switch between RANS and LES
+    real, allocatable :: alpha1(:)
   end type
 
   !--------------------------------------------------------!
@@ -170,16 +181,8 @@
   ! Non-dimensional distance
   real, allocatable :: y_plus(:)
 
-  ! Effective turbulent viscosity
-  real, allocatable :: vis_t_eff(:)
-  real, allocatable :: vis_t_sgs(:)
-
   ! Production of turbulent kinetic energy
   real,allocatable :: p_kin(:), p_t2(:)
-
-  ! Hydraulic roughness (constant and variable)
-  real              :: z_o
-  real, allocatable :: z_o_f(:)
 
   ! Buoyancy production for k-eps-zeta-f model
   ! (bouy_beta is only set to 1 and used as such.  Is it needed?)

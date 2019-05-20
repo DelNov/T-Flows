@@ -25,12 +25,12 @@
 
   do c = 1, grid % n_cells
     lf = grid % vol(c) ** ONE_THIRD
-    vis_t_sgs(c) = density                &
-                 * (lf*lf)                &          ! delta^2 
-                 * c_dyn(c)               &          ! c_dynamic   
-                 * flow % shear(c)
+    turb % vis_t_sgs(c) = density                &
+                        * (lf*lf)                &          ! delta^2 
+                        * c_dyn(c)               &          ! c_dynamic   
+                        * flow % shear(c)
   end do
 
-  call Comm_Mod_Exchange_Real(grid, vis_t_sgs)
+  call Comm_Mod_Exchange_Real(grid, turb % vis_t_sgs)
 
   end subroutine

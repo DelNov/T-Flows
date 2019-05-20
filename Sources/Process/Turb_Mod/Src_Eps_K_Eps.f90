@@ -93,9 +93,9 @@
         u_tan = Field_Mod_U_Tan(flow, s)
 
         if(rough_walls) then 
-          z_o = Roughness_Coefficient(grid, z_o_f(c1), c1)       
+          turb % z_o = Roughness_Coefficient(turb % z_o, turb % z_o_f(c1), c1)       
           eps % n(c1) = c_mu75 * kin % n(c1)**1.5  &
-                      / ((grid % wall_dist(c1) + z_o) * kappa)
+                      / ((grid % wall_dist(c1) + turb % z_o) * kappa)
 
           ! Adjusting coefficient to fix eps value in near wall calls
           do j = a % row(c1), a % row(c1 + 1) - 1

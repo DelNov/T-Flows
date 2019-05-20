@@ -71,6 +71,11 @@
     backup = .false.
   end if
 
+  !-------------------------!
+  !   Read wall roughness   !
+  !-------------------------!
+  call Control_Mod_Roughness_Coefficient(turb % z_o)
+
   !----------------------------------------------------------------!
   !   Count number of types per boundary condition, total number   !
   !        of types specified, and also extract their names        !

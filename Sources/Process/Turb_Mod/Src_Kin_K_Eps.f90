@@ -82,13 +82,14 @@
         u_tan = Field_Mod_U_Tan(flow, s)
 
         if(rough_walls) then
-          z_o = Roughness_Coefficient(grid, z_o_f(c1), c1)
+          turb % z_o = Roughness_Coefficient(turb % z_o, turb % z_o_f(c1), c1)
           u_tau = c_mu25 * sqrt(kin % n(c1))
-          y_plus(c1) = u_tau * (grid % wall_dist(c1) + z_o) / kin_vis
+          y_plus(c1) = u_tau * (grid % wall_dist(c1) + turb % z_o) / kin_vis
           tau_wall = density * kappa * u_tau * u_tan  &
-                   / log(max(((grid % wall_dist(c1)+z_o)/z_o), 1.05))
+                   / log(max(((grid % wall_dist(c1) + turb % z_o)  &
+                             / turb % z_o), 1.05))
           p_kin(c1) = density * tau_wall * c_mu25 * sqrt(kin % n(c1))   &
-                    / (kappa*(grid % wall_dist(c1) + z_o))
+                    / (kappa*(grid % wall_dist(c1) + turb % z_o))
           b(c1)     = b(c1) + (p_kin(c1) - p_kin(c1)) * grid % vol(c1)
         else
           u_tau = c_mu25 * sqrt(kin % n(c1))
