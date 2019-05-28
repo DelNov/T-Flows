@@ -105,7 +105,8 @@
     ! Other variables such as time scale, length scale and production
     allocate(turb % t_scale (-nb:nc));  turb % t_scale  = 0.
     allocate(turb % l_scale (-nb:nc));  turb % l_scale  = 0.
-    allocate(turb % alpha1  (-nb:nc));  turb % alpha1   = 0.
+    allocate(turb % alpha_l (-nb:nc));  turb % alpha_l  = 0.
+    allocate(turb % alpha_u (-nb:nc));  turb % alpha_u  = 0.
     allocate(p_kin   (-nb:nc));  p_kin    = 0.
     allocate(vis_t   (-nb:nc));  vis_t    = 0.
     allocate(vis_wall(-nb:nc));  vis_wall = 0.
@@ -548,7 +549,8 @@
     allocate(turb % vis_t_sgs(-nb:nc));  turb % vis_t_sgs = 0.
     allocate(turb % t_scale  (-nb:nc));  turb % t_scale   = 0.
     allocate(turb % l_scale  (-nb:nc));  turb % l_scale   = 0.
-    allocate(turb % alpha1   (-nb:nc));  turb % alpha1    = 0.
+    allocate(turb % alpha_l  (-nb:nc));  turb % alpha_l   = 0.
+    allocate(turb % alpha_u  (-nb:nc));  turb % alpha_u   = 0.
     allocate(p_kin    (-nb:nc));  p_kin     = 0.
     allocate(vis_t    (-nb:nc));  vis_t     = 0.
     allocate(vis_wall (-nb:nc));  vis_wall  = 0.

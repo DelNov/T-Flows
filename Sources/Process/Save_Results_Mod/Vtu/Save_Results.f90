@@ -243,9 +243,10 @@
                                            turb % eps % n(1))
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentKineticEnergyProduction", &
                                            p_kin(1))
-    call Save_Scalar(grid, IN_4, IN_5, "TurbulenQuantityAlpha1", &
-                                           turb % alpha1(1))
-      
+    call Save_Scalar(grid, IN_4, IN_5, "TurbulenQuantityAlphaL", &
+                                           turb % alpha_l(1))
+    call Save_Scalar(grid, IN_4, IN_5, "TurbulenQuantityAlphaU", &
+                                           turb % alpha_u(1))
     if (turbulence_model .eq. K_EPS .and. heat_transfer) then
       call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityT2",  &
                                              turb % t2 % n(1))
@@ -266,14 +267,13 @@
                                            turb % zeta % n(1))
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityF22",   &
                                            turb % f22  % n(1))
-    
     if (heat_transfer) then
       call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityT2",  &
                                              turb % t2 % n(1))
       call Save_Scalar(grid, IN_4, IN_5, "TurbulentT2Production", &
                                              p_t2(1))
     end if
-  
+
   end if
 
   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then

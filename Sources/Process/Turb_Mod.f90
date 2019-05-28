@@ -101,7 +101,8 @@
     real, allocatable :: h_w(:)
 
     ! Variable for switch between RANS and LES
-    real, allocatable :: alpha1(:)
+    real, allocatable :: alpha_l(:)  ! ratio of length scales
+    real, allocatable :: alpha_u(:)  ! ratio of velocity scales
   end type
 
   !--------------------------------------------------------!
