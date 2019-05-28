@@ -24,13 +24,13 @@
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w
-  type(Var_Type),    pointer :: kin, eps, ut, vt, wt
+  type(Var_Type),    pointer :: kin, eps, zeta, f, ut, vt, wt
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: c, c1, c2, s
   real                       :: u_tan, u_tau, tau_wall
   real                       :: lf, ebf, p_kin_int, p_kin_wf
-  real                       :: l_rans, l_sgs, kin_vis
+  real                       :: l_rans, l_sgs, u_rans, u_sgs, kin_vis
 !==============================================================================!
 !   Dimensions:                                                                !
 !                                                                              !
@@ -48,10 +48,10 @@
   ! Take aliases
   flow => turb % pnt_flow
   grid => flow % pnt_grid
-  call Field_Mod_Alias_Momentum  (flow, u, v, w)
-  call Turb_Mod_Alias_K_Eps      (turb, kin, eps)
-  call Turb_Mod_Alias_Heat_Fluxes(turb, ut, vt, wt)
-  call Solver_Mod_Alias_System   (sol, a, b)
+  call Field_Mod_Alias_Momentum   (flow, u, v, w)
+  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f)
+  call Turb_Mod_Alias_Heat_Fluxes (turb, ut, vt, wt)
+  call Solver_Mod_Alias_System    (sol, a, b)
 
   ! Production source:
   do c = 1, grid % n_cells
@@ -61,22 +61,43 @@
 
   if(turbulence_model .eq. HYBRID_LES_RANS) then
     do c = 1, grid % n_cells
+
+      ! Ratio of turbulent lenght scales
       lf = grid % vol(c)**ONE_THIRD
       l_sgs  = 0.8*lf
       l_rans = 0.41*grid % wall_dist(c)
-      turb % alpha1(c) = max(1.0,l_rans/l_sgs)
+      turb % alpha_l(c) = max(1.0, l_rans / l_sgs)
 
-      if(turb % alpha1(c) < 1.05) then
+      ! Ratio of velocity scales
+      u_sgs  = grid % vol(c)**ONE_THIRD * flow % shear(c)
+      u_rans = sqrt(kin % n(c) * zeta % n(c))
+      turb % alpha_u(c) = u_rans / u_sgs
+
+      ! We are in the RANS region
+      if(turb % alpha_u(c) < 0.85) then
         a % val(a % dia(c)) = a % val(a % dia(c))   &
                             + density * eps % n(c)  &
                             / (kin % n(c) + TINY) * grid % vol(c)
+      ! LES region
       else
         a % val(a % dia(c)) = a % val(a % dia(c))                     &
           + density                                                   &
-          * min(turb % alpha1(c)**1.45 * eps % n(c), kin % n(c)**1.5  &
-                 / (lf*0.01))                                         &
-          / (kin % n(c) + TINY) * grid % vol(c)
+          * min(turb % alpha_l(c)**1.4 * eps % n(c), kin % n(c)**1.5  &
+          / (lf*0.01)) / (kin % n(c) + TINY) * grid % vol(c)
       end if
+
+!     if(turb % alpha_l(c) < 1.05) then
+!       a % val(a % dia(c)) = a % val(a % dia(c))   &
+!                           + density * eps % n(c)  &
+!                           / (kin % n(c) + TINY) * grid % vol(c)
+!     else
+!       a % val(a % dia(c)) = a % val(a % dia(c))                     &
+!         + density                                                   &
+!         * min(turb % alpha_l(c)**1.45 * eps % n(c), kin % n(c)**1.5  &
+!                / (lf*0.01))                                         &
+!         / (kin % n(c) + TINY) * grid % vol(c)
+!     end if
+
     end do
   else  ! turbuence model will be K_EPS_ZETA_F
     do c = 1, grid % n_cells
