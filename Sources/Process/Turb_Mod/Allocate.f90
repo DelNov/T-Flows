@@ -41,9 +41,9 @@
     call Var_Mod_Allocate_Solution('EPS', '', turb % eps, grid)
 
     ! Other turbulent quantities
-    allocate(p_kin   (-nb:nc));  p_kin    = 0.
-    allocate(vis_t   (-nb:nc));  vis_t    = 0.
-    allocate(vis_wall(-nb:nc));  vis_wall = 0.
+    allocate(turb % vis_t(-nb:nc));  turb % vis_t = 0.
+    allocate(turb % vis_w(-nb:nc));  turb % vis_w = 0.  ! wall visc
+    allocate(turb % p_kin(-nb:nc));  turb % p_kin = 0.
     allocate(y_plus  (-nb:nc));  y_plus   = 0.
 
     if(heat_transfer) then
@@ -51,8 +51,8 @@
       call Var_Mod_Allocate_New_Only('UT', turb % ut, grid)
       call Var_Mod_Allocate_New_Only('VT', turb % vt, grid)
       call Var_Mod_Allocate_New_Only('WT', turb % wt, grid)
-      allocate(con_wall(-nb:nc)); con_wall = 0.
-      allocate(p_t2    (-nb:nc)); p_t2     = 0.
+      allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
+      allocate(turb % p_t2 (-nb:nc));  turb % p_t2  = 0.
     end if ! heat_transfer
 
     ! Turbulent statistics; if needed
@@ -103,18 +103,18 @@
     call Var_Mod_Allocate_Solution('F22',  '', turb % f22,  grid)
 
     ! Other variables such as time scale, length scale and production
-    allocate(turb % t_scale (-nb:nc));  turb % t_scale  = 0.
-    allocate(turb % l_scale (-nb:nc));  turb % l_scale  = 0.
-    allocate(turb % alpha_l (-nb:nc));  turb % alpha_l  = 0.
-    allocate(turb % alpha_u (-nb:nc));  turb % alpha_u  = 0.
-    allocate(p_kin   (-nb:nc));  p_kin    = 0.
-    allocate(vis_t   (-nb:nc));  vis_t    = 0.
-    allocate(vis_wall(-nb:nc));  vis_wall = 0.
+    allocate(turb % t_scale (-nb:nc));  turb % t_scale = 0.
+    allocate(turb % l_scale (-nb:nc));  turb % l_scale = 0.
+    allocate(turb % alpha_l (-nb:nc));  turb % alpha_l = 0.
+    allocate(turb % alpha_u (-nb:nc));  turb % alpha_u = 0.
+    allocate(turb % vis_t   (-nb:nc));  turb % vis_t   = 0.
+    allocate(turb % vis_w   (-nb:nc));  turb % vis_w   = 0.  ! wall visc
+    allocate(turb % p_kin   (-nb:nc));  turb % p_kin   = 0.
     allocate(y_plus  (-nb:nc));  y_plus   = 0.
 
     ! Hydraulic roughness given by formula
     if(rough_walls) then
-      allocate(turb % z_o_f(-nb:nc));  turb % z_o_f   = 0.
+      allocate(turb % z_o_f(-nb:nc));  turb % z_o_f = -1.0
     end if
 
     if(heat_transfer) then
@@ -122,8 +122,8 @@
       call Var_Mod_Allocate_New_Only('UT', turb % ut, grid)
       call Var_Mod_Allocate_New_Only('VT', turb % vt, grid)
       call Var_Mod_Allocate_New_Only('WT', turb % wt, grid)
-      allocate(con_wall(-nb:nc)); con_wall = 0.
-      allocate(p_t2    (-nb:nc)); p_t2     = 0.
+      allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
+      allocate(turb % p_t2 (-nb:nc));  turb % p_t2  = 0.
     end if ! heat_transfer
 
     if(turbulence_statistics) then
@@ -179,11 +179,11 @@
      turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
 
     ! Other variables such as time scale, length scale and production
-    allocate(turb % t_scale (-nb:nc));  turb % t_scale  = 0.
-    allocate(turb % l_scale (-nb:nc));  turb % l_scale  = 0.
-    allocate(p_kin   (-nb:nc));  p_kin    = 0.
-    allocate(vis_t   (-nb:nc));  vis_t    = 0.
-    allocate(vis_wall(-nb:nc));  vis_wall = 0.
+    allocate(turb % t_scale(-nb:nc));  turb % t_scale = 0.
+    allocate(turb % l_scale(-nb:nc));  turb % l_scale = 0.
+    allocate(turb % vis_t  (-nb:nc));  turb % vis_t   = 0.
+    allocate(turb % vis_w  (-nb:nc));  turb % vis_w   = 0.  ! wall visc
+    allocate(turb % p_kin  (-nb:nc));  turb % p_kin   = 0.
     allocate(y_plus  (-nb:nc));  y_plus   = 0.
 
     ! Reynolds stresses
@@ -201,7 +201,7 @@
       call Var_Mod_Allocate_New_Only('UT', turb % ut, grid)
       call Var_Mod_Allocate_New_Only('VT', turb % vt, grid)
       call Var_Mod_Allocate_New_Only('WT', turb % wt, grid)
-      allocate(con_wall(-nb:nc)); con_wall = 0.
+      allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
     end if ! heat_transfer
 
     if(turbulence_statistics) then
@@ -264,18 +264,18 @@
     call Var_Mod_Allocate_Solution('VIS', '', turb % vis, grid)
 
     ! Other variables such as time scale, length scale and production
-    allocate(turb % t_scale (-nb:nc));  turb % t_scale  = 0.
-    allocate(turb % l_scale (-nb:nc));  turb % l_scale  = 0.
-    allocate(p_kin   (-nb:nc));  p_kin    = 0.
-    allocate(vis_t   (-nb:nc));  vis_t    = 0.
-    allocate(vis_wall(-nb:nc));  vis_wall = 0.
+    allocate(turb % t_scale (-nb:nc));  turb % t_scale = 0.
+    allocate(turb % l_scale (-nb:nc));  turb % l_scale = 0.
+    allocate(turb % vis_t   (-nb:nc));  turb % vis_t   = 0.
+    allocate(turb % vis_w   (-nb:nc));  turb % vis_w   = 0.  ! wall visc
+    allocate(turb % p_kin   (-nb:nc));  turb % p_kin   = 0.
     allocate(y_plus  (-nb:nc));  y_plus   = 0.
 
     if(heat_transfer) then
       call Var_Mod_Allocate_New_Only('UT', turb % ut, grid)
       call Var_Mod_Allocate_New_Only('VT', turb % vt, grid)
       call Var_Mod_Allocate_New_Only('WT', turb % wt, grid)
-      allocate(con_wall(-nb:nc)); con_wall = 0.
+      allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
     end if ! heat_transfer
 
     ! Turbulence statistics, if needed
@@ -322,18 +322,18 @@
     nearest_wall_cell = 0
 
     ! Other variables such as time scale, length scale and production
-    allocate(turb % t_scale (-nb:nc));  turb % t_scale  = 0.
-    allocate(turb % l_scale (-nb:nc));  turb % l_scale  = 0.
-    allocate(p_kin   (-nb:nc));  p_kin    = 0.
-    allocate(vis_t   (-nb:nc));  vis_t    = 0.
-    allocate(vis_wall(-nb:nc));  vis_wall = 0.
+    allocate(turb % t_scale (-nb:nc));  turb % t_scale = 0.
+    allocate(turb % l_scale (-nb:nc));  turb % l_scale = 0.
+    allocate(turb % vis_t   (-nb:nc));  turb % vis_t   = 0.
+    allocate(turb % vis_w   (-nb:nc));  turb % vis_w   = 0.  ! wall visc
+    allocate(turb % p_kin   (-nb:nc));  turb % p_kin    = 0.
     allocate(y_plus  (-nb:nc));  y_plus   = 0.
 
     if(heat_transfer) then
       call Var_Mod_Allocate_New_Only('UT', turb % ut, grid)
       call Var_Mod_Allocate_New_Only('VT', turb % vt, grid)
       call Var_Mod_Allocate_New_Only('WT', turb % wt, grid)
-      allocate(con_wall(-nb:nc)); con_wall = 0.
+      allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
     end if ! heat_transfer
 
     if(turbulence_statistics) then
@@ -377,18 +377,18 @@
     nearest_wall_cell = 0
 
     ! Other variables such as time scale, length scale and production
-    allocate(turb % t_scale (-nb:nc));  turb % t_scale  = 0.
-    allocate(turb % l_scale (-nb:nc));  turb % l_scale  = 0.
-    allocate(p_kin   (-nb:nc));  p_kin    = 0.
-    allocate(vis_t   (-nb:nc));  vis_t    = 0.
-    allocate(vis_wall(-nb:nc));  vis_wall = 0.
+    allocate(turb % t_scale (-nb:nc));  turb % t_scale = 0.
+    allocate(turb % l_scale (-nb:nc));  turb % l_scale = 0.
+    allocate(turb % vis_t   (-nb:nc));  turb % vis_t   = 0.
+    allocate(turb % vis_w   (-nb:nc));  turb % vis_w   = 0.  ! wall visc
+    allocate(turb % p_kin   (-nb:nc));  turb % p_kin   = 0.
     allocate(y_plus  (-nb:nc));  y_plus   = 0.
 
     if(heat_transfer) then
       call Var_Mod_Allocate_New_Only('UT', turb % ut, grid)
       call Var_Mod_Allocate_New_Only('VT', turb % vt, grid)
       call Var_Mod_Allocate_New_Only('WT', turb % wt, grid)
-      allocate(con_wall(-nb:nc)); con_wall = 0.
+      allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
     end if ! heat_transfer
 
     if(turbulence_statistics) then
@@ -430,18 +430,18 @@
     allocate(wale_v(-nb:nc));  wale_v = 0.
 
     ! Other variables such as time scale, length scale and production
-    allocate(turb % t_scale (-nb:nc));  turb % t_scale  = 0.
-    allocate(turb % l_scale (-nb:nc));  turb % l_scale  = 0.
-    allocate(p_kin   (-nb:nc));  p_kin    = 0.
-    allocate(vis_t   (-nb:nc));  vis_t    = 0.
-    allocate(vis_wall(-nb:nc));  vis_wall = 0.
+    allocate(turb % t_scale (-nb:nc));  turb % t_scale = 0.
+    allocate(turb % l_scale (-nb:nc));  turb % l_scale = 0.
+    allocate(turb % vis_t   (-nb:nc));  turb % vis_t   = 0.
+    allocate(turb % vis_w   (-nb:nc));  turb % vis_w   = 0.
+    allocate(turb % p_kin   (-nb:nc));  turb % p_kin   = 0.
     allocate(y_plus  (-nb:nc));  y_plus   = 0.
 
     if(heat_transfer) then
       call Var_Mod_Allocate_New_Only('UT', turb % ut, grid)
       call Var_Mod_Allocate_New_Only('VT', turb % vt, grid)
       call Var_Mod_Allocate_New_Only('WT', turb % wt, grid)
-      allocate(con_wall(-nb:nc)); con_wall = 0.
+      allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
     end if ! heat_transfer
 
     if(turbulence_statistics) then
@@ -483,11 +483,11 @@
     allocate(c_dyn(-nb:nc));  c_dyn = 0.
 
     ! Other variables such as time scale, length scale and production
-    allocate(turb % t_scale (-nb:nc));  turb % t_scale  = 0.
-    allocate(turb % l_scale (-nb:nc));  turb % l_scale  = 0.
-    allocate(p_kin   (-nb:nc));  p_kin    = 0.
-    allocate(vis_t   (-nb:nc));  vis_t    = 0.
-    allocate(vis_wall(-nb:nc));  vis_wall = 0.
+    allocate(turb % t_scale (-nb:nc));  turb % t_scale = 0.
+    allocate(turb % l_scale (-nb:nc));  turb % l_scale = 0.
+    allocate(turb % vis_t   (-nb:nc));  turb % vis_t   = 0.
+    allocate(turb % vis_w   (-nb:nc));  turb % vis_w   = 0.  ! wall visc
+    allocate(turb % p_kin   (-nb:nc));  turb % p_kin   = 0.
     allocate(y_plus  (-nb:nc));  y_plus   = 0.
 
     if(heat_transfer) then
@@ -495,7 +495,7 @@
       call Var_Mod_Allocate_New_Only('UT', turb % ut, grid)
       call Var_Mod_Allocate_New_Only('VT', turb % vt, grid)
       call Var_Mod_Allocate_New_Only('WT', turb % wt, grid)
-      allocate(con_wall(-nb:nc)); con_wall = 0.
+      allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
 
     end if ! heat_transfer
 
@@ -547,13 +547,13 @@
     ! Other variables such as time scale, length scale and production
     allocate(turb % vis_t_eff(-nb:nc));  turb % vis_t_eff = 0.
     allocate(turb % vis_t_sgs(-nb:nc));  turb % vis_t_sgs = 0.
+    allocate(turb % vis_t    (-nb:nc));  turb % vis_t     = 0.
+    allocate(turb % vis_w    (-nb:nc));  turb % vis_w     = 0.  ! wall visc
     allocate(turb % t_scale  (-nb:nc));  turb % t_scale   = 0.
     allocate(turb % l_scale  (-nb:nc));  turb % l_scale   = 0.
     allocate(turb % alpha_l  (-nb:nc));  turb % alpha_l   = 0.
     allocate(turb % alpha_u  (-nb:nc));  turb % alpha_u   = 0.
-    allocate(p_kin    (-nb:nc));  p_kin     = 0.
-    allocate(vis_t    (-nb:nc));  vis_t     = 0.
-    allocate(vis_wall (-nb:nc));  vis_wall  = 0.
+    allocate(turb % p_kin    (-nb:nc));  turb % p_kin     = 0.
     allocate(y_plus   (-nb:nc));  y_plus    = 0.
 
     if(heat_transfer) then
@@ -561,8 +561,8 @@
       call Var_Mod_Allocate_New_Only('UT', turb % ut, grid)
       call Var_Mod_Allocate_New_Only('VT', turb % vt, grid)
       call Var_Mod_Allocate_New_Only('WT', turb % wt, grid)
-      allocate(con_wall(-nb:nc)); con_wall = 0.
-      allocate(p_t2    (-nb:nc)); p_t2     = 0.
+      allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
+      allocate(turb % p_t2 (-nb:nc));  turb % p_t2  = 0.
     end if ! heat_transfer
 
     if(turbulence_statistics) then

@@ -9,7 +9,6 @@
   type(Solver_Type), target :: sol
 !---------------------------------[Calling]------------------------------------!
   real :: Y_Plus_Low_Re
-  real :: Roughness_Coefficient
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
@@ -50,11 +49,11 @@
   ! Production source:
   do c = 1, grid % n_cells
 
-    p_t2(c) = - 2.0 * (  ut % n(c) * t % x(c)   &
-                       + vt % n(c) * t % y(c)   &
-                       + wt % n(c) * t % z(c))
+    turb % p_t2(c) = - 2.0 * (  ut % n(c) * t % x(c)   &
+                              + vt % n(c) * t % y(c)   &
+                              + wt % n(c) * t % z(c))
 
-    b(c) = b(c) + p_t2(c) * grid % vol(c)
+    b(c) = b(c) + turb % p_t2(c) * grid % vol(c)
 
    ! Negative contribution
    a % val(a % dia(c)) = a % val(a % dia(c)) +  &

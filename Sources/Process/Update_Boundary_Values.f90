@@ -18,7 +18,6 @@
   type(Field_Type), target :: flow
   type(Turb_Type),  target :: turb
 !---------------------------------[Calling]------------------------------------!
-  real :: Turbulent_Prandtl_Number
   real :: Y_Plus_Low_Re
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
@@ -161,7 +160,7 @@
            turbulence_model .ne. HYBRID_LES_PRANDTL  .and.  &
            turbulence_model .ne. NONE                .and.  &
            turbulence_model .ne. DNS) then
-          pr_t = Turbulent_Prandtl_Number(grid, c1)
+          pr_t = Turb_Mod_Prandtl_Number(turb, c1)
         end if
 
         nx = grid % sx(s) / grid % s(s)
@@ -175,7 +174,7 @@
         if(turbulence_model .ne. NONE .and.    &
            turbulence_model .ne. DNS) then
           con_t = conductivity                 &
-                + capacity*vis_t(c1) / pr_t
+                + capacity * turb % vis_t(c1) / pr_t
         else
           con_t = conductivity
         end if
@@ -187,11 +186,11 @@
            turbulence_model .eq. K_EPS) then
           if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
             t % n(c2) = t % n(c1) + t % q(c2) * grid % wall_dist(c1)  &
-                      / (con_wall(c1) + TINY)
+                      / (turb % con_w(c1) + TINY)
             heat_flux = heat_flux + t % q(c2) * grid % s(s)
             if(abs(t % q(c2)) > TINY) heated_area = heated_area + grid % s(s)
           else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) then
-            t % q(c2) = ( t % n(c2) - t % n(c1) ) * con_wall(c1)  &
+            t % q(c2) = ( t % n(c2) - t % n(c1) ) * turb % con_w(c1)  &
                       / grid % wall_dist(c1)
             heat_flux = heat_flux + t % q(c2) * grid % s(s)
             if(abs(t % q(c2)) > TINY) heated_area = heated_area + grid % s(s)

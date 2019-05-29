@@ -24,8 +24,6 @@
   type(Solver_Type), target :: sol
   integer                   :: ini
   real                      :: dt
-!----------------------------------[Calling]-----------------------------------!
-  real :: Turbulent_Prandtl_Number
 !-----------------------------------[Locals]-----------------------------------! 
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w, t
@@ -132,8 +130,8 @@
        turbulence_model .ne. LES_WALE           .and.  &
        turbulence_model .ne. NONE               .and.  &
        turbulence_model .ne. DNS) then
-      pr_t1 = Turbulent_Prandtl_Number(grid, c1)
-      pr_t2 = Turbulent_Prandtl_Number(grid, c2)
+      pr_t1 = Turb_Mod_Prandtl_Number(turb, c1)
+      pr_t2 = Turb_Mod_Prandtl_Number(turb, c2)
       pr_tf = grid % fw(s) * pr_t1 + (1.0-grid % fw(s)) * pr_t2
     else
       pr_tf = pr_t      
@@ -148,10 +146,10 @@
     tz_f2 = tz_f1
     if(turbulence_model .ne. NONE .and.  &
        turbulence_model .ne. DNS) then
-      con_eff1 =      grid % fw(s)  * (conductivity+capacity*vis_t(c1)/pr_tf)  &
-               + (1.0-grid % fw(s)) * (conductivity+capacity*vis_t(c2)/pr_tf)
-      con_t    =      grid % fw(s)  * capacity*vis_t(c1)/pr_tf  &
-               + (1.0-grid % fw(s)) * capacity*vis_t(c2)/pr_tf
+      con_eff1 = grid % fw(s) *(conductivity+capacity*turb % vis_t(c1)/pr_tf) &
+          + (1.0-grid % fw(s))*(conductivity+capacity*turb % vis_t(c2)/pr_tf)
+      con_t    = grid % fw(s) *capacity*turb % vis_t(c1)/pr_tf  &
+          + (1.0-grid % fw(s))*capacity*turb % vis_t(c2)/pr_tf
     else
       con_eff1 = conductivity
     end if
@@ -164,7 +162,7 @@
       if(c2 < 0) then
         if(Var_Mod_Bnd_Cell_Type(t, c2) .eq. WALL .or.  &
            Var_Mod_Bnd_Cell_Type(t, c2) .eq. WALLFL) then
-          con_eff1 = con_wall(c1)
+          con_eff1 = turb % con_w(c1)
           con_eff2 = con_eff1
         end if
       end if

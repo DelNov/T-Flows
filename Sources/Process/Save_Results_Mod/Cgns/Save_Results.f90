@@ -158,22 +158,31 @@
      turbulence_model .eq. RSM_MANCEAU_HANJALIC  .or.  &
      turbulence_model .eq. RSM_HANJALIC_JAKIRLIC       ) then
 
-    call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              turb % kin % n(1), "TurbulentKineticEnergy")
-    call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              turb % eps % n(1), "TurbulentDissipation")
-    call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              p_kin(1), "TurbulentKineticEnergyProduction")
-    call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              turb % alpha1(1), "TurbulentQauntityAlpha1")
+    call Cgns_Mod_Write_Field(base, block, solution, field, grid,  &
+                              turb % kin % n(1),                   &
+                              "TurbulentKineticEnergy")
+    call Cgns_Mod_Write_Field(base, block, solution, field, grid,  &
+                              turb % eps % n(1),                   &
+                              "TurbulentDissipation")
+    call Cgns_Mod_Write_Field(base, block, solution, field, grid,  &
+                              turb % p_kin(1),                     &
+                              "TurbulentKineticEnergyProduction")
+    call Cgns_Mod_Write_Field(base, block, solution, field, grid,  &
+                              turb % alpha_l(1),                   &
+                              "TurbulentQauntityAlphaL")
+    call Cgns_Mod_Write_Field(base, block, solution, field, grid,  &
+                              turb % alpha_u(1),                   &
+                              "TurbulentQauntityAlphaU")
 
     if(heat_transfer .and. turbulence_model .eq. K_EPS) then
-      call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                                turb % t2 % n(1),  "TurbulentQuantityT2")
-      call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                                p_t2(1),    "TurbulentT2Production")
+      call Cgns_Mod_Write_Field(base, block, solution, field, grid,  &
+                                turb % t2 % n(1),                    &
+                                "TurbulentQuantityT2")
+      call Cgns_Mod_Write_Field(base, block, solution, field, grid,  &
+                                turb % p_t2(1),                      &
+                                "TurbulentT2Production")
     end if
-   
+
   end if
 
   ! Zeta, v2 and f22 and T2
@@ -193,7 +202,7 @@
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                                 turb % t2 % n(1),  "TurbulentQuantityT2")
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                                p_t2(1),    "TurbulentT2Production")
+                                turb % p_t2(1),    "TurbulentT2Production")
     end if
     
   end if
@@ -212,7 +221,7 @@
                               flow % vort(1),"VorticityMagnitude")
   end if
   if(turbulence_model .ne. NONE) then
-    kin_vis_t(1) = vis_t(1) / viscosity
+    kin_vis_t(1) = turb % vis_t(1) / viscosity
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               kin_vis_t(1),"EddyOverMolecularViscosity")
   end if

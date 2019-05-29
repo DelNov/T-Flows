@@ -50,18 +50,18 @@
   do  c = 1, grid % n_cells 
     kin % n(c) = max(0.5*(  uu % n(c)  &
                           + vv % n(c)  &
-                          + ww % n(c)), tiny)
-    p_kin(c)   = max(-(  uu % n(c)*u % x(c)  &
-                       + uv % n(c)*u % y(c)  &
-                       + uw % n(c)*u % z(c)  &
-                       + uv % n(c)*v % x(c)  &
-                       + vv % n(c)*v % y(c)  &
-                       + vw % n(c)*v % z(c)  &
-                       + uw % n(c)*w % x(c)  &
-                       + vw % n(c)*w % y(c)  &
-                       + ww % n(c)*w % z(c)), tiny)
+                          + ww % n(c)), TINY)
+    turb % p_kin(c) = max(-(  uu % n(c)*u % x(c)  &
+                            + uv % n(c)*u % y(c)  &
+                            + uw % n(c)*u % z(c)  &
+                            + uv % n(c)*v % x(c)  &
+                            + vv % n(c)*v % y(c)  &
+                            + vw % n(c)*v % z(c)  &
+                            + uw % n(c)*w % x(c)  &
+                            + vw % n(c)*w % y(c)  &
+                            + ww % n(c)*w % z(c)), TINY)
 
-    mag = max(tiny, sqrt(f22_x(c)**2 + f22_y(c)**2 + f22_z(c)**2))
+    mag = max(TINY, sqrt(f22_x(c)**2 + f22_y(c)**2 + f22_z(c)**2))
     n1 = f22_x(c) / mag
     n2 = f22_y(c) / mag
     n3 = f22_z(c) / mag
@@ -114,7 +114,7 @@
                              - 0.5*(n1*n1+1.0)*uu_nn)
 
       phi_hom = - g1      * eps % n(c) * (-ONE_THIRD)                    &
-                - g1_star * p_kin(c)   * (-ONE_THIRD)                    &
+                - g1_star * turb % p_kin(c) * (-ONE_THIRD)               &
                 + (g3-g3_star*sqrt(b_mn_b_mn)) * kin % n(c) * s11        &
                 +  g4 * kin % n(c)*( 2.0*(b11*s11 + b12*s12 + b13*s13)   &
                                     -2.0/3.0 * b_lk_s_lk)                &
@@ -133,12 +133,12 @@
                   + (1.0-f22 % n(c)**2) * phi_wall                   &
                   +      f22 % n(c)**2  *(phi_hom)) * grid % vol(c)
 
-      a % val(a % dia(c)) = a % val(a % dia(c))                         &
-        + density * (max(-prod,0.0) / max(uu % n(c), tiny)           &
-           + (1.0-f22 % n(c)**2) * 6.0 * eps % n(c)/kin % n(c)          &
-           +      f22 % n(c)**2 *(diss_hom/max(uu % n(c), tiny)      &
-                                  + g1*eps % n(c)   /(2.0*kin % n(c))   &
-                                  + g1_star*p_kin(c)/(2.0*kin % n(c)))  &
+      a % val(a % dia(c)) = a % val(a % dia(c))                              &
+        + density * (max(-prod,0.0) / max(uu % n(c), TINY)                   &
+           + (1.0-f22 % n(c)**2) * 6.0 * eps % n(c)/kin % n(c)               &
+           +      f22 % n(c)**2 *(diss_hom/max(uu % n(c), TINY)              &
+                            + g1 * eps % n(c)           / (2.0*kin % n(c))   &
+                            + g1_star * turb % p_kin(c) / (2.0*kin % n(c)))  &
           ) * grid % vol(c)
 
     !---------------!
@@ -151,8 +151,8 @@
                              + 2.0*vw % n(c)*n2*n3     &
                              - 0.5*(n2*n2+1.0)*uu_nn)
 
-      phi_hom = - g1      * eps % n(c) * (-ONE_THIRD)                    &
-                - g1_star * p_kin(c)   * (-ONE_THIRD)                    &
+      phi_hom = - g1      * eps % n(c)      * (-ONE_THIRD)               &
+                - g1_star * turb % p_kin(c) * (-ONE_THIRD)               &
                 + (g3-g3_star*sqrt(b_mn_b_mn)) * kin % n(c) * s22        &
                 +  g4 * kin % n(c) *( 2.0*(b21*s21 + b22*s22 + b23*s23)  &
                                      -2.0/3.0 * b_lk_s_lk)               &
@@ -175,12 +175,12 @@
                   + (1.0-f22 % n(c)**2) * phi_wall                   &
                   +      f22 % n(c)**2  *(phi_hom)) * grid % vol(c)
 
-      a % val(a % dia(c)) = a % val(a % dia(c))                         &
-        + density * (max(-prod,0.0) / max(vv % n(c), tiny)           &
-           + (1.0-f22 % n(c)**2) * 6.0 * eps % n(c)/kin % n(c)          &
-           +      f22 % n(c)**2 *(diss_hom/max(vv % n(c), tiny)      &
-                                  + g1*eps % n(c)   /(2.0*kin % n(c))   &
-                                  + g1_star*p_kin(c)/(2.0*kin % n(c)))  &
+      a % val(a % dia(c)) = a % val(a % dia(c))                              &
+        + density * (max(-prod,0.0) / max(vv % n(c), TINY)                   &
+           + (1.0-f22 % n(c)**2) * 6.0 * eps % n(c)/kin % n(c)               &
+           +      f22 % n(c)**2 *(diss_hom/max(vv % n(c), TINY)              &
+                            + g1 * eps % n(c)           / (2.0*kin % n(c))   &
+                            + g1_star * turb % p_kin(c) / (2.0*kin % n(c)))  &
           ) * grid % vol(c)
 
     !---------------!
@@ -193,8 +193,8 @@
                              + 2.0*ww % n(c)*n3*n3     &
                              - 0.5*(n3*n3+1.0)*uu_nn)
 
-      phi_hom = - g1      * eps % n(c) * (-ONE_THIRD)                    &
-                - g1_star * p_kin(c)   * (-ONE_THIRD)                    &
+      phi_hom = - g1      * eps % n(c)      * (-ONE_THIRD)               &
+                - g1_star * turb % p_kin(c) * (-ONE_THIRD)               &
                 + (g3-g3_star*sqrt(b_mn_b_mn)) * kin % n(c) * s33        &
                 +  g4 * kin % n(c) *( 2.0*(b31*s31 + b32*s32 + b33*s33)  &
                                      -2.0/3.0 * b_lk_s_lk)               &
@@ -216,12 +216,12 @@
                   + (1.0-f22 % n(c)**2) * phi_wall                   &
                   +      f22 % n(c)**2  *(phi_hom)) * grid % vol(c)
 
-      a % val(a % dia(c)) = a % val(a % dia(c))                         &
-        + density * (max(-prod,0.0) / max(ww % n(c), tiny)           &
-           + (1.0-f22 % n(c)**2) * 6.0 * eps % n(c)/kin % n(c)          &
-           +      f22 % n(c)**2 *(diss_hom/max(ww % n(c), tiny)      &
-                                  + g1*eps % n(c)   /(2.0*kin % n(c))   &
-                                  + g1_star*p_kin(c)/(2.0*kin % n(c)))  &
+      a % val(a % dia(c)) = a % val(a % dia(c))                              &
+        + density * (max(-prod,0.0) / max(ww % n(c), TINY)                   &
+           + (1.0-f22 % n(c)**2) * 6.0 * eps % n(c)/kin % n(c)               &
+           +      f22 % n(c)**2 *(diss_hom/max(ww % n(c), TINY)              &
+                            + g1 * eps % n(c)           / (2.0*kin % n(c))   &
+                            + g1_star * turb % p_kin(c) / (2.0*kin % n(c)))  &
           ) * grid % vol(c)
 
     !---------------!
@@ -261,10 +261,10 @@
                   + (1.0-f22 % n(c)**2) * phi_wall                   &
                   +      f22 % n(c)**2  *(phi_hom)) * grid % vol(c)
 
-      a % val(a % dia(c)) =  a % val(a % dia(c))                             &
-        + density * ((1.0 - f22 % n(c)**2) * 6.0 * eps % n(c) / kin % n(c)   &
-                + f22 % n(c)**2  *(  g1 * eps % n(c) / (2.0 * kin % n(c))    &
-                                   + g1_star*p_kin(c) / (2.0 * kin % n(c)))  &
+      a % val(a % dia(c)) =  a % val(a % dia(c))                            &
+        + density * ((1.0 - f22 % n(c)**2) * 6.0 * eps % n(c) / kin % n(c)  &
+                + f22 % n(c)**2 *(  g1 * eps % n(c) / (2.0 * kin % n(c))    &
+                        + g1_star * turb % p_kin(c) / (2.0 * kin % n(c)))   &
           ) * grid % vol(c)
 
     !---------------!
@@ -304,10 +304,10 @@
                   + (1.0-f22 % n(c)**2) * phi_wall                   &
                   +      f22 % n(c)**2  *(phi_hom)) * grid % vol(c)
 
-      a % val(a % dia(c)) =  a % val(a % dia(c))                             &
-        + density * ((1.0 - f22 % n(c)**2) * 6.0 * eps % n(c) / kin % n(c)   &
-                + f22 % n(c)**2  *(  g1 * eps % n(c) / (2.0 * kin % n(c))    &
-                                   + g1_star*p_kin(c) / (2.0 * kin % n(c)))  &
+      a % val(a % dia(c)) =  a % val(a % dia(c))                            &
+        + density * ((1.0 - f22 % n(c)**2) * 6.0 * eps % n(c) / kin % n(c)  &
+                + f22 % n(c)**2  *(  g1 * eps % n(c) / (2.0 * kin % n(c))   &
+                         + g1_star * turb % p_kin(c) / (2.0 * kin % n(c)))  &
           ) * grid % vol(c)
 
     !---------------!
@@ -347,20 +347,21 @@
                   + (1.0-f22 % n(c)**2) * phi_wall                   &
                   +      f22 % n(c)**2  *(phi_hom)) * grid % vol(c)
 
-      a % val(a % dia(c)) =  a % val(a % dia(c))                             &
-        + density * ((1.0 - f22 % n(c)**2) * 6.0 * eps % n(c) / kin % n(c)   &
-        + f22 % n(c)**2  *(  g1 * eps % n(c) / (2.0 * kin % n(c))    &
-                           + g1_star*p_kin(c) / (2.0 * kin % n(c)))  &
+      a % val(a % dia(c)) =  a % val(a % dia(c))                            &
+        + density * ((1.0 - f22 % n(c)**2) * 6.0 * eps % n(c) / kin % n(c)  &
+        + f22 % n(c)**2  *(  g1 * eps % n(c) / (2.0 * kin % n(c))           &
+                 + g1_star * turb % p_kin(c) / (2.0 * kin % n(c)))          &
                      ) * grid % vol(c)
 
     !----------------------!
     !   Epsilon equation   !
     !----------------------!
     else if(name_phi == 'EPS') then
-      esor = grid % vol(c) / max(turb % t_scale(c),tiny)
+      esor = grid % vol(c) / max(turb % t_scale(c), TINY)
 
-      ce_11 = c_1e*(1.0 + 0.065*(1.0 - f22 % n(c)**3) * p_kin(c) / eps % n(c))
-      b(c) = b(c) + density * ce_11 * p_kin(c) * esor
+      ce_11 = c_1e * (1.0 + 0.065*(1.0 - f22 % n(c)**3)  &
+                   * turb % p_kin(c) / eps % n(c))
+      b(c) = b(c) + density * ce_11 * turb % p_kin(c) * esor
 
       ! Fill in a diagonal of coefficient matrix
       a % val(a % dia(c)) =  a % val(a % dia(c)) + c_2e * esor * density

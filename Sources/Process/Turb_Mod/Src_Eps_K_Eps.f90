@@ -26,9 +26,10 @@
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: s, c, c1, c2, j
-  real                       :: u_tan, u_tau, tau_wall
+  real                       :: u_tan, u_tau, tau_wall, y_plus
   real                       :: re_t, f_mu, u_tau_new, fa, kin_vis
   real                       :: eps_wf, eps_int, ebf, y_star
+  real                       :: z_o
 !==============================================================================!
 !   Dimensions:                                                                !
 !                                                                              !
@@ -55,7 +56,7 @@
   do c = 1, grid % n_cells
     ! Positive contribution:
     b(c) = b(c) + &
-            c_1e * p_kin(c) * eps % n(c)/kin % n(c) * grid % vol(c)
+            c_1e * turb % p_kin(c) * eps % n(c) / kin % n(c) * grid % vol(c)
 
     ! Negative contribution:
     re_t = kin % n(c)*kin % n(c)/(kin_vis*eps % n(c))
@@ -93,9 +94,9 @@
         u_tan = Field_Mod_U_Tan(flow, s)
 
         if(rough_walls) then 
-          turb % z_o = Roughness_Coefficient(turb % z_o, turb % z_o_f(c1), c1)       
+          z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
           eps % n(c1) = c_mu75 * kin % n(c1)**1.5  &
-                      / ((grid % wall_dist(c1) + turb % z_o) * kappa)
+                      / ((grid % wall_dist(c1) + z_o) * kappa)
 
           ! Adjusting coefficient to fix eps value in near wall calls
           do j = a % row(c1), a % row(c1 + 1) - 1
@@ -106,21 +107,22 @@
           a % val(a % dia(c1)) = 1.0 * density
         else
           u_tau = c_mu25 * sqrt(kin % n(c1))
-          y_plus(c1) = Y_Plus_Low_Re(u_tau, grid % wall_dist(c1), kin_vis)
-          tau_wall = density * kappa * u_tau * u_tan   &
-                   / log(e_log * max(y_plus(c1), 1.05))
-          u_tau_new = sqrt(tau_wall / density)
-          y_plus(c1) = Y_Plus_Low_Re(u_tau_new, grid % wall_dist(c1), kin_vis)
+          y_plus = Y_Plus_Low_Re(u_tau, grid % wall_dist(c1), kin_vis)
 
-          ebf = 0.01 * y_plus(c1)**4 / (1.0 + 5.0*y_plus(c1))
+          tau_wall = density*kappa*u_tau*u_tan   &
+                   / log(e_log * max(y_plus, 1.05))
+
+          u_tau_new = sqrt(tau_wall/density)
+          y_plus = Y_Plus_Low_Re(u_tau_new, grid % wall_dist(c1), kin_vis)
+
           eps_int = 2.0*viscosity/density * kin % n(c1)    &
                   / grid % wall_dist(c1)**2
           eps_wf  = c_mu75 * kin % n(c1)**1.5              &
                   / (grid % wall_dist(c1) * kappa)
 
-          if(y_plus(c1) > 3) then
+          if(y_plus > 3) then
             fa = min(density*u_tau_new**3  &
-               / (kappa*grid % wall_dist(c1)*p_kin(c1)),1.0)
+               / (kappa*grid % wall_dist(c1) * turb % p_kin(c1)),1.0)
 
             eps % n(c1) = (1.0-fa)*eps_int + fa*eps_wf
 

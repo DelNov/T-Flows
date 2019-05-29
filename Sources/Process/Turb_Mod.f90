@@ -83,13 +83,23 @@
     real, allocatable :: uv_mean(:), vw_mean(:), uw_mean(:)
     real, allocatable :: ut_mean(:), vt_mean(:), wt_mean(:), t2_mean(:)
 
+    ! Production of turbulent kinetic energy and temperature fluctuations
+    real, allocatable :: p_kin(:), p_t2(:)
+
     ! Turbulent lenght and time Scales
     real, allocatable :: l_scale(:)
     real, allocatable :: t_scale(:)
 
+    ! Turbulent viscosity
+    real, allocatable :: vis_t(:)
+
     ! Effective turbulent viscosity
     real, allocatable :: vis_t_eff(:)
     real, allocatable :: vis_t_sgs(:)
+
+    ! Wall viscosity and conductivity (wall function approach)
+    real, allocatable :: vis_w(:)
+    real, allocatable :: con_w(:)
 
     ! Hydraulic roughness (constant and variable)
     real              :: z_o
@@ -141,10 +151,6 @@
 
   logical :: rough_walls
 
-  !---------------------------------!
-  !   Turbulence models variables   !
-  !---------------------------------!
-
   !--------------------------------!
   !   Turbulence model constants   !
   !--------------------------------!
@@ -162,28 +168,17 @@
   ! For scale-resolving models
   real              :: c_smag
   real, allocatable :: c_dyn(:)
+  real, allocatable :: wale_v(:)
 
   !-----------------------------------!
   !   Auxiliary turbulent variables   !
   !-----------------------------------!
 
-  ! Turbulent viscosity
-  real, allocatable :: vis_t(:)
-
-  real, allocatable :: wale_v(:)
-
   ! For LES you need to know nearest wall cell
   integer, allocatable :: nearest_wall_cell(:)
 
-  ! Wall viscosity (wall function approuch)
-  real, allocatable :: vis_wall(:)
-  real, allocatable :: con_wall(:)
-
   ! Non-dimensional distance
   real, allocatable :: y_plus(:)
-
-  ! Production of turbulent kinetic energy
-  real,allocatable :: p_kin(:), p_t2(:)
 
   ! Buoyancy production for k-eps-zeta-f model
   ! (bouy_beta is only set to 1 and used as such.  Is it needed?)
@@ -246,5 +241,7 @@
   include 'Turb_Mod/Vis_T_Spalart_Allmaras.f90'
   include 'Turb_Mod/Vis_T_Wale.f90'
 
+  ! Calculation of turbulent Prandtl number
+  include 'Turb_Mod/Prandtl_Number.f90'
 
   end module

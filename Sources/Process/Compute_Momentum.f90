@@ -43,7 +43,7 @@
   real                       :: f_ex, f_im, f_stress
   real                       :: uis, vel_max
   real                       :: a0, a12, a21
-  real                       :: vis_eff, vis_tS
+  real                       :: vis_eff, vis_ts
   real                       :: ui_i_f, ui_j_f, ui_k_f, uj_i_f, uk_i_f
   real                       :: uu_f, vv_f, ww_f, uv_f, uw_f, vw_f
 !------------------------------------------------------------------------------!
@@ -100,7 +100,7 @@
 !     au*, av*, aw*  [kgm/s^2]   [N]
 !     du*, dv*, dw*  [kgm/s^2]   [N]
 !     cu*, cv*, cw*  [kgm/s^2]   [N]
-!     Wall visc.      vis_wall [kg/(m*s)]
+!     Wall visc.      vis_w [kg/(m*s)]
 !==============================================================================!
 
   call Cpu_Timer_Mod_Start('Compute_Momentum (without solvers)')
@@ -190,7 +190,8 @@
 
     if(turbulence_model .ne. NONE .and.  &
        turbulence_model .ne. DNS) then
-      vis_eff = vis_eff + grid % fw(s)*vis_t(c1)+(1.0-grid % fw(s))*vis_t(c2)
+      vis_eff = vis_eff + grid % fw(s)  * turb % vis_t(c1)  &
+                    +(1.0-grid % fw(s)) * turb % vis_t(c2)
     end if
 
     if(turbulence_model .eq. HYBRID_LES_RANS) then
@@ -205,7 +206,7 @@
           turbulence_model .eq. LES_WALE) then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
-          vis_eff = vis_wall(c1)
+          vis_eff = turb % vis_w(c1)
         end if
       end if
     end if
@@ -216,7 +217,7 @@
       if(c2 < 0) then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
-          vis_eff = vis_wall(c1)
+          vis_eff = turb % vis_w(c1)
         end if
       end if
     end if
@@ -309,9 +310,10 @@
         c1 = grid % faces_c(1,s)
         c2 = grid % faces_c(2,s)
 
-        vis_tS = (grid % fw(s)*vis_t(c1)+(1.0-grid % fw(s))*vis_t(c2))
-        a0 = a % fc(s)*vis_tS
-        vis_eff = vis_tS
+        vis_ts =     (grid % fw(s)  * turb % vis_t(c1)  &
+               + (1.0-grid % fw(s)) * turb % vis_t(c2))
+        a0 = a % fc(s)*vis_ts
+        vis_eff = vis_ts
 
         ui_i_f = grid % fw(s) * ui_i(c1) + (1.0-grid % fw(s)) * ui_i(c2)
         ui_j_f = grid % fw(s) * ui_j(c1) + (1.0-grid % fw(s)) * ui_j(c2)

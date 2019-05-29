@@ -31,6 +31,7 @@
   real                       :: u_tan, u_tau, tau_wall
   real                       :: lf, ebf, p_kin_int, p_kin_wf
   real                       :: l_rans, l_sgs, u_rans, u_sgs, kin_vis
+  real                       :: z_o, alpha1, y_plus
 !==============================================================================!
 !   Dimensions:                                                                !
 !                                                                              !
@@ -55,49 +56,27 @@
 
   ! Production source:
   do c = 1, grid % n_cells
-    p_kin(c) = vis_t(c) * flow % shear(c)**2
-    b(c)     = b(c) + p_kin(c) * grid % vol(c)
+    turb % p_kin(c) = turb % vis_t(c) * flow % shear(c)**2
+    b(c) = b(c) + turb % p_kin(c) * grid % vol(c)
   end do
 
   if(turbulence_model .eq. HYBRID_LES_RANS) then
     do c = 1, grid % n_cells
-
-      ! Ratio of turbulent lenght scales
       lf = grid % vol(c)**ONE_THIRD
       l_sgs  = 0.8*lf
       l_rans = 0.41*grid % wall_dist(c)
-      turb % alpha_l(c) = max(1.0, l_rans / l_sgs)
+      alpha1 = max(1.0,l_rans/l_sgs)
 
-      ! Ratio of velocity scales
-      u_sgs  = grid % vol(c)**ONE_THIRD * flow % shear(c)
-      u_rans = sqrt(kin % n(c) * zeta % n(c))
-      turb % alpha_u(c) = u_rans / u_sgs
-
-      ! We are in the RANS region
-      if(turb % alpha_u(c) < 0.85) then
+      if(alpha1 < 1.05) then
         a % val(a % dia(c)) = a % val(a % dia(c))   &
                             + density * eps % n(c)  &
                             / (kin % n(c) + TINY) * grid % vol(c)
-      ! LES region
       else
-        a % val(a % dia(c)) = a % val(a % dia(c))                     &
-          + density                                                   &
-          * min(turb % alpha_l(c)**1.4 * eps % n(c), kin % n(c)**1.5  &
-          / (lf*0.01)) / (kin % n(c) + TINY) * grid % vol(c)
+        a % val(a % dia(c)) = a % val(a % dia(c))   &
+          + density                                 &
+          * min(alpha1**1.45 * eps % n(c), kin % n(c)**1.5 / (lf*0.01))  &
+          / (kin % n(c) + TINY) * grid % vol(c)
       end if
-
-!     if(turb % alpha_l(c) < 1.05) then
-!       a % val(a % dia(c)) = a % val(a % dia(c))   &
-!                           + density * eps % n(c)  &
-!                           / (kin % n(c) + TINY) * grid % vol(c)
-!     else
-!       a % val(a % dia(c)) = a % val(a % dia(c))                     &
-!         + density                                                   &
-!         * min(turb % alpha_l(c)**1.45 * eps % n(c), kin % n(c)**1.5  &
-!                / (lf*0.01))                                         &
-!         / (kin % n(c) + TINY) * grid % vol(c)
-!     end if
-
     end do
   else  ! turbuence model will be K_EPS_ZETA_F
     do c = 1, grid % n_cells
@@ -132,34 +111,38 @@
         u_tan = Field_Mod_U_Tan(flow, s)
 
         if(rough_walls) then
-          turb % z_o = Roughness_Coefficient(turb % z_o, turb % z_o_f(c1), c1)
-          u_tau = c_mu25 * sqrt(kin % n(c1))
-          y_plus(c1) = Y_Plus_Rough_Walls(turb,                  &
-                                          u_tau,                 &
-                                          grid % wall_dist(c1),  &
-                                          kin_vis)
-          tau_wall = density * kappa * u_tau * u_tan  &
-                   / log(((grid % wall_dist(c1)+turb % z_o) / turb % z_o))
-          p_kin(c1) = tau_wall * c_mu25 * sqrt(kin % n(c1)) &
-                      / (kappa*(grid % wall_dist(c1) + turb % z_o))
-          b(c1)     = b(c1) + (p_kin(c1)  &
-                    - vis_t(c1) * flow % shear(c1)**2) * grid % vol(c1)
+          z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
+          u_tau  = c_mu25 * sqrt(kin % n(c1))
+          y_plus = Y_Plus_Rough_Walls(u_tau, &
+                       grid % wall_dist(c1), kin_vis) 
+
+          tau_wall = density*kappa*u_tau*u_tan  &
+                   / log(((grid % wall_dist(c1)+z_o) / z_o))
+
+          turb % p_kin(c1) = tau_wall * c_mu25 * sqrt(kin % n(c1)) &
+                           / (kappa*(grid % wall_dist(c1)+z_o))
+          b(c1) = b(c1) + (turb % p_kin(c1)  &
+                - turb % vis_t(c1) * flow % shear(c1)**2) * grid % vol(c1)
         else
           u_tau = c_mu25 * sqrt(kin % n(c1))
-          y_plus(c1) = Y_Plus_Low_Re(u_tau, grid % wall_dist(c1), kin_vis)
-          tau_wall = density*kappa*u_tau*u_tan  &
-                   / log(e_log*max(y_plus(c1),1.05))
+          y_plus = Y_Plus_Low_Re(u_tau, grid % wall_dist(c1), kin_vis)
 
-          ebf = max(0.01 * y_plus(c1)**4 / (1.0 + 5.0*y_plus(c1)),tiny)
-          p_kin_wf  = tau_wall * 0.07**0.25 * sqrt(kin % n(c1))  &
+          tau_wall = density*kappa*u_tau*u_tan  &
+                   / log(e_log*max(y_plus,1.05))
+
+          ebf = max(0.01 * y_plus**4 / (1.0 + 5.0*y_plus), TINY)
+
+          p_kin_wf  = tau_wall * c_mu25 * sqrt(kin % n(c1))  &
                     / (grid % wall_dist(c1) * kappa)
-          p_kin_int = vis_t(c1) * flow % shear(c1)**2
-          p_kin(c1) = p_kin_int * exp(-1.0 * ebf) + p_kin_wf  &
-                    * exp(-1.0 / ebf)
-          b(c1)     = b(c1) + (p_kin(c1) - p_kin_int) * grid % vol(c1)
-        end if  ! rough_walls
-      end if    ! Grid_Mod_Bnd_Cond_Type(grid,c2).eq.WALL or WALLFL
-    end if      ! c2 < 0
+
+          p_kin_int = turb % vis_t(c1) * flow % shear(c1)**2
+
+          turb % p_kin(c1) = p_kin_int * exp(-1.0 * ebf) + p_kin_wf  &
+                           * exp(-1.0 / ebf)
+          b(c1) = b(c1) + (turb % p_kin(c1) - p_kin_int) * grid % vol(c1)
+        end if! rough_walls
+      end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2).eq.WALL or WALLFL
+    end if    ! c2 < 0
   end do
 
   end subroutine

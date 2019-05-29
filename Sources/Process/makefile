@@ -255,7 +255,6 @@ SRC_FUN += Y_Plus_Low_Re.f90		\
            U_Plus_Rough_Walls.f90	\
            Time_And_Length_Scale.f90	\
            Find_Nearest_Wall_Cell.f90	\
-           Turbulent_Prandtl_Number.f90	\
            Roughness_Coefficient.f90
 
 SRC_FUN += Distance.f90		\

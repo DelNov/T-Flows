@@ -123,18 +123,18 @@
     call Backup_Mod_Write_Variable(fh,d,vc, 'eps', tur % eps)
 
     ! Other turbulent quantities
-    call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'p_kin',    p_kin   (-nb_s:nc_s))
-    call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'y_plus',   y_plus  (-nb_s:nc_s))
-    call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'vis_t',    vis_t   (-nb_s:nc_s))
-    call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'vis_wall', vis_wall(-nb_s:nc_s))
+    call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'p_kin',  tur % p_kin(-nb_s:nc_s))
+    call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'y_plus', y_plus     (-nb_s:nc_s))
+    call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'vis_t',  tur % vis_t(-nb_s:nc_s))
+    call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'vis_w',  tur % vis_w(-nb_s:nc_s))
 
     ! Turbulence quantities connected with heat transfer
     if(heat_transfer) then
-      call Backup_Mod_Write_Variable(fh,d,vc, 't2',       tur % t2)
-      call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'p_t2',     p_t2    (-nb_s:nc_s))
-      call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'con_wall',con_wall(-nb_s:nc_s))
+      call Backup_Mod_Write_Variable(fh,d,vc, 't2',    tur % t2)
+      call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'p_t2',  tur % p_t2 (-nb_s:nc_s))
+      call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'con_w', tur % con_w(-nb_s:nc_s))
     end if
-  
+
   end if
 
   !------------------------!
@@ -150,17 +150,17 @@
     call Backup_Mod_Write_Variable(fh,d,vc, 'f22',  tur % f22)
 
     ! Other turbulent quantities
-    call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'p_kin',    p_kin   (-nb_s:nc_s))
-    call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'y_plus',   y_plus  (-nb_s:nc_s))
-    call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'vis_t',    vis_t   (-nb_s:nc_s))
-    call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'vis_wall', vis_wall(-nb_s:nc_s))
-    call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 't_scale',  tur % t_scale(-nb_s:nc_s))
-    call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'l_scale',  tur % l_scale(-nb_s:nc_s))
-  
+    call Backup_Mod_Write_Cell_Bnd(fh,d,vc,'p_kin',  tur % p_kin(-nb_s:nc_s))
+    call Backup_Mod_Write_Cell_Bnd(fh,d,vc,'y_plus', y_plus     (-nb_s:nc_s))
+    call Backup_Mod_Write_Cell_Bnd(fh,d,vc,'vis_t',  tur % vis_t(-nb_s:nc_s))
+    call Backup_Mod_Write_Cell_Bnd(fh,d,vc,'vis_w',  tur % vis_w(-nb_s:nc_s))
+    call Backup_Mod_Write_Cell_Bnd(fh,d,vc,'t_scale',tur % t_scale(-nb_s:nc_s))
+    call Backup_Mod_Write_Cell_Bnd(fh,d,vc,'l_scale',tur % l_scale(-nb_s:nc_s))
+
     if(heat_transfer) then
-      call Backup_Mod_Write_Variable(fh,d,vc, 't2',       tur % t2)
-      call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'p_t2',     p_t2    (-nb_s:nc_s))
-      call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'con_wall', con_wall(-nb_s:nc_s))
+      call Backup_Mod_Write_Variable(fh,d,vc, 't2',    tur % t2)
+      call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'p_t2',  tur % p_t2 (-nb_s:nc_s))
+      call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'con_w', tur % con_w(-nb_s:nc_s))
     end if
 
   end if
@@ -188,11 +188,12 @@
     end if
 
     ! Other turbulent quantities 
-    call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'vis_t', vis_t(-nb_s:nc_s))
+    call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'vis_t', tur % vis_t(-nb_s:nc_s))
+    call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'vis_w', tur % vis_w(-nb_s:nc_s))
 
     ! Turbulence quantities connected with heat transfer
     if(heat_transfer) then
-      call Backup_Mod_Write_Cell_Bnd(fh,d,vc, 'con_wall',con_wall(-nb_s:nc_s))
+      call Backup_Mod_Write_Cell_Bnd(fh,d,vc,'con_w',tur % con_w(-nb_s:nc_s))
     end if
   end if
 

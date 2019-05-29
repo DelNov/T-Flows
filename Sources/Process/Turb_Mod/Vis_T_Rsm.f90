@@ -26,7 +26,7 @@
 !   density       density  [kg/m^3]    | turb. kin en.   kin % n   [m^2/s^2]   !
 !   cell volume   vol      [m^3]       | length          lf        [m]         !
 !   left hand s.  A        [kg/s]      | right hand s.   b         [kg*m^2/s^3]!
-!   wall visc.    vis_wall [kg/(m*s)]  | kinematic viscosity       [m^2/s]     !
+!   wall visc.    vis_w    [kg/(m*s)]  | kinematic viscosity       [m^2/s]     !
 !   thermal cap.  capacity[m^2/(s^2*K)]| therm. conductivity     [kg*m/(s^3*K)]!
 !------------------------------------------------------------------------------!
 
@@ -51,10 +51,10 @@
       / (kin % n(c) * turb % t_scale(c) * flow % shear(c)**2 + TINY), 0.0)
 
     cmu_mod = min(0.12, cmu_mod)
-    vis_t(c) = cmu_mod * density * kin % n(c) * turb % t_scale(c)
-    vis_t(c) = max(vis_t(c), TINY)
+    turb % vis_t(c) = cmu_mod * density * kin % n(c) * turb % t_scale(c)
+    turb % vis_t(c) = max(turb % vis_t(c), TINY)
   end do
 
-  call Comm_Mod_Exchange_Real(grid, vis_t)
+  call Comm_Mod_Exchange_Real(grid, turb % vis_t)
 
   end subroutine

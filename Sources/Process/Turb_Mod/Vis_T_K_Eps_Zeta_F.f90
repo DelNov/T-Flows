@@ -7,7 +7,6 @@
 !--------------------------------[Arguments]-----------------------------------!
   type(Turb_Type), target :: turb
 !---------------------------------[Calling]------------------------------------!
-  real :: Turbulent_Prandtl_Number
   real :: U_Plus_Log_Law
   real :: U_Plus_Rough_Walls
   real :: Y_Plus_Low_Re
@@ -21,7 +20,8 @@
   integer                   :: c, c1, c2, s
   real                      :: u_tan, u_tau, tau_wall
   real                      :: beta, pr
-  real                      :: u_plus, ebf, kin_vis
+  real                      :: u_plus, ebf, kin_vis, y_plus
+  real                      :: z_o
 !==============================================================================!
 !   Dimensions:                                                                !
 !                                                                              !
@@ -31,7 +31,7 @@
 !   Density       density  [kg/m^3]    | Turb. kin en.   kin % n   [m^2/s^2]   !
 !   Cell volume   vol      [m^3]       | Length          lf        [m]         !
 !   left hand s.  A        [kg/s]      | right hand s.   b         [kg*m^2/s^3]!
-!   Wall visc.    vis_wall [kg/(m*s)]  | kinematic viscosity       [m^2/s]     !
+!   Wall visc.    vis_w    [kg/(m*s)]  | kinematic viscosity       [m^2/s]     !
 !   Thermal cap.  capacity[m^2/(s^2*K)]| Therm. conductivity     [kg*m/(s^3*K)]!
 !------------------------------------------------------------------------------!
 !   p_kin = 2*vis_t / density S_ij S_ij                                        !
@@ -49,15 +49,17 @@
   ! Pure k-eps-zeta-f
   if(turbulence_model .eq. K_EPS_ZETA_F) then
     do c = -grid % n_bnd_cells, grid % n_cells
-      vis_t(c) = c_mu_d * density * zeta % n(c) * kin % n(c) * turb % t_scale(c)
+      turb % vis_t(c) = c_mu_d * density * zeta % n(c)  &
+                      * kin % n(c) * turb % t_scale(c)
     end do
 
   ! Hybrid between k-eps-zeta-f and dynamic SGS model
   else if(turbulence_model .eq. HYBRID_LES_RANS) then
     do c = -grid % n_bnd_cells, grid % n_cells
-      vis_t(c)     = c_mu_d * density * zeta % n(c)  &
-                   * kin % n(c) * turb % t_scale(c)
-      turb % vis_t_eff(c) = max(vis_t(c), turb % vis_t_sgs(c))
+      turb % vis_t(c) = c_mu_d * density * zeta % n(c)  &
+                      * kin % n(c) * turb % t_scale(c)
+      turb % vis_t_eff(c) = max(turb % vis_t(c),  &
+                                turb % vis_t_sgs(c))
     end do
     call Comm_Mod_Exchange_Real(grid, turb % vis_t_eff)
 
@@ -77,56 +79,54 @@
         u_tan = Field_Mod_U_Tan(flow, s)
 
         u_tau = c_mu25 * sqrt(kin % n(c1))
-        y_plus(c1) = Y_Plus_Low_Re(u_tau, grid % wall_dist(c1), kin_vis)
+        y_plus = Y_Plus_Low_Re(u_tau, grid % wall_dist(c1), kin_vis)
 
-        tau_wall = density * kappa * u_tau * u_tan    &  ! this is never used
-                 / log(e_log*max(y_plus(c1),1.05))
+        tau_wall = density*kappa*u_tau*u_tan    &
+                 / log(e_log*max(y_plus,1.05))
 
-        ebf = 0.01 * y_plus(c1)**4 / (1.0 + 5.0*y_plus(c1))
+        ebf = 0.01 * y_plus**4 / (1.0 + 5.0*y_plus)
 
-        u_plus = U_Plus_Log_Law(y_plus(c1))
+        u_plus = U_Plus_Log_Law(y_plus)
 
-        if(y_plus(c1) < 3.0) then
-          vis_wall(c1) = vis_t(c1) + viscosity
+        if(y_plus < 3.0) then
+          turb % vis_w(c1) = turb % vis_t(c1) + viscosity
         else
-          vis_wall(c1) = y_plus(c1) * viscosity         &
-                       / (  y_plus(c1) * exp(-1.0*ebf)  &
-                          + u_plus     * exp(-1.0/ebf) + TINY)
+          turb % vis_w(c1) = y_plus * viscosity         &
+                       / (  y_plus * exp(-1.0*ebf)  &
+                          + u_plus * exp(-1.0/ebf) + TINY)
         end if
 
-        y_plus(c1) = Y_Plus_Low_Re(u_tau, grid % wall_dist(c1), kin_vis)
+        y_plus = Y_Plus_Low_Re(u_tau, grid % wall_dist(c1), kin_vis)
 
         if(rough_walls) then
-          turb % z_o = Roughness_Coefficient(turb % z_o, turb % z_o_f(c1), c1)      
-          y_plus(c1) = Y_Plus_Rough_Walls(turb,                  &
-                                          u_tau,                 &
-                                          grid % wall_dist(c1),  &
-                                          kin_vis)
-          u_plus     = U_Plus_Rough_Walls(turb,                  &
-                                          grid % wall_dist(c1))
-          vis_wall(c1) = y_plus(c1) * viscosity * kappa  &
-                       / log((grid % wall_dist(c1)+turb % z_o)/turb % z_o)
-        end if
+          z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
+!          z_o = max(grid % wall_dist(c1)/(e_log*y_plus),z_o) 
+          y_plus = Y_Plus_Rough_Walls(u_tau,             &
+                                      grid % wall_dist(c1),  &
+                                      kin_vis)
+          u_plus     = U_Plus_Rough_Walls(grid % wall_dist(c1))
+          turb % vis_w(c1) = y_plus * viscosity / u_plus
+        end if  
 
         if(heat_transfer) then
-          pr_t = Turbulent_Prandtl_Number(grid, c1)
+          pr_t = Turb_Mod_Prandtl_Number(turb, c1)
           pr = viscosity * capacity / conductivity
           beta = 9.24 * ((pr/pr_t)**0.75 - 1.0) * &
             (1.0 + 0.28 * exp(-0.007*pr/pr_t))
-          ebf = 0.01 * (pr*y_plus(c1)**4 / &
-            ((1.0 + 5.0 * pr**3 * y_plus(c1)) + TINY))
-          con_wall(c1) =    y_plus(c1) * viscosity * capacity          &
-                       / (  y_plus(c1) * pr        * exp(-1.0 * ebf)   &
-                          +(u_plus + beta) * pr_t  * exp(-1.0/ebf) + TINY)
+          ebf = 0.01 * (pr*y_plus**4 / &
+            ((1.0 + 5.0 * pr**3 * y_plus) + TINY))
+          turb % con_w(c1) =    y_plus * viscosity  * capacity          &
+                           / (  y_plus * pr         * exp(-1.0 * ebf)   &
+                           + (u_plus + beta) * pr_t * exp(-1.0/ebf) + TINY)
         end if
       end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2).eq.WALL or WALLFL
     end if    ! c2 < 0
   end do
 
-  call Comm_Mod_Exchange_Real(grid, vis_t)
-  call Comm_Mod_Exchange_Real(grid, vis_wall)
+  call Comm_Mod_Exchange_Real(grid, turb % vis_t)
+  call Comm_Mod_Exchange_Real(grid, turb % vis_w)
   if(heat_transfer) then
-    call Comm_Mod_Exchange_Real(grid, con_wall)
+    call Comm_Mod_Exchange_Real(grid, turb % con_w)
   end if
 
   end subroutine

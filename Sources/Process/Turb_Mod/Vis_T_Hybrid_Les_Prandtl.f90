@@ -72,7 +72,8 @@
     else
       fd = 1.0
     end if
-    vis_t(c) = min((c_smag*lf_wm)**2, (kappa*dw)**2) * flow % shear(c) * fd
+    turb % vis_t(c) = min((c_smag*lf_wm)**2, (kappa*dw)**2)  &
+                    * flow % shear(c) * fd
 
   end do
 
@@ -87,13 +88,13 @@
     c2 = grid % faces_c(2,s)
 
     if(c2 < 0) then
-      vis_wall(c1) = viscosity                       &
-                   +        grid % fw(s) *vis_t(c1)  &
-                   + (1.0 - grid % fw(s))*vis_t(c2)
+      turb % vis_w(c1) = viscosity                       &
+              +        grid % fw(s)  * turb % vis_t(c1)  &
+              + (1.0 - grid % fw(s)) * turb % vis_t(c2)
     end if    ! c2 < 0
   end do
 
-  call Comm_Mod_Exchange_Real(grid, vis_t)
-  call Comm_Mod_Exchange_Real(grid, vis_wall)
+  call Comm_Mod_Exchange_Real(grid, turb % vis_t)
+  call Comm_Mod_Exchange_Real(grid, turb % vis_w)
 
   end subroutine

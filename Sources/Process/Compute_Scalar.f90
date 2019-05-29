@@ -36,8 +36,6 @@
   real                      :: dt
   integer                   :: ini
   integer                   :: sc
-!----------------------------------[Calling]-----------------------------------!
-  real :: Turbulent_Prandtl_Number
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: uu, vv, ww, uv, uw, vw
@@ -151,8 +149,8 @@
        turbulence_model .ne. HYBRID_LES_PRANDTL .or.  &
        turbulence_model .ne. LES_WALE           .or.  &
        turbulence_model .ne. DNS) then
-      pr_t1 = Turbulent_Prandtl_Number(grid, c1)
-      pr_t2 = Turbulent_Prandtl_Number(grid, c2)
+      pr_t1 = Turb_Mod_Prandtl_Number(turb, c1)
+      pr_t2 = Turb_Mod_Prandtl_Number(turb, c2)
       pr_t  = grid % fw(s) * pr_t1 + (1.0-grid % fw(s)) * pr_t2
     end if
 
@@ -164,8 +162,8 @@
       phix_f2 = phix_f1 
       phiy_f2 = phiy_f1 
       phiz_f2 = phiz_f1 
-      con_eff1 =     grid % f(s)  * (conductivity+capacity*vis_t(c1)/pr_t)  &
-               + (1.-grid % f(s)) * (conductivity+capacity*vis_t(c2)/pr_t)
+      con_eff1 = grid % f(s) *(conductivity+capacity * turb % vis_t(c1)/pr_t)  &
+           + (1.-grid % f(s))*(conductivity+capacity * turb % vis_t(c2)/pr_t)
       con_eff2 = con_eff1 
     else
       phix_f1 = phi_x(c1) 
@@ -174,7 +172,7 @@
       phix_f2 = phix_f1 
       phiy_f2 = phiy_f1 
       phiz_f2 = phiz_f1 
-      con_eff1 = conductivity + capacity * vis_t(c1) / pr_t   
+      con_eff1 = conductivity + capacity * turb % vis_t(c1) / pr_t
       con_eff2 = con_eff1 
     end if
 
@@ -184,7 +182,7 @@
       if(c2 < 0) then
         if(Var_Mod_Bnd_Cell_Type(phi,c2) .eq. WALL .or.  &
            Var_Mod_Bnd_Cell_Type(phi,c2) .eq. WALLFL) then
-          con_eff1 = con_wall(c1)
+          con_eff1 = turb % con_w(c1)
           con_eff2 = con_eff1
         end if
       end if
@@ -303,8 +301,8 @@
         c1 = grid % faces_c(1,s)
         c2 = grid % faces_c(2,s)
 
-        pr_t1 = Turbulent_Prandtl_Number(grid, c1)
-        pr_t2 = Turbulent_Prandtl_Number(grid, c2)
+        pr_t1 = Turb_Mod_Prandtl_Number(turb, c1)
+        pr_t2 = Turb_Mod_Prandtl_Number(turb, c2)
         pr_t  = grid % fw(s) * pr_t1 + (1.0-grid % fw(s)) * pr_t2
 
         if(c2 > 0) then
@@ -314,8 +312,8 @@
           phix_f2 = phix_f1 
           phiy_f2 = phiy_f1 
           phiz_f2 = phiz_f1 
-          con_eff1 =      grid % f(s)  * (capacity*vis_t(c1)/pr_t )  &
-                  + (1. - grid % f(s)) * (capacity*vis_t(c2)/pr_t )
+          con_eff1 =      grid % f(s)  * (capacity * turb % vis_t(c1)/pr_t )  &
+                  + (1. - grid % f(s)) * (capacity * turb % vis_t(c2)/pr_t )
           con_eff2 = con_eff1 
         else
           phix_f1 = phi_x(c1)
@@ -324,7 +322,7 @@
           phix_f2 = phix_f1
           phiy_f2 = phiy_f1
           phiz_f2 = phiz_f1
-          con_eff1 = capacity * vis_t(c1) / pr_t
+          con_eff1 = capacity * turb % vis_t(c1) / pr_t
           con_eff2 = con_eff1
         end if
 

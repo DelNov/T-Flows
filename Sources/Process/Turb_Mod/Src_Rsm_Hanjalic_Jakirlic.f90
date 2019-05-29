@@ -344,25 +344,25 @@
   r13 = ONE_THIRD
   r23 = TWO_THIRDS
   do  c = 1, grid % n_cells
-    p_kin(c) = max( &
+    turb % p_kin(c) = max(                                                     &
           - (  uu % n(c)*u % x(c) + uv % n(c)*u % y(c) + uw % n(c)*u % z(c)    &
              + uv % n(c)*v % x(c) + vv % n(c)*v % y(c) + vw % n(c)*v % z(c)    &
              + uw % n(c)*w % x(c) + vw % n(c)*w % y(c) + ww % n(c)*w % z(c)),  &
                1.0e-10)
-  
-    mag = max(0.0, sqrt(l_sc_x(c)**2 + l_sc_y(c)**2 + l_sc_z(c)**2), tiny)       
 
-    n1 = l_sc_x(c) / mag 
+    mag = max(0.0, sqrt(l_sc_x(c)**2 + l_sc_y(c)**2 + l_sc_z(c)**2), TINY)
+
+    n1 = l_sc_x(c) / mag
     n2 = l_sc_y(c) / mag
     n3 = l_sc_z(c) / mag
 
-    a11 = uu % n(c)/kin % n(c) - r23 
-    a22 = vv % n(c)/kin % n(c) - r23
-    a33 = ww % n(c)/kin % n(c) - r23
-    a12 = uv % n(c)/kin % n(c)   
-    a13 = uw % n(c)/kin % n(c)    
-    a23 = vw % n(c)/kin % n(c)    
-    
+    a11 = uu % n(c) / kin % n(c) - r23
+    a22 = vv % n(c) / kin % n(c) - r23
+    a33 = ww % n(c) / kin % n(c) - r23
+    a12 = uv % n(c) / kin % n(c)
+    a13 = uw % n(c) / kin % n(c)
+    a23 = vw % n(c) / kin % n(c)
+
     S11 = u % x(c)
     S22 = v % y(c)
     S33 = w % z(c)
@@ -394,7 +394,7 @@
     a_mn_a_mn = a11*a11 + a22*a22 + a33*a33 + 2.0*(a12*a12+a13*a13+a23*a23)
     a_lk_s_lk = a11*S11 + a22*S22 + a33*S33 + 2.0*(a12*s12+a13*s13+a23*s23)
 
-    re_t= (kin % n(c)**2)/(kin_vis*eps % n(c)+tiny)
+    re_t= (kin % n(c)**2)/(kin_vis*eps % n(c)+TINY)
     ff5 = min(aa2, (1.0-exp(-re_t/150))**3)
     tkolm = sqrt( kin_vis / max(eps % n(c), TINY) )
 
@@ -439,7 +439,7 @@
       fss=1.0-(aa**0.5*ee**2)
     end do
 
-    re_t  = (kin % n(c)*kin % n(c)) / (kin_vis*eps % n(c) + tiny)
+    re_t  = (kin % n(c)*kin % n(c)) / (kin_vis*eps % n(c) + TINY)
     f_eps = 1.0 - ((c_2e-1.4)/c_2e)*exp(-(re_t/6.0)**2)
     ff2   = (re_t/150.0)**1.5
     ff2   = min(ff2,1.0)
@@ -509,9 +509,9 @@
     var1_13 = -cc1*eps%n(c)*a13 
     var1_23 = -cc1*eps%n(c)*a23 
 
-    var2_11 = -cc2*(p11 - r23*p_kin(c))
-    var2_22 = -cc2*(p22 - r23*p_kin(c))
-    var2_33 = -cc2*(p33 - r23*p_kin(c))
+    var2_11 = -cc2*(p11 - r23 * turb % p_kin(c))
+    var2_22 = -cc2*(p22 - r23 * turb % p_kin(c))
+    var2_33 = -cc2*(p33 - r23 * turb % p_kin(c))
     var2_12 = -cc2*p12
     var2_13 = -cc2*p13
     var2_23 = -cc2*p23
@@ -605,7 +605,7 @@
                              + max(-var1w_11,0.0)             &
                              + max(-var2w_11,0.0)             &
                              + (1.0-fss) * r23 * eps % n(c))  &
-                            / max(uu%n(c), tiny) * grid % vol(c)
+                            / max(uu%n(c), TINY) * grid % vol(c)
 
     !---------------!
     !   VV stress   !
@@ -627,7 +627,7 @@
                              + max(-var1w_22,0.0)             &
                              + max(-var2w_22,0.0)             &
                              + (1.0-fss) * r23 * eps % n(c))  &
-                            / max(vv%n(c), tiny) * grid % vol(c)
+                            / max(vv%n(c), TINY) * grid % vol(c)
 
     !---------------!
     !   WW stress   !
@@ -649,7 +649,7 @@
                              + max(-var1w_33,0.0)             &
                              + max(-var2w_33,0.0)             &
                              + (1.0-fss) * r23 * eps % n(c))  &
-                            / max(ww%n(c), tiny) * grid % vol(c)
+                            / max(ww % n(c), TINY) * grid % vol(c)
 
     !---------------!
     !   UV stress   !
@@ -686,7 +686,7 @@
     !----------------------!
     else if(name_phi == 'EPS') then 
       f_eps = 1.0 - ((c_2e-1.4)/c_2e) * exp(-(re_t/6.0)**2)
-      eps_1 = 1.44 * p_kin(c) / turb % t_scale(c)
+      eps_1 = 1.44 * turb % p_kin(c) / turb % t_scale(c)
       eps_2 = c_2e * f_eps  / turb % t_scale(c)
       b(c) = b(c) + density * (eps_1 + diss1(c)) * grid % vol(c)
 

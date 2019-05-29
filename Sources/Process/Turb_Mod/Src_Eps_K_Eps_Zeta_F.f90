@@ -22,7 +22,8 @@
   real                       :: u_tan, u_tau, tau_wall
   real                       :: e_sor, c_11e, ebf
   real                       :: eps_wf, eps_int
-  real                       :: fa, u_tau_new, kin_vis
+  real                       :: fa, u_tau_new, kin_vis, y_plus
+  real                       :: z_o
 !==============================================================================!
 !   In dissipation of turbulent kinetic energy equation exist two              !
 !   source terms which have form:                                              !
@@ -58,9 +59,9 @@
   call Time_And_Length_Scale(grid, turb)
 
   do c = 1, grid % n_cells 
-    e_sor = grid % vol(c) / (turb % t_scale(c)+TINY)
+    e_sor = grid % vol(c)/(turb % t_scale(c)+TINY)
     c_11e = c_1e*(1.0 + alpha * ( 1.0/(zeta % n(c)+TINY) ))
-    b(c) = b(c) + c_11e * e_sor * p_kin(c)
+    b(c) = b(c) + c_11e * e_sor * turb % p_kin(c)
 
     ! Fill in a diagonal of coefficient matrix
     a % val(a % dia(c)) =  a % val(a % dia(c)) + c_2e * e_sor * density
@@ -91,9 +92,9 @@
         u_tan = Field_Mod_U_Tan(flow, s)
 
         if(rough_walls) then 
-          turb % z_o = Roughness_Coefficient(turb % z_o, turb % z_o_f(c1), c1)      
+          z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
           eps % n(c1) = c_mu75 * kin % n(c1)**1.5 / & 
-                      ((grid % wall_dist(c1) + turb % z_o) * kappa)
+                      ((grid % wall_dist(c1) + z_o) * kappa)
 
           ! Adjusting coefficient to fix eps value in near wall calls
           do j = a % row(c1), a % row(c1 + 1) - 1 
@@ -104,25 +105,25 @@
           a % val(a % dia(c1)) = 1.0 
         else
           u_tau = c_mu25 * sqrt(kin % n(c1))
-          y_plus(c1) = Y_Plus_Low_Re(u_tau, grid % wall_dist(c1), kin_vis)
-          tau_wall = density * kappa * u_tau * u_tan  &
-                   / log(e_log * max(y_plus(c1), 1.05))
-          u_tau_new = sqrt(tau_wall / density)
-          y_plus(c1) = Y_Plus_Low_Re(u_tau_new, grid % wall_dist(c1), kin_vis)
+          y_plus = Y_Plus_Low_Re(u_tau, grid % wall_dist(c1), kin_vis)
 
-          ebf = 0.001 * y_plus(c1)**4 / (1.0 + y_plus(c1))
+          tau_wall = density * kappa * u_tau * u_tan  &
+                   / log(e_log * max(y_plus, 1.05))
+
+          u_tau_new = sqrt(tau_wall/density)
+          y_plus = Y_Plus_Low_Re(u_tau_new, grid % wall_dist(c1), kin_vis)
+
           eps_int = 2.0* kin_vis * kin % n(c1)  &
                   / grid % wall_dist(c1)**2
           eps_wf  = c_mu75 * kin % n(c1)**1.5            &
                   / (grid % wall_dist(c1) * kappa)
 
-          if(y_plus(c1) > 3) then
+          if(y_plus > 3) then
 
-            fa = min(density * u_tau_new**3                       &
-                     / (kappa*grid % wall_dist(c1) * p_kin(c1)),  &
+            fa = min(density * u_tau_new**3                              &
+                     / (kappa*grid % wall_dist(c1) * turb % p_kin(c1)),  &
                      1.0)
             eps % n(c1) = (1.0 - fa) * eps_int + fa * eps_wf
-
             ! Adjusting coefficient to fix eps value in near wall calls
             do j = a % row(c1), a % row(c1 + 1) - 1
               a % val(j) = 0.0
@@ -135,6 +136,6 @@
         end if    ! rough_walls
       end if      ! wall or wall_flux
     end if        ! c2 < 0
-  end do
+  end do  
 
   end subroutine

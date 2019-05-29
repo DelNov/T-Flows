@@ -109,7 +109,8 @@
 
     ! vis_tur is used to make diaginal element more dominant.
     ! This contribution is later substracted.
-    vis_t_f = grid % fw(s) * vis_t(c1) + (1.0-grid % fw(s)) * vis_t(c2)
+    vis_t_f = grid % fw(s)       * turb % vis_t(c1)  &
+            + (1.0-grid % fw(s)) * turb % vis_t(c2)
 
     vis_eff = viscosity + vis_t_f
 
@@ -245,7 +246,8 @@
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
 
-      vis_eff = (grid % fw(s) * vis_t(c1) + (1.0-grid % fw(s)) * vis_t(c2))
+      vis_eff = (grid % fw(s)      * turb % vis_t(c1)  &
+              + (1.0-grid % fw(s)) * turb % vis_t(c2))
 
       phix_f = grid % fw(s) * phi_x(c1) + (1.0-grid % fw(s)) * phi_x(c2)
       phiy_f = grid % fw(s) * phi_y(c1) + (1.0-grid % fw(s)) * phi_y(c2)

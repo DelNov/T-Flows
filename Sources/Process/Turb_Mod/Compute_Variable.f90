@@ -91,8 +91,8 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
-    vis_eff = viscosity + (    grid % fw(s)  * vis_t(c1)         &
-                        + (1.0-grid % fw(s)) * vis_t(c2))        &
+    vis_eff = viscosity + (    grid % fw(s)  * turb % vis_t(c1)   &
+                        + (1.0-grid % fw(s)) * turb % vis_t(c2))  &
                         / phi % sigma
 
     if(turbulence_model .eq. SPALART_ALLMARAS .or.               &

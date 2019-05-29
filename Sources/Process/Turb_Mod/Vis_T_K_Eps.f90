@@ -19,7 +19,6 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type), target :: turb
 !---------------------------------[Calling]------------------------------------!
-  real :: Turbulent_Prandtl_Number
   real :: U_Plus_Log_Law
   real :: U_Plus_Rough_Walls
   real :: Y_Plus_Low_Re
@@ -34,6 +33,7 @@
   real                      :: pr, beta, ebf
   real                      :: u_tan, u_tau
   real                      :: kin_vis, u_plus, y_star, re_t, f_mu
+  real                      :: z_o, y_plus, tau_wall
 !==============================================================================!
 !   Dimensions:                                                                !
 !                                                                              !
@@ -43,7 +43,7 @@
 !   density       density  [kg/m^3]    | turb. kin en.   kin % n  [m^2/s^2]    !
 !   cell volume   vol      [m^3]       | length          lf       [m]          !
 !   left hand s.  A        [kg/s]      | right hand s.   b        [kg*m^2/s^3] !
-!   wall visc.    vis_wall [kg/(m*s)]  | kinematic viscosity      [m^2/s]      !
+!   wall visc.    vis_w    [kg/(m*s)]  | kinematic viscosity      [m^2/s]      !
 !   thermal cap.  capacity[m^2/(s^2*K)]| therm. conductivity     [kg*m/(s^3*K)]!
 !------------------------------------------------------------------------------!
 !   p_kin = 2*vis_t / density S_ij S_ij                                        !
@@ -69,7 +69,7 @@
 
     f_mu = min(1.0,f_mu)
 
-    vis_t(c) = f_mu * c_mu * density * kin % n(c)**2  / eps % n(c)
+    turb % vis_t(c) = f_mu * c_mu * density * kin % n(c)**2  / eps % n(c)
   end do
 
   do s = 1, grid % n_faces
@@ -81,50 +81,55 @@
          Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
 
         u_tan = Field_Mod_U_Tan(flow, s)
+
         u_tau = c_mu25 * sqrt(kin % n(c1))
-        y_plus(c1) = Y_Plus_Low_Re(u_tau, grid % wall_dist(c1), kin_vis)
+        y_plus = Y_Plus_Low_Re(u_tau, grid % wall_dist(c1), kin_vis)
 
-        ebf = 0.01 * y_plus(c1)**4 / (1.0 + 5.0*y_plus(c1))
-        u_plus = U_Plus_Log_Law(y_plus(c1))
+        tau_wall = density*kappa*u_tau*u_tan   &
+                 / log(e_log*max(y_plus,1.05))
 
-        if(y_plus(c1) < 3.0) then
-          vis_wall(c1) = vis_t(c1) + viscosity
+        ebf = 0.01 * y_plus**4 / (1.0 + 5.0*y_plus)
+
+        u_plus = U_Plus_Log_Law(y_plus)
+
+        if(y_plus < 3.0) then
+          turb % vis_w(c1) = turb % vis_t(c1) + viscosity
         else
-          vis_wall(c1) =  y_plus(c1) * viscosity         &
-                       / (  y_plus(c1) * exp(-1.0*ebf)   &
-                          + u_plus     * exp(-1.0/ebf) + TINY)
+          turb % vis_w(c1) =  y_plus * viscosity         &
+                       / (  y_plus * exp(-1.0*ebf)   &
+                          + u_plus * exp(-1.0/ebf) + TINY)
         end if
 
-        y_plus(c1) = Y_Plus_Low_Re(u_tau, grid % wall_dist(c1), kin_vis)
+        y_plus = Y_Plus_Low_Re(u_tau, grid % wall_dist(c1), kin_vis)
 
         if(rough_walls) then
-          turb % z_o = Roughness_Coefficient(turb % z_o, turb % z_o_f(c1), c1)
-          y_plus(c1) = Y_Plus_Rough_Walls(turb,                  &
-                                          u_tau,                 &
-                                          grid % wall_dist(c1),  &
-                                          kin_vis)
-          u_plus     = U_Plus_Rough_Walls(turb,                  &
-                                          grid % wall_dist(c1))
-          vis_wall(c1) = y_plus(c1) * viscosity * kappa  &
-                       / log((grid % wall_dist(c1)+turb % z_o)/turb % z_o)
+          z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
+          y_plus = Y_Plus_Rough_Walls(u_tau,             &
+                                      grid % wall_dist(c1),  &
+                                      kin_vis)
+          u_plus     = U_Plus_Rough_Walls(grid % wall_dist(c1))
+          turb % vis_w(c1) = y_plus * viscosity / u_plus
         end if
 
         if(heat_transfer) then
           pr = viscosity * capacity / conductivity
-          pr_t = Turbulent_Prandtl_Number(grid, c1)
+          pr_t = Turb_Mod_Prandtl_Number(turb, c1)
           beta = 9.24 * ((pr/pr_t)**0.75 - 1.0)  &
                * (1.0 + 0.28 * exp(-0.007*pr/pr_t))
-          ebf = 0.01 * (pr*y_plus(c1)**4  &
-              / ((1.0 + 5.0 * pr**3 * y_plus(c1)) + TINY))
-          con_wall(c1) =    y_plus(c1) * viscosity * capacity          &
-                       / (  y_plus(c1) * pr        * exp(-1.0 * ebf)   &
-                          +(u_plus + beta) * pr_t  * exp(-1.0/ebf) + TINY)
+          ebf = 0.01 * (pr*y_plus**4  &
+              / ((1.0 + 5.0 * pr**3 * y_plus) + TINY))
+          turb % con_w(c1) =    y_plus * viscosity * capacity           &
+                           / (  y_plus * pr         * exp(-1.0 * ebf)   &
+                           + (u_plus + beta) * pr_t * exp(-1.0 / ebf) + TINY)
         end if
       end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2).eq.WALL or WALLFL
     end if    ! c2 < 0
   end do
 
-  call Comm_Mod_Exchange_Real(grid, vis_t)
-  call Comm_Mod_Exchange_Real(grid, vis_wall)
+  call Comm_Mod_Exchange_Real(grid, turb % vis_t)
+  call Comm_Mod_Exchange_Real(grid, turb % vis_w)
+  if(heat_transfer) then
+    call Comm_Mod_Exchange_Real(grid, turb % con_w)
+  end if
 
   end subroutine

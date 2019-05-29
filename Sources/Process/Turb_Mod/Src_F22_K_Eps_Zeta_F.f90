@@ -49,11 +49,11 @@
 
  ! Source term f22hg
  do c = 1, grid % n_cells
-   f22hg = (1.0 - c_f1 - 0.65 * p_kin(c) / density  &
-         / (eps  % n(c) + TINY))                    &
-         * (zeta % n(c) - TWO_THIRDS)               &
-         / (turb % t_scale(c) + TINY)               &
-         + 0.0085 * (p_kin(c) / density) / (kin % n(c) + TINY)
+   f22hg = (1.0 - c_f1 - 0.65 * turb % p_kin(c) / density  &
+         / (eps  % n(c) + TINY))                           &
+         * (zeta % n(c) - TWO_THIRDS)                      &
+         / (turb % t_scale(c) + TINY)                      &
+         + 0.0085 * (turb % p_kin(c) / density) / (kin % n(c) + TINY)
    b(c) = b(c) + f22hg * grid % vol(c) / (turb % l_scale(c)**2 + TINY)
  end do
 

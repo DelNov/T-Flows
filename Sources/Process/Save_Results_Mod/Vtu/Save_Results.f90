@@ -242,16 +242,16 @@
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentDissipation",    &
                                            turb % eps % n(1))
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentKineticEnergyProduction", &
-                                           p_kin(1))
+                                           turb % p_kin(1))
     call Save_Scalar(grid, IN_4, IN_5, "TurbulenQuantityAlphaL", &
                                            turb % alpha_l(1))
     call Save_Scalar(grid, IN_4, IN_5, "TurbulenQuantityAlphaU", &
                                            turb % alpha_u(1))
     if (turbulence_model .eq. K_EPS .and. heat_transfer) then
       call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityT2",  &
-                                             turb % t2 % n(1))
+                                           turb % t2 % n(1))
       call Save_Scalar(grid, IN_4, IN_5, "TurbulentT2Production", &
-                                             p_t2(1))
+                                           turb % p_t2(1))
     end if
 
   end if
@@ -269,9 +269,9 @@
                                            turb % f22  % n(1))
     if (heat_transfer) then
       call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityT2",  &
-                                             turb % t2 % n(1))
+                                           turb % t2 % n(1))
       call Save_Scalar(grid, IN_4, IN_5, "TurbulentT2Production", &
-                                             p_t2(1))
+                                           turb % p_t2(1))
     end if
 
   end if
@@ -289,7 +289,7 @@
     call Save_Scalar(grid, IN_4, IN_5, "VorticityMagnitude", flow % vort(1))
   end if
   if(turbulence_model .ne. NONE) then
-    kin_vis_t(1:grid % n_cells) = vis_t(1:grid % n_cells)/viscosity
+    kin_vis_t(1:grid % n_cells) = turb % vis_t(1:grid % n_cells)/viscosity
     call Save_Scalar(grid, IN_4, IN_5, "EddyOverMolecularViscosity", &
       kin_vis_t(1))
   end if

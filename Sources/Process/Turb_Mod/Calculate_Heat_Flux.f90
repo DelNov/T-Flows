@@ -6,8 +6,6 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type),  target :: turb
-!---------------------------------[Calling]------------------------------------!
-  real :: Turbulent_Prandtl_Number
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: flow
   type(Grid_Type),  pointer :: grid
@@ -35,10 +33,10 @@
   if(turbulent_heat_flux_model .eq. SGDH) then
 
     do c = 1, grid % n_cells
-      pr_t = max(Turbulent_Prandtl_Number(grid, c), TINY)
-      ut % n(c) = -vis_t(c) / pr_t * t % x(c)
-      vt % n(c) = -vis_t(c) / pr_t * t % y(c)
-      wt % n(c) = -vis_t(c) / pr_t * t % z(c)
+      pr_t = max(Turb_Mod_Prandtl_Number(turb, c), TINY)
+      ut % n(c) = - turb % vis_t(c) / pr_t * t % x(c)
+      vt % n(c) = - turb % vis_t(c) / pr_t * t % y(c)
+      wt % n(c) = - turb % vis_t(c) / pr_t * t % z(c)
     end do
 
   else if(turbulent_heat_flux_model .eq. GGDH) then
