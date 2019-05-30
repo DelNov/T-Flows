@@ -153,7 +153,7 @@
             wm_p(i) = wm_p(i) + w % n(c)
             uu_p(i) = uu_p(i) + kin % n(c)
             vv_p(i) = vv_p(i) + eps % n(c)
-            v1_p(i) = v1_p(i) + vis_t(c)*(u % y(c) + v % x(c))/U_B**2
+            v1_p(i) = v1_p(i) + turb % vis_t(c)*(u % y(c) + v % x(c))/U_B**2
             v2_p(i) = v2_p(i) + t % n(c) - 20.0
             n_count(i) = n_count(i) + 1
             if(turbulence_model == K_EPS_ZETA_F) then
