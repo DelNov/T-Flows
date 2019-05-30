@@ -293,7 +293,7 @@
     '#', 'Cf_error = ', error, ' %', 'Dean formula is used.'
     if(heat_transfer) then
       write(i,'(a1,(a12, f12.6))')'#', 'Nu number =', nu_mean 
-      write(i,'(a1,(a12, f12.6,a2,a39))')'#', 'Nu_error  =',  &
+      write(i,'(a1,(a12, f12.6,a2,a39))')'#', 'Nu error  =',  &
             abs(0.023*0.5*re**0.8*pr**0.4 - nu_mean)          &
             / (0.023*0.5*re**0.8*pr**0.4) * 100.0, ' %',      &
             'correlation of Dittus-Boelter is used.' 
@@ -316,30 +316,30 @@
   if(heat_transfer) then
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(3,'(12e15.7)') wall_p(i),                       &  !  1
-                             u_p(i),                          &  !  2
-                             uu_p(i),                         &  !  3
-                             vv_p(i),                         &  !  4
-                             ww_p(i),                         &  !  5
-                             uw_p(i),                         &  !  6
-                             0.5*(uu_p(i)+vv_p(i)+ww_p(i)),   &  !  7
-                             t_p(i),                          &  !  8
-                             t2_p(i),                         &  !  9
-                             ut_p(i),                         &  ! 10
-                             vt_p(i),                         &  ! 11
-                             wt_p(i)                             ! 12
+        write(3,'(12es15.5e3)') wall_p(i),                       &  !  1
+                                u_p(i),                          &  !  2
+                                uu_p(i),                         &  !  3
+                                vv_p(i),                         &  !  4
+                                ww_p(i),                         &  !  5
+                                uw_p(i),                         &  !  6
+                                0.5*(uu_p(i)+vv_p(i)+ww_p(i)),   &  !  7
+                                t_p(i),                          &  !  8
+                                t2_p(i),                         &  !  9
+                                ut_p(i),                         &  ! 10
+                                vt_p(i),                         &  ! 11
+                                wt_p(i)                             ! 12
       end if
     end do
   else
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(3,'(7e15.7)')  wall_p(i),                       &  !  1
-                             u_p(i),                          &  !  2
-                             uu_p(i),                         &  !  3
-                             vv_p(i),                         &  !  4
-                             ww_p(i),                         &  !  5
-                             uw_p(i),                         &  !  6
-                             0.5*(uu_p(i)+vv_p(i)+ww_p(i))       !  7
+        write(3,'(7es15.5e3)')  wall_p(i),                       &  !  1
+                                u_p(i),                          &  !  2
+                                uu_p(i),                         &  !  3
+                                vv_p(i),                         &  !  4
+                                ww_p(i),                         &  !  5
+                                uw_p(i),                         &  !  6
+                                0.5*(uu_p(i)+vv_p(i)+ww_p(i))       !  7
       end if
     end do
   end if
@@ -369,30 +369,30 @@
   if(heat_transfer) then
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(4,'(12e15.7)') wall_p(i),                       &  !  1
-                             u_p(i),                          &  !  2
-                             uu_p(i),                         &  !  3
-                             vv_p(i),                         &  !  4
-                             ww_p(i),                         &  !  5
-                             uw_p(i),                         &  !  6
-                             0.5*(uu_p(i)+vv_p(i)+ww_p(i)),   &  !  7
-                             t_p(i),                          &  !  8
-                             t2_p(i),                         &  !  9
-                             ut_p(i),                         &  ! 10
-                             vt_p(i),                         &  ! 11
-                             wt_p(i)                             ! 12
+        write(4,'(12es15.5e3)') wall_p(i),                       &  !  1
+                                u_p(i),                          &  !  2
+                                uu_p(i),                         &  !  3
+                                vv_p(i),                         &  !  4
+                                ww_p(i),                         &  !  5
+                                uw_p(i),                         &  !  6
+                                0.5*(uu_p(i)+vv_p(i)+ww_p(i)),   &  !  7
+                                t_p(i),                          &  !  8
+                                t2_p(i),                         &  !  9
+                                ut_p(i),                         &  ! 10
+                                vt_p(i),                         &  ! 11
+                                wt_p(i)                             ! 12
       end if
     end do
   else
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(4,'(7e15.7)')  wall_p(i),                       &  !  1
-                             u_p(i),                          &  !  2
-                             uu_p(i),                         &  !  3
-                             vv_p(i),                         &  !  4
-                             ww_p(i),                         &  !  5
-                             uw_p(i),                         &  !  6
-                             0.5*(uu_p(i)+vv_p(i)+ww_p(i))       !  7
+        write(4,'(7es15.5e3)')  wall_p(i),                       &  !  1
+                                u_p(i),                          &  !  2
+                                uu_p(i),                         &  !  3
+                                vv_p(i),                         &  !  4
+                                ww_p(i),                         &  !  5
+                                uw_p(i),                         &  !  6
+                                0.5*(uu_p(i)+vv_p(i)+ww_p(i))       !  7
       end if
     end do
   end if

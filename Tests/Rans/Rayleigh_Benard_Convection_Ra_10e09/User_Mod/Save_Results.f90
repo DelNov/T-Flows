@@ -264,27 +264,27 @@
 
   do i = 1, n_prob
     if(n_count(i) .ne. 0) then
-      write(3,'(21e15.7)') wall_p(i),                  &  !  1
-                           tz_p(i),                    &  !  2
-                           (ti_p(i) - t_cold)/t_diff,  &  !  3
-                           w_p(i),                     &  !  4
-                           kin_p(i),                   &  !  5
-                           kin_mod_p(i),               &  !  6
-                           (kin_p(i) + kin_mod_p(i)),  &  !  7
-                           uw_p(i),                    &  !  8
-                           (t_p(i) - t_cold)/t_diff,   &  !  9
-                           tt_p(i),                    &  ! 10
-                           tt_mod_p(i),                &  ! 11
-                           (tt_p(i)+tt_mod_p(i)),      &  ! 12
-                           ut_p(i),                    &  ! 13
-                           vt_p(i),                    &  ! 14
-                           wt_p(i),                    &  ! 15
-                           ut_mod(i),                  &  ! 16
-                           vt_mod(i),                  &  ! 17
-                           wt_mod(i),                  &  ! 18
-                           ut_p(i) + ut_mod(i),        &  ! 19
-                           vt_p(i) + vt_mod(i),        &  ! 20
-                           wt_p(i) + wt_mod(i)            ! 21
+      write(3,'(21es15.5e3)') wall_p(i),                  &  !  1
+                              tz_p(i),                    &  !  2
+                              (ti_p(i) - t_cold)/t_diff,  &  !  3
+                              w_p(i),                     &  !  4
+                              kin_p(i),                   &  !  5
+                              kin_mod_p(i),               &  !  6
+                              (kin_p(i) + kin_mod_p(i)),  &  !  7
+                              uw_p(i),                    &  !  8
+                              (t_p(i) - t_cold)/t_diff,   &  !  9
+                              tt_p(i),                    &  ! 10
+                              tt_mod_p(i),                &  ! 11
+                              (tt_p(i)+tt_mod_p(i)),      &  ! 12
+                              ut_p(i),                    &  ! 13
+                              vt_p(i),                    &  ! 14
+                              wt_p(i),                    &  ! 15
+                              ut_mod(i),                  &  ! 16
+                              vt_mod(i),                  &  ! 17
+                              wt_mod(i),                  &  ! 18
+                              ut_p(i) + ut_mod(i),        &  ! 19
+                              vt_p(i) + vt_mod(i),        &  ! 20
+                              wt_p(i) + wt_mod(i)            ! 21
     end if
   end do
 

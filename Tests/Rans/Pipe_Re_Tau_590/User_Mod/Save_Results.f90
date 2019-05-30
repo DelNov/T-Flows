@@ -323,7 +323,7 @@
       else
         write(i,'(A1,2X,A60)')  '#', ' r,'                    //  &    !  1
                                      ' w,'                    //  &    !  2
-                                     ' kin, eps, uw, vis_t/viscosity'  ! 3 - 6
+                                     ' kin, eps, uw, vis_t/viscosity'  !  3 - 6
       end if
     else if(turbulence_model .eq. K_EPS_ZETA_F) then
       if(heat_transfer) then
@@ -346,33 +346,33 @@
   if(heat_transfer) then
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(3,'(12e15.7,i5)') wall_p(i),   &  !  1
-                                w_p(i),      &  !  2
-                                kin_p(i),    &  !  3
-                                eps_p(i),    &  !  4
-                                uw_p(i),     &  !  5
-                                f22_p(i),    &  !  6
-                                zeta_p(i),   &  !  7
-                                vis_t_p(i),  &  !  8
-                                t_p(i),      &  !  9
-                                ut_p(i),     &  ! 10
-                                vt_p(i),     &  ! 11
-                                wt_p(i),     &  ! 12
-                                n_count(i)      ! 13
+        write(3,'(12es15.5e3,i5)') wall_p(i),   &  !  1
+                                   w_p(i),      &  !  2
+                                   kin_p(i),    &  !  3
+                                   eps_p(i),    &  !  4
+                                   uw_p(i),     &  !  5
+                                   f22_p(i),    &  !  6
+                                   zeta_p(i),   &  !  7
+                                   vis_t_p(i),  &  !  8
+                                   t_p(i),      &  !  9
+                                   ut_p(i),     &  ! 10
+                                   vt_p(i),     &  ! 11
+                                   wt_p(i),     &  ! 12
+                                   n_count(i)      ! 13
       end if
     end do
   else
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(3,'(8e15.7,i5)')  wall_p(i),   &  !  1
-                                w_p(i),      &  !  2
-                                kin_p(i),    &  !  3
-                                eps_p(i),    &  !  4
-                                uw_p(i),     &  !  5
-                                f22_p(i),    &  !  6
-                                zeta_p(i),   &  !  7
-                                vis_t_p(i),  &  !  8
-                                n_count(i)      !  9
+        write(3,'(8es15.5e3,i5)')  wall_p(i),   &  !  1
+                                   w_p(i),      &  !  2
+                                   kin_p(i),    &  !  3
+                                   eps_p(i),    &  !  4
+                                   uw_p(i),     &  !  5
+                                   f22_p(i),    &  !  6
+                                   zeta_p(i),   &  !  7
+                                   vis_t_p(i),  &  !  8
+                                   n_count(i)      !  9
       end if
     end do
   end if
@@ -401,31 +401,31 @@
   if(heat_transfer) then
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(4,'(12e15.7)') wall_p(i),   &  !  1
-                             w_p(i),      &  !  2
-                             kin_p(i),    &  !  3
-                             eps_p(i),    &  !  4
-                             uw_p(i),     &  !  5
-                             f22_p(i),    &  !  6
-                             zeta_p(i),   &  !  7
-                             vis_t_p(i),  &  !  8
-                             t_p(i),      &  !  9
-                             ut_p(i),     &  ! 10
-                             vt_p(i),     &  ! 11
-                             wt_p(i)         ! 12
+        write(4,'(12es15.5e3)') wall_p(i),   &  !  1
+                                w_p(i),      &  !  2
+                                kin_p(i),    &  !  3
+                                eps_p(i),    &  !  4
+                                uw_p(i),     &  !  5
+                                f22_p(i),    &  !  6
+                                zeta_p(i),   &  !  7
+                                vis_t_p(i),  &  !  8
+                                t_p(i),      &  !  9
+                                ut_p(i),     &  ! 10
+                                vt_p(i),     &  ! 11
+                                wt_p(i)         ! 12
       end if
     end do
   else
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(4,'(12e15.7)') wall_p(i),   &  !  1
-                             w_p(i),      &  !  2
-                             kin_p(i),    &  !  3
-                             eps_p(i),    &  !  4
-                             uw_p(i),     &  !  5
-                             f22_p(i),    &  !  6
-                             zeta_p(i),   &  !  7
-                             vis_t_p(i)      !  8
+        write(4,'(12es15.5e3)') wall_p(i),   &  !  1
+                                w_p(i),      &  !  2
+                                kin_p(i),    &  !  3
+                                eps_p(i),    &  !  4
+                                uw_p(i),     &  !  5
+                                f22_p(i),    &  !  6
+                                zeta_p(i),   &  !  7
+                                vis_t_p(i)      !  8
       end if
     end do
   end if

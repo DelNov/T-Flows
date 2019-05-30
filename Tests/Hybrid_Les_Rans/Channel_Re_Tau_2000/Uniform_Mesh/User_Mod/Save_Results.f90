@@ -323,7 +323,7 @@
     '#', 'Cf_error = ', error, ' %', 'Dean formula is used.'
     if(heat_transfer) then
       write(i,'(a1,(a12, f12.6))')'#', 'Nu number =', nu_mean 
-      write(i,'(a1,(a12, f12.6,a2,A39))')'#', 'Nu_error  =',  &
+      write(i,'(a1,(a12, f12.6,a2,A39))')'#', 'Nu error  =',  &
             abs(0.023*0.5*re**0.8*pr**0.4 - nu_mean)          &
             / (0.023*0.5*re**0.8*pr**0.4) * 100.0, ' %',     &
             'correlation of Dittus-Boelter is used.' 
@@ -332,10 +332,10 @@
     if(heat_transfer) then
       write(i,'(a1,2X,a105)') '#', ' z,'                         //  &
                                    ' u mean,'                    //  &
-                                   ' kin_resolved, kin_modeled,' //  & 
-                                   ' kin_tot,  uw_resolved,'     //  & 
+                                   ' kin_resolved, kin_modeled,' //  &
+                                   ' kin_tot,  uw_resolved,'     //  &
                                    ' uw_modeled, uw_tot, vis_t'  //  &
-                                   ' t mean, ut_res, vt_res, wt_res,'   
+                                   ' t mean, ut_res, vt_res, wt_res,'
     else
       write(i,'(a1,2X,a85)') '#',  ' z,'                         //  &
                                    ' u mean,'                    //  &
@@ -348,34 +348,36 @@
   if(heat_transfer) then
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(3,'(14e15.7)') wall_p(i),                                   &
-                             u_p(i),                                      &
-                             0.5*(uu_p(i)+vv_p(i)+ww_p(i)),               &
-                             kin_p(i),                                    &
-                             (0.5*(uu_p(i)+vv_p(i)+ww_p(i)) + kin_p(i)),  &
-                             uw_p(i),                                     &
-                             uw_mod_p(i),                                 &
-                             (uw_p(i) + uw_mod_p(i)),                     &
-                             vis_t_p(i),                                  &
-                             t_p(i),                                      &
-                             t2_p(i),                                     &
-                             ut_p(i),                                     &
-                             vt_p(i),                                     &
-                             wt_p(i)
+        write(3,'(14es15.5e3)')                            &  !  write
+              wall_p(i),                                   &  !  1
+              u_p(i),                                      &  !  2
+              0.5*(uu_p(i)+vv_p(i)+ww_p(i)),               &  !  3
+              kin_p(i),                                    &  !  4
+              (0.5*(uu_p(i)+vv_p(i)+ww_p(i)) + kin_p(i)),  &  !  5
+              uw_p(i),                                     &  !  6
+              uw_mod_p(i),                                 &  !  7
+              (uw_p(i) + uw_mod_p(i)),                     &  !  8
+              vis_t_p(i),                                  &  !  9
+              t_p(i),                                      &  ! 10
+              t2_p(i),                                     &  ! 11
+              ut_p(i),                                     &  ! 12
+              vt_p(i),                                     &  ! 13
+              wt_p(i)                                         ! 14
       end if
     end do
   else
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(3,'(9e15.7)')  wall_p(i),                                   &
-                             u_p(i),                                      &
-                             0.5*(uu_p(i)+vv_p(i)+ww_p(i)),               &
-                             kin_p(i),                                    &
-                             (0.5*(uu_p(i)+vv_p(i)+ww_p(i)) + kin_p(i)),  &
-                             uw_p(i),                                     &
-                             uw_mod_p(i),                                 &
-                             (uw_p(i) + uw_mod_p(i)),                     &
-                             vis_t_p(i)
+        write(3,'(9es15.5e3)')                             &  !  write
+              wall_p(i),                                   &  !  1
+              u_p(i),                                      &  !  2
+              0.5*(uu_p(i)+vv_p(i)+ww_p(i)),               &  !  3
+              kin_p(i),                                    &  !  4
+              (0.5*(uu_p(i)+vv_p(i)+ww_p(i)) + kin_p(i)),  &  !  5
+              uw_p(i),                                     &  !  6
+              uw_mod_p(i),                                 &  !  7
+              (uw_p(i) + uw_mod_p(i)),                     &  !  8
+              vis_t_p(i)                                      !  9
       end if
     end do
   end if
@@ -406,34 +408,34 @@
   if(heat_transfer) then
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(4,'(14e15.7)') wall_p(i),                                   &
-                             u_p(i),                                      &
-                             0.5*(uu_p(i)+vv_p(i)+ww_p(i)),               &
-                             kin_p(i),                                    &
-                             (0.5*(uu_p(i)+vv_p(i)+ww_p(i)) + kin_p(i)),  &
-                             uw_p(i),                                     &
-                             uw_mod_p(i),                                 &
-                             (uw_p(i) + uw_mod_p(i)),                     &
-                             vis_t_p(i),                                  &
-                             t_p(i),                                      &
-                             t2_p(i),                                     &
-                             ut_p(i),                                     &
-                             vt_p(i),                                     &
-                             wt_p(i)
+        write(4,'(14es15.5e3)') wall_p(i),                                   &
+                                u_p(i),                                      &
+                                0.5*(uu_p(i)+vv_p(i)+ww_p(i)),               &
+                                kin_p(i),                                    &
+                                (0.5*(uu_p(i)+vv_p(i)+ww_p(i)) + kin_p(i)),  &
+                                uw_p(i),                                     &
+                                uw_mod_p(i),                                 &
+                                (uw_p(i) + uw_mod_p(i)),                     &
+                                vis_t_p(i),                                  &
+                                t_p(i),                                      &
+                                t2_p(i),                                     &
+                                ut_p(i),                                     &
+                                vt_p(i),                                     &
+                                wt_p(i)
       end if
     end do
   else
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(4,'(9e15.7)')  wall_p(i),                                   &
-                             u_p(i),                                      &
-                             0.5*(uu_p(i)+vv_p(i)+ww_p(i)),               &
-                             kin_p(i),                                    &
-                             (0.5*(uu_p(i)+vv_p(i)+ww_p(i)) + kin_p(i)),  &
-                             uw_p(i),                                     &
-                             uw_mod_p(i),                                 &
-                             (uw_p(i) + uw_mod_p(i)),                     &
-                             vis_t_p(i)
+        write(4,'(9es15.5e3)')  wall_p(i),                                   &
+                                u_p(i),                                      &
+                                0.5*(uu_p(i)+vv_p(i)+ww_p(i)),               &
+                                kin_p(i),                                    &
+                                (0.5*(uu_p(i)+vv_p(i)+ww_p(i)) + kin_p(i)),  &
+                                uw_p(i),                                     &
+                                uw_mod_p(i),                                 &
+                                (uw_p(i) + uw_mod_p(i)),                     &
+                                vis_t_p(i)
       end if
     end do
   end if

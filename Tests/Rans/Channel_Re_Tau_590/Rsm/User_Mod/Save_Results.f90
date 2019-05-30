@@ -324,31 +324,31 @@
   if(heat_transfer) then
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(3,'(12e15.7)') wall_p(i),  &
-                             u_p(i),     &
-                             uu_p(i),    &
-                             vv_p(i),    &
-                             ww_p(i),    &
-                             uw_p(i),    &
-                             kin_p(i),   &
-                             eps_p(i),   &
-                             t_p(i),     &
-                             ut_p(i),    &
-                             vt_p(i),    &
-                             wt_p(i)
+        write(3,'(12es15.5e3)') wall_p(i),  &  !  1
+                                u_p(i),     &  !  2
+                                uu_p(i),    &  !  3
+                                vv_p(i),    &  !  4
+                                ww_p(i),    &  !  5
+                                uw_p(i),    &  !  6
+                                kin_p(i),   &  !  7
+                                eps_p(i),   &  !  8
+                                t_p(i),     &  !  9
+                                ut_p(i),    &  ! 10
+                                vt_p(i),    &  ! 11
+                                wt_p(i)        ! 12
       end if
     end do
   else
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(3,'(8e15.7)')  wall_p(i),  &
-                             u_p(i),     &
-                             uu_p(i),    &
-                             vv_p(i),    &
-                             ww_p(i),    &
-                             uw_p(i),    &
-                             kin_p(i),   &
-                             eps_p(i)
+        write(3,'(8es15.5e3)')  wall_p(i),  &  !  1
+                                u_p(i),     &  !  2
+                                uu_p(i),    &  !  3
+                                vv_p(i),    &  !  4
+                                ww_p(i),    &  !  5
+                                uw_p(i),    &  !  6
+                                kin_p(i),   &  !  7
+                                eps_p(i)       !  8
       end if
     end do
   end if
@@ -377,31 +377,31 @@
   if(heat_transfer) then
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(4,'(12e15.7)') wall_p(i),  &
-                             u_p(i),     &
-                             uu_p(i),    &
-                             vv_p(i),    &
-                             ww_p(i),    &
-                             uw_p(i),    &
-                             kin_p(i),   &
-                             eps_p(i),   &
-                             t_p(i),     &
-                             ut_p(i),    &
-                             vt_p(i),    &
-                             wt_p(i)
+        write(4,'(12es15.5e3)') wall_p(i),  &  !  1
+                                u_p(i),     &  !  2
+                                uu_p(i),    &  !  3
+                                vv_p(i),    &  !  4
+                                ww_p(i),    &  !  5
+                                uw_p(i),    &  !  6
+                                kin_p(i),   &  !  7
+                                eps_p(i),   &  !  8
+                                t_p(i),     &  !  9
+                                ut_p(i),    &  ! 10
+                                vt_p(i),    &  ! 11
+                                wt_p(i)        ! 12
       end if
     end do
   else
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(4,'(8e15.7)')  wall_p(i),  &
-                             u_p(i),     &
-                             uu_p(i),    &
-                             vv_p(i),    &
-                             ww_p(i),    &
-                             uw_p(i),    &
-                             kin_p(i),   &
-                             eps_p(i)
+        write(4,'(8es15.5e3)')  wall_p(i),  &  !  1
+                                u_p(i),     &  !  2
+                                uu_p(i),    &  !  3
+                                vv_p(i),    &  !  4
+                                ww_p(i),    &  !  5
+                                uw_p(i),    &  !  6
+                                kin_p(i),   &  !  7
+                                eps_p(i)       !  8
       end if
     end do
   end if

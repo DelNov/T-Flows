@@ -218,14 +218,14 @@
         v4_p(i) = v4_p(i) / n_count(i)
         v5_p(i) = v5_p(i) / n_count(i)
 
-        write(3,'(8E15.7)') (z_p(i)+z_p(i+1))/(2.*H),  &
-                           um_p(i) / U_B,              &
-                           uu_p(i) / U_B**2,           &
-                           vv_p(i) * H / U_B**3,       &
-                           ww_p(i) / U_B**2,           &
-                           uv_p(i) * H / U_B**2,       &
-                           v1_p(i),                    &
-                           v2_p(i)
+        write(3,'(8es15.5e3)') (z_p(i)+z_p(i+1))/(2.*H),    &
+                                um_p(i) / U_B,              &
+                                uu_p(i) / U_B**2,           &
+                                vv_p(i) * H / U_B**3,       &
+                                ww_p(i) / U_B**2,           &
+                                uv_p(i) * H / U_B**2,       &
+                                v1_p(i),                    &
+                                v2_p(i)
 
         wm_p(i)    = 0.0
         um_p(i)    = 0.0
