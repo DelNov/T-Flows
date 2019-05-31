@@ -238,20 +238,20 @@
      turbulence_model .eq. RSM_MANCEAU_HANJALIC  .or.  &
      turbulence_model .eq. RSM_HANJALIC_JAKIRLIC  ) then
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentKineticEnergy",  &
-                                           turb % kin % n(1))
+                                       turb % kin % n(1))
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentDissipation",    &
-                                           turb % eps % n(1))
+                                       turb % eps % n(1))
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentKineticEnergyProduction", &
-                                           turb % p_kin(1))
+                                       turb % p_kin(1))
     call Save_Scalar(grid, IN_4, IN_5, "TurbulenQuantityAlphaL", &
-                                           turb % alpha_l(1))
+                                       turb % alpha_l(1))
     call Save_Scalar(grid, IN_4, IN_5, "TurbulenQuantityAlphaU", &
-                                           turb % alpha_u(1))
+                                       turb % alpha_u(1))
     if (turbulence_model .eq. K_EPS .and. heat_transfer) then
       call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityT2",  &
-                                           turb % t2 % n(1))
+                                         turb % t2 % n(1))
       call Save_Scalar(grid, IN_4, IN_5, "TurbulentT2Production", &
-                                           turb % p_t2(1))
+                                         turb % p_t2(1))
     end if
 
   end if
@@ -264,14 +264,14 @@
     end do
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityV2",   v2_calc (1))
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityZeta",  &
-                                           turb % zeta % n(1))
+                                       turb % zeta % n(1))
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityF22",   &
-                                           turb % f22  % n(1))
+                                       turb % f22  % n(1))
     if (heat_transfer) then
       call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityT2",  &
-                                           turb % t2 % n(1))
+                                         turb % t2 % n(1))
       call Save_Scalar(grid, IN_4, IN_5, "TurbulentT2Production", &
-                                           turb % p_t2(1))
+                                         turb % p_t2(1))
     end if
 
   end if
@@ -285,13 +285,13 @@
   if(turbulence_model .eq. DES_SPALART .or.  &
      turbulence_model .eq. SPALART_ALLMARAS) then
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentViscosity",  &
-                                           turb % vis % n(1))
+                                       turb % vis % n(1))
     call Save_Scalar(grid, IN_4, IN_5, "VorticityMagnitude", flow % vort(1))
   end if
   if(turbulence_model .ne. NONE) then
     kin_vis_t(1:grid % n_cells) = turb % vis_t(1:grid % n_cells)/viscosity
     call Save_Scalar(grid, IN_4, IN_5, "EddyOverMolecularViscosity", &
-      kin_vis_t(1))
+                                       kin_vis_t(1))
   end if
 
   ! Reynolds stress models
@@ -313,10 +313,10 @@
      turbulence_model .eq. DES_SPALART        .or.  &
      turbulence_model .eq. HYBRID_LES_PRANDTL .or.  &
      turbulence_model .eq. HYBRID_LES_RANS) then
-    call Save_Vector(grid, IN_4, IN_5, "MeanVelocity",  &
-                                           turb % u_mean(1),  &
-                                           turb % v_mean(1),  &
-                                           turb % w_mean(1))
+    call Save_Vector(grid, IN_4, IN_5, "MeanVelocity",    &
+                                       turb % u_mean(1),  &
+                                       turb % v_mean(1),  &
+                                       turb % w_mean(1))
     do c = 1, grid % n_cells
       uu_save(c) = turb % uu_res(c) - turb % u_mean(c) * turb % u_mean(c)
       vv_save(c) = turb % vv_res(c) - turb % v_mean(c) * turb % v_mean(c)
@@ -333,7 +333,7 @@
     call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressYZ", vw_save(1))
     if(heat_transfer) then
       call Save_Scalar(grid, IN_4, IN_5, "TemperatureMean",  &
-                                             turb % t_mean(1))
+                                         turb % t_mean(1))
       do c = 1, grid % n_cells
         t2_save(c) = turb % t2_res(c) - turb % t_mean(c) * turb % t_mean(c)
         ut_save(c) = turb % ut_res(c) - turb % u_mean(c) * turb % t_mean(c)
@@ -350,7 +350,8 @@
 
   ! Save y+ for all turbulence models
   if(turbulence_model .ne. NONE) then
-    call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityYplus", y_plus(1))
+    call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityYplus",  &
+                                       turb % y_plus(1))
   end if
 
   ! Wall distance and delta, important for all models

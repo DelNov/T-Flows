@@ -48,8 +48,8 @@
                            + v % n(nearest_wall_cell(c)) ** 2   &
                            + w % n(nearest_wall_cell(c)) ** 2)  &
                    / (grid % wall_dist(nearest_wall_cell(c))+TINY) )
-        y_plus(c) = grid % wall_dist(c) * u_f / viscosity
-        cs = c_smag * (1.0 - exp(-y_plus(c) / 25.0))
+        turb % y_plus(c) = grid % wall_dist(c) * u_f / viscosity
+        cs = c_smag * (1.0 - exp(-turb % y_plus(c) / 25.0))
       else  
         cs = c_smag
       end if
@@ -133,8 +133,8 @@
         tau_wall = viscosity * u_tan / dely
 
         ! Calculate y+
-        y_plus(c1)  = dely * u_tau_l / nu
-        if(y_plus(c1)  >=  11.81) then
+        turb % y_plus(c1)  = dely * u_tau_l / nu
+        if(turb % y_plus(c1)  >=  11.81) then
           ! This one is effective viscosity
           turb % vis_w(c1) = density*u_tau_l*u_tau_l*dely/abs(u_tan)
         else

@@ -157,7 +157,7 @@
         eps_p   (i) = eps_p   (i) + turb % eps_mean(c)
         uw_mod_p(i) = uw_mod_p(i) + turb % vis_t_eff(c)*(u % y(c) + v % x(c))
         vis_t_p (i) = vis_t_p (i) + turb % vis_t(c) / viscosity
-        y_plus_p(i) = y_plus_p(i) + y_plus(c)
+        y_plus_p(i) = y_plus_p(i) + turb % y_plus(c)
 
         if(heat_transfer) then
           t_p (i) = t_p (i) + turb % t_mean(c)

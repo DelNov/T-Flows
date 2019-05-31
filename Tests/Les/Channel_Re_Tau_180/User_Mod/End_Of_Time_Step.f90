@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine User_Mod_End_Of_Time_Step(flow, turb, swarm, n, time)
 !------------------------------------------------------------------------------!
-!   This function is called at the beginning of time step.                     !
+!   This function is called at the end of time step.                           !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod,  only: Grid_Type

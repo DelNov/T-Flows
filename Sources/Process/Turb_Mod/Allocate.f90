@@ -41,10 +41,10 @@
     call Var_Mod_Allocate_Solution('EPS', '', turb % eps, grid)
 
     ! Other turbulent quantities
-    allocate(turb % vis_t(-nb:nc));  turb % vis_t = 0.
-    allocate(turb % vis_w(-nb:nc));  turb % vis_w = 0.  ! wall visc
-    allocate(turb % p_kin(-nb:nc));  turb % p_kin = 0.
-    allocate(y_plus  (-nb:nc));  y_plus   = 0.
+    allocate(turb % vis_t (-nb:nc));  turb % vis_t  = 0.
+    allocate(turb % vis_w (-nb:nc));  turb % vis_w  = 0.  ! wall visc
+    allocate(turb % p_kin (-nb:nc));  turb % p_kin  = 0.
+    allocate(turb % y_plus(-nb:nc));  turb % y_plus = 0.
 
     if(heat_transfer) then
       call Var_Mod_Allocate_Solution('T2', '', turb % t2, grid)
@@ -110,7 +110,7 @@
     allocate(turb % vis_t   (-nb:nc));  turb % vis_t   = 0.
     allocate(turb % vis_w   (-nb:nc));  turb % vis_w   = 0.  ! wall visc
     allocate(turb % p_kin   (-nb:nc));  turb % p_kin   = 0.
-    allocate(y_plus  (-nb:nc));  y_plus   = 0.
+    allocate(turb % y_plus  (-nb:nc));  turb % y_plus  = 0.
 
     ! Hydraulic roughness given by formula
     if(rough_walls) then
@@ -165,9 +165,7 @@
     end if ! turbulence_statistics
 
     if(buoyancy) then
-     allocate(g_buoy   (-nb:nc));  g_buoy    = 0.
-     allocate(buoy_beta(-nb:nc));  buoy_beta = 0.
-     allocate(g_kin    (-nb:nc));  g_kin     = 0.
+      allocate(turb % g_buoy(-nb:nc));  turb % g_buoy = 0.
     end if ! buoyancy
 
   end if ! K_EPS_ZETA_F
@@ -184,7 +182,7 @@
     allocate(turb % vis_t  (-nb:nc));  turb % vis_t   = 0.
     allocate(turb % vis_w  (-nb:nc));  turb % vis_w   = 0.  ! wall visc
     allocate(turb % p_kin  (-nb:nc));  turb % p_kin   = 0.
-    allocate(y_plus  (-nb:nc));  y_plus   = 0.
+    allocate(turb % y_plus (-nb:nc));  turb % y_plus  = 0.
 
     ! Reynolds stresses
     call Var_Mod_Allocate_Solution('UU', '', turb % uu, grid)
@@ -269,7 +267,7 @@
     allocate(turb % vis_t   (-nb:nc));  turb % vis_t   = 0.
     allocate(turb % vis_w   (-nb:nc));  turb % vis_w   = 0.  ! wall visc
     allocate(turb % p_kin   (-nb:nc));  turb % p_kin   = 0.
-    allocate(y_plus  (-nb:nc));  y_plus   = 0.
+    allocate(turb % y_plus  (-nb:nc));  turb % y_plus  = 0.
 
     if(heat_transfer) then
       call Var_Mod_Allocate_New_Only('UT', turb % ut, grid)
@@ -326,8 +324,8 @@
     allocate(turb % l_scale (-nb:nc));  turb % l_scale = 0.
     allocate(turb % vis_t   (-nb:nc));  turb % vis_t   = 0.
     allocate(turb % vis_w   (-nb:nc));  turb % vis_w   = 0.  ! wall visc
-    allocate(turb % p_kin   (-nb:nc));  turb % p_kin    = 0.
-    allocate(y_plus  (-nb:nc));  y_plus   = 0.
+    allocate(turb % p_kin   (-nb:nc));  turb % p_kin   = 0.
+    allocate(turb % y_plus  (-nb:nc));  turb % y_plus  = 0.
 
     if(heat_transfer) then
       call Var_Mod_Allocate_New_Only('UT', turb % ut, grid)
@@ -382,7 +380,7 @@
     allocate(turb % vis_t   (-nb:nc));  turb % vis_t   = 0.
     allocate(turb % vis_w   (-nb:nc));  turb % vis_w   = 0.  ! wall visc
     allocate(turb % p_kin   (-nb:nc));  turb % p_kin   = 0.
-    allocate(y_plus  (-nb:nc));  y_plus   = 0.
+    allocate(turb % y_plus  (-nb:nc));  turb % y_plus  = 0.
 
     if(heat_transfer) then
       call Var_Mod_Allocate_New_Only('UT', turb % ut, grid)
@@ -435,7 +433,7 @@
     allocate(turb % vis_t   (-nb:nc));  turb % vis_t   = 0.
     allocate(turb % vis_w   (-nb:nc));  turb % vis_w   = 0.
     allocate(turb % p_kin   (-nb:nc));  turb % p_kin   = 0.
-    allocate(y_plus  (-nb:nc));  y_plus   = 0.
+    allocate(turb % y_plus  (-nb:nc));  turb % y_plus  = 0.
 
     if(heat_transfer) then
       call Var_Mod_Allocate_New_Only('UT', turb % ut, grid)
@@ -488,7 +486,7 @@
     allocate(turb % vis_t   (-nb:nc));  turb % vis_t   = 0.
     allocate(turb % vis_w   (-nb:nc));  turb % vis_w   = 0.  ! wall visc
     allocate(turb % p_kin   (-nb:nc));  turb % p_kin   = 0.
-    allocate(y_plus  (-nb:nc));  y_plus   = 0.
+    allocate(turb % y_plus  (-nb:nc));  turb % y_plus  = 0.
 
     if(heat_transfer) then
 
@@ -554,7 +552,7 @@
     allocate(turb % alpha_l  (-nb:nc));  turb % alpha_l   = 0.
     allocate(turb % alpha_u  (-nb:nc));  turb % alpha_u   = 0.
     allocate(turb % p_kin    (-nb:nc));  turb % p_kin     = 0.
-    allocate(y_plus   (-nb:nc));  y_plus    = 0.
+    allocate(turb % y_plus   (-nb:nc));  turb % y_plus    = 0.
 
     if(heat_transfer) then
       call Var_Mod_Allocate_Solution('T2', '', turb % t2, grid)
@@ -604,9 +602,7 @@
     end if ! turbulence_statistics
 
     if(buoyancy) then
-      allocate(g_buoy   (-nb:nc));  g_buoy    = 0.
-      allocate(buoy_beta(-nb:nc));  buoy_beta = 0.
-      allocate(g_kin    (-nb:nc));  g_kin     = 0.
+      allocate(turb % g_buoy(-nb:nc));  turb % g_buoy = 0.
     end if ! buoyancy
 
   end if ! HYBRID_LES_RANS

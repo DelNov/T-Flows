@@ -302,7 +302,7 @@
   ! Save y+ for all turbulence models
   if(turbulence_model .ne. NONE) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              y_plus(1),"TurbulentQuantityYplus")
+                              turb % y_plus(1),"TurbulentQuantityYplus")
   end if
 
   ! Wall distance and delta

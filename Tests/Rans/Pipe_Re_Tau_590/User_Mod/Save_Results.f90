@@ -143,7 +143,7 @@
                    + b11 * vis_t(c) *(u % z(c) + w % x(c)) &
                    + b12 * vis_t(c) *(v % z(c) + w % y(c)) 
         vis_t_p(i) = vis_t_p(i) + vis_t(c) / viscosity
-        y_plus_p(i)= y_plus_p(i) + y_plus(c)
+        y_plus_p(i)= y_plus_p(i) + turb % y_plus(c)
 
         if(turbulence_model .eq. K_EPS_ZETA_F) then
           f22_p(i)  = f22_p(i) + f22  % n(c)

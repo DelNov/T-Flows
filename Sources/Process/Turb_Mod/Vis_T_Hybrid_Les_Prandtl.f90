@@ -65,10 +65,10 @@
                          + v % n(nearest_wall_cell(c)) ** 2   &
                          + w % n(nearest_wall_cell(c)) ** 2)  &
                  / (grid % wall_dist(nearest_wall_cell(c))+TINY) )
-      y_plus(c) = grid % wall_dist(c) * u_ff / viscosity
+      turb % y_plus(c) = grid % wall_dist(c) * u_ff / viscosity
 
       ! Piomelli damping function
-      fd = 1.0 - exp(-(y_plus(c)/25.0)**3)
+      fd = 1.0 - exp(-(turb % y_plus(c)/25.0)**3)
     else
       fd = 1.0
     end if
@@ -77,12 +77,12 @@
 
   end do
 
-  !-----------------! 
-  !   Wall Region   ! 
+  !-----------------!
+  !   Wall Region   !
   !-----------------+---------------------------!
   !  The procedure below calculates the vis..   !
   !  .. at the wall.                            !
-  !----------------.----------------------------! 
+  !----------------.----------------------------!
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)

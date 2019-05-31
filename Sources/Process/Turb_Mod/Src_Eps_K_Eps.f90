@@ -26,7 +26,7 @@
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: s, c, c1, c2, j
-  real                       :: u_tan, u_tau, tau_wall, y_plus
+  real                       :: u_tan, u_tau, tau_wall
   real                       :: re_t, f_mu, u_tau_new, fa, kin_vis
   real                       :: eps_wf, eps_int, ebf, y_star
   real                       :: z_o
@@ -73,11 +73,13 @@
 
     ! Buoyancy contribution
     if(buoyancy) then
-      b(c) = b(c) + max(0.0, c_1e * g_buoy(c) &
+      b(c) = b(c) + max(0.0, c_1e * turb % g_buoy(c) &
                     * eps % n(c) / kin % n(c) * grid % vol(c))
-      a % val(a % dia(c)) = a % val(a % dia(c))  &
-                + max(0.0,(-c_1e * g_buoy(c) &
-                * eps % n(c) / kin % n(c) * grid % vol(c)) / (eps % n(c) + TINY))
+      a % val(a % dia(c)) = a % val(a % dia(c))                &
+                          + max(0.0,(-c_1e * turb % g_buoy(c)  &
+                          * eps % n(c)                         &
+                          / kin % n(c) * grid % vol(c))        &
+                          / (eps % n(c) + TINY))
     end if
 
   end do
@@ -107,20 +109,24 @@
           a % val(a % dia(c1)) = 1.0 * density
         else
           u_tau = c_mu25 * sqrt(kin % n(c1))
-          y_plus = Y_Plus_Low_Re(u_tau, grid % wall_dist(c1), kin_vis)
+          turb % y_plus(c1) = Y_Plus_Low_Re(u_tau,                 &
+                                            grid % wall_dist(c1),  &
+                                            kin_vis)
 
           tau_wall = density*kappa*u_tau*u_tan   &
-                   / log(e_log * max(y_plus, 1.05))
+                   / log(e_log * max(turb % y_plus(c1), 1.05))
 
           u_tau_new = sqrt(tau_wall/density)
-          y_plus = Y_Plus_Low_Re(u_tau_new, grid % wall_dist(c1), kin_vis)
+          turb % y_plus(c1) = Y_Plus_Low_Re(u_tau_new,             &
+                                            grid % wall_dist(c1),  &
+                                            kin_vis)
 
           eps_int = 2.0*viscosity/density * kin % n(c1)    &
                   / grid % wall_dist(c1)**2
           eps_wf  = c_mu75 * kin % n(c1)**1.5              &
                   / (grid % wall_dist(c1) * kappa)
 
-          if(y_plus > 3) then
+          if(turb % y_plus(c1) > 3) then
             fa = min(density*u_tau_new**3  &
                / (kappa*grid % wall_dist(c1) * turb % p_kin(c1)),1.0)
 
@@ -135,7 +141,7 @@
             a % val(a % dia(c1)) = 1.0
           else
             eps % n(c2) = eps_int
-          end if ! y_plus > 4
+          end if ! y_plus(c1) > 4
         end if   ! rough_walls
       end if     ! wall or wall_flux
     end if       ! c2 < 0

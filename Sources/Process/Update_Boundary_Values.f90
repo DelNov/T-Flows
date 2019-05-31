@@ -96,7 +96,9 @@
           kin % n(c2) = 0.0
           u_tau = kin_vis * sqrt(u % n(c1)**2 + v % n(c1)**2 + w % n(c1)**2)  &
                 / grid % wall_dist(c1)
-          y_plus(c1) = Y_Plus_Low_Re(u_tau, grid % wall_dist(c1), kin_vis)
+          turb % y_plus(c1) = Y_Plus_Low_Re(u_tau,                 &
+                                            grid % wall_dist(c1),  &
+                                            kin_vis)
           if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) f22 % n(c2) = 0.0
         end if
       end if
@@ -114,7 +116,7 @@
           f22  % n(c2) = f22  % n(c1)
           if(heat_transfer) then
             t2  % n(c2) = t2  % n(c1)
-          end if          
+          end if
         end if
       end if
 

@@ -83,8 +83,14 @@
     real, allocatable :: uv_mean(:), vw_mean(:), uw_mean(:)
     real, allocatable :: ut_mean(:), vt_mean(:), wt_mean(:), t2_mean(:)
 
+    ! Non-dimensional distance
+    real, allocatable :: y_plus(:)
+
     ! Production of turbulent kinetic energy and temperature fluctuations
     real, allocatable :: p_kin(:), p_t2(:)
+
+    ! Buoyancy production for k-eps-zeta-f model
+    real, allocatable :: g_buoy(:)
 
     ! Turbulent lenght and time Scales
     real, allocatable :: l_scale(:)
@@ -176,15 +182,6 @@
 
   ! For LES you need to know nearest wall cell
   integer, allocatable :: nearest_wall_cell(:)
-
-  ! Non-dimensional distance
-  real, allocatable :: y_plus(:)
-
-  ! Buoyancy production for k-eps-zeta-f model
-  ! (bouy_beta is only set to 1 and used as such.  Is it needed?)
-  real, allocatable :: g_buoy(:)
-  real, allocatable :: buoy_beta(:)
-  real, allocatable :: g_kin(:)
 
   ! Turbulent Prandtl and Schmidt numbers
   real :: pr_t, sc_t

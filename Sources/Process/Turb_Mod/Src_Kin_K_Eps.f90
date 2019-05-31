@@ -21,7 +21,7 @@
   real                       :: u_tan, u_tau, tau_wall
   real                       :: kin_vis  ! [m^2/s]
   real                       :: ebf, p_kin_int, p_kin_wf
-  real                       :: z_o, y_plus
+  real                       :: z_o
 !==============================================================================!
 !   Dimensions:                                                                !
 !                                                                              !
@@ -56,13 +56,15 @@
          density * eps % n(c)/(kin % n(c) + TINY) * grid % vol(c)
 
     if (buoyancy) then
-      buoy_beta(c) = 1.0
-      g_buoy(c) = -buoy_beta(c) * (grav_x * ut % n(c) +  &
-                                   grav_y * vt % n(c) +  &
-                                   grav_z * wt % n(c)) * density
-      b(c) = b(c) + max(0.0, g_buoy(c) * grid % vol(c))
-      a % val(a % dia(c)) = a % val(a % dia(c))  &
-      + max(0.0,-g_buoy(c) * grid % vol(c) / (kin % n(c) + TINY))
+      turb % g_buoy(c) = -flow % beta           &
+                       * (grav_x * ut % n(c) +  &
+                          grav_y * vt % n(c) +  &
+                          grav_z * wt % n(c))   &
+                       * density
+      b(c) = b(c) + max(0.0, turb % g_buoy(c) * grid % vol(c))
+      a % val(a % dia(c)) = a % val(a % dia(c))        &
+                          + max(0.0,-turb % g_buoy(c)  &
+                          * grid % vol(c) / (kin % n(c) + TINY))
     end if
   end do
 
@@ -85,10 +87,10 @@
         if(rough_walls) then
           z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
           u_tau = c_mu25 * sqrt(kin % n(c1))
-          y_plus = u_tau * (grid % wall_dist(c1) + z_o) &
-                 / kin_vis
+          turb % y_plus(c1) = u_tau * (grid % wall_dist(c1) + z_o) &
+                            / kin_vis
 
-          tau_wall = density*kappa*u_tau*u_tan  &
+          tau_wall = density * kappa * u_tau * u_tan  &
                    / log(((grid % wall_dist(c1)+z_o) / z_o))
 
           turb % p_kin(c1) = tau_wall * c_mu25 * sqrt(kin % n(c1))   &
@@ -98,12 +100,15 @@
                 * grid % vol(c1)
         else
           u_tau = c_mu25 * sqrt(kin % n(c1))
-          y_plus = Y_Plus_Low_Re(u_tau, grid % wall_dist(c1), kin_vis)
+          turb % y_plus(c1) = Y_Plus_Low_Re(u_tau,                 &
+                                            grid % wall_dist(c1),  &
+                                            kin_vis)
 
           tau_wall = density*kappa*u_tau*u_tan   &
-                   / log(e_log * max(y_plus, 1.05))
+                   / log(e_log * max(turb % y_plus(c1), 1.05))
 
-          ebf = 0.01 * y_plus**4 / (1.0 + 5.0*y_plus)
+          ebf = 0.01 * turb % y_plus(c1)**4  &
+                     / (1.0 + 5.0 * turb % y_plus(c1))
 
           p_kin_wf  = tau_wall * c_mu25 * sqrt(kin % n(c1))  &
                     / (grid % wall_dist(c1) * kappa)

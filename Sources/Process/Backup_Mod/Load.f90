@@ -142,10 +142,10 @@
     call Backup_Mod_Read_Variable(fh,d,vc, 'eps', tur % eps)
 
     ! Other turbulent quantities
-    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'p_kin',  tur % p_kin   (-nb_s:nc_s))
-    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'y_plus', y_plus  (-nb_s:nc_s))
-    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'vis_t',  tur % vis_t(-nb_s:nc_s))
-    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'vis_w',  tur % vis_w(-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'p_kin',  tur % p_kin (-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'y_plus', tur % y_plus(-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'vis_t',  tur % vis_t (-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'vis_w',  tur % vis_w (-nb_s:nc_s))
 
     ! Turbulence quantities connected with heat transfer
     if(heat_transfer) then
@@ -168,12 +168,12 @@
     call Backup_Mod_Read_Variable(fh,d,vc, 'f22',  tur % f22)
 
     ! Other turbulent quantities
-    call Backup_Mod_Read_Cell_Bnd(fh,d,vc,'p_kin',  tur % p_kin(-nb_s:nc_s))
-    call Backup_Mod_Read_Cell_Bnd(fh,d,vc,'y_plus', y_plus  (-nb_s:nc_s))
-    call Backup_Mod_Read_Cell_Bnd(fh,d,vc,'vis_t',  tur % vis_t(-nb_s:nc_s))
-    call Backup_Mod_Read_Cell_Bnd(fh,d,vc,'vis_w',  tur % vis_w(-nb_s:nc_s))
-    call Backup_Mod_Read_Cell_Bnd(fh,d,vc,'t_scale',tur % t_scale (-nb_s:nc_s))
-    call Backup_Mod_Read_Cell_Bnd(fh,d,vc,'l_scale',tur % l_scale (-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc,'p_kin',  tur % p_kin  (-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc,'y_plus', tur % y_plus (-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc,'vis_t',  tur % vis_t  (-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc,'vis_w',  tur % vis_w  (-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc,'t_scale',tur % t_scale(-nb_s:nc_s))
+    call Backup_Mod_Read_Cell_Bnd(fh,d,vc,'l_scale',tur % l_scale(-nb_s:nc_s))
 
     ! Turbulence quantities connected with heat transfer
 

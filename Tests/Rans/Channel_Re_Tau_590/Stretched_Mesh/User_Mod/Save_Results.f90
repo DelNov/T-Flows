@@ -149,7 +149,7 @@
         eps_p   (i) = eps_p   (i) + eps % n(c)
         uw_p    (i) = uw_p    (i) + turb % vis_t(c) *(u % z(c) + w % x(c))
         vis_t_p (i) = vis_t_p (i) + turb % vis_t(c) / viscosity
-        y_plus_p(i) = y_plus_p(i) + y_plus(c)
+        y_plus_p(i) = y_plus_p(i) + turb % y_plus(c)
 
         if(turbulence_model .eq. K_EPS_ZETA_F) then
           f22_p (i) = f22_p (i) + f22  % n(c)

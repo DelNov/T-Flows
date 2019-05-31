@@ -116,7 +116,7 @@
       if(c2 < 0 .and. phi % name .eq. 'KIN') then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
-          if(y_plus(c1) > 4) then
+          if(turb % y_plus(c1) > 4) then
 
             phi_x_f = 0.0
             phi_y_f = 0.0

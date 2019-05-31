@@ -100,23 +100,25 @@
             um_p(i)   = um_p(i) + u % n(c1)
             vm_p(i)   = vm_p(i) + v % n(c1)
             wm_p(i)   = wm_p(i) + w % n(c1)
-            if(y_plus(c1) < 4.0) then
+            if(turb % y_plus(c1) < 4.0) then
               v1_p(i) = v1_p(i)  &
                       + (2.0 * viscosity * u % n(c1)   &
                              / grid % wall_dist(c1))   &
                       / (density * 11.3**2)
             else
-kin_vis = viscosity / density
-u_tan = Field_Mod_U_Tan(flow, s)
-u_tau = c_mu25 * sqrt(turb % kin % n(c1))
-y_plus(c1) = Y_Plus_Low_Re(u_tau, grid % wall_dist(c1), kin_vis)
-tau_wall = density*kappa*u_tau*u_tan    &
-             / log(e_log*max(y_plus(c1),1.05))
+              kin_vis = viscosity / density
+              u_tan = Field_Mod_U_Tan(flow, s)
+              u_tau = c_mu25 * sqrt(turb % kin % n(c1))
+              turb % y_plus(c1) = Y_Plus_Low_Re(u_tau,                 &
+                                                grid % wall_dist(c1),  &
+                                                kin_vis)
+              tau_wall = density * kappa * u_tau * u_tan    &
+                       / log(e_log*max(turb % y_plus(c1), 1.05))
 
               v1_p(i) = v1_p(i)  &
                       + 0.015663 * tau_wall * u % n(c1) / abs(u % n(c1))
             end if
-            v2_p(i) = v2_p(i) + y_plus(c1)
+            v2_p(i) = v2_p(i) + turb % y_plus(c1)
             v3_p(i) = v3_p(i) + t % q(c2)  &
                     / (density * capacity * (t % n(c2) - 20) * 11.3)
             v5_p(i) = v5_p(i) + t % n(c2) 
@@ -124,8 +126,8 @@ tau_wall = density*kappa*u_tau*u_tan    &
           end if
         end if
       end if
-    end do 
-  end do 
+    end do
+  end do
 
   ! Average over all processors
   do pl=1, n_prob

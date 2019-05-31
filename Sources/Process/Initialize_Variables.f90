@@ -299,7 +299,7 @@
           kin % oo(c) = kin % n(c)
           eps % o(c)  = eps % n(c)
           eps % oo(c) = eps % n(c)
-          y_plus(c) = 0.001
+          turb % y_plus(c) = 0.001
           if(heat_transfer) then
             vals(0) = t2_def;  t2 % n(c) = vals(Key_Ind('T2',  keys, nks))
             t2 % o(c)  = t2 % n(c)
@@ -321,7 +321,7 @@
           zeta % oo(c) = zeta % n(c)
           f22  % o(c)  = f22  % n(c)
           f22  % oo(c) = f22  % n(c)
-          y_plus(c) = 0.001
+          turb % y_plus(c) = 0.001
           if(heat_transfer) then
             vals(0) = t2_def;  t2 % n(c) = vals(Key_Ind('T2',  keys, nks))
             t2 % o(c)  = t2 % n(c)

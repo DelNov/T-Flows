@@ -22,7 +22,7 @@
   real                       :: u_tan, u_tau, tau_wall
   real                       :: e_sor, c_11e, ebf
   real                       :: eps_wf, eps_int
-  real                       :: fa, u_tau_new, kin_vis, y_plus
+  real                       :: fa, u_tau_new, kin_vis
   real                       :: z_o
 !==============================================================================!
 !   In dissipation of turbulent kinetic energy equation exist two              !
@@ -68,9 +68,10 @@
 
     ! Add buoyancy (linearly split) to eps equation as required in the t2 model
     if(buoyancy) then
-      b(c) = b(c) + max(0.0, c_11e * e_sor * g_buoy(c))
-      a % val(a % dia(c)) = a % val(a % dia(c))  &
-              + max(0.0,-c_11e * e_sor * g_buoy(c) / (eps % n(c) + TINY))
+      b(c) = b(c) + max(0.0, c_11e * e_sor * turb % g_buoy(c))
+      a % val(a % dia(c)) = a % val(a % dia(c))                         &
+                          + max(0.0, -c_11e * e_sor * turb % g_buoy(c)  &
+                          / (eps % n(c) + TINY))
     end if
   end do
 
@@ -101,24 +102,28 @@
             a % val(j) = 0.0 
           end do
 
-          b(c1) = eps % n(c1) 
-          a % val(a % dia(c1)) = 1.0 
+          b(c1) = eps % n(c1)
+          a % val(a % dia(c1)) = 1.0
         else
           u_tau = c_mu25 * sqrt(kin % n(c1))
-          y_plus = Y_Plus_Low_Re(u_tau, grid % wall_dist(c1), kin_vis)
+          turb % y_plus(c1) = Y_Plus_Low_Re(u_tau,                 &
+                                            grid % wall_dist(c1),  &
+                                            kin_vis)
 
           tau_wall = density * kappa * u_tau * u_tan  &
-                   / log(e_log * max(y_plus, 1.05))
+                   / log(e_log * max(turb % y_plus(c1), 1.05))
 
           u_tau_new = sqrt(tau_wall/density)
-          y_plus = Y_Plus_Low_Re(u_tau_new, grid % wall_dist(c1), kin_vis)
+          turb % y_plus(c1) = Y_Plus_Low_Re(u_tau_new,             &
+                                            grid % wall_dist(c1),  &
+                                            kin_vis)
 
           eps_int = 2.0* kin_vis * kin % n(c1)  &
                   / grid % wall_dist(c1)**2
           eps_wf  = c_mu75 * kin % n(c1)**1.5            &
                   / (grid % wall_dist(c1) * kappa)
 
-          if(y_plus > 3) then
+          if(turb % y_plus(c1) > 3) then
 
             fa = min(density * u_tau_new**3                              &
                      / (kappa*grid % wall_dist(c1) * turb % p_kin(c1)),  &
@@ -132,7 +137,7 @@
             a % val(a % dia(c1)) = 1.0
           else
             eps % n(c2) = eps_int
-          end if  ! y_plus < 4
+          end if  ! y_plus(c1) < 4
         end if    ! rough_walls
       end if      ! wall or wall_flux
     end if        ! c2 < 0

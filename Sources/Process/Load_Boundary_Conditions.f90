@@ -279,7 +279,7 @@
             if(turbulence_model .eq. K_EPS) then
               i = Key_Ind('KIN', keys, nks); if(i > 0) kin % n(c) = vals(i)
               i = Key_Ind('EPS', keys, nks); if(i > 0) eps % n(c) = vals(i)
-              y_plus(c) = 1.1
+              turb % y_plus(c) = 1.1
               if(heat_transfer) then
                 i = Key_Ind('T2',  keys, nks); if(i > 0) t2  % n(c) = vals(i)
               end if
