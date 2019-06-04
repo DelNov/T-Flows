@@ -478,7 +478,7 @@
   !-------------------!
   if(turbulence_model .eq. LES_DYNAMIC) then
 
-    allocate(c_dyn(-nb:nc));  c_dyn = 0.
+    allocate(turb % c_dyn(-nb:nc));  turb % c_dyn = 0.
 
     ! Other variables such as time scale, length scale and production
     allocate(turb % t_scale (-nb:nc));  turb % t_scale = 0.
@@ -540,7 +540,7 @@
     call Var_Mod_Allocate_Solution('F22',  '', turb % f22,  grid)
 
     ! Main model's variables (for LES part)
-    allocate(c_dyn(-nb:nc));  c_dyn = 0.
+    allocate(turb % c_dyn(-nb:nc));  turb % c_dyn = 0.
 
     ! Other variables such as time scale, length scale and production
     allocate(turb % vis_t_eff(-nb:nc));  turb % vis_t_eff = 0.

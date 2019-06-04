@@ -107,6 +107,9 @@
     real, allocatable :: vis_w(:)
     real, allocatable :: con_w(:)
 
+    ! Scale-resolving simulations
+    real, allocatable :: c_dyn(:)
+
     ! Hydraulic roughness (constant and variable)
     real              :: z_o
     real, allocatable :: z_o_f(:)
@@ -173,7 +176,6 @@
 
   ! For scale-resolving models
   real              :: c_smag
-  real, allocatable :: c_dyn(:)
   real, allocatable :: wale_v(:)
 
   !-----------------------------------!

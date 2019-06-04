@@ -62,9 +62,9 @@
   else if(turbulence_model .eq. LES_DYNAMIC) then
     do c = 1, grid % n_cells
       lf = grid % vol(c) ** ONE_THIRD
-      turb % vis_t(c) = density  &
-                      * (lf*lf)   &  ! delta^2
-                      * c_dyn(c)  &  ! c_dynamic
+      turb % vis_t(c) = density          &
+                      * (lf*lf)          &  ! delta^2
+                      * turb % c_dyn(c)  &  ! c_dynamic
                       * flow % shear(c)
     end do
   else if(turbulence_model .eq. LES_WALE) then

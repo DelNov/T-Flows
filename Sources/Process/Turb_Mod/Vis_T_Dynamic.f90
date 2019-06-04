@@ -207,12 +207,13 @@
     l_dot_m =        l_11 * m_11 + l_22 * m_22 + l_33 * m_33   & 
             + 2.0 * (l_12 * m_12 + l_13 * m_13 + l_23 * m_23)
 
-    c_dyn(c)  =  -0.5 * l_dot_m / (m_dot_m + TINY) 
+    turb % c_dyn(c)  =  -0.5 * l_dot_m / (m_dot_m + TINY) 
 
-    if(c_dyn(c) < 0.0) then
-      c_dyn(c) = 0.0 
-    else if(c_dyn(c) > 0.04) then
-      c_dyn(c) = 0.04
+    ! Set lower and upper limiter on c_dyn
+    if(turb % c_dyn(c) < 0.0) then
+      turb % c_dyn(c) = 0.0 
+    else if(turb % c_dyn(c) > 0.04) then
+      turb % c_dyn(c) = 0.04
     end if 
   end do
 
