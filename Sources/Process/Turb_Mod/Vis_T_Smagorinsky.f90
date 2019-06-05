@@ -73,7 +73,7 @@
       turb % vis_t(c) = density   &
                       * (lf*lf)    &  ! delta^2
                       * (0.5*0.5)  &  ! cs^2
-                      * wale_v(c)
+                      * turb % wale_v(c)
     end do
   end if
 

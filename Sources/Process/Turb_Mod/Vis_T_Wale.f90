@@ -78,7 +78,7 @@
     sijd_sijd(c) = s11d*s11d + s22d*s22d + s33d*s33d  &
                  + s12d*s12d + s13d*s13d + s23d*s23d
 
-    wale_v(c) =  sqrt( abs (sijd_sijd(c)**3) )          &
+    turb % wale_v(c) =  sqrt( abs (sijd_sijd(c)**3) )          &
               / (sqrt( abs (shear2(c)   **5) ) +        &
                  sqrt( sqrt(sijd_sijd(c)**6) ) + TINY)
   end do

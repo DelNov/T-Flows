@@ -109,6 +109,7 @@
 
     ! Scale-resolving simulations
     real, allocatable :: c_dyn(:)
+    real, allocatable :: wale_v(:)
 
     ! Hydraulic roughness (constant and variable)
     real              :: z_o
@@ -175,8 +176,7 @@
   real :: c_b1, c_b2, c_w1, c_w2, c_w3, c_v1
 
   ! For scale-resolving models
-  real              :: c_smag
-  real, allocatable :: wale_v(:)
+  real :: c_smag
 
   !-----------------------------------!
   !   Auxiliary turbulent variables   !

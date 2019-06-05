@@ -425,7 +425,7 @@
   !----------------!
   if(turbulence_model .eq. LES_WALE) then
 
-    allocate(wale_v(-nb:nc));  wale_v = 0.
+    allocate(turb % wale_v(-nb:nc));  turb % wale_v = 0.
 
     ! Other variables such as time scale, length scale and production
     allocate(turb % t_scale (-nb:nc));  turb % t_scale = 0.
