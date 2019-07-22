@@ -294,7 +294,7 @@
 
   if( (n_faces_check > grid % max_n_faces) .or.  &
       (n_nodes_check > grid % max_n_nodes) ) then
-    print *, '# Error message from TFlowS:'
+    print *, '# Error message from T-Flows:'
   end if
 
   if( n_faces_check  > grid % max_n_faces ) then
