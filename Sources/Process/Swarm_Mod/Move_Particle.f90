@@ -62,9 +62,6 @@
   ! Particle relaxation time
   part_tau = part % density * (part % d **2) / 18.0 / viscosity
 
-  ! Particle time step (division of the global time step)
-  swarm % dt = flow % dt / 20.0
-
   ! Compute particle relative vel. in y-dir for buoyant force calculation
   part % rel_u   = up - part % u
   part % rel_v   = vp - part % v
