@@ -9,14 +9,19 @@
   type(Turb_Type),  target :: turb
   integer                  :: k      ! particle number
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),     pointer     :: grid
-  type(Particle_Type), pointer     :: part
-  logical,             pointer     :: escaped
-  logical,             pointer     :: deposited
+  type(Grid_Type),     pointer :: grid
+  type(Field_Type),    pointer :: flow
+  type(Particle_Type), pointer :: part
+  logical,             pointer :: escaped
+  logical,             pointer :: deposited
 !==============================================================================!
 
   ! Take aliases for the swarm
   grid => swarm % pnt_grid
+  flow => swarm % pnt_flow
+
+  ! Particle time step (division of the global time step)
+  swarm % dt = flow % dt / 100.0
 
   !----------------------------------!
   !                                  !
@@ -45,6 +50,13 @@
         ! Calling the nearest node subroutine to find the ...
         ! ... nearest node for each particle and stores it
         call Swarm_Mod_Find_Nearest_Node(swarm, k)
+
+        ! Make sure particle didn't run out of periodicity
+        call Swarm_Mod_Check_Periodicity(swarm, k)
+        if(swarm % particle(k) % node .eq. 0) then
+          call Swarm_Mod_Find_Nearest_Cell(swarm, k)
+          call Swarm_Mod_Find_Nearest_Node(swarm, k)
+        end if
 
         ! Compute velocity at the particle, and move it
         ! (also calls Bounce_Particle)
@@ -75,8 +87,9 @@
       part => swarm % particle(k)
 
       ! Printing particle position
-      write(*,'(a,i3,a,i2,a,3e15.6,a,e12.4)')                        &
+      write(*,'(a,i3,a,i7,a,i2,a,3es15.6,a,es12.4)')                 &
               '#  particle: ',  k,                                   &
+              ',  cell: ',      part % cell,                         &
               ',  processor: ', part % proc,                         &
               ',  x,y,z: ',     part % x_n, part % y_n, part % z_n,  &
               ',  cfl: ',       part % cfl
