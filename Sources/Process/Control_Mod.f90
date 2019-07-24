@@ -83,6 +83,7 @@
     ! Multiphase
     include 'Control_Mod/Physics/Number_Of_Phases.f90'
     include 'Control_Mod/Physics/Number_Of_Particles.f90'
+    include 'Control_Mod/Physics/Number_Of_Swarm_Sub_Steps.f90'
     include 'Control_Mod/Physics/Swarm_Density.f90'
     include 'Control_Mod/Physics/Swarm_Diameter.f90'
     include 'Control_Mod/Physics/Swarm_Coefficient_Of_Restitution.f90'
