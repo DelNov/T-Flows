@@ -37,11 +37,11 @@
 
   ! From this point on, domain should not be used anymore
   call Determine_Grid_Connectivity(refines, grid, .false.)  ! trial run 
-  call Calculate_Grid_Geometry    (grid, .false.)
+  call Calculate_Grid_Geometry    (grid,          .false.)
   call Smooth_Grid                (smooths, grid)
   call Refine_Grid                (refines, grid)
   call Determine_Grid_Connectivity(refines, grid, .true.)   ! real run
-  call Calculate_Grid_Geometry    (grid, .true.)
+  call Calculate_Grid_Geometry    (grid,          .true.)
 
   call Grid_Mod_Sort_Cells_Smart       (grid)
   call Grid_Mod_Sort_Faces_Smart       (grid)
