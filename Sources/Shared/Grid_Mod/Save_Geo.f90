@@ -161,6 +161,13 @@
 
   end do
 
+  !-----------------!
+  !   Periodicity   !
+  !-----------------!
+  write(9) grid % per_x
+  write(9) grid % per_y
+  write(9) grid % per_z
+
   close(9)
 
   end subroutine

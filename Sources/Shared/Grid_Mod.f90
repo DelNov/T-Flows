@@ -60,6 +60,9 @@
     integer :: n_copy       ! ... copy cells and faces
     integer :: n_levels     ! ... multigrid levels
 
+    ! Periodic span
+    real :: per_x, per_y, per_z
+
     !-------------------------!
     !  Cell-based variables   !
     !-------------------------!

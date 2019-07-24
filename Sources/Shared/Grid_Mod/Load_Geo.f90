@@ -52,6 +52,10 @@
   read(9) (grid % yf(s), s = 1, grid % n_faces)
   read(9) (grid % zf(s), s = 1, grid % n_faces)
 
+  read(9) grid % per_x
+  read(9) grid % per_y
+  read(9) grid % per_z
+
   close(9)
 
   end subroutine
