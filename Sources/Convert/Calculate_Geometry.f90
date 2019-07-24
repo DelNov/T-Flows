@@ -55,7 +55,7 @@
 !                                                                              !
 !   Notes:                                                                     !
 !                                                                              !
-!     ! side s is oriented from cell center c1 to cell center c2               !
+!     ! face s is oriented from cell center c1 to cell center c2               !
 !     ! c2 is greater then c1 inside the domain or smaller then 0              !
 !       on the boundary                                                        !
 !     ! nodes are denoted with n1 - n4                                         !
@@ -140,7 +140,7 @@
 
   !-----------------------------------------------------!
   !   Calculate:                                        !
-  !      components of cell sides, cell side centers.   !
+  !      components of cell faces, cell face centers.   !
   !-----------------------------------------------------!
   !   => depends on: x_node,y_node,z_node               !
   !   <= gives:      Sx,Sy,Sz,xsp,yzp,zsp               !
@@ -152,7 +152,7 @@
       zt(n) = grid % zn(grid % faces_n(n,s))
     end do
 
-    ! Cell side components
+    ! Cell face components
     if( grid % faces_n_nodes(s) .eq. 4 ) then
       grid % sx(s)= 0.5 * ( (yt(2)-yt(1))*(zt(2)+zt(1))   &
                            +(yt(3)-yt(2))*(zt(2)+zt(3))   &
@@ -192,7 +192,7 @@
       grid % zf(s) = (zt(1)+zt(2)+zt(3))/3.0
     end if
 
-  end do ! through sides
+  end do ! through faces
 
   print *, '# Cell face components calculated !'
 
@@ -231,7 +231,7 @@
         grid % zc(c2) = grid % zf(s)
       end if
     end if
-  end do ! through sides
+  end do ! through faces
 
   !---------------------------------------------------------------!
   !   Move the centers of co-planar molecules towards the walls   !
@@ -252,7 +252,7 @@
       grid % dy(c2) = max( grid % dy(c2), abs( grid % yc(c2) - grid % yc(c1) ) )
       grid % dz(c2) = max( grid % dz(c2), abs( grid % zc(c2) - grid % zc(c1) ) )
     end if
-  end do ! through sides
+  end do ! through faces
 
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
@@ -266,7 +266,7 @@
       if( Approx_Real(grid % dz(c1), 0.0, small) )  &
         grid % zc(c1) = 0.75*grid % zc(c1) + 0.25*grid % zc(c2)
     end if
-  end do ! through sides
+  end do ! through faces
 
   ! Why are the following three lines needed?
   grid % dx = 0.0
@@ -274,7 +274,7 @@
   grid % dz = 0.0
 
   !--------------------------------------------!
-  !   Find the sides on the periodic boundary  !
+  !   Find the faces on the periodic boundary  !
   !--------------------------------------------!
   !   => depends on: xc,yc,zc,Sx,Sy,Sz         !
   !   <= gives:      Dx,Dy,Dz                  !
@@ -284,7 +284,7 @@
 
   !--------------------------------------------------------!
   !                                                        !
-  !   Phase I  ->  find the sides on periodic boundaries   !
+  !   Phase I  ->  find the faces on periodic boundaries   !
   !                                                        !
   !--------------------------------------------------------!
 
@@ -628,10 +628,10 @@
   do s = 1, cnt_per/2
     s1 = b_face(s)
     s2 = b_face(s+cnt_per/2)
-    c11 = grid % faces_c(1,s1)  ! cell 1 for side 1
+    c11 = grid % faces_c(1,s1)  ! cell 1 for face 1
     c21 = grid % faces_c(2,s1)  ! cell 2 for cell 1
-    c12 = grid % faces_c(1,s2)  ! cell 1 for side 2
-    c22 = grid % faces_c(2,s2)  ! cell 2 for side 2
+    c12 = grid % faces_c(1,s2)  ! cell 1 for face 2
+    c22 = grid % faces_c(2,s2)  ! cell 2 for face 2
     face_copy(s1) = s2          ! just to remember where it was coppied from
     grid % faces_c(2,s1) = c12
     grid % faces_c(1,s2) = 0    ! c21
@@ -713,19 +713,24 @@
   !                                                    !
   !----------------------------------------------------!
 1 continue
+
   n_per = 0
+  grid % per_x = 0.0
+  grid % per_y = 0.0
+  grid % per_z = 0.0
+
   do s = 1, grid % n_faces
 
     ! Initialize
-    grid % dx(s)=0.0
-    grid % dy(s)=0.0
-    grid % dz(s)=0.0
+    grid % dx(s) = 0.0
+    grid % dy(s) = 0.0
+    grid % dz(s) = 0.0
 
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
     if(c2   >  0) then
 
-      ! Scalar product of the side with line c1-c2 is good criteria
+      ! Scalar product of the face with line c1-c2 is good criteria
       if( (grid % sx(s) * (grid % xc(c2)-grid % xc(c1) )+                  &
            grid % sy(s) * (grid % yc(c2)-grid % yc(c1) )+                  &
            grid % sz(s) * (grid % zc(c2)-grid % zc(c1) )) < 0.0 ) then
@@ -753,10 +758,17 @@
         grid % dy(s) = grid % yf(s) - ys2  ! later: xc2 = xc2 + Dx
         grid % dz(s) = grid % zf(s) - zs2  !
 
-      end if !  S*(c2-c1) < 0.0
-    end if  !  c2 > 0
-  end do    !  sides
-  print '(a38,i9)', ' # Phase II: number of shadow faces:  ', n_per
+        grid % per_x = max(grid % per_x, abs(grid % dx(s)))
+        grid % per_y = max(grid % per_y, abs(grid % dy(s)))
+        grid % per_z = max(grid % per_z, abs(grid % dz(s)))
+
+      end if !  s*(c2-c1) < 0.0
+    end if   !  c2 > 0
+  end do     !  faces
+  print '(a38,i9)',   ' # Phase II: number of shadow faces:  ', n_per
+  print '(a38,f8.3)', ' # Periodicity in x direction         ', grid % per_x
+  print '(a38,f8.3)', ' # Periodicity in y direction         ', grid % per_y
+  print '(a38,f8.3)', ' # Periodicity in z direction         ', grid % per_z
 
   deallocate(face_copy)
 
@@ -781,7 +793,7 @@
 
   !--------------------------------------!
   !                                      !
-  !   Phase IV  ->  compress the sides   !
+  !   Phase IV  ->  compress the faces   !
   !                                      !
   !--------------------------------------!
   do s = 1, grid % n_faces
@@ -867,7 +879,7 @@
   deallocate(b_face)
 
   !------------------------------------------------------------!
-  !   Calculate the interpolation factors for the cell sides   !
+  !   Calculate the interpolation factors for the cell faces   !
   !------------------------------------------------------------!
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)

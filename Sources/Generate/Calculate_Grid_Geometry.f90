@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Calculate_Grid_Geometry(grid, rrun)
+  subroutine Calculate_Grid_Geometry(grid, real_run)
 !------------------------------------------------------------------------------!
 !   Calculates geometrical quantities of the grid.                             !
 !------------------------------------------------------------------------------!
@@ -11,7 +11,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type)     :: grid
-  logical, intent(in) :: rrun
+  logical, intent(in) :: real_run
 !----------------------------------[Calling]-----------------------------------!
   real :: Tet_Volume
   real :: Distance
@@ -45,7 +45,7 @@
 !                                                                              !
 !   Notes:                                                                     !
 !                                                                              !
-!     ! side s is oriented from cell center c1 to cell center c2               !
+!     ! faec s is oriented from cell center c1 to cell center c2               !
 !     ! c2 is greater then c1 inside the domain or smaller then 0              !
 !       on the boundary                                                        !
 !     ! nodes are denoted with n1 - n4                                         !
@@ -144,7 +144,7 @@
 
     !-----------------------------------------------------!
     !   Calculate:                                        ! 
-    !      components of cell sides, cell side centers.   !
+    !      components of cell faces, cell face centers.   !
     !-----------------------------------------------------!
     !   => depends on: x_node,y_node,z_node               ! 
     !   <= gives:      sx,sy,sz,xsp,yzp,zsp               !
@@ -220,7 +220,7 @@
         grid % zf(s) = (loc_z_node(1)+loc_z_node(2)+loc_z_node(3)) / 3.0
       end if 
 
-    end do ! through sides
+    end do ! through faces
 
     !--------------------------------------!
     !   Calculate boundary cell centers    !
@@ -247,89 +247,102 @@
     end do ! through sides
 
     !---------------------------------------------!
-    !   Find the sides on the periodic boundary   !
+    !   Find the faces on the periodic boundary   !
     !---------------------------------------------!
-    !   => depends on: xc,yc,zc,Sx,Sy,Sz          !
+    !   => depends on: xc,yc,zc,sx,sy,sz          !
     !   <= gives:      dx,dy,dz                   !
     !---------------------------------------------!
-    if(rrun) then
-    n_per = 0
-    do s = 1, grid % n_faces
+    if(real_run) then
 
-      ! Initialize
-      grid % dx(s) = 0.0
-      grid % dy(s) = 0.0
-      grid % dz(s) = 0.0
+      ! Initialize variables for grid periodicity      
+      n_per = 0
+      grid % per_x = 0.0
+      grid % per_y = 0.0
+      grid % per_z = 0.0
 
-      c1 = grid % faces_c(1, s)
-      c2 = grid % faces_c(2, s)
-      if(c2   >  0) then
+      do s = 1, grid % n_faces
 
-        ! Scalar product of the side with line c1 - c2 is a good ...
-        ! ... criterion to check if face is on periodic boundary
-        if( (grid % sx(s) * (grid % xc(c2) - grid % xc(c1) ) +  &
-             grid % sy(s) * (grid % yc(c2) - grid % yc(c1) ) +  &
-             grid % sz(s) * (grid % zc(c2) - grid % zc(c1) ))  < 0.0 ) then
+        ! Initialize
+        grid % dx(s) = 0.0
+        grid % dy(s) = 0.0
+        grid % dz(s) = 0.0
 
-          n_per = n_per + 1
- 
-          ! Find the coordinates of ...
-          m = face_c_to_c(s,2)
+        c1 = grid % faces_c(1, s)
+        c2 = grid % faces_c(2, s)
+        if(c2 > 0) then
 
-          if(grid % faces_n_nodes(s) .eq. 4) then   
+          ! Scalar product of the side with line c1 - c2 is a good ...
+          ! ... criterion to check if face is on periodic boundary
+          if( (grid % sx(s) * (grid % xc(c2) - grid % xc(c1) ) +  &
+               grid % sy(s) * (grid % yc(c2) - grid % yc(c1) ) +  &
+               grid % sz(s) * (grid % zc(c2) - grid % zc(c1) )) < 0.0 ) then
 
-            ! Coordinates of the shadow face
-            xs2=.25*(  grid % xn(grid % cells_n(f4n(m,1), c2))  &
-                     + grid % xn(grid % cells_n(f4n(m,2), c2))  &
-                     + grid % xn(grid % cells_n(f4n(m,3), c2))  &
-                     + grid % xn(grid % cells_n(f4n(m,4), c2)))
+            n_per = n_per + 1
 
-            ys2=.25*(  grid % yn(grid % cells_n(f4n(m,1), c2))  &
-                     + grid % yn(grid % cells_n(f4n(m,2), c2))  &
-                     + grid % yn(grid % cells_n(f4n(m,3), c2))  &
-                     + grid % yn(grid % cells_n(f4n(m,4), c2)))
+            ! Find the coordinates of ...
+            m = face_c_to_c(s,2)
 
-            zs2=.25*(  grid % zn(grid % cells_n(f4n(m,1), c2))  &
-                     + grid % zn(grid % cells_n(f4n(m,2), c2))  &
-                     + grid % zn(grid % cells_n(f4n(m,3), c2))  &
-                     + grid % zn(grid % cells_n(f4n(m,4), c2)))
- 
-          else if(grid % faces_n_nodes(s) .eq. 3) then  
+            if(grid % faces_n_nodes(s) .eq. 4) then
 
-            ! Coordinates of the shadow face
-            xs2 = ONE_THIRD * (grid % xn(grid % cells_n(f3n(m,1), c2))  &
-                             + grid % xn(grid % cells_n(f3n(m,2), c2))  &
-                             + grid % xn(grid % cells_n(f3n(m,3), c2)) )
+              ! Coordinates of the shadow face
+              xs2=.25*(  grid % xn(grid % cells_n(f4n(m,1), c2))  &
+                       + grid % xn(grid % cells_n(f4n(m,2), c2))  &
+                       + grid % xn(grid % cells_n(f4n(m,3), c2))  &
+                       + grid % xn(grid % cells_n(f4n(m,4), c2)))
 
-            ys2 = ONE_THIRD * (grid % yn(grid % cells_n(f3n(m,1), c2))  &
-                             + grid % yn(grid % cells_n(f3n(m,2), c2))  &
-                             + grid % yn(grid % cells_n(f3n(m,3), c2)) )
+              ys2=.25*(  grid % yn(grid % cells_n(f4n(m,1), c2))  &
+                       + grid % yn(grid % cells_n(f4n(m,2), c2))  &
+                       + grid % yn(grid % cells_n(f4n(m,3), c2))  &
+                       + grid % yn(grid % cells_n(f4n(m,4), c2)))
 
-            zs2 = ONE_THIRD * (grid % zn(grid % cells_n(f3n(m,1), c2))  &
-                             + grid % zn(grid % cells_n(f3n(m,2), c2))  &
-                             + grid % zn(grid % cells_n(f3n(m,3), c2)) )
+              zs2=.25*(  grid % zn(grid % cells_n(f4n(m,1), c2))  &
+                       + grid % zn(grid % cells_n(f4n(m,2), c2))  &
+                       + grid % zn(grid % cells_n(f4n(m,3), c2))  &
+                       + grid % zn(grid % cells_n(f4n(m,4), c2)))
 
-          end if 
+            else if(grid % faces_n_nodes(s) .eq. 3) then  
 
-          grid % dx(s) = grid % xf(s) - xs2  !------------------------!
-          grid % dy(s) = grid % yf(s) - ys2  ! later: xc2 = xc2 + dx  !
-          grid % dz(s) = grid % zf(s) - zs2  !------------------------!
+              ! Coordinates of the shadow face
+              xs2 = ONE_THIRD * (grid % xn(grid % cells_n(f3n(m,1), c2))  &
+                               + grid % xn(grid % cells_n(f3n(m,2), c2))  &
+                               + grid % xn(grid % cells_n(f3n(m,3), c2)) )
 
-        end if !  S*(c2-c1) < 0.0
-      end if  !  c2 > 0
-    end do    !  sides  
-    print '(a38,i7)', '# Number of periodic faces:          ', n_per
+              ys2 = ONE_THIRD * (grid % yn(grid % cells_n(f3n(m,1), c2))  &
+                               + grid % yn(grid % cells_n(f3n(m,2), c2))  &
+                               + grid % yn(grid % cells_n(f3n(m,3), c2)) )
+
+              zs2 = ONE_THIRD * (grid % zn(grid % cells_n(f3n(m,1), c2))  &
+                               + grid % zn(grid % cells_n(f3n(m,2), c2))  &
+                               + grid % zn(grid % cells_n(f3n(m,3), c2)) )
+
+            end if 
+
+            grid % dx(s) = grid % xf(s) - xs2  !------------------------!
+            grid % dy(s) = grid % yf(s) - ys2  ! later: xc2 = xc2 + dx  !
+            grid % dz(s) = grid % zf(s) - zs2  !------------------------!
+
+            grid % per_x = max(grid % per_x, abs(grid % dx(s)))
+            grid % per_y = max(grid % per_y, abs(grid % dy(s)))
+            grid % per_z = max(grid % per_z, abs(grid % dz(s)))
+
+          end if !  s*(c2-c1) < 0.0
+        end if  !  c2 > 0
+      end do    !  sides  
+      print '(a38,i7)',   '# Number of periodic faces:          ', n_per
+      print '(a38,f8.3)', '# Periodicity in x direction         ', grid % per_x
+      print '(a38,f8.3)', '# Periodicity in y direction         ', grid % per_y
+      print '(a38,f8.3)', '# Periodicity in z direction         ', grid % per_z
     end if
 
   !----------------------------------!
   !   Calculate the cell volumes     !
   !----------------------------------!
   !   => depends on: xc,yc,zc,       !
-  !                  Dx,Dy,Dz,       !
+  !                  dx,dy,dz,       !
   !                  xsp, ysp, zsp   !
   !   <= gives:      volume          !
   !----------------------------------!
-  if(rrun) then
+  if(real_run) then
     do c = 1, grid % n_cells
       grid % vol(c)=0.0
     end do
@@ -422,9 +435,9 @@
   end if
 
   !------------------------------------------------------------!
-  !   Calculate the interpolation factors for the cell sides   !
+  !   Calculate the interpolation factors for the cell faces   !
   !------------------------------------------------------------!
-  if(rrun) then
+  if(real_run) then
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
