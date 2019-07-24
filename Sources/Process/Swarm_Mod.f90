@@ -98,6 +98,9 @@
     ! Time step for the swarm
     real :: dt
 
+    ! Number of sub-steps; time sub-steps
+    integer :: n_sub_steps
+
     ! Counter for depositing (d), escaped (e) and reflected (r) particles
     integer :: cnt_d
     integer :: cnt_e
@@ -118,6 +121,7 @@
   include 'Swarm_Mod/Advance_Particles.f90'
   include 'Swarm_Mod/Allocate.f90'
   include 'Swarm_Mod/Bounce_Particle.f90'
+  include 'Swarm_Mod/Check_Periodicity.f90'
   include 'Swarm_Mod/Exchange_Particles.f90'
   include 'Swarm_Mod/Find_Nearest_Cell.f90'
   include 'Swarm_Mod/Find_Nearest_Node.f90'
