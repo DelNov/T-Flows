@@ -14,6 +14,7 @@
   type(Particle_Type), pointer :: part
   logical,             pointer :: escaped
   logical,             pointer :: deposited
+  integer                      :: ss         ! sub-step counter
 !==============================================================================!
 
   ! Take aliases for the swarm
@@ -21,54 +22,56 @@
   flow => swarm % pnt_flow
 
   ! Particle time step (division of the global time step)
-  swarm % dt = flow % dt / 100.0
+  swarm % dt = flow % dt / swarm % n_sub_steps
 
   !----------------------------------!
   !                                  !
   !   Browse through all particles   !
   !                                  !
   !----------------------------------!
-  do k = 1, swarm % n_particles
+  do ss = 1, swarm % n_sub_steps
+    do k = 1, swarm % n_particles
 
-    ! Take aliases for the particle
-    part      => swarm % particle(k)
-    escaped   => part  % escaped
-    deposited => part  % deposited
+      ! Take aliases for the particle
+      part      => swarm % particle(k)
+      escaped   => part  % escaped
+      deposited => part  % deposited
 
-    !-------------------------------------------------!
-    !   If particle is neither deposited nor escped   !
-    !-------------------------------------------------!
-    if(.not. deposited .and. .not. escaped) then
+      !-------------------------------------------------!
+      !   If particle is neither deposited nor escped   !
+      !-------------------------------------------------!
+      if(.not. deposited .and. .not. escaped) then
 
-      ! If particle is in this processor, carry on with it
-      if(part % proc .eq. this_proc) then
+        ! If particle is in this processor, carry on with it
+        if(part % proc .eq. this_proc) then
 
-        ! Calling the nearest cell subroutine to find the ...
-        ! ... nearest cell for each particle and stores it
-        call Swarm_Mod_Find_Nearest_Cell(swarm, k)
-
-        ! Calling the nearest node subroutine to find the ...
-        ! ... nearest node for each particle and stores it
-        call Swarm_Mod_Find_Nearest_Node(swarm, k)
-
-        ! Make sure particle didn't run out of periodicity
-        call Swarm_Mod_Check_Periodicity(swarm, k)
-        if(swarm % particle(k) % node .eq. 0) then
+          ! Calling the nearest cell subroutine to find the ...
+          ! ... nearest cell for each particle and stores it
           call Swarm_Mod_Find_Nearest_Cell(swarm, k)
+
+          ! Calling the nearest node subroutine to find the ...
+          ! ... nearest node for each particle and stores it
           call Swarm_Mod_Find_Nearest_Node(swarm, k)
-        end if
 
-        ! Compute velocity at the particle, and move it
-        ! (also calls Bounce_Particle)
-        call Swarm_Mod_Move_Particle(swarm, turb, k)
+          ! Make sure particle didn't run out of periodicity
+          call Swarm_Mod_Check_Periodicity(swarm, k)
+          if(swarm % particle(k) % node .eq. 0) then
+            call Swarm_Mod_Find_Nearest_Cell(swarm, k)
+            call Swarm_Mod_Find_Nearest_Node(swarm, k)
+          end if
 
-        ! Calling particle forces subroutine to ...
-        ! ... compute the forces on each particle and store it
-        call Swarm_Mod_Particle_Forces(swarm, k)
+          ! Compute velocity at the particle, and move it
+          ! (also calls Bounce_Particle)
+          call Swarm_Mod_Move_Particle(swarm, turb, k)
 
-      end if  ! in this processor
-    end if    ! not deposited or escaped
-  end do      ! through particles
+          ! Calling particle forces subroutine to ...
+          ! ... compute the forces on each particle and store it
+          call Swarm_Mod_Particle_Forces(swarm, k)
+
+        end if  ! in this processor
+      end if    ! not deposited or escaped
+    end do      ! through particles
+  end do        ! through sub-steps
 
   !---------------------------------------------!
   !                                             !
