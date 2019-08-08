@@ -70,6 +70,37 @@
     write(9,'(a,a)') IN_4, '</DataArray>'
     write(9,'(a,a)') IN_3, '</Points>'
 
+    !----------------!
+    !                !
+    !   Point data   !
+    !                !
+    !----------------!
+    write(9,'(a,a)') IN_3, '<PointData Scalars="scalars" vectors="velocity">'
+
+    !--------------------!
+    !   Particle i.d.s   !
+    !--------------------!
+    write(9,'(a,a)') IN_4, '<DataArray type="Int64" Name="Index" ' // &
+                           'format="ascii">'
+    do k = 1, swarm % n_particles
+      write(9,'(a,i9)') IN_5, k
+    end do
+    write(9,'(a,a)') IN_4, '</DataArray>'
+
+    !-------------------------!
+    !   Particle velocities   !
+    !-------------------------!
+    write(9,'(a,a)') IN_4, '<DataArray type="Float64" Name="Velocity" ' // &
+                           ' NumberOfComponents="3" format="ascii">'
+    do k = 1, swarm % n_particles
+      part => swarm % particle(k)
+      write(9,'(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')                         &
+                IN_5, part % u, part % v, part % w
+    end do
+    write(9,'(a,a)') IN_4, '</DataArray>'
+
+    write(9,'(a,a)') IN_3, '</PointData>'
+
     !-----------!
     !           !
     !   Cells   !
