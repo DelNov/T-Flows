@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Scalar(grid, in_1, in_2, var_name, val)
+  subroutine Save_Scalar(grid, in_1, in_2, var_name, plot_inside, val)
 !------------------------------------------------------------------------------!
 !   Writes one real scalar defined over cells.                                 !
 !------------------------------------------------------------------------------!
@@ -8,9 +8,10 @@
   type(Grid_Type)  :: grid
   character(len=*) :: in_1, in_2
   character(len=*) :: var_name
-  real             :: val(1:grid % n_cells)
+  logical          :: plot_inside     ! plot results inside?
+  real             :: val(-grid % n_bnd_cells:grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c
+  integer :: c, c2, s
 !==============================================================================!
 
   ! Header
@@ -26,9 +27,18 @@
                   '" format="ascii">'
 
   ! Data
-  do c = 1, grid % n_cells - grid % comm % n_buff_cells
-    write(9,'(a,1pe16.6e4)') in_2, val(c)
-  end do  
+  if(plot_inside) then
+    do c = 1, grid % n_cells - grid % comm % n_buff_cells
+      write(9,'(a,1pe16.6e4)') in_2, val(c)
+    end do
+  else
+    do s = 1, grid % n_faces
+      c2 = grid % faces_c(2,s)
+      if( c2 < 0 ) then
+        write(9,'(a,1pe16.6e4)') in_2, val(c2)
+      end if
+    end do
+  end if
 
   ! Footer
   write(9,'(a,a)') in_1, '</DataArray>'

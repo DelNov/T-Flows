@@ -1,5 +1,6 @@
 !==============================================================================!
-  subroutine Save_Vector(grid, in_1, in_2, var_name, val_1, val_2, val_3)
+  subroutine Save_Vector(grid, in_1, in_2, var_name, plot_inside,  &
+                         val_1, val_2, val_3)
 !------------------------------------------------------------------------------!
 !   Writes one real vector defined over cells.                                 !
 !------------------------------------------------------------------------------!
@@ -8,11 +9,12 @@
   type(Grid_Type)  :: grid
   character(len=*) :: in_1, in_2
   character(len=*) :: var_name
-  real             :: val_1(1:grid % n_cells)
-  real             :: val_2(1:grid % n_cells)
-  real             :: val_3(1:grid % n_cells)
+  logical          :: plot_inside     ! plot results inside?
+  real             :: val_1(-grid % n_bnd_cells:grid % n_cells)
+  real             :: val_2(-grid % n_bnd_cells:grid % n_cells)
+  real             :: val_3(-grid % n_bnd_cells:grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c
+  integer :: c, c2, s
 !==============================================================================!
 
   ! Header
@@ -27,10 +29,20 @@
                   trim(var_name),                             &
                   '" NumberOfComponents="3" format="ascii">'
   ! Data
-  do c = 1, grid % n_cells - grid % comm % n_buff_cells
-    write(9,'(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)') &
-            in_2, val_1(c), val_2(c), val_3(c)
-  end do  
+  if(plot_inside) then
+    do c = 1, grid % n_cells - grid % comm % n_buff_cells
+      write(9,'(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)') &
+              in_2, val_1(c), val_2(c), val_3(c)
+    end do
+  else
+    do s = 1, grid % n_faces
+      c2 = grid % faces_c(2,s)
+      if( c2 < 0 ) then
+        write(9,'(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)') &
+                  in_2, val_1(c2), val_2(c2), val_3(c2)
+      end if
+    end do
+  end if
 
   ! Footer
   write(9,'(a,a)') in_1, '</DataArray>'

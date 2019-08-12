@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Results(flow, turb, name_save)
+  subroutine Save_Results(flow, turb, name_save, plot_inside)
 !------------------------------------------------------------------------------!
 !   Writes results in VTU file format (for VisIt and Paraview)                 !
 !------------------------------------------------------------------------------!
@@ -22,12 +22,15 @@
   type(Field_Type), target :: flow
   type(Turb_Type),  target :: turb
   character(len=*)         :: name_save
+  logical                  :: plot_inside     ! plot results inside?
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: grid
-  integer                  :: c, n, offset
+  integer                  :: c, n, s, offset
   character(len=80)        :: name_out_8, name_out_9, store_name
 !-----------------------------[Local parameters]-------------------------------!
-  integer, parameter :: VTK_TETRA      = 10  ! cell shapes in VTK format
+  integer, parameter :: VTK_TRIANGLE   =  5  ! cell shapes in VTK format
+  integer, parameter :: VTK_QUAD       =  9
+  integer, parameter :: VTK_TETRA      = 10
   integer, parameter :: VTK_HEXAHEDRON = 12
   integer, parameter :: VTK_WEDGE      = 13
   integer, parameter :: VTK_PYRAMID    = 14
@@ -82,10 +85,17 @@
                          'byte_order="LittleEndian">'
   write(9,'(a,a)') IN_1, '<UnstructuredGrid>'
 
-  write(9,'(a,a,i0.0,a,i0.0,a)')   &
-               IN_2, '<Piece NumberOfPoints="', grid % n_nodes,      &
-                          '" NumberOfCells ="', grid % n_cells -     &
-                                                grid % comm % n_buff_cells, '">'
+  if(plot_inside) then
+    write(9,'(a,a,i0.0,a,i0.0,a)')   &
+                 IN_2, '<Piece NumberOfPoints="', grid % n_nodes,              &
+                            '" NumberOfCells ="', grid % n_cells               &
+                                                - grid % comm % n_buff_cells,  &
+                                                '">'
+  else
+    write(9,'(a,a,i0.0,a,i0.0,a)')   &
+                 IN_2, '<Piece NumberOfPoints="', grid % n_nodes,              &
+                            '" NumberOfCells ="', grid % n_bnd_cells, '">'
+  end if
 
   !----------!
   !          !
@@ -121,67 +131,113 @@
   write(9,'(a,a)') IN_4, '<DataArray type="Int64" Name="connectivity"' //  &
                          ' format="ascii">'
 
-  do c = 1, grid % n_cells - grid % comm % n_buff_cells
-    if(grid % cells_n_nodes(c) .eq. 8) then
-      write(9,'(a,8i9)')                                &
-        IN_5,                                           &
-        grid % cells_n(1,c)-1, grid % cells_n(2,c)-1,   &
-        grid % cells_n(4,c)-1, grid % cells_n(3,c)-1,   &
-        grid % cells_n(5,c)-1, grid % cells_n(6,c)-1,   &
-        grid % cells_n(8,c)-1, grid % cells_n(7,c)-1
-    else if(grid % cells_n_nodes(c) .eq. 6) then
-      write(9,'(a,6i9)')                                &
-        IN_5,                                           &
-        grid % cells_n(1,c)-1, grid % cells_n(2,c)-1,   &
-        grid % cells_n(3,c)-1, grid % cells_n(4,c)-1,   &
-        grid % cells_n(5,c)-1, grid % cells_n(6,c)-1
-    else if(grid % cells_n_nodes(c) .eq. 4) then
-      write(9,'(a,4i9)')                                &
-        IN_5,                                           &
-        grid % cells_n(1,c)-1, grid % cells_n(2,c)-1,   &
-        grid % cells_n(3,c)-1, grid % cells_n(4,c)-1
-    else if(grid % cells_n_nodes(c) .eq. 5) then
-      write(9,'(a,5i9)')                                &
-        IN_5,                                           &
-        grid % cells_n(5,c)-1, grid % cells_n(1,c)-1,   &
-        grid % cells_n(2,c)-1, grid % cells_n(4,c)-1,   &
-        grid % cells_n(3,c)-1
-    else
-      print *, '# EERROR!  Unsupported cell type with ',  &
-                  grid % cells_n_nodes(c), ' nodes.'
-      print *, '# Exiting'
-      call Comm_Mod_End
-    end if
-  end do
+  if(plot_inside) then
+    do c = 1, grid % n_cells - grid % comm % n_buff_cells
+      if(grid % cells_n_nodes(c) .eq. 8) then
+        write(9,'(a,8i9)')                                &
+          IN_5,                                           &
+          grid % cells_n(1,c)-1, grid % cells_n(2,c)-1,   &
+          grid % cells_n(4,c)-1, grid % cells_n(3,c)-1,   &
+          grid % cells_n(5,c)-1, grid % cells_n(6,c)-1,   &
+          grid % cells_n(8,c)-1, grid % cells_n(7,c)-1
+      else if(grid % cells_n_nodes(c) .eq. 6) then
+        write(9,'(a,6i9)')                                &
+          IN_5,                                           &
+          grid % cells_n(1,c)-1, grid % cells_n(2,c)-1,   &
+          grid % cells_n(3,c)-1, grid % cells_n(4,c)-1,   &
+          grid % cells_n(5,c)-1, grid % cells_n(6,c)-1
+      else if(grid % cells_n_nodes(c) .eq. 4) then
+        write(9,'(a,4i9)')                                &
+          IN_5,                                           &
+          grid % cells_n(1,c)-1, grid % cells_n(2,c)-1,   &
+          grid % cells_n(3,c)-1, grid % cells_n(4,c)-1
+      else if(grid % cells_n_nodes(c) .eq. 5) then
+        write(9,'(a,5i9)')                                &
+          IN_5,                                           &
+          grid % cells_n(5,c)-1, grid % cells_n(1,c)-1,   &
+          grid % cells_n(2,c)-1, grid % cells_n(4,c)-1,   &
+          grid % cells_n(3,c)-1
+      else
+        print *, '# ERROR!  Unsupported cell type with ',  &
+                    grid % cells_n_nodes(c), ' nodes.'
+        print *, '# Exiting'
+        call Comm_Mod_End
+      end if
+    end do
+  else  ! plot only boundary
+    do s = 1, grid % n_faces
+      if( grid % faces_c(2,s) < 0 ) then
+        if(grid % faces_n_nodes(s) .eq. 4) then
+          write(9,'(a,4I9)')                               &
+            IN_5,                                          &
+            grid % faces_n(1,s)-1, grid % faces_n(2,s)-1,  &
+            grid % faces_n(3,s)-1, grid % faces_n(4,s)-1
+        else if(grid % faces_n_nodes(s) .eq. 3) then
+          write(9,'(a,3I9)')                               &
+            IN_5,                                          &
+            grid % faces_n(1,s)-1, grid % faces_n(2,s)-1,  &
+            grid % faces_n(3,s)-1
+        else
+          print *, '# ERROR!  Unsupported cell type ',     &
+                    grid % faces_n_nodes(s), ' nodes.'
+          print *, '# Exiting'
+          call Comm_Mod_End
+        end if
+      end if
+    end do
+  end if
+
   write(9,'(a,a)') IN_4, '</DataArray>'
 
   ! Now write all cells' offsets
-  write(9,'(a,a)') IN_4, '<DataArray type="Int64" Name="offsets" format="ascii">'
+  write(9,'(a,a)') IN_4, '<DataArray type="Int64" Name="offsets"' //  &
+                         ' format="ascii">'
   offset = 0
-  do c = 1, grid % n_cells - grid % comm % n_buff_cells
-    offset = offset + grid % cells_n_nodes(c)
-    write(9,'(a,i9)') IN_5, offset
-  end do
+
+  if(plot_inside) then
+    do c = 1, grid % n_cells - grid % comm % n_buff_cells
+      offset = offset + grid % cells_n_nodes(c)
+      write(9,'(a,i9)') IN_5, offset
+    end do
+  else  ! plot only boundary
+    do s = 1, grid % n_faces
+      if( grid % faces_c(2,s) < 0 ) then
+        offset = offset + grid % faces_n_nodes(s)
+        write(9,'(a,i9)') IN_5, offset
+      end if
+    end do
+  end if
   write(9,'(a,a)') IN_4, '</DataArray>'
 
   ! Now write all cells' types
   write(9,'(a,a)') IN_4, '<DataArray type="UInt8" Name="types" format="ascii">'
-  do c = 1, grid % n_cells - grid % comm % n_buff_cells
-    if(grid % cells_n_nodes(c) .eq. 8) then
-      write(9,'(a,i9)') IN_5, VTK_HEXAHEDRON
-    else if(grid % cells_n_nodes(c) .eq. 6) then
-      write(9,'(a,i9)') IN_5, VTK_WEDGE
-    else if(grid % cells_n_nodes(c) .eq. 4) then
-      write(9,'(a,i9)') IN_5, VTK_TETRA
-    else if(grid % cells_n_nodes(c) .eq. 5) then
-      write(9,'(a,i9)') IN_5, VTK_PYRAMID
-    else
-      print *, '# ERROR!  Unsupported cell type with ',  &
-                  grid % cells_n_nodes(c), ' nodes.'
-      print *, '# Exiting'
-      call Comm_Mod_End
-    end if
-  end do
+
+  if(plot_inside) then
+    do c = 1, grid % n_cells - grid % comm % n_buff_cells
+      if(grid % cells_n_nodes(c) .eq. 8) then
+        write(9,'(a,i9)') IN_5, VTK_HEXAHEDRON
+      else if(grid % cells_n_nodes(c) .eq. 6) then
+        write(9,'(a,i9)') IN_5, VTK_WEDGE
+      else if(grid % cells_n_nodes(c) .eq. 4) then
+        write(9,'(a,i9)') IN_5, VTK_TETRA
+      else if(grid % cells_n_nodes(c) .eq. 5) then
+        write(9,'(a,i9)') IN_5, VTK_PYRAMID
+      else
+        print *, '# ERROR!  Unsupported cell type with ',  &
+                    grid % cells_n_nodes(c), ' nodes.'
+        print *, '# Exiting'
+        call Comm_Mod_End
+      end if
+    end do
+  else  ! plot only boundary
+    do s = 1, grid % n_faces
+      if( grid % faces_c(2,s) < 0 ) then
+        if(grid % faces_n_nodes(s) .eq. 4) write(9,'(a,i9)') IN_5, VTK_QUAD
+        if(grid % faces_n_nodes(s) .eq. 3) write(9,'(a,i9)') IN_5, VTK_TRIANGLE
+      end if
+    end do
+  end if
+
   write(9,'(a,a)') IN_4, '</DataArray>'
   write(9,'(a,a)') IN_3, '</Cells>'
 
@@ -204,27 +260,39 @@
   end if
   write(9,'(a,a)') IN_4, '<DataArray type="UInt8" Name="Processor"' //  &
                          ' format="ascii">'
-  do c = 1, grid % n_cells - grid % comm % n_buff_cells
-    write(9,'(a,i9)') IN_5, grid % comm % proces(c)
-  end do
+  if(plot_inside) then
+    do c = 1, grid % n_cells - grid % comm % n_buff_cells
+      write(9,'(a,i9)') IN_5, grid % comm % proces(c)
+    end do
+  else  ! plot only boundary
+    do s = 1, grid % n_faces
+      if( grid % faces_c(2,s) < 0 ) then
+        write(9,'(a,i9)') IN_5, grid % comm % proces( grid % faces_c(1,s) )
+      end if
+    end do
+  end if
   write(9,'(a,a)') IN_4, '</DataArray>'
 
   !--------------!
   !   Velocity   !
   !--------------!
-  call Save_Vector(grid, IN_4, IN_5, "Velocity",  &
-                   flow % u % n(1), flow % v % n(1), flow % w % n(1))
+  call Save_Vector(grid, IN_4, IN_5, "Velocity", plot_inside,            &
+                                     flow % u % n(-grid % n_bnd_cells),  &
+                                     flow % v % n(-grid % n_bnd_cells),  &
+                                     flow % w % n(-grid % n_bnd_cells))
 
   !--------------!
   !   Pressure   !
   !--------------!
-  call Save_Scalar(grid, IN_4, IN_5, "Pressure", flow % p % n(1))
+  call Save_Scalar(grid, IN_4, IN_5, "Pressure", plot_inside,            &
+                                     flow % p % n(-grid % n_bnd_cells))
 
   !-----------------!
   !   Temperature   !
   !-----------------!
   if(heat_transfer) then
-    call Save_Scalar(grid, IN_4, IN_5, "Temperature", flow % t % n(1))
+    call Save_Scalar(grid, IN_4, IN_5, "Temperature", plot_inside,         &
+                                       flow % t % n(-grid % n_bnd_cells))
   end if
 
   !--------------------------!
@@ -237,21 +305,26 @@
      turbulence_model .eq. HYBRID_LES_RANS       .or.  &
      turbulence_model .eq. RSM_MANCEAU_HANJALIC  .or.  &
      turbulence_model .eq. RSM_HANJALIC_JAKIRLIC  ) then
-    call Save_Scalar(grid, IN_4, IN_5, "TurbulentKineticEnergy",  &
-                                       turb % kin % n(1))
-    call Save_Scalar(grid, IN_4, IN_5, "TurbulentDissipation",    &
-                                       turb % eps % n(1))
-    call Save_Scalar(grid, IN_4, IN_5, "TurbulentKineticEnergyProduction", &
-                                       turb % p_kin(1))
-    call Save_Scalar(grid, IN_4, IN_5, "TurbulenQuantityAlphaL", &
-                                       turb % alpha_l(1))
-    call Save_Scalar(grid, IN_4, IN_5, "TurbulenQuantityAlphaU", &
-                                       turb % alpha_u(1))
+    call Save_Scalar(grid, IN_4, IN_5, "TurbulentKineticEnergy", plot_inside,  &
+                                       turb % kin % n(-grid % n_bnd_cells))
+    call Save_Scalar(grid, IN_4, IN_5, "TurbulentDissipation", plot_inside,    &
+                                       turb % eps % n(-grid % n_bnd_cells))
+    call Save_Scalar(grid, IN_4, IN_5, "TurbulentKineticEnergyProduction",     &
+                                       plot_inside,                            &
+                                       turb % p_kin(-grid % n_bnd_cells))
+    call Save_Scalar(grid, IN_4, IN_5, "TurbulenQuantityAlphaL",               &
+                                       plot_inside,                            &
+                                       turb % alpha_l(-grid % n_bnd_cells))
+    call Save_Scalar(grid, IN_4, IN_5, "TurbulenQuantityAlphaU",               &
+                                       plot_inside,                            &
+                                       turb % alpha_u(-grid % n_bnd_cells))
     if (turbulence_model .eq. K_EPS .and. heat_transfer) then
-      call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityT2",  &
-                                         turb % t2 % n(1))
-      call Save_Scalar(grid, IN_4, IN_5, "TurbulentT2Production", &
-                                         turb % p_t2(1))
+      call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityT2",               &
+                                         plot_inside,                         &
+                                         turb % t2 % n(-grid % n_bnd_cells))
+      call Save_Scalar(grid, IN_4, IN_5, "TurbulentT2Production",             &
+                                         plot_inside,                         &
+                                         turb % p_t2(-grid % n_bnd_cells))
     end if
 
   end if
@@ -259,50 +332,62 @@
   ! Save zeta and f22
   if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
      turbulence_model .eq. HYBRID_LES_RANS) then
+    v2_calc(:) = 0.0
     do c = 1, grid % n_cells
       v2_calc(c) = turb % kin % n(c) * turb % zeta % n(c)
     end do
-    call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityV2",   v2_calc (1))
-    call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityZeta",  &
-                                       turb % zeta % n(1))
-    call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityF22",   &
-                                       turb % f22  % n(1))
+    call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityV2", plot_inside,     &
+                                       v2_calc (-grid % n_bnd_cells))
+    call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityZeta", plot_inside,   &
+                                       turb % zeta % n(-grid % n_bnd_cells))
+    call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityF22", plot_inside,    &
+                                       turb % f22  % n(-grid % n_bnd_cells))
     if (heat_transfer) then
-      call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityT2",  &
-                                         turb % t2 % n(1))
-      call Save_Scalar(grid, IN_4, IN_5, "TurbulentT2Production", &
-                                         turb % p_t2(1))
+      call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityT2", plot_inside,   &
+                                         turb % t2 % n(-grid % n_bnd_cells))
+      call Save_Scalar(grid, IN_4, IN_5, "TurbulentT2Production", plot_inside, &
+                                         turb % p_t2(-grid % n_bnd_cells))
     end if
 
   end if
 
   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
-    call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityF22",   &
-                                           turb % f22 % n(1))
+    call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityF22", plot_inside,  &
+                                       turb % f22 % n(-grid % n_bnd_cells))
   end if
 
   ! Save vis and vis_t
   if(turbulence_model .eq. DES_SPALART .or.  &
      turbulence_model .eq. SPALART_ALLMARAS) then
-    call Save_Scalar(grid, IN_4, IN_5, "TurbulentViscosity",  &
-                                       turb % vis % n(1))
-    call Save_Scalar(grid, IN_4, IN_5, "VorticityMagnitude", flow % vort(1))
+    call Save_Scalar(grid, IN_4, IN_5, "TurbulentViscosity", plot_inside,  &
+                                       turb % vis % n(-grid % n_bnd_cells))
+    call Save_Scalar(grid, IN_4, IN_5, "VorticityMagnitude", plot_inside,  &
+                                       flow % vort(-grid % n_bnd_cells))
   end if
+  kin_vis_t(:) = 0.0
   if(turbulence_model .ne. NONE) then
-    kin_vis_t(1:grid % n_cells) = turb % vis_t(1:grid % n_cells)/viscosity
-    call Save_Scalar(grid, IN_4, IN_5, "EddyOverMolecularViscosity", &
-                                       kin_vis_t(1))
+    kin_vis_t   (-grid % n_bnd_cells:grid % n_cells) =  &
+    turb % vis_t(-grid % n_bnd_cells:grid % n_cells) / viscosity
+    call Save_Scalar(grid, IN_4, IN_5, "EddyOverMolecularViscosity",    &
+                                       plot_inside,                     &
+                                       kin_vis_t(-grid % n_bnd_cells))
   end if
 
   ! Reynolds stress models
   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
      turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
-    call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressXX", turb % uu % n(1))
-    call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressYY", turb % vv % n(1))
-    call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressZZ", turb % ww % n(1))
-    call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressXY", turb % uv % n(1))
-    call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressXZ", turb % uw % n(1))
-    call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressYZ", turb % vw % n(1))
+    call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressXX", plot_inside,     &
+                                       turb % uu % n(-grid % n_bnd_cells))
+    call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressYY", plot_inside,     &
+                                       turb % vv % n(-grid % n_bnd_cells))
+    call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressZZ", plot_inside,     &
+                                       turb % ww % n(-grid % n_bnd_cells))
+    call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressXY", plot_inside,     &
+                                       turb % uv % n(-grid % n_bnd_cells))
+    call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressXZ", plot_inside,     &
+                                       turb % uw % n(-grid % n_bnd_cells))
+    call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressYZ", plot_inside,     &
+                                       turb % vw % n(-grid % n_bnd_cells))
   end if
 
   ! Statistics for large-scale simulations of turbulence
@@ -313,10 +398,16 @@
      turbulence_model .eq. DES_SPALART        .or.  &
      turbulence_model .eq. HYBRID_LES_PRANDTL .or.  &
      turbulence_model .eq. HYBRID_LES_RANS) then
-    call Save_Vector(grid, IN_4, IN_5, "MeanVelocity",    &
-                                       turb % u_mean(1),  &
-                                       turb % v_mean(1),  &
-                                       turb % w_mean(1))
+    call Save_Vector(grid, IN_4, IN_5, "MeanVelocity", plot_inside,         &
+                                       turb % u_mean(-grid % n_bnd_cells),  &
+                                       turb % v_mean(-grid % n_bnd_cells),  &
+                                       turb % w_mean(-grid % n_bnd_cells))
+    uu_save(:) = 0.0
+    vv_save(:) = 0.0
+    ww_save(:) = 0.0
+    uv_save(:) = 0.0
+    uw_save(:) = 0.0
+    vw_save(:) = 0.0
     do c = 1, grid % n_cells
       uu_save(c) = turb % uu_res(c) - turb % u_mean(c) * turb % u_mean(c)
       vv_save(c) = turb % vv_res(c) - turb % v_mean(c) * turb % v_mean(c)
@@ -325,40 +416,62 @@
       uw_save(c) = turb % uw_res(c) - turb % u_mean(c) * turb % w_mean(c)
       vw_save(c) = turb % vw_res(c) - turb % v_mean(c) * turb % w_mean(c)
     end do
-    call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressXX", uu_save(1))
-    call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressYY", vv_save(1))
-    call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressZZ", ww_save(1))
-    call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressXY", uv_save(1))
-    call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressXZ", uw_save(1))
-    call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressYZ", vw_save(1))
+    call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressXX", plot_inside,  &
+                                       uu_save(-grid % n_bnd_cells))
+    call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressYY", plot_inside,  &
+                                       vv_save(-grid % n_bnd_cells))
+    call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressZZ", plot_inside,  &
+                                       ww_save(-grid % n_bnd_cells))
+    call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressXY", plot_inside,  &
+                                       uv_save(-grid % n_bnd_cells))
+    call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressXZ", plot_inside,  &
+                                       uw_save(-grid % n_bnd_cells))
+    call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressYZ", plot_inside,  &
+                                       vw_save(-grid % n_bnd_cells))
     if(heat_transfer) then
-      call Save_Scalar(grid, IN_4, IN_5, "TemperatureMean",  &
-                                         turb % t_mean(1))
+      call Save_Scalar(grid, IN_4, IN_5, "TemperatureMean", plot_inside,  &
+                                         turb % t_mean(-grid % n_bnd_cells))
+      t2_save(:) = 0.0
+      ut_save(:) = 0.0
+      vt_save(:) = 0.0
+      wt_save(:) = 0.0
       do c = 1, grid % n_cells
         t2_save(c) = turb % t2_res(c) - turb % t_mean(c) * turb % t_mean(c)
         ut_save(c) = turb % ut_res(c) - turb % u_mean(c) * turb % t_mean(c)
         vt_save(c) = turb % vt_res(c) - turb % v_mean(c) * turb % t_mean(c)
         wt_save(c) = turb % wt_res(c) - turb % w_mean(c) * turb % t_mean(c)
       end do
-      call Save_Scalar(grid, IN_4, IN_5, "TemperatureFluctuations",  &
-                                 t2_save(1))
-      call Save_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxX", ut_save(1))
-      call Save_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxY", vt_save(1))
-      call Save_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxZ", wt_save(1))
+      call Save_Scalar(grid, IN_4, IN_5, "TemperatureFluctuations",     &
+                                         plot_inside,                   &
+                                         t2_save(-grid % n_bnd_cells))
+      call Save_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxX",          &
+                                         plot_inside,                   &
+                                         ut_save(-grid % n_bnd_cells))
+      call Save_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxY",          &
+                                         plot_inside,                   &
+                                         vt_save(-grid % n_bnd_cells))
+      call Save_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxZ",          &
+                                         plot_inside,                   &
+                                         wt_save(-grid % n_bnd_cells))
     end if
   end if
 
   ! Save y+ for all turbulence models
   if(turbulence_model .ne. NONE) then
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityYplus",  &
-                                       turb % y_plus(1))
+                                       plot_inside,               &
+                                       turb % y_plus(-grid % n_bnd_cells))
   end if
 
   ! Wall distance and delta, important for all models
-  call Save_Scalar(grid, IN_4, IN_5, "WallDistance",  grid % wall_dist(1))
-  call Save_Scalar(grid, IN_4, IN_5, "CellDeltaMax",  turb % h_max(1))
-  call Save_Scalar(grid, IN_4, IN_5, "CellDeltaMin",  turb % h_min(1))
-  call Save_Scalar(grid, IN_4, IN_5, "CellDeltaWall", turb % h_w  (1))
+  call Save_Scalar(grid, IN_4, IN_5, "WallDistance", plot_inside,   &
+                                     grid % wall_dist(-grid % n_bnd_cells))
+  call Save_Scalar(grid, IN_4, IN_5, "CellDeltaMax", plot_inside,   &
+                                     turb % h_max(-grid % n_bnd_cells))
+  call Save_Scalar(grid, IN_4, IN_5, "CellDeltaMin", plot_inside,   &
+                                     turb % h_min(-grid % n_bnd_cells))
+  call Save_Scalar(grid, IN_4, IN_5, "CellDeltaWall", plot_inside,  &
+                                     turb % h_w  (-grid % n_bnd_cells))
 
   !----------------------!
   !   Save user arrays   !
