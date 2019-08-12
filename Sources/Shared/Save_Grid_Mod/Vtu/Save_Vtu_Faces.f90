@@ -77,7 +77,7 @@
       print *, '# Exiting'
       stop
     end if
-  end do  
+  end do
   write(9,'(a,a)') IN_4, '</DataArray>'
 
   ! Then write all faces' offsets
