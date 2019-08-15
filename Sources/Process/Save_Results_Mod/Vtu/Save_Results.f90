@@ -302,7 +302,8 @@
   !------------------!
   do sc = 1, flow % n_scalars
     phi => flow % scalar(sc)
-    call Save_Scalar(grid, IN_4, IN_5, phi % name, plot_inside, phi % n(1))
+    call Save_Scalar(grid, IN_4, IN_5, phi % name, plot_inside,  &
+                                       phi % n(-grid % n_bnd_cells))
   end do
 
   !--------------------------!
