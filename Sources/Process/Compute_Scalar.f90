@@ -378,8 +378,8 @@
   call Cpu_Timer_Mod_Stop('Linear_Solver_For_Scalars')
 
   read(phi % name(3:4), *) ns  ! reterive the number of scalar
-  row = ceiling(ns/4)          ! will be 1 (scal. 1-4), 2 (scal. 5-8), etc.
-  col = ns - (row-1)*4         ! will be in range 1 - 4
+  row = ceiling(ns/6)          ! will be 1 (scal. 1-6), 2 (scal. 6-12), etc.
+  col = ns - (row-1)*6         ! will be in range 1 - 6
 
   call Info_Mod_Iter_Fill_User_At(row, col, phi % name, exec_iter, phi % res)
 
