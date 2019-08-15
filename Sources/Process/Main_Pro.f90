@@ -99,15 +99,15 @@
   ! Read physical models from control file
   call Read_Control_Physical(flow, swarm, turb, backup)
 
-  ! Read numerical models from control file
-  call Read_Control_Numerical(flow, turb)
-
   ! Allocate memory for all variables
   call Field_Mod_Allocate(flow, grid)
   call Grad_Mod_Allocate(grid)
   call Turb_Mod_Allocate(turb, flow)
   call Swarm_Mod_Allocate(swarm, flow)
   call User_Mod_Allocate(grid)
+
+  ! Read numerical models from control file (after the memory is allocated)
+  call Read_Control_Numerical(flow, turb)
 
   call Grid_Mod_Calculate_Face_Geometry(grid)
   call Grid_Mod_Find_Nodes_Cells(grid)         ! for Lagrangian particle track
