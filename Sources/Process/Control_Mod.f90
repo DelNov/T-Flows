@@ -56,6 +56,7 @@
     include 'Control_Mod/Physics/Heat_Capacity.f90'
     include 'Control_Mod/Physics/Mass_Density.f90'
     include 'Control_Mod/Physics/Thermal_Conductivity.f90'
+    include 'Control_Mod/Physics/Species_Diffusivity.f90'
 
     ! Heat transfer
     include 'Control_Mod/Physics/Heat_Transfer.f90'

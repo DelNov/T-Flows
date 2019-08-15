@@ -18,5 +18,6 @@
   call Control_Mod_Heat_Capacity        (capacity)
   call Control_Mod_Mass_Density         (density)
   call Control_Mod_Thermal_Conductivity (conductivity)
+  call Control_Mod_Species_Diffusivity  (diffusivity)
 
   end subroutine
