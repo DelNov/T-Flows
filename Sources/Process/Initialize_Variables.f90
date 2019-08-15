@@ -24,12 +24,12 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
-  type(Var_Type),  pointer :: u, v, w, t
+  type(Var_Type),  pointer :: u, v, w, t, phi
   type(Var_Type),  pointer :: kin, eps, f22, zeta, vis, t2
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   real,            pointer :: u_mean(:), v_mean(:), w_mean(:)
   real,            pointer :: flux(:)
-  integer                  :: i, c, c1, c2, m, s, nks, nvs
+  integer                  :: i, c, c1, c2, m, s, nks, nvs, sc
   integer                  :: n_wall, n_inflow, n_outflow, n_symmetry,  &
                               n_heated_wall, n_convect
   character(len=80)        :: keys(128)
@@ -43,7 +43,7 @@
 
   ! Default values for initial conditions
   real, parameter          :: u_def   = 0.0,  v_def    = 0.0,  w_def    = 0.0
-  real, parameter          :: t_def   = 0.0,  t2_def   = 0.0
+  real, parameter          :: t_def   = 0.0,  t2_def   = 0.0,  phi_def  = 0.0
   real, parameter          :: kin_def = 0.0,  eps_def  = 0.0,  f22_def  = 0.0
   real, parameter          :: vis_def = 0.0,  zeta_def = 0.0
   real, parameter          :: uu_def  = 0.0,  vv_def   = 0.0,  ww_def   = 0.0
@@ -262,6 +262,16 @@
           vals(0) = t_def;  t % n(c) = vals(Key_Ind('T', keys, nks))
           t % o(c)  = t % n(c)
           t % oo(c) = t % n(c)
+        end if
+
+        if(flow % n_scalars > 0) then
+          do sc = 1, flow % n_scalars
+            phi => flow % scalar(sc)
+            vals(0) = phi_def
+            phi % n(c)  = vals(Key_Ind(phi % name, keys, nks))
+            phi % o(c)  = phi % n(c)
+            phi % oo(c) = phi % n(c)
+          end do
         end if
 
         if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
