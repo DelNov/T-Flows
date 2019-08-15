@@ -100,7 +100,8 @@
                 * grid % vol(c1)
         else
           u_tau = c_mu25 * sqrt(kin % n(c1))
-          turb % y_plus(c1) = Y_Plus_Low_Re(u_tau,                 &
+          turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
+                                            u_tau,                 &
                                             grid % wall_dist(c1),  &
                                             kin_vis)
 

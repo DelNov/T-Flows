@@ -109,7 +109,8 @@
           a % val(a % dia(c1)) = 1.0 * density
         else
           u_tau = c_mu25 * sqrt(kin % n(c1))
-          turb % y_plus(c1) = Y_Plus_Low_Re(u_tau,                 &
+          turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
+                                            u_tau,                 &
                                             grid % wall_dist(c1),  &
                                             kin_vis)
 
@@ -117,7 +118,8 @@
                    / log(e_log * max(turb % y_plus(c1), 1.05))
 
           u_tau_new = sqrt(tau_wall/density)
-          turb % y_plus(c1) = Y_Plus_Low_Re(u_tau_new,             &
+          turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
+                                            u_tau_new,             &
                                             grid % wall_dist(c1),  &
                                             kin_vis)
 

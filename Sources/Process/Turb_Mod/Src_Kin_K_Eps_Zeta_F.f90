@@ -116,7 +116,8 @@
         if(rough_walls) then
           z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
           u_tau  = c_mu25 * sqrt(kin % n(c1))
-          turb % y_plus(c1) = Y_Plus_Rough_Walls(u_tau,                 &
+          turb % y_plus(c1) = Y_Plus_Rough_Walls(turb,                  &
+                                                 u_tau,                 &
                                                  grid % wall_dist(c1),  &
                                                  kin_vis)
 
@@ -129,7 +130,8 @@
                 - turb % vis_t(c1) * flow % shear(c1)**2) * grid % vol(c1)
         else
           u_tau = c_mu25 * sqrt(kin % n(c1))
-          turb % y_plus(c1) = Y_Plus_Low_Re(u_tau,                 &
+          turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
+                                            u_tau,                 &
                                             grid % wall_dist(c1),  &
                                             kin_vis)
 

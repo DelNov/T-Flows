@@ -83,7 +83,8 @@
         u_tan = Field_Mod_U_Tan(flow, s)
 
         u_tau = c_mu25 * sqrt(kin % n(c1))
-        turb % y_plus(c1) = Y_Plus_Low_Re(u_tau,                 &
+        turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
+                                          u_tau,                 &
                                           grid % wall_dist(c1),  &
                                           kin_vis)
 
@@ -93,7 +94,7 @@
         ebf = 0.01 * turb % y_plus(c1)**4  &
                    / (1.0 + 5.0 * turb % y_plus(c1))
 
-        u_plus = U_Plus_Log_Law(turb % y_plus(c1))
+        u_plus = U_Plus_Log_Law(turb, turb % y_plus(c1))
 
         if(turb % y_plus(c1) < 3.0) then
           turb % vis_w(c1) = turb % vis_t(c1) + viscosity
@@ -103,16 +104,18 @@
                               + u_plus * exp(-1.0/ebf) + TINY)
         end if
 
-        turb % y_plus(c1) = Y_Plus_Low_Re(u_tau,                 &
+        turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
+                                          u_tau,                 &
                                           grid % wall_dist(c1),  &
                                           kin_vis)
 
         if(rough_walls) then
           z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
-          turb % y_plus(c1) = Y_Plus_Rough_Walls(u_tau,                 &
+          turb % y_plus(c1) = Y_Plus_Rough_Walls(turb,                  &
+                                                 u_tau,                 &
                                                  grid % wall_dist(c1),  &
                                                  kin_vis)
-          u_plus     = U_Plus_Rough_Walls(grid % wall_dist(c1))
+          u_plus     = U_Plus_Rough_Walls(turb, grid % wall_dist(c1))
           turb % vis_w(c1) = turb % y_plus(c1) * viscosity / u_plus
         end if
 
