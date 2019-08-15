@@ -7,7 +7,7 @@
   use Const_Mod
   use Comm_Mod
   use Cpu_Timer_Mod, only: Cpu_Timer_Mod_Start, Cpu_Timer_Mod_Stop
-  use Field_Mod,     only: Field_Type, conductivity, capacity, density
+  use Field_Mod,     only: Field_Type, diffusivity, density
   use Turb_Mod
   use Var_Mod
   use Grid_Mod
@@ -46,40 +46,22 @@
   integer                    :: n, c, s, c1, c2, row, col, exec_iter
   real                       :: a0, a12, a21
   real                       :: ns
-  real                       :: con_eff1, f_ex1, f_im1
-  real                       :: con_eff2, f_ex2, f_im2
+  real                       :: dif_eff1, f_ex1, f_im1
+  real                       :: dif_eff2, f_ex2, f_im2
   real                       :: phix_f1, phiy_f1, phiz_f1
   real                       :: phix_f2, phiy_f2, phiz_f2
-  real                       :: phis, pr_t1, pr_t2
+  real                       :: phis, sc_t1, sc_t2
   character(len=80)          :: name
 !------------------------------------------------------------------------------!
 !
 !  The form of equations which are solved:
 !
-!     /                /                 /
-!    |        dT      |                 |
-!    | rho Cp -- dV   | rho u Cp T dS = | lambda  DIV T dS
-!    |        dt      |                 |
-!   /                /                 /
+!     /                /                /
+!    |     d phi      |                |
+!    | rho ----- dV   | rho u phi dS = | gamma DIV phi dS
+!    |      dt        |                |
+!   /                /                /
 !
-!
-!  Dimension of the system under consideration
-!
-!     [A]{T} = {b}   [J/s = W]  
-!
-!  Dimensions of certain variables:
-!
-!     Cp     [J/kg K] (heat capacity)
-!     lambda [W/m K] (heat conductivity)
-!
-!     A      [kg/s]
-!     T      [K]
-!     b      [kg K/s] 
-!     Flux   [kg/s]
-!     CT*,   [kg K/s] 
-!     DT*,   [kg K/s] 
-!     XT*,   [kg K/s]
-! 
 !==============================================================================!
 
   call Cpu_Timer_Mod_Start('Compute_Scalars')
@@ -137,22 +119,23 @@
   !----------------------------!
   !   Spatial discretization   !
   !----------------------------!
-  call Control_Mod_Turbulent_Prandtl_Number(pr_t)  ! get default pr_t (0.9)
+  call Control_Mod_Turbulent_Schmidt_Number(sc_t)  ! get default sc_t (0.9)
 
   do s = 1, grid % n_faces
 
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
-    if(turbulence_model .ne. LES_SMAGORINSKY    .or.  &
-       turbulence_model .ne. LES_DYNAMIC        .or.  &
-       turbulence_model .ne. HYBRID_LES_PRANDTL .or.  &
-       turbulence_model .ne. LES_WALE           .or.  &
-       turbulence_model .ne. DNS) then
-      pr_t1 = Turb_Mod_Prandtl_Number(turb, c1)
-      pr_t2 = Turb_Mod_Prandtl_Number(turb, c2)
-      pr_t  = grid % fw(s) * pr_t1 + (1.0-grid % fw(s)) * pr_t2
-    end if
+!   For species, we don't have a function for turbulent Schmidt number
+!   if(turbulence_model .ne. LES_SMAGORINSKY    .or.  &
+!      turbulence_model .ne. LES_DYNAMIC        .or.  &
+!      turbulence_model .ne. HYBRID_LES_PRANDTL .or.  &
+!      turbulence_model .ne. LES_WALE           .or.  &
+!      turbulence_model .ne. DNS) then
+!     sc_t1 = Turb_Mod_Prandtl_Number(turb, c1)
+!     sc_t2 = Turb_Mod_Prandtl_Number(turb, c2)
+!     sc_t  = grid % fw(s) * sc_t1 + (1.0-grid % fw(s)) * sc_t2
+!   end if
 
     ! Gradients on the cell face 
     if(c2 > 0) then
@@ -162,9 +145,9 @@
       phix_f2 = phix_f1 
       phiy_f2 = phiy_f1 
       phiz_f2 = phiz_f1 
-      con_eff1 = grid % f(s) *(conductivity+capacity * turb % vis_t(c1)/pr_t)  &
-           + (1.-grid % f(s))*(conductivity+capacity * turb % vis_t(c2)/pr_t)
-      con_eff2 = con_eff1 
+      dif_eff1 = grid % f(s) *(diffusivity + turb % vis_t(c1)/sc_t)  &
+           + (1.-grid % f(s))*(diffusivity + turb % vis_t(c2)/sc_t)
+      dif_eff2 = dif_eff1 
     else
       phix_f1 = phi_x(c1) 
       phiy_f1 = phi_y(c1) 
@@ -172,36 +155,37 @@
       phix_f2 = phix_f1 
       phiy_f2 = phiy_f1 
       phiz_f2 = phiz_f1 
-      con_eff1 = conductivity + capacity * turb % vis_t(c1) / pr_t
-      con_eff2 = con_eff1 
+      dif_eff1 = diffusivity + turb % vis_t(c1) / sc_t
+      dif_eff2 = dif_eff1 
     end if
 
 
-    if(turbulence_model .eq. K_EPS .or.  &
-       turbulence_model .eq. K_EPS_ZETA_F) then 
-      if(c2 < 0) then
-        if(Var_Mod_Bnd_Cell_Type(phi,c2) .eq. WALL .or.  &
-           Var_Mod_Bnd_Cell_Type(phi,c2) .eq. WALLFL) then
-          con_eff1 = turb % con_w(c1)
-          con_eff2 = con_eff1
-        end if
-      end if
-    end if  
+!   For species, we don't have some wall diffusivity
+!   if(turbulence_model .eq. K_EPS .or.  &
+!      turbulence_model .eq. K_EPS_ZETA_F) then 
+!     if(c2 < 0) then
+!       if(Var_Mod_Bnd_Cell_Type(phi,c2) .eq. WALL .or.  &
+!          Var_Mod_Bnd_Cell_Type(phi,c2) .eq. WALLFL) then
+!         dif_eff1 = turb % con_w(c1)
+!         dif_eff2 = dif_eff1
+!       end if
+!     end if
+!   end if  
 
     ! Total (exact) diffusive flux
-    f_ex1 = con_eff1 * (  phix_f1 * grid % sx(s)  &
+    f_ex1 = dif_eff1 * (  phix_f1 * grid % sx(s)  &
                         + phiy_f1 * grid % sy(s)  &
                         + phiz_f1 * grid % sz(s))
-    f_ex2 = con_eff2 * (  phix_f2 * grid % sx(s)  &
+    f_ex2 = dif_eff2 * (  phix_f2 * grid % sx(s)  &
                         + phiy_f2 * grid % sy(s)  &
                         + phiz_f2 * grid % sz(s))
 
     ! Implicit diffusive flux
-    f_im1 = con_eff1 * a % fc(s)          &
+    f_im1 = dif_eff1 * a % fc(s)          &
           * (  phix_f1 * grid % dx(s)      &
              + phiy_f1 * grid % dy(s)      &
              + phiz_f1 * grid % dz(s) )
-    f_im2 = con_eff2 * a % fc(s)          &
+    f_im2 = dif_eff2 * a % fc(s)          &
           * (  phix_f2 * grid % dx(s)      &
              + phiy_f2 * grid % dy(s)      &
              + phiz_f2 * grid % dz(s) )
@@ -214,11 +198,11 @@
 
     ! Calculate the coefficients for the sysytem matrix
 
-    a12 = con_eff1 * a % fc(s)
-    a21 = con_eff2 * a % fc(s)
+    a12 = dif_eff1 * a % fc(s)
+    a21 = dif_eff2 * a % fc(s)
 
-    a12 = a12  - min(flux(s), 0.0) * capacity
-    a21 = a21  + max(flux(s), 0.0) * capacity
+    a12 = a12  - min(flux(s), 0.0)
+    a21 = a21  + max(flux(s), 0.0)
 
     ! Fill the system matrix
     if(c2 > 0) then
@@ -301,9 +285,10 @@
         c1 = grid % faces_c(1,s)
         c2 = grid % faces_c(2,s)
 
-        pr_t1 = Turb_Mod_Prandtl_Number(turb, c1)
-        pr_t2 = Turb_Mod_Prandtl_Number(turb, c2)
-        pr_t  = grid % fw(s) * pr_t1 + (1.0-grid % fw(s)) * pr_t2
+!   For species, we don't have a function for turbulent Schmidt number
+!       sc_t1 = Turb_Mod_Prandtl_Number(turb, c1)
+!       sc_t2 = Turb_Mod_Prandtl_Number(turb, c2)
+!       sc_t  = grid % fw(s) * sc_t1 + (1.0-grid % fw(s)) * sc_t2
 
         if(c2 > 0) then
           phix_f1 = grid % fw(s)*phi_x(c1) + (1.0-grid % fw(s))*phi_x(c2)
@@ -312,9 +297,9 @@
           phix_f2 = phix_f1 
           phiy_f2 = phiy_f1 
           phiz_f2 = phiz_f1 
-          con_eff1 =      grid % f(s)  * (capacity * turb % vis_t(c1)/pr_t )  &
-                  + (1. - grid % f(s)) * (capacity * turb % vis_t(c2)/pr_t )
-          con_eff2 = con_eff1 
+          dif_eff1 =      grid % f(s)  * (turb % vis_t(c1)/sc_t )  &
+                  + (1. - grid % f(s)) * (turb % vis_t(c2)/sc_t )
+          dif_eff2 = dif_eff1 
         else
           phix_f1 = phi_x(c1)
           phiy_f1 = phi_y(c1)
@@ -322,32 +307,32 @@
           phix_f2 = phix_f1
           phiy_f2 = phiy_f1
           phiz_f2 = phiz_f1
-          con_eff1 = capacity * turb % vis_t(c1) / pr_t
-          con_eff2 = con_eff1
+          dif_eff1 = turb % vis_t(c1) / sc_t
+          dif_eff2 = dif_eff1
         end if
 
         ! Total (exact) diffusive flux
-        f_ex1 = con_eff1 * (  phix_f1 * grid % sx(s)  &
+        f_ex1 = dif_eff1 * (  phix_f1 * grid % sx(s)  &
                             + phiy_f1 * grid % sy(s)  &
                             + phiz_f1 * grid % sz(s))
-        f_ex2 = con_eff2 * (  phix_f2 * grid % sx(s)  &
+        f_ex2 = dif_eff2 * (  phix_f2 * grid % sx(s)  &
                             + phiy_f2 * grid % sy(s)  &
                             + phiz_f2 * grid % sz(s))
 
         ! Implicit diffusive flux
-        f_im1 = con_eff1 * a % fc(s) *         &
+        f_im1 = dif_eff1 * a % fc(s) *         &
                 (  phix_f1 * grid % dx(s)      &
                  + phiy_f1 * grid % dy(s)      &
                  + phiz_f1 * grid % dz(s) )
-        f_im2 = con_eff2 * a % fc(s) *         &
+        f_im2 = dif_eff2 * a % fc(s) *         &
                 (  phix_f2 * grid % dx(s)      &
                  + phiy_f2 * grid % dy(s)      &
                  + phiz_f2 * grid % dz(s) )
 
-        b(c1) = b(c1) - con_eff1 * (phi % n(c2) - phi % n(c1)) * a % fc(s)  &
+        b(c1) = b(c1) - dif_eff1 * (phi % n(c2) - phi % n(c1)) * a % fc(s)  &
               - f_ex1 + f_im1
         if(c2  > 0) then
-          b(c2) = b(c2) + con_eff1 * (phi % n(c2) - phi % n(c1)) * a % fc(s)  &
+          b(c2) = b(c2) + dif_eff1 * (phi % n(c2) - phi % n(c1)) * a % fc(s)  &
                 + f_ex2 - f_im2
         end if
       end do
