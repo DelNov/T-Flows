@@ -10,10 +10,10 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: flow
   type(Grid_Type),  pointer :: grid
-  type(Var_Type),   pointer :: u, v, w, p, t
+  type(Var_Type),   pointer :: u, v, w, p, t, phi
   type(Var_Type),   pointer :: kin, eps, f22, zeta, vis, t2
   type(Var_Type),   pointer :: uu, vv, ww, uv, uw, vw
-  integer                   :: c, n
+  integer                   :: c, n, sc
   real,             pointer :: u_mean(:), v_mean(:), w_mean(:),  &
                                p_mean(:), t_mean(:)
   real,             pointer :: kin_mean (:), eps_mean(:),  &
@@ -24,6 +24,7 @@
   real,             pointer :: uu_mean(:), vv_mean(:), ww_mean(:)
   real,             pointer :: uv_mean(:), vw_mean(:), uw_mean(:)
   real,             pointer :: ut_mean(:), vt_mean(:), wt_mean(:), t2_mean(:)
+  real,             pointer :: phi_mean(:,:)
 !==============================================================================!
 
   if(.not. turbulence_statistics) return
@@ -229,10 +230,15 @@
 
       end if
 
-      !------------------------------!
-      !   User scalars are missing   !
-      !------------------------------!
-    end do 
+      !-------------!
+      !   Scalars   !
+      !-------------!
+      do sc = 1, flow % n_scalars
+        phi      => flow % scalar(sc)
+        phi_mean => turb % scalar_mean
+        phi_mean(sc, c) = (phi_mean(sc, c) * (1.*n) + phi % n(c)) / (1.*(n+1))
+      end do
+    end do
   end if
 
   end subroutine

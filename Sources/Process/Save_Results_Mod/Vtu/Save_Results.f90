@@ -15,7 +15,8 @@
                       ut_save   => r_cell_09,  &
                       vt_save   => r_cell_10,  &
                       wt_save   => r_cell_11,  &
-                      kin_vis_t => r_cell_12
+                      kin_vis_t => r_cell_12,  &
+                      phi_save  => r_cell_13
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
@@ -25,8 +26,9 @@
   logical                  :: plot_inside     ! plot results inside?
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: grid
-  integer                  :: c, n, s, offset
-  character(len=80)        :: name_out_8, name_out_9, store_name
+  type(Var_Type),  pointer :: phi
+  integer                  :: c, n, s, offset, sc
+  character(len=80)        :: name_out_8, name_out_9, store_name, name_mean
 !-----------------------------[Local parameters]-------------------------------!
   integer, parameter :: VTK_TRIANGLE   =  5  ! cell shapes in VTK format
   integer, parameter :: VTK_QUAD       =  9
@@ -295,16 +297,20 @@
                                        flow % t % n(-grid % n_bnd_cells))
   end if
 
+  !------------------!
+  !   Save scalars   !
+  !------------------!
+  do sc = 1, flow % n_scalars
+    phi => flow % scalar(sc)
+    call Save_Scalar(grid, IN_4, IN_5, phi % name, plot_inside, phi % n(1))
+  end do
+
   !--------------------------!
   !   Turbulent quantities   !
   !--------------------------!
 
   ! Save kin and eps abd t2 for K_EPS (to improve)
-  if(turbulence_model .eq. K_EPS                 .or.  &
-     turbulence_model .eq. K_EPS_ZETA_F          .or.  &
-     turbulence_model .eq. HYBRID_LES_RANS       .or.  &
-     turbulence_model .eq. RSM_MANCEAU_HANJALIC  .or.  &
-     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC  ) then
+  if(turbulence_statistics) then
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentKineticEnergy", plot_inside,  &
                                        turb % kin % n(-grid % n_bnd_cells))
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentDissipation", plot_inside,    &
@@ -391,13 +397,7 @@
   end if
 
   ! Statistics for large-scale simulations of turbulence
-  if(turbulence_model .eq. LES_SMAGORINSKY    .or.  &
-     turbulence_model .eq. LES_DYNAMIC        .or.  &
-     turbulence_model .eq. LES_WALE           .or.  &
-     turbulence_model .eq. DNS                .or.  &
-     turbulence_model .eq. DES_SPALART        .or.  &
-     turbulence_model .eq. HYBRID_LES_PRANDTL .or.  &
-     turbulence_model .eq. HYBRID_LES_RANS) then
+  if(turbulence_statistics) then
     call Save_Vector(grid, IN_4, IN_5, "MeanVelocity", plot_inside,         &
                                        turb % u_mean(-grid % n_bnd_cells),  &
                                        turb % v_mean(-grid % n_bnd_cells),  &
@@ -453,6 +453,19 @@
       call Save_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxZ",          &
                                          plot_inside,                   &
                                          wt_save(-grid % n_bnd_cells))
+    end if
+
+    if(flow % n_scalars > 0) then
+      do sc = 1, flow % n_scalars
+        phi => flow % scalar(sc)
+        name_mean = 'Mean'
+        name_mean(5:8) = phi % name
+        do c = 1, grid % n_cells
+          phi_save(c) = turb % scalar_mean(sc, c)
+        end do
+        call Save_Scalar(grid, IN_4, IN_5, name_mean, plot_inside,  &
+                         phi_save(-grid % n_bnd_cells))
+      end do
     end if
   end if
 

@@ -15,8 +15,9 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
-  character(len=80)        :: name_in, answer
-  integer                  :: fh,d,vc
+  type(Var_Type),  pointer :: phi
+  character(len=80)        :: name_in, answer, name_mean
+  integer                  :: fh, d, vc, sc
 !==============================================================================!
 
   call Cpu_Timer_Mod_Start('Backup_Mode_Load')
@@ -218,6 +219,14 @@
     end if
   end if
 
+  !------------------!
+  !   Save scalars   !
+  !------------------!
+  do sc = 1, fld % n_scalars
+    phi => fld % scalar(sc)
+    call Backup_Mod_Read_Variable(fh,d,vc, phi % name, phi)
+  end do
+
   !-----------------------------------------!
   !                                         !
   !   Turbulent statistics for all models   !
@@ -292,6 +301,16 @@
       call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'ut_res', tur % ut_res(-nb_s:nc_s))
       call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'vt_res', tur % vt_res(-nb_s:nc_s))
       call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'wt_res', tur % wt_res(-nb_s:nc_s))
+    end if
+
+    if(fld % n_scalars > 0) then
+      do sc = 1, fld % n_scalars
+        phi => fld % scalar(sc)
+        name_mean = phi % name
+        name_mean(5:9) = '_mean'
+        call Backup_Mod_Read_Cell_Bnd(fh,d,vc, name_mean,  &
+                                      tur % scalar_mean(sc, -nb_s:nc_s))
+      end do
     end if
 
   end if

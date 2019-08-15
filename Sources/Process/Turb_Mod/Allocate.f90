@@ -607,4 +607,14 @@
 
   end if ! HYBRID_LES_RANS
 
+  !----------------------------------------------------------!
+  !   Scalars are independent of the turbulence model used   !
+  !----------------------------------------------------------!
+  if(turbulence_statistics) then
+    if(flow % n_scalars > 0) then
+      allocate(turb % scalar_mean(flow % n_scalars, -nb:nc))
+      turb % scalar_mean = 0.
+    end if
+  end if
+
   end subroutine

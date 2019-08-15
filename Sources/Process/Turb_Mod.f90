@@ -83,6 +83,9 @@
     real, allocatable :: uv_mean(:), vw_mean(:), uw_mean(:)
     real, allocatable :: ut_mean(:), vt_mean(:), wt_mean(:), t2_mean(:)
 
+    ! Mean passive scalars
+    real, allocatable :: scalar_mean(:,:)
+
     ! Non-dimensional distance
     real, allocatable :: y_plus(:)
 
