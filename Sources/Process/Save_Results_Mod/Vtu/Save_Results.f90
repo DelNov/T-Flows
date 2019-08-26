@@ -310,8 +310,12 @@
   !   Turbulent quantities   !
   !--------------------------!
 
-  ! Save kin and eps abd t2 for K_EPS (to improve)
-  if(turbulence_statistics) then
+  ! Save kin and eps
+  if(turbulence_model .eq. K_EPS                 .or.  &
+     turbulence_model .eq. K_EPS_ZETA_F          .or.  &
+     turbulence_model .eq. HYBRID_LES_RANS       .or.  &
+     turbulence_model .eq. RSM_MANCEAU_HANJALIC  .or.  &
+     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC  ) then
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentKineticEnergy", plot_inside,  &
                                        turb % kin % n(-grid % n_bnd_cells))
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentDissipation", plot_inside,    &
@@ -319,21 +323,6 @@
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentKineticEnergyProduction",     &
                                        plot_inside,                            &
                                        turb % p_kin(-grid % n_bnd_cells))
-    call Save_Scalar(grid, IN_4, IN_5, "TurbulenQuantityAlphaL",               &
-                                       plot_inside,                            &
-                                       turb % alpha_l(-grid % n_bnd_cells))
-    call Save_Scalar(grid, IN_4, IN_5, "TurbulenQuantityAlphaU",               &
-                                       plot_inside,                            &
-                                       turb % alpha_u(-grid % n_bnd_cells))
-    if (turbulence_model .eq. K_EPS .and. heat_transfer) then
-      call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityT2",               &
-                                         plot_inside,                         &
-                                         turb % t2 % n(-grid % n_bnd_cells))
-      call Save_Scalar(grid, IN_4, IN_5, "TurbulentT2Production",             &
-                                         plot_inside,                         &
-                                         turb % p_t2(-grid % n_bnd_cells))
-    end if
-
   end if
 
   ! Save zeta and f22
@@ -354,8 +343,13 @@
                                          turb % t2 % n(-grid % n_bnd_cells))
       call Save_Scalar(grid, IN_4, IN_5, "TurbulentT2Production", plot_inside, &
                                          turb % p_t2(-grid % n_bnd_cells))
+      call Save_Scalar(grid, IN_4, IN_5, "TurbulenQuantityAlphaL",             &
+                                         plot_inside,                          &
+                                         turb % alpha_l(-grid % n_bnd_cells))
+      call Save_Scalar(grid, IN_4, IN_5, "TurbulenQuantityAlphaU",             &
+                                         plot_inside,                          &
+                                         turb % alpha_u(-grid % n_bnd_cells))
     end if
-
   end if
 
   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
