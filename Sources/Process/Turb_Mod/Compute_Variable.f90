@@ -159,18 +159,35 @@
       a % val(a % dia(c1))  = a % val(a % dia(c1))  + a12
       a % val(a % pos(2,s)) = a % val(a % pos(2,s)) - a21
       a % val(a % dia(c2))  = a % val(a % dia(c2))  + a21
-    else if(c2  < 0) then
+    else if(c2 < 0) then
 
-      ! Outflow is not included because it was causing problems
-      if((Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW)  .or.   &
-         (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL)    .or.   &
-         (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE).or.   &
-         (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) .or.   &
-         (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) ) then
-        a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
-        b(c1) = b(c1) + a12 * phi % n(c2)
+      ! All modeled turbulent quantities except t2(!) are zero at the wall
+      ! or specified otherwise in the control file
+      if(phi % name .ne. 'T2') then
+
+        ! Outflow is not included because it was causing problems
+        if((Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW)  .or.   &
+           (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL)    .or.   &
+           (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE).or.   &
+           (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) .or.   &
+           (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) ) then
+          a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
+          b(c1) = b(c1) + a12 * phi % n(c2)
+        end if
+
+      ! For t2; fix the value at all these boundary condition types,
+      ! but not WALLFL!!!
+      else
+        if((Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW)  .or.   &
+           (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL)    .or.   &
+           (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE).or.   &
+           (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) ) then
+          a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
+          b(c1) = b(c1) + a12 * phi % n(c2)
+        end if
       end if
-    end if
+
+    end if  ! if c2 < 0
 
   end do  ! through faces
 
