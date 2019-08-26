@@ -41,8 +41,8 @@
   kin_vis = viscosity / density
 
   if(heat_transfer) then
-    heat        = 0.0
-    heat_flux   = 0.0
+    heat        = 0.0     ! [W]
+    heat_flux   = 0.0     ! [W/m^2]
     heated_area = 0.0
     ! Take (default) turbulent Prandtl number from control file
     call Control_Mod_Turbulent_Prandtl_Number(pr_t)
@@ -57,7 +57,7 @@
     !------------------------------------------------!
 
     ! On the boundary perform the extrapolation
-    if(c2  < 0) then
+    if(c2 < 0) then
 
       ! Extrapolate velocities on the outflow boundary
       ! SYMMETRY is intentionally not treated here because I wanted to
@@ -189,12 +189,12 @@
           if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
             t % n(c2) = t % n(c1) + t % q(c2) * grid % wall_dist(c1)  &
                       / (turb % con_w(c1) + TINY)
-            heat_flux = heat_flux + t % q(c2) * grid % s(s)
+            heat = heat + t % q(c2) * grid % s(s)
             if(abs(t % q(c2)) > TINY) heated_area = heated_area + grid % s(s)
           else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) then
             t % q(c2) = ( t % n(c2) - t % n(c1) ) * turb % con_w(c1)  &
                       / grid % wall_dist(c1)
-            heat_flux = heat_flux + t % q(c2) * grid % s(s)
+            heat = heat + t % q(c2) * grid % s(s)
             if(abs(t % q(c2)) > TINY) heated_area = heated_area + grid % s(s)
           end if
 
@@ -203,12 +203,12 @@
           if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
             t % n(c2) = t % n(c1) + t % q(c2) * grid % wall_dist(c1)  &
                        /conductivity
-            heat_flux = heat_flux + t % q(c2) * grid % s(s)
+            heat = heat + t % q(c2) * grid % s(s)
             if(abs(t % q(c2)) > TINY) heated_area = heated_area + grid % s(s)
           else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) then
             t % q(c2) = ( t % n(c2) - t % n(c1) ) * conductivity  &
                       / grid % wall_dist(c1)
-            heat_flux = heat_flux + t % q(c2) * grid % s(s)
+            heat = heat + t % q(c2) * grid % s(s)
             if(abs(t % q(c2)) > TINY) heated_area = heated_area + grid % s(s)
           end if
         end if
@@ -262,7 +262,13 @@
             f22 % n(c2) = f22 % n(grid % bnd_cond % copy_c(c2))
         end if
       end if
-    end if
+    end if    ! c2 < 0
+
   end do
+
+  ! Integrate (summ) heated area, and heat up
+  call Comm_Mod_Global_Sum_Real(heat)
+  call Comm_Mod_Global_Sum_Real(heated_area)
+  heat_flux = heat / heated_area
 
   end subroutine
