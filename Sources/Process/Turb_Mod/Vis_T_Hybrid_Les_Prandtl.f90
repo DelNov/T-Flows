@@ -49,8 +49,8 @@
   ! Calculate model's eddy viscosity
   do c = 1, grid % n_cells
 
-    hmax = turb % h_w(c)
-    hwn  = turb % h_max(c)
+    hmax = turb % h_max(c)
+    hwn  = turb % h_w(c)
     dw   = grid % wall_dist(c)
 
     ! Wall-modeled LES length scale
