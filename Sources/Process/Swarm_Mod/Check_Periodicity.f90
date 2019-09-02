@@ -40,18 +40,28 @@
     end if
   end if
 
-  ! Y-direction
+  ! Y-direction  (customized for periodic channel)
   yn = grid % yn(part % node)
   yc = grid % yc(part % cell)
   ryn = part % y_n - yn
   ryc = yc - part % y_n
   if(ryc*ryn < 0.0) then
     if(flow % v % n(part % cell) > 0.0) then
-      part % y_n = part % y_n - grid % per_y
-      part % y_o = part % y_o - grid % per_y
+      if(part % y_n > grid % per_y) then
+        part % y_n = part % y_n - grid % per_y
+        part % y_o = part % y_o - grid % per_y
+      else
+        part % y_n = -1.0 * part % y_n + grid % per_y
+        part % y_o = -1.0 * part % y_o + grid % per_y
+      end if
     else
-      part % y_n = part % y_n + grid % per_y
-      part % y_o = part % y_o + grid % per_y
+      if(part % y_n < 0.0) then
+        part % y_n = part % y_n + grid % per_y
+        part % y_o = part % y_o + grid % per_y
+      else
+        part % y_n = -1.0 * part % y_n + grid % per_y
+        part % y_o = -1.0 * part % y_o + grid % per_y
+      end if
     end if
   end if
 
