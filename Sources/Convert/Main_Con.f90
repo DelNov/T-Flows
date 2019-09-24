@@ -15,7 +15,7 @@
   implicit none
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type)   :: grid     ! grid to be converted
-  integer           :: c, n, s, l, color
+  integer           :: c, n, s, l
   character(len=80) :: file_name, file_name_up, extension
 !==============================================================================!
 
