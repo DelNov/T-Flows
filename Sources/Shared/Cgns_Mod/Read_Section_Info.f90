@@ -10,8 +10,10 @@
   integer           :: base_id       ! base index number
   integer           :: block_id      ! block index number
   integer           :: sect_id       ! element section index
-  character(len=80) :: sect_name     ! name of the Elements_t node
+  character(len=80) :: sect_name     ! name of the elements_t node
   character(len=80) :: int_name      ! name of the interface
+  character(len=80) :: bnd_name      ! name of the boundary section
+  integer           :: min_name_l
   integer           :: int_type      ! type of interface.  1-quad, 2-tri, 3-mix
   integer           :: loc_type      ! type of interface.  1-quad, 2-tri, 3-mix
   integer           :: cell_type     ! types of elements in the section
@@ -60,9 +62,11 @@
   !   Consider only boundary conditions in this block   !
   !-----------------------------------------------------!
   do bc = 1, cgns_base(base) % block(block) % n_bnd_conds
-    if(index(trim(sect_name), &
-        trim(cgns_base(base) % block(block) % bnd_cond(bc) % name), &
-        back = .true.) .ne. 0) then
+
+    bnd_name    = trim(cgns_base(base) % block(block) % bnd_cond(bc) % name)
+    min_name_l  = min(len(trim(bnd_name)), len(trim(sect_name)))
+
+    if(bnd_name(1:min_name_l) .eq. sect_name(1:min_name_l)) then
 
       if(verbose) then
         print *, '#         ---------------------------------'
@@ -91,7 +95,7 @@
   !   Consider only interfaces in this block   !
   !--------------------------------------------!
   do int = 1, cgns_base(base) % block(block) % n_interfaces
- 
+
     int_name = trim(cgns_base(base) % block(block) % interface(int) % name)
     int_type = cgns_base(base) % block(block) % interface(int) % int_type
 
