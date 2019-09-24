@@ -9,6 +9,14 @@ $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
+#-- ./Find_Parents.f90
+$(DIR_OBJECT)/Find_Parents.o:\
+$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
+$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
+$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 
+
 #-- ./Load_Cgns_Void.f90
 $(DIR_OBJECT)/Load_Cgns_Void.o:\
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
@@ -122,6 +130,13 @@ $(DIR_SHARED)/Cgns_Mod_Seq.f90 \
 $(DIR_SHARED)/Cgns_Mod_Par.f90 \
 $(DIR_SHARED)/Cgns_Mod/*.f90 \
 $(DIR_SHARED)/Cgns_Mod/*/*.f90 
+
+#-- ./Cpu_Timer_Mod.f90
+$(DIR_OBJECT)/Cpu_Timer_Mod.o:\
+$(DIR_SHARED)/Cpu_Timer_Mod/*.f90 \
+$(DIR_SHARED)/Comm_Mod_Seq.f90 \
+$(DIR_SHARED)/Comm_Mod_Par.f90 \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 
 
 #-- ./Comm_Mod_Seq.f90
 $(DIR_OBJECT)/Comm_Mod_Seq.o:\
@@ -511,66 +526,15 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 
 #-- ./Grid_Level_Mod.f90
 #-- ./Swap_Short.f90
+#-- ./Cpu_Timer_Mod/Stop.f90
+#-- ./Cpu_Timer_Mod/Start.f90
+#-- ./Cpu_Timer_Mod/Statistics.f90
 #-- ./Save_Grid_Mod/Cgns/Save_Cgns_Cells.f90
-$(DIR_OBJECT)/Save_Cgns_Cells.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 \
-$(DIR_SHARED)/Cgns_Mod_Seq.f90 \
-$(DIR_SHARED)/Cgns_Mod_Par.f90 \
-$(DIR_SHARED)/Cgns_Mod/*.f90 \
-$(DIR_SHARED)/Cgns_Mod/*/*.f90 
-
 #-- ./Save_Grid_Mod/Vtu/Save_Vtu_Links.f90
-$(DIR_OBJECT)/Save_Vtu_Links.o:\
-$(DIR_OBJECT)/Name_Mod.o \
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Div_Mod.o 
-
 #-- ./Save_Grid_Mod/Vtu/Save_Vtu_Grid_Levels.f90
-$(DIR_OBJECT)/Save_Vtu_Grid_Levels.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
 #-- ./Save_Grid_Mod/Vtu/Save_Vtu_Faces.f90
-$(DIR_OBJECT)/Save_Vtu_Faces.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
 #-- ./Save_Grid_Mod/Vtu/Save_Cgns_Cells_Void.f90
-$(DIR_OBJECT)/Save_Cgns_Cells_Void.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
 #-- ./Save_Grid_Mod/Vtu/Save_Vtu_Cells.f90
-$(DIR_OBJECT)/Save_Vtu_Cells.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
 #-- ./Distance_Squared.f90
 #-- ./Swap_Int.f90
 #-- ./Save_Grid_Mod_Vtu.f90
