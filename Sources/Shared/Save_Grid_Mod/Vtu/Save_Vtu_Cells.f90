@@ -182,6 +182,16 @@
   end do
   write(9,'(a,a)') IN_4, '</DataArray>'
 
+  ! Cell volume
+  write(9,'(a,a)') IN_4, '<DataArray type="Float64" ' //  &
+                         'Name="CellVolume" format="ascii">'
+  do c = 1, grid % n_cells
+    if(grid % new_c(c) .ne. 0) then
+      write(9,'(a,1pe15.7)') IN_5, grid % vol(c)
+    end if
+  end do
+  write(9,'(a,a)') IN_4, '</DataArray>'
+
   !------------!
   !   Footer   !
   !------------!
@@ -221,6 +231,8 @@
     write(9,'(a,a)') IN_3, '<PDataArray type="Int64" Name="Processor"' // &
                            ' format="ascii"/>'
     write(9,'(a,a)') IN_3, '<PDataArray type="Float64" Name="WallDistance"' // &
+                           ' format="ascii"/>'
+    write(9,'(a,a)') IN_3, '<PDataArray type="Float64" Name="CellVolume"' // &
                            ' format="ascii"/>'
     write(9,'(a,a)') IN_3, '<PDataArray type="Float64" Name="CellDelta"' // &
                            ' format="ascii"/>'
