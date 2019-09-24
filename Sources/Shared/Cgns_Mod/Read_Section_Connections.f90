@@ -1,5 +1,6 @@
 !==============================================================================!
-  subroutine Cgns_Mod_Read_Section_Connections(base, block, sect, grid)
+  subroutine Cgns_Mod_Read_Section_Connections(base, block, sect, grid,  &
+                                               parent_flag)
 !------------------------------------------------------------------------------!
 !   Read elements connection info for current sect
 !------------------------------------------------------------------------------!
@@ -9,6 +10,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   integer         :: base, block, sect
+  integer         :: parent_flag
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: base_id       ! base index number
@@ -16,11 +18,12 @@
   integer              :: sect_id       ! element section index
   character(len=80)    :: sect_name     ! name of the Elements_t node
   character(len=80)    :: int_name      ! name of the interface
+  character(len=80)    :: bnd_name      ! name of the interface
+  integer              :: min_name_l
   integer              :: int_type      ! type of interface 1-quad, 2-tri, 3-mix
   integer              :: cell_type     ! types of elements in the section
   integer              :: first_cell    ! index of first element
   integer              :: last_cell     ! index of last element
-  integer              :: parent_flag
   integer              :: error
   integer              :: n_nodes, loc, c, n, cell, dir, cnt, bc, int, int_id
   integer, allocatable :: cell_n(:,:)
@@ -45,18 +48,18 @@
   ! Number of cells in this section
   cnt = last_cell - first_cell + 1 ! cells in this sections
 
-  if(parent_flag .eq. 1) then ! parent data was provided in Read_Section_Info
-    !"For faces on the boundary of the domain, the second parent is set to zero"
-    allocate(parent_data(2*cnt, 2))
-  end if
+  ! For faces on the boundary of the domain, the second parent is set to zero"
+  allocate(parent_data(2*cnt, 2))
 
   !--------------------------------------------------------!
   !   Consider boundary conditions defined in this block   !
   !--------------------------------------------------------!
   do bc = 1, cgns_base(base) % block(block) % n_bnd_conds
-    if(index(trim(sect_name), &
-      trim(cgns_base(base) % block(block) % bnd_cond(bc) % name), &
-      back = .true.) .ne. 0) then
+
+    bnd_name    = trim(cgns_base(base) % block(block) % bnd_cond(bc) % name)
+    min_name_l  = min(len(trim(bnd_name)), len(trim(sect_name)))
+
+    if(bnd_name(1:min_name_l) .eq. sect_name(1:min_name_l)) then
 
       if(verbose) then
         print *, '#         ---------------------------------'
@@ -70,11 +73,8 @@
       end if
 
       ! Count boundary cells
-    !if ( ElementTypeName(cell_type) .eq. 'QUAD_4') cnt_qua = cnt_qua + cnt!del
-    !if ( ElementTypeName(cell_type) .eq. 'TRI_3' ) cnt_tri = cnt_tri + cnt!del
-
-      ! Update number of boundary cells in the block
-      cnt_block_bnd_cells = cnt_block_bnd_cells + cnt
+      !if ( ElementTypeName(cell_type) .eq. 'QUAD_4') cnt_qua = cnt_qua + cnt
+      !if ( ElementTypeName(cell_type) .eq. 'TRI_3' ) cnt_tri = cnt_tri + cnt
 
       ! Allocate memory
       if ( ElementTypeName(cell_type) .eq. 'QUAD_4') n_nodes = 4
@@ -88,23 +88,46 @@
                               face_n(1,1),  & !(out)
                               parent_data,  & !(out)
                               error)          !(out)
-      ! Fetch the data
-      do loc = 1, cnt
-        cell = parent_data(loc, 1) + cnt_cells
-        dir  = parent_data(loc, 2)
-        grid % cells_bnd_color(dir,cell) =  &
-             cgns_base(base) % block(block) % bnd_cond(bc) % color
-      end do
+
+      ! Fetch the data if parent is provided
+      if(parent_flag .eq. 1) then
+        do loc = 1, cnt
+          cell = parent_data(loc, 1) + cnt_cells
+          dir  = parent_data(loc, 2)
+          grid % cells_bnd_color(dir,cell) =  &
+               cgns_base(base) % block(block) % bnd_cond(bc) % color
+        end do
+
+      ! Parent data not provided
+      else
+        do loc = 1, cnt
+          grid % cells_n_nodes(-cnt_bnd_cells-loc) = n_nodes
+
+          ! Copy individual nodes beloning to this cell
+          do n = 1, n_nodes
+            grid % cells_n(n, -cnt_bnd_cells-loc) =  &
+                    face_n(n, loc) + cnt_nodes
+          end do
+
+          grid % bnd_cond % color(-cnt_bnd_cells-loc) =  &
+                    cgns_base(base) % block(block) % bnd_cond(bc) % color
+        end do
+      end if
+
+      ! Update number of boundary cells in the block
+      cnt_bnd_cells = cnt_bnd_cells + cnt
 
       if(verbose) then
         print *, "#         Connection table (sample): "
         do loc = 1, min(6, cnt)
           print '(a8,4i7)', " ", (face_n(n,loc), n = 1, n_nodes)
         end do
-        print *, "#         Parent data (sample): "
-        do loc = 1, min(6, cnt)
-          print '(a10,2i7)', " ", parent_data(loc, 1), parent_data(loc, 2)
-        end do
+        if(parent_flag .eq. 1) then
+          print *, "#         Parent data (sample): "
+          do loc = 1, min(6, cnt)
+            print '(a10,2i7)', " ", parent_data(loc, 1), parent_data(loc, 2)
+          end do
+        end if
       end if
 
       deallocate(face_n)
