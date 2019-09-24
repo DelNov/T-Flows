@@ -28,7 +28,7 @@
   real                 :: x_c, y_c, z_c, det
   real                 :: ab_i, ab_j, ab_k, ac_i, ac_j, ac_k, p_i, p_j, p_k
   real                 :: dsc1, dsc2, per_min, per_max
-  real                 :: t, sur_tot, angle, d
+  real                 :: t, sur_tot, angle
   real                 :: xc1, yc1, zc1, xc2, yc2, zc2
   real                 :: max_dis, tot_vol, min_vol, max_vol
   real, allocatable    :: xspr(:), yspr(:), zspr(:)
