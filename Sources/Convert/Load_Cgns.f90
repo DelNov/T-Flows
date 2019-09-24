@@ -17,6 +17,7 @@
   character(len=80) :: name_in
   integer           :: c, i, j, bc, base, block, sect, int, coord, mode
   integer           :: cgns_1, cgns_2, cgns_3, cgns_4, cgns_5, cell_type
+  integer           :: parent_flag
 !==============================================================================!
 
   name_in = problem_name
@@ -200,22 +201,28 @@
       !----------------------!
       !   Read cells block   !
       !----------------------!
-      cnt_block_bnd_cells = 0
 
       ! Browse through all sections to read elements
       do sect = 1, cgns_base(base) % block(block) % n_sects
 
         ! Read element data (count HEXA_8/PYRA_5/PENTA_6/TETRA_4/QUAD_4/TRI_3)
-        call Cgns_Mod_Read_Section_Connections(base, block, sect, grid)
+        call Cgns_Mod_Read_Section_Connections(base, block, sect, grid,  &
+                                               parent_flag)
 
       end do ! elements sections
 
       cnt_nodes = cnt_nodes + cgns_base(base) % block(block) % mesh_info(1)
       cnt_cells = cnt_cells + cgns_base(base) % block(block) % mesh_info(2)
-      cnt_bnd_cells = cnt_bnd_cells + cnt_block_bnd_cells
 
     end do ! blocks
   end do ! bases
+
+  !------------------!
+  !   Find parents   !
+  !------------------!
+  if(parent_flag .eq. 0) then
+    call Find_Parents(grid)
+  end if
 
   print '(a38,i9)', ' # Total number of nodes:             ', cnt_nodes
   print '(a38,i9)', ' # Total number of cells:             ', cnt_cells
@@ -239,40 +246,42 @@
   !   Correct boundary conditions directions for hexahedral cells   !
   !   (They are not the same in CGNS and Gambit's neutral format.)  !
   !-----------------------------------------------------------------!
-  cnt_bnd_cells = 0
-  do base = 1, n_bases
-    do block = 1, cgns_base(base) % n_blocks
-      do sect = 1, cgns_base(base) % block(block) % n_sects
-        cell_type   = cgns_base(base) % block(block) % section(sect) % cell_type
+  if(parent_flag .ne. 0) then
+    cnt_bnd_cells = 0
+    do base = 1, n_bases
+      do block = 1, cgns_base(base) % n_blocks
+        do sect = 1, cgns_base(base) % block(block) % n_sects
+          cell_type = cgns_base(base) % block(block) % section(sect) % cell_type
 
-        if ( ElementTypeName(cell_type) .eq. 'HEXA_8' ) then
+          if ( ElementTypeName(cell_type) .eq. 'HEXA_8' ) then
 
-          do c = cgns_base(base) % block(block) % section(sect) % first_cell,  &
-                 cgns_base(base) % block(block) % section(sect) % last_cell
-            cgns_1 = grid % cells_bnd_color(1,c)
-            cgns_2 = grid % cells_bnd_color(2,c)
-            cgns_3 = grid % cells_bnd_color(3,c)
-            cgns_4 = grid % cells_bnd_color(4,c)
-            cgns_5 = grid % cells_bnd_color(5,c)
-            grid % cells_bnd_color(4,c) = cgns_5
-            grid % cells_bnd_color(3,c) = cgns_4
-            grid % cells_bnd_color(2,c) = cgns_3
-            grid % cells_bnd_color(1,c) = cgns_2
-            grid % cells_bnd_color(5,c) = cgns_1
+            do c = cgns_base(base) % block(block) % section(sect) % first_cell,&
+                   cgns_base(base) % block(block) % section(sect) % last_cell
+              cgns_1 = grid % cells_bnd_color(1,c)
+              cgns_2 = grid % cells_bnd_color(2,c)
+              cgns_3 = grid % cells_bnd_color(3,c)
+              cgns_4 = grid % cells_bnd_color(4,c)
+              cgns_5 = grid % cells_bnd_color(5,c)
+              grid % cells_bnd_color(4,c) = cgns_5
+              grid % cells_bnd_color(3,c) = cgns_4
+              grid % cells_bnd_color(2,c) = cgns_3
+              grid % cells_bnd_color(1,c) = cgns_2
+              grid % cells_bnd_color(5,c) = cgns_1
 
-            do j = 1, 6
-              if( grid % cells_bnd_color(j,c) .ne. 0 ) then 
-                cnt_bnd_cells = cnt_bnd_cells + 1
-              end if
-            end do
+              do j = 1, 6
+                if( grid % cells_bnd_color(j,c) .ne. 0 ) then
+                  cnt_bnd_cells = cnt_bnd_cells + 1
+                end if
+              end do
 
-          end do ! ElementTypeName(cell_type) .eq. 'HEXA_8'
-        end if
+            end do ! ElementTypeName(cell_type) .eq. 'HEXA_8'
+          end if
 
-      end do ! elements sections
-    end do ! blocks
-  end do ! bases
-  print '(a38,i9)', ' # Corrected hex boundary cells:      ', cnt_bnd_cells
+        end do ! elements sections
+      end do ! blocks
+    end do ! bases
+    print '(a38,i9)', ' # Corrected hex boundary cells:      ', cnt_bnd_cells
+  end if
 
   call Grid_Mod_Print_Bnd_Cond_List(grid)
 
