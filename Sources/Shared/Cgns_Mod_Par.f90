@@ -134,7 +134,6 @@
   integer              :: cnt_int_cells
 
   ! Block-wise counter of boundary cells
-  integer           :: cnt_block_bnd_cells  ! probably not needed
   integer           :: cnt_bnd_conds
   character(len=80) :: bnd_cond_names(1024)
 

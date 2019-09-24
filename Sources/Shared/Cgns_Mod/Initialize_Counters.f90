@@ -8,6 +8,7 @@
 
   cnt_nodes     = 0 ! number of nodes
   cnt_cells     = 0 ! number of cells (except boundary and interface)
+  cnt_bnd_cells = 0 ! number of boundary cells
   cnt_blocks    = 0 ! number of block
   cnt_bnd_conds = 0 ! number of boundary
 
