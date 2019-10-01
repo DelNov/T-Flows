@@ -25,8 +25,9 @@
   integer              :: first_cell    ! index of first element
   integer              :: last_cell     ! index of last element
   integer              :: error
-  integer              :: n_nodes, loc, c, n, cell, dir, cnt, bc, int, int_id
-  integer, allocatable :: cell_n(:,:)
+  integer              :: n_nodes, loc, c, n, cell, dir, cnt, bc, int,  &
+                          int_id, pos
+  integer, allocatable :: cell_n(:,:), mixed_cell_n(:)
   integer, allocatable :: face_n(:,:)
   integer, allocatable :: interface_n(:,:)
   integer, allocatable :: parent_data(:,:)
@@ -216,6 +217,7 @@
 
   !-------------------------------------------------!
   !   Consider three-dimensional cells / sections   !
+  !    defined in blocks with unified cell types    !
   !-------------------------------------------------!
   if ( ( ElementTypeName(cell_type) .eq. 'HEXA_8' ) .or.  &
        ( ElementTypeName(cell_type) .eq. 'PYRA_5' ) .or.  &
@@ -295,6 +297,93 @@
     end if
 
     deallocate(cell_n)
+  end if
+
+  !-------------------------------------------------!
+  !   Consider three-dimensional cells / sections   !
+  !     defined in blocks with mixed cell types     !
+  !-------------------------------------------------!
+  if(ElementTypeName(cell_type) .eq. 'MIXED') then
+
+    if(verbose) then
+      print *, '#         ---------------------------------'
+      print *, '#         Cell section name: ', sect_name
+      print *, '#         ---------------------------------'
+      print *, '#         Cell section idx:    ', sect
+      print *, '#         Cell section type:   ', ElementTypeName(cell_type)
+      print *, '#         Number of cells:     ', cnt
+      print *, '#         Corrected first cell:', first_cell + cnt_cells
+      print *, '#         Corrected last cell: ', last_cell  + cnt_cells
+    end if
+
+    ! Globalized first and last cell of the section
+    cgns_base(base) % block(block) % section(sect) % first_cell =  &
+    cgns_base(base) % block(block) % section(sect) % first_cell + cnt_cells
+    cgns_base(base) % block(block) % section(sect) % last_cell  =  &
+    cgns_base(base) % block(block) % section(sect) % last_cell  + cnt_cells
+
+    ! Allocate memory
+    allocate(mixed_cell_n(cnt*9))  ! if all are hexa
+
+    call Cg_Elements_Read_F(file_id,           & !(in )
+                            base_id,           & !(in )
+                            block_id,          & !(in )
+                            sect_id,           & !(in )
+                            mixed_cell_n(1),   & !(out)
+                            parent_datum,      & !(out)
+                            error)               !(out)
+
+    loc = 0
+    pos = 0
+    do
+
+      ! Increase cell and position counters
+      loc = loc + 1
+      pos = pos + 1
+
+      ! Exit if end of array has been reached
+      if(loc > cnt) exit
+
+      ! Calculate absolute cell number
+      c = first_cell + loc + cnt_cells - 1
+
+      ! Increase counters for different types of elements
+      if ( ElementTypeName(cell_type) .eq. 'HEXA_8' ) cnt_hex = cnt_hex + cnt
+      if ( ElementTypeName(cell_type) .eq. 'PYRA_5' ) cnt_pyr = cnt_pyr + cnt
+      if ( ElementTypeName(cell_type) .eq. 'PENTA_6') cnt_wed = cnt_wed + cnt
+      if ( ElementTypeName(cell_type) .eq. 'TETRA_4') cnt_tet = cnt_tet + cnt
+
+      ! Estimate number of nodes for this cell type
+      cell_type = mixed_cell_n(pos)
+      if ( ElementTypeName(cell_type) .eq. 'HEXA_8' ) n_nodes = 8
+      if ( ElementTypeName(cell_type) .eq. 'PYRA_5' ) n_nodes = 5
+      if ( ElementTypeName(cell_type) .eq. 'PENTA_6') n_nodes = 6
+      if ( ElementTypeName(cell_type) .eq. 'TETRA_4') n_nodes = 4
+
+      ! Store the number of nodes for this cell
+      grid % cells_n_nodes(c) = n_nodes
+
+      ! Copy individual nodes beloning to this cell
+      do n = 1, n_nodes
+        pos = pos + 1
+        grid % cells_n(n, c) = mixed_cell_n(pos) + cnt_nodes
+      end do
+
+      ! Convert from CGNS to Gambit's Neutral file format
+      if ( ElementTypeName(cell_type) .eq. 'HEXA_8' ) then
+        call Swap_Int(grid % cells_n(3, c),  &
+                      grid % cells_n(4, c))
+        call Swap_Int(grid % cells_n(7, c),  &
+                      grid % cells_n(8, c))
+      end if
+      if ( ElementTypeName(cell_type) .eq. 'PYRA_5' ) then
+        call Swap_Int(grid % cells_n(3, c),  &
+                      grid % cells_n(4, c))
+      end if
+
+    end do
+
+    deallocate(mixed_cell_n)
   end if
 
   end subroutine
