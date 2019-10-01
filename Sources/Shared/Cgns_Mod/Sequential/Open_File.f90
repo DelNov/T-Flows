@@ -13,7 +13,7 @@
 
   file_name = file
 
-  print *, "# Opening file:", trim(file_name)
+  print *, "# Opening file: ", trim(file_name)
 
   ! Open a CGNS file
   call Cg_Open_F(file_name,  & !(in )
