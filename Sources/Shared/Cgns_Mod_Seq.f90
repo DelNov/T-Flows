@@ -43,7 +43,9 @@
           !   Field section  !
           !------------------!
 
-  ! TO DO : Pack monitoring points in ConvergenceHistory_t
+  ! TO DO:
+  ! 1) Pack monitoring points in ConvergenceHistory_t
+  ! 2) Deal with Salome test_cases
 
   ! File
   integer           :: file_id
@@ -59,19 +61,22 @@
 
   ! Interface section
   type Cgns_Interface_Type
-    character(len=80) :: name
-    logical           :: marked_for_deletion
-    integer           :: id
-    integer           :: int_type ! 0 - uninit, 1 -quad, 2 -tri, 3 - mix
+    character(len=80)    :: name
+    logical              :: marked_for_deletion
+    integer              :: id ! like "color" for b.c.
+    integer              :: int_type ! 0 - uninit, 1 -quad, 2 -tri, 3 - mix
+    integer              :: n_nodes
+    integer, allocatable :: point_list(:)
+    integer, allocatable :: belongs_to_sect(:)
   end type
 
   ! Element section
   type Cgns_Section_Type
-    character(len=80)    :: name
-    integer              :: cell_type
-    integer              :: first_cell
-    integer              :: last_cell
-    integer              :: parent_flag
+    character(len=80) :: name
+    integer           :: cell_type
+    integer           :: first_cell
+    integer           :: last_cell
+    integer           :: parent_flag
   end type
 
   ! Boundary conditions   ! -> it is similar to Bnd_Cond in ../Share :-(
@@ -79,6 +84,8 @@
     character(len=80)    :: name
     integer              :: color
     integer              :: n_nodes
+    integer, allocatable :: point_list(:)
+    integer, allocatable :: belongs_to_sect(:)
   end type
 
   ! Blocks
@@ -87,6 +94,8 @@
     integer                                 :: type
     integer                                 :: mesh_info(3)
     integer                                 :: n_sects
+    integer                                 :: n_3d_sects
+    integer                                 :: n_2d_sects
     type(Cgns_Section_Type), allocatable    :: section(:)
     integer                                 :: n_bnd_conds
     type(Cgns_Bnd_Cond_Type), allocatable   :: bnd_cond(:)
@@ -114,6 +123,7 @@
   integer :: cnt_cells
   integer :: cnt_blocks     ! probably not needed
   integer :: cnt_bnd_cells
+  integer :: pos_of_last_3d_cell
 
   ! Cells (3d)
   integer :: cnt_hex
@@ -131,9 +141,10 @@
   integer              :: cnt_int
   character(len=80)    :: interface_names(1024)
   integer, allocatable :: interface_cells(:,:,:,:)
-  integer              :: cnt_int_cells
+  integer              :: cnt_int_cells            ! 2d cells of interfaces
 
   ! Block-wise counter of boundary cells
+  integer           :: cnt_block_bnd_cells  ! probably not needed
   integer           :: cnt_bnd_conds
   character(len=80) :: bnd_cond_names(1024)
 
@@ -166,8 +177,12 @@
   include 'Cgns_Mod/Read_Coordinate_Info.f90'
   include 'Cgns_Mod/Read_Coordinate_Array.f90'
   include 'Cgns_Mod/Read_Section_Connections.f90'
+  include 'Cgns_Mod/Read_2d_Bnd_Section_Connections_With_Parent_Data.f90'
+  include 'Cgns_Mod/Read_2d_Bnd_Section_Connections_With_No_Parent_Data.f90'
+  include 'Cgns_Mod/Read_2d_Interface_Section_Connections.f90'
   include 'Cgns_Mod/Merge_Nodes.f90'
 
+  ! Seq and Par
   include 'Cgns_Mod/Sequential/Open_File.f90'
   include 'Cgns_Mod/Sequential/Close_File.f90'
   include 'Cgns_Mod/Sequential/Write_Base_Info.f90'

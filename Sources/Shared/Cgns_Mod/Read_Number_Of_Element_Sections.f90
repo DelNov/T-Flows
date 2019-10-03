@@ -25,7 +25,7 @@
                       error)       !(out)
 
   if (error.ne.0) then
-    print *, "# Failed to read number of elements"
+    print *, " #     Failed to read number of elements"
     call Cg_Error_Exit_F()
   endif
 
@@ -33,7 +33,8 @@
   cgns_base(base) % block(block) % n_sects = n_sects
 
   if(verbose) then
-    print *, "#       Number of sections: ",  &
+    print "(a)", " #======================================================="
+    print "(a,i14)", " #     Number of sections in this block: ",  &
              cgns_base(base) % block(block) % n_sects
   end if
 
