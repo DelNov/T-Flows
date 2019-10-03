@@ -51,7 +51,7 @@
   integer           :: file_id
   character(len=80) :: file_name
   integer           :: file_mode
-  logical           :: verbose = .false.
+  logical           :: verbose = .true.
 
   ! Solution section
   type Cgns_Solution_Type
@@ -145,7 +145,7 @@
 
   ! Block-wise counter of boundary cells
   integer           :: cnt_block_bnd_cells  ! probably not needed
-  integer           :: cnt_bnd_conds
+  integer           :: cnt_bnd_cond
   character(len=80) :: bnd_cond_names(1024)
 
   ! If an actual grid was written, further saves have just a link to that grid

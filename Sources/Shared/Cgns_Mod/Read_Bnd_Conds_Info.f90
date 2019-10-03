@@ -71,15 +71,15 @@
 
   ! Fill up the boundary condition names
   color = 0
-  do i = 1, cnt_bnd_conds
+  do i = 1, cnt_bnd_cond
     if(bnd_cond_names(i) .eq. trim(bc_name)) then
       color = i
       goto 1
     end if
   end do
-  cnt_bnd_conds = cnt_bnd_conds + 1
-  bnd_cond_names(cnt_bnd_conds) = trim(bc_name)
-  color = cnt_bnd_conds
+  cnt_bnd_cond = cnt_bnd_cond + 1
+  bnd_cond_names(cnt_bnd_cond) = trim(bc_name)
+  color = cnt_bnd_cond
 1 continue
   cgns_base(base) % block(block) % bnd_cond(bc) % color = color
 
@@ -104,7 +104,8 @@
   !-------------------------------------------------------!
   !   Copy b.c. point_list to Cgns_Block_Type structure   !
   !-------------------------------------------------------!
-  if (trim(PointSetTypeName(bc_ptset_type)) .eq. 'PointList') then
+  if (trim(PointSetTypeName(bc_ptset_type)) .eq. 'PointList' .or. &
+      trim(PointSetTypeName(bc_ptset_type)) .eq. 'ElementList') then
 
     cgns_base(base) % block(block) % bnd_cond(bc) % n_nodes = bc_n_nodes
 
@@ -119,9 +120,6 @@
       belongs_to_sect( bc_n_nodes ) )
     cgns_base(base) % block(block) % bnd_cond(bc) % belongs_to_sect(:) = 0
 
-    !allocate( cgns_base(base) % block(block) % bnd_cond(bc) % &
-    !  assigned( bc_n_nodes ) )
-    !cgns_base(base) % block(block) % bnd_cond(bc) % assigned(:) = .false.
   elseif (trim(PointSetTypeName(bc_ptset_type)) .eq. 'PointRange' .or. &
           trim(PointSetTypeName(bc_ptset_type)) .eq. 'ElementRange' ) then
 
@@ -144,10 +142,6 @@
     allocate( cgns_base(base) % block(block) % bnd_cond(bc) % &
       belongs_to_sect( last_point - first_point + 1 ) )
     cgns_base(base) % block(block) % bnd_cond(bc) % belongs_to_sect(:) = 0
-
-    !allocate( cgns_base(base) % block(block) % bnd_cond(bc) % assigned( &
-    !    last_point - first_point + 1 ) )
-    !cgns_base(base) % block(block) % bnd_cond(bc) % assigned(:) = .false.
 
   end if
 
