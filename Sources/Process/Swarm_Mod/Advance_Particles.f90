@@ -15,6 +15,7 @@
   logical,             pointer :: escaped
   logical,             pointer :: deposited
   integer                      :: ss         ! sub-step counter
+  integer                      :: part_node  ! storage for particle node
 !==============================================================================!
 
   ! Take aliases for the swarm
@@ -53,13 +54,6 @@
           ! ... nearest node for each particle and stores it
           call Swarm_Mod_Find_Nearest_Node(swarm, k)
 
-          ! Make sure particle didn't run out of periodicity
-          call Swarm_Mod_Check_Periodicity(swarm, k)
-          if(part % node .eq. 0) then
-            call Swarm_Mod_Find_Nearest_Cell(swarm, k)
-            call Swarm_Mod_Find_Nearest_Node(swarm, k)
-          end if
-
           ! Compute velocity at the particle, and move it
           ! (also calls Bounce_Particle)
           call Swarm_Mod_Move_Particle(swarm, turb, k)
@@ -68,7 +62,20 @@
           ! ... compute the forces on each particle and store it
           call Swarm_Mod_Particle_Forces(swarm, k)
 
+          ! Make sure particle didn't run out of periodicity
+          ! (If it did, its node will be set to zero)
+! BUG =-> call Swarm_Mod_Check_Periodicity(swarm, k)
+
         end if  ! in this processor
+
+        ! If escaped through periodicity, locate it again
+        part_node = part % node
+        call Comm_Mod_Global_Min_Int(part_node)
+        if(part_node .eq. 0) then
+          call Swarm_Mod_Find_Nearest_Cell(swarm, k)
+          call Swarm_Mod_Find_Nearest_Node(swarm, k)
+        end if
+
       end if    ! not deposited or escaped
     end do      ! through particles
   end do        ! through sub-steps

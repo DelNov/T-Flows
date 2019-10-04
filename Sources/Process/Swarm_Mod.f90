@@ -6,6 +6,7 @@
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
   use Comm_Mod,  only: this_proc, n_proc,                  &
+                       Comm_Mod_Global_Min_Int,            &
                        Comm_Mod_Global_Min_Real,           &
                        Comm_Mod_Global_Sum_Int_Array,      &
                        Comm_Mod_Global_Sum_Real_Array
