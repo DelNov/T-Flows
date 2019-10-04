@@ -53,10 +53,6 @@
   !   Correct velocities and fluxes with    !
   !    periodic part of the pressure to     !
   !    obtain divergence free velocity      !
-  !- - - - - - - - - - - - - - - - - - - -  !
-  !   For SOLIDs, px, py and pz are zero    !
-  !   so this loop will not correct SOLID   !
-  !   velocities.                           !
   !-----------------------------------------!
   do c = 1, grid % n_cells
     u % n(c) = u % n(c) - pp % x(c) * grid % vol(c) / a % sav(c)
