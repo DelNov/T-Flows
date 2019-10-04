@@ -401,6 +401,24 @@
              * flow % beta * grid % vol(c)
       end do
     end if
+
+  !-------------------!
+  !   Gravity force   !
+  !-------------------!
+  else
+    if(ui % name .eq. 'U') then
+      do c = 1, grid % n_cells
+        b(c) = b(c) - density * grav_x * grid % vol(c)
+      end do
+    else if(ui % name .eq. 'V') then
+      do c = 1, grid % n_cells
+        b(c) = b(c) - density * grav_y * grid % vol(c)
+      end do
+    else if(ui % name .eq. 'W') then
+      do c = 1, grid % n_cells
+        b(c) = b(c) - density * grav_z * grid % vol(c)
+      end do
+    end if
   end if
 
   !----------------------------------------!
