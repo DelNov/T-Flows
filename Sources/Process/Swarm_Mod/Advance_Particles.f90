@@ -21,11 +21,6 @@
   grid => swarm % pnt_grid
   flow => swarm % pnt_flow
 
-  ! Take aliases for the particle
-  part      => swarm % particle(k)
-  escaped   => part  % escaped
-  deposited => part  % deposited
-
   ! Particle time step (division of the global time step)
   swarm % dt = flow % dt / swarm % n_sub_steps
 
@@ -36,6 +31,11 @@
   !----------------------------------!
   do ss = 1, swarm % n_sub_steps
     do k = 1, swarm % n_particles
+
+      ! Take aliases for the particle
+      part      => swarm % particle(k)
+      escaped   => part  % escaped
+      deposited => part  % deposited
 
       !-------------------------------------------------!
       !   If particle is neither deposited nor escped   !
@@ -85,6 +85,9 @@
   !-----------------------------------!
   if(this_proc < 2) then
     do k = 1, swarm % n_particles
+
+      ! Refresh the alias
+      part => swarm % particle(k)
 
       ! Printing particle position
       write(*,'(a,i3,a,i7,a,i2,a,3es15.6,a,es12.4)')                 &
