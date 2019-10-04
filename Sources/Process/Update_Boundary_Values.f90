@@ -267,8 +267,10 @@
   end do
 
   ! Integrate (summ) heated area, and heat up
-  call Comm_Mod_Global_Sum_Real(heat)
-  call Comm_Mod_Global_Sum_Real(heated_area)
-  heat_flux = heat / heated_area
+  if(heat_transfer) then
+    call Comm_Mod_Global_Sum_Real(heat)
+    call Comm_Mod_Global_Sum_Real(heated_area)
+    heat_flux = heat / heated_area
+  end if
 
   end subroutine
