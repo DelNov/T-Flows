@@ -15,6 +15,7 @@
   cnt_pyr = 0  ! number of pyramid     cells
   cnt_wed = 0  ! number of wedge/prism cells
   cnt_tet = 0  ! number of tetrahedral cells
+  cnt_mix = 0  ! number of mixed       cells
 
   cnt_bnd_tri = 0  ! number of triangles defining boundary conditions
   cnt_bnd_qua = 0  ! number of quads     defining boundary conditions

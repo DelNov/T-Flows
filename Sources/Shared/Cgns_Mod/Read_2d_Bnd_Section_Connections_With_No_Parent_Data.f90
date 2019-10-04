@@ -33,7 +33,6 @@
 
   integer              :: cell_face(6,4)
 
-  !integer, allocatable :: cell_face(:)
   ! cgns HEXA_8 cell faces nodal connections
   integer, parameter, dimension(6, 4) :: face_hexa_8 =            &
                                transpose(reshape( (/ 1, 4, 3, 2,  &
@@ -129,9 +128,9 @@
     cnt = last_cell - first_cell + 1 ! cells in this sections
 
     ! Only 2d sections with no ParentData
-    if ( (parent_flag .eq. 0) .and. &
-       ( ElementTypeName(cell_type) .eq. 'QUAD_4' .or. &
-         ElementTypeName(cell_type) .eq. 'TRI_3'     ) )then
+    if ( ( ElementTypeName(cell_type) .eq. 'QUAD_4' .or.  &
+           ElementTypeName(cell_type) .eq. 'TRI_3') .and. &
+         (parent_flag .eq. 0)                          ) then
 
       ! Allocate memory
       if ( ElementTypeName(cell_type) .eq. 'QUAD_4') then
@@ -154,7 +153,7 @@
                               block,        & !(in )
                               sect,         & !(in )
                               face_n(:,:),  & !(out)
-                              NULL,         & ! parent data
+                              NULL,         & !(out) no parent data
                               error)          !(out)
 
       if (error.ne.0) then
@@ -166,8 +165,6 @@
 
         bc_found = 0
         do j = 1, cgns_base(base) % block(block) % bnd_cond(bc) % n_nodes
-          !equal = &
-          !  cgns_base(base) % block(block) % bnd_cond(bc) % assigned(j).eqv..false.
           if (cgns_base(base) % block(block) % bnd_cond(bc) % &
             belongs_to_sect(j) .eq. sect_id) then
             bc_found = bc_found + 1
@@ -187,7 +184,7 @@
             print "(a,a25)", " #   They belong to b.c.: ", &
               trim(cgns_base(base) % block(block) % bnd_cond(bc) % name)
             print "(a)", " #-------------------------------------------------"
-            print "(a)", " #     Connections table (sample): "
+            print "(a)",     " #     Connections table (sample): "
             do loc = 1, min(6, cnt)
               print "(a,a16,4i8)", " # "," ", (face_n(n,loc), n = 1, n_nodes)
             end do
@@ -198,9 +195,6 @@
           ! This loop should restore ParentData for current b.c. and sect_3d
           f_found = 0
           do j = 1, cgns_base(base) % block(block) % bnd_cond(bc) % n_nodes
-            !equal = &
-            !  cgns_base(base)% block(block) % bnd_cond(bc) % assigned(i).eqv..false.
-            !if (equal) then
 
             ! If point from b.c. list belongs to sect_3d
             equal = cgns_base(base) % block(block) % bnd_cond(bc) % &
@@ -233,8 +227,6 @@
 
                   if (equal) then
                     f_found = f_found + 1
-                    ! cgns_base(base)% block(block) % bnd_cond(bc) % &
-                    ! assigned(j) = .true.
                     ! use Parent Data
                     ! like in Read_2d_Bnd_Section_Connections_With_Parent_Data
                     cell = cnt_cells + i
@@ -253,13 +245,12 @@
             end do ! i
           end do ! j
 
-      !end if ! b.c. point is not assigned
         if(verbose .and. f_found .ne. 0) then
-          print "(a)",    " #-------------------------------------------------"
+          print "(a)",     " #-------------------------------------------------"
           print "(a,a22)", " #   Searching bnd faces in: ", &
             trim(cgns_base(base) % block(block) % section(sect_3d_id) % name)
           print "(a,i17)", " #   Found bnd faces in 3d block: ", f_found
-          print "(a)",    " #-------------------------------------------------"
+          print "(a)",     " #-------------------------------------------------"
         end if ! verbose
 
       end if ! bc_f_found .ne. 0

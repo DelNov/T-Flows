@@ -74,8 +74,6 @@
 
     bc_found = 0
     do j = 1, cgns_base(base) % block(block) % bnd_cond(bc) % n_nodes
-      !equal = &
-      !  cgns_base(base) % block(block) % bnd_cond(bc) % assigned(j).eqv..false.
       if (cgns_base(base) % block(block) % bnd_cond(bc) % &
         belongs_to_sect(j) .eq. sect_id) then
         bc_found = bc_found + 1
@@ -114,7 +112,6 @@
         grid % cells_bnd_color(dir, cell) = &
           cgns_base(base) % block(block) % bnd_cond(bc) % color
 
-        !cgns_base(base) % block(block) % bnd_cond(bc) % assigned(j) = .true.
         if(loc < 7 .and. verbose) then
           print "(a,a24,3i8)", " # ", " ", cell, dir, &
             grid % cells_bnd_color(dir, cell)

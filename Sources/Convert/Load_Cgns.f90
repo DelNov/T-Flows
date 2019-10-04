@@ -20,7 +20,7 @@
   character(len=80) :: name_in
   integer           :: c, i, j, bc, base, block, sect, int, coord, mode
   integer           :: cgns_1, cgns_2, cgns_3, cgns_4, cgns_5, cell_type
-  integer           :: parent_flag
+  integer           :: parent_flag =1
 !==============================================================================!
 
   name_in = problem_name
@@ -116,6 +116,7 @@
     print "(a,i26)", " # - number of pyramids cells: ",             cnt_pyr
     print "(a,i29)", " # - number of prism cells: ",                cnt_wed
     print "(a,i29)", " # - number of tetra cells: ",                cnt_tet
+    print "(a,i29)", " # - number of mixed cells: ",                cnt_mix
     print "(a,i13)", " # - number of triangles faces on boundary: ",cnt_bnd_tri
     print "(a,i17)", " # - number of quads faces on boundary: ",    cnt_bnd_qua
     print "(a,i15)", " # - number of boundary conditions faces: ",  cnt_bnd_tri&
@@ -210,20 +211,17 @@
       !----------------------!
       !   Read cells block   !
       !----------------------!
-      cnt_block_bnd_cells = 0
 
       ! Browse through all sections to read elements
       do sect = 1, cgns_base(base) % block(block) % n_sects
 
-        ! Read element data (count HEXA_8/PYRA_5/PENTA_6/TETRA_4/QUAD_4/TRI_3)
-        call Cgns_Mod_Read_Section_Connections(base, block, sect, grid,  &
-                                               parent_flag)
+        ! Read element data (HEXA_8/PYRA_5/PENTA_6/TETRA_4/QUAD_4/TRI_3/MIXED)
+        call Cgns_Mod_Read_Section_Connections(base, block, sect, grid)
 
       end do ! elements sections
 
       cnt_nodes = cnt_nodes + cgns_base(base) % block(block) % mesh_info(1)
       cnt_cells = cnt_cells + cgns_base(base) % block(block) % mesh_info(2)
-      cnt_bnd_cells = cnt_bnd_cells + cnt_block_bnd_cells
 
     end do ! blocks
   end do ! bases
@@ -231,17 +229,17 @@
   !------------------!
   !   Find parents   !
   !------------------!
-  if(parent_flag .eq. 0) then
-    call Find_Parents(grid)
-  end if
+  !if(parent_flag .eq. 0) then
+  !  call Find_Parents(grid)
+  !end if
 
-  print "(a)", " #-------------------------------------------------"
+  print "(a)",     " #-------------------------------------------------"
   print "(a,i13)", " # Total number of nodes:             ", cnt_nodes
   print "(a,i13)", " # Total number of cells:             ", cnt_cells
   print "(a,i13)", " # Total number of blocks:            ", cnt_blocks
   print "(a,i13)", " # Total number of boundary sections: ", grid % n_bnd_cond
   print "(a,i13)", " # Total number of boundary cells:    ", grid % n_bnd_cells
-  print "(a)", " #-------------------------------------------------"
+  print "(a)",     " #-------------------------------------------------"
 
   !---------------------!
   !   Merge the nodes   !
@@ -266,7 +264,7 @@
     i = 0
   end if
 
-  if(parent_flag .ne. 0) then
+  !if(parent_flag .ne. 0) then
     cnt_bnd_cells = 0
     do base = 1, n_bases
       do block = 1, cgns_base(base) % n_blocks
@@ -307,7 +305,7 @@
     end do ! bases
     print "(a)", " #--------------------------------------------------"
     print "(a,i19)", " # Corrected hex boundary cells: ", cnt_bnd_cells
-  end if
+  !end if
 
   call Grid_Mod_Print_Bnd_Cond_List(grid)
 

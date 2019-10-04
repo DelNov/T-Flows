@@ -12,8 +12,6 @@
   integer           :: sect_id       ! element section index
   character(len=80) :: sect_name     ! name of the elements_t node
   character(len=80) :: int_name      ! name of the interface
-  character(len=80) :: bnd_name      ! name of the boundary section
-  integer           :: min_name_l
   integer           :: int_type      ! type of interface.  1-quad, 2-tri, 3-mix
   integer           :: loc_type      ! type of interface.  1-quad, 2-tri, 3-mix
   integer           :: cell_type     ! types of elements in the section
@@ -232,7 +230,8 @@
   if ( ( ElementTypeName(cell_type) .eq. 'HEXA_8' ) .or.  &
        ( ElementTypeName(cell_type) .eq. 'PYRA_5' ) .or.  &
        ( ElementTypeName(cell_type) .eq. 'PENTA_6') .or.  &
-       ( ElementTypeName(cell_type) .eq. 'TETRA_4') ) then
+       ( ElementTypeName(cell_type) .eq. 'TETRA_4') .or.  &
+         ElementTypeName(cell_type) .eq. 'MIXED'  ) then
 
     if(verbose) then
       print "(a)",     " #-----------------------------------------------------"
@@ -272,7 +271,8 @@
     if ( ElementTypeName(cell_type) .eq. 'PYRA_5' ) cnt_pyr = cnt_pyr + cnt
     if ( ElementTypeName(cell_type) .eq. 'PENTA_6') cnt_wed = cnt_wed + cnt
     if ( ElementTypeName(cell_type) .eq. 'TETRA_4') cnt_tet = cnt_tet + cnt
+    if ( ElementTypeName(cell_type) .eq. 'MIXED'  ) cnt_mix = cnt_mix + cnt
 
-  end if ! HEXA_8, PYRA_5, PENTA_6, TETRA_4
+  end if ! HEXA_8, PYRA_5, PENTA_6, TETRA_4, MIXED
 
   end subroutine

@@ -130,6 +130,7 @@
   integer :: cnt_pyr
   integer :: cnt_wed
   integer :: cnt_tet
+  integer :: cnt_mix
 
   ! Boundary condition cells (2d)
   integer :: cnt_bnd_qua
