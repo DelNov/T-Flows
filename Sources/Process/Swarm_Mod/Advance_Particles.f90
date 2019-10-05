@@ -62,22 +62,25 @@
           ! ... compute the forces on each particle and store it
           call Swarm_Mod_Particle_Forces(swarm, k)
 
-          ! Make sure particle didn't run out of periodicity
-          ! (If it did, its node will be set to zero)
-! BUG =-> call Swarm_Mod_Check_Periodicity(swarm, k)
-
         end if  ! in this processor
-
-        ! If escaped through periodicity, locate it again
-        part_node = part % node
-        call Comm_Mod_Global_Min_Int(part_node)
-        if(part_node .eq. 0) then
-          call Swarm_Mod_Find_Nearest_Cell(swarm, k)
-          call Swarm_Mod_Find_Nearest_Node(swarm, k)
-        end if
 
       end if    ! not deposited or escaped
     end do      ! through particles
+
+    ! Make sure particles didn't run out of periodicity
+    ! (If they did, their node will be set to zero meaning it is lost)
+    call Swarm_Mod_Check_Periodicity(swarm)
+
+    ! If any of the particles escaped through periodicity, locate it again
+    do k = 1, swarm % n_particles
+      part_node = part % node
+      call Comm_Mod_Global_Min_Int(part_node)
+      if(part_node .eq. 0) then
+        call Swarm_Mod_Find_Nearest_Cell(swarm, k)
+        call Swarm_Mod_Find_Nearest_Node(swarm, k)
+      end if
+    end do
+
   end do        ! through sub-steps
 
   !---------------------------------------------!

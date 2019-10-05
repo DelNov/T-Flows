@@ -107,6 +107,9 @@
     integer :: cnt_e
     integer :: cnt_r
 
+    ! Logical array if cell has particles
+    logical, allocatable :: cell_has_particles(:)
+
   end type
 
   ! Working arrays, buffers for parallel version

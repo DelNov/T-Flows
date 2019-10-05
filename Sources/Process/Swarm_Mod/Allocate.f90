@@ -21,6 +21,10 @@
     allocate(swarm % particle(swarm % n_particles))
   end if
 
+  ! Allocate logical array if cell holds particles
+  allocate(swarm % cell_has_particles(swarm % pnt_grid % n_cells))
+  swarm % cell_has_particles(:) = .false.
+
   ! Allocate memory for working arrays
   allocate(i_work(swarm % n_particles * N_I_VARS))
   allocate(l_work(swarm % n_particles * N_L_VARS))
