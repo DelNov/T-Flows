@@ -106,6 +106,9 @@
     integer, allocatable :: faces_n(:,:)
     integer, allocatable :: faces_c(:,:)
 
+    ! Periodic faces
+    integer, allocatable :: per_faces(:)
+
     ! Face surface areas (si), total surface (s) 
     ! and distances between cells (di)
     real, allocatable :: sx(:), sy(:), sz(:), s(:)
@@ -169,6 +172,7 @@
   include 'Grid_Mod/Calculate_Face_Geometry.f90'
   include 'Grid_Mod/Calculate_Wall_Distance.f90'
   include 'Grid_Mod/Estimate_Big_And_Small.f90'
+  include 'Grid_Mod/Find_Periodic_Faces.f90'
   include 'Grid_Mod/Find_Nodes_Cells.f90'
   include 'Grid_Mod/Get_C1_And_C2_At_Level.f90'
   include 'Grid_Mod/Load_Cns.f90'
