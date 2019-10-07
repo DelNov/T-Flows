@@ -24,7 +24,7 @@
                       block_type,  &
                       error)
   if (error .ne. 0) then
-    print *, "# Failed to get block type"
+    print "(a)", " #     Failed to get block type"
     call Cg_Error_Exit_F()
   endif
 
@@ -32,12 +32,12 @@
   cgns_base(base) % block(block) % type = block_type
 
   if(verbose) then
-    print *, "#     Block type is ",  &
-             ZoneTypeName(cgns_base(base) % block(block) % type)
+    print "(a,a36)", " #     Block type: ",  &
+             trim(ZoneTypeName(cgns_base(base) % block(block) % type))
   end if
 
   if (cgns_base(base) % block(block) % type .eq. STRUCTURED) then
-    print *, "# Structured CGNS meshed are unsupported"
+    print "(a)", " #     Structured CGNS meshed are unsupported"
     stop
   endif
 

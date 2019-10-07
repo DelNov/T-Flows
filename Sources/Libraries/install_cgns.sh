@@ -1,17 +1,16 @@
 #!/bin/bash
-# Requires: C, C++, Fortran compilers
-# If you want cgnstools(graphical tools to view .cgns files) then install:
-# libx11-dev libxmu-headers libxmu-dev packages for debian/ubuntu,
-# libX11-devel for openSUSE,
-# xorg-x11-devel for Fedora
-
-# This script will automatically build cgns lib in several releases:
+# This script automatically builds 'cgns lib' in several releases:
 # 1) with hdf5 and parallel   access (optional)
 # 2) with hdf5 and sequential access + cgnstools (optional)
 # (parallel cgns lib can only be based on hdf5, not adf5)
-
 # Hdf5_Par lib most likely can not be built with your current mpif90
 # therefore script builds mpif90 first to compile Hdf5_Par later
+
+# Prerequisites: C, C++, Fortran compilers
+# Extra requirements for 'cgnstools' (graphical tools to view .cgns files):
+# libx11-dev libxmu-headers libxmu-dev packages (debian/ubuntu),
+# libX11-devel (openSUSE),
+# xorg-x11-devel (Fedora)
 
 # You can optionally build cgnstools to view/edit .cgns files
 # https://cgns.github.io/CGNS_docs_current/cgnstools/cgnsview/index.html
@@ -25,25 +24,27 @@
 # CGNS lib does not use compression:
 # https://cgns.github.io/FAQs.html
 
-# build mpich, otherwise Hdf5_Par can not be built
+# ------------------------------------------------------------------------------
+
+# Build mpich, otherwise Hdf5_Par can not be built
 BUILD_MPI=false
 
-# build cgnstools, which contains cgnsview - small program to view .cgns files
+# Build cgnstools, which contains cgnsview - small program to view .cgns files
 # https://cgns.github.io/CGNS_docs_current/cgnstools/cgnsview/index.html
 BUILD_CGNS_TOOLS=true
 
-# build latest cgns lib, otherwise build 3.2.1 version
+# Build latest cgns lib, otherwise build 3.2.1 version
 BUILD_LATEST_CGNS=false
 
-# folder structure
+# Folder structure
 CGNS_DIR=$PWD                     # this is top dir for this lib
 INSTALL_DIR=$CGNS_DIR/install_dir # this dir contains Cgns/ Hdf5/ Mpich/
 SRC_DIR=$CGNS_DIR/src_dir         # this dir contains downloaded sources
 rm -rf $INSTALL_DIR $SRC_DIR
 
-# script temp dir
+# Script temp dir
 TEMP_DIR=`mktemp -d 2>/dev/null || mktemp -d -t 'TEMP_DIR'`
-# script logs
+# Script logs
 LOG_FILE=$SRC_DIR/build_cgns.log # logs of current script
 if [ -f $LOG_FILE ]; then
   cp /dev/null $LOG_FILE
@@ -87,7 +88,7 @@ TCL_DIR=$INSTALL_DIR/Tcl
 # tk folder structure
 TK_DIR=$INSTALL_DIR/Tk
 
-#current environment vars
+# Current environment vars
 PATH_CLEAN="$PATH"
 LD_LIBRARY_PATH_CLEAN="$LD_LIBRARY_PATH"
 
@@ -112,12 +113,12 @@ fi
 mkdir -p $SRC_DIR/
 mkdir -p $INSTALL_DIR/
 
-# exit when any command fails
+# Stop the script whenever any command fails
 set -e
 
-# keep track of the last executed command
+# Keep track of the last executed command
 trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
-# echo an error message before exiting
+# Output an error message before exiting
 trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT
 
 #------------------------------------------------------------------------------#
@@ -161,12 +162,12 @@ function switch_compilers_and_environment_to {
     export PATH=$OPENMPI_DIR/bin:$PATH
     export LD_LIBRARY_PATH=$OPENMPI_DIR/lib/:$LD_LIBRARY_PATH
   elif [ $1 = "sequential" ]; then
-    export CCLAGS='-O2'
-    export CPPFLAGS='-O2'
-    export CXXFLAGS='-O2'
-    export CFLAGS='-O2'
-    export FFLAGS='-O2'
-    export FCFLAGS='-O2'
+    export CCLAGS='-O2 -fPIC'
+    export CPPFLAGS='-O2 -fPIC'
+    export CXXFLAGS='-O2 -fPIC'
+    export CFLAGS='-O2 -fPIC'
+    export FFLAGS='-O2 -fPIC'
+    export FCFLAGS='-O2 -fPIC'
 
     export CC=$CCOMP
     export CXX=$CPPCOMP
@@ -202,7 +203,7 @@ function build_mpich_lib {
 
   ./configure \
   --prefix=$MPICH_DIR \
-  --enable-fast=all,O3 \
+  --enable-fast=all,O2 \
   --enable-fortran=all \
   >> $LOG_FILE 2>&1
 
@@ -273,7 +274,7 @@ function build_hdf5_lib {
   cd $SRC_DIR
   mkdir -p $SRC_DIR/Hdf5/
   git clone --depth=1 https://bitbucket.hdfgroup.org/scm/hdffv/hdf5.git \
-  --branch hdf5_1_8_21 ./hdf5 >> $LOG_FILE 2>&1
+  --branch hdf5_1_8 ./hdf5 >> $LOG_FILE 2>&1
   rm -rf ./hdf5/.git
   rsync -azh hdf5/* $SRC_DIR/Hdf5/
   rm -rf ./hdf5
@@ -651,6 +652,10 @@ function build_cgns_lib_3.2.1 {
     echo '  Working with sequential version + HDF5 + cgnstools:'
 
     echo '    Configuring installation'
+
+    # Fix bug for glib > 2.26
+    sed -i '/matherr/d' $SRC_DIR/Cgns_3.2.1/src/cgnstools/cgnscalc/calcwish.c
+    sed -i '/matherr/d' $SRC_DIR/Cgns_3.2.1/src/cgnstools/cgnsview/cgiowish.c
 
     FLIBS="-Wl,--no-as-needed -ldl" \
     LIBS="-Wl,--no-as-needed -ldl" \

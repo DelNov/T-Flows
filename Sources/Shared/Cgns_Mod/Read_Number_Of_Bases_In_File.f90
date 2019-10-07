@@ -14,12 +14,12 @@
                    ierror)   
 
   if (ierror .ne. 0) then
-    print *, "# Failed to get bases number"
+    print "(a)", " # Failed to get bases number"
     call Cg_Error_Exit_F()
   endif
 
   if(verbose) then 
-    print *, "# Number of bases: ", n_bases
+    print "(a,i3)", " # Number of bases: ", n_bases
   end if
 
   allocate(cgns_base(n_bases))

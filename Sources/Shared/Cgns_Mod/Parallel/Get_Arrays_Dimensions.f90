@@ -35,7 +35,7 @@
   tmp = 0
   tmp(this_proc) = nn_or_nc
 
-  call Comm_Mod_Global_Sum_Int_Array(tmp, n_proc)
+  call Comm_Mod_Global_Sum_Int_Array(n_proc, tmp)
 
   idx = 1
 
