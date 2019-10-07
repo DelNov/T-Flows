@@ -6,7 +6,7 @@
   implicit none
 !==============================================================================!
 
-  cnt_nodes    = 0  ! number of nodes
+  cnt_nodes    = 0  ! number of nodes (except boundary and interface)
   cnt_cells    = 0  ! number of cells (except boundary and interface)
   cnt_blocks   = 0  ! number of block
   cnt_bnd_cond = 0  ! number of boundary

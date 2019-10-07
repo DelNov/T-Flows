@@ -207,16 +207,16 @@
 
         if(verbose) then
          print "(a)",  " #-----------------------------------------------------"
-          print "(a,a22)", " #       Interface section name: ", trim(sect_name)
+         print "(a,a22)", " #       Interface section name: ", trim(sect_name)
          print "(a)",  " #-----------------------------------------------------"
-          print "(a,i21)", " #       Interface section index: ", sect
-          print "(a,a29)", &
-            " #       Interface type:  ", trim(ElementTypeName(cell_type))
-          print "(a,i34)", " #       First cell: ",  &
-            cgns_base(base) % block(block) % section(sect) % first_cell
-          print "(a,i35)", " #       Last cell: ",  &
-            cgns_base(base) % block(block) % section(sect) % last_cell
-          print "(a,l25)", " #       Marked for deletion: ", cgns_base(base) % &
+         print "(a,i21)", " #       Interface section index: ", sect
+         print "(a,a29)", " #       Interface type:  ", &
+           trim(ElementTypeName(cell_type))
+         print "(a,i34)", " #       First cell: ",  &
+           cgns_base(base) % block(block) % section(sect) % first_cell
+         print "(a,i35)", " #       Last cell: ",  &
+           cgns_base(base) % block(block) % section(sect) % last_cell
+         print "(a,l25)", " #       Marked for deletion: ", cgns_base(base) % &
             block(block) % interface(int) % marked_for_deletion
         end if ! verbose
       end if ! int_found .ne. 0
