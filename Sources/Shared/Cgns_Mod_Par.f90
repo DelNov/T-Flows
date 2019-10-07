@@ -37,7 +37,7 @@
 
   ! TO DO : 
   ! 1) Pack monitoring points in ConvergenceHistory_t
-  ! 2) Deal with Salome test_cases
+  ! 2) Salome test: mesh is converted correctly, but WallDistance is wrong
 
   ! File
   integer           :: file_id

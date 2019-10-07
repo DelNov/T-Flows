@@ -45,13 +45,13 @@
 
   ! TO DO:
   ! 1) Pack monitoring points in ConvergenceHistory_t
-  ! 2) Deal with Salome test_cases
+  ! 2) Salome test: mesh is converted correctly, but WallDistance is wrong
 
   ! File
   integer           :: file_id
   character(len=80) :: file_name
   integer           :: file_mode
-  logical           :: verbose = .true.
+  logical           :: verbose = .false.
 
   ! Solution section
   type Cgns_Solution_Type
