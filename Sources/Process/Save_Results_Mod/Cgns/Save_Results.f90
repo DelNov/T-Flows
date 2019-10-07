@@ -1,7 +1,7 @@
 !==============================================================================!
-  subroutine Save_Results(flow, turb, name_save)
+  subroutine Save_Results(flow, turb, name_save, plot_inside)
 !------------------------------------------------------------------------------!
-!   Creates save file and adds fields to existing grid cgns                    !
+!   Writes results in CGNS file format (for VisIt and Paraview)                !
 !------------------------------------------------------------------------------!
 !---------------------------------[Modules]------------------------------------!
   use Work_Mod, only: v2_calc   => r_cell_01,  &
@@ -15,13 +15,15 @@
                       ut_save   => r_cell_09,  &
                       vt_save   => r_cell_10,  &
                       wt_save   => r_cell_11,  &
-                      kin_vis_t => r_cell_12
+                      kin_vis_t => r_cell_12,  &
+                      phi_save  => r_cell_13
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   type(Field_Type), target :: flow
   type(Turb_Type),  target :: turb
   character(len=*)         :: name_save
+  logical                  :: plot_inside  ! plot results inside?
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: grid
   character(len=80)        :: store_name, name_out
@@ -57,7 +59,6 @@
   !--------------------------!
   file_mode = CG_MODE_MODIFY
   call Cgns_Mod_Open_File(name_out, file_mode)
-
 
   call Cgns_Mod_Initialize_Counters
 
@@ -151,7 +152,7 @@
   !   Turbulent quantities   !
   !--------------------------!
 
-  ! Kin and Eps and T2 for K_EPS (still a little confusing)
+  ! Save kin and eps
   if(turbulence_model .eq. K_EPS                 .or.  &
      turbulence_model .eq. K_EPS_ZETA_F          .or.  &
      turbulence_model .eq. HYBRID_LES_RANS       .or.  &
@@ -167,25 +168,10 @@
     call Cgns_Mod_Write_Field(base, block, solution, field, grid,  &
                               turb % p_kin(1),                     &
                               "TurbulentKineticEnergyProduction")
-    call Cgns_Mod_Write_Field(base, block, solution, field, grid,  &
-                              turb % alpha_l(1),                   &
-                              "TurbulentQauntityAlphaL")
-    call Cgns_Mod_Write_Field(base, block, solution, field, grid,  &
-                              turb % alpha_u(1),                   &
-                              "TurbulentQauntityAlphaU")
-
-    if(heat_transfer .and. turbulence_model .eq. K_EPS) then
-      call Cgns_Mod_Write_Field(base, block, solution, field, grid,  &
-                                turb % t2 % n(1),                    &
-                                "TurbulentQuantityT2")
-      call Cgns_Mod_Write_Field(base, block, solution, field, grid,  &
-                                turb % p_t2(1),                      &
-                                "TurbulentT2Production")
-    end if
 
   end if
 
-  ! Zeta, v2 and f22 and T2
+  ! Save zeta and f22
   if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
      turbulence_model .eq. HYBRID_LES_RANS) then
     do c = 1, grid % n_cells - grid % comm % n_buff_cells
@@ -200,11 +186,16 @@
  
     if(heat_transfer) then
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                                turb % t2 % n(1),  "TurbulentQuantityT2")
+                                turb % t2 % n(1), "TurbulentQuantityT2")
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                                turb % p_t2(1),    "TurbulentT2Production")
+                                turb % p_t2(1), "TurbulentT2Production")
+      call Cgns_Mod_Write_Field(base, block, solution, field, grid,  &
+                                turb % alpha_l(1),                   &
+                                "TurbulentQauntityAlphaL")
+      call Cgns_Mod_Write_Field(base, block, solution, field, grid,  &
+                                turb % alpha_u(1),                   &
+                                "TurbulentQauntityAlphaU")
     end if
-    
   end if
 
   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
@@ -244,13 +235,7 @@
   end if
 
   ! Statistics for large-scale simulations of turbulence
-  if(turbulence_model .eq. LES_SMAGORINSKY    .or.  &
-     turbulence_model .eq. LES_DYNAMIC        .or.  &
-     turbulence_model .eq. LES_WALE           .or.  &
-     turbulence_model .eq. DNS                .or.  &
-     turbulence_model .eq. DES_SPALART        .or.  &
-     turbulence_model .eq. HYBRID_LES_PRANDTL .or.  &
-     turbulence_model .eq. HYBRID_LES_RANS) then
+  if(turbulence_statistics) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               turb % u_mean(1),"MeanVelocityX")
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
@@ -297,6 +282,19 @@
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                                 wt_save(1),"TurbulentHeatFluxZ")
     end if
+
+    !if(flow % n_scalars > 0) then
+    !  do sc = 1, flow % n_scalars
+    !    phi => flow % scalar(sc)
+    !    name_mean = 'Mean'
+    !    name_mean(5:8) = phi % name
+    !    do c = 1, grid % n_cells
+    !      phi_save(c) = turb % scalar_mean(sc, c)
+    !    end do
+    !    call Cgns_Mod_Write_Field(grid, IN_4, IN_5, name_mean, plot_inside,  &
+    !                              phi_save(1))
+    !  end do
+    !end if
   end if
 
   ! Save y+ for all turbulence models

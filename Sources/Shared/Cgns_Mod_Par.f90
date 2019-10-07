@@ -96,6 +96,7 @@
   integer :: cnt_pyr
   integer :: cnt_wed
   integer :: cnt_tet
+  integer :: cnt_mix
 
   ! Boundary condition cells (2d)
   integer :: cnt_bnd_qua
@@ -111,7 +112,7 @@
 
   ! Block-wise counter of boundary cells
   integer           :: cnt_block_bnd_cells  ! probably not needed
-  integer           :: cnt_bnd_conds
+  integer           :: cnt_bnd_cond
   character(len=80) :: bnd_cond_names(1024)
 
   ! if an actual grid was written, further saves have just a link to that grid
