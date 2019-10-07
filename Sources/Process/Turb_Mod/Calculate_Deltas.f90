@@ -16,8 +16,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   integer :: s, c, c1, c2
-  real    :: d, d1, d2, dx1, dx2, dy1, dy2, dz1, dz2,  &
-                        xc1, xc2, yc1, yc2, zc1, zc2
+  real    :: d, d1, d2, dx1, dx2, dy1, dy2, dz1, dz2
 !==============================================================================!
 
   ! Take aliases
