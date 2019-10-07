@@ -15,16 +15,12 @@
   logical,             pointer :: escaped
   logical,             pointer :: deposited
   integer                      :: ss         ! sub-step counter
+  integer                      :: part_node  ! storage for particle node
 !==============================================================================!
 
   ! Take aliases for the swarm
   grid => swarm % pnt_grid
   flow => swarm % pnt_flow
-
-  ! Take aliases for the particle
-  part      => swarm % particle(k)
-  escaped   => part  % escaped
-  deposited => part  % deposited
 
   ! Particle time step (division of the global time step)
   swarm % dt = flow % dt / swarm % n_sub_steps
@@ -36,6 +32,11 @@
   !----------------------------------!
   do ss = 1, swarm % n_sub_steps
     do k = 1, swarm % n_particles
+
+      ! Take aliases for the particle
+      part      => swarm % particle(k)
+      escaped   => part  % escaped
+      deposited => part  % deposited
 
       !-------------------------------------------------!
       !   If particle is neither deposited nor escped   !
@@ -53,13 +54,6 @@
           ! ... nearest node for each particle and stores it
           call Swarm_Mod_Find_Nearest_Node(swarm, k)
 
-          ! Make sure particle didn't run out of periodicity
-          call Swarm_Mod_Check_Periodicity(swarm, k)
-          if(part % node .eq. 0) then
-            call Swarm_Mod_Find_Nearest_Cell(swarm, k)
-            call Swarm_Mod_Find_Nearest_Node(swarm, k)
-          end if
-
           ! Compute velocity at the particle, and move it
           ! (also calls Bounce_Particle)
           call Swarm_Mod_Move_Particle(swarm, turb, k)
@@ -69,8 +63,24 @@
           call Swarm_Mod_Particle_Forces(swarm, k)
 
         end if  ! in this processor
+
       end if    ! not deposited or escaped
     end do      ! through particles
+
+    ! Make sure particles didn't run out of periodicity
+    ! (If they did, their node will be set to zero meaning it is lost)
+    call Swarm_Mod_Check_Periodicity(swarm)
+
+    ! If any of the particles escaped through periodicity, locate it again
+    do k = 1, swarm % n_particles
+      part_node = part % node
+      call Comm_Mod_Global_Min_Int(part_node)
+      if(part_node .eq. 0) then
+        call Swarm_Mod_Find_Nearest_Cell(swarm, k)
+        call Swarm_Mod_Find_Nearest_Node(swarm, k)
+      end if
+    end do
+
   end do        ! through sub-steps
 
   !---------------------------------------------!
@@ -85,6 +95,9 @@
   !-----------------------------------!
   if(this_proc < 2) then
     do k = 1, swarm % n_particles
+
+      ! Refresh the alias
+      part => swarm % particle(k)
 
       ! Printing particle position
       write(*,'(a,i3,a,i7,a,i2,a,3es15.6,a,es12.4)')                 &

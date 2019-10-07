@@ -27,6 +27,9 @@
     phi % z(c) = 0.0
   end do
 
+  !-------------------------------------------!
+  !   First extrapolation to boundary cells   !
+  !-------------------------------------------!
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
@@ -41,7 +44,10 @@
   call Grad_Mod_Component(grid, phi % n, 2, phi % y, .true.)  ! dp/dy
   call Grad_Mod_Component(grid, phi % n, 3, phi % z, .true.)  ! dp/dz
 
-  do iter=1, 1
+  !-----------------------------------------------------!
+  !   Improve pressure on boundary cells iterativelly   !
+  !-----------------------------------------------------!
+  do iter = 1, 12
 
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
@@ -49,7 +55,7 @@
       if(c2 < 0) then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. PRESSURE) then
           phi % n(c2) = phi % n(c1)   &
-                      + 1.2*( phi % x(c1) * (grid % xc(c2)-grid % xc(c1))  &
+                      + 1.0*( phi % x(c1) * (grid % xc(c2)-grid % xc(c1))  &
                       +       phi % y(c1) * (grid % yc(c2)-grid % yc(c1))  &
                       +       phi % z(c1) * (grid % zc(c2)-grid % zc(c1))  &
                             )
