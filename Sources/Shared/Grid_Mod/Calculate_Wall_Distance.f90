@@ -13,6 +13,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: b, c1, c2
   integer              :: n_wall_colors, n_cells_fraction
+  integer              :: processed_cells
   integer, allocatable :: wall_colors(:)
 !==============================================================================!
 
@@ -45,15 +46,23 @@
     grid % wall_dist = 1.0
     print *, '# Distance to the wall set to 1.0 everywhere !'
   else
-    n_cells_fraction = (grid % n_cells + grid % n_bnd_cells) / 20
+    n_cells_fraction = (grid % n_bnd_cells + grid % n_cells) / 20
+
+    processed_cells = 0
+
+    !$omp parallel do
     do c1 = -grid % n_bnd_cells, grid % n_cells
-      if(mod( (c1+grid % n_bnd_cells), n_cells_fraction ) .eq. 0) then
-        write(*,'(a2, f5.0, a14)')                               &
-          ' #',                                                  &
-          (100. * (c1 + grid % n_bnd_cells)                      &
-                / (1.0*(grid % n_bnd_cells + grid % n_cells))),  &
+
+      processed_cells = processed_cells + 1
+
+      if(mod( (processed_cells), n_cells_fraction ) .eq. 0) then
+        print '(a2, f5.0, a14)',                                  &
+          ' #',                                                   &
+          (100. * processed_cells                                 &
+                 / (1.0*(grid % n_bnd_cells + grid % n_cells))),  &
           ' % complete...'
-      end if
+      end if ! each 5%
+
       do b = 1, n_wall_colors
         do c2 = grid % bnd_cond % color_f( wall_colors(b) ),  &
                 grid % bnd_cond % color_l( wall_colors(b) ),  &
@@ -68,6 +77,7 @@
         end do
       end do
     end do
+    !$omp end parallel do
 
     grid % wall_dist(:) = sqrt(grid % wall_dist(:))
 

@@ -26,7 +26,7 @@
                       error)
 
   if (error .ne. 0) then
-    print *, "# Failed to get base info"
+    print "(a)", " # Failed to get base info"
     call Cg_Error_Exit_F()
   endif
 
@@ -37,14 +37,11 @@
 
   ! Print some info
   if(verbose) then
-    print *, '#   ============================'
-    print *, '#   '
-    print *, '#   Base name: ',      base_name
-    print *, '#   '
-    print *, '#   ============================'
-    print *, '#   Base name: ',      base_name
-    print *, '#   Cell dimension: ', cell_dim
-    print *, '#   Phys dimension: ', phys_dim
+    print "(a)", " #============================"
+    print "(a,a9)", " #   Base name:      ", trim(base_name)
+    print "(a,i9)", " #   Cell dimension: ", cell_dim
+    print "(a,i9)", " #   Phys dimension: ", phys_dim
+    print "(a)", " #----------------------------"
   end if
 
   end subroutine

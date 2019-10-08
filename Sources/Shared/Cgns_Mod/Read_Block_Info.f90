@@ -28,7 +28,7 @@
                       error)                
 
   if (error .ne. 0) then
-    print *, "# Failed read block info"
+    print "(a)", " # Failed read block info"
     call Cg_Error_Exit_F()
   endif
 
@@ -41,21 +41,21 @@
   cnt_cells = cnt_cells + cgns_base(base) % block(block) % mesh_info(2)
 
   if(verbose) then
-    print *, '#     =========================================='
-    print *, "#     Block name:                ",  &
-             cgns_base(base) % block(block) % name
-    print *, '#     =========================================='
-    print *, "#     Block index:               ", block    
-    print *, "#     Nodes:                     ",  &
-             cgns_base(base) % block(block) % mesh_info(1)
-    print *, "#     Cells:                     ",  &
-             cgns_base(base) % block(block) % mesh_info(2)
-    print *, "#     Boundary nodes(if sorted): ",  &
-             cgns_base(base) % block(block) % mesh_info(3)
+    print "(a)", " #====================================================="
+    print "(a,a36)", " #     Block name: ",  &
+             trim( cgns_base(base) % block(block) % name)
+    print "(a)", " #-----------------------------------------------------"
+    print "(a,i35)", " #     Block index: ", block
+    print "(a,i41)", " #     Nodes: ", &
+      cgns_base(base) % block(block) % mesh_info(1)
+    print "(a,i41)", " #     Cells: ", &
+      cgns_base(base) % block(block) % mesh_info(2)
+    print "(a,i21)", " #     Boundary nodes(if sorted): ",  &
+      cgns_base(base) % block(block) % mesh_info(3)
   end if
 
   if (cgns_base(base) % block(block) % mesh_info(3) .ne. 0) then
-    print *, "# Boundary condition nodes != 0 -> Unsupported"
+    print "(a)", " # Boundary condition nodes != 0 -> Unsupported"
     stop
   endif
 

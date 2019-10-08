@@ -18,20 +18,19 @@
   block_id = block
 
   ! Gets number of interfaces
-  call Cg_Nconns_F(file_id,              & !(in )
-                   base,                 & !(in )
-                   block,                & !(in )
-                   number_of_interfaces, & !(out)
-                   error)                  !(out)
+  call Cg_Nconns_F(file_id,               & !(in )
+                   base,                  & !(in )
+                   block,                 & !(in )
+                   number_of_interfaces,  & !(out)
+                   error)                   !(out)
 
   if (error.ne.0) then
-    print *, '# Failed to number of interfaces in block ', block
+    print "(a,i10)", " #     Failed to number of interfaces in block: ", block
     call Cg_Error_Exit_F()
   endif
 
   if(verbose) then
-    print '(a,i4)', &
-      ' #     Interfaces in block: ', number_of_interfaces
+    print "(a,i27)", ' #     Interfaces in block: ', number_of_interfaces
   end if
 
   cgns_base(base) % block(block) % n_interfaces = number_of_interfaces
@@ -44,6 +43,7 @@
 
   cgns_base(base) % block(block) % interface(1:number_of_interfaces) % id = 0
 
+  ! 2 for QUAD_4, 2 for TRI_3, 1 for mixed
   cgns_base(base) % block(block) % interface(1:number_of_interfaces) % &
     int_type = 0
 

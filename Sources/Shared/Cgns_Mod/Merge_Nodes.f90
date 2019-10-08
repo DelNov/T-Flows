@@ -2,7 +2,7 @@
   subroutine Cgns_Mod_Merge_Nodes(grid)
 !------------------------------------------------------------------------------!
 !   For each interface in geometry merges nodes on interfaces and remaps       !
-!   cell_connections.                                                          !
+!   cell_connections                                                           !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod
@@ -27,16 +27,19 @@
 
 !==============================================================================!
 
-  print *, '# Merging blocks since they have common interfaces'
-  print *, '# Hint: Join blocks in mesh builder to avoid any problems'
-  print '(a38,i9)', ' # Old number of nodes:               ', grid % n_nodes
-  ! "/2" because mixed interface type had weight 1, while quad and tri had 1
+  print "(a)", " #=============================================="
+  print "(a)", " # Merging blocks since they have common interfaces"
+  print "(a)", " # Hint: Join blocks in mesher to avoid issues"
+  print "(a,i26)", " # Old number of nodes: ", grid % n_nodes
+  print "(a)", " #----------------------------------------------"
+  ! "/2" because mixed interface type had weight 1, while quad and tri had 2
   cnt_int = cnt_int / 2
 
   !----------------------------------------------------------------------------!
-  !   At this point number of interfaces cnt_int is known.                     !
+  !   At this point number of unique interfaces cnt_int is known               !
   !   Cells on interfaces are in interface_cells                               !
   !   Array interface_cells has 4 indices: (1:2, cnt_int_cells, 1:4, cnt_int)  !
+  !                                                                            !
   !   Each interface has two domains from 2 different blocks                   !
   !   First index denotes this first and second part of a interface            !
   !   Second index is interface cell id                                        !
@@ -44,8 +47,8 @@
   !   Last index tells to which unique interface this cell belongs.            !
   !                                                                            !
   !   Unfortunately coordinates of cell nodes inside domains                   !
-  !   interface_cells(1,...) and interface_cells                               !
-  !   interface_nodes(n, int) = 1 and interface_nodes(n, int) = -1             !
+  !   interface_cells(1,...) and interface_cells(2,...)                        !
+  !   (interface_nodes(n, int) = 1 and interface_nodes(n, int) = -1)           !
   !   do not match, because they originated from different blocks.             !
   !   That is why sorting is required by some criterion to group them.         !
   !----------------------------------------------------------------------------!
@@ -91,14 +94,14 @@
   !                                                                            !
   !----------------------------------------------------------------------------!
 
-
   ! Estimate big and small
   call Grid_Mod_Estimate_Big_And_Small(grid, big, small)
 
   if (verbose) then
-    print *, '# Cells before Cgns_Mod_Merge_Nodes_New function (sample)'
+    print "(a)", " # Cells before Cgns_Mod_Merge_Nodes_New function (sample)"
     do c = 1, min(6, grid % n_cells)
-      print *, '#', (grid % cells_n(i,c), i = 1, grid % cells_n_nodes(c))
+      print "(a,8i8)", " # ", &
+        (grid % cells_n(i,c), i = 1, grid % cells_n_nodes(c))
     end do
   end if
 
@@ -118,19 +121,38 @@
     !--------------------------------------------------------------------------!
 
     if (verbose) then
-      print *, '# Interface to keep:', int
-      do c = 1, min(6, cnt_int_cells)
-        if (interface_cells(1, c, 1, int) > 0) then
-          print *, 'c =', interface_cells(1, c, 1:4, int)
-        end if
-      end do
-      print *, '# Interface to remove:', int
-      do c = 1, min(6, cnt_int_cells)
-        if (interface_cells(2, c, 1, int) > 0) then
-          print *, 'c =', interface_cells(2, c, 1:4, int)
-        end if
-      end do
-    end if
+
+      print "(a,i8)", " # Interface to keep: ", int
+      v = 0
+      do c = 1, cnt_int_cells
+
+        do k = 1, 4
+          n1 = interface_cells(1, c, k, int)
+
+          if (n1 > 0 .and. v < 7) then
+            print "(a,4i8)", " # ", interface_cells(1, c, 1:4, int)
+            v = v + 1
+          end if ! n1 > 0
+
+        end do ! k
+      end do ! c
+
+      print "(a,i8)", " # Interface to remove: ", int
+      v = 0
+      do c = 1, cnt_int_cells
+
+        do k = 1, 4
+          n2 = interface_cells(2, c, k, int)
+
+          if (n2 > 0 .and. v < 7) then
+            print "(a,4i8)", " # ", interface_cells(2, c, 1:4, int)
+            v = v + 1
+          end if ! n1 > 0
+
+        end do ! k
+      end do ! c
+
+    end if ! verbose
 
     ! Count nodes on interface
     cnt_nodes_on_int_to_keep = 0
@@ -206,7 +228,7 @@
           write (*, '(a)', advance='no')' # c: '
           print '(100es14.7)', (criterion(k), k = i-1, i)
           v = v + 1
-        end if
+        end if ! verbose
       end if
     end do ! i
 
@@ -263,7 +285,8 @@
     !------------------------!
     !   Reinitialize nodes   !
     !------------------------!
-    print '(a38,i9)', ' # New number of nodes:               ', cnt_node - 1
+    print "(a,i7)", " # New number of nodes: ", cnt_node - 1
+    print "(a)", " #-----------------------------------------------------------"
 
     deallocate(grid % xn)
     deallocate(grid % yn)
@@ -307,7 +330,8 @@
   if (verbose) then
     print *, '# Cells after Cgns_Mod_Merge_Nodes_New function (sample)'
     do c = 1, min(6, grid % n_cells)
-      print *, '#', (grid % cells_n(i,c), i = 1, grid % cells_n_nodes(c))
+      print "(a,8i8)", " # ", &
+        (grid % cells_n(i,c), i = 1, grid % cells_n_nodes(c))
     end do
   end if
 
