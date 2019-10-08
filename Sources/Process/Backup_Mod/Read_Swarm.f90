@@ -25,6 +25,10 @@
   ! Number of particles
   call Backup_Mod_Read_Int(fh, disp, vc, 'n_particles', n_part)
 
+  i_work(:) = 0
+  l_work(:) = .false.
+  r_work(:) = 0.0
+
   if(n_part > 0) then
     swr % n_particles = n_part
     call Backup_Mod_Read_Int_Array(fh, disp, vc,         &
@@ -38,7 +42,6 @@
                                     r_work(1:n_r_vars*swr % n_particles))
 
     ! Pack particle data in arrays
-    n_parts_in_buffers = 0
     do k = 1, swr % n_particles
 
       ! Take aliases for the particle
@@ -63,11 +66,17 @@
       part % d    = r_work(i + 7)
       part % cfl  = r_work(i + 8)
 
-      ! Searching for the closest cell and node to place the moved particle
-      part % node = 0  ! force it to look for all cells
-      call Swarm_Mod_Find_Nearest_Cell(swr, k, n_parts_in_buffers)
-      call Swarm_Mod_Find_Nearest_Node(swr, k)
     end do
   end if
+
+  n_parts_in_buffers = 0
+  do k = 1, swr % n_particles
+    swr % particle(k) % cell = 0
+    swr % particle(k) % node = 0
+    swr % particle(k) % proc = 0
+    swr % particle(k) % buff = 0
+    call Swarm_Mod_Find_Nearest_Cell(swr, k, n_parts_in_buffers)
+    call Swarm_Mod_Find_Nearest_Node(swr, k)
+  end do
 
   end subroutine
