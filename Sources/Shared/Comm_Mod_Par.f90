@@ -37,6 +37,7 @@
   include 'Comm_Mod/Parallel/End.f90'
   include 'Comm_Mod/Parallel/Exchange_Int.f90'
   include 'Comm_Mod/Parallel/Exchange_Real.f90'
+  include 'Comm_Mod/Parallel/Global_Lor_Log_Array.f90'
   include 'Comm_Mod/Parallel/Global_Max_Real.f90'
   include 'Comm_Mod/Parallel/Global_Min_Real.f90'
   include 'Comm_Mod/Parallel/Global_Max_Int.f90'
