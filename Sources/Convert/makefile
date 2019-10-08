@@ -17,6 +17,9 @@ DEBUG = no
 # Link with CGNS ("yes" or "no")
 CGNS = no
 
+# Multi-threaded Calculate_Wall_Distance.f90 (env. var to use: OMP_NUM_THREADS)
+OPENMP = no
+
 # Directories for objects and modules. (No need to change.)
 DIR_BINARY = ../../Binaries
 DIR_SHARED = ../Shared
@@ -65,6 +68,9 @@ ifeq ($(FORTRAN), gnu)
   else
     OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8 -fdefault-integer-8 -O3
   endif
+  ifeq ($(OPENMP), yes)
+    OPT_COMP += -fopenmp
+  endif
   OPT_LINK = $(OPT_COMP)
 endif
 
@@ -77,6 +83,9 @@ ifeq ($(FORTRAN), intel)
   else
     OPT_COMP = -module $(DIR_MODULE) -r8 -i8 -O3
   endif
+  ifeq ($(OPENMP), yes)
+    OPT_COMP += -qopenmp
+  endif
   OPT_LINK = $(OPT_COMP)
 endif
 
@@ -88,8 +97,12 @@ ifeq ($(FORTRAN), portland)
   else
     OPT_COMP = -module $(DIR_MODULE) -r8 -i8 -O3
   endif
+  ifeq ($(OPENMP), yes)
+    OPT_COMP += -mp
+  endif
   OPT_LINK = $(OPT_COMP)
 endif
+
 
 # If compiling with CGNS, add path to include directory
 # (One day, when you want to work with compressed
