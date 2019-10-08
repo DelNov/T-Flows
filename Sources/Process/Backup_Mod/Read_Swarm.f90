@@ -33,13 +33,13 @@
     swr % n_particles = n_part
     call Backup_Mod_Read_Int_Array(fh, disp, vc,         &
                                    'particle_int_data',  &
-                                   i_work(1:n_i_vars*swr % n_particles))
+                                   i_work(1:N_I_VARS*swr % n_particles))
     call Backup_Mod_Read_Log_Array(fh, disp, vc,         &
                                    'particle_log_data',  &
-                                   l_work(1:n_l_vars*swr % n_particles))
+                                   l_work(1:N_L_VARS*swr % n_particles))
     call Backup_Mod_Read_Real_Array(fh, disp, vc,          &
                                     'particle_real_data',  &
-                                    r_work(1:n_r_vars*swr % n_particles))
+                                    r_work(1:N_R_VARS*swr % n_particles))
 
     ! Pack particle data in arrays
     do k = 1, swr % n_particles
@@ -47,16 +47,16 @@
       ! Take aliases for the particle
       part => swr % particle(k)
 
-      i = (k-1) * n_i_vars
+      i = (k-1) * N_I_VARS
       part % proc = i_work(i + 1)
       part % buff = i_work(i + 2)
       part % cell = i_work(i + 3)  ! holds global number for the moment
 
-      i = (k-1) * n_l_vars
+      i = (k-1) * N_L_VARS
       part % deposited = l_work(i + 1)
       part % escaped   = l_work(i + 2)
 
-      i = (k-1) * n_r_vars
+      i = (k-1) * N_R_VARS
       part % x_n  = r_work(i + 1)
       part % y_n  = r_work(i + 2)
       part % z_n  = r_work(i + 3)

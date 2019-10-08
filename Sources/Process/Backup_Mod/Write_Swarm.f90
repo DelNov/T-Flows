@@ -36,16 +36,16 @@
     part => swr % particle(k)
 
     if(part % proc .eq. this_proc) then
-      i = (k-1) * n_i_vars
+      i = (k-1) * N_I_VARS
       i_work(i + 1) = part % proc  ! where it resides
       i_work(i + 2) = part % buff  ! where it wants to go
       i_work(i + 3) = grid % comm % cell_glo(part % cell)
 
-      i = (k-1) * n_l_vars
+      i = (k-1) * N_L_VARS
       l_work(i + 1) = part % deposited
       l_work(i + 2) = part % escaped
 
-      i = (k-1) * n_r_vars
+      i = (k-1) * N_R_VARS
       r_work(i + 1) = part % x_n
       r_work(i + 2) = part % y_n
       r_work(i + 3) = part % z_n
@@ -60,19 +60,19 @@
   !-----------------------!
   !   Exchange the data   !
   !-----------------------!
-  call Comm_Mod_Global_Sum_Int_Array (swr % n_particles * n_i_vars, i_work)
-  call Comm_Mod_Global_Sum_Real_Array(swr % n_particles * n_r_vars, r_work)
+  call Comm_Mod_Global_Sum_Int_Array (swr % n_particles * N_I_VARS, i_work)
+  call Comm_Mod_Global_Sum_Real_Array(swr % n_particles * N_R_VARS, r_work)
 
   if(swr % n_particles > 0) then
     call Backup_Mod_Write_Int_Array(fh, disp, vc,         &
                                     'particle_int_data',  &
-                                    i_work(1:n_i_vars*swr % n_particles))
+                                    i_work(1:N_I_VARS*swr % n_particles))
     call Backup_Mod_Write_Log_Array(fh, disp, vc,         &
                                     'particle_log_data',  &
-                                    l_work(1:n_l_vars*swr % n_particles))
+                                    l_work(1:N_L_VARS*swr % n_particles))
     call Backup_Mod_Write_Real_Array(fh, disp, vc,          &
                                      'particle_real_data',  &
-                                     r_work(1:n_r_vars*swr % n_particles))
+                                     r_work(1:N_R_VARS*swr % n_particles))
   end if
 
   end subroutine

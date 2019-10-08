@@ -14,7 +14,7 @@
   use Swarm_Mod,     only: Swarm_Mod_Find_Nearest_Node,  &
                            Swarm_Mod_Find_Nearest_Cell,  &
                            Swarm_Type, Particle_Type,    &
-                           i_work, l_work, r_work, n_i_vars, n_l_vars, n_r_vars
+                           i_work, l_work, r_work, N_I_VARS, N_L_VARS, N_R_VARS
   use Grid_Mod,      only: Grid_Type
   use Bulk_Mod,      only: Bulk_Type
   use Control_Mod

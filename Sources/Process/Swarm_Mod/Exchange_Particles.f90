@@ -34,12 +34,12 @@
       !   ... send will put data in this globall pool)      !
       !-----------------------------------------------------!
       if(part % proc .eq. this_proc) then
-        i = (k-1) * n_i_vars
+        i = (k-1) * N_I_VARS
         i_work(i + 1) = part % proc  ! where it resides
         i_work(i + 2) = part % buff  ! where it wants to go
         i_work(i + 3) = grid % comm % cell_glo(part % cell)
 
-        i = (k-1) * n_r_vars
+        i = (k-1) * N_R_VARS
         r_work(i +  1) = part % x_n
         r_work(i +  2) = part % y_n
         r_work(i +  3) = part % z_n
@@ -64,8 +64,8 @@
     !-----------------------!
     !   Exchange the data   !
     !-----------------------!
-    call Comm_Mod_Global_Sum_Int_Array (swarm % n_particles * n_i_vars, i_work)
-    call Comm_Mod_Global_Sum_Real_Array(swarm % n_particles * n_r_vars, r_work)
+    call Comm_Mod_Global_Sum_Int_Array (swarm % n_particles * N_I_VARS, i_work)
+    call Comm_Mod_Global_Sum_Real_Array(swarm % n_particles * N_R_VARS, r_work)
 
     !-----------------------------------------!
     !   Distribute global data on particles   !
@@ -75,7 +75,7 @@
       ! Take alias
       part => swarm % particle(k)
 
-      i = (k-1) * n_i_vars
+      i = (k-1) * N_I_VARS
       part % proc = i_work(i + 1)
       part % buff = i_work(i + 2)
       part % cell = i_work(i + 3)  ! holds global number for the moment
@@ -118,7 +118,7 @@
         part % buff = 0
       end if
 
-      i = (k-1) * n_r_vars
+      i = (k-1) * N_R_VARS
       part % x_n     = r_work(i +  1)
       part % y_n     = r_work(i +  2)
       part % z_n     = r_work(i +  3)
