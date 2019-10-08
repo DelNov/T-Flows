@@ -29,8 +29,10 @@
       ! Take aliases for the particle
       part => swarm % particle(k)
 
-      ! Pack data for sending (all processors which ...
-      ! ... send will put data in this globall pool)
+      !-----------------------------------------------------!
+      !   Pack data for sending (all processors which ...   !
+      !   ... send will put data in this globall pool)      !
+      !-----------------------------------------------------!
       if(part % proc .eq. this_proc) then
         i = (k-1) * n_i_vars
         i_work(i + 1) = part % proc  ! where it resides
@@ -59,11 +61,15 @@
 
     end do    ! through particles
 
-    ! Exchange the data
+    !-----------------------!
+    !   Exchange the data   !
+    !-----------------------!
     call Comm_Mod_Global_Sum_Int_Array (swarm % n_particles * n_i_vars, i_work)
     call Comm_Mod_Global_Sum_Real_Array(swarm % n_particles * n_r_vars, r_work)
 
-    ! Distribute global data on particles
+    !-----------------------------------------!
+    !   Distribute global data on particles   !
+    !-----------------------------------------!
     do k = 1, swarm % n_particles
 
       ! Take alias
@@ -74,8 +80,18 @@
       part % buff = i_work(i + 2)
       part % cell = i_work(i + 3)  ! holds global number for the moment
 
-      ! If particle crossed processor boundary
-      if(part % buff .ne. part % proc) then
+      ! Particle was in this processor and wants to stay here
+      if(part % proc .eq. this_proc .and. part % buff .eq. this_proc) then
+        do c = 1, grid % n_cells
+          if(grid % comm % cell_glo(c) .eq. part % cell) then
+            part % cell = c
+            exit
+          end if
+        end do
+        call Swarm_Mod_Find_Nearest_Node(swarm, k)
+
+      ! Particle was not in this processor but wants to enter here
+      else if(part % proc .ne. this_proc .and. part % buff .eq. this_proc) then
 
         ! Set particle processor to correct value
         part % proc = part % buff
@@ -87,13 +103,19 @@
           do c = 1, grid % n_cells
             if(grid % comm % cell_glo(c) .eq. part % cell) then
               part % cell = c
+              exit
             end if
           end do
 
           ! ... and the closest node.
           call Swarm_Mod_Find_Nearest_Node(swarm, k)
-
+        else
+          part % proc = 0
+          part % buff = 0
         end if
+      else
+        part % proc = 0
+        part % buff = 0
       end if
 
       i = (k-1) * n_r_vars
