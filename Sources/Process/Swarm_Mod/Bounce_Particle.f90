@@ -30,6 +30,8 @@
   c2 = part % bnd_cell  ! index of the closest boundary cell for reflection
   s  = part % bnd_face  ! index of the closest boundary face
 
+  if(s .eq. 0) return
+
   ! Normal to the wall face
   ! (It points outwards, but you change the sign!!!)
   nx = -grid % sx(s) / grid % s(s)
