@@ -10,7 +10,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: grid
   type(Particle_Type), pointer :: part
-  integer                      :: i, k, n_part
+  integer                      :: i, k, n_part, n_parts_in_buffers
 !==============================================================================!
 
   ! Take aliases
@@ -38,6 +38,7 @@
                                     r_work(1:n_r_vars*swr % n_particles))
 
     ! Pack particle data in arrays
+    n_parts_in_buffers = 0
     do k = 1, swr % n_particles
 
       ! Take aliases for the particle
@@ -64,7 +65,7 @@
 
       ! Searching for the closest cell and node to place the moved particle
       part % node = 0  ! force it to look for all cells
-      call Swarm_Mod_Find_Nearest_Cell(swr, k)
+      call Swarm_Mod_Find_Nearest_Cell(swr, k, n_parts_in_buffers)
       call Swarm_Mod_Find_Nearest_Node(swr, k)
     end do
   end if
