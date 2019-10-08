@@ -1,12 +1,13 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Find_Nearest_Cell(swarm, k)
+  subroutine Swarm_Mod_Find_Nearest_Cell(swarm, k, n_parts_in_buffers)
 !------------------------------------------------------------------------------!
 !   Finds a cell closest to a particle.                                        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Swarm_Type), target :: swarm
-  integer                  :: k      ! particle number
+  integer                  :: k                   ! particle number
+  integer                  :: n_parts_in_buffers
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: grid
   type(Particle_Type), pointer :: part
@@ -92,6 +93,7 @@
     ! (and part % proc in this case) you entered the buffer
     if(grid % comm % proces(cc) .ne. part % proc) then
       part % buff = grid % comm % proces(cc)  ! store buffer process
+      n_parts_in_buffers = n_parts_in_buffers + 1
     end if
 
   !---------------------------------------------------------!
@@ -106,7 +108,7 @@
     min_dc = HUGE  ! initialize minimum distance to cells inside
     min_db = HUGE  ! initialize minimum distance to boundary cells
 
-    do c = -grid % n_bnd_cells, grid % n_cells
+    do c = -grid % n_bnd_cells, grid % n_cells ! - grid % comm % n_buff_cells
 
       if(c .ne. 0) then
 
@@ -165,9 +167,11 @@
     end if
 
     part % proc = 0
+    part % buff = 0
     if( (min_dc .eq. min_dc_glob) .and.  &
         (min_db .eq. min_db_glob) ) then
       part % proc = this_proc
+      part % buff = this_proc
     end if
 
   end if  ! closest node is (not) known
