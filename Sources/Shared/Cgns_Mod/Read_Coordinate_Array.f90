@@ -43,17 +43,17 @@
                        error)          !(out)
 
   if (error.ne.0) then
-    print "(a)", " # Failed to read DoubleReal Coord", coord_name
+    print *, '# Failed to read DoubleReal Coord', coord_name
     call Cg_Error_Exit_F()
   endif
 
   if(verbose) then
-    print "(a)", " #=================================="
-    print "(a,a16)", " # Coordinate name: ", trim(coord_name)
-    print "(a)", " #----------------------------------"
-    print "(a)", " #   Data table (sample): "
+    print '(a)', ' #=================================='
+    print '(a,a16)', ' # Coordinate name: ', trim(coord_name)
+    print '(a)', ' #----------------------------------'
+    print '(a)', ' #   Data table (sample): '
       do n = 1, 6
-        print "(a,1es15.5)", " # ", coordinates(n)
+        print '(a,1es15.5)', ' # ', coordinates(n)
       end do
   end if
 
@@ -71,7 +71,7 @@
       i = cnt_nodes + 1
       j = cnt_nodes + j
       grid % zn(i:j) = coordinates(:)
-      if(verbose) print "(a)", " #---------------------------------------------"
+      if(verbose) print *, '#---------------------------------------------'
   end select
 
   deallocate(coordinates)

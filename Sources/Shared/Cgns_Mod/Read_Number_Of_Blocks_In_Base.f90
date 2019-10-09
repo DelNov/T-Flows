@@ -22,7 +22,7 @@
                    error)       !(out)
 
   if (error .ne. 0) then
-    print *, "# Failed to get blocks number"
+    print *, '# Failed to get blocks number'
     call Cg_Error_Exit_F()
   endif
 
@@ -31,7 +31,7 @@
 
   ! Print some info
   if(verbose) then
-    print "(a,i8)", " #   Number of blocks:", cgns_base(base) % n_blocks
+    print '(a,i8)', ' #   Number of blocks:', cgns_base(base) % n_blocks
   end if
 
   ! Allocate memory for the blocks in current base

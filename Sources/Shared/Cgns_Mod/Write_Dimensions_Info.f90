@@ -35,7 +35,7 @@
   call Cg_Goto_F(file_id,  & !(in )
                  base_id,  & !(in )
                  error,    & !(out)
-                 "end")      !(out)
+                 'end')      !(out)
 
   ! Write Units
   call Cg_Units_Write_F(Kilogram,  & !(in )
@@ -61,16 +61,16 @@
     call Cg_Goto_F(file_id,              & !(in )
                    base_id,              & !(in )
                    error,                & !(out)
-                   "Zone_t",             & !(in )
+                   'Zone_t',             & !(in )
                    block_id,             & !(in )
-                   "GridCoordinates_t",  & !(in )
+                   'GridCoordinates_t',  & !(in )
                    1,                    & !(in )
-                   "DataArray_t",        & !(in )
+                   'DataArray_t',        & !(in )
                    coord_id,             & !(in )
-                   "end")                  !(in )
+                   'end')                  !(in )
 
     if (error .ne. 0) then
-      print *, "#         Failed to navigate to GridCoordinates_t subnodes"
+      print *, '#         Failed to navigate to GridCoordinates_t subnodes'
       call Cg_Error_Exit_F()
     end if
 
@@ -78,7 +78,7 @@
     call Cg_Dataclass_Write_F(Dimensional,  & !(in )
                               error)          !(out)
     if (error .ne. 0) then
-      print *, "#         Failed to write DataClass"
+      print *, '#         Failed to write DataClass'
       call Cg_Error_Exit_F()
     end if
 
@@ -92,7 +92,7 @@
                               error)         !(out)
 
     if (error .ne. 0) then
-      print *, "#         Failed to write DimensionalExponents"
+      print *, '#         Failed to write DimensionalExponents'
       call Cg_Error_Exit_F()
     end if
 
@@ -111,7 +111,7 @@
                     error)          !(out)
 
     if (error .ne. 0) then
-      print *, "#         Failed to read number of fields"
+      print *, '#         Failed to read number of fields'
       call Cg_Error_Exit_F()
     end if
 
@@ -127,7 +127,7 @@
                          error)          !(out)
 
     if (error .ne. 0) then
-      print *, "#         Failed to read fieldname"
+      print *, '#         Failed to read fieldname'
       call Cg_Error_Exit_F()
     end if
 
@@ -135,49 +135,49 @@
     exponents   =0.
     dimensional_bool = .true.
 
-    if (fieldname .eq. "Density") then
+    if (fieldname .eq. 'Density') then
       exponents(1)=1.
       exponents(2)=-3.
-    else if (fieldname(1:8) .eq. "Velocity") then
+    else if (fieldname(1:8) .eq. 'Velocity') then
       exponents(2)=1.
       exponents(3)=-1.
-    else if (fieldname .eq. "Pressure") then
+    else if (fieldname .eq. 'Pressure') then
       exponents(1)=1.
       exponents(2)=-1.
       exponents(3)=-2.
-    else if (fieldname .eq. "Temperature") then
+    else if (fieldname .eq. 'Temperature') then
       exponents(4)=1.
-    else if (fieldname .eq. "MeanTemperature") then
+    else if (fieldname .eq. 'MeanTemperature') then
       exponents(4)=1.
-    else if (fieldname .eq. "MeanTemperature") then
+    else if (fieldname .eq. 'MeanTemperature') then
       exponents(4)=1.
-    else if (fieldname .eq. "TemperatureFluctuations") then
+    else if (fieldname .eq. 'TemperatureFluctuations') then
       exponents(4)=2.
-    else if (fieldname(1:17) .eq. "TurbulentHeatFlux") then
+    else if (fieldname(1:17) .eq. 'TurbulentHeatFlux') then
       exponents(2)=1.
       exponents(3)=-1.
       exponents(4)=1.
-    else if (fieldname .eq. "TurbulentEnergyKinetic") then
+    else if (fieldname .eq. 'TurbulentEnergyKinetic') then
       exponents(2)=2.
       exponents(3)=-2.
-    else if (fieldname .eq. "TurbulentDissipation") then
+    else if (fieldname .eq. 'TurbulentDissipation') then
       exponents(2)=2.
       exponents(3)=-3.
-    else if (fieldname .eq. "TurbulentEnergyKineticProduction") then
+    else if (fieldname .eq. 'TurbulentEnergyKineticProduction') then
       exponents(2)=2.
       exponents(3)=-3.
-    else if (fieldname .eq. "TurbulentQuantityV2") then
+    else if (fieldname .eq. 'TurbulentQuantityV2') then
       exponents(2)=2.
       exponents(3)=-2.
-    else if (fieldname .eq. "TurbulentViscosity") then
+    else if (fieldname .eq. 'TurbulentViscosity') then
       exponents(2)=2.
       exponents(3)=-1.
-    else if (fieldname .eq. "VorticityMagnitude") then
+    else if (fieldname .eq. 'VorticityMagnitude') then
       exponents(3)=-1.
-    else if (fieldname(1:14) .eq. "ReynoldsStress") then
+    else if (fieldname(1:14) .eq. 'ReynoldsStress') then
       exponents(2)=2.
       exponents(3)=-2.
-    else if (fieldname .eq. "WallDistance") then
+    else if (fieldname .eq. 'WallDistance') then
       exponents(2)=1.
     else ! all others are NonDimensional
       dimensional_bool = .false.
@@ -187,16 +187,16 @@
     call Cg_Goto_F(file_id,           & !(in )
                    base_id,           & !(in )
                    error,             & !(out)
-                   "Zone_t",          & !(in )
+                   'Zone_t',          & !(in )
                    block_id,          & !(in )
-                   "FlowSolution_t",  & !(in )
+                   'FlowSolution_t',  & !(in )
                    1,                 & !(in )
-                   "DataArray_t",     & !(in )
+                   'DataArray_t',     & !(in )
                    c,                 & !(in )
-                   "end")
+                   'end')
 
     if (error .ne. 0) then
-      print *, "#         Failed to navigate to FlowSolution_t subnodes"
+      print *, '#         Failed to navigate to FlowSolution_t subnodes'
       call Cg_Error_Exit_F()
     end if
 
@@ -206,7 +206,7 @@
       call Cg_Dataclass_Write_F(Dimensional,  & !(in )
                                 error)          !(out)
       if (error .ne. 0) then
-        print *, "#         Failed to write DataClass"
+        print *, '#         Failed to write DataClass'
         call Cg_Error_Exit_F()
       end if
 
@@ -215,7 +215,7 @@
                                 exponents,   & !(in )
                                 error)         !(out)
       if (error .ne. 0) then
-        print *, "#         Failed to write DimensionalExponents"
+        print *, '#         Failed to write DimensionalExponents'
         call Cg_Error_Exit_F()
       end if
 
@@ -225,7 +225,7 @@
       call Cg_Dataclass_Write_F(NondimensionalParameter,  & !(in )
                                 error)                      !(out)
       if (error .ne. 0) then
-        print *, "#         Failed to write DataClass"
+        print *, '#         Failed to write DataClass'
         call Cg_Error_Exit_F()
       end if
 

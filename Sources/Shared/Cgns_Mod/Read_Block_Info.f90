@@ -20,15 +20,15 @@
   block_id = block
 
   ! Read block information
-  call Cg_Zone_Read_F(file_id,          & 
+  call Cg_Zone_Read_F(file_id,          &
                       base_id,          &
                       block_id,         &
                       block_name,       &
                       block_mesh_info,  &
-                      error)                
+                      error)
 
   if (error .ne. 0) then
-    print "(a)", " # Failed read block info"
+    print *, '# Failed read block info'
     call Cg_Error_Exit_F()
   endif
 
@@ -41,21 +41,21 @@
   cnt_cells = cnt_cells + cgns_base(base) % block(block) % mesh_info(2)
 
   if(verbose) then
-    print "(a)", " #====================================================="
-    print "(a,a36)", " #     Block name: ",  &
+    print '(a)', ' #====================================================='
+    print '(a,a36)', ' #     Block name: ',  &
              trim( cgns_base(base) % block(block) % name)
-    print "(a)", " #-----------------------------------------------------"
-    print "(a,i35)", " #     Block index: ", block
-    print "(a,i41)", " #     Nodes: ", &
+    print '(a)', ' #-----------------------------------------------------'
+    print '(a,i35)', ' #     Block index: ', block
+    print '(a,i41)', ' #     Nodes: ', &
       cgns_base(base) % block(block) % mesh_info(1)
-    print "(a,i41)", " #     Cells: ", &
+    print '(a,i41)', ' #     Cells: ', &
       cgns_base(base) % block(block) % mesh_info(2)
-    print "(a,i21)", " #     Boundary nodes(if sorted): ",  &
+    print '(a,i21)', ' #     Boundary nodes(if sorted): ',  &
       cgns_base(base) % block(block) % mesh_info(3)
   end if
 
   if (cgns_base(base) % block(block) % mesh_info(3) .ne. 0) then
-    print "(a)", " # Boundary condition nodes != 0 -> Unsupported"
+    print *, '# Boundary condition nodes != 0 -> Unsupported'
     stop
   endif
 

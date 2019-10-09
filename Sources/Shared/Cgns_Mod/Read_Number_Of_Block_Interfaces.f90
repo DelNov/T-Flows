@@ -25,17 +25,17 @@
                    error)                   !(out)
 
   if (error.ne.0) then
-    print "(a,i10)", " #     Failed to number of interfaces in block: ", block
+    print '(a,i10)', ' #     Failed to number of interfaces in block: ', block
     call Cg_Error_Exit_F()
   endif
 
   if(verbose) then
-    print "(a,i27)", ' #     Interfaces in block: ', number_of_interfaces
+    print '(a,i27)', ' #     Interfaces in block: ', number_of_interfaces
   end if
 
   cgns_base(base) % block(block) % n_interfaces = number_of_interfaces
 
-  ! Initialization of "interface" structure
+  ! Initialization of 'interface' structure
   allocate( cgns_base(base) % block(block) % interface(number_of_interfaces) )
 
   cgns_base(base) % block(block) % interface(1:number_of_interfaces) % &

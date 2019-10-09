@@ -25,7 +25,7 @@
                    error)          !(out)
 
   if (error.ne.0) then
-    print "(a)", " #     Failed to obtain number of boundary conditions"
+    print *, '#     Failed to obtain number of boundary conditions'
     call Cg_Error_Exit_F()
   endif
 
@@ -33,7 +33,7 @@
   cgns_base(base) % block(block) % n_bnd_conds = n_bnd_conds
 
   if(verbose) then
-    print "(a,i4)", " #     Number of boundary conditions in the block: ",  &
+    print '(a,i4)', ' #     Number of boundary conditions in the block: ',  &
              cgns_base(base) % block(block) % n_bnd_conds
   end if
 

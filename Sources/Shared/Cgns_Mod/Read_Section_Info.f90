@@ -43,7 +43,7 @@
                          parent_flag,  & !(out)
                          error)          !(out)
   if (error.ne.0) then
-    print "(a)", " # Failed to read section ", sect, " info"
+    print *, '# Failed to read section ', sect, ' info'
     call Cg_Error_Exit_F()
   endif
 
@@ -131,18 +131,18 @@
         end if
 
         if(verbose) then
-          print "(a)", " #====================================================="
-          print "(a,a28)", " #       Bnd section name: ", trim(sect_name)
-          print "(a)", " #-----------------------------------------------------"
-          print "(a,i28)", " #       Bnd section index ", sect
-          print "(a,a28)", &
-            " #       Bnd section type: ", trim(ElementTypeName(cell_type))
-          print "(a,i21)", " #       Bnd section has # faces: ", bc_found
-          print "(a,a25)", " #       They belong to b.c.: ", &
+          print '(a)', ' #====================================================='
+          print '(a,a28)', ' #       Bnd section name: ', trim(sect_name)
+          print '(a)', ' #-----------------------------------------------------'
+          print '(a,i28)', ' #       Bnd section index ', sect
+          print '(a,a28)', &
+            ' #       Bnd section type: ', trim(ElementTypeName(cell_type))
+          print '(a,i21)', ' #       Bnd section has # faces: ', bc_found
+          print '(a,a25)', ' #       They belong to b.c.: ', &
             trim(cgns_base(base) % block(block) % bnd_cond(bc) % name)
-          print "(a,i34)", " #       First cell: ",  &
+          print '(a,i34)', ' #       First cell: ',  &
             cgns_base(base) % block(block) % section(sect) % first_cell
-          print "(a,i35)", " #       Last cell: ",  &
+          print '(a,i35)', ' #       Last cell: ',  &
             cgns_base(base) % block(block) % section(sect) % last_cell
         end if ! verbose
       end if !bc_found .ne. 0
@@ -206,17 +206,17 @@
         end if ! .not. found_in_global_int_list
 
         if(verbose) then
-         print "(a)",  " #-----------------------------------------------------"
-         print "(a,a22)", " #       Interface section name: ", trim(sect_name)
-         print "(a)",  " #-----------------------------------------------------"
-         print "(a,i21)", " #       Interface section index: ", sect
-         print "(a,a29)", " #       Interface type:  ", &
+         print '(a)',  ' #-----------------------------------------------------'
+         print '(a,a22)', ' #       Interface section name: ', trim(sect_name)
+         print '(a)',  ' #-----------------------------------------------------'
+         print '(a,i21)', ' #       Interface section index: ', sect
+         print '(a,a29)', ' #       Interface type:  ', &
            trim(ElementTypeName(cell_type))
-         print "(a,i34)", " #       First cell: ",  &
+         print '(a,i34)', ' #       First cell: ',  &
            cgns_base(base) % block(block) % section(sect) % first_cell
-         print "(a,i35)", " #       Last cell: ",  &
+         print '(a,i35)', ' #       Last cell: ',  &
            cgns_base(base) % block(block) % section(sect) % last_cell
-         print "(a,l25)", " #       Marked for deletion: ", cgns_base(base) % &
+         print '(a,l25)', ' #       Marked for deletion: ', cgns_base(base) % &
             block(block) % interface(int) % marked_for_deletion
         end if ! verbose
       end if ! int_found .ne. 0
@@ -234,15 +234,15 @@
          ElementTypeName(cell_type) .eq. 'MIXED'  ) then
 
     if(verbose) then
-      print "(a)",     " #-----------------------------------------------------"
-      print "(a,a24)", " #       3d cell section name: ", trim(sect_name)
-      print "(a)",     " #-----------------------------------------------------"
-      print "(a,i28)", " #       Cell section idx: ", sect
-      print "(a,a27)", " #       Cell section type: ", &
+      print '(a)',     ' #-----------------------------------------------------'
+      print '(a,a24)', ' #       3d cell section name: ', trim(sect_name)
+      print '(a)',     ' #-----------------------------------------------------'
+      print '(a,i28)', ' #       Cell section idx: ', sect
+      print '(a,a27)', ' #       Cell section type: ', &
         trim(ElementTypeName(cell_type))
-      print "(a,i34)", " #       First cell: ",  &
+      print '(a,i34)', ' #       First cell: ',  &
         cgns_base(base) % block(block) % section(sect) % first_cell
-      print "(a,i35)", " #       Last cell: ",  &
+      print '(a,i35)', ' #       Last cell: ',  &
         cgns_base(base) % block(block) % section(sect) % last_cell
     end if
 
@@ -260,9 +260,9 @@
     end if ! pos_of_last_3d_cell .eq. 0
 
     if(verbose) then
-      print "(a,i24)", " #       Corrected first cell: ",  &
+      print '(a,i24)', ' #       Corrected first cell: ',  &
         cgns_base(base) % block(block) % section(sect) % first_cell
-      print "(a,i25)", " #       Corrected last cell: ",  &
+      print '(a,i25)', ' #       Corrected last cell: ',  &
         cgns_base(base) % block(block) % section(sect) % last_cell
     end if ! verbose
 

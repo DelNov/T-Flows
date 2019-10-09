@@ -27,12 +27,12 @@
 
 !==============================================================================!
 
-  print "(a)", " #=============================================="
-  print "(a)", " # Merging blocks since they have common interfaces"
-  print "(a)", " # Hint: Join blocks in mesher to avoid issues"
-  print "(a,i26)", " # Old number of nodes: ", grid % n_nodes
-  print "(a)", " #----------------------------------------------"
-  ! "/2" because mixed interface type had weight 1, while quad and tri had 2
+  print '(a)', ' #=============================================='
+  print '(a)', ' # Merging blocks since they have common interfaces'
+  print '(a)', ' # Hint: Join blocks in mesher to avoid issues'
+  print '(a,i26)', ' # Old number of nodes: ', grid % n_nodes
+  print '(a)', ' #----------------------------------------------'
+  ! '/2' because mixed interface type had weight 1, while quad and tri had 2
   cnt_int = cnt_int / 2
 
   !----------------------------------------------------------------------------!
@@ -98,9 +98,9 @@
   call Grid_Mod_Estimate_Big_And_Small(grid, big, small)
 
   if (verbose) then
-    print "(a)", " # Cells before Cgns_Mod_Merge_Nodes_New function (sample)"
+    print '(a)', ' # Cells before Cgns_Mod_Merge_Nodes_New function (sample)'
     do c = 1, min(6, grid % n_cells)
-      print "(a,8i8)", " # ", &
+      print '(a,8i8)', ' # ', &
         (grid % cells_n(i,c), i = 1, grid % cells_n_nodes(c))
     end do
   end if
@@ -108,7 +108,7 @@
   ! For each unique interface
   do int = 1, cnt_int
 
-    ! Array new_seq is a map for nodes "n -> new_seq(n)"
+    ! Array new_seq is a map for nodes 'n -> new_seq(n)'
     allocate(new_seq (grid % n_nodes)); new_seq = 0
     allocate(nodes_to_remove(grid % n_nodes));  nodes_to_remove = .false.
 
@@ -122,7 +122,7 @@
 
     if (verbose) then
 
-      print "(a,i8)", " # Interface to keep: ", int
+      print '(a,i8)', ' # Interface to keep: ', int
       v = 0
       do c = 1, cnt_int_cells
 
@@ -130,14 +130,14 @@
           n1 = interface_cells(1, c, k, int)
 
           if (n1 > 0 .and. v < 7) then
-            print "(a,4i8)", " # ", interface_cells(1, c, 1:4, int)
+            print '(a,4i8)', ' # ', interface_cells(1, c, 1:4, int)
             v = v + 1
           end if ! n1 > 0
 
         end do ! k
       end do ! c
 
-      print "(a,i8)", " # Interface to remove: ", int
+      print '(a,i8)', ' # Interface to remove: ', int
       v = 0
       do c = 1, cnt_int_cells
 
@@ -145,7 +145,7 @@
           n2 = interface_cells(2, c, k, int)
 
           if (n2 > 0 .and. v < 7) then
-            print "(a,4i8)", " # ", interface_cells(2, c, 1:4, int)
+            print '(a,4i8)', ' # ', interface_cells(2, c, 1:4, int)
             v = v + 1
           end if ! n1 > 0
 
@@ -285,8 +285,8 @@
     !------------------------!
     !   Reinitialize nodes   !
     !------------------------!
-    print "(a,i7)", " # New number of nodes: ", cnt_node - 1
-    print "(a)", " #-----------------------------------------------------------"
+    print '(a,i7)', ' # New number of nodes: ', cnt_node - 1
+    print '(a)', ' #-----------------------------------------------------------'
 
     deallocate(grid % xn)
     deallocate(grid % yn)
@@ -330,7 +330,7 @@
   if (verbose) then
     print *, '# Cells after Cgns_Mod_Merge_Nodes_New function (sample)'
     do c = 1, min(6, grid % n_cells)
-      print "(a,8i8)", " # ", &
+      print '(a,8i8)', ' # ', &
         (grid % cells_n(i,c), i = 1, grid % cells_n_nodes(c))
     end do
   end if

@@ -48,23 +48,23 @@
                       error)               !(out)
 
   if (error .ne. 0) then
-    print "(a)", " # Failed to read interface info"
+    print *, '# Failed to read interface info'
     call Cg_Error_Exit_F()
     stop
   end if
 
-  !"For a int_ptset_type of PointRange, int_n_nodes is always two.
+  !'For a int_ptset_type of PointRange, int_n_nodes is always two.
   ! For a int_ptset_type of PointList, int_n_nodes is the number of
-  ! points in the PointList"
+  ! points in the PointList'
 
   if (int_n_nodes .eq. 2) then
-    print *, "# Interface is set as PointRange -> Unsupported"
+    print *, '# Interface is set as PointRange -> Unsupported'
     stop
     ! To do: int_n_nodes .eq. 2
   end if
 
-  ! Cut substring from last "dom-"
-  int_name_short = int_name(index(int_name,"dom-", &
+  ! Cut substring from last 'dom-'
+  int_name_short = int_name(index(int_name,'dom-', &
     back = .true.):)
 
   ! allocate space for interface specified as PointList or PointRange
@@ -79,7 +79,7 @@
                             error)            !(out)
 
   if (error .ne. 0) then
-    print "(a)", " # Failed to read interface PointList"
+    print *, '# Failed to read interface PointList'
     call Cg_Error_Exit_F()
     stop
   end if
@@ -108,17 +108,17 @@
     trim(int_name_short)
 
   if(verbose) then
-    print "(a)",     " #======================================================="
-    print "(a, a32)"," #       Interface name: ", trim(int_name)
-    print "(a, a32)"," #       Shortened to:   ", trim(int_name_short)
-    print "(a, a32)"," #       Donor name:     ", trim(donor_name)
-    print "(a, i31)", " #       Interface nodes: ", &
+    print '(a)',     ' #======================================================='
+    print '(a, a32)',' #       Interface name: ', trim(int_name)
+    print '(a, a32)',' #       Shortened to:   ', trim(int_name_short)
+    print '(a, a32)',' #       Donor name:     ', trim(donor_name)
+    print '(a, i31)', ' #       Interface nodes: ', &
              cgns_base(base) % block(block) % interface(int_id) % n_nodes
-    print "(a,a30)", " #       Interface Extent: ",  "PointList"
-    print "(a)",     " #       Point list (sample): "
-    print "(a,a12,6i7)", " # ", " ", (point_list(i), &
+    print '(a,a30)', ' #       Interface Extent: ',  'PointList'
+    print '(a)',     ' #       Point list (sample): '
+    print '(a,a12,6i7)', ' # ', ' ', (point_list(i), &
       i = 1, min(6,int_n_nodes))
-    print "(a)",     " #-------------------------------------------------------"
+    print '(a)',     ' #-------------------------------------------------------'
   end if
 
   ! Free memory

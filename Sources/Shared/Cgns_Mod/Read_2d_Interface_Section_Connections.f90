@@ -46,8 +46,8 @@
   if ( ElementTypeName(cell_type) .eq. 'TRI_3' ) n_nodes = 3
 
   allocate(face_n(n_nodes, cnt)); face_n(:,:) = 0
-  !"For faces on the boundary of the domain,
-  ! the second parent is set to zero"
+  ! For faces on the boundary of the domain,
+  ! the second parent is set to zero
   allocate(parent_data(2*cnt, 2)); parent_data(:,:) = 0
 
   ! Read element data
@@ -60,7 +60,7 @@
                           error)               !(out)
 
   if (error.ne.0) then
-    print "(a)", " # Failed to read 2d section connections from: ", sect
+    print *, '# Failed to read 2d section connections from: ', sect
     call Cg_Error_Exit_F()
   endif
 
@@ -81,25 +81,25 @@
       int_type = cgns_base(base) % block(block) % interface(int) % int_type
 
       if(verbose) then
-        print "(a)",     " #-----------------------------------------------"
-        print "(a,a24)", " # 2d cell section name: ", trim(sect_name)
-        print "(a)",     " #-----------------------------------------------"
-        print "(a,a30)", " # Interface name: ", trim(int_name)
-        print "(a,i29)", " # Interface index: ", &
+        print '(a)',     ' #-----------------------------------------------'
+        print '(a,a24)', ' # 2d cell section name: ', trim(sect_name)
+        print '(a)',     ' #-----------------------------------------------'
+        print '(a,a30)', ' # Interface name: ', trim(int_name)
+        print '(a,i29)', ' # Interface index: ', &
           cgns_base(base) % block(block) % interface(int) % id
-        print "(a,i31)", " # Section index: ", sect
-        print "(a,a30)", " # Interface type: ", &
+        print '(a,i31)', ' # Section index: ', sect
+        print '(a,a30)', ' # Interface type: ', &
           trim(ElementTypeName(cell_type))
-        print "(a,l25)", " # Marked for deletion: ", cgns_base(base) % &
+        print '(a,l25)', ' # Marked for deletion: ', cgns_base(base) % &
           block(block) % interface(int) % marked_for_deletion
-        !print "(a)",     " # Interface cells connection table (sample): "
+        !print '(a)',     ' # Interface cells connection table (sample): '
         !do loc = 1, min(6, cnt)
-        !  print "(a,a16,4i8)", " # ", " ", &
+        !  print '(a,a16,4i8)', ' # ', ' ', &
         !    (face_n(n,loc), n = 1, n_nodes)
         !end do
-        !print *, "#       Interface parent data (sample): "
+        !print *, '#       Interface parent data (sample): '
         !do loc = 1, min(6, cnt)
-        !    print "(a9,8i7)", " ",parent_data(loc, 1)
+        !    print '(a9,8i7)', ' ',parent_data(loc, 1)
         !end do
       end if ! verbose
 
@@ -133,7 +133,6 @@
       cnt_int_cells = cnt_int_cells + cnt
     end if ! int_found
   end do ! int = 1, cgns_base(base) % block(block) % n_interfaces
-
 
   deallocate(face_n)
   deallocate(parent_data)

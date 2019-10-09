@@ -11,15 +11,15 @@
   ! Get number of CGNS bases in file
   call Cg_Nbases_F(file_id,  &
                    n_bases,  &
-                   ierror)   
+                   ierror)
 
   if (ierror .ne. 0) then
-    print "(a)", " # Failed to get bases number"
+    print *, '# Failed to get bases number'
     call Cg_Error_Exit_F()
   endif
 
   if(verbose) then 
-    print "(a,i3)", " # Number of bases: ", n_bases
+    print '(a,i3)', ' # Number of bases: ', n_bases
   end if
 
   allocate(cgns_base(n_bases))

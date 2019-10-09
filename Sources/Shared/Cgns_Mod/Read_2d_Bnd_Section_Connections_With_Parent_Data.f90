@@ -48,8 +48,8 @@
   if ( ElementTypeName(cell_type) .eq. 'TRI_3' ) n_nodes = 3
 
   allocate(face_n(n_nodes, cnt)); face_n(:,:) = 0
-  !"For faces on the boundary of the domain,
-  ! the second parent is set to zero"
+  ! For faces on the boundary of the domain,
+  ! the second parent is set to zero
   allocate(parent_data(2*cnt, 2)); parent_data(:,:) = 0
 
   ! Read element data
@@ -62,7 +62,7 @@
                           error)               !(out)
 
   if (error.ne.0) then
-    print "(a)", " # Failed to read 2d section connections from: ", sect
+    print *, '# Failed to read 2d section connections from: ', sect
     call Cg_Error_Exit_F()
   endif
 
@@ -82,24 +82,24 @@
 
     if(bc_found .ne. 0) then
       if(verbose) then
-        print "(a)",     " #==============================================="
-        print "(a,a24)", " # 2d cell section name: ", trim(sect_name)
-        print "(a,i28)", ' # Cell section idx: ', sect
-        print "(a,a28)", " # Bnd section type: ", &
+        print '(a)',     ' #==============================================='
+        print '(a,a24)', ' # 2d cell section name: ', trim(sect_name)
+        print '(a,i28)', ' # Cell section idx: ', sect
+        print '(a,a28)', ' # Bnd section type: ', &
           trim(ElementTypeName(cell_type))
-        print "(a,i25)", " # Bnd condition color: ", &
+        print '(a,i25)', ' # Bnd condition color: ', &
           cgns_base(base) % block(block) % bnd_cond(bc) % color
-        print "(a,i21)", " # Bnd section has # faces: ", &
+        print '(a,i21)', ' # Bnd section has # faces: ', &
           cgns_base(base) % block(block) % bnd_cond(bc) % n_nodes
-        print "(a,a25)", " # They belong to b.c.: ", &
+        print '(a,a25)', ' # They belong to b.c.: ', &
           trim(cgns_base(base) % block(block) % bnd_cond(bc) % name)
-        print "(a)",     " #-----------------------------------------------"
-        print "(a)",     " # Connections table (sample): "
+        print '(a)',     ' #-----------------------------------------------'
+        print '(a)',     ' # Connections table (sample): '
         do loc = 1, min(6, cnt)
-          print "(a,a16,4i8)", " # "," ", (face_n(n,loc), n = 1, n_nodes)
+          print '(a,a16,4i8)', ' # ',' ', (face_n(n,loc), n = 1, n_nodes)
         end do
-        print "(a)",     " #-----------------------------------------------"
-        print "(a)",     " # Parent data (sample): "
+        print '(a)',     ' #-----------------------------------------------'
+        print '(a)',     ' # Parent data (sample): '
       end if ! verbose
 
       do loc = 1, cnt
@@ -110,7 +110,7 @@
           cgns_base(base) % block(block) % bnd_cond(bc) % color
 
         if(loc < 7 .and. verbose) then
-          print "(a,a24,3i8)", " # ", " ", cell, dir, &
+          print '(a,a24,3i8)', ' # ', ' ', cell, dir, &
             grid % cells_bnd_color(dir, cell)
         end if ! verbose
 

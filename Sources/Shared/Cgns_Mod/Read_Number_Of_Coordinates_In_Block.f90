@@ -25,7 +25,7 @@
                     error)             !(out)
 
   if (error .ne. 0) then
-    print *, "# Failed to get number of coordinate arrays"
+    print *, '# Failed to get number of coordinate arrays'
     call Cg_Error_Exit_F()
   endif
 

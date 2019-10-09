@@ -29,7 +29,7 @@
                        coord_name,       & !(out)
                        error)              !(out)
   if (error .ne. 0) then
-    print *, "# Failed to get info in for coord_id"
+    print *, '# Failed to get info in for coord_id'
     call Cg_Error_Exit_F()
   endif
 
