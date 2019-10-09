@@ -5,7 +5,7 @@
 !   This function retrieves data as Load_Neu does, but for .cgns               !
 !   https://cgns.github.io/index.html                                          !
 !   Recomendations for Salome mesher:                                          !
-!   use "group" option during export to .cgns                                  !
+!   use 'group' option during export to .cgns                                  !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Name_Mod,  only: problem_name
@@ -108,29 +108,29 @@
   !                        !
   !------------------------!
   if(verbose) then
-    print "(a)",     " #======================================================="
-    print "(a)",     " # First run finished!"
-    print "(a,i35)", " # - number of nodes: ",                      cnt_nodes
-    print "(a,i35)", " # - number of cells: ",                      cnt_cells
-    print "(a,i31)", " # - number of hex cells: ",                  cnt_hex
-    print "(a,i26)", " # - number of pyramids cells: ",             cnt_pyr
-    print "(a,i29)", " # - number of prism cells: ",                cnt_wed
-    print "(a,i29)", " # - number of tetra cells: ",                cnt_tet
-    print "(a,i29)", " # - number of mixed cells: ",                cnt_mix
-    print "(a,i13)", " # - number of triangles faces on boundary: ",cnt_bnd_tri
-    print "(a,i17)", " # - number of quads faces on boundary: ",    cnt_bnd_qua
-    print "(a,i15)", " # - number of boundary conditions faces: ",  cnt_bnd_tri&
+    print '(a)',     ' #======================================================='
+    print '(a)',     ' # First run finished!'
+    print '(a,i35)', ' # - number of nodes: ',                      cnt_nodes
+    print '(a,i35)', ' # - number of cells: ',                      cnt_cells
+    print '(a,i31)', ' # - number of hex cells: ',                  cnt_hex
+    print '(a,i26)', ' # - number of pyramids cells: ',             cnt_pyr
+    print '(a,i29)', ' # - number of prism cells: ',                cnt_wed
+    print '(a,i29)', ' # - number of tetra cells: ',                cnt_tet
+    print '(a,i29)', ' # - number of mixed cells: ',                cnt_mix
+    print '(a,i13)', ' # - number of triangles faces on boundary: ',cnt_bnd_tri
+    print '(a,i17)', ' # - number of quads faces on boundary: ',    cnt_bnd_qua
+    print '(a,i15)', ' # - number of boundary conditions faces: ',  cnt_bnd_tri&
                                                                   + cnt_bnd_qua
-    print "(a,i12)", " # - number of triangles faces on interface: ", &
+    print '(a,i12)', ' # - number of triangles faces on interface: ', &
                                                                     cnt_int_tri
-    print "(a,i16)", " # - number of quads faces on interface: ", &
+    print '(a,i16)', ' # - number of quads faces on interface: ', &
                                                                     cnt_int_qua
-    print "(a,i21)", " # - number of boundary conditions: ",        cnt_bnd_cond
+    print '(a,i21)', ' # - number of boundary conditions: ',        cnt_bnd_cond
     if (cnt_bnd_tri + cnt_bnd_qua .eq. 0) then
-      print "(a)",   " # No boundary faces were found !"
+      print '(a)',   ' # No boundary faces were found !'
       stop
     end if
-    print "(a)",     " #-------------------------------------------------------"
+    print '(a)',     ' #-------------------------------------------------------'
   end if
 
   !--------------------------------------------!
@@ -170,7 +170,7 @@
   !-------------------------------------!
   call Cgns_Mod_Initialize_Counters
 
-  print "(a)", " # Filling arrays.."
+  print '(a)', ' # Filling arrays..'
 
   launch_find_parents_subroutine = .false.
 
@@ -185,7 +185,7 @@
     !   Browse through all blocks   !
     !-------------------------------!
     do block = 1, cgns_base(base) % n_blocks
-      print "(a,a21)", " # Block name: ",  &
+      print '(a,a21)', ' # Block name: ',  &
                trim(cgns_base(base) % block(block) % name)
 
       ! Count block, just for information
@@ -236,13 +236,13 @@
     call Find_Parents(grid)
   end if
 
-  print "(a)",     " #-------------------------------------------------"
-  print "(a,i13)", " # Total number of nodes:             ", cnt_nodes
-  print "(a,i13)", " # Total number of cells:             ", cnt_cells
-  print "(a,i13)", " # Total number of blocks:            ", cnt_blocks
-  print "(a,i13)", " # Total number of boundary sections: ", grid % n_bnd_cond
-  print "(a,i13)", " # Total number of boundary cells:    ", grid % n_bnd_cells
-  print "(a)",     " #-------------------------------------------------"
+  print '(a)',     ' #-------------------------------------------------'
+  print '(a,i13)', ' # Total number of nodes:             ', cnt_nodes
+  print '(a,i13)', ' # Total number of cells:             ', cnt_cells
+  print '(a,i13)', ' # Total number of blocks:            ', cnt_blocks
+  print '(a,i13)', ' # Total number of boundary sections: ', grid % n_bnd_cond
+  print '(a,i13)', ' # Total number of boundary cells:    ', grid % n_bnd_cells
+  print '(a)',     ' #-------------------------------------------------'
 
   !---------------------!
   !   Merge the nodes   !
@@ -254,7 +254,7 @@
   !---------------------------------!
   !   Read block (material?) data   !
   !---------------------------------!
-  grid % material % name = "AIR"
+  grid % material % name = 'AIR'
 
   !-----------------------------------------------------------------!
   !   Correct boundary conditions directions for hexahedral cells   !
@@ -271,10 +271,10 @@
           if (ElementTypeName(cell_type) .eq. 'HEXA_8' ) then
 
             if(verbose) then
-              print "(a)",      " # HEX_8 colors (sample):"
-              print "(a, 7a7)", " # ", &
-                                "c", "bnd_c1", "bnd_c2", "bnd_c3", "bnd_c4", &
-                                     "bnd_c5", "bnd_c6"
+              print '(a)',      ' # HEX_8 colors (sample):'
+              print '(a, 7a7)', ' # ', &
+                                'c', 'bnd_c1', 'bnd_c2', 'bnd_c3', 'bnd_c4', &
+                                     'bnd_c5', 'bnd_c6'
               i = 0
             end if
 
@@ -298,14 +298,14 @@
               end do
 
               if(verbose .and. i < 7) then
-                print "(a,7i7)"," # ",c, (grid % cells_bnd_color(j,c), j = 1, 6)
+                print '(a,7i7)',' # ',c, (grid % cells_bnd_color(j,c), j = 1, 6)
                 i = i + 1
               end if ! verbose
 
             end do ! c
 
-            print "(a)",    " #--------------------------------------------------"
-            print "(a,i19)"," # Corrected hex boundary cells: ", cnt_bnd_cells
+            print *,    '#--------------------------------------------------'
+            print '(a,i19)',' # Corrected hex boundary cells: ', cnt_bnd_cells
           end if ! 'HEXA_8'
 
         end do ! elements sections
