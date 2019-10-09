@@ -44,18 +44,18 @@
 
   if(this_proc < 2) then
 
-    line( 1:160) = " "
+    line( 1:160) = ' '
     line( 1+I:63+I) =   &
-               "#=============================================================#"
+               '#=============================================================#'
     print *, trim(line)
     line( 1+I:63+I) =   &
-               "#                    CPU usage statistics                     #"
+               '#                    CPU usage statistics                     #'
     print *, trim(line)
     line( 1+I:63+I) =   &
-               "#-------------------------------------------------------------#"
+               '#-------------------------------------------------------------#'
     print *, trim(line)
-    line( 1:160) = " "
-    line( 1+I:30+I) = "#            Total CPU time:  "
+    line( 1:160) = ' '
+    line( 1+I:30+I) = '#            Total CPU time:  '
 
     ! Work out hours, minutes and seconds
     hours   = floor(  total_time  / 3600.0 )
@@ -67,34 +67,34 @@
     write(line(36+I:36+I),   '(a1)')  ':'
     write(line(37+I:38+I), '(i2.2)')  seconds
     write(line(40+I:50+I),  '(a11)') '[hhh:mm:ss]'
-    line(63+I:63+I) = "#"
+    line(63+I:63+I) = '#'
     print *, trim(line)
     line( 1+I:63+I) =  &
-               "#-------------------------------------------+-----------------#"
+               '#-------------------------------------------+-----------------#'
     print *, trim(line)
     line( 1+I:63+I) =  &
-               "#       Description of the activity:        |   Spent time:   #"
+               '#       Description of the activity:        |   Spent time:   #'
     print *, trim(line)
     line( 1+I:63+I) =   &
-               "#-------------------------------------------+-----------------#"
+               '#-------------------------------------------+-----------------#'
     print *, trim(line)
 
     do f=1, n_funct
-      line( 1:160) = " "
-      line( 1+I: 1+I) = "#"
-      line(63+I:63+I) = "#"
-      line( 3+I: 3+I) = "-"
+      line( 1:160) = ' '
+      line( 1+I: 1+I) = '#'
+      line(63+I:63+I) = '#'
+      line( 3+I: 3+I) = '-'
       line( 5+I: 5+I+len_trim(funct_name(f))) = funct_name(f)
-      line(45+I:45+I) = "|"
-      write(line(50+I:55+I), "(f6.2)") funct_time(f) / total_time * 100.0
-      line(57+I:57+I) = "%"
+      line(45+I:45+I) = '|'
+      write(line(50+I:55+I), '(f6.2)') funct_time(f) / total_time * 100.0
+      line(57+I:57+I) = '%'
       print *, trim(line)
     end do
 
     line( 1+I:63+I) =  &
-               "#-------------------------------------------+-----------------#"
+               '#-------------------------------------------+-----------------#'
     print *, trim(line)
-    print *, ""
+    print *, ''
 
   end if
 
