@@ -105,8 +105,8 @@
 
       read (line % tokens(1),*) n_points
 
-      if (this_proc < 2) print '(A,I0,2A)', " # Reading ", nks, &
-        " columns in file " , trim(keys_file(1))
+      if (this_proc < 2) print '(a,i0,2a)', ' # Reading ', nks, &
+        ' columns in file ' , trim(keys_file(1))
 
       allocate(prof(n_points, 0:nks)); prof = 0.
       allocate(x(n_points));           x    = 0.

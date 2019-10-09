@@ -41,8 +41,8 @@
   inquire(file=trim(name_in), exist=present )
   if(.not.present) then
     if(this_proc < 2) then
-      print *, "# ERROR!  Backup file ", trim(name_in), " was not found."
-      print *, "# Exiting!"
+      print *, '# ERROR!  Backup file ', trim(name_in), ' was not found.'
+      print *, '# Exiting!'
     end if
     call Comm_Mod_End
   end if
@@ -64,7 +64,7 @@
   if(vc .eq. 0) vc = 2048  ! for backward compatibility
 
   if(this_proc < 2) then
-    print *, "# Backup file holds ", vc, " variables."
+    print *, '# Backup file holds ', vc, ' variables.'
   end if
 
   !---------------!

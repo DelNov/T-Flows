@@ -44,9 +44,9 @@
 
   problem_name = name_save
 
-  call Name_File(0, name_out, ".cgns")
+  call Name_File(0, name_out, '.cgns')
 
-  if (this_proc .lt. 2) print *, "# subroutine Save_Cgns_Results"
+  if (this_proc .lt. 2) print *, '# subroutine Save_Cgns_Results'
 
   !-------------------------------------------!
   !   Write a mesh (if not already written)   !
@@ -79,7 +79,7 @@
   allocate(cgns_base(n_bases))
 
   base = 1
-  cgns_base(base) % name = "Base 1"
+  cgns_base(base) % name = 'Base 1'
   cgns_base(base) % cell_dim = 3
   cgns_base(base) % phys_dim = 3
 
@@ -93,7 +93,7 @@
   allocate(cgns_base(base) % block(cgns_base(base) % n_blocks))
 
   block = 1
-  cgns_base(base) % block(block) % name = "Zone 1"
+  cgns_base(base) % block(block) % name = 'Zone 1'
   cgns_base(base) % block(block) % mesh_info(1) = grid % n_nodes
   cgns_base(base) % block(block) % mesh_info(2) = grid % n_cells - &
                                                   grid % comm % n_buff_cells
@@ -111,7 +111,7 @@
     cgns_base(base) % block(block) % n_solutions))
   solution = 1
 
-  cgns_base(base) % block(block) % solution(solution) % name = "FlowSolution"
+  cgns_base(base) % block(block) % solution(solution) % name = 'FlowSolution'
   cgns_base(base) % block(block) % solution(solution) % sol_type = CellCenter
 
   call Cgns_Mod_Write_Solution_Info(base, block, solution)
@@ -130,22 +130,22 @@
   !   Velocity   !
   !--------------!
   call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                            flow % u % n(1), "VelocityX")
+                            flow % u % n(1), 'VelocityX')
   call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                            flow % v % n(1), "VelocityY")
+                            flow % v % n(1), 'VelocityY')
   call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                            flow % w % n(1), "VelocityZ")
+                            flow % w % n(1), 'VelocityZ')
   !--------------!
   !   Pressure   !
   !--------------!
   call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                            flow % p % n(1), "Pressure")
+                            flow % p % n(1), 'Pressure')
   !-----------------!
   !   Temperature   !
   !-----------------!
   if(heat_transfer) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              flow % t % n(1), "Temperature")
+                              flow % t % n(1), 'Temperature')
   end if
 
   !--------------------------!
@@ -161,13 +161,13 @@
 
     call Cgns_Mod_Write_Field(base, block, solution, field, grid,  &
                               turb % kin % n(1),                   &
-                              "TurbulentKineticEnergy")
+                              'TurbulentKineticEnergy')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid,  &
                               turb % eps % n(1),                   &
-                              "TurbulentDissipation")
+                              'TurbulentDissipation')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid,  &
                               turb % p_kin(1),                     &
-                              "TurbulentKineticEnergyProduction")
+                              'TurbulentKineticEnergyProduction')
 
   end if
 
@@ -178,70 +178,70 @@
       v2_calc(c) = turb % kin % n(c) * turb % zeta % n(c)
     end do
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              v2_calc(1),  "TurbulentQuantityV2")
+                              v2_calc(1),  'TurbulentQuantityV2')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              turb % zeta % n(1), "TurbulentQuantityZeta")
+                              turb % zeta % n(1), 'TurbulentQuantityZeta')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              turb % f22 % n(1),  "TurbulentQuantityF22")
+                              turb % f22 % n(1),  'TurbulentQuantityF22')
  
     if(heat_transfer) then
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                                turb % t2 % n(1), "TurbulentQuantityT2")
+                                turb % t2 % n(1), 'TurbulentQuantityT2')
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                                turb % p_t2(1), "TurbulentT2Production")
+                                turb % p_t2(1), 'TurbulentT2Production')
       call Cgns_Mod_Write_Field(base, block, solution, field, grid,  &
                                 turb % alpha_l(1),                   &
-                                "TurbulentQauntityAlphaL")
+                                'TurbulentQauntityAlphaL')
       call Cgns_Mod_Write_Field(base, block, solution, field, grid,  &
                                 turb % alpha_u(1),                   &
-                                "TurbulentQauntityAlphaU")
+                                'TurbulentQauntityAlphaU')
     end if
   end if
 
   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              turb % f22 % n(1),  "TurbulentQuantityF22")
+                              turb % f22 % n(1),  'TurbulentQuantityF22')
   end if
 
   ! Vis and Turbulent Vicosity_t
   if(turbulence_model .eq. DES_SPALART .or.  &
      turbulence_model .eq. SPALART_ALLMARAS) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              turb % vis % n(1),"TurbulentViscosity")
+                              turb % vis % n(1),'TurbulentViscosity')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              flow % vort(1),"VorticityMagnitude")
+                              flow % vort(1),'VorticityMagnitude')
   end if
   if(turbulence_model .ne. NONE) then
     kin_vis_t(1) = turb % vis_t(1) / viscosity
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              kin_vis_t(1),"EddyOverMolecularViscosity")
+                              kin_vis_t(1),'EddyOverMolecularViscosity')
   end if
 
   ! Reynolds stress models
   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
      turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              turb % uu % n(1),"ReynoldsStressXX")
+                              turb % uu % n(1),'ReynoldsStressXX')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              turb % vv % n(1),"ReynoldsStressYY")
+                              turb % vv % n(1),'ReynoldsStressYY')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              turb % ww % n(1),"ReynoldsStressZZ")
+                              turb % ww % n(1),'ReynoldsStressZZ')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              turb % uv % n(1),"ReynoldsStressXY")
+                              turb % uv % n(1),'ReynoldsStressXY')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              turb % uw % n(1),"ReynoldsStressXZ")
+                              turb % uw % n(1),'ReynoldsStressXZ')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              turb % vw % n(1),"ReynoldsStressYZ")
+                              turb % vw % n(1),'ReynoldsStressYZ')
   end if
 
   ! Statistics for large-scale simulations of turbulence
   if(turbulence_statistics) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              turb % u_mean(1),"MeanVelocityX")
+                              turb % u_mean(1),'MeanVelocityX')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              turb % v_mean(1),"MeanVelocityY")
+                              turb % v_mean(1),'MeanVelocityY')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              turb % w_mean(1),"MeanVelocityZ")
+                              turb % w_mean(1),'MeanVelocityZ')
     do c = 1, grid % n_cells
       uu_save(c) = turb % uu_res(c) - turb % u_mean(c) * turb % u_mean(c)
       vv_save(c) = turb % vv_res(c) - turb % v_mean(c) * turb % v_mean(c)
@@ -252,20 +252,20 @@
     end do
 
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              uu_save(1),"ReynoldsStressXX")
+                              uu_save(1),'ReynoldsStressXX')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              vv_save(1),"ReynoldsStressYY")
+                              vv_save(1),'ReynoldsStressYY')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              ww_save(1),"ReynoldsStressZZ")
+                              ww_save(1),'ReynoldsStressZZ')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              uv_save(1),"ReynoldsStressXY")
+                              uv_save(1),'ReynoldsStressXY')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              uw_save(1),"ReynoldsStressXZ")
+                              uw_save(1),'ReynoldsStressXZ')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              vw_save(1),"ReynoldsStressYZ")
+                              vw_save(1),'ReynoldsStressYZ')
     if(heat_transfer) then
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                               turb % t_mean(1), "TemperatureMean")
+                               turb % t_mean(1), 'TemperatureMean')
       do c = 1, grid % n_cells
         t2_save(c) = turb % t2_res(c) - turb % t_mean(c) * turb % t_mean(c)
         ut_save(c) = turb % ut_res(c) - turb % u_mean(c) * turb % t_mean(c)
@@ -274,13 +274,13 @@
       end do
 
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                                t2_save(1),"TemperatureFluctuations")
+                                t2_save(1),'TemperatureFluctuations')
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                                ut_save(1),"TurbulentHeatFluxX")
+                                ut_save(1),'TurbulentHeatFluxX')
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                                vt_save(1),"TurbulentHeatFluxY")
+                                vt_save(1),'TurbulentHeatFluxY')
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                                wt_save(1),"TurbulentHeatFluxZ")
+                                wt_save(1),'TurbulentHeatFluxZ')
     end if
 
     !if(flow % n_scalars > 0) then
@@ -300,26 +300,26 @@
   ! Save y+ for all turbulence models
   if(turbulence_model .ne. NONE) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              turb % y_plus(1),"TurbulentQuantityYplus")
+                              turb % y_plus(1),'TurbulentQuantityYplus')
   end if
 
   ! Wall distance and delta
   if (.not. permanent_fields_written) then ! [actual write]
 
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              grid % wall_dist(1),"WallDistance")
+                              grid % wall_dist(1),'WallDistance')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              turb % h_max(1),"CellDeltaMax")
+                              turb % h_max(1),'CellDeltaMax')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              turb % h_min(1),"CellDeltaMin")
+                              turb % h_min(1),'CellDeltaMin')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              turb % h_w(1),"CellDeltaWall")
+                              turb % h_w(1),'CellDeltaWall')
     permanent_fields_written = .true.
   else ! [link]
-    call Write_Link_To_Field(base, block, solution, "WallDistance")
-    call Write_Link_To_Field(base, block, solution, "CellDeltaMax")
-    call Write_Link_To_Field(base, block, solution, "CellDeltaMin")
-    call Write_Link_To_Field(base, block, solution, "CellDeltaWall")
+    call Write_Link_To_Field(base, block, solution, 'WallDistance')
+    call Write_Link_To_Field(base, block, solution, 'CellDeltaMax')
+    call Write_Link_To_Field(base, block, solution, 'CellDeltaMin')
+    call Write_Link_To_Field(base, block, solution, 'CellDeltaWall')
   end if
 
   !----------------------!
@@ -336,7 +336,7 @@
   call Cgns_Mod_Close_File
 
   if (this_proc < 2) &
-    print *, "# Added fields to ", trim(name_out)
+    print *, '# Added fields to ', trim(name_out)
 
   deallocate(cgns_base)
 

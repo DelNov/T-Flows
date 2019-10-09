@@ -37,8 +37,8 @@
 
     ! Print a warning message
     if(this_proc < 2) then
-      print '(a)',  ' #============================================='//      &
-                    '============================================='
+      print *,  '#============================================='//           &
+                '============================================='
       if(.not. present(key_type)) then
         print '(4a)', ' # NOTE! Could not find the keyword: ', keyword,      &
                       ', but found similar: ', item
@@ -46,10 +46,10 @@
         print '(6a)', ' # NOTE! Could not find the ',key_type,': ',keyword,  &
                       ', but found similar: ', item
       end if
-      print '(a)', ' #          Are you sure it is not a typing error'//     &
+      print *, '#          Are you sure it is not a typing error'//          &
                    ' in the control file?'
-      print '(a)',  ' #---------------------------------------------'//      &
-                      '---------------------------------------------'
+      print *,  '#---------------------------------------------'//           &
+                '---------------------------------------------'
     end if
 
     ! Store similar item in the list of similar items
