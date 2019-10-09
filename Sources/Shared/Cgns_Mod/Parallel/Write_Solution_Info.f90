@@ -37,7 +37,7 @@
                       error)       !(out)
 
   if (error .ne. 0) then
-    print *, "# Failed to write solution info"
+    print *, '# Failed to write solution info'
     call Cgp_Error_Exit_F()
   endif
 

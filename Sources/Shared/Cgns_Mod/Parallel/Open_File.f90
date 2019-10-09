@@ -19,7 +19,7 @@
 
   file_name = file
 
-  if (this_proc .lt. 2) print *, "# Opening file:", trim(file_name)
+  if (this_proc .lt. 2) print *, '# Opening file:', trim(file_name)
 
   ! Set the parallel IO mode for CGNS
   call Cgp_Pio_Mode_F(CGP_INDEPENDENT,  &
@@ -32,7 +32,7 @@
                   error)        !(out)
 
   if (error .ne. 0) then
-    print *, "# Failed to open the file: ", trim(file_name)
+    print *, '# Failed to open the file: ', trim(file_name)
     call Cgp_Error_Exit_F()
   endif
 

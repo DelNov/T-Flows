@@ -147,14 +147,14 @@
                                    error)                       !(out)
 
     if (error .ne. 0) then
-      print*, '*FAILED* to fill ', sect_id
+      print *, '*FAILED* to fill ', sect_id
       call Cgp_Error_Exit_F()
     endif
 
     ! Print some info
     if(verbose) then
-      print *, '#         First cell:', first_cell, " (P:",this_proc,")"
-      print *, '#         Last cell: ', last_cell,  " (P:",this_proc,")"
+      print *, '#         First cell:', first_cell, ' (P:',this_proc,')'
+      print *, '#         Last cell: ', last_cell,  ' (P:',this_proc,')'
     end if
 
     c = cnt

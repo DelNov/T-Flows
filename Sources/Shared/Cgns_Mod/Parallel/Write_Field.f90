@@ -55,7 +55,7 @@
                          error)          !(out)
 
   if (error .ne. 0) then
-    print *, "#           Failed to create empty ", trim(field_name)
+    print *, '#           Failed to create empty ', trim(field_name)
     call Cgp_Error_Exit_F()
   endif
 
@@ -112,7 +112,7 @@
                                   error)          !(out)
 
       if (error .ne. 0) then
-        print *, "#           Failed to fill ", trim(field_name)
+        print *, '#           Failed to fill ', trim(field_name)
         call Cgp_Error_Exit_F()
       endif
 
@@ -128,8 +128,8 @@
         print *, '#           ---------------------------------'
       end if
       if(verbose) then
-        print *, '#           First cell:', i, " (P:",this_proc,")"
-        print *, '#           Last cell: ', j, " (P:",this_proc,")"
+        print *, '#           First cell:', i, ' (P:',this_proc,')'
+        print *, '#           Last cell: ', j, ' (P:',this_proc,')'
       end if
 
     end if

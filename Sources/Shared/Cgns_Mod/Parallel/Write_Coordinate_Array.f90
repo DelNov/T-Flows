@@ -64,7 +64,7 @@
                          error)         !(out)
 
   if (error.ne.CG_OK) then
-    print *, "#         to create empty: ", trim(coord_name)
+    print *, '#         to create empty: ', trim(coord_name)
     call Cgp_Error_Exit_F()
   endif
 
@@ -83,18 +83,18 @@
                               error)          !(out)
 
   if (error .ne. 0) then
-    print *, "#         Failed to fill: ", trim(coord_name)
+    print *, '#         Failed to fill: ', trim(coord_name)
     call Cgp_Error_Exit_F()
   endif
 
   ! Print some info
   if(verbose .and. this_proc.lt.2) then
-    print *, "#         Coord array: ", coord_name
+    print *, '#         Coord array: ', coord_name
   end if
   if(verbose .and. coord_id.eq.1) then
-    print *, "#         Number of nodes: ", j - i + 1, " (P:",this_proc,")"
-    print *, "#         First node:", i,               " (P:",this_proc,")"
-    print *, "#         Last node: ", j,               " (P:",this_proc,")"
+    print *, '#         Number of nodes: ', j - i + 1, ' (P:',this_proc,')'
+    print *, '#         First node:', i,               ' (P:',this_proc,')'
+    print *, '#         Last node: ', j,               ' (P:',this_proc,')'
   end if
 
   end subroutine
