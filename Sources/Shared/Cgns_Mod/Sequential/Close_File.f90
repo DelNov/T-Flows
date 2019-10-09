@@ -13,7 +13,7 @@
                   error)      !(out)
 
   if (error .ne. 0) then
-    print *, "# Failed to close the file: ", trim(file_name)
+    print *, '# Failed to close the file: ', trim(file_name)
     call Cg_Error_Exit_F()
   endif
 

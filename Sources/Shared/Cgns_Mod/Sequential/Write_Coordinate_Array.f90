@@ -51,18 +51,18 @@
                         error)          !(out)
 
   if (error .ne. 0) then
-         print *, "#         Failed to write: ", trim(coord_name)
+         print *, '#         Failed to write: ', trim(coord_name)
      call Cg_Error_Exit_F()
   endif
 
   ! Print some info
   if(verbose) then
-    print *, "#         Coord array: ", coord_name
+    print *, '#         Coord array: ', coord_name
   end if
   if(verbose.and.coord_id.eq.1) then
-    print *, "#         Number of nodes: ", j - i + 1
-    print *, "#         First node:", i
-    print *, "#         Last node: ", j
+    print *, '#         Number of nodes: ', j - i + 1
+    print *, '#         First node:', i
+    print *, '#         Last node: ', j
   end if
 
   end subroutine

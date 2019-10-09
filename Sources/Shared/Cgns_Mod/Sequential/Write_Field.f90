@@ -92,7 +92,7 @@
                                     error)          !(out)
 
       if (error .ne. 0) then
-        print *, "# Failed to write field", trim(field_name)
+        print *, '# Failed to write field', trim(field_name)
         call Cg_Error_Exit_F()
       endif
 

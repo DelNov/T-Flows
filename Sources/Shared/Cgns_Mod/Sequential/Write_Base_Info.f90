@@ -29,7 +29,7 @@
                        error)       !(out)
 
   if (error .ne. 0) then
-    print *, "# Failed to get base info"
+    print *, '# Failed to get base info'
     call Cg_Error_Exit_F()
   endif
 

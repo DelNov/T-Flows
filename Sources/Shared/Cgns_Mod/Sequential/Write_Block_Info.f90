@@ -31,22 +31,22 @@
                        error)             !(out)
 
   if (error .ne. 0) then
-    print *, "# Failed to write block info"
+    print *, '# Failed to write block info'
     call Cg_Error_Exit_F()
   endif
 
   if(verbose) then
     print *, '#     =========================================='
-    print *, "#     Block name:                ", block_name
-    print *, "#     Block index:               ", block_id
-    print *, "#     Nodes:                     ", block_mesh_info(1)
-    print *, "#     Cells:                     ", block_mesh_info(2)
-    print *, "#     Boundary nodes(if sorted): ", block_mesh_info(3)
-    print *, '#     =========================================='
+    print *, '#     Block name:                ', block_name
+    print *, '#     Block index:               ', block_id
+    print *, '#     Nodes:                     ', block_mesh_info(1)
+    print *, '#     Cells:                     ', block_mesh_info(2)
+    print *, '#     Boundary nodes(if sorted): ', block_mesh_info(3)
+    print *, '#     ------------------------------------------'
   end if
 
   if (block_mesh_info(3) .ne. 0) then
-    print *, "# Boundary condition nodes != 0 -> Unsupported"
+    print *, '# Boundary condition nodes != 0 -> Unsupported'
     stop
   endif
 
