@@ -21,7 +21,7 @@
   ! If here, Cpu_Timer_Start wasn't invoked for this function
   print *, 'CRITICAL ERROR in ''Cpu_Timer_End'':'
   print *, 'For function ''', trim(f_name), ''', ''Cpu_Ti' // &
-           'mer_Start'' wasn't invoked.  Exiting!'
+           'mer_Start'' wasn''t invoked.  Exiting!'
   stop
 
   ! Function has been found, continue
