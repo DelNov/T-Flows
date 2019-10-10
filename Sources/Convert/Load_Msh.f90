@@ -62,10 +62,6 @@
     read(line % tokens(3), *) phys_names(j)
     read(line % tokens(1), *) phys_dimen(j)  ! store dimension
   end do
-  print *, '# Found the following sections:'
-  do i = 1, n_sect
-    print '(a2, i2, a2, a, i2)', ' #', i, '. ', phys_names(i), phys_dimen(i)
-  end do
 
   !--------------------------!
   !   Read number of nodes   !
@@ -145,7 +141,6 @@
     read(line % tokens(1), *) dim     ! dimension of the element
     read(line % tokens(2), *) s_tag   ! element tag
     read(line % tokens(4), *) n_memb  ! number of members in the group
-    if(dim .eq. 2) print *, 'name = ', phys_names(phys_tags(s_tag))
     do j = 1, n_memb
       call Tokenizer_Mod_Read_Line(9)
       read(line % tokens(1), *) c     ! Gmsh cell number
@@ -189,7 +184,6 @@
     read(line % tokens(1), *) dim     ! dimension of the element
     read(line % tokens(2), *) s_tag   ! element tag
     read(line % tokens(4), *) n_memb  ! number of members in the group
-    if(dim .eq. 2) print *, 'name = ', phys_names(phys_tags(s_tag))
     do j = 1, n_memb
       call Tokenizer_Mod_Read_Line(9)
       read(line % tokens(1), *) c     ! Gmsh cell number
@@ -246,6 +240,14 @@
 
       ! Boundary cell, hopefully
       if(dim .eq. 2) then
+        if(type .eq. MSH_TRI) then
+          read(line % tokens(1), *) c       ! Gmsh cell number
+          c = new(c)                        ! use T-Flows numbering
+          grid % cells_n_nodes(c) = 3
+          read(line % tokens(2), *) grid % cells_n(1, c)
+          read(line % tokens(3), *) grid % cells_n(2, c)
+          read(line % tokens(4), *) grid % cells_n(3, c)
+        end if
         if(type .eq. MSH_QUAD) then
           read(line % tokens(1), *) c       ! Gmsh cell number
           c = new(c)                        ! use T-Flows numbering
@@ -259,6 +261,15 @@
 
       ! Inside cells
       if(dim .eq. 3) then
+        if(type .eq. MSH_TETRA) then
+          read(line % tokens(1), *) c       ! Gmsh cell number
+          c = new(c)                        ! use T-Flows numbering
+          grid % cells_n_nodes(c) = 4
+          read(line % tokens(2), *) grid % cells_n(1, c)
+          read(line % tokens(3), *) grid % cells_n(2, c)
+          read(line % tokens(4), *) grid % cells_n(3, c)
+          read(line % tokens(5), *) grid % cells_n(4, c)
+        end if
         if(type .eq. MSH_HEXA) then
           read(line % tokens(1), *) c       ! Gmsh cell number
           c = new(c)                        ! use T-Flows numbering
@@ -289,12 +300,19 @@
   grid % n_bnd_cond = n_bnd_sect
   allocate(grid % bnd_cond % name(n_bnd_sect))
 
+  ! Sift through all physical regions to avoid volume conditions
   j = 0
   do i = 1, n_sect
     if(phys_dimen(i) .eq. 2) then
       j = j + 1
       grid % bnd_cond % name(j) = phys_names(i)
       call To_Upper_Case(grid % bnd_cond % name(j))
+
+      do c = -grid % n_bnd_cells, -1
+        if( grid % bnd_cond % color( c ) .eq. i ) then
+            grid % bnd_cond % color( c ) = j
+        end if
+      end do
     end if
   end do
 
