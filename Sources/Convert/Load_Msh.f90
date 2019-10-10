@@ -24,7 +24,7 @@
   integer              :: i, j, c, dim, p_tag, s_tag, n_tags, type
   integer              :: run, s_tag_max, n_e_0d, n_e_1d, n_e_2d, n_e_3d
   integer, allocatable :: n(:), new(:)
-  integer, allocatable :: phys_tags(:), phys_dimen(:)
+  integer, allocatable :: phys_tags(:), p_tag_corr(:), n_bnd_cells(:)
   character(len=80), allocatable :: phys_names(:)
 !==============================================================================!
 
@@ -53,14 +53,17 @@
   call Tokenizer_Mod_Read_Line(9)
   read(line % tokens(1), *) n_sect
   allocate(phys_names(n_sect))
-  allocate(phys_dimen(n_sect))
+  allocate(p_tag_corr(n_sect))
   do i = 1, n_sect
     call Tokenizer_Mod_Read_Line(9)
+    read(line % tokens(2), *) j
     if(line % tokens(1) .eq. '2') n_bnd_sect = n_bnd_sect + 1
     if(line % tokens(1) .eq. '3') n_blocks   = n_blocks   + 1
-    read(line % tokens(2), *) j  ! section number
-    read(line % tokens(3), *) phys_names(j)
-    read(line % tokens(1), *) phys_dimen(j)  ! store dimension
+    read(line % tokens(2), *) j  ! section number; neglect
+    if(line % tokens(1) .eq. '2') then
+      read(line % tokens(3), *) phys_names(n_bnd_sect)
+      p_tag_corr(j) = n_bnd_sect
+    end if
   end do
 
   !--------------------------!
@@ -115,8 +118,17 @@
       read(line % tokens(1), *) s_tag   ! surface tag
       read(line % tokens(8), *) n_tags  ! this should be one!  check some day
       read(line % tokens(9), *) p_tag   ! physcal tag
-      if(run .eq. 1) s_tag_max = max(s_tag_max, s_tag)
-      if(run .eq. 2) phys_tags(s_tag) = p_tag
+      if(n_tags .eq. 1) then
+        if(run .eq. 1) s_tag_max = max(s_tag_max, s_tag)
+        if(run .eq. 2) then
+          phys_tags(s_tag) = p_tag_corr(p_tag)
+        end if
+      end if
+      if(n_tags > 1) then
+        print *, '# ERROR in Load_Msh @ s_tag: ', s_tag
+        print *, '# More than one boundary condition per entity - not allowed!'
+        stop
+      end if
     end do
     if(run .eq. 1) then
       allocate(phys_tags(s_tag_max))
@@ -172,6 +184,9 @@
   !---------------------------------------------------!
   !   Read boundary conditions for individual cells   !
   !---------------------------------------------------!
+  allocate(n_bnd_cells(n_bnd_sect))
+  n_bnd_cells(:) = 0
+
   rewind(9)
   do
     call Tokenizer_Mod_Read_Line(9)
@@ -189,8 +204,13 @@
       read(line % tokens(1), *) c     ! Gmsh cell number
       if(dim .eq. 2) then
         grid % bnd_cond % color( new(c) ) = phys_tags(s_tag)
+        n_bnd_cells(phys_tags(s_tag)) = n_bnd_cells(phys_tags(s_tag)) + 1
       end if
     end do
+  end do
+
+  do i = 1, n_bnd_sect
+    print '(a, i2, i6)', ' # Boundary sells in section: ', i, n_bnd_cells(i)
   end do
 
   !--------------------------------!
@@ -270,6 +290,17 @@
           read(line % tokens(4), *) grid % cells_n(3, c)
           read(line % tokens(5), *) grid % cells_n(4, c)
         end if
+        if(type .eq. MSH_PENTA) then
+          read(line % tokens(1), *) c       ! Gmsh cell number
+          c = new(c)                        ! use T-Flows numbering
+          grid % cells_n_nodes(c) = 4
+          read(line % tokens(2), *) grid % cells_n(1, c)
+          read(line % tokens(3), *) grid % cells_n(2, c)
+          read(line % tokens(4), *) grid % cells_n(3, c)
+          read(line % tokens(5), *) grid % cells_n(4, c)
+          read(line % tokens(6), *) grid % cells_n(5, c)
+          read(line % tokens(7), *) grid % cells_n(6, c)
+        end if
         if(type .eq. MSH_HEXA) then
           read(line % tokens(1), *) c       ! Gmsh cell number
           c = new(c)                        ! use T-Flows numbering
@@ -300,20 +331,9 @@
   grid % n_bnd_cond = n_bnd_sect
   allocate(grid % bnd_cond % name(n_bnd_sect))
 
-  ! Sift through all physical regions to avoid volume conditions
-  j = 0
-  do i = 1, n_sect
-    if(phys_dimen(i) .eq. 2) then
-      j = j + 1
-      grid % bnd_cond % name(j) = phys_names(i)
-      call To_Upper_Case(grid % bnd_cond % name(j))
-
-      do c = -grid % n_bnd_cells, -1
-        if( grid % bnd_cond % color( c ) .eq. i ) then
-            grid % bnd_cond % color( c ) = j
-        end if
-      end do
-    end if
+  do i = 1, n_bnd_sect
+    grid % bnd_cond % name(i) = phys_names(i)
+    call To_Upper_Case(grid % bnd_cond % name(i))
   end do
 
   !------------------------------------!
