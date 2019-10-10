@@ -45,6 +45,11 @@
              ' reading CGNS file format'
     problem_name = file_name(1:l-5)
     extension = file_name_up(l-3:l)
+  else if( file_name_up(l-2:l) .eq. 'MSH' ) then
+    print *, '# Based on the extension, you are' // &
+             ' reading GMSH file format'
+    problem_name = file_name(1:l-4)
+    extension = file_name_up(l-2:l)
   else
     print *, '# Unrecognized input file format; exiting!'
     stop
@@ -60,6 +65,10 @@
   end if
   if (extension .eq. 'CGNS') then
     call Load_Cgns(grid)
+  end if
+  if (extension .eq. 'MSH') then
+    call Load_Msh(grid)
+    call Find_Parents(grid)
   end if
 
   call Grid_Topology     (grid)
