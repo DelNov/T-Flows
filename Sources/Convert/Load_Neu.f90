@@ -122,7 +122,7 @@
   !-----------------------------!
   call Tokenizer_Mod_Read_Line(9)          ! ELEMENTS/CELLS
   do i = 1, grid % n_cells
-    read(9,'(I8,1X,I2,1X,I2,1X,7I8:/(15X,7I8:))') dum1, dum2, &
+    read(9,'(i8,1x,i2,1x,i2,1x,7i8:/(15x,7i8:))') dum1, dum2, &
            grid % cells_n_nodes(i),                           &
           (grid % cells_n(j,i), j = 1,grid % cells_n_nodes(i))
   end do
@@ -136,10 +136,10 @@
   do j = 1, n_blocks
     call Tokenizer_Mod_Read_Line(9)          ! ELEMENT GROUP
     call Tokenizer_Mod_Read_Line(9)
-    read(line % tokens(4),'(I10)') dum1      ! number of cells in this group
+    read(line % tokens(4),'(i10)') dum1      ! number of cells in this group
     call Tokenizer_Mod_Read_Line(9)          ! block*
     call Tokenizer_Mod_Read_Line(9)          ! 0
-    read(9,'(10I8)') (temp(i), i = 1, dum1)  ! read all cells in the group
+    read(9,'(10i8)') (temp(i), i = 1, dum1)  ! read all cells in the group
     call Tokenizer_Mod_Read_Line(9)          ! ENDOFSECTION
   end do
 
@@ -154,7 +154,7 @@
     call Tokenizer_Mod_Read_Line(9)
     call To_Upper_Case(  line % tokens(1)  )
     grid % bnd_cond % name(j) = line % tokens(1)
-    read(line % tokens(3),'(I8)') dum1
+    read(line % tokens(3),'(i8)') dum1
     do i = 1, dum1
       read(9,*) c, dum2, dir
       grid % cells_bnd_color(dir,c) = j
