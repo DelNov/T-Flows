@@ -3,7 +3,7 @@ Problem name (this line is a comment)
  PROBLEM_NAME    backstep
 
  BACKUP_SAVE_INTERVAL 600
- RESULT_SAVE_INTERVAL 600
+ RESULTS_SAVE_INTERVAL 600
 
 # LOAD_BACKUP_NAME   backstep-ts000001.backup 
 
