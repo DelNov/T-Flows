@@ -4,8 +4,6 @@
 !   Writes links for GridCoordinates_t and Elements_t nodes in DB              !
 !   This allowes to write a mesh once and then use links to it further         !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Comm_Mod, only: this_proc
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   character(len=*) :: input_name

@@ -5,9 +5,6 @@
 !   This allows to write WallDistance and CellDelta once then use links to it  !
 !   [sequential and parallel version]                                          !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Comm_Mod, only: this_proc
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   integer          :: base, block, solution, field

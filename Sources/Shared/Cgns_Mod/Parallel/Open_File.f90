@@ -6,9 +6,6 @@
 !   CGP_INDEPENDENT = any processor  CAN  access data                          !
 !   CGP_COLLECTIVE  = all processors MUST access data                          !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Comm_Mod, only: this_proc
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   character(len=*) :: file

@@ -8,9 +8,6 @@
 !   Prerequisites: all 3d cells in this block already follow                   !
 !   grid structure https://cgns.github.io/CGNS_docs_current/sids/conv.html     !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Grid_Mod, only: Grid_Type
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   integer              :: base_id, block_id, sect_id

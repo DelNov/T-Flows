@@ -5,6 +5,7 @@
 !   arrays throughout the code.  By doing so, memory is saved (reused),        !
 !   as well as time for allocation and de-allocation.                          !
 !------------------------------------------------------------------------------!
+!----------------------------------[Modules]-----------------------------------!
   use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
