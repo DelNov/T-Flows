@@ -212,40 +212,8 @@
     call Info_Mod_Time_Fill( n, time, (sc_cur-sc_ini)/real(sc_cr) )
     call Info_Mod_Time_Print()
 
-    if(turbulence_model .eq. DES_SPALART) then
-      call Calculate_Shear_And_Vorticity(flow)
-      call Calculate_Vorticity (flow)
-    end if
-
-    if(turbulence_model .eq. LES_SMAGORINSKY .or.  &
-       turbulence_model .eq. LES_DYNAMIC     .or.  &
-       turbulence_model .eq. LES_WALE) then
-      call Calculate_Shear_And_Vorticity(flow)
-      if(turbulence_model .eq. LES_DYNAMIC) then
-        call Turb_Mod_Vis_T_Dynamic(turb, sol)
-      end if
-      if(turbulence_model .eq. LES_WALE) then
-        call Turb_Mod_Vis_T_Wale(turb)
-      end if
-      call Turb_Mod_Vis_T_Smagorinsky(turb)
-    end if
-
-    if(turbulence_model .eq. HYBRID_LES_RANS) then
-      call Turb_Mod_Vis_T_Dynamic(turb, sol)
-      call Turb_Mod_Vis_T_Hybrid_Les_Rans(turb)
-    end if
-
-
-    if(turbulence_model .eq. HYBRID_LES_PRANDTL) then
-      call Calculate_Shear_And_Vorticity(flow)
-      call Turb_Mod_Vis_T_Hybrid_Les_Prandtl(turb)
-    end if
-
-    call Convective_Outflow(flow, flow % dt)
-    if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
-       turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
-      call Turb_Mod_Vis_T_Rsm(turb)
-    end if
+    ! Turbulence models initializations
+    call Turb_Mod_Init(turb, sol)
 
     !--------------------------!
     !   Inner-iteration loop   !
@@ -291,90 +259,8 @@
         call Compute_Scalar(flow, turb, sol, flow % dt, ini, sc)
       end do
 
-      if(turbulence_model .eq. K_EPS) then
-
-        ! Update the values at boundaries
-        call Update_Boundary_Values(flow, turb)
-
-        call Calculate_Shear_And_Vorticity(flow)
-
-        call Turb_Mod_Compute_Variable(turb, sol, ini, turb % kin, n)
-        call Turb_Mod_Compute_Variable(turb, sol, ini, turb % eps, n)
-
-        if(heat_transfer) then
-          call Turb_Mod_Calculate_Heat_Flux(turb)
-          call Turb_Mod_Compute_Variable(turb, sol, ini, turb % t2, n)
-        end if
-
-        call Turb_Mod_Vis_T_K_Eps(turb)
-
-      end if
-
-      if(turbulence_model .eq. K_EPS_ZETA_F .or. &
-         turbulence_model .eq. HYBRID_LES_RANS) then
-        call Calculate_Shear_And_Vorticity(flow)
-
-        call Turb_Mod_Compute_Variable(turb, sol, ini, turb % kin, n)
-        call Turb_Mod_Compute_Variable(turb, sol, ini, turb % eps, n)
-
-        if(heat_transfer) then
-          call Turb_Mod_Calculate_Heat_Flux(turb)
-          call Turb_Mod_Compute_Variable(turb, sol, ini, turb % t2, n)
-        end if
-
-        call Update_Boundary_Values(flow, turb)
-
-        call Turb_Mod_Compute_F22(turb, sol, ini, turb % f22)
-        call Turb_Mod_Compute_Variable(turb, sol, ini, turb % zeta, n)
-
-        call Turb_Mod_Vis_T_K_Eps_Zeta_F(turb)
-
-      end if
-
-      if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
-         turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
-
-        ! Update the values at boundaries
-        call Update_Boundary_Values(flow, turb)
-
-        call Time_And_Length_Scale(grid, turb)
-
-        call Grad_Mod_Variable(flow % u, .true.)
-        call Grad_Mod_Variable(flow % v, .true.)
-        call Grad_Mod_Variable(flow % w, .true.)
-
-        call Turb_Mod_Compute_Stress(turb, sol, ini, turb % uu, n)
-        call Turb_Mod_Compute_Stress(turb, sol, ini, turb % vv, n)
-        call Turb_Mod_Compute_Stress(turb, sol, ini, turb % ww, n)
-
-        call Turb_Mod_Compute_Stress(turb, sol, ini, turb % uv, n)
-        call Turb_Mod_Compute_Stress(turb, sol, ini, turb % uw, n)
-        call Turb_Mod_Compute_Stress(turb, sol, ini, turb % vw, n)
-
-        if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
-          call Turb_Mod_Compute_F22(turb, sol, ini, turb % f22)
-        end if
-
-        call Turb_Mod_Compute_Stress(turb, sol, ini, turb % eps, n)
-
-        call Turb_Mod_Vis_T_Rsm(turb)
-
-        if(heat_transfer) then
-          call Turb_Mod_Calculate_Heat_Flux(turb)
-        end if
-      end if
-
-      if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
-         turbulence_model .eq. DES_SPALART) then
-        call Calculate_Shear_And_Vorticity(flow)
-        call Calculate_Vorticity(flow)
-
-        ! Update the values at boundaries
-        call Update_Boundary_Values(flow, turb)
-
-        call Turb_Mod_Compute_Variable(turb, sol, ini, turb % vis, n)
-        call Turb_Mod_Vis_T_Spalart_Allmaras(turb)
-      end if
+      ! Deal with turbulence (if you dare ;-))
+      call Turb_Mod_Main(turb, sol, n, ini)
 
       ! Update the values at boundaries
       call Update_Boundary_Values(flow, turb)

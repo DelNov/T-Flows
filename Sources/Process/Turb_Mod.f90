@@ -193,6 +193,10 @@
 
   contains
 
+  ! Logic of turbulence models
+  include 'Turb_Mod/Init.f90'
+  include 'Turb_Mod/Main.f90'
+
   ! The constructor-like
   include 'Turb_Mod/Allocate.f90'
 
