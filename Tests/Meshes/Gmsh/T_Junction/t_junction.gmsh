@@ -21,9 +21,6 @@ d  =  0.1;   // mesh resolution
 NC = 11;     // number of nodes in the core
 NB =  7;     // number of nodes in the bundary layer
 NL = 41;     // number of nodes longitudinally
-NC =  6;     // number of nodes in the core
-NB =  3;     // number of nodes in the bundary layer
-NL = 11;     // number of nodes longitudinally
 
 //---------------
 //
