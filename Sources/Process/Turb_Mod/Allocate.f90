@@ -3,10 +3,6 @@
 !------------------------------------------------------------------------------!
 !   Allocates memory for variables. It is called either from LoaRes            !
 !   or from Processor.                                                         !
-!----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Field_Mod,   only: Field_Type, heat_transfer, buoyancy
-  use Grid_Mod,    only: Grid_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

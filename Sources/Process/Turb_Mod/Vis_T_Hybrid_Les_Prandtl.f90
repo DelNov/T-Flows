@@ -8,14 +8,6 @@
 !   any nearwall cells, the near(c) is zero.
 !   near(c) is calculated in NearWallCells.f90, only ones in the beginig
 !   of a simulation.
-!----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Comm_Mod,  only: Comm_Mod_Exchange_Real
-  use Field_Mod, only: Field_Type, density, viscosity, buoyancy,  &
-                       grav_x, grav_y, grav_z
-  !use Les_Mod
-  use Grid_Mod,  only: Grid_Type
-  use Grad_Mod,  only: Grad_Mod_Array
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
