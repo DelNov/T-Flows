@@ -362,8 +362,11 @@
   call Sort_Mod_Int_By_Index(grid % comm % proces(1),  &
                              grid % new_c(1),          &
                              grid % n_cells)
-  call Sort_Mod_Real_By_Index(grid % wall_dist(1),   &
-                              grid % new_c(1),       &
+  call Sort_Mod_Real_By_Index(grid % wall_dist(1),     &
+                              grid % new_c(1),         &
+                              grid % n_cells)
+  call Sort_Mod_Real_By_Index(grid % vol(1),           &
+                              grid % new_c(1),         &
                               grid % n_cells)
 
   ! Sort face-cell connectivity
