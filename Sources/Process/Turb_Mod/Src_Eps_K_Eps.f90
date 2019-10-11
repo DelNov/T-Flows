@@ -95,7 +95,7 @@
         ! Compute tangential velocity component
         u_tan = Field_Mod_U_Tan(flow, s)
 
-        if(rough_walls) then 
+        if(turb % rough_walls) then 
           z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
           eps % n(c1) = c_mu75 * kin % n(c1)**1.5  &
                       / ((grid % wall_dist(c1) + z_o) * kappa)

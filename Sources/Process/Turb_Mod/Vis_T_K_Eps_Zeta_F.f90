@@ -105,7 +105,7 @@
                                           grid % wall_dist(c1),  &
                                           kin_vis)
 
-        if(rough_walls) then
+        if(turb % rough_walls) then
           z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
 !          z_o = max(grid % wall_dist(c1)/(e_log * turb % y_plus(c1)),z_o) 
           turb % y_plus(c1) = Y_Plus_Rough_Walls(turb,                  &

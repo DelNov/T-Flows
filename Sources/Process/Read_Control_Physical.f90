@@ -131,7 +131,7 @@
   !----------------------------!
   !   Rough or smooth walls?   !
   !----------------------------!
-  call Control_Mod_Rough_Walls(rough_walls, .true.)
+  call Control_Mod_Rough_Walls(turb % rough_walls, .true.)
 
   !-------------------------------!
   !   Turbulent heat flux model   !

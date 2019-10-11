@@ -114,6 +114,9 @@
     real, allocatable :: c_dyn(:)
     real, allocatable :: wale_v(:)
 
+    ! Rough walls
+    logical :: rough_walls
+
     ! Hydraulic roughness (constant and variable)
     real              :: z_o
     real, allocatable :: z_o_f(:)
@@ -126,6 +129,10 @@
     ! Variable for switch between RANS and LES
     real, allocatable :: alpha_l(:)  ! ratio of length scales
     real, allocatable :: alpha_u(:)  ! ratio of velocity scales
+
+    ! For LES you need to know nearest wall cell
+    integer, allocatable :: nearest_wall_cell(:)
+
   end type
 
   !--------------------------------------------------------!
@@ -162,8 +169,6 @@
   integer, parameter :: GGDH = 30139
   integer, parameter :: AFM  = 30161
 
-  logical :: rough_walls
-
   !--------------------------------!
   !   Turbulence model constants   !
   !--------------------------------!
@@ -184,9 +189,6 @@
   !-----------------------------------!
   !   Auxiliary turbulent variables   !
   !-----------------------------------!
-
-  ! For LES you need to know nearest wall cell
-  integer, allocatable :: nearest_wall_cell(:)
 
   ! Turbulent Prandtl and Schmidt numbers
   real :: pr_t, sc_t

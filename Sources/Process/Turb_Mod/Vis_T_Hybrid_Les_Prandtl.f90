@@ -59,12 +59,12 @@
     ! If(nearest_wall_cell(c) .ne. 0) is needed for parallel
     ! version since the subdomains which do not "touch" wall
     ! has nearest_wall_cell(c) = 0. 
-    if(nearest_wall_cell(c) .ne. 0) then
+    if(turb % nearest_wall_cell(c) .ne. 0) then
       u_ff = sqrt( viscosity  &
-                  * sqrt(  u % n(nearest_wall_cell(c)) ** 2   &
-                         + v % n(nearest_wall_cell(c)) ** 2   &
-                         + w % n(nearest_wall_cell(c)) ** 2)  &
-                 / (grid % wall_dist(nearest_wall_cell(c))+TINY) )
+                  * sqrt(  u % n(turb % nearest_wall_cell(c)) ** 2   &
+                         + v % n(turb % nearest_wall_cell(c)) ** 2   &
+                         + w % n(turb % nearest_wall_cell(c)) ** 2)  &
+                 / (grid % wall_dist(turb % nearest_wall_cell(c))+TINY) )
       turb % y_plus(c) = grid % wall_dist(c) * u_ff / viscosity
 
       ! Piomelli damping function

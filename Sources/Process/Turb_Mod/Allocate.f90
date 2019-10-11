@@ -113,7 +113,7 @@
     allocate(turb % y_plus  (-nb:nc));  turb % y_plus  = 0.
 
     ! Hydraulic roughness given by formula
-    if(rough_walls) then
+    if(turb % rough_walls) then
       allocate(turb % z_o_f(-nb:nc));  turb % z_o_f = -1.0
     end if
 
@@ -316,8 +316,8 @@
   !-----------------------!
   if(turbulence_model .eq. LES_SMAGORINSKY) then
 
-    allocate(nearest_wall_cell(-nb:nc))
-    nearest_wall_cell = 0
+    allocate(turb % nearest_wall_cell(-nb:nc))
+    turb % nearest_wall_cell = 0
 
     ! Other variables such as time scale, length scale and production
     allocate(turb % t_scale (-nb:nc));  turb % t_scale = 0.
@@ -371,8 +371,8 @@
   !------------------------------!
   if(turbulence_model .eq. HYBRID_LES_PRANDTL) then
 
-    allocate(nearest_wall_cell(-nb:nc))
-    nearest_wall_cell = 0
+    allocate(turb % nearest_wall_cell(-nb:nc))
+    turb % nearest_wall_cell = 0
 
     ! Other variables such as time scale, length scale and production
     allocate(turb % t_scale (-nb:nc));  turb % t_scale = 0.

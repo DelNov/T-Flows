@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Find_Nearest_Wall_Cell(grid)
+  subroutine Find_Nearest_Wall_Cell(turb)
 !------------------------------------------------------------------------------!
 !   The subroutine links interior cells to the closes wall cell. This is       !
 !   needed for Standard Smagorinsky SGS model used in 'LES'.                   !
@@ -8,24 +8,27 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod, only: HUGE
-  use Turb_Mod
+  use Turb_Mod,  only: Turb_Type
   use Comm_Mod,  only: this_proc
   use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Turb_Type) :: turb
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: k,  c, nearest_cell  
-  real    :: new_distance, old_distance
-  real    :: Distance
-!==============================================================================!  
+  type(Grid_Type), pointer :: grid
+  integer                  :: k,  c, nearest_cell
+  real                     :: new_distance, old_distance
+  real                     :: Distance
+!==============================================================================!
+
+  grid => turb % pnt_grid
 
   if(this_proc  < 2)  &
     print *, '# Searching for corresponding wall cells!'
 
   nearest_cell = 0
-  nearest_wall_cell = 0
+  turb % nearest_wall_cell = 0
   old_distance = HUGE
   do c = 1, grid % n_cells
     old_distance = HUGE
@@ -39,7 +42,7 @@
         end if 
       end if
     end do
-    nearest_wall_cell(c) = nearest_cell 
+    turb % nearest_wall_cell(c) = nearest_cell
   end do
 
   if(this_proc < 2) print *, '# Searching finished'
