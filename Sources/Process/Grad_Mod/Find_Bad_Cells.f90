@@ -6,9 +6,6 @@
 !   Practically, these are the tetrahedronal cells with two faces on the       !
 !   boundary and two in the domain.                                            ! 
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Comm_Mod
-  use Grid_Mod
   use Work_Mod, only: n_good => i_cell_01
 !------------------------------------------------------------------------------!
   implicit none

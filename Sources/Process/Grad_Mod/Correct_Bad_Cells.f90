@@ -4,10 +4,6 @@
 !   Corrects the pressure gradients in the cells where they cannot             !
 !   be computed, the so called "bad" cells.                                    !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Comm_Mod
-  use Grid_Mod
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
