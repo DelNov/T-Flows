@@ -64,7 +64,7 @@
     b(c) = b(c) + c_11e * e_sor * turb % p_kin(c)
 
     ! Fill in a diagonal of coefficient matrix
-    a % val(a % dia(c)) =  a % val(a % dia(c)) + c_2e * e_sor * density
+    a % val(a % dia(c)) =  a % val(a % dia(c)) + c_2e * e_sor * density(c)
 
     ! Add buoyancy (linearly split) to eps equation as required in the t2 model
     if(buoyancy) then
@@ -79,13 +79,12 @@
   !   Following block shows density dependent behaviour   !
   !-------------------------------------------------------!
 
-  kin_vis = viscosity / density
-
   ! Imposing a boundary condition on wall for eps
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
     if(c2 < 0) then
+      kin_vis = viscosity(c1) / density(c1) 
       if( Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
           Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
 
@@ -111,10 +110,10 @@
                                             grid % wall_dist(c1),  &
                                             kin_vis)
 
-          tau_wall = density * kappa * u_tau * u_tan  &
+          tau_wall = density(c1) * kappa * u_tau * u_tan           &
                    / log(e_log * max(turb % y_plus(c1), 1.05))
 
-          u_tau_new = sqrt(tau_wall/density)
+          u_tau_new = sqrt(tau_wall/density(c1))
           turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
                                             u_tau_new,             &
                                             grid % wall_dist(c1),  &
@@ -127,7 +126,7 @@
 
           if(turb % y_plus(c1) > 3) then
 
-            fa = min(density * u_tau_new**3                              &
+            fa = min(density(c1) * u_tau_new**3                              &
                      / (kappa*grid % wall_dist(c1) * turb % p_kin(c1)),  &
                      1.0)
             eps % n(c1) = (1.0 - fa) * eps_int + fa * eps_wf

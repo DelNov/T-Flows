@@ -212,7 +212,8 @@
                               flow % vort(1),'VorticityMagnitude')
   end if
   if(turbulence_model .ne. NONE) then
-    kin_vis_t(1) = turb % vis_t(1) / viscosity
+    kin_vis_t(1:grid % n_cells) = turb % vis_t(1:grid % n_cells)  &
+                                / viscosity(1:grid % n_cells)
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               kin_vis_t(1),'EddyOverMolecularViscosity')
   end if

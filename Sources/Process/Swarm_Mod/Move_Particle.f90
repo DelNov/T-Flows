@@ -13,12 +13,13 @@
   type(Grid_Type),     pointer :: grid
   type(Var_Type),      pointer :: u, v, w
   type(Particle_Type), pointer :: part
-  integer                      :: c, c2                ! nearest cell
-  real                         :: rx, ry, rz           ! paticle-cell vector
-  real                         :: up, vp, wp           ! velocity at particle
-  real                         :: flow_vel             ! flow vel. magn.
-  real                         :: k1, k2, k3, k4       ! for Runge-Kutta
+  integer                      :: c, c2               ! nearest cell
+  real                         :: rx, ry, rz          ! paticle-cell vector
+  real                         :: up, vp, wp          ! velocity at particle
+  real                         :: flow_vel            ! flow vel. magn.
+  real                         :: k1, k2, k3, k4      ! for Runge-Kutta
   real                         :: part_tau, part_vel
+  real                         :: visc_const          ! characteristic viscosity
 !==============================================================================!
 
   ! Take aliases
@@ -28,6 +29,9 @@
   v    => flow % v
   w    => flow % w
   part => swarm % particle(k)
+
+  ! Characteristic viscosity (needs to be discussed yet)
+  visc_const = maxval(viscosity(:))
 
   c  = part % cell      ! index of the closest cell for interpolation
   c2 = part % bnd_cell  ! index of the closest boundary cell for reflection
@@ -60,7 +64,7 @@
   part_vel = sqrt(part % u **2 + part % v **2 + part % w **2)
 
   ! Particle relaxation time
-  part_tau = part % density * (part % d **2) / 18.0 / viscosity
+  part_tau = part % density * (part % d **2) / 18.0 / visc_const
 
   ! Compute particle relative vel. in y-dir for buoyant force calculation
   part % rel_u   = up - part % u
@@ -71,7 +75,7 @@
                         + part % rel_w ** 2)
 
   ! Compute Reynolds number for calculating Cd
-  part % re = part % density * part % d * abs(flow_vel - part_vel) / viscosity
+  part % re = part % density * part % d * abs(flow_vel - part_vel) / visc_const
 
   ! Compute the drag factor f
   part % f = 1.0 + 0.15 *(part % re ** 0.687)

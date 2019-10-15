@@ -92,8 +92,6 @@
   ee = 0.5
   aa = 0.5
 
-  kin_vis = viscosity / density
-
   do c = 1, grid % n_cells
     kin % n(c) = max(0.5*(uu % n(c) + vv % n(c) + ww % n(c)), TINY)
   end do
@@ -267,6 +265,7 @@
       end if
 
       do c = 1, grid % n_cells
+        kin_vis = viscosity(c) / density(c)
         if(i == 1) then
           uxx = ui_xx(c)
           uxy = ui_xy(c)
@@ -344,6 +343,7 @@
   r13 = ONE_THIRD
   r23 = TWO_THIRDS
   do  c = 1, grid % n_cells
+    kin_vis = viscosity(c) / density(c)
     turb % p_kin(c) = max(                                                     &
           - (  uu % n(c)*u % x(c) + uv % n(c)*u % y(c) + uw % n(c)*u % z(c)    &
              + uv % n(c)*v % x(c) + vv % n(c)*v % y(c) + vw % n(c)*v % z(c)    &
@@ -590,17 +590,17 @@
     !---------------!
     if(name_phi == 'UU') then
 
-      b(c) = b(c) + density * (  max(p11,0.0)  &
-                     + cc1 * eps % n(c) * r23  &
-                     + max(var2_11, 0.0)       &
-                     + max(var1w_11,0.0)       &
+      b(c) = b(c) + density(c) * (  max(p11,0.0)  &
+                     + cc1 * eps % n(c) * r23     &
+                     + max(var2_11, 0.0)          &
+                     + max(var1w_11,0.0)          &
                      + max(var2w_11,0.0))*grid % vol(c) 
       a % val(a % dia(c)) = a % val(a % dia(c))                               &
-                + density * (  cc1 * eps % n(c) / kin % n(c)                  &
+                + density(c) * (  cc1 * eps % n(c) / kin % n(c)               &
                              + c1w * f_w * eps % n(c) / kin % n(c)*3.0*n1*n1  &
                              + fss * eps % n(c) / kin % n(c))*grid % vol(c)
       a % val(a % dia(c)) = a % val(a % dia(c))               &
-                + density * (  max(-p11,     0.0)             &
+                + density(c) * (  max(-p11,     0.0)          &
                              + max(-var2_11, 0.0)             &
                              + max(-var1w_11,0.0)             &
                              + max(-var2w_11,0.0)             &
@@ -612,17 +612,17 @@
     !---------------!
     else if(name_phi == 'VV') then
 
-      b(c) = b(c) + density * (  max(p22,0.0)  &
-                     + cc1 * eps % n(c) * r23  &
-                     + max(var2_22, 0.0)       &
-                     + max(var1w_22,0.0)       &
+      b(c) = b(c) + density(c) * (  max(p22,0.0)  &
+                     + cc1 * eps % n(c) * r23     &
+                     + max(var2_22, 0.0)          &
+                     + max(var1w_22,0.0)          &
                      + max(var2w_22,0.0))*grid % vol(c) 
       a % val(a % dia(c)) = a % val(a % dia(c))                               &
-                + density * (  cc1 * eps % n(c) / kin % n(c)                  &
+                + density(c) * (  cc1 * eps % n(c) / kin % n(c)               &
                              + c1w * f_w * eps % n(c) / kin % n(c)*3.0*n2*n2  &
                              + fss * eps % n(c) / kin % n(c))*grid % vol(c)
       a % val(a % dia(c)) = a % val(a % dia(c))               &
-                + density * (  max(-p22,     0.0)             &
+                + density(c) * (  max(-p22,     0.0)          &
                              + max(-var2_22, 0.0)             &
                              + max(-var1w_22,0.0)             &
                              + max(-var2w_22,0.0)             &
@@ -634,17 +634,17 @@
     !---------------!
     else if(name_phi == 'WW') then
 
-      b(c) = b(c) + density * (  max(p33,0.0)  &
-                     + cc1 * eps % n(c) * r23  &
-                     + max(var2_33, 0.0)       &
-                     + max(var1w_33,0.0)       &
+      b(c) = b(c) + density(c) * (  max(p33,0.0)  &
+                     + cc1 * eps % n(c) * r23     &
+                     + max(var2_33, 0.0)          &
+                     + max(var1w_33,0.0)          &
                      + max(var2w_33,0.0))*grid % vol(c) 
       a % val(a % dia(c)) = a % val(a % dia(c))                               &
-                + density * (  cc1 * eps % n(c) / kin % n(c)                  &
+                + density(c) * (  cc1 * eps % n(c) / kin % n(c)               &
                              + c1w * f_w * eps % n(c) / kin % n(c)*3.0*n3*n3  &
                              + fss * eps % n(c) / kin % n(c))*grid % vol(c)
       a % val(a % dia(c)) = a % val(a % dia(c))               &
-                + density * (  max(-p33,     0.0)             &
+                + density(c) * (  max(-p33,     0.0)          &
                              + max(-var2_33, 0.0)             &
                              + max(-var1w_33,0.0)             &
                              + max(-var2w_33,0.0)             &
@@ -655,9 +655,10 @@
     !   UV stress   !
     !---------------!
     else if(name_phi == 'UV') then
-      b(c) = b(c) + density * (p12 + var2_12 + var1w_12 + var2w_12)*grid % vol(c)
+      b(c) = b(c) + density(c) * (p12 + var2_12 + var1w_12 + var2w_12)      &
+           * grid % vol(c)
       a % val(a % dia(c)) = a % val(a % dia(c))                             &
-            + density * (  cc1 * eps % n(c) / kin % n(c)                    &
+            + density(c) * (  cc1 * eps % n(c) / kin % n(c)                 &
                + c1w * f_w * eps % n(c) / kin % n(c) * 1.5*(n1*n1 + n2*n2)  &
                + fss * eps % n(c) / kin % n(c) ) * grid % vol(c)
 
@@ -665,9 +666,10 @@
     !   UW stress   !
     !---------------!
     else if(name_phi == 'UW') then
-      b(c) = b(c) + density * (p13 + var2_13 + var1w_13 + var2w_13)*grid % vol(c)
+      b(c) = b(c) + density(c) * (p13 + var2_13 + var1w_13 + var2w_13)      &
+           * grid % vol(c)
       a % val(a % dia(c)) = a % val(a % dia(c))                             &
-            + density * (  cc1 * eps % n(c) / kin % n(c)                    &
+            + density(c) * (  cc1 * eps % n(c) / kin % n(c)                 &
                + c1w * f_w * eps % n(c) / kin % n(c) * 1.5*(n1*n1 + n3*n3)  &
                + fss * eps % n(c) / kin % n(c) ) * grid % vol(c)
 
@@ -675,9 +677,10 @@
     !   VW stress   !
     !---------------!
     else if(name_phi == 'VW') then
-      b(c) = b(c) + density * (p23 + var2_23 + var1w_23 + var2w_23)*grid % vol(c)
+      b(c) = b(c) + density(c) * (p23 + var2_23 + var1w_23 + var2w_23)      &
+           * grid % vol(c)
       a % val(a % dia(c)) = a % val(a % dia(c))                             &
-            + density * (  cc1 * eps % n(c) / kin % n(c)                    &
+            + density(c) * (  cc1 * eps % n(c) / kin % n(c)                 &
                + c1w * f_w * eps % n(c) / kin % n(c) * 1.5*(n2*n2 + n3*n3)  &
                + fss * eps % n(c) / kin % n(c) ) * grid % vol(c)
 
@@ -688,9 +691,10 @@
       f_eps = 1.0 - ((c_2e-1.4)/c_2e) * exp(-(re_t/6.0)**2)
       eps_1 = 1.44 * turb % p_kin(c) / turb % t_scale(c)
       eps_2 = c_2e * f_eps  / turb % t_scale(c)
-      b(c) = b(c) + density * (eps_1 + diss1(c)) * grid % vol(c)
+      b(c) = b(c) + density(c) * (eps_1 + diss1(c)) * grid % vol(c)
 
-      a % val(a % dia(c)) =  a % val(a % dia(c)) + density * eps_2 * grid % vol(c)
+      a % val(a % dia(c)) = a % val(a % dia(c)) + density(c) * eps_2  &
+                          * grid % vol(c)
     end if
   end do
 
@@ -703,12 +707,13 @@
     call Grad_Mod_Component(grid, kin_e, 2, kin_e_y, .true.)   ! dk/dy
     call Grad_Mod_Component(grid, kin_e, 3, kin_e_z, .true.)   ! dk/dz
     do c = 1, grid % n_cells
+      kin_vis = viscosity(c) / density(c)
       re_t  = (kin % n(c)**2) / (kin_vis*eps % n(c) + TINY)
       f_eps = 1.0 - ((c_2e-1.4)/c_2e) * exp(-(re_t/6.0)**2)
-      b(c) = b(c) + density * (c_2e * f_eps / turb % t_scale(c)  &
-                     * (kin_vis *(  kin_e_x(c)**2                &
-                                  + kin_e_y(c)**2                &
-                                  + kin_e_z(c)**2)))             &
+      b(c) = b(c) + density(c) * (c_2e * f_eps / turb % t_scale(c)  &
+                     * (kin_vis *(  kin_e_x(c)**2                   &
+                                  + kin_e_y(c)**2                   &
+                                  + kin_e_z(c)**2)))                &
                      * grid % vol(c)
     end do
   end if
@@ -723,6 +728,7 @@
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
 
+          kin_vis = viscosity(c1) / density(c1)
           eps % n(c2) = kin_vis * (  kin_e_x(c1)**2  &
                                    + kin_e_y(c1)**2  &
                                    + kin_e_z(c1)**2)

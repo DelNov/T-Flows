@@ -36,6 +36,10 @@
     real, allocatable :: shear(:)
     real, allocatable :: vort(:)
 
+    ! Volume fraction (colour function) 
+    type(Var_Type)    :: vof
+    real, allocatable :: vof_f(:)
+
     ! Scalars (like chemical species for example)
     integer                     :: n_scalars
     type(Var_Type), allocatable :: scalar(:)
@@ -57,12 +61,18 @@
   ! Variables determining if we are dealing with heat transfer and buoyancy
   logical :: heat_transfer
   logical :: buoyancy
+  logical :: multiphase
 
   ! Heat flux to the domain (important for periodic case with heat transfer)
   real :: heat_flux, heated_area, heat
 
   ! Physical properties
-  real :: viscosity, density, conductivity, diffusivity, capacity
+  real :: conductivity, diffusivity, capacity
+  real, allocatable :: viscosity(:), density(:), dens_face(:)
+
+  ! Physical properties in case of multiphase flow
+  real              :: surface_tension
+  real, allocatable :: viscosity_mult(:), density_mult(:)
 
   ! Angular velocity
   real :: omega_x, omega_y, omega_z, omega
@@ -79,5 +89,6 @@
   include 'Field_Mod/Alias_Energy.f90'
   include 'Field_Mod/Alias_Momentum.f90'
   include 'Field_Mod/U_Tan.f90'
+  include 'Field_Mod/Alias_V_Fraction.f90'
 
   end module

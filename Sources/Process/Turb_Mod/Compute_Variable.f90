@@ -26,6 +26,7 @@
   real                       :: vis_eff
   real                       :: phi_x_f, phi_y_f, phi_z_f
   real                       :: dt
+  real                       :: visc_const, fs
 !==============================================================================!
 !                                                                              !
 !  The form of equations which are solved:                                     !
@@ -90,21 +91,28 @@
 
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
+    fs = grid % f(s)
 
-    vis_eff = viscosity + (    grid % fw(s)  * turb % vis_t(c1)   &
-                        + (1.0-grid % fw(s)) * turb % vis_t(c2))  &
-                        / phi % sigma
+    if (c2 > 0) then
+      visc_const = fs * viscosity(c1) + (1.0 - fs) * viscosity(c2)
+    else
+      visc_const = viscosity(c1)
+    end if
+
+    vis_eff = visc_const + (    grid % fw(s)  * turb % vis_t(c1)   &
+                         + (1.0-grid % fw(s)) * turb % vis_t(c2))  &
+                         / phi % sigma
 
     if(turbulence_model .eq. SPALART_ALLMARAS .or.               &
        turbulence_model .eq. DES_SPALART)                        &
-      vis_eff = viscosity + (    grid % fw(s)  * vis % n(c1)     &
-                          + (1.0-grid % fw(s)) * vis % n(c2))    &
+      vis_eff = visc_const + (    grid % fw(s)  * vis % n(c1)    &
+                           + (1.0-grid % fw(s)) * vis % n(c2))   &
                           / phi % sigma
 
     if(turbulence_model .eq. HYBRID_LES_RANS) then
-      vis_eff = viscosity + (    grid % fw(s)  * turb % vis_t_eff(c1)   &
-                          + (1.0-grid % fw(s)) * turb % vis_t_eff(c2))  &
-                          / phi % sigma
+      vis_eff = visc_const + (    grid % fw(s)  * turb % vis_t_eff(c1)   &
+                           + (1.0-grid % fw(s)) * turb % vis_t_eff(c2))  &
+                           / phi % sigma
     end if
     phi_x_f = grid % fw(s) * phi % x(c1) + (1.0-grid % fw(s)) * phi % x(c2)
     phi_y_f = grid % fw(s) * phi % y(c1) + (1.0-grid % fw(s)) * phi % y(c2)

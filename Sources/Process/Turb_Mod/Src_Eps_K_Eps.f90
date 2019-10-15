@@ -51,9 +51,9 @@
   call Turb_Mod_Alias_K_Eps    (turb, kin, eps)
   call Solver_Mod_Alias_System (sol, a, b)
 
-  kin_vis = viscosity/density
-
   do c = 1, grid % n_cells
+    kin_vis = viscosity(c)/density(c)
+
     ! Positive contribution:
     b(c) = b(c) + &
             c_1e * turb % p_kin(c) * eps % n(c) / kin % n(c) * grid % vol(c)
@@ -68,7 +68,7 @@
     f_mu = min(f_mu,1.0)
 
     a % val(a % dia(c)) = a % val(a % dia(c)) &
-     + density * f_mu* c_2e * eps % n(c) / kin % n(c) * grid % vol(c)
+     + density(c) * f_mu* c_2e * eps % n(c) / kin % n(c) * grid % vol(c)
  
 
     ! Buoyancy contribution
@@ -105,8 +105,8 @@
             a % val(j) = 0.0 
           end do
 
-          b(c1) = eps % n(c1) * density
-          a % val(a % dia(c1)) = 1.0 * density
+          b(c1) = eps % n(c1) * density(c1)
+          a % val(a % dia(c1)) = 1.0 * density(c1)
         else
           u_tau = c_mu25 * sqrt(kin % n(c1))
           turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
@@ -114,22 +114,22 @@
                                             grid % wall_dist(c1),  &
                                             kin_vis)
 
-          tau_wall = density*kappa*u_tau*u_tan   &
+          tau_wall = density(c1)*kappa*u_tau*u_tan   &
                    / log(e_log * max(turb % y_plus(c1), 1.05))
 
-          u_tau_new = sqrt(tau_wall/density)
+          u_tau_new = sqrt(tau_wall/density(c1))
           turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
                                             u_tau_new,             &
                                             grid % wall_dist(c1),  &
                                             kin_vis)
 
-          eps_int = 2.0*viscosity/density * kin % n(c1)    &
+          eps_int = 2.0*viscosity(c1)/density(c1) * kin % n(c1)    &
                   / grid % wall_dist(c1)**2
           eps_wf  = c_mu75 * kin % n(c1)**1.5              &
                   / (grid % wall_dist(c1) * kappa)
 
           if(turb % y_plus(c1) > 3) then
-            fa = min(density*u_tau_new**3  &
+            fa = min(density(c1)*u_tau_new**3  &
                / (kappa*grid % wall_dist(c1) * turb % p_kin(c1)),1.0)
 
             eps % n(c1) = (1.0-fa)*eps_int + fa*eps_wf

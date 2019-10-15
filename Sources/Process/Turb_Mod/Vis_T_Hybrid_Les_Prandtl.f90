@@ -52,12 +52,12 @@
     ! version since the subdomains which do not "touch" wall
     ! has nearest_wall_cell(c) = 0. 
     if(turb % nearest_wall_cell(c) .ne. 0) then
-      u_ff = sqrt( viscosity  &
+      u_ff = sqrt( viscosity(c)  &
                   * sqrt(  u % n(turb % nearest_wall_cell(c)) ** 2   &
                          + v % n(turb % nearest_wall_cell(c)) ** 2   &
                          + w % n(turb % nearest_wall_cell(c)) ** 2)  &
                  / (grid % wall_dist(turb % nearest_wall_cell(c))+TINY) )
-      turb % y_plus(c) = grid % wall_dist(c) * u_ff / viscosity
+      turb % y_plus(c) = grid % wall_dist(c) * u_ff / viscosity(c)
 
       ! Piomelli damping function
       fd = 1.0 - exp(-(turb % y_plus(c)/25.0)**3)
@@ -80,7 +80,7 @@
     c2 = grid % faces_c(2,s)
 
     if(c2 < 0) then
-      turb % vis_w(c1) = viscosity                       &
+      turb % vis_w(c1) = viscosity(c1)                   &
               +        grid % fw(s)  * turb % vis_t(c1)  &
               + (1.0 - grid % fw(s)) * turb % vis_t(c2)
     end if    ! c2 < 0

@@ -56,11 +56,12 @@
   call Field_Mod_Alias_Momentum(flow, u, v, w)
   call Turb_Mod_Alias_K_Eps    (turb, kin, eps)
 
-  ! Kinematic viscosities
-  kin_vis = viscosity/density
-
   do c = 1, grid % n_cells
-    re_t = density * kin % n(c)**2/(viscosity*eps % n(c))
+
+    ! Kinematic viscosities
+    kin_vis = viscosity(c)/density(c)
+
+    re_t = density(c) * kin % n(c)**2 / (viscosity(c) * eps % n(c))
 
     y_star = (kin_vis * eps % n(c))**0.25 * grid % wall_dist(c)/kin_vis
 
@@ -69,7 +70,7 @@
 
     f_mu = min(1.0,f_mu)
 
-    turb % vis_t(c) = f_mu * c_mu * density * kin % n(c)**2  / eps % n(c)
+    turb % vis_t(c) = f_mu * c_mu * density(c) * kin % n(c)**2 / eps % n(c)
   end do
 
   do s = 1, grid % n_faces
@@ -88,7 +89,7 @@
                                           grid % wall_dist(c1),  &
                                           kin_vis)
 
-        tau_wall = density*kappa*u_tau*u_tan   &
+        tau_wall = density(c1)*kappa*u_tau*u_tan   &
                  / log(e_log*max(turb % y_plus(c1), 1.05))
 
         ebf = 0.01 * turb % y_plus(c1)**4  &
@@ -97,9 +98,9 @@
         u_plus = U_Plus_Log_Law(turb, turb % y_plus(c1))
 
         if(turb % y_plus(c1) < 3.0) then
-          turb % vis_w(c1) = turb % vis_t(c1) + viscosity
+          turb % vis_w(c1) = turb % vis_t(c1) + viscosity(c)
         else
-          turb % vis_w(c1) =    turb % y_plus(c1) * viscosity         &
+          turb % vis_w(c1) =    turb % y_plus(c1) * viscosity(c)      &
                            / (  turb % y_plus(c1) * exp(-1.0 * ebf)   &
                               + u_plus * exp(-1.0/ebf) + TINY)
         end if
@@ -116,17 +117,17 @@
                                                  grid % wall_dist(c1),  &
                                                  kin_vis)
           u_plus     = U_Plus_Rough_Walls(turb, grid % wall_dist(c1))
-          turb % vis_w(c1) = turb % y_plus(c1) * viscosity / u_plus
+          turb % vis_w(c1) = turb % y_plus(c1) * viscosity(c1) / u_plus
         end if
 
         if(heat_transfer) then
-          pr = viscosity * capacity / conductivity
+          pr = viscosity(c1) * capacity / conductivity
           pr_t = Turb_Mod_Prandtl_Number(turb, c1)
           beta = 9.24 * ((pr/pr_t)**0.75 - 1.0)  &
                * (1.0 + 0.28 * exp(-0.007*pr/pr_t))
           ebf = 0.01 * (pr*turb % y_plus(c1) ** 4  &
               / ((1.0 + 5.0 * pr**3 * turb % y_plus(c1)) + TINY))
-          turb % con_w(c1) =    turb % y_plus(c1) * viscosity * capacity   &
+          turb % con_w(c1) =    turb % y_plus(c1) * viscosity(c1) * capacity   &
                            / (  turb % y_plus(c1) * pr * exp(-1.0 * ebf)   &
                            + (u_plus + beta) * pr_t * exp(-1.0 / ebf) + TINY)
         end if

@@ -38,6 +38,7 @@
   real                       :: phix_f, phiy_f, phiz_f
   real                       :: vis_t_f
   real                       :: dt
+  real                       :: visc_const, dens_const
 !==============================================================================!
 !                                                                              !
 !   The form of equations which are being solved:                              !
@@ -112,11 +113,14 @@
     vis_t_f = grid % fw(s)       * turb % vis_t(c1)  &
             + (1.0-grid % fw(s)) * turb % vis_t(c2)
 
-    vis_eff = viscosity + vis_t_f
+    visc_const = grid % f(s)         * viscosity(c1)  &
+               + (1.0 - grid % f(s)) * viscosity(c2)
 
+    vis_eff = visc_const + vis_t_f
+    
     if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
       if(turbulence_model_variant .ne. STABILIZED) then
-        vis_eff = 1.5*viscosity + vis_t_f
+        vis_eff = 1.5*visc_const + vis_t_f
       end if
     end if
 
@@ -127,8 +131,8 @@
 
     ! Total (exact) diffusive flux plus turb. diffusion
     f_ex = vis_eff * (  phix_f * grid % sx(s)  &
-                    + phiy_f * grid % sy(s)  &
-                    + phiz_f * grid % sz(s) ) 
+                      + phiy_f * grid % sy(s)  &
+                      + phiz_f * grid % sz(s) ) 
 
     a0 = vis_eff * a % fc(s)
 
@@ -186,40 +190,40 @@
   if(turbulence_model_variant .ne. STABILIZED) then
     if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
       do c = 1, grid % n_cells
-        u1uj_phij(c) = density * c_mu_d / phi % sigma * kin % n(c)     &
+        u1uj_phij(c) = density(c) * c_mu_d / phi % sigma * kin % n(c)     &
                      / max(eps % n(c), TINY)                           &
                      * (  uu % n(c) * phi_x(c)                         &
                         + uv % n(c) * phi_y(c)                         &
                         + uw % n(c) * phi_z(c))                        &
-                     - viscosity * phi_x(c)
+                     - viscosity(c) * phi_x(c)
 
-        u2uj_phij(c) = density * c_mu_d / phi % sigma * kin % n(c)     &
+        u2uj_phij(c) = density(c) * c_mu_d / phi % sigma * kin % n(c)     &
                      / max(eps % n(c), TINY)                           &
                      * (  uv % n(c) * phi_x(c)                         &
                         + vv % n(c) * phi_y(c)                         &
                         + vw % n(c) * phi_z(c))                        &
-                     - viscosity * phi_y(c)
+                     - viscosity(c) * phi_y(c)
 
-        u3uj_phij(c) = density * c_mu_d / phi % sigma * kin % n(c)     &
+        u3uj_phij(c) = density(c) * c_mu_d / phi % sigma * kin % n(c)     &
                      / max(eps % n(c), TINY)                           &
                      * (  uw % n(c) * phi_x(c)                         &
                         + vw % n(c) * phi_y(c)                         &
                         + ww % n(c) * phi_z(c))                        &
-                     - viscosity * phi_z(c)
+                     - viscosity(c) * phi_z(c)
       end do
     else if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
       do c = 1, grid % n_cells
-        u1uj_phij(c) = density * c_mu_d / phi % sigma * turb % t_scale(c)  &
+        u1uj_phij(c) = density(c) * c_mu_d / phi % sigma * turb % t_scale(c)  &
                      * (  uu % n(c) * phi_x(c)                             &
                         + uv % n(c) * phi_y(c)                             &
                         + uw % n(c) * phi_z(c))
 
-        u2uj_phij(c) = density * c_mu_d / phi % sigma * turb % t_scale(c)  &
+        u2uj_phij(c) = density(c) * c_mu_d / phi % sigma * turb % t_scale(c)  &
                      * (  uv % n(c) * phi_x(c)                             &
                         + vv % n(c) * phi_y(c)                             &
                         + vw % n(c) * phi_z(c))
 
-        u3uj_phij(c) = density * c_mu_d / phi % sigma * turb % t_scale(c)  &
+        u3uj_phij(c) = density(c) * c_mu_d / phi % sigma * turb % t_scale(c)  &
                      * (  uw % n(c) * phi_x(c)                             &
                         + vw % n(c) * phi_y(c)                             &
                         + ww % n(c) * phi_z(c))

@@ -53,22 +53,20 @@
     b(c) = b(c) + turb % p_kin(c) * grid % vol(c)
 
     a % val(a % dia(c)) = a % val(a % dia(c)) + &
-         density * eps % n(c)/(kin % n(c) + TINY) * grid % vol(c)
+         density(c) * eps % n(c)/(kin % n(c) + TINY) * grid % vol(c)
 
     if (buoyancy) then
       turb % g_buoy(c) = -flow % beta           &
                        * (grav_x * ut % n(c) +  &
                           grav_y * vt % n(c) +  &
                           grav_z * wt % n(c))   &
-                       * density
+                       * density(c)
       b(c) = b(c) + max(0.0, turb % g_buoy(c) * grid % vol(c))
       a % val(a % dia(c)) = a % val(a % dia(c))        &
                           + max(0.0,-turb % g_buoy(c)  &
                           * grid % vol(c) / (kin % n(c) + TINY))
     end if
   end do
-
-  kin_vis = viscosity / density
 
   !-----------------------------------------------!
   !  Compute the sources in the near wall cells   !
@@ -78,6 +76,7 @@
     c2 = grid % faces_c(2,s)
 
     if(c2 < 0) then
+      kin_vis = viscosity(c1) / density(c1)
       if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
          Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
 
@@ -90,7 +89,7 @@
           turb % y_plus(c1) = u_tau * (grid % wall_dist(c1) + z_o) &
                             / kin_vis
 
-          tau_wall = density * kappa * u_tau * u_tan  &
+          tau_wall = density(c1) * kappa * u_tau * u_tan  &
                    / log(((grid % wall_dist(c1)+z_o) / z_o))
 
           turb % p_kin(c1) = tau_wall * c_mu25 * sqrt(kin % n(c1))   &
@@ -105,7 +104,7 @@
                                             grid % wall_dist(c1),  &
                                             kin_vis)
 
-          tau_wall = density*kappa*u_tau*u_tan   &
+          tau_wall = density(c1)*kappa*u_tau*u_tan   &
                    / log(e_log * max(turb % y_plus(c1), 1.05))
 
           ebf = 0.01 * turb % y_plus(c1)**4  &
