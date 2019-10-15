@@ -1,5 +1,5 @@
 !==============================================================================!
-  logical function Approx_String(s, t, tol)
+  logical function Math_Mod_Approx_String(s, t, tol)
 !------------------------------------------------------------------------------!
 !   For all i and j, d[i,j] will hold the Levenshtein distance between the     !
 !   first "i" characters of "s" and the first "j" characters of "t".           !
@@ -53,9 +53,9 @@
   end do
 
   if( d(m,n) > 0 .and. d(m,n) <= tolerance ) then
-    Approx_String = .true.
+    Math_Mod_Approx_String = .true.
   else
-    Approx_String = .false.
+    Math_Mod_Approx_String = .false.
   end if
 
   end function

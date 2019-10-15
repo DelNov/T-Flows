@@ -2,6 +2,7 @@
   module Control_Mod
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
+  use Math_Mod
   use Tokenizer_Mod
   use Comm_Mod,      only: this_proc, Comm_Mod_End
 !------------------------------------------------------------------------------!

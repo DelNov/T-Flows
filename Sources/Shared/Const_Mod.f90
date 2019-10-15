@@ -17,6 +17,8 @@
   real, parameter :: TERA  = 1.e+12
   real, parameter :: GIGA  = 1.e+9
   real, parameter :: MEGA  = 1.e+6
+  real, parameter :: KILO  = 1.e+3
+  real, parameter :: MILI  = 1.e-3
   real, parameter :: MICRO = 1.e-6
   real, parameter :: NANO  = 1.e-9
   real, parameter :: PICO  = 1.e-12

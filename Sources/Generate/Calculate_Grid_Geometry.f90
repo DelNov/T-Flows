@@ -5,6 +5,7 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod, only: HUGE, ONE_THIRD
+  use Math_Mod
   use Gen_Mod,   only: face_c_to_c
   use Grid_Mod,  only: Grid_Type
 !------------------------------------------------------------------------------!
@@ -12,9 +13,6 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type)     :: grid
   logical, intent(in) :: real_run
-!----------------------------------[Calling]-----------------------------------!
-  real :: Tet_Volume
-  real :: Distance
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c, c1, c2, m, n, s, n_per
   real    :: loc_x_node(4), loc_y_node(4), loc_z_node(4)
@@ -361,32 +359,32 @@
       x_cell_tmp = grid % xc(c1)
       y_cell_tmp = grid % yc(c1)
       z_cell_tmp = grid % zc(c1)
-      dsc1 = Distance(x_cell_tmp,   y_cell_tmp,   z_cell_tmp,    &
-                      grid % xf(s), grid % yf(s), grid % zf(s)) 
+      dsc1 = Math_Mod_Distance(x_cell_tmp,   y_cell_tmp,   z_cell_tmp,    &
+                               grid % xf(s), grid % yf(s), grid % zf(s))
       grid % vol(c1) = grid % vol(c1)                                      &
-                 + Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),      &
+        + Math_Mod_Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),      &
                               loc_x_node(1),loc_y_node(1),loc_z_node(1),   &
                               loc_x_node(2),loc_y_node(2),loc_z_node(2),   &
                               x_cell_tmp,y_cell_tmp,z_cell_tmp)
       grid % vol(c1) = grid % vol(c1)                                      &
-                 + Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),      &
+        + Math_Mod_Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),      &
                               loc_x_node(2),loc_y_node(2),loc_z_node(2),   &
                               loc_x_node(3),loc_y_node(3),loc_z_node(3),   &
                               x_cell_tmp,y_cell_tmp,z_cell_tmp)
       if(grid % faces_n_nodes(s) .eq. 4) then
         grid % vol(c1) = grid % vol(c1)                                    &
-                   + Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),    &
+          + Math_Mod_Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),    &
                                 loc_x_node(3),loc_y_node(3),loc_z_node(3), &
                                 loc_x_node(4),loc_y_node(4),loc_z_node(4), &
                                 x_cell_tmp,y_cell_tmp,z_cell_tmp)
         grid % vol(c1) = grid % vol(c1)                                    &
-                   + Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),    &
+          + Math_Mod_Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),    &
                                 loc_x_node(4),loc_y_node(4),loc_z_node(4), &
                                 loc_x_node(1),loc_y_node(1),loc_z_node(1), &
                                 x_cell_tmp,y_cell_tmp,z_cell_tmp)
       else if(grid % faces_n_nodes(s) .eq. 3) then
         grid % vol(c1) = grid % vol(c1)                                    &
-                   + Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),    &
+          + Math_Mod_Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),    &
                                 loc_x_node(3),loc_y_node(3),loc_z_node(3), &
                                 loc_x_node(1),loc_y_node(1),loc_z_node(1), &
                                 x_cell_tmp,y_cell_tmp,z_cell_tmp)
@@ -397,32 +395,32 @@
         x_cell_tmp = grid % xc(c2) + grid % dx(s)
         y_cell_tmp = grid % yc(c2) + grid % dy(s)
         z_cell_tmp = grid % zc(c2) + grid % dz(s)
-        dsc2=Distance(x_cell_tmp,   y_cell_tmp,   z_cell_tmp,    &
-                      grid % xf(s), grid % yf(s), grid % zf(s)) 
+        dsc2=Math_Mod_Distance(x_cell_tmp,   y_cell_tmp,   z_cell_tmp,    &
+                               grid % xf(s), grid % yf(s), grid % zf(s))
         grid % vol(c2) = grid % vol(c2)                                    &
-                   - Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),    &
+          - Math_Mod_Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),    &
                                 loc_x_node(1),loc_y_node(1),loc_z_node(1), &
                                 loc_x_node(2),loc_y_node(2),loc_z_node(2), &
                                 x_cell_tmp,y_cell_tmp,z_cell_tmp)
         grid % vol(c2) = grid % vol(c2)                                    &
-                   - Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),    &
+          - Math_Mod_Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),    &
                                 loc_x_node(2),loc_y_node(2),loc_z_node(2), &
                                 loc_x_node(3),loc_y_node(3),loc_z_node(3), &
                                 x_cell_tmp,y_cell_tmp,z_cell_tmp)
         if(grid % faces_n_nodes(s) .eq. 4) then
           grid % vol(c2) = grid % vol(c2)                                  &
-                     - Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),  &
+            - Math_Mod_Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),  &
                            loc_x_node(3),loc_y_node(3),loc_z_node(3),      &
                            loc_x_node(4),loc_y_node(4),loc_z_node(4),      &
                            x_cell_tmp,y_cell_tmp,z_cell_tmp)
           grid % vol(c2) = grid % vol(c2)                                  &
-                     - Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),  &
+            - Math_Mod_Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),  &
                            loc_x_node(4),loc_y_node(4),loc_z_node(4),      &
                            loc_x_node(1),loc_y_node(1),loc_z_node(1),      &
                            x_cell_tmp,y_cell_tmp,z_cell_tmp)
         else if(grid % faces_n_nodes(s) .eq. 3) then
           grid % vol(c2) = grid % vol(c2)                                  &
-                     - Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),  &
+            - Math_Mod_Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),  &
                            loc_x_node(3),loc_y_node(3),loc_z_node(3),      &
                            loc_x_node(1),loc_y_node(1),loc_z_node(1),      &
                            x_cell_tmp,y_cell_tmp,z_cell_tmp)
@@ -446,13 +444,15 @@
       xc1 = grid % xc(c1)
       yc1 = grid % yc(c1)
       zc1 = grid % zc(c1)
-      dsc1 = Distance(xc1, yc1, zc1, grid % xf(s), grid % yf(s), grid % zf(s))
+      dsc1 = Math_Mod_Distance(xc1, yc1, zc1,  &
+                               grid % xf(s), grid % yf(s), grid % zf(s))
 
       ! Second cell (pls. check if xsi=xc on the boundary)
       xc2 = grid % xc(c2) + grid % dx(s)
       yc2 = grid % yc(c2) + grid % dy(s)
       zc2 = grid % zc(c2) + grid % dz(s)
-      dsc2 = Distance(xc2, yc2, zc2, grid % xf(s), grid % yf(s), grid % zf(s))
+      dsc2 = Math_Mod_Distance(xc2, yc2, zc2,  &
+                               grid % xf(s), grid % yf(s), grid % zf(s))
 
       ! Interpolation factor
       grid % f(s) = dsc2 / (dsc1 + dsc2)

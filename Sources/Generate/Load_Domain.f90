@@ -4,6 +4,7 @@
 !   Reads: .dom file                                                           !
 !----------------------------------[Modules]-----------------------------------!
   use Name_Mod,    only: problem_name
+  use Math_Mod
   use Gen_Mod
   use Domain_Mod,  only: Domain_Type,                  &
                          Domain_Mod_Allocate_Points,   &
@@ -29,8 +30,6 @@
   type(Smooths_Type) :: smr
   type(Refines_Type) :: ref
   type(Grid_Type)    :: grid
-!----------------------------------[Calling]-----------------------------------!
-  real :: Tet_Volume
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: b, i, l, s, fc, n, n1, n2, n3, n4, dumi
   integer           :: n_faces_check, n_nodes_check
@@ -172,8 +171,8 @@
       zt(n) = dom % points(dom % blocks(b) % corners(n)) % z
     end do
 
-    if(Tet_Volume( xt(2),yt(2),zt(2), xt(5),yt(5),zt(5),  &
-                   xt(3),yt(3),zt(3), xt(1),yt(1),zt(1) )  < 0) then
+    if(Math_Mod_Tet_Volume( xt(2),yt(2),zt(2), xt(5),yt(5),zt(5),  &
+                            xt(3),yt(3),zt(3), xt(1),yt(1),zt(1) )  < 0) then
       dom % blocks(b) % corners(0)=-1            !  It's nor properly oriented
       call Swap_Int(dom % blocks(b) % corners(2),  &
                     dom % blocks(b) % corners(3))

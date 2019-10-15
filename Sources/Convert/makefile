@@ -133,7 +133,8 @@ METIS_LIB = ../Libraries/Metis_5.1.0_Linux_64/libmetis.a
 
 # Modules in shared directories
 SRC_MOD = Const_Mod.f90			\
-          Gen_Mod.f90   		\
+          Math_Mod.f90			\
+          Gen_Mod.f90			\
           Div_Mod.f90			\
           Tokenizer_Mod.f90		\
           Material_Mod.f90		\
@@ -150,10 +151,7 @@ SRC_MOD = Const_Mod.f90			\
 #---------------
 
 # Sources for all shared functions
-SRC_FUN = Approx_Real.f90		\
-          Distance.f90			\
-          Distance_Squared.f90		\
-          Name_File.f90			\
+SRC_FUN = Name_File.f90			\
           Probe_1d_Nodes.f90		\
           Swap_Int.f90			\
           Swap_Real.f90			\

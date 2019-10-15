@@ -9,8 +9,6 @@
   character(len=*)           :: item
   logical,          optional :: verbose
   character(len=*), optional :: key_type
-!---------------------------------[Interface]----------------------------------!
-  include '../Shared/Approx_String.int'
 !-----------------------------------[Locals]-----------------------------------!
   integer :: n
   logical :: found
@@ -33,7 +31,7 @@
   !   This item is not in the list of similar   !
   !        ones, print a warning message        !
   !---------------------------------------------!
-  if( Approx_String(keyword, item, 1) ) then
+  if( Math_Mod_Approx_String(keyword, item, 1) ) then
 
     ! Print a warning message
     if(this_proc < 2) then

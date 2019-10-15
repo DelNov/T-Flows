@@ -7,8 +7,6 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
   logical         :: restart
-!----------------------------------[Calling]-----------------------------------!
-  real :: Distance
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: c, m, n, l
   real              :: curr_dist, min_dist_all
@@ -63,12 +61,12 @@
     min_dist(m) = HUGE
 
     do c = 1, grid % n_cells
-      curr_dist = Distance( monitor % x(m),  &
-                            monitor % y(m),  &
-                            monitor % z(m),  &
-                            grid % xc(c),    &
-                            grid % yc(c),    &
-                            grid % zc(c))
+      curr_dist = Math_Mod_Distance( monitor % x(m),  &
+                                     monitor % y(m),  &
+                                     monitor % z(m),  &
+                                     grid % xc(c),    &
+                                     grid % yc(c),    &
+                                     grid % zc(c))
       ! Current distance is smaller than the stored one 
       if(curr_dist < min_dist(m)) then
         monitor % cell(m) = c

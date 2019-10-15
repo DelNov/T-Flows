@@ -20,7 +20,6 @@
   type(Turb_Type),  target :: turb
   logical                  :: backup
 !----------------------------------[Calling]-----------------------------------!
-  real    :: Distance
   integer :: Key_Ind
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
@@ -374,15 +373,18 @@
                 i = Key_Ind('Z', keys, nks); prof(m,0) = 0.0;  z = prof(m,i)
 
                 if(keys(1) .eq. 'Y' .and. keys(2) .eq. 'Z') then
-                  dist = Distance(y,            z,            0.0,  &
+                  dist = Math_Mod_Distance(                         &
+                                  y,            z,            0.0,  &
                                   grid % yc(c), grid % zc(c), 0.0)
 
                 else if(keys(1) .eq. 'X' .and. keys(2) .eq. 'Z') then
-                  dist = Distance(x,            z,            0.0,  &
+                  dist = Math_Mod_Distance(                         &
+                                  x,            z,            0.0,  &
                                   grid % xc(c), grid % zc(c), 0.0)
 
                 else if(keys(1) .eq. 'X' .and. keys(2) .eq. 'Y') then
-                  dist = Distance(x,            y,            0.0,  &
+                  dist = Math_Mod_Distance(                         &
+                                  x,            y,            0.0,  &
                                   grid % xc(c), grid % yc(c), 0.0)
 
                 end if

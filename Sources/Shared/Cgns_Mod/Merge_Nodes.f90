@@ -7,8 +7,6 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
-!------------------------------------------------------------------------------!
-  include '../Shared/Approx_Real.int'
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, cnt_node, n, i, k, v
   real,    allocatable :: criterion(:) ! sorting criterion
@@ -198,7 +196,7 @@
     v = 1 ! related to verbose output
     do i = 2, cnt_nodes_on_int_total
       ! If node is unique
-      if( .not. Approx_Real(criterion(i-1), criterion(i), small) ) then
+      if( .not. Math_Mod_Approx_Real(criterion(i-1), criterion(i), small) ) then
         cnt_node = cnt_node + 1
       end if
     end do ! i
@@ -206,7 +204,7 @@
     v = 1 ! related to verbose output
     do i = 2, cnt_nodes_on_int_total
       ! If node is duplicated
-      if( Approx_Real(criterion(i-1), criterion(i), small) ) then
+      if( Math_Mod_Approx_Real(criterion(i-1), criterion(i), small) ) then
 
         if (old_seq(i-1) .ne. old_seq(i)) then
           new_seq(old_seq(i)  ) = minval(old_seq(i-1:i))

@@ -5,6 +5,7 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod, only: HUGE, PI, ONE_THIRD
+  use Math_Mod
   use Grid_Mod,  only: Grid_Type,                        &
                        Grid_Mod_Estimate_Big_And_Small,  &
                        Grid_Mod_Print_Bnd_Cond_List
@@ -14,10 +15,6 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
-!------------------------------------------------------------------------------!
-  include '../Shared/Approx_Real.int'
-!----------------------------------[Calling]-----------------------------------!
-  real :: Distance
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, c1, c2, n, s, ss, cc2, c_max, nnn, hh, mm, b
   integer              :: c11, c12, c21, c22, s1, s2, bou_cen, cnt_bnd, cnt_per
@@ -259,11 +256,11 @@
     c2 = grid % faces_c(2,s)
 
     if(c2 < 0) then
-      if( Approx_Real(grid % dx(c1), 0.0, small) )  &
+      if( Math_Mod_Approx_Real(grid % dx(c1), 0.0, small) )  &
         grid % xc(c1) = 0.75*grid % xc(c1) + 0.25*grid % xc(c2)
-      if( Approx_Real(grid % dy(c1), 0.0, small) )  &
+      if( Math_Mod_Approx_Real(grid % dy(c1), 0.0, small) )  &
         grid % yc(c1) = 0.75*grid % yc(c1) + 0.25*grid % yc(c2)
-      if( Approx_Real(grid % dz(c1), 0.0, small) )  &
+      if( Math_Mod_Approx_Real(grid % dz(c1), 0.0, small) )  &
         grid % zc(c1) = 0.75*grid % zc(c1) + 0.25*grid % zc(c2)
     end if
   end do ! through faces
@@ -408,7 +405,7 @@
       c2 = grid % faces_c(2,s)
       if(c2 < 0) then
         if(grid % bnd_cond % color(c2) .eq. color_per) then
-          if( Approx_Real(angle, 0.0, small) ) then
+          if( Math_Mod_Approx_Real(angle, 0.0, small) ) then
             xspr(s) = grid % xf(s)
             yspr(s) = grid % yf(s)
             zspr(s) = grid % zf(s)
@@ -889,15 +886,15 @@
     xc1  = grid % xc(c1)
     yc1  = grid % yc(c1)
     zc1  = grid % zc(c1)
-    dsc1 = Distance(xc1, yc1, zc1,   &
-                    grid % xf(s), grid % yf(s), grid % zf(s))
+    dsc1 = Math_Mod_Distance(xc1, yc1, zc1,   &
+                             grid % xf(s), grid % yf(s), grid % zf(s))
 
     ! Second cell (pls. check if xsi=xc on the boundary)
     xc2  = grid % xc(c2) + grid % dx(s)
     yc2  = grid % yc(c2) + grid % dy(s)
     zc2  = grid % zc(c2) + grid % dz(s)
-    dsc2 = Distance(xc2, yc2, zc2,   &
-                    grid % xf(s), grid % yf(s), grid % zf(s))
+    dsc2 = Math_Mod_Distance(xc2, yc2, zc2,   &
+                             grid % xf(s), grid % yf(s), grid % zf(s))
 
     ! Interpolation factor
     grid % f(s) = dsc2 / (dsc1 + dsc2)

@@ -6,14 +6,13 @@
 !------------------------------------------------------------------------------!
   use Name_Mod,  only: problem_name
   use Const_Mod, only: NANO          ! 1.0e-9
+  use Math_Mod
   use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
-  logical :: isit
-!----------------------------------[Calling]-----------------------------------! 
-  include "Approx_Real.int"
+  logical         :: isit
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: n_prob, p, c
   real              :: zp(16384)
@@ -40,11 +39,11 @@
     ! Try to find the cell among the probes
     do p=1,n_prob
       if(answer .eq. 'X') then
-        if( Approx_Real(grid % xc(c), zp(p), NANO)) go to 1
+        if( Math_Mod_Approx_Real(grid % xc(c), zp(p), NANO)) go to 1
       else if(answer .eq. 'Y') then
-        if( Approx_Real(grid % yc(c), zp(p), NANO)) go to 1
+        if( Math_Mod_Approx_Real(grid % yc(c), zp(p), NANO)) go to 1
       else if(answer .eq. 'Z') then
-        if( Approx_Real(grid % zc(c), zp(p), NANO)) go to 1
+        if( Math_Mod_Approx_Real(grid % zc(c), zp(p), NANO)) go to 1
       end if
     end do
 

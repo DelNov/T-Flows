@@ -1,87 +1,11 @@
-#-- ./Logo_Con.f90
-#-- ./Find_Faces.f90
-$(DIR_OBJECT)/Find_Faces.o:\
-$(DIR_OBJECT)/Sort_Mod.o \
-$(DIR_SHARED)/Sort_Mod/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
-
-#-- ./Find_Parents_old.f90
-$(DIR_OBJECT)/Find_Parents_old.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#-- ./Connect_Domains.f90
-$(DIR_OBJECT)/Connect_Domains.o:\
-$(DIR_OBJECT)/Tokenizer_Mod.o \
-$(DIR_SHARED)/Tokenizer_Mod/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
-
-#-- ./Grid_Topology.f90
-$(DIR_OBJECT)/Grid_Topology.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#-- ./Cell_Numbering_Cgns.f90
-#-- ./Load_Cgns.f90
-$(DIR_OBJECT)/Load_Cgns.o:\
-$(DIR_OBJECT)/Name_Mod.o \
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Cgns_Mod_Seq.f90 \
-$(DIR_SHARED)/Cgns_Mod_Par.f90 \
-$(DIR_SHARED)/Cgns_Mod/*/*.f90 \
-$(DIR_SHARED)/Cgns_Mod/*.f90 
-
-#-- ./Cell_Numbering_Neu.f90
-#-- ./Allocate_Memory.f90
-$(DIR_OBJECT)/Allocate_Memory.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#-- ./Load_Cgns_Void.f90
-$(DIR_OBJECT)/Load_Cgns_Void.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#-- ./Find_Parents.f90
-$(DIR_OBJECT)/Find_Parents.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
 #-- ./Calculate_Geometry.f90
 $(DIR_OBJECT)/Calculate_Geometry.o:\
 $(DIR_OBJECT)/Tokenizer_Mod.o \
 $(DIR_SHARED)/Tokenizer_Mod/*.f90 \
 $(DIR_OBJECT)/Sort_Mod.o \
 $(DIR_SHARED)/Sort_Mod/*.f90 \
+$(DIR_OBJECT)/Math_Mod.o \
+$(DIR_SHARED)/Math_Mod/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
@@ -89,17 +13,20 @@ $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
-#-- ./Load_Neu.f90
-$(DIR_OBJECT)/Load_Neu.o:\
+#-- ./Connect_Domains.f90
+$(DIR_OBJECT)/Connect_Domains.o:\
 $(DIR_OBJECT)/Tokenizer_Mod.o \
 $(DIR_SHARED)/Tokenizer_Mod/*.f90 \
-$(DIR_OBJECT)/Name_Mod.o \
+$(DIR_OBJECT)/Math_Mod.o \
+$(DIR_SHARED)/Math_Mod/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o 
 
+#-- ./Logo_Con.f90
 #-- ./Main_Con.f90
 $(DIR_OBJECT)/Main_Con.o:\
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
@@ -112,6 +39,300 @@ $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
+#-- ./Load_Neu.f90
+$(DIR_OBJECT)/Load_Neu.o:\
+$(DIR_OBJECT)/Tokenizer_Mod.o \
+$(DIR_SHARED)/Tokenizer_Mod/*.f90 \
+$(DIR_OBJECT)/Name_Mod.o \
+$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
+$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
+$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 
+
+#-- ./Load_Msh.f90
+$(DIR_OBJECT)/Load_Msh.o:\
+$(DIR_OBJECT)/Tokenizer_Mod.o \
+$(DIR_SHARED)/Tokenizer_Mod/*.f90 \
+$(DIR_OBJECT)/Name_Mod.o \
+$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
+$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
+$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 
+
+#-- ./Allocate_Memory.f90
+$(DIR_OBJECT)/Allocate_Memory.o:\
+$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
+$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
+$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 
+
+#-- ./Load_Cgns.f90
+$(DIR_OBJECT)/Load_Cgns.o:\
+$(DIR_OBJECT)/Name_Mod.o \
+$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
+$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
+$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_SHARED)/Cgns_Mod_Seq.f90 \
+$(DIR_SHARED)/Cgns_Mod_Par.f90 \
+$(DIR_SHARED)/Cgns_Mod/*.f90 \
+$(DIR_SHARED)/Cgns_Mod/*/*.f90 
+
+#-- ./Cell_Numbering_Neu.f90
+#-- ./Cell_Numbering_Cgns.f90
+#-- ./Find_Parents.f90
+$(DIR_OBJECT)/Find_Parents.o:\
+$(DIR_OBJECT)/Sort_Mod.o \
+$(DIR_SHARED)/Sort_Mod/*.f90 \
+$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
+$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
+$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 
+
+#-- ./Grid_Topology.f90
+$(DIR_OBJECT)/Grid_Topology.o:\
+$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
+$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
+$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 
+
+#-- ./Find_Faces.f90
+$(DIR_OBJECT)/Find_Faces.o:\
+$(DIR_OBJECT)/Sort_Mod.o \
+$(DIR_SHARED)/Sort_Mod/*.f90 \
+$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
+$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
+$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o 
+
+#-- ./Load_Cgns_Void.f90
+$(DIR_OBJECT)/Load_Cgns_Void.o:\
+$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
+$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
+$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 
+
+#-- ./Swap_Real.f90
+#-- ./Div_Mod.f90
+#-- ./Sort_Mod.f90
+$(DIR_OBJECT)/Sort_Mod.o:\
+$(DIR_SHARED)/Sort_Mod/*.f90 
+
+#-- ./Const_Mod.f90
+#-- ./Comm_Mod_Par.f90
+$(DIR_OBJECT)/Comm_Mod_Par.o:\
+$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
+$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
+$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_SHARED)/Comm_Mod_Seq.f90 \
+$(DIR_SHARED)/Comm_Mod_Par.f90 \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 
+
+#-- ./Probe_1d_Nodes.f90
+$(DIR_OBJECT)/Probe_1d_Nodes.o:\
+$(DIR_OBJECT)/Sort_Mod.o \
+$(DIR_SHARED)/Sort_Mod/*.f90 \
+$(DIR_OBJECT)/Name_Mod.o \
+$(DIR_OBJECT)/Math_Mod.o \
+$(DIR_SHARED)/Math_Mod/*.f90 \
+$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
+$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
+$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 
+
+#-- ./Work_Mod/Allocate.f90
+#-- ./Work_Mod/Allocate_Integer_Cells.f90
+#-- ./Work_Mod/Allocate_Real_Faces.f90
+#-- ./Work_Mod/Allocate_Real_Nodes.f90
+#-- ./Work_Mod/Allocate_Real_Cells.f90
+#-- ./Work_Mod/Allocate_Integer_Faces.f90
+#-- ./Grid_Mod.f90
+$(DIR_OBJECT)/Grid_Mod.o:\
+$(DIR_OBJECT)/Tokenizer_Mod.o \
+$(DIR_SHARED)/Tokenizer_Mod/*.f90 \
+$(DIR_OBJECT)/Sort_Mod.o \
+$(DIR_SHARED)/Sort_Mod/*.f90 \
+$(DIR_OBJECT)/Metis_Options_Mod.o \
+$(DIR_OBJECT)/Math_Mod.o \
+$(DIR_SHARED)/Math_Mod/*.f90 \
+$(DIR_OBJECT)/Material_Mod.o \
+$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
+$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
+$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Grid_Level_Mod.o \
+$(DIR_OBJECT)/Div_Mod.o \
+$(DIR_OBJECT)/Const_Mod.o \
+$(DIR_OBJECT)/Bnd_Cond_Mod.o 
+
+#-- ./Metis_Options_Mod.f90
+#-- ./Sort_Mod/Int.f90
+#-- ./Sort_Mod/2_Int.f90
+#-- ./Sort_Mod/3_Int.f90
+#-- ./Sort_Mod/Int_Carry_Real.f90
+#-- ./Sort_Mod/Real.f90
+#-- ./Sort_Mod/Int_By_Index.f90
+#-- ./Sort_Mod/Real_By_Index.f90
+#-- ./Sort_Mod/3_Int_Carry_2_Int.f90
+#-- ./Sort_Mod/3_Int_Carry_Int.f90
+#-- ./Sort_Mod/2_Int_Carry_Int.f90
+#-- ./Sort_Mod/Int_Carry_Int.f90
+#-- ./Sort_Mod/2_Real.f90
+#-- ./Sort_Mod/Real_Carry_Int.f90
+#-- ./Sort_Mod/3_Real_Carry_2_Int.f90
+#-- ./Sort_Mod/2_Int_Carry_2_Int.f90
+#-- ./Sort_Mod/3_Real_Carry_Int.f90
+#-- ./Sort_Mod/2_Real_Carry_2_Int.f90
+#-- ./Sort_Mod/Short_Carry_Short.f90
+#-- ./Sort_Mod/3_Real.f90
+#-- ./Sort_Mod/2_Real_Carry_Int.f90
+#-- ./Comm_Mod/Parallel/Load_Maps.f90
+#-- ./Comm_Mod/Parallel/Open_File_Write.f90
+#-- ./Comm_Mod/Parallel/Global_Sum_Real.f90
+#-- ./Comm_Mod/Parallel/Read_Real.f90
+#-- ./Comm_Mod/Parallel/Allocate.f90
+#-- ./Comm_Mod/Parallel/Create_New_Types.f90
+#-- ./Comm_Mod/Parallel/Global_Sum_Real_Array.f90
+#-- ./Comm_Mod/Parallel/Read_Int_Array.f90
+#-- ./Comm_Mod/Parallel/Write_Text.f90
+#-- ./Comm_Mod/Parallel/Write_Real_Array.f90
+#-- ./Comm_Mod/Parallel/Create_Buffers.f90
+#-- ./Comm_Mod/Parallel/Global_Max_Int.f90
+#-- ./Comm_Mod/Parallel/Global_Sum_Int.f90
+#-- ./Comm_Mod/Parallel/Write_Cell_Real.f90
+#-- ./Comm_Mod/Parallel/Open_File_Read.f90
+#-- ./Comm_Mod/Parallel/Write_Log_Array.f90
+#-- ./Comm_Mod/Parallel/Global_Min_Int.f90
+#-- ./Comm_Mod/Parallel/Read_Text.f90
+#-- ./Comm_Mod/Parallel/Write_Int.f90
+#-- ./Comm_Mod/Parallel/Global_Min_Real.f90
+#-- ./Comm_Mod/Parallel/End.f90
+#-- ./Comm_Mod/Parallel/Read_Int.f90
+#-- ./Comm_Mod/Parallel/Read_Log_Array.f90
+#-- ./Comm_Mod/Parallel/Read_Bnd_Real.f90
+#-- ./Comm_Mod/Parallel/Set_Buffer_Color.f90
+#-- ./Comm_Mod/Parallel/Exchange_Int.f90
+#-- ./Comm_Mod/Parallel/Global_Sum_Int_Array.f90
+#-- ./Comm_Mod/Parallel/Close_File.f90
+#-- ./Comm_Mod/Parallel/Wait.f90
+#-- ./Comm_Mod/Parallel/Exchange_Real.f90
+#-- ./Comm_Mod/Parallel/Write_Bnd_Real.f90
+#-- ./Comm_Mod/Parallel/Write_Int_Array.f90
+#-- ./Comm_Mod/Parallel/Write_Real.f90
+#-- ./Comm_Mod/Parallel/Read_Cell_Real.f90
+#-- ./Comm_Mod/Parallel/Global_Max_Real.f90
+#-- ./Comm_Mod/Parallel/Read_Real_Array.f90
+#-- ./Comm_Mod/Parallel/Start.f90
+#-- ./Comm_Mod/Parallel/Global_Lor_Log_Array.f90
+#-- ./Comm_Mod/Sequential/Load_Maps.f90
+#-- ./Comm_Mod/Sequential/Open_File_Write.f90
+#-- ./Comm_Mod/Sequential/Global_Sum_Real.f90
+#-- ./Comm_Mod/Sequential/Read_Real.f90
+#-- ./Comm_Mod/Sequential/Allocate.f90
+#-- ./Comm_Mod/Sequential/Create_New_Types.f90
+#-- ./Comm_Mod/Sequential/Global_Sum_Real_Array.f90
+#-- ./Comm_Mod/Sequential/Read_Int_Array.f90
+#-- ./Comm_Mod/Sequential/Write_Text.f90
+#-- ./Comm_Mod/Sequential/Write_Real_Array.f90
+#-- ./Comm_Mod/Sequential/Old/GloMax.f90
+#-- ./Comm_Mod/Sequential/Old/EndPar.f90
+#-- ./Comm_Mod/Sequential/Old/BufLoa.f90
+#-- ./Comm_Mod/Sequential/Old/GloMin.f90
+#-- ./Comm_Mod/Sequential/Old/GloSum.f90
+#-- ./Comm_Mod/Sequential/Old/IGlSum.f90
+#-- ./Comm_Mod/Sequential/Old/Timex.f90
+#-- ./Comm_Mod/Sequential/Old/Exchange.f90
+$(DIR_OBJECT)/Exchange.o:\
+$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
+$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
+$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 
+
+#-- ./Comm_Mod/Sequential/Old/Wait.f90
+#-- ./Comm_Mod/Sequential/Old/StaPar.f90
+$(DIR_OBJECT)/StaPar.o:
+
+#-- ./Comm_Mod/Sequential/Create_Buffers.f90
+#-- ./Comm_Mod/Sequential/Global_Max_Int.f90
+#-- ./Comm_Mod/Sequential/Global_Sum_Int.f90
+#-- ./Comm_Mod/Sequential/Write_Cell_Real.f90
+#-- ./Comm_Mod/Sequential/Open_File_Read.f90
+#-- ./Comm_Mod/Sequential/Write_Log_Array.f90
+#-- ./Comm_Mod/Sequential/Global_Min_Int.f90
+#-- ./Comm_Mod/Sequential/Read_Text.f90
+#-- ./Comm_Mod/Sequential/Write_Int.f90
+#-- ./Comm_Mod/Sequential/Global_Min_Real.f90
+#-- ./Comm_Mod/Sequential/End.f90
+#-- ./Comm_Mod/Sequential/Read_Int.f90
+#-- ./Comm_Mod/Sequential/Read_Log_Array.f90
+#-- ./Comm_Mod/Sequential/Read_Bnd_Real.f90
+#-- ./Comm_Mod/Sequential/Set_Buffer_Color.f90
+#-- ./Comm_Mod/Sequential/Exchange_Int.f90
+#-- ./Comm_Mod/Sequential/Global_Sum_Int_Array.f90
+#-- ./Comm_Mod/Sequential/Close_File.f90
+#-- ./Comm_Mod/Sequential/Wait.f90
+#-- ./Comm_Mod/Sequential/Exchange_Real.f90
+#-- ./Comm_Mod/Sequential/Write_Bnd_Real.f90
+#-- ./Comm_Mod/Sequential/Write_Int_Array.f90
+#-- ./Comm_Mod/Sequential/Write_Real.f90
+#-- ./Comm_Mod/Sequential/Read_Cell_Real.f90
+#-- ./Comm_Mod/Sequential/Global_Max_Real.f90
+#-- ./Comm_Mod/Sequential/Read_Real_Array.f90
+#-- ./Comm_Mod/Sequential/Start.f90
+#-- ./Comm_Mod/Sequential/Global_Lor_Log_Array.f90
+#-- ./Cpu_Timer_Mod.f90
+$(DIR_OBJECT)/Cpu_Timer_Mod.o:\
+$(DIR_SHARED)/Cpu_Timer_Mod/*.f90 \
+$(DIR_SHARED)/Comm_Mod_Seq.f90 \
+$(DIR_SHARED)/Comm_Mod_Par.f90 \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 
+
+#-- ./Grid_Mod/Check_Levels.f90
+#-- ./Grid_Mod/Sort_Cells_Smart.f90
+#-- ./Grid_Mod/Load_Geo.f90
+#-- ./Grid_Mod/Find_Nodes_Cells.f90
+#-- ./Grid_Mod/Decompose.f90
+#-- ./Grid_Mod/Allocate_Nodes.f90
+#-- ./Grid_Mod/Print_Bnd_Cond_Info.f90
+#-- ./Grid_Mod/Calculate_Face_Geometry.f90
+#-- ./Grid_Mod/Calculate_Wall_Distance.f90
+#-- ./Grid_Mod/Allocate_Levels.f90
+#-- ./Grid_Mod/Allocate_Cells.f90
+#-- ./Grid_Mod/Allocate_New_Numbers.f90
+#-- ./Grid_Mod/Bnd_Cond_Type.f90
+#-- ./Grid_Mod/Save_Cns.f90
+#-- ./Grid_Mod/Find_Periodic_Faces.f90
+#-- ./Grid_Mod/Save_Geo.f90
+#-- ./Grid_Mod/Coarsen.f90
+#-- ./Grid_Mod/Create_Levels.f90
+#-- ./Grid_Mod/Load_Cns.f90
+#-- ./Grid_Mod/Allocate_Bnd_Cond.f90
+#-- ./Grid_Mod/Sort_Faces_Smart.f90
+#-- ./Grid_Mod/Get_C1_And_C2_At_Level.f90
+#-- ./Grid_Mod/Allocate_Faces.f90
+#-- ./Grid_Mod/Bnd_Cond_Ranges.f90
+#-- ./Grid_Mod/Sort_Faces_By_Index.f90
+#-- ./Grid_Mod/Sort_Cells_By_Index.f90
+#-- ./Grid_Mod/Estimate_Big_And_Small.f90
+#-- ./Save_Grid_Mod/Vtu/Save_Vtu_Links.f90
+#-- ./Save_Grid_Mod/Vtu/Save_Vtu_Faces.f90
+#-- ./Save_Grid_Mod/Vtu/Save_Vtu_Grid_Levels.f90
+#-- ./Save_Grid_Mod/Vtu/Save_Cgns_Cells_Void.f90
+#-- ./Save_Grid_Mod/Vtu/Save_Vtu_Cells.f90
+#-- ./Save_Grid_Mod/Cgns/Save_Cgns_Cells.f90
 #-- ./Save_Grid_Mod_Cgns.f90
 $(DIR_OBJECT)/Save_Grid_Mod_Cgns.o:\
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
@@ -130,329 +351,9 @@ $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 \
 $(DIR_SHARED)/Cgns_Mod_Seq.f90 \
 $(DIR_SHARED)/Cgns_Mod_Par.f90 \
-$(DIR_SHARED)/Cgns_Mod/*/*.f90 \
-$(DIR_SHARED)/Cgns_Mod/*.f90 
+$(DIR_SHARED)/Cgns_Mod/*.f90 \
+$(DIR_SHARED)/Cgns_Mod/*/*.f90 
 
-#-- ./Sort_Mod.f90
-$(DIR_OBJECT)/Sort_Mod.o:\
-$(DIR_SHARED)/Sort_Mod/*.f90 
-
-#-- ./Swap_Short.f90
-#-- ./Const_Mod.f90
-#-- ./Cpu_Timer_Mod.f90
-$(DIR_OBJECT)/Cpu_Timer_Mod.o:\
-$(DIR_SHARED)/Cpu_Timer_Mod/*.f90 \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Probe_1d_Cells_Nodes.f90
-$(DIR_OBJECT)/Probe_1d_Cells_Nodes.o:\
-$(DIR_OBJECT)/Sort_Mod.o \
-$(DIR_SHARED)/Sort_Mod/*.f90 \
-$(DIR_OBJECT)/Name_Mod.o \
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#-- ./Approx_Real.f90
-#-- ./Name_File.f90
-$(DIR_OBJECT)/Name_File.o:\
-$(DIR_OBJECT)/Name_Mod.o 
-
-#-- ./Grid_Mod/Get_C1_And_C2_At_Level.f90
-#-- ./Grid_Mod/Sort_Faces_By_Index.f90
-#-- ./Grid_Mod/Estimate_Big_And_Small.f90
-#-- ./Grid_Mod/Calculate_Wall_Distance.f90
-$(DIR_OBJECT)/Calculate_Wall_Distance.o:
-
-#-- ./Grid_Mod/Save_Geo.f90
-#-- ./Grid_Mod/Allocate_Bnd_Cond.f90
-#-- ./Grid_Mod/Coarsen.f90
-#-- ./Grid_Mod/Allocate_Levels.f90
-#-- ./Grid_Mod/Sort_Faces_Smart.f90
-#-- ./Grid_Mod/Allocate_New_Numbers.f90
-#-- ./Grid_Mod/Create_Levels.f90
-#-- ./Grid_Mod/Decompose.f90
-#-- ./Grid_Mod/Allocate_Faces.f90
-#-- ./Grid_Mod/Save_Cns.f90
-#-- ./Grid_Mod/Print_Bnd_Cond_Info.f90
-#-- ./Grid_Mod/Allocate_Cells.f90
-#-- ./Grid_Mod/Calculate_Face_Geometry.f90
-#-- ./Grid_Mod/Load_Geo.f90
-#-- ./Grid_Mod/Sort_Cells_By_Index.f90
-#-- ./Grid_Mod/Check_Levels.f90
-#-- ./Grid_Mod/Find_Nodes_Cells.f90
-$(DIR_OBJECT)/Find_Nodes_Cells.o:\
-$(DIR_OBJECT)/Const_Mod.o 
-
-#-- ./Grid_Mod/Load_Cns.f90
-#-- ./Grid_Mod/Sort_Cells_Smart.f90
-#-- ./Grid_Mod/Allocate_Nodes.f90
-#-- ./Grid_Mod/Bnd_Cond_Type.f90
-#-- ./Grid_Mod/Bnd_Cond_Ranges.f90
-#-- ./Cgns_Mod_Seq.f90
-$(DIR_OBJECT)/Cgns_Mod_Seq.o:\
-$(DIR_OBJECT)/Sort_Mod.o \
-$(DIR_SHARED)/Sort_Mod/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 \
-$(DIR_SHARED)/Cgns_Mod_Seq.f90 \
-$(DIR_SHARED)/Cgns_Mod_Par.f90 \
-$(DIR_SHARED)/Cgns_Mod/*/*.f90 \
-$(DIR_SHARED)/Cgns_Mod/*.f90 
-
-#-- ./Div_Mod.f90
-#-- ./To_Lower_Case.f90
-#-- ./Metis_Options_Mod.f90
-#-- ./Approx_String.f90
-#-- ./Cpu_Timer_Mod/Stop.f90
-#-- ./Cpu_Timer_Mod/Start.f90
-#-- ./Cpu_Timer_Mod/Statistics.f90
-#-- ./Comm_Mod_Par.f90
-$(DIR_OBJECT)/Comm_Mod_Par.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Comm_Mod_Seq.f90
-$(DIR_OBJECT)/Comm_Mod_Seq.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Name_Mod.f90
-#-- ./Work_Mod/Allocate_Real_Faces.f90
-$(DIR_OBJECT)/Allocate_Real_Faces.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#-- ./Work_Mod/Allocate_Integer_Faces.f90
-$(DIR_OBJECT)/Allocate_Integer_Faces.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#-- ./Work_Mod/Allocate_Real_Cells.f90
-$(DIR_OBJECT)/Allocate_Real_Cells.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#-- ./Work_Mod/Allocate_Integer_Cells.f90
-$(DIR_OBJECT)/Allocate_Integer_Cells.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#-- ./Work_Mod/Allocate.f90
-$(DIR_OBJECT)/Allocate.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#-- ./Work_Mod/Allocate_Real_Nodes.f90
-$(DIR_OBJECT)/Allocate_Real_Nodes.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#-- ./Comm_Mod/Sequential/Read_Text.f90
-#-- ./Comm_Mod/Sequential/Global_Sum_Real_Array.f90
-#-- ./Comm_Mod/Sequential/Create_New_Types.f90
-#-- ./Comm_Mod/Sequential/Write_Text.f90
-#-- ./Comm_Mod/Sequential/Start.f90
-#-- ./Comm_Mod/Sequential/Close_File.f90
-#-- ./Comm_Mod/Sequential/Global_Sum_Int.f90
-#-- ./Comm_Mod/Sequential/Global_Sum_Real.f90
-#-- ./Comm_Mod/Sequential/Set_Buffer_Color.f90
-#-- ./Comm_Mod/Sequential/Read_Cell_Real.f90
-#-- ./Comm_Mod/Sequential/Old/StaPar.f90
-$(DIR_OBJECT)/StaPar.o:
-
-#-- ./Comm_Mod/Sequential/Old/IGlSum.f90
-#-- ./Comm_Mod/Sequential/Old/Timex.f90
-#-- ./Comm_Mod/Sequential/Old/GloMax.f90
-#-- ./Comm_Mod/Sequential/Old/GloSum.f90
-#-- ./Comm_Mod/Sequential/Old/Exchange.f90
-$(DIR_OBJECT)/Exchange.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#-- ./Comm_Mod/Sequential/Old/BufLoa.f90
-#-- ./Comm_Mod/Sequential/Old/Wait.f90
-#-- ./Comm_Mod/Sequential/Old/EndPar.f90
-#-- ./Comm_Mod/Sequential/Old/GloMin.f90
-#-- ./Comm_Mod/Sequential/Write_Bnd_Real.f90
-#-- ./Comm_Mod/Sequential/Read_Int.f90
-#-- ./Comm_Mod/Sequential/Write_Real_Array.f90
-#-- ./Comm_Mod/Sequential/Read_Log_Array.f90
-#-- ./Comm_Mod/Sequential/End.f90
-#-- ./Comm_Mod/Sequential/Write_Real.f90
-#-- ./Comm_Mod/Sequential/Exchange_Int.f90
-#-- ./Comm_Mod/Sequential/Read_Bnd_Real.f90
-#-- ./Comm_Mod/Sequential/Load_Maps.f90
-#-- ./Comm_Mod/Sequential/Read_Int_Array.f90
-#-- ./Comm_Mod/Sequential/Write_Log_Array.f90
-#-- ./Comm_Mod/Sequential/Global_Max_Real.f90
-#-- ./Comm_Mod/Sequential/Global_Sum_Int_Array.f90
-#-- ./Comm_Mod/Sequential/Open_File_Write.f90
-#-- ./Comm_Mod/Sequential/Wait.f90
-#-- ./Comm_Mod/Sequential/Global_Min_Real.f90
-#-- ./Comm_Mod/Sequential/Global_Max_Int.f90
-#-- ./Comm_Mod/Sequential/Read_Real_Array.f90
-#-- ./Comm_Mod/Sequential/Write_Int_Array.f90
-#-- ./Comm_Mod/Sequential/Global_Min_Int.f90
-#-- ./Comm_Mod/Sequential/Exchange_Real.f90
-#-- ./Comm_Mod/Sequential/Open_File_Read.f90
-#-- ./Comm_Mod/Sequential/Read_Real.f90
-#-- ./Comm_Mod/Sequential/Write_Int.f90
-#-- ./Comm_Mod/Sequential/Allocate.f90
-$(DIR_OBJECT)/Allocate.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#-- ./Comm_Mod/Sequential/Create_Buffers.f90
-#-- ./Comm_Mod/Sequential/Write_Cell_Real.f90
-#-- ./Comm_Mod/Parallel/Read_Text.f90
-#-- ./Comm_Mod/Parallel/Global_Sum_Real_Array.f90
-#-- ./Comm_Mod/Parallel/Create_New_Types.f90
-#-- ./Comm_Mod/Parallel/Write_Text.f90
-#-- ./Comm_Mod/Parallel/Start.f90
-#-- ./Comm_Mod/Parallel/Close_File.f90
-#-- ./Comm_Mod/Parallel/Global_Sum_Int.f90
-#-- ./Comm_Mod/Parallel/Global_Sum_Real.f90
-#-- ./Comm_Mod/Parallel/Set_Buffer_Color.f90
-#-- ./Comm_Mod/Parallel/Read_Cell_Real.f90
-#-- ./Comm_Mod/Parallel/Write_Bnd_Real.f90
-#-- ./Comm_Mod/Parallel/Read_Int.f90
-#-- ./Comm_Mod/Parallel/Write_Real_Array.f90
-#-- ./Comm_Mod/Parallel/Read_Log_Array.f90
-#-- ./Comm_Mod/Parallel/End.f90
-#-- ./Comm_Mod/Parallel/Write_Real.f90
-#-- ./Comm_Mod/Parallel/Exchange_Int.f90
-#-- ./Comm_Mod/Parallel/Read_Bnd_Real.f90
-#-- ./Comm_Mod/Parallel/Load_Maps.f90
-#-- ./Comm_Mod/Parallel/Read_Int_Array.f90
-#-- ./Comm_Mod/Parallel/Write_Log_Array.f90
-#-- ./Comm_Mod/Parallel/Global_Max_Real.f90
-#-- ./Comm_Mod/Parallel/Global_Sum_Int_Array.f90
-#-- ./Comm_Mod/Parallel/Open_File_Write.f90
-#-- ./Comm_Mod/Parallel/Wait.f90
-#-- ./Comm_Mod/Parallel/Global_Min_Real.f90
-#-- ./Comm_Mod/Parallel/Global_Max_Int.f90
-#-- ./Comm_Mod/Parallel/Read_Real_Array.f90
-#-- ./Comm_Mod/Parallel/Write_Int_Array.f90
-#-- ./Comm_Mod/Parallel/Global_Min_Int.f90
-#-- ./Comm_Mod/Parallel/Exchange_Real.f90
-#-- ./Comm_Mod/Parallel/Open_File_Read.f90
-#-- ./Comm_Mod/Parallel/Read_Real.f90
-#-- ./Comm_Mod/Parallel/Write_Int.f90
-#-- ./Comm_Mod/Parallel/Allocate.f90
-#-- ./Comm_Mod/Parallel/Create_Buffers.f90
-#-- ./Comm_Mod/Parallel/Write_Cell_Real.f90
-#-- ./Bnd_Cond_Mod.f90
-#-- ./Swap_Real.f90
-#-- ./Sort_Mod/Short_Carry_Short.f90
-#-- ./Sort_Mod/Int_By_Index.f90
-#-- ./Sort_Mod/2_Real_Carry_Int.f90
-#-- ./Sort_Mod/3_Real_Carry_Int.f90
-#-- ./Sort_Mod/2_Int_Carry_Int.f90
-#-- ./Sort_Mod/2_Int.f90
-#-- ./Sort_Mod/2_Real.f90
-#-- ./Sort_Mod/Int_Carry_Int.f90
-#-- ./Sort_Mod/3_Int.f90
-#-- ./Sort_Mod/3_Real.f90
-#-- ./Sort_Mod/Real_Carry_Int.f90
-#-- ./Sort_Mod/Int_Carry_Real.f90
-#-- ./Sort_Mod/3_Int_Carry_Int.f90
-#-- ./Sort_Mod/Int.f90
-#-- ./Sort_Mod/Real.f90
-#-- ./Sort_Mod/Real_By_Index.f90
-#-- ./Cgns_Mod_Par.f90
-$(DIR_OBJECT)/Cgns_Mod_Par.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 \
-$(DIR_SHARED)/Cgns_Mod_Seq.f90 \
-$(DIR_SHARED)/Cgns_Mod_Par.f90 \
-$(DIR_SHARED)/Cgns_Mod/*/*.f90 \
-$(DIR_SHARED)/Cgns_Mod/*.f90 
-
-#-- ./Grid_Mod.f90
-$(DIR_OBJECT)/Grid_Mod.o:\
-$(DIR_OBJECT)/Tokenizer_Mod.o \
-$(DIR_SHARED)/Tokenizer_Mod/*.f90 \
-$(DIR_OBJECT)/Sort_Mod.o \
-$(DIR_SHARED)/Sort_Mod/*.f90 \
-$(DIR_OBJECT)/Metis_Options_Mod.o \
-$(DIR_OBJECT)/Material_Mod.o \
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Grid_Level_Mod.o \
-$(DIR_OBJECT)/Div_Mod.o \
-$(DIR_OBJECT)/Const_Mod.o \
-$(DIR_OBJECT)/Bnd_Cond_Mod.o 
-
-#-- ./To_Upper_Case.f90
-#-- ./Tokenizer_Mod/Read_Line.f90
-#-- ./Grid_Level_Mod.f90
-#-- ./Work_Mod.f90
-$(DIR_OBJECT)/Work_Mod.o:\
-$(DIR_SHARED)/Work_Mod/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#-- ./Material_Mod.f90
 #-- ./Save_Grid_Mod_Vtu.f90
 $(DIR_OBJECT)/Save_Grid_Mod_Vtu.o:\
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
@@ -470,197 +371,43 @@ $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
 
-#-- ./Distance.f90
-#-- ./Distance_Squared.f90
-#-- ./Save_Grid_Mod/Vtu/Save_Vtu_Faces.f90
-#-- ./Save_Grid_Mod/Vtu/Save_Cgns_Cells_Void.f90
-#-- ./Save_Grid_Mod/Vtu/Save_Vtu_Cells.f90
-#-- ./Save_Grid_Mod/Vtu/Save_Vtu_Links.f90
-#-- ./Save_Grid_Mod/Vtu/Save_Vtu_Grid_Levels.f90
-#-- ./Save_Grid_Mod/Cgns/Save_Cgns_Cells.f90
-#-- ./Cgns_Mod/Read_Base_Info.f90
-#-- ./Cgns_Mod/Read_Block_Info.f90
-#-- ./Cgns_Mod/Read_2d_Bnd_Section_Connections_With_Parent_Data.f90
-$(DIR_OBJECT)/Read_2d_Bnd_Section_Connections_With_Parent_Data.o:\
+#-- ./Probe_2d.f90
+$(DIR_OBJECT)/Probe_2d.o:\
+$(DIR_OBJECT)/Name_Mod.o \
+$(DIR_OBJECT)/Math_Mod.o \
+$(DIR_SHARED)/Math_Mod/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
-#-- ./Cgns_Mod/Read_Number_Of_Blocks_In_Base.f90
-#-- ./Cgns_Mod/Write_Link_To_Mesh_In_File.f90
-$(DIR_OBJECT)/Write_Link_To_Mesh_In_File.o:\
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Cgns_Mod/Write_Link_To_Field.f90
-$(DIR_OBJECT)/Write_Link_To_Field.o:\
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Cgns_Mod/Read_Grid_Location.f90
-#-- ./Cgns_Mod/Read_2d_Bnd_Section_Connections_With_No_Parent_Data.f90
-$(DIR_OBJECT)/Read_2d_Bnd_Section_Connections_With_No_Parent_Data.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#-- ./Cgns_Mod/Read_Section_Info.f90
-#-- ./Cgns_Mod/Read_Block_Type.f90
-#-- ./Cgns_Mod/Read_Number_Of_Block_Interfaces.f90
-#-- ./Cgns_Mod/Read_Section_Connections.f90
-$(DIR_OBJECT)/Read_Section_Connections.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#-- ./Cgns_Mod/Read_Number_Of_Bnd_Conds_In_Block.f90
-#-- ./Cgns_Mod/Read_2d_Interface_Section_Connections.f90
-#-- ./Cgns_Mod/Sequential/Close_File.f90
-#-- ./Cgns_Mod/Sequential/Open_File.f90
-#-- ./Cgns_Mod/Sequential/Write_Solution_Info.f90
-#-- ./Cgns_Mod/Sequential/Write_Section_Connections.f90
-$(DIR_OBJECT)/Write_Section_Connections.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#-- ./Cgns_Mod/Sequential/Write_Base_Info.f90
-#-- ./Cgns_Mod/Sequential/Write_Field.f90
-$(DIR_OBJECT)/Write_Field.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#-- ./Cgns_Mod/Sequential/Write_Block_Info.f90
-#-- ./Cgns_Mod/Sequential/Write_Coordinate_Array.f90
-$(DIR_OBJECT)/Write_Coordinate_Array.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#-- ./Cgns_Mod/Read_Interface_Info.f90
-#-- ./Cgns_Mod/Initialize_Counters.f90
-#-- ./Cgns_Mod/Read_Coordinate_Array.f90
-$(DIR_OBJECT)/Read_Coordinate_Array.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#-- ./Cgns_Mod/Parallel/Close_File.f90
-#-- ./Cgns_Mod/Parallel/Open_File.f90
-$(DIR_OBJECT)/Open_File.o:\
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Cgns_Mod/Parallel/Write_Solution_Info.f90
-$(DIR_OBJECT)/Write_Solution_Info.o:\
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Cgns_Mod/Parallel/Write_Section_Connections.f90
-$(DIR_OBJECT)/Write_Section_Connections.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Cgns_Mod/Parallel/Get_Arrays_Dimensions.f90
-$(DIR_OBJECT)/Get_Arrays_Dimensions.o:\
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Cgns_Mod/Parallel/Write_Base_Info.f90
-$(DIR_OBJECT)/Write_Base_Info.o:\
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Cgns_Mod/Parallel/Write_Field.f90
-$(DIR_OBJECT)/Write_Field.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Cgns_Mod/Parallel/Write_Block_Info.f90
-$(DIR_OBJECT)/Write_Block_Info.o:\
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Cgns_Mod/Parallel/Write_Coordinate_Array.f90
-$(DIR_OBJECT)/Write_Coordinate_Array.o:\
+#-- ./Cgns_Mod_Par.f90
+$(DIR_OBJECT)/Cgns_Mod_Par.o:\
 $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#-- ./Cgns_Mod/Write_Dimensions_Info.f90
-#-- ./Cgns_Mod/Read_Number_Of_Element_Sections.f90
-#-- ./Cgns_Mod/Read_Coordinate_Info.f90
-#-- ./Cgns_Mod/Merge_Nodes.f90
-$(DIR_OBJECT)/Merge_Nodes.o:\
 $(DIR_OBJECT)/Sort_Mod.o \
 $(DIR_SHARED)/Sort_Mod/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_SHARED)/Comm_Mod_Seq.f90 \
+$(DIR_SHARED)/Comm_Mod_Par.f90 \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 \
+$(DIR_SHARED)/Cgns_Mod_Seq.f90 \
+$(DIR_SHARED)/Cgns_Mod_Par.f90 \
+$(DIR_SHARED)/Cgns_Mod/*.f90 \
+$(DIR_SHARED)/Cgns_Mod/*/*.f90 
 
-#-- ./Cgns_Mod/Read_Number_Of_Bases_In_File.f90
-#-- ./Cgns_Mod/Read_Bnd_Conds_Info.f90
-#-- ./Cgns_Mod/Read_2d_Bnd_Section_Connections_With_No_Parent_Data_old.f90
-$(DIR_OBJECT)/Read_2d_Bnd_Section_Connections_With_No_Parent_Data_old.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#-- ./Cgns_Mod/Read_Number_Of_Coordinates_In_Block.f90
 #-- ./Tokenizer_Mod.f90
 $(DIR_OBJECT)/Tokenizer_Mod.o:\
 $(DIR_SHARED)/Tokenizer_Mod/*.f90 
 
-#-- ./Tet_Volume.f90
-#-- ./Gen_Mod.f90
-#-- ./Probe_2d.f90
-$(DIR_OBJECT)/Probe_2d.o:\
-$(DIR_OBJECT)/Name_Mod.o \
+#-- ./Work_Mod.f90
+$(DIR_OBJECT)/Work_Mod.o:\
+$(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
@@ -668,20 +415,123 @@ $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Swap_Int.f90
-#-- ./Probe_1d_Nodes.f90
-$(DIR_OBJECT)/Probe_1d_Nodes.o:\
+#-- ./Comm_Mod_Seq.f90
+$(DIR_OBJECT)/Comm_Mod_Seq.o:\
+$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
+$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
+$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_SHARED)/Comm_Mod_Seq.f90 \
+$(DIR_SHARED)/Comm_Mod_Par.f90 \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 
+
+#-- ./Tokenizer_Mod/Read_Line.f90
+#-- ./To_Lower_Case.f90
+#-- ./Material_Mod.f90
+#-- ./Cgns_Mod_Seq.f90
+$(DIR_OBJECT)/Cgns_Mod_Seq.o:\
+$(DIR_OBJECT)/Sort_Mod.o \
+$(DIR_SHARED)/Sort_Mod/*.f90 \
+$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
+$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
+$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_SHARED)/Comm_Mod_Seq.f90 \
+$(DIR_SHARED)/Comm_Mod_Par.f90 \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 \
+$(DIR_SHARED)/Cgns_Mod_Seq.f90 \
+$(DIR_SHARED)/Cgns_Mod_Par.f90 \
+$(DIR_SHARED)/Cgns_Mod/*.f90 \
+$(DIR_SHARED)/Cgns_Mod/*/*.f90 
+
+#-- ./Probe_1d_Cells_Nodes.f90
+$(DIR_OBJECT)/Probe_1d_Cells_Nodes.o:\
 $(DIR_OBJECT)/Sort_Mod.o \
 $(DIR_SHARED)/Sort_Mod/*.f90 \
 $(DIR_OBJECT)/Name_Mod.o \
+$(DIR_OBJECT)/Math_Mod.o \
+$(DIR_SHARED)/Math_Mod/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
+#-- ./Swap_Short.f90
+#-- ./Cpu_Timer_Mod/Stop.f90
+#-- ./Cpu_Timer_Mod/Statistics.f90
+#-- ./Cpu_Timer_Mod/Start.f90
+#-- ./To_Upper_Case.f90
+#-- ./Math_Mod/Approx_String.f90
+#-- ./Math_Mod/Approx_Real.f90
+#-- ./Math_Mod/Distance_Squared.f90
+#-- ./Math_Mod/Tet_Volume.f90
+#-- ./Math_Mod/Distance.f90
+#-- ./Math_Mod/Cross_Product.f90
+#-- ./Bnd_Cond_Mod.f90
+#-- ./Grid_Level_Mod.f90
+#-- ./Cgns_Mod/Read_Coordinate_Info.f90
+#-- ./Cgns_Mod/Read_Block_Info.f90
+#-- ./Cgns_Mod/Read_2d_Interface_Section_Connections.f90
+#-- ./Cgns_Mod/Read_Number_Of_Bnd_Conds_In_Block.f90
+#-- ./Cgns_Mod/Read_Section_Connections.f90
+#-- ./Cgns_Mod/Read_Coordinate_Array.f90
+#-- ./Cgns_Mod/Read_Number_Of_Coordinates_In_Block.f90
+#-- ./Cgns_Mod/Read_Grid_Location.f90
+#-- ./Cgns_Mod/Write_Dimensions_Info.f90
+#-- ./Cgns_Mod/Read_Number_Of_Blocks_In_Base.f90
+#-- ./Cgns_Mod/Initialize_Counters.f90
+#-- ./Cgns_Mod/Read_Block_Type.f90
+#-- ./Cgns_Mod/Parallel/Write_Block_Info.f90
+#-- ./Cgns_Mod/Parallel/Get_Arrays_Dimensions.f90
+#-- ./Cgns_Mod/Parallel/Open_File.f90
+#-- ./Cgns_Mod/Parallel/Write_Base_Info.f90
+#-- ./Cgns_Mod/Parallel/Write_Solution_Info.f90
+#-- ./Cgns_Mod/Parallel/Write_Field.f90
+#-- ./Cgns_Mod/Parallel/Write_Section_Connections.f90
+#-- ./Cgns_Mod/Parallel/Close_File.f90
+#-- ./Cgns_Mod/Parallel/Write_Coordinate_Array.f90
+$(DIR_OBJECT)/Write_Coordinate_Array.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*.f90 
+
+#-- ./Cgns_Mod/Read_Number_Of_Block_Interfaces.f90
+#-- ./Cgns_Mod/Write_Link_To_Mesh_In_File.f90
+#-- ./Cgns_Mod/Read_Base_Info.f90
+#-- ./Cgns_Mod/Read_2d_Bnd_Section_Connections_With_Parent_Data.f90
+#-- ./Cgns_Mod/Sequential/Write_Block_Info.f90
+#-- ./Cgns_Mod/Sequential/Open_File.f90
+#-- ./Cgns_Mod/Sequential/Write_Base_Info.f90
+#-- ./Cgns_Mod/Sequential/Write_Solution_Info.f90
+#-- ./Cgns_Mod/Sequential/Write_Field.f90
+#-- ./Cgns_Mod/Sequential/Write_Section_Connections.f90
+#-- ./Cgns_Mod/Sequential/Close_File.f90
+#-- ./Cgns_Mod/Sequential/Write_Coordinate_Array.f90
+#-- ./Cgns_Mod/Merge_Nodes.f90
+#-- ./Cgns_Mod/Read_Interface_Info.f90
+#-- ./Cgns_Mod/Write_Link_To_Field.f90
+#-- ./Cgns_Mod/Read_2d_Bnd_Section_Connections_With_No_Parent_Data.f90
+#-- ./Cgns_Mod/Read_Bnd_Conds_Info.f90
+#-- ./Cgns_Mod/Read_Section_Info.f90
+#-- ./Cgns_Mod/Read_Number_Of_Bases_In_File.f90
+#-- ./Cgns_Mod/Read_Number_Of_Element_Sections.f90
+#-- ./Math_Mod.f90
+$(DIR_OBJECT)/Math_Mod.o:\
+$(DIR_SHARED)/Math_Mod/*.f90 
+
+#-- ./Name_File.f90
+$(DIR_OBJECT)/Name_File.o:\
+$(DIR_OBJECT)/Name_Mod.o 
+
+#-- ./Gen_Mod.f90
+#-- ./Name_Mod.f90
 #-- ./Probe_1d_Cells.f90
 $(DIR_OBJECT)/Probe_1d_Cells.o:\
 $(DIR_OBJECT)/Name_Mod.o \
+$(DIR_OBJECT)/Math_Mod.o \
+$(DIR_SHARED)/Math_Mod/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \

@@ -23,14 +23,13 @@
 !                                                                              !
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod,     only: ONE_THIRD, TWO_THIRDS
+  use Math_Mod
   use Tokenizer_Mod, only: Tokenizer_Mod_Read_Line, line
   use Grid_Mod,      only: Grid_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
-!----------------------------------[Calling]-----------------------------------!
-  include '../Shared/Approx_Real.int'
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: i, c1, c11, c12, c21, c22, s1, s2
   integer           :: color_copy,  x_copy, y_copy, z_copy
@@ -93,8 +92,8 @@
             yc_22 = yc_22 / (real(grid % faces_n_nodes(s2)))
             zc_22 = zc_22 / (real(grid % faces_n_nodes(s2)))
 
-            if( Approx_Real( yc_22, yc_12, tol=SMALL ) .and. &
-                Approx_Real( zc_22, zc_12, tol=SMALL ) ) then
+            if( Math_Mod_Approx_Real( yc_22, yc_12, tol=SMALL ) .and. &
+                Math_Mod_Approx_Real( zc_22, zc_12, tol=SMALL ) ) then
               grid % n_copy = grid % n_copy + 1
               x_copy = x_copy + 1
               if( abs(grid % xc(c11)-grid % xc(c22)) <  &
@@ -146,8 +145,8 @@
             xc_22 = xc_22 / (real(grid % faces_n_nodes(s2)))
             zc_22 = zc_22 / (real(grid % faces_n_nodes(s2)))
 
-            if( Approx_Real( xc_22, xc_12, tol=SMALL ) .and. &
-                Approx_Real( zc_22, zc_12, tol=SMALL ) ) then
+            if( Math_Mod_Approx_Real( xc_22, xc_12, tol=SMALL ) .and. &
+                Math_Mod_Approx_Real( zc_22, zc_12, tol=SMALL ) ) then
               grid % n_copy = grid % n_copy + 1 
               y_copy = y_copy + 1
               if( abs(grid % yc(c11)-grid % yc(c22)) <  &
@@ -199,8 +198,8 @@
             yc_22 = yc_22 / (real(grid % faces_n_nodes(s2)))
             xc_22 = xc_22 / (real(grid % faces_n_nodes(s2)))
 
-            if( Approx_Real( yc_22, yc_12, tol=SMALL ) .and. &
-                Approx_Real( xc_22, xc_12, tol=SMALL ) ) then
+            if( Math_Mod_Approx_Real( yc_22, yc_12, tol=SMALL ) .and. &
+                Math_Mod_Approx_Real( xc_22, xc_12, tol=SMALL ) ) then
               grid % n_copy = grid % n_copy + 1 
               z_copy = z_copy + 1
               if( abs(grid % zc(c11)-grid % zc(c22)) <  &

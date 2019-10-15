@@ -19,7 +19,6 @@
   type(Grid_Type), pointer :: grid
   integer                  :: k,  c, nearest_cell
   real                     :: new_distance, old_distance
-  real                     :: Distance
 !==============================================================================!
 
   grid => turb % pnt_grid
@@ -34,7 +33,8 @@
     old_distance = HUGE
     do k = 1, grid % n_cells
       if(grid % cell_near_wall(k)) then
-        new_distance = Distance(grid % xc(k), grid % yc(k), grid % zc(k),  &
+        new_distance = Math_Mod_Distance(                                  &
+                                grid % xc(k), grid % yc(k), grid % zc(k),  &
                                 grid % xc(c), grid % yc(c), grid % zc(c))
         if(new_distance <= old_distance) then
           nearest_cell =  k

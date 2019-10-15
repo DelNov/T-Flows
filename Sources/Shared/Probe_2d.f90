@@ -5,13 +5,12 @@
 ! It assumes that homogeneous directions of the flow are x and y.              !
 !------------------------------------------------------------------------------!
   use Name_Mod, only: problem_name
+  use Math_Mod
   use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
-!----------------------------------[Calling]-----------------------------------! 
-  include "Approx_Real.int"
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: n_prob, p, c
   real              :: yp(32768), zp(32768)
@@ -41,14 +40,14 @@
     ! Try to find the cell among the probes
     do p=1,n_prob
       if(answer .eq. 'YZ') then
-        if( Approx_Real(grid % yc(c), yp(p)) .and.      &
-            Approx_Real(grid % zc(c), zp(p)) ) go to 1
+        if( Math_Mod_Approx_Real(grid % yc(c), yp(p)) .and.      &
+            Math_Mod_Approx_Real(grid % zc(c), zp(p)) ) go to 1
       else if(answer .eq. 'ZX') then
-        if( Approx_Real(grid % xc(c), yp(p)) .and.      &
-            Approx_Real(grid % zc(c), zp(p)) ) go to 1
+        if( Math_Mod_Approx_Real(grid % xc(c), yp(p)) .and.      &
+            Math_Mod_Approx_Real(grid % zc(c), zp(p)) ) go to 1
       else if(answer .eq. 'XY') then
-        if( Approx_Real(grid % xc(c), yp(p)) .and.      &
-            Approx_Real(grid % yc(c), zp(p)) ) go to 1
+        if( Math_Mod_Approx_Real(grid % xc(c), yp(p)) .and.      &
+            Math_Mod_Approx_Real(grid % yc(c), zp(p)) ) go to 1
       end if
     end do 
 

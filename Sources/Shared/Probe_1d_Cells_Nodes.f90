@@ -5,14 +5,13 @@
 !   direction and write them in file called "name.1d"                          !
 !------------------------------------------------------------------------------!
   use Name_Mod, only: problem_name
+  use Math_Mod
   use Grid_Mod
   use Sort_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
-!----------------------------------[Calling]-----------------------------------! 
-  include "Approx_Real.int"
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: n_prob, p, c, n
   real              :: zp(16384)
@@ -44,22 +43,28 @@
       ! Try to find the cell among the probes
       do p=1, n_prob
         if(answer .eq. 'X') then
-          if( Approx_Real(grid % xn(grid % cells_n(n,c)), zp(p)) ) go to 1
+          if( Math_Mod_Approx_Real(  &
+              grid % xn(grid % cells_n(n,c)), zp(p)) ) go to 1
         else if(answer .eq. 'Y') then
-          if( Approx_Real(grid % yn(grid % cells_n(n,c)), zp(p)) ) go to 1
+          if( Math_Mod_Approx_Real(  &
+              grid % yn(grid % cells_n(n,c)), zp(p)) ) go to 1
         else if(answer .eq. 'Z') then
-          if( Approx_Real(grid % zn(grid % cells_n(n,c)), zp(p)) ) go to 1
+          if( Math_Mod_Approx_Real(  &
+              grid % zn(grid % cells_n(n,c)), zp(p)) ) go to 1
         else if(answer .eq. 'RX') then
-          if( Approx_Real( sqrt(grid % zn(grid % cells_n(n,c))**2 +           &
-                                grid % yn(grid % cells_n(n,c))**2), zp(p)) )  &
+          if( Math_Mod_Approx_Real(                              &
+              sqrt(grid % zn(grid % cells_n(n,c))**2 +           &
+                   grid % yn(grid % cells_n(n,c))**2), zp(p)) )  &
             go to 1
         else if(answer .eq. 'RY') then
-          if( Approx_Real( sqrt(grid % xn(grid % cells_n(n,c))**2 +           &
-                                grid % zn(grid % cells_n(n,c))**2), zp(p)) )  &
+          if( Math_Mod_Approx_Real(                              &
+              sqrt(grid % xn(grid % cells_n(n,c))**2 +           &
+                   grid % zn(grid % cells_n(n,c))**2), zp(p)) )  &
             go to 1
         else if(answer .eq. 'RZ') then
-          if( Approx_Real( sqrt(grid % xn(grid % cells_n(n,c))**2 +           &
-                                grid % yn(grid % cells_n(n,c))**2), zp(p)) )  &
+          if( Math_Mod_Approx_Real(                              &
+              sqrt(grid % xn(grid % cells_n(n,c))**2 +           &
+                   grid % yn(grid % cells_n(n,c))**2), zp(p)) )  &
             go to 1
         end if
       end do

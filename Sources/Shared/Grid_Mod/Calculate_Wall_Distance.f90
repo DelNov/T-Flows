@@ -6,10 +6,6 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
-!------------------------------------------------------------------------------!
-  include '../Shared/Approx_Real.int'
-!----------------------------------[Calling]-----------------------------------!
-  real :: Distance_Squared
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: b, c1, c2
   integer              :: n_wall_colors, n_cells_fraction
@@ -67,13 +63,14 @@
         do c2 = grid % bnd_cond % color_f( wall_colors(b) ),  &
                 grid % bnd_cond % color_l( wall_colors(b) ),  &
                 -1
-          grid % wall_dist(c1) = min(grid % wall_dist(c1),            &
-                                     Distance_Squared(grid % xc(c1),  &
-                                                      grid % yc(c1),  &
-                                                      grid % zc(c1),  &
-                                                      grid % xc(c2),  &
-                                                      grid % yc(c2),  &
-                                                      grid % zc(c2)))
+          grid % wall_dist(c1) =  &
+            min(grid % wall_dist(c1),                     &
+                Math_Mod_Distance_Squared(grid % xc(c1),  &
+                                          grid % yc(c1),  &
+                                          grid % zc(c1),  &
+                                          grid % xc(c2),  &
+                                          grid % yc(c2),  &
+                                          grid % zc(c2)))
         end do
       end do
     end do

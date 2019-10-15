@@ -5,6 +5,7 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod,   only: HUGE, TINY
+  use Math_Mod
   use Comm_Mod,    only: n_proc, Comm_Mod_Global_Min_Real
   use Name_Mod
   use Grid_Mod,    only: Grid_Type

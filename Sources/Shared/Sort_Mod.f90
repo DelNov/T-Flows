@@ -8,8 +8,10 @@
 
   contains
 
+  include 'Sort_Mod/2_Int_Carry_2_Int.f90'
   include 'Sort_Mod/2_Int_Carry_Int.f90'
   include 'Sort_Mod/2_Int.f90'
+  include 'Sort_Mod/2_Real_Carry_2_Int.f90'
   include 'Sort_Mod/2_Real_Carry_Int.f90'
   include 'Sort_Mod/2_Real.f90'
   include 'Sort_Mod/3_Int_Carry_2_Int.f90'

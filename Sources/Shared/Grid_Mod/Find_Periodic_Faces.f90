@@ -6,8 +6,6 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
-!------------------------------------------------------------------------------!
-  include '../Shared/Approx_Real.int'
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c1, c2, s, run    ! counters
 !==============================================================================!
@@ -32,28 +30,28 @@
       if(c2 .gt. 0) then
 
         ! In x direction
-        if( (abs(grid % per_x) > NANO) .and.                    &
-            Approx_Real(   abs(grid % dx(s))                    &
-                         + abs(grid % xc(c1) - grid % xc(c2)),  &
-                           grid % per_x) ) then
+        if( (abs(grid % per_x) > NANO) .and.                             &
+            Math_Mod_Approx_Real(   abs(grid % dx(s))                    &
+                                  + abs(grid % xc(c1) - grid % xc(c2)),  &
+                                    grid % per_x) ) then
           grid % n_per_faces = grid % n_per_faces + 1
           if(run .eq. 2) grid % per_faces(grid % n_per_faces) = s
         end if
 
         ! In y direction
-        if( (abs(grid % per_y) > NANO) .and.                    &
-            Approx_Real(   abs(grid % dy(s))                    &
-                         + abs(grid % yc(c1) - grid % yc(c2)),  &
-                           grid % per_y) ) then
+        if( (abs(grid % per_y) > NANO) .and.                             &
+            Math_Mod_Approx_Real(   abs(grid % dy(s))                    &
+                                  + abs(grid % yc(c1) - grid % yc(c2)),  &
+                                    grid % per_y) ) then
           grid % n_per_faces = grid % n_per_faces + 1
           if(run .eq. 2) grid % per_faces(grid % n_per_faces) = s
         end if
 
         ! In z direction
-        if( (abs(grid % per_z) > NANO) .and.                    &
-            Approx_Real(   abs(grid % dz(s))                    &
-                         + abs(grid % zc(c1) - grid % zc(c2)),  &
-                           grid % per_z) ) then
+        if( (abs(grid % per_z) > NANO) .and.                             &
+            Math_Mod_Approx_Real(   abs(grid % dz(s))                    &
+                                  + abs(grid % zc(c1) - grid % zc(c2)),  &
+                                    grid % per_z) ) then
           grid % n_per_faces = grid % n_per_faces + 1
           if(run .eq. 2) grid % per_faces(grid % n_per_faces) = s
         end if

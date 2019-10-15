@@ -14,6 +14,7 @@
   use Save_Grid_Mod
   use Turb_Mod
   use Swarm_Mod,     only: Particle_Type, Swarm_Type
+  use Surf_Mod,      only: Vert_Type, Elem_Type, Surf_Type
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -24,5 +25,6 @@
   include 'Save_Results_Mod/Vtu/Save_Scalar.f90'
   include 'Save_Results_Mod/Vtu/Save_Swarm.f90'
   include 'Save_Results_Mod/Vtu/Save_Vector.f90'
+  include 'Save_Results_Mod/Vtu/Save_Surf.f90'
 
   end module 

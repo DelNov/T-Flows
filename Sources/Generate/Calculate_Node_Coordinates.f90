@@ -5,6 +5,7 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod,  only: HUGE, ONE_THIRD
+  use Math_Mod
   use Domain_Mod, only: Domain_Type
   use Grid_Mod,   only: Grid_Type
 !------------------------------------------------------------------------------!
@@ -14,8 +15,6 @@
   type(Grid_Type)   :: grid
 !----------------------------------[Calling]-----------------------------------!
   integer :: Is_Line_in_Block
-!---------------------------------[Interface]----------------------------------!
-  include '../Shared/Approx_Real.int'
 !-----------------------------------[Locals]-----------------------------------!
   integer :: fc, b, bl, i, j, k, n, c, ig
   integer :: l, l1, l2
@@ -215,7 +214,7 @@
         end if ! l1-l2
 
         ! Line is defined point by point
-        if( Approx_Real( dom % lines(l) % weight, 0.0) ) then
+        if( Math_Mod_Approx_Real( dom % lines(l) % weight, 0.0) ) then
           print *, '# Line: ', l
           print *, '# l1= ', l1
           print *, '# l2= ', l2
@@ -281,7 +280,8 @@
     ! I (k=1) 
     fc = 1   ! face index
     k = 1
-    if( .not. Approx_Real(dom % blocks(b) % face_weights(fc,1),1.0 ) ) then
+    if( .not. Math_Mod_Approx_Real(  &
+              dom % blocks(b) % face_weights(fc,1),1.0 ) ) then
       do j=1,nj
         call Distribute_Nodes(dom, grid,                                &
                               b, dom % blocks(b) % face_weights(fc,1),  &
@@ -298,7 +298,8 @@
     ! VI (k=nk)
     fc = 6   ! face index
     k = nk
-    if( .not. Approx_Real(dom % blocks(b) % face_weights(fc,1),1.0 ) ) then
+    if( .not. Math_Mod_Approx_Real(  &
+              dom % blocks(b) % face_weights(fc,1),1.0 ) ) then
      do j=1,nj
         call Distribute_Nodes(dom, grid,                                &
                               b, dom % blocks(b) % face_weights(fc,1),  &
@@ -315,7 +316,8 @@
     ! V (i=1)
     fc = 5   ! face index
     i = 1
-    if( .not. Approx_Real(dom % blocks(b) % face_weights(fc,3),1.0 ) ) then
+    if( .not. Math_Mod_Approx_Real(  &
+              dom % blocks(b) % face_weights(fc,3),1.0 ) ) then
       do j=1,nj
         call Distribute_Nodes(dom, grid,                                &
                               b, dom % blocks(b) % face_weights(fc,3),  &
@@ -332,7 +334,8 @@
     ! III (i=ni)
     fc = 3   ! face index
     i = ni
-    if( .not. Approx_Real(dom % blocks(b) % face_weights(fc,3),1.0 ) ) then
+    if( .not. Math_Mod_Approx_Real(  &
+              dom % blocks(b) % face_weights(fc,3),1.0 ) ) then
       do j=1,nj
         call Distribute_Nodes(dom, grid,                                &
                               b, dom % blocks(b) % face_weights(fc,3),  & 
@@ -349,7 +352,8 @@
     ! II (j=1)       
     fc = 2   ! face index
     j = 1
-    if( .not. Approx_Real(dom % blocks(b) % face_weights(fc,3),1.0 ) ) then
+    if( .not. Math_Mod_Approx_Real(  &
+              dom % blocks(b) % face_weights(fc,3),1.0 ) ) then
       do i=1,ni
         call Distribute_Nodes(dom, grid,                                &
                               b, dom % blocks(b) % face_weights(fc,3),  &
@@ -366,7 +370,8 @@
     ! IV (j=nj)       
     fc = 4   ! face index
     j = nj
-    if( .not. Approx_Real(dom % blocks(b) % face_weights(fc,3),1.0 ) ) then
+    if( .not. Math_Mod_Approx_Real(  &
+              dom % blocks(b) % face_weights(fc,3),1.0 ) ) then
       do i=1,ni
         call Distribute_Nodes(dom, grid,                                &
                               b, dom % blocks(b) % face_weights(fc,3),  &
@@ -383,21 +388,24 @@
     !-------------!
     !   Volumes   !
     !-------------!
-    if( .not. Approx_Real( dom % blocks(b) % weights(3), 1.0 ) ) then
+    if( .not. Math_Mod_Approx_Real(  &
+              dom % blocks(b) % weights(3), 1.0 ) ) then
       do i=1,ni
         do j=1,nj
           call Distribute_Nodes(dom, grid,  &
                                 b, dom % blocks(b) % weights(3), i,j,1,i,j,nk)
         end do
       end do
-    else if( .not. Approx_Real( dom % blocks(b) % weights(1), 1.0 ) ) then
+    else if( .not. Math_Mod_Approx_Real(  &
+                   dom % blocks(b) % weights(1), 1.0 ) ) then
       do k=1,nk
         do j=1,nj
           call Distribute_Nodes(dom, grid,  &
                                 b, dom % blocks(b) % weights(1), 1,j,k,ni,j,k)
         end do
       end do
-    else if( .not. Approx_Real( dom % blocks(b) % weights(2), 1.0 ) ) then
+    else if( .not. Math_Mod_Approx_Real(  &
+                   dom % blocks(b) % weights(2), 1.0 ) ) then
       do k=1,nk
         do i=1,ni
           call Distribute_Nodes(dom, grid,  &

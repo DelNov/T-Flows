@@ -15,6 +15,7 @@
   use Save_Grid_Mod
   use Turb_Mod
   use Swarm_Mod,     only: Particle_Type, Swarm_Type
+  use Surf_Mod,      only: Vert_Type, Elem_Type, Surf_Type
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!

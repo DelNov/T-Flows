@@ -70,7 +70,6 @@ ifeq ($(FORTRAN), gnu)
                -fimplicit-none -finit-real=nan                              \
                -Wall -Wextra -Waliasing -Wampersand -Warray-temporaries     \
                -Wc-binding-type -Wcharacter-truncation -Wline-truncation    \
-               -Wconversion -Wconversion-extra -Wintrinsics-std             \
                -Wreal-q-constant -Wsurprising -Wtabs -Wunderflow            \
                -Wintrinsic-shadow -Wunused-parameter -Walign-commons        \
                -Wfunction-elimination -Wrealloc-lhs -Wrealloc-lhs-all       \
@@ -186,6 +185,7 @@ endif
 # Modules in shared directory
 SRC_MOD = Const_Mod.f90		\
           Sort_Mod.f90		\
+          Math_Mod.f90		\
           Tokenizer_Mod.f90	\
           Div_Mod.f90		\
           Grid_Mod.f90		\
@@ -219,7 +219,8 @@ SRC_MOD += Control_Mod.f90	\
            Grad_Mod.f90		\
            Monitor_Mod.f90	\
            Turb_Mod.f90		\
-           Swarm_Mod.f90
+           Swarm_Mod.f90	\
+           Surf_Mod.f90
 
 # Save_Results_Mod - conditional VTU/CGNS support
 ifeq ($(CGNS), no)
@@ -257,11 +258,7 @@ SRC_FUN += Y_Plus_Low_Re.f90		\
            Find_Nearest_Wall_Cell.f90	\
            Roughness_Coefficient.f90
 
-SRC_FUN += Distance.f90		\
-           Distance_Squared.f90	\
-           Name_File.f90	\
-           Approx_Real.f90	\
-           Approx_String.f90	\
+SRC_FUN += Name_File.f90	\
            Swap_Int.f90		\
            Swap_Real.f90	\
            Swap_Short.f90	\
