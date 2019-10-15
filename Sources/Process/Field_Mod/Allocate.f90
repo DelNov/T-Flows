@@ -31,6 +31,8 @@
   ! Mass flow rates at cell faces are always needed
   allocate(flow % flux(grid % n_faces));  flow % flux = 0.
 
+  ! density at cell faces:
+  allocate(dens_face(grid % n_faces))
   !-----------------------------------------!
   !   Enthalpy conservation (temperature)   !
   !-----------------------------------------!

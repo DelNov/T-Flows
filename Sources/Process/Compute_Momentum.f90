@@ -40,7 +40,7 @@
   real,              pointer :: si(:), sj(:), sk(:), di(:), dj(:), dk(:)
   real,              pointer :: h_i(:)
   integer                    :: s, c, c1, c2, exec_iter
-  real                       :: f_ex, f_im, f_stress
+  real                       :: f_ex, f_im, f_stress, fs
   real                       :: uis, vel_max
   real                       :: a0, a12, a21
   real                       :: vis_eff, vis_ts
@@ -185,8 +185,13 @@
 
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
+    fs = grid % f(s)
 
-    vis_eff = viscosity
+    if (c2 > 0) then
+      vis_eff = fs * viscosity(c1) + (1.0 - fs) * viscosity(c2)
+    else
+      vis_eff = viscosity(c1)
+    end if
 
     if(turbulence_model .ne. NONE .and.  &
        turbulence_model .ne. DNS) then
@@ -196,7 +201,7 @@
 
     if(turbulence_model .eq. HYBRID_LES_RANS) then
       vis_eff =      grid % fw(s)  * turb % vis_t_eff(c1)   &
-              + (1.0-grid % fw(s)) * turb % vis_t_eff(c2) + viscosity
+              + (1.0-grid % fw(s)) * turb % vis_t_eff(c2) + vis_eff
     end if
 
     if(c2 < 0) then
@@ -270,9 +275,9 @@
              + ui_k_f*dk(s)) * a0
 
     ! Cross diffusion part
-    ui % c(c1) = ui % c(c1) + f_ex - f_im + f_stress * density
+    ui % c(c1) = ui % c(c1) + f_ex - f_im + f_stress * density(c1)
     if(c2  > 0) then
-      ui % c(c2) = ui % c(c2) - f_ex + f_im - f_stress * density
+      ui % c(c2) = ui % c(c2) - f_ex + f_im - f_stress * density(c2)
     end if
 
     ! Compute the coefficients for the sysytem matrix
@@ -387,17 +392,17 @@
   if(buoyancy) then
     if(ui % name .eq. 'U') then
       do c = 1, grid % n_cells
-        b(c) = b(c) - density * grav_x * (t % n(c) - t_ref)  &
+        b(c) = b(c) - density(c) * grav_x * (t % n(c) - t_ref)  &
              * flow % beta * grid % vol(c)
       end do
     else if(ui % name .eq. 'V') then
       do c = 1, grid % n_cells
-        b(c) = b(c) - density * grav_y * (t % n(c) - t_ref)  &
+        b(c) = b(c) - density(c) * grav_y * (t % n(c) - t_ref)  &
              * flow % beta * grid % vol(c)
       end do
     else if(ui % name .eq. 'W') then
       do c = 1, grid % n_cells
-        b(c) = b(c) - density * grav_z * (t % n(c) - t_ref)  &
+        b(c) = b(c) - density(c) * grav_z * (t % n(c) - t_ref)  &
              * flow % beta * grid % vol(c)
       end do
     end if
@@ -408,15 +413,15 @@
   else
     if(ui % name .eq. 'U') then
       do c = 1, grid % n_cells
-        b(c) = b(c) - density * grav_x * grid % vol(c)
+        b(c) = b(c) - density(c) * grav_x * grid % vol(c)
       end do
     else if(ui % name .eq. 'V') then
       do c = 1, grid % n_cells
-        b(c) = b(c) - density * grav_y * grid % vol(c)
+        b(c) = b(c) - density(c) * grav_y * grid % vol(c)
       end do
     else if(ui % name .eq. 'W') then
       do c = 1, grid % n_cells
-        b(c) = b(c) - density * grav_z * grid % vol(c)
+        b(c) = b(c) - density(c) * grav_z * grid % vol(c)
       end do
     end if
   end if

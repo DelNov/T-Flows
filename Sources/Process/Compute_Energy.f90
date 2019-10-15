@@ -37,6 +37,7 @@
   real                       :: con_eff2, f_ex2, f_im2, tx_f2, ty_f2, tz_f2
   real                       :: ts, pr_t1, pr_t2, pr_tf
   real                       :: ut_s, vt_s, wt_s, t_stress, con_t
+  real, allocatable          :: capacity_times_density(:) 
 !------------------------------------------------------------------------------!
 !
 !  The form of equations which are solved:
@@ -266,7 +267,12 @@
   !   Inertial terms   !
   !                    !
   !--------------------!
-  call Numerics_Mod_Inertial_Term(t, capacity * density, sol, dt)
+  allocate(capacity_times_density(size(density)))
+  capacity_times_density(:) = capacity * density(:)
+
+  call Numerics_Mod_Inertial_Term(t, capacity_times_density, sol, dt)
+
+  deallocate(capacity_times_density)
 
   !--------------------!
   !                    !

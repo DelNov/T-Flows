@@ -5,7 +5,8 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Field_Mod,   only: Field_Type, heat_transfer, density
+  use Field_Mod,   only: Field_Type, heat_transfer, density, multiphase,       &
+                          dens_face
   use Comm_Mod
   use Turb_Mod
   use Swarm_Mod
@@ -13,6 +14,7 @@
   use Bulk_Mod
   use User_Mod
   use Control_Mod
+  use Numerics_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -38,6 +40,7 @@
   real                     :: area
 
   integer                  :: n_points, k
+  integer                  :: mult_dummy  ! To catch Volume Fraction Initialization
   real, allocatable        :: prof(:,:), x(:), y(:), z(:), dist(:)
   logical                  :: found
 
@@ -105,8 +108,8 @@
 
       read (line % tokens(1),*) n_points
 
-      if (this_proc < 2) print '(a,i0,2a)', ' # Reading ', nks, &
-        ' columns in file ' , trim(keys_file(1))
+      if (this_proc < 2) print '(a,i0,2a)', " # Reading ", nks, &
+        " columns in file " , trim(keys_file(1))
 
       allocate(prof(n_points, 0:nks)); prof = 0.
       allocate(x(n_points));           x    = 0.
@@ -238,6 +241,14 @@
       do i = 1, nks
         call To_Upper_Case(keys(i))
       end do
+
+      if (multiphase) then
+        mult_dummy = floor(vals(Key_Ind('V_FRAC', keys, nks)))
+      else !density at faces:
+        do s = 1, grid % n_faces
+          dens_face(s) = density(grid % faces_c(1,s))
+        end do
+      end if
 
       do c = 1, grid % n_cells
 
@@ -371,8 +382,8 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
     if(c2  < 0) then
-      flux(s) = density*( u % n(c2) * grid % sx(s) + &
-                          v % n(c2) * grid % sy(s) + &
+      flux(s) = density(c1) * ( u % n(c2) * grid % sx(s) + &
+                          v % n(c2) * grid % sy(s) +       &
                           w % n(c2) * grid % sz(s) )
 
       if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
@@ -395,6 +406,7 @@
       flux(s) = 0.0
     end if
   end do
+
   call Comm_Mod_Global_Sum_Int(n_wall)
   call Comm_Mod_Global_Sum_Int(n_inflow)
   call Comm_Mod_Global_Sum_Int(n_outflow)
@@ -410,8 +422,14 @@
   if(this_proc  < 2) then
     if(n_inflow .gt. 0) then
       print '(a29,es12.5)', ' # Mass inflow             : ', bulk % mass_in
-      print '(a29,es12.5)', ' # Average inflow velocity : ', bulk % mass_in &
-                                                             / (density * area)
+      if (multiphase) then
+        ! Needs to be corrected
+        print '(a29,es12.5)', ' # Average inflow velocity : ',  &
+          bulk % mass_in / (dens_face(1) * area)
+      else
+        print '(a29,es12.5)', ' # Average inflow velocity : ',  &
+          bulk % mass_in / (density(1) * area)
+      end if
     end if
     print *, '# Number of faces on the wall        : ', n_wall
     print *, '# Number of inflow faces             : ', n_inflow

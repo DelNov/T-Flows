@@ -43,13 +43,13 @@
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
   call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
 
-  kin_vis = viscosity / density
-
   if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
      turbulence_model .eq. HYBRID_LES_RANS) then
 
     do c = 1, grid % n_cells
       eps_l(c) = eps % n(c) + TINY ! limited eps % n
+
+      kin_vis = viscosity(c) / density(c)
 
       t_1(c) = kin % n(c) / eps_l(c)
       t_2(c) = c_t*sqrt(kin_vis/eps_l(c))
@@ -68,6 +68,8 @@
 
     do c = 1, grid % n_cells
       eps_l(c) = eps % n(c) + TINY ! limited eps % n
+
+      kin_vis = viscosity(c) / density(c)
 
       t_1(c) = kin % n(c)/eps_l(c)
       t_2(c) = c_t*sqrt(kin_vis/eps_l(c))

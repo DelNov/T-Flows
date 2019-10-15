@@ -32,6 +32,7 @@
   integer                    :: c, c1, c2, s
   real                       :: cfl_max, pe_max
   real                       :: cfl_t, pe_t, mass_err
+  real                       :: fs, dens_const, visc_const
 !==============================================================================!
 
   call Cpu_Timer_Mod_Start('Correct_Velocity')
@@ -107,7 +108,7 @@
   end do
 
   do c = 1, grid % n_cells
-    b(c) = b(c) / (grid % vol(c) * density / dt)
+    b(c) = b(c) / (grid % vol(c) * density(c) / dt)
   end do
 
   mass_err = 0.0
@@ -125,13 +126,15 @@
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
+    dens_const = dens_face(s)
+    visc_const = grid % f(s) * viscosity(c1) + (1.0 - grid % f(s)) * viscosity(c2)
     if(c2 > 0) then
-      cfl_t = abs( dt * flux(s) / density /      &
+      cfl_t = abs( dt * flux(s) / dens_const /      &
                    ( a % fc(s) *                 &
                    (  grid % dx(s)*grid % dx(s)  &
                     + grid % dy(s)*grid % dy(s)  &
                     + grid % dz(s)*grid % dz(s)) ) )
-      pe_t    = abs( flux(s) / a % fc(s) / (viscosity / density + TINY) )
+      pe_t    = abs( flux(s) / a % fc(s) / (visc_const / dens_const + TINY) )
       cfl_max = max( cfl_max, cfl_t ) 
       pe_max  = max( pe_max,  pe_t  ) 
     end if

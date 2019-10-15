@@ -68,20 +68,20 @@
       alpha1 = max(1.0,l_rans/l_sgs)
 
       if(alpha1 < 1.05) then
-        a % val(a % dia(c)) = a % val(a % dia(c))   &
-                            + density * eps % n(c)  &
+        a % val(a % dia(c)) = a % val(a % dia(c))      &
+                            + density(c) * eps % n(c)  &
                             / (kin % n(c) + TINY) * grid % vol(c)
       else
         a % val(a % dia(c)) = a % val(a % dia(c))   &
-          + density                                 &
+          + density(c)                              &
           * min(alpha1**1.45 * eps % n(c), kin % n(c)**1.5 / (lf*0.01))  &
           / (kin % n(c) + TINY) * grid % vol(c)
       end if
     end do
   else  ! turbuence model will be K_EPS_ZETA_F
     do c = 1, grid % n_cells
-      a % val(a % dia(c)) = a % val(a % dia(c))   &
-                          + density * eps % n(c)  &
+      a % val(a % dia(c)) = a % val(a % dia(c))      &
+                          + density(c) * eps % n(c)  &
                           / (kin % n(c) + TINY) * grid % vol(c)
 
       if(buoyancy) then
@@ -89,7 +89,7 @@
                          * (grav_x * ut % n(c) +  &
                             grav_y * vt % n(c) +  &
                             grav_z * wt % n(c))   &
-                         * density
+                         * density(c)
         b(c) = b(c) + max(0.0, turb % g_buoy(c) * grid % vol(c))
         a % val(a % dia(c)) = a % val(a % dia(c))         &
                             + max(0.0,-turb % g_buoy(c)   &
@@ -99,14 +99,14 @@
     end do
   end if
 
-  ! Kinematic viscosities
-  kin_vis = viscosity / density
-
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
     if(c2 < 0) then
+      ! Kinematic viscosities
+      kin_vis = viscosity(c1) / density(c1)
+
       if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or. &
          Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
 
@@ -121,7 +121,7 @@
                                                  grid % wall_dist(c1),  &
                                                  kin_vis)
 
-          tau_wall = density*kappa*u_tau*u_tan  &
+          tau_wall = density(c1)*kappa*u_tau*u_tan  &
                    / log(((grid % wall_dist(c1)+z_o) / z_o))
 
           turb % p_kin(c1) = tau_wall * c_mu25 * sqrt(kin % n(c1)) &
@@ -135,7 +135,7 @@
                                             grid % wall_dist(c1),  &
                                             kin_vis)
 
-          tau_wall = density * kappa * u_tau * u_tan  &
+          tau_wall = density(c1) * kappa * u_tau * u_tan  &
                    / log(e_log*max(turb % y_plus(c1), 1.05))
 
           ebf = max(0.01 * turb % y_plus(c1) ** 4      &
@@ -149,7 +149,7 @@
           turb % p_kin(c1) = p_kin_int * exp(-1.0 * ebf) + p_kin_wf  &
                            * exp(-1.0 / ebf)
           b(c1) = b(c1) + (turb % p_kin(c1) - p_kin_int) * grid % vol(c1)
-        end if  ! rough_walls
+        end if! rough_walls
       end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2).eq.WALL or WALLFL
     end if    ! c2 < 0
   end do

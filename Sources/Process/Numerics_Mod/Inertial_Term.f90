@@ -6,7 +6,7 @@
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
   type(Var_Type)            :: phi
-  real                      :: coef
+  real,         allocatable :: coef(:)
   type(Solver_Type), target :: sol
   real                      :: dt
 !-----------------------------------[Locals]-----------------------------------!
@@ -25,7 +25,7 @@
   ! Two time levels; Linear interpolation
   if(phi % td_scheme .eq. LINEAR) then
     do c = 1, grid % n_cells
-      a0 = coef * grid % vol(c) / dt
+      a0 = coef(c) * grid % vol(c) / dt
       a % val(a % dia(c)) = a % val(a % dia(c)) + a0
       b(c)  = b(c) + a0 * phi % o(c)
     end do
@@ -34,7 +34,7 @@
   ! Three time levels; parabolic interpolation
   if(phi % td_scheme .eq. PARABOLIC) then
     do c = 1, grid % n_cells
-      a0 = coef * grid % vol(c) / dt
+      a0 = coef(c) * grid % vol(c) / dt
       a % val(a % dia(c)) = a % val(a % dia(c)) + 1.5 * a0
       b(c)  = b(c) + 2.0 * a0 * phi % o(c) - 0.5 * a0 * phi % oo(c)
     end do

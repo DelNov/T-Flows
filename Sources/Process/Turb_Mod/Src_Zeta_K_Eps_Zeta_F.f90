@@ -45,12 +45,12 @@
   ! choose this particular way to the add source term.
   do c = 1, grid % n_cells
     if(n_step > 500) then
-      b(c) = b(c) + f22 % n(c) * grid % vol(c) * density
+      b(c) = b(c) + f22 % n(c) * grid % vol(c) * density(c)
     else
-      b(c) = b(c) + max(0.0, f22 % n(c)*grid % vol(c)) * density
+      b(c) = b(c) + max(0.0, f22 % n(c)*grid % vol(c)) * density(c)
       a % val(a % dia(c)) = a % val(a % dia(c))                  &
                           + max(0.0, -f22 % n(c) * grid % vol(c) &
-                          / (zeta % n(c) + TINY)) * density
+                          / (zeta % n(c) + TINY)) * density(c)
     end if
     a % val(a % dia(c)) =  a % val(a % dia(c))             &
                         + grid % vol(c) * turb % p_kin(c)  &

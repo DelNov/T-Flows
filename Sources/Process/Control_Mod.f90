@@ -88,6 +88,9 @@
     include 'Control_Mod/Physics/Swarm_Density.f90'
     include 'Control_Mod/Physics/Swarm_Diameter.f90'
     include 'Control_Mod/Physics/Swarm_Coefficient_Of_Restitution.f90'
+    include 'Control_Mod/Physics/Multiphase_Density.f90'
+    include 'Control_Mod/Physics/Multiphase_Viscosity.f90'
+    include 'Control_Mod/Physics/Surface_Tension.f90'
 
     ! Species    
     include 'Control_Mod/Physics/Number_Of_Species.f90'

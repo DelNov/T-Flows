@@ -8,7 +8,8 @@
   use Comm_Mod
   use Field_Mod,   only: Field_Type, heat_transfer, heated_area,     &
                          density, viscosity, capacity, conductivity, &
-                         heat_flux, heat
+                         heat_flux, heat, multiphase,                &
+                         Field_Mod_Alias_V_Fraction
   use Turb_Mod
   use Grid_Mod
   use Control_Mod
@@ -21,7 +22,7 @@
   real :: Y_Plus_Low_Re
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
-  type(Var_Type),  pointer :: u, v, w, t
+  type(Var_Type),  pointer :: u, v, w, t, vof
   type(Var_Type),  pointer :: kin, eps, zeta, f22, vis, t2
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   integer                  :: c1, c2, s
@@ -34,11 +35,10 @@
   vis  => turb % vis
   call Field_Mod_Alias_Momentum   (flow, u, v, w)
   call Field_Mod_Alias_Energy     (flow, t)
+  call Field_Mod_Alias_V_Fraction (flow, vof)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
   call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
   call Turb_Mod_Alias_T2          (turb, t2)
-
-  kin_vis = viscosity / density
 
   if(heat_transfer) then
     heat        = 0.0     ! [W]
@@ -59,6 +59,7 @@
     ! On the boundary perform the extrapolation
     if(c2 < 0) then
 
+      kin_vis = viscosity(c1) / density(c1)
       ! Extrapolate velocities on the outflow boundary
       ! SYMMETRY is intentionally not treated here because I wanted to
       ! be sure that is handled only via graPHI and NewUVW functions)
@@ -69,6 +70,7 @@
         v % n(c2) = v % n(c1)
         w % n(c2) = w % n(c1)
         if(heat_transfer) t % n(c2) = t % n(c1)
+        if(multiphase) vof % n(c2) = vof % n(c1)
       end if
 
       ! Spalart Allmaras
@@ -225,6 +227,9 @@
         if(heat_transfer)  &
           t % n(c2) = t % n(grid % bnd_cond % copy_c(c2))
 
+        if(multiphase)  &
+          vof % n(c2) = vof % n(grid % bnd_cond % copy_c(c2))
+
         if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
            turbulence_model .eq. DES_SPALART)           &
           vis % n(c2) = vis % n(grid % bnd_cond % copy_c(c2))
@@ -267,10 +272,16 @@
   end do
 
   ! Integrate (summ) heated area, and heat up
-  if(heat_transfer) then
-    call Comm_Mod_Global_Sum_Real(heat)
-    call Comm_Mod_Global_Sum_Real(heated_area)
-    heat_flux = heat / heated_area
-  end if
+ if(heat_transfer) then
+   call Comm_Mod_Global_Sum_Real(heat)
+   call Comm_Mod_Global_Sum_Real(heated_area)
+   heat_flux = heat / heated_area
+ end if
+
+!  Doesn´t need the flag for heat_transfer??????
+
+!  call Comm_Mod_Global_Sum_Real(heat)
+!  call Comm_Mod_Global_Sum_Real(heated_area)
+!  heat_flux = heat / heated_area
 
   end subroutine

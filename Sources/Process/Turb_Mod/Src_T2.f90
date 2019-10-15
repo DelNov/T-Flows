@@ -57,7 +57,7 @@
 
    ! Negative contribution
    a % val(a % dia(c)) = a % val(a % dia(c)) +  &
-         2.0 * density * eps % n(c) / (kin % n(c) + TINY) * grid % vol(c)
+         2.0 * density(c)  * eps % n(c) / (kin % n(c) + TINY) * grid % vol(c)
 
   end do
 
