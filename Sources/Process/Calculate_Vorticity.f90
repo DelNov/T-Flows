@@ -27,9 +27,9 @@
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! Velocity gradients
-  call Grad_Mod_Variable(flow % u, .true.)
-  call Grad_Mod_Variable(flow % v, .true.)
-  call Grad_Mod_Variable(flow % w, .true.)
+  call Grad_Mod_Variable(flow % u)
+  call Grad_Mod_Variable(flow % v)
+  call Grad_Mod_Variable(flow % w)
 
   do c = 1, grid % n_cells
     flow % vort(c) = 2.0 * (0.5 * (w % y(c) - v % z(c)))**2  &

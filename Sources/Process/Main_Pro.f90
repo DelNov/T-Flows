@@ -22,6 +22,7 @@
   use Control_Mod
   use Monitor_Mod
   use Backup_Mod
+  use Surf_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Calling]------------------------------------!
@@ -34,6 +35,7 @@
   type(Grid_Type)   :: grid            ! grid used in computations
   type(Field_Type)  :: flow            ! flow field we will be solving for
   type(Swarm_Type)  :: swarm           ! swarm of particles
+  type(Surf_Type)   :: surf            ! interface between two phases
   type(Turb_Type)   :: turb            ! turbulence modelling
   type(Solver_Type) :: sol             ! linear solvers
   real              :: time            ! physical time of the simulation
@@ -104,6 +106,7 @@
   call Grad_Mod_Allocate(grid)
   call Turb_Mod_Allocate(turb, flow)
   call Swarm_Mod_Allocate(swarm, flow)
+  call Surf_Mod_Allocate(surf, flow)
   call User_Mod_Allocate(grid)
 
   ! Read numerical models from control file (after the memory is allocated)
@@ -143,7 +146,6 @@
 
   ! Prepare ...
   call Bulk_Mod_Monitoring_Planes_Areas(flow % bulk, grid)
-  call Grad_Mod_Find_Bad_Cells         (grid)
 
   if(turbulence_model .eq. LES_SMAGORINSKY .and. .not. backup) then
     call Find_Nearest_Wall_Cell(grid)
@@ -154,7 +156,7 @@
   end if
 
   ! Prepare the gradient matrix for velocities
-  call Compute_Gradient_Matrix(grid, .true.)
+  call Compute_Gradient_Matrix(grid)
 
   ! Print the areas of monitoring planes
   call Bulk_Mod_Print_Areas(flow % bulk)
@@ -228,9 +230,9 @@
       call Grad_Mod_Pressure(flow % p)
 
       ! Compute velocity gradients
-      call Grad_Mod_Variable(flow % u, .true.)
-      call Grad_Mod_Variable(flow % v, .true.)
-      call Grad_Mod_Variable(flow % w, .true.)
+      call Grad_Mod_Variable(flow % u)
+      call Grad_Mod_Variable(flow % v)
+      call Grad_Mod_Variable(flow % w)
 
       ! All velocity components one after another
       call Compute_Momentum(flow, turb, 1, sol, flow % dt, ini)

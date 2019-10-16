@@ -23,7 +23,7 @@
 
   ! Check if these are already computed somewhere, ...
   ! ... maybe this call is not needed
-  call Grad_Mod_Array(grid, t % n, t % x, t % y, t % z, .true.)
+  call Grad_Mod_Array(grid, t % n, t % x, t % y, t % z)
 
   !-----------------------------------------!
   !   Compute the sources in the interior   !

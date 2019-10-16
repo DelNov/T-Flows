@@ -23,7 +23,7 @@
   grid => turb % pnt_grid
 
   ! Compute gradients of wall distance
-  call Grad_Mod_Array(grid, grid % wall_dist, h_w_x, h_w_y, h_w_z, .true.)
+  call Grad_Mod_Array(grid, grid % wall_dist, h_w_x, h_w_y, h_w_z)
 
   ! Normalize gradients
   do c = 1, grid % n_cells

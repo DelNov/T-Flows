@@ -40,7 +40,7 @@
   !-------------------------------------------------!
 
   ! Extrapolate from cells to nodes with variable's gradients
-  call Grad_Mod_Variable(phi, boundary = .true.)
+  call Grad_Mod_Variable(phi)
 
   do c = 1, grid % n_cells - grid % comm % n_buff_cells
     xc = grid % xc(c)

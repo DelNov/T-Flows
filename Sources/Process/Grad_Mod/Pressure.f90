@@ -35,9 +35,9 @@
     end if
   end do
 
-  call Grad_Mod_Component(grid, phi % n, 1, phi % x, .true.)  ! dp/dx
-  call Grad_Mod_Component(grid, phi % n, 2, phi % y, .true.)  ! dp/dy
-  call Grad_Mod_Component(grid, phi % n, 3, phi % z, .true.)  ! dp/dz
+  call Grad_Mod_Component(grid, phi % n, 1, phi % x)  ! dp/dx
+  call Grad_Mod_Component(grid, phi % n, 2, phi % y)  ! dp/dy
+  call Grad_Mod_Component(grid, phi % n, 3, phi % z)  ! dp/dz
 
   !-----------------------------------------------------!
   !   Improve pressure on boundary cells iterativelly   !
@@ -58,9 +58,9 @@
       end if
     end do
 
-    call Grad_Mod_Component(grid, phi % n, 1, phi % x, .true.)  ! dp/dx
-    call Grad_Mod_Component(grid, phi % n, 2, phi % y, .true.)  ! dp/dy
-    call Grad_Mod_Component(grid, phi % n, 3, phi % z, .true.)  ! dp/dz
+    call Grad_Mod_Component(grid, phi % n, 1, phi % x)  ! dp/dx
+    call Grad_Mod_Component(grid, phi % n, 2, phi % y)  ! dp/dy
+    call Grad_Mod_Component(grid, phi % n, 3, phi % z)  ! dp/dz
 
   end do
 

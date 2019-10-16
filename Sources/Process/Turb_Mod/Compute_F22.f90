@@ -66,7 +66,7 @@
   end do
 
   ! Gradients
-  call Grad_Mod_Variable(phi, .true.)
+  call Grad_Mod_Variable(phi)
 
   !------------------!
   !                  !

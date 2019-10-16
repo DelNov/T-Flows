@@ -92,7 +92,7 @@
   end if
 
   ! Gradients
-  call Grad_Mod_Variable(t, .true.)
+  call Grad_Mod_Variable(t)
 
   !---------------!
   !               !

@@ -75,7 +75,7 @@
   call Surf_Mod_Count_Verts_Elements(surf)
   nne_s = minval(vert(1:nv) % nne)
   nne_e = maxval(vert(1:nv) % nne)
-  allocate(nne(nne_s:nne_e))
+  allocate(nne(nne_s:nne_e)); nne = 0.0
   do v = 1, nv
     nne(vert(v) % nne) = nne(vert(v) % nne) + 1.0
   end do

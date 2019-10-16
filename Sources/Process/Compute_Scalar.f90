@@ -93,9 +93,9 @@
   end if
 
   ! Gradients
-  call Grad_Mod_Component(grid, phi % n, 1, phi_x, .true.)
-  call Grad_Mod_Component(grid, phi % n, 2, phi_y, .true.)
-  call Grad_Mod_Component(grid, phi % n, 3, phi_z, .true.)
+  call Grad_Mod_Component(grid, phi % n, 1, phi_x)
+  call Grad_Mod_Component(grid, phi % n, 2, phi_y)
+  call Grad_Mod_Component(grid, phi % n, 3, phi_z)
 
   !---------------!
   !               !
@@ -268,9 +268,9 @@
                     + vw % n(c) * phi_y(c)          &
                     + ww % n(c) * phi_z(c))
       end do
-      call Grad_Mod_Component(grid, u1uj_phij, 1, u1uj_phij_x, .true.)
-      call Grad_Mod_Component(grid, u2uj_phij, 2, u2uj_phij_y, .true.)
-      call Grad_Mod_Component(grid, u3uj_phij, 3, u3uj_phij_z, .true.)
+      call Grad_Mod_Component(grid, u1uj_phij, 1, u1uj_phij_x)
+      call Grad_Mod_Component(grid, u2uj_phij, 2, u2uj_phij_y)
+      call Grad_Mod_Component(grid, u3uj_phij, 3, u3uj_phij_z)
       do c = 1, grid % n_cells
         b(c) = b(c) - (  u1uj_phij_x(c)  &
                        + u2uj_phij_y(c)  &

@@ -61,7 +61,7 @@
 
     ! Temperature gradients might have been computed and
     ! stored already in t % x, t % y and t % z, check it
-    call Grad_Mod_Variable(t, .true.)
+    call Grad_Mod_Variable(t)
 
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)

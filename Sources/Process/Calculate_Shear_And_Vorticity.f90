@@ -26,9 +26,9 @@
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! Velocity gradients
-  call Grad_Mod_Variable(flow % u, .true.)
-  call Grad_Mod_Variable(flow % v, .true.)
-  call Grad_Mod_Variable(flow % w, .true.)
+  call Grad_Mod_Variable(flow % u)
+  call Grad_Mod_Variable(flow % v)
+  call Grad_Mod_Variable(flow % w)
 
   flow % shear(:) = u % x(:)**2                     &
                   + v % y(:)**2                     &

@@ -101,50 +101,50 @@
 ! !      model that required much more memory         !
 ! !---------------------------------------------------!
 ! if(name_phi == "23") then
-!   call Grad_Mod_Component(grid, uu % n, 1, var3x, .true.) ! duu/dx  
-!   call Grad_Mod_Component(grid, uu % n, 2, var3y, .true.) ! duu/dy  
-!   call Grad_Mod_Component(grid, uu % n, 3, var3z, .true.) ! duu/dz  
+!   call Grad_Mod_Component(grid, uu % n, 1, var3x) ! duu/dx  
+!   call Grad_Mod_Component(grid, uu % n, 2, var3y) ! duu/dy  
+!   call Grad_Mod_Component(grid, uu % n, 3, var3z) ! duu/dz  
 !
-!   call Grad_Mod_Component(grid, vv % n, 1, var4x, .true.) ! duw/dx  
-!   call Grad_Mod_Component(grid, vv % n, 2, var4y, .true.) ! duw/dy  
-!   call Grad_Mod_Component(grid, vv % n, 3, var4z, .true.) ! duw/dz  
+!   call Grad_Mod_Component(grid, vv % n, 1, var4x) ! duw/dx  
+!   call Grad_Mod_Component(grid, vv % n, 2, var4y) ! duw/dy  
+!   call Grad_Mod_Component(grid, vv % n, 3, var4z) ! duw/dz  
 !
-!   call Grad_Mod_Component(grid, ww % n, 1, var5x, .true.) ! duw/dx  
-!   call Grad_Mod_Component(grid, ww % n, 2, var5y, .true.) ! duw/dy  
-!   call Grad_Mod_Component(grid, ww % n, 3, var5z, .true.) ! duw/dz  
+!   call Grad_Mod_Component(grid, ww % n, 1, var5x) ! duw/dx  
+!   call Grad_Mod_Component(grid, ww % n, 2, var5y) ! duw/dy  
+!   call Grad_Mod_Component(grid, ww % n, 3, var5z) ! duw/dz  
 !
-!   call Grad_Mod_Component(grid, uv % n, 1, var6x, .true.) ! duv/dx  
-!   call Grad_Mod_Component(grid, uv % n, 2, var6y, .true.) ! duv/dy  
-!   call Grad_Mod_Component(grid, uv % n, 3, var6z, .true.) ! duv/dz  
+!   call Grad_Mod_Component(grid, uv % n, 1, var6x) ! duv/dx  
+!   call Grad_Mod_Component(grid, uv % n, 2, var6y) ! duv/dy  
+!   call Grad_Mod_Component(grid, uv % n, 3, var6z) ! duv/dz  
 !
-!   call Grad_Mod_Component(grid, uw % n, 1, kin_x, .true.) ! duw/dx  
-!   call Grad_Mod_Component(grid, uw % n, 2, kin_y, .true.) ! duw/dy  
-!   call Grad_Mod_Component(grid, uw % n, 3, kin_z, .true.) ! duw/dz  
+!   call Grad_Mod_Component(grid, uw % n, 1, kin_x) ! duw/dx  
+!   call Grad_Mod_Component(grid, uw % n, 2, kin_y) ! duw/dy  
+!   call Grad_Mod_Component(grid, uw % n, 3, kin_z) ! duw/dz  
 !
-!   call Grad_Mod_Component(grid, vw % n, 1, var8x, .true.) ! duw/dx  
-!   call Grad_Mod_Component(grid, vw % n, 2, var8y, .true.) ! duw/dy  
-!   call Grad_Mod_Component(grid, vw % n, 3, var8z, .true.) ! duw/dz  
+!   call Grad_Mod_Component(grid, vw % n, 1, var8x) ! duw/dx  
+!   call Grad_Mod_Component(grid, vw % n, 2, var8y) ! duw/dy  
+!   call Grad_Mod_Component(grid, vw % n, 3, var8z) ! duw/dz  
 !
-!   call Grad_Mod_Component(grid, u % x, 1, var1x, .true.)  ! d2U/dxdx
-!   call Grad_Mod_Component(grid, u % y, 2, var1y, .true.)  ! d2U/dydy
-!   call Grad_Mod_Component(grid, u % z, 3, var1z, .true.)  ! d2U/dzdz
-!   call Grad_Mod_Component(grid, u % x, 2, var2x, .true.)  ! d2U/dxdy
-!   call Grad_Mod_Component(grid, u % x, 3, var2y, .true.)  ! d2U/dxdz
-!   call Grad_Mod_Component(grid, u % y, 3, var2z, .true.)  ! d2U/dydz
+!   call Grad_Mod_Component(grid, u % x, 1, var1x)  ! d2U/dxdx
+!   call Grad_Mod_Component(grid, u % y, 2, var1y)  ! d2U/dydy
+!   call Grad_Mod_Component(grid, u % z, 3, var1z)  ! d2U/dzdz
+!   call Grad_Mod_Component(grid, u % x, 2, var2x)  ! d2U/dxdy
+!   call Grad_Mod_Component(grid, u % x, 3, var2y)  ! d2U/dxdz
+!   call Grad_Mod_Component(grid, u % y, 3, var2z)  ! d2U/dydz
 !
-!   call Grad_Mod_Component(grid, v % x, 1, var9x, .true.)  ! d2V/dxdx
-!   call Grad_Mod_Component(grid, v % y, 2, var9y, .true.)  ! d2V/dydy
-!   call Grad_Mod_Component(grid, v % z, 3, var9z, .true.)  ! d2V/dzdz
-!   call Grad_Mod_Component(grid, v % x, 2, var10x, .true.)  ! d2V/dxdy
-!   call Grad_Mod_Component(grid, v % x, 3, var10y, .true.)  ! d2V/dxdz
-!   call Grad_Mod_Component(grid, v % y, 3, var10z, .true.)  ! d2V/dydz
+!   call Grad_Mod_Component(grid, v % x, 1, var9x)  ! d2V/dxdx
+!   call Grad_Mod_Component(grid, v % y, 2, var9y)  ! d2V/dydy
+!   call Grad_Mod_Component(grid, v % z, 3, var9z)  ! d2V/dzdz
+!   call Grad_Mod_Component(grid, v % x, 2, var10x)  ! d2V/dxdy
+!   call Grad_Mod_Component(grid, v % x, 3, var10y)  ! d2V/dxdz
+!   call Grad_Mod_Component(grid, v % y, 3, var10z)  ! d2V/dydz
 !
-!   call Grad_Mod_Component(grid, w % x, 1, var11x, .true.)  ! d2W/dxdx
-!   call Grad_Mod_Component(grid, w % y, 2, var11y, .true.)  ! d2W/dydy
-!   call Grad_Mod_Component(grid, w % z, 3, var11z, .true.)  ! d2W/dzdz
-!   call Grad_Mod_Component(grid, w % x, 2, var12x, .true.)  ! d2W/dxdy
-!   call Grad_Mod_Component(grid, w % x, 3, var12y, .true.)  ! d2W/dxdz
-!   call Grad_Mod_Component(grid, w % y, 3, var12z, .true.)  ! d2W/dydz
+!   call Grad_Mod_Component(grid, w % x, 1, var11x)  ! d2W/dxdx
+!   call Grad_Mod_Component(grid, w % y, 2, var11y)  ! d2W/dydy
+!   call Grad_Mod_Component(grid, w % z, 3, var11z)  ! d2W/dzdz
+!   call Grad_Mod_Component(grid, w % x, 2, var12x)  ! d2W/dxdy
+!   call Grad_Mod_Component(grid, w % x, 3, var12y)  ! d2W/dxdz
+!   call Grad_Mod_Component(grid, w % y, 3, var12z)  ! d2W/dydz
 !
 !   do c = 1, grid % n_cells
 !     uxx = var1x(c)
@@ -240,28 +240,28 @@
   if(name_phi == 'EPS') then
     do i=1,3
       if(i == 1) then
-        call Grad_Mod_Component(grid, u % x, 1, ui_xx, .true.)  ! d2u/dxdx
-        call Grad_Mod_Component(grid, u % x, 2, ui_xy, .true.)  ! d2u/dxdy
-        call Grad_Mod_Component(grid, u % x, 3, ui_xz, .true.)  ! d2u/dxdz
-        call Grad_Mod_Component(grid, u % y, 2, ui_yy, .true.)  ! d2u/dydy
-        call Grad_Mod_Component(grid, u % y, 3, ui_yz, .true.)  ! d2u/dydz
-        call Grad_Mod_Component(grid, u % z, 3, ui_zz, .true.)  ! d2u/dzdz
+        call Grad_Mod_Component(grid, u % x, 1, ui_xx)  ! d2u/dxdx
+        call Grad_Mod_Component(grid, u % x, 2, ui_xy)  ! d2u/dxdy
+        call Grad_Mod_Component(grid, u % x, 3, ui_xz)  ! d2u/dxdz
+        call Grad_Mod_Component(grid, u % y, 2, ui_yy)  ! d2u/dydy
+        call Grad_Mod_Component(grid, u % y, 3, ui_yz)  ! d2u/dydz
+        call Grad_Mod_Component(grid, u % z, 3, ui_zz)  ! d2u/dzdz
       end if
       if(i == 2) then
-        call Grad_Mod_Component(grid, v % x, 1, ui_xx, .true.)  ! d2v/dxdx
-        call Grad_Mod_Component(grid, v % x, 2, ui_xy, .true.)  ! d2v/dxdy
-        call Grad_Mod_Component(grid, v % x, 3, ui_xz, .true.)  ! d2v/dxdz
-        call Grad_Mod_Component(grid, v % y, 2, ui_yy, .true.)  ! d2v/dydy
-        call Grad_Mod_Component(grid, v % y, 3, ui_yz, .true.)  ! d2v/dydz
-        call Grad_Mod_Component(grid, v % z, 3, ui_zz, .true.)  ! d2v/dzdz
+        call Grad_Mod_Component(grid, v % x, 1, ui_xx)  ! d2v/dxdx
+        call Grad_Mod_Component(grid, v % x, 2, ui_xy)  ! d2v/dxdy
+        call Grad_Mod_Component(grid, v % x, 3, ui_xz)  ! d2v/dxdz
+        call Grad_Mod_Component(grid, v % y, 2, ui_yy)  ! d2v/dydy
+        call Grad_Mod_Component(grid, v % y, 3, ui_yz)  ! d2v/dydz
+        call Grad_Mod_Component(grid, v % z, 3, ui_zz)  ! d2v/dzdz
       end if
       if(i == 3) then
-        call Grad_Mod_Component(grid, w % x, 1, ui_xx, .true.)  ! d2w/dxdx
-        call Grad_Mod_Component(grid, w % x, 2, ui_xy, .true.)  ! d2w/dxdy
-        call Grad_Mod_Component(grid, w % x, 3, ui_xz, .true.)  ! d2w/dxdz
-        call Grad_Mod_Component(grid, w % y, 2, ui_yy, .true.)  ! d2w/dydy
-        call Grad_Mod_Component(grid, w % y, 3, ui_yz, .true.)  ! d2w/dydz
-        call Grad_Mod_Component(grid, w % z, 3, ui_zz, .true.)  ! d2w/dzdz
+        call Grad_Mod_Component(grid, w % x, 1, ui_xx)  ! d2w/dxdx
+        call Grad_Mod_Component(grid, w % x, 2, ui_xy)  ! d2w/dxdy
+        call Grad_Mod_Component(grid, w % x, 3, ui_xz)  ! d2w/dxdz
+        call Grad_Mod_Component(grid, w % y, 2, ui_yy)  ! d2w/dydy
+        call Grad_Mod_Component(grid, w % y, 3, ui_yz)  ! d2w/dydz
+        call Grad_Mod_Component(grid, w % z, 3, ui_zz)  ! d2w/dzdz
       end if
 
       do c = 1, grid % n_cells
@@ -334,11 +334,11 @@
         end if
       end do
     end do  ! i
-  end if    ! end if EPS == yes                              
+  end if    ! end if EPS == yes
 
-  call Grad_Mod_Component(grid, turb % l_scale, 1, l_sc_x,.true.) 
-  call Grad_Mod_Component(grid, turb % l_scale, 2, l_sc_y,.true.) 
-  call Grad_Mod_Component(grid, turb % l_scale, 3, l_sc_z,.true.) 
+  call Grad_Mod_Component(grid, turb % l_scale, 1, l_sc_x)
+  call Grad_Mod_Component(grid, turb % l_scale, 2, l_sc_y)
+  call Grad_Mod_Component(grid, turb % l_scale, 3, l_sc_z)
 
   r13 = ONE_THIRD
   r23 = TWO_THIRDS
@@ -703,9 +703,9 @@
   end do
 
   if(name_phi == 'EPS') then
-    call Grad_Mod_Component(grid, kin_e, 1, kin_e_x, .true.)   ! dk/dx
-    call Grad_Mod_Component(grid, kin_e, 2, kin_e_y, .true.)   ! dk/dy
-    call Grad_Mod_Component(grid, kin_e, 3, kin_e_z, .true.)   ! dk/dz
+    call Grad_Mod_Component(grid, kin_e, 1, kin_e_x)   ! dk/dx
+    call Grad_Mod_Component(grid, kin_e, 2, kin_e_y)   ! dk/dy
+    call Grad_Mod_Component(grid, kin_e, 3, kin_e_z)   ! dk/dz
     do c = 1, grid % n_cells
       kin_vis = viscosity(c) / density(c)
       re_t  = (kin % n(c)**2) / (kin_vis*eps % n(c) + TINY)

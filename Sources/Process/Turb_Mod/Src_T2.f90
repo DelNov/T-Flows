@@ -40,7 +40,7 @@
   call Turb_Mod_Alias_Heat_Fluxes(turb, ut, vt, wt)
   call Solver_Mod_Alias_System   (sol, a, b)
 
-  call Grad_Mod_Array(grid, t % n, t % x, t % y, t % z, .true.)
+  call Grad_Mod_Array(grid, t % n, t % x, t % y, t % z)
 
   !-----------------------------------------!
   !   Compute the sources in all the cells  !
