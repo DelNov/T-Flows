@@ -69,59 +69,74 @@
 
     ! Move the vertices to their new positions
     do v = 1, nv
-      vert(v) % x_n = vert(v) % sumx / vert(v) % nne
-      vert(v) % y_n = vert(v) % sumy / vert(v) % nne
-      vert(v) % z_n = vert(v) % sumz / vert(v) % nne
-      call Surf_Mod_Find_Nearest_Cell(surf, v, n_verts_in_buffers)
-      call Surf_Mod_Find_Nearest_Node(surf, v)
+
+      ! This is how I check if vertex is on a boundary.  Maybe there
+      ! is a more spothisticated way to do it, but this works so far
+      if(vert(v) % nne > 3) then
+        vert(v) % x_n = vert(v) % sumx / vert(v) % nne
+        vert(v) % y_n = vert(v) % sumy / vert(v) % nne
+        vert(v) % z_n = vert(v) % sumz / vert(v) % nne
+        call Surf_Mod_Find_Nearest_Cell(surf, v, n_verts_in_buffers)
+        call Surf_Mod_Find_Nearest_Node(surf, v)
+      end if
+
     end do
+
+    ! Re-initalize the sums
     vert(1:nv) % sumx = 0.0
     vert(1:nv) % sumy = 0.0
     vert(1:nv) % sumz = 0.0
 
     ! Correct vertex position
-    do v = 1, nv 
-      c = vert(v) % cell
+    do v = 1, nv
 
-      ! Cell coordinates
-      xc = grid % xc(c)
-      yc = grid % yc(c)
-      zc = grid % zc(c)
+      ! This is how I check if vertex is on a boundary.  Maybe there
+      ! is a more spothisticated way to do it, but this works so far
+      if(vert(v) % nne > 3) then
 
-      ! Surface normal
-      phi_m = sqrt(phi % x(c)**2 + phi % y(c)**2 + phi % z(c)**2)
-      nx = phi % x(c) / phi_m
-      ny = phi % y(c) / phi_m
-      nz = phi % z(c) / phi_m
+        c = vert(v) % cell
 
-      ! Value at current vertex position
-      dx = vert(v) % x_n - xc
-      dy = vert(v) % y_n - yc
-      dz = vert(v) % z_n - zc
-      val_v = phi % n(c) + dx * phi % x(c)  &
-                         + dy * phi % y(c)  &
-                         + dz * phi % z(c)
+        ! Cell coordinates
+        xc = grid % xc(c)
+        yc = grid % yc(c)
+        zc = grid % zc(c)
 
-      dm = (val_e - val_v) / (phi % x(c)*nx + phi % y(c)*ny + phi % z(c)*nz)
+        ! Surface normal
+        phi_m = sqrt(phi % x(c)**2 + phi % y(c)**2 + phi % z(c)**2)
+        nx = phi % x(c) / phi_m
+        ny = phi % y(c) / phi_m
+        nz = phi % z(c) / phi_m
 
-      dx = dm * nx
-      dy = dm * ny
-      dz = dm * nz
+        ! Value at current vertex position
+        dx = vert(v) % x_n - xc
+        dy = vert(v) % y_n - yc
+        dz = vert(v) % z_n - zc
+        val_v = phi % n(c) + dx * phi % x(c)  &
+                           + dy * phi % y(c)  &
+                           + dz * phi % z(c)
 
-      ! Move vertex in the surface normal direction
-      vert(v) % x_n = vert(v) % x_n + dx
-      vert(v) % y_n = vert(v) % y_n + dy
-      vert(v) % z_n = vert(v) % z_n + dz
+        dm = (val_e - val_v) / (phi % x(c)*nx + phi % y(c)*ny + phi % z(c)*nz)
 
-      dx = vert(v) % x_n - xc
-      dy = vert(v) % y_n - yc
-      dz = vert(v) % z_n - zc
-      val_v = phi % n(c) + dx * phi % x(c)  &
-                         + dy * phi % y(c)  &
-                         + dz * phi % z(c)
+        dx = dm * nx
+        dy = dm * ny
+        dz = dm * nz
 
-      call Surf_Mod_Find_Nearest_Cell(surf, v, n_verts_in_buffers)
-      call Surf_Mod_Find_Nearest_Node(surf, v)
+        ! Move vertex in the surface normal direction
+        vert(v) % x_n = vert(v) % x_n + dx
+        vert(v) % y_n = vert(v) % y_n + dy
+        vert(v) % z_n = vert(v) % z_n + dz
+
+        dx = vert(v) % x_n - xc
+        dy = vert(v) % y_n - yc
+        dz = vert(v) % z_n - zc
+        val_v = phi % n(c) + dx * phi % x(c)  &
+                           + dy * phi % y(c)  &
+                           + dz * phi % z(c)
+
+        call Surf_Mod_Find_Nearest_Cell(surf, v, n_verts_in_buffers)
+        call Surf_Mod_Find_Nearest_Node(surf, v)
+
+      end if  ! if vertex is on a boundary
 
     end do
 
