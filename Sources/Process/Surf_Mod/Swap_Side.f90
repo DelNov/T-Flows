@@ -22,10 +22,10 @@
   elem => surf % elem
   side => surf % side
 
-  ea = side(s) % eb  ! in EasyMesh, definition of ea and eb was opposite
-  eb = side(s) % ea  ! in EasyMesh, definition of ea and eb was opposite
-  a  = side(s) % b   ! in EasyMesh, definition of ea and eb was opposite
-  b  = side(s) % a   ! in EasyMesh, definition of ea and eb was opposite
+  ea = side(s) % ea
+  eb = side(s) % eb
+  a  = side(s) % a
+  b  = side(s) % b
   c  = side(s) % c
   d  = side(s) % d
 

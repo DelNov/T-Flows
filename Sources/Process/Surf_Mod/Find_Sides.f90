@@ -11,7 +11,7 @@
   type(Side_Type), pointer :: side(:)
   type(Elem_Type), pointer :: elem(:)
   integer,         pointer :: nv, ns, ne
-  integer                  :: e, ea, eb, i, j, k, a, b, c, d, s, n_side
+  integer                  :: e, eb, ea, i, j, k, b, a, c, d, s, n_side
   integer                  :: i1, j1, k1, i2, j2, k2, ss, sum_ijk, sum_cd
   integer, allocatable     :: ci(:), di(:), ei(:), ni(:)
 !==============================================================================!
@@ -76,7 +76,7 @@
       c = side(n_side) % c
       d = side(n_side) % d
 
-      ! Tedious but (hopefully) correct way to find ea and eb
+      ! Tedious but (hopefully) correct way to find eb and ea
       do ss = s, s+1
 
         i = elem(ei(ss)) % i
@@ -84,35 +84,35 @@
         k = elem(ei(ss)) % k
 
         ! Check ea
-        if(i.eq.c .and. k.eq.d) then
-          side(n_side) % ea = ei(ss)
-          side(n_side) % a  = j
-        end if
-
-        if(k.eq.c .and. j.eq.d) then
-          side(n_side) % ea = ei(ss)
-          side(n_side) % a  = i
-        end if
-
-        if(j.eq.c .and. i.eq.d) then
+        if(i.eq.c .and. j.eq.d) then
           side(n_side) % ea = ei(ss)
           side(n_side) % a  = k
         end if
 
-        ! Check eb
-        if(i.eq.c .and. j.eq.d) then
-          side(n_side) % eb = ei(ss)
-          side(n_side) % b  = k
+        if(k.eq.c .and. i.eq.d) then
+          side(n_side) % ea = ei(ss)
+          side(n_side) % a  = j
         end if
 
-        if(k.eq.c .and. i.eq.d) then
+        if(j.eq.c .and. k.eq.d) then
+          side(n_side) % ea = ei(ss)
+          side(n_side) % a  = i
+        end if
+
+        ! Check eb
+        if(i.eq.c .and. k.eq.d) then
           side(n_side) % eb = ei(ss)
           side(n_side) % b  = j
         end if
 
-        if(j.eq.c .and. k.eq.d) then
+        if(k.eq.c .and. j.eq.d) then
           side(n_side) % eb = ei(ss)
           side(n_side) % b  = i
+        end if
+
+        if(j.eq.c .and. i.eq.d) then
+          side(n_side) % eb = ei(ss)
+          side(n_side) % b  = k
         end if
 
       end do
@@ -125,22 +125,16 @@
   ns = n_side
   print *, '# Compressed number of sides: ', ns
 
-! ! Checking
-! do s = 1, ns
-!   WRITE(400, *) '----------------------------------------'
-!   WRITE(400, '(5i5)'), s, side(s) % c, side(s) % d, side(s) % a, side(s) % b
-!   WRITE(400, '(3i5)'), s, side(s) % ea, side(s) % eb
-!   WRITE(400, '(3i5)'), elem(side(s) % ea) % i, elem(side(s) % ea) % j, elem(side(s) % ea) % k
-!   WRITE(400, '(3i5)'), elem(side(s) % eb) % i, elem(side(s) % eb) % j, elem(side(s) % eb) % k
-! end do
-
+  !-------------------------------!
+  !   Find elements' neighbours   !
+  !-------------------------------!
   do s = 1, ns
     c  = side(s) % c
     d  = side(s) % d
     a  = side(s) % a
     b  = side(s) % b
-    ea = side(s) % ea
     eb = side(s) % eb
+    ea = side(s) % ea
 
     ! Element a
     if(elem(ea) % i .eq. a) then
