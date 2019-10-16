@@ -4,7 +4,7 @@
 !   Calculates nodal values of variable phi                                    !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: phi_n => r_node_01  ! value at the (static) grid nodes
+  use Work_Mod, only: phi_r => r_node_01  ! value at the (static) grid nodes
 !------------------------------------------------------------------------------!
 !   Be careful with the above variables from Work_Mod.  They are used by       !
 !   two subroutines in Surf_Mod, hence values shouldn't be changed elsewhere.  !
@@ -52,7 +52,7 @@
       yn = grid % yn(n)
       zn = grid % zn(n)
       if( .not. is_node_bnd(n) ) then
-        phi_n(n) = phi_n(n) + phi % n(c)              &
+        phi_r(n) = phi_r(n) + phi % n(c)              &
                             + phi % x(c) * (xn - xc)  &
                             + phi % y(c) * (yn - yc)  &
                             + phi % z(c) * (zn - zc)
@@ -62,7 +62,7 @@
 
   do n = 1, grid % n_nodes
     if( .not. is_node_bnd(n) ) then
-      phi_n(n) = phi_n(n) / grid % nodes_n_cells(n)
+      phi_r(n) = phi_r(n) / grid % nodes_n_cells(n)
     end if
   end do
 
