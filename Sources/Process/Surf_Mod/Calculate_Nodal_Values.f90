@@ -4,7 +4,8 @@
 !   Calculates nodal values of variable phi                                    !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: phi_r => r_node_01  ! value at the (static) grid nodes
+  use Work_Mod, only: phi_r => r_node_01,  &  ! value at the (static) grid nodes
+                      ncn   => i_node_01      ! number of cells around nodes
 !------------------------------------------------------------------------------!
 !   Be careful with the above variables from Work_Mod.  They are used by       !
 !   two subroutines in Surf_Mod, hence values shouldn't be changed elsewhere.  !
@@ -15,55 +16,43 @@
   type(Var_Type),  target :: phi
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
-  logical, allocatable     :: is_node_bnd(:)
-  integer                  :: c, ni, n, s
-  real                     :: xc, yc, zc, xn, yn, zn
+  integer                  :: c, ni, n
+  real                     :: xc, yc, zc
 !==============================================================================!
 
   ! Take aliases
   grid => surf % pnt_grid
 
-  ! Mark boundary nodes (one should set true boundary values there)
-  allocate(is_node_bnd(grid % n_nodes))
-  is_node_bnd(:) = .false.
-  do s = 1, grid % n_faces
-    c = grid % faces_c(2, s)
-    if(c < 0) then
-      do ni = 1, grid % faces_n_nodes(s)  ! 3 or 4
-        is_node_bnd( grid % faces_n(ni, s) ) = .true.
-      end do
-    end if
+  !-------------------------------------------------------!
+  !   Find number of inside cells surrounding each node   !
+  !-------------------------------------------------------!
+  do c = 1, grid % n_cells
+    do ni = 1, grid % cells_n_nodes(c)  ! local node number
+      n = grid % cells_n(ni, c)         ! global node number
+
+      ! Increase number of cells surrounding the this node by one
+      ncn(n) = ncn(n) + 1
+    end do
   end do
 
   !-------------------------------------------------!
   !   Compute values of variable phi on the nodes   !
   !-------------------------------------------------!
 
-  ! Extrapolate from cells to nodes with variable's gradients
-  call Grad_Mod_Variable(phi)
-
-  do c = 1, grid % n_cells - grid % comm % n_buff_cells
+  ! Add them up for all nodes from cells ...
+  do c = 1, grid % n_cells ! think about it: - grid % comm % n_buff_cells
     xc = grid % xc(c)
     yc = grid % yc(c)
     zc = grid % zc(c)
     do ni = 1, grid % cells_n_nodes(c)
-      n  = grid % cells_n(ni, c)
-      xn = grid % xn(n)
-      yn = grid % yn(n)
-      zn = grid % zn(n)
-      if( .not. is_node_bnd(n) ) then
-        phi_r(n) = phi_r(n) + phi % n(c)              &
-                            + phi % x(c) * (xn - xc)  &
-                            + phi % y(c) * (yn - yc)  &
-                            + phi % z(c) * (zn - zc)
-      end if
+      n = grid % cells_n(ni, c)
+      phi_r(n) = phi_r(n) + phi % n(c)
     end do
   end do
 
+  ! ... and divide by number of cells surrounding each node
   do n = 1, grid % n_nodes
-    if( .not. is_node_bnd(n) ) then
-      phi_r(n) = phi_r(n) / grid % nodes_n_cells(n)
-    end if
+    phi_r(n) = phi_r(n) / ncn(n)
   end do
 
   end subroutine
