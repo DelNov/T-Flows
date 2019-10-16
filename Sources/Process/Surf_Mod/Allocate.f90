@@ -15,10 +15,6 @@
   surf % pnt_flow => flow
   surf % pnt_grid => flow % pnt_grid
 
-  ! Allocate memory for nodal values
-  allocate(surf % phi_n(surf % pnt_grid % n_nodes))
-  surf % phi_n(:) = 0.0
-
   ! Allocate logical array if cell holds vertices 
   ! (not sure if this will be needed)
   allocate(surf % cell_has_vertex(surf % pnt_grid % n_cells))

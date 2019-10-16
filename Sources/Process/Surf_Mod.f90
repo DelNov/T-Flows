@@ -104,9 +104,6 @@
     type(Elem_Type) :: elem(MAX_SURFACE_ELEMENTS)
     type(Side_Type) :: side(MAX_SURFACE_ELEMENTS * 3)
 
-    ! Nodal values of variable phi
-    real, allocatable :: phi_n(:)
-
     ! Logical array if cell has particles
     logical, allocatable :: cell_has_vertex(:)
 

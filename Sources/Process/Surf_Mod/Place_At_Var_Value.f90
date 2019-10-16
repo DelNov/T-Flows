@@ -3,6 +3,12 @@
 !------------------------------------------------------------------------------!
 !   Places surface where variable phi has value val                            !
 !------------------------------------------------------------------------------!
+!----------------------------------[Modules]-----------------------------------!
+  use Work_Mod, only: phi_n => r_node_01  ! value at the (static) grid nodes
+!------------------------------------------------------------------------------!
+!   Be careful with the above variables from Work_Mod.  They are used by       !
+!   two subroutines in Surf_Mod, hence values shouldn't be changed elsewhere.  !
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Surf_Type), target :: surf
@@ -62,8 +68,8 @@
       n1 = grid % cells_n( en(j,1), c )
       n2 = grid % cells_n( en(j,2), c )
 
-      phi1 = surf % phi_n(n1)
-      phi2 = surf % phi_n(n2)
+      phi1 = phi_n(n1)
+      phi2 = phi_n(n2)
 
       ! There is a vertex between these two edges
       if( ((phi2-val) * (val-phi1)) >= MICRO ) then
