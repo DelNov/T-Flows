@@ -74,6 +74,7 @@
     integer :: ei, ej, ek
     integer :: si, sj, sk
     real    :: nx, ny, nz  ! surface normal vector
+    real    :: area
 
   end type
 
@@ -85,7 +86,7 @@
     integer :: ei, ea, eb      ! element undefined, elements left and right
     integer :: a, b, c, d
 
-    real :: s  ! not sure if this is needed
+    real :: length
 
   end type
 
@@ -123,6 +124,7 @@
   include 'Surf_Mod/Allocate.f90'
   include 'Surf_Mod/Calculate_Element_Normals.f90'
   include 'Surf_Mod/Calculate_Nodal_Values.f90'
+  include 'Surf_Mod/Count_Verts_Elements.f90'
   include 'Surf_Mod/Compress_Nodes.f90'
   include 'Surf_Mod/Find_Sides.f90'
   include 'Surf_Mod/Find_Nearest_Cell.f90'
@@ -135,6 +137,7 @@
   include 'Surf_Mod/Relax.f90'
   include 'Surf_Mod/Swap_Side.f90'
   include 'Surf_Mod/Smooth.f90'
+  include 'Surf_Mod/Statistics.f90'
 ! include 'Surf_Mod/Bounce_Particle.f90'
 ! include 'Surf_Mod/Check_Periodicity.f90'
 ! include 'Surf_Mod/Exchange_Particles.f90'
