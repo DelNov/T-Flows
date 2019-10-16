@@ -36,7 +36,7 @@
   if(elem(ea) % ej .eq. eb) then
     ead = elem(ea) % ek;  eac = elem(ea) % ei
     sad = elem(ea) % sk;  sac = elem(ea) % si
-  end if   
+  end if
   if(elem(ea) % ek .eq. eb) then
     ead = elem(ea) % ei;  eac = elem(ea) % ej
     sad = elem(ea) % si;  sac = elem(ea) % sj
