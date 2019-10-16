@@ -160,4 +160,6 @@
     call Surf_Mod_Relax(surf)
   end do
 
+  call Surf_Mod_Statistics(surf)
+
   end subroutine

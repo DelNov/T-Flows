@@ -20,15 +20,7 @@
   side => surf % side
   elem => surf % elem
 
-  vert(1:nv) % nne = 0
-  do e = 1, ne
-    i = elem(e) % i
-    j = elem(e) % j
-    k = elem(e) % k
-    vert(i) % nne = vert(i) % nne + 1
-    vert(j) % nne = vert(j) % nne + 1
-    vert(k) % nne = vert(k) % nne + 1
-  end do
+  call Surf_Mod_Count_Verts_Elements(surf)
 
   do t = 6, 3, -1
     do s = 1, ns
