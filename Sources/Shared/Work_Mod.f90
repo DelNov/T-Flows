@@ -82,14 +82,18 @@
   ! Real; 01 - 08
   real, allocatable :: r_node_01(:), r_node_02(:), r_node_03(:), r_node_04(:)
   real, allocatable :: r_node_05(:), r_node_06(:), r_node_07(:), r_node_08(:)
+  ! Integer; 01 - 08
+  integer, allocatable :: i_node_01(:), i_node_02(:), i_node_03(:), i_node_04(:)
+  integer, allocatable :: i_node_05(:), i_node_06(:), i_node_07(:), i_node_08(:)
 
   contains
- 
+
   include 'Work_Mod/Allocate.f90'
+  include 'Work_Mod/Allocate_Integer_Cells.f90'
+  include 'Work_Mod/Allocate_Integer_Faces.f90'
+  include 'Work_Mod/Allocate_Integer_Nodes.f90'
   include 'Work_Mod/Allocate_Real_Cells.f90'
   include 'Work_Mod/Allocate_Real_Faces.f90'
   include 'Work_Mod/Allocate_Real_Nodes.f90'
-  include 'Work_Mod/Allocate_Integer_Cells.f90'
-  include 'Work_Mod/Allocate_Integer_Faces.f90'
 
   end module

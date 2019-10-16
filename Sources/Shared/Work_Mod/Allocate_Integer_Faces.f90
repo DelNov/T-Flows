@@ -9,6 +9,8 @@
   integer :: nf
 !==============================================================================!
 
+  if(n .eq. 0) return
+
   ! Get number of cells and boundary cells
   nf = grid % n_faces
 

@@ -9,6 +9,8 @@
   integer :: nc, nb
 !==============================================================================!
 
+  if(n .eq. 0) return
+
   ! Get number of cells and boundary cells
   nc = grid % n_cells
   nb = grid % n_bnd_cells
