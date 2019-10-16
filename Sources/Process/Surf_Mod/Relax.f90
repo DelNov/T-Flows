@@ -9,7 +9,7 @@
   type(Side_Type), pointer :: side(:)
   type(Elem_Type), pointer :: elem(:)
   integer,         pointer :: nv, ns, ne
-  integer                  :: s, t, e, v, i, j, k
+  integer                  :: a, b, c, d, s, t, e, v, i, j, k
 !==============================================================================!
 
   ! Take aliases
@@ -25,16 +25,29 @@
   do t = 6, 3, -1
     do s = 1, ns
 
-      e = vert(side(s) % c) % nne + vert(side(s) % d) % nne  &
-        - vert(side(s) % a) % nne - vert(side(s) % b) % nne
+      a = side(s) % a
+      b = side(s) % b
+      c = side(s) % c
+      d = side(s) % d
 
-      if(e .eq. t) then
-        vert(side(s) % a) % nne = vert(side(s) % a) % nne + 1
-        vert(side(s) % b) % nne = vert(side(s) % b) % nne + 1
-        vert(side(s) % c) % nne = vert(side(s) % c) % nne - 1
-        vert(side(s) % d) % nne = vert(side(s) % d) % nne - 1
-        call Surf_Mod_Swap_Side(surf, s)
-      end if
+      ! This is how I check if side is on a boundary
+      if( min(a, b, c, d) > 0 ) then
+        if( min(vert(a) % nne, vert(b) % nne,  &
+                vert(c) % nne, vert(d) % nne ) > 3) then
+
+          e = vert(c) % nne + vert(d) % nne  &
+            - vert(a) % nne - vert(b) % nne
+
+          if(e .eq. t) then
+            vert(a) % nne = vert(a) % nne + 1
+            vert(b) % nne = vert(b) % nne + 1
+            vert(c) % nne = vert(c) % nne - 1
+            vert(d) % nne = vert(d) % nne - 1
+            call Surf_Mod_Swap_Side(surf, s)
+          end if
+
+        end if
+      end if  ! side is on a boundary
 
     end do
   end do
