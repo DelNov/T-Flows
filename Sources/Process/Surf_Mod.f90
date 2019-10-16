@@ -124,6 +124,7 @@
   include 'Surf_Mod/Allocate.f90'
   include 'Surf_Mod/Calculate_Element_Normals.f90'
   include 'Surf_Mod/Calculate_Nodal_Values.f90'
+  include 'Surf_Mod/Count_Elements_Neighbours.f90'
   include 'Surf_Mod/Count_Verts_Elements.f90'
   include 'Surf_Mod/Compress_Nodes.f90'
   include 'Surf_Mod/Find_Sides.f90'
