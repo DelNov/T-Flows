@@ -83,7 +83,7 @@
   call Grid_Mod_Load_Cns(grid, this_proc)
 
   ! Allocate memory for working arrays and comm.
-  call Work_Mod_Allocate(grid, 30, 1, 1, 4)
+  call Work_Mod_Allocate(grid, 30, 1, 1, 4, 0, 0)
   call Comm_Mod_Allocate(grid)
 
   call Grid_Mod_Load_Geo(grid, this_proc)
