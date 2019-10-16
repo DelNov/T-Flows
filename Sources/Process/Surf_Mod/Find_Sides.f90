@@ -11,6 +11,7 @@
   type(Side_Type), pointer :: side(:)
   type(Elem_Type), pointer :: elem(:)
   integer,         pointer :: nv, ns, ne
+  integer                  :: cnt_one, cnt_two
   integer                  :: e, eb, ea, i, j, k, b, a, c, d, s, n_side
   integer                  :: i1, j1, k1, i2, j2, k2, ss, sum_ijk, sum_cd
   integer, allocatable     :: ci(:), di(:), ei(:), ni(:)
@@ -57,6 +58,7 @@
     ei(s) = side(s) % ei
     ni(s) = s
   end do
+
   call Sort_Mod_2_Int_Carry_Int(ci, di, ei)
 
   !------------------------!
@@ -64,7 +66,15 @@
   !------------------------!
   ns = n_side
   n_side = 0
-  do s = 1, ns, 2
+
+  cnt_one = 0
+  cnt_two = 0
+
+  s = 0
+  do  ! s = 1, ns
+
+    s = s + 1
+    if(s > ns) exit
 
     if(ci(s) .eq. ci(s+1) .and.  &
        di(s) .eq. di(s+1)) then
@@ -117,13 +127,66 @@
 
       end do
 
+      ! You handled two sides, skip one
+      cnt_two = cnt_two + 1
+      s = s + 1
+
     else
-      print *, '# ERROR!  Compression of sides failed!  '
-      stop
+      n_side = n_side + 1
+
+      side(n_side) % c  = ci(s)
+      side(n_side) % d  = di(s)
+
+      c = side(n_side) % c
+      d = side(n_side) % d
+
+      ! Tedious but (hopefully) correct way to find eb and ea
+      ss = s
+
+      i = elem(ei(ss)) % i
+      j = elem(ei(ss)) % j
+      k = elem(ei(ss)) % k
+
+      ! Check ea
+      if(i.eq.c .and. j.eq.d) then
+        side(n_side) % ea = ei(ss)
+        side(n_side) % a  = k
+      end if
+
+      if(k.eq.c .and. i.eq.d) then
+        side(n_side) % ea = ei(ss)
+        side(n_side) % a  = j
+      end if
+
+      if(j.eq.c .and. k.eq.d) then
+        side(n_side) % ea = ei(ss)
+        side(n_side) % a  = i
+      end if
+
+      ! Check eb
+      if(i.eq.c .and. k.eq.d) then
+        side(n_side) % eb = ei(ss)
+        side(n_side) % b  = j
+      end if
+
+      if(k.eq.c .and. j.eq.d) then
+        side(n_side) % eb = ei(ss)
+        side(n_side) % b  = i
+      end if
+
+      if(j.eq.c .and. i.eq.d) then
+        side(n_side) % eb = ei(ss)
+        side(n_side) % b  = k
+      end if
+
+      ! You handled only one side
+      cnt_one = cnt_one + 1
     end if
   end do
   ns = n_side
-  print *, '# Compressed number of sides: ', ns
+  print *, '# Compressed number of sides:       ', ns
+  print *, '# Sides surrounded by two elements: ', cnt_two
+  print *, '# Sides surrounded by one element:  ', cnt_one
 
   !-------------------------------!
   !   Find elements' neighbours   !
@@ -137,31 +200,35 @@
     ea = side(s) % ea
 
     ! Element a
-    if(elem(ea) % i .eq. a) then
-      elem(ea) % ei = eb
-      elem(ea) % si = s
-    end if
-    if(elem(ea) % j .eq. a) then
-      elem(ea) % ej = eb
-      elem(ea) % sj = s
-    end if
-    if(elem(ea) % k .eq. a) then
-      elem(ea) % ek = eb
-      elem(ea) % sk = s
-    end if
+    if(ea > 0) then
+      if(elem(ea) % i .eq. a) then
+        elem(ea) % ei = eb
+        elem(ea) % si = s
+      end if
+      if(elem(ea) % j .eq. a) then
+        elem(ea) % ej = eb
+        elem(ea) % sj = s
+      end if
+      if(elem(ea) % k .eq. a) then
+        elem(ea) % ek = eb
+        elem(ea) % sk = s
+      end if
+    end if    ! ea > 0
 
     ! Element b
-    if(elem(eb) % i .eq. b) then
-      elem(eb) % ei = ea
-      elem(eb) % si = s
-    end if
-    if(elem(eb) % j .eq. b) then
-      elem(eb) % ej = ea
-      elem(eb) % sj = s
-    end if
-    if(elem(eb) % k .eq. b) then
-      elem(eb) % ek = ea
-      elem(eb) % sk = s
+    if(eb > 0) then
+      if(elem(eb) % i .eq. b) then
+        elem(eb) % ei = ea
+        elem(eb) % si = s
+      end if
+      if(elem(eb) % j .eq. b) then
+        elem(eb) % ej = ea
+        elem(eb) % sj = s
+      end if
+      if(elem(eb) % k .eq. b) then
+        elem(eb) % ek = ea
+        elem(eb) % sk = s
+      end if
     end if
 
   end do
@@ -176,20 +243,8 @@
       print *, '# ERROR in forming elements'' neighbours!'
       stop
     end if
-!   WRITE(500, *) '----------------------------------------'
-!   WRITE(500, '(3i5)') elem(e) % ei, elem(e) % ej, elem(e) % ek
-!   WRITE(500, '(3i5)') elem(e) % i,  elem(e) % j,  elem(e) % k
-!   WRITE(500, '(3i5)') side(elem(e) % si) % c, side(elem(e) % si) % d
-!   WRITE(500, '(3i5)') side(elem(e) % sj) % c, side(elem(e) % sj) % d
-!   WRITE(500, '(3i5)') side(elem(e) % sk) % c, side(elem(e) % sk) % d
-!   WRITE(500, *) sum_ijk, sum_cd
   end do
 
-  elem(1:ne) % nne = 0
-  do e = 1, ne
-    if(elem(e) % ei .ne. 0) elem(e) % nne = elem(e) % nne + 1
-    if(elem(e) % ej .ne. 0) elem(e) % nne = elem(e) % nne + 1
-    if(elem(e) % ek .ne. 0) elem(e) % nne = elem(e) % nne + 1
-  end do
+  call Surf_Mod_Count_Elements_Neighbours(surf)
 
   end subroutine
