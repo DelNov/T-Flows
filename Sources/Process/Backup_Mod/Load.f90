@@ -94,6 +94,14 @@
   call Backup_Mod_Read_Real(fh,d,vc, 'bulk_p_drop_y', bulk % p_drop_y)
   call Backup_Mod_Read_Real(fh,d,vc, 'bulk_p_drop_z', bulk % p_drop_z)
 
+  !----------------------------------!
+  !                                  !
+  !   Variable physical properties   !
+  !                                  !
+  !----------------------------------!
+  call Backup_Mod_Read_Cell(fh,d,vc, 'density',   density)
+  call Backup_Mod_Read_Cell(fh,d,vc, 'viscosity', viscosity)
+
   !----------------------------!
   !                            !
   !   Navier-Stokes equation   !
@@ -185,7 +193,6 @@
     end if
 
   end if
-
 
   !----------------------------!
   !   Reynolds stress models   !

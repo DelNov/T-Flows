@@ -32,6 +32,7 @@
     call Control_Mod_Surface_Tension      (surface_tension)
   else
     density(:)   = dens_const
+    dens_face(:) = dens_const
     viscosity(:) = visc_const
   end if
 
