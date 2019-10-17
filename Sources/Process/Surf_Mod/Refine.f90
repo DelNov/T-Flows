@@ -1,11 +1,12 @@
 !==============================================================================!
-  subroutine Surf_Mod_Refine(surf)
+  subroutine Surf_Mod_Refine(surf, n_biggest)
 !------------------------------------------------------------------------------!
 !   Refines ten biggest elements on the surface surf                           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Surf_Type), target :: surf
+  integer                 :: n_biggest  ! number of biggest elements for ref.
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: vert(:)
   type(Elem_Type), pointer :: elem(:)
@@ -38,7 +39,7 @@
 
   ! Refine ten biggest element
   ne_old = ne
-  do e = ne_old, ne_old, -1
+  do e = ne_old, ne_old - n_biggest, -1
     call Surf_Mod_Split_Element(surf, elems(e))
   end do
 
