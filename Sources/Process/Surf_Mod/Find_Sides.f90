@@ -13,7 +13,7 @@
   integer,         pointer :: nv, ns, ne
   integer                  :: cnt_one, cnt_two
   integer                  :: e, eb, ea, i, j, k, b, a, c, d, s, n_side
-  integer                  :: i1, j1, k1, i2, j2, k2, ss, sum_ijk, sum_cd
+  integer                  :: ss, sum_ijk, sum_cd
   integer, allocatable     :: ci(:), di(:), ei(:), ni(:)
 !==============================================================================!
 
