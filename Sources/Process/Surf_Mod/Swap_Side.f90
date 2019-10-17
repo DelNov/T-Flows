@@ -29,6 +29,9 @@
   c  = side(s) % c
   d  = side(s) % d
 
+  eac = 0; ead = 0; ebc = 0; ebd = 0
+  sad = 0; sac = 0; sbc = 0; sbd = 0
+
   if(elem(ea) % ei .eq. eb) then
     ead = elem(ea) % ej;  eac = elem(ea) % ek
     sad = elem(ea) % sj;  sac = elem(ea) % sk
