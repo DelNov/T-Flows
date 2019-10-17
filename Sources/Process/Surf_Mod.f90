@@ -135,6 +135,7 @@
   include 'Surf_Mod/Handle_5_Verts.f90'
   include 'Surf_Mod/Handle_6_Verts.f90'
   include 'Surf_Mod/Place_At_Var_Value.f90'
+  include 'Surf_Mod/Refine_Element.f90'
   include 'Surf_Mod/Relax.f90'
   include 'Surf_Mod/Swap_Side.f90'
   include 'Surf_Mod/Smooth.f90'
