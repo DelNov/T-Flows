@@ -156,10 +156,17 @@
   call Surf_Mod_Calculate_Element_Normals(surf, phi)
 
   do j = 1, 9
-    call Surf_Mod_Smooth(surf, phi, val)
     call Surf_Mod_Relax(surf)
+    call Surf_Mod_Smooth(surf, phi, val)
   end do
 
+  call Surf_Mod_Statistics(surf)
+
+  call Surf_Mod_Refine(surf, 4)
+  do j = 1, 9
+    call Surf_Mod_Relax(surf)
+    call Surf_Mod_Smooth(surf, phi, val)
+  end do
   call Surf_Mod_Statistics(surf)
 
   end subroutine
