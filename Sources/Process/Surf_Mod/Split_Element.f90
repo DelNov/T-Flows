@@ -12,7 +12,8 @@
   type(Side_Type), pointer :: side(:)
   type(Elem_Type), pointer :: elem(:)
   integer,         pointer :: nv, ns, ne
-  integer                  :: i, j, k, ei, ej, ek, si, sj, sk
+  integer                  :: i, j, k, ei, ej, ek, s, si, sj, sk
+  integer                  :: sum_ijk, sum_cd, run, ea, eb
   integer                  :: s_in, s_jn, s_kn, e_ijn, e_njk, e_ink
 !==============================================================================!
 
@@ -136,24 +137,90 @@
     if(elem(ei) % ek .eq. e_ijn) elem(ei) % ek = e_njk
   end if
 
-  if(side(si) % a .eq. i) side(si) % a = nv
-  if(side(si) % b .eq. i) side(si) % b = nv
-
   if(ej .gt. 0) then
     if(elem(ej) % ei .eq. e_ijn) elem(ej) % ei = e_ink
     if(elem(ej) % ej .eq. e_ijn) elem(ej) % ej = e_ink
     if(elem(ej) % ek .eq. e_ijn) elem(ej) % ek = e_ink
   end if
 
-  if(side(sj) % a .eq. j) side(si) % a = nv
-  if(side(sj) % b .eq. j) side(si) % b = nv
+  if(side(si) % ea .eq. e_ijn) then
+    side(si) % ea = e_njk
+    side(si) % a  = nv
+  end if
+  if(side(si) % eb .eq. e_ijn) then
+    side(si) % eb = e_njk
+    side(si) % b  = nv
+  end if
 
-  if(side(sk) % a .eq. k) side(sk) % a = nv
-  if(side(sk) % b .eq. k) side(sk) % b = nv
+  if(side(sj) % ea .eq. e_ijn) then
+    side(sj) % ea = e_ink
+    side(sj) % a  = nv
+  end if
+  if(side(sj) % eb .eq. e_ijn) then
+    side(sj) % eb = e_ink
+    side(sj) % b  = nv
+  end if
 
+  if(side(sk) % ea .eq. e_ijn) then
+    side(sk) % ea = e_ijn
+    side(sk) % a  = nv
+  end if
+  if(side(sk) % eb .eq. e_ijn) then
+    side(sk) % eb = e_ijn
+    side(sk) % b  = nv
+  end if
+
+! if(side(sj) % ea .eq. e_ijn) side(sj) % a = nv
+! if(side(sj) % eb .eq. e_ijn) side(sj) % b = nv
+! if(side(sk) % ea .eq. e_ijn) side(sk) % a = nv
+! if(side(sk) % eb .eq. e_ijn) side(sk) % b = nv
+
+!  ! One could think of this, but it's probably not needed
 !  vert(i)  % nne = vert(i) % nne + 1
 !  vert(j)  % nne = vert(j) % nne + 1
 !  vert(k)  % nne = vert(k) % nne + 1
 !  vert(nv) % nne = 3
+
+  !--------------!
+  !   Checking   !
+  !--------------!
+  do run = 1, 3
+    if(run .eq. 1) s = si
+    if(run .eq. 2) s = sj
+    if(run .eq. 3) s = sk
+    if(run .eq. 4) s = s_in
+    if(run .eq. 5) s = s_jn
+    if(run .eq. 6) s = s_kn
+    ea = side(s) % ea
+    if( (elem(ea) % i + elem(ea) % j + elem(ea) % k) .ne.  &
+        (side(s) % c + side(s) % d + side(s) % a) ) then
+      print *, '# ERROR A in splitting an element at run', run
+      stop
+    end if
+
+    eb = side(s) % eb
+    if( (elem(eb) % i + elem(eb) % j + elem(eb) % k) .ne.  &
+        (side(s) % c + side(s) % d + side(s) % b) ) then
+      print *, '# ERROR B in splitting an element at run', run
+      stop
+    end if
+  end do
+
+  do run = 1, 6
+    if(run .eq. 1) e = e_ijn
+    if(run .eq. 2) e = e_njk
+    if(run .eq. 3) e = e_ink
+    if(run .eq. 4) e = ei
+    if(run .eq. 5) e = ej
+    if(run .eq. 6) e = ek
+    sum_ijk = elem(e) % i + elem(e) % j + elem(e) % k
+    sum_cd  = side(elem(e) % si) % c + side(elem(e) % si) % d  &
+            + side(elem(e) % sj) % c + side(elem(e) % sj) % d  &
+            + side(elem(e) % sk) % c + side(elem(e) % sk) % d
+    if( sum_cd / sum_ijk .ne. 2 ) then
+      print *, '# ERROR C in splitting an element!'
+      stop
+    end if
+  end do
 
   end subroutine
