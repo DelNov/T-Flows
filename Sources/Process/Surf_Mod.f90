@@ -26,9 +26,9 @@
   !--------------------------------!
   !   A few important parameters   !
   !--------------------------------!
-  integer, parameter   :: MAX_ELEMENT_VERTICES =     6
-  integer, parameter   :: MAX_SURFACE_VERTICES = 65536
-  integer, parameter   :: MAX_SURFACE_ELEMENTS = 65536
+  integer, parameter   :: MAX_ELEMENT_VERTICES =      6
+  integer, parameter   :: MAX_SURFACE_VERTICES = 131072
+  integer, parameter   :: MAX_SURFACE_ELEMENTS = 131072
 
   !---------------!
   !   Vert type   !
@@ -47,7 +47,8 @@
 
     real :: sumx, sumy, sumz
 
-    integer :: nne  ! number of neighbouring elements
+    integer :: nne       ! number of neighbouring elements
+    logical :: boundary  ! is vertex on a boundary
 
     ! The closest cell, node, boundary cell and face
     integer :: cell
@@ -85,8 +86,8 @@
 
     integer :: ei, ea, eb      ! element undefined, elements left and right
     integer :: a, b, c, d
-
-    real :: length
+    real    :: length
+    logical :: boundary
 
   end type
 
@@ -125,8 +126,9 @@
   include 'Surf_Mod/Calculate_Element_Normals.f90'
   include 'Surf_Mod/Calculate_Nodal_Values.f90'
   include 'Surf_Mod/Count_Elements_Neighbours.f90'
-  include 'Surf_Mod/Count_Verts_Elements.f90'
+  include 'Surf_Mod/Count_Vertex_Elements.f90'
   include 'Surf_Mod/Compress_Nodes.f90'
+  include 'Surf_Mod/Find_Boundaries.f90'
   include 'Surf_Mod/Find_Sides.f90'
   include 'Surf_Mod/Find_Nearest_Cell.f90'
   include 'Surf_Mod/Find_Nearest_Node.f90'
@@ -135,8 +137,9 @@
   include 'Surf_Mod/Handle_5_Verts.f90'
   include 'Surf_Mod/Handle_6_Verts.f90'
   include 'Surf_Mod/Place_At_Var_Value.f90'
-  include 'Surf_Mod/Refine_Element.f90'
+  include 'Surf_Mod/Refine.f90'
   include 'Surf_Mod/Relax.f90'
+  include 'Surf_Mod/Split_Element.f90'
   include 'Surf_Mod/Swap_Side.f90'
   include 'Surf_Mod/Smooth.f90'
   include 'Surf_Mod/Statistics.f90'
