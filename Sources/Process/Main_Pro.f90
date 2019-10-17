@@ -85,7 +85,7 @@
   call Grid_Mod_Load_Cns(grid, this_proc)
 
   ! Allocate memory for working arrays and comm.
-  call Work_Mod_Allocate(grid, 30, 1, 1, 4, 0, 0)
+  call Work_Mod_Allocate(grid, rc=30, rf=1, rn=1, ic=4, if=0, in=1)
   call Comm_Mod_Allocate(grid)
 
   call Grid_Mod_Load_Geo(grid, this_proc)
@@ -169,6 +169,9 @@
   !   Time loop   !
   !               !
   !---------------!
+
+  ! call Surf_Mod_Place_At_Var_Value(surf, flow % t, 0.5001)
+  ! call Save_Surf(surf, 'surface')
 
   call Control_Mod_Time_Step(flow % dt, verbose=.true.)
   call Control_Mod_Backup_Save_Interval (bsi,    verbose=.true.)
