@@ -38,6 +38,8 @@
     vert(elem(e) % k) % nne = vert(elem(e) % k) % nne + 1
   end do
 
+  call Surf_Mod_Find_Boundaries(surf)
+
   !---------------------------------------------------------------!
   !   Initialize sums of x, y and z coordinates for each vertex   !
   !---------------------------------------------------------------!
@@ -72,7 +74,7 @@
 
       ! This is how I check if vertex is on a boundary.  Maybe there
       ! is a more spothisticated way to do it, but this works so far
-      if(vert(v) % nne > 3) then
+      if( .not. vert(v) % boundary ) then
         vert(v) % x_n = vert(v) % sumx / vert(v) % nne
         vert(v) % y_n = vert(v) % sumy / vert(v) % nne
         vert(v) % z_n = vert(v) % sumz / vert(v) % nne
@@ -92,7 +94,7 @@
 
       ! This is how I check if vertex is on a boundary.  Maybe there
       ! is a more spothisticated way to do it, but this works so far
-      if(vert(v) % nne > 3) then
+      if( .not. vert(v) % boundary ) then
 
         c = vert(v) % cell
 

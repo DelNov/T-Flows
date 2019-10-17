@@ -20,7 +20,8 @@
   side => surf % side
   elem => surf % elem
 
-  call Surf_Mod_Count_Verts_Elements(surf)
+  call Surf_Mod_Count_Vertex_Elements(surf)
+  call Surf_Mod_Find_Boundaries(surf)
 
   do t = 6, 3, -1
     do s = 1, ns
@@ -32,8 +33,13 @@
 
       ! This is how I check if side is on a boundary
       if( min(a, b, c, d) > 0 ) then
-        if( min(vert(a) % nne, vert(b) % nne,  &
-                vert(c) % nne, vert(d) % nne ) > 3) then
+
+!       if( .not. vert(a) % boundary .and.  &
+!           .not. vert(b) % boundary .and.  &
+!           .not. vert(c) % boundary .and.  &
+!           .not. vert(d) % boundary ) then
+
+        if( .not. side(s) % boundary ) then
 
           e = vert(c) % nne + vert(d) % nne  &
             - vert(a) % nne - vert(b) % nne
