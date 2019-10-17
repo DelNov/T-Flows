@@ -72,7 +72,7 @@
   !--------------------------------!
   !   Count number of neighbours   !
   !--------------------------------!
-  call Surf_Mod_Count_Verts_Elements(surf)
+  call Surf_Mod_Count_Vertex_Elements(surf)
   nne_s = minval(vert(1:nv) % nne)
   nne_e = maxval(vert(1:nv) % nne)
   allocate(nne(nne_s:nne_e)); nne = 0.0
@@ -149,10 +149,10 @@
       line( 1+T: 1+T) = '#'
       line(63+T:63+T) = '#'
       line( 3+T: 3+T) = '-'
-      line( 5+T: 5+T+40) = 'Percentage of nodes with XX neighbours: '
-      write(line(30+T:31+T), '(i2)') item
-      write(line(45+T:50+T), '(f6.2)') nne(item) / nv * 100.0
-      line(52+T:52+T) = '%'
+      line( 5+T: 5+T+43) = 'Percentage of vertices with XX neighbours: '
+      write(line(33+T:34+T), '(i2)') item
+      write(line(48+T:53+T), '(f6.2)') nne(item) / nv * 100.0
+      line(55+T:55+T) = '%'
       print *, trim(line)
     end do
 
