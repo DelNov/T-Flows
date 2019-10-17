@@ -34,11 +34,6 @@
       ! This is how I check if side is on a boundary
       if( min(a, b, c, d) > 0 ) then
 
-!       if( .not. vert(a) % boundary .and.  &
-!           .not. vert(b) % boundary .and.  &
-!           .not. vert(c) % boundary .and.  &
-!           .not. vert(d) % boundary ) then
-
         if( .not. side(s) % boundary ) then
 
           e = vert(c) % nne + vert(d) % nne  &
