@@ -9,7 +9,7 @@
   type(Side_Type), pointer :: side(:)
   type(Elem_Type), pointer :: elem(:)
   integer,         pointer :: nv, ns, ne
-  integer                  :: a, b, c, d, s, t, e, v, i, j, k
+  integer                  :: a, b, c, d, s, t, e
 !==============================================================================!
 
   ! Take aliases
