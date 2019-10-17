@@ -474,6 +474,9 @@
   !-------------------!
   if(turbulence_model .eq. LES_DYNAMIC) then
 
+    allocate(turb % nearest_wall_cell(-nb:nc))
+    turb % nearest_wall_cell = 0
+
     allocate(turb % c_dyn(-nb:nc));  turb % c_dyn = 0.
 
     ! Other variables such as time scale, length scale and production
