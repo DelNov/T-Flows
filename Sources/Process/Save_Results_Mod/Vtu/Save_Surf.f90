@@ -89,6 +89,16 @@
     end do
     write(9,'(a,a)') IN_4, '</DataArray>'
 
+    !--------------------------!
+    !   Number of neighbours   !
+    !--------------------------!
+    write(9,'(a,a)') IN_4, '<DataArray type="Int64" Name="Neighbours" ' // &
+                           'format="ascii">'
+    do v = 1, surf % n_verts
+      write(9,'(a,i9)') IN_5, surf % vert(v) % nne
+    end do
+    write(9,'(a,a)') IN_4, '</DataArray>'
+
 !   !-------------------------!
 !   !   Particle velocities   !
 !   !-------------------------!
@@ -141,13 +151,17 @@
     write(9,'(a,a)') IN_3, '</Cells>'
 
     !---------------!
+    !               !
     !   Cell data   !
+    !               !
     !---------------!
 
     ! Beginning of cell data
     write(9,'(a,a)') IN_3, '<CellData Scalars="scalars" vectors="velocity">'
 
-    ! Number of neighbouring elements
+    !-------------------------------------!
+    !   Number of neighbouring elements   !
+    !-------------------------------------!
     write(9,'(a,a)') IN_4, '<DataArray type="Int64" Name="Neighbours"' //  &
                            ' format="ascii">'
     do e = 1, surf % n_elems
@@ -155,7 +169,9 @@
     end do
     write(9,'(a,a)') IN_4, '</DataArray>'
 
-    ! Surface normals
+    !---------------------!
+    !   Surface normals   !
+    !---------------------!
     write(9,'(4a)') IN_4,                                                &
                   '<DataArray type="Float64" Name="SurfaceNormals" ' //  &
                   ' NumberOfComponents="3" format="ascii">'
