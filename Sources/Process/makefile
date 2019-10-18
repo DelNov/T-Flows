@@ -70,6 +70,7 @@ ifeq ($(FORTRAN), gnu)
                -fimplicit-none -finit-real=nan                              \
                -Wall -Wextra -Waliasing -Wampersand -Warray-temporaries     \
                -Wc-binding-type -Wcharacter-truncation -Wline-truncation    \
+               -Wconversion -Wconversion-extra -Wintrinsics-std             \
                -Wreal-q-constant -Wsurprising -Wtabs -Wunderflow            \
                -Wintrinsic-shadow -Wunused-parameter -Walign-commons        \
                -Wfunction-elimination -Wrealloc-lhs -Wrealloc-lhs-all       \
@@ -220,7 +221,8 @@ SRC_MOD += Control_Mod.f90	\
            Monitor_Mod.f90	\
            Turb_Mod.f90		\
            Swarm_Mod.f90	\
-           Surf_Mod.f90
+           Surf_Mod.f90		\
+           Multiphase_Mod.f90
 
 # Save_Results_Mod - conditional VTU/CGNS support
 ifeq ($(CGNS), no)
