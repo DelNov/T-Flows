@@ -33,10 +33,6 @@
   ! Sort all elements by their areas
   call Sort_Mod_Real_Carry_Int(areas(1:ne), elems(1:ne))
 
-  do e = 1, ne
-    WRITE(333, *) areas(e), elems(e)
-  end do
-
   ! Refine ten biggest element
   ne_old = ne
   do e = ne_old, ne_old - n_biggest, -1
