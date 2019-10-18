@@ -1,7 +1,7 @@
 !==============================================================================!
-  subroutine Surf_Mod_Handle_3_Verts(surf, surf_v)
+  subroutine Surf_Mod_Handle_3_Points(surf, surf_v)
 !------------------------------------------------------------------------------!
-!   Places surface where variable phi has value val                            !
+!   Surface intersects cell at three points                                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -12,7 +12,7 @@
   type(Elem_Type), pointer :: elem(:)
   integer,         pointer :: nv, ne
   integer                  :: ver(3)
-  real                     :: a(3), b(3), tri_v(3)
+  real                     :: a(3), b(3), tri_p(3)
 !==============================================================================!
 
   ! Take aliases
@@ -42,9 +42,9 @@
   b(2) = vert(ver(3)) % y_n - vert(ver(1)) % y_n
   b(3) = vert(ver(3)) % z_n - vert(ver(1)) % z_n
 
-  tri_v = Math_Mod_Cross_Product(a, b)
+  tri_p = Math_Mod_Cross_Product(a, b)
 
-  if(dot_product(surf_v, tri_v) < 0.0) then
+  if(dot_product(surf_v, tri_p) < 0.0) then
     call Swap_Int(elem(ne) % j,  &
                   elem(ne) % k)
   end if

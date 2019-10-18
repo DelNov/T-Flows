@@ -1,7 +1,7 @@
 !==============================================================================!
-  subroutine Surf_Mod_Place_At_Var_Value(surf, phi, val)
+  subroutine Surf_Mod_Place_At_Var_Value(surf, phi, phi_e)
 !------------------------------------------------------------------------------!
-!   Places surface where variable phi has value val                            !
+!   Places surface where variable phi has value phi_e                            !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Work_Mod, only: phi_n => r_node_01  ! value at the (static) grid nodes
@@ -13,7 +13,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Surf_Type), target :: surf
   type(Var_Type),  target :: phi
-  real                    :: val
+  real                    :: phi_e
 !------------------------------------------------------------------------------!
   include 'Surf_Mod/Edge_Numbering_Neu.f90'
 !-----------------------------------[Locals]-----------------------------------!
@@ -34,6 +34,7 @@
   vert => surf % vert
   elem => surf % elem
 
+  call Grad_Mod_Variable(phi)
   call Surf_Mod_Calculate_Nodal_Values(surf, phi)
 
   ! Take aliases
@@ -61,9 +62,9 @@
     if(grid % cells_n_nodes(c) .eq. 6) en = neu_wed
     if(grid % cells_n_nodes(c) .eq. 8) en = neu_hex
 
-    !-------------------------------------------!
-    !   Browse through edges to find vertices   !
-    !-------------------------------------------!
+    !------------------------------------------------------!
+    !   Browse through edges to find intersection points   !
+    !------------------------------------------------------!
     do j = 1, 12  ! max number of edges
       n1 = grid % cells_n( en(j,1), c )
       n2 = grid % cells_n( en(j,2), c )
@@ -72,7 +73,7 @@
       phi2 = phi_n(n2)
 
       ! There is a vertex between these two edges
-      if( ((phi2-val) * (val-phi1)) >= MICRO ) then
+      if( ((phi2-phi_e) * (phi_e-phi1)) >= MICRO ) then
         n_cells_v(c) = n_cells_v(c) + 1
 
         nv = nv + 1
@@ -87,7 +88,7 @@
         yn2 = grid % yn(n2)
         zn2 = grid % zn(n2)
 
-        w1 = abs(phi2-val) / abs(phi2-phi1)
+        w1 = abs(phi2-phi_e) / abs(phi2-phi1)
         w2 = 1.0 - w1
 
         ! All vertices have to be stored
@@ -99,9 +100,9 @@
 
     end do  ! through edges
 
-    !-----------------------------------!
-    !   Some vertices have been found   !
-    !-----------------------------------!
+    !---------------------------------!
+    !   Some points have been found   !
+    !---------------------------------!
     if(n_vert > 0) then
 
       ! Surface vector
@@ -110,10 +111,10 @@
       surf_v(3) = phi % z(c)
 
       ! If valid elements were formed
-      if(n_vert .eq. 3) call Surf_Mod_Handle_3_Verts(surf, surf_v)
-      if(n_vert .eq. 4) call Surf_Mod_Handle_4_Verts(surf, surf_v)
-      if(n_vert .eq. 5) call Surf_Mod_Handle_5_Verts(surf, surf_v)
-      if(n_vert .eq. 6) call Surf_Mod_Handle_6_Verts(surf, surf_v)
+      if(n_vert .eq. 3) call Surf_Mod_Handle_3_Points(surf, surf_v)
+      if(n_vert .eq. 4) call Surf_Mod_Handle_4_Points(surf, surf_v)
+      if(n_vert .eq. 5) call Surf_Mod_Handle_5_Points(surf, surf_v)
+      if(n_vert .eq. 6) call Surf_Mod_Handle_6_Points(surf, surf_v)
       if(n_vert .eq. 7) then
         print *, '# ERROR: seven vertices in an intersection!'
         stop
@@ -133,12 +134,6 @@
 
   call Surf_Mod_Find_Sides(surf)
 
-! ! For checking
-! do v = 1, nv
-!   WRITE(200, '(i6,3f12.6)') v,  &
-!               vert(v) % x_n, vert(v) % y_n, vert(v) % z_n
-! end do
-
   !--------------------------------!
   !   Find nearest cell and node   !
   !--------------------------------!
@@ -156,16 +151,16 @@
   call Surf_Mod_Calculate_Element_Normals(surf, phi)
 
   do j = 1, 9
-    call Surf_Mod_Relax(surf)
-    call Surf_Mod_Smooth(surf, phi, val)
+    call Surf_Mod_Relax_Topology(surf)
+    call Surf_Mod_Smooth(surf, phi, phi_e)
   end do
 
   call Surf_Mod_Statistics(surf)
 
   call Surf_Mod_Refine(surf, 4)
   do j = 1, 9
-    call Surf_Mod_Relax(surf)
-    call Surf_Mod_Smooth(surf, phi, val)
+    call Surf_Mod_Relax_Topology(surf)
+    call Surf_Mod_Smooth(surf, phi, phi_e)
   end do
   call Surf_Mod_Statistics(surf)
 

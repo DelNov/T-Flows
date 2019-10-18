@@ -1,7 +1,7 @@
 !==============================================================================!
-  subroutine Surf_Mod_Handle_6_Verts(surf, surf_v)
+  subroutine Surf_Mod_Handle_6_Points(surf, surf_v)
 !------------------------------------------------------------------------------!
-!   Places surface where variable phi has value val                            !
+!   Surface intersects cell at six points                                      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -13,7 +13,7 @@
   integer,         pointer :: nv, ne
   integer                  :: ver(6), loop
   real                     :: v_21(3), v_31(3), v_41(3), v_51(3), v_61(3)
-  real                     :: tri_v_123(3), tri_v_134(3), tri_v_145(3), tri_v_156(3)
+  real                     :: tri_p_123(3), tri_p_134(3), tri_p_145(3), tri_p_156(3)
   integer                  :: permutations(6, 120)
 !=============================================================================!
 
@@ -178,15 +178,15 @@
     v_61(2) = vert(ver(6)) % y_n - vert(ver(1)) % y_n
     v_61(3) = vert(ver(6)) % z_n - vert(ver(1)) % z_n
 
-    tri_v_123 = Math_Mod_Cross_Product(v_21, v_31)
-    tri_v_134 = Math_Mod_Cross_Product(v_31, v_41)
-    tri_v_145 = Math_Mod_Cross_Product(v_41, v_51)
-    tri_v_156 = Math_Mod_Cross_Product(v_51, v_61)
+    tri_p_123 = Math_Mod_Cross_Product(v_21, v_31)
+    tri_p_134 = Math_Mod_Cross_Product(v_31, v_41)
+    tri_p_145 = Math_Mod_Cross_Product(v_41, v_51)
+    tri_p_156 = Math_Mod_Cross_Product(v_51, v_61)
 
-    if(dot_product(surf_v, tri_v_123) > 0.0 .and.  &
-       dot_product(surf_v, tri_v_134) > 0.0 .and.  &
-       dot_product(surf_v, tri_v_145) > 0.0 .and.  &
-       dot_product(surf_v, tri_v_156) > 0.0) then
+    if(dot_product(surf_v, tri_p_123) > 0.0 .and.  &
+       dot_product(surf_v, tri_p_134) > 0.0 .and.  &
+       dot_product(surf_v, tri_p_145) > 0.0 .and.  &
+       dot_product(surf_v, tri_p_156) > 0.0) then
       exit
     end if
 
