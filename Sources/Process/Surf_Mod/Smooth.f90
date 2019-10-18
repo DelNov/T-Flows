@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Surf_Mod_Smooth(surf, phi, val_e)
+  subroutine Surf_Mod_Smooth(surf, phi, phi_e)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Surf_Type), target :: surf
   type(Var_Type),  target :: phi
-  real                    :: val_e
+  real                    :: phi_e
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Vert_Type), pointer :: vert(:)
@@ -16,7 +16,7 @@
   integer,         pointer :: nv, ne, ns
   real                     :: xc, yc, zc
   real                     :: nx, ny, nz, phi_m, dx, dy, dz, dm
-  real                     :: val_v
+  real                     :: phi_v
 !==============================================================================!
 
   ! Take aliases
@@ -113,11 +113,11 @@
         dx = vert(v) % x_n - xc
         dy = vert(v) % y_n - yc
         dz = vert(v) % z_n - zc
-        val_v = phi % n(c) + dx * phi % x(c)  &
+        phi_v = phi % n(c) + dx * phi % x(c)  &
                            + dy * phi % y(c)  &
                            + dz * phi % z(c)
 
-        dm = (val_e - val_v) / (phi % x(c)*nx + phi % y(c)*ny + phi % z(c)*nz)
+        dm = (phi_e - phi_v) / (phi % x(c)*nx + phi % y(c)*ny + phi % z(c)*nz)
 
         dx = dm * nx
         dy = dm * ny
@@ -131,7 +131,7 @@
         dx = vert(v) % x_n - xc
         dy = vert(v) % y_n - yc
         dz = vert(v) % z_n - zc
-        val_v = phi % n(c) + dx * phi % x(c)  &
+        phi_v = phi % n(c) + dx * phi % x(c)  &
                            + dy * phi % y(c)  &
                            + dz * phi % z(c)
 
