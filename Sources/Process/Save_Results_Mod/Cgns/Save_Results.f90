@@ -22,17 +22,20 @@
 !--------------------------------[Arguments]-----------------------------------!
   type(Field_Type), target :: flow
   type(Turb_Type),  target :: turb
+  type(Var_Type),  pointer :: phi
   character(len=*)         :: name_save
   logical                  :: plot_inside  ! plot results inside?
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: grid
-  character(len=80)        :: store_name, name_out
+  character(len=80)        :: store_name, name_out, name_mean
   integer                  :: base
   integer                  :: block
   integer                  :: solution
   integer                  :: field
-  integer                  :: c
+  integer                  :: c, sc
 !==============================================================================!
+
+  if(.not. plot_inside) return ! no point to write *-bnd.cgns yet
 
   call Cpu_Timer_Mod_Start('Save_Cgns_Results')
 
@@ -147,6 +150,15 @@
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               flow % t % n(1), 'Temperature')
   end if
+
+  !------------------!
+  !   Save scalars   !
+  !------------------!
+  do sc = 1, flow % n_scalars
+    phi => flow % scalar(sc)
+    call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
+                              phi % n(1), phi % name)
+  end do
 
   !--------------------------!
   !   Turbulent quantities   !
@@ -284,18 +296,18 @@
                                 wt_save(1),'TurbulentHeatFluxZ')
     end if
 
-    !if(flow % n_scalars > 0) then
-    !  do sc = 1, flow % n_scalars
-    !    phi => flow % scalar(sc)
-    !    name_mean = 'Mean'
-    !    name_mean(5:8) = phi % name
-    !    do c = 1, grid % n_cells
-    !      phi_save(c) = turb % scalar_mean(sc, c)
-    !    end do
-    !    call Cgns_Mod_Write_Field(grid, IN_4, IN_5, name_mean, plot_inside,  &
-    !                              phi_save(1))
-    !  end do
-    !end if
+    if(flow % n_scalars > 0) then
+      do sc = 1, flow % n_scalars
+        phi       => flow % scalar(sc)
+        name_mean = 'Mean'
+        name_mean(5:8) = phi % name
+        do c = 1, grid % n_cells
+          phi_save(c) = turb % scalar_mean(sc, c)
+        end do
+        call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
+                                  phi_save(1), name_mean)
+      end do
+    end if
   end if
 
   ! Save y+ for all turbulence models
