@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Energy(flow, turb, sol, dt, ini)
+  subroutine Compute_Energy(flow, turb, mult, sol, dt, ini)
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for scalar (such as temperature)         !
 !------------------------------------------------------------------------------!
@@ -19,11 +19,12 @@
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
-  type(Field_Type),  target :: flow
-  type(Turb_Type),   target :: turb
-  type(Solver_Type), target :: sol
-  integer                   :: ini
-  real                      :: dt
+  type(Field_Type),      target :: flow
+  type(Turb_Type),       target :: turb
+  type(Multiphase_Type), target :: mult
+  type(Solver_Type),     target :: sol
+  integer                       :: ini
+  real                          :: dt
 !-----------------------------------[Locals]-----------------------------------! 
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w, t

@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Read_Control_Physical(flow, swarm, turb, backup)
 !------------------------------------------------------------------------------!
-!   Reads details about physial models from control file.                      !
+!   Reads details about physical models from control file.                     !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod,   only: HUGE_INT
@@ -11,6 +11,7 @@
   use Swarm_Mod,   only: Swarm_Type
   use Bulk_Mod,    only: Bulk_Type
   use Turb_Mod
+  use Multiphase_Mod
   use Control_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -202,6 +203,13 @@
   !                               !
   !-------------------------------!
   call Control_Mod_Number_Of_Scalars(flow % n_scalars, verbose = .true.)
+
+  !-------------------------------!
+  !                               !
+  !   Related to Multiphase Flow  !
+  !                               !
+  !-------------------------------!
+  call Control_Mod_Multiphase_Model(multiphase_model, .true.)
 
   !-----------------------!
   !                       !

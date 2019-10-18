@@ -5,7 +5,6 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Math_Mod
   use Comm_Mod
   use Cpu_Timer_Mod, only: Cpu_Timer_Mod_Start, Cpu_Timer_Mod_Stop
   use Info_Mod
@@ -148,6 +147,7 @@
   integer :: turbulent_heat_flux_model
 
   ! Parameters describing turbulence model choice
+  ! (Prime numbers starting from 30000)
   integer, parameter :: NONE                  = 30011
   integer, parameter :: DNS                   = 30013
   integer, parameter :: LES_WALE              = 30029

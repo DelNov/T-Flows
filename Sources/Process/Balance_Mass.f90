@@ -8,7 +8,7 @@
   use Comm_Mod
   use Grid_Mod,  only: Grid_Type, Grid_Mod_Bnd_Cond_Type,  &
                        INFLOW, OUTFLOW, CONVECT, PRESSURE
-  use Field_Mod, only: Field_Type, Field_Mod_Alias_Momentum, density
+  use Field_Mod, only: Field_Type, Field_Mod_Alias_Momentum, dens_face
   use Var_Mod,   only: Var_Type
   use Bulk_Mod,  only: Bulk_Type
 !------------------------------------------------------------------------------!
@@ -38,9 +38,9 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
     if(c2 < 0) then
-      flux(s) = density(c1)*( u % n(c2)*grid % sx(s) + &
-                              v % n(c2)*grid % sy(s) + &
-                              w % n(c2)*grid % sz(s) )
+      flux(s) = dens_face(s)*( u % n(c2)*grid % sx(s) + &
+                               v % n(c2)*grid % sy(s) + &
+                               w % n(c2)*grid % sz(s) )
 
       if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
         bulk % mass_in = bulk % mass_in - flux(s)
@@ -71,22 +71,22 @@
         u % n(c2) = u % n(c1)
         v % n(c2) = v % n(c1)
         w % n(c2) = w % n(c1)
-        flux(s) = density(c1) * ( u % n(c2)*grid % sx(s) +  & 
-                                  v % n(c2)*grid % sy(s) +  &
-                                  w % n(c2)*grid % sz(s) )
+        flux(s) = dens_face(s) * ( u % n(c2)*grid % sx(s) +  & 
+                                   v % n(c2)*grid % sy(s) +  &
+                                   w % n(c2)*grid % sz(s) )
         bulk % mass_out = bulk % mass_out + flux(s)
       end if
 
       if(Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. CONVECT .and. flux(s)>0.) then
-        flux(s) = density(c1) * ( u % n(c2)*grid % sx(s) +  & 
-                                  v % n(c2)*grid % sy(s) +  &
-                                  w % n(c2)*grid % sz(s) )
+        flux(s) = dens_face(s) * ( u % n(c2)*grid % sx(s) +  & 
+                                   v % n(c2)*grid % sy(s) +  &
+                                   w % n(c2)*grid % sz(s) )
         bulk % mass_out = bulk % mass_out + flux(s)
       end if
 
-      flux(s) = density(c1) * ( u % n(c2)*grid % sx(s) +  & 
-                                v % n(c2)*grid % sy(s) +  &
-                                w % n(c2)*grid % sz(s) )
+      flux(s) = dens_face(s) * ( u % n(c2)*grid % sx(s) +  & 
+                                 v % n(c2)*grid % sy(s) +  &
+                                 w % n(c2)*grid % sz(s) )
 
       if(Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. PRESSURE .and. flux(s)>0.) then
         bulk % mass_out = bulk % mass_out + flux(s)
@@ -108,7 +108,7 @@
         u % n(c2) = u % n(c2) * fac
         v % n(c2) = v % n(c2) * fac
         w % n(c2) = w % n(c2) * fac
-        flux(s) = flux(s)*fac
+        flux(s) = flux(s) * fac
         bulk % mass_out = bulk % mass_out + flux(s)
       end if
     end if

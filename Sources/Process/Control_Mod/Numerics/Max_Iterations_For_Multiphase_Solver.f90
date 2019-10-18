@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Control_Mod_Results_Save_Interval(val, verbose)
+  subroutine Control_Mod_Max_Iterations_For_Multiphase_Solver(val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -7,7 +7,7 @@
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Int_Item('RESULTS_SAVE_INTERVAL', 50, &
-                                  val, verbose)
+  call Control_Mod_Read_Int_Item('MAX_ITERATIONS_FOR_MULTIPHASE_SOLVER',  &
+                                  val, val, verbose)
 
   end subroutine

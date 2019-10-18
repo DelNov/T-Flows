@@ -25,26 +25,27 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Bulk_Type),   pointer :: bulk
-  type(Var_Type),    pointer :: u, v, w, p, pp
+  type(Var_Type),    pointer :: u, v, w, p, pp, vol_flux
   real,              pointer :: flux(:)
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: c, c1, c2, s
-  real                       :: cfl_max, pe_max
+  real                       :: a12, cfl_max, pe_max
   real                       :: cfl_t, pe_t, mass_err
-  real                       :: fs, dens_const, visc_const
+  real                       :: dens_const, visc_const
 !==============================================================================!
 
   call Cpu_Timer_Mod_Start('Correct_Velocity')
 
   ! Take aliases
-  grid => flow % pnt_grid
-  bulk => flow % bulk
-  flux => flow % flux
-  p    => flow % p
-  pp   => flow % pp
-  a    => sol % a
-  b    => sol % b % val
+  grid     => flow % pnt_grid
+  bulk     => flow % bulk
+  flux     => flow % flux
+  vol_flux => flow % vol_flux
+  p        => flow % p
+  pp       => flow % pp
+  a        => sol % a
+  b        => sol % b % val
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! User function
@@ -85,6 +86,11 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
     if(c2 > 0) then
+      a12 = 0.5 * a % fc(s) *                                                 &
+          ( grid % vol(c1) / a % sav(c1)                                      &
+          + grid % vol(c2) / a % sav(c2) )
+
+      vol_flux % n(s) = vol_flux % n(s) - (pp % n(c2) - pp % n(c1)) * a12
       flux(s) = flux(s) + (pp % n(c2) - pp % n(c1))*a % val(a % pos(1,s))
     end if               !                                               !
   end do                 !<------------ this is correction ------------->!

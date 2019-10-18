@@ -30,6 +30,10 @@
       Numerics_Mod_Advection_Scheme_Code = SUPERBEE
     case('AVL_SMART')
       Numerics_Mod_Advection_Scheme_Code = AVL_SMART
+    case('CICSAM')
+      Numerics_Mod_Advection_Scheme_Code = CICSAM
+    case('STACS')
+      Numerics_Mod_Advection_Scheme_Code = STACS
 
     case default
       if(this_proc < 2) then

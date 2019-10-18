@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Results(flow, turb, name_save, plot_inside)
+  subroutine Save_Results(flow, turb, mult, name_save, plot_inside)
 !------------------------------------------------------------------------------!
 !   Writes results in CGNS file format (for VisIt and Paraview)                !
 !------------------------------------------------------------------------------!
@@ -17,13 +17,15 @@
                       wt_save   => r_cell_11,  &
                       kin_vis_t => r_cell_12,  &
                       phi_save  => r_cell_13
+  use Field_Mod,   only: multiphase                                             
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Field_Type), target :: flow
-  type(Turb_Type),  target :: turb
-  character(len=*)         :: name_save
-  logical                  :: plot_inside  ! plot results inside?
+  type(Field_Type),      target :: flow
+  type(Turb_Type),       target :: turb
+  type(Multiphase_Type), target :: turb
+  character(len=*)              :: name_save
+  logical                       :: plot_inside  ! plot results inside?
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: grid
   character(len=80)        :: store_name, name_out

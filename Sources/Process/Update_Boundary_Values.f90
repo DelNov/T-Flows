@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Update_Boundary_Values(flow, turb)
+  subroutine Update_Boundary_Values(flow, turb, mult)
 !------------------------------------------------------------------------------!
 !   Update variables on the boundaries (boundary cells) where needed.          !
 !------------------------------------------------------------------------------!
@@ -8,16 +8,18 @@
   use Comm_Mod
   use Field_Mod,   only: Field_Type, heat_transfer, heated_area,     &
                          density, viscosity, capacity, conductivity, &
-                         heat_flux, heat, multiphase,                &
-                         Field_Mod_Alias_V_Fraction
+                         heat_flux, heat
   use Turb_Mod
   use Grid_Mod
   use Control_Mod
+  use Multiphase_Mod, only: Multiphase_Type, Multiphase_Mod_Alias_Vof,  &
+                            multiphase_model, VOLUME_OF_FLUID
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
-  type(Turb_Type),  target :: turb
+  type(Field_Type),      target :: flow
+  type(Turb_Type),       target :: turb
+  type(Multiphase_Type), target :: mult
 !---------------------------------[Calling]------------------------------------!
   real :: Y_Plus_Low_Re
 !-----------------------------------[Locals]-----------------------------------!
@@ -27,7 +29,7 @@
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   integer                  :: c1, c2, s
   real                     :: qx, qy, qz, nx, ny, nz, con_t
-  real                     :: pr, kin_vis, u_tau
+  real                     :: kin_vis, u_tau
 !==============================================================================!
 
   ! Take aliases
@@ -35,7 +37,7 @@
   vis  => turb % vis
   call Field_Mod_Alias_Momentum   (flow, u, v, w)
   call Field_Mod_Alias_Energy     (flow, t)
-  call Field_Mod_Alias_V_Fraction (flow, vof)
+  call Multiphase_Mod_Alias_Vof   (mult, vof)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
   call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
   call Turb_Mod_Alias_T2          (turb, t2)
@@ -70,7 +72,7 @@
         v % n(c2) = v % n(c1)
         w % n(c2) = w % n(c1)
         if(heat_transfer) t % n(c2) = t % n(c1)
-        if(multiphase) vof % n(c2) = vof % n(c1)
+        if(multiphase_model .eq. VOLUME_OF_FLUID) vof % n(c2) = vof % n(c1)
       end if
 
       ! Spalart Allmaras
@@ -227,7 +229,7 @@
         if(heat_transfer)  &
           t % n(c2) = t % n(grid % bnd_cond % copy_c(c2))
 
-        if(multiphase)  &
+        if(multiphase_model .eq. VOLUME_OF_FLUID)  &
           vof % n(c2) = vof % n(grid % bnd_cond % copy_c(c2))
 
         if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
@@ -277,11 +279,5 @@
    call Comm_Mod_Global_Sum_Real(heated_area)
    heat_flux = heat / heated_area
  end if
-
-!  Doesn´t need the flag for heat_transfer??????
-
-!  call Comm_Mod_Global_Sum_Real(heat)
-!  call Comm_Mod_Global_Sum_Real(heated_area)
-!  heat_flux = heat / heated_area
 
   end subroutine

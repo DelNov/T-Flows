@@ -14,9 +14,11 @@
   use Bulk_Mod,    only: Bulk_Type
   use Turb_Mod                       ! needed for saving results
   use Swarm_Mod
+  use Multiphase_Mod
   use Control_Mod
 !------------------------------------------------------------------------------!
   implicit none
+!==============================================================================!
 
   integer           :: n_user_arrays
   real, allocatable :: user_array(:,:)

@@ -1,13 +1,15 @@
 !==============================================================================!
-  subroutine Control_Mod_Results_Save_Interval(val, verbose)
+  subroutine Control_Mod_Multiphase_Model(multiphase_model, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer           :: val
+  integer           :: multiphase_model
   logical, optional :: verbose
+!-----------------------------------[Locals]-----------------------------------!
+  character(len=80) :: val
 !==============================================================================!
 
-  call Control_Mod_Read_Int_Item('RESULTS_SAVE_INTERVAL', 50, &
-                                  val, verbose)
+  call Control_Mod_Read_Char_Item('MULTIPHASE_MODEL', 'none', val, verbose)
+  call To_Upper_Case(val)
 
   end subroutine

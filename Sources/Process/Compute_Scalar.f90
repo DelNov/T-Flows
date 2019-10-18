@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Scalar(flow, turb, sol, dt, ini, sc)
+  subroutine Compute_Scalar(flow, turb, mult, sol, dt, ini, sc)
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for use scalar.                          !
 !------------------------------------------------------------------------------!
@@ -30,12 +30,13 @@
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
-  type(Field_Type),  target :: flow
-  type(Turb_Type),   target :: turb
-  type(Solver_Type), target :: sol
-  real                      :: dt
-  integer                   :: ini
-  integer                   :: sc
+  type(Field_Type),      target :: flow
+  type(Turb_Type),       target :: turb
+  type(Multiphase_Type), target :: mult
+  type(Solver_Type),     target :: sol
+  real                          :: dt
+  integer                       :: ini
+  integer                       :: sc
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: uu, vv, ww, uv, uw, vw

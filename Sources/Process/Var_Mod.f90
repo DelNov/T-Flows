@@ -47,6 +47,7 @@
 
   include 'Var_Mod/Allocate_New_Only.f90'
   include 'Var_Mod/Allocate_Solution.f90'
+  include 'Var_Mod/Allocate_Vol_Flux.f90'
   include 'Var_Mod/Bnd_Cell_Type.f90'
 
   end module

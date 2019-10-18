@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Results(flow, turb, name_save, plot_inside)
+  subroutine Save_Results(flow, turb, mult, name_save, plot_inside)
 !------------------------------------------------------------------------------!
 !   Writes results in VTU file format (for VisIt and Paraview)                 !
 !------------------------------------------------------------------------------!
@@ -20,10 +20,11 @@
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Field_Type), target :: flow
-  type(Turb_Type),  target :: turb
-  character(len=*)         :: name_save
-  logical                  :: plot_inside     ! plot results inside?
+  type(Field_Type),      target :: flow
+  type(Turb_Type),       target :: turb
+  type(Multiphase_Type), target :: mult
+  character(len=*)              :: name_save
+  logical                       :: plot_inside     ! plot results inside?
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: phi
@@ -295,6 +296,14 @@
   if(heat_transfer) then
     call Save_Scalar(grid, IN_4, IN_5, "Temperature", plot_inside,         &
                                        flow % t % n(-grid % n_bnd_cells))
+  end if
+
+  !---------------------!
+  !   Volume Fraction   !
+  !---------------------!
+  if(multiphase_model .eq. VOLUME_OF_FLUID) then
+    call Save_Scalar(grid, IN_4, IN_5, "VolumeFraction", plot_inside,         &
+                                       mult % vof % n(-grid % n_bnd_cells))
   end if
 
   !------------------!

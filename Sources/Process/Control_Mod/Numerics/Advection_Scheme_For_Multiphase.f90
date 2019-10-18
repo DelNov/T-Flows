@@ -1,14 +1,16 @@
 !==============================================================================!
-  subroutine Field_Mod_Alias_V_Fraction(flow, vof)
+  subroutine Control_Mod_Advection_Scheme_For_Multiphase(scheme_name, verbose)
 !------------------------------------------------------------------------------!
-!   Creates aliases for volume fraction.  (Actually, only one alias.)          !
+!   Reading turbulence model from the control file.                            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target  :: flow
-  type(Var_Type),   pointer :: vof
+  character(len=80) :: scheme_name
+  logical, optional :: verbose
 !==============================================================================!
 
-  vof => flow % vof
+  call Control_Mod_Read_Char_Item('ADVECTION_SCHEME_FOR_MULTIPHASE', 'upwind',  &
+                                   scheme_name, verbose)
+  call To_Upper_Case(scheme_name)
 
   end subroutine

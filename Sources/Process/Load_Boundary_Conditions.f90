@@ -1,29 +1,31 @@
 !==============================================================================!
-  subroutine Load_Boundary_Conditions(flow, turb, backup)
+  subroutine Load_Boundary_Conditions(flow, turb, mult, backup)
 !------------------------------------------------------------------------------!
 !   Reads boundary condition from control file                                 !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Comm_Mod,      only: this_proc, Comm_Mod_End
-  use Field_Mod,     only: Field_Type, heat_transfer
+  use Comm_Mod,       only: this_proc, Comm_Mod_End
+  use Field_Mod,      only: Field_Type, heat_transfer
   use Turb_Mod
+  use Multiphase_Mod, only: Multiphase_Type, multiphase_model, VOLUME_OF_FLUID
   use Tokenizer_Mod
-  use Grid_Mod,      only: Grid_Type
+  use Grid_Mod,       only: Grid_Type
   use User_Mod
   use Control_Mod
-  use Var_Mod,       only: Var_Type
+  use Var_Mod,        only: Var_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
-  type(Turb_Type),  target :: turb
-  logical                  :: backup
+  type(Field_Type),       target :: flow
+  type(Turb_Type),        target :: turb
+  type(Multiphase_Type),  target :: mult
+  logical                        :: backup
 !----------------------------------[Calling]-----------------------------------!
   integer :: Key_Ind
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
-  type(Var_Type),  pointer :: u, v, w, t, p
+  type(Var_Type),  pointer :: u, v, w, t, p, vof
   type(Var_Type),  pointer :: kin, eps, f22, zeta, vis, t2
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   type(Var_Type),  pointer :: scalar(:)
@@ -50,6 +52,8 @@
   scalar => flow % scalar
   vis    => turb % vis
   t2     => turb % t2
+  vof    => mult % vof
+
   call Field_Mod_Alias_Momentum   (flow, u, v, w)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
   call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
@@ -220,6 +224,14 @@
               if(i > 0) t % bnd_cell_type(c) = bc_type_tag
             end if
 
+            ! Multiphase flow
+            if (multiphase_model .eq. VOLUME_OF_FLUID) then
+              i = Key_Ind('V_FRAC', keys, nks)
+              if(i > 0) vof % bnd_cell_type(c) = bc_type_tag
+              i = Key_Ind('V_FRAC_GRAD', keys, nks)
+              if(i > 0) vof % bnd_cell_type(c) = bc_type_tag
+            end if
+
             ! For scalars
             do sc = 1, flow % n_scalars
               i = Key_Ind(scalar(sc) % name, keys, nks)
@@ -249,6 +261,14 @@
               if(i > 0) t % n(c) = vals(i)
               i = Key_Ind('Q', keys, nks)
               if(i > 0) t % q(c) = vals(i)
+            end if
+
+            ! Multiphase flow
+            if (multiphase_model .eq. VOLUME_OF_FLUID) then
+              i = Key_Ind('V_FRAC', keys, nks)
+              if(i > 0) vof % n(c) = vals(i)
+              i = Key_Ind('V_FRAC_GRAD', keys, nks)
+              if(i > 0) vof % q(c) = vals(i)
             end if
 
             ! For scalars

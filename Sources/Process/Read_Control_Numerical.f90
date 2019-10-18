@@ -1,19 +1,21 @@
 !==============================================================================!
-  subroutine Read_Control_Numerical(flow, turb)
+  subroutine Read_Control_Numerical(flow, turb, mult)
 !------------------------------------------------------------------------------!
 !   Reads details about numerical models from control file.                    !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Field_Mod,    only: Field_Type, heat_transfer
-  use Var_Mod,      only: Var_Type
-  use Turb_Mod,     only: Turb_Type
+  use Field_Mod,      only: Field_Type, heat_transfer
+  use Var_Mod,        only: Var_Type
+  use Turb_Mod,       only: Turb_Type
+  use Multiphase_Mod, only: Multiphase_Type, multiphase_model, VOLUME_OF_FLUID
   use Control_Mod
   use Numerics_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
-  type(Turb_Type),  target :: turb
+  type(Field_Type),      target :: flow
+  type(Turb_Type),       target :: turb
+  type(Multiphase_Type), target :: mult
 !----------------------------------[Locals]------------------------------------!
   type(Var_Type),   pointer :: tq, ui, phi
   character(len=80)         :: name
@@ -64,6 +66,23 @@
     call Control_Mod_Tolerance_For_Energy_Solver         (flow % t % tol)
     call Control_Mod_Preconditioner_For_System_Matrix    (flow % t % precond)
     call Control_Mod_Max_Iterations_For_Energy_Solver    (flow % t % niter)
+  end if
+
+  !--------------------------------!
+  !   Related to multiphase flow   !
+  !--------------------------------!
+  if(multiphase_model .eq. VOLUME_OF_FLUID) then
+    mult % vof % urf   = 0.7
+    mult % vof % niter = 5
+    call Control_Mod_Advection_Scheme_For_Multiphase                  (name)
+    mult % vof % adv_scheme = Numerics_Mod_Advection_Scheme_Code      (name)
+    call Control_Mod_Time_Integration_Scheme                          (name)
+    mult % vof % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
+    call Control_Mod_Blending_Coefficient_For_Multiphase  (mult % vof % blend)
+    call Control_Mod_Simple_Underrelaxation_For_Multiphase(mult % vof % urf)
+    call Control_Mod_Tolerance_For_Multiphase_Solver      (mult % vof % tol)
+    call Control_Mod_Preconditioner_For_System_Matrix     (mult % vof % precond)
+    call Control_Mod_Max_Iterations_For_Multiphase_Solver (mult % vof % niter)
   end if
 
   !--------------------------------!

@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine Control_Mod_Results_Save_Interval(val, verbose)
+  subroutine Control_Mod_Simple_Underrelaxation_For_Multiphase(val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer           :: val
+  real              :: val
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Int_Item('RESULTS_SAVE_INTERVAL', 50, &
-                                  val, verbose)
+  call Control_Mod_Read_Real_Item('SIMPLE_UNDERRELAXATION_FOR_MULTIPHASE', 0.5,  &
+                                   val, verbose)
 
   end subroutine

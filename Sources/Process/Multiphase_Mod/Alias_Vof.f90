@@ -1,13 +1,14 @@
 !==============================================================================!
-  subroutine Control_Mod_Results_Save_Interval(val, verbose)
+  subroutine Multiphase_Mod_Alias_Vof(mult, vof)
+!------------------------------------------------------------------------------!
+!   Creates aliases for volume fraction.  (Actually, only one alias.)          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer           :: val
-  logical, optional :: verbose
+  type(Multiphase_Type), target  :: mult
+  type(Var_Type),        pointer :: vof
 !==============================================================================!
 
-  call Control_Mod_Read_Int_Item('RESULTS_SAVE_INTERVAL', 50, &
-                                  val, verbose)
+  vof => mult % vof
 
   end subroutine

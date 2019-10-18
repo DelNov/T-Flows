@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Initialize_Variables(flow, turb, swarm)
+  subroutine Initialize_Variables(flow, turb, mult, swarm)
 !------------------------------------------------------------------------------!
 !   Initialize dependent variables.  (It is a bit of a mess still)             !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Field_Mod,   only: Field_Type, heat_transfer, density, multiphase,       &
+  use Field_Mod,   only: Field_Type, heat_transfer, density,  &
                           dens_face
   use Comm_Mod
   use Turb_Mod
@@ -14,13 +14,15 @@
   use Bulk_Mod
   use User_Mod
   use Control_Mod
+  use Multiphase_Mod
   use Numerics_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
-  type(Turb_Type),  target :: turb
-  type(Swarm_Type), target :: swarm
+  type(Field_Type),      target :: flow
+  type(Turb_Type),       target :: turb
+  type(Multiphase_Type), target :: mult
+  type(Swarm_Type),      target :: swarm
 !----------------------------------[Calling]-----------------------------------!
   integer :: Key_Ind
 !-----------------------------------[Locals]-----------------------------------!
@@ -29,6 +31,7 @@
   type(Var_Type),  pointer :: u, v, w, t, phi
   type(Var_Type),  pointer :: kin, eps, f22, zeta, vis, t2
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
+  type(Var_Type),  pointer :: vol_flux
   real,            pointer :: u_mean(:), v_mean(:), w_mean(:)
   real,            pointer :: flux(:)
   integer                  :: i, c, c1, c2, m, s, nks, nvs, sc
@@ -54,13 +57,14 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => flow % pnt_grid
-  bulk => flow % bulk
-  flux => flow % flux
-  vis  => turb % vis
-  u_mean => turb % u_mean
-  v_mean => turb % v_mean
-  w_mean => turb % w_mean
+  grid     => flow % pnt_grid
+  bulk     => flow % bulk
+  flux     => flow % flux
+  vol_flux => flow % vol_flux
+  vis      => turb % vis
+  u_mean   => turb % u_mean
+  v_mean   => turb % v_mean
+  w_mean   => turb % w_mean
   call Field_Mod_Alias_Momentum   (flow, u, v, w)
   call Field_Mod_Alias_Energy     (flow, t)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
@@ -242,8 +246,10 @@
         call To_Upper_Case(keys(i))
       end do
 
-      if (multiphase) then
+      if (multiphase_model .eq. VOLUME_OF_FLUID) then
         mult_dummy = floor(vals(Key_Ind('V_FRAC', keys, nks)))
+        ! Initialize vof function:
+        call Multiphase_Mod_Vof_Initialization(mult, mult_dummy)
       else !density at faces:
         do s = 1, grid % n_faces
           dens_face(s) = density(grid % faces_c(1,s))
@@ -382,9 +388,10 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
     if(c2  < 0) then
-      flux(s) = density(c1) * ( u % n(c2) * grid % sx(s) + &
-                          v % n(c2) * grid % sy(s) +       &
-                          w % n(c2) * grid % sz(s) )
+      vol_flux % n(s) =  ( u % n(c2) * grid % sx(s) +   &
+                           v % n(c2) * grid % sy(s) +   &
+                           w % n(c2) * grid % sz(s) )
+      flux(s) = dens_face(s) * vol_flux % n(s)
 
       if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
         bulk % mass_in = bulk % mass_in - flux(s)
@@ -403,9 +410,11 @@
       if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT)   &
         n_convect     = n_convect     + 1
     else
+      vol_flux % n(s) = 0.0
       flux(s) = 0.0
     end if
   end do
+
 
   call Comm_Mod_Global_Sum_Int(n_wall)
   call Comm_Mod_Global_Sum_Int(n_inflow)
@@ -422,7 +431,7 @@
   if(this_proc  < 2) then
     if(n_inflow .gt. 0) then
       print '(a29,es12.5)', ' # Mass inflow             : ', bulk % mass_in
-      if (multiphase) then
+      if (multiphase_model .eq. VOLUME_OF_FLUID) then
         ! Needs to be corrected
         print '(a29,es12.5)', ' # Average inflow velocity : ',  &
           bulk % mass_in / (dens_face(1) * area)

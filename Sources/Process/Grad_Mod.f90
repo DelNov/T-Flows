@@ -7,7 +7,8 @@
   use Const_Mod
   use Comm_Mod
   use Grid_Mod
-  use Var_Mod,  only: Var_Type
+  use Var_Mod,   only : Var_Type
+  use Field_Mod, only : density, grav_x, grav_y, grav_z
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -24,6 +25,7 @@
   include 'Grad_Mod/Array.f90'
   include 'Grad_Mod/Calculate_Matrix.f90'
   include 'Grad_Mod/Pressure.f90'
+  include 'Grad_Mod/Pressure_Correction.f90'
   include 'Grad_Mod/Component.f90'
   include 'Grad_Mod/Variable.f90'
 

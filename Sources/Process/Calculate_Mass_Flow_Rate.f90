@@ -1,23 +1,25 @@
 !==============================================================================!
-  subroutine Calculate_Mass_Field_Rate(flow)
+  subroutine Calculate_Mass_Field_Rate(flow, mult)
 !------------------------------------------------------------------------------!
 !   Calculate mass flow rate at cell faces based on velocities only.           !
 !----------------------------------[Modules]-----------------------------------!
-  use Grid_Mod,  only: Grid_Type
-  use Field_Mod, only: Field_Type, Field_Mod_Alias_Momentum, density,          &
-                       multiphase, density_mult
-  use Var_Mod,   only: Var_Type
+  use Grid_Mod,       only: Grid_Type
+  use Field_Mod,      only: Field_Type, Field_Mod_Alias_Momentum, density
+  use Var_Mod,        only: Var_Type
+  use Multiphase_Mod, only: Multiphase_Type, phase_dens, multiphase_model,  &
+                            VOLUME_OF_FLUID
+  use Work_Mod,       only: dens_face => r_face_01
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
+  type(Field_Type),      target :: flow
+  type(Multiphase_Type), target :: mult
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: u, v, w
   real,            pointer :: flux(:)
   integer                  :: s, c1, c2
   real                     :: fs
-  real       , allocatable :: dens_face(:)
 !==============================================================================!
 
   ! Take aliases
@@ -25,19 +27,17 @@
   flux => flow % flux
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
-  allocate(dens_face(grid % n_faces))
-
-  if (multiphase) then
+  if (multiphase_model .eq. VOLUME_OF_FLUID) then
     do s=1, grid % n_faces
-      dens_face(s) = flow % vof_f(s) * density_mult(1)                    &
-                   + (1.0 - flow % vof_f(s)) * density_mult(2)
+      dens_face(s) = mult % vof_f(s)         * phase_dens(1)  &
+                   + (1.0 - mult % vof_f(s)) * phase_dens(2)
     end do
   else
     do s=1, grid % n_faces
       dens_face(s) = density(grid % faces_c(1,s))
     end do
-
   end if
+
   !-------------------------------------------------!
   !   Calculate the mass fluxes on the cell faces   !
   !-------------------------------------------------!

@@ -1,31 +1,34 @@
 !==============================================================================!
-  subroutine Compute_Pressure(flow, sol, dt, ini)
+  subroutine Compute_Pressure(flow, mult, sol, dt, ini)
 !------------------------------------------------------------------------------!
 !   Forms and solves pressure equation for the SIMPLE method.                  !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Comm_Mod
   use Const_Mod
-  use Cpu_Timer_Mod, only: Cpu_Timer_Mod_Start, Cpu_Timer_Mod_Stop
+  use Cpu_Timer_Mod,  only: Cpu_Timer_Mod_Start, Cpu_Timer_Mod_Stop
   use Field_Mod
-  use Grid_Mod,      only: Grid_Type
-  use Bulk_Mod,      only: Bulk_Type
-  use Info_Mod,      only: Info_Mod_Iter_Fill_At
-  use Solver_Mod,    only: Solver_Type, Bicg, Cg, Cgs, Acm
-  use Matrix_Mod,    only: Matrix_Type
+  use Grid_Mod,       only: Grid_Type
+  use Bulk_Mod,       only: Bulk_Type
+  use Info_Mod,       only: Info_Mod_Iter_Fill_At
+  use Solver_Mod,     only: Solver_Type, Bicg, Cg, Cgs, Acm
+  use Matrix_Mod,     only: Matrix_Type
   use Control_Mod
+  use Multiphase_Mod, only: Multiphase_Type, surface_tension,  &
+                            multiphase_model, VOLUME_OF_FLUID
   use User_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),  target :: flow
-  type(Solver_Type), target :: sol
-  real                      :: dt
-  integer                   :: ini
+  type(Field_Type),      target :: flow
+  type(Multiphase_Type), target :: mult
+  type(Solver_Type),     target :: sol
+  real                          :: dt
+  integer                       :: ini
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Bulk_Type),   pointer :: bulk
-  type(Var_Type),    pointer :: u, v, w, p, pp
+  type(Var_Type),    pointer :: u, v, w, p, pp, vol_flux
   real,              pointer :: flux(:)
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
@@ -35,7 +38,7 @@
   real                       :: px_f, py_f, pz_f
   character(len=80)          :: solver
   real                       :: p_max, p_min, p_nor, p_nor_c
-  real                       :: dens_const
+  real                       :: dens_const, dotprod, stens_source
 !==============================================================================!
 !
 !   The form of equations which I am solving:
@@ -62,13 +65,14 @@
   call Cpu_Timer_Mod_Start('Compute_Pressure (without solvers)')
 
   ! Take aliases
-  grid => flow % pnt_grid
-  bulk => flow % bulk
-  flux => flow % flux
-  p    => flow % p
-  pp   => flow % pp
-  a    => sol % a
-  b    => sol % b % val
+  grid     => flow % pnt_grid
+  bulk     => flow % bulk
+  flux     => flow % flux
+  vol_flux => flow % vol_flux
+  p        => flow % p
+  pp       => flow % pp
+  a        => sol % a
+  b        => sol % b % val
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! User function
@@ -126,21 +130,13 @@
       w_f = fs * w % n(c1) + (1.0-fs) * w % n(c2)
 
       ! Calculate coeficients for the system matrix
-      if(c2 > 0) then
-        a12 = 0.5 * dens_const * a % fc(s) *        &
-           (  grid % vol(c1) / a % sav(c1)          &
-            + grid % vol(c2) / a % sav(c2) )
-        a % val(a % pos(1,s)) = -a12
-        a % val(a % pos(2,s)) = -a12
-        a % val(a % dia(c1))  = a % val(a % dia(c1)) +  a12
-        a % val(a % dia(c2))  = a % val(a % dia(c2)) +  a12
-      else  ! I am somewhat surprised this part is here
-        a12 = 0.5 * dens_const * a % fc(s) *        &
-             (  grid % vol(c1) / a % sav(c1)        &
-              + grid % vol(c2) / a % sav(c2) )
-        a % val(a % pos(1,s)) = -a12
-        a % val(a % dia(c1))  = a % val(a % dia(c1)) +  a12
-      end if 
+      a12 = 0.5 * dens_const * a % fc(s)             &
+           * ( grid % vol(c1) / a % sav(c1)          &
+             + grid % vol(c2) / a % sav(c2) )
+      a % val(a % pos(1,s)) = -a12
+      a % val(a % pos(2,s)) = -a12
+      a % val(a % dia(c1))  = a % val(a % dia(c1)) +  a12
+      a % val(a % dia(c2))  = a % val(a % dia(c2)) +  a12
 
       ! Interpolate pressure gradients
       px_f = 0.5*( p % x(c1) + p % x(c2) ) * grid % dx(s)
@@ -148,14 +144,20 @@
       pz_f = 0.5*( p % z(c1) + p % z(c2) ) * grid % dz(s)
 
       ! Calculate flux through cell face
-      flux(s) = dens_const * (  u_f*grid % sx(s)       &
-                              + v_f*grid % sy(s)       &
-                              + w_f*grid % sz(s) )     &
-                + a12 * (p % n(c1) - p % n(c2))        &
-                + a12 * (px_f + py_f + pz_f)
+      a12 = 0.5 * a % fc(s)                          &
+           * ( grid % vol(c1) / a % sav(c1)          &
+             + grid % vol(c2) / a % sav(c2) )
 
-      b(c1)=b(c1)-flux(s)
-      if(c2  > 0) b(c2)=b(c2)+flux(s)
+      vol_flux % n(s) = (  u_f*grid % sx(s)       &
+                         + v_f*grid % sy(s)       &
+                         + w_f*grid % sz(s) )     &
+                         + a12 * (p % n(c1) - p % n(c2)) &
+                         + a12 * (px_f + py_f + pz_f)
+
+      flux(s) = dens_face(s) * vol_flux % n(s)
+
+      b(c1) = b(c1) - flux(s)
+      b(c2) = b(c2) + flux(s)
 
     ! Side is on the boundary
     else ! (c2 < 0)
@@ -164,42 +166,99 @@
         u_f = u % n(c2)
         v_f = v % n(c2)
         w_f = w % n(c2)
-        flux(s) = density(c1) * (  u_f * grid % sx(s)  &
-                                 + v_f * grid % sy(s)  &
-                                 + w_f * grid % sz(s) )
-        b(c1) = b(c1)-flux(s)
+        vol_flux % n(s) = (  u_f * grid % sx(s)  &
+                           + v_f * grid % sy(s)  &
+                           + w_f * grid % sz(s) )
+
+        flux(s) = dens_face(s) * vol_flux % n(s)
+
+        b(c1) = b(c1) - flux(s)
       else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW .or.   &
               Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) then
         u_f = u % n(c2)
         v_f = v % n(c2)
         w_f = w % n(c2)
-        flux(s) = density(c1) * (  u_f*grid % sx(s)  &
-                                 + v_f*grid % sy(s)  &
-                                 + w_f*grid % sz(s) )
-        b(c1) = b(c1)-flux(s)
+        vol_flux % n(s) =  (  u_f*grid % sx(s)  &
+                            + v_f*grid % sy(s)  &
+                            + w_f*grid % sz(s) )
 
-        a12 = density(c1) * a % fc(s) * grid % vol(c1) / a % sav(c1)
+        flux(s) = dens_face(s) * vol_flux % n(s)
+
+        b(c1) = b(c1) - flux(s)
+
+        a12 = dens_face(s) * a % fc(s) * grid % vol(c1) / a % sav(c1)
         a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
 
       else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE) then
         u_f = u % n(c1)
         v_f = v % n(c1)
         w_f = w % n(c1)
-        flux(s) = density(c1) * (  u_f * grid % sx(s)  &
-                                 + v_f * grid % sy(s)  &
-                                 + w_f * grid % sz(s) )
-        b(c1) = b(c1)-flux(s)
+        vol_flux % n(s) = (  u_f * grid % sx(s)  &
+                           + v_f * grid % sy(s)  &
+                           + w_f * grid % sz(s) )
 
-        a12 = density(c1) * a % fc(s) * grid % vol(c1) / a % sav(c1)
+        flux(s) = dens_face(s) * vol_flux % n(s)
+
+        b(c1) = b(c1) - flux(s)
+
+        a12 = dens_face(s) * a % fc(s) * grid % vol(c1) / a % sav(c1)
         a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
 
       else  ! it is SYMMETRY
+        vol_flux % n(s) = 0.0
         flux(s) = 0.0
       end if
     end if
 
   end do
 
+  !--------------------------------------------------!
+  !   In case of VOF, surface tension contribution   !
+  !--------------------------------------------------!
+
+  if(multiphase_model .eq. VOLUME_OF_FLUID) then
+
+    if(abs(surface_tension) > TINY) then
+      do s = 1, grid % n_faces
+        c1 = grid % faces_c(1,s)
+        c2 = grid % faces_c(2,s)
+        fs = grid % f(s)
+
+        ! Face is inside the domain
+        if(c2 > 0) then
+
+          a12 = 0.5 * a % fc(s)                         &
+              * ( grid % vol(c1) / a % sav(c1)          &
+                + grid % vol(c2) / a % sav(c2) )
+
+          ! Interpolate VOF gradients
+          dotprod =  0.5 * (mult % vof % x(c1) + mult % vof % x(c2))          &
+                          * grid % dx(s)                                      &
+                   + 0.5 * (mult % vof % y(c1) + mult % vof % y(c2))          &
+                          * grid % dy(s)                                      &
+                   + 0.5 * (mult % vof % z(c1) + mult % vof % z(c2))          &
+                          * grid % dz(s)
+
+          a12 = a12 * 0.5 * ( mult % vof % oo(c1)                             &
+                            + mult % vof % oo(c2) ) * surface_tension
+
+          stens_source = a12 * ( mult % vof % n(c2) -  mult % vof % n(c1)     &
+                               - dotprod )
+
+          vol_flux % n(s) = vol_flux % n(s) + stens_source
+
+          flux(s) = flux(s) + dens_face(s) * stens_source  
+
+          b(c1) = b(c1) - dens_face(s) * stens_source           
+          b(c2) = b(c2) + dens_face(s) * stens_source
+
+        end if
+
+      end do
+
+    end if
+
+  end if
   mass_err = 0.0
   do c = 1, grid % n_cells
     mass_err = max(mass_err, abs(b(c)))

@@ -23,33 +23,35 @@
   use Monitor_Mod
   use Backup_Mod
   use Surf_Mod
+  use Multiphase_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Calling]------------------------------------!
   real :: Correct_Velocity
 !----------------------------------[Locals]------------------------------------!
-  integer           :: n, sc
-  real              :: mass_res
-  character(len=80) :: name_save, name_save_bnd
-  logical           :: backup, save_now, exit_now
-  type(Grid_Type)   :: grid            ! grid used in computations
-  type(Field_Type)  :: flow            ! flow field we will be solving for
-  type(Swarm_Type)  :: swarm           ! swarm of particles
-  type(Surf_Type)   :: surf            ! interface between two phases
-  type(Turb_Type)   :: turb            ! turbulence modelling
-  type(Solver_Type) :: sol             ! linear solvers
-  real              :: time            ! physical time of the simulation
-  integer           :: first_dt        ! first time step in this run
-  integer           :: last_dt         ! number of time steps
-  integer           :: max_ini         ! max number of inner iterations
-  integer           :: min_ini         ! min number of inner iterations
-  integer           :: n_stat          ! starting time step for statistic
-  integer           :: ini             ! inner iteration counter
-  integer           :: bsi, rsi        ! backup and results save interval
-  real              :: simple_tol      ! tolerance for SIMPLE algorithm
-  integer           :: sc_cr           ! system clock count rate
-  integer           :: sc_ini, sc_cur  ! system clock start and end rate
-  real              :: wt_max
+  integer               :: n, sc
+  real                  :: mass_res
+  character(len=80)     :: name_save, name_save_bnd
+  logical               :: backup, save_now, exit_now
+  type(Grid_Type)       :: grid            ! grid used in computations
+  type(Field_Type)      :: flow            ! flow field we will be solving for
+  type(Swarm_Type)      :: swarm           ! swarm of particles
+  type(Surf_Type)       :: surf            ! interface between two phases
+  type(Turb_Type)       :: turb            ! turbulence modelling
+  type(Multiphase_Type) :: mult            ! multiphase modelling
+  type(Solver_Type)     :: sol             ! linear solvers
+  real                  :: time            ! physical time of the simulation
+  integer               :: first_dt        ! first time step in this run
+  integer               :: last_dt         ! number of time steps
+  integer               :: max_ini         ! max number of inner iterations
+  integer               :: min_ini         ! min number of inner iterations
+  integer               :: n_stat          ! starting time step for statistic
+  integer               :: ini             ! inner iteration counter
+  integer               :: bsi, rsi        ! backup and results save interval
+  real                  :: simple_tol      ! tolerance for SIMPLE algorithm
+  integer               :: sc_cr           ! system clock count rate
+  integer               :: sc_ini, sc_cur  ! system clock start and end rate
+  real                  :: wt_max
 !==============================================================================!
 
   ! Initialize program profler
@@ -122,17 +124,17 @@
 
   call Load_Physical_Properties(grid)
 
-  call Load_Boundary_Conditions(flow, turb, backup)
+  call Load_Boundary_Conditions(flow, turb, mult, backup)
 
   ! First time step is one, unless read from backup otherwise
   first_dt = 0
 
   ! Read backup file if directed so, and set the "backup" to .true. or .false.
-  call Backup_Mod_Load(flow, swarm, turb, first_dt, n_stat, backup) 
+  call Backup_Mod_Load(flow, swarm, turb, mult, first_dt, n_stat, backup) 
 
   ! Initialize variables
   if(.not. backup) then
-    call Initialize_Variables(flow, turb, swarm)
+    call Initialize_Variables(flow, turb, mult, swarm)
     call Comm_Mod_Wait
   end if
 
@@ -172,6 +174,7 @@
 
   ! call Surf_Mod_Place_At_Var_Value(surf, flow % t, 0.5001)
   ! call Save_Surf(surf, 'surface')
+  ! stop
 
   call Control_Mod_Time_Step(flow % dt, verbose=.true.)
   call Control_Mod_Backup_Save_Interval (bsi,    verbose=.true.)
@@ -196,11 +199,14 @@
 
   ! It will save results in .vtk or .cgns file format,
   ! depending on how the code was compiled
-  call Save_Results(flow, turb, name_save,     .true.)   ! save inside
-  call Save_Results(flow, turb, name_save_bnd, .false.)  ! save boundary
+  call Save_Results(flow, turb, mult, name_save,     .true.)   ! save inside
+  call Save_Results(flow, turb, mult, name_save_bnd, .false.)  ! save boundary
   call Save_Swarm (swarm, problem_name)
 
   do n = first_dt + 1, last_dt
+    ! For post-processing
+
+    !call  Multiphase_Mod_Vof_Spurious_Post(flow, time, n)
 
     time = time + flow % dt
 
@@ -226,6 +232,13 @@
     call Control_Mod_Max_Simple_Iterations(max_ini)
     call Control_Mod_Min_Simple_Iterations(min_ini)
 
+    ! Volume of Fluid
+    if(multiphase_model .eq. VOLUME_OF_FLUID) then
+      ! Update the values at boundaries
+      call Update_Boundary_Values(flow, turb, mult)
+      call Multiphase_Mod_Compute_Vof(mult, sol, flow % dt, 1)
+    end if
+
     do ini = 1, max_ini
 
       call Info_Mod_Iter_Fill(ini)
@@ -238,30 +251,30 @@
       call Grad_Mod_Variable(flow % w)
 
       ! All velocity components one after another
-      call Compute_Momentum(flow, turb, 1, sol, flow % dt, ini)
-      call Compute_Momentum(flow, turb, 2, sol, flow % dt, ini)
-      call Compute_Momentum(flow, turb, 3, sol, flow % dt, ini)
+      call Compute_Momentum(flow, turb, mult, 1, sol, flow % dt, ini)
+      call Compute_Momentum(flow, turb, mult, 2, sol, flow % dt, ini)
+      call Compute_Momentum(flow, turb, mult, 3, sol, flow % dt, ini)
 
       ! Refresh buffers for a % sav before discretizing for pressure
       ! (Can this call be somewhere in Compute Pressure?)
       call Comm_Mod_Exchange_Real(grid, sol % a % sav)
 
       call Balance_Mass(flow)
-      call Compute_Pressure(flow, sol, flow % dt, ini)
+      call Compute_Pressure(flow, mult, sol, flow % dt, ini)
 
-      call Grad_Mod_Pressure(flow % pp)
+      call Grad_Mod_Pressure_Correction(flow % pp)
 
       call Bulk_Mod_Calculate_Fluxes(grid, flow % bulk, flow % flux)
       mass_res = Correct_Velocity(flow, sol, flow % dt, ini)
 
       ! Energy (practically temperature)
       if(heat_transfer) then
-        call Compute_Energy(flow, turb, sol, flow % dt, ini)
+        call Compute_Energy(flow, turb, mult, sol, flow % dt, ini)
       end if
 
       ! Passive scalars
       do sc = 1, flow % n_scalars
-        call Compute_Scalar(flow, turb, sol, flow % dt, ini, sc)
+        call Compute_Scalar(flow, turb, mult, sol, flow % dt, ini, sc)
       end do
 
       ! Deal with turbulence (if you dare ;-))
@@ -328,7 +341,7 @@
        exit_now           .or.  &
        mod(n, bsi) .eq. 0 .or.  &
        (sc_cur-sc_ini)/real(sc_cr) > wt_max) then
-      call Backup_Mod_Save(flow, swarm, turb, n, n_stat, name_save)
+      call Backup_Mod_Save(flow, swarm, turb, mult, n, n_stat, name_save)
     end if
 
     ! Is it time to save results for post-processing
@@ -337,12 +350,12 @@
        mod(n, rsi) .eq. 0 .or.  &
        (sc_cur-sc_ini)/real(sc_cr) > wt_max) then
       call Comm_Mod_Wait
-      call Save_Results(flow, turb, name_save,     .true.)   ! save inside
-      call Save_Results(flow, turb, name_save_bnd, .false.)  ! save boundary
+      call Save_Results(flow, turb, mult, name_save,     .true.)   ! save inside
+      call Save_Results(flow, turb, mult, name_save_bnd, .false.)  ! save bnd
       call Save_Swarm (swarm, name_save)
 
       ! Write results in user-customized format
-      call User_Mod_Save_Results(flow, turb, name_save)
+      call User_Mod_Save_Results(flow, turb, mult, name_save)
       ! call User_Mod_Save_Swarm(swarm, name_save)  to be done!
     end if
 
@@ -374,7 +387,7 @@
 
   ! Save backup and post-processing files at exit
   call Comm_Mod_Wait
-  call Backup_Mod_Save(flow, swarm, turb, n, n_stat, name_save)
+  call Backup_Mod_Save(flow, swarm, turb, mult, n, n_stat, name_save)
 
   if(this_proc < 2) then
     open(9, file='stop')

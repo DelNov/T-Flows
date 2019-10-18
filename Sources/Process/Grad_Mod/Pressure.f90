@@ -25,43 +25,36 @@
   !-------------------------------------------!
   !   First extrapolation to boundary cells   !
   !-------------------------------------------!
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
-    if(c2 < 0) then
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. PRESSURE) then  
-        phi % n(c2) = phi % n(c1)
-      end if
-    end if
-  end do
 
-  call Grad_Mod_Component(grid, phi % n, 1, phi % x)  ! dp/dx
-  call Grad_Mod_Component(grid, phi % n, 2, phi % y)  ! dp/dy
-  call Grad_Mod_Component(grid, phi % n, 3, phi % z)  ! dp/dz
-
-  !-----------------------------------------------------!
-  !   Improve pressure on boundary cells iterativelly   !
-  !-----------------------------------------------------!
-  do iter = 1, 12
-
+  ! User specified gravity vector
+  if(sqrt(grav_x ** 2 + grav_y ** 2 + grav_z ** 2) > TINY) then
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
       if(c2 < 0) then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. PRESSURE) then
-          phi % n(c2) = phi % n(c1)   &
-                      + 1.0*( phi % x(c1) * (grid % xc(c2)-grid % xc(c1))  &
-                      +       phi % y(c1) * (grid % yc(c2)-grid % yc(c1))  &
-                      +       phi % z(c1) * (grid % zc(c2)-grid % zc(c1))  &
-                            )
+          phi % n(c2) = phi % n(c1) + density(c1) * (grav_x * grid % dx(s)    &
+                                                   + grav_y * grid % dy(s)    &
+                                                   + grav_z * grid % dz(s))
         end if
       end if
     end do
 
-    call Grad_Mod_Component(grid, phi % n, 1, phi % x)  ! dp/dx
-    call Grad_Mod_Component(grid, phi % n, 2, phi % y)  ! dp/dy
-    call Grad_Mod_Component(grid, phi % n, 3, phi % z)  ! dp/dz
+  ! No gravity vector was specified by the user
+  else
+    do s = 1, grid % n_faces
+      c1 = grid % faces_c(1,s)
+      c2 = grid % faces_c(2,s)
+      if(c2 < 0) then
+        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. PRESSURE) then
+          phi % n(c2) = phi % n(c1)
+        end if
+      end if
+    end do
+  end if
 
-  end do
+  call Grad_Mod_Component(grid, phi % n, 1, phi % x)  ! dp/dx
+  call Grad_Mod_Component(grid, phi % n, 2, phi % y)  ! dp/dy
+  call Grad_Mod_Component(grid, phi % n, 3, phi % z)  ! dp/dz
 
   end subroutine

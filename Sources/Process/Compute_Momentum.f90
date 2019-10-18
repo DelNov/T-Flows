@@ -1,33 +1,37 @@
 !==============================================================================!
-  subroutine Compute_Momentum(flow, turb, i, sol, dt, ini)
+  subroutine Compute_Momentum(flow, turb, mult, i, sol, dt, ini)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves momentum conservation equations                     !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
   use Comm_Mod
-  use Cpu_Timer_Mod, only: Cpu_Timer_Mod_Start, Cpu_Timer_Mod_Stop
-  use Field_Mod,     only: Field_Type, buoyancy, t_ref,  &
-                           grav_x, grav_y, grav_z,       &
-                           density, viscosity
+  use Cpu_Timer_Mod,  only: Cpu_Timer_Mod_Start, Cpu_Timer_Mod_Stop
+  use Field_Mod,      only: Field_Type, buoyancy, t_ref,  &
+                            grav_x, grav_y, grav_z,       &
+                            density, viscosity
   use Turb_Mod
-  use Var_Mod,       only: Var_Type
-  use Grid_Mod,      only: Grid_Type
-  use Bulk_Mod,      only: Bulk_Type
-  use Info_Mod,      only: Info_Mod_Iter_Fill_At
+  use Multiphase_Mod, only: Multiphase_Type, &
+                            Multiphase_Mod_Vof_Surface_Tension_Contribution,  &
+                            multiphase_model, VOLUME_OF_FLUID
+  use Var_Mod,        only: Var_Type
+  use Grid_Mod,       only: Grid_Type
+  use Bulk_Mod,       only: Bulk_Type
+  use Info_Mod,       only: Info_Mod_Iter_Fill_At
   use Numerics_Mod
-  use Solver_Mod,    only: Solver_Type, Solver_Mod_Alias_System, Bicg, Cg, Cgs
-  use Matrix_Mod,    only: Matrix_Type
+  use Solver_Mod,     only: Solver_Type, Solver_Mod_Alias_System, Bicg, Cg, Cgs
+  use Matrix_Mod,     only: Matrix_Type
   use User_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),  target :: flow
-  type(Turb_Type),   target :: turb
-  integer                   :: i           ! component
-  type(Solver_Type), target :: sol
-  real                      :: dt
-  integer                   :: ini
+  type(Field_Type),      target :: flow
+  type(Turb_Type),       target :: turb
+  type(Multiphase_Type), target :: mult
+  integer                       :: i           ! component
+  type(Solver_Type),     target :: sol
+  real                          :: dt
+  integer                       :: ini
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Bulk_Type),   pointer :: bulk
@@ -41,7 +45,7 @@
   real,              pointer :: h_i(:)
   integer                    :: s, c, c1, c2, exec_iter
   real                       :: f_ex, f_im, f_stress, fs
-  real                       :: uis, vel_max
+  real                       :: vel_max
   real                       :: a0, a12, a21
   real                       :: vis_eff, vis_ts
   real                       :: ui_i_f, ui_j_f, ui_k_f, uj_i_f, uk_i_f
@@ -411,19 +415,53 @@
   !   Gravity force   !
   !-------------------!
   else
-    if(ui % name .eq. 'U') then
-      do c = 1, grid % n_cells
-        b(c) = b(c) - density(c) * grav_x * grid % vol(c)
-      end do
-    else if(ui % name .eq. 'V') then
-      do c = 1, grid % n_cells
-        b(c) = b(c) - density(c) * grav_y * grid % vol(c)
-      end do
-    else if(ui % name .eq. 'W') then
-      do c = 1, grid % n_cells
-        b(c) = b(c) - density(c) * grav_z * grid % vol(c)
-      end do
+    if(sqrt(grav_x ** 2 + grav_y ** 2 + grav_z ** 2) > TINY) then
+      if(ui % name .eq. 'U') then
+        do c = 1, grid % n_cells
+          b(c) = b(c) + density(c) * grav_x * grid % vol(c)
+        end do
+      else if(ui % name .eq. 'V') then
+        do c = 1, grid % n_cells
+          b(c) = b(c) + density(c) * grav_y * grid % vol(c)
+        end do
+      else if(ui % name .eq. 'W') then
+        do c = 1, grid % n_cells
+          b(c) = b(c) + density(c) * grav_z * grid % vol(c)
+        end do
+      end if
     end if
+  end if
+
+  !----------------------------------!
+  !   Surface tension contribution   !
+  !----------------------------------!
+  if(multiphase_model .eq. VOLUME_OF_FLUID) then
+
+    if (surface_tension > TINY ) then
+      if(ui % name .eq. 'U') then
+        call Multiphase_Mod_Vof_Surface_Tension_Contribution(mult)
+        call Grad_Mod_Variable(mult % vof)
+        do c = 1, grid % n_cells
+          b(c) = b(c) + surface_tension * mult % vof % oo(c)  &
+                                        * mult % vof % x(c)   &
+                                        * grid % vol(c)
+        end do
+      else if(ui % name .eq. 'V') then
+        do c = 1, grid % n_cells
+          b(c) = b(c) + surface_tension * mult % vof % oo(c)  &
+                                        * mult % vof % y(c)   &
+                                        * grid % vol(c)
+        end do
+      else if(ui % name .eq. 'W') then
+        do c = 1, grid % n_cells
+          b(c) = b(c) + surface_tension * mult % vof % oo(c)  &
+                                        * mult % vof % z(c)   &
+                                        * grid % vol(c)
+        end do
+      end if
+
+    end if
+
   end if
 
   !----------------------------------------!

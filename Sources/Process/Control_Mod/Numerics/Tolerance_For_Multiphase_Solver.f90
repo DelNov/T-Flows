@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine Control_Mod_Results_Save_Interval(val, verbose)
+  subroutine Control_Mod_Tolerance_For_Multiphase_Solver(val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer           :: val
+  real              :: val
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Int_Item('RESULTS_SAVE_INTERVAL', 50, &
-                                  val, verbose)
+  call Control_Mod_Read_Real_Item('TOLERANCE_FOR_MULTIPHASE_SOLVER',  &
+                                   1.0e-6, val, verbose)
 
   end subroutine

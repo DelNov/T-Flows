@@ -31,10 +31,12 @@
   integer, parameter :: BLENDED   = 40093
   integer, parameter :: SUPERBEE  = 40099
   integer, parameter :: AVL_SMART = 40111
+  integer, parameter :: CICSAM    = 40123
+  integer, parameter :: STACS     = 40127
 
   ! Time integration parameters
-  integer, parameter :: LINEAR    = 40123
-  integer, parameter :: PARABOLIC = 40127
+  integer, parameter :: LINEAR    = 40129
+  integer, parameter :: PARABOLIC = 40151
 
   contains
 

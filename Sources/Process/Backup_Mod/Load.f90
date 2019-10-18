@@ -1,17 +1,18 @@
 !==============================================================================!
-  subroutine Backup_Mod_Load(fld, swr, tur,  &
+  subroutine Backup_Mod_Load(fld, swr, tur, mul,  &
                              time_step, time_step_stat, backup)
 !------------------------------------------------------------------------------!
 !   Loads backup files name.backup                                             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: fld
-  type(Swarm_Type), target :: swr
-  type(Turb_Type),  target :: tur
-  integer                  :: time_step       ! current time step
-  integer                  :: time_step_stat  ! starting step for statistics
-  logical                  :: backup, present
+  type(Field_Type),      target :: fld
+  type(Swarm_Type),      target :: swr
+  type(Turb_Type),       target :: tur
+  type(Multiphase_Type), target :: mul
+  integer                       :: time_step       ! current time step
+  integer                       :: time_step_stat  ! starting step for statist.
+  logical                       :: backup, present
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
@@ -41,8 +42,8 @@
   inquire(file=trim(name_in), exist=present )
   if(.not.present) then
     if(this_proc < 2) then
-      print *, '# ERROR!  Backup file ', trim(name_in), ' was not found.'
-      print *, '# Exiting!'
+      print *, "# ERROR!  Backup file ", trim(name_in), " was not found."
+      print *, "# Exiting!"
     end if
     call Comm_Mod_End
   end if
@@ -64,7 +65,7 @@
   if(vc .eq. 0) vc = 2048  ! for backward compatibility
 
   if(this_proc < 2) then
-    print *, '# Backup file holds ', vc, ' variables.'
+    print *, "# Backup file holds ", vc, " variables."
   end if
 
   !---------------!
@@ -93,14 +94,6 @@
   call Backup_Mod_Read_Real(fh,d,vc, 'bulk_p_drop_x', bulk % p_drop_x)
   call Backup_Mod_Read_Real(fh,d,vc, 'bulk_p_drop_y', bulk % p_drop_y)
   call Backup_Mod_Read_Real(fh,d,vc, 'bulk_p_drop_z', bulk % p_drop_z)
-
-  !----------------------------------!
-  !                                  !
-  !   Variable physical properties   !
-  !                                  !
-  !----------------------------------!
-  call Backup_Mod_Read_Cell(fh,d,vc, 'density',   density)
-  call Backup_Mod_Read_Cell(fh,d,vc, 'viscosity', viscosity)
 
   !----------------------------!
   !                            !
@@ -133,6 +126,15 @@
   !--------------!
   if(heat_transfer) then
     call Backup_Mod_Read_Variable(fh,d,vc, 'temp', fld % t)
+  end if
+
+  !--------------!
+  !              !
+  !  Multiphase  !
+  !              !
+  !--------------!
+  if(multiphase_model .eq. VOLUME_OF_FLUID) then
+    call Backup_Mod_Read_Variable(fh,d,vc, 'vof', mul % vof)
   end if
 
   !-----------------------!
@@ -193,6 +195,7 @@
     end if
 
   end if
+
 
   !----------------------------!
   !   Reynolds stress models   !

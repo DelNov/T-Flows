@@ -28,11 +28,15 @@
   call Var_Mod_Allocate_New_Only('PP', flow % pp, grid)
   call Var_Mod_Allocate_New_Only('P',  flow % p,  grid)
 
+  ! Allocate memory for volumetric flux
+  call Var_Mod_Allocate_Vol_Flux('V_FLUX','', flow % vol_flux, grid)
+
   ! Mass flow rates at cell faces are always needed
   allocate(flow % flux(grid % n_faces));  flow % flux = 0.
 
   ! density at cell faces:
   allocate(dens_face(grid % n_faces))
+
   !-----------------------------------------!
   !   Enthalpy conservation (temperature)   !
   !-----------------------------------------!
@@ -63,6 +67,5 @@
     call Var_Mod_Allocate_Solution(c_name, q_name, flow % scalar(sc), grid)
 
   end do
-
 
   end subroutine
