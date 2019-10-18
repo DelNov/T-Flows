@@ -192,17 +192,21 @@
     if(run .eq. 5) s = s_jn
     if(run .eq. 6) s = s_kn
     ea = side(s) % ea
-    if( (elem(ea) % i + elem(ea) % j + elem(ea) % k) .ne.  &
-        (side(s) % c + side(s) % d + side(s) % a) ) then
-      print *, '# ERROR A in splitting an element at run', run
-      stop
+    if(ea > 0) then
+      if( (elem(ea) % i + elem(ea) % j + elem(ea) % k) .ne.  &
+          (side(s) % c + side(s) % d + side(s) % a) ) then
+        print *, '# ERROR A in splitting an element at run', run
+        stop
+      end if
     end if
 
     eb = side(s) % eb
-    if( (elem(eb) % i + elem(eb) % j + elem(eb) % k) .ne.  &
-        (side(s) % c + side(s) % d + side(s) % b) ) then
-      print *, '# ERROR B in splitting an element at run', run
-      stop
+    if(eb > 0) then
+      if( (elem(eb) % i + elem(eb) % j + elem(eb) % k) .ne.  &
+          (side(s) % c + side(s) % d + side(s) % b) ) then
+        print *, '# ERROR B in splitting an element at run', run
+        stop
+      end if
     end if
   end do
 
@@ -213,13 +217,15 @@
     if(run .eq. 4) e = ei
     if(run .eq. 5) e = ej
     if(run .eq. 6) e = ek
-    sum_ijk = elem(e) % i + elem(e) % j + elem(e) % k
-    sum_cd  = side(elem(e) % si) % c + side(elem(e) % si) % d  &
-            + side(elem(e) % sj) % c + side(elem(e) % sj) % d  &
-            + side(elem(e) % sk) % c + side(elem(e) % sk) % d
-    if( sum_cd / sum_ijk .ne. 2 ) then
-      print *, '# ERROR C in splitting an element!'
-      stop
+    if(e > 0) then  ! ei, ej or ek can be zero
+      sum_ijk = elem(e) % i + elem(e) % j + elem(e) % k
+      sum_cd  = side(elem(e) % si) % c + side(elem(e) % si) % d  &
+              + side(elem(e) % sj) % c + side(elem(e) % sj) % d  &
+              + side(elem(e) % sk) % c + side(elem(e) % sk) % d
+      if( sum_cd / sum_ijk .ne. 2 ) then
+        print *, '# ERROR C in splitting an element!'
+        stop
+      end if
     end if
   end do
 
