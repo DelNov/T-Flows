@@ -138,6 +138,7 @@
   include 'Surf_Mod/Handle_6_Points.f90'
   include 'Surf_Mod/Place_At_Var_Value.f90'
   include 'Surf_Mod/Refine.f90'
+  include 'Surf_Mod/Relax_Geometry.f90'
   include 'Surf_Mod/Relax_Topology.f90'
   include 'Surf_Mod/Split_Element.f90'
   include 'Surf_Mod/Swap_Side.f90'

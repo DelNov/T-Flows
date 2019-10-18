@@ -162,6 +162,10 @@
     call Surf_Mod_Relax_Topology(surf)
     call Surf_Mod_Smooth(surf, phi, phi_e)
   end do
+  do j = 1, 3
+    call Surf_Mod_Relax_Geometry(surf)
+    call Surf_Mod_Smooth(surf, phi, phi_e)
+  end do
   call Surf_Mod_Statistics(surf)
 
   end subroutine
