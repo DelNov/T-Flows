@@ -16,7 +16,7 @@
 !==============================================================================!
 
   ! Allocate properties
-  allocate(density(-grid % n_bnd_cells:grid % n_cells))
+  allocate(density  (-grid % n_bnd_cells:grid % n_cells))
   allocate(viscosity(-grid % n_bnd_cells:grid % n_cells))
 
   call Control_Mod_Dynamic_Viscosity   (visc_const)
@@ -26,9 +26,9 @@
   call Control_Mod_Species_Diffusivity (diffusivity)
 
   if(multiphase_model .eq. VOLUME_OF_FLUID) then
-    call Control_Mod_Multiphase_Density  (phase_dens)
-    call Control_Mod_Multiphase_Viscosity(phase_visc)
-    call Control_Mod_Surface_Tension     (surface_tension)
+    call Control_Mod_Phase_Densities  (phase_dens)
+    call Control_Mod_Phase_Viscosities(phase_visc)
+    call Control_Mod_Surface_Tension  (surface_tension)
   else
     density(:)   = dens_const
     dens_face(:) = dens_const

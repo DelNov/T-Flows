@@ -1,7 +1,7 @@
 !==============================================================================!
-  subroutine Control_Mod_Multiphase_Viscosity(val, verbose)
+  subroutine Control_Mod_Phase_Densities(val, verbose)
 !------------------------------------------------------------------------------!
-!   Reading stuff related to passive scalars                                   !
+!   Reads as many densities as there are phases.                               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -12,7 +12,7 @@
 
   def = 1.0
 
-  call Control_Mod_Read_Real_Array('VISCOSITY_MULT',  &
-                                   size(val), def, val, verbose)
+  call Control_Mod_Read_Real_Array('PHASE_DENSITIES',  &
+                                    size(val), def, val, verbose)
 
   end subroutine

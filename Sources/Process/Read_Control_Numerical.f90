@@ -61,11 +61,11 @@
     flow % t % adv_scheme = Numerics_Mod_Advection_Scheme_Code      (name)
     call Control_Mod_Time_Integration_Scheme                        (name)
     flow % t % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
-    call Control_Mod_Blending_Coefficient_For_Energy     (flow % t % blend)
-    call Control_Mod_Simple_Underrelaxation_For_Energy   (flow % t % urf)
-    call Control_Mod_Tolerance_For_Energy_Solver         (flow % t % tol)
-    call Control_Mod_Preconditioner_For_System_Matrix    (flow % t % precond)
-    call Control_Mod_Max_Iterations_For_Energy_Solver    (flow % t % niter)
+    call Control_Mod_Blending_Coefficient_For_Energy  (flow % t % blend)
+    call Control_Mod_Simple_Underrelaxation_For_Energy(flow % t % urf)
+    call Control_Mod_Tolerance_For_Energy_Solver      (flow % t % tol)
+    call Control_Mod_Preconditioner_For_System_Matrix (flow % t % precond)
+    call Control_Mod_Max_Iterations_For_Energy_Solver (flow % t % niter)
   end if
 
   !--------------------------------!
