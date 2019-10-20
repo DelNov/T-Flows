@@ -308,7 +308,7 @@
 
     ! Calculate mean values
     call Turb_Mod_Calculate_Mean(turb, n_stat, n)
-    call User_Mod_Calculate_Mean(flow, n_stat, n)
+    call User_Mod_Calculate_Mean(turb, n_stat, n)
 
     ! Adjust pressure drops to keep the mass fluxes constant
     call Bulk_Mod_Adjust_P_Drops(flow % bulk, flow % dt)

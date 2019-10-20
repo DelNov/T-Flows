@@ -17,7 +17,6 @@
                       wt_save   => r_cell_11,  &
                       kin_vis_t => r_cell_12,  &
                       phi_save  => r_cell_13
-  use Field_Mod,   only: multiphase                                             
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
@@ -28,6 +27,7 @@
   logical                       :: plot_inside  ! plot results inside?
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: grid
+  type(Var_Type),  pointer :: phi
   character(len=80)        :: store_name, name_out, name_mean
   integer                  :: base
   integer                  :: block
