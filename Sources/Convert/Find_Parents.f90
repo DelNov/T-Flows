@@ -4,7 +4,8 @@
 !   Looks boundary cells' parents for meshes in which they are not given       !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Grid_Mod, only: Grid_Type
+  use Const_Mod, only: HUGE_INT
+  use Grid_Mod,  only: Grid_Type
   use Sort_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -14,7 +15,7 @@
   include 'Cell_Numbering_Neu.f90'
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: fn(6,4), j, n1, n2, c1, c2, cb, run
-  integer              :: n_match, n_found_parents, n_cells_fraction
+  integer              :: n_match
   integer              :: n_bnd_nodes  ! near boundary nodes
   integer              :: n_bnd_proj   ! bnd. cells projected from cells
   integer              :: n_near_bnd   ! number of near boundary cells
@@ -134,11 +135,12 @@
       end do ! n1
       if(n_match .eq. n_face_nodes) then
         n_bnd_proj = n_bnd_proj + 1
+        ai(1:4) = HUGE_INT
         ai(1:n_face_nodes) = grid % cells_n( fn(j,1:n_face_nodes), c1)
         call Sort_Mod_Int(ai)
-        a1(n_bnd_proj) = ai(2)
-        a2(n_bnd_proj) = ai(3)
-        a3(n_bnd_proj) = ai(4)
+        a1(n_bnd_proj) = ai(1)
+        a2(n_bnd_proj) = ai(2)
+        a3(n_bnd_proj) = ai(3)
         c (n_bnd_proj) = c1
         d (n_bnd_proj) = j
       end if ! n_match .eq. n_face_nodes
@@ -151,13 +153,13 @@
   !   Collect and sort data from boundary cells   !
   !-----------------------------------------------!
   do c2 = -grid % n_bnd_cells, -1
-    ai(1:4) = -1
     n_face_nodes = grid % cells_n_nodes(c2)
+    ai(1:4) = HUGE_INT
     ai(1:n_face_nodes) = grid % cells_n(1:n_face_nodes, c2)
     call Sort_Mod_Int(ai)
-    a1(-c2) = ai(2)
-    a2(-c2) = ai(3)
-    a3(-c2) = ai(4)
+    a1(-c2) = ai(1)
+    a2(-c2) = ai(2)
+    a3(-c2) = ai(3)
     b (-c2) = c2
   end do
   call Sort_Mod_3_Int_Carry_Int(a1, a2, a3, b)
