@@ -19,6 +19,7 @@
   integer              :: n_bnd_proj   ! bnd. cells projected from cells
   integer              :: n_near_bnd   ! number of near boundary cells
   integer              :: n_face_nodes ! number of nodes in a face
+  integer              :: n_cell_faces ! number of faces in a cell
   integer              :: n_fr_cells   ! for statistics
   integer, allocatable :: near_bnd(:)  ! near boundary cells
   logical, allocatable :: is_node_bnd(:)
@@ -31,6 +32,9 @@
   print *, '# Parent information not given in the input file!'
   print *, '# Looking for parents. This may take a few minutes'
   print *, '#-------------------------------------------------'
+
+  print *, '# Number of boundary cells: ', grid % n_bnd_cells
+  print *, '# Number of inside cells:   ', grid % n_cells
 
   !----------------------------------------!
   !   Allocate memory for helping arrays   !
@@ -107,7 +111,13 @@
     if(grid % cells_n_nodes(c1) .eq. 6) fn = neu_wed
     if(grid % cells_n_nodes(c1) .eq. 8) fn = neu_hex
 
-    do j = 1, 6  ! from 1 to 6th face (6 = hexahedron)
+    n_cell_faces = 6  ! assume it is a hexahedron
+    if(grid % cells_n_nodes(c1) .eq. 4) n_cell_faces = 4
+    if(grid % cells_n_nodes(c1) .eq. 5) n_cell_faces = 5
+    if(grid % cells_n_nodes(c1) .eq. 6) n_cell_faces = 5
+
+    ! Browse through all possible faces
+    do j = 1, n_cell_faces
       n_match = 0
 
       n_face_nodes = 4         ! assume it is a quad
@@ -124,7 +134,7 @@
       end do ! n1
       if(n_match .eq. n_face_nodes) then
         n_bnd_proj = n_bnd_proj + 1
-        ai(1:4) = grid % cells_n( fn(j,1:4), c1)
+        ai(1:n_face_nodes) = grid % cells_n( fn(j,1:n_face_nodes), c1)
         call Sort_Mod_Int(ai)
         a1(n_bnd_proj) = ai(2)
         a2(n_bnd_proj) = ai(3)
