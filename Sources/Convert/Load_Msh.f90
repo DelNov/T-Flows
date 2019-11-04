@@ -293,7 +293,7 @@
         if(type .eq. MSH_PENTA) then
           read(line % tokens(1), *) c       ! Gmsh cell number
           c = new(c)                        ! use T-Flows numbering
-          grid % cells_n_nodes(c) = 4
+          grid % cells_n_nodes(c) = 6
           read(line % tokens(2), *) grid % cells_n(1, c)
           read(line % tokens(3), *) grid % cells_n(2, c)
           read(line % tokens(4), *) grid % cells_n(3, c)
@@ -313,6 +313,10 @@
           read(line % tokens(7), *) grid % cells_n(6, c)
           read(line % tokens(8), *) grid % cells_n(8, c)
           read(line % tokens(9), *) grid % cells_n(7, c)
+        end if
+        if(type .eq. MSH_PYRA) then
+          print *, '# ERROR: Pyramid cells not implemented yet!'
+          stop
         end if
       end if
     end do
