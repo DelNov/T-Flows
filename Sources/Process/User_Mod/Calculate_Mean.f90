@@ -9,9 +9,9 @@
   type(Turb_Type), target  :: turb
   integer                  :: n0, n1
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type), target :: flow
-  type(Grid_Type), pointer :: grid
-  integer                  :: c, n
+  type(Field_Type), pointer :: flow
+  type(Grid_Type),  pointer :: grid
+  integer                   :: c, n
 !==============================================================================!
 
   if(.not. turbulence_statistics) return

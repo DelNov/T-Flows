@@ -17,17 +17,17 @@
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u, v, w, t
-  real,            pointer :: flux(:)
+  real,            pointer :: m_flux(:)
 !==============================================================================!
 
   ! Take aliases
-  grid => flow % pnt_grid
-  flux => flow % flux
-  bulk => flow % bulk
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
-  t    => flow % t
+  grid   => flow % pnt_grid
+  m_flux => flow % m_flux
+  bulk   => flow % bulk
+  u      => flow % u
+  v      => flow % v
+  w      => flow % w
+  t      => flow % t
 
   !-----------------------------------------------------! 
   !                                                     !
