@@ -21,18 +21,18 @@
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u, v, w, t
-  real,            pointer :: flux(:)
+  type(Face_Type), pointer :: m_flux
   integer                  :: c1, c2, s
 !==============================================================================!
 
   ! Take aliases
-  grid => flow % pnt_grid
-  bulk => flow % bulk
-  flux => flow % flux
+  grid   => flow % pnt_grid
+  bulk   => flow % bulk
+  m_flux => flow % m_flux
   call Field_Mod_Alias_Momentum(flow, u, v, w)
   call Field_Mod_Alias_Energy  (flow, t)
 
-  call Bulk_Mod_Calculate_Fluxes(grid, bulk, flux)
+  call Bulk_Mod_Calculate_Fluxes(grid, bulk, m_flux % n)
 
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
