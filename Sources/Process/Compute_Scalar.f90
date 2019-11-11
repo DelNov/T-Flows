@@ -10,6 +10,7 @@
   use Field_Mod,     only: Field_Type, diffusivity, density
   use Turb_Mod
   use Var_Mod
+  use Face_Mod
   use Grid_Mod
   use Grad_Mod
   use Info_Mod
@@ -42,7 +43,7 @@
   type(Var_Type),    pointer :: uu, vv, ww, uv, uw, vw
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
-  real,              pointer :: flux(:)
+  type(Face_Type),   pointer :: m_flux
   type(Var_Type),    pointer :: phi
   integer                    :: n, c, s, c1, c2, row, col, exec_iter
   real                       :: a0, a12, a21
@@ -68,9 +69,9 @@
   call Cpu_Timer_Mod_Start('Compute_Scalars')
 
   ! Take aliases
-  grid => flow % pnt_grid
-  flux => flow % flux
-  phi  => flow % scalar(sc)
+  grid   => flow % pnt_grid
+  m_flux => flow % m_flux
+  phi    => flow % scalar(sc)
   call Turb_Mod_Alias_Stresses(turb, uu, vv, ww, uv, uw, vw)
   call Solver_Mod_Alias_System(sol, a, b)
 
@@ -103,12 +104,12 @@
   !   Advection   !
   !               !
   !---------------!
-  call Numerics_Mod_Advection_Term(phi, 1.0, flux, sol,  &
-                                   phi % x,              &
-                                   phi % y,              &
-                                   phi % z,              &
-                                   grid % dx,            &
-                                   grid % dy,            &
+  call Numerics_Mod_Advection_Term(phi, 1.0, m_flux % n, sol,  &
+                                   phi % x,                    &
+                                   phi % y,                    &
+                                   phi % z,                    &
+                                   grid % dx,                  &
+                                   grid % dy,                  &
                                    grid % dz)
 
   !--------------!
@@ -182,11 +183,11 @@
                         + phiz_f2 * grid % sz(s))
 
     ! Implicit diffusive flux
-    f_im1 = dif_eff1 * a % fc(s)          &
+    f_im1 = dif_eff1 * a % fc(s)           &
           * (  phix_f1 * grid % dx(s)      &
              + phiy_f1 * grid % dy(s)      &
              + phiz_f1 * grid % dz(s) )
-    f_im2 = dif_eff2 * a % fc(s)          &
+    f_im2 = dif_eff2 * a % fc(s)           &
           * (  phix_f2 * grid % dx(s)      &
              + phiy_f2 * grid % dy(s)      &
              + phiz_f2 * grid % dz(s) )
@@ -202,8 +203,8 @@
     a12 = dif_eff1 * a % fc(s)
     a21 = dif_eff2 * a % fc(s)
 
-    a12 = a12  - min(flux(s), 0.0)
-    a21 = a21  + max(flux(s), 0.0)
+    a12 = a12  - min(m_flux % n(s), 0.0)
+    a21 = a21  + max(m_flux % n(s), 0.0)
 
     ! Fill the system matrix
     if(c2 > 0) then
@@ -213,7 +214,7 @@
       a % val(a % pos(2,s)) = a % val(a % pos(2,s)) - a21
     else if(c2 < 0) then
 
-      ! Outflow is included because of the flux 
+      ! Outflow is included because of the flux
       ! corrections which also affects velocities
       if( (Var_Mod_Bnd_Cell_Type(phi,c2) .eq. INFLOW) .or.  &
           (Var_Mod_Bnd_Cell_Type(phi,c2) .eq. WALL)   .or.  &

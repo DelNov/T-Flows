@@ -9,6 +9,7 @@
   use Field_Mod,    only: Field_Type, conductivity, capacity, density
   use Turb_Mod
   use Var_Mod,      only: Var_Type
+  use Face_Mod,     only: Face_Type
   use Grid_Mod,     only: Grid_Type
   use Grad_Mod
   use Info_Mod
@@ -29,7 +30,7 @@
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w, t
   type(Var_Type),    pointer :: ut, vt, wt
-  real,              pointer :: flux(:)
+  type(Face_Type),   pointer :: m_flux
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: n, c, s, c1, c2, exec_iter
@@ -70,8 +71,8 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => flow % pnt_grid
-  flux => flow % flux
+  grid   => flow % pnt_grid
+  m_flux => flow % m_flux
   call Field_Mod_Alias_Momentum  (flow, u, v, w)
   call Field_Mod_Alias_Energy    (flow, t)
   call Turb_Mod_Alias_Heat_Fluxes(turb, ut, vt, wt)
@@ -100,7 +101,7 @@
   !   Advection   !
   !               !
   !---------------!
-  call Numerics_Mod_Advection_Term(t, capacity, flux, sol,  &
+  call Numerics_Mod_Advection_Term(t, capacity, m_flux % n, sol,  &
                                    t % x,                   &
                                    t % y,                   &
                                    t % z,                   &
@@ -228,8 +229,8 @@
     a12 = con_eff1 * a % fc(s)
     a21 = con_eff2 * a % fc(s)
 
-    a12 = a12  - min(flux(s), 0.0) * capacity
-    a21 = a21  + max(flux(s), 0.0) * capacity
+    a12 = a12  - min(m_flux % n(s), 0.0) * capacity
+    a21 = a21  + max(m_flux % n(s), 0.0) * capacity
 
     ! Fill the system matrix
     if(c2 > 0) then
