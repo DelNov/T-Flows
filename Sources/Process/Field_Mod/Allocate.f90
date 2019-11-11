@@ -28,11 +28,9 @@
   call Var_Mod_Allocate_New_Only('PP', flow % pp, grid)
   call Var_Mod_Allocate_New_Only('P',  flow % p,  grid)
 
-  ! Allocate memory for volumetric flux
-  call Var_Mod_Allocate_Vol_Flux('V_FLUX','', flow % vol_flux, grid)
-
-  ! Mass flow rates at cell faces are always needed
-  allocate(flow % flux(grid % n_faces));  flow % flux = 0.
+  ! Allocate memory for mass and volumetric fluxes
+  call Face_Mod_Allocate_New_Only   ('M_FLUX', flow % m_flux, grid)
+  call Face_Mod_Allocate_New_And_Old('V_FLUX', flow % v_flux, grid)
 
   ! density at cell faces:
   allocate(dens_face(grid % n_faces))
