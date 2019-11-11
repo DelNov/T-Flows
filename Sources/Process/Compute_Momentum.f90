@@ -15,6 +15,7 @@
                             Multiphase_Mod_Vof_Surface_Tension_Contribution,  &
                             multiphase_model, VOLUME_OF_FLUID
   use Var_Mod,        only: Var_Type
+  use Face_Mod,       only: Face_Type
   use Grid_Mod,       only: Grid_Type
   use Bulk_Mod,       only: Bulk_Type
   use Info_Mod,       only: Info_Mod_Iter_Fill_At
@@ -38,7 +39,7 @@
   type(Matrix_Type), pointer :: a
   type(Var_Type),    pointer :: ui, uj, uk, t, p
   type(Var_Type),    pointer :: uu, vv, ww, uv, uw, vw
-  real,              pointer :: flux(:)
+  type(Face_Type),   pointer :: m_flux
   real,              pointer :: b(:)
   real,              pointer :: ui_i(:), ui_j(:), ui_k(:), uj_i(:), uk_i(:)
   real,              pointer :: si(:), sj(:), sk(:), di(:), dj(:), dk(:)
@@ -110,11 +111,11 @@
   call Cpu_Timer_Mod_Start('Compute_Momentum (without solvers)')
 
   ! Take aliases
-  grid => flow % pnt_grid
-  bulk => flow % bulk
-  flux => flow % flux
-  t    => flow % t
-  p    => flow % p
+  grid   => flow % pnt_grid
+  bulk   => flow % bulk
+  m_flux => flow % m_flux
+  t      => flow % t
+  p      => flow % p
   call Turb_Mod_Alias_Stresses(turb, uu, vv, ww, uv, uw, vw)
   call Solver_Mod_Alias_System(sol, a, b)
 
@@ -168,12 +169,12 @@
   !   Advection   !
   !               !
   !---------------!
-  call Numerics_Mod_Advection_Term(ui, 1.0, flux, sol,  &
-                                   ui_i,                &
-                                   ui_j,                &
-                                   ui_k,                &
-                                   di,                  &
-                                   dj,                  &
+  call Numerics_Mod_Advection_Term(ui, 1.0, m_flux % n, sol,  &
+                                   ui_i,                      &
+                                   ui_j,                      &
+                                   ui_k,                      &
+                                   di,                        &
+                                   dj,                        &
                                    dk)
 
   !---------------!
@@ -288,8 +289,8 @@
     a12 = a0
     a21 = a0
 
-    a12 = a12  - min(flux(s), real(0.0))
-    a21 = a21  + max(flux(s), real(0.0))
+    a12 = a12  - min(m_flux % n(s), real(0.0))
+    a21 = a21  + max(m_flux % n(s), real(0.0))
 
     ! Fill the system matrix
     if(c2 > 0) then

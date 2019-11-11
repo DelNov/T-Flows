@@ -25,8 +25,9 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Bulk_Type),   pointer :: bulk
-  type(Var_Type),    pointer :: u, v, w, p, pp, vol_flux
-  real,              pointer :: flux(:)
+  type(Var_Type),    pointer :: u, v, w, p, pp
+  type(Face_Type),   pointer :: m_flux
+  type(Face_Type),   pointer :: v_flux
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: c, c1, c2, s
@@ -38,14 +39,14 @@
   call Cpu_Timer_Mod_Start('Correct_Velocity')
 
   ! Take aliases
-  grid     => flow % pnt_grid
-  bulk     => flow % bulk
-  flux     => flow % flux
-  vol_flux => flow % vol_flux
-  p        => flow % p
-  pp       => flow % pp
-  a        => sol % a
-  b        => sol % b % val
+  grid   => flow % pnt_grid
+  bulk   => flow % bulk
+  m_flux => flow % m_flux
+  v_flux => flow % v_flux
+  p      => flow % p
+  pp     => flow % pp
+  a      => sol % a
+  b      => sol % b % val
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! User function
@@ -68,9 +69,9 @@
 
     if(c2  < 0) then
       if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE) ) then
-        u % n(c2) = u % n(c1) 
-        v % n(c2) = v % n(c1) 
-        w % n(c2) = w % n(c1) 
+        u % n(c2) = u % n(c1)
+        v % n(c2) = v % n(c1)
+        w % n(c2) = w % n(c1)
       end if
     end if
   end do 
@@ -90,8 +91,8 @@
           ( grid % vol(c1) / a % sav(c1)                                      &
           + grid % vol(c2) / a % sav(c2) )
 
-      vol_flux % n(s) = vol_flux % n(s) - (pp % n(c2) - pp % n(c1)) * a12
-      flux(s) = flux(s) + (pp % n(c2) - pp % n(c1))*a % val(a % pos(1,s))
+      v_flux % n(s) = v_flux % n(s) - (pp % n(c2) - pp % n(c1)) * a12
+      m_flux % n(s) = m_flux % n(s) + (pp % n(c2) - pp % n(c1)) * a % val(a % pos(1,s))
     end if               !                                               !
   end do                 !<------------ this is correction ------------->!
 
@@ -107,9 +108,9 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
-    b(c1) = b(c1) - flux(s)
+    b(c1) = b(c1) - m_flux % n(s)
     if(c2 > 0) then
-      b(c2) = b(c2) + flux(s)
+      b(c2) = b(c2) + m_flux % n(s)
     end if
   end do
 
@@ -135,12 +136,12 @@
     dens_const = dens_face(s)
     visc_const = grid % f(s) * viscosity(c1) + (1.0 - grid % f(s)) * viscosity(c2)
     if(c2 > 0) then
-      cfl_t = abs( dt * flux(s) / dens_const /      &
+      cfl_t = abs( dt * m_flux % n(s) / dens_const /      &
                    ( a % fc(s) *                 &
                    (  grid % dx(s)*grid % dx(s)  &
                     + grid % dy(s)*grid % dy(s)  &
                     + grid % dz(s)*grid % dz(s)) ) )
-      pe_t    = abs( flux(s) / a % fc(s) / (visc_const / dens_const + TINY) )
+      pe_t    = abs( m_flux % n(s) / a % fc(s) / (visc_const / dens_const + TINY) )
       cfl_max = max( cfl_max, cfl_t ) 
       pe_max  = max( pe_max,  pe_t  ) 
     end if

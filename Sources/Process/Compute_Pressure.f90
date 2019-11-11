@@ -29,7 +29,8 @@
   type(Grid_Type),   pointer :: grid
   type(Bulk_Type),   pointer :: bulk
   type(Var_Type),    pointer :: u, v, w, p, pp, vol_flux
-  real,              pointer :: flux(:)
+  type(Face_Type),   pointer :: m_flux
+  type(Face_Type),   pointer :: v_flux
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: s, c, c1, c2, exec_iter
@@ -65,14 +66,14 @@
   call Cpu_Timer_Mod_Start('Compute_Pressure (without solvers)')
 
   ! Take aliases
-  grid     => flow % pnt_grid
-  bulk     => flow % bulk
-  flux     => flow % flux
-  vol_flux => flow % vol_flux
-  p        => flow % p
-  pp       => flow % pp
-  a        => sol % a
-  b        => sol % b % val
+  grid   => flow % pnt_grid
+  bulk   => flow % bulk
+  m_flux => flow % m_flux
+  v_flux => flow % v_flux
+  p      => flow % p
+  pp     => flow % pp
+  a      => sol % a
+  b      => sol % b % val
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! User function
@@ -148,16 +149,16 @@
            * ( grid % vol(c1) / a % sav(c1)          &
              + grid % vol(c2) / a % sav(c2) )
 
-      vol_flux % n(s) = (  u_f*grid % sx(s)       &
-                         + v_f*grid % sy(s)       &
-                         + w_f*grid % sz(s) )     &
-                         + a12 * (p % n(c1) - p % n(c2)) &
-                         + a12 * (px_f + py_f + pz_f)
+      v_flux % n(s) = u_f * grid % sx(s)             &
+                    + v_f * grid % sy(s)             &
+                    + w_f * grid % sz(s)             &
+                    + a12 * (p % n(c1) - p % n(c2))  &
+                    + a12 * (px_f + py_f + pz_f)
 
-      flux(s) = dens_face(s) * vol_flux % n(s)
+      m_flux % n(s) = dens_face(s) * v_flux % n(s)
 
-      b(c1) = b(c1) - flux(s)
-      b(c2) = b(c2) + flux(s)
+      b(c1) = b(c1) - m_flux % n(s)
+      b(c2) = b(c2) + m_flux % n(s)
 
     ! Side is on the boundary
     else ! (c2 < 0)
@@ -166,25 +167,25 @@
         u_f = u % n(c2)
         v_f = v % n(c2)
         w_f = w % n(c2)
-        vol_flux % n(s) = (  u_f * grid % sx(s)  &
-                           + v_f * grid % sy(s)  &
-                           + w_f * grid % sz(s) )
+        v_flux % n(s) = u_f * grid % sx(s)  &
+                      + v_f * grid % sy(s)  &
+                      + w_f * grid % sz(s)
 
-        flux(s) = dens_face(s) * vol_flux % n(s)
+        m_flux % n(s) = dens_face(s) * v_flux % n(s)
 
-        b(c1) = b(c1) - flux(s)
+        b(c1) = b(c1) - m_flux % n(s)
       else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW .or.   &
               Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) then
         u_f = u % n(c2)
         v_f = v % n(c2)
         w_f = w % n(c2)
-        vol_flux % n(s) =  (  u_f*grid % sx(s)  &
-                            + v_f*grid % sy(s)  &
-                            + w_f*grid % sz(s) )
+        v_flux % n(s) = u_f*grid % sx(s)  &
+                      + v_f*grid % sy(s)  &
+                      + w_f*grid % sz(s)
 
-        flux(s) = dens_face(s) * vol_flux % n(s)
+        m_flux % n(s) = dens_face(s) * v_flux % n(s)
 
-        b(c1) = b(c1) - flux(s)
+        b(c1) = b(c1) - m_flux % n(s)
 
         a12 = dens_face(s) * a % fc(s) * grid % vol(c1) / a % sav(c1)
         a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
@@ -193,20 +194,20 @@
         u_f = u % n(c1)
         v_f = v % n(c1)
         w_f = w % n(c1)
-        vol_flux % n(s) = (  u_f * grid % sx(s)  &
-                           + v_f * grid % sy(s)  &
-                           + w_f * grid % sz(s) )
+        v_flux % n(s) = u_f * grid % sx(s)  &
+                      + v_f * grid % sy(s)  &
+                      + w_f * grid % sz(s)
 
-        flux(s) = dens_face(s) * vol_flux % n(s)
+        m_flux % n(s) = dens_face(s) * v_flux % n(s)
 
-        b(c1) = b(c1) - flux(s)
+        b(c1) = b(c1) - m_flux % n(s)
 
         a12 = dens_face(s) * a % fc(s) * grid % vol(c1) / a % sav(c1)
         a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
 
       else  ! it is SYMMETRY
-        vol_flux % n(s) = 0.0
-        flux(s) = 0.0
+        v_flux % n(s) = 0.0
+        m_flux % n(s) = 0.0
       end if
     end if
 
@@ -245,11 +246,10 @@
           stens_source = a12 * ( mult % vof % n(c2) -  mult % vof % n(c1)     &
                                - dotprod )
 
-          vol_flux % n(s) = vol_flux % n(s) + stens_source
+          v_flux % n(s) = v_flux % n(s) + stens_source
+          m_flux % n(s) = m_flux % n(s) + dens_face(s) * stens_source
 
-          flux(s) = flux(s) + dens_face(s) * stens_source  
-
-          b(c1) = b(c1) - dens_face(s) * stens_source           
+          b(c1) = b(c1) - dens_face(s) * stens_source
           b(c2) = b(c2) + dens_face(s) * stens_source
 
         end if
