@@ -31,9 +31,9 @@
   type(Var_Type),  pointer :: u, v, w, t, phi
   type(Var_Type),  pointer :: kin, eps, f22, zeta, vis, t2
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
-  type(Var_Type),  pointer :: vol_flux
+  type(Face_Type), pointer :: v_flux
+  type(Face_Type), pointer :: m_flux
   real,            pointer :: u_mean(:), v_mean(:), w_mean(:)
-  real,            pointer :: flux(:)
   integer                  :: i, c, c1, c2, m, s, nks, nvs, sc
   integer                  :: n_wall, n_inflow, n_outflow, n_symmetry,  &
                               n_heated_wall, n_convect
@@ -59,8 +59,8 @@
   ! Take aliases
   grid     => flow % pnt_grid
   bulk     => flow % bulk
-  flux     => flow % flux
-  vol_flux => flow % vol_flux
+  v_flux   => flow % v_flux
+  m_flux   => flow % m_flux
   vis      => turb % vis
   u_mean   => turb % u_mean
   v_mean   => turb % v_mean
@@ -371,11 +371,11 @@
 
   call User_Mod_Initialize(flow, turb, swarm)
 
-  !---------------------------------!
-  !      Calculate the inflow       !
-  !   and initializes the flux(s)   !
-  !   at both inflow and outflow    !
-  !---------------------------------!
+  !--------------------------------!
+  !      Calculate the inflow      !
+  !   and initializes the m_flux   !
+  !   at both inflow and outflow   !
+  !--------------------------------!
   n_wall        = 0
   n_inflow      = 0
   n_outflow     = 0
@@ -388,13 +388,13 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
     if(c2  < 0) then
-      vol_flux % n(s) =  ( u % n(c2) * grid % sx(s) +   &
-                           v % n(c2) * grid % sy(s) +   &
-                           w % n(c2) * grid % sz(s) )
-      flux(s) = dens_face(s) * vol_flux % n(s)
+      v_flux % n(s) = u % n(c2) * grid % sx(s)  &
+                    + v % n(c2) * grid % sy(s)  &
+                    + w % n(c2) * grid % sz(s)
+      m_flux % n(s) = dens_face(s) * v_flux % n(s)
 
       if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
-        bulk % mass_in = bulk % mass_in - flux(s)
+        bulk % mass_in = bulk % mass_in - m_flux % n(s)
         area = area  + grid % s(s)
       end if
       if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL)      &
@@ -410,8 +410,8 @@
       if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT)   &
         n_convect     = n_convect     + 1
     else
-      vol_flux % n(s) = 0.0
-      flux(s) = 0.0
+      v_flux % n(s) = 0.0
+      m_flux % n(s) = 0.0
     end if
   end do
 
