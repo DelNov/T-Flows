@@ -17,7 +17,7 @@
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u, v, w, t
-  real,            pointer :: m_flux(:)
+  type(Face_Type), pointer :: m_flux
 !==============================================================================!
 
   ! Take aliases
