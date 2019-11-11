@@ -10,6 +10,7 @@
                        INFLOW, OUTFLOW, CONVECT, PRESSURE
   use Field_Mod, only: Field_Type, Field_Mod_Alias_Momentum, dens_face
   use Var_Mod,   only: Var_Type
+  use Face_Mod,  only: Face_Type
   use Bulk_Mod,  only: Bulk_Type
 !------------------------------------------------------------------------------!
   implicit none
@@ -19,15 +20,17 @@
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u, v, w
-  real,            pointer :: flux(:)
+  type(Face_Type), pointer :: m_flux
+  type(Face_Type), pointer :: v_flux
   integer                  :: s, c1, c2
   real                     :: fac
 !==============================================================================!
 
   ! Take aliases
-  grid => flow % pnt_grid
-  bulk => flow % bulk
-  flux => flow % flux
+  grid   => flow % pnt_grid
+  bulk   => flow % bulk
+  m_flux => flow % m_flux
+  v_flux => flow % v_flux
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   !--------------------------------------!
@@ -38,20 +41,23 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
     if(c2 < 0) then
-      flux(s) = dens_face(s)*( u % n(c2)*grid % sx(s) + &
-                               v % n(c2)*grid % sy(s) + &
-                               w % n(c2)*grid % sz(s) )
+      v_flux % n(s) = u % n(c2)*grid % sx(s)  &
+                    + v % n(c2)*grid % sy(s)  &
+                    + w % n(c2)*grid % sz(s)
+      m_flux % n(s) = dens_face(s) * v_flux % n(s)
 
       if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
-        bulk % mass_in = bulk % mass_in - flux(s)
+        bulk % mass_in = bulk % mass_in - m_flux % n(s)
       end if
 
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE .and. flux(s)<0.) then
-        bulk % mass_in = bulk % mass_in - flux(s)
+      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE  &
+         .and. m_flux % n(s) < 0.0) then
+        bulk % mass_in = bulk % mass_in - m_flux % n(s)
       end if
 
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT .and. flux(s)<0.) then
-        bulk % mass_in = bulk % mass_in - flux(s)
+      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT  &
+         .and. m_flux % n(s) < 0.0) then
+        bulk % mass_in = bulk % mass_in - m_flux % n(s)
       end if
     end if
   end do
@@ -71,32 +77,37 @@
         u % n(c2) = u % n(c1)
         v % n(c2) = v % n(c1)
         w % n(c2) = w % n(c1)
-        flux(s) = dens_face(s) * ( u % n(c2)*grid % sx(s) +  & 
-                                   v % n(c2)*grid % sy(s) +  &
-                                   w % n(c2)*grid % sz(s) )
-        bulk % mass_out = bulk % mass_out + flux(s)
+        v_flux % n(s) = u % n(c2)*grid % sx(s)  &
+                      + v % n(c2)*grid % sy(s)  &
+                      + w % n(c2)*grid % sz(s)
+        m_flux % n(s) = dens_face(s) * v_flux % n(s)
+        bulk % mass_out = bulk % mass_out + m_flux % n(s)
       end if
 
-      if(Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. CONVECT .and. flux(s)>0.) then
-        flux(s) = dens_face(s) * ( u % n(c2)*grid % sx(s) +  & 
-                                   v % n(c2)*grid % sy(s) +  &
-                                   w % n(c2)*grid % sz(s) )
-        bulk % mass_out = bulk % mass_out + flux(s)
+      if(Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. CONVECT  &
+         .and. m_flux % n(s) > 0.0) then
+        v_flux % n(s) = u % n(c2)*grid % sx(s)  &
+                      + v % n(c2)*grid % sy(s)  &
+                      + w % n(c2)*grid % sz(s)
+        m_flux % n(s) = dens_face(s) * v_flux % n(s)
+        bulk % mass_out = bulk % mass_out + m_flux % n(s)
       end if
 
-      flux(s) = dens_face(s) * ( u % n(c2)*grid % sx(s) +  & 
-                                 v % n(c2)*grid % sy(s) +  &
-                                 w % n(c2)*grid % sz(s) )
+      v_flux % n(s) = u % n(c2)*grid % sx(s)  &
+                    + v % n(c2)*grid % sy(s)  &
+                    + w % n(c2)*grid % sz(s)
+      m_flux % n(s) = dens_face(s) * v_flux % n(s)
 
-      if(Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. PRESSURE .and. flux(s)>0.) then
-        bulk % mass_out = bulk % mass_out + flux(s)
+      if(Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. PRESSURE  &
+         .and. m_flux % n(s) >0.0) then
+        bulk % mass_out = bulk % mass_out + m_flux % n(s)
       end if
 
     end if
   end do
   call Comm_Mod_Global_Sum_Real(bulk % mass_out)  ! not checked
 
-  fac = bulk % mass_in/(bulk % mass_out+TINY)
+  fac = bulk % mass_in / (bulk % mass_out + TINY)
 
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
@@ -108,8 +119,9 @@
         u % n(c2) = u % n(c2) * fac
         v % n(c2) = v % n(c2) * fac
         w % n(c2) = w % n(c2) * fac
-        flux(s) = flux(s) * fac
-        bulk % mass_out = bulk % mass_out + flux(s)
+        v_flux % n(s) = v_flux % n(s) * fac
+        m_flux % n(s) = m_flux % n(s) * fac
+        bulk % mass_out = bulk % mass_out + m_flux % n(s)
       end if
     end if
   end do
