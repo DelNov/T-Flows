@@ -7,8 +7,6 @@
 !---------------------------------[Arguments]----------------------------------!
   character(len=80) :: val
   logical, optional :: verbose
-!-----------------------------------[Locals]-----------------------------------!
-  integer           :: n_times, n_stat
 !==============================================================================!
 
   call Control_Mod_Read_Char_Item('TURBULENCE_MODEL', 'none',  &

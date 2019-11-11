@@ -12,10 +12,10 @@
   use Name_Mod
   use Grid_Mod,       only: Grid_Type
   use Save_Grid_Mod
-  use Turb_Mod
+  use Turb_Mod,       NO_TURBULENCE => NONE
   use Swarm_Mod,      only: Particle_Type, Swarm_Type
   use Surf_Mod,       only: Vert_Type, Elem_Type, Surf_Type
-  use Multiphase_Mod
+  use Multiphase_Mod, NO_MULTIPHASE => NONE
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!

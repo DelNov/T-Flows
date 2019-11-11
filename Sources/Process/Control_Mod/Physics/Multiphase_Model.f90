@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Control_Mod_Multiphase_Model(multiphase_model, verbose)
+  subroutine Control_Mod_Multiphase_Model(val, verbose)
+!------------------------------------------------------------------------------!
+!   Reading multiphase model from the control file.                            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer           :: multiphase_model
-  logical, optional :: verbose
-!-----------------------------------[Locals]-----------------------------------!
   character(len=80) :: val
+  logical, optional :: verbose
 !==============================================================================!
 
   call Control_Mod_Read_Char_Item('MULTIPHASE_MODEL', 'none', val, verbose)

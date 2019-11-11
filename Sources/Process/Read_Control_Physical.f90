@@ -4,14 +4,14 @@
 !   Reads details about physical models from control file.                     !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod,   only: HUGE_INT
-  use Comm_Mod,    only: Comm_Mod_End, this_proc
-  use Field_Mod,   only: Field_Type, buoyancy, heat_transfer, t_ref,  &
-                         grav_x, grav_y, grav_z
-  use Swarm_Mod,   only: Swarm_Type
-  use Bulk_Mod,    only: Bulk_Type
-  use Turb_Mod
-  use Multiphase_Mod
+  use Const_Mod,      only: HUGE_INT
+  use Comm_Mod,       only: Comm_Mod_End, this_proc
+  use Field_Mod,      only: Field_Type, buoyancy, heat_transfer, t_ref,  &
+                            grav_x, grav_y, grav_z
+  use Swarm_Mod,      only: Swarm_Type
+  use Bulk_Mod,       only: Bulk_Type
+  use Turb_Mod,       NO_TURBULENCE => NONE
+  use Multiphase_Mod, NO_MULTIPHASE => NONE
   use Control_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -52,7 +52,7 @@
   select case(name)
 
     case('NONE')
-      turbulence_model = NONE
+      turbulence_model = NO_TURBULENCE
     case('K_EPS')
       turbulence_model = K_EPS
     case('K_EPS_ZETA_F')
@@ -118,7 +118,7 @@
   !------------------------------!
   call Control_Mod_Turbulence_Model_Variant(name, .true.)
   if     (name .eq. 'NONE') then
-    turbulence_model_variant = NONE
+    turbulence_model_variant = NO_TURBULENCE
   else if(name .eq. 'STABILIZED') then
     turbulence_model_variant = STABILIZED
   else
@@ -209,7 +209,17 @@
   !   Related to Multiphase Flow  !
   !                               !
   !-------------------------------!
-  call Control_Mod_Multiphase_Model(multiphase_model, .true.)
+  call Control_Mod_Multiphase_Model(name, .true.)
+
+  if(name .eq. 'VOLUME_OF_FLUID' ) then
+    multiphase_model = VOLUME_OF_FLUID
+  else if(name .eq. 'LAGRANGIAN_PARTICLES' ) then
+    multiphase_model = LAGRANGIAN_PARTICLES
+  else if(name .eq. 'EULER_EULER' ) then
+    multiphase_model = EULER_EULER
+  else
+    multiphase_model = NO_MULTIPHASE
+  end if
 
   !-----------------------!
   !                       !
