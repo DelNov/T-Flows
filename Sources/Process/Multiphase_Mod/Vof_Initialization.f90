@@ -13,8 +13,8 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: flow
   type(Grid_Type),  pointer :: grid
-  type(Var_Type),   pointer :: vol_flux
   type(Var_Type),   pointer :: vof
+  type(Face_Type),  pointer :: v_flux
   real,             pointer :: dt
   real,             pointer :: vof_f(:)
   integer                   :: c, c1, c2, s
@@ -26,12 +26,12 @@
 !==============================================================================!
 
   ! Take aliases
-  flow     => mult % pnt_flow
-  grid     => flow % pnt_grid
-  vol_flux => flow % vol_flux
-  vof      => mult % vof
-  dt       => flow % dt
-  vof_f    => mult % vof_f
+  flow   => mult % pnt_flow
+  grid   => flow % pnt_grid
+  v_flux => flow % v_flux
+  vof    => mult % vof
+  dt     => flow % dt
+  vof_f  => mult % vof_f
 
  ! Initialize the whole domain as 0.0
   do c = 1, grid % n_cells
@@ -103,13 +103,13 @@
       ! Face is inside the domain
       if(c2 > 0) then
 
-        c_d(c1) = c_d(c1) + max(-vol_flux % n(s) * dt / grid % vol(c1), 0.0)
-        c_d(c2) = c_d(c2) + max(vol_flux % n(s) * dt / grid % vol(c2), 0.0)
+        c_d(c1) = c_d(c1) + max(-v_flux % n(s) * dt / grid % vol(c1), 0.0)
+        c_d(c2) = c_d(c2) + max( v_flux % n(s) * dt / grid % vol(c2), 0.0)
 
       ! Side is on the boundary
       else ! (c2 < 0)
 
-        c_d(c1) = c_d(c1) + max(-vol_flux % n(s) * dt / grid % vol(c1), 0.0)
+        c_d(c1) = c_d(c1) + max(-v_flux % n(s) * dt / grid % vol(c1), 0.0)
 
       end if
 
@@ -120,8 +120,8 @@
       c2 = grid % faces_c(2,s)
       fs = grid % f(s)
 
-      if (vol_flux % n(s) .ne. 0.0) then 
-        if (vol_flux % n(s) > 0.0) then
+      if (v_flux % n(s) .ne. 0.0) then 
+        if (v_flux % n(s) > 0.0) then
           donor = c1
           accept = c2
           signo = 1.0
@@ -223,8 +223,8 @@
       c2 = grid % faces_c(2,s)
       fs = grid % f(s)
 
-      if (vol_flux % n(s) .ne. 0.0) then 
-        if (vol_flux % n(s) > 0.0) then
+      if (v_flux % n(s) .ne. 0.0) then 
+        if (v_flux % n(s) > 0.0) then
           donor = c1
           accept = c2
           signo = 1.0
