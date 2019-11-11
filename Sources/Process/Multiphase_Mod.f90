@@ -5,6 +5,7 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Var_Mod,   only: Var_Type, Var_Mod_Allocate_Solution
+  use Face_Mod,  only: Face_Type
   use Grid_Mod,  only: Grid_Type
   use Field_Mod, only: Field_Type, density, viscosity, dens_face
   use Grad_Mod
