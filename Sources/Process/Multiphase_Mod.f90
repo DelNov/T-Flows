@@ -45,9 +45,10 @@
 
   ! Parameters describing multiphase model choice
   ! (Prime numbers starting from 40000)
-  integer, parameter :: VOLUME_OF_FLUID       = 40009
-  integer, parameter :: LAGRANGIAN_PARTICLES  = 40013
-  integer, parameter :: EULER_EULER           = 40031
+  integer, parameter :: NONE                  = 50021
+  integer, parameter :: VOLUME_OF_FLUID       = 50023
+  integer, parameter :: LAGRANGIAN_PARTICLES  = 50033
+  integer, parameter :: EULER_EULER           = 50047
 
   contains
 
@@ -62,5 +63,6 @@
   include 'Multiphase_Mod/Vof_Predict_Beta.f90'
   include 'Multiphase_Mod/Vof_Spurious_Post.f90'
   include 'Multiphase_Mod/Vof_Surface_Tension_Contribution.f90'
+  include 'Multiphase_Mod/Compute_Benchmark.f90'
 
   end module
