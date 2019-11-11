@@ -45,7 +45,7 @@
   flow => turb % pnt_flow
   grid => flow % pnt_grid
   vis  => turb % vis
-  flux => flow % flux
+  flux => flow % m_flux % n
   dt   =  flow % dt
   call Field_Mod_Alias_Momentum(flow, u, v, w)
   call Solver_Mod_Alias_System (sol, a, b)

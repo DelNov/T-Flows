@@ -11,6 +11,7 @@
   use Var_Mod,       only: Var_Type,                    &
                            Var_Mod_Allocate_New_Only,   &
                            Var_Mod_Allocate_Solution
+  use Face_Mod,      only: Face_Type
   use Grid_Mod
   use Grad_Mod
   use Field_Mod,     only: Field_Type,                                  &
