@@ -30,10 +30,10 @@
   type(Grid_Type),   pointer :: grid
   type(Bulk_Type),   pointer :: bulk
   type(Var_Type),    pointer :: vof
-  type(Var_type),    pointer :: vol_flux
+  type(Face_type),   pointer :: m_flux
+  type(Face_type),   pointer :: v_flux
   real,              pointer :: vof_f(:)
   real,              pointer :: vof_i(:), vof_j(:), vof_k(:)
-  real,              pointer :: flux(:)
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: s, c, c1, c2
@@ -48,16 +48,16 @@
   call Cpu_Timer_Mod_Start('Compute_Multiphase (without solvers)')
 
   ! Take aliases
-  flow     => mult % pnt_flow
-  grid     => flow % pnt_grid
-  bulk     => flow % bulk
-  vof      => mult % vof
-  vof_f    => mult % vof_f
-  vol_flux => flow % vol_flux
-  vof_i    => vof % x
-  vof_j    => vof % y
-  vof_k    => vof % z
-  flux     => flow % flux
+  flow   => mult % pnt_flow
+  grid   => flow % pnt_grid
+  bulk   => flow % bulk
+  vof    => mult % vof
+  vof_f  => mult % vof_f
+  v_flux => flow % v_flux
+  m_flux => flow % m_flux
+  vof_i  => vof % x
+  vof_j  => vof % y
+  vof_k  => vof % z
 
   a => sol % a
   b => sol % b % val
@@ -89,8 +89,8 @@
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
 
-      upwd1 = 0.5 * max(vol_flux % n(s), 0.0)
-      upwd2 = 0.5 * max(-vol_flux % n(s), 0.0)
+      upwd1 = 0.5 * max( v_flux % n(s), 0.0)
+      upwd2 = 0.5 * max(-v_flux % n(s), 0.0)
 
       a % val(a % dia(c1)) = a % val(a % dia(c1)) + upwd1
       b(c1) = b(c1) - ( upwd1 * vof % o(c1) -  upwd2 * vof % o(c2) ) 
@@ -103,9 +103,9 @@
         a % val(a % pos(2,s)) =  - upwd1 
       else
         if (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
-          b(c1) = b(c1) - vol_flux % n(s) * vof % n(c2)
+          b(c1) = b(c1) - v_flux % n(s) * vof % n(c2)
         else if (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) then
-          a % val(a % dia(c1)) = a % val(a % dia(c1)) + vol_flux % n(s)
+          a % val(a % dia(c1)) = a % val(a % dia(c1)) + v_flux % n(s)
         end if
       end if
 
@@ -186,7 +186,7 @@
     call Grad_Mod_Variable(vof)
 
     call Multiphase_Mod_Vof_Predict_Beta(vof,                  &
-                                         vol_flux % n,         &
+                                         v_flux % n,           &
                                          vof_i, vof_j, vof_k,  &
                                          grid % dx,            &
                                          grid % dy,            &
@@ -207,13 +207,13 @@
         c1 = grid % faces_c(1,s)
         c2 = grid % faces_c(2,s)
 
-        if (vol_flux % n(s) > 0.0) then
+        if (v_flux % n(s) > 0.0) then
           beta_dummy = beta_f(s)
         else
           beta_dummy = 1.0 - beta_f(s)
         end if
-        upwd1 = 0.5 * (1.0 - beta_dummy) * vol_flux % n(s)
-        upwd2 = 0.5 * beta_dummy * vol_flux % n(s)
+        upwd1 = 0.5 * (1.0 - beta_dummy) * v_flux % n(s)
+        upwd2 = 0.5 * beta_dummy * v_flux % n(s)
 
         if (c2 > 0) then
           a % val(a % dia(c1)) = a % val(a % dia(c1)) + upwd1
@@ -225,9 +225,9 @@
           b(c2) = b(c2) + upwd2 * vof % o(c2) + upwd1 * vof % o(c1)
         else
           if (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
-            b(c1) = b(c1) - vol_flux % n(s) * vof % n(c2)
+            b(c1) = b(c1) - v_flux % n(s) * vof % n(c2)
           else if (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) then
-            a % val(a % dia(c1)) = a % val(a % dia(c1)) + vol_flux % n(s)
+            a % val(a % dia(c1)) = a % val(a % dia(c1)) + v_flux % n(s)
           end if
         end if
 
@@ -287,9 +287,9 @@
       !---------------------------!
       !   Correct Beta at faces   !
       !---------------------------!
-      call Multiphase_Mod_Vof_Correct_Beta(vof,           &
-                                           vol_flux % n,  &
-                                           beta_f,        &
+      call Multiphase_Mod_Vof_Correct_Beta(vof,         &
+                                           v_flux % n,  &
+                                           beta_f,      &
                                            dt)
 
       !------------------------!
@@ -374,10 +374,10 @@
       ! Face is inside the domain
       if(c2 > 0) then
 
-        if (vol_flux % n(s)>=0.0) then
-          vof_f(s) = vof % n(c1) 
+        if (v_flux % n(s)>=0.0) then
+          vof_f(s) = vof % n(c1)
         else
-          vof_f(s) = vof % n(c2) 
+          vof_f(s) = vof % n(c2)
         end if
 
       ! Side is on the boundary
@@ -398,7 +398,7 @@
 
 
       if(c2 > 0) then
-        if (flow % flux(s) >= 0) then
+        if (flow % m_flux % n(s) >= 0) then
           donor = c1
           accept = c2
         else
