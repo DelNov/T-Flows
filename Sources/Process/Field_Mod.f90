@@ -7,6 +7,7 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Var_Mod
+  use Face_Mod
   use Grid_Mod, only: Grid_Type
   use Bulk_Mod, only: Bulk_Type
 !------------------------------------------------------------------------------!
@@ -25,8 +26,9 @@
     type(Var_Type) :: v
     type(Var_Type) :: w
 
-    ! Volumetric flux through cell faces:
-    type(Var_Type) :: vol_flux
+    ! Mass and volumetric flux through cell faces:
+    type(Face_Type) :: m_flux
+    type(Face_Type) :: v_flux
 
     ! Pressure and pressure correction
     type(Var_Type) :: p
@@ -42,9 +44,6 @@
     ! Scalars (like chemical species for example)
     integer                     :: n_scalars
     type(Var_Type), allocatable :: scalar(:)
-
-    ! Mass fluxes throught cell faces
-    real, allocatable :: flux(:)
 
     ! Bulk velocities, pressure drops, etc.
     type(Bulk_Type) :: bulk
