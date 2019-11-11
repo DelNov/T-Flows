@@ -117,7 +117,7 @@
   !----------------------!
   !   Mass flow raters   !
   !----------------------!
-  call Backup_Mod_Read_Face(fh,d,vc, grid, fld % flux)
+  call Backup_Mod_Read_Face(fh,d,vc, grid, fld % m_flux % n)
 
   !--------------!
   !              !
