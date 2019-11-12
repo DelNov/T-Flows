@@ -1,17 +1,17 @@
 !==============================================================================!
-  subroutine Save_Surf(surf, name_save)
+  subroutine Save_Surf(surf, time_step)
 !------------------------------------------------------------------------------!
 !   Writes surface vertices in VTU file format (for VisIt and Paraview)        !
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   type(Surf_Type), target :: surf
-  character(len=*)        :: name_save
+  integer                 :: time_step
 !----------------------------------[Locals]------------------------------------!
   type(Vert_Type), pointer :: vert
   integer                  :: v, e     ! vertex and element counters
   integer                  :: offset
-  character(len=80)        :: name_out_9, store_name
+  character(len=80)        :: name_out_9
 !-----------------------------[Local parameters]-------------------------------!
   integer, parameter :: VTK_TRIANGLE = 5  ! cell shapes in VTK format
   character(len= 0)  :: IN_0 = ''         ! indentation levels
@@ -24,11 +24,6 @@
 
   if(surf % n_verts < 1) return
 
-  ! Store the name
-  store_name = problem_name
-
-  problem_name = name_save
-
   !---------------------------!
   !                           !
   !   Create .surf.vtu file   !
@@ -37,7 +32,7 @@
 
   if(this_proc < 2) then
 
-    call Name_File(0, name_out_9, '.surf.vtu')
+    call File_Mod_Set_Name(name_out_9, time_step=time_step, extension='.surf.vtu')
 
     open(9, file=name_out_9)
     print *, '# Creating file: ', trim(name_out_9)
@@ -194,8 +189,5 @@
     write(9,'(a,a)') IN_0, '</VTKFile>'
     close(9)
   end if
-
-  ! Restore the name
-  problem_name = store_name
 
   end subroutine

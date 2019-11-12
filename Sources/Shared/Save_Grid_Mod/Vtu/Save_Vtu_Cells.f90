@@ -28,7 +28,7 @@
   !   Create .vtu file   !
   !                      !
   !----------------------!
-  call Name_File(sub, name_out, '.vtu')
+  call File_Mod_Set_Name(name_out, processor=sub, extension='.vtu')
   open(9, file=name_out)
   print *, '# Creating the file: ', trim(name_out)
 
@@ -211,7 +211,7 @@
   ! Create it only from subdomain 1, when decomposed
   if(maxval(grid % comm % proces(:)) > 1 .and. sub .eq. 1) then
 
-    call Name_File(0, name_out, '.pvtu')
+    call File_Mod_Set_Name(name_out, extension='.pvtu')
     print *, '# Creating the file: ', trim(name_out)
     open(9, file = name_out)
 
@@ -240,7 +240,7 @@
 
     ! Write out the names of all the pieces
     do n = 1, maxval(grid % comm % proces(:))
-      call Name_File(n, name_out, '.vtu')
+      call File_Mod_Set_Name(name_out, processor=n, extension='.vtu')
       write(9, '(a,a,a,a)') IN_2, '<Piece Source="', trim(name_out), '"/>'
     end do
 

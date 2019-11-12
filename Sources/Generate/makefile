@@ -118,9 +118,9 @@ METIS_LIB = ../Libraries/Metis_5.1.0_Linux_64/libmetis.a
 # Modules in shared directories
 SRC_MOD = Const_Mod.f90			\
           Math_Mod.f90			\
+          File_Mod.f90			\
           Gen_Mod.f90			\
           Div_Mod.f90			\
-          Name_Mod.f90			\
           Tokenizer_Mod.f90		\
           Material_Mod.f90		\
           Metis_Options_Mod.f90		\

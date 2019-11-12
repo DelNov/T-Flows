@@ -25,7 +25,7 @@
   !   Create boundary condition .vtu file   !
   !                                         !
   !-----------------------------------------!
-  call Name_File(0, name_out, '.faces.vtu')
+  call File_Mod_Set_Name(name_out, extension='.faces.vtu')
   open(9, file=name_out)
   print *, '# Creating the file: ', trim(name_out)
 

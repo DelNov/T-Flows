@@ -36,7 +36,7 @@
   !----------------------!
   extension = '.mg00.faces.vtu'
   write(extension(4:5), '(i2.2)') mg_lev
-  call Name_File(0, name_out, trim(extension))
+  call File_Mod_Set_Name(name_out, extension=trim(extension))
   open(9, file=name_out)
   print *, '# Creating the file: ', trim(name_out)
 

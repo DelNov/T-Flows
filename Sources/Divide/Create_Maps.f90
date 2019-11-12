@@ -4,6 +4,7 @@
 !   Number the cells in each subdomain for subsequent separate saving.         !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
+  use File_Mod
   use Grid_Mod, only: Grid_Type
 !------------------------------------------------------------------------------!
   implicit none
@@ -27,7 +28,7 @@
   !-------------------------------!
   do sub = 1, maxval(grid % comm % proces(:))
 
-    call Name_File(sub, name_map, '.map')
+    call File_Mod_Set_Name(name_map, processor=sub, extension='.map')
     open(9, file=name_map)
     print *, '# Creating files: ', trim(name_map)
 

@@ -4,7 +4,7 @@
 !   This subroutine finds the coordinate of nodes in non-homogeneous           !
 !   direction and write them in file name.1d                                   !
 !------------------------------------------------------------------------------!
-  use Name_Mod, only: problem_name
+  use File_Mod
   use Math_Mod
   use Grid_Mod, only: Grid_Type
   use Sort_Mod
@@ -81,8 +81,7 @@
   !--------------------!
   !   Create 1d file   !
   !--------------------!
-  name_prob = problem_name
-  name_prob(len_trim(problem_name)+1:len_trim(problem_name)+3) = '.1d'
+  call File_Mod_Set_Name(name_prob, extension='.1d')
   print *, 'Now creating the file: ', trim(name_prob)
   open(9, file=name_prob)
   ! Write the number of probes 

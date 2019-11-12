@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Results(flow, turb, mult, name_save, plot_inside)
+  subroutine Save_Results(flow, turb, mult, ts, plot_inside)
 !------------------------------------------------------------------------------!
 !   Writes results in CGNS file format (for VisIt and Paraview)                !
 !------------------------------------------------------------------------------!
@@ -23,12 +23,12 @@
   type(Field_Type),      target :: flow
   type(Turb_Type),       target :: turb
   type(Multiphase_Type), target :: mult
-  character(len=*)              :: name_save
+  integer                       :: ts           ! time step
   logical                       :: plot_inside  ! plot results inside?
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: phi
-  character(len=80)        :: store_name, name_out, name_mean
+  character(len=80)        :: name_out, name_mean
   integer                  :: base
   integer                  :: block
   integer                  :: solution
@@ -43,12 +43,7 @@
   ! Take aliases
   grid => flow % pnt_grid
 
-  ! Store the name
-  store_name = problem_name
-
-  problem_name = name_save
-
-  call Name_File(0, name_out, '.cgns')
+  call File_Mod_Set_Name(name_out, extension='.cgns')
 
   if (this_proc .lt. 2) print *, '# subroutine Save_Cgns_Results'
 
@@ -224,7 +219,7 @@
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               flow % vort(1),'VorticityMagnitude')
   end if
-  if(turbulence_model .ne. NONE) then
+  if(turbulence_model .ne. NO_TURBULENCE) then
     kin_vis_t(1:grid % n_cells) = turb % vis_t(1:grid % n_cells)  &
                                 / viscosity(1:grid % n_cells)
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
@@ -312,7 +307,7 @@
   end if
 
   ! Save y+ for all turbulence models
-  if(turbulence_model .ne. NONE) then
+  if(turbulence_model .ne. NO_TURBULENCE) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               turb % y_plus(1),'TurbulentQuantityYplus')
   end if
@@ -353,9 +348,6 @@
     print *, '# Added fields to ', trim(name_out)
 
   deallocate(cgns_base)
-
-  ! Restore the name
-  problem_name = store_name
 
   call Cpu_Timer_Mod_Stop('Save_Cgns_Results')
 

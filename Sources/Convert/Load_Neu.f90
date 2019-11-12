@@ -4,7 +4,7 @@
 !   Reads the Fluents (Gambits) neutral file format.                           !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Name_Mod,      only: problem_name
+  use File_Mod
   use Grid_Mod,      only: Grid_Type,  &
                            Grid_Mod_Print_Bnd_Cond_List
   use Tokenizer_Mod  ! it's too small for "only" to be meaningful
@@ -19,8 +19,7 @@
   integer             :: c, dir
 !==============================================================================!
 
-  name_in = problem_name
-  name_in(len_trim(problem_name)+1:len_trim(problem_name)+4) = '.neu'
+  call File_Mod_Set_Name(name_in, extension='.neu')
 
   open(9,file=name_in)
   print *, '# Reading the file: ', trim(name_in)

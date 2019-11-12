@@ -162,7 +162,8 @@ $(DIR_OBJECT)/Smooths_Mod.o \
 Smooths_Mod/*.f90 \
 $(DIR_OBJECT)/Refines_Mod.o \
 Refines_Mod/*.f90 \
-$(DIR_OBJECT)/Name_Mod.o \
+$(DIR_OBJECT)/File_Mod.o \
+$(DIR_SHARED)/File_Mod/*.f90 \
 $(DIR_OBJECT)/Math_Mod.o \
 $(DIR_SHARED)/Math_Mod/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
@@ -245,6 +246,8 @@ $(DIR_SHARED)/Sort_Mod/*.f90
 #-- ./Const_Mod.f90
 #-- ./Comm_Mod_Par.f90
 $(DIR_OBJECT)/Comm_Mod_Par.o:\
+$(DIR_OBJECT)/File_Mod.o \
+$(DIR_SHARED)/File_Mod/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
@@ -258,7 +261,8 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 $(DIR_OBJECT)/Probe_1d_Nodes.o:\
 $(DIR_OBJECT)/Sort_Mod.o \
 $(DIR_SHARED)/Sort_Mod/*.f90 \
-$(DIR_OBJECT)/Name_Mod.o \
+$(DIR_OBJECT)/File_Mod.o \
+$(DIR_SHARED)/File_Mod/*.f90 \
 $(DIR_OBJECT)/Math_Mod.o \
 $(DIR_SHARED)/Math_Mod/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
@@ -267,6 +271,7 @@ $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
+#-- ./Work_Mod/Allocate_Integer_Nodes.f90
 #-- ./Work_Mod/Allocate.f90
 #-- ./Work_Mod/Allocate_Integer_Cells.f90
 #-- ./Work_Mod/Allocate_Real_Faces.f90
@@ -279,6 +284,8 @@ $(DIR_OBJECT)/Tokenizer_Mod.o \
 $(DIR_SHARED)/Tokenizer_Mod/*.f90 \
 $(DIR_OBJECT)/Sort_Mod.o \
 $(DIR_SHARED)/Sort_Mod/*.f90 \
+$(DIR_OBJECT)/File_Mod.o \
+$(DIR_SHARED)/File_Mod/*.f90 \
 $(DIR_OBJECT)/Metis_Options_Mod.o \
 $(DIR_OBJECT)/Math_Mod.o \
 $(DIR_SHARED)/Math_Mod/*.f90 \
@@ -453,7 +460,8 @@ $(DIR_OBJECT)/Save_Grid_Mod_Cgns.o:\
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Name_Mod.o \
+$(DIR_OBJECT)/File_Mod.o \
+$(DIR_SHARED)/File_Mod/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
@@ -474,7 +482,8 @@ $(DIR_OBJECT)/Save_Grid_Mod_Vtu.o:\
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Name_Mod.o \
+$(DIR_OBJECT)/File_Mod.o \
+$(DIR_SHARED)/File_Mod/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
@@ -486,9 +495,11 @@ $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
 
+#-- ./File_Mod/Name_File.f90
 #-- ./Probe_2d.f90
 $(DIR_OBJECT)/Probe_2d.o:\
-$(DIR_OBJECT)/Name_Mod.o \
+$(DIR_OBJECT)/File_Mod.o \
+$(DIR_SHARED)/File_Mod/*.f90 \
 $(DIR_OBJECT)/Math_Mod.o \
 $(DIR_SHARED)/Math_Mod/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
@@ -532,6 +543,8 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 #-- ./Swap_Int.f90
 #-- ./Comm_Mod_Seq.f90
 $(DIR_OBJECT)/Comm_Mod_Seq.o:\
+$(DIR_OBJECT)/File_Mod.o \
+$(DIR_SHARED)/File_Mod/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
@@ -565,7 +578,8 @@ $(DIR_SHARED)/Cgns_Mod/*/*.f90
 $(DIR_OBJECT)/Probe_1d_Cells_Nodes.o:\
 $(DIR_OBJECT)/Sort_Mod.o \
 $(DIR_SHARED)/Sort_Mod/*.f90 \
-$(DIR_OBJECT)/Name_Mod.o \
+$(DIR_OBJECT)/File_Mod.o \
+$(DIR_SHARED)/File_Mod/*.f90 \
 $(DIR_OBJECT)/Math_Mod.o \
 $(DIR_SHARED)/Math_Mod/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
@@ -636,15 +650,15 @@ $(DIR_SHARED)/Work_Mod/*.f90
 $(DIR_OBJECT)/Math_Mod.o:\
 $(DIR_SHARED)/Math_Mod/*.f90 
 
-#-- ./Name_File.f90
-$(DIR_OBJECT)/Name_File.o:\
-$(DIR_OBJECT)/Name_Mod.o 
-
 #-- ./Gen_Mod.f90
-#-- ./Name_Mod.f90
+#-- ./File_Mod.f90
+$(DIR_OBJECT)/File_Mod.o:\
+$(DIR_SHARED)/File_Mod/*.f90 
+
 #-- ./Probe_1d_Cells.f90
 $(DIR_OBJECT)/Probe_1d_Cells.o:\
-$(DIR_OBJECT)/Name_Mod.o \
+$(DIR_OBJECT)/File_Mod.o \
+$(DIR_SHARED)/File_Mod/*.f90 \
 $(DIR_OBJECT)/Math_Mod.o \
 $(DIR_SHARED)/Math_Mod/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \

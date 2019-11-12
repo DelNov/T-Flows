@@ -48,9 +48,7 @@
   !--------------------------------------------!
   !   Set the names for all monitoring files   !
   !--------------------------------------------!
-  mon_file_name = problem_name
-  mon_file_name(len_trim(problem_name)+ 1:  &
-                len_trim(problem_name)+10) = '-monit.000'
+  call File_Mod_Set_Name(mon_file_name, extension='-monit.000')
   l = len_trim(mon_file_name)
 
   !-------------------------------!

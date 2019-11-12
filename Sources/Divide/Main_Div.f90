@@ -4,7 +4,7 @@
 !   Divides the domain in equaly balanced subdomains.                          !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Name_Mod,      only: problem_name
+  use File_Mod,      only: problem_name
   use Grid_Mod,      only: Grid_Type,           &
                            Grid_Mod_Decompose,  &
                            Grid_Mod_Load_Cns,   &

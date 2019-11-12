@@ -18,8 +18,7 @@
   !   connections between cells   !
   !                               !
   !-------------------------------!
-  call Name_File(this_proc, name_in, '.cns')  
-
+  call File_Mod_Set_Name(name_in, processor=this_proc, extension='.cns')
   open(9, file=name_in,form='unformatted', access='stream')
   if(this_proc < 2) print *, '# Reading the file: ', name_in
 

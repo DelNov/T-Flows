@@ -5,7 +5,7 @@
 !   define his/her variables and pass them around his functions
 !------------------------------------------------------------------------------!
   use Const_Mod
-  use Name_Mod
+  use File_Mod
   use Comm_Mod
   use Grid_Mod,    only: Grid_Type
   use Matrix_Mod,  only: Matrix_Type

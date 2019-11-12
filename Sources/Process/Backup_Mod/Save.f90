@@ -1,6 +1,6 @@
 !==============================================================================!
   subroutine Backup_Mod_Save(fld, swr, tur, mul, &
-                             time_step, time_step_stat, name_save)
+                             time_step, time_step_stat)
 !------------------------------------------------------------------------------!
 !   Saves backup files name.backup                                             !
 !------------------------------------------------------------------------------!
@@ -12,12 +12,11 @@
   type(Multiphase_Type), target :: mul
   integer                       :: time_step       ! current time step
   integer                       :: time_step_stat  ! starting step for statist.
-  character(len=*)              :: name_save
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: phi
-  character(len=80)        :: name_out, store_name, name_mean
+  character(len=80)        :: name_out, name_mean
   integer                  :: fh, d, vc, sc
 !==============================================================================!
 
@@ -27,12 +26,8 @@
   grid => fld % pnt_grid
   bulk => fld % bulk
 
-  store_name = problem_name
-
-  problem_name = name_save
-
   ! Name backup file
-  call Name_File(0, name_out, '.backup')
+  call File_Mod_Set_Name(name_out, time_step=time_step, extension='.backup')
 
   ! Open backup file
   call Comm_Mod_Open_File_Write(fh, name_out)
@@ -326,8 +321,6 @@
 
   ! Close backup file
   call Comm_Mod_Close_File(fh)
-
-  problem_name = store_name
 
   call Cpu_Timer_Mod_Stop('Backup_Mode_Save')
 

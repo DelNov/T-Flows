@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Results(flow, turb, mult, name_save, plot_inside)
+  subroutine Save_Results(flow, turb, mult, ts, plot_inside)
 !------------------------------------------------------------------------------!
 !   Writes results in VTU file format (for VisIt and Paraview)                 !
 !------------------------------------------------------------------------------!
@@ -23,13 +23,13 @@
   type(Field_Type),      target :: flow
   type(Turb_Type),       target :: turb
   type(Multiphase_Type), target :: mult
-  character(len=*)              :: name_save
-  logical                       :: plot_inside     ! plot results inside?
+  integer                       :: ts           ! time step
+  logical                       :: plot_inside  ! plot results inside?
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: phi
   integer                  :: c, n, s, offset, sc
-  character(len=80)        :: name_out_8, name_out_9, store_name, name_mean
+  character(len=80)        :: name_out_8, name_out_9, name_mean
 !-----------------------------[Local parameters]-------------------------------!
   integer, parameter :: VTK_TRIANGLE   =  5  ! cell shapes in VTK format
   integer, parameter :: VTK_QUAD       =  9
@@ -50,11 +50,6 @@
   ! Take aliases
   grid => flow % pnt_grid
 
-  ! Store the name
-  store_name = problem_name
-
-  problem_name = name_save
-
   call Comm_Mod_Wait
 
   !--------------------------------------!
@@ -62,8 +57,23 @@
   !   Create .pvtu file and .vtu files   !
   !                                      !
   !--------------------------------------!
-  call Name_File(0, name_out_8, '.pvtu')
-  call Name_File(this_proc, name_out_9, '.vtu')
+  if(plot_inside) then
+    call File_Mod_Set_Name(name_out_8,             &
+                           time_step=ts,           &
+                           extension='.pvtu')
+    call File_Mod_Set_Name(name_out_9,             &
+                           processor=this_proc,    &
+                           time_step=ts,           &
+                           extension='.vtu')
+  else
+    call File_Mod_Set_Name(name_out_8,             &
+                           time_step=ts,           &
+                           extension='-bnd.pvtu')
+    call File_Mod_Set_Name(name_out_9,             &
+                           processor=this_proc,    &
+                           time_step=ts,           &
+                           extension='-bnd.vtu')
+  end if
 
   if(n_proc > 1 .and. this_proc .eq. 1) then
     open(8, file=name_out_8)
@@ -513,7 +523,17 @@
   !------------!
   if(n_proc > 1 .and. this_proc .eq. 1) then
     do n = 1, n_proc
-      call Name_File(n, name_out_9, '.vtu')
+      if(plot_inside) then
+        call File_Mod_Set_Name(name_out_9,        &
+                               processor=n,       &
+                               time_step=ts,      &
+                               extension='.vtu')
+      else
+        call File_Mod_Set_Name(name_out_9,        &
+                               processor=n,       &
+                               time_step=ts,      &
+                               extension='-bnd.vtu')
+      end if
       write(8, '(a,a,a,a)') IN_2, '<Piece Source="', trim(name_out_9), '"/>'
     end do
     write(8, '(a,a)') IN_1, '</PUnstructuredGrid>'
@@ -524,9 +544,6 @@
   write(9,'(a,a)') IN_1, '</UnstructuredGrid>'
   write(9,'(a,a)') IN_0, '</VTKFile>'
   close(9)
-
-  ! Restore the name
-  problem_name = store_name
 
   call Cpu_Timer_Mod_Stop('Save_Vtu_Results')
 

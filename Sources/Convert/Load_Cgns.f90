@@ -8,7 +8,7 @@
 !   use 'group' option during export to .cgns                                  !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Name_Mod,  only: problem_name
+  use File_Mod
   use Grid_Mod,  only: Grid_Type,                    &
                        Grid_Mod_Print_Bnd_Cond_List
   use Cgns_Mod  ! plenty of functions are used
@@ -23,9 +23,7 @@
   logical           :: launch_find_parents_subroutine
 !==============================================================================!
 
-  name_in = problem_name
-
-  name_in(len_trim(problem_name)+1:len_trim(problem_name)+5) = '.cgns'
+  call File_Mod_Set_Name(name_in, extension='.cgns')
 
   file_name = name_in
 

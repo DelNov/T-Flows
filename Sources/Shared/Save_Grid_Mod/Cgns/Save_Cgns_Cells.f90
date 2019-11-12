@@ -9,8 +9,8 @@
   type(Grid_Type) :: grid
   integer         :: sub
 !-----------------------------------[Locals]-----------------------------------!
-  character(len=80) :: problem_name, store_name, name_out
-  integer :: c, base, block, sect, coord
+  character(len=80) :: name_out
+  integer           :: c, base, block, sect, coord
 !==============================================================================!
 
   !-----------------------!
@@ -19,12 +19,7 @@
   !                       !
   !-----------------------!
 
-  ! Store the name
-  store_name = problem_name
-
-  problem_name = file_name  ! file_name is from Cgns_Mod
-
-  call Name_File(0, name_out, '.cgns')
+  call File_Mod_Set_Name(name_out, extension='.cgns')
   if (sub .lt. 2) print *, '# Creating the file: ', trim(name_out)
 
   file_mode = CG_MODE_WRITE
@@ -155,9 +150,5 @@
     print *, '# Wrote unstructured grid to file ',trim(name_out)
 
   deallocate(cgns_base)
-
-  ! Restore the name
-  problem_name = store_name
-
 
   end subroutine

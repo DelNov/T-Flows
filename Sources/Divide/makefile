@@ -106,6 +106,7 @@ METIS_LIB = ../Libraries/Metis_5.1.0_Linux_64/libmetis.a
 # Modules in shared directories
 SRC_MOD =  Const_Mod.f90		\
            Math_Mod.f90			\
+           File_Mod.f90			\
            Gen_Mod.f90			\
            Div_Mod.f90			\
            Tokenizer_Mod.f90		\
@@ -115,7 +116,6 @@ SRC_MOD =  Const_Mod.f90		\
            Sort_Mod.f90			\
            Grid_Level_Mod.f90		\
            Grid_Mod.f90			\
-           Name_Mod.f90			\
            Comm_Mod_Seq.f90		\
            Save_Grid_Mod_Vtu.f90
 
@@ -124,8 +124,7 @@ SRC_MOD =  Const_Mod.f90		\
 #---------------
 
 # Sources for all shared functions
-SRC_FUN = Name_File.f90			\
-          Swap_Int.f90			\
+SRC_FUN = Swap_Int.f90			\
           Swap_Short.f90		\
           Swap_Real.f90			\
           To_Upper_Case.f90

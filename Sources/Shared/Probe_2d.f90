@@ -4,8 +4,8 @@
 ! Finds coordinates of all the planes for the channel flow.                    !
 ! It assumes that homogeneous directions of the flow are x and y.              !
 !------------------------------------------------------------------------------!
-  use Name_Mod, only: problem_name
   use Math_Mod
+  use File_Mod
   use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -73,8 +73,7 @@
   !--------------------!
   !   Create 2D file   !
   !--------------------!
-  name_prob = problem_name
-  name_prob(len_trim(problem_name)+1:len_trim(problem_name)+3) = '.2d'
+  call File_Mod_Set_Name(name_prob, extension='.2d')
   print *, '# Creating the file: ', trim(name_prob)
   open(9, file=name_prob)
 

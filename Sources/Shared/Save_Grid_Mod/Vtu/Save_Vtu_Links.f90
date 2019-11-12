@@ -42,9 +42,7 @@
   !   Create .gmv file   !
   !                      !
   !----------------------!
-  name_out = problem_name         
-
-  call Name_File(sub, name_out, '.links.vtu')
+  call File_Mod_Set_Name(name_out, processor=sub, extension='.links.vtu')
   open(9, file=name_out)
   print *, '# Creating the file: ', trim(name_out)
 

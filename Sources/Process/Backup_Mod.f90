@@ -7,7 +7,7 @@
   use Const_Mod
   use Cpu_Timer_Mod,  only: Cpu_Timer_Mod_Start, Cpu_Timer_Mod_Stop
   use Comm_Mod
-  use Name_Mod,       only: problem_name
+  use File_Mod
   use Var_Mod
   use Turb_Mod
   use Field_Mod,      only: Field_Type, heat_transfer

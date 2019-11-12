@@ -20,7 +20,7 @@
   !   Create .geo file   !
   !                      !
   !----------------------!
-  call Name_File( sub, name_out, '.geo' )
+  call File_Mod_Set_Name(name_out, processor=sub, extension='.geo')
   open(9, file=name_out, form='unformatted', access='stream')
   write(*, *) '# Creating the file: ', trim(name_out)
 

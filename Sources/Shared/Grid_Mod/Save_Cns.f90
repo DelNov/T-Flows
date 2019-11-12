@@ -24,7 +24,7 @@
   !   Create .cns file   !
   !                      !
   !----------------------!
-  call Name_File( sub, name_out, '.cns' )
+  call File_Mod_Set_Name(name_out, processor=sub, extension='.cns')
   open(9, file=name_out,form='unformatted', access='stream')
   write(*, *) '# Creating the file: ', trim(name_out)
 

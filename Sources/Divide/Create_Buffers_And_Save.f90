@@ -4,6 +4,7 @@
 !   Number the cells in each subdomain for subsequent separate saving.         !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
+  use File_Mod
   use Div_Mod
   use Grid_Mod,      only: Grid_Type,                     &
                            Grid_Mod_Sort_Cells_By_Index,  &
@@ -50,7 +51,7 @@
   do sub = 1, maxval(grid % comm % proces(:))
 
     if(verbose) then
-      call Name_File(sub, name_buf, '.buf')
+      call File_Mod_Set_Name(name_buf, processor=sub, extension='.buf')
       open(9, file=name_buf)
       print *, '# Creating files: ', trim(name_buf)
 

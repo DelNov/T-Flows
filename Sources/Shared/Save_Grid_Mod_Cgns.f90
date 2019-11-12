@@ -8,7 +8,6 @@
   use Comm_Mod
   use Grid_Mod
   use Cgns_Mod
-  use Name_Mod, only: problem_name
   use Div_Mod,  only: buf_send_ind, buf_recv_ind
 !------------------------------------------------------------------------------!
   implicit none

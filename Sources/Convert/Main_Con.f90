@@ -2,7 +2,7 @@
   program Convert
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Name_Mod,      only: problem_name
+  use File_Mod,      only: problem_name
   use Grid_Mod,      only: Grid_Type,                         &
                            Grid_Mod_Sort_Faces_Smart,         &
                            Grid_Mod_Calculate_Wall_Distance,  &

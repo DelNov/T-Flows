@@ -7,7 +7,7 @@
   use Const_Mod
   use Comm_Mod
   use Cpu_Timer_Mod
-  use Name_Mod,      only: problem_name
+  use File_Mod,      only: problem_name
   use Field_Mod,     only: Field_Type, Field_Mod_Allocate, heat_transfer
   use Turb_Mod
   use Grid_Mod
@@ -31,7 +31,7 @@
 !----------------------------------[Locals]------------------------------------!
   integer               :: n, sc
   real                  :: mass_res
-  character(len=80)     :: name_save, name_save_bnd
+! character(len=80)     :: name_save, name_save_bnd
   logical               :: backup, save_now, exit_now
   type(Grid_Type)       :: grid            ! grid used in computations
   type(Field_Type)      :: flow            ! flow field we will be solving for
@@ -182,26 +182,11 @@
   call Control_Mod_Wall_Time_Max_Hours  (wt_max, verbose=.true.)
   wt_max = wt_max * 3600  ! make it in seconds
 
-  ! Form the file name before the time, in case ...
-  ! ... user just wants to save files from backup
-  name_save = problem_name
-  write(name_save(len_trim(problem_name)+1:                      &
-                  len_trim(problem_name)+3), '(a3)')   '-ts'
-  write(name_save(len_trim(problem_name)+4:                      &
-                  len_trim(problem_name)+9), '(i6.6)') first_dt
-  name_save_bnd = problem_name
-  write(name_save_bnd(len_trim(problem_name)+1:                       &
-                      len_trim(problem_name)+3),  '(a3)')   '-ts'
-  write(name_save_bnd(len_trim(problem_name)+4:                       &
-                      len_trim(problem_name)+9),  '(i6.6)') first_dt
-  write(name_save_bnd(len_trim(problem_name)+10:                      &
-                      len_trim(problem_name)+13), '(a4)')   '-bnd'
-
   ! It will save results in .vtk or .cgns file format,
   ! depending on how the code was compiled
-  call Save_Results(flow, turb, mult, name_save,     .true.)   ! save inside
-  call Save_Results(flow, turb, mult, name_save_bnd, .false.)  ! save boundary
-  call Save_Swarm (swarm, problem_name)
+  call Save_Results(flow, turb, mult, first_dt, .true.)   ! save inside
+  call Save_Results(flow, turb, mult, first_dt, .false.)  ! save boundary
+  call Save_Swarm(swarm, first_dt)
 
   do n = first_dt + 1, last_dt
     ! For post-processing
@@ -322,26 +307,12 @@
     inquire(file='exit_now', exist=exit_now)
     inquire(file='save_now', exist=save_now)
 
-    ! Form the file name
-    name_save = problem_name
-    write(name_save(len_trim(problem_name)+1:                    &
-                    len_trim(problem_name)+3), '(a3)')   '-ts'
-    write(name_save(len_trim(problem_name)+4:                    &
-                    len_trim(problem_name)+9), '(i6.6)') n
-    name_save_bnd = problem_name
-    write(name_save_bnd(len_trim(problem_name)+1:                      &
-                        len_trim(problem_name)+3),   '(a3)')   '-ts'
-    write(name_save_bnd(len_trim(problem_name)+4:                      &
-                        len_trim(problem_name)+9),   '(i6.6)') n
-    write(name_save_bnd(len_trim(problem_name)+10:                     &
-                        len_trim(problem_name)+13),  '(a4)')   '-bnd'
-
     ! Is it time to save the backup file?
     if(save_now           .or.  &
        exit_now           .or.  &
        mod(n, bsi) .eq. 0 .or.  &
        (sc_cur-sc_ini)/real(sc_cr) > wt_max) then
-      call Backup_Mod_Save(flow, swarm, turb, mult, n, n_stat, name_save)
+      call Backup_Mod_Save(flow, swarm, turb, mult, n, n_stat)
     end if
 
     ! Is it time to save results for post-processing
@@ -350,13 +321,13 @@
        mod(n, rsi) .eq. 0 .or.  &
        (sc_cur-sc_ini)/real(sc_cr) > wt_max) then
       call Comm_Mod_Wait
-      call Save_Results(flow, turb, mult, name_save,     .true.)   ! save inside
-      call Save_Results(flow, turb, mult, name_save_bnd, .false.)  ! save bnd
-      call Save_Swarm (swarm, name_save)
+      call Save_Results(flow, turb, mult, n, .true.)   ! save inside
+      call Save_Results(flow, turb, mult, n, .false.)  ! save bnd
+      call Save_Swarm(swarm, n)
 
       ! Write results in user-customized format
-      call User_Mod_Save_Results(flow, turb, mult, name_save)
-      ! call User_Mod_Save_Swarm(swarm, name_save)  to be done!
+      call User_Mod_Save_Results(flow, turb, mult, n)
+      ! call User_Mod_Save_Swarm(swarm, n)  to be done!
     end if
 
     if(save_now) then
@@ -387,7 +358,7 @@
 
   ! Save backup and post-processing files at exit
   call Comm_Mod_Wait
-  call Backup_Mod_Save(flow, swarm, turb, mult, n, n_stat, name_save)
+  call Backup_Mod_Save(flow, swarm, turb, mult, n, n_stat)
 
   if(this_proc < 2) then
     open(9, file='stop')

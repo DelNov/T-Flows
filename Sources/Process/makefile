@@ -187,12 +187,12 @@ endif
 SRC_MOD = Const_Mod.f90		\
           Sort_Mod.f90		\
           Math_Mod.f90		\
+          File_Mod.f90		\
           Tokenizer_Mod.f90	\
           Div_Mod.f90		\
           Grid_Mod.f90		\
           Grid_Level_Mod.f90	\
           Work_Mod.f90		\
-          Name_Mod.f90		\
           Material_Mod.f90	\
           Metis_Options_Mod.f90
 
@@ -261,8 +261,7 @@ SRC_FUN += Y_Plus_Low_Re.f90		\
            Find_Nearest_Wall_Cell.f90	\
            Roughness_Coefficient.f90
 
-SRC_FUN += Name_File.f90	\
-           Swap_Int.f90		\
+SRC_FUN += Swap_Int.f90		\
            Swap_Real.f90	\
            Swap_Short.f90	\
            To_Upper_Case.f90

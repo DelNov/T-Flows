@@ -65,7 +65,7 @@
   !-------------------------------------------------!
   else
 
-    call Name_File(this_proc, name_in, '.map')
+    call File_Mod_Set_Name(name_in, processor=this_proc, extension='.map')
     open(9, file=name_in)
     if(this_proc < 2) print *, '# Now reading the file:', name_in
 

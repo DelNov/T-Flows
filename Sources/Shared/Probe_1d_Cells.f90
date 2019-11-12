@@ -4,7 +4,7 @@
 !   This subroutine finds the coordinate of cell-centers in non-homogeneous    !
 !   direction and write them in file called "name.1d"                          !
 !------------------------------------------------------------------------------!
-  use Name_Mod,  only: problem_name
+  use File_Mod
   use Const_Mod, only: NANO          ! 1.0e-9
   use Math_Mod
   use Grid_Mod
@@ -65,8 +65,7 @@
   !--------------------!
   !   Create 1D file   !
   !--------------------!
-  name_prob = problem_name
-  name_prob(len_trim(problem_name)+1:len_trim(problem_name)+3) = '.1d'
+  call File_Mod_Set_Name(name_prob, extension='.1d')
   print *, '# Creating the file: ', trim(name_prob)
   open(9, file=name_prob)
 

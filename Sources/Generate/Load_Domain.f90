@@ -3,7 +3,7 @@
 !------------------------------------------------------------------------------!
 !   Reads: .dom file                                                           !
 !----------------------------------[Modules]-----------------------------------!
-  use Name_Mod,    only: problem_name
+  use File_Mod
   use Math_Mod
   use Gen_Mod
   use Domain_Mod,  only: Domain_Type,                  &
@@ -52,8 +52,7 @@
   call Tokenizer_Mod_Read_Line(5) 
   read(line % tokens(1), *) problem_name
 
-  domain_name = problem_name
-  domain_name(len_trim(problem_name)+1:len_trim(problem_name)+4) = '.dom'
+  call File_Mod_Set_Name(domain_name, extension='.dom')
   write(*, *) '# Now reading the file: ', domain_name
   open(9, file=domain_name)
 
