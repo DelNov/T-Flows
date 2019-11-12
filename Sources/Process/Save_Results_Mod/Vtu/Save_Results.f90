@@ -362,6 +362,12 @@
                                          turb % t2 % n(-grid % n_bnd_cells))
       call Save_Scalar(grid, IN_4, IN_5, "TurbulentT2Production", plot_inside, &
                                          turb % p_t2(-grid % n_bnd_cells))
+      call Save_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxX", plot_inside,    &
+                                         turb % ut % n(-grid % n_bnd_cells))
+      call Save_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxY", plot_inside,    &
+                                         turb % vt % n(-grid % n_bnd_cells))
+      call Save_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxZ", plot_inside,    &
+                                         turb % wt % n(-grid % n_bnd_cells))
       call Save_Scalar(grid, IN_4, IN_5, "TurbulenQuantityAlphaL",             &
                                          plot_inside,                          &
                                          turb % alpha_l(-grid % n_bnd_cells))
@@ -431,20 +437,20 @@
       uw_save(c) = turb % uw_res(c) - turb % u_mean(c) * turb % w_mean(c)
       vw_save(c) = turb % vw_res(c) - turb % v_mean(c) * turb % w_mean(c)
     end do
-    call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressXX", plot_inside,  &
+    call Save_Scalar(grid, IN_4, IN_5, "MeanReynoldsStressXX", plot_inside,  &
                                        uu_save(-grid % n_bnd_cells))
-    call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressYY", plot_inside,  &
+    call Save_Scalar(grid, IN_4, IN_5, "MeanReynoldsStressYY", plot_inside,  &
                                        vv_save(-grid % n_bnd_cells))
-    call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressZZ", plot_inside,  &
+    call Save_Scalar(grid, IN_4, IN_5, "MeanReynoldsStressZZ", plot_inside,  &
                                        ww_save(-grid % n_bnd_cells))
-    call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressXY", plot_inside,  &
+    call Save_Scalar(grid, IN_4, IN_5, "MeanReynoldsStressXY", plot_inside,  &
                                        uv_save(-grid % n_bnd_cells))
-    call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressXZ", plot_inside,  &
+    call Save_Scalar(grid, IN_4, IN_5, "MeanReynoldsStressXZ", plot_inside,  &
                                        uw_save(-grid % n_bnd_cells))
-    call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressYZ", plot_inside,  &
+    call Save_Scalar(grid, IN_4, IN_5, "MeanReynoldsStressYZ", plot_inside,  &
                                        vw_save(-grid % n_bnd_cells))
     if(heat_transfer) then
-      call Save_Scalar(grid, IN_4, IN_5, "TemperatureMean", plot_inside,  &
+      call Save_Scalar(grid, IN_4, IN_5, "MeanTemperature", plot_inside,  &
                                          turb % t_mean(-grid % n_bnd_cells))
       t2_save(:) = 0.0
       ut_save(:) = 0.0
@@ -456,16 +462,16 @@
         vt_save(c) = turb % vt_res(c) - turb % v_mean(c) * turb % t_mean(c)
         wt_save(c) = turb % wt_res(c) - turb % w_mean(c) * turb % t_mean(c)
       end do
-      call Save_Scalar(grid, IN_4, IN_5, "TemperatureFluctuations",     &
+      call Save_Scalar(grid, IN_4, IN_5, "MeanTurbulentQuantityT2",     &
                                          plot_inside,                   &
                                          t2_save(-grid % n_bnd_cells))
-      call Save_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxX",          &
+      call Save_Scalar(grid, IN_4, IN_5, "MeanTurbulentHeatFluxX",      &
                                          plot_inside,                   &
                                          ut_save(-grid % n_bnd_cells))
-      call Save_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxY",          &
+      call Save_Scalar(grid, IN_4, IN_5, "MeanTurbulentHeatFluxY",      &
                                          plot_inside,                   &
                                          vt_save(-grid % n_bnd_cells))
-      call Save_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxZ",          &
+      call Save_Scalar(grid, IN_4, IN_5, "MeanTurbulentHeatFluxZ",      &
                                          plot_inside,                   &
                                          wt_save(-grid % n_bnd_cells))
     end if
