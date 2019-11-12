@@ -224,7 +224,7 @@
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               flow % vort(1),'VorticityMagnitude')
   end if
-  if(turbulence_model .ne. NONE) then
+  if(turbulence_model .ne. NO_TURBULENCE) then
     kin_vis_t(1:grid % n_cells) = turb % vis_t(1:grid % n_cells)  &
                                 / viscosity(1:grid % n_cells)
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
@@ -312,7 +312,7 @@
   end if
 
   ! Save y+ for all turbulence models
-  if(turbulence_model .ne. NONE) then
+  if(turbulence_model .ne. NO_TURBULENCE) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               turb % y_plus(1),'TurbulentQuantityYplus')
   end if
