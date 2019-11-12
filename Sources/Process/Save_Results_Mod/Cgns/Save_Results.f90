@@ -147,6 +147,14 @@
                               flow % t % n(1), 'Temperature')
   end if
 
+  !---------------------!
+  !   Volume Fraction   !
+  !---------------------!
+  if(multiphase_model .eq. VOLUME_OF_FLUID) then
+    call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
+                              mult % vof % n(1), 'Temperature')
+  end if
+
   !------------------!
   !   Save scalars   !
   !------------------!
