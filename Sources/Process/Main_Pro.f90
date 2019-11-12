@@ -195,7 +195,7 @@
 
     time = time + flow % dt
 
-    ! Beginning of time steo
+    ! Beginning of time step
     call User_Mod_Beginning_Of_Time_Step(flow, turb, swarm, n, time)
 
     ! Start info boxes.
