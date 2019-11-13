@@ -44,7 +44,7 @@
     end do
   end do
   print '(a,a,i6)', ' # Number of boundary cells at ',  &
-                    eddies % bc_name,                   &
+                    trim(eddies % bc_name),             &
                     eddies % n_bnd_cells
 
   !-------------------------------!
