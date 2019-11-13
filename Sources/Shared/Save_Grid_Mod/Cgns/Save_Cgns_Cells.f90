@@ -29,9 +29,6 @@
     if (sub .lt. 2) print *, '# Creating the file with fields: ', trim(name_out)
   end if
 
-  if (sub .lt. 2) print *, '!!! mesh_written: ', mesh_written
-  if (sub .lt. 2) print *, '!!! file_with_mesh: ', file_with_mesh
-
   file_mode = CG_MODE_WRITE
   call Cgns_Mod_Open_File(name_out, file_mode)
 
