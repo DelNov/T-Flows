@@ -6,8 +6,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
-  integer         :: sub
+  type(Grid_Type)   :: grid
+  integer           :: sub
 !-----------------------------------[Locals]-----------------------------------!
   character(len=80) :: name_out
   integer           :: c, base, block, sect, coord
@@ -19,8 +19,18 @@
   !                       !
   !-----------------------!
 
-  call File_Mod_Set_Name(name_out, extension='.cgns')
-  if (sub .lt. 2) print *, '# Creating the file: ', trim(name_out)
+  if (.not. mesh_written) then
+    ! problem_name.cgns
+    call File_Mod_Set_Name(name_out, extension='.cgns')
+    if (sub .lt. 2) print *, '# Creating the file with mesh  : ', trim(name_out)
+  else
+    ! problem_name-ts??????.cgns
+    name_out = trim(file_name)
+    if (sub .lt. 2) print *, '# Creating the file with fields: ', trim(name_out)
+  end if
+
+  if (sub .lt. 2) print *, '!!! mesh_written: ', mesh_written
+  if (sub .lt. 2) print *, '!!! file_with_mesh: ', file_with_mesh
 
   file_mode = CG_MODE_WRITE
   call Cgns_Mod_Open_File(name_out, file_mode)
@@ -87,7 +97,7 @@
   coord = 3
   cgns_base(base) % block(block) % coord_name(coord) = "CoordinateZ"
 
-  ! actually write grid coordinates in DB
+  ! Actually write grid coordinates in DB
   if (.not. mesh_written) then
     do coord = 1, cgns_base(base) % cell_dim
       call Cgns_Mod_Write_Coordinate_Array(base, block, coord, grid)
@@ -129,15 +139,11 @@
   cgns_base(base) % block(block) % section(sect) % last_cell = cnt_tet
   
   ! actually write grid connections in DB
-  if (.not. mesh_written) then 
+  if (.not. mesh_written) then
 
     do sect = 1, cgns_base(base) % block(block) % n_sects
       call Cgns_Mod_Write_Section_Connections(base, block, sect, grid)
     end do
-
-    ! at this moment mesh is considered to be written successfully
-    mesh_written = .true.
-    file_with_mesh = trim(name_out)
 
   else ! write an link to actual mesh inside a different DB file
     call Write_Link_To_Mesh_In_File(file_with_mesh, base, block)
@@ -146,8 +152,8 @@
   ! Close DB
   call Cgns_Mod_Close_File
 
-  if (sub .lt. 2) &
-    print *, '# Wrote unstructured grid to file ',trim(name_out)
+  if (.not. mesh_written .and. sub .lt. 2) &
+    print *, '# Have written unstructured grid to file: ',trim(name_out)
 
   deallocate(cgns_base)
 

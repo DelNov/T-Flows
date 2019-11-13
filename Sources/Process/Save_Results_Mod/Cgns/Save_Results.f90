@@ -26,14 +26,14 @@
   integer                       :: ts           ! time step
   logical                       :: plot_inside  ! plot results inside?
 !----------------------------------[Locals]------------------------------------!
-  type(Grid_Type), pointer :: grid
-  type(Var_Type),  pointer :: phi
-  character(len=80)        :: name_out, name_mean
-  integer                  :: base
-  integer                  :: block
-  integer                  :: solution
-  integer                  :: field
-  integer                  :: c, sc
+  type(Grid_Type), pointer      :: grid
+  type(Var_Type),  pointer      :: phi
+  character(len=80)             :: name_out, name_mean
+  integer                       :: base
+  integer                       :: block
+  integer                       :: solution
+  integer                       :: field
+  integer                       :: c, sc
 !==============================================================================!
 
   if(.not. plot_inside) return ! no point to write *-bnd.cgns yet
@@ -43,9 +43,16 @@
   ! Take aliases
   grid => flow % pnt_grid
 
-  call File_Mod_Set_Name(name_out, extension='.cgns')
+  if (.not. mesh_written) then
+    ! problem_name.cgns
+    call File_Mod_Set_Name(name_out, extension='.cgns')
+  else
+    ! problem_name-ts??????.cgns
+    call File_Mod_Set_Name(name_out, time_step=ts, extension='.cgns')
+    file_name = trim(name_out) ! used in Save_Cgns_Cells
+  end if
 
-  if (this_proc .lt. 2) print *, '# subroutine Save_Cgns_Results'
+  if (this_proc < 2) print *, '# Subroutine Save_Cgns_Results'
 
   !-------------------------------------------!
   !   Write a mesh (if not already written)   !
@@ -190,7 +197,7 @@
   ! Save zeta and f22
   if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
      turbulence_model .eq. HYBRID_LES_RANS) then
-    do c = 1, grid % n_cells - grid % comm % n_buff_cells
+    do c = 1, grid % n_cells
       v2_calc(c) = turb % kin % n(c) * turb % zeta % n(c)
     end do
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
@@ -205,6 +212,12 @@
                                 turb % t2 % n(1), 'TurbulentQuantityT2')
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                                 turb % p_t2(1), 'TurbulentT2Production')
+      call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
+                                turb % ut % n(1), 'TurbulentHeatFluxX')
+      call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
+                                turb % vt % n(1), 'TurbulentHeatFluxY')
+      call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
+                                turb % wt % n(1), 'TurbulentHeatFluxZ')
       call Cgns_Mod_Write_Field(base, block, solution, field, grid,  &
                                 turb % alpha_l(1),                   &
                                 'TurbulentQauntityAlphaL')
@@ -269,17 +282,17 @@
     end do
 
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              uu_save(1),'ReynoldsStressXX')
+                              uu_save(1),'MeanReynoldsStressXX')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              vv_save(1),'ReynoldsStressYY')
+                              vv_save(1),'MeanReynoldsStressYY')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              ww_save(1),'ReynoldsStressZZ')
+                              ww_save(1),'MeanReynoldsStressZZ')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              uv_save(1),'ReynoldsStressXY')
+                              uv_save(1),'MeanReynoldsStressXY')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              uw_save(1),'ReynoldsStressXZ')
+                              uw_save(1),'MeanReynoldsStressXZ')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              vw_save(1),'ReynoldsStressYZ')
+                              vw_save(1),'MeanReynoldsStressYZ')
     if(heat_transfer) then
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                                turb % t_mean(1), 'TemperatureMean')
@@ -291,13 +304,13 @@
       end do
 
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                                t2_save(1),'TemperatureFluctuations')
+                                t2_save(1),'MeanTurbulentQuantityT2')
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                                ut_save(1),'TurbulentHeatFluxX')
+                                ut_save(1),'MeanTurbulentHeatFluxX')
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                                vt_save(1),'TurbulentHeatFluxY')
+                                vt_save(1),'MeanTurbulentHeatFluxY')
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                                wt_save(1),'TurbulentHeatFluxZ')
+                                wt_save(1),'MeanTurbulentHeatFluxZ')
     end if
 
     if(flow % n_scalars > 0) then
@@ -321,7 +334,7 @@
   end if
 
   ! Wall distance and delta
-  if (.not. permanent_fields_written) then ! [actual write]
+  if (.not. mesh_written) then ! Actual write
 
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               grid % wall_dist(1),'WallDistance')
@@ -331,8 +344,11 @@
                               turb % h_min(1),'CellDeltaMin')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               turb % h_w(1),'CellDeltaWall')
-    permanent_fields_written = .true.
-  else ! [link]
+
+    ! At this moment the mesh is considered to be written successfully
+    mesh_written = .true.
+    file_with_mesh = trim(name_out)
+  else ! Link to permanent fields
     call Write_Link_To_Field(base, block, solution, 'WallDistance')
     call Write_Link_To_Field(base, block, solution, 'CellDeltaMax')
     call Write_Link_To_Field(base, block, solution, 'CellDeltaMin')
@@ -352,8 +368,7 @@
   ! Close DB
   call Cgns_Mod_Close_File
 
-  if (this_proc < 2) &
-    print *, '# Added fields to ', trim(name_out)
+  if (this_proc < 2) print *, '# Added fields to ', trim(name_out)
 
   deallocate(cgns_base)
 

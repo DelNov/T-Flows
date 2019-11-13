@@ -67,7 +67,7 @@
   endif
 
   ! Print some info
-  if(verbose .and. this_proc.lt.2) then
+  if(verbose .and. this_proc < 2) then
     print *, '#     GridCoordinates linked to : ',  &
       trim(file), ':', trim(name_in_file)
   end if
@@ -102,7 +102,7 @@
       endif
 
       ! Print some info
-      if(verbose .and. this_proc.lt.2) then
+      if(verbose .and. this_proc < 2) then
         print *, '#     ', trim(name_in_file), ' linked to : ',  &
           trim(file), ':', trim(name_in_file)
       end if

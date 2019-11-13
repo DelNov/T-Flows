@@ -57,21 +57,21 @@
   name_in_file = '/'//trim(base_name)//'/'&
     //trim(block_name)//'/'//trim(solution_name)//'/'//trim(node_name)
 
-  ! Create a link in 'file' to 'name_in_file' and name it 'node_name'
+  ! Create a link in 'file_with_mesh' to 'name_in_file' and name it 'node_name'
   call Cg_Link_Write_F(trim(node_name),       & ! (in )
                        trim(file_with_mesh),  & ! (in )
                        trim(name_in_file),    & ! (in )
                        error)                   ! (out)
 
   if (error .ne. 0) then
-    print *, '# Failed to create a link to ', trim(file)
+    print *, '# Failed to create a link to ', trim(file_with_mesh)
     call Cg_Error_Exit_F()
   endif
 
   ! Print some info
   if(verbose .and. this_proc < 2) then
     print *, '# ', trim(node_name), ' linked to : ',  &
-      trim(file), ':', trim(name_in_file)
+      trim(file_with_mesh), ':', trim(name_in_file)
   end if
 
   end subroutine

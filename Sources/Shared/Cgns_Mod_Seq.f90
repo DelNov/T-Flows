@@ -154,9 +154,8 @@
   integer           :: cnt_bnd_cond
   character(len=80) :: bnd_cond_names(1024)
 
-  ! If an actual grid was written, further saves have just a link to that grid
+  ! If actual grid was written, further saves have just a link to that grid
   logical           :: mesh_written = .false.
-  logical           :: permanent_fields_written = .false. ! like "WallDistance"
   character(len=80) :: file_with_mesh
 
   contains
