@@ -11,6 +11,7 @@
   use Field_Mod,     only: Field_Type, Field_Mod_Allocate, heat_transfer
   use Turb_Mod
   use Grid_Mod
+  use Eddies_Mod
   use Grad_Mod
   use Bulk_Mod
   use Var_Mod,       only: Var_Type
@@ -39,6 +40,7 @@
   type(Turb_Type)       :: turb            ! turbulence modelling
   type(Multiphase_Type) :: mult            ! multiphase modelling
   type(Solver_Type)     :: sol             ! linear solvers
+  type(Eddies_Type)     :: eddies(1)       ! synthetic eddies
   real                  :: time            ! physical time of the simulation
   integer               :: first_dt        ! first time step in this run
   integer               :: last_dt         ! number of time steps
@@ -125,6 +127,11 @@
   call Load_Physical_Properties(grid)
 
   call Load_Boundary_Conditions(flow, turb, mult, backup)
+
+! call Eddies_Mod_Allocate   (eddies(1),  4, 0.3, flow, 'IN')
+! call Eddies_Mod_Superimpose(eddies(1))
+! call Save_Results(flow, turb, mult, 0, .false.)   ! save boundary
+! stop
 
   ! First time step is one, unless read from backup otherwise
   first_dt = 0

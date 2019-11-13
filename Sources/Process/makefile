@@ -219,6 +219,7 @@ SRC_MOD += Control_Mod.f90	\
            Numerics_Mod.f90	\
            Field_Mod.f90	\
            Grad_Mod.f90		\
+           Eddies_Mod.f90	\
            Monitor_Mod.f90	\
            Turb_Mod.f90		\
            Swarm_Mod.f90	\
