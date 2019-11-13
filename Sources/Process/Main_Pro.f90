@@ -31,7 +31,6 @@
 !----------------------------------[Locals]------------------------------------!
   integer               :: n, sc
   real                  :: mass_res
-! character(len=80)     :: name_save, name_save_bnd
   logical               :: backup, save_now, exit_now
   type(Grid_Type)       :: grid            ! grid used in computations
   type(Field_Type)      :: flow            ! flow field we will be solving for
@@ -108,11 +107,12 @@
   call Grad_Mod_Allocate(grid)
   call Turb_Mod_Allocate(turb, flow)
   call Swarm_Mod_Allocate(swarm, flow)
+  call Multiphase_Mod_Allocate(mult, flow)
   call Surf_Mod_Allocate(surf, flow)
   call User_Mod_Allocate(grid)
 
   ! Read numerical models from control file (after the memory is allocated)
-  call Read_Control_Numerical(flow, turb)
+  call Read_Control_Numerical(flow, turb, mult)
 
   call Grid_Mod_Calculate_Face_Geometry(grid)
   call Grid_Mod_Find_Nodes_Cells(grid)         ! for Lagrangian particle track
@@ -266,7 +266,7 @@
       call Turb_Mod_Main(turb, sol, n, ini)
 
       ! Update the values at boundaries
-      call Update_Boundary_Values(flow, turb)
+      call Update_Boundary_Values(flow, turb, mult)
 
       ! End of the current iteration
       call Info_Mod_Iter_Print()

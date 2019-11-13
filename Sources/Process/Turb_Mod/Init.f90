@@ -38,6 +38,7 @@
   end if
 
   if(turbulence_model .eq. HYBRID_LES_RANS) then
+    call Calculate_Shear_And_Vorticity(flow)
     call Turb_Mod_Vis_T_Dynamic(turb, sol)
     call Turb_Mod_Vis_T_Hybrid_Les_Rans(turb)
   end if
