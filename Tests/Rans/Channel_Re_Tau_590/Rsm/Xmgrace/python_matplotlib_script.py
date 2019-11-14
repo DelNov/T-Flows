@@ -2,12 +2,14 @@
 # this python template is used to plot data from .dat file produced by
 # Save_Results.f90
 # it is executed in ./Xmgrace directory
-# variables DAT_FILE_WITH_RESULTS_MACRO must be substituted
+# As argument you should supply a valid ../file.dat and 5 columns to read
+# Launch as python2 python_matplotlib_script.py ../file.dat 1 2 3 4 5
 
 # Header
 import numpy              as np
 import matplotlib.pyplot  as plt
 import matplotlib.lines   as lines
+import sys
 
 # Update default matplotlib settings
 plt.rcParams['mathtext.fontset'] = 'cm'
@@ -47,8 +49,14 @@ y3, eps1 = np.loadtxt(eps_plus_ref_data, unpack=True)
 y4, uv1  = np.loadtxt(uv_plus_ref_data,  unpack=True)
 
 #-Input data
-input_name = 'DAT_FILE_WITH_RESULTS_MACRO'
-y5, u2, k2, eps2, uv2 = np.loadtxt(input_name, usecols=(0,1,6,7,5), unpack=True)
+input_name = sys.argv[1]
+y5_c   = int(sys.argv[2])-1
+u2_c   = int(sys.argv[3])-1
+k2_c   = int(sys.argv[4])-1
+eps2_c = int(sys.argv[5])-1
+uv2_c  = int(sys.argv[6])-1
+y5, u2, k2, eps2, uv2 = np.loadtxt(input_name, \
+  usecols=(y5_c,u2_c,k2_c,eps2_c,uv2_c), unpack=True)
 
 # Assemble all data in one array ([x1, y1, x2, y2])
 data = np.array([[y1, u1,   y5, u2  ], \
@@ -63,10 +71,10 @@ axis = np.array([[0., 300., 50., 0., 30., 10.], \
                  [0., 300., 50., 0., 1. , 0.5]] )
 
 # Labels for each plot ([xlabel, ylabel])
-label = np.array([[r'$y$', r'$U^+$'          ], \
-                  [r'$y$', r'$k^+$'          ], \
-                  [r'$y$', r'$\varepsilon^+$'], \
-                  [r'$y$', r'$uv^+$'         ]] )
+label = np.array([[r'$y^+$', r'$U^+$'          ], \
+                  [r'$y^+$', r'$k^+$'          ], \
+                  [r'$y^+$', r'$\varepsilon^+$'], \
+                  [r'$y^+$', r'$uv^+$'         ]] )
 
 # Layout
 fig, ax = plt.subplots(2, 2)
