@@ -36,6 +36,20 @@
         call Eddies_Mod_Place_Eddy(eddies, e)
       end if
     end do
+  else if(eddies % y_plane < HUGE) then
+    do e = 1, eddies % n_eddies
+      if( abs(eddies % eddy(e) % y - eddies % y_plane)  &
+            > eddies % eddy(e) % length) then
+        call Eddies_Mod_Place_Eddy(eddies, e)
+      end if
+    end do
+  else if(eddies % z_plane < HUGE) then
+    do e = 1, eddies % n_eddies
+      if( abs(eddies % eddy(e) % z - eddies % z_plane)  &
+            > eddies % eddy(e) % length) then
+        call Eddies_Mod_Place_Eddy(eddies, e)
+      end if
+    end do
   end if
 
   end subroutine
