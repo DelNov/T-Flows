@@ -1,5 +1,9 @@
 !==============================================================================!
-  subroutine Eddies_Mod_Allocate(eddies, n_edd, max_r, flow, bnd_cond_name)
+  subroutine Eddies_Mod_Allocate(eddies,   &
+                                 n_edd,    &
+                                 max_r,    &
+                                 intns,    &
+                                 flow, bnd_cond_name)
 !------------------------------------------------------------------------------!
 !   Allocate memory for eddies                                                 !
 !------------------------------------------------------------------------------!
@@ -9,6 +13,7 @@
   type(Field_Type),  target :: flow
   integer                   :: n_edd   ! number of eddies
   real                      :: max_r   ! maximum eddy radius
+  real                      :: intns   ! eddy intensity
   character(len=*)          :: bnd_cond_name
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
@@ -29,6 +34,7 @@
   ! Store number of eddies ...
   eddies % n_eddies   = n_edd
   eddies % max_radius = max_r
+  eddies % intensity  = intns
 
   ! ... and allocate memory for all of them
   allocate(eddies % eddy(eddies % n_eddies))
