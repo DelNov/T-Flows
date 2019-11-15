@@ -46,6 +46,7 @@
     type(Eddy_Type), allocatable :: eddy(:)   ! storage for eddies
 
     real :: max_radius  ! maximum radius for an eddy
+    real :: intensity   ! intensity of the eddies
     real :: x_plane
     real :: y_plane
     real :: z_plane
