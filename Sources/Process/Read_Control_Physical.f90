@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Read_Control_Physical(flow, swarm, turb, backup)
+  subroutine Read_Control_Physical(flow, swarm, turb)
 !------------------------------------------------------------------------------!
 !   Reads details about physical models from control file.                     !
 !------------------------------------------------------------------------------!
@@ -19,7 +19,6 @@
   type(Field_Type), target :: flow
   type(Swarm_Type), target :: swarm
   type(Turb_Type),  target :: turb
-  logical                  :: backup
 !----------------------------------[Locals]------------------------------------!
   type(Bulk_Type), pointer :: bulk
   character(len=80)        :: name
@@ -188,14 +187,12 @@
   !   Pressure drops and mass fluxes   !
   !                                    !
   !------------------------------------!
-  if(.not. backup) then
-    call Control_Mod_Pressure_Drops(bulk % p_drop_x,  &
-                                    bulk % p_drop_y,  &
-                                    bulk % p_drop_z)
-    call Control_Mod_Mass_Flow_Rates(bulk % flux_x_o,  &
-                                     bulk % flux_y_o,  &
-                                     bulk % flux_z_o)
-  end if
+  call Control_Mod_Pressure_Drops(bulk % p_drop_x,  &
+                                  bulk % p_drop_y,  &
+                                  bulk % p_drop_z)
+  call Control_Mod_Mass_Flow_Rates(bulk % flux_x_o,  &
+                                   bulk % flux_y_o,  &
+                                   bulk % flux_z_o)
 
   !-------------------------------!
   !                               !
