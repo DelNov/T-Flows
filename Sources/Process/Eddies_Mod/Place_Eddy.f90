@@ -41,6 +41,12 @@
   eddies % eddy(e) % x = eddies % bnd_xc(rc)
   eddies % eddy(e) % y = eddies % bnd_yc(rc)
   eddies % eddy(e) % z = eddies % bnd_zc(rc)
+  eddies % eddy(e) % u = eddies % bnd_u (rc)
+  eddies % eddy(e) % v = eddies % bnd_v (rc)
+  eddies % eddy(e) % w = eddies % bnd_w (rc)
+
+  ! Don't allow eddies bigger than wall distance
+  if(eddies % eddy(e) % radius > eddies % bnd_wd(rc)) goto 1
 
   ! Check that it is not too close to other eddies
   min_dist = HUGE
@@ -54,19 +60,24 @@
                                                  eddies % eddy(oe) % z))
     end if
   end do
-! if(min_dist < ONE_THIRD * eddies % max_radius) then
-!   goto 1
-! end if
+  if(min_dist < TWO_THIRDS * eddies % max_radius) then
+    goto 1
+  end if
 
   ! Assume eddies move in x direction
   call random_number(tmp)
-  eddies % eddy(e) % x = eddies % eddy(e) % x             &
-                       - eddies % eddy(e) % length * 0.5  &
-                       + eddies % eddy(e) % length * tmp
-
-!DEBUG EDDIES % EDDY(E) % Y = 0.5
-!DEBUG EDDIES % EDDY(E) % Z = 0.5
-!DEBUG EDDIES % EDDY(E) % RADIUS = 0.45
-!DEBUG EDDIES % EDDY(E) % LENGTH = 3.0
+  if(eddies % x_plane < HUGE) then
+    eddies % eddy(e) % x = eddies % eddy(e) % x             &
+                         - eddies % eddy(e) % length * 0.5  &
+                         + eddies % eddy(e) % length * tmp
+  else if(eddies % y_plane < HUGE) then
+    eddies % eddy(e) % y = eddies % eddy(e) % y             &
+                         - eddies % eddy(e) % length * 0.5  &
+                         + eddies % eddy(e) % length * tmp
+  else if(eddies % z_plane < HUGE) then
+    eddies % eddy(e) % z = eddies % eddy(e) % z             &
+                         - eddies % eddy(e) % length * 0.5  &
+                         + eddies % eddy(e) % length * tmp
+  end if
 
   end subroutine
