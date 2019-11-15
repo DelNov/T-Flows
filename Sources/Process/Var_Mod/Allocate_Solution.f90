@@ -30,10 +30,13 @@
   allocate (phi % a(grid % n_cells));  phi % a = 0.
 
   ! Cross diffusion terms
-  allocate (phi % c(grid % n_cells));   phi % c = 0.
+  allocate (phi % c(grid % n_cells));  phi % c = 0.
+
+  ! Variable's boundary value
+  allocate (phi % b(-grid % n_bnd_cells: -1));  phi % b = 0.
 
   ! Variable's boundary flux
-  allocate (phi % q(-grid % n_bnd_cells: -1));  phi % q  = 0.
+  allocate (phi % q(-grid % n_bnd_cells: -1));  phi % q = 0.
 
   ! Boundary cell type (important for scalars, since they
   ! can have different boundary conditions at the walls)
