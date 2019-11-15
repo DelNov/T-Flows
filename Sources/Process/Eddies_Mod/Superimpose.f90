@@ -33,7 +33,7 @@
         ze  = eddies % eddy(e) % z
         re  = eddies % eddy(e) % radius
         le  = eddies % eddy(e) % length
-        sgn = eddies % eddy(e) % sgn
+        sgn = eddies % eddy(e) % sense
 
         ! Sigmas for Gaussian distribution
         sig_x = le / 2.0
