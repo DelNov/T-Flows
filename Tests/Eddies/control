@@ -1,13 +1,16 @@
 #----------
 # Prologue
 #---------
- PROBLEM_NAME     cube
+#PROBLEM_NAME     cube-x
+#PROBLEM_NAME     cube-y
+ PROBLEM_NAME     cube-z
  HEAT_TRANSFER    no
 
-NUMBER_OF_TIME_STEPS     300
- RESULTS_SAVE_INTERVAL    60
-BACKUP_SAVE_INTERVAL 10
- TIME_STEP               1.0
+NUMBER_OF_TIME_STEPS    240
+RESULTS_SAVE_INTERVAL     1
+BACKUP_SAVE_INTERVAL     30
+
+TIME_STEP                 0.02
 
 #LOAD_BACKUP_NAME backstep_orthogonal-ts.backup
 
@@ -74,9 +77,23 @@ BACKUP_SAVE_INTERVAL 10
 #   VARIABLES           z   u
 #   FILE                profile.dat
     VARIABLES           u     v     w
-    VALUES              0.0   0.0   0.0
+# x VALUES              1.0   0.0   0.0
+# y VALUES              0.0   1.0   0.0
+    VALUES              0.0   0.0   1.0
 
   BOUNDARY_CONDITION    out
     TYPE                outflow
     VARIABLES           u     v     w
-    VALUES              0.0   0.0   0.0
+# x VALUES              1.0   0.0   0.0
+# y VALUES              0.0   1.0   0.0
+    VALUES              0.0   0.0   1.0
+
+  SYNTHETIC_EDDIES      in
+    NUMBER_OF_EDDIES    36
+    MAX_EDDY_RADIUS     0.1333
+    EDDY_INTENSITY      0.1
+
+  SYNTHETIC_EDDIES      out
+    NUMBER_OF_EDDIES    24
+    MAX_EDDY_RADIUS     0.1666
+    EDDY_INTENSITY      0.1
