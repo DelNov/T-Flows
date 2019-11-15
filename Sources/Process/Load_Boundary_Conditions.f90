@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Load_Boundary_Conditions(flow, turb, mult, backup)
+  subroutine Load_Boundary_Conditions(flow, turb, mult)
 !------------------------------------------------------------------------------!
 !   Reads boundary condition from control file                                 !
 !------------------------------------------------------------------------------!
@@ -17,10 +17,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),       target :: flow
-  type(Turb_Type),        target :: turb
-  type(Multiphase_Type),  target :: mult
-  logical                        :: backup
+  type(Field_Type),      target :: flow
+  type(Turb_Type),       target :: turb
+  type(Multiphase_Type), target :: mult
 !----------------------------------[Calling]-----------------------------------!
   integer :: Key_Ind
 !-----------------------------------[Locals]-----------------------------------!
@@ -29,8 +28,8 @@
   type(Var_Type),  pointer :: kin, eps, f22, zeta, vis, t2
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   type(Var_Type),  pointer :: scalar(:)
-  integer                  :: c, m, l, k, i, n, n_points, nks, nvs, sc, c1, c2, s
-  character(len=80)        :: name_prof(128), answer, name_in
+  integer                  :: c,m,l,k,i,bc,n_points,nks,nvs,sc,c1,c2,s
+  character(len=80)        :: name_prof(128)
   real                     :: wi, dist_min, x, y, z, xp, dist
   real, allocatable        :: prof(:,:)
   logical                  :: here
@@ -58,22 +57,6 @@
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
   call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
 
-  !--------------------------------------------!
-  !   Full name is specified in control file   !
-  !--------------------------------------------!
-  call Control_Mod_Load_Backup_Name(name_in)
-
-  !--------------------------------!
-  !   Check if backup is present   !
-  !--------------------------------!
-  answer = name_in
-  call To_Upper_Case(answer)
-
-  backup = .true.
-  if(answer .eq. 'SKIP') then
-    backup = .false.
-  end if
-
   !-------------------------!
   !   Read wall roughness   !
   !-------------------------!
@@ -87,10 +70,10 @@
   types_file(:)      = .false.
   c_types            = 0
 
-  do n = 1, grid % n_bnd_cond
-    call Control_Mod_Position_At_Two_Keys('BOUNDARY_CONDITION',       &
-                                          grid % bnd_cond % name(n),  &
-                                          found,                      &
+  do bc = 1, grid % n_bnd_cond
+    call Control_Mod_Position_At_Two_Keys('BOUNDARY_CONDITION',        &
+                                          grid % bnd_cond % name(bc),  &
+                                          found,                       &
                                           .false.)
     if(found) then
 1     continue
@@ -105,7 +88,7 @@
       call Control_Mod_Read_Char_Item_On('VARIABLES', 'VOID', try_str, .false.)
       call Control_Mod_Read_Char_Item_On('VALUES',    'VOID', try_str, .false.)
 
-      types_per_color(n) = types_per_color(n) + 1
+      types_per_color(bc) = types_per_color(bc) + 1
       c_types = c_types + 1
       types_names(c_types) = bc_type_name
 
@@ -119,7 +102,7 @@
     else
       if(this_proc < 2) then
         print *, '# ERROR!  Boundary conditions for ',  &
-                 trim(grid % bnd_cond % name(n)),       &
+                 trim(grid % bnd_cond % name(bc)),      &
                  ' not specified in the control file!'
         print *, '# Exiting the program.'
       end if
@@ -139,14 +122,14 @@
   !------------------------------------------------!
   c_types = 0
 
-  do n = 1, grid % n_bnd_cond
+  do bc = 1, grid % n_bnd_cond
 
     ! Position yourself well
-    call Control_Mod_Position_At_Two_Keys('BOUNDARY_CONDITION',       &
-                                          grid % bnd_cond % name(n),  &
-                                          found,                      &
+    call Control_Mod_Position_At_Two_Keys('BOUNDARY_CONDITION',        &
+                                          grid % bnd_cond % name(bc),  &
+                                          found,                       &
                                           .false.)
-    do l = 1, types_per_color(n)
+    do l = 1, types_per_color(bc)
 
       ! Update the counter
       c_types = c_types + 1
@@ -162,25 +145,25 @@
       ! Copy boundary conditions which were given for the grid
       if( bc_type_name .eq. 'INFLOW') then
         bc_type_tag = INFLOW
-        grid % bnd_cond % type(n) = INFLOW
+        grid % bnd_cond % type(bc) = INFLOW
       else if( bc_type_name .eq. 'WALL') then
         bc_type_tag = WALL
-        grid % bnd_cond % type(n) = WALL
+        grid % bnd_cond % type(bc) = WALL
       else if( bc_type_name .eq. 'OUTFLOW') then
         bc_type_tag = OUTFLOW
-        grid % bnd_cond % type(n) = OUTFLOW
+        grid % bnd_cond % type(bc) = OUTFLOW
       else if( bc_type_name .eq. 'SYMMETRY') then
         bc_type_tag = SYMMETRY
-        grid % bnd_cond % type(n) = SYMMETRY
+        grid % bnd_cond % type(bc) = SYMMETRY
       else if( bc_type_name .eq. 'WALL_FLUX') then
         bc_type_tag = WALLFL
-        grid % bnd_cond % type(n) = WALLFL
+        grid % bnd_cond % type(bc) = WALLFL
       else if( bc_type_name .eq. 'CONVECTIVE') then
         bc_type_tag = CONVECT
-        grid % bnd_cond % type(n) = CONVECT
+        grid % bnd_cond % type(bc) = CONVECT
       else if( bc_type_name .eq. 'PRESSURE') then
         bc_type_tag = PRESSURE
-        grid % bnd_cond % type(n) = PRESSURE
+        grid % bnd_cond % type(bc) = PRESSURE
       else
         if(this_proc < 2)  &
           print *, '# ERROR!  Load_Boundary_Conditions: '//        &
@@ -212,9 +195,8 @@
         !--------------------------------------------------!
 
         ! Distribute b.c. tags only.
-        ! They are distributed if backup or not
         do c = -1, -grid % n_bnd_cells, -1
-          if(grid % bnd_cond % color(c) .eq. n) then
+          if(grid % bnd_cond % color(c) .eq. bc) then
 
             ! Temperature
             if(heat_transfer) then
@@ -240,25 +222,24 @@
               if(i > 0) scalar(sc) % bnd_cell_type(c) = bc_type_tag
             end do
 
-          end if  ! bnd_color .eq. n
+          end if  ! bnd_color .eq. bc
 
         end do
 
         ! Distribute b.c. values
-        ! They are distributed only if not backup
         do c = -1, -grid % n_bnd_cells, -1
-          if(grid % bnd_cond % color(c) .eq. n .and. .not. backup) then
+          if(grid % bnd_cond % color(c) .eq. bc) then
 
             ! For velocity and pressure
-            i = Key_Ind('U', keys, nks); if(i > 0) u % n(c) = vals(i)
-            i = Key_Ind('V', keys, nks); if(i > 0) v % n(c) = vals(i)
-            i = Key_Ind('W', keys, nks); if(i > 0) w % n(c) = vals(i)
-            i = Key_Ind('P', keys, nks); if(i > 0) p % n(c) = vals(i)
+            i = Key_Ind('U', keys, nks); if(i > 0) u % b(c) = vals(i)
+            i = Key_Ind('V', keys, nks); if(i > 0) v % b(c) = vals(i)
+            i = Key_Ind('W', keys, nks); if(i > 0) w % b(c) = vals(i)
+            i = Key_Ind('P', keys, nks); if(i > 0) p % b(c) = vals(i)
 
             ! Temperature
             if(heat_transfer) then
               i = Key_Ind('T', keys, nks)
-              if(i > 0) t % n(c) = vals(i)
+              if(i > 0) t % b(c) = vals(i)
               i = Key_Ind('Q', keys, nks)
               if(i > 0) t % q(c) = vals(i)
             end if
@@ -266,7 +247,7 @@
             ! Multiphase flow
             if (multiphase_model .eq. VOLUME_OF_FLUID) then
               i = Key_Ind('V_FRAC', keys, nks)
-              if(i > 0) vof % n(c) = vals(i)
+              if(i > 0) vof % b(c) = vals(i)
               i = Key_Ind('V_FRAC_GRAD', keys, nks)
               if(i > 0) vof % q(c) = vals(i)
             end if
@@ -274,7 +255,7 @@
             ! For scalars
             do sc = 1, flow % n_scalars
               i = Key_Ind(scalar(sc) % name, keys, nks)
-              if(i > 0) scalar(sc) % n(c) = vals(i)
+              if(i > 0) scalar(sc) % b(c) = vals(i)
               i = Key_Ind(scalar(sc) % flux_name, keys, nks)
               if(i > 0) scalar(sc) % q(c) = vals(i)
             end do
@@ -282,44 +263,45 @@
             ! For turbulence models
             if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
                turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
-              i = Key_Ind('UU',  keys, nks); if(i > 0) uu  % n(c) = vals(i)
-              i = Key_Ind('VV',  keys, nks); if(i > 0) vv  % n(c) = vals(i)
-              i = Key_Ind('WW',  keys, nks); if(i > 0) ww  % n(c) = vals(i)
-              i = Key_Ind('UV',  keys, nks); if(i > 0) uv  % n(c) = vals(i)
-              i = Key_Ind('UW',  keys, nks); if(i > 0) uw  % n(c) = vals(i)
-              i = Key_Ind('VW',  keys, nks); if(i > 0) vw  % n(c) = vals(i)
-              i = Key_Ind('EPS', keys, nks); if(i > 0) eps % n(c) = vals(i)
+              i = Key_Ind('UU',  keys, nks); if(i > 0) uu  % b(c) = vals(i)
+              i = Key_Ind('VV',  keys, nks); if(i > 0) vv  % b(c) = vals(i)
+              i = Key_Ind('WW',  keys, nks); if(i > 0) ww  % b(c) = vals(i)
+              i = Key_Ind('UV',  keys, nks); if(i > 0) uv  % b(c) = vals(i)
+              i = Key_Ind('UW',  keys, nks); if(i > 0) uw  % b(c) = vals(i)
+              i = Key_Ind('VW',  keys, nks); if(i > 0) vw  % b(c) = vals(i)
+              i = Key_Ind('EPS', keys, nks); if(i > 0) eps % b(c) = vals(i)
 
               if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
-                i = Key_Ind('F22', keys, nks); if(i > 0) f22 % n(c) = vals(i)
+                i = Key_Ind('F22', keys, nks); if(i > 0) f22 % b(c) = vals(i)
               end if
             end if
 
             if(turbulence_model .eq. K_EPS) then
-              i = Key_Ind('KIN', keys, nks); if(i > 0) kin % n(c) = vals(i)
-              i = Key_Ind('EPS', keys, nks); if(i > 0) eps % n(c) = vals(i)
+              i = Key_Ind('KIN', keys, nks); if(i > 0) kin % b(c) = vals(i)
+              i = Key_Ind('EPS', keys, nks); if(i > 0) eps % b(c) = vals(i)
               turb % y_plus(c) = 1.1
               if(heat_transfer) then
-                i = Key_Ind('T2',  keys, nks); if(i > 0) t2  % n(c) = vals(i)
+                i = Key_Ind('T2',  keys, nks); if(i > 0) t2 % b(c) = vals(i)
               end if
             end if
 
             if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
                turbulence_model .eq. HYBRID_LES_RANS) then
-              i = Key_Ind('KIN',  keys, nks); if(i > 0) kin  % n(c) = vals(i)
-              i = Key_Ind('EPS',  keys, nks); if(i > 0) eps  % n(c) = vals(i)
-              i = Key_Ind('ZETA', keys, nks); if(i > 0) zeta % n(c) = vals(i)
-              i = Key_Ind('F22',  keys, nks); if(i > 0) f22  % n(c) = vals(i)
+              i = Key_Ind('KIN',  keys, nks); if(i > 0) kin  % b(c) = vals(i)
+              i = Key_Ind('EPS',  keys, nks); if(i > 0) eps  % b(c) = vals(i)
+              i = Key_Ind('ZETA', keys, nks); if(i > 0) zeta % b(c) = vals(i)
+              i = Key_Ind('F22',  keys, nks); if(i > 0) f22  % b(c) = vals(i)
               if(heat_transfer) then
-                i = Key_Ind('T2',  keys, nks); if(i > 0) t2  % n(c) = vals(i)
+                i = Key_Ind('T2',  keys, nks); if(i > 0) t2  % b(c) = vals(i)
               end if
             end if
 
             if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
                turbulence_model .eq. DES_SPALART) then
-              i = Key_Ind('VIS',  keys, nks); if(i > 0) vis % n(c) = vals(i)
+              i = Key_Ind('VIS',  keys, nks); if(i > 0) vis % b(c) = vals(i)
             end if
-          end if ! backup
+          end if
+
         end do
 
       !---------------------------------------------!
@@ -360,8 +342,7 @@
           do c = -1, -grid % n_bnd_cells, -1
 
             ! Distribute b.c. types
-            ! They are distributed only if not backup
-            if(grid % bnd_cond % color(c) .eq. n) then
+            if(grid % bnd_cond % color(c) .eq. bc) then
 
               ! For temperature
               if(heat_transfer) then
@@ -382,8 +363,7 @@
             end if
 
             ! Distribute b.c. values
-            ! They are distributed only if not backup
-            if(grid % bnd_cond % color(c) .eq. n .and. .not. backup) then
+            if(grid % bnd_cond % color(c) .eq. bc) then
 
               dist_min = HUGE
               do m = 1, n_points
@@ -418,15 +398,15 @@
               end do
 
               ! For velocity and pressure
-              i = Key_Ind('U', keys, nks); if(i > 0) u % n(c) = prof(k,i)
-              i = Key_Ind('V', keys, nks); if(i > 0) v % n(c) = prof(k,i)
-              i = Key_Ind('W', keys, nks); if(i > 0) w % n(c) = prof(k,i)
-              i = Key_Ind('P', keys, nks); if(i > 0) p % n(c) = prof(k,i)
+              i = Key_Ind('U', keys, nks); if(i > 0) u % b(c) = prof(k,i)
+              i = Key_Ind('V', keys, nks); if(i > 0) v % b(c) = prof(k,i)
+              i = Key_Ind('W', keys, nks); if(i > 0) w % b(c) = prof(k,i)
+              i = Key_Ind('P', keys, nks); if(i > 0) p % b(c) = prof(k,i)
 
               ! For temperature
               if(heat_transfer) then
                 i = Key_Ind('T', keys, nks)
-                if(i > 0) t % n(c) = prof(k,i)
+                if(i > 0) t % b(c) = prof(k,i)
                 i = Key_Ind('Q', keys, nks)
                 if(i > 0) t % q(c) = prof(k,i)
               end if
@@ -434,51 +414,51 @@
               ! For scalars
               do sc = 1, flow % n_scalars
                 i = Key_Ind(scalar(sc) % name, keys, nks)
-                if(i > 0) scalar(sc) % n(c) = prof(k,i)
+                if(i > 0) scalar(sc) % b(c) = prof(k,i)
                 i = Key_Ind(scalar(sc) % flux_name, keys, nks)
                 if(i > 0) scalar(sc) % q(c) = prof(k,i)
               end do
 
               ! For turbulence models
               if(turbulence_model .eq. K_EPS) then
-                i = Key_Ind('KIN', keys, nks); if(i > 0) kin % n(c) = prof(k,i)
-                i = Key_Ind('EPS', keys, nks); if(i > 0) eps % n(c) = prof(k,i)
+                i = Key_Ind('KIN', keys, nks); if(i > 0) kin % b(c) = prof(k,i)
+                i = Key_Ind('EPS', keys, nks); if(i > 0) eps % b(c) = prof(k,i)
                 if(heat_transfer) then
-                  i = Key_Ind('T2',  keys, nks); if(i>0) t2  % n(c) = prof(k,i)
+                  i = Key_Ind('T2',  keys, nks); if(i>0) t2  % b(c) = prof(k,i)
                 end if
               end if
 
               if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
                  turbulence_model .eq. HYBRID_LES_RANS) then
-                i = Key_Ind('KIN',  keys, nks); if(i>0) kin  % n(c) = prof(k,i)
-                i = Key_Ind('EPS',  keys, nks); if(i>0) eps  % n(c) = prof(k,i)
-                i = Key_Ind('ZETA', keys, nks); if(i>0) zeta % n(c) = prof(k,i)
-                i = Key_Ind('F22',  keys, nks); if(i>0) f22  % n(c) = prof(k,i)
+                i = Key_Ind('KIN',  keys, nks); if(i>0) kin  % b(c) = prof(k,i)
+                i = Key_Ind('EPS',  keys, nks); if(i>0) eps  % b(c) = prof(k,i)
+                i = Key_Ind('ZETA', keys, nks); if(i>0) zeta % b(c) = prof(k,i)
+                i = Key_Ind('F22',  keys, nks); if(i>0) f22  % b(c) = prof(k,i)
                 if(heat_transfer) then
-                  i = Key_Ind('T2',  keys, nks); if(i>0) t2  % n(c) = prof(k,i)
+                  i = Key_Ind('T2',  keys, nks); if(i>0) t2  % b(c) = prof(k,i)
                 end if
               end if
 
               if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
                  turbulence_model .eq. DES_SPALART) then
-                i = Key_Ind('VIS', keys, nks); if(i > 0) vis % n(c) = prof(k,i)
+                i = Key_Ind('VIS', keys, nks); if(i > 0) vis % b(c) = prof(k,i)
               end if
 
               if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
                  turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
-                i = Key_Ind('UU', keys, nks); if(i > 0) uu  % n(c) = prof(k,i)
-                i = Key_Ind('VV', keys, nks); if(i > 0) vv  % n(c) = prof(k,i)
-                i = Key_Ind('WW', keys, nks); if(i > 0) ww  % n(c) = prof(k,i)
-                i = Key_Ind('UV', keys, nks); if(i > 0) uv  % n(c) = prof(k,i)
-                i = Key_Ind('UW', keys, nks); if(i > 0) uw  % n(c) = prof(k,i)
-                i = Key_Ind('VW', keys, nks); if(i > 0) vw  % n(c) = prof(k,i)
-                i = Key_Ind('EPS',keys, nks); if(i > 0) eps % n(c) = prof(k,i)
+                i = Key_Ind('UU', keys, nks); if(i > 0) uu  % b(c) = prof(k,i)
+                i = Key_Ind('VV', keys, nks); if(i > 0) vv  % b(c) = prof(k,i)
+                i = Key_Ind('WW', keys, nks); if(i > 0) ww  % b(c) = prof(k,i)
+                i = Key_Ind('UV', keys, nks); if(i > 0) uv  % b(c) = prof(k,i)
+                i = Key_Ind('UW', keys, nks); if(i > 0) uw  % b(c) = prof(k,i)
+                i = Key_Ind('VW', keys, nks); if(i > 0) vw  % b(c) = prof(k,i)
+                i = Key_Ind('EPS',keys, nks); if(i > 0) eps % b(c) = prof(k,i)
 
                 if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
-                  i = Key_Ind('F22', keys, nks); if(i>0) f22 % n(c) = prof(k,i)
+                  i = Key_Ind('F22', keys, nks); if(i>0) f22 % b(c) = prof(k,i)
                 end if
               end if
-            end if      !end if(grid % bnd_cond % color(c) .eq. n .and. backup)
+            end if      !end if(grid % bnd_cond % color(c) .eq. n)
           end do        !end do c = -1, -grid % n_bnd_cells, -1
 
         !----------------------------!
@@ -488,9 +468,7 @@
 
           do c = -1, -grid % n_bnd_cells, -1
 
-            ! If backup is set to true, set boundary values,
-            ! otherwise, just the TypeBC remains set.
-            if(grid % bnd_cond % color(c) .eq. n) then
+            if(grid % bnd_cond % color(c) .eq. bc) then
 
               do m = 1, n_points-1
                 here = .false.
@@ -561,11 +539,9 @@
 
                 end if  ! here
               end do    ! m, points
-            end if      ! bnd_color .eq. n
+            end if      ! bnd_color .eq. bc
 
-            ! If backup is set to true, set boundary values,
-            ! otherwise, just the TypeBC remains set.
-            if(grid % bnd_cond % color(c) .eq. n .and. .not. backup) then
+            if(grid % bnd_cond % color(c) .eq. bc) then
 
               do m = 1, n_points-1
                 here = .false.
@@ -621,18 +597,18 @@
 
                   ! For velocity and pressure
                   i = Key_Ind('U',keys,nks)
-                  if(i > 0) u % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
+                  if(i > 0) u % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
                   i = Key_Ind('V',keys,nks)
-                  if(i > 0) v % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
+                  if(i > 0) v % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
                   i = Key_Ind('W',keys,nks)
-                  if(i > 0) w % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
+                  if(i > 0) w % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
                   i = Key_Ind('P',keys,nks)
-                  if(i > 0) p % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
+                  if(i > 0) p % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
 
                   ! For temperature
                   if(heat_transfer) then
                     i = Key_Ind('T',keys,nks)
-                    if(i > 0) t % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
+                    if(i > 0) t % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
                     if(i > 0) t % bnd_cell_type(c) = bc_type_tag
                     i = Key_Ind('Q',keys,nks)
                     if(i > 0) t % q(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
@@ -643,7 +619,7 @@
                   do sc = 1, flow % n_scalars
                     i = Key_Ind(scalar(sc) % name, keys, nks)
                     if(i > 0) &
-                      scalar(sc) % n(c)=wi*prof(m,i)+(1.-wi)*prof(m+1,i)
+                      scalar(sc) % b(c)=wi*prof(m,i)+(1.-wi)*prof(m+1,i)
                     i = Key_Ind(scalar(sc) % flux_name, keys, nks)
                     if(i > 0) &
                       scalar(sc) % q(c)=wi*prof(m,i)+(1.-wi)*prof(m+1,i)
@@ -653,14 +629,14 @@
                   if(turbulence_model .eq. K_EPS) then
 
                     i = Key_Ind('KIN',keys,nks)
-                    if(i > 0) kin % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
+                    if(i > 0) kin % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
 
                     i = Key_Ind('EPS',keys,nks)
-                    if(i > 0) eps % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
-                  
+                    if(i > 0) eps % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
+
                     if(heat_transfer) then
                       i = Key_Ind('T2',keys,nks)
-                      if(i > 0) t2 % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
+                      if(i > 0) t2 % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
                     end if
 
                   end if
@@ -669,20 +645,20 @@
                      turbulence_model .eq. HYBRID_LES_RANS) then
 
                     i = Key_Ind('KIN',keys,nks)
-                    if(i > 0) kin % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
+                    if(i > 0) kin % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
 
                     i = Key_Ind('EPS',keys,nks)
-                    if(i > 0) eps % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
+                    if(i > 0) eps % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
 
                     i = Key_Ind('ZETA',keys,nks)
-                    if(i > 0) zeta % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
+                    if(i > 0) zeta % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
 
                     i = Key_Ind('F22',keys,nks)
-                    if(i > 0) f22 % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
-                    
+                    if(i > 0) f22 % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
+
                     if(heat_transfer) then
                       i = Key_Ind('T2',keys,nks)
-                      if(i > 0) t2 % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
+                      if(i > 0) t2 % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
                     end if
 
                   end if
@@ -691,41 +667,41 @@
                      turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
 
                     i = Key_Ind('UU', keys, nks)
-                    if(i > 0) uu % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
+                    if(i > 0) uu % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
 
                     i = Key_Ind('VV', keys, nks)
-                    if(i > 0) vv % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
+                    if(i > 0) vv % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
 
                     i = Key_Ind('WW', keys, nks)
-                    if(i > 0) ww % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
+                    if(i > 0) ww % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
 
                     i = Key_Ind('UV', keys, nks)
-                    if(i > 0) uv % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
+                    if(i > 0) uv % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
 
                     i = Key_Ind('UW', keys, nks)
-                    if(i > 0) uw % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
+                    if(i > 0) uw % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
 
                     i = Key_Ind('VW', keys, nks)
-                    if(i > 0) vw % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
+                    if(i > 0) vw % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
 
                     i = Key_Ind('EPS', keys, nks)
-                    if(i > 0) eps % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
+                    if(i > 0) eps % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
 
                     if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
                       i = Key_Ind('F22', keys, nks)
-                      if(i > 0)f22 % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
+                      if(i > 0)f22 % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
                     end if
                   end if
 
                   if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
                      turbulence_model .eq. DES_SPALART) then
                     i = Key_Ind('VIS',keys,nks)
-                    if(i > 0) vis % n(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
+                    if(i > 0) vis % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
                   end if
 
                 end if  ! (here)
               end do  ! m = 1, n_points-1
-            end if  ! if(backup)
+            end if
           end do  ! c = -1, -grid % n_bnd_cells, -1
         end if  ! plane is defined?
         close(9)
@@ -733,6 +709,75 @@
     end do
 
   end do
+
+  !---------------------------------------!
+  !                                       !
+  !                                       !
+  !   Copy all "b" values to "n" values   !
+  !                                       !
+  !                                       !
+  !---------------------------------------!
+! if(.not. backup) then
+    do c = -1, -grid % n_bnd_cells, -1
+
+      u % n(c) = u % b(c)
+      v % n(c) = v % b(c)
+      w % n(c) = w % b(c)
+      p % n(c) = p % b(c)
+
+      if(heat_transfer) then
+        t % n(c) = t % b(c)
+      end if
+
+      if (multiphase_model .eq. VOLUME_OF_FLUID) then
+        vof % n(c) = vof % b(c)
+      end if
+
+      do sc = 1, flow % n_scalars
+        scalar(sc) % n = scalar(sc) % b(c)
+      end do
+
+      if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
+         turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
+        uu  % n(c) = uu  % b(c)
+        vv  % n(c) = vv  % b(c)
+        ww  % n(c) = ww  % b(c)
+        uv  % n(c) = uv  % b(c)
+        uw  % n(c) = uw  % b(c)
+        vw  % n(c) = vw  % b(c)
+        eps % n(c) = eps % b(c)
+
+        if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+          f22 % n(c) = f22 % b(c)
+        end if
+      end if
+
+      if(turbulence_model .eq. K_EPS) then
+        kin % n(c) = kin % b(c)
+        eps % n(c) = eps % b(c)
+        if(heat_transfer) then
+          t2 % n(c) = t2 % b(c)
+        end if
+      end if
+
+      if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
+         turbulence_model .eq. HYBRID_LES_RANS) then
+        kin  % n(c) = kin  % b(c)
+        eps  % n(c) = eps  % b(c)
+        zeta % n(c) = zeta % b(c)
+        f22  % n(c) = eps  % b(c)
+        if(heat_transfer) then
+          t2 % n(c) = t2 % b(c)
+        end if
+      end if
+
+      if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
+         turbulence_model .eq. DES_SPALART) then
+        vis % n(c) = vis % b(c)
+      end if
+
+    end do  ! through boundary cells
+! end if ! backup
 
   !------------------------------!
   !   Find the near-wall cells   !

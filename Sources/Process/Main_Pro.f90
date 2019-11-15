@@ -102,7 +102,7 @@
   call Control_Mod_Starting_Time_Step_For_Statistics(n_stat, verbose=.true.)
 
   ! Read physical models from control file
-  call Read_Control_Physical(flow, swarm, turb, backup)
+  call Read_Control_Physical(flow, swarm, turb)
 
   ! Allocate memory for all variables
   call Field_Mod_Allocate(flow, grid)
@@ -126,12 +126,12 @@
 
   call Load_Physical_Properties(grid)
 
-  call Load_Boundary_Conditions(flow, turb, mult, backup)
+  call Load_Boundary_Conditions(flow, turb, mult)
 
-! call Eddies_Mod_Allocate   (eddies(1),  4, 0.3, flow, 'IN')
-! call Eddies_Mod_Superimpose(eddies(1))
-! call Save_Results(flow, turb, mult, 0, .false.)   ! save boundary
-! stop
+  ! call Eddies_Mod_Allocate   (eddies(1),  4, 0.3, flow, 'IN')
+  ! call Eddies_Mod_Superimpose(eddies(1))
+  ! call Save_Results(flow, turb, mult, 0, .false.)   ! save boundary
+  ! stop
 
   ! First time step is one, unless read from backup otherwise
   first_dt = 0

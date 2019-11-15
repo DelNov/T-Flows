@@ -49,11 +49,10 @@
   !-------------------------------!
   if( phi % name .eq. 'T' ) then
 
-    call Comm_Mod_Global_Sum_Real(heat_flux)
+    call Comm_Mod_Global_Sum_Real(heat)
     call Comm_Mod_Global_Sum_Real(heated_area)
-    heat_flux = heat_flux / (heated_area + TINY)
-    heat      = heat_flux * heated_area
-      
+    heat_flux = heat / (heated_area + TINY)
+
     do c = 1, grid % n_cells
       b(c) = b(c) - heat_flux * u % n(c)  &
            / bulk % flux_x * grid % vol(c)

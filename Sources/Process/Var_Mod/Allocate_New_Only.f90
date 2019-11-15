@@ -27,4 +27,7 @@
   allocate (phi % y(-grid % n_bnd_cells : grid % n_cells));  phi % y = 0.0
   allocate (phi % z(-grid % n_bnd_cells : grid % n_cells));  phi % z = 0.0
 
+  ! Variable's boundary value
+  allocate (phi % b(-grid % n_bnd_cells: -1));  phi % b = 0.
+
   end subroutine
