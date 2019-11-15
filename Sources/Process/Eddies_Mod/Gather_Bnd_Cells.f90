@@ -30,9 +30,6 @@
       eddies % n_bnd_cells = eddies % n_bnd_cells + 1
     end if
   end do
-  print '(a,a,i6)', ' # Number of boundary cells at ',  &
-                    trim(eddies % bc_name),             &
-                    eddies % n_bnd_cells
 
   ! Estimate first boundary cell for each processor
   if(n_proc > 1) then
@@ -44,9 +41,6 @@
     do n = 2, n_proc
       s_bnd_cell_proc(n) = s_bnd_cell_proc(n-1) + n_bnd_cells_proc(n-1)
     end do
-    do n = 1, n_proc
-      print *, this_proc, n, s_bnd_cell_proc(n)
-    end do
   else
     allocate(s_bnd_cell_proc(0:0));  s_bnd_cell_proc(:) = 0;
   end if
@@ -54,6 +48,11 @@
   ! Gather coordinates from all processors
   eddies % n_bnd_cells_glo = eddies % n_bnd_cells
   call Comm_Mod_Global_Sum_Int(eddies % n_bnd_cells_glo)
+  if(this_proc < 2) then
+    print '(a,a,i6)', ' # Number of boundary cells at ',  &
+                      trim(eddies % bc_name),             &
+                      eddies % n_bnd_cells_glo
+  end if
   allocate(eddies % bnd_xc(eddies % n_bnd_cells_glo));  eddies % bnd_xc(:) = 0.0
   allocate(eddies % bnd_yc(eddies % n_bnd_cells_glo));  eddies % bnd_yc(:) = 0.0
   allocate(eddies % bnd_zc(eddies % n_bnd_cells_glo));  eddies % bnd_zc(:) = 0.0
