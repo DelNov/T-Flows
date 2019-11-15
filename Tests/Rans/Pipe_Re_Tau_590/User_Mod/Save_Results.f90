@@ -1,28 +1,35 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(flow, save_name)
+  subroutine User_Mod_Save_Results(flow, turb, mult, ts)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1r file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
 !                                                                              !
 !   The results are then writen in files name_res.dat and name_res_plus.dat    !
 !------------------------------------------------------------------------------!
-  use Grid_Mod,  only: Grid_Type
-  use Field_Mod
-  use Var_Mod,   only: Var_Type
-  use Bulk_Mod,  only: Bulk_Type
-  use Rans_Mod
-  use Comm_Mod                       ! parallel stuff
-  use Name_Mod,  only: problem_name
   use Const_Mod                      ! constants
+  use Comm_Mod                       ! parallel stuff
+  use Grid_Mod,  only: Grid_Type
+  use Field_Mod, only: Field_Type, heat_transfer, heat_flux, heat, &
+                       density, viscosity, capacity, conductivity, &
+                       heated_area
+  use Bulk_Mod,  only: Bulk_Type
+  use Var_Mod,   only: Var_Type
+  use Turb_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
-  character(len=*)         :: save_name
+  type(Field_Type),      target :: flow
+  type(Turb_Type),       target :: turb
+  type(Multiphase_Type), target :: mult
+  integer                       :: ts   ! time step
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
-  type(Var_Type),  pointer :: u, v, w, t
   type(Bulk_Type), pointer :: bulk
+  type(Var_Type),  pointer :: u, v, w, t
+  type(Var_Type),  pointer :: kin, eps, zeta, f22
+  type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
+  type(Var_Type),  pointer :: ut, vt, wt
+  type(Face_Type), pointer :: m_flux
   integer                  :: n_prob, pl, c, i, count, s, c1, c2, n_points
   character(len=80)        :: coord_name, res_name, res_name_plus
   character(len=80)        :: store_name
@@ -31,6 +38,7 @@
                               vis_t_p(:), uw_p(:), zeta_p(:),               &
                               t_p(:), tt_p(:), ut_p(:), vt_p(:), wt_p(:),   &
                               ind(:), wall_p(:)
+  real, pointer            :: vis_t(:)
   integer,allocatable      :: n_p(:), n_count(:)
   real                     :: t_wall, t_tau, d_wall, nu_mean, b11, b12, rad, r
   real                     :: ubulk, error, re, cf_dean, cf, pr, u_tau_p, t_inf
@@ -38,22 +46,21 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => flow % pnt_grid
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
-  t    => flow % t
-  bulk => flow % bulk
+  grid   => flow % pnt_grid
+  m_flux => flow % m_flux
+  bulk   => flow % bulk
+  vis_t  => turb % vis_t
+  call Field_Mod_Alias_Momentum   (flow, u, v, w)
+  call Field_Mod_Alias_Energy     (flow, t)
+  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
+  call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
+  call Turb_Mod_Alias_Heat_Fluxes (turb, ut, vt, wt)
 
   ! Set the name for coordinate file
-  call Name_File(0, coord_name, ".1r")
+  call File_Mod_Set_Name(coord_name, extension='.1r')
 
-  ! Store the name
-  store_name = problem_name
-  problem_name = save_name
-
-  call Name_File(0, res_name,      "-res.dat")
-  call Name_File(0, res_name_plus, "-res-plus.dat")
+  call File_Mod_Set_Name(res_name,      time_step=ts, extension='-res.dat')
+  call File_Mod_Set_Name(res_name_plus, time_step=ts, extension='-res-plus.dat')
 
   !------------------!
   !   Read 1r file   !
@@ -74,12 +81,10 @@
       print *, '#--------------------------------------------------------------'
     end if
 
-    ! Restore the name and return
-    problem_name = store_name
     return
   end if
 
-  ubulk    = bulk % flux_z / (density*bulk % area_z)
+  ubulk    = bulk % flux_z / (density(1)*bulk % area_z)
   t_wall   = 0.0
   nu_mean  = 0.0
   n_points = 0
@@ -139,10 +144,10 @@
 
         kin_p(i)   = kin_p(i) + kin % n(c)
         eps_p(i)   = eps_p(i) + eps % n(c)
-        uw_p(i)    = uw_p(i) &
+        uw_p(i)    = uw_p(i)  &
                    + b11 * vis_t(c) *(u % z(c) + w % x(c)) &
-                   + b12 * vis_t(c) *(v % z(c) + w % y(c)) 
-        vis_t_p(i) = vis_t_p(i) + vis_t(c) / viscosity
+                   + b12 * vis_t(c) *(v % z(c) + w % y(c))
+        vis_t_p(i) = vis_t_p(i) + vis_t(c) / viscosity(1)
         y_plus_p(i)= y_plus_p(i) + turb % y_plus(c)
 
         if(turbulence_model .eq. K_EPS_ZETA_F) then
@@ -223,13 +228,13 @@
   if(y_plus_p(1) > 5.0) then
     u_tau_p = sqrt(max(abs(bulk % p_drop_x),  &
                        abs(bulk % p_drop_y),  &
-                       abs(bulk % p_drop_z))/density)
+                       abs(bulk % p_drop_z))/density(1))
   else  
-    u_tau_p =  sqrt( (viscosity*sqrt(u_p(1)**2 +        &
-                                     v_p(1)**2 +        &
-                                     w_p(1)**2)         &
-                                     / wall_p(1))       &
-                                     / density)
+    u_tau_p =  sqrt( (viscosity(1)*sqrt(u_p(1)**2 +   &
+                                        v_p(1)**2 +   &
+                                        w_p(1)**2)    &
+                                        / wall_p(1))  &
+                                        / density(1))
   end if
 
   if(u_tau_p .eq. 0.0) then
@@ -237,8 +242,6 @@
       write(*,*) '# Friction velocity is zero in Save_Results.f90!'
     end if
 
-    ! Restore the name and return
-    problem_name = store_name
     return
   end if
 
@@ -281,24 +284,24 @@
 
     t_wall  = t_wall / n_points
     nu_mean = nu_mean / n_points
-    t_tau   = heat_flux / (density * capacity * u_tau_p)
+    t_tau   = heat_flux / (density(1) * capacity * u_tau_p)
   end if
 
   open(3, file = res_name)
   open(4, file = res_name_plus)
 
   do i = 3, 4
-    pr = viscosity * capacity / conductivity
-    re = density * ubulk * 2.0 / viscosity
+    pr = viscosity(1) * capacity / conductivity
+    re = density(1) * ubulk * 2.0 / viscosity(1)
     cf_dean = 0.0791*(re)**(-0.25)
     cf      = u_tau_p**2/(0.5*ubulk**2)
     error   = abs(cf_dean - cf)/cf_dean * 100.0
     write(i,'(A1,(A12,E12.6))')  &
     '#', 'ubulk    = ', ubulk 
     write(i,'(A1,(A12,E12.6))')  &
-    '#', 'Re       = ', density * ubulk * 2.0/viscosity
+    '#', 'Re       = ', density(1) * ubulk * 2.0/viscosity(1)
     write(i,'(A1,(A12,E12.6))')  &
-    '#', 'Re_tau   = ', density*u_tau_p/viscosity
+    '#', 'Re_tau   = ', density(1)*u_tau_p/viscosity(1)
     write(i,'(A1,(A12,E12.6))')  &
     '#', 'Cf       = ', 2.0*(u_tau_p/ubulk)**2
     write(i,'(A1,(A12,F12.6))')  &
@@ -318,12 +321,12 @@
         write(i,'(A1,2X,A60)') '#',  ' r,'                    //  &  !  1
                                      ' w,'                    //  &  !  2
                                      ' kin, eps, uw,'         //  &  !  3, 4, 5
-                                     ' vis_t/viscosity,'      //  &  !  6
+                                     ' vis_t/viscosity(1),'   //  &  !  6
                                      ' t, ut, vt, wt,'               !  7 - 10
       else
-        write(i,'(A1,2X,A60)')  '#', ' r,'                    //  &    !  1
-                                     ' w,'                    //  &    !  2
-                                     ' kin, eps, uw, vis_t/viscosity'  !  3 - 6
+        write(i,'(A1,2X,A60)') '#', ' r,'                    //  &       !  1
+                                    ' w,'                    //  &       !  2
+                                    ' kin, eps, uw, vis_t/viscosity(1)'  !  3-6
       end if
     else if(turbulence_model .eq. K_EPS_ZETA_F) then
       if(heat_transfer) then
@@ -331,14 +334,14 @@
                                      ' w,'                    //  &  !  2
                                      ' kin, eps, uw,'         //  &  !  3, 4, 5
                                      ' f22, zeta,'            //  &  !  6, 7
-                                     ' vis_t/viscosity,'      //  &  !  8 - 11
+                                     ' vis_t/viscosity(1),'   //  &  !  8 - 11
                                      ' t, ut, vt, wt'
       else
         write(i,'(A1,2X,A50)') '#', ' r,'                     //  &  !  1
                                     ' w,'                     //  &  !  2
                                     ' kin, eps, uw,'          //  &  !  3, 4, 5
                                     ' f22, zeta'              //  &  !  6, 7
-                                    ' vis_t/viscosity,'              !  8
+                                    ' vis_t/viscosity(1),'           !  8
       end if
     end if
   end do
@@ -380,14 +383,14 @@
   close(3)
 
   do i = 1, n_prob-1
-    wall_p(i) = density * wall_p(i)*u_tau_p/viscosity
+    wall_p(i) = density(1) * wall_p(i)*u_tau_p/viscosity(1)
     w_p   (i) = w_p  (i) / u_tau_p
     kin_p (i) = kin_p(i) / u_tau_p**2                      ! kin%n(c)
-    eps_p (i) = eps_p(i)*viscosity / (u_tau_p**4*density)  ! eps%n(c)
-    uw_p  (i) = uw_p (i) / (u_tau_p**2*density)     ! vis_t(c)*(u%z(c)+w%x(c))
+    eps_p (i) = eps_p(i)*viscosity(1) / (u_tau_p**4*density(1))  ! eps%n(c)
+    uw_p  (i) = uw_p (i) / (u_tau_p**2*density(1))    ! vis_t(c)*(u%z(c)+w%x(c))
 
     if(turbulence_model .eq. K_EPS_ZETA_F) then
-      f22_p(i) = f22_p(i) * viscosity / u_tau_p**2  ! f22%n(c)
+      f22_p(i) = f22_p(i) * viscosity(1) / u_tau_p**2  ! f22%n(c)
     end if
  
     if(heat_transfer) then
@@ -453,8 +456,5 @@
   end if
 
   if(this_proc < 2)  print *, '# Finished with User_Mod_Save_Results.f90.'
-
-  ! Restore the name
-  problem_name = store_name
 
   end subroutine

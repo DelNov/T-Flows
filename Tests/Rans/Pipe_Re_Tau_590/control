@@ -6,14 +6,14 @@
 
  HEAT_TRANSFER          yes
 
- PRESSURE_DROPS         0.0   0.0   0.0036  
+ PRESSURE_DROPS         0.0   0.0   0.0036
  MASS_FLOW_RATES        0.0   0.0   11.5
 
 #---------------
 # Time stepping
 #---------------
 
- TIME_STEP                  0.3
+ TIME_STEP                0.3
  NUMBER_OF_TIME_STEPS     3600
  RESULTS_SAVE_INTERVAL    600
  BACKUP_SAVE_INTERVAL     600
@@ -41,6 +41,8 @@
  THERMAL_CONDUCTIVITY   1.4e-4
  DYNAMIC_VISCOSITY      1.0e-4
  HEAT_CAPACITY          1.0
+ NUMBER_OF_SCALARS      1
+ SPECIES_DIFFUSIVITY    1.4e-4
 
  TURBULENCE_MODEL       k_eps_zeta_f
 
@@ -61,29 +63,33 @@
  ADVECTION_SCHEME_FOR_ENERGY      superbee
  ADVECTION_SCHEME_FOR_TURBULENCE  superbee
 
- MIN_SIMPLE_ITERATIONS                           3
+ MIN_SIMPLE_ITERATIONS              3
 #------------------------
 # Linear solver settings
 #------------------------
 
  PRECONDITIONER_FOR_SYSTEM_MATRIX   incomplete_cholesky
- TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-5
- TOLERANCE_FOR_PRESSURE_SOLVER      1.e-5
- TOLERANCE_FOR_TURBULENCE_SOLVER    1.e-5
- TOLERANCE_FOR_ENERGY_SOLVER        1.e-5
- TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
+ TOLERANCE_FOR_MOMENTUM_SOLVER      1e-5
+ TOLERANCE_FOR_PRESSURE_SOLVER      1e-5
+ TOLERANCE_FOR_TURBULENCE_SOLVER    1e-5
+ TOLERANCE_FOR_ENERGY_SOLVER        1e-5
+ TOLERANCE_FOR_SIMPLE_ALGORITHM     1e-3
 
 #--------------------
 # Initial conditions
 #--------------------
   INITIAL_CONDITION
-    VARIABLES           u     v     w     t      kin      eps      zeta     f22     uu   vv   ww   uv    uw    vw 
-    VALUES              0.0   0.0   0.5   20.0   1.0e-1   1.0e-4   1.0e-1   6.6e-2  0.01 0.01 0.01 0.001 0.001 0.001 
+    VARIABLES u  v  w   t   kin eps  zeta  f22    uu   vv   ww   uv   uw   vw   c_01
+    VALUES    0. 0. 0.5 20. 0.1 1e-4 0.1   6.6e-2 1e-2 1e-2 1e-2 1e-3 1e-3 1e-3 0.
 
 #---------------------
 # Boundary conditions
 #---------------------
+# Flux is set on the wall for temp, value is set for c_01
   BOUNDARY_CONDITION    wall
     TYPE                wall_flux
-    VARIABLES           u     v     w     q     kin   eps      zeta  f22
-    VALUES              0.0   0.0   0.0   0.1   0.0   1.0e-3   0.0   0.0
+    VARIABLES           u  v  w  q   kin eps  zeta f22
+    VALUES              0. 0. 0. 0.1 0.  1e-3 0.   0.
+    TYPE                wall
+    VARIABLES           c_01
+    VALUES              1.
