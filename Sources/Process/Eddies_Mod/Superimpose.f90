@@ -100,9 +100,9 @@
           wc = wc * exp(-0.5*((zc-ze)/sig_z)**2)
 
           ! Scale them so that intensity turns to be equal to one
-          uc = uc * ONE_THIRD * 10.0
-          vc = vc * ONE_THIRD * 10.0
-          wc = wc * ONE_THIRD * 10.0
+          uc = uc * ONE_THIRD * 10.0 * eddies % intensity
+          vc = vc * ONE_THIRD * 10.0 * eddies % intensity
+          wc = wc * ONE_THIRD * 10.0 * eddies % intensity
 
           flow % u % n(c) = flow % u % n(c) + uc
           flow % v % n(c) = flow % v % n(c) + vc
