@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Load_Boundary_Conditions(flow, turb, mult)
+  subroutine Load_Boundary_Conditions(flow, turb, mult, turb_planes)
 !------------------------------------------------------------------------------!
 !   Reads boundary condition from control file                                 !
 !------------------------------------------------------------------------------!
@@ -11,6 +11,7 @@
   use Multiphase_Mod, only: Multiphase_Type, multiphase_model, VOLUME_OF_FLUID
   use Tokenizer_Mod
   use Grid_Mod,       only: Grid_Type
+  use Eddies_Mod
   use User_Mod
   use Control_Mod
   use Var_Mod,        only: Var_Type
@@ -20,6 +21,7 @@
   type(Field_Type),      target :: flow
   type(Turb_Type),       target :: turb
   type(Multiphase_Type), target :: mult
+  type(Turb_Plane_Type)         :: turb_planes
 !----------------------------------[Calling]-----------------------------------!
   integer :: Key_Ind
 !-----------------------------------[Locals]-----------------------------------!
@@ -41,6 +43,10 @@
   character(len=80)        :: types_names(128)      ! name of each type
   logical                  :: types_file(128)       ! type specified in a file?
   integer                  :: c_types               ! counter types
+  integer                  :: c_synth               ! counter synthetic eddies
+  integer                  :: edd_n
+  real                     :: edd_r
+  real                     :: edd_i
   logical                  :: found
 !==============================================================================!
 
@@ -708,6 +714,30 @@
       end if  ! boundary defined in a file
     end do
 
+  end do
+
+  !-----------------------------------!
+  !                                   !
+  !   Read data on synthetic eddies   !
+  !                                   !
+  !-----------------------------------!
+  turb_planes % n_planes = 0
+  do bc = 1, grid % n_bnd_cond  ! imagine there are as many eddies as bcs
+    call Control_Mod_Position_At_Two_Keys('SYNTHETIC_EDDIES',          &
+                                          grid % bnd_cond % name(bc),  &
+                                          found,                       &
+                                          .false.)
+    if(found) then
+      turb_planes % n_planes = turb_planes % n_planes + 1
+      call Control_Mod_Read_Int_Item ('NUMBER_OF_EDDIES', 24, edd_n, .false.)
+      call Control_Mod_Read_Real_Item('MAX_EDDY_RADIUS',  .2, edd_r, .false.)
+      call Control_Mod_Read_Real_Item('EDDY_INTENSITY',   .1, edd_i, .false.)
+      call Eddies_Mod_Allocate(turb_planes % plane(turb_planes % n_planes),  &
+                               edd_n,                                        &
+                               edd_r,                                        &
+                               flow,                                         &
+                               grid % bnd_cond % name(bc))
+    end if
   end do
 
   !---------------------------------------!
