@@ -37,7 +37,7 @@
   !-----------------------------------------------!
 1 continue
   call random_number(tmp)
-  rc = int(tmp * real(eddies % n_bnd_cells_glo))  ! random index
+  rc = 1 + floor(tmp * real(eddies % n_bnd_cells_glo))  ! random index
   eddies % eddy(e) % x = eddies % bnd_xc(rc)
   eddies % eddy(e) % y = eddies % bnd_yc(rc)
   eddies % eddy(e) % z = eddies % bnd_zc(rc)
@@ -68,15 +68,15 @@
   call random_number(tmp)
   if(eddies % x_plane < HUGE) then
     eddies % eddy(e) % x = eddies % eddy(e) % x             &
-                         - eddies % eddy(e) % length * 0.5  &
+                         - eddies % eddy(e) % length * 2.0  &
                          + eddies % eddy(e) % length * tmp
   else if(eddies % y_plane < HUGE) then
     eddies % eddy(e) % y = eddies % eddy(e) % y             &
-                         - eddies % eddy(e) % length * 0.5  &
+                         - eddies % eddy(e) % length * 2.0  &
                          + eddies % eddy(e) % length * tmp
   else if(eddies % z_plane < HUGE) then
     eddies % eddy(e) % z = eddies % eddy(e) % z             &
-                         - eddies % eddy(e) % length * 0.5  &
+                         - eddies % eddy(e) % length * 2.0  &
                          + eddies % eddy(e) % length * tmp
   end if
 
