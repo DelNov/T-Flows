@@ -43,7 +43,6 @@
   character(len=80)        :: types_names(128)      ! name of each type
   logical                  :: types_file(128)       ! type specified in a file?
   integer                  :: c_types               ! counter types
-  integer                  :: c_synth               ! counter synthetic eddies
   integer                  :: edd_n
   real                     :: edd_r
   real                     :: edd_i
@@ -729,9 +728,9 @@
                                           .false.)
     if(found) then
       turb_planes % n_planes = turb_planes % n_planes + 1
-      call Control_Mod_Read_Int_Item ('NUMBER_OF_EDDIES', 24, edd_n, .false.)
-      call Control_Mod_Read_Real_Item('MAX_EDDY_RADIUS',  .2, edd_r, .false.)
-      call Control_Mod_Read_Real_Item('EDDY_INTENSITY',   .1, edd_i, .false.)
+      call Control_Mod_Read_Int_Item_On ('NUMBER_OF_EDDIES', 24, edd_n, .false.)
+      call Control_Mod_Read_Real_Item_On('MAX_EDDY_RADIUS',  .2, edd_r, .false.)
+      call Control_Mod_Read_Real_Item_On('EDDY_INTENSITY',   .1, edd_i, .false.)
       call Eddies_Mod_Allocate(turb_planes % plane(turb_planes % n_planes),  &
                                edd_n,                                        &
                                edd_r,                                        &
@@ -739,6 +738,9 @@
                                grid % bnd_cond % name(bc))
     end if
   end do
+  if(turb_planes % n_planes > 0) then
+    print *, '# Found ', turb_planes % n_planes, ' turbulent planes'
+  end if
 
   !---------------------------------------!
   !                                       !
