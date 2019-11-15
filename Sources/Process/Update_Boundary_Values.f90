@@ -293,9 +293,9 @@
       if (c2 < 0) then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
           phi % n(c2) = phi % n(c1) + phi % q(c2) * grid % wall_dist(c1)  &
-                      / (diffusivity/density(1))
+                      / diffusivity
         else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) then
-          phi % q(c2) = (phi % n(c2) - phi % n(c1)) * (diffusivity/density(1)) &
+          phi % q(c2) = (phi % n(c2) - phi % n(c1)) * diffusivity &
                       / grid % wall_dist(c1)
         end if ! WALL or WALLFL
 
