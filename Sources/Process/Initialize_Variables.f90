@@ -281,15 +281,14 @@
           t % oo(c) = t % n(c)
         end if
 
-        if(flow % n_scalars > 0) then
-          do sc = 1, flow % n_scalars
-            phi => flow % scalar(sc)
-            vals(0) = phi_def
-            phi % n(c)  = vals(Key_Ind(phi % name, keys, nks))
-            phi % o(c)  = phi % n(c)
-            phi % oo(c) = phi % n(c)
-          end do
-        end if
+        ! Scalars
+        do sc = 1, flow % n_scalars
+          phi => flow % scalar(sc)
+          vals(0) = phi_def
+          phi % n(c)  = vals(Key_Ind(phi % name, keys, nks))
+          phi % o(c)  = phi % n(c)
+          phi % oo(c) = phi % n(c)
+        end do
 
         if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
            turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then

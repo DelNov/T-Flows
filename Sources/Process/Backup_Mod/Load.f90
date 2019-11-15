@@ -230,7 +230,7 @@
   end if
 
   !------------------!
-  !   Save scalars   !
+  !   Load scalars   !
   !------------------!
   do sc = 1, fld % n_scalars
     phi => fld % scalar(sc)
@@ -313,15 +313,14 @@
       call Backup_Mod_Read_Cell_Bnd(fh,d,vc, 'wt_res', tur % wt_res(-nb_s:nc_s))
     end if
 
-    if(fld % n_scalars > 0) then
-      do sc = 1, fld % n_scalars
-        phi => fld % scalar(sc)
-        name_mean = phi % name
-        name_mean(5:9) = '_mean'
-        call Backup_Mod_Read_Cell_Bnd(fh,d,vc, name_mean,  &
-                                      tur % scalar_mean(sc, -nb_s:nc_s))
-      end do
-    end if
+    ! Scalars
+    do sc = 1, fld % n_scalars
+      phi => fld % scalar(sc)
+      name_mean = phi % name
+      name_mean(5:9) = '_mean'
+      call Backup_Mod_Read_Cell_Bnd(fh,d,vc, name_mean,  &
+                                    tur % scalar_mean(sc, -nb_s:nc_s))
+    end do
 
   end if
 

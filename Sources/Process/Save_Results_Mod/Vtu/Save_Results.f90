@@ -476,18 +476,17 @@
                                          wt_save(-grid % n_bnd_cells))
     end if
 
-    if(flow % n_scalars > 0) then
-      do sc = 1, flow % n_scalars
-        phi => flow % scalar(sc)
-        name_mean = 'Mean'
-        name_mean(5:8) = phi % name
-        do c = 1, grid % n_cells
-          phi_save(c) = turb % scalar_mean(sc, c)
-        end do
-        call Save_Scalar(grid, IN_4, IN_5, name_mean, plot_inside,  &
-                         phi_save(-grid % n_bnd_cells))
+    ! Scalars
+    do sc = 1, flow % n_scalars
+      phi => flow % scalar(sc)
+      name_mean = 'Mean'
+      name_mean(5:8) = phi % name
+      do c = 1, grid % n_cells
+        phi_save(c) = turb % scalar_mean(sc, c)
       end do
-    end if
+      call Save_Scalar(grid, IN_4, IN_5, name_mean, plot_inside,  &
+                       phi_save(-grid % n_bnd_cells))
+    end do
   end if
 
   ! Save y+ for all turbulence models

@@ -8,7 +8,7 @@
   use Comm_Mod
   use Field_Mod,   only: Field_Type, heat_transfer, heated_area,     &
                          density, viscosity, capacity, conductivity, &
-                         heat_flux, heat
+                         heat_flux, heat, diffusivity
   use Turb_Mod
   use Grid_Mod
   use Control_Mod
@@ -24,10 +24,10 @@
   real :: Y_Plus_Low_Re
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
-  type(Var_Type),  pointer :: u, v, w, t, vof
+  type(Var_Type),  pointer :: u, v, w, t, phi, vof
   type(Var_Type),  pointer :: kin, eps, zeta, f22, vis, t2
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
-  integer                  :: c1, c2, s
+  integer                  :: c1, c2, s, sc
   real                     :: qx, qy, qz, nx, ny, nz, con_t
   real                     :: kin_vis, u_tau
 !==============================================================================!
@@ -206,7 +206,7 @@
         else
           if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
             t % n(c2) = t % n(c1) + t % q(c2) * grid % wall_dist(c1)  &
-                       /conductivity
+                      / conductivity
             heat = heat + t % q(c2) * grid % s(s)
             if(abs(t % q(c2)) > TINY) heated_area = heated_area + grid % s(s)
           else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) then
@@ -216,7 +216,7 @@
             if(abs(t % q(c2)) > TINY) heated_area = heated_area + grid % s(s)
           end if
         end if
-      end if
+      end if ! heat_transfer
 
       !---------------------!
       !   Copy boundaries   !
@@ -269,8 +269,7 @@
             f22 % n(c2) = f22 % n(grid % bnd_cond % copy_c(c2))
         end if
       end if
-    end if    ! c2 < 0
-
+    end if ! c2 < 0
   end do
 
   ! Integrate (summ) heated area, and heat up
@@ -279,5 +278,34 @@
    call Comm_Mod_Global_Sum_Real(heated_area)
    heat_flux = heat / heated_area
  end if
+
+  !-------------!
+  !   Scalars   !
+  !-------------!
+  do sc = 1, flow % n_scalars
+    phi => flow % scalar(sc)
+
+    do s = 1, grid % n_faces
+      c1 = grid % faces_c(1,s)
+      c2 = grid % faces_c(2,s)
+
+      ! On the boundary perform the extrapolation
+      if (c2 < 0) then
+        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
+          phi % n(c2) = phi % n(c1) + phi % q(c2) * grid % wall_dist(c1)  &
+                      / (diffusivity/density(1))
+        else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) then
+          phi % q(c2) = (phi % n(c2) - phi % n(c1)) * (diffusivity/density(1)) &
+                      / grid % wall_dist(c1)
+        end if ! WALL or WALLFL
+
+        ! Copy boundaries
+        if(grid % bnd_cond % copy_c(c2) .ne. 0) then
+          phi % n(c2) = phi % n(grid % bnd_cond % copy_c(c2))
+        end if ! grid % bnd_cond % copy_c(c2) .ne. 0
+
+      end if ! c2 < 0
+    end do ! s = 1, grid % n_faces
+  end do ! sc = 1, flow % n_scalars
 
   end subroutine

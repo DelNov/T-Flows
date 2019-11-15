@@ -313,19 +313,18 @@
                                 wt_save(1),'MeanTurbulentHeatFluxZ')
     end if
 
-    if(flow % n_scalars > 0) then
-      do sc = 1, flow % n_scalars
-        phi       => flow % scalar(sc)
-        name_mean = 'Mean'
-        name_mean(5:8) = phi % name
-        do c = 1, grid % n_cells
-          phi_save(c) = turb % scalar_mean(sc, c)
-        end do
-        call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                                  phi_save(1), name_mean)
+    ! Scalars
+    do sc = 1, flow % n_scalars
+      phi => flow % scalar(sc)
+      name_mean = 'Mean'
+      name_mean(5:8) = phi % name
+      do c = 1, grid % n_cells
+        phi_save(c) = turb % scalar_mean(sc, c)
       end do
-    end if
-  end if
+      call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
+                                phi_save(1), name_mean)
+    end do ! sc = 1, flow % n_scalars
+  end if ! turbulence_statistics
 
   ! Save y+ for all turbulence models
   if(turbulence_model .ne. NO_TURBULENCE) then
