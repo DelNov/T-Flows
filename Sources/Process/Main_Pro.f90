@@ -30,7 +30,7 @@
 !---------------------------------[Calling]------------------------------------!
   real :: Correct_Velocity
 !----------------------------------[Locals]------------------------------------!
-  integer               :: n, sc
+  integer               :: n, sc, tp
   real                  :: mass_res
   logical               :: backup, save_now, exit_now
   type(Grid_Type)       :: grid            ! grid used in computations
@@ -40,7 +40,7 @@
   type(Turb_Type)       :: turb            ! turbulence modelling
   type(Multiphase_Type) :: mult            ! multiphase modelling
   type(Solver_Type)     :: sol             ! linear solvers
-  type(Eddies_Type)     :: eddies(1)       ! synthetic eddies
+  type(Turb_Plane_Type) :: turb_planes     ! holder for synthetic turbulences
   real                  :: time            ! physical time of the simulation
   integer               :: first_dt        ! first time step in this run
   integer               :: last_dt         ! number of time steps
@@ -126,12 +126,7 @@
 
   call Load_Physical_Properties(grid)
 
-  call Load_Boundary_Conditions(flow, turb, mult)
-
-  ! call Eddies_Mod_Allocate   (eddies(1),  4, 0.3, flow, 'IN')
-  ! call Eddies_Mod_Superimpose(eddies(1))
-  ! call Save_Results(flow, turb, mult, 0, .false.)   ! save boundary
-  ! stop
+  call Load_Boundary_Conditions(flow, turb, mult, turb_planes)
 
   ! First time step is one, unless read from backup otherwise
   first_dt = 0
@@ -198,7 +193,13 @@
   do n = first_dt + 1, last_dt
     ! For post-processing
 
-    !call  Multiphase_Mod_Vof_Spurious_Post(flow, time, n)
+    ! call  Multiphase_Mod_Vof_Spurious_Post(flow, time, n)
+
+    ! Update turbulent planes
+    do tp = 1, turb_planes % n_planes
+      call Eddies_Mod_Superimpose(turb_planes % plane(tp))
+      call Eddies_Mod_Advance    (turb_planes % plane(tp))
+    end do
 
     time = time + flow % dt
 
