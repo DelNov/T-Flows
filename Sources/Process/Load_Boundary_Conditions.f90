@@ -739,7 +739,7 @@
                                grid % bnd_cond % name(bc))
     end if
   end do
-  if(turb_planes % n_planes > 0) then
+  if(turb_planes % n_planes > 0 .and. this_proc < 2) then
     print *, '# Found ', turb_planes % n_planes, ' turbulent planes'
   end if
 
