@@ -734,6 +734,7 @@
       call Eddies_Mod_Allocate(turb_planes % plane(turb_planes % n_planes),  &
                                edd_n,                                        &
                                edd_r,                                        &
+                               edd_i,                                        &
                                flow,                                         &
                                grid % bnd_cond % name(bc))
     end if
