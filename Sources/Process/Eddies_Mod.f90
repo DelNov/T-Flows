@@ -8,9 +8,15 @@
   use Grid_Mod
   use Comm_Mod
   use Field_Mod
+  use Control_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
+
+  !--------------------------------!
+  !   A few important parameters   !
+  !--------------------------------!
+  integer, parameter :: MAX_TURBULENT_PLANES = 64
 
   !---------------!
   !               !
@@ -58,6 +64,16 @@
     real, allocatable :: bnd_u (:)
     real, allocatable :: bnd_v (:)
     real, allocatable :: bnd_w (:)
+  end type
+
+  !--------------------------------------!
+  !                                      !
+  !   Synthtetic turbulence plane type   !
+  !                                      !
+  !--------------------------------------!
+  type Turb_Plane_Type
+    integer           :: n_planes
+    type(Eddies_Type) :: plane(MAX_TURBULENT_PLANES)
   end type
 
   contains
