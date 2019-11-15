@@ -1,0 +1,2 @@
+# launch python_matplotlib_script.py as:
+python2 python_matplotlib_script.py ../chan-ts001200-res-plus.dat 1 2 3 4 5
