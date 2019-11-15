@@ -20,9 +20,11 @@
   flow => eddies % pnt_flow
 
   do c = -grid % n_bnd_cells, -1
-    flow % u % n(c) = flow % u % b(c)
-    flow % v % n(c) = flow % v % b(c)
-    flow % w % n(c) = flow % w % b(c)
+    if(Grid_Mod_Bnd_Cond_Name(grid, c) .eq. eddies % bc_name) then
+      flow % u % n(c) = flow % u % b(c)
+      flow % v % n(c) = flow % v % b(c)
+      flow % w % n(c) = flow % w % b(c)
+    end if
   end do
 
   !----------------------------------------------------------!
