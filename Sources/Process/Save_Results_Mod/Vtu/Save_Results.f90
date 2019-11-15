@@ -68,11 +68,13 @@
   else
     call File_Mod_Set_Name(name_out_8,             &
                            time_step=ts,           &
-                           extension='-bnd.pvtu')
+                           appendix ='-bnd',       &
+                           extension='.pvtu')
     call File_Mod_Set_Name(name_out_9,             &
                            processor=this_proc,    &
                            time_step=ts,           &
-                           extension='-bnd.vtu')
+                           appendix ='-bnd',       &
+                           extension='.vtu')
   end if
 
   if(n_proc > 1 .and. this_proc .eq. 1) then
@@ -537,7 +539,8 @@
         call File_Mod_Set_Name(name_out_9,        &
                                processor=n,       &
                                time_step=ts,      &
-                               extension='-bnd.vtu')
+                               appendix ='-bnd',  &
+                               extension='.vtu')
       end if
       write(8, '(a,a,a,a)') IN_2, '<Piece Source="', trim(name_out_9), '"/>'
     end do
