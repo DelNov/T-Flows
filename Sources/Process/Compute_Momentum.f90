@@ -38,19 +38,17 @@
   type(Bulk_Type),   pointer :: bulk
   type(Matrix_Type), pointer :: a
   type(Var_Type),    pointer :: ui, uj, uk, t, p
-  type(Var_Type),    pointer :: uu, vv, ww, uv, uw, vw
   type(Face_Type),   pointer :: m_flux
   real,              pointer :: b(:)
   real,              pointer :: ui_i(:), ui_j(:), ui_k(:), uj_i(:), uk_i(:)
   real,              pointer :: si(:), sj(:), sk(:), di(:), dj(:), dk(:)
   real,              pointer :: h_i(:)
   integer                    :: s, c, c1, c2, exec_iter
-  real                       :: f_ex, f_im, f_stress, fs
+  real                       :: f_ex, f_im, f_stress
   real                       :: vel_max
   real                       :: a0, a12, a21
   real                       :: vis_eff, vis_ts
   real                       :: ui_i_f, ui_j_f, ui_k_f, uj_i_f, uk_i_f
-  real                       :: uu_f, vv_f, ww_f, uv_f, uw_f, vw_f
 !------------------------------------------------------------------------------!
 !
 !  Stress tensor on the face s:
@@ -116,7 +114,6 @@
   m_flux => flow % m_flux
   t      => flow % t
   p      => flow % p
-  call Turb_Mod_Alias_Stresses(turb, uu, vv, ww, uv, uw, vw)
   call Solver_Mod_Alias_System(sol, a, b)
 
   if(i .eq. 1) then
@@ -190,76 +187,9 @@
 
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
-    fs = grid % f(s)
 
-    if (c2 > 0) then
-      vis_eff = fs * viscosity(c1) + (1.0 - fs) * viscosity(c2)
-    else
-      vis_eff = viscosity(c1)
-    end if
-
-    if(turbulence_model .ne. NONE .and.  &
-       turbulence_model .ne. DNS) then
-      vis_eff = vis_eff + grid % fw(s)  * turb % vis_t(c1)  &
-                    +(1.0-grid % fw(s)) * turb % vis_t(c2)
-    end if
-
-    if(turbulence_model .eq. HYBRID_LES_RANS) then
-      vis_eff =      grid % fw(s)  * turb % vis_t_eff(c1)   &
-              + (1.0-grid % fw(s)) * turb % vis_t_eff(c2) + vis_eff
-    end if
-
-    if(c2 < 0) then
-      if( turbulence_model .eq. LES_SMAGORINSKY    .or.  &
-          turbulence_model .eq. LES_DYNAMIC        .or.  &
-          turbulence_model .eq. HYBRID_LES_PRANDTL .or.  &
-          turbulence_model .eq. LES_WALE) then
-        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
-           Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
-          vis_eff = turb % vis_w(c1)
-        end if
-      end if
-    end if
-
-    if( turbulence_model .eq. K_EPS_ZETA_F     .or.  &
-        turbulence_model .eq. HYBRID_LES_RANS  .or.  &
-        turbulence_model .eq. K_EPS) then 
-      if(c2 < 0) then
-        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
-           Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
-          vis_eff = turb % vis_w(c1)
-        end if
-      end if
-    end if
-
-    ! Add influence of Re stresses
-    if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
-       turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
-      if(turbulence_model_variant .ne. STABILIZED) then
-        if(ui % name .eq. 'U') then
-          uu_f = grid % fw(s) * uu % n(c1) + (1.0-grid % fw(s)) * uu % n(c2)
-          uv_f = grid % fw(s) * uv % n(c1) + (1.0-grid % fw(s)) * uv % n(c2)
-          uw_f = grid % fw(s) * uw % n(c1) + (1.0-grid % fw(s)) * uw % n(c2)
-          f_stress = - (  uu_f * grid % sx(s)  &
-                        + uv_f * grid % sy(s)  &
-                        + uw_f * grid % sz(s) )
-        else if(ui % name .eq. 'V') then
-          uv_f = grid % fw(s) * uv % n(c1) + (1.0-grid % fw(s)) * uv % n(c2)
-          vv_f = grid % fw(s) * vv % n(c1) + (1.0-grid % fw(s)) * vv % n(c2)
-          vw_f = grid % fw(s) * vw % n(c1) + (1.0-grid % fw(s)) * vw % n(c2)
-          f_stress =  - (  uv_f * grid % sx(s)  &
-                         + vv_f * grid % sy(s)  &
-                         + vw_f * grid % sz(s) )
-        else if(ui % name .eq. 'W') then
-          uw_f = grid % fw(s) * uw % n(c1) + (1.0-grid % fw(s)) * uw % n(c2)
-          vw_f = grid % fw(s) * vw % n(c1) + (1.0-grid % fw(s)) * vw % n(c2)
-          ww_f = grid % fw(s) * ww % n(c1) + (1.0-grid % fw(s)) * ww % n(c2)
-          f_stress =  - (  uw_f * grid % sx(s)  &
-                         + vw_f * grid % sy(s)  &
-                         + ww_f * grid % sz(s) )
-        end if
-      end if
-    end if
+    call Turb_Mod_Calculate_Face_Vis   (turb, vis_eff,  s)
+    call Turb_Mod_Calculate_Face_Stress(turb, ui, f_stress, s)
 
     ui_i_f = grid % fw(s)*ui_i(c1) + (1.0-grid % fw(s))*ui_i(c2)
     ui_j_f = grid % fw(s)*ui_j(c1) + (1.0-grid % fw(s))*ui_j(c2)
