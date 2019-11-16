@@ -152,11 +152,11 @@
   call Bulk_Mod_Monitoring_Planes_Areas(flow % bulk, grid)
 
   if(turbulence_model .eq. LES_SMAGORINSKY .and. .not. backup) then
-    call Find_Nearest_Wall_Cell(grid)
+    call Find_Nearest_Wall_Cell(turb)
   end if
 
   if(turbulence_model .eq. HYBRID_LES_PRANDTL .and. .not. backup) then
-    call Find_Nearest_Wall_Cell(grid)
+    call Find_Nearest_Wall_Cell(turb)
   end if
 
   ! Prepare the gradient matrix for velocities
