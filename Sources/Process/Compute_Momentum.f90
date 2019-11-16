@@ -43,12 +43,14 @@
   real,              pointer :: ui_i(:), ui_j(:), ui_k(:), uj_i(:), uk_i(:)
   real,              pointer :: si(:), sj(:), sk(:), di(:), dj(:), dk(:)
   real,              pointer :: h_i(:)
-  integer                    :: s, c, c1, c2, exec_iter
+  integer                    :: s, c, c1, c2, ci, exec_iter
   real                       :: f_ex, f_im, f_stress
   real                       :: vel_max
   real                       :: a0, a12, a21
-  real                       :: vis_eff, vis_ts
+  real                       :: vis_eff, vis_tur
   real                       :: ui_i_f, ui_j_f, ui_k_f, uj_i_f, uk_i_f
+  real                       :: grav_i, p_drop_i
+  real                       :: ui_si, ui_di
 !------------------------------------------------------------------------------!
 !
 !  Stress tensor on the face s:
@@ -122,6 +124,8 @@
     si   => grid % sx;  sj   => grid % sy;  sk   => grid % sz
     di   => grid % dx;  dj   => grid % dy;  dk   => grid % dz
     h_i  => p % x;      uj_i => uj % x;     uk_i => uk % x
+    grav_i   = grav_x
+    p_drop_i = bulk % p_drop_x
   end if
   if(i .eq. 2) then
     ui   => flow % v;   uj   => flow % w;   uk   => flow % u
@@ -129,6 +133,8 @@
     si   => grid % sy;  sj   => grid % sz;  sk   => grid % sx
     di   => grid % dy;  dj   => grid % dz;  dk   => grid % dx
     h_i  => p % y;      uj_i => uj % y;     uk_i => uk % y
+    grav_i   = grav_y
+    p_drop_i = bulk % p_drop_y
   end if
   if(i .eq. 3) then
     ui   => flow % w;   uj   => flow % u;   uk   => flow % v
@@ -136,6 +142,8 @@
     si   => grid % sz;  sj   => grid % sx;  sk   => grid % sy
     di   => grid % dz;  dj   => grid % dx;  dk   => grid % dy
     h_i  => p % z;      uj_i => uj % z;     uk_i => uk % z
+    grav_i   = grav_z
+    p_drop_i = bulk % p_drop_z
   end if
 
   ! Initialize matrix and right hand side
@@ -197,17 +205,19 @@
     uj_i_f = grid % fw(s)*uj_i(c1) + (1.0-grid % fw(s))*uj_i(c2)
     uk_i_f = grid % fw(s)*uk_i(c1) + (1.0-grid % fw(s))*uk_i(c2)
 
-    ! Total (exact) viscous stress
-    f_ex = vis_eff*(      2.0*ui_i_f  * si(s)      &
-                    + (ui_j_f+uj_i_f) * sj(s)      &
-                    + (ui_k_f+uk_i_f) * sk(s) )
+    ui_si = (  (ui_i_f + ui_i_f) * si(s)    &
+             + (ui_j_f + uj_i_f) * sj(s)    &
+             + (ui_k_f + uk_i_f) * sk(s) )
+    ui_di = (  ui_i_f * di(s)  &
+             + ui_j_f * dj(s)  &
+             + ui_k_f * dk(s))
 
-    a0 = vis_eff * a % fc(s)
+    ! Total (exact) viscous stress
+    f_ex = vis_eff * ui_si
 
     ! Implicit viscous stress
-    f_im = (   ui_i_f*di(s)                &
-             + ui_j_f*dj(s)                &
-             + ui_k_f*dk(s)) * a0
+    a0 = vis_eff * a % fc(s)
+    f_im = ui_di * a0
 
     ! Cross diffusion part
     ui % c(c1) = ui % c(c1) + f_ex - f_im + f_stress * density(c1)
@@ -216,11 +226,8 @@
     end if
 
     ! Compute the coefficients for the sysytem matrix
-    a12 = a0
-    a21 = a0
-
-    a12 = a12  - min(m_flux % n(s), real(0.0))
-    a21 = a21  + max(m_flux % n(s), real(0.0))
+    a12 = a0 - min(m_flux % n(s), real(0.0))
+    a21 = a0 + max(m_flux % n(s), real(0.0))
 
     ! Fill the system matrix
     if(c2 > 0) then
@@ -240,44 +247,12 @@
       end if
     end if
 
+    ! Here we clean up momentum from the false diffusion
+    call Turb_Mod_Substract_Face_Stress(turb, ui_si, ui_di,            &
+                                              ui % n(c1), ui % n(c2),  &
+                                              a % fc(s), b, s)
+
   end do  ! through faces
-
-  ! Here we clean up momentum from the false diffusion
-  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
-     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
-    if(turbulence_model_variant .ne. STABILIZED) then
-      do s = 1, grid % n_faces
-        c1 = grid % faces_c(1,s)
-        c2 = grid % faces_c(2,s)
-
-        vis_ts =     (grid % fw(s)  * turb % vis_t(c1)  &
-               + (1.0-grid % fw(s)) * turb % vis_t(c2))
-        a0 = a % fc(s)*vis_ts
-        vis_eff = vis_ts
-
-        ui_i_f = grid % fw(s) * ui_i(c1) + (1.0-grid % fw(s)) * ui_i(c2)
-        ui_j_f = grid % fw(s) * ui_j(c1) + (1.0-grid % fw(s)) * ui_j(c2)
-        ui_k_f = grid % fw(s) * ui_k(c1) + (1.0-grid % fw(s)) * ui_k(c2)
-        uj_i_f = grid % fw(s) * uj_i(c1) + (1.0-grid % fw(s)) * uj_i(c2)
-        uk_i_f = grid % fw(s) * uk_i(c1) + (1.0-grid % fw(s)) * uk_i(c2)
-
-        f_ex = vis_eff*( 2.0*ui_i_f         * si(s) &
-                          + (ui_j_f+uj_i_f) * sj(s) &
-                          + (ui_k_f+uk_i_f) * sk(s) )
-
-        f_im = (  ui_i_f * di(s)  &
-                + ui_j_f * dj(s)  &
-                + ui_k_f * dk(s)) * vis_eff * a % fc(s)
-
-        b(c1) = b(c1) - vis_eff * (ui % n(c2) -ui % n(c1)) * a % fc(s)  &
-              - f_ex + f_im
-        if(c2  > 0) then
-          b(c2) = b(c2) + vis_eff * (ui % n(c2) -ui % n(c1)) * a % fc(s)  &
-                + f_ex - f_im
-        end if
-      end do
-    end if
-  end if
 
   ! Explicit treatment for cross diffusion terms
   do c = 1, grid % n_cells
@@ -300,19 +275,9 @@
   !--------------------------!
   !   Global pressure drop   !
   !--------------------------!
-  if(ui % name .eq. 'U') then
-    do c = 1, grid % n_cells
-      b(c) = b(c) + bulk % p_drop_x * grid % vol(c)
-    end do
-  else if(ui % name .eq. 'V') then
-    do c = 1, grid % n_cells
-      b(c) = b(c) + bulk % p_drop_y * grid % vol(c)
-    end do
-  else if(ui % name .eq. 'W') then
-    do c = 1, grid % n_cells
-      b(c) = b(c) + bulk % p_drop_z * grid % vol(c)
-    end do
-  end if
+  do c = 1, grid % n_cells
+    b(c) = b(c) + p_drop_i * grid % vol(c)
+  end do
 
   !---------------------------------!
   !   Local pressure distribution   !
@@ -325,19 +290,9 @@
   !   Buoyancy force   !
   !--------------------!
   if(buoyancy) then
-    if(ui % name .eq. 'U') then
+    if(abs(grav_i) > NANO) then
       do c = 1, grid % n_cells
-        b(c) = b(c) - density(c) * grav_x * (t % n(c) - t_ref)  &
-             * flow % beta * grid % vol(c)
-      end do
-    else if(ui % name .eq. 'V') then
-      do c = 1, grid % n_cells
-        b(c) = b(c) - density(c) * grav_y * (t % n(c) - t_ref)  &
-             * flow % beta * grid % vol(c)
-      end do
-    else if(ui % name .eq. 'W') then
-      do c = 1, grid % n_cells
-        b(c) = b(c) - density(c) * grav_z * (t % n(c) - t_ref)  &
+        b(c) = b(c) - density(c) * grav_i * (t % n(c) - t_ref)  &
              * flow % beta * grid % vol(c)
       end do
     end if
@@ -346,20 +301,10 @@
   !   Gravity force   !
   !-------------------!
   else
-    if(sqrt(grav_x ** 2 + grav_y ** 2 + grav_z ** 2) > TINY) then
-      if(ui % name .eq. 'U') then
-        do c = 1, grid % n_cells
-          b(c) = b(c) + density(c) * grav_x * grid % vol(c)
-        end do
-      else if(ui % name .eq. 'V') then
-        do c = 1, grid % n_cells
-          b(c) = b(c) + density(c) * grav_y * grid % vol(c)
-        end do
-      else if(ui % name .eq. 'W') then
-        do c = 1, grid % n_cells
-          b(c) = b(c) + density(c) * grav_z * grid % vol(c)
-        end do
-      end if
+    if(abs(grav_i) > NANO) then
+      do c = 1, grid % n_cells
+        b(c) = b(c) + density(c) * grav_i * grid % vol(c)
+      end do
     end if
   end if
 
@@ -428,15 +373,7 @@
   call Cpu_Timer_Mod_Stop('Linear_Solver_For_Momentum')
 
   ! Fill the info screen up
-  if(ui % name .eq. 'U') then
-    call Info_Mod_Iter_Fill_At(1, 1, ui % name, exec_iter, ui % res)
-  end if
-  if(ui % name .eq. 'V') then
-    call Info_Mod_Iter_Fill_At(1, 2, ui % name, exec_iter, ui % res)
-  end if
-  if(ui % name .eq. 'W') then
-    call Info_Mod_Iter_Fill_At(1, 3, ui % name, exec_iter, ui % res)
-  end if
+  call Info_Mod_Iter_Fill_At(1, i, ui % name, exec_iter, ui % res)
 
   call Comm_Mod_Exchange_Real(grid, ui % n)
 
