@@ -12,7 +12,7 @@
   !   Close the monitoring files   !
   !--------------------------------!
   do m = 1, monitor % n_points
-    if(monitor % cell(m) > 0) close(10 + m)
+    if(monitor % cell(m) > 0) close(monitor % file_unit(m))
   end do
 
   end subroutine

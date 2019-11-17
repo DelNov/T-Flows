@@ -22,10 +22,10 @@
 !   First domain must be the channel-like, periodic in streamwise direction.   !
 !                                                                              !
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod,     only: ONE_THIRD, TWO_THIRDS
+  use Const_Mod, only: ONE_THIRD, TWO_THIRDS
   use Math_Mod
-  use Tokenizer_Mod, only: Tokenizer_Mod_Read_Line, line
-  use Grid_Mod,      only: Grid_Type
+  use File_Mod
+  use Grid_Mod,  only: Grid_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -49,7 +49,7 @@
   print *, '# Type ordinal number(s) of inflow boundary(s) that    '
   print *, '# will be linked to precursor domain(s) (skip to exit):'
   print *, '#------------------------------------------------------'
-  call Tokenizer_Mod_Read_Line(5)
+  call File_Mod_Read_Line(5)
   read(line % tokens(1), *) answer
   call To_Upper_Case(answer)
   if(answer .eq. 'SKIP') then

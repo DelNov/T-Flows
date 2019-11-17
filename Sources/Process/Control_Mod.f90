@@ -3,14 +3,14 @@
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
   use Math_Mod
-  use Tokenizer_Mod
-  use Comm_Mod,      only: this_proc, Comm_Mod_End
+  use File_Mod
+  use Comm_Mod,  only: this_proc, Comm_Mod_End
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
 
   character(len=80), parameter :: CONTROL_FILE_NAME = 'control'
-  integer, parameter           :: CONTROL_FILE_UNIT = 10
+  integer                      :: control_file_unit
 
   ! Number of presumably misstyped keywords followed by their list
   integer           :: n_similar =  0

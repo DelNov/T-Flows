@@ -6,8 +6,6 @@
   implicit none
 !==============================================================================!
 
-  open(unit   = CONTROL_FILE_UNIT,  &
-       file   = CONTROL_FILE_NAME,  &
-       action = 'read')
+  call File_Mod_Open_File_For_Reading(CONTROL_FILE_NAME, control_file_unit)
 
   end subroutine

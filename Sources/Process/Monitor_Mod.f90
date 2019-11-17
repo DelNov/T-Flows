@@ -25,6 +25,7 @@
     integer              :: n_points
     integer, allocatable :: cell(:)
     real,    allocatable :: x(:), y(:), z(:)
+    integer, allocatable :: file_unit(:)
 
   end type
 

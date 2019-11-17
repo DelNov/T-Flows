@@ -5,6 +5,7 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
+  use File_Mod
   use Field_Mod,   only: Field_Type, heat_transfer, density,  &
                           dens_face
   use Comm_Mod
@@ -34,7 +35,7 @@
   type(Face_Type), pointer :: v_flux
   type(Face_Type), pointer :: m_flux
   real,            pointer :: u_mean(:), v_mean(:), w_mean(:)
-  integer                  :: i, c, c1, c2, m, s, nks, nvs, sc
+  integer                  :: i, c, c1, c2, m, s, nks, nvs, sc, fu
   integer                  :: n_wall, n_inflow, n_outflow, n_symmetry,  &
                               n_heated_wall, n_convect
   character(len=80)        :: keys(128)
@@ -104,13 +105,12 @@
       if (this_proc < 2) &
         print *, '# Values specified in the file: ', trim(keys_file(nvs))
 
-      open(9, file = keys_file(1))
-      if (this_proc < 2) print *, '# Reading the file: ', trim(keys_file(1))
+      call File_Mod_Open_File_For_Reading(keys_file(1), fu, this_proc)
 
       ! number of points
-      call Tokenizer_Mod_Read_Line(9)
+      call File_Mod_Read_Line(fu)
 
-      read (line % tokens(1),*) n_points
+      read(line % tokens(1), *) n_points
 
       if (this_proc < 2) print '(a,i0,2a)', " # Reading ", nks, &
         " columns in file " , trim(keys_file(1))
@@ -123,12 +123,12 @@
 
       ! Read the entire profile file
       do m = 1, n_points
-        call Tokenizer_Mod_Read_Line(9)
+        call File_Mod_Read_Line(fu)
         do i = 1, nks
           read(line % tokens(i), *) prof(m, i)
         end do
       end do
-      close(9)
+      close(fu)
 
       ! A plane is defined
       if (keys(1) .eq. 'X' .and. keys(2) .eq. 'Y' .or.  &

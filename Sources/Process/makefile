@@ -188,7 +188,6 @@ SRC_MOD = Const_Mod.f90		\
           Sort_Mod.f90		\
           Math_Mod.f90		\
           File_Mod.f90		\
-          Tokenizer_Mod.f90	\
           Div_Mod.f90		\
           Grid_Mod.f90		\
           Grid_Level_Mod.f90	\

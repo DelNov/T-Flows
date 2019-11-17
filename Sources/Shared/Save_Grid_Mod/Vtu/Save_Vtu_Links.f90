@@ -20,13 +20,13 @@
   integer         :: sub, n_nodes_sub, n_cells_sub, n_faces_sub,  &
                           n_bnd_cells_sub, n_buf_cells_sub
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: n, c, c1, c2, s, offset
+  integer           :: n, c, c1, c2, s, offset, fu
   integer           :: nf_sub_non_per, nf_sub_per
   character(len=80) :: name_out
 !------------------------------[Local parameters]------------------------------!
   integer,           parameter :: VTK_LINE       =  3  ! cells in VTK format
   integer,           parameter :: VTK_TETRA      = 10
-  integer,           parameter :: VTK_HEXAHEDRON = 12  
+  integer,           parameter :: VTK_HEXAHEDRON = 12
   integer,           parameter :: VTK_WEDGE      = 13
   integer,           parameter :: VTK_PYRAMID    = 14
   character(len= 0), parameter :: IN_0 = ''            ! indentation levels 
@@ -43,111 +43,110 @@
   !                      !
   !----------------------!
   call File_Mod_Set_Name(name_out, processor=sub, extension='.links.vtu')
-  open(9, file=name_out)
-  print *, '# Creating the file: ', trim(name_out)
+  call File_Mod_Open_File_For_Writing(name_out, fu)
 
   !-----------!
   !   Start   !
   !-----------!
-  write(9,'(a,a)') IN_0, '<?xml version="1.0"?>'
-  write(9,'(a,a)') IN_0, '<VTKFile type="UnstructuredGrid" version="0.1" ' //  &
+  write(fu,'(a,a)') IN_0, '<?xml version="1.0"?>'
+  write(fu,'(a,a)') IN_0, '<VTKFile type="UnstructuredGrid" version="0.1" '//  &
                          'byte_order="LittleEndian">'
-  write(9,'(a,a)') IN_1, '<UnstructuredGrid>'
-  write(9,'(a,a,i0.0,a,i0.0,a)')   &
-                   IN_2, '<Piece NumberOfPoints="',               &
-                          n_nodes_sub + n_cells_sub +             &
-                          n_bnd_cells_sub + n_buf_cells_sub,      &
-                         '" NumberOfCells ="',                    &
-                          n_cells_sub + n_faces_sub + n_buf_cells_sub, '">' 
+  write(fu,'(a,a)') IN_1, '<UnstructuredGrid>'
+  write(fu,'(a,a,i0.0,a,i0.0,a)')   &
+                    IN_2, '<Piece NumberOfPoints="',               &
+                           n_nodes_sub + n_cells_sub +             &
+                           n_bnd_cells_sub + n_buf_cells_sub,      &
+                          '" NumberOfCells ="',                    &
+                           n_cells_sub + n_faces_sub + n_buf_cells_sub, '">' 
   !-----------!
   !   Nodes   !
   !-----------!
-  write(9,'(a,a)') IN_3, '<Points>'
-  write(9,'(a,a)') IN_4, '<DataArray type="Float64" NumberOfComponents' //  &
-                         '="3" format="ascii">'
+  write(fu,'(a,a)') IN_3, '<Points>'
+  write(fu,'(a,a)') IN_4, '<DataArray type="Float64" NumberOfComponents' //  &
+                          '="3" format="ascii">'
   do n = 1, grid % n_nodes
-    if(grid % new_n(n) .ne. 0) write(9, '(a,1pe15.7,1pe15.7,1pe15.7)')   &
+    if(grid % new_n(n) .ne. 0) write(fu, '(a,1pe15.7,1pe15.7,1pe15.7)')   &
                    IN_5, grid % xn(n), grid % yn(n), grid % zn(n)
   end do
   do c = 1, grid % n_cells
-    if(grid % new_c(c) .ne. 0) write(9, '(a,1pe15.7,1pe15.7,1pe15.7)')   &
+    if(grid % new_c(c) .ne. 0) write(fu, '(a,1pe15.7,1pe15.7,1pe15.7)')   &
                    IN_5, grid % xc(c), grid % yc(c), grid % zc(c)
   end do
   do c = -1,-grid % n_bnd_cells,-1
-    if(grid % new_c(c) .ne. 0) write(9, '(a,1pe15.7,1pe15.7,1pe15.7)')   &
+    if(grid % new_c(c) .ne. 0) write(fu, '(a,1pe15.7,1pe15.7,1pe15.7)')   &
                    IN_5, grid % xc(c), grid % yc(c), grid % zc(c)
   end do
   do c = 1,n_buf_cells_sub
-    write(9, '(a,1pe15.7,1pe15.7,1pe15.7)') IN_5,  &
-               grid % xc(buf_recv_ind(c)),         &
-               grid % yc(buf_recv_ind(c)),         &
-               grid % zc(buf_recv_ind(c))
+    write(fu, '(a,1pe15.7,1pe15.7,1pe15.7)') IN_5,  &
+                grid % xc(buf_recv_ind(c)),         &
+                grid % yc(buf_recv_ind(c)),         &
+                grid % zc(buf_recv_ind(c))
   end do
-  write(9,'(a,a)') IN_4, '</DataArray>'
-  write(9,'(a,a)') IN_3, '</Points>'
+  write(fu,'(a,a)') IN_4, '</DataArray>'
+  write(fu,'(a,a)') IN_3, '</Points>'
 
   !-----------!
   !   Cells   !
   !-----------!
-  write(9,'(a,a)') IN_3, '<Cells>'
+  write(fu,'(a,a)') IN_3, '<Cells>'
 
   ! First write all cells' nodes
-  write(9,'(a,a)') IN_4, '<DataArray type="Int64" Name="connectivity"' //  &
-                         ' format="ascii">'
+  write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="connectivity"' //  &
+                          ' format="ascii">'
 
   do c = 1, grid % n_cells
     if(grid % new_c(c) .ne. 0) then
 
       ! Hexahedral
       if(grid % cells_n_nodes(c) .eq. 8) then
-        write(9,'(a,8i9)')                      &
-          IN_5,                                 &
-          grid % new_n(grid % cells_n(1,c))-1,  &
-          grid % new_n(grid % cells_n(2,c))-1,  &
-          grid % new_n(grid % cells_n(4,c))-1,  &
-          grid % new_n(grid % cells_n(3,c))-1,  &
-          grid % new_n(grid % cells_n(5,c))-1,  &
-          grid % new_n(grid % cells_n(6,c))-1,  &
-          grid % new_n(grid % cells_n(8,c))-1,  &
-          grid % new_n(grid % cells_n(7,c))-1
+        write(fu,'(a,8i9)')                      &
+           IN_5,                                 &
+           grid % new_n(grid % cells_n(1,c))-1,  &
+           grid % new_n(grid % cells_n(2,c))-1,  &
+           grid % new_n(grid % cells_n(4,c))-1,  &
+           grid % new_n(grid % cells_n(3,c))-1,  &
+           grid % new_n(grid % cells_n(5,c))-1,  &
+           grid % new_n(grid % cells_n(6,c))-1,  &
+           grid % new_n(grid % cells_n(8,c))-1,  &
+           grid % new_n(grid % cells_n(7,c))-1
 
       ! Wedge
       else if(grid % cells_n_nodes(c) .eq. 6) then
-        write(9,'(a,6i9)')                      &
-          IN_5,                                 &
-          grid % new_n(grid % cells_n(1,c))-1,  &
-          grid % new_n(grid % cells_n(2,c))-1,  &
-          grid % new_n(grid % cells_n(3,c))-1,  &
-          grid % new_n(grid % cells_n(4,c))-1,  &
-          grid % new_n(grid % cells_n(5,c))-1,  &
-          grid % new_n(grid % cells_n(6,c))-1
+        write(fu,'(a,6i9)')                      &
+           IN_5,                                 &
+           grid % new_n(grid % cells_n(1,c))-1,  &
+           grid % new_n(grid % cells_n(2,c))-1,  &
+           grid % new_n(grid % cells_n(3,c))-1,  &
+           grid % new_n(grid % cells_n(4,c))-1,  &
+           grid % new_n(grid % cells_n(5,c))-1,  &
+           grid % new_n(grid % cells_n(6,c))-1
 
       ! Tetrahedra
       else if(grid % cells_n_nodes(c) .eq. 4) then
-        write(9,'(a,4i9)')                      &
-          IN_5,                                 &
-          grid % new_n(grid % cells_n(1,c))-1,  &
-          grid % new_n(grid % cells_n(2,c))-1,  &
-          grid % new_n(grid % cells_n(3,c))-1,  &
-          grid % new_n(grid % cells_n(4,c))-1
+        write(fu,'(a,4i9)')                      &
+           IN_5,                                 &
+           grid % new_n(grid % cells_n(1,c))-1,  &
+           grid % new_n(grid % cells_n(2,c))-1,  &
+           grid % new_n(grid % cells_n(3,c))-1,  &
+           grid % new_n(grid % cells_n(4,c))-1
 
       ! Pyramid
       else if(grid % cells_n_nodes(c) .eq. 5) then
-        write(9,'(a,5i9)')                      &
-          IN_5,                                 &
-          grid % new_n(grid % cells_n(1,c))-1,  &
-          grid % new_n(grid % cells_n(2,c))-1,  &
-          grid % new_n(grid % cells_n(4,c))-1,  &
-          grid % new_n(grid % cells_n(3,c))-1,  &
-          grid % new_n(grid % cells_n(5,c))-1
+        write(fu,'(a,5i9)')                      &
+           IN_5,                                 &
+           grid % new_n(grid % cells_n(1,c))-1,  &
+           grid % new_n(grid % cells_n(2,c))-1,  &
+           grid % new_n(grid % cells_n(4,c))-1,  &
+           grid % new_n(grid % cells_n(3,c))-1,  &
+           grid % new_n(grid % cells_n(5,c))-1
       else
         print *, '# Unsupported cell type with ',  &
                     grid % cells_n_nodes(c), ' nodes.'
         print *, '# Exiting'
-        stop 
+        stop
       end if
     end if
-  end do  
+  end do
 
   ! Physical links; non-periodic
   nf_sub_non_per = 0 
@@ -159,23 +158,23 @@
 
       if( (grid % sx(s) * (grid % xc(c2)-grid % xc(c1) ) +  &
            grid % sy(s) * (grid % yc(c2)-grid % yc(c1) ) +  &
-           grid % sz(s) * (grid % zc(c2)-grid % zc(c1) ))  > 0.0 ) then 
+           grid % sz(s) * (grid % zc(c2)-grid % zc(c1) ))  > 0.0 ) then
 
         nf_sub_non_per = nf_sub_non_per + 1
 
         c1 = grid % new_c(grid % faces_c(1,s))
         c2 = grid % new_c(grid % faces_c(2,s))
         if( c2  > 0 ) then
-          write(9,'(a,2i9)') IN_5, n_nodes_sub + c1 - 1,  & 
-                                   n_nodes_sub + c2 - 1
+          write(fu,'(a,2i9)') IN_5, n_nodes_sub + c1 - 1,  & 
+                                    n_nodes_sub + c2 - 1
         else
-          write(9,'(a,2i9)') IN_5, n_nodes_sub + c1 - 1,  &
-                                   n_nodes_sub + n_cells_sub - c2 - 1
+          write(fu,'(a,2i9)') IN_5, n_nodes_sub + c1 - 1,  &
+                                    n_nodes_sub + n_cells_sub - c2 - 1
         end if
       end if
 
     end if
-  end do  
+  end do
 
   ! Physical links; periodic
   nf_sub_per    = 0 
@@ -187,18 +186,18 @@
 
       if( (grid % sx(s) * (grid % xc(c2)-grid % xc(c1) ) +  &
            grid % sy(s) * (grid % yc(c2)-grid % yc(c1) ) +  &
-           grid % sz(s) * (grid % zc(c2)-grid % zc(c1) ))  < 0.0 ) then 
+           grid % sz(s) * (grid % zc(c2)-grid % zc(c1) ))  < 0.0 ) then
 
         nf_sub_per = nf_sub_per + 1
 
         c1 = grid % new_c(grid % faces_c(1,s))
         c2 = grid % new_c(grid % faces_c(2,s))
         if( c2  > 0 ) then
-          write(9,'(a,2i9)') IN_5, n_nodes_sub + c1 - 1,  &
-                                   n_nodes_sub + c2 - 1
+          write(fu,'(a,2i9)') IN_5, n_nodes_sub + c1 - 1,  &
+                                    n_nodes_sub + c2 - 1
         else
-          write(9,'(a,2i9)') IN_5, n_nodes_sub + c1 - 1,  &
-                                   n_nodes_sub + n_cells_sub - c2 - 1
+          write(fu,'(a,2i9)') IN_5, n_nodes_sub + c1 - 1,  &
+                                    n_nodes_sub + n_cells_sub - c2 - 1
         end if
       end if
 
@@ -208,93 +207,93 @@
   ! Interprocessor links
   do c = 1, n_buf_cells_sub
     c1 = buf_send_ind(c) 
-    write(9,'(a,2i9)') IN_5, n_nodes_sub + c1 - 1, &
-                             n_nodes_sub + n_cells_sub + n_bnd_cells_sub + c - 1
-  end do  
+    write(fu,'(a,2i9)') IN_5,  &
+      n_nodes_sub + c1 - 1, n_nodes_sub + n_cells_sub + n_bnd_cells_sub + c - 1
+  end do
 
-  write(9,'(a,a)') IN_4, '</DataArray>'
+  write(fu,'(a,a)') IN_4, '</DataArray>'
 
   print '(a38,i9)', '# Non-periodic links    :            ', nf_sub_non_per
   print '(a38,i9)', '# Periodic links        :            ', nf_sub_per
   print '(a38,i9)', '# Inter-processor links :            ', n_buf_cells_sub
 
   ! Now write all cells' offsets
-  write(9,'(a,a)') IN_4, '<DataArray type="Int64" Name="offsets" ' // & 
-                         'format="ascii">'
+  write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="offsets" ' // & 
+                          'format="ascii">'
   offset = 0
   do c = 1, grid % n_cells
     if(grid % new_c(c) .ne. 0) then
       offset = offset + grid % cells_n_nodes(c)
-      write(9,'(a,i9)') IN_5, offset
+      write(fu,'(a,i9)') IN_5, offset
     end if
   end do
   do c = 1, nf_sub_non_per
     offset = offset + 2
-    write(9,'(a,i9)') IN_5, offset
+    write(fu,'(a,i9)') IN_5, offset
   end do
   do c = 1, nf_sub_per
     offset = offset + 2
-    write(9,'(a,i9)') IN_5, offset
+    write(fu,'(a,i9)') IN_5, offset
   end do
   do c = 1, n_buf_cells_sub
     offset = offset + 2
-    write(9,'(a,i9)') IN_5, offset
+    write(fu,'(a,i9)') IN_5, offset
   end do
 
-  write(9,'(a,a)') IN_4, '</DataArray>'
- 
+  write(fu,'(a,a)') IN_4, '</DataArray>'
+
   ! Now write all cells' types
-  write(9,'(a,a)') IN_4, '<DataArray type="Int64" Name="types" format="ascii">'
+  write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="types" format="ascii">'
   do c = 1, grid % n_cells
     if(grid % new_c(c) .ne. 0) then
-      if(grid % cells_n_nodes(c) .eq. 4) write(9,'(a,i9)') IN_5, VTK_TETRA
-      if(grid % cells_n_nodes(c) .eq. 8) write(9,'(a,i9)') IN_5, VTK_HEXAHEDRON
-      if(grid % cells_n_nodes(c) .eq. 6) write(9,'(a,i9)') IN_5, VTK_WEDGE
-      if(grid % cells_n_nodes(c) .eq. 5) write(9,'(a,i9)') IN_5, VTK_PYRAMID
+      if(grid % cells_n_nodes(c) .eq. 4) write(fu,'(a,i9)') IN_5, VTK_TETRA
+      if(grid % cells_n_nodes(c) .eq. 8) write(fu,'(a,i9)') IN_5, VTK_HEXAHEDRON
+      if(grid % cells_n_nodes(c) .eq. 6) write(fu,'(a,i9)') IN_5, VTK_WEDGE
+      if(grid % cells_n_nodes(c) .eq. 5) write(fu,'(a,i9)') IN_5, VTK_PYRAMID
     end if
   end do
   do c = 1, nf_sub_non_per
-    write(9,'(a,i9)') IN_5, VTK_LINE
+    write(fu,'(a,i9)') IN_5, VTK_LINE
   end do
   do c = 1, nf_sub_per
-    write(9,'(a,i9)') IN_5, VTK_LINE
+    write(fu,'(a,i9)') IN_5, VTK_LINE
   end do
   do c = 1, n_buf_cells_sub
-    write(9,'(a,i9)') IN_5, VTK_LINE
+    write(fu,'(a,i9)') IN_5, VTK_LINE
   end do
-  write(9,'(a,a)') IN_4, '</DataArray>'
-  write(9,'(a,a)') IN_3, '</Cells>'
- 
+  write(fu,'(a,a)') IN_4, '</DataArray>'
+  write(fu,'(a,a)') IN_3, '</Cells>'
+
   !----------------!
   !   Link types   !
   !----------------!
-  write(9,'(a,a)') IN_3, '<CellData Scalars="scalars" vectors="velocity">'
-  write(9,'(a,a)') IN_4, '<DataArray type="Int64" ' // & 
-                         'Name="link type" format="ascii">'
+  write(fu,'(a,a)') IN_3, '<CellData Scalars="scalars" vectors="velocity">'
+  write(fu,'(a,a)') IN_4, '<DataArray type="Int64" ' // & 
+                          'Name="link type" format="ascii">'
   do c = 1, grid % n_cells
     if(grid % new_c(c) .ne. 0) then
-      write(9,'(a,i9)') IN_5, 0
+      write(fu,'(a,i9)') IN_5, 0
     end if
   end do
   do c = 1, nf_sub_non_per
-    write(9,'(a,i9)') IN_5, 1
+    write(fu,'(a,i9)') IN_5, 1
   end do
   do c = 1, nf_sub_per
-    write(9,'(a,i9)') IN_5, 2
+    write(fu,'(a,i9)') IN_5, 2
   end do
   do c = 1, n_buf_cells_sub
-    write(9,'(a,i9)') IN_5, 3
+    write(fu,'(a,i9)') IN_5, 3
   end do
-  write(9,'(a,a)') IN_4, '</DataArray>'
-  write(9,'(a,a)') IN_3, '</CellData>'
+  write(fu,'(a,a)') IN_4, '</DataArray>'
+  write(fu,'(a,a)') IN_3, '</CellData>'
 
   !------------!
   !   Footer   !
   !------------!
-  write(9,'(a,a)') IN_2, '</Piece>'
-  write(9,'(a,a)') IN_1, '</UnstructuredGrid>'
-  write(9,'(a,a)') IN_0, '</VTKFile>'
+  write(fu,'(a,a)') IN_2, '</Piece>'
+  write(fu,'(a,a)') IN_1, '</UnstructuredGrid>'
+  write(fu,'(a,a)') IN_0, '</VTKFile>'
 
-  close(9)
+  close(fu)
 
   end subroutine

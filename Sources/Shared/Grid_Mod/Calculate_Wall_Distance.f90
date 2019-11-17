@@ -31,7 +31,7 @@
   print *, '# for the listed wall boundary(s).                                 '
   print *, '# This is needed for RANS and HYBRID turbulence models.            '
   print *, '#------------------------------------------------------------------'
-  call Tokenizer_Mod_Read_Line(5)
+  call File_Mod_Read_Line(5)
   n_wall_colors = line % n_tokens
   allocate(wall_colors(n_wall_colors))
   do b = 1, n_wall_colors

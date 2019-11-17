@@ -12,7 +12,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: n_prob, p, c
+  integer           :: n_prob, p, c, fu
   real              :: yp(32768), zp(32768)
   character(len=80) :: name_prob
   character(len=80) :: answer
@@ -74,17 +74,16 @@
   !   Create 2D file   !
   !--------------------!
   call File_Mod_Set_Name(name_prob, extension='.2d')
-  print *, '# Creating the file: ', trim(name_prob)
-  open(9, file=name_prob)
+  call File_Mod_Open_File_For_Writing(name_prob, fu)
 
   ! Write the number of probes 
-  write(9,'(i8)') n_prob
+  write(fu,'(i8)') n_prob
 
   ! Write the probe coordinates out
   do p=1, n_prob
-    write(9,'(i8,1pe17.8,1pe17.8)') p, yp(p), zp(p)
+    write(fu,'(i8,1pe17.8,1pe17.8)') p, yp(p), zp(p)
   end do
 
-  close(9)
+  close(fu)
 
   end subroutine

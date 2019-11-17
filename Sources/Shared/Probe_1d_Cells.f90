@@ -5,7 +5,7 @@
 !   direction and write them in file called "name.1d"                          !
 !------------------------------------------------------------------------------!
   use File_Mod
-  use Const_Mod, only: NANO          ! 1.0e-9
+  use Const_Mod, only: NANO          ! 1.0e-fu
   use Math_Mod
   use Grid_Mod
 !------------------------------------------------------------------------------!
@@ -14,7 +14,7 @@
   type(Grid_Type) :: grid
   logical         :: isit
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: n_prob, p, c
+  integer           :: n_prob, p, c, fu
   real              :: zp(16384)
   character(len=80) :: name_prob
   character(len=80) :: answer
@@ -66,17 +66,16 @@
   !   Create 1D file   !
   !--------------------!
   call File_Mod_Set_Name(name_prob, extension='.1d')
-  print *, '# Creating the file: ', trim(name_prob)
-  open(9, file=name_prob)
+  call File_Mod_Open_File_For_Writing(name_prob, fu)
 
-  ! Write the number of probes 
-  write(9,'(i8)') n_prob
+  ! Write the number of probes
+  write(fu,'(i8)') n_prob
 
   ! Write the probe coordinates out
   do p=1,n_prob
-    write(9,'(i8,1pe17.8)') p, zp(p)
+    write(fu,'(i8,1pe17.8)') p, zp(p)
   end do
 
-  close(9)
+  close(fu)
 
   end subroutine

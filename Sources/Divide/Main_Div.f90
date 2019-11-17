@@ -4,12 +4,11 @@
 !   Divides the domain in equaly balanced subdomains.                          !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use File_Mod,      only: problem_name
-  use Grid_Mod,      only: Grid_Type,           &
-                           Grid_Mod_Decompose,  &
-                           Grid_Mod_Load_Cns,   &
-                           Grid_Mod_Load_Geo
-  use Tokenizer_Mod  ! it's too small for "only" to be meaningful
+  use File_Mod
+  use Grid_Mod, only: Grid_Type,           &
+                      Grid_Mod_Decompose,  &
+                      Grid_Mod_Load_Cns,   &
+                      Grid_Mod_Load_Geo
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Locals]-----------------------------------!
@@ -23,7 +22,7 @@
   call Logo_Div
 
   print *, '# Input problem name: (without extension)'
-  call Tokenizer_Mod_Read_Line(5)
+  call File_Mod_Read_Line(5)
   read(line % tokens(1), *)  problem_name
 
   ! Load the finite volume grid

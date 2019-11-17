@@ -5,11 +5,11 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
+  use File_Mod
   use Comm_Mod,       only: this_proc, Comm_Mod_End
   use Field_Mod,      only: Field_Type, heat_transfer
   use Turb_Mod
   use Multiphase_Mod, only: Multiphase_Type, multiphase_model, VOLUME_OF_FLUID
-  use Tokenizer_Mod
   use Grid_Mod,       only: Grid_Type
   use Eddies_Mod
   use User_Mod
@@ -30,7 +30,7 @@
   type(Var_Type),  pointer :: kin, eps, f22, zeta, vis, t2
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   type(Var_Type),  pointer :: scalar(:)
-  integer                  :: c,m,l,k,i,bc,n_points,nks,nvs,sc,c1,c2,s
+  integer                  :: c,m,l,k,i,bc,n_points,nks,nvs,sc,c1,c2,s,fu
   character(len=80)        :: name_prof(128)
   real                     :: wi, dist_min, x, y, z, xp, dist
   real, allocatable        :: prof(:,:)
@@ -318,9 +318,8 @@
 
         call Control_Mod_Read_Strings_On('FILE', name_prof, nvs, .false.)
 
-        open(9, file=name_prof(1))
-        if(this_proc < 2) print *, '# Reading the file: ', trim(name_prof(1))
-        call Tokenizer_Mod_Read_Line(9)
+        call File_Mod_Open_File_For_Reading(name_prof(1), fu)
+        call File_Mod_Read_Line(fu)
         read(line % tokens(1),*) n_points  ! number of points
 
         allocate(prof(n_points, 0:nks))
@@ -329,12 +328,12 @@
         !   Read the entire profile file   !
         !----------------------------------!
         do m = 1, n_points
-          call Tokenizer_Mod_Read_Line(9)
+          call File_Mod_Read_Line(fu)
           do i = 1, nks
             read(line % tokens(i), *) prof(m,i)
           end do
         end do
-        close(9)
+        close(fu)
 
         !------------------------!
         !   A plane is defined   !
@@ -709,7 +708,7 @@
             end if
           end do  ! c = -1, -grid % n_bnd_cells, -1
         end if  ! plane is defined?
-        close(9)
+        close(fu)
       end if  ! boundary defined in a file
     end do
 

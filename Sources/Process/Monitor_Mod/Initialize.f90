@@ -28,8 +28,9 @@
   allocate(monitor % z(monitor % n_points))
 
   ! Allocate memory accordingly
-  allocate(monitor % cell(monitor % n_points))
-  allocate(min_dist      (monitor % n_points))
+  allocate(monitor % cell     (monitor % n_points))
+  allocate(monitor % file_unit(monitor % n_points))
+  allocate(min_dist           (monitor % n_points))
 
   !----------------------------------------!
   !   Read monitoring points coordinates   !
@@ -94,15 +95,17 @@
       write(mon_file_name(l-2:l),'(I3.3)') m
 
       if(.not. restart) then
-        open(10+m, file = mon_file_name)
+        call File_Mod_Open_File_For_Writing(mon_file_name,  &
+                                            monitor % file_unit(m))
       else
-        open(10+m, file = mon_file_name, position = 'append')
+        call File_Mod_Append_File_For_Writing(mon_file_name,  &
+                                              monitor % file_unit(m))
       endif
 
-      write(10+m, '(a24, 3f16.6)')         &
-            '# Monitoring point:',         &
-            grid % xc( monitor % cell(m) ),  &
-            grid % yc( monitor % cell(m) ),  &
+      write(monitor % file_unit(m), '(a24, 3f16.6)')   &
+            '# Monitoring point:',                     &
+            grid % xc( monitor % cell(m) ),            &
+            grid % yc( monitor % cell(m) ),            &
             grid % zc( monitor % cell(m) )
 
     end if

@@ -12,7 +12,7 @@
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, s, c1, c2, sub, n_cells_sub, n_faces_sub,  &
-                          n_buf_sub, n_bnd_cells_sub, NCSsub
+                          n_buf_sub, n_bnd_cells_sub, fu, NCSsub
   character(len=80)    :: name_map
   integer, allocatable :: global_cell_ins(:)
   integer, allocatable :: global_cell_bnd(:)
@@ -29,8 +29,7 @@
   do sub = 1, maxval(grid % comm % proces(:))
 
     call File_Mod_Set_Name(name_map, processor=sub, extension='.map')
-    open(9, file=name_map)
-    print *, '# Creating files: ', trim(name_map)
+    call File_Mod_Open_File_For_Writing(name_map, fu)
 
     ! Cells
     n_cells_sub = 0     ! number of cells in subdomain
@@ -64,20 +63,20 @@
     !-----------------------!
 
     ! First line are the number of boundary cells and cells
-    write(9, '(4i9)') n_cells_sub, n_bnd_cells_sub
+    write(fu, '(4i9)') n_cells_sub, n_bnd_cells_sub
 
     ! Extents are followed by mapping of the cells inside ...
     do c = 1, n_cells_sub
-      write(9, '(i9)') global_cell_ins(c)
+      write(fu, '(i9)') global_cell_ins(c)
     end do
 
     ! ... followed by the cells on the boundary ...
     do c = -n_bnd_cells_sub, -1
-      write(9, '(i9)') global_cell_bnd(c)
+      write(fu, '(i9)') global_cell_bnd(c)
     end do
 
   end do   ! through subdomains
 
-  close(9)
+  close(fu)
 
   end subroutine

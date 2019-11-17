@@ -17,7 +17,7 @@
   integer :: i
 !==============================================================================!
 
-  rewind(CONTROL_FILE_UNIT)
+  rewind(control_file_unit)
 
   ! Set default values
   val = def
@@ -26,7 +26,7 @@
   !   Browse through command file to find the keyword   !
   !-----------------------------------------------------!
   do
-    call Tokenizer_Mod_Read_Line(CONTROL_FILE_UNIT, reached_end)
+    call File_Mod_Read_Line(control_file_unit, reached_end)
     if(reached_end) goto 1
 
     ! Found the correct keyword

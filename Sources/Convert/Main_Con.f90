@@ -52,6 +52,8 @@
     extension = file_name_up(l-2:l)
   else
     print *, '# Unrecognized input file format; exiting!'
+    print *, '#----------------------------------' // &
+             '-----------------------------------'
     stop
   end if
   print *, '#----------------------------------' // &

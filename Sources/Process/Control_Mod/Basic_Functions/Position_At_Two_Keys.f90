@@ -15,14 +15,14 @@
   logical :: reached_end
 !==============================================================================!
 
-  rewind(CONTROL_FILE_UNIT)
+  rewind(control_file_unit)
 
   !------------------------------------------------------------------!
   !   Browse through command file to find two keywords in one file   !
   !------------------------------------------------------------------!
   found = .false.
   do
-    call Tokenizer_Mod_Read_Line(CONTROL_FILE_UNIT, reached_end)
+    call File_Mod_Read_Line(control_file_unit, reached_end)
     if(reached_end) goto 1
 
     call To_Upper_Case(line % tokens(2))

@@ -28,7 +28,7 @@
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: phi
-  integer                  :: c, n, s, offset, sc
+  integer                  :: c, n, s, offset, sc, f8, f9
   character(len=80)        :: name_out_8, name_out_9, name_mean
 !-----------------------------[Local parameters]-------------------------------!
   integer, parameter :: VTK_TRIANGLE   =  5  ! cell shapes in VTK format
@@ -78,11 +78,9 @@
   end if
 
   if(n_proc > 1 .and. this_proc .eq. 1) then
-    open(8, file=name_out_8)
-    print *, '# Creating file: ', trim(name_out_8)
+    call File_Mod_Open_File_For_Writing(name_out_8, f8)
   end if
-  open(9, file=name_out_9)
-  print *, '# Creating file: ', trim(name_out_9)
+  call File_Mod_Open_File_For_Writing(name_out_9, f9)
 
   !------------!
   !            !
@@ -90,24 +88,24 @@
   !            !
   !------------!
   if(n_proc > 1 .and. this_proc .eq. 1)  then
-    write(8,'(a,a)') IN_0, '<?xml version="1.0"?>'
-    write(8,'(a,a)') IN_0, '<VTKFile type="PUnstructuredGrid">'
-    write(8,'(a,a)') IN_1, '<PUnstructuredGrid GhostLevel="0">'
+    write(f8,'(a,a)') IN_0, '<?xml version="1.0"?>'
+    write(f8,'(a,a)') IN_0, '<VTKFile type="PUnstructuredGrid">'
+    write(f8,'(a,a)') IN_1, '<PUnstructuredGrid GhostLevel="0">'
   end if
 
-  write(9,'(a,a)') IN_0, '<?xml version="1.0"?>'
-  write(9,'(a,a)') IN_0, '<VTKFile type="UnstructuredGrid" version="0.1" ' //  &
-                         'byte_order="LittleEndian">'
-  write(9,'(a,a)') IN_1, '<UnstructuredGrid>'
+  write(f9,'(a,a)') IN_0, '<?xml version="1.0"?>'
+  write(f9,'(a,a)') IN_0, '<VTKFile type="UnstructuredGrid" version="0.1" ' // &
+                          'byte_order="LittleEndian">'
+  write(f9,'(a,a)') IN_1, '<UnstructuredGrid>'
 
   if(plot_inside) then
-    write(9,'(a,a,i0.0,a,i0.0,a)')   &
+    write(f9,'(a,a,i0.0,a,i0.0,a)')   &
                  IN_2, '<Piece NumberOfPoints="', grid % n_nodes,              &
                             '" NumberOfCells ="', grid % n_cells               &
                                                 - grid % comm % n_buff_cells,  &
                                                 '">'
   else
-    write(9,'(a,a,i0.0,a,i0.0,a)')   &
+    write(f9,'(a,a,i0.0,a,i0.0,a)')   &
                  IN_2, '<Piece NumberOfPoints="', grid % n_nodes,              &
                             '" NumberOfCells ="', grid % n_bnd_cells, '">'
   end if
@@ -122,56 +120,56 @@
   !   Nodes   !
   !-----------!
   if(n_proc > 1 .and. this_proc .eq. 1)  then
-    write(8,'(a,a)') IN_3, '<PPoints>'
-    write(8,'(a,a)') IN_4, '<PDataArray type="Float64" NumberOfComponents=' // &
-                           '"3" format="ascii"/>'
-    write(8,'(a,a)') IN_3, '</PPoints>'
+    write(f8,'(a,a)') IN_3, '<PPoints>'
+    write(f8,'(a,a)') IN_4, '<PDataArray type="Float64" NumberOfComponents=' // &
+                            '"3" format="ascii"/>'
+    write(f8,'(a,a)') IN_3, '</PPoints>'
   end if
-  write(9,'(a,a)') IN_3, '<Points>'
-  write(9,'(a,a)') IN_4, '<DataArray type="Float64" NumberOfComponents' //  &
-                         '="3" format="ascii">'
+  write(f9,'(a,a)') IN_3, '<Points>'
+  write(f9,'(a,a)') IN_4, '<DataArray type="Float64" NumberOfComponents' //  &
+                          '="3" format="ascii">'
   do n = 1, grid % n_nodes
-    write(9, '(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')                &
-               IN_5, grid % xn(n), grid % yn(n), grid % zn(n)
+    write(f9, '(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')                &
+                IN_5, grid % xn(n), grid % yn(n), grid % zn(n)
   end do
-  write(9,'(a,a)') IN_4, '</DataArray>'
-  write(9,'(a,a)') IN_3, '</Points>'
+  write(f9,'(a,a)') IN_4, '</DataArray>'
+  write(f9,'(a,a)') IN_3, '</Points>'
 
   !-----------!
   !   Cells   !
   !-----------!
-  write(9,'(a,a)') IN_3, '<Cells>'
+  write(f9,'(a,a)') IN_3, '<Cells>'
 
   ! First write all cells' nodes
-  write(9,'(a,a)') IN_4, '<DataArray type="Int64" Name="connectivity"' //  &
-                         ' format="ascii">'
+  write(f9,'(a,a)') IN_4, '<DataArray type="Int64" Name="connectivity"' //  &
+                          ' format="ascii">'
 
   if(plot_inside) then
     do c = 1, grid % n_cells - grid % comm % n_buff_cells
       if(grid % cells_n_nodes(c) .eq. 8) then
-        write(9,'(a,8i9)')                                &
-          IN_5,                                           &
-          grid % cells_n(1,c)-1, grid % cells_n(2,c)-1,   &
-          grid % cells_n(4,c)-1, grid % cells_n(3,c)-1,   &
-          grid % cells_n(5,c)-1, grid % cells_n(6,c)-1,   &
-          grid % cells_n(8,c)-1, grid % cells_n(7,c)-1
+        write(f9,'(a,8i9)')                                &
+           IN_5,                                           &
+           grid % cells_n(1,c)-1, grid % cells_n(2,c)-1,   &
+           grid % cells_n(4,c)-1, grid % cells_n(3,c)-1,   &
+           grid % cells_n(5,c)-1, grid % cells_n(6,c)-1,   &
+           grid % cells_n(8,c)-1, grid % cells_n(7,c)-1
       else if(grid % cells_n_nodes(c) .eq. 6) then
-        write(9,'(a,6i9)')                                &
-          IN_5,                                           &
-          grid % cells_n(1,c)-1, grid % cells_n(2,c)-1,   &
-          grid % cells_n(3,c)-1, grid % cells_n(4,c)-1,   &
-          grid % cells_n(5,c)-1, grid % cells_n(6,c)-1
+        write(f9,'(a,6i9)')                                &
+           IN_5,                                           &
+           grid % cells_n(1,c)-1, grid % cells_n(2,c)-1,   &
+           grid % cells_n(3,c)-1, grid % cells_n(4,c)-1,   &
+           grid % cells_n(5,c)-1, grid % cells_n(6,c)-1
       else if(grid % cells_n_nodes(c) .eq. 4) then
-        write(9,'(a,4i9)')                                &
-          IN_5,                                           &
-          grid % cells_n(1,c)-1, grid % cells_n(2,c)-1,   &
-          grid % cells_n(3,c)-1, grid % cells_n(4,c)-1
+        write(f9,'(a,4i9)')                                &
+           IN_5,                                           &
+           grid % cells_n(1,c)-1, grid % cells_n(2,c)-1,   &
+           grid % cells_n(3,c)-1, grid % cells_n(4,c)-1
       else if(grid % cells_n_nodes(c) .eq. 5) then
-        write(9,'(a,5i9)')                                &
-          IN_5,                                           &
-          grid % cells_n(5,c)-1, grid % cells_n(1,c)-1,   &
-          grid % cells_n(2,c)-1, grid % cells_n(4,c)-1,   &
-          grid % cells_n(3,c)-1
+        write(f9,'(a,5i9)')                                &
+           IN_5,                                           &
+           grid % cells_n(5,c)-1, grid % cells_n(1,c)-1,   &
+           grid % cells_n(2,c)-1, grid % cells_n(4,c)-1,   &
+           grid % cells_n(3,c)-1
       else
         print *, '# ERROR!  Unsupported cell type with ',  &
                     grid % cells_n_nodes(c), ' nodes.'
@@ -183,17 +181,17 @@
     do s = 1, grid % n_faces
       if( grid % faces_c(2,s) < 0 ) then
         if(grid % faces_n_nodes(s) .eq. 4) then
-          write(9,'(a,4I9)')                               &
-            IN_5,                                          &
-            grid % faces_n(1,s)-1, grid % faces_n(2,s)-1,  &
-            grid % faces_n(3,s)-1, grid % faces_n(4,s)-1
+          write(f9,'(a,4I9)')                               &
+             IN_5,                                          &
+             grid % faces_n(1,s)-1, grid % faces_n(2,s)-1,  &
+             grid % faces_n(3,s)-1, grid % faces_n(4,s)-1
         else if(grid % faces_n_nodes(s) .eq. 3) then
-          write(9,'(a,3I9)')                               &
-            IN_5,                                          &
-            grid % faces_n(1,s)-1, grid % faces_n(2,s)-1,  &
-            grid % faces_n(3,s)-1
+          write(f9,'(a,3I9)')                               &
+             IN_5,                                          &
+             grid % faces_n(1,s)-1, grid % faces_n(2,s)-1,  &
+             grid % faces_n(3,s)-1
         else
-          print *, '# ERROR!  Unsupported cell type ',     &
+          print *, '# ERROR!  Unsupported face type ',     &
                     grid % faces_n_nodes(s), ' nodes.'
           print *, '# Exiting'
           call Comm_Mod_End
@@ -202,41 +200,41 @@
     end do
   end if
 
-  write(9,'(a,a)') IN_4, '</DataArray>'
+  write(f9,'(a,a)') IN_4, '</DataArray>'
 
   ! Now write all cells' offsets
-  write(9,'(a,a)') IN_4, '<DataArray type="Int64" Name="offsets"' //  &
-                         ' format="ascii">'
+  write(f9,'(a,a)') IN_4, '<DataArray type="Int64" Name="offsets"' //  &
+                          ' format="ascii">'
   offset = 0
 
   if(plot_inside) then
     do c = 1, grid % n_cells - grid % comm % n_buff_cells
       offset = offset + grid % cells_n_nodes(c)
-      write(9,'(a,i9)') IN_5, offset
+      write(f9,'(a,i9)') IN_5, offset
     end do
   else  ! plot only boundary
     do s = 1, grid % n_faces
       if( grid % faces_c(2,s) < 0 ) then
         offset = offset + grid % faces_n_nodes(s)
-        write(9,'(a,i9)') IN_5, offset
+        write(f9,'(a,i9)') IN_5, offset
       end if
     end do
   end if
-  write(9,'(a,a)') IN_4, '</DataArray>'
+  write(f9,'(a,a)') IN_4, '</DataArray>'
 
   ! Now write all cells' types
-  write(9,'(a,a)') IN_4, '<DataArray type="UInt8" Name="types" format="ascii">'
+  write(f9,'(a,a)') IN_4, '<DataArray type="UInt8" Name="types" format="ascii">'
 
   if(plot_inside) then
     do c = 1, grid % n_cells - grid % comm % n_buff_cells
       if(grid % cells_n_nodes(c) .eq. 8) then
-        write(9,'(a,i9)') IN_5, VTK_HEXAHEDRON
+        write(f9,'(a,i9)') IN_5, VTK_HEXAHEDRON
       else if(grid % cells_n_nodes(c) .eq. 6) then
-        write(9,'(a,i9)') IN_5, VTK_WEDGE
+        write(f9,'(a,i9)') IN_5, VTK_WEDGE
       else if(grid % cells_n_nodes(c) .eq. 4) then
-        write(9,'(a,i9)') IN_5, VTK_TETRA
+        write(f9,'(a,i9)') IN_5, VTK_TETRA
       else if(grid % cells_n_nodes(c) .eq. 5) then
-        write(9,'(a,i9)') IN_5, VTK_PYRAMID
+        write(f9,'(a,i9)') IN_5, VTK_PYRAMID
       else
         print *, '# ERROR!  Unsupported cell type with ',  &
                     grid % cells_n_nodes(c), ' nodes.'
@@ -247,14 +245,14 @@
   else  ! plot only boundary
     do s = 1, grid % n_faces
       if( grid % faces_c(2,s) < 0 ) then
-        if(grid % faces_n_nodes(s) .eq. 4) write(9,'(a,i9)') IN_5, VTK_QUAD
-        if(grid % faces_n_nodes(s) .eq. 3) write(9,'(a,i9)') IN_5, VTK_TRIANGLE
+        if(grid % faces_n_nodes(s) .eq. 4) write(f9,'(a,i9)') IN_5, VTK_QUAD
+        if(grid % faces_n_nodes(s) .eq. 3) write(f9,'(a,i9)') IN_5, VTK_TRIANGLE
       end if
     end do
   end if
 
-  write(9,'(a,a)') IN_4, '</DataArray>'
-  write(9,'(a,a)') IN_3, '</Cells>'
+  write(f9,'(a,a)') IN_4, '</DataArray>'
+  write(f9,'(a,a)') IN_3, '</Cells>'
 
   !---------------------------------!
   !                                 !
@@ -262,31 +260,31 @@
   !                                 !
   !---------------------------------!
   if(n_proc > 1 .and. this_proc .eq. 1)  then
-    write(8,'(a,a)') IN_3, '<PCellData Scalars="scalars" vectors="velocity">'
+    write(f8,'(a,a)') IN_3, '<PCellData Scalars="scalars" vectors="velocity">'
   end if
-  write(9,'(a,a)') IN_3, '<CellData Scalars="scalars" vectors="velocity">'
+  write(f9,'(a,a)') IN_3, '<CellData Scalars="scalars" vectors="velocity">'
 
   !--------------------!
   !   Processor i.d.   !
   !--------------------!
   if(n_proc > 1 .and. this_proc .eq. 1)  then
-    write(8,'(a,a)') IN_3, '<PDataArray type="UInt8" Name="Processor"' //  &
-                           ' format="ascii"/>'
+    write(f8,'(a,a)') IN_3, '<PDataArray type="UInt8" Name="Processor"' //  &
+                            ' format="ascii"/>'
   end if
-  write(9,'(a,a)') IN_4, '<DataArray type="UInt8" Name="Processor"' //  &
-                         ' format="ascii">'
+  write(f9,'(a,a)') IN_4, '<DataArray type="UInt8" Name="Processor"' //  &
+                          ' format="ascii">'
   if(plot_inside) then
     do c = 1, grid % n_cells - grid % comm % n_buff_cells
-      write(9,'(a,i9)') IN_5, grid % comm % proces(c)
+      write(f9,'(a,i9)') IN_5, grid % comm % proces(c)
     end do
   else  ! plot only boundary
     do s = 1, grid % n_faces
       if( grid % faces_c(2,s) < 0 ) then
-        write(9,'(a,i9)') IN_5, grid % comm % proces( grid % faces_c(1,s) )
+        write(f9,'(a,i9)') IN_5, grid % comm % proces( grid % faces_c(1,s) )
       end if
     end do
   end if
-  write(9,'(a,a)') IN_4, '</DataArray>'
+  write(f9,'(a,a)') IN_4, '</DataArray>'
 
   !--------------!
   !   Velocity   !
@@ -519,9 +517,9 @@
   !                      !
   !----------------------!
   if(n_proc > 1 .and. this_proc .eq. 1) then
-    write(8,'(a,a)') IN_3, '</PCellData>'
+    write(f8,'(a,a)') IN_3, '</PCellData>'
    end if
-  write(9,'(a,a)') IN_3, '</CellData>'
+  write(f9,'(a,a)') IN_3, '</CellData>'
 
   !------------!
   !            !
@@ -542,16 +540,16 @@
                                appendix ='-bnd',  &
                                extension='.vtu')
       end if
-      write(8, '(a,a,a,a)') IN_2, '<Piece Source="', trim(name_out_9), '"/>'
+      write(f8, '(a,a,a,a)') IN_2, '<Piece Source="', trim(name_out_9), '"/>'
     end do
-    write(8, '(a,a)') IN_1, '</PUnstructuredGrid>'
-    write(8, '(a,a)') IN_0, '</VTKFile>'
-    close(8)
+    write(f8, '(a,a)') IN_1, '</PUnstructuredGrid>'
+    write(f8, '(a,a)') IN_0, '</VTKFile>'
+    close(f8)
   end if
-  write(9,'(a,a)') IN_2, '</Piece>'
-  write(9,'(a,a)') IN_1, '</UnstructuredGrid>'
-  write(9,'(a,a)') IN_0, '</VTKFile>'
-  close(9)
+  write(f9,'(a,a)') IN_2, '</Piece>'
+  write(f9,'(a,a)') IN_1, '</UnstructuredGrid>'
+  write(f9,'(a,a)') IN_0, '</VTKFile>'
+  close(f9)
 
   call Cpu_Timer_Mod_Stop('Save_Vtu_Results')
 

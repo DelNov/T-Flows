@@ -8,8 +8,8 @@
   type(Grid_Type) :: grid
   integer         :: this_proc
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: c, n, s
-  character(len=80) :: name_in  
+  integer           :: c, n, s, fu
+  character(len=80) :: name_in
 !==============================================================================!
 
   !----------------------------!
@@ -19,43 +19,42 @@
   !                            !
   !----------------------------!
   call File_Mod_Set_Name(name_in, processor=this_proc, extension='.geo')
-  open(9, file=name_in, form='unformatted', access='stream')
-  if(this_proc < 2) print *, '# Reading the file: ', name_in
+  call File_Mod_Open_File_For_Reading_Binary(name_in, fu, this_proc)
 
-  read(9) (grid % xn(n), n = 1, grid % n_nodes)
-  read(9) (grid % yn(n), n = 1, grid % n_nodes)
-  read(9) (grid % zn(n), n = 1, grid % n_nodes)
+  read(fu) (grid % xn(n), n = 1, grid % n_nodes)
+  read(fu) (grid % yn(n), n = 1, grid % n_nodes)
+  read(fu) (grid % zn(n), n = 1, grid % n_nodes)
 
-  read(9) (grid % xc(c), c = 1, grid % n_cells)
-  read(9) (grid % yc(c), c = 1, grid % n_cells)
-  read(9) (grid % zc(c), c = 1, grid % n_cells)
+  read(fu) (grid % xc(c), c = 1, grid % n_cells)
+  read(fu) (grid % yc(c), c = 1, grid % n_cells)
+  read(fu) (grid % zc(c), c = 1, grid % n_cells)
 
-  read(9) (grid % xc(c), c=-1,-grid % n_bnd_cells,-1)
-  read(9) (grid % yc(c), c=-1,-grid % n_bnd_cells,-1)
-  read(9) (grid % zc(c), c=-1,-grid % n_bnd_cells,-1)
+  read(fu) (grid % xc(c), c=-1,-grid % n_bnd_cells,-1)
+  read(fu) (grid % yc(c), c=-1,-grid % n_bnd_cells,-1)
+  read(fu) (grid % zc(c), c=-1,-grid % n_bnd_cells,-1)
 
-  read(9) (grid % vol  (c),     c = 1, grid % n_cells)
-  read(9) (grid % wall_dist(c), c = 1, grid % n_cells)
-  read(9) (grid % wall_dist(c), c =-1,-grid % n_bnd_cells,-1)
+  read(fu) (grid % vol  (c),     c = 1, grid % n_cells)
+  read(fu) (grid % wall_dist(c), c = 1, grid % n_cells)
+  read(fu) (grid % wall_dist(c), c =-1,-grid % n_bnd_cells,-1)
 
-  read(9) (grid % sx(s), s = 1, grid % n_faces)
-  read(9) (grid % sy(s), s = 1, grid % n_faces)
-  read(9) (grid % sz(s), s = 1, grid % n_faces)
+  read(fu) (grid % sx(s), s = 1, grid % n_faces)
+  read(fu) (grid % sy(s), s = 1, grid % n_faces)
+  read(fu) (grid % sz(s), s = 1, grid % n_faces)
 
-  read(9) (grid % dx(s), s = 1, grid % n_faces)
-  read(9) (grid % dy(s), s = 1, grid % n_faces)
-  read(9) (grid % dz(s), s = 1, grid % n_faces)
+  read(fu) (grid % dx(s), s = 1, grid % n_faces)
+  read(fu) (grid % dy(s), s = 1, grid % n_faces)
+  read(fu) (grid % dz(s), s = 1, grid % n_faces)
 
-  read(9) (grid % f(s), s = 1, grid % n_faces)
+  read(fu) (grid % f(s), s = 1, grid % n_faces)
 
-  read(9) (grid % xf(s), s = 1, grid % n_faces)
-  read(9) (grid % yf(s), s = 1, grid % n_faces)
-  read(9) (grid % zf(s), s = 1, grid % n_faces)
+  read(fu) (grid % xf(s), s = 1, grid % n_faces)
+  read(fu) (grid % yf(s), s = 1, grid % n_faces)
+  read(fu) (grid % zf(s), s = 1, grid % n_faces)
 
-  read(9) grid % per_x
-  read(9) grid % per_y
-  read(9) grid % per_z
+  read(fu) grid % per_x
+  read(fu) grid % per_y
+  read(fu) grid % per_z
 
-  close(9)
+  close(fu)
 
   end subroutine

@@ -5,9 +5,8 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use File_Mod
-  use Grid_Mod,      only: Grid_Type,  &
-                           Grid_Mod_Print_Bnd_Cond_List
-  use Tokenizer_Mod  ! it's too small for "only" to be meaningful
+  use Grid_Mod, only: Grid_Type,  &
+                      Grid_Mod_Print_Bnd_Cond_List
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -21,7 +20,7 @@
   integer, parameter   :: MSH_PYRA  = 7
   character(len=130)   :: name_in
   integer              :: n_sect, n_elem, n_blocks, n_bnd_sect, n_grps, n_memb
-  integer              :: i, j, c, dim, p_tag, s_tag, n_tags, type
+  integer              :: i, j, c, dim, p_tag, s_tag, n_tags, type, fu
   integer              :: run, s_tag_max, n_e_0d, n_e_1d, n_e_2d, n_e_3d
   integer, allocatable :: n(:), new(:)
   integer, allocatable :: phys_tags(:), p_tag_corr(:), n_bnd_cells(:)
@@ -29,9 +28,7 @@
 !==============================================================================!
 
   call File_Mod_Set_Name(name_in, extension='.msh')
-
-  open(9, file=name_in)
-  print *, '# Reading the file: ', trim(name_in)
+  call File_Mod_Open_File_For_Reading(name_in, fu)
 
   !----------------------------------------------!
   !                                              !
@@ -44,17 +41,17 @@
   !-------------------------------------------------!
   n_blocks   = 0
   n_bnd_sect = 0
-  rewind(9)
+  rewind(fu)
   do
-    call Tokenizer_Mod_Read_Line(9)
+    call File_Mod_Read_Line(fu)
     if(line % tokens(1) .eq. '$PhysicalNames') exit
   end do
-  call Tokenizer_Mod_Read_Line(9)
+  call File_Mod_Read_Line(fu)
   read(line % tokens(1), *) n_sect
   allocate(phys_names(n_sect))
   allocate(p_tag_corr(n_sect))
   do i = 1, n_sect
-    call Tokenizer_Mod_Read_Line(9)
+    call File_Mod_Read_Line(fu)
     read(line % tokens(2), *) j
     if(line % tokens(1) .eq. '2') n_bnd_sect = n_bnd_sect + 1
     if(line % tokens(1) .eq. '3') n_blocks   = n_blocks   + 1
@@ -68,24 +65,24 @@
   !--------------------------!
   !   Read number of nodes   !
   !--------------------------!
-  rewind(9)
+  rewind(fu)
   do
-    call Tokenizer_Mod_Read_Line(9)
+    call File_Mod_Read_Line(fu)
     if(line % tokens(1) .eq. '$Nodes') exit
   end do
-  call Tokenizer_Mod_Read_Line(9)
+  call File_Mod_Read_Line(fu)
   read(line % tokens(4), *) grid % n_nodes  ! both 2 and 4 store number of nodes
   print *,'# Number of nodes: ', grid % n_nodes
 
   !--------------------------------------!
   !   Read number of elements (0D - 3D)  !
   !--------------------------------------!
-  rewind(9)
+  rewind(fu)
   do
-    call Tokenizer_Mod_Read_Line(9)
+    call File_Mod_Read_Line(fu)
     if(line % tokens(1) .eq. '$Elements') exit
   end do
-  call Tokenizer_Mod_Read_Line(9)
+  call File_Mod_Read_Line(fu)
   read(line % tokens(4), *) n_elem  ! both 2 and 4 store number of elements
   allocate(new(n_elem))
   new(:) = 0
@@ -96,12 +93,12 @@
   do run = 1, 2  ! in the first run find max index
     if(run .eq. 1) s_tag_max = 0
 
-    rewind(9)
+    rewind(fu)
     do
-      call Tokenizer_Mod_Read_Line(9)
+      call File_Mod_Read_Line(fu)
       if(line % tokens(1) .eq. '$Entities') exit
     end do
-    call Tokenizer_Mod_Read_Line(9)
+    call File_Mod_Read_Line(fu)
     read(line % tokens(1), *) n_e_0d  ! number of 0D entities (points)
     read(line % tokens(2), *) n_e_1d  ! number of 1D entities (lines)
     read(line % tokens(3), *) n_e_2d  ! number of 2D entities (faces)
@@ -109,14 +106,14 @@
 
     ! Skip 0D and 1D info
     do i = 1, n_e_0d + n_e_1d
-      call Tokenizer_Mod_Read_Line(9)
+      call File_Mod_Read_Line(fu)
     end do
     ! Analyze 2D data
     do i = 1, n_e_2d
-      call Tokenizer_Mod_Read_Line(9)
+      call File_Mod_Read_Line(fu)
       read(line % tokens(1), *) s_tag   ! surface tag
       read(line % tokens(8), *) n_tags  ! this should be one!  check some day
-      read(line % tokens(9), *) p_tag   ! physcal tag
+      read(line % tokens(fu), *) p_tag   ! physcal tag
       if(n_tags .eq. 1) then
         if(run .eq. 1) s_tag_max = max(s_tag_max, s_tag)
         if(run .eq. 2) then
@@ -140,20 +137,20 @@
   !----------------------------------------!
   grid % n_bnd_cells = 0
   grid % n_cells     = 0
-  rewind(9)
+  rewind(fu)
   do
-    call Tokenizer_Mod_Read_Line(9)
+    call File_Mod_Read_Line(fu)
     if(line % tokens(1) .eq. '$Elements') exit
   end do
-  call Tokenizer_Mod_Read_Line(9)
+  call File_Mod_Read_Line(fu)
   read(line % tokens(1),*) n_grps
   do i = 1, n_grps
-    call Tokenizer_Mod_Read_Line(9)
+    call File_Mod_Read_Line(fu)
     read(line % tokens(1), *) dim     ! dimension of the element
     read(line % tokens(2), *) s_tag   ! element tag
     read(line % tokens(4), *) n_memb  ! number of members in the group
     do j = 1, n_memb
-      call Tokenizer_Mod_Read_Line(9)
+      call File_Mod_Read_Line(fu)
       read(line % tokens(1), *) c     ! Gmsh cell number
       if(dim .eq. 2) then
         grid % n_bnd_cells = grid % n_bnd_cells + 1
@@ -186,20 +183,20 @@
   allocate(n_bnd_cells(n_bnd_sect))
   n_bnd_cells(:) = 0
 
-  rewind(9)
+  rewind(fu)
   do
-    call Tokenizer_Mod_Read_Line(9)
+    call File_Mod_Read_Line(fu)
     if(line % tokens(1) .eq. '$Elements') exit
   end do
-  call Tokenizer_Mod_Read_Line(9)
+  call File_Mod_Read_Line(fu)
   read(line % tokens(1),*) n_grps
   do i = 1, n_grps
-    call Tokenizer_Mod_Read_Line(9)
+    call File_Mod_Read_Line(fu)
     read(line % tokens(1), *) dim     ! dimension of the element
     read(line % tokens(2), *) s_tag   ! element tag
     read(line % tokens(4), *) n_memb  ! number of members in the group
     do j = 1, n_memb
-      call Tokenizer_Mod_Read_Line(9)
+      call File_Mod_Read_Line(fu)
       read(line % tokens(1), *) c     ! Gmsh cell number
       if(dim .eq. 2) then
         grid % bnd_cond % color( new(c) ) = phys_tags(s_tag)
@@ -215,23 +212,23 @@
   !--------------------------------!
   !   Read the nodal coordinates   !
   !--------------------------------!
-  rewind(9)
+  rewind(fu)
   do
-    call Tokenizer_Mod_Read_Line(9)
+    call File_Mod_Read_Line(fu)
     if(line % tokens(1) .eq. '$Nodes') exit
   end do
-  call Tokenizer_Mod_Read_Line(9)
-  read(line % tokens(1),*) n_grps        ! fetch number of groups
+  call File_Mod_Read_Line(fu)
+  read(line % tokens(1),*) n_grps    ! fetch number of groups
   do i = 1, n_grps
-    call Tokenizer_Mod_Read_Line(9)
-    read(line % tokens(4),*) n_memb      ! fetch number of members
+    call File_Mod_Read_Line(fu)
+    read(line % tokens(4),*) n_memb  ! fetch number of members
     allocate(n(n_memb))
-    do j = 1, n_memb                     ! fetch all node numbers
-      call Tokenizer_Mod_Read_Line(9)
+    do j = 1, n_memb                 ! fetch all node numbers
+      call File_Mod_Read_Line(fu)
       read(line % tokens(1),*) n(j)
     end do
     do j = 1, n_memb
-      call Tokenizer_Mod_Read_Line(9)    ! read node coordinates
+      call File_Mod_Read_Line(fu)    ! read node coordinates
       read(line % tokens(1),*) grid % xn(n(j))
       read(line % tokens(2),*) grid % yn(n(j))
       read(line % tokens(3),*) grid % zn(n(j))
@@ -242,20 +239,20 @@
   !-----------------------------!
   !   Read nodes of each cell   !
   !-----------------------------!
-  rewind(9)
+  rewind(fu)
   do
-    call Tokenizer_Mod_Read_Line(9)
+    call File_Mod_Read_Line(fu)
     if(line % tokens(1) .eq. '$Elements') exit
   end do
-  call Tokenizer_Mod_Read_Line(9)
+  call File_Mod_Read_Line(fu)
   read(line % tokens(1),*) n_grps
   do i = 1, n_grps
-    call Tokenizer_Mod_Read_Line(9)
+    call File_Mod_Read_Line(fu)
     read(line % tokens(1),*) dim     ! dimension of the element
     read(line % tokens(3),*) type    ! element type
     read(line % tokens(4),*) n_memb  ! number of members in the group
     do j = 1, n_memb
-      call Tokenizer_Mod_Read_Line(9)
+      call File_Mod_Read_Line(fu)
 
       ! Boundary cell, hopefully
       if(dim .eq. 2) then
@@ -311,7 +308,7 @@
           read(line % tokens(6), *) grid % cells_n(5, c)
           read(line % tokens(7), *) grid % cells_n(6, c)
           read(line % tokens(8), *) grid % cells_n(8, c)
-          read(line % tokens(9), *) grid % cells_n(7, c)
+          read(line % tokens(fu), *) grid % cells_n(7, c)
         end if
         if(type .eq. MSH_PYRA) then
           print *, '# ERROR: Pyramid cells not implemented yet!'
@@ -344,6 +341,6 @@
   !------------------------------------!
   call Grid_Mod_Print_Bnd_Cond_List(grid)
 
-  close(9)
+  close(fu)
 
   end subroutine

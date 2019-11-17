@@ -7,7 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: c
+  integer           :: c, fu
   character(len=80) :: name_in
 !==============================================================================!
 !   There is an issue with this procedure, but it's more related to MPI/IO     !
@@ -45,14 +45,14 @@
     !-----------------------------------------!
     !   Global cell numbers for MPI mapping   !
     !-----------------------------------------!
-    allocate(grid % comm % cell_map    (nc_s))  
+    allocate(grid % comm % cell_map    (nc_s))
     allocate(grid % comm % bnd_cell_map(nb_s))
 
     ! -1 is to start from zero, as needed by MPI functions
     do c = 1, nc_t
       grid % comm % cell_map(c) = c - 1
     end do
-  
+
     ! -1 is to start from zero, as needed by MPI functions
     do c = 1, nb_t
       grid % comm % bnd_cell_map(c) = c - 1
@@ -66,11 +66,10 @@
   else
 
     call File_Mod_Set_Name(name_in, processor=this_proc, extension='.map')
-    open(9, file=name_in)
-    if(this_proc < 2) print *, '# Now reading the file:', name_in
+    call File_Mod_Open_File_For_Reading(name_in, fu, this_proc)
 
     ! Read map sizes
-    read(9, '(4i9)') nc_s, nb_s
+    read(fu, '(4i9)') nc_s, nb_s
 
     nc_t  = nc_s
     nb_t  = nb_s
@@ -88,14 +87,14 @@
     !-----------------------------------------!
     allocate(grid % comm % cell_map    (nc_s))   
     allocate(grid % comm % bnd_cell_map(max(nb_s,1)))  ! avoid zero allocation   
-    grid % comm % cell_map(:)     = 0       
+    grid % comm % cell_map(:)     = 0
     grid % comm % bnd_cell_map(:) = 0
 
     !-------------------!
     !   Read cell map   !
     !-------------------!
     do c = 1, nc_s
-      read(9, '(i9)') grid % comm % cell_glo(c)
+      read(fu, '(i9)') grid % comm % cell_glo(c)
 
       ! Take cell mapping to be the same as global cell numbers but start from 0
       grid % comm % cell_map(c) = grid % comm % cell_glo(c) - 1
@@ -105,7 +104,7 @@
     !   Read boundary cell map   !
     !----------------------------!
     do c = -nb_s, -1
-      read(9, '(i9)') grid % comm % cell_glo(c)
+      read(fu, '(i9)') grid % comm % cell_glo(c)
 
       ! Correct boundary cell mapping.  
       ! - First it is in positive range, so insted of -nb_s to -1, it goes from 
@@ -113,13 +112,13 @@
       ! - Second, mapping must be positive and start from zero.  (The "+ nb_t")
       grid % comm % bnd_cell_map(c+nb_s+1) = grid % comm % cell_glo(c) + nb_t
     end do
-    
+
     !---------------------------------------------!
     !   Refresh buffers for global cell numbers   !
     !---------------------------------------------!
     call Comm_Mod_Exchange_Int(grid, grid % comm % cell_glo)
 
-    close(9)
+    close(fu)
 
   end if
 

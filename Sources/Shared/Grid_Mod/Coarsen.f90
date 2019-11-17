@@ -40,7 +40,7 @@
   print *, '# followed by refinement ration in between other grid levels     '
   print *, '# (typical values are 4 or 9).  Type 0 to skip this step         '
   print *, '#----------------------------------------------------------------'
-  call Tokenizer_Mod_Read_Line(5)
+  call File_Mod_Read_Line(5)
   n_entries = line % n_tokens
   if(n_entries .eq. 2) then
     read(line % tokens(1), *) n_coarsest_cells

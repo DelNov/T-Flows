@@ -1,7 +1,8 @@
 !==============================================================================!
-  subroutine Tokenizer_Mod_Read_Line(un, reached_end)
+  subroutine File_Mod_Read_Line(un, reached_end)
 !------------------------------------------------------------------------------!
-!  Reads a line from a file (unit 9) and discards if it is comment.            !
+!   Reads a line from a file unit un and discards if it is comment.            !
+!   In addition, it breaks the line in tokens (individual strings).            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

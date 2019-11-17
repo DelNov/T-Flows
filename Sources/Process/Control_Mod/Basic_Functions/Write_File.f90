@@ -4,10 +4,10 @@
   implicit none
 !==============================================================================!
 
-  open(unit   = CONTROL_FILE_UNIT,  &
+  open(unit   = control_file_unit,  &
        file   = CONTROL_FILE_NAME,  &
        action = 'write')
 
-  close(unit = CONTROL_FILE_UNIT)
+  close(unit = control_file_unit)
 
   end subroutine

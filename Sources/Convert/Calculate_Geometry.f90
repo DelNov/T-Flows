@@ -6,11 +6,11 @@
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod, only: HUGE, PI, ONE_THIRD
   use Math_Mod
+  use File_Mod
   use Grid_Mod,  only: Grid_Type,                        &
                        Grid_Mod_Estimate_Big_And_Small,  &
                        Grid_Mod_Print_Bnd_Cond_List
-  use Sort_Mod       ! it's a collection of subroutines, no need for "only"
-  use Tokenizer_Mod  ! it's too small for "only" to be meaningful
+  use Sort_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -295,7 +295,7 @@
   print *, '# from the boundary condition list (see above)'
   print *, '# Type skip if there is none !'
   print *, '#--------------------------------------------------------------'
-  call Tokenizer_Mod_Read_Line(5)
+  call File_Mod_Read_Line(5)
   answer = line % tokens(1)
   call To_Upper_Case(answer)
   if( answer .eq. 'SKIP' ) then
@@ -330,7 +330,7 @@
   print *, '# (If the periodic direction is not parallel to the Caresian    '
   print *, '#  axis the coordinate system has to be rotated in 2D           '
   print *, '#---------------------------------------------------------------'
-  call Tokenizer_Mod_Read_Line(5)
+  call File_Mod_Read_Line(5)
   answer = line % tokens(1)
   call To_Upper_Case(answer)
   if( answer .eq. 'SKIP' ) then

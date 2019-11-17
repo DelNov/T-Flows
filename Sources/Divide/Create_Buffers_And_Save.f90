@@ -18,7 +18,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: b, c, n, s, c1, c2, sub, subo, ln
+  integer              :: b, c, n, s, c1, c2, sub, subo, ln, fu
   integer              :: nn_sub,    &  ! number of nodes in the subdomain
                           nc_sub,    &  ! number of cells in the subdomain
                           nf_sub,    &  ! number of faces in the subdomain
@@ -52,12 +52,11 @@
 
     if(verbose) then
       call File_Mod_Set_Name(name_buf, processor=sub, extension='.buf')
-      open(9, file=name_buf)
-      print *, '# Creating files: ', trim(name_buf)
+      call File_Mod_Open_File_For_Writing(name_buf, fu)
 
-      write(9,'(a22)') '#--------------------#'
-      write(9,'(a22)') '#   Buffer indexes   #'
-      write(9,'(a22)') '#--------------------#'
+      write(fu,'(a22)') '#--------------------#'
+      write(fu,'(a22)') '#   Buffer indexes   #'
+      write(fu,'(a22)') '#--------------------#'
     else
       print *, '# Creating buffers '
     end if
@@ -136,8 +135,8 @@
     nbfcc_sub = 0
 
     if(verbose) then
-      write(9,'(a30)') '# Number of physical cells:'
-      write(9,'(i8)')  nc_sub
+      write(fu,'(a30)') '# Number of physical cells:'
+      write(fu,'(i8)')  nc_sub
     end if
 
     do subo = 1, maxval(grid % comm % proces(:))
@@ -196,17 +195,17 @@
 
         ! Write to buffer file
         if(verbose) then
-          write(9,'(a33)') '#-------------------------------#' 
-          write(9,'(a33)') '#   Conections with subdomain:  #' 
-          write(9,'(a33)') '#-------------------------------#' 
-          write(9,'(i8)')  subo
-          write(9,'(a30)') '# Number of local connections:'
-          write(9,'(i8)')  grid % comm % nbb_e(subo) -  &
+          write(fu,'(a33)') '#-------------------------------#' 
+          write(fu,'(a33)') '#   Conections with subdomain:  #' 
+          write(fu,'(a33)') '#-------------------------------#' 
+          write(fu,'(i8)')  subo
+          write(fu,'(a30)') '# Number of local connections:'
+          write(fu,'(i8)')  grid % comm % nbb_e(subo) -  &
                            grid % comm % nbb_s(subo)+1 
-          write(9,'(a37)') '# Local number in a buffer and index:'
+          write(fu,'(a37)') '# Local number in a buffer and index:'
           do b = grid % comm % nbb_s(subo),  &
                  grid % comm % nbb_e(subo)
-            write(9,'(2i8)') b - grid % comm % nbb_s(subo) + 1, buf_send_ind(b)
+            write(fu,'(2i8)') b - grid % comm % nbb_s(subo) + 1, buf_send_ind(b)
           end do
         end if
       end if
@@ -305,7 +304,7 @@
   end do   ! through subdomains
 
   if(verbose) then
-    close(9)
+    close(fu)
   end if
 
   !--------------------------------------------------!
