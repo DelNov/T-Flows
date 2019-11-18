@@ -113,7 +113,7 @@
       call File_Mod_Read_Line(fu)
       read(line % tokens(1), *) s_tag   ! surface tag
       read(line % tokens(8), *) n_tags  ! this should be one!  check some day
-      read(line % tokens(fu), *) p_tag   ! physcal tag
+      read(line % tokens(9), *) p_tag   ! physcal tag
       if(n_tags .eq. 1) then
         if(run .eq. 1) s_tag_max = max(s_tag_max, s_tag)
         if(run .eq. 2) then
@@ -308,7 +308,7 @@
           read(line % tokens(6), *) grid % cells_n(5, c)
           read(line % tokens(7), *) grid % cells_n(6, c)
           read(line % tokens(8), *) grid % cells_n(8, c)
-          read(line % tokens(fu), *) grid % cells_n(7, c)
+          read(line % tokens(9), *) grid % cells_n(7, c)
         end if
         if(type .eq. MSH_PYRA) then
           print *, '# ERROR: Pyramid cells not implemented yet!'
