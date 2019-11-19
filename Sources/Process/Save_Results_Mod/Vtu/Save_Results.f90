@@ -121,7 +121,7 @@
   !-----------!
   if(n_proc > 1 .and. this_proc .eq. 1)  then
     write(f8,'(a,a)') IN_3, '<PPoints>'
-    write(f8,'(a,a)') IN_4, '<PDataArray type="Float64" NumberOfComponents=' // &
+    write(f8,'(a,a)') IN_4, '<PDataArray type="Float64" NumberOfComponents='//&
                             '"3" format="ascii"/>'
     write(f8,'(a,a)') IN_3, '</PPoints>'
   end if
@@ -191,7 +191,7 @@
              grid % faces_n(1,s)-1, grid % faces_n(2,s)-1,  &
              grid % faces_n(3,s)-1
         else
-          print *, '# ERROR!  Unsupported face type ',     &
+          print *, '# ERROR!  Unsupported face type ',      &
                     grid % faces_n_nodes(s), ' nodes.'
           print *, '# Exiting'
           call Comm_Mod_End
@@ -292,28 +292,32 @@
   call Save_Vector(grid, IN_4, IN_5, "Velocity", plot_inside,            &
                                      flow % u % n(-grid % n_bnd_cells),  &
                                      flow % v % n(-grid % n_bnd_cells),  &
-                                     flow % w % n(-grid % n_bnd_cells))
+                                     flow % w % n(-grid % n_bnd_cells),  &
+                                     f8, f9)
 
   !--------------!
   !   Pressure   !
   !--------------!
   call Save_Scalar(grid, IN_4, IN_5, "Pressure", plot_inside,            &
-                                     flow % p % n(-grid % n_bnd_cells))
+                                     flow % p % n(-grid % n_bnd_cells),  &
+                                     f8, f9)
 
   !-----------------!
   !   Temperature   !
   !-----------------!
   if(heat_transfer) then
     call Save_Scalar(grid, IN_4, IN_5, "Temperature", plot_inside,         &
-                                       flow % t % n(-grid % n_bnd_cells))
+                                       flow % t % n(-grid % n_bnd_cells),  &
+                                       f8, f9)
   end if
 
   !---------------------!
   !   Volume Fraction   !
   !---------------------!
   if(multiphase_model .eq. VOLUME_OF_FLUID) then
-    call Save_Scalar(grid, IN_4, IN_5, "VolumeFraction", plot_inside,         &
-                                       mult % vof % n(-grid % n_bnd_cells))
+    call Save_Scalar(grid, IN_4, IN_5, "VolumeFraction", plot_inside,        &
+                                       mult % vof % n(-grid % n_bnd_cells),  &
+                                       f8, f9)
   end if
 
   !------------------!
@@ -322,7 +326,7 @@
   do sc = 1, flow % n_scalars
     phi => flow % scalar(sc)
     call Save_Scalar(grid, IN_4, IN_5, phi % name, plot_inside,  &
-                                       phi % n(-grid % n_bnd_cells))
+                                       phi % n(-grid % n_bnd_cells), f8, f9)
   end do
 
   !--------------------------!
@@ -336,12 +340,15 @@
      turbulence_model .eq. RSM_MANCEAU_HANJALIC  .or.  &
      turbulence_model .eq. RSM_HANJALIC_JAKIRLIC  ) then
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentKineticEnergy", plot_inside,  &
-                                       turb % kin % n(-grid % n_bnd_cells))
+                                       turb % kin % n(-grid % n_bnd_cells),    &
+                                       f8, f9)
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentDissipation", plot_inside,    &
-                                       turb % eps % n(-grid % n_bnd_cells))
+                                       turb % eps % n(-grid % n_bnd_cells),    &
+                                       f8, f9)
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentKineticEnergyProduction",     &
                                        plot_inside,                            &
-                                       turb % p_kin(-grid % n_bnd_cells))
+                                       turb % p_kin(-grid % n_bnd_cells),      &
+                                       f8, f9)
   end if
 
   ! Save zeta and f22
@@ -352,77 +359,97 @@
       v2_calc(c) = turb % kin % n(c) * turb % zeta % n(c)
     end do
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityV2", plot_inside,     &
-                                       v2_calc (-grid % n_bnd_cells))
+                                       v2_calc (-grid % n_bnd_cells),          &
+                                       f8, f9)
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityZeta", plot_inside,   &
-                                       turb % zeta % n(-grid % n_bnd_cells))
+                                       turb % zeta % n(-grid % n_bnd_cells),   &
+                                       f8, f9)
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityF22", plot_inside,    &
-                                       turb % f22  % n(-grid % n_bnd_cells))
+                                       turb % f22  % n(-grid % n_bnd_cells),   &
+                                       f8, f9)
     if (heat_transfer) then
       call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityT2", plot_inside,   &
-                                         turb % t2 % n(-grid % n_bnd_cells))
+                                         turb % t2 % n(-grid % n_bnd_cells),   &
+                                         f8, f9)
       call Save_Scalar(grid, IN_4, IN_5, "TurbulentT2Production", plot_inside, &
-                                         turb % p_t2(-grid % n_bnd_cells))
+                                         turb % p_t2(-grid % n_bnd_cells),     &
+                                         f8, f9)
       call Save_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxX", plot_inside,    &
-                                         turb % ut % n(-grid % n_bnd_cells))
+                                         turb % ut % n(-grid % n_bnd_cells),   &
+                                         f8, f9)
       call Save_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxY", plot_inside,    &
-                                         turb % vt % n(-grid % n_bnd_cells))
+                                         turb % vt % n(-grid % n_bnd_cells),   &
+                                         f8, f9)
       call Save_Scalar(grid, IN_4, IN_5, "TurbulentHeatFluxZ", plot_inside,    &
-                                         turb % wt % n(-grid % n_bnd_cells))
+                                         turb % wt % n(-grid % n_bnd_cells),   &
+                                         f8, f9)
       call Save_Scalar(grid, IN_4, IN_5, "TurbulenQuantityAlphaL",             &
                                          plot_inside,                          &
-                                         turb % alpha_l(-grid % n_bnd_cells))
+                                         turb % alpha_l(-grid % n_bnd_cells),  &
+                                         f8, f9)
       call Save_Scalar(grid, IN_4, IN_5, "TurbulenQuantityAlphaU",             &
                                          plot_inside,                          &
-                                         turb % alpha_u(-grid % n_bnd_cells))
+                                         turb % alpha_u(-grid % n_bnd_cells),  &
+                                         f8, f9)
     end if
   end if
 
   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityF22", plot_inside,  &
-                                       turb % f22 % n(-grid % n_bnd_cells))
+                                       turb % f22 % n(-grid % n_bnd_cells),  &
+                                       f8, f9)
   end if
 
   ! Save vis and vis_t
   if(turbulence_model .eq. DES_SPALART .or.  &
      turbulence_model .eq. SPALART_ALLMARAS) then
-    call Save_Scalar(grid, IN_4, IN_5, "TurbulentViscosity", plot_inside,  &
-                                       turb % vis % n(-grid % n_bnd_cells))
-    call Save_Scalar(grid, IN_4, IN_5, "VorticityMagnitude", plot_inside,  &
-                                       flow % vort(-grid % n_bnd_cells))
+    call Save_Scalar(grid, IN_4, IN_5, "TurbulentViscosity", plot_inside,    &
+                                       turb % vis % n(-grid % n_bnd_cells),  &
+                                       f8, f9)
+    call Save_Scalar(grid, IN_4, IN_5, "VorticityMagnitude", plot_inside,    &
+                                       flow % vort(-grid % n_bnd_cells),     &
+                                       f8, f9)
   end if
   kin_vis_t(:) = 0.0
   if(turbulence_model .ne. NO_TURBULENCE) then
     kin_vis_t   (-grid % n_bnd_cells:grid % n_cells) =  &
     turb % vis_t(-grid % n_bnd_cells:grid % n_cells) /  &
        viscosity(-grid % n_bnd_cells:grid % n_cells)
-    call Save_Scalar(grid, IN_4, IN_5, "EddyOverMolecularViscosity",    &
-                                       plot_inside,                     &
-                                       kin_vis_t(-grid % n_bnd_cells))
+    call Save_Scalar(grid, IN_4, IN_5, "EddyOverMolecularViscosity",        &
+                                       plot_inside,                         &
+                                       kin_vis_t(-grid % n_bnd_cells), f8, f9)
   end if
 
   ! Reynolds stress models
   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
      turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
     call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressXX", plot_inside,     &
-                                       turb % uu % n(-grid % n_bnd_cells))
+                                       turb % uu % n(-grid % n_bnd_cells),  &
+                                       f8, f9)
     call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressYY", plot_inside,     &
-                                       turb % vv % n(-grid % n_bnd_cells))
+                                       turb % vv % n(-grid % n_bnd_cells),  &
+                                       f8, f9)
     call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressZZ", plot_inside,     &
-                                       turb % ww % n(-grid % n_bnd_cells))
+                                       turb % ww % n(-grid % n_bnd_cells),  &
+                                       f8, f9)
     call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressXY", plot_inside,     &
-                                       turb % uv % n(-grid % n_bnd_cells))
+                                       turb % uv % n(-grid % n_bnd_cells),  &
+                                       f8, f9)
     call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressXZ", plot_inside,     &
-                                       turb % uw % n(-grid % n_bnd_cells))
+                                       turb % uw % n(-grid % n_bnd_cells),  &
+                                       f8, f9)
     call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressYZ", plot_inside,     &
-                                       turb % vw % n(-grid % n_bnd_cells))
+                                       turb % vw % n(-grid % n_bnd_cells),  &
+                                       f8, f9)
   end if
 
   ! Statistics for large-scale simulations of turbulence
   if(turbulence_statistics) then
-    call Save_Vector(grid, IN_4, IN_5, "MeanVelocity", plot_inside,         &
-                                       turb % u_mean(-grid % n_bnd_cells),  &
-                                       turb % v_mean(-grid % n_bnd_cells),  &
-                                       turb % w_mean(-grid % n_bnd_cells))
+    call Save_Vector(grid, IN_4, IN_5, "MeanVelocity", plot_inside,          &
+                                       turb % u_mean(-grid % n_bnd_cells),   &
+                                       turb % v_mean(-grid % n_bnd_cells),   &
+                                       turb % w_mean(-grid % n_bnd_cells),   &
+                                       f8, f9)
     uu_save(:) = 0.0
     vv_save(:) = 0.0
     ww_save(:) = 0.0
@@ -438,20 +465,27 @@
       vw_save(c) = turb % vw_res(c) - turb % v_mean(c) * turb % w_mean(c)
     end do
     call Save_Scalar(grid, IN_4, IN_5, "MeanReynoldsStressXX", plot_inside,  &
-                                       uu_save(-grid % n_bnd_cells))
+                                       uu_save(-grid % n_bnd_cells),         &
+                                       f8, f9)
     call Save_Scalar(grid, IN_4, IN_5, "MeanReynoldsStressYY", plot_inside,  &
-                                       vv_save(-grid % n_bnd_cells))
+                                       vv_save(-grid % n_bnd_cells),         &
+                                       f8, f9)
     call Save_Scalar(grid, IN_4, IN_5, "MeanReynoldsStressZZ", plot_inside,  &
-                                       ww_save(-grid % n_bnd_cells))
+                                       ww_save(-grid % n_bnd_cells),         &
+                                       f8, f9)
     call Save_Scalar(grid, IN_4, IN_5, "MeanReynoldsStressXY", plot_inside,  &
-                                       uv_save(-grid % n_bnd_cells))
+                                       uv_save(-grid % n_bnd_cells),         &
+                                       f8, f9)
     call Save_Scalar(grid, IN_4, IN_5, "MeanReynoldsStressXZ", plot_inside,  &
-                                       uw_save(-grid % n_bnd_cells))
+                                       uw_save(-grid % n_bnd_cells),         &
+                                       f8, f9)
     call Save_Scalar(grid, IN_4, IN_5, "MeanReynoldsStressYZ", plot_inside,  &
-                                       vw_save(-grid % n_bnd_cells))
+                                       vw_save(-grid % n_bnd_cells),         &
+                                       f8, f9)
     if(heat_transfer) then
-      call Save_Scalar(grid, IN_4, IN_5, "MeanTemperature", plot_inside,  &
-                                         turb % t_mean(-grid % n_bnd_cells))
+      call Save_Scalar(grid, IN_4, IN_5, "MeanTemperature", plot_inside,      &
+                                         turb % t_mean(-grid % n_bnd_cells),  &
+                                         f8, f9)
       t2_save(:) = 0.0
       ut_save(:) = 0.0
       vt_save(:) = 0.0
@@ -464,16 +498,20 @@
       end do
       call Save_Scalar(grid, IN_4, IN_5, "MeanTurbulentQuantityT2",     &
                                          plot_inside,                   &
-                                         t2_save(-grid % n_bnd_cells))
+                                         t2_save(-grid % n_bnd_cells),  &
+                                         f8, f9)
       call Save_Scalar(grid, IN_4, IN_5, "MeanTurbulentHeatFluxX",      &
                                          plot_inside,                   &
-                                         ut_save(-grid % n_bnd_cells))
+                                         ut_save(-grid % n_bnd_cells),  &
+                                         f8, f9)
       call Save_Scalar(grid, IN_4, IN_5, "MeanTurbulentHeatFluxY",      &
                                          plot_inside,                   &
-                                         vt_save(-grid % n_bnd_cells))
+                                         vt_save(-grid % n_bnd_cells),  &
+                                         f8, f9)
       call Save_Scalar(grid, IN_4, IN_5, "MeanTurbulentHeatFluxZ",      &
                                          plot_inside,                   &
-                                         wt_save(-grid % n_bnd_cells))
+                                         wt_save(-grid % n_bnd_cells),  &
+                                         f8, f9)
     end if
 
     ! Scalars
@@ -485,26 +523,31 @@
         phi_save(c) = turb % scalar_mean(sc, c)
       end do
       call Save_Scalar(grid, IN_4, IN_5, name_mean, plot_inside,  &
-                       phi_save(-grid % n_bnd_cells))
+                       phi_save(-grid % n_bnd_cells), f8, f9)
     end do
   end if
 
   ! Save y+ for all turbulence models
   if(turbulence_model .ne. NO_TURBULENCE) then
-    call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityYplus",  &
-                                       plot_inside,               &
-                                       turb % y_plus(-grid % n_bnd_cells))
+    call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityYplus",            &
+                                       plot_inside,                         &
+                                       turb % y_plus(-grid % n_bnd_cells),  &
+                                       f8, f9)
   end if
 
   ! Wall distance and delta, important for all models
-  call Save_Scalar(grid, IN_4, IN_5, "WallDistance", plot_inside,   &
-                                     grid % wall_dist(-grid % n_bnd_cells))
-  call Save_Scalar(grid, IN_4, IN_5, "CellDeltaMax", plot_inside,   &
-                                     turb % h_max(-grid % n_bnd_cells))
-  call Save_Scalar(grid, IN_4, IN_5, "CellDeltaMin", plot_inside,   &
-                                     turb % h_min(-grid % n_bnd_cells))
-  call Save_Scalar(grid, IN_4, IN_5, "CellDeltaWall", plot_inside,  &
-                                     turb % h_w  (-grid % n_bnd_cells))
+  call Save_Scalar(grid, IN_4, IN_5, "WallDistance", plot_inside,            &
+                                     grid % wall_dist(-grid % n_bnd_cells),  &
+                                     f8, f9)
+  call Save_Scalar(grid, IN_4, IN_5, "CellDeltaMax", plot_inside,        &
+                                     turb % h_max(-grid % n_bnd_cells),  &
+                                     f8, f9)
+  call Save_Scalar(grid, IN_4, IN_5, "CellDeltaMin", plot_inside,        &
+                                     turb % h_min(-grid % n_bnd_cells),  &
+                                     f8, f9)
+  call Save_Scalar(grid, IN_4, IN_5, "CellDeltaWall", plot_inside,       &
+                                     turb % h_w  (-grid % n_bnd_cells),  &
+                                     f8, f9)
 
   !----------------------!
   !   Save user arrays   !
