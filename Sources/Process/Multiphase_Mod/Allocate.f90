@@ -23,7 +23,7 @@
   nc = grid % n_cells
   nf = grid % n_faces
 
-  call Var_Mod_Allocate_Solution('V_FRAC', '', mult % vof, grid)
+  call Var_Mod_Allocate_Solution('VOF', '', mult % vof, grid)
   allocate(mult % vof_f(grid % n_faces));  mult % vof_f(1:nf) = 0.0
 
   ! Physical properties for all (two) phases
