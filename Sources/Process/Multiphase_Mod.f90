@@ -34,6 +34,7 @@
     ! Volume fraction (colour function)
     type(Var_Type)    :: vof
     real, allocatable :: vof_f(:)
+    real, allocatable :: curv(:)   ! curvature
 
   end type
 

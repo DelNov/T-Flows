@@ -30,11 +30,11 @@
 
   ! First take aliases
   flow   => mult % pnt_flow
-  grid => mult % pnt_grid
-  vof  => mult % vof
+  grid   => mult % pnt_grid
+  vof    => mult % vof
   v_flux => flow % v_flux
 
-  vof % oo = vof % n
+  mult % curv = vof % n
 
   ! This parameter maybe also implemented in "control" file
   n_conv = 2
@@ -52,7 +52,7 @@
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
       if (c2 < 0) then
-        vof % oo(c2) = vof % oo(c1) 
+        mult % curv(c2) = mult % curv(c1)
       end if
     end do
 
@@ -63,13 +63,13 @@
       fs = grid % f(s)
       sxyz_mod = sqrt(grid % sx(s) ** 2 + grid % sy(s) ** 2 + grid % sz(s) ** 2)
       if (c2 > 0) then
-        vol_face = fs * vof % oo(c1) + (1.0 - fs) * vof % oo(c2)
+        vol_face = fs * mult % curv(c1) + (1.0 - fs) * mult % curv(c2)
         sum_v1(c1) = sum_v1(c1) + vol_face * sxyz_mod
         sum_v2(c1) = sum_v2(c1) + sxyz_mod 
         sum_v1(c2) = sum_v1(c2) + vol_face * sxyz_mod
         sum_v2(c2) = sum_v2(c2) + sxyz_mod 
       else
-        vol_face = vof % oo(c1)
+        vol_face = mult % curv(c1)
         sum_v1(c1) = sum_v1(c1) + vol_face * sxyz_mod
         sum_v2(c1) = sum_v2(c1) + sxyz_mod 
       end if
@@ -79,23 +79,23 @@
     call Comm_Mod_Exchange_Real(grid, sum_v2)
 
     do c = 1, grid % n_cells
-      vof % oo(c) = sum_v1(c) / sum_v2(c)
+      mult % curv(c) = sum_v1(c) / sum_v2(c)
     end do
 
-    call Comm_Mod_Exchange_Real(grid, vof % oo)
+    call Comm_Mod_Exchange_Real(grid, mult % curv)
 
 !    if (c_iter == 6) then
-!      vof % min = vof % oo
+!      vof % min = mult % curv
 !    end if
   end do
 
   !clean noise
   do c = 1, grid % n_cells
-    if (vof % oo(c) < epsloc) then
-      vof % oo(c) = 0.0
+    if (mult % curv(c) < epsloc) then
+      mult % curv(c) = 0.0
     end if
-    if ((1.0 - vof % oo(c)) < epsloc) then
-      vof % oo(c) = 1.0
+    if ((1.0 - mult % curv(c)) < epsloc) then
+      mult % curv(c) = 1.0
     end if
   end do 
 
@@ -115,7 +115,7 @@
     c2 = grid % faces_c(2,s)
     fs = grid % f(s)
     if (c2 > 0) then
-      vol_face = fs * vof % oo(c1) + (1.0 - fs) * vof % oo(c2)
+      vol_face = fs * mult % curv(c1) + (1.0 - fs) * mult % curv(c2)
 
       sum_v1(c1) = sum_v1(c1) + vol_face * grid % sx(s)
       sum_v2(c1) = sum_v2(c1) + vol_face * grid % sy(s)
@@ -134,7 +134,7 @@
 !      sum_v5(c2) = sum_v5(c2) - vol_face * grid % sy(s)
 !      sum_v6(c2) = sum_v6(c2) - vol_face * grid % sz(s)
     else
-      vol_face = vof % oo(c1)
+      vol_face = mult % curv(c1)
 
       sum_v1(c1) = sum_v1(c1) + vol_face * grid % sx(s)
       sum_v2(c1) = sum_v2(c1) + vol_face * grid % sy(s)
@@ -183,7 +183,7 @@
   !   Find Curvature   !
   !--------------------!
 
-  vof % oo = 0.0
+  mult % curv = 0.0
 
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
@@ -203,8 +203,8 @@
                  + grad_face(2) * grid % sy(s)  &
                  + grad_face(3) * grid % sz(s)) / sxyz_mod
 
-        vof % oo(c1) = vof % oo(c1) + dotprod
-        vof % oo(c2) = vof % oo(c2) - dotprod
+        mult % curv(c1) = mult % curv(c1) + dotprod
+        mult % curv(c2) = mult % curv(c2) - dotprod
       end if
 
     else
@@ -221,23 +221,23 @@
                  + grad_face(2) * grid % sy(s)  &
                  + grad_face(3) * grid % sz(s)) / sxyz_mod
 
-        vof % oo(c1) = vof % oo(c1) + dotprod
+        mult % curv(c1) = mult % curv(c1) + dotprod
       end if
 
     end if
   end do
 
-  call Comm_Mod_Exchange_Real(grid, vof % oo)
+  call Comm_Mod_Exchange_Real(grid, mult % curv)
 
 
   do c = 1, grid % n_cells
-    vof % oo(c) = - vof % oo(c) / grid % vol(c)
+    mult % curv(c) = - mult % curv(c) / grid % vol(c)
   end do
 
   !clean noise
   do c = 1, grid % n_cells
-    if (abs(vof % oo(c)) < epsloc) then
-      vof % oo(c) = 0.0
+    if (abs(mult % curv(c)) < epsloc) then
+      mult % curv(c) = 0.0
     end if
   end do 
 
