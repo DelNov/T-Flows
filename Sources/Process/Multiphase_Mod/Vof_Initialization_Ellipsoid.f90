@@ -44,9 +44,9 @@
       ! for every node:
       do n = 1, grid % cells_n_nodes(c)
         res_dummy = sqrt(                                               &
-              ((grid % xn(grid % cells_n(n,c))-cent_x)/radius_1)**2.0   &
-            + ((grid % yn(grid % cells_n(n,c))-cent_y)/radius_2)**2.0   &
-            + ((grid % zn(grid % cells_n(n,c))-cent_z)/radius_3)**2.0)
+              ((grid % xn(grid % cells_n(n,c))-cent_x)/radius_1)**2   &
+            + ((grid % yn(grid % cells_n(n,c))-cent_y)/radius_2)**2   &
+            + ((grid % zn(grid % cells_n(n,c))-cent_z)/radius_3)**2)
 
         min_max_crit_1(c)= min(res_dummy, min_max_crit_1(c)) 
         min_max_crit_2(c)= max(res_dummy, min_max_crit_2(c)) 
