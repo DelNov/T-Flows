@@ -16,7 +16,7 @@
   integer                   :: s, c, cellt
   real                      :: u_max, p_min, p_max, u_rms
   real                      :: a_in, a_out, a_tot, u_res, p_in, p_out, a_vof
-  real                      :: min_x, max_z
+  real                      :: min_x, max_z, min_vfrac, max_vfrac
 !==============================================================================!
 
   ! Take aliases
@@ -34,6 +34,11 @@
   p_out = 0.0
   a_vof = 0.0
 
+  ! Find max and min vfractions, to limit pressure calculation:
+
+  min_vfrac = minval(mult % vof % n(:))
+  max_vfrac = maxval(mult % vof % n(:))
+
   do c = 1, grid % n_cells
     u_res = sqrt( flow % u % n(c) ** 2.0       &
                 + flow % v % n(c) ** 2.0       &
@@ -41,12 +46,12 @@
     sum_v1(c) = u_res 
     u_rms = u_rms + u_res ** 2.0
     a_tot = a_tot + grid % vol(c)
-    if (abs(1.0 - mult % vof % n(c)) < TINY) then
+    if (abs(max_vfrac - mult % vof % n(c)) < TINY) then
       a_in = a_in + grid % vol(c)
       p_in = p_in + flow % p % n(c) * grid % vol(c) 
     end if
 
-    if (abs(mult % vof % n(c)) < TINY) then
+    if (abs(mult % vof % n(c)) < min_vfrac + TINY) then
       a_out = a_out + grid % vol(c)
       p_out = p_out + flow % p % n(c) * grid % vol(c) 
     end if
@@ -71,10 +76,6 @@
   p_in = p_in / a_in
   p_out = p_out / a_out
 
-!  write(*,*) cellt,grid % xc(cellt),grid % yc(cellt),grid % zc(cellt)
-!  write(*,*) cellt,flow % p % n(cellt),flow % u %n(cellt),flow % v %n(cellt),flow % w %n(cellt)
-!  cellt =maxloc(sum_v1(:),dim = 1)
-!  write(*,*) cellt,sum_v1(cellt),grid % xc(cellt),grid % yc(cellt),grid % zc(cellt)
   open(9, file = 'Spurious-post.dat',position='append')
 
     write(9,*) time_loc, a_vof, u_rms, u_max, p_max-p_min, p_in-p_out
