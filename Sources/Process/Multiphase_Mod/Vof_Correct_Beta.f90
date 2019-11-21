@@ -15,6 +15,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   integer                  :: s, c1, c2, donor, accept
+  integer                  :: c1_glo, c2_glo
   real                     :: fs, signo, e_plus, e_minus, cf, delta_alfa, bcorr
 !==============================================================================!
 
@@ -26,7 +27,8 @@
     c2 = grid % faces_c(2,s)
     fs = grid % f(s)
     if (c2 > 0) then
-      if (phi_flux(s) .ne. 0.0) then
+      if (abs(phi_flux(s)) > PICO) then
+
         if (phi_flux(s) > 0.0) then
           donor = c1
           accept = c2
@@ -44,9 +46,9 @@
         delta_alfa = 0.5 * (phi % n(accept) + phi % o(accept)               &
                          - (phi % n(donor) + phi % o(donor)))
 
+        cf = min(max(- phi_flux(s) * dt / grid % vol(donor),0.0),1.0)
 
         if (phi % n(donor) < 0.0) then
-          cf = min(max(signo * phi_flux(s) * dt / grid % vol(donor),0.0),1.0)
           e_minus = max(-phi % n(donor),0.0)
           !Donor value < 0.0 Ex: sd = -0.1 -> e_minus = +0.1
           if (e_minus > TINY .and. cf > TINY) then
@@ -59,11 +61,9 @@
         end if
 
         if (phi % n(donor) > 1.0) then
-          cf = min(max(signo * phi_flux(s) * dt / grid % vol(donor),0.0),1.0)
           e_plus = max(phi % n(donor) - 1.0,0.0)
           !Donor value > 1.0 Ex: sd = 1.1 -> e_plus = +0.1
-          !if (e_plus > TINY .and. cf > TINY) then
-          if (e_plus > TINY) then
+          if (e_plus > TINY .and. cf > TINY) then
             if (delta_alfa < - e_plus) then
               bcorr = e_plus * (2.0 + cf - 2.0 * cf * beta_f(s))            &
                              / (2.0 * cf * (-delta_alfa - e_plus))
