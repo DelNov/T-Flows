@@ -39,7 +39,6 @@
   type(Matrix_Type), pointer :: a
   type(Var_Type),    pointer :: ui, uj, uk, t, p
   type(Face_Type),   pointer :: m_flux
-  character(len=1)           :: charI
   real,              pointer :: b(:)
   real,              pointer :: ui_i(:), ui_j(:), ui_k(:), uj_i(:), uk_i(:)
   real,              pointer :: si(:), sj(:), sk(:), di(:), dj(:), dk(:)
@@ -315,9 +314,7 @@
   !   Surface tension contribution   !
   !----------------------------------!
   if(multiphase_model .eq. VOLUME_OF_FLUID) then
-
-    call Multiphase_Mod_Vof_Momentum_Contribution(flow, mult, i, b, dt)
-
+    call Multiphase_Mod_Vof_Momentum_Contribution(mult, i, b, dt)
   end if
 
   !----------------------------------------!
