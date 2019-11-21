@@ -247,7 +247,7 @@
       end do
 
       if (multiphase_model .eq. VOLUME_OF_FLUID) then
-        mult_dummy = floor(vals(Key_Ind('V_FRAC', keys, nks)))
+        mult_dummy = floor(vals(Key_Ind('VOF', keys, nks)))
         ! Initialize vof function:
         call Multiphase_Mod_Vof_Initialization(mult, mult_dummy)
       else !density at faces:
