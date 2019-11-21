@@ -225,11 +225,14 @@
     call Control_Mod_Max_Simple_Iterations(max_ini)
     call Control_Mod_Min_Simple_Iterations(min_ini)
 
+    ! Update old Volume Flux:
+    flow % v_flux % o(:) = flow % v_flux % n(:)
+
     ! Volume of Fluid
     if(multiphase_model .eq. VOLUME_OF_FLUID) then
       ! Update the values at boundaries
       call Update_Boundary_Values(flow, turb, mult)
-      call Multiphase_Mod_Compute_Vof(mult, sol, flow % dt, 1)
+      call Multiphase_Mod_Compute_Vof(mult, sol, flow % dt, n)
     end if
 
     do ini = 1, max_ini
@@ -363,6 +366,10 @@
   ! After the time loop, decrease "n" since ...
   ! ... it is one above the loop boundaries here
   n = n - 1
+
+  if (multiphase_model > 0) then
+    call Compute_Benchmark(mult, flow % dt)
+  end if
 
   ! Save backup and post-processing files at exit
   call Comm_Mod_Wait
