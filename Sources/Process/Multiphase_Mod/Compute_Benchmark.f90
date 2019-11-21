@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Benchmark(mult, dt, ini)
+  subroutine Compute_Benchmark(mult, dt)
 !------------------------------------------------------------------------------!
 !   This function aftar VOF is solved                                          !
 !------------------------------------------------------------------------------!
@@ -10,8 +10,8 @@
   type(Grid_Type),      pointer :: grid
   type(Var_Type),       pointer :: vof
   real                          :: dt    ! time step
-  integer                       :: ini   ! iner itteration
 !--------------------------------[Locals]--------------------------------------!
+  character(len=1)              :: charI
   integer                       :: c, last_cell
   real                          :: b_volume, surface, rise_velocity,           &
                                    circularity, c_position
@@ -46,8 +46,15 @@
   call Comm_Mod_Global_Sum_Real(rise_velocity)  
 
   if (this_proc < 2) then
+!    !with circularity:
+!    open(unit = 70359, file='Bench-data.dat',position='APPEND')
+!      write(70359,*) b_volume, 2.0*PI/surface*sqrt(b_volume/PI),              &
+!                 c_position/b_volume, rise_velocity/b_volume
+!    close(70359)
+
+    !with sphericity:
     open(unit = 70359, file='Bench-data.dat',position='APPEND')
-      write(70359,*) b_volume, 2.0*PI/surface*sqrt(b_volume/PI),              &
+      write(70359,*) b_volume, PI**(1.0/3.0)*(6.0*b_volume)**(2.0/3.0)/surface,         &
                  c_position/b_volume, rise_velocity/b_volume
     close(70359)
   end if
