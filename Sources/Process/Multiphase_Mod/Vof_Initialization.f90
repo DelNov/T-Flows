@@ -13,10 +13,11 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: flow
   type(Grid_Type),  pointer :: grid
-  type(Var_Type),   pointer :: vof
   type(Face_Type),  pointer :: v_flux
+  type(Var_Type),   pointer :: vof
   real,             pointer :: dt
   real,             pointer :: vof_f(:)
+  character(len=1)         :: charI
   integer                   :: c, c1, c2, s
   integer                   :: donor, accept
   real                      :: fs, dot_prod
@@ -45,18 +46,22 @@
       call Multiphase_Mod_Vof_Initialization_Ellipsoid(mult)
     case (3) ! Cylinder:
       call Multiphase_Mod_Vof_Initialization_Cylinder(mult)
-  END select
+  end select
+
+  call Comm_Mod_Exchange_Real(grid, vof % n)
 
   ! Old value
   vof % o(:) = vof % n(:)
 
   ! Initialize properties:
   do c = 1, grid % n_cells
-    density(c) = vof % n(c)         * phase_dens(1)      &
-               + (1.0 - vof % n(c)) * phase_dens(2)
+    density(c)   = vof % n(c)         * phase_dens(1)      &
+                 + (1.0 - vof % n(c)) * phase_dens(2)
     viscosity(c) = vof % n(c)         * phase_visc(1)      &
                  + (1.0 - vof % n(c)) * phase_visc(2)
   end do
+  call Comm_Mod_Exchange_Real(grid, density)
+  call Comm_Mod_Exchange_Real(grid, viscosity)
 
   ! Initialize volume fraction at faces:
   if(vof % adv_scheme .eq. UPWIND) then
@@ -114,13 +119,15 @@
       end if
 
     end do
+    call Comm_Mod_Exchange_Real(grid, c_d)
 
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
       fs = grid % f(s)
 
-      if (v_flux % n(s) .ne. 0.0) then 
+      if (abs(v_flux % n(s)) > PICO) then
+
         if (v_flux % n(s) > 0.0) then
           donor = c1
           accept = c2
@@ -223,8 +230,10 @@
       c2 = grid % faces_c(2,s)
       fs = grid % f(s)
 
-      if (v_flux % n(s) .ne. 0.0) then 
+      if (abs(v_flux % n(s)) > PICO) then
+
         if (v_flux % n(s) > 0.0) then
+
           donor = c1
           accept = c2
           signo = 1.0
@@ -323,5 +332,4 @@
     dens_face(s) = vof_f(s)         * phase_dens(1)     &
                  + (1.0 - vof_f(s)) * phase_dens(2)
   end do
-
   end subroutine
