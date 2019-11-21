@@ -39,6 +39,7 @@
   type(Matrix_Type), pointer :: a
   type(Var_Type),    pointer :: ui, uj, uk, t, p
   type(Face_Type),   pointer :: m_flux
+  character(len=1)           :: charI
   real,              pointer :: b(:)
   real,              pointer :: ui_i(:), ui_j(:), ui_k(:), uj_i(:), uk_i(:)
   real,              pointer :: si(:), sj(:), sk(:), di(:), dj(:), dk(:)
@@ -302,9 +303,11 @@
   !-------------------!
   else
     if(abs(grav_i) > NANO) then
-      do c = 1, grid % n_cells
-        b(c) = b(c) + density(c) * grav_i * grid % vol(c)
-      end do
+      if(multiphase_model .ne. VOLUME_OF_FLUID) then
+        do c = 1, grid % n_cells
+          b(c) = b(c) + density(c) * grav_i * grid % vol(c)
+        end do
+      end if
     end if
   end if
 
@@ -313,30 +316,7 @@
   !----------------------------------!
   if(multiphase_model .eq. VOLUME_OF_FLUID) then
 
-    if (surface_tension > TINY ) then
-      if(ui % name .eq. 'U') then
-        call Multiphase_Mod_Vof_Surface_Tension_Contribution(mult)
-        call Grad_Mod_Variable(mult % vof)
-        do c = 1, grid % n_cells
-          b(c) = b(c) + surface_tension * mult % vof % oo(c)  &
-                                        * mult % vof % x(c)   &
-                                        * grid % vol(c)
-        end do
-      else if(ui % name .eq. 'V') then
-        do c = 1, grid % n_cells
-          b(c) = b(c) + surface_tension * mult % vof % oo(c)  &
-                                        * mult % vof % y(c)   &
-                                        * grid % vol(c)
-        end do
-      else if(ui % name .eq. 'W') then
-        do c = 1, grid % n_cells
-          b(c) = b(c) + surface_tension * mult % vof % oo(c)  &
-                                        * mult % vof % z(c)   &
-                                        * grid % vol(c)
-        end do
-      end if
-
-    end if
+    call Multiphase_Mod_Vof_Momentum_Contribution(flow, mult, i, b, dt)
 
   end if
 
