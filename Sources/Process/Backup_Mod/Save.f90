@@ -16,8 +16,8 @@
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: phi
-  character(len=80)        :: name_out, name_mean
-  integer                  :: fh, d, vc, sc
+  character(len=80)        :: name_out, name_mean, a_name
+  integer                  :: fh, d, vc, sc, ua
 !==============================================================================!
 
   call Cpu_Timer_Mod_Start('Backup_Mode_Save')
@@ -305,11 +305,18 @@
   !--------------------------!
   call Backup_Mod_Write_Swarm(fh,d,vc, swr)
 
-  !------------------------------!
-  !                              !
-  !   User scalars are missing   !
-  !                              !
-  !------------------------------!
+  !-----------------!
+  !                 !
+  !   User arrays   !
+  !                 !
+  !-----------------!
+
+  do ua = 1, n_user_arrays
+    a_name = 'A_??'
+    write(a_name(3:4),'(I2.2)') ua
+    call Backup_Mod_Write_Cell_Bnd(fh,d,vc, a_name,  &
+                                   user_array(ua,-nb_s:nc_s))
+  end do
 
   ! Variable count (store +1 to count its own self)
   call Backup_Mod_Write_Int(fh,d,vc, 'variable_count', vc + 1)

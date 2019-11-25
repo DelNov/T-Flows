@@ -28,8 +28,8 @@
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: phi
-  integer                  :: c, n, s, offset, sc, f8, f9
-  character(len=80)        :: name_out_8, name_out_9, name_mean
+  integer                  :: c, n, s, offset, sc, f8, f9, ua
+  character(len=80)        :: name_out_8, name_out_9, name_mean, a_name
 !-----------------------------[Local parameters]-------------------------------!
   integer, parameter :: VTK_TRIANGLE   =  5  ! cell shapes in VTK format
   integer, parameter :: VTK_QUAD       =  9
@@ -552,7 +552,15 @@
   !----------------------!
   !   Save user arrays   !
   !----------------------!
-  ! call User_Mod_Save_Results(grid)
+  do ua = 1, n_user_arrays
+
+    a_name = 'A_00'
+    write(a_name(3:4), '(I2.2)') ua
+    call Save_Scalar(grid, IN_4, IN_5, a_name,                              &
+                                       plot_inside,                         &
+                                       user_array(ua,-grid % n_bnd_cells),  &
+                                       f8, f9)
+  end do
 
   !----------------------!
   !                      !

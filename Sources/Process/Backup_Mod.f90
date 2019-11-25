@@ -20,6 +20,7 @@
   use Grid_Mod,       only: Grid_Type
   use Bulk_Mod,       only: Bulk_Type
   use Control_Mod
+  use User_Mod, only: n_user_arrays, user_array
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
