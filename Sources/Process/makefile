@@ -63,6 +63,8 @@ endif
 ifeq ($(FORTRAN), gnu)
   ifeq ($(FCOMP),)
     FC = gfortran
+  else
+    FC = $(FCOMP)
   endif
   ifeq ($(DEBUG),yes)
     OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8 -fdefault-integer-8 -O0 -g \
@@ -86,6 +88,8 @@ endif
 ifeq ($(FORTRAN), intel)
   ifeq ($(FCOMP),)
     FC = ifort
+  else
+    FC = $(FCOMP)
   endif
   ifeq ($(DEBUG),yes)
     OPT_COMP = -module $(DIR_MODULE) -r8 -i8 -O0 -g -warn all -check all \
@@ -100,6 +104,8 @@ endif
 ifeq ($(FORTRAN), portland)
   ifeq ($(FCOMP),)
     FC = pgfortran
+  else
+    FC = $(FCOMP)
   endif
   ifeq ($(DEBUG),yes)
     OPT_COMP = -module $(DIR_MODULE) -r8 -i8 -O0 -g
@@ -113,6 +119,8 @@ endif
 ifeq ($(MPI), yes)
   ifeq ($(FCOMP),)
     FC = mpif90
+  else
+    FC = $(FCOMP)
   endif
 endif
 
