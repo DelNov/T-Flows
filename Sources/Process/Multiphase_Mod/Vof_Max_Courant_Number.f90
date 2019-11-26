@@ -9,7 +9,7 @@
   type(Field_Type),     pointer :: flow
   type(Grid_Type),      pointer :: grid
   type(Var_Type),       pointer :: vof
-  type(Face_Type),      pointer :: v_flux
+  type(Face_Type),      pointer :: m_flux
   real                          :: dt     ! time step
   real                          :: c_d(-mult % pnt_grid % n_bnd_cells:  &
                                         mult % pnt_grid % n_cells) ! Courant n.
@@ -22,7 +22,7 @@
   
   ! Take aliases
   flow     => mult % pnt_flow
-  v_flux   => flow % v_flux
+  m_flux   => flow % m_flux
   grid     => flow % pnt_grid
   vof      => mult % vof
 
@@ -45,16 +45,18 @@
         vof_dist = (1.0 - vof_dist) * (1.0 - vof_dist)            &
                                     * vof_dist * vof_dist * 16.0    
 
-        c_d(c1) = c_d(c1) + vof_dist * max(- v_flux % n(s)         &
-                                     * dt / grid % vol(c1), 0.0)
+        c_d(c1) = c_d(c1) + vof_dist * max(- m_flux % n(s)              &
+                                           / dens_face(s)               &
+                                           * dt / grid % vol(c1), 0.0)
 
         vof_dist = min(max(vof % n(c2), 0.0),1.0)
 
         vof_dist = (1.0 - vof_dist) * (1.0 - vof_dist)            &
                                     * vof_dist * vof_dist * 16.0    
 
-        c_d(c2) = c_d(c2) + vof_dist * max( v_flux % n(s)         &
-                                     * dt / grid % vol(c2), 0.0)
+        c_d(c2) = c_d(c2) + vof_dist * max( m_flux % n(s)              &
+                                          / dens_face(s)               &
+                                          * dt / grid % vol(c2), 0.0)
 
       ! Side is on the boundary
       else ! (c2 < 0)
@@ -63,8 +65,9 @@
         vof_dist = (1.0 - vof_dist) * (1.0 - vof_dist)            &
                                     * vof_dist * vof_dist * 16.0    
 
-        c_d(c1) = c_d(c1) + vof_dist * max(-v_flux % n(s)         &
-                                     * dt / grid % vol(c1), 0.0)
+        c_d(c1) = c_d(c1) + vof_dist * max(- m_flux % n(s)              &
+                                           / dens_face(s)               &
+                                           * dt / grid % vol(c1), 0.0)
       end if
 
     end do
@@ -81,14 +84,17 @@
       
       if (c2 > 0) then
 
-        c_d(c1) = c_d(c1) + max(-v_flux % n(s) * dt / grid % vol(c1), 0.0)
+        c_d(c1) = c_d(c1) + max(- m_flux % n(s) / dens_face(s)         &
+                                          * dt / grid % vol(c1), 0.0)
 
-        c_d(c2) = c_d(c2) + max( v_flux % n(s) * dt / grid % vol(c2), 0.0)
+        c_d(c2) = c_d(c2) + max( m_flux % n(s) / dens_face(s)          &
+                                          * dt / grid % vol(c2), 0.0)
 
       ! Side is on the boundary
       else ! (c2 < 0)
 
-        c_d(c1) = c_d(c1) + max(-v_flux % n(s) * dt / grid % vol(c1), 0.0)
+        c_d(c1) = c_d(c1) + max(- m_flux % n(s) / dens_face(s)         &
+                                          * dt / grid % vol(c1), 0.0)
 
       end if
 
