@@ -3,12 +3,6 @@
 !----------------------------------------------------------------------!
 !  Solves Volume Fraction equation using UPWIND ADVECTION and CICSAM   !
 !----------------------------------------------------------------------!
-!------------------------------[Modules]-------------------------------!
-  use Const_Mod
-  use Comm_Mod
-  use Bulk_Mod,      only: Bulk_Type
-  use Matrix_Mod,    only: Matrix_Type
-!------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Work_Mod, only: beta_f => r_face_01, c_d => r_cell_01
 !------------------------------------------------------------------------------!
@@ -23,9 +17,9 @@
   type(Grid_Type),   pointer :: grid
   type(Bulk_Type),   pointer :: bulk
   type(Var_Type),    pointer :: vof
+  type(Face_Type),   pointer :: m_flux
   real,              pointer :: vof_f(:)
   real,              pointer :: vof_i(:), vof_j(:), vof_k(:)
-  type(Face_type),   pointer :: v_flux
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: s, c, c1, c2
@@ -48,9 +42,9 @@
   flow   => mult % pnt_flow
   grid   => flow % pnt_grid
   bulk   => flow % bulk
+  m_flux => flow % m_flux
   vof    => mult % vof
   vof_f  => mult % vof_f
-  v_flux => flow % v_flux
   vof_i  => vof % x
   vof_j  => vof % y
   vof_k  => vof % z
@@ -78,7 +72,7 @@
     !   Matrix Coefficients   !
     !-------------------------!
 
-    call Multiphase_Mod_Vof_Coefficients(flow, mult, a, b, dt, beta_f)   
+    call Multiphase_Mod_Vof_Coefficients(mult, a, b, dt, beta_f)   
 
     ! Get solver
     call Control_Mod_Solver_For_Multiphase(solver)
@@ -115,7 +109,7 @@
       call Grad_Mod_Variable(vof)
 
       call Multiphase_Mod_Vof_Predict_Beta(vof,                  &
-                                           v_flux % n,           &
+                                           m_flux % n,           &
                                            vof_i, vof_j, vof_k,  &
                                            grid % dx,            &
                                            grid % dy,            &
@@ -128,8 +122,9 @@
         !   Matrix Coefficients   !
         !-------------------------!
 
-        call Multiphase_Mod_Vof_Coefficients(flow, mult, a, b,          &
-                                             dt / real(n_sub), beta_f)   
+        call Multiphase_Mod_Vof_Coefficients(mult, a, b,         &
+                                             dt / real(n_sub),   &
+                                             beta_f)   
   
         ! Solve System
         call Multiphase_Mod_Vof_Solve_System(mult, sol, b)
@@ -139,9 +134,9 @@
         !---------------------------!
         !   Correct Beta at faces   !
         !---------------------------!
-        call Multiphase_Mod_Vof_Correct_Beta(vof,         &
-                                             v_flux % n,  &
-                                             beta_f,      &
+        call Multiphase_Mod_Vof_Correct_Beta(vof,                &
+                                             m_flux % n,         &
+                                             beta_f,             &
                                              dt / real(n_sub))
 
         !------------------------!
@@ -215,7 +210,7 @@
       ! Face is inside the domain
       if(c2 > 0) then
 
-        if (v_flux % n(s)>=0.0) then
+        if (m_flux % n(s)>=0.0) then
           vof_f(s) = vof % n(c1) 
         else
           vof_f(s) = vof % n(c2) 
@@ -241,7 +236,7 @@
       c2_glo = grid % comm % cell_glo(c2)
 
       if(c2 > 0) then
-        if(v_flux % n(s) >= 0) then
+        if(m_flux % n(s) >= 0) then
           donor = c1
           accept = c2
         else
