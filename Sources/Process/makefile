@@ -16,12 +16,11 @@ DEBUG = no
 
 # Compile for MPI ("yes" or "no")
 MPI = no
-# MPI implementation ("openmpi" or "mpich")
-# Warning: change line "FC = mpif90" to your compiler
-MPI_TYPE = openmpi
 
 # Link with CGNS ("yes" or "no")
 CGNS = no
+# MPI implementation used in parallel CGNS lib ("openmpi" or "mpich")
+CGNS_MPI = openmpi
 
 # Directories for objects and modules. (No need to change.)
 DIR_BINARY = ../../Binaries
@@ -38,22 +37,22 @@ VPATH = $(DIR_SHARED):$(DIR_TURBUL):$(DIR_SWARM):.
 PROGRAM_NAME = Process
 PROGRAM_FILE = $(DIR_BINARY)/$(PROGRAM_NAME)
 
+ifeq ($(MAKECMDGOALS), clean)
 $(info #=======================================================================)
-$(info # Compiling $(PROGRAM_NAME) with compiler $(FORTRAN)                    )
-$(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
-$(info #   make <FORTRAN=gnu/intel/portland> <DEBUG=yes/no> <CGNS=yes/no>      )
-$(info #        <MPI=yes/no> <MPI_TYPE=openmpi/mpich>                          )
-$(info #        <DIR_CASE=relative_path_to_case>                               )
+$(info #   make <FORTRAN=gnu/intel/portland> <DEBUG=yes/no> <MPI=yes/no>       )
+$(info #        <FCOMP=gfortran/ifort/portland/mpif90>                         )
+$(info #        <CGNS=yes/no> <CGNS_MPI=openmpi/mpich>                         )
+$(info #        <DIR_CASE=full_or_relative_path_to_case>                       )
 $(info #                                                                       )
 $(info # Examples:                                                             )
 $(info #   make                       - sequential version with gnu compiler   )
 $(info #   make MPI=yes               - parallel version with gnu compiler     )
+$(info #   make MPI=yes FC=my_mpif90  - parallel version with custom compiler  )
 $(info #   make FORTRAN=intel MPI=yes - parallel version with intel compiler   )
 $(info #   make MPI=yes CGNS=yes      - parallel version with CGNS/HDF5 support)
-$(info #   make MPI=yes MPI_TYPE=mpich- parallel version with MPICH/OpenMPI mpi)
 $(info #-----------------------------------------------------------------------)
-
+endif
 #-------------------------------------------------------------------------------
 #   Compiler and linker options
 #-------------------------------------------------------------------------------
@@ -62,7 +61,9 @@ $(info #-----------------------------------------------------------------------)
 
 # Fortran == gnu
 ifeq ($(FORTRAN), gnu)
-  FC = gfortran
+  ifeq ($(FCOMP),)
+    FC = gfortran
+  endif
   ifeq ($(DEBUG),yes)
     OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8 -fdefault-integer-8 -O0 -g \
                -ffixed-line-length-80 -fcheck=all -fwhole-file -fbacktrace  \
@@ -83,7 +84,9 @@ endif
 
 # Fortran == intel
 ifeq ($(FORTRAN), intel)
-  FC = ifort
+  ifeq ($(FCOMP),)
+    FC = ifort
+  endif
   ifeq ($(DEBUG),yes)
     OPT_COMP = -module $(DIR_MODULE) -r8 -i8 -O0 -g -warn all -check all \
                -debug all -fpe-all=0 -traceback
@@ -95,7 +98,9 @@ endif
 
 # Fortran == portland
 ifeq ($(FORTRAN), portland)
-  FC = pgfortran
+  ifeq ($(FCOMP),)
+    FC = pgfortran
+  endif
   ifeq ($(DEBUG),yes)
     OPT_COMP = -module $(DIR_MODULE) -r8 -i8 -O0 -g
   else
@@ -106,19 +111,28 @@ endif
 
 # Use here your command for mpi fortran compiler:
 ifeq ($(MPI), yes)
-  FC = mpif90
+  ifeq ($(FCOMP),)
+    FC = mpif90
+  endif
+endif
+
+# If not "make clean"
+ifneq ($(MAKECMDGOALS), clean)
+$(info #=======================================================================)
+$(info # Compiling $(PROGRAM_NAME) with $(FC) compiler                         )
+$(info #-----------------------------------------------------------------------)
 endif
 
 # If compiling with CGNS, add path to include directory
 ifeq ($(CGNS), yes)
   ifeq ($(MPI), yes)
-    ifeq ($(MPI_TYPE), openmpi)
+    ifeq ($(CGNS_MPI), openmpi)
       VALUE = $(shell echo Using CGNS library built on OpenMPI MPI implementation)
       DIR_CGNS_H  = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Par_Openmpi/Include
       CGNS_LIB    = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Par_Openmpi/Lib/libcgns.a \
                     ../Libraries/Hdf5_Par_Openmpi/Lib/libhdf5.a -ldl
     endif
-    ifeq ($(MPI_TYPE), mpich)
+    ifeq ($(CGNS_MPI), mpich)
       VALUE = $(shell echo Using CGNS library built on MPICH MPI implementation)
       DIR_CGNS_H  = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Par_Mpich/Include
       CGNS_LIB    = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Par_Mpich/Lib/libcgns.a \
