@@ -78,9 +78,9 @@
                       + (grid % yf(s) - grid % yc(c1)) * grav_y    &
                       + (grid % zf(s) - grid % zc(c1)) * grav_z )
 
-              body_fx(c1) = body_fx(c1) + dens_face(s) * si(s) * dotprod
-              body_fy(c1) = body_fy(c1) + dens_face(s) * sj(s) * dotprod
-              body_fz(c1) = body_fz(c1) + dens_face(s) * sk(s) * dotprod
+            body_fx(c1) = body_fx(c1) + dens_face(s) * si(s) * dotprod
+            body_fy(c1) = body_fy(c1) + dens_face(s) * sj(s) * dotprod
+            body_fz(c1) = body_fz(c1) + dens_face(s) * sk(s) * dotprod
 
             if (c2 > 0) then
               dotprod = ( (grid % xf(s) - grid % xc(c2)) * grav_x    &
@@ -95,19 +95,6 @@
 
             end if
           end do
-
-          !clean noise
-        do c = 1, grid % n_cells
-          if (abs(body_fx(c)) < PICO) then
-            body_fx(c) = 0.0
-          end if
-          if (abs(body_fy(c)) < PICO) then
-            body_fy(c) = 0.0
-          end if
-          if (abs(body_fz(c)) < PICO) then
-            body_fz(c) = 0.0
-          end if
-        end do 
 
         call Comm_Mod_Exchange_Real(grid, body_fx)
         call Comm_Mod_Exchange_Real(grid, body_fy)
