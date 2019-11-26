@@ -43,10 +43,11 @@
         !   Correct beta_f   !
         !--------------------!
         bcorr = 0.0
-        delta_alfa = 0.5 * (phi % n(accept) + phi % o(accept)               &
+        delta_alfa = 0.5 * (phi % n(accept) + phi % o(accept)     &
                          - (phi % n(donor) + phi % o(donor)))
 
-        cf = min(max(- phi_flux(s) * dt / grid % vol(donor),0.0),1.0)
+        cf = min(max(- phi_flux(s) / dens_face(s)                 &
+                              * dt / grid % vol(donor),0.0),1.0)
 
         if (phi % n(donor) < 0.0) then
           e_minus = max(-phi % n(donor),0.0)
