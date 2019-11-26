@@ -28,7 +28,6 @@
 
     ! Mass and volumetric flux through cell faces:
     type(Face_Type) :: m_flux
-    type(Face_Type) :: v_flux
 
     ! Pressure and pressure correction
     type(Var_Type) :: p
