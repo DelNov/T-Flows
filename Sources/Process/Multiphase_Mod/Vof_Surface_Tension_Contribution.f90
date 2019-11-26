@@ -18,7 +18,6 @@
   type(Field_Type),pointer :: flow
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: vof
-  type(Face_type),   pointer :: v_flux
   character(len=1)         :: charI
   integer                  :: s, c, c1, c2, c_iter,n_conv,n
   real                     :: vol_face, grad_face(3)
@@ -32,7 +31,6 @@
   flow   => mult % pnt_flow
   grid   => mult % pnt_grid
   vof    => mult % vof
-  v_flux => flow % v_flux
 
   mult % curv = vof % n
 
