@@ -17,6 +17,7 @@
   use Multiphase_Mod, only: Multiphase_Type, surface_tension,  &
                             multiphase_model, VOLUME_OF_FLUID
   use User_Mod
+  use Work_Mod,       only: dens_factor => r_face_01
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -28,9 +29,8 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Bulk_Type),   pointer :: bulk
-  type(Var_Type),    pointer :: u, v, w, p, pp, vol_flux
-  type(Face_Type),   pointer :: m_flux
-  type(Face_Type),   pointer :: v_flux
+  type(Var_Type),    pointer :: u, v, w, p, pp
+  type(Face_Type),   pointer :: flux            ! mass or volume flux
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: s, c, c1, c2, exec_iter
@@ -39,7 +39,9 @@
   real                       :: px_f, py_f, pz_f
   character(len=80)          :: solver
   real                       :: p_max, p_min, p_nor, p_nor_c
-  real                       :: dens_const, dotprod, stens_source
+  real                       :: a1_in, a2_in, u_fo, v_fo, w_fo
+  real                       :: dens_const, dotprod, stens_source, delta_star
+  real                       :: cf,df
 !==============================================================================!
 !
 !   The form of equations which I am solving:
@@ -66,14 +68,13 @@
   call Cpu_Timer_Mod_Start('Compute_Pressure (without solvers)')
 
   ! Take aliases
-  grid   => flow % pnt_grid
-  bulk   => flow % bulk
-  m_flux => flow % m_flux
-  v_flux => flow % v_flux
-  p      => flow % p
-  pp     => flow % pp
-  a      => sol % a
-  b      => sol % b % val
+  grid => flow % pnt_grid
+  bulk => flow % bulk
+  flux => flow % m_flux
+  p    => flow % p
+  pp   => flow % pp
+  a    => sol % a
+  b    => sol % b % val
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! User function
@@ -111,6 +112,18 @@
   !-----------------------------------------!
   pp % n = 0.0 
 
+  !----------------------------!
+  !   Initialize dens_factor   !
+  !----------------------------!
+
+  ! The purpose of this factor is to make possible solving
+  ! either for volume flux or for mass flux conservation
+  if(multiphase_model .eq. VOLUME_OF_FLUID) then
+    dens_factor(:) = 1.0
+  else
+    dens_factor(:) = dens_face(:)
+  end if
+
   !-------------------------------------------------!
   !   Calculate the mass fluxes on the cell faces   !
   !-------------------------------------------------!
@@ -122,18 +135,15 @@
     ! Face is inside the domain
     if(c2 > 0) then
 
-      ! Interpolate density 
-      dens_const = dens_face(s)
-
       ! Interpolate velocity 
-      u_f = fs * u % n(c1) + (1.0-fs) * u % n(c2)
-      v_f = fs * v % n(c1) + (1.0-fs) * v % n(c2)
-      w_f = fs * w % n(c1) + (1.0-fs) * w % n(c2)
+      u_f = fs * u % n(c1) + (1.0 - fs) * u % n(c2)
+      v_f = fs * v % n(c1) + (1.0 - fs) * v % n(c2)
+      w_f = fs * w % n(c1) + (1.0 - fs) * w % n(c2)
 
       ! Calculate coeficients for the system matrix
-      a12 = 0.5 * dens_const * a % fc(s)             &
-           * ( grid % vol(c1) / a % sav(c1)          &
-             + grid % vol(c2) / a % sav(c2) )
+      a12 = 0.5 * dens_factor(s) * a % fc(s)        &
+                * ( grid % vol(c1) / a % sav(c1)    &
+                  + grid % vol(c2) / a % sav(c2) )
       a % val(a % pos(1,s)) = -a12
       a % val(a % pos(2,s)) = -a12
       a % val(a % dia(c1))  = a % val(a % dia(c1)) +  a12
@@ -144,21 +154,16 @@
       py_f = 0.5*( p % y(c1) + p % y(c2) ) * grid % dy(s)
       pz_f = 0.5*( p % z(c1) + p % z(c2) ) * grid % dz(s)
 
-      ! Calculate flux through cell face
-      a12 = 0.5 * a % fc(s)                          &
-           * ( grid % vol(c1) / a % sav(c1)          &
-             + grid % vol(c2) / a % sav(c2) )
-
-      v_flux % n(s) = u_f * grid % sx(s)             &
-                    + v_f * grid % sy(s)             &
-                    + w_f * grid % sz(s)             &
-                    + a12 * (p % n(c1) - p % n(c2))  &
+      ! Calculate mass or volume flux through cell face
+      ! (depending on what is in "dens_factor")
+      flux % n(s) = dens_factor(s) * ( u_f * grid % sx(s)     &
+                                     + v_f * grid % sy(s)     &
+                                     + w_f * grid % sz(s) )   &
+                    + a12 * (p % n(c1) - p % n(c2))             &
                     + a12 * (px_f + py_f + pz_f)
 
-      m_flux % n(s) = dens_face(s) * v_flux % n(s)
-
-      b(c1) = b(c1) - m_flux % n(s)
-      b(c2) = b(c2) + m_flux % n(s)
+      b(c1) = b(c1) - flux % n(s)
+      b(c2) = b(c2) + flux % n(s)
 
     ! Side is on the boundary
     else ! (c2 < 0)
@@ -167,98 +172,55 @@
         u_f = u % n(c2)
         v_f = v % n(c2)
         w_f = w % n(c2)
-        v_flux % n(s) = u_f * grid % sx(s)  &
-                      + v_f * grid % sy(s)  &
-                      + w_f * grid % sz(s)
+        flux % n(s) = dens_factor(s) * ( u_f * grid % sx(s)     &
+                                       + v_f * grid % sy(s)     &
+                                       + w_f * grid % sz(s) )
 
-        m_flux % n(s) = dens_face(s) * v_flux % n(s)
-
-        b(c1) = b(c1) - m_flux % n(s)
+        b(c1) = b(c1) - flux % n(s)
       else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW .or.   &
               Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) then
         u_f = u % n(c2)
         v_f = v % n(c2)
         w_f = w % n(c2)
-        v_flux % n(s) = u_f*grid % sx(s)  &
-                      + v_f*grid % sy(s)  &
-                      + w_f*grid % sz(s)
+        flux % n(s) = dens_factor(s) * ( u_f * grid % sx(s)     &
+                                       + v_f * grid % sy(s)     &
+                                       + w_f * grid % sz(s) )
 
-        m_flux % n(s) = dens_face(s) * v_flux % n(s)
+        b(c1) = b(c1) - flux % n(s)
 
-        b(c1) = b(c1) - m_flux % n(s)
-
-        a12 = dens_face(s) * a % fc(s) * grid % vol(c1) / a % sav(c1)
+        a12 = dens_factor(s) * a % fc(s) * grid % vol(c1) / a % sav(c1)
         a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
 
       else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE) then
         u_f = u % n(c1)
         v_f = v % n(c1)
         w_f = w % n(c1)
-        v_flux % n(s) = u_f * grid % sx(s)  &
-                      + v_f * grid % sy(s)  &
-                      + w_f * grid % sz(s)
+        flux % n(s) = dens_factor(s) * ( u_f * grid % sx(s)     &
+                                       + v_f * grid % sy(s)     &
+                                       + w_f * grid % sz(s) )
 
-        m_flux % n(s) = dens_face(s) * v_flux % n(s)
+        b(c1) = b(c1) - flux % n(s)
 
-        b(c1) = b(c1) - m_flux % n(s)
-
-        a12 = dens_face(s) * a % fc(s) * grid % vol(c1) / a % sav(c1)
+        a12 = dens_factor(s) * a % fc(s) * grid % vol(c1) / a % sav(c1)
         a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
 
       else  ! it is SYMMETRY
-        v_flux % n(s) = 0.0
-        m_flux % n(s) = 0.0
+        flux % n(s) = 0.0
       end if
     end if
 
   end do
 
-  !--------------------------------------------------!
-  !   In case of VOF, surface tension contribution   !
-  !--------------------------------------------------!
+  !-------------------------------------------------------------!
+  !   In case of VOF, surface tension and  gravity correction   !
+  !-------------------------------------------------------------!
 
   if(multiphase_model .eq. VOLUME_OF_FLUID) then
 
-    if(abs(surface_tension) > TINY) then
-      do s = 1, grid % n_faces
-        c1 = grid % faces_c(1,s)
-        c2 = grid % faces_c(2,s)
-        fs = grid % f(s)
-
-        ! Face is inside the domain
-        if(c2 > 0) then
-
-          a12 = 0.5 * a % fc(s)                         &
-              * ( grid % vol(c1) / a % sav(c1)          &
-                + grid % vol(c2) / a % sav(c2) )
-
-          ! Interpolate VOF gradients
-          dotprod =  0.5 * (mult % vof % x(c1) + mult % vof % x(c2))          &
-                          * grid % dx(s)                                      &
-                   + 0.5 * (mult % vof % y(c1) + mult % vof % y(c2))          &
-                          * grid % dy(s)                                      &
-                   + 0.5 * (mult % vof % z(c1) + mult % vof % z(c2))          &
-                          * grid % dz(s)
-
-          a12 = a12 * 0.5 * ( mult % vof % oo(c1)                             &
-                            + mult % vof % oo(c2) ) * surface_tension
-
-          stens_source = a12 * ( mult % vof % n(c2) -  mult % vof % n(c1)     &
-                               - dotprod )
-
-          v_flux % n(s) = v_flux % n(s) + stens_source
-          m_flux % n(s) = m_flux % n(s) + dens_face(s) * stens_source
-
-          b(c1) = b(c1) - dens_face(s) * stens_source
-          b(c2) = b(c2) + dens_face(s) * stens_source
-
-        end if
-
-      end do
-
-    end if
-
+    call Multiphase_Mod_Vof_Pressure_Correction(mult, sol, dt)
+    
   end if
+
   mass_err = 0.0
   do c = 1, grid % n_cells
     mass_err = max(mass_err, abs(b(c)))
