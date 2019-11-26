@@ -38,7 +38,7 @@ plt.rcParams["legend.borderaxespad"] = 0.
 plt.rcParams["legend.labelspacing"] = 0.
 
 #-Reference data
-R_data = 'Re_tau_550_ref_data.dat'
+R_data = 're_tau_550_ref_data.dat'
 
 # r, Uz, r+ Uz+ uzur^+, k_rr, k_tt, k_zz, eps_rr, eps_tt, eps_zz
 r1, uz1, rp1, uzp1, uzurp1, kp1_1, kp1_2, kp1_3, epsp1_1, epsp1_2, epsp1_3 = \
