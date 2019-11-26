@@ -225,9 +225,6 @@
     call Control_Mod_Max_Simple_Iterations(max_ini)
     call Control_Mod_Min_Simple_Iterations(min_ini)
 
-    ! Update old Volume Flux:
-    flow % v_flux % o(:) = flow % v_flux % n(:)
-
     ! Volume of Fluid
     if(multiphase_model .eq. VOLUME_OF_FLUID) then
       ! Update the values at boundaries
