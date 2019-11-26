@@ -1,19 +1,18 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Vof_Coefficients(flow, mult, a, b, dt, beta_f)
+  subroutine Multiphase_Mod_Vof_Coefficients(mult, a, b, dt, beta_f)
 !------------------------------------------------------------------------------!
 !   Computes matrix coefficients                                               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),      target :: flow
   type(Matrix_Type),     target :: a
   type(Multiphase_Type), target :: mult
   real,                  target :: b(:)
   real                          :: beta_f(:)
   real                          :: dt
 !-----------------------------------[Locals]-----------------------------------!
+  type(Field_Type), pointer :: flow
   type(Grid_Type),  pointer :: grid
-  type(Face_Type),  pointer :: v_flux
   type(Face_Type),  pointer :: m_flux
   type(Var_Type),   pointer :: vof
   integer                   :: c, c1, c2, s, c1_glo, c2_glo
@@ -21,8 +20,8 @@
 !==============================================================================!
 
   ! Take aliases
+  flow   => mult % pnt_flow
   grid   => flow % pnt_grid
-  v_flux => flow % v_flux
   m_flux => flow % m_flux
   vof    => mult % vof
 
@@ -39,8 +38,8 @@
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
 
-      upwd1 = 0.5 * max( v_flux % n(s), 0.0)
-      upwd2 = 0.5 * max(-v_flux % n(s), 0.0)
+      upwd1 = 0.5 * max( m_flux % n(s) / dens_face(s), 0.0)
+      upwd2 = 0.5 * max(-m_flux % n(s) / dens_face(s), 0.0)
 
       a % val(a % dia(c1)) = a % val(a % dia(c1)) + upwd1
       b(c1) = b(c1) - ( upwd1 * vof % o(c1) -  upwd2 * vof % o(c2) ) 
@@ -53,9 +52,10 @@
         a % val(a % pos(2,s)) =  - upwd1 
       else
         if (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
-          b(c1) = b(c1) - v_flux % n(s) * vof % n(c2)
+          b(c1) = b(c1) - m_flux % n(s) * vof % n(c2)
         else if (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) then
-          a % val(a % dia(c1)) = a % val(a % dia(c1)) + v_flux % n(s)
+          a % val(a % dia(c1)) = a % val(a % dia(c1))          &
+                               + m_flux % n(s) / dens_face(s)
         end if
       end if
 
@@ -73,11 +73,13 @@
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
 
-      upwd1 = (0.5 - beta_f(s)) * max(-v_flux % n(s), 0.0)              &
-             - 0.5 * beta_f(s) * v_flux % n(s)
-      upwd2 = (0.5 - beta_f(s)) * max(v_flux % n(s), 0.0)               &
-             + 0.5 * beta_f(s) * v_flux % n(s)
-      upwd3 = 0.5 * v_flux % n(s)
+      upwd1 = (0.5 - beta_f(s)) * max(-m_flux % n(s)           &
+                                     / dens_face(s), 0.0)      &
+             - 0.5 * beta_f(s) * m_flux % n(s) / dens_face(s)
+      upwd2 = (0.5 - beta_f(s)) * max(m_flux % n(s)            &
+                                     / dens_face(s), 0.0)      &
+             + 0.5 * beta_f(s) * m_flux % n(s) / dens_face(s)  
+      upwd3 = 0.5 * m_flux % n(s) / dens_face(s)
 
       if (c2 > 0) then
         a % val(a % dia(c1)) = a % val(a % dia(c1)) + upwd1 + upwd3
@@ -88,7 +90,7 @@
         a % val(a % pos(2,s)) = -upwd2 
         b(c2) = b(c2) - (upwd2 - upwd3) * vof % o(c2) + upwd2 * vof % o(c1)
       else
-        b(c1) = b(c1) - v_flux % n(s) * vof % n(c2)
+        b(c1) = b(c1) - m_flux % n(s) / dens_face(s) * vof % n(c2)
       end if
     end do
 
