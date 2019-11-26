@@ -8,10 +8,10 @@
 #-------------------------------------------------------------------------------
 #-------- input data
 #-------------------------------------------------------------------------------
-U_PLUS   = sprintf('"U_plus_Re_tau_590.dat"')
-K_PLUS   = sprintf('"k_plus_Re_tau_590.dat"')
-EPS_PLUS = sprintf('"eps_plus_Re_tau_590.dat"')
-UV_PLUS  = sprintf('"uv_plus_Re_tau_590.dat"')
+U_PLUS   = sprintf('"u_plus_re_tau_590.dat"')
+K_PLUS   = sprintf('"k_plus_re_tau_590.dat"')
+EPS_PLUS = sprintf('"eps_plus_re_tau_590.dat"')
+UV_PLUS  = sprintf('"uv_plus_re_tau_590.dat"')
 #-------------------------------------------------------------------------------
 #-------- composition
 #-------------------------------------------------------------------------------
