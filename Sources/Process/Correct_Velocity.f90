@@ -1,7 +1,7 @@
 !==============================================================================!
   real function Correct_Velocity(flow, sol, dt, ini)
 !------------------------------------------------------------------------------!
-!   Corrects the velocities, and mass fluxes on the cell faces.                !
+!   Corrects the velocities, and mass (or volume) fluxes on cell faces.        !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
@@ -26,12 +26,11 @@
   type(Grid_Type),   pointer :: grid
   type(Bulk_Type),   pointer :: bulk
   type(Var_Type),    pointer :: u, v, w, p, pp
-  type(Face_Type),   pointer :: m_flux
-  type(Face_Type),   pointer :: v_flux
+  type(Face_Type),   pointer :: flux            ! mass or volume flux
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: c, c1, c2, s
-  real                       :: a12, cfl_max, pe_max
+  real                       :: a12, cfl_max, pe_max, a1_0, a2_0
   real                       :: cfl_t, pe_t, mass_err
   real                       :: dens_const, visc_const
 !==============================================================================!
@@ -39,14 +38,13 @@
   call Cpu_Timer_Mod_Start('Correct_Velocity')
 
   ! Take aliases
-  grid   => flow % pnt_grid
-  bulk   => flow % bulk
-  m_flux => flow % m_flux
-  v_flux => flow % v_flux
-  p      => flow % p
-  pp     => flow % pp
-  a      => sol % a
-  b      => sol % b % val
+  grid => flow % pnt_grid
+  bulk => flow % bulk
+  flux => flow % m_flux
+  p    => flow % p
+  pp   => flow % pp
+  a    => sol % a
+  b    => sol % b % val
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! User function
@@ -76,25 +74,25 @@
     end if
   end do 
 
-  !-------------------------------------------------------------------!
-  !   Look at the following equation and you will understand why      !
-  !   is the matrix for pressure corrections in SIMPLE algorythm      !
-  !   formed from the coefficients of the velocity matrix.            !
-  !   Moreover, it should also be clear that pressure correction      !
-  !   matrix must be formed from underrelaxed velocity coefficients   !
-  !-------------------------------------------------------------------!
+  !----------------------------------------------------------------!
+  !   Look at the following equation and you will understand why   !
+  !   is the matrix for pressure corrections in SIMPLE algorythm   !
+  !   formed from the coefficients of the velocity matrix.         !
+  !                                                                !
+  !   Note that the fluxes corrected below are either mass or      !
+  !   volume fluxes, depending on how the right hand side term     !
+  !   for pressure was formed.                                     !
+  !----------------------------------------------------------------!
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
     if(c2 > 0) then
-      a12 = 0.5 * a % fc(s) *                                                 &
-          ( grid % vol(c1) / a % sav(c1)                                      &
-          + grid % vol(c2) / a % sav(c2) )
+                                 !<--- this is correction --->!
+      flux % n(s) = flux % n(s) + ( pp % n(c2) - pp % n(c1) )   &
+                                   * a % val(a % pos(1,s)) 
 
-      v_flux % n(s) = v_flux % n(s) - (pp % n(c2) - pp % n(c1)) * a12
-      m_flux % n(s) = m_flux % n(s) + (pp % n(c2) - pp % n(c1)) * a % val(a % pos(1,s))
-    end if               !                                               !
-  end do                 !<------------ this is correction ------------->!
+    end if
+  end do                 
 
   !-------------------------------------!
   !    Calculate the max mass error     !
@@ -108,15 +106,23 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
-    b(c1) = b(c1) - m_flux % n(s)
+    b(c1) = b(c1) - flux % n(s)
     if(c2 > 0) then
-      b(c2) = b(c2) + m_flux % n(s)
+      b(c2) = b(c2) + flux % n(s)
     end if
   end do
 
-  do c = 1, grid % n_cells
-    b(c) = b(c) / (grid % vol(c) * density(c) / dt)
-  end do
+  if(multiphase_model .eq. VOLUME_OF_FLUID) then
+    do c = 1, grid % n_cells
+      b(c) = b(c) / (grid % vol(c) / dt)
+    end do
+    ! Here volume flux is converted into mass flux:
+    flux % n(:) = flux % n(:) * dens_face(:)
+  else
+    do c = 1, grid % n_cells
+      b(c) = b(c) / (density(c) * grid % vol(c) / dt)
+    end do
+  end if
 
   mass_err = 0.0
   do c = 1, grid % n_cells - grid % comm % n_buff_cells
@@ -134,14 +140,15 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
     dens_const = dens_face(s)
-    visc_const = grid % f(s) * viscosity(c1) + (1.0 - grid % f(s)) * viscosity(c2)
+    visc_const =        grid % f(s)  * viscosity(c1)   &
+               + (1.0 - grid % f(s)) * viscosity(c2)
     if(c2 > 0) then
-      cfl_t = abs( dt * m_flux % n(s) / dens_const /      &
+      cfl_t = abs( dt * flux % n(s) / dens_const /      &
                    ( a % fc(s) *                 &
                    (  grid % dx(s)*grid % dx(s)  &
                     + grid % dy(s)*grid % dy(s)  &
                     + grid % dz(s)*grid % dz(s)) ) )
-      pe_t    = abs( m_flux % n(s) / a % fc(s) / (visc_const / dens_const + TINY) )
+      pe_t    = abs( flux % n(s) / a % fc(s) / (visc_const/dens_const+TINY) )
       cfl_max = max( cfl_max, cfl_t ) 
       pe_max  = max( pe_max,  pe_t  ) 
     end if

@@ -213,9 +213,9 @@
 
             ! Multiphase flow
             if (multiphase_model .eq. VOLUME_OF_FLUID) then
-              i = Key_Ind('V_FRAC', keys, nks)
+              i = Key_Ind('VOF', keys, nks)
               if(i > 0) vof % bnd_cell_type(c) = bc_type_tag
-              i = Key_Ind('V_FRAC_GRAD', keys, nks)
+              i = Key_Ind('VOF_GRAD', keys, nks)
               if(i > 0) vof % bnd_cell_type(c) = bc_type_tag
             end if
 
@@ -251,9 +251,9 @@
 
             ! Multiphase flow
             if (multiphase_model .eq. VOLUME_OF_FLUID) then
-              i = Key_Ind('V_FRAC', keys, nks)
+              i = Key_Ind('VOF', keys, nks)
               if(i > 0) vof % b(c) = vals(i)
-              i = Key_Ind('V_FRAC_GRAD', keys, nks)
+              i = Key_Ind('VOF_GRAD', keys, nks)
               if(i > 0) vof % q(c) = vals(i)
             end if
 

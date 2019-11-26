@@ -30,7 +30,6 @@
 
   ! Allocate memory for mass and volumetric fluxes
   call Face_Mod_Allocate_New_Only   ('M_FLUX', flow % m_flux, grid)
-  call Face_Mod_Allocate_New_And_Old('V_FLUX', flow % v_flux, grid)
 
   ! density at cell faces:
   allocate(dens_face(grid % n_faces))
