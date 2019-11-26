@@ -15,6 +15,10 @@
   use Grad_Mod
   use Control_Mod
   use Numerics_Mod
+  use Const_Mod
+  use Comm_Mod
+  use Bulk_Mod,      only: Bulk_Type
+  use Matrix_Mod,    only: Matrix_Type
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
