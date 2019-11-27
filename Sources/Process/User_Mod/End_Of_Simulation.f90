@@ -1,7 +1,7 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Time_Step(flow, turb, mult, swarm, n, time)
+  subroutine User_Mod_End_Of_Simulation(flow, turb, mult, swarm, n, time)
 !------------------------------------------------------------------------------!
-!   This function is called at the end of time step.                           !
+!   This function is called at the end of simulation.                          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
