@@ -137,7 +137,9 @@
   ! Initialize variables
   if(.not. backup) then
     call Initialize_Variables(flow, turb, mult, swarm)
-    call Comm_Mod_Wait
+    if(multiphase_model .eq. VOLUME_OF_FLUID) then
+      call Multiphase_Mod_Update_Physical_Properties(mult)
+    end if
   end if
 
   ! Initialize monitoring points
@@ -204,7 +206,7 @@
     time = time + flow % dt
 
     ! Beginning of time step
-    call User_Mod_Beginning_Of_Time_Step(flow, turb, swarm, n, time)
+    call User_Mod_Beginning_Of_Time_Step(flow, turb, mult, swarm, n, time)
 
     ! Start info boxes.
     call Info_Mod_Time_Start()
@@ -213,7 +215,7 @@
 
     ! Initialize and print time info box
     call system_clock(sc_cur)
-    call Info_Mod_Time_Fill( n, time, (sc_cur-sc_ini)/real(sc_cr) )
+    call Info_Mod_Time_Fill( n, time, real(sc_cur-sc_ini)/real(sc_cr) )
     call Info_Mod_Time_Print()
 
     ! Turbulence models initializations
@@ -230,6 +232,7 @@
       ! Update the values at boundaries
       call Update_Boundary_Values(flow, turb, mult)
       call Multiphase_Mod_Compute_Vof(mult, sol, flow % dt, n)
+      call Multiphase_Mod_Update_Physical_Properties(mult)
     end if
 
     do ini = 1, max_ini
@@ -307,7 +310,7 @@
     call Bulk_Mod_Adjust_P_Drops(flow % bulk, flow % dt)
 
     ! Just before the end of time step
-    call User_Mod_End_Of_Time_Step(flow, turb, swarm, n, time)
+    call User_Mod_End_Of_Time_Step(flow, turb, mult, swarm, n, time)
 
     !----------------------!
     !   Save the results   !
@@ -319,7 +322,7 @@
     if(save_now           .or.  &
        exit_now           .or.  &
        mod(n, bsi) .eq. 0 .or.  &
-       (sc_cur-sc_ini)/real(sc_cr) > wt_max) then
+       real(sc_cur-sc_ini)/real(sc_cr) > wt_max) then
       call Backup_Mod_Save(flow, swarm, turb, mult, n, n_stat)
     end if
 
@@ -327,7 +330,7 @@
     if(save_now           .or.  &
        exit_now           .or.  &
        mod(n, rsi) .eq. 0 .or.  &
-       (sc_cur-sc_ini)/real(sc_cr) > wt_max) then
+       real(sc_cur-sc_ini)/real(sc_cr) > wt_max) then
       call Comm_Mod_Wait
       call Save_Results(flow, turb, mult, n, .true.)   ! save inside
       call Save_Results(flow, turb, mult, n, .false.)  ! save bnd
@@ -354,7 +357,7 @@
     end if
 
     ! Ran more than a set limit
-    if((sc_cur-sc_ini)/real(sc_cr) > wt_max) then
+    if(real(sc_cur-sc_ini)/real(sc_cr) > wt_max) then
       goto 2
     end if
 
@@ -364,9 +367,8 @@
   ! ... it is one above the loop boundaries here
   n = n - 1
 
-  if (multiphase_model > 0) then
-    call Compute_Benchmark(mult, flow % dt)
-  end if
+  ! User function for end of simulation
+  call User_Mod_End_Of_Simulation(flow, turb, mult, swarm, n, time)
 
   ! Save backup and post-processing files at exit
   call Comm_Mod_Wait
