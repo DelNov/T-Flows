@@ -43,7 +43,6 @@
   real                     :: area
 
   integer                  :: n_points, k
-  integer                  :: mult_dummy  ! To catch Volume Fraction Initialization
   real, allocatable        :: prof(:,:), x(:), y(:), z(:), dist(:)
   logical                  :: found
 
@@ -243,16 +242,6 @@
       do i = 1, nks
         call To_Upper_Case(keys(i))
       end do
-
-      if (multiphase_model .eq. VOLUME_OF_FLUID) then
-        mult_dummy = floor(vals(Key_Ind('VOF', keys, nks)))
-        ! Initialize vof function:
-        call Multiphase_Mod_Vof_Initialization(mult, mult_dummy)
-      else !density at faces:
-        do s = 1, grid % n_faces
-          dens_face(s) = density(grid % faces_c(1,s))
-        end do
-      end if
 
       do c = 1, grid % n_cells
 
