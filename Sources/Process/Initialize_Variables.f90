@@ -366,7 +366,7 @@
 
   end if
 
-  call User_Mod_Initialize(flow, turb, swarm)
+  call User_Mod_Initialize_Variables(flow, turb, mult, swarm)
 
   !--------------------------------!
   !      Calculate the inflow      !
