@@ -1,8 +1,8 @@
-!======================================================================!
+!==============================================================================!
   subroutine Multiphase_Mod_Compute_Vof(mult, sol, dt, n)
-!----------------------------------------------------------------------!
-!  Solves Volume Fraction equation using UPWIND ADVECTION and CICSAM   !
-!----------------------------------------------------------------------!
+!------------------------------------------------------------------------------!
+!   Solves Volume Fraction equation using UPWIND ADVECTION and CICSAM          !
+!------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Work_Mod, only: beta_f => r_face_01, c_d => r_cell_01
 !------------------------------------------------------------------------------!
@@ -11,7 +11,7 @@
   type(Multiphase_Type), target :: mult
   type(Solver_Type),     target :: sol
   real                          :: dt
-  integer                       :: n !Current temporal iteration
+  integer                       :: n    ! current temporal iteration
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
@@ -23,17 +23,11 @@
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: s, c, c1, c2
-  integer                    :: exec_iter
   integer                    :: donor, accept, corr_num, corr_num_max
   integer                    :: i_sub, n_sub
-  real                       :: fs, a0
+  real                       :: fs
   character(len=80)          :: solver
-  character(len=1)           :: charI
-  character(len=4)           :: charIter
-  real                       :: upwd1, upwd2, upwd3, beta_const, eps_loc
   real                       :: courant_max, epsloc
-  integer                    :: c1_glo, c2_glo
-  logical                    :: corr_cicsam
 !==============================================================================!
 
   call Cpu_Timer_Mod_Start('Compute_Multiphase (without solvers)')
@@ -56,8 +50,8 @@
 
   if (vof % adv_scheme .eq. CICSAM .or. &
       vof % adv_scheme .eq. STACS) then
-    ! Courant Number closeto the interface:
-    call Vof_Max_Courant_Number(mult, dt, c_d, 1, courant_max, n)
+    ! Courant Number close to the interface:
+    call Vof_Max_Courant_Number(mult, dt, c_d, 1, courant_max)
 
     n_sub = min(max(ceiling(courant_max / 0.25),1),100)
 
@@ -97,7 +91,7 @@
 
       ! Courant number full domain:
       call Vof_Max_Courant_Number(mult, dt / real(n_sub),    &
-                                  c_d, 0, courant_max, n)
+                                  c_d, 0, courant_max)
 
       ! Old volume fraction:
       vof % o(:) = vof % n(:)
@@ -124,8 +118,8 @@
 
         call Multiphase_Mod_Vof_Coefficients(mult, a, b,         &
                                              dt / real(n_sub),   &
-                                             beta_f)   
-  
+                                             beta_f)
+
         ! Solve System
         call Multiphase_Mod_Vof_Solve_System(mult, sol, b)
 
@@ -183,19 +177,6 @@
 
   end if
 
-  !-----------------------!
-  !   Update properties   !
-  !-----------------------!
-  do c = 1, grid % n_cells
-    density(c) = vof % n(c)         * phase_dens(1)         &
-               + (1.0 - vof % n(c)) * phase_dens(2)
-    viscosity(c) = vof % n(c)         * phase_visc(1)       &
-                 + (1.0 - vof % n(c)) * phase_visc(2)
-  end do
-
-  call Comm_Mod_Exchange_Real(grid, density)
-  call Comm_Mod_Exchange_Real(grid, viscosity)
-
   !------------------------------!
   !   Volume fraction at faces   !
   !------------------------------!
@@ -211,9 +192,9 @@
       if(c2 > 0) then
 
         if (m_flux % n(s)>=0.0) then
-          vof_f(s) = vof % n(c1) 
+          vof_f(s) = vof % n(c1)
         else
-          vof_f(s) = vof % n(c2) 
+          vof_f(s) = vof % n(c2)
         end if
 
       ! Side is on the boundary
@@ -231,9 +212,6 @@
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
       fs = grid % f(s)
-
-      c1_glo = grid % comm % cell_glo(c1)
-      c2_glo = grid % comm % cell_glo(c2)
 
       if(c2 > 0) then
         if(m_flux % n(s) >= 0) then
@@ -263,25 +241,20 @@
 
   end if
 
-  !----------------------!
-  !   Density at faces   !
-  !----------------------!
-  do s = 1, grid % n_faces
-    dens_face(s) = vof_f(s) * phase_dens(1)  &
-                 + (1.0 - vof_f(s)) * phase_dens(2)
-  end do
+  !-----------------------!
+  !   Update properties   !
+  !-----------------------!
+  call Multiphase_Mod_Update_Physical_Properties(mult)
 
   !----------------------------------------!
   !   Surface Tension Force Contribution   !
   !----------------------------------------!
   if (surface_tension > TINY ) then
-    call Multiphase_Mod_Vof_Surface_Tension_Contribution(mult, n)
-    call Grad_Mod_Variable(vof)
+    call Multiphase_Mod_Vof_Surface_Tension_Contribution(mult)
   end if
 
-  call Cpu_Timer_Mod_Stop('Compute_Multiphase (without solvers)')
-
   call Grad_Mod_Variable(vof)
-  call Compute_Benchmark(mult, dt)
+
+  call Cpu_Timer_Mod_Stop('Compute_Multiphase (without solvers)')
 
   end subroutine

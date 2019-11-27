@@ -22,14 +22,14 @@
   real           :: di(phi % pnt_grid % n_faces),         &
                     dj(phi % pnt_grid % n_faces),         &
                     dk(phi % pnt_grid % n_faces)
+  real           :: beta_f(phi % pnt_grid % n_faces)
   real           :: c_d(-phi % pnt_grid % n_bnd_cells:  &
                          phi % pnt_grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   integer                  :: s
-  integer                  :: c1, c2, donor, accept, c1_glo, c2_glo
+  integer                  :: c1, c2, donor, accept
   real                     :: fs, dot_prod
-  real,        allocatable :: beta_f(:)
   real                     :: alfa_u, alfa_d, alfa_a, alfa_d_til, alfa_cbc
   real                     :: alfa_uq, gamma_f, alfa_f_til, signo
   real                     :: alfa_superbee, alfa_stoic

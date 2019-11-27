@@ -13,7 +13,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: grid
   type(Field_Type), pointer :: flow
-  integer                   :: s, c, cellt
+  integer                   :: c, cellt
   real                      :: u_max, p_min, p_max, u_rms
   real                      :: a_in, a_out, a_tot, u_res, p_in, p_out, a_vof
   real                      :: min_x, max_z, min_vfrac, max_vfrac
@@ -40,10 +40,10 @@
   max_vfrac = maxval(mult % vof % n(:))
 
   do c = 1, grid % n_cells
-    u_res = sqrt( flow % u % n(c) ** 2.0       &
-                + flow % v % n(c) ** 2.0       &
-                + flow % w % n(c) ** 2.0)
-    sum_v1(c) = u_res 
+    u_res = sqrt( flow % u % n(c) ** 2       &
+                + flow % v % n(c) ** 2       &
+                + flow % w % n(c) ** 2)
+    sum_v1(c) = u_res
     u_rms = u_rms + u_res ** 2.0
     a_tot = a_tot + grid % vol(c)
     if (abs(max_vfrac - mult % vof % n(c)) < TINY) then
@@ -53,7 +53,7 @@
 
     if (abs(mult % vof % n(c)) < min_vfrac + TINY) then
       a_out = a_out + grid % vol(c)
-      p_out = p_out + flow % p % n(c) * grid % vol(c) 
+      p_out = p_out + flow % p % n(c) * grid % vol(c)
     end if
 
     a_tot = a_tot + grid % vol(c)

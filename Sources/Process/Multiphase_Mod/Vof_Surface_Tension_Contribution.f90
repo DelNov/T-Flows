@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Vof_Surface_Tension_Contribution(mult, n)
+  subroutine Multiphase_Mod_Vof_Surface_Tension_Contribution(mult)
 !------------------------------------------------------------------------------!
 !        Computes the Curvature based on old-fashion  Brackbill's CSF          !
 !------------------------------------------------------------------------------!
@@ -18,8 +18,7 @@
   type(Field_Type),pointer :: flow
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: vof
-  character(len=1)         :: charI
-  integer                  :: s, c, c1, c2, c_iter,n_conv,n
+  integer                  :: s, c, c1, c2, c_iter, n_conv
   real                     :: vol_face, grad_face(3)
   real                     :: dotprod, sxyz_mod, fs, epsloc, err_2
 !==============================================================================!
@@ -28,11 +27,11 @@
   epsloc = epsilon(epsloc)
 
   ! First take aliases
-  flow   => mult % pnt_flow
-  grid   => mult % pnt_grid
-  vof    => mult % vof
+  flow => mult % pnt_flow
+  grid => mult % pnt_grid
+  vof  => mult % vof
 
-  mult % curv = vof % n
+  mult % curv(:) = vof % n(:)
 
   ! This parameter maybe also implemented in "control" file
   n_conv = 2

@@ -5,18 +5,18 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Matrix_Type),     target :: a
   type(Multiphase_Type), target :: mult
+  type(Matrix_Type),     target :: a
   real,                  target :: b(:)
-  real                          :: beta_f(:)
   real                          :: dt
+  real                          :: beta_f(:)
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: flow
   type(Grid_Type),  pointer :: grid
   type(Face_Type),  pointer :: m_flux
   type(Var_Type),   pointer :: vof
-  integer                   :: c, c1, c2, s, c1_glo, c2_glo
-  real                      :: upwd1, upwd2, upwd3, a0, beta_const
+  integer                   :: c, c1, c2, s
+  real                      :: upwd1, upwd2, upwd3, a0
 !==============================================================================!
 
   ! Take aliases
@@ -29,10 +29,10 @@
   b       = 0.0
   a % val = 0.0
 
+  !-------------------------!
+  !   Matrix Coefficients   !
+  !-------------------------!
   if (vof % adv_scheme .eq. UPWIND) then
-    !-------------------------!
-    !   Matrix Coefficients   !
-    !-------------------------!
 
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
@@ -64,10 +64,6 @@
   else if (vof % adv_scheme .eq. CICSAM .or. &
            vof % adv_scheme .eq. STACS) then
 
-    !-------------------------!
-    !   Matrix Coefficients   !
-    !-------------------------!
-
     do s = 1, grid % n_faces
 
       c1 = grid % faces_c(1,s)
@@ -78,7 +74,7 @@
              - 0.5 * beta_f(s) * m_flux % n(s) / dens_face(s)
       upwd2 = (0.5 - beta_f(s)) * max(m_flux % n(s)            &
                                      / dens_face(s), 0.0)      &
-             + 0.5 * beta_f(s) * m_flux % n(s) / dens_face(s)  
+             + 0.5 * beta_f(s) * m_flux % n(s) / dens_face(s)
       upwd3 = 0.5 * m_flux % n(s) / dens_face(s)
 
       if (c2 > 0) then

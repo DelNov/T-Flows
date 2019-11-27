@@ -1,5 +1,5 @@
   !============================================================================!
-    subroutine Multiphase_Mod_Vof_Momentum_Contribution(mult, i, b, dt)
+    subroutine Multiphase_Mod_Vof_Momentum_Contribution(mult, i, b)
   !----------------------------------------------------------------------------!
   !   Correct fluxes on pressure equation                                      !
   !----------------------------------------------------------------------------!
@@ -7,13 +7,11 @@
   !---------------------------------[Arguments]--------------------------------!
     type(Multiphase_Type), target :: mult
     real,                  target :: b(:)
-    real                          :: dt
     integer                       :: i
   !-----------------------------------[Locals]---------------------------------!
     type(Field_Type), pointer :: flow
     type(Grid_Type),  pointer :: grid
     type(Var_Type),   pointer :: vof
-    character(len=1)         :: charI
     integer                   :: s, c, c1, c2
     real                      :: dotprod, epsloc
     real,             pointer :: si(:), sj(:), sk(:)

@@ -15,7 +15,6 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   integer                  :: s, c1, c2, donor, accept
-  integer                  :: c1_glo, c2_glo
   real                     :: fs, signo, e_plus, e_minus, cf, delta_alfa, bcorr
 !==============================================================================!
 
