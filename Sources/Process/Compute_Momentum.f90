@@ -146,13 +146,13 @@
     p_drop_i = bulk % p_drop_z
   end if
 
+  ! User function
+  call User_Mod_Beginning_Of_Compute_Momentum(flow, turb, mult, dt, ini)
+
   ! Initialize matrix and right hand side
   a % val(:) = 0.0
   b      (:) = 0.0
   f_stress   = 0.0
-
-  ! User function
-  call User_Mod_Beginning_Of_Compute_Momentum(flow, dt, ini)
 
   ! Calculate velocity magnitude for normalization
   vel_max = 0.0
@@ -355,7 +355,7 @@
   call Comm_Mod_Exchange_Real(grid, ui % n)
 
   ! User function
-  call User_Mod_End_Of_Compute_Momentum(flow, dt, ini)
+  call User_Mod_End_Of_Compute_Momentum(flow, turb, mult, dt, ini)
 
   call Cpu_Timer_Mod_Stop('Compute_Momentum (without solvers)')
 

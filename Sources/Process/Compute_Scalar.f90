@@ -66,7 +66,7 @@
 !
 !==============================================================================!
 
-  call Cpu_Timer_Mod_Start('Compute_Scalars')
+  call Cpu_Timer_Mod_Start('Compute_Scalars (without solvers)')
 
   ! Take aliases
   grid   => flow % pnt_grid
@@ -74,6 +74,9 @@
   phi    => flow % scalar(sc)
   call Turb_Mod_Alias_Stresses(turb, uu, vv, ww, uv, uw, vw)
   call Solver_Mod_Alias_System(sol, a, b)
+
+  ! User function
+  call User_Mod_Beginning_Of_Compute_Scalar(flow, turb, mult, dt, ini)
 
   do n = 1, a % row(grid % n_cells+1) ! to je broj nonzero + 1
     a % val(n) = 0.0
@@ -372,6 +375,9 @@
 
   call Comm_Mod_Exchange_Real(grid, phi % n)
 
-  call Cpu_Timer_Mod_Stop('Compute_Scalars')
+  ! User function
+  call User_Mod_End_Of_Compute_Scalar(flow, turb, mult, dt, ini)
+
+  call Cpu_Timer_Mod_Stop('Compute_Scalars (without solvers)')
 
   end subroutine

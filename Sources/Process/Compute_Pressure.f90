@@ -78,7 +78,7 @@
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Pressure(flow, dt, ini)
+  call User_Mod_Beginning_Of_Compute_Pressure(flow, mult, dt, ini)
 
   !--------------------------------------------------!
   !   Find the value for normalization of pressure   !
@@ -277,7 +277,7 @@
   call Comm_Mod_Exchange_Real(grid, pp % n)
 
   ! User function
-  call User_Mod_End_Of_Compute_Pressure(flow, dt, ini)
+  call User_Mod_End_Of_Compute_Pressure(flow, mult, dt, ini)
 
   call Cpu_Timer_Mod_Stop('Compute_Pressure (without solvers)')
 

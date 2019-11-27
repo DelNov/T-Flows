@@ -70,6 +70,8 @@
 ! 
 !==============================================================================!
 
+  call Cpu_Timer_Mod_Start('Compute_Energy (without solvers)')
+
   ! Take aliases
   grid   => flow % pnt_grid
   m_flux => flow % m_flux
@@ -78,12 +80,12 @@
   call Turb_Mod_Alias_Heat_Fluxes(turb, ut, vt, wt)
   call Solver_Mod_Alias_System   (sol, a, b)
 
+  ! User function
+  call User_Mod_Beginning_Of_Compute_Energy(flow, turb, mult, dt, ini)
+
   ! Initialize matrix and right hand side
   a % val(:) = 0.0
   b      (:) = 0.0
-
-  ! User function
-  call User_Mod_Beginning_Of_Compute_Energy(flow, dt, ini)
 
   ! Old values (o and oo)
   if(ini .eq. 1) then
@@ -293,6 +295,7 @@
   call Numerics_Mod_Under_Relax(t, sol)
 
   ! Call linear solver to solve the equations
+  call Cpu_Timer_Mod_Start('Linear_Solver_For_Energy')
   call Bicg(sol,          &
             t % n,        &
             b,            &
@@ -301,6 +304,7 @@
             exec_iter,    &
             t % tol,      &
             t % res)
+  call Cpu_Timer_Mod_Stop('Linear_Solver_For_Energy')
 
   ! Print some info on the screen
   call Info_Mod_Iter_Fill_At(1, 6, t % name, exec_iter, t % res)
@@ -308,6 +312,8 @@
   call Comm_Mod_Exchange_Real(grid, t % n)
 
   ! User function
-  call User_Mod_End_Of_Compute_Energy(flow, dt, ini)
+  call User_Mod_End_Of_Compute_Energy(flow, turb, mult, dt, ini)
+
+  call Cpu_Timer_Mod_Stop('Compute_Energy (without solvers)')
 
   end subroutine
