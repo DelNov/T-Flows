@@ -9,8 +9,8 @@
   !----------------------------------------!
   !   A few handy mathematical constants   !
   !----------------------------------------!
-  real,    parameter :: HUGE = 1.e+30
-  real,    parameter :: TINY = 1.e-30
+  real,    parameter :: HUGE     = 1.e+30
+  real,    parameter :: TINY     = 1.e-30
   integer, parameter :: HUGE_INT = 9223372036854775807
 
   ! Big and small numbers in metric system
