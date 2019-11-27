@@ -30,7 +30,7 @@
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: c, c1, c2, s
-  real                       :: a12, cfl_max, pe_max, a1_0, a2_0
+  real                       :: cfl_max, pe_max
   real                       :: cfl_t, pe_t, mass_err
   real                       :: dens_const, visc_const
 !==============================================================================!
