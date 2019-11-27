@@ -39,9 +39,6 @@
   real                       :: px_f, py_f, pz_f
   character(len=80)          :: solver
   real                       :: p_max, p_min, p_nor, p_nor_c
-  real                       :: a1_in, a2_in, u_fo, v_fo, w_fo
-  real                       :: dens_const, dotprod, stens_source, delta_star
-  real                       :: cf,df
 !==============================================================================!
 !
 !   The form of equations which I am solving:
