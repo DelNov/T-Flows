@@ -190,7 +190,7 @@ ifneq ($(DIR_CASE), no)
 
       # Append "../" to each of the file names
       SRC_USR = $(patsubst %.f90, ../%.f90, $(STEP_A))
-      $(info  $(SRC_USR))
+      $(info $(SRC_USR))
 
       ifneq ("$(wildcard $(STEP_A))","")
         # Make soft links
