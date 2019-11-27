@@ -9,7 +9,7 @@
   use Cpu_Timer_Mod,  only: Cpu_Timer_Mod_Start, Cpu_Timer_Mod_Stop
   use Field_Mod,      only: Field_Type, buoyancy, t_ref,  &
                             grav_x, grav_y, grav_z,       &
-                            density, viscosity
+                            density
   use Turb_Mod
   use Multiphase_Mod, only: Multiphase_Type, &
                             Multiphase_Mod_Vof_Surface_Tension_Contribution,  &
@@ -43,11 +43,11 @@
   real,              pointer :: ui_i(:), ui_j(:), ui_k(:), uj_i(:), uk_i(:)
   real,              pointer :: si(:), sj(:), sk(:), di(:), dj(:), dk(:)
   real,              pointer :: h_i(:)
-  integer                    :: s, c, c1, c2, ci, exec_iter
+  integer                    :: s, c, c1, c2, exec_iter
   real                       :: f_ex, f_im, f_stress
   real                       :: vel_max
   real                       :: a0, a12, a21
-  real                       :: vis_eff, vis_tur
+  real                       :: vis_eff
   real                       :: ui_i_f, ui_j_f, ui_k_f, uj_i_f, uk_i_f
   real                       :: grav_i, p_drop_i
   real                       :: ui_si, ui_di
@@ -314,7 +314,7 @@
   !   Surface tension contribution   !
   !----------------------------------!
   if(multiphase_model .eq. VOLUME_OF_FLUID) then
-    call Multiphase_Mod_Vof_Momentum_Contribution(mult, i, b, dt)
+    call Multiphase_Mod_Vof_Momentum_Contribution(mult, i, b)
   end if
 
   !----------------------------------------!

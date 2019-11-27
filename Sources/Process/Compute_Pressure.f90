@@ -213,9 +213,7 @@
   !-------------------------------------------------------------!
 
   if(multiphase_model .eq. VOLUME_OF_FLUID) then
-
-    call Multiphase_Mod_Vof_Pressure_Correction(mult, sol, dt)
-    
+    call Multiphase_Mod_Vof_Pressure_Correction(mult, sol)
   end if
 
   mass_err = 0.0
