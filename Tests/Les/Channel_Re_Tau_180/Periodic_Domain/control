@@ -1,0 +1,73 @@
+Prologue
+
+ PROBLEM_NAME    chan
+
+ HEAT_TRANSFER   yes
+
+ TIME_STEP                            0.05
+ NUMBER_OF_TIME_STEPS                 18000
+ STARTING_TIME_STEP_FOR_STATISTICS    10000
+
+ RESULTS_SAVE_INTERVAL     1800
+ BACKUP_SAVE_INTERVAL      1800
+
+# LOAD_BACKUP_NAME          chan-ts012985.backup
+
+#-------------------
+# Monitoring points 
+#-------------------
+ NUMBER_OF_MONITORING_POINTS    1
+ MONITORING_POINT_001           0.5  0.5  1.0
+ POINT_FOR_MONITORING_PLANES    0.5  0.5  0.5
+
+#-----------------
+# Physical models
+#-----------------
+ MASS_DENSITY           1.0
+ THERMAL_CONDUCTIVITY   4.70e-4
+ DYNAMIC_VISCOSITY      3.33333e-4
+ HEAT_CAPACITY          1.0
+
+ TURBULENCE_MODEL    les_dynamic
+
+ PRESSURE_DROPS     0.0036   0.0   0.0
+ MASS_FLOW_RATES    7.28     0.0   0.0
+
+#----------------------
+# Numerical parameters
+#----------------------
+ PRESSURE_MOMENTUM_COUPLING    simple
+
+ SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.8
+ SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.8
+ SIMPLE_UNDERRELAXATION_FOR_ENERGY      0.6
+
+ TIME_INTEGRATION_SCHEME  parabolic
+
+ ADVECTION_SCHEME_FOR_MOMENTUM    central
+ ADVECTION_SCHEME_FOR_ENERGY      smart
+
+ PRECONDITIONER_FOR_SYSTEM_MATRIX    incomplete_cholesky
+
+ TOLERANCE_FOR_MOMENTUM_SOLVER     1.e-4
+ TOLERANCE_FOR_PRESSURE_SOLVER     1.e-4
+ TOLERANCE_FOR_ENERGY_SOLVER       1.e-4
+ TOLERANCE_FOR_SIMPLE_ALGORITHM    1.e-3
+
+ MAX_ITERATIONS_FOR_PRESSURE_SOLVER   240
+
+#--------------------
+# Initial conditions
+#--------------------
+  INITIAL_CONDITION
+    VARIABLES           u     v     w     t 
+    VALUES              1.0   0.0   0.0   20.0
+
+#---------------------
+# Boundary conditions
+#---------------------
+  BOUNDARY_CONDITION    wall
+
+    TYPE                wall_flux
+    VARIABLES           u     v     w     q
+    VALUES              0.0   0.0   0.0   0.1
