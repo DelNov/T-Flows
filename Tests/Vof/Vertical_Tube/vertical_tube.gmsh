@@ -14,8 +14,8 @@ PI = Acos(-1);
 //--------------------------------------
 D   =   1.0;     // cylinder diameter
 H   =   D * PI;  // cylinder height
-N_C = 120;       // number of cells in circumferential direction
-N_H = 120;       // number of cells in z direction (height)
+N_C =  80;       // number of cells in circumferential direction
+N_H =  80;       // number of cells in z direction (height)
 
 // Computed parameters
 delta = D * PI / N_C;
