@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Impinging_Jet_Nu(flow, save_name)     
+  subroutine User_Mod_Impinging_Jet_Nu(turb)
 !------------------------------------------------------------------------------!
 !   The subroutine creates ASCII file with Nusselt number averaged             !
 !   in azimuthal direction.                                                    !
@@ -8,41 +8,45 @@
   use Field_Mod, only: Field_Type,  &
                        viscosity, density, conductivity, heat_transfer
   use Var_Mod,   only: Var_Type
-  use Rans_Mod
+  use Turb_Mod,  only: Turb_Type
   use Comm_Mod                       ! parallel stuff
-  use Name_Mod,  only: problem_name
+  use File_Mod,  only: problem_name
   use Const_Mod                      ! constants
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
-  character(len=*)         :: save_name
+  type(Turb_Type), target :: turb
 !-----------------------------------[Locals]-----------------------------------!
-  type(Var_Type),  pointer :: u, v, w, t
-  type(Grid_Type), pointer :: grid
-  integer                  :: n_prob, pl, i, count, s, c1, c2
-  character(len=80)        :: res_name, store_name
-  real, allocatable        :: z_p(:),                              &
-                              um_p(:), vm_p(:), wm_p(:), tm_p(:),  &
-                              uu_p(:), vv_p(:), ww_p(:),           &
-                              uv_p(:), uw_p(:), vw_p(:),           &
-                              v1_p(:), v2_p(:), v3_p(:),           &
-                              v4_p(:), v5_p(:), v6_p(:),           &
-                              rm_p(:), rad_1(:),                   &
-                              ind(:)
-  integer,allocatable      :: n_p(:), n_count(:)
-  real                     :: r
-  logical                  :: there
+  type(Grid_Type),  pointer :: grid
+  type(Field_Type), pointer :: flow
+  type(Var_Type),   pointer :: u, v, w, t
+  type(Var_Type),   pointer :: kin, eps, zeta, f22
+  integer                   :: n_prob, pl, i, count, s, c1, c2, fu
+  character(len=80)         :: res_name
+  real, allocatable         :: z_p(:),                              &
+                               um_p(:), vm_p(:), wm_p(:), tm_p(:),  &
+                               v1_p(:), v2_p(:), v3_p(:),           &
+                               v4_p(:), v5_p(:), v6_p(:),           &
+                               rm_p(:), rad_1(:),                   &
+                               ind(:)
+  integer, allocatable      :: n_p(:), n_count(:)
+  real                      :: r
+  logical                   :: there
 !==============================================================================!
 
   ! Take aliases
+  flow => turb % pnt_flow
   grid => flow % pnt_grid
   u    => flow % u
   v    => flow % v
   w    => flow % w
   t    => flow % t
+  kin  => turb % kin
+  eps  => turb % eps
+  zeta => turb % zeta
+  f22  => turb % f22
 
-  inquire( file='rad_coordinate.dat', exist=there ) 
+  inquire(file='rad_coordinate.dat', exist=there)
   if(.not.there) then
     if(this_proc < 2) then
       print *, "#=========================================================="
@@ -92,7 +96,7 @@
 
   if(heat_transfer) then
     allocate(tm_p(n_prob));   tm_p=0.0
-  end if  
+  end if
 
   !-------------------------!
   !   Average the results   !
@@ -121,8 +125,8 @@
             wm_p(i) = wm_p(i) +   w % n(c1)
             tm_p(i) = tm_p(i) + t % n(c2) 
             v1_p(i) = v1_p(i) + grid % zc(c1)
-            v2_p(i) = v2_p(i) + sqrt(tau_wall(c1))
-            v3_p(i) = v3_p(i) + (c_mu**0.25 * kin % n(c1)**0.5) 
+            v2_p(i) = v2_p(i) + sqrt(turb % tau_wall(c1))
+            v3_p(i) = v3_p(i) + (c_mu**0.25 * kin % n(c1)**0.5)
             v4_p(i) = v4_p(i) + kin % n(c1)
             v5_p(i) = v5_p(i) + eps % n(c1)
             v6_p(i) = v6_p(i) + t % q(c2)
@@ -171,25 +175,26 @@
   end do
   call Comm_Mod_Wait
 
-    ! Set the file name
-    store_name = problem_name
-    problem_name = save_name
-    call Name_File(0, res_name, '-nu-utau.dat')
-    open(3, file = res_name)
-    problem_name = store_name
+  if(this_proc < 2) then
 
-  write(3,*) '# Xrad, Nu, Utau, Yplus, Temp, Numb of points '
-  do i = 1, n_prob
-    if(n_count(i) .ne. 0) then
-      write(3,'(5e11.3,i6)') rm_p(i)/2.0,                                &
-                             2.0*v6_p(i)/(conductivity*(tm_p(i)-20.0)),  & 
-                             v2_p(i),                                    &
-                             v2_p(i) * v1_p(i)/viscosity,                &
-                             tm_p(i),                                    &
-                             n_count(i)
-    end if
-  end do
-  close(3)
+    ! Set the file name
+    call File_Mod_Set_Name(res_name, appendix='-nu-utau', extension='.dat')
+    call File_Mod_Open_File_For_Writing(res_name, fu)
+
+    ! Write the file out
+    write(fu, *) '# Xrad, Nu, Utau, Yplus, Temp, Numb of points '
+    do i = 1, n_prob
+      if(n_count(i) .ne. 0) then
+        write(fu, '(5e11.3,i6)') rm_p(i)/2.0,                                &
+                                 2.0*v6_p(i)/(conductivity*(tm_p(i)-20.0)),  &
+                                 v2_p(i),                                    &
+                                 v2_p(i) * v1_p(i)/viscosity(1),             &
+                                 tm_p(i),                                    &
+                                 n_count(i)
+      end if
+    end do
+    close(fu)
+  end if
 
   deallocate(n_p)
   deallocate(um_p)
