@@ -29,7 +29,7 @@
   type(Face_Type), pointer :: flux
   integer                  :: n_prob, pl, c, i, count, s, c1, c2, n_points
   character(len=80)        :: coord_name, res_name, res_name_plus
-  real,allocatable         :: z_p(:), ind(:), wall_p(:),                 &
+  real, allocatable        :: z_p(:), ind(:), wall_p(:),                 &
                               u_p(:), v_p(:), w_p(:), y_plus_p(:),       &
                               kin_p(:), eps_p(:), uw_p(:), uw_mod_p(:),  &
                               uu_p(:), vv_p(:), ww_p(:), vis_t_p(:),     &
@@ -53,7 +53,7 @@
   ! Set the name for coordinate file
   call File_Mod_Set_Name(coord_name, extension='.1d')
 
-  ! Store the name
+  ! Set file names for results
   call File_Mod_Set_Name(res_name,      appendix='-res',      extension='.dat')
   call File_Mod_Set_Name(res_name_plus, appendix='-res-plus', extension='.dat')
 
@@ -112,7 +112,7 @@
   allocate(vis_t_p (n_prob));  vis_t_p  = 0.0
   allocate(y_plus_p(n_prob));  y_plus_p = 0.0
 
-  allocate(n_count(n_prob)); n_count=0
+  allocate(n_count(n_prob)); n_count = 0
   count = 0
   if(heat_transfer) then
     allocate(t_p (n_prob));  t_p  = 0.0
@@ -162,7 +162,7 @@
                             - turb % w_mean(c) * turb % t_mean(c)
         end if
         n_count(i) = n_count(i) + 1
-      end if 
+      end if
     end do
   end do
 
@@ -311,7 +311,7 @@
     '#', 'Cf_error = ', error, ' %', 'Dean formula is used.'
     if(heat_transfer) then
       write(i,'(a1,(a12, f12.6))')'#', 'Nu number =', nu_mean 
-      write(i,'(a1,(a12, f12.6,a2,A39))')'#', 'Nu_error  =', &
+      write(i,'(a1,(a12, f12.6,a2,a39))')'#', 'Nu_error  =', &
             abs(0.023*0.5*re**0.8*pr**0.4 - nu_mean)          &
             / (0.023*0.5*re**0.8*pr**0.4) * 100.0, ' %',     &
             'correlation of Dittus-Boelter is used.' 
@@ -374,12 +374,12 @@
     v_p   (i) = v_p(i) / u_tau_p
     w_p   (i) = w_p(i) / u_tau_p
 
-    kin_p   (i) = kin_p(i) / u_tau_p**2                             ! kin % n(c)
-    eps_p   (i) = eps_p(i)*visc_const / (u_tau_p**4 * dens_const)   ! eps % n(c)
-    uu_p    (i) = uu_p (i) / (u_tau_p**2)
-    vv_p    (i) = vv_p (i) / (u_tau_p**2)
-    ww_p    (i) = ww_p (i) / (u_tau_p**2)
-    uw_p    (i) = uw_p (i) / (u_tau_p**2)
+    kin_p (i) = kin_p(i) / u_tau_p**2                              ! kin % n(c)
+    eps_p (i) = eps_p(i) * visc_const / (u_tau_p**4 * dens_const)  ! eps % n(c)
+    uu_p  (i) = uu_p (i) / (u_tau_p**2)
+    vv_p  (i) = vv_p (i) / (u_tau_p**2)
+    ww_p  (i) = ww_p (i) / (u_tau_p**2)
+    uw_p  (i) = uw_p (i) / (u_tau_p**2)
     uw_mod_p(i) = uw_p (i) / (u_tau_p**2)
 
     if(heat_transfer) then
