@@ -16,8 +16,9 @@
   type(Turb_Type),   target :: turb
   type(Solver_Type), target :: sol
 !---------------------------------[Calling]------------------------------------!
-  real :: Y_Plus_Low_Re
   real :: Roughness_Coefficient
+  real :: Tau_Wall_Low_Re
+  real :: Y_Plus_Low_Re
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
@@ -26,7 +27,7 @@
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: s, c, c1, c2, j
-  real                       :: u_tan, u_tau, tau_wall
+  real                       :: u_tan, u_tau
   real                       :: re_t, f_mu, u_tau_new, fa, kin_vis
   real                       :: eps_wf, eps_int, ebf, y_star
   real                       :: z_o
@@ -114,10 +115,13 @@
                                             grid % wall_dist(c1),  &
                                             kin_vis)
 
-          tau_wall = density(c1)*kappa*u_tau*u_tan   &
-                   / log(e_log * max(turb % y_plus(c1), 1.05))
+          turb % tau_wall(c1) = Tau_Wall_Low_Re(turb,               &
+                                                density(c1),        &
+                                                u_tau,              &
+                                                u_tan,              &
+                                                turb % y_plus(c1))
 
-          u_tau_new = sqrt(tau_wall/density(c1))
+          u_tau_new = sqrt(turb % tau_wall(c1)/density(c1))
           turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
                                             u_tau_new,             &
                                             grid % wall_dist(c1),  &

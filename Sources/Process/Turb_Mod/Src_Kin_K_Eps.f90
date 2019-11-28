@@ -8,8 +8,11 @@
   type(Turb_Type),   target :: turb
   type(Solver_Type), target :: sol
 !---------------------------------[Calling]------------------------------------!
-  real :: Y_Plus_Low_Re
   real :: Roughness_Coefficient
+  real :: Tau_Wall_Low_Re
+  real :: Tau_Wall_Rough_Walls
+  real :: Y_Plus_Low_Re
+  real :: Y_Plus_Rough_Walls
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
@@ -18,7 +21,7 @@
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: c, c1, c2, s
-  real                       :: u_tan, u_tau, tau_wall
+  real                       :: u_tan, u_tau
   real                       :: kin_vis  ! [m^2/s]
   real                       :: ebf, p_kin_int, p_kin_wf
   real                       :: z_o
@@ -86,13 +89,20 @@
         if(turb % rough_walls) then
           z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
           u_tau = c_mu25 * sqrt(kin % n(c1))
-          turb % y_plus(c1) = u_tau * (grid % wall_dist(c1) + z_o) &
-                            / kin_vis
 
-          tau_wall = density(c1) * kappa * u_tau * u_tan  &
-                   / log(((grid % wall_dist(c1)+z_o) / z_o))
+          turb % y_plus(c1) = Y_Plus_Rough_Walls(turb,                  &
+                                                 u_tau,                 &
+                                                 grid % wall_dist(c1),  &
+                                                 kin_vis)
 
-          turb % p_kin(c1) = tau_wall * c_mu25 * sqrt(kin % n(c1))   &
+          turb % tau_wall(c1) = Tau_Wall_Rough_Walls(turb,                  &
+                                                     density(c1),           &
+                                                     u_tau,                 &
+                                                     u_tan,                 &
+                                                     grid % wall_dist(c1),  &
+                                                     z_o)
+
+          turb % p_kin(c1) = turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
                            / (kappa*(grid % wall_dist(c1) + z_o))
           b(c1) = b(c1)                                                        &
                 + (turb % p_kin(c1) - turb % vis_t(c1) * flow % shear(c1)**2)  &
@@ -104,13 +114,16 @@
                                             grid % wall_dist(c1),  &
                                             kin_vis)
 
-          tau_wall = density(c1)*kappa*u_tau*u_tan   &
-                   / log(e_log * max(turb % y_plus(c1), 1.05))
+          turb % tau_wall(c1) = Tau_Wall_Low_Re(turb,               &
+                                                density(c1),        &
+                                                u_tau,              &
+                                                u_tan,              &
+                                                turb % y_plus(c1))
 
           ebf = 0.01 * turb % y_plus(c1)**4  &
                      / (1.0 + 5.0 * turb % y_plus(c1))
 
-          p_kin_wf  = tau_wall * c_mu25 * sqrt(kin % n(c1))  &
+          p_kin_wf  = turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
                     / (grid % wall_dist(c1) * kappa)
 
           p_kin_int = turb % vis_t(c1) * flow % shear(c1)**2
