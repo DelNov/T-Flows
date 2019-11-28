@@ -28,7 +28,6 @@
   type(Bulk_Type), pointer :: bulk
   integer                  :: n_prob, pl, c, i, count, s, c1, c2, n_points
   character(len=80)        :: coord_name, res_name, res_name_plus
-  character(len=80)        :: store_name
   real, allocatable        :: z_p(:), u_p(:), v_p(:), w_p(:), t_p(:),  &
                               ind(:),  wall_p(:), kin_p(:), eps_p(:),  &
                               uw_p(:), uu_p(:), vv_p(:), ww_p(:),      &
@@ -52,7 +51,7 @@
   ! Set the name for coordinate file
   call File_Mod_Set_Name(coord_name, extension='.1d')
 
-  ! Store the name
+  ! Set names for result files
   call File_Mod_Set_Name(res_name,      appendix='-res',      extension='.dat')
   call File_Mod_Set_Name(res_name_plus, appendix='-res-plus', extension='.dat')
 
@@ -405,8 +404,5 @@
   end if
 
   if(this_proc < 2)  print *, '# Finished with User_Mod_Save_Results.f90.'
-
-  ! Restore the name
-  problem_name = store_name
 
   end subroutine

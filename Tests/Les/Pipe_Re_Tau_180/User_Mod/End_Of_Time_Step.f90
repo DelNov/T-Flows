@@ -1,24 +1,23 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Time_Step(flow, turb, swarm, n, time)
+  subroutine User_Mod_End_Of_Time_Step(flow, turb, mult, swarm, n, time)
 !------------------------------------------------------------------------------!
 !   This function is called at the beginning of time step.                     !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod,  only: Grid_Type
-  use Field_Mod, only: Field_Type,  &
-                       viscosity, density, conductivity, heat_transfer
+  use Field_Mod, only: Field_Type
   use Var_Mod,   only: Var_Type
   use Const_Mod, only: PI
   use Comm_Mod,  only: Comm_Mod_Global_Max_Real, this_proc
-  use Save_Results_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
-  type(Turb_Type),  target :: turb
-  type(Swarm_Type), target :: swarm
-  integer                  :: n     ! time step
-  real                     :: time  ! physical time
+  type(Field_Type),       target :: flow
+  type(Turb_Type),        target :: turb
+  type(Multiphase_Type),  target :: mult
+  type(Swarm_Type),       target :: swarm
+  integer                        :: n     ! time step
+  real                           :: time  ! physical time
 !----------------------------------[Locals]------------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
   type(Grid_Type), pointer :: grid

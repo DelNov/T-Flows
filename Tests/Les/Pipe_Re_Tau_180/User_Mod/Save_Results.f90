@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(flow, turb, save_name) 
+  subroutine User_Mod_Save_Results(flow, turb, mult, n)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
@@ -9,19 +9,19 @@
   use Const_Mod                      ! constants
   use Comm_Mod                       ! parallel stuff
   use Grid_Mod,  only: Grid_Type
-  use Field_Mod, only: Field_Type, heat_transfer, heat_flux, heat, &
-                       density, viscosity, capacity, conductivity, &
-                       heated_area 
+  use Field_Mod, only: Field_Type, heat_transfer,                  &
+                       capacity, conductivity
   use Bulk_Mod,  only: Bulk_Type
   use Var_Mod,   only: Var_Type
-  use Name_Mod,  only: problem_name
+  use File_Mod
   use Turb_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
-  type(Turb_Type),  target :: turb
-  character(len=*)         :: save_name
+  type(Field_Type),       target :: flow
+  type(Turb_Type),        target :: turb
+  type(Multiphase_Type),  target :: mult
+  integer                        :: n
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
   type(Grid_Type), pointer :: grid
@@ -47,15 +47,15 @@
   call Field_Mod_Alias_Momentum(flow, u, v, w)
   call Field_Mod_Alias_Energy  (flow, t)
 
+  call Control_Mod_Dynamic_Viscosity(visc_const)
+  call Control_Mod_Mass_Density     (dens_const)
+
   ! Set the name for coordinate file
-  call Name_File(0, coord_name, ".1r")
+  call File_Mod_Set_Name(coord_name, extension='.1d')
 
-  ! Store the name
-  store_name = problem_name
-  problem_name = save_name
-
-  call Name_File(0, res_name,      "-res.dat")
-  call Name_File(0, res_name_plus, "-res-plus.dat")
+  ! Set names for result files
+  call File_Mod_Set_Name(res_name,      appendix='-res',      extension='.dat')
+  call File_Mod_Set_Name(res_name_plus, appendix='-res-plus', extension='.dat')
 
   !------------------!
   !   Read 1d file   !
@@ -75,9 +75,6 @@
       print *, '# ... '
       print *, '#--------------------------------------------------------------'
     end if
-
-    ! Restore the name and return
-    problem_name = store_name
     return
   end if
 
@@ -230,9 +227,6 @@
     if(this_proc < 2) then
       write(*,*) '# Friction velocity is zero in Save_Results.f90!'
     end if
-
-    ! Restore the name and return
-    problem_name = store_name
     return
   end if
 
@@ -426,8 +420,5 @@
   end if
 
   if(this_proc < 2)  print *, '# Finished with User_Mod_Save_Results.f90.'
-
-  ! Restore the name
-  problem_name = store_name
 
   end subroutine

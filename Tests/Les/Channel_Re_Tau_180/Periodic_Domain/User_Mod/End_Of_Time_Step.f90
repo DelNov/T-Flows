@@ -5,8 +5,7 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod,  only: Grid_Type
-  use Field_Mod, only: Field_Type,  &
-                       viscosity, density, conductivity, heat_transfer
+  use Field_Mod, only: Field_Type
   use Var_Mod,   only: Var_Type
   use Const_Mod, only: PI
   use Comm_Mod,  only: Comm_Mod_Global_Max_Real, this_proc
