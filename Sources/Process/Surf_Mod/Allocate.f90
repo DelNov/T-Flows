@@ -8,7 +8,7 @@
   type(Surf_Type),  target :: surf
   type(Field_Type), target :: flow
 !----------------------------------[Locals]------------------------------------!
-  integer :: v, e
+  integer :: v, e, s
 !==============================================================================!
 
   ! Take aliases to object vertex flow around
@@ -28,7 +28,8 @@
   !-----------------------------!
   !   Initialize all elements   !
   !-----------------------------!
-  do e = 1, surf % n_elems
+  allocate(surf % elem(MAX_SURFACE_ELEMENTS))
+  do e = 1, MAX_SURFACE_ELEMENTS
     surf % elem(e) % nne = 0
     surf % elem(e) %   i = 0
     surf % elem(e) %   j = 0
@@ -40,13 +41,15 @@
     surf % elem(e) %  sj = 0
     surf % elem(e) %  sk = 0
   end do
+  surf % n_elems = 0
 
   !-----------------------------!
   !   Initialize all vertices   !
   !-----------------------------!
-  do v = 1, surf % n_verts
+  allocate(surf % vert(MAX_SURFACE_VERTICES))
+  do v = 1, MAX_SURFACE_VERTICES
 
-    surf % vert(e) % nne = 0
+    surf % vert(v) % nne = 0
 
     ! Set initial velocity to zero
     surf % vert(v) % u = 0.0
@@ -78,5 +81,23 @@
     surf % vert(v) % buff = 0
 
   end do
+  surf % n_verts = 0
+
+  !--------------------------!
+  !   Initialize all sides   !
+  !--------------------------!
+  allocate(surf % side(MAX_SURFACE_ELEMENTS * 3))
+  do s = 1, MAX_SURFACE_ELEMENTS * 3
+    surf % side(s) % a        = 0
+    surf % side(s) % b        = 0
+    surf % side(s) % c        = 0
+    surf % side(s) % d        = 0
+    surf % side(s) % ei       = 0
+    surf % side(s) % ea       = 0
+    surf % side(s) % eb       = 0
+    surf % side(s) % length   = 0.0
+    surf % side(s) % boundary = .false.
+  end do
+  surf % n_sides = 0
 
   end subroutine
