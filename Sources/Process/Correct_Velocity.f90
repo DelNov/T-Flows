@@ -10,7 +10,7 @@
   use Field_Mod,     only: Field_Type, viscosity, density
   use Grid_Mod,      only: Grid_Type
   use Bulk_Mod,      only: Bulk_Type
-  use Info_Mod
+  use Info_Mod,      only: Info_Mod_Iter_Fill_At, Info_Mod_Bulk_Fill
   use Solver_Mod,    only: Solver_Type
   use Matrix_Mod,    only: Matrix_Type
   use Numerics_Mod
