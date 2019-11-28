@@ -53,14 +53,14 @@
     ! Volume expansion coefficient
     real :: beta
 
+    ! Heat flux to the domain (important for periodic case with heat transfer)
+    real :: heat_flux, heated_area, heat
+
   end type
 
   ! Variables determining if we are dealing with heat transfer and buoyancy
   logical :: heat_transfer
   logical :: buoyancy
-
-  ! Heat flux to the domain (important for periodic case with heat transfer)
-  real :: heat_flux, heated_area, heat
 
   ! Physical properties
   real :: conductivity, diffusivity, capacity

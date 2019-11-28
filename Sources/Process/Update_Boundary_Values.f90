@@ -6,9 +6,8 @@
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
   use Comm_Mod
-  use Field_Mod,   only: Field_Type, heat_transfer, heated_area,     &
-                         density, viscosity, capacity, conductivity, &
-                         heat_flux, heat, diffusivity
+  use Field_Mod,   only: Field_Type, heat_transfer, diffusivity,     &
+                         density, viscosity, capacity, conductivity
   use Turb_Mod
   use Grid_Mod
   use Control_Mod
@@ -43,9 +42,9 @@
   call Turb_Mod_Alias_T2          (turb, t2)
 
   if(heat_transfer) then
-    heat        = 0.0     ! [W]
-    heat_flux   = 0.0     ! [W/m^2]
-    heated_area = 0.0
+    flow % heat        = 0.0     ! [W]
+    flow % heat_flux   = 0.0     ! [W/m^2]
+    flow % heated_area = 0.0
     ! Take (default) turbulent Prandtl number from control file
     call Control_Mod_Turbulent_Prandtl_Number(pr_t)
   end if
@@ -193,13 +192,17 @@
           if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
             t % n(c2) = t % n(c1) + t % q(c2) * grid % wall_dist(c1)  &
                       / (turb % con_w(c1) + TINY)
-            heat = heat + t % q(c2) * grid % s(s)
-            if(abs(t % q(c2)) > TINY) heated_area = heated_area + grid % s(s)
+            flow % heat = flow % heat + t % q(c2) * grid % s(s)
+            if(abs(t % q(c2)) > TINY) then
+              flow % heated_area = flow % heated_area + grid % s(s)
+            end if
           else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) then
             t % q(c2) = ( t % n(c2) - t % n(c1) ) * turb % con_w(c1)  &
                       / grid % wall_dist(c1)
-            heat = heat + t % q(c2) * grid % s(s)
-            if(abs(t % q(c2)) > TINY) heated_area = heated_area + grid % s(s)
+            flow % heat = flow % heat + t % q(c2) * grid % s(s)
+            if(abs(t % q(c2)) > TINY) then
+              flow % heated_area = flow % heated_area + grid % s(s)
+            end if
           end if
 
         ! Wall temperature or heat fluxes for other trubulence models
@@ -207,13 +210,17 @@
           if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
             t % n(c2) = t % n(c1) + t % q(c2) * grid % wall_dist(c1)  &
                       / conductivity
-            heat = heat + t % q(c2) * grid % s(s)
-            if(abs(t % q(c2)) > TINY) heated_area = heated_area + grid % s(s)
+            flow % heat = flow % heat + t % q(c2) * grid % s(s)
+            if(abs(t % q(c2)) > TINY) then
+              flow % heated_area = flow % heated_area + grid % s(s)
+            end if
           else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) then
             t % q(c2) = ( t % n(c2) - t % n(c1) ) * conductivity  &
                       / grid % wall_dist(c1)
-            heat = heat + t % q(c2) * grid % s(s)
-            if(abs(t % q(c2)) > TINY) heated_area = heated_area + grid % s(s)
+            flow % heat = flow % heat + t % q(c2) * grid % s(s)
+            if(abs(t % q(c2)) > TINY) then
+              flow % heated_area = flow % heated_area + grid % s(s)
+            end if
           end if
         end if
       end if ! heat_transfer
@@ -274,9 +281,9 @@
 
   ! Integrate (summ) heated area, and heat up
   if(heat_transfer) then
-    call Comm_Mod_Global_Sum_Real(heat)
-    call Comm_Mod_Global_Sum_Real(heated_area)
-    heat_flux = heat / max(heated_area, TINY)
+    call Comm_Mod_Global_Sum_Real(flow % heat)
+    call Comm_Mod_Global_Sum_Real(flow % heated_area)
+    flow % heat_flux = flow % heat / max(flow % heated_area, TINY)
   end if
 
   !-------------!
