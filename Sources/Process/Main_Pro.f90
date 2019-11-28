@@ -110,7 +110,6 @@
   call Turb_Mod_Allocate(turb, flow)
   call Swarm_Mod_Allocate(swarm, flow)
   call Multiphase_Mod_Allocate(mult, flow)
-  call Surf_Mod_Allocate(surf, flow)
   call User_Mod_Allocate(grid)
 
   ! Read numerical models from control file (after the memory is allocated)
@@ -176,10 +175,6 @@
   !               !
   !---------------!
 
-  ! call Surf_Mod_Place_At_Var_Value(surf, flow % t, 0.5001)
-  ! call Save_Surf(surf, 'surface')
-  ! stop
-
   call Control_Mod_Time_Step(flow % dt, verbose=.true.)
   call Control_Mod_Backup_Save_Interval (bsi,    verbose=.true.)
   call Control_Mod_Results_Save_Interval(rsi,    verbose=.true.)
@@ -233,6 +228,7 @@
       call Update_Boundary_Values(flow, turb, mult)
       call Multiphase_Mod_Compute_Vof(mult, sol, flow % dt, n)
       call Multiphase_Mod_Update_Physical_Properties(mult)
+
     end if
 
     do ini = 1, max_ini
@@ -335,6 +331,17 @@
       call Save_Results(flow, turb, mult, n, .true.)   ! save inside
       call Save_Results(flow, turb, mult, n, .false.)  ! save bnd
       call Save_Swarm(swarm, n)
+
+      if(multiphase_model .eq. VOLUME_OF_FLUID) then
+        call Surf_Mod_Allocate(surf, flow)
+        call Surf_Mod_Place_At_Var_Value(surf,        &
+                                         mult % vof,  &
+                                         sol,         &
+                                         0.5,         &
+                                         .false.)  ! don't print messages
+        call Save_Surf(surf, n)
+        call Surf_Mod_Clean(surf)
+      end if
 
       ! Write results in user-customized format
       call User_Mod_Save_Results(flow, turb, mult, n)
