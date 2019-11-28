@@ -72,7 +72,7 @@
         w % n(c2) = w % n(c1)
       end if
     end if
-  end do 
+  end do
 
   !----------------------------------------------------------------!
   !   Look at the following equation and you will understand why   !
@@ -92,7 +92,7 @@
                                    * a % val(a % pos(1,s)) 
 
     end if
-  end do                 
+  end do
 
   !-------------------------------------!
   !    Calculate the max mass error     !
