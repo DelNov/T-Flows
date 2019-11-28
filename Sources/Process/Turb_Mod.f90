@@ -107,6 +107,8 @@
     real, allocatable :: vis_t_eff(:)
     real, allocatable :: vis_t_sgs(:)
 
+    real, allocatable :: tau_wall(:)
+
     ! Wall viscosity and conductivity (wall function approach)
     real, allocatable :: vis_w(:)
     real, allocatable :: con_w(:)

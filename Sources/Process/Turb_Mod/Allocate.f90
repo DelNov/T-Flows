@@ -27,6 +27,8 @@
   allocate(turb % h_min(-nb:nc));  turb % h_min = 0.
   allocate(turb % h_w  (-nb:nc));  turb % h_w   = 0.
 
+  allocate(turb % tau_wall(-nb:nc));  turb % tau_wall = 0.
+
   !-----------------!
   !   K-eps model   !
   !-----------------!
