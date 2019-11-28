@@ -1,17 +1,16 @@
 #----------
 # Prologue
 #----------
- PROBLEM_NAME     vertical_tube
- HEAT_TRANSFER    no
+ PROBLEM_NAME      vertical_tube
+ HEAT_TRANSFER     no
  MULTIPHASE_MODEL  VOLUME_OF_FLUID
 
- NUMBER_OF_TIME_STEPS     1920
+ NUMBER_OF_TIME_STEPS      720
+ RESULTS_SAVE_INTERVAL      15
+ BACKUP_SAVE_INTERVAL      120
 
- RESULTS_SAVE_INTERVAL    48
- BACKUP_SAVE_INTERVAL     48 
+ TIME_STEP   1.5e-2
 
- TIME_STEP               1.5625e-3
-  
 #-------------------
 # Monitoring points 
 #-------------------
@@ -53,10 +52,11 @@
 # Linear solver settings
 #------------------------
  PRECONDITIONER_FOR_SYSTEM_MATRIX   incomplete_cholesky
- TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-6
- TOLERANCE_FOR_PRESSURE_SOLVER      1.e-6
- TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-6
- TOLERANCE_FOR_MULTIPHASE_SOLVER    1.e-6
+ TOLERANCE_FOR_MOMENTUM_SOLVER         1.e-4
+ TOLERANCE_FOR_PRESSURE_SOLVER         1.e-6
+ TOLERANCE_FOR_SIMPLE_ALGORITHM        1.e-4
+ TOLERANCE_FOR_MULTIPHASE_SOLVER       1.e-4
+ MAX_ITERATIONS_FOR_PRESSURE_SOLVER  120
 
 #--------------------
 # Initial conditions
