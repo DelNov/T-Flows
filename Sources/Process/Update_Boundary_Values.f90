@@ -273,11 +273,11 @@
   end do
 
   ! Integrate (summ) heated area, and heat up
- if(heat_transfer) then
-   call Comm_Mod_Global_Sum_Real(heat)
-   call Comm_Mod_Global_Sum_Real(heated_area)
-   heat_flux = heat / max(heated_area, TINY)
- end if
+  if(heat_transfer) then
+    call Comm_Mod_Global_Sum_Real(heat)
+    call Comm_Mod_Global_Sum_Real(heated_area)
+    heat_flux = heat / max(heated_area, TINY)
+  end if
 
   !-------------!
   !   Scalars   !
