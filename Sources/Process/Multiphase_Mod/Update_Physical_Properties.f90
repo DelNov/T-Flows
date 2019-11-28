@@ -32,7 +32,7 @@
 
   ! Density at faces
   do s = 1, grid % n_faces
-    dens_face(s) =        vof_f(s)  * phase_dens(1)   &
+    density_f(s) =        vof_f(s)  * phase_dens(1)   &
                  + (1.0 - vof_f(s)) * phase_dens(2)
   end do
 

@@ -45,7 +45,7 @@
                                     * vof_dist * vof_dist * 16.0
 
         c_d(c1) = c_d(c1) + vof_dist * max(- m_flux % n(s)              &
-                                           / dens_face(s)               &
+                                           / density_f(s)               &
                                            * dt / grid % vol(c1), 0.0)
 
         vof_dist = min(max(vof % n(c2), 0.0),1.0)
@@ -54,7 +54,7 @@
                                     * vof_dist * vof_dist * 16.0    
 
         c_d(c2) = c_d(c2) + vof_dist * max( m_flux % n(s)              &
-                                          / dens_face(s)               &
+                                          / density_f(s)               &
                                           * dt / grid % vol(c2), 0.0)
 
       ! Side is on the boundary
@@ -65,7 +65,7 @@
                                     * vof_dist * vof_dist * 16.0    
 
         c_d(c1) = c_d(c1) + vof_dist * max(- m_flux % n(s)              &
-                                           / dens_face(s)               &
+                                           / density_f(s)               &
                                            * dt / grid % vol(c1), 0.0)
       end if
 
@@ -83,16 +83,16 @@
       
       if (c2 > 0) then
 
-        c_d(c1) = c_d(c1) + max(- m_flux % n(s) / dens_face(s)         &
+        c_d(c1) = c_d(c1) + max(- m_flux % n(s) / density_f(s)         &
                                           * dt / grid % vol(c1), 0.0)
 
-        c_d(c2) = c_d(c2) + max( m_flux % n(s) / dens_face(s)          &
+        c_d(c2) = c_d(c2) + max( m_flux % n(s) / density_f(s)          &
                                           * dt / grid % vol(c2), 0.0)
 
       ! Side is on the boundary
       else ! (c2 < 0)
 
-        c_d(c1) = c_d(c1) + max(- m_flux % n(s) / dens_face(s)         &
+        c_d(c1) = c_d(c1) + max(- m_flux % n(s) / density_f(s)         &
                                           * dt / grid % vol(c1), 0.0)
 
       end if

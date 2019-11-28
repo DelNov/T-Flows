@@ -117,7 +117,7 @@
       b(c) = b(c) / (grid % vol(c) / dt)
     end do
     ! Here volume flux is converted into mass flux:
-    flux % n(:) = flux % n(:) * dens_face(:)
+    flux % n(:) = flux % n(:) * density_f(:)
   else
     do c = 1, grid % n_cells
       b(c) = b(c) / (density(c) * grid % vol(c) / dt)
@@ -139,7 +139,7 @@
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
-    dens_const = dens_face(s)
+    dens_const = density_f(s)
     visc_const =        grid % f(s)  * viscosity(c1)   &
                + (1.0 - grid % f(s)) * viscosity(c2)
     if(c2 > 0) then

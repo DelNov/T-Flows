@@ -64,7 +64,7 @@
 
   ! Physical properties
   real :: conductivity, diffusivity, capacity
-  real, allocatable :: viscosity(:), density(:), dens_face(:)
+  real, allocatable :: viscosity(:), density(:), density_f(:)
 
   ! Angular velocity
   real :: omega_x, omega_y, omega_z, omega

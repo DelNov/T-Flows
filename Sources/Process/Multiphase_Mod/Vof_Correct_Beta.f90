@@ -45,7 +45,7 @@
         delta_alfa = 0.5 * (phi % n(accept) + phi % o(accept)     &
                          - (phi % n(donor) + phi % o(donor)))
 
-        cf = min(max(- phi_flux(s) / dens_face(s)                 &
+        cf = min(max(- phi_flux(s) / density_f(s)                 &
                               * dt / grid % vol(donor),0.0),1.0)
 
         if (phi % n(donor) < 0.0) then

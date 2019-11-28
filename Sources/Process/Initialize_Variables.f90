@@ -7,7 +7,7 @@
   use Const_Mod
   use File_Mod
   use Field_Mod,   only: Field_Type, heat_transfer, density,  &
-                          dens_face
+                          density_f
   use Comm_Mod
   use Turb_Mod
   use Swarm_Mod
@@ -374,7 +374,7 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
     if(c2  < 0) then
-      m_flux % n(s) = dens_face(s) * ( u % n(c2) * grid % sx(s)  &
+      m_flux % n(s) = density_f(s) * ( u % n(c2) * grid % sx(s)  &
                                      + v % n(c2) * grid % sy(s)  &
                                      + w % n(c2) * grid % sz(s) )
 
@@ -418,7 +418,7 @@
       if (multiphase_model .eq. VOLUME_OF_FLUID) then
         ! Needs to be corrected
         print '(a29,es12.5)', ' # Average inflow velocity : ',  &
-          bulk % mass_in / (dens_face(1) * area)
+          bulk % mass_in / (density_f(1) * area)
       else
         print '(a29,es12.5)', ' # Average inflow velocity : ',  &
           bulk % mass_in / (density(1) * area)

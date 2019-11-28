@@ -31,8 +31,8 @@
   ! Allocate memory for mass and volumetric fluxes
   call Face_Mod_Allocate_New_Only   ('M_FLUX', flow % m_flux, grid)
 
-  ! density at cell faces:
-  allocate(dens_face(grid % n_faces))
+  ! Density at cell faces
+  allocate(density_f(grid % n_faces))
 
   !-----------------------------------------!
   !   Enthalpy conservation (temperature)   !
