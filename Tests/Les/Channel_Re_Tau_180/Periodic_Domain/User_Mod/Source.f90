@@ -37,11 +37,11 @@
   t    => flow % t
   bulk => flow % bulk
 
-  !-----------------------------------------------------! 
+  !-----------------------------------------------------!
   !                                                     !
-  !   Set source for temperature of the form:           ! 
+  !   Set source for temperature of the form:           !
   !                                                     !
-  !    /                                                ! 
+  !    /                                                !
   !   |                                                 !
   !   | dT/dx * Ux * dV                                 !
   !   |                                                 !
@@ -49,26 +49,18 @@
   !                                                     !
   ! dT/dx is derived from condition that there is no    !
   ! change of energy in the system. It means            !
-  !   mass_flux * cp * dT - Q * Area = 0,               ! 
-  !   Area = B*dx*Nwall,                                !  
+  !   mass_flux * cp * dT - Q * Area = 0,               !
+  !   Area = B*dx*Nwall,                                !
   !   dT/dx = Q*B*Nwall/(mass_flux*cp),                 !
-  ! where Q is heat flux through the wall, B is         ! 
-  ! channel width and Nwall is number of heated walls.  ! 
+  ! where Q is heat flux through the wall, B is         !
+  ! channel width and Nwall is number of heated walls.  !
   !                                                     !
   !-----------------------------------------------------!
-
-
-
   if( phi % name .eq. 'T' ) then  
 
-    call Comm_Mod_Global_Sum_Real(heat_flux)
-    call Comm_Mod_Global_Sum_Real(heated_area)
-    heat_flux = heat_flux / (heated_area + TINY)
-    heat      = heat_flux * heated_area
-
     do c = 1, grid % n_cells
-      b_vector(c) = b_vector(c)                       &
-                  - PI * 2.0 * heat_flux * u % n(c)   &
+      b_vector(c) = b_vector(c)                              &
+                  - PI * 2.0 * flow % heat_flux * u % n(c)   &
                   / (bulk % flux_x * capacity) * grid % vol(c)
     end do
   end if
