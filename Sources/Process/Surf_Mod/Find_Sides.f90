@@ -1,11 +1,12 @@
 !==============================================================================!
-  subroutine Surf_Mod_Find_Sides(surf)
+  subroutine Surf_Mod_Find_Sides(surf, verbose)
 !------------------------------------------------------------------------------!
 !   Compresses nodes' list                                                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Surf_Type), target :: surf
+  logical                 :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: vert(:)
   type(Side_Type), pointer :: side(:)
@@ -45,8 +46,10 @@
     side(n_side) % d  = elem(e) % i
     side(n_side) % ei = e
   end do
-  print *, '# Number of elements:        ', ne
-  print *, '# Tentative number of sides: ', n_side
+  if(verbose) then
+    print *, '# Number of elements:        ', ne
+    print *, '# Tentative number of sides: ', n_side
+  end if
 
   allocate(ci(n_side))
   allocate(di(n_side))
@@ -184,9 +187,11 @@
     end if
   end do
   ns = n_side
-  print *, '# Compressed number of sides:       ', ns
-  print *, '# Sides surrounded by two elements: ', cnt_two
-  print *, '# Sides surrounded by one element:  ', cnt_one
+  if(verbose) then
+    print *, '# Compressed number of sides:       ', ns
+    print *, '# Sides surrounded by two elements: ', cnt_two
+    print *, '# Sides surrounded by one element:  ', cnt_one
+  end if
 
   !-------------------------------!
   !   Find elements' neighbours   !
