@@ -34,7 +34,6 @@
   integer                    :: en(12,2)  ! edge numbering
   real                       :: phi1, phi2, xn1, yn1, zn1, xn2, yn2, zn2, w1, w2
   real                       :: surf_v(3)
-  real                       :: tot_vol_o, tot_vol_c
 !==============================================================================!
 
   ! Take aliases
@@ -55,7 +54,7 @@
   phi_o(:) = phi % n(:)
   phi_c(:) = phi % n(:)
 
-  do run = 1, 12
+  do run = 1, 16
     phi_src(:) = 0.0
     phi_cen(:) = 0.0
     do s = 1, grid % n_faces
