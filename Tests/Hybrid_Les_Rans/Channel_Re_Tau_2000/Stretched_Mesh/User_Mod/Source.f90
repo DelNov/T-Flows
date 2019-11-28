@@ -8,7 +8,7 @@
 !   system for always positive variables, for example.                         !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Field_Mod,  only: Field_Type, heat_flux, heat, heated_area
+  use Field_Mod,  only: Field_Type
   use Grid_Mod,   only: Grid_Type
   use Var_Mod,    only: Var_Type
   use Matrix_Mod, only: Matrix_Type
@@ -25,13 +25,13 @@
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u, v, w, t
-  real,            pointer :: flux(:)
+  type(Face_Type), pointer :: flux
   integer                  :: c
 !==============================================================================!
 
   ! Take aliases
   grid => flow % pnt_grid
-  flux => flow % flux
+  flux => flow % m_flux
   bulk => flow % bulk
   u    => flow % u
   v    => flow % v
@@ -48,15 +48,9 @@
   !  Set source for temperature   !
   !-------------------------------!
   if( phi % name .eq. 'T' ) then
-  
-    call Comm_Mod_Global_Sum_Real(heat_flux)
-    call Comm_Mod_Global_Sum_Real(heated_area)
-    heat_flux = heat_flux / (heated_area + TINY)
-    heat      = heat_flux * heated_area
- 
     do c = 1, grid % n_cells
       b_vector(c) = b_vector(c)   &
-                  - heat_flux * u % n(c) / bulk % flux_x * grid % vol(c)
+                  - flow % heat_flux * u % n(c) / bulk % flux_x * grid % vol(c)
     end do
   end if
 
