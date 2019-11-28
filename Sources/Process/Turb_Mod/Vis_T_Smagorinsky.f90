@@ -17,7 +17,7 @@
   integer                   :: c, s, c1, c2
   real                      :: nx, ny, nz
   real                      :: cs, lf, u_tau_l, u_f, nc2
-  real                      :: u_tan, tau_wall, a_pow, b_pow, nu, dely
+  real                      :: u_tan, a_pow, b_pow, nu, dely
 !==============================================================================!
 
   ! Take aliases
@@ -130,7 +130,7 @@
         u_tau_l = ( u_tan/a_pow * (nu/dely)**b_pow ) ** (1.0/(1.0+b_pow))
 
         ! Calculate tau_wall (but it is never used)
-        tau_wall = viscosity(c1) * u_tan / dely
+        turb % tau_wall(c1) = viscosity(c1) * u_tan / dely
 
         ! Calculate y+
         turb % y_plus(c1)  = dely * u_tau_l / nu

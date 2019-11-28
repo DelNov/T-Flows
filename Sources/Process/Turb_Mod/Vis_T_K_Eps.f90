@@ -19,11 +19,12 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type), target :: turb
 !---------------------------------[Calling]------------------------------------!
+  real :: Roughness_Coefficient
+  real :: Tau_Wall_Low_Re
   real :: U_Plus_Log_Law
   real :: U_Plus_Rough_Walls
   real :: Y_Plus_Low_Re
   real :: Y_Plus_Rough_Walls
-  real :: Roughness_Coefficient
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: flow
   type(Grid_Type),  pointer :: grid
@@ -33,7 +34,7 @@
   real                      :: pr, beta, ebf
   real                      :: u_tan, u_tau
   real                      :: kin_vis, u_plus, y_star, re_t, f_mu
-  real                      :: z_o, tau_wall
+  real                      :: z_o
 !==============================================================================!
 !   Dimensions:                                                                !
 !                                                                              !
@@ -89,8 +90,11 @@
                                           grid % wall_dist(c1),  &
                                           kin_vis)
 
-        tau_wall = density(c1)*kappa*u_tau*u_tan   &
-                 / log(e_log*max(turb % y_plus(c1), 1.05))
+        turb % tau_wall(c1) = Tau_Wall_Low_Re(turb,               &
+                                              density(c1),        &
+                                              u_tau,              &
+                                              u_tan,              &
+                                              turb % y_plus(c1))
 
         ebf = 0.01 * turb % y_plus(c1)**4  &
                    / (1.0 + 5.0 * turb % y_plus(c1))
