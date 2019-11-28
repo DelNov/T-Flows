@@ -276,7 +276,9 @@ SRC_MOD += Backup_Mod.f90
 SRC_FUN =  $(shell ls -1 *.f90 | grep -v -i _Mod)
 
 # Non-member functions still residing in Turb_Mod
-SRC_FUN += Y_Plus_Low_Re.f90		\
+SRC_FUN += Tau_Wall_Low_Re.f90		\
+           Tau_Wall_Rough_Walls.f90	\
+           Y_Plus_Low_Re.f90		\
            Y_Plus_Rough_Walls.f90	\
            U_Plus_Log_Law.f90		\
            U_Plus_Rough_Walls.f90	\
