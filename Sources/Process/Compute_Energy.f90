@@ -7,7 +7,6 @@
   use Const_Mod
   use Comm_Mod
   use Field_Mod,    only: Field_Type, conductivity, capacity, density
-  use Turb_Mod
   use Var_Mod,      only: Var_Type
   use Face_Mod,     only: Face_Type
   use Grid_Mod,     only: Grid_Type
@@ -17,6 +16,7 @@
   use Solver_Mod,   only: Solver_Type, Solver_Mod_Alias_System, Bicg, Cg, Cgs
   use Matrix_Mod,   only: Matrix_Type
   use User_Mod
+  use Turb_Mod, NO_TURBULENCE => NONE
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
@@ -120,7 +120,7 @@
   !----------------------------!
   !   Spatial discretization   !
   !----------------------------!
-  if(turbulence_model .ne. NONE .and.  &
+  if(turbulence_model .ne. NO_TURBULENCE .and.  &
      turbulence_model .ne. DNS) then
   end if
 
@@ -133,7 +133,7 @@
        turbulence_model .ne. LES_DYNAMIC        .and.  &
        turbulence_model .ne. HYBRID_LES_PRANDTL .and.  &
        turbulence_model .ne. LES_WALE           .and.  &
-       turbulence_model .ne. NONE               .and.  &
+       turbulence_model .ne. NO_TURBULENCE      .and.  &
        turbulence_model .ne. DNS) then
       pr_t1 = Turb_Mod_Prandtl_Number(turb, c1)
       pr_t2 = Turb_Mod_Prandtl_Number(turb, c2)
@@ -149,7 +149,7 @@
     tx_f2 = tx_f1
     ty_f2 = ty_f1
     tz_f2 = tz_f1
-    if(turbulence_model .ne. NONE .and.  &
+    if(turbulence_model .ne. NO_TURBULENCE .and.  &
        turbulence_model .ne. DNS) then
       con_eff1 = grid % fw(s) *(conductivity+capacity*turb % vis_t(c1)/pr_tf) &
           + (1.0-grid % fw(s))*(conductivity+capacity*turb % vis_t(c2)/pr_tf)
