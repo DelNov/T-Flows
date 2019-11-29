@@ -8,9 +8,8 @@
   use Field_Mod,   only: Field_Type, heat_transfer, density
   use Turb_Mod
   use Grid_Mod
-  use Bulk_Mod,    only: Bulk_Type
+  use Bulk_Mod,    only: Bulk_Type, Bulk_Mod_Calculate_Fluxes
   use Grad_Mod
-  use Bulk_Mod
   use Control_Mod
 !------------------------------------------------------------------------------!
   implicit none
