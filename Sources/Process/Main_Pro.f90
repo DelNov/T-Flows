@@ -47,12 +47,14 @@
   integer               :: max_ini         ! max number of inner iterations
   integer               :: min_ini         ! min number of inner iterations
   integer               :: n_stat          ! starting time step for statistic
+  integer               :: n_stat_p        ! starting time step for swarm st.
   integer               :: ini             ! inner iteration counter
-  integer               :: bsi, rsi        ! backup and results save interval
+  integer               :: bsi, rsi, prsi  ! backup and results save interval
   real                  :: simple_tol      ! tolerance for SIMPLE algorithm
   integer               :: sc_cr           ! system clock count rate
   integer               :: sc_ini, sc_cur  ! system clock start and end rate
   real                  :: wt_max
+  character(len=80)     :: name_save
 !==============================================================================!
 
   ! Initialize program profler
@@ -104,11 +106,14 @@
   ! Read physical models from control file
   call Read_Control_Physical(flow, swarm, turb)
 
+  call Control_Mod_Starting_Time_Step_For_Swarm_Statistics &
+       (n_stat_p, verbose=.true.)
+
   ! Allocate memory for all variables
   call Field_Mod_Allocate(flow, grid)
   call Grad_Mod_Allocate(grid)
   call Turb_Mod_Allocate(turb, flow)
-  call Swarm_Mod_Allocate(swarm, flow)
+  call Swarm_Mod_Allocate(swarm, turb)
   call Multiphase_Mod_Allocate(mult, flow)
   call Surf_Mod_Allocate(surf, flow)
   call User_Mod_Allocate(grid)
@@ -181,6 +186,7 @@
   call Control_Mod_Time_Step(flow % dt, verbose=.true.)
   call Control_Mod_Backup_Save_Interval (bsi,    verbose=.true.)
   call Control_Mod_Results_Save_Interval(rsi,    verbose=.true.)
+  call Control_Mod_Swarm_Save_Interval(prsi,    verbose=.true.)
   call Control_Mod_Wall_Time_Max_Hours  (wt_max, verbose=.true.)
   wt_max = wt_max * 3600  ! make it in seconds
 
@@ -188,7 +194,7 @@
   ! depending on how the code was compiled
   call Save_Results(flow, turb, mult, first_dt, .true.)   ! save inside
   call Save_Results(flow, turb, mult, first_dt, .false.)  ! save boundary
-  call Save_Swarm(swarm, first_dt)
+  call Save_Swarm(swarm, .true.)
 
   do n = first_dt + 1, last_dt
     ! For post-processing
@@ -331,11 +337,11 @@
       call Comm_Mod_Wait
       call Save_Results(flow, turb, mult, n, .true.)   ! save inside
       call Save_Results(flow, turb, mult, n, .false.)  ! save bnd
-      call Save_Swarm(swarm, n)
+      call Save_Swarm(swarm, .true.)
 
       ! Write results in user-customized format
-      call User_Mod_Save_Results(flow, turb, mult, n)
-      ! call User_Mod_Save_Swarm(swarm, n)  to be done!
+      call User_Mod_Save_Results(flow, turb, name_save)
+      call User_Mod_Save_Swarm(flow, turb, swarm, name_save) 
     end if
 
     if(save_now) then

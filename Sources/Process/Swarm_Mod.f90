@@ -15,7 +15,7 @@
                        INFLOW, OUTFLOW, CONVECT, PRESSURE, WALL, WALLFL
   use Var_Mod,   only: Var_Type
   use Field_Mod, only: Field_Type, density, viscosity
-  use Turb_Mod,  only: Turb_Type
+  use Turb_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -71,6 +71,11 @@
     logical :: deposited
     logical :: escaped
 
+!    ! Ensemble-averaged statistics for the swarm
+!    real    :: u_mean, v_mean, w_mean
+!    real    :: uu, vv, ww, uv, uw, vw
+!    integer :: n_states
+
     ! Particle inside the subdomain
     integer :: proc
     integer :: buff
@@ -84,6 +89,7 @@
 
     type(Grid_Type),  pointer :: pnt_grid  ! grid for which it is defined
     type(Field_Type), pointer :: pnt_flow  ! flow field for which it is defined
+    type(Turb_Type),  pointer :: pnt_turb  ! turb field for which it is defined
 
     integer                          :: n_particles
     type(Particle_Type), allocatable :: particle(:)
@@ -107,16 +113,24 @@
     integer :: cnt_d
     integer :: cnt_e
     integer :: cnt_r
+ 
+    ! particle statistics
+    logical :: swarm_statistics
 
     ! Logical array if cell has particles
     logical, allocatable :: cell_has_particles(:)
+
+    ! Ensemble-averaged statistics for the swarm
+    real,    allocatable :: u_mean(:), v_mean(:), w_mean(:)
+    real,    allocatable :: uu(:), vv(:), ww(:), uv(:), uw(:), vw(:)
+    integer, allocatable :: n_states(:)
 
   end type
 
   ! Working arrays, buffers for parallel version
   integer, parameter   :: N_I_VARS = 3
   integer, parameter   :: N_L_VARS = 2
-  integer, parameter   :: N_R_VARS = 8
+  integer, parameter   :: N_R_VARS = 17
   integer, allocatable :: i_work(:)
   logical, allocatable :: l_work(:)
   real,    allocatable :: r_work(:)
@@ -126,6 +140,7 @@
   include 'Swarm_Mod/Advance_Particles.f90'
   include 'Swarm_Mod/Allocate.f90'
   include 'Swarm_Mod/Bounce_Particle.f90'
+  include 'Swarm_Mod/Calculate_Mean.f90'
   include 'Swarm_Mod/Check_Periodicity.f90'
   include 'Swarm_Mod/Exchange_Particles.f90'
   include 'Swarm_Mod/Find_Nearest_Cell.f90'

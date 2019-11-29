@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Allocate(swarm, flow)
+  subroutine Swarm_Mod_Allocate(swarm, turb)
 !------------------------------------------------------------------------------!
 !   Allocates memory to store the charge of each particle                      !
 !   It assumes that the number of particles was read from the control file     !
@@ -7,14 +7,15 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Swarm_Type), target :: swarm
-  type(Field_Type), target :: flow
+  type(Turb_Type),  target :: turb
 !----------------------------------[Locals]------------------------------------!
-  integer :: k
+  integer :: k, nb, nc
 !==============================================================================!
 
   ! Take aliases to object particle flow around
-  swarm % pnt_flow => flow
-  swarm % pnt_grid => flow % pnt_grid
+  swarm % pnt_turb => turb
+  swarm % pnt_flow => turb % pnt_flow
+  swarm % pnt_grid => turb % pnt_grid
 
   ! Allocate memory for all of them
   if(swarm % n_particles > 0) then
@@ -70,5 +71,19 @@
     swarm % particle(k) % buff = 0
 
   end do
+
+  !   Allocate variables for ensemble-averaging   !
+  nb = turb % pnt_grid % n_bnd_cells
+  nc = turb % pnt_grid % n_cells
+  allocate(swarm % u_mean  (-nb:nc));  swarm % u_mean   = 0.
+  allocate(swarm % v_mean  (-nb:nc));  swarm % v_mean   = 0.
+  allocate(swarm % w_mean  (-nb:nc));  swarm % w_mean   = 0.
+  allocate(swarm % uu      (-nb:nc));  swarm % uu       = 0.
+  allocate(swarm % vv      (-nb:nc));  swarm % vv       = 0.
+  allocate(swarm % ww      (-nb:nc));  swarm % ww       = 0.
+  allocate(swarm % uv      (-nb:nc));  swarm % uv       = 0.
+  allocate(swarm % uw      (-nb:nc));  swarm % uw       = 0.
+  allocate(swarm % vw      (-nb:nc));  swarm % vw       = 0.
+  allocate(swarm % n_states(-nb:nc));  swarm % n_states = 0
 
   end subroutine

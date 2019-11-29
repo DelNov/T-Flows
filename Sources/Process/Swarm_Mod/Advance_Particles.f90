@@ -15,6 +15,8 @@
   logical,             pointer :: escaped
   logical,             pointer :: deposited
   integer                      :: ss         ! sub-step counter
+  integer                      :: n0         ! time for statistics
+  integer                      :: n1         ! current time step
   integer                      :: n_parts_in_buffers
 !==============================================================================!
 
@@ -67,6 +69,9 @@
 
           ! First check if it didn't escape through periodicity
           call Swarm_Mod_Check_Periodicity(swarm, k, n_parts_in_buffers)
+
+          ! Gathering swarm statistics  
+          call Swarm_Mod_Calculate_Mean(swarm, k, n0, n1)
 
         end if  ! in this processor
       end if    ! deposited or escaped

@@ -22,6 +22,7 @@
 !--------------------------------[Arguments]-----------------------------------!
   type(Field_Type),      target :: flow
   type(Turb_Type),       target :: turb
+  type(Swarm_Type),      target :: swarm
   type(Multiphase_Type), target :: mult
   integer                       :: ts           ! time step
   logical                       :: plot_inside  ! plot results inside?

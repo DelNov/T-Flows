@@ -40,23 +40,33 @@
         i_work(i + 3) = grid % comm % cell_glo(part % cell)
 
         i = (k-1) * N_R_VARS
-        r_work(i +  1) = part % x_n
-        r_work(i +  2) = part % y_n
-        r_work(i +  3) = part % z_n
-        r_work(i +  4) = part % u
-        r_work(i +  5) = part % v
-        r_work(i +  6) = part % w
-        r_work(i +  7) = part % d
-        r_work(i +  8) = part % cfl
+        r_work(i +  1)  = part % x_n
+        r_work(i +  2)  = part % y_n
+        r_work(i +  3)  = part % z_n
+        r_work(i +  4)  = part % u
+        r_work(i +  5)  = part % v
+        r_work(i +  6)  = part % w
+        r_work(i +  7)  = part % d
+        r_work(i +  8)  = part % cfl
+       ! r_work(i +  9)  = part % u_mean
+       ! r_work(i +  10) = part % v_mean
+       ! r_work(i +  11) = part % w_mean
+       ! r_work(i +  12) = part % uu
+       ! r_work(i +  13) = part % vv
+       ! r_work(i +  14) = part % ww
+       ! r_work(i +  15) = part % uv
+       ! r_work(i +  16) = part % vw
+       ! r_work(i +  17) = part % uw
+
         ! The following data is not really needed, at least not yet:
-        ! r_work(i +  9) = part % density
-        ! r_work(i + 10) = part % x_o
-        ! r_work(i + 11) = part % y_o
-        ! r_work(i + 12) = part % z_o
-        ! r_work(i + 13) = part % rel_u
-        ! r_work(i + 14) = part % rel_v
-        ! r_work(i + 15) = part % rel_w
-        ! r_work(i + 16) = part % rel_vel
+        ! r_work(i + 18) = part % density
+        ! r_work(i + 19) = part % x_o
+        ! r_work(i + 20) = part % y_o
+        ! r_work(i + 21) = part % z_o
+        ! r_work(i + 22) = part % rel_u
+        ! r_work(i + 23) = part % rel_v
+        ! r_work(i + 24) = part % rel_w
+        ! r_work(i + 25) = part % rel_vel
       end if
 
     end do    ! through particles
@@ -127,15 +137,24 @@
       part % w       = r_work(i +  6)
       part % d       = r_work(i +  7)
       part % cfl     = r_work(i +  8)
+     ! part % u_mean  = r_work(i +  9)
+     ! part % v_mean  = r_work(i +  10)
+     ! part % w_mean  = r_work(i +  11)
+     ! part % uu      = r_work(i +  12)
+     ! part % vv      = r_work(i +  13)
+     ! part % ww      = r_work(i +  14)
+     ! part % uv      = r_work(i +  15)
+     ! part % vw      = r_work(i +  16)
+     ! part % uw      = r_work(i +  17)
       ! The following data is not really needed, at least not yet:
-      ! part % density = r_work(i +  9)
-      ! part % x_o     = r_work(i + 10)
-      ! part % y_o     = r_work(i + 11)
-      ! part % z_o     = r_work(i + 12)
-      ! part % rel_u   = r_work(i + 13)
-      ! part % rel_v   = r_work(i + 14)
-      ! part % rel_w   = r_work(i + 15)
-      ! part % rel_vel = r_work(i + 16)
+      ! part % density = r_work(i + 18)
+      ! part % x_o     = r_work(i + 19)
+      ! part % y_o     = r_work(i + 20)
+      ! part % z_o     = r_work(i + 21)
+      ! part % rel_u   = r_work(i + 22)
+      ! part % rel_v   = r_work(i + 23)
+      ! part % rel_w   = r_work(i + 24)
+      ! part % rel_vel = r_work(i + 25)
     end do
 
   end if

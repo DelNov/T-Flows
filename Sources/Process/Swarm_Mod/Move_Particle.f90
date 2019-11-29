@@ -20,6 +20,7 @@
   real                         :: k1, k2, k3, k4      ! for Runge-Kutta
   real                         :: part_tau, part_vel
   real                         :: visc_const          ! characteristic viscosity
+  real                         :: density_const       ! characteristic density
 !==============================================================================!
 
   ! Take aliases
@@ -31,7 +32,8 @@
   part => swarm % particle(k)
 
   ! Characteristic viscosity (needs to be discussed yet)
-  visc_const = maxval(viscosity(:))
+  visc_const    = maxval(viscosity(:))
+  density_const = maxval(density(:))
 
   c  = part % cell      ! index of the closest cell for interpolation
   c2 = part % bnd_cell  ! index of the closest boundary cell for reflection
@@ -75,7 +77,7 @@
                         + part % rel_w ** 2)
 
   ! Compute Reynolds number for calculating Cd
-  part % re = part % density * part % d * abs(flow_vel - part_vel) / visc_const
+  part % re = density_const * part % d * abs(flow_vel - part_vel) / visc_const
 
   ! Compute the drag factor f
   part % f = 1.0 + 0.15 *(part % re ** 0.687)
@@ -90,10 +92,10 @@
   !-------------------------!
   !   Updating x-velocity   !
   !-------------------------!
-  k1 = part % f * (up -  part % u)                        / part_tau
-  k2 = part % f * (up - (part % u + (k1*swarm % dt)*0.5)) / part_tau
-  k3 = part % f * (up - (part % u + (k2*swarm % dt)*0.5)) / part_tau
-  k4 = part % f * (up - (part % u +  k3*swarm % dt))      / part_tau
+  k1 = (part % f * (up -  part % u)                        / part_tau) - grav_x
+  k2 = (part % f * (up - (part % u + (k1*swarm % dt)*0.5)) / part_tau) - grav_x
+  k3 = (part % f * (up - (part % u + (k2*swarm % dt)*0.5)) / part_tau) - grav_x
+  k4 = (part % f * (up - (part % u +  k3*swarm % dt))      / part_tau) - grav_x
 
   ! X-velocity calculation
   part % u = part % u + (ONE_SIXTH) * (k1 + 2.0*(k2+k3) + k4)*swarm % dt
@@ -101,10 +103,10 @@
   !-------------------------!
   !   Updating y-velocity   !
   !-------------------------!
-  k1 = (part % f * (vp -  part % v)                        / part_tau) - EARTH_G
-  k2 = (part % f * (vp - (part % v + (k1*swarm % dt)*0.5)) / part_tau) - EARTH_G
-  k3 = (part % f * (vp - (part % v + (k2*swarm % dt)*0.5)) / part_tau) - EARTH_G
-  k4 = (part % f * (vp - (part % v +  k3*swarm % dt))      / part_tau) - EARTH_G
+  k1 = (part % f * (vp -  part % v)                        / part_tau) - grav_y
+  k2 = (part % f * (vp - (part % v + (k1*swarm % dt)*0.5)) / part_tau) - grav_y
+  k3 = (part % f * (vp - (part % v + (k2*swarm % dt)*0.5)) / part_tau) - grav_y
+  k4 = (part % f * (vp - (part % v +  k3*swarm % dt))      / part_tau) - grav_y
 
   ! Y-velocity calculation
   part % v = part % v + (ONE_SIXTH) * (k1 + 2.0*(k2+k3) + k4)*swarm % dt
@@ -112,10 +114,10 @@
   !-------------------------!
   !   Updating z-velocity   !
   !-------------------------!
-  k1 = part % f * (wp -   part % w)                        / part_tau
-  k2 = part % f * (wp -  (part % w + (k1*swarm % dt)*0.5)) / part_tau
-  k3 = part % f * (wp -  (part % w + (k2*swarm % dt)*0.5)) / part_tau
-  k4 = part % f * (wp -  (part % w +  k3*swarm % dt))      / part_tau
+  k1 = (part % f * (wp -   part % w)                        / part_tau) - grav_z
+  k2 = (part % f * (wp -  (part % w + (k1*swarm % dt)*0.5)) / part_tau) - grav_z
+  k3 = (part % f * (wp -  (part % w + (k2*swarm % dt)*0.5)) / part_tau) - grav_z
+  k4 = (part % f * (wp -  (part % w +  k3*swarm % dt))      / part_tau) - grav_z
 
   ! Z-velocity calculation
   part % w = part % w + (ONE_SIXTH) * (k1 + 2.0*(k2+k3) + k4)*swarm % dt
