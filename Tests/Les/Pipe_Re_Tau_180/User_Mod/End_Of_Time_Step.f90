@@ -24,7 +24,6 @@
   integer                  :: c, e, dir
   real                     :: lo, xo, yo, zo(2), ro, xc, yc, zc, uc, vc, sg, &
                               sig_xy, sig_z, rmin, rmax, rp, lx, ly, lz, vmax
-  character(len=80)        :: file_name
 !==============================================================================!
 
   ! Take aliases
@@ -129,10 +128,5 @@
     u % n(c) = u % n(c) / vmax / 10.0
     v % n(c) = v % n(c) / vmax / 10.0
   end do
-
-  file_name = 'with_random_eddies_000000'
-  write(file_name(20:25), '(i6.6)') n
-
-  call Save_Results(flow, turb, file_name)
 
   end subroutine

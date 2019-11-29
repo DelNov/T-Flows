@@ -1,29 +1,27 @@
 !==============================================================================!
-  subroutine User_Mod_Backstep_Cf_St(flow, turb, save_name)
+  subroutine User_Mod_Backstep_Cf_St(flow, turb)
 !------------------------------------------------------------------------------!
 !   Subroutine extracts skin friction coefficient and Stanton number for       !
 !   backstep case.                                                             !
 !------------------------------------------------------------------------------!
   use Grid_Mod,  only: Grid_Type
-  use Field_Mod, only: Field_Type,  &
-                       viscosity, capacity, density, conductivity, heat_transfer
+  use Field_Mod, only: Field_Type, capacity, conductivity, heat_transfer
   use Var_Mod,   only: Var_Type
   use Turb_Mod
   use Comm_Mod                       ! parallel stuff
-  use Name_Mod,  only: problem_name
+  use File_Mod
   use Const_Mod                      ! constants
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
   type(Turb_Type),  target :: turb
-  character(len=*)         :: save_name
 !----------------------------------[Calling]-----------------------------------!
   real :: Y_Plus_Low_Re
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
   type(Grid_Type), pointer :: grid
-  integer                  :: n_prob, pl, c, dummy, i, count, k, c1, c2, s, l
+  integer                  :: n_prob, pl, c, dummy, i, count, k, c1, c2, s, fu
   character(len=80)        :: result_name
   real, allocatable        :: r1_p(:), r2_p(:), z_p(:),  &
                               um_p(:), vm_p(:), wm_p(:), & 
@@ -35,6 +33,7 @@
                               v4_p(:), v5_p(:)  
   integer, allocatable     :: n_p(:), n_count(:)
   real                     :: kin_vis, u_tan, u_tau, tau_wall
+  real                     :: visc_const, dens_const
 !==============================================================================!
 
   ! Take aliases
@@ -43,6 +42,9 @@
   v    => flow % v
   w    => flow % w
   t    => flow % t
+
+  call Control_Mod_Dynamic_Viscosity(visc_const)
+  call Control_Mod_Mass_Density     (dens_const)
 
   !----------------------------------!
   !   Read "x_coordinate.dat" file   !
@@ -102,17 +104,17 @@
             wm_p(i)   = wm_p(i) + w % n(c1)
             if(turb % y_plus(c1) < 4.0) then
               v1_p(i) = v1_p(i)  &
-                      + (2.0 * viscosity * u % n(c1)   &
+                      + (2.0 * visc_const * u % n(c1)   &
                              / grid % wall_dist(c1))   &
-                      / (density * 11.3**2)
+                      / (dens_const * 11.3**2)
             else
-              kin_vis = viscosity / density
+              kin_vis = visc_const / dens_const
               u_tan = Field_Mod_U_Tan(flow, s)
               u_tau = c_mu25 * sqrt(turb % kin % n(c1))
               turb % y_plus(c1) = Y_Plus_Low_Re(u_tau,                 &
                                                 grid % wall_dist(c1),  &
                                                 kin_vis)
-              tau_wall = density * kappa * u_tau * u_tan    &
+              tau_wall = dens_const * kappa * u_tau * u_tan    &
                        / log(e_log*max(turb % y_plus(c1), 1.05))
 
               v1_p(i) = v1_p(i)  &
@@ -120,7 +122,7 @@
             end if
             v2_p(i) = v2_p(i) + turb % y_plus(c1)
             v3_p(i) = v3_p(i) + t % q(c2)  &
-                    / (density * capacity * (t % n(c2) - 20) * 11.3)
+                    / (dens_const * capacity * (t % n(c2) - 20) * 11.3)
             v5_p(i) = v5_p(i) + t % n(c2) 
             n_count(i) = n_count(i) + 1
           end if
@@ -158,13 +160,10 @@
     end if
   end do
 
-  result_name = save_name ! problem_name
-  l = len_trim(result_name)
-  write(result_name(l+1:l+10),'(a10)') '-cf-st.dat'
+  call File_Mod_Set_Name(result_name, appendix='-cf-st', extension='.dat')
+  call File_Mod_Open_File_For_Writing(result_name, fu)
 
-  open(3,file=result_name)
-
-  write(3,*) '# x, Cf, St, U, T, yPlus'
+  write(fu,*) '# x, Cf, St, U, T, yPlus'
   do i = 1, n_prob
     if(n_count(i) .ne. 0) then
       wm_p(i) = wm_p(i) / n_count(i)
@@ -182,15 +181,15 @@
       v4_p(i) = v4_p(i) / n_count(i)
       v5_p(i) = v5_p(i) / n_count(i)
 
-      write(3,'(6es15.5e3)') (z_p(i)+z_p(i+1))/(2.*0.038),  &
-                             v1_p(i),                       &
-                             v3_p(i),                       &
-                             um_p(i),                       &
-                             v5_p(i),                       &
-                             v2_p(i) 
+      write(fu,'(6es15.5e3)') (z_p(i)+z_p(i+1))/(2.*0.038),  &
+                              v1_p(i),                       &
+                              v3_p(i),                       &
+                              um_p(i),                       &
+                              v5_p(i),                       &
+                              v2_p(i) 
     end if
   end do 
-  close(3)
+  close(fu)
 
   deallocate(n_p)
   deallocate(z_p)

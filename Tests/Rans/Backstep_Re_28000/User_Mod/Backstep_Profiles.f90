@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Backstep_Profiles(flow, turb, save_name) 
+  subroutine User_Mod_Backstep_Profiles(flow, turb)
 !------------------------------------------------------------------------------!
 !   Description
 !------------------------------------------------------------------------------!
@@ -9,22 +9,21 @@
   use Var_Mod,   only: Var_Type
   use Turb_Mod
   use Comm_Mod                       ! parallel stuff
-  use Name_Mod,  only: problem_name
+  use File_Mod
   use Const_Mod                      ! constants
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
   type(Turb_Type),  target :: turb
-  character(len=*)         :: save_name
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
   type(Var_Type),  pointer :: kin, eps, zeta, f22
   type(Grid_Type), pointer :: grid
   integer                  :: n_prob, pl, c, idumm, i, count,  &
-                              k, c1, c2, s, n_hor, l
+                              k, c1, c2, s, n_hor, fu
   character(len=80)        :: coord_name, result_name
-  real, parameter          :: U_B = 11.3, H = 0.038
+  real, parameter          :: u_b = 11.3, h = 0.038
   real, allocatable        :: x1_p(:), x2_p(:), lnum(:), z_p(:), &
                               um_p(:), vm_p(:), wm_p(:), & 
                               uu_p(:), vv_p(:), ww_p(:), &
@@ -45,9 +44,9 @@
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
 
   ! Set the name for coordinate file
-  call Name_File(0, coord_name, ".1d")
+  call File_Mod_Set_Name(coord_name, extension='.1d')
 
-  inquire( file='horizontal_positions.dat', exist=there ) 
+  inquire(file='horizontal_positions.dat', exist=there)
 
   if(.not.there) then
     if(this_proc < 2) then
@@ -153,7 +152,7 @@
             wm_p(i) = wm_p(i) + w % n(c)
             uu_p(i) = uu_p(i) + kin % n(c)
             vv_p(i) = vv_p(i) + eps % n(c)
-            v1_p(i) = v1_p(i) + turb % vis_t(c)*(u % y(c) + v % x(c))/U_B**2
+            v1_p(i) = v1_p(i) + turb % vis_t(c)*(u % y(c) + v % x(c))/u_b**2
             v2_p(i) = v2_p(i) + t % n(c) - 20.0
             n_count(i) = n_count(i) + 1
             if(turbulence_model == K_EPS_ZETA_F) then
@@ -194,13 +193,12 @@
       end if
     end do
 
-    result_name = save_name ! problem_name
-    l = len_trim(result_name)
-    write(result_name(l+1:l+14),'(a5,f4.2,a5)') '-prof', lnum(k), 'h.dat'
+    call File_Mod_Set_Name(result_name, appendix='-prof', extension='.h.dat')
+    call File_Mod_Open_File_For_Writing(result_name, fu)
 
-    open(3,file=result_name)
-    write(3,*) '# z, u, kin, eps, zeta, f22, uv, T'
-    write(3,*) '# all data are normalized by Ub = 11.3 and step height h = 0.038'
+    open(fu,file=result_name)
+    write(fu,*) '# z, u, kin, eps, zeta, f22, uv, T'
+    write(fu,*) '# all data are normalized by Ub=11.3 and step height h=0.038'
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
         wm_p(i) = wm_p(i) / n_count(i)
@@ -218,14 +216,14 @@
         v4_p(i) = v4_p(i) / n_count(i)
         v5_p(i) = v5_p(i) / n_count(i)
 
-        write(3,'(8es15.5e3)') (z_p(i)+z_p(i+1))/(2.*H),    &
-                                um_p(i) / U_B,              &
-                                uu_p(i) / U_B**2,           &
-                                vv_p(i) * H / U_B**3,       &
-                                ww_p(i) / U_B**2,           &
-                                uv_p(i) * H / U_B**2,       &
-                                v1_p(i),                    &
-                                v2_p(i)
+        write(fu,'(8es15.5e3)') (z_p(i)+z_p(i+1))/(2.*h),    &
+                                 um_p(i) / u_b,              &
+                                 uu_p(i) / u_b**2,           &
+                                 vv_p(i) * h / u_b**3,       &
+                                 ww_p(i) / u_b**2,           &
+                                 uv_p(i) * h / u_b**2,       &
+                                 v1_p(i),                    &
+                                 v2_p(i)
 
         wm_p(i)    = 0.0
         um_p(i)    = 0.0
@@ -244,7 +242,7 @@
         n_count(i) = 0
       end if
     end do
-    close(3)
+    close(fu)
   end do
 
   deallocate(n_p)

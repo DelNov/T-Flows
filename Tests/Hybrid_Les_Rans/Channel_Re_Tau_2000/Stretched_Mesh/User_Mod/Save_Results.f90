@@ -47,6 +47,7 @@
   call Field_Mod_Alias_Momentum(flow, u, v, w)
   call Field_Mod_Alias_Energy  (flow, t)
 
+  ! Take constant physical properties
   call Control_Mod_Dynamic_Viscosity(visc_const)
   call Control_Mod_Mass_Density     (dens_const)
 
