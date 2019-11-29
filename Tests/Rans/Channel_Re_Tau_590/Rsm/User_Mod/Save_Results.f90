@@ -9,9 +9,7 @@
   use Const_Mod                      ! constants
   use Comm_Mod                       ! parallel stuff
   use Grid_Mod,  only: Grid_Type
-  use Field_Mod, only: Field_Type, heat_transfer, heat_flux, heat, &
-                       density, viscosity, capacity, conductivity, &
-                       heated_area
+  use Field_Mod, only: Field_Type, capacity, conductivity
   use Bulk_Mod,  only: Bulk_Type
   use Var_Mod,   only: Var_Type
   use Turb_Mod
@@ -86,10 +84,10 @@
   n_points = 0
 
   if(heat_transfer) then
-    call Comm_Mod_Global_Sum_Real(heat_flux)
-    call Comm_Mod_Global_Sum_Real(heated_area)
-    heat_flux = heat_flux / (heated_area + TINY)
-    heat      = heat_flux * heated_area
+    call Comm_Mod_Global_Sum_Real(flow % heat_flux)
+    call Comm_Mod_Global_Sum_Real(flow % heated_area)
+    flow % heat_flux = flow % heat_flux / (flow % heated_area + TINY)
+    flow % heat      = flow % heat_flux * flow % heated_area
   end if
 
   open(9, file=coord_name)
@@ -237,7 +235,7 @@
 
     call Comm_Mod_Wait
 
-    if(heat_flux > 0.0) then
+    if(flow % heat_flux > 0.0) then
       call Comm_Mod_Global_Min_Real(t_inf)
     else
       call Comm_Mod_Global_Max_Real(t_inf)
@@ -266,7 +264,7 @@
 
     t_wall  = t_wall / n_points
     nu_mean = nu_mean / n_points
-    t_tau   = heat_flux / (density(1) * capacity * u_tau_p)
+    t_tau   = flow % heat_flux / (density(1) * capacity * u_tau_p)
   end if
 
   open(3, file = res_name)

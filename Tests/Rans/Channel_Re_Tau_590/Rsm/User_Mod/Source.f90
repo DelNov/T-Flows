@@ -8,7 +8,7 @@
 !   system for always positive variables, for example.                         !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Field_Mod,  only: Field_Type, heat_flux, heat, heated_area
+  use Field_Mod,  only: Field_Type
   use Grid_Mod,   only: Grid_Type
   use Var_Mod,    only: Var_Type
   use Matrix_Mod, only: Matrix_Type
@@ -49,13 +49,13 @@
   !-------------------------------!
   if( phi % name .eq. 'T' ) then
 
-    call Comm_Mod_Global_Sum_Real(heat_flux)
-    call Comm_Mod_Global_Sum_Real(heated_area)
-    heat_flux = heat_flux / (heated_area + TINY)
-    heat      = heat_flux * heated_area
+    call Comm_Mod_Global_Sum_Real(flow % heat_flux)
+    call Comm_Mod_Global_Sum_Real(flow % heated_area)
+    flow % heat_flux = flow % heat_flux / (flow % heated_area + TINY)
+    flow % heat      = flow % heat_flux * flow % heated_area
   
     do c = 1, grid % n_cells
-      b(c) = b(c) -   2.0 * heat_flux * u % n(c)  &
+      b(c) = b(c) -   2.0 * flow % heat_flux * u % n(c)  &
            / bulk % flux_x * grid % vol(c)
     end do
   end if
