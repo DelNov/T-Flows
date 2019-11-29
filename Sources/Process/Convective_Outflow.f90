@@ -10,7 +10,6 @@
   use Grid_Mod
   use Bulk_Mod,    only: Bulk_Type
   use Grad_Mod
-  use Bulk_Mod
   use Control_Mod
 !------------------------------------------------------------------------------!
   implicit none
