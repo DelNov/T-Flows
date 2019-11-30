@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Var_Mod_Allocate_Solution(name_phi, name_flux, phi, grid)
+  subroutine Var_Mod_Allocate_Solution(phi, grid, name_phi, name_flux)
 !------------------------------------------------------------------------------!
 !   This is to allocate a variable for a solution with usual algorithm.        !
 !   Variables such as velocities and pressures should be allocated with it.    !
@@ -8,18 +8,18 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(len=*)        :: name_phi
-  character(len=*)        :: name_flux
   type(Var_Type)          :: phi
   type(Grid_Type), target :: grid
+  character(len=*)        :: name_phi
+  character(len=*)        :: name_flux
 !==============================================================================!
+
+  ! Store grid for which the variable is defined
+  phi % pnt_grid => grid
 
   ! Store variable name
   phi % name      = name_phi
   phi % flux_name = name_flux
-
-  ! Store grid for which the variable is defined
-  phi % pnt_grid => grid
 
   ! Values new (n), old (o), and older than old (oo)
   allocate (phi % n (-grid % n_bnd_cells: grid % n_cells));  phi % n  = 0.
