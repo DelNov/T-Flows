@@ -24,6 +24,7 @@
   include 'Surf_Mod/Edge_Numbering_Neu.f90'
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
+  type(Field_Type),  pointer :: flow
   type(Vert_Type),   pointer :: vert(:)
   type(Elem_Type),   pointer :: elem(:)
   type(Matrix_Type), pointer :: a
@@ -38,6 +39,7 @@
 
   ! Take aliases
   grid => surf % pnt_grid
+  flow => surf % pnt_flow
   nv   => surf % n_verts
   ne   => surf % n_elems
   vert => surf % vert
@@ -73,7 +75,7 @@
   end do
 
   phi % n(:) = phi_c(:)
-  call Grad_Mod_Variable(phi)
+  call Field_Mod_Grad_Variable(flow, phi)
 
   allocate(n_cells_v(grid % n_cells))
   n_cells_v(:) = 0

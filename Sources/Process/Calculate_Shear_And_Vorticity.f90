@@ -9,7 +9,6 @@
 !----------------------------------[Modules]-----------------------------------!
   use Comm_Mod
   use Turb_Mod
-  use Grad_Mod
   use Field_Mod,  only: Field_Type
   use Grid_Mod,   only: Grid_Type
 !------------------------------------------------------------------------------!
@@ -26,9 +25,9 @@
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! Velocity gradients
-  call Grad_Mod_Variable(flow % u)
-  call Grad_Mod_Variable(flow % v)
-  call Grad_Mod_Variable(flow % w)
+  call Field_Mod_Grad_Variable(flow, flow % u)
+  call Field_Mod_Grad_Variable(flow, flow % v)
+  call Field_Mod_Grad_Variable(flow, flow % w)
 
   flow % shear(:) = u % x(:)**2                     &
                   + v % y(:)**2                     &

@@ -9,7 +9,6 @@
   use Turb_Mod
   use Grid_Mod
   use Bulk_Mod,    only: Bulk_Type, Bulk_Mod_Calculate_Fluxes
-  use Grad_Mod
   use Control_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -60,7 +59,7 @@
 
     ! Temperature gradients might have been computed and
     ! stored already in t % x, t % y and t % z, check it
-    call Grad_Mod_Variable(t)
+    call Field_Mod_Grad_Variable(flow, t)
 
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)

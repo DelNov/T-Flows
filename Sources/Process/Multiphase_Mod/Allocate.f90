@@ -23,7 +23,7 @@
   nc = grid % n_cells
   nf = grid % n_faces
 
-  call Var_Mod_Allocate_Solution('VOF', '', mult % vof, grid)
+  call Var_Mod_Allocate_Solution(mult % vof, grid, 'VOF', '')
   allocate(mult % vof_f(nf));  mult % vof_f(1:nf) = 0.0
 
   allocate(mult % curv(-nb:nc));  mult % curv(-nb:nc) = 0.0

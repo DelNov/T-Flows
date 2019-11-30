@@ -15,6 +15,8 @@
   ! Store the pointer to a grid
   flow % pnt_grid => grid
 
+  call Field_Mod_Allocate_Grad_Matrix(flow)
+
   !----------------------------!
   !   Navier-Stokes equation   !
   !----------------------------!

@@ -4,21 +4,20 @@
 !   Definition of variables used for all multiphase modelling paradigms.       !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Var_Mod,       only: Var_Type, Var_Mod_Allocate_Solution
+  use Var_Mod
   use Math_Mod
-  use Face_Mod,      only: Face_Type
-  use Grid_Mod,      only: Grid_Type
-  use Field_Mod,     only: Field_Type, density, viscosity, density_f
-  use Cpu_Timer_Mod, only: Cpu_Timer_Mod_Start, Cpu_Timer_Mod_Stop
-  use Info_Mod,      only: Info_Mod_Iter_Fill_At
-  use Solver_Mod,    only: Solver_Type, Bicg, Cg, Cgs, Acm
-  use Grad_Mod
+  use Face_Mod
+  use Grid_Mod
+  use Field_Mod
+  use Cpu_Timer_Mod
+  use Info_Mod
+  use Solver_Mod
   use Control_Mod
   use Numerics_Mod
   use Const_Mod
   use Comm_Mod
-  use Bulk_Mod,      only: Bulk_Type
-  use Matrix_Mod,    only: Matrix_Type
+  use Bulk_Mod
+  use Matrix_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!

@@ -1,25 +1,31 @@
 !==============================================================================!
-  subroutine Grad_Mod_Pressure(phi)
+  subroutine Field_Mod_Grad_Pressure(flow,     &
+                                     p,        &
+                                     density,  &
+                                     grav_x, grav_y, grav_z)
 !------------------------------------------------------------------------------!
 !   Calculates gradient of pressure of pressure correction.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Var_Type), target :: phi
+  type(Field_Type) :: flow
+  type(Var_Type)   :: p
+  real             :: density(-p % pnt_grid % n_bnd_cells:p % pnt_grid % n_cells)
+  real             :: grav_x, grav_y, grav_z
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   integer                  :: s, c, c1, c2, iter
 !==============================================================================!
 
   ! Take aliases
-  grid  => phi % pnt_grid
+  grid => flow % pnt_grid
 
-  call Comm_Mod_Exchange_Real(grid, phi % n)
+  call Comm_Mod_Exchange_Real(grid, p % n)
 
   do c = 1, grid % n_cells
-    phi % x(c) = 0.0
-    phi % y(c) = 0.0
-    phi % z(c) = 0.0
+    p % x(c) = 0.0
+    p % y(c) = 0.0
+    p % z(c) = 0.0
   end do
 
   !-------------------------------------------!
@@ -33,9 +39,9 @@
       c2 = grid % faces_c(2,s)
       if(c2 < 0) then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. PRESSURE) then
-          phi % n(c2) = phi % n(c1) + density(c1) * (grav_x * grid % dx(s)    &
-                                                   + grav_y * grid % dy(s)    &
-                                                   + grav_z * grid % dz(s))
+          p % n(c2) = p % n(c1) + density(c1) * (grav_x * grid % dx(s)    &
+                                               + grav_y * grid % dy(s)    &
+                                               + grav_z * grid % dz(s))
         end if
       end if
     end do
@@ -47,14 +53,14 @@
       c2 = grid % faces_c(2,s)
       if(c2 < 0) then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. PRESSURE) then
-          phi % n(c2) = phi % n(c1)
+          p % n(c2) = p % n(c1)
         end if
       end if
     end do
   end if
 
-  call Grad_Mod_Component(grid, phi % n, 1, phi % x)  ! dp/dx
-  call Grad_Mod_Component(grid, phi % n, 2, phi % y)  ! dp/dy
-  call Grad_Mod_Component(grid, phi % n, 3, phi % z)  ! dp/dz
+  call Field_Mod_Grad_Component(flow, p % n, 1, p % x)  ! dp/dx
+  call Field_Mod_Grad_Component(flow, p % n, 2, p % y)  ! dp/dy
+  call Field_Mod_Grad_Component(flow, p % n, 3, p % z)  ! dp/dz
 
   end subroutine

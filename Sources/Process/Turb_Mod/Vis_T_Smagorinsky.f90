@@ -32,7 +32,7 @@
   !               !
   !---------------!
   if(buoyancy) then
-    call Grad_Mod_Array(grid, t % n, t % x, t % y, t % z)
+    call Field_Mod_Grad_Variable(flow, t)
   end if
 
   if(turbulence_model .eq. LES_SMAGORINSKY) then

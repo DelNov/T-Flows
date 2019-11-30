@@ -7,12 +7,12 @@
   use Const_Mod
   use File_Mod
   use Comm_Mod
-  use Grid_Mod,    only: Grid_Type
-  use Matrix_Mod,  only: Matrix_Type
-  use Var_Mod,     only: Var_Type
+  use Grid_Mod
+  use Matrix_Mod
+  use Var_Mod
   use Field_Mod
-  use Bulk_Mod,    only: Bulk_Type
-  use Turb_Mod                       ! needed for saving results
+  use Bulk_Mod
+  use Turb_Mod
   use Swarm_Mod
   use Multiphase_Mod
   use Control_Mod

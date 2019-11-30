@@ -70,9 +70,9 @@
 
     call Time_And_Length_Scale(grid, turb)
 
-    call Grad_Mod_Variable(flow % u)
-    call Grad_Mod_Variable(flow % v)
-    call Grad_Mod_Variable(flow % w)
+    call Field_Mod_Grad_Variable(flow, flow % u)
+    call Field_Mod_Grad_Variable(flow, flow % v)
+    call Field_Mod_Grad_Variable(flow, flow % w)
 
     call Turb_Mod_Compute_Stress(turb, sol, ini, turb % uu, n)
     call Turb_Mod_Compute_Stress(turb, sol, ini, turb % vv, n)

@@ -4,11 +4,6 @@
 !   Calculate source terms for Re stresses and dissipation for 
 !   RSM_MANCEAU_HANJALIC model                                                 !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: f22_x  => r_cell_23,  &
-                      f22_y  => r_cell_24,  &
-                      f22_z  => r_cell_25
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type),   target :: turb
@@ -41,11 +36,9 @@
 
   call Time_And_Length_Scale(grid, turb)
 
-  call Grad_Mod_Component(grid, f22 % n, 1, f22_x)  ! df22/dx
-  call Grad_Mod_Component(grid, f22 % n, 2, f22_y)  ! df22/dy
-  call Grad_Mod_Component(grid, f22 % n, 3, f22_z)  ! df22/dz
+  call Field_Mod_Grad_Variable(flow, f22)
 
-  do  c = 1, grid % n_cells 
+  do  c = 1, grid % n_cells
     kin % n(c) = max(0.5*(  uu % n(c)  &
                           + vv % n(c)  &
                           + ww % n(c)), TINY)
@@ -59,10 +52,10 @@
                             + vw % n(c)*w % y(c)  &
                             + ww % n(c)*w % z(c)), TINY)
 
-    mag = max(TINY, sqrt(f22_x(c)**2 + f22_y(c)**2 + f22_z(c)**2))
-    n1 = f22_x(c) / mag
-    n2 = f22_y(c) / mag
-    n3 = f22_z(c) / mag
+    mag = max(TINY, sqrt(f22 % x(c)**2 + f22 % y(c)**2 + f22 % z(c)**2))
+    n1 = f22 % x(c) / mag
+    n2 = f22 % y(c) / mag
+    n3 = f22 % z(c) / mag
 
     b11 = uu % n(c) / (2.0 * kin % n(c)) - ONE_THIRD
     b22 = vv % n(c) / (2.0 * kin % n(c)) - ONE_THIRD

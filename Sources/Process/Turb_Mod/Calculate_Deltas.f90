@@ -14,16 +14,20 @@
 !----------------------------------[Calling]-----------------------------------!
   real Distance
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
-  integer :: s, c, c1, c2
-  real    :: d, d1, d2, dx1, dx2, dy1, dy2, dz1, dz2
+  type(Grid_Type),  pointer :: grid
+  type(Field_Type), pointer :: flow
+  integer                   :: s, c, c1, c2
+  real                      :: d, d1, d2, dx1, dx2, dy1, dy2, dz1, dz2
 !==============================================================================!
 
   ! Take aliases
+  flow => turb % pnt_flow
   grid => turb % pnt_grid
 
   ! Compute gradients of wall distance
-  call Grad_Mod_Array(grid, grid % wall_dist, h_w_x, h_w_y, h_w_z)
+  call Field_Mod_Grad_Component(flow, grid % wall_dist, 1, h_w_x)  ! dhw/dx
+  call Field_Mod_Grad_Component(flow, grid % wall_dist, 2, h_w_y)  ! dhy/dx
+  call Field_Mod_Grad_Component(flow, grid % wall_dist, 3, h_w_z)  ! dhz/dx
 
   ! Normalize gradients
   do c = 1, grid % n_cells

@@ -40,11 +40,12 @@
   call Turb_Mod_Alias_Heat_Fluxes(turb, ut, vt, wt)
   call Solver_Mod_Alias_System   (sol, a, b)
 
-  call Grad_Mod_Array(grid, t % n, t % x, t % y, t % z)
-
   !-----------------------------------------!
   !   Compute the sources in all the cells  !
   !-----------------------------------------!
+
+  ! Temperature gradients are needed
+  call Field_Mod_Grad_Variable(flow, t)
 
   ! Production source:
   do c = 1, grid % n_cells

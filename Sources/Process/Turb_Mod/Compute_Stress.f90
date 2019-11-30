@@ -77,9 +77,9 @@
   end if
 
   ! Gradients
-  call Grad_Mod_Component(grid, phi % n, 1, phi_x)
-  call Grad_Mod_Component(grid, phi % n, 2, phi_y)
-  call Grad_Mod_Component(grid, phi % n, 3, phi_z)
+  call Field_Mod_Grad_Component(flow, phi % n, 1, phi_x)
+  call Field_Mod_Grad_Component(flow, phi % n, 2, phi_y)
+  call Field_Mod_Grad_Component(flow, phi % n, 3, phi_z)
 
   !---------------!
   !               !
@@ -230,9 +230,9 @@
       end do
     end if
 
-    call Grad_Mod_Component(grid, u1uj_phij, 1, u1uj_phij_x)
-    call Grad_Mod_Component(grid, u2uj_phij, 2, u2uj_phij_y)
-    call Grad_Mod_Component(grid, u3uj_phij, 3, u3uj_phij_z)
+    call Field_Mod_Grad_Component(flow, u1uj_phij, 1, u1uj_phij_x)
+    call Field_Mod_Grad_Component(flow, u2uj_phij, 2, u2uj_phij_y)
+    call Field_Mod_Grad_Component(flow, u3uj_phij, 3, u3uj_phij_z)
 
     do c = 1, grid % n_cells
       b(c) = b(c) + (  u1uj_phij_x(c)  &
@@ -296,9 +296,7 @@
   !                                     !
   !-------------------------------------!
   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
-    call Grad_Mod_Component(grid, f22 % n, 1, f22 % x) ! df22/dx
-    call Grad_Mod_Component(grid, f22 % n, 2, f22 % y) ! df22/dy
-    call Grad_Mod_Component(grid, f22 % n, 3, f22 % z) ! df22/dz
+    call Field_Mod_Grad_Variable(flow, f22)
 
     call Turb_Mod_Src_Rsm_Manceau_Hanjalic(turb, sol, phi % name)
   else if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then

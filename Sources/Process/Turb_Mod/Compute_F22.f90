@@ -66,7 +66,7 @@
   end do
 
   ! Gradients
-  call Grad_Mod_Variable(phi)
+  call Field_Mod_Grad_Variable(flow, phi)
 
   !------------------!
   !                  !

@@ -10,7 +10,6 @@
   use Var_Mod,      only: Var_Type
   use Face_Mod,     only: Face_Type
   use Grid_Mod,     only: Grid_Type
-  use Grad_Mod
   use Info_Mod
   use Numerics_Mod
   use Solver_Mod,   only: Solver_Type, Solver_Mod_Alias_System, Bicg, Cg, Cgs
@@ -96,7 +95,7 @@
   end if
 
   ! Gradients
-  call Grad_Mod_Variable(t)
+  call Field_Mod_Grad_Variable(flow, t)
 
   !---------------!
   !               !

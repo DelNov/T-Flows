@@ -6,25 +6,15 @@
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
   use Comm_Mod
-  use Cpu_Timer_Mod, only: Cpu_Timer_Mod_Start, Cpu_Timer_Mod_Stop
+  use Cpu_Timer_Mod
   use Info_Mod
-  use Var_Mod,       only: Var_Type,                    &
-                           Var_Mod_Allocate_New_Only,   &
-                           Var_Mod_Allocate_Solution
-  use Face_Mod,      only: Face_Type
+  use Var_Mod
+  use Face_Mod
   use Grid_Mod
-  use Grad_Mod
-  use Field_Mod,     only: Field_Type,                                  &
-                           Field_Mod_Alias_Momentum,                    &
-                           Field_Mod_Alias_Energy,                      &
-                           Field_Mod_U_Tan,                             &
-                           viscosity, density, conductivity, capacity,  &
-                           grav_x,  grav_y,  grav_z,                    &
-                           omega_x, omega_y, omega_z,                   &
-                           buoyancy, heat_transfer, t_ref
-  use Solver_Mod,    only: Solver_Type, Solver_Mod_Alias_System, Bicg, Cg, Cgs
-  use Matrix_Mod,    only: Matrix_Type
-  use Control_Mod,   only: Control_Mod_Turbulent_Prandtl_Number
+  use Field_Mod
+  use Solver_Mod
+  use Matrix_Mod
+  use Control_Mod
   use Numerics_Mod
 !------------------------------------------------------------------------------!
   implicit none

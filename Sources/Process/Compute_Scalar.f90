@@ -12,17 +12,13 @@
   use Var_Mod
   use Face_Mod
   use Grid_Mod
-  use Grad_Mod
   use Info_Mod
   use Numerics_Mod
   use Solver_Mod,    only: Solver_Type, Solver_Mod_Alias_System, Bicg, Cg, Cgs
   use Matrix_Mod,    only: Matrix_Type
   use Control_Mod
   use User_Mod
-  use Work_Mod,      only: phi_x       => r_cell_01,  &
-                           phi_y       => r_cell_02,  &
-                           phi_z       => r_cell_03,  &
-                           u1uj_phij   => r_cell_06,  &
+  use Work_Mod,      only: u1uj_phij   => r_cell_06,  &
                            u2uj_phij   => r_cell_07,  &
                            u3uj_phij   => r_cell_08,  &
                            u1uj_phij_x => r_cell_09,  &
@@ -98,9 +94,7 @@
   end if
 
   ! Gradients
-  call Grad_Mod_Component(grid, phi % n, 1, phi_x)
-  call Grad_Mod_Component(grid, phi % n, 2, phi_y)
-  call Grad_Mod_Component(grid, phi % n, 3, phi_z)
+  call Field_Mod_Grad_Variable(flow, phi)
 
   !---------------!
   !               !
@@ -144,9 +138,9 @@
 
     ! Gradients on the cell face 
     if(c2 > 0) then
-      phix_f1 = grid % fw(s)*phi_x(c1) + (1.0-grid % fw(s))*phi_x(c2)
-      phiy_f1 = grid % fw(s)*phi_y(c1) + (1.0-grid % fw(s))*phi_y(c2)
-      phiz_f1 = grid % fw(s)*phi_z(c1) + (1.0-grid % fw(s))*phi_z(c2)
+      phix_f1 = grid % fw(s)*phi % x(c1) + (1.0-grid % fw(s))*phi % x(c2)
+      phiy_f1 = grid % fw(s)*phi % y(c1) + (1.0-grid % fw(s))*phi % y(c2)
+      phiz_f1 = grid % fw(s)*phi % z(c1) + (1.0-grid % fw(s))*phi % z(c2)
       phix_f2 = phix_f1 
       phiy_f2 = phiy_f1 
       phiz_f2 = phiz_f1 
@@ -154,9 +148,9 @@
            + (1.-grid % f(s))*(diffusivity + turb % vis_t(c2)/sc_t)
       dif_eff2 = dif_eff1 
     else
-      phix_f1 = phi_x(c1) 
-      phiy_f1 = phi_y(c1) 
-      phiz_f1 = phi_z(c1) 
+      phix_f1 = phi % x(c1) 
+      phiy_f1 = phi % y(c1) 
+      phiz_f1 = phi % z(c1) 
       phix_f2 = phix_f1 
       phiy_f2 = phiy_f1 
       phiz_f2 = phiz_f1 
@@ -261,21 +255,21 @@
     if(turbulence_model_variant .ne. STABILIZED) then
       do c = 1, grid % n_cells
         u1uj_phij(c) = -0.22 * turb % t_scale(c) *  &
-                   (  uu % n(c) * phi_x(c)          &
-                    + uv % n(c) * phi_y(c)          &
-                    + uw % n(c) * phi_z(c))
+                   (  uu % n(c) * phi % x(c)          &
+                    + uv % n(c) * phi % y(c)          &
+                    + uw % n(c) * phi % z(c))
         u2uj_phij(c) = -0.22 * turb % t_scale(c) *  &
-                   (  uv % n(c) * phi_x(c)          &
-                    + vv % n(c) * phi_y(c)          &
-                    + vw % n(c) * phi_z(c))
+                   (  uv % n(c) * phi % x(c)          &
+                    + vv % n(c) * phi % y(c)          &
+                    + vw % n(c) * phi % z(c))
         u3uj_phij(c) = -0.22 * turb % t_scale(c) *  &
-                   (  uw % n(c) * phi_x(c)          &
-                    + vw % n(c) * phi_y(c)          &
-                    + ww % n(c) * phi_z(c))
+                   (  uw % n(c) * phi % x(c)          &
+                    + vw % n(c) * phi % y(c)          &
+                    + ww % n(c) * phi % z(c))
       end do
-      call Grad_Mod_Component(grid, u1uj_phij, 1, u1uj_phij_x)
-      call Grad_Mod_Component(grid, u2uj_phij, 2, u2uj_phij_y)
-      call Grad_Mod_Component(grid, u3uj_phij, 3, u3uj_phij_z)
+      call Field_Mod_Grad_Component(flow, u1uj_phij, 1, u1uj_phij_x)
+      call Field_Mod_Grad_Component(flow, u2uj_phij, 2, u2uj_phij_y)
+      call Field_Mod_Grad_Component(flow, u3uj_phij, 3, u3uj_phij_z)
       do c = 1, grid % n_cells
         b(c) = b(c) - (  u1uj_phij_x(c)  &
                        + u2uj_phij_y(c)  &
@@ -296,9 +290,9 @@
 !       sc_t  = grid % fw(s) * sc_t1 + (1.0-grid % fw(s)) * sc_t2
 
         if(c2 > 0) then
-          phix_f1 = grid % fw(s)*phi_x(c1) + (1.0-grid % fw(s))*phi_x(c2)
-          phiy_f1 = grid % fw(s)*phi_y(c1) + (1.0-grid % fw(s))*phi_y(c2)
-          phiz_f1 = grid % fw(s)*phi_z(c1) + (1.0-grid % fw(s))*phi_z(c2)
+          phix_f1 = grid % fw(s)*phi % x(c1) + (1.0-grid % fw(s))*phi % x(c2)
+          phiy_f1 = grid % fw(s)*phi % y(c1) + (1.0-grid % fw(s))*phi % y(c2)
+          phiz_f1 = grid % fw(s)*phi % z(c1) + (1.0-grid % fw(s))*phi % z(c2)
           phix_f2 = phix_f1 
           phiy_f2 = phiy_f1 
           phiz_f2 = phiz_f1 
@@ -306,9 +300,9 @@
                   + (1. - grid % f(s)) * (turb % vis_t(c2)/sc_t )
           dif_eff2 = dif_eff1 
         else
-          phix_f1 = phi_x(c1)
-          phiy_f1 = phi_y(c1)
-          phiz_f1 = phi_z(c1)
+          phix_f1 = phi % x(c1)
+          phiy_f1 = phi % y(c1)
+          phiz_f1 = phi % z(c1)
           phix_f2 = phix_f1
           phiy_f2 = phiy_f1
           phiz_f2 = phiz_f1

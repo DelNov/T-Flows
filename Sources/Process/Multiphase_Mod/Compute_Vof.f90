@@ -15,7 +15,6 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
-  type(Bulk_Type),   pointer :: bulk
   type(Var_Type),    pointer :: vof
   type(Face_Type),   pointer :: m_flux
   real,              pointer :: vof_f(:)
@@ -35,7 +34,6 @@
   ! Take aliases
   flow   => mult % pnt_flow
   grid   => flow % pnt_grid
-  bulk   => flow % bulk
   m_flux => flow % m_flux
   vof    => mult % vof
   vof_f  => mult % vof_f
@@ -100,7 +98,7 @@
       !   Predict Beta at faces   !
       !---------------------------!
       ! Compute Gradient:
-      call Grad_Mod_Variable(vof)
+      call Field_Mod_Grad_Variable(flow, vof)
 
       call Multiphase_Mod_Vof_Predict_Beta(vof,                  &
                                            m_flux % n,           &
@@ -253,7 +251,7 @@
     call Multiphase_Mod_Vof_Surface_Tension_Contribution(mult)
   end if
 
-  call Grad_Mod_Variable(vof)
+  call Field_Mod_Grad_Variable(flow, vof)
 
   call Cpu_Timer_Mod_Stop('Compute_Multiphase (without solvers)')
 

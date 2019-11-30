@@ -12,7 +12,6 @@
   use Turb_Mod
   use Grid_Mod
   use Eddies_Mod
-  use Grad_Mod
   use Bulk_Mod
   use Var_Mod,       only: Var_Type
   use Solver_Mod,    only: Solver_Mod_Create
@@ -106,7 +105,6 @@
 
   ! Allocate memory for all variables
   call Field_Mod_Allocate(flow, grid)
-  call Grad_Mod_Allocate(grid)
   call Turb_Mod_Allocate(turb, flow)
   call Swarm_Mod_Allocate(swarm, flow)
   call Multiphase_Mod_Allocate(mult, flow)
@@ -161,7 +159,7 @@
   end if
 
   ! Prepare the gradient matrix for velocities
-  call Compute_Gradient_Matrix(grid)
+  call Field_Mod_Calculate_Grad_Matrix(flow)
 
   ! Print the areas of monitoring planes
   call Bulk_Mod_Print_Areas(flow % bulk)
@@ -235,12 +233,14 @@
 
       call Info_Mod_Iter_Fill(ini)
 
-      call Grad_Mod_Pressure(flow % p)
+      call Field_Mod_Grad_Pressure(flow, flow % p,  &
+                                   density,         &
+                                   grav_x, grav_y, grav_z)
 
       ! Compute velocity gradients
-      call Grad_Mod_Variable(flow % u)
-      call Grad_Mod_Variable(flow % v)
-      call Grad_Mod_Variable(flow % w)
+      call Field_Mod_Grad_Variable(flow, flow % u)
+      call Field_Mod_Grad_Variable(flow, flow % v)
+      call Field_Mod_Grad_Variable(flow, flow % w)
 
       ! All velocity components one after another
       call Compute_Momentum(flow, turb, mult, 1, sol, flow % dt, ini)
@@ -254,7 +254,7 @@
       call Balance_Mass(flow)
       call Compute_Pressure(flow, mult, sol, flow % dt, ini)
 
-      call Grad_Mod_Pressure_Correction(flow % pp)
+      call Field_Mod_Grad_Pressure_Correction(flow, flow % pp)
 
       call Bulk_Mod_Calculate_Fluxes(grid, flow % bulk, flow % m_flux % n)
       mass_res = Correct_Velocity(flow, sol, flow % dt, ini)

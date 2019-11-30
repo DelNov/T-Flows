@@ -1,14 +1,13 @@
 !==============================================================================!
-  subroutine Grad_Mod_Allocate(grid)
+  subroutine Field_Mod_Allocate_Grad_Matrix(flow)
 !------------------------------------------------------------------------------!
-!   Allocates memory for this module.                                          !
+!   Allocates memory for gradient matrix.                                      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Field_Type) :: flow
 !==============================================================================!
 
-  allocate(g(6,grid % n_cells));        g         = 0.
-  allocate(bad_cells(grid % n_cells));  bad_cells = .false.
+  allocate(flow % grad(6, flow % pnt_grid % n_cells));  flow % grad(:,:) = 0.0
 
   end subroutine

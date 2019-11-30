@@ -166,15 +166,15 @@
     m_23_f(c) = m_23_a / vol_e 
   end do
 
-  call Grad_Mod_Component(grid, u_f, 1, u % x)  ! dU/dx
-  call Grad_Mod_Component(grid, u_f, 2, u % y)  ! dU/dy
-  call Grad_Mod_Component(grid, u_f, 3, u % z)  ! dU/dz
-  call Grad_Mod_Component(grid, v_f, 1, v % x)  ! dV/dx
-  call Grad_Mod_Component(grid, v_f, 2, v % y)  ! dV/dy
-  call Grad_Mod_Component(grid, v_f, 3, v % z)  ! dV/dz
-  call Grad_Mod_Component(grid, w_f, 1, w % x)  ! dW/dx
-  call Grad_Mod_Component(grid, w_f, 2, w % y)  ! dW/dy
-  call Grad_Mod_Component(grid, w_f, 3, w % z)  ! dW/dz
+  call Field_Mod_Grad_Component(flow, u_f, 1, u % x)  ! dU/dx
+  call Field_Mod_Grad_Component(flow, u_f, 2, u % y)  ! dU/dy
+  call Field_Mod_Grad_Component(flow, u_f, 3, u % z)  ! dU/dz
+  call Field_Mod_Grad_Component(flow, v_f, 1, v % x)  ! dV/dx
+  call Field_Mod_Grad_Component(flow, v_f, 2, v % y)  ! dV/dy
+  call Field_Mod_Grad_Component(flow, v_f, 3, v % z)  ! dV/dz
+  call Field_Mod_Grad_Component(flow, w_f, 1, w % x)  ! dW/dx
+  call Field_Mod_Grad_Component(flow, w_f, 2, w % y)  ! dW/dy
+  call Field_Mod_Grad_Component(flow, w_f, 3, w % z)  ! dW/dz
 
   do c = 1, grid % n_cells
     l_g  = grid % vol(c)**ONE_THIRD
