@@ -94,9 +94,10 @@
     fs = grid % f(s)
 
     if (c2 > 0) then
-      visc_const = fs * viscosity(c1) + (1.0 - fs) * viscosity(c2)
+      visc_const =        fs  * flow % viscosity(c1)   &
+                 + (1.0 - fs) * flow % viscosity(c2)
     else
-      visc_const = viscosity(c1)
+      visc_const = flow % viscosity(c1)
     end if
 
     vis_eff = visc_const + (    grid % fw(s)  * turb % vis_t(c1)   &
@@ -209,7 +210,7 @@
   !   Inertial terms   !
   !                    !
   !--------------------!
-  call Numerics_Mod_Inertial_Term(phi, density, sol, dt)
+  call Numerics_Mod_Inertial_Term(phi, flow % density, sol, dt)
 
   !-------------------------------------!
   !                                     !

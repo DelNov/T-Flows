@@ -5,7 +5,7 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Field_Mod,   only: Field_Type, heat_transfer, density
+  use Field_Mod,   only: Field_Type, heat_transfer
   use Turb_Mod
   use Grid_Mod
   use Bulk_Mod,    only: Bulk_Type, Bulk_Mod_Calculate_Fluxes

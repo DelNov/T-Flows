@@ -43,36 +43,36 @@
       ! since the subdomains which do not "touch" wall
       ! has nearest_wall_cell(c) = 0. 
       if(turb % nearest_wall_cell(c) .ne. 0) then
-        u_f = sqrt( viscosity(c)  &
+        u_f = sqrt( flow % viscosity(c)                                &
                     * sqrt(  u % n(turb % nearest_wall_cell(c)) ** 2   &
                            + v % n(turb % nearest_wall_cell(c)) ** 2   &
                            + w % n(turb % nearest_wall_cell(c)) ** 2)  &
                    / (grid % wall_dist(turb % nearest_wall_cell(c))+TINY) )
-        turb % y_plus(c) = grid % wall_dist(c) * u_f / viscosity(c)
+        turb % y_plus(c) = grid % wall_dist(c) * u_f / flow % viscosity(c)
         cs = c_smag * (1.0 - exp(-turb % y_plus(c) / 25.0))
       else  
         cs = c_smag
       end if
-      turb % vis_t(c) = density(c)  &
-              * (lf*lf)   &  ! delta^2
-              * (cs*cs)   &  ! cs^2
-              * flow % shear(c)
+      turb % vis_t(c) = flow % density(c)  &
+                      * (lf*lf)            &  ! delta^2
+                      * (cs*cs)            &  ! cs^2
+                      * flow % shear(c)
     end do
 
   else if(turbulence_model .eq. LES_DYNAMIC) then
     do c = 1, grid % n_cells
       lf = grid % vol(c) ** ONE_THIRD
-      turb % vis_t(c) = density(c)          &
-                      * (lf*lf)          &  ! delta^2
-                      * turb % c_dyn(c)  &  ! c_dynamic
+      turb % vis_t(c) = flow % density(c)  &
+                      * (lf*lf)            &  ! delta^2
+                      * turb % c_dyn(c)    &  ! c_dynamic
                       * flow % shear(c)
     end do
   else if(turbulence_model .eq. LES_WALE) then
     do c = 1, grid % n_cells
       lf = grid % vol(c)**ONE_THIRD
-      turb % vis_t(c) = density(c)   &
-                      * (lf*lf)    &  ! delta^2
-                      * (0.5*0.5)  &  ! cs^2
+      turb % vis_t(c) = flow % density(c)  &
+                      * (lf*lf)            &  ! delta^2
+                      * (0.5*0.5)          &  ! cs^2
                       * turb % wale_v(c)
     end do
   end if
@@ -123,22 +123,23 @@
 
         a_pow = 8.3
         b_pow = 1.0/7.0
-        nu = viscosity(c1)/density(c1)
+        nu = flow % viscosity(c1) / flow % density(c1)
         dely = grid % wall_dist(c1)
 
         ! Calculate u_tau_l
         u_tau_l = ( u_tan/a_pow * (nu/dely)**b_pow ) ** (1.0/(1.0+b_pow))
 
         ! Calculate tau_wall (but it is never used)
-        turb % tau_wall(c1) = viscosity(c1) * u_tan / dely
+        turb % tau_wall(c1) = flow % viscosity(c1) * u_tan / dely
 
         ! Calculate y+
         turb % y_plus(c1)  = dely * u_tau_l / nu
         if(turb % y_plus(c1)  >=  11.81) then
           ! This one is effective viscosity
-          turb % vis_w(c1) = density(c1)*u_tau_l*u_tau_l*dely/abs(u_tan)
+          turb % vis_w(c1) = flow % density(c1) * u_tau_l * u_tau_l * dely  &
+                           / abs(u_tan)
         else
-          turb % vis_w(c1) = viscosity(c1)                       &
+          turb % vis_w(c1) = flow % viscosity(c1)                &
                         +      grid % fw(s)  * turb % vis_t(c1)  &
                         + (1.0-grid % fw(s)) * turb % vis_t(c2)
         end if

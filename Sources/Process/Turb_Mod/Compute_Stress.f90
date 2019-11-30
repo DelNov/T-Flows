@@ -113,11 +113,11 @@
     vis_t_f = grid % fw(s)       * turb % vis_t(c1)  &
             + (1.0-grid % fw(s)) * turb % vis_t(c2)
 
-    visc_const = grid % f(s)         * viscosity(c1)  &
-               + (1.0 - grid % f(s)) * viscosity(c2)
+    visc_const = grid % f(s)         * flow % viscosity(c1)  &
+               + (1.0 - grid % f(s)) * flow % viscosity(c2)
 
     vis_eff = visc_const + vis_t_f
-    
+
     if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
       if(turbulence_model_variant .ne. STABILIZED) then
         vis_eff = 1.5*visc_const + vis_t_f
@@ -190,40 +190,46 @@
   if(turbulence_model_variant .ne. STABILIZED) then
     if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
       do c = 1, grid % n_cells
-        u1uj_phij(c) = density(c) * c_mu_d / phi % sigma * kin % n(c)     &
+        u1uj_phij(c) = flow % density(c) * c_mu_d / phi % sigma        &
+                     * kin % n(c)                                      &
                      / max(eps % n(c), TINY)                           &
                      * (  uu % n(c) * phi_x(c)                         &
                         + uv % n(c) * phi_y(c)                         &
                         + uw % n(c) * phi_z(c))                        &
-                     - viscosity(c) * phi_x(c)
+                     - flow % viscosity(c) * phi_x(c)
 
-        u2uj_phij(c) = density(c) * c_mu_d / phi % sigma * kin % n(c)     &
+        u2uj_phij(c) = flow % density(c) * c_mu_d / phi % sigma        &
+                     * kin % n(c)                                      &
                      / max(eps % n(c), TINY)                           &
                      * (  uv % n(c) * phi_x(c)                         &
                         + vv % n(c) * phi_y(c)                         &
                         + vw % n(c) * phi_z(c))                        &
-                     - viscosity(c) * phi_y(c)
+                     - flow % viscosity(c) * phi_y(c)
 
-        u3uj_phij(c) = density(c) * c_mu_d / phi % sigma * kin % n(c)     &
+        u3uj_phij(c) = flow % density(c) * c_mu_d / phi % sigma        &
+                     * kin % n(c)                                      &
                      / max(eps % n(c), TINY)                           &
                      * (  uw % n(c) * phi_x(c)                         &
                         + vw % n(c) * phi_y(c)                         &
                         + ww % n(c) * phi_z(c))                        &
-                     - viscosity(c) * phi_z(c)
+                     - flow % viscosity(c) * phi_z(c)
       end do
     else if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
       do c = 1, grid % n_cells
-        u1uj_phij(c) = density(c) * c_mu_d / phi % sigma * turb % t_scale(c)  &
+        u1uj_phij(c) = flow % density(c) * c_mu_d / phi % sigma            &
+                     * turb % t_scale(c)                                   &
                      * (  uu % n(c) * phi_x(c)                             &
                         + uv % n(c) * phi_y(c)                             &
                         + uw % n(c) * phi_z(c))
 
-        u2uj_phij(c) = density(c) * c_mu_d / phi % sigma * turb % t_scale(c)  &
+        u2uj_phij(c) = flow % density(c) * c_mu_d / phi % sigma            &
+                     * turb % t_scale(c)                                   &
                      * (  uv % n(c) * phi_x(c)                             &
                         + vv % n(c) * phi_y(c)                             &
                         + vw % n(c) * phi_z(c))
 
-        u3uj_phij(c) = density(c) * c_mu_d / phi % sigma * turb % t_scale(c)  &
+        u3uj_phij(c) = flow % density(c) * c_mu_d / phi % sigma            &
+                     * turb % t_scale(c)                                   &
                      * (  uw % n(c) * phi_x(c)                             &
                         + vw % n(c) * phi_y(c)                             &
                         + ww % n(c) * phi_z(c))
@@ -288,7 +294,7 @@
   !   Inertial terms   !
   !                    !
   !--------------------!
-  call Numerics_Mod_Inertial_Term(phi, density, sol, dt)
+  call Numerics_Mod_Inertial_Term(phi, flow % density, sol, dt)
 
   !-------------------------------------!
   !                                     !

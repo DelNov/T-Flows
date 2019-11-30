@@ -118,7 +118,7 @@
   if(multiphase_model .eq. VOLUME_OF_FLUID) then
     dens_factor(:) = 1.0
   else
-    dens_factor(:) = density_f(:)
+    dens_factor(:) = flow % density_f(:)
   end if
 
   !-------------------------------------------------!

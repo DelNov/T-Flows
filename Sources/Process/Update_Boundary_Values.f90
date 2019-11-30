@@ -6,8 +6,7 @@
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
   use Comm_Mod
-  use Field_Mod,   only: Field_Type, heat_transfer, diffusivity,     &
-                         density, viscosity, capacity, conductivity
+  use Field_Mod,   only: Field_Type, heat_transfer
   use Turb_Mod
   use Grid_Mod
   use Control_Mod
@@ -60,7 +59,7 @@
     ! On the boundary perform the extrapolation
     if(c2 < 0) then
 
-      kin_vis = viscosity(c1) / density(c1)
+      kin_vis = flow % viscosity(c1) / flow % density(c1)
       ! Extrapolate velocities on the outflow boundary
       ! SYMMETRY is intentionally not treated here because I wanted to
       ! be sure that is handled only via graPHI and NewUVW functions)
@@ -178,10 +177,10 @@
         ! Turbulent conductivity from Reynolds analogy
         if(turbulence_model .ne. NONE .and.    &
            turbulence_model .ne. DNS) then
-          con_t = conductivity                 &
-                + capacity * turb % vis_t(c1) / pr_t
+          con_t = flow % conductivity                 &
+                + flow % capacity * turb % vis_t(c1) / pr_t
         else
-          con_t = conductivity
+          con_t = flow % conductivity
         end if
 
         ! Wall temperature or heat fluxes for k-eps-zeta-f
@@ -209,13 +208,13 @@
         else
           if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
             t % n(c2) = t % n(c1) + t % q(c2) * grid % wall_dist(c1)  &
-                      / conductivity
+                      / flow % conductivity
             flow % heat = flow % heat + t % q(c2) * grid % s(s)
             if(abs(t % q(c2)) > TINY) then
               flow % heated_area = flow % heated_area + grid % s(s)
             end if
           else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) then
-            t % q(c2) = ( t % n(c2) - t % n(c1) ) * conductivity  &
+            t % q(c2) = ( t % n(c2) - t % n(c1) ) * flow % conductivity  &
                       / grid % wall_dist(c1)
             flow % heat = flow % heat + t % q(c2) * grid % s(s)
             if(abs(t % q(c2)) > TINY) then
@@ -300,9 +299,9 @@
       if (c2 < 0) then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
           phi % n(c2) = phi % n(c1) + phi % q(c2) * grid % wall_dist(c1)  &
-                      / diffusivity
+                      / flow % diffusivity
         else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) then
-          phi % q(c2) = (phi % n(c2) - phi % n(c1)) * diffusivity &
+          phi % q(c2) = (phi % n(c2) - phi % n(c1)) * flow % diffusivity &
                       / grid % wall_dist(c1)
         end if ! WALL or WALLFL
 

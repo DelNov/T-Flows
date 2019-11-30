@@ -49,11 +49,11 @@
 
  ! Source term f22hg
  do c = 1, grid % n_cells
-   f22hg = (1.0 - c_f1 - 0.65 * turb % p_kin(c) / density(c)  &
-         / (eps  % n(c) + TINY))                              &
-         * (zeta % n(c) - TWO_THIRDS)                         &
-         / (turb % t_scale(c) + TINY)                         &
-         + 0.0085 * (turb % p_kin(c) / density(c)) / (kin % n(c) + TINY)
+   f22hg = (1.0 - c_f1 - 0.65 * turb % p_kin(c) / flow % density(c)  &
+         / (eps  % n(c) + TINY))                                     &
+         * (zeta % n(c) - TWO_THIRDS)                                &
+         / (turb % t_scale(c) + TINY)                                &
+         + 0.0085 * (turb % p_kin(c) / flow % density(c)) / (kin % n(c) + TINY)
    b(c) = b(c) + f22hg * grid % vol(c) / (turb % l_scale(c)**2 + TINY)
  end do
 
@@ -71,7 +71,8 @@
      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
         Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
 
-       f22 % n(c2) = -2.0 * viscosity(c1)/density(c1) * zeta % n(c1) &
+       f22 % n(c2) = -2.0 * flow % viscosity(c1)        &
+                   / flow % density(c1) * zeta % n(c1)  &
                    / grid % wall_dist(c1)**2
 
       ! Fill in a source coefficients

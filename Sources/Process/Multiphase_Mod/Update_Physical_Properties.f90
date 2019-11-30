@@ -22,18 +22,18 @@
 
   ! Density and viscosity in cells
   do c = 1, grid % n_cells
-    density(c)   = vof % n(c)         * phase_dens(1)      &
-                 + (1.0 - vof % n(c)) * phase_dens(2)
-    viscosity(c) = vof % n(c)         * phase_visc(1)      &
-                 + (1.0 - vof % n(c)) * phase_visc(2)
+    flow % density(c)   = vof % n(c)         * phase_dens(1)      &
+                        + (1.0 - vof % n(c)) * phase_dens(2)
+    flow % viscosity(c) = vof % n(c)         * phase_visc(1)      &
+                        + (1.0 - vof % n(c)) * phase_visc(2)
   end do
-  call Comm_Mod_Exchange_Real(grid, density)
-  call Comm_Mod_Exchange_Real(grid, viscosity)
+  call Comm_Mod_Exchange_Real(grid, flow % density)
+  call Comm_Mod_Exchange_Real(grid, flow % viscosity)
 
   ! Density at faces
   do s = 1, grid % n_faces
-    density_f(s) =        vof_f(s)  * phase_dens(1)   &
-                 + (1.0 - vof_f(s)) * phase_dens(2)
+    flow % density_f(s) =        vof_f(s)  * phase_dens(1)   &
+                        + (1.0 - vof_f(s)) * phase_dens(2)
   end do
 
   end subroutine

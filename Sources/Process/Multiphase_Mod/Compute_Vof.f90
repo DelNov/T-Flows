@@ -126,7 +126,8 @@
         !---------------------------!
         !   Correct Beta at faces   !
         !---------------------------!
-        call Multiphase_Mod_Vof_Correct_Beta(vof,                &
+        call Multiphase_Mod_Vof_Correct_Beta(mult,               &
+                                             vof,                &
                                              m_flux % n,         &
                                              beta_f,             &
                                              dt / real(n_sub))

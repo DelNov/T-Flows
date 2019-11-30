@@ -80,25 +80,25 @@
                         * grid % dy(s)                              &
                  + 0.5 * (body_fz(c1) / grid % vol(c1)              &
                         + body_fz(c2) / grid % vol(c2))             &
-                        * grid % dz(s)                           
+                        * grid % dz(s)
         gravity_source = ((grid % xf(s) - grid % xc(c1)) * grav_x   &
                         + (grid % yf(s) - grid % yc(c1)) * grav_y   &
                         + (grid % zf(s) - grid % zc(c1)) * grav_z)  &
-                        * density(c1)                               &                                         
+                        * flow % density(c1)                        &
                         -((grid % xf(s) - grid % xc(c2)) * grav_x   &
                         + (grid % yf(s) - grid % yc(c2)) * grav_y   &
                         + (grid % zf(s) - grid % zc(c2)) * grav_z)  &
-                        * density(c2)         
+                        * flow % density(c2)
 
         a12 = 0.5 * a % fc(s)                    &
              * ( grid % vol(c1) / a % sav(c1)    &
                + grid % vol(c2) / a % sav(c2) )
 
-        gravity_source =  a12 * (gravity_source - dotprod)           
+        gravity_source =  a12 * (gravity_source - dotprod)
 
         m_flux % n(s) = m_flux % n(s) + gravity_source
 
-        b(c1) = b(c1) - gravity_source           
+        b(c1) = b(c1) - gravity_source
         b(c2) = b(c2) + gravity_source
 
       end if

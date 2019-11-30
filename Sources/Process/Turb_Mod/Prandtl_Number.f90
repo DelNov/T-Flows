@@ -10,11 +10,17 @@
   type(Turb_Type), target :: turb
   integer                 :: c
   real                    :: pr, pr_t_inf, pe_t
+!-----------------------------------[Locals]-----------------------------------!
+  type(Field_Type), pointer :: flow
 !==============================================================================!
 
-  pr       = viscosity(c) * capacity / conductivity
+  ! Take alias
+  flow => turb % pnt_flow
+
+  pr       = flow % viscosity(c) * flow % capacity  &
+           / flow % conductivity
   pr_t_inf = 0.85
-  pe_t     = max(pr * turb % vis_t(c) / viscosity(c), TINY)
+  pe_t     = max(pr * turb % vis_t(c) / flow % viscosity(c), TINY)
 
   Turb_Mod_Prandtl_Number =                                             &
     1.0 / (   1.0/(2.0*pr_t_inf)                                        &

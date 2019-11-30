@@ -121,7 +121,7 @@
   ! (You need face geomtry for this step)
   call Solver_Mod_Create(sol, grid)
 
-  call Load_Physical_Properties(grid)
+  call Load_Physical_Properties(flow)
 
   call Load_Boundary_Conditions(flow, turb, mult, turb_planes)
 
@@ -234,7 +234,7 @@
       call Info_Mod_Iter_Fill(ini)
 
       call Field_Mod_Grad_Pressure(flow, flow % p,  &
-                                   density,         &
+                                   flow % density,  &
                                    grav_x, grav_y, grav_z)
 
       ! Compute velocity gradients

@@ -7,7 +7,7 @@
   use Const_Mod
   use Comm_Mod
   use Cpu_Timer_Mod, only: Cpu_Timer_Mod_Start, Cpu_Timer_Mod_Stop
-  use Field_Mod,     only: Field_Type, diffusivity, density
+  use Field_Mod,     only: Field_Type
   use Turb_Mod
   use Var_Mod
   use Face_Mod
@@ -144,8 +144,8 @@
       phix_f2 = phix_f1 
       phiy_f2 = phiy_f1 
       phiz_f2 = phiz_f1 
-      dif_eff1 = grid % f(s) *(diffusivity + turb % vis_t(c1)/sc_t)  &
-           + (1.-grid % f(s))*(diffusivity + turb % vis_t(c2)/sc_t)
+      dif_eff1 = grid % f(s) *(flow % diffusivity + turb % vis_t(c1)/sc_t)  &
+           + (1.-grid % f(s))*(flow % diffusivity + turb % vis_t(c2)/sc_t)
       dif_eff2 = dif_eff1 
     else
       phix_f1 = phi % x(c1) 
@@ -154,7 +154,7 @@
       phix_f2 = phix_f1 
       phiy_f2 = phiy_f1 
       phiz_f2 = phiz_f1 
-      dif_eff1 = diffusivity + turb % vis_t(c1) / sc_t
+      dif_eff1 = flow % diffusivity + turb % vis_t(c1) / sc_t
       dif_eff2 = dif_eff1 
     end if
 
@@ -243,7 +243,7 @@
   !   Inertial terms   !
   !                    !
   !--------------------!
-  call Numerics_Mod_Inertial_Term(phi, density, sol, dt)
+  call Numerics_Mod_Inertial_Term(phi, flow % density, sol, dt)
 
   !-------------------------------------!
   !                                     !

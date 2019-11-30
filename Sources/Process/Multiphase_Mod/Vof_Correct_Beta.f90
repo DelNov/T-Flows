@@ -1,25 +1,29 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Vof_Correct_Beta(phi,                  &
-                                             phi_flux,             &
-                                             beta_f,               &
+  subroutine Multiphase_Mod_Vof_Correct_Beta(mult,      &
+                                             phi,       &
+                                             phi_flux,  &
+                                             beta_f,    &
                                              dt)
 !------------------------------------------------------------------------------!
 !   Computes the value at the cell face using different convective  schemes.   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  type(Multiphase_Type)    :: mult
   type(Var_Type)           :: phi
   real,        allocatable :: phi_flux(:)
   real,        allocatable :: beta_f(:)
   real                     :: dt
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
-  integer                  :: s, c1, c2, donor, accept
-  real                     :: fs, signo, e_plus, e_minus, cf, delta_alfa, bcorr
+  type(Grid_Type),  pointer :: grid
+  type(Field_Type), pointer :: flow
+  integer                   :: s, c1, c2, donor, accept
+  real                      :: fs, signo, e_plus, e_minus, cf, delta_alfa, bcorr
 !==============================================================================!
 
   ! Take aliases
-  grid => phi % pnt_grid
+  flow => mult % pnt_flow
+  grid => phi  % pnt_grid
 
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
@@ -45,7 +49,7 @@
         delta_alfa = 0.5 * (phi % n(accept) + phi % o(accept)     &
                          - (phi % n(donor) + phi % o(donor)))
 
-        cf = min(max(- phi_flux(s) / density_f(s)                 &
+        cf = min(max(- phi_flux(s) / flow % density_f(s)          &
                               * dt / grid % vol(donor),0.0),1.0)
 
         if (phi % n(donor) < 0.0) then

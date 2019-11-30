@@ -31,7 +31,7 @@
   part => swarm % particle(k)
 
   ! Characteristic viscosity (needs to be discussed yet)
-  visc_const = maxval(viscosity(:))
+  visc_const = maxval(flow % viscosity(:))
 
   c  = part % cell      ! index of the closest cell for interpolation
   c2 = part % bnd_cell  ! index of the closest boundary cell for reflection

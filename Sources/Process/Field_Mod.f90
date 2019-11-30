@@ -22,6 +22,14 @@
 
     type(Grid_Type), pointer :: pnt_grid  ! grid for which it is defined
 
+    ! Physical properties
+    real :: capacity
+    real :: conductivity
+    real :: diffusivity
+    real, allocatable :: density(:)
+    real, allocatable :: viscosity(:)
+    real, allocatable :: density_f(:)
+
     ! Velocity components
     type(Var_Type) :: u
     type(Var_Type) :: v
@@ -67,10 +75,6 @@
   ! Variables determining if we are dealing with heat transfer and buoyancy
   logical :: heat_transfer
   logical :: buoyancy
-
-  ! Physical properties
-  real :: conductivity, diffusivity, capacity
-  real, allocatable :: viscosity(:), density(:), density_f(:)
 
   ! Angular velocity
   real :: omega_x, omega_y, omega_z, omega

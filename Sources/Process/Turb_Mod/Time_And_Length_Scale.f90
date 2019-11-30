@@ -49,7 +49,7 @@
     do c = 1, grid % n_cells
       eps_l(c) = eps % n(c) + TINY ! limited eps % n
 
-      kin_vis = viscosity(c) / density(c)
+      kin_vis = flow % viscosity(c) / flow % density(c)
 
       t_1(c) = kin % n(c) / eps_l(c)
       t_2(c) = c_t*sqrt(kin_vis/eps_l(c))
@@ -69,7 +69,7 @@
     do c = 1, grid % n_cells
       eps_l(c) = eps % n(c) + TINY ! limited eps % n
 
-      kin_vis = viscosity(c) / density(c)
+      kin_vis = flow % viscosity(c) / flow % density(c)
 
       t_1(c) = kin % n(c)/eps_l(c)
       t_2(c) = c_t*sqrt(kin_vis/eps_l(c))
