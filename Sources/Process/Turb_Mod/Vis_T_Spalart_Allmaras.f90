@@ -23,17 +23,17 @@
 
   if(turbulence_model .eq. DES_SPALART) then
     do c = 1, grid % n_cells
-      x_rat    = vis % n(c)/viscosity(c)
+      x_rat    = vis % n(c) / flow % viscosity(c)
       f_v1     = x_rat**3/(x_rat**3 + c_v1**3)
-      turb % vis_t(c) = density(c) * f_v1 * vis % n(c)
+      turb % vis_t(c) = flow % density(c) * f_v1 * vis % n(c)
     end do
   end if
 
   if(turbulence_model .eq. SPALART_ALLMARAS) then
     do c = 1, grid % n_cells
-      x_rat = vis % n(c)/viscosity(c)
+      x_rat = vis % n(c) / flow % viscosity(c)
       f_v1  = x_rat**3/(x_rat**3 + c_v1**3)
-      turb % vis_t(c) = density(c) * f_v1 * vis % n(c)
+      turb % vis_t(c) = flow % density(c) * f_v1 * vis % n(c)
     end do
   end if
 

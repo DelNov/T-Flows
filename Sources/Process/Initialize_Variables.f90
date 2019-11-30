@@ -6,8 +6,7 @@
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
   use File_Mod
-  use Field_Mod,   only: Field_Type, heat_transfer, density,  &
-                          density_f
+  use Field_Mod,   only: Field_Type, heat_transfer
   use Comm_Mod
   use Turb_Mod
   use Swarm_Mod
@@ -374,9 +373,9 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
     if(c2  < 0) then
-      m_flux % n(s) = density_f(s) * ( u % n(c2) * grid % sx(s)  &
-                                     + v % n(c2) * grid % sy(s)  &
-                                     + w % n(c2) * grid % sz(s) )
+      m_flux % n(s) = flow % density_f(s) * ( u % n(c2) * grid % sx(s)  &
+                                            + v % n(c2) * grid % sy(s)  &
+                                            + w % n(c2) * grid % sz(s) )
 
       if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
         bulk % mass_in = bulk % mass_in - m_flux % n(s)
@@ -418,10 +417,10 @@
       if (multiphase_model .eq. VOLUME_OF_FLUID) then
         ! Needs to be corrected
         print '(a29,es12.5)', ' # Average inflow velocity : ',  &
-          bulk % mass_in / (density_f(1) * area)
+          bulk % mass_in / (flow % density_f(1) * area)
       else
         print '(a29,es12.5)', ' # Average inflow velocity : ',  &
-          bulk % mass_in / (density(1) * area)
+          bulk % mass_in / (flow % density(1) * area)
       end if
     end if
     print *, '# Number of faces on the wall        : ', n_wall

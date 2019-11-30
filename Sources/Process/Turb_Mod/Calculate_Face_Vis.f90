@@ -11,11 +11,13 @@
   integer                 :: s
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: grid
+  type(Field_Type), pointer :: flow
   integer                   :: c1, c2
   real                      :: fs
 !==============================================================================!
 
   ! Take alias
+  flow => turb % pnt_flow
   grid => turb % pnt_grid
 
   c1 = grid % faces_c(1,s)
@@ -23,9 +25,9 @@
   fs = grid % f(s)
 
   if (c2 > 0) then
-    vis_eff = fs * viscosity(c1) + (1.0 - fs) * viscosity(c2)
+    vis_eff = fs * flow % viscosity(c1) + (1.0 - fs) * flow % viscosity(c2)
   else
-    vis_eff = viscosity(c1)
+    vis_eff = flow % viscosity(c1)
   end if
 
   if(turbulence_model .ne. NONE .and.  &

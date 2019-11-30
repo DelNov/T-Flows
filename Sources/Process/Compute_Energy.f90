@@ -6,11 +6,10 @@
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
   use Comm_Mod
-  use Field_Mod,    only: Field_Type, conductivity, capacity, density
+  use Field_Mod,    only: Field_Type
   use Var_Mod,      only: Var_Type
   use Face_Mod,     only: Face_Type
   use Grid_Mod,     only: Grid_Type
-  use Grad_Mod
   use Info_Mod
   use Numerics_Mod
   use Solver_Mod,   only: Solver_Type, Solver_Mod_Alias_System, Bicg, Cg, Cgs
@@ -96,19 +95,19 @@
   end if
 
   ! Gradients
-  call Grad_Mod_Variable(t)
+  call Field_Mod_Grad_Variable(flow, t)
 
   !---------------!
   !               !
   !   Advection   !
   !               !
   !---------------!
-  call Numerics_Mod_Advection_Term(t, capacity, m_flux % n, sol,  &
-                                   t % x,                   &
-                                   t % y,                   &
-                                   t % z,                   &
-                                   grid % dx,               &
-                                   grid % dy,               &
+  call Numerics_Mod_Advection_Term(t, flow % capacity, m_flux % n, sol,  &
+                                   t % x,                                &
+                                   t % y,                                &
+                                   t % z,                                &
+                                   grid % dx,                            &
+                                   grid % dy,                            &
                                    grid % dz)
 
   !--------------!
@@ -151,12 +150,14 @@
     tz_f2 = tz_f1
     if(turbulence_model .ne. NO_TURBULENCE .and.  &
        turbulence_model .ne. DNS) then
-      con_eff1 = grid % fw(s) *(conductivity+capacity*turb % vis_t(c1)/pr_tf) &
-          + (1.0-grid % fw(s))*(conductivity+capacity*turb % vis_t(c2)/pr_tf)
-      con_t    = grid % fw(s) *capacity*turb % vis_t(c1)/pr_tf  &
-          + (1.0-grid % fw(s))*capacity*turb % vis_t(c2)/pr_tf
+      con_eff1 = grid % fw(s) *(flow % conductivity +                      &
+                                flow % capacity * turb % vis_t(c1)/pr_tf)  &
+          + (1.0-grid % fw(s))*(flow % conductivity +                      &
+                                flow % capacity * turb % vis_t(c2)/pr_tf)
+      con_t    = grid % fw(s) *flow % capacity * turb % vis_t(c1)/pr_tf    &
+          + (1.0-grid % fw(s))*flow % capacity * turb % vis_t(c2)/pr_tf
     else
-      con_eff1 = conductivity
+      con_eff1 = flow % conductivity
     end if
 
     con_eff2 = con_eff1
@@ -231,8 +232,8 @@
     a12 = con_eff1 * a % fc(s)
     a21 = con_eff2 * a % fc(s)
 
-    a12 = a12  - min(m_flux % n(s), 0.0) * capacity
-    a21 = a21  + max(m_flux % n(s), 0.0) * capacity
+    a12 = a12  - min(m_flux % n(s), 0.0) * flow % capacity
+    a21 = a21  + max(m_flux % n(s), 0.0) * flow % capacity
 
     ! Fill the system matrix
     if(c2 > 0) then
@@ -271,8 +272,8 @@
   !   Inertial terms   !
   !                    !
   !--------------------!
-  allocate(capacity_times_density(size(density)))
-  capacity_times_density(:) = capacity * density(:)
+  allocate(capacity_times_density(size(flow % density)))
+  capacity_times_density(:) = flow % capacity * flow % density(:)
 
   call Numerics_Mod_Inertial_Term(t, capacity_times_density, sol, dt)
 

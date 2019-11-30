@@ -414,7 +414,7 @@
   if(turbulence_model .ne. NO_TURBULENCE) then
     kin_vis_t   (-grid % n_bnd_cells:grid % n_cells) =  &
     turb % vis_t(-grid % n_bnd_cells:grid % n_cells) /  &
-       viscosity(-grid % n_bnd_cells:grid % n_cells)
+       flow % viscosity(-grid % n_bnd_cells:grid % n_cells)
     call Save_Scalar(grid, IN_4, IN_5, "EddyOverMolecularViscosity",        &
                                        plot_inside,                         &
                                        kin_vis_t(-grid % n_bnd_cells), f8, f9)

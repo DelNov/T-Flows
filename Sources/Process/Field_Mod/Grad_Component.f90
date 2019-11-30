@@ -1,18 +1,25 @@
 !==============================================================================!
-  subroutine Grad_Mod_Component(grid, phi, i, phii)
+  subroutine Field_Mod_Grad_Component(flow, phi, i, phii)
 !------------------------------------------------------------------------------!
 !   Calculates gradient of generic variable phi by a least squares method.     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
-  integer         :: i
-  real            :: phi (-grid % n_bnd_cells:grid % n_cells),  &
-                     phii(-grid % n_bnd_cells:grid % n_cells) 
+  type(Field_Type), target :: flow
+  integer                  :: i
+  real                     :: phi (-flow % pnt_grid % n_bnd_cells:  &
+                                    flow % pnt_grid % n_cells),     &
+                              phii(-flow % pnt_grid % n_bnd_cells:  &
+                                    flow % pnt_grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: s, c1, c2
-  real    :: dphi1, dphi2, dx_c1, dy_c1, dz_c1, dx_c2, dy_c2, dz_c2 
+  type(Grid_Type), pointer :: grid
+  integer                  :: s, c1, c2
+  real                     :: dphi1, dphi2
+  real                     :: dx_c1, dy_c1, dz_c1, dx_c2, dy_c2, dz_c2
 !==============================================================================!
+
+  ! Take alias
+  grid => flow % pnt_grid
 
   call Comm_Mod_Exchange_Real(grid, phi)
 
@@ -38,13 +45,13 @@
         end if
       end if
 
-      phii(c1) = phii(c1) + dphi1*(g(1,c1)*dx_c1  &
-                                 + g(4,c1)*dy_c1  &
-                                 + g(5,c1)*dz_c1) 
+      phii(c1) = phii(c1) + dphi1*(flow % grad(1,c1) * dx_c1  &
+                                 + flow % grad(4,c1) * dy_c1  &
+                                 + flow % grad(5,c1) * dz_c1)
       if(c2 > 0) then
-        phii(c2) = phii(c2) + dphi2*(g(1,c2)*dx_c2  &
-                                   + g(4,c2)*dy_c2  &
-                                   + g(5,c2)*dz_c2)
+        phii(c2) = phii(c2) + dphi2*(flow % grad(1,c2) * dx_c2  &
+                                   + flow % grad(4,c2) * dy_c2  &
+                                   + flow % grad(5,c2) * dz_c2)
       end if
     end do
   end if
@@ -69,13 +76,13 @@
         end if
       end if
 
-      phii(c1) = phii(c1) + dphi1*(g(4,c1)*dx_c1 +  &
-                                   g(2,c1)*dy_c1 +  &
-                                   g(6,c1)*dz_c1)
+      phii(c1) = phii(c1) + dphi1*(flow % grad(4,c1) * dx_c1 +  &
+                                   flow % grad(2,c1) * dy_c1 +  &
+                                   flow % grad(6,c1) * dz_c1)
       if(c2  > 0) then
-        phii(c2) = phii(c2) + dphi2*(g(4,c2)*dx_c2 +  &
-                                     g(2,c2)*dy_c2 +  &
-                                     g(6,c2)*dz_c2)
+        phii(c2) = phii(c2) + dphi2*(flow % grad(4,c2) * dx_c2 +  &
+                                     flow % grad(2,c2) * dy_c2 +  &
+                                     flow % grad(6,c2) * dz_c2)
       end if
     end do
   end if
@@ -100,13 +107,13 @@
         end if
       end if
 
-      phii(c1) = phii(c1) + dphi1*(g(5,c1)*dx_c1  &
-                                 + g(6,c1)*dy_c1  &
-                                 + g(3,c1)*dz_c1)
+      phii(c1) = phii(c1) + dphi1 * (flow % grad(5,c1) * dx_c1  &
+                                   + flow % grad(6,c1) * dy_c1  &
+                                   + flow % grad(3,c1) * dz_c1)
       if(c2 > 0) then
-        phii(c2) = phii(c2) + dphi2*(g(5,c2)*dx_c2  &
-                                   + g(6,c2)*dy_c2  &
-                                   + g(3,c2)*dz_c2)
+        phii(c2) = phii(c2) + dphi2 * (flow % grad(5,c2) * dx_c2  &
+                                     + flow % grad(6,c2) * dy_c2  &
+                                     + flow % grad(3,c2) * dz_c2)
       end if
     end do
   end if

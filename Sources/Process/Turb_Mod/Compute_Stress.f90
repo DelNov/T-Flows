@@ -77,9 +77,9 @@
   end if
 
   ! Gradients
-  call Grad_Mod_Component(grid, phi % n, 1, phi_x)
-  call Grad_Mod_Component(grid, phi % n, 2, phi_y)
-  call Grad_Mod_Component(grid, phi % n, 3, phi_z)
+  call Field_Mod_Grad_Component(flow, phi % n, 1, phi_x)
+  call Field_Mod_Grad_Component(flow, phi % n, 2, phi_y)
+  call Field_Mod_Grad_Component(flow, phi % n, 3, phi_z)
 
   !---------------!
   !               !
@@ -113,11 +113,11 @@
     vis_t_f = grid % fw(s)       * turb % vis_t(c1)  &
             + (1.0-grid % fw(s)) * turb % vis_t(c2)
 
-    visc_const = grid % f(s)         * viscosity(c1)  &
-               + (1.0 - grid % f(s)) * viscosity(c2)
+    visc_const = grid % f(s)         * flow % viscosity(c1)  &
+               + (1.0 - grid % f(s)) * flow % viscosity(c2)
 
     vis_eff = visc_const + vis_t_f
-    
+
     if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
       if(turbulence_model_variant .ne. STABILIZED) then
         vis_eff = 1.5*visc_const + vis_t_f
@@ -190,49 +190,55 @@
   if(turbulence_model_variant .ne. STABILIZED) then
     if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
       do c = 1, grid % n_cells
-        u1uj_phij(c) = density(c) * c_mu_d / phi % sigma * kin % n(c)     &
+        u1uj_phij(c) = flow % density(c) * c_mu_d / phi % sigma        &
+                     * kin % n(c)                                      &
                      / max(eps % n(c), TINY)                           &
                      * (  uu % n(c) * phi_x(c)                         &
                         + uv % n(c) * phi_y(c)                         &
                         + uw % n(c) * phi_z(c))                        &
-                     - viscosity(c) * phi_x(c)
+                     - flow % viscosity(c) * phi_x(c)
 
-        u2uj_phij(c) = density(c) * c_mu_d / phi % sigma * kin % n(c)     &
+        u2uj_phij(c) = flow % density(c) * c_mu_d / phi % sigma        &
+                     * kin % n(c)                                      &
                      / max(eps % n(c), TINY)                           &
                      * (  uv % n(c) * phi_x(c)                         &
                         + vv % n(c) * phi_y(c)                         &
                         + vw % n(c) * phi_z(c))                        &
-                     - viscosity(c) * phi_y(c)
+                     - flow % viscosity(c) * phi_y(c)
 
-        u3uj_phij(c) = density(c) * c_mu_d / phi % sigma * kin % n(c)     &
+        u3uj_phij(c) = flow % density(c) * c_mu_d / phi % sigma        &
+                     * kin % n(c)                                      &
                      / max(eps % n(c), TINY)                           &
                      * (  uw % n(c) * phi_x(c)                         &
                         + vw % n(c) * phi_y(c)                         &
                         + ww % n(c) * phi_z(c))                        &
-                     - viscosity(c) * phi_z(c)
+                     - flow % viscosity(c) * phi_z(c)
       end do
     else if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
       do c = 1, grid % n_cells
-        u1uj_phij(c) = density(c) * c_mu_d / phi % sigma * turb % t_scale(c)  &
+        u1uj_phij(c) = flow % density(c) * c_mu_d / phi % sigma            &
+                     * turb % t_scale(c)                                   &
                      * (  uu % n(c) * phi_x(c)                             &
                         + uv % n(c) * phi_y(c)                             &
                         + uw % n(c) * phi_z(c))
 
-        u2uj_phij(c) = density(c) * c_mu_d / phi % sigma * turb % t_scale(c)  &
+        u2uj_phij(c) = flow % density(c) * c_mu_d / phi % sigma            &
+                     * turb % t_scale(c)                                   &
                      * (  uv % n(c) * phi_x(c)                             &
                         + vv % n(c) * phi_y(c)                             &
                         + vw % n(c) * phi_z(c))
 
-        u3uj_phij(c) = density(c) * c_mu_d / phi % sigma * turb % t_scale(c)  &
+        u3uj_phij(c) = flow % density(c) * c_mu_d / phi % sigma            &
+                     * turb % t_scale(c)                                   &
                      * (  uw % n(c) * phi_x(c)                             &
                         + vw % n(c) * phi_y(c)                             &
                         + ww % n(c) * phi_z(c))
       end do
     end if
 
-    call Grad_Mod_Component(grid, u1uj_phij, 1, u1uj_phij_x)
-    call Grad_Mod_Component(grid, u2uj_phij, 2, u2uj_phij_y)
-    call Grad_Mod_Component(grid, u3uj_phij, 3, u3uj_phij_z)
+    call Field_Mod_Grad_Component(flow, u1uj_phij, 1, u1uj_phij_x)
+    call Field_Mod_Grad_Component(flow, u2uj_phij, 2, u2uj_phij_y)
+    call Field_Mod_Grad_Component(flow, u3uj_phij, 3, u3uj_phij_z)
 
     do c = 1, grid % n_cells
       b(c) = b(c) + (  u1uj_phij_x(c)  &
@@ -288,7 +294,7 @@
   !   Inertial terms   !
   !                    !
   !--------------------!
-  call Numerics_Mod_Inertial_Term(phi, density, sol, dt)
+  call Numerics_Mod_Inertial_Term(phi, flow % density, sol, dt)
 
   !-------------------------------------!
   !                                     !
@@ -296,9 +302,7 @@
   !                                     !
   !-------------------------------------!
   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
-    call Grad_Mod_Component(grid, f22 % n, 1, f22 % x) ! df22/dx
-    call Grad_Mod_Component(grid, f22 % n, 2, f22 % y) ! df22/dy
-    call Grad_Mod_Component(grid, f22 % n, 3, f22 % z) ! df22/dz
+    call Field_Mod_Grad_Variable(flow, f22)
 
     call Turb_Mod_Src_Rsm_Manceau_Hanjalic(turb, sol, phi % name)
   else if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then

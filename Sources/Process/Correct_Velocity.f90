@@ -7,7 +7,7 @@
   use Const_Mod
   use Comm_Mod
   use Cpu_Timer_Mod, only: Cpu_Timer_Mod_Start, Cpu_Timer_Mod_Stop
-  use Field_Mod,     only: Field_Type, viscosity, density
+  use Field_Mod,     only: Field_Type
   use Grid_Mod,      only: Grid_Type
   use Bulk_Mod,      only: Bulk_Type
   use Info_Mod,      only: Info_Mod_Iter_Fill_At, Info_Mod_Bulk_Fill
@@ -32,7 +32,7 @@
   integer                    :: c, c1, c2, s
   real                       :: cfl_max, pe_max
   real                       :: cfl_t, pe_t, mass_err
-  real                       :: dens_const, visc_const
+  real                       :: dens_f, visc_f
 !==============================================================================!
 
   call Cpu_Timer_Mod_Start('Correct_Velocity')
@@ -117,10 +117,10 @@
       b(c) = b(c) / (grid % vol(c) / dt)
     end do
     ! Here volume flux is converted into mass flux:
-    flux % n(:) = flux % n(:) * density_f(:)
+    flux % n(:) = flux % n(:) * flow % density_f(:)
   else
     do c = 1, grid % n_cells
-      b(c) = b(c) / (density(c) * grid % vol(c) / dt)
+      b(c) = b(c) / (flow % density(c) * grid % vol(c) / dt)
     end do
   end if
 
@@ -139,18 +139,18 @@
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
-    dens_const = density_f(s)
-    visc_const =        grid % f(s)  * viscosity(c1)   &
-               + (1.0 - grid % f(s)) * viscosity(c2)
+    dens_f = flow % density_f(s)
+    visc_f =        grid % f(s)  * flow % viscosity(c1)   &
+           + (1.0 - grid % f(s)) * flow % viscosity(c2)
     if(c2 > 0) then
-      cfl_t = abs( dt * flux % n(s) / dens_const /      &
+      cfl_t = abs( dt * flux % n(s) / dens_f /   &
                    ( a % fc(s) *                 &
                    (  grid % dx(s)*grid % dx(s)  &
                     + grid % dy(s)*grid % dy(s)  &
                     + grid % dz(s)*grid % dz(s)) ) )
-      pe_t    = abs( flux % n(s) / a % fc(s) / (visc_const/dens_const+TINY) )
-      cfl_max = max( cfl_max, cfl_t ) 
-      pe_max  = max( pe_max,  pe_t  ) 
+      pe_t    = abs( flux % n(s) / a % fc(s) / (visc_f / dens_f + TINY) )
+      cfl_max = max( cfl_max, cfl_t )
+      pe_max  = max( pe_max,  pe_t  )
     end if
   end do
   call Comm_Mod_Global_Max_Real(cfl_max)

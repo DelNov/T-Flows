@@ -11,11 +11,11 @@
 !    have them spread over included functions.)                                !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Comm_Mod,   only: this_proc, Comm_Mod_End, Comm_Mod_Exchange_Real
-  use Grid_Mod,   only: Grid_Type
-  use Matrix_Mod, only: Matrix_Type
-  use Solver_Mod, only: Solver_Type
-  use Var_Mod,    only: Var_Type
+  use Comm_Mod
+  use Grid_Mod
+  use Matrix_Mod
+  use Solver_Mod
+  use Var_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!

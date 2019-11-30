@@ -8,8 +8,7 @@
   use Comm_Mod
   use Cpu_Timer_Mod,  only: Cpu_Timer_Mod_Start, Cpu_Timer_Mod_Stop
   use Field_Mod,      only: Field_Type, buoyancy, t_ref,  &
-                            grav_x, grav_y, grav_z,       &
-                            density
+                            grav_x, grav_y, grav_z
   use Turb_Mod
   use Multiphase_Mod, only: Multiphase_Type, &
                             Multiphase_Mod_Vof_Surface_Tension_Contribution,  &
@@ -220,9 +219,9 @@
     f_im = ui_di * a0
 
     ! Cross diffusion part
-    ui % c(c1) = ui % c(c1) + f_ex - f_im + f_stress * density(c1)
+    ui % c(c1) = ui % c(c1) + f_ex - f_im + f_stress * flow % density(c1)
     if(c2  > 0) then
-      ui % c(c2) = ui % c(c2) - f_ex + f_im - f_stress * density(c2)
+      ui % c(c2) = ui % c(c2) - f_ex + f_im - f_stress * flow % density(c2)
     end if
 
     ! Compute the coefficients for the sysytem matrix
@@ -264,7 +263,7 @@
   !   Inertial terms   !
   !                    !
   !--------------------!
-  call Numerics_Mod_Inertial_Term(ui, density, sol, dt)
+  call Numerics_Mod_Inertial_Term(ui, flow % density, sol, dt)
 
   !---------------------------------!
   !                                 !
@@ -292,7 +291,7 @@
   if(buoyancy) then
     if(abs(grav_i) > NANO) then
       do c = 1, grid % n_cells
-        b(c) = b(c) - density(c) * grav_i * (t % n(c) - t_ref)  &
+        b(c) = b(c) - flow % density(c) * grav_i * (t % n(c) - t_ref)  &
              * flow % beta * grid % vol(c)
       end do
     end if
@@ -304,7 +303,7 @@
     if(abs(grav_i) > NANO) then
       if(multiphase_model .ne. VOLUME_OF_FLUID) then
         do c = 1, grid % n_cells
-          b(c) = b(c) + density(c) * grav_i * grid % vol(c)
+          b(c) = b(c) + flow % density(c) * grav_i * grid % vol(c)
         end do
       end if
     end if

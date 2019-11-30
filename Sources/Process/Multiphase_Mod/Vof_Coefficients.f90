@@ -38,8 +38,8 @@
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
 
-      upwd1 = 0.5 * max( m_flux % n(s) / density_f(s), 0.0)
-      upwd2 = 0.5 * max(-m_flux % n(s) / density_f(s), 0.0)
+      upwd1 = 0.5 * max( m_flux % n(s) / flow % density_f(s), 0.0)
+      upwd2 = 0.5 * max(-m_flux % n(s) / flow % density_f(s), 0.0)
 
       a % val(a % dia(c1)) = a % val(a % dia(c1)) + upwd1
       b(c1) = b(c1) - ( upwd1 * vof % o(c1) -  upwd2 * vof % o(c2) ) 
@@ -55,7 +55,7 @@
           b(c1) = b(c1) - m_flux % n(s) * vof % n(c2)
         else if (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) then
           a % val(a % dia(c1)) = a % val(a % dia(c1))          &
-                               + m_flux % n(s) / density_f(s)
+                               + m_flux % n(s) / flow % density_f(s)
         end if
       end if
 
@@ -69,13 +69,13 @@
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
 
-      upwd1 = (0.5 - beta_f(s)) * max(-m_flux % n(s)           &
-                                     / density_f(s), 0.0)      &
-             - 0.5 * beta_f(s) * m_flux % n(s) / density_f(s)
-      upwd2 = (0.5 - beta_f(s)) * max(m_flux % n(s)            &
-                                     / density_f(s), 0.0)      &
-             + 0.5 * beta_f(s) * m_flux % n(s) / density_f(s)
-      upwd3 = 0.5 * m_flux % n(s) / density_f(s)
+      upwd1 = (0.5 - beta_f(s)) * max(-m_flux % n(s)                  &
+                                     / flow % density_f(s), 0.0)      &
+             - 0.5 * beta_f(s) * m_flux % n(s) / flow % density_f(s)
+      upwd2 = (0.5 - beta_f(s)) * max(m_flux % n(s)                   &
+                                     / flow % density_f(s), 0.0)      &
+             + 0.5 * beta_f(s) * m_flux % n(s) / flow % density_f(s)
+      upwd3 = 0.5 * m_flux % n(s) / flow % density_f(s)
 
       if (c2 > 0) then
         a % val(a % dia(c1)) = a % val(a % dia(c1)) + upwd1 + upwd3
@@ -86,7 +86,7 @@
         a % val(a % pos(2,s)) = -upwd2 
         b(c2) = b(c2) - (upwd2 - upwd3) * vof % o(c2) + upwd2 * vof % o(c1)
       else
-        b(c1) = b(c1) - m_flux % n(s) / density_f(s) * vof % n(c2)
+        b(c1) = b(c1) - m_flux % n(s) / flow % density_f(s) * vof % n(c2)
       end if
     end do
 

@@ -4,7 +4,7 @@
   use Const_Mod
   use Math_Mod
   use File_Mod
-  use Comm_Mod,  only: this_proc, Comm_Mod_End
+  use Comm_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!

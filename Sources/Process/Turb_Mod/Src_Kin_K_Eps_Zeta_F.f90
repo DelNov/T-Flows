@@ -70,20 +70,20 @@
       alpha1 = max(1.0,l_rans/l_sgs)
 
       if(alpha1 < 1.05) then
-        a % val(a % dia(c)) = a % val(a % dia(c))      &
-                            + density(c) * eps % n(c)  &
+        a % val(a % dia(c)) = a % val(a % dia(c))             &
+                            + flow % density(c) * eps % n(c)  &
                             / (kin % n(c) + TINY) * grid % vol(c)
       else
         a % val(a % dia(c)) = a % val(a % dia(c))   &
-          + density(c)                              &
+          + flow % density(c)                       &
           * min(alpha1**1.45 * eps % n(c), kin % n(c)**1.5 / (lf*0.01))  &
           / (kin % n(c) + TINY) * grid % vol(c)
       end if
     end do
   else  ! turbuence model will be K_EPS_ZETA_F
     do c = 1, grid % n_cells
-      a % val(a % dia(c)) = a % val(a % dia(c))      &
-                          + density(c) * eps % n(c)  &
+      a % val(a % dia(c)) = a % val(a % dia(c))             &
+                          + flow % density(c) * eps % n(c)  &
                           / (kin % n(c) + TINY) * grid % vol(c)
 
       if(buoyancy) then
@@ -91,7 +91,7 @@
                          * (grav_x * ut % n(c) +  &
                             grav_y * vt % n(c) +  &
                             grav_z * wt % n(c))   &
-                         * density(c)
+                         * flow % density(c)
         b(c) = b(c) + max(0.0, turb % g_buoy(c) * grid % vol(c))
         a % val(a % dia(c)) = a % val(a % dia(c))         &
                             + max(0.0,-turb % g_buoy(c)   &
@@ -107,7 +107,7 @@
 
     if(c2 < 0) then
       ! Kinematic viscosities
-      kin_vis = viscosity(c1) / density(c1)
+      kin_vis = flow % viscosity(c1) / flow % density(c1)
 
       if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or. &
          Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
@@ -124,7 +124,7 @@
                                                  kin_vis)
 
           turb % tau_wall(c1) = Tau_Wall_Rough_Walls(turb,                  &
-                                                     density(c1),           &
+                                                     flow % density(c1),    &
                                                      u_tau,                 &
                                                      u_tan,                 &
                                                      grid % wall_dist(c1),  &
@@ -142,7 +142,7 @@
                                             kin_vis)
 
           turb % tau_wall(c1) = Tau_Wall_Low_Re(turb,               &
-                                                density(c1),        &
+                                                flow % density(c1), &
                                                 u_tau,              &
                                                 u_tan,              &
                                                 turb % y_plus(c1))

@@ -56,14 +56,14 @@
     b(c) = b(c) + turb % p_kin(c) * grid % vol(c)
 
     a % val(a % dia(c)) = a % val(a % dia(c)) + &
-         density(c) * eps % n(c)/(kin % n(c) + TINY) * grid % vol(c)
+         flow % density(c) * eps % n(c)/(kin % n(c) + TINY) * grid % vol(c)
 
     if (buoyancy) then
       turb % g_buoy(c) = -flow % beta           &
                        * (grav_x * ut % n(c) +  &
                           grav_y * vt % n(c) +  &
                           grav_z * wt % n(c))   &
-                       * density(c)
+                       * flow % density(c)
       b(c) = b(c) + max(0.0, turb % g_buoy(c) * grid % vol(c))
       a % val(a % dia(c)) = a % val(a % dia(c))        &
                           + max(0.0,-turb % g_buoy(c)  &
@@ -79,7 +79,7 @@
     c2 = grid % faces_c(2,s)
 
     if(c2 < 0) then
-      kin_vis = viscosity(c1) / density(c1)
+      kin_vis = flow % viscosity(c1) / flow % density(c1)
       if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
          Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
 
@@ -96,7 +96,7 @@
                                                  kin_vis)
 
           turb % tau_wall(c1) = Tau_Wall_Rough_Walls(turb,                  &
-                                                     density(c1),           &
+                                                     flow % density(c1),    &
                                                      u_tau,                 &
                                                      u_tan,                 &
                                                      grid % wall_dist(c1),  &
@@ -115,7 +115,7 @@
                                             kin_vis)
 
           turb % tau_wall(c1) = Tau_Wall_Low_Re(turb,               &
-                                                density(c1),        &
+                                                flow % density(c1), &
                                                 u_tau,              &
                                                 u_tan,              &
                                                 turb % y_plus(c1))
