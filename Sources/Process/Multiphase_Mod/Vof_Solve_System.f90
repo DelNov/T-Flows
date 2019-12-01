@@ -7,7 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Solver_Type),     target :: sol
   type(Multiphase_Type), target :: mult
-  real,                  target :: b(:)
+  real, contiguous,      target :: b(:)
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),   pointer :: vof
   character(len=80)         :: solver

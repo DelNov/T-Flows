@@ -19,9 +19,9 @@
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w
   type(Var_Type),    pointer :: vis
-  real,              pointer :: flux(:)
+  real, contiguous,  pointer :: flux(:)
   type(Matrix_Type), pointer :: a
-  real,              pointer :: b(:)
+  real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2, exec_iter
   real                       :: f_ex, f_im
   real                       :: phis

@@ -32,12 +32,12 @@
   type(Var_Type),    pointer :: ut, vt, wt
   type(Face_Type),   pointer :: m_flux
   type(Matrix_Type), pointer :: a
-  real,              pointer :: b(:)
+  real, contiguous,  pointer :: b(:)
   integer                    :: n, c, s, c1, c2, exec_iter
   real                       :: a0, a12, a21, con_eff_f
   real                       :: f_ex1, f_im1, tx_f1, ty_f1, tz_f1
   real                       :: f_ex2, f_im2, tx_f2, ty_f2, tz_f2
-  real                       :: ts, pr_t1, pr_t2, pr_tf
+  real                       :: pr_t1, pr_t2, pr_tf
   real                       :: ut_s, vt_s, wt_s, t_stress, con_t_f
 !------------------------------------------------------------------------------!
 !

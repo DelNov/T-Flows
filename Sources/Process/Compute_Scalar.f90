@@ -39,7 +39,7 @@
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: uu, vv, ww, uv, uw, vw
   type(Matrix_Type), pointer :: a
-  real,              pointer :: b(:)
+  real, contiguous,  pointer :: b(:)
   type(Face_Type),   pointer :: m_flux
   type(Var_Type),    pointer :: phi
   integer                    :: n, c, s, c1, c2, row, col, exec_iter

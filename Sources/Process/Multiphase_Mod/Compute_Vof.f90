@@ -17,10 +17,10 @@
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: vof
   type(Face_Type),   pointer :: m_flux
-  real,              pointer :: vof_f(:)
-  real,              pointer :: vof_i(:), vof_j(:), vof_k(:)
+  real, contiguous,  pointer :: vof_f(:)
+  real, contiguous,  pointer :: vof_i(:), vof_j(:), vof_k(:)
   type(Matrix_Type), pointer :: a
-  real,              pointer :: b(:)
+  real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2
   integer                    :: donor, accept, corr_num, corr_num_max
   integer                    :: i_sub, n_sub

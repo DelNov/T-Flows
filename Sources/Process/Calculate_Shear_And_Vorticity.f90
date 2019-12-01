@@ -18,6 +18,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: u, v, w
+  integer                  :: c
 !==============================================================================!
 
   ! Take aliases
@@ -29,18 +30,20 @@
   call Field_Mod_Grad_Variable(flow, flow % v)
   call Field_Mod_Grad_Variable(flow, flow % w)
 
-  flow % shear(:) = u % x(:)**2                     &
-                  + v % y(:)**2                     &
-                  + w % z(:)**2                     &
-                  + 0.5 * (v % z(:) + w % y(:))**2  &
-                  + 0.5 * (u % z(:) + w % x(:))**2  &
-                  + 0.5 * (v % x(:) + u % y(:))**2
+  do c = -grid % n_bnd_cells, grid % n_cells
+    flow % shear(c) = u % x(c)**2                     &
+                    + v % y(c)**2                     &
+                    + w % z(c)**2                     &
+                    + 0.5 * (v % z(c) + w % y(c))**2  &
+                    + 0.5 * (u % z(c) + w % x(c))**2  &
+                    + 0.5 * (v % x(c) + u % y(c))**2
 
-  flow % vort(:) = - (   0.5 * (v % z(:) - w % y(:))**2  &
-                       + 0.5 * (u % z(:) - w % x(:))**2  &
-                       + 0.5 * (v % x(:) - u % y(:))**2 )
+    flow % vort(c) = - (   0.5 * (v % z(c) - w % y(c))**2  &
+                         + 0.5 * (u % z(c) - w % x(c))**2  &
+                         + 0.5 * (v % x(c) - u % y(c))**2 )
 
-  flow % shear(:) = sqrt(2.0 * flow % shear(:))
-  flow % vort(:)  = sqrt(2.0 * abs(flow % vort(:)))
+    flow % shear(c) = sqrt(2.0 * flow % shear(c))
+    flow % vort(c)  = sqrt(2.0 * abs(flow % vort(c)))
+  end do
 
   end subroutine

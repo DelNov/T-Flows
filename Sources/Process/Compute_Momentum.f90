@@ -39,10 +39,10 @@
   type(Matrix_Type), pointer :: a
   type(Var_Type),    pointer :: ui, uj, uk, t, p
   type(Face_Type),   pointer :: m_flux
-  real,              pointer :: b(:)
-  real,              pointer :: ui_i(:), ui_j(:), ui_k(:), uj_i(:), uk_i(:)
-  real,              pointer :: si(:), sj(:), sk(:), di(:), dj(:), dk(:)
-  real,              pointer :: h_i(:)
+  real, contiguous,  pointer :: b(:)
+  real, contiguous,  pointer :: ui_i(:), ui_j(:), ui_k(:), uj_i(:), uk_i(:)
+  real, contiguous,  pointer :: si(:), sj(:), sk(:), di(:), dj(:), dk(:)
+  real, contiguous,  pointer :: h_i(:)
   integer                    :: s, c, c1, c2, exec_iter
   real                       :: f_ex, f_im, f_stress
   real                       :: vel_max

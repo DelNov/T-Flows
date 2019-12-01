@@ -32,7 +32,7 @@
   type(Var_Type),    pointer :: u, v, w, p, pp
   type(Face_Type),   pointer :: flux            ! mass or volume flux
   type(Matrix_Type), pointer :: a
-  real,              pointer :: b(:)
+  real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2, exec_iter
   real                       :: u_f, v_f, w_f, a12, fs
   real                       :: mass_err
