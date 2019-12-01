@@ -123,14 +123,14 @@
 
         if(heat_transfer) then
           pr_t = Turb_Mod_Prandtl_Number(turb, c1)
-          pr = flow % viscosity(c1) * flow % capacity / flow % conductivity
+          pr   = Field_Mod_Prandtl_Number(flow, c1)  ! laminar Prandtl number
           beta = 9.24 * ((pr/pr_t)**0.75 - 1.0)     &
                * (1.0 + 0.28 * exp(-0.007*pr/pr_t))
           ebf = 0.01 * (pr * turb % y_plus(c1)**4    &
                      / ((1.0 + 5.0 * pr**3 * turb % y_plus(c1)) + TINY))
           turb % con_w(c1) =    turb % y_plus(c1)                         &
                               * flow % viscosity(c1)                      &
-                              * flow % capacity                           &
+                              * flow % capacity(c1)                       &
                       / (  turb % y_plus(c1) * pr * exp(-1.0 * ebf)       &
                          + (u_plus + beta) * pr_t * exp(-1.0 / ebf) + TINY)
         end if

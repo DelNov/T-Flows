@@ -4,6 +4,9 @@
 !   Discretizes and solves transport equations for different turbulent         !
 !   variables.                                                                 !
 !------------------------------------------------------------------------------!
+!----------------------------------[Modules]-----------------------------------!
+  use Work_Mod, only: one => r_cell_12
+!------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   type(Turb_Type),   target :: turb
@@ -70,7 +73,8 @@
   !   Advection   !
   !               !
   !---------------!
-  call Numerics_Mod_Advection_Term(phi, 1.0, flux, sol,  &
+  one(:) = 1.0
+  call Numerics_Mod_Advection_Term(phi, one, flux, sol,  &
                                    phi % x,              &
                                    phi % y,              &
                                    phi % z,              &

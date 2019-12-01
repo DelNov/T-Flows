@@ -14,10 +14,10 @@
   type(Field_Type), pointer :: flow
 !==============================================================================!
 
-  ! Take alias
+  ! Take alias to the flow to access its properties
   flow => turb % pnt_flow
 
-  pr       = flow % viscosity(c) * flow % capacity  &
+  pr       = flow % viscosity(c) * flow % capacity(c)  &
            / flow % conductivity
   pr_t_inf = 0.85
   pe_t     = max(pr * turb % vis_t(c) / flow % viscosity(c), TINY)

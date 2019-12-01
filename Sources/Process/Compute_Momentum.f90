@@ -22,6 +22,7 @@
   use Solver_Mod,     only: Solver_Type, Solver_Mod_Alias_System, Bicg, Cg, Cgs
   use Matrix_Mod,     only: Matrix_Type
   use User_Mod
+  use Work_Mod,       only: one => r_cell_12
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -173,7 +174,8 @@
   !   Advection   !
   !               !
   !---------------!
-  call Numerics_Mod_Advection_Term(ui, 1.0, m_flux % n, sol,  &
+  one(:) = 1.0
+  call Numerics_Mod_Advection_Term(ui, one, m_flux % n, sol,  &
                                    ui_i,                      &
                                    ui_j,                      &
                                    ui_k,                      &

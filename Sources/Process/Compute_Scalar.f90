@@ -23,7 +23,8 @@
                            u3uj_phij   => r_cell_08,  &
                            u1uj_phij_x => r_cell_09,  &
                            u2uj_phij_y => r_cell_10,  &
-                           u3uj_phij_z => r_cell_11
+                           u3uj_phij_z => r_cell_11,  &
+                           one         => r_cell_12
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
@@ -101,7 +102,8 @@
   !   Advection   !
   !               !
   !---------------!
-  call Numerics_Mod_Advection_Term(phi, 1.0, m_flux % n, sol,  &
+  one = 1.0
+  call Numerics_Mod_Advection_Term(phi, one, m_flux % n, sol,  &
                                    phi % x,                    &
                                    phi % y,                    &
                                    phi % z,                    &

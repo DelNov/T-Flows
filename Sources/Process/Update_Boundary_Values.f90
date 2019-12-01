@@ -178,7 +178,7 @@
         if(turbulence_model .ne. NONE .and.    &
            turbulence_model .ne. DNS) then
           con_t = flow % conductivity                 &
-                + flow % capacity * turb % vis_t(c1) / pr_t
+                + flow % capacity(c1) * turb % vis_t(c1) / pr_t
         else
           con_t = flow % conductivity
         end if

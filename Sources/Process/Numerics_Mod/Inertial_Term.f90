@@ -6,7 +6,8 @@
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
   type(Var_Type)            :: phi
-  real,         allocatable :: coef(:)
+  real                      :: coef(-phi % pnt_grid % n_bnd_cells:  &
+                                     phi % pnt_grid % n_cells)
   type(Solver_Type), target :: sol
   real                      :: dt
 !-----------------------------------[Locals]-----------------------------------!

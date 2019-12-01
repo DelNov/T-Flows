@@ -15,7 +15,8 @@
   use Solver_Mod,   only: Solver_Type, Solver_Mod_Alias_System, Bicg, Cg, Cgs
   use Matrix_Mod,   only: Matrix_Type
   use User_Mod
-  use Turb_Mod, NO_TURBULENCE => NONE
+  use Turb_Mod,           NO_TURBULENCE      => NONE
+  use Work_Mod,     only: capacity_x_density => r_cell_11
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
@@ -38,7 +39,6 @@
   real                       :: con_eff2, f_ex2, f_im2, tx_f2, ty_f2, tz_f2
   real                       :: ts, pr_t1, pr_t2, pr_tf
   real                       :: ut_s, vt_s, wt_s, t_stress, con_t
-  real, allocatable          :: capacity_times_density(:) 
 !------------------------------------------------------------------------------!
 !
 !  The form of equations which are solved:
@@ -138,7 +138,7 @@
       pr_t2 = Turb_Mod_Prandtl_Number(turb, c2)
       pr_tf = grid % fw(s) * pr_t1 + (1.0-grid % fw(s)) * pr_t2
     else
-      pr_tf = pr_t      
+      pr_tf = pr_t
     end if
 
     ! Gradients on the cell face (fw corrects situation close to the wall)
@@ -151,11 +151,11 @@
     if(turbulence_model .ne. NO_TURBULENCE .and.  &
        turbulence_model .ne. DNS) then
       con_eff1 = grid % fw(s) *(flow % conductivity +                      &
-                                flow % capacity * turb % vis_t(c1)/pr_tf)  &
+                                flow % capacity(c1) * turb % vis_t(c1)/pr_tf)  &
           + (1.0-grid % fw(s))*(flow % conductivity +                      &
-                                flow % capacity * turb % vis_t(c2)/pr_tf)
-      con_t    = grid % fw(s) *flow % capacity * turb % vis_t(c1)/pr_tf    &
-          + (1.0-grid % fw(s))*flow % capacity * turb % vis_t(c2)/pr_tf
+                                flow % capacity(c2) * turb % vis_t(c2)/pr_tf)
+      con_t    = grid % fw(s) *flow % capacity(c1) * turb % vis_t(c1)/pr_tf    &
+          + (1.0-grid % fw(s))*flow % capacity(c2) * turb % vis_t(c2)/pr_tf
     else
       con_eff1 = flow % conductivity
     end if
@@ -232,8 +232,8 @@
     a12 = con_eff1 * a % fc(s)
     a21 = con_eff2 * a % fc(s)
 
-    a12 = a12  - min(m_flux % n(s), 0.0) * flow % capacity
-    a21 = a21  + max(m_flux % n(s), 0.0) * flow % capacity
+    a12 = a12  - min(m_flux % n(s), 0.0) * flow % capacity(c1)  ! flow: 1 -> 2
+    a21 = a21  + max(m_flux % n(s), 0.0) * flow % capacity(c2)  ! flow: 2 -> 1
 
     ! Fill the system matrix
     if(c2 > 0) then
@@ -272,12 +272,10 @@
   !   Inertial terms   !
   !                    !
   !--------------------!
-  allocate(capacity_times_density(size(flow % density)))
-  capacity_times_density(:) = flow % capacity * flow % density(:)
-
-  call Numerics_Mod_Inertial_Term(t, capacity_times_density, sol, dt)
-
-  deallocate(capacity_times_density)
+  do c = -grid % n_bnd_cells, grid % n_cells
+    capacity_x_density(c) = flow % capacity(c) * flow % density(c)
+  end do
+  call Numerics_Mod_Inertial_Term(t, capacity_x_density, sol, dt)
 
   !--------------------!
   !                    !
