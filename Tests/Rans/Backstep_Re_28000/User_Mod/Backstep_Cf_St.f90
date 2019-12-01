@@ -4,14 +4,6 @@
 !   Subroutine extracts skin friction coefficient and Stanton number for       !
 !   backstep case.                                                             !
 !------------------------------------------------------------------------------!
-  use Grid_Mod,  only: Grid_Type
-  use Field_Mod, only: Field_Type, capacity, conductivity, heat_transfer
-  use Var_Mod,   only: Var_Type
-  use Turb_Mod
-  use Comm_Mod                       ! parallel stuff
-  use File_Mod
-  use Const_Mod                      ! constants
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
@@ -33,7 +25,8 @@
                               v4_p(:), v5_p(:)  
   integer, allocatable     :: n_p(:), n_count(:)
   real                     :: kin_vis, u_tan, u_tau, tau_wall
-  real                     :: visc_const, dens_const
+  real                     :: dens_const, visc_const
+  real                     :: capa_const, cond_const
 !==============================================================================!
 
   ! Take aliases
@@ -43,8 +36,11 @@
   w    => flow % w
   t    => flow % t
 
-  call Control_Mod_Dynamic_Viscosity(visc_const)
-  call Control_Mod_Mass_Density     (dens_const)
+  ! Get constant physical properties
+  call Control_Mod_Mass_Density        (dens_const)
+  call Control_Mod_Dynamic_Viscosity   (visc_const)
+  call Control_Mod_Heat_Capacity       (capa_const)
+  call Control_Mod_Thermal_Conductivity(cond_const)
 
   !----------------------------------!
   !   Read "x_coordinate.dat" file   !
@@ -122,8 +118,8 @@
             end if
             v2_p(i) = v2_p(i) + turb % y_plus(c1)
             v3_p(i) = v3_p(i) + t % q(c2)  &
-                    / (dens_const * capacity * (t % n(c2) - 20) * 11.3)
-            v5_p(i) = v5_p(i) + t % n(c2) 
+                    / (dens_const * capa_const * (t % n(c2) - 20) * 11.3)
+            v5_p(i) = v5_p(i) + t % n(c2)
             n_count(i) = n_count(i) + 1
           end if
         end if

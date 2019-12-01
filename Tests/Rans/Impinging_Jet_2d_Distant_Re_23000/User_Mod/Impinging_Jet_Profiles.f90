@@ -5,16 +5,6 @@
 !   and extracts profiles on several locations that corresponds with the       !
 !   experimental measurements.                                                 !
 !------------------------------------------------------------------------------!
-  use Grid_Mod,  only: Grid_Type
-  use Field_Mod, only: Field_Type,  &
-                       viscosity, density, conductivity, heat_transfer
-  use Var_Mod,   only: Var_Type
-  use Turb_Mod,  only: Turb_Type
-  use Comm_Mod                       ! parallel stuff
-  use File_Mod,  only: problem_name
-  use Const_Mod                      ! constants
-  use Sort_Mod
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type), target :: turb
@@ -155,13 +145,13 @@
             if(turbulence_model .eq. K_EPS) then
               v1_p(i) = v1_p(i) + kin % n(c)
               v2_p(i) = v2_p(i) + eps % n(c)
-              v3_p(i) = v3_p(i) + turb % vis_t(c) / viscosity(c)
+              v3_p(i) = v3_p(i) + turb % vis_t(c) / flow % viscosity(c)
             end if
 
             if(turbulence_model .eq. K_EPS_ZETA_F) then
               v1_p(i)   = v1_p(i) + kin % n(c)
               v2_p(i)   = v2_p(i) + eps % n(c)
-              v3_p(i)   = v3_p(i) + turb % vis_t(c) / viscosity(c)
+              v3_p(i)   = v3_p(i) + turb % vis_t(c) / flow % viscosity(c)
               v4_p(i)   = v4_p(i) + zeta % n(c)
               v5_p(i)   = v5_p(i) + f22 % n(c)
             end if
