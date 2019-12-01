@@ -31,7 +31,9 @@
   grid => mult % pnt_grid
   vof  => mult % vof
 
-  mult % curv(:) = vof % n(:)
+  do c = -grid % n_bnd_cells, grid % n_cells
+    mult % curv(c) = vof % n(c)
+  end do
 
   ! This parameter maybe also implemented in "control" file
   n_conv = 2

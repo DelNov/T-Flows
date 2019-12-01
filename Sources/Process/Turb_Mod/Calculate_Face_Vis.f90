@@ -13,7 +13,6 @@
   type(Grid_Type),  pointer :: grid
   type(Field_Type), pointer :: flow
   integer                   :: c1, c2
-  real                      :: fs
 !==============================================================================!
 
   ! Take alias
@@ -22,13 +21,9 @@
 
   c1 = grid % faces_c(1,s)
   c2 = grid % faces_c(2,s)
-  fs = grid % f(s)
 
-  if (c2 > 0) then
-    vis_eff = fs * flow % viscosity(c1) + (1.0 - fs) * flow % viscosity(c2)
-  else
-    vis_eff = flow % viscosity(c1)
-  end if
+  vis_eff =        grid % fw(s)  * flow % viscosity(c1)   &
+          + (1.0 - grid % fw(s)) * flow % viscosity(c2)
 
   if(turbulence_model .ne. NONE .and.  &
      turbulence_model .ne. DNS) then

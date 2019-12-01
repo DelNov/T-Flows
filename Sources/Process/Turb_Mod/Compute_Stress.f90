@@ -12,7 +12,8 @@
                       u3uj_phij   => r_cell_08,  &
                       u1uj_phij_x => r_cell_09,  &
                       u2uj_phij_y => r_cell_10,  &
-                      u3uj_phij_z => r_cell_11
+                      u3uj_phij_z => r_cell_11,  &
+                      one         => r_cell_12
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -27,9 +28,9 @@
   type(Var_Type),    pointer :: u, v, w
   type(Var_Type),    pointer :: kin, eps, zeta, f22, ut, vt, wt
   type(Var_Type),    pointer :: uu, vv, ww, uv, uw, vw
-  real,              pointer :: flux(:)
+  real, contiguous,  pointer :: flux(:)
   type(Matrix_Type), pointer :: a
-  real,              pointer :: b(:)
+  real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2, exec_iter
   real                       :: f_ex, f_im
   real                       :: phis
@@ -38,7 +39,7 @@
   real                       :: phix_f, phiy_f, phiz_f
   real                       :: vis_t_f
   real                       :: dt
-  real                       :: visc_const, dens_const
+  real                       :: visc_f
 !==============================================================================!
 !                                                                              !
 !   The form of equations which are being solved:                              !
@@ -86,7 +87,8 @@
   !   Advection   !
   !               !
   !---------------!
-  call Numerics_Mod_Advection_Term(phi, 1.0, flux, sol,  &
+  one(:) = 1.0
+  call Numerics_Mod_Advection_Term(phi, one, flux, sol,  &
                                    phi % x,              &
                                    phi % y,              &
                                    phi % z,              &
@@ -110,17 +112,17 @@
 
     ! vis_tur is used to make diaginal element more dominant.
     ! This contribution is later substracted.
-    vis_t_f = grid % fw(s)       * turb % vis_t(c1)  &
+    vis_t_f =      grid % fw(s)  * turb % vis_t(c1)  &
             + (1.0-grid % fw(s)) * turb % vis_t(c2)
 
-    visc_const = grid % f(s)         * flow % viscosity(c1)  &
-               + (1.0 - grid % f(s)) * flow % viscosity(c2)
+    visc_f =        grid % fw(s)  * flow % viscosity(c1)  &
+           + (1.0 - grid % fw(s)) * flow % viscosity(c2)
 
-    vis_eff = visc_const + vis_t_f
+    vis_eff = visc_f + vis_t_f
 
     if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
       if(turbulence_model_variant .ne. STABILIZED) then
-        vis_eff = 1.5*visc_const + vis_t_f
+        vis_eff = 1.5 * visc_f + vis_t_f
       end if
     end if
 

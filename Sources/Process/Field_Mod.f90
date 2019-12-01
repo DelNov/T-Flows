@@ -23,8 +23,8 @@
     type(Grid_Type), pointer :: pnt_grid  ! grid for which it is defined
 
     ! Physical properties
-    real :: capacity
-    real :: conductivity
+    real, allocatable :: capacity(:)
+    real, allocatable :: conductivity(:)
     real :: diffusivity
     real, allocatable :: density(:)
     real, allocatable :: viscosity(:)
@@ -96,6 +96,7 @@
   include 'Field_Mod/Grad_Pressure.f90'
   include 'Field_Mod/Grad_Pressure_Correction.f90'
   include 'Field_Mod/Grad_Variable.f90'
+  include 'Field_Mod/Prandtl_Number.f90'
   include 'Field_Mod/U_Tan.f90'
 
   end module
