@@ -26,7 +26,7 @@
   type(Var_Type),  pointer :: kin, eps, zeta, f22, vis, t2
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   integer                  :: c1, c2, s, sc
-  real                     :: qx, qy, qz, nx, ny, nz, con_t
+  real                     :: qx, qy, qz, nx, ny, nz
   real                     :: kin_vis, u_tau
 !==============================================================================!
 
@@ -174,15 +174,6 @@
         qy = t % q(c2) * ny
         qz = t % q(c2) * nz
 
-        ! Turbulent conductivity from Reynolds analogy
-        if(turbulence_model .ne. NONE .and.    &
-           turbulence_model .ne. DNS) then
-          con_t = flow % conductivity                 &
-                + flow % capacity(c1) * turb % vis_t(c1) / pr_t
-        else
-          con_t = flow % conductivity
-        end if
-
         ! Wall temperature or heat fluxes for k-eps-zeta-f
         ! and high-re k-eps models. 
         if(turbulence_model .eq. K_EPS_ZETA_F    .or.  &
@@ -208,13 +199,13 @@
         else
           if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
             t % n(c2) = t % n(c1) + t % q(c2) * grid % wall_dist(c1)  &
-                      / flow % conductivity
+                      / flow % conductivity(c1)
             flow % heat = flow % heat + t % q(c2) * grid % s(s)
             if(abs(t % q(c2)) > TINY) then
               flow % heated_area = flow % heated_area + grid % s(s)
             end if
           else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) then
-            t % q(c2) = ( t % n(c2) - t % n(c1) ) * flow % conductivity  &
+            t % q(c2) = ( t % n(c2) - t % n(c1) ) * flow % conductivity(c1)  &
                       / grid % wall_dist(c1)
             flow % heat = flow % heat + t % q(c2) * grid % s(s)
             if(abs(t % q(c2)) > TINY) then

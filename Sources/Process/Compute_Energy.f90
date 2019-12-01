@@ -34,11 +34,11 @@
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: n, c, s, c1, c2, exec_iter
-  real                       :: a0, a12, a21
-  real                       :: con_eff1, f_ex1, f_im1, tx_f1, ty_f1, tz_f1
-  real                       :: con_eff2, f_ex2, f_im2, tx_f2, ty_f2, tz_f2
+  real                       :: a0, a12, a21, con_eff_f
+  real                       :: f_ex1, f_im1, tx_f1, ty_f1, tz_f1
+  real                       :: f_ex2, f_im2, tx_f2, ty_f2, tz_f2
   real                       :: ts, pr_t1, pr_t2, pr_tf
-  real                       :: ut_s, vt_s, wt_s, t_stress, con_t
+  real                       :: ut_s, vt_s, wt_s, t_stress, con_t_f
 !------------------------------------------------------------------------------!
 !
 !  The form of equations which are solved:
@@ -150,17 +150,18 @@
     tz_f2 = tz_f1
     if(turbulence_model .ne. NO_TURBULENCE .and.  &
        turbulence_model .ne. DNS) then
-      con_eff1 = grid % fw(s) *(flow % conductivity +                      &
-                                flow % capacity(c1) * turb % vis_t(c1)/pr_tf)  &
-          + (1.0-grid % fw(s))*(flow % conductivity +                      &
-                                flow % capacity(c2) * turb % vis_t(c2)/pr_tf)
-      con_t    = grid % fw(s) *flow % capacity(c1) * turb % vis_t(c1)/pr_tf    &
-          + (1.0-grid % fw(s))*flow % capacity(c2) * turb % vis_t(c2)/pr_tf
+      con_eff_f =                                                              &
+               grid % fw(s) * (flow % conductivity(c1) +                       &
+                               flow % capacity(c1) * turb % vis_t(c1) / pr_tf) &
+        + (1.0-grid % fw(s))* (flow % conductivity(c2) +                       &
+                               flow % capacity(c2) * turb % vis_t(c2) / pr_tf)
+      con_t_f  = grid % fw(s) *flow % capacity(c1) * turb % vis_t(c1) / pr_tf  &
+          + (1.0-grid % fw(s))*flow % capacity(c2) * turb % vis_t(c2) / pr_tf
     else
-      con_eff1 = flow % conductivity
+      con_eff_f =                                      &
+               grid % fw(s) * flow % conductivity(c1)  &
+        + (1.0-grid % fw(s))* flow % conductivity(c2)
     end if
-
-    con_eff2 = con_eff1
 
     if(turbulence_model .eq. K_EPS        .or.  &
        turbulence_model .eq. K_EPS_ZETA_F .or.  &
@@ -168,29 +169,28 @@
       if(c2 < 0) then
         if(Var_Mod_Bnd_Cell_Type(t, c2) .eq. WALL .or.  &
            Var_Mod_Bnd_Cell_Type(t, c2) .eq. WALLFL) then
-          con_eff1 = turb % con_w(c1)
-          con_eff2 = con_eff1
+          con_eff_f = turb % con_w(c1)
         end if
       end if
     end if
 
     ! Total (exact) diffusion flux
-    f_ex1 = con_eff1 * (  tx_f1 * grid % sx(s)   &
-                        + ty_f1 * grid % sy(s)   &
-                        + tz_f1 * grid % sz(s))
-    f_ex2 = con_eff2 * (  tx_f2 * grid % sx(s)   &
-                        + ty_f2 * grid % sy(s)   &
-                        + tz_f2 * grid % sz(s))
+    f_ex1 = con_eff_f * (  tx_f1 * grid % sx(s)   &
+                         + ty_f1 * grid % sy(s)   &
+                         + tz_f1 * grid % sz(s))
+    f_ex2 = con_eff_f * (  tx_f2 * grid % sx(s)   &
+                         + ty_f2 * grid % sy(s)   &
+                         + tz_f2 * grid % sz(s))
 
     ! Implicit diffusion flux
-    f_im1 = con_eff1 * a % fc(s)         &
-          * (  tx_f1 * grid % dx(s)      &
-             + ty_f1 * grid % dy(s)      &
-             + tz_f1 * grid % dz(s) )
-    f_im2 = con_eff2 * a % fc(s)         &
-          * (  tx_f2 * grid % dx(s)      &
-             + ty_f2 * grid % dy(s)      &
-             + tz_f2 * grid % dz(s) )
+    f_im1 = con_eff_f * a % fc(s)         &
+          * (   tx_f1 * grid % dx(s)      &
+              + ty_f1 * grid % dy(s)      &
+              + tz_f1 * grid % dz(s) )
+    f_im2 = con_eff_f * a % fc(s)         &
+          * (   tx_f2 * grid % dx(s)      &
+              + ty_f2 * grid % dy(s)      &
+              + tz_f2 * grid % dz(s) )
 
     ! Cross diffusion part
     t % c(c1) = t % c(c1) + f_ex1 - f_im1
@@ -214,12 +214,12 @@
            +  (1.0-grid % fw(s)) * vt % n(c2))
       wt_s =  (    grid % fw(s)  * wt % n(c1)   &
            +  (1.0-grid % fw(s)) * wt % n(c2))
-      t_stress = - (  ut_s * grid % sx(s)                  &
-                    + vt_s * grid % sy(s)                  &
-                    + wt_s * grid % sz(s) )                &
-                    - (con_t * (  tx_f1 * grid % sx(s)     &
-                                + ty_f1 * grid % sy(s)     &
-                                + tz_f1 * grid % sz(s)) )
+      t_stress = - (  ut_s * grid % sx(s)                    &
+                    + vt_s * grid % sy(s)                    &
+                    + wt_s * grid % sz(s) )                  &
+                    - (con_t_f * (  tx_f1 * grid % sx(s)     &
+                                  + ty_f1 * grid % sy(s)     &
+                                  + tz_f1 * grid % sz(s)) )
 
       ! Put the influence of turbulent heat fluxes explicitly in the system
       b(c1) = b(c1) + t_stress
@@ -229,8 +229,8 @@
     end if  ! if models are of RSM type
 
     ! Calculate the coefficients for the sysytem matrix
-    a12 = con_eff1 * a % fc(s)
-    a21 = con_eff2 * a % fc(s)
+    a12 = con_eff_f * a % fc(s)
+    a21 = con_eff_f * a % fc(s)
 
     a12 = a12  - min(m_flux % n(s), 0.0) * flow % capacity(c1)  ! flow: 1 -> 2
     a21 = a21  + max(m_flux % n(s), 0.0) * flow % capacity(c2)  ! flow: 2 -> 1

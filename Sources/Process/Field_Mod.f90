@@ -24,7 +24,7 @@
 
     ! Physical properties
     real, allocatable :: capacity(:)
-    real :: conductivity
+    real, allocatable :: conductivity(:)
     real :: diffusivity
     real, allocatable :: density(:)
     real, allocatable :: viscosity(:)

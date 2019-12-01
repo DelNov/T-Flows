@@ -10,6 +10,6 @@
 !==============================================================================!
 
   Field_Mod_Prandtl_Number = flow % viscosity(c) * flow % capacity(c)  &
-                           / flow % conductivity
+                           / flow % conductivity(c)
 
   end function
