@@ -6,22 +6,12 @@
 !                                                                              !
 !   The results are then writen in files name_res.dat and name_res_plus.dat    !
 !------------------------------------------------------------------------------!
-  use Const_Mod                      ! constants
-  use Comm_Mod                       ! parallel stuff
-  use Grid_Mod,  only: Grid_Type
-  use Field_Mod, only: Field_Type, heat_transfer,                  &
-                       capacity, conductivity
-  use Bulk_Mod,  only: Bulk_Type
-  use Var_Mod,   only: Var_Type
-  use File_Mod
-  use Turb_Mod
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),       target :: flow
-  type(Turb_Type),        target :: turb
-  type(Multiphase_Type),  target :: mult
-  integer                        :: n
+  type(Field_Type),      target :: flow
+  type(Turb_Type),       target :: turb
+  type(Multiphase_Type), target :: mult
+  integer                       :: n
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
@@ -38,6 +28,7 @@
   real                     :: t_wall, t_tau, d_wall, nu_mean, t_inf
   real                     :: ubulk, error, re, cf_dean, cf, pr, u_tau_p
   real                     :: dens_const, visc_const
+  real                     :: capa_const, cond_const
   logical                  :: there
 !==============================================================================!
 
@@ -48,8 +39,10 @@
   call Field_Mod_Alias_Energy  (flow, t)
 
   ! Take constant physical properties
-  call Control_Mod_Dynamic_Viscosity(visc_const)
-  call Control_Mod_Mass_Density     (dens_const)
+  call Control_Mod_Mass_Density        (dens_const)
+  call Control_Mod_Dynamic_Viscosity   (visc_const)
+  call Control_Mod_Heat_Capacity       (capa_const)
+  call Control_Mod_Thermal_Conductivity(cond_const)
 
   ! Set the name for coordinate file
   call File_Mod_Set_Name(coord_name, extension='.1d')
@@ -246,7 +239,7 @@
     return
   end if
 
-  if(heat_transfer) then 
+  if(heat_transfer) then
     d_wall = 0.0 
     do c = 1, grid % n_cells
       if(grid % wall_dist(c) > d_wall) then
@@ -272,7 +265,7 @@
 
           t_wall   = t_wall + turb % t_mean(c2)
           nu_mean  = nu_mean + t % q(c2)  &
-                   / (conductivity*(turb % t_mean(c2) - t_inf))
+                   / (cond_const*(turb % t_mean(c2) - t_inf))
           n_points = n_points + 1
         end if
       end if
@@ -286,14 +279,14 @@
 
     t_wall  = t_wall / n_points
     nu_mean = nu_mean / n_points
-    t_tau   = flow % heat_flux / (dens_const * capacity * u_tau_p)
+    t_tau   = flow % heat_flux / (dens_const * capa_const * u_tau_p)
   end if
 
   open(3, file = res_name)
   open(4, file = res_name_plus)
 
   do i = 3, 4
-    pr = visc_const * capacity / conductivity
+    pr = visc_const * capa_const / cond_const
     re = dens_const * ubulk * 2.0 / visc_const
     cf_dean = 0.073*(re)**(-0.25)
     cf      = u_tau_p**2/(0.5*ubulk**2)
@@ -311,20 +304,20 @@
     write(i,'(a1,(a12,f12.6,a2,a22))') & 
     '#', 'Cf_error = ', error, ' %', 'Dean formula is used.'
     if(heat_transfer) then
-      write(i,'(a1,(a12, f12.6))')'#', 'Nu number =', nu_mean 
-      write(i,'(a1,(a12, f12.6,a2,a39))')'#', 'Nu_error  =', &
+      write(i,'(a1,(a12, f12.6))')'#', 'Nu number =', nu_mean
+      write(i,'(a1,(a12, f12.6,a2,a39))')'#', 'Nu_error  =',  &
             abs(0.023*0.5*re**0.8*pr**0.4 - nu_mean)          &
-            / (0.023*0.5*re**0.8*pr**0.4) * 100.0, ' %',     &
-            'correlation of Dittus-Boelter is used.' 
+            / (0.023*0.5*re**0.8*pr**0.4) * 100.0, ' %',      &
+            'correlation of Dittus-Boelter is used.'
     end if
 
     if(heat_transfer) then
       write(i,'(a1,2X,a105)') '#', ' z,'                         //  &
                                    ' u mean,'                    //  &
-                                   ' kin_resolved, kin_modeled,' //  & 
-                                   ' kin_tot,  uw_resolved,'     //  & 
+                                   ' kin_resolved, kin_modeled,' //  &
+                                   ' kin_tot,  uw_resolved,'     //  &
                                    ' uw_modeled, uw_tot, vis_t'  //  &
-                                   ' t mean, ut_res, vt_res, wt_res,'   
+                                   ' t mean, ut_res, vt_res, wt_res,'
     else
       write(i,'(a1,2X,a85)') '#',  ' z,'                         //  &
                                    ' u mean,'                    //  &

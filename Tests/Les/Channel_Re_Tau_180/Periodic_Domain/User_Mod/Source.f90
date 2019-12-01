@@ -7,15 +7,6 @@
 !   vector ("b_vector") are sent should the user want to stabilize the         !
 !   system for always positive variables, for example.                         !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Grid_Mod,   only: Grid_Type
-  use Field_Mod
-  use Comm_Mod
-  use Var_Mod,    only: Var_Type
-  use Bulk_Mod,   only: Bulk_Type
-  use Const_Mod,  only: PI
-  use Matrix_Mod, only: Matrix_Type
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
@@ -26,6 +17,7 @@
   type(Var_Type),  pointer :: u, v, w, t
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
+  real                     :: capa_const
   integer                  :: c
 !==============================================================================!
 
@@ -36,6 +28,9 @@
   w    => flow % w
   t    => flow % t
   bulk => flow % bulk
+
+  ! Get constant physical properties
+  call Control_Mod_Heat_Capacity(capa_const)
 
   !-----------------------------------------------------!
   !                                                     !
@@ -56,12 +51,12 @@
   ! channel width and Nwall is number of heated walls.  !
   !                                                     !
   !-----------------------------------------------------!
-  if( phi % name .eq. 'T' ) then  
+  if( phi % name .eq. 'T' ) then
 
     do c = 1, grid % n_cells
       b_vector(c) = b_vector(c)                              &
                   - PI * 2.0 * flow % heat_flux * u % n(c)   &
-                  / (bulk % flux_x * capacity) * grid % vol(c)
+                  / (bulk % flux_x * capa_const) * grid % vol(c)
     end do
   end if
 

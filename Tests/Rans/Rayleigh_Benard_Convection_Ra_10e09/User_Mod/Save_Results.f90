@@ -6,18 +6,6 @@
 !                                                                              !
 !   The results are then writen in files name_res.dat and name_res_plus.dat    !
 !------------------------------------------------------------------------------!
-  use Const_Mod                      ! constants
-  use Comm_Mod                       ! parallel stuff
-  use Grid_Mod,  only: Grid_Type
-  use Grad_Mod
-  use Field_Mod, only: Field_Type, heat_transfer,  &
-                       capacity, conductivity,     &
-                       grav_x, grav_y, grav_z
-  use Bulk_Mod,  only: Bulk_Type
-  use Var_Mod,   only: Var_Type
-  use File_Mod
-  use Turb_Mod
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),       target :: flow
@@ -57,7 +45,7 @@
   t_hot  = 15.0
   t_diff =  t_hot - t_cold
 
-  call Grad_Mod_Variable(t)
+  call Field_Mod_Grad_Variable(flow, t)
 
   ! Set the name for coordinate file
   call File_Mod_Set_Name(coord_name, extension='.1d')

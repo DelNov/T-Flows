@@ -6,9 +6,6 @@ include '../User_Mod/Backstep_Cf_St.f90'
 !------------------------------------------------------------------------------!
 !   Calls User_Backstep_Profiles and User_Backstep_Cf_St functions.            !
 !------------------------------------------------------------------------------!
-  use Field_Mod, only: Field_Type
-  use Turb_Mod,  only: Turb_Type
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),       target :: flow

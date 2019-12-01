@@ -6,16 +6,6 @@
 !                                                                              !
 !   The results are then writen in files name_res.dat and name_res_plus.dat    !
 !------------------------------------------------------------------------------!
-  use Const_Mod                      ! constants
-  use Comm_Mod                       ! parallel stuff
-  use Grid_Mod,  only: Grid_Type
-  use Field_Mod, only: Field_Type, heat_transfer,                  &
-                       capacity, conductivity
-  use Bulk_Mod,  only: Bulk_Type
-  use Var_Mod,   only: Var_Type
-  use File_Mod
-  use Turb_Mod
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),      target :: flow
@@ -41,6 +31,7 @@
   real                     :: t_wall, t_tau, d_wall, nu_mean, t_inf
   real                     :: ubulk, error, re, cf_dean, cf, pr, u_tau_p
   real                     :: dens_const, visc_const
+  real                     :: capa_const, cond_const
   logical                  :: there
 !==============================================================================!
 
@@ -55,8 +46,10 @@
   call Turb_Mod_Alias_Heat_Fluxes (turb, ut, vt, wt)
 
   ! Take constant physical properties
-  call Control_Mod_Dynamic_Viscosity(visc_const)
-  call Control_Mod_Mass_Density     (dens_const)
+  call Control_Mod_Mass_Density        (dens_const)
+  call Control_Mod_Dynamic_Viscosity   (visc_const)
+  call Control_Mod_Heat_Capacity       (capa_const)
+  call Control_Mod_Thermal_Conductivity(cond_const)
 
   ! Set the name for coordinate file
   call File_Mod_Set_Name(coord_name, extension='.1d')
@@ -257,7 +250,7 @@
 
           t_wall  = t_wall + t % n(c2)
           nu_mean = nu_mean + t % q(c2)  &
-                  / (conductivity * (t % n(c2) - t_inf + TINY))
+                  / (cond_const * (t % n(c2) - t_inf + TINY))
           n_points = n_points + 1
         end if
       end if
@@ -271,14 +264,14 @@
 
     t_wall  = t_wall / n_points
     nu_mean = nu_mean / n_points
-    t_tau   = flow % heat_flux / (dens_const * capacity * u_tau_p)
+    t_tau   = flow % heat_flux / (dens_const * capa_const * u_tau_p)
   end if
 
   open(3, file = res_name)
   open(4, file = res_name_plus)
 
   do i = 3, 4
-    pr = visc_const * capacity / conductivity
+    pr = visc_const * capa_const / cond_const
     re = dens_const * ubulk * 2.0 / visc_const
     cf_dean = 0.073*(re)**(-0.25)
     cf      = u_tau_p**2/(0.5*ubulk**2)

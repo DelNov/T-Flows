@@ -4,15 +4,6 @@
 !   The subroutine creates ASCII file with Nusselt number averaged             !
 !   in azimuthal direction.                                                    !
 !------------------------------------------------------------------------------!
-  use Grid_Mod,  only: Grid_Type
-  use Field_Mod, only: Field_Type,  &
-                       viscosity, density, conductivity, heat_transfer
-  use Var_Mod,   only: Var_Type
-  use Turb_Mod,  only: Turb_Type
-  use Comm_Mod                       ! parallel stuff
-  use File_Mod,  only: problem_name
-  use Const_Mod                      ! constants
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type), target :: turb
@@ -185,12 +176,13 @@
     write(fu, *) '# Xrad, Nu, Utau, Yplus, Temp, Numb of points '
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(fu, '(5e11.3,i6)') rm_p(i)/2.0,                                &
-                                 2.0*v6_p(i)/(conductivity*(tm_p(i)-20.0)),  &
-                                 v2_p(i),                                    &
-                                 v2_p(i) * v1_p(i)/viscosity(1),             &
-                                 tm_p(i),                                    &
-                                 n_count(i)
+        write(fu, '(5e11.3,i6)')                                  &
+          rm_p(i)/2.0,                                            &
+          2.0*v6_p(i) / (flow % conductivity(1)*(tm_p(i)-20.0)),  &
+          v2_p(i),                                                &
+          v2_p(i) * v1_p(i) / flow % viscosity(1),                &
+          tm_p(i),                                                &
+          n_count(i)
       end if
     end do
     close(fu)

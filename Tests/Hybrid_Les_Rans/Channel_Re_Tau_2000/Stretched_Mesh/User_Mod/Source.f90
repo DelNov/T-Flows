@@ -7,14 +7,6 @@
 !   vector ("b_vector") are sent should the user want to stabilize the         !
 !   system for always positive variables, for example.                         !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Field_Mod,  only: Field_Type
-  use Grid_Mod,   only: Grid_Type
-  use Var_Mod,    only: Var_Type
-  use Matrix_Mod, only: Matrix_Type
-  use Bulk_Mod,   only: Bulk_Type
-  use Comm_Mod
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow

@@ -3,15 +3,6 @@
 !------------------------------------------------------------------------------!
 !   Description
 !------------------------------------------------------------------------------!
-  use Grid_Mod,  only: Grid_Type
-  use Field_Mod, only: Field_Type,  &
-                       viscosity, capacity, density, conductivity, heat_transfer
-  use Var_Mod,   only: Var_Type
-  use Turb_Mod
-  use Comm_Mod                       ! parallel stuff
-  use File_Mod
-  use Const_Mod                      ! constants
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
