@@ -72,7 +72,7 @@
     ! Solve System
     call Multiphase_Mod_Vof_Solve_System(mult, sol, b)
 
-    call Comm_Mod_Exchange_Real(grid, vof % n)
+    call Grid_Mod_Exchange_Real(grid, vof % n)
 
     !-----------------------------!
     !   Correct Volume Fraction   !
@@ -121,7 +121,7 @@
         ! Solve System
         call Multiphase_Mod_Vof_Solve_System(mult, sol, b)
 
-        call Comm_Mod_Exchange_Real(grid, vof % n)
+        call Grid_Mod_Exchange_Real(grid, vof % n)
 
         !---------------------------!
         !   Correct Beta at faces   !
@@ -170,7 +170,7 @@
         vof % n(c) = max(min(vof % n(c),1.0),0.0)
       end do
 
-      call Comm_Mod_Exchange_Real(grid, vof % n)
+      call Grid_Mod_Exchange_Real(grid, vof % n)
     end do
 
 

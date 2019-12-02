@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Comm_Mod_Load_Maps(grid)
+  subroutine Grid_Mod_Load_Maps(grid)
 !------------------------------------------------------------------------------!
 !   Reads: name.map file                                                       !
 !------------------------------------------------------------------------------!
@@ -27,34 +27,34 @@
   !------------------------------------------------------------------------!
   if(n_proc < 2) then
 
-    nc_s  = grid % n_cells
-    nb_s  = grid % n_bnd_cells
-    nc_t  = nc_s
-    nb_t  = nb_s
+    grid % comm % nc_s  = grid % n_cells
+    grid % comm % nb_s  = grid % n_bnd_cells
+    grid % comm % nc_t  = grid % comm % nc_s
+    grid % comm % nb_t  = grid % comm % nb_s
 
     !-------------------------------------!
     !   Global cell numbers for T-Flows   !
     !-------------------------------------!
-    allocate(grid % comm % cell_glo(-nb_s:nc_s))
+    allocate(grid % comm % cell_glo(-grid % comm % nb_s:grid % comm % nc_s))
 
     ! Fill up global cell numbers
-    do c = -nb_t, nc_t
+    do c = -grid % comm % nb_t, grid % comm % nc_t
       grid % comm % cell_glo(c) = c
     end do
 
     !-----------------------------------------!
     !   Global cell numbers for MPI mapping   !
     !-----------------------------------------!
-    allocate(grid % comm % cell_map    (nc_s))
-    allocate(grid % comm % bnd_cell_map(nb_s))
+    allocate(grid % comm % cell_map    (grid % comm % nc_s))
+    allocate(grid % comm % bnd_cell_map(grid % comm % nb_s))
 
     ! -1 is to start from zero, as needed by MPI functions
-    do c = 1, nc_t
+    do c = 1, grid % comm % nc_t
       grid % comm % cell_map(c) = c - 1
     end do
 
     ! -1 is to start from zero, as needed by MPI functions
-    do c = 1, nb_t
+    do c = 1, grid % comm % nb_t
       grid % comm % bnd_cell_map(c) = c - 1
     end do
 
@@ -69,12 +69,12 @@
     call File_Mod_Open_File_For_Reading(name_in, fu, this_proc)
 
     ! Read map sizes
-    read(fu, '(4i9)') nc_s, nb_s
+    read(fu, '(4i9)') grid % comm % nc_s, grid % comm % nb_s
 
-    nc_t  = nc_s
-    nb_t  = nb_s
-    call Comm_Mod_Global_Sum_Int(nc_t)
-    call Comm_Mod_Global_Sum_Int(nb_t)
+    grid % comm % nc_t  = grid % comm % nc_s
+    grid % comm % nb_t  = grid % comm % nb_s
+    call Comm_Mod_Global_Sum_Int(grid % comm % nc_t)
+    call Comm_Mod_Global_Sum_Int(grid % comm % nb_t)
 
     !-------------------------------------!
     !   Global cell numbers for T-Flows   !
@@ -85,15 +85,15 @@
     !-----------------------------------------!
     !   Global cell numbers for MPI mapping   !
     !-----------------------------------------!
-    allocate(grid % comm % cell_map    (nc_s))   
-    allocate(grid % comm % bnd_cell_map(max(nb_s,1)))  ! avoid zero allocation   
+    allocate(grid % comm % cell_map    (grid % comm % nc_s))   
+    allocate(grid % comm % bnd_cell_map(max(grid % comm % nb_s,1)))
     grid % comm % cell_map(:)     = 0
     grid % comm % bnd_cell_map(:) = 0
 
     !-------------------!
     !   Read cell map   !
     !-------------------!
-    do c = 1, nc_s
+    do c = 1, grid % comm % nc_s
       read(fu, '(i9)') grid % comm % cell_glo(c)
 
       ! Take cell mapping to be the same as global cell numbers but start from 0
@@ -103,20 +103,21 @@
     !----------------------------!
     !   Read boundary cell map   !
     !----------------------------!
-    do c = -nb_s, -1
+    do c = -grid % comm % nb_s, -1
       read(fu, '(i9)') grid % comm % cell_glo(c)
 
       ! Correct boundary cell mapping.  
       ! - First it is in positive range, so insted of -nb_s to -1, it goes from 
       !   1 to nb_s.  (Therefore the "c+nb_s+1")
       ! - Second, mapping must be positive and start from zero.  (The "+ nb_t")
-      grid % comm % bnd_cell_map(c+nb_s+1) = grid % comm % cell_glo(c) + nb_t
+      grid % comm % bnd_cell_map(c+grid % comm % nb_s+1) =  &
+        grid % comm % cell_glo(c) + grid % comm % nb_t
     end do
 
     !---------------------------------------------!
     !   Refresh buffers for global cell numbers   !
     !---------------------------------------------!
-    call Comm_Mod_Exchange_Int(grid, grid % comm % cell_glo)
+    call Grid_Mod_Exchange_Int(grid, grid % comm % cell_glo)
 
     close(fu)
 

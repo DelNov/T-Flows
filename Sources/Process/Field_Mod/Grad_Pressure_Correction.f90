@@ -15,7 +15,7 @@
   ! Take aliases
   grid => flow % pnt_grid
 
-  call Comm_Mod_Exchange_Real(grid, pp % n)
+  call Grid_Mod_Exchange_Real(grid, pp % n)
 
   do c = 1, grid % n_cells
     pp % x(c) = 0.0

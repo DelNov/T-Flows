@@ -88,11 +88,11 @@
 
   ! Allocate memory for working arrays and comm.
   call Work_Mod_Allocate(grid, rc=30, rf=1, rn=1, ic=4, if=0, in=1)
-  call Comm_Mod_Allocate(grid)
+  call Grid_Mod_Allocate_Comm(grid)
 
   call Grid_Mod_Load_Geo(grid, this_proc)
-  call Comm_Mod_Create_Buffers(grid)
-  call Comm_Mod_Load_Maps(grid)       ! maps should move to .cns file soon
+  call Grid_Mod_Create_Buffers(grid)
+  call Grid_Mod_Load_Maps(grid)       ! maps should move to .cns file soon
 
   call Comm_Mod_Wait
 
@@ -249,7 +249,7 @@
 
       ! Refresh buffers for a % sav before discretizing for pressure
       ! (Can this call be somewhere in Compute Pressure?)
-      call Comm_Mod_Exchange_Real(grid, sol % a % sav)
+      call Grid_Mod_Exchange_Real(grid, sol % a % sav)
 
       call Balance_Mass(flow)
       call Compute_Pressure(flow, mult, sol, flow % dt, ini)

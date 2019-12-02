@@ -83,8 +83,8 @@
     turb % h_min(c) = turb % h_min(c) * 2.0
   end do
 
-  call Comm_Mod_Exchange_Real(grid, turb % h_max)
-  call Comm_Mod_Exchange_Real(grid, turb % h_min)
-  call Comm_Mod_Exchange_Real(grid, turb % h_w)
+  call Grid_Mod_Exchange_Real(grid, turb % h_max)
+  call Grid_Mod_Exchange_Real(grid, turb % h_min)
+  call Grid_Mod_Exchange_Real(grid, turb % h_w)
 
   end subroutine

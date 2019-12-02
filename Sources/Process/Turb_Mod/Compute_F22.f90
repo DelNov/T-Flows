@@ -179,6 +179,6 @@
     call Info_Mod_Iter_Fill_At(4, 2, phi % name, exec_iter, phi % res)
   end if
 
-  call Comm_Mod_Exchange_Real(grid, phi % n)
+  call Grid_Mod_Exchange_Real(grid, phi % n)
 
   end subroutine

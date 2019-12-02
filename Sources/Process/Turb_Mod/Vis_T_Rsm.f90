@@ -56,6 +56,6 @@
     turb % vis_t(c) = max(turb % vis_t(c), TINY)
   end do
 
-  call Comm_Mod_Exchange_Real(grid, turb % vis_t)
+  call Grid_Mod_Exchange_Real(grid, turb % vis_t)
 
   end subroutine

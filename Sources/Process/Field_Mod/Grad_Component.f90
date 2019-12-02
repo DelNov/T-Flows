@@ -21,7 +21,7 @@
   ! Take alias
   grid => flow % pnt_grid
 
-  call Comm_Mod_Exchange_Real(grid, phi)
+  call Grid_Mod_Exchange_Real(grid, phi)
 
   phii(1:grid % n_cells) = 0.
 
@@ -118,6 +118,6 @@
     end do
   end if
 
-  call Comm_Mod_Exchange_Real(grid, phii)
+  call Grid_Mod_Exchange_Real(grid, phii)
 
   end subroutine

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Comm_Mod_Create_Buffers(grid)
+  subroutine Grid_Mod_Create_Buffers(grid)
 !------------------------------------------------------------------------------!
 !   Reads: name.buf                                                            !
 !------------------------------------------------------------------------------!
@@ -21,7 +21,7 @@
 !   indexes. That one is called buffind().                                     !
 !------------------------------------------------------------------------------!
 
-  if(n_proc .eq. 0) return
+  if(n_proc < 2) return
 
   allocate (grid % comm % nbb_s(0:n_proc))  ! why from zero?
   allocate (grid % comm % nbb_e(0:n_proc))

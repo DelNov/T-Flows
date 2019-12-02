@@ -205,28 +205,25 @@ endif
 #   Modules
 #-------------
 
-# Modules in shared directory
-SRC_MOD = Const_Mod.f90		\
-          Sort_Mod.f90		\
-          Math_Mod.f90		\
-          File_Mod.f90		\
-          Div_Mod.f90		\
-          Grid_Mod.f90		\
-          Grid_Level_Mod.f90	\
-          Work_Mod.f90		\
-          Material_Mod.f90	\
-          Metis_Options_Mod.f90
-
 # Conditional support for MPI communication
 ifeq ($(MPI), yes)
-  SRC_MOD += Comm_Mod_Par.f90
-  COMM_OBJ = Comm_Mod_Par.o
+  SRC_MOD  = Comm_Mod_Par.f90
 else
-  SRC_MOD += Comm_Mod_Seq.f90
-  COMM_OBJ = Comm_Mod_Seq.o
+  SRC_MOD  = Comm_Mod_Seq.f90
 endif
 
-SRC_MOD += Cpu_Timer_Mod.f90
+# Modules in shared directory
+SRC_MOD += Const_Mod.f90	\
+           Cpu_Timer_Mod.f90	\
+           Sort_Mod.f90		\
+           Math_Mod.f90		\
+           File_Mod.f90		\
+           Div_Mod.f90		\
+           Grid_Mod.f90		\
+           Grid_Level_Mod.f90	\
+           Work_Mod.f90		\
+           Material_Mod.f90	\
+           Metis_Options_Mod.f90
 
 # Sources for modules in the local directory
 SRC_MOD += Control_Mod.f90	\

@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine Comm_Mod_Allocate(grid)
+  subroutine Comm_Mod_Exchange_Real_Array(phi, length, dest)
+!------------------------------------------------------------------------------!
+!   Dummy function for sequential compilation.                                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  real    :: phi(length)
+  integer :: length
+  integer :: dest         ! destination processor
 !==============================================================================!
-
-  allocate (grid % comm % buffer_index(grid % n_cells:-1))
-
-  grid % comm % buffer_index = 0
 
   end subroutine

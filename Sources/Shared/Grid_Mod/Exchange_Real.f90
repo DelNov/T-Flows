@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Comm_Mod_Exchange_Real(grid, phi)
+  subroutine Grid_Mod_Exchange_Real(grid, phi)
 !------------------------------------------------------------------------------!
 !   Exchanges the values of a real array between the processors.               !
 !------------------------------------------------------------------------------!
@@ -8,8 +8,7 @@
   type(Grid_Type) :: grid
   real            :: phi(-grid % n_bnd_cells:grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c1, c2, sub, rtag, stag, length, error
-  integer :: status(MPI_STATUS_SIZE)
+  integer :: c1, c2, sub
 !==============================================================================!
 
   ! Fill the buffers with new values
@@ -29,21 +28,11 @@
     if( grid % comm % nbb_e(sub)  >=   &
         grid % comm % nbb_s(sub) ) then
 
-      length = grid % comm % nbb_e(sub)  &
-             - grid % comm % nbb_s(sub) + 1
-      stag = (n_proc) * this_proc + sub  ! tag for sending
-      rtag = (n_proc) * sub + this_proc  ! tag for receiving
-
-      call Mpi_Sendrecv_Replace(phi(grid % comm % nbb_s(sub)),    & ! buffer
-                                length,                           & ! length
-                                MPI_DOUBLE_PRECISION,             & ! datatype
-                                (sub-1),                          & ! dest,
-                                stag,                             & ! sendtag,
-                                (sub-1),                          & ! source,
-                                rtag,                             & ! recvtag,
-                                MPI_COMM_WORLD,                   &
-                                status,                           &
-                                error)
+      call Comm_Mod_Exchange_Real_Array(       &
+        phi(grid % comm % nbb_s(sub)),         &  ! array to be exchanged
+          grid % comm % nbb_e(sub)             &
+        - grid % comm % nbb_s(sub) + 1,        &  ! array's length
+        sub)                                      ! destination processor
 
     end if
   end do

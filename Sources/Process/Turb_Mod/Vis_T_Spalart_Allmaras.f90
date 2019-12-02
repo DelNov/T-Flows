@@ -37,6 +37,6 @@
     end do
   end if
 
-  call Comm_Mod_Exchange_Real(grid, turb % vis_t)
+  call Grid_Mod_Exchange_Real(grid, turb % vis_t)
 
   end subroutine

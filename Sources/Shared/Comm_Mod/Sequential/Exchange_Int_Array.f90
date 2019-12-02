@@ -1,15 +1,13 @@
 !==============================================================================!
-  subroutine Comm_Mod_Set_Buffer_Color(grid)
+  subroutine Comm_Mod_Exchange_Int_Array(phi, length, dest)
 !------------------------------------------------------------------------------!
-!   Add one boundary condition type for buffer cells.                          !
+!   Dummy function for sequential runs.                                        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
-!-----------------------------------[Locals]-----------------------------------!
-  integer :: c, n
+  integer :: phi(length)
+  integer :: length
+  integer :: dest         ! destination processor
 !==============================================================================!
-
-  return
 
   end subroutine

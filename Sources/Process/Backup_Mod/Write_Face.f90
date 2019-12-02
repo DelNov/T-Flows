@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Backup_Mod_Write_Face(fh, d, vc, grid, flux)
+  subroutine Backup_Mod_Write_Face(comm, fh, d, vc, grid, flux)
 !------------------------------------------------------------------------------!
 !   Writes backup files. name.backup                                           !
 !------------------------------------------------------------------------------!
@@ -10,6 +10,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  type(Comm_Type) :: comm
   integer         :: fh, d, vc
   type(Grid_Type) :: grid
   real            :: flux(grid % n_faces)
@@ -87,7 +88,7 @@
     do c = 1, grid % n_cells
       ivalues(c) = cells_cg(mc,c)
     end do
-    call Comm_Mod_Exchange_Int(grid, ivalues)
+    call Grid_Mod_Exchange_Int(grid, ivalues)
 
     ! Update buffer cells with neighbors
     do c = grid % n_cells - grid % comm % n_buff_cells + 1, grid % n_cells
@@ -121,7 +122,8 @@
         rvalues(c) = flux( cells_fc(mc,c) )
       end if
     end do
-    call Backup_Mod_Write_Cell(fh, d, vc, cf_name, rvalues(1:nc_s))
+    call Backup_Mod_Write_Cell(comm,  &
+                               fh, d, vc, cf_name, rvalues(1:comm % nc_s))
   end do
 
   deallocate(cells_cg)

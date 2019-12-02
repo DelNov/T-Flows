@@ -74,14 +74,14 @@
       end if
     end do
 
-    call Comm_Mod_Exchange_Real(grid, sum_v1)
-    call Comm_Mod_Exchange_Real(grid, sum_v2)
+    call Grid_Mod_Exchange_Real(grid, sum_v1)
+    call Grid_Mod_Exchange_Real(grid, sum_v2)
 
     do c = 1, grid % n_cells
       mult % curv(c) = sum_v1(c) / sum_v2(c)
     end do
 
-    call Comm_Mod_Exchange_Real(grid, mult % curv)
+    call Grid_Mod_Exchange_Real(grid, mult % curv)
 
 !    if (c_iter == 6) then
 !      vof % min = mult % curv
@@ -166,13 +166,13 @@
 !    sum_v6(c) = sum_v6(c) / grid % vol(c)
   end do
 
-  call Comm_Mod_Exchange_Real(grid, sum_v1)
-  call Comm_Mod_Exchange_Real(grid, sum_v2)
-  call Comm_Mod_Exchange_Real(grid, sum_v3)
+  call Grid_Mod_Exchange_Real(grid, sum_v1)
+  call Grid_Mod_Exchange_Real(grid, sum_v2)
+  call Grid_Mod_Exchange_Real(grid, sum_v3)
 
-!  call Comm_Mod_Exchange_Real(grid, sum_v4)
-!  call Comm_Mod_Exchange_Real(grid, sum_v5)
-!  call Comm_Mod_Exchange_Real(grid, sum_v6)
+!  call Grid_Mod_Exchange_Real(grid, sum_v4)
+!  call Grid_Mod_Exchange_Real(grid, sum_v5)
+!  call Grid_Mod_Exchange_Real(grid, sum_v6)
 
   !vof % x = sum_v4
   !vof % y = sum_v5
@@ -226,7 +226,7 @@
     end if
   end do
 
-  call Comm_Mod_Exchange_Real(grid, mult % curv)
+  call Grid_Mod_Exchange_Real(grid, mult % curv)
 
 
   do c = 1, grid % n_cells

@@ -1,11 +1,13 @@
 !==============================================================================!
-  subroutine Comm_Mod_Create_Buffers(grid)
-!------------------------------------------------------------------------------!
-!   Dummy function for sequential runs.                                        !
+  subroutine Grid_Mod_Allocate_Comm(grid)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !==============================================================================!
+
+  allocate (grid % comm % buffer_index(grid % n_cells))
+
+  grid % comm % buffer_index = 0
 
   end subroutine

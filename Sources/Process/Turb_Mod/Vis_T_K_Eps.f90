@@ -143,10 +143,10 @@
     end if    ! c2 < 0
   end do
 
-  call Comm_Mod_Exchange_Real(grid, turb % vis_t)
-  call Comm_Mod_Exchange_Real(grid, turb % vis_w)
+  call Grid_Mod_Exchange_Real(grid, turb % vis_t)
+  call Grid_Mod_Exchange_Real(grid, turb % vis_w)
   if(heat_transfer) then
-    call Comm_Mod_Exchange_Real(grid, turb % con_w)
+    call Grid_Mod_Exchange_Real(grid, turb % con_w)
   end if
 
   end subroutine

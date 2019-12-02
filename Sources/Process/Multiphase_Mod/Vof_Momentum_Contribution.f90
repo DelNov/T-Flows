@@ -94,9 +94,9 @@
             end if
           end do
 
-        call Comm_Mod_Exchange_Real(grid, body_fx)
-        call Comm_Mod_Exchange_Real(grid, body_fy)
-        call Comm_Mod_Exchange_Real(grid, body_fz)
+        call Grid_Mod_Exchange_Real(grid, body_fx)
+        call Grid_Mod_Exchange_Real(grid, body_fy)
+        call Grid_Mod_Exchange_Real(grid, body_fz)
 
         do c = 1, grid % n_cells
           b(c) = b(c) + body_fx(c)
