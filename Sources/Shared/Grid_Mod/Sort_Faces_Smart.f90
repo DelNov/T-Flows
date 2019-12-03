@@ -154,8 +154,8 @@
     end do
 
     do color = 1, grid % n_bnd_cond
-      print '(2i6)', grid % bnd_cond % color_f(color),  &
-                     grid % bnd_cond % color_l(color)
+      print '(2i6)', grid % bnd_cond % color_s(color),  &
+                     grid % bnd_cond % color_e(color)
     end do
   end if
 

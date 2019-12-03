@@ -60,8 +60,8 @@
       end if ! each 5%
 
       do b = 1, n_wall_colors
-        do c2 = grid % bnd_cond % color_f( wall_colors(b) ),  &
-                grid % bnd_cond % color_l( wall_colors(b) ),  &
+        do c2 = grid % bnd_cond % color_s( wall_colors(b) ),  &
+                grid % bnd_cond % color_e( wall_colors(b) ),  &
                 -1
           grid % wall_dist(c1) =  &
             min(grid % wall_dist(c1),                     &

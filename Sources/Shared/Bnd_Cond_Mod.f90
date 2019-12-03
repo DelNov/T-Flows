@@ -30,15 +30,15 @@
     ! Boundary condition color ranging through boundary cells.
     ! Values start from one, zero is internal cell
     integer, allocatable :: color(:)
-    integer, allocatable :: color_f(:)  ! first bnd cell for color
-    integer, allocatable :: color_l(:)  ! last bnd cell for color
+    integer, allocatable :: color_s(:)  ! start bnd cell for color
+    integer, allocatable :: color_e(:)  ! end bnd cell for color
 
-    ! Boundary types, ranging through all colors                  
+    ! Boundary types, ranging through all colors
     integer, allocatable :: type(:)
 
     ! Copy boundary conditions; useful when one domain generates boundary
     ! conditions for another.  
-    integer, allocatable :: copy_c(:)   
+    integer, allocatable :: copy_c(:)
     integer, allocatable :: copy_s(:,:)
 
   end type
