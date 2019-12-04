@@ -80,7 +80,7 @@
   !---------------------------------------------!
   !   Open control file and read problem name   !
   !---------------------------------------------!
-  call Control_Mod_Open_File()
+  call Control_Mod_Open_File('control')
   call Control_Mod_Problem_Name(problem_name)
 
   ! Load the finite volume grid
