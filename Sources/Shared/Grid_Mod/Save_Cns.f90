@@ -140,33 +140,6 @@
     end if
   end do
 
-  ! Boundary copy cells (this is a complete mess)
-  do c = -1, -grid % n_bnd_cells, -1  ! OK, later chooses just ...
-    if(grid % new_c(c) .ne. 0) then   ! ... cells with grid % new_c
-      item = grid % new_c(grid % bnd_cond % copy_c(c))
-      if(grid % bnd_cond % copy_c(c) .ne. 0) then
-        if(grid % comm % cell_proc(grid % bnd_cond % copy_c(c)) .ne. sub) then
-          do b=1,nbf_sub
-            if(buf_recv_ind(b) .eq. grid % bnd_cond % copy_c(c)) then
-              print *, buf_pos(b) 
-              print *, grid % xc(grid % bnd_cond % copy_c(c)),  &
-                       grid % yc(grid % bnd_cond % copy_c(c)),  &
-                       grid % zc(grid % bnd_cond % copy_c(c))
-              item = -buf_pos(b) ! - sign, copy buffer
-            end if
-          end do
-        endif
-      endif
-      write(fu) item
-    end if
-  end do
-
-  !----------!
-  !   Copy   !
-  !----------!
-  write(fu) grid % n_copy
-  write(fu) ((grid % bnd_cond % copy_s(c,s), c = 1, 2), s = 1, grid % n_copy)
-
   !----------------------!
   !   Multigrid levels   !
   !----------------------!

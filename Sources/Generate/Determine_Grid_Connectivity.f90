@@ -115,47 +115,10 @@
 
           ! Restore the boundary color, take positive value for color
           grid % cells_c(m,c)  = -grid % bnd_cond % color(-grid % n_bnd_cells)
-        end if 
-      end do
-    end do 
-  end if
-
-  if(rrun) then
-
-    !-------------------------------------------!
-    !   Find the side oposite on the boundary   !
-    !-------------------------------------------!
-    ! do s = 1, grid % n_faces
-    !   c1 = grid % faces_c(1,s)
-    !   c2 = grid % faces_c(2,s)
-    !   if(c2  < 0) then
-    !     do i=1,6
-    !       if(grid % cells_c(i,c1) .eq. c2) then
-    !         if(i .eq. 1) grid % faces_c(0,s) = grid % cells_c(6,c1)
-    !         if(i .eq. 2) grid % faces_c(0,s) = grid % cells_c(4,c1)
-    !         if(i .eq. 3) grid % faces_c(0,s) = grid % cells_c(5,c1)
-    !         if(i .eq. 4) grid % faces_c(0,s) = grid % cells_c(2,c1)
-    !         if(i .eq. 5) grid % faces_c(0,s) = grid % cells_c(3,c1)
-    !         if(i .eq. 6) grid % faces_c(0,s) = grid % cells_c(1,c1)
-    !       end if
-    !     end do
-    !   end if
-    ! end do 
-
-    !-------------------------------------------------------!
-    !   Find the boundary cell on which you should copy     ! 
-    !-------------------------------------------------------!
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
-      if(c2 < 0 .and. grid % bnd_cond % copy_c(c1) .ne. 0) then
-        if(grid % bnd_cond % color(c2) .eq. copy_cond(1,0)) then
-           grid % bnd_cond % copy_c(c2) = grid % bnd_cond % copy_c(c1)
         end if
-      end if
+      end do
     end do
-
-  end if ! rrun
+  end if
 
   !--------------------------------------!
   !   Is there enough allocated memory   !

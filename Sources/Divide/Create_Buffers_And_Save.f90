@@ -118,16 +118,6 @@
       end if 
     end do
 
-    ! Copy cells which stay inside the sub-domain
-    do s = 1, grid % n_copy
-      c1 = grid % bnd_cond % copy_s(1,s)
-      c2 = grid % bnd_cond % copy_s(2,s)
-      if( (grid % comm % cell_proc(c1) .eq. sub) .and.  &
-          (grid % comm % cell_proc(c2) .eq. sub) ) then
-        ncc_sub = ncc_sub + 1
-      end if
-    end do
-
     !--------------------!
     !   Create buffers   !
     !--------------------!
@@ -169,28 +159,6 @@
           end if  ! c2 > 0
         end do    ! through sides
 
-        ! Faces on the "copy" boundary
-        ! (still not sure how to really handle it)
-        do s = 1, grid % n_copy
-          c1 = grid % bnd_cond % copy_s(1,s)
-          c2 = grid % bnd_cond % copy_s(2,s)
-          if( (grid % comm % cell_proc(c1) .eq. sub) .and.  &
-              (grid % comm % cell_proc(c2) .eq. subo) ) then
-            nbf_sub   = nbf_sub   + 1
-            nbfcc_sub = nbfcc_sub + 1
-            buf_send_ind(nbf_sub) = grid % new_c(c1)    ! buffer send index 
-            buf_recv_ind(nbf_sub) = c2
-            buf_pos(nbf_sub)      = nc_sub + nbf_sub    ! new way
-          end if
-          if( (grid % comm % cell_proc(c2) .eq. sub) .and.  &
-              (grid % comm % cell_proc(c1) .eq. subo) ) then
-            nbf_sub = nbf_sub+1
-            nbfcc_sub = nbfcc_sub+1
-            buf_send_ind(nbf_sub) = grid % new_c(c2)    ! buffer send index
-            buf_recv_ind(nbf_sub) = c1
-            buf_pos(nbf_sub)      = nc_sub + nbf_sub    ! new way
-          end if
-        end do    ! through faces
         grid % comm % buff_e_cell(subo) = nbf_sub
 
         ! Write to buffer file
