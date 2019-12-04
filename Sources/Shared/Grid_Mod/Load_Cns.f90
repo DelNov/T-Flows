@@ -66,8 +66,8 @@
              c = 1, grid % n_cells)
 
   ! Cells' processor ids
-  read(fu) (grid % comm % proces(c), c =  1, grid % n_cells)
-  read(fu) (grid % comm % proces(c), c = -1,-grid % n_bnd_cells,-1)
+  read(fu) (grid % comm % cell_proc(c), c =  1,  grid % n_cells)
+  read(fu) (grid % comm % cell_proc(c), c = -1, -grid % n_bnd_cells, -1)
 
   !-----------!
   !   Faces   !

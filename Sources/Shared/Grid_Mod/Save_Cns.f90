@@ -81,15 +81,15 @@
   ! Cells' processor ids
   do c = 1, grid % n_cells
     if(grid % new_c(c) .ne. 0) then
-      write(fu) grid % comm % proces(c)
+      write(fu) grid % comm % cell_proc(c)
     end if
   end do
   do s = 1, nbf_sub
-    write(fu) grid % comm % proces(buf_recv_ind(s))
+    write(fu) grid % comm % cell_proc(buf_recv_ind(s))
   end do
   do c = -1, -grid % n_bnd_cells, -1
     if(grid % new_c(c) .ne. 0) then
-      write(fu) grid % comm % proces(c)
+      write(fu) grid % comm % cell_proc(c)
     end if
   end do
 
@@ -145,7 +145,7 @@
     if(grid % new_c(c) .ne. 0) then   ! ... cells with grid % new_c
       item = grid % new_c(grid % bnd_cond % copy_c(c))
       if(grid % bnd_cond % copy_c(c) .ne. 0) then
-        if(grid % comm % proces(grid % bnd_cond % copy_c(c)) .ne. sub) then
+        if(grid % comm % cell_proc(grid % bnd_cond % copy_c(c)) .ne. sub) then
           do b=1,nbf_sub
             if(buf_recv_ind(b) .eq. grid % bnd_cond % copy_c(c)) then
               print *, buf_pos(b) 

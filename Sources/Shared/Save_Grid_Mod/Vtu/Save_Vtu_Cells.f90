@@ -154,7 +154,7 @@
                           'Name="Processor" format="ascii">'
   do c = 1, grid % n_cells
     if(grid % new_c(c) .ne. 0) then
-      write(fu,'(a,i9)') IN_5, grid % comm % proces(c)
+      write(fu,'(a,i9)') IN_5, grid % comm % cell_proc(c)
     end if
   end do
   write(fu,'(a,a)') IN_4, '</DataArray>'
@@ -208,7 +208,7 @@
   !-----------------------!
 
   ! Create it only from subdomain 1, when decomposed
-  if(maxval(grid % comm % proces(:)) > 1 .and. sub .eq. 1) then
+  if(maxval(grid % comm % cell_proc(:)) > 1 .and. sub .eq. 1) then
 
     call File_Mod_Set_Name(name_out, extension='.pvtu')
     call File_Mod_Open_File_For_Writing(name_out, fu)
@@ -237,7 +237,7 @@
     write(fu,'(a,a)') IN_2, '</PCellData>'
 
     ! Write out the names of all the pieces
-    do n = 1, maxval(grid % comm % proces(:))
+    do n = 1, maxval(grid % comm % cell_proc(:))
       call File_Mod_Set_Name(name_out, processor=n, extension='.vtu')
       write(fu, '(a,a,a,a)') IN_2, '<Piece Source="', trim(name_out), '"/>'
     end do

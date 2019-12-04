@@ -29,9 +29,10 @@
 
     ! Boundary condition color ranging through boundary cells.
     ! Values start from one, zero is internal cell
+    ! (Follows nomenclature from "../Shared/Comm_Mod_Par.f90")
     integer, allocatable :: color(:)
-    integer, allocatable :: color_s(:)  ! start bnd cell for color
-    integer, allocatable :: color_e(:)  ! end bnd cell for color
+    integer, allocatable :: color_s_cell(:)  ! start bnd cell for color
+    integer, allocatable :: color_e_cell(:)  ! end bnd cell for color
 
     ! Boundary types, ranging through all colors
     integer, allocatable :: type(:)

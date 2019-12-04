@@ -6,8 +6,8 @@
   type(Grid_Type) :: grid
 !==============================================================================!
 
-  allocate (grid % comm % buffer_index(grid % n_cells))
+  allocate (grid % comm % buff_index(grid % n_cells))
 
-  grid % comm % buffer_index = 0
+  grid % comm % buff_index(:) = 0
 
   end subroutine

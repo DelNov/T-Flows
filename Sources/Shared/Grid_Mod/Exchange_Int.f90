@@ -13,11 +13,11 @@
 
   ! Fill the buffers with new values
   do sub = 1, n_proc
-    if( grid % comm % nbb_e(sub)  >=   &
-        grid % comm % nbb_s(sub) ) then
-      do c2 = grid % comm % nbb_s(sub),  &
-              grid % comm % nbb_e(sub)
-        c1 = grid % comm % buffer_index(c2)
+    if( grid % comm % buff_e_cell(sub)  >=   &
+        grid % comm % buff_s_cell(sub) ) then
+      do c2 = grid % comm % buff_s_cell(sub),  &
+              grid % comm % buff_e_cell(sub)
+        c1 = grid % comm % buff_index(c2)
         phi(c2) = phi(c1)
       end do
     end if
@@ -25,13 +25,13 @@
 
   ! Exchange the values
   do sub = 1, n_proc
-    if( grid % comm % nbb_e(sub)  >=   &
-        grid % comm % nbb_s(sub) ) then
+    if( grid % comm % buff_e_cell(sub)  >=   &
+        grid % comm % buff_s_cell(sub) ) then
 
       call Comm_Mod_Exchange_Int_Array(        &
-        phi(grid % comm % nbb_s(sub)),         &  ! array to be exchanged
-          grid % comm % nbb_e(sub)             &
-        - grid % comm % nbb_s(sub) + 1,        &  ! array's length
+        phi(grid % comm % buff_s_cell(sub)),   &  ! array to be exchanged
+          grid % comm % buff_e_cell(sub)       &  ! end minus start plus 1 ...
+        - grid % comm % buff_s_cell(sub) + 1,  &  ! ... makes array's length
         sub)                                      ! destination processor
 
     end if
