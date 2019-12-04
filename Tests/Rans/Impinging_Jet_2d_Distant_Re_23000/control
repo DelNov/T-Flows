@@ -5,12 +5,12 @@
  HEAT_TRANSFER   yes
 
  TIME_STEP                 0.05
- NUMBER_OF_TIME_STEPS    120
+ NUMBER_OF_TIME_STEPS    600
 
 #------------------
 # Saving intervals
 #------------------
- RESULTS_SAVE_INTERVAL    40
+ RESULTS_SAVE_INTERVAL   120
  BACKUP_SAVE_INTERVAL    600
 
 #LOAD_BACKUP_NAME  jet-ts000050.backup
