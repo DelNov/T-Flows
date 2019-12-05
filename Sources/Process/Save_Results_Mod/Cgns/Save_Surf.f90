@@ -47,7 +47,7 @@
     allocate(cgns_base(n_bases))
 
     base = 1
-    cgns_base(base) % name = 'Base'
+    cgns_base(base) % name = 'Base 1'
     cgns_base(base) % cell_dim = 2 ! 2 -> surfaces cells, 3 -> volume cells
     cgns_base(base) % phys_dim = 3 ! 3 points to define a vector
 
@@ -87,7 +87,7 @@
 
     ! Actually write grid coordinates in DB
     do coord = 1, cgns_base(base) % phys_dim
-      call Write_Coordinate_Array(base, block, coord, surf)
+      call Write_Surf_Coordinate_Array(base, block, coord, surf)
     end do
 
     ! Mostly repeats Save_Cgns_Cells
@@ -110,7 +110,7 @@
     cgns_base(base) % block(block) % section(sect) % last_cell = surf % n_elems
 
     ! Mostly repeats Write_Section_Connections
-    call Write_Section_Connections(base, block, sect, surf)
+    call Write_Surf_Section_Connections(base, block, sect, surf)
 
     ! Mostly repeats Save_Results
 
@@ -134,17 +134,17 @@
     cgns_base(base) % block(block) % solution(solution) % sol_type = Vertex
     call Cgns_Mod_Write_Solution_Info(base, block, solution)
 
-    ! Mostly repeats Cgns_Mod_Write_Field
+    ! Mostly repeats Write_Field
 
     do i = 1, surf % n_verts
       n_array(i) = real(i)
     end do
-    call Write_Field_In_Nodes(base, block, solution, field, surf, &
-                              n_array, 'Index')
+    call Write_Surf_Field_In_Nodes(base, block, solution, field, surf, &
+                                   n_array, 'Index')
 
     n_array = real(surf % vert(1:surf % n_verts) % nne)
-    call Write_Field_In_Nodes(base, block, solution, field, surf, &
-                              n_array, 'NeighboursN')
+    call Write_Surf_Field_In_Nodes(base, block, solution, field, surf, &
+                                   n_array, 'NeighboursN')
 
     ! First solution block is for cell centered data
     solution = 2
@@ -185,9 +185,9 @@
   contains
 
   !============================================================================!
-    subroutine Write_Coordinate_Array(base, block, coord, surf)
+    subroutine Write_Surf_Coordinate_Array(base, block, coord, surf)
   !----------------------------------------------------------------------------!
-  !   Writes grid coordinates (RealDouble) [sequential vesion]                 !
+  !   Writes surf grid coordinates (RealDouble)                                !
   !----------------------------------------------------------------------------!
     implicit none
   !---------------------------------[Arguments]--------------------------------!
@@ -251,9 +251,9 @@
     end subroutine
 
   !============================================================================!
-    subroutine Write_Section_Connections(base, block, sect, surf)
+    subroutine Write_Surf_Section_Connections(base, block, sect, surf)
   !----------------------------------------------------------------------------!
-  !   Writes elements connection for sect_id [sequential version]              !
+  !   Writes surf elements connection for sect                                 !
   !----------------------------------------------------------------------------!
   !   Each node in zone/block must have unique id                              !
   !   https://cgns.github.io/CGNS_docs_current/midlevel/grid.html              !
@@ -349,14 +349,11 @@
     end subroutine
 
   !============================================================================!
-    subroutine Write_Field_In_Nodes(base, block, solution, field, surf, &
+    subroutine Write_Surf_Field_In_Nodes(base, block, solution, field, surf, &
       input_array, input_name)
   !----------------------------------------------------------------------------!
-  !   Writes field to solution node and sets its field_id  [sequential vesion] !
-  !----------------------------------------------------------------------------!
-  !   Array structures in current function are strictly followings:            !
-  !                                                                            !
-  !   Solution type:    |      FlowSolution_n      |     FlowSolution_c     |  !
+  !   Writes field to solution node and sets its field                         !
+  !   Solution type: Vertex                                                    !
   !----------------------------------------------------------------------------!
     implicit none
   !--------------------------------[Arguments]---------------------------------!
@@ -400,9 +397,9 @@
         k = k + 1
       end do
 
-      !----------------------------------------------!
+      !--------------------------------------------!
       !   Writing cells assocciated with sect_id   !
-      !----------------------------------------------!
+      !--------------------------------------------!
 
       ! Add field to FlowSolution_t node for sect_id
       call Cg_Field_Partial_Write_F(file_id,      & !(in )
@@ -444,11 +441,8 @@
     subroutine Write_Field_In_Cells(base, block, solution, field, surf, &
       input_array, input_name)
   !----------------------------------------------------------------------------!
-  !   Writes field to solution node and sets its field_id  [sequential vesion] !
-  !----------------------------------------------------------------------------!
-  !   Array structures in current function are strictly followings:            !
-  !                                                                            !
-  !   Solution type:    |      FlowSolution_n      |     FlowSolution_c     |  !
+  !   Writes field to solution node and sets its field                         !
+  !   Solution type: Face centered                                             !
   !----------------------------------------------------------------------------!
     implicit none
   !--------------------------------[Arguments]---------------------------------!
@@ -477,9 +471,9 @@
 
     field_name = trim(input_name)
 
-    !------------------------------------------------!
-    !   Mapping 1:nc -> Connection structure above   !
-    !------------------------------------------------!
+    !---------------------!
+    !   Mapping 1:n_elems !
+    !---------------------!
 
     ! Find first and last cells of sect_id
     ! cells of sect_id
