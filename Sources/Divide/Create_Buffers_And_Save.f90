@@ -40,15 +40,15 @@
 !   indexes. That one is called buffind().                                     !
 !------------------------------------------------------------------------------!
 
-  allocate (grid % comm % nbb_s(0 : maxval(grid % comm % proces(:))))
-  allocate (grid % comm % nbb_e(0 : maxval(grid % comm % proces(:))))
+  allocate (grid % comm % buff_s_cell(0 : maxval(grid % comm % cell_proc(:))))
+  allocate (grid % comm % buff_e_cell(0 : maxval(grid % comm % cell_proc(:))))
 
   !-------------------------------!
   !                               !
   !   Browse through subdomains   !
   !                               !
   !-------------------------------!
-  do sub = 1, maxval(grid % comm % proces(:))
+  do sub = 1, maxval(grid % comm % cell_proc(:))
 
     if(verbose) then
       call File_Mod_Set_Name(name_buf, processor=sub, extension='.buf')
@@ -69,7 +69,7 @@
       grid % new_c(c) = 0
     end do
     do c = 1, grid % n_cells
-      if(grid % comm % proces(c) .eq. sub) then
+      if(grid % comm % cell_proc(c) .eq. sub) then
         nc_sub   = nc_sub + 1     ! increase the number of cells in sub.
         grid % new_c(c) = nc_sub         ! assign new (local) cell number 
       end if
@@ -92,23 +92,23 @@
 
     ! Faces step 1/2: inside the domain
     do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)  
-      c2 = grid % faces_c(2,s) 
+      c1 = grid % faces_c(1,s)
+      c2 = grid % faces_c(2,s)
       if(c2 > 0) then
-        if( (grid % comm % proces(c1) .eq. sub) .and.  &
-            (grid % comm % proces(c2) .eq. sub) ) then
+        if( (grid % comm % cell_proc(c1) .eq. sub) .and.  &
+            (grid % comm % cell_proc(c2) .eq. sub) ) then
           nf_sub   = nf_sub + 1
           grid % new_f(s) = nf_sub
         end if
-      end if 
+      end if
     end do
 
     ! Faces step 2/2: on the boundaries
     do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)  
-      c2 = grid % faces_c(2,s) 
+      c1 = grid % faces_c(1,s)
+      c2 = grid % faces_c(2,s)
       if(c2 < 0) then
-        if( grid % comm % proces(c1) .eq. sub )  then
+        if( grid % comm % cell_proc(c1) .eq. sub )  then
           nf_sub   = nf_sub + 1
           grid % new_f(s) = nf_sub
 
@@ -116,16 +116,6 @@
           grid % new_c(c2) = -nbc_sub  ! new loc. number of bnd. cell
         end if
       end if 
-    end do
-
-    ! Copy cells which stay inside the sub-domain
-    do s = 1, grid % n_copy
-      c1 = grid % bnd_cond % copy_s(1,s)
-      c2 = grid % bnd_cond % copy_s(2,s)
-      if( (grid % comm % proces(c1) .eq. sub) .and.  &
-          (grid % comm % proces(c2) .eq. sub) ) then
-        ncc_sub = ncc_sub + 1
-      end if
     end do
 
     !--------------------!
@@ -139,17 +129,17 @@
       write(fu,'(i8)')  nc_sub
     end if
 
-    do subo = 1, maxval(grid % comm % proces(:))
+    do subo = 1, maxval(grid % comm % cell_proc(:))
       if(subo .ne. sub) then
-        grid % comm % nbb_s(subo) = nbf_sub + 1
+        grid % comm % buff_s_cell(subo) = nbf_sub + 1
 
         ! Faces inside the domain
         do s = 1, grid % n_faces
           c1 = grid % faces_c(1,s)
           c2 = grid % faces_c(2,s)
           if(c2  > 0) then
-            if( (grid % comm % proces(c1) .eq. sub) .and.  &
-                (grid % comm % proces(c2) .eq. subo) ) then
+            if( (grid % comm % cell_proc(c1) .eq. sub) .and.  &
+                (grid % comm % cell_proc(c2) .eq. subo) ) then
               nbf_sub = nbf_sub + 1                ! increase buffer cell count
               buf_send_ind(nbf_sub) = grid % new_c(c1)  ! buffer send index
               buf_recv_ind(nbf_sub) = c2           ! important for coordinate
@@ -157,8 +147,8 @@
 
               grid % new_f(s) = nf_sub + nbf_sub
             end if
-            if( (grid % comm % proces(c2) .eq. sub) .and.  &
-                (grid % comm % proces(c1) .eq. subo) ) then
+            if( (grid % comm % cell_proc(c2) .eq. sub) .and.  &
+                (grid % comm % cell_proc(c1) .eq. subo) ) then
               nbf_sub = nbf_sub + 1                ! increasu buffer cell count
               buf_send_ind(nbf_sub) = grid % new_c(c2)  ! buffer send index
               buf_recv_ind(nbf_sub) = c1           ! important for coordinate
@@ -169,29 +159,7 @@
           end if  ! c2 > 0
         end do    ! through sides
 
-        ! Faces on the "copy" boundary
-        ! (still not sure how to really handle it)
-        do s = 1, grid % n_copy
-          c1 = grid % bnd_cond % copy_s(1,s)
-          c2 = grid % bnd_cond % copy_s(2,s)
-          if( (grid % comm % proces(c1) .eq. sub) .and.  &
-              (grid % comm % proces(c2) .eq. subo) ) then
-            nbf_sub   = nbf_sub   + 1
-            nbfcc_sub = nbfcc_sub + 1
-            buf_send_ind(nbf_sub) = grid % new_c(c1)    ! buffer send index 
-            buf_recv_ind(nbf_sub) = c2
-            buf_pos(nbf_sub)      = nc_sub + nbf_sub    ! new way
-          end if
-          if( (grid % comm % proces(c2) .eq. sub) .and.  &
-              (grid % comm % proces(c1) .eq. subo) ) then
-            nbf_sub = nbf_sub+1
-            nbfcc_sub = nbfcc_sub+1
-            buf_send_ind(nbf_sub) = grid % new_c(c2)    ! buffer send index
-            buf_recv_ind(nbf_sub) = c1
-            buf_pos(nbf_sub)      = nc_sub + nbf_sub    ! new way
-          end if
-        end do    ! through faces
-        grid % comm % nbb_e(subo) = nbf_sub
+        grid % comm % buff_e_cell(subo) = nbf_sub
 
         ! Write to buffer file
         if(verbose) then
@@ -200,12 +168,13 @@
           write(fu,'(a33)') '#-------------------------------#' 
           write(fu,'(i8)')  subo
           write(fu,'(a30)') '# Number of local connections:'
-          write(fu,'(i8)')  grid % comm % nbb_e(subo) -  &
-                           grid % comm % nbb_s(subo)+1 
+          write(fu,'(i8)')  grid % comm % buff_e_cell(subo) -  &
+                            grid % comm % buff_s_cell(subo) + 1
           write(fu,'(a37)') '# Local number in a buffer and index:'
-          do b = grid % comm % nbb_s(subo),  &
-                 grid % comm % nbb_e(subo)
-            write(fu,'(2i8)') b - grid % comm % nbb_s(subo) + 1, buf_send_ind(b)
+          do b = grid % comm % buff_s_cell(subo),  &
+                 grid % comm % buff_e_cell(subo)
+            write(fu,'(2i8)') b - grid % comm % buff_s_cell(subo) + 1,  &
+                              buf_send_ind(b)
           end do
         end if
       end if
@@ -224,7 +193,7 @@
 
     ! Mark nodes for renumbering with -1
     do c = 1, grid % n_cells
-      if(grid % comm % proces(c) .eq. sub) then
+      if(grid % comm % cell_proc(c) .eq. sub) then
         do ln = 1, grid % cells_n_nodes(c)
           grid % new_n(grid % cells_n(ln,c)) = -1
         end do
@@ -289,13 +258,13 @@
       print '(a)',    ' #==============================================='
       print '(a,i9)', ' # Subdomain   ', sub
       print '(a,i9)', ' # Buffer size ', nbf_sub
-      do subo = 1, maxval(grid % comm % proces(:))
+      do subo = 1, maxval(grid % comm % cell_proc(:))
         if(subo .ne. sub) then
           print '(a,i9,a,3i9)', ' # Connections with ', subo ,' : ',  &
-            grid % comm % nbb_e(subo) -                               &
-            grid % comm % nbb_s(subo) + 1,                            &
-            nbc_sub + grid % comm % nbb_s(subo),                      &
-            nbc_sub + grid % comm % nbb_e(subo)
+            grid % comm % buff_e_cell(subo) -                         &
+            grid % comm % buff_s_cell(subo) + 1,                      &
+            nbc_sub + grid % comm % buff_s_cell(subo),                &
+            nbc_sub + grid % comm % buff_e_cell(subo)
         end if 
       end do ! for subo
       print '(a)',    ' #-----------------------------------------------'
@@ -326,9 +295,9 @@
   !   Assign new numbers   !
   !------------------------!
   nc_sub = 0     ! number of cells renumbered
-  do sub = 1, maxval(grid % comm % proces(:))
+  do sub = 1, maxval(grid % comm % cell_proc(:))
     do c = 1, grid % n_cells
-      if(grid % comm % proces(c) .eq. sub) then
+      if(grid % comm % cell_proc(c) .eq. sub) then
         nc_sub = nc_sub+1
         grid % new_c(c) = nc_sub
       end if
@@ -336,11 +305,11 @@
   end do
 
   nf_sub = 0     ! number of sides renumbered
-  do sub = 1, maxval(grid % comm % proces(:))
+  do sub = 1, maxval(grid % comm % cell_proc(:))
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
-      if(grid % comm % proces(c1) .eq. sub) then
+      if(grid % comm % cell_proc(c1) .eq. sub) then
         nf_sub = nf_sub+1
         grid % new_f(s) = nf_sub
       end if
@@ -353,21 +322,23 @@
   !----------------------------------!
 
   ! Sort cell and face connectivities
-  call Grid_Mod_Sort_Cells_By_Index(grid,             &
-                                    grid % new_c(1),  &
-                                    grid % n_cells)
-  call Grid_Mod_Sort_Faces_By_Index(grid, grid % new_f(1), grid % n_faces)
+  call Grid_Mod_Sort_Cells_By_Index(grid,                &
+                                    grid % new_c(1),     &
+                                    n=grid % n_cells)
+  call Grid_Mod_Sort_Faces_By_Index(grid,                &
+                                    grid % new_f(1),     &
+                                    n=grid % n_faces)
 
   ! Sort cell-based values to be plotted
-  call Sort_Mod_Int_By_Index(grid % comm % proces(1),  &
-                             grid % new_c(1),          &
-                             grid % n_cells)
-  call Sort_Mod_Real_By_Index(grid % wall_dist(1),     &
-                              grid % new_c(1),         &
-                              grid % n_cells)
-  call Sort_Mod_Real_By_Index(grid % vol(1),           &
-                              grid % new_c(1),         &
-                              grid % n_cells)
+  call Sort_Mod_Int_By_Index(grid % comm % cell_proc(1),  &
+                             grid % new_c(1),             &
+                             n=grid % n_cells)
+  call Sort_Mod_Real_By_Index(grid % wall_dist(1),        &
+                              grid % new_c(1),            &
+                              n=grid % n_cells)
+  call Sort_Mod_Real_By_Index(grid % vol(1),              &
+                              grid % new_c(1),            &
+                              n=grid % n_cells)
 
   ! Sort face-cell connectivity
   allocate(side_cell(grid % n_faces, 2))
@@ -375,8 +346,12 @@
     side_cell(s,1) = grid % faces_c(1,s)
     side_cell(s,2) = grid % faces_c(2,s)
   end do
-  call Sort_Mod_Int_By_Index(side_cell(1,1), grid % new_f(1), grid % n_faces)
-  call Sort_Mod_Int_By_Index(side_cell(1,2), grid % new_f(1), grid % n_faces)
+  call Sort_Mod_Int_By_Index(side_cell(1,1),      &
+                             grid % new_f(1),     &
+                             n=grid % n_faces)
+  call Sort_Mod_Int_By_Index(side_cell(1,2),      &
+                             grid % new_f(1),     &
+                             n=grid % n_faces)
   do s = 1, grid % n_faces
     grid % faces_c(1,s) = side_cell(s,1)
     grid % faces_c(2,s) = side_cell(s,2)

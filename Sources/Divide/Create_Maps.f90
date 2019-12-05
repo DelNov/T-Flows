@@ -26,7 +26,7 @@
   !   Browse through subdomains   !
   !                               !
   !-------------------------------!
-  do sub = 1, maxval(grid % comm % proces(:))
+  do sub = 1, maxval(grid % comm % cell_proc(:))
 
     call File_Mod_Set_Name(name_map, processor=sub, extension='.map')
     call File_Mod_Open_File_For_Writing(name_map, fu)
@@ -34,24 +34,24 @@
     ! Cells
     n_cells_sub = 0     ! number of cells in subdomain
     do c = 1, grid % n_cells
-      if(grid % comm % proces(c) .eq. sub) then
+      if(grid % comm % cell_proc(c) .eq. sub) then
         n_cells_sub = n_cells_sub + 1     ! increase the number of cells in sub.
         global_cell_ins(n_cells_sub) = c  ! map to global cell number
       end if
     end do
 
     ! Faces & real boundary cells
-    n_faces_sub     = 0  ! number of sides in subdomain
+    n_faces_sub     = 0  ! number of faces in subdomain
     n_buf_sub       = 0  ! number of buffer faces (and cells)
     n_bnd_cells_sub = 0  ! number of real boundary cells in subdomain
     NCSsub = 0
 
     ! Faces step 2/3: on the boundaries + bundary cells
     do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)  
-      c2 = grid % faces_c(2,s) 
+      c1 = grid % faces_c(1,s)
+      c2 = grid % faces_c(2,s)
       if(c2 < 0) then
-        if( grid % comm % proces(c1) .eq. sub )  then
+        if( grid % comm % cell_proc(c1) .eq. sub )  then
           n_bnd_cells_sub = n_bnd_cells_sub + 1  ! increase n. of bnd. cells
           global_cell_bnd(-n_bnd_cells_sub) = c2  ! map to global cell number
         end if

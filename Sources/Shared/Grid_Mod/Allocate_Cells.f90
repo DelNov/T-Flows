@@ -35,6 +35,6 @@
   allocate(grid % cells_bnd_color(6, -nb:nc))
 
   ! Allocate processor i.d.
-  allocate(grid % comm % proces(-nb:nc)); grid % comm % proces = 0
+  allocate(grid % comm % cell_proc(-nb:nc));  grid % comm % cell_proc(:) = 0
 
   end subroutine

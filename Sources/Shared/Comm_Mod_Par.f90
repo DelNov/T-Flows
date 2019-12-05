@@ -15,16 +15,18 @@
   !---------------!
   type Comm_Type    ! also used inside the Grid_Type) 
 
+    ! Number of buffer cells
     integer :: n_buff_cells
 
-    ! Processor i.d. defined for each cell
-    integer, allocatable :: proces(:)
+    ! For each buffer region: index of start (_s) and end (_e) buffer cell
+    ! (Follows nomenclature in "../Shared/Bnd_Cond_Mod.f90")
+    integer, allocatable :: buff_s_cell(:), buff_e_cell(:)
 
-    ! These names are ugly but mean number of buffer boundaries start and end
-    integer, allocatable :: nbb_s(:), nbb_e(:)
+    ! Processor i.d. defined for each cell
+    integer, allocatable :: cell_proc(:)
 
     ! Buffer index
-    integer, allocatable :: buffer_index(:)
+    integer, allocatable :: buff_index(:)
 
     ! Global cell numbers
     integer, allocatable :: cell_glo(:)

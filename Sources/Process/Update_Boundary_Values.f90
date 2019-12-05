@@ -215,57 +215,6 @@
         end if
       end if ! heat_transfer
 
-      !---------------------!
-      !   Copy boundaries   !
-      !---------------------!
-      if(grid % bnd_cond % copy_c(c2) .ne. 0) then
-        u % n(c2) = u % n(grid % bnd_cond % copy_c(c2))
-        v % n(c2) = v % n(grid % bnd_cond % copy_c(c2))
-        w % n(c2) = w % n(grid % bnd_cond % copy_c(c2))
-
-        if(heat_transfer)  &
-          t % n(c2) = t % n(grid % bnd_cond % copy_c(c2))
-
-        if(multiphase_model .eq. VOLUME_OF_FLUID)  &
-          vof % n(c2) = vof % n(grid % bnd_cond % copy_c(c2))
-
-        if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
-           turbulence_model .eq. DES_SPALART)           &
-          vis % n(c2) = vis % n(grid % bnd_cond % copy_c(c2))
-
-        if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
-           turbulence_model .eq. HYBRID_LES_RANS) then
-          kin  % n(c2) = kin  % n(grid % bnd_cond % copy_c(c2))
-          eps  % n(c2) = eps  % n(grid % bnd_cond % copy_c(c2))
-          zeta % n(c2) = zeta % n(grid % bnd_cond % copy_c(c2))
-          f22  % n(c2) = f22  % n(grid % bnd_cond % copy_c(c2))
-          if(heat_transfer) then 
-            t2 % n(c2) = t2 % n(grid % bnd_cond % copy_c(c2))
-          end if
-        end if
-
-        if(turbulence_model .eq. K_EPS) then
-          kin % n(c2) = kin % n(grid % bnd_cond % copy_c(c2))
-          eps % n(c2) = eps % n(grid % bnd_cond % copy_c(c2))
-          if(heat_transfer) then 
-            t2 % n(c2) = t2 % n(grid % bnd_cond % copy_c(c2))
-          end if
-        end if
-
-        if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
-           turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
-          uu  % n(c2) = uu  % n(grid % bnd_cond % copy_c(c2))
-          vv  % n(c2) = vv  % n(grid % bnd_cond % copy_c(c2))
-          ww  % n(c2) = ww  % n(grid % bnd_cond % copy_c(c2))
-          uv  % n(c2) = uv  % n(grid % bnd_cond % copy_c(c2))
-          uw  % n(c2) = uw  % n(grid % bnd_cond % copy_c(c2))
-          vw  % n(c2) = vw  % n(grid % bnd_cond % copy_c(c2))
-          kin % n(c2) = kin % n(grid % bnd_cond % copy_c(c2))
-          eps % n(c2) = eps % n(grid % bnd_cond % copy_c(c2))
-          if(turbulence_model .eq. RSM_MANCEAU_HANJALIC)  &
-            f22 % n(c2) = f22 % n(grid % bnd_cond % copy_c(c2))
-        end if
-      end if
     end if ! c2 < 0
   end do
 
@@ -295,11 +244,6 @@
           phi % q(c2) = (phi % n(c2) - phi % n(c1)) * flow % diffusivity &
                       / grid % wall_dist(c1)
         end if ! WALL or WALLFL
-
-        ! Copy boundaries
-        if(grid % bnd_cond % copy_c(c2) .ne. 0) then
-          phi % n(c2) = phi % n(grid % bnd_cond % copy_c(c2))
-        end if ! grid % bnd_cond % copy_c(c2) .ne. 0
 
       end if ! c2 < 0
     end do ! s = 1, grid % n_faces

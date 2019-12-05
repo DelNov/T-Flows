@@ -9,8 +9,8 @@
   implicit none
 !==============================================================================!
 
-  character(len=80), parameter :: CONTROL_FILE_NAME = 'control'
-  integer                      :: control_file_unit
+  character(len=80) :: control_file_name
+  integer           :: control_file_unit
 
   ! Number of presumably misstyped keywords followed by their list
   integer           :: n_similar =  0

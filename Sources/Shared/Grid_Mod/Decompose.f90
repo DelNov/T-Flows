@@ -130,7 +130,7 @@
   !   Save the result from the call to METIS function   !
   !-----------------------------------------------------!
   do c = 1, grid % n_cells
-    grid % comm % proces(c) = part(c)
+    grid % comm % cell_proc(c) = part(c)
   end do
 
   end subroutine

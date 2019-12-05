@@ -23,13 +23,13 @@
 
   if(n_proc < 2) return
 
-  allocate (grid % comm % nbb_s(0:n_proc))  ! why from zero?
-  allocate (grid % comm % nbb_e(0:n_proc))
+  allocate (grid % comm % buff_s_cell(0:n_proc))  ! why from zero?
+  allocate (grid % comm % buff_e_cell(0:n_proc))
 
   ! Initialize
   do sub = 0, n_proc
-    grid % comm % nbb_s(sub) = grid % n_cells - grid % comm % n_buff_cells
-    grid % comm % nbb_e(sub) = grid % n_cells - grid % comm % n_buff_cells
+    grid % comm % buff_s_cell(sub) = grid % n_cells - grid % comm % n_buff_cells
+    grid % comm % buff_e_cell(sub) = grid % n_cells - grid % comm % n_buff_cells
   end do
 
   ! Browse through other sub-domains
@@ -37,8 +37,8 @@
 
     ! Connection with new domain will start ...
     ! ... where the domain with previous ended
-    grid % comm % nbb_s(subo) = grid % comm % nbb_e(subo-1) + 1
-    grid % comm % nbb_e(subo) = grid % comm % nbb_e(subo-1)
+    grid % comm % buff_s_cell(subo) = grid % comm % buff_e_cell(subo-1) + 1
+    grid % comm % buff_e_cell(subo) = grid % comm % buff_e_cell(subo-1)
 
     ! Initialize buffer connections with this subdomain
     buf_cnt = 0
@@ -51,13 +51,13 @@
         if(c2 > 0) then
 
           ! If c2 is a buffer face
-          if( (grid % comm % proces(c1) .eq. this_proc) .and.  &
-              (grid % comm % proces(c2) .eq. subo) ) then
+          if( (grid % comm % cell_proc(c1) .eq. this_proc) .and.  &
+              (grid % comm % cell_proc(c2) .eq. subo) ) then
             buf_cnt = buf_cnt + 1                ! increase buffer cell count
-            grid % comm % buffer_index(c2) = c1  ! buffer send index
+            grid % comm % buff_index(c2) = c1    ! buffer send index
           end if
-          if( (grid % comm % proces(c2) .eq. this_proc) .and.  &
-              (grid % comm % proces(c1) .eq. subo) ) then
+          if( (grid % comm % cell_proc(c2) .eq. this_proc) .and.  &
+              (grid % comm % cell_proc(c1) .eq. subo) ) then
             print *, '# FATAL ERROR! Shouldn''t be here at all!'
             print *, '# Exiting now!'
             stop
@@ -68,7 +68,8 @@
     end if
 
     ! Set the end of the current buffer
-    grid % comm % nbb_e(subo) = grid % comm % nbb_e(subo) + buf_cnt
+    grid % comm % buff_e_cell(subo) =  &
+    grid % comm % buff_e_cell(subo) + buf_cnt
 
   end do
 

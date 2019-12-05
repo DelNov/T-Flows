@@ -12,6 +12,7 @@
 *.com
 *.pvtu
 *.restart
+*.msh
 *.neu
 *.shadow
 *-monit.*

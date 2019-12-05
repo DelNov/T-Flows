@@ -275,12 +275,12 @@
                           ' format="ascii">'
   if(plot_inside) then
     do c = 1, grid % n_cells - grid % comm % n_buff_cells
-      write(f9,'(a,i9)') IN_5, grid % comm % proces(c)
+      write(f9,'(a,i9)') IN_5, grid % comm % cell_proc(c)
     end do
   else  ! plot only boundary
     do s = 1, grid % n_faces
       if( grid % faces_c(2,s) < 0 ) then
-        write(f9,'(a,i9)') IN_5, grid % comm % proces( grid % faces_c(1,s) )
+        write(f9,'(a,i9)') IN_5, grid % comm % cell_proc( grid % faces_c(1,s) )
       end if
     end do
   end if

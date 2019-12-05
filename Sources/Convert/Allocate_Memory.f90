@@ -29,10 +29,4 @@
   allocate(grid % bnd_cond % color(-grid % n_bnd_cells:-1))
   grid % bnd_cond % color=0
 
-  grid % n_copy = grid % n_faces  ! I believe it is n_cells * 5 at this point
-  allocate(grid % bnd_cond % copy_c( -grid % n_bnd_cells:-1))
-  grid % bnd_cond % copy_c = 0
-  allocate(grid % bnd_cond % copy_s(2,grid % n_copy))
-  grid % bnd_cond % copy_s=0
-
   end subroutine

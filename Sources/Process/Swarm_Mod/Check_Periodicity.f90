@@ -89,9 +89,9 @@
           call Swarm_Mod_Find_Nearest_Node(swarm, k)
 
           ! If c2 is in the buffer, tell that particle wants to go there
-          if(grid % comm % proces(c2) .ne.  &
-             grid % comm % proces(c1)) then
-            part % buff = grid % comm % proces(c2)
+          if(grid % comm % cell_proc(c2) .ne.  &
+             grid % comm % cell_proc(c1)) then
+            part % buff = grid % comm % cell_proc(c2)
             n_parts_in_buffers = n_parts_in_buffers + 1
           end if
         end if
@@ -145,9 +145,9 @@
           call Swarm_Mod_Find_Nearest_Node(swarm, k)
 
           ! If c1 is in the buffer, tell that particle wants to go there
-          if(grid % comm % proces(c1) .ne.  &
-             grid % comm % proces(c2)) then
-            part % buff = grid % comm % proces(c1)
+          if(grid % comm % cell_proc(c1) .ne.  &
+             grid % comm % cell_proc(c2)) then
+            part % buff = grid % comm % cell_proc(c1)
             n_parts_in_buffers = n_parts_in_buffers + 1
           end if
         end if

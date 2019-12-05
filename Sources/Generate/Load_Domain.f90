@@ -71,11 +71,6 @@
   print *, '#', grid % max_n_bnd_cells, ' boundary cells'
   print *, '#', grid % max_n_faces,     ' cell faces'
 
-  allocate (grid % bnd_cond % copy_c(-grid%max_n_bnd_cells:grid%max_n_nodes))
-  grid % bnd_cond % copy_c = 0
-  allocate (grid % bnd_cond % copy_s(2,grid % max_n_bnd_cells))
-  grid % bnd_cond % copy_s = 0    
-
   allocate (grid % bnd_cond % color(-grid % max_n_bnd_cells-1:-1))
   grid % bnd_cond % color = 0
 
