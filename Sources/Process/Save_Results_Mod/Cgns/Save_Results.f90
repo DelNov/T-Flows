@@ -242,7 +242,7 @@
   end if
   if(turbulence_model .ne. NO_TURBULENCE) then
     kin_vis_t(1:grid % n_cells) = turb % vis_t(1:grid % n_cells)  &
-                                / viscosity(1:grid % n_cells)
+                                / flow % viscosity(1:grid % n_cells)
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               kin_vis_t(1),'EddyOverMolecularViscosity')
   end if

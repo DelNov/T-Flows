@@ -40,7 +40,7 @@ include '../User_Mod/Vof_Initialization_Plane.f90'
   ! Cylinder:
   ! call Vof_Initialization_Cylinder(mult)
 
-  call Comm_Mod_Exchange_Real(grid, vof % n)
+  call Grid_Mod_Exchange_Real(grid, vof % n)
 
   ! Old value
   vof % o(:) = vof % n(:)
