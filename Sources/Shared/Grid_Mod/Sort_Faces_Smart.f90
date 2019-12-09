@@ -1,5 +1,5 @@
 !==============================================================================!
-  Subroutine Grid_Mod_Sort_Faces_Smart(grid)
+  subroutine Grid_Mod_Sort_Faces_Smart(grid)
 !------------------------------------------------------------------------------!
 !   sorts array of faces in a smart way.  that would mean boundary faces       !
 !   first, boundary region by boundary region, then inside faces, then         !
