@@ -1,5 +1,5 @@
 !==============================================================================!
-  real function Y_Plus_Low_Re(u_tau, wall_dist, kin_vis)
+  real function Y_Plus_Low_Re(turb, u_tau, wall_dist, kin_vis)
 !------------------------------------------------------------------------------!
 !   Calculates y+ for low Reynolds approach.                                   !
 !------------------------------------------------------------------------------!
@@ -14,5 +14,6 @@
 !==============================================================================!
 
   Y_Plus_Low_Re = max(u_tau * wall_dist / kin_vis, TINY)
+  write(*,*) u_tau, wall_dist, kin_vis
 
   end function
