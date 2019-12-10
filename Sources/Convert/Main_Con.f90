@@ -16,7 +16,8 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type)   :: grid     ! grid to be converted
   integer           :: c, n, s, l
-  character(len=80) :: file_name, file_name_up, extension
+  character(len=80) :: file_name, file_name_up, app_up, ext_up
+  logical           :: city
 !==============================================================================!
 
   call Logo_Con
@@ -39,17 +40,17 @@
     print *, '# Based on the extension, you are' // &
              ' reading Gambit''s neutral file format'
     problem_name = file_name(1:l-4)
-    extension = file_name_up(l-2:l)
+    ext_up = file_name_up(l-2:l)
   else if( file_name_up(l-3:l) .eq. 'CGNS' ) then
-    print *, '# Based on the extension, you are' // &
+    print *, '# Based on the ext_up, you are' // &
              ' reading CGNS file format'
     problem_name = file_name(1:l-5)
-    extension = file_name_up(l-3:l)
+    ext_up = file_name_up(l-3:l)
   else if( file_name_up(l-2:l) .eq. 'MSH' ) then
-    print *, '# Based on the extension, you are' // &
+    print *, '# Based on the ext_up, you are' // &
              ' reading GMSH file format'
     problem_name = file_name(1:l-4)
-    extension = file_name_up(l-2:l)
+    ext_up = file_name_up(l-2:l)
   else
     print *, '# Unrecognized input file format; exiting!'
     print *, '#----------------------------------' // &
@@ -59,18 +60,30 @@
   print *, '#----------------------------------' // &
            '-----------------------------------'
 
+  city = .false.
+  if(l > 10) then
+    app_up = problem_name(l-7:l-4)
+    call To_Upper_Case(app_up)
+    if(app_up .eq. 'CITY') city = .true.
+  end if
+
   !----------------------------------------!
   !   Read the file and start conversion   !
   !----------------------------------------!
-  if (extension .eq. 'NEU') then
-    call Load_Neu (grid)
+  if (ext_up .eq. 'NEU') then
+    call Load_Neu(grid, city)
   end if
-  if (extension .eq. 'CGNS') then
-    call Load_Cgns(grid)
+  if (ext_up .eq. 'CGNS') then
+    call Load_Cgns(grid, city)
   end if
-  if (extension .eq. 'MSH') then
-    call Load_Msh(grid)
+  if (ext_up .eq. 'MSH') then
+    call Load_Msh(grid, city)
     call Find_Parents(grid)
+  end if
+
+  ! Sort cells in height first thing after reading
+  if(city) then
+    call Insert_Buildings(grid)
   end if
 
   call Grid_Topology     (grid)

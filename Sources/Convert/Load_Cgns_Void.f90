@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Load_Cgns(grid)
+  subroutine Load_Cgns(grid, mesh_city)
 !------------------------------------------------------------------------------!
 !   Dummy function in case the code is not linked with CGNS support            !
 !------------------------------------------------------------------------------!
@@ -9,6 +9,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
+  logical         :: mesh_city
 !==============================================================================!
 
   print *, '# This version of the code is not compiled with CGNS support!'
