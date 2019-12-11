@@ -1,0 +1,257 @@
+/*********************************************************************
+ *
+ *  Simple city mesh
+ *
+ *********************************************************************/
+
+//------------------------------------------------------------------------------
+//
+// Definitions of parameters and constants
+//
+//------------------------------------------------------------------------------
+
+NUMBER_OF_BUILDINGS =   8;                // number of buildings
+NUMBER_OF_LAYERS    =  30;                // number of layers in height
+SKY_HIGH            =   1.0;              // height of the domain
+
+// Dimensions of the problem domain
+X_MIN = -2.0;
+X_MAX =  3.0;
+Y_MIN = -1.5;
+Y_MAX =  1.5;
+
+// Parameters for the algorithm, better untouched
+GROUND_LOOP         = 100;                // land loop number
+HOLE_LOOP_START     = GROUND_LOOP + 100;  // hole definitions
+BASE_LOOP_START     = GROUND_LOOP + 200;  // buildings' base definitions
+GROUND_SURF         = 100;                // ground surface number
+MAX_BUILDING_HEIGHT = 300;
+MAXN                =   8;                // max nodes per building
+TINY                =   1.0e-9;
+HUGE                =   1.0e+9;
+
+//------------------------------------------------------------
+// Points and lines defining the extents of the ground domain
+//------------------------------------------------------------
+Point(1) = {X_MIN, Y_MIN, 0};
+Point(2) = {X_MAX, Y_MIN, 0};
+Point(3) = {X_MAX, Y_MAX, 0};
+Point(4) = {X_MIN, Y_MAX, 0};
+Line(1) = {1, 2};
+Line(2) = {2, 3};
+Line(3) = {3, 4};
+Line(4) = {4, 1};
+Curve Loop(GROUND_LOOP) = {1, 2, 3, 4};
+
+//---------------------------------
+// Define all buildings' positions
+//---------------------------------
+
+b = 1;
+node_b(b) = 4;
+x(MAXN*b + 1) =  0.0;   y(MAXN*b + 1) = 0.1;
+x(MAXN*b + 2) =  0.2;   y(MAXN*b + 2) = 0.1;
+x(MAXN*b + 3) =  0.1;   y(MAXN*b + 3) = 0.4;
+x(MAXN*b + 4) =  0.0;   y(MAXN*b + 4) = 0.4;
+height_b(b) = 280;
+
+b = 2;
+node_b(b) = 3;
+x(MAXN*b + 1) = -0.70;  y(MAXN*b + 1) = -0.10;
+x(MAXN*b + 2) = -0.50;  y(MAXN*b + 2) = -0.30;
+x(MAXN*b + 3) = -0.45;  y(MAXN*b + 3) = -0.05;
+height_b(b) = 200;
+
+b = 3;
+node_b(b) = 6;
+x(MAXN*b + 1) = -0.10;  y(MAXN*b + 1) = -0.40;
+x(MAXN*b + 2) =  0.10;  y(MAXN*b + 2) = -0.40;
+x(MAXN*b + 3) =  0.10;  y(MAXN*b + 3) = -0.30;
+x(MAXN*b + 4) =  0.00;  y(MAXN*b + 4) = -0.30;
+x(MAXN*b + 5) =  0.00;  y(MAXN*b + 5) = -0.10;
+x(MAXN*b + 6) = -0.10;  y(MAXN*b + 6) = -0.10;
+height_b(b) = 120;
+
+b = 4;
+node_b(b) = 6;
+x(MAXN*b + 1) =  0.28;  y(MAXN*b + 1) = -0.40;
+x(MAXN*b + 2) =  0.48;  y(MAXN*b + 2) = -0.40;
+x(MAXN*b + 3) =  0.48;  y(MAXN*b + 3) = -0.30;
+x(MAXN*b + 4) =  0.38;  y(MAXN*b + 4) = -0.30;
+x(MAXN*b + 5) =  0.38;  y(MAXN*b + 5) = -0.10;
+x(MAXN*b + 6) =  0.28;  y(MAXN*b + 6) = -0.10;
+height_b(b) = 120;
+
+b = 5;
+node_b(b) = 4;
+x(MAXN*b + 1) = -0.70;  y(MAXN*b + 1) = 0.20;
+x(MAXN*b + 2) = -0.55;  y(MAXN*b + 2) = 0.20;
+x(MAXN*b + 3) = -0.55;  y(MAXN*b + 3) = 0.30;
+x(MAXN*b + 4) = -0.70;  y(MAXN*b + 4) = 0.30;
+height_b(b) =  60;
+
+b = 6;
+node_b(b) = 4;
+x(MAXN*b + 1) = -0.40;  y(MAXN*b + 1) = 0.20;
+x(MAXN*b + 2) = -0.25;  y(MAXN*b + 2) = 0.20;
+x(MAXN*b + 3) = -0.25;  y(MAXN*b + 3) = 0.30;
+x(MAXN*b + 4) = -0.40;  y(MAXN*b + 4) = 0.30;
+height_b(b) =  60;
+
+b = 7;
+node_b(b) = 4;
+x(MAXN*b + 1) = -0.70;  y(MAXN*b + 1) = 0.40;
+x(MAXN*b + 2) = -0.55;  y(MAXN*b + 2) = 0.40;
+x(MAXN*b + 3) = -0.55;  y(MAXN*b + 3) = 0.50;
+x(MAXN*b + 4) = -0.70;  y(MAXN*b + 4) = 0.50;
+height_b(b) =  80;
+
+b = 8;
+node_b(b) = 4;
+x(MAXN*b + 1) = -0.40;  y(MAXN*b + 1) = 0.40;
+x(MAXN*b + 2) = -0.25;  y(MAXN*b + 2) = 0.40;
+x(MAXN*b + 3) = -0.25;  y(MAXN*b + 3) = 0.50;
+x(MAXN*b + 4) = -0.40;  y(MAXN*b + 4) = 0.50;
+height_b(b) =  80;
+
+//-----------------------------------------------------------------------
+// Browse through all buildings to define points and lines defining them
+//-----------------------------------------------------------------------
+For b In {1:NUMBER_OF_BUILDINGS}
+
+  // Browse through nodes of the building "b"
+  For n In{ 1 : node_b(b) }
+    Point(MAXN*b + n) = {x(MAXN*b + n), y(MAXN*b + n), 0};
+  EndFor
+
+  // Lines defining the building
+  For n In{ 1 : node_b(b)-1 }
+    Line(MAXN*b + n) = {MAXN*b + n, MAXN*b + n + 1};
+  EndFor
+  Line(MAXN*b + node_b(b)) = {MAXN*b + node_b(b), MAXN*b + 1};
+
+  // Anticlockwise curves (holes)
+  Curve Loop(HOLE_LOOP_START + b) = {MAXN*b + 1 : MAXN*b + node_b(b)};
+
+  // Clockwise curves (buidlings' bases)
+  Curve Loop(BASE_LOOP_START + b) = {MAXN*b + 1 : MAXN*b + node_b(b)};
+EndFor
+
+//------------------------------------------------------------------------------
+//
+// Define surfaces
+//
+//------------------------------------------------------------------------------
+
+//----------------------------------------
+// Define ground surface witout buildings
+//----------------------------------------
+Plane Surface(GROUND_SURF) = {GROUND_LOOP,
+                              HOLE_LOOP_START + 1:
+                              HOLE_LOOP_START + NUMBER_OF_BUILDINGS};
+Printf("Defined ground surface %g", GROUND_SURF);
+
+//-----------------------------------
+// Add individual buildings surfaces
+//-----------------------------------
+For b In {1:NUMBER_OF_BUILDINGS}
+  Plane Surface(GROUND_SURF + b) = {BASE_LOOP_START + b};
+  Printf("Defined building surface %g", GROUND_SURF + b);
+EndFor
+
+//------------------------------------------------------------------------------
+//
+// Define mesh
+//
+//------------------------------------------------------------------------------
+
+//------------------------
+// First spacing function
+//------------------------
+Field[1] = MathEval;
+Field[1].F = "0.03 
+            + 0.03 
+            * (1.0 - (0.5 * (tanh((x+1.2)/0.07) - tanh((x-1.2)/0.07)))  
+                   * (0.5 * (tanh((y+0.8)/0.07) - tanh((y-0.8)/0.07))) 
+              )";
+Background Field = 1;
+
+//---------------------------------------------------
+// Generate mesh on the ground, and on all the bases
+//---------------------------------------------------
+Recombine Surface{GROUND_SURF};
+For b In {1:NUMBER_OF_BUILDINGS}
+  Recombine Surface{GROUND_SURF + b};
+EndFor
+
+// This experimental algorithm could give better results
+Mesh.Algorithm = 8;
+
+// Uncomment the following line to try the full-quad algorithm:
+// Mesh.RecombinationAlgorithm = 2; // or 3
+
+//---------------
+// Create volume
+//---------------
+Extrude {0, 0, SKY_HIGH} {
+  Surface{GROUND_SURF:GROUND_SURF+NUMBER_OF_BUILDINGS};
+  Layers{NUMBER_OF_LAYERS};
+  Recombine;
+}
+
+//------------------------------------------------------------------------------
+//
+// Define boundary conditions
+//
+//------------------------------------------------------------------------------
+
+//--------
+// Ground
+//--------
+Physical Surface("ground") = {GROUND_SURF};
+
+//-----------
+// Buildings
+//-----------
+
+For h In {0:MAX_BUILDING_HEIGHT}     // browse through all heights
+  exists = 0;
+
+  For b In {1:NUMBER_OF_BUILDINGS}   // browse through all buildings
+
+    // Add the buildings whose height matches "h"
+    If(height_b(b) == h)  // found a building with matching height
+      If(exists == 0)     // is it the first building at this height
+        exists = 1;       // not any more
+        Physical Surface(Sprintf("building_%03g", h)) = {GROUND_SURF + b};
+      Else                // not the first building at this height, append
+        Physical Surface(Sprintf("building_%03g", h)) += {GROUND_SURF + b};
+      EndIf
+    EndIf
+
+  EndFor
+EndFor
+
+// East and west
+Physical Surface("east") = {Surface In BoundingBox{X_MIN-TINY, -HUGE, -HUGE,
+                                                   X_MIN+TINY, +HUGE, +HUGE}};
+Physical Surface("west") = {Surface In BoundingBox{X_MAX-TINY, -HUGE, -HUGE,
+                                                   X_MAX+TINY, +HUGE, +HUGE}};
+
+// South and north
+Physical Surface("south") = {Surface In BoundingBox{-HUGE, Y_MIN-TINY, -HUGE,
+                                                    +HUGE, Y_MIN+TINY, +HUGE}};
+Physical Surface("north") = {Surface In BoundingBox{-HUGE, Y_MAX-TINY, -HUGE,
+                                                    +HUGE, Y_MAX+TINY, +HUGE}};
+
+// Top
+Physical Surface("top") = {Surface In BoundingBox{-HUGE, -HUGE, SKY_HIGH-TINY,
+                                                  +HUGE, +HUGE, SKY_HIGH+TINY}};
+
+
+//------------------------------------------------------------------------------
+//
+// Create pysical volume
+//
+//------------------------------------------------------------------------------
+Physical Volume("interior") = {1:1+NUMBER_OF_BUILDINGS};
