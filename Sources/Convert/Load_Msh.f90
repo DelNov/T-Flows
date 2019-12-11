@@ -176,7 +176,7 @@
   !   Allocate memory for Grid_Mod variables   !
   !                                            !
   !--------------------------------------------!
-  call Allocate_Memory(grid)
+  call Allocate_Memory(grid, mesh_city)
 
   !---------------------------------------------------!
   !   Read boundary conditions for individual cells   !
