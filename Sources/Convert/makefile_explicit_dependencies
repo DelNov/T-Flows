@@ -18,6 +18,17 @@ $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 
 
+#-- ./Insert_Buildings.f90
+$(DIR_OBJECT)/Insert_Buildings.o:\
+$(DIR_OBJECT)/Sort_Mod.o \
+$(DIR_SHARED)/Sort_Mod/*.f90 \
+$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
+$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
+$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o 
+
 #-- ./Find_Parents.f90
 $(DIR_OBJECT)/Find_Parents.o:\
 $(DIR_OBJECT)/Sort_Mod.o \
@@ -28,6 +39,16 @@ $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
+
+#-- ./Calculate_Cell_Centers.f90
+$(DIR_OBJECT)/Calculate_Cell_Centers.o:\
+$(DIR_OBJECT)/Sort_Mod.o \
+$(DIR_SHARED)/Sort_Mod/*.f90 \
+$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
+$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
+$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Load_Cgns_Void.f90
 $(DIR_OBJECT)/Load_Cgns_Void.o:\

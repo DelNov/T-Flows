@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Load_Cgns(grid)
+  subroutine Load_Cgns(grid, mesh_city)
 !------------------------------------------------------------------------------!
 !   Reads the Cgns mesh file.                                                  !
 !   This function retrieves data as Load_Neu does, but for .cgns               !
@@ -15,7 +15,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)   :: grid
+  type(Grid_Type) :: grid
+  logical         :: mesh_city
 !-----------------------------------[Locals]-----------------------------------!
   character(len=80) :: name_in
   integer           :: c, i, j, bc, base, block, sect, int, coord, mode

@@ -158,10 +158,12 @@ SRC_FUN = Probe_1d_Nodes.f90		\
 
 # Local functions are added one by one ...
 SRC_FUN += Allocate_Memory.f90		\
+           Calculate_Cell_Centers.f90	\
            Calculate_Geometry.f90	\
            Find_Faces.f90		\
            Find_Parents.f90		\
            Grid_Topology.f90		\
+           Insert_Buildings.f90		\
            Load_Neu.f90			\
            Load_Msh.f90			\
            Logo_Con.f90			\

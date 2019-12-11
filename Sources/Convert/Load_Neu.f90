@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Load_Neu(grid)
+  subroutine Load_Neu(grid, mesh_city)
 !------------------------------------------------------------------------------!
 !   Reads the Fluents (Gambits) neutral file format.                           !
 !------------------------------------------------------------------------------!
@@ -11,6 +11,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
+  logical         :: mesh_city
 !-----------------------------------[Locals]-----------------------------------!
   character(len=130)  :: name_in
   integer             :: i, j, n_blocks, n_bnd_sect, dum1, dum2, fu

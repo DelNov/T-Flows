@@ -1,0 +1,109 @@
+/*********************************************************************
+ *
+ *  Gmsh tutorial 11
+ *
+ *  Unstructured quadrangular meshes
+ *
+ *********************************************************************/
+
+PI = 3.14159265359;
+
+NUMBER_OF_BUILDINGS =   7;              // number of buildings
+LAND_LOOP           = 100;              // land loop number
+HOLE_LOOP_START     = LAND_LOOP + 100;  // hole definitions
+BASE_LOOP_START     = LAND_LOOP + 200;  // buildings' base definitions
+GROUND_SURF         = 100;              // ground surface number
+
+//------------------------------------------------------------
+// Points and lines defining the extents of the ground domain
+//------------------------------------------------------------
+
+Point(1) = {-2.00, -1.5,  0};
+Point(2) = { 3.00, -1.5,  0};
+Point(3) = { 3.00,  1.5,  0};
+Point(4) = {-2.00,  1.5,  0};
+
+Line(1) = {1, 2};
+Line(2) = {2, 3};
+Line(3) = {3, 4};
+Line(4) = {4, 1};
+
+Curve Loop(LAND_LOOP) = {1, 2, 3, 4};
+
+//---------------------------------
+// Define all buildings' positions
+//---------------------------------
+x(1) =  0.2;  y(1) = -0.15;  alfa(1) = 0.0;       dx(1) = 0.08;  dy(1) = 0.24;
+x(2) = -0.2;  y(2) = -0.22;  alfa(2) = PI / 6.0;  dx(2) = 0.2;   dy(2) = 0.2;
+x(3) = -0.5;  y(3) = -0.4;   alfa(3) = PI / 6.0;  dx(3) = 0.2;   dy(3) = 0.2;
+x(4) =  0.0;  y(4) =  0.15;  alfa(4) = PI / 2.0;  dx(4) = 0.08;  dy(4) = 0.24;
+x(5) =  0.6;  y(5) = -0.2;   alfa(5) = PI / 2.0;  dx(5) = 0.06;  dy(5) = 0.30;
+x(6) =  0.6;  y(6) =  0.0;   alfa(6) = PI / 2.0;  dx(6) = 0.06;  dy(6) = 0.30;
+x(7) =  0.6;  y(7) =  0.2;   alfa(7) = PI / 2.0;  dx(7) = 0.06;  dy(7) = 0.30;
+
+//--------------------------------------------------------------
+// Browse through all buildingsa to define points defining them
+//--------------------------------------------------------------
+For b In {1:NUMBER_OF_BUILDINGS}
+
+  Point(4*b+1) = {x(b) - dx(b)/2 * Cos(alfa(b)) + dy(b)/2 * Sin(alfa(b)),
+                  y(b) - dy(b)/2 * Cos(alfa(b)) - dx(b)/2 * Sin(alfa(b)),  0};
+  Point(4*b+2) = {x(b) + dx(b)/2 * Cos(alfa(b)) + dy(b)/2 * Sin(alfa(b)),
+                  y(b) - dy(b)/2 * Cos(alfa(b)) + dx(b)/2 * Sin(alfa(b)),  0};
+  Point(4*b+3) = {x(b) + dx(b)/2 * Cos(alfa(b)) - dy(b)/2 * Sin(alfa(b)),
+                  y(b) + dy(b)/2 * Cos(alfa(b)) + dx(b)/2 * Sin(alfa(b)),  0};
+  Point(4*b+4) = {x(b) - dx(b)/2 * Cos(alfa(b)) - dy(b)/2 * Sin(alfa(b)),
+                  y(b) + dy(b)/2 * Cos(alfa(b)) - dx(b)/2 * Sin(alfa(b)),  0};
+
+  // Lines from 5 on ...
+  Line(4*b+1) = {4*b+1, 4*b+2};
+  Line(4*b+2) = {4*b+2, 4*b+3};
+  Line(4*b+3) = {4*b+3, 4*b+4};
+  Line(4*b+4) = {4*b+4, 4*b+1};
+
+  // Anticlockwise curves (holes)
+  Curve Loop(HOLE_LOOP_START + b) = {4*b+2, 4*b+3, 4*b+4, 4*b+1};
+
+  // Clockwise curves (buidlings' bases)
+  Curve Loop(BASE_LOOP_START + b) = {4*b+1, 4*b+2, 4*b+3, 4*b+4};
+EndFor
+
+//------------------------
+// Define ground surface
+//------------------------
+
+// Ground without buildings
+Plane Surface(GROUND_SURF) =  {LAND_LOOP, HOLE_LOOP_START+1:
+                                          HOLE_LOOP_START+NUMBER_OF_BUILDINGS};
+
+//-----------------------------------
+// Add individual buildings surfaces
+//-----------------------------------
+For b In {1:NUMBER_OF_BUILDINGS}
+  Plane Surface(GROUND_SURF + b) = {BASE_LOOP_START + b};
+EndFor
+
+//-------------------------
+// Define spacing function
+//-------------------------
+Field[1] = MathEval;
+Field[1].F = "0.03 
+            + 0.03 
+            * (1.0 - (0.5 * (tanh((x+1.2)/0.07) - tanh((x-1.2)/0.07)))  
+                   * (0.5 * (tanh((y+0.8)/0.07) - tanh((y-0.8)/0.07))) 
+              )";
+Background Field = 1;
+
+//---------------------------------------------------
+// Generate mesh on the ground, and on all the bases
+//---------------------------------------------------
+Recombine Surface{GROUND_SURF};
+For b In {1:NUMBER_OF_BUILDINGS}
+  Recombine Surface{GROUND_SURF + b};
+EndFor
+
+// This experimental algorithm could give better results
+Mesh.Algorithm = 8;
+
+// Uncomment the following line to try the full-quad algorithm:
+// Mesh.RecombinationAlgorithm = 2; // or 3
