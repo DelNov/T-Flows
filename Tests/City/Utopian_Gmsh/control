@@ -2,7 +2,7 @@
 # Problem definition
 #--------------------
 
- PROBLEM_NAME          utpoian.city
+ PROBLEM_NAME          utopian.city
 
  HEAT_TRANSFER         no
 
@@ -88,15 +88,10 @@
     VARIABLES           u     v     w     t      kin   eps      zeta  f22
     VALUES              0.0   0.0   0.0   2.0    0.0   1.0e-3   0.0   0.0
 
-#  BOUNDARY_CONDITION    building_walls
-#    TYPE                wall
-#    VARIABLES           u     v     w     t      kin   eps      zeta  f22
-#    VALUES              0.0   0.0   0.0   4.0    0.0   1.0e-3   0.0   0.0
-
-  BOUNDARY_CONDITION    building_020
-    TYPE                wall
-    VARIABLES           u     v     w     t      kin   eps      zeta  f22
-    VALUES              0.0   0.0   0.0   4.0    0.0   1.0e-3   0.0   0.0
+   BOUNDARY_CONDITION    building_walls
+     TYPE                wall
+     VARIABLES           u     v     w     t      kin   eps      zeta  f22
+     VALUES              0.0   0.0   0.0   4.0    0.0   1.0e-3   0.0   0.0
 
   BOUNDARY_CONDITION    top
     TYPE                pressure
@@ -116,9 +111,7 @@
   BOUNDARY_CONDITION    east
     TYPE                inflow
     VARIABLES            u    v  w    kin   eps  f22 zeta t
-    VALUES              -1.0 0.0 0.0  1.0E-4   1.0E-5   1.6E-2   1.0e-3 0.0
-#    VARIABLES           z u kin   eps  f22 zeta t
-#    FILE                inflow_Umag_1.8_East.dat  
+    VALUES               1.0 0.0 0.0  1.0E-4   1.0E-5   1.6E-2   1.0e-3 0.0
 
   BOUNDARY_CONDITION    west
     TYPE                pressure
