@@ -14,7 +14,9 @@
 !------------------------------------------------------------------------------!
   include 'Cell_Numbering_Neu.f90'
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: s, c, cu, n, ni, dir, bc
+  integer              :: run, s, c, cg, nr_cg, cu, n, ni, dir, bc, n_ground_cells
+  real                 :: dis2, dis2_min
+  integer, allocatable :: ground_cell(:)
   integer, allocatable :: new_c(:)
   integer, allocatable :: old_c(:)
   integer, allocatable :: i_work_1(:)
@@ -30,17 +32,84 @@
   integer              :: fn(6,4), n_f_nod, f_nod(4)
 !==============================================================================!
 
-  !---------------------------------------------------!
-  !                                                   !
-  !   Phase I: Sort cells in columns in z direction   !
-  !                                                   !
-  !---------------------------------------------------!
+  !------------------------------------------------!
+  !                                                !
+  !   Phase I: Align horizontal cell coordinates   !
+  !                                                !
+  !------------------------------------------------!
 
   !---------------------------------------------!
   !   Calculate cell centers because you will   !
   !     be sorting them by height later on      !
   !---------------------------------------------!
   call Calculate_Cell_Centers(grid)
+
+  !----------------------------------------!
+  !   Find and store cells on the ground   !
+  !----------------------------------------!
+  do run = 1, 2
+    n_ground_cells = 0
+    do c = 1, grid % n_cells
+      do dir = 1, 6
+        if(grid % cells_bnd_color(dir, c) .ne. 0) then
+          bc_name = trim(grid % bnd_cond % name(grid % cells_bnd_color(dir, c)))
+          call To_Upper_Case(bc_name)
+          if(bc_name(1:8) .eq. 'BUILDING' .or.  &
+             bc_name      .eq. 'GROUND') then
+
+            n_ground_cells = n_ground_cells + 1
+            if(run .eq. 2) ground_cell(n_ground_cells) = c
+          end if
+        end if
+      end do
+    end do
+    if(run .eq. 1) then
+      allocate(ground_cell(n_ground_cells)); ground_cell(:) = 0
+    end if
+  end do
+  print '(a38,i9)', '# Number of cells on the ground:     ', n_ground_cells
+  print '(a38,i9)', '# Number of horizontal layers (1)    ', grid % n_cells  &
+                                                           / n_ground_cells
+
+  !---------------------------------------------------------------------!
+  !   For each cell, find the nearest on the ground and align with it   !
+  !---------------------------------------------------------------------!
+  print *, '#=================================================================='
+  print *, '# Aligning cell coordinates.  This may take a few minutes          '
+  print *, '#------------------------------------------------------------------'
+  do c = 1, grid % n_cells
+    dis2_min = HUGE
+
+    ! Print progress on the screen
+    if(mod(c, (grid % n_cells / 20) ) .eq. 0) then
+      print '(a2, f5.0, a14)',   &
+            ' #', (100. * c / (1.0*(grid % n_cells))), ' % complete...'
+    end if ! each 5%
+
+    do n = 1, n_ground_cells
+      cg = ground_cell(n)     ! real ground cell number
+
+      ! Compute planar distance
+      dis2 = (  (grid % xc(c) - grid % xc(cg)) ** 2  &
+              + (grid % yc(c) - grid % yc(cg)) ** 2)
+
+      ! Store ground cell if nearest
+      if(dis2 < dis2_min) then
+        dis2_min = dis2
+        nr_cg = cg
+      end if
+    end do
+
+    ! Simply take planar coordinates from the nearest wall cell
+    grid % xc(c) = grid % xc(nr_cg)
+    grid % yc(c) = grid % yc(nr_cg)
+  end do
+
+  !----------------------------------------------------!
+  !                                                    !
+  !   Phase II: Sort cells in columns in z direction   !
+  !                                                    !
+  !----------------------------------------------------!
 
   allocate(i_work_1(   grid % n_cells));     i_work_1(:)   = 0
   allocate(i_work_2(8, grid % n_cells));     i_work_2(:,:) = 0
@@ -75,7 +144,8 @@
                                 criteria(1:grid % n_cells, 2),  &
                                 criteria(1:grid % n_cells, 3),  &
                                 old_c   (1:grid % n_cells))
-  ! This is a bit of a bluff
+
+  ! This was a bit of a bluff but it worked
   do c = 1, grid % n_cells
     new_c(old_c(c)) = c
   end do
@@ -92,13 +162,13 @@
   call Sort_Mod_Real_By_Index(grid % yc   (1), new_c(1), grid % n_cells)
   call Sort_Mod_Real_By_Index(grid % zc   (1), new_c(1), grid % n_cells)
 
-  !---------------------------------------!
-  !                                       !
-  !   Phase II: Find cells in buildings   !
-  !                                       !
-  !---------------------------------------!
+  !----------------------------------------!
+  !                                        !
+  !   Phase III: Find cells in buildings   !
+  !                                        !
+  !----------------------------------------!
 
-  ! Estimate number of horizontal layers
+  ! Estimate number of horizontal layers again (to check if sorting worked)
   do c = 1, grid % n_cells
     if(grid % zc(c+1) < grid % zc(c)) then
       n_hor_layers = c
@@ -106,9 +176,11 @@
     end if
   end do
 1 continue
-  print '(a38,i9)', '# Number of hotizontal layers:       ', n_hor_layers
+  print '(a38,i9)', '# Number of horizontal layers (2):   ', n_hor_layers
 
-  ! Find cells in buildings
+  !-----------------------------!
+  !   Find cells in buildings   !
+  !-----------------------------!
   buildings_exist = .false.
   allocate(cell_in_building(grid % n_cells))
   cell_in_building(:) = .false.
@@ -138,7 +210,9 @@
   end do
   print '(a38,i9)', '# Number of cells in buildings:      ', cnt
 
-  ! Mark nodes on buildings
+  !-----------------------------!
+  !   Mark nodes on buildings   !
+  !-----------------------------!
   allocate(node_on_building(grid % n_nodes))
   node_on_building(:) = .false.
   do c = 1, grid % n_cells
@@ -150,11 +224,11 @@
     end if
   end do
 
-  !------------------------------------------------------------!
-  !                                                            !
-  !   Phase III: Manage boundary condition names and numbers   !
-  !                                                            !
-  !------------------------------------------------------------!
+  !-----------------------------------------------------------!
+  !                                                           !
+  !   Phase IV: Manage boundary condition names and numbers   !
+  !                                                           !
+  !-----------------------------------------------------------!
 
   ! Find ground b.c. number
   do bc = 1, grid % n_bnd_cond
@@ -216,20 +290,24 @@
     grid % bnd_cond % name(1) = 'BUILDING_WALLS'
   end if
 
-  !-----------------------------------------------------------!
-  !                                                           !
-  !   Phase IV: Store only cells which are not in buildings   !
-  !                                                           !
-  !-----------------------------------------------------------!
+  !----------------------------------------------------------!
+  !                                                          !
+  !   Phase V: Store only cells which are not in buildings   !
+  !                                                          !
+  !----------------------------------------------------------!
 
-  ! Store cells' nodes and boundary conditons again
+  !-----------------------------------------------------!
+  !   Store cells' nodes and boundary conditons again   !
+  !-----------------------------------------------------!
   do c = 1, grid % n_cells
     i_work_1(c)      = grid % cells_n_nodes(c)
     i_work_2(1:8, c) = grid % cells_n(1:8, c)
     i_work_3(1:6, c) = grid % cells_bnd_color(1:6, c)
   end do
 
-  ! Renumber the cells without the cells in building
+  !------------------------------------------------------!
+  !   Renumber the cells without the cells in building   !
+  !------------------------------------------------------!
   new_c(:) = 0
   cnt      = 0
   do c = 1, grid % n_cells
@@ -242,7 +320,9 @@
   print *, '# Number of cells with excluded buildings: ', cnt
   print *, '# Number of excluded cells: ',                grid % n_cells - cnt
 
-  ! Information on cell connectivity
+  !--------------------------------------!
+  !   Information on cell connectivity   !
+  !--------------------------------------!
   do c = 1, grid % n_cells
     if(new_c(c) .ne. 0) then
       grid % cells_n_nodes       (new_c(c)) = i_work_1(c)
@@ -252,11 +332,11 @@
   end do
   grid % n_cells = cnt
 
-  !----------------------------------------!
-  !                                        !
-  !   Phase V: Insert new boundary faces   !
-  !                                        !
-  !----------------------------------------!
+  !-----------------------------------------!
+  !                                         !
+  !   Phase VI: Insert new boundary faces   !
+  !                                         !
+  !-----------------------------------------!
   if(buildings_exist) then
 
     do c = 1, grid % n_cells
