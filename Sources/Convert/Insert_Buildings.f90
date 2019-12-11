@@ -83,17 +83,14 @@
   !-----------------------------------------------!
   !   Do the sorting of data pertinent to cells   !
   !-----------------------------------------------!
-
-  ! This is important before the topological estimations
   do c = 1, grid % n_cells
     grid % cells_n_nodes       (new_c(c)) = i_work_1(c)
     grid % cells_n        (1:8, new_c(c)) = i_work_2(1:8, c)
     grid % cells_bnd_color(1:6, new_c(c)) = i_work_3(1:6, c)
   end do
-
-  ! Re-calculate cell centers, you might (should) need them again
-  ! (This was one with sorting before, I don't know what is smarter)
-  call Calculate_Cell_Centers(grid)
+  call Sort_Mod_Real_By_Index(grid % xc   (1), new_c(1), grid % n_cells)
+  call Sort_Mod_Real_By_Index(grid % yc   (1), new_c(1), grid % n_cells)
+  call Sort_Mod_Real_By_Index(grid % zc   (1), new_c(1), grid % n_cells)
 
   !---------------------------------------!
   !                                       !
