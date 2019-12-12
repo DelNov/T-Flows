@@ -11,10 +11,12 @@
   use Save_Grid_Mod, only: Save_Vtu_Cells,  &
                            Save_Vtu_Faces,  &
                            Save_Vtu_Links
+  use Ground_Mod, only: Ground_Type, Ground_Mod_Read_Stl
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type)   :: grid     ! grid to be converted
+  type(Ground_Type) :: ground   ! ground
   integer           :: c, n, s, l
   character(len=80) :: file_name, file_name_up, app_up, ext_up
   logical           :: city
@@ -83,7 +85,8 @@
 
   ! Sort cells in height first thing after reading
   if(city) then
-    call Insert_Buildings(grid)
+    call Ground_Mod_Read_Stl(ground)
+    call Insert_Buildings(grid, ground)
   end if
 
   call Grid_Topology     (grid)

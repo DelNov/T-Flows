@@ -1,20 +1,25 @@
 !==============================================================================!
-  subroutine Insert_Buildings(grid)
+  subroutine Insert_Buildings(grid, ground)
 !------------------------------------------------------------------------------!
 !   Sorts cells by their height (z coordinate)                                 !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
   use Grid_Mod,  only: Grid_Type
+  use Ground_Mod
   use Sort_Mod
+  use Math_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(grid_type) :: grid
+  type(Grid_Type)   :: grid
+  type(Ground_Type) :: ground
 !------------------------------------------------------------------------------!
   include 'Cell_Numbering_Neu.f90'
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: run, s, c, cg, nr_cg, cu, n, ni, dir, bc, n_ground_cells
+  integer              :: f, run, s, c, cg, nr_cg, cu, n, ni, dir, bc
+  real                 :: area, area_1, area_2, area_3, l_1, l_2, l_3
+  real                 :: z, z_min, z_max, z_from_top, z_scale
   real                 :: dis2, dis2_min
   integer, allocatable :: ground_cell(:)
   integer, allocatable :: new_c(:)
@@ -23,7 +28,7 @@
   integer, allocatable :: i_work_2(:,:)
   integer, allocatable :: i_work_3(:,:)
   integer, allocatable :: criteria(:,:)
-  integer              :: n_hor_layers, cnt, ground_n
+  integer              :: n_ground_cells, n_hor_layers, cnt, ground_n
   character(len=80)    :: bc_name
   real                 :: height
   logical, allocatable :: cell_in_building(:)
@@ -32,11 +37,72 @@
   integer              :: fn(6,4), n_f_nod, f_nod(4)
 !==============================================================================!
 
-  !------------------------------------------------!
-  !                                                !
-  !   Phase I: Align horizontal cell coordinates   !
-  !                                                !
-  !------------------------------------------------!
+  !--------------------------------------------------------------!
+  !                                                              !
+  !   Phase I: Place grid on the terrain defind in an STL file   !
+  !                                                              !
+  !--------------------------------------------------------------!
+
+  print *, '#=================================================================='
+  print *, '# Placing grid on the ground.  This may take a few minutes         '
+  print *, '#------------------------------------------------------------------'
+
+  ! Find maximum z (sky coordinate)
+  z_min =  HUGE
+  z_max = -HUGE
+  do n = 1, grid % n_nodes
+    z_min = min(grid % zn(n), z_min)
+    z_max = max(grid % zn(n), z_max)
+  end do
+  print '(a,2f8.4)', ' # Minimum and maximum z coordinate: ', z_min, z_max
+
+  !----------------------------------------------!
+  !   For each node, find corresponding ground   !
+  !     facet, and approximate z coordinate      !
+  !----------------------------------------------!
+  do n = 1, grid % n_nodes
+
+    ! Print progress on the screen
+    if(mod(n, (grid % n_nodes / 20) ) .eq. 0) then
+      print '(a2, f5.0, a14)',   &
+            ' #', (100. * n / (1.0*(grid % n_nodes))), ' % complete...'
+    end if ! each 5%
+
+    do f = 1, ground % n_facets
+
+      area = ground % facet(f) % area_z
+
+      area_1 = Math_Mod_Tri_Area_Z(grid % xn(n), grid % yn(n),  &
+          ground % facet(f) % x(2), ground % facet(f) % y(2),    &
+          ground % facet(f) % x(3), ground % facet(f) % y(3))
+
+      area_2 = Math_Mod_Tri_Area_Z(grid % xn(n), grid % yn(n),  &
+          ground % facet(f) % x(3), ground % facet(f) % y(3),    &
+          ground % facet(f) % x(1), ground % facet(f) % y(1))
+
+      area_3 = Math_Mod_Tri_Area_Z(grid % xn(n), grid % yn(n),  &
+          ground % facet(f) % x(1), ground % facet(f) % y(1),    &
+          ground % facet(f) % x(2), ground % facet(f) % y(2))
+
+      if((area_1+area_2+area_3 - NANO) < area) then
+        l_1 = area_1 / area
+        l_2 = area_2 / area
+        l_3 = area_3 / area
+        z = l_1 * ground % facet(f) % z(1)  &
+          + l_2 * ground % facet(f) % z(2)  &
+          + l_3 * ground % facet(f) % z(3)
+        z_from_top   = z_max - grid % zn(n)
+        z_scale      = (z_max - z) / (z_max - z_min)
+        grid % zn(n) = z_max - z_from_top * z_scale
+      end if
+    end do
+  end do
+
+  !-------------------------------------------------!
+  !                                                 !
+  !   Phase II: Align horizontal cell coordinates   !
+  !                                                 !
+  !-------------------------------------------------!
 
   !---------------------------------------------!
   !   Calculate cell centers because you will   !
@@ -74,6 +140,7 @@
   !---------------------------------------------------------------------!
   !   For each cell, find the nearest on the ground and align with it   !
   !---------------------------------------------------------------------!
+
   print *, '#=================================================================='
   print *, '# Aligning cell coordinates.  This may take a few minutes          '
   print *, '#------------------------------------------------------------------'
@@ -105,11 +172,11 @@
     grid % yc(c) = grid % yc(nr_cg)
   end do
 
-  !----------------------------------------------------!
-  !                                                    !
-  !   Phase II: Sort cells in columns in z direction   !
-  !                                                    !
-  !----------------------------------------------------!
+  !-----------------------------------------------------!
+  !                                                     !
+  !   Phase III: Sort cells in columns in z direction   !
+  !                                                     !
+  !-----------------------------------------------------!
 
   allocate(i_work_1(   grid % n_cells));     i_work_1(:)   = 0
   allocate(i_work_2(8, grid % n_cells));     i_work_2(:,:) = 0
@@ -162,11 +229,11 @@
   call Sort_Mod_Real_By_Index(grid % yc   (1), new_c(1), grid % n_cells)
   call Sort_Mod_Real_By_Index(grid % zc   (1), new_c(1), grid % n_cells)
 
-  !----------------------------------------!
-  !                                        !
-  !   Phase III: Find cells in buildings   !
-  !                                        !
-  !----------------------------------------!
+  !---------------------------------------!
+  !                                       !
+  !   Phase IV: Find cells in buildings   !
+  !                                       !
+  !---------------------------------------!
 
   ! Estimate number of horizontal layers again (to check if sorting worked)
   do c = 1, grid % n_cells
@@ -224,11 +291,11 @@
     end if
   end do
 
-  !-----------------------------------------------------------!
-  !                                                           !
-  !   Phase IV: Manage boundary condition names and numbers   !
-  !                                                           !
-  !-----------------------------------------------------------!
+  !----------------------------------------------------------!
+  !                                                          !
+  !   Phase V: Manage boundary condition names and numbers   !
+  !                                                          !
+  !----------------------------------------------------------!
 
   ! Find ground b.c. number
   do bc = 1, grid % n_bnd_cond
@@ -290,11 +357,11 @@
     grid % bnd_cond % name(1) = 'BUILDING_WALLS'
   end if
 
-  !----------------------------------------------------------!
-  !                                                          !
-  !   Phase V: Store only cells which are not in buildings   !
-  !                                                          !
-  !----------------------------------------------------------!
+  !-----------------------------------------------------------!
+  !                                                           !
+  !   Phase VI: Store only cells which are not in buildings   !
+  !                                                           !
+  !-----------------------------------------------------------!
 
   !-----------------------------------------------------!
   !   Store cells' nodes and boundary conditons again   !
@@ -332,11 +399,11 @@
   end do
   grid % n_cells = cnt
 
-  !-----------------------------------------!
-  !                                         !
-  !   Phase VI: Insert new boundary faces   !
-  !                                         !
-  !-----------------------------------------!
+  !------------------------------------------!
+  !                                          !
+  !   Phase VII: Insert new boundary faces   !
+  !                                          !
+  !------------------------------------------!
   if(buildings_exist) then
 
     do c = 1, grid % n_cells
