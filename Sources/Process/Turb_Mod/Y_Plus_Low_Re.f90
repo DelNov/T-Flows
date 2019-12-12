@@ -14,6 +14,5 @@
 !==============================================================================!
 
   Y_Plus_Low_Re = max(u_tau * wall_dist / kin_vis, TINY)
-  write(*,*) u_tau, wall_dist, kin_vis
 
   end function
