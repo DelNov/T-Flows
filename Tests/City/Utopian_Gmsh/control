@@ -10,10 +10,10 @@
 # Time stepping
 #---------------
 
- TIME_STEP                0.01
+ TIME_STEP                   0.01
  NUMBER_OF_TIME_STEPS     3600
- RESULTS_SAVE_INTERVAL    360
- BACKUP_SAVE_INTERVAL     360
+ RESULTS_SAVE_INTERVAL     120
+ BACKUP_SAVE_INTERVAL      360
 
 #-------------------
 # Monitoring points 
@@ -28,17 +28,8 @@
 #-----------------
 
  MASS_DENSITY           1.0
- THERMAL_CONDUCTIVITY   1.0080e-7
  DYNAMIC_VISCOSITY      1.8e-8
- HEAT_CAPACITY          1.0
 
-# TURBULENCE_MODEL       
-# ROUGH_WALLS            YES
-# ROUGHNESS_COEFFICIENT  0.00016
-
-# BUOYANCY                       yes
-# GRAVITATIONAL_VECTOR           0.0,  0.0,  -43.6
-# REFERENCE_TEMPERATURE          1.0
 #----------------------
 # Numerical parameters
 #----------------------
@@ -77,43 +68,43 @@
 # Initial conditions
 #--------------------
   INITIAL_CONDITION
-    VARIABLES           u       v     w     t      kin      eps      zeta     f22 t2
-    VALUES              0.0     0.0   0.0   0.0   1.0e-4   1.0e-5   1.0e-2   0.1  0.1
+    VARIABLES           u       v     w     t
+    VALUES              1.0     0.0   0.0   0.0
 
 #---------------------
 # Boundary conditions
 #---------------------
   BOUNDARY_CONDITION    ground
     TYPE                wall
-    VARIABLES           u     v     w     t      kin   eps      zeta  f22
-    VALUES              0.0   0.0   0.0   2.0    0.0   1.0e-3   0.0   0.0
+    VARIABLES           u     v     w     t
+    VALUES              0.0   0.0   0.0   2.0
 
    BOUNDARY_CONDITION    building_walls
      TYPE                wall
-     VARIABLES           u     v     w     t      kin   eps      zeta  f22
-     VALUES              0.0   0.0   0.0   4.0    0.0   1.0e-3   0.0   0.0
+     VARIABLES           u     v     w     t
+     VALUES              0.0   0.0   0.0   4.0
 
   BOUNDARY_CONDITION    top
     TYPE                pressure
-    VARIABLES           u     v     w     t      kin      eps      zeta     f22
-    VALUES              0.0   0.0   0.0   0.0   1.0E-2   1.0E-3   6.6E-2   1.0e-3
+    VARIABLES           u     v     w     t
+    VALUES              0.0   0.0   0.0   0.0
 
   BOUNDARY_CONDITION    north
     TYPE                pressure
-    VARIABLES           u     v     w     t      kin      eps      zeta     f22
-    VALUES              0.0   0.0   0.0   0.0   1.0E-2   1.0E-3   6.6E-2   1.0e-3
+    VARIABLES           u     v     w     t
+    VALUES              0.0   0.0   0.0   0.0
 
   BOUNDARY_CONDITION    south
     TYPE                pressure
-    VARIABLES           u     v     w     t      kin      eps      zeta     f22
-    VALUES              0.0   0.0   0.0   0.0   1.0E-2   1.0E-3   6.6E-2   1.0e-3
+    VARIABLES           u     v     w     t
+    VALUES              0.0   0.0   0.0   0.0
 
   BOUNDARY_CONDITION    east
     TYPE                inflow
-    VARIABLES            u    v  w    kin   eps  f22 zeta t
-    VALUES               1.0 0.0 0.0  1.0E-4   1.0E-5   1.6E-2   1.0e-3 0.0
+    VARIABLES           u     v     w     t
+    VALUES              1.0   0.0   0.0   0.0
 
   BOUNDARY_CONDITION    west
     TYPE                pressure
-    VARIABLES           u v w t kin   eps  f22 zeta 
-    VALUES              0.0   0.0   0.0   20.0   1.0E-2   1.0E-3   6.6E-2   1.0e-3
+    VARIABLES           u     v     w     t
+    VALUES              0.0   0.0   0.0   00.0
