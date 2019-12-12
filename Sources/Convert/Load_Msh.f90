@@ -50,7 +50,8 @@
   call File_Mod_Read_Line(fu)
   read(line % tokens(1), *) n_sect
   allocate(phys_names(n_sect))
-  allocate(p_tag_corr(n_sect))
+  allocate(p_tag_corr(n_sect * 128))  ! allocate more than needed because
+                                      ! it's all very messy in .msh files
   do i = 1, n_sect
     call File_Mod_Read_Line(fu)
     read(line % tokens(2), *) j
@@ -176,7 +177,7 @@
   !   Allocate memory for Grid_Mod variables   !
   !                                            !
   !--------------------------------------------!
-  call Allocate_Memory(grid)
+  call Allocate_Memory(grid, mesh_city)
 
   !---------------------------------------------------!
   !   Read boundary conditions for individual cells   !

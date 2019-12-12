@@ -18,6 +18,7 @@
   integer :: f = 1
 !==============================================================================!
 
+  ! (Dirty) trick to allocate additional memory for cities
   if(mesh_city) f = 3
 
   ! Allocate memory 
@@ -33,5 +34,8 @@
 
   allocate(grid % bnd_cond % color(-grid % n_bnd_cells:-1))
   grid % bnd_cond % color = 0
+
+  ! (Dirty) trick to allocate additional memory for cities
+  if(mesh_city) grid % n_bnd_cells = grid % n_bnd_cells / 3
 
   end subroutine
