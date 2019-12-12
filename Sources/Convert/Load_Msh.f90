@@ -208,7 +208,7 @@
   end do
 
   do i = 1, n_bnd_sect
-    print '(a, i2, i6)', ' # Boundary sells in section: ', i, n_bnd_cells(i)
+    print '(a, i2, i6)', ' # Boundary cells in section: ', i, n_bnd_cells(i)
   end do
 
   !--------------------------------!
