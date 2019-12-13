@@ -11,12 +11,10 @@
   use Save_Grid_Mod, only: Save_Vtu_Cells,  &
                            Save_Vtu_Faces,  &
                            Save_Vtu_Links
-  use Ground_Mod, only: Ground_Type, Ground_Mod_Read_Stl
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type)   :: grid     ! grid to be converted
-  type(Ground_Type) :: ground   ! ground
   integer           :: c, n, s, l
   character(len=80) :: file_name, file_name_up, app_up, ext_up
   logical           :: city
@@ -44,12 +42,12 @@
     problem_name = file_name(1:l-4)
     ext_up = file_name_up(l-2:l)
   else if( file_name_up(l-3:l) .eq. 'CGNS' ) then
-    print *, '# Based on the ext_up, you are' // &
+    print *, '# Based on the extension, you are' // &
              ' reading CGNS file format'
     problem_name = file_name(1:l-5)
     ext_up = file_name_up(l-3:l)
   else if( file_name_up(l-2:l) .eq. 'MSH' ) then
-    print *, '# Based on the ext_up, you are' // &
+    print *, '# Based on the extension, you are' // &
              ' reading GMSH file format'
     problem_name = file_name(1:l-4)
     ext_up = file_name_up(l-2:l)
@@ -85,8 +83,7 @@
 
   ! Sort cells in height first thing after reading
   if(city) then
-    call Ground_Mod_Read_Stl(ground)
-    call Insert_Buildings(grid, ground)
+    call Insert_Buildings(grid)
   end if
 
   call Grid_Topology     (grid)
