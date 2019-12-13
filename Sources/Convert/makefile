@@ -145,9 +145,6 @@ SRC_MOD = Comm_Mod_Seq.f90		\
           Grid_Level_Mod.f90		\
           Grid_Mod.f90
 
-# Sources for modules in the local directory
-SRC_MOD += Ground_Mod.f90
-
 #---------------
 #   Functions
 #---------------
