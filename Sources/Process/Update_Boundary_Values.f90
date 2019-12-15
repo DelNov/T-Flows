@@ -98,7 +98,7 @@
           kin % n(c2) = 0.0
           u_tau = kin_vis * sqrt(u % n(c1)**2 + v % n(c1)**2 + w % n(c1)**2)  &
                 / grid % wall_dist(c1)
-          turb % y_plus(c1) = Y_Plus_Low_Re(u_tau,                 &
+          turb % y_plus(c1) = Y_Plus_Low_Re(turb, u_tau,           &
                                             grid % wall_dist(c1),  &
                                             kin_vis)
           if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) f22 % n(c2) = 0.0
