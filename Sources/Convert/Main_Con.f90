@@ -42,12 +42,12 @@
     problem_name = file_name(1:l-4)
     ext_up = file_name_up(l-2:l)
   else if( file_name_up(l-3:l) .eq. 'CGNS' ) then
-    print *, '# Based on the ext_up, you are' // &
+    print *, '# Based on the extension, you are' // &
              ' reading CGNS file format'
     problem_name = file_name(1:l-5)
     ext_up = file_name_up(l-3:l)
   else if( file_name_up(l-2:l) .eq. 'MSH' ) then
-    print *, '# Based on the ext_up, you are' // &
+    print *, '# Based on the extension, you are' // &
              ' reading GMSH file format'
     problem_name = file_name(1:l-4)
     ext_up = file_name_up(l-2:l)

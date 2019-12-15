@@ -24,6 +24,11 @@
   c_f1   =  1.4
   c_f2   =  0.3
 
+  ! Constants for buoyancy wall function
+  c_mu_theta   =  0.1225
+  c_mu_theta5  =  0.35
+  kappa_theta  =  0.38         ! von Karman constant for temperature
+
   turb % kin  % sigma = 1.0
   turb % eps  % sigma = 1.3
   turb % zeta % sigma = 1.2

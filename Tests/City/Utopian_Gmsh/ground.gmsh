@@ -1,0 +1,37 @@
+/*******************************************************************************
+*                                                                              *
+*  Ground mesh needed to create an STL file for ground                         *
+*                                                                              *
+*******************************************************************************/
+
+// Coordinates of the problem domain (the whole piece of simulated land)
+GROUND_X_MIN = -2.5;
+GROUND_X_MAX =  3.5;
+GROUND_Y_MIN = -2.0;
+GROUND_Y_MAX =  2.0;
+GROUND_Z     =  0.01;
+
+GROUND_LOOP = 100;
+GROUND_SURF = 100;
+
+//------------------------------------------------------------
+// Points and lines defining the extents of the ground domain
+//------------------------------------------------------------
+Point(1) = {GROUND_X_MIN, GROUND_Y_MIN, GROUND_Z};
+Point(2) = {GROUND_X_MAX, GROUND_Y_MIN, GROUND_Z};
+Point(3) = {GROUND_X_MAX, GROUND_Y_MAX, GROUND_Z};
+Point(4) = {GROUND_X_MIN, GROUND_Y_MAX, GROUND_Z};
+Line(1) = {1, 2};
+Line(2) = {2, 3};
+Line(3) = {3, 4};
+Line(4) = {4, 1};
+Curve Loop(GROUND_LOOP) = {1, 2, 3, 4};
+Plane Surface(GROUND_SURF) = {GROUND_LOOP};
+
+//------------------
+// Spacing function
+//------------------
+Field[1] = MathEval;
+Field[1].F = "0.33";
+Background Field = 1;
+
