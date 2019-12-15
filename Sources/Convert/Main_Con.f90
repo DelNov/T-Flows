@@ -17,7 +17,6 @@
   type(Grid_Type)   :: grid     ! grid to be converted
   integer           :: c, n, s, l
   character(len=80) :: file_name, file_name_up, app_up, ext_up
-  logical           :: city
 !==============================================================================!
 
   call Logo_Con
@@ -60,30 +59,18 @@
   print *, '#----------------------------------' // &
            '-----------------------------------'
 
-  city = .false.
-  if(l > 10) then
-    app_up = problem_name(l-7:l-4)
-    call To_Upper_Case(app_up)
-    if(app_up .eq. 'CITY') city = .true.
-  end if
-
   !----------------------------------------!
   !   Read the file and start conversion   !
   !----------------------------------------!
   if (ext_up .eq. 'NEU') then
-    call Load_Neu(grid, city)
+    call Load_Neu(grid, .false.)
   end if
   if (ext_up .eq. 'CGNS') then
-    call Load_Cgns(grid, city)
+    call Load_Cgns(grid, .false.)
   end if
   if (ext_up .eq. 'MSH') then
-    call Load_Msh(grid, city)
+    call Load_Msh(grid, .false.)
     call Find_Parents(grid)
-  end if
-
-  ! Sort cells in height first thing after reading
-  if(city) then
-    call Insert_Buildings(grid)
   end if
 
   call Grid_Topology     (grid)

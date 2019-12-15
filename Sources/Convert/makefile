@@ -163,7 +163,6 @@ SRC_FUN += Allocate_Memory.f90		\
            Find_Faces.f90		\
            Find_Parents.f90		\
            Grid_Topology.f90		\
-           Insert_Buildings.f90		\
            Load_Neu.f90			\
            Load_Msh.f90			\
            Logo_Con.f90			\
