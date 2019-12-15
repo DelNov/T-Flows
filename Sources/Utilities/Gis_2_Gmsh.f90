@@ -117,6 +117,7 @@
   !             to other points and buldings        !
   !                                                 !
   !-------------------------------------------------!
+  print *, '# Calculating minimum distances between buildings'
 
   !----------------------------------------------------------!
   !   For each point find minumum distance to other points   !
@@ -204,5 +205,7 @@
     write(f_out, '(a14,i4,a1)') 'height_b(b) = ', nint(build_height(b)), ';'
     write(f_out, *)     ! an empty line
   end do
+
+  print *, '# Done!'
 
   end
