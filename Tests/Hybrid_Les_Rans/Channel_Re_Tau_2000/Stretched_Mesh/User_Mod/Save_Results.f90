@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(flow, turb, mult, n)
+  subroutine User_Mod_Save_Results(flow, turb, mult, ts)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
@@ -11,7 +11,7 @@
   type(Field_Type),      target :: flow
   type(Turb_Type),       target :: turb
   type(Multiphase_Type), target :: mult
-  integer                       :: n
+  integer                       :: ts   ! time step
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
@@ -48,8 +48,14 @@
   call File_Mod_Set_Name(coord_name, extension='.1d')
 
   ! Set file names for results
-  call File_Mod_Set_Name(res_name,      appendix='-res',      extension='.dat')
-  call File_Mod_Set_Name(res_name_plus, appendix='-res-plus', extension='.dat')
+  call File_Mod_Set_Name(res_name,         &
+                         time_step=ts,     &   
+                         appendix='-res',  &
+                         extension='.dat')
+  call File_Mod_Set_Name(res_name_plus,         &
+                         time_step=ts,          &
+                         appendix='-res-plus',  &
+                         extension='.dat')
 
   !------------------!
   !   Read 1d file   !
@@ -140,8 +146,8 @@
 
         kin_p   (i) = kin_p   (i) + turb % kin_mean(c)
         eps_p   (i) = eps_p   (i) + turb % eps_mean(c)
-        uw_mod_p(i) = uw_mod_p(i) + turb % vis_t_eff(c)*(u % y(c) + v % x(c))
-        vis_t_p (i) = vis_t_p (i) + turb % vis_t(c) / visc_const
+        uw_mod_p(i) = uw_mod_p(i) + turb % vis_t_eff(c)*(u % z(c) + w % x(c))
+        vis_t_p (i) = vis_t_p (i) + turb % vis_t_eff(c) / visc_const
         y_plus_p(i) = y_plus_p(i) + turb % y_plus(c)
 
         if(heat_transfer) then
@@ -331,19 +337,19 @@
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
         write(3,'(14es15.5e3)') wall_p(i),                                   &
-                                u_p(i),                                      &
-                                0.5*(uu_p(i)+vv_p(i)+ww_p(i)),               &
-                                kin_p(i),                                    &
-                                (0.5*(uu_p(i)+vv_p(i)+ww_p(i)) + kin_p(i)),  &
-                                uw_p(i),                                     &
-                                uw_mod_p(i),                                 &
-                                (uw_p(i) + uw_mod_p(i)),                     &
-                                vis_t_p(i),                                  &
-                                t_p(i),                                      &
-                                t2_p(i),                                     &
-                                ut_p(i),                                     &
-                                vt_p(i),                                     &
-                                wt_p(i)
+                            u_p(i),                                          &
+                            0.5*(uu_p(i)+vv_p(i)+ww_p(i)),                   &
+                            kin_p(i),                                        &
+                            0.5*(uu_p(i)+vv_p(i)+ww_p(i)) + kin_p(i),        &
+                            abs(uw_p(i)),                                    &
+                            abs(uw_mod_p(i)),                                &
+                            abs(uw_p(i)) + abs(uw_mod_p(i)),                 &
+                            vis_t_p(i),                                      &
+                            t_p(i),                                          &
+                            t2_p(i),                                         &
+                            ut_p(i),                                         &
+                            vt_p(i),                                         &
+                            wt_p(i)
       end if
     end do
   else
@@ -362,7 +368,7 @@
     end do
   end if
 
-  do i = 1, n_prob-1
+  do i = 1, n_prob
     wall_p(i) = dens_const * wall_p(i)*u_tau_p / visc_const
     u_p   (i) = u_p(i) / u_tau_p
     v_p   (i) = v_p(i) / u_tau_p
@@ -374,7 +380,7 @@
     vv_p  (i) = vv_p (i) / (u_tau_p**2)
     ww_p  (i) = ww_p (i) / (u_tau_p**2)
     uw_p  (i) = uw_p (i) / (u_tau_p**2)
-    uw_mod_p(i) = uw_p (i) / (u_tau_p**2)
+    uw_mod_p(i) = uw_mod_p (i) / (u_tau_p**2)
 
     if(heat_transfer) then
       t_p (i) = (t_wall - t_p(i)) / t_tau  ! t % n(c)
@@ -388,21 +394,21 @@
   if(heat_transfer) then
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(4,'(14es15.5e3)')                            &  !  write
-              wall_p(i),                                   &  !  1
-              u_p(i),                                      &  !  2
-              0.5*(uu_p(i)+vv_p(i)+ww_p(i)),               &  !  3
-              kin_p(i),                                    &  !  4
-              (0.5*(uu_p(i)+vv_p(i)+ww_p(i)) + kin_p(i)),  &  !  5
-              uw_p(i),                                     &  !  6
-              uw_mod_p(i),                                 &  !  7
-              (uw_p(i) + uw_mod_p(i)),                     &  !  8
-              vis_t_p(i),                                  &  !  9
-              t_p(i),                                      &  ! 10
-              t2_p(i),                                     &  ! 11
-              ut_p(i),                                     &  ! 12
-              vt_p(i),                                     &  ! 13
-              wt_p(i)                                         ! 14
+        write(4,'(14es15.5e3)')                                & ! write
+              wall_p(i),                                       & ! 1    
+              u_p(i),                                          & ! 2
+              0.5*(uu_p(i)+vv_p(i)+ww_p(i)),                   & ! 3
+              kin_p(i),                                        & ! 4
+              0.5*(uu_p(i)+vv_p(i)+ww_p(i)) + kin_p(i),        & ! 5
+              abs(uw_p(i)),                                    & ! 6
+              abs(uw_mod_p(i)),                                & ! 6
+              abs(uw_p(i)) + abs(uw_mod_p(i)),                 & ! 8
+              vis_t_p(i),                                      & ! 9
+              t_p(i),                                          & ! 10
+              t2_p(i),                                         & ! 11 
+              ut_p(i),                                         & ! 12
+              vt_p(i),                                         & ! 13
+              wt_p(i)                                            ! 14
       end if
     end do
   else

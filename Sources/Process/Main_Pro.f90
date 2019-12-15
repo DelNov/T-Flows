@@ -381,6 +381,9 @@
   call Comm_Mod_Wait
   call Backup_Mod_Save(flow, swarm, turb, mult, n, n_stat)
 
+  ! Write results in user-customized format
+  call User_Mod_Save_Results(flow, turb, mult, n) 
+
   if(this_proc < 2) then
     open(9, file='stop')
     close(9)
