@@ -16,22 +16,22 @@ NUMBER_OF_LAYERS    =  60;                // number of mesh layers in height
 SKY_HIGH            =   1.0;              // height of the domain
 
 // Coordinates of the problem domain (the whole piece of simulated land)
-GROUND_X_MIN = -2.0;
-GROUND_X_MAX =  3.0;
-GROUND_Y_MIN = -1.5;
-GROUND_Y_MAX =  1.5;
+ground_x_min = -2.0;
+ground_x_max =  3.0;
+ground_y_min = -1.5;
+ground_y_max =  1.5;
 
 // Coordinates of the city (where buildings will reside)
-CITY_X_MIN = -1.2;
-CITY_X_MAX =  1.0;
-CITY_Y_MIN = -0.8;
-CITY_Y_MAX =  0.8;
+city_x_min = -1.2;
+city_x_max =  2.0;
+city_y_min = -0.8;
+city_y_max =  0.8;
 
 // Transition between fine and coarse mesh, ...
 // ... between city and the rest of the domain
-DELTA_MIN = 0.02;  // resolution in the city
-DELTA_MAX = 0.22;  // resolution in the country side
-TW = 0.11;
+delta_min = 0.02;  // resolution in the city
+delta_max = 0.1;   // resolution in the country side
+city_limit_width = 0.05;
 
 //------------------------------------------------------------------------------
 //
@@ -51,10 +51,10 @@ HUGE                =   1.0e+9;
 //------------------------------------------------------------
 // Points and lines defining the extents of the ground domain
 //------------------------------------------------------------
-Point(1) = {GROUND_X_MIN, GROUND_Y_MIN, 0};
-Point(2) = {GROUND_X_MAX, GROUND_Y_MIN, 0};
-Point(3) = {GROUND_X_MAX, GROUND_Y_MAX, 0};
-Point(4) = {GROUND_X_MIN, GROUND_Y_MAX, 0};
+Point(1) = {ground_x_min, ground_y_min, 0};
+Point(2) = {ground_x_max, ground_y_min, 0};
+Point(3) = {ground_x_max, ground_y_max, 0};
+Point(4) = {ground_x_min, ground_y_max, 0};
 Line(1) = {1, 2};
 Line(2) = {2, 3};
 Line(3) = {3, 4};
@@ -196,12 +196,12 @@ Field[1].F = Sprintf("  (%5.2g)
                                              - tanh((x-(%5.2g))/(%5.2g))))
                                       *(0.5*(  tanh((y-(%5.2g))/(%5.2g))
                                              - tanh((y-(%5.2g))/(%5.2g)))) )",
-  DELTA_MIN,
-  DELTA_MAX - DELTA_MIN,
-  CITY_X_MIN, TW,
-  CITY_X_MAX, TW,
-  CITY_Y_MIN, TW,
-  CITY_Y_MAX, TW);
+  delta_min,
+  delta_max - delta_min,
+  city_x_min, city_limit_width,
+  city_x_max, city_limit_width,
+  city_y_min, city_limit_width,
+  city_y_max, city_limit_width);
 Background Field = 1;
 
 //---------------------------------------------------
@@ -264,17 +264,17 @@ EndFor
 // East, west, south, north and eventually top
 //---------------------------------------------
 Physical Surface("east")
-  = {Surface In BoundingBox{GROUND_X_MIN-TINY, -HUGE, -HUGE,
-                            GROUND_X_MIN+TINY, +HUGE, +HUGE}};
+  = {Surface In BoundingBox{ground_x_min-TINY, -HUGE, -HUGE,
+                            ground_x_min+TINY, +HUGE, +HUGE}};
 Physical Surface("west")
-  = {Surface In BoundingBox{GROUND_X_MAX-TINY, -HUGE, -HUGE,
-                            GROUND_X_MAX+TINY, +HUGE, +HUGE}};
+  = {Surface In BoundingBox{ground_x_max-TINY, -HUGE, -HUGE,
+                            ground_x_max+TINY, +HUGE, +HUGE}};
 Physical Surface("south")
-  = {Surface In BoundingBox{-HUGE, GROUND_Y_MIN-TINY, -HUGE,
-                            +HUGE, GROUND_Y_MIN+TINY, +HUGE}};
+  = {Surface In BoundingBox{-HUGE, ground_y_min-TINY, -HUGE,
+                            +HUGE, ground_y_min+TINY, +HUGE}};
 Physical Surface("north")
-  = {Surface In BoundingBox{-HUGE, GROUND_Y_MAX-TINY, -HUGE,
-                            +HUGE, GROUND_Y_MAX+TINY, +HUGE}};
+  = {Surface In BoundingBox{-HUGE, ground_y_max-TINY, -HUGE,
+                            +HUGE, ground_y_max+TINY, +HUGE}};
 Physical Surface("top") 
   = {Surface In BoundingBox{-HUGE, -HUGE, SKY_HIGH-TINY,
                             +HUGE, +HUGE, SKY_HIGH+TINY}};
