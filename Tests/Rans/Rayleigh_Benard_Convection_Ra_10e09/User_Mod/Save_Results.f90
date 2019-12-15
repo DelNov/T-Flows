@@ -30,15 +30,17 @@
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u, v, w, t
+  type(Var_Type),  pointer :: kin, eps, zeta, f, ut, vt, wt, t2
 !==============================================================================!
 
   ! Take aliases
   grid => flow % pnt_grid
   bulk => flow % bulk
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
-  t    => flow % t
+  call Field_Mod_Alias_Momentum   (flow, u, v, w)
+  call Field_Mod_Alias_Energy     (flow, t)
+  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f)
+  call Turb_Mod_Alias_Heat_Fluxes (turb, ut, vt, wt) 
+  call Turb_Mod_Alias_T2          (turb, t2) 
 
   ! Set some constants
   t_cold =  5.0
@@ -51,8 +53,14 @@
   call File_Mod_Set_Name(coord_name, extension='.1d')
 
   ! Set file names for results
-  call File_Mod_Set_Name(res_name,      appendix='-res',      extension='.dat')
-  call File_Mod_Set_Name(res_name_plus, appendix='-res-plus', extension='.dat')
+  call File_Mod_Set_Name(res_name,         &
+                          time_step=n,     &
+                          appendix='-res',  &
+                          extension='.dat')
+   call File_Mod_Set_Name(res_name_plus,         &
+                          time_step=n,          &
+                          appendix='-res-plus',  &
+                          extension='.dat')
 
 !  call Grad_Mod_For_Phi(grid, t % n, 3, phi_z, .true.)
 
@@ -134,18 +142,18 @@
         ti_p  (i) = ti_p  (i) + t % n(c)
         w_p   (i) = w_p   (i) + turb % w_mean(c)
 
-        uu_p(i)   = uu_p(i) + turb % uu_mean(c)  &
+        uu_p(i)   = uu_p(i) + turb % uu_res(c)  &
                             - turb % u_mean(c) * turb % u_mean(c)
-        vv_p(i)   = vv_p(i) + turb % vv_mean(c)  &
+        vv_p(i)   = vv_p(i) + turb % vv_res(c)  &
                             - turb % v_mean(c) * turb % v_mean(c)
-        ww_p(i)   = ww_p(i) + turb % ww_mean(c)  &
+        ww_p(i)   = ww_p(i) + turb % ww_res(c)  &
                             - turb % w_mean(c) * turb % w_mean(c)
-        uw_p(i)   = uw_p(i) + turb % uw_mean(c)  &
+        uw_p(i)   = uw_p(i) + turb % uw_res(c)  &
                             - turb % u_mean(c) * turb % w_mean(c)
         kin_p(i)  = kin_p(i) &
-                + 0.5*(turb % uu_mean(c) - turb % u_mean(c) * turb % u_mean(c) &
-                     + turb % vv_mean(c) - turb % v_mean(c) * turb % v_mean(c) &
-                     + turb % ww_mean(c) - turb % w_mean(c) * turb % w_mean(c))
+                + 0.5*(turb % uu_res(c) - turb % u_mean(c) * turb % u_mean(c) &
+                     + turb % vv_res(c) - turb % v_mean(c) * turb % v_mean(c) &
+                     + turb % ww_res(c) - turb % w_mean(c) * turb % w_mean(c))
         kin_mod_p(i) = kin_mod_p(i) + turb % kin_mean(c)
 
         if(heat_transfer) then
@@ -153,15 +161,15 @@
           t2_p(i) = t2_p(i) + turb % t2_mean(c)  &
                             - turb % t_mean(c) * turb % t_mean(c)
           t2_mod_p(i) = t2_mod_p(i) + turb % t2_mean(c)
-          ut_p(i) = ut_p(i) + turb % ut_mean(c)  &
+          ut_p(i) = ut_p(i) + turb % ut_res(c)  &
                             - turb % u_mean(c) * turb % t_mean(c)
-          vt_p(i) = vt_p(i) + turb % vt_mean(c)  &
+          vt_p(i) = vt_p(i) + turb % vt_res(c)  &
                             - turb % v_mean(c) * turb % t_mean(c)
-          wt_p(i) = wt_p(i) + turb % wt_mean(c)  &
+          wt_p(i) = wt_p(i) + turb % wt_res(c)  &
                             - turb % w_mean(c) * turb % t_mean(c)
-          ut_mod(i) = ut_mod(i) + turb % ut_mean(c)
-          vt_mod(i) = vt_mod(i) + turb % vt_mean(c)
-          wt_mod(i) = wt_mod(i) + turb % wt_mean(c)
+          ut_mod(i) = ut_mod(i) + turb % ut_res(c)
+          vt_mod(i) = vt_mod(i) + turb % vt_res(c)
+          wt_mod(i) = wt_mod(i) + turb % wt_res(c)
         end if
         n_count(i) = n_count(i) + 1
       end if
