@@ -107,7 +107,7 @@
               kin_vis = visc_const / dens_const
               u_tan = Field_Mod_U_Tan(flow, s)
               u_tau = c_mu25 * sqrt(turb % kin % n(c1))
-              turb % y_plus(c1) = Y_Plus_Low_Re(u_tau,                 &
+              turb % y_plus(c1) = Y_Plus_Low_Re(turb, u_tau,                 &
                                                 grid % wall_dist(c1),  &
                                                 kin_vis)
               tau_wall = dens_const * kappa * u_tau * u_tan    &
@@ -117,6 +117,7 @@
                       + 0.015663 * tau_wall * u % n(c1) / abs(u % n(c1))
             end if
             v2_p(i) = v2_p(i) + turb % y_plus(c1)
+
             v3_p(i) = v3_p(i) + t % q(c2)  &
                     / (dens_const * capa_const * (t % n(c2) - 20) * 11.3)
             v5_p(i) = v5_p(i) + t % n(c2)
