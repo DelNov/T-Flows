@@ -28,5 +28,6 @@
   include 'Sort_Mod/Real_Carry_Int.f90'
   include 'Sort_Mod/Real.f90'
   include 'Sort_Mod/Short_Carry_Short.f90'
+  include 'Sort_Mod/Unique_Int.f90'
 
   end module
