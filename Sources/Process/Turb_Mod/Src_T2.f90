@@ -78,12 +78,12 @@
         ! Kinematic viscosities
         kin_vis = flow % viscosity(c1) / flow % density(c1)
 
-        u_tau = c_mu25 * sqrt(kin % n(c1)) 
+        u_tau = c_mu25 * sqrt(kin % n(c1))
 
         turb % y_plus(c1) = Y_Plus_Low_Re(turb, u_tau,      &
                      grid % wall_dist(c1), kin_vis)
 
-        ebf  = 0.01*turb % y_plus(c1)**4.0/(1.0+5.0*turb % y_plus(c1))
+        ebf = Turb_Mod_Ebf_Momentum(turb, c1)
 
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) &
         t % q(c2) = abs(turb % con_w(c1)*(t % n(c1) &
@@ -97,13 +97,13 @@
         if(turb % y_plus(c1) > 11.0) then
           turb % p_t2(c1) = p_t2_wall
         else
-          turb % p_t2(c1) = (turb % p_t2(c1) * exp(-1.0 * ebf) + & 
-                  p_t2_wall * exp(-1.0/ebf))
+          turb % p_t2(c1) = (  turb % p_t2(c1) * exp(-1.0 * ebf)  &
+                             + p_t2_wall * exp(-1.0/ebf))
         end if
 
         b(c1) = b(c1) + turb % p_t2(c1) * grid % vol(c1)
 
-        t2 % n(c2) = 0.0 
+        t2 % n(c2) = 0.0
 
       end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2).eq.WALL or WALLFL
     end if    ! c2 < 0

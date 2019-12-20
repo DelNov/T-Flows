@@ -247,7 +247,9 @@
   include 'Turb_Mod/Vis_T_Spalart_Allmaras.f90'
   include 'Turb_Mod/Vis_T_Wale.f90'
 
-  ! Calculation of turbulent Prandtl number
+  ! Other subroutines ellipitic blending, turbulent Prandtl number
+  include 'Turb_Mod/Ebf_Momentum.f90'
+  include 'Turb_Mod/Ebf_Scalar.f90'
   include 'Turb_Mod/Prandtl_Number.f90'
 
   end module

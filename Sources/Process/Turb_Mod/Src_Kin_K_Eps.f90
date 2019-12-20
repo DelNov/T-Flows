@@ -23,7 +23,7 @@
   integer                    :: c, c1, c2, s
   real                       :: u_tan, u_tau
   real                       :: kin_vis  ! [m^2/s]
-  real                       :: ebf, p_kin_int, p_kin_wf
+  real                       :: p_kin_int, p_kin_wf
   real                       :: z_o
 !==============================================================================!
 !   Dimensions:                                                                !
@@ -98,9 +98,6 @@
                                               u_tan,              &
                                               turb % y_plus(c1))
 
-        ebf = 0.01 * turb % y_plus(c1)**4  &
-                   / (1.0 + 5.0 * turb % y_plus(c1))
-
         p_kin_wf  = turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
                   / (grid % wall_dist(c1) * kappa)
 
@@ -125,7 +122,7 @@
 
           turb % p_kin(c1) = turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
                            / (kappa*(grid % wall_dist(c1) + z_o))
-        
+
         end if  ! rough_walls
 
         b(c1) = b(c1)                                                        &

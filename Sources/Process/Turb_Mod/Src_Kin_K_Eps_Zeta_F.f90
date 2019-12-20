@@ -120,7 +120,7 @@
         u_tan = Field_Mod_U_Tan(flow, s)
 
         u_tau = c_mu25 * sqrt(kin % n(c1))
-          
+
         turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
                                           u_tau,                 &
                                           grid % wall_dist(c1),  &
@@ -132,8 +132,7 @@
                                               u_tan,              &
                                               turb % y_plus(c1))
 
-        ebf = max(0.01 * turb % y_plus(c1) ** 4      &
-                       / (1.0 + 5.0 * turb % y_plus(c1)), TINY)
+        ebf = Turb_Mod_Ebf_Momentum(turb, c1)
 
         p_kin_wf  = turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
                   / (grid % wall_dist(c1) * kappa)
@@ -158,13 +157,13 @@
 
           turb % p_kin(c1) = turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1)) &
                            / (kappa*(grid % wall_dist(c1)+z_o))
-        
+
         end if ! rough_walls
 
         b(c1) = b(c1) + (turb % p_kin(c1)  &
               - turb % vis_t(c1) * flow % shear(c1)**2) * grid % vol(c1)
-         
-        ! Implementation of wall function for buoyancy-driven flows        
+
+        ! Implementation of wall function for buoyancy-driven flows
         if(buoyancy) then
 
           nx = grid % sx(s) / grid % s(s)
@@ -201,7 +200,7 @@
           ! when flow starts to develop
           g_buoy_wall = min(3.0*turb % p_kin(c1),g_buoy_wall)
 
-          ! Clean up b(c) from old values of g_buoy         
+          ! Clean up b(c) from old values of g_buoy
           b(c1)      = b(c1) - turb % g_buoy(c1) * grid % vol(c1)
 
           turb % g_buoy(c1) = turb % g_buoy(c1) * exp(-1.0 * ebf) &
