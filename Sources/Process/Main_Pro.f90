@@ -380,6 +380,8 @@
   ! Save backup and post-processing files at exit
   call Comm_Mod_Wait
   call Backup_Mod_Save(flow, swarm, turb, mult, n, n_stat)
+  call Save_Results(flow, turb, mult, n, .true.)   ! save inside
+  call Save_Results(flow, turb, mult, n, .false.)  ! save bnd
 
   ! Write results in user-customized format
   call User_Mod_Save_Results(flow, turb, mult, n) 
