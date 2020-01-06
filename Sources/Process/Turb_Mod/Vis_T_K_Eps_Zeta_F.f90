@@ -92,8 +92,7 @@
                                               u_tan,               &
                                               turb % y_plus(c1))
 
-        ebf = 0.01 * turb % y_plus(c1) ** 4  &
-            / (1.0 + 5.0 * turb % y_plus(c1))
+        ebf = Turb_Mod_Ebf_Momentum(turb, c1)
 
         u_plus = U_Plus_Log_Law(turb, turb % y_plus(c1))
 
@@ -126,8 +125,7 @@
           pr   = Field_Mod_Prandtl_Number(flow, c1)  ! laminar Prandtl number
           beta = 9.24 * ((pr/pr_t)**0.75 - 1.0)     &
                * (1.0 + 0.28 * exp(-0.007*pr/pr_t))
-          ebf = 0.01 * (pr * turb % y_plus(c1)**4    &
-                     / ((1.0 + 5.0 * pr**3 * turb % y_plus(c1)) + TINY))
+          ebf = Turb_Mod_Ebf_Scalar(turb, c1, pr)
           turb % con_w(c1) =    turb % y_plus(c1)                         &
                               * flow % viscosity(c1)                      &
                               * flow % capacity(c1)                       &
