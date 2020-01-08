@@ -167,8 +167,8 @@
        turbulence_model .eq. K_EPS_ZETA_F .or.  &
        turbulence_model .eq. HYBRID_LES_RANS) then
       if(c2 < 0) then
-        if(Var_Mod_Bnd_Cell_Type(t, c2) .eq. WALL .or.  &
-           Var_Mod_Bnd_Cell_Type(t, c2) .eq. WALLFL) then
+        if(Var_Mod_Bnd_Cond_Type(t, c2) .eq. WALL .or.  &
+           Var_Mod_Bnd_Cond_Type(t, c2) .eq. WALLFL) then
           con_eff_f = turb % con_w(c1)
         end if
       end if
@@ -244,13 +244,13 @@
     else if(c2.lt.0) then
       ! Outflow is included because of the flux 
       ! corrections which also affects velocities
-      if( (Var_Mod_Bnd_Cell_Type(t, c2) .eq. INFLOW) .or.  &
-          (Var_Mod_Bnd_Cell_Type(t, c2) .eq. WALL)   .or.  &
-          (Var_Mod_Bnd_Cell_Type(t, c2) .eq. CONVECT) ) then
+      if( (Var_Mod_Bnd_Cond_Type(t, c2) .eq. INFLOW) .or.  &
+          (Var_Mod_Bnd_Cond_Type(t, c2) .eq. WALL)   .or.  &
+          (Var_Mod_Bnd_Cond_Type(t, c2) .eq. CONVECT) ) then
         a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
         b(c1)  = b(c1)  + a12 * t % n(c2)
       ! In case of wallflux 
-      else if(Var_Mod_Bnd_Cell_Type(t, c2) .eq. WALLFL) then
+      else if(Var_Mod_Bnd_Cond_Type(t, c2) .eq. WALLFL) then
         b(c1) = b(c1) + grid % s(s) * t % q(c2)
       end if
     end if
