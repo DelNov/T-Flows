@@ -766,7 +766,7 @@
       end if
 
       do sc = 1, flow % n_scalars
-        scalar(sc) % n = scalar(sc) % b(c)
+        scalar(sc) % n(c) = scalar(sc) % b(c)
       end do
 
       if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
