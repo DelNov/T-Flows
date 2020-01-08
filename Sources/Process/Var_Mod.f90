@@ -30,7 +30,7 @@
                                            ! temperature, angle
     ! Boundary cell type (important for scalars, since they
     ! can have different boundary conditions at the walls)
-    integer, allocatable :: bnd_cell_type(:)
+    integer, allocatable :: bnd_cond_type(:)
 
     ! Parameters for numerical solution of the variable
     character(len=80) :: precond
@@ -48,6 +48,6 @@
 
   include 'Var_Mod/Allocate_New_Only.f90'
   include 'Var_Mod/Allocate_Solution.f90'
-  include 'Var_Mod/Bnd_Cell_Type.f90'
+  include 'Var_Mod/Bnd_Cond_Type.f90'
 
   end module

@@ -75,12 +75,9 @@
   ! User function
   call User_Mod_Beginning_Of_Compute_Scalar(flow, turb, mult, dt, ini)
 
-  do n = 1, a % row(grid % n_cells+1) ! to je broj nonzero + 1
-    a % val(n) = 0.0
-  end do
-  a % val = 0.0
-
-  b(:) = 0.0
+  ! Initialize matrix and right hand side
+  a % val(:) = 0.0
+  b      (:) = 0.0
 
   !-------------------------------------!
   !   Initialize variables and fluxes   !
@@ -165,8 +162,8 @@
 !   if(turbulence_model .eq. K_EPS .or.  &
 !      turbulence_model .eq. K_EPS_ZETA_F) then 
 !     if(c2 < 0) then
-!       if(Var_Mod_Bnd_Cell_Type(phi,c2) .eq. WALL .or.  &
-!          Var_Mod_Bnd_Cell_Type(phi,c2) .eq. WALLFL) then
+!       if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALL .or.  &
+!          Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALLFL) then
 !         dif_eff1 = turb % con_w(c1)
 !         dif_eff2 = dif_eff1
 !       end if
@@ -215,14 +212,14 @@
 
       ! Outflow is included because of the flux
       ! corrections which also affects velocities
-      if( (Var_Mod_Bnd_Cell_Type(phi,c2) .eq. INFLOW) .or.  &
-          (Var_Mod_Bnd_Cell_Type(phi,c2) .eq. WALL)   .or.  &
-          (Var_Mod_Bnd_Cell_Type(phi,c2) .eq. CONVECT) ) then    
+      if( (Var_Mod_Bnd_Cond_Type(phi,c2) .eq. INFLOW) .or.  &
+          (Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALL)   .or.  &
+          (Var_Mod_Bnd_Cond_Type(phi,c2) .eq. CONVECT) ) then
         a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
         b(c1)  = b(c1)  + a12 * phi % n(c2)
 
       ! In case of wallflux 
-      else if(Var_Mod_Bnd_Cell_Type(phi,c2) .eq. WALLFL) then
+      else if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALLFL) then
         b(c1) = b(c1) + grid % s(s) * phi % q(c2)
       end if
 
