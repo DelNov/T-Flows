@@ -48,6 +48,7 @@
 
   include 'Var_Mod/Allocate_New_Only.f90'
   include 'Var_Mod/Allocate_Solution.f90'
+  include 'Var_Mod/Bnd_Cond_Name.f90'
   include 'Var_Mod/Bnd_Cond_Type.f90'
 
   end module
