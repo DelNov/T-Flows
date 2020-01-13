@@ -46,7 +46,6 @@
 
   ! Parameters for size of typical variables in bytes
   integer, parameter :: SIZE_INT  = 8
-  integer, parameter :: SIZE_LOG  = 8
   integer, parameter :: SIZE_REAL = 8
 
   integer :: this_proc  ! processor i.d.
@@ -59,7 +58,6 @@
   include 'Comm_Mod/Sequential/End.f90'
   include 'Comm_Mod/Sequential/Exchange_Int_Array.f90'
   include 'Comm_Mod/Sequential/Exchange_Real_Array.f90'
-  include 'Comm_Mod/Sequential/Global_Lor_Log_Array.f90'
   include 'Comm_Mod/Sequential/Global_Max_Real.f90'
   include 'Comm_Mod/Sequential/Global_Min_Real.f90'
   include 'Comm_Mod/Sequential/Global_Max_Int.f90'
@@ -72,7 +70,6 @@
   include 'Comm_Mod/Sequential/Open_File_Write.f90'
   include 'Comm_Mod/Sequential/Read_Int.f90'
   include 'Comm_Mod/Sequential/Read_Int_Array.f90'
-  include 'Comm_Mod/Sequential/Read_Log_Array.f90'
   include 'Comm_Mod/Sequential/Read_Bnd_Real.f90'
   include 'Comm_Mod/Sequential/Read_Cell_Real.f90'
   include 'Comm_Mod/Sequential/Read_Real.f90'
@@ -82,7 +79,6 @@
   include 'Comm_Mod/Sequential/Wait.f90'
   include 'Comm_Mod/Sequential/Write_Int.f90'
   include 'Comm_Mod/Sequential/Write_Int_Array.f90'
-  include 'Comm_Mod/Sequential/Write_Log_Array.f90'
   include 'Comm_Mod/Sequential/Write_Bnd_Real.f90'
   include 'Comm_Mod/Sequential/Write_Cell_Real.f90'
   include 'Comm_Mod/Sequential/Write_Real.f90'

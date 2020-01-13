@@ -26,7 +26,7 @@
   call Backup_Mod_Write_Int(fh, disp, vc, 'n_particles', swr % n_particles)
 
   i_work(:) = 0
-  l_work(:) = .false.
+  l_work(:) = 0
   r_work(:) = 0.0
 
   ! Pack particle data in arrays
@@ -67,7 +67,7 @@
     call Backup_Mod_Write_Int_Array(fh, disp, vc,         &
                                     'particle_int_data',  &
                                     i_work(1:N_I_VARS*swr % n_particles))
-    call Backup_Mod_Write_Log_Array(fh, disp, vc,         &
+    call Backup_Mod_Write_Int_Array(fh, disp, vc,         &
                                     'particle_log_data',  &
                                     l_work(1:N_L_VARS*swr % n_particles))
     call Backup_Mod_Write_Real_Array(fh, disp, vc,          &

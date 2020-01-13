@@ -10,8 +10,8 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: grid
   type(Particle_Type), pointer :: part
-  logical,             pointer :: deposited            ! part. deposition flag
-  logical,             pointer :: escaped              ! part. departure  flag
+  integer,             pointer :: deposited            ! part. deposition flag
+  integer,             pointer :: escaped              ! part. departure  flag
   integer                      :: c, c2, s             ! nearest cells, face
   real                         :: vel_dot_n
   real                         :: rx_nx_o, ry_ny_o, rz_nz_o,              &
@@ -123,7 +123,7 @@
 
         ! Trap condition (deposition)
         if(swarm % rst <= TINY .or. abs(vel_dot_n) <= 1.0e-3) then
-          deposited = .true.
+          deposited = 1
           swarm % cnt_d = swarm % cnt_d + 1
           print *, k, 'Particle is deposited at: ', xi, yi, zi, f
 
@@ -163,7 +163,7 @@
       !   The boundary cell is an outlet   !
       !------------------------------------!
       if(Grid_Mod_Bnd_Cond_Type(grid, c2) == OUTFLOW) then
-        escaped =  .true.
+        escaped =  1
         swarm % cnt_e = swarm % cnt_e + 1
         print *, k, 'Particle escaped from outlet at: ', xi, yi, zi, f
       end if  ! it is an outflow

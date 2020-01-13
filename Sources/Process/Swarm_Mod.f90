@@ -62,8 +62,8 @@
     real :: ft_x, ft_y, ft_z  ! total force
 
     ! Particle deposition and departure from domain 
-    logical :: deposited
-    logical :: escaped
+    integer :: deposited
+    integer :: escaped
 
     ! Particle inside the subdomain
     integer :: proc
@@ -112,7 +112,7 @@
   integer, parameter   :: N_L_VARS = 2
   integer, parameter   :: N_R_VARS = 8
   integer, allocatable :: i_work(:)
-  logical, allocatable :: l_work(:)
+  integer, allocatable :: l_work(:) ! 0 or 1
   real,    allocatable :: r_work(:)
 
   contains
