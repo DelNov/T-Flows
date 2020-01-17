@@ -129,7 +129,7 @@
         turb % p_kin(c1) = p_kin_int * exp(-1.0 * ebf) + p_kin_wf  &
                            * exp(-1.0 / ebf)
 
-        fa = min(p_kin_wf * exp(-1.0 / ebf)/turb % p_kin(c1) , 1.0)
+        fa = min( p_kin_wf * exp(-1.0 / ebf) / (turb % p_kin(c1) + TINY), 1.0)
 
         eps % n(c1) = (1.0 - fa)**0.5 * eps_int + fa**0.5 * eps_wf
 
