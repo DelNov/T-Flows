@@ -231,6 +231,9 @@
 
     do ini = 1, max_ini
 
+      ! Beginning of iteration
+      call User_Mod_Beginning_Of_Iteration(flow, turb, mult, swarm, n, time)
+
       call Info_Mod_Iter_Fill(ini)
 
       call Field_Mod_Grad_Pressure(flow, flow % p,  &
@@ -277,6 +280,9 @@
 
       ! End of the current iteration
       call Info_Mod_Iter_Print()
+
+      ! End of iteration
+      call User_Mod_End_Of_Iteration(flow, turb, mult, swarm, n, time)
 
       if(ini >= min_ini) then
         call Control_Mod_Tolerance_For_Simple_Algorithm(simple_tol)
