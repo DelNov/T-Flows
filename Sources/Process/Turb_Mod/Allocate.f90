@@ -27,14 +27,16 @@
   allocate(turb % h_min(-nb:nc));  turb % h_min = 0.
   allocate(turb % h_w  (-nb:nc));  turb % h_w   = 0.
 
+  allocate(turb % tau_wall(-nb:nc));  turb % tau_wall = 0.
+
   !-----------------!
   !   K-eps model   !
   !-----------------!
   if(turbulence_model .eq. K_EPS) then
 
     ! Variables we solve for: k and epsilon
-    call Var_Mod_Allocate_Solution('KIN', '', turb % kin, grid)
-    call Var_Mod_Allocate_Solution('EPS', '', turb % eps, grid)
+    call Var_Mod_Allocate_Solution(turb % kin, grid, 'KIN', '')
+    call Var_Mod_Allocate_Solution(turb % eps, grid, 'EPS', '')
 
     ! Other turbulent quantities
     allocate(turb % vis_t (-nb:nc));  turb % vis_t  = 0.
@@ -43,10 +45,10 @@
     allocate(turb % y_plus(-nb:nc));  turb % y_plus = 0.
 
     if(heat_transfer) then
-      call Var_Mod_Allocate_Solution('T2', '', turb % t2, grid)
-      call Var_Mod_Allocate_New_Only('UT', turb % ut, grid)
-      call Var_Mod_Allocate_New_Only('VT', turb % vt, grid)
-      call Var_Mod_Allocate_New_Only('WT', turb % wt, grid)
+      call Var_Mod_Allocate_Solution(turb % t2, grid, 'T2', '')
+      call Var_Mod_Allocate_New_Only(turb % ut, grid, 'UT')
+      call Var_Mod_Allocate_New_Only(turb % vt, grid, 'VT')
+      call Var_Mod_Allocate_New_Only(turb % wt, grid, 'WT')
       allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
       allocate(turb % p_t2 (-nb:nc));  turb % p_t2  = 0.
     end if ! heat_transfer
@@ -93,10 +95,10 @@
   if(turbulence_model .eq. K_EPS_ZETA_F) then
 
     ! Main model's variables
-    call Var_Mod_Allocate_Solution('KIN',  '', turb % kin,  grid)
-    call Var_Mod_Allocate_Solution('EPS',  '', turb % eps,  grid)
-    call Var_Mod_Allocate_Solution('ZETA', '', turb % zeta, grid)
-    call Var_Mod_Allocate_Solution('F22',  '', turb % f22,  grid)
+    call Var_Mod_Allocate_Solution(turb % kin,  grid, 'KIN',  '')
+    call Var_Mod_Allocate_Solution(turb % eps,  grid, 'EPS',  '')
+    call Var_Mod_Allocate_Solution(turb % zeta, grid, 'ZETA', '')
+    call Var_Mod_Allocate_Solution(turb % f22,  grid, 'F22',  '')
 
     ! Other variables such as time scale, length scale and production
     allocate(turb % t_scale (-nb:nc));  turb % t_scale = 0.
@@ -114,10 +116,10 @@
     end if
 
     if(heat_transfer) then
-      call Var_Mod_Allocate_Solution('T2', '', turb % t2, grid)
-      call Var_Mod_Allocate_New_Only('UT', turb % ut, grid)
-      call Var_Mod_Allocate_New_Only('VT', turb % vt, grid)
-      call Var_Mod_Allocate_New_Only('WT', turb % wt, grid)
+      call Var_Mod_Allocate_Solution(turb % t2, grid, 'T2', '')
+      call Var_Mod_Allocate_New_Only(turb % ut, grid, 'UT')
+      call Var_Mod_Allocate_New_Only(turb % vt, grid, 'VT')
+      call Var_Mod_Allocate_New_Only(turb % wt, grid, 'WT')
       allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
       allocate(turb % p_t2 (-nb:nc));  turb % p_t2  = 0.
     end if ! heat_transfer
@@ -181,20 +183,20 @@
     allocate(turb % y_plus (-nb:nc));  turb % y_plus  = 0.
 
     ! Reynolds stresses
-    call Var_Mod_Allocate_Solution('UU', '', turb % uu, grid)
-    call Var_Mod_Allocate_Solution('VV', '', turb % vv, grid)
-    call Var_Mod_Allocate_Solution('WW', '', turb % ww, grid)
-    call Var_Mod_Allocate_Solution('UV', '', turb % uv, grid)
-    call Var_Mod_Allocate_Solution('UW', '', turb % uw, grid)
-    call Var_Mod_Allocate_Solution('VW', '', turb % vw, grid)
+    call Var_Mod_Allocate_Solution(turb % uu, grid, 'UU', '')
+    call Var_Mod_Allocate_Solution(turb % vv, grid, 'VV', '')
+    call Var_Mod_Allocate_Solution(turb % ww, grid, 'WW', '')
+    call Var_Mod_Allocate_Solution(turb % uv, grid, 'UV', '')
+    call Var_Mod_Allocate_Solution(turb % uw, grid, 'UW', '')
+    call Var_Mod_Allocate_Solution(turb % vw, grid, 'VW', '')
 
-    call Var_Mod_Allocate_New_Only('KIN',     turb % kin, grid)
-    call Var_Mod_Allocate_Solution('EPS', '', turb % eps, grid)
+    call Var_Mod_Allocate_New_Only(turb % kin, grid, 'KIN')
+    call Var_Mod_Allocate_Solution(turb % eps, grid, 'EPS', '')
 
     if(heat_transfer) then
-      call Var_Mod_Allocate_New_Only('UT', turb % ut, grid)
-      call Var_Mod_Allocate_New_Only('VT', turb % vt, grid)
-      call Var_Mod_Allocate_New_Only('WT', turb % wt, grid)
+      call Var_Mod_Allocate_New_Only(turb % ut, grid, 'UT')
+      call Var_Mod_Allocate_New_Only(turb % vt, grid, 'VT')
+      call Var_Mod_Allocate_New_Only(turb % wt, grid, 'WT')
       allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
     end if ! heat_transfer
 
@@ -239,7 +241,7 @@
 
     if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
 
-      call Var_Mod_Allocate_Solution('F22', '', turb % f22, grid)
+      call Var_Mod_Allocate_Solution(turb % f22, grid, 'F22', '')
 
       if(turbulence_statistics) then
         allocate(turb % f22_mean(-nb:nc));  turb % f22_mean  = 0.
@@ -255,7 +257,7 @@
   if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
      turbulence_model .eq. DES_SPALART) then
 
-    call Var_Mod_Allocate_Solution('VIS', '', turb % vis, grid)
+    call Var_Mod_Allocate_Solution(turb % vis, grid, 'VIS', '')
 
     ! Other variables such as time scale, length scale and production
     allocate(turb % t_scale (-nb:nc));  turb % t_scale = 0.
@@ -266,9 +268,9 @@
     allocate(turb % y_plus  (-nb:nc));  turb % y_plus  = 0.
 
     if(heat_transfer) then
-      call Var_Mod_Allocate_New_Only('UT', turb % ut, grid)
-      call Var_Mod_Allocate_New_Only('VT', turb % vt, grid)
-      call Var_Mod_Allocate_New_Only('WT', turb % wt, grid)
+      call Var_Mod_Allocate_New_Only(turb % ut, grid, 'UT')
+      call Var_Mod_Allocate_New_Only(turb % vt, grid, 'VT')
+      call Var_Mod_Allocate_New_Only(turb % wt, grid, 'WT')
       allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
     end if ! heat_transfer
 
@@ -324,9 +326,9 @@
     allocate(turb % y_plus  (-nb:nc));  turb % y_plus  = 0.
 
     if(heat_transfer) then
-      call Var_Mod_Allocate_New_Only('UT', turb % ut, grid)
-      call Var_Mod_Allocate_New_Only('VT', turb % vt, grid)
-      call Var_Mod_Allocate_New_Only('WT', turb % wt, grid)
+      call Var_Mod_Allocate_New_Only(turb % ut, grid, 'UT')
+      call Var_Mod_Allocate_New_Only(turb % vt, grid, 'VT')
+      call Var_Mod_Allocate_New_Only(turb % wt, grid, 'WT')
       allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
     end if ! heat_transfer
 
@@ -379,9 +381,9 @@
     allocate(turb % y_plus  (-nb:nc));  turb % y_plus  = 0.
 
     if(heat_transfer) then
-      call Var_Mod_Allocate_New_Only('UT', turb % ut, grid)
-      call Var_Mod_Allocate_New_Only('VT', turb % vt, grid)
-      call Var_Mod_Allocate_New_Only('WT', turb % wt, grid)
+      call Var_Mod_Allocate_New_Only(turb % ut, grid, 'UT')
+      call Var_Mod_Allocate_New_Only(turb % vt, grid, 'VT')
+      call Var_Mod_Allocate_New_Only(turb % wt, grid, 'WT')
       allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
     end if ! heat_transfer
 
@@ -432,9 +434,9 @@
     allocate(turb % y_plus  (-nb:nc));  turb % y_plus  = 0.
 
     if(heat_transfer) then
-      call Var_Mod_Allocate_New_Only('UT', turb % ut, grid)
-      call Var_Mod_Allocate_New_Only('VT', turb % vt, grid)
-      call Var_Mod_Allocate_New_Only('WT', turb % wt, grid)
+      call Var_Mod_Allocate_New_Only(turb % ut, grid, 'UT')
+      call Var_Mod_Allocate_New_Only(turb % vt, grid, 'VT')
+      call Var_Mod_Allocate_New_Only(turb % wt, grid, 'WT')
       allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
     end if ! heat_transfer
 
@@ -486,9 +488,9 @@
 
     if(heat_transfer) then
 
-      call Var_Mod_Allocate_New_Only('UT', turb % ut, grid)
-      call Var_Mod_Allocate_New_Only('VT', turb % vt, grid)
-      call Var_Mod_Allocate_New_Only('WT', turb % wt, grid)
+      call Var_Mod_Allocate_New_Only(turb % ut, grid, 'UT')
+      call Var_Mod_Allocate_New_Only(turb % vt, grid, 'VT')
+      call Var_Mod_Allocate_New_Only(turb % wt, grid, 'WT')
       allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
 
     end if ! heat_transfer
@@ -530,10 +532,10 @@
   if(turbulence_model .eq. HYBRID_LES_RANS) then
 
     ! Main model's variables (for RANS part)
-    call Var_Mod_Allocate_Solution('KIN',  '', turb % kin,  grid)
-    call Var_Mod_Allocate_Solution('EPS',  '', turb % eps,  grid)
-    call Var_Mod_Allocate_Solution('ZETA', '', turb % zeta, grid)
-    call Var_Mod_Allocate_Solution('F22',  '', turb % f22,  grid)
+    call Var_Mod_Allocate_Solution(turb % kin,  grid, 'KIN',  '')
+    call Var_Mod_Allocate_Solution(turb % eps,  grid, 'EPS',  '')
+    call Var_Mod_Allocate_Solution(turb % zeta, grid, 'ZETA', '')
+    call Var_Mod_Allocate_Solution(turb % f22,  grid, 'F22',  '')
 
     ! Main model's variables (for LES part)
     allocate(turb % c_dyn(-nb:nc));  turb % c_dyn = 0.
@@ -551,10 +553,10 @@
     allocate(turb % y_plus   (-nb:nc));  turb % y_plus    = 0.
 
     if(heat_transfer) then
-      call Var_Mod_Allocate_Solution('T2', '', turb % t2, grid)
-      call Var_Mod_Allocate_New_Only('UT', turb % ut, grid)
-      call Var_Mod_Allocate_New_Only('VT', turb % vt, grid)
-      call Var_Mod_Allocate_New_Only('WT', turb % wt, grid)
+      call Var_Mod_Allocate_Solution(turb % t2, grid, 'T2', '')
+      call Var_Mod_Allocate_New_Only(turb % ut, grid, 'UT')
+      call Var_Mod_Allocate_New_Only(turb % vt, grid, 'VT')
+      call Var_Mod_Allocate_New_Only(turb % wt, grid, 'WT')
       allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
       allocate(turb % p_t2 (-nb:nc));  turb % p_t2  = 0.
     end if ! heat_transfer

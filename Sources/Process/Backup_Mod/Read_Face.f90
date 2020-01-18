@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Backup_Mod_Read_Face(fh, disp, vc, grid, flux)
+  subroutine Backup_Mod_Read_Face(comm, fh, disp, vc, grid, flux)
 !------------------------------------------------------------------------------!
 !   Reads face-based variable (flux) using cell-based arrays.                  !
 !------------------------------------------------------------------------------!
@@ -10,6 +10,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  type(Comm_Type) :: comm
   integer         :: fh, disp, vc
   type(Grid_Type) :: grid
   real            :: flux(grid % n_faces)
@@ -72,7 +73,7 @@
     do c = 1, grid % n_cells
       ivalues(c) = cells_cg(mc,c)
     end do
-    call Comm_Mod_Exchange_Int(grid, ivalues)
+    call Grid_Mod_Exchange_Int(grid, ivalues)
 
     ! Update buffer cells with neighbors
     do c = grid % n_cells - grid % comm % n_buff_cells + 1, grid % n_cells
@@ -100,8 +101,9 @@
   do mc = 1, max_cnt
     rvalues(:) = 0.0
     write(cf_name(11:12), '(i2.2)') mc  ! set name of the backup variable
-    call Backup_Mod_Read_Cell(fh, disp, vc, cf_name, rvalues(1:nc_s))
-    call Comm_Mod_Exchange_Real(grid, rvalues)
+    call Backup_Mod_Read_Cell(comm,  &
+                              fh, disp, vc, cf_name, rvalues(1:comm % nc_s))
+    call Grid_Mod_Exchange_Real(grid, rvalues)
     do c = 1, grid % n_cells - grid % comm % n_buff_cells
       if( cells_cg(mc, c) .ne. 0 ) then
         flux( cells_fc(mc, c) ) = rvalues(c)

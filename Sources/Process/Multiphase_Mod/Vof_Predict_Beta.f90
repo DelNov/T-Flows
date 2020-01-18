@@ -4,16 +4,15 @@
                                              phi_x, phi_y, phi_z,  &
                                              di, dj, dk,           &
                                              beta_f,               &
-                                             dt)
+                                             c_d)
 !------------------------------------------------------------------------------!
 !   Computes the value at the cell face using different convective  schemes.   !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: c_d => r_cell_01
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Var_Type) :: phi
+  real           :: phi_flux(phi % pnt_grid % n_faces)
   real           :: phi_x(-phi % pnt_grid % n_bnd_cells:  &
                            phi % pnt_grid % n_cells),     &
                     phi_y(-phi % pnt_grid % n_bnd_cells:  &
@@ -23,51 +22,26 @@
   real           :: di(phi % pnt_grid % n_faces),         &
                     dj(phi % pnt_grid % n_faces),         &
                     dk(phi % pnt_grid % n_faces)
-  real           :: dt
+  real           :: beta_f(phi % pnt_grid % n_faces)
+  real           :: c_d(-phi % pnt_grid % n_bnd_cells:  &
+                         phi % pnt_grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   integer                  :: s
   integer                  :: c1, c2, donor, accept
   real                     :: fs, dot_prod
-  real,        allocatable :: beta_f(:)
-  real,        allocatable :: phi_flux(:)
   real                     :: alfa_u, alfa_d, alfa_a, alfa_d_til, alfa_cbc
   real                     :: alfa_uq, gamma_f, alfa_f_til, signo
   real                     :: alfa_superbee, alfa_stoic
-  real                     :: cod, prodmag, ang
+  real                     :: cod, prodmag, ang, epsloc
 !==============================================================================!
 
   ! Take aliases
   grid => phi % pnt_grid
 
+  epsloc = epsilon(epsloc)
+
   if(phi % adv_scheme .eq. CICSAM) then
-
-    !-----------------------------------------!
-    !   Compute Courant Number in each cell   !
-    !-----------------------------------------!
-    c_d(:) = 0.0
-
-    beta_f(:) = 0.0
-
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
-      fs = grid % f(s)
-
-      ! Face is inside the domain
-      if(c2 > 0) then
-
-        c_d(c1) = c_d(c1) + max(-phi_flux(s) * dt / grid % vol(c1), 0.0)
-        c_d(c2) = c_d(c2) + max(phi_flux(s) * dt / grid % vol(c2), 0.0)
-
-      ! Side is on the boundary
-      else ! (c2 < 0)
-
-        c_d(c1) = c_d(c1) + max(-phi_flux(s) * dt / grid % vol(c1), 0.0)
-
-      end if
-
-    end do
 
     !--------------------!
     !   Compute beta_f   !
@@ -78,7 +52,9 @@
       c2 = grid % faces_c(2,s)
       fs = grid % f(s)
 
-      if (phi_flux(s) .ne. 0.0) then 
+      beta_f(s) = 0.0
+      if (abs(phi_flux(s)) > epsloc) then 
+
         if (phi_flux(s) > 0.0) then
           donor = c1
           accept = c2
@@ -88,8 +64,8 @@
           accept = c1
           signo = - 1.0
         end if
-        if (c2 > 0) then
 
+        if (c2 > 0) then
           alfa_d = phi % n(donor)
           alfa_a = phi % n(accept)
 
@@ -129,13 +105,13 @@
                          + phi_z(donor) ** 2)             &
                     * sqrt(di(s) ** 2 + dj(s) ** 2 + dk(s) ** 2)
 
-            if (abs(prodmag) > TINY) then
+            if (prodmag > TINY) then
               ang = dot_prod / prodmag
             else
               ang = 1.0 / TINY
             end if
 
-            gamma_f = min(abs(ang) ** 2.0, 1.0)
+            gamma_f = min(ang ** 2.0, 1.0)
 
             alfa_f_til = gamma_f * alfa_cbc + (1.0 - gamma_f) * alfa_uq
 
@@ -152,13 +128,14 @@
 
   else if (phi % adv_scheme .eq. STACS) then
 
-    beta_f(:) = 0.0
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
       fs = grid % f(s)
 
-      if (phi_flux(s) .ne. 0.0) then 
+      beta_f(s) = 0.0
+      if (abs(phi_flux(s)) > epsloc) then 
+
         if (phi_flux(s) > 0.0) then
           donor = c1
           accept = c2
@@ -168,6 +145,7 @@
           accept = c1
           signo = - 1.0
         end if
+
         if (c2 > 0) then
 
           alfa_d = phi % n(donor)
@@ -208,10 +186,10 @@
                     * sqrt(di(s) ** 2 + dj(s) ** 2 + dk(s) ** 2)
 
 
-            if (abs(prodmag) > TINY) then
+            if (prodmag > TINY) then
               ang = dot_prod / prodmag
             else
-              ang = cos(PI/2.0)
+              ang = 1.0 / tiny
             end if
 
             gamma_f = min(ang ** 4.0, 1.0)

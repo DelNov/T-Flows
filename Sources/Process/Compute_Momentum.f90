@@ -8,8 +8,7 @@
   use Comm_Mod
   use Cpu_Timer_Mod,  only: Cpu_Timer_Mod_Start, Cpu_Timer_Mod_Stop
   use Field_Mod,      only: Field_Type, buoyancy, t_ref,  &
-                            grav_x, grav_y, grav_z,       &
-                            density, viscosity
+                            grav_x, grav_y, grav_z
   use Turb_Mod
   use Multiphase_Mod, only: Multiphase_Type, &
                             Multiphase_Mod_Vof_Surface_Tension_Contribution,  &
@@ -23,6 +22,7 @@
   use Solver_Mod,     only: Solver_Type, Solver_Mod_Alias_System, Bicg, Cg, Cgs
   use Matrix_Mod,     only: Matrix_Type
   use User_Mod
+  use Work_Mod,       only: one => r_cell_12
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -39,15 +39,15 @@
   type(Matrix_Type), pointer :: a
   type(Var_Type),    pointer :: ui, uj, uk, t, p
   type(Face_Type),   pointer :: m_flux
-  real,              pointer :: b(:)
-  real,              pointer :: ui_i(:), ui_j(:), ui_k(:), uj_i(:), uk_i(:)
-  real,              pointer :: si(:), sj(:), sk(:), di(:), dj(:), dk(:)
-  real,              pointer :: h_i(:)
-  integer                    :: s, c, c1, c2, ci, exec_iter
+  real, contiguous,  pointer :: b(:)
+  real, contiguous,  pointer :: ui_i(:), ui_j(:), ui_k(:), uj_i(:), uk_i(:)
+  real, contiguous,  pointer :: si(:), sj(:), sk(:), di(:), dj(:), dk(:)
+  real, contiguous,  pointer :: h_i(:)
+  integer                    :: s, c, c1, c2, exec_iter
   real                       :: f_ex, f_im, f_stress
   real                       :: vel_max
   real                       :: a0, a12, a21
-  real                       :: vis_eff, vis_tur
+  real                       :: vis_eff
   real                       :: ui_i_f, ui_j_f, ui_k_f, uj_i_f, uk_i_f
   real                       :: grav_i, p_drop_i
   real                       :: ui_si, ui_di
@@ -146,13 +146,13 @@
     p_drop_i = bulk % p_drop_z
   end if
 
+  ! User function
+  call User_Mod_Beginning_Of_Compute_Momentum(flow, turb, mult, dt, ini)
+
   ! Initialize matrix and right hand side
   a % val(:) = 0.0
   b      (:) = 0.0
   f_stress   = 0.0
-
-  ! User function
-  call User_Mod_Beginning_Of_Compute_Momentum(flow, dt, ini)
 
   ! Calculate velocity magnitude for normalization
   vel_max = 0.0
@@ -174,7 +174,8 @@
   !   Advection   !
   !               !
   !---------------!
-  call Numerics_Mod_Advection_Term(ui, 1.0, m_flux % n, sol,  &
+  one(:) = 1.0
+  call Numerics_Mod_Advection_Term(ui, one, m_flux % n, sol,  &
                                    ui_i,                      &
                                    ui_j,                      &
                                    ui_k,                      &
@@ -220,9 +221,9 @@
     f_im = ui_di * a0
 
     ! Cross diffusion part
-    ui % c(c1) = ui % c(c1) + f_ex - f_im + f_stress * density(c1)
+    ui % c(c1) = ui % c(c1) + f_ex - f_im + f_stress * flow % density(c1)
     if(c2  > 0) then
-      ui % c(c2) = ui % c(c2) - f_ex + f_im - f_stress * density(c2)
+      ui % c(c2) = ui % c(c2) - f_ex + f_im - f_stress * flow % density(c2)
     end if
 
     ! Compute the coefficients for the sysytem matrix
@@ -264,7 +265,7 @@
   !   Inertial terms   !
   !                    !
   !--------------------!
-  call Numerics_Mod_Inertial_Term(ui, density, sol, dt)
+  call Numerics_Mod_Inertial_Term(ui, flow % density, sol, dt)
 
   !---------------------------------!
   !                                 !
@@ -292,7 +293,7 @@
   if(buoyancy) then
     if(abs(grav_i) > NANO) then
       do c = 1, grid % n_cells
-        b(c) = b(c) - density(c) * grav_i * (t % n(c) - t_ref)  &
+        b(c) = b(c) - flow % density(c) * grav_i * (t % n(c) - t_ref)  &
              * flow % beta * grid % vol(c)
       end do
     end if
@@ -302,9 +303,11 @@
   !-------------------!
   else
     if(abs(grav_i) > NANO) then
-      do c = 1, grid % n_cells
-        b(c) = b(c) + density(c) * grav_i * grid % vol(c)
-      end do
+      if(multiphase_model .ne. VOLUME_OF_FLUID) then
+        do c = 1, grid % n_cells
+          b(c) = b(c) + flow % density(c) * grav_i * grid % vol(c)
+        end do
+      end if
     end if
   end if
 
@@ -312,32 +315,7 @@
   !   Surface tension contribution   !
   !----------------------------------!
   if(multiphase_model .eq. VOLUME_OF_FLUID) then
-
-    if (surface_tension > TINY ) then
-      if(ui % name .eq. 'U') then
-        call Multiphase_Mod_Vof_Surface_Tension_Contribution(mult)
-        call Grad_Mod_Variable(mult % vof)
-        do c = 1, grid % n_cells
-          b(c) = b(c) + surface_tension * mult % vof % oo(c)  &
-                                        * mult % vof % x(c)   &
-                                        * grid % vol(c)
-        end do
-      else if(ui % name .eq. 'V') then
-        do c = 1, grid % n_cells
-          b(c) = b(c) + surface_tension * mult % vof % oo(c)  &
-                                        * mult % vof % y(c)   &
-                                        * grid % vol(c)
-        end do
-      else if(ui % name .eq. 'W') then
-        do c = 1, grid % n_cells
-          b(c) = b(c) + surface_tension * mult % vof % oo(c)  &
-                                        * mult % vof % z(c)   &
-                                        * grid % vol(c)
-        end do
-      end if
-
-    end if
-
+    call Multiphase_Mod_Vof_Momentum_Contribution(mult, i, b)
   end if
 
   !----------------------------------------!
@@ -375,10 +353,10 @@
   ! Fill the info screen up
   call Info_Mod_Iter_Fill_At(1, i, ui % name, exec_iter, ui % res)
 
-  call Comm_Mod_Exchange_Real(grid, ui % n)
+  call Grid_Mod_Exchange_Real(grid, ui % n)
 
   ! User function
-  call User_Mod_End_Of_Compute_Momentum(flow, dt, ini)
+  call User_Mod_End_Of_Compute_Momentum(flow, turb, mult, dt, ini)
 
   call Cpu_Timer_Mod_Stop('Compute_Momentum (without solvers)')
 

@@ -94,8 +94,8 @@
 
     ! If processor number in the cell is differnt than this_proc 
     ! (and vert % proc in this case) you entered the buffer
-    if(grid % comm % proces(cc) .ne. vert % proc) then
-      vert % buff = grid % comm % proces(cc)  ! store buffer process
+    if(grid % comm % cell_proc(cc) .ne. vert % proc) then
+      vert % buff = grid % comm % cell_proc(cc)  ! store buffer process
       n_verts_in_buffers = n_verts_in_buffers + 1
     end if
 

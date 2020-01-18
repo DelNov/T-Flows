@@ -3,14 +3,46 @@
 !------------------------------------------------------------------------------!
 !   Module for no MPI functionality.                                           !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use File_Mod
-  use Grid_Mod, only: Grid_Type
-!------------------------------------------------------------------------------!
   implicit none
 !----------------------------------[Include]-----------------------------------!
 ! include 'mpif.h'
 !==============================================================================!
+
+  !---------------!
+  !               !
+  !   Comm type   !
+  !               !
+  !---------------!
+  type Comm_Type    ! also used inside the Grid_Type) 
+
+    ! Number of buffer cells
+    integer :: n_buff_cells
+
+    ! For each buffer region: index of start (_s) and end (_e) buffer cell
+    ! (Follows nomenclature in "../Shared/Bnd_Cond_Mod.f90")
+    integer, allocatable :: buff_s_cell(:), buff_e_cell(:)
+
+    ! Processor i.d. defined for each cell
+    integer, allocatable :: cell_proc(:)
+
+    ! Buffer index
+    integer, allocatable :: buff_index(:)
+
+    ! Global cell numbers
+    integer, allocatable :: cell_glo(:)
+
+    ! (kind=4) coud not be avoided here :-(
+    integer(kind=4), allocatable :: cell_map(:)
+    integer(kind=4), allocatable :: bnd_cell_map(:)
+
+    ! Variables which follow are for backup saving to single file
+    ! (These should probably be inside the Comm_Type)
+    integer :: nc_s   ! number of cells in subdomain
+    integer :: nb_s   ! number of bundary cells in subdoima
+    integer :: nc_t   ! total number of cells 
+    integer :: nb_t   ! total number of bundary cells
+
+  end type
 
   ! Parameters for size of typical variables in bytes
   integer, parameter :: SIZE_INT  = 8
@@ -20,21 +52,13 @@
   integer :: this_proc  ! processor i.d.
   integer :: n_proc     ! number of processors
 
-  ! Variables which follow are for backup saving to single file
-  integer :: nc_s   ! number of cells in subdomain
-  integer :: nb_s   ! number of bundary cells in subdoima
-  integer :: nc_t   ! total number of cells 
-  integer :: nb_t   ! total number of bundary cells
-
   contains
 
-  include 'Comm_Mod/Sequential/Allocate.f90'
   include 'Comm_Mod/Sequential/Close_File.f90'
-  include 'Comm_Mod/Sequential/Create_Buffers.f90'
   include 'Comm_Mod/Sequential/Create_New_Types.f90'
   include 'Comm_Mod/Sequential/End.f90'
-  include 'Comm_Mod/Sequential/Exchange_Int.f90'
-  include 'Comm_Mod/Sequential/Exchange_Real.f90'
+  include 'Comm_Mod/Sequential/Exchange_Int_Array.f90'
+  include 'Comm_Mod/Sequential/Exchange_Real_Array.f90'
   include 'Comm_Mod/Sequential/Global_Lor_Log_Array.f90'
   include 'Comm_Mod/Sequential/Global_Max_Real.f90'
   include 'Comm_Mod/Sequential/Global_Min_Real.f90'
@@ -44,7 +68,6 @@
   include 'Comm_Mod/Sequential/Global_Sum_Int_Array.f90'
   include 'Comm_Mod/Sequential/Global_Sum_Real.f90'
   include 'Comm_Mod/Sequential/Global_Sum_Real_Array.f90'
-  include 'Comm_Mod/Sequential/Load_Maps.f90'
   include 'Comm_Mod/Sequential/Open_File_Read.f90'
   include 'Comm_Mod/Sequential/Open_File_Write.f90'
   include 'Comm_Mod/Sequential/Read_Int.f90'
@@ -55,7 +78,6 @@
   include 'Comm_Mod/Sequential/Read_Real.f90'
   include 'Comm_Mod/Sequential/Read_Real_Array.f90'
   include 'Comm_Mod/Sequential/Read_Text.f90'
-  include 'Comm_Mod/Sequential/Set_Buffer_Color.f90'
   include 'Comm_Mod/Sequential/Start.f90'
   include 'Comm_Mod/Sequential/Wait.f90'
   include 'Comm_Mod/Sequential/Write_Int.f90'

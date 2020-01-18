@@ -15,31 +15,29 @@
   ! Store the pointer to a grid
   flow % pnt_grid => grid
 
+  call Field_Mod_Allocate_Grad_Matrix(flow)
+
   !----------------------------!
   !   Navier-Stokes equation   !
   !----------------------------!
 
   ! Allocate memory for velocity components
-  call Var_Mod_Allocate_Solution('U', '', flow % u, grid)
-  call Var_Mod_Allocate_Solution('V', '', flow % v, grid)
-  call Var_Mod_Allocate_Solution('W', '', flow % w, grid)
+  call Var_Mod_Allocate_Solution(flow % u, grid, 'U', '')
+  call Var_Mod_Allocate_Solution(flow % v, grid, 'V', '')
+  call Var_Mod_Allocate_Solution(flow % w, grid, 'W', '')
 
   ! Allocate memory for pressure correction and pressure
-  call Var_Mod_Allocate_New_Only('PP', flow % pp, grid)
-  call Var_Mod_Allocate_New_Only('P',  flow % p,  grid)
+  call Var_Mod_Allocate_New_Only(flow % pp, grid, 'PP')
+  call Var_Mod_Allocate_New_Only(flow % p,  grid, 'P')
 
   ! Allocate memory for mass and volumetric fluxes
-  call Face_Mod_Allocate_New_Only   ('M_FLUX', flow % m_flux, grid)
-  call Face_Mod_Allocate_New_And_Old('V_FLUX', flow % v_flux, grid)
-
-  ! density at cell faces:
-  allocate(dens_face(grid % n_faces))
+  call Face_Mod_Allocate_New_Only(flow % m_flux, grid, 'M_FLUX')
 
   !-----------------------------------------!
   !   Enthalpy conservation (temperature)   !
   !-----------------------------------------!
   if(heat_transfer) then
-    call Var_Mod_Allocate_Solution('T', 'Q', flow % t, grid)
+    call Var_Mod_Allocate_Solution(flow % t, grid, 'T', 'Q')
   end if ! heat_transfer
 
   allocate(flow % vort (-grid % n_bnd_cells:grid % n_cells)); flow % vort  = 0.
@@ -62,7 +60,7 @@
     write(q_name(3:4),'(i2.2)') sc
 
     ! Allocate memory for passive scalar
-    call Var_Mod_Allocate_Solution(c_name, q_name, flow % scalar(sc), grid)
+    call Var_Mod_Allocate_Solution(flow % scalar(sc), grid, c_name, q_name)
 
   end do
 

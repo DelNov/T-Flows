@@ -16,12 +16,11 @@ DEBUG = no
 
 # Compile for MPI ("yes" or "no")
 MPI = no
-# MPI implementation ("openmpi" or "mpich")
-# Warning: change line "FC = mpif90" to your compiler
-MPI_TYPE = openmpi
 
 # Link with CGNS ("yes" or "no")
 CGNS = no
+# MPI implementation used in parallel CGNS lib ("openmpi" or "mpich")
+CGNS_MPI = openmpi
 
 # Directories for objects and modules. (No need to change.)
 DIR_BINARY = ../../Binaries
@@ -38,22 +37,22 @@ VPATH = $(DIR_SHARED):$(DIR_TURBUL):$(DIR_SWARM):.
 PROGRAM_NAME = Process
 PROGRAM_FILE = $(DIR_BINARY)/$(PROGRAM_NAME)
 
+ifeq ($(MAKECMDGOALS), clean)
 $(info #=======================================================================)
-$(info # Compiling $(PROGRAM_NAME) with compiler $(FORTRAN)                    )
-$(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
-$(info #   make <FORTRAN=gnu/intel/portland> <DEBUG=yes/no> <CGNS=yes/no>      )
-$(info #        <MPI=yes/no> <MPI_TYPE=openmpi/mpich>                          )
-$(info #        <DIR_CASE=relative_path_to_case>                               )
+$(info #   make <FORTRAN=gnu/intel/portland> <DEBUG=yes/no> <MPI=yes/no>       )
+$(info #        <FCOMP=gfortran/ifort/pgf90/mpif90/...>                        )
+$(info #        <CGNS=yes/no> <CGNS_MPI=openmpi/mpich>                         )
+$(info #        <DIR_CASE=full_or_relative_path_to_case>                       )
 $(info #                                                                       )
 $(info # Examples:                                                             )
 $(info #   make                       - sequential version with gnu compiler   )
 $(info #   make MPI=yes               - parallel version with gnu compiler     )
+$(info #   make MPI=yes FCOMP=compiler- parallel version with custom compiler  )
 $(info #   make FORTRAN=intel MPI=yes - parallel version with intel compiler   )
 $(info #   make MPI=yes CGNS=yes      - parallel version with CGNS/HDF5 support)
-$(info #   make MPI=yes MPI_TYPE=mpich- parallel version with MPICH/OpenMPI mpi)
 $(info #-----------------------------------------------------------------------)
-
+endif
 #-------------------------------------------------------------------------------
 #   Compiler and linker options
 #-------------------------------------------------------------------------------
@@ -62,7 +61,11 @@ $(info #-----------------------------------------------------------------------)
 
 # Fortran == gnu
 ifeq ($(FORTRAN), gnu)
-  FC = gfortran
+  ifeq ($(FCOMP),)
+    FC = gfortran
+  else
+    FC = $(FCOMP)
+  endif
   ifeq ($(DEBUG),yes)
     OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8 -fdefault-integer-8 -O0 -g \
                -ffixed-line-length-80 -fcheck=all -fwhole-file -fbacktrace  \
@@ -83,7 +86,11 @@ endif
 
 # Fortran == intel
 ifeq ($(FORTRAN), intel)
-  FC = ifort
+  ifeq ($(FCOMP),)
+    FC = ifort
+  else
+    FC = $(FCOMP)
+  endif
   ifeq ($(DEBUG),yes)
     OPT_COMP = -module $(DIR_MODULE) -r8 -i8 -O0 -g -warn all -check all \
                -debug all -fpe-all=0 -traceback
@@ -95,7 +102,11 @@ endif
 
 # Fortran == portland
 ifeq ($(FORTRAN), portland)
-  FC = pgfortran
+  ifeq ($(FCOMP),)
+    FC = pgfortran
+  else
+    FC = $(FCOMP)
+  endif
   ifeq ($(DEBUG),yes)
     OPT_COMP = -module $(DIR_MODULE) -r8 -i8 -O0 -g
   else
@@ -106,19 +117,30 @@ endif
 
 # Use here your command for mpi fortran compiler:
 ifeq ($(MPI), yes)
-  FC = mpif90
+  ifeq ($(FCOMP),)
+    FC = mpif90
+  else
+    FC = $(FCOMP)
+  endif
+endif
+
+# If not "make clean"
+ifneq ($(MAKECMDGOALS), clean)
+$(info #=======================================================================)
+$(info # Compiling $(PROGRAM_NAME) with $(FC) compiler                         )
+$(info #-----------------------------------------------------------------------)
 endif
 
 # If compiling with CGNS, add path to include directory
 ifeq ($(CGNS), yes)
   ifeq ($(MPI), yes)
-    ifeq ($(MPI_TYPE), openmpi)
+    ifeq ($(CGNS_MPI), openmpi)
       VALUE = $(shell echo Using CGNS library built on OpenMPI MPI implementation)
       DIR_CGNS_H  = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Par_Openmpi/Include
       CGNS_LIB    = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Par_Openmpi/Lib/libcgns.a \
                     ../Libraries/Hdf5_Par_Openmpi/Lib/libhdf5.a -ldl
     endif
-    ifeq ($(MPI_TYPE), mpich)
+    ifeq ($(CGNS_MPI), mpich)
       VALUE = $(shell echo Using CGNS library built on MPICH MPI implementation)
       DIR_CGNS_H  = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Par_Mpich/Include
       CGNS_LIB    = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Par_Mpich/Lib/libcgns.a \
@@ -168,7 +190,7 @@ ifneq ($(DIR_CASE), no)
 
       # Append "../" to each of the file names
       SRC_USR = $(patsubst %.f90, ../%.f90, $(STEP_A))
-      $(info  $(SRC_USR))
+      $(info $(SRC_USR))
 
       ifneq ("$(wildcard $(STEP_A))","")
         # Make soft links
@@ -183,32 +205,29 @@ endif
 #   Modules
 #-------------
 
-# Modules in shared directory
-SRC_MOD = Const_Mod.f90		\
-          Sort_Mod.f90		\
-          Math_Mod.f90		\
-          File_Mod.f90		\
-          Div_Mod.f90		\
-          Grid_Mod.f90		\
-          Grid_Level_Mod.f90	\
-          Work_Mod.f90		\
-          Material_Mod.f90	\
-          Metis_Options_Mod.f90
-
 # Conditional support for MPI communication
 ifeq ($(MPI), yes)
-  SRC_MOD += Comm_Mod_Par.f90
-  COMM_OBJ = Comm_Mod_Par.o
+  SRC_MOD  = Comm_Mod_Par.f90
 else
-  SRC_MOD += Comm_Mod_Seq.f90
-  COMM_OBJ = Comm_Mod_Seq.o
+  SRC_MOD  = Comm_Mod_Seq.f90
 endif
 
-SRC_MOD += Cpu_Timer_Mod.f90
+# Modules in shared directory
+SRC_MOD += Const_Mod.f90	\
+           Cpu_Timer_Mod.f90	\
+           Sort_Mod.f90		\
+           Math_Mod.f90		\
+           File_Mod.f90		\
+           Control_Mod.f90	\
+           Div_Mod.f90		\
+           Grid_Mod.f90		\
+           Grid_Level_Mod.f90	\
+           Work_Mod.f90		\
+           Material_Mod.f90	\
+           Metis_Options_Mod.f90
 
 # Sources for modules in the local directory
-SRC_MOD += Control_Mod.f90	\
-           Info_Mod.f90		\
+SRC_MOD += Info_Mod.f90		\
            Bulk_Mod.f90		\
            Var_Mod.f90		\
            Face_Mod.f90		\
@@ -217,13 +236,15 @@ SRC_MOD += Control_Mod.f90	\
            Solver_Mod.f90	\
            Numerics_Mod.f90	\
            Field_Mod.f90	\
-           Grad_Mod.f90		\
            Eddies_Mod.f90	\
            Monitor_Mod.f90	\
            Turb_Mod.f90		\
            Swarm_Mod.f90	\
            Surf_Mod.f90		\
            Multiphase_Mod.f90
+
+# User_Mod should come before Save_Results_Mod
+SRC_MOD += User_Mod.f90
 
 # Save_Results_Mod - conditional VTU/CGNS support
 ifeq ($(CGNS), no)
@@ -239,8 +260,6 @@ else
              Save_Results_Mod_Cgns.f90
 endif
 
-SRC_MOD += User_Mod.f90
-
 # Backup_Mod should come last because it uses all other modules
 SRC_MOD += Backup_Mod.f90
 
@@ -253,7 +272,9 @@ SRC_MOD += Backup_Mod.f90
 SRC_FUN =  $(shell ls -1 *.f90 | grep -v -i _Mod)
 
 # Non-member functions still residing in Turb_Mod
-SRC_FUN += Y_Plus_Low_Re.f90		\
+SRC_FUN += Tau_Wall_Low_Re.f90		\
+           Tau_Wall_Rough_Walls.f90	\
+           Y_Plus_Low_Re.f90		\
            Y_Plus_Rough_Walls.f90	\
            U_Plus_Log_Law.f90		\
            U_Plus_Rough_Walls.f90	\

@@ -7,18 +7,11 @@
   use Const_Mod
   use Math_Mod
   use Sort_Mod
-  use Comm_Mod,  only: this_proc, n_proc,                  &
-                       Comm_Mod_Global_Min_Int,            &
-                       Comm_Mod_Global_Min_Real,           &
-                       Comm_Mod_Global_Sum_Int,            &
-                       Comm_Mod_Global_Sum_Int_Array,      &
-                       Comm_Mod_Global_Sum_Real_Array
-  use Grid_Mod,  only: Grid_Type !, Grid_Mod_Bnd_Cond_Type,  &
-!                      INFLOW, OUTFLOW, CONVECT, PRESSURE, WALL, WALLFL
-  use Var_Mod,   only: Var_Type
-  use Grad_Mod,  only: Grad_Mod_Variable
-  use Field_Mod, only: Field_Type
-! use Turb_Mod,  only: Turb_Type
+  use Comm_Mod
+  use Grid_Mod
+  use Var_Mod
+  use Field_Mod
+  use Solver_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -99,12 +92,12 @@
     type(Grid_Type),  pointer :: pnt_grid  ! grid for which it is defined
     type(Field_Type), pointer :: pnt_flow  ! flow field for which it is defined
 
-    integer         :: n_elems
-    integer         :: n_verts
-    integer         :: n_sides
-    type(Vert_Type) :: vert(MAX_SURFACE_VERTICES)
-    type(Elem_Type) :: elem(MAX_SURFACE_ELEMENTS)
-    type(Side_Type) :: side(MAX_SURFACE_ELEMENTS * 3)
+    integer                      :: n_elems
+    integer                      :: n_verts
+    integer                      :: n_sides
+    type(Vert_Type), allocatable :: vert(:)
+    type(Elem_Type), allocatable :: elem(:)
+    type(Side_Type), allocatable :: side(:)
 
     ! Logical array if cell has particles
     logical, allocatable :: cell_has_vertex(:)
@@ -125,6 +118,7 @@
   include 'Surf_Mod/Allocate.f90'
   include 'Surf_Mod/Calculate_Element_Normals.f90'
   include 'Surf_Mod/Calculate_Nodal_Values.f90'
+  include 'Surf_Mod/Clean.f90'
   include 'Surf_Mod/Count_Elements_Neighbours.f90'
   include 'Surf_Mod/Count_Vertex_Elements.f90'
   include 'Surf_Mod/Compress_Nodes.f90'

@@ -120,15 +120,15 @@
 
     ! From nf_sub+1 to nf_sub + nbf_sub
     ! (think: are they in right order ?)
-    do subo = 1, maxval(grid % comm % proces(:))
+    do subo = 1, maxval(grid % comm % cell_proc(:))
       do s = 1, grid % n_faces
         if(grid % new_f(s) > nf_sub .and.  &
            grid % new_f(s) <= nf_sub + nbf_sub) then
           c1 = grid % faces_c(1,s)
           c2 = grid % faces_c(2,s)
           if(c2 > 0) then
-            if( (grid % comm % proces(c1) .eq. sub) .and.  &
-                (grid % comm % proces(c2) .eq. subo) ) then
+            if( (grid % comm % cell_proc(c1) .eq. sub) .and.  &
+                (grid % comm % cell_proc(c2) .eq. subo) ) then
               if(var .eq.  1)  write(fu) grid % sx(s)
               if(var .eq.  2)  write(fu) grid % sy(s)
               if(var .eq.  3)  write(fu) grid % sz(s)
@@ -140,8 +140,8 @@
               if(var .eq.  9)  write(fu) grid % yf(s)
               if(var .eq. 10)  write(fu) grid % zf(s)
             end if  
-            if( (grid % comm % proces(c2) .eq. sub) .and.   &
-                (grid % comm % proces(c1) .eq. subo) ) then
+            if( (grid % comm % cell_proc(c2) .eq. sub) .and.   &
+                (grid % comm % cell_proc(c1) .eq. subo) ) then
               if(var .eq.  1)  write(fu) -grid % sx(s)
               if(var .eq.  2)  write(fu) -grid % sy(s)
               if(var .eq.  3)  write(fu) -grid % sz(s)

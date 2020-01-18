@@ -1,44 +1,81 @@
 !==============================================================================!
-  subroutine Surf_Mod_Place_At_Var_Value(surf, phi, phi_e)
+  subroutine Surf_Mod_Place_At_Var_Value(surf, phi, sol, phi_e, verbose)
 !------------------------------------------------------------------------------!
-!   Places surface where variable phi has value phi_e                            !
+!   Places surface where variable phi has value phi_e                          !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: phi_n => r_node_01  ! value at the (static) grid nodes
+  use Work_Mod, only: phi_n   => r_node_01,  &  ! value at the static grid nodes
+                      phi_c   => r_cell_01,  &  ! cell values of phi
+                      phi_o   => r_cell_02,  &  ! original values of phi
+                      phi_cen => r_cell_03,  &
+                      phi_src => r_cell_04
 !------------------------------------------------------------------------------!
 !   Be careful with the above variables from Work_Mod.  They are used by       !
 !   two subroutines in Surf_Mod, hence values shouldn't be changed elsewhere.  !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Surf_Type), target :: surf
-  type(Var_Type),  target :: phi
-  real                    :: phi_e
+  type(Surf_Type),   target :: surf
+  type(Var_Type),    target :: phi
+  type(Solver_Type), target :: sol   ! needed for smoothing
+  real                      :: phi_e
+  logical                   :: verbose
 !------------------------------------------------------------------------------!
   include 'Surf_Mod/Edge_Numbering_Neu.f90'
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
-  type(Vert_Type), pointer :: vert(:)
-  type(Elem_Type), pointer :: elem(:)
-  integer,         pointer :: nv, ne
-  integer, allocatable     :: n_cells_v(:)
-  integer                  :: c, j, n1, n2, v, n_vert, n_verts_in_buffers
-  integer                  :: en(12,2)  ! edge numbering
-  real                     :: phi1, phi2, xn1, yn1, zn1, xn2, yn2, zn2, w1, w2
-  real                     :: surf_v(3)
+  type(Grid_Type),   pointer :: grid
+  type(Field_Type),  pointer :: flow
+  type(Vert_Type),   pointer :: vert(:)
+  type(Elem_Type),   pointer :: elem(:)
+  type(Matrix_Type), pointer :: a
+  integer,           pointer :: nv, ne
+  integer, allocatable       :: n_cells_v(:)
+  integer                    :: c, c1, c2, s, j, n1, n2, run
+  integer                    :: v, n_vert, n_verts_in_buffers
+  integer                    :: en(12,2)  ! edge numbering
+  real                       :: phi1, phi2, xn1, yn1, zn1, xn2, yn2, zn2, w1, w2
+  real                       :: surf_v(3)
 !==============================================================================!
 
   ! Take aliases
+  grid => surf % pnt_grid
+  flow => surf % pnt_flow
   nv   => surf % n_verts
   ne   => surf % n_elems
   vert => surf % vert
   elem => surf % elem
+  a    => sol % a
 
-  call Grad_Mod_Variable(phi)
   call Surf_Mod_Calculate_Nodal_Values(surf, phi)
 
-  ! Take aliases
-  grid => surf % pnt_grid
+  !-----------------------------!
+  !   Smooth the VOF function   !
+  !-----------------------------!
+
+  ! Copy the values from phi % n to local variable
+  phi_o(:) = phi % n(:)
+  phi_c(:) = phi % n(:)
+
+  do run = 1, 16
+    phi_src(:) = 0.0
+    phi_cen(:) = 0.0
+    do s = 1, grid % n_faces
+      c1 = grid % faces_c(1,s)
+      c2 = grid % faces_c(2,s)
+      if(c2 > 0) then
+        phi_src(c1) = phi_src(c1) + a % fc(s) * phi_c(c2)
+        phi_cen(c1) = phi_cen(c1) + a % fc(s)
+        phi_src(c2) = phi_src(c2) + a % fc(s) * phi_c(c1)
+        phi_cen(c2) = phi_cen(c2) + a % fc(s)
+      end if
+    end do
+    do c = 1, grid % n_cells
+      phi_c(c) = 0.1 * phi_c(c) + 0.9 * phi_src(c) / phi_cen(c)
+    end do
+  end do
+
+  phi % n(:) = phi_c(:)
+  call Field_Mod_Grad_Variable(flow, phi)
 
   allocate(n_cells_v(grid % n_cells))
   n_cells_v(:) = 0
@@ -122,17 +159,19 @@
     end if
 
   end do
-  print *, '# Cummulative number of elements found: ', ne
-  print *, '# Cummulative number of vertices found: ', nv
+  if(verbose) then
+    print *, '# Cummulative number of elements found: ', ne
+    print *, '# Cummulative number of vertices found: ', nv
+  end if
 
   !--------------------!
   !                    !
   !   Compress nodes   !
   !                    !
   !--------------------!
-  call Surf_Mod_Compress_Nodes(surf)
+  call Surf_Mod_Compress_Nodes(surf, verbose)
 
-  call Surf_Mod_Find_Sides(surf)
+  call Surf_Mod_Find_Sides(surf, verbose)
 
   !--------------------------------!
   !   Find nearest cell and node   !
@@ -149,6 +188,15 @@
   !                               !
   !-------------------------------!
   call Surf_Mod_Calculate_Element_Normals(surf, phi)
+
+  do j = 1, 3
+    call Surf_Mod_Relax_Topology(surf)
+    call Surf_Mod_Smooth(surf, phi, phi_e)
+  end do
+
+  phi % n(:) = phi_o(:)
+
+  RETURN
 
   do j = 1, 9
     call Surf_Mod_Relax_Topology(surf)

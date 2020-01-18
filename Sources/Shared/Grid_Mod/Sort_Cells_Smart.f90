@@ -1,9 +1,7 @@
 !==============================================================================!
-  Subroutine Grid_Mod_Sort_Cells_Smart(grid)
+  subroutine Grid_Mod_Sort_Cells_Smart(grid)
 !------------------------------------------------------------------------------!
-!   sorts array of faces in a smart way.  that would mean boundary faces       !
-!   first, boundary region by boundary region, then inside faces, then         !
-!   also accordin to indices of cells surrounding a face (c1 and c2).          !
+!   Sorts cells by their geometrical positions.                                !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -62,12 +60,24 @@
     grid % faces_c(1, s) = new_c(c1)
     if(c2 > 0) then
       grid % faces_c(2, s) = new_c(c2)
+
+      ! If the face changed its orientation during cell renumeration
+      if(grid % faces_c(2, s) < grid % faces_c(1, s)) then
+        call Swap_Int(grid % faces_c(1, s), grid % faces_c(2, s))
+        grid % sx(s) = -grid % sx(s)
+        grid % sy(s) = -grid % sy(s)
+        grid % sz(s) = -grid % sz(s)
+        grid % dx(s) = -grid % dx(s)
+        grid % dy(s) = -grid % dy(s)
+        grid % dz(s) = -grid % dz(s)
+        grid % f (s) = 1.0 - grid % f(s)
+      end if
     end if
   end do
 
-  !---------------------------!
-  !   Do the actual sorting   !
-  !---------------------------!
+  !-----------------------------------------------!
+  !   Do the sorting of data pertinent to cells   !
+  !-----------------------------------------------!
   do c = 1, grid % n_cells
     grid % cells_n_nodes(new_c(c)) = i_work_1(c)
     grid % cells_n(1:8, new_c(c))  = i_work_2(1:8, c)

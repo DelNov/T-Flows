@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Comm_Mod_Create_New_Types(grid)
+  subroutine Comm_Mod_Create_New_Types(comm)
 !------------------------------------------------------------------------------!
 !   Creates new data type for MPI I/O.                                         !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Comm_Type) :: comm
 !-----------------------------------[Locals]-----------------------------------!
   integer :: error
 !==============================================================================!
@@ -20,21 +20,21 @@
 !------------------------------------------------------------------------------!
 
   ! Create new type for cells
-  call Mpi_Type_Create_Indexed_Block(nc_s,                   & ! length of map
-                                     1,                      & ! block size
-                                     grid % comm % cell_map, & ! displacements 
-                                     MPI_DOUBLE,             & ! old data type
-                                     cell_map_type,          & ! new data type 
-                                     error)                    ! integer error
+  call Mpi_Type_Create_Indexed_Block(comm % nc_s,     & ! length of map
+                                     1,               & ! block size
+                                     comm % cell_map, & ! displacements 
+                                     MPI_DOUBLE,      & ! old data type
+                                     cell_map_type,   & ! new data type 
+                                     error)             ! integer error
   call Mpi_Type_Commit(cell_map_type, error)
 
   ! Create new type for boundary cells
-  call Mpi_Type_Create_Indexed_Block(max(nb_s,1),                & ! map length
-                                     1,                          & ! block size
-                                     grid % comm % bnd_cell_map, & ! displacem.
-                                     MPI_DOUBLE,                 & ! old type
-                                     bnd_cell_map_type,          & ! new type 
-                                     error)                        ! int. error
+  call Mpi_Type_Create_Indexed_Block(max(comm % nb_s,1),  & ! map length
+                                     1,                   & ! block size
+                                     comm % bnd_cell_map, & ! displacem.
+                                     MPI_DOUBLE,          & ! old type
+                                     bnd_cell_map_type,   & ! new type 
+                                     error)                 ! int. error
   call Mpi_Type_Commit(bnd_cell_map_type, error)
 
   end subroutine

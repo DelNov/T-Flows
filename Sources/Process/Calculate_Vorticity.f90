@@ -11,7 +11,6 @@
   use Comm_Mod
   use Turb_Mod
   use Grid_Mod
-  use Grad_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -27,9 +26,9 @@
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! Velocity gradients
-  call Grad_Mod_Variable(flow % u)
-  call Grad_Mod_Variable(flow % v)
-  call Grad_Mod_Variable(flow % w)
+  call Field_Mod_Grad_Variable(flow, flow % u)
+  call Field_Mod_Grad_Variable(flow, flow % v)
+  call Field_Mod_Grad_Variable(flow, flow % w)
 
   do c = 1, grid % n_cells
     flow % vort(c) = 2.0 * (0.5 * (w % y(c) - v % z(c)))**2  &

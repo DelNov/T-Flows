@@ -8,8 +8,11 @@
   type(Turb_Type),   target :: turb
   type(Solver_Type), target :: sol
 !---------------------------------[Calling]------------------------------------!
-  real :: Y_Plus_Low_Re
   real :: Roughness_Coefficient
+  real :: Tau_Wall_Low_Re
+  real :: Tau_Wall_Rough_Walls
+  real :: Y_Plus_Low_Re
+  real :: Y_Plus_Rough_Walls
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
@@ -18,9 +21,9 @@
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: c, c1, c2, s
-  real                       :: u_tan, u_tau, tau_wall
+  real                       :: u_tan, u_tau
   real                       :: kin_vis  ! [m^2/s]
-  real                       :: ebf, p_kin_int, p_kin_wf
+  real                       :: p_kin_int, p_kin_wf
   real                       :: z_o
 !==============================================================================!
 !   Dimensions:                                                                !
@@ -53,14 +56,14 @@
     b(c) = b(c) + turb % p_kin(c) * grid % vol(c)
 
     a % val(a % dia(c)) = a % val(a % dia(c)) + &
-         density(c) * eps % n(c)/(kin % n(c) + TINY) * grid % vol(c)
+         flow % density(c) * eps % n(c)/(kin % n(c) + TINY) * grid % vol(c)
 
     if (buoyancy) then
       turb % g_buoy(c) = -flow % beta           &
                        * (grav_x * ut % n(c) +  &
                           grav_y * vt % n(c) +  &
                           grav_z * wt % n(c))   &
-                       * density(c)
+                       * flow % density(c)
       b(c) = b(c) + max(0.0, turb % g_buoy(c) * grid % vol(c))
       a % val(a % dia(c)) = a % val(a % dia(c))        &
                           + max(0.0,-turb % g_buoy(c)  &
@@ -76,54 +79,60 @@
     c2 = grid % faces_c(2,s)
 
     if(c2 < 0) then
-      kin_vis = viscosity(c1) / density(c1)
+      kin_vis = flow % viscosity(c1) / flow % density(c1)
       if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
          Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
 
         ! Compute tangential velocity component
         u_tan = Field_Mod_U_Tan(flow, s)
 
+        u_tau = c_mu25 * sqrt(kin % n(c1))
+        turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
+                                          u_tau,                 &
+                                          grid % wall_dist(c1),  &
+                                          kin_vis)
+
+        turb % tau_wall(c1) = Tau_Wall_Low_Re(turb,               &
+                                              flow % density(c1), &
+                                              u_tau,              &
+                                              u_tan,              &
+                                              turb % y_plus(c1))
+
+        p_kin_wf  = turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
+                  / (grid % wall_dist(c1) * kappa)
+
+        p_kin_int = turb % vis_t(c1) * flow % shear(c1)**2
+
+        turb % p_kin(c1) = p_kin_wf
+
         if(turb % rough_walls) then
           z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
-          u_tau = c_mu25 * sqrt(kin % n(c1))
-          turb % y_plus(c1) = u_tau * (grid % wall_dist(c1) + z_o) &
-                            / kin_vis
 
-          tau_wall = density(c1) * kappa * u_tau * u_tan  &
-                   / log(((grid % wall_dist(c1)+z_o) / z_o))
+          turb % y_plus(c1) = Y_Plus_Rough_Walls(turb,                  &
+                                                 u_tau,                 &
+                                                 grid % wall_dist(c1),  &
+                                                 kin_vis)
 
-          turb % p_kin(c1) = tau_wall * c_mu25 * sqrt(kin % n(c1))   &
+          turb % tau_wall(c1) = Tau_Wall_Rough_Walls(turb,                  &
+                                                     flow % density(c1),    &
+                                                     u_tau,                 &
+                                                     u_tan,                 &
+                                                     grid % wall_dist(c1),  &
+                                                     z_o)
+
+          turb % p_kin(c1) = turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
                            / (kappa*(grid % wall_dist(c1) + z_o))
-          b(c1) = b(c1)                                                        &
-                + (turb % p_kin(c1) - turb % vis_t(c1) * flow % shear(c1)**2)  &
-                * grid % vol(c1)
-        else
-          u_tau = c_mu25 * sqrt(kin % n(c1))
-          turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
-                                            u_tau,                 &
-                                            grid % wall_dist(c1),  &
-                                            kin_vis)
 
-          tau_wall = density(c1)*kappa*u_tau*u_tan   &
-                   / log(e_log * max(turb % y_plus(c1), 1.05))
-
-          ebf = 0.01 * turb % y_plus(c1)**4  &
-                     / (1.0 + 5.0 * turb % y_plus(c1))
-
-          p_kin_wf  = tau_wall * c_mu25 * sqrt(kin % n(c1))  &
-                    / (grid % wall_dist(c1) * kappa)
-
-          p_kin_int = turb % vis_t(c1) * flow % shear(c1)**2
-
-          turb % p_kin(c1) = p_kin_int * exp(-1.0 * ebf) + p_kin_wf  &
-                           * exp(-1.0 / ebf)
-
-          b(c1) = b(c1) + (turb % p_kin(c1) - p_kin_int) * grid % vol(c1)
         end if  ! rough_walls
+
+        b(c1) = b(c1)                                                        &
+              + (turb % p_kin(c1) - turb % vis_t(c1) * flow % shear(c1)**2)  &
+              * grid % vol(c1)
+
       end if    ! Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL or WALLFL
     end if      ! c2 < 0
   end do
 
-  call Comm_Mod_Exchange_Real(grid, kin % n)
+  call Grid_Mod_Exchange_Real(grid, kin % n)
 
   end subroutine

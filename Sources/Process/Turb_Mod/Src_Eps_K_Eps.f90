@@ -16,8 +16,9 @@
   type(Turb_Type),   target :: turb
   type(Solver_Type), target :: sol
 !---------------------------------[Calling]------------------------------------!
-  real :: Y_Plus_Low_Re
   real :: Roughness_Coefficient
+  real :: Tau_Wall_Low_Re
+  real :: Y_Plus_Low_Re
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
@@ -26,9 +27,9 @@
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: s, c, c1, c2, j
-  real                       :: u_tan, u_tau, tau_wall
+  real                       :: u_tan, u_tau
   real                       :: re_t, f_mu, u_tau_new, fa, kin_vis
-  real                       :: eps_wf, eps_int, ebf, y_star
+  real                       :: eps_wf, eps_int, y_star
   real                       :: z_o
 !==============================================================================!
 !   Dimensions:                                                                !
@@ -52,7 +53,7 @@
   call Solver_Mod_Alias_System (sol, a, b)
 
   do c = 1, grid % n_cells
-    kin_vis = viscosity(c)/density(c)
+    kin_vis =  flow % viscosity(c) / flow % density(c)
 
     ! Positive contribution:
     b(c) = b(c) + &
@@ -67,8 +68,9 @@
 
     f_mu = min(f_mu,1.0)
 
-    a % val(a % dia(c)) = a % val(a % dia(c)) &
-     + density(c) * f_mu* c_2e * eps % n(c) / kin % n(c) * grid % vol(c)
+    a % val(a % dia(c)) = a % val(a % dia(c))                             &
+                        +    flow % density(c) * f_mu* c_2e * eps % n(c)  &
+                           / kin % n(c) * grid % vol(c)
  
 
     ! Buoyancy contribution
@@ -105,8 +107,8 @@
             a % val(j) = 0.0 
           end do
 
-          b(c1) = eps % n(c1) * density(c1)
-          a % val(a % dia(c1)) = 1.0 * density(c1)
+          b(c1) = eps % n(c1) * flow % density(c1)
+          a % val(a % dia(c1)) = 1.0 * flow % density(c1)
         else
           u_tau = c_mu25 * sqrt(kin % n(c1))
           turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
@@ -114,22 +116,26 @@
                                             grid % wall_dist(c1),  &
                                             kin_vis)
 
-          tau_wall = density(c1)*kappa*u_tau*u_tan   &
-                   / log(e_log * max(turb % y_plus(c1), 1.05))
+          turb % tau_wall(c1) = Tau_Wall_Low_Re(turb,               &
+                                                flow % density(c1), &
+                                                u_tau,              &
+                                                u_tan,              &
+                                                turb % y_plus(c1))
 
-          u_tau_new = sqrt(tau_wall/density(c1))
+          u_tau_new = sqrt(turb % tau_wall(c1) / flow % density(c1))
           turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
                                             u_tau_new,             &
                                             grid % wall_dist(c1),  &
                                             kin_vis)
 
-          eps_int = 2.0*viscosity(c1)/density(c1) * kin % n(c1)    &
-                  / grid % wall_dist(c1)**2
+          eps_int = 2.0 * flow % viscosity(c1)                &
+                        / flow % density(c1) * kin % n(c1)    &
+                        / grid % wall_dist(c1)**2
           eps_wf  = c_mu75 * kin % n(c1)**1.5              &
                   / (grid % wall_dist(c1) * kappa)
 
           if(turb % y_plus(c1) > 3) then
-            fa = min(density(c1)*u_tau_new**3  &
+            fa = min(flow % density(c1) * u_tau_new**3  &
                / (kappa*grid % wall_dist(c1) * turb % p_kin(c1)),1.0)
 
             eps % n(c1) = (1.0-fa)*eps_int + fa*eps_wf

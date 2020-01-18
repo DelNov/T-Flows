@@ -7,27 +7,24 @@
   use Const_Mod
   use Comm_Mod
   use Cpu_Timer_Mod, only: Cpu_Timer_Mod_Start, Cpu_Timer_Mod_Stop
-  use Field_Mod,     only: Field_Type, diffusivity, density
+  use Field_Mod,     only: Field_Type
   use Turb_Mod
   use Var_Mod
   use Face_Mod
   use Grid_Mod
-  use Grad_Mod
   use Info_Mod
   use Numerics_Mod
   use Solver_Mod,    only: Solver_Type, Solver_Mod_Alias_System, Bicg, Cg, Cgs
   use Matrix_Mod,    only: Matrix_Type
   use Control_Mod
   use User_Mod
-  use Work_Mod,      only: phi_x       => r_cell_01,  &
-                           phi_y       => r_cell_02,  &
-                           phi_z       => r_cell_03,  &
-                           u1uj_phij   => r_cell_06,  &
+  use Work_Mod,      only: u1uj_phij   => r_cell_06,  &
                            u2uj_phij   => r_cell_07,  &
                            u3uj_phij   => r_cell_08,  &
                            u1uj_phij_x => r_cell_09,  &
                            u2uj_phij_y => r_cell_10,  &
-                           u3uj_phij_z => r_cell_11
+                           u3uj_phij_z => r_cell_11,  &
+                           one         => r_cell_12
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
@@ -42,7 +39,7 @@
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: uu, vv, ww, uv, uw, vw
   type(Matrix_Type), pointer :: a
-  real,              pointer :: b(:)
+  real, contiguous,  pointer :: b(:)
   type(Face_Type),   pointer :: m_flux
   type(Var_Type),    pointer :: phi
   integer                    :: n, c, s, c1, c2, row, col, exec_iter
@@ -66,7 +63,7 @@
 !
 !==============================================================================!
 
-  call Cpu_Timer_Mod_Start('Compute_Scalars')
+  call Cpu_Timer_Mod_Start('Compute_Scalars (without solvers)')
 
   ! Take aliases
   grid   => flow % pnt_grid
@@ -75,12 +72,12 @@
   call Turb_Mod_Alias_Stresses(turb, uu, vv, ww, uv, uw, vw)
   call Solver_Mod_Alias_System(sol, a, b)
 
-  do n = 1, a % row(grid % n_cells+1) ! to je broj nonzero + 1
-    a % val(n) = 0.0
-  end do
-  a % val = 0.0
+  ! User function
+  call User_Mod_Beginning_Of_Compute_Scalar(flow, turb, mult, dt, ini)
 
-  b(:) = 0.0
+  ! Initialize matrix and right hand side
+  a % val(:) = 0.0
+  b      (:) = 0.0
 
   !-------------------------------------!
   !   Initialize variables and fluxes   !
@@ -95,16 +92,15 @@
   end if
 
   ! Gradients
-  call Grad_Mod_Component(grid, phi % n, 1, phi_x)
-  call Grad_Mod_Component(grid, phi % n, 2, phi_y)
-  call Grad_Mod_Component(grid, phi % n, 3, phi_z)
+  call Field_Mod_Grad_Variable(flow, phi)
 
   !---------------!
   !               !
   !   Advection   !
   !               !
   !---------------!
-  call Numerics_Mod_Advection_Term(phi, 1.0, m_flux % n, sol,  &
+  one = 1.0
+  call Numerics_Mod_Advection_Term(phi, one, m_flux % n, sol,  &
                                    phi % x,                    &
                                    phi % y,                    &
                                    phi % z,                    &
@@ -141,23 +137,23 @@
 
     ! Gradients on the cell face 
     if(c2 > 0) then
-      phix_f1 = grid % fw(s)*phi_x(c1) + (1.0-grid % fw(s))*phi_x(c2)
-      phiy_f1 = grid % fw(s)*phi_y(c1) + (1.0-grid % fw(s))*phi_y(c2)
-      phiz_f1 = grid % fw(s)*phi_z(c1) + (1.0-grid % fw(s))*phi_z(c2)
+      phix_f1 = grid % fw(s)*phi % x(c1) + (1.0-grid % fw(s))*phi % x(c2)
+      phiy_f1 = grid % fw(s)*phi % y(c1) + (1.0-grid % fw(s))*phi % y(c2)
+      phiz_f1 = grid % fw(s)*phi % z(c1) + (1.0-grid % fw(s))*phi % z(c2)
       phix_f2 = phix_f1 
       phiy_f2 = phiy_f1 
       phiz_f2 = phiz_f1 
-      dif_eff1 = grid % f(s) *(diffusivity + turb % vis_t(c1)/sc_t)  &
-           + (1.-grid % f(s))*(diffusivity + turb % vis_t(c2)/sc_t)
+      dif_eff1 = grid % f(s) *(flow % diffusivity + turb % vis_t(c1)/sc_t)  &
+           + (1.-grid % f(s))*(flow % diffusivity + turb % vis_t(c2)/sc_t)
       dif_eff2 = dif_eff1 
     else
-      phix_f1 = phi_x(c1) 
-      phiy_f1 = phi_y(c1) 
-      phiz_f1 = phi_z(c1) 
+      phix_f1 = phi % x(c1) 
+      phiy_f1 = phi % y(c1) 
+      phiz_f1 = phi % z(c1) 
       phix_f2 = phix_f1 
       phiy_f2 = phiy_f1 
       phiz_f2 = phiz_f1 
-      dif_eff1 = diffusivity + turb % vis_t(c1) / sc_t
+      dif_eff1 = flow % diffusivity + turb % vis_t(c1) / sc_t
       dif_eff2 = dif_eff1 
     end if
 
@@ -166,8 +162,8 @@
 !   if(turbulence_model .eq. K_EPS .or.  &
 !      turbulence_model .eq. K_EPS_ZETA_F) then 
 !     if(c2 < 0) then
-!       if(Var_Mod_Bnd_Cell_Type(phi,c2) .eq. WALL .or.  &
-!          Var_Mod_Bnd_Cell_Type(phi,c2) .eq. WALLFL) then
+!       if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALL .or.  &
+!          Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALLFL) then
 !         dif_eff1 = turb % con_w(c1)
 !         dif_eff2 = dif_eff1
 !       end if
@@ -216,14 +212,14 @@
 
       ! Outflow is included because of the flux
       ! corrections which also affects velocities
-      if( (Var_Mod_Bnd_Cell_Type(phi,c2) .eq. INFLOW) .or.  &
-          (Var_Mod_Bnd_Cell_Type(phi,c2) .eq. WALL)   .or.  &
-          (Var_Mod_Bnd_Cell_Type(phi,c2) .eq. CONVECT) ) then    
+      if( (Var_Mod_Bnd_Cond_Type(phi,c2) .eq. INFLOW) .or.  &
+          (Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALL)   .or.  &
+          (Var_Mod_Bnd_Cond_Type(phi,c2) .eq. CONVECT) ) then
         a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
         b(c1)  = b(c1)  + a12 * phi % n(c2)
 
       ! In case of wallflux 
-      else if(Var_Mod_Bnd_Cell_Type(phi,c2) .eq. WALLFL) then
+      else if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALLFL) then
         b(c1) = b(c1) + grid % s(s) * phi % q(c2)
       end if
 
@@ -246,7 +242,7 @@
   !   Inertial terms   !
   !                    !
   !--------------------!
-  call Numerics_Mod_Inertial_Term(phi, density, sol, dt)
+  call Numerics_Mod_Inertial_Term(phi, flow % density, sol, dt)
 
   !-------------------------------------!
   !                                     !
@@ -258,21 +254,21 @@
     if(turbulence_model_variant .ne. STABILIZED) then
       do c = 1, grid % n_cells
         u1uj_phij(c) = -0.22 * turb % t_scale(c) *  &
-                   (  uu % n(c) * phi_x(c)          &
-                    + uv % n(c) * phi_y(c)          &
-                    + uw % n(c) * phi_z(c))
+                   (  uu % n(c) * phi % x(c)          &
+                    + uv % n(c) * phi % y(c)          &
+                    + uw % n(c) * phi % z(c))
         u2uj_phij(c) = -0.22 * turb % t_scale(c) *  &
-                   (  uv % n(c) * phi_x(c)          &
-                    + vv % n(c) * phi_y(c)          &
-                    + vw % n(c) * phi_z(c))
+                   (  uv % n(c) * phi % x(c)          &
+                    + vv % n(c) * phi % y(c)          &
+                    + vw % n(c) * phi % z(c))
         u3uj_phij(c) = -0.22 * turb % t_scale(c) *  &
-                   (  uw % n(c) * phi_x(c)          &
-                    + vw % n(c) * phi_y(c)          &
-                    + ww % n(c) * phi_z(c))
+                   (  uw % n(c) * phi % x(c)          &
+                    + vw % n(c) * phi % y(c)          &
+                    + ww % n(c) * phi % z(c))
       end do
-      call Grad_Mod_Component(grid, u1uj_phij, 1, u1uj_phij_x)
-      call Grad_Mod_Component(grid, u2uj_phij, 2, u2uj_phij_y)
-      call Grad_Mod_Component(grid, u3uj_phij, 3, u3uj_phij_z)
+      call Field_Mod_Grad_Component(flow, u1uj_phij, 1, u1uj_phij_x)
+      call Field_Mod_Grad_Component(flow, u2uj_phij, 2, u2uj_phij_y)
+      call Field_Mod_Grad_Component(flow, u3uj_phij, 3, u3uj_phij_z)
       do c = 1, grid % n_cells
         b(c) = b(c) - (  u1uj_phij_x(c)  &
                        + u2uj_phij_y(c)  &
@@ -293,9 +289,9 @@
 !       sc_t  = grid % fw(s) * sc_t1 + (1.0-grid % fw(s)) * sc_t2
 
         if(c2 > 0) then
-          phix_f1 = grid % fw(s)*phi_x(c1) + (1.0-grid % fw(s))*phi_x(c2)
-          phiy_f1 = grid % fw(s)*phi_y(c1) + (1.0-grid % fw(s))*phi_y(c2)
-          phiz_f1 = grid % fw(s)*phi_z(c1) + (1.0-grid % fw(s))*phi_z(c2)
+          phix_f1 = grid % fw(s)*phi % x(c1) + (1.0-grid % fw(s))*phi % x(c2)
+          phiy_f1 = grid % fw(s)*phi % y(c1) + (1.0-grid % fw(s))*phi % y(c2)
+          phiz_f1 = grid % fw(s)*phi % z(c1) + (1.0-grid % fw(s))*phi % z(c2)
           phix_f2 = phix_f1 
           phiy_f2 = phiy_f1 
           phiz_f2 = phiz_f1 
@@ -303,9 +299,9 @@
                   + (1. - grid % f(s)) * (turb % vis_t(c2)/sc_t )
           dif_eff2 = dif_eff1 
         else
-          phix_f1 = phi_x(c1)
-          phiy_f1 = phi_y(c1)
-          phiz_f1 = phi_z(c1)
+          phix_f1 = phi % x(c1)
+          phiy_f1 = phi % y(c1)
+          phiz_f1 = phi % z(c1)
           phix_f2 = phix_f1
           phiy_f2 = phiy_f1
           phiz_f2 = phiz_f1
@@ -370,8 +366,11 @@
 
   call Info_Mod_Iter_Fill_User_At(row, col, phi % name, exec_iter, phi % res)
 
-  call Comm_Mod_Exchange_Real(grid, phi % n)
+  call Grid_Mod_Exchange_Real(grid, phi % n)
 
-  call Cpu_Timer_Mod_Stop('Compute_Scalars')
+  ! User function
+  call User_Mod_End_Of_Compute_Scalar(flow, turb, mult, dt, ini)
+
+  call Cpu_Timer_Mod_Stop('Compute_Scalars (without solvers)')
 
   end subroutine

@@ -24,22 +24,18 @@
   type Bnd_Cond_Type
 
     ! Name of the boundary conditions specified in grid generation
-    ! It ranges through number of boundary conditions.
+    ! It ranges through number of boundary conditions (aka colors)
     character(len=80), allocatable :: name(:)
+
+    ! Boundary types, ranging through all colors
+    integer, allocatable :: type(:)
 
     ! Boundary condition color ranging through boundary cells.
     ! Values start from one, zero is internal cell
+    ! (Follows nomenclature from "../Shared/Comm_Mod_Par.f90")
     integer, allocatable :: color(:)
-    integer, allocatable :: color_f(:)  ! first bnd cell for color
-    integer, allocatable :: color_l(:)  ! last bnd cell for color
-
-    ! Boundary types, ranging through all colors                  
-    integer, allocatable :: type(:)
-
-    ! Copy boundary conditions; useful when one domain generates boundary
-    ! conditions for another.  
-    integer, allocatable :: copy_c(:)   
-    integer, allocatable :: copy_s(:,:)
+    integer, allocatable :: color_s_cell(:)  ! start bnd cell for color
+    integer, allocatable :: color_e_cell(:)  ! end bnd cell for color
 
   end type
 

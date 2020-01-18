@@ -17,13 +17,14 @@
   real                      :: di(phi % pnt_grid % n_faces),         &
                                dj(phi % pnt_grid % n_faces),         &
                                dk(phi % pnt_grid % n_faces)
-  real                      :: coef
+  real                      :: coef(-phi % pnt_grid % n_bnd_cells:  &
+                                     phi % pnt_grid % n_cells)
   real                      :: flux(phi % pnt_grid % n_faces)
   type(Solver_Type), target :: sol
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   real,            pointer :: b(:)
-  real                     :: phi_f  ! phi at the cell face
+  real                     :: phi_f, coef_f  ! phi and coef at the cell face
   integer                  :: c, c1, c2, s
 !==============================================================================!
 
@@ -57,6 +58,9 @@
     phi_f =      grid % f(s)  * phi % n(c1)   &
           + (1.0-grid % f(s)) * phi % n(c2)
 
+    coef_f =      grid % f(s)  * coef(c1)   &
+           + (1.0-grid % f(s)) * coef(c2)
+
     ! Compute phi_f with desired advection scheme
     if(phi % adv_scheme .ne. CENTRAL) then
       call Numerics_Mod_Advection_Scheme(phi_f,    &
@@ -73,22 +77,22 @@
 
     ! Compute advection term
     if(c2 > 0) then
-      phi % a(c1) = phi % a(c1) - flux(s) * phi_f * coef
-      phi % a(c2) = phi % a(c2) + flux(s) * phi_f * coef
+      phi % a(c1) = phi % a(c1) - flux(s) * phi_f * coef_f
+      phi % a(c2) = phi % a(c2) + flux(s) * phi_f * coef_f
     else
-      phi % a(c1) = phi % a(c1) - flux(s) * phi_f * coef
+      phi % a(c1) = phi % a(c1) - flux(s) * phi_f * coef_f
     end if
 
     ! Store upwinded part of the advection term in "c"
     if(flux(s) .lt. 0) then   ! from c2 to c1
-      phi % c(c1) = phi % c(c1) - flux(s) * phi % n(c2) * coef
+      phi % c(c1) = phi % c(c1) - flux(s) * phi % n(c2) * coef(c2)
       if(c2 > 0) then
-        phi % c(c2) = phi % c(c2) + flux(s) * phi % n(c2) * coef
+        phi % c(c2) = phi % c(c2) + flux(s) * phi % n(c2) * coef(c2)
       end if
     else
-      phi % c(c1) = phi % c(c1) - flux(s) * phi % n(c1) * coef
+      phi % c(c1) = phi % c(c1) - flux(s) * phi % n(c1) * coef(c1)
       if(c2 > 0) then
-        phi % c(c2) = phi % c(c2) + flux(s) * phi % n(c1) * coef
+        phi % c(c2) = phi % c(c2) + flux(s) * phi % n(c1) * coef(c1)
       end if
     end if
 

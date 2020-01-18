@@ -1,11 +1,12 @@
 !==============================================================================!
-  subroutine Surf_Mod_Compress_Nodes(surf)
+  subroutine Surf_Mod_Compress_Nodes(surf, verbose)
 !------------------------------------------------------------------------------!
 !   Compresses nodes' list                                                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Surf_Type), target :: surf
+  logical                 :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: vert(:)
   type(Elem_Type), pointer :: elem(:)
@@ -13,8 +14,8 @@
   integer                  :: e, v, n_vert
   integer, allocatable     :: xi(:), yi(:), zi(:)
   integer, allocatable     :: ni(:), new_n(:)
-  integer, parameter       :: INT_SCL = 1000000
-  integer, parameter       :: INT_TOL =     100
+  integer, parameter       :: INT_SCL = 100000000  ! increased this for VOF
+  integer, parameter       :: INT_TOL =       100
 !==============================================================================!
 
   ! Take aliases
@@ -22,6 +23,16 @@
   ne   => surf % n_elems
   vert => surf % vert
   elem => surf % elem
+
+  ! Check sanity of the elements so far
+  do e = 1, ne
+    if( (elem(e) % i .eq. elem(e) % j) .or.  &
+        (elem(e) % i .eq. elem(e) % k) .or.  &
+        (elem(e) % j .eq. elem(e) % k) ) then
+      print '(a)',      ' # ERROR in the beginning of Compress_Nodes'
+      print '(a,i6,a)', ' # element ', e, 'has same nodes'
+    end if
+  end do
 
   allocate(xi(nv));     xi    = 0
   allocate(yi(nv));     yi    = 0
@@ -65,7 +76,8 @@
   end do
 
 ! do v = 1, nv
-!   WRITE(150, '(3i6,3f12.6)') v, ni(v), new_n(v), real(xi(v))/INT_SCL, real(yi(v))/INT_SCL, real(zi(v))/INT_SCL
+!   WRITE(150, '(3i6,3f12.6)') v, ni(v), new_n(v),  &
+!              real(xi(v))/INT_SCL, real(yi(v))/INT_SCL, real(zi(v))/INT_SCL
 ! end do
 
   !----------------------------------------!
@@ -90,6 +102,17 @@
 
   ! Store compressed number of vertices
   nv = n_vert
-  print *, '# Compressed number of vertices: ', nv
+  if(verbose) print *, '# Compressed number of vertices: ', nv
+
+  ! Check sanity of the elements in the end
+  do e = 1, ne
+    if( (elem(e) % i .eq. elem(e) % j) .or.  &
+        (elem(e) % i .eq. elem(e) % k) .or.  &
+        (elem(e) % j .eq. elem(e) % k) ) then
+      print '(a)',      ' # ERROR in the end of Compress_Nodes'
+      print '(a,i6,a)', ' # element', e, ' has same nodes'
+      stop
+    end if
+  end do
 
   end subroutine

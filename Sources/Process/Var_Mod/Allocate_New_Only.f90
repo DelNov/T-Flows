@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Var_Mod_Allocate_New_Only(name_phi, phi, grid)
+  subroutine Var_Mod_Allocate_New_Only(phi, grid, name_phi)
 !------------------------------------------------------------------------------!
 !   This is to allocate a simplified uknown, holding only current value,       !
 !   such as pressure for example.                                              !
@@ -8,16 +8,16 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(len=*)        :: name_phi
   type(Var_Type)          :: phi
   type(Grid_Type), target :: grid
+  character(len=*)        :: name_phi
 !==============================================================================!
-
-  ! Store variable name
-  phi % name = name_phi
 
   ! Store grid for which the variable is defined
   phi % pnt_grid => grid
+
+  ! Store variable name
+  phi % name = name_phi
 
   ! Values in the new (n) time step
   allocate (phi % n(-grid % n_bnd_cells : grid % n_cells));  phi % n = 0.0

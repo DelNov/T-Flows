@@ -28,12 +28,12 @@
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer      :: grid
   type(Var_Type),  pointer      :: phi
-  character(len=80)             :: name_out, name_mean
+  character(len=80)             :: name_out, name_mean, a_name
   integer                       :: base
   integer                       :: block
   integer                       :: solution
   integer                       :: field
-  integer                       :: c, sc
+  integer                       :: c, sc, ua
 !==============================================================================!
 
   if(.not. plot_inside) return ! no point to write *-bnd.cgns yet
@@ -242,7 +242,7 @@
   end if
   if(turbulence_model .ne. NO_TURBULENCE) then
     kin_vis_t(1:grid % n_cells) = turb % vis_t(1:grid % n_cells)  &
-                                / viscosity(1:grid % n_cells)
+                                / flow % viscosity(1:grid % n_cells)
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               kin_vis_t(1),'EddyOverMolecularViscosity')
   end if
@@ -357,7 +357,13 @@
   !----------------------!
   !   Save user arrays   !
   !----------------------!
-  ! call User_Mod_Save_Cgns_Results(base, block, solution, field, grid)
+  do ua = 1, n_user_arrays
+
+    a_name = 'A_00'
+    write(a_name(3:4), '(I2.2)') ua
+    call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
+                              user_array(ua,1), a_name)
+  end do
 
   !----------------------------!
   !   Add info on dimensions   !

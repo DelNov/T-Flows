@@ -22,15 +22,14 @@
 !--------------------------------[Arguments]-----------------------------------!
   type(Field_Type),      target :: flow
   type(Turb_Type),       target :: turb
-  type(Swarm_Type),      target :: swarm
   type(Multiphase_Type), target :: mult
   integer                       :: ts           ! time step
   logical                       :: plot_inside  ! plot results inside?
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: phi
-  integer                  :: c, n, s, offset, sc, f8, f9
-  character(len=80)        :: name_out_8, name_out_9, name_mean
+  integer                  :: c, n, s, offset, sc, f8, f9, ua
+  character(len=80)        :: name_out_8, name_out_9, name_mean, a_name
 !-----------------------------[Local parameters]-------------------------------!
   integer, parameter :: VTK_TRIANGLE   =  5  ! cell shapes in VTK format
   integer, parameter :: VTK_QUAD       =  9
@@ -276,12 +275,12 @@
                           ' format="ascii">'
   if(plot_inside) then
     do c = 1, grid % n_cells - grid % comm % n_buff_cells
-      write(f9,'(a,i9)') IN_5, grid % comm % proces(c)
+      write(f9,'(a,i9)') IN_5, grid % comm % cell_proc(c)
     end do
   else  ! plot only boundary
     do s = 1, grid % n_faces
       if( grid % faces_c(2,s) < 0 ) then
-        write(f9,'(a,i9)') IN_5, grid % comm % proces( grid % faces_c(1,s) )
+        write(f9,'(a,i9)') IN_5, grid % comm % cell_proc( grid % faces_c(1,s) )
       end if
     end do
   end if
@@ -415,7 +414,7 @@
   if(turbulence_model .ne. NO_TURBULENCE) then
     kin_vis_t   (-grid % n_bnd_cells:grid % n_cells) =  &
     turb % vis_t(-grid % n_bnd_cells:grid % n_cells) /  &
-       viscosity(-grid % n_bnd_cells:grid % n_cells)
+       flow % viscosity(-grid % n_bnd_cells:grid % n_cells)
     call Save_Scalar(grid, IN_4, IN_5, "EddyOverMolecularViscosity",        &
                                        plot_inside,                         &
                                        kin_vis_t(-grid % n_bnd_cells), f8, f9)
@@ -553,7 +552,15 @@
   !----------------------!
   !   Save user arrays   !
   !----------------------!
-  ! call User_Mod_Save_Results(grid)
+  do ua = 1, n_user_arrays
+
+    a_name = 'A_00'
+    write(a_name(3:4), '(I2.2)') ua
+    call Save_Scalar(grid, IN_4, IN_5, a_name,                              &
+                                       plot_inside,                         &
+                                       user_array(ua,-grid % n_bnd_cells),  &
+                                       f8, f9)
+  end do
 
   !----------------------!
   !                      !

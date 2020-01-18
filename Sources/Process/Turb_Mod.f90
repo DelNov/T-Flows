@@ -6,25 +6,15 @@
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
   use Comm_Mod
-  use Cpu_Timer_Mod, only: Cpu_Timer_Mod_Start, Cpu_Timer_Mod_Stop
+  use Cpu_Timer_Mod
   use Info_Mod
-  use Var_Mod,       only: Var_Type,                    &
-                           Var_Mod_Allocate_New_Only,   &
-                           Var_Mod_Allocate_Solution
-  use Face_Mod,      only: Face_Type
+  use Var_Mod
+  use Face_Mod
   use Grid_Mod
-  use Grad_Mod
-  use Field_Mod,     only: Field_Type,                                  &
-                           Field_Mod_Alias_Momentum,                    &
-                           Field_Mod_Alias_Energy,                      &
-                           Field_Mod_U_Tan,                             &
-                           viscosity, density, conductivity, capacity,  &
-                           grav_x,  grav_y,  grav_z,                    &
-                           omega_x, omega_y, omega_z,                   &
-                           buoyancy, heat_transfer, t_ref
-  use Solver_Mod,    only: Solver_Type, Solver_Mod_Alias_System, Bicg, Cg, Cgs
-  use Matrix_Mod,    only: Matrix_Type
-  use Control_Mod,   only: Control_Mod_Turbulent_Prandtl_Number
+  use Field_Mod
+  use Solver_Mod
+  use Matrix_Mod
+  use Control_Mod
   use Numerics_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -107,6 +97,8 @@
     real, allocatable :: vis_t_eff(:)
     real, allocatable :: vis_t_sgs(:)
 
+    real, allocatable :: tau_wall(:)
+
     ! Wall viscosity and conductivity (wall function approach)
     real, allocatable :: vis_w(:)
     real, allocatable :: con_w(:)
@@ -181,6 +173,7 @@
   ! For the k-eps-v2f model:
   real :: c_mu_d, c_l, c_t, alpha, c_nu, c_f1, c_f2
   real :: g1, g1_star, g2, g3, g3_star, g4, g5, c_theta
+  real :: c_mu_theta, c_mu_theta5, kappa_theta
 
   ! For the Spalart-Allmaras model:
   real :: c_b1, c_b2, c_w1, c_w2, c_w3, c_v1
@@ -254,7 +247,9 @@
   include 'Turb_Mod/Vis_T_Spalart_Allmaras.f90'
   include 'Turb_Mod/Vis_T_Wale.f90'
 
-  ! Calculation of turbulent Prandtl number
+  ! Other subroutines ellipitic blending, turbulent Prandtl number
+  include 'Turb_Mod/Ebf_Momentum.f90'
+  include 'Turb_Mod/Ebf_Scalar.f90'
   include 'Turb_Mod/Prandtl_Number.f90'
 
   end module

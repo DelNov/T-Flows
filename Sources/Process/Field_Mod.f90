@@ -8,8 +8,9 @@
 !----------------------------------[Modules]-----------------------------------!
   use Var_Mod
   use Face_Mod
-  use Grid_Mod, only: Grid_Type
-  use Bulk_Mod, only: Bulk_Type
+  use Grid_Mod
+  use Bulk_Mod
+  use Comm_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -21,6 +22,14 @@
 
     type(Grid_Type), pointer :: pnt_grid  ! grid for which it is defined
 
+    ! Physical properties
+    real, allocatable :: capacity(:)
+    real, allocatable :: conductivity(:)
+    real :: diffusivity
+    real, allocatable :: density(:)
+    real, allocatable :: viscosity(:)
+    real, allocatable :: density_f(:)
+
     ! Velocity components
     type(Var_Type) :: u
     type(Var_Type) :: v
@@ -28,7 +37,6 @@
 
     ! Mass and volumetric flux through cell faces:
     type(Face_Type) :: m_flux
-    type(Face_Type) :: v_flux
 
     ! Pressure and pressure correction
     type(Var_Type) :: p
@@ -54,18 +62,19 @@
     ! Volume expansion coefficient
     real :: beta
 
+    ! Heat flux to the domain (important for periodic case with heat transfer)
+    real :: heat_flux, heated_area, heat
+
+    !-------------------------------------!
+    !   Gradient matrices for all cells   !
+    !-------------------------------------!
+    real, allocatable :: grad(:,:)
+
   end type
 
   ! Variables determining if we are dealing with heat transfer and buoyancy
   logical :: heat_transfer
   logical :: buoyancy
-
-  ! Heat flux to the domain (important for periodic case with heat transfer)
-  real :: heat_flux, heated_area, heat
-
-  ! Physical properties
-  real :: conductivity, diffusivity, capacity
-  real, allocatable :: viscosity(:), density(:), dens_face(:)
 
   ! Angular velocity
   real :: omega_x, omega_y, omega_z, omega
@@ -79,8 +88,15 @@
   contains
 
   include 'Field_Mod/Allocate.f90'
+  include 'Field_Mod/Allocate_Grad_Matrix.f90'
   include 'Field_Mod/Alias_Energy.f90'
   include 'Field_Mod/Alias_Momentum.f90'
+  include 'Field_Mod/Calculate_Grad_Matrix.f90'
+  include 'Field_Mod/Grad_Component.f90'
+  include 'Field_Mod/Grad_Pressure.f90'
+  include 'Field_Mod/Grad_Pressure_Correction.f90'
+  include 'Field_Mod/Grad_Variable.f90'
+  include 'Field_Mod/Prandtl_Number.f90'
   include 'Field_Mod/U_Tan.f90'
 
   end module

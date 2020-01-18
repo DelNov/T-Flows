@@ -18,7 +18,7 @@
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
   type(Matrix_Type), pointer :: a
-  real,              pointer :: b(:)
+  real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2, exec_iter
   real                       :: f_ex, f_im
   real                       :: a0, a12, a21
@@ -66,7 +66,7 @@
   end do
 
   ! Gradients
-  call Grad_Mod_Variable(phi)
+  call Field_Mod_Grad_Variable(flow, phi)
 
   !------------------!
   !                  !
@@ -179,6 +179,6 @@
     call Info_Mod_Iter_Fill_At(4, 2, phi % name, exec_iter, phi % res)
   end if
 
-  call Comm_Mod_Exchange_Real(grid, phi % n)
+  call Grid_Mod_Exchange_Real(grid, phi % n)
 
   end subroutine

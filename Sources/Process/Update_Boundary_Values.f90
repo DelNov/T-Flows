@@ -6,9 +6,7 @@
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
   use Comm_Mod
-  use Field_Mod,   only: Field_Type, heat_transfer, heated_area,     &
-                         density, viscosity, capacity, conductivity, &
-                         heat_flux, heat, diffusivity
+  use Field_Mod,   only: Field_Type, heat_transfer
   use Turb_Mod
   use Grid_Mod
   use Control_Mod
@@ -28,7 +26,6 @@
   type(Var_Type),  pointer :: kin, eps, zeta, f22, vis, t2
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   integer                  :: c1, c2, s, sc
-  real                     :: qx, qy, qz, nx, ny, nz, con_t
   real                     :: kin_vis, u_tau
 !==============================================================================!
 
@@ -43,11 +40,9 @@
   call Turb_Mod_Alias_T2          (turb, t2)
 
   if(heat_transfer) then
-    heat        = 0.0     ! [W]
-    heat_flux   = 0.0     ! [W/m^2]
-    heated_area = 0.0
-    ! Take (default) turbulent Prandtl number from control file
-    call Control_Mod_Turbulent_Prandtl_Number(pr_t)
+    flow % heat        = 0.0     ! [W]
+    flow % heat_flux   = 0.0     ! [W/m^2]
+    flow % heated_area = 0.0
   end if
 
   do s = 1, grid % n_faces
@@ -61,7 +56,7 @@
     ! On the boundary perform the extrapolation
     if(c2 < 0) then
 
-      kin_vis = viscosity(c1) / density(c1)
+      kin_vis = flow % viscosity(c1) / flow % density(c1)
       ! Extrapolate velocities on the outflow boundary
       ! SYMMETRY is intentionally not treated here because I wanted to
       ! be sure that is handled only via graPHI and NewUVW functions)
@@ -71,7 +66,6 @@
         u % n(c2) = u % n(c1)
         v % n(c2) = v % n(c1)
         w % n(c2) = w % n(c1)
-        if(heat_transfer) t % n(c2) = t % n(c1)
         if(multiphase_model .eq. VOLUME_OF_FLUID) vof % n(c2) = vof % n(c1)
       end if
 
@@ -100,7 +94,7 @@
           kin % n(c2) = 0.0
           u_tau = kin_vis * sqrt(u % n(c1)**2 + v % n(c1)**2 + w % n(c1)**2)  &
                 / grid % wall_dist(c1)
-          turb % y_plus(c1) = Y_Plus_Low_Re(u_tau,                 &
+          turb % y_plus(c1) = Y_Plus_Low_Re(turb, u_tau,           &
                                             grid % wall_dist(c1),  &
                                             kin_vis)
           if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) f22 % n(c2) = 0.0
@@ -155,129 +149,65 @@
             f22 % n(c2) = f22 % n(c1)
         end if
       end if
+    end if ! c2 < 0
+  end do
 
-      ! Is this good in general case, when q <> 0 ??? Check it.
-      if(heat_transfer) then
+  if(heat_transfer) then
+    do s = 1, grid % n_faces
+      c1 = grid % faces_c(1,s)
+      c2 = grid % faces_c(2,s)
 
-        ! If not DNS or LES, compute Prandtl number 
-        if(turbulence_model .ne. LES_SMAGORINSKY     .and.  &
-           turbulence_model .ne. LES_DYNAMIC         .and.  &
-           turbulence_model .ne. LES_WALE            .and.  &
-           turbulence_model .ne. HYBRID_LES_PRANDTL  .and.  &
-           turbulence_model .ne. NONE                .and.  &
-           turbulence_model .ne. DNS) then
-          pr_t = Turb_Mod_Prandtl_Number(turb, c1)
-        end if
-
-        nx = grid % sx(s) / grid % s(s)
-        ny = grid % sy(s) / grid % s(s)
-        nz = grid % sz(s) / grid % s(s)
-        qx = t % q(c2) * nx
-        qy = t % q(c2) * ny
-        qz = t % q(c2) * nz
-
-        ! Turbulent conductivity from Reynolds analogy
-        if(turbulence_model .ne. NONE .and.    &
-           turbulence_model .ne. DNS) then
-          con_t = conductivity                 &
-                + capacity * turb % vis_t(c1) / pr_t
-        else
-          con_t = conductivity
-        end if
+      ! On the boundary perform the extrapolation
+      if (c2 < 0) then
 
         ! Wall temperature or heat fluxes for k-eps-zeta-f
         ! and high-re k-eps models. 
         if(turbulence_model .eq. K_EPS_ZETA_F    .or.  &
            turbulence_model .eq. HYBRID_LES_RANS .or.  &
            turbulence_model .eq. K_EPS) then
-          if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
+          if(Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALLFL) then
             t % n(c2) = t % n(c1) + t % q(c2) * grid % wall_dist(c1)  &
                       / (turb % con_w(c1) + TINY)
-            heat = heat + t % q(c2) * grid % s(s)
-            if(abs(t % q(c2)) > TINY) heated_area = heated_area + grid % s(s)
-          else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) then
+          else if(Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALL) then
             t % q(c2) = ( t % n(c2) - t % n(c1) ) * turb % con_w(c1)  &
                       / grid % wall_dist(c1)
-            heat = heat + t % q(c2) * grid % s(s)
-            if(abs(t % q(c2)) > TINY) heated_area = heated_area + grid % s(s)
           end if
 
         ! Wall temperature or heat fluxes for other trubulence models
         else
-          if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
+          if(Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALLFL) then
             t % n(c2) = t % n(c1) + t % q(c2) * grid % wall_dist(c1)  &
-                      / conductivity
-            heat = heat + t % q(c2) * grid % s(s)
-            if(abs(t % q(c2)) > TINY) heated_area = heated_area + grid % s(s)
-          else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) then
-            t % q(c2) = ( t % n(c2) - t % n(c1) ) * conductivity  &
+                      / flow % conductivity(c1)
+          else if(Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALL) then
+            t % q(c2) = ( t % n(c2) - t % n(c1) ) * flow % conductivity(c1)  &
                       / grid % wall_dist(c1)
-            heat = heat + t % q(c2) * grid % s(s)
-            if(abs(t % q(c2)) > TINY) heated_area = heated_area + grid % s(s)
           end if
-        end if
-      end if ! heat_transfer
 
-      !---------------------!
-      !   Copy boundaries   !
-      !---------------------!
-      if(grid % bnd_cond % copy_c(c2) .ne. 0) then
-        u % n(c2) = u % n(grid % bnd_cond % copy_c(c2))
-        v % n(c2) = v % n(grid % bnd_cond % copy_c(c2))
-        w % n(c2) = w % n(grid % bnd_cond % copy_c(c2))
-
-        if(heat_transfer)  &
-          t % n(c2) = t % n(grid % bnd_cond % copy_c(c2))
-
-        if(multiphase_model .eq. VOLUME_OF_FLUID)  &
-          vof % n(c2) = vof % n(grid % bnd_cond % copy_c(c2))
-
-        if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
-           turbulence_model .eq. DES_SPALART)           &
-          vis % n(c2) = vis % n(grid % bnd_cond % copy_c(c2))
-
-        if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
-           turbulence_model .eq. HYBRID_LES_RANS) then
-          kin  % n(c2) = kin  % n(grid % bnd_cond % copy_c(c2))
-          eps  % n(c2) = eps  % n(grid % bnd_cond % copy_c(c2))
-          zeta % n(c2) = zeta % n(grid % bnd_cond % copy_c(c2))
-          f22  % n(c2) = f22  % n(grid % bnd_cond % copy_c(c2))
-          if(heat_transfer) then 
-            t2 % n(c2) = t2 % n(grid % bnd_cond % copy_c(c2))
-          end if
         end if
 
-        if(turbulence_model .eq. K_EPS) then
-          kin % n(c2) = kin % n(grid % bnd_cond % copy_c(c2))
-          eps % n(c2) = eps % n(grid % bnd_cond % copy_c(c2))
-          if(heat_transfer) then 
-            t2 % n(c2) = t2 % n(grid % bnd_cond % copy_c(c2))
-          end if
+        ! Integrate heat and heated area
+        flow % heat = flow % heat + t % q(c2) * grid % s(s)
+        if(abs(t % q(c2)) > TINY) then
+          flow % heated_area = flow % heated_area + grid % s(s)
         end if
 
-        if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
-           turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
-          uu  % n(c2) = uu  % n(grid % bnd_cond % copy_c(c2))
-          vv  % n(c2) = vv  % n(grid % bnd_cond % copy_c(c2))
-          ww  % n(c2) = ww  % n(grid % bnd_cond % copy_c(c2))
-          uv  % n(c2) = uv  % n(grid % bnd_cond % copy_c(c2))
-          uw  % n(c2) = uw  % n(grid % bnd_cond % copy_c(c2))
-          vw  % n(c2) = vw  % n(grid % bnd_cond % copy_c(c2))
-          kin % n(c2) = kin % n(grid % bnd_cond % copy_c(c2))
-          eps % n(c2) = eps % n(grid % bnd_cond % copy_c(c2))
-          if(turbulence_model .eq. RSM_MANCEAU_HANJALIC)  &
-            f22 % n(c2) = f22 % n(grid % bnd_cond % copy_c(c2))
+        if( Var_Mod_Bnd_Cond_Type(t,c2) .eq. OUTFLOW .or.     &
+            Var_Mod_Bnd_Cond_Type(t,c2) .eq. PRESSURE .or.    &
+            Var_Mod_Bnd_Cond_Type(t,c2) .eq. SYMMETRY ) then
+          t % n(c2) = t % n(c1)
         end if
-      end if
-    end if ! c2 < 0
-  end do
+
+
+      end if ! c2 < 0
+    end do ! s = 1, grid % n_faces
+  end if
 
   ! Integrate (summ) heated area, and heat up
- if(heat_transfer) then
-   call Comm_Mod_Global_Sum_Real(heat)
-   call Comm_Mod_Global_Sum_Real(heated_area)
-   heat_flux = heat / heated_area
- end if
+  if(heat_transfer) then
+    call Comm_Mod_Global_Sum_Real(flow % heat)
+    call Comm_Mod_Global_Sum_Real(flow % heated_area)
+    flow % heat_flux = flow % heat / max(flow % heated_area, TINY)
+  end if
 
   !-------------!
   !   Scalars   !
@@ -291,18 +221,13 @@
 
       ! On the boundary perform the extrapolation
       if (c2 < 0) then
-        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
+        if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALLFL) then
           phi % n(c2) = phi % n(c1) + phi % q(c2) * grid % wall_dist(c1)  &
-                      / diffusivity
-        else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) then
-          phi % q(c2) = (phi % n(c2) - phi % n(c1)) * diffusivity &
+                      / flow % diffusivity
+        else if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALL) then
+          phi % q(c2) = (phi % n(c2) - phi % n(c1)) * flow % diffusivity &
                       / grid % wall_dist(c1)
         end if ! WALL or WALLFL
-
-        ! Copy boundaries
-        if(grid % bnd_cond % copy_c(c2) .ne. 0) then
-          phi % n(c2) = phi % n(grid % bnd_cond % copy_c(c2))
-        end if ! grid % bnd_cond % copy_c(c2) .ne. 0
 
       end if ! c2 < 0
     end do ! s = 1, grid % n_faces

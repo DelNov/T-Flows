@@ -4,6 +4,9 @@
 !   Discretizes and solves transport equations for different turbulent         !
 !   variables.                                                                 !
 !------------------------------------------------------------------------------!
+!----------------------------------[Modules]-----------------------------------!
+  use Work_Mod, only: one => r_cell_12
+!------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   type(Turb_Type),   target :: turb
@@ -16,9 +19,9 @@
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w
   type(Var_Type),    pointer :: vis
-  real,              pointer :: flux(:)
+  real, contiguous,  pointer :: flux(:)
   type(Matrix_Type), pointer :: a
-  real,              pointer :: b(:)
+  real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2, exec_iter
   real                       :: f_ex, f_im
   real                       :: phis
@@ -26,7 +29,7 @@
   real                       :: vis_eff
   real                       :: phi_x_f, phi_y_f, phi_z_f
   real                       :: dt
-  real                       :: visc_const, fs
+  real                       :: visc_f
 !==============================================================================!
 !                                                                              !
 !  The form of equations which are solved:                                     !
@@ -63,14 +66,15 @@
   end if
 
   ! Gradients
-  call Grad_Mod_Variable(phi)
+  call Field_Mod_Grad_Variable(flow, phi)
 
   !---------------!
   !               !
   !   Advection   !
   !               !
   !---------------!
-  call Numerics_Mod_Advection_Term(phi, 1.0, flux, sol,  &
+  one(:) = 1.0
+  call Numerics_Mod_Advection_Term(phi, one, flux, sol,  &
                                    phi % x,              &
                                    phi % y,              &
                                    phi % z,              &
@@ -91,28 +95,24 @@
 
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
-    fs = grid % f(s)
 
-    if (c2 > 0) then
-      visc_const = fs * viscosity(c1) + (1.0 - fs) * viscosity(c2)
-    else
-      visc_const = viscosity(c1)
-    end if
+    visc_f =        grid % fw(s)  * flow % viscosity(c1)   &
+           + (1.0 - grid % fw(s)) * flow % viscosity(c2)
 
-    vis_eff = visc_const + (    grid % fw(s)  * turb % vis_t(c1)   &
-                         + (1.0-grid % fw(s)) * turb % vis_t(c2))  &
-                         / phi % sigma
+    vis_eff = visc_f + (    grid % fw(s)  * turb % vis_t(c1)   &
+                     + (1.0-grid % fw(s)) * turb % vis_t(c2))  &
+                     / phi % sigma
 
     if(turbulence_model .eq. SPALART_ALLMARAS .or.               &
        turbulence_model .eq. DES_SPALART)                        &
-      vis_eff = visc_const + (    grid % fw(s)  * vis % n(c1)    &
-                           + (1.0-grid % fw(s)) * vis % n(c2))   &
-                          / phi % sigma
+      vis_eff = visc_f + (    grid % fw(s)  * vis % n(c1)    &
+                       + (1.0-grid % fw(s)) * vis % n(c2))   &
+                       / phi % sigma
 
     if(turbulence_model .eq. HYBRID_LES_RANS) then
-      vis_eff = visc_const + (    grid % fw(s)  * turb % vis_t_eff(c1)   &
-                           + (1.0-grid % fw(s)) * turb % vis_t_eff(c2))  &
-                           / phi % sigma
+      vis_eff = visc_f + (    grid % fw(s)  * turb % vis_t_eff(c1)   &
+                       + (1.0-grid % fw(s)) * turb % vis_t_eff(c2))  &
+                       / phi % sigma
     end if
     phi_x_f = grid % fw(s) * phi % x(c1) + (1.0-grid % fw(s)) * phi % x(c2)
     phi_y_f = grid % fw(s) * phi % y(c1) + (1.0-grid % fw(s)) * phi % y(c2)
@@ -209,7 +209,7 @@
   !   Inertial terms   !
   !                    !
   !--------------------!
-  call Numerics_Mod_Inertial_Term(phi, density, sol, dt)
+  call Numerics_Mod_Inertial_Term(phi, flow % density, sol, dt)
 
   !-------------------------------------!
   !                                     !
@@ -282,7 +282,7 @@
     end if
   end if
 
-  call Comm_Mod_Exchange_Real(grid, phi % n)
+  call Grid_Mod_Exchange_Real(grid, phi % n)
 
   call Cpu_Timer_Mod_Stop('Compute_Turbulence (without solvers)')
 

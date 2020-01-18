@@ -51,10 +51,11 @@
       / (kin % n(c) * turb % t_scale(c) * flow % shear(c)**2 + TINY), 0.0)
 
     cmu_mod = min(0.12, cmu_mod)
-    turb % vis_t(c) = cmu_mod * density(c) * kin % n(c) * turb % t_scale(c)
+    turb % vis_t(c) = cmu_mod * flow % density(c)  &
+                    * kin % n(c) * turb % t_scale(c)
     turb % vis_t(c) = max(turb % vis_t(c), TINY)
   end do
 
-  call Comm_Mod_Exchange_Real(grid, turb % vis_t)
+  call Grid_Mod_Exchange_Real(grid, turb % vis_t)
 
   end subroutine

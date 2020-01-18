@@ -1,5 +1,5 @@
 !==============================================================================!
-  Subroutine Grid_Mod_Sort_Faces_Smart(grid)
+  subroutine Grid_Mod_Sort_Faces_Smart(grid)
 !------------------------------------------------------------------------------!
 !   sorts array of faces in a smart way.  that would mean boundary faces       !
 !   first, boundary region by boundary region, then inside faces, then         !
@@ -154,8 +154,8 @@
     end do
 
     do color = 1, grid % n_bnd_cond
-      print '(2i6)', grid % bnd_cond % color_f(color),  &
-                     grid % bnd_cond % color_l(color)
+      print '(2i6)', grid % bnd_cond % color_s_cell(color),  &
+                     grid % bnd_cond % color_e_cell(color)
     end do
   end if
 

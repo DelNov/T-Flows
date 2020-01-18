@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine Control_Mod_Starting_Time_Step_For_Swarm_Statistics(val, verbose)
+  subroutine Comm_Mod_Exchange_Real_Array(phi, length, dest)
+!------------------------------------------------------------------------------!
+!   Dummy function for sequential compilation.                                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer           :: val
-  logical, optional :: verbose
+  real    :: phi(length)
+  integer :: length
+  integer :: dest         ! destination processor
 !==============================================================================!
-
-  call Control_Mod_Read_Int_Item('STARTING_TIME_STEP_FOR_Swarm_STATISTICS',  &
-                                 HUGE_INT, val, verbose)
 
   end subroutine

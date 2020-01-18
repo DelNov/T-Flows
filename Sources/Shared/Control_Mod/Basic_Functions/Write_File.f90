@@ -5,7 +5,7 @@
 !==============================================================================!
 
   open(unit   = control_file_unit,  &
-       file   = CONTROL_FILE_NAME,  &
+       file   = control_file_name,  &
        action = 'write')
 
   close(unit = control_file_unit)

@@ -1,21 +1,20 @@
 !==============================================================================!
-  subroutine Grad_Mod_Variable(var)
+  subroutine User_Mod_Initialize_Variables(flow, turb, mult, swarm)
 !------------------------------------------------------------------------------!
-!   Calculates gradient of generic array.                                      !
+!   User initialization of dependent variables.                                !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Var_Type), target :: var
+  type(Field_Type),      target :: flow
+  type(Turb_Type),       target :: turb
+  type(Multiphase_Type), target :: mult
+  type(Swarm_Type),      target :: swarm
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
-  integer                  :: s, c, c1, c2, iter
+  type(Var_Type),  pointer :: u, v, w, t, phi, vof
 !==============================================================================!
 
   ! Take aliases
-  grid  => var % pnt_grid
-
-  call Grad_Mod_Component(grid, var % n, 1, var % x)  ! dp/dx
-  call Grad_Mod_Component(grid, var % n, 2, var % y)  ! dp/dy
-  call Grad_Mod_Component(grid, var % n, 3, var % z)  ! dp/dz
+  grid => flow % pnt_grid
 
   end subroutine

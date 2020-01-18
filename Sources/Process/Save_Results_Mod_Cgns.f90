@@ -17,6 +17,7 @@
   use Swarm_Mod,      only: Particle_Type, Swarm_Type
   use Surf_Mod,       only: Vert_Type, Elem_Type, Surf_Type
   use Multiphase_Mod, NO_MULTIPHASE => NONE
+  use User_Mod, only: n_user_arrays, user_array
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -25,5 +26,6 @@
 
   include 'Save_Results_Mod/Cgns/Save_Results.f90'
   include 'Save_Results_Mod/Cgns/Save_Swarm.f90'
+  include 'Save_Results_Mod/Cgns/Save_Surf.f90'
 
   end module 

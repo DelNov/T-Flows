@@ -12,6 +12,6 @@
   real            :: u_tau, wall_dist, kin_vis
 !==============================================================================!
 
-  Y_Plus_Rough_Walls = (wall_dist + turb % z_o) * u_tau / kin_vis
+  Y_Plus_Rough_Walls = u_tau * (wall_dist + turb % z_o) / kin_vis
 
   end function

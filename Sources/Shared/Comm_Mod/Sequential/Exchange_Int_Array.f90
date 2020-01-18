@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine Control_Mod_Swarm_Save_Interval(val, verbose)
+  subroutine Comm_Mod_Exchange_Int_Array(phi, length, dest)
+!------------------------------------------------------------------------------!
+!   Dummy function for sequential runs.                                        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer           :: val
-  logical, optional :: verbose
+  integer :: phi(length)
+  integer :: length
+  integer :: dest         ! destination processor
 !==============================================================================!
-
-  call Control_Mod_Read_Int_Item('SWARM_SAVE_INTERVAL', 50, &
-                                  val, verbose)
 
   end subroutine

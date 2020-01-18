@@ -1,11 +1,13 @@
 !==============================================================================!
-  subroutine Control_Mod_Open_File
-!------------------------------------------------------------------------------!
-!   It rarely gets simpler than this - just opens a file for reading.          !
+  subroutine Grid_Mod_Allocate_Comm(grid)
 !------------------------------------------------------------------------------!
   implicit none
+!---------------------------------[Arguments]----------------------------------!
+  type(Grid_Type) :: grid
 !==============================================================================!
 
-  call File_Mod_Open_File_For_Reading(CONTROL_FILE_NAME, control_file_unit)
+  allocate (grid % comm % buff_index(grid % n_cells))
+
+  grid % comm % buff_index(:) = 0
 
   end subroutine

@@ -26,7 +26,7 @@
     phi % max(c2) = max(phi % max(c2), phi % n(c1))
   end do
 
-  call Comm_Mod_Exchange_Real(grid, phi % min)
-  call Comm_Mod_Exchange_Real(grid, phi % max)
+  call Grid_Mod_Exchange_Real(grid, phi % min)
+  call Grid_Mod_Exchange_Real(grid, phi % max)
 
   end subroutine

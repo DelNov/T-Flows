@@ -66,8 +66,8 @@
              c = 1, grid % n_cells)
 
   ! Cells' processor ids
-  read(fu) (grid % comm % proces(c), c =  1, grid % n_cells)
-  read(fu) (grid % comm % proces(c), c = -1,-grid % n_bnd_cells,-1)
+  read(fu) (grid % comm % cell_proc(c), c =  1,  grid % n_cells)
+  read(fu) (grid % comm % cell_proc(c), c = -1, -grid % n_bnd_cells, -1)
 
   !-----------!
   !   Faces   !
@@ -93,17 +93,6 @@
   read(fu) (grid % bnd_cond % color(c), c = -1,-grid % n_bnd_cells, -1)
 
   call Grid_Mod_Bnd_Cond_Ranges(grid)
-
-  ! Boundary copy cells
-  allocate (grid % bnd_cond % copy_c(-grid % n_bnd_cells:-1))
-  read(fu) (grid % bnd_cond % copy_c(c), c = -1,-grid % n_bnd_cells, -1)
-
-  !----------!
-  !   Copy   !
-  !----------!
-  read(fu)   grid % n_copy
-  allocate  (grid % bnd_cond % copy_s(2,grid % n_copy))
-  read(fu) ((grid % bnd_cond % copy_s(c,s), c = 1, 2), s = 1, grid % n_copy)
 
   !----------------------!
   !   Multigrid levels   !
