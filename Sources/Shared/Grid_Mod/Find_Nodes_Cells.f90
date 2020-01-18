@@ -57,10 +57,6 @@
     end if
   end do
 
-  do c = 1, grid % n_cells
-    write(301, '(9i9)') c, cells_c(1:max_n_cells, c)
-  end do
-
   !-------------------------------------------------------------------!
   !   Find cells which surround faces locally (for this subroutine)   !
   !-------------------------------------------------------------------!
@@ -93,9 +89,7 @@
       work(   1:n1   ) = cells_c(1:n1,c1)
       work(n1+1:n1+n2) = cells_c(1:n2,c2)
       n = n1 + n2
-      write(302, '(a1,i5,a1,i5,a1,12i9)') '(',c1,',',c2,')', work(1:n)
       call Sort_Mod_Unique_Int(n, work(1:n))
-      write(303, '(a1,i5,a1,i5,a1,12i9)') '(',c1,',',c2,')', work(1:n)
       faces_n_cells(s) = n
       faces_c (1:n, s) = work(1:n)
     end if
@@ -246,8 +240,6 @@
   ! Allocate memory for cells surrounding each node
   if(run .eq. 1) then
     max_n_cells = maxval(grid % nodes_n_cells)
-    write(100, *) 'max_n_cells(1) = ', max_n_cells
-
     allocate(nodes_c(1:max_n_cells, 1:grid % n_nodes))
   end if
 
@@ -256,30 +248,12 @@
   deallocate(faces_n_cells)  ! local faces_n_cells not used beyond this point
   deallocate(faces_c)        ! local faces_c not used beyond this point
 
-! ! Boundary cells
-! do s = 1, grid % n_bnd_cells
-!   c2 = grid % faces_c(2,s)
-!   do ln = 1, grid % faces_n_nodes(s)  ! local face number
-!     n = grid % faces_n(ln, s)         ! global node number
-!
-!     ! Increase number of cells surrounding the this node by one ...
-!     grid % nodes_n_cells(n) = grid % nodes_n_cells(n) + 1
-!
-!     ! ... and store the current cell
-!     nodes_c(grid % nodes_n_cells(n), n) = c2
-!
-!     ! Also store boundary face for boundary cell
-!     grid % cells_bnd_face(c2) = s
-!   end do
-! end do
-
   do n = 1, grid % n_nodes
     call Sort_Mod_Unique_Int( grid % nodes_n_cells(n),  &
                 nodes_c(1:grid % nodes_n_cells(n), n) )
   end do
 
   max_n_cells = maxval(grid % nodes_n_cells)
-  write(100, *) 'max_n_cells(2) = ', max_n_cells
 
   ! Allocate memory for cells surrounding each node
   allocate(grid % nodes_c(1:max_n_cells, 1:grid % n_nodes))
@@ -290,16 +264,14 @@
        nodes_c(1:grid % nodes_n_cells(n), n)
   end do
 
-  do n = 1, grid % n_nodes
-    write(100, '(3f12.5, i8, 8i8)')                               &
-          grid % xn(n),                                           &
-          grid % yn(n),                                           &
-          grid % zn(n),                                           &
-          grid % nodes_n_cells(n), grid % nodes_c(1:max_n_cells, n)
-  end do
-
   deallocate(nodes_c)
 
-  stop
+  !----------------------------------------------!
+  !   Store boundary cells to face connections   !
+  !----------------------------------------------!
+  do s = 1, grid % n_bnd_cells
+    c2 = grid % faces_c(2,s)
+    grid % cells_bnd_face(c2) = s
+  end do
 
   end subroutine
