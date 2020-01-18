@@ -12,7 +12,6 @@
   use Turb_Mod
   use Grid_Mod
   use Eddies_Mod
-  use Grad_Mod
   use Bulk_Mod
   use Var_Mod,       only: Var_Type
   use Solver_Mod,    only: Solver_Mod_Create
@@ -83,7 +82,7 @@
   !---------------------------------------------!
   !   Open control file and read problem name   !
   !---------------------------------------------!
-  call Control_Mod_Open_File()
+  call Control_Mod_Open_File('control')
   call Control_Mod_Problem_Name(problem_name)
 
   ! Load the finite volume grid
@@ -91,11 +90,11 @@
 
   ! Allocate memory for working arrays and comm.
   call Work_Mod_Allocate(grid, rc=30, rf=1, rn=1, ic=4, if=0, in=1)
-  call Comm_Mod_Allocate(grid)
+  call Grid_Mod_Allocate_Comm(grid)
 
   call Grid_Mod_Load_Geo(grid, this_proc)
-  call Comm_Mod_Create_Buffers(grid)
-  call Comm_Mod_Load_Maps(grid)       ! maps should move to .cns file soon
+  call Grid_Mod_Create_Buffers(grid)
+  call Grid_Mod_Load_Maps(grid)       ! maps should move to .cns file soon
 
   call Comm_Mod_Wait
 
@@ -111,7 +110,6 @@
 
   ! Allocate memory for all variables
   call Field_Mod_Allocate(flow, grid)
-  call Grad_Mod_Allocate(grid)
   call Turb_Mod_Allocate(turb, flow)
   call Swarm_Mod_Allocate(swarm, turb)
   call Multiphase_Mod_Allocate(mult, flow)
@@ -129,7 +127,7 @@
   ! (You need face geomtry for this step)
   call Solver_Mod_Create(sol, grid)
 
-  call Load_Physical_Properties(grid)
+  call Load_Physical_Properties(flow)
 
   call Load_Boundary_Conditions(flow, turb, mult, turb_planes)
 
@@ -142,7 +140,9 @@
   ! Initialize variables
   if(.not. backup) then
     call Initialize_Variables(flow, turb, mult, swarm)
-    call Comm_Mod_Wait
+    if(multiphase_model .eq. VOLUME_OF_FLUID) then
+      call Multiphase_Mod_Update_Physical_Properties(mult)
+    end if
   end if
 
   ! Initialize monitoring points
@@ -165,7 +165,7 @@
   end if
 
   ! Prepare the gradient matrix for velocities
-  call Compute_Gradient_Matrix(grid)
+  call Field_Mod_Calculate_Grad_Matrix(flow)
 
   ! Print the areas of monitoring planes
   call Bulk_Mod_Print_Areas(flow % bulk)
@@ -186,7 +186,7 @@
   call Control_Mod_Time_Step(flow % dt, verbose=.true.)
   call Control_Mod_Backup_Save_Interval (bsi,    verbose=.true.)
   call Control_Mod_Results_Save_Interval(rsi,    verbose=.true.)
-  call Control_Mod_Swarm_Save_Interval(prsi,    verbose=.true.)
+  call Control_Mod_Swarm_Save_Interval  (prsi,   verbose=.true.)
   call Control_Mod_Wall_Time_Max_Hours  (wt_max, verbose=.true.)
   wt_max = wt_max * 3600  ! make it in seconds
 
@@ -194,7 +194,7 @@
   ! depending on how the code was compiled
   call Save_Results(flow, turb, mult, first_dt, .true.)   ! save inside
   call Save_Results(flow, turb, mult, first_dt, .false.)  ! save boundary
-  call Save_Swarm(swarm, .true.)
+  call Save_Swarm(swarm, first_dt)
 
   do n = first_dt + 1, last_dt
     ! For post-processing
@@ -210,7 +210,7 @@
     time = time + flow % dt
 
     ! Beginning of time step
-    call User_Mod_Beginning_Of_Time_Step(flow, turb, swarm, n, time)
+    call User_Mod_Beginning_Of_Time_Step(flow, turb, mult, swarm, n, time)
 
     ! Start info boxes.
     call Info_Mod_Time_Start()
@@ -219,7 +219,7 @@
 
     ! Initialize and print time info box
     call system_clock(sc_cur)
-    call Info_Mod_Time_Fill( n, time, (sc_cur-sc_ini)/real(sc_cr) )
+    call Info_Mod_Time_Fill( n, time, real(sc_cur-sc_ini)/real(sc_cr) )
     call Info_Mod_Time_Print()
 
     ! Turbulence models initializations
@@ -235,19 +235,25 @@
     if(multiphase_model .eq. VOLUME_OF_FLUID) then
       ! Update the values at boundaries
       call Update_Boundary_Values(flow, turb, mult)
-      call Multiphase_Mod_Compute_Vof(mult, sol, flow % dt, 1)
+      call Multiphase_Mod_Compute_Vof(mult, sol, flow % dt, n)
+      call Multiphase_Mod_Update_Physical_Properties(mult)
     end if
 
     do ini = 1, max_ini
 
+      ! Beginning of iteration
+      call User_Mod_Beginning_Of_Iteration(flow, turb, mult, swarm, n, time)
+
       call Info_Mod_Iter_Fill(ini)
 
-      call Grad_Mod_Pressure(flow % p)
+      call Field_Mod_Grad_Pressure(flow, flow % p,  &
+                                   flow % density,  &
+                                   grav_x, grav_y, grav_z)
 
       ! Compute velocity gradients
-      call Grad_Mod_Variable(flow % u)
-      call Grad_Mod_Variable(flow % v)
-      call Grad_Mod_Variable(flow % w)
+      call Field_Mod_Grad_Variable(flow, flow % u)
+      call Field_Mod_Grad_Variable(flow, flow % v)
+      call Field_Mod_Grad_Variable(flow, flow % w)
 
       ! All velocity components one after another
       call Compute_Momentum(flow, turb, mult, 1, sol, flow % dt, ini)
@@ -256,12 +262,12 @@
 
       ! Refresh buffers for a % sav before discretizing for pressure
       ! (Can this call be somewhere in Compute Pressure?)
-      call Comm_Mod_Exchange_Real(grid, sol % a % sav)
+      call Grid_Mod_Exchange_Real(grid, sol % a % sav)
 
       call Balance_Mass(flow)
       call Compute_Pressure(flow, mult, sol, flow % dt, ini)
 
-      call Grad_Mod_Pressure_Correction(flow % pp)
+      call Field_Mod_Grad_Pressure_Correction(flow, flow % pp)
 
       call Bulk_Mod_Calculate_Fluxes(grid, flow % bulk, flow % m_flux % n)
       mass_res = Correct_Velocity(flow, sol, flow % dt, ini)
@@ -284,6 +290,9 @@
 
       ! End of the current iteration
       call Info_Mod_Iter_Print()
+
+      ! End of iteration
+      call User_Mod_End_Of_Iteration(flow, turb, mult, swarm, n, time)
 
       if(ini >= min_ini) then
         call Control_Mod_Tolerance_For_Simple_Algorithm(simple_tol)
@@ -313,7 +322,7 @@
     call Bulk_Mod_Adjust_P_Drops(flow % bulk, flow % dt)
 
     ! Just before the end of time step
-    call User_Mod_End_Of_Time_Step(flow, turb, swarm, n, time)
+    call User_Mod_End_Of_Time_Step(flow, turb, mult, swarm, n, time)
 
     !----------------------!
     !   Save the results   !
@@ -325,7 +334,7 @@
     if(save_now           .or.  &
        exit_now           .or.  &
        mod(n, bsi) .eq. 0 .or.  &
-       (sc_cur-sc_ini)/real(sc_cr) > wt_max) then
+       real(sc_cur-sc_ini)/real(sc_cr) > wt_max) then
       call Backup_Mod_Save(flow, swarm, turb, mult, n, n_stat)
     end if
 
@@ -333,15 +342,26 @@
     if(save_now           .or.  &
        exit_now           .or.  &
        mod(n, rsi) .eq. 0 .or.  &
-       (sc_cur-sc_ini)/real(sc_cr) > wt_max) then
+       real(sc_cur-sc_ini)/real(sc_cr) > wt_max) then
       call Comm_Mod_Wait
       call Save_Results(flow, turb, mult, n, .true.)   ! save inside
       call Save_Results(flow, turb, mult, n, .false.)  ! save bnd
-      call Save_Swarm(swarm, .true.)
+      call Save_Swarm(swarm, n)
+
+      if(multiphase_model .eq. VOLUME_OF_FLUID) then
+        call Surf_Mod_Allocate(surf, flow)
+        call Surf_Mod_Place_At_Var_Value(surf,        &
+                                         mult % vof,  &
+                                         sol,         &
+                                         0.5,         &
+                                         .false.)  ! don't print messages
+        call Save_Surf(surf, n)
+        call Surf_Mod_Clean(surf)
+      end if
 
       ! Write results in user-customized format
-      call User_Mod_Save_Results(flow, turb, name_save)
-      call User_Mod_Save_Swarm(flow, turb, swarm, name_save) 
+      call User_Mod_Save_Results(flow, turb, mult, n)
+!???  call User_Mod_Save_Swarm(flow, turb, swarm, name_save) 
     end if
 
     if(save_now) then
@@ -360,7 +380,7 @@
     end if
 
     ! Ran more than a set limit
-    if((sc_cur-sc_ini)/real(sc_cr) > wt_max) then
+    if(real(sc_cur-sc_ini)/real(sc_cr) > wt_max) then
       goto 2
     end if
 
@@ -370,9 +390,17 @@
   ! ... it is one above the loop boundaries here
   n = n - 1
 
+  ! User function for end of simulation
+  call User_Mod_End_Of_Simulation(flow, turb, mult, swarm, n, time)
+
   ! Save backup and post-processing files at exit
   call Comm_Mod_Wait
   call Backup_Mod_Save(flow, swarm, turb, mult, n, n_stat)
+  call Save_Results(flow, turb, mult, n, .true.)   ! save inside
+  call Save_Results(flow, turb, mult, n, .false.)  ! save bnd
+
+  ! Write results in user-customized format
+  call User_Mod_Save_Results(flow, turb, mult, n) 
 
   if(this_proc < 2) then
     open(9, file='stop')

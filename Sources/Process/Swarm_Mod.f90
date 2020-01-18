@@ -4,17 +4,10 @@
 !   Module for Lagrangian particle tracking                                    !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Comm_Mod,  only: this_proc, n_proc,                  &
-                       Comm_Mod_Global_Min_Int,            &
-                       Comm_Mod_Global_Min_Real,           &
-                       Comm_Mod_Global_Sum_Int,            &
-                       Comm_Mod_Global_Sum_Int_Array,      &
-                       Comm_Mod_Global_Sum_Real_Array
-  use Grid_Mod,  only: Grid_Type, Grid_Mod_Bnd_Cond_Type,  &
-                       INFLOW, OUTFLOW, CONVECT, PRESSURE, WALL, WALLFL
-  use Var_Mod,   only: Var_Type
-  use Field_Mod, only: Field_Type, density, viscosity
+  use Comm_Mod
+  use Grid_Mod
+  use Var_Mod
+  use Field_Mod
   use Turb_Mod
 !------------------------------------------------------------------------------!
   implicit none

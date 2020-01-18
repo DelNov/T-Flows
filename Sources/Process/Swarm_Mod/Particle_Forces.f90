@@ -37,7 +37,7 @@
   ! ...will be deducted from the total force.
 
   ! Characteristic density (needs to be discussed):
-  dens_const = maxval(density(:))
+  dens_const = maxval(flow % density(:))
 
   part % fb_x = 0.0
   part % fb_y = (dens_const - part % density) * EARTH_G * part_vol
