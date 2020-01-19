@@ -31,7 +31,7 @@
   call Grid_Mod_Load_Geo  (grid, 0)
 
   ! Initialize processor numbers (poor idea to put it here)
-  grid % comm % cell_proc(1:grid % n_cells) = 1
+  grid % comm % cell_proc(-grid % n_bnd_cells:grid % n_cells) = 1
 
   print *, '# Number of subdomains:'
   read(*,*)  n_sub
