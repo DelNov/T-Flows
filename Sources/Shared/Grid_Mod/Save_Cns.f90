@@ -56,7 +56,7 @@
 
   ! Number of nodes for each cell
   do c = 1, grid % n_cells
-    if(grid % new_c(c) .ne. 0) then
+    if(grid % comm % cell_proc(c) .eq. sub) then
       write(fu) grid % cells_n_nodes(c)
     end if
   end do
@@ -66,7 +66,7 @@
 
   ! Cells' nodes
   do c = 1, grid % n_cells
-    if(grid % new_c(c) .ne. 0) then
+    if(grid % comm % cell_proc(c) .eq. sub) then
       do n = 1, grid % cells_n_nodes(c)
         write(fu) grid % new_n(grid % cells_n(n,c))
       end do
@@ -80,7 +80,7 @@
 
   ! Cells' processor ids
   do c = 1, grid % n_cells
-    if(grid % new_c(c) .ne. 0) then
+    if(grid % comm % cell_proc(c) .eq. sub) then
       write(fu) grid % comm % cell_proc(c)
     end if
   end do
@@ -88,7 +88,7 @@
     write(fu) grid % comm % cell_proc(buf_recv_ind(s))
   end do
   do c = -1, -grid % n_bnd_cells, -1
-    if(grid % new_c(c) .ne. 0) then
+    if(grid % comm % cell_proc(c) .eq. sub) then
       write(fu) grid % comm % cell_proc(c)
     end if
   end do
@@ -133,7 +133,7 @@
 
   ! Physical boundary cells
   do c = -1, -grid % n_bnd_cells, -1
-    if(grid % new_c(c) .ne. 0) then
+    if(grid % comm % cell_proc(c) .eq. sub) then
       write(fu) grid % bnd_cond % color(c)
     end if
   end do

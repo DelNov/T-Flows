@@ -41,7 +41,7 @@
   !-----------------------------!
   do var = 1, 3
     do c = 1, grid % n_cells
-      if(grid % new_c(c) > 0) then
+      if(grid % comm % cell_proc(c) .eq. sub) then
         if(var .eq. 1) write(fu) grid % xc(c)
         if(var .eq. 2) write(fu) grid % yc(c)
         if(var .eq. 3) write(fu) grid % zc(c)
@@ -71,7 +71,7 @@
   !   Cell volumes   !
   !------------------!
   do c = 1, grid % n_cells
-    if(grid % new_c(c) > 0) then
+    if(grid % comm % cell_proc(c) .eq. sub) then
       write(fu) grid % vol(c)
     end if
   end do
@@ -83,7 +83,7 @@
   !   Wall distance   !
   !-------------------!
   do c = 1, grid % n_cells
-    if(grid % new_c(c) > 0) then
+    if(grid % comm % cell_proc(c) .eq. sub) then
       write(fu) grid % wall_dist(c)
     end if
   end do
@@ -91,7 +91,7 @@
     write(fu) grid % wall_dist(buf_recv_ind(s))
   end do
   do c = -1, -grid % n_bnd_cells, -1
-    if(grid % new_c(c) .ne. 0) then
+    if(grid % comm % cell_proc(c) .eq. sub) then
       write(fu) grid % wall_dist(c)
     end if
   end do
