@@ -143,7 +143,6 @@
               nbf_sub = nbf_sub + 1                ! increase buffer cell count
               buf_send_ind(nbf_sub) = grid % new_c(c1)  ! buffer send index
               buf_recv_ind(nbf_sub) = c2           ! important for coordinate
-              buf_pos(nbf_sub) = nc_sub + nbf_sub  ! place buffers after cells
 
               grid % new_f(s) = nf_sub + nbf_sub
             end if
@@ -152,7 +151,6 @@
               nbf_sub = nbf_sub + 1                ! increasu buffer cell count
               buf_send_ind(nbf_sub) = grid % new_c(c2)  ! buffer send index
               buf_recv_ind(nbf_sub) = c1           ! important for coordinate
-              buf_pos(nbf_sub) = nc_sub + nbf_sub  ! place buffers after cells
 
               grid % new_f(s) = nf_sub + nbf_sub
             end if

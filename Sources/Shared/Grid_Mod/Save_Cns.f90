@@ -121,12 +121,10 @@
     end if
   end do
 
-  ! nbf_sub buffer faces (copy faces here, avoid them with buf_pos)
+  ! nbf_sub buffer faces and the new numbers of cells surrounding them
   do s = 1, nbf_sub
-    if(buf_pos(s) > nc_sub) then     ! normal buffer (non-copy)
-      write(fu) buf_send_ind(s),  &  ! new cell number
-               buf_pos(s)            ! position in the buffer
-    end if
+    write(fu) buf_send_ind(s),  &
+              nc_sub + s
   end do
 
   !--------------!
