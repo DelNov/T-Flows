@@ -23,9 +23,7 @@
                           nc_sub,    &  ! number of cells in the subdomain
                           nf_sub,    &  ! number of faces in the subdomain
                           nbc_sub,   &  ! number of boundary cells in sub.
-                          ncc_sub,   &  ! number of copy cells in the sub.
-                          nbf_sub,   &  ! number of buffer cells in subdom.
-                          nbfcc_sub     ! number of buffer copy cells in sub.
+                          nbf_sub
   character(len=80)    :: name_buf
   integer, allocatable :: side_cell(:,:)
   logical, parameter   :: verbose = .false.
@@ -82,7 +80,6 @@
     ! Faces & real boundary cells
     nf_sub  = 0  ! number of faces in subdomain
     nbc_sub = 0  ! number of real boundary cells in subdomain
-    ncc_sub = 0
     do s = 1, grid % n_faces
       grid % new_f(s) = 0
     end do
@@ -122,7 +119,6 @@
     !   Create buffers   !
     !--------------------!
     nbf_sub   = 0
-    nbfcc_sub = 0
 
     if(verbose) then
       write(fu,'(a30)') '# Number of physical cells:'
@@ -217,7 +213,6 @@
     print '(a,i9,a)', ' # ', nn_sub,            ' nodes' 
     print '(a,i9,a)', ' # ', nf_sub + nbf_sub,  ' faces' 
     print '(a,i9,a)', ' # ', nbc_sub,           ' boundary cells' 
-    print '(a,i9,a)', ' # ', ncc_sub,           ' copy cell pairs'
     print '(a,i5,a)', ' #---------------------------------------------'
 
     call Grid_Mod_Save_Cns(grid,         &
