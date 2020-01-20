@@ -1,34 +1,23 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(flow, turb, save_name)
+  subroutine User_Mod_Save_Results(flow, turb, mult, n)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
 !                                                                              !
 !   The results are then writen in files name_res.dat and name_res_plus.dat    !
 !------------------------------------------------------------------------------!
-  use Const_Mod                      ! constants
-  use Comm_Mod                       ! parallel stuff
-  use Grid_Mod,  only: Grid_Type
-  use Field_Mod, only: Field_Type, heat_transfer, heat_flux, heat, &
-                       density, viscosity, capacity, conductivity, &
-                       heated_area 
-  use Bulk_Mod,  only: Bulk_Type
-  use Var_Mod,   only: Var_Type
-  use Name_Mod,  only: problem_name
-  use Turb_Mod
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
-  type(Turb_Type),  target :: turb
-  character(len=*)         :: save_name
+  type(Field_Type),       target :: flow
+  type(Turb_Type),        target :: turb
+  type(Multiphase_Type),  target :: mult
+  integer                        :: n
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
   integer                  :: n_prob, pl, c, i, count, s, c1, c2, n_points
   character(len=80)        :: coord_name, res_name, res_name_plus
-  character(len=80)        :: store_name
   real, allocatable        :: z_p(:), u_p(:), v_p(:), w_p(:), t_p(:),  &
                               ind(:),  wall_p(:), kin_p(:), eps_p(:),  &
                               uw_p(:), uu_p(:), vv_p(:), ww_p(:),      &
@@ -36,6 +25,8 @@
   integer, allocatable     :: n_p(:), n_count(:)
   real                     :: t_wall, t_tau, d_wall, nu_mean, t_inf
   real                     :: ubulk, error, re, cf_dean, cf, pr, u_tau_p
+  real                     :: dens_const, visc_const
+  real                     :: capa_const, cond_const
   logical                  :: there
 !==============================================================================!
 
@@ -45,15 +36,18 @@
   call Field_Mod_Alias_Momentum(flow, u, v, w)
   call Field_Mod_Alias_Energy  (flow, t)
 
+  ! Get constant physical properties
+  call Control_Mod_Mass_Density        (dens_const)
+  call Control_Mod_Dynamic_Viscosity   (visc_const)
+  call Control_Mod_Heat_Capacity       (capa_const)
+  call Control_Mod_Thermal_Conductivity(cond_const)
+
   ! Set the name for coordinate file
-  call Name_File(0, coord_name, ".1d")
+  call File_Mod_Set_Name(coord_name, extension='.1d')
 
-  ! Store the name
-  store_name = problem_name
-  problem_name = save_name
-
-  call Name_File(0, res_name,      "-res.dat")
-  call Name_File(0, res_name_plus, "-res-plus.dat")
+  ! Set file names for results
+  call File_Mod_Set_Name(res_name,      appendix='-res',      extension='.dat')
+  call File_Mod_Set_Name(res_name_plus, appendix='-res-plus', extension='.dat')
 
   !------------------!
   !   Read 1d file   !
@@ -74,17 +68,10 @@
       print *, '#--------------------------------------------------------------'
     end if
 
-    ! Restore the name and return
-    problem_name = store_name
     return
   end if
 
-  call Comm_Mod_Global_Sum_Real(heat_flux)
-  call Comm_Mod_Global_Sum_Real(heated_area)
-  heat_flux = heat_flux / (heated_area + TINY)
-  heat      = heat_flux * heated_area
-
-  ubulk = bulk % flux_x / (density*bulk % area_x)
+  ubulk    = bulk % flux_x / (dens_const * bulk % area_x)
   t_wall   = 0.0
   nu_mean  = 0.0
   n_points = 0
@@ -145,7 +132,7 @@
                           - turb % u_mean(c) * turb % w_mean(c)
 
         if(heat_transfer) then
-          t_p(i)  = t_p(i)  + turb % t_mean(c)
+          t_p (i) = t_p (i)  + turb % t_mean(c)
           t2_p(i) = t2_p(i) + turb % t2_res(c)  &
                             - turb % t_mean(c) * turb % t_mean(c)
           ut_p(i) = ut_p(i) + turb % ut_res(c)  &
@@ -159,7 +146,6 @@
       end if
     end do
   end do
-
 
   ! Average over all processors
   do pl=1, n_prob-1
@@ -179,7 +165,7 @@
     count =  count + n_count(pl)
 
     if(heat_transfer) then
-      call Comm_Mod_Global_Sum_Real(t_p(pl))
+      call Comm_Mod_Global_Sum_Real(t_p (pl))
       call Comm_Mod_Global_Sum_Real(t2_p(pl))
       call Comm_Mod_Global_Sum_Real(ut_p(pl))
       call Comm_Mod_Global_Sum_Real(vt_p(pl))
@@ -195,11 +181,10 @@
       u_p   (i) = u_p   (i) / n_count(i)
       v_p   (i) = v_p   (i) / n_count(i)
       w_p   (i) = w_p   (i) / n_count(i)
-
-      uu_p(i) = uu_p(i) / n_count(i)
-      vv_p(i) = vv_p(i) / n_count(i)
-      ww_p(i) = ww_p(i) / n_count(i)
-      uw_p(i) = uw_p(i) / n_count(i)
+      uu_p  (i) = uu_p(i) / n_count(i)
+      vv_p  (i) = vv_p(i) / n_count(i)
+      ww_p  (i) = ww_p(i) / n_count(i)
+      uw_p  (i) = uw_p(i) / n_count(i)
 
       if(heat_transfer) then
         t_p (i) = t_p (i) / n_count(i)
@@ -212,18 +197,15 @@
   end do
 
   ! Calculating friction velocity and friction temperature
-    u_tau_p = sqrt( (viscosity*sqrt(u_p(1)**2 +   &
-                                    v_p(1)**2 +   &
-                                    w_p(1)**2)    &
-                                    / wall_p(1))  &
-                                    / density)
+    u_tau_p = sqrt( (visc_const*sqrt(u_p(1)**2 +   &
+                                     v_p(1)**2 +   &
+                                     w_p(1)**2)    &
+                                     / wall_p(1))  &
+                                     / dens_const)
   if(u_tau_p .eq. 0.0) then
     if(this_proc < 2) then
       write(*,*) '# Friction velocity is zero in Save_Results.f90!'
     end if
-
-    ! Restore the name and return
-    problem_name = store_name
     return
   end if
 
@@ -238,7 +220,7 @@
 
     call Comm_Mod_Wait
 
-    if(heat_flux> 0.0) then
+    if(flow % heat_flux > 0.0) then
       call Comm_Mod_Global_Min_Real(t_inf)
     else
       call Comm_Mod_Global_Max_Real(t_inf)
@@ -251,9 +233,9 @@
         if( Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. WALL .or.  &
             Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. WALLFL) then
 
-          t_wall = t_wall + turb % t_mean(c2)
-          nu_mean = nu_mean + t % q(c2)  &
-                            / (conductivity*(turb % t_mean(c2) - t_inf))
+          t_wall   = t_wall + turb % t_mean(c2)
+          nu_mean  = nu_mean + t % q(c2)  &
+                   / (cond_const*(turb % t_mean(c2) - t_inf))
           n_points = n_points + 1
         end if
       end if
@@ -267,24 +249,24 @@
 
     t_wall  = t_wall / n_points
     nu_mean = nu_mean / n_points
-    t_tau   = heat_flux / (density * capacity * u_tau_p)
+    t_tau   = flow % heat_flux / (dens_const * capa_const * u_tau_p)
   end if
 
   open(3, file = res_name)
   open(4, file = res_name_plus)
-  
+
   do i = 3, 4
-    pr = viscosity * capacity / conductivity
-    re = density * ubulk * 2.0/viscosity
+    pr = visc_const * capa_const / cond_const
+    re = dens_const * ubulk * 2.0 / visc_const
     cf_dean = 0.073*(re)**(-0.25)
     cf      = u_tau_p**2/(0.5*ubulk**2)
     error   = abs(cf_dean - cf)/cf_dean * 100.0
     write(i,'(a1,(a12,e12.6))')  &
     '#', 'ubulk    = ', ubulk 
     write(i,'(a1,(a12,e12.6))')  &
-    '#', 're       = ', density * ubulk * 2.0/viscosity
+    '#', 're       = ', dens_const * ubulk * 2.0 / visc_const
     write(i,'(a1,(a12,e12.6))')  &
-    '#', 'Re_tau   = ', density*u_tau_p/viscosity
+    '#', 'Re_tau   = ', dens_const * u_tau_p / visc_const
     write(i,'(a1,(a12,e12.6))')  &
     '#', 'cf       = ', 2.0*(u_tau_p/ubulk)**2
     write(i,'(a1,(a12,f12.6))')  &
@@ -345,17 +327,17 @@
   end if
 
   do i = 1, n_prob-1
-    wall_p(i) = density * wall_p(i)*u_tau_p/viscosity
+    wall_p(i) = dens_const * wall_p(i)*u_tau_p/visc_const
     u_p   (i) = u_p(i) / u_tau_p
     v_p   (i) = v_p(i) / u_tau_p
     w_p   (i) = w_p(i) / u_tau_p
 
-    kin_p(i) = kin_p(i) / u_tau_p**2                      ! kin%n(c)
-    eps_p(i) = eps_p(i)*viscosity / (u_tau_p**4*density)  ! eps%n(c)
-    uu_p (i) = uu_p (i) / (u_tau_p**2)
-    vv_p (i) = vv_p (i) / (u_tau_p**2)
-    ww_p (i) = ww_p (i) / (u_tau_p**2)
-    uw_p (i) = uw_p (i) / (u_tau_p**2)
+    kin_p (i) = kin_p(i) / u_tau_p**2                              ! kin % n(c)
+    eps_p (i) = eps_p(i) * visc_const / (u_tau_p**4 * dens_const)  ! eps % n(c)
+    uu_p  (i) = uu_p (i) / (u_tau_p**2)
+    vv_p  (i) = vv_p (i) / (u_tau_p**2)
+    ww_p  (i) = ww_p (i) / (u_tau_p**2)
+    uw_p  (i) = uw_p (i) / (u_tau_p**2)
 
     if(heat_transfer) then
       t_p (i) = (t_wall - t_p(i)) / t_tau  ! t % n(c)
@@ -418,8 +400,5 @@
   end if
 
   if(this_proc < 2)  print *, '# Finished with User_Mod_Save_Results.f90.'
-
-  ! Restore the name
-  problem_name = store_name
 
   end subroutine

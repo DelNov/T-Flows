@@ -1,31 +1,22 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Time_Step(flow, turb, swarm, n, time)
+  subroutine User_Mod_End_Of_Time_Step(flow, turb, mult, swarm, n, time)
 !------------------------------------------------------------------------------!
 !   This function is called at the beginning of time step.                     !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Grid_Mod,  only: Grid_Type
-  use Field_Mod, only: Field_Type,  &
-                       viscosity, density, conductivity, heat_transfer
-  use Var_Mod,   only: Var_Type
-  use Const_Mod, only: PI
-  use Comm_Mod,  only: Comm_Mod_Global_Max_Real, this_proc
-  use Save_Results_Mod
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
-  type(Turb_Type),  target :: turb
-  type(Swarm_Type), target :: swarm
-  integer                  :: n     ! time step
-  real                     :: time  ! physical time
+  type(Field_Type),       target :: flow
+  type(Turb_Type),        target :: turb
+  type(Multiphase_Type),  target :: mult
+  type(Swarm_Type),       target :: swarm
+  integer                        :: n     ! time step
+  real                           :: time  ! physical time
 !----------------------------------[Locals]------------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
   type(Grid_Type), pointer :: grid
   integer                  :: c, e, dir
   real                     :: lo, xo, yo, zo(2), ro, xc, yc, zc, uc, vc, sg, &
                               sig_xy, sig_z, rmin, rmax, rp, lx, ly, lz, vmax
-  character(len=80)        :: file_name
 !==============================================================================!
 
   ! Take aliases
@@ -130,10 +121,5 @@
     u % n(c) = u % n(c) / vmax / 10.0
     v % n(c) = v % n(c) / vmax / 10.0
   end do
-
-  file_name = 'with_random_eddies_000000'
-  write(file_name(20:25), '(i6.6)') n
-
-  call Save_Results(flow, turb, file_name)
 
   end subroutine

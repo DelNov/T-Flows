@@ -1,17 +1,18 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Time_Step(flow, turb, swarm, n, time)
+  subroutine User_Mod_End_Of_Time_Step(flow, turb, mult, swarm, n, time)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of time step.                           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
-  type(Turb_Type),  target :: turb
-  type(Swarm_Type), target :: swarm
-  integer                  :: n     ! time step
-  real                     :: time  ! physical time
+  type(Field_Type),      target :: flow
+  type(Turb_Type),       target :: turb
+  type(Multiphase_Type), target :: mult
+  type(Swarm_Type),      target :: swarm
+  integer                       :: n     ! time step
+  real                          :: time  ! physical time
 !----------------------------------[Locals]------------------------------------!
-  integer :: k
+  integer :: k, n_parts_in_buffers
   real    :: dx
 !==============================================================================!
 
@@ -36,7 +37,7 @@
       swarm % particle(k) % z_n = 0.0
 
       ! Searching for the closest cell and node to place the moved particle
-      call Swarm_Mod_Find_Nearest_Cell(swarm, k)
+      call Swarm_Mod_Find_Nearest_Cell(swarm, k, n_parts_in_buffers)
       call Swarm_Mod_Find_Nearest_Node(swarm, k)
     end do
 

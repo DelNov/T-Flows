@@ -132,7 +132,8 @@ METIS_LIB = ../Libraries/Metis_5.1.0_Linux_64/libmetis.a
 #-------------
 
 # Modules in shared directories
-SRC_MOD = Const_Mod.f90			\
+SRC_MOD = Comm_Mod_Seq.f90		\
+          Const_Mod.f90			\
           Math_Mod.f90			\
           File_Mod.f90			\
           Gen_Mod.f90			\
@@ -142,8 +143,7 @@ SRC_MOD = Const_Mod.f90			\
           Bnd_Cond_Mod.f90		\
           Sort_Mod.f90			\
           Grid_Level_Mod.f90		\
-          Grid_Mod.f90			\
-          Comm_Mod_Seq.f90
+          Grid_Mod.f90
 
 #---------------
 #   Functions
@@ -158,8 +158,8 @@ SRC_FUN = Probe_1d_Nodes.f90		\
 
 # Local functions are added one by one ...
 SRC_FUN += Allocate_Memory.f90		\
+           Calculate_Cell_Centers.f90	\
            Calculate_Geometry.f90	\
-           Connect_Domains.f90		\
            Find_Faces.f90		\
            Find_Parents.f90		\
            Grid_Topology.f90		\

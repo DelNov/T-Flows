@@ -15,5 +15,6 @@
   include 'Math_Mod/Distance.f90'
   include 'Math_Mod/Distance_Squared.f90'
   include 'Math_Mod/Tet_Volume.f90'
+  include 'Math_Mod/Tri_Area_Z.f90'
 
   end module

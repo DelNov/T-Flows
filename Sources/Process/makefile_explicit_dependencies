@@ -525,19 +525,11 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 #-- ./User_Mod/End_Of_Simulation.f90
 #-- ./User_Mod/Initialize.f90
 #-- ./User_Mod/Allocate.f90
-#-- ./User_Mod/Save_Vtu_Results.f90
 #-- ./User_Mod/Force.f90
 #-- ./User_Mod/End_Of_Compute_Energy.f90
 #-- ./User_Mod/End_Of_Correct_Velocity.f90
 #-- ./User_Mod/Beginning_Of_Correct_Velocity.f90
 #-- ./User_Mod/Save_Results.f90
-#-- ./User_Mod/Save_Cgns_Results.f90
-$(DIR_OBJECT)/Save_Cgns_Results.o:\
-$(DIR_SHARED)/Cgns_Mod_Seq.f90 \
-$(DIR_SHARED)/Cgns_Mod_Par.f90 \
-$(DIR_SHARED)/Cgns_Mod/*.f90 \
-$(DIR_SHARED)/Cgns_Mod/*/*.f90 
-
 #-- ./User_Mod/End_Of_Time_Step.f90
 #-- ./User_Mod/Beginning_Of_Compute_Pressure.f90
 #-- ./User_Mod/Beginning_Of_Compute_Scalar.f90
@@ -1677,14 +1669,11 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 #-- ./Comm_Mod/Sequential/Read_Bnd_Real.f90
 #-- ./Comm_Mod/Sequential/Global_Sum_Int_Array.f90
 #-- ./Comm_Mod/Sequential/Global_Sum_Int.f90
-#-- ./Comm_Mod/Sequential/Set_Buffer_Color.f90
 #-- ./Comm_Mod/Sequential/Write_Log_Array.f90
 #-- ./Comm_Mod/Sequential/Read_Int.f90
 #-- ./Comm_Mod/Sequential/Read_Int_Array.f90
 #-- ./Comm_Mod/Sequential/Write_Int.f90
 #-- ./Comm_Mod/Sequential/Global_Min_Int.f90
-#-- ./Comm_Mod/Sequential/Exchange_Real.f90
-#-- ./Comm_Mod/Sequential/Allocate.f90
 #-- ./Comm_Mod/Sequential/Global_Max_Int.f90
 #-- ./Comm_Mod/Sequential/Write_Int_Array.f90
 #-- ./Comm_Mod/Sequential/Global_Sum_Real_Array.f90
@@ -1698,7 +1687,6 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 #-- ./Comm_Mod/Sequential/Global_Sum_Real.f90
 #-- ./Comm_Mod/Sequential/Start.f90
 #-- ./Comm_Mod/Sequential/Read_Real.f90
-#-- ./Comm_Mod/Sequential/Exchange_Int.f90
 #-- ./Comm_Mod/Sequential/Read_Text.f90
 #-- ./Comm_Mod/Sequential/Write_Real_Array.f90
 #-- ./Comm_Mod/Sequential/Open_File_Read.f90
@@ -1712,19 +1700,15 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 #-- ./Comm_Mod/Sequential/Write_Real.f90
 #-- ./Comm_Mod/Sequential/Exchange_Real_Array.f90
 #-- ./Comm_Mod/Sequential/Write_Cell_Real.f90
-#-- ./Comm_Mod/Sequential/Load_Maps.f90
 #-- ./Comm_Mod/Sequential/Global_Lor_Log_Array.f90
 #-- ./Comm_Mod/Parallel/Read_Bnd_Real.f90
 #-- ./Comm_Mod/Parallel/Global_Sum_Int_Array.f90
 #-- ./Comm_Mod/Parallel/Global_Sum_Int.f90
-#-- ./Comm_Mod/Parallel/Set_Buffer_Color.f90
 #-- ./Comm_Mod/Parallel/Write_Log_Array.f90
 #-- ./Comm_Mod/Parallel/Read_Int.f90
 #-- ./Comm_Mod/Parallel/Read_Int_Array.f90
 #-- ./Comm_Mod/Parallel/Write_Int.f90
 #-- ./Comm_Mod/Parallel/Global_Min_Int.f90
-#-- ./Comm_Mod/Parallel/Exchange_Real.f90
-#-- ./Comm_Mod/Parallel/Allocate.f90
 #-- ./Comm_Mod/Parallel/Global_Max_Int.f90
 #-- ./Comm_Mod/Parallel/Write_Int_Array.f90
 #-- ./Comm_Mod/Parallel/Global_Sum_Real_Array.f90
@@ -1738,7 +1722,6 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 #-- ./Comm_Mod/Parallel/Global_Sum_Real.f90
 #-- ./Comm_Mod/Parallel/Start.f90
 #-- ./Comm_Mod/Parallel/Read_Real.f90
-#-- ./Comm_Mod/Parallel/Exchange_Int.f90
 #-- ./Comm_Mod/Parallel/Read_Text.f90
 #-- ./Comm_Mod/Parallel/Write_Real_Array.f90
 #-- ./Comm_Mod/Parallel/Open_File_Read.f90
@@ -1752,7 +1735,6 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 #-- ./Comm_Mod/Parallel/Write_Real.f90
 #-- ./Comm_Mod/Parallel/Exchange_Real_Array.f90
 #-- ./Comm_Mod/Parallel/Write_Cell_Real.f90
-#-- ./Comm_Mod/Parallel/Load_Maps.f90
 #-- ./Comm_Mod/Parallel/Global_Lor_Log_Array.f90
 #-- ./Metis_Options_Mod.f90
 #-- ./Swap_Real.f90

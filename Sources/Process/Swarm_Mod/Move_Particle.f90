@@ -20,7 +20,7 @@
   real                         :: k1, k2, k3, k4      ! for Runge-Kutta
   real                         :: part_tau, part_vel
   real                         :: visc_const          ! characteristic viscosity
-  real                         :: density_const       ! characteristic density
+  real                         :: dens_const          ! characteristic density
 !==============================================================================!
 
   ! Take aliases
@@ -32,8 +32,8 @@
   part => swarm % particle(k)
 
   ! Characteristic viscosity (needs to be discussed yet)
-  visc_const    = maxval(flow % viscosity(:))
-  density_const = maxval(flow % density(:))
+  visc_const = maxval(flow % viscosity(:))
+  dens_const = maxval(flow % density(:))
 
   c  = part % cell      ! index of the closest cell for interpolation
   c2 = part % bnd_cell  ! index of the closest boundary cell for reflection
@@ -77,7 +77,7 @@
                         + part % rel_w ** 2)
 
   ! Compute Reynolds number for calculating Cd
-  part % re = density_const * part % d * abs(flow_vel - part_vel) / visc_const
+  part % re = dens_const * part % d * abs(flow_vel - part_vel) / visc_const
 
   ! Compute the drag factor f
   part % f = 1.0 + 0.15 *(part % re ** 0.687)

@@ -1,36 +1,25 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(flow, save_name) 
+  subroutine User_Mod_Save_Results(flow, turb, mult, n)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
 !                                                                              !
 !   The results are then writen in files name_res.dat and name_res_plus.dat    !
 !------------------------------------------------------------------------------!
-  use Const_Mod                      ! constants
-  use Comm_Mod                       ! parallel stuff
-  use Grid_Mod,  only: Grid_Type
-  use Grad_Mod
-  use Field_Mod, only: Field_Type, heat_transfer, heat_flux,        &
-                       density, viscosity, capacity, conductivity,  &
-                       grav_x, grav_y, grav_z
-  use Bulk_Mod,  only: Bulk_Type
-  use Var_Mod,   only: Var_Type
-  use Name_Mod,  only: problem_name
-  use Rans_Mod
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
-  character(len=*)         :: save_name
+  type(Field_Type),       target :: flow
+  type(Turb_Type),        target :: turb
+  type(Multiphase_Type),  target :: mult
+  integer                        :: n
 !-----------------------------------[Locals]-----------------------------------!
   integer             :: n_prob, pl, c, i, count, s, c1, c2, n_points
   character(len=80)   :: coord_name, res_name, res_name_plus
-  character(len=80)   :: store_name
   real, allocatable   :: z_p(:), tz_p(:), ti_p(:), w_p(:), t_p(:),         &
                          y_plus_p(:),  ind(:),  wall_p(:), kin_p(:),       &
                          eps_p(:), kin_mod_p(:),                           &
                          uw_p(:), uu_p(:), vv_p(:), ww_p(:),               &
-                         tt_p(:), ut_p(:), vt_p(:), wt_p(:), tt_mod_p(:),  &
+                         t2_p(:), ut_p(:), vt_p(:), wt_p(:), t2_mod_p(:),  &
                          ut_mod(:), vt_mod(:), wt_mod(:)
   integer, allocatable :: n_p(:), n_count(:)
   real                 :: t_wall, t_tau, d_wall, t_hot, t_cold, t_diff
@@ -41,32 +30,37 @@
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u, v, w, t
+  type(Var_Type),  pointer :: kin, eps, zeta, f, ut, vt, wt, t2
 !==============================================================================!
 
   ! Take aliases
   grid => flow % pnt_grid
   bulk => flow % bulk
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
-  t    => flow % t
+  call Field_Mod_Alias_Momentum   (flow, u, v, w)
+  call Field_Mod_Alias_Energy     (flow, t)
+  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f)
+  call Turb_Mod_Alias_Heat_Fluxes (turb, ut, vt, wt) 
+  call Turb_Mod_Alias_T2          (turb, t2) 
 
   ! Set some constants
   t_cold =  5.0
   t_hot  = 15.0
   t_diff =  t_hot - t_cold
 
-  call Grad_Mod_Variable(t, .true.)
-  
-! Set the name for coordinate file
-  call Name_File(0, coord_name, ".1d")
+  call Field_Mod_Grad_Variable(flow, t)
 
-  ! Store the name
-  store_name = problem_name
-  problem_name = save_name
+  ! Set the name for coordinate file
+  call File_Mod_Set_Name(coord_name, extension='.1d')
 
-  call Name_File(0, res_name,      "-res.dat")
-  call Name_File(0, res_name_plus, "-res-plus.dat")
+  ! Set file names for results
+  call File_Mod_Set_Name(res_name,         &
+                          time_step=n,     &
+                          appendix='-res',  &
+                          extension='.dat')
+   call File_Mod_Set_Name(res_name_plus,         &
+                          time_step=n,          &
+                          appendix='-res-plus',  &
+                          extension='.dat')
 
 !  call Grad_Mod_For_Phi(grid, t % n, 3, phi_z, .true.)
 
@@ -89,8 +83,6 @@
       print *, '#--------------------------------------------------------------'
     end if
 
-    ! Restore the name and return
-    problem_name = store_name
     return
   end if
 
@@ -127,8 +119,8 @@
   count = 0
   if(heat_transfer) then
     allocate(t_p (n_prob));     t_p = 0.0
-    allocate(tt_p(n_prob));     tt_p = 0.0
-    allocate(tt_mod_p(n_prob)); tt_mod_p = 0.0
+    allocate(t2_p(n_prob));     t2_p = 0.0
+    allocate(t2_mod_p(n_prob)); t2_mod_p = 0.0
     allocate(ut_p(n_prob));     ut_p = 0.0
     allocate(vt_p(n_prob));     vt_p = 0.0
     allocate(wt_p(n_prob));     wt_p = 0.0
@@ -148,28 +140,36 @@
         wall_p(i) = wall_p(i) + grid % zc(c)
         tz_p  (i) = tz_p  (i) + t % z(c)
         ti_p  (i) = ti_p  (i) + t % n(c)
-        w_p   (i) = w_p   (i) + w % mean(c)
+        w_p   (i) = w_p   (i) + turb % w_mean(c)
 
-        uu_p(i)   = uu_p(i) + uu % mean(c) - u % mean(c) * u % mean(c)
-        vv_p(i)   = vv_p(i) + vv % mean(c) - v % mean(c) * v % mean(c)
-        ww_p(i)   = ww_p(i) + ww % mean(c) - w % mean(c) * w % mean(c)
-        uw_p(i)   = uw_p(i) + uw % mean(c) - u % mean(c) * w % mean(c)
+        uu_p(i)   = uu_p(i) + turb % uu_res(c)  &
+                            - turb % u_mean(c) * turb % u_mean(c)
+        vv_p(i)   = vv_p(i) + turb % vv_res(c)  &
+                            - turb % v_mean(c) * turb % v_mean(c)
+        ww_p(i)   = ww_p(i) + turb % ww_res(c)  &
+                            - turb % w_mean(c) * turb % w_mean(c)
+        uw_p(i)   = uw_p(i) + turb % uw_res(c)  &
+                            - turb % u_mean(c) * turb % w_mean(c)
         kin_p(i)  = kin_p(i) &
-                    + 0.5*(uu % mean(c) - u % mean(c) * u % mean(c) &
-                         + vv % mean(c) - v % mean(c) * v % mean(c) &
-                         + ww % mean(c) - w % mean(c) * w % mean(c))
-        kin_mod_p(i) = kin_mod_p(i) + kin % mean(c)  ! <--= we put kin % mean
+                + 0.5*(turb % uu_res(c) - turb % u_mean(c) * turb % u_mean(c) &
+                     + turb % vv_res(c) - turb % v_mean(c) * turb % v_mean(c) &
+                     + turb % ww_res(c) - turb % w_mean(c) * turb % w_mean(c))
+        kin_mod_p(i) = kin_mod_p(i) + turb % kin_mean(c)
 
         if(heat_transfer) then
-          t_p(i)  = t_p(i)  + (t % mean(c) - t_cold)/t_diff
-          tt_p(i) = tt_p(i) + tt % mean(c) - t % mean(c) * t % mean(c)
-          tt_mod_p(i) = tt_mod_p(i) + t2 % mean(c)  ! <--= isn't it t2 % mean?
-          ut_p(i) = ut_p(i) + ut % mean(c) - u % mean(c) * t % mean(c)
-          vt_p(i) = vt_p(i) + vt % mean(c) - v % mean(c) * t % mean(c)
-          wt_p(i) = wt_p(i) + wt % mean(c) - w % mean(c) * t % mean(c)
-          ut_mod(i) = ut_mod(i) + ut % mean(c)  ! <--= isn't it ut % mean?
-          vt_mod(i) = vt_mod(i) + vt % mean(c)  ! <--= isn't it vt % mean?
-          wt_mod(i) = wt_mod(i) + wt % mean(c)  ! <--= isn't it wt % mean?
+          t_p(i)  = t_p(i)  + (turb % t_mean(c) - t_cold)/t_diff
+          t2_p(i) = t2_p(i) + turb % t2_mean(c)  &
+                            - turb % t_mean(c) * turb % t_mean(c)
+          t2_mod_p(i) = t2_mod_p(i) + turb % t2_mean(c)
+          ut_p(i) = ut_p(i) + turb % ut_res(c)  &
+                            - turb % u_mean(c) * turb % t_mean(c)
+          vt_p(i) = vt_p(i) + turb % vt_res(c)  &
+                            - turb % v_mean(c) * turb % t_mean(c)
+          wt_p(i) = wt_p(i) + turb % wt_res(c)  &
+                            - turb % w_mean(c) * turb % t_mean(c)
+          ut_mod(i) = ut_mod(i) + turb % ut_res(c)
+          vt_mod(i) = vt_mod(i) + turb % vt_res(c)
+          wt_mod(i) = wt_mod(i) + turb % wt_res(c)
         end if
         n_count(i) = n_count(i) + 1
       end if
@@ -198,8 +198,8 @@
 
     if(heat_transfer) then
       call Comm_Mod_Global_Sum_Real(t_p(pl))
-      call Comm_Mod_Global_Sum_Real(tt_p(pl))
-      call Comm_Mod_Global_Sum_Real(tt_mod_p(pl))
+      call Comm_Mod_Global_Sum_Real(t2_p(pl))
+      call Comm_Mod_Global_Sum_Real(t2_mod_p(pl))
       call Comm_Mod_Global_Sum_Real(ut_p(pl))
       call Comm_Mod_Global_Sum_Real(vt_p(pl))
       call Comm_Mod_Global_Sum_Real(wt_p(pl))
@@ -227,8 +227,8 @@
 
       if(heat_transfer) then
         t_p (i) = t_p (i) / n_count(i)
-        tt_p(i) = tt_p(i) / n_count(i)
-        tt_mod_p(i) = tt_mod_p(i) / n_count(i)
+        t2_p(i) = t2_p(i) / n_count(i)
+        t2_mod_p(i) = t2_mod_p(i) / n_count(i)
         ut_p(i) = ut_p(i) / n_count(i)
         vt_p(i) = vt_p(i) / n_count(i)
         wt_p(i) = wt_p(i) / n_count(i)
@@ -258,8 +258,8 @@
 
   do i = 1, n_prob-1
     t_p (i) = (t_p(i) - t_cold) / t_diff           ! t % n(c)
-    tt_p(i) = tt_p(i) / (t_diff*t_diff)            ! ut % n(c)
-    tt_mod_p(i) = tt_mod_p(i) / (t_diff*t_diff)    ! ut % n(c)
+    t2_p(i) = t2_p(i) / (t_diff*t_diff)            ! ut % n(c)
+    t2_mod_p(i) = t2_mod_p(i) / (t_diff*t_diff)    ! ut % n(c)
   end do
 
   do i = 1, n_prob
@@ -273,9 +273,9 @@
                               (kin_p(i) + kin_mod_p(i)),  &  !  7
                               uw_p(i),                    &  !  8
                               (t_p(i) - t_cold)/t_diff,   &  !  9
-                              tt_p(i),                    &  ! 10
-                              tt_mod_p(i),                &  ! 11
-                              (tt_p(i)+tt_mod_p(i)),      &  ! 12
+                              t2_p(i),                    &  ! 10
+                              t2_mod_p(i),                &  ! 11
+                              (t2_p(i)+t2_mod_p(i)),      &  ! 12
                               ut_p(i),                    &  ! 13
                               vt_p(i),                    &  ! 14
                               wt_p(i),                    &  ! 15
@@ -303,16 +303,13 @@
   deallocate(kin_mod_p)
   if(heat_transfer) then
     deallocate(t_p)
-    deallocate(tt_p)
-    deallocate(tt_mod_p)
+    deallocate(t2_p)
+    deallocate(t2_mod_p)
     deallocate(ut_p)
     deallocate(vt_p)
     deallocate(wt_p)
   end if
 
   if(this_proc < 2)  print *, '# Finished with User_Mod_Save_Results.f90.'
-
-  ! Restore the name
-  problem_name = store_name
 
   end subroutine

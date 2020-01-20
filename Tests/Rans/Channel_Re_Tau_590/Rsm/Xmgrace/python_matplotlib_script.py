@@ -38,10 +38,10 @@ plt.rcParams["legend.borderaxespad"] = 0.
 plt.rcParams["legend.labelspacing"] = 0.
 
 #-Reference data
-U_plus_ref_data   = 'U_plus_Re_tau_590.dat'
-k_plus_ref_data   = 'k_plus_Re_tau_590.dat'
-eps_plus_ref_data = 'eps_plus_Re_tau_590.dat'
-uv_plus_ref_data  = 'uv_plus_Re_tau_590.dat'
+U_plus_ref_data   = 'u_plus_re_tau_590.dat'
+k_plus_ref_data   = 'k_plus_re_tau_590.dat'
+eps_plus_ref_data = 'eps_plus_re_tau_590.dat'
+uv_plus_ref_data  = 'uv_plus_re_tau_590.dat'
 
 y1, u1   = np.loadtxt(U_plus_ref_data,   unpack=True)
 y2, k1   = np.loadtxt(k_plus_ref_data,   unpack=True)

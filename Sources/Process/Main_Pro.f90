@@ -113,7 +113,6 @@
   call Turb_Mod_Allocate(turb, flow)
   call Swarm_Mod_Allocate(swarm, turb)
   call Multiphase_Mod_Allocate(mult, flow)
-  call Surf_Mod_Allocate(surf, flow)
   call User_Mod_Allocate(grid)
 
   ! Read numerical models from control file (after the memory is allocated)
@@ -178,10 +177,6 @@
   !   Time loop   !
   !               !
   !---------------!
-
-  ! call Surf_Mod_Place_At_Var_Value(surf, flow % t, 0.5001)
-  ! call Save_Surf(surf, 'surface')
-  ! stop
 
   call Control_Mod_Time_Step(flow % dt, verbose=.true.)
   call Control_Mod_Backup_Save_Interval (bsi,    verbose=.true.)

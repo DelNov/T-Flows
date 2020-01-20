@@ -13,7 +13,7 @@
   implicit none
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type) :: grid           ! grid to be divided
-  integer         :: c, n_sub
+  integer         :: n_sub
   real            :: start, finish  ! variables to time the program
 !==============================================================================!
 
@@ -31,9 +31,7 @@
   call Grid_Mod_Load_Geo  (grid, 0)
 
   ! Initialize processor numbers (poor idea to put it here)
-  do c = 1, grid % n_cells
-    grid % comm % proces(c) = 1
-  end do
+  grid % comm % cell_proc(-grid % n_bnd_cells:grid % n_cells) = 1
 
   print *, '# Number of subdomains:'
   read(*,*)  n_sub

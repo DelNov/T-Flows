@@ -56,7 +56,7 @@
 
   ! Number of nodes for each cell
   do c = 1, grid % n_cells
-    if(grid % new_c(c) .ne. 0) then
+    if(grid % comm % cell_proc(c) .eq. sub) then
       write(fu) grid % cells_n_nodes(c)
     end if
   end do
@@ -66,7 +66,7 @@
 
   ! Cells' nodes
   do c = 1, grid % n_cells
-    if(grid % new_c(c) .ne. 0) then
+    if(grid % comm % cell_proc(c) .eq. sub) then
       do n = 1, grid % cells_n_nodes(c)
         write(fu) grid % new_n(grid % cells_n(n,c))
       end do
@@ -121,12 +121,10 @@
     end if
   end do
 
-  ! nbf_sub buffer faces (copy faces here, avoid them with buf_pos)
+  ! nbf_sub buffer faces and the new numbers of cells surrounding them
   do s = 1, nbf_sub
-    if(buf_pos(s) > nc_sub) then     ! normal buffer (non-copy)
-      write(fu) buf_send_ind(s),  &  ! new cell number
-               buf_pos(s)            ! position in the buffer
-    end if
+    write(fu) buf_send_ind(s),  &
+              nc_sub + s
   end do
 
   !--------------!
@@ -135,7 +133,7 @@
 
   ! Physical boundary cells
   do c = -1, -grid % n_bnd_cells, -1
-    if(grid % new_c(c) .ne. 0) then
+    if(grid % comm % cell_proc(c) .eq. sub) then
       write(fu) grid % bnd_cond % color(c)
     end if
   end do
