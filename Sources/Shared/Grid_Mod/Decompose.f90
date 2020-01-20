@@ -133,4 +133,12 @@
     grid % comm % cell_proc(c) = part(c)
   end do
 
+  do s = 1, grid % n_faces
+    c1 = grid % faces_c(1, s)
+    c2 = grid % faces_c(2, s)
+    if(c2 < 0) then
+      grid % comm % cell_proc(c2) = grid % comm % cell_proc(c1)
+    end if
+  end do
+
   end subroutine
