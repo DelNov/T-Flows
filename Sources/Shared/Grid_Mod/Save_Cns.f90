@@ -80,7 +80,7 @@
 
   ! Cells' processor ids
   do c = 1, grid % n_cells
-    if(grid % new_c(c) .ne. 0) then
+    if(grid % comm % cell_proc(c) .eq. sub) then
       write(fu) grid % comm % cell_proc(c)
     end if
   end do
@@ -88,7 +88,7 @@
     write(fu) grid % comm % cell_proc(buf_recv_ind(s))
   end do
   do c = -1, -grid % n_bnd_cells, -1
-    if(grid % new_c(c) .ne. 0) then
+    if(grid % comm % cell_proc(c) .eq. sub) then
       write(fu) grid % comm % cell_proc(c)
     end if
   end do
