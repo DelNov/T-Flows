@@ -23,7 +23,8 @@
                           nc_sub,    &  ! number of cells in the subdomain
                           nf_sub,    &  ! number of faces in the subdomain
                           nbc_sub,   &  ! number of boundary cells in sub.
-                          nbf_sub
+                          nbf_sub,   &
+                          nbfc_sub
   character(len=80)    :: name_buf
   integer, allocatable :: side_cell(:,:)
   logical, parameter   :: verbose = .false.
@@ -118,7 +119,8 @@
     !--------------------!
     !   Create buffers   !
     !--------------------!
-    nbf_sub   = 0
+    nbf_sub  = 0
+    nbfc_sub = 0
 
     if(verbose) then
       write(fu,'(a30)') '# Number of physical cells:'
@@ -140,6 +142,11 @@
               buf_send_ind(nbf_sub) = grid % new_c(c1)  ! buffer send index
               buf_recv_ind(nbf_sub) = c2           ! important for coordinate
 
+              if(grid % new_c(c2) .eq. 0) then
+                nbfc_sub = nbfc_sub + 1
+                grid % new_c(c2) = nbfc_sub
+              end if
+
               grid % new_f(s) = nf_sub + nbf_sub
             end if
             if( (grid % comm % cell_proc(c2) .eq. sub) .and.  &
@@ -147,6 +154,11 @@
               nbf_sub = nbf_sub + 1                ! increasu buffer cell count
               buf_send_ind(nbf_sub) = grid % new_c(c2)  ! buffer send index
               buf_recv_ind(nbf_sub) = c1           ! important for coordinate
+
+              if(grid % new_c(c1) .eq. 0) then
+                nbfc_sub = nbfc_sub + 1
+                grid % new_c(c1) = nbfc_sub
+              end if
 
               grid % new_f(s) = nf_sub + nbf_sub
             end if
@@ -231,7 +243,7 @@
     call Save_Vtu_Cells(grid,       &
                         sub,        &
                         nn_sub,     &
-                        nc_sub)
+                        nc_sub + nbfc_sub)
 
     call Save_Vtu_Links(grid,       &
                         sub,        &

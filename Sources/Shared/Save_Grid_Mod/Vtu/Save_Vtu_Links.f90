@@ -69,12 +69,14 @@
                    IN_5, grid % xn(n), grid % yn(n), grid % zn(n)
   end do
   do c = 1, grid % n_cells
-    if(grid % new_c(c) .ne. 0) write(fu, '(a,1pe15.7,1pe15.7,1pe15.7)')   &
-                   IN_5, grid % xc(c), grid % yc(c), grid % zc(c)
+    if(grid % comm % cell_proc(c) .eq. sub)      &
+      write(fu, '(a,1pe15.7,1pe15.7,1pe15.7)')   &
+                 IN_5, grid % xc(c), grid % yc(c), grid % zc(c)
   end do
   do c = -1,-grid % n_bnd_cells,-1
-    if(grid % new_c(c) .ne. 0) write(fu, '(a,1pe15.7,1pe15.7,1pe15.7)')   &
-                   IN_5, grid % xc(c), grid % yc(c), grid % zc(c)
+    if(grid % comm % cell_proc(c) .eq. sub)      &
+      write(fu, '(a,1pe15.7,1pe15.7,1pe15.7)')   &
+                 IN_5, grid % xc(c), grid % yc(c), grid % zc(c)
   end do
   do c = 1,n_buf_cells_sub
     write(fu, '(a,1pe15.7,1pe15.7,1pe15.7)') IN_5,  &
@@ -95,7 +97,7 @@
                           ' format="ascii">'
 
   do c = 1, grid % n_cells
-    if(grid % new_c(c) .ne. 0) then
+    if(grid % comm % cell_proc(c) .eq. sub) then
 
       ! Hexahedral
       if(grid % cells_n_nodes(c) .eq. 8) then
@@ -222,7 +224,7 @@
                           'format="ascii">'
   offset = 0
   do c = 1, grid % n_cells
-    if(grid % new_c(c) .ne. 0) then
+    if(grid % comm % cell_proc(c) .eq. sub) then
       offset = offset + grid % cells_n_nodes(c)
       write(fu,'(a,i9)') IN_5, offset
     end if
@@ -245,7 +247,7 @@
   ! Now write all cells' types
   write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="types" format="ascii">'
   do c = 1, grid % n_cells
-    if(grid % new_c(c) .ne. 0) then
+    if(grid % comm % cell_proc(c) .eq. sub) then
       if(grid % cells_n_nodes(c) .eq. 4) write(fu,'(a,i9)') IN_5, VTK_TETRA
       if(grid % cells_n_nodes(c) .eq. 8) write(fu,'(a,i9)') IN_5, VTK_HEXAHEDRON
       if(grid % cells_n_nodes(c) .eq. 6) write(fu,'(a,i9)') IN_5, VTK_WEDGE
@@ -271,7 +273,7 @@
   write(fu,'(a,a)') IN_4, '<DataArray type="Int64" ' // & 
                           'Name="link type" format="ascii">'
   do c = 1, grid % n_cells
-    if(grid % new_c(c) .ne. 0) then
+    if(grid % comm % cell_proc(c) .eq. sub) then
       write(fu,'(a,i9)') IN_5, 0
     end if
   end do
