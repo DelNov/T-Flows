@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Advance_Particles(swarm, turb)
+  subroutine Swarm_Mod_Advance_Particles(swarm, turb, n_stat_p, n)
 !------------------------------------------------------------------------------!
 !   Advances all particles in the swarm.                                       !
 !------------------------------------------------------------------------------!
@@ -18,6 +18,8 @@
   integer                      :: n0         ! time for statistics
   integer                      :: n1         ! current time step
   integer                      :: n_parts_in_buffers
+  integer                      :: n_stat_p
+  integer                      :: n
 !==============================================================================!
 
   ! Take aliases for the swarm
@@ -71,7 +73,7 @@
           call Swarm_Mod_Check_Periodicity(swarm, k, n_parts_in_buffers)
 
           ! Gathering swarm statistics  
-          call Swarm_Mod_Calculate_Mean(swarm, k, n0, n1)
+          call Swarm_Mod_Calculate_Mean(swarm, k, n_stat_p, n)
 
         end if  ! in this processor
       end if    ! deposited or escaped
@@ -80,7 +82,6 @@
     ! Exchange particles for parallel version; if needed
     call Comm_Mod_Global_Sum_Int(n_parts_in_buffers)
     if(n_parts_in_buffers > 0) then
-if(this_proc < 2) PRINT *, 'IS EXCHANGING PARTICLES'
       call Swarm_Mod_Exchange_Particles(swarm)
     end if
 
