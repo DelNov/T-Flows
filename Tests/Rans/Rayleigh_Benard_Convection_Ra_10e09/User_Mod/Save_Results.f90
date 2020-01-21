@@ -12,7 +12,7 @@
   type(Turb_Type),       target :: turb
   type(Multiphase_Type), target :: mult
   type(Swarm_Type),      target :: swarm
-  integer                       :: n
+  integer                       :: ts
 !-----------------------------------[Locals]-----------------------------------!
   integer             :: n_prob, pl, c, i, count, s, c1, c2, n_points
   character(len=80)   :: coord_name, res_name, res_name_plus
