@@ -12,7 +12,7 @@ include '../User_Mod/Impinging_Jet_Profiles.f90'
   type(Turb_Type)       :: turb
   type(Multiphase_Type) :: mult
   type(Swarm_Type)      :: swarm
-  integer               :: n     ! time step
+  integer               :: ts     ! time step
 !==============================================================================!
 
   call User_Mod_Impinging_Jet_Nu      (turb)
