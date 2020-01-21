@@ -1,5 +1,6 @@
 !==============================================================================!
-  subroutine Backup_Mod_Read_Face(comm, fh, disp, vc, grid, flux)
+  subroutine Backup_Mod_Read_Face(comm, fh, disp, vc, grid, var_name, flux,  &
+                                  correct_sign)
 !------------------------------------------------------------------------------!
 !   Reads face-based variable (flux) using cell-based arrays.                  !
 !------------------------------------------------------------------------------!
@@ -10,15 +11,17 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Comm_Type) :: comm
-  integer         :: fh, disp, vc
-  type(Grid_Type) :: grid
-  real            :: flux(grid % n_faces)
+  type(Comm_Type)   :: comm
+  integer           :: fh, disp, vc
+  type(Grid_Type)   :: grid
+  character(len=*)  :: var_name
+  real              :: flux(grid % n_faces)
+  logical, optional :: correct_sign  ! in case of face fluxes, signs might have
+                                     ! to be changed (check it one day)
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: s, c, c1, c2, cg1, cg2, mc, max_cnt
   integer, allocatable :: cells_cg(:,:)   ! cells' cells
   integer, allocatable :: cells_fc(:,:)   ! cells' faces
-  character(len=12)    :: cf_name = 'cell_flux_00'
 !==============================================================================!
 
   allocate(cells_cg (24, grid % n_cells));  cells_cg  = 0
@@ -100,9 +103,9 @@
   !---------------------------------------------!
   do mc = 1, max_cnt
     rvalues(:) = 0.0
-    write(cf_name(11:12), '(i2.2)') mc  ! set name of the backup variable
+    write(var_name(11:12), '(i2.2)') mc  ! set name of the backup variable
     call Backup_Mod_Read_Cell(comm,  &
-                              fh, disp, vc, cf_name, rvalues(1:comm % nc_s))
+                              fh, disp, vc, var_name, rvalues(1:comm % nc_s))
     call Grid_Mod_Exchange_Real(grid, rvalues)
     do c = 1, grid % n_cells - grid % comm % n_buff_cells
       if( cells_cg(mc, c) .ne. 0 ) then
@@ -116,15 +119,19 @@
   !   (Remember, they are defined to be pos-   !
   !    itive from cg1 to cg2; and cg2 > cg1)   !
   !--------------------------------------------!
-  do s = 1, grid % n_faces
-    c1  = grid % faces_c(1,s)
-    c2  = grid % faces_c(2,s)
-    cg1 = grid % comm % cell_glo(c1)
-    cg2 = grid % comm % cell_glo(c2)
-    if(cg2 > 0 .and. cg2 < cg1) then
-      flux(s) = -flux(s)
+  if(present(correct_sign)) then
+    if(correct_sign) then
+      do s = 1, grid % n_faces
+        c1  = grid % faces_c(1,s)
+        c2  = grid % faces_c(2,s)
+        cg1 = grid % comm % cell_glo(c1)
+        cg2 = grid % comm % cell_glo(c2)
+        if(cg2 > 0 .and. cg2 < cg1) then
+          flux(s) = -flux(s)
+        end if
+      end do
     end if
-  end do
+  end if
 
   deallocate(cells_cg)
   deallocate(cells_fc)

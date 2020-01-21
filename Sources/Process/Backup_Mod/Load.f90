@@ -124,7 +124,8 @@
   !----------------------!
   !   Mass flow raters   !
   !----------------------!
-  call Backup_Mod_Read_Face(grid % comm, fh, d, vc, grid, fld % m_flux % n)
+  call Backup_Mod_Read_Face(grid % comm, fh, d, vc, grid, 'face_flux_00',  &
+                            fld % m_flux % n, correct_sign = .true.)
 
   !--------------!
   !              !
@@ -142,6 +143,8 @@
   !--------------!
   if(multiphase_model .eq. VOLUME_OF_FLUID) then
     call Backup_Mod_Read_Variable(fh, d, vc, 'vof', mul % vof)
+    call Backup_Mod_Read_Face(grid % comm, fh, d, vc, grid, 'face_dens_00',  &
+                              fld % density_f)
   end if
 
   !-----------------------!

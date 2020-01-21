@@ -1,5 +1,6 @@
 !==============================================================================!
-  subroutine Backup_Mod_Write_Face(comm, fh, d, vc, grid, flux)
+  subroutine Backup_Mod_Write_Face(comm, fh, d, vc, grid, var_name, flux,  &
+                                   correct_sign)
 !------------------------------------------------------------------------------!
 !   Writes backup files. name.backup                                           !
 !------------------------------------------------------------------------------!
@@ -10,10 +11,13 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Comm_Type) :: comm
-  integer         :: fh, d, vc
-  type(Grid_Type) :: grid
-  real            :: flux(grid % n_faces)
+  type(Comm_Type)   :: comm
+  integer           :: fh, d, vc
+  type(Grid_Type)   :: grid
+  character(len=*)  :: var_name
+  real              :: flux(grid % n_faces)
+  logical, optional :: correct_sign  ! in case of face fluxes, signs might have
+                                     ! to be changed (check it one day)
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: s, c, c1, c2, cg1, cg2, mc, max_cnt
   integer, allocatable :: cells_cg(:,:)   ! cells' cells
