@@ -1,10 +1,10 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(flow, turb, mult, swarm, time_step)
+  subroutine User_Mod_Save_Results(flow, turb, mult, swarm, ts)
 !------------------------------------------------------------------------------!
-!   This subroutine reads name.1d file created by Convert or Generator and     !
-!   averages the results in homogeneous directions.                            !
-!                                                                              !
-!   The results are then writen in files name_res.dat and name_res_plus.dat    !
+!   This subroutine is called each                                             !
+!     RESULTS_SAVE_INTERVAL (set in conrtol file),                             !
+!     at the end of a simulation                                               !
+!     and after 'save_now' command                                             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -12,7 +12,7 @@
   type(Turb_Type),       target :: turb
   type(Multiphase_Type), target :: mult
   type(Swarm_Type),      target :: swarm
-  integer                       :: time_step
+  integer                       :: ts
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
