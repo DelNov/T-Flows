@@ -116,6 +116,9 @@
   call Grid_Mod_Calculate_Face_Geometry(grid)
   call Grid_Mod_Find_Nodes_Cells(grid)         ! for Lagrangian particle track
   call Grid_Mod_Find_Periodic_Faces(grid)      ! for Lagrangian particle track
+  call Grid_Mod_Find_Cells_Cells(grid)         ! for Lagrangian particle track
+  call Grid_Mod_Find_Cells_Faces(grid)         ! for Multiphase Module
+  call Grid_Mod_Calculate_Global_Volumes(grid)
 
   ! Allocate memory for linear systems of equations
   ! (You need face geomtry for this step)
@@ -222,11 +225,12 @@
 
     ! Volume of Fluid
     if(multiphase_model .eq. VOLUME_OF_FLUID) then
+      flow % m_flux % o = flow % m_flux % n / flow % density_f
       ! Update the values at boundaries
       call Update_Boundary_Values(flow, turb, mult)
       call Multiphase_Mod_Compute_Vof(mult, sol, flow % dt, n)
-      call Multiphase_Mod_Update_Physical_Properties(mult)
-
+    else
+      flow % m_flux % o = flow % m_flux % n
     end if
 
     do ini = 1, max_ini
@@ -333,14 +337,14 @@
       call Save_Swarm(swarm, n)
 
       if(multiphase_model .eq. VOLUME_OF_FLUID) then
-        call Surf_Mod_Allocate(surf, flow)
-        call Surf_Mod_Place_At_Var_Value(surf,        &
-                                         mult % vof,  &
-                                         sol,         &
-                                         0.5,         &
-                                         .false.)  ! don't print messages
-        call Save_Surf(surf, n)
-        call Surf_Mod_Clean(surf)
+!        call Surf_Mod_Allocate(surf, flow)
+!        call Surf_Mod_Place_At_Var_Value(surf,        &
+!                                         mult % vof,  &
+!                                         sol,         &
+!                                         0.5,         &
+!                                         .false.)  ! don't print messages
+!        call Save_Surf(surf, n)
+!        call Surf_Mod_Clean(surf)
       end if
 
       ! Write results in user-customized format
