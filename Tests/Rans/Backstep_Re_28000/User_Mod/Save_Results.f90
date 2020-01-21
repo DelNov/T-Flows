@@ -12,7 +12,7 @@ include '../User_Mod/Backstep_Cf_St.f90'
   type(Turb_Type),       target :: turb
   type(Multiphase_Type), target :: mult
   type(Swarm_Type),      target :: swarm
-  integer                       :: n
+  integer                       :: ts
 !==============================================================================!
 
   call User_Mod_Backstep_Profiles(flow, turb)
