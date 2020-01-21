@@ -60,6 +60,11 @@ Numerics
 	NORMALIZATION_FOR_TURBULENCE_SOLVER		1.0
 	V_CYCLE_RESIDUAL_RATIO				0.01
 	V_CYCLE_NUMBER_OF_SMOOTHING_ITERATIONS		10
+        MAX_CORRECTION_CYCLES_BETA_VOF                  2
+        MAX_SMOOTHING_CYCLES_CURVATURE_VOF              2
+        MAX_SMOOTHING_CYCLES_NORMAL_VOF                 0
+        MAX_COURANT_VOF                                 0.25
+        MAX_SUBSTEP_CYCLES_VOF                          100
 
 Physics
 
