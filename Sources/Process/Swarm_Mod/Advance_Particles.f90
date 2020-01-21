@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Advance_Particles(swarm, turb, n_stat_p, n)
+  subroutine Swarm_Mod_Advance_Particles(swarm, turb, n, n_stat_p)
 !------------------------------------------------------------------------------!
 !   Advances all particles in the swarm.                                       !
 !------------------------------------------------------------------------------!
@@ -7,19 +7,17 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Swarm_Type), target :: swarm
   type(Turb_Type),  target :: turb
-  integer                  :: k      ! particle number
+  integer                  :: n          ! current time step
+  integer                  :: n_stat_p   ! starting time for swarm statistics
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: grid
   type(Field_Type),    pointer :: flow
   type(Particle_Type), pointer :: part
   logical,             pointer :: escaped
   logical,             pointer :: deposited
+  integer                      :: k          ! particle number
   integer                      :: ss         ! sub-step counter
-  integer                      :: n0         ! time for statistics
-  integer                      :: n1         ! current time step
   integer                      :: n_parts_in_buffers
-  integer                      :: n_stat_p
-  integer                      :: n
 !==============================================================================!
 
   ! Take aliases for the swarm
@@ -73,7 +71,7 @@
           call Swarm_Mod_Check_Periodicity(swarm, k, n_parts_in_buffers)
 
           ! Gathering swarm statistics  
-          call Swarm_Mod_Calculate_Mean(swarm, k, n_stat_p, n)
+          call Swarm_Mod_Calculate_Mean(swarm, k, n, n_stat_p)
 
         end if  ! in this processor
       end if    ! deposited or escaped
@@ -90,20 +88,20 @@
   !-----------------------------------!
   !   Print some data on the screen   !
   !-----------------------------------!
-  do k = 1, swarm % n_particles
+  !do k = 1, swarm % n_particles
 
-    ! Refresh the alias
-    part => swarm % particle(k)
-
-    if(this_proc .eq. part % proc) then
-      ! Printing particle position
-      write(*,'(a,i3,a,i7,a,i2,a,3es15.6,a,es12.4)')                 &
-              ' #  particle:',  k,                                   &
-              ',  cell: ',      part % cell,                         &
-              ',  processor: ', part % proc,                         &
-              ',  x,y,z: ',     part % x_n, part % y_n, part % z_n,  &
-              ',  cfl: ',       part % cfl
-    end if
-  end do
+    !! Refresh the alias
+    !part => swarm % particle(k)
+    !
+    !if(this_proc .eq. part % proc) then
+    !  ! Printing particle position
+    !  write(*,'(a,i3,a,i7,a,i2,a,3es15.6,a,es12.4)')                 &
+    !          ' #  particle:',  k,                                   &
+    !          ',  cell: ',      part % cell,                         &
+    !          ',  processor: ', part % proc,                         &
+    !          ',  x,y,z: ',     part % x_n, part % y_n, part % z_n,  &
+    !          ',  cfl: ',       part % cfl
+    !end if
+  !end do
 
   end subroutine
