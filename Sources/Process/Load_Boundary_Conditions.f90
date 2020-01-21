@@ -206,9 +206,9 @@
             ! Temperature
             if(heat_transfer) then
               i = Key_Ind('T', keys, nks)
-              if(i > 0) t % bnd_cell_type(c) = bc_type_tag
+              if(i > 0) t % bnd_cond_type(c) = bc_type_tag
               i = Key_Ind('Q', keys, nks)
-              if(i > 0) t % bnd_cell_type(c) = bc_type_tag
+              if(i > 0) t % bnd_cond_type(c) = bc_type_tag
             end if
 
             ! Multiphase flow
@@ -222,9 +222,9 @@
             ! For scalars
             do sc = 1, flow % n_scalars
               i = Key_Ind(scalar(sc) % name, keys, nks)
-              if(i > 0) scalar(sc) % bnd_cell_type(c) = bc_type_tag
+              if(i > 0) scalar(sc) % bnd_cond_type(c) = bc_type_tag
               i = Key_Ind(scalar(sc) % flux_name, keys, nks)
-              if(i > 0) scalar(sc) % bnd_cell_type(c) = bc_type_tag
+              if(i > 0) scalar(sc) % bnd_cond_type(c) = bc_type_tag
             end do
 
           end if  ! bnd_color .eq. bc
@@ -351,17 +351,17 @@
               ! For temperature
               if(heat_transfer) then
                 i = Key_Ind('T', keys, nks)
-                if(i > 0) t % bnd_cell_type(c) = bc_type_tag
+                if(i > 0) t % bnd_cond_type(c) = bc_type_tag
                 i = Key_Ind('Q', keys, nks)
-                if(i > 0) t % bnd_cell_type(c) = bc_type_tag
+                if(i > 0) t % bnd_cond_type(c) = bc_type_tag
               end if
 
               ! For scalars
               do sc = 1, flow % n_scalars
                 i = Key_Ind(scalar(sc) % name, keys, nks)
-                if(i > 0) scalar(sc) % bnd_cell_type(c) = bc_type_tag
+                if(i > 0) scalar(sc) % bnd_cond_type(c) = bc_type_tag
                 i = Key_Ind(scalar(sc) % flux_name, keys, nks)
-                if(i > 0) scalar(sc) % bnd_cell_type(c) = bc_type_tag
+                if(i > 0) scalar(sc) % bnd_cond_type(c) = bc_type_tag
               end do
 
             end if
@@ -528,17 +528,17 @@
                   ! For temperature
                   if(heat_transfer) then
                     i = Key_Ind('T',keys,nks)
-                    if(i > 0) t % bnd_cell_type(c) = bc_type_tag
+                    if(i > 0) t % bnd_cond_type(c) = bc_type_tag
                     i = Key_Ind('Q',keys,nks)
-                    if(i > 0) t % bnd_cell_type(c) = bc_type_tag
+                    if(i > 0) t % bnd_cond_type(c) = bc_type_tag
                   end if
 
                   ! For scalars
                   do sc = 1, flow % n_scalars
                     i = Key_Ind(scalar(sc) % name, keys, nks)
-                    if(i > 0) scalar(sc) % bnd_cell_type(c) = bc_type_tag
+                    if(i > 0) scalar(sc) % bnd_cond_type(c) = bc_type_tag
                     i = Key_Ind(scalar(sc) % flux_name, keys, nks)
-                    if(i > 0) scalar(sc) % bnd_cell_type(c) = bc_type_tag
+                    if(i > 0) scalar(sc) % bnd_cond_type(c) = bc_type_tag
                   end do
 
                 end if  ! here
@@ -613,10 +613,10 @@
                   if(heat_transfer) then
                     i = Key_Ind('T',keys,nks)
                     if(i > 0) t % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
-                    if(i > 0) t % bnd_cell_type(c) = bc_type_tag
+                    if(i > 0) t % bnd_cond_type(c) = bc_type_tag
                     i = Key_Ind('Q',keys,nks)
                     if(i > 0) t % q(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
-                    if(i > 0) t % bnd_cell_type(c) = bc_type_tag
+                    if(i > 0) t % bnd_cond_type(c) = bc_type_tag
                   end if
 
                   ! For scalars
@@ -766,7 +766,7 @@
       end if
 
       do sc = 1, flow % n_scalars
-        scalar(sc) % n = scalar(sc) % b(c)
+        scalar(sc) % n(c) = scalar(sc) % b(c)
       end do
 
       if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &

@@ -119,8 +119,7 @@
         eps_wf  = c_mu75 * kin % n(c1)**1.5            &
                 / (grid % wall_dist(c1) * kappa)
 
-        ebf = max(0.01 * turb % y_plus(c1)**4         &
-              / (1.0 + 5.0* turb % y_plus(c1)), TINY)
+        ebf = Turb_Mod_Ebf_Momentum(turb, c1)
 
         p_kin_wf  = turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
                 / (grid % wall_dist(c1) * kappa)
@@ -130,24 +129,24 @@
         turb % p_kin(c1) = p_kin_int * exp(-1.0 * ebf) + p_kin_wf  &
                            * exp(-1.0 / ebf)
 
-        fa = min(p_kin_wf * exp(-1.0 / ebf)/turb % p_kin(c1) , 1.0)
-   
+        fa = min( p_kin_wf * exp(-1.0 / ebf) / (turb % p_kin(c1) + TINY), 1.0)
+
         eps % n(c1) = (1.0 - fa)**0.5 * eps_int + fa**0.5 * eps_wf
-      
-        if(turb % rough_walls) then 
+
+        if(turb % rough_walls) then
           z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
           turb % y_plus(c1) = Y_Plus_Rough_Walls(turb,                  &
                                                  u_tau,                 &
                                                  grid % wall_dist(c1),  &
                                                  kin_vis)
- 
-          eps % n(c1) = c_mu75 * kin % n(c1)**1.5 / & 
+
+          eps % n(c1) = c_mu75 * kin % n(c1)**1.5 / &
                       ((grid % wall_dist(c1) + z_o) * kappa)
 
         end if ! rough_walls 
 
         if(turb % y_plus(c1) > 3) then
-      
+
           ! Adjusting coefficient to fix eps value in near wall calls
           do j = a % row(c1), a % row(c1 + 1) - 1
             a % val(j) = 0.0
@@ -160,6 +159,6 @@
         end if  ! y_plus(c1) < 3
       end if      ! wall or wall_flux
     end if        ! c2 < 0
-  end do  
+  end do
 
   end subroutine

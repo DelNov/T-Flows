@@ -1,10 +1,7 @@
-include '../User_Mod/Backstep_Profiles.f90'
-include '../User_Mod/Backstep_Cf_St.f90'
-
 !==============================================================================!
-  subroutine User_Mod_Save_Results(flow, turb, mult, swarm, ts)
+  subroutine User_Mod_End_Of_Iteration(flow, turb, mult, swarm, n, time)
 !------------------------------------------------------------------------------!
-!   Calls User_Backstep_Profiles and User_Backstep_Cf_St functions.            !
+!   This function is called at the end of time step.                           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -12,10 +9,8 @@ include '../User_Mod/Backstep_Cf_St.f90'
   type(Turb_Type),       target :: turb
   type(Multiphase_Type), target :: mult
   type(Swarm_Type),      target :: swarm
-  integer                       :: ts
+  integer                       :: n     ! time step
+  real                          :: time  ! physical time
 !==============================================================================!
-
-  call User_Mod_Backstep_Profiles(flow, turb)
-  call User_Mod_Backstep_Cf_St   (flow, turb)
 
   end subroutine

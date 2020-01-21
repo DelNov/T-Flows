@@ -29,7 +29,7 @@
   integer                    :: s, c, c1, c2, j
   real                       :: u_tan, u_tau
   real                       :: re_t, f_mu, u_tau_new, fa, kin_vis
-  real                       :: eps_wf, eps_int, ebf, y_star
+  real                       :: eps_wf, eps_int, y_star
   real                       :: z_o
 !==============================================================================!
 !   Dimensions:                                                                !

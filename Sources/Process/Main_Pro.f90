@@ -184,8 +184,8 @@
 
   ! It will save results in .vtk or .cgns file format,
   ! depending on how the code was compiled
-  call Save_Results(flow, turb, mult, first_dt, .true.)   ! save inside
-  call Save_Results(flow, turb, mult, first_dt, .false.)  ! save boundary
+  call Save_Results(flow, turb, mult, swarm, first_dt, .true.)   ! save inside
+  call Save_Results(flow, turb, mult, swarm, first_dt, .false.)  ! save boundary
   call Save_Swarm(swarm, first_dt)
 
   do n = first_dt + 1, last_dt
@@ -235,6 +235,9 @@
 
     do ini = 1, max_ini
 
+      ! Beginning of iteration
+      call User_Mod_Beginning_Of_Iteration(flow, turb, mult, swarm, n, time)
+
       call Info_Mod_Iter_Fill(ini)
 
       call Field_Mod_Grad_Pressure(flow, flow % p,  &
@@ -281,6 +284,9 @@
 
       ! End of the current iteration
       call Info_Mod_Iter_Print()
+
+      ! End of iteration
+      call User_Mod_End_Of_Iteration(flow, turb, mult, swarm, n, time)
 
       if(ini >= min_ini) then
         call Control_Mod_Tolerance_For_Simple_Algorithm(simple_tol)
@@ -332,8 +338,8 @@
        mod(n, rsi) .eq. 0 .or.  &
        real(sc_cur-sc_ini)/real(sc_cr) > wt_max) then
       call Comm_Mod_Wait
-      call Save_Results(flow, turb, mult, n, .true.)   ! save inside
-      call Save_Results(flow, turb, mult, n, .false.)  ! save bnd
+      call Save_Results(flow, turb, mult, swarm, n, .true.)   ! save inside
+      call Save_Results(flow, turb, mult, swarm, n, .false.)  ! save bnd
       call Save_Swarm(swarm, n)
 
       if(multiphase_model .eq. VOLUME_OF_FLUID) then
@@ -348,7 +354,7 @@
       end if
 
       ! Write results in user-customized format
-      call User_Mod_Save_Results(flow, turb, mult, n)
+      call User_Mod_Save_Results(flow, turb, mult, swarm, n)
       ! call User_Mod_Save_Swarm(swarm, n)  to be done!
     end if
 
@@ -384,9 +390,11 @@
   ! Save backup and post-processing files at exit
   call Comm_Mod_Wait
   call Backup_Mod_Save(flow, swarm, turb, mult, n, n_stat)
+  call Save_Results(flow, turb, mult, swarm, n, .true.)   ! save inside
+  call Save_Results(flow, turb, mult, swarm, n, .false.)  ! save bnd
 
   ! Write results in user-customized format
-  call User_Mod_Save_Results(flow, turb, mult, n) 
+  call User_Mod_Save_Results(flow, turb, mult, swarm, n)
 
   if(this_proc < 2) then
     open(9, file='stop')

@@ -9,6 +9,6 @@
 
   ! Buffer send index and buffer receive index.  
   ! Used for plotting dcomposed grids with links.
-  integer, allocatable :: buf_send_ind(:), buf_recv_ind(:), buf_pos(:)
+  integer, allocatable :: buf_send_ind(:), buf_recv_ind(:)
 
   end module

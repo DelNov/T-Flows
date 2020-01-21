@@ -40,8 +40,8 @@
 
   ! Boundary cell type (important for scalars, since they
   ! can have different boundary conditions at the walls)
-  allocate (phi % bnd_cell_type(-grid % n_bnd_cells: -1))
-  phi % bnd_cell_type = 0
+  allocate (phi % bnd_cond_type(-grid % n_bnd_cells: -1))
+  phi % bnd_cond_type = 0
 
   ! Gradients
   allocate (phi % x(-grid % n_bnd_cells : grid % n_cells));  phi % x = 0.0
