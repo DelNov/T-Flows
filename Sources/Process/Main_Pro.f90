@@ -356,7 +356,6 @@
 
       ! Write results in user-customized format
       call User_Mod_Save_Results(flow, turb, mult, swarm, n)
-!???  call User_Mod_Save_Swarm(flow, turb, swarm, name_save) 
     end if
 
     if(save_now) then
@@ -395,7 +394,11 @@
   call Save_Results(flow, turb, mult, swarm, n, .false.)  ! save bnd
 
   ! Write results in user-customized format
+<<<<<<< HEAD
   call User_Mod_Save_Results(flow, turb, mult, swarm, n) 
+=======
+  call User_Mod_Save_Results(flow, turb, mult, swarm, n)
+>>>>>>> 70d026500a7d8457d541842406ae01397e865d6e
 
   if(this_proc < 2) then
     open(9, file='stop')
