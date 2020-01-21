@@ -214,9 +214,9 @@
             ! Multiphase flow
             if (multiphase_model .eq. VOLUME_OF_FLUID) then
               i = Key_Ind('VOF', keys, nks)
-              if(i > 0) vof % bnd_cell_type(c) = bc_type_tag
+              if(i > 0) vof % bnd_cond_type(c) = bc_type_tag
               i = Key_Ind('VOF_C_ANG', keys, nks)
-              if(i > 0) vof % bnd_cell_type(c) = bc_type_tag
+              if(i > 0) vof % bnd_cond_type(c) = bc_type_tag
             end if
 
             ! For scalars
