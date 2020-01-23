@@ -7,7 +7,8 @@
   use Field_Mod,      only: Field_Type, heat_transfer
   use Var_Mod,        only: Var_Type
   use Turb_Mod,       only: Turb_Type
-  use Multiphase_Mod, only: Multiphase_Type, multiphase_model, VOLUME_OF_FLUID
+  use Multiphase_Mod, only: Multiphase_Type, multiphase_model,   &
+                            VOLUME_OF_FLUID
   use Control_Mod
   use Numerics_Mod
 !------------------------------------------------------------------------------!
@@ -83,6 +84,19 @@
     call Control_Mod_Tolerance_For_Multiphase_Solver      (mult % vof % tol)
     call Control_Mod_Preconditioner_For_System_Matrix     (mult % vof % precond)
     call Control_Mod_Max_Iterations_For_Multiphase_Solver (mult % vof % niter)
+    ! Max Courant number and Max substep cycles
+    call Control_Mod_Max_Courant_Vof(mult % courant_max_param)
+    call Control_Mod_Max_Substep_Cycles_Vof(mult % n_sub_param)
+    ! Max correction cycles for beta
+    call Control_Mod_Max_Correction_Cycles_Beta_Vof(mult % corr_num_max)
+    ! Max number convolution/smoothing steps for curvature and normal
+    call Control_Mod_Max_Smoothing_Cycles_Curvature_Vof(mult % n_conv_curv)
+    call Control_Mod_Max_Smoothing_Cycles_Normal_Vof(mult % n_conv_norm)
+    ! Parameters for distance function
+    call Control_Mod_Factor_Fictitious_Time_Vof(mult % c_tau)
+    call Control_Mod_Factor_Number_Cells_Distance_Function_Vof(mult % c_eps)
+    call Control_Mod_Distance_Function_Time_Integration_Scheme(name)
+    mult % t_dist_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
   end if
 
   !--------------------------------!
