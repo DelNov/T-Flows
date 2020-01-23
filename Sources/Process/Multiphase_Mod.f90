@@ -93,7 +93,7 @@
   include 'Multiphase_Mod/Vof_Max_Courant_Number.f90'
   include 'Multiphase_Mod/Vof_Momentum_Contribution.f90'
   include 'Multiphase_Mod/Vof_Solve_System.f90'
-  include 'Multiphase_Mod/Vof_Solver_Distance_Function_C_Loop.f90'
+  include 'Multiphase_Mod/Vof_Solver_Dist_Function_Cell_Loop.f90'
   include 'Multiphase_Mod/Vof_Surface_Tension_Contribution.f90'
   include 'Multiphase_Mod/Update_Physical_Properties.f90'
 

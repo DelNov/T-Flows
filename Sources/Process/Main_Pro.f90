@@ -116,7 +116,6 @@
   call Grid_Mod_Calculate_Face_Geometry(grid)
   call Grid_Mod_Find_Nodes_Cells(grid)         ! for Lagrangian particle track
   call Grid_Mod_Find_Periodic_Faces(grid)      ! for Lagrangian particle track
-  call Grid_Mod_Find_Cells_Cells(grid)         ! for Lagrangian particle track
   call Grid_Mod_Find_Cells_Faces(grid)         ! for Multiphase Module
   call Grid_Mod_Calculate_Global_Volumes(grid)
 
