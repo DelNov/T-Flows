@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Load_Physical_Properties(flow)
+  subroutine Load_Physical_Properties(flow, mult)
 !------------------------------------------------------------------------------!
 !   Reads physical properties from control file.                               !
 !------------------------------------------------------------------------------!
@@ -11,7 +11,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type) :: flow
+  type(Field_Type)      :: flow
+  type(Multiphase_Type) :: mult
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   real                     :: dens_const, visc_const
@@ -36,11 +37,11 @@
   call Control_Mod_Species_Diffusivity (flow % diffusivity)
 
   if(multiphase_model .eq. VOLUME_OF_FLUID) then
-    call Control_Mod_Phase_Densities     (phase_dens)
-    call Control_Mod_Phase_Viscosities   (phase_visc)
+    call Control_Mod_Phase_Densities     (mult % phase_dens)
+    call Control_Mod_Phase_Viscosities   (mult % phase_visc)
 !   call Control_Mod_Phase_Capacities    (phase_capa)
 !   call Control_Mod_Phase_Conductivities(phase_cond)
-    call Control_Mod_Surface_Tension     (surface_tension)
+    call Control_Mod_Surface_Tension     (mult % surface_tension)
   else
     flow % density     (:) = dens_const
     flow % viscosity   (:) = visc_const
