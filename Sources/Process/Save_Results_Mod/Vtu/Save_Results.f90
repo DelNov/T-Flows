@@ -319,6 +319,12 @@
     call Save_Scalar(grid, IN_4, IN_5, "VolumeFraction", plot_inside,        &
                                        mult % vof % n(-grid % n_bnd_cells),  &
                                        f8, f9)
+    if (mult % d_func) then
+      call Save_Scalar(grid, IN_4, IN_5, "DistanceFunction", plot_inside,    &
+                                         mult % dist_func                    &
+                                         % n(-grid % n_bnd_cells),           &
+                                         f8, f9)
+    end if
   end if
 
   !------------------!
