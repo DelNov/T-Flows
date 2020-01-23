@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Read_Control_Physical(flow, mult, swarm, turb)
+  subroutine Read_Control_Physical(flow, turb, mult, swarm)
 !------------------------------------------------------------------------------!
 !   Reads details about physical models from control file.                     !
 !------------------------------------------------------------------------------!
@@ -17,9 +17,9 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),      target :: flow
+  type(Turb_Type),       target :: turb
   type(Multiphase_Type), target :: mult
   type(Swarm_Type),      target :: swarm
-  type(Turb_Type),       target :: turb
 !----------------------------------[Locals]------------------------------------!
   type(Bulk_Type), pointer :: bulk
   character(len=80)        :: name

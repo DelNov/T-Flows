@@ -101,7 +101,7 @@
   call Control_Mod_Starting_Time_Step_For_Statistics(n_stat, verbose=.true.)
 
   ! Read physical models from control file
-  call Read_Control_Physical(flow, swarm, turb)
+  call Read_Control_Physical(flow, turb, mult, swarm)
 
   ! Allocate memory for all variables
   call Field_Mod_Allocate(flow, grid)
@@ -124,7 +124,7 @@
   ! (You need face geomtry for this step)
   call Solver_Mod_Create(sol, grid)
 
-  call Load_Physical_Properties(flow)
+  call Load_Physical_Properties(flow, mult, swarm)
 
   call Load_Boundary_Conditions(flow, turb, mult, turb_planes)
 
@@ -189,9 +189,6 @@
   call Save_Swarm(swarm, first_dt)
 
   do n = first_dt + 1, last_dt
-    ! For post-processing
-
-    ! call  Multiphase_Mod_Vof_Spurious_Post(flow, time, n)
 
     ! Update turbulent planes
     do tp = 1, turb_planes % n_planes

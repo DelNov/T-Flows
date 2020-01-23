@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Load_Physical_Properties(flow, mult)
+  subroutine Load_Physical_Properties(flow, mult, swarm)
 !------------------------------------------------------------------------------!
 !   Reads physical properties from control file.                               !
 !------------------------------------------------------------------------------!
@@ -13,6 +13,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type)      :: flow
   type(Multiphase_Type) :: mult
+  type(Swarm_Type)      :: swarm
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   real                     :: dens_const, visc_const
