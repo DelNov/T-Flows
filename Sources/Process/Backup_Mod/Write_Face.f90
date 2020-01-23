@@ -33,15 +33,19 @@
   !   (Remember, they are defined to be pos-   !
   !    itive from cg1 to cg2; and cg2 > cg1)   !
   !--------------------------------------------!
-  do s = 1, grid % n_faces
-    c1  = grid % faces_c(1,s)
-    c2  = grid % faces_c(2,s)
-    cg1 = grid % comm % cell_glo(c1)
-    cg2 = grid % comm % cell_glo(c2)
-    if(cg2 > 0 .and. cg2 < cg1) then
-      flux(s) = -flux(s)
+  if(present(correct_sign)) then
+    if(correct_sign) then
+      do s = 1, grid % n_faces
+        c1  = grid % faces_c(1,s)
+        c2  = grid % faces_c(2,s)
+        cg1 = grid % comm % cell_glo(c1)
+        cg2 = grid % comm % cell_glo(c2)
+        if(cg2 > 0 .and. cg2 < cg1) then
+          flux(s) = -flux(s)
+        end if
+      end do
     end if
-  end do
+  end if
 
   cells_nf(:) = 0
 
@@ -138,14 +142,18 @@
   !   (Remember, they are defined to be pos-   !
   !    itive from cg1 to cg2; and cg2 > cg1)   !
   !--------------------------------------------!
-  do s = 1, grid % n_faces
-    c1  = grid % faces_c(1,s)
-    c2  = grid % faces_c(2,s)
-    cg1 = grid % comm % cell_glo(c1)
-    cg2 = grid % comm % cell_glo(c2)
-    if(cg2 > 0 .and. cg2 < cg1) then
-      flux(s) = -flux(s)
+  if(present(correct_sign)) then
+    if(correct_sign) then
+      do s = 1, grid % n_faces
+        c1  = grid % faces_c(1,s)
+        c2  = grid % faces_c(2,s)
+        cg1 = grid % comm % cell_glo(c1)
+        cg2 = grid % comm % cell_glo(c2)
+        if(cg2 > 0 .and. cg2 < cg1) then
+          flux(s) = -flux(s)
+        end if
+      end do
     end if
-  end do
+  end if
 
   end subroutine
