@@ -69,7 +69,7 @@ ALL_COMPILE_TESTS=("$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
                    "$RANS_CHANNEL_LR_RSM_DIR" \
                    "$HYB_CHANNEL_HR_UNIFORM_DIR" \
                    "$HYB_CHANNEL_HR_STRETCHED_DIR")
-DONE_COMPILE_TESTS=1
+DONE_COMPILE_TESTS=0
 
 #----------------------------------
 # All directories to test Generate
@@ -88,7 +88,7 @@ ALL_GENERATE_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR" \
                     "$RANS_CHANNEL_LR_UNIFORM_DIR" \
                     "$HYB_CHANNEL_HR_UNIFORM_DIR" \
                     "$HYB_CHANNEL_HR_STRETCHED_DIR")
-DONE_GENERATE_TESTS=1
+DONE_GENERATE_TESTS=0
 
 #---------------------------------
 # All directories to test Convert
@@ -96,7 +96,7 @@ DONE_GENERATE_TESTS=1
 ALL_CONVERT_TESTS=("$RANS_IMPINGING_JET_DIR" \
                    "$RANS_FUEL_BUNDLE_DIR" \
                    "$LES_PIPE_DIR")
-DONE_CONVERT_TESTS=1
+DONE_CONVERT_TESTS=0
 
 #--------------------------------
 # All directories to test Divide
@@ -118,7 +118,7 @@ ALL_DIVIDE_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR" \
                   "$RANS_IMPINGING_JET_DIR" \
                   "$RANS_FUEL_BUNDLE_DIR"
                   "$LES_PIPE_DIR")
-DONE_DIVIDE_TESTS=1
+DONE_DIVIDE_TESTS=0
 
 #-----------------------------------------------
 # All directories to test save_now and exit_now
@@ -593,13 +593,13 @@ function process_backup_tests {
   echo "!!    Test 1: "$RANS_CHANNEL_LR_UNIFORM_DIR" [k_eps model + T]"
   echo "!!"
   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  #-- Channel_Re_Tau_590 [k_eps model + T]
-  replace_line_with_first_occurence_in_file "TURBULENCE_MODEL" \
-    "TURBULENCE_MODEL k_eps" $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR/control
-  process_backup_test no  $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR
-  if [ "$CGNS" = "yes" ]; then
-    process_backup_test yes $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR
-  fi
+  ##-- Channel_Re_Tau_590 [k_eps model + T]
+  #replace_line_with_first_occurence_in_file "TURBULENCE_MODEL" \
+  #  "TURBULENCE_MODEL k_eps" $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR/control
+  #process_backup_test no  $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR
+  #if [ "$CGNS" = "yes" ]; then
+  #  process_backup_test yes $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR
+  #fi
 
   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   echo "!!"
