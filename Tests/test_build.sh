@@ -593,13 +593,13 @@ function process_backup_tests {
   echo "!!    Test 1: "$RANS_CHANNEL_LR_UNIFORM_DIR" [k_eps model + T]"
   echo "!!"
   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  ##-- Channel_Re_Tau_590 [k_eps model + T]
-  #replace_line_with_first_occurence_in_file "TURBULENCE_MODEL" \
-  #  "TURBULENCE_MODEL k_eps" $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR/control
-  #process_backup_test no  $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR
-  #if [ "$CGNS" = "yes" ]; then
-  #  process_backup_test yes $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR
-  #fi
+  #-- Channel_Re_Tau_590 [k_eps model + T]
+  replace_line_with_first_occurence_in_file "TURBULENCE_MODEL" \
+    "TURBULENCE_MODEL k_eps" $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR/control
+  process_backup_test no  $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR
+  if [ "$CGNS" = "yes" ]; then
+    process_backup_test yes $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR
+  fi
 
   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   echo "!!"
