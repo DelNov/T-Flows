@@ -119,11 +119,11 @@
   call Backup_Mod_Read_Cell_Bnd(comm, fh, d, vc, 'press',       &
                                 fld % p % n(-comm % nb_s:comm % nc_s))
   call Backup_Mod_Read_Cell_Bnd(comm, fh, d, vc, 'press_corr',  &
-                                fld %pp % n(-comm % nb_s:comm % nc_s))
+                                fld % pp % n(-comm % nb_s:comm % nc_s))
 
-  !----------------------!
-  !   Mass flow raters   !
-  !----------------------!
+  !---------------------!
+  !   Mass flow rates   !
+  !---------------------!
   call Backup_Mod_Read_Face(grid % comm, fh, d, vc, grid, 'face_flux_00',  &
                             fld % m_flux % n, correct_sign = .true.)
 
