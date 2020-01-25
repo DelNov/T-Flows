@@ -580,19 +580,19 @@ function process_backup_test {
 #------------------------------------------------------------------------------#
 function process_backup_tests {
 
-  echo "  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "  !!"
-  echo "  !!    Running Processor Backup tests"
-  echo "  !!"
-  echo "  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo ""
+  echo "#======================================================================"
+  echo "#"
+  echo "#   Running Processor backup tests"
+  echo "#"
+  echo "#----------------------------------------------------------------------"
 
   # Grasp/embrace as many different model combinations as you can
 
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "!!"
-  echo "!!    Test 1: "$RANS_CHANNEL_LR_UNIFORM_DIR" [k_eps model + T]"
-  echo "!!"
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo ""
+  echo "#======================================================================"
+  echo "#   Test 1: "$RANS_CHANNEL_LR_UNIFORM_DIR" [k_eps model + T]"
+  echo "#----------------------------------------------------------------------"
   #-- Channel_Re_Tau_590 [k_eps model + T]
   replace_line_with_first_occurence_in_file "TURBULENCE_MODEL" \
     "TURBULENCE_MODEL k_eps" $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR/control
@@ -601,11 +601,10 @@ function process_backup_tests {
     process_backup_test yes $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR
   fi
 
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "!!"
-  echo "!!    Test 2: "$RANS_CHANNEL_LR_UNIFORM_DIR" [k_eps_zeta_f model + T]"
-  echo "!!"
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo ""
+  echo "#======================================================================"
+  echo "#   Test 2: "$RANS_CHANNEL_LR_UNIFORM_DIR" [k_eps_zeta_f model + T]"
+  echo "#----------------------------------------------------------------------"
   #-- Channel_Re_Tau_590 [k_eps_zeta_f model + T]
   replace_line_with_first_occurence_in_file "TURBULENCE_MODEL" \
     "TURBULENCE_MODEL k_eps_zeta_f" $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR/control
@@ -614,11 +613,10 @@ function process_backup_tests {
     process_backup_test yes $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR
   fi
 
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "!!"
-  echo "!!    Test 3: "$RANS_CHANNEL_LR_RSM_DIR" [rsm_hanjalic_jakirlic model + T]"
-  echo "!!"
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo ""
+  echo "#======================================================================"
+  echo "#   Test 3: "$RANS_CHANNEL_LR_RSM_DIR" [rsm_hanjalic_jakirlic model + T]"
+  echo "#----------------------------------------------------------------------"
   #-- Channel_Re_Tau_590_Rsm [rsm_hanjalic_jakirlic model + T]
   replace_line_with_first_occurence_in_file "TURBULENCE_MODEL" \
     "TURBULENCE_MODEL rsm_hanjalic_jakirlic" $TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR/control
@@ -627,11 +625,10 @@ function process_backup_tests {
     process_backup_test yes $TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR
   fi
 
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "!!"
-  echo "!!    Test 4: "$RANS_CHANNEL_LR_RSM_DIR" [rsm_manceau_hanjalic model + T]"
-  echo "!!"
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo ""
+  echo "#======================================================================"
+  echo "#   Test 4: "$RANS_CHANNEL_LR_RSM_DIR" [rsm_manceau_hanjalic model + T]"
+  echo "#----------------------------------------------------------------------"
   #-- Channel_Re_Tau_590_Rsm [rsm_manceau_hanjalic model + T]
   replace_line_with_first_occurence_in_file "TURBULENCE_MODEL" \
     "TURBULENCE_MODEL rsm_manceau_hanjalic" $TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR/control
@@ -640,22 +637,20 @@ function process_backup_tests {
     process_backup_test yes $TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR
   fi
 
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "!!"
-  echo "!!    Test 5: "$LES_PIPE_DIR" les_dynamic"
-  echo "!!"
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo ""
+  echo "#======================================================================"
+  echo "#   Test 5: "$LES_PIPE_DIR" les_dynamic"
+  echo "#----------------------------------------------------------------------"
   #-- Pipe_Re_Tau_180 [les_dynamic]
   process_backup_test no  $TEST_DIR/$LES_PIPE_DIR
   if [ "$CGNS" = "yes" ]; then
     process_backup_test yes $TEST_DIR/$LES_PIPE_DIR
   fi
 
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "!!"
-  echo "!!    Test 6: "$LAMINAR_CAVITY_LID_DRIVEN_DIR" none"
-  echo "!!"
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo ""
+  echo "#======================================================================"
+  echo "#   Test 6: "$LAMINAR_CAVITY_LID_DRIVEN_DIR" none"
+  echo "#----------------------------------------------------------------------"
   #-- Cavity_Lid_Driven_Re_1000 [none]
   process_backup_test no  $TEST_DIR/$LAMINAR_CAVITY_LID_DRIVEN_DIR
   if [ "$CGNS" = "yes" ]; then
@@ -678,6 +673,7 @@ function process_save_exit_now_test {
     exit 1
   fi
 
+  echo ""
   echo "#======================================================================"
   echo "#   Test save_now & exit_now on:" $2
   echo "#----------------------------------------------------------------------"
@@ -700,6 +696,7 @@ function process_save_exit_now_test {
 
   for i in {1..3}
   do
+    echo ""
     echo "#===================================================================="
     if [ "$i" = 1 ]; then
       echo "#   Test np=1, MPI=no"
