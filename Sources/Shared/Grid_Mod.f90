@@ -33,7 +33,6 @@
     integer :: n_bnd_cells  ! ... boundary cells
     integer :: n_per_faces  ! ... periodic faces (shadows)
     integer :: n_bnd_cond   ! ... boundary conditions
-    integer :: n_copy       ! ... copy cells and faces
     integer :: n_levels     ! ... multigrid levels
 
     ! Periodic span
