@@ -11,9 +11,9 @@ set -e
 # Compilation flags used in makefiles
 FCOMP="gnu"
 # Conduct tests with DEBUG=yes
-DEBUG="no"
+DEBUG="yes"
 # Repeat tests with CGNS=yes
-CGNS="no"
+CGNS="yes"
 
 # A small reminder how to set up alternatives if you have mpich and openmpi:
 #update-alternatives --install /usr/bin/mpif90 mpif90 /usr/bin/mpif90.openmpi 20
@@ -745,7 +745,7 @@ function process_save_exit_now_test {
 
     # find if save was made in the range [n_start: n_finish]
     if tail -n+$n_start $FULL_LOG | \
-      grep -q "# Creating file: "$name_in_div"-ts"$n1""; then
+      grep -q "# Creating the file: "$name_in_div"-ts"$n1"\|# Creating the file with fields: "$name_in_div"-ts"$n1""; then
 
       echo "save_now was successfull"
 
