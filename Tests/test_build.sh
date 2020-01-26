@@ -1066,7 +1066,7 @@ while [ 0 -eq 0 ]; do
     process_full_length_tests
   fi
   if [ $option -eq 9 ]; then
-    git clean -dfx
+    git clean -dfx ./
   fi
 done
 
