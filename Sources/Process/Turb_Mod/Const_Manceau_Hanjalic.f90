@@ -25,7 +25,7 @@
   g3_star =  1.3
   g4      =  1.25
   g5      =  0.4
-  c_theta =  0.22 
+  c_theta =  0.22
 
   turb % kin % sigma = 1.0
   turb % eps % sigma = 1.15
