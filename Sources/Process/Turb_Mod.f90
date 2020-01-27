@@ -208,6 +208,7 @@
   include 'Turb_Mod/Calculate_Face_Vis.f90'
   include 'Turb_Mod/Calculate_Heat_Flux.f90'
   include 'Turb_Mod/Calculate_Mean.f90'
+  include 'Turb_Mod/Calculate_Stress.f90'
   include 'Turb_Mod/Substract_Face_Stress.f90'
 
   ! Functions to set turbulence constants
