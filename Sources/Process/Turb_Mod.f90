@@ -165,8 +165,8 @@
   integer, parameter :: AFM  = 30161
 
   ! Switching criteria for hybrid LES/RANS
-  integer, parameter :: HYBRID_SWITCH_DISTANCE = 30169
-  integer, parameter :: HYBRID_SWITCH_VELOCITY = 30181
+  integer, parameter :: SWITCH_DISTANCE = 30169
+  integer, parameter :: SWITCH_VELOCITY = 30181
 
   !--------------------------------!
   !   Turbulence model constants   !

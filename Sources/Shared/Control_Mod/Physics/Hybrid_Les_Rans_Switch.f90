@@ -10,7 +10,7 @@
 !==============================================================================!
 
   call Control_Mod_Read_Char_Item('HYBRID_LES_RANS_SWITCH',   &
-                                  'HYBRID_SWITCH_DISTANCE',   &
+                                  'SWITCH_DISTANCE',          &
                                    val, verbose)
   call To_Upper_Case(val)
 

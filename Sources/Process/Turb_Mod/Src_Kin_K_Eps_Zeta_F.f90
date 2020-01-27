@@ -50,6 +50,9 @@
 !   shear = sqrt(2 S_ij S_ij)                                                  !
 !------------------------------------------------------------------------------!
 
+PRINT *, hybrid_les_rans_switch
+STOP
+
   ! Take aliases
   flow => turb % pnt_flow
   grid => flow % pnt_grid
@@ -95,10 +98,10 @@
       l_rans_v = sqrt(kin % n(c) * zeta % n(c))
       alpha_v  = l_rans_v/l_sgs_v
 
-      if( (hybrid_les_rans_switch .eq. HYBRID_SWITCH_DISTANCE)  &
-          .and. (alpha_d < 1.05)                                &
-          .or.                                                  &
-          (hybrid_les_rans_switch .eq. HYBRID_SWITCH_VELOCITY)  &
+      if( (hybrid_les_rans_switch .eq. SWITCH_DISTANCE)  &
+          .and. (alpha_d < 1.05)                         &
+          .or.                                           &
+          (hybrid_les_rans_switch .eq. SWITCH_VELOCITY)  &
           .and. (alpha_v < 0.85) ) then
         a % val(a % dia(c)) = a % val(a % dia(c))             &
                             + flow % density(c) * eps % n(c)  &
