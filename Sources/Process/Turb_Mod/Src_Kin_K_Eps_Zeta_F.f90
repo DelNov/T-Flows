@@ -50,9 +50,6 @@
 !   shear = sqrt(2 S_ij S_ij)                                                  !
 !------------------------------------------------------------------------------!
 
-PRINT *, hybrid_les_rans_switch
-STOP
-
   ! Take aliases
   flow => turb % pnt_flow
   grid => flow % pnt_grid
