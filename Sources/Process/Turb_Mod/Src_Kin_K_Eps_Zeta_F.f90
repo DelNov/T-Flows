@@ -67,18 +67,19 @@
   end do
 
   if(buoyancy) then
-    turb % g_buoy(c) = -flow % beta             &
-                       * (grav_x * ut % n(c) +  &
-                          grav_y * vt % n(c) +  &
-                          grav_z * wt % n(c))   &
-                        * flow % density(c)
-    b(c) = b(c) + max(0.0, turb % g_buoy(c) * grid % vol(c))
-           a % val(a % dia(c)) = a % val(a % dia(c))         &
-                               + max(0.0,-turb % g_buoy(c)   &
-                               * grid % vol(c)               &
-                               / (kin % n(c) + TINY))
+    do c = 1, grid % n_cells
+      turb % g_buoy(c) = -flow % beta             &
+                         * (grav_x * ut % n(c) +  &
+                            grav_y * vt % n(c) +  &
+                            grav_z * wt % n(c))   &
+                          * flow % density(c)
+      b(c) = b(c) + max(0.0, turb % g_buoy(c) * grid % vol(c))
+             a % val(a % dia(c)) = a % val(a % dia(c))         &
+                                 + max(0.0,-turb % g_buoy(c)   &
+                                 * grid % vol(c)               &
+                                 / (kin % n(c) + TINY))
+    end do
   end if
-
 
   if(turbulence_model .eq. HYBRID_LES_RANS) then
     do c = 1, grid % n_cells
@@ -220,11 +221,11 @@
           turb % g_buoy(c1) = turb % g_buoy(c1) * exp(-1.0 * ebf) &
                      + g_buoy_wall * exp(-1.0 / ebf)
 
-          ! Add new values of g_buoy based on wall function approach          
+          ! Add new values of g_buoy based on wall function approach
           b(c1)      = b(c1) + turb % g_buoy(c1) * grid % vol(c1)
 
         end if ! buoyancy
- 
+
       end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2).eq.WALL or WALLFL
     end if    ! c2 < 0
   end do
