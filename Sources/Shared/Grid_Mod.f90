@@ -33,11 +33,13 @@
     integer :: n_bnd_cells  ! ... boundary cells
     integer :: n_per_faces  ! ... periodic faces (shadows)
     integer :: n_bnd_cond   ! ... boundary conditions
-    integer :: n_copy       ! ... copy cells and faces
     integer :: n_levels     ! ... multigrid levels
 
     ! Periodic span
     real :: per_x, per_y, per_z
+
+    ! Minimum, Maximum and total volumes
+    real :: min_vol, max_vol, tot_vol
 
     !-------------------------!
     !  Cell-based variables   !
@@ -58,8 +60,15 @@
     ! Number of nodes at each cell (determines cell's shape really)
     integer, allocatable :: cells_n_nodes(:)
 
-    ! Cells' nodes and neigboring cells
+    ! Number of faces surrounding each cell
+    integer, allocatable :: cells_n_faces(:)
+
+    ! Number of cells surrounding each cell
+    integer, allocatable :: cells_n_cells(:)
+
+    ! Cells' nodes, faces and neigboring cells
     integer, allocatable :: cells_n(:,:)
+    integer, allocatable :: cells_f(:,:)
     integer, allocatable :: cells_c(:,:)
 
     ! For boundary cells, store corresponding face
@@ -67,12 +76,6 @@
 
     ! For each cell; type of the boundary condition in a given direction
     integer, allocatable :: cells_bnd_color(:,:)
-
-    ! Number of faces at each cell (you know it from the shape anyway)
-    integer, allocatable :: cells_n_faces(:)
-
-    ! Cells' faces (i.e. faces surrounding each cell
-    integer, allocatable :: cells_f(:,:)
 
     ! Coarser levels for the grid
     type(Grid_Level_Type) :: level(MAX_MG_LEVELS)
@@ -143,24 +146,27 @@
   include 'Grid_Mod/Allocate_Cells.f90'
   include 'Grid_Mod/Allocate_Comm.f90'
   include 'Grid_Mod/Allocate_Faces.f90'
-  include 'Grid_Mod/Allocate_Nodes.f90'
-  include 'Grid_Mod/Allocate_New_Numbers.f90'
-  include 'Grid_Mod/Create_Levels.f90'
   include 'Grid_Mod/Allocate_Levels.f90'
-  include 'Grid_Mod/Calculate_Face_Geometry.f90'
-  include 'Grid_Mod/Calculate_Wall_Distance.f90'
-  include 'Grid_Mod/Check_Levels.f90'
-  include 'Grid_Mod/Coarsen.f90'
-  include 'Grid_Mod/Create_Buffers.f90'
+  include 'Grid_Mod/Allocate_New_Numbers.f90'
+  include 'Grid_Mod/Allocate_Nodes.f90'
   include 'Grid_Mod/Bnd_Cond_Name.f90'
   include 'Grid_Mod/Bnd_Cond_Type.f90'
   include 'Grid_Mod/Bnd_Cond_Ranges.f90'
+  include 'Grid_Mod/Calculate_Face_Geometry.f90'
+  include 'Grid_Mod/Calculate_Global_Volumes.f90'
+  include 'Grid_Mod/Calculate_Wall_Distance.f90'
+  include 'Grid_Mod/Check_Levels.f90'
+  include 'Grid_Mod/Coarsen.f90'
+  include 'Grid_Mod/Correction_Periodicity.f90'
+  include 'Grid_Mod/Create_Buffers.f90'
+  include 'Grid_Mod/Create_Levels.f90'
   include 'Grid_Mod/Decompose.f90'
+  include 'Grid_Mod/Estimate_Big_And_Small.f90'
   include 'Grid_Mod/Exchange_Int.f90'
   include 'Grid_Mod/Exchange_Real.f90'
-  include 'Grid_Mod/Estimate_Big_And_Small.f90'
-  include 'Grid_Mod/Find_Periodic_Faces.f90'
+  include 'Grid_Mod/Find_Cells_Faces.f90'
   include 'Grid_Mod/Find_Nodes_Cells.f90'
+  include 'Grid_Mod/Find_Periodic_Faces.f90'
   include 'Grid_Mod/Get_C1_And_C2_At_Level.f90'
   include 'Grid_Mod/Load_Cns.f90'
   include 'Grid_Mod/Load_Geo.f90'

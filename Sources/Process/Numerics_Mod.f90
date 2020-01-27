@@ -35,8 +35,9 @@
   integer, parameter :: STACS     = 40127
 
   ! Time integration parameters
-  integer, parameter :: LINEAR    = 40129
-  integer, parameter :: PARABOLIC = 40151
+  integer, parameter :: LINEAR        = 40129
+  integer, parameter :: PARABOLIC     = 40151
+  integer, parameter :: RUNGE_KUTTA_3 = 40153
 
   contains
 

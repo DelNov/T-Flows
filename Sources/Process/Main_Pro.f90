@@ -101,7 +101,7 @@
   call Control_Mod_Starting_Time_Step_For_Statistics(n_stat, verbose=.true.)
 
   ! Read physical models from control file
-  call Read_Control_Physical(flow, swarm, turb)
+  call Read_Control_Physical(flow, turb, mult, swarm)
 
   ! Allocate memory for all variables
   call Field_Mod_Allocate(flow, grid)
@@ -116,12 +116,14 @@
   call Grid_Mod_Calculate_Face_Geometry(grid)
   call Grid_Mod_Find_Nodes_Cells(grid)         ! for Lagrangian particle track
   call Grid_Mod_Find_Periodic_Faces(grid)      ! for Lagrangian particle track
+  call Grid_Mod_Find_Cells_Faces(grid)         ! for Multiphase Module
+  call Grid_Mod_Calculate_Global_Volumes(grid)
 
   ! Allocate memory for linear systems of equations
   ! (You need face geomtry for this step)
   call Solver_Mod_Create(sol, grid)
 
-  call Load_Physical_Properties(flow)
+  call Load_Physical_Properties(flow, mult, swarm)
 
   call Load_Boundary_Conditions(flow, turb, mult, turb_planes)
 
@@ -186,9 +188,6 @@
   call Save_Swarm(swarm, first_dt)
 
   do n = first_dt + 1, last_dt
-    ! For post-processing
-
-    ! call  Multiphase_Mod_Vof_Spurious_Post(flow, time, n)
 
     ! Update turbulent planes
     do tp = 1, turb_planes % n_planes
@@ -222,11 +221,12 @@
 
     ! Volume of Fluid
     if(multiphase_model .eq. VOLUME_OF_FLUID) then
+      flow % m_flux % o = flow % m_flux % n / flow % density_f
       ! Update the values at boundaries
       call Update_Boundary_Values(flow, turb, mult)
       call Multiphase_Mod_Compute_Vof(mult, sol, flow % dt, n)
-      call Multiphase_Mod_Update_Physical_Properties(mult)
-
+    else
+      flow % m_flux % o = flow % m_flux % n
     end if
 
     do ini = 1, max_ini
@@ -339,14 +339,14 @@
       call Save_Swarm(swarm, n)
 
       if(multiphase_model .eq. VOLUME_OF_FLUID) then
-        call Surf_Mod_Allocate(surf, flow)
-        call Surf_Mod_Place_At_Var_Value(surf,        &
-                                         mult % vof,  &
-                                         sol,         &
-                                         0.5,         &
-                                         .false.)  ! don't print messages
-        call Save_Surf(surf, n)
-        call Surf_Mod_Clean(surf)
+!        call Surf_Mod_Allocate(surf, flow)
+!        call Surf_Mod_Place_At_Var_Value(surf,        &
+!                                         mult % vof,  &
+!                                         sol,         &
+!                                         0.5,         &
+!                                         .false.)  ! don't print messages
+!        call Save_Surf(surf, n)
+!        call Surf_Mod_Clean(surf)
       end if
 
       ! Write results in user-customized format

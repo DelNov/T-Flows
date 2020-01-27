@@ -18,7 +18,7 @@
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: phi
-  character(len=80)        :: name_in, answer, name_mean, a_name
+  character(len=80)        :: name_in, answer, name_mean, a_name, f_name
   integer                  :: fh, d, vc, sc, ua
 !==============================================================================!
 
@@ -119,12 +119,14 @@
   call Backup_Mod_Read_Cell_Bnd(comm, fh, d, vc, 'press',       &
                                 fld % p % n(-comm % nb_s:comm % nc_s))
   call Backup_Mod_Read_Cell_Bnd(comm, fh, d, vc, 'press_corr',  &
-                                fld %pp % n(-comm % nb_s:comm % nc_s))
+                                fld % pp % n(-comm % nb_s:comm % nc_s))
 
-  !----------------------!
-  !   Mass flow raters   !
-  !----------------------!
-  call Backup_Mod_Read_Face(grid % comm, fh, d, vc, grid, fld % m_flux % n)
+  !---------------------!
+  !   Mass flow rates   !
+  !---------------------!
+  f_name = 'face_flux_00'
+  call Backup_Mod_Read_Face(grid % comm, fh, d, vc, grid, f_name,  &
+                            fld % m_flux % n, correct_sign = .true.)
 
   !--------------!
   !              !
@@ -141,7 +143,10 @@
   !              !
   !--------------!
   if(multiphase_model .eq. VOLUME_OF_FLUID) then
+    f_name = 'face_dens_00'
     call Backup_Mod_Read_Variable(fh, d, vc, 'vof', mul % vof)
+    call Backup_Mod_Read_Face(grid % comm, fh, d, vc, grid, f_name,  &
+                              fld % density_f)
   end if
 
   !-----------------------!
@@ -377,7 +382,7 @@
   !-----------------!
 
   do ua = 1, n_user_arrays
-    a_name = 'A_??'
+    a_name = 'A_00'
     write(a_name(3:4),'(I2.2)') ua
     call Backup_Mod_Read_Cell_Bnd(comm, fh, d, vc, a_name,  &
                                   user_array(ua,-comm % nb_s:comm % nc_s))

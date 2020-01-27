@@ -103,9 +103,9 @@
         u_plus = U_Plus_Log_Law(turb, turb % y_plus(c1))
 
         if(turb % y_plus(c1) < 3.0) then
-          turb % vis_w(c1) = turb % vis_t(c1) + flow % viscosity(c)
+          turb % vis_w(c1) = turb % vis_t(c1) + flow % viscosity(c1)
         else
-          turb % vis_w(c1) =    turb % y_plus(c1) * flow % viscosity(c)  &
+          turb % vis_w(c1) =    turb % y_plus(c1) * flow % viscosity(c1)  &
                            / (  turb % y_plus(c1) * exp(-1.0 * ebf)      &
                               + u_plus * exp(-1.0/ebf) + TINY)
         end if
@@ -130,7 +130,7 @@
           pr_t = Turb_Mod_Prandtl_Number(turb, c1)
           beta = 9.24 * ((pr/pr_t)**0.75 - 1.0)  &
                * (1.0 + 0.28 * exp(-0.007*pr/pr_t))
-          ebf = Turb_Mod_Ebf_Scalar(turb, c, pr)
+          ebf = Turb_Mod_Ebf_Scalar(turb, c1, pr)
           turb % con_w(c1) =    turb % y_plus(c1)                         &
                               * flow % viscosity(c1)                      &
                               * flow % capacity(c1)                       &

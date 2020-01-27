@@ -1,5 +1,6 @@
 !==============================================================================!
-  subroutine Backup_Mod_Write_Face(comm, fh, d, vc, grid, flux)
+  subroutine Backup_Mod_Write_Face(comm, fh, d, vc, grid, var_name, flux,  &
+                                   correct_sign)
 !------------------------------------------------------------------------------!
 !   Writes backup files. name.backup                                           !
 !------------------------------------------------------------------------------!
@@ -10,10 +11,13 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Comm_Type) :: comm
-  integer         :: fh, d, vc
-  type(Grid_Type) :: grid
-  real            :: flux(grid % n_faces)
+  type(Comm_Type)   :: comm
+  integer           :: fh, d, vc
+  type(Grid_Type)   :: grid
+  character(len=*)  :: var_name
+  real              :: flux(grid % n_faces)
+  logical, optional :: correct_sign  ! in case of face fluxes, signs might have
+                                     ! to be changed (check it one day)
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: s, c, c1, c2, cg1, cg2, mc, max_cnt
   integer, allocatable :: cells_cg(:,:)   ! cells' cells
@@ -29,15 +33,19 @@
   !   (Remember, they are defined to be pos-   !
   !    itive from cg1 to cg2; and cg2 > cg1)   !
   !--------------------------------------------!
-  do s = 1, grid % n_faces
-    c1  = grid % faces_c(1,s)
-    c2  = grid % faces_c(2,s)
-    cg1 = grid % comm % cell_glo(c1)
-    cg2 = grid % comm % cell_glo(c2)
-    if(cg2 > 0 .and. cg2 < cg1) then
-      flux(s) = -flux(s)
+  if(present(correct_sign)) then
+    if(correct_sign) then
+      do s = 1, grid % n_faces
+        c1  = grid % faces_c(1,s)
+        c2  = grid % faces_c(2,s)
+        cg1 = grid % comm % cell_glo(c1)
+        cg2 = grid % comm % cell_glo(c2)
+        if(cg2 > 0 .and. cg2 < cg1) then
+          flux(s) = -flux(s)
+        end if
+      end do
     end if
-  end do
+  end if
 
   cells_nf(:) = 0
 
@@ -134,14 +142,18 @@
   !   (Remember, they are defined to be pos-   !
   !    itive from cg1 to cg2; and cg2 > cg1)   !
   !--------------------------------------------!
-  do s = 1, grid % n_faces
-    c1  = grid % faces_c(1,s)
-    c2  = grid % faces_c(2,s)
-    cg1 = grid % comm % cell_glo(c1)
-    cg2 = grid % comm % cell_glo(c2)
-    if(cg2 > 0 .and. cg2 < cg1) then
-      flux(s) = -flux(s)
+  if(present(correct_sign)) then
+    if(correct_sign) then
+      do s = 1, grid % n_faces
+        c1  = grid % faces_c(1,s)
+        c2  = grid % faces_c(2,s)
+        cg1 = grid % comm % cell_glo(c1)
+        cg2 = grid % comm % cell_glo(c2)
+        if(cg2 > 0 .and. cg2 < cg1) then
+          flux(s) = -flux(s)
+        end if
+      end do
     end if
-  end do
+  end if
 
   end subroutine

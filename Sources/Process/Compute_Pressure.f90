@@ -14,7 +14,7 @@
   use Solver_Mod,     only: Solver_Type, Bicg, Cg, Cgs, Acm
   use Matrix_Mod,     only: Matrix_Type
   use Control_Mod
-  use Multiphase_Mod, only: Multiphase_Type, surface_tension,  &
+  use Multiphase_Mod, only: Multiphase_Type,  &
                             multiphase_model, VOLUME_OF_FLUID
   use User_Mod
   use Work_Mod,       only: dens_factor => r_face_01

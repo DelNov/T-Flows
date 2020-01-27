@@ -11,9 +11,9 @@ set -e
 # Compilation flags used in makefiles
 FCOMP="gnu"
 # Conduct tests with DEBUG=yes
-DEBUG="no"
-# Repeat tests with CGNS_HDF5=yes
-CGNS="no"
+DEBUG="yes"
+# Repeat tests with CGNS=yes
+CGNS="yes"
 
 # A small reminder how to set up alternatives if you have mpich and openmpi:
 #update-alternatives --install /usr/bin/mpif90 mpif90 /usr/bin/mpif90.openmpi 20
@@ -32,7 +32,11 @@ LAMINAR_CAVITY_THERM_DRIVEN_106_DIR=Laminar/Cavity/Thermally_Driven/Ra_10e6
 LAMINAR_CAVITY_THERM_DRIVEN_108_DIR=Laminar/Cavity/Thermally_Driven/Ra_10e8
 LAMINAR_T_JUNCTION_DIR=Laminar/T_Junction
 
-LES_CHANNEL_180_DIR=Les/Channel_Re_Tau_180
+LES_CHANNEL_180_PD_DIR=Les/Channel_Re_Tau_180/Periodic_Domain
+
+# Generate takes ages for this one
+LES_CHANNEL_180_LD_DIR=Les/Channel_Re_Tau_180/Long_Domain
+
 LES_PIPE_DIR=Les/Pipe_Re_Tau_180
 LES_RB_109_DIR=Les/Rayleigh_Benard_Convection_Ra_10e09
 
@@ -49,13 +53,14 @@ HYB_CHANNEL_HR_STRETCHED_DIR=Hybrid_Les_Rans/Channel_Re_Tau_2000/Stretched_Mesh
 HYB_CHANNEL_HR_UNIFORM_DIR=Hybrid_Les_Rans/Channel_Re_Tau_2000/Uniform_Mesh
 
 #----------------------------------------------------------------------------
-# All compilation tests - would be good to include those with user functions
+# All compilation tests including those with User_Mod/
 #----------------------------------------------------------------------------
 ALL_COMPILE_TESTS=("$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
                    "$LAMINAR_CAVITY_THERM_DRIVEN_106_DIR" \
                    "$LAMINAR_CAVITY_THERM_DRIVEN_108_DIR" \
                    "$LAMINAR_T_JUNCTION_DIR" \
-                   "$LES_CHANNEL_180_DIR" \
+                   "$LES_CHANNEL_180_LD_DIR" \
+                   "$LES_CHANNEL_180_PD_DIR" \
                    "$LES_PIPE_DIR" \
                    "$LES_RB_109_DIR" \
                    "$RANS_BACKSTEP_28000_DIR" \
@@ -64,7 +69,7 @@ ALL_COMPILE_TESTS=("$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
                    "$RANS_CHANNEL_LR_RSM_DIR" \
                    "$HYB_CHANNEL_HR_UNIFORM_DIR" \
                    "$HYB_CHANNEL_HR_STRETCHED_DIR")
-RAN_COMPILE_TESTS=0
+DONE_COMPILE_TESTS=0
 
 #----------------------------------
 # All directories to test Generate
@@ -74,6 +79,7 @@ ALL_GENERATE_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR" \
                     "$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
                     "$LAMINAR_CAVITY_THERM_DRIVEN_106_DIR" \
                     "$LAMINAR_CAVITY_THERM_DRIVEN_108_DIR" \
+                    "$LES_CHANNEL_180_PD_DIR" \
                     "$RANS_BACKSTEP_05100_DIR" \
                     "$RANS_BACKSTEP_28000_DIR" \
                     "$RANS_CHANNEL_LR_LONG_DIR" \
@@ -82,7 +88,7 @@ ALL_GENERATE_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR" \
                     "$RANS_CHANNEL_LR_UNIFORM_DIR" \
                     "$HYB_CHANNEL_HR_UNIFORM_DIR" \
                     "$HYB_CHANNEL_HR_STRETCHED_DIR")
-RAN_GENERATE_TESTS=0
+DONE_GENERATE_TESTS=0
 
 #---------------------------------
 # All directories to test Convert
@@ -90,7 +96,7 @@ RAN_GENERATE_TESTS=0
 ALL_CONVERT_TESTS=("$RANS_IMPINGING_JET_DIR" \
                    "$RANS_FUEL_BUNDLE_DIR" \
                    "$LES_PIPE_DIR")
-RAN_CONVERT_TESTS=0
+DONE_CONVERT_TESTS=0
 
 #--------------------------------
 # All directories to test Divide
@@ -100,6 +106,7 @@ ALL_DIVIDE_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR" \
                   "$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
                   "$LAMINAR_CAVITY_THERM_DRIVEN_106_DIR" \
                   "$LAMINAR_CAVITY_THERM_DRIVEN_108_DIR" \
+                  "$LES_CHANNEL_180_PD_DIR" \
                   "$RANS_BACKSTEP_05100_DIR" \
                   "$RANS_BACKSTEP_28000_DIR" \
                   "$RANS_CHANNEL_LR_LONG_DIR" \
@@ -111,7 +118,7 @@ ALL_DIVIDE_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR" \
                   "$RANS_IMPINGING_JET_DIR" \
                   "$RANS_FUEL_BUNDLE_DIR"
                   "$LES_PIPE_DIR")
-RAN_DIVIDE_TESTS=0
+DONE_DIVIDE_TESTS=0
 
 #-----------------------------------------------
 # All directories to test save_now and exit_now
@@ -139,7 +146,7 @@ ALL_PROCESS_MODELS=("none" \
                     "rsm_hanjalic_jakirlic" \
                     "hybrid_les_rans" \
                     "hybrid_les_rans")
-RAN_PROCESS_TESTS=0
+DONE_PROCESS_TESTS=0
 
 # Folder structure
 TEST_DIR=$PWD                      # dir with tests
@@ -185,7 +192,7 @@ function time_in_seconds {
 #------------------------------------------------------------------------------#
 function clean_compile {
   # $1 = dir 
-  # $2 = CGNS_HDF5 = yes/no
+  # $2 = CGNS = yes/no
   # $3 = MPI = yes/no
   # $4 = DIR_CASE path
 
@@ -193,7 +200,7 @@ function clean_compile {
     echo "directory with sources is not set at all"
     exit 1
   elif [ -z "${2+xxx}" ]; then 
-    echo "CGNS_HDF5 flag is not set at all"
+    echo "CGNS flag is not set at all"
     exit 1
   elif [ -z "${3+xxx}" ]; then 
     echo "MPI flag is not set at all"
@@ -205,13 +212,13 @@ function clean_compile {
   make clean >> $FULL_LOG 2>&1
 
   if [ -z "${4+xxx}" ]; then 
-    echo "make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS_HDF5=$2 MPI=$3"
-              make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS_HDF5=$2 MPI=$3 \
+    echo "make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS=$2 MPI=$3"
+              make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS=$2 MPI=$3 \
               >> $FULL_LOG 2>&1
               success=$?
   else
-    echo "make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS_HDF5=$2 MPI=$3 DIR_CASE=$4"
-              make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS_HDF5=$2 MPI=$3 DIR_CASE=$4 \
+    echo "make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS=$2 MPI=$3 DIR_CASE=$4"
+              make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS=$2 MPI=$3 DIR_CASE=$4 \
               >> $FULL_LOG 2>&1
               success=$?
   fi
@@ -343,7 +350,7 @@ function generate_tests {
   echo "#----------------------------------------------------------------------"
 
   #-- seq, no cgns
-  clean_compile $GENE_DIR  no  no  # dir CGNS_HDF5 MPI
+  clean_compile $GENE_DIR  no  no  # dir CGNS MPI
 
   for CASE_DIR in ${ALL_GENERATE_TESTS[@]}; do
     launch_generate $CASE_DIR
@@ -351,14 +358,14 @@ function generate_tests {
 
   #-- seq, cgns(hdf5)
   if [ "$CGNS" = "yes" ]; then
-    clean_compile $GENE_DIR  yes  no  # dir CGNS_HDF5 MPI
+    clean_compile $GENE_DIR  yes  no  # dir CGNS MPI
 
     for CASE_DIR in ${ALL_GENERATE_TESTS[@]}; do
       launch_generate $CASE_DIR
     done
   fi
 
-  RAN_GENERATE_TESTS=1
+  DONE_GENERATE_TESTS=1
 }
 
 #------------------------------------------------------------------------------#
@@ -413,22 +420,22 @@ function convert_tests {
   cd $TEST_DIR/$LES_PIPE_DIR;            unpack_neu_mesh  pipe.neu.gz
 
   #-- seq, no cgns
-  clean_compile $CONV_DIR no no # dir CGNS_HDF5 MPI
+  clean_compile $CONV_DIR no no # dir CGNS MPI
 
   for CASE_DIR in ${ALL_CONVERT_TESTS[@]}; do
     launch_convert $CASE_DIR
   done
 
-  #-- seq, cgns_hdf5
+  #-- seq, cgns
   if [ "$CGNS" = "yes" ]; then
-    clean_compile $CONV_DIR yes no # dir CGNS_HDF5 MPI
+    clean_compile $CONV_DIR yes no # dir CGNS MPI
 
     for CASE_DIR in ${ALL_CONVERT_TESTS[@]}; do
       launch_convert $CASE_DIR
     done
   fi
 
-  RAN_CONVERT_TESTS=1
+  DONE_CONVERT_TESTS=1
 }
 
 #------------------------------------------------------------------------------#
@@ -444,13 +451,13 @@ function divide_tests {
   echo "#----------------------------------------------------------------------"
 
   #-- seq
-  clean_compile $DIVI_DIR no no no # dir CGNS_HDF5 MPI
+  clean_compile $DIVI_DIR no no no # dir CGNS MPI
 
   for CASE_DIR in ${ALL_DIVIDE_TESTS[@]}; do
     launch_divide $CASE_DIR
   done
 
-  RAN_DIVIDE_TESTS=1
+  DONE_DIVIDE_TESTS=1
 }
 
 #------------------------------------------------------------------------------#
@@ -479,11 +486,11 @@ function replace_line_with_first_occurence_in_file {
 # processor: backup test
 #------------------------------------------------------------------------------#
 function process_backup_test {
-  # $1 = CGNS_HDF5 = yes
+  # $1 = CGNS = yes
   # $2 = test_dir
 
   if [ -z "${1+xxx}" ]; then 
-    echo "CGNS_HDF5 flag is not set at all"
+    echo "CGNS flag is not set at all"
     exit 1
   elif [ -z "${2+xxx}" ]; then 
     echo "directory is not set at all"
@@ -503,7 +510,7 @@ function process_backup_test {
 
   #----------------------------------------#
   echo "np=1, MPI=no, start from 0, make a backup"
-  clean_compile $PROC_DIR $1 no # dir CGNS_HDF5 MPI
+  clean_compile $PROC_DIR $1 no # dir CGNS MPI
   cd $2
 
   # comment line with LOAD_BACKUP_NAME
@@ -529,7 +536,7 @@ function process_backup_test {
   launch_process seq 1
   #----------------------------------------#
   echo "np=1, MPI=yes, load from backup(produced by seq)"
-  clean_compile $PROC_DIR $1 yes # dir CGNS_HDF5 MPI
+  clean_compile $PROC_DIR $1 yes # dir CGNS MPI
   cd $2
 
   launch_process par 1
@@ -560,7 +567,7 @@ function process_backup_test {
   launch_process par $nproc_in_div
   #----------------------------------------#
   echo "np=1, MPI=yes, backup=(produced by par.np=2)"
-  clean_compile $PROC_DIR $1 no # dir CGNS_HDF5 MPI
+  clean_compile $PROC_DIR $1 no # dir CGNS MPI
   cd $2
   launch_process par 1
   #----------------------------------------#
@@ -573,19 +580,19 @@ function process_backup_test {
 #------------------------------------------------------------------------------#
 function process_backup_tests {
 
-  echo "  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "  !!"
-  echo "  !!    Running Processor Backup tests"
-  echo "  !!"
-  echo "  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo ""
+  echo "#======================================================================"
+  echo "#"
+  echo "#   Running Processor backup tests"
+  echo "#"
+  echo "#----------------------------------------------------------------------"
 
   # Grasp/embrace as many different model combinations as you can
 
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "!!"
-  echo "!!    Test 1"
-  echo "!!"
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo ""
+  echo "#======================================================================"
+  echo "#   Test 1: "$RANS_CHANNEL_LR_UNIFORM_DIR" [k_eps model + T]"
+  echo "#----------------------------------------------------------------------"
   #-- Channel_Re_Tau_590 [k_eps model + T]
   replace_line_with_first_occurence_in_file "TURBULENCE_MODEL" \
     "TURBULENCE_MODEL k_eps" $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR/control
@@ -594,11 +601,10 @@ function process_backup_tests {
     process_backup_test yes $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR
   fi
 
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "!!"
-  echo "!!    Test 2"
-  echo "!!"
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo ""
+  echo "#======================================================================"
+  echo "#   Test 2: "$RANS_CHANNEL_LR_UNIFORM_DIR" [k_eps_zeta_f model + T]"
+  echo "#----------------------------------------------------------------------"
   #-- Channel_Re_Tau_590 [k_eps_zeta_f model + T]
   replace_line_with_first_occurence_in_file "TURBULENCE_MODEL" \
     "TURBULENCE_MODEL k_eps_zeta_f" $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR/control
@@ -607,11 +613,10 @@ function process_backup_tests {
     process_backup_test yes $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR
   fi
 
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "!!"
-  echo "!!    Test 3"
-  echo "!!"
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo ""
+  echo "#======================================================================"
+  echo "#   Test 3: "$RANS_CHANNEL_LR_RSM_DIR" [rsm_hanjalic_jakirlic model + T]"
+  echo "#----------------------------------------------------------------------"
   #-- Channel_Re_Tau_590_Rsm [rsm_hanjalic_jakirlic model + T]
   replace_line_with_first_occurence_in_file "TURBULENCE_MODEL" \
     "TURBULENCE_MODEL rsm_hanjalic_jakirlic" $TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR/control
@@ -620,11 +625,10 @@ function process_backup_tests {
     process_backup_test yes $TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR
   fi
 
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "!!"
-  echo "!!    Test 4"
-  echo "!!"
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo ""
+  echo "#======================================================================"
+  echo "#   Test 4: "$RANS_CHANNEL_LR_RSM_DIR" [rsm_manceau_hanjalic model + T]"
+  echo "#----------------------------------------------------------------------"
   #-- Channel_Re_Tau_590_Rsm [rsm_manceau_hanjalic model + T]
   replace_line_with_first_occurence_in_file "TURBULENCE_MODEL" \
     "TURBULENCE_MODEL rsm_manceau_hanjalic" $TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR/control
@@ -633,22 +637,20 @@ function process_backup_tests {
     process_backup_test yes $TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR
   fi
 
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "!!"
-  echo "!!    Test 5"
-  echo "!!"
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo ""
+  echo "#======================================================================"
+  echo "#   Test 5: "$LES_PIPE_DIR" les_dynamic"
+  echo "#----------------------------------------------------------------------"
   #-- Pipe_Re_Tau_180 [les_dynamic]
   process_backup_test no  $TEST_DIR/$LES_PIPE_DIR
   if [ "$CGNS" = "yes" ]; then
     process_backup_test yes $TEST_DIR/$LES_PIPE_DIR
   fi
 
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  echo "!!"
-  echo "!!    Test 6"
-  echo "!!"
-  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo ""
+  echo "#======================================================================"
+  echo "#   Test 6: "$LAMINAR_CAVITY_LID_DRIVEN_DIR" none"
+  echo "#----------------------------------------------------------------------"
   #-- Cavity_Lid_Driven_Re_1000 [none]
   process_backup_test no  $TEST_DIR/$LAMINAR_CAVITY_LID_DRIVEN_DIR
   if [ "$CGNS" = "yes" ]; then
@@ -660,17 +662,18 @@ function process_backup_tests {
 # process: save_now / exit_now test
 #------------------------------------------------------------------------------#
 function process_save_exit_now_test {
-  # $1 = CGNS_HDF5 = yes
+  # $1 = CGNS = yes
   # $2 = relative dir with test
 
   if [ -z "${1+xxx}" ]; then 
-    echo "CGNS_HDF5 flag is not set at all"
+    echo "CGNS flag is not set at all"
     exit 1
   elif [ -z "${2+xxx}" ]; then 
     echo "directory is not set at all"
     exit 1
   fi
 
+  echo ""
   echo "#======================================================================"
   echo "#   Test save_now & exit_now on:" $2
   echo "#----------------------------------------------------------------------"
@@ -693,6 +696,7 @@ function process_save_exit_now_test {
 
   for i in {1..3}
   do
+    echo ""
     echo "#===================================================================="
     if [ "$i" = 1 ]; then
       echo "#   Test np=1, MPI=no"
@@ -741,7 +745,7 @@ function process_save_exit_now_test {
 
     # find if save was made in the range [n_start: n_finish]
     if tail -n+$n_start $FULL_LOG | \
-      grep -q "# Creating file: "$name_in_div"-ts"$n1""; then
+      grep -q "# Creating the file: "$name_in_div"-ts"$n1"\|# Creating the file with fields: "$name_in_div"-ts"$n1""; then
 
       echo "save_now was successfull"
 
@@ -864,9 +868,9 @@ function process_compilation_test {
   rel_dir=$(realpath --relative-to="$PROC_DIR" "$TEST_DIR/$1")
 
   if [ "$CGNS" = "yes" ]; then
-    clean_compile $PROC_DIR yes yes $rel_dir # dir CGNS_HDF5 MPI DIR_CASE
+    clean_compile $PROC_DIR yes yes $rel_dir # dir CGNS MPI DIR_CASE
   else
-    clean_compile $PROC_DIR no yes $rel_dir # dir CGNS_HDF5 MPI DIR_CASE
+    clean_compile $PROC_DIR no yes $rel_dir # dir CGNS MPI DIR_CASE
   fi
 }
 
@@ -916,9 +920,9 @@ function process_full_length_test {
   rel_dir=$(realpath --relative-to="$PROC_DIR" "$1")
 
   if [ "$CGNS" = "yes" ]; then
-    clean_compile $PROC_DIR yes yes $rel_dir # dir CGNS_HDF5 MPI DIR_CASE
+    clean_compile $PROC_DIR yes yes $rel_dir # dir CGNS MPI DIR_CASE
   else
-    clean_compile $PROC_DIR no yes $rel_dir # dir CGNS_HDF5 MPI DIR_CASE
+    clean_compile $PROC_DIR no yes $rel_dir # dir CGNS MPI DIR_CASE
   fi
 
   cd "$1"
@@ -999,9 +1003,6 @@ function process_full_length_tests {
 #------------------------------------------------------------------------------#
 # actual script
 #------------------------------------------------------------------------------#
-for val in $ALL_GENERATE_TESTS; do
-   echo $val
-done
 while [ 0 -eq 0 ]; do
   echo ""
   echo "#======================================================================"
@@ -1016,7 +1017,7 @@ while [ 0 -eq 0 ]; do
   echo "  1. Generate tests"
   echo "  2. Convert tests"
   echo "  3. Divide tests"
-  echo "  4. Processor compilation tests"
+  echo "  4. Processor compilation tests with User_Mod"
   echo "  5. Processor backup tests"
   echo "  6. Processor save_now/exit_now tests"
   echo "  7. Processor full lenght tests"
@@ -1032,18 +1033,29 @@ while [ 0 -eq 0 ]; do
     convert_tests
   fi
   if [ $option -eq 3 ]; then
-    if [ $RAN_GENERATE_TESTS -eq 0 ]; then generate_tests; fi
-    if [ $RAN_CONVERT_TESTS  -eq 0 ]; then convert_tests;  fi
+    if [ $DONE_GENERATE_TESTS -eq 0 ]; then generate_tests; fi
+    if [ $DONE_CONVERT_TESTS  -eq 0 ]; then convert_tests;  fi
     divide_tests
   fi
   if [ $option -eq 4 ]; then process_compilation_tests;    fi
-  if [ $option -eq 5 ]; then process_backup_tests;         fi
+  if [ $option -eq 5 ]; then 
+    if [ $DONE_GENERATE_TESTS -eq 0 ]; then generate_tests; fi
+    if [ $DONE_CONVERT_TESTS  -eq 0 ]; then convert_tests;  fi
+    if [ $DONE_DIVIDE_TESTS   -eq 0 ]; then divide_tests;   fi
+    process_backup_tests;
+  fi
   if [ $option -eq 6 ]; then
-    if [ $RAN_GENERATE_TESTS -eq 0 ]; then generate_tests; fi
-    if [ $RAN_DIVIDE_TESTS   -eq 0 ]; then divide_tests; fi
+    if [ $DONE_GENERATE_TESTS -eq 0 ]; then generate_tests; fi
+    if [ $DONE_CONVERT_TESTS  -eq 0 ]; then convert_tests;  fi
+    if [ $DONE_DIVIDE_TESTS   -eq 0 ]; then divide_tests;   fi
     process_save_exit_now_tests;
   fi
-  if [ $option -eq 7 ]; then process_full_length_tests;    fi
+  if [ $option -eq 7 ]; then
+    if [ $DONE_GENERATE_TESTS -eq 0 ]; then generate_tests; fi
+    if [ $DONE_CONVERT_TESTS  -eq 0 ]; then convert_tests;  fi
+    if [ $DONE_DIVIDE_TESTS   -eq 0 ]; then divide_tests;   fi
+    process_full_length_tests;
+  fi
   if [ $option -eq 8 ]; then
     generate_tests
     convert_tests
@@ -1054,20 +1066,7 @@ while [ 0 -eq 0 ]; do
     process_full_length_tests
   fi
   if [ $option -eq 9 ]; then
-    find . -name \*.cns    -type f -delete
-    find . -name \*.geo    -type f -delete
-    find . -name \*.map    -type f -delete
-    find . -name \*.buf    -type f -delete
-    find . -name \*.neu    -type f -delete
-    find . -name \*.vtu    -type f -delete
-    find . -name \*.pvtu   -type f -delete
-    find . -name \*.cgns   -type f -delete
-    find . -name \*-monit* -type f -delete
-    find . -name \out_test -type f -delete
-    find . -name \Generate -type l -delete
-    find . -name \Convert  -type l -delete
-    find . -name \Divide   -type l -delete
-    find . -name \Process  -type l -delete
+    git clean -dfx ./
   fi
 done
 
