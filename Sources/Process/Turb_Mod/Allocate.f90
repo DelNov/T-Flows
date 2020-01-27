@@ -52,15 +52,13 @@
       allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
       allocate(turb % p_t2 (-nb:nc));  turb % p_t2  = 0.
 
-      if(turbulent_heat_flux_model .eq. GGDH) then
-        ! Reynolds stresses
-        call Var_Mod_Allocate_New_Only(turb % uu, grid, 'UU')
-        call Var_Mod_Allocate_New_Only(turb % vv, grid, 'VV')
-        call Var_Mod_Allocate_New_Only(turb % ww, grid, 'WW')
-        call Var_Mod_Allocate_New_Only(turb % uv, grid, 'UV')
-        call Var_Mod_Allocate_New_Only(turb % uw, grid, 'UW')
-        call Var_Mod_Allocate_New_Only(turb % vw, grid, 'VW')
-      end if
+      ! Reynolds stresses
+      call Var_Mod_Allocate_New_Only(turb % uu, grid, 'UU')
+      call Var_Mod_Allocate_New_Only(turb % vv, grid, 'VV')
+      call Var_Mod_Allocate_New_Only(turb % ww, grid, 'WW')
+      call Var_Mod_Allocate_New_Only(turb % uv, grid, 'UV')
+      call Var_Mod_Allocate_New_Only(turb % uw, grid, 'UW')
+      call Var_Mod_Allocate_New_Only(turb % vw, grid, 'VW')
     end if ! heat_transfer
 
     ! Turbulent statistics; if needed
@@ -133,15 +131,13 @@
       allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
       allocate(turb % p_t2 (-nb:nc));  turb % p_t2  = 0.
 
-      if(turbulent_heat_flux_model .eq. GGDH) then
-        ! Reynolds stresses
-        call Var_Mod_Allocate_New_Only(turb % uu, grid, 'UU')
-        call Var_Mod_Allocate_New_Only(turb % vv, grid, 'VV')
-        call Var_Mod_Allocate_New_Only(turb % ww, grid, 'WW')
-        call Var_Mod_Allocate_New_Only(turb % uv, grid, 'UV')
-        call Var_Mod_Allocate_New_Only(turb % uw, grid, 'UW')
-        call Var_Mod_Allocate_New_Only(turb % vw, grid, 'VW')
-      end if
+      ! Reynolds stresses
+      call Var_Mod_Allocate_New_Only(turb % uu, grid, 'UU')
+      call Var_Mod_Allocate_New_Only(turb % vv, grid, 'VV')
+      call Var_Mod_Allocate_New_Only(turb % ww, grid, 'WW')
+      call Var_Mod_Allocate_New_Only(turb % uv, grid, 'UV')
+      call Var_Mod_Allocate_New_Only(turb % uw, grid, 'UW')
+      call Var_Mod_Allocate_New_Only(turb % vw, grid, 'VW')
     end if ! heat_transfer
 
     if(turbulence_statistics) then
