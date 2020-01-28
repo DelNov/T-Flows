@@ -1,7 +1,7 @@
 !==============================================================================!
-  subroutine Face_Mod_Allocate_New_And_Old(phi, grid, name_phi)
+  subroutine Face_Mod_Allocate_New_Only(phi, grid, name_phi)
 !------------------------------------------------------------------------------!
-!   This is to allocate a face-based uknown with new and old values.           !
+!   This is to allocate a face-based uknown, holding only current value.       !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -18,9 +18,5 @@
 
   ! Values in the new (n) time step
   allocate (phi % n(grid % n_faces));  phi % n = 0.0
-
-  ! Values in old (o) and older than old (oo) time step
-  allocate (phi % o (grid % n_faces));  phi % o  = 0.0
-  allocate (phi % oo(grid % n_faces));  phi % oo = 0.0
 
   end subroutine
