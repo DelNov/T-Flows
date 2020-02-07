@@ -5,8 +5,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Swarm_Type), target :: swarm
-  integer                  :: k      ! particle number
+  type(Swarm_Type), target     :: swarm
+  integer                      :: k      ! particle number
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: grid
   type(Particle_Type), pointer :: part
@@ -48,15 +48,6 @@
         r_work(i +  6)  = part % w
         r_work(i +  7)  = part % d
         r_work(i +  8)  = part % cfl
-       ! r_work(i +  9)  = part % u_mean
-       ! r_work(i +  10) = part % v_mean
-       ! r_work(i +  11) = part % w_mean
-       ! r_work(i +  12) = part % uu
-       ! r_work(i +  13) = part % vv
-       ! r_work(i +  14) = part % ww
-       ! r_work(i +  15) = part % uv
-       ! r_work(i +  16) = part % vw
-       ! r_work(i +  17) = part % uw
 
         ! The following data is not really needed, at least not yet:
         ! r_work(i + 18) = part % density
@@ -137,15 +128,7 @@
       part % w       = r_work(i +  6)
       part % d       = r_work(i +  7)
       part % cfl     = r_work(i +  8)
-     ! part % u_mean  = r_work(i +  9)
-     ! part % v_mean  = r_work(i +  10)
-     ! part % w_mean  = r_work(i +  11)
-     ! part % uu      = r_work(i +  12)
-     ! part % vv      = r_work(i +  13)
-     ! part % ww      = r_work(i +  14)
-     ! part % uv      = r_work(i +  15)
-     ! part % vw      = r_work(i +  16)
-     ! part % uw      = r_work(i +  17)
+
       ! The following data is not really needed, at least not yet:
       ! part % density = r_work(i + 18)
       ! part % x_o     = r_work(i + 19)
@@ -156,6 +139,18 @@
       ! part % rel_w   = r_work(i + 24)
       ! part % rel_vel = r_work(i + 25)
     end do
+
+    ! Refresh buffers for grid-base variables here
+    ! (This is probably not needed, but it won't do harm)
+    call Grid_Mod_Exchange_Real(grid, swarm % u_mean)
+    call Grid_Mod_Exchange_Real(grid, swarm % v_mean)
+    call Grid_Mod_Exchange_Real(grid, swarm % w_mean)
+    call Grid_Mod_Exchange_Real(grid, swarm % uu)
+    call Grid_Mod_Exchange_Real(grid, swarm % vv)
+    call Grid_Mod_Exchange_Real(grid, swarm % ww)
+    call Grid_Mod_Exchange_Real(grid, swarm % uv)
+    call Grid_Mod_Exchange_Real(grid, swarm % uw)
+    call Grid_Mod_Exchange_Real(grid, swarm % vw)
 
   end if
 
