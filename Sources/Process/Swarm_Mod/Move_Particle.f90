@@ -139,6 +139,12 @@
   ! Calculate cfl number for the particle (this is kind of wrong)
   part % cfl = part_vel * swarm % dt / turb % h_min(c)
 
+  ! Particle stokes number 
+  ! St= tau_p/tau_f || tau_p = (rho_P*d_p^2)/18 mu || tau_f = nu/u_tau^2    ...
+  !... should be done in a smarter way by calling the friction velocity here...
+  !... the used value used here is case_specific (Re_tau=150).
+  swarm % st = swarm % density * (part % d)**2/18.0/(visc_const**2)*0.0043**2
+ 
   !----------------------------------------------!
   !                                              !
   !   If particle is close to a boundary cell,   !
