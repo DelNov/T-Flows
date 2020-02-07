@@ -31,9 +31,9 @@
   real,              pointer :: b(:)
   integer                    :: c, c1, c2, s
   real                       :: u_tan, u_tau
-  real                       :: lf, ebf, p_kin_int, p_kin_wf
+  real                       :: lf, ebf, p_kin_int, p_kin_wf, l_rans_d, l_rans_v
   real                       :: l_rans, l_sgs, u_rans, u_sgs, kin_vis
-  real                       :: z_o, alpha1
+  real                       :: z_o, alpha_d, alpha_v, l_sgs_d, l_sgs_v 
   real                       :: ut_log_law, vt_log_law, wt_log_law
   real                       :: nx, ny, nz, qx, qy, qz, g_buoy_wall
 !==============================================================================!
@@ -66,21 +66,48 @@
     b(c) = b(c) + turb % p_kin(c) * grid % vol(c)
   end do
 
+  if(buoyancy) then
+    do c = 1, grid % n_cells
+      turb % g_buoy(c) = -flow % beta             &
+                         * (grav_x * ut % n(c) +  &
+                            grav_y * vt % n(c) +  &
+                            grav_z * wt % n(c))   &
+                          * flow % density(c)
+      b(c) = b(c) + max(0.0, turb % g_buoy(c) * grid % vol(c))
+             a % val(a % dia(c)) = a % val(a % dia(c))         &
+                                 + max(0.0,-turb % g_buoy(c)   &
+                                 * grid % vol(c)               &
+                                 / (kin % n(c) + TINY))
+    end do
+  end if
+
   if(turbulence_model .eq. HYBRID_LES_RANS) then
     do c = 1, grid % n_cells
-      lf = grid % vol(c)**ONE_THIRD
-      l_sgs  = 0.8*lf
-      l_rans = 0.41*grid % wall_dist(c)
-      alpha1 = max(1.0,l_rans/l_sgs)
 
-      if(alpha1 < 1.05) then
+      lf = grid % vol(c)**ONE_THIRD
+
+      ! Distance switch
+      l_sgs_d  = 0.8 * lf
+      l_rans_d = 0.41 * grid % wall_dist(c)
+      alpha_d  = max(1.0,l_rans_d/l_sgs_d)
+
+      ! Velocity switch
+      l_sgs_v  = lf * flow % shear(c)
+      l_rans_v = sqrt(kin % n(c) * zeta % n(c))
+      alpha_v  = l_rans_v/l_sgs_v
+
+      if( (hybrid_les_rans_switch .eq. SWITCH_DISTANCE)  &
+          .and. (alpha_d < 1.05)                         &
+          .or.                                           &
+          (hybrid_les_rans_switch .eq. SWITCH_VELOCITY)  &
+          .and. (alpha_v < 0.85) ) then
         a % val(a % dia(c)) = a % val(a % dia(c))             &
                             + flow % density(c) * eps % n(c)  &
                             / (kin % n(c) + TINY) * grid % vol(c)
       else
         a % val(a % dia(c)) = a % val(a % dia(c))   &
           + flow % density(c)                       &
-          * min(alpha1**1.45 * eps % n(c), kin % n(c)**1.5 / (lf*0.01))  &
+          * min(alpha_d**1.4 * eps % n(c), kin % n(c)**1.5 / (lf*0.01))  &
           / (kin % n(c) + TINY) * grid % vol(c)
       end if
     end do
@@ -90,18 +117,6 @@
                           + flow % density(c) * eps % n(c)  &
                           / (kin % n(c) + TINY) * grid % vol(c)
 
-      if(buoyancy) then
-        turb % g_buoy(c) = -flow % beta           &
-                         * (grav_x * ut % n(c) +  &
-                            grav_y * vt % n(c) +  &
-                            grav_z * wt % n(c))   &
-                         * flow % density(c)
-        b(c) = b(c) + max(0.0, turb % g_buoy(c) * grid % vol(c))
-        a % val(a % dia(c)) = a % val(a % dia(c))         &
-                            + max(0.0,-turb % g_buoy(c)   &
-                            * grid % vol(c)               &
-                            / (kin % n(c) + TINY))
-      end if
     end do
   end if
 
@@ -206,11 +221,11 @@
           turb % g_buoy(c1) = turb % g_buoy(c1) * exp(-1.0 * ebf) &
                      + g_buoy_wall * exp(-1.0 / ebf)
 
-          ! Add new values of g_buoy based on wall function approach          
+          ! Add new values of g_buoy based on wall function approach
           b(c1)      = b(c1) + turb % g_buoy(c1) * grid % vol(c1)
 
         end if ! buoyancy
- 
+
       end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2).eq.WALL or WALLFL
     end if    ! c2 < 0
   end do
