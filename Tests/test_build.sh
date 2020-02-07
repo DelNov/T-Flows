@@ -947,19 +947,20 @@ function process_full_length_test {
 
   launch_process par $nproc_in_div
 
-  if ls *-res-plus.dat 1> /dev/null 2>&1; then # case-ts??????-res-plus.dat
+  if ls "$name_in_div"-res-plus-ts??????.dat 1> /dev/null 2>&1; then # case-ts??????-res-plus.dat
 
     # extract essential data from produced .dat files
     last_results_plus_dat_file=$(realpath --relative-to="$3" \
-      $(ls -tr1 *-res-plus.dat | tail -n1))
+      $(ls -tr1 "$name_in_div"-res-plus-ts??????.dat | tail -n1))
 
     echo "results are:"
-    echo "$(head -n9 $(ls -tr1 *-res-plus.dat | tail -n1))"
+    echo "$(head -n9 $(ls -tr1 "$name_in_div"-res-plus-ts??????.dat | \
+      tail -n1))"
 
     launch_gnuplot "$3" gnuplot_script_template.sh \
       "$last_results_plus_dat_file" "result_plus_"$2""
   else
-      echo "Warning: file *-res-plus.dat does not exist"
+      echo "Warning: file "$name_in_div"-res-plus-ts??????.dat does not exist"
   fi
 }
 #------------------------------------------------------------------------------#
