@@ -85,23 +85,24 @@
 
   end do        ! through sub-steps
 
+
   !-----------------------------------!
   !   Print some data on the screen   !
   !-----------------------------------!
-  !do k = 1, swarm % n_particles
+  do k = 1, swarm % n_particles
 
-    !! Refresh the alias
-    !part => swarm % particle(k)
-    !
-    !if(this_proc .eq. part % proc) then
-    !  ! Printing particle position
-    !  write(*,'(a,i3,a,i7,a,i2,a,3es15.6,a,es12.4)')                 &
-    !          ' #  particle:',  k,                                   &
-    !          ',  cell: ',      part % cell,                         &
-    !          ',  processor: ', part % proc,                         &
-    !          ',  x,y,z: ',     part % x_n, part % y_n, part % z_n,  &
-    !          ',  cfl: ',       part % cfl
-    !end if
-  !end do
+    ! Refresh the alias
+    part => swarm % particle(k)
+    
+    if(this_proc .eq. part % proc) then
+      ! Printing particle position
+      write(*,'(a,i7,a,i7,a,i2,a,3es15.6,a,es12.4)')                 &
+              '# particle:',  k,                                     &
+              ',  cell: ',      part % cell,                         &
+              ',  processor: ', part % proc,                         &
+              ',  x,y,z: ',     part % x_n, part % y_n, part % z_n,  &
+              ',  cfl: ',       part % cfl
+    end if
+  end do
 
   end subroutine
