@@ -298,16 +298,16 @@
     end if
 
     if(heat_transfer) then
-      write(i,'(a1,2X,a60)') '#',  ' z,'                    //  &
-                                   ' u,'                    //  &
-                                   ' uu, vv, ww, uw'        //  &
-                                   ' kin, eps,'             //  &
-                                   ' t, ut, vt, wt,'   
+      write(i,'(a1,2x,a120)') '#',  ' 1) z,  '                         //  &
+                                    ' 2) u,  '                         //  &
+                                    ' 3) uu,  4) vv,  5) ww,  6) uw  ' //  &
+                                    ' 7) kin,  8) eps,  '              //  &
+                                    ' 9) t,  10) ut, 11) vt, 12) wt'
     else
-      write(i,'(a1,2X,a50)') '#',  ' z,'                    //  &
-                                   ' u,'                    //  &
-                                   ' uu, vv, ww, uw'        //  &
-                                   ' kin, eps'  
+      write(i,'(a1,2x,a120)') '#',  ' 1) z,  '                         //  &
+                                    ' 2) u,  '                         //  &
+                                    ' 3) uu,  4) vv,  5) ww, 6) uw  '  //  &
+                                    ' 7) kin,  8) eps'
     end if
   end do
 
@@ -349,8 +349,8 @@
     v_p   (i) = v_p(i) / u_tau_p
     w_p   (i) = w_p(i) / u_tau_p
 
-    kin_p(i) = kin_p(i) / u_tau_p**2                      ! kin%n(c)
-    eps_p(i) = eps_p(i)*visc_const / (u_tau_p**4*dens_const)  ! eps%n(c)
+    kin_p(i) = kin_p(i) / u_tau_p**2                          ! kin % n(c)
+    eps_p(i) = eps_p(i)*visc_const / (u_tau_p**4*dens_const)  ! eps % n(c)
     uu_p (i) = uu_p (i) / (u_tau_p**2)
     vv_p (i) = vv_p (i) / (u_tau_p**2)
     ww_p (i) = ww_p (i) / (u_tau_p**2)
