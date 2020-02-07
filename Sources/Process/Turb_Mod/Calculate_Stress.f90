@@ -65,18 +65,21 @@
       w2 = (zeta % n(c) * kin % n(c)) * wd_z(c)
 
       ! Take the part from Boussinesq's hypothesis (as if in k_eps) ...
-      uu % n(c) = - 2. * turb % vis_t(c) * u % x(c) + TWO_THIRDS * kin % n(c)
-      vv % n(c) = - 2. * turb % vis_t(c) * v % y(c) + TWO_THIRDS * kin % n(c)
-      ww % n(c) = - 2. * turb % vis_t(c) * w % z(c) + TWO_THIRDS * kin % n(c)
+      uu % n(c) = - 2. * turb % vis_t(c) / flow % density(c)  &
+                       * u % x(c) + TWO_THIRDS * kin % n(c)
+      vv % n(c) = - 2. * turb % vis_t(c) / flow % density(c)  &
+                       * v % y(c) + TWO_THIRDS * kin % n(c)
+      ww % n(c) = - 2. * turb % vis_t(c) / flow % density(c)  &
+                       * w % z(c) + TWO_THIRDS * kin % n(c)
 
       ! ... and balance them with explicitly resolved normal stresses
       uu % n(c) = uu % n(c) * (1.0 - wd_x(c)) + u2
       vv % n(c) = vv % n(c) * (1.0 - wd_y(c)) + v2
       ww % n(c) = ww % n(c) * (1.0 - wd_z(c)) + w2
 
-      uv % n(c) = - turb % vis_t(c) * (u % y(c) + v % x(c))
-      uw % n(c) = - turb % vis_t(c) * (u % z(c) + w % x(c))
-      vw % n(c) = - turb % vis_t(c) * (v % z(c) + w % y(c))
+      uv % n(c) = - turb % vis_t(c) / flow % density(c) * (u % y(c) + v % x(c))
+      uw % n(c) = - turb % vis_t(c) / flow % density(c) * (u % z(c) + w % x(c))
+      vw % n(c) = - turb % vis_t(c) / flow % density(c) * (v % z(c) + w % y(c))
 
     end do
   end if
