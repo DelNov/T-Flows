@@ -40,10 +40,9 @@
   !  Set source for temperature   !
   !-------------------------------!
   if( phi % name .eq. 'T' ) then
-
     do c = 1, grid % n_cells
-      b(c) = b(c) -   2.0 * flow % heat_flux * u % n(c)  &
-           / bulk % flux_x * grid % vol(c)
+      b(c) = b(c) - 2.0 * flow % heat_flux * flow % density(c) * u % n(c)   &
+                                           / bulk % flux_x * grid % vol(c)
     end do
   end if
 
