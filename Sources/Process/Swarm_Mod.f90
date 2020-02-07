@@ -54,7 +54,7 @@
 
     ! Particle drag factor (from Re_p)
     real :: f    ! this is not to be confused with the drag coefficient
-
+ 
     ! Forces exerted on the particle
     real :: fd_x, fd_y, fd_z  ! drag force
     real :: fb_x, fb_y, fb_z  ! buoyant force
@@ -63,11 +63,6 @@
     ! Particle deposition and departure from domain 
     logical :: deposited
     logical :: escaped
-
-!    ! Ensemble-averaged statistics for the swarm
-!    real    :: u_mean, v_mean, w_mean
-!    real    :: uu, vv, ww, uv, uw, vw
-!    integer :: n_states
 
     ! Particle inside the subdomain
     integer :: proc
@@ -95,6 +90,9 @@
 
     ! Coefficient of restitution (1.0 - elastic, 0.0 - sticky)
     real :: rst
+
+    ! Swarm's Stokes number
+    real :: st
 
     ! Time step for the swarm
     real :: dt
