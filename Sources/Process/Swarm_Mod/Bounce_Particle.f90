@@ -119,7 +119,8 @@
       !---------------------------------!
       !   The boundary cell is a wall   !
       !---------------------------------!
-      if(Grid_Mod_Bnd_Cond_Type(grid, c2) == WALL) then
+      if(Grid_Mod_Bnd_Cond_Type(grid, c2) == WALL .or.  & 
+         Grid_Mod_Bnd_Cond_Type(grid, c2) == WALLFL) then
 
         ! Trap condition (deposition)
         if(swarm % rst <= TINY .or. abs(vel_dot_n) <= 1.0e-3) then
