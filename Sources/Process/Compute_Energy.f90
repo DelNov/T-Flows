@@ -39,6 +39,7 @@
   real                       :: f_ex2, f_im2, tx_f2, ty_f2, tz_f2
   real                       :: pr_t1, pr_t2, pr_tf
   real                       :: ut_s, vt_s, wt_s, t_stress, con_t_f
+  real                       :: cap_dens_c1, cap_dens_c2
 !------------------------------------------------------------------------------!
 !
 !  The form of equations which are solved:
@@ -206,14 +207,17 @@
     if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
        turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
 
+      cap_dens_c1 = flow % capacity(c1) * flow % density(c1)
+      cap_dens_c2 = flow % capacity(c2) * flow % density(c2)
+
       ! Turbulent heat fluxes according to GGDH scheme
       ! (first line is GGDH, second line is SGDH substratced 
-      ut_s =  (    grid % fw(s)  * ut % n(c1)   &
-           +  (1.0-grid % fw(s)) * ut % n(c2))
-      vt_s =  (    grid % fw(s)  * vt % n(c1)   &
-           +  (1.0-grid % fw(s)) * vt % n(c2))
-      wt_s =  (    grid % fw(s)  * wt % n(c1)   &
-           +  (1.0-grid % fw(s)) * wt % n(c2))
+      ut_s =  (    grid % fw(s)  * ut % n(c1) * cap_dens_c1   &
+           +  (1.0-grid % fw(s)) * ut % n(c2) * cap_dens_c2)
+      vt_s =  (    grid % fw(s)  * vt % n(c1) * cap_dens_c1   &
+           +  (1.0-grid % fw(s)) * vt % n(c2) * cap_dens_c2)
+      wt_s =  (    grid % fw(s)  * wt % n(c1) * cap_dens_c1   &
+           +  (1.0-grid % fw(s)) * wt % n(c2) * cap_dens_c2)
       t_stress = - (  ut_s * grid % sx(s)                    &
                     + vt_s * grid % sy(s)                    &
                     + wt_s * grid % sz(s) )                  &
