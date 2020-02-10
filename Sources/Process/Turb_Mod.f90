@@ -138,6 +138,7 @@
   integer :: turbulence_wall_treatment  ! HIGH_RE, LOW_RE, COMPOUND
   logical :: turbulence_statistics
   integer :: turbulent_heat_flux_model
+  integer :: hybrid_les_rans_switch
 
   ! Parameters describing turbulence model choice
   ! (Prime numbers starting from 30000)
@@ -162,6 +163,10 @@
   integer, parameter :: SGDH = 30137
   integer, parameter :: GGDH = 30139
   integer, parameter :: AFM  = 30161
+
+  ! Switching criteria for hybrid LES/RANS
+  integer, parameter :: SWITCH_DISTANCE = 30169
+  integer, parameter :: SWITCH_VELOCITY = 30181
 
   !--------------------------------!
   !   Turbulence model constants   !

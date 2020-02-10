@@ -153,6 +153,26 @@
       call Comm_Mod_End
   end select
 
+  !-------------------------------------------!
+  !   Type of switching for hybrid LES/RANS   !
+  !-------------------------------------------!
+  if(turbulence_model .eq. HYBRID_LES_RANS) then
+    call Control_Mod_Hybrid_Les_Rans_Switch(name, .true.)
+    select case(name)
+      case('SWITCH_DISTANCE')
+        hybrid_les_rans_switch = SWITCH_DISTANCE
+      case('SWITCH_VELOCITY')
+        hybrid_les_rans_switch = SWITCH_VELOCITY
+      case default
+        if(this_proc < 2) then
+          print *, '# ERROR!  Unknown type of hybrid LES/RANS switch:',  &
+                   trim(name)
+          print *, '# Exiting!'
+        end if
+        call Comm_Mod_End
+    end select
+  end if
+
   !-------------------------------------------------------------------------!
   !   Initialization of model constants depending on the turbulence model   !
   !-------------------------------------------------------------------------!
