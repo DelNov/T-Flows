@@ -50,24 +50,31 @@
 !    |        dt      |                 |
 !   /                /                 /
 !
+!   [A]{T} = {b}
 !
-!  Dimension of the system under consideration
+!------------------------------------------------------------------------------!
+!   Dimensions of certain variables:                                           !
+!                                                                              !
+!   lambda <-> conductivity
+!   rho    <-> density
+!   Cp     <-> capacity
+!   T      <-> t % n, t % o, t % oo
+!   heat capacity               capacity      [J/(kg K)]
+!   thermal conductivity        conductivity  [W/(m K)] ([W = J/s])
+!   density                     density       [kg/m^3]
+!   flux                        m_flux        [kg/s]
+!   left  hand s.               a             [J/(s K)]
+!   temperature                 t % n         [K]
+!   right hand s.               b             [J/s]
+!   turb. thermal conductivity  con_t_f       [W/(m K)]
+!   turb. hear flux             ut            [(m K)/s]
+!   turb. hear flux             ut_s          [J/(s m^2)] <- rename this var !
+!   turb. stress                t_stress      [J/s]
 !
-!     [A]{T} = {b}   [J/s = W]  
-!
-!  Dimensions of certain variables:
-!
-!     Cp     [J/kg K] (heat capacity)
-!     lambda [W/m K] (heat conductivity)
-!
-!     A      [kg/s]
-!     T      [K]
-!     b      [kg K/s] 
-!     Flux   [kg/s]
-!     CT*,   [kg K/s] 
-!     DT*,   [kg K/s] 
-!     XT*,   [kg K/s]
-! 
+!   turb. viscosity             vis_t         is really troublesome variable
+!     has dim. [m^2/s]    in computation of ut % n,
+!     but has  [kg/(m s)] in computation of con_t_f
+
 !==============================================================================!
 
   call Cpu_Timer_Mod_Start('Compute_Energy (without solvers)')
@@ -143,7 +150,7 @@
     end if
 
     ! Gradients on the cell face (fw corrects situation close to the wall)
-    tx_f1 = grid % fw(s) * t % x(c1) + (1.0-grid % fw(s)) * t % x(c2) 
+    tx_f1 = grid % fw(s) * t % x(c1) + (1.0-grid % fw(s)) * t % x(c2)
     ty_f1 = grid % fw(s) * t % y(c1) + (1.0-grid % fw(s)) * t % y(c2)
     tz_f1 = grid % fw(s) * t % z(c1) + (1.0-grid % fw(s)) * t % z(c2)
     tx_f2 = tx_f1
@@ -211,12 +218,12 @@
       cap_dens_c2 = flow % capacity(c2) * flow % density(c2)
 
       ! Turbulent heat fluxes according to GGDH scheme
-      ! (first line is GGDH, second line is SGDH substratced 
-      ut_s =  (    grid % fw(s)  * ut % n(c1) * cap_dens_c1   &
+      ! (first line is GGDH, second line is SGDH substratced
+      ut_s =  (    grid % fw(s)  * ut % n(c1) * cap_dens_c1  &
            +  (1.0-grid % fw(s)) * ut % n(c2) * cap_dens_c2)
-      vt_s =  (    grid % fw(s)  * vt % n(c1) * cap_dens_c1   &
+      vt_s =  (    grid % fw(s)  * vt % n(c1) * cap_dens_c1  &
            +  (1.0-grid % fw(s)) * vt % n(c2) * cap_dens_c2)
-      wt_s =  (    grid % fw(s)  * wt % n(c1) * cap_dens_c1   &
+      wt_s =  (    grid % fw(s)  * wt % n(c1) * cap_dens_c1  &
            +  (1.0-grid % fw(s)) * wt % n(c2) * cap_dens_c2)
       t_stress = - (  ut_s * grid % sx(s)                    &
                     + vt_s * grid % sy(s)                    &
@@ -246,7 +253,7 @@
       a % val(a % pos(1,s)) = a % val(a % pos(1,s)) - a12
       a % val(a % pos(2,s)) = a % val(a % pos(2,s)) - a21
     else if(c2.lt.0) then
-      ! Outflow is included because of the flux 
+      ! Outflow is included because of the flux
       ! corrections which also affects velocities
       if( (Var_Mod_Bnd_Cond_Type(t, c2) .eq. INFLOW) .or.  &
           (Var_Mod_Bnd_Cond_Type(t, c2) .eq. WALL)   .or.  &
