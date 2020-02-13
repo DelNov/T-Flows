@@ -55,29 +55,26 @@
 !------------------------------------------------------------------------------!
 !   Dimensions of certain variables:                                           !
 !                                                                              !
-!   lambda <-> conductivity
+!   lambda <-> conductivity, con_w
 !   rho    <-> density
 !   Cp     <-> capacity
 !   T      <-> t % n, t % o, t % oo
-!   heat capacity               capacity      [J/(kg K)]
-!   thermal conductivity        conductivity  [W/(m K)] ([W = J/s])
-!   density                     density       [kg/m^3]
-!   flux                        m_flux        [kg/s]
-!   left  hand s.               a             [J/(s K)]
-!   temperature                 t % n         [K]
-!   right hand s.               b             [J/s]
-!   turb. thermal conductivity  con_t_f       [W/(m K)]
-!   turb. hear flux             ut            [(m K)/s]
-!   turb. hear flux             ut_s          [J/(m^2 s)] <- rename this var !
-!   turb. stress                t_stress      [J/s]
-!
-!   turb. viscosity             vis_t         is really troublesome variable
-!     has dim. [m^2/s]    in computation of ut % n,
-!     but has  [kg/(m s)] in computation of con_t_f
+!   heat capacity               capacity          [J/(kg K)]
+!   thermal conductivity        conductivity      [W/(m K)] ([W = J/s])
+!   density                     density           [kg/m^3]
+!   flux                        m_flux            [kg/s]
+!   left  hand s.               a                 [J/(s K)]
+!   temperature                 t % n             [K]
+!   right hand s.               b                 [J/s]
+!   turb. thermal conductivity  con_t_f           [W/(m K)]
+!   turb. hear flux             ut                [(m K)/s]
+!   turb. hear flux             ut_s              [J/(m^2 s)] <- rename this var !
+!   turb. stress                t_stress          [J/s]
+!   turb. viscosity             vis_t             [kg/(m s)]
 !
 !   User_Mod variables:
-!   bulk flux  bulk % flux_x     [kg/(m^2 s)]
-!   heat flux  flow % heat_flux  [???]
+!   bulk flux                   bulk % flux_x     [kg/s]
+!   heat flux                   flow % heat_flux  [W/m^2]
 !==============================================================================!
 
   call Cpu_Timer_Mod_Start('Compute_Energy (without solvers)')
