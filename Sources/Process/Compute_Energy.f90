@@ -68,13 +68,16 @@
 !   right hand s.               b             [J/s]
 !   turb. thermal conductivity  con_t_f       [W/(m K)]
 !   turb. hear flux             ut            [(m K)/s]
-!   turb. hear flux             ut_s          [J/(s m^2)] <- rename this var !
+!   turb. hear flux             ut_s          [J/(m^2 s)] <- rename this var !
 !   turb. stress                t_stress      [J/s]
 !
 !   turb. viscosity             vis_t         is really troublesome variable
 !     has dim. [m^2/s]    in computation of ut % n,
 !     but has  [kg/(m s)] in computation of con_t_f
-
+!
+!   User_Mod variables:
+!   bulk flux  bulk % flux_x     [kg/(m^2 s)]
+!   heat flux  flow % heat_flux  [???]
 !==============================================================================!
 
   call Cpu_Timer_Mod_Start('Compute_Energy (without solvers)')
