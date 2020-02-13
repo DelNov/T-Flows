@@ -35,13 +35,16 @@
   if( turbulence_model .eq. K_EPS ) then
     do c = 1, grid % n_cells
 
-      uu % n(c) = - 2. * turb % vis_t(c) * u % x(c) + TWO_THIRDS * kin % n(c)
-      vv % n(c) = - 2. * turb % vis_t(c) * v % y(c) + TWO_THIRDS * kin % n(c)
-      ww % n(c) = - 2. * turb % vis_t(c) * w % z(c) + TWO_THIRDS * kin % n(c)
+      uu % n(c) = - 2. * turb % vis_t(c) / flow % density(c)  &
+                       * u % x(c) + TWO_THIRDS * kin % n(c)
+      vv % n(c) = - 2. * turb % vis_t(c) / flow % density(c)  &
+                       * v % y(c) + TWO_THIRDS * kin % n(c)
+      ww % n(c) = - 2. * turb % vis_t(c) / flow % density(c)  &
+                       * w % z(c) + TWO_THIRDS * kin % n(c)
 
-      uv % n(c) = - turb % vis_t(c) * (u % y(c) + v % x(c))
-      uw % n(c) = - turb % vis_t(c) * (u % z(c) + w % x(c))
-      vw % n(c) = - turb % vis_t(c) * (v % z(c) + w % y(c))
+      uv % n(c) = - turb % vis_t(c) / flow % density(c) * (u % y(c) + v % x(c))
+      uw % n(c) = - turb % vis_t(c) / flow % density(c) * (u % z(c) + w % x(c))
+      vw % n(c) = - turb % vis_t(c) / flow % density(c) * (v % z(c) + w % y(c))
 
     end do
   end if
