@@ -483,6 +483,33 @@ function replace_line_with_first_occurence_in_file {
 }
 
 #------------------------------------------------------------------------------#
+# Get value next to the keyword
+#------------------------------------------------------------------------------#
+function get_value_next_to_keyword {
+  #$1 string to search in file
+  #$2 file
+
+  # This function searches for a first line with occurence of $1 in $2
+  #   and gets a value right next to it regardless of 
+  #   preceeding or following tabs & spaces
+
+  # Thus, from a line
+  #   \tab   \tab  MASS_DENSITY  \tab \tab     1.0 \tab   \tab
+  # it returns 1.0
+
+  if [ -z "${1+xxx}" ]; then 
+    echo "Keyword to search is not set at all"
+    exit 1
+  elif [ -z "${2+xxx}" ]; then 
+    echo "File to search in is not set at all"
+    exit 1
+  fi
+
+  echo "$(grep -i $1 $2 | tr -s '\t' | sed 's/^[ \t]*//' | \
+    sed 's/\t/ /' | tr -s ' ' | cut -d' ' -f2 | head -n1)"
+}
+
+#------------------------------------------------------------------------------#
 # processor: backup test
 #------------------------------------------------------------------------------#
 function process_backup_test {
@@ -982,6 +1009,11 @@ function process_full_length_tests {
   for i in ${!ALL_PROCESS_TESTS[@]}; do
     CASE_DIR="${ALL_PROCESS_TESTS[$i]}"
     CASE_TUR="${ALL_PROCESS_MODELS[$i]}"
+    #MASS_DENSITY=$(get_value_next_to_keyword "MASS_DENSITY" \
+    #  "${ALL_PROCESS_TESTS[$i]}""/control")
+    #DYNAMIC_VISCOSITY=$(get_value_next_to_keyword "DYNAMIC_VISCOSITY" \
+    #  "${ALL_PROCESS_TESTS[$i]}""/control")
+
     echo ""
     echo "#===================================================================="
     echo "#   Process test: "     $CASE_DIR
@@ -1025,6 +1057,7 @@ while [ 0 -eq 0 ]; do
   echo "  8. Perform all tests"
   echo "  9. Clean all test directories"
   echo ""
+
   read -p "  Enter the desired type of test: " option
   if [ $option -eq 0 ]; then exit 1;                       fi
   if [ $option -eq 1 ]; then
