@@ -4,10 +4,7 @@
 !   Mass fluxes, bulk velocities and pressure drops (for each material)        !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
   use Grid_Mod
-  use Comm_Mod
-  use Bnd_Cond_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -17,30 +14,30 @@
   !---------------!
   type Bulk_Type
 
-    real :: area_x
-    real :: area_y
-    real :: area_z
+    real :: area_x  ! [m^2]
+    real :: area_y  ! [m^2]
+    real :: area_z  ! [m^2]
 
-    real :: mass_in
-    real :: mass_out
+    real :: mass_in   ! [kg/s]
+    real :: mass_out  ! [kg/s]
 
     ! Fluxes in x, y and z direction
-    real :: flux_x
-    real :: flux_y
-    real :: flux_z
+    real :: flux_x  ! [kg/s]
+    real :: flux_y  ! [kg/s]
+    real :: flux_z  ! [kg/s]
 
     ! Old fluxes in x, y and z direction
-    real :: flux_x_o
-    real :: flux_y_o
-    real :: flux_z_o
+    real :: flux_x_o  ! [kg/s]
+    real :: flux_y_o  ! [kg/s]
+    real :: flux_z_o  ! [kg/s]
 
-    real :: p_drop_x
-    real :: p_drop_y
-    real :: p_drop_z
+    real :: p_drop_x  ! [N/m^3] = [kg/m^2/s^2]
+    real :: p_drop_y  ! [N/m^3] = [kg/m^2/s^2]
+    real :: p_drop_z  ! [N/m^3] = [kg/m^2/s^2]
 
-    real :: u
-    real :: v
-    real :: w
+    real :: u  ! [m/s]
+    real :: v  ! [m/s]
+    real :: w  ! [m/s]
 
     ! Monitoring plane coordinates
     real :: xp
@@ -52,7 +49,6 @@
   contains
 
   include 'Bulk_Mod/Adjust_P_Drops.f90'
-  include 'Bulk_Mod/Calculate_Fluxes.f90'
   include 'Bulk_Mod/Monitoring_Planes_Areas.f90'
   include 'Bulk_Mod/Print_Areas.f90'
 
