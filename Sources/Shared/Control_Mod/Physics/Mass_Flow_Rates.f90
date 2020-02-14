@@ -10,7 +10,7 @@
   real :: val(3)
 !==============================================================================!
 
-  data def / 0.0, 0.0, 0.0 /
+  def = 0.0
 
   call Control_Mod_Read_Real_Array('MASS_FLOW_RATES', 3, def,  &
                                     val, verbose)

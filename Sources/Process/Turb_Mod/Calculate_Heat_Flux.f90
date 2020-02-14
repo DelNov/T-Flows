@@ -34,9 +34,9 @@
 
     do c = 1, grid % n_cells
       pr_t = max(Turb_Mod_Prandtl_Number(turb, c), TINY)
-      ut % n(c) = - turb % vis_t(c) / pr_t * t % x(c)
-      vt % n(c) = - turb % vis_t(c) / pr_t * t % y(c)
-      wt % n(c) = - turb % vis_t(c) / pr_t * t % z(c)
+      ut % n(c) = - turb % vis_t(c) / flow % density(c) / pr_t * t % x(c)
+      vt % n(c) = - turb % vis_t(c) / flow % density(c) / pr_t * t % y(c)
+      wt % n(c) = - turb % vis_t(c) / flow % density(c) / pr_t * t % z(c)
     end do
 
   else if(turbulent_heat_flux_model .eq. GGDH) then
