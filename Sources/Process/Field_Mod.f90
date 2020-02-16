@@ -24,7 +24,7 @@
 
     ! Physical properties
     real, allocatable :: capacity(:)      ! [J/kg/K]
-    real, allocatable :: conductivity(:)  ! [W/m/k]
+    real, allocatable :: conductivity(:)  ! [W/(m K)]
     real :: diffusivity                   ! [m^2/s]
     real, allocatable :: density(:)       ! [kg/m^3]
     real, allocatable :: viscosity(:)     ! [kg/m/s]
