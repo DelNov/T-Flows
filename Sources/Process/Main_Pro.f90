@@ -259,7 +259,7 @@
 
       call Field_Mod_Grad_Pressure_Correction(flow, flow % pp)
 
-      call Bulk_Mod_Calculate_Fluxes(grid, flow % bulk, flow % m_flux % n)
+      call Field_Mod_Calculate_Fluxes(flow, flow % m_flux % n)
       mass_res = Correct_Velocity(flow, sol, flow % dt, ini)
 
       ! Energy (practically temperature)

@@ -81,27 +81,27 @@
     real, allocatable :: y_plus(:)
 
     ! Production of turbulent kinetic energy and temperature fluctuations
-    real, allocatable :: p_kin(:), p_t2(:)
+    real, allocatable :: p_kin(:), p_t2(:) ! [m^2/s^3], [K^2/s]
 
     ! Buoyancy production for k-eps-zeta-f model
     real, allocatable :: g_buoy(:)
 
     ! Turbulent lenght and time Scales
-    real, allocatable :: l_scale(:)
-    real, allocatable :: t_scale(:)
+    real, allocatable :: l_scale(:) ! [m]
+    real, allocatable :: t_scale(:) ! [s]
 
     ! Turbulent viscosity
-    real, allocatable :: vis_t(:)
+    real, allocatable :: vis_t(:) ! [kg/(m s)]
 
     ! Effective turbulent viscosity
-    real, allocatable :: vis_t_eff(:)
-    real, allocatable :: vis_t_sgs(:)
+    real, allocatable :: vis_t_eff(:) ! [kg/(m s)]
+    real, allocatable :: vis_t_sgs(:) ! [kg/(m s)]
 
-    real, allocatable :: tau_wall(:)
+    real, allocatable :: tau_wall(:)  ! [kg/(m s^2)]
 
     ! Wall viscosity and conductivity (wall function approach)
-    real, allocatable :: vis_w(:)
-    real, allocatable :: con_w(:)
+    real, allocatable :: vis_w(:) ! [kg/(m s)]
+    real, allocatable :: con_w(:) ! [W/(m K)]
 
     ! Scale-resolving simulations
     real, allocatable :: c_dyn(:)
