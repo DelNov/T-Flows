@@ -41,8 +41,9 @@
   !-------------------------------!
   if( phi % name .eq. 'T' ) then
     do c = 1, grid % n_cells
-      b_vector(c) = b_vector(c)   &
-                  - flow % heat_flux * u % n(c) / bulk % flux_x * grid % vol(c)
+      b_vector(c) = b_vector(c) - flow % heat_flux                &
+                                * flow % density(c) * u % n(c)    &
+                                / bulk % flux_x * grid % vol(c)
     end do
   end if
 
