@@ -5,10 +5,9 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use Field_Mod,   only: Field_Type, heat_transfer
+  use Field_Mod,   only: Field_Type, Field_Mod_Calculate_Fluxes, heat_transfer
   use Turb_Mod
   use Grid_Mod
-  use Bulk_Mod,    only: Bulk_Type, Bulk_Mod_Calculate_Fluxes
   use Control_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -30,7 +29,7 @@
   call Field_Mod_Alias_Momentum(flow, u, v, w)
   call Field_Mod_Alias_Energy  (flow, t)
 
-  call Bulk_Mod_Calculate_Fluxes(grid, bulk, m_flux % n)
+  call Field_Mod_Calculate_Fluxes(flow, m_flux % n)
 
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)

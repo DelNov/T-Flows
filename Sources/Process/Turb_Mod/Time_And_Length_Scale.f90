@@ -34,7 +34,7 @@
 !   dissipation   eps % n  [m^2/s^3]   | turb. visc.     vis_t     [kg/(m*s)]  !
 !   wall shear s. tau_wall [kg/(m*s^2)]| dyn visc.       viscosity [kg/(m*s)]  !
 !   density       density  [kg/m^3]    | turb. kin en.   kin % n   [m^2/s^2]   !
-!   cell volume   vol      [m^3]       | length          lf        [m]         !
+!   cell volume   vol      [m^3]       | length          l_1       [m]         !
 !   left hand s.  A        [kg/s]      | right hand s.   b         [kg*m^2/s^4]!
 !------------------------------------------------------------------------------!
 
