@@ -22,7 +22,6 @@
   integer              :: s, c, c1, c2, cg1, cg2, mc, max_cnt
   integer, allocatable :: cells_cg(:,:)   ! cells' cells
   integer, allocatable :: cells_fc(:,:)   ! cells' faces
-  character(len=12)    :: cf_name = 'cell_flux_00'
 !==============================================================================!
 
   allocate(cells_cg (24, grid % n_cells));  cells_cg  = 0
@@ -123,7 +122,7 @@
   !   save all fluxes in the backup file.      !
   !--------------------------------------------!
   do mc = 1, max_cnt
-    write(cf_name(11:12), '(i2.2)') mc  ! set name of the backup variable
+    write(var_name(11:12), '(i2.2)') mc  ! set name of the backup variable
     rvalues(:) = 0.0
     do c = 1, grid % n_cells - grid % comm % n_buff_cells
       if( cells_cg(mc, c) .ne. 0 ) then
@@ -131,7 +130,7 @@
       end if
     end do
     call Backup_Mod_Write_Cell(comm,  &
-                               fh, d, vc, cf_name, rvalues(1:comm % nc_s))
+                               fh, d, vc, var_name, rvalues(1:comm % nc_s))
   end do
 
   deallocate(cells_cg)
