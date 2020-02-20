@@ -20,11 +20,11 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
-  type(Var_Type),  pointer :: u, v, w, t
+  type(Var_Type),  pointer :: u, v, w, t, phi
   type(Var_Type),  pointer :: kin, eps, zeta, f22, vis, t2
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   type(Face_Type), pointer :: m_flux
-  integer                  :: c1, c2, s
+  integer                  :: c1, c2, s, sc
 !==============================================================================!
 
   ! Take aliases
@@ -48,17 +48,17 @@
     c2 = grid % faces_c(2,s)
 
     ! On the boundary perform the extrapolation
-    if(c2  < 0) then
+    if(c2 < 0) then
       if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) ) then
-        u % n(c2) = u % n(c2)   &
+        u % n(c2) = u % n(c2)                      &
                   - ( bulk % u * u % x(c1)         &
                     + bulk % v * u % y(c1)         &
                     + bulk % w * u % z(c1) ) * dt
-        v % n(c2) = v % n(c2)  &
+        v % n(c2) = v % n(c2)                      &
                   - ( bulk % u * v % x(c1)         &
                     + bulk % v * v % y(c1)         &
                     + bulk % w * v % z(c1) ) * dt
-        w % n(c2) = w % n(c2)  &
+        w % n(c2) = w % n(c2)                      &
                   - ( bulk % u * w % x(c1)         &
                     + bulk % v * w % y(c1)         &
                     + bulk % w * w % z(c1) ) * dt
@@ -66,7 +66,54 @@
     end if
   end do
 
-  ! k-epsilon-zeta-f
+  !--------------------------!
+  !                          !
+  !   Turbulent quantities   !
+  !                          !
+  !--------------------------!
+
+  !-----------------!
+  !   K-eps model   !
+  !-----------------!
+  if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
+     turbulence_model .eq. HYBRID_LES_RANS) then
+
+    call Field_Mod_Grad_Variable(flow, kin)
+    call Field_Mod_Grad_Variable(flow, eps)
+    if(heat_transfer) then
+      call Field_Mod_Grad_Variable(flow, t2)
+    end if
+
+    do s = 1, grid % n_faces
+      c1 = grid % faces_c(1,s)
+      c2 = grid % faces_c(2,s)
+
+      ! On the boundary perform the extrapolation
+      if(c2 < 0) then
+        if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) ) then
+          kin % n(c2) = kin % n(c2)                       &
+                      - ( bulk % u * kin % x(c1)          &
+                        + bulk % v * kin % y(c1)          &
+                        + bulk % w * kin % z(c1) ) * dt
+          eps % n(c2) = eps % n(c2)                       &
+                      - ( bulk % u * eps % x(c1)          &
+                        + bulk % v * eps % y(c1)          &
+                        + bulk % w * eps % z(c1) ) * dt
+          if(heat_transfer) then
+            t2 % n(c2) = t2 % n(c2)                       &
+                        - ( bulk % u * t2 % x(c1)         &
+                          + bulk % v * t2 % y(c1)         &
+                          + bulk % w * t2 % z(c1) ) * dt
+          end if
+        end if
+      end if
+    end do
+
+  end if
+
+  !------------------------!
+  !   K-eps-zeta-f model   !
+  !------------------------!
   if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
      turbulence_model .eq. HYBRID_LES_RANS) then
 
@@ -83,26 +130,26 @@
       c2 = grid % faces_c(2,s)
 
       ! On the boundary perform the extrapolation
-      if(c2  < 0) then
+      if(c2 < 0) then
         if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) ) then
-          kin % n(c2) = kin % n(c2)   &
-                      - ( bulk % u * kin % x(c1)         &
-                        + bulk % v * kin % y(c1)         &
+          kin % n(c2) = kin % n(c2)                       &
+                      - ( bulk % u * kin % x(c1)          &
+                        + bulk % v * kin % y(c1)          &
                         + bulk % w * kin % z(c1) ) * dt
-          eps % n(c2) = eps % n(c2)   &
-                      - ( bulk % u * eps % x(c1)         &
-                        + bulk % v * eps % y(c1)         &
+          eps % n(c2) = eps % n(c2)                       &
+                      - ( bulk % u * eps % x(c1)          &
+                        + bulk % v * eps % y(c1)          &
                         + bulk % w * eps % z(c1) ) * dt
-          f22 % n(c2) = f22 % n(c2)   &
-                      - ( bulk % u * f22 % x(c1)         &
-                        + bulk % v * f22 % y(c1)         &
+          f22 % n(c2) = f22 % n(c2)                       &
+                      - ( bulk % u * f22 % x(c1)          &
+                        + bulk % v * f22 % y(c1)          &
                         + bulk % w * f22 % z(c1) ) * dt
-          zeta % n(c2) = zeta % n(c2)   &
+          zeta % n(c2) = zeta % n(c2)                     &
                       - ( bulk % u * zeta % x(c1)         &
                         + bulk % v * zeta % y(c1)         &
                         + bulk % w * zeta % z(c1) ) * dt
           if(heat_transfer) then
-            t2 % n(c2) = t2 % n(c2)   &
+            t2 % n(c2) = t2 % n(c2)                       &
                         - ( bulk % u * t2 % x(c1)         &
                           + bulk % v * t2 % y(c1)         &
                           + bulk % w * t2 % z(c1) ) * dt
@@ -112,6 +159,89 @@
     end do
 
   end if
+
+  !----------------------------!
+  !   Reynolds stress models   !
+  !----------------------------!
+
+  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
+     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
+
+    call Field_Mod_Grad_Variable(flow, kin)
+    call Field_Mod_Grad_Variable(flow, eps)
+    call Field_Mod_Grad_Variable(flow, f22)
+    call Field_Mod_Grad_Variable(flow, zeta)
+    if(heat_transfer) then
+      call Field_Mod_Grad_Variable(flow, t2)
+    end if
+
+    do s = 1, grid % n_faces
+      c1 = grid % faces_c(1,s)
+      c2 = grid % faces_c(2,s)
+
+      ! On the boundary perform the extrapolation
+      if(c2 < 0) then
+        if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) ) then
+          uu % n(c2) = uu % n(c2)                          &
+                      - ( bulk % u * uu % x(c1)            &
+                        + bulk % v * uu % y(c1)            &
+                        + bulk % w * uu % z(c1) ) * dt
+          vv % n(c2) = vv % n(c2)                          &
+                      - ( bulk % u * vv % x(c1)            &
+                        + bulk % v * vv % y(c1)            &
+                        + bulk % w * vv % z(c1) ) * dt
+          ww % n(c2) = ww % n(c2)                          &
+                      - ( bulk % u * ww % x(c1)            &
+                        + bulk % v * ww % y(c1)            &
+                        + bulk % w * ww % z(c1) ) * dt
+          uv % n(c2) = uv % n(c2)                          &
+                      - ( bulk % u * uv % x(c1)            &
+                        + bulk % v * uv % y(c1)            &
+                        + bulk % w * uv % z(c1) ) * dt
+          uw % n(c2) = uw % n(c2)                          &
+                      - ( bulk % u * uw % x(c1)            &
+                        + bulk % v * uw % y(c1)            &
+                        + bulk % w * uw % z(c1) ) * dt
+          vw % n(c2) = vw % n(c2)                          &
+                      - ( bulk % u * vw % x(c1)            &
+                        + bulk % v * vw % y(c1)            &
+                        + bulk % w * vw % z(c1) ) * dt
+          eps % n(c2) = eps % n(c2)                        &
+                      - ( bulk % u * eps % x(c1)           &
+                        + bulk % v * eps % y(c1)           &
+                        + bulk % w * eps % z(c1) ) * dt
+          if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+            f22 % n(c2) = f22 % n(c2)                      &
+                        - ( bulk % u * f22 % x(c1)         &
+                          + bulk % v * f22 % y(c1)         &
+                          + bulk % w * f22 % z(c1) ) * dt
+          end if
+        end if
+      end if
+    end do
+
+  end if
+
+  !-------------!
+  !   Scalars   !
+  !-------------!
+  do sc = 1, flow % n_scalars
+    phi => flow % scalar(sc)
+    do s = 1, grid % n_faces
+      c1 = grid % faces_c(1,s)
+      c2 = grid % faces_c(2,s)
+
+      ! On the boundary perform the extrapolation
+      if(c2 < 0) then
+        if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) ) then
+          phi % n(c2) = phi % n(c2)                      &
+                      - ( bulk % u * phi % x(c1)         &
+                        + bulk % v * phi % y(c1)         &
+                        + bulk % w * phi % z(c1) ) * dt
+        end if
+      end if
+    end do
+  end do
 
   if(heat_transfer) then
 
@@ -124,9 +254,9 @@
       c2 = grid % faces_c(2,s)
 
       ! On the boundary perform the extrapolation
-      if(c2  < 0) then
+      if(c2 < 0) then
         if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) ) then
-          t % n(c2) = t % n(c2)   &
+          t % n(c2) = t % n(c2)                      &
                     - ( bulk % u * t % x(c1)         &
                       + bulk % v * t % y(c1)         &
                       + bulk % w * t % z(c1) ) * dt
