@@ -98,9 +98,9 @@
   call Comm_Mod_Global_Sum_Real(bulk % flux_y)
   call Comm_Mod_Global_Sum_Real(bulk % flux_z)
 
-  ! Bulk velocities.  Units: [kg/s] / [kg/m] = [m/s]
-  bulk % u = bulk % flux_x / (dens_avg_x + TINY)
-  bulk % v = bulk % flux_y / (dens_avg_y + TINY)
-  bulk % w = bulk % flux_z / (dens_avg_z + TINY)
+  ! Bulk velocities.  Units: [kg/s] / [kg/m^3] / [m^2] = [m/s]
+  bulk % u = bulk % flux_x / (dens_avg_x * bulk % area_x + TINY)
+  bulk % v = bulk % flux_y / (dens_avg_y * bulk % area_y + TINY)
+  bulk % w = bulk % flux_z / (dens_avg_z * bulk % area_z + TINY)
 
   end subroutine

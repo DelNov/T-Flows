@@ -48,7 +48,6 @@
     call Turb_Mod_Vis_T_Hybrid_Les_Prandtl(turb)
   end if
 
-  call Convective_Outflow(flow, flow % dt)
   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
      turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
     call Turb_Mod_Vis_T_Rsm(turb)
