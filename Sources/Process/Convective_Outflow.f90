@@ -21,7 +21,7 @@
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u, v, w, t, phi
-  type(Var_Type),  pointer :: kin, eps, zeta, f22, vis, t2
+  type(Var_Type),  pointer :: kin, eps, zeta, f22, t2
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   type(Face_Type), pointer :: m_flux
   integer                  :: c1, c2, s, sc
@@ -167,12 +167,15 @@
   if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
      turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
 
-    call Field_Mod_Grad_Variable(flow, kin)
+    call Field_Mod_Grad_Variable(flow, uu)
+    call Field_Mod_Grad_Variable(flow, vv)
+    call Field_Mod_Grad_Variable(flow, ww)
+    call Field_Mod_Grad_Variable(flow, uv)
+    call Field_Mod_Grad_Variable(flow, uw)
+    call Field_Mod_Grad_Variable(flow, vw)
     call Field_Mod_Grad_Variable(flow, eps)
-    call Field_Mod_Grad_Variable(flow, f22)
-    call Field_Mod_Grad_Variable(flow, zeta)
-    if(heat_transfer) then
-      call Field_Mod_Grad_Variable(flow, t2)
+    if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+      call Field_Mod_Grad_Variable(flow, f22)
     end if
 
     do s = 1, grid % n_faces
@@ -227,6 +230,9 @@
   !-------------!
   do sc = 1, flow % n_scalars
     phi => flow % scalar(sc)
+
+    call Field_Mod_Grad_Variable(flow, phi)
+
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
