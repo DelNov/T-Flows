@@ -19,10 +19,13 @@
   logical, optional :: correct_sign  ! in case of face fluxes, signs might have
                                      ! to be changed (check it one day)
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: s, c, c1, c2, cg1, cg2, mc, max_cnt
-  integer, allocatable :: cells_cg(:,:)   ! cells' cells
-  integer, allocatable :: cells_fc(:,:)   ! cells' faces
+  integer                       :: s, c, c1, c2, cg1, cg2, mc, max_cnt
+  integer, allocatable          :: cells_cg(:,:)   ! cells' cells
+  integer, allocatable          :: cells_fc(:,:)   ! cells' faces
+  character(len=:), allocatable :: cf_name
 !==============================================================================!
+
+  cf_name = trim(var_name)
 
   allocate(cells_cg (24, grid % n_cells));  cells_cg  = 0
   allocate(cells_fc (24, grid % n_cells));  cells_fc  = 0
@@ -122,7 +125,7 @@
   !   save all fluxes in the backup file.      !
   !--------------------------------------------!
   do mc = 1, max_cnt
-    write(var_name(11:12), '(i2.2)') mc  ! set name of the backup variable
+    write(cf_name(11:12), '(i2.2)') mc  ! set name of the backup variable
     rvalues(:) = 0.0
     do c = 1, grid % n_cells - grid % comm % n_buff_cells
       if( cells_cg(mc, c) .ne. 0 ) then
@@ -130,7 +133,7 @@
       end if
     end do
     call Backup_Mod_Write_Cell(comm,  &
-                               fh, d, vc, var_name, rvalues(1:comm % nc_s))
+                               fh, d, vc, cf_name, rvalues(1:comm % nc_s))
   end do
 
   deallocate(cells_cg)
