@@ -14,6 +14,7 @@ FCOMP="gnu"
 DEBUG="yes"
 # Repeat tests with CGNS=yes
 CGNS="yes"
+CGNS_MPI="mpich"
 
 # A small reminder how to set up alternatives if you have mpich and openmpi:
 #update-alternatives --install /usr/bin/mpif90 mpif90 /usr/bin/mpif90.openmpi 20
@@ -31,6 +32,7 @@ LAMINAR_CAVITY_LID_DRIVEN_DIR=Laminar/Cavity/Lid_Driven/Re_1000
 LAMINAR_CAVITY_THERM_DRIVEN_106_DIR=Laminar/Cavity/Thermally_Driven/Ra_10e6
 LAMINAR_CAVITY_THERM_DRIVEN_108_DIR=Laminar/Cavity/Thermally_Driven/Ra_10e8
 LAMINAR_T_JUNCTION_DIR=Laminar/T_Junction
+LAMINAR_CHANNEL=Laminar/Accuracy_Test/Channel_Re_2000
 
 LES_CHANNEL_180_PD_DIR=Les/Channel_Re_Tau_180/Periodic_Domain
 
@@ -148,6 +150,12 @@ ALL_PROCESS_MODELS=("none" \
                     "hybrid_les_rans")
 DONE_PROCESS_TESTS=0
 
+#----------------------------------------------------------------------------
+# All directories to Process accuracy test
+#----------------------------------------------------------------------------
+ALL_PROCESS_ACCURACY_TESTS=("$LAMINAR_CHANNEL")
+DONE_PROCESS_ACCURACY_TESTS=0
+
 # Folder structure
 TEST_DIR=$PWD                      # dir with tests
 GENE_DIR=$PWD/../Sources/Generate  # Generate src folder
@@ -213,13 +221,13 @@ function clean_compile {
 
   if [ -z "${4+xxx}" ]; then 
     echo "make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS=$2 MPI=$3"
-              make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS=$2 MPI=$3 \
-              >> $FULL_LOG 2>&1
+              make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS=$2 CGNS_MPI=$CGNS_MPI \
+              MPI=$3 >> $FULL_LOG 2>&1
               success=$?
   else
     echo "make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS=$2 MPI=$3 DIR_CASE=$4"
-              make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS=$2 MPI=$3 DIR_CASE=$4 \
-              >> $FULL_LOG 2>&1
+              make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS=$2 CGNS_MPI=$CGNS_MPI \
+              MPI=$3 DIR_CASE=$4 >> $FULL_LOG 2>&1
               success=$?
   fi
 
@@ -248,12 +256,16 @@ function make_links {
 #------------------------------------------------------------------------------#
 function launch_generate {
   # $1 = relative dir
+  # $2 = quiet
+
   make_links $TEST_DIR/$1
-  echo ""
-  echo "#=================================================================="
-  echo "#   Generate test:" $1
-  echo "#------------------------------------------------------------------"
-  echo "generate.scr: " >> $FULL_LOG 2>&1
+  if [ "$2" != "quiet" ]; then
+    echo ""
+    echo "#=================================================================="
+    echo "#   Generate test:" $1
+    echo "#------------------------------------------------------------------"
+    echo "generate.scr: " >> $FULL_LOG 2>&1
+  fi
   cat generate.scr >> $FULL_LOG 2>&1
   $GENE_EXE < generate.scr >> $FULL_LOG 2>&1
   success=$?
@@ -268,12 +280,16 @@ function launch_generate {
 #------------------------------------------------------------------------------#
 function launch_divide {
   # $1 = relative dir
+  # $2 = quiet
+
   make_links $TEST_DIR/$1
-  echo ""
-  echo "#=================================================================="
-  echo "#   Divide test:" $1
-  echo "#------------------------------------------------------------------"
-  echo "divide.scr: " >> $FULL_LOG 2>&1
+  if [ "$2" != "quiet" ]; then
+    echo ""
+    echo "#=================================================================="
+    echo "#   Divide test:" $1
+    echo "#------------------------------------------------------------------"
+    echo "divide.scr: " >> $FULL_LOG 2>&1
+  fi
   cat divide.scr >> $FULL_LOG 2>&1
   $DIVI_EXE < divide.scr >> $FULL_LOG 2>&1
   success=$?
@@ -1034,6 +1050,96 @@ function process_full_length_tests {
 }
 
 #------------------------------------------------------------------------------#
+# Individual process accuracy test
+#------------------------------------------------------------------------------#
+function process_accuracy_test {
+  # $1 = case dir
+
+  # Full path to test case
+  path="$TEST_DIR"/"$1"
+
+  if [ -z "${1+xxx}" ]; then 
+    echo "directory is not set at all"
+    exit 1
+  fi
+
+  for i in {3..7..1}
+  do
+    Ny="$(echo "1 + 2^"$i"" | bc)"
+    echo "Ny: "$Ny""
+
+    cd $path
+
+    # change Ny in chan.dom
+    replace_line_with_first_occurence_in_file "1  65  65" \
+      "  1  65  65  "$Ny" # Nx Nz Ny" chan.dom
+    launch_generate "$1" "quiet"
+    launch_divide   "$1" "quiet"
+
+    name_in_div=$(head  -n1 divide.scr)
+    nproc_in_div=$(head -n2 divide.scr | tail -n1)
+
+    echo "np="$nproc_in_div", MPI=yes"
+
+    # rel_dir to User_Mod/ from Process/
+    rel_dir=$(realpath --relative-to="$PROC_DIR" "$path")
+
+    if [ "$CGNS" = "yes" ]; then
+      clean_compile $PROC_DIR yes yes $rel_dir # dir CGNS MPI DIR_CASE
+    else
+      clean_compile $PROC_DIR no  yes $rel_dir # dir CGNS MPI DIR_CASE
+    fi
+
+   cd $path
+
+   launch_process par $nproc_in_div
+
+    # Process chan-ts??????-res.dat
+    if ls "$name_in_div"-res-ts??????.dat 1> /dev/null 2>&1; then
+
+      # extract essential data from produced .dat files
+      last_results_dat_file=$(realpath --relative-to="$3" \
+        $(ls -tr1 "$name_in_div"-res-ts??????.dat | tail -n1))
+
+      # Store this file with result
+      nNy=$(printf "%06d" $Ny)
+      cp "$last_results_dat_file" "$nNy".dat
+
+    else
+        echo "Warning: file "$name_in_div"-res-ts??????.dat does not exist"
+    fi
+  done # for loop
+}
+
+#------------------------------------------------------------------------------#
+# Process accuracy tests (simple tests with given analytical solution)
+#------------------------------------------------------------------------------#
+function process_accuracy_tests {
+  # $1 = test dir
+  # it requires a new file in Xmgrace/ dir called gnuplot_script_template.sh
+
+  echo ""
+  echo "#======================================================================"
+  echo "#"
+  echo "#   Running Processor accuracy test check"
+  echo "#"
+  echo "#----------------------------------------------------------------------"
+
+  for i in ${!ALL_PROCESS_ACCURACY_TESTS[@]}; do
+    CASE_DIR="${ALL_PROCESS_ACCURACY_TESTS[$i]}"
+
+    echo ""
+    echo "#===================================================================="
+    echo "#   Process test: "     $CASE_DIR
+    echo "#   with tolerance for u, p, SIMPLE : 1.e-8"
+    echo "#--------------------------------------------------------------------"
+
+    process_accuracy_test "$CASE_DIR"
+  done
+
+}
+
+#------------------------------------------------------------------------------#
 # actual script
 #------------------------------------------------------------------------------#
 while [ 0 -eq 0 ]; do
@@ -1056,6 +1162,7 @@ while [ 0 -eq 0 ]; do
   echo "  7. Processor full lenght tests"
   echo "  8. Perform all tests"
   echo "  9. Clean all test directories"
+  echo " 10. Process accuracy test"
   echo ""
 
   read -p "  Enter the desired type of test: " option
@@ -1098,6 +1205,9 @@ while [ 0 -eq 0 ]; do
     process_backup_tests
     process_save_exit_now_tests
     process_full_length_tests
+  fi
+  if [ $option -eq 10 ]; then
+    process_accuracy_tests
   fi
   if [ $option -eq 9 ]; then
     git clean -dfx ./
