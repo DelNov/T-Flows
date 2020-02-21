@@ -19,11 +19,13 @@
   logical, optional :: correct_sign  ! in case of face fluxes, signs might have
                                      ! to be changed (check it one day)
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: s, c, c1, c2, cg1, cg2, mc, max_cnt
-  integer, allocatable :: cells_cg(:,:)   ! cells' cells
-  integer, allocatable :: cells_fc(:,:)   ! cells' faces
-  character(len=12)    :: cf_name = 'cell_flux_00'
+  integer                       :: s, c, c1, c2, cg1, cg2, mc, max_cnt
+  integer, allocatable          :: cells_cg(:,:)   ! cells' cells
+  integer, allocatable          :: cells_fc(:,:)   ! cells' faces
+  character(len=:), allocatable :: cf_name
 !==============================================================================!
+
+  cf_name = trim(var_name)
 
   allocate(cells_cg (24, grid % n_cells));  cells_cg  = 0
   allocate(cells_fc (24, grid % n_cells));  cells_fc  = 0

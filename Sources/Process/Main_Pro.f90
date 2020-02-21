@@ -276,6 +276,7 @@
       call Turb_Mod_Main(turb, sol, n, ini)
 
       ! Update the values at boundaries
+      call Convective_Outflow(flow, turb, mult, flow % dt)
       call Update_Boundary_Values(flow, turb, mult)
 
       ! End of the current iteration
