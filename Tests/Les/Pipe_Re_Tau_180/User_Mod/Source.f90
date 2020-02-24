@@ -1,18 +1,18 @@
 !==============================================================================!
-  subroutine User_Mod_Source(flow, phi, a_matrix, b_vector)
+  subroutine User_Mod_Source(flow, phi, a, b)
 !------------------------------------------------------------------------------!
 !   This is a prototype of a function for customized source for scalar.        !
 !   It is called from "Compute_Scalar" function, just before calling the       !
-!   linear solver.  Both system matrix ("a_matrix") and right hand side        !
-!   vector ("b_vector") are sent should the user want to stabilize the         !
+!   linear solver.  Both system matrix ("a") and right hand side               !
+!   vector ("b") are sent should the user want to stabilize the                !
 !   system for always positive variables, for example.                         !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
   type(Var_Type),   target :: phi
-  type(Matrix_Type)        :: a_matrix
-  real, dimension(:)       :: b_vector
+  type(Matrix_Type)        :: a
+  real, dimension(:)       :: b
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
@@ -41,9 +41,9 @@
   !-------------------------------!
   if( phi % name .eq. 'T' ) then
     do c = 1, grid % n_cells
-      b_vector(c) = b_vector(c)   &
-                  - 2.0 * pi * flow % heat_flux * w % n(c) &
-                  / (bulk % flux_z * flow % capacity(c)) * grid % vol(c)
+      b(c) = b(c) - w % n(c) / bulk % w          &
+                  * flow % heat / bulk % area_z  &
+                  * grid % vol(c)
     end do
   end if
 
