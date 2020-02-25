@@ -11,7 +11,7 @@ set -e
 # Compilation flags used in makefiles
 FCOMP="gnu"
 # Conduct tests with DEBUG=yes
-DEBUG="yes"
+DEBUG="no"
 # Repeat tests with CGNS=yes
 CGNS="yes"
 CGNS_MPI="mpich"
@@ -1098,17 +1098,20 @@ function process_accuracy_test {
     if ls "$name_in_div"-res-ts??????.dat 1> /dev/null 2>&1; then
 
       # extract essential data from produced .dat files
-      last_results_dat_file=$(realpath --relative-to="$3" \
+      last_results_dat_file=$(realpath --relative-to="$1" \
         $(ls -tr1 "$name_in_div"-res-ts??????.dat | tail -n1))
 
       # Store this file with result
       nNy=$(printf "%06d" $Ny)
-      cp "$last_results_dat_file" "$nNy".dat
+      cp "$last_results_dat_file" Results/"$nNy".dat
 
     else
         echo "Warning: file "$name_in_div"-res-ts??????.dat does not exist"
     fi
   done # for loop
+
+  cd Results/
+  python2 python_matplotlib_script.py
 }
 
 #------------------------------------------------------------------------------#
