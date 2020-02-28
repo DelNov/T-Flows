@@ -1,7 +1,7 @@
  PROBLEM_NAME    chan
 
  TIME_STEP                    5.e-2
- NUMBER_OF_TIME_STEPS         24000
+ NUMBER_OF_TIME_STEPS         14000
  RESULTS_SAVE_INTERVAL        9999999 # no saves   during this test
  BACKUP_SAVE_INTERVAL         9999999 # no backups during this test
 

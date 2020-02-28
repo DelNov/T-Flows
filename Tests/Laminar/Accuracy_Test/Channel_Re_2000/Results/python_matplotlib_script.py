@@ -5,9 +5,10 @@
 # Launch as python2 python_matplotlib_script.py
 
 # Header
-import numpy              as np
-import matplotlib.pyplot  as plt
-import matplotlib.lines   as lines
+import numpy                as np
+import matplotlib.pyplot    as plt
+import matplotlib.lines     as lines
+import matplotlib.offsetbox as offsetbox
 import sys
 import glob
 
@@ -33,7 +34,7 @@ plt.rcParams['xtick.direction'] = 'in'
 plt.rcParams['ytick.direction'] = 'in'
 plt.rcParams['figure.figsize'] = [3508./300, 2480./300] # A4 at 300 dpi
 plt.rcParams['savefig.dpi'] = 300
-plt.rcParams['figure.dpi'] = 300
+plt.rcParams['figure.dpi'] = 100
 plt.rcParams['image.cmap'] = 'jet'
 plt.rcParams["legend.frameon"] = True
 plt.rcParams["legend.fancybox"] = False
@@ -47,101 +48,87 @@ plt.rcParams["legend.borderpad"] = 0.1
 plt.rcParams['lines.linewidth'] = 2.
 plt.rcParams['lines.markeredgewidth'] = 2.0
 plt.rcParams['lines.markersize'] = 15
-plt.rcParams["legend.numpoints"] = 3
+plt.rcParams["legend.numpoints"] = 2
 
-path = '../'
-files = np.sort(glob.glob(path + '??????.dat'))
+# arg1 -> y, arg2 -> H, returns (3.0*(y/(0.5*H))*(1.0-y/H)
+y_profile = lambda arg1, arg2: np.array(3.0*(arg1/(0.5*arg2))*(1.0-arg1/arg2));
 
-print len(files)
-
-for fid in range(len(files)):
-
-#-Reference data
-
-y1, u1   = np.loadtxt(U_plus_ref_data,   unpack=True)
-y2, k1   = np.loadtxt(k_plus_ref_data,   unpack=True)
-y3, eps1 = np.loadtxt(eps_plus_ref_data, unpack=True)
-y4, uv1  = np.loadtxt(uv_plus_ref_data,  unpack=True)
-
-#-Input data
-input_name = sys.argv[1]
-y5_c   = int(sys.argv[2])-1
-u2_c   = int(sys.argv[3])-1
-k2_c   = int(sys.argv[4])-1
-eps2_c = int(sys.argv[5])-1
-uv2_c  = int(sys.argv[6])-1
-y5, u2, k2, eps2, uv2 = np.loadtxt(input_name, \
-  usecols=(y5_c,u2_c,k2_c,eps2_c,uv2_c), unpack=True)
-
-# Assemble all data in one array ([x1, y1, x2, y2])
-data = np.array([[y1, u1,   y5, u2  ], \
-                 [y2, k1,   y5, k2  ], \
-                 [y3, eps1, y5, eps2], \
-                 [y4, uv1,  y5, uv2 ]] )
-
-# Limits for each plot ([x_min, x_max, x_label_dx, y_min, y_max, y_label_dy])
-axis = np.array([[0., 300., 50., 0., 30., 10.], \
-                 [0., 300., 50., 0., 5. ,  2.], \
-                 [0., 300., 50., 0., 0.3, 0.1], \
-                 [0., 300., 50., 0., 1. , 0.5]] )
-
-# Labels for each plot ([xlabel, ylabel])
-label = np.array([[r'$y^+$', r'$U^+$'          ], \
-                  [r'$y^+$', r'$k^+$'          ], \
-                  [r'$y^+$', r'$\varepsilon^+$'], \
-                  [r'$y^+$', r'$uv^+$'         ]] )
+files = np.sort(glob.glob('??????.dat'))
 
 # Layout
-fig, ax = plt.subplots(2, 2)
-plt.subplots_adjust(left=0.05, right=0.97, top=0.97, bottom=0.05, \
+fig, ax = plt.subplots(1, 1)
+plt.subplots_adjust(left=0.10, right=1.0, top=0.97, bottom=0.09, \
                     hspace=0.15, wspace=0.15)
 
-# Plot id [i,j] or [p]
-p = -1
-for i in range(2):
-  for j in range(2):
-    p = p + 1
+x_data = np.array([], dtype=np.int64)
+y_data = np.array([], dtype=np.double)
+z_data = np.array([], dtype=np.double)
 
-    # Add 1d plots
-    ax[i,j].plot(data[p,0], data[p,1], 'b-', \
-                 data[p,2], data[p,3], 'r-', \
-                 ms=30, markerfacecolor='none', markeredgewidth=3)
-    ax[i,j].plot(data[p,0], data[p,1], 'b.', \
-                 data[p,2], data[p,3], 'r.', \
-                 ms=5, markeredgewidth=3)
+print '{0:<1}{1:>17}{2:>18}{3:>18}'.format('#', 'Ny', 'L2(u)', 'LInf(u)')
+for fi in range(len(files)):
 
-    # Set axes
-    ax[i,j].axis([axis[p,0], axis[p,1], axis[p,3], axis[p,4]])
+  #-Input data
+  y, u = np.loadtxt(files[fi], unpack=True)
 
-    # Set scale x:y = 1 by tweaking axes -> no control over margins
-    #ax[i,j].set_aspect('equal', adjustable='box')
+  N_y = np.shape(y)[0]
+  l2_error = np.sqrt(np.sum((u - y_profile(y, 1.0))**2)/N_y)
+  linf_error = np.max(np.abs(u - y_profile(y, 1.0)))
+  print '{0: 18d}{1: 18.8E}{2: 18.8E}'.format(N_y, l2_error, linf_error)
 
-    # Ticks and labels
-    x_ticks = np.arange(axis[p,0], axis[p,1]+0.001,axis[p,2])
-    y_ticks = np.arange(axis[p,3], axis[p,4]+0.001,axis[p,5])
-    ax[i,j].xaxis.set_ticks(x_ticks)
-    ax[i,j].yaxis.set_ticks(y_ticks)
-    # Apply ticks on canvas
-    fig.canvas.draw()
-    # Replace last tick label
-    xlabel = [k.get_text() for k in ax[i,j].get_xticklabels()]
-    xlabel[-1] = label[p,0]
-    ax[i,j].set_xticklabels(xlabel)
-    ylabel = [k.get_text() for k in ax[i,j].get_yticklabels()]
-    ylabel[-1] = label[p,1]
-    ax[i,j].set_yticklabels(ylabel)
+  x_data = np.append(x_data, N_y)
+  y_data = np.append(y_data, l2_error)
+  z_data = np.append(z_data, linf_error)
+
+fi = open('results.dat','w')
+data_to_write = np.array([x_data, y_data, z_data])
+
+np.savetxt(fi, data_to_write.T)
+fi.close()
+
+# Add 1d plots
+first_order_y_data  = np.ones(len(files)) * 1.2 * max(y_data[0], z_data[0])
+second_order_y_data = np.ones(len(files)) * 0.8 * min(y_data[0], z_data[0])
+for i in range(1,len(files)):
+  first_order_y_data[i]  = first_order_y_data[i-1]/2.
+  second_order_y_data[i] = second_order_y_data[i-1]/4.
+
+# 1st order precision line
+ax.loglog(x_data, first_order_y_data, \
+  linestyle='dashed', color='r')
+
+# 2nd order precision line
+ax.loglog(x_data, second_order_y_data, \
+  linestyle='dashed', color='g')
+
+ax.loglog(x_data, y_data, \
+  linestyle='solid', color='k', marker='o', \
+  markerfacecolor='none')
+
+ax.loglog(x_data, z_data, \
+  linestyle='solid', color='b', marker='s', \
+  markerfacecolor='none')
 
 # Legend
-leg1 = lines.Line2D([], [], color='b', marker='.',
-                    ms=30, label=r'DNS $Re_\tau=590$')
-leg2 = lines.Line2D([], [], color='r', marker='.',
-                    ms=30, label=r'Present')
-lines  = [leg1, leg2]
+leg1 = lines.Line2D([], [], color='r', linestyle='dashed', \
+                    label=r'1st order')
+leg2 = lines.Line2D([], [], color='g', linestyle='dashed', \
+                    label=r'2nd order')
+leg3 = lines.Line2D([], [], color='k', marker='o', markerfacecolor='none', \
+                    label=r'$L_2$-error')
+leg4 = lines.Line2D([], [], color='b', marker='s', markerfacecolor='none', \
+                    label=r'$L_\infty$-error')
+lines  = [leg1, leg2, leg3, leg4]
 labels = [line.get_label() for line in lines]
 plt.legend(lines, labels)
 
-# Show
-#plt.show()
+# Plot x label in a box
+atext = offsetbox.AnchoredText(r'$N_y$', \
+  loc='lower right', pad=0.05, borderpad=0.1, frameon=True)
+atext.patch.set_edgecolor('w')
+ax.add_artist(atext)
 
 # Save
-plt.savefig(input_name.replace('.dat','.png').replace('../','./'))
+plt.savefig('results.png', bbox_inches='tight', pad_inches=0)
+
+# Show
+plt.show()
