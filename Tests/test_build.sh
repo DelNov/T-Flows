@@ -3,16 +3,18 @@
 # Description: This script is made for debug purposes.
 # It automatically builds and runs most cases in T-Flows
 
-# Requires: gnuplot, texlive-base, mpi, gfortran
+# Requires:
+# mpi, gfortran, git to launch tests
+# python-matplotlib + texlive-base to plot results
 
-# exit when any command fails
+# Exit when any command fails
 set -e
 
 # Compilation flags used in makefiles
 FCOMP="gnu"
 # Conduct tests with DEBUG=yes
 DEBUG="no"
-# Repeat tests with CGNS=yes
+# Conduct tests with CGNS or not
 CGNS="yes"
 CGNS_MPI="mpich"
 
@@ -138,7 +140,8 @@ ALL_PROCESS_TESTS=("$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
                    "$RANS_CHANNEL_LR_RSM_DIR" \
                    "$RANS_CHANNEL_LR_RSM_DIR" \
                    "$HYB_CHANNEL_HR_STRETCHED_DIR" \
-                   "$HYB_CHANNEL_HR_UNIFORM_DIR")
+                   "$HYB_CHANNEL_HR_UNIFORM_DIR" \
+                   "$LES_PIPE_DIR")
 ALL_PROCESS_MODELS=("none" \
                     "none" \
                     "none" \
@@ -147,7 +150,8 @@ ALL_PROCESS_MODELS=("none" \
                     "rsm_manceau_hanjalic" \
                     "rsm_hanjalic_jakirlic" \
                     "hybrid_les_rans" \
-                    "hybrid_les_rans")
+                    "hybrid_les_rans" \
+                    "les_dynamic")
 DONE_PROCESS_TESTS=0
 
 #----------------------------------------------------------------------------
@@ -199,18 +203,14 @@ function time_in_seconds {
 # return success
 #------------------------------------------------------------------------------#
 function clean_compile {
-  # $1 = dir 
-  # $2 = CGNS = yes/no
-  # $3 = MPI = yes/no
-  # $4 = DIR_CASE path
+  # $1 = dir
+  # $2 = MPI = yes/no
+  # $3 = DIR_CASE path
 
   if [ -z "${1+xxx}" ]; then 
     echo "directory with sources is not set at all"
     exit 1
   elif [ -z "${2+xxx}" ]; then 
-    echo "CGNS flag is not set at all"
-    exit 1
-  elif [ -z "${3+xxx}" ]; then 
     echo "MPI flag is not set at all"
     exit 1
   fi
@@ -219,15 +219,24 @@ function clean_compile {
   echo "clean compile in:" "$1"
   make clean >> $FULL_LOG 2>&1
 
-  if [ -z "${4+xxx}" ]; then 
-    echo "make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS=$2 MPI=$3"
-              make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS=$2 CGNS_MPI=$CGNS_MPI \
-              MPI=$3 >> $FULL_LOG 2>&1
+  if [ -z "${3+xxx}" ]; then
+    echo "make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS=$CGNS MPI=$2"
+              make \
+                FORTRAN=$FCOMP \
+                DEBUG=$DEBUG \
+                CGNS=$CGNS \
+                CGNS_MPI=$CGNS_MPI \
+                MPI=$2 >> $FULL_LOG 2>&1
               success=$?
   else
-    echo "make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS=$2 MPI=$3 DIR_CASE=$4"
-              make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS=$2 CGNS_MPI=$CGNS_MPI \
-              MPI=$3 DIR_CASE=$4 >> $FULL_LOG 2>&1
+    echo "make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS=$CGNS MPI=$2 DIR_CASE=$3"
+              make \
+                FORTRAN=$FCOMP \
+                DEBUG=$DEBUG \
+                CGNS=$CGNS \
+                CGNS_MPI=$CGNS_MPI \
+                MPI=$2 \
+                DIR_CASE=$3 >> $FULL_LOG 2>&1
               success=$?
   fi
 
@@ -365,21 +374,11 @@ function generate_tests {
   echo "#"
   echo "#----------------------------------------------------------------------"
 
-  #-- seq, no cgns
-  clean_compile $GENE_DIR  no  no  # dir CGNS MPI
+  clean_compile $GENE_DIR no # dir MPI
 
   for CASE_DIR in ${ALL_GENERATE_TESTS[@]}; do
     launch_generate $CASE_DIR
   done
-
-  #-- seq, cgns(hdf5)
-  if [ "$CGNS" = "yes" ]; then
-    clean_compile $GENE_DIR  yes  no  # dir CGNS MPI
-
-    for CASE_DIR in ${ALL_GENERATE_TESTS[@]}; do
-      launch_generate $CASE_DIR
-    done
-  fi
 
   DONE_GENERATE_TESTS=1
 }
@@ -405,10 +404,13 @@ function unpack_neu_mesh {
     return
   elif [ -f "$fname"."tar.gz" ]; then
     tar -zxvf "$fname"."tar.gz"
+    git checkout "$fname"."tar.gz"
   elif [ -f "$fname"."tgz" ]; then
     tar -zxvf "$fname"."tgz"
+    git checkout "$fname"."tgz"
   elif [ -f "$fname"."neu.tgz" ]; then
     tar -zxvf "$fname"."neu.tgz"
+    git checkout "$fname"."neu.tgz"
   elif [ -f "$fname"."gz" ]; then
     gunzip -dv "$fname"."gz"
   elif [ -f "$fname"."neu.gz" ]; then
@@ -435,21 +437,11 @@ function convert_tests {
   cd $TEST_DIR/$RANS_FUEL_BUNDLE_DIR;    unpack_neu_mesh  subflow.neu.gz
   cd $TEST_DIR/$LES_PIPE_DIR;            unpack_neu_mesh  pipe.neu.gz
 
-  #-- seq, no cgns
-  clean_compile $CONV_DIR no no # dir CGNS MPI
+  clean_compile $CONV_DIR no # dir MPI
 
   for CASE_DIR in ${ALL_CONVERT_TESTS[@]}; do
     launch_convert $CASE_DIR
   done
-
-  #-- seq, cgns
-  if [ "$CGNS" = "yes" ]; then
-    clean_compile $CONV_DIR yes no # dir CGNS MPI
-
-    for CASE_DIR in ${ALL_CONVERT_TESTS[@]}; do
-      launch_convert $CASE_DIR
-    done
-  fi
 
   DONE_CONVERT_TESTS=1
 }
@@ -466,8 +458,7 @@ function divide_tests {
   echo "#"
   echo "#----------------------------------------------------------------------"
 
-  #-- seq
-  clean_compile $DIVI_DIR no no no # dir CGNS MPI
+  clean_compile $DIVI_DIR no # dir MPI
 
   for CASE_DIR in ${ALL_DIVIDE_TESTS[@]}; do
     launch_divide $CASE_DIR
@@ -529,13 +520,9 @@ function get_value_next_to_keyword {
 # processor: backup test
 #------------------------------------------------------------------------------#
 function process_backup_test {
-  # $1 = CGNS = yes
-  # $2 = test_dir
+  # 1 = test_dir
 
   if [ -z "${1+xxx}" ]; then 
-    echo "CGNS flag is not set at all"
-    exit 1
-  elif [ -z "${2+xxx}" ]; then 
     echo "directory is not set at all"
     exit 1
   fi
@@ -543,44 +530,52 @@ function process_backup_test {
   echo "Process backup tests.."
 
   # save original contol file
-  cp $2/control $2/control.backup
+  cp $1/control $1/control.backup
 
-  name_in_div=$(head -n1 "$2"/divide.scr)
-  nproc_in_div=$(head -n2  "$2"/divide.scr | tail -n1)
+  name_in_div=$(head -n1 "$1"/divide.scr)
+  nproc_in_div=$(head -n2  "$1"/divide.scr | tail -n1)
 
   n1=$(printf "%06d" 1)
   n2=$(printf "%06d" 2)
 
   #----------------------------------------#
   echo "np=1, MPI=no, start from 0, make a backup"
-  clean_compile $PROC_DIR $1 no # dir CGNS MPI
-  cd $2
+  clean_compile $PROC_DIR no # dir MPI
+  cd $1
 
   # comment line with LOAD_BACKUP_NAME
-  replace_line_with_first_occurence_in_file "LOAD_BACKUP_NAME" \
-    "#LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" control
+  replace_line_with_first_occurence_in_file \
+    "LOAD_BACKUP_NAME" \
+    "#LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" \
+    control
 
   # change number of timesteps to 3
-  replace_line_with_first_occurence_in_file "NUMBER_OF_TIME_STEPS" \
-    "NUMBER_OF_TIME_STEPS 3" control
+  replace_line_with_first_occurence_in_file \
+    "NUMBER_OF_TIME_STEPS" \
+    "NUMBER_OF_TIME_STEPS 3" \
+    control
 
   # change backup interval to 1 ts
-  replace_line_with_first_occurence_in_file "BACKUP_SAVE_INTERVAL" \
-    "BACKUP_SAVE_INTERVAL 1" control
+  replace_line_with_first_occurence_in_file \
+    "BACKUP_SAVE_INTERVAL" \
+    "BACKUP_SAVE_INTERVAL 1" \
+    control
 
   launch_process seq 1
   #----------------------------------------#
   echo "np=1, MPI=no, load from backup(produced by seq)"
 
   # uncomment line with LOAD_BACKUP_NAME
-  replace_line_with_first_occurence_in_file "LOAD_BACKUP_NAME" \
-    "LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" control
+  replace_line_with_first_occurence_in_file \
+    "LOAD_BACKUP_NAME" \
+    "LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" \
+    control
 
   launch_process seq 1
   #----------------------------------------#
   echo "np=1, MPI=yes, load from backup(produced by seq)"
-  clean_compile $PROC_DIR $1 yes # dir CGNS MPI
-  cd $2
+  clean_compile $PROC_DIR yes # dir MPI
+  cd $1
 
   launch_process par 1
   #----------------------------------------#
@@ -590,32 +585,38 @@ function process_backup_test {
   #----------------------------------------#
   echo "np=2, MPI=yes, load from backup(produced by par.np=1)"
 
-  replace_line_with_first_occurence_in_file "LOAD_BACKUP_NAME" \
-    "LOAD_BACKUP_NAME "$name_in_div"-ts"$n2".backup" control
+  replace_line_with_first_occurence_in_file \
+    "LOAD_BACKUP_NAME" \
+    "LOAD_BACKUP_NAME "$name_in_div"-ts"$n2".backup" \
+    control
 
   launch_process par $nproc_in_div
   #----------------------------------------#
   echo "np=2, MPI=yes, start from 0, make a backup"
 
-  replace_line_with_first_occurence_in_file "LOAD_BACKUP_NAME" \
-    "#LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" control
+  replace_line_with_first_occurence_in_file \
+    "LOAD_BACKUP_NAME" \
+    "#LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" \
+    control
 
   launch_process par $nproc_in_div
   #----------------------------------------#
   echo "np=2, MPI=yes, load from backup(produced by par.np=2) "
 
-  replace_line_with_first_occurence_in_file "LOAD_BACKUP_NAME" \
-    "LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" control
+  replace_line_with_first_occurence_in_file \
+    "LOAD_BACKUP_NAME" \
+    "LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" \
+    control
 
   launch_process par $nproc_in_div
   #----------------------------------------#
   echo "np=1, MPI=yes, backup=(produced by par.np=2)"
-  clean_compile $PROC_DIR $1 no # dir CGNS MPI
-  cd $2
+  clean_compile $PROC_DIR no # dir MPI
+  cd $1
   launch_process par 1
   #----------------------------------------#
 
-  cp $2/control.backup $2/control
+  cp $1/control.backup $1/control
 }
 
 #------------------------------------------------------------------------------#
@@ -637,91 +638,87 @@ function process_backup_tests {
   echo "#   Test 1: "$RANS_CHANNEL_LR_UNIFORM_DIR" [k_eps model + T]"
   echo "#----------------------------------------------------------------------"
   #-- Channel_Re_Tau_590 [k_eps model + T]
-  replace_line_with_first_occurence_in_file "TURBULENCE_MODEL" \
-    "TURBULENCE_MODEL k_eps" $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR/control
-  process_backup_test no  $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR
-  if [ "$CGNS" = "yes" ]; then
-    process_backup_test yes $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR
-  fi
+  replace_line_with_first_occurence_in_file \
+    "TURBULENCE_MODEL" \
+    "TURBULENCE_MODEL k_eps" \
+    $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR/control
+
+  process_backup_test \
+    $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR
 
   echo ""
   echo "#======================================================================"
   echo "#   Test 2: "$RANS_CHANNEL_LR_UNIFORM_DIR" [k_eps_zeta_f model + T]"
   echo "#----------------------------------------------------------------------"
   #-- Channel_Re_Tau_590 [k_eps_zeta_f model + T]
-  replace_line_with_first_occurence_in_file "TURBULENCE_MODEL" \
-    "TURBULENCE_MODEL k_eps_zeta_f" $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR/control
-  process_backup_test no  $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR
-  if [ "$CGNS" = "yes" ]; then
-    process_backup_test yes $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR
-  fi
+  replace_line_with_first_occurence_in_file \
+    "TURBULENCE_MODEL" \
+    "TURBULENCE_MODEL k_eps_zeta_f" \
+    $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR/control
+
+  process_backup_test \
+    $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR
 
   echo ""
   echo "#======================================================================"
   echo "#   Test 3: "$RANS_CHANNEL_LR_RSM_DIR" [rsm_hanjalic_jakirlic model + T]"
   echo "#----------------------------------------------------------------------"
   #-- Channel_Re_Tau_590_Rsm [rsm_hanjalic_jakirlic model + T]
-  replace_line_with_first_occurence_in_file "TURBULENCE_MODEL" \
-    "TURBULENCE_MODEL rsm_hanjalic_jakirlic" $TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR/control
-  process_backup_test no  $TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR
-  if [ "$CGNS" = "yes" ]; then
-    process_backup_test yes $TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR
-  fi
+  replace_line_with_first_occurence_in_file \
+    "TURBULENCE_MODEL" \
+    "TURBULENCE_MODEL rsm_hanjalic_jakirlic" \
+    $TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR/control
+
+  process_backup_test \
+    $TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR
 
   echo ""
   echo "#======================================================================"
   echo "#   Test 4: "$RANS_CHANNEL_LR_RSM_DIR" [rsm_manceau_hanjalic model + T]"
   echo "#----------------------------------------------------------------------"
   #-- Channel_Re_Tau_590_Rsm [rsm_manceau_hanjalic model + T]
-  replace_line_with_first_occurence_in_file "TURBULENCE_MODEL" \
-    "TURBULENCE_MODEL rsm_manceau_hanjalic" $TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR/control
-  process_backup_test no  $TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR
-  if [ "$CGNS" = "yes" ]; then
-    process_backup_test yes $TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR
-  fi
+  replace_line_with_first_occurence_in_file \
+    "TURBULENCE_MODEL" \
+    "TURBULENCE_MODEL rsm_manceau_hanjalic" \
+    $TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR/control
+
+  process_backup_test \
+    $TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR
 
   echo ""
   echo "#======================================================================"
   echo "#   Test 5: "$LES_PIPE_DIR" les_dynamic"
   echo "#----------------------------------------------------------------------"
   #-- Pipe_Re_Tau_180 [les_dynamic]
-  process_backup_test no  $TEST_DIR/$LES_PIPE_DIR
-  if [ "$CGNS" = "yes" ]; then
-    process_backup_test yes $TEST_DIR/$LES_PIPE_DIR
-  fi
+  process_backup_test \
+    $TEST_DIR/$LES_PIPE_DIR
 
   echo ""
   echo "#======================================================================"
   echo "#   Test 6: "$LAMINAR_CAVITY_LID_DRIVEN_DIR" none"
   echo "#----------------------------------------------------------------------"
   #-- Cavity_Lid_Driven_Re_1000 [none]
-  process_backup_test no  $TEST_DIR/$LAMINAR_CAVITY_LID_DRIVEN_DIR
-  if [ "$CGNS" = "yes" ]; then
-    process_backup_test yes $TEST_DIR/$LAMINAR_CAVITY_LID_DRIVEN_DIR
-  fi
+  process_backup_test \
+    $TEST_DIR/$LAMINAR_CAVITY_LID_DRIVEN_DIR
 
 }
 #------------------------------------------------------------------------------#
 # process: save_now / exit_now test
 #------------------------------------------------------------------------------#
 function process_save_exit_now_test {
-  # $1 = CGNS = yes
-  # $2 = relative dir with test
+  # $1 = relative dir with test
 
   if [ -z "${1+xxx}" ]; then 
-    echo "CGNS flag is not set at all"
-    exit 1
-  elif [ -z "${2+xxx}" ]; then 
     echo "directory is not set at all"
     exit 1
   fi
 
   echo ""
   echo "#======================================================================"
-  echo "#   Test save_now & exit_now on:" $2
+  echo "#   Test save_now & exit_now on:" $1
   echo "#----------------------------------------------------------------------"
 
-  cd "$TEST_DIR/$2"
+  cd "$TEST_DIR/$1"
   name_in_div=$(head -n1 divide.scr)
   nproc_in_div=$(head -n2  divide.scr | tail -n1)
 
@@ -730,12 +727,16 @@ function process_save_exit_now_test {
   if [ -f "exit_now" ]; then rm exit_now; fi
 
   # change number of timesteps to 3
-  replace_line_with_first_occurence_in_file "NUMBER_OF_TIME_STEPS" \
-    "NUMBER_OF_TIME_STEPS 3" control
+  replace_line_with_first_occurence_in_file \
+    "NUMBER_OF_TIME_STEPS" \
+    "NUMBER_OF_TIME_STEPS 3" \
+    control
 
   # change backup interval to 1 ts
-  replace_line_with_first_occurence_in_file "BACKUP_SAVE_INTERVAL" \
-    "BACKUP_SAVE_INTERVAL 10" control
+  replace_line_with_first_occurence_in_file \
+    "BACKUP_SAVE_INTERVAL" \
+    "BACKUP_SAVE_INTERVAL 10" \
+    control
 
   for i in {1..3}
   do
@@ -754,20 +755,22 @@ function process_save_exit_now_test {
 
     # comment line with LOAD_BACKUP_NAME
     n1=$(printf "%06d" 1)
-    replace_line_with_first_occurence_in_file "LOAD_BACKUP_NAME" \
-      "#LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" control
+    replace_line_with_first_occurence_in_file \
+      "LOAD_BACKUP_NAME" \
+      "#LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" \
+      control
 
     if [ "$i" = 1 ]; then
-      clean_compile $PROC_DIR $1 no
+      clean_compile $PROC_DIR no
     fi
     if [ "$i" = 2 ]; then
-      clean_compile $PROC_DIR $1 yes
+      clean_compile $PROC_DIR yes
     fi
     if [ "$i" = 3 ]; then
-      clean_compile $PROC_DIR $1 yes
+      clean_compile $PROC_DIR yes
     fi
 
-    cd $TEST_DIR/$2
+    cd $TEST_DIR/$1
 
     echo "#   Forcing to save: save_now"
     touch save_now
@@ -796,8 +799,10 @@ function process_save_exit_now_test {
       touch exit_now
 
       # uncomment line with LOAD_BACKUP_NAME
-      replace_line_with_first_occurence_in_file "LOAD_BACKUP_NAME" \
-        "LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" control
+      replace_line_with_first_occurence_in_file \
+        "LOAD_BACKUP_NAME" \
+        "LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" \
+        control
 
       # start from ts=1
       n_start="$(echo "$(wc -l $FULL_LOG | cut -d" " -f1) + 1" | bc -l)"
@@ -840,30 +845,25 @@ function process_save_exit_now_tests {
   echo "#----------------------------------------------------------------------"
 
   for CASE_DIR in ${ALL_SAVE_EXIT_NOW_TESTS[@]}; do
-    process_save_exit_now_test no $CASE_DIR
+    process_save_exit_now_test \
+      $CASE_DIR
   done
-
-  if [ "$CGNS" = "yes" ]; then
-    for CASE_DIR in ${ALL_SAVE_EXIT_NOW_TESTS[@]}; do
-      process_save_exit_now_test yes $CASE_DIR
-    done
-  fi
 }
 
 #------------------------------------------------------------------------------#
-# launch execute script and convert results to .png format
+# Launch matplotlib script which plots and prints results in .png format
 #------------------------------------------------------------------------------#
-function launch_gnuplot {
-  # $1 = dir with gnuplot script
-  # $2 = gnuplot script name
-  # $3 = input file
-  # $4 = output file
+function launch_matplotlib {
+  # $1 = dir with matplotlib script
+  # $2 = matplotlib script name
+  # $3 = input file  [or "" if none]
+  # $4 = output file [or "" if none]
 
   if [ -z "${1+xxx}" ]; then 
-    echo "directory with gnuplot script is not set at all"
+    echo "directory with matplotlib script is not set at all"
     exit 1
   elif [ -z "${2+xxx}" ]; then 
-    echo "gnuplot script name is not set at all"
+    echo "matplotlib script name is not set at all"
     exit 1
   elif [ -z "${3+xxx}" ]; then 
     echo "input file name is not set at all"
@@ -879,13 +879,10 @@ function launch_gnuplot {
     return
   fi
   sed "s%DAT_FILE_WITH_RESULTS_MACRO%$3%" "$2" > ./tmp
-  sed -i "s%TEX_FILE_WITH_PLOT_MACRO%$4%" ./tmp
-  gnuplot ./tmp >> $FULL_LOG 2>&1
-  latex "$4".tex >> $FULL_LOG 2>&1
-  dvips -o "$4".ps "$4".dvi >> $FULL_LOG 2>&1
-  ps2pdf "$4".ps "$4".pdf >> $FULL_LOG 2>&1
-  convert -density 300 "$4".pdf -quality 100 -flatten "$4".png >> $FULL_LOG 2>&1
-  echo "new graph was created:" "$1"/"$4".png
+  sed -i "s%PNG_FILE_WITH_RESULTS_MACRO%$4%"     ./tmp
+  # Launch script:
+  $(sed -e '/#/d' ./tmp) >> $FULL_LOG 2>&1
+  echo "new figure was created:" "$1"/"$4".png
   time_in_seconds
 }
 #------------------------------------------------------------------------------#
@@ -910,11 +907,7 @@ function process_compilation_test {
   # rel_dir to User_Mod/ from Process/
   rel_dir=$(realpath --relative-to="$PROC_DIR" "$TEST_DIR/$1")
 
-  if [ "$CGNS" = "yes" ]; then
-    clean_compile $PROC_DIR yes yes $rel_dir # dir CGNS MPI DIR_CASE
-  else
-    clean_compile $PROC_DIR no yes $rel_dir # dir CGNS MPI DIR_CASE
-  fi
+  clean_compile $PROC_DIR yes $rel_dir # dir MPI DIR_CASE
 }
 
 #------------------------------------------------------------------------------#
@@ -962,19 +955,17 @@ function process_full_length_test {
   # rel_dir to User_Mod/ from Process/
   rel_dir=$(realpath --relative-to="$PROC_DIR" "$1")
 
-  if [ "$CGNS" = "yes" ]; then
-    clean_compile $PROC_DIR yes yes $rel_dir # dir CGNS MPI DIR_CASE
-  else
-    clean_compile $PROC_DIR no yes $rel_dir # dir CGNS MPI DIR_CASE
-  fi
+  clean_compile $PROC_DIR yes $rel_dir # dir MPI DIR_CASE
 
   cd "$1"
 
   n1=$(printf "%06d" 1)
 
   # comment line with LOAD_BACKUP_NAME
-  replace_line_with_first_occurence_in_file "LOAD_BACKUP_NAME" \
-    "#LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" control
+  replace_line_with_first_occurence_in_file \
+    "LOAD_BACKUP_NAME" \
+    "#LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" \
+    control
 
 #  # change number of timesteps to 2000
 #  replace_line_with_first_occurence_in_file "NUMBER_OF_TIME_STEPS" \
@@ -985,8 +976,10 @@ function process_full_length_test {
 #    "BACKUP_SAVE_INTERVAL 1000" control
 
   # change model to $2
-  replace_line_with_first_occurence_in_file "TURBULENCE_MODEL" \
-    "TURBULENCE_MODEL "$2"" control
+  replace_line_with_first_occurence_in_file \
+    "TURBULENCE_MODEL" \
+    "TURBULENCE_MODEL "$2"" \
+    control
 
   launch_process par $nproc_in_div
 
@@ -997,11 +990,14 @@ function process_full_length_test {
       $(ls -tr1 "$name_in_div"-res-plus-ts??????.dat | tail -n1))
 
     echo "results are:"
-    echo "$(head -n9 $(ls -tr1 "$name_in_div"-res-plus-ts??????.dat | \
+    echo "$(head -n8 $(ls -tr1 "$name_in_div"-res-plus-ts??????.dat | \
       tail -n1))"
 
-    launch_gnuplot "$3" gnuplot_script_template.sh \
-      "$last_results_plus_dat_file" "result_plus_"$2""
+    launch_matplotlib \
+      "$3" \
+      readme_python_matplotlib_script \
+      "$last_results_plus_dat_file" \
+      "result_plus_"$2""
   else
       echo "Warning: file "$name_in_div"-res-plus-ts??????.dat does not exist"
   fi
@@ -1013,7 +1009,7 @@ function process_full_length_tests {
   # $1 = dir with test
   # $2 = model
   # $3 = dir with results
-  # it requires a new file in Xmgrace/ dir called gnuplot_script_template.sh
+  # it requires a template file readme_python_matplotlib_script.sh in Results/
 
   echo ""
   echo "#======================================================================"
@@ -1039,14 +1035,8 @@ function process_full_length_tests {
     process_full_length_test \
       "$TEST_DIR/$CASE_DIR" \
       "$CASE_TUR" \
-      "$TEST_DIR/$CASE_DIR/Xmgrace"
+      "$TEST_DIR/$CASE_DIR/Results"
   done
-
-#  # Issue: pipe does not pass process_backup_tests
-#  process_full_length_test \
-#    "$TEST_DIR/$LES_PIPE_DIR" \
-#    "les_dynamic" \
-#    "$TEST_DIR/$LES_PIPE_DIR/Xmgrace"
 }
 
 #------------------------------------------------------------------------------#
@@ -1071,8 +1061,10 @@ function process_accuracy_test {
     cd $path
 
     # change Ny in chan.dom
-    replace_line_with_first_occurence_in_file "1  65  65" \
-      "  1  65  65  "$Ny" # Nx Nz Ny" chan.dom
+    replace_line_with_first_occurence_in_file \
+      "1  65  65" \
+      "  1  65  65  "$Ny" # Nx Nz Ny" \
+      chan.dom
     launch_generate "$1" "quiet"
     launch_divide   "$1" "quiet"
 
@@ -1084,25 +1076,20 @@ function process_accuracy_test {
     # rel_dir to User_Mod/ from Process/
     rel_dir=$(realpath --relative-to="$PROC_DIR" "$path")
 
-    if [ "$CGNS" = "yes" ]; then
-      clean_compile $PROC_DIR yes yes $rel_dir # dir CGNS MPI DIR_CASE
-    else
-      clean_compile $PROC_DIR no  yes $rel_dir # dir CGNS MPI DIR_CASE
-    fi
+    clean_compile $PROC_DIR yes $rel_dir # dir MPI DIR_CASE
 
-   cd $path
+    cd $path
 
-   launch_process par $nproc_in_div
+    launch_process par $nproc_in_div
 
     # Process chan-ts??????-res.dat
     if ls "$name_in_div"-res-ts??????.dat 1> /dev/null 2>&1; then
 
       # extract essential data from produced .dat files
-      last_results_dat_file=$(realpath --relative-to="$1" \
-        $(ls -tr1 "$name_in_div"-res-ts??????.dat | tail -n1))
+      last_results_dat_file=$(ls -tr1 "$name_in_div"-res-ts??????.dat | tail -n1)
 
       # Store this file with result
-      nNy=$(printf "%06d" $Ny)
+      nNy=$(printf "%06d" $((Ny-1)))
       cp "$last_results_dat_file" Results/"$nNy".dat
 
     else
@@ -1110,8 +1097,9 @@ function process_accuracy_test {
     fi
   done # for loop
 
-  cd Results/
-  python2 python_matplotlib_script.py
+  launch_matplotlib \
+    "$path"/Results \
+    readme_python_matplotlib_script "" ""
 }
 
 #------------------------------------------------------------------------------#
@@ -1119,7 +1107,7 @@ function process_accuracy_test {
 #------------------------------------------------------------------------------#
 function process_accuracy_tests {
   # $1 = test dir
-  # it requires a new file in Xmgrace/ dir called gnuplot_script_template.sh
+  # it requires a template file readme_python_matplotlib_script.sh in Results/
 
   echo ""
   echo "#======================================================================"

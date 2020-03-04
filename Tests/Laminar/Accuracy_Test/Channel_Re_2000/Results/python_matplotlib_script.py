@@ -127,8 +127,16 @@ atext = offsetbox.AnchoredText(r'$N_y$', \
 atext.patch.set_edgecolor('w')
 ax.add_artist(atext)
 
-# Save
-plt.savefig('results.png', bbox_inches='tight', pad_inches=0)
+#-Input data
+output_name = ""
+if len(sys.argv) >= 2:
+  output_name = sys.argv[1] # str type
+
+# Correct if no input was given
+if output_name == "" or output_name == "PNG_FILE_WITH_RESULTS_MACRO":
+  output_name = 'results'
+
+plt.savefig(output_name + '.png', bbox_inches='tight', pad_inches=0)
 
 # Show
-plt.show()
+#plt.show()
