@@ -64,20 +64,23 @@
     goto 1
   end if
 
-  ! Assume eddies move in x direction
+  ! Place eddies with a certain shift to the inlet plane
   call random_number(tmp)
   if(eddies % x_plane < HUGE) then
-    eddies % eddy(e) % x = eddies % eddy(e) % x             &
-                         - eddies % eddy(e) % length * 2.0  &
-                         + eddies % eddy(e) % length * tmp
+    eddies % eddy(e) % x = eddies % eddy(e) % x                 &
+                         + sign(1.0, eddies % eddy(e) % u)      &
+                         * (- eddies % eddy(e) % length * 2.0   &
+                            + eddies % eddy(e) % length * tmp)
   else if(eddies % y_plane < HUGE) then
-    eddies % eddy(e) % y = eddies % eddy(e) % y             &
-                         - eddies % eddy(e) % length * 2.0  &
-                         + eddies % eddy(e) % length * tmp
+    eddies % eddy(e) % y = eddies % eddy(e) % y                 &
+                         + sign(1.0, eddies % eddy(e) % v)      &
+                         * (- eddies % eddy(e) % length * 2.0   &
+                            + eddies % eddy(e) % length * tmp)
   else if(eddies % z_plane < HUGE) then
-    eddies % eddy(e) % z = eddies % eddy(e) % z             &
-                         - eddies % eddy(e) % length * 2.0  &
-                         + eddies % eddy(e) % length * tmp
+    eddies % eddy(e) % z = eddies % eddy(e) % z                 &
+                         + sign(1.0, eddies % eddy(e) % w)      &
+                         * (- eddies % eddy(e) % length * 2.0   &
+                            + eddies % eddy(e) % length * tmp)
   end if
 
   end subroutine
