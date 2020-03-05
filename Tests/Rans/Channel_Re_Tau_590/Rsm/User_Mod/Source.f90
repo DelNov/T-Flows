@@ -40,10 +40,10 @@
   !  Set source for temperature   !
   !-------------------------------!
   if( phi % name .eq. 'T' ) then
-    ! 2.0 here is actually 2.0 [m], then b(c) has dim. [W]
     do c = 1, grid % n_cells
-      b(c) = b(c) - 2.0 * flow % heat_flux * flow % density(c) * u % n(c)   &
-                                           / bulk % flux_x * grid % vol(c)
+      b(c) = b(c) - u % n(c) / bulk % u          &
+                  * flow % heat / bulk % area_x  &
+                  * grid % vol(c)
     end do
   end if
 
