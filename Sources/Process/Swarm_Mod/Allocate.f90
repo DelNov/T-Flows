@@ -62,8 +62,8 @@
     ! Assume particle is in the domain
     ! (A smarter way could be worked out, depending ...
     ! ... on the result of the call to Find_Nearest_Cell)
-    swarm % particle(k) % deposited = 0
-    swarm % particle(k) % escaped   = 0
+    swarm % particle(k) % deposited = .false.
+    swarm % particle(k) % escaped   = .false.
 
     ! Is particle in this processor?
     swarm % particle(k) % proc = 0

@@ -12,8 +12,8 @@
   type(Grid_Type),     pointer :: grid
   type(Field_Type),    pointer :: flow
   type(Particle_Type), pointer :: part
-  integer,             pointer :: escaped
-  integer,             pointer :: deposited
+  logical,             pointer :: escaped
+  logical,             pointer :: deposited
   integer                      :: ss         ! sub-step counter
   integer                      :: n_parts_in_buffers
 !==============================================================================!
@@ -41,10 +41,10 @@
       escaped   => part  % escaped
       deposited => part  % deposited
 
-      !--------------------------------------------------!
-      !   If particle is neither deposited nor escaped   !
-      !--------------------------------------------------!
-      if( deposited .ne. 1 .and. escaped .ne. 1) then
+      !-------------------------------------------------!
+      !   If particle is neither deposited nor escped   !
+      !-------------------------------------------------!
+      if(.not. deposited .and. .not. escaped) then
 
         ! If particle is in this processor, carry on with it
         if(part % proc .eq. this_proc) then

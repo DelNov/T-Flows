@@ -26,7 +26,7 @@
   call Backup_Mod_Read_Int(fh, disp, vc, 'n_particles', n_part)
 
   i_work(:) = 0
-  l_work(:) = 0
+  l_work(:) = .false.
   r_work(:) = 0.0
 
   if(n_part > 0) then
@@ -34,7 +34,7 @@
     call Backup_Mod_Read_Int_Array(fh, disp, vc,         &
                                    'particle_int_data',  &
                                    i_work(1:N_I_VARS*swr % n_particles))
-    call Backup_Mod_Read_Int_Array(fh, disp, vc,         &
+    call Backup_Mod_Read_Log_Array(fh, disp, vc,         &
                                    'particle_log_data',  &
                                    l_work(1:N_L_VARS*swr % n_particles))
     call Backup_Mod_Read_Real_Array(fh, disp, vc,          &
