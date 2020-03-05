@@ -1158,13 +1158,13 @@ while [ 0 -eq 0 ]; do
   echo "  5. Processor backup tests"
   echo "  6. Processor save_now/exit_now tests"
   echo "  7. Processor full lenght tests"
-  echo "  8. Perform all tests"
-  echo "  9. Clean all test directories"
-  echo " 10. Process accuracy test"
+  echo "  8. Process accuracy test"
+  echo "  9. Perform all tests"
+  echo " 10. Clean all test directories"
   echo ""
 
   read -p "  Enter the desired type of test: " option
-  if [ $option -eq 0 ]; then exit 1;                       fi
+  if [ $option -eq 0 ]; then exit 1; fi
   if [ $option -eq 1 ]; then
     generate_tests
   fi
@@ -1177,25 +1177,28 @@ while [ 0 -eq 0 ]; do
     divide_tests
   fi
   if [ $option -eq 4 ]; then process_compilation_tests;    fi
-  if [ $option -eq 5 ]; then 
+  if [ $option -eq 5 ]; then
     if [ $DONE_GENERATE_TESTS -eq 0 ]; then generate_tests; fi
     if [ $DONE_CONVERT_TESTS  -eq 0 ]; then convert_tests;  fi
     if [ $DONE_DIVIDE_TESTS   -eq 0 ]; then divide_tests;   fi
-    process_backup_tests;
+    process_backup_tests
   fi
   if [ $option -eq 6 ]; then
     if [ $DONE_GENERATE_TESTS -eq 0 ]; then generate_tests; fi
     if [ $DONE_CONVERT_TESTS  -eq 0 ]; then convert_tests;  fi
     if [ $DONE_DIVIDE_TESTS   -eq 0 ]; then divide_tests;   fi
-    process_save_exit_now_tests;
+    process_save_exit_now_tests
   fi
   if [ $option -eq 7 ]; then
     if [ $DONE_GENERATE_TESTS -eq 0 ]; then generate_tests; fi
     if [ $DONE_CONVERT_TESTS  -eq 0 ]; then convert_tests;  fi
     if [ $DONE_DIVIDE_TESTS   -eq 0 ]; then divide_tests;   fi
-    process_full_length_tests;
+    process_full_length_tests
   fi
   if [ $option -eq 8 ]; then
+    process_accuracy_tests
+  fi
+  if [ $option -eq 9 ]; then
     generate_tests
     convert_tests
     divide_tests
@@ -1203,11 +1206,9 @@ while [ 0 -eq 0 ]; do
     process_backup_tests
     process_save_exit_now_tests
     process_full_length_tests
-  fi
-  if [ $option -eq 10 ]; then
     process_accuracy_tests
   fi
-  if [ $option -eq 9 ]; then
+  if [ $option -eq 10 ]; then
     git clean -dfx $TEST_DIR/..
   fi
 done
