@@ -161,12 +161,12 @@ ALL_PROCESS_ACCURACY_TESTS=("$LAMINAR_CHANNEL")
 DONE_PROCESS_ACCURACY_TESTS=0
 
 # Folder structure
-TEST_DIR=$PWD                      # dir with tests
+TEST_DIR=$PWD                      # Dir with tests
 GENE_DIR=$PWD/../Sources/Generate  # Generate src folder
 CONV_DIR=$PWD/../Sources/Convert   # Convert  src folder
 DIVI_DIR=$PWD/../Sources/Divide    # Divide   src folder
 PROC_DIR=$PWD/../Sources/Process   # Process  src folder
-BINA_DIR=$PWD/../Binaries/         # binaries folder
+BINA_DIR=$PWD/../Binaries          # Binaries folder
 
 # Executables
 GENE_EXE=$BINA_DIR/Generate        # Generate executable
@@ -1069,7 +1069,15 @@ function process_accuracy_test {
       "1  65  33" \
       "  1  65  33  "$Ny" # Nx Nz Ny" \
       chan.dom
+
+    if [ ! -f $GENE_EXE ]; then
+      clean_compile $GENE_DIR no # dir MPI
+    fi
     launch_generate "$1" "quiet"
+
+    if [ ! -f $DIVI_EXE ]; then
+      clean_compile $DIVI_DIR no # dir MPI
+    fi
     launch_divide   "$1" "quiet"
 
     name_in_div=$(head  -n1 divide.scr)
