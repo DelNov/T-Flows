@@ -109,6 +109,15 @@ ax.loglog(x_data, z_data, \
   linestyle='solid', color='b', marker='s', \
   markerfacecolor='none')
 
+# Set axes
+ax.axis([7, 150, 1e-5, 1e-1])
+
+# Ticks and labels
+x_ticks = np.logspace(1, 3, 2, endpoint=False)
+y_ticks = np.logspace(-5, -1, 5, endpoint=True)
+ax.xaxis.set_ticks(x_ticks)
+ax.yaxis.set_ticks(y_ticks)
+
 # Legend
 leg1 = lines.Line2D([], [], color='r', linestyle='dashed', \
                     label=r'1st order')
