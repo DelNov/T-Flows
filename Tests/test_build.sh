@@ -1066,8 +1066,8 @@ function process_accuracy_test {
 
     # change Ny in chan.dom
     replace_line_with_first_occurence_in_file \
-      "1  65  65" \
-      "  1  65  65  "$Ny" # Nx Nz Ny" \
+      "1  65  33" \
+      "  1  65  33  "$Ny" # Nx Nz Ny" \
       chan.dom
     launch_generate "$1" "quiet"
     launch_divide   "$1" "quiet"
