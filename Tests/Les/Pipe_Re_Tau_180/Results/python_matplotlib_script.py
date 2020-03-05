@@ -50,44 +50,44 @@ plt.rcParams['lines.markersize'] = 15
 plt.rcParams["legend.numpoints"] = 2
 
 #-Reference data
-U_plus_ref_data   = 'u_plus_re_tau_590.dat'
-k_plus_ref_data   = 'k_plus_re_tau_590.dat'
-eps_plus_ref_data = 'eps_plus_re_tau_590.dat'
-uv_plus_ref_data  = 'uv_plus_re_tau_590.dat'
+W_plus_ref_data  = 'W_plus_re_tau_180.dat'
+uu_plus_ref_data = 'uu_plus_re_tau_180.dat'
+uv_plus_ref_data = 'uv_plus_re_tau_180.dat'
+uw_plus_ref_data = 'uw_plus_re_tau_180.dat'
 
-y1, u1   = np.loadtxt(U_plus_ref_data,   unpack=True)
-y2, k1   = np.loadtxt(k_plus_ref_data,   unpack=True)
-y3, eps1 = np.loadtxt(eps_plus_ref_data, unpack=True)
-y4, uv1  = np.loadtxt(uv_plus_ref_data,  unpack=True)
+y1, u1  = np.loadtxt(W_plus_ref_data,  unpack=True)
+y2, uu1 = np.loadtxt(uu_plus_ref_data, unpack=True)
+y3, uv1 = np.loadtxt(uv_plus_ref_data, unpack=True)
+y4, uw1 = np.loadtxt(uw_plus_ref_data, unpack=True)
 
 #-Input data
 input_name  = sys.argv[1] # str type
 output_name = sys.argv[2] # str type
-y5_c   = int(sys.argv[3]) - 1
-u2_c   = int(sys.argv[4]) - 1
-k2_c   = int(sys.argv[5]) - 1
-eps2_c = int(sys.argv[6]) - 1
-uv2_c  = int(sys.argv[7]) - 1
-y5, u2, k2, eps2, uv2 = np.loadtxt(input_name, \
-  usecols=(y5_c,u2_c,k2_c,eps2_c,uv2_c), unpack=True)
+y5_c  = int(sys.argv[3]) - 1
+u2_c  = int(sys.argv[4]) - 1
+uu2_c = int(sys.argv[5]) - 1
+uv2_c = int(sys.argv[6]) - 1
+uw2_c = int(sys.argv[7]) - 1
+y5, u2, uu2, uv2, uw2 = np.loadtxt(input_name, \
+  usecols=(y5_c,u2_c,uu2_c,uv2_c,uw2_c), unpack=True)
 
 # Assemble all data in one array ([x1, y1, x2, y2])
-data = np.array([[y1, u1,   y5, u2  ], \
-                 [y2, k1,   y5, k2  ], \
-                 [y3, eps1, y5, eps2], \
-                 [y4, uv1,  y5, uv2 ]] )
+data = np.array([[y1, u1,   y5, u2 ], \
+                 [y2, uu1,  y5, uu2], \
+                 [y3, uv1,  y5, uv2], \
+                 [y4, uw1,  y5, uw2]] )
 
 # Limits for each plot ([x_min, x_max, x_label_dx, y_min, y_max, y_label_dy])
-axis = np.array([[0., 300., 100., 0., 30., 10.], \
-                 [0., 300., 100., 0., 6. ,  2.], \
-                 [0., 300., 100., 0., 0.3, 0.1], \
-                 [0., 300., 100., 0., 1. , 0.5]] )
+axis = np.array([[0., 200., 50., 0., 25., 10.], \
+                 [0., 200., 50., 0., 8.,  2. ], \
+                 [0., 200., 50., 0., 8.,  2. ], \
+                 [0., 200., 50., 0., 8.,  2. ]] )
 
 # Labels for each plot ([xlabel, ylabel])
-label = np.array([[r'$y^+$', r'$U^+$'          ], \
-                  [r'$y^+$', r'$k^+$'          ], \
-                  [r'$y^+$', r'$\varepsilon^+$'], \
-                  [r'$y^+$', r'$uv^+$'         ]] )
+label = np.array([[r'$r^+$', r'$W^+$'  ], \
+                  [r'$r^+$', r'$uu^+$' ], \
+                  [r'$r^+$', r'$uv^+$' ], \
+                  [r'$r^+$', r'$uw^+$' ]] )
 
 # Layout
 fig, ax = plt.subplots(2, 2)
@@ -128,7 +128,7 @@ for i in range(2):
 
 # Legend
 leg1 = lines.Line2D([], [], color='b', marker='.',
-                    ms=10, label=r'DNS $Re_\tau=590$')
+                    ms=10, label=r'DNS $Re_\tau=180$')
 leg2 = lines.Line2D([], [], color='r', marker='.',
                     ms=10, label=r'Present')
 lines  = [leg1, leg2]

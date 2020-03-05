@@ -1,8 +1,9 @@
 #!/bin/python2
 # this python template is used to plot data from ??????.dat files
 # produced by test_build.sh(Process accuracy test)
-# it is executed in ./Results directory
-# Launch as python2 python_matplotlib_script.py
+# it is executed automatically by test_build.sh script
+#
+# You can also launch it manually according to readme_python_matplotlib_script
 
 # Header
 import numpy                as np

@@ -1,3 +1,1 @@
-# launch python_matplotlib_script.py as:
-python2 python_matplotlib_script.py DAT_FILE_WITH_RESULTS_MACRO PNG_FILE_WITH_RESULTS_MACRO 1 2 3 4
-# All arguments are mandatory
+../../Uniform_Mesh/Results/readme_python_matplotlib_script

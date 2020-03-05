@@ -220,24 +220,24 @@ function clean_compile {
   make clean >> $FULL_LOG 2>&1
 
   if [ -z "${3+xxx}" ]; then
-    echo "make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS=$CGNS MPI=$2"
-              make \
-                FORTRAN=$FCOMP \
-                DEBUG=$DEBUG \
-                CGNS=$CGNS \
-                CGNS_MPI=$CGNS_MPI \
-                MPI=$2 >> $FULL_LOG 2>&1
-              success=$?
+    echo "make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS=$CGNS CGNS_MPI=$CGNS_MPI MPI=$2"
+    make \
+      FORTRAN=$FCOMP \
+      DEBUG=$DEBUG \
+      CGNS=$CGNS \
+      CGNS_MPI=$CGNS_MPI \
+      MPI=$2 >> $FULL_LOG 2>&1
+    success=$?
   else
-    echo "make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS=$CGNS MPI=$2 DIR_CASE=$3"
-              make \
-                FORTRAN=$FCOMP \
-                DEBUG=$DEBUG \
-                CGNS=$CGNS \
-                CGNS_MPI=$CGNS_MPI \
-                MPI=$2 \
-                DIR_CASE=$3 >> $FULL_LOG 2>&1
-              success=$?
+    echo "make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS=$CGNS CGNS_MPI=$CGNS_MPI MPI=$2 DIR_CASE=$3"
+    make \
+      FORTRAN=$FCOMP \
+      DEBUG=$DEBUG \
+      CGNS=$CGNS \
+      CGNS_MPI=$CGNS_MPI \
+      MPI=$2 \
+      DIR_CASE=$3 >> $FULL_LOG 2>&1
+    success=$?
   fi
 
   time_in_seconds

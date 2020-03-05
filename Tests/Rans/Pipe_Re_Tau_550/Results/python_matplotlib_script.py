@@ -1,9 +1,9 @@
 #!/bin/python2
 # this python template is used to plot data from .dat file produced by
 # Save_Results.f90
-# it is executed in ./Xmgrace directory
-# As argument you should supply a valid ../file.dat and 5 columns to read
-# Launch as python2 python_matplotlib_script.py ../file.dat 1 2 3 4 5
+# it is executed automatically by test_build.sh script
+#
+# You can also launch it manually according to readme_python_matplotlib_script
 
 # Header
 import numpy              as np
