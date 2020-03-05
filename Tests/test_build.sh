@@ -404,17 +404,14 @@ function unpack_neu_mesh {
     return
   elif [ -f "$fname"."tar.gz" ]; then
     tar -zxvf "$fname"."tar.gz"
-    git checkout "$fname"."tar.gz"
   elif [ -f "$fname"."tgz" ]; then
     tar -zxvf "$fname"."tgz"
-    git checkout "$fname"."tgz"
   elif [ -f "$fname"."neu.tgz" ]; then
     tar -zxvf "$fname"."neu.tgz"
-    git checkout "$fname"."neu.tgz"
   elif [ -f "$fname"."gz" ]; then
-    gunzip -dv "$fname"."gz"
+    gunzip -c "$fname"."gz" > "$fname"
   elif [ -f "$fname"."neu.gz" ]; then
-    gunzip -dv "$fname"."neu.gz"
+    gunzip -c "$fname"."neu.gz" > "$fname"."neu"
   else
     echo "could not extract" "$fname"."$ext"
     exit 1
@@ -616,7 +613,8 @@ function process_backup_test {
   launch_process par 1
   #----------------------------------------#
 
-  cp $1/control.backup $1/control
+  # Restore control
+  git checkout control
 }
 
 #------------------------------------------------------------------------------#
@@ -830,6 +828,9 @@ function process_save_exit_now_test {
     fi
 
   done
+
+  # Restore control
+  git checkout "$TEST_DIR/$1"/control
 }
 
 #------------------------------------------------------------------------------#
@@ -983,6 +984,9 @@ function process_full_length_test {
 
   launch_process par $nproc_in_div
 
+  # Restore control
+  git checkout control
+
   if ls "$name_in_div"-res-plus-ts??????.dat 1> /dev/null 2>&1; then # case-ts??????-res-plus.dat
 
     # extract essential data from produced .dat files
@@ -1081,6 +1085,9 @@ function process_accuracy_test {
     cd $path
 
     launch_process par $nproc_in_div
+
+    # Restore control
+    git checkout control
 
     # Process chan-ts??????-res.dat
     if ls "$name_in_div"-res-ts??????.dat 1> /dev/null 2>&1; then
@@ -1201,7 +1208,7 @@ while [ 0 -eq 0 ]; do
     process_accuracy_tests
   fi
   if [ $option -eq 9 ]; then
-    git clean -dfx ./
+    git clean -dfx $TEST_DIR/..
   fi
 done
 
