@@ -104,7 +104,7 @@
 
   call File_Mod_Open_File_For_Writing(res_name, fu)
 
-  write(fu,'(a,1es17.7e3)') '# U_bulk:' ub
+  write(fu,'(a,1es17.7e3)') '# U_bulk:', ub
 
   do i = 1, n
     if(n_count(i) .ne. 0) then
