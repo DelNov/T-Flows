@@ -883,7 +883,11 @@ function launch_matplotlib {
   sed -i "s%PNG_FILE_WITH_RESULTS_MACRO%$4%"     ./tmp
   # Launch script:
   $(sed -e '/#/d' ./tmp) >> $FULL_LOG 2>&1
-  echo "new figure was created:" "$1"/"$4".png
+  if [ "$4" == "" ]; then
+    echo "new figure was created:" "$1"/results.png
+  else
+    echo "new figure was created:" "$1"/"$4".png
+  fi
   time_in_seconds
 }
 #------------------------------------------------------------------------------#
