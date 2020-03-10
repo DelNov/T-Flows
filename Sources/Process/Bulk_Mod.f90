@@ -27,7 +27,7 @@
     real :: flux_y  ! [kg/s]
     real :: flux_z  ! [kg/s]
 
-    ! Desired bulk mass flux in x-, y-, z- direction
+    ! Desired bulk mass flux in x-, y-, z- direction (set in control file)
     real :: flux_x_o  ! [kg/s]
     real :: flux_y_o  ! [kg/s]
     real :: flux_z_o  ! [kg/s]
