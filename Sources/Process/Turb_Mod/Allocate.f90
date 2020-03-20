@@ -552,6 +552,43 @@
 
   end if ! LES_DYNAMIC
 
+  !---------------------------------!
+  !   Direct numerical simulation   !
+  !---------------------------------!
+  if(turbulence_model .eq. DNS .or.  &
+     turbulence_model .eq. NONE) then
+
+    if(turbulence_statistics) then
+
+      ! Time-averaged velocities (and temperature)
+      allocate(turb % u_mean(-nb:nc));  turb % u_mean = 0.
+      allocate(turb % v_mean(-nb:nc));  turb % v_mean = 0.
+      allocate(turb % w_mean(-nb:nc));  turb % w_mean = 0.
+      allocate(turb % p_mean(-nb:nc));  turb % p_mean = 0.
+      if(heat_transfer) then
+        allocate(turb % t_mean(-nb:nc));  turb % t_mean = 0.
+      end if
+
+      ! Resolved Reynolds stresses
+      allocate(turb % uu_res(-nb:nc));  turb % uu_res = 0.
+      allocate(turb % vv_res(-nb:nc));  turb % vv_res = 0.
+      allocate(turb % ww_res(-nb:nc));  turb % ww_res = 0.
+      allocate(turb % uv_res(-nb:nc));  turb % uv_res = 0.
+      allocate(turb % vw_res(-nb:nc));  turb % vw_res = 0.
+      allocate(turb % uw_res(-nb:nc));  turb % uw_res = 0.
+
+      ! Resolved turbulent heat fluxes
+      if(heat_transfer) then
+        allocate(turb % t2_res(-nb:nc));  turb % t2_res = 0.
+        allocate(turb % ut_res(-nb:nc));  turb % ut_res = 0.
+        allocate(turb % vt_res(-nb:nc));  turb % vt_res = 0.
+        allocate(turb % wt_res(-nb:nc));  turb % wt_res = 0.
+      end if ! heat_transfer
+
+    end if ! turbulence_statistics
+
+  end if ! DNS
+
   !-------------------!
   !   Hybrid model    !
   !-------------------!

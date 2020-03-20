@@ -34,8 +34,8 @@
 
   ! Allocate memory =--> carefull, there is no checking!
   call Grid_Mod_Allocate_Nodes(grid, grid % n_nodes)
-  call Grid_Mod_Allocate_Cells(grid, grid % n_cells, grid % n_bnd_cells) 
-  call Grid_Mod_Allocate_Faces(grid, grid % n_faces) 
+  call Grid_Mod_Allocate_Cells(grid, grid % n_cells, grid % n_bnd_cells)
+  call Grid_Mod_Allocate_Faces(grid, grid % n_faces)
 
   ! Boundary conditions' keys
   allocate(grid % bnd_cond % name(grid % n_bnd_cond))
