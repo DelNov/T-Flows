@@ -102,6 +102,7 @@
     ! Wall viscosity and conductivity (wall function approach)
     real, allocatable :: vis_w(:) ! [kg/(m s)]
     real, allocatable :: con_w(:) ! [W/(m K)]
+    real, allocatable :: diff_w(:)! [m^2/s]
 
     ! Scale-resolving simulations
     real, allocatable :: c_dyn(:)
