@@ -98,6 +98,7 @@
   include 'Field_Mod/Grad_Pressure_Correction.f90'
   include 'Field_Mod/Grad_Variable.f90'
   include 'Field_Mod/Prandtl_Number.f90'
+  include 'Field_Mod/Schmidt_Number.f90'
   include 'Field_Mod/U_Tan.f90'
 
   end module
