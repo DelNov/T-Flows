@@ -418,7 +418,8 @@
                                        f8, f9)
   end if
   kin_vis_t(:) = 0.0
-  if(turbulence_model .ne. NO_TURBULENCE) then
+  if(turbulence_model .ne. NO_TURBULENCE .and.  &
+     turbulence_model .ne. DNS) then
     kin_vis_t   (-grid % n_bnd_cells:grid % n_cells) =  &
     turb % vis_t(-grid % n_bnd_cells:grid % n_cells) /  &
        flow % viscosity(-grid % n_bnd_cells:grid % n_cells)
@@ -546,7 +547,8 @@
   end if
 
   ! Save y+ for all turbulence models
-  if(turbulence_model .ne. NO_TURBULENCE) then
+  if(turbulence_model .ne. NO_TURBULENCE .and.  &
+     turbulence_model .ne. DNS) then
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityYplus",            &
                                        plot_inside,                         &
                                        turb % y_plus(-grid % n_bnd_cells),  &
