@@ -141,7 +141,6 @@
               * (flow % viscosity(c1)/flow % density(c1)) &
               / (  turb % y_plus(c1) * sc * exp(-1.0 * ebf)     &   
               + (u_plus + beta) * sc_t * exp(-1.0 / ebf) + TINY)
-          turb % diff_w(c1) =  flow % diffusivity
         end if
 
       end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2).eq.WALL or WALLFL
