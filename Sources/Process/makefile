@@ -38,7 +38,7 @@ PROGRAM_NAME = Process
 PROGRAM_FILE = $(DIR_BINARY)/$(PROGRAM_NAME)
 
 $(info #=======================================================================)
-$(info # Compiling $(PROGRAM_NAME) with $(FC) compiler                         )
+$(info # Compiling $(PROGRAM_NAME) with $(FORTRAN) compiler                         )
 $(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
 $(info #   make <FORTRAN=gnu/intel/portland> <DEBUG=yes/no> <MPI=yes/no>       )
