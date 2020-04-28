@@ -61,6 +61,11 @@
       call Var_Mod_Allocate_New_Only(turb % vw, grid, 'VW')
     end if ! heat_transfer
 
+    !  Wall difussivity for user scalar
+    if(flow % n_scalars > 0) then            
+      allocate(turb % diff_w(-nb:nc));  turb % diff_w = 0.  
+    end if
+
     ! Turbulent statistics; if needed
     if(turbulence_statistics) then
 
@@ -139,6 +144,11 @@
       call Var_Mod_Allocate_New_Only(turb % uw, grid, 'UW')
       call Var_Mod_Allocate_New_Only(turb % vw, grid, 'VW')
     end if ! heat_transfer
+
+    !  Wall difussivity for user scalar
+    if(flow % n_scalars > 0) then            
+      allocate(turb % diff_w(-nb:nc));  turb % diff_w = 0.  
+    end if
 
     if(turbulence_statistics) then
 
@@ -605,6 +615,11 @@
     allocate(turb % p_kin    (-nb:nc));  turb % p_kin     = 0.
     allocate(turb % y_plus   (-nb:nc));  turb % y_plus    = 0.
 
+    ! Hydraulic roughness given by formula
+    if(turb % rough_walls) then
+      allocate(turb % z_o_f(-nb:nc));  turb % z_o_f = -1.0
+    end if
+
     if(heat_transfer) then
       call Var_Mod_Allocate_Solution(turb % t2, grid, 'T2', '')
       call Var_Mod_Allocate_New_Only(turb % ut, grid, 'UT')
@@ -621,6 +636,12 @@
       call Var_Mod_Allocate_New_Only(turb % uw, grid, 'UW')
       call Var_Mod_Allocate_New_Only(turb % vw, grid, 'VW')
     end if ! heat_transfer
+
+    !  Wall difussivity for user scalar
+    if(flow % n_scalars > 0) then            
+      allocate(turb % diff_w(-nb:nc));  turb % diff_w = 0.  
+    end if
+
 
     if(turbulence_statistics) then
 
