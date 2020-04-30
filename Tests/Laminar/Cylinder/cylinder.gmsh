@@ -12,7 +12,7 @@
 //------------------------------------------------------------------------------
 
 n_box_layers =   5;                // number of mesh layers in height
-n_bnd_layers =  11;                // number of node layers in boundary layer
+n_bnd_layers =  31;                // number of node layers in boundary layer
 sky_high     =   2.0;              // height of the domain
 
 // Coordinates of the problem domain (the whole piece of simulated land)
@@ -34,9 +34,9 @@ wake_y_max = box_y_max - 20.0;
 
 // Transition between fine and coarse mesh, ...
 // ... between city and the rest of the domain
-delta_min = 0.05;   // resolution in the wake
+delta_min = 0.03;   // resolution in the wake
 delta_max = 0.20;   // resolution in the box
-wake_limit_width = 0.40;
+wake_limit_width = 0.5;
 
 //------------------------------------------------------------------------------
 //
@@ -138,6 +138,8 @@ Printf("Defined ground surface %g", BOX_SURF);
 //----------------------------
 // First the spacing function
 //----------------------------
+
+// Option 1: with MathEval
 Field[1] = MathEval;
 Field[1].F = Sprintf("  (%5.2g)
                       + (%5.2g) * (1.0-(0.5*(  tanh((x-(%5.2g))/(%5.2g))
@@ -150,7 +152,16 @@ Field[1].F = Sprintf("  (%5.2g)
   wake_x_max, wake_limit_width,
   wake_y_min, wake_limit_width,
   wake_y_max, wake_limit_width);
-Background Field = 1;
+
+// Option 2: with Cylinder
+Field[2]         = Cylinder;
+Field[2].VIn     = delta_min;
+Field[2].VOut    = delta_max;
+Field[2].Radius  = cyl_r + wake_limit_width;
+Field[2].XCenter = cyl_x;
+Field[2].YCenter = cyl_y;
+
+Background Field = 2;
 Printf("Spacing function with delta_min - delta_max: %g - %g defined!",
        delta_min, delta_max);
 
