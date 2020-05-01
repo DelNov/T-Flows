@@ -58,6 +58,7 @@
   include 'Comm_Mod/Sequential/Create_New_Types.f90'
   include 'Comm_Mod/Sequential/End.f90'
   include 'Comm_Mod/Sequential/Exchange_Int_Array.f90'
+  include 'Comm_Mod/Sequential/Exchange_Log_Array.f90'
   include 'Comm_Mod/Sequential/Exchange_Real_Array.f90'
   include 'Comm_Mod/Sequential/Global_Lor_Log_Array.f90'
   include 'Comm_Mod/Sequential/Global_Max_Real.f90'

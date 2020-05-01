@@ -99,7 +99,7 @@
       ! Velocity switch
       l_sgs_v  = lf * flow % shear(c)
       l_rans_v = sqrt(kin % n(c) * zeta % n(c))
-      alpha_v  = l_rans_v/l_sgs_v
+      alpha_v  = l_rans_v / (l_sgs_v + TINY)
 
       if( (hybrid_les_rans_switch .eq. SWITCH_DISTANCE)  &
           .and. (alpha_d < 1.05)                         &
