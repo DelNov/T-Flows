@@ -1,6 +1,6 @@
 !==============================================================================!
   subroutine Backup_Mod_Save(fld, swr, tur, mul, &
-                             time_step, time_step_stat)
+                             time, time_step, time_step_stat)
 !------------------------------------------------------------------------------!
 !   Saves backup files name.backup                                             !
 !------------------------------------------------------------------------------!
@@ -10,6 +10,7 @@
   type(Swarm_Type),      target :: swr
   type(Turb_Type),       target :: tur
   type(Multiphase_Type), target :: mul
+  real                          :: time            ! time of simulation
   integer                       :: time_step       ! current time step
   integer                       :: time_step_stat  ! starting step for statist.
 !-----------------------------------[Locals]-----------------------------------!
@@ -61,6 +62,9 @@
 
   ! Time step
   call Backup_Mod_Write_Int(fh, d, vc, 'time_step', time_step)
+
+  ! Simulation time
+  call Backup_Mod_Write_Real(fh, d, vc, 'time', time)
 
   ! Number of processors
   call Backup_Mod_Write_Int(fh, d, vc, 'n_proc', n_proc)

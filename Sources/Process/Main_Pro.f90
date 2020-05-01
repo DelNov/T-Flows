@@ -131,7 +131,7 @@
   first_dt = 0
 
   ! Read backup file if directed so, and set the "backup" to .true. or .false.
-  call Backup_Mod_Load(flow, swarm, turb, mult, first_dt, n_stat, backup) 
+  call Backup_Mod_Load(flow, swarm, turb, mult, time, first_dt, n_stat, backup)
 
   ! Initialize variables
   if(.not. backup) then
@@ -326,7 +326,7 @@
        exit_now           .or.  &
        mod(n, bsi) .eq. 0 .or.  &
        real(sc_cur-sc_ini)/real(sc_cr) > wt_max) then
-      call Backup_Mod_Save(flow, swarm, turb, mult, n, n_stat)
+      call Backup_Mod_Save(flow, swarm, turb, mult, time, n, n_stat)
     end if
 
     ! Is it time to save results for post-processing
@@ -386,7 +386,7 @@
 
   ! Save backup and post-processing files at exit
   call Comm_Mod_Wait
-  call Backup_Mod_Save(flow, swarm, turb, mult, n, n_stat)
+  call Backup_Mod_Save(flow, swarm, turb, mult, time, n, n_stat)
   call Save_Results(flow, turb, mult, swarm, n, .true.)   ! save inside
   call Save_Results(flow, turb, mult, swarm, n, .false.)  ! save bnd
 
