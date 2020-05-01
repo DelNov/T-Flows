@@ -829,4 +829,6 @@
 
   end do  ! faces
 
+  call Grid_Mod_Exchange_Log(grid, grid % cell_near_wall)
+
   end subroutine
