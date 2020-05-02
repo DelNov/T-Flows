@@ -100,6 +100,10 @@
 
     end if ! turbulence_statistics
 
+    if(buoyancy) then
+      allocate(turb % g_buoy(-nb:nc));  turb % g_buoy = 0.
+    end if ! buoyancy
+
   end if ! K_EPS
 
   !------------------!
