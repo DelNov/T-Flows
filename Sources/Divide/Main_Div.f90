@@ -23,7 +23,7 @@
 
   print *, '# Input problem name: (without extension)'
   call File_Mod_Read_Line(5)
-  read(line % tokens(1), *)  problem_name
+  read(line % tokens(1), *)  problem_name(1)
 
   ! Load the finite volume grid
   call Grid_Mod_Load_Cns  (grid, 0)
