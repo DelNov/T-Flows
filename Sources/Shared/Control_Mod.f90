@@ -29,6 +29,7 @@
     include 'Control_Mod/Basic_Functions/Open_Root_File.f90'
     include 'Control_Mod/Basic_Functions/Position_At_One_Key.f90'
     include 'Control_Mod/Basic_Functions/Position_At_Two_Keys.f90'
+    include 'Control_Mod/Basic_Functions/Position_At_Three_Keys.f90'
     include 'Control_Mod/Basic_Functions/Read_Char_Item.f90'
     include 'Control_Mod/Basic_Functions/Read_Char_Item_On.f90'
     include 'Control_Mod/Basic_Functions/Read_Strings_On.f90'
