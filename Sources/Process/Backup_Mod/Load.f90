@@ -385,11 +385,11 @@
   !                 !
   !-----------------!
 
-  do ua = 1, n_user_arrays
+  do ua = 1, grid % n_user_arrays
     a_name = 'A_00'
     write(a_name(3:4),'(I2.2)') ua
     call Backup_Mod_Read_Cell_Bnd(comm, fh, d, vc, a_name,  &
-                                  user_array(ua,-comm % nb_s:comm % nc_s))
+                              grid % user_array(ua,-comm % nb_s:comm % nc_s))
   end do
 
   ! Close backup file
