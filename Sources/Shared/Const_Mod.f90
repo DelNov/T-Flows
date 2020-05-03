@@ -34,4 +34,7 @@
   real, parameter :: TWO_THIRDS = 1.0 - ONE_THIRD
   real, parameter :: ONE_SIXTH  = ONE_THIRD * 0.5
 
+  ! Maximum number of domains
+  integer, parameter :: MD = 4
+
   end module 
