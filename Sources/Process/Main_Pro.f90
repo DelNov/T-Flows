@@ -11,6 +11,7 @@
   use Field_Mod,     only: Field_Type, Field_Mod_Allocate, heat_transfer
   use Turb_Mod
   use Grid_Mod
+  use Interface_Mod
   use Eddies_Mod
   use Bulk_Mod
   use Var_Mod,       only: Var_Type
@@ -42,7 +43,8 @@
   type(Multiphase_Type) :: mult(MD)        ! multiphase modelling
   type(Solver_Type)     :: sol(MD)         ! linear solvers
   type(Turb_Plane_Type) :: turb_planes(MD) ! holder for synthetic turbulences
-  type(Monitor_Type)    :: monitor(MD)
+  type(Monitor_Type)    :: monitor(MD)     ! monitors
+  type(Interface_Type)  :: inter(MD,MD)    ! interfaces between domains
   real                  :: time            ! physical time of the simulation
   integer               :: first_dt        ! first time step in this run
   integer               :: last_dt         ! number of time steps
@@ -56,7 +58,7 @@
   integer               :: sc_ini, sc_cur  ! system clock start and end rate
   real                  :: wt_max
   integer               :: n_dom           ! number of domains
-  integer               :: d = 1           ! domain counter
+  integer               :: d               ! domain counter
 !==============================================================================!
 
   ! Initialize program profler
@@ -66,12 +68,13 @@
   call system_clock(count_rate=sc_cr)  ! get system clock clock rate
   call system_clock(sc_ini)            ! get system clock initial count rate
 
-  ! Initialize variables
+  ! Initialize control file names
   root_control = 'control'             ! root control file name
   do d = 1, MD                         ! domain control file names
     write(dom_control(d), '(a8,i1)') 'control.', d
   end do
 
+  ! Initialize variables
   time      =  0.      ! initialize time to zero
   backup(:) = .false.  ! can turn .true. in Load_Backup
 
@@ -116,11 +119,14 @@
     call Comm_Mod_Wait
   end do
 
+  ! Create interfaces
+  call Control_Mod_Switch_To_Root()
+  call Interface_Mod_Create(inter, grid, n_dom)
+
   ! Allocate memory for working arrays
   call Work_Mod_Allocate(grid, rc=30, rf=1, rn=1, ic=4, if=0, in=1)
 
   ! Get the number of time steps from the control file
-  call Control_Mod_Switch_To_Root()
   call Control_Mod_Number_Of_Time_Steps(last_dt, verbose=.true.)
   call Control_Mod_Starting_Time_Step_For_Statistics(n_stat, verbose=.true.)
 
@@ -200,7 +206,7 @@
     call Bulk_Mod_Print_Areas(flow(d) % bulk)
 
     ! Compute deltas for Spalart-Allmaras models
-    call Turb_Mod_Calculate_Deltas(turb(d))
+!   call Turb_Mod_Calculate_Deltas(turb(d))
 
   end do
 
@@ -285,6 +291,10 @@
     call Control_Mod_Min_Simple_Iterations(min_ini)
 
     do ini = 1, max_ini
+
+      ! Exchange data between domains
+      call Interface_Mod_Exchange(inter, flow, n_dom)
+
       do d = 1, n_dom
 
         call Control_Mod_Switch_To_Domain(d)
