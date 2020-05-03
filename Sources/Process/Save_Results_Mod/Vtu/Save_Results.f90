@@ -292,6 +292,30 @@
   end if
   write(f9,'(a,a)') IN_4, '</DataArray>'
 
+  !-------------------!
+  !   Domain number   !
+  !-------------------!
+  if(present(domain)) then
+    if(n_proc > 1 .and. this_proc .eq. 1)  then
+      write(f8,'(a,a)') IN_3, '<PDataArray type="UInt8" Name="Domain"' //  &
+                            ' format="ascii"/>'
+    end if
+    write(f9,'(a,a)') IN_4, '<DataArray type="UInt8" Name="Domain"' //  &
+                            ' format="ascii">'
+    if(plot_inside) then
+      do c = 1, grid % n_cells - grid % comm % n_buff_cells
+        write(f9,'(a,i9)') IN_5, domain
+      end do
+    else  ! plot only boundary
+      do s = 1, grid % n_faces
+        if( grid % faces_c(2,s) < 0 ) then
+          write(f9,'(a,i9)') IN_5, domain
+        end if
+      end do
+    end if
+    write(f9,'(a,a)') IN_4, '</DataArray>'
+  end if  ! present(domain)
+
   !--------------!
   !   Velocity   !
   !--------------!
