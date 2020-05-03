@@ -1,0 +1,11 @@
+ NUMBER_OF_DOMAINS         2
+
+ NUMBER_OF_TIME_STEPS     360
+ RESULTS_SAVE_INTERVAL     30
+ BACKUP_SAVE_INTERVAL     120
+
+ TIME_STEP               0.1
+
+ INTERFACE_CONDITION      upper_dom    lower_dom
+   BOUNDARY_CONDITIONS    bottom_wall  top_wall
+
