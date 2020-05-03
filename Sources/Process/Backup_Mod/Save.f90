@@ -1,6 +1,7 @@
 !==============================================================================!
-  subroutine Backup_Mod_Save(fld, swr, tur, mul, &
-                             time, time_step, time_step_stat)
+  subroutine Backup_Mod_Save(fld, swr, tur, mul,               &
+                             time, time_step, time_step_stat,  &
+                             domain)
 !------------------------------------------------------------------------------!
 !   Saves backup files name.backup                                             !
 !------------------------------------------------------------------------------!
@@ -13,6 +14,7 @@
   real                          :: time            ! time of simulation
   integer                       :: time_step       ! current time step
   integer                       :: time_step_stat  ! starting step for statist.
+  integer,             optional :: domain
 !-----------------------------------[Locals]-----------------------------------!
   type(Comm_Type), pointer :: comm
   type(Grid_Type), pointer :: grid
@@ -30,7 +32,8 @@
   comm => grid % comm
 
   ! Name backup file
-  call File_Mod_Set_Name(name_out, time_step=time_step, extension='.backup')
+  call File_Mod_Set_Name(name_out, time_step=time_step,  &
+                         extension='.backup', domain=domain)
 
   ! Open backup file
   call Comm_Mod_Open_File_Write(fh, name_out)
@@ -357,11 +360,11 @@
   !                 !
   !-----------------!
 
-  do ua = 1, n_user_arrays
+  do ua = 1, grid % n_user_arrays
     a_name = 'A_??'
     write(a_name(3:4),'(I2.2)') ua
     call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, a_name,  &
-                                   user_array(ua,-comm % nb_s:comm % nc_s))
+                               grid % user_array(ua,-comm % nb_s:comm % nc_s))
   end do
 
   ! Variable count (store +1 to count its own self)
