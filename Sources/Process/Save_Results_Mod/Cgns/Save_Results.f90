@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Results(flow, turb, mult, swarm, ts, plot_inside)
+  subroutine Save_Results(flow, turb, mult, swarm, ts, plot_inside, domain)
 !------------------------------------------------------------------------------!
 !   Writes results in CGNS file format (for VisIt and Paraview)                !
 !------------------------------------------------------------------------------!
@@ -26,6 +26,7 @@
   type(Swarm_Type),      target :: swarm
   integer                       :: ts           ! time step
   logical                       :: plot_inside  ! plot results inside?
+  integer,             optional :: domain
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer      :: grid
   type(Var_Type),  pointer      :: phi
@@ -46,10 +47,12 @@
 
   if (.not. mesh_written) then
     ! problem_name.cgns
-    call File_Mod_Set_Name(name_out, extension='.cgns')
+    call File_Mod_Set_Name(name_out, extension='.cgns',  &
+                           domain=domain)
   else
     ! problem_name-ts??????.cgns
-    call File_Mod_Set_Name(name_out, time_step=ts, extension='.cgns')
+    call File_Mod_Set_Name(name_out, time_step=ts, extension='.cgns',  &
+                           domain=domain)
     file_name = trim(name_out) ! used in Save_Cgns_Cells
   end if
 
@@ -358,12 +361,12 @@
   !----------------------!
   !   Save user arrays   !
   !----------------------!
-  do ua = 1, n_user_arrays
+  do ua = 1, grid % n_user_arrays
 
     a_name = 'A_00'
     write(a_name(3:4), '(I2.2)') ua
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              user_array(ua,1), a_name)
+                              grid % user_array(ua,1), a_name)
   end do
 
   !----------------------------!

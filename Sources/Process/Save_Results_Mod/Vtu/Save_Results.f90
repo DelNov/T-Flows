@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Results(flow, turb, mult, swarm, ts, plot_inside)
+  subroutine Save_Results(flow, turb, mult, swarm, ts, plot_inside, domain)
 !------------------------------------------------------------------------------!
 !   Writes results in VTU file format (for VisIt and Paraview)                 !
 !------------------------------------------------------------------------------!
@@ -26,6 +26,7 @@
   type(Swarm_Type),      target :: swarm
   integer                       :: ts           ! time step
   logical                       :: plot_inside  ! plot results inside?
+  integer,             optional :: domain
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: phi
@@ -61,21 +62,25 @@
   if(plot_inside) then
     call File_Mod_Set_Name(name_out_8,             &
                            time_step=ts,           &
-                           extension='.pvtu')
+                           extension='.pvtu',      &
+                           domain=domain)
     call File_Mod_Set_Name(name_out_9,             &
                            processor=this_proc,    &
                            time_step=ts,           &
-                           extension='.vtu')
+                           extension='.vtu',       &
+                           domain=domain)
   else
     call File_Mod_Set_Name(name_out_8,             &
                            time_step=ts,           &
                            appendix ='-bnd',       &
-                           extension='.pvtu')
+                           extension='.pvtu',      &
+                           domain=domain)
     call File_Mod_Set_Name(name_out_9,             &
                            processor=this_proc,    &
                            time_step=ts,           &
                            appendix ='-bnd',       &
-                           extension='.vtu')
+                           extension='.vtu',       &
+                           domain=domain)
   end if
 
   if(n_proc > 1 .and. this_proc .eq. 1) then
@@ -572,14 +577,14 @@
   !----------------------!
   !   Save user arrays   !
   !----------------------!
-  do ua = 1, n_user_arrays
+  do ua = 1, grid % n_user_arrays
 
     a_name = 'A_00'
     write(a_name(3:4), '(I2.2)') ua
     call Save_Scalar(grid, IN_4, IN_5, a_name,                              &
-                                       plot_inside,                         &
-                                       user_array(ua,-grid % n_bnd_cells),  &
-                                       f8, f9)
+                     plot_inside,                         &
+                     grid % user_array(ua,-grid % n_bnd_cells),  &
+                     f8, f9)
   end do
 
   !----------------------!
@@ -603,13 +608,15 @@
         call File_Mod_Set_Name(name_out_9,        &
                                processor=n,       &
                                time_step=ts,      &
-                               extension='.vtu')
+                               extension='.vtu',  &
+                               domain=domain)
       else
         call File_Mod_Set_Name(name_out_9,        &
                                processor=n,       &
                                time_step=ts,      &
                                appendix ='-bnd',  &
-                               extension='.vtu')
+                               extension='.vtu',  &
+                               domain=domain)
       end if
       write(f8, '(a,a,a,a)') IN_2, '<Piece Source="', trim(name_out_9), '"/>'
     end do
