@@ -1,12 +1,13 @@
 !==============================================================================!
-  subroutine Grid_Mod_Load_Cns(grid, this_proc)
+  subroutine Grid_Mod_Load_Cns(grid, this_proc, domain)
 !------------------------------------------------------------------------------!
 !   Reads: .cns file.                                                          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
-  integer         :: this_proc  ! needed if called from Processor
+  type(Grid_Type)   :: grid
+  integer           :: this_proc  ! needed if called from Processor
+  integer, optional :: domain
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: c, n, s, lev, fu
   character(len=80) :: name_in
@@ -18,7 +19,8 @@
   !   connections between cells   !
   !                               !
   !-------------------------------!
-  call File_Mod_Set_Name(name_in, processor=this_proc, extension='.cns')
+  call File_Mod_Set_Name(name_in, processor=this_proc, extension='.cns',  &
+                         domain=domain)
   call File_Mod_Open_File_For_Reading_Binary(name_in, fu, this_proc)
 
   !-----------------------------------------------!
