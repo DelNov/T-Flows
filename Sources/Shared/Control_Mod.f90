@@ -9,8 +9,10 @@
   implicit none
 !==============================================================================!
 
-  character(len=80) :: control_file_name
-  integer           :: control_file_unit
+  ! Control file unit
+  integer :: control_file_unit          ! current control file unit
+  integer :: root_control_file_unit     ! root control file unit
+  integer :: dom_control_file_unit(MD)  ! domain control file units
 
   ! Number of presumably misstyped keywords followed by their list
   integer           :: n_similar =  0
@@ -23,7 +25,8 @@
   !--------------------!
 
     ! Basic functionality
-    include 'Control_Mod/Basic_Functions/Open_File.f90'
+    include 'Control_Mod/Basic_Functions/Open_Domain_File.f90'
+    include 'Control_Mod/Basic_Functions/Open_Root_File.f90'
     include 'Control_Mod/Basic_Functions/Position_At_One_Key.f90'
     include 'Control_Mod/Basic_Functions/Position_At_Two_Keys.f90'
     include 'Control_Mod/Basic_Functions/Read_Char_Item.f90'
@@ -36,7 +39,9 @@
     include 'Control_Mod/Basic_Functions/Read_Real_Array.f90'
     include 'Control_Mod/Basic_Functions/Read_Real_Array_On.f90'
     include 'Control_Mod/Basic_Functions/Similar_Warning.f90'
-    include 'Control_Mod/Basic_Functions/Write_File.f90'
+    include 'Control_Mod/Basic_Functions/Switch_To_Domain.f90'
+    include 'Control_Mod/Basic_Functions/Switch_To_Root.f90'
+!   include 'Control_Mod/Basic_Functions/Write_File.f90'
 
     ! Load
     include 'Control_Mod/Input_Output/Problem_Name.f90'
@@ -53,6 +58,9 @@
   !-------------!
   !   Physics   !
   !-------------!
+
+    ! Number of domains you are solving
+    include 'Control_Mod/Physics/Number_Of_Domains.f90'
 
     ! Physical properties
     include 'Control_Mod/Physics/Dynamic_Viscosity.f90'
