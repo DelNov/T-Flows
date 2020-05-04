@@ -354,7 +354,7 @@
         call Update_Boundary_Values(flow(d), turb(d), mult(d))
 
         ! End of the current iteration
-        call Info_Mod_Iter_Print()
+        call Info_Mod_Iter_Print(d)
 
         ! End of iteration
         call User_Mod_End_Of_Iteration(flow(d), turb(d), mult(d), swarm(d),  &
@@ -374,7 +374,10 @@
     !----------------------------------!
     !   End of the current time step   !
     !----------------------------------!
-1   call Info_Mod_Bulk_Print()  ! not quite sure how to handle this yet
+1   continue
+    do d = 1, n_dom
+      call Info_Mod_Bulk_Print(flow(d), d, n_dom)
+    end do
 
     do d = 1, n_dom
 

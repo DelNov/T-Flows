@@ -860,9 +860,8 @@ $(DIR_SHARED)/Work_Mod/*.f90
 #-- ./Info_Mod.f90
 $(DIR_OBJECT)/Info_Mod.o:\
 Info_Mod/*.f90 \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 
 
 #-- ./Compute_Pressure.f90
 $(DIR_OBJECT)/Compute_Pressure.o:\

@@ -9,7 +9,7 @@
   integer          :: c         ! column
   character(len=*) :: name_var
   integer          :: n_iter    ! number of iterations
-  real             :: res       
+  real             :: res
 !==============================================================================!
 
   if(this_proc < 2) then

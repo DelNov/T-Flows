@@ -15,6 +15,8 @@
   real                     :: t_int, cond_1, cond_2
 !==============================================================================!
 
+  call Cpu_Timer_Mod_Start('Interface_Mod_Exchange')
+
   ! Write some debugging info
   do d_1 = 1, n_dom
     grid_1 => flow(d_1) % pnt_grid
@@ -47,5 +49,7 @@
       end if
     end do
   end do
+
+  call Cpu_Timer_Mod_Stop('Interface_Mod_Exchange')
 
   end subroutine
