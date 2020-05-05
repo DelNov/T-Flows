@@ -14,7 +14,7 @@
   integer                   :: c, n
 !==============================================================================!
 
-  if(.not. turbulence_statistics) return
+  if(.not. turb % statistics) return
 
   n = n1-n0
 
