@@ -1,1 +1,0 @@
-../../Uniform_Mesh/Xmgrace/gnuplot_script_template.sh

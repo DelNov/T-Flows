@@ -16,7 +16,8 @@
                       vt_save   => r_cell_10,  &
                       wt_save   => r_cell_11,  &
                       kin_vis_t => r_cell_12,  &
-                      phi_save  => r_cell_13
+                      phi_save  => r_cell_13,  &
+                      q_save    => r_cell_14
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
@@ -171,6 +172,17 @@
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               phi % n(1), phi % name)
   end do
+
+  !-----------------!
+  !   Q-criterion   !
+  !-----------------!
+  q_save(:) = 0.0
+  do c = 1, grid % n_cells
+    q_save(c) = (flow % vort(c)**2 - flow % shear(c)**2)/4.
+  end do
+
+  call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
+                            q_save(1), 'Qcriterion')
 
   !--------------------------!
   !   Turbulent quantities   !
