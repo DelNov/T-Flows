@@ -50,7 +50,7 @@
   print *, '# Input problem name: (without extension)'
   print *, '#----------------------------------------'
   call File_Mod_Read_Line(5)
-  read(line % tokens(1), *) problem_name
+  read(line % tokens(1), *) problem_name(1)
 
   call File_Mod_Set_Name(domain_name, extension='.dom')
   call File_Mod_Open_File_For_Reading(domain_name, fu)
