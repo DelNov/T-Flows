@@ -370,11 +370,11 @@
   !--------------------------!
 
   ! Save kin and eps
-  if(turbulence_model .eq. K_EPS                 .or.  &
-     turbulence_model .eq. K_EPS_ZETA_F          .or.  &
-     turbulence_model .eq. HYBRID_LES_RANS       .or.  &
-     turbulence_model .eq. RSM_MANCEAU_HANJALIC  .or.  &
-     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC  ) then
+  if(turb % model .eq. K_EPS                 .or.  &
+     turb % model .eq. K_EPS_ZETA_F          .or.  &
+     turb % model .eq. HYBRID_LES_RANS       .or.  &
+     turb % model .eq. RSM_MANCEAU_HANJALIC  .or.  &
+     turb % model .eq. RSM_HANJALIC_JAKIRLIC  ) then
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentKineticEnergy", plot_inside,  &
                                        turb % kin % n(-grid % n_bnd_cells),    &
                                        f8, f9)
@@ -388,8 +388,8 @@
   end if
 
   ! Save zeta and f22
-  if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
-     turbulence_model .eq. HYBRID_LES_RANS) then
+  if(turb % model .eq. K_EPS_ZETA_F .or.  &
+     turb % model .eq. HYBRID_LES_RANS) then
     v2_calc(:) = 0.0
     do c = 1, grid % n_cells
       v2_calc(c) = turb % kin % n(c) * turb % zeta % n(c)
@@ -430,15 +430,15 @@
     end if
   end if
 
-  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+  if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityF22", plot_inside,  &
                                        turb % f22 % n(-grid % n_bnd_cells),  &
                                        f8, f9)
   end if
 
   ! Save vis and vis_t
-  if(turbulence_model .eq. DES_SPALART .or.  &
-     turbulence_model .eq. SPALART_ALLMARAS) then
+  if(turb % model .eq. DES_SPALART .or.  &
+     turb % model .eq. SPALART_ALLMARAS) then
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentViscosity", plot_inside,    &
                                        turb % vis % n(-grid % n_bnd_cells),  &
                                        f8, f9)
@@ -447,8 +447,8 @@
                                        f8, f9)
   end if
   kin_vis_t(:) = 0.0
-  if(turbulence_model .ne. NO_TURBULENCE .and.  &
-     turbulence_model .ne. DNS) then
+  if(turb % model .ne. NO_TURBULENCE .and.  &
+     turb % model .ne. DNS) then
     kin_vis_t   (-grid % n_bnd_cells:grid % n_cells) =  &
     turb % vis_t(-grid % n_bnd_cells:grid % n_cells) /  &
        flow % viscosity(-grid % n_bnd_cells:grid % n_cells)
@@ -458,8 +458,8 @@
   end if
 
   ! Reynolds stress models
-  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
-     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
+  if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+     turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
     call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressXX", plot_inside,     &
                                        turb % uu % n(-grid % n_bnd_cells),  &
                                        f8, f9)
@@ -492,7 +492,7 @@
   end if
 
   ! Statistics for large-scale simulations of turbulence
-  if(turbulence_statistics) then
+  if(turb % statistics) then
     call Save_Vector(grid, IN_4, IN_5, "MeanVelocity", plot_inside,          &
                                        turb % u_mean(-grid % n_bnd_cells),   &
                                        turb % v_mean(-grid % n_bnd_cells),   &
@@ -576,8 +576,8 @@
   end if
 
   ! Save y+ for all turbulence models
-  if(turbulence_model .ne. NO_TURBULENCE .and.  &
-     turbulence_model .ne. DNS) then
+  if(turb % model .ne. NO_TURBULENCE .and.  &
+     turb % model .ne. DNS) then
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityYplus",            &
                                        plot_inside,                         &
                                        turb % y_plus(-grid % n_bnd_cells),  &

@@ -15,6 +15,8 @@
   real                     :: t_int, cond_1, cond_2
 !==============================================================================!
 
+  if(n_dom < 2) return
+
   call Cpu_Timer_Mod_Start('Interface_Mod_Exchange')
 
   ! Write some debugging info

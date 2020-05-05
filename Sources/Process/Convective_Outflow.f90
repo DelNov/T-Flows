@@ -75,8 +75,8 @@
   !-----------------!
   !   K-eps model   !
   !-----------------!
-  if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
-     turbulence_model .eq. HYBRID_LES_RANS) then
+  if(turb % model .eq. K_EPS_ZETA_F .or.  &
+     turb % model .eq. HYBRID_LES_RANS) then
 
     call Field_Mod_Grad_Variable(flow, kin)
     call Field_Mod_Grad_Variable(flow, eps)
@@ -114,8 +114,8 @@
   !------------------------!
   !   K-eps-zeta-f model   !
   !------------------------!
-  if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
-     turbulence_model .eq. HYBRID_LES_RANS) then
+  if(turb % model .eq. K_EPS_ZETA_F .or.  &
+     turb % model .eq. HYBRID_LES_RANS) then
 
     call Field_Mod_Grad_Variable(flow, kin)
     call Field_Mod_Grad_Variable(flow, eps)
@@ -164,8 +164,8 @@
   !   Reynolds stress models   !
   !----------------------------!
 
-  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
-     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
+  if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+     turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
 
     call Field_Mod_Grad_Variable(flow, uu)
     call Field_Mod_Grad_Variable(flow, vv)
@@ -174,7 +174,7 @@
     call Field_Mod_Grad_Variable(flow, uw)
     call Field_Mod_Grad_Variable(flow, vw)
     call Field_Mod_Grad_Variable(flow, eps)
-    if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+    if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
       call Field_Mod_Grad_Variable(flow, f22)
     end if
 
@@ -213,7 +213,7 @@
                       - ( bulk % u * eps % x(c1)           &
                         + bulk % v * eps % y(c1)           &
                         + bulk % w * eps % z(c1) ) * dt
-          if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+          if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
             f22 % n(c2) = f22 % n(c2)                      &
                         - ( bulk % u * f22 % x(c1)         &
                           + bulk % v * f22 % y(c1)         &

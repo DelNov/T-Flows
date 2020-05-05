@@ -147,7 +147,7 @@
   !   Source terms and wall function    !
   !                                     !
   !-------------------------------------!
-  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+  if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
     call Turb_Mod_Src_F22_Rsm_Manceau_Hanjalic(turb, sol)
   else
     call Turb_Mod_Src_F22_K_Eps_Zeta_F(turb, sol)
@@ -173,9 +173,9 @@
           phi % res)
 
   ! Print info on the screen
-  if(turbulence_model .eq. K_EPS_ZETA_F) then
+  if(turb % model .eq. K_EPS_ZETA_F) then
     call Info_Mod_Iter_Fill_At(3, 4, phi % name, exec_iter, phi % res)
-  else if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+  else if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
     call Info_Mod_Iter_Fill_At(4, 2, phi % name, exec_iter, phi % res)
   end if
 

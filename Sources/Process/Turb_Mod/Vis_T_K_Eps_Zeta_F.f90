@@ -48,14 +48,14 @@
   call Time_And_Length_Scale(grid, turb)
 
   ! Pure k-eps-zeta-f
-  if(turbulence_model .eq. K_EPS_ZETA_F) then
+  if(turb % model .eq. K_EPS_ZETA_F) then
     do c = -grid % n_bnd_cells, grid % n_cells
       turb % vis_t(c) = c_mu_d * flow % density(c) * zeta % n(c)  &
                       * kin % n(c) * turb % t_scale(c)
     end do
 
   ! Hybrid between k-eps-zeta-f and dynamic SGS model
-  else if(turbulence_model .eq. HYBRID_LES_RANS) then
+  else if(turb % model .eq. HYBRID_LES_RANS) then
     do c = -grid % n_bnd_cells, grid % n_cells
       turb % vis_t(c) = c_mu_d * flow % density(c) * zeta % n(c)  &
                       * kin % n(c) * turb % t_scale(c)

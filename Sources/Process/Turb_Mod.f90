@@ -127,19 +127,15 @@
     ! For LES you need to know nearest wall cell
     integer, allocatable :: nearest_wall_cell(:)
 
+    ! Variable holding the turbulence model; its variant and statistics
+    integer :: model
+    integer :: model_variant   ! STABILIZED or NONE
+    integer :: wall_treatment  ! HIGH_RE, LOW_RE, COMPOUND
+    logical :: statistics
+    integer :: heat_flux_model
+    integer :: hybrid_les_rans_switch
+
   end type
-
-  !--------------------------------------------------------!
-  !   Parameters and variables defining turbulence model   !
-  !--------------------------------------------------------!
-
-  ! Variable holding the turbulence model; its variant and statistics
-  integer :: turbulence_model
-  integer :: turbulence_model_variant   ! STABILIZED or NONE
-  integer :: turbulence_wall_treatment  ! HIGH_RE, LOW_RE, COMPOUND
-  logical :: turbulence_statistics
-  integer :: turbulent_heat_flux_model
-  integer :: hybrid_les_rans_switch
 
   ! Parameters describing turbulence model choice
   ! (Prime numbers starting from 30000)

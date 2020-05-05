@@ -191,11 +191,11 @@
     ! Prepare ...
     call Bulk_Mod_Monitoring_Planes_Areas(flow(d) % bulk, grid(d))
 
-    if(turbulence_model .eq. LES_SMAGORINSKY .and. .not. backup(d)) then
+    if(turb(d) % model .eq. LES_SMAGORINSKY .and. .not. backup(d)) then
       call Find_Nearest_Wall_Cell(turb(d))
     end if
 
-    if(turbulence_model .eq. HYBRID_LES_PRANDTL .and. .not. backup(d)) then
+    if(turb(d) % model .eq. HYBRID_LES_PRANDTL .and. .not. backup(d)) then
       call Find_Nearest_Wall_Cell(turb(d))
     end if
 
@@ -289,6 +289,7 @@
     call Control_Mod_Switch_To_Root()
     call Control_Mod_Max_Simple_Iterations(max_ini)
     call Control_Mod_Min_Simple_Iterations(min_ini)
+    call Control_Mod_Tolerance_For_Simple_Algorithm(simple_tol)
 
     do ini = 1, max_ini
 
@@ -332,7 +333,7 @@
         call Field_Mod_Grad_Pressure_Correction(flow(d), flow(d) % pp)
 
         call Field_Mod_Calculate_Fluxes(flow(d), flow(d) % m_flux % n)
-        mass_res = Correct_Velocity(flow(d), sol(d), flow(d) % dt, ini)
+        mass_res(d) = Correct_Velocity(flow(d), sol(d), flow(d) % dt, ini)
 
         ! Energy (practically temperature)
         if(heat_transfer) then
@@ -362,7 +363,6 @@
       end do  ! through domains
 
       if(ini >= min_ini) then
-        call Control_Mod_Tolerance_For_Simple_Algorithm(simple_tol)
         if( maxval(flow(1:n_dom) % u  % res) <= simple_tol .and.  &
             maxval(flow(1:n_dom) % v  % res) <= simple_tol .and.  &
             maxval(flow(1:n_dom) % w  % res) <= simple_tol .and.  &
@@ -416,7 +416,7 @@
       do d = 1, n_dom
         call Control_Mod_Switch_To_Domain(d)
         call Backup_Mod_Save(flow(d), swarm(d), turb(d), mult(d),  &
-                             time, n, n_stat)
+                             time, n, n_stat, domain=d)
       end do
     end if
 
@@ -487,7 +487,7 @@
 
     ! Save backup and post-processing files at exit
     call Backup_Mod_Save(flow(d), swarm(d), turb(d), mult(d),  &
-                         time, n, n_stat)
+                         time, n, n_stat, domain=d)
     call Save_Results(flow(d), turb(d), mult(d), swarm(d), n,  &
                       plot_inside=.true., domain=d)
     call Save_Results(flow(d), turb(d), mult(d), swarm(d), n,  &

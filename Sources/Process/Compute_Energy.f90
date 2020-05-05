@@ -130,8 +130,8 @@
   !----------------------------!
   !   Spatial discretization   !
   !----------------------------!
-  if(turbulence_model .ne. NO_TURBULENCE .and.  &
-     turbulence_model .ne. DNS) then
+  if(turb % model .ne. NO_TURBULENCE .and.  &
+     turb % model .ne. DNS) then
   end if
 
   do s = 1, grid % n_faces
@@ -139,12 +139,12 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
-    if(turbulence_model .ne. LES_SMAGORINSKY    .and.  &
-       turbulence_model .ne. LES_DYNAMIC        .and.  &
-       turbulence_model .ne. HYBRID_LES_PRANDTL .and.  &
-       turbulence_model .ne. LES_WALE           .and.  &
-       turbulence_model .ne. NO_TURBULENCE      .and.  &
-       turbulence_model .ne. DNS) then
+    if(turb % model .ne. LES_SMAGORINSKY    .and.  &
+       turb % model .ne. LES_DYNAMIC        .and.  &
+       turb % model .ne. HYBRID_LES_PRANDTL .and.  &
+       turb % model .ne. LES_WALE           .and.  &
+       turb % model .ne. NO_TURBULENCE      .and.  &
+       turb % model .ne. DNS) then
       pr_t1 = Turb_Mod_Prandtl_Number(turb, c1)
       pr_t2 = Turb_Mod_Prandtl_Number(turb, c2)
       pr_tf = grid % fw(s) * pr_t1 + (1.0-grid % fw(s)) * pr_t2
@@ -159,8 +159,8 @@
     tx_f2 = tx_f1
     ty_f2 = ty_f1
     tz_f2 = tz_f1
-    if(turbulence_model .ne. NO_TURBULENCE .and.  &
-       turbulence_model .ne. DNS) then
+    if(turb % model .ne. NO_TURBULENCE .and.  &
+       turb % model .ne. DNS) then
       con_eff_f =                                                              &
                grid % fw(s) * (flow % conductivity(c1) +                       &
                                flow % capacity(c1) * turb % vis_t(c1) / pr_tf) &
@@ -174,9 +174,9 @@
         + (1.0-grid % fw(s))* flow % conductivity(c2)
     end if
 
-    if(turbulence_model .eq. K_EPS        .or.  &
-       turbulence_model .eq. K_EPS_ZETA_F .or.  &
-       turbulence_model .eq. HYBRID_LES_RANS) then
+    if(turb % model .eq. K_EPS        .or.  &
+       turb % model .eq. K_EPS_ZETA_F .or.  &
+       turb % model .eq. HYBRID_LES_RANS) then
       if(c2 < 0) then
         if(Var_Mod_Bnd_Cond_Type(t, c2) .eq. WALL .or.  &
            Var_Mod_Bnd_Cond_Type(t, c2) .eq. WALLFL) then
@@ -214,8 +214,8 @@
     !   Turbulent heat fluxes   !
     !                           !
     !---------------------------!
-    if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
-       turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+    if(turb % model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
+       turb % model .eq. RSM_MANCEAU_HANJALIC) then
 
       cap_dens_c1 = flow % capacity(c1) * flow % density(c1)
       cap_dens_c2 = flow % capacity(c2) * flow % density(c2)

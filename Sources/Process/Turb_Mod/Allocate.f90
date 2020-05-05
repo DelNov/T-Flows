@@ -32,7 +32,7 @@
   !-----------------!
   !   K-eps model   !
   !-----------------!
-  if(turbulence_model .eq. K_EPS) then
+  if(turb % model .eq. K_EPS) then
 
     ! Variables we solve for: k and epsilon
     call Var_Mod_Allocate_Solution(turb % kin, grid, 'KIN', '')
@@ -67,7 +67,7 @@
     end if
 
     ! Turbulent statistics; if needed
-    if(turbulence_statistics) then
+    if(turb % statistics) then
 
       ! Time-averaged velocities (and temperature)
       allocate(turb % u_mean(-nb:nc));  turb % u_mean = 0.
@@ -98,7 +98,7 @@
         allocate(turb % wt_res(-nb:nc));  turb % wt_res = 0.
       end if ! heat_transfer
 
-    end if ! turbulence_statistics
+    end if ! turb % statistics
 
     if(buoyancy) then
       allocate(turb % g_buoy(-nb:nc));  turb % g_buoy = 0.
@@ -109,7 +109,7 @@
   !------------------!
   !   K-eps-zeta-f   !
   !------------------!
-  if(turbulence_model .eq. K_EPS_ZETA_F) then
+  if(turb % model .eq. K_EPS_ZETA_F) then
 
     ! Main model's variables
     call Var_Mod_Allocate_Solution(turb % kin,  grid, 'KIN',  '')
@@ -154,7 +154,7 @@
       allocate(turb % diff_w(-nb:nc));  turb % diff_w = 0.  
     end if
 
-    if(turbulence_statistics) then
+    if(turb % statistics) then
 
       ! Time-averaged velocities (and temperature)
       allocate(turb % u_mean(-nb:nc));  turb % u_mean = 0.
@@ -190,7 +190,7 @@
         allocate(turb % wt_res(-nb:nc));  turb % wt_res = 0.
       end if ! heat_transfer
 
-    end if ! turbulence_statistics
+    end if ! turb % statistics
 
     if(buoyancy) then
       allocate(turb % g_buoy(-nb:nc));  turb % g_buoy = 0.
@@ -201,8 +201,8 @@
   !----------------------------!
   !   Reynolds stress models   !
   !----------------------------!
-  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
-     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
+  if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+     turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
 
     ! Other variables such as time scale, length scale and production
     allocate(turb % t_scale(-nb:nc));  turb % t_scale = 0.
@@ -230,7 +230,7 @@
       allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
     end if ! heat_transfer
 
-    if(turbulence_statistics) then
+    if(turb % statistics) then
 
       ! Time-averaged velocities (and temperature)
       allocate(turb % u_mean(-nb:nc));  turb % u_mean = 0.
@@ -267,15 +267,15 @@
         allocate(turb % wt_res(-nb:nc));  turb % wt_res = 0.
       end if ! heat_transfer
 
-    end if ! turbulence_statistics
+    end if ! turb % statistics
 
-    if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+    if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
 
       call Var_Mod_Allocate_Solution(turb % f22, grid, 'F22', '')
 
-      if(turbulence_statistics) then
+      if(turb % statistics) then
         allocate(turb % f22_mean(-nb:nc));  turb % f22_mean  = 0.
-      end if ! turbulence_statistics
+      end if ! turb % statistics
 
     end if ! RSM_MANCEAU_HANJALIC
 
@@ -284,8 +284,8 @@
   !----------------------!
   !   Spalart Allmaras   !
   !----------------------!
-  if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
-     turbulence_model .eq. DES_SPALART) then
+  if(turb % model .eq. SPALART_ALLMARAS .or.  &
+     turb % model .eq. DES_SPALART) then
 
     call Var_Mod_Allocate_Solution(turb % vis, grid, 'VIS', '')
 
@@ -305,7 +305,7 @@
     end if ! heat_transfer
 
     ! Turbulence statistics, if needed
-    if(turbulence_statistics) then
+    if(turb % statistics) then
 
       ! Time-averaged velocities (and temperature)
       allocate(turb % u_mean(-nb:nc));  turb % u_mean = 0.
@@ -335,14 +335,14 @@
         allocate(turb % wt_res(-nb:nc));  turb % wt_res = 0.
       end if ! heat_transfer
 
-    end if ! turbulence_statistics
+    end if ! turb % statistics
 
   end if ! SPALART_ALLMARAS & DES_SPALART
 
   !-----------------------!
   !   Smagorinsky model   !
   !-----------------------!
-  if(turbulence_model .eq. LES_SMAGORINSKY) then
+  if(turb % model .eq. LES_SMAGORINSKY) then
 
     allocate(turb % nearest_wall_cell(-nb:nc))
     turb % nearest_wall_cell = 0
@@ -362,7 +362,7 @@
       allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
     end if ! heat_transfer
 
-    if(turbulence_statistics) then
+    if(turb % statistics) then
 
       ! Time-averaged velocities (and temperature)
       allocate(turb % u_mean(-nb:nc));  turb % u_mean = 0.
@@ -389,7 +389,7 @@
         allocate(turb % wt_res(-nb:nc));  turb % wt_res = 0.
       end if ! heat_transfer
 
-    end if ! turbulence_statistics
+    end if ! turb % statistics
 
   end if ! LES_SMAGORINSKY
 
@@ -397,7 +397,7 @@
   !------------------------------!
   !   Hybrid_Les_Prandtl model   !
   !------------------------------!
-  if(turbulence_model .eq. HYBRID_LES_PRANDTL) then
+  if(turb % model .eq. HYBRID_LES_PRANDTL) then
 
     allocate(turb % nearest_wall_cell(-nb:nc))
     turb % nearest_wall_cell = 0
@@ -417,7 +417,7 @@
       allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
     end if ! heat_transfer
 
-    if(turbulence_statistics) then
+    if(turb % statistics) then
 
       ! Time-averaged velocities (and temperature)
       allocate(turb % u_mean(-nb:nc));  turb % u_mean = 0.
@@ -444,14 +444,14 @@
         allocate(turb % wt_res(-nb:nc));  turb % wt_res = 0.
       end if ! heat_transfer
 
-    end if ! turbulence_statistics
+    end if ! turb % statistics
 
   end if ! HYBRID_LES_PRANDTL
 
   !----------------!
   !   Wale model   !
   !----------------!
-  if(turbulence_model .eq. LES_WALE) then
+  if(turb % model .eq. LES_WALE) then
 
     allocate(turb % wale_v(-nb:nc));  turb % wale_v = 0.
 
@@ -470,7 +470,7 @@
       allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
     end if ! heat_transfer
 
-    if(turbulence_statistics) then
+    if(turb % statistics) then
 
       ! Time-averaged velocities (and temperature)
       allocate(turb % u_mean(-nb:nc));  turb % u_mean = 0.
@@ -497,14 +497,14 @@
         allocate(turb % wt_res(-nb:nc));  turb % wt_res = 0.
       end if ! heat_transfer
 
-    end if ! turbulence_statistics
+    end if ! turb % statistics
 
   end if ! LES_WALE
 
   !-------------------!
   !   Dynamic model   !
   !-------------------!
-  if(turbulence_model .eq. LES_DYNAMIC) then
+  if(turb % model .eq. LES_DYNAMIC) then
 
     allocate(turb % c_dyn(-nb:nc));  turb % c_dyn = 0.
 
@@ -525,7 +525,7 @@
 
     end if ! heat_transfer
 
-    if(turbulence_statistics) then
+    if(turb % statistics) then
 
       ! Time-averaged velocities (and temperature)
       allocate(turb % u_mean(-nb:nc));  turb % u_mean = 0.
@@ -552,17 +552,17 @@
         allocate(turb % wt_res(-nb:nc));  turb % wt_res = 0.
       end if ! heat_transfer
 
-    end if ! turbulence_statistics
+    end if ! turb % statistics
 
   end if ! LES_DYNAMIC
 
   !---------------------------------!
   !   Direct numerical simulation   !
   !---------------------------------!
-  if(turbulence_model .eq. DNS .or.  &
-     turbulence_model .eq. NONE) then
+  if(turb % model .eq. DNS .or.  &
+     turb % model .eq. NONE) then
 
-    if(turbulence_statistics) then
+    if(turb % statistics) then
 
       ! Time-averaged velocities (and temperature)
       allocate(turb % u_mean(-nb:nc));  turb % u_mean = 0.
@@ -589,14 +589,14 @@
         allocate(turb % wt_res(-nb:nc));  turb % wt_res = 0.
       end if ! heat_transfer
 
-    end if ! turbulence_statistics
+    end if ! turb % statistics
 
   end if ! DNS
 
   !-------------------!
   !   Hybrid model    !
   !-------------------!
-  if(turbulence_model .eq. HYBRID_LES_RANS) then
+  if(turb % model .eq. HYBRID_LES_RANS) then
 
     ! Main model's variables (for RANS part)
     call Var_Mod_Allocate_Solution(turb % kin,  grid, 'KIN',  '')
@@ -647,7 +647,7 @@
     end if
 
 
-    if(turbulence_statistics) then
+    if(turb % statistics) then
 
       ! Time-averaged velocities (and temperature)
       allocate(turb % u_mean(-nb:nc));  turb % u_mean = 0.
@@ -683,7 +683,7 @@
         allocate(turb % wt_res(-nb:nc));  turb % wt_res = 0.
       end if ! heat_transfer
 
-    end if ! turbulence_statistics
+    end if ! turb % statistics
 
     if(buoyancy) then
       allocate(turb % g_buoy(-nb:nc));  turb % g_buoy = 0.
@@ -694,7 +694,7 @@
   !----------------------------------------------------------!
   !   Scalars are independent of the turbulence model used   !
   !----------------------------------------------------------!
-  if(turbulence_statistics) then
+  if(turb % statistics) then
     if(flow % n_scalars > 0) then
       allocate(turb % scalar_mean(flow % n_scalars, -nb:nc))
       turb % scalar_mean = 0.

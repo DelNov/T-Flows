@@ -21,7 +21,7 @@
   vis  => turb % vis
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
-  if(turbulence_model .eq. DES_SPALART) then
+  if(turb % model .eq. DES_SPALART) then
     do c = 1, grid % n_cells
       x_rat    = vis % n(c) / flow % viscosity(c)
       f_v1     = x_rat**3/(x_rat**3 + c_v1**3)
@@ -29,7 +29,7 @@
     end do
   end if
 
-  if(turbulence_model .eq. SPALART_ALLMARAS) then
+  if(turb % model .eq. SPALART_ALLMARAS) then
     do c = 1, grid % n_cells
       x_rat = vis % n(c) / flow % viscosity(c)
       f_v1  = x_rat**3/(x_rat**3 + c_v1**3)
