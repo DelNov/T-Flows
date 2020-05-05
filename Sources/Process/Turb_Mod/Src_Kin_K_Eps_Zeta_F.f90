@@ -69,10 +69,15 @@
   if(buoyancy) then
     do c = 1, grid % n_cells
       turb % g_buoy(c) = -flow % beta             &
-                         * (grav_x * ut % n(c) +  &
-                            grav_y * vt % n(c) +  &
-                            grav_z * wt % n(c))   &
+                         * (grav_x * ut % n(c)    &
+                          + grav_y * vt % n(c)    &
+                          + grav_z * wt % n(c))   &
                           * flow % density(c)
+
+      if(turb % g_buoy(c) + turb % p_kin(c) < 0.0) then
+        turb % g_buoy(c) = 0.0
+      end if
+
       b(c) = b(c) + max(0.0, turb % g_buoy(c) * grid % vol(c))
              a % val(a % dia(c)) = a % val(a % dia(c))         &
                                  + max(0.0,-turb % g_buoy(c)   &
@@ -94,7 +99,7 @@
       ! Velocity switch
       l_sgs_v  = lf * flow % shear(c)
       l_rans_v = sqrt(kin % n(c) * zeta % n(c))
-      alpha_v  = l_rans_v/l_sgs_v
+      alpha_v  = l_rans_v / (l_sgs_v + TINY)
 
       if( (hybrid_les_rans_switch .eq. SWITCH_DISTANCE)  &
           .and. (alpha_d < 1.05)                         &
@@ -158,6 +163,8 @@
 
         if(turb % rough_walls) then
           z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
+          z_o = max(grid % wall_dist(c1)/(e_log * max(turb % y_plus(c1),1.0)),z_o)
+ 
           turb % y_plus(c1) = Y_Plus_Rough_Walls(turb,                  &
                                                  u_tau,                 &
                                                  grid % wall_dist(c1),  &
@@ -213,7 +220,7 @@
 
           ! This limiter is preventing unphysical solutions
           ! when flow starts to develop
-          g_buoy_wall = min(3.0*turb % p_kin(c1),g_buoy_wall)
+          ! g_buoy_wall = min(3.0*turb % p_kin(c1),g_buoy_wall)
 
           ! Clean up b(c) from old values of g_buoy
           b(c1)      = b(c1) - turb % g_buoy(c1) * grid % vol(c1)

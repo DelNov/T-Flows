@@ -1,6 +1,6 @@
 !==============================================================================!
   subroutine Backup_Mod_Load(fld, swr, tur, mul,  &
-                             time_step, time_step_stat, backup)
+                             time, time_step, time_step_stat, backup)
 !------------------------------------------------------------------------------!
 !   Loads backup files name.backup                                             !
 !------------------------------------------------------------------------------!
@@ -10,6 +10,7 @@
   type(Swarm_Type),      target :: swr
   type(Turb_Type),       target :: tur
   type(Multiphase_Type), target :: mul
+  real                          :: time            ! time of simulation
   integer                       :: time_step       ! current time step
   integer                       :: time_step_stat  ! starting step for statist.
   logical                       :: backup, present
@@ -88,6 +89,9 @@
 
   ! Time step
   call Backup_Mod_Read_Int(fh, d, vc, 'time_step', time_step)
+
+  ! Simulation time
+  call Backup_Mod_Read_Real(fh, d, vc, 'time', time)
 
   ! Bulk flows and pressure drops in each direction
   call Backup_Mod_Read_Real(fh, d, vc, 'bulk_flux_x',   bulk % flux_x)

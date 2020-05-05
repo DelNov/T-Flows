@@ -27,6 +27,7 @@
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   integer                  :: c1, c2, s, sc
   real                     :: kin_vis, u_tau
+  real                     :: qx, qy, qz, nx, ny, nz
 !==============================================================================!
 
   ! Take aliases
@@ -116,6 +117,7 @@
             t2  % n(c2) = t2  % n(c1)
           end if
         end if
+
       end if
 
       ! k-epsilon
@@ -221,14 +223,38 @@
 
       ! On the boundary perform the extrapolation
       if (c2 < 0) then
-        if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALLFL) then
-          phi % n(c2) = phi % n(c1) + phi % q(c2) * grid % wall_dist(c1)  &
-                      / flow % diffusivity
-        else if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALL) then
-          phi % q(c2) = (phi % n(c2) - phi % n(c1)) * flow % diffusivity &
-                      / grid % wall_dist(c1)
-        end if ! WALL or WALLFL
 
+        nx = grid % sx(s) / grid % s(s)
+        ny = grid % sy(s) / grid % s(s)
+        nz = grid % sz(s) / grid % s(s)
+        qx = t % q(c2) * nx
+        qy = t % q(c2) * ny
+        qz = t % q(c2) * nz
+
+        ! Wall temperature or heat fluxes for k-eps-zeta-f
+        ! and high-re k-eps models. 
+        if(turbulence_model .eq. K_EPS_ZETA_F    .or.  &
+           turbulence_model .eq. HYBRID_LES_RANS .or.  &
+           turbulence_model .eq. K_EPS) then
+
+          if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALLFL) then
+            phi % n(c2) = phi % n(c1) + phi % q(c2) * grid % wall_dist(c1)  &
+                      / (turb % diff_w(c1) + TINY)
+          else if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALL) then
+            phi % q(c2) = ( phi % n(c2) - phi % n(c1) ) * turb % diff_w(c1)  &
+                      / grid % wall_dist(c1)
+          end if
+
+        ! Scalar boundary for other trubulence models
+        else
+          if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALLFL) then
+            phi % n(c2) = phi % n(c1) + phi % q(c2) * grid % wall_dist(c1)  &
+                        / flow % diffusivity
+          else if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALL) then
+            phi % q(c2) = (phi % n(c2) - phi % n(c1)) * flow % diffusivity &
+                        / grid % wall_dist(c1)
+          end if ! WALL or WALLFL
+        end if ! Turb. models
       end if ! c2 < 0
     end do ! s = 1, grid % n_faces
   end do ! sc = 1, flow % n_scalars

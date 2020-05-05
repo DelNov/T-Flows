@@ -709,6 +709,7 @@
           end do  ! c = -1, -grid % n_bnd_cells, -1
         end if  ! plane is defined?
         close(fu)
+        if( grid % bnd_cond % type(bc) == INFLOW ) deallocate(prof)
       end if  ! boundary defined in a file
     end do
 
@@ -828,5 +829,7 @@
     end if
 
   end do  ! faces
+
+  call Grid_Mod_Exchange_Log(grid, grid % cell_near_wall)
 
   end subroutine

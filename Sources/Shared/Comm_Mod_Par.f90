@@ -61,6 +61,7 @@
   include 'Comm_Mod/Parallel/Create_New_Types.f90'
   include 'Comm_Mod/Parallel/End.f90'
   include 'Comm_Mod/Parallel/Exchange_Int_Array.f90'
+  include 'Comm_Mod/Parallel/Exchange_Log_Array.f90'
   include 'Comm_Mod/Parallel/Exchange_Real_Array.f90'
   include 'Comm_Mod/Parallel/Global_Lor_Log_Array.f90'
   include 'Comm_Mod/Parallel/Global_Max_Real.f90'

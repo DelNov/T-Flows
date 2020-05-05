@@ -163,6 +163,7 @@
   include 'Grid_Mod/Decompose.f90'
   include 'Grid_Mod/Estimate_Big_And_Small.f90'
   include 'Grid_Mod/Exchange_Int.f90'
+  include 'Grid_Mod/Exchange_Log.f90'
   include 'Grid_Mod/Exchange_Real.f90'
   include 'Grid_Mod/Find_Cells_Faces.f90'
   include 'Grid_Mod/Find_Nodes_Cells.f90'

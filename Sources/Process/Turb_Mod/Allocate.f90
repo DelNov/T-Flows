@@ -61,6 +61,11 @@
       call Var_Mod_Allocate_New_Only(turb % vw, grid, 'VW')
     end if ! heat_transfer
 
+    !  Wall difussivity for user scalar
+    if(flow % n_scalars > 0) then            
+      allocate(turb % diff_w(-nb:nc));  turb % diff_w = 0.  
+    end if
+
     ! Turbulent statistics; if needed
     if(turbulence_statistics) then
 
@@ -94,6 +99,10 @@
       end if ! heat_transfer
 
     end if ! turbulence_statistics
+
+    if(buoyancy) then
+      allocate(turb % g_buoy(-nb:nc));  turb % g_buoy = 0.
+    end if ! buoyancy
 
   end if ! K_EPS
 
@@ -139,6 +148,11 @@
       call Var_Mod_Allocate_New_Only(turb % uw, grid, 'UW')
       call Var_Mod_Allocate_New_Only(turb % vw, grid, 'VW')
     end if ! heat_transfer
+
+    !  Wall difussivity for user scalar
+    if(flow % n_scalars > 0) then            
+      allocate(turb % diff_w(-nb:nc));  turb % diff_w = 0.  
+    end if
 
     if(turbulence_statistics) then
 
@@ -542,6 +556,43 @@
 
   end if ! LES_DYNAMIC
 
+  !---------------------------------!
+  !   Direct numerical simulation   !
+  !---------------------------------!
+  if(turbulence_model .eq. DNS .or.  &
+     turbulence_model .eq. NONE) then
+
+    if(turbulence_statistics) then
+
+      ! Time-averaged velocities (and temperature)
+      allocate(turb % u_mean(-nb:nc));  turb % u_mean = 0.
+      allocate(turb % v_mean(-nb:nc));  turb % v_mean = 0.
+      allocate(turb % w_mean(-nb:nc));  turb % w_mean = 0.
+      allocate(turb % p_mean(-nb:nc));  turb % p_mean = 0.
+      if(heat_transfer) then
+        allocate(turb % t_mean(-nb:nc));  turb % t_mean = 0.
+      end if
+
+      ! Resolved Reynolds stresses
+      allocate(turb % uu_res(-nb:nc));  turb % uu_res = 0.
+      allocate(turb % vv_res(-nb:nc));  turb % vv_res = 0.
+      allocate(turb % ww_res(-nb:nc));  turb % ww_res = 0.
+      allocate(turb % uv_res(-nb:nc));  turb % uv_res = 0.
+      allocate(turb % vw_res(-nb:nc));  turb % vw_res = 0.
+      allocate(turb % uw_res(-nb:nc));  turb % uw_res = 0.
+
+      ! Resolved turbulent heat fluxes
+      if(heat_transfer) then
+        allocate(turb % t2_res(-nb:nc));  turb % t2_res = 0.
+        allocate(turb % ut_res(-nb:nc));  turb % ut_res = 0.
+        allocate(turb % vt_res(-nb:nc));  turb % vt_res = 0.
+        allocate(turb % wt_res(-nb:nc));  turb % wt_res = 0.
+      end if ! heat_transfer
+
+    end if ! turbulence_statistics
+
+  end if ! DNS
+
   !-------------------!
   !   Hybrid model    !
   !-------------------!
@@ -568,6 +619,11 @@
     allocate(turb % p_kin    (-nb:nc));  turb % p_kin     = 0.
     allocate(turb % y_plus   (-nb:nc));  turb % y_plus    = 0.
 
+    ! Hydraulic roughness given by formula
+    if(turb % rough_walls) then
+      allocate(turb % z_o_f(-nb:nc));  turb % z_o_f = -1.0
+    end if
+
     if(heat_transfer) then
       call Var_Mod_Allocate_Solution(turb % t2, grid, 'T2', '')
       call Var_Mod_Allocate_New_Only(turb % ut, grid, 'UT')
@@ -584,6 +640,12 @@
       call Var_Mod_Allocate_New_Only(turb % uw, grid, 'UW')
       call Var_Mod_Allocate_New_Only(turb % vw, grid, 'VW')
     end if ! heat_transfer
+
+    !  Wall difussivity for user scalar
+    if(flow % n_scalars > 0) then            
+      allocate(turb % diff_w(-nb:nc));  turb % diff_w = 0.  
+    end if
+
 
     if(turbulence_statistics) then
 
