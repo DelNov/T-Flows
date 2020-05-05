@@ -180,11 +180,11 @@
   !--------------------------!
 
   ! Save kin and eps
-  if(turbulence_model .eq. K_EPS                 .or.  &
-     turbulence_model .eq. K_EPS_ZETA_F          .or.  &
-     turbulence_model .eq. HYBRID_LES_RANS       .or.  &
-     turbulence_model .eq. RSM_MANCEAU_HANJALIC  .or.  &
-     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC       ) then
+  if(turb % model .eq. K_EPS                 .or.  &
+     turb % model .eq. K_EPS_ZETA_F          .or.  &
+     turb % model .eq. HYBRID_LES_RANS       .or.  &
+     turb % model .eq. RSM_MANCEAU_HANJALIC  .or.  &
+     turb % model .eq. RSM_HANJALIC_JAKIRLIC       ) then
 
     call Cgns_Mod_Write_Field(base, block, solution, field, grid,  &
                               turb % kin % n(1),                   &
@@ -199,8 +199,8 @@
   end if
 
   ! Save zeta and f22
-  if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
-     turbulence_model .eq. HYBRID_LES_RANS) then
+  if(turb % model .eq. K_EPS_ZETA_F .or.  &
+     turb % model .eq. HYBRID_LES_RANS) then
     do c = 1, grid % n_cells
       v2_calc(c) = turb % kin % n(c) * turb % zeta % n(c)
     end do
@@ -231,20 +231,20 @@
     end if
   end if
 
-  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+  if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               turb % f22 % n(1),  'TurbulentQuantityF22')
   end if
 
   ! Vis and Turbulent Vicosity_t
-  if(turbulence_model .eq. DES_SPALART .or.  &
-     turbulence_model .eq. SPALART_ALLMARAS) then
+  if(turb % model .eq. DES_SPALART .or.  &
+     turb % model .eq. SPALART_ALLMARAS) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               turb % vis % n(1),'TurbulentViscosity')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               flow % vort(1),'VorticityMagnitude')
   end if
-  if(turbulence_model .ne. NO_TURBULENCE) then
+  if(turb % model .ne. NO_TURBULENCE) then
     kin_vis_t(1:grid % n_cells) = turb % vis_t(1:grid % n_cells)  &
                                 / flow % viscosity(1:grid % n_cells)
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
@@ -252,8 +252,8 @@
   end if
 
   ! Reynolds stress models
-  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
-     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
+  if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+     turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               turb % uu % n(1),'ReynoldsStressXX')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
@@ -269,7 +269,7 @@
   end if
 
   ! Statistics for large-scale simulations of turbulence
-  if(turbulence_statistics) then
+  if(turb % statistics) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               turb % u_mean(1),'MeanVelocityX')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
@@ -328,10 +328,10 @@
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                                 phi_save(1), name_mean)
     end do ! sc = 1, flow % n_scalars
-  end if ! turbulence_statistics
+  end if ! turb % statistics
 
   ! Save y+ for all turbulence models
-  if(turbulence_model .ne. NO_TURBULENCE) then
+  if(turb % model .ne. NO_TURBULENCE) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               turb % y_plus(1),'TurbulentQuantityYplus')
   end if
