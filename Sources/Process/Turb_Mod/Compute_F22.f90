@@ -3,11 +3,6 @@
 !------------------------------------------------------------------------------!
 !   Discretizes and solves eliptic relaxation equations for f22.               !
 !------------------------------------------------------------------------------!
-!---------------------------------[Modules]------------------------------------!
-  use Work_Mod, only: phi_x => r_cell_01,  &
-                      phi_y => r_cell_02,  &
-                      phi_z => r_cell_03
-!------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   type(Turb_Type)           :: turb
@@ -82,9 +77,9 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
-    phi_x_f = grid % fw(s) * phi_x(c1) + (1.0-grid % fw(s)) * phi_x(c2)
-    phi_y_f = grid % fw(s) * phi_y(c1) + (1.0-grid % fw(s)) * phi_y(c2)
-    phi_z_f = grid % fw(s) * phi_z(c1) + (1.0-grid % fw(s)) * phi_z(c2)
+    phi_x_f = grid % fw(s) * phi % x(c1) + (1.0-grid % fw(s)) * phi % x(c2)
+    phi_y_f = grid % fw(s) * phi % y(c1) + (1.0-grid % fw(s)) * phi % y(c2)
+    phi_z_f = grid % fw(s) * phi % z(c1) + (1.0-grid % fw(s)) * phi % z(c2)
 
     ! Total (exact) diffusive flux
     f_ex = (  phi_x_f * grid % sx(s)   &
