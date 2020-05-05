@@ -16,7 +16,8 @@
                       vt_save   => r_cell_10,  &
                       wt_save   => r_cell_11,  &
                       kin_vis_t => r_cell_12,  &
-                      phi_save  => r_cell_13
+                      phi_save  => r_cell_13,  &
+                      q_save    => r_cell_14
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
@@ -364,6 +365,18 @@
     call Save_Scalar(grid, IN_4, IN_5, phi % name, plot_inside,  &
                                        phi % n(-grid % n_bnd_cells), f8, f9)
   end do
+
+  !-----------------!
+  !   Q-criterion   !
+  !-----------------!
+  q_save(:) = 0.0
+  do c = 1, grid % n_cells
+    q_save(c) = (flow % vort(c)**2 - flow % shear(c)**2)/4.
+  end do
+
+  call Save_Scalar(grid, IN_4, IN_5, "Qcriterion", plot_inside,   &
+                                     q_save(-grid % n_bnd_cells),  &
+                                     f8, f9)
 
   !--------------------------!
   !   Turbulent quantities   !

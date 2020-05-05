@@ -18,28 +18,31 @@
     real :: area_y  ! [m^2]
     real :: area_z  ! [m^2]
 
+    ! Total inflow and outflow mass flux
     real :: mass_in   ! [kg/s]
     real :: mass_out  ! [kg/s]
 
-    ! Fluxes in x, y and z direction
+    ! Bulk mass flux in x-, y-, z- direction
     real :: flux_x  ! [kg/s]
     real :: flux_y  ! [kg/s]
     real :: flux_z  ! [kg/s]
 
-    ! Old fluxes in x, y and z direction
+    ! Desired bulk mass flux in x-, y-, z- direction (set in control file)
     real :: flux_x_o  ! [kg/s]
     real :: flux_y_o  ! [kg/s]
     real :: flux_z_o  ! [kg/s]
 
+    ! Pressure drop to achieve desired mass flux
     real :: p_drop_x  ! [N/m^3] = [kg/m^2/s^2]
     real :: p_drop_y  ! [N/m^3] = [kg/m^2/s^2]
     real :: p_drop_z  ! [N/m^3] = [kg/m^2/s^2]
 
+    ! Bulk velocities
     real :: u  ! [m/s]
     real :: v  ! [m/s]
     real :: w  ! [m/s]
 
-    ! Monitoring plane coordinates
+    ! Monitoring plane coordinates used to compute bulk fluxes
     real :: xp
     real :: yp
     real :: zp
