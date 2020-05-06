@@ -23,18 +23,6 @@
   integer           :: n, c, c1, c2, s, offset, fu
   integer           :: nf_sub_non_per, nf_sub_per
   character(len=80) :: name_out
-!------------------------------[Local parameters]------------------------------!
-  integer,           parameter :: VTK_LINE       =  3  ! cells in VTK format
-  integer,           parameter :: VTK_TETRA      = 10
-  integer,           parameter :: VTK_HEXAHEDRON = 12
-  integer,           parameter :: VTK_WEDGE      = 13
-  integer,           parameter :: VTK_PYRAMID    = 14
-  character(len= 0), parameter :: IN_0 = ''            ! indentation levels 
-  character(len= 2), parameter :: IN_1 = '  '
-  character(len= 4), parameter :: IN_2 = '    '
-  character(len= 6), parameter :: IN_3 = '      '
-  character(len= 8), parameter :: IN_4 = '        '
-  character(len=10), parameter :: IN_5 = '          '
 !==============================================================================!
 
   !----------------------!
