@@ -120,8 +120,8 @@
 
     vis_eff = visc_f + vis_t_f
 
-    if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
-      if(turbulence_model_variant .ne. STABILIZED) then
+    if(turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
+      if(turb % model_variant .ne. STABILIZED) then
         vis_eff = 1.5 * visc_f + vis_t_f
       end if
     end if
@@ -189,8 +189,8 @@
     c_mu_d = 0.22
   end if
 
-  if(turbulence_model_variant .ne. STABILIZED) then
-    if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
+  if(turb % model_variant .ne. STABILIZED) then
+    if(turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
       do c = 1, grid % n_cells
         u1uj_phij(c) = flow % density(c) * c_mu_d / phi % sigma        &
                      * kin % n(c)                                      &
@@ -216,7 +216,7 @@
                         + ww % n(c) * phi_z(c))                        &
                      - flow % viscosity(c) * phi_z(c)
       end do
-    else if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+    else if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
       do c = 1, grid % n_cells
         u1uj_phij(c) = flow % density(c) * c_mu_d / phi % sigma            &
                      * turb % t_scale(c)                                   &
@@ -252,7 +252,7 @@
   !------------------------------------------------------------------!
   !   Here we clean up transport equation from the false diffusion   !
   !------------------------------------------------------------------!
-  if(turbulence_model_variant .ne. STABILIZED) then
+  if(turb % model_variant .ne. STABILIZED) then
     do s = 1, grid % n_faces
 
       c1 = grid % faces_c(1,s)
@@ -303,11 +303,11 @@
   !   Source terms and wall function    !
   !                                     !
   !-------------------------------------!
-  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+  if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
     call Field_Mod_Grad_Variable(flow, f22)
 
     call Turb_Mod_Src_Rsm_Manceau_Hanjalic(turb, sol, phi % name)
-  else if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
+  else if(turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
     call Turb_Mod_Src_Rsm_Hanjalic_Jakirlic(turb, sol, phi % name, n_time_step)
   end if
 

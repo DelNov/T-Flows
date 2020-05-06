@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Results(flow, turb, mult, swarm, ts, plot_inside)
+  subroutine Save_Results(flow, turb, mult, swarm, ts, plot_inside, domain)
 !------------------------------------------------------------------------------!
 !   Writes results in VTU file format (for VisIt and Paraview)                 !
 !------------------------------------------------------------------------------!
@@ -27,6 +27,7 @@
   type(Swarm_Type),      target :: swarm
   integer                       :: ts           ! time step
   logical                       :: plot_inside  ! plot results inside?
+  integer,             optional :: domain
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: phi
@@ -62,21 +63,25 @@
   if(plot_inside) then
     call File_Mod_Set_Name(name_out_8,             &
                            time_step=ts,           &
-                           extension='.pvtu')
+                           extension='.pvtu',      &
+                           domain=domain)
     call File_Mod_Set_Name(name_out_9,             &
                            processor=this_proc,    &
                            time_step=ts,           &
-                           extension='.vtu')
+                           extension='.vtu',       &
+                           domain=domain)
   else
     call File_Mod_Set_Name(name_out_8,             &
                            time_step=ts,           &
                            appendix ='-bnd',       &
-                           extension='.pvtu')
+                           extension='.pvtu',      &
+                           domain=domain)
     call File_Mod_Set_Name(name_out_9,             &
                            processor=this_proc,    &
                            time_step=ts,           &
                            appendix ='-bnd',       &
-                           extension='.vtu')
+                           extension='.vtu',       &
+                           domain=domain)
   end if
 
   if(n_proc > 1 .and. this_proc .eq. 1) then
@@ -288,6 +293,30 @@
   end if
   write(f9,'(a,a)') IN_4, '</DataArray>'
 
+  !-------------------!
+  !   Domain number   !
+  !-------------------!
+  if(present(domain)) then
+    if(n_proc > 1 .and. this_proc .eq. 1)  then
+      write(f8,'(a,a)') IN_3, '<PDataArray type="UInt8" Name="Domain"' //  &
+                            ' format="ascii"/>'
+    end if
+    write(f9,'(a,a)') IN_4, '<DataArray type="UInt8" Name="Domain"' //  &
+                            ' format="ascii">'
+    if(plot_inside) then
+      do c = 1, grid % n_cells - grid % comm % n_buff_cells
+        write(f9,'(a,i9)') IN_5, domain
+      end do
+    else  ! plot only boundary
+      do s = 1, grid % n_faces
+        if( grid % faces_c(2,s) < 0 ) then
+          write(f9,'(a,i9)') IN_5, domain
+        end if
+      end do
+    end if
+    write(f9,'(a,a)') IN_4, '</DataArray>'
+  end if  ! present(domain)
+
   !--------------!
   !   Velocity   !
   !--------------!
@@ -354,11 +383,11 @@
   !--------------------------!
 
   ! Save kin and eps
-  if(turbulence_model .eq. K_EPS                 .or.  &
-     turbulence_model .eq. K_EPS_ZETA_F          .or.  &
-     turbulence_model .eq. HYBRID_LES_RANS       .or.  &
-     turbulence_model .eq. RSM_MANCEAU_HANJALIC  .or.  &
-     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC  ) then
+  if(turb % model .eq. K_EPS                 .or.  &
+     turb % model .eq. K_EPS_ZETA_F          .or.  &
+     turb % model .eq. HYBRID_LES_RANS       .or.  &
+     turb % model .eq. RSM_MANCEAU_HANJALIC  .or.  &
+     turb % model .eq. RSM_HANJALIC_JAKIRLIC  ) then
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentKineticEnergy", plot_inside,  &
                                        turb % kin % n(-grid % n_bnd_cells),    &
                                        f8, f9)
@@ -372,8 +401,8 @@
   end if
 
   ! Save zeta and f22
-  if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
-     turbulence_model .eq. HYBRID_LES_RANS) then
+  if(turb % model .eq. K_EPS_ZETA_F .or.  &
+     turb % model .eq. HYBRID_LES_RANS) then
     v2_calc(:) = 0.0
     do c = 1, grid % n_cells
       v2_calc(c) = turb % kin % n(c) * turb % zeta % n(c)
@@ -414,15 +443,15 @@
     end if
   end if
 
-  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+  if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityF22", plot_inside,  &
                                        turb % f22 % n(-grid % n_bnd_cells),  &
                                        f8, f9)
   end if
 
   ! Save vis and vis_t
-  if(turbulence_model .eq. DES_SPALART .or.  &
-     turbulence_model .eq. SPALART_ALLMARAS) then
+  if(turb % model .eq. DES_SPALART .or.  &
+     turb % model .eq. SPALART_ALLMARAS) then
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentViscosity", plot_inside,    &
                                        turb % vis % n(-grid % n_bnd_cells),  &
                                        f8, f9)
@@ -431,8 +460,8 @@
                                        f8, f9)
   end if
   kin_vis_t(:) = 0.0
-  if(turbulence_model .ne. NO_TURBULENCE .and.  &
-     turbulence_model .ne. DNS) then
+  if(turb % model .ne. NO_TURBULENCE .and.  &
+     turb % model .ne. DNS) then
     kin_vis_t   (-grid % n_bnd_cells:grid % n_cells) =  &
     turb % vis_t(-grid % n_bnd_cells:grid % n_cells) /  &
        flow % viscosity(-grid % n_bnd_cells:grid % n_cells)
@@ -442,8 +471,8 @@
   end if
 
   ! Reynolds stress models
-  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
-     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
+  if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+     turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
     call Save_Scalar(grid, IN_4, IN_5, "ReynoldsStressXX", plot_inside,     &
                                        turb % uu % n(-grid % n_bnd_cells),  &
                                        f8, f9)
@@ -476,7 +505,7 @@
   end if
 
   ! Statistics for large-scale simulations of turbulence
-  if(turbulence_statistics) then
+  if(turb % statistics) then
     call Save_Vector(grid, IN_4, IN_5, "MeanVelocity", plot_inside,          &
                                        turb % u_mean(-grid % n_bnd_cells),   &
                                        turb % v_mean(-grid % n_bnd_cells),   &
@@ -560,8 +589,8 @@
   end if
 
   ! Save y+ for all turbulence models
-  if(turbulence_model .ne. NO_TURBULENCE .and.  &
-     turbulence_model .ne. DNS) then
+  if(turb % model .ne. NO_TURBULENCE .and.  &
+     turb % model .ne. DNS) then
     call Save_Scalar(grid, IN_4, IN_5, "TurbulentQuantityYplus",            &
                                        plot_inside,                         &
                                        turb % y_plus(-grid % n_bnd_cells),  &
@@ -585,14 +614,14 @@
   !----------------------!
   !   Save user arrays   !
   !----------------------!
-  do ua = 1, n_user_arrays
+  do ua = 1, grid % n_user_arrays
 
     a_name = 'A_00'
     write(a_name(3:4), '(I2.2)') ua
     call Save_Scalar(grid, IN_4, IN_5, a_name,                              &
-                                       plot_inside,                         &
-                                       user_array(ua,-grid % n_bnd_cells),  &
-                                       f8, f9)
+                     plot_inside,                         &
+                     grid % user_array(ua,-grid % n_bnd_cells),  &
+                     f8, f9)
   end do
 
   !----------------------!
@@ -616,13 +645,15 @@
         call File_Mod_Set_Name(name_out_9,        &
                                processor=n,       &
                                time_step=ts,      &
-                               extension='.vtu')
+                               extension='.vtu',  &
+                               domain=domain)
       else
         call File_Mod_Set_Name(name_out_9,        &
                                processor=n,       &
                                time_step=ts,      &
                                appendix ='-bnd',  &
-                               extension='.vtu')
+                               extension='.vtu',  &
+                               domain=domain)
       end if
       write(f8, '(a,a,a,a)') IN_2, '<Piece Source="', trim(name_out_9), '"/>'
     end do

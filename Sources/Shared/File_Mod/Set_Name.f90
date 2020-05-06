@@ -3,9 +3,10 @@
                                time_step,  &
                                processor,  &
                                appendix,   &
-                               extension)
+                               extension,  &
+                               domain)
 !------------------------------------------------------------------------------!
-!   Creates the file name depending on time step, subdomain and file type.     !
+!   Creates the file name depending on time step, subdomain, type and domain   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -14,13 +15,22 @@
   integer,          optional :: processor
   character(len=*), optional :: appendix   ! used to add '-bnd' to name
   character(len=*)           :: extension
+  integer,          optional :: domain
 !-----------------------------------[Locals]-----------------------------------!
   integer          :: last_pos
   integer          :: lext, lapp
   character(len=5) :: num_proc  ! processor number as a string
 !==============================================================================!
 
-  name_out = problem_name
+  !-------------------------------------------!
+  !   Handle problems with multiple domains   !
+  !-------------------------------------------!
+  if(present(domain)) then
+    name_out = problem_name(domain)
+  else
+    name_out = problem_name(1)
+  end if
+
   last_pos = len_trim(name_out)
 
   !----------------------------------!

@@ -20,9 +20,6 @@
   implicit none
 !==============================================================================!
 
-  integer           :: n_user_arrays
-  real, allocatable :: user_array(:,:)
-
   contains
 
   include 'User_Mod/Allocate.f90'

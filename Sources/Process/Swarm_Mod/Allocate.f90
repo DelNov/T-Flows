@@ -26,9 +26,9 @@
   swarm % cell_has_particles(:) = .false.
 
   ! Allocate memory for working arrays
-  allocate(i_work(swarm % n_particles * N_I_VARS))
-  allocate(l_work(swarm % n_particles * N_L_VARS))
-  allocate(r_work(swarm % n_particles * N_R_VARS))
+  allocate(swarm % i_work(swarm % n_particles * N_I_VARS))
+  allocate(swarm % l_work(swarm % n_particles * N_L_VARS))
+  allocate(swarm % r_work(swarm % n_particles * N_R_VARS))
 
   !------------------------------!
   !   Initialize all particles   !

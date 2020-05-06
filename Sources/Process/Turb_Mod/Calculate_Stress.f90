@@ -32,7 +32,7 @@
   call Field_Mod_Grad_Variable(flow, v)
   call Field_Mod_Grad_Variable(flow, w)
 
-  if( turbulence_model .eq. K_EPS ) then
+  if( turb % model .eq. K_EPS ) then
     do c = 1, grid % n_cells
 
       uu % n(c) = - 2. * turb % vis_t(c) / flow % density(c)  &
@@ -49,7 +49,7 @@
     end do
   end if
 
-  if( turbulence_model .eq. K_EPS_ZETA_F ) then
+  if( turb % model .eq. K_EPS_ZETA_F ) then
 
     call Field_Mod_Grad_Component(flow, grid % wall_dist, 1, wd_x)
     call Field_Mod_Grad_Component(flow, grid % wall_dist, 2, wd_y)

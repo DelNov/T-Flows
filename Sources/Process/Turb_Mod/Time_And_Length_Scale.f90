@@ -43,8 +43,8 @@
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
   call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
 
-  if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
-     turbulence_model .eq. HYBRID_LES_RANS) then
+  if(turb % model .eq. K_EPS_ZETA_F .or.  &
+     turb % model .eq. HYBRID_LES_RANS) then
 
     do c = 1, grid % n_cells
       eps_l(c) = eps % n(c) + TINY ! limited eps % n
@@ -64,7 +64,7 @@
       turb % l_scale(c) = c_l * max( min(l_1(c), l_3(c)), l_2(c) )
     end do
 
-  else if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+  else if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
 
     do c = 1, grid % n_cells
       eps_l(c) = eps % n(c) + TINY ! limited eps % n
@@ -83,7 +83,7 @@
       turb % l_scale(c) = c_l * max( l_1(c), l_2(c) )
     end do
 
-  else if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
+  else if(turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
 
     do c = 1, grid % n_cells
       eps_l(c) = eps % n(c) + TINY ! limited eps % n

@@ -71,8 +71,8 @@
       end if
 
       ! Spalart Allmaras
-      if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
-         turbulence_model .eq. DES_SPALART) then
+      if(turb % model .eq. SPALART_ALLMARAS .or.  &
+         turb % model .eq. DES_SPALART) then
         if ( Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW  .or.  &
              Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT  .or.  &
              Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE .or.  &
@@ -82,8 +82,8 @@
       end if
 
       ! Reynolds stress models
-      if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
-         turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
+      if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+         turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
           uu  % n(c2) = 0.0
@@ -98,13 +98,13 @@
           turb % y_plus(c1) = Y_Plus_Low_Re(turb, u_tau,           &
                                             grid % wall_dist(c1),  &
                                             kin_vis)
-          if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) f22 % n(c2) = 0.0
+          if(turb % model .eq. RSM_MANCEAU_HANJALIC) f22 % n(c2) = 0.0
         end if
       end if
 
       ! k-epsilon-zeta-f
-      if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
-         turbulence_model .eq. HYBRID_LES_RANS) then
+      if(turb % model .eq. K_EPS_ZETA_F .or.  &
+         turb % model .eq. HYBRID_LES_RANS) then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW  .or.   &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT  .or.   &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE .or.   &
@@ -121,7 +121,7 @@
       end if
 
       ! k-epsilon
-      if(turbulence_model .eq. K_EPS) then
+      if(turb % model .eq. K_EPS) then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW  .or.  &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT  .or.  &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE .or.  &
@@ -134,8 +134,8 @@
         end if
       end if
 
-      if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
-         turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
+      if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+         turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW .or.  &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT .or.  &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE) then
@@ -147,7 +147,7 @@
           vw  % n(c2) = vw  % n(c1)
           kin % n(c2) = kin % n(c1)
           eps % n(c2) = eps % n(c1)
-          if(turbulence_model .eq. RSM_MANCEAU_HANJALIC)  &
+          if(turb % model .eq. RSM_MANCEAU_HANJALIC)  &
             f22 % n(c2) = f22 % n(c1)
         end if
       end if
@@ -164,9 +164,9 @@
 
         ! Wall temperature or heat fluxes for k-eps-zeta-f
         ! and high-re k-eps models. 
-        if(turbulence_model .eq. K_EPS_ZETA_F    .or.  &
-           turbulence_model .eq. HYBRID_LES_RANS .or.  &
-           turbulence_model .eq. K_EPS) then
+        if(turb % model .eq. K_EPS_ZETA_F    .or.  &
+           turb % model .eq. HYBRID_LES_RANS .or.  &
+           turb % model .eq. K_EPS) then
           if(Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALLFL) then
             t % n(c2) = t % n(c1) + t % q(c2) * grid % wall_dist(c1)  &
                       / (turb % con_w(c1) + TINY)
@@ -233,9 +233,9 @@
 
         ! Wall temperature or heat fluxes for k-eps-zeta-f
         ! and high-re k-eps models. 
-        if(turbulence_model .eq. K_EPS_ZETA_F    .or.  &
-           turbulence_model .eq. HYBRID_LES_RANS .or.  &
-           turbulence_model .eq. K_EPS) then
+        if(turb % model .eq. K_EPS_ZETA_F    .or.  &
+           turb % model .eq. HYBRID_LES_RANS .or.  &
+           turb % model .eq. K_EPS) then
 
           if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALLFL) then
             phi % n(c2) = phi % n(c1) + phi % q(c2) * grid % wall_dist(c1)  &

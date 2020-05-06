@@ -116,9 +116,9 @@
   ! The purpose of this factor is to make possible solving
   ! either for volume flux or for mass flux conservation
   if(multiphase_model .eq. VOLUME_OF_FLUID) then
-    dens_factor(:) = 1.0
+    dens_factor(1:grid % n_faces) = 1.0
   else
-    dens_factor(:) = flow % density_f(:)
+    dens_factor(1:grid % n_faces) = flow % density_f(1:grid % n_faces)
   end if
 
   !-------------------------------------------------!

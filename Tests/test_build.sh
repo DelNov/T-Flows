@@ -16,7 +16,7 @@ FCOMP="gnu"
 DEBUG="no"
 # Conduct tests with CGNS or not
 CGNS="yes"
-CGNS_MPI="mpich"
+CGNS_MPI="openmpi"
 
 # A small reminder how to set up alternatives if you have mpich and openmpi:
 #update-alternatives --install /usr/bin/mpif90 mpif90 /usr/bin/mpif90.openmpi 20

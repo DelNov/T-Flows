@@ -25,9 +25,9 @@
   c2 = grid % faces_c(2,s)
 
   ! Add influence of Re stresses
-  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
-     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
-    if(turbulence_model_variant .ne. STABILIZED) then
+  if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+     turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
+    if(turb % model_variant .ne. STABILIZED) then
       if(ui % name .eq. 'U') then
         uu_f = grid % fw(s) * uu % n(c1) + (1.0-grid % fw(s)) * uu % n(c2)
         uv_f = grid % fw(s) * uv % n(c1) + (1.0-grid % fw(s)) * uv % n(c2)

@@ -3,11 +3,6 @@
 !------------------------------------------------------------------------------!
 !   Discretizes and solves eliptic relaxation equations for f22.               !
 !------------------------------------------------------------------------------!
-!---------------------------------[Modules]------------------------------------!
-  use Work_Mod, only: phi_x => r_cell_01,  &
-                      phi_y => r_cell_02,  &
-                      phi_z => r_cell_03
-!------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   type(Turb_Type)           :: turb
@@ -82,9 +77,9 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
-    phi_x_f = grid % fw(s) * phi_x(c1) + (1.0-grid % fw(s)) * phi_x(c2)
-    phi_y_f = grid % fw(s) * phi_y(c1) + (1.0-grid % fw(s)) * phi_y(c2)
-    phi_z_f = grid % fw(s) * phi_z(c1) + (1.0-grid % fw(s)) * phi_z(c2)
+    phi_x_f = grid % fw(s) * phi % x(c1) + (1.0-grid % fw(s)) * phi % x(c2)
+    phi_y_f = grid % fw(s) * phi % y(c1) + (1.0-grid % fw(s)) * phi % y(c2)
+    phi_z_f = grid % fw(s) * phi % z(c1) + (1.0-grid % fw(s)) * phi % z(c2)
 
     ! Total (exact) diffusive flux
     f_ex = (  phi_x_f * grid % sx(s)   &
@@ -147,7 +142,7 @@
   !   Source terms and wall function    !
   !                                     !
   !-------------------------------------!
-  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+  if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
     call Turb_Mod_Src_F22_Rsm_Manceau_Hanjalic(turb, sol)
   else
     call Turb_Mod_Src_F22_K_Eps_Zeta_F(turb, sol)
@@ -173,9 +168,9 @@
           phi % res)
 
   ! Print info on the screen
-  if(turbulence_model .eq. K_EPS_ZETA_F) then
+  if(turb % model .eq. K_EPS_ZETA_F) then
     call Info_Mod_Iter_Fill_At(3, 4, phi % name, exec_iter, phi % res)
-  else if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+  else if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
     call Info_Mod_Iter_Fill_At(4, 2, phi % name, exec_iter, phi % res)
   end if
 

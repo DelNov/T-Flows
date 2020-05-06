@@ -125,11 +125,11 @@
     c2 = grid % faces_c(2,s)
 
 !   For species, we don't have a function for turbulent Schmidt number
-!   if(turbulence_model .ne. LES_SMAGORINSKY    .or.  &
-!      turbulence_model .ne. LES_DYNAMIC        .or.  &
-!      turbulence_model .ne. HYBRID_LES_PRANDTL .or.  &
-!      turbulence_model .ne. LES_WALE           .or.  &
-!      turbulence_model .ne. DNS) then
+!   if(turb % model .ne. LES_SMAGORINSKY    .or.  &
+!      turb % model .ne. LES_DYNAMIC        .or.  &
+!      turb % model .ne. HYBRID_LES_PRANDTL .or.  &
+!      turb % model .ne. LES_WALE           .or.  &
+!      turb % model .ne. DNS) then
 !     sc_t1 = Turb_Mod_Prandtl_Number(turb, c1)
 !     sc_t2 = Turb_Mod_Prandtl_Number(turb, c2)
 !     sc_t  = grid % fw(s) * sc_t1 + (1.0-grid % fw(s)) * sc_t2
@@ -159,8 +159,8 @@
 
 
 !   For species, we don't have some wall diffusivity
-!   if(turbulence_model .eq. K_EPS .or.  &
-!      turbulence_model .eq. K_EPS_ZETA_F) then 
+!   if(turb % model .eq. K_EPS .or.  &
+!      turb % model .eq. K_EPS_ZETA_F) then 
 !     if(c2 < 0) then
 !       if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALL .or.  &
 !          Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALLFL) then
@@ -249,9 +249,9 @@
   !   Source terms and wall function    !
   !                                     !
   !-------------------------------------!
-  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
-     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
-    if(turbulence_model_variant .ne. STABILIZED) then
+  if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+     turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
+    if(turb % model_variant .ne. STABILIZED) then
       do c = 1, grid % n_cells
         u1uj_phij(c) = -0.22 * turb % t_scale(c) *  &
                    (  uu % n(c) * phi % x(c)          &

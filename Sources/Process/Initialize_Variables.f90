@@ -158,7 +158,7 @@
             i=Key_Ind('T',keys,nks);prof(k,0)=t_def;t%n(c)=prof(k,i)
           end if
 
-          if(turbulence_model .eq. K_EPS) then
+          if(turb % model .eq. K_EPS) then
             i=Key_Ind('KIN',keys,nks);prof(k,0)=kin_def; kin%n(c)=prof(k,i)
             i=Key_Ind('EPS',keys,nks);prof(k,0)=eps_def; eps%n(c)=prof(k,i)
             if(heat_transfer) then
@@ -166,8 +166,8 @@
             end if
           end if
 
-          if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
-             turbulence_model .eq. HYBRID_LES_RANS) then
+          if(turb % model .eq. K_EPS_ZETA_F .or.  &
+             turb % model .eq. HYBRID_LES_RANS) then
             i=Key_Ind('KIN', keys,nks);prof(k,0)=kin_def; kin %n(c)=prof(k,i)
             i=Key_Ind('EPS', keys,nks);prof(k,0)=eps_def; eps %n(c)=prof(k,i)
             i=Key_Ind('ZETA',keys,nks);prof(k,0)=zeta_def;zeta%n(c)=prof(k,i)
@@ -177,12 +177,12 @@
             end if
            end if
 
-          if(turbulence_model .eq. DES_SPALART) then
+          if(turb % model .eq. DES_SPALART) then
             i=Key_Ind('VIS',keys,nks); prof(k,0)=vis_def; vis%n(c)=prof(k,i)
           end if
 
-          if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or. &
-             turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
+          if(turb % model .eq. RSM_MANCEAU_HANJALIC .or. &
+             turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
             i=Key_Ind('UU', keys,nks);prof(k,0)=uu_def; uu %n(c)=prof(k,i)
             i=Key_Ind('VV', keys,nks);prof(k,0)=vv_def; vv %n(c)=prof(k,i)
             i=Key_Ind('WW', keys,nks);prof(k,0)=ww_def; ww %n(c)=prof(k,i)
@@ -190,7 +190,7 @@
             i=Key_Ind('UW', keys,nks);prof(k,0)=uw_def; uw %n(c)=prof(k,i)
             i=Key_Ind('VW', keys,nks);prof(k,0)=vw_def; vw %n(c)=prof(k,i)
             i=Key_Ind('EPS',keys,nks);prof(k,0)=eps_def;eps%n(c)=prof(k,i)
-            if (turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+            if (turb % model .eq. RSM_MANCEAU_HANJALIC) then
               i=Key_Ind('F22',keys,nks);prof(k,0)=f22_def;f22%n(c)=prof(k,i)
             end if
           end if
@@ -244,7 +244,7 @@
 
       do c = 1, grid % n_cells
 
-        if(turbulence_statistics) then
+        if(turb % statistics) then
           u_mean(c) = 0.0
           v_mean(c) = 0.0
           w_mean(c) = 0.0
@@ -276,8 +276,8 @@
           phi % oo(c) = phi % n(c)
         end do
 
-        if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
-           turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
+        if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+           turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
           vals(0) = uu_def;  uu  % n(c) = vals(Key_Ind('UU',  keys, nks))
           vals(0) = vv_def;  vv  % n(c) = vals(Key_Ind('VV',  keys, nks))
           vals(0) = ww_def;  ww  % n(c) = vals(Key_Ind('WW',  keys, nks))
@@ -297,14 +297,14 @@
           uw % oo(c) = uw % n(c)
           vw % o(c)  = vw % n(c)
           vw % oo(c) = vw % n(c)
-          if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+          if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
             vals(0) = f22_def; f22 % n(c) = vals(Key_Ind('F22', keys, nks))
             f22 % o(c)  = f22 % n(c)
             f22 % oo(c) = f22 % n(c)
           end if
         end if
 
-        if(turbulence_model .eq. K_EPS) then
+        if(turb % model .eq. K_EPS) then
           vals(0) = kin_def; kin % n(c) = vals(Key_Ind('KIN', keys, nks))
           vals(0) = eps_def; eps % n(c) = vals(Key_Ind('EPS', keys, nks))
           kin % o(c)  = kin % n(c)
@@ -319,8 +319,8 @@
           end if
         end if
 
-        if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
-           turbulence_model .eq. HYBRID_LES_RANS) then
+        if(turb % model .eq. K_EPS_ZETA_F .or.  &
+           turb % model .eq. HYBRID_LES_RANS) then
           vals(0) = kin_def;  kin  % n(c) = vals(Key_Ind('KIN',  keys, nks))
           vals(0) = eps_def;  eps  % n(c) = vals(Key_Ind('EPS',  keys, nks))
           vals(0) = zeta_def; zeta % n(c) = vals(Key_Ind('ZETA', keys, nks))
@@ -341,8 +341,8 @@
           end if
         end if
 
-        if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
-           turbulence_model .eq. DES_SPALART) then
+        if(turb % model .eq. SPALART_ALLMARAS .or.  &
+           turb % model .eq. DES_SPALART) then
           vals(0) = vis_def; vis % n(c) = vals(Key_Ind('VIS', keys, nks))
           vis % o(c)  = vis % n(c)
           vis % oo(c) = vis % n(c)

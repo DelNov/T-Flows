@@ -21,8 +21,8 @@
   !-----------------------------------------------!
   if(n_proc > 1) then
 
-    i_work(:) = 0
-    r_work(:) = 0.0
+    swarm % i_work(:) = 0
+    swarm % r_work(:) = 0.0
 
     do k = 1, swarm % n_particles
 
@@ -35,28 +35,28 @@
       !-----------------------------------------------------!
       if(part % proc .eq. this_proc) then
         i = (k-1) * N_I_VARS
-        i_work(i + 1) = part % proc  ! where it resides
-        i_work(i + 2) = part % buff  ! where it wants to go
-        i_work(i + 3) = grid % comm % cell_glo(part % cell)
+        swarm % i_work(i + 1) = part % proc  ! where it resides
+        swarm % i_work(i + 2) = part % buff  ! where it wants to go
+        swarm % i_work(i + 3) = grid % comm % cell_glo(part % cell)
 
         i = (k-1) * N_R_VARS
-        r_work(i +  1) = part % x_n
-        r_work(i +  2) = part % y_n
-        r_work(i +  3) = part % z_n
-        r_work(i +  4) = part % u
-        r_work(i +  5) = part % v
-        r_work(i +  6) = part % w
-        r_work(i +  7) = part % d
-        r_work(i +  8) = part % cfl
+        swarm % r_work(i +  1) = part % x_n
+        swarm % r_work(i +  2) = part % y_n
+        swarm % r_work(i +  3) = part % z_n
+        swarm % r_work(i +  4) = part % u
+        swarm % r_work(i +  5) = part % v
+        swarm % r_work(i +  6) = part % w
+        swarm % r_work(i +  7) = part % d
+        swarm % r_work(i +  8) = part % cfl
         ! The following data is not really needed, at least not yet:
-        ! r_work(i +  9) = part % density
-        ! r_work(i + 10) = part % x_o
-        ! r_work(i + 11) = part % y_o
-        ! r_work(i + 12) = part % z_o
-        ! r_work(i + 13) = part % rel_u
-        ! r_work(i + 14) = part % rel_v
-        ! r_work(i + 15) = part % rel_w
-        ! r_work(i + 16) = part % rel_vel
+        ! swarm % r_work(i +  9) = part % density
+        ! swarm % r_work(i + 10) = part % x_o
+        ! swarm % r_work(i + 11) = part % y_o
+        ! swarm % r_work(i + 12) = part % z_o
+        ! swarm % r_work(i + 13) = part % rel_u
+        ! swarm % r_work(i + 14) = part % rel_v
+        ! swarm % r_work(i + 15) = part % rel_w
+        ! swarm % r_work(i + 16) = part % rel_vel
       end if
 
     end do    ! through particles
@@ -64,8 +64,10 @@
     !-----------------------!
     !   Exchange the data   !
     !-----------------------!
-    call Comm_Mod_Global_Sum_Int_Array (swarm % n_particles * N_I_VARS, i_work)
-    call Comm_Mod_Global_Sum_Real_Array(swarm % n_particles * N_R_VARS, r_work)
+    call Comm_Mod_Global_Sum_Int_Array (swarm % n_particles * N_I_VARS,  &
+                                        swarm % i_work)
+    call Comm_Mod_Global_Sum_Real_Array(swarm % n_particles * N_R_VARS,  &
+                                        swarm % r_work)
 
     !-----------------------------------------!
     !   Distribute global data on particles   !
@@ -76,9 +78,9 @@
       part => swarm % particle(k)
 
       i = (k-1) * N_I_VARS
-      part % proc = i_work(i + 1)
-      part % buff = i_work(i + 2)
-      part % cell = i_work(i + 3)  ! holds global number for the moment
+      part % proc = swarm % i_work(i + 1)
+      part % buff = swarm % i_work(i + 2)
+      part % cell = swarm % i_work(i + 3)  ! holds global number for the moment
 
       ! Particle was in this processor and wants to stay here
       if(part % proc .eq. this_proc .and. part % buff .eq. this_proc) then
@@ -119,23 +121,23 @@
       end if
 
       i = (k-1) * N_R_VARS
-      part % x_n     = r_work(i +  1)
-      part % y_n     = r_work(i +  2)
-      part % z_n     = r_work(i +  3)
-      part % u       = r_work(i +  4)
-      part % v       = r_work(i +  5)
-      part % w       = r_work(i +  6)
-      part % d       = r_work(i +  7)
-      part % cfl     = r_work(i +  8)
+      part % x_n     = swarm % r_work(i +  1)
+      part % y_n     = swarm % r_work(i +  2)
+      part % z_n     = swarm % r_work(i +  3)
+      part % u       = swarm % r_work(i +  4)
+      part % v       = swarm % r_work(i +  5)
+      part % w       = swarm % r_work(i +  6)
+      part % d       = swarm % r_work(i +  7)
+      part % cfl     = swarm % r_work(i +  8)
       ! The following data is not really needed, at least not yet:
-      ! part % density = r_work(i +  9)
-      ! part % x_o     = r_work(i + 10)
-      ! part % y_o     = r_work(i + 11)
-      ! part % z_o     = r_work(i + 12)
-      ! part % rel_u   = r_work(i + 13)
-      ! part % rel_v   = r_work(i + 14)
-      ! part % rel_w   = r_work(i + 15)
-      ! part % rel_vel = r_work(i + 16)
+      ! part % density = swarm % r_work(i +  9)
+      ! part % x_o     = swarm % r_work(i + 10)
+      ! part % y_o     = swarm % r_work(i + 11)
+      ! part % z_o     = swarm % r_work(i + 12)
+      ! part % rel_u   = swarm % r_work(i + 13)
+      ! part % rel_v   = swarm % r_work(i + 14)
+      ! part % rel_w   = swarm % r_work(i + 15)
+      ! part % rel_vel = swarm % r_work(i + 16)
     end do
 
   end if

@@ -3,8 +3,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type), target :: grid
-  integer                 :: n    ! number of arrays
+  type(Grid_Type) :: grid(:)
+  integer         :: n    ! number of arrays
 !-----------------------------------[Locals]-----------------------------------!
   integer :: nf
 !==============================================================================!
@@ -12,10 +12,7 @@
   if(n .eq. 0) return
 
   ! Get number of cells and boundary cells
-  nf = grid % n_faces
-
-  ! Store the pointer to the grid
-  pnt_grid => grid
+  nf = maxval(grid(1:size(grid)) % n_faces)
 
   ! Allocate requested memory
   allocate(i_face_01(nf));   i_face_01 = 0;   if(n .eq.  1) return

@@ -13,19 +13,23 @@
     ! Create a frame
 
     do i = 1, L_LINE
-      bulk_info % line_lead (i:i) = '-'
+      bulk_info % line_lead(i:i) = '-'
+      bulk_info % line_foll(i:i) = ' '
     end do
-    bulk_info % line_lead (     1:     1) = '#'
-    bulk_info % line_lead (L_LINE:L_LINE) = '#'
+    bulk_info % line_lead(     1:     1) = '#'
+    bulk_info % line_lead(L_LINE:L_LINE) = '#'
 
     do i = L_BOX + 1,  5*L_BOX + 1
       bulk_info % line_lead (i:i) = '='
+      bulk_info % line_foll (i:i) = '='
       bulk_info % line_sep  (i:i) = '-'
       bulk_info % line_trail(i:i) = '-'
     end do
 
-    bulk_info % line_lead (  L_BOX+1:  L_BOX+1) = '+'
-    bulk_info % line_lead (5*L_BOX+1:5*L_BOX+1) = '+'
+    bulk_info % line_lead(  L_BOX+1:  L_BOX+1) = '+'
+    bulk_info % line_foll(  L_BOX+1:  L_BOX+1) = '+'
+    bulk_info % line_lead(5*L_BOX+1:5*L_BOX+1) = '+'
+    bulk_info % line_foll(5*L_BOX+1:5*L_BOX+1) = '+'
 
     do i = 22, 106, 106-22
       bulk_info % lines(1)  (i:i) = '#'
@@ -37,6 +41,7 @@
 
     ! Create separators
     bulk_info % line_lead(L_LINE/2+1:L_LINE/2+1) = '+'
+    bulk_info % line_foll(L_LINE/2+1:L_LINE/2+1) = '+'
     bulk_info % lines(1) (L_LINE/2+1:L_LINE/2+1) = '|'
     bulk_info % line_sep (L_LINE/2+1:L_LINE/2+1) = '+'
 

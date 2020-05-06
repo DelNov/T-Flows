@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Swarm(swarm, time_step)
+  subroutine Save_Swarm(swarm, time_step, domain)
 !------------------------------------------------------------------------------!
 !   Writes particles in VTU file format (for VisIt and Paraview)               !
 !------------------------------------------------------------------------------!
@@ -11,6 +11,7 @@
   type(Particle_Type), pointer :: part
   integer                      :: k, fu
   character(len=80)            :: name_out
+  integer,            optional :: domain
 !-----------------------------[Local parameters]-------------------------------!
   character(len= 0)  :: IN_0 = ''           ! indentation levels
   character(len= 2)  :: IN_1 = '  '
@@ -30,7 +31,7 @@
 
   if(this_proc < 2) then
 
-    call File_Mod_Set_Name(name_out, extension='.swarm.vtu')
+    call File_Mod_Set_Name(name_out, extension='.swarm.vtu', domain=domain)
     call File_Mod_Open_File_For_Writing(name_out, fu)
 
     !------------!

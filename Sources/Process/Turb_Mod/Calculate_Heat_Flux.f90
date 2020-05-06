@@ -30,7 +30,7 @@
   !-----------------------------------------!
   call Control_Mod_Turbulent_Prandtl_Number(pr_t)
 
-  if(turbulent_heat_flux_model .eq. SGDH) then
+  if(turb % heat_flux_model .eq. SGDH) then
 
     do c = 1, grid % n_cells
       pr_t = max(Turb_Mod_Prandtl_Number(turb, c), TINY)
@@ -39,7 +39,7 @@
       wt % n(c) = - turb % vis_t(c) / flow % density(c) / pr_t * t % z(c)
     end do
 
-  else if(turbulent_heat_flux_model .eq. GGDH) then
+  else if(turb % heat_flux_model .eq. GGDH) then
 
     do c = 1, grid % n_cells
       ut % n(c) = -c_theta * turb % t_scale(c) * (uu % n(c) * t % x(c)  +  &
@@ -53,7 +53,7 @@
                                                   ww % n(c) * t % z(c))
     end do
 
-  else if(turbulent_heat_flux_model .eq. AFM) then
+  else if(turb % heat_flux_model .eq. AFM) then
   end if
 
   end subroutine

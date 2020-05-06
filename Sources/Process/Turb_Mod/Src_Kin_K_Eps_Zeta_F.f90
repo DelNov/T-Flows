@@ -86,7 +86,7 @@
     end do
   end if
 
-  if(turbulence_model .eq. HYBRID_LES_RANS) then
+  if(turb % model .eq. HYBRID_LES_RANS) then
     do c = 1, grid % n_cells
 
       lf = grid % vol(c)**ONE_THIRD
@@ -101,10 +101,10 @@
       l_rans_v = sqrt(kin % n(c) * zeta % n(c))
       alpha_v  = l_rans_v / (l_sgs_v + TINY)
 
-      if( (hybrid_les_rans_switch .eq. SWITCH_DISTANCE)  &
+      if( (turb % hybrid_les_rans_switch .eq. SWITCH_DISTANCE)  &
           .and. (alpha_d < 1.05)                         &
           .or.                                           &
-          (hybrid_les_rans_switch .eq. SWITCH_VELOCITY)  &
+          (turb % hybrid_les_rans_switch .eq. SWITCH_VELOCITY)  &
           .and. (alpha_v < 0.85) ) then
         a % val(a % dia(c)) = a % val(a % dia(c))             &
                             + flow % density(c) * eps % n(c)  &

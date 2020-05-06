@@ -139,6 +139,11 @@
     !------------------------------------------!
     type(Comm_Type) :: comm
 
+    ! User arrays.  I am neither sure if this is the ...
+    ! ... best place for them nor do I need them at all?
+    integer           :: n_user_arrays
+    real, allocatable :: user_array(:,:)
+
   end type
 
   contains

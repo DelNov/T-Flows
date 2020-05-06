@@ -22,7 +22,7 @@
   !   Start branching for various turbulence models   !
   !---------------------------------------------------!
 
-  if(turbulence_model .eq. K_EPS) then
+  if(turb % model .eq. K_EPS) then
 
     ! Update the values at boundaries
     call Update_Boundary_Values(flow, turb)
@@ -42,8 +42,8 @@
 
   end if
 
-  if(turbulence_model .eq. K_EPS_ZETA_F .or. &
-     turbulence_model .eq. HYBRID_LES_RANS) then
+  if(turb % model .eq. K_EPS_ZETA_F .or. &
+     turb % model .eq. HYBRID_LES_RANS) then
     call Calculate_Shear_And_Vorticity(flow)
 
     call Turb_Mod_Compute_Variable(turb, sol, ini, turb % kin, n)
@@ -64,8 +64,8 @@
 
   end if
 
-  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
-     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
+  if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+     turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
 
     ! Update the values at boundaries
     call Update_Boundary_Values(flow, turb)
@@ -84,7 +84,7 @@
     call Turb_Mod_Compute_Stress(turb, sol, ini, turb % uw, n)
     call Turb_Mod_Compute_Stress(turb, sol, ini, turb % vw, n)
 
-    if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+    if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
       call Turb_Mod_Compute_F22(turb, sol, ini, turb % f22)
     end if
 
@@ -97,8 +97,8 @@
     end if
   end if
 
-  if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
-     turbulence_model .eq. DES_SPALART) then
+  if(turb % model .eq. SPALART_ALLMARAS .or.  &
+     turb % model .eq. DES_SPALART) then
     call Calculate_Shear_And_Vorticity(flow)
     call Calculate_Vorticity(flow)
 

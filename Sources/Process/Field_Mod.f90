@@ -25,10 +25,10 @@
     ! Physical properties
     real, allocatable :: capacity(:)      ! [J/kg/K]
     real, allocatable :: conductivity(:)  ! [W/(m K)]
-    real :: diffusivity                   ! [m^2/s]
     real, allocatable :: density(:)       ! [kg/m^3]
     real, allocatable :: viscosity(:)     ! [kg/m/s]
     real, allocatable :: density_f(:)     ! [kg/m^3]
+    real              :: diffusivity      ! [m^2/s]
 
     ! Velocity components
     type(Var_Type) :: u  ! [m/s]
@@ -55,6 +55,9 @@
 
     ! Bulk velocities, pressure drops, etc.
     type(Bulk_Type) :: bulk
+
+    ! Maximum CFL and Pe numbers
+    real :: cfl_max, pe_max
 
     ! Time step used in this field
     real :: dt  ! [s]

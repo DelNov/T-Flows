@@ -27,7 +27,7 @@
   real,             pointer :: phi_mean(:,:)
 !==============================================================================!
 
-  if(.not. turbulence_statistics) return
+  if(.not. turb % statistics) return
 
   ! Take aliases
   flow => turb % pnt_flow
@@ -70,12 +70,12 @@
       !---------------------------------!
       !   Scale-resolving simulations   ! 
       !---------------------------------!
-      if(turbulence_model .eq. LES_SMAGORINSKY    .or.  &
-         turbulence_model .eq. LES_DYNAMIC        .or.  &
-         turbulence_model .eq. LES_WALE           .or.  &
-         turbulence_model .eq. HYBRID_LES_PRANDTL .or.  &
-         turbulence_model .eq. DES_SPALART        .or.  &
-         turbulence_model .eq. DNS) then
+      if(turb % model .eq. LES_SMAGORINSKY    .or.  &
+         turb % model .eq. LES_DYNAMIC        .or.  &
+         turb % model .eq. LES_WALE           .or.  &
+         turb % model .eq. HYBRID_LES_PRANDTL .or.  &
+         turb % model .eq. DES_SPALART        .or.  &
+         turb % model .eq. DNS) then
 
         ! Mean velocities (and temperature)
         u_mean(c) = (u_mean(c) * (1.*n) + u % n(c)) / (1.*(n+1))
@@ -107,7 +107,7 @@
       !-----------------!
       !   K-eps model   !
       !-----------------!
-      if(turbulence_model .eq. K_EPS) then
+      if(turb % model .eq. K_EPS) then
 
         ! Time-averaged velocities (and temperature)
         u_mean(c) = (u_mean(c) * (1.*n) + u % n(c)) / (1.*(n+1))
@@ -143,8 +143,8 @@
       !------------------!
       !   K-eps-zeta-f   !
       !------------------!
-      if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
-         turbulence_model .eq. HYBRID_LES_RANS) then
+      if(turb % model .eq. K_EPS_ZETA_F .or.  &
+         turb % model .eq. HYBRID_LES_RANS) then
 
         ! Time-averaged velocities (and temperature)
         u_mean(c) = (u_mean(c) * (1.*n) + u % n(c)) / (1.*(n+1))
@@ -186,8 +186,8 @@
       !----------------------------!
       !   Reynolds stress models   !
       !----------------------------!
-      if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
-         turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+      if(turb % model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
+         turb % model .eq. RSM_MANCEAU_HANJALIC) then
 
         ! Time-averaged velocities (and temperature)
         u_mean(c) = (u_mean(c) * (1.*n) + u % n(c)) / (1.*(n+1))
@@ -207,7 +207,7 @@
         vw_mean (c) = (vw_mean (c) * (1.*n) + vw  % n(c)) / (1.*(n+1))
         kin_mean(c) = (kin_mean(c) * (1.*n) + kin % n(c)) / (1.*(n+1))
         eps_mean(c) = (eps_mean(c) * (1.*n) + eps % n(c)) / (1.*(n+1))
-        if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+        if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
           f22_mean(c) = (f22_mean(c) * (1.*n) + f22 % n(c)) / (1.*(n+1))
         end if
 
