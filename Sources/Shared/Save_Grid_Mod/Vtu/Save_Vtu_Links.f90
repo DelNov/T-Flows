@@ -210,34 +210,14 @@
   print '(a38,i9)', '# Periodic links        :            ', nf_sub_per
   print '(a38,i9)', '# Inter-processor links :            ', n_buf_cells_sub
 
-  ! Now write all cells' offsets
-  write(fu) IN_4 // '<DataArray type="Int64" Name="offsets" ' // & 
-                    'format="ascii">' // LF
-  offset = 0
-  do c = 1, grid % n_cells
-    if(grid % comm % cell_proc(c) .eq. sub) then
-      offset = offset + grid % cells_n_nodes(c)
-      write(str1,'(a,i9)') IN_5, offset
-      write(fu) trim(str1) // LF
-    end if
-  end do
-  do c = 1, nf_sub_non_per
-    offset = offset + 2
-    write(str1,'(a,i9)') IN_5, offset
-    write(fu) trim(str1) // LF
-  end do
-  do c = 1, nf_sub_per
-    offset = offset + 2
-    write(str1,'(a,i9)') IN_5, offset
-    write(fu) trim(str1) // LF
-  end do
-  do c = 1, n_buf_cells_sub
-    offset = offset + 2
-    write(str1,'(a,i9)') IN_5, offset
-    write(fu) trim(str1) // LF
-  end do
-
+  ! Cells' offsets
+  write(str1, '(i0.0)') data_offset
+  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+                    ' Name="offsets"'                //  &
+                    ' format="appended"'             //  &
+                    ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
+  data_offset = data_offset + SP + n_cells_here * IP  ! prepare for next
 
   ! Cells' types
   write(str1, '(i0.0)') data_offset
@@ -321,6 +301,29 @@
   !---------------!
   !   Cell data   !
   !---------------!
+
+  ! Cells' offsets
+  data_size = n_cells_here * IP
+  write(fu) data_size
+  offset = 0
+  do c = 1, grid % n_cells
+    if(grid % comm % cell_proc(c) .eq. sub) then
+      offset = offset + grid % cells_n_nodes(c)
+      write(fu) offset
+    end if
+  end do
+  do c = 1, nf_sub_non_per
+    offset = offset + 2
+    write(fu) offset
+  end do
+  do c = 1, nf_sub_per
+    offset = offset + 2
+    write(fu) offset
+  end do
+  do c = 1, n_buf_cells_sub
+    offset = offset + 2
+    write(fu) offset
+  end do
 
   ! Cells' types
   data_size = n_cells_here * IP
