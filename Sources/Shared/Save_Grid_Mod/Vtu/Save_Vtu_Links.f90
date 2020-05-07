@@ -20,10 +20,17 @@
   integer         :: sub, n_nodes_sub, n_cells_sub, n_faces_sub,  &
                           n_bnd_cells_sub, n_buf_cells_sub
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: n, c, c1, c2, s, offset, fu
-  integer           :: nf_sub_non_per, nf_sub_per
+  integer(4)         :: data_size
+  integer            :: n, c, c1, c2, s, data_offset, offset, fu
+  integer            :: nf_sub_non_per, nf_sub_per
+  integer            :: n_nodes_here, n_cells_here
   character(len=160) :: name_out, str1, str2
+  integer, parameter :: IP=8, RP=8, SP=4
 !==============================================================================!
+
+  n_nodes_here = n_nodes_sub + n_cells_sub +             &
+                 n_bnd_cells_sub + n_buf_cells_sub
+  n_cells_here = n_cells_sub + n_faces_sub + n_buf_cells_sub
 
   !----------------------!
   !                      !
@@ -33,55 +40,33 @@
   call File_Mod_Set_Name(name_out, processor=sub, extension='.links.vtu')
   call File_Mod_Open_File_For_Writing_Binary(name_out, fu)
 
-  !-----------!
-  !   Start   !
-  !-----------!
+  !------------!
+  !            !
+  !   Header   !
+  !            !
+  !------------!
   write(fu) IN_0 // '<?xml version="1.0"?>' // LF
   write(fu) IN_0 // '<VTKFile type="UnstructuredGrid" version="0.1" '//  &
                     ' byte_order="LittleEndian">' // LF
   write(fu) IN_1 // '<UnstructuredGrid>' // LF
-  write(str1, '(i0.0)')    n_nodes_sub + n_cells_sub +             &
-                           n_bnd_cells_sub + n_buf_cells_sub
-  write(str2, '(i0.0)')    n_cells_sub + n_faces_sub + n_buf_cells_sub
+  write(str1, '(i0.0)') n_nodes_here
+  write(str2, '(i0.0)') n_cells_here
   write(fu) IN_2 // '<Piece NumberOfPoints="' // trim(str1) // '"' //  &
                     ' NumberOfCells="' // trim(str2) // '">'       // LF
+  data_offset = 0
 
   !-----------!
   !   Nodes   !
   !-----------!
-  write(fu) IN_3 // '<Points>' // LF
-  write(fu) IN_4 // '<DataArray type="Float64" NumberOfComponents' //  &
-                          '="3" format="ascii">' // LF
-  do n = 1, grid % n_nodes
-    if(grid % new_n(n) .ne. 0) then
-      write(str1, '(a,1pe15.7,1pe15.7,1pe15.7)')   &
-                  IN_5, grid % xn(n), grid % yn(n), grid % zn(n)
-      write(fu) trim(str1) // LF
-    end if
-  end do
-  do c = 1, grid % n_cells
-    if(grid % comm % cell_proc(c) .eq. sub) then
-      write(str1, '(a,1pe15.7,1pe15.7,1pe15.7)')   &
-                  IN_5, grid % xc(c), grid % yc(c), grid % zc(c)
-      write(fu) trim(str1) // LF
-    end if
-  end do
-  do c = -1,-grid % n_bnd_cells,-1
-    if(grid % comm % cell_proc(c) .eq. sub) then
-      write(str1, '(a,1pe15.7,1pe15.7,1pe15.7)')   &
-                  IN_5, grid % xc(c), grid % yc(c), grid % zc(c)
-      write(fu) trim(str1) // LF
-    end if
-  end do
-  do c = 1,n_buf_cells_sub
-    write(str1, '(a,1pe15.7,1pe15.7,1pe15.7)') IN_5,  &
-                  grid % xc(buf_recv_ind(c)),         &
-                  grid % yc(buf_recv_ind(c)),         &
-                  grid % zc(buf_recv_ind(c))
-    write(fu) trim(str1) // LF
-  end do
+  write(str1, '(i1)') data_offset
+  write(fu) IN_3 // '<Points>'                       // LF
+  write(fu) IN_4 // '<DataArray type="Float64"'      //  &
+                    ' NumberOfComponents="3"'        //  &
+                    ' format="appended"'             //  &
+                    ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
   write(fu) IN_3 // '</Points>'    // LF
+  data_offset = data_offset + SP + n_nodes_here * RP * 3  ! prepare for next
 
   !-----------!
   !   Cells   !
@@ -323,7 +308,43 @@
   !------------!
   write(fu) IN_2 // '</Piece>'            // LF
   write(fu) IN_1 // '</UnstructuredGrid>' // LF
-  write(fu) IN_0 // '</VTKFile>'          // LF
+
+  !-------------------!
+  !                   !
+  !   Appended data   !
+  !                   !
+  !-------------------!
+  write(fu) IN_0 // '<AppendedData encoding="raw">' // LF
+  write(fu) '_'
+
+  !-----------!
+  !   Nodes   !
+  !-----------!
+  data_size = n_nodes_here * RP * 3
+  write(fu) data_size
+  do n = 1, grid % n_nodes
+    if(grid % new_n(n) .ne. 0) then
+      write(fu) grid % xn(n), grid % yn(n), grid % zn(n)
+    end if
+  end do
+  do c = 1, grid % n_cells
+    if(grid % comm % cell_proc(c) .eq. sub) then
+      write(fu) grid % xc(c), grid % yc(c), grid % zc(c)
+    end if
+  end do
+  do c = -1,-grid % n_bnd_cells,-1
+    if(grid % comm % cell_proc(c) .eq. sub) then
+      write(fu) grid % xc(c), grid % yc(c), grid % zc(c)
+    end if
+  end do
+  do c = 1,n_buf_cells_sub
+    write(fu) grid % xc(buf_recv_ind(c)),  &
+              grid % yc(buf_recv_ind(c)),  &
+              grid % zc(buf_recv_ind(c))
+  end do
+
+  write(fu) LF // IN_0 // '</AppendedData>' // LF
+  write(fu) IN_0 // '</VTKFile>'            // LF
 
   close(fu)
 
