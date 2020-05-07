@@ -239,41 +239,16 @@
 
   write(fu) IN_4 // '</DataArray>' // LF
 
-  ! Now write all cells' types
-  write(fu) IN_4 // '<DataArray type="Int64" Name="types" format="ascii">' // LF
-  do c = 1, grid % n_cells
-    if(grid % comm % cell_proc(c) .eq. sub) then
-      if(grid % cells_n_nodes(c) .eq. 4) then
-        write(str1,'(a,i9)') IN_5, VTK_TETRA
-        write(fu) trim(str1) // LF
-      end if
-      if(grid % cells_n_nodes(c) .eq. 8) then
-        write(str1,'(a,i9)') IN_5, VTK_HEXAHEDRON
-        write(fu) trim(str1) // LF
-      end if
-      if(grid % cells_n_nodes(c) .eq. 6) then
-        write(str1,'(a,i9)') IN_5, VTK_WEDGE
-        write(fu) trim(str1) // LF
-      end if
-      if(grid % cells_n_nodes(c) .eq. 5) then
-        write(str1,'(a,i9)') IN_5, VTK_PYRAMID
-        write(fu) trim(str1) // LF
-      end if
-    end if
-  end do
-  do c = 1, nf_sub_non_per
-    write(str1,'(a,i9)') IN_5, VTK_LINE
-    write(fu) trim(str1) // LF
-  end do
-  do c = 1, nf_sub_per
-    write(str1,'(a,i9)') IN_5, VTK_LINE
-    write(fu) trim(str1) // LF
-  end do
-  do c = 1, n_buf_cells_sub
-    write(str1,'(a,i9)') IN_5, VTK_LINE
-    write(fu) trim(str1) // LF
-  end do
+  ! Cells' types
+  write(str1, '(i0.0)') data_offset
+  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+                    ' Name="types"'                  //  &
+                    ' format="appended"'             //  &
+                    ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
+  data_offset = data_offset + SP + n_cells_here * IP  ! prepare for next
+
+! write(fu) IN_4 // '</DataArray>' // LF
   write(fu) IN_3 // '</Cells>'     // LF
 
   !----------------!
@@ -341,6 +316,39 @@
     write(fu) grid % xc(buf_recv_ind(c)),  &
               grid % yc(buf_recv_ind(c)),  &
               grid % zc(buf_recv_ind(c))
+  end do
+
+  !---------------!
+  !   Cell data   !
+  !---------------!
+
+  ! Cells' types
+  data_size = n_cells_here * IP
+  write(fu) data_size
+  do c = 1, grid % n_cells
+    if(grid % comm % cell_proc(c) .eq. sub) then
+      if(grid % cells_n_nodes(c) .eq. 4) then
+        write(fu) VTK_TETRA
+      end if
+      if(grid % cells_n_nodes(c) .eq. 8) then
+        write(fu) VTK_HEXAHEDRON
+      end if
+      if(grid % cells_n_nodes(c) .eq. 6) then
+        write(fu) VTK_WEDGE
+      end if
+      if(grid % cells_n_nodes(c) .eq. 5) then
+        write(fu) VTK_PYRAMID
+      end if
+    end if
+  end do
+  do c = 1, nf_sub_non_per
+    write(fu) VTK_LINE
+  end do
+  do c = 1, nf_sub_per
+    write(fu) VTK_LINE
+  end do
+  do c = 1, n_buf_cells_sub
+    write(fu) VTK_LINE
   end do
 
   write(fu) LF // IN_0 // '</AppendedData>' // LF
