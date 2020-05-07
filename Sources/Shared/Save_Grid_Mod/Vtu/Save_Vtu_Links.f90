@@ -228,39 +228,31 @@
   write(fu) IN_4 // '</DataArray>' // LF
   data_offset = data_offset + SP + n_cells_here * IP  ! prepare for next
 
-! write(fu) IN_4 // '</DataArray>' // LF
+  !----------------------!
+  !   The end of cells   !
+  !----------------------!
   write(fu) IN_3 // '</Cells>'     // LF
 
-  !----------------!
-  !   Link types   !
-  !----------------!
+  !---------------!
+  !   Cell data   !
+  !---------------!
   write(fu) IN_3 // '<CellData Scalars="scalars" vectors="velocity">' // LF
-  write(fu) IN_4 // '<DataArray type="Int64" ' // & 
-                          'Name="link type" format="ascii">' // LF
-  do c = 1, grid % n_cells
-    if(grid % comm % cell_proc(c) .eq. sub) then
-      write(str1,'(a,i9)') IN_5, 0
-      write(fu) trim(str1) // LF
-    end if
-  end do
-  do c = 1, nf_sub_non_per
-    write(str1,'(a,i9)') IN_5, 1
-    write(fu) trim(str1) // LF
-  end do
-  do c = 1, nf_sub_per
-    write(str1,'(a,i9)') IN_5, 2
-    write(fu) trim(str1) // LF
-  end do
-  do c = 1, n_buf_cells_sub
-    write(str1,'(a,i9)') IN_5, 3
-    write(fu) trim(str1) // LF
-  end do
+
+  ! Link types
+  write(str1, '(i0.0)') data_offset
+  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+                    ' Name="LinkType"'               //  &
+                    ' format="appended"'             //  &
+                    ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
-  write(fu) IN_3 // '</CellData>'  // LF
+  data_offset = data_offset + SP  &
+              + (n_cells_sub + n_buf_cells_sub +  &
+                 nf_sub_per + nf_sub_non_per) * IP  ! prepare for next
 
   !------------!
   !   Footer   !
   !------------!
+  write(fu) IN_3 // '</CellData>'  // LF
   write(fu) IN_2 // '</Piece>'            // LF
   write(fu) IN_1 // '</UnstructuredGrid>' // LF
 
@@ -298,9 +290,9 @@
               grid % zc(buf_recv_ind(c))
   end do
 
-  !---------------!
-  !   Cell data   !
-  !---------------!
+  !-----------!
+  !   Cells   !
+  !-----------!
 
   ! Cells' offsets
   data_size = n_cells_here * IP
@@ -352,6 +344,29 @@
   end do
   do c = 1, n_buf_cells_sub
     write(fu) VTK_LINE
+  end do
+
+  !---------------!
+  !   Cell data   !
+  !---------------!
+
+  ! Link types
+  data_size = (n_cells_sub + n_buf_cells_sub +  &
+               nf_sub_per + nf_sub_non_per) * IP
+  write(fu) data_size
+  do c = 1, grid % n_cells
+    if(grid % comm % cell_proc(c) .eq. sub) then
+      write(fu) 0
+    end if
+  end do
+  do c = 1, nf_sub_non_per
+    write(fu) 1
+  end do
+  do c = 1, nf_sub_per
+    write(fu) 2
+  end do
+  do c = 1, n_buf_cells_sub
+    write(fu) 3
   end do
 
   write(fu) LF // IN_0 // '</AppendedData>' // LF
