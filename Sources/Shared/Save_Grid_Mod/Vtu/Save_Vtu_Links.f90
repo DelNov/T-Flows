@@ -23,20 +23,33 @@
   integer(4)         :: data_size
   integer            :: n, c, c1, c2, s, data_offset, offset, fu
   integer            :: nf_sub_non_per, nf_sub_per
-  integer            :: n_nodes_here, n_cells_here
+  integer            :: n_nodes_here, n_cells_here, n_conns_here, tag
   character(len=160) :: name_out, str1, str2
   integer, parameter :: IP=8, RP=8, SP=4
 !==============================================================================!
 
+  ! Work out a few handy aliases
   n_nodes_here = n_nodes_sub + n_cells_sub +             &
                  n_bnd_cells_sub + n_buf_cells_sub
   n_cells_here = n_cells_sub + n_faces_sub + n_buf_cells_sub
+  n_conns_here = 0
+  do c = 1, grid % n_cells
+    if(grid % comm % cell_proc(c) .eq. sub) then
+      n_conns_here = n_conns_here + grid % cells_n_nodes(c)
+    end if
+  end do
+  do s=1, grid % n_faces
+    c1 = grid % faces_c(1,s)
+    c2 = grid % faces_c(2,s)
+    if( (grid % new_f(s) > 0) .and. (grid % new_f(s) <= n_faces_sub) ) then
+      n_conns_here = n_conns_here + 2
+    end if
+  end do
+  n_conns_here = n_conns_here + n_buf_cells_sub * 2
 
-  !----------------------!
-  !                      !
-  !   Create .gmv file   !
-  !                      !
-  !----------------------!
+  !------------------------!
+  !   Open the .vtu file   !
+  !------------------------!
   call File_Mod_Set_Name(name_out, processor=sub, extension='.links.vtu')
   call File_Mod_Open_File_For_Writing_Binary(name_out, fu)
 
@@ -73,142 +86,14 @@
   !-----------!
   write(fu) IN_3 // '<Cells>' // LF
 
-  ! First write all cells' nodes
-  write(fu) IN_4 // '<DataArray type="Int64" Name="connectivity"' //  &
-                    ' format="ascii">' // LF
-
-  do c = 1, grid % n_cells
-    if(grid % comm % cell_proc(c) .eq. sub) then
-
-      ! Hexahedral
-      if(grid % cells_n_nodes(c) .eq. 8) then
-        write(str1,'(a,8i9)')                      &
-           IN_5,                                 &
-           grid % new_n(grid % cells_n(1,c))-1,  &
-           grid % new_n(grid % cells_n(2,c))-1,  &
-           grid % new_n(grid % cells_n(4,c))-1,  &
-           grid % new_n(grid % cells_n(3,c))-1,  &
-           grid % new_n(grid % cells_n(5,c))-1,  &
-           grid % new_n(grid % cells_n(6,c))-1,  &
-           grid % new_n(grid % cells_n(8,c))-1,  &
-           grid % new_n(grid % cells_n(7,c))-1
-        write(fu) trim(str1) // LF
-
-      ! Wedge
-      else if(grid % cells_n_nodes(c) .eq. 6) then
-        write(str1,'(a,6i9)')                      &
-           IN_5,                                 &
-           grid % new_n(grid % cells_n(1,c))-1,  &
-           grid % new_n(grid % cells_n(2,c))-1,  &
-           grid % new_n(grid % cells_n(3,c))-1,  &
-           grid % new_n(grid % cells_n(4,c))-1,  &
-           grid % new_n(grid % cells_n(5,c))-1,  &
-           grid % new_n(grid % cells_n(6,c))-1
-        write(fu) trim(str1) // LF
-
-      ! Tetrahedra
-      else if(grid % cells_n_nodes(c) .eq. 4) then
-        write(str1,'(a,4i9)')                      &
-           IN_5,                                 &
-           grid % new_n(grid % cells_n(1,c))-1,  &
-           grid % new_n(grid % cells_n(2,c))-1,  &
-           grid % new_n(grid % cells_n(3,c))-1,  &
-           grid % new_n(grid % cells_n(4,c))-1
-        write(fu) trim(str1) // LF
-
-      ! Pyramid
-      else if(grid % cells_n_nodes(c) .eq. 5) then
-        write(str1,'(a,5i9)')                      &
-           IN_5,                                 &
-           grid % new_n(grid % cells_n(1,c))-1,  &
-           grid % new_n(grid % cells_n(2,c))-1,  &
-           grid % new_n(grid % cells_n(4,c))-1,  &
-           grid % new_n(grid % cells_n(3,c))-1,  &
-           grid % new_n(grid % cells_n(5,c))-1
-        write(fu) trim(str1) // LF
-
-      else
-        print *, '# Unsupported cell type with ',  &
-                    grid % cells_n_nodes(c), ' nodes.'
-        print *, '# Exiting'
-        stop
-      end if
-    end if
-  end do
-
-  ! Physical links; non-periodic
-  nf_sub_non_per = 0 
-  do s=1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
-
-    if( (grid % new_f(s) > 0) .and. (grid % new_f(s) <= n_faces_sub) ) then
-
-      if( (grid % sx(s) * (grid % xc(c2)-grid % xc(c1) ) +  &
-           grid % sy(s) * (grid % yc(c2)-grid % yc(c1) ) +  &
-           grid % sz(s) * (grid % zc(c2)-grid % zc(c1) ))  > 0.0 ) then
-
-        nf_sub_non_per = nf_sub_non_per + 1
-
-        c1 = grid % new_c(grid % faces_c(1,s))
-        c2 = grid % new_c(grid % faces_c(2,s))
-        if( c2  > 0 ) then
-          write(str1,'(a,2i9)') IN_5, n_nodes_sub + c1 - 1,  & 
-                                      n_nodes_sub + c2 - 1
-          write(fu) trim(str1) // LF
-        else
-          write(str1,'(a,2i9)') IN_5, n_nodes_sub + c1 - 1,  &
-                                      n_nodes_sub + n_cells_sub - c2 - 1
-          write(fu) trim(str1) // LF
-        end if
-      end if
-
-    end if
-  end do
-
-  ! Physical links; periodic
-  nf_sub_per    = 0 
-  do s=1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
-
-    if( (grid % new_f(s) > 0) .and. (grid % new_f(s) <= n_faces_sub) ) then
-
-      if( (grid % sx(s) * (grid % xc(c2)-grid % xc(c1) ) +  &
-           grid % sy(s) * (grid % yc(c2)-grid % yc(c1) ) +  &
-           grid % sz(s) * (grid % zc(c2)-grid % zc(c1) ))  < 0.0 ) then
-
-        nf_sub_per = nf_sub_per + 1
-
-        c1 = grid % new_c(grid % faces_c(1,s))
-        c2 = grid % new_c(grid % faces_c(2,s))
-        if( c2  > 0 ) then
-          write(str1,'(a,2i9)') IN_5, n_nodes_sub + c1 - 1,  & 
-                                      n_nodes_sub + c2 - 1
-          write(fu) trim(str1) // LF
-        else
-          write(str1,'(a,2i9)') IN_5, n_nodes_sub + c1 - 1,  &
-                                      n_nodes_sub + n_cells_sub - c2 - 1
-          write(fu) trim(str1) // LF
-        end if
-      end if
-
-    end if
-  end do  
-
-  ! Interprocessor links
-  do c = 1, n_buf_cells_sub
-    c1 = buf_send_ind(c) 
-    write(str1,'(a,2i9)') IN_5,  &
-      n_nodes_sub + c1 - 1, n_nodes_sub + n_cells_sub + n_bnd_cells_sub + c - 1
-    write(fu) trim(str1) // LF
-  end do
-
+  ! Cells' nodes
+  write(str1, '(i0.0)') data_offset
+  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+                    ' Name="connectivity"'           //  &
+                    ' format="appended"'             //  &
+                    ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
-
-  print '(a38,i9)', '# Non-periodic links    :            ', nf_sub_non_per
-  print '(a38,i9)', '# Periodic links        :            ', nf_sub_per
-  print '(a38,i9)', '# Inter-processor links :            ', n_buf_cells_sub
+  data_offset = data_offset + SP + n_conns_here * IP  ! prepare for next
 
   ! Cells' offsets
   write(str1, '(i0.0)') data_offset
@@ -245,9 +130,9 @@
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
-  data_offset = data_offset + SP  &
-              + (n_cells_sub + n_buf_cells_sub +  &
-                 nf_sub_per + nf_sub_non_per) * IP  ! prepare for next
+  data_offset = data_offset + SP + n_cells_here * IP  ! prepare for next
+  ! (Previous line was obviously never checked since this is the last
+  !  chunk of data, but don't have time to play with it anymore)
 
   !------------!
   !   Footer   !
@@ -293,6 +178,128 @@
   !-----------!
   !   Cells   !
   !-----------!
+
+  ! Cells' nodes
+  data_size = n_conns_here * IP
+  write(fu) data_size
+  do c = 1, grid % n_cells
+    if(grid % comm % cell_proc(c) .eq. sub) then
+
+      ! Hexahedral
+      if(grid % cells_n_nodes(c) .eq. 8) then
+        write(fu)                                &
+           grid % new_n(grid % cells_n(1,c))-1,  &
+           grid % new_n(grid % cells_n(2,c))-1,  &
+           grid % new_n(grid % cells_n(4,c))-1,  &
+           grid % new_n(grid % cells_n(3,c))-1,  &
+           grid % new_n(grid % cells_n(5,c))-1,  &
+           grid % new_n(grid % cells_n(6,c))-1,  &
+           grid % new_n(grid % cells_n(8,c))-1,  &
+           grid % new_n(grid % cells_n(7,c))-1
+
+      ! Wedge
+      else if(grid % cells_n_nodes(c) .eq. 6) then
+        write(fu)                                &
+           grid % new_n(grid % cells_n(1,c))-1,  &
+           grid % new_n(grid % cells_n(2,c))-1,  &
+           grid % new_n(grid % cells_n(3,c))-1,  &
+           grid % new_n(grid % cells_n(4,c))-1,  &
+           grid % new_n(grid % cells_n(5,c))-1,  &
+           grid % new_n(grid % cells_n(6,c))-1
+
+      ! Tetrahedra
+      else if(grid % cells_n_nodes(c) .eq. 4) then
+        write(fu)                                &
+           grid % new_n(grid % cells_n(1,c))-1,  &
+           grid % new_n(grid % cells_n(2,c))-1,  &
+           grid % new_n(grid % cells_n(3,c))-1,  &
+           grid % new_n(grid % cells_n(4,c))-1
+
+      ! Pyramid
+      else if(grid % cells_n_nodes(c) .eq. 5) then
+        write(fu)                                &
+           grid % new_n(grid % cells_n(1,c))-1,  &
+           grid % new_n(grid % cells_n(2,c))-1,  &
+           grid % new_n(grid % cells_n(4,c))-1,  &
+           grid % new_n(grid % cells_n(3,c))-1,  &
+           grid % new_n(grid % cells_n(5,c))-1
+
+      else
+        print *, '# Unsupported cell type with ',  &
+                    grid % cells_n_nodes(c), ' nodes.'
+        print *, '# Exiting'
+        stop
+      end if
+    end if
+  end do
+
+  ! Cells' nodes continued: Physical links; non-periodic
+  nf_sub_non_per = 0
+  do s=1, grid % n_faces
+    c1 = grid % faces_c(1,s)
+    c2 = grid % faces_c(2,s)
+
+    if( (grid % new_f(s) > 0) .and. (grid % new_f(s) <= n_faces_sub) ) then
+
+      if( (grid % sx(s) * (grid % xc(c2)-grid % xc(c1) ) +  &
+           grid % sy(s) * (grid % yc(c2)-grid % yc(c1) ) +  &
+           grid % sz(s) * (grid % zc(c2)-grid % zc(c1) ))  > 0.0 ) then
+
+        nf_sub_non_per = nf_sub_non_per + 1
+
+        c1 = grid % new_c(grid % faces_c(1,s))
+        c2 = grid % new_c(grid % faces_c(2,s))
+        if( c2  > 0 ) then
+          write(fu) n_nodes_sub + c1 - 1,  &
+                    n_nodes_sub + c2 - 1
+        else
+          write(fu) n_nodes_sub + c1 - 1,  &
+                    n_nodes_sub + n_cells_sub - c2 - 1
+        end if
+      end if
+
+    end if
+  end do
+
+  ! Cells' nodes continued: physical links; periodic
+  nf_sub_per    = 0 
+  do s=1, grid % n_faces
+    c1 = grid % faces_c(1,s)
+    c2 = grid % faces_c(2,s)
+
+    if( (grid % new_f(s) > 0) .and. (grid % new_f(s) <= n_faces_sub) ) then
+
+      if( (grid % sx(s) * (grid % xc(c2)-grid % xc(c1) ) +  &
+           grid % sy(s) * (grid % yc(c2)-grid % yc(c1) ) +  &
+           grid % sz(s) * (grid % zc(c2)-grid % zc(c1) ))  < 0.0 ) then
+
+        nf_sub_per = nf_sub_per + 1
+
+        c1 = grid % new_c(grid % faces_c(1,s))
+        c2 = grid % new_c(grid % faces_c(2,s))
+        if( c2  > 0 ) then
+          write(fu) n_nodes_sub + c1 - 1,  & 
+                    n_nodes_sub + c2 - 1
+        else
+          write(fu) n_nodes_sub + c1 - 1,  &
+                    n_nodes_sub + n_cells_sub - c2 - 1
+        end if
+      end if
+
+    end if
+  end do
+
+  print '(a38,i9)', '# Non-periodic links    :            ', nf_sub_non_per
+  print '(a38,i9)', '# Periodic links        :            ', nf_sub_per
+  print '(a38,i9)', '# Inter-processor links :            ', n_buf_cells_sub
+
+  ! Cells' nodes continued: interprocessor links
+  do c = 1, n_buf_cells_sub
+    c1 = buf_send_ind(c) 
+    write(fu)                    &
+      n_nodes_sub + c1 - 1,      &
+      n_nodes_sub + n_cells_sub + n_bnd_cells_sub + c - 1
+  end do
 
   ! Cells' offsets
   data_size = n_cells_here * IP
@@ -354,19 +361,23 @@
   data_size = (n_cells_sub + n_buf_cells_sub +  &
                nf_sub_per + nf_sub_non_per) * IP
   write(fu) data_size
+  tag = 0
   do c = 1, grid % n_cells
     if(grid % comm % cell_proc(c) .eq. sub) then
-      write(fu) 0
+      write(fu) tag
     end if
   end do
+  tag = 1
   do c = 1, nf_sub_non_per
-    write(fu) 1
+    write(fu) tag
   end do
+  tag = 2
   do c = 1, nf_sub_per
-    write(fu) 2
+    write(fu) tag
   end do
+  tag = 3
   do c = 1, n_buf_cells_sub
-    write(fu) 3
+    write(fu) tag
   end do
 
   write(fu) LF // IN_0 // '</AppendedData>' // LF
