@@ -1,64 +1,150 @@
 !==============================================================================!
   subroutine Save_Vtu_Faces(grid)
 !------------------------------------------------------------------------------!
-!   Writes .faces.vtu file.                                                    !
+!   Writes boundary condition .faces.vtu file.                                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer             :: c1, c2, n, s, offset, fu
-  character(len=80)  :: name_out
+  integer(4)         :: data_size
+  integer            :: c2, n, s, cell_offset, data_offset, n_conns, fu
+  character(len=80)  :: name_out, str1, str2
+  integer, parameter :: IP=8, RP=8, SP=4
 !==============================================================================!
 
-  !-----------------------------------------!
-  !                                         !
-  !   Create boundary condition .vtu file   !
-  !                                         !
-  !-----------------------------------------!
-  call File_Mod_Set_Name(name_out, extension='.faces.vtu')
-  call File_Mod_Open_File_For_Writing(name_out, fu)
+  ! Count connections in this subdomain, you will need it later
+  n_conns = 0
+  do s = 1, grid % n_faces
+    n_conns = n_conns + grid % faces_n_nodes(s)
+  end do
 
-  !-----------!
-  !   Start   !
-  !-----------!
-  write(fu,'(a,a)') IN_0, '<?xml version="1.0"?>'
-  write(fu,'(a,a)') IN_0, '<VTKFile type="UnstructuredGrid" version="0.1" ' //  &
-                         'byte_order="LittleEndian">'
-  write(fu,'(a,a)') IN_1, '<UnstructuredGrid>'
-  write(fu,'(a,a,i0.0,a,i0.0,a)')   &
-                    IN_2, '<Piece NumberOfPoints="', grid % n_nodes, &
-                               '" NumberOfCells ="', grid % n_faces, '">'
+  !------------------------!
+  !   Open the .vtu file   !
+  !------------------------!
+  call File_Mod_Set_Name(name_out, extension='.faces.vtu')
+  call File_Mod_Open_File_For_Writing_Binary(name_out, fu)
+
+  !------------!
+  !            !
+  !   Header   !
+  !            !
+  !------------!
+  write(fu) IN_0 // '<?xml version="1.0"?>'             // LF
+  write(fu) IN_0 // '<VTKFile type="UnstructuredGrid"'  //  &
+                    ' version="0.1"'                    //  &
+                    ' byte_order="LittleEndian">'       // LF
+  write(fu) IN_1 // '<UnstructuredGrid>' // LF
+  write(str1, '(i0.0)') grid % n_nodes
+  write(str2, '(i0.0)') grid % n_faces
+  write(fu) IN_2 // '<Piece NumberOfPoints="' // trim(str1) // '"' //  &
+                    ' NumberOfCells="' // trim(str2) // '">'       // LF
+  data_offset = 0
+
   !-----------!
   !   Nodes   !
   !-----------!
-  write(fu,'(a,a)') IN_3, '<Points>'
-  write(fu,'(a,a)') IN_4, '<DataArray type="Float64" NumberOfComponents=' //  &
-                 '"3" format="ascii">'
-  do n = 1, grid % n_nodes
-    write(fu, '(a,1PE15.7,1PE15.7,1PE15.7)')                        &
-                    IN_5, grid % xn(n), grid % yn(n), grid % zn(n)
-  end do
-  write(fu,'(a,a)') IN_4, '</DataArray>'
-  write(fu,'(a,a)') IN_3, '</Points>'
+  write(str1, '(i1)') data_offset
+  write(fu) IN_3 // '<Points>'                       // LF
+  write(fu) IN_4 // '<DataArray type="Float64"'      //  &
+                    ' NumberOfComponents="3"'        //  &
+                    ' format="appended"'             //  &
+                    ' offset="' // trim(str1) //'">' // LF
+  write(fu) IN_4 // '</DataArray>' // LF
+  write(fu) IN_3 // '</Points>'    // LF
+  data_offset = data_offset + SP + grid % n_nodes * RP * 3  ! prepare for next
 
   !-----------!
   !   Faces   !
   !-----------!
-  write(fu,'(a,a)') IN_3, '<Cells>'
+  write(fu) IN_3 // '<Cells>' // LF
 
-  ! First write all faces' nodes
-  write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="connectivity"' //  &
-                         ' format="ascii">'
+  ! Faces' nodes
+  write(str1, '(i0.0)') data_offset
+  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+                    ' Name="connectivity"'           //  &
+                    ' format="appended"'             //  &
+                    ' offset="' // trim(str1) //'">' // LF
+  write(fu) IN_4 // '</DataArray>' // LF
+  data_offset = data_offset + SP + n_conns * IP             ! prepare for next
+
+  ! Faces' offsets
+  write(str1, '(i0.0)') data_offset
+  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+                    ' Name="offsets"'                //  &
+                    ' format="appended"'             //  &
+                    ' offset="' // trim(str1) //'">' // LF
+  write(fu) IN_4 // '</DataArray>' // LF
+  data_offset = data_offset + SP + grid % n_faces * IP      ! prepare for next
+
+  ! Faces' types
+  write(str1, '(i0.0)') data_offset
+  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+                    ' Name="types"'                  //  &
+                    ' format="appended"'             //  &
+                    ' offset="' // trim(str1) //'">' // LF
+  write(fu) IN_4 // '</DataArray>' // LF
+  data_offset = data_offset + SP + grid % n_faces * IP      ! prepare for next
+
+  !----------------------!
+  !   The end of faces   !
+  !----------------------!
+  write(fu) IN_3 // '</Cells>' // LF
+
+  !---------------!
+  !   Face data   !
+  !---------------!
+  write(fu) IN_3 // '<CellData Scalars="scalars" vectors="velocity">' // LF
+
+  ! Boundary conditions
+  write(str1, '(i0.0)') data_offset
+  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+                    ' Name="BoundaryConditions"'     //  &
+                    ' format="appended"'             //  &
+                    ' offset="' // trim(str1) //'">' // LF
+  write(fu) IN_4 // '</DataArray>' // LF
+  data_offset = data_offset + SP + grid % n_faces * IP      ! prepare for next
+
+  !------------!
+  !            !
+  !   Footer   !
+  !            !
+  !------------!
+  write(fu) IN_3 // '</CellData>'         // LF
+  write(fu) IN_2 // '</Piece>'            // LF
+  write(fu) IN_1 // '</UnstructuredGrid>' // LF
+
+  !-------------------!
+  !                   !
+  !   Appended data   !
+  !                   !
+  !-------------------!
+  write(fu) IN_0 // '<AppendedData encoding="raw">' // LF
+  write(fu) '_'
+
+  !-----------!
+  !   Nodes   !
+  !-----------!
+  data_size = grid % n_nodes * RP * 3
+  write(fu) data_size
+  do n = 1, grid % n_nodes
+    write(fu) grid % xn(n), grid % yn(n), grid % zn(n)
+  end do
+
+  !-----------!
+  !   Faces   !
+  !-----------!
+
+  ! Faces' nodes
+  data_size = n_conns * IP
+  write(fu) data_size
   do s = 1, grid % n_faces
     if(grid % faces_n_nodes(s) .eq. 4) then
-      write(fu,'(a,4I9)')                              &
-        IN_5,                                          &
+      write(fu)                                        &
         grid % faces_n(1,s)-1, grid % faces_n(2,s)-1,  &
         grid % faces_n(3,s)-1, grid % faces_n(4,s)-1
     else if(grid % faces_n_nodes(s) .eq. 3) then
-      write(fu,'(a,3I9)')                              &
-        IN_5,                                          &
+      write(fu)                                        &
         grid % faces_n(1,s)-1, grid % faces_n(2,s)-1,  &
         grid % faces_n(3,s)-1
     else
@@ -68,58 +154,36 @@
       stop
     end if
   end do
-  write(fu,'(a,a)') IN_4, '</DataArray>'
 
-  ! Then write all faces' offsets
-  write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="offsets" ' // &
-                          'format="ascii">'
-  offset = 0
+  ! Faces' offsets
+  data_size = grid % n_faces * IP
+  write(fu) data_size
+  cell_offset = 0
   do s = 1, grid % n_faces
-    offset = offset + grid % faces_n_nodes(s)
-    write(fu,'(a,i9)') IN_5, offset
+    cell_offset = cell_offset + grid % faces_n_nodes(s)
+    write(fu) cell_offset
   end do
-  write(fu,'(a,a)') IN_4, '</DataArray>'
 
-  ! Now write all cells' types
-  write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="types" format="ascii">'
+  ! Faces' types
+  data_size = grid % n_faces * IP
+  write(fu) data_size
   do s = 1, grid % n_faces
-    if(grid % faces_n_nodes(s) .eq. 4) write(fu,'(a,i9)') IN_5, VTK_QUAD
-    if(grid % faces_n_nodes(s) .eq. 3) write(fu,'(a,i9)') IN_5, VTK_TRIANGLE
+    if(grid % faces_n_nodes(s) .eq. 4) write(fu) VTK_QUAD
+    if(grid % faces_n_nodes(s) .eq. 3) write(fu) VTK_TRIANGLE
   end do
-  write(fu,'(a,a)') IN_4, '</DataArray>'
-  write(fu,'(a,a)') IN_3, '</Cells>'
-
-  !---------------!
-  !   Cell data   !
-  !---------------!
-  write(fu,'(a,a)') IN_3, '<CellData Scalars="scalars" vectors="velocity">'
 
   ! Boundary conditions
-  write(fu,'(a,a)') IN_4, '<DataArray type="Int64" ' // &
-                    'Name="BoundaryConditions" format="ascii">'
+  data_size = grid % n_faces * IP
+  write(fu) data_size
   do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
-    ! If boundary
-    if( c2 < 0 ) then
-      write(fu,'(a,i9)') IN_5, grid % bnd_cond % color(c2)
-
-    ! If inside
-    else
-      write(fu,'(a,i9)') IN_5, 0
-    end if
+    if(c2 < 0) write(fu) grid % bnd_cond % color(c2)
+    if(c2 > 0) write(fu) 0
   end do
 
-  write(fu,'(a,a)') IN_4, '</DataArray>'
-
-  !------------!
-  !   Footer   !
-  !------------!
-  write(fu,'(a,a)') IN_3, '</CellData>'
-  write(fu,'(a,a)') IN_2, '</Piece>'
-  write(fu,'(a,a)') IN_1, '</UnstructuredGrid>'
-  write(fu,'(a,a)') IN_0, '</VTKFile>'
+  write(fu) LF // IN_0 // '</AppendedData>' // LF
+  write(fu) IN_0 // '</VTKFile>' // LF
 
   close(fu)
 
