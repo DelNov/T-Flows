@@ -114,7 +114,7 @@
 
     call Grid_Mod_Load_Geo(grid(d), this_proc, domain=d)
     call Grid_Mod_Create_Buffers(grid(d))
-    call Grid_Mod_Load_Maps(grid(d))       ! maps should move to .cns file soon
+    call Grid_Mod_Create_Maps(grid(d))
 
     call Comm_Mod_Wait
   end do

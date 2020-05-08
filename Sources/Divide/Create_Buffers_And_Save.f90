@@ -39,8 +39,8 @@
 !   indexes. That one is called buffind().                                     !
 !------------------------------------------------------------------------------!
 
-  allocate (grid % comm % buff_s_cell(0 : maxval(grid % comm % cell_proc(:))))
-  allocate (grid % comm % buff_e_cell(0 : maxval(grid % comm % cell_proc(:))))
+  allocate(grid % comm % buff_s_cell(0 : maxval(grid % comm % cell_proc(:))))
+  allocate(grid % comm % buff_e_cell(0 : maxval(grid % comm % cell_proc(:))))
 
   !-------------------------------!
   !                               !
