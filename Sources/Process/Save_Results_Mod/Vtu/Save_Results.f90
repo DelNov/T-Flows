@@ -18,7 +18,9 @@
                       kin_vis_t => r_cell_12,  &
                       phi_save  => r_cell_13,  &
                       q_save    => r_cell_14,  &
-                      int_save  => i_cell_01
+                      int_save  => i_cell_01,  &
+                      type_save => i_cell_02,  &  ! cell type save array
+                      offs_save => i_cell_03      ! cell offsets save array
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
@@ -32,9 +34,11 @@
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: phi
+  integer(4)               :: data_size
   integer                  :: data_offset
-  integer                  :: c, n, s, cell_offset, sc, f8, f9, ua, run
-  character(len=160)       :: name_out_8, name_out_9, name_mean, a_name, str1, str2
+  integer                  :: c, n, s, cell_offset, sc, f8, f9, ua, run, c2
+  character(len=160)       :: name_out_8, name_out_9, name_mean, a_name
+  character(len=160)       :: str1, str2
   integer, parameter       :: IP=8, RP=8, SP=4
 !==============================================================================!
 
@@ -110,6 +114,8 @@
   !          !
   !----------!
 
+  data_offset = 0
+
   !-----------!
   !   Nodes   !
   !-----------!
@@ -119,16 +125,16 @@
                       '"3" format="ascii"/>'                           // LF
     write(f8) IN_3 // '</PPoints>' // LF
   end if
-  write(f9) IN_3 // '<Points>' // LF
-  write(f9) IN_4 // '<DataArray type="Float64" NumberOfComponents' //  &
-                    '="3" format="ascii">' // LF
-  do n = 1, grid % n_nodes
-    write(str1, '(1pe16.6e4,1pe16.6e4,1pe16.6e4)')                &
-                 grid % xn(n), grid % yn(n), grid % zn(n)
-    write(f9) IN_5 // trim(str1) // LF
-  end do
+
+  write(str1, '(i1)') data_offset
+  write(f9) IN_3 // '<Points>'                       // LF
+  write(f9) IN_4 // '<DataArray type="Float64"'      //  &
+                    ' NumberOfComponents="3"'        //  &
+                    ' format="appended"'             //  &
+                    ' offset="' // trim(str1) //'">' // LF
   write(f9) IN_4 // '</DataArray>' // LF
   write(f9) IN_3 // '</Points>'    // LF
+  data_offset = data_offset + SP + grid % n_nodes * RP * 3
 
   !-----------!
   !   Cells   !
@@ -197,63 +203,42 @@
 
   write(f9) IN_4 // '</DataArray>' // LF
 
-  ! Now write all cells' offsets
-  write(f9) IN_4 // '<DataArray type="Int64" Name="offsets"' //  &
-                    ' format="ascii">' // LF
+  ! Fill up an array with cell offsets and save the header only
   cell_offset = 0
+  do c = 1, grid % n_cells - grid % comm % n_buff_cells
+    cell_offset = cell_offset + grid % cells_n_nodes(c)
+    offs_save(c) = cell_offset
+  end do
+  cell_offset = 0
+  do s = 1, grid % n_faces
+    if( grid % faces_c(2,s) < 0 ) then
+      c2 = grid % faces_c(2,s)
+      cell_offset = cell_offset + grid % faces_n_nodes(s)
+      offs_save(c2) = cell_offset
+    end if
+  end do
+  call Save_Scalar_Int(grid, "offsets", plot_inside,           &
+                              offs_save(-grid % n_bnd_cells),  &
+                              f8, f9, data_offset, 1)  ! 1 => header only
 
-  if(plot_inside) then
-    do c = 1, grid % n_cells - grid % comm % n_buff_cells
-      cell_offset = cell_offset + grid % cells_n_nodes(c)
-      write(str1,'(i9)') cell_offset
-      write(f9) IN_5 // trim(str1) // LF
-    end do
-  else  ! plot only boundary
-    do s = 1, grid % n_faces
-      if( grid % faces_c(2,s) < 0 ) then
-        cell_offset = cell_offset + grid % faces_n_nodes(s)
-        write(str1,'(i9)') cell_offset
-        write(f9) IN_5 // trim(str1) // LF
-      end if
-    end do
-  end if
-  write(f9) IN_4 // '</DataArray>' // LF
+  ! Fill up an array with cell types and save the header only
+  do c = 1, grid % n_cells - grid % comm % n_buff_cells
+    if(grid % cells_n_nodes(c) .eq. 8) type_save(c) = VTK_HEXAHEDRON
+    if(grid % cells_n_nodes(c) .eq. 6) type_save(c) = VTK_WEDGE
+    if(grid % cells_n_nodes(c) .eq. 4) type_save(c) = VTK_TETRA
+    if(grid % cells_n_nodes(c) .eq. 5) type_save(c) = VTK_PYRAMID
+  end do
+  do s = 1, grid % n_faces
+    if( grid % faces_c(2,s) < 0 ) then
+      c2 = grid % faces_c(2,s)
+      if(grid % faces_n_nodes(s) .eq. 4) type_save(c2) = VTK_QUAD
+      if(grid % faces_n_nodes(s) .eq. 3) type_save(c2) = VTK_TRIANGLE
+    end if
+  end do
+  call Save_Scalar_Int(grid, "types", plot_inside,             &
+                              type_save(-grid % n_bnd_cells),  &
+                              f8, f9, data_offset, 1)  ! 1 => header only
 
-  ! Now write all cells' types
-  write(f9) IN_4 // '<DataArray type="UInt8" Name="types" format="ascii">' // LF
-
-  if(plot_inside) then
-    do c = 1, grid % n_cells - grid % comm % n_buff_cells
-      if(grid % cells_n_nodes(c) .eq. 8) then
-        write(str1,'(i9)') VTK_HEXAHEDRON
-        write(f9) IN_5 // trim(str1) // LF
-      else if(grid % cells_n_nodes(c) .eq. 6) then
-        write(str1,'(i9)') VTK_WEDGE
-        write(f9) IN_5 // trim(str1) // LF
-      else if(grid % cells_n_nodes(c) .eq. 4) then
-        write(str1,'(i9)') VTK_TETRA
-        write(f9) IN_5 // trim(str1) // LF
-      else if(grid % cells_n_nodes(c) .eq. 5) then
-        write(str1,'(i9)') VTK_PYRAMID
-        write(f9) IN_5 // trim(str1) // LF
-      else
-        print *, '# ERROR!  Unsupported cell type with ',  &
-                    grid % cells_n_nodes(c), ' nodes.'
-        print *, '# Exiting'
-        call Comm_Mod_End
-      end if
-    end do
-  else  ! plot only boundary
-    do s = 1, grid % n_faces
-      if( grid % faces_c(2,s) < 0 ) then
-        if(grid % faces_n_nodes(s) .eq. 4) write(str1,'(i9)') VTK_QUAD
-        if(grid % faces_n_nodes(s) .eq. 3) write(str1,'(i9)') VTK_TRIANGLE
-        write(f9) IN_5 // trim(str1) // LF
-      end if
-    end do
-  end if
-
-  write(f9) IN_4 // '</DataArray>' // LF
   write(f9) IN_3 // '</Cells>'     // LF
 
   !---------------------------------!
@@ -273,7 +258,27 @@
   !----------------!
   do run = 1, 2
 
-    data_offset = 0
+    !------------------------------------------!
+    !   Save remnants of the grid definition   !
+    !------------------------------------------!
+    if(run .eq. 2) then
+
+      ! Save the nodes
+      data_size = grid % n_nodes * RP * 3
+      write(f9) data_size
+      do n = 1, grid % n_nodes
+        write(f9) grid % xn(n), grid % yn(n), grid % zn(n)
+      end do
+
+      ! Save cell offsets
+      call Save_Scalar_Int(grid, "offsets", plot_inside,           &
+                                  offs_save(-grid % n_bnd_cells),  &
+                                  f8, f9, data_offset, run)
+      ! Save cell types
+      call Save_Scalar_Int(grid, "types", plot_inside,             &
+                                  type_save(-grid % n_bnd_cells),  &
+                                  f8, f9, data_offset, run)
+    end if
 
     !--------------------!
     !   Processor i.d.   !
