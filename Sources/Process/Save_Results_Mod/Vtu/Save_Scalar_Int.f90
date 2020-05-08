@@ -24,10 +24,9 @@
   ! Header
   if(sweep .eq. 1) then
     if(n_proc > 1 .and. this_proc .eq. 1) then
-      write(fs) IN_4                                //  &
-                '<PDataArray type="Int64" Name="'   //  &
-                trim(var_name)                      //  &
-                '" format="ascii"/>'                // LF
+      write(fs) IN_4                                  //  &
+                '<PDataArray type="Int64"'            //  &
+                ' Name="' // trim(var_name) // '"/>'  // LF
     end if
 
     write(str1, '(i0.0)') data_offset
