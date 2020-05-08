@@ -35,8 +35,8 @@
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: phi
   integer(4)               :: data_size
-  integer                  :: data_offset
-  integer                  :: c, n, s, cell_offset, sc, f8, f9, ua, run, c2
+  integer                  :: data_offset, cell_offset
+  integer                  :: c, n, s, n_conns, sc, f8, f9, ua, run, c2
   character(len=160)       :: name_out_8, name_out_9, name_mean, a_name
   character(len=160)       :: str1, str2
   integer, parameter       :: IP=8, RP=8, SP=4
@@ -46,6 +46,20 @@
 
   ! Take aliases
   grid => flow % pnt_grid
+
+  ! Count connections in this grid, you will need it later
+  n_conns = 0
+  if(plot_inside) then
+    do c = 1, grid % n_cells - grid % comm % n_buff_cells
+      n_conns = n_conns + grid % cells_n_nodes(c)
+    end do
+  else
+    do s = 1, grid % n_faces
+      if( grid % faces_c(2,s) < 0 ) then
+        n_conns = n_conns + grid % faces_n_nodes(s)
+      end if
+    end do
+  end if
 
   call Comm_Mod_Wait
 
@@ -141,67 +155,14 @@
   !-----------!
   write(f9) IN_3 // '<Cells>' // LF
 
-  ! First write all cells' nodes
-  write(f9) IN_4 // '<DataArray type="Int64" Name="connectivity"' //  &
-                          ' format="ascii">' // LF
-
-  if(plot_inside) then
-    do c = 1, grid % n_cells - grid % comm % n_buff_cells
-      if(grid % cells_n_nodes(c) .eq. 8) then
-        write(str1,'(8i9)')                                &
-           grid % cells_n(1,c)-1, grid % cells_n(2,c)-1,   &
-           grid % cells_n(4,c)-1, grid % cells_n(3,c)-1,   &
-           grid % cells_n(5,c)-1, grid % cells_n(6,c)-1,   &
-           grid % cells_n(8,c)-1, grid % cells_n(7,c)-1
-        write(f9) IN_5 // trim(str1) // LF
-      else if(grid % cells_n_nodes(c) .eq. 6) then
-        write(str1,'(6i9)')                                &
-           grid % cells_n(1,c)-1, grid % cells_n(2,c)-1,   &
-           grid % cells_n(3,c)-1, grid % cells_n(4,c)-1,   &
-           grid % cells_n(5,c)-1, grid % cells_n(6,c)-1
-        write(f9) IN_5 // trim(str1) // LF
-      else if(grid % cells_n_nodes(c) .eq. 4) then
-        write(str1,'(4i9)')                                &
-           grid % cells_n(1,c)-1, grid % cells_n(2,c)-1,   &
-           grid % cells_n(3,c)-1, grid % cells_n(4,c)-1
-        write(f9) IN_5 // trim(str1) // LF
-      else if(grid % cells_n_nodes(c) .eq. 5) then
-        write(str1,'(5i9)')                                &
-           grid % cells_n(5,c)-1, grid % cells_n(1,c)-1,   &
-           grid % cells_n(2,c)-1, grid % cells_n(4,c)-1,   &
-           grid % cells_n(3,c)-1
-        write(f9) IN_5 // trim(str1) // LF
-      else
-        print *, '# ERROR!  Unsupported cell type with ',  &
-                    grid % cells_n_nodes(c), ' nodes.'
-        print *, '# Exiting'
-        call Comm_Mod_End
-      end if
-    end do
-  else  ! plot only boundary
-    do s = 1, grid % n_faces
-      if( grid % faces_c(2,s) < 0 ) then
-        if(grid % faces_n_nodes(s) .eq. 4) then
-          write(str1,'(4i9)')                               &
-             grid % faces_n(1,s)-1, grid % faces_n(2,s)-1,  &
-             grid % faces_n(3,s)-1, grid % faces_n(4,s)-1
-          write(f9) IN_5 // trim(str1) // LF
-        else if(grid % faces_n_nodes(s) .eq. 3) then
-          write(str1,'(3i9)')                               &
-             grid % faces_n(1,s)-1, grid % faces_n(2,s)-1,  &
-             grid % faces_n(3,s)-1
-          write(f9) IN_5 // trim(str1) // LF
-        else
-          print *, '# ERROR!  Unsupported face type ',      &
-                    grid % faces_n_nodes(s), ' nodes.'
-          print *, '# Exiting'
-          call Comm_Mod_End
-        end if
-      end if
-    end do
-  end if
-
+  ! Cells' nodes
+  write(str1, '(i0.0)') data_offset
+  write(f9) IN_4 // '<DataArray type="Int64"'        //  &
+                    ' Name="connectivity"'           //  &
+                    ' format="appended"'             //  &
+                    ' offset="' // trim(str1) //'">' // LF
   write(f9) IN_4 // '</DataArray>' // LF
+  data_offset = data_offset + SP + n_conns * IP  ! prepare for next
 
   ! Fill up an array with cell offsets and save the header only
   cell_offset = 0
@@ -263,12 +224,49 @@
     !------------------------------------------!
     if(run .eq. 2) then
 
-      ! Save the nodes
+      ! Save the nodes' coordinates
       data_size = grid % n_nodes * RP * 3
       write(f9) data_size
       do n = 1, grid % n_nodes
         write(f9) grid % xn(n), grid % yn(n), grid % zn(n)
       end do
+
+      ! Save connections
+      data_size = n_conns * IP
+      write(f9) data_size
+      if(plot_inside) then
+        do c = 1, grid % n_cells - grid % comm % n_buff_cells
+          if(grid % cells_n_nodes(c) .eq. 8) then
+            write(f9) grid % cells_n(1,c)-1, grid % cells_n(2,c)-1,   &
+                      grid % cells_n(4,c)-1, grid % cells_n(3,c)-1,   &
+                      grid % cells_n(5,c)-1, grid % cells_n(6,c)-1,   &
+                      grid % cells_n(8,c)-1, grid % cells_n(7,c)-1
+          else if(grid % cells_n_nodes(c) .eq. 6) then
+            write(f9) grid % cells_n(1,c)-1, grid % cells_n(2,c)-1,   &
+                      grid % cells_n(3,c)-1, grid % cells_n(4,c)-1,   &
+                      grid % cells_n(5,c)-1, grid % cells_n(6,c)-1
+          else if(grid % cells_n_nodes(c) .eq. 4) then
+            write(f9) grid % cells_n(1,c)-1, grid % cells_n(2,c)-1,   &
+                      grid % cells_n(3,c)-1, grid % cells_n(4,c)-1
+          else if(grid % cells_n_nodes(c) .eq. 5) then
+            write(f9) grid % cells_n(5,c)-1, grid % cells_n(1,c)-1,   &
+                      grid % cells_n(2,c)-1, grid % cells_n(4,c)-1,   &
+                      grid % cells_n(3,c)-1
+          end if
+        end do
+      else  ! plot only boundary
+        do s = 1, grid % n_faces
+          if( grid % faces_c(2,s) < 0 ) then
+            if(grid % faces_n_nodes(s) .eq. 4) then
+              write(f9) grid % faces_n(1,s)-1, grid % faces_n(2,s)-1,  &
+                        grid % faces_n(3,s)-1, grid % faces_n(4,s)-1
+            else if(grid % faces_n_nodes(s) .eq. 3) then
+              write(f9) grid % faces_n(1,s)-1, grid % faces_n(2,s)-1,  &
+                        grid % faces_n(3,s)-1
+            end if
+          end if
+        end do
+      end if
 
       ! Save cell offsets
       call Save_Scalar_Int(grid, "offsets", plot_inside,           &
