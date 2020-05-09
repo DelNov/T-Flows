@@ -93,21 +93,6 @@
     end if
   end do
 
-  ! Cells' global numbers
-  do c = 1, grid % n_cells
-    if(grid % comm % cell_proc(c) .eq. sub) then
-      write(fu) grid % comm % cell_glo(c)
-    end if
-  end do
-  do s = 1, nbf_sub
-    write(fu) grid % comm % cell_glo(buf_recv_ind(s))
-  end do
-  do c = -1, -grid % n_bnd_cells, -1
-    if(grid % comm % cell_proc(c) .eq. sub) then
-      write(fu) grid % comm % cell_glo(c)
-    end if
-  end do
-
   !-----------!
   !   Faces   !
   !-----------!

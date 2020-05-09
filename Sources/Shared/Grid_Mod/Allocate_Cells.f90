@@ -38,8 +38,7 @@
   ! Boundary condition color in a given direction
   allocate(grid % cells_bnd_color(6, -nb:nc))
 
-  ! Allocate processor i.d. and global cell numbers
+  ! Allocate processor i.d.
   allocate(grid % comm % cell_proc(-nb:nc));  grid % comm % cell_proc(:) = 0
-  allocate(grid % comm % cell_glo (-nb:nc));  grid % comm % cell_glo (:) = 0
 
   end subroutine

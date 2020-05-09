@@ -71,10 +71,6 @@
   read(fu) (grid % comm % cell_proc(c), c =  1,  grid % n_cells)
   read(fu) (grid % comm % cell_proc(c), c = -1, -grid % n_bnd_cells, -1)
 
-  ! Cells' global number
-  read(fu) (grid % comm % cell_glo(c), c =  1,  grid % n_cells)
-  read(fu) (grid % comm % cell_glo(c), c = -1, -grid % n_bnd_cells, -1)
-
   !-----------!
   !   Faces   !
   !-----------!
