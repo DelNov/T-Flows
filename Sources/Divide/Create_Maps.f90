@@ -12,14 +12,12 @@
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, s, c1, c2, sub, n_cells_sub, n_faces_sub,  &
-                          n_buf_sub, n_bnd_cells_sub, fu, NCSsub
+                          n_buf_sub, n_bnd_cells_sub, fu
   character(len=80)    :: name_map
-  integer, allocatable :: global_cell_ins(:)
-  integer, allocatable :: global_cell_bnd(:)
 !==============================================================================!
 
-  allocate (global_cell_ins( grid % n_cells));         global_cell_ins = 0
-  allocate (global_cell_bnd(-grid % n_bnd_cells:-1));  global_cell_bnd = 0
+  allocate(grid % comm % cell_glo(-grid % n_bnd_cells : grid % n_cells));
+  grid % comm % cell_glo(:) = 0
 
   !-------------------------------!
   !                               !
@@ -36,7 +34,7 @@
     do c = 1, grid % n_cells
       if(grid % comm % cell_proc(c) .eq. sub) then
         n_cells_sub = n_cells_sub + 1     ! increase the number of cells in sub.
-        global_cell_ins(n_cells_sub) = c  ! map to global cell number
+        grid % comm % cell_glo(n_cells_sub) = c  ! map to global cell number
       end if
     end do
 
@@ -44,7 +42,6 @@
     n_faces_sub     = 0  ! number of faces in subdomain
     n_buf_sub       = 0  ! number of buffer faces (and cells)
     n_bnd_cells_sub = 0  ! number of real boundary cells in subdomain
-    NCSsub = 0
 
     ! Faces step 2/3: on the boundaries + bundary cells
     do s = 1, grid % n_faces
@@ -53,7 +50,7 @@
       if(c2 < 0) then
         if( grid % comm % cell_proc(c1) .eq. sub )  then
           n_bnd_cells_sub = n_bnd_cells_sub + 1  ! increase n. of bnd. cells
-          global_cell_bnd(-n_bnd_cells_sub) = c2  ! map to global cell number
+          grid % comm % cell_glo(-n_bnd_cells_sub) = c2  ! map to global cell number
         end if
       end if 
     end do
@@ -67,12 +64,12 @@
 
     ! Extents are followed by mapping of the cells inside ...
     do c = 1, n_cells_sub
-      write(fu, '(i9)') global_cell_ins(c)
+      write(fu, '(i9)') grid % comm % cell_glo(c)
     end do
 
     ! ... followed by the cells on the boundary ...
     do c = -n_bnd_cells_sub, -1
-      write(fu, '(i9)') global_cell_bnd(c)
+      write(fu, '(i9)') grid % comm % cell_glo(c)
     end do
 
   end do   ! through subdomains
