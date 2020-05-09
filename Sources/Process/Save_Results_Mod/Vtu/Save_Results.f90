@@ -135,8 +135,8 @@
   !-----------!
   if(n_proc > 1 .and. this_proc .eq. 1)  then
     write(f8) IN_3 // '<PPoints>' // LF
-    write(f8) IN_4 // '<PDataArray type="Float64" NumberOfComponents=' //  &
-                      '"3" format="ascii"/>'                           // LF
+    write(f8) IN_4 // '<PDataArray type="Float64"' //  &
+                      ' NumberOfComponents="3"/>'  // LF
     write(f8) IN_3 // '</PPoints>' // LF
   end if
 
