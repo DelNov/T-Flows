@@ -68,8 +68,8 @@
     call File_Mod_Set_Name(name_in, processor=this_proc, extension='.map')
     call File_Mod_Open_File_For_Reading(name_in, fu, this_proc)
 
-    ! Read map sizes
-    read(fu, '(4i9)') grid % comm % nc_s, grid % comm % nb_s
+    grid % comm % nc_s  = grid % n_cells - grid % comm % n_buff_cells
+    grid % comm % nb_s  = grid % n_bnd_cells
 
     grid % comm % nc_t  = grid % comm % nc_s
     grid % comm % nb_t  = grid % comm % nb_s
@@ -85,7 +85,7 @@
     !-----------------------------------------!
     !   Global cell numbers for MPI mapping   !
     !-----------------------------------------!
-    allocate(grid % comm % cell_map    (grid % comm % nc_s))   
+    allocate(grid % comm % cell_map    (grid % comm % nc_s))
     allocate(grid % comm % bnd_cell_map(max(grid % comm % nb_s,1)))
     grid % comm % cell_map(:)     = 0
     grid % comm % bnd_cell_map(:) = 0
