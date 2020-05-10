@@ -38,17 +38,17 @@
   if( file_name_up(l-2:l) .eq. 'NEU' ) then
     print *, '# Based on the extension, you are' // &
              ' reading Gambit''s neutral file format'
-    problem_name = file_name(1:l-4)
+    problem_name(1) = file_name(1:l-4)
     ext_up = file_name_up(l-2:l)
   else if( file_name_up(l-3:l) .eq. 'CGNS' ) then
     print *, '# Based on the extension, you are' // &
              ' reading CGNS file format'
-    problem_name = file_name(1:l-5)
+    problem_name(1) = file_name(1:l-5)
     ext_up = file_name_up(l-3:l)
   else if( file_name_up(l-2:l) .eq. 'MSH' ) then
     print *, '# Based on the extension, you are' // &
              ' reading GMSH file format'
-    problem_name = file_name(1:l-4)
+    problem_name(1) = file_name(1:l-4)
     ext_up = file_name_up(l-2:l)
   else
     print *, '# Unrecognized input file format; exiting!'
@@ -58,6 +58,9 @@
   end if
   print *, '#----------------------------------' // &
            '-----------------------------------'
+
+  grid % name = problem_name(1)
+  call To_Upper_Case(grid % name)
 
   !----------------------------------------!
   !   Read the file and start conversion   !
