@@ -15,9 +15,31 @@
   integer         :: sub, nn_sub, nc_sub, nf_sub,  &
                      nbc_sub,  nbf_sub
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: b, c, s, n, lev, item, fu
+  integer           :: b, c, s, n, lev, item, fu, mu
   character(len=80) :: name_out
+  character(len=80) :: name_map
 !==============================================================================!
+
+  !----------------------!
+  !                      !
+  !   Create .map file   !
+  !                      !
+  !----------------------!
+  if(sub > 0) then
+    call File_Mod_Set_Name(name_map, processor=sub, extension='.map')
+    call File_Mod_Open_File_For_Writing(name_map, mu)
+    do c = 1, grid % n_cells
+      if(grid % comm % cell_proc(c) .eq. sub) then
+        write(mu, '(i9)') grid % comm % cell_glo(c)
+      end if
+    end do
+    do c = -grid % n_bnd_cells, -1
+      if(grid % comm % cell_proc(c) .eq. sub) then
+        write(mu, '(i9)') grid % comm % cell_glo(c)
+      end if
+    end do
+    close(mu)
+  end if   ! through subdomains
 
   !----------------------!
   !                      !

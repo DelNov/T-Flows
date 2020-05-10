@@ -38,7 +38,6 @@
 
   call Grid_Mod_Decompose(grid, n_sub)
 
-  call Create_Maps(grid)
   call Create_Buffers_And_Save(grid)
 
   call cpu_time(finish)

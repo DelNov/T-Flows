@@ -1,13 +1,3 @@
-#-- ./Create_Maps.f90
-$(DIR_OBJECT)/Create_Maps.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/File_Mod.o \
-$(DIR_SHARED)/File_Mod/*.f90 
-
 #-- ./Create_Buffers_And_Save.f90
 $(DIR_OBJECT)/Create_Buffers_And_Save.o:\
 $(DIR_OBJECT)/Sort_Mod.o \
