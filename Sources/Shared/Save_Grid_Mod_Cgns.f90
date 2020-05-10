@@ -8,7 +8,7 @@
   use Comm_Mod
   use Grid_Mod
   use Cgns_Mod
-  use Div_Mod,  only: buf_send_ind, buf_recv_ind
+  use Div_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
