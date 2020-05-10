@@ -43,10 +43,10 @@
   allocate(grid % bnd_cond % name(grid % n_bnd_cond))
   allocate(grid % bnd_cond % type(grid % n_bnd_cond))
 
-  !-------------------!
-  !   Material name   !
-  !-------------------!
-  read(fu) grid % material % name
+  !-----------------!
+  !   Domain name   !
+  !-----------------!
+  read(fu) grid % name
 
   !------------------------------!
   !   Boundary conditions list   !
