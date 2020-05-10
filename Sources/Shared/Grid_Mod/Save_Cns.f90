@@ -61,7 +61,7 @@
     end if
   end do
   do s = 1, nbf_sub
-    write(fu) grid % cells_n_nodes(buf_recv_ind(s))
+    write(fu) grid % cells_n_nodes(grid % comm % buff_face_c2(s))
   end do
 
   ! Cells' nodes
@@ -73,8 +73,8 @@
     end if
   end do
   do s = 1, nbf_sub
-    do n = 1, grid % cells_n_nodes(buf_recv_ind(s))
-      write(fu) grid % new_n(grid % cells_n(n,buf_recv_ind(s)))
+    do n = 1, grid % cells_n_nodes(grid % comm % buff_face_c2(s))
+      write(fu) grid % new_n(grid % cells_n(n,grid % comm % buff_face_c2(s)))
     end do
   end do
 
@@ -85,7 +85,7 @@
     end if
   end do
   do s = 1, nbf_sub
-    write(fu) grid % comm % cell_proc(buf_recv_ind(s))
+    write(fu) grid % comm % cell_proc(grid % comm % buff_face_c2(s))
   end do
   do c = -1, -grid % n_bnd_cells, -1
     if(grid % comm % cell_proc(c) .eq. sub) then
@@ -100,7 +100,7 @@
     end if
   end do
   do s = 1, nbf_sub
-    write(fu) grid % comm % cell_glo(buf_recv_ind(s))
+    write(fu) grid % comm % cell_glo(grid % comm % buff_face_c2(s))
   end do
   do c = -1, -grid % n_bnd_cells, -1
     if(grid % comm % cell_proc(c) .eq. sub) then
@@ -138,7 +138,7 @@
 
   ! nbf_sub buffer faces and the new numbers of cells surrounding them
   do s = 1, nbf_sub
-    write(fu) buf_send_ind(s),  &
+    write(fu) grid % comm % buff_face_c1(s),  &
               nc_sub + s
   end do
 

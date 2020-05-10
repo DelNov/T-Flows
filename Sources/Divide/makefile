@@ -109,7 +109,6 @@ SRC_MOD = Comm_Mod_Seq.f90		\
           Math_Mod.f90			\
           File_Mod.f90			\
           Gen_Mod.f90			\
-          Div_Mod.f90			\
           Metis_Options_Mod.f90		\
           Bnd_Cond_Mod.f90		\
           Sort_Mod.f90			\

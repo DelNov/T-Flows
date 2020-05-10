@@ -5,7 +5,6 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use File_Mod
-  use Div_Mod
   use Grid_Mod,      only: Grid_Type,                     &
                            Grid_Mod_Sort_Cells_By_Index,  &
                            Grid_Mod_Sort_Faces_By_Index,  &
@@ -135,8 +134,8 @@
             if( (grid % comm % cell_proc(c1) .eq. sub) .and.  &
                 (grid % comm % cell_proc(c2) .eq. subo) ) then
               nbf_sub = nbf_sub + 1                ! increase buffer cell count
-              buf_send_ind(nbf_sub) = grid % new_c(c1)  ! buffer send index
-              buf_recv_ind(nbf_sub) = c2           ! important for coordinate
+              grid % comm % buff_face_c1(nbf_sub) = grid % new_c(c1)
+              grid % comm % buff_face_c2(nbf_sub) = c2
 
               if(grid % new_c(c2) .eq. 0) then
                 nbfc_sub = nbfc_sub + 1
@@ -147,9 +146,9 @@
             end if
             if( (grid % comm % cell_proc(c2) .eq. sub) .and.  &
                 (grid % comm % cell_proc(c1) .eq. subo) ) then
-              nbf_sub = nbf_sub + 1                ! increasu buffer cell count
-              buf_send_ind(nbf_sub) = grid % new_c(c2)  ! buffer send index
-              buf_recv_ind(nbf_sub) = c1           ! important for coordinate
+              nbf_sub = nbf_sub + 1                ! increase buffer cell count
+              grid % comm % buff_face_c1(nbf_sub) = grid % new_c(c2)
+              grid % comm % buff_face_c2(nbf_sub) = c1
 
               if(grid % new_c(c1) .eq. 0) then
                 nbfc_sub = nbfc_sub + 1
@@ -184,8 +183,8 @@
       end if
     end do
     do s = 1, nbf_sub
-      do ln = 1, grid % cells_n_nodes(buf_recv_ind(s))
-        grid % new_n(grid % cells_n(ln,buf_recv_ind(s))) = -1
+      do ln = 1, grid % cells_n_nodes(grid % comm % buff_face_c2(s))
+        grid % new_n(grid % cells_n(ln,grid % comm % buff_face_c2(s))) = -1
       end do
     end do
 
