@@ -250,11 +250,6 @@
     call Cgns_Mod_Merge_Nodes(grid)
   end if
 
-  !---------------------------------!
-  !   Read block (material?) data   !
-  !---------------------------------!
-  grid % material % name = 'AIR'
-
   !-----------------------------------------------------------------!
   !   Correct boundary conditions directions for hexahedral cells   !
   !   (They are not the same in CGNS and Gambit's neutral format.)  !
