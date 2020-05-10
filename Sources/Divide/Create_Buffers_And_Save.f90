@@ -39,9 +39,6 @@
 !   indexes. That one is called buffind().                                     !
 !------------------------------------------------------------------------------!
 
-  allocate (grid % comm % buff_s_cell(0 : maxval(grid % comm % cell_proc(:))))
-  allocate (grid % comm % buff_e_cell(0 : maxval(grid % comm % cell_proc(:))))
-
   !-------------------------------!
   !                               !
   !   Browse through subdomains   !
@@ -129,7 +126,6 @@
 
     do subo = 1, maxval(grid % comm % cell_proc(:))
       if(subo .ne. sub) then
-        grid % comm % buff_s_cell(subo) = nbf_sub + 1
 
         ! Faces inside the domain
         do s = 1, grid % n_faces
@@ -165,25 +161,7 @@
           end if  ! c2 > 0
         end do    ! through sides
 
-        grid % comm % buff_e_cell(subo) = nbf_sub
-
-        ! Write to buffer file
-        if(verbose) then
-          write(fu,'(a33)') '#-------------------------------#' 
-          write(fu,'(a33)') '#   Conections with subdomain:  #' 
-          write(fu,'(a33)') '#-------------------------------#' 
-          write(fu,'(i8)')  subo
-          write(fu,'(a30)') '# Number of local connections:'
-          write(fu,'(i8)')  grid % comm % buff_e_cell(subo) -  &
-                            grid % comm % buff_s_cell(subo) + 1
-          write(fu,'(a37)') '# Local number in a buffer and index:'
-          do b = grid % comm % buff_s_cell(subo),  &
-                 grid % comm % buff_e_cell(subo)
-            write(fu,'(2i8)') b - grid % comm % buff_s_cell(subo) + 1,  &
-                              buf_send_ind(b)
-          end do
-        end if
-      end if
+      end if  ! subo .ne. sub
 
     end do ! for subo
 
