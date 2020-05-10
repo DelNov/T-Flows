@@ -69,7 +69,7 @@
   call Turb_Mod_Alias_T2          (turb, t2)
 
   area  = 0.0
-  if (this_proc < 2) print *, '# Grid material: ', grid % material % name
+  if (this_proc < 2) print *, '# Grid name: ', grid % name
 
   ! Found the line where boundary condition definition is defined
   call Control_Mod_Position_At_One_Key('INITIAL_CONDITION', &
