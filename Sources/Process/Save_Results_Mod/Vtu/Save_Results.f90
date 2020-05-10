@@ -37,8 +37,8 @@
   integer(4)               :: data_size
   integer                  :: data_offset, cell_offset
   integer                  :: c, n, s, n_conns, sc, f8, f9, ua, run, c2
-  character(len=160)       :: name_out_8, name_out_9, name_mean, a_name
-  character(len=160)       :: str1, str2
+  character(len=80)        :: name_out_8, name_out_9, name_mean, a_name
+  character(len=80)        :: str1, str2
   integer, parameter       :: IP=8, RP=8, SP=4
 !==============================================================================!
 
