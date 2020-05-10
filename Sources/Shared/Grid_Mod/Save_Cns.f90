@@ -38,10 +38,10 @@
   write(fu) grid % n_bnd_cond  ! number of bounary conditions
   write(fu) grid % n_levels    ! number of multigrid levels
 
-  !-------------------!
-  !   Material name   !
-  !-------------------!
-  write(fu) grid % material % name
+  !------------------------!
+  !   Domain (grid) name   !
+  !------------------------!
+  write(fu) grid % name
 
   !------------------------------!
   !   Boundary conditions list   !
