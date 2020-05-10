@@ -24,7 +24,7 @@
   integer            :: n, c, c1, c2, s, data_offset, offset, fu
   integer            :: nf_sub_non_per, nf_sub_per
   integer            :: n_nodes_here, n_cells_here, n_conns_here, tag
-  character(len=160) :: name_out, str1, str2
+  character(len=80)  :: name_out, str1, str2
   integer, parameter :: IP=8, RP=8, SP=4
 !==============================================================================!
 
