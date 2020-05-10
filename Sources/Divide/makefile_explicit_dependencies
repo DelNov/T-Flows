@@ -75,7 +75,6 @@ $(DIR_SHARED)/Sort_Mod/*.f90 \
 $(DIR_OBJECT)/Metis_Options_Mod.o \
 $(DIR_OBJECT)/Math_Mod.o \
 $(DIR_SHARED)/Math_Mod/*.f90 \
-$(DIR_OBJECT)/Material_Mod.o \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
@@ -333,7 +332,6 @@ $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
 
 #-- ./To_Lower_Case.f90
-#-- ./Material_Mod.f90
 #-- ./Cgns_Mod_Seq.f90
 $(DIR_OBJECT)/Cgns_Mod_Seq.o:\
 $(DIR_OBJECT)/Sort_Mod.o \
