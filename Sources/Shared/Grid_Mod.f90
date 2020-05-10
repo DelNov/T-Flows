@@ -10,7 +10,6 @@
   use Comm_Mod
   use File_Mod
   use Grid_Level_Mod
-  use Material_Mod
   use Bnd_Cond_Mod
   use Metis_Options_Mod
   use Sort_Mod
@@ -25,6 +24,9 @@
   !               !
   !---------------!
   type Grid_Type
+
+    ! Stores the name of this domain
+    character(len=80) :: name
 
     ! Number of ...
     integer :: n_nodes      ! ... nodes
@@ -114,7 +116,6 @@
     ! Node coordinates
     real, allocatable :: xn(:), yn(:), zn(:)
 
-    type(Material_Type) :: material
     type(Bnd_Cond_Type) :: bnd_cond
 
     !  Maximum number of cells, boundary cells and faces
