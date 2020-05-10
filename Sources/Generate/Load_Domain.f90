@@ -52,6 +52,9 @@
   call File_Mod_Read_Line(5)
   read(line % tokens(1), *) problem_name(1)
 
+  grid % name = problem_name(1)
+  call To_Upper_Case(grid % name)
+
   call File_Mod_Set_Name(domain_name, extension='.dom')
   call File_Mod_Open_File_For_Reading(domain_name, fu)
 
