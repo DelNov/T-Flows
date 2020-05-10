@@ -13,6 +13,7 @@
   open(newunit = file_unit,      &
        file    = name_o,         &
        form    = 'unformatted',  &
+       status  = 'replace',      &
        access  = 'stream')
 
   if(.not. present(processor)) then

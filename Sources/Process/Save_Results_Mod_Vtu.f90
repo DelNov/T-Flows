@@ -23,10 +23,11 @@
 
   contains
 
-  include 'Save_Results_Mod/Vtu/Save_Results.f90'
-  include 'Save_Results_Mod/Vtu/Save_Scalar.f90'
+  include 'Save_Results_Mod/Vtu/Save_Results.f90'      ! binary
+  include 'Save_Results_Mod/Vtu/Save_Scalar_Int.f90'   ! binary
+  include 'Save_Results_Mod/Vtu/Save_Scalar_Real.f90'  ! binary
   include 'Save_Results_Mod/Vtu/Save_Swarm.f90'
-  include 'Save_Results_Mod/Vtu/Save_Vector.f90'
+  include 'Save_Results_Mod/Vtu/Save_Vector_Real.f90'  ! binary
   include 'Save_Results_Mod/Vtu/Save_Surf.f90'
 
   end module 
