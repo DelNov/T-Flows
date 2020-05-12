@@ -35,7 +35,7 @@
     end do
     if (i >= j) exit
 
-    ! Swap values in a and b
+    ! Swap values in a, b and c
     call Swap_Real(a1(i), a1(j))
     call Swap_Real(a2(i), a2(j))
     call Swap_Real(a3(i), a3(j))
