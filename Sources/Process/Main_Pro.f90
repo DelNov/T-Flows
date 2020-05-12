@@ -119,12 +119,12 @@
     call Comm_Mod_Wait
   end do
 
+  ! Allocate memory for working arrays
+  call Work_Mod_Allocate(grid, rc=30, rf=6, rn=1, ic=4, if=0, in=1)
+
   ! Create interfaces
   call Control_Mod_Switch_To_Root()
   call Interface_Mod_Create(inter, grid, n_dom)
-
-  ! Allocate memory for working arrays
-  call Work_Mod_Allocate(grid, rc=30, rf=1, rn=1, ic=4, if=0, in=1)
 
   ! Get the number of time steps from the control file
   call Control_Mod_Number_Of_Time_Steps(last_dt, verbose=.true.)

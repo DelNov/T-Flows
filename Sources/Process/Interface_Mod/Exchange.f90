@@ -9,46 +9,58 @@
   type(Field_Type), target :: flow(MD)
   integer                  :: n_dom
 
-  type(Grid_Type), pointer :: grid_1, grid_2
-  integer                  :: d_1, d_2, n_1, n_2, s_1, s_2
-  integer                  :: c_11, c_12, c_21, c_22
-  real                     :: t_int, cond_1, cond_2
+  type(Grid_Type), pointer :: grid1, grid2
+  integer                  :: d1, d2, n1, n2, s
+  integer                  :: c1i, c1b, c2i, c2b
+  real                     :: t_int, cond1, cond2
 !==============================================================================!
 
   if(n_dom < 2) return
 
   call Cpu_Timer_Mod_Start('Interface_Mod_Exchange')
 
-  ! Write some debugging info
-  do d_1 = 1, n_dom
-    grid_1 => flow(d_1) % pnt_grid
-    do d_2 = 1, n_dom
-      grid_2 => flow(d_2) % pnt_grid
-      if(inter(d_1, d_2) % n_faces > 0) then
-        do n_1 = 1, inter(d_1, d_2) % n_faces
-          s_1 = inter(d_1, d_2) % faces_1(n_1)     ! face in dom 1
-          n_2 = inter(d_1, d_2) % close_in_2(n_1)
-          s_2 = inter(d_1, d_2) % faces_2(n_2)     ! face in dom 2
-          c_11 = grid_1 % faces_c(1, s_1)
-          c_12 = grid_1 % faces_c(2, s_1)
-          c_21 = grid_2 % faces_c(1, s_2)
-          c_22 = grid_2 % faces_c(2, s_2)
+  ! Copy values from inside cells to the interface
+  do d1 = 1, n_dom
+    grid1 => flow(d1) % pnt_grid
+    do d2 = 1, n_dom
+      grid2 => flow(d2) % pnt_grid
 
-          cond_1 = flow(d_1) % conductivity(c_11)
-          cond_2 = flow(d_2) % conductivity(c_21)
+      ! On the side of domain 1
+      do s = 1, inter(d1, d2) % n_faces
+        c1i = inter(d1, d2) % glo_1(s)   ! domain 1, cell 1
+        inter(d1, d2) % phi_1(s) = flow(d1) % t % n(c1i)
+      end do
 
-          ! Impose interface condition (assuming delta_1 == delta_2)
-          t_int = (  flow(d_1) % t % n(c_11) * cond_1    &
-                   + flow(d_2) % t % n(c_21) * cond_2 )  &
-                / ( cond_1 + cond_2)
-          flow(d_1) % t % n(c_12) = t_int
-          flow(d_2) % t % n(c_22) = t_int
+      ! On the side of domain 2
+      do s = 1, inter(d1, d2) % n_faces
+        c2i = inter(d1, d2) % glo_2(s)   ! domain 2, cell 1
+        inter(d1, d2) % phi_2(s) = flow(d2) % t % n(c2i)
+      end do
 
-!         WRITE(100,'(4F9.4)')                                 &
-!           flow(d_1) % t % n(c_11), flow(d_1) % t % n(c_12),  &
-!           flow(d_2) % t % n(c_21), flow(d_2) % t % n(c_22)
-        end do
-      end if
+    end do
+  end do
+
+  ! Here you will have to exchange (global sum) of phi_1 and phi_2
+
+  ! Copy values from interface back to boundary cells
+  do d1 = 1, n_dom
+    grid1 => flow(d1) % pnt_grid
+    do d2 = 1, n_dom
+      grid2 => flow(d2) % pnt_grid
+
+      ! On the side of domain 1
+      do s = 1, inter(d1, d2) % n_faces
+        c1b = inter(d1, d2) % bnd_1(s)   ! domain 1, cell 2  (bnd cell)
+        flow(d1) % t % n(c1b) = (  inter(d1, d2) % phi_1(s)  &
+                                 + inter(d1, d2) % phi_2(s)) * 0.5
+      end do
+
+      ! On the side of domain 2
+      do s = 1, inter(d1, d2) % n_faces
+        c2b = inter(d1, d2) % bnd_2(s)   ! domain 2, cell 2  (bnd cell)
+        flow(d2) % t % n(c2b) = (  inter(d1, d2) % phi_1(s)  &
+                                 + inter(d1, d2) % phi_2(s)) * 0.5
+      end do
     end do
   end do
 
