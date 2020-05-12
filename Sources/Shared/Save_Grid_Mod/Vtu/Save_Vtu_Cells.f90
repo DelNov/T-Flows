@@ -321,8 +321,8 @@
                            ' format="ascii"/>'
     write(fu,'(a,a)') IN_3, '<PDataArray type="Float64" Name="CellVolume"' // &
                            ' format="ascii"/>'
-    write(fu,'(a,a)') IN_3, '<PDataArray type="Float64" Name="CellDelta"' // &
-                           ' format="ascii"/>'
+    ! write(fu,'(a,a)') IN_3, '<PDataArray type="Float64" Name="CellDelta"' // &
+    !                        ' format="ascii"/>'
     write(fu,'(a,a)') IN_2, '</PCellData>'
 
     ! Write out the names of all the pieces

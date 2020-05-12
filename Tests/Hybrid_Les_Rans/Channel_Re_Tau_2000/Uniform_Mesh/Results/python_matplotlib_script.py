@@ -1,4 +1,4 @@
-#!/bin/python2
+#!/bin/python
 # this python template is used to plot data from .dat file produced by
 # Save_Results.f90
 # it is executed automatically by test_build.sh script
@@ -16,11 +16,11 @@ plt.rcParams['mathtext.fontset'] = 'cm'
 plt.rcParams['mathtext.rm'] = 'serif'
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
-plt.rcParams['font.size'] = '48'
+plt.rcParams['font.size'] = '22.325'
 plt.rcParams['xtick.minor.visible'] = True
 plt.rcParams['ytick.minor.visible'] = True
-plt.rcParams['xtick.major.pad'] = 15 # distance from axis to Mticks label
-plt.rcParams['ytick.major.pad'] = 15 # distance from axis to Mticks label
+plt.rcParams['xtick.major.pad'] = 15  # distance from axis to Mticks label
+plt.rcParams['ytick.major.pad'] = 15  # distance from axis to Mticks label
 plt.rcParams['xtick.major.size'] = 24
 plt.rcParams['xtick.minor.size'] = 16
 plt.rcParams['ytick.major.size'] = 24
@@ -31,23 +31,23 @@ plt.rcParams['ytick.major.width'] = 1.5
 plt.rcParams['ytick.minor.width'] = 1.0
 plt.rcParams['xtick.direction'] = 'in'
 plt.rcParams['ytick.direction'] = 'in'
-plt.rcParams['figure.figsize'] = [3508./300, 2480./300] # A4 at 300 dpi
+plt.rcParams['figure.figsize'] = [3508./300, 2480./300]  # A4 at 300 dpi
 plt.rcParams['savefig.dpi'] = 300
 plt.rcParams['figure.dpi'] = 100
 plt.rcParams['image.cmap'] = 'jet'
-plt.rcParams["legend.frameon"] = True
-plt.rcParams["legend.fancybox"] = False
-plt.rcParams["legend.framealpha"] = 1
-plt.rcParams["legend.edgecolor"]  = 'k'
-plt.rcParams["legend.labelspacing"] = 0
-plt.rcParams["legend.handlelength"] = 1.5
-plt.rcParams["legend.handletextpad"] = 0.5
-plt.rcParams["legend.columnspacing"] = 0.1
-plt.rcParams["legend.borderpad"] = 0.1
+plt.rcParams['legend.frameon'] = True
+plt.rcParams['legend.fancybox'] = False
+plt.rcParams['legend.framealpha'] = 1
+plt.rcParams['legend.edgecolor'] = 'k'
+plt.rcParams['legend.labelspacing'] = 0
+plt.rcParams['legend.handlelength'] = 1.5
+plt.rcParams['legend.handletextpad'] = 0.5
+plt.rcParams['legend.columnspacing'] = 0.1
+plt.rcParams['legend.borderpad'] = 0.1
 plt.rcParams['lines.linewidth'] = 2.
 plt.rcParams['lines.markeredgewidth'] = 2.0
 plt.rcParams['lines.markersize'] = 15
-plt.rcParams["legend.numpoints"] = 2
+plt.rcParams['legend.numpoints'] = 2
 
 #-Reference data
 U_plus_ref_data   = 'u_plus_re_tau_2000.dat'
@@ -141,7 +141,7 @@ leg4 = lines.Line2D([], [], color='k', linestyle='dashed', \
                     label=r'$x$')
 lines  = [leg1, leg2, leg3, leg4]
 labels = [line.get_label() for line in lines]
-ax[0].legend(lines, labels, fontsize=32)
+ax[0].legend(lines, labels)
 
 # Show
 #plt.show()

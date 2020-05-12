@@ -40,11 +40,6 @@
              ' reading Gambit''s neutral file format'
     problem_name(1) = file_name(1:l-4)
     ext_up = file_name_up(l-2:l)
-  else if( file_name_up(l-3:l) .eq. 'CGNS' ) then
-    print *, '# Based on the extension, you are' // &
-             ' reading CGNS file format'
-    problem_name(1) = file_name(1:l-5)
-    ext_up = file_name_up(l-3:l)
   else if( file_name_up(l-2:l) .eq. 'MSH' ) then
     print *, '# Based on the extension, you are' // &
              ' reading GMSH file format'
@@ -67,9 +62,6 @@
   !----------------------------------------!
   if (ext_up .eq. 'NEU') then
     call Load_Neu(grid, .false.)
-  end if
-  if (ext_up .eq. 'CGNS') then
-    call Load_Cgns(grid, .false.)
   end if
   if (ext_up .eq. 'MSH') then
     call Load_Msh(grid, .false.)

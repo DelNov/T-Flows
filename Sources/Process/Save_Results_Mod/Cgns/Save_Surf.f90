@@ -367,7 +367,6 @@
     integer                 :: solution_id ! solution index
     integer                 :: field_id    ! field index
     character(len=80)       :: field_name  ! name of the FlowSolution_t node
-    integer                 :: sect_id
     integer                 :: cnt            ! cells of sect_id
     real                    :: field_array(surf % n_verts) ! field array
     integer                 :: i, j, k, v
@@ -456,7 +455,6 @@
     integer                 :: solution_id ! solution index
     integer                 :: field_id    ! field index
     character(len=80)       :: field_name  ! name of the FlowSolution_t node
-    integer                 :: sect_id
     integer                 :: cnt            ! cells of sect_id
     real                    :: field_array(surf % n_elems) ! field array
     integer                 :: i, j, k, e
