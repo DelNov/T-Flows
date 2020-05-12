@@ -1,13 +1,3 @@
-#-- ./Create_Maps.f90
-$(DIR_OBJECT)/Create_Maps.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/File_Mod.o \
-$(DIR_SHARED)/File_Mod/*.f90 
-
 #-- ./Create_Buffers_And_Save.f90
 $(DIR_OBJECT)/Create_Buffers_And_Save.o:\
 $(DIR_OBJECT)/Sort_Mod.o \
@@ -21,8 +11,7 @@ $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/File_Mod.o \
-$(DIR_SHARED)/File_Mod/*.f90 \
-$(DIR_OBJECT)/Div_Mod.o 
+$(DIR_SHARED)/File_Mod/*.f90
 
 #-- ./Allocate_Additional.f90
 $(DIR_OBJECT)/Allocate_Additional.o:\
@@ -30,8 +19,7 @@ $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Div_Mod.o 
+$(DIR_SHARED)/Grid_Mod/*.f90
 
 #-- ./Main_Div.f90
 $(DIR_OBJECT)/Main_Div.o:\
@@ -45,7 +33,6 @@ $(DIR_SHARED)/File_Mod/*.f90
 
 #-- ./Logo_Div.f90
 #-- ./Swap_Real.f90
-#-- ./Div_Mod.f90
 #-- ./Sort_Mod.f90
 $(DIR_OBJECT)/Sort_Mod.o:\
 $(DIR_SHARED)/Sort_Mod/*.f90 
@@ -85,7 +72,6 @@ $(DIR_SHARED)/Sort_Mod/*.f90 \
 $(DIR_OBJECT)/Metis_Options_Mod.o \
 $(DIR_OBJECT)/Math_Mod.o \
 $(DIR_SHARED)/Math_Mod/*.f90 \
-$(DIR_OBJECT)/Material_Mod.o \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
@@ -93,7 +79,6 @@ $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Level_Mod.o \
 $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 \
-$(DIR_OBJECT)/Div_Mod.o \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
@@ -268,7 +253,6 @@ $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Div_Mod.o \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
@@ -288,7 +272,6 @@ $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Div_Mod.o \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
@@ -343,7 +326,6 @@ $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
 
 #-- ./To_Lower_Case.f90
-#-- ./Material_Mod.f90
 #-- ./Cgns_Mod_Seq.f90
 $(DIR_OBJECT)/Cgns_Mod_Seq.o:\
 $(DIR_OBJECT)/Sort_Mod.o \

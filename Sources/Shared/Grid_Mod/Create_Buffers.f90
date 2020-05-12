@@ -53,8 +53,8 @@
           ! If c2 is a buffer face
           if( (grid % comm % cell_proc(c1) .eq. this_proc) .and.  &
               (grid % comm % cell_proc(c2) .eq. subo) ) then
-            buf_cnt = buf_cnt + 1                ! increase buffer cell count
-            grid % comm % buff_index(c2) = c1    ! buffer send index
+            buf_cnt = buf_cnt + 1                   ! increase buffer cell count
+            grid % comm % buff_c1_from_c2(c2) = c1  ! buffer send index
           end if
           if( (grid % comm % cell_proc(c2) .eq. this_proc) .and.  &
               (grid % comm % cell_proc(c1) .eq. subo) ) then

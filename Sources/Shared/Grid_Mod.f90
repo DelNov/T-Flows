@@ -10,11 +10,9 @@
   use Comm_Mod
   use File_Mod
   use Grid_Level_Mod
-  use Material_Mod
   use Bnd_Cond_Mod
   use Metis_Options_Mod
   use Sort_Mod
-  use Div_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -25,6 +23,9 @@
   !               !
   !---------------!
   type Grid_Type
+
+    ! Stores the name of this domain
+    character(len=80) :: name
 
     ! Number of ...
     integer :: n_nodes      ! ... nodes
@@ -114,7 +115,6 @@
     ! Node coordinates
     real, allocatable :: xn(:), yn(:), zn(:)
 
-    type(Material_Type) :: material
     type(Bnd_Cond_Type) :: bnd_cond
 
     !  Maximum number of cells, boundary cells and faces
@@ -173,10 +173,10 @@
   include 'Grid_Mod/Find_Cells_Faces.f90'
   include 'Grid_Mod/Find_Nodes_Cells.f90'
   include 'Grid_Mod/Find_Periodic_Faces.f90'
+  include 'Grid_Mod/Form_Maps.f90'
   include 'Grid_Mod/Get_C1_And_C2_At_Level.f90'
   include 'Grid_Mod/Load_Cns.f90'
   include 'Grid_Mod/Load_Geo.f90'
-  include 'Grid_Mod/Load_Maps.f90'
   include 'Grid_Mod/Print_Bnd_Cond_Info.f90'
   include 'Grid_Mod/Save_Cns.f90'
   include 'Grid_Mod/Save_Geo.f90'

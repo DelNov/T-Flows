@@ -24,7 +24,7 @@
   integer            :: n, c, c1, c2, s, data_offset, offset, fu
   integer            :: nf_sub_non_per, nf_sub_per
   integer            :: n_nodes_here, n_cells_here, n_conns_here, tag
-  character(len=160) :: name_out, str1, str2
+  character(len=80)  :: name_out, str1, str2
   integer, parameter :: IP=8, RP=8, SP=4
 !==============================================================================!
 
@@ -169,10 +169,10 @@
       write(fu) grid % xc(c), grid % yc(c), grid % zc(c)
     end if
   end do
-  do c = 1,n_buf_cells_sub
-    write(fu) grid % xc(buf_recv_ind(c)),  &
-              grid % yc(buf_recv_ind(c)),  &
-              grid % zc(buf_recv_ind(c))
+  do s = 1, n_buf_cells_sub
+    write(fu) grid % xc(grid % comm % buff_face_c2(s)),  &
+              grid % yc(grid % comm % buff_face_c2(s)),  &
+              grid % zc(grid % comm % buff_face_c2(s))
   end do
 
   !-----------!
@@ -294,11 +294,11 @@
   print '(a38,i9)', '# Inter-processor links :            ', n_buf_cells_sub
 
   ! Cells' nodes continued: interprocessor links
-  do c = 1, n_buf_cells_sub
-    c1 = buf_send_ind(c) 
+  do s = 1, n_buf_cells_sub
+    c1 = grid % comm % buff_face_c1(s)
     write(fu)                    &
       n_nodes_sub + c1 - 1,      &
-      n_nodes_sub + n_cells_sub + n_bnd_cells_sub + c - 1
+      n_nodes_sub + n_cells_sub + n_bnd_cells_sub + s - 1
   end do
 
   ! Cells' offsets

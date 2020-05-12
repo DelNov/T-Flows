@@ -213,11 +213,9 @@ SRC_MOD += Const_Mod.f90	\
            Math_Mod.f90		\
            File_Mod.f90		\
            Control_Mod.f90	\
-           Div_Mod.f90		\
            Grid_Mod.f90		\
            Grid_Level_Mod.f90	\
            Work_Mod.f90		\
-           Material_Mod.f90	\
            Metis_Options_Mod.f90
 
 # Sources for modules in the local directory

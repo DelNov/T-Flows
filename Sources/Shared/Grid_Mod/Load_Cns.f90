@@ -43,10 +43,10 @@
   allocate(grid % bnd_cond % name(grid % n_bnd_cond))
   allocate(grid % bnd_cond % type(grid % n_bnd_cond))
 
-  !-------------------!
-  !   Material name   !
-  !-------------------!
-  read(fu) grid % material % name
+  !-----------------!
+  !   Domain name   !
+  !-----------------!
+  read(fu) grid % name
 
   !------------------------------!
   !   Boundary conditions list   !
@@ -70,6 +70,10 @@
   ! Cells' processor ids
   read(fu) (grid % comm % cell_proc(c), c =  1,  grid % n_cells)
   read(fu) (grid % comm % cell_proc(c), c = -1, -grid % n_bnd_cells, -1)
+
+  ! Cells' global indices
+  read(fu) (grid % comm % cell_glo(c), c =  1,  grid % n_cells)
+  read(fu) (grid % comm % cell_glo(c), c = -1, -grid % n_bnd_cells, -1)
 
   !-----------!
   !   Faces   !

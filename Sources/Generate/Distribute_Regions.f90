@@ -13,8 +13,8 @@
   type(Grid_Type)   :: grid
 !-----------------------------------[Locals]-----------------------------------!
   integer :: b, i, j, k, n, c, r
-  integer :: n_mat, n_bnd         ! number of materials and boundary conditions
-  integer :: is, js, ks, ie, je, ke, face 
+  integer :: n_bnd                         ! number of boundary conditions
+  integer :: is, js, ks, ie, je, ke, face
   integer :: ci, cj, ck
   logical :: found
 !==============================================================================!
@@ -28,10 +28,8 @@
   !  (+1 is to store the default values)
   allocate(grid % bnd_cond % name(dom % n_regions + 1))
 
-  ! Set the bare bones - one material minimum, and call it "AIR"
+  ! Initialize number of boundary conditions
   n_bnd = 0
-  n_mat = 1
-  grid % material % name = "AIR"
 
   do n = 1, dom % n_regions
 

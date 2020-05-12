@@ -4,7 +4,6 @@
 !   Allocates additional memory for Divisor                                    !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Div_Mod
   use Grid_Mod, only: Grid_Type,  &
                       Grid_Mod_Allocate_New_Numbers
 !------------------------------------------------------------------------------!
@@ -20,8 +19,9 @@
                                      grid % n_cells,      &
                                      grid % n_faces)
 
-  ! Variables declared in Div_Mod
-  allocate (buf_send_ind(grid % n_faces));  buf_send_ind = 0
-  allocate (buf_recv_ind(grid % n_faces));  buf_recv_ind = 0
+  allocate (grid % comm % buff_face_c1(grid % n_faces))
+  allocate (grid % comm % buff_face_c2(grid % n_faces))
+  grid % comm % buff_face_c1(:) = 0
+  grid % comm % buff_face_c2(:) = 0
 
   end subroutine

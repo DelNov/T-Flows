@@ -12,8 +12,8 @@
   real             :: val(-grid % n_bnd_cells:grid % n_cells)
   integer          :: fs, fp          ! file unit sequential and parallel
 !-----------------------------------[Locals]-----------------------------------!
-  integer            :: c, c2, s
-  character(len=160) :: str1
+  integer           :: c, c2, s
+  character(len=80) :: str1
 !==============================================================================!
 
   ! Header

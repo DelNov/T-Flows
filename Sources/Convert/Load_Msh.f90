@@ -320,13 +320,6 @@
     end do
   end do
 
-  !-----------------------!
-  !                       !
-  !   Set material name   !
-  !                       !
-  !-----------------------!
-  grid % material % name = "AIR"
-
   !-------------------------!
   !   Boundary conditions   !
   !-------------------------!
