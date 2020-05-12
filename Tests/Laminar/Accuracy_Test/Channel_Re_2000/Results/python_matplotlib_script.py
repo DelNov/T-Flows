@@ -1,4 +1,4 @@
-#!/bin/python2
+#!/bin/python
 # this python template is used to plot data from ??????.dat files
 # produced by test_build.sh(Process accuracy test)
 # it is executed automatically by test_build.sh script
@@ -18,11 +18,11 @@ plt.rcParams['mathtext.fontset'] = 'cm'
 plt.rcParams['mathtext.rm'] = 'serif'
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
-plt.rcParams['font.size'] = '48'
+plt.rcParams['font.size'] = '22.325'
 plt.rcParams['xtick.minor.visible'] = True
 plt.rcParams['ytick.minor.visible'] = True
-plt.rcParams['xtick.major.pad'] = 15 # distance from axis to Mticks label
-plt.rcParams['ytick.major.pad'] = 15 # distance from axis to Mticks label
+plt.rcParams['xtick.major.pad'] = 15  # distance from axis to Mticks label
+plt.rcParams['ytick.major.pad'] = 15  # distance from axis to Mticks label
 plt.rcParams['xtick.major.size'] = 24
 plt.rcParams['xtick.minor.size'] = 16
 plt.rcParams['ytick.major.size'] = 24
@@ -33,23 +33,23 @@ plt.rcParams['ytick.major.width'] = 1.5
 plt.rcParams['ytick.minor.width'] = 1.0
 plt.rcParams['xtick.direction'] = 'in'
 plt.rcParams['ytick.direction'] = 'in'
-plt.rcParams['figure.figsize'] = [3508./300, 2480./300] # A4 at 300 dpi
+plt.rcParams['figure.figsize'] = [3508./300, 2480./300]  # A4 at 300 dpi
 plt.rcParams['savefig.dpi'] = 300
 plt.rcParams['figure.dpi'] = 100
 plt.rcParams['image.cmap'] = 'jet'
-plt.rcParams["legend.frameon"] = True
-plt.rcParams["legend.fancybox"] = False
-plt.rcParams["legend.framealpha"] = 1
-plt.rcParams["legend.edgecolor"]  = 'k'
-plt.rcParams["legend.labelspacing"] = 0
-plt.rcParams["legend.handlelength"] = 1.5
-plt.rcParams["legend.handletextpad"] = 0.5
-plt.rcParams["legend.columnspacing"] = 0.1
-plt.rcParams["legend.borderpad"] = 0.1
+plt.rcParams['legend.frameon'] = True
+plt.rcParams['legend.fancybox'] = False
+plt.rcParams['legend.framealpha'] = 1
+plt.rcParams['legend.edgecolor'] = 'k'
+plt.rcParams['legend.labelspacing'] = 0
+plt.rcParams['legend.handlelength'] = 1.5
+plt.rcParams['legend.handletextpad'] = 0.5
+plt.rcParams['legend.columnspacing'] = 0.1
+plt.rcParams['legend.borderpad'] = 0.1
 plt.rcParams['lines.linewidth'] = 2.
 plt.rcParams['lines.markeredgewidth'] = 2.0
 plt.rcParams['lines.markersize'] = 15
-plt.rcParams["legend.numpoints"] = 2
+plt.rcParams['legend.numpoints'] = 2
 
 # arg1 -> y, arg2 -> H, returns (3.0*(y/(0.5*H))*(1.0-y/H)
 y_profile = lambda arg1, arg2: np.array(3.0*(arg1/(0.5*arg2))*(1.0-arg1/arg2));
@@ -65,7 +65,7 @@ x_data = np.array([], dtype=np.int64)
 y_data = np.array([], dtype=np.double)
 z_data = np.array([], dtype=np.double)
 
-print '{0:<1}{1:>17}{2:>18}{3:>18}'.format('#', 'Ny', 'L2(u)', 'LInf(u)')
+# print '{0:<1}{1:>17}{2:>18}{3:>18}'.format('#', 'Ny', 'L2(u)', 'LInf(u)')
 for fi in range(len(files)):
 
   #-Input data
@@ -74,7 +74,7 @@ for fi in range(len(files)):
   N_y = np.shape(y)[0]
   l2_error = np.sqrt(np.sum((u - y_profile(y, 1.0))**2)/N_y)
   linf_error = np.max(np.abs(u - y_profile(y, 1.0)))
-  print '{0: 18d}{1: 18.8E}{2: 18.8E}'.format(N_y, l2_error, linf_error)
+  # print '{0: 18d}{1: 18.8E}{2: 18.8E}'.format(N_y, l2_error, linf_error)
 
   x_data = np.append(x_data, N_y)
   y_data = np.append(y_data, l2_error)
