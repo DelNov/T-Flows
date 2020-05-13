@@ -120,7 +120,7 @@
   end do
 
   ! Allocate memory for working arrays
-  call Work_Mod_Allocate(grid, rc=30, rf=6, rn=1, ic=4, if=0, in=1)
+  call Work_Mod_Allocate(grid, rc=30, rf=6, rn=1, ic=4, if=6, in=1)
 
   ! Create interfaces
   call Control_Mod_Switch_To_Root()

@@ -7,12 +7,6 @@
   use Field_Mod
   use Control_Mod
   use Cpu_Timer_Mod
-  use Work_Mod,     only: xf_1 => r_face_01,  &  ! face coordinates ...
-                          yf_1 => r_face_02,  &  ! ... on the each side ...
-                          zf_1 => r_face_03,  &  ! ... of the interface
-                          xf_2 => r_face_04,  &
-                          yf_2 => r_face_05,  &
-                          zf_2 => r_face_06
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -23,16 +17,20 @@
   type Interface_Type
 
     ! Global number of faces at that interface
-    integer :: n_faces
+    integer :: n_tot
+    integer :: n1_sub
+    integer :: n2_sub
 
     ! Buffers for storing interface values
     real, allocatable :: phi_1(:)
     real, allocatable :: phi_2(:)
 
-    ! Global cell numbers on each side of the interface
-    integer, allocatable :: glo_1(:), glo_2(:)
-    integer, allocatable :: bnd_1(:), bnd_2(:)
-
+    integer, allocatable :: cell_1(:)
+    integer, allocatable :: face_1(:)
+    integer, allocatable :: bcel_1(:)
+    integer, allocatable :: cell_2(:)
+    integer, allocatable :: face_2(:)
+    integer, allocatable :: bcel_2(:)
   end type
 
   contains
