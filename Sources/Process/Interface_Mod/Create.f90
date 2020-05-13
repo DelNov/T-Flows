@@ -127,9 +127,11 @@
           else
             n_tot = n1_tot
             inter(d1, d2) % n_tot = n_tot
-            print '(a,a,a,a,a,i6,a)', ' # Domains ', trim(problem_name(d1)),  &
-                                            ' and ', trim(problem_name(d2)),  &
-                      ' are connected with ', n_tot, ' interface cells!'
+            if(this_proc < 2) then
+              print '(5a,i6,a)', ' # Domains ', trim(problem_name(d1)),  &
+                                       ' and ', trim(problem_name(d2)),  &
+                        ' are connected with ', n_tot, ' interface cells!'
+            end if
           end if
 
           !---------------------------------------!
@@ -225,13 +227,13 @@
                                            ic_2(1:n_tot),  &
                                            ib_2(1:n_tot),  &
                                            ip_2(1:n_tot))
-          ! Write some debugging information
-          do n = 1, inter(d1, d2) % n_tot
-            write(100*this_proc+d1*10+d2, '(i4, 6f10.5)')   &
-                      n,                                    &
-                      xf_1(n), yf_1(n), zf_1(n),            &
-                      xf_2(n), yf_2(n), zf_2(n)
-          end do
+!         ! Write some debugging information
+!         do n = 1, inter(d1, d2) % n_tot
+!           write(100*this_proc+d1*10+d2, '(i4, 6f10.5)')   &
+!                     n,                                    &
+!                     xf_1(n), yf_1(n), zf_1(n),            &
+!                     xf_2(n), yf_2(n), zf_2(n)
+!         end do
 
           !------------------------------!
           !   Store buffer information   !
