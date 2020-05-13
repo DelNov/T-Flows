@@ -21,12 +21,12 @@
   j = n
 
   do
-    do while ( (a1(i).lt.x1)                        .or.  &
-               (a1(i).eq.x1) .and. (a2(i).lt.x2) )
+    do while ( (a1(i).lt.x1)                                            .or.  &
+               Math_Mod_Approx_Real(a1(i),x1) .and. (a2(i).lt.x2) )
       i = i + 1
     end do
-    do while ( (x1.lt.a1(j))                        .or.  &
-               (x1.eq.a1(j)) .and. (x2.lt.a2(j)) )
+    do while ( (x1.lt.a1(j))                                            .or.  &
+               Math_Mod_Approx_Real(x1,a1(j)) .and. (x2.lt.a2(j)) )
       j = j - 1
     end do
     if (i >= j) exit

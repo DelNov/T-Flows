@@ -46,13 +46,13 @@
     j = j - 1
   end do
 
-  if (1 < i - 1) call Sort_Mod_3_Int_Carry_2_Int(a1(1:i-1),  &
+  if (1 < i - 1) call Sort_Mod_3_Int_Carry_3_Int(a1(1:i-1),  &
                                                  a2(1:i-1),  &
                                                  a3(1:i-1),  &
                                                  b (1:i-1),  &
                                                  c (1:i-1),  &
                                                  d (1:i-1))
-  if (j + 1 < n) call Sort_Mod_3_Int_Carry_2_Int(a1(j+1:n),  &
+  if (j + 1 < n) call Sort_Mod_3_Int_Carry_3_Int(a1(j+1:n),  &
                                                  a2(j+1:n),  &
                                                  a3(j+1:n),  &
                                                  b (j+1:n),  &

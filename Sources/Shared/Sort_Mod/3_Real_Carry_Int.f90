@@ -24,13 +24,15 @@
 
   do
     do while ( (a1(i).lt.x1)                                            .or.  &
-               (a1(i).eq.x1) .and. (a2(i).lt.x2)                        .or.  &
-               (a1(i).eq.x1) .and. (a2(i).eq.x2) .and. (a3(i).lt.x3)  )
+               Math_Mod_Approx_Real(a1(i),x1) .and. (a2(i).lt.x2)       .or.  &
+               Math_Mod_Approx_Real(a1(i),x1) .and.                           &
+               Math_Mod_Approx_Real(a2(i),x2) .and. (a3(i).lt.x3)  )
       i = i + 1
     end do
     do while ( (x1.lt.a1(j))                                            .or.  &
-               (x1.eq.a1(j)) .and. (x2.lt.a2(j))                        .or.  &
-               (x1.eq.a1(j)) .and. (x2.eq.a2(j)) .and. (x3.lt.a3(j))  )
+               Math_Mod_Approx_Real(x1,a1(j)) .and. (x2.lt.a2(j))       .or.  &
+               Math_Mod_Approx_Real(x1,a1(j)) .and.                           &
+               Math_Mod_Approx_Real(x2,a2(j)) .and. (x3.lt.a3(j))  )
       j = j - 1
     end do
     if (i >= j) exit
