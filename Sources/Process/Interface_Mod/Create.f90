@@ -227,14 +227,10 @@
                                            ip_2(1:n_tot))
           ! Write some debugging information
           do n = 1, inter(d1, d2) % n_tot
-            write(100*this_proc+d1*10+d2, '(i4, 2i8, 3f10.5, 2i8, 3f10.5)')   &
-                  n,                                    &
-                  grid(d1) % comm % cell_glo(ic_1(n)),  &
-                  grid(d1) % comm % cell_glo(ib_1(n)),  &
-                  xf_1(n), yf_1(n), zf_1(n),            &
-                  grid(d2) % comm % cell_glo(ic_2(n)),  &
-                  grid(d2) % comm % cell_glo(ib_2(n)),  &
-                  xf_2(n), yf_2(n), zf_2(n)
+            write(100*this_proc+d1*10+d2, '(i4, 6f10.5)')   &
+                      n,                                    &
+                      xf_1(n), yf_1(n), zf_1(n),            &
+                      xf_2(n), yf_2(n), zf_2(n)
           end do
 
           !------------------------------!
