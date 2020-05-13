@@ -7,6 +7,9 @@
   implicit none
 !==============================================================================!
 
+  ! Default precision for "Approx_Real" and "Smaller_Real" functions
+  real, parameter :: DEFAULT_TOLERANCE = 1.0e-9
+
   contains
 
   include 'Math_Mod/Approx_Real.f90'

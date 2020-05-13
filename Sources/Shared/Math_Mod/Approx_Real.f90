@@ -4,7 +4,7 @@
 !   Returns .true. if a is approximatelly equal to "b", .false. otherwise.     !
 !                                                                              !
 !   The approximation is controlled by optional parameter "tol".  If it is     !
-!   not provided, the function will use value 1.0e-9 as a default.             !
+!   not given, the function will use DEFAULT_TOLERANCE specified in Math_Mod   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -15,7 +15,7 @@
 !==============================================================================!
 
   if( .not. present(tol) ) then
-    tolerance = 1.e-9
+    tolerance = DEFAULT_TOLERANCE
   else
     tolerance = tol
   end if
