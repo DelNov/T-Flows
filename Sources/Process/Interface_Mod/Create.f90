@@ -39,7 +39,7 @@
   type(Interface_Type)    :: inter(MD, MD)
   type(Grid_Type), target :: grid(MD)
   integer                 :: n_dom
-
+!-----------------------------------[Locals]-----------------------------------!
   integer, allocatable :: off_1(:)
   integer, allocatable :: off_2(:)
   integer              :: n, n1, n2, n1_tot, n2_tot, n_tot
@@ -64,18 +64,23 @@
       inter(d1, d2) % n_tot = 0
       if(d1 .ne. d2) then
 
-        !-------------------------------------------------------------------!
+        xf_1(:) = 0;  yf_1(:) = 0; zf_1(:) = 0
+        xf_2(:) = 0;  yf_2(:) = 0; zf_2(:) = 0
+        ic_1(:) = 0;  ib_1(:) = 0; ip_1(:) = 0
+        ic_2(:) = 0;  ib_2(:) = 0; ip_2(:) = 0
+
+        !-----------------------------------------------------------------!
         !   Try to find specified interface condition between d1 and d2   !
-        !-------------------------------------------------------------------!
+        !-----------------------------------------------------------------!
         call Control_Mod_Position_At_Three_Keys('INTERFACE_CONDITION',    &
                                                 trim(problem_name(d1)),   &
                                                 trim(problem_name(d2)),   &
                                                 found,                    &
                                                 verbose=.false.)
 
-        !-----------------------------------------------------!
+        !---------------------------------------------------!
         !   Found specification between domains d1 and d2   !
-        !-----------------------------------------------------!
+        !---------------------------------------------------!
         if(found) then
           call Control_Mod_Read_Strings_On('BOUNDARY_CONDITIONS',  &
                                            keys, nks, .false.)
@@ -222,7 +227,7 @@
                                            ip_2(1:n_tot))
           ! Write some debugging information
           do n = 1, inter(d1, d2) % n_tot
-            write(100+this_proc, '(i4, 2i8, 3f10.5, 2i8, 3f10.5)')   &
+            write(100*this_proc+d1*10+d2, '(i4, 2i8, 3f10.5, 2i8, 3f10.5)')   &
                   n,                                    &
                   grid(d1) % comm % cell_glo(ic_1(n)),  &
                   grid(d1) % comm % cell_glo(ib_1(n)),  &
