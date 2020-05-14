@@ -16,12 +16,21 @@
   !--------------------!
   type Interface_Type
 
-    integer              :: n_faces        ! number of faces at that interface
-    integer, allocatable :: faces_1   (:)  ! list of faces in domain 1
-    integer, allocatable :: close_in_2(:)  ! list of closest faces in domain 2
-    integer, allocatable :: faces_2   (:)  ! list of faces in domain 2
-    integer, allocatable :: close_in_1(:)  ! list of closest faces in domain 1
+    ! Global number of faces at that interface
+    integer :: n_tot
+    integer :: n1_sub
+    integer :: n2_sub
 
+    ! Buffers for storing interface values
+    real, allocatable :: phi_1(:)
+    real, allocatable :: phi_2(:)
+
+    integer, allocatable :: cell_1(:)
+    integer, allocatable :: face_1(:)
+    integer, allocatable :: bcel_1(:)
+    integer, allocatable :: cell_2(:)
+    integer, allocatable :: face_2(:)
+    integer, allocatable :: bcel_2(:)
   end type
 
   contains

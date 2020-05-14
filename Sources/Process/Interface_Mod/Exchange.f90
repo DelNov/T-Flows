@@ -9,46 +9,74 @@
   type(Field_Type), target :: flow(MD)
   integer                  :: n_dom
 
-  type(Grid_Type), pointer :: grid_1, grid_2
-  integer                  :: d_1, d_2, n_1, n_2, s_1, s_2
-  integer                  :: c_11, c_12, c_21, c_22
-  real                     :: t_int, cond_1, cond_2
+  type(Grid_Type), pointer :: grid1, grid2
+  integer                  :: d1, d2, n1, n2, c, s, n_tot
+  real                     :: t_int, cond1, cond2
 !==============================================================================!
 
   if(n_dom < 2) return
 
   call Cpu_Timer_Mod_Start('Interface_Mod_Exchange')
 
-  ! Write some debugging info
-  do d_1 = 1, n_dom
-    grid_1 => flow(d_1) % pnt_grid
-    do d_2 = 1, n_dom
-      grid_2 => flow(d_2) % pnt_grid
-      if(inter(d_1, d_2) % n_faces > 0) then
-        do n_1 = 1, inter(d_1, d_2) % n_faces
-          s_1 = inter(d_1, d_2) % faces_1(n_1)     ! face in dom 1
-          n_2 = inter(d_1, d_2) % close_in_2(n_1)
-          s_2 = inter(d_1, d_2) % faces_2(n_2)     ! face in dom 2
-          c_11 = grid_1 % faces_c(1, s_1)
-          c_12 = grid_1 % faces_c(2, s_1)
-          c_21 = grid_2 % faces_c(1, s_2)
-          c_22 = grid_2 % faces_c(2, s_2)
+  !----------------------------------------------------!
+  !   Copy values from inside cells to the interface   !
+  !----------------------------------------------------!
+  do d1 = 1, n_dom
+    grid1 => flow(d1) % pnt_grid
+    do d2 = 1, n_dom
+      grid2 => flow(d2) % pnt_grid
 
-          cond_1 = flow(d_1) % conductivity(c_11)
-          cond_2 = flow(d_2) % conductivity(c_21)
+      n_tot = inter(d1, d2) % n_tot
 
-          ! Impose interface condition (assuming delta_1 == delta_2)
-          t_int = (  flow(d_1) % t % n(c_11) * cond_1    &
-                   + flow(d_2) % t % n(c_21) * cond_2 )  &
-                / ( cond_1 + cond_2)
-          flow(d_1) % t % n(c_12) = t_int
-          flow(d_2) % t % n(c_22) = t_int
+      ! Nullify values at the interface
+      inter(d1, d2) % phi_1(1:n_tot) = 0.0
+      inter(d1, d2) % phi_2(1:n_tot) = 0.0
 
-!         WRITE(100,'(4F9.4)')                                 &
-!           flow(d_1) % t % n(c_11), flow(d_1) % t % n(c_12),  &
-!           flow(d_2) % t % n(c_21), flow(d_2) % t % n(c_22)
-        end do
-      end if
+      ! On the side of domain 1
+      do n1 = 1, inter(d1, d2) % n1_sub
+        c = inter(d1, d2) % cell_1(n1)   ! domain 1, cell inside
+        s = inter(d1, d2) % face_1(n1)   ! domain 1, face
+        inter(d1, d2) % phi_1(s) = flow(d1) % t % n(c)
+      end do
+
+      ! On the side of domain 2
+      do n2 = 1, inter(d1, d2) % n2_sub
+        c = inter(d1, d2) % cell_2(n2)   ! domain 2, cell inside
+        s = inter(d1, d2) % face_2(n2)   ! domain 2, face
+        inter(d1, d2) % phi_2(s) = flow(d2) % t % n(c)
+      end do
+
+      ! Here we exchange (global sum) of phi_1 and phi_2
+      call Comm_Mod_Global_Sum_Real_Array(n_tot, inter(d1, d2) % phi_1(1:n_tot))
+      call Comm_Mod_Global_Sum_Real_Array(n_tot, inter(d1, d2) % phi_2(1:n_tot))
+
+    end do
+  end do
+
+  !-------------------------------------------------------!
+  !   Copy values from interface back to boundary cells   !
+  !-------------------------------------------------------!
+  do d1 = 1, n_dom
+    grid1 => flow(d1) % pnt_grid
+    do d2 = 1, n_dom
+      grid2 => flow(d2) % pnt_grid
+
+      ! On the side of domain 1
+      do n1 = 1, inter(d1, d2) % n1_sub
+        c = inter(d1, d2) % bcel_1(n1)   ! domain 1, cell on the boundary
+        s = inter(d1, d2) % face_1(n1)   ! domain 1, face
+        flow(d1) % t % n(c) = (  inter(d1, d2) % phi_1(s)  &
+                               + inter(d1, d2) % phi_2(s)) * 0.5
+      end do
+
+      ! On the side of domain 2
+      do n2 = 1, inter(d1, d2) % n2_sub
+        c = inter(d1, d2) % bcel_2(n2)   ! domain 2, cell on the boundary
+        s = inter(d1, d2) % face_2(n2)   ! domain 2, face
+        flow(d2) % t % n(c) = (  inter(d1, d2) % phi_1(s)  &
+                               + inter(d1, d2) % phi_2(s)) * 0.5
+      end do
+
     end do
   end do
 
