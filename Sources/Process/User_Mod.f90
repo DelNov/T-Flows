@@ -15,6 +15,7 @@
   use Turb_Mod
   use Swarm_Mod
   use Multiphase_Mod
+  use Interface_Mod
   use Control_Mod
 !------------------------------------------------------------------------------!
   implicit none
