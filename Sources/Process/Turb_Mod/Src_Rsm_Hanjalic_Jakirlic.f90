@@ -41,7 +41,7 @@
   type(Var_Type),    pointer :: uu, vv, ww, uv, uw, vw
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
-  integer                    :: c, s, c1, c2, i, icont
+  integer                    :: c, s, c1, c2, i, icont, nc, nb
   real                       :: mag
   real                       :: a11, a22, a33, a12, a13, a23
   real                       :: s11, s22, s33, s12, s13, s23
@@ -82,6 +82,8 @@
   ! Take aliases
   flow => turb % pnt_flow
   grid => flow % pnt_grid
+  nc   =  grid % n_cells
+  nb   =  grid % n_bnd_cells
   call Field_Mod_Alias_Momentum   (flow, u, v, w)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
   call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
@@ -240,28 +242,28 @@
   if(name_phi == 'EPS') then
     do i=1,3
       if(i == 1) then
-        call Field_Mod_Grad_Component(flow, u % x, 1, ui_xx)  ! d2u/dxdx
-        call Field_Mod_Grad_Component(flow, u % x, 2, ui_xy)  ! d2u/dxdy
-        call Field_Mod_Grad_Component(flow, u % x, 3, ui_xz)  ! d2u/dxdz
-        call Field_Mod_Grad_Component(flow, u % y, 2, ui_yy)  ! d2u/dydy
-        call Field_Mod_Grad_Component(flow, u % y, 3, ui_yz)  ! d2u/dydz
-        call Field_Mod_Grad_Component(flow, u % z, 3, ui_zz)  ! d2u/dzdz
+        call Field_Mod_Grad_Component(flow, u % x, 1, ui_xx(-nb:nc))  ! d2u/dxdx
+        call Field_Mod_Grad_Component(flow, u % x, 2, ui_xy(-nb:nc))  ! d2u/dxdy
+        call Field_Mod_Grad_Component(flow, u % x, 3, ui_xz(-nb:nc))  ! d2u/dxdz
+        call Field_Mod_Grad_Component(flow, u % y, 2, ui_yy(-nb:nc))  ! d2u/dydy
+        call Field_Mod_Grad_Component(flow, u % y, 3, ui_yz(-nb:nc))  ! d2u/dydz
+        call Field_Mod_Grad_Component(flow, u % z, 3, ui_zz(-nb:nc))  ! d2u/dzdz
       end if
       if(i == 2) then
-        call Field_Mod_Grad_Component(flow, v % x, 1, ui_xx)  ! d2v/dxdx
-        call Field_Mod_Grad_Component(flow, v % x, 2, ui_xy)  ! d2v/dxdy
-        call Field_Mod_Grad_Component(flow, v % x, 3, ui_xz)  ! d2v/dxdz
-        call Field_Mod_Grad_Component(flow, v % y, 2, ui_yy)  ! d2v/dydy
-        call Field_Mod_Grad_Component(flow, v % y, 3, ui_yz)  ! d2v/dydz
-        call Field_Mod_Grad_Component(flow, v % z, 3, ui_zz)  ! d2v/dzdz
+        call Field_Mod_Grad_Component(flow, v % x, 1, ui_xx(-nb:nc))  ! d2v/dxdx
+        call Field_Mod_Grad_Component(flow, v % x, 2, ui_xy(-nb:nc))  ! d2v/dxdy
+        call Field_Mod_Grad_Component(flow, v % x, 3, ui_xz(-nb:nc))  ! d2v/dxdz
+        call Field_Mod_Grad_Component(flow, v % y, 2, ui_yy(-nb:nc))  ! d2v/dydy
+        call Field_Mod_Grad_Component(flow, v % y, 3, ui_yz(-nb:nc))  ! d2v/dydz
+        call Field_Mod_Grad_Component(flow, v % z, 3, ui_zz(-nb:nc))  ! d2v/dzdz
       end if
       if(i == 3) then
-        call Field_Mod_Grad_Component(flow, w % x, 1, ui_xx)  ! d2w/dxdx
-        call Field_Mod_Grad_Component(flow, w % x, 2, ui_xy)  ! d2w/dxdy
-        call Field_Mod_Grad_Component(flow, w % x, 3, ui_xz)  ! d2w/dxdz
-        call Field_Mod_Grad_Component(flow, w % y, 2, ui_yy)  ! d2w/dydy
-        call Field_Mod_Grad_Component(flow, w % y, 3, ui_yz)  ! d2w/dydz
-        call Field_Mod_Grad_Component(flow, w % z, 3, ui_zz)  ! d2w/dzdz
+        call Field_Mod_Grad_Component(flow, w % x, 1, ui_xx(-nb:nc))  ! d2w/dxdx
+        call Field_Mod_Grad_Component(flow, w % x, 2, ui_xy(-nb:nc))  ! d2w/dxdy
+        call Field_Mod_Grad_Component(flow, w % x, 3, ui_xz(-nb:nc))  ! d2w/dxdz
+        call Field_Mod_Grad_Component(flow, w % y, 2, ui_yy(-nb:nc))  ! d2w/dydy
+        call Field_Mod_Grad_Component(flow, w % y, 3, ui_yz(-nb:nc))  ! d2w/dydz
+        call Field_Mod_Grad_Component(flow, w % z, 3, ui_zz(-nb:nc))  ! d2w/dzdz
       end if
 
       do c = 1, grid % n_cells
@@ -336,9 +338,9 @@
     end do  ! i
   end if    ! end if EPS == yes
 
-  call Field_Mod_Grad_Component(flow, turb % l_scale, 1, l_sc_x)
-  call Field_Mod_Grad_Component(flow, turb % l_scale, 2, l_sc_y)
-  call Field_Mod_Grad_Component(flow, turb % l_scale, 3, l_sc_z)
+  call Field_Mod_Grad_Component(flow, turb % l_scale, 1, l_sc_x(-nb:nc))
+  call Field_Mod_Grad_Component(flow, turb % l_scale, 2, l_sc_y(-nb:nc))
+  call Field_Mod_Grad_Component(flow, turb % l_scale, 3, l_sc_z(-nb:nc))
 
   r13 = ONE_THIRD
   r23 = TWO_THIRDS
@@ -703,9 +705,9 @@
   end do
 
   if(name_phi == 'EPS') then
-    call Field_Mod_Grad_Component(flow, kin_e, 1, kin_e_x)   ! dk/dx
-    call Field_Mod_Grad_Component(flow, kin_e, 2, kin_e_y)   ! dk/dy
-    call Field_Mod_Grad_Component(flow, kin_e, 3, kin_e_z)   ! dk/dz
+    call Field_Mod_Grad_Component(flow, kin_e, 1, kin_e_x(-nb:nc))   ! dk/dx
+    call Field_Mod_Grad_Component(flow, kin_e, 2, kin_e_y(-nb:nc))   ! dk/dy
+    call Field_Mod_Grad_Component(flow, kin_e, 3, kin_e_z(-nb:nc))   ! dk/dz
     do c = 1, grid % n_cells
       kin_vis = flow % viscosity(c) / flow % density(c)
       re_t  = (kin % n(c)**2) / (kin_vis*eps % n(c) + TINY)
