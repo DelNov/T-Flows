@@ -22,8 +22,8 @@
     integer :: n2_sub
 
     ! Buffers for storing interface values
-    real, allocatable :: phi_1(:)
-    real, allocatable :: phi_2(:)
+    real, allocatable :: phi_1(:,:)
+    real, allocatable :: phi_2(:,:)
 
     integer, allocatable :: cell_1(:)
     integer, allocatable :: face_1(:)
@@ -36,6 +36,6 @@
   contains
 
   include 'Interface_Mod/Create.f90'
-  include 'Interface_Mod/Exchange.f90'
+  include 'Interface_Mod/To_Buffer.f90'
 
   end module

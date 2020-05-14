@@ -140,8 +140,10 @@
           ic_1(1:n_tot) = 0; ic_2(1:n_tot) = 0
           ib_1(1:n_tot) = 0; ib_2(1:n_tot) = 0
           ip_1(1:n_tot) = 0; ip_2(1:n_tot) = 0
-          allocate(inter(d1, d2) % phi_1(n_tot));  inter(d1, d2) % phi_1 = 0.0
-          allocate(inter(d1, d2) % phi_2(n_tot));  inter(d1, d2) % phi_2 = 0.0
+          allocate(inter(d1, d2) % phi_1(n_tot, MAX_VARS_INTERFACE))
+          allocate(inter(d1, d2) % phi_2(n_tot, MAX_VARS_INTERFACE))
+          inter(d1, d2) % phi_1(:,:) = 0.0
+          inter(d1, d2) % phi_2(:,:) = 0.0
 
           if(n_proc > 1) then
             off_1(1:n_proc)  = 0

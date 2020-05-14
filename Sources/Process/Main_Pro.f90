@@ -294,7 +294,7 @@
     do ini = 1, max_ini
 
       ! Exchange data between domains
-      call Interface_Mod_Exchange(inter, flow, n_dom)
+      call User_Mod_Interface_Exchange(inter, flow, n_dom)
 
       do d = 1, n_dom
 
