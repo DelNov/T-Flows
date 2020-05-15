@@ -16,6 +16,10 @@
   !--------------------!
   type Interface_Type
 
+    ! Pointers to grids surrounding this interface
+    type(Grid_Type), pointer :: pnt_grid1
+    type(Grid_Type), pointer :: pnt_grid2
+
     ! Global number of faces at that interface
     integer :: n_tot
     integer :: n1_sub
