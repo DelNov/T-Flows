@@ -4,15 +4,17 @@
 // (This should be fiddled with, but with care)
 //
 //------------------------------------------------------------------------------
-option = 0;  // 1 - fuel; 2 - cladding; 3 - water; any other number - all
+option = 1;  // 1 - fuel; 2 - cladding; 3 - water
 
 r_ilay = 0.007;
 r_fuel = 0.008;
 r_clad = 0.01;   // 1   cm
 r_blay = 0.012;  // 1.2 cm
-h_full = 0.05;   // 10  cm
+h_full = 0.02;   // 2   cm
 x_box  = 0.05;
-y_box  = 0.15;
+y_box  = 0.05;
+
+delta = 1.0e-15;  // make it 0.0002 to see anything
 
 n_ilay =  5;  // number of nodes in inner layer
 n_fuel = 13;  // number of nodes across the cladding
@@ -31,6 +33,8 @@ y_cent = 0.0;
 // (These are better kept untouched)
 //
 //------------------------------------------------------------------------------
+TINY = 1.0e-9;
+HUGE = 1.0e+9;
 
 // Work out necessary resolutions in the fluid
 circum = 2.0 * r_blay * Pi;
@@ -48,23 +52,30 @@ CIRCLES = 200;
 //------------------------------------------------------------------------------
 
 // Points defining the arcs
-For n In{ 1 : 16 }
-  r = r_ilay;
-  If(n >  4) r = r_fuel; EndIf
-  If(n >  8) r = r_clad; EndIf
-  If(n > 12) r = r_blay; EndIf
-  angle = Pi/4.0 + (n-1) * Pi/2.0;
-  Point(n) = {x_cent + r * Cos(angle), y_cent + r * Sin(angle), 0.0};
+For lay In{ 0 : 5 }
+  For n In{ 1 : 4 }
+    point = n + lay*4;
+    If(lay == 0) r = r_ilay;         EndIf
+    If(lay == 1) r = r_fuel - delta; EndIf
+    If(lay == 2) r = r_fuel + delta; EndIf
+    If(lay == 3) r = r_clad - delta; EndIf
+    If(lay == 4) r = r_clad + delta; EndIf
+    If(lay == 5) r = r_blay;         EndIf
+    angle = Pi/4.0 + (n-1) * Pi/2.0;
+    Point(point) = {x_cent + r * Cos(angle), y_cent + r * Sin(angle), 0.0};
+  EndFor
 EndFor
 
 // Central point
-Point(17) = {x_cent, y_cent, 0.0};
+CENTRAL = point + 1;
+Point(CENTRAL) = {x_cent, y_cent, 0.0};
 
 // Points defining the domain
-Point(18) = {x_cent + x_box/2.0, y_cent + y_box - x_box/2.0, 0.0};
-Point(19) = {x_cent - x_box/2.0, y_cent + y_box - x_box/2.0, 0.0};
-Point(20) = {x_cent - x_box/2.0, y_cent - x_box/2.0, 0.0};
-Point(21) = {x_cent + x_box/2.0, y_cent - x_box/2.0, 0.0};
+Point(CENTRAL+1) = {x_cent + x_box/2.0, y_cent + y_box - x_box/2.0, 0.0};
+Point(CENTRAL+2) = {x_cent - x_box/2.0, y_cent + y_box - x_box/2.0, 0.0};
+Point(CENTRAL+3) = {x_cent - x_box/2.0, y_cent - x_box/2.0, 0.0};
+Point(CENTRAL+4) = {x_cent + x_box/2.0, y_cent - x_box/2.0, 0.0};
+Printf("Defined: %g points", CENTRAL+4);
 
 //------------------------------------------------------------------------------
 //
@@ -77,29 +88,31 @@ For lay In{ 0 : 2 }     // 0 - inner layer; 1 - cladding; 2 - boundary layer
   For line In{ 1 : 4 }
     n1 = line     + lay*4;
     n2 = line + 4 + lay*4;
+    If(lay > 0) n1 = n1 + 4; n2 = n2 + 4; EndIf
+    If(lay > 1) n1 = n1 + 4; n2 = n2 + 4; EndIf
     Line(LINES + line + lay*4) = {n1, n2};
-  EndFor
+ EndFor
 EndFor
 Transfinite Line{LINES +1:LINES +4} = n_ilay;
 Transfinite Line{LINES +5:LINES +8} = n_fuel Using Progression 1.0/prog;
 Transfinite Line{LINES +9:LINES+12} = n_blay Using Progression prog;
 
 // Lines defining the bounding box
-Line(LINES + 13) = {18, 19};
-Line(LINES + 14) = {19, 20};
-Line(LINES + 15) = {20, 21};
-Line(LINES + 16) = {21, 18};
+Line(LINES + 13) = {26, 27};
+Line(LINES + 14) = {27, 28};
+Line(LINES + 15) = {28, 29};
+Line(LINES + 16) = {29, 26};
 
 // All the circles
-For lay In{ 0 : 3 }     // 0 - inner layer; 1 - cladding; 2 - boundary layer
+For lay In{ 0 : 5 }     // 0 - inner layer; 1 - cladding; 2 - boundary layer
   For circ In{ 1 : 4 }
     n1 = circ     + lay*4;
     n2 = circ + 1 + lay*4;
     If(circ == 4) n2 = n2 - 4; EndIf
-    Circle(CIRCLES + circ + lay*4) = {n1, 17, n2};
+    Circle(CIRCLES + circ + lay*4) = {n1, CENTRAL, n2};
   EndFor
 EndFor
-Transfinite Line{CIRCLES+1:CIRCLES+16} = n_azim;
+Transfinite Line{CIRCLES+1:CIRCLES+24} = n_azim;
 
 //------------------------------------------------------------------------------
 //
@@ -113,6 +126,8 @@ For lay In{ 0 : 2 }     // 0 - inner layer; 1 - cladding; 2 - boundary layer
     l1 = LINES   + loop + lay*4;   l3 = l1 + 1;
     c4 = CIRCLES + loop + lay*4;   c2 = c4 + 4;
     If(loop == 4) l3 = l3 - 4; EndIf
+    If(lay > 0) c4 = c4 + 4; c2 = c2 + 4; EndIf
+    If(lay > 1) c4 = c4 + 4; c2 = c2 + 4; EndIf
     Curve Loop   (loop + lay*4) = {l1, c2, -l3, -c4};
     Plane Surface(loop + lay*4) = {loop + lay*4};
   EndFor
@@ -120,10 +135,14 @@ EndFor
 Transfinite Surface  "*";
 
 // Create surface for the fluid domain
-Curve Loop(13) = {CIRCLES+1:CIRCLES+4};  Plane Surface(13) = {13};
-Curve Loop(14) = {LINES  +13:LINES  +16};
-Curve Loop(15) = {CIRCLES+13:CIRCLES+16};
-Plane Surface(14) = {14, 15};
+SURF_FUEL = 13;
+Curve Loop   (SURF_FUEL) = {CIRCLES+1:CIRCLES+4};
+Plane Surface(SURF_FUEL) = {SURF_FUEL};
+
+SURF_WATER = 14;
+Curve Loop(SURF_WATER)   = {LINES  +13:LINES  +16};
+Curve Loop(SURF_WATER+1) = {CIRCLES+21:CIRCLES+24};
+Plane Surface(14) = {SURF_WATER, SURF_WATER+1};
 
 // Recombine all surfaces
 // This is mandatory for extrusion <----------= IMPORTANT
@@ -139,6 +158,8 @@ Field[2].XCenter = x_cent;
 Field[2].YCenter = y_cent;
 Background Field = 2;
 
+Mesh.Algorithm = 8;
+
 //------------------------------------------------------------------------------
 // Volumes
 //------------------------------------------------------------------------------
@@ -150,8 +171,8 @@ If(option == 1)
     Layers{n_axis};
     Recombine;
   }
-  Physical Surface("wall") = {229, 251, 273, 295};
-  Physical Volume("fuel")  = {1:4, 13};
+  Physical Surface("fuel_wall") = {237, 259, 281, 303};
+  Physical Volume("fuel")       = {1:5};
   Recursive Delete {Surface{5:12,14};}
 
 // Cladding
@@ -161,8 +182,9 @@ ElseIf(option == 2)
     Layers{n_axis};
     Recombine;
   }
-  Physical Surface("wall")    = {229, 251, 273, 295, 237, 259, 281, 303};
-  Physical Volume("cladding") = {5:8};
+  Physical Surface("cladding_inner_wall") = {245, 267, 289, 311};
+  Physical Surface("cladding_outer_wall") = {237, 259, 281, 303};
+  Physical Volume("cladding") = {1:4};
   Recursive Delete {Surface{1:4, 9:14};}
 
 // Water
@@ -172,26 +194,19 @@ ElseIf(option == 3)
     Layers{n_axis};
     Recombine;
   }
-  Physical Surface("wall")   = {237, 259, 281, 303};
-  Physical Surface("sides")  = {329, 321};
-  Physical Surface("bottom") = {325};
-  Physical Surface("top")    = {317};
-  Physical Volume("water")   = {9:12, 14};
+
+  Physical Surface("cylinder_wall") = {311, 245, 267, 289};
+  Physical Surface("sides_x")       = {329, 337};
+  Physical Surface("bottom")        = {333};
+  Physical Surface("top")           = {325};
+  Physical Volume("water")          = {1:5};
   Recursive Delete {Surface{1:8,13};}
 
-// All three domains
-Else
-  Extrude {0, 0, h_full} {
-    Surface{1:14};
-    Layers{n_axis};
-    Recombine;
-  }
-  Physical Surface("wall")    = {229, 251, 273, 295, 237, 259, 281, 303};
-  Physical Surface("sides")   = {329, 321};
-  Physical Surface("bottom")  = {325};
-  Physical Surface("top")     = {317};
-  Physical Volume("fuel")     = {1:4, 13};
-  Physical Volume("cladding") = {5:8};
-  Physical Volume("water")    = {9:12, 14};
 EndIf
 
+// Periodic direction is the same for all options
+Physical Surface("sides_z")
+  = {Surface In BoundingBox{-HUGE, -HUGE, h_full-TINY,
+                            +HUGE, +HUGE, h_full+TINY},
+     Surface In BoundingBox{-HUGE, -HUGE, 0.0   -TINY,
+                            +HUGE, +HUGE, 0.0   +TINY}};
