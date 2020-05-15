@@ -32,7 +32,6 @@
       call Interface_Mod_To_Buffer(inter(d1, d2),                    &
                                    flow(d1) % pnt_grid % wall_dist,  &
                                    flow(d2) % pnt_grid % wall_dist,  &
-                                   d1, d2,                           &
                                    WD)
     end do
   end do
