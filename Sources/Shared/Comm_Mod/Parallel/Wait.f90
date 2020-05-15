@@ -8,6 +8,6 @@
   integer :: error
 !==============================================================================!
 
-  call Mpi_Barrier(MPI_COMM_WORLD, error) 
+  call Mpi_Barrier(MPI_COMM_WORLD, error)
 
   end subroutine
