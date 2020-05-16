@@ -4,17 +4,17 @@
 // (This should be fiddled with, but with care)
 //
 //------------------------------------------------------------------------------
-option = 1;  // 1 - fuel; 2 - cladding; 3 - water
+option = 3;  // 1 - fuel; 2 - cladding; 3 - water
 
 r_ilay = 0.007;
 r_fuel = 0.008;
 r_clad = 0.01;   // 1   cm
 r_blay = 0.012;  // 1.2 cm
 h_full = 0.02;   // 2   cm
-x_box  = 0.05;
-y_box  = 0.05;
+x_box  = 0.06;
+y_box  = 0.24;
 
-delta = 1.0e-15;  // make it 0.0002 to see anything
+delta = 2.0e-9;  // make it 2.0e-4 to see something
 
 n_ilay =  5;  // number of nodes in inner layer
 n_fuel = 13;  // number of nodes across the cladding
