@@ -705,9 +705,9 @@
   end do
 
   if(name_phi == 'EPS') then
-    call Field_Mod_Grad_Component(flow, kin_e, 1, kin_e_x(-nb:nc))   ! dk/dx
-    call Field_Mod_Grad_Component(flow, kin_e, 2, kin_e_y(-nb:nc))   ! dk/dy
-    call Field_Mod_Grad_Component(flow, kin_e, 3, kin_e_z(-nb:nc))   ! dk/dz
+    call Field_Mod_Grad_Component(flow, kin_e(-nb:nc), 1, kin_e_x(-nb:nc))
+    call Field_Mod_Grad_Component(flow, kin_e(-nb:nc), 2, kin_e_y(-nb:nc))
+    call Field_Mod_Grad_Component(flow, kin_e(-nb:nc), 3, kin_e_z(-nb:nc))
     do c = 1, grid % n_cells
       kin_vis = flow % viscosity(c) / flow % density(c)
       re_t  = (kin % n(c)**2) / (kin_vis*eps % n(c) + TINY)
