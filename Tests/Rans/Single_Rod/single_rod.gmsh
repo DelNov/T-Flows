@@ -11,10 +11,10 @@ r_fuel = 0.008;
 r_clad = 0.01;   // 1   cm
 r_blay = 0.012;  // 1.2 cm
 h_full = 0.02;   // 2   cm
-x_box  = 0.06;
-y_box  = 0.24;
+x_box  = 0.1;
+y_box  = 0.3;
 
-delta = 2.0e-9;  // make it 2.0e-4 to see something
+delta = 2.0e-7;  // make it 2.0e-4 to see something
 
 n_ilay =  5;  // number of nodes in inner layer
 n_fuel = 13;  // number of nodes across the cladding
