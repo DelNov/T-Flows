@@ -117,7 +117,11 @@
   if(plot_inside) then
     write(str2,'(i0.0)') grid % n_cells - grid % comm % n_buff_cells
   else
-    write(str2,'(i0.0)') grid % n_bnd_cells
+    if(grid % n_bnd_cells .eq. 0) then
+      write(str2,'(i1)')   grid % n_bnd_cells  ! i0.0 doesn't work for zero :-/
+    else
+      write(str2,'(i0.0)') grid % n_bnd_cells
+    end if
   end if
   write(f9) IN_2 // '<Piece NumberOfPoints="' // trim(str1)    //  &
                     '" NumberOfCells ="' // trim(str2) // '">' // LF
