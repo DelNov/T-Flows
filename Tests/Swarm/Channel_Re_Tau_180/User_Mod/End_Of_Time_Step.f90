@@ -28,8 +28,8 @@
   integer                        :: c, eddy, dir, npb = 0, nn
   integer                        :: ss, oo, n_b, n_bp, fu, n_bin1, n_bin2, temp
   integer                        :: i, j, k, n_stat_p, r, s, ii, mark, n_test
-  integer, allocatable           :: bin_count(:)                                      
-  real, allocatable              :: rep(:), delta(:), bin(:)                                       
+  integer, allocatable           :: bin_count(:)
+  real, allocatable              :: rep(:), delta(:), bin(:)
   real                           :: lo, xo(4), yo(4),                          &
                                     rx, ry, rz, Re_tau, ss0, ss1, ss00, ss11,  &
                                     zo, ro, xc, yc, zc, vc, wc, sig_x, sig_yz, &
@@ -57,7 +57,7 @@
   n_bin2  = 343729   ! time at which we should collect bins info t+=1125
                      ! ..particle concentration should be equivalent to t+=1000).
   n_test  = 350000   ! testing (for swarm statistics)
- 
+
   ! allocating some arrays for bins
   allocate(rep(swarm % n_particles)); rep = 0.0
   allocate(bin(n_b)); bin = 0.0     ! bin distance from wall
@@ -156,13 +156,22 @@
   !   2nd time step on   !
   !----------------------!
   if(n .gt. 150001) then     ! should be started after the flow is fully developed
-    call Swarm_Mod_Advance_Particles(swarm, turb, n, n_stat_p)
+    call Swarm_Mod_Advance_Particles(swarm, n, n_stat_p)
     if(this_proc < 2) then
       write(*,'(a,i7,a,i4,a,i4,a,i4)')                 &
                " # particles: ", swarm % n_particles,  &
                " trapped:   ",   swarm % cnt_d,        &
                " escaped:   ",   swarm % cnt_e,        &
                " reflected: ",   swarm % cnt_r
+    end if
+  end if
+
+  ! Moved these five lines from Main_Pro.f90
+  ! The call assumes that one uses dynamic LES model.
+  ! Can we really always make such an assumption?
+  if(mult % model .eq. LAGRANGIAN_PARTICLES) then
+    if(swarm % subgrid_scale_model .eq. BROWNIAN_FUKAGATA) then
+      call Turb_Mod_Vis_T_Dynamic(turb)
     end if
   end if
 
