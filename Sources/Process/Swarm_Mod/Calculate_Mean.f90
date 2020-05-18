@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Calculate_Mean(swarm, k, n, n_stat_p)
+  subroutine Swarm_Mod_Calculate_Mean(swarm, k, n, n_stat_p, ss)
 !------------------------------------------------------------------------------!
 !   Calculates particle time averaged velocity                                 !
 !------------------------------------------------------------------------------!
@@ -7,22 +7,24 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Swarm_Type), target :: swarm
   integer                  :: k
-  integer                  :: n_stat_p
   integer                  :: n
+  integer                  :: n_stat_p
+  integer                  :: ss
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),    pointer :: flow
   type(Grid_Type),     pointer :: grid
   type(Particle_Type), pointer :: part
-  integer                      :: c, m
+  integer                      :: c, m, l
 !==============================================================================!
 
-  if(.not. swarm % swarm_statistics) return
+  if(.not. swarm % statistics) return
 
   ! Take aliases
   grid => swarm % pnt_grid
   flow => swarm % pnt_flow
 
-  if(n_stat_p > n) then
+  l = n - n_stat_p
+  if(l > -1) then
 
     !---------------------------------!
     !   Scale-resolving simulations   ! 
@@ -31,6 +33,7 @@
        turbulence_model .eq. LES_DYNAMIC        .or.  &
        turbulence_model .eq. LES_WALE           .or.  &
        turbulence_model .eq. HYBRID_LES_PRANDTL .or.  &
+       turbulence_model .eq. HYBRID_LES_RANS    .or.  &
        turbulence_model .eq. DES_SPALART        .or.  &
        turbulence_model .eq. DNS) then
 
@@ -58,6 +61,7 @@
 
       ! Increaset the number of states for the cell
       swarm % n_states(c) = swarm % n_states(c) + 1
+
     end if
   end if
 
