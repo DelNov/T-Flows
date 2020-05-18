@@ -15,8 +15,8 @@
   type(Particle_Type), pointer :: part
   logical,             pointer :: escaped
   logical,             pointer :: deposited
-  integer                      :: k          ! particle number
-  integer                      :: ss         ! sub-step counter
+  integer                      :: k                         ! particle number
+  integer                      :: ss                        ! sub-step counter
   integer                      :: n_parts_in_buffers
 !==============================================================================!
 
@@ -26,6 +26,27 @@
 
   ! Particle time step (division of the global time step)
   swarm % dt = flow % dt / swarm % n_sub_steps
+
+  !------------------------!
+  !   Fukagata SGS model   !
+  !------------------------!
+  if(turbulence_model .eq. HYBRID_LES_PRANDTL) then
+    if(swarm_subgrid_scale_model .eq. BROWNIAN_FUKAGATA) then
+      if(this_proc < 2) then  ! parallelisation issue 
+        call Swarm_Mod_Sgs_Fukagata(swarm, turb)
+      end if 
+    end if
+  end if 
+
+  if(TURBULENCE_MODEL .eq. HYBRID_LES_RANS) then
+
+    ! correcting for particle time step size (if ER-HRL model is used) 
+    call Swarm_Mod_Particle_Time_Scale(swarm, turb)
+
+    ! Store gradients for modeled flow quantities for swarm 
+    call Swarm_Mod_Grad_Modeled_Flow(swarm, turb, k)
+
+  end if 
 
   !----------------------------------!
   !                                  !
@@ -43,9 +64,9 @@
       escaped   => part  % escaped
       deposited => part  % deposited
 
-      !-------------------------------------------------!
-      !   If particle is neither deposited nor escped   !
-      !-------------------------------------------------!
+      !--------------------------------------------------!
+      !   If particle is neither deposited nor escaped   !
+      !--------------------------------------------------!
       if(.not. deposited .and. .not. escaped) then
 
         ! If particle is in this processor, carry on with it
@@ -71,7 +92,7 @@
           call Swarm_Mod_Check_Periodicity(swarm, k, n_parts_in_buffers)
 
           ! Gathering swarm statistics  
-          call Swarm_Mod_Calculate_Mean(swarm, k, n, n_stat_p)
+          call Swarm_Mod_Calculate_Mean(swarm, k, n, n_stat_p, ss)
 
         end if  ! in this processor
       end if    ! deposited or escaped
@@ -89,20 +110,20 @@
   !-----------------------------------!
   !   Print some data on the screen   !
   !-----------------------------------!
-  do k = 1, swarm % n_particles
+  !do k = 1, swarm % n_particles
 
-    ! Refresh the alias
-    part => swarm % particle(k)
-    
-    if(this_proc .eq. part % proc) then
-      ! Printing particle position
-      write(*,'(a,i7,a,i7,a,i2,a,3es15.6,a,es12.4)')                 &
-              '# particle:',  k,                                     &
-              ',  cell: ',      part % cell,                         &
-              ',  processor: ', part % proc,                         &
-              ',  x,y,z: ',     part % x_n, part % y_n, part % z_n,  &
-              ',  cfl: ',       part % cfl
-    end if
-  end do
+  !  ! Refresh the alias
+  !  part => swarm % particle(k)
+  !  
+  !  if(this_proc .eq. part % proc) then
+  !    ! Printing particle position
+  !    write(*,'(a,i7,a,i7,a,i2,a,3es15.6,a,es12.4)')                 &
+  !            '# particle:',  k,                                     &
+  !            ',  cell: ',      part % cell,                         &
+  !            ',  processor: ', part % proc,                         &
+  !            ',  x,y,z: ',     part % x_n, part % y_n, part % z_n,  &
+  !            ',  cfl: ',       part % cfl
+  !  end if
+  !end do
 
   end subroutine
