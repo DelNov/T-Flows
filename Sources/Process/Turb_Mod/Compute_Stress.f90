@@ -31,7 +31,7 @@
   real, contiguous,  pointer :: flux(:)
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
-  integer                    :: s, c, c1, c2, exec_iter
+  integer                    :: s, c, c1, c2, exec_iter, nc, nb
   real                       :: f_ex, f_im
   real                       :: phis
   real                       :: a0, a12, a21
@@ -57,6 +57,8 @@
   ! Take aliases
   flow => turb % pnt_flow
   grid => flow % pnt_grid
+  nc   =  grid % n_cells
+  nb   =  grid % n_bnd_cells
   dt   =  flow % dt
   flux => flow % m_flux % n
   call Field_Mod_Alias_Momentum   (flow, u, v, w)
@@ -78,9 +80,9 @@
   end if
 
   ! Gradients
-  call Field_Mod_Grad_Component(flow, phi % n, 1, phi_x)
-  call Field_Mod_Grad_Component(flow, phi % n, 2, phi_y)
-  call Field_Mod_Grad_Component(flow, phi % n, 3, phi_z)
+  call Field_Mod_Grad_Component(flow, phi % n, 1, phi_x(-nb:nc))
+  call Field_Mod_Grad_Component(flow, phi % n, 2, phi_y(-nb:nc))
+  call Field_Mod_Grad_Component(flow, phi % n, 3, phi_z(-nb:nc))
 
   !---------------!
   !               !
@@ -238,9 +240,12 @@
       end do
     end if
 
-    call Field_Mod_Grad_Component(flow, u1uj_phij, 1, u1uj_phij_x)
-    call Field_Mod_Grad_Component(flow, u2uj_phij, 2, u2uj_phij_y)
-    call Field_Mod_Grad_Component(flow, u3uj_phij, 3, u3uj_phij_z)
+    call Field_Mod_Grad_Component(flow, u1uj_phij(-nb:nc), 1,  &
+                                        u1uj_phij_x(-nb:nc))
+    call Field_Mod_Grad_Component(flow, u2uj_phij(-nb:nc), 2,  &
+                                        u2uj_phij_y(-nb:nc))
+    call Field_Mod_Grad_Component(flow, u3uj_phij(-nb:nc), 3,  &
+                                        u3uj_phij_z(-nb:nc))
 
     do c = 1, grid % n_cells
       b(c) = b(c) + (  u1uj_phij_x(c)  &

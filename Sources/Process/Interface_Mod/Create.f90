@@ -61,7 +61,14 @@
   !--------------------------------------------!
   do d1 = 1, n_dom
     do d2 = 1, n_dom
+
+      ! Innitialize number of faces at the interface
       inter(d1, d2) % n_tot = 0
+
+      ! Store pointers to the grids surrounding the interface
+      inter(d1, d2) % pnt_grid1 => grid(d1)
+      inter(d1, d2) % pnt_grid2 => grid(d2)
+
       if(d1 .ne. d2) then
 
         xf_1(:) = 0;  yf_1(:) = 0; zf_1(:) = 0
@@ -91,7 +98,11 @@
           !---------------------------------------!
           !   Count boundary cells on each side   !
           !---------------------------------------!
+
+          ! Innitialize counter in first domain
           n1 = 0
+
+          ! On physical boundary cells
           do s = 1, grid(d1) % n_faces
             c2 = grid(d1) % faces_c(2,s)
             if(c2 < 0) then
@@ -100,9 +111,19 @@
               end if
             end if
           end do
+
+          ! On periodic faces
+          do s = 1, grid(d1) % n_faces
+            if(Grid_Mod_Bnd_Cond_Name(grid(d1), s) .eq. keys(1)) then
+              n1 = n1 + 1
+            end if
+          end do
           inter(d1, d2) % n1_sub = n1
 
+          ! Innitialize counter in first domain
           n2 = 0
+
+          ! On physical boundary cells
           do s = 1, grid(d2) % n_faces
             c2 = grid(d2) % faces_c(2,s)
             if(c2 < 0) then
@@ -111,19 +132,33 @@
               end if
             end if
           end do
+
+          ! On periodic faces
+          do s = 1, grid(d2) % n_faces
+            if(Grid_Mod_Bnd_Cond_Name(grid(d2), s) .eq. keys(2)) then
+              n2 = n2 + 1
+            end if
+          end do
           inter(d1, d2) % n2_sub = n2
 
+          !------------------------------------------!
+          !     Check if the mapping is conformal    !
+          !   (Simply by comparing number of faces   !
+          !      on each side of the interface)      !
+          !------------------------------------------!
           n1_tot = n1
           n2_tot = n2
           call Comm_Mod_Global_Sum_Int(n1_tot)
           call Comm_Mod_Global_Sum_Int(n2_tot)
 
           if(n1_tot .ne. n2_tot) then
-            print *, '# Number of cells at the interface between ',  &
-                      trim(problem_name(d1)), ' and ',               &
-                      trim(problem_name(d2)), ' is not the same!'
-            print *, '# Only conformal mappings are supported.  Exiting!'
-            stop
+            if(this_proc < 2) then
+              print *, '# Number of cells at the interface between ',  &
+                        trim(problem_name(d1)), ' and ',               &
+                        trim(problem_name(d2)), ' is not the same!'
+              print *, '# Only conformal mappings are supported.  Exiting!'
+            end if
+            call Comm_Mod_End()
           else
             n_tot = n1_tot
             inter(d1, d2) % n_tot = n_tot
@@ -134,15 +169,19 @@
             end if
           end if
 
-          !---------------------------------------!
-          !   Store boundary cells on each side   !
-          !---------------------------------------!
+          !-----------------------------------------------------!
+          !          Store boundary cells on each side          !
+          !   (Inside cells in case periodicity is specified)   !
+          !-----------------------------------------------------!
           ic_1(1:n_tot) = 0; ic_2(1:n_tot) = 0
           ib_1(1:n_tot) = 0; ib_2(1:n_tot) = 0
           ip_1(1:n_tot) = 0; ip_2(1:n_tot) = 0
-          allocate(inter(d1, d2) % phi_1(n_tot));  inter(d1, d2) % phi_1 = 0.0
-          allocate(inter(d1, d2) % phi_2(n_tot));  inter(d1, d2) % phi_2 = 0.0
+          allocate(inter(d1, d2) % phi_1(n_tot, MAX_VARS_INTERFACE))
+          allocate(inter(d1, d2) % phi_2(n_tot, MAX_VARS_INTERFACE))
+          inter(d1, d2) % phi_1(:,:) = 0.0
+          inter(d1, d2) % phi_2(:,:) = 0.0
 
+          ! Work out offsets for each interface for each processor
           if(n_proc > 1) then
             off_1(1:n_proc)  = 0
             off_2(1:n_proc)  = 0
@@ -151,7 +190,6 @@
             call Comm_Mod_Global_Sum_Int_Array(n_proc, off_1)
             call Comm_Mod_Global_Sum_Int_Array(n_proc, off_2)
 
-            ! Work out offsets for each interface for each processor
             do p = n_proc, 2, -1
               off_1(p) = sum(off_1(1:p-1))
               off_2(p) = sum(off_2(1:p-1))
@@ -179,6 +217,21 @@
               end if
             end if
           end do
+          do s = 1, grid(d1) % n_faces
+            c1 = grid(d1) % faces_c(1,s)
+            c2 = grid(d1) % faces_c(2,s)
+            if(Grid_Mod_Bnd_Cond_Name(grid(d1), s) .eq. keys(1)) then
+              n1 = n1 + 1
+              pos = n1
+              if(n_proc > 1) pos = pos + off_1(this_proc)
+              ic_1(pos) = c1
+              ib_1(pos) = c2
+              ip_1(pos) = this_proc
+              xf_1(pos) = grid(d1) % xf(s)
+              yf_1(pos) = grid(d1) % yf(s)
+              zf_1(pos) = grid(d1) % zf(s)
+            end if
+          end do
 
           ! On the side of d2
           n2 = 0
@@ -199,7 +252,25 @@
               end if
             end if
           end do
+          do s = 1, grid(d2) % n_faces
+            c1 = grid(d2) % faces_c(1,s)
+            c2 = grid(d2) % faces_c(2,s)
+            if(Grid_Mod_Bnd_Cond_Name(grid(d2), s) .eq. keys(2)) then
+              n2 = n2 + 1
+              pos = n2
+              if(n_proc > 1) pos = pos + off_2(this_proc)
+              ic_2(pos) = c1
+              ib_2(pos) = c2
+              ip_2(pos) = this_proc
+              xf_2 (pos) = grid(d2) % xf(s)
+              yf_2 (pos) = grid(d2) % yf(s)
+              zf_2 (pos) = grid(d2) % zf(s)
+            end if
+          end do
 
+          !----------------------------------------------------------!
+          !   Distribute interface coordinates over all processors   !
+          !----------------------------------------------------------!
           call Comm_Mod_Global_Sum_Real_Array(n_tot, xf_1(1:n_tot))
           call Comm_Mod_Global_Sum_Real_Array(n_tot, yf_1(1:n_tot))
           call Comm_Mod_Global_Sum_Real_Array(n_tot, zf_1(1:n_tot))
@@ -213,14 +284,17 @@
           call Comm_Mod_Global_Sum_Int_Array (n_tot, ib_2(1:n_tot))
           call Comm_Mod_Global_Sum_Int_Array (n_tot, ip_2(1:n_tot))
 
-          ! Sort interfaces from domain 1
+          ! Sort interfaces from domain 1 carrying
+          ! information of cells surrounding it along
           call Sort_Mod_3_Real_Carry_3_Int(xf_1(1:n_tot),  &
                                            yf_1(1:n_tot),  &
                                            zf_1(1:n_tot),  &
                                            ic_1(1:n_tot),  &
                                            ib_1(1:n_tot),  &
                                            ip_1(1:n_tot))
-          ! Sort interfaces from domain 2
+
+          ! Sort interfaces from domain 2 carrying
+          ! information of cells surrounding it along
           call Sort_Mod_3_Real_Carry_3_Int(xf_2(1:n_tot),  &
                                            yf_2(1:n_tot),  &
                                            zf_2(1:n_tot),  &

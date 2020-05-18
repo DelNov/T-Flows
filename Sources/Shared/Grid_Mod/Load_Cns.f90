@@ -40,8 +40,9 @@
   call Grid_Mod_Allocate_Faces(grid, grid % n_faces)
 
   ! Boundary conditions' keys
-  allocate(grid % bnd_cond % name(grid % n_bnd_cond))
-  allocate(grid % bnd_cond % type(grid % n_bnd_cond))
+  ! (Go from zero for faces which are not at the boundary)
+  allocate(grid % bnd_cond % name(0 : grid % n_bnd_cond + 3))
+  allocate(grid % bnd_cond % type(0 : grid % n_bnd_cond + 3))
 
   !-----------------!
   !   Domain name   !
@@ -54,6 +55,11 @@
   do n = 1, grid % n_bnd_cond
     read(fu) grid % bnd_cond % name(n)
   end do
+  ! The last three are reserved for perodicity,
+  ! (should the domain has periodic direction)
+  grid % bnd_cond % name(grid % n_bnd_cond + 1) = 'PERIODIC_X'
+  grid % bnd_cond % name(grid % n_bnd_cond + 2) = 'PERIODIC_Y'
+  grid % bnd_cond % name(grid % n_bnd_cond + 3) = 'PERIODIC_Z'
 
   !-----------!
   !   Cells   !  (including buffer cells)
@@ -94,8 +100,10 @@
   !   Boundary   !
   !--------------!
 
-  ! Physical boundary cells
-  allocate (grid % bnd_cond % color(-grid % n_bnd_cells-1:-1))
+  ! Physical boundary cells (and all the faces)
+  ! (This opens the oportunity to store bounary condition info in ...
+  !  ... the faces thus ridding us of the "if(c2 < 0) then" checks)
+  allocate (grid % bnd_cond % color(-grid % n_bnd_cells-1:grid % n_faces))
   read(fu) (grid % bnd_cond % color(c), c = -1,-grid % n_bnd_cells, -1)
 
   call Grid_Mod_Bnd_Cond_Ranges(grid)

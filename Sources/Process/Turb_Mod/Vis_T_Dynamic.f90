@@ -31,7 +31,7 @@
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   type(Var_Type),    pointer :: u, v, w
-  integer                    :: c, j, cj
+  integer                    :: c, j, cj, nc, nb
   real                       :: u_a, v_a, w_a
   real                       :: uu_a, vv_a, ww_a, uv_a, uw_a, vw_a
   real                       :: m_11_a, m_22_a, m_33_a, m_12_a, m_13_a, m_23_a
@@ -64,6 +64,8 @@
   ! Take aliases
   flow => turb % pnt_flow
   grid => flow % pnt_grid
+  nc   =  grid % n_cells
+  nb   =  grid % n_bnd_cells
   call Field_Mod_Alias_Momentum(flow, u, v, w)
   call Solver_Mod_Alias_System (sol, a, b)
 
@@ -166,15 +168,15 @@
     m_23_f(c) = m_23_a / vol_e 
   end do
 
-  call Field_Mod_Grad_Component(flow, u_f, 1, u % x)  ! dU/dx
-  call Field_Mod_Grad_Component(flow, u_f, 2, u % y)  ! dU/dy
-  call Field_Mod_Grad_Component(flow, u_f, 3, u % z)  ! dU/dz
-  call Field_Mod_Grad_Component(flow, v_f, 1, v % x)  ! dV/dx
-  call Field_Mod_Grad_Component(flow, v_f, 2, v % y)  ! dV/dy
-  call Field_Mod_Grad_Component(flow, v_f, 3, v % z)  ! dV/dz
-  call Field_Mod_Grad_Component(flow, w_f, 1, w % x)  ! dW/dx
-  call Field_Mod_Grad_Component(flow, w_f, 2, w % y)  ! dW/dy
-  call Field_Mod_Grad_Component(flow, w_f, 3, w % z)  ! dW/dz
+  call Field_Mod_Grad_Component(flow, u_f(-nb:nc), 1, u % x)  ! dU/dx
+  call Field_Mod_Grad_Component(flow, u_f(-nb:nc), 2, u % y)  ! dU/dy
+  call Field_Mod_Grad_Component(flow, u_f(-nb:nc), 3, u % z)  ! dU/dz
+  call Field_Mod_Grad_Component(flow, v_f(-nb:nc), 1, v % x)  ! dV/dx
+  call Field_Mod_Grad_Component(flow, v_f(-nb:nc), 2, v % y)  ! dV/dy
+  call Field_Mod_Grad_Component(flow, v_f(-nb:nc), 3, v % z)  ! dV/dz
+  call Field_Mod_Grad_Component(flow, w_f(-nb:nc), 1, w % x)  ! dW/dx
+  call Field_Mod_Grad_Component(flow, w_f(-nb:nc), 2, w % y)  ! dW/dy
+  call Field_Mod_Grad_Component(flow, w_f(-nb:nc), 3, w % z)  ! dW/dz
 
   do c = 1, grid % n_cells
     l_g  = grid % vol(c)**ONE_THIRD

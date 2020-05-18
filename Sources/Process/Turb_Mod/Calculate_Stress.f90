@@ -17,13 +17,15 @@
   type(Var_Type),   pointer :: u, v, w
   type(Var_Type),   pointer :: uu, vv, ww, uv, uw, vw
   type(Var_Type),   pointer :: kin, eps, zeta, f22
-  integer                   :: c
+  integer                   :: c, nc, nb
   real                      :: wd_m, u2, v2, w2
 !==============================================================================!
 
   ! Take aliases
   flow => turb % pnt_flow
   grid => flow % pnt_grid
+  nc = grid % n_cells
+  nb = grid % n_bnd_cells
   call Field_Mod_Alias_Momentum   (flow, u, v, w)
   call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
@@ -51,9 +53,9 @@
 
   if( turb % model .eq. K_EPS_ZETA_F ) then
 
-    call Field_Mod_Grad_Component(flow, grid % wall_dist, 1, wd_x)
-    call Field_Mod_Grad_Component(flow, grid % wall_dist, 2, wd_y)
-    call Field_Mod_Grad_Component(flow, grid % wall_dist, 3, wd_z)
+    call Field_Mod_Grad_Component(flow, grid % wall_dist, 1, wd_x(-nb:nc))
+    call Field_Mod_Grad_Component(flow, grid % wall_dist, 2, wd_y(-nb:nc))
+    call Field_Mod_Grad_Component(flow, grid % wall_dist, 3, wd_z(-nb:nc))
 
     do c = 1, grid % n_cells
 
