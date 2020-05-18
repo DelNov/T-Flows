@@ -336,12 +336,10 @@
     if(save_now            .or.  &
        exit_now            .or.  &
        mod(n, rsi) .eq.  0 .or.  &
-    !   mod(n, prsi) .eq. 0 .or.  &
        real(sc_cur-sc_ini)/real(sc_cr) > wt_max) then
       call Comm_Mod_Wait
       call Save_Results(flow, turb, mult, swarm, n, .true.)   ! save inside
       call Save_Results(flow, turb, mult, swarm, n, .false.)  ! save bnd
-      call Save_Swarm(swarm, n)
 
       if(multiphase_model .eq. VOLUME_OF_FLUID) then
         call Surf_Mod_Allocate(surf, flow)
@@ -358,8 +356,16 @@
       call User_Mod_Save_Results(flow, turb, mult, swarm, n)
     end if
    
-    if(mod(n, prsi) .eq. 0) then 
+    if(multiphase_model .eq. LAGRANGIAN_PARTICLES) then
+      if(swarm_subgrid_scale_model .eq. BROWNIAN_FUKAGATA) then
+        call Turb_Mod_Vis_T_Dynamic(turb, sol)
+      end if
+    end if
+
+    ! Instance of saving swarm results at pre-caculated t+ (HARD coded)
+    if(n .eq. 155325) then  ! time to save swarm results at t+=2000
       ! Write swarm results in user-customized format
+      call Save_Swarm(swarm, n)  ! This has to be called first!
       call User_Mod_Save_Swarm(flow, turb, mult, swarm, n)
     end if 
 
@@ -400,7 +406,7 @@
 
   ! Write results in user-customized format
   call User_Mod_Save_Results(flow, turb, mult, swarm, n) 
-  !call User_Mod_Save_Swarm(flow, turb, mult, swarm, n) 
+  call User_Mod_Save_Swarm(flow, turb, mult, swarm, n)
 
   if(this_proc < 2) then
     open(9, file='stop')
