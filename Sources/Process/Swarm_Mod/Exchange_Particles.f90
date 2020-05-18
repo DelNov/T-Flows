@@ -49,15 +49,6 @@
         r_work(i +  7)  = part % d
         r_work(i +  8)  = part % cfl
 
-        ! The following data is not really needed, at least not yet:
-        ! r_work(i + 18) = part % density
-        ! r_work(i + 19) = part % x_o
-        ! r_work(i + 20) = part % y_o
-        ! r_work(i + 21) = part % z_o
-        ! r_work(i + 22) = part % rel_u
-        ! r_work(i + 23) = part % rel_v
-        ! r_work(i + 24) = part % rel_w
-        ! r_work(i + 25) = part % rel_vel
       end if
 
     end do    ! through particles
@@ -129,19 +120,12 @@
       part % d       = r_work(i +  7)
       part % cfl     = r_work(i +  8)
 
-      ! The following data is not really needed, at least not yet:
-      ! part % density = r_work(i + 18)
-      ! part % x_o     = r_work(i + 19)
-      ! part % y_o     = r_work(i + 20)
-      ! part % z_o     = r_work(i + 21)
-      ! part % rel_u   = r_work(i + 22)
-      ! part % rel_v   = r_work(i + 23)
-      ! part % rel_w   = r_work(i + 24)
-      ! part % rel_vel = r_work(i + 25)
     end do
 
+    ! Seems that this section is not really needed in statistics (March,4th,2020)
     ! Refresh buffers for grid-base variables here
     ! (This is probably not needed, but it won't do harm)
+    call Grid_Mod_Exchange_Int(grid, swarm % n_states)
     call Grid_Mod_Exchange_Real(grid, swarm % u_mean)
     call Grid_Mod_Exchange_Real(grid, swarm % v_mean)
     call Grid_Mod_Exchange_Real(grid, swarm % w_mean)
