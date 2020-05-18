@@ -3,8 +3,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type), target :: grid
-  integer                 :: n    ! number of arrays
+  type(Grid_Type) :: grid(:)
+  integer         :: n    ! number of arrays
 !-----------------------------------[Locals]-----------------------------------!
   integer :: nn
 !==============================================================================!
@@ -12,10 +12,7 @@
   if(n .eq. 0) return
 
   ! Get number of nodes
-  nn = grid % n_nodes
-
-  ! Store the pointer to the grid
-  pnt_grid => grid
+  nn = maxval(grid(1:size(grid)) % n_nodes)
 
   ! Allocate requested memory
   allocate(i_node_01(nn));  i_node_01 = 0;  if(n .eq.  1) return

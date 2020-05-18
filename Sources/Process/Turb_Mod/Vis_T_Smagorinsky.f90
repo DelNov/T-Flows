@@ -35,7 +35,7 @@
     call Field_Mod_Grad_Variable(flow, t)
   end if
 
-  if(turbulence_model .eq. LES_SMAGORINSKY) then
+  if(turb % model .eq. LES_SMAGORINSKY) then
     do c = 1, grid % n_cells
       lf = grid % vol(c)**ONE_THIRD
 
@@ -59,7 +59,7 @@
                       * flow % shear(c)
     end do
 
-  else if(turbulence_model .eq. LES_DYNAMIC) then
+  else if(turb % model .eq. LES_DYNAMIC) then
     do c = 1, grid % n_cells
       lf = grid % vol(c) ** ONE_THIRD
       turb % vis_t(c) = flow % density(c)  &
@@ -67,7 +67,7 @@
                       * turb % c_dyn(c)    &  ! c_dynamic
                       * flow % shear(c)
     end do
-  else if(turbulence_model .eq. LES_WALE) then
+  else if(turb % model .eq. LES_WALE) then
     do c = 1, grid % n_cells
       lf = grid % vol(c)**ONE_THIRD
       turb % vis_t(c) = flow % density(c)  &

@@ -1,17 +1,17 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Advance_Particles(swarm, turb, n, n_stat_p)
+  subroutine Swarm_Mod_Advance_Particles(swarm, n, n_stat_p)
 !------------------------------------------------------------------------------!
 !   Advances all particles in the swarm.                                       !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Swarm_Type), target :: swarm
-  type(Turb_Type),  target :: turb
   integer                  :: n          ! current time step
   integer                  :: n_stat_p   ! starting time for swarm statistics
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: grid
   type(Field_Type),    pointer :: flow
+  type(Turb_Type),     pointer :: turb
   type(Particle_Type), pointer :: part
   logical,             pointer :: escaped
   logical,             pointer :: deposited
@@ -23,6 +23,7 @@
   ! Take aliases for the swarm
   grid => swarm % pnt_grid
   flow => swarm % pnt_flow
+  turb => swarm % pnt_turb
 
   ! Particle time step (division of the global time step)
   swarm % dt = flow % dt / swarm % n_sub_steps
@@ -30,23 +31,23 @@
   !------------------------!
   !   Fukagata SGS model   !
   !------------------------!
-  if(turbulence_model .eq. HYBRID_LES_PRANDTL) then
-    if(swarm_subgrid_scale_model .eq. BROWNIAN_FUKAGATA) then
-      if(this_proc < 2) then  ! parallelisation issue 
-        call Swarm_Mod_Sgs_Fukagata(swarm, turb)
-      end if 
+  if(turb % model .eq. HYBRID_LES_PRANDTL) then
+    if(swarm % subgrid_scale_model .eq. BROWNIAN_FUKAGATA) then
+      if(this_proc < 2) then  ! parallelisation issue
+        call Swarm_Mod_Sgs_Fukagata(swarm)
+      end if
     end if
-  end if 
+  end if
 
-  if(TURBULENCE_MODEL .eq. HYBRID_LES_RANS) then
+  if(turb % model .eq. HYBRID_LES_RANS) then
 
-    ! correcting for particle time step size (if ER-HRL model is used) 
+    ! Correcting for particle time step size (if ER-HRL model is used)
     call Swarm_Mod_Particle_Time_Scale(swarm, turb)
 
-    ! Store gradients for modeled flow quantities for swarm 
+    ! Store gradients for modeled flow quantities for swarm
     call Swarm_Mod_Grad_Modeled_Flow(swarm, turb, k)
 
-  end if 
+  end if
 
   !----------------------------------!
   !                                  !

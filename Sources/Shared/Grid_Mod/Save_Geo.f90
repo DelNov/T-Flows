@@ -48,9 +48,9 @@
       end if
     end do
     do s = 1, nbf_sub
-      if(var .eq. 1) write(fu) grid % xc(buf_recv_ind(s))
-      if(var .eq. 2) write(fu) grid % yc(buf_recv_ind(s))
-      if(var .eq. 3) write(fu) grid % zc(buf_recv_ind(s))
+      if(var .eq. 1) write(fu) grid % xc(grid % comm % buff_face_c2(s))
+      if(var .eq. 2) write(fu) grid % yc(grid % comm % buff_face_c2(s))
+      if(var .eq. 3) write(fu) grid % zc(grid % comm % buff_face_c2(s))
     end do
   end do
 
@@ -76,7 +76,7 @@
     end if
   end do
   do s = 1, nbf_sub
-    write(fu) grid % vol(buf_recv_ind(s))
+    write(fu) grid % vol(grid % comm % buff_face_c2(s))
   end do
 
   !-------------------!
@@ -88,7 +88,7 @@
     end if
   end do
   do s = 1, nbf_sub
-    write(fu) grid % wall_dist(buf_recv_ind(s))
+    write(fu) grid % wall_dist(grid % comm % buff_face_c2(s))
   end do
   do c = -1, -grid % n_bnd_cells, -1
     if(grid % comm % cell_proc(c) .eq. sub) then

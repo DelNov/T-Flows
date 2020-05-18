@@ -5,7 +5,6 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use File_Mod
-  use Div_Mod
   use Grid_Mod,      only: Grid_Type,                     &
                            Grid_Mod_Sort_Cells_By_Index,  &
                            Grid_Mod_Sort_Faces_By_Index,  &
@@ -38,9 +37,6 @@
 !   simply buffer(). An additional array is needed to keep track of all the    !
 !   indexes. That one is called buffind().                                     !
 !------------------------------------------------------------------------------!
-
-  allocate (grid % comm % buff_s_cell(0 : maxval(grid % comm % cell_proc(:))))
-  allocate (grid % comm % buff_e_cell(0 : maxval(grid % comm % cell_proc(:))))
 
   !-------------------------------!
   !                               !
@@ -129,7 +125,6 @@
 
     do subo = 1, maxval(grid % comm % cell_proc(:))
       if(subo .ne. sub) then
-        grid % comm % buff_s_cell(subo) = nbf_sub + 1
 
         ! Faces inside the domain
         do s = 1, grid % n_faces
@@ -139,8 +134,8 @@
             if( (grid % comm % cell_proc(c1) .eq. sub) .and.  &
                 (grid % comm % cell_proc(c2) .eq. subo) ) then
               nbf_sub = nbf_sub + 1                ! increase buffer cell count
-              buf_send_ind(nbf_sub) = grid % new_c(c1)  ! buffer send index
-              buf_recv_ind(nbf_sub) = c2           ! important for coordinate
+              grid % comm % buff_face_c1(nbf_sub) = grid % new_c(c1)
+              grid % comm % buff_face_c2(nbf_sub) = c2
 
               if(grid % new_c(c2) .eq. 0) then
                 nbfc_sub = nbfc_sub + 1
@@ -151,9 +146,9 @@
             end if
             if( (grid % comm % cell_proc(c2) .eq. sub) .and.  &
                 (grid % comm % cell_proc(c1) .eq. subo) ) then
-              nbf_sub = nbf_sub + 1                ! increasu buffer cell count
-              buf_send_ind(nbf_sub) = grid % new_c(c2)  ! buffer send index
-              buf_recv_ind(nbf_sub) = c1           ! important for coordinate
+              nbf_sub = nbf_sub + 1                ! increase buffer cell count
+              grid % comm % buff_face_c1(nbf_sub) = grid % new_c(c2)
+              grid % comm % buff_face_c2(nbf_sub) = c1
 
               if(grid % new_c(c1) .eq. 0) then
                 nbfc_sub = nbfc_sub + 1
@@ -165,25 +160,7 @@
           end if  ! c2 > 0
         end do    ! through sides
 
-        grid % comm % buff_e_cell(subo) = nbf_sub
-
-        ! Write to buffer file
-        if(verbose) then
-          write(fu,'(a33)') '#-------------------------------#' 
-          write(fu,'(a33)') '#   Conections with subdomain:  #' 
-          write(fu,'(a33)') '#-------------------------------#' 
-          write(fu,'(i8)')  subo
-          write(fu,'(a30)') '# Number of local connections:'
-          write(fu,'(i8)')  grid % comm % buff_e_cell(subo) -  &
-                            grid % comm % buff_s_cell(subo) + 1
-          write(fu,'(a37)') '# Local number in a buffer and index:'
-          do b = grid % comm % buff_s_cell(subo),  &
-                 grid % comm % buff_e_cell(subo)
-            write(fu,'(2i8)') b - grid % comm % buff_s_cell(subo) + 1,  &
-                              buf_send_ind(b)
-          end do
-        end if
-      end if
+      end if  ! subo .ne. sub
 
     end do ! for subo
 
@@ -206,8 +183,8 @@
       end if
     end do
     do s = 1, nbf_sub
-      do ln = 1, grid % cells_n_nodes(buf_recv_ind(s))
-        grid % new_n(grid % cells_n(ln,buf_recv_ind(s))) = -1
+      do ln = 1, grid % cells_n_nodes(grid % comm % buff_face_c2(s))
+        grid % new_n(grid % cells_n(ln,grid % comm % buff_face_c2(s))) = -1
       end do
     end do
 

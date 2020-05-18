@@ -2,6 +2,8 @@
   integer function Grid_Mod_Bnd_Cond_Type(grid, bnd_cell)
 !------------------------------------------------------------------------------!
 !   Provides a shortcut to obtain boundary condition type.                     !
+!   Warning: avoid calling this function for temperature and species (scalars) !
+!            since they may have different b.c. for the same color.            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

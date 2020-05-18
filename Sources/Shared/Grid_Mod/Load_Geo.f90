@@ -1,12 +1,13 @@
 !==============================================================================!
-  subroutine Grid_Mod_Load_Geo(grid, this_proc)
+  subroutine Grid_Mod_Load_Geo(grid, this_proc, domain)
 !------------------------------------------------------------------------------!
 !   Reads:  name.geo                                                           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
-  integer         :: this_proc
+  type(Grid_Type)   :: grid
+  integer           :: this_proc
+  integer, optional :: domain
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: c, n, s, fu
   character(len=80) :: name_in
@@ -18,7 +19,8 @@
   !   geometrical quantities   !
   !                            !
   !----------------------------!
-  call File_Mod_Set_Name(name_in, processor=this_proc, extension='.geo')
+  call File_Mod_Set_Name(name_in, processor=this_proc, extension='.geo',  &
+                         domain=domain)
   call File_Mod_Open_File_For_Reading_Binary(name_in, fu, this_proc)
 
   read(fu) (grid % xn(n), n = 1, grid % n_nodes)

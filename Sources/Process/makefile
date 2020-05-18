@@ -37,8 +37,9 @@ VPATH = $(DIR_SHARED):$(DIR_TURBUL):$(DIR_SWARM):.
 PROGRAM_NAME = Process
 PROGRAM_FILE = $(DIR_BINARY)/$(PROGRAM_NAME)
 
-ifeq ($(MAKECMDGOALS), clean)
 $(info #=======================================================================)
+$(info # Compiling $(PROGRAM_NAME) with $(FORTRAN) compiler                         )
+$(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
 $(info #   make <FORTRAN=gnu/intel/portland> <DEBUG=yes/no> <MPI=yes/no>       )
 $(info #        <FCOMP=gfortran/ifort/pgf90/mpif90/...>                        )
@@ -52,7 +53,7 @@ $(info #   make MPI=yes FCOMP=compiler- parallel version with custom compiler  )
 $(info #   make FORTRAN=intel MPI=yes - parallel version with intel compiler   )
 $(info #   make MPI=yes CGNS=yes      - parallel version with CGNS/HDF5 support)
 $(info #-----------------------------------------------------------------------)
-endif
+
 #-------------------------------------------------------------------------------
 #   Compiler and linker options
 #-------------------------------------------------------------------------------
@@ -122,13 +123,6 @@ ifeq ($(MPI), yes)
   else
     FC = $(FCOMP)
   endif
-endif
-
-# If not "make clean"
-ifneq ($(MAKECMDGOALS), clean)
-$(info #=======================================================================)
-$(info # Compiling $(PROGRAM_NAME) with $(FC) compiler                         )
-$(info #-----------------------------------------------------------------------)
 endif
 
 # If compiling with CGNS, add path to include directory
@@ -215,20 +209,17 @@ endif
 # Modules in shared directory
 SRC_MOD += Const_Mod.f90	\
            Cpu_Timer_Mod.f90	\
-           Sort_Mod.f90		\
            Math_Mod.f90		\
+           Sort_Mod.f90		\
            File_Mod.f90		\
            Control_Mod.f90	\
-           Div_Mod.f90		\
            Grid_Mod.f90		\
            Grid_Level_Mod.f90	\
            Work_Mod.f90		\
-           Material_Mod.f90	\
            Metis_Options_Mod.f90
 
 # Sources for modules in the local directory
-SRC_MOD += Info_Mod.f90		\
-           Bulk_Mod.f90		\
+SRC_MOD += Bulk_Mod.f90		\
            Var_Mod.f90		\
            Face_Mod.f90		\
            Matrix_Mod.f90	\
@@ -236,6 +227,8 @@ SRC_MOD += Info_Mod.f90		\
            Solver_Mod.f90	\
            Numerics_Mod.f90	\
            Field_Mod.f90	\
+           Info_Mod.f90		\
+           Interface_Mod.f90	\
            Eddies_Mod.f90	\
            Monitor_Mod.f90	\
            Turb_Mod.f90		\

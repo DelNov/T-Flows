@@ -60,7 +60,7 @@
   !------------------------------!
   !   Find the near-wall cells   !
   !------------------------------!
-  grid % cell_near_wall = .false.
+  grid % cell_near_wall(:) = .false.
 
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)

@@ -7,7 +7,7 @@
   use Grid_Mod
   use Field_Mod
   use Turb_Mod
-!  use Control_Mod
+  use Control_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -57,9 +57,9 @@
 
     ! Particle drag factor (from Re_p)
     real :: f    ! this is not to be confused with the drag coefficient
- 
+
     ! Particle terminal speed
-    real :: vel_t 
+    real :: vel_t
 
     ! Particle distance between two successive sub-time-steps
     real :: dsp 
@@ -79,11 +79,8 @@
 
   end type
 
-  ! Variable holding the subgrid scale (SGS)  model type 
-  integer :: swarm_subgrid_scale_model
-
   ! Parameters describing turbulence model choice
-  ! (Prime numbers starting from 30169  as a continuation for turb_mod) 
+  ! (Prime numbers starting from 30169  as a continuation for turb_mod)
   integer, parameter :: BROWNIAN_FUKAGATA  = 30169
 
   !----------------!
@@ -123,8 +120,8 @@
     integer :: cnt_d
     integer :: cnt_e
     integer :: cnt_r
- 
-    ! particle statistics
+
+    ! Particle statistics
     logical :: statistics
 
     ! Logical array if cell has particles
@@ -135,27 +132,40 @@
     real,    allocatable :: uu(:), vv(:), ww(:), uv(:), uw(:), vw(:)
     integer, allocatable :: n_states(:)
 
-    ! Gradients of flow modeled  quantity "zeta" (for SGS of Hybrid_Les_Rans model)
-    real,    allocatable :: w_mod_x(:), w_mod_y(:), w_mod_z(:)
+    ! Gradients of flow modeled  quantity "zeta"
+    ! (for SGS of Hybrid_Les_Rans model)
+    real, allocatable :: w_mod_x(:), w_mod_y(:), w_mod_z(:)
 
     ! Modeled TKE for swarm over the whole grid
-    real,    allocatable :: kin_mod(:)
+    real, allocatable :: kin_mod(:)
 
     ! SGS Brownian diffusion force
-    real,    allocatable :: f_fuka_x(:), f_fuka_y(:), f_fuka_z(:)
+    real, allocatable :: f_fuka_x(:), f_fuka_y(:), f_fuka_z(:)
 
-    ! counter (was initially added for sequential particle injection case)                                 
+    ! Counter (was initially added for sequential particle injection case)
     integer :: counter
+
+    ! Variable holding the subgrid scale (SGS)  model type
+    ! (Must be part of type definition for multiple materials)
+    integer :: subgrid_scale_model
+
+    integer, allocatable :: i_work(:)
+    logical, allocatable :: l_work(:)
+    real,    allocatable :: r_work(:)
 
   end type
 
-  ! Working arrays, buffers for parallel version
   integer, parameter   :: N_I_VARS = 3
   integer, parameter   :: N_L_VARS = 2
-  integer, parameter   :: N_R_VARS = 17
-  integer, allocatable :: i_work(:)
-  logical, allocatable :: l_work(:)
-  real,    allocatable :: r_work(:)
+  integer, parameter   :: N_R_VARS = 8
+
+  !---------------------!
+  !   Model constants   !
+  !---------------------!
+
+  ! For Fukagata model
+  real :: c_o   = 2.1
+  real :: c_eps = 1.0
 
   contains
 

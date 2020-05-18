@@ -1,12 +1,13 @@
 !==============================================================================!
-  subroutine Grid_Mod_Load_Cns(grid, this_proc)
+  subroutine Grid_Mod_Load_Cns(grid, this_proc, domain)
 !------------------------------------------------------------------------------!
 !   Reads: .cns file.                                                          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
-  integer         :: this_proc  ! needed if called from Processor
+  type(Grid_Type)   :: grid
+  integer           :: this_proc  ! needed if called from Processor
+  integer, optional :: domain
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: c, n, s, lev, fu
   character(len=80) :: name_in
@@ -18,7 +19,8 @@
   !   connections between cells   !
   !                               !
   !-------------------------------!
-  call File_Mod_Set_Name(name_in, processor=this_proc, extension='.cns')
+  call File_Mod_Set_Name(name_in, processor=this_proc, extension='.cns',  &
+                         domain=domain)
   call File_Mod_Open_File_For_Reading_Binary(name_in, fu, this_proc)
 
   !-----------------------------------------------!
@@ -34,17 +36,18 @@
 
   ! Allocate memory =--> carefull, there is no checking!
   call Grid_Mod_Allocate_Nodes(grid, grid % n_nodes)
-  call Grid_Mod_Allocate_Cells(grid, grid % n_cells, grid % n_bnd_cells) 
-  call Grid_Mod_Allocate_Faces(grid, grid % n_faces) 
+  call Grid_Mod_Allocate_Cells(grid, grid % n_cells, grid % n_bnd_cells)
+  call Grid_Mod_Allocate_Faces(grid, grid % n_faces)
 
   ! Boundary conditions' keys
-  allocate(grid % bnd_cond % name(grid % n_bnd_cond))
-  allocate(grid % bnd_cond % type(grid % n_bnd_cond))
+  ! (Go from zero for faces which are not at the boundary)
+  allocate(grid % bnd_cond % name(0 : grid % n_bnd_cond + 3))
+  allocate(grid % bnd_cond % type(0 : grid % n_bnd_cond + 3))
 
-  !-------------------!
-  !   Material name   !
-  !-------------------!
-  read(fu) grid % material % name
+  !-----------------!
+  !   Domain name   !
+  !-----------------!
+  read(fu) grid % name
 
   !------------------------------!
   !   Boundary conditions list   !
@@ -52,6 +55,11 @@
   do n = 1, grid % n_bnd_cond
     read(fu) grid % bnd_cond % name(n)
   end do
+  ! The last three are reserved for perodicity,
+  ! (should the domain has periodic direction)
+  grid % bnd_cond % name(grid % n_bnd_cond + 1) = 'PERIODIC_X'
+  grid % bnd_cond % name(grid % n_bnd_cond + 2) = 'PERIODIC_Y'
+  grid % bnd_cond % name(grid % n_bnd_cond + 3) = 'PERIODIC_Z'
 
   !-----------!
   !   Cells   !  (including buffer cells)
@@ -68,6 +76,10 @@
   ! Cells' processor ids
   read(fu) (grid % comm % cell_proc(c), c =  1,  grid % n_cells)
   read(fu) (grid % comm % cell_proc(c), c = -1, -grid % n_bnd_cells, -1)
+
+  ! Cells' global indices
+  read(fu) (grid % comm % cell_glo(c), c =  1,  grid % n_cells)
+  read(fu) (grid % comm % cell_glo(c), c = -1, -grid % n_bnd_cells, -1)
 
   !-----------!
   !   Faces   !
@@ -88,8 +100,10 @@
   !   Boundary   !
   !--------------!
 
-  ! Physical boundary cells
-  allocate (grid % bnd_cond % color(-grid % n_bnd_cells-1:-1))
+  ! Physical boundary cells (and all the faces)
+  ! (This opens the oportunity to store bounary condition info in ...
+  !  ... the faces thus ridding us of the "if(c2 < 0) then" checks)
+  allocate (grid % bnd_cond % color(-grid % n_bnd_cells-1:grid % n_faces))
   read(fu) (grid % bnd_cond % color(c), c = -1,-grid % n_bnd_cells, -1)
 
   call Grid_Mod_Bnd_Cond_Ranges(grid)

@@ -24,7 +24,7 @@
   vis  => turb % vis
   call Solver_Mod_Alias_System(sol, a, b)
 
-  if(turbulence_model .eq. SPALART_ALLMARAS) then
+  if(turb % model .eq. SPALART_ALLMARAS) then
 
     do c = 1, grid % n_cells
 
@@ -59,7 +59,7 @@
       b(c)  = b(c) + dif * grid % vol(c)
     end do
 
-  else if(turbulence_model .eq. DES_SPALART) then
+  else if(turb % model .eq. DES_SPALART) then
     do c = 1, grid % n_cells
 
       ! What is 0.65 here?  A ghost number

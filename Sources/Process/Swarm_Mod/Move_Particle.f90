@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Swarm_Mod_Move_Particle(swarm, turb, k)
 !------------------------------------------------------------------------------!
-!                  Updates particle velocity and position                      !
+!   Updates particle velocity and position                                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -14,21 +14,23 @@
   type(Var_Type),      pointer :: u, v, w, kin, zeta
   type(Particle_Type), pointer :: part
   real,                pointer :: fb_x, fb_y, fb_z
-  integer                      :: c, c2                          ! nearest cell
-  real                         :: rx, ry, rz                     ! paticle-cell vector
-  real                         :: up, vp, wp                     ! velocity at particle
-  real                         :: flow_vel                       ! flow vel. magnitude
-  real                         :: k1, k2, k3, k4                 ! Runge-Kutta increments
-  real                         :: part_vel                       ! relative velocity 
-  real                         :: gravity                        ! gravity magnitude
-  real                         :: visc_const                     ! characteristic viscosity
-  real                         :: dens_const                     ! characteristic density
-  real                         :: f_fx, f_fy, f_fz               ! Brownian force components
-  real                         :: fd_p                           ! particle damping fn. 
-  real                         :: t_scale_max                    ! maximum t_scale for ERHRL model on the employed grid  
-  real                         :: u_mod_xc, v_mod_xc, w_mod_xc   ! gradients of modeled flow velocities   
-  real                         :: u_mod_yc, v_mod_yc, w_mod_yc  
-  real                         :: u_mod_zc, v_mod_zc, w_mod_zc  
+  integer                      :: c, c2             ! nearest cell
+  real                         :: rx, ry, rz        ! paticle-cell vector
+  real                         :: up, vp, wp        ! velocity at particle
+  real                         :: flow_vel          ! flow vel. magnitude
+  real                         :: k1, k2, k3, k4    ! Runge-Kutta increments
+  real                         :: part_vel          ! relative velocity 
+  real                         :: gravity           ! gravity magnitude
+  real                         :: visc_const        ! characteristic viscosity
+  real                         :: dens_const        ! characteristic density
+  real                         :: f_fx, f_fy, f_fz  ! Brownian force components
+  real                         :: fd_p              ! particle damping fn. 
+  real                         :: t_scale_max       ! maximum t_scale for ERHRL 
+                                                    ! model on the grid used
+  ! Gradients of modeled flow velocities
+  real                         :: u_mod_xc, v_mod_xc, w_mod_xc
+  real                         :: u_mod_yc, v_mod_yc, w_mod_yc
+  real                         :: u_mod_zc, v_mod_zc, w_mod_zc
 !==============================================================================!
 
   ! Take aliases for flow
@@ -45,6 +47,10 @@
   fb_z => part  % fb_z
 
   ! Characteristic viscosity (needs to be discussed yet)
+  ! (You can read it from the control file:
+  ! call Control_Mod_Dynamic_Viscosity   (visc_const)
+  ! call Control_Mod_Mass_Density        (dens_const)
+  ! The way it is implemented now it could be different in every processor)
   visc_const = maxval(flow % viscosity(:))
   dens_const = maxval(flow % density(:))
 
@@ -61,7 +67,7 @@
   fd_p = 1.0 - exp(-(turb % y_plus(c)/25.0)**3)
 
   ! Compute velocities at the particle position from velocity gradients
-  if(TURBULENCE_MODEL .eq. HYBRID_LES_PRANDTL) then
+  if(turb % model .eq. HYBRID_LES_PRANDTL) then
     up = u % n(c)       &  ! u velocity at the new time step (% n)
        + u % x(c) * rx  &  ! u % x is gradient du/dx
        + u % y(c) * ry  &  ! u % y is gradient du/dy
@@ -76,9 +82,9 @@
        + w % x(c) * rx  &  ! w % x is gradient dw/dx
        + w % y(c) * ry  &  ! w % y is gradient dw/dy
        + w % z(c) * rz     ! w % x is gradient dw/dz
-  end if 
+  end if
 
-  if(TURBULENCE_MODEL .eq. HYBRID_LES_RANS) then
+  if(turb % model .eq. HYBRID_LES_RANS) then
 
     ! Modeled quantity "zeta" at particle location  
     w_mod_xc = sqrt(swarm % w_mod_x(c) * rx * rx)  
@@ -123,9 +129,6 @@
        + w_mod_xc       &      ! w_mod_dx is gradient dw_mod/dx
        + w_mod_yc       &      ! w_mod_dy is gradient dw_mod/dy
        + w_mod_zc              ! w_mod_dz is gradient dw_mod/dz
-       !+ (w_mod_xc * sign1  &  ! w_mod_dx is gradient dw_mod/dx
-       !+ w_mod_yc  * sign2  &  ! w_mod_dy is gradient dw_mod/dy
-       !+ w_mod_zc  * sign3) * fd_p  ! w_mod_dz is gradient dw_mod/dz
   end if
 
   ! Compute the magnitude of the interpolated velocity 
@@ -186,10 +189,10 @@
   !-------------------------!
   !   Updating x-velocity   !
   !-------------------------!
-  k1 = (part % f * (up -  part % u) / part % tau) + fb_x + f_fx 
-  k2 = (part % f * (up - (part % u + (k1*swarm % dt)*0.5)) / part % tau)  
-  k3 = (part % f * (up - (part % u + (k2*swarm % dt)*0.5)) / part % tau)  
-  k4 = (part % f * (up - (part % u +  k3*swarm % dt))      / part % tau)  
+  k1 = (part % f * (up -  part % u) / part % tau) + fb_x + f_fx
+  k2 = (part % f * (up - (part % u + (k1*swarm % dt)*0.5)) / part % tau)
+  k3 = (part % f * (up - (part % u + (k2*swarm % dt)*0.5)) / part % tau)
+  k4 = (part % f * (up - (part % u +  k3*swarm % dt))      / part % tau)
 
   ! X-velocity calculation
   part % u = part % u + (ONE_SIXTH) * (k1 + 2.0*(k2+k3) + k4)*swarm % dt
@@ -197,10 +200,10 @@
   !-------------------------!
   !   Updating y-velocity   !
   !-------------------------!
-  k1 = (part % f * (vp -  part % v) / part % tau) + fb_y + f_fy 
-  k2 = (part % f * (vp - (part % v + (k1*swarm % dt)*0.5)) / part % tau) 
-  k3 = (part % f * (vp - (part % v + (k2*swarm % dt)*0.5)) / part % tau) 
-  k4 = (part % f * (vp - (part % v +  k3*swarm % dt))      / part % tau) 
+  k1 = (part % f * (vp -  part % v) / part % tau) + fb_y + f_fy
+  k2 = (part % f * (vp - (part % v + (k1*swarm % dt)*0.5)) / part % tau)
+  k3 = (part % f * (vp - (part % v + (k2*swarm % dt)*0.5)) / part % tau)
+  k4 = (part % f * (vp - (part % v +  k3*swarm % dt))      / part % tau)
 
   ! Y-velocity calculation
   part % v = part % v + (ONE_SIXTH) * (k1 + 2.0*(k2+k3) + k4)*swarm % dt
@@ -208,10 +211,10 @@
   !-------------------------!
   !   Updating z-velocity   !
   !-------------------------!
-  k1 = (part % f * (wp -  part % w) / part % tau) + fb_z + f_fz 
-  k2 = (part % f * (wp - (part % w + (k1*swarm % dt)*0.5)) / part % tau) 
-  k3 = (part % f * (wp - (part % w + (k2*swarm % dt)*0.5)) / part % tau) 
-  k4 = (part % f * (wp - (part % w +  k3*swarm % dt))      / part % tau) 
+  k1 = (part % f * (wp -  part % w) / part % tau) + fb_z + f_fz
+  k2 = (part % f * (wp - (part % w + (k1*swarm % dt)*0.5)) / part % tau)
+  k3 = (part % f * (wp - (part % w + (k2*swarm % dt)*0.5)) / part % tau)
+  k4 = (part % f * (wp - (part % w +  k3*swarm % dt))      / part % tau)
 
   ! Z-velocity calculation
   part % w = part % w + (ONE_SIXTH) * (k1 + 2.0*(k2+k3) + k4)*swarm % dt
@@ -230,7 +233,7 @@
   part % y_n = part % y_n + part % v * swarm % dt
   part % z_n = part % z_n + part % w * swarm % dt
 
-  ! calculating the distance that particle just moved (for cfl condition)
+  ! Calculating the distance that particle just moved (for cfl condition)
   part % dsp = Math_Mod_Distance_Squared(part % x_n, part % y_n, part % z_n, &
                                          part % x_o, part % y_o, part % z_o)
 

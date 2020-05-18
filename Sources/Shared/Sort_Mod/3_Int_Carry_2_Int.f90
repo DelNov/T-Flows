@@ -34,7 +34,7 @@
     end do
     if (i >= j) exit
 
-    ! Swap values in a and b
+    ! Swap values in a, b and c
     call Swap_Int(a1(i), a1(j))
     call Swap_Int(a2(i), a2(j))
     call Swap_Int(a3(i), a3(j))

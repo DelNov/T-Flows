@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Multiphase_Mod_Update_Physical_Properties(mult)
 !------------------------------------------------------------------------------!
-!   Update physical properties based on vof variable                           !
+!    Update physical properties based on volume fraction variable              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -22,18 +22,18 @@
 
   ! Density and viscosity in cells
   do c = 1, grid % n_cells
-    flow % density(c)   = vof % n(c)         * phase_dens(1)      &
-                        + (1.0 - vof % n(c)) * phase_dens(2)
-    flow % viscosity(c) = vof % n(c)         * phase_visc(1)      &
-                        + (1.0 - vof % n(c)) * phase_visc(2)
+    flow % density(c)   = vof % n(c)         * mult % phase_dens(1)      &
+                        + (1.0 - vof % n(c)) * mult % phase_dens(2)
+    flow % viscosity(c) = vof % n(c)         * mult % phase_visc(1)      &
+                        + (1.0 - vof % n(c)) * mult % phase_visc(2)
   end do
   call Grid_Mod_Exchange_Real(grid, flow % density)
   call Grid_Mod_Exchange_Real(grid, flow % viscosity)
 
   ! Density at faces
   do s = 1, grid % n_faces
-    flow % density_f(s) =        vof_f(s)  * phase_dens(1)   &
-                        + (1.0 - vof_f(s)) * phase_dens(2)
+    flow % density_f(s) =        vof_f(s)  * mult % phase_dens(1)   &
+                        + (1.0 - vof_f(s)) * mult % phase_dens(2)
   end do
 
   end subroutine

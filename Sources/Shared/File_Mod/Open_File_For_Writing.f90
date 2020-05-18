@@ -10,7 +10,7 @@
   integer, optional :: processor
 !==============================================================================!
 
-  open(newunit = file_unit, file = trim(name_o))
+  open(newunit = file_unit, file = trim(name_o), status = 'replace')
 
   if(.not. present(processor)) then
     print *, '# Creating the file: ', trim(name_o)

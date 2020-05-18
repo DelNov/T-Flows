@@ -17,7 +17,7 @@
         grid % comm % buff_s_cell(sub) ) then
       do c2 = grid % comm % buff_s_cell(sub),  &
               grid % comm % buff_e_cell(sub)
-        c1 = grid % comm % buff_index(c2)
+        c1 = grid % comm % buff_c1_from_c2(c2)
         phi(c2) = phi(c1)
       end do
     end if

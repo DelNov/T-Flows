@@ -103,13 +103,13 @@
                      + (1.0-grid % fw(s)) * turb % vis_t(c2))  &
                      / phi % sigma
 
-    if(turbulence_model .eq. SPALART_ALLMARAS .or.               &
-       turbulence_model .eq. DES_SPALART)                        &
+    if(turb % model .eq. SPALART_ALLMARAS .or.               &
+       turb % model .eq. DES_SPALART)                        &
       vis_eff = visc_f + (    grid % fw(s)  * vis % n(c1)    &
                        + (1.0-grid % fw(s)) * vis % n(c2))   &
                        / phi % sigma
 
-    if(turbulence_model .eq. HYBRID_LES_RANS) then
+    if(turb % model .eq. HYBRID_LES_RANS) then
       vis_eff = visc_f + (    grid % fw(s)  * turb % vis_t_eff(c1)   &
                        + (1.0-grid % fw(s)) * turb % vis_t_eff(c2))  &
                        / phi % sigma
@@ -118,9 +118,9 @@
     phi_y_f = grid % fw(s) * phi % y(c1) + (1.0-grid % fw(s)) * phi % y(c2)
     phi_z_f = grid % fw(s) * phi % z(c1) + (1.0-grid % fw(s)) * phi % z(c2)
 
-    if(turbulence_model .eq. K_EPS_ZETA_F    .or.  &
-       turbulence_model .eq. HYBRID_LES_RANS .or.  &
-       turbulence_model .eq. K_EPS) then
+    if(turb % model .eq. K_EPS_ZETA_F    .or.  &
+       turb % model .eq. HYBRID_LES_RANS .or.  &
+       turb % model .eq. K_EPS) then
       if(c2 < 0 .and. phi % name .eq. 'KIN') then
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
@@ -216,7 +216,7 @@
   !   Source terms and wall function    !
   !                                     !
   !-------------------------------------!
-  if(turbulence_model .eq. K_EPS) then
+  if(turb % model .eq. K_EPS) then
     if(phi % name .eq. 'KIN') call Turb_Mod_Src_Kin_K_Eps(turb, sol)
     if(phi % name .eq. 'EPS') call Turb_Mod_Src_Eps_K_Eps(turb, sol)
     if(heat_transfer) then
@@ -224,8 +224,8 @@
     end if
   end if
 
-  if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
-     turbulence_model .eq. HYBRID_LES_RANS) then
+  if(turb % model .eq. K_EPS_ZETA_F .or.  &
+     turb % model .eq. HYBRID_LES_RANS) then
     if(phi % name .eq. 'KIN')  call Turb_Mod_Src_Kin_K_Eps_Zeta_F(turb, sol)
     if(phi % name .eq. 'EPS')  call Turb_Mod_Src_Eps_K_Eps_Zeta_F(turb, sol)
     if(phi % name .eq. 'ZETA')  &
@@ -235,8 +235,8 @@
     end if
   end if
 
-  if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
-     turbulence_model .eq. DES_SPALART) then
+  if(turb % model .eq. SPALART_ALLMARAS .or.  &
+     turb % model .eq. DES_SPALART) then
     call Turb_Mod_Src_Vis_Spalart_Almaras(turb, sol)
   end if
 
@@ -267,9 +267,9 @@
   end do
 
   ! Print info on the screen
-  if(turbulence_model .eq. K_EPS        .or.  &
-     turbulence_model .eq. K_EPS_ZETA_F .or.  &
-     turbulence_model .eq. HYBRID_LES_RANS) then
+  if(turb % model .eq. K_EPS        .or.  &
+     turb % model .eq. K_EPS_ZETA_F .or.  &
+     turb % model .eq. HYBRID_LES_RANS) then
     if(phi % name .eq. 'KIN')  &
       call Info_Mod_Iter_Fill_At(3, 1, phi % name, exec_iter, phi % res)
     if(phi % name .eq. 'EPS')  &

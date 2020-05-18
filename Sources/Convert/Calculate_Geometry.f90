@@ -27,7 +27,7 @@
   real                 :: dsc1, dsc2, per_min, per_max
   real                 :: t, sur_tot, angle
   real                 :: xc1, yc1, zc1, xc2, yc2, zc2
-  real                 :: max_dis, tot_vol, min_vol, max_vol
+  real                 :: max_dis
   real, allocatable    :: xspr(:), yspr(:), zspr(:)
   real, allocatable    :: b_coor(:), phi_face(:)
   integer, allocatable :: b_face(:), face_copy(:)
@@ -842,20 +842,23 @@
   end do
   grid % vol(:) = grid % vol(:) * ONE_THIRD
   c1 = 0
-  min_vol =  HUGE
-  max_vol = -HUGE
-  tot_vol = 0.0
+  grid % min_vol =  HUGE
+  grid % max_vol = -HUGE
+  grid % tot_vol = 0.0
   do c = 1, grid % n_cells
-    tot_vol = tot_vol + grid % vol(c)
-    min_vol = min(min_vol, grid % vol(c))
-    max_vol = max(max_vol, grid % vol(c))
+    grid % tot_vol = grid % tot_vol + grid % vol(c)
+    grid % min_vol = min(grid % min_vol, grid % vol(c))
+    grid % max_vol = max(grid % max_vol, grid % vol(c))
   end do
-  print '(a45,es12.5)', ' # Minimal cell volume is:                   ', min_vol
-  print '(a45,es12.5)', ' # Maximal cell volume is:                   ', max_vol
-  print '(a45,es12.5)', ' # Total domain volume is:                   ', tot_vol
+  print '(a45,es12.5)', ' # Minimal cell volume is:                   ',  &
+        grid % min_vol
+  print '(a45,es12.5)', ' # Maximal cell volume is:                   ',  &
+        grid % max_vol
+  print '(a45,es12.5)', ' # Total domain volume is:                   ',  &
+        grid % tot_vol
   print *, '# Cell volumes calculated !'
 
-  if(min_vol < 0.0) then
+  if(grid % min_vol < 0.0) then
     print *, '# Negative volume occured! Slower, algoritham should be run !'
     print *, '# Execution will halt now! '
 !    stop

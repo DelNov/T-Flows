@@ -26,7 +26,9 @@
     integer, allocatable :: cell_proc(:)
 
     ! Buffer index
-    integer, allocatable :: buff_index(:)
+    integer, allocatable :: buff_c1_from_c2(:)  ! out-in cell mapping
+    integer, allocatable :: buff_face_c1(:),  & ! inside cell for a buffer face
+                            buff_face_c2(:)     ! outside cell for a buffer face
 
     ! Global cell numbers
     integer, allocatable :: cell_glo(:)
@@ -58,6 +60,7 @@
   include 'Comm_Mod/Sequential/Create_New_Types.f90'
   include 'Comm_Mod/Sequential/End.f90'
   include 'Comm_Mod/Sequential/Exchange_Int_Array.f90'
+  include 'Comm_Mod/Sequential/Exchange_Log_Array.f90'
   include 'Comm_Mod/Sequential/Exchange_Real_Array.f90'
   include 'Comm_Mod/Sequential/Global_Lor_Log_Array.f90'
   include 'Comm_Mod/Sequential/Global_Max_Real.f90'

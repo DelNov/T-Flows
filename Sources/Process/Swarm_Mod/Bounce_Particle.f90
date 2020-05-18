@@ -39,14 +39,14 @@
   nz = -grid % sz(s) / grid % s(s)
 
   ! Coordinates of closest boundary cell
-  xc = -grid % xc(c2)                                                         
-  yc = -grid % yc(c2)                                                         
-  zc = -grid % zc(c2)                                                         
-                                                                                
-  ! Distance squared from the particle to the boundary cell centre                       
-  d_sq = (xc - part % x_n)**2  &                                            
-       + (yc - part % y_n)**2  &                                            
-       + (zc - part % z_n)**2          
+  xc = -grid % xc(c2)
+  yc = -grid % yc(c2)
+  zc = -grid % zc(c2)
+
+  ! Distance squared from the particle to the boundary cell centre
+  d_sq = (xc - part % x_n)**2  &
+       + (yc - part % y_n)**2  &
+       + (zc - part % z_n)**2
 
   !-------------------------------------------!
   !                                           !
@@ -129,15 +129,15 @@
       yi = part % y_o + f*dy
       zi = part % z_o + f*dz
 
-      ! particles touch the wall when their center is one radius far from  wall..
-      ! ...this should correct for reflection behavior (HARD coded)
+      ! particles touch the wall when their center is one radius far from ...
+      ! ... wall this should correct for reflection behavior (HARD coded)
       if(zi .le. 0.0) then
         zi = zi + part % d / 2.0    ! for lower channel wall 
-      else 
-        if(zi .ge. 2.0) then 
+      else
+        if(zi .ge. 2.0) then
           zi = zi - part % d / 2.0  ! for upper wall
-        end if  
-      end if  
+        end if
+      end if
 
       !---------------------------------!
       !   The boundary cell is a wall   !
@@ -150,17 +150,17 @@
           deposited = .true.
           swarm % cnt_d = swarm % cnt_d + 1
           print *, k, 'Particle is deposited at: ', xi, yi, zi, f
-          
-          ! correct for 'last' computed particle position (HARD coded)!
+
+          ! Correct for 'last' computed particle position (HARD coded)
           if(part % z_n .le. 0.0) then
             part % z_n = part % d / 2.0
-          else 
+          else
             if(part % z_n .gt. 2.0) then 
                part % z_n = 2.0 - part % d / 2.0
-            end if  
-          end if  
+            end if
+          end if
 
-        ! Reflection condition   
+        ! Reflection condition
         else
 
           ! Reflected velocity (https://tinyurl.com/y3dcx8sh)
@@ -195,7 +195,8 @@
       !------------------------------------!
       !   The boundary cell is an outlet   !
       !------------------------------------!
-      if(Grid_Mod_Bnd_Cond_Type(grid, c2) == OUTFLOW) then
+      if(Grid_Mod_Bnd_Cond_Type(grid, c2) == OUTFLOW .or.  &
+         Grid_Mod_Bnd_Cond_Type(grid, c2) == CONVECT) then
         escaped =  .true.
         swarm % cnt_e = swarm % cnt_e + 1
         print *, k, 'Particle escaped from outlet at: ', xi, yi, zi, f

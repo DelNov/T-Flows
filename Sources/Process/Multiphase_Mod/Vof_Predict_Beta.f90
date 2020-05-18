@@ -6,8 +6,7 @@
                                              beta_f,               &
                                              c_d)
 !------------------------------------------------------------------------------!
-!   Computes the value at the cell face using different convective  schemes.   !
-!------------------------------------------------------------------------------!
+!   Step 1 of CICSAM: Compute beta for computation of volume fraction          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -74,8 +73,13 @@
                             + phi_z(donor) * dk(s))
 
           ! Face is inside the domain
-          alfa_u = min(max(alfa_a - 2.0 * dot_prod, 0.0), 1.0)
+          alfa_u = min(max(alfa_a - 2.0 * dot_prod, 0.0), 1.0) !old way
 
+!          call Multiphase_Mod_Vof_Find_Upstream_phi(phi,    &
+!                                                    phi_x,  &
+!                                                    phi_y,  &
+!                                                    phi_z,  &    
+!                                                    s, donor, accept, alfa_u)
           if (abs(alfa_u - alfa_a) > TINY) then
 
             alfa_d_til = (alfa_d - alfa_u) / (alfa_a - alfa_u)

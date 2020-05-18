@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Vis_T_Dynamic(turb, sol)
+  subroutine Turb_Mod_Vis_T_Dynamic(turb)
 !------------------------------------------------------------------------------!
 !   Calculates Smagorinsky constant with dynamic procedure                     !
 !------------------------------------------------------------------------------!
@@ -23,15 +23,12 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type),   target :: turb
-  type(Solver_Type), target :: sol
+  type(Turb_Type), target :: turb
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
-  type(Matrix_Type), pointer :: a
-  real,              pointer :: b(:)
   type(Var_Type),    pointer :: u, v, w
-  integer                    :: c, j, cj
+  integer                    :: c, c1, c2, s, sj, j, cj, nc, nb
   real                       :: u_a, v_a, w_a
   real                       :: uu_a, vv_a, ww_a, uv_a, uw_a, vw_a
   real                       :: m_11_a, m_22_a, m_33_a, m_12_a, m_13_a, m_23_a
@@ -56,16 +53,17 @@
 !                                                                              !
 !   C = 0.5 * Lij:Mij / Mij:Mij                                                !
 !                                                                              !
-!   Aij : Bij = A11 * B11 + A22 * B22 + A33 * B33                              !
-!             + 2.0 * A12 * B12 + 2.0 A13 * B13 + 2.0 * A23 * B23              !   
+!   aij : bij = a11 * b11 + a22 * b22 + a33 * b33                              !
+!             + 2.0 * a12 * b12 + 2.0 a13 * b13 + 2.0 * a23 * b23              !   
 !                                                                              !
 !------------------------------------------------------------------------------!
 
   ! Take aliases
   flow => turb % pnt_flow
   grid => flow % pnt_grid
+  nc   =  grid % n_cells
+  nb   =  grid % n_bnd_cells
   call Field_Mod_Alias_Momentum(flow, u, v, w)
-  call Solver_Mod_Alias_System (sol, a, b)
 
   call Grid_Mod_Exchange_Real(grid, u % n)
   call Grid_Mod_Exchange_Real(grid, v % n)
@@ -91,10 +89,14 @@
     m_12_a = 0.0
     m_13_a = 0.0
     m_23_a = 0.0
-  
-    do j = a % row(c), a % row(c + 1) - 1
-      cj = a % col(j) 
-      if(cj .ne. c) then
+
+    do sj = 1, grid % cells_n_faces(c)  ! browse thrugh faces surrouind the cell
+      s = grid % cells_f(sj, c)         ! true face number
+      c1 = grid % faces_c(1, s)
+      c2 = grid % faces_c(2, s)
+      if(c2 .gt. 0) then
+        if(c1 .eq. c) cj = c2
+        if(c2 .eq. c) cj = c1
 
         ! Test velocities
         u_a = u_a + grid % vol(cj) * u % n(cj)
@@ -166,15 +168,15 @@
     m_23_f(c) = m_23_a / vol_e 
   end do
 
-  call Field_Mod_Grad_Component(flow, u_f, 1, u % x)  ! dU/dx
-  call Field_Mod_Grad_Component(flow, u_f, 2, u % y)  ! dU/dy
-  call Field_Mod_Grad_Component(flow, u_f, 3, u % z)  ! dU/dz
-  call Field_Mod_Grad_Component(flow, v_f, 1, v % x)  ! dV/dx
-  call Field_Mod_Grad_Component(flow, v_f, 2, v % y)  ! dV/dy
-  call Field_Mod_Grad_Component(flow, v_f, 3, v % z)  ! dV/dz
-  call Field_Mod_Grad_Component(flow, w_f, 1, w % x)  ! dW/dx
-  call Field_Mod_Grad_Component(flow, w_f, 2, w % y)  ! dW/dy
-  call Field_Mod_Grad_Component(flow, w_f, 3, w % z)  ! dW/dz
+  call Field_Mod_Grad_Component(flow, u_f(-nb:nc), 1, u % x)  ! dU/dx
+  call Field_Mod_Grad_Component(flow, u_f(-nb:nc), 2, u % y)  ! dU/dy
+  call Field_Mod_Grad_Component(flow, u_f(-nb:nc), 3, u % z)  ! dU/dz
+  call Field_Mod_Grad_Component(flow, v_f(-nb:nc), 1, v % x)  ! dV/dx
+  call Field_Mod_Grad_Component(flow, v_f(-nb:nc), 2, v % y)  ! dV/dy
+  call Field_Mod_Grad_Component(flow, v_f(-nb:nc), 3, v % z)  ! dV/dz
+  call Field_Mod_Grad_Component(flow, w_f(-nb:nc), 1, w % x)  ! dW/dx
+  call Field_Mod_Grad_Component(flow, w_f(-nb:nc), 2, w % y)  ! dW/dy
+  call Field_Mod_Grad_Component(flow, w_f(-nb:nc), 3, w % z)  ! dW/dz
 
   do c = 1, grid % n_cells
     l_g  = grid % vol(c)**ONE_THIRD

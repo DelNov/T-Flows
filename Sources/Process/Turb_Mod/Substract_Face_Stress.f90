@@ -24,9 +24,9 @@
   c1 = grid % faces_c(1,s)
   c2 = grid % faces_c(2,s)
 
-  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
-     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
-    if(turbulence_model_variant .ne. STABILIZED) then
+  if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+     turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
+    if(turb % model_variant .ne. STABILIZED) then
 
       vis_tur =     (grid % fw(s)  * turb % vis_t(c1)  &
               + (1.0-grid % fw(s)) * turb % vis_t(c2))

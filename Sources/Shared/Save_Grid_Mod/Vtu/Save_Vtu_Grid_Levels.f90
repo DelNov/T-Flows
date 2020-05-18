@@ -10,16 +10,6 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer            :: c, c1, c2, n, s, offset, level_n_faces, fu
   character(len=80)  :: extension, name_out
-!------------------------------[Local parameters]------------------------------!
-  integer,           parameter :: VTK_LINE     = 3
-  integer,           parameter :: VTK_TRIANGLE = 5  ! cell shapes in VTK format
-  integer,           parameter :: VTK_QUAD     = 9
-  character(len= 0), parameter :: IN_0 = ''         ! indentation levels 
-  character(len= 2), parameter :: IN_1 = '  '
-  character(len= 4), parameter :: IN_2 = '    '
-  character(len= 6), parameter :: IN_3 = '      '
-  character(len= 8), parameter :: IN_4 = '        '
-  character(len=10), parameter :: IN_5 = '          '
 !==============================================================================!
 
   !------------------------------------------------------!

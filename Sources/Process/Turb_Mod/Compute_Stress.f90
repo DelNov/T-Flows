@@ -31,7 +31,7 @@
   real, contiguous,  pointer :: flux(:)
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
-  integer                    :: s, c, c1, c2, exec_iter
+  integer                    :: s, c, c1, c2, exec_iter, nc, nb
   real                       :: f_ex, f_im
   real                       :: phis
   real                       :: a0, a12, a21
@@ -57,6 +57,8 @@
   ! Take aliases
   flow => turb % pnt_flow
   grid => flow % pnt_grid
+  nc   =  grid % n_cells
+  nb   =  grid % n_bnd_cells
   dt   =  flow % dt
   flux => flow % m_flux % n
   call Field_Mod_Alias_Momentum   (flow, u, v, w)
@@ -78,9 +80,9 @@
   end if
 
   ! Gradients
-  call Field_Mod_Grad_Component(flow, phi % n, 1, phi_x)
-  call Field_Mod_Grad_Component(flow, phi % n, 2, phi_y)
-  call Field_Mod_Grad_Component(flow, phi % n, 3, phi_z)
+  call Field_Mod_Grad_Component(flow, phi % n, 1, phi_x(-nb:nc))
+  call Field_Mod_Grad_Component(flow, phi % n, 2, phi_y(-nb:nc))
+  call Field_Mod_Grad_Component(flow, phi % n, 3, phi_z(-nb:nc))
 
   !---------------!
   !               !
@@ -120,8 +122,8 @@
 
     vis_eff = visc_f + vis_t_f
 
-    if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
-      if(turbulence_model_variant .ne. STABILIZED) then
+    if(turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
+      if(turb % model_variant .ne. STABILIZED) then
         vis_eff = 1.5 * visc_f + vis_t_f
       end if
     end if
@@ -189,8 +191,8 @@
     c_mu_d = 0.22
   end if
 
-  if(turbulence_model_variant .ne. STABILIZED) then
-    if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
+  if(turb % model_variant .ne. STABILIZED) then
+    if(turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
       do c = 1, grid % n_cells
         u1uj_phij(c) = flow % density(c) * c_mu_d / phi % sigma        &
                      * kin % n(c)                                      &
@@ -216,7 +218,7 @@
                         + ww % n(c) * phi_z(c))                        &
                      - flow % viscosity(c) * phi_z(c)
       end do
-    else if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+    else if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
       do c = 1, grid % n_cells
         u1uj_phij(c) = flow % density(c) * c_mu_d / phi % sigma            &
                      * turb % t_scale(c)                                   &
@@ -238,9 +240,12 @@
       end do
     end if
 
-    call Field_Mod_Grad_Component(flow, u1uj_phij, 1, u1uj_phij_x)
-    call Field_Mod_Grad_Component(flow, u2uj_phij, 2, u2uj_phij_y)
-    call Field_Mod_Grad_Component(flow, u3uj_phij, 3, u3uj_phij_z)
+    call Field_Mod_Grad_Component(flow, u1uj_phij(-nb:nc), 1,  &
+                                        u1uj_phij_x(-nb:nc))
+    call Field_Mod_Grad_Component(flow, u2uj_phij(-nb:nc), 2,  &
+                                        u2uj_phij_y(-nb:nc))
+    call Field_Mod_Grad_Component(flow, u3uj_phij(-nb:nc), 3,  &
+                                        u3uj_phij_z(-nb:nc))
 
     do c = 1, grid % n_cells
       b(c) = b(c) + (  u1uj_phij_x(c)  &
@@ -252,7 +257,7 @@
   !------------------------------------------------------------------!
   !   Here we clean up transport equation from the false diffusion   !
   !------------------------------------------------------------------!
-  if(turbulence_model_variant .ne. STABILIZED) then
+  if(turb % model_variant .ne. STABILIZED) then
     do s = 1, grid % n_faces
 
       c1 = grid % faces_c(1,s)
@@ -303,11 +308,11 @@
   !   Source terms and wall function    !
   !                                     !
   !-------------------------------------!
-  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+  if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
     call Field_Mod_Grad_Variable(flow, f22)
 
     call Turb_Mod_Src_Rsm_Manceau_Hanjalic(turb, sol, phi % name)
-  else if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
+  else if(turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
     call Turb_Mod_Src_Rsm_Hanjalic_Jakirlic(turb, sol, phi % name, n_time_step)
   end if
 

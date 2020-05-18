@@ -12,6 +12,8 @@
       Numerics_Mod_Time_Integration_Scheme_Code = LINEAR
     case('PARABOLIC')
       Numerics_Mod_Time_Integration_Scheme_Code = PARABOLIC
+    case('RUNGE_KUTTA_3')
+      Numerics_Mod_Time_Integration_Scheme_Code = RUNGE_KUTTA_3
 
     case default
       if(this_proc < 2) then

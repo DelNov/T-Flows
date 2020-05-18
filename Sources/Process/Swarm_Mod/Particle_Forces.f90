@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Swarm_Mod_Particle_Forces(swarm, k)
 !------------------------------------------------------------------------------!
-!                 Computes the forces exerted on the particle                  !
+!   Computes the forces exerted on the particle                                !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -37,6 +37,9 @@
   ! ...will be deducted from the total force.
 
   ! Characteristic density (needs to be discussed):
+  ! (You can read it from the control file:
+  ! call Control_Mod_Mass_Density(dens_const)
+  ! The way it is implemented now it could be different in every processor)
   dens_const = maxval(flow % density(:))
 
   ! Compute drag coefficient

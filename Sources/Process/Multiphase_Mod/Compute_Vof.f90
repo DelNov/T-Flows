@@ -18,15 +18,16 @@
   type(Var_Type),    pointer :: vof
   type(Face_Type),   pointer :: m_flux
   real, contiguous,  pointer :: vof_f(:)
-  real, contiguous,  pointer :: vof_i(:), vof_j(:), vof_k(:)
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2
-  integer                    :: donor, accept, corr_num, corr_num_max
+  integer                    :: donor, accept, corr_num
   integer                    :: i_sub, n_sub
   real                       :: fs
-  character(len=80)          :: solver
   real                       :: courant_max, epsloc
+  real,              pointer :: courant_max_param
+  integer,           pointer :: n_sub_param, corr_num_max
+  character(len=80)          :: solver
 !==============================================================================!
 
   call Cpu_Timer_Mod_Start('Compute_Multiphase (without solvers)')
@@ -37,9 +38,9 @@
   m_flux => flow % m_flux
   vof    => mult % vof
   vof_f  => mult % vof_f
-  vof_i  => vof % x
-  vof_j  => vof % y
-  vof_k  => vof % z
+  courant_max_param => mult % courant_max_param
+  n_sub_param       => mult % n_sub_param
+  corr_num_max      => mult % corr_num_max
 
   a => sol % a
   b => sol % b % val
@@ -48,12 +49,12 @@
 
   if (vof % adv_scheme .eq. CICSAM .or. &
       vof % adv_scheme .eq. STACS) then
-    ! Courant Number close to the interface:
+
+    ! Compute courant Number close to the interface:
     call Vof_Max_Courant_Number(mult, dt, c_d, 1, courant_max)
 
-    n_sub = min(max(ceiling(courant_max / 0.25),1),100)
+    n_sub = min(max(ceiling(courant_max / courant_max_param),1),n_sub_param)
 
-    corr_num_max = 2
   else
     ! Old volume fraction:
     vof % o(:) = vof % n(:)
@@ -64,10 +65,7 @@
     !   Matrix Coefficients   !
     !-------------------------!
 
-    call Multiphase_Mod_Vof_Coefficients(mult, a, b, dt, beta_f)   
-
-    ! Get solver
-    call Control_Mod_Solver_For_Multiphase(solver)
+    call Multiphase_Mod_Vof_Coefficients(mult, a, b, dt, beta_f)
 
     ! Solve System
     call Multiphase_Mod_Vof_Solve_System(mult, sol, b)
@@ -100,13 +98,13 @@
       ! Compute Gradient:
       call Field_Mod_Grad_Variable(flow, vof)
 
-      call Multiphase_Mod_Vof_Predict_Beta(vof,                  &
-                                           m_flux % n,           &
-                                           vof_i, vof_j, vof_k,  &
-                                           grid % dx,            &
-                                           grid % dy,            &
-                                           grid % dz,            &
-                                           beta_f,               &
+      call Multiphase_Mod_Vof_Predict_Beta(vof,                        &
+                                           m_flux % n,                 &
+                                           vof % x, vof % y, vof % z,  &
+                                           grid % dx,                  &
+                                           grid % dy,                  &
+                                           grid % dz,                  &
+                                           beta_f,                     &
                                            c_d)
 
       loop_corr:  do corr_num = 1, corr_num_max
@@ -142,6 +140,9 @@
 
           if (c2 < 0) then
             if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) then
+              vof % n(c2) = max(min(vof % n(c1),1.0),0.0)
+            end if
+            if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) then
               vof % n(c2) = max(min(vof % n(c1),1.0),0.0)
             end if
           end if
@@ -235,7 +236,7 @@
           vof_f(s) = vof % n(c1)
         end if
 
-      end if 
+      end if
     end do
 
   end if
@@ -245,14 +246,20 @@
   !-----------------------!
   call Multiphase_Mod_Update_Physical_Properties(mult)
 
+  call Field_Mod_Grad_Variable(flow, vof)
+
   !----------------------------------------!
   !   Surface Tension Force Contribution   !
   !----------------------------------------!
-  if (surface_tension > TINY ) then
-    call Multiphase_Mod_Vof_Surface_Tension_Contribution(mult)
+
+  ! If distance function is calculated
+  if (mult % d_func) then
+    call Multiphase_Mod_Compute_Distance_Function(mult, sol, flow % dt, n)
   end if
 
-  call Field_Mod_Grad_Variable(flow, vof)
+  if (mult % surface_tension > TINY ) then
+    call Multiphase_Mod_Vof_Surface_Tension_Contribution(mult)
+  end if
 
   call Cpu_Timer_Mod_Stop('Compute_Multiphase (without solvers)')
 

@@ -24,12 +24,17 @@
   nf = grid % n_faces
 
   call Var_Mod_Allocate_Solution(mult % vof, grid, 'VOF', '')
+
+  if (mult % d_func) then
+    call Var_Mod_Allocate_Solution(mult % dist_func, grid, 'D_FUNC', '')
+  end if
+
   allocate(mult % vof_f(nf));  mult % vof_f(1:nf) = 0.0
 
   allocate(mult % curv(-nb:nc));  mult % curv(-nb:nc) = 0.0
 
   ! Physical properties for all (two) phases
-  allocate(phase_dens(2))
-  allocate(phase_visc(2))
+  allocate(mult % phase_dens(2))
+  allocate(mult % phase_visc(2))
 
   end subroutine

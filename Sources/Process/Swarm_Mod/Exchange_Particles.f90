@@ -21,8 +21,8 @@
   !-----------------------------------------------!
   if(n_proc > 1) then
 
-    i_work(:) = 0
-    r_work(:) = 0.0
+    swarm % i_work(:) = 0
+    swarm % r_work(:) = 0.0
 
     do k = 1, swarm % n_particles
 
@@ -35,20 +35,19 @@
       !-----------------------------------------------------!
       if(part % proc .eq. this_proc) then
         i = (k-1) * N_I_VARS
-        i_work(i + 1) = part % proc  ! where it resides
-        i_work(i + 2) = part % buff  ! where it wants to go
-        i_work(i + 3) = grid % comm % cell_glo(part % cell)
+        swarm % i_work(i + 1) = part % proc  ! where it resides
+        swarm % i_work(i + 2) = part % buff  ! where it wants to go
+        swarm % i_work(i + 3) = grid % comm % cell_glo(part % cell)
 
         i = (k-1) * N_R_VARS
-        r_work(i +  1)  = part % x_n
-        r_work(i +  2)  = part % y_n
-        r_work(i +  3)  = part % z_n
-        r_work(i +  4)  = part % u
-        r_work(i +  5)  = part % v
-        r_work(i +  6)  = part % w
-        r_work(i +  7)  = part % d
-        r_work(i +  8)  = part % cfl
-
+        swarm % r_work(i +  1) = part % x_n
+        swarm % r_work(i +  2) = part % y_n
+        swarm % r_work(i +  3) = part % z_n
+        swarm % r_work(i +  4) = part % u
+        swarm % r_work(i +  5) = part % v
+        swarm % r_work(i +  6) = part % w
+        swarm % r_work(i +  7) = part % d
+        swarm % r_work(i +  8) = part % cfl
       end if
 
     end do    ! through particles
@@ -56,8 +55,10 @@
     !-----------------------!
     !   Exchange the data   !
     !-----------------------!
-    call Comm_Mod_Global_Sum_Int_Array (swarm % n_particles * N_I_VARS, i_work)
-    call Comm_Mod_Global_Sum_Real_Array(swarm % n_particles * N_R_VARS, r_work)
+    call Comm_Mod_Global_Sum_Int_Array (swarm % n_particles * N_I_VARS,  &
+                                        swarm % i_work)
+    call Comm_Mod_Global_Sum_Real_Array(swarm % n_particles * N_R_VARS,  &
+                                        swarm % r_work)
 
     !-----------------------------------------!
     !   Distribute global data on particles   !
@@ -68,9 +69,9 @@
       part => swarm % particle(k)
 
       i = (k-1) * N_I_VARS
-      part % proc = i_work(i + 1)
-      part % buff = i_work(i + 2)
-      part % cell = i_work(i + 3)  ! holds global number for the moment
+      part % proc = swarm % i_work(i + 1)
+      part % buff = swarm % i_work(i + 2)
+      part % cell = swarm % i_work(i + 3)  ! holds global number for the moment
 
       ! Particle was in this processor and wants to stay here
       if(part % proc .eq. this_proc .and. part % buff .eq. this_proc) then
@@ -111,21 +112,19 @@
       end if
 
       i = (k-1) * N_R_VARS
-      part % x_n     = r_work(i +  1)
-      part % y_n     = r_work(i +  2)
-      part % z_n     = r_work(i +  3)
-      part % u       = r_work(i +  4)
-      part % v       = r_work(i +  5)
-      part % w       = r_work(i +  6)
-      part % d       = r_work(i +  7)
-      part % cfl     = r_work(i +  8)
-
+      part % x_n     = swarm % r_work(i +  1)
+      part % y_n     = swarm % r_work(i +  2)
+      part % z_n     = swarm % r_work(i +  3)
+      part % u       = swarm % r_work(i +  4)
+      part % v       = swarm % r_work(i +  5)
+      part % w       = swarm % r_work(i +  6)
+      part % d       = swarm % r_work(i +  7)
+      part % cfl     = swarm % r_work(i +  8)
     end do
 
-    ! Seems that this section is not really needed in statistics (March,4th,2020)
     ! Refresh buffers for grid-base variables here
     ! (This is probably not needed, but it won't do harm)
-    call Grid_Mod_Exchange_Int(grid, swarm % n_states)
+    call Grid_Mod_Exchange_Int (grid, swarm % n_states)
     call Grid_Mod_Exchange_Real(grid, swarm % u_mean)
     call Grid_Mod_Exchange_Real(grid, swarm % v_mean)
     call Grid_Mod_Exchange_Real(grid, swarm % w_mean)
