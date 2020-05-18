@@ -86,4 +86,36 @@
   allocate(swarm % vw      (-nb:nc));  swarm % vw       = 0.
   allocate(swarm % n_states(-nb:nc));  swarm % n_states = 0
 
+  ! Allocate Brownnian diffusion force components 
+  allocate(swarm % f_fuka_x(-nb:nc));  swarm % f_fuka_x = 0.
+  allocate(swarm % f_fuka_y(-nb:nc));  swarm % f_fuka_y = 0.
+  allocate(swarm % f_fuka_z(-nb:nc));  swarm % f_fuka_z = 0.
+
+  ! Allocate variables for the modeled flow quantity "k" 
+  allocate(swarm % kin_mod  (-nb:nc));  swarm % kin_mod   = 0.
+
+  ! Allocate variables for the modeled flow quantity "Zeta" 
+  allocate(swarm % w_mod_x  (-nb:nc));  swarm % w_mod_x   = 0.
+  allocate(swarm % w_mod_y  (-nb:nc));  swarm % w_mod_y   = 0.
+  allocate(swarm % w_mod_z  (-nb:nc));  swarm % w_mod_z   = 0.
+
+  ! To be confined only for Fukagata SGS model 
+  ! LES Dynamic model parameters for Fukagata
+
+  !if(multiphase_model .eq. LAGRANGIAN_PARTICLES) then
+  !@  allocate(turb % c_dyn(-nb:nc));  turb % c_dyn = 0.
+
+    ! Other variables such as time scale, length scale and production
+    ! All the variables below are already allocated in LES Prandtl model!
+    !allocate(turb % t_scale (-nb:nc));  turb % t_scale = 0.
+    !allocate(turb % l_scale (-nb:nc));  turb % l_scale = 0.
+    !allocate(turb % vis_t   (-nb:nc));  turb % vis_t   = 0.
+    !allocate(turb % vis_w   (-nb:nc));  turb % vis_w   = 0.  ! wall visc
+    !allocate(turb % p_kin   (-nb:nc));  turb % p_kin   = 0.
+    !allocate(turb % y_plus  (-nb:nc));  turb % y_plus  = 0.
+
+  !end if
+
+
+
   end subroutine
