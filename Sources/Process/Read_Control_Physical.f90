@@ -8,11 +8,11 @@
   use Comm_Mod,       only: Comm_Mod_End, this_proc
   use Field_Mod,      only: Field_Type, buoyancy, heat_transfer, t_ref,  &
                             grav_x, grav_y, grav_z
-  use Swarm_Mod,      only: Swarm_Type
   use Bulk_Mod,       only: Bulk_Type
   use Turb_Mod,       NO_TURBULENCE => NONE
   use Multiphase_Mod, NO_MULTIPHASE => NONE
   use Control_Mod
+  use Swarm_Mod      
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -226,6 +226,7 @@
   call Control_Mod_Number_Of_Particles(swarm % n_particles, verbose = .true.)
   call Control_Mod_Swarm_Density      (swarm % density,     verbose = .true.)
   call Control_Mod_Swarm_Diameter     (swarm % diameter,    verbose = .true.)
+
   call Control_Mod_Swarm_Coefficient_Of_Restitution(swarm % rst,         &
                                                     verbose = .true.)
   call Control_Mod_Number_Of_Swarm_Sub_Steps       (swarm % n_sub_steps, &
@@ -234,12 +235,19 @@
   call Control_Mod_Read_Int_Item('STARTING_TIME_STEP_FOR_SWARM_STATISTICS',  &
                                  HUGE_INT, n_stat_p, .false.)
 
+  ! SGS models for particle 
+  call Control_Mod_Swarm_Subgrid_Scale_Model(name, verbose = .true.)
+  select case(name)
+  case('BROWNIAN_FUKAGATA')
+       swarm_subgrid_scale_model = BROWNIAN_FUKAGATA
+  end select
+
   if(n_times > n_stat_p) then  ! last line covers unsteady RANS models
     if(this_proc < 2) then
       print *, '# NOTE! Lagrangian particle tracking used; ' // &
                'swarm statistics engaged!' // &
                'and particle statistics begins at:', n_stat_p
     end if
-    swarm % swarm_statistics = .true.
+    swarm % statistics = .true.
   end if
   end subroutine
