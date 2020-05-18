@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(flow, turb) 
+  subroutine User_Mod_Save_Results(flow, turb, mult, swarm, ts) 
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
@@ -9,9 +9,7 @@
   use Const_Mod                      ! constants
   use Comm_Mod                       ! parallel stuff
   use Grid_Mod,  only: Grid_Type
-  use Field_Mod, only: Field_Type, heat_transfer, heat_flux, heat, &
-                       density, viscosity, capacity, conductivity, &
-                       heated_area 
+  use Field_Mod, only: Field_Type
   use Bulk_Mod,  only: Bulk_Type
   use Var_Mod,   only: Var_Type
   use File_Mod,  only: problem_name
@@ -19,8 +17,11 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
-  type(Turb_Type),  target :: turb
+  type(Field_Type),      target :: flow
+  type(Turb_Type),       target :: turb
+  type(Swarm_Type),      target :: swarm
+  type(Multiphase_Type), target :: mult
+  integer                       :: ts
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
   type(Grid_Type), pointer :: grid
@@ -35,7 +36,7 @@
   integer, allocatable     :: n_p(:), n_count(:)
   real                     :: t_wall, t_tau, d_wall, nu_mean, t_inf
   real                     :: ubulk, error, re, cf_dean, cf, pr, u_tau_p
-  real                     :: density_all, viscosity_all 
+  real                     :: visc_const, dens_const, capa_const, cond_const
   logical                  :: there
 !==============================================================================!
 
@@ -44,6 +45,10 @@
   bulk => flow % bulk
   call Field_Mod_Alias_Momentum(flow, u, v, w)
   call Field_Mod_Alias_Energy  (flow, t)
+  visc_const = maxval(flow % viscosity(:))
+  dens_const = maxval(flow % density(:))
+  capa_const = maxval(flow % capacity(:))
+  cond_const = maxval(flow % conductivity(:))
 
   ! Set the name for coordinate file
   call File_Mod_Set_Name(coord_name, extension='.1d')
@@ -67,14 +72,11 @@
       print *, '#--------------------------------------------------------------'
     end if
 
-!    ! Restore the name and return
-!    problem_name = store_name
     return
   end if
 
   do c = 1, grid % n_cells
-    density_all= density(c)
-    ubulk    = bulk % flux_x / (density_all*bulk % area_x)
+    ubulk    = bulk % flux_x / (dens_const*bulk % area_x)
     t_wall   = 0.0
     nu_mean  = 0.0
     n_points = 0
@@ -170,37 +172,33 @@
 
   ! Calculating friction velocity and friction temperature
     do c = 1, grid % n_cells
-      viscosity_all= viscosity(c)
-      u_tau_p = sqrt( (viscosity_all*sqrt(u_p(1)**2 +   &
-                                      v_p(1)**2 +   &
-                                      w_p(1)**2)    &
-                                      / wall_p(1))  &
-                                      / density_all)
+      u_tau_p = sqrt( (visc_const*sqrt(u_p(1)**2 +   &
+                                       v_p(1)**2 +   &
+                                       w_p(1)**2)    &
+                                       / wall_p(1))  &
+                                       / dens_const)
     end do
 
   if(u_tau_p .eq. 0.0) then
     if(this_proc < 2) then
       write(*,*) '# Friction velocity is zero in Save_Results.f90!'
     end if
-
-!    ! Restore the name and return
-!    problem_name = store_name
     return
   end if
 
-  call File_Mod_Set_Name(result_name, appendix='-res', extension='.dat')
+  call File_Mod_Set_Name(result_name, time_step = ts,              & 
+       appendix='-res', extension='.dat')
   call File_Mod_Open_File_For_Writing(result_name, fu1)
-  call File_Mod_Set_Name(result_name_plus, appendix='-res-plus', extension='.dat')
+  call File_Mod_Set_Name(result_name_plus, time_step = ts,         & 
+       appendix='-res-plus', extension='.dat')
   call File_Mod_Open_File_For_Writing(result_name_plus, fu2)
 
   open(fu1,file=result_name)
   open(fu2,file=result_name_plus)
 
-!  open(3, file = res_name)
-!  open(4, file = res_name_plus)
 
-    pr = viscosity_all * capacity / conductivity
-    re = density_all * ubulk * 2.0/viscosity_all
+    pr = visc_const * capa_const / cond_const
+    re = dens_const * ubulk * 2.0 / visc_const
     cf_dean = 0.073*(re)**(-0.25)
     cf      = u_tau_p**2/(0.5*ubulk**2)
     error   = abs(cf_dean - cf)/cf_dean * 100.0
@@ -208,9 +206,9 @@
     write(fu1,'(a1,(a12,e12.6))')  &
     '#', 'ubulk    = ', ubulk 
     write(fu1,'(a1,(a12,e12.6))')  &
-    '#', 're       = ', density_all * ubulk * 2.0/viscosity_all
+    '#', 're       = ', dens_const * ubulk * 2.0/visc_const
     write(fu1,'(a1,(a12,e12.6))')  &
-    '#', 'Re_tau   = ', density_all*u_tau_p/viscosity_all
+    '#', 'Re_tau   = ', dens_const*u_tau_p/visc_const
     write(fu1,'(a1,(a12,e12.6))')  &
     '#', 'cf       = ', 2.0*(u_tau_p/ubulk)**2
     write(fu1,'(a1,(a12,f12.6))')  &
@@ -222,9 +220,9 @@
     write(fu2,'(a1,(a12,e12.6))')  &
     '#', 'ubulk    = ', ubulk 
     write(fu2,'(a1,(a12,e12.6))')  &
-    '#', 're       = ', density_all * ubulk * 2.0/viscosity_all
+    '#', 're       = ', dens_const * ubulk * 2.0/visc_const
     write(fu2,'(a1,(a12,e12.6))')  &
-    '#', 'Re_tau   = ', density_all*u_tau_p/viscosity_all
+    '#', 'Re_tau   = ', dens_const*u_tau_p/visc_const
     write(fu2,'(a1,(a12,e12.6))')  &
     '#', 'cf       = ', 2.0*(u_tau_p/ubulk)**2
     write(fu2,'(a1,(a12,f12.6))')  &
@@ -255,7 +253,7 @@
     end do
 
   do i = 1, n_prob-1
-    wall_p(i) = density_all * wall_p(i)*u_tau_p/viscosity_all
+    wall_p(i) = dens_const * wall_p(i)*u_tau_p/visc_const
     u_p   (i) = u_p(i) / u_tau_p
     v_p   (i) = v_p(i) / u_tau_p
     w_p   (i) = w_p(i) / u_tau_p
@@ -268,7 +266,6 @@
 
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-       ! write(4,'(7es15.5e3)')  wall_p(i),                       & !  1
         write(fu2,'(7es15.5e3)')  wall_p(i),                     & !  1
                                 u_p(i),                          & !  2
                                 uu_p(i),                         & !  3
@@ -293,8 +290,5 @@
   deallocate(uw_p)
 
   if(this_proc < 2)  print *, '# Finished with User_Mod_Save_Results.f90.'
-
-!  ! Restore the name
-!  problem_name = store_name
 
   end subroutine
