@@ -1,35 +1,40 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Time_Step(flow, turb, swarm, n_stat_p, n, time)
+  subroutine User_Mod_End_Of_Time_Step(flow, turb, mult, swarm, n, time)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of time step.                           !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod,  only: Grid_Type
-  use Field_Mod, only: Field_Type,  &
-                       viscosity, density, conductivity, heat_transfer
+  use Field_Mod, only: Field_Type
   use Var_Mod,   only: Var_Type
   use Const_Mod, only: PI
   use Comm_Mod,  only: Comm_Mod_Global_Max_Real, this_proc
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
-  type(Turb_Type),  target :: turb
-  type(Swarm_Type), target :: swarm
-  integer                  :: n, n_stat_p     ! time step
-  real                     :: time            ! physical time
+  type(Field_Type),      target     :: flow
+  type(Turb_Type),       target     :: turb
+  type(Multiphase_Type), target     :: mult
+  type(Swarm_Type),      target     :: swarm
+  integer,               intent(in) :: n                   ! current time step
+  real,                  intent(in) :: time                ! physical time
 !----------------------------------[Locals]------------------------------------!
-  integer                        :: i, j, k
-  real                           :: L1, L2, L3             ! domain dimensions 
+  real                           :: l1, l2, l3             ! domain dimensions 
   real                           :: c1, c2, c3             ! random variables 
-!  integer, parameter             :: N_P     =    16        ! number of particles
   type(Var_Type),  pointer       :: u, v, w, t
   type(Grid_Type), pointer       :: grid
-  integer                        :: c, eddy, dir, npb = 0
+  type(Particle_Type), pointer   :: part
+  character(len=80)              :: result_name
+  integer                        :: c, eddy, dir, npb = 0, nn
+  integer                        :: ss, oo, n_b, n_bp, fu, n_bin1, n_bin2, temp
+  integer                        :: i, j, k, n_stat_p, r, s, ii, mark, n_test
+  integer, allocatable           :: bin_count(:)                                      
+  real, allocatable              :: rep(:), delta(:), bin(:)                                       
   real                           :: lo, xo(4), yo(4),                          &
-                                    rx, ry, rz,                                &
+                                    rx, ry, rz, Re_tau, ss0, ss1, ss00, ss11,  &
                                     zo, ro, xc, yc, zc, vc, wc, sig_x, sig_yz, &
-                                    rmin, rmax, sg, lx, ly, lz, vmax
+                                    rmin, rmax, sg, lx, ly, lz, vmax, max_rep, &
+                                    level
 !==============================================================================!
 
   ! Take aliases
@@ -39,6 +44,25 @@
   w    => flow % w
   t    => flow % t
 
+  ! reading starting time for swarm statistics from control file
+  call Control_Mod_Starting_Time_Step_For_Swarm_Statistics &
+       (n_stat_p, verbose=.true.)
+
+  ! Reynolds number should be passed from Save_Results and number of bins should
+  ! be defined in control file, also same for n_bin... (it's okey for now!) 
+  Re_tau = 142.0     ! operating shear Reynolds number (a little bit above what
+                     ! we have so we don't lose any particle in counting!) 
+  n_b    = 64        ! number of bins across half of the channel 
+  n_bin1  = 342237   ! time at which we should collect bins info t+=675
+  n_bin2  = 343729   ! time at which we should collect bins info t+=1125
+                     ! ..particle concentration should be equivalent to t+=1000).
+  n_test  = 350000   ! testing (for swarm statistics)
+ 
+  ! allocating some arrays for bins
+  allocate(rep(swarm % n_particles)); rep = 0.0
+  allocate(bin(n_b)); bin = 0.0     ! bin distance from wall
+  allocate(delta(n_b - 1)); delta = 0.0 ! bin thickness
+  allocate(bin_count(swarm % n_particles)); bin_count = 0
 
   !----------------------!
   !                      !
@@ -52,16 +76,14 @@
   c3 = 1.0
 
   ! domain size 
-  L1 = 6.28 !streamwise 
-  L2 = 3.14 !spanwise
-  L3 = 2.0  !wall-normal
-
-!  print *, 'End_Of_Time_Step; cnt_d = ', swarm % cnt_d
+  l1 = 6.28 !streamwise 
+  l2 = 3.14 !spanwise
+  l3 = 2.0  !wall-normal
 
   !-------------------!
   !   1st time step   !
   !-------------------!
-  if(n .eq. 340010) then     ! should be after the flow is developed
+  if(n .eq. 150001) then     ! should be after the flow is developed
 
     ! Initializing both deposition and departure counters
     swarm % cnt_d = 0
@@ -71,10 +93,11 @@
     ! Browsing through all introduced particles
     do k = 1, swarm % n_particles
 
-        ! Initalizing particle position
-        !swarm % particle(k) % x_n = 0.0 
-        !swarm % particle(k) % y_n = 0.0 
-        !swarm % particle(k) % z_n = 0.0 
+        ! Initalizing particle position (already initialized in
+        ! Swarm_Mod_Allocate)
+        swarm % particle(k) % x_n = 0.0 
+        swarm % particle(k) % y_n = 0.0 
+        swarm % particle(k) % z_n = 0.0 
 
         ! Generating random locations for particle
         call random_number(c1)
@@ -82,9 +105,9 @@
         call random_number(c3)
 
         ! Initalizing particle position
-        swarm % particle(k) % x_n = (L1 * c1) + swarm % particle(k) % x_n
-        swarm % particle(k) % y_n = (L2 * c2) + swarm % particle(k) % y_n
-        swarm % particle(k) % z_n = (L3 * c3) + swarm % particle(k) % z_n
+        swarm % particle(k) % x_n = (l1 * c1) + swarm % particle(k) % x_n
+        swarm % particle(k) % y_n = (l2 * c2) + swarm % particle(k) % y_n
+        swarm % particle(k) % z_n = (l3 * c3) + swarm % particle(k) % z_n
 
         ! you essentially moved them a lot (from 0, 0, 0)
         swarm % particle(k) % cell = 0
@@ -96,7 +119,7 @@
         swarm % particle(k) % y_o = swarm % particle(k) % y_n
         swarm % particle(k) % z_o = swarm % particle(k) % z_n
 
-        ! Searching for the closest cell and node to place the moved particle
+       ! ! Searching for the closest cell and node to place the moved particle
         call Swarm_Mod_Find_Nearest_Cell(swarm, k, npb)
         call Swarm_Mod_Find_Nearest_Node(swarm, k)
 
@@ -132,19 +155,98 @@
   !----------------------!
   !   2nd time step on   !
   !----------------------!
-  if(n .gt. 340010) then     ! should be started after the flow is fully developed
-    call Swarm_Mod_Advance_Particles(swarm, turb, n_stat_p, n)
+  if(n .gt. 150001) then     ! should be started after the flow is fully developed
+    call Swarm_Mod_Advance_Particles(swarm, turb, n, n_stat_p)
+    if(this_proc < 2) then
+      write(*,'(a,i7,a,i4,a,i4,a,i4)')                 &
+               " # particles: ", swarm % n_particles,  &
+               " trapped:   ",   swarm % cnt_d,        &
+               " escaped:   ",   swarm % cnt_e,        &
+               " reflected: ",   swarm % cnt_r
+    end if
   end if
 
-  if(this_proc < 2) then
-    write(*,'(a,i4,a,i4,a,i4,a,i4)')                 &
-             " # particles: ", swarm % n_particles,  &
-             " trapped:   ",   swarm % cnt_d,        &
-             " escaped:   ",   swarm % cnt_e,        &
-             " reflected: ",   swarm % cnt_r
-!    print *, 'particle statistics begins at: ', n_stat_p
-!    stop
-  end if
+!!<<<<<<<<<<<<<<<<<<<<<<<<<<< Binning Simulation latest 26th Feb 2020 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+!  ! Chebyshev polynomials to compute slice thickness 
+!  if(n .eq. 340001 .or.  n .eq. n_bin1   .or. & 
+!     n .eq. n_bin2 .or.  n .eq. 344975   .or. &  ! t+ = 1000, 1500
+!     n .eq. 346630 .or.  n .eq. 348290   .or. &  ! t+ = 2000, 2500
+!     n .eq. 349945 .or.  n .eq. 353260   .or. &  ! t+ = 3000, 4000
+!     n .eq. 360000 .or.  n .eq. 370000) then
+!!  nn =  n - 340000 - 1 ! since we started having particle distribution from...
+!                       ! ... n = 340001! 
+!!  if(mod(nn , 2500) .eq. 0 .or. n .eq. n_bin .and. n .le. 347500) then
+!    if(this_proc < 2) then
+!
+!      level = 0.0 
+!      temp  = 0 
+!      ! browse though the bins 
+!      do ss = 1, n_b 
+!
+!        ! calculate the thickness of this bin and the following one
+!        bin(ss) = 0.5 * Re_tau * (1.0 - cos(PI*(ss - 1)/(n_b - 1)))
+!        ss0 = bin(ss) 
+!        ss1 = (ss0 * 3.0E-5) / 0.004255 
+!        bin_count(ss) = 0
+!
+!        ! browse through the particles 
+!        !do oo = 1, swarm % n_particles
+!        !  part => swarm % particle(oo)
+!        !  if(part % z_n .le. ss1 .and. ss .lt. n_b) then
+!        !    bin_count(ss) = bin_count(ss) + 1
+!        !  end if 
+!        !  rep(oo) = part % re
+!        !end do
+!
+!        ! browse through the particles 
+!        do oo = 1, swarm % n_particles
+!          part => swarm % particle(oo)
+!          if(part % z_n .gt. level .and. part % z_n .le. ss1) then
+!            bin_count(ss) = bin_count(ss) + 1
+!          end if 
+!          rep(oo) = part % re
+!        end do
+!        level = ss1
+!
+!        max_rep =  maxval(rep) ! make SURE this is really the max Re_p!!
+!      end do
+!
+!      ! DEBUGGING
+!      !do i = 1, n_b
+!      !  temp = temp + bin_count(i)
+!      !end do 
+!      !print *, 'Number of particles inside is:', temp
+!      !stop 
+!
+!      ! calling the problem name to open a new file for binning results
+!      call File_Mod_Set_Name(result_name, time_step = n,              & 
+!           appendix='-swarm-concentration', extension='.dat')
+!      call File_Mod_Open_File_For_Writing(result_name, fu)
+!
+!      ! printing info in a separate file...
+!      open(fu,file=result_name)
+!      write(fu,'(a1,(a12,e12.6))')  &
+!      '#', 'Maximum Re_p    = ', max_rep
+!      write(fu,'(a1,(a12,e12.6))')  &
+!      '#', 'St+    = ', swarm % st 
+!      ! columns' headers
+!      write(fu,'(a1,2x,a50)') '#',   ' Bin index,'          //  &  !  1
+!                                     ' Bin_y+,'             //  &  !  2
+!                                     ' Number density (np)'        !  3 -  6
+!      ! printing values for bins and stored particles inside
+!      do ss = 1, n_b 
+!        write(fu,'(i7,es15.5e3,i7)') ss,                         & !  1
+!                                     bin(ss),                    & !  2
+!                                     bin_count(ss)                 !  3
+!      end do
+!      close(fu) 
+!    end if ! only one processor handles this
+!  end if  ! Binning analysis loop
+!
+!  !mark = maxval(bin_count)
+!  !print *, 'Number of particles inside is:', mark 
+!  !stop 
+!!>>>>>>>>>>>>>>>>>>>>>>>>>>> Binning Simulation >>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
   !------------------------!
   !                        !
