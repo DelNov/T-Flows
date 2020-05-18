@@ -39,10 +39,6 @@
   ! Characteristic density (needs to be discussed):
   dens_const = maxval(flow % density(:))
 
-  part % fb_x = 0.0
-  part % fb_y = (dens_const - part % density) * EARTH_G * part_vol
-  part % fb_y = 0.0
-
   ! Compute drag coefficient
   if (part % re .ge. 1000.0) then
     cd = 0.43
