@@ -4,11 +4,10 @@
 !   Module for Lagrangian particle tracking                                    !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Comm_Mod
   use Grid_Mod
-  use Var_Mod
   use Field_Mod
   use Turb_Mod
+!  use Control_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -34,6 +33,9 @@
     ! Particle's diameter
     real :: d
 
+    ! Particle relaxation time 
+    real :: tau
+
     ! The closest cell, node, boundary cell and face
     integer :: cell
     integer :: node
@@ -46,7 +48,8 @@
     real :: rel_w
     real :: rel_vel
 
-    ! Particle Reynolds number (computed from relative velocity)
+    ! Particle Reynolds number (computed from relative velocity and "flow-
+    ! viscosity")
     real :: re
 
     ! Particle Courant number
@@ -55,6 +58,12 @@
     ! Particle drag factor (from Re_p)
     real :: f    ! this is not to be confused with the drag coefficient
  
+    ! Particle terminal speed
+    real :: vel_t 
+
+    ! Particle distance between two successive sub-time-steps
+    real :: dsp 
+
     ! Forces exerted on the particle
     real :: fd_x, fd_y, fd_z  ! drag force
     real :: fb_x, fb_y, fb_z  ! buoyant force
@@ -69,6 +78,13 @@
     integer :: buff
 
   end type
+
+  ! Variable holding the subgrid scale (SGS)  model type 
+  integer :: swarm_subgrid_scale_model
+
+  ! Parameters describing turbulence model choice
+  ! (Prime numbers starting from 30169  as a continuation for turb_mod) 
+  integer, parameter :: BROWNIAN_FUKAGATA  = 30169
 
   !----------------!
   !   Swarm type   !
@@ -88,6 +104,9 @@
     ! (Mean) diameter for this swarm
     real :: diameter
 
+    ! Swarm mean relaxation time 
+    real :: tau
+
     ! Coefficient of restitution (1.0 - elastic, 0.0 - sticky)
     real :: rst
 
@@ -106,7 +125,7 @@
     integer :: cnt_r
  
     ! particle statistics
-    logical :: swarm_statistics
+    logical :: statistics
 
     ! Logical array if cell has particles
     logical, allocatable :: cell_has_particles(:)
@@ -115,6 +134,18 @@
     real,    allocatable :: u_mean(:), v_mean(:), w_mean(:)
     real,    allocatable :: uu(:), vv(:), ww(:), uv(:), uw(:), vw(:)
     integer, allocatable :: n_states(:)
+
+    ! Gradients of flow modeled  quantity "zeta" (for SGS of Hybrid_Les_Rans model)
+    real,    allocatable :: w_mod_x(:), w_mod_y(:), w_mod_z(:)
+
+    ! Modeled TKE for swarm over the whole grid
+    real,    allocatable :: kin_mod(:)
+
+    ! SGS Brownian diffusion force
+    real,    allocatable :: f_fuka_x(:), f_fuka_y(:), f_fuka_z(:)
+
+    ! counter (was initially added for sequential particle injection case)                                 
+    integer :: counter
 
   end type
 
@@ -136,7 +167,10 @@
   include 'Swarm_Mod/Exchange_Particles.f90'
   include 'Swarm_Mod/Find_Nearest_Cell.f90'
   include 'Swarm_Mod/Find_Nearest_Node.f90'
+  include 'Swarm_Mod/Grad_Modeled_Flow.f90'
   include 'Swarm_Mod/Move_Particle.f90'
   include 'Swarm_Mod/Particle_Forces.f90'
+  include 'Swarm_Mod/Particle_Time_Scale.f90'
+  include 'Swarm_Mod/Sgs_Fukagata.f90'
 
   end module
