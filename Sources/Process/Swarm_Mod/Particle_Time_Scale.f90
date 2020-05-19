@@ -10,22 +10,13 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: grid
   type(Field_Type),    pointer :: flow
-  type(Particle_Type), pointer :: part
-  logical,             pointer :: escaped
-  logical,             pointer :: deposited
-  integer                      :: k                         ! particle number
-  integer                      :: ss                        ! sub-step counter
-  integer                      :: ii, n_dtp, index0, index1                  
-  integer                      :: n_parts_in_buffers
-  real                         :: gravity                   ! gravity magnitude
-  real                         :: delta                     ! part_dia /2
-  real                         :: part_tss                  ! particle timestep size criterion
-  real                         :: flow_dt                   ! flow global time step
-  real                         :: visc_const                ! C/c viscosity 
-  real                         :: t_scale_max               ! maximum timescale for k-e-z-f model
-  real                         :: t_ratio1                  ! fluid time scale / particle_tscale_critireon 
-  real                         :: t_ratio2                  ! turb_timescale / particle_tscale_critireon
-  real                         :: t_ratio3                  ! turb_timescale / flow global time step
+  real                         :: part_tss      ! particle timestep size criterion
+  real                         :: flow_dt       ! flow global time step
+  real                         :: visc_const    ! C/c viscosity 
+  real                         :: t_scale_max   ! maximum timescale for k-e-z-f model
+  real                         :: t_ratio1      ! fluid time scale / particle_tscale_critireon 
+  real                         :: t_ratio2      ! turb_timescale / particle_tscale_critireon
+  real                         :: t_ratio3      ! turb_timescale / flow global time step
 !==============================================================================!
 
   ! Take aliases for the swarm
