@@ -1,7 +1,9 @@
 !==============================================================================!
   subroutine User_Mod_Interface_Exchange(inter, flow, n_dom)
 !------------------------------------------------------------------------------!
-!   Create interface between two grids.                                        !
+!   Exchanges information between two domains for conjugate heat transfer      !
+!   problems.  Clearly, it only makes sense to exchange temperatures if        !
+!   heat transfer flag is set to true.                                         !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -15,6 +17,9 @@
                         K  = 2,  &  ! ... conductivity as the second ...
                         WD = 3      ! ... and wall distance as the third
 !==============================================================================!
+
+  ! If not heat transfer, don't exchange temperatures
+  if(.not. heat_transfer) return
 
   !-------------------------------------------!
   !   Store the desired values to interface   !
