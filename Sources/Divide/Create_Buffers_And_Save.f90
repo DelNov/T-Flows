@@ -139,6 +139,9 @@
 
               if(grid % new_c(c2) .eq. 0) then
                 nbfc_sub = nbfc_sub + 1
+
+                ! Shouldn't this line read:
+                ! grid % new_c(c2) = nbfc_sub + nc_sub ?
                 grid % new_c(c2) = nbfc_sub
               end if
 
@@ -152,6 +155,9 @@
 
               if(grid % new_c(c1) .eq. 0) then
                 nbfc_sub = nbfc_sub + 1
+
+                ! Shouldn't this line read:
+                ! grid % new_c(c1) = nbfc_sub + nc_sub ?
                 grid % new_c(c1) = nbfc_sub
               end if
 
