@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Grid_Mod_Exchange_Real(grid, phi)
+  subroutine Grid_Mod_Exchange_Cells_Int(grid, phi)
 !------------------------------------------------------------------------------!
-!   Exchanges the values of a real array between the processors.               !
+!   Exchanges the values of an integer array between the processors.           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
-  real            :: phi(-grid % n_bnd_cells:grid % n_cells)
+  integer         :: phi(-grid % n_bnd_cells:grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c1, c2, sub
 !==============================================================================!
@@ -28,7 +28,7 @@
     if( grid % comm % buff_e_cell(sub)  >=   &
         grid % comm % buff_s_cell(sub) ) then
 
-      call Comm_Mod_Exchange_Real_Array(       &
+      call Comm_Mod_Exchange_Int_Array(        &
         phi(grid % comm % buff_s_cell(sub)),   &  ! array to be exchanged
           grid % comm % buff_e_cell(sub)       &  ! end minus start plus 1 ...
         - grid % comm % buff_s_cell(sub) + 1,  &  ! ... makes array's length

@@ -31,6 +31,6 @@
                         * flow % shear(c)
   end do
 
-  call Grid_Mod_Exchange_Real(grid, turb % vis_t_sgs)
+  call Grid_Mod_Exchange_Cells_Real(grid, turb % vis_t_sgs)
 
   end subroutine

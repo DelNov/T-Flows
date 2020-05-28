@@ -328,7 +328,7 @@
 
         ! Refresh buffers for a % sav before discretizing for pressure
         ! (Can this call be somewhere in Compute Pressure?)
-        call Grid_Mod_Exchange_Real(grid(d), sol(d) % a % sav)
+        call Grid_Mod_Exchange_Cells_Real(grid(d), sol(d) % a % sav)
 
         call Balance_Mass(flow(d))
         call Compute_Pressure(flow(d), mult(d), sol(d), flow(d) % dt, ini)

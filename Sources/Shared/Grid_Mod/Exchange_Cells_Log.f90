@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Grid_Mod_Exchange_Int(grid, phi)
+  subroutine Grid_Mod_Exchange_Cells_Log(grid, phi)
 !------------------------------------------------------------------------------!
-!   Exchanges the values of an integer array between the processors.           !
+!   Exchanges the values of a logical array between the processors.            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
-  integer         :: phi(-grid % n_bnd_cells:grid % n_cells)
+  logical         :: phi(-grid % n_bnd_cells:grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c1, c2, sub
 !==============================================================================!
@@ -28,7 +28,7 @@
     if( grid % comm % buff_e_cell(sub)  >=   &
         grid % comm % buff_s_cell(sub) ) then
 
-      call Comm_Mod_Exchange_Int_Array(        &
+      call Comm_Mod_Exchange_Log_Array(        &
         phi(grid % comm % buff_s_cell(sub)),   &  ! array to be exchanged
           grid % comm % buff_e_cell(sub)       &  ! end minus start plus 1 ...
         - grid % comm % buff_s_cell(sub) + 1,  &  ! ... makes array's length

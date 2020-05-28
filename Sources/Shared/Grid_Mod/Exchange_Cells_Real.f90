@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Grid_Mod_Exchange_Log(grid, phi)
+  subroutine Grid_Mod_Exchange_Cells_Real(grid, phi)
 !------------------------------------------------------------------------------!
-!   Exchanges the values of a logical array between the processors.            !
+!   Exchanges the values of a real array between the processors.               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
-  logical         :: phi(-grid % n_bnd_cells:grid % n_cells)
+  real            :: phi(-grid % n_bnd_cells:grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c1, c2, sub
 !==============================================================================!
@@ -28,7 +28,7 @@
     if( grid % comm % buff_e_cell(sub)  >=   &
         grid % comm % buff_s_cell(sub) ) then
 
-      call Comm_Mod_Exchange_Log_Array(        &
+      call Comm_Mod_Exchange_Real_Array(       &
         phi(grid % comm % buff_s_cell(sub)),   &  ! array to be exchanged
           grid % comm % buff_e_cell(sub)       &  ! end minus start plus 1 ...
         - grid % comm % buff_s_cell(sub) + 1,  &  ! ... makes array's length

@@ -105,6 +105,6 @@
   end if
 
   call Comm_Mod_Global_Max_Real(courant_max)
-  call Grid_Mod_Exchange_Real(grid, c_d)
+  call Grid_Mod_Exchange_Cells_Real(grid, c_d)
 
   end subroutine

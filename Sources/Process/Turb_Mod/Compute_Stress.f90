@@ -373,7 +373,7 @@
     end do
   end if
 
-  call Grid_Mod_Exchange_Real(grid, phi % n)
+  call Grid_Mod_Exchange_Cells_Real(grid, phi % n)
 
   call Cpu_Timer_Mod_Stop('Compute_Turbulence (without solvers)')
 

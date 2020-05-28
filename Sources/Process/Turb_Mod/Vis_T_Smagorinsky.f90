@@ -147,7 +147,7 @@
     end if    ! c2 < 0
   end do
 
-  call Grid_Mod_Exchange_Real(grid, turb % vis_t)
-  call Grid_Mod_Exchange_Real(grid, turb % vis_w)
+  call Grid_Mod_Exchange_Cells_Real(grid, turb % vis_t)
+  call Grid_Mod_Exchange_Cells_Real(grid, turb % vis_w)
 
   end subroutine

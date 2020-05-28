@@ -133,6 +133,6 @@
     end if      ! c2 < 0
   end do
 
-  call Grid_Mod_Exchange_Real(grid, kin % n)
+  call Grid_Mod_Exchange_Cells_Real(grid, kin % n)
 
   end subroutine

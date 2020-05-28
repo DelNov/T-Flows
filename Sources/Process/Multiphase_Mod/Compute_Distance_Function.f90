@@ -90,7 +90,7 @@
     end if
   end do
 
-  call Grid_Mod_Exchange_Real(grid, dist_func % n)
+  call Grid_Mod_Exchange_Cells_Real(grid, dist_func % n)
 
   call Field_Mod_Grad_Variable(flow, dist_func)
 
@@ -219,7 +219,7 @@
 
   end do  ! end Solver loop
 
-  call Grid_Mod_Exchange_Real(grid, dist_func % n)
+  call Grid_Mod_Exchange_Cells_Real(grid, dist_func % n)
 
   call Field_Mod_Grad_Variable(flow, dist_func)
 

@@ -19,16 +19,20 @@
   logical, optional :: correct_sign  ! in case of face fluxes, signs might have
                                      ! to be changed (check it one day)
 !-----------------------------------[Locals]-----------------------------------!
-  integer                       :: s, c, c1, c2, cg1, cg2, mc, max_cnt
+  integer                       :: s, c, c1, c2, cg1, cg2, mc, max_cnt, nb, nc
   integer, allocatable          :: cells_cg(:,:)   ! cells' cells
   integer, allocatable          :: cells_fc(:,:)   ! cells' faces
   character(len=:), allocatable :: cf_name
 !==============================================================================!
 
+  ! Take aliases
+  nb = grid % n_bnd_cells
+  nc = grid % n_cells
+
   cf_name = trim(var_name)
 
-  allocate(cells_cg (24, grid % n_cells));  cells_cg  = 0
-  allocate(cells_fc (24, grid % n_cells));  cells_fc  = 0
+  allocate(cells_cg(24, grid % n_cells));  cells_cg  = 0
+  allocate(cells_fc(24, grid % n_cells));  cells_fc  = 0
 
   !--------------------------------------------!
   !        Correct the signs of fluxes         !
@@ -98,7 +102,7 @@
     do c = 1, grid % n_cells
       ivalues(c) = cells_cg(mc,c)
     end do
-    call Grid_Mod_Exchange_Int(grid, ivalues)
+    call Grid_Mod_Exchange_Cells_Int(grid, ivalues(-nb:nc))
 
     ! Update buffer cells with neighbors
     do c = grid % n_cells - grid % comm % n_buff_cells + 1, grid % n_cells
