@@ -8,6 +8,18 @@
   include 'mpif.h'
 !==============================================================================!
 
+  !-----------------!
+  !                 !
+  !   Buffer type   !
+  !                 !
+  !-----------------!
+  type Buffer_Type
+    integer              :: n_items
+    integer, allocatable :: map  (:)  ! map to local node
+    integer, allocatable :: i_val(:)  ! integer values stored in buffers
+    real,    allocatable :: r_val(:)  ! real    values stored in buffers
+  end type
+
   !---------------!
   !               !
   !   Comm type   !
@@ -30,19 +42,24 @@
     integer, allocatable :: buff_face_c1(:),  & ! inside cell for a buffer face
                             buff_face_c2(:)     ! outside cell for a buffer face
 
-    ! Global cell numbers
+    ! Global cell and node numbers
     integer, allocatable :: cell_glo(:)
+    integer, allocatable :: node_glo(:)
 
     ! (kind=4) coud not be avoided here :-(
     integer(kind=4), allocatable :: cell_map(:)
     integer(kind=4), allocatable :: bnd_cell_map(:)
 
     ! Variables which follow are for backup saving to single file
-    ! (These should probably be inside the Comm_Type)
     integer :: nc_s   ! number of cells in subdomain
     integer :: nb_s   ! number of bundary cells in subdoima
     integer :: nc_t   ! total number of cells 
     integer :: nb_t   ! total number of bundary cells
+
+    ! Number of processors per node and processor i.d.s for each node
+    integer,           allocatable :: nodes_n_procs(:)
+    integer,           allocatable :: nodes_p(:,:)
+    type(Buffer_Type), allocatable :: nodes_buff(:)
 
   end type
 
