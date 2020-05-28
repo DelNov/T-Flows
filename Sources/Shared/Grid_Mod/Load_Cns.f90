@@ -61,6 +61,11 @@
   grid % bnd_cond % name(grid % n_bnd_cond + 2) = 'PERIODIC_Y'
   grid % bnd_cond % name(grid % n_bnd_cond + 3) = 'PERIODIC_Z'
 
+  !--------------------------!
+  !   Nodes global numbers   !
+  !--------------------------!
+  read(fu) (grid % comm % node_glo(n), n = 1, grid % n_nodes)
+
   !-----------!
   !   Cells   !  (including buffer cells)
   !-----------!

@@ -50,6 +50,15 @@
     write(fu) grid % bnd_cond % name(n)
   end do
 
+  !--------------------------!
+  !   Nodes global numbers   !
+  !--------------------------!
+  do n = 1, grid % n_nodes
+    if(grid % new_n(n) > 0) then
+      write(fu) grid % comm % node_glo(n)
+    end if
+  end do
+
   !-----------!
   !   Cells   !  (including buffer cells)
   !-----------!
