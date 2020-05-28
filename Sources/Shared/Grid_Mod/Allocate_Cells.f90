@@ -6,6 +6,8 @@
   type(Grid_Type) :: grid
   integer         :: nc        ! number of cells inside
   integer         :: nb        ! number of cells on the bounday
+!-----------------------------------[Locals]-----------------------------------!
+  integer :: c
 !==============================================================================!
 
   ! Store number of cells and boundary cells
@@ -40,6 +42,9 @@
 
   ! Allocate processor i.d.
   allocate(grid % comm % cell_proc(-nb:nc));  grid % comm % cell_proc(:) = 0
-  allocate(grid % comm % cell_glo (-nb:nc));  grid % comm % cell_glo (:) = 0
+  allocate(grid % comm % cell_glo (-nb:nc))
+  do c = -nb, nc
+    grid % comm % cell_glo(c) = c
+  end do
 
   end subroutine
