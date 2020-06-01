@@ -34,6 +34,7 @@
     integer :: n_bnd_cells  ! ... boundary cells
     integer :: n_per_faces  ! ... periodic faces (shadows)
     integer :: n_bnd_cond   ! ... boundary conditions
+    integer :: n_shadows    ! ... shadow faces
     integer :: n_levels     ! ... multigrid levels
 
     ! Periodic span
@@ -88,9 +89,10 @@
     ! Number of nodes at each face (determines face's shape really)
     integer, allocatable :: faces_n_nodes(:)
 
-    ! Faces' nodes and neigboring cells
+    ! Faces' nodes, neigboring cells and shadows
     integer, allocatable :: faces_n(:,:)
     integer, allocatable :: faces_c(:,:)
+    integer, allocatable :: faces_s(:)
 
     ! Periodic faces
     integer, allocatable :: per_faces(:)
@@ -149,7 +151,6 @@
   contains
 
   include 'Grid_Mod/Allocate_Cells.f90'
-  include 'Grid_Mod/Allocate_Comm.f90'
   include 'Grid_Mod/Allocate_Faces.f90'
   include 'Grid_Mod/Allocate_Levels.f90'
   include 'Grid_Mod/Allocate_New_Numbers.f90'
@@ -163,7 +164,6 @@
   include 'Grid_Mod/Check_Levels.f90'
   include 'Grid_Mod/Coarsen.f90'
   include 'Grid_Mod/Correction_Periodicity.f90'
-  include 'Grid_Mod/Create_Buffers.f90'
   include 'Grid_Mod/Create_Levels.f90'
   include 'Grid_Mod/Decompose.f90'
   include 'Grid_Mod/Estimate_Big_And_Small.f90'
@@ -171,10 +171,12 @@
   include 'Grid_Mod/Exchange_Cells_Log.f90'
   include 'Grid_Mod/Exchange_Cells_Real.f90'
   include 'Grid_Mod/Exchange_Nodes_Int.f90'
+  include 'Grid_Mod/Exchange_Nodes_Log.f90'
   include 'Grid_Mod/Exchange_Nodes_Real.f90'
   include 'Grid_Mod/Find_Cells_Faces.f90'
   include 'Grid_Mod/Find_Nodes_Cells.f90'
   include 'Grid_Mod/Find_Periodic_Faces.f90'
+  include 'Grid_Mod/Form_Cells_Comm.f90'
   include 'Grid_Mod/Form_Maps.f90'
   include 'Grid_Mod/Form_Nodes_Comm.f90'
   include 'Grid_Mod/Get_C1_And_C2_At_Level.f90'
