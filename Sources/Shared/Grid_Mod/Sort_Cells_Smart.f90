@@ -54,7 +54,7 @@
   !----------------------------------!
   !   Update cell numbers at faces   !
   !----------------------------------!
-  do s = 1, grid % n_faces
+  do s = 1, grid % n_faces + grid % n_shadows
     c1 = grid % faces_c(1, s)
     c2 = grid % faces_c(2, s)
     grid % faces_c(1, s) = new_c(c1)
