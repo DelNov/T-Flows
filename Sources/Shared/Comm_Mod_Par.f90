@@ -15,9 +15,10 @@
   !-----------------!
   type Buffer_Type
     integer              :: n_items
-    integer, allocatable :: map  (:)  ! map to local node
-    integer, allocatable :: i_val(:)  ! integer values stored in buffers
-    real,    allocatable :: r_val(:)  ! real    values stored in buffers
+    integer, allocatable :: map  (:)   ! map to local node / face
+    integer, allocatable :: i_buff(:)  ! integer values stored in buffers
+    logical, allocatable :: l_buff(:)  ! logical values stored in buffers
+    real,    allocatable :: r_buff(:)  ! real    values stored in buffers
   end type
 
   !---------------!
@@ -30,17 +31,8 @@
     ! Number of buffer cells
     integer :: n_buff_cells
 
-    ! For each buffer region: index of start (_s) and end (_e) buffer cell
-    ! (Follows nomenclature in "../Shared/Bnd_Cond_Mod.f90")
-    integer, allocatable :: buff_s_cell(:), buff_e_cell(:)
-
     ! Processor i.d. defined for each cell
     integer, allocatable :: cell_proc(:)
-
-    ! Buffer index
-    integer, allocatable :: buff_c1_from_c2(:)  ! out-in cell mapping
-    integer, allocatable :: buff_face_c1(:),  & ! inside cell for a buffer face
-                            buff_face_c2(:)     ! outside cell for a buffer face
 
     ! Global cell and node numbers
     integer, allocatable :: cell_glo(:)
@@ -59,7 +51,9 @@
     ! Number of processors per node and processor i.d.s for each node
     integer,           allocatable :: nodes_n_procs(:)
     integer,           allocatable :: nodes_p(:,:)
-    type(Buffer_Type), allocatable :: nodes_buff(:)
+    type(Buffer_Type), allocatable :: nodes_repl(:)
+    type(Buffer_Type), allocatable :: cells_send(:)
+    type(Buffer_Type), allocatable :: cells_recv(:)
 
   end type
 
@@ -101,6 +95,15 @@
   include 'Comm_Mod/Parallel/Read_Real.f90'
   include 'Comm_Mod/Parallel/Read_Real_Array.f90'
   include 'Comm_Mod/Parallel/Read_Text.f90'
+  include 'Comm_Mod/Parallel/Recv_Int_Array.f90'
+  include 'Comm_Mod/Parallel/Recv_Log_Array.f90'
+  include 'Comm_Mod/Parallel/Recv_Real_Array.f90'
+  include 'Comm_Mod/Parallel/Send_Int_Array.f90'
+  include 'Comm_Mod/Parallel/Send_Log_Array.f90'
+  include 'Comm_Mod/Parallel/Send_Real_Array.f90'
+  include 'Comm_Mod/Parallel/Sendrecv_Int_Arrays.f90'
+  include 'Comm_Mod/Parallel/Sendrecv_Log_Arrays.f90'
+  include 'Comm_Mod/Parallel/Sendrecv_Real_Arrays.f90'
   include 'Comm_Mod/Parallel/Start.f90'
   include 'Comm_Mod/Parallel/Wait.f90'
   include 'Comm_Mod/Parallel/Write_Int.f90'

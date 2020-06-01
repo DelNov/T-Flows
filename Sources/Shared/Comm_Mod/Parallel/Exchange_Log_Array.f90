@@ -2,6 +2,8 @@
   subroutine Comm_Mod_Exchange_Log_Array(phi, length, dest)
 !------------------------------------------------------------------------------!
 !   Exchanges the values of a logical array between the processors.            !
+!   (Check out the Sendrecv variant of this function - it is more flexible ... !
+!    ... because buffer in each subdomain don't have to have the same length)  !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

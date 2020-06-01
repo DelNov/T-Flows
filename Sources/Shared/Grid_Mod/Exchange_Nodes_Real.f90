@@ -13,21 +13,21 @@
 
   ! Fill the buffers with new values
   do sub = 1, n_proc
-    length = grid % comm % nodes_buff(sub) % n_items
+    length = grid % comm % nodes_repl(sub) % n_items
     do ln = 1, length
-      n = grid % comm % nodes_buff(sub) % map(ln)
-      grid % comm % nodes_buff(sub) % r_val(ln) = phi(n)
+      n = grid % comm % nodes_repl(sub) % map(ln)
+      grid % comm % nodes_repl(sub) % r_buff(ln) = phi(n)
     end do
   end do
 
   ! Exchange the values
   do sub = 1, n_proc
-    length = grid % comm % nodes_buff(sub) % n_items
+    length = grid % comm % nodes_repl(sub) % n_items
     if( length > 0 ) then
-      call Comm_Mod_Exchange_Real_Array(           &
-        grid % comm % nodes_buff(sub) % r_val(1),  &  ! array to be exchanged
-        length,                                    &  ! array's length
-        sub)                                          ! destination processor
+      call Comm_Mod_Exchange_Real_Array(            &
+        grid % comm % nodes_repl(sub) % r_buff(1),  &  ! array to be exchanged
+        length,                                     &  ! array's length
+        sub)                                           ! destination processor
     end if
   end do
 
