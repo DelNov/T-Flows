@@ -37,6 +37,7 @@
     !-----------!
     nc_sub = 0     ! number of cells in subdomain
     grid % new_c(1:grid % n_cells) = 0
+    grid % old_c(1:grid % n_cells) = 0
     grid % new_n(1:grid % n_nodes) = 0
 
     ! Renumber cells inside the subdomain and mark their nodes
@@ -44,6 +45,7 @@
       if(grid % comm % cell_proc(c) .eq. sub) then
         nc_sub = nc_sub + 1       ! increase the number of cells in sub.
         grid % new_c(c) = nc_sub  ! assign new (local) cell number 
+        grid % old_c(nc_sub) = c
 
         do ln = 1, grid % cells_n_nodes(c)
           grid % new_n(grid % cells_n(ln,c)) = -1
@@ -90,6 +92,7 @@
              grid % new_c(c) .eq. -1) then
             nc_sub = nc_sub + 1       ! increase the number of cells in sub.
             grid % new_c(c) = nc_sub  ! assign new (local) cell number 
+            grid % old_c(nc_sub) = c
           end if
         end do
 
@@ -109,9 +112,10 @@
     end do
     do c = -grid % n_bnd_cells, -1
       grid % new_c(c) = 0
+      grid % old_c(c) = 0
     end do
 
-    ! Faces step 1/2: inside the domain
+    ! Faces step 1: inside the domain
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
@@ -124,7 +128,7 @@
       end if
     end do
 
-    ! Faces step 2/2: on the boundaries
+    ! Faces step 2: on the boundaries of domain sub
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
@@ -135,9 +139,31 @@
 
           nbc_sub = nbc_sub + 1        ! increase n. of bnd. cells
           grid % new_c(c2) = -nbc_sub  ! new loc. number of bnd. cell
+          grid % old_c(-nbc_sub) = c2
         end if
       end if
     end do
+
+    ! Faces step 2: on the boundaries of the buffers
+    do subo = 1, maxval(grid % comm % cell_proc(:))
+      if(subo .ne. sub) then
+
+        do s = 1, grid % n_faces
+          c1 = grid % faces_c(1,s)
+          c2 = grid % faces_c(2,s)
+          if(c2 < 0) then
+            if( grid % comm % cell_proc(c1) .eq. subo .and.  &
+                grid % new_c(c1) .ne. 0)  then
+              nbc_sub = nbc_sub + 1        ! increase n. of bnd. cells
+              grid % new_c(c2) = -nbc_sub  ! new loc. number of bnd. cell
+              grid % old_c(-nbc_sub) = c2
+            end if
+          end if
+        end do
+
+      end if
+    end do
+
 
     !----------------------!
     !   Faces in buffers   !

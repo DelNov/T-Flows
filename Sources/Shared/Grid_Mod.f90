@@ -130,6 +130,9 @@
     integer, allocatable :: new_c(:)
     integer, allocatable :: new_f(:)
 
+    ! Old numbers for cells
+    integer, allocatable :: old_c(:)
+
     ! Number of cells surrounding each node
     integer, allocatable :: nodes_n_cells(:)
 

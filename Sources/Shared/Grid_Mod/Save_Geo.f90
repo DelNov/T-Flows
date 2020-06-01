@@ -38,77 +38,30 @@
   !   Cell center coordinates   !
   !-----------------------------!
   do var = 1, 3
-    do c = 1, grid % n_cells
-      if(grid % comm % cell_proc(c) .eq. sub) then
-        if(var .eq. 1) write(fu) grid % xc(c)
-        if(var .eq. 2) write(fu) grid % yc(c)
-        if(var .eq. 3) write(fu) grid % zc(c)
-      end if
-    end do
-    do subo = 1, maxval(grid % comm % cell_proc(:))
-      if(subo .ne. sub) then
-        do c = 1, grid % n_cells
-          if(grid % comm % cell_proc(c) .eq. subo .and. grid % new_c(c) > 0) then
-            if(var .eq. 1) write(fu) grid % xc(c)
-            if(var .eq. 2) write(fu) grid % yc(c)
-            if(var .eq. 3) write(fu) grid % zc(c)
-          end if
-        end do
+    do c = -grid % n_bnd_cells, grid % n_cells
+      if(grid % old_c(c) .ne. 0 .or. c .eq. 0) then
+        if(var .eq. 1) write(fu) grid % xc(grid % old_c(c))
+        if(var .eq. 2) write(fu) grid % yc(grid % old_c(c))
+        if(var .eq. 3) write(fu) grid % zc(grid % old_c(c))
       end if
     end do
   end do
 
-  !---------------------------!
-  !   Boundary cell centers   !
-  !---------------------------!
-  do var = 1, 3
-    do c = -1, -grid % n_bnd_cells, -1
-      if(grid % new_c(c) .ne. 0) then
-        if(var .eq. 1) write(fu) grid % xc(c)
-        if(var .eq. 2) write(fu) grid % yc(c)
-        if(var .eq. 3) write(fu) grid % zc(c)
-      end if
-    end do 
+  !-------------------!
+  !   Wall distance   !
+  !-------------------!
+  do c = -grid % n_bnd_cells, grid % n_cells
+    if(grid % old_c(c) .ne. 0 .or. c .eq. 0) then
+      write(fu) grid % wall_dist(grid % old_c(c))
+    end if
   end do
 
   !------------------!
   !   Cell volumes   !
   !------------------!
   do c = 1, grid % n_cells
-    if(grid % comm % cell_proc(c) .eq. sub) then
-      write(fu) grid % vol(c)
-    end if
-  end do
-  do subo = 1, maxval(grid % comm % cell_proc(:))
-    if(subo .ne. sub) then
-      do c = 1, grid % n_cells
-        if(grid % comm % cell_proc(c) .eq. subo .and. grid % new_c(c) > 0) then
-          write(fu) grid % vol(c)
-        end if
-      end do
-    end if
-  end do
-
-  !-------------------!
-  !   Wall distance   !
-  !-------------------!
-  do c = 1, grid % n_cells
-    if(grid % comm % cell_proc(c) .eq. sub) then
-      write(fu) grid % wall_dist(c)
-    end if
-  end do
-  do subo = 1, maxval(grid % comm % cell_proc(:))
-    if(subo .ne. sub) then
-      do c = 1, grid % n_cells
-        if(grid % comm % cell_proc(c) .eq. subo .and. grid % new_c(c) > 0) then
-          write(fu) grid % wall_dist(c)
-        end if
-      end do
-    end if
-  end do
-  do c = -1, -grid % n_bnd_cells, -1
-    if(grid % comm % cell_proc(c) .eq. sub) then
-      write(fu) grid % wall_dist(c)
+    if(grid % old_c(c) .ne. 0) then
+      write(fu) grid % vol(grid % old_c(c))
     end if
   end do
 

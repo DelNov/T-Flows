@@ -64,69 +64,31 @@
 
   ! Number of nodes for each cell
   do c = -grid % n_bnd_cells, grid % n_cells
-    if(grid % comm % cell_proc(c) .eq. sub .or. c .eq. 0) then
-      write(fu) grid % cells_n_nodes(c)
-    end if
-  end do
-  do subo = 1, maxval(grid % comm % cell_proc(:))
-    if(subo .ne. sub) then
-      do c = 1, grid % n_cells
-        if(grid % comm % cell_proc(c) .eq. subo .and. grid % new_c(c) > 0) then
-          write(fu) grid % cells_n_nodes(c)
-        end if
-      end do
+    if(grid % old_c(c) .ne. 0 .or. c .eq. 0) then
+      write(fu) grid % cells_n_nodes(grid % old_c(c))
     end if
   end do
 
   ! Cells' nodes
   do c = -grid % n_bnd_cells, grid % n_cells
-    if(grid % comm % cell_proc(c) .eq. sub .or. c .eq. 0) then
-      do n = 1, grid % cells_n_nodes(c)
-        write(fu) grid % new_n(grid % cells_n(n,c))
-      end do
-    end if
-  end do
-  do subo = 1, maxval(grid % comm % cell_proc(:))
-    if(subo .ne. sub) then
-      do c = 1, grid % n_cells
-        if(grid % comm % cell_proc(c) .eq. subo .and. grid % new_c(c) > 0) then
-          do n = 1, grid % cells_n_nodes(c)
-            write(fu) grid % new_n(grid % cells_n(n,c))
-          end do
-        end if
+    if(grid % old_c(c) .ne. 0 .or. c .eq. 0) then
+      do n = 1, grid % cells_n_nodes(grid % old_c(c))
+        write(fu) grid % new_n(grid % cells_n(n, grid % old_c(c)))
       end do
     end if
   end do
 
   ! Cells' processor ids
   do c = -grid % n_bnd_cells, grid % n_cells
-    if(grid % comm % cell_proc(c) .eq. sub .or. c .eq. 0) then
-      write(fu) grid % comm % cell_proc(c)
-    end if
-  end do
-  do subo = 1, maxval(grid % comm % cell_proc(:))
-    if(subo .ne. sub) then
-      do c = 1, grid % n_cells
-        if(grid % comm % cell_proc(c) .eq. subo .and. grid % new_c(c) > 0) then
-          write(fu) grid % comm % cell_proc(c)
-        end if
-      end do
+    if(grid % old_c(c) .ne. 0 .or. c .eq. 0) then
+      write(fu) grid % comm % cell_proc(grid % old_c(c))
     end if
   end do
 
   ! Cells' global indices
   do c = -grid % n_bnd_cells, grid % n_cells
-    if(grid % comm % cell_proc(c) .eq. sub .or. c .eq. 0) then
-      write(fu) grid % comm % cell_glo(c)
-    end if
-  end do
-  do subo = 1, maxval(grid % comm % cell_proc(:))
-    if(subo .ne. sub) then
-      do c = 1, grid % n_cells
-        if(grid % comm % cell_proc(c) .eq. subo .and. grid % new_c(c) > 0) then
-          write(fu) grid % comm % cell_glo(c)
-        end if
-      end do
+    if(grid % old_c(c) .ne. 0 .or. c .eq. 0) then
+      write(fu) grid % comm % cell_glo(grid % old_c(c))
     end if
   end do
 
@@ -182,8 +144,8 @@
 
   ! Physical boundary cells
   do c = -grid % n_bnd_cells, -1
-    if(grid % comm % cell_proc(c) .eq. sub) then
-      write(fu) grid % bnd_cond % color(c)
+    if(grid % old_c(c) .ne. 0) then
+      write(fu) grid % bnd_cond % color(grid % old_c(c))
     end if
   end do
 

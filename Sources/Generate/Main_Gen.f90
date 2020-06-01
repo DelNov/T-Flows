@@ -22,7 +22,7 @@
   type(Grid_Type)    :: grid      ! grid which will be generated
   type(Smooths_Type) :: smooths   ! smoothing regions
   type(Refines_Type) :: refines   ! refinement regions and levels
-  integer            :: c, s, n, lev, SC
+  integer            :: c, s, n, lev
 !==============================================================================!
 
   ! Open with a logo
@@ -52,6 +52,7 @@
   end do
   do c = -grid % n_bnd_cells, grid % n_cells
     grid % new_c(c) = c
+    grid % old_c(c) = c
   end do
   do s = 1, grid % n_faces + grid % n_shadows
     grid % new_f(s) = s
