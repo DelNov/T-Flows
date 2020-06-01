@@ -7,8 +7,9 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: b, c, c2, ln, n, s, sub  ! counters
-  integer :: max_n_cells              ! max number of cells at node
+  integer :: c, ln, n, run   ! counters
+  integer :: max_n_cells     ! max number of cells surrounding a node
+
 ! Just for checking, erase this later
 ! integer :: lc
 ! real    :: xn, xc, yn, yc, zn, zc, max_del, min_del, del
@@ -21,112 +22,44 @@
 
   !--------------------------------------------------------!
   !   Find maximum number of cells surrounding each node   !
-  !     (use only inside cells at this point in time)      !
+  !   (That includes sells inside and on the boundaries)   !
   !--------------------------------------------------------!
 
-  ! Inside cells
-  do c = 1, grid % n_cells - grid % comm % n_buff_cells
-    do ln = 1, grid % cells_n_nodes(c)  ! local node number
-      n = grid % cells_n(ln, c)         ! global node number
+  do run = 1, 2
+    grid % nodes_n_cells(:) = 0  ! re-initialize the cell count
 
-      ! Increase number of cells surrounding the this node by one
-      grid % nodes_n_cells(n) = grid % nodes_n_cells(n) + 1
-    end do
-  end do
+    do c = -grid % n_bnd_cells, grid % n_cells
+      do ln = 1, grid % cells_n_nodes(c)  ! local node number
+        n = grid % cells_n(ln, c)         ! global node number
 
-! ! Boundary cells
-! do s = 1, grid % n_bnd_cells
-!   c2 = grid % faces_c(2, s)
-!   if(c2 >= 0) then
-!     print *, 'PANIC!  Something is very wrong in Find_Nodes_Cells'
-!   end if
-!   do ln = 1, grid % faces_n_nodes(s)  ! local face number
-!     n = grid % faces_n(ln, s)         ! global node number
-!
-!     ! Increase number of cells surrounding the this node by one
-!     grid % nodes_n_cells(n) = grid % nodes_n_cells(n) + 1
-!   end do
-! end do
-
-  max_n_cells = maxval(grid % nodes_n_cells)
-
-  ! Allocate memory for cells surrounding each node
-  n = grid % n_nodes
-  allocate(grid % nodes_c(1:max_n_cells, 1:n))
-
-  !----------------------------------------------------------!
-  !   Now you can really store the cells surrounding nodes   !
-  !----------------------------------------------------------!
-  grid % nodes_n_cells(:) = 0  ! re-initialize the cell count
-
-  ! Inside cells
-  do c = 1, grid % n_cells - grid % comm % n_buff_cells
-    do ln = 1, grid % cells_n_nodes(c)  ! local node number
-      n = grid % cells_n(ln, c)         ! global node number
-
-        ! Increase number of cells surrounding the this node by one ...
+        ! Increase number of cells surrounding the this node by one
         grid % nodes_n_cells(n) = grid % nodes_n_cells(n) + 1
 
-        ! ... and store the current cell
-        grid % nodes_c(grid % nodes_n_cells(n), n) = c
-
+        ! Store the current cell in the second run
+        if(run .eq. 2) then
+          grid % nodes_c(grid % nodes_n_cells(n), n) = c
+        end if
+      end do
     end do
-  end do
 
-  WRITE(100+this_proc, *) 'grid % nodes_n_cells(n) = ', grid % n_nodes
-  do n = 1, grid % n_nodes
-    WRITE(100+this_proc, '(I5,99I5)') grid % nodes_n_cells(n), grid % nodes_c(1:grid % nodes_n_cells(n), n)
-  end do
-
-  WRITE(200+this_proc, *) 'grid % nodes_n_cells(n) = ', grid % n_nodes
-  do n = 1, grid % n_nodes
-    if(grid % nodes_n_cells(n) > 0) then
-      WRITE(200+this_proc, '(A,I5,A,99I5)')            &
-        ' n=', n, ' g=', grid % comm % node_glo(n),    &
-        grid % nodes_n_cells(n),                       &
-        grid % nodes_c(1:grid % nodes_n_cells(n), n)
+    ! Allocate memory for cells surrounding each node
+    if(run .eq. 1) then
+      max_n_cells = maxval(grid % nodes_n_cells)
+      allocate(grid % nodes_c(1:max_n_cells, 1:grid % n_nodes))
     end if
+
   end do
 
-!#  call Grid_Mod_Exchange_Nodes_Int(grid, grid % nodes_n_cells)
-!#
-!#  ! Add values from buffer back to nodes
-!#  do sub = 1, n_proc
-!#    do ln = 1, grid % comm % nodes_buff(sub) % n_items
-!#      n = grid % comm % nodes_buff(sub) % map(ln)
-!#      grid % nodes_n_cells(n) = grid % nodes_n_cells(n)  &
-!#                              + grid % comm % nodes_buff(sub) % i_val(ln)
-!#    end do
-!#  end do
-
-  WRITE(300+this_proc, *) 'grid % nodes_n_cells(n) = ', grid % n_nodes
-  do n = 1, grid % n_nodes
-    if(grid % nodes_n_cells(n) > 0) then
-      WRITE(300+this_proc, '(A,I5,A,99I5)')            &
-        ' n=', n, ' g=', grid % comm % node_glo(n),    &
-        grid % nodes_n_cells(n),                       &
-        grid % nodes_c(1:grid % nodes_n_cells(n), n)
-    end if
-  end do
-
-! ! Boundary cells
-! do s = 1, grid % n_bnd_cells
-!   c2 = grid % faces_c(2,s)
-!   do ln = 1, grid % faces_n_nodes(s)  ! local face number
-!     n = grid % faces_n(ln, s)         ! global node number
-!
-!     ! Increase number of cells surrounding the this node by one ...
-!     grid % nodes_n_cells(n) = grid % nodes_n_cells(n) + 1
-!
-!     ! ... and store the current cell
-!     grid % nodes_c(grid % nodes_n_cells(n), n) = c2
-!
-!     ! Also store boundary face for boundary cell
-!     grid % cells_bnd_face(c2) = s
+! ! Check #1, save those nodes' cells
+! do c = 1, grid % n_cells - grid % comm % n_buff_cells
+!   do ln = 1, grid % cells_n_nodes(c)  ! local node number
+!     n = grid % cells_n(ln, c)         ! global node number
+!     write(500+this_proc, '(36i6)') grid % nodes_n_cells(n)
+!     write(600+this_proc, '(36i6)') grid % nodes_c(1:max_n_cells, n)
 !   end do
 ! end do
 
-! ! Just for checking, erase this later
+! ! Check #2, erase this later
 ! max_del = -HUGE
 ! min_del = +HUGE
 !
