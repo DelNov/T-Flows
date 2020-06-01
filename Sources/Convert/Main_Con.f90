@@ -82,6 +82,7 @@
   end do
   do c = -grid % n_bnd_cells, grid % n_cells
     grid % new_c(c) = c
+    grid % old_c(c) = c
   end do
   do s = 1, grid % n_faces + grid % n_shadows
     grid % new_f(s) = s
