@@ -128,7 +128,7 @@ SRC_FUN = Swap_Int.f90			\
 
 # Local functions are added one by one ...
 SRC_FUN += Allocate_Additional.f90	\
-           Create_Buffers_And_Save.f90	\
+           Save_Subdomains.f90		\
            Logo_Div.f90			\
            Main_Div.f90
 
