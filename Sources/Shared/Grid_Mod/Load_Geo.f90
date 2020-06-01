@@ -39,19 +39,19 @@
   read(fu) (grid % wall_dist(c), c = 1, grid % n_cells)
   read(fu) (grid % wall_dist(c), c =-1,-grid % n_bnd_cells,-1)
 
-  read(fu) (grid % sx(s), s = 1, grid % n_faces)
-  read(fu) (grid % sy(s), s = 1, grid % n_faces)
-  read(fu) (grid % sz(s), s = 1, grid % n_faces)
+  read(fu) (grid % sx(s), s = 1, grid % n_faces + grid % n_shadows)
+  read(fu) (grid % sy(s), s = 1, grid % n_faces + grid % n_shadows)
+  read(fu) (grid % sz(s), s = 1, grid % n_faces + grid % n_shadows)
 
-  read(fu) (grid % dx(s), s = 1, grid % n_faces)
-  read(fu) (grid % dy(s), s = 1, grid % n_faces)
-  read(fu) (grid % dz(s), s = 1, grid % n_faces)
+  read(fu) (grid % dx(s), s = 1, grid % n_faces + grid % n_shadows)
+  read(fu) (grid % dy(s), s = 1, grid % n_faces + grid % n_shadows)
+  read(fu) (grid % dz(s), s = 1, grid % n_faces + grid % n_shadows)
 
-  read(fu) (grid % f(s), s = 1, grid % n_faces)
+  read(fu) (grid % f(s), s = 1, grid % n_faces + grid % n_shadows)
 
-  read(fu) (grid % xf(s), s = 1, grid % n_faces)
-  read(fu) (grid % yf(s), s = 1, grid % n_faces)
-  read(fu) (grid % zf(s), s = 1, grid % n_faces)
+  read(fu) (grid % xf(s), s = 1, grid % n_faces + grid % n_shadows)
+  read(fu) (grid % yf(s), s = 1, grid % n_faces + grid % n_shadows)
+  read(fu) (grid % zf(s), s = 1, grid % n_faces + grid % n_shadows)
 
   read(fu) grid % per_x
   read(fu) grid % per_y
