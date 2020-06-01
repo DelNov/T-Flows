@@ -14,7 +14,6 @@
   integer, allocatable :: nodes_cons(:)
   logical, allocatable :: active(:)     ! active nodes
   real,    allocatable :: xn_buff(:), yn_buff(:), zn_buff(:)
-  integer, allocatable :: node(:)       ! storage for cell number
 !==============================================================================!
 
   !------------------------------------------------------------------------!
@@ -86,7 +85,6 @@
       call Sort_Mod_Unique_Int(grid % comm % nodes_p(1:max_n_procs+1, n), nu)
       nu = nu - 1  ! remove the last HUGE_INT
       grid % comm % nodes_n_procs(n) = nu
-      WRITE(400+this_proc, '(99I5)') n, nu, grid % comm % nodes_p(1:nu, n)
     end if
   end do
 
@@ -104,37 +102,33 @@
     end if
   end do
 
-  do sub = 1, n_proc
-    WRITE(500+this_proc, '(A,99I5)') 'Connections with sub: ', sub, nodes_cons(sub)
-  end do
-
-  allocate(grid % comm % nodes_buff(n_proc))
+  allocate(grid % comm % nodes_repl(n_proc))
 
   allocate(xn_buff(maxval(nodes_cons)));  xn_buff(:) = 0.0
   allocate(yn_buff(maxval(nodes_cons)));  yn_buff(:) = 0.0
   allocate(zn_buff(maxval(nodes_cons)));  zn_buff(:) = 0.0
-  allocate(node   (maxval(nodes_cons)));  node   (:) = 0
 
   do sub = 1, n_proc
     n = nodes_cons(sub)
-    grid % comm % nodes_buff(sub) % n_items = n
+    grid % comm % nodes_repl(sub) % n_items = n
     if(n > 0) then
-      allocate(grid % comm % nodes_buff(sub) % map(n));
-      allocate(grid % comm % nodes_buff(sub) % i_val(n));
-      allocate(grid % comm % nodes_buff(sub) % r_val(n));
+      allocate(grid % comm % nodes_repl(sub) % map(n));
+      allocate(grid % comm % nodes_repl(sub) % i_buff(n));
+      allocate(grid % comm % nodes_repl(sub) % l_buff(n));
+      allocate(grid % comm % nodes_repl(sub) % r_buff(n));
     end if
   end do
 
   do sub = 1, n_proc
     cnt = 0
-    if(grid % comm % nodes_buff(sub) % n_items > 0) then
+    if(grid % comm % nodes_repl(sub) % n_items > 0) then
       do n = 1, grid % n_nodes
         if( any(grid % comm % nodes_p(:,n) .eq. sub) ) then
           cnt = cnt + 1
           xn_buff(cnt) = grid % xn(n)
           yn_buff(cnt) = grid % yn(n)
           zn_buff(cnt) = grid % zn(n)
-          grid % comm % nodes_buff(sub) % map(cnt) = n;
+          grid % comm % nodes_repl(sub) % map(cnt) = n;
         end if
       end do
 
@@ -143,21 +137,21 @@
                       xn_buff(1:cnt),  &
                       yn_buff(1:cnt),  &
                       zn_buff(1:cnt),  &
-                      grid % comm % nodes_buff(sub) % map(1:cnt))
+                      grid % comm % nodes_repl(sub) % map(1:cnt))
 
     end if
   end do
 
-  do sub = 1, n_proc
-    do ln = 1, grid % comm % nodes_buff(sub) % n_items
-      n = grid % comm % nodes_buff(sub) % map(ln)
-      WRITE(600 + this_proc*10 + sub, '(A,I5,A,I5,3F9.3)')           &
-                                  ' n=', n,                          &
-                                  ' g=', grid % comm % node_glo(n),  &
-                                                      grid % xn(n),  &
-                                                      grid % yn(n),  &
-                                                      grid % zn(n)
-    end do
-  end do
+! do sub = 1, n_proc
+!   do ln = 1, grid % comm % nodes_repl(sub) % n_items
+!     n = grid % comm % nodes_repl(sub) % map(ln)
+!     write(600 + this_proc*10 + sub, '(A,I5,A,I5,3F9.3)')           &
+!                                 ' n=', n,                          &
+!                                 ' g=', grid % comm % node_glo(n),  &
+!                                                     grid % xn(n),  &
+!                                                     grid % yn(n),  &
+!                                                     grid % zn(n)
+!   end do
+! end do
 
   end subroutine

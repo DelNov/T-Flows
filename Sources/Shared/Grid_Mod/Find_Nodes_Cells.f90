@@ -14,11 +14,6 @@
 ! real    :: xn, xc, yn, yc, zn, zc, max_del, min_del, del
 !==============================================================================!
 
-  !-------------------------------------------!
-  !   Form communication patterns for nodes   !
-  !-------------------------------------------!
-  call Grid_Mod_Form_Nodes_Comm(grid)
-
   ! Allocate memory for node coordinates
   n = grid % n_nodes
   allocate(grid % nodes_n_cells(1:n))
@@ -93,16 +88,16 @@
     end if
   end do
 
-  call Grid_Mod_Exchange_Nodes_Int(grid, grid % nodes_n_cells)
-
-  ! Add values from buffer back to nodes
-  do sub = 1, n_proc
-    do ln = 1, grid % comm % nodes_buff(sub) % n_items
-      n = grid % comm % nodes_buff(sub) % map(ln)
-      grid % nodes_n_cells(n) = grid % nodes_n_cells(n)  &
-                              + grid % comm % nodes_buff(sub) % i_val(ln)
-    end do
-  end do
+!#  call Grid_Mod_Exchange_Nodes_Int(grid, grid % nodes_n_cells)
+!#
+!#  ! Add values from buffer back to nodes
+!#  do sub = 1, n_proc
+!#    do ln = 1, grid % comm % nodes_buff(sub) % n_items
+!#      n = grid % comm % nodes_buff(sub) % map(ln)
+!#      grid % nodes_n_cells(n) = grid % nodes_n_cells(n)  &
+!#                              + grid % comm % nodes_buff(sub) % i_val(ln)
+!#    end do
+!#  end do
 
   WRITE(300+this_proc, *) 'grid % nodes_n_cells(n) = ', grid % n_nodes
   do n = 1, grid % n_nodes

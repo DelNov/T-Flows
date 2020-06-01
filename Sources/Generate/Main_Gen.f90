@@ -22,7 +22,7 @@
   type(Grid_Type)    :: grid      ! grid which will be generated
   type(Smooths_Type) :: smooths   ! smoothing regions
   type(Refines_Type) :: refines   ! refinement regions and levels
-  integer            :: c, s, n, lev
+  integer            :: c, s, n, lev, SC
 !==============================================================================!
 
   ! Open with a logo
@@ -35,12 +35,12 @@
   call Connect_Periodicity       (dom, grid)
 
   ! From this point on, domain should not be used anymore
-  call Determine_Grid_Connectivity(refines, grid, .false.)  ! trial run 
-  call Calculate_Grid_Geometry    (grid,          .false.)
-  call Smooth_Grid                (smooths, grid)
-  call Refine_Grid                (refines, grid)
-  call Determine_Grid_Connectivity(refines, grid, .true.)   ! real run
-  call Calculate_Grid_Geometry    (grid,          .true.)
+  call Determine_Connectivity(refines, grid, .false.)  ! trial run 
+  call Calculate_Geometry    (grid,          .false.)
+  call Smooth_Grid           (smooths, grid)
+  call Refine_Grid           (refines, grid)
+  call Determine_Connectivity(refines, grid, .true.)   ! real run
+  call Calculate_Geometry    (grid,          .true.)
 
   call Grid_Mod_Sort_Cells_Smart       (grid)
   call Grid_Mod_Sort_Faces_Smart       (grid)
@@ -53,7 +53,7 @@
   do c = -grid % n_bnd_cells, grid % n_cells
     grid % new_c(c) = c
   end do
-  do s = 1, grid % n_faces
+  do s = 1, grid % n_faces + grid % n_shadows
     grid % new_f(s) = s
   end do
 
@@ -67,12 +67,10 @@
                          grid % n_nodes,      &
                          grid % n_cells,      &
                          grid % n_faces,      &
-                         grid % n_bnd_cells,  &
-                         0)
+                         grid % n_shadows,    &
+                         grid % n_bnd_cells)
 
-  call Grid_Mod_Save_Geo(grid, 0,             &
-                         grid % n_faces,      &
-                         0)
+  call Grid_Mod_Save_Geo(grid, 0)
 
   !-----------------------------------------------------!
   !   Save grid for visualisation and post-processing   !
@@ -88,14 +86,6 @@
   do lev = 1, grid % n_levels
     call Save_Vtu_Grid_Levels(grid, lev)
   end do
-
-  ! Save links for checking
-  call Save_Vtu_Links(grid, 0,             &
-                      grid % n_nodes,      &
-                      grid % n_cells,      &
-                      grid % n_faces,      &
-                      grid % n_bnd_cells,  &
-                      0)
 
   ! Try to save in CGNS format, it might work
   call Save_Cgns_Cells(grid, 0) 

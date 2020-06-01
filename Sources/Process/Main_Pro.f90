@@ -108,12 +108,9 @@
 
     ! Load the finite volume grid
     call Grid_Mod_Load_Cns(grid(d), this_proc, domain=d)
-
-    ! Allocate memory for communication
-    call Grid_Mod_Allocate_Comm(grid(d))
-
     call Grid_Mod_Load_Geo(grid(d), this_proc, domain=d)
-    call Grid_Mod_Create_Buffers(grid(d))
+    call Grid_Mod_Form_Cells_Comm(grid(d))
+    call Grid_Mod_Form_Nodes_Comm(grid(d))
     call Grid_Mod_Form_Maps(grid(d))
 
     call Comm_Mod_Wait
