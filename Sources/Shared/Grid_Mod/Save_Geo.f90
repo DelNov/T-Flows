@@ -70,31 +70,31 @@
   !-----------!
   do var = 1, 10
     do s = 1, grid % n_faces + grid % n_shadows
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
-      if(grid % new_f(s) .ne. 0) then
+      if(grid % old_f(s) .ne. 0) then
+        c1 = grid % faces_c(1, grid % old_f(s))
+        c2 = grid % faces_c(2, grid % old_f(s))
         if(grid % new_c(c2) < 0 .or. grid % new_c(c1) < grid % new_c(c2)) then
-          if(var .eq.  1)  write(fu) grid % sx(s)
-          if(var .eq.  2)  write(fu) grid % sy(s)
-          if(var .eq.  3)  write(fu) grid % sz(s)
-          if(var .eq.  4)  write(fu) grid % dx(s)
-          if(var .eq.  5)  write(fu) grid % dy(s)
-          if(var .eq.  6)  write(fu) grid % dz(s)
-          if(var .eq.  7)  write(fu) grid % f(s)
-          if(var .eq.  8)  write(fu) grid % xf(s)
-          if(var .eq.  9)  write(fu) grid % yf(s)
-          if(var .eq. 10)  write(fu) grid % zf(s)
+          if(var .eq.  1)  write(fu) grid % sx(grid % old_f(s))
+          if(var .eq.  2)  write(fu) grid % sy(grid % old_f(s))
+          if(var .eq.  3)  write(fu) grid % sz(grid % old_f(s))
+          if(var .eq.  4)  write(fu) grid % dx(grid % old_f(s))
+          if(var .eq.  5)  write(fu) grid % dy(grid % old_f(s))
+          if(var .eq.  6)  write(fu) grid % dz(grid % old_f(s))
+          if(var .eq.  7)  write(fu) grid % f(grid % old_f(s))
+          if(var .eq.  8)  write(fu) grid % xf(grid % old_f(s))
+          if(var .eq.  9)  write(fu) grid % yf(grid % old_f(s))
+          if(var .eq. 10)  write(fu) grid % zf(grid % old_f(s))
         else
-          if(var .eq.  1)  write(fu) -grid % sx(s)
-          if(var .eq.  2)  write(fu) -grid % sy(s)
-          if(var .eq.  3)  write(fu) -grid % sz(s)
-          if(var .eq.  4)  write(fu) -grid % dx(s)
-          if(var .eq.  5)  write(fu) -grid % dy(s)
-          if(var .eq.  6)  write(fu) -grid % dz(s)
-          if(var .eq.  7)  write(fu) 1.0 - grid % f(s)
-          if(var .eq.  8)  write(fu) grid % xf(s) - grid % dx(s)
-          if(var .eq.  9)  write(fu) grid % yf(s) - grid % dy(s)
-          if(var .eq. 10)  write(fu) grid % zf(s) - grid % dz(s)
+          if(var .eq.  1)  write(fu) -grid % sx(grid % old_f(s))
+          if(var .eq.  2)  write(fu) -grid % sy(grid % old_f(s))
+          if(var .eq.  3)  write(fu) -grid % sz(grid % old_f(s))
+          if(var .eq.  4)  write(fu) -grid % dx(grid % old_f(s))
+          if(var .eq.  5)  write(fu) -grid % dy(grid % old_f(s))
+          if(var .eq.  6)  write(fu) -grid % dz(grid % old_f(s))
+          if(var .eq.  7)  write(fu) 1.0 - grid % f(grid % old_f(s))
+          if(var .eq.  8)  write(fu) grid % xf(grid % old_f(s))
+          if(var .eq.  9)  write(fu) grid % yf(grid % old_f(s))
+          if(var .eq. 10)  write(fu) grid % zf(grid % old_f(s))
         end if
       end if
     end do

@@ -98,42 +98,42 @@
 
   ! Number of nodes for each face
   do s = 1, grid % n_faces + grid % n_shadows
-    if(grid % new_f(s) .ne. 0) then
-      write(fu) grid % faces_n_nodes(s)
+    if(grid % old_f(s) .ne. 0) then
+      write(fu) grid % faces_n_nodes(grid % old_f(s))
     end if
   end do
 
   ! Faces' nodes
   do s = 1, grid % n_faces + grid % n_shadows
-    if(grid % new_f(s) .ne. 0) then
-      do n = 1, grid % faces_n_nodes(s)
-        write(fu) grid % new_n(grid % faces_n(n,s))
+    if(grid % old_f(s) .ne. 0) then
+      do n = 1, grid % faces_n_nodes(grid % old_f(s))
+        write(fu) grid % new_n(grid % faces_n(n, grid % old_f(s)))
       end do
     end if
   end do
 
   ! Faces' cells
   do s = 1, grid % n_faces + grid % n_shadows
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
-    if(grid % new_f(s) .ne. 0) then
+    if(grid % old_f(s) .ne. 0) then
+      c1 = grid % faces_c(1, grid % old_f(s))
+      c2 = grid % faces_c(2, grid % old_f(s))
       if(grid % new_c(c2) < 0 .or. grid % new_c(c1) < grid % new_c(c2)) then
-        write(fu) grid % new_c(grid % faces_c(1,s)),  &
-                  grid % new_c(grid % faces_c(2,s))
+        write(fu) grid % new_c(grid % faces_c(1, grid % old_f(s))),  &
+                  grid % new_c(grid % faces_c(2, grid % old_f(s)))
       else
-        write(fu) grid % new_c(grid % faces_c(2,s)),  &
-                  grid % new_c(grid % faces_c(1,s))
+        write(fu) grid % new_c(grid % faces_c(2, grid % old_f(s))),  &
+                  grid % new_c(grid % faces_c(1, grid % old_f(s)))
       end if
     end if
   end do
 
   ! Faces' shadows
   do s = 1, grid % n_faces + grid % n_shadows
-    if(grid % new_f(s) .ne. 0) then
-      if(grid % faces_s(s) .eq. 0) then   ! there is no shadow for this face
+    if(grid % old_f(s) .ne. 0) then
+      if(grid % faces_s(grid % old_f(s)) .eq. 0) then   ! there is no shadow for this face
         write(fu) 0
       else
-        write(fu) grid % new_f(grid % faces_s(s))
+        write(fu) grid % new_f(grid % faces_s(grid % old_f(s)))
       end if
     end if
   end do

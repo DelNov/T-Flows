@@ -86,6 +86,7 @@
   end do
   do s = 1, grid % n_faces + grid % n_shadows
     grid % new_f(s) = s
+    grid % old_f(s) = s
   end do
 
   ! Decompose/coarsen the grid with METIS

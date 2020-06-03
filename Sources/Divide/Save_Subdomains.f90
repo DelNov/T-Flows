@@ -109,6 +109,7 @@
     nbc_sub = 0  ! number of real boundary cells in subdomain
     do s = 1, grid % n_faces + grid % n_shadows
       grid % new_f(s) = 0
+      grid % old_f(s) = 0
     end do
     do c = -grid % n_bnd_cells, -1
       grid % new_c(c) = 0
@@ -124,6 +125,7 @@
             (grid % comm % cell_proc(c2) .eq. sub) ) then
           nf_sub = nf_sub + 1
           grid % new_f(s) = nf_sub
+          grid % old_f(nf_sub) = s
         end if
       end if
     end do
@@ -136,6 +138,7 @@
         if( grid % comm % cell_proc(c1) .eq. sub )  then
           nf_sub = nf_sub + 1
           grid % new_f(s) = nf_sub
+          grid % old_f(nf_sub) = s
 
           nbc_sub = nbc_sub + 1        ! increase n. of bnd. cells
           grid % new_c(c2) = -nbc_sub  ! new loc. number of bnd. cell
@@ -181,11 +184,13 @@
                 (grid % comm % cell_proc(c2) .eq. subo) ) then
               nf_sub = nf_sub + 1
               grid % new_f(s) = nf_sub
+              grid % old_f(nf_sub) = s
             end if
             if( (grid % comm % cell_proc(c2) .eq. sub) .and.  &
                 (grid % comm % cell_proc(c1) .eq. subo) ) then
               nf_sub = nf_sub + 1
               grid % new_f(s) = nf_sub
+              grid % old_f(nf_sub) = s
             end if
           end if  ! c2 > 0
         end do    ! through sides
@@ -202,11 +207,12 @@
     do s = grid % n_faces + 1, grid % n_faces + grid % n_shadows
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
-      if(c2  > 0) then
+      if(c2 > 0) then
         if( (grid % comm % cell_proc(c1) .eq. sub) .or.  &
             (grid % comm % cell_proc(c2) .eq. sub) ) then
           ns_sub = ns_sub + 1
           grid % new_f(s) = nf_sub + ns_sub
+          grid % old_f(nf_sub + ns_sub) = s
         end if
       end if  ! c2 > 0
     end do    ! through sides
