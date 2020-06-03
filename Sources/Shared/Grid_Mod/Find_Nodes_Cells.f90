@@ -99,18 +99,18 @@
     end do
   end do
 
-  ! Check #1, save those nodes' cells
-  do c = 1, grid % n_cells - grid % comm % n_buff_cells
-    do ln = 1, grid % cells_n_nodes(c)  ! local node number
-      n = grid % cells_n(ln, c)         ! global node number
-      write(600+this_proc, '(a,i2,a,36i6)')  &
-            'nc=', grid % nodes_n_cells(n),  &
-            ' cell list=', grid % nodes_c(1:max_n_cells, n)
-      write(600+this_proc, '(a,36i6)')  &
-            '           proc=',  &
-            grid % comm % cell_proc(grid % nodes_c(1:max_n_cells, n))
-    end do
-  end do
+! ! Check #1, save those nodes' cells
+! do c = 1, grid % n_cells - grid % comm % n_buff_cells
+!   do ln = 1, grid % cells_n_nodes(c)  ! local node number
+!     n = grid % cells_n(ln, c)         ! global node number
+!     write(600+this_proc, '(a,i2,a,36i6)')  &
+!           'nc=', grid % nodes_n_cells(n),  &
+!           ' cell list=', grid % nodes_c(1:max_n_cells, n)
+!     write(600+this_proc, '(a,36i6)')  &
+!           '           proc=',  &
+!           grid % comm % cell_proc(grid % nodes_c(1:max_n_cells, n))
+!   end do
+! end do
 
 ! ! Check #2, erase this later
 ! max_del = -HUGE
