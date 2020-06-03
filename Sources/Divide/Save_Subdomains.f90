@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Subdomains(grid)
+  subroutine Save_Subdomains(grid, n_buff_layers)
 !------------------------------------------------------------------------------!
 !   Number the cells in each subdomain for subsequent separate saving.         !
 !------------------------------------------------------------------------------!
@@ -16,8 +16,9 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
+  integer         :: n_buff_layers  ! number of buffer layers
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, n, s, c1, c2, sub, subo, ln, fu, sh, nn
+  integer :: c, n, s, c1, c2, sub, subo, ln, fu, sh, nn, lev
   integer :: nn_sub      ! number of nodes in the subdomain
   integer :: nc_sub      ! number of cells in the subdomain
   integer :: nf_sub      ! number of faces in the subdomain
@@ -86,6 +87,29 @@
           end if
         end do
 
+        ! Browse through deeper levels of buffers
+        do lev = 2, n_buff_layers
+
+          ! Mark nodes on this level ...
+          do c = 1, grid % n_cells
+            if(grid % new_c(c) .eq. -1) then
+              do ln = 1, grid % cells_n_nodes(c)
+                grid % new_n(grid % cells_n(ln,c)) = -1
+              end do
+            end if
+          end do
+
+          ! ... and then also the cells
+          do c = 1, grid % n_cells
+            if(grid % comm % cell_proc(c) .eq. subo) then
+              n = grid % cells_n_nodes(c)
+              if( any(grid % new_n(grid % cells_n(1:n, c)) .eq. -1) ) then
+                grid % new_c(c) = -1
+              end if
+            end if
+          end do
+        end do
+
         ! Renumber
         do c = 1, grid % n_cells
           if(grid % comm % cell_proc(c) .eq. subo .and.  &
@@ -114,20 +138,6 @@
     do c = -grid % n_bnd_cells, -1
       grid % new_c(c) = 0
       grid % old_c(c) = 0
-    end do
-
-    ! Faces step 1: inside the domain
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
-      if(c2 > 0) then
-        if( (grid % comm % cell_proc(c1) .eq. sub) .and.  &
-            (grid % comm % cell_proc(c2) .eq. sub) ) then
-          nf_sub = nf_sub + 1
-          grid % new_f(s) = nf_sub
-          grid % old_f(nf_sub) = s
-        end if
-      end if
     end do
 
     ! Faces step 2: on the boundaries of domain sub
@@ -167,6 +177,19 @@
       end if
     end do
 
+    ! Faces step 1: inside the domain
+    do s = 1, grid % n_faces
+      c1 = grid % faces_c(1,s)
+      c2 = grid % faces_c(2,s)
+      if(c2 > 0) then
+        if( (grid % comm % cell_proc(c1) .eq. sub) .and.  &
+            (grid % comm % cell_proc(c2) .eq. sub) ) then
+          nf_sub = nf_sub + 1
+          grid % new_f(s) = nf_sub
+          grid % old_f(nf_sub) = s
+        end if
+      end if
+    end do
 
     !----------------------!
     !   Faces in buffers   !
@@ -175,7 +198,7 @@
     do subo = 1, maxval(grid % comm % cell_proc(:))
       if(subo .ne. sub) then
 
-        ! Faces inside the domain
+        ! Faces half in the domain, half in the buffers
         do s = 1, grid % n_faces
           c1 = grid % faces_c(1,s)
           c2 = grid % faces_c(2,s)
@@ -193,11 +216,27 @@
               grid % old_f(nf_sub) = s
             end if
           end if  ! c2 > 0
-        end do    ! through sides
+        end do    ! through faces
 
       end if  ! subo .ne. sub
 
     end do ! for subo
+
+    ! Faces inside the buffers only
+    do s = 1, grid % n_faces
+      c1 = grid % faces_c(1,s)
+      c2 = grid % faces_c(2,s)
+      if(c2  > 0) then
+        if( (grid % new_c(c1) .ne. 0)              .and.  &
+            (grid % new_c(c2) .ne. 0)              .and.  &
+            (grid % comm % cell_proc(c1) .ne. sub) .and.  &
+            (grid % comm % cell_proc(c2) .ne. sub) ) then
+          nf_sub = nf_sub + 1
+          grid % new_f(s) = nf_sub
+          grid % old_f(nf_sub) = s
+        end if
+      end if  ! c2 > 0
+    end do    ! through faces
 
     !------------------!
     !   Shadow faces   !
@@ -215,7 +254,7 @@
           grid % old_f(nf_sub + ns_sub) = s
         end if
       end if  ! c2 > 0
-    end do    ! through sides
+    end do    ! through faces
 
     !-----------!
     !   Nodes   !
