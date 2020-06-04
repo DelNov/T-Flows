@@ -17,7 +17,8 @@
                       wt_save   => r_cell_11,  &
                       kin_vis_t => r_cell_12,  &
                       phi_save  => r_cell_13,  &
-                      q_save    => r_cell_14
+                      q_save    => r_cell_14,  &
+                      int_save  => r_cell_15
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
@@ -36,7 +37,7 @@
   integer                       :: block
   integer                       :: solution
   integer                       :: field
-  integer                       :: c, sc, ua
+  integer                       :: c, sc, ua, s
 !==============================================================================!
 
   if(.not. plot_inside) return ! no point to write *-bnd.cgns yet
@@ -137,6 +138,30 @@
   !   Copied code below from Save_Vtu_Results   !
   !---------------------------------------------!
 
+  !--------------------!
+  !   Processor i.d.   !
+  !--------------------!
+  do c = 1, grid % n_cells - grid % comm % n_buff_cells
+    int_save(c) = real(grid % comm % cell_proc(c))
+  end do
+  do s = 1, grid % n_faces
+    if( grid % faces_c(2,s) < 0 ) then
+      int_save(grid % faces_c(2,s)) =  &
+               real(grid % comm % cell_proc( grid % faces_c(1,s) ))
+    end if
+  end do
+  call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
+                            int_save(1), 'Processor')
+
+  !-------------------!
+  !   Domain number   !
+  !-------------------!
+  ! if(present(domain)) then
+  !   int_save(-grid % n_bnd_cells:grid % n_cells) = real(domain)
+  !   call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
+  !                             int_save(1), 'Domain')
+  ! end if
+
   !--------------!
   !   Velocity   !
   !--------------!
@@ -164,7 +189,11 @@
   !---------------------!
   if(multiphase_model .eq. VOLUME_OF_FLUID) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              mult % vof % n(1), 'Temperature')
+                              mult % vof % n(1), 'VolumeFraction')
+    if (mult % d_func) then
+      call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
+                          mult % dist_func % n(1), 'DistanceFunction')
+    end if
   end if
 
   !------------------!
@@ -245,7 +274,7 @@
 
   if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              turb % f22 % n(1),  'TurbulentQuantityF22')
+                              turb % f22 % n(1), 'TurbulentQuantityF22')
   end if
 
   ! Vis and Turbulent Vicosity_t
@@ -343,7 +372,8 @@
   end if ! turb % statistics
 
   ! Save y+ for all turbulence models
-  if(turb % model .ne. NO_TURBULENCE) then
+  if(turb % model .ne. NO_TURBULENCE .and.  &
+     turb % model .ne. DNS) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               turb % y_plus(1),'TurbulentQuantityYplus')
   end if
