@@ -140,24 +140,7 @@
       grid % old_c(c) = 0
     end do
 
-    ! Faces step 2: on the boundaries of domain sub
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
-      if(c2 < 0) then
-        if( grid % comm % cell_proc(c1) .eq. sub )  then
-          nf_sub = nf_sub + 1
-          grid % new_f(s) = nf_sub
-          grid % old_f(nf_sub) = s
-
-          nbc_sub = nbc_sub + 1        ! increase n. of bnd. cells
-          grid % new_c(c2) = -nbc_sub  ! new loc. number of bnd. cell
-          grid % old_c(-nbc_sub) = c2
-        end if
-      end if
-    end do
-
-    ! Faces step 2: on the boundaries of the buffers
+    ! Faces step 1: on the boundaries of the buffers
     do subo = 1, maxval(grid % comm % cell_proc(:))
       if(subo .ne. sub) then
 
@@ -177,7 +160,24 @@
       end if
     end do
 
-    ! Faces step 1: inside the domain
+    ! Faces step 2: on the boundaries of domain sub
+    do s = 1, grid % n_faces
+      c1 = grid % faces_c(1,s)
+      c2 = grid % faces_c(2,s)
+      if(c2 < 0) then
+        if( grid % comm % cell_proc(c1) .eq. sub )  then
+          nf_sub = nf_sub + 1
+          grid % new_f(s) = nf_sub
+          grid % old_f(nf_sub) = s
+
+          nbc_sub = nbc_sub + 1        ! increase n. of bnd. cells
+          grid % new_c(c2) = -nbc_sub  ! new loc. number of bnd. cell
+          grid % old_c(-nbc_sub) = c2
+        end if
+      end if
+    end do
+
+    ! Faces step 3: inside the domain
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
