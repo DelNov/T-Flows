@@ -21,7 +21,11 @@
 
   ! Initialize number of cells in subdomain
   grid % comm % nc_s = grid % n_cells - grid % comm % n_buff_cells
-  grid % comm % nb_s = grid % n_bnd_cells
+  do c = -grid % n_bnd_cells, -1
+    if(grid % comm % cell_proc(c) .eq. this_proc) then
+      grid % comm % nb_s = grid % comm % nb_s + 1
+    end if
+  end do
   grid % comm % nc_t = grid % comm % nc_s
   grid % comm % nb_t = grid % comm % nb_s
 
