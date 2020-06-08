@@ -24,6 +24,10 @@
   bulk % flux_y = 0.0
   bulk % flux_z = 0.0
 
+  dens_are_x = 0.0
+  dens_are_y = 0.0
+  dens_are_z = 0.0
+
   !-------------------------------------------------------------------------!
   !   Summ up mass fluxes [kg/s] over all faces at monitoring plane         !
   !   (Resulting mass flux will be for the whole domain, still in [kg/s])   !
