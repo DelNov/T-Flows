@@ -27,8 +27,8 @@
     flow % viscosity(c) = vof % n(c)         * mult % phase_visc(1)      &
                         + (1.0 - vof % n(c)) * mult % phase_visc(2)
   end do
-  call Grid_Mod_Exchange_Real(grid, flow % density)
-  call Grid_Mod_Exchange_Real(grid, flow % viscosity)
+  call Grid_Mod_Exchange_Cells_Real(grid, flow % density)
+  call Grid_Mod_Exchange_Cells_Real(grid, flow % viscosity)
 
   ! Density at faces
   do s = 1, grid % n_faces

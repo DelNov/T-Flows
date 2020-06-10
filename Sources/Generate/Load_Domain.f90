@@ -86,7 +86,7 @@
                                grid % max_n_bnd_cells)
 
   call Grid_Mod_Allocate_Faces(grid,                    &
-                               grid % max_n_faces)
+                               grid % max_n_faces, 0)
 
   ! Variables for renumbering
   call Grid_Mod_Allocate_New_Numbers(grid,                    &
@@ -293,7 +293,7 @@
   end if
 
   if( n_faces_check  > grid % max_n_faces ) then
-    print *, '# The estimated number of sides is :', n_faces_check
+    print *, '# The estimated number of faces is :', n_faces_check
     print *, '# There is space available only for:', grid % max_n_faces
     print *, '# Increase the parameter grid % max_n_faces in the input file'
     print *, '# and re-run the code !'
@@ -373,21 +373,7 @@
   !   Copy boundaries   !
   !---------------------!
   call File_Mod_Read_Line(fu)
-  read(line % tokens(1), *)  n_copy_cond  ! number of copy boundaries
-  print '(a38,i7)', '# Number of copy boundaries:         ', n_copy_cond
-
-  allocate (copy_cond(n_copy_cond,8))
-
-  do n=1,n_copy_cond
-    call File_Mod_Read_Line(fu)
-    read(line % whole, *) dum, copy_cond(n,1), copy_cond(n,2),  &
-                               copy_cond(n,3), copy_cond(n,4) 
-    call File_Mod_Read_Line(fu)
-    read(line % whole, *)      copy_cond(n,5), copy_cond(n,6),  &
-                               copy_cond(n,7),copy_cond(n,8)
-    call File_Mod_Read_Line(fu)
-    read(line % whole, *)  copy_cond(n,0)
-  end do
+  read(line % tokens(1), *)  dumi  ! used to be number of copy boundaries
 
   !-----------------------------------!
   !   Refinement levels and regions   !

@@ -19,7 +19,7 @@
   type(Field_Type),pointer :: flow
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: vof
-  integer                  :: s, c, c1, c2, c_iter
+  integer                  :: s, c, c1, c2, c_iter, nb, nc
   real                     :: vol_face, grad_face(3), grad_control(3)
   real                     :: dotprod, sxyz_mod, sxyz_control, fs, epsloc
   real                     :: d_n(3) !normal pointing to the wall
@@ -32,6 +32,8 @@
   flow => mult % pnt_flow
   grid => mult % pnt_grid
   vof  => mult % vof
+  nb   = grid % n_bnd_cells
+  nc   = grid % n_cells
 
   if(mult % d_func) then  ! using distance function
 
@@ -83,14 +85,14 @@
         end if
       end do
 
-      call Grid_Mod_Exchange_Real(grid, grad_kx)
-      call Grid_Mod_Exchange_Real(grid, grad_ky)
+      call Grid_Mod_Exchange_Cells_Real(grid, grad_kx(-nb:nc))
+      call Grid_Mod_Exchange_Cells_Real(grid, grad_ky(-nb:nc))
 
       do c = 1, grid % n_cells
         mult % curv(c) = grad_kx(c) / grad_ky(c)
       end do
 
-      call Grid_Mod_Exchange_Real(grid, mult % curv)
+      call Grid_Mod_Exchange_Cells_Real(grid, mult % curv)
 
       if (c_iter == mult % n_conv_norm) then  ! smooth for normal
         vof_norm = mult % curv
@@ -228,13 +230,13 @@
     end if
   end do
 
-  call Grid_Mod_Exchange_Real(grid, grad_kx)
-  call Grid_Mod_Exchange_Real(grid, grad_ky)
-  call Grid_Mod_Exchange_Real(grid, grad_kz)
+  call Grid_Mod_Exchange_Cells_Real(grid, grad_kx(-nb:nc))
+  call Grid_Mod_Exchange_Cells_Real(grid, grad_ky(-nb:nc))
+  call Grid_Mod_Exchange_Cells_Real(grid, grad_kz(-nb:nc))
 
-  call Grid_Mod_Exchange_Real(grid, grad_nx)
-  call Grid_Mod_Exchange_Real(grid, grad_ny)
-  call Grid_Mod_Exchange_Real(grid, grad_nz)
+  call Grid_Mod_Exchange_Cells_Real(grid, grad_nx(-nb:nc))
+  call Grid_Mod_Exchange_Cells_Real(grid, grad_ny(-nb:nc))
+  call Grid_Mod_Exchange_Cells_Real(grid, grad_nz(-nb:nc))
 
   !--------------------!
   !   Find Curvature   !
@@ -292,7 +294,7 @@
     end if
   end do
 
-  call Grid_Mod_Exchange_Real(grid, mult % curv)
+  call Grid_Mod_Exchange_Cells_Real(grid, mult % curv)
 
   do c = 1, grid % n_cells
     mult % curv(c) = - mult % curv(c) / grid % vol(c)

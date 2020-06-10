@@ -11,4 +11,7 @@
   allocate (grid % new_c(-nb:nc));  grid % new_c(:) = 0
   allocate (grid % new_f(    nf));  grid % new_f(:) = 0
 
+  allocate (grid % old_c(-nb:nc));  grid % old_c(:) = 0
+  allocate (grid % old_f(    nf));  grid % old_f(:) = 0
+
   end subroutine

@@ -21,6 +21,8 @@
   integer, parameter :: IP=8, RP=8, SP=4
 !==============================================================================!
 
+  data_size = 0
+
   ! Header
   if(sweep .eq. 1) then
     if(n_proc > 1 .and. this_proc .eq. 1) then

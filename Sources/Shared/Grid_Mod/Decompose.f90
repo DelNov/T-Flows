@@ -141,11 +141,4 @@
     end if
   end do
 
-  !---------------------------------!
-  !   Store cells' global numbers   !
-  !---------------------------------!
-  do c = -grid % n_bnd_cells, grid % n_cells
-    grid % comm % cell_glo(c) = c
-  end do
-
   end subroutine

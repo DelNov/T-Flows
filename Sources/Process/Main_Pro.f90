@@ -108,12 +108,9 @@
 
     ! Load the finite volume grid
     call Grid_Mod_Load_Cns(grid(d), this_proc, domain=d)
-
-    ! Allocate memory for communication
-    call Grid_Mod_Allocate_Comm(grid(d))
-
     call Grid_Mod_Load_Geo(grid(d), this_proc, domain=d)
-    call Grid_Mod_Create_Buffers(grid(d))
+    call Grid_Mod_Form_Cells_Comm(grid(d))
+    call Grid_Mod_Form_Nodes_Comm(grid(d))
     call Grid_Mod_Form_Maps(grid(d))
 
     call Comm_Mod_Wait
@@ -328,7 +325,7 @@
 
         ! Refresh buffers for a % sav before discretizing for pressure
         ! (Can this call be somewhere in Compute Pressure?)
-        call Grid_Mod_Exchange_Real(grid(d), sol(d) % a % sav)
+        call Grid_Mod_Exchange_Cells_Real(grid(d), sol(d) % a % sav)
 
         call Balance_Mass(flow(d))
         call Compute_Pressure(flow(d), mult(d), sol(d), flow(d) % dt, ini)

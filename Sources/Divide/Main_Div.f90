@@ -38,7 +38,7 @@
 
   call Grid_Mod_Decompose(grid, n_sub)
 
-  call Create_Buffers_And_Save(grid)
+  call Save_Subdomains(grid, 1)  ! Number of buffer levels is hard-coded now
 
   call cpu_time(finish)
   print '(a10,f14.3,a9)', ' # Time = ', finish-start, ' seconds.'

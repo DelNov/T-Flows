@@ -366,7 +366,7 @@
 
   call Info_Mod_Iter_Fill_User_At(row, col, phi % name, exec_iter, phi % res)
 
-  call Grid_Mod_Exchange_Real(grid, phi % n)
+  call Grid_Mod_Exchange_Cells_Real(grid, phi % n)
 
   ! User function
   call User_Mod_End_Of_Compute_Scalar(flow, turb, mult, dt, ini)

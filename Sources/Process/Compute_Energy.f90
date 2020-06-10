@@ -322,7 +322,7 @@
   ! Print some info on the screen
   call Info_Mod_Iter_Fill_At(1, 6, t % name, exec_iter, t % res)
 
-  call Grid_Mod_Exchange_Real(grid, t % n)
+  call Grid_Mod_Exchange_Cells_Real(grid, t % n)
 
   ! User function
   call User_Mod_End_Of_Compute_Energy(flow, turb, mult, dt, ini)
