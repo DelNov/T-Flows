@@ -1,10 +1,8 @@
 !==============================================================================!
   subroutine User_Mod_Save_Results(flow, turb, mult, swarm, ts)
 !------------------------------------------------------------------------------!
-!   This subroutine is called each                                             !
-!     RESULTS_SAVE_INTERVAL (set in conrtol file),                             !
-!     at the end of a simulation                                               !
-!     and after 'save_now' command                                             !
+!   This subroutine is called each RESULTS_SAVE_INTERVAL (set in control       !
+!   file), at the end of a simulation and after 'save_now' command.            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
