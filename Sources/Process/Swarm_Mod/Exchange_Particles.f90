@@ -124,16 +124,16 @@
 
     ! Refresh buffers for grid-base variables here
     ! (This is probably not needed, but it won't do harm)
-    call Grid_Mod_Exchange_Int (grid, swarm % n_states)
-    call Grid_Mod_Exchange_Real(grid, swarm % u_mean)
-    call Grid_Mod_Exchange_Real(grid, swarm % v_mean)
-    call Grid_Mod_Exchange_Real(grid, swarm % w_mean)
-    call Grid_Mod_Exchange_Real(grid, swarm % uu)
-    call Grid_Mod_Exchange_Real(grid, swarm % vv)
-    call Grid_Mod_Exchange_Real(grid, swarm % ww)
-    call Grid_Mod_Exchange_Real(grid, swarm % uv)
-    call Grid_Mod_Exchange_Real(grid, swarm % uw)
-    call Grid_Mod_Exchange_Real(grid, swarm % vw)
+    call Grid_Mod_Exchange_Cells_Int (grid, swarm % n_states)
+    call Grid_Mod_Exchange_Cells_Real(grid, swarm % u_mean)
+    call Grid_Mod_Exchange_Cells_Real(grid, swarm % v_mean)
+    call Grid_Mod_Exchange_Cells_Real(grid, swarm % w_mean)
+    call Grid_Mod_Exchange_Cells_Real(grid, swarm % uu)
+    call Grid_Mod_Exchange_Cells_Real(grid, swarm % vv)
+    call Grid_Mod_Exchange_Cells_Real(grid, swarm % ww)
+    call Grid_Mod_Exchange_Cells_Real(grid, swarm % uv)
+    call Grid_Mod_Exchange_Cells_Real(grid, swarm % uw)
+    call Grid_Mod_Exchange_Cells_Real(grid, swarm % vw)
 
   end if
 
