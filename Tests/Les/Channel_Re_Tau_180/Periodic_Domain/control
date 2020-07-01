@@ -4,9 +4,9 @@ Prologue
 
  HEAT_TRANSFER   yes
 
- TIME_STEP                            0.05
- NUMBER_OF_TIME_STEPS                 18000
- STARTING_TIME_STEP_FOR_STATISTICS    10000
+ TIME_STEP                                     0.05
+ NUMBER_OF_TIME_STEPS                      18000
+ STARTING_TIME_STEP_FOR_TURB_STATISTICS    12000
 
  RESULTS_SAVE_INTERVAL     1800
  BACKUP_SAVE_INTERVAL      1800

@@ -5,11 +5,11 @@
  HEAT_TRANSFER   yes
  BUOYANCY        yes
 
- TIME_STEP                             0.01
- NUMBER_OF_TIME_STEPS                  1200
- STARTING_TIME_STEP_FOR_STATISTICS  1200000
- RESULTS_SAVE_INTERVAL                  120
- BACKUP_SAVE_INTERVAL                   600
+ TIME_STEP                                     0.01
+ NUMBER_OF_TIME_STEPS                       1200
+ STARTING_TIME_STEP_FOR_TURB_STATISTICS  1200000
+ RESULTS_SAVE_INTERVAL                       120
+ BACKUP_SAVE_INTERVAL                        600
 
 # LOAD_BACKUP_NAME  cylinder-ts000600.backup
 

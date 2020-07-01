@@ -5,11 +5,11 @@
  HEAT_TRANSFER   yes
  BUOYANCY        yes
 
- TIME_STEP                             0.01
- NUMBER_OF_TIME_STEPS                  1200
- STARTING_TIME_STEP_FOR_STATISTICS  1200000
- RESULTS_SAVE_INTERVAL                  150
- BACKUP_SAVE_INTERVAL                   600
+ TIME_STEP                                     0.01
+ NUMBER_OF_TIME_STEPS                       1200
+ STARTING_TIME_STEP_FOR_TURB_STATISTICS  1200000
+ RESULTS_SAVE_INTERVAL                       150
+ BACKUP_SAVE_INTERVAL                        600
 
 #-------------------
 # Monitoring points 
