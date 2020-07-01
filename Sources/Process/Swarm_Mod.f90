@@ -33,7 +33,7 @@
     ! Particle's diameter
     real :: d
 
-    ! Particle relaxation time 
+    ! Particle relaxation time
     real :: tau
 
     ! The closest cell, node, boundary cell and face
@@ -101,7 +101,7 @@
     ! (Mean) diameter for this swarm
     real :: diameter
 
-    ! Swarm mean relaxation time 
+    ! Swarm mean relaxation time
     real :: tau
 
     ! Coefficient of restitution (1.0 - elastic, 0.0 - sticky)
