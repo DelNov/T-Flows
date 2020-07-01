@@ -73,6 +73,9 @@
     integer, allocatable :: cells_f(:,:)
     integer, allocatable :: cells_c(:,:)
 
+    ! Nodes weight for each cell
+    real,    allocatable :: cells_weight_n(:,:)
+
     ! For boundary cells, store corresponding face
     integer, allocatable :: cells_bnd_face(:)
 
@@ -137,8 +140,10 @@
     ! Number of cells surrounding each node
     integer, allocatable :: nodes_n_cells(:)
 
-    ! List of cells surrounding each node
+    ! List of cells surrounding each node ...
+    ! ... and weights for each cell
     integer, allocatable :: nodes_c(:,:)
+    real,    allocatable :: nodes_weight_c(:,:)
 
     !------------------------------------------!
     !   Variables important for parallel run   ! 
@@ -165,6 +170,8 @@
   include 'Grid_Mod/Calculate_Face_Geometry.f90'
   include 'Grid_Mod/Calculate_Global_Volumes.f90'
   include 'Grid_Mod/Calculate_Wall_Distance.f90'
+  include 'Grid_Mod/Calculate_Weights_Cells_To_Nodes.f90'
+  include 'Grid_Mod/Calculate_Weights_Nodes_To_Cells.f90'
   include 'Grid_Mod/Check_Levels.f90'
   include 'Grid_Mod/Coarsen.f90'
   include 'Grid_Mod/Correction_Periodicity.f90'
