@@ -11,7 +11,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),    pointer :: flow
   type(Grid_Type),     pointer :: grid
-  type(Var_Type),      pointer :: u, v, w, kin, zeta
+  type(Var_Type),      pointer :: u, v, w, kin, eps, zeta, f22
   type(Particle_Type), pointer :: part
   real,                pointer :: fb_x, fb_y, fb_z
   integer                      :: c, c2             ! nearest cell
@@ -36,9 +36,10 @@
   ! Take aliases for flow
   flow => swarm % pnt_flow
   grid => swarm % pnt_grid
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
+  call Field_Mod_Alias_Momentum(flow, u, v, w)
+
+  ! Take aliases for turb
+  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
 
   ! Take aliases for swarm
   part => swarm % particle(k)
