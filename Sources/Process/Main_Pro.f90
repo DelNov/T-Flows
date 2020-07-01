@@ -50,8 +50,8 @@
   integer               :: last_dt         ! number of time steps
   integer               :: max_ini         ! max number of inner iterations
   integer               :: min_ini         ! min number of inner iterations
-  integer               :: n_stat          ! starting time step for statistic
-  integer               :: n_stat_p        ! starting time step for swarm st.
+  integer               :: n_stat_t        ! first time step for turb. statistic
+  integer               :: n_stat_p        ! first time step for swarm statistic
   integer               :: ini             ! inner iteration counter
   integer               :: bsi, rsi, prsi  ! backup and results save interval
   real                  :: simple_tol      ! tolerance for SIMPLE algorithm
@@ -125,7 +125,10 @@
 
   ! Get the number of time steps from the control file
   call Control_Mod_Number_Of_Time_Steps(last_dt, verbose=.true.)
-  call Control_Mod_Starting_Time_Step_For_Statistics(n_stat, verbose=.true.)
+  call Control_Mod_Starting_Time_Step_For_Turb_Statistics(n_stat_t,  &
+                                                          verbose = .true.)
+  call Control_Mod_Starting_Time_Step_For_Swarm_Statistics(n_stat_p,  &
+                                                           verbose = .true.)
 
   ! Read physical models for each domain from control file
   do d = 1, n_dom
@@ -171,7 +174,7 @@
   do d = 1, n_dom
     call Control_Mod_Switch_To_Domain(d)  ! take proper control file
     call Backup_Mod_Load(flow(d), swarm(d), turb(d), mult(d),  &
-                         time, first_dt, n_stat, backup(d))
+                         time, first_dt, n_stat_t, backup(d))
 
     ! Initialize variables
     if(.not. backup(d)) then
@@ -402,15 +405,15 @@
       end if
 
       ! Calculate mean values
-      call Turb_Mod_Calculate_Mean(turb(d), n_stat, n)
-      call User_Mod_Calculate_Mean(turb(d), n_stat, n)
+      call Turb_Mod_Calculate_Mean(turb(d), n_stat_t, n)
+      call User_Mod_Calculate_Mean(turb(d), n_stat_t, n)
 
       ! Adjust pressure drops to keep the mass fluxes constant
       call Bulk_Mod_Adjust_P_Drops(flow(d) % bulk, flow(d) % dt)
 
       ! Just before the end of time step
       call User_Mod_End_Of_Time_Step(flow(d), turb(d), mult(d), swarm(d),  &
-                                     n, time)
+                                     n, n_stat_t, n_stat_p, time)
     end do
 
     !----------------------!
@@ -427,7 +430,7 @@
       do d = 1, n_dom
         call Control_Mod_Switch_To_Domain(d)
         call Backup_Mod_Save(flow(d), swarm(d), turb(d), mult(d),  &
-                             time, n, n_stat, domain=d)
+                             time, n, n_stat_t, domain=d)
       end do
     end if
 
@@ -498,7 +501,7 @@
 
     ! Save backup and post-processing files at exit
     call Backup_Mod_Save(flow(d), swarm(d), turb(d), mult(d),  &
-                         time, n, n_stat, domain=d)
+                         time, n, n_stat_t, domain=d)
     call Save_Results(flow(d), turb(d), mult(d), swarm(d), n,  &
                       plot_inside=.true., domain=d)
     call Save_Results(flow(d), turb(d), mult(d), swarm(d), n,  &
