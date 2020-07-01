@@ -17,11 +17,6 @@
                                      grid % n_nodes,      &
                                      grid % n_bnd_cells,  &
                                      grid % n_cells,      &
-                                     grid % n_faces)
-
-  allocate (grid % comm % buff_face_c1(grid % n_faces))
-  allocate (grid % comm % buff_face_c2(grid % n_faces))
-  grid % comm % buff_face_c1(:) = 0
-  grid % comm % buff_face_c2(:) = 0
+                                     grid % n_faces + grid % n_shadows)
 
   end subroutine

@@ -353,7 +353,7 @@
   ! Fill the info screen up
   call Info_Mod_Iter_Fill_At(1, i, ui % name, exec_iter, ui % res)
 
-  call Grid_Mod_Exchange_Real(grid, ui % n)
+  call Grid_Mod_Exchange_Cells_Real(grid, ui % n)
 
   ! User function
   call User_Mod_End_Of_Compute_Momentum(flow, turb, mult, dt, ini)

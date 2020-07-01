@@ -19,13 +19,17 @@
   logical, optional :: correct_sign  ! in case of face fluxes, signs might have
                                      ! to be changed (check it one day)
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: s, c, c1, c2, cg1, cg2, mc, max_cnt
+  integer              :: s, c, c1, c2, cg1, cg2, mc, max_cnt, nb, nc
   integer, allocatable :: cells_cg(:,:)   ! cells' cells
   integer, allocatable :: cells_fc(:,:)   ! cells' faces
 !==============================================================================!
 
-  allocate(cells_cg (24, grid % n_cells));  cells_cg  = 0
-  allocate(cells_fc (24, grid % n_cells));  cells_fc  = 0
+  ! Take aliases
+  nb = grid % n_bnd_cells
+  nc = grid % n_cells
+
+  allocate(cells_cg(24, grid % n_cells));  cells_cg  = 0
+  allocate(cells_fc(24, grid % n_cells));  cells_fc  = 0
 
   cells_nf(:) = 0
 
@@ -76,7 +80,7 @@
     do c = 1, grid % n_cells
       ivalues(c) = cells_cg(mc,c)
     end do
-    call Grid_Mod_Exchange_Int(grid, ivalues)
+    call Grid_Mod_Exchange_Cells_Int(grid, ivalues(-nb:nc))
 
     ! Update buffer cells with neighbors
     do c = grid % n_cells - grid % comm % n_buff_cells + 1, grid % n_cells
@@ -106,7 +110,7 @@
     write(var_name(11:12), '(i2.2)') mc  ! set name of the backup variable
     call Backup_Mod_Read_Cell(comm,  &
                               fh, disp, vc, var_name, rvalues(1:comm % nc_s))
-    call Grid_Mod_Exchange_Real(grid, rvalues)
+    call Grid_Mod_Exchange_Cells_Real(grid, rvalues(-nb:nc))
     do c = 1, grid % n_cells - grid % comm % n_buff_cells
       if( cells_cg(mc, c) .ne. 0 ) then
         flux( cells_fc(mc, c) ) = rvalues(c)

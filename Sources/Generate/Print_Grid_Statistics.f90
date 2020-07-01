@@ -19,7 +19,8 @@
   print 1, '#------------------------------------------------'
   print 2, '# Number of nodes         :', grid % n_nodes
   print 2, '# Number of cells         :', grid % n_cells
-  print 2, '# Number of sides         :', grid % n_faces
+  print 2, '# Number of faces         :', grid % n_faces
+  print 2, '# Number of shadow faces  :', grid % n_shadows
   print 2, '# Number of boundary cells:', grid % n_bnd_cells
   print 1, '#------------------------------------------------'
 1 format (a50)

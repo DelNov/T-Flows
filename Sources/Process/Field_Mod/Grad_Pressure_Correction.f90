@@ -15,7 +15,7 @@
   ! Take aliases
   grid => flow % pnt_grid
 
-  call Grid_Mod_Exchange_Real(grid, pp % n)
+  call Grid_Mod_Exchange_Cells_Real(grid, pp % n)
 
   !---------------------------------!
   !   No correction at boundaries   !

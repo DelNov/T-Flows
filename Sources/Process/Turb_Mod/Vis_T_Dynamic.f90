@@ -65,10 +65,10 @@
   nb   =  grid % n_bnd_cells
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
-  call Grid_Mod_Exchange_Real(grid, u % n)
-  call Grid_Mod_Exchange_Real(grid, v % n)
-  call Grid_Mod_Exchange_Real(grid, w % n)
-  call Grid_Mod_Exchange_Real(grid, flow % shear)
+  call Grid_Mod_Exchange_Cells_Real(grid, u % n)
+  call Grid_Mod_Exchange_Cells_Real(grid, v % n)
+  call Grid_Mod_Exchange_Cells_Real(grid, w % n)
+  call Grid_Mod_Exchange_Cells_Real(grid, flow % shear)
 
   do c =1, grid % n_cells
     u_a   = 0.0

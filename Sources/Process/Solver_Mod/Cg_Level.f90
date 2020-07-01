@@ -101,7 +101,7 @@
     !------------!
     !   q = Ap   !
     !------------!
-    call Grid_Mod_Exchange_Real(a % pnt_grid, p)
+    call Grid_Mod_Exchange_Cells_Real(a % pnt_grid, p)
     do i = 1, ni
       z(i) = 0.0
       do j = a % row(i), a % row(i+1)-1

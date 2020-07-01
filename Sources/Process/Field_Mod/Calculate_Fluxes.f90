@@ -24,6 +24,10 @@
   bulk % flux_y = 0.0
   bulk % flux_z = 0.0
 
+  dens_are_x = 0.0
+  dens_are_y = 0.0
+  dens_are_z = 0.0
+
   !-------------------------------------------------------------------------!
   !   Summ up mass fluxes [kg/s] over all faces at monitoring plane         !
   !   (Resulting mass flux will be for the whole domain, still in [kg/s])   !
@@ -33,7 +37,7 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
-    if(c2 > 0) then
+    if(grid % comm % cell_proc(c1) .eq. this_proc) then
 
       xc1 = grid % xc(c1)
       yc1 = grid % yc(c1)

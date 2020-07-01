@@ -122,7 +122,7 @@
     !--------------!
     !   v2 = Ap2   !
     !--------------!
-    call Grid_Mod_Exchange_Real(a % pnt_grid, p2(-nb:ni))
+    call Grid_Mod_Exchange_Cells_Real(a % pnt_grid, p2(-nb:ni))
     do i = 1, ni
       v2(i) = 0.0
       do j = a % row(i), a % row(i+1)-1
@@ -158,7 +158,7 @@
     !---------------!
     !   q2 = A p1   !
     !---------------!
-    call Grid_Mod_Exchange_Real(a % pnt_grid, p1(-nb:ni))
+    call Grid_Mod_Exchange_Cells_Real(a % pnt_grid, p1(-nb:ni))
     do i = 1, ni
       q2(i) = 0.0
       do j = a % row(i), a % row(i+1)-1

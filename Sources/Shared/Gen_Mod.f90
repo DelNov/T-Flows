@@ -14,7 +14,7 @@
   integer, allocatable :: face_c_to_c(:,:)
 
   ! Periodic and copy boundaries
-  integer              :: n_periodic_cond,      n_copy_cond
-  integer, allocatable ::   periodic_cond(:,:),   copy_cond(:,:)
+  integer              :: n_periodic_cond
+  integer, allocatable ::   periodic_cond(:,:)
 
 end module

@@ -15,7 +15,7 @@ FCOMP="gnu"
 # Conduct tests with DEBUG=yes
 DEBUG="no"
 # Conduct tests with CGNS or not
-CGNS="yes"
+CGNS="no"
 CGNS_MPI="openmpi"
 
 # A small reminder how to set up alternatives if you have mpich and openmpi:
@@ -35,6 +35,14 @@ LAMINAR_CAVITY_THERM_DRIVEN_106_DIR=Laminar/Cavity/Thermally_Driven/Ra_10e6
 LAMINAR_CAVITY_THERM_DRIVEN_108_DIR=Laminar/Cavity/Thermally_Driven/Ra_10e8
 LAMINAR_T_JUNCTION_DIR=Laminar/T_Junction
 LAMINAR_CHANNEL=Laminar/Accuracy_Test/Channel_Re_2000
+
+MULTDOM_MEMBRANE_DIR=Rans/Membrane
+
+# Add compressed meshes for these:
+# MULTDOM_SINGLE_ROD_DIR=Rans/Single_Rod
+# MULTDOM_COPY_INLET_DIR=Laminar/Copy_Inlet
+# MULTDOM_HEAT_EXCHANGER_2_DIR=Laminar/Heat_Exchanger/2_Domains
+# MULTDOM_HEAT_EXCHANGER_3_DIR=Laminar/Heat_Exchanger/3_Domains
 
 LES_CHANNEL_180_PD_DIR=Les/Channel_Re_Tau_180/Periodic_Domain
 
@@ -72,7 +80,9 @@ ALL_COMPILE_TESTS=("$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
                    "$RANS_CHANNEL_LR_STRETCHED_DIR" \
                    "$RANS_CHANNEL_LR_RSM_DIR" \
                    "$HYB_CHANNEL_HR_UNIFORM_DIR" \
-                   "$HYB_CHANNEL_HR_STRETCHED_DIR")
+                   "$HYB_CHANNEL_HR_STRETCHED_DIR" \
+                   "$MULTDOM_MEMBRANE_DIR" \
+                   )
 DONE_COMPILE_TESTS=0
 
 #----------------------------------
@@ -91,7 +101,9 @@ ALL_GENERATE_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR" \
                     "$RANS_CHANNEL_LR_STRETCHED_DIR" \
                     "$RANS_CHANNEL_LR_UNIFORM_DIR" \
                     "$HYB_CHANNEL_HR_UNIFORM_DIR" \
-                    "$HYB_CHANNEL_HR_STRETCHED_DIR")
+                    "$HYB_CHANNEL_HR_STRETCHED_DIR" \
+                    "$MULTDOM_COPY_INLET" \
+                    )
 DONE_GENERATE_TESTS=0
 
 #---------------------------------
@@ -99,7 +111,9 @@ DONE_GENERATE_TESTS=0
 #---------------------------------
 ALL_CONVERT_TESTS=("$RANS_IMPINGING_JET_DIR" \
                    "$RANS_FUEL_BUNDLE_DIR" \
-                   "$LES_PIPE_DIR")
+                   "$LES_PIPE_DIR" \
+                   "$MULTDOM_MEMBRANE_DIR" \
+                   )
 DONE_CONVERT_TESTS=0
 
 #--------------------------------
@@ -121,7 +135,9 @@ ALL_DIVIDE_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR" \
                   "$HYB_CHANNEL_HR_UNIFORM_DIR" \
                   "$RANS_IMPINGING_JET_DIR" \
                   "$RANS_FUEL_BUNDLE_DIR"
-                  "$LES_PIPE_DIR")
+                  "$LES_PIPE_DIR" \
+                  "$MULTDOM_MEMBRANE_DIR" \
+                  )
 DONE_DIVIDE_TESTS=0
 
 #-----------------------------------------------
@@ -141,7 +157,8 @@ ALL_PROCESS_TESTS=("$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
                    "$RANS_CHANNEL_LR_RSM_DIR" \
                    "$HYB_CHANNEL_HR_STRETCHED_DIR" \
                    "$HYB_CHANNEL_HR_UNIFORM_DIR" \
-                   "$LES_PIPE_DIR")
+                   "$LES_PIPE_DIR" \
+                   )
 ALL_PROCESS_MODELS=("none" \
                     "none" \
                     "none" \
@@ -242,6 +259,7 @@ function clean_compile {
 
   time_in_seconds
 
+  cd - > /dev/null
   return $success
   if [ $success -eq 0 ]; then
     echo "Clean compile passed."
@@ -275,8 +293,17 @@ function launch_generate {
     echo "#------------------------------------------------------------------"
     echo "generate.scr: " >> $FULL_LOG 2>&1
   fi
-  cat generate.scr >> $FULL_LOG 2>&1
-  $GENE_EXE < generate.scr >> $FULL_LOG 2>&1
+
+  if [ $(ls -1 generate*.scr 2>/dev/null | wc -l) -gt 0 ]; then
+    if [ -L gen.scr ]; then unlink gen.scr; fi
+    for gen in $(ls -1 generate*.scr); do
+      ln -s "$gen" gen.scr
+      cat gen.scr >> $FULL_LOG 2>&1
+      $GENE_EXE < gen.scr >> $FULL_LOG 2>&1
+      unlink gen.scr
+    done
+  fi
+
   success=$?
   time_in_seconds
   return $success
@@ -299,8 +326,17 @@ function launch_divide {
     echo "#------------------------------------------------------------------"
     echo "divide.scr: " >> $FULL_LOG 2>&1
   fi
-  cat divide.scr >> $FULL_LOG 2>&1
-  $DIVI_EXE < divide.scr >> $FULL_LOG 2>&1
+
+  if [ $(ls -1 divide*.scr 2>/dev/null | wc -l) -gt 0 ]; then
+    if [ -L div.scr ]; then unlink div.scr; fi
+    for div in $(ls -1 divide*.scr); do
+      ln -s "$div" div.scr
+      cat div.scr >> $FULL_LOG 2>&1
+      $DIVI_EXE < div.scr >> $FULL_LOG 2>&1
+      unlink div.scr
+    done
+  fi
+
   success=$?
   time_in_seconds
   return $success
@@ -313,14 +349,26 @@ function launch_divide {
 #------------------------------------------------------------------------------#
 function launch_convert {
   # $1 = relative dir
-  make_links $TEST_DIR/$1
   echo ""
   echo "#=================================================================="
   echo "#   Convert test:" $1
   echo "#------------------------------------------------------------------"
+
+  make_links $TEST_DIR/$1
+  unpack_mesh $TEST_DIR/$1
+
   echo "convert.scr: " >> $FULL_LOG 2>&1
-  cat convert.scr >> $FULL_LOG 2>&1
-  $CONV_EXE < convert.scr >> $FULL_LOG 2>&1
+
+  if [ $(ls -1 convert*.scr 2>/dev/null | wc -l) -gt 0 ]; then
+    if [ -L conv.scr ]; then unlink conv.scr; fi
+    for conv in $(ls -1 convert*.scr); do
+      ln -s "$conv" conv.scr
+      cat conv.scr >> $FULL_LOG 2>&1
+      $CONV_EXE < conv.scr >> $FULL_LOG 2>&1
+      unlink conv.scr
+    done
+  fi
+
   success=$?
   time_in_seconds
   return $success
@@ -384,38 +432,43 @@ function generate_tests {
 }
 
 #------------------------------------------------------------------------------#
-# unpack .neu mesh
+# unpack mesh (.tar & tar.xz, .tgz & tar.gz, .gz, 7z)
 #------------------------------------------------------------------------------#
-function unpack_neu_mesh {
-  # $1 = archive name
+function unpack_mesh {
+  # $1 = directory with test case
 
-   if [ -z "${1+xxx}" ]; then 
-    echo "archive name is not set at all"
+  if [ -z "${1+xxx}" ]; then 
+    echo "directory is not set at all"
     exit 1
   fi
 
-  echo "unpacking geometry" "$1"
+  cd "$1"
 
-  filename=$(basename -- "$1") # filename without path
-  fname="${filename%%.*}"      # filename without extension
-  ext="${filename#*.}"         # extension
-
-  if [ -f "$fname"."neu" ]; then
-    return
-  elif [ -f "$fname"."tar.gz" ]; then
-    tar -zxvf "$fname"."tar.gz"
-  elif [ -f "$fname"."tgz" ]; then
-    tar -zxvf "$fname"."tgz"
-  elif [ -f "$fname"."neu.tgz" ]; then
-    tar -zxvf "$fname"."neu.tgz"
-  elif [ -f "$fname"."gz" ]; then
-    gunzip -c "$fname"."gz" > "$fname"
-  elif [ -f "$fname"."neu.gz" ]; then
-    gunzip -c "$fname"."neu.gz" > "$fname"."neu"
-  else
-    echo "could not extract" "$fname"."$ext"
-    exit 1
+  # .gz, *.tgz
+  if [ $(ls -1 {*.gz,*.tgz} 2>/dev/null | wc -l) -gt 0 ]; then
+    for archive in $(ls -1 {*.gz,*.tgz} 2>/dev/null); do
+      echo "uncompressing archive:" "$archive"
+      gunzip -kf "$archive" >> $FULL_LOG 2>&1
+    done
   fi
+
+  # .tar, .tar.xz
+  if [ $(ls -1 {*.tar,*.tar.xz} 2>/dev/null | wc -l) -gt 0 ]; then
+    for archive in $(ls -1 {*.tar,*.tar.xz} 2>/dev/null); do
+      echo "uncompressing archive:" "$archive"
+      tar -xf "$archive" >> $FULL_LOG 2>&1
+    done
+  fi
+
+  # .7z
+  if [ $(ls -1 *.7z 2>/dev/null | wc -l) -gt 0 ]; then
+    for archive in $(ls -1 *.7z 2>/dev/null); do
+      echo "uncompressing archive:" "$archive"
+      7z x -y "$archive" >> $FULL_LOG 2>&1
+    done
+  fi
+
+  cd - > /dev/null
 }
 
 #------------------------------------------------------------------------------#
@@ -429,10 +482,6 @@ function convert_tests {
   echo "#   Running Convert tests"
   echo "#"
   echo "#----------------------------------------------------------------------"
-
-  cd $TEST_DIR/$RANS_IMPINGING_JET_DIR;  unpack_neu_mesh  jet.neu
-  cd $TEST_DIR/$RANS_FUEL_BUNDLE_DIR;    unpack_neu_mesh  subflow.neu.gz
-  cd $TEST_DIR/$LES_PIPE_DIR;            unpack_neu_mesh  pipe.neu.gz
 
   clean_compile $CONV_DIR no # dir MPI
 
@@ -479,7 +528,7 @@ function replace_line_with_first_occurence_in_file {
     echo $new_line >> $3
     echo "Warning: added "$2" to the end of $3"
   else
-    sed -i ""$line_to_replace"s%.*%$new_line%" $3
+    sed --follow-symlinks -i ""$line_to_replace"s%.*%$new_line%" $3
   fi
 
   # previous approach was with
@@ -525,96 +574,162 @@ function process_backup_test {
   fi
 
   echo "Process backup tests.."
-
-  # save original contol file
-  cp $1/control $1/control.backup
-
-  name_in_div=$(head -n1 "$1"/divide.scr)
-  nproc_in_div=$(head -n2  "$1"/divide.scr | tail -n1)
+  cd "$1"
 
   n1=$(printf "%06d" 1)
   n2=$(printf "%06d" 2)
 
-  #----------------------------------------#
+  # Unlink all possible links, which are used below
+  if [ -L control ]; then unlink control; fi
+  for i in {0..9}; do
+    if [ -L control."$i" ]; then unlink control."$i"; fi
+  done
+  if [ -L divide.1.scr ]; then unlink divide.1.scr; fi
+
+  n_dom=$(ls -1 control.? 2>/dev/null | wc -l)
+  if [ $n_dom -eq 0 ]; then
+    n_dom=1
+    ln -s control control.0
+    ln -s control control.1
+    ln -s divide.scr divide.1.scr
+  elif [ $n_dom -gt 1 ]; then
+    n_dom=$(($n_dom-1))
+    ln -s control.0 control
+  fi
+
+  nproc_in_div=$(head -n2 divide.1.scr | tail -n1)
+
+  # BEGIN:---------------------------------------#
   echo "np=1, MPI=no, start from 0, make a backup"
   clean_compile $PROC_DIR no # dir MPI
-  cd $1
 
-  # comment line with LOAD_BACKUP_NAME
-  replace_line_with_first_occurence_in_file \
-    "LOAD_BACKUP_NAME" \
-    "#LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" \
-    control
+  for (( i=1; i<=$n_dom; i++ )); do
+    name_in_div=$(head -n1 divide."$i".scr)
 
-  # change number of timesteps to 3
-  replace_line_with_first_occurence_in_file \
-    "NUMBER_OF_TIME_STEPS" \
-    "NUMBER_OF_TIME_STEPS 3" \
-    control
+    # comment line with LOAD_BACKUP_NAME
+    replace_line_with_first_occurence_in_file \
+      "LOAD_BACKUP_NAME" \
+      "#LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" \
+      control."$i"
 
-  # change backup interval to 1 ts
-  replace_line_with_first_occurence_in_file \
-    "BACKUP_SAVE_INTERVAL" \
-    "BACKUP_SAVE_INTERVAL 1" \
-    control
+    # change number of timesteps to 3
+    replace_line_with_first_occurence_in_file \
+      "NUMBER_OF_TIME_STEPS" \
+      "NUMBER_OF_TIME_STEPS 3" \
+      control.0
+
+    # change backup interval to 1 ts
+    replace_line_with_first_occurence_in_file \
+      "BACKUP_SAVE_INTERVAL" \
+      "BACKUP_SAVE_INTERVAL 1" \
+      control.0
+  done
 
   launch_process seq 1
-  #----------------------------------------#
+  #-----------------------------------------:END #
+
+
+  # BEGIN:---------------------------------------------#
   echo "np=1, MPI=no, load from backup(produced by seq)"
 
-  # uncomment line with LOAD_BACKUP_NAME
-  replace_line_with_first_occurence_in_file \
-    "LOAD_BACKUP_NAME" \
-    "LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" \
-    control
+  for (( i=1; i<=$n_dom; i++ )); do
+    name_in_div=$(head -n1 divide."$i".scr)
+
+    # uncomment line with LOAD_BACKUP_NAME
+    replace_line_with_first_occurence_in_file \
+      "LOAD_BACKUP_NAME" \
+      "LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" \
+      control."$i"
+  done
 
   launch_process seq 1
-  #----------------------------------------#
+  #-----------------------------------------------:END #
+
+
+  # BEGIN:----------------------------------------------#
   echo "np=1, MPI=yes, load from backup(produced by seq)"
   clean_compile $PROC_DIR yes # dir MPI
-  cd $1
 
   launch_process par 1
-  #----------------------------------------#
+  #------------------------------------------------:END #
+
+
+  # BEGIN:----------------------------------------------#
   echo "np=2, MPI=yes, load from backup(produced by seq)"
 
   launch_process par $nproc_in_div
-  #----------------------------------------#
+  #------------------------------------------------:END #
+
+
+  # BEGIN:---------------------------------------------------#
   echo "np=2, MPI=yes, load from backup(produced by par.np=1)"
 
-  replace_line_with_first_occurence_in_file \
-    "LOAD_BACKUP_NAME" \
-    "LOAD_BACKUP_NAME "$name_in_div"-ts"$n2".backup" \
-    control
+  for (( i=1; i<=$n_dom; i++ )); do
+    name_in_div=$(head -n1 divide."$i".scr)
+
+    replace_line_with_first_occurence_in_file \
+      "LOAD_BACKUP_NAME" \
+      "LOAD_BACKUP_NAME "$name_in_div"-ts"$n2".backup" \
+      control."$i"
+  done
 
   launch_process par $nproc_in_div
-  #----------------------------------------#
+  #-----------------------------------------------------:END #
+
+
+  # BEGIN:----------------------------------------#
   echo "np=2, MPI=yes, start from 0, make a backup"
 
-  replace_line_with_first_occurence_in_file \
-    "LOAD_BACKUP_NAME" \
-    "#LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" \
-    control
+  for (( i=1; i<=$n_dom; i++ )); do
+    name_in_div=$(head -n1 divide."$i".scr)
+
+    replace_line_with_first_occurence_in_file \
+      "LOAD_BACKUP_NAME" \
+      "#LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" \
+      control."$i"
+  done
 
   launch_process par $nproc_in_div
-  #----------------------------------------#
-  echo "np=2, MPI=yes, load from backup(produced by par.np=2) "
+  #------------------------------------------:END #
 
-  replace_line_with_first_occurence_in_file \
-    "LOAD_BACKUP_NAME" \
-    "LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" \
-    control
+
+  # BEGIN:----------------------------------------------------#
+  echo "np=2, MPI=yes, load from backup(produced by par.np=2)"
+
+  for (( i=1; i<=$n_dom; i++ )); do
+    name_in_div=$(head -n1 divide."$i".scr)
+
+    replace_line_with_first_occurence_in_file \
+      "LOAD_BACKUP_NAME" \
+      "LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" \
+      control."$i"
+  done
 
   launch_process par $nproc_in_div
-  #----------------------------------------#
+  #------------------------------------------------------:END #
+
+
+  # BEGIN:------------------------------------------#
   echo "np=1, MPI=yes, backup=(produced by par.np=2)"
   clean_compile $PROC_DIR no # dir MPI
-  cd $1
   launch_process par 1
-  #----------------------------------------#
+  #--------------------------------------------:END #
+
 
   # Restore control
-  git checkout control
+  if [ $n_dom -eq 1 ]; then
+    unlink control.0
+    unlink control.1
+    unlink divide.1.scr
+
+    git checkout control
+  else
+    unlink control
+    git checkout control.?
+  fi
+
+  cd - > /dev/null
+
 }
 
 #------------------------------------------------------------------------------#
@@ -622,6 +737,7 @@ function process_backup_test {
 #------------------------------------------------------------------------------#
 function process_backup_tests {
 
+  # Grasp/embrace as many different model combinations as you can
   echo ""
   echo "#======================================================================"
   echo "#"
@@ -629,13 +745,10 @@ function process_backup_tests {
   echo "#"
   echo "#----------------------------------------------------------------------"
 
-  # Grasp/embrace as many different model combinations as you can
-
   echo ""
   echo "#======================================================================"
   echo "#   Test 1: "$RANS_CHANNEL_LR_UNIFORM_DIR" [k_eps model + T]"
   echo "#----------------------------------------------------------------------"
-  #-- Channel_Re_Tau_590 [k_eps model + T]
   replace_line_with_first_occurence_in_file \
     "TURBULENCE_MODEL" \
     "TURBULENCE_MODEL k_eps" \
@@ -648,7 +761,6 @@ function process_backup_tests {
   echo "#======================================================================"
   echo "#   Test 2: "$RANS_CHANNEL_LR_UNIFORM_DIR" [k_eps_zeta_f model + T]"
   echo "#----------------------------------------------------------------------"
-  #-- Channel_Re_Tau_590 [k_eps_zeta_f model + T]
   replace_line_with_first_occurence_in_file \
     "TURBULENCE_MODEL" \
     "TURBULENCE_MODEL k_eps_zeta_f" \
@@ -661,7 +773,6 @@ function process_backup_tests {
   echo "#======================================================================"
   echo "#   Test 3: "$RANS_CHANNEL_LR_RSM_DIR" [rsm_hanjalic_jakirlic model + T]"
   echo "#----------------------------------------------------------------------"
-  #-- Channel_Re_Tau_590_Rsm [rsm_hanjalic_jakirlic model + T]
   replace_line_with_first_occurence_in_file \
     "TURBULENCE_MODEL" \
     "TURBULENCE_MODEL rsm_hanjalic_jakirlic" \
@@ -674,7 +785,6 @@ function process_backup_tests {
   echo "#======================================================================"
   echo "#   Test 4: "$RANS_CHANNEL_LR_RSM_DIR" [rsm_manceau_hanjalic model + T]"
   echo "#----------------------------------------------------------------------"
-  #-- Channel_Re_Tau_590_Rsm [rsm_manceau_hanjalic model + T]
   replace_line_with_first_occurence_in_file \
     "TURBULENCE_MODEL" \
     "TURBULENCE_MODEL rsm_manceau_hanjalic" \
@@ -687,7 +797,6 @@ function process_backup_tests {
   echo "#======================================================================"
   echo "#   Test 5: "$LES_PIPE_DIR" les_dynamic"
   echo "#----------------------------------------------------------------------"
-  #-- Pipe_Re_Tau_180 [les_dynamic]
   process_backup_test \
     $TEST_DIR/$LES_PIPE_DIR
 
@@ -695,9 +804,15 @@ function process_backup_tests {
   echo "#======================================================================"
   echo "#   Test 6: "$LAMINAR_CAVITY_LID_DRIVEN_DIR" none"
   echo "#----------------------------------------------------------------------"
-  #-- Cavity_Lid_Driven_Re_1000 [none]
   process_backup_test \
     $TEST_DIR/$LAMINAR_CAVITY_LID_DRIVEN_DIR
+
+  echo ""
+  echo "#======================================================================"
+  echo "#   Test 7: "$MULTDOM_MEMBRANE_DIR" multidom: k_eps_zeta_f model + T"
+  echo "#----------------------------------------------------------------------"
+  process_backup_test \
+    $TEST_DIR/$MULTDOM_MEMBRANE_DIR
 
 }
 #------------------------------------------------------------------------------#
@@ -717,27 +832,54 @@ function process_save_exit_now_test {
   echo "#----------------------------------------------------------------------"
 
   cd "$TEST_DIR/$1"
-  name_in_div=$(head -n1 divide.scr)
-  nproc_in_div=$(head -n2  divide.scr | tail -n1)
 
   # get rid of "save_now" and "exit_now" files if they happen to exist
   if [ -f "save_now" ]; then rm save_now; fi
   if [ -f "exit_now" ]; then rm exit_now; fi
 
-  # change number of timesteps to 3
-  replace_line_with_first_occurence_in_file \
-    "NUMBER_OF_TIME_STEPS" \
-    "NUMBER_OF_TIME_STEPS 3" \
-    control
+  n1=$(printf "%06d" 1)
 
-  # change backup interval to 1 ts
-  replace_line_with_first_occurence_in_file \
-    "BACKUP_SAVE_INTERVAL" \
-    "BACKUP_SAVE_INTERVAL 10" \
-    control
+  # Unlink all possible links, which are used below
+  if [ -L control ]; then unlink control; fi
+  for i in {0..9}; do
+    if [ -L control."$i" ]; then unlink control."$i"; fi
+  done
+  if [ -L divide.1.scr ]; then unlink divide.1.scr; fi
 
-  for i in {1..3}
-  do
+  n_dom=$(ls -1 control.? 2>/dev/null | wc -l)
+  if [ $n_dom -eq 0 ]; then
+    n_dom=1
+    ln -s control control.0
+    ln -s control control.1
+    ln -s divide.scr divide.1.scr
+  elif [ $n_dom -gt 1 ]; then
+    n_dom=$(($n_dom-1))
+    ln -s control.0 control
+  fi
+
+  nproc_in_div=$(head -n2 divide.1.scr | tail -n1)
+
+  # BEGIN:---------------------------------------#
+  echo "np=1, MPI=no, start from 0, make a backup"
+  clean_compile $PROC_DIR no # dir MPI
+
+  for (( i=1; i<=$n_dom; i++ )); do
+    name_in_div=$(head -n1 divide."$i".scr)
+
+    # change number of timesteps to 3
+    replace_line_with_first_occurence_in_file \
+      "NUMBER_OF_TIME_STEPS" \
+      "NUMBER_OF_TIME_STEPS 3" \
+      control.0
+
+    # change backup interval to 1 ts
+    replace_line_with_first_occurence_in_file \
+      "BACKUP_SAVE_INTERVAL" \
+      "BACKUP_SAVE_INTERVAL 10" \
+      control.0
+  done
+
+  for i in {1..3}; do
     echo ""
     echo "#===================================================================="
     if [ "$i" = 1 ]; then
@@ -751,24 +893,29 @@ function process_save_exit_now_test {
     fi
     echo "#--------------------------------------------------------------------"
 
-    # comment line with LOAD_BACKUP_NAME
-    n1=$(printf "%06d" 1)
-    replace_line_with_first_occurence_in_file \
-      "LOAD_BACKUP_NAME" \
-      "#LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" \
-      control
+    # BEGIN:---------------------------------------------#
+    echo "np=1, MPI=no, load from backup(produced by seq)"
+
+    for (( i=1; i<=$n_dom; i++ )); do
+      name_in_div=$(head -n1 divide."$i".scr)
+
+      # comment line with LOAD_BACKUP_NAME
+      replace_line_with_first_occurence_in_file \
+        "LOAD_BACKUP_NAME" \
+        "#LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" \
+        control."$i"
+    done
+
+    launch_process seq 1
+    #-----------------------------------------------:END #
 
     if [ "$i" = 1 ]; then
       clean_compile $PROC_DIR no
-    fi
-    if [ "$i" = 2 ]; then
+    elif [ "$i" = 2 ]; then
+      clean_compile $PROC_DIR yes
+    elif [ "$i" = 3 ]; then
       clean_compile $PROC_DIR yes
     fi
-    if [ "$i" = 3 ]; then
-      clean_compile $PROC_DIR yes
-    fi
-
-    cd $TEST_DIR/$1
 
     echo "#   Forcing to save: save_now"
     touch save_now
@@ -779,39 +926,40 @@ function process_save_exit_now_test {
     # start from scratch
     if [ "$i" = 1 ]; then
       launch_process seq 1
-    fi
-    if [ "$i" = 2 ]; then
+    elif [ "$i" = 2 ]; then
       launch_process par 1
-    fi
-    if [ "$i" = 3 ]; then
+    elif [ "$i" = 3 ]; then
       launch_process par $nproc_in_div
     fi
 
     # find if save was made in the range [n_start: n_finish]
     if tail -n+$n_start $FULL_LOG | \
-      grep -q "# Creating the file: "$name_in_div"-ts"$n1"\|# Creating the file with fields: "$name_in_div"-ts"$n1""; then
+      grep -q "# Creating the file: "$name_in_div"-ts"$n1"\|\
+               # Creating the file with fields: "$name_in_div"-ts"$n1""; then
 
       echo "save_now was successfull"
 
       echo "Forcing to exit: exit_now"
       touch exit_now
 
-      # uncomment line with LOAD_BACKUP_NAME
-      replace_line_with_first_occurence_in_file \
-        "LOAD_BACKUP_NAME" \
-        "LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" \
-        control
+      for (( i=1; i<=$n_dom; i++ )); do
+        name_in_div=$(head -n1 divide."$i".scr)
+
+        # uncomment line with LOAD_BACKUP_NAME
+        replace_line_with_first_occurence_in_file \
+          "LOAD_BACKUP_NAME" \
+          "LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" \
+          control."$i"
+      done
 
       # start from ts=1
       n_start="$(echo "$(wc -l $FULL_LOG | cut -d" " -f1) + 1" | bc -l)"
 
       if [ "$i" = 1 ]; then
         launch_process seq 1
-      fi
-      if [ "$i" = 2 ]; then
+      elif [ "$i" = 2 ]; then
         launch_process par 1
-      fi
-      if [ "$i" = 3 ]; then
+      elif [ "$i" = 3 ]; then
         launch_process par $nproc_in_div
       fi
 
@@ -830,7 +978,16 @@ function process_save_exit_now_test {
   done
 
   # Restore control
-  git checkout "$TEST_DIR/$1"/control
+  if [ $n_dom -eq 1 ]; then
+    unlink control.0
+    unlink control.1
+    unlink divide.1.scr
+
+    git checkout control
+  else
+    unlink control
+    git checkout control.?
+  fi
 }
 
 #------------------------------------------------------------------------------#
@@ -906,13 +1063,42 @@ function process_compilation_test {
   fi
 
   cd "$TEST_DIR/$1"
-  name_in_div=$(head -n1 divide.scr)
-  nproc_in_div=$(head -n2 divide.scr | tail -n1)
+
+  # Unlink all possible links, which are used below
+  if [ -L control ]; then unlink control; fi
+  for i in {0..9}; do
+    if [ -L control."$i" ]; then unlink control."$i"; fi
+  done
+  if [ -L divide.1.scr ]; then unlink divide.1.scr; fi
+
+  n_dom=$(ls -1 control.? 2>/dev/null | wc -l)
+  if [ $n_dom -eq 0 ]; then
+    n_dom=1
+    ln -s control control.1
+    ln -s divide.scr divide.1.scr
+  elif [ $n_dom -gt 1 ]; then
+    n_dom=$(($n_dom-1))
+    ln -s control.0 control
+  fi
+
+  nproc_in_div=$(head -n2 divide.1.scr | tail -n1)
+  name_in_div=$(head -n1 divide.1.scr)
 
   # rel_dir to User_Mod/ from Process/
   rel_dir=$(realpath --relative-to="$PROC_DIR" "$TEST_DIR/$1")
 
   clean_compile $PROC_DIR yes $rel_dir # dir MPI DIR_CASE
+
+  # Restore control
+  if [ $n_dom -eq 1 ]; then
+    unlink control.1
+    unlink divide.1.scr
+
+    git checkout control
+  else
+    unlink control
+    git checkout control.?
+  fi
 }
 
 #------------------------------------------------------------------------------#
@@ -953,45 +1139,68 @@ function process_full_length_test {
   fi
 
   cd "$1"
-  name_in_div=$(head -n1 divide.scr)
-  nproc_in_div=$(head -n2 divide.scr | tail -n1)
 
+  n1=$(printf "%06d" 1)
+
+  # Unlink all possible links, which are used below
+  if [ -L control ]; then unlink control; fi
+  for i in {0..9}; do
+    if [ -L control."$i" ]; then unlink control."$i"; fi
+  done
+  if [ -L divide.1.scr ]; then unlink divide.1.scr; fi
+
+  n_dom=$(ls -1 control.? 2>/dev/null | wc -l)
+  if [ $n_dom -eq 0 ]; then
+    n_dom=1
+    ln -s control control.1
+    ln -s divide.scr divide.1.scr
+  elif [ $n_dom -gt 1 ]; then
+    n_dom=$(($n_dom-1))
+    ln -s control.0 control
+  fi
+
+  nproc_in_div=$(head -n2 divide.1.scr | tail -n1)
+
+  # BEGIN:-------------------------#
   echo "np="$nproc_in_div", MPI=yes"
   # rel_dir to User_Mod/ from Process/
   rel_dir=$(realpath --relative-to="$PROC_DIR" "$1")
 
   clean_compile $PROC_DIR yes $rel_dir # dir MPI DIR_CASE
 
-  cd "$1"
+  for (( i=1; i<=$n_dom; i++ )); do
+    name_in_div=$(head -n1 divide."$i".scr)
 
-  n1=$(printf "%06d" 1)
+    # comment line with LOAD_BACKUP_NAME
+    replace_line_with_first_occurence_in_file \
+      "LOAD_BACKUP_NAME" \
+      "#LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" \
+      control."$i"
 
-  # comment line with LOAD_BACKUP_NAME
-  replace_line_with_first_occurence_in_file \
-    "LOAD_BACKUP_NAME" \
-    "#LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" \
-    control
-
-#  # change number of timesteps to 2000
-#  replace_line_with_first_occurence_in_file "NUMBER_OF_TIME_STEPS" \
-#    "NUMBER_OF_TIME_STEPS 2000" control
-#
-#  # change backup interval to 100 ts
-#  replace_line_with_first_occurence_in_file "BACKUP_SAVE_INTERVAL" \
-#    "BACKUP_SAVE_INTERVAL 1000" control
-
-  # change model to $2
-  replace_line_with_first_occurence_in_file \
-    "TURBULENCE_MODEL" \
-    "TURBULENCE_MODEL "$2"" \
-    control
+    # change model to $2
+    replace_line_with_first_occurence_in_file \
+      "TURBULENCE_MODEL" \
+      "TURBULENCE_MODEL "$2"" \
+      control."$i"
+  done
 
   launch_process par $nproc_in_div
+  #---------------------------:END #
 
   # Restore control
-  git checkout control
+  if [ $n_dom -eq 1 ]; then
+    unlink control.1
+    unlink divide.1.scr
 
-  if ls "$name_in_div"-res-plus-ts??????.dat 1> /dev/null 2>&1; then # case-ts??????-res-plus.dat
+    git checkout control
+  else
+    unlink control
+    git checkout control.?
+  fi
+
+  # If results are present [produced by User_Mod_Save_Results]
+  if [ $(ls -1 "$name_in_div"-res-plus-ts??????.dat 2>/dev/null | wc -l)\
+    -gt 0 ]; then
 
     # extract essential data from produced .dat files
     last_results_plus_dat_file=$(realpath --relative-to="$3" \
@@ -1094,8 +1303,6 @@ function process_accuracy_test {
 
     clean_compile $PROC_DIR yes $rel_dir # dir MPI DIR_CASE
 
-    cd $path
-
     launch_process par $nproc_in_div
 
     # Restore control
@@ -1105,7 +1312,8 @@ function process_accuracy_test {
     if ls "$name_in_div"-res-ts??????.dat 1> /dev/null 2>&1; then
 
       # extract essential data from produced .dat files
-      last_results_dat_file=$(ls -tr1 "$name_in_div"-res-ts??????.dat | tail -n1)
+      last_results_dat_file=\
+        $(ls -tr1 "$name_in_div"-res-ts??????.dat | tail -n1)
 
       # Store this file with result
       nNy=$(printf "%06d" $((Ny-1)))

@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine Grid_Mod_Allocate_Comm(grid)
+  subroutine Comm_Mod_Recv_Log_Array(phi_r, len_r, dest)
+!------------------------------------------------------------------------------!
+!   Dummy function for sequential compilation.                                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  logical :: phi_r(len_r)  ! receive buffer
+  integer :: len_r         ! receive length
+  integer :: dest          ! destination processor
 !==============================================================================!
-
-  allocate (grid % comm % buff_c1_from_c2(grid % n_cells))
-
-  grid % comm % buff_c1_from_c2(:) = 0
 
   end subroutine
