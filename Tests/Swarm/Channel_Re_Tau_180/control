@@ -30,7 +30,6 @@ Prologue
 #----------------
 # Swarm related
 #----------------
-
  SWARM_DIAMETER                     1.8E-03
  SWARM_DENSITY                      1.00e3
  NUMBER_OF_SWARM_SUB_STEPS          50
