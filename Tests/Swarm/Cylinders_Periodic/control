@@ -5,7 +5,7 @@
  HEAT_TRANSFER    no
 
 NUMBER_OF_TIME_STEPS     300
- RESULTS_SAVE_INTERVAL    60
+ RESULTS_SAVE_INTERVAL     1
  BACKUP_SAVE_INTERVAL    150
  TIME_STEP               1.0
 
@@ -26,6 +26,15 @@ NUMBER_OF_TIME_STEPS     300
 
  TURBULENCE_MODEL       none
  MASS_FLOW_RATES        2.0  0.0  0.0
+
+#----------------
+# Swarm related
+#----------------
+ SWARM_DIAMETER                       1.8E-03
+ SWARM_DENSITY                        1.00e3
+ NUMBER_OF_SWARM_SUB_STEPS           50
+ NUMBER_OF_PARTICLES                100
+ SWARM_COEFFICIENT_OF_RESTITUTION     1.0
 
 #----------------------
 # Numerical parameters
