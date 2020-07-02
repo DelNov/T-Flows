@@ -31,8 +31,11 @@
 
   if(this_proc < 2) then
 
-    call File_Mod_Set_Name(name_out, time_step=time_step,  &
-                           extension='.swarm.vtu', domain=domain)
+    call File_Mod_Set_Name(name_out,             &
+                           time_step=time_step,  &
+                           appendix ='-swarm',   &
+                           extension='.vtu',     &
+                           domain=domain)
     call File_Mod_Open_File_For_Writing(name_out, fu)
 
     !------------!
@@ -91,6 +94,19 @@
       part => swarm % particle(k)
       write(fu,'(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')                         &
                  IN_5, part % u, part % v, part % w
+    end do
+    write(fu,'(a,a)') IN_4, '</DataArray>'
+
+    !-------------------------!
+    !   Velocity magnitudes   !
+    !-------------------------!
+    write(fu,'(a,a)') IN_4, '<DataArray type="Float64" '  //  &
+                            ' Name="Velocity_Magnitude" ' //  &
+                            ' format="ascii">'
+    do k = 1, swarm % n_particles
+      part => swarm % particle(k)
+      write(fu,'(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')                         &
+                 IN_5, sqrt(part % u**2 + part % v**2 + part % w**2)
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
 
