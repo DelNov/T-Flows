@@ -65,25 +65,23 @@
 
   ! Particle damping function for wall treatment (for feeded modeled flow
   ! quantities)
-  fd_p = 1.0 - exp(-(turb % y_plus(c)/25.0)**3)
+  ! fd_p = 1.0 - exp(-(turb % y_plus(c)/25.0)**3)
 
   ! Compute velocities at the particle position from velocity gradients
-  if(turb % model .eq. HYBRID_LES_PRANDTL) then
-    up = u % n(c)       &  ! u velocity at the new time step (% n)
-       + u % x(c) * rx  &  ! u % x is gradient du/dx
-       + u % y(c) * ry  &  ! u % y is gradient du/dy
-       + u % z(c) * rz     ! u % x is gradient du/dz
+  up = u % n(c)       &  ! u velocity at the new time step (% n)
+     + u % x(c) * rx  &  ! u % x is gradient du/dx
+     + u % y(c) * ry  &  ! u % y is gradient du/dy
+     + u % z(c) * rz     ! u % x is gradient du/dz
 
-    vp = v % n(c)       &  ! v velocity at the new time step (% n)
-       + v % x(c) * rx  &  ! v % x is gradient dv/dx
-       + v % y(c) * ry  &  ! v % y is gradient dv/dy
-       + v % z(c) * rz     ! v % x is gradient dv/dz
+  vp = v % n(c)       &  ! v velocity at the new time step (% n)
+     + v % x(c) * rx  &  ! v % x is gradient dv/dx
+     + v % y(c) * ry  &  ! v % y is gradient dv/dy
+     + v % z(c) * rz     ! v % x is gradient dv/dz
 
-    wp = w % n(c)       &  ! w velocity at the new time step (% n)
-       + w % x(c) * rx  &  ! w % x is gradient dw/dx
-       + w % y(c) * ry  &  ! w % y is gradient dw/dy
-       + w % z(c) * rz     ! w % x is gradient dw/dz
-  end if
+  wp = w % n(c)       &  ! w velocity at the new time step (% n)
+     + w % x(c) * rx  &  ! w % x is gradient dw/dx
+     + w % y(c) * ry  &  ! w % y is gradient dw/dy
+     + w % z(c) * rz     ! w % x is gradient dw/dz
 
   if(turb % model .eq. HYBRID_LES_RANS) then
 
@@ -107,29 +105,20 @@
     ! Compute velocities at the particle position from velocity gradients
     ! should create a switch for this case (SGS model is k-eps-zeta-f model
     ! itself)
-    up = u % n(c)       &  ! u velocity at the new time step (% n)
-       + u % x(c) * rx  &  ! u % x is gradient du/dx
-       + u % y(c) * ry  &  ! u % y is gradient du/dy
-       + u % z(c) * rz  &  ! u % x is gradient du/dz
-       + u_mod_xc       &  ! u_mod_dx is gradient du_mod/dx 
-       + u_mod_yc       &  ! u_mod_dy is gradient du_mod/dy   
-       + u_mod_zc          ! u_mod_dz is gradient du_mod/dz  
+    up = up             &  ! u velocity already at the particle
+       + u_mod_xc       &  ! u_mod_dx is gradient du_mod/dx
+       + u_mod_yc       &  ! u_mod_dy is gradient du_mod/dy
+       + u_mod_zc          ! u_mod_dz is gradient du_mod/dz
 
-    vp = v % n(c)      &  ! v velocity at the new time step (% n)
-       + v % x(c) * rx  &  ! v % x is gradient dv/dx
-       + v % y(c) * ry  &  ! v % y is gradient dv/dy
-       + v % z(c) * rz  &  ! v % x is gradient dv/dz
+    vp = vp             &  ! v velocity already at the particle
        + v_mod_xc       &  ! v_mod_dx is gradient dv_mod/dx
        + v_mod_yc       &  ! v_mod_dy is gradient dv_mod/dy
        + v_mod_zc          ! v_mod_dz is gradient dv_mod/dz
 
-    wp = w % n(c)       &      ! w velocity at the new time step (% n)
-       + w % x(c) * rx  &      ! w % x is gradient dw/dx
-       + w % y(c) * ry  &      ! w % y is gradient dw/dy
-       + w % z(c) * rz  &      ! w % x is gradient dw/dz
-       + w_mod_xc       &      ! w_mod_dx is gradient dw_mod/dx
-       + w_mod_yc       &      ! w_mod_dy is gradient dw_mod/dy
-       + w_mod_zc              ! w_mod_dz is gradient dw_mod/dz
+    wp = wp             &  ! w velocity already at the particle
+       + w_mod_xc       &  ! w_mod_dx is gradient dw_mod/dx
+       + w_mod_yc       &  ! w_mod_dy is gradient dw_mod/dy
+       + w_mod_zc          ! w_mod_dz is gradient dw_mod/dz
   end if
 
   ! Compute the magnitude of the interpolated velocity 
@@ -142,8 +131,8 @@
   part % tau = part % density * (part % d **2) / 18.0 / visc_const
 
   ! Particle terminal speed 
-  GRAVITY = sqrt(grav_x**2 + grav_y**2 + grav_z**2)
-  part % vel_t = part % tau * GRAVITY 
+  gravity = sqrt(grav_x**2 + grav_y**2 + grav_z**2)
+  part % vel_t = part % tau * gravity
 
   ! Compute particle relative vel. in y-dir for buoyant force calculation
   part % rel_u   = up - part % u
