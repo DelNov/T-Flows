@@ -14,7 +14,7 @@
   type(Field_Type),    pointer :: flow
   type(Grid_Type),     pointer :: grid
   type(Particle_Type), pointer :: part
-  integer                      :: c, m, l
+  integer                      :: c, o, m, l
 !==============================================================================!
 
   if(.not. swarm % statistics) return
@@ -27,7 +27,7 @@
   if(l > -1) then
 
     !---------------------------------!
-    !   Scale-resolving simulations   ! 
+    !   Scale-resolving simulations   !
     !---------------------------------!
     if(turbulence_model .eq. LES_SMAGORINSKY    .or.  &
        turbulence_model .eq. LES_DYNAMIC        .or.  &
@@ -43,9 +43,18 @@
       ! Cell in which the current particle resides
       c = swarm % particle(k) % cell
 
+      ! Current number of states (for swarm quantity averaging) 
       m = swarm % n_states(c)
 
-      ! Mean velocities
+      ! Current number of states (for particle velocity averaging) 
+      n = part % n_states
+
+      ! Mean velocities for "each" particle
+      part % u_mean = (part % u_mean * (1.*o) + part % u) / (1.*(o+1))
+      part % v_mean = (part % v_mean * (1.*o) + part % v) / (1.*(o+1))
+      part % w_mean = (part % w_mean * (1.*o) + part % w) / (1.*(o+1))
+
+      ! Mean velocities for swarm
       swarm % u_mean(c) = (swarm % u_mean(c) * (1.*m) + part % u) / (1.*(m+1))
       swarm % v_mean(c) = (swarm % v_mean(c) * (1.*m) + part % v) / (1.*(m+1))
       swarm % w_mean(c) = (swarm % w_mean(c) * (1.*m) + part % w) / (1.*(m+1))
@@ -59,8 +68,11 @@
       swarm % uw(c) = (swarm % uw(c)*(1.*m) + part % u * part % w) / (1.*(m+1))
       swarm % vw(c) = (swarm % vw(c)*(1.*m) + part % v * part % w) / (1.*(m+1))
 
-      ! Increaset the number of states for the cell
+      ! Increaset the number of states of the cell (for swarm) 
       swarm % n_states(c) = swarm % n_states(c) + 1
+
+      ! Increaset the number of states for the particle
+      part % n_states = part % n_states + 1
 
     end if
   end if

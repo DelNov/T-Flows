@@ -27,6 +27,11 @@
     real :: v
     real :: w
 
+    ! Particle's mean velocity (ensemble averaging)
+    real :: u_mean
+    real :: v_mean
+    real :: w_mean
+
     ! Particle's density
     real :: density
 
@@ -42,11 +47,24 @@
     integer :: bnd_cell
     integer :: bnd_face
 
+    ! Number of states for averaging particle velocity 
+    integer :: n_states
+
     ! Particle relative velocity components and magnitude
     real :: rel_u
     real :: rel_v
     real :: rel_w
     real :: rel_vel
+
+    ! Relative velocities (modeled flow quantity and particle's)
+    real :: rel_u_mod
+    real :: rel_v_mod
+    real :: rel_w_mod
+
+    ! Velocity fluctuations from stochastic eddy interaction (DRW model)
+    real :: u_drw
+    real :: v_drw
+    real :: w_drw
 
     ! Particle Reynolds number (computed from relative velocity and "flow-
     ! viscosity")
@@ -57,12 +75,9 @@
 
     ! Particle drag factor (from Re_p)
     real :: f    ! this is not to be confused with the drag coefficient
- 
-    ! Particle terminal speed
-    real :: vel_t 
 
-    ! Particle distance between two successive sub-time-steps
-    real :: dsp 
+    ! Particle terminal speed
+    real :: vel_t
 
     ! Forces exerted on the particle
     real :: fd_x, fd_y, fd_z  ! drag force
@@ -83,8 +98,9 @@
   integer :: swarm_subgrid_scale_model
 
   ! Parameters describing turbulence model choice
-  ! (Prime numbers starting from 30169  as a continuation for turb_mod) 
-  integer, parameter :: BROWNIAN_FUKAGATA  = 30169
+  ! (Prime numbers starting from 20000)
+  integer, parameter :: BROWNIAN_FUKAGATA    = 20011
+  integer, parameter :: DISCRETE_RANDOM_WALK = 20021
 
   !----------------!
   !   Swarm type   !
@@ -116,6 +132,9 @@
     ! Time step for the swarm
     real :: dt
 
+    ! Eddy time interval for stochastic eddy interaction (SEIM) model
+    integer :: time_eim
+
     ! Number of sub-steps; time sub-steps
     integer :: n_sub_steps
 
@@ -123,7 +142,7 @@
     integer :: cnt_d
     integer :: cnt_e
     integer :: cnt_r
- 
+
     ! particle statistics
     logical :: statistics
 
@@ -136,29 +155,27 @@
     integer, allocatable :: n_states(:)
 
     ! Gradients of flow modeled  quantity "zeta" (for SGS of Hybrid_Les_Rans model)
-    real,    allocatable :: w_mod_x(:), w_mod_y(:), w_mod_z(:)
+    real, allocatable :: w_mod_x(:), w_mod_y(:), w_mod_z(:)
 
-    ! Modeled TKE for swarm over the whole grid
-    real,    allocatable :: kin_mod(:)
+    ! Gradients of flow modeled "w2" (for SGS of Hybrid_Les_Rans model)
+    real, allocatable :: w_x(:), w_y(:), w_z(:), w_mod(:)
 
     ! SGS Brownian diffusion force
-    real,    allocatable :: f_fuka_x(:), f_fuka_y(:), f_fuka_z(:)
-
-    ! counter (was initially added for sequential particle injection case)                                 
-    integer :: counter
+    real, allocatable :: f_fuka_x(:), f_fuka_y(:), f_fuka_z(:)
 
   end type
 
   ! Working arrays, buffers for parallel version
   integer, parameter   :: N_I_VARS = 3
   integer, parameter   :: N_L_VARS = 2
-  integer, parameter   :: N_R_VARS = 17
+  integer, parameter   :: N_R_VARS = 8
   integer, allocatable :: i_work(:)
   logical, allocatable :: l_work(:)
   real,    allocatable :: r_work(:)
 
   contains
 
+  ! Member procedures sorted alphabetically
   include 'Swarm_Mod/Advance_Particles.f90'
   include 'Swarm_Mod/Allocate.f90'
   include 'Swarm_Mod/Bounce_Particle.f90'
@@ -171,6 +188,7 @@
   include 'Swarm_Mod/Move_Particle.f90'
   include 'Swarm_Mod/Particle_Forces.f90'
   include 'Swarm_Mod/Particle_Time_Scale.f90'
+  include 'Swarm_Mod/Sgs_Discrete_Random_Walk.f90'
   include 'Swarm_Mod/Sgs_Fukagata.f90'
 
   end module

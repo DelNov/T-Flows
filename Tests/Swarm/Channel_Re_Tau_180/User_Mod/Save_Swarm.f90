@@ -29,21 +29,26 @@
   type(Grid_Type), pointer  :: grid
   type(Bulk_Type), pointer  :: bulk
   integer                   :: n_prob, pl, c, i, count, s, c1, c2, n_points, k
+  integer                   :: index_p, j, ip, counter, blabla, ip0, ip01
+  integer                   :: ip1, ip2, counter_k, l, n_ss, kk, counter_kk 
   integer                   :: label, counter1, counter2, fu1 , fu2
   integer                   :: nb, nc 
   character(len=80)         :: coord_name, result_name, result_name_plus
   character(len=80)         :: swarm_result_name, swarm_result_name_plus
   character(len=80)         :: store_name
   real, allocatable         :: z_p(:), u_p(:), v_p(:), w_p(:), t_p(:),      &
-                              ind(:), wall_p(:), kin_p(:), eps_p(:),        &
+                              ind(:), wall_p(:),                            &
                               uw_pp(:), uu_pp(:), vv_pp(:), ww_pp(:),       &
-                              u_pp(:), v_pp(:), w_pp(:), vw_pp(:), uv_pp(:) 
-  integer, allocatable      :: n_p(:), n_count1(:), n_count2(:)
+                              u_pp(:), v_pp(:), w_pp(:), vw_pp(:), uv_pp(:),& 
+                              y_plus_p(:), vis_t_p(:) 
+  integer, allocatable      :: n_p(:), n_count1(:), n_count2(:), store(:)
   integer, allocatable      :: n_states(:)
   real                      :: t_wall, t_tau, d_wall, nu_mean, t_inf
   real                      :: ubulk, re, cf_dean, cf, pr, u_tau_p, temp
+  real                      :: temp_p1, temp_pp, temp_p2, slice, sslice_l 
+  real                      :: sslice_u, sslice_diff, temp_kk
   real                      :: density_const, visc_const
-  logical                   :: there
+  logical                   :: there, flag
 !==============================================================================!
 
 
@@ -86,6 +91,15 @@
   end if
 
   ubulk    = bulk % flux_x / (density_const*bulk % area_x)
+  t_wall   = 0.0
+  nu_mean  = 0.0
+  n_points = 0
+  index_p  = 0
+  temp     = 0.0
+  temp_p1  = 0.0
+  temp_p2  = 10.0**10
+  temp_pp  = 10.0**10
+  n_ss     = 4
 
   open(9, file=coord_name)
 
@@ -110,14 +124,17 @@
   nb = turb % pnt_grid % n_bnd_cells                                            
   nc = turb % pnt_grid % n_cells
 
-  ! Swarm arrays:
-  allocate(u_pp      (-nb:nc));   u_pp        = 0.0
-  allocate(v_pp      (-nb:nc));   v_pp        = 0.0
-  allocate(w_pp      (-nb:nc));   w_pp        = 0.0
-  allocate(uu_pp     (-nb:nc));   uu_pp       = 0.0
-  allocate(vv_pp     (-nb:nc));   vv_pp       = 0.0
-  allocate(ww_pp     (-nb:nc));   ww_pp       = 0.0
-  allocate(uw_pp     (-nb:nc));   uw_pp       = 0.0
+  ! Discrete phase arrays:
+  allocate(u_pp    (-nb:nc));  u_pp     = 0.0
+  allocate(v_pp    (-nb:nc));  v_pp     = 0.0
+  allocate(w_pp    (-nb:nc));  w_pp     = 0.0
+  allocate(uu_pp   (-nb:nc));  uu_pp    = 0.0
+  allocate(vv_pp   (-nb:nc));  vv_pp    = 0.0
+  allocate(ww_pp   (-nb:nc));  ww_pp    = 0.0
+  allocate(uw_pp   (-nb:nc));  uw_pp    = 0.0
+
+  allocate(vis_t_p (-nb:nc));  vis_t_p  = 0.0
+  allocate(y_plus_p(-nb:nc));  y_plus_p = 0.0
 
   allocate(n_states(n_prob)); n_states  = 0
   allocate(n_count2(n_prob)); n_count2 = 0
@@ -148,6 +165,7 @@
 
       ! Averaging over the number of cells in this bin  
       n_states(i) = n_states(i) + 1
+      !n_states(i) = n_states(i) + swarm % n_states(c)
       end if
     end do
   end do
@@ -167,6 +185,9 @@
         v_p(i) = v_p(i) + turb % v_mean(c)
         w_p(i) = w_p(i) + turb % w_mean(c)
 
+        vis_t_p (i) = vis_t_p (i) + turb % vis_t(c) / visc_const
+        y_plus_p(i) = y_plus_p(i) + turb % y_plus(c)
+     
         n_count2(i) = n_count2(i) + 1  ! counter 2 for the flowfield 
       end if
     end do
@@ -182,7 +203,10 @@
     call Comm_Mod_Global_Sum_Real(v_p(pl))
     call Comm_Mod_Global_Sum_Real(w_p(pl))
 
-    ! Swarm
+    call Comm_Mod_Global_Sum_Real(vis_t_p (pl))
+    call Comm_Mod_Global_Sum_Real(y_plus_p(pl))
+
+    ! SWARM
     call Comm_Mod_Global_Sum_Int(n_states(pl))
     call Comm_Mod_Global_Sum_Real(u_pp(pl))
     call Comm_Mod_Global_Sum_Real(v_pp(pl))
@@ -197,6 +221,14 @@
 
   call Comm_Mod_Wait
 
+ ! ! DEBUGGING
+ ! if(this_proc < 2) then 
+ !   do i = 1, n_prob-1
+ !     print *, 'n_states in bin', i, 'is:', n_states(i)
+ !   end do 
+ !     stop
+ ! end if
+
   do i = 1, n_prob-1
 
     ! Background flow
@@ -205,6 +237,9 @@
       u_p   (i)  = u_p   (i) / n_count2(i)
       v_p   (i)  = v_p   (i) / n_count2(i)
       w_p   (i)  = w_p   (i) / n_count2(i)
+
+      vis_t_p (i) = vis_t_p (i) / n_count2(i)
+      y_plus_p(i) = y_plus_p(i) / n_count2(i)
     end if 
    
     ! Particle-related 
@@ -234,10 +269,9 @@
                                      v_p(1)**2 +   &
                                      w_p(1)**2)/ wall_p(1)))
 
-  open(fu1, file = swarm_result_name)
-  open(fu2, file = swarm_result_name_plus)
+    open(fu1, file = swarm_result_name)
+    open(fu2, file = swarm_result_name_plus)
 
-    !pr = visc_const * capacity / conductivity
     re = density_const * ubulk * 2.0/visc_const
     cf_dean = 0.073*(re)**(-0.25)
     cf      = u_tau_p**2/(0.5*ubulk**2)
@@ -259,6 +293,7 @@
                                  ' u,'                    //  &  !  2
                                  ' uu, vv, ww, uw'        //  &  !  3 - 6
                                  ' kin'                          !  7
+
 
     write(fu2,'(a1,(a12,e12.6))')  &
     '#', 'ubulk    = ', ubulk 
@@ -300,6 +335,7 @@
     vv_pp (i) = vv_pp (i) / (u_tau_p**2)
     ww_pp (i) = ww_pp (i) / (u_tau_p**2)
     uw_pp (i) = uw_pp (i) / (u_tau_p**2)
+
   end do
 
   ! Writing normalized statistics 
@@ -331,6 +367,8 @@
   deallocate(uw_pp)
   deallocate(n_states)
   deallocate(ind)
+  deallocate(vis_t_p)
+  deallocate(y_plus_p)
 
   if(this_proc < 2)  print *, '# Finished with User_Mod_Save_Swarm.f90.'
 

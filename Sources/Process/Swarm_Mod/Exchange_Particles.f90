@@ -40,14 +40,14 @@
         i_work(i + 3) = grid % comm % cell_glo(part % cell)
 
         i = (k-1) * N_R_VARS
-        r_work(i +  1)  = part % x_n
-        r_work(i +  2)  = part % y_n
-        r_work(i +  3)  = part % z_n
-        r_work(i +  4)  = part % u
-        r_work(i +  5)  = part % v
-        r_work(i +  6)  = part % w
-        r_work(i +  7)  = part % d
-        r_work(i +  8)  = part % cfl
+        r_work(i + 1) = part % x_n
+        r_work(i + 2) = part % y_n
+        r_work(i + 3) = part % z_n
+        r_work(i + 4) = part % u
+        r_work(i + 5) = part % v
+        r_work(i + 6) = part % w
+        r_work(i + 7) = part % d
+        r_work(i + 8) = part % cfl
 
       end if
 
@@ -111,21 +111,21 @@
       end if
 
       i = (k-1) * N_R_VARS
-      part % x_n     = r_work(i +  1)
-      part % y_n     = r_work(i +  2)
-      part % z_n     = r_work(i +  3)
-      part % u       = r_work(i +  4)
-      part % v       = r_work(i +  5)
-      part % w       = r_work(i +  6)
-      part % d       = r_work(i +  7)
-      part % cfl     = r_work(i +  8)
+      part % x_n = r_work(i + 1)
+      part % y_n = r_work(i + 2)
+      part % z_n = r_work(i + 3)
+      part % u   = r_work(i + 4)
+      part % v   = r_work(i + 5)
+      part % w   = r_work(i + 6)
+      part % d   = r_work(i + 7)
+      part % cfl = r_work(i + 8)
 
     end do
 
     ! Seems that this section is not really needed in statistics (March,4th,2020)
     ! Refresh buffers for grid-base variables here
     ! (This is probably not needed, but it won't do harm)
-    call Grid_Mod_Exchange_Int(grid, swarm % n_states)
+    call Grid_Mod_Exchange_Int (grid, swarm % n_states)
     call Grid_Mod_Exchange_Real(grid, swarm % u_mean)
     call Grid_Mod_Exchange_Real(grid, swarm % v_mean)
     call Grid_Mod_Exchange_Real(grid, swarm % w_mean)

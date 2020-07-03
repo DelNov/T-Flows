@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Advance_Particles(swarm, turb, n, n_stat_p)
+  subroutine Swarm_Mod_Advance_Particles(swarm, turb, n, n_stat_p, first_dt)
 !------------------------------------------------------------------------------!
 !   Advances all particles in the swarm.                                       !
 !------------------------------------------------------------------------------!
@@ -9,14 +9,15 @@
   type(Turb_Type),  target :: turb
   integer                  :: n          ! current time step
   integer                  :: n_stat_p   ! starting time for swarm statistics
+  integer                  :: first_dt   ! starting time for "this" simulation
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: grid
   type(Field_Type),    pointer :: flow
   type(Particle_Type), pointer :: part
   logical,             pointer :: escaped
   logical,             pointer :: deposited
-  integer                      :: k                         ! particle number
-  integer                      :: ss                        ! sub-step counter
+  integer                      :: k                   ! particle number
+  integer                      :: ss                  ! sub-step counter
   integer                      :: n_parts_in_buffers
 !==============================================================================!
 
@@ -32,21 +33,22 @@
   !------------------------!
   if(turbulence_model .eq. HYBRID_LES_PRANDTL) then
     if(swarm_subgrid_scale_model .eq. BROWNIAN_FUKAGATA) then
-      if(this_proc < 2) then  ! parallelisation issue 
-        call Swarm_Mod_Sgs_Fukagata(swarm, turb)
-      end if 
+      call Swarm_Mod_Sgs_Fukagata(swarm, turb)
     end if
-  end if 
+  end if
 
   if(TURBULENCE_MODEL .eq. HYBRID_LES_RANS) then
 
-    ! correcting for particle time step size (if ER-HRL model is used) 
+    ! Correcting for particle time step size (if ER-HRL model is used)
     call Swarm_Mod_Particle_Time_Scale(swarm, turb)
 
-    ! Store gradients for modeled flow quantities for swarm 
+    ! Store gradients for modeled flow quantities for swarm
     call Swarm_Mod_Grad_Modeled_Flow(swarm, turb, k)
 
-  end if 
+  end if
+
+  ! Gaussian random no.s interval (for SEIM model)
+  swarm % time_eim = n - first_dt
 
   !----------------------------------!
   !                                  !
@@ -103,9 +105,7 @@
     if(n_parts_in_buffers > 0) then
       call Swarm_Mod_Exchange_Particles(swarm)
     end if
-
   end do        ! through sub-steps
-
 
   !-----------------------------------!
   !   Print some data on the screen   !

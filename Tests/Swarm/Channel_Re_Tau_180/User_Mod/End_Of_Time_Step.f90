@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Time_Step(flow, turb, mult, swarm, n, time)
+  subroutine User_Mod_End_Of_Time_Step(flow, turb, mult, swarm, n, first_dt)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of time step.                           !
 !------------------------------------------------------------------------------!
@@ -17,7 +17,8 @@
   type(Multiphase_Type), target     :: mult
   type(Swarm_Type),      target     :: swarm
   integer,               intent(in) :: n                   ! current time step
-  real,                  intent(in) :: time                ! physical time
+  integer,               intent(in) :: first_dt            ! first time step for this simulation
+!  real,                  intent(in) :: time                ! physical time
 !----------------------------------[Locals]------------------------------------!
   real                           :: l1, l2, l3             ! domain dimensions 
   real                           :: c1, c2, c3             ! random variables 
@@ -83,7 +84,7 @@
   !-------------------!
   !   1st time step   !
   !-------------------!
-  if(n .eq. 150001) then     ! should be after the flow is developed
+  if(n .eq. 100001) then     ! should be after the flow is developed
 
     ! Initializing both deposition and departure counters
     swarm % cnt_d = 0
@@ -155,8 +156,8 @@
   !----------------------!
   !   2nd time step on   !
   !----------------------!
-  if(n .gt. 150001) then     ! should be started after the flow is fully developed
-    call Swarm_Mod_Advance_Particles(swarm, turb, n, n_stat_p)
+  if(n .gt. 100001) then     ! should be started after the flow is fully developed
+    call Swarm_Mod_Advance_Particles(swarm, turb, n, n_stat_p, first_dt)
     if(this_proc < 2) then
       write(*,'(a,i7,a,i4,a,i4,a,i4)')                 &
                " # particles: ", swarm % n_particles,  &

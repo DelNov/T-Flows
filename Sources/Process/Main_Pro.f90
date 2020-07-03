@@ -316,7 +316,7 @@
     call Bulk_Mod_Adjust_P_Drops(flow % bulk, flow % dt)
 
     ! Just before the end of time step
-    call User_Mod_End_Of_Time_Step(flow, turb, mult, swarm, n, time)
+    call User_Mod_End_Of_Time_Step(flow, turb, mult, swarm, n, first_dt)
 
     !----------------------!
     !   Save the results   !
@@ -363,7 +363,9 @@
     end if
 
     ! Instance of saving swarm results at pre-caculated t+ (HARD coded)
-    if(n .eq. 155325) then  ! time to save swarm results at t+=2000
+    if(n .eq. 106195) then  ! time to save swarm results at t+=2000
+!    if(n .eq. 108260) then  ! time to save swarm results at t+=2000
+!    if(n .eq. 100050) then  ! time to save swarm results at t+=2000
       ! Write swarm results in user-customized format
       call Save_Swarm(swarm, n)  ! This has to be called first!
       call User_Mod_Save_Swarm(flow, turb, mult, swarm, n)

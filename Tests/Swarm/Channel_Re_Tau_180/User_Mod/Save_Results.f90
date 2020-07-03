@@ -32,7 +32,10 @@
   real, allocatable        :: z_p(:), u_p(:), v_p(:), w_p(:), t_p(:),  &
                               ind(:),  wall_p(:), kin_p(:), eps_p(:),  &
                               uw_p(:), uu_p(:), vv_p(:), ww_p(:),      &
-                              t2_p(:), ut_p(:), vt_p(:), wt_p(:)
+                              t2_p(:), ut_p(:), vt_p(:), wt_p(:),      & 
+                              zeta_p(:), f22(:), uw_mod_p(:),          &
+                              ww_mod_p(:), y_plus_p(:), vis_t_p(:),    & 
+                              f22_p(:)
   integer, allocatable     :: n_p(:), n_count(:)
   real                     :: t_wall, t_tau, d_wall, nu_mean, t_inf
   real                     :: ubulk, error, re, cf_dean, cf, pr, u_tau_p
@@ -72,6 +75,8 @@
       print *, '#--------------------------------------------------------------'
     end if
 
+!    ! Restore the name and return
+!    problem_name = store_name
     return
   end if
 
@@ -95,18 +100,41 @@
   end do
   close(9)
 
-  allocate(n_p   (n_prob));  n_p      = 0
-  allocate(wall_p(n_prob));  wall_p   = 0.0
-  allocate(u_p   (n_prob));  u_p      = 0.0
-  allocate(v_p   (n_prob));  v_p      = 0.0
-  allocate(w_p   (n_prob));  w_p      = 0.0
-  allocate(uu_p  (n_prob));  uu_p     = 0.0
-  allocate(vv_p  (n_prob));  vv_p     = 0.0
-  allocate(ww_p  (n_prob));  ww_p     = 0.0
-  allocate(uw_p  (n_prob));  uw_p     = 0.0
+  allocate(n_p     (n_prob));  n_p      = 0
+  allocate(wall_p  (n_prob));  wall_p   = 0.0
+  allocate(u_p     (n_prob));  u_p      = 0.0
+  allocate(v_p     (n_prob));  v_p      = 0.0
+  allocate(w_p     (n_prob));  w_p      = 0.0
+  allocate(uu_p    (n_prob));  uu_p     = 0.0
+  allocate(vv_p    (n_prob));  vv_p     = 0.0
+  allocate(ww_p    (n_prob));  ww_p     = 0.0
+  allocate(uw_p    (n_prob));  uw_p     = 0.0
+  allocate(kin_p   (n_prob));  kin_p    = 0.0
+  allocate(eps_p   (n_prob));  eps_p    = 0.0
+  allocate(zeta_p  (n_prob));  zeta_p   = 0.0
+  allocate(f22_p   (n_prob));  f22_p    = 0.0
+  allocate(uw_mod_p(n_prob));  uw_mod_p = 0.0
+  allocate(ww_mod_p(n_prob));  ww_mod_p = 0.0
+!  allocate(ww_mod_p(grid % n_cells));  ww_mod_p = 0.0
+  allocate(vis_t_p (n_prob));  vis_t_p  = 0.0
+  allocate(y_plus_p(n_prob));  y_plus_p = 0.0
 
   allocate(n_count(n_prob)); n_count = 0
   count = 0
+
+  !!=========================================================
+  !! DEBUGGING 
+  !do c = 1, grid % n_cells - grid % comm % n_buff_cells
+  !  ww_mod_p(c) =  turb % kin_mean(c) * turb % zeta_mean(c)
+  !end do 
+  !if(this_proc < 2) then 
+  ! print *, "w_mod(503) = ", ww_mod_p(503)
+  ! print *, "min_val_wmod = ", minval(ww_mod_p(:))
+  ! print *, "max_val_wmod = ", maxval(ww_mod_p(:))
+  ! stop  
+  !end if
+  !!=========================================================
+
 
   !-------------------------!
   !   Average the results   !
@@ -129,7 +157,16 @@
                           - turb % w_mean(c) * turb % w_mean(c)
         uw_p(i) = uw_p(i) + turb % uw_res(c)  &
                           - turb % u_mean(c) * turb % w_mean(c)
-
+      
+        ! Modeled quantities 
+        kin_p   (i) = kin_p   (i) + turb % kin_mean(c)
+        eps_p   (i) = eps_p   (i) + turb % eps_mean(c)
+        zeta_p  (i) = zeta_p  (i) + turb % zeta_mean(c)
+        f22_p   (i) = f22_p   (i) + turb % f22_mean(c)
+        uw_mod_p(i) = uw_mod_p(i) + turb % vis_t_eff(c)*(u % y(c) + v % x(c))
+        ww_mod_p(i) = ww_mod_p(i) + turb % kin_mean(c) * turb % zeta_mean(c)
+        vis_t_p (i) = vis_t_p (i) + turb % vis_t(c) / visc_const
+        y_plus_p(i) = y_plus_p(i) + turb % y_plus(c) 
         n_count(i) = n_count(i) + 1
       end if
     end do
@@ -150,6 +187,15 @@
     call Comm_Mod_Global_Sum_Real(vv_p(pl))
     call Comm_Mod_Global_Sum_Real(ww_p(pl))
     call Comm_Mod_Global_Sum_Real(uw_p(pl))
+ 
+    call Comm_Mod_Global_Sum_Real(uw_mod_p(pl))
+    call Comm_Mod_Global_Sum_Real(kin_p   (pl))
+    call Comm_Mod_Global_Sum_Real(eps_p   (pl))
+    call Comm_Mod_Global_Sum_Real(zeta_p  (pl))
+    call Comm_Mod_Global_Sum_Real(f22_p   (pl))
+    call Comm_Mod_Global_Sum_Real(vis_t_p (pl))
+    call Comm_Mod_Global_Sum_Real(y_plus_p(pl))
+    call Comm_Mod_Global_Sum_Real(ww_mod_p(pl))
 
     count =  count + n_count(pl)
   end do
@@ -167,22 +213,40 @@
       vv_p(i) = vv_p(i) / n_count(i)
       ww_p(i) = ww_p(i) / n_count(i)
       uw_p(i) = uw_p(i) / n_count(i)
+
+      uw_mod_p(i) = uw_mod_p(i) / n_count(i)
+      ww_mod_p(i) = ww_mod_p(i) / n_count(i)
+      kin_p   (i) = kin_p   (i) / n_count(i)
+      eps_p   (i) = eps_p   (i) / n_count(i)
+      zeta_p  (i) = zeta_p  (i) / n_count(i)
+      f22_p   (i) = f22_p   (i) / n_count(i)
+      vis_t_p (i) = vis_t_p (i) / n_count(i)
+      y_plus_p(i) = y_plus_p(i) / n_count(i)
     end if
   end do
 
   ! Calculating friction velocity and friction temperature
-    do c = 1, grid % n_cells
+!    do c= 1, grid % n_cells
+ if(y_plus_p(1) > 5.0) then
+    u_tau_p = sqrt(max(abs(bulk % p_drop_x),  &
+                       abs(bulk % p_drop_y),  &
+                       abs(bulk % p_drop_z))/dens_const)
+  else
       u_tau_p = sqrt( (visc_const*sqrt(u_p(1)**2 +   &
                                        v_p(1)**2 +   &
                                        w_p(1)**2)    &
                                        / wall_p(1))  &
                                        / dens_const)
-    end do
+!    end do
+  end if
 
   if(u_tau_p .eq. 0.0) then
     if(this_proc < 2) then
       write(*,*) '# Friction velocity is zero in Save_Results.f90!'
     end if
+
+!    ! Restore the name and return
+!    problem_name = store_name
     return
   end if
 
@@ -196,6 +260,8 @@
   open(fu1,file=result_name)
   open(fu2,file=result_name_plus)
 
+!  open(3, file = res_name)
+!  open(4, file = res_name_plus)
 
     pr = visc_const * capa_const / cond_const
     re = dens_const * ubulk * 2.0 / visc_const
@@ -231,24 +297,49 @@
     '#', 'Cf_error = ', error, ' %', 'Dean formula is used.'
 
      
-    write(fu1,'(a1,2x,a50)') '#',  ' z,'                    //  &  !  1
-                                   ' u,'                    //  &  !  2
-                                   ' uu, vv, ww, uw'        //  &  !  3 -  6
-                                   ' kin'                          !  7
+  !  write(fu1,'(a1,2x,a50)') '#',  ' z,'                    //  &  !  1
+  !                                 ' u,'                    //  &  !  2
+  !                                 ' uu, vv, ww, uw'        //  &  !  3 -  6
+  !                                 ' kin'                          !  7
 
-    write(fu2,'(a1,2x,a50)') '#',  ' z,'                    //  &  !  1
-                                   ' u,'                    //  &  !  2
-                                   ' uu, vv, ww, uw'        //  &  !  3 -  6
-                                   ' kin'                          !  7
+  !  write(fu2,'(a1,2x,a50)') '#',  ' z,'                    //  &  !  1
+  !                                 ' u,'                    //  &  !  2
+  !                                 ' uu, vv, ww, uw'        //  &  !  3 -  6
+  !                                 ' kin'                          !  7
+
+     write(fu1,'(a1,2X,a105)') '#',  ' z,'                         //  &
+                                   ' u mean,'                    //  &
+                                   ' kin_resolved, kin_modeled,' //  &
+                                   ' kin_tot,  uw_resolved,'     //  &
+                                   ' uw_modeled, uw_tot, vis_t,' //  &
+                                   ' ww_total '
+
+     write(fu2,'(a1,2X,a105)') '#',  ' z,'                         //  &
+                                   ' u mean,'                    //  &
+                                   ' kin_resolved, kin_modeled,' //  &
+                                   ' kin_tot,  uw_resolved,'     //  &
+                                   ' uw_modeled, uw_tot, vis_t,' //  &
+                                   ' ww_total '
+
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(fu1,'(7es15.5e3)')  wall_p(i),                       & !  1
-                                u_p(i),                          & !  2
-                                uu_p(i),                         & !  3
-                                vv_p(i),                         & !  4
-                                ww_p(i),                         & !  5
-                                uw_p(i),                         & !  6
-                                0.5*(uu_p(i)+vv_p(i)+ww_p(i))      !  7
+      !  write(fu1,'(7es15.5e3)')  wall_p(i),                       & !  1
+      !                          u_p(i),                          & !  2
+      !                          uu_p(i),                         & !  3
+      !                          vv_p(i),                         & !  4
+      !                          ww_p(i),                         & !  5
+      !                          uw_p(i),                         & !  6
+      !                          0.5*(uu_p(i)+vv_p(i)+ww_p(i))      !  7
+        write(fu1,'(10e15.7)')  wall_p(i),                               &
+                            u_p(i),                                      &
+                            0.5*(uu_p(i)+vv_p(i)+ww_p(i)),               &
+                            kin_p(i),                                    &
+                            (0.5*(uu_p(i)+vv_p(i)+ww_p(i)) + kin_p(i)),  &
+                            uw_p(i),                                     &
+                            uw_mod_p(i),                                 &
+                            (uw_p(i) + uw_mod_p(i)),                     &
+                            vis_t_p(i),                                  &
+                            (ww_p(i) + ww_mod_p(i))
       end if
     end do
 
@@ -262,17 +353,32 @@
     vv_p (i) = vv_p (i) / (u_tau_p**2)
     ww_p (i) = ww_p (i) / (u_tau_p**2)
     uw_p (i) = uw_p (i) / (u_tau_p**2)
+  
+    kin_p   (i) = kin_p(i) / u_tau_p**2                       ! kin%n(c)
+    eps_p   (i) = eps_p(i)*visc_const / (u_tau_p**4*dens_const)   ! eps%n(c)
+    uw_mod_p(i) = uw_mod_p (i) / (u_tau_p**2)
+    ww_mod_p(i) = ww_mod_p (i) / (u_tau_p**2)
   end do
 
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(fu2,'(7es15.5e3)')  wall_p(i),                     & !  1
-                                u_p(i),                          & !  2
-                                uu_p(i),                         & !  3
-                                vv_p(i),                         & !  4
-                                ww_p(i),                         & !  5
-                                uw_p(i),                         & !  6
-                                0.5*(uu_p(i)+vv_p(i)+ww_p(i))      !  7
+       ! write(fu2,'(7es15.5e3)')  wall_p(i),                     & !  1
+       !                         u_p(i),                          & !  2
+       !                         uu_p(i),                         & !  3
+       !                         vv_p(i),                         & !  4
+       !                         ww_p(i),                         & !  5
+       !                         uw_p(i),                         & !  6
+       !                         0.5*(uu_p(i)+vv_p(i)+ww_p(i))      !  7
+         write(fu2,'(10e15.7)')  wall_p(i),                               &
+                             u_p(i),                                      &
+                             0.5*(uu_p(i)+vv_p(i)+ww_p(i)),               &
+                             kin_p(i),                                    &
+                             (0.5*(uu_p(i)+vv_p(i)+ww_p(i)) + kin_p(i)),  &
+                             uw_p(i),                                     &
+                             uw_mod_p(i),                                 &
+                             (uw_p(i) + uw_mod_p(i)),                     &
+                             vis_t_p(i),                                  &
+                             (ww_p(i) + ww_mod_p(i))
       end if
     end do
 
@@ -288,7 +394,19 @@
   deallocate(vv_p)
   deallocate(ww_p)
   deallocate(uw_p)
+  deallocate(uw_mod_p)
+  deallocate(ww_mod_p)
+  deallocate(kin_p)
+  deallocate(eps_p)
+  deallocate(zeta_p)
+  deallocate(f22_p)
+  deallocate(vis_t_p)
+  deallocate(y_plus_p)
+
 
   if(this_proc < 2)  print *, '# Finished with User_Mod_Save_Results.f90.'
+
+!  ! Restore the name
+!  problem_name = store_name
 
   end subroutine

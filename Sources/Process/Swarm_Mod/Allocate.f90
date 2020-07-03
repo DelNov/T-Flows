@@ -45,6 +45,21 @@
     swarm % particle(k) % v = 0.0
     swarm % particle(k) % w = 0.0
 
+    ! Set initial mean velocity to zero
+    swarm % particle(k) % u_mean = 0.0
+    swarm % particle(k) % v_mean = 0.0
+    swarm % particle(k) % w_mean = 0.0
+
+    ! Set relative velocities to zero (DRW model)
+    swarm % particle(k) % rel_u_mod = 0.0
+    swarm % particle(k) % rel_v_mod = 0.0
+    swarm % particle(k) % rel_w_mod = 0.0
+
+    ! Set DRW velocities to zero (produced by SEIM and seen by particle) 
+    swarm % particle(k) % u_drw = 0.0
+    swarm % particle(k) % v_drw = 0.0
+    swarm % particle(k) % w_drw = 0.0
+
     ! Set initial coordinates to zero
     swarm % particle(k) % x_n = 0.0
     swarm % particle(k) % y_n = 0.0
@@ -70,9 +85,12 @@
     swarm % particle(k) % proc = 0
     swarm % particle(k) % buff = 0
 
+    ! Set initial number of particle states to zero
+    swarm % particle(k) % n_states = 0
+
   end do
 
-  !   Allocate variables for ensemble-averaging   !
+  ! Allocate variables for ensemble-averaging
   nb = turb % pnt_grid % n_bnd_cells
   nc = turb % pnt_grid % n_cells
   allocate(swarm % u_mean  (-nb:nc));  swarm % u_mean   = 0.
@@ -86,36 +104,20 @@
   allocate(swarm % vw      (-nb:nc));  swarm % vw       = 0.
   allocate(swarm % n_states(-nb:nc));  swarm % n_states = 0
 
-  ! Allocate Brownnian diffusion force components 
+  ! Allocate Brownnian diffusion force components
   allocate(swarm % f_fuka_x(-nb:nc));  swarm % f_fuka_x = 0.
   allocate(swarm % f_fuka_y(-nb:nc));  swarm % f_fuka_y = 0.
   allocate(swarm % f_fuka_z(-nb:nc));  swarm % f_fuka_z = 0.
 
-  ! Allocate variables for the modeled flow quantity "k" 
-  allocate(swarm % kin_mod  (-nb:nc));  swarm % kin_mod   = 0.
+  ! Allocate variables for the modeled flow quantity "v^2"
+  allocate(swarm % w_mod_x(-nb:nc));  swarm % w_mod_x   = 0.
+  allocate(swarm % w_mod_y(-nb:nc));  swarm % w_mod_y   = 0.
+  allocate(swarm % w_mod_z(-nb:nc));  swarm % w_mod_z   = 0.
 
-  ! Allocate variables for the modeled flow quantity "Zeta" 
-  allocate(swarm % w_mod_x  (-nb:nc));  swarm % w_mod_x   = 0.
-  allocate(swarm % w_mod_y  (-nb:nc));  swarm % w_mod_y   = 0.
-  allocate(swarm % w_mod_z  (-nb:nc));  swarm % w_mod_z   = 0.
-
-  ! To be confined only for Fukagata SGS model 
-  ! LES Dynamic model parameters for Fukagata
-
-  !if(multiphase_model .eq. LAGRANGIAN_PARTICLES) then
-  !@  allocate(turb % c_dyn(-nb:nc));  turb % c_dyn = 0.
-
-    ! Other variables such as time scale, length scale and production
-    ! All the variables below are already allocated in LES Prandtl model!
-    !allocate(turb % t_scale (-nb:nc));  turb % t_scale = 0.
-    !allocate(turb % l_scale (-nb:nc));  turb % l_scale = 0.
-    !allocate(turb % vis_t   (-nb:nc));  turb % vis_t   = 0.
-    !allocate(turb % vis_w   (-nb:nc));  turb % vis_w   = 0.  ! wall visc
-    !allocate(turb % p_kin   (-nb:nc));  turb % p_kin   = 0.
-    !allocate(turb % y_plus  (-nb:nc));  turb % y_plus  = 0.
-
-  !end if
-
-
+  ! Gradients of wall-normal modele velocity (retrieved from zeta)
+  allocate(swarm % w_mod(-nb:nc));  swarm % w_mod = 0.
+  allocate(swarm % w_x  (-nb:nc));  swarm % w_x   = 0.
+  allocate(swarm % w_y  (-nb:nc));  swarm % w_y   = 0.
+  allocate(swarm % w_z  (-nb:nc));  swarm % w_z   = 0.
 
   end subroutine
