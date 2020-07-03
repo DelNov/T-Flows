@@ -7,10 +7,9 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: sub, ln, ms, mr, n, nn, sh
-  character(len=80)    :: name_in
-  integer              :: c, c1, c2, s, buf_cnt
-  real,    allocatable :: xf_buff(:), yf_buff(:), zf_buff(:)
+  integer           :: sub, ln, ms, mr, n, nn, sh
+  character(len=80) :: name_in
+  integer           :: c, c1, c2, s, buf_cnt
 !==============================================================================!
 
   if(n_proc < 2) return
@@ -79,7 +78,7 @@
 
       ms = 0
       mr = 0
-      do c = 1, grid % n_cells
+      do c = -grid % n_bnd_cells, grid % n_cells
         if(grid % comm % cell_proc(c) .eq. this_proc) then
           n = grid % cells_n_nodes(c)
           if( any( grid % new_n(grid % cells_n(1:n,c)) .eq. -1) ) then
@@ -109,7 +108,7 @@
 
       ms = 0
       mr = 0
-      do c = 1, grid % n_cells
+      do c = -grid % n_bnd_cells, grid % n_cells
         if(grid % comm % cell_proc(c) .eq. this_proc) then
           n = grid % cells_n_nodes(c)
           if( any( grid % new_n(grid % cells_n(1:n,c)) .eq. -1) ) then
