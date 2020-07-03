@@ -1,6 +1,7 @@
 !==============================================================================!
-  subroutine Backup_Mod_Save(fld, swr, tur, mul, &
-                             time_step, time_step_stat)
+  subroutine Backup_Mod_Save(fld, swr, tur, mul,               &
+                             time, time_step, time_step_stat,  &
+                             domain)
 !------------------------------------------------------------------------------!
 !   Saves backup files name.backup                                             !
 !------------------------------------------------------------------------------!
@@ -10,8 +11,10 @@
   type(Swarm_Type),      target :: swr
   type(Turb_Type),       target :: tur
   type(Multiphase_Type), target :: mul
+  real                          :: time            ! time of simulation
   integer                       :: time_step       ! current time step
   integer                       :: time_step_stat  ! starting step for statist.
+  integer,             optional :: domain
 !-----------------------------------[Locals]-----------------------------------!
   type(Comm_Type), pointer :: comm
   type(Grid_Type), pointer :: grid
@@ -21,7 +24,7 @@
   integer                  :: fh, d, vc, sc, ua
 !==============================================================================!
 
-  call Cpu_Timer_Mod_Start('Backup_Mode_Save')
+  call Cpu_Timer_Mod_Start('Backup_Mod_Save')
 
   ! Take aliases
   grid => fld % pnt_grid
@@ -29,7 +32,8 @@
   comm => grid % comm
 
   ! Name backup file
-  call File_Mod_Set_Name(name_out, time_step=time_step, extension='.backup')
+  call File_Mod_Set_Name(name_out, time_step=time_step,  &
+                         extension='.backup', domain=domain)
 
   ! Open backup file
   call Comm_Mod_Open_File_Write(fh, name_out)
@@ -61,6 +65,9 @@
 
   ! Time step
   call Backup_Mod_Write_Int(fh, d, vc, 'time_step', time_step)
+
+  ! Simulation time
+  call Backup_Mod_Write_Real(fh, d, vc, 'time', time)
 
   ! Number of processors
   call Backup_Mod_Write_Int(fh, d, vc, 'n_proc', n_proc)
@@ -97,10 +104,11 @@
   call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'press_corr',  &
                                  fld % pp % n(-comm % nb_s:comm % nc_s))
 
-  !----------------------!
-  !   Mass flow raters   !
-  !----------------------!
-  call Backup_Mod_Write_Face(grid % comm, fh, d, vc, grid, fld % m_flux % n)
+  !---------------------!
+  !   Mass flow rates   !
+  !---------------------!
+  call Backup_Mod_Write_Face(grid % comm, fh, d, vc, grid, 'face_flux_00',  &
+                             fld % m_flux % n, correct_sign = .true.)
 
   !--------------!
   !              !
@@ -116,8 +124,10 @@
   !  Multiphase  !
   !              !
   !--------------!
-  if(multiphase_model .eq. VOLUME_OF_FLUID) then
+  if(mul % model .eq. VOLUME_OF_FLUID) then
     call Backup_Mod_Write_Variable(fh, d, vc, 'vof', mul % vof)
+    call Backup_Mod_Write_Face(grid % comm, fh, d, vc, grid, 'face_dens_00',  &
+                               fld % density_f)
   end if
 
   !-----------------------!
@@ -129,7 +139,7 @@
   !-----------------!
   !   K-eps model   !
   !-----------------!
-  if(turbulence_model .eq. K_EPS) then
+  if(tur % model .eq. K_EPS) then
 
     ! K and epsilon
     call Backup_Mod_Write_Variable(fh, d, vc, 'kin', tur % kin)
@@ -159,8 +169,8 @@
   !------------------------!
   !   K-eps-zeta-f model   !
   !------------------------!
-  if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
-     turbulence_model .eq. HYBRID_LES_RANS) then
+  if(tur % model .eq. K_EPS_ZETA_F .or.  &
+     tur % model .eq. HYBRID_LES_RANS) then
 
     ! K, eps, zeta and f22
     call Backup_Mod_Write_Variable(fh, d, vc, 'kin',  tur % kin)
@@ -195,8 +205,8 @@
   !----------------------------!
   !   Reynolds stress models   !
   !----------------------------!
-  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
-     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
+  if(tur % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+     tur % model .eq. RSM_HANJALIC_JAKIRLIC) then
 
     ! Reynolds stresses
     call Backup_Mod_Write_Variable(fh, d, vc, 'uu',  tur % uu)
@@ -210,7 +220,7 @@
     call Backup_Mod_Write_Variable(fh, d, vc, 'eps', tur % eps)
 
     ! F22
-    if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+    if(tur % model .eq. RSM_MANCEAU_HANJALIC) then
       call Backup_Mod_Write_Variable(fh, d, vc, 'f22',  tur % f22)
     end if
 
@@ -240,7 +250,7 @@
   !   Turbulent statistics for all models   !
   !                                         !
   !-----------------------------------------!
-  if(turbulence_statistics .and.  &
+  if(tur % statistics .and.  &
      time_step > time_step_stat) then
 
     call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'u_mean',  &
@@ -257,7 +267,7 @@
     end if
 
     ! K and epsilon
-    if(turbulence_model .eq. K_EPS) then
+    if(tur % model .eq. K_EPS) then
       call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'kin_mean',  &
                                      tur % kin_mean(-comm % nb_s:comm % nc_s))
       call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'eps_mean',  &
@@ -269,8 +279,8 @@
     end if
 
     ! K-eps-zeta-f and the hybrid model
-    if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
-       turbulence_model .eq. HYBRID_LES_RANS) then
+    if(tur % model .eq. K_EPS_ZETA_F .or.  &
+       tur % model .eq. HYBRID_LES_RANS) then
       call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'kin_mean',  &
                                      tur % kin_mean (-comm % nb_s:comm % nc_s))
       call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'eps_mean',  &
@@ -286,8 +296,8 @@
     end if
 
     ! Reynolds stress models
-    if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
-       turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
+    if(tur % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+       tur % model .eq. RSM_HANJALIC_JAKIRLIC) then
       call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'uu_mean',  &
                                      tur % uu_mean(-comm % nb_s:comm % nc_s))
       call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'vv_mean',  &
@@ -350,11 +360,11 @@
   !                 !
   !-----------------!
 
-  do ua = 1, n_user_arrays
+  do ua = 1, grid % n_user_arrays
     a_name = 'A_??'
     write(a_name(3:4),'(I2.2)') ua
     call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, a_name,  &
-                                   user_array(ua,-comm % nb_s:comm % nc_s))
+                               grid % user_array(ua,-comm % nb_s:comm % nc_s))
   end do
 
   ! Variable count (store +1 to count its own self)
@@ -367,6 +377,6 @@
   ! Close backup file
   call Comm_Mod_Close_File(fh)
 
-  call Cpu_Timer_Mod_Stop('Backup_Mode_Save')
+  call Cpu_Timer_Mod_Stop('Backup_Mod_Save')
 
   end subroutine

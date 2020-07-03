@@ -6,6 +6,8 @@
   type(Grid_Type) :: grid
   integer         :: nc        ! number of cells inside
   integer         :: nb        ! number of cells on the bounday
+!-----------------------------------[Locals]-----------------------------------!
+  integer :: c
 !==============================================================================!
 
   ! Store number of cells and boundary cells
@@ -24,6 +26,7 @@
 
   ! Cells' nodes and neigboring cells
   allocate(grid % cells_n( 8, -nb:nc));  grid % cells_n = 0
+  allocate(grid % cells_f( 6, -nb:nc));  grid % cells_f = 0
   allocate(grid % cells_c(24, -nb:nc));  grid % cells_c = 0
 
   allocate(grid % cells_bnd_face(-nb:-1));  grid % cells_bnd_face = 0
@@ -31,10 +34,17 @@
   ! Number of nodes at each cell (determines cell's shape really)
   allocate(grid % cells_n_nodes(-nb:nc));  grid % cells_n_nodes = 0
 
+  ! Number of faces at each cell
+  allocate(grid % cells_n_faces(-nb:nc));  grid % cells_n_faces = 0
+
   ! Boundary condition color in a given direction
   allocate(grid % cells_bnd_color(6, -nb:nc))
 
   ! Allocate processor i.d.
   allocate(grid % comm % cell_proc(-nb:nc));  grid % comm % cell_proc(:) = 0
+  allocate(grid % comm % cell_glo (-nb:nc))
+  do c = -nb, nc
+    grid % comm % cell_glo(c) = c
+  end do
 
   end subroutine

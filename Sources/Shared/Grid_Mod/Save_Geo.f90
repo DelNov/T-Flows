@@ -1,15 +1,13 @@
 !==============================================================================!
   subroutine Grid_Mod_Save_Geo(grid,        &
-                               sub,         &  ! subdomain
-                               nf_sub,      &  ! number of faces in the sub.
-                               nbf_sub)        ! number of buffer cells in sub.
+                               sub)
 !------------------------------------------------------------------------------!
 !   Writes file with geomeatrical data: name.geo                               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
-  integer         :: sub, nf_sub, nbf_sub
+  integer         :: sub
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, s, n, c1, c2, var, subo, fu
   character(len=80)    :: name_out
@@ -40,124 +38,66 @@
   !   Cell center coordinates   !
   !-----------------------------!
   do var = 1, 3
-    do c = 1, grid % n_cells
-      if(grid % comm % cell_proc(c) .eq. sub) then
-        if(var .eq. 1) write(fu) grid % xc(c)
-        if(var .eq. 2) write(fu) grid % yc(c)
-        if(var .eq. 3) write(fu) grid % zc(c)
+    do c = -grid % n_bnd_cells, grid % n_cells
+      if(grid % old_c(c) .ne. 0 .or. c .eq. 0) then
+        if(var .eq. 1) write(fu) grid % xc(grid % old_c(c))
+        if(var .eq. 2) write(fu) grid % yc(grid % old_c(c))
+        if(var .eq. 3) write(fu) grid % zc(grid % old_c(c))
       end if
-    end do
-    do s = 1, nbf_sub
-      if(var .eq. 1) write(fu) grid % xc(buf_recv_ind(s))
-      if(var .eq. 2) write(fu) grid % yc(buf_recv_ind(s))
-      if(var .eq. 3) write(fu) grid % zc(buf_recv_ind(s))
     end do
   end do
 
-  !---------------------------!
-  !   Boundary cell centers   !
-  !---------------------------!
-  do var = 1, 3
-    do c = -1, -grid % n_bnd_cells, -1
-      if(grid % new_c(c) .ne. 0) then
-        if(var .eq. 1) write(fu) grid % xc(c)
-        if(var .eq. 2) write(fu) grid % yc(c)
-        if(var .eq. 3) write(fu) grid % zc(c)
-      end if
-    end do 
+  !-------------------!
+  !   Wall distance   !
+  !-------------------!
+  do c = -grid % n_bnd_cells, grid % n_cells
+    if(grid % old_c(c) .ne. 0 .or. c .eq. 0) then
+      write(fu) grid % wall_dist(grid % old_c(c))
+    end if
   end do
 
   !------------------!
   !   Cell volumes   !
   !------------------!
   do c = 1, grid % n_cells
-    if(grid % comm % cell_proc(c) .eq. sub) then
-      write(fu) grid % vol(c)
-    end if
-  end do
-  do s = 1, nbf_sub
-    write(fu) grid % vol(buf_recv_ind(s))
-  end do
-
-  !-------------------!
-  !   Wall distance   !
-  !-------------------!
-  do c = 1, grid % n_cells
-    if(grid % comm % cell_proc(c) .eq. sub) then
-      write(fu) grid % wall_dist(c)
-    end if
-  end do
-  do s = 1, nbf_sub
-    write(fu) grid % wall_dist(buf_recv_ind(s))
-  end do
-  do c = -1, -grid % n_bnd_cells, -1
-    if(grid % comm % cell_proc(c) .eq. sub) then
-      write(fu) grid % wall_dist(c)
+    if(grid % old_c(c) .ne. 0) then
+      write(fu) grid % vol(grid % old_c(c))
     end if
   end do
 
   !-----------!
   !   Faces   !
   !-----------!
-
-  ! From 1 to nf_sub -> cell faces for which both cells are inside sub
   do var = 1, 10
-
-    do s = 1, grid % n_faces
-      if(grid % new_f(s) > 0 .and. grid % new_f(s) <= nf_sub) then
-        if(var .eq.  1)  write(fu) grid % sx(s)
-        if(var .eq.  2)  write(fu) grid % sy(s)
-        if(var .eq.  3)  write(fu) grid % sz(s)
-        if(var .eq.  4)  write(fu) grid % dx(s)
-        if(var .eq.  5)  write(fu) grid % dy(s)
-        if(var .eq.  6)  write(fu) grid % dz(s)
-        if(var .eq.  7)  write(fu) grid % f(s)
-        if(var .eq.  8)  write(fu) grid % xf(s)
-        if(var .eq.  9)  write(fu) grid % yf(s)
-        if(var .eq. 10)  write(fu) grid % zf(s)
+    do s = 1, grid % n_faces + grid % n_shadows
+      if(grid % old_f(s) .ne. 0) then
+        c1 = grid % faces_c(1, grid % old_f(s))
+        c2 = grid % faces_c(2, grid % old_f(s))
+        if(grid % new_c(c2) < 0 .or. grid % new_c(c1) < grid % new_c(c2)) then
+          if(var .eq.  1)  write(fu) grid % sx(grid % old_f(s))
+          if(var .eq.  2)  write(fu) grid % sy(grid % old_f(s))
+          if(var .eq.  3)  write(fu) grid % sz(grid % old_f(s))
+          if(var .eq.  4)  write(fu) grid % dx(grid % old_f(s))
+          if(var .eq.  5)  write(fu) grid % dy(grid % old_f(s))
+          if(var .eq.  6)  write(fu) grid % dz(grid % old_f(s))
+          if(var .eq.  7)  write(fu) grid % f(grid % old_f(s))
+          if(var .eq.  8)  write(fu) grid % xf(grid % old_f(s))
+          if(var .eq.  9)  write(fu) grid % yf(grid % old_f(s))
+          if(var .eq. 10)  write(fu) grid % zf(grid % old_f(s))
+        else
+          if(var .eq.  1)  write(fu) -grid % sx(grid % old_f(s))
+          if(var .eq.  2)  write(fu) -grid % sy(grid % old_f(s))
+          if(var .eq.  3)  write(fu) -grid % sz(grid % old_f(s))
+          if(var .eq.  4)  write(fu) -grid % dx(grid % old_f(s))
+          if(var .eq.  5)  write(fu) -grid % dy(grid % old_f(s))
+          if(var .eq.  6)  write(fu) -grid % dz(grid % old_f(s))
+          if(var .eq.  7)  write(fu) 1.0 - grid % f(grid % old_f(s))
+          if(var .eq.  8)  write(fu) grid % xf(grid % old_f(s))
+          if(var .eq.  9)  write(fu) grid % yf(grid % old_f(s))
+          if(var .eq. 10)  write(fu) grid % zf(grid % old_f(s))
+        end if
       end if
     end do
-
-    ! From nf_sub+1 to nf_sub + nbf_sub
-    ! (think: are they in right order ?)
-    do subo = 1, maxval(grid % comm % cell_proc(:))
-      do s = 1, grid % n_faces
-        if(grid % new_f(s) > nf_sub .and.  &
-           grid % new_f(s) <= nf_sub + nbf_sub) then
-          c1 = grid % faces_c(1,s)
-          c2 = grid % faces_c(2,s)
-          if(c2 > 0) then
-            if( (grid % comm % cell_proc(c1) .eq. sub) .and.  &
-                (grid % comm % cell_proc(c2) .eq. subo) ) then
-              if(var .eq.  1)  write(fu) grid % sx(s)
-              if(var .eq.  2)  write(fu) grid % sy(s)
-              if(var .eq.  3)  write(fu) grid % sz(s)
-              if(var .eq.  4)  write(fu) grid % dx(s)
-              if(var .eq.  5)  write(fu) grid % dy(s)
-              if(var .eq.  6)  write(fu) grid % dz(s)
-              if(var .eq.  7)  write(fu) grid % f(s)
-              if(var .eq.  8)  write(fu) grid % xf(s)
-              if(var .eq.  9)  write(fu) grid % yf(s)
-              if(var .eq. 10)  write(fu) grid % zf(s)
-            end if  
-            if( (grid % comm % cell_proc(c2) .eq. sub) .and.   &
-                (grid % comm % cell_proc(c1) .eq. subo) ) then
-              if(var .eq.  1)  write(fu) -grid % sx(s)
-              if(var .eq.  2)  write(fu) -grid % sy(s)
-              if(var .eq.  3)  write(fu) -grid % sz(s)
-              if(var .eq.  4)  write(fu) -grid % dx(s)
-              if(var .eq.  5)  write(fu) -grid % dy(s)
-              if(var .eq.  6)  write(fu) -grid % dz(s)
-              if(var .eq.  7)  write(fu) 1.0 - grid % f(s)
-              if(var .eq.  8)  write(fu) grid % xf(s) - grid % dx(s)
-              if(var .eq.  9)  write(fu) grid % yf(s) - grid % dy(s)
-              if(var .eq. 10)  write(fu) grid % zf(s) - grid % dz(s)
-            end if
-          end if  ! c2 > 0
-        end if    ! I think this is not really necessary
-      end do  ! s
-    end do  ! subo
-
   end do
 
   !-----------------!

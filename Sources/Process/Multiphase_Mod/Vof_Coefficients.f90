@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Multiphase_Mod_Vof_Coefficients(mult, a, b, dt, beta_f)
 !------------------------------------------------------------------------------!
-!   Computes matrix coefficients                                               !
+!   Computes matrix coefficients for volume fraction equation                  !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -49,10 +49,10 @@
 
         a % val(a % dia(c2)) = a % val(a % dia(c2)) + upwd2
         b(c2) = b(c2) - ( upwd2 * vof % o(c2) - upwd1 * vof % o(c1))
-        a % val(a % pos(2,s)) =  - upwd1 
+        a % val(a % pos(2,s)) =  - upwd1
       else
         if (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
-          b(c1) = b(c1) - m_flux % n(s) * vof % n(c2)
+          b(c1) = b(c1) - m_flux % n(s) / flow % density_f(s) * vof % n(c2)
         else if (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) then
           a % val(a % dia(c1)) = a % val(a % dia(c1))          &
                                + m_flux % n(s) / flow % density_f(s)

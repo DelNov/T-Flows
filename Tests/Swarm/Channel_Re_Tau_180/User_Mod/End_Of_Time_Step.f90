@@ -16,12 +16,11 @@
   type(Turb_Type),       target     :: turb
   type(Multiphase_Type), target     :: mult
   type(Swarm_Type),      target     :: swarm
-  integer,               intent(in) :: n                   ! current time step
-  integer,               intent(in) :: first_dt            ! first time step for this simulation
-!  real,                  intent(in) :: time                ! physical time
+  integer,               intent(in) :: n         ! current time step
+  integer,               intent(in) :: first_dt  ! 1st time step of this sim.
 !----------------------------------[Locals]------------------------------------!
-  real                           :: l1, l2, l3             ! domain dimensions 
-  real                           :: c1, c2, c3             ! random variables 
+  real                           :: l1, l2, l3   ! domain dimensions
+  real                           :: c1, c2, c3   ! random variables
   type(Var_Type),  pointer       :: u, v, w, t
   type(Grid_Type), pointer       :: grid
   type(Particle_Type), pointer   :: part
@@ -29,8 +28,8 @@
   integer                        :: c, eddy, dir, npb = 0, nn
   integer                        :: ss, oo, n_b, n_bp, fu, n_bin1, n_bin2, temp
   integer                        :: i, j, k, n_stat_p, r, s, ii, mark, n_test
-  integer, allocatable           :: bin_count(:)                                      
-  real, allocatable              :: rep(:), delta(:), bin(:)                                       
+  integer, allocatable           :: bin_count(:)
+  real, allocatable              :: rep(:), delta(:), bin(:)
   real                           :: lo, xo(4), yo(4),                          &
                                     rx, ry, rz, Re_tau, ss0, ss1, ss00, ss11,  &
                                     zo, ro, xc, yc, zc, vc, wc, sig_x, sig_yz, &
@@ -45,21 +44,21 @@
   w    => flow % w
   t    => flow % t
 
-  ! reading starting time for swarm statistics from control file
+  ! Reading starting time for swarm statistics from control file
   call Control_Mod_Starting_Time_Step_For_Swarm_Statistics &
        (n_stat_p, verbose=.true.)
 
   ! Reynolds number should be passed from Save_Results and number of bins should
   ! be defined in control file, also same for n_bin... (it's okey for now!) 
-  Re_tau = 142.0     ! operating shear Reynolds number (a little bit above what
-                     ! we have so we don't lose any particle in counting!) 
-  n_b    = 64        ! number of bins across half of the channel 
-  n_bin1  = 342237   ! time at which we should collect bins info t+=675
-  n_bin2  = 343729   ! time at which we should collect bins info t+=1125
-                     ! ..particle concentration should be equivalent to t+=1000).
-  n_test  = 350000   ! testing (for swarm statistics)
- 
-  ! allocating some arrays for bins
+  Re_tau =    142  ! operating shear Reynolds number (a little bit above what
+                   ! we have so we don't lose any particle in counting!) 
+  n_b    =     64  ! number of bins across half of the channel 
+  n_bin1 = 342237  ! time at which we should collect bins info t+=675
+  n_bin2 = 343729  ! time at which we should collect bins info t+=1125
+                   ! ..particle concentration should be equivalent to t+=1000).
+  n_test = 350000  ! testing (for swarm statistics)
+
+  ! Allocating some arrays for bins
   allocate(rep(swarm % n_particles)); rep = 0.0
   allocate(bin(n_b)); bin = 0.0     ! bin distance from wall
   allocate(delta(n_b - 1)); delta = 0.0 ! bin thickness
@@ -120,7 +119,7 @@
         swarm % particle(k) % y_o = swarm % particle(k) % y_n
         swarm % particle(k) % z_o = swarm % particle(k) % z_n
 
-       ! ! Searching for the closest cell and node to place the moved particle
+        ! Searching for the closest cell and node to place the moved particle
         call Swarm_Mod_Find_Nearest_Cell(swarm, k, npb)
         call Swarm_Mod_Find_Nearest_Node(swarm, k)
 
@@ -156,8 +155,8 @@
   !----------------------!
   !   2nd time step on   !
   !----------------------!
-  if(n .gt. 100001) then     ! should be started after the flow is fully developed
-    call Swarm_Mod_Advance_Particles(swarm, turb, n, n_stat_p, first_dt)
+  if(n .gt. 150001) then     ! should be started after the flow is fully developed
+    call Swarm_Mod_Advance_Particles(swarm, n, n_stat_p)
     if(this_proc < 2) then
       write(*,'(a,i7,a,i4,a,i4,a,i4)')                 &
                " # particles: ", swarm % n_particles,  &
@@ -167,7 +166,16 @@
     end if
   end if
 
-!!<<<<<<<<<<<<<<<<<<<<<<<<<<< Binning Simulation latest 26th Feb 2020 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+  ! Moved these five lines from Main_Pro.f90
+  ! The call assumes that one uses dynamic LES model.
+  ! Can we really always make such an assumption?
+  if(mult % model .eq. LAGRANGIAN_PARTICLES) then
+    if(swarm % subgrid_scale_model .eq. BROWNIAN_FUKAGATA) then
+      call Turb_Mod_Vis_T_Dynamic(turb)
+    end if
+  end if
+
+!!<<<<<<<<<<< Binning Simulation latest 26th Feb 2020 >>>>>>>>>>>>>
 !  ! Chebyshev polynomials to compute slice thickness 
 !  if(n .eq. 340001 .or.  n .eq. n_bin1   .or. & 
 !     n .eq. n_bin2 .or.  n .eq. 344975   .or. &  ! t+ = 1000, 1500
@@ -247,7 +255,7 @@
 !  !mark = maxval(bin_count)
 !  !print *, 'Number of particles inside is:', mark 
 !  !stop 
-!!>>>>>>>>>>>>>>>>>>>>>>>>>>> Binning Simulation >>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+!!>>>>>>>>>>> Binning Simulation >>>>>>>>>>>>>
 
   !------------------------!
   !                        !

@@ -23,7 +23,7 @@
 
   print *, '# Input problem name: (without extension)'
   call File_Mod_Read_Line(5)
-  read(line % tokens(1), *)  problem_name
+  read(line % tokens(1), *)  problem_name(1)
 
   ! Load the finite volume grid
   call Grid_Mod_Load_Cns  (grid, 0)
@@ -38,8 +38,7 @@
 
   call Grid_Mod_Decompose(grid, n_sub)
 
-  call Create_Maps(grid)
-  call Create_Buffers_And_Save(grid)
+  call Save_Subdomains(grid, 1)  ! Number of buffer levels is hard-coded now
 
   call cpu_time(finish)
   print '(a10,f14.3,a9)', ' # Time = ', finish-start, ' seconds.'

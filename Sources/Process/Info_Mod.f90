@@ -4,7 +4,7 @@
 !   Data types and functions for printing info boxes.                          !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Comm_Mod
+  use Field_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Locals]-----------------------------------!
@@ -39,6 +39,7 @@
   !--------------------!
   type Bulk_Info_Type
     character(len=L_LINE) :: line_lead  = ''
+    character(len=L_LINE) :: line_foll  = ''
     character(len=L_LINE) :: line_sep   = ''
     character(len=L_LINE) :: line_trail = ''
     character(len=L_LINE) :: lines(3)   = ''

@@ -1,12 +1,13 @@
 !==============================================================================!
-  subroutine Monitor_Mod_Write_5_Vars(n, flow)
+  subroutine Monitor_Mod_Write_5_Vars(monitor, n, flow)
 !------------------------------------------------------------------------------!
 !   This is to set up monitoring points.                                       !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type) :: flow
-  integer          :: n
+  type(Monitor_Type) :: monitor
+  integer            :: n
+  type(Field_Type)   :: flow
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, p, t
   integer                  :: m

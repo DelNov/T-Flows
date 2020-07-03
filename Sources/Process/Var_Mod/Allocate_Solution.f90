@@ -40,7 +40,10 @@
 
   ! Boundary cell type (important for scalars, since they
   ! can have different boundary conditions at the walls)
-  allocate (phi % bnd_cond_type(-grid % n_bnd_cells: -1))
+  ! It expands over all faces, in the case we decide to store ...
+  ! ... store boundary conditions in the faces one day, and ...
+  ! ... thus get rid of the "if(c2 < 0) then" checks
+  allocate (phi % bnd_cond_type(-grid % n_bnd_cells : grid % n_faces))
   phi % bnd_cond_type = 0
 
   ! Gradients

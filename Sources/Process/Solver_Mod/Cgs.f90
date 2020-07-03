@@ -117,12 +117,12 @@
     !---------------------!
     !   Solve M p2 = u2   !
     !---------------------!
-    call Prec_Solve(ni, a, d, p2(1:nt), u2(1:nt), prec) 
+    call Prec_Solve(ni, a, d, p2(1:nt), u2(1:nt), prec)
 
     !--------------!
     !   v2 = Ap2   !
     !--------------!
-    call Grid_Mod_Exchange_Real(a % pnt_grid, p2)
+    call Grid_Mod_Exchange_Cells_Real(a % pnt_grid, p2(-nb:ni))
     do i = 1, ni
       v2(i) = 0.0
       do j = a % row(i), a % row(i+1)-1
@@ -144,9 +144,9 @@
     !-------------------------!
     q1(1:ni) = u1(1:ni) - alfa * v2(1:ni)
 
-    !-------------------------------!
-    !   solve Mp1 = u1(1:ni) + q1(1:ni)   !
-    !-------------------------------!
+    !-------------------------!
+    !   solve Mp1 = u1 + q1   !
+    !-------------------------!
     u1_plus_q1(1:ni) = u1(1:ni) + q1(1:ni)
     call Prec_Solve(ni, a, d, p1(1:nt), u1_plus_q1(1:nt), prec)
 
@@ -158,7 +158,7 @@
     !---------------!
     !   q2 = A p1   !
     !---------------!
-    call Grid_Mod_Exchange_Real(a % pnt_grid, p1)
+    call Grid_Mod_Exchange_Cells_Real(a % pnt_grid, p1(-nb:ni))
     do i = 1, ni
       q2(i) = 0.0
       do j = a % row(i), a % row(i+1)-1

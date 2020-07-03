@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Sgs_Discrete_Random_Walk(swarm, turb, k, rx, ry, rz)
+  subroutine Swarm_Mod_Sgs_Discrete_Random_Walk(swarm, k, rx, ry, rz)
 !------------------------------------------------------------------------------!
 !  SGS model introducing stochasticity to LES/K-Eps-Zeta-F modeled quantities..
 !  .. seen by particles. (taken from Z. Cheng et. al., (2018) 435-451)
@@ -7,7 +7,6 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Swarm_Type), target :: swarm
-  type(Turb_Type),  target :: turb
   integer                  :: k 
   real                     :: rx
   real                     :: ry
@@ -15,6 +14,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),    pointer :: flow
   type(Grid_Type),     pointer :: grid
+  type(Turb_Type),     pointer :: turb
   type(Particle_Type), pointer :: part
   integer,             pointer :: time
   integer :: c                          ! nearest cell
@@ -37,6 +37,7 @@
   ! Take aliases for flow
   flow => swarm % pnt_flow
   grid => swarm % pnt_grid
+  turb => swarm % pnt_turb
   time => swarm % time_eim
   part => swarm % particle(k)
 
@@ -135,7 +136,7 @@
 
   ! This can be done in a diff. way ((current_ts - backup_ts) * dt)
   ! Flow time (to check the condition of sigma)
-  time  =  time * flow % dt
+  time = time * flow % dt
 
   ! Gaussian random numbers with zero mean and unit std. deviation ...
   ! .. Box-Muller Wiener algorithm was used for this distribution

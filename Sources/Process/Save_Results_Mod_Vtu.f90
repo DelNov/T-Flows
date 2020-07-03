@@ -16,17 +16,18 @@
   use Swarm_Mod,      only: Particle_Type, Swarm_Type
   use Surf_Mod,       only: Vert_Type, Elem_Type, Surf_Type
   use Multiphase_Mod, NO_MULTIPHASE => NONE
-  use User_Mod, only: n_user_arrays, user_array
+  use User_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
 
   contains
 
-  include 'Save_Results_Mod/Vtu/Save_Results.f90'
-  include 'Save_Results_Mod/Vtu/Save_Scalar.f90'
+  include 'Save_Results_Mod/Vtu/Save_Results.f90'      ! binary
+  include 'Save_Results_Mod/Vtu/Save_Scalar_Int.f90'   ! binary
+  include 'Save_Results_Mod/Vtu/Save_Scalar_Real.f90'  ! binary
   include 'Save_Results_Mod/Vtu/Save_Swarm.f90'
-  include 'Save_Results_Mod/Vtu/Save_Vector.f90'
+  include 'Save_Results_Mod/Vtu/Save_Vector_Real.f90'  ! binary
   include 'Save_Results_Mod/Vtu/Save_Surf.f90'
 
   end module 

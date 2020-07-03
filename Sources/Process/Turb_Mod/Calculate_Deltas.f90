@@ -16,18 +16,20 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: grid
   type(Field_Type), pointer :: flow
-  integer                   :: s, c, c1, c2
+  integer                   :: s, c, c1, c2, nc, nb
   real                      :: d, d1, d2, dx1, dx2, dy1, dy2, dz1, dz2
 !==============================================================================!
 
   ! Take aliases
   flow => turb % pnt_flow
   grid => turb % pnt_grid
+  nc = grid % n_cells
+  nb = grid % n_bnd_cells
 
   ! Compute gradients of wall distance
-  call Field_Mod_Grad_Component(flow, grid % wall_dist, 1, h_w_x)  ! dhw/dx
-  call Field_Mod_Grad_Component(flow, grid % wall_dist, 2, h_w_y)  ! dhy/dx
-  call Field_Mod_Grad_Component(flow, grid % wall_dist, 3, h_w_z)  ! dhz/dx
+  call Field_Mod_Grad_Component(flow, grid % wall_dist, 1, h_w_x(-nb:nc))
+  call Field_Mod_Grad_Component(flow, grid % wall_dist, 2, h_w_y(-nb:nc))
+  call Field_Mod_Grad_Component(flow, grid % wall_dist, 3, h_w_z(-nb:nc))
 
   ! Normalize gradients
   do c = 1, grid % n_cells
@@ -83,8 +85,8 @@
     turb % h_min(c) = turb % h_min(c) * 2.0
   end do
 
-  call Grid_Mod_Exchange_Real(grid, turb % h_max)
-  call Grid_Mod_Exchange_Real(grid, turb % h_min)
-  call Grid_Mod_Exchange_Real(grid, turb % h_w)
+  call Grid_Mod_Exchange_Cells_Real(grid, turb % h_max)
+  call Grid_Mod_Exchange_Cells_Real(grid, turb % h_min)
+  call Grid_Mod_Exchange_Cells_Real(grid, turb % h_w)
 
   end subroutine

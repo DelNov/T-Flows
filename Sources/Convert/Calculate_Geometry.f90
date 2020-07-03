@@ -9,14 +9,15 @@
   use File_Mod
   use Grid_Mod,  only: Grid_Type,                        &
                        Grid_Mod_Estimate_Big_And_Small,  &
-                       Grid_Mod_Print_Bnd_Cond_List
+                       Grid_Mod_Print_Bnd_Cond_List,     &
+                       Grid_Mod_Sort_Faces_By_Index
   use Sort_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: c, c1, c2, n, s, ss, cc2, c_max, nnn, hh, mm, b
+  integer              :: c, c1, c2, n, s, ss, cc2, c_max, nnn, hh, mm, b, SC
   integer              :: c11, c12, c21, c22, s1, s2, bou_cen, cnt_bnd, cnt_per
   integer              :: color_per, n_per, number_faces, option
   integer              :: rot_dir
@@ -27,7 +28,7 @@
   real                 :: dsc1, dsc2, per_min, per_max
   real                 :: t, sur_tot, angle
   real                 :: xc1, yc1, zc1, xc2, yc2, zc2
-  real                 :: max_dis, tot_vol, min_vol, max_vol
+  real                 :: max_dis
   real, allocatable    :: xspr(:), yspr(:), zspr(:)
   real, allocatable    :: b_coor(:), phi_face(:)
   integer, allocatable :: b_face(:), face_copy(:)
@@ -700,21 +701,20 @@
   !----------------------------------------------------!
 1 continue
 
+  ! Initialize
   n_per = 0
+  grid % dx(:) = 0.0
+  grid % dy(:) = 0.0
+  grid % dz(:) = 0.0
   grid % per_x = 0.0
   grid % per_y = 0.0
   grid % per_z = 0.0
 
   do s = 1, grid % n_faces
 
-    ! Initialize
-    grid % dx(s) = 0.0
-    grid % dy(s) = 0.0
-    grid % dz(s) = 0.0
-
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
-    if(c2   >  0) then
+    if(c2 > 0) then
 
       ! Scalar product of the face with line c1-c2 is good criteria
       if( (grid % sx(s) * (grid % xc(c2)-grid % xc(c1) )+                  &
@@ -740,9 +740,16 @@
 
         end if
 
-        grid % dx(s) = grid % xf(s) - xs2  !
-        grid % dy(s) = grid % yf(s) - ys2  ! later: xc2 = xc2 + Dx
-        grid % dz(s) = grid % zf(s) - zs2  !
+        grid % dx(s) = grid % xf(s) - xs2  !-----------------------!
+        grid % dy(s) = grid % yf(s) - ys2  ! later: xc2 = xc2 + dx !
+        grid % dz(s) = grid % zf(s) - zs2  !-----------------------!
+
+        grid % dx(face_copy(s)) = grid % dx(s)
+        grid % dy(face_copy(s)) = grid % dy(s)
+        grid % dz(face_copy(s)) = grid % dz(s)
+
+        grid % faces_s(s) = face_copy(s)
+        grid % faces_s(face_copy(s)) = s
 
         grid % per_x = max(grid % per_x, abs(grid % dx(s)))
         grid % per_y = max(grid % per_y, abs(grid % dy(s)))
@@ -751,6 +758,9 @@
       end if !  s*(c2-c1) < 0.0
     end if   !  c2 > 0
   end do     !  faces
+
+  grid % n_shadows = n_per
+
   print '(a38,i9)',   ' # Phase II: number of shadow faces:  ', n_per
   print '(a38,f8.3)', ' # Periodicity in x direction         ', grid % per_x
   print '(a38,f8.3)', ' # Periodicity in y direction         ', grid % per_y
@@ -770,39 +780,45 @@
     if(c1 > 0) then
       number_faces = number_faces  + 1
       grid % new_f(s) = number_faces
-    else
-      grid % new_f(s) = -1
+    end if
+  end do
+  do s = 1, grid % n_faces
+    c1 = grid % faces_c(1,s)
+    c2 = grid % faces_c(2,s)
+    if(.not. c1 > 0) then
+      number_faces = number_faces  + 1
+      grid % new_f(s) = number_faces
     end if
   end do
   print '(a38,i9)', ' # Old number of faces:               ',  grid % n_faces
   print '(a38,i9)', ' # New number of faces:               ',  number_faces
 
-  !--------------------------------------!
-  !                                      !
-  !   Phase IV  ->  compress the faces   !
-  !                                      !
-  !--------------------------------------!
-  do s = 1, grid % n_faces
-    if(grid % new_f(s) > 0) then
-      grid % faces_c(1,grid % new_f(s)) = grid % faces_c(1,s)
-      grid % faces_c(2,grid % new_f(s)) = grid % faces_c(2,s)
-      grid % faces_n_nodes(grid % new_f(s)) = grid % faces_n_nodes(s)
-      grid % faces_n(1,grid % new_f(s)) = grid % faces_n(1,s)
-      grid % faces_n(2,grid % new_f(s)) = grid % faces_n(2,s)
-      grid % faces_n(3,grid % new_f(s)) = grid % faces_n(3,s)
-      grid % faces_n(4,grid % new_f(s)) = grid % faces_n(4,s)
-      grid % xf(grid % new_f(s)) = grid % xf(s)
-      grid % yf(grid % new_f(s)) = grid % yf(s)
-      grid % zf(grid % new_f(s)) = grid % zf(s)
-      grid % sx(grid % new_f(s)) = grid % sx(s)
-      grid % sy(grid % new_f(s)) = grid % sy(s)
-      grid % sz(grid % new_f(s)) = grid % sz(s)
-      grid % dx(grid % new_f(s)) = grid % dx(s)
-      grid % dy(grid % new_f(s)) = grid % dy(s)
-      grid % dz(grid % new_f(s)) = grid % dz(s)
+  !----------------------------------!
+  !                                  !
+  !   Phase IV  ->  sort the faces   !
+  !                                  !
+  !----------------------------------!
+  call Grid_Mod_Sort_Faces_By_Index(grid, grid % new_f, grid % n_faces)
+  call Sort_Mod_Real_By_Index(grid % xf, grid % new_f,  grid % n_faces)
+  call Sort_Mod_Real_By_Index(grid % yf, grid % new_f,  grid % n_faces)
+  call Sort_Mod_Real_By_Index(grid % zf, grid % new_f,  grid % n_faces)
+  call Sort_Mod_Real_By_Index(grid % sx, grid % new_f,  grid % n_faces)
+  call Sort_Mod_Real_By_Index(grid % sy, grid % new_f,  grid % n_faces)
+  call Sort_Mod_Real_By_Index(grid % sz, grid % new_f,  grid % n_faces)
+  call Sort_Mod_Real_By_Index(grid % dx, grid % new_f,  grid % n_faces)
+  call Sort_Mod_Real_By_Index(grid % dy, grid % new_f,  grid % n_faces)
+  call Sort_Mod_Real_By_Index(grid % dz, grid % new_f,  grid % n_faces)
+
+  grid % n_faces = grid % n_faces - n_per
+
+  ! Final correction to shadow faces for grid % faces_s and grid faces_c
+  do s = 1, grid % n_faces + grid % n_shadows
+    if(grid % faces_s(s) > 0) then
+      grid % faces_s(s) = grid % new_f(grid % faces_s(s))
+      grid % faces_c(1, grid % faces_s(s)) = grid % faces_c(1, s)
+      grid % faces_c(2, grid % faces_s(s)) = grid % faces_c(2, s)
     end if
   end do
-  grid % n_faces = number_faces
 
   !-----------------------------------!
   !   Check the periodic boundaries   !
@@ -842,20 +858,23 @@
   end do
   grid % vol(:) = grid % vol(:) * ONE_THIRD
   c1 = 0
-  min_vol =  HUGE
-  max_vol = -HUGE
-  tot_vol = 0.0
+  grid % min_vol =  HUGE
+  grid % max_vol = -HUGE
+  grid % tot_vol = 0.0
   do c = 1, grid % n_cells
-    tot_vol = tot_vol + grid % vol(c)
-    min_vol = min(min_vol, grid % vol(c))
-    max_vol = max(max_vol, grid % vol(c))
+    grid % tot_vol = grid % tot_vol + grid % vol(c)
+    grid % min_vol = min(grid % min_vol, grid % vol(c))
+    grid % max_vol = max(grid % max_vol, grid % vol(c))
   end do
-  print '(a45,es12.5)', ' # Minimal cell volume is:                   ', min_vol
-  print '(a45,es12.5)', ' # Maximal cell volume is:                   ', max_vol
-  print '(a45,es12.5)', ' # Total domain volume is:                   ', tot_vol
+  print '(a45,es12.5)', ' # Minimal cell volume is:                   ',  &
+        grid % min_vol
+  print '(a45,es12.5)', ' # Maximal cell volume is:                   ',  &
+        grid % max_vol
+  print '(a45,es12.5)', ' # Total domain volume is:                   ',  &
+        grid % tot_vol
   print *, '# Cell volumes calculated !'
 
-  if(min_vol < 0.0) then
+  if(grid % min_vol < 0.0) then
     print *, '# Negative volume occured! Slower, algoritham should be run !'
     print *, '# Execution will halt now! '
 !    stop

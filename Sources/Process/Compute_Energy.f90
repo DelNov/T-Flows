@@ -34,11 +34,15 @@
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
   integer                    :: n, c, s, c1, c2, exec_iter
-  real                       :: a0, a12, a21, con_eff_f
+  real                       :: a0, a12, a21, con_eff_f, con_t_f
   real                       :: f_ex1, f_im1, tx_f1, ty_f1, tz_f1
   real                       :: f_ex2, f_im2, tx_f2, ty_f2, tz_f2
   real                       :: pr_t1, pr_t2, pr_tf
-  real                       :: ut_s, vt_s, wt_s, t_stress, con_t_f
+  real                       :: t_stress
+  real                       :: cap_dens_c1, cap_dens_c2
+  real                       :: ut_x_cap_dens_s, &
+                                vt_x_cap_dens_s, &
+                                wt_x_cap_dens_s
 !------------------------------------------------------------------------------!
 !
 !  The form of equations which are solved:
@@ -49,24 +53,31 @@
 !    |        dt      |                 |
 !   /                /                 /
 !
+!   [A]{T} = {b}
 !
-!  Dimension of the system under consideration
+!------------------------------------------------------------------------------!
+!   Dimensions of certain variables:                                           !
+!                                                                              !
+!   lambda <-> conductivity, con_w
+!   rho    <-> density
+!   Cp     <-> capacity
+!   T      <-> t % n, t % o, t % oo
+!   heat capacity               capacity          [J/(kg K)]
+!   thermal conductivity        conductivity      [W/(m K)] ([W = J/s])
+!   density                     density           [kg/m^3]
+!   flux                        m_flux            [kg/s]
+!   left  hand s.               a                 [J/(s K)]
+!   temperature                 t % n             [K]
+!   right hand s.               b                 [J/s]
+!   turb. thermal conductivity  con_t_f           [W/(m K)]
+!   turb. hear flux             ut                [(m K)/s]
+!   turb. hear flux             ut_x_cap_dens_s   [J/(m^2 s)]
+!   turb. stress                t_stress          [J/s]
+!   turb. viscosity             vis_t             [kg/(m s)]
 !
-!     [A]{T} = {b}   [J/s = W]  
-!
-!  Dimensions of certain variables:
-!
-!     Cp     [J/kg K] (heat capacity)
-!     lambda [W/m K] (heat conductivity)
-!
-!     A      [kg/s]
-!     T      [K]
-!     b      [kg K/s] 
-!     Flux   [kg/s]
-!     CT*,   [kg K/s] 
-!     DT*,   [kg K/s] 
-!     XT*,   [kg K/s]
-! 
+!   User_Mod variables:
+!   bulk flux                   bulk % flux_x     [kg/s]
+!   heat flux                   flow % heat_flux  [W/m^2]
 !==============================================================================!
 
   call Cpu_Timer_Mod_Start('Compute_Energy (without solvers)')
@@ -119,8 +130,8 @@
   !----------------------------!
   !   Spatial discretization   !
   !----------------------------!
-  if(turbulence_model .ne. NO_TURBULENCE .and.  &
-     turbulence_model .ne. DNS) then
+  if(turb % model .ne. NO_TURBULENCE .and.  &
+     turb % model .ne. DNS) then
   end if
 
   do s = 1, grid % n_faces
@@ -128,12 +139,12 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
-    if(turbulence_model .ne. LES_SMAGORINSKY    .and.  &
-       turbulence_model .ne. LES_DYNAMIC        .and.  &
-       turbulence_model .ne. HYBRID_LES_PRANDTL .and.  &
-       turbulence_model .ne. LES_WALE           .and.  &
-       turbulence_model .ne. NO_TURBULENCE      .and.  &
-       turbulence_model .ne. DNS) then
+    if(turb % model .ne. LES_SMAGORINSKY    .and.  &
+       turb % model .ne. LES_DYNAMIC        .and.  &
+       turb % model .ne. HYBRID_LES_PRANDTL .and.  &
+       turb % model .ne. LES_WALE           .and.  &
+       turb % model .ne. NO_TURBULENCE      .and.  &
+       turb % model .ne. DNS) then
       pr_t1 = Turb_Mod_Prandtl_Number(turb, c1)
       pr_t2 = Turb_Mod_Prandtl_Number(turb, c2)
       pr_tf = grid % fw(s) * pr_t1 + (1.0-grid % fw(s)) * pr_t2
@@ -142,14 +153,14 @@
     end if
 
     ! Gradients on the cell face (fw corrects situation close to the wall)
-    tx_f1 = grid % fw(s) * t % x(c1) + (1.0-grid % fw(s)) * t % x(c2) 
+    tx_f1 = grid % fw(s) * t % x(c1) + (1.0-grid % fw(s)) * t % x(c2)
     ty_f1 = grid % fw(s) * t % y(c1) + (1.0-grid % fw(s)) * t % y(c2)
     tz_f1 = grid % fw(s) * t % z(c1) + (1.0-grid % fw(s)) * t % z(c2)
     tx_f2 = tx_f1
     ty_f2 = ty_f1
     tz_f2 = tz_f1
-    if(turbulence_model .ne. NO_TURBULENCE .and.  &
-       turbulence_model .ne. DNS) then
+    if(turb % model .ne. NO_TURBULENCE .and.  &
+       turb % model .ne. DNS) then
       con_eff_f =                                                              &
                grid % fw(s) * (flow % conductivity(c1) +                       &
                                flow % capacity(c1) * turb % vis_t(c1) / pr_tf) &
@@ -163,9 +174,9 @@
         + (1.0-grid % fw(s))* flow % conductivity(c2)
     end if
 
-    if(turbulence_model .eq. K_EPS        .or.  &
-       turbulence_model .eq. K_EPS_ZETA_F .or.  &
-       turbulence_model .eq. HYBRID_LES_RANS) then
+    if(turb % model .eq. K_EPS        .or.  &
+       turb % model .eq. K_EPS_ZETA_F .or.  &
+       turb % model .eq. HYBRID_LES_RANS) then
       if(c2 < 0) then
         if(Var_Mod_Bnd_Cond_Type(t, c2) .eq. WALL .or.  &
            Var_Mod_Bnd_Cond_Type(t, c2) .eq. WALLFL) then
@@ -203,20 +214,23 @@
     !   Turbulent heat fluxes   !
     !                           !
     !---------------------------!
-    if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
-       turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+    if(turb % model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
+       turb % model .eq. RSM_MANCEAU_HANJALIC) then
+
+      cap_dens_c1 = flow % capacity(c1) * flow % density(c1)
+      cap_dens_c2 = flow % capacity(c2) * flow % density(c2)
 
       ! Turbulent heat fluxes according to GGDH scheme
-      ! (first line is GGDH, second line is SGDH substratced 
-      ut_s =  (    grid % fw(s)  * ut % n(c1)   &
-           +  (1.0-grid % fw(s)) * ut % n(c2))
-      vt_s =  (    grid % fw(s)  * vt % n(c1)   &
-           +  (1.0-grid % fw(s)) * vt % n(c2))
-      wt_s =  (    grid % fw(s)  * wt % n(c1)   &
-           +  (1.0-grid % fw(s)) * wt % n(c2))
-      t_stress = - (  ut_s * grid % sx(s)                    &
-                    + vt_s * grid % sy(s)                    &
-                    + wt_s * grid % sz(s) )                  &
+      ! (first line is GGDH, second line is SGDH substratced
+      ut_x_cap_dens_s =  (    grid % fw(s)  * ut % n(c1) * cap_dens_c1  &
+                      +  (1.0-grid % fw(s)) * ut % n(c2) * cap_dens_c2)
+      vt_x_cap_dens_s =  (    grid % fw(s)  * vt % n(c1) * cap_dens_c1  &
+                      +  (1.0-grid % fw(s)) * vt % n(c2) * cap_dens_c2)
+      wt_x_cap_dens_s =  (    grid % fw(s)  * wt % n(c1) * cap_dens_c1  &
+                      +  (1.0-grid % fw(s)) * wt % n(c2) * cap_dens_c2)
+      t_stress = - (  ut_x_cap_dens_s * grid % sx(s)                    &
+                    + vt_x_cap_dens_s * grid % sy(s)                    &
+                    + wt_x_cap_dens_s * grid % sz(s) )                  &
                     - (con_t_f * (  tx_f1 * grid % sx(s)     &
                                   + ty_f1 * grid % sy(s)     &
                                   + tz_f1 * grid % sz(s)) )
@@ -242,7 +256,7 @@
       a % val(a % pos(1,s)) = a % val(a % pos(1,s)) - a12
       a % val(a % pos(2,s)) = a % val(a % pos(2,s)) - a21
     else if(c2.lt.0) then
-      ! Outflow is included because of the flux 
+      ! Outflow is included because of the flux
       ! corrections which also affects velocities
       if( (Var_Mod_Bnd_Cond_Type(t, c2) .eq. INFLOW) .or.  &
           (Var_Mod_Bnd_Cond_Type(t, c2) .eq. WALL)   .or.  &
@@ -308,7 +322,7 @@
   ! Print some info on the screen
   call Info_Mod_Iter_Fill_At(1, 6, t % name, exec_iter, t % res)
 
-  call Grid_Mod_Exchange_Real(grid, t % n)
+  call Grid_Mod_Exchange_Cells_Real(grid, t % n)
 
   ! User function
   call User_Mod_End_Of_Compute_Energy(flow, turb, mult, dt, ini)

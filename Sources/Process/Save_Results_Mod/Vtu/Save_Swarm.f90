@@ -1,16 +1,17 @@
 !==============================================================================!
-  subroutine Save_Swarm(swarm, ts)
+  subroutine Save_Swarm(swarm, time_step, domain)
 !------------------------------------------------------------------------------!
 !   Writes particles in VTU file format (for VisIt and Paraview)               !
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   type(Swarm_Type), target :: swarm
-  integer                  :: ts
+  integer                  :: time_step
+  integer,        optional :: domain
 !----------------------------------[Locals]------------------------------------!
   type(Particle_Type), pointer :: part
   integer                      :: k, fu
-  character(len=80)            :: name_out, store_name
+  character(len=80)            :: name_out
 !-----------------------------[Local parameters]-------------------------------!
   character(len= 0)  :: IN_0 = ''           ! indentation levels
   character(len= 2)  :: IN_1 = '  '
@@ -30,7 +31,11 @@
 
   if(this_proc < 2) then
 
-    call File_Mod_Set_Name(name_out, time_step=ts, extension='.swarm.vtu')
+    call File_Mod_Set_Name(name_out,             &
+                           time_step=time_step,  &
+                           appendix ='-swarm',   &
+                           extension='.vtu',     &
+                           domain=domain)
     call File_Mod_Open_File_For_Writing(name_out, fu)
 
     !------------!
@@ -89,6 +94,19 @@
       part => swarm % particle(k)
       write(fu,'(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')                         &
                  IN_5, part % u, part % v, part % w
+    end do
+    write(fu,'(a,a)') IN_4, '</DataArray>'
+
+    !-------------------------!
+    !   Velocity magnitudes   !
+    !-------------------------!
+    write(fu,'(a,a)') IN_4, '<DataArray type="Float64" '  //  &
+                            ' Name="Velocity_Magnitude" ' //  &
+                            ' format="ascii">'
+    do k = 1, swarm % n_particles
+      part => swarm % particle(k)
+      write(fu,'(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')                         &
+                 IN_5, sqrt(part % u**2 + part % v**2 + part % w**2)
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
 

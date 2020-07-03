@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Results(flow, turb, mult, swarm, ts, plot_inside)
+  subroutine Save_Results(flow, turb, mult, swarm, ts, plot_inside, domain)
 !------------------------------------------------------------------------------!
 !   Writes results in CGNS file format (for VisIt and Paraview)                !
 !------------------------------------------------------------------------------!
@@ -16,7 +16,9 @@
                       vt_save   => r_cell_10,  &
                       wt_save   => r_cell_11,  &
                       kin_vis_t => r_cell_12,  &
-                      phi_save  => r_cell_13
+                      phi_save  => r_cell_13,  &
+                      q_save    => r_cell_14,  &
+                      int_save  => r_cell_15
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
@@ -26,6 +28,7 @@
   type(Swarm_Type),      target :: swarm
   integer                       :: ts           ! time step
   logical                       :: plot_inside  ! plot results inside?
+  integer,             optional :: domain
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer      :: grid
   type(Var_Type),  pointer      :: phi
@@ -34,7 +37,7 @@
   integer                       :: block
   integer                       :: solution
   integer                       :: field
-  integer                       :: c, sc, ua
+  integer                       :: c, sc, ua, s
 !==============================================================================!
 
   if(.not. plot_inside) return ! no point to write *-bnd.cgns yet
@@ -46,10 +49,12 @@
 
   if (.not. mesh_written) then
     ! problem_name.cgns
-    call File_Mod_Set_Name(name_out, extension='.cgns')
+    call File_Mod_Set_Name(name_out, extension='.cgns',  &
+                           domain=domain)
   else
     ! problem_name-ts??????.cgns
-    call File_Mod_Set_Name(name_out, time_step=ts, extension='.cgns')
+    call File_Mod_Set_Name(name_out, time_step=ts, extension='.cgns',  &
+                           domain=domain)
     file_name = trim(name_out) ! used in Save_Cgns_Cells
   end if
 
@@ -133,6 +138,30 @@
   !   Copied code below from Save_Vtu_Results   !
   !---------------------------------------------!
 
+  !--------------------!
+  !   Processor i.d.   !
+  !--------------------!
+  do c = 1, grid % n_cells - grid % comm % n_buff_cells
+    int_save(c) = real(grid % comm % cell_proc(c))
+  end do
+  do s = 1, grid % n_faces
+    if( grid % faces_c(2,s) < 0 ) then
+      int_save(grid % faces_c(2,s)) =  &
+               real(grid % comm % cell_proc( grid % faces_c(1,s) ))
+    end if
+  end do
+  call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
+                            int_save(1), 'Processor')
+
+  !-------------------!
+  !   Domain number   !
+  !-------------------!
+  ! if(present(domain)) then
+  !   int_save(-grid % n_bnd_cells:grid % n_cells) = real(domain)
+  !   call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
+  !                             int_save(1), 'Domain')
+  ! end if
+
   !--------------!
   !   Velocity   !
   !--------------!
@@ -160,7 +189,11 @@
   !---------------------!
   if(multiphase_model .eq. VOLUME_OF_FLUID) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              mult % vof % n(1), 'Temperature')
+                              mult % vof % n(1), 'VolumeFraction')
+    if (mult % d_func) then
+      call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
+                          mult % dist_func % n(1), 'DistanceFunction')
+    end if
   end if
 
   !------------------!
@@ -172,16 +205,27 @@
                               phi % n(1), phi % name)
   end do
 
+  !-----------------!
+  !   Q-criterion   !
+  !-----------------!
+  q_save(:) = 0.0
+  do c = 1, grid % n_cells
+    q_save(c) = (flow % vort(c)**2 - flow % shear(c)**2)/4.
+  end do
+
+  call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
+                            q_save(1), 'Qcriterion')
+
   !--------------------------!
   !   Turbulent quantities   !
   !--------------------------!
 
   ! Save kin and eps
-  if(turbulence_model .eq. K_EPS                 .or.  &
-     turbulence_model .eq. K_EPS_ZETA_F          .or.  &
-     turbulence_model .eq. HYBRID_LES_RANS       .or.  &
-     turbulence_model .eq. RSM_MANCEAU_HANJALIC  .or.  &
-     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC       ) then
+  if(turb % model .eq. K_EPS                 .or.  &
+     turb % model .eq. K_EPS_ZETA_F          .or.  &
+     turb % model .eq. HYBRID_LES_RANS       .or.  &
+     turb % model .eq. RSM_MANCEAU_HANJALIC  .or.  &
+     turb % model .eq. RSM_HANJALIC_JAKIRLIC       ) then
 
     call Cgns_Mod_Write_Field(base, block, solution, field, grid,  &
                               turb % kin % n(1),                   &
@@ -196,8 +240,8 @@
   end if
 
   ! Save zeta and f22
-  if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
-     turbulence_model .eq. HYBRID_LES_RANS) then
+  if(turb % model .eq. K_EPS_ZETA_F .or.  &
+     turb % model .eq. HYBRID_LES_RANS) then
     do c = 1, grid % n_cells
       v2_calc(c) = turb % kin % n(c) * turb % zeta % n(c)
     end do
@@ -228,20 +272,20 @@
     end if
   end if
 
-  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+  if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              turb % f22 % n(1),  'TurbulentQuantityF22')
+                              turb % f22 % n(1), 'TurbulentQuantityF22')
   end if
 
   ! Vis and Turbulent Vicosity_t
-  if(turbulence_model .eq. DES_SPALART .or.  &
-     turbulence_model .eq. SPALART_ALLMARAS) then
+  if(turb % model .eq. DES_SPALART .or.  &
+     turb % model .eq. SPALART_ALLMARAS) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               turb % vis % n(1),'TurbulentViscosity')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               flow % vort(1),'VorticityMagnitude')
   end if
-  if(turbulence_model .ne. NO_TURBULENCE) then
+  if(turb % model .ne. NO_TURBULENCE) then
     kin_vis_t(1:grid % n_cells) = turb % vis_t(1:grid % n_cells)  &
                                 / flow % viscosity(1:grid % n_cells)
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
@@ -249,8 +293,8 @@
   end if
 
   ! Reynolds stress models
-  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC .or.  &
-     turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
+  if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+     turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               turb % uu % n(1),'ReynoldsStressXX')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
@@ -266,7 +310,7 @@
   end if
 
   ! Statistics for large-scale simulations of turbulence
-  if(turbulence_statistics) then
+  if(turb % statistics) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               turb % u_mean(1),'MeanVelocityX')
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
@@ -325,10 +369,11 @@
       call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                                 phi_save(1), name_mean)
     end do ! sc = 1, flow % n_scalars
-  end if ! turbulence_statistics
+  end if ! turb % statistics
 
   ! Save y+ for all turbulence models
-  if(turbulence_model .ne. NO_TURBULENCE) then
+  if(turb % model .ne. NO_TURBULENCE .and.  &
+     turb % model .ne. DNS) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               turb % y_plus(1),'TurbulentQuantityYplus')
   end if
@@ -358,12 +403,12 @@
   !----------------------!
   !   Save user arrays   !
   !----------------------!
-  do ua = 1, n_user_arrays
+  do ua = 1, grid % n_user_arrays
 
     a_name = 'A_00'
     write(a_name(3:4), '(I2.2)') ua
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
-                              user_array(ua,1), a_name)
+                              grid % user_array(ua,1), a_name)
   end do
 
   !----------------------------!

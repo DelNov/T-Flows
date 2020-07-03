@@ -17,7 +17,7 @@
   real                         :: rx_nx_o, ry_ny_o, rz_nz_o,              &
                                   rx_nx_n, ry_ny_n, rz_nz_n,              &
                                   xi, yi, zi, dx, dy, dz, nx, ny, nz, f,  &
-                                  u_ref, v_ref, w_ref, xc, yc, zc, delta , d_sq 
+                                  u_ref, v_ref, w_ref, xc, yc, zc, delta
 !==============================================================================!
 
   ! Take aliases
@@ -39,14 +39,9 @@
   nz = -grid % sz(s) / grid % s(s)
 
   ! Coordinates of closest boundary cell
-  xc = -grid % xc(c2)
-  yc = -grid % yc(c2)
-  zc = -grid % zc(c2)
-
-  ! Distance squared from the particle to the boundary cell centre
-  d_sq = (xc - part % x_n)**2  &
-       + (yc - part % y_n)**2  &
-       + (zc - part % z_n)**2
+  xc = grid % xc(c2)
+  yc = grid % yc(c2)
+  zc = grid % zc(c2)
 
   !-------------------------------------------!
   !                                           !
@@ -59,10 +54,13 @@
             + part % v * ny   &
             + part % w * nz
 
+  write(100 + k, '(a,4i6,1pe11.3)') 'k, c, c2, s = ',  &
+                  k, c, c2, s, vel_dot_n
+
   ! Tolerance before collision with wall
   delta = part % d / 2.0
 
-  if( vel_dot_n <= 0.0 .or. d_sq <= delta) then
+  if( vel_dot_n <= 0.0) then
 
     ! Old dot product of rx and nx
     rx_nx_o = (grid % xc(c2) - part % x_o) * nx
@@ -73,6 +71,10 @@
     rx_nx_n = (grid % xc(c2) - part % x_n) * nx
     ry_ny_n = (grid % yc(c2) - part % y_n) * ny
     rz_nz_n = (grid % zc(c2) - part % z_n) * nz
+
+    write(100 + k, '(a,1pe11.3,1pe11.3)') 'rx nx = ',  rx_nx_o * rx_nx_n  &
+                                                     + ry_ny_o * ry_ny_n  &
+                                                     + rz_nz_o * rz_nz_n
 
     !------------------------------------------!
     !                                          !
@@ -129,15 +131,15 @@
       yi = part % y_o + f * dy
       zi = part % z_o + f * dz
 
-      ! particles touch the wall when their center is one radius far from  wall..
-      ! ...this should correct for reflection behavior (HARD coded)
-      !==>if(zi .le. 0.0) then
-      !==>  zi = zi + part % d / 2.0    ! for lower channel wall 
-      !==>else 
-      !==>  if(zi .ge. 2.0) then 
-      !==>    zi = zi - part % d / 2.0  ! for upper wall
-      !==>  end if  
-      !==>end if  
+      ! particles touch the wall when their center is one radius far from ...
+      ! ... wall this should correct for reflection behavior (HARD coded)
+      if(zi .le. 0.0) then
+        zi = zi + part % d / 2.0    ! for lower channel wall 
+      else
+        if(zi .ge. 2.0) then
+          zi = zi - part % d / 2.0  ! for upper wall
+        end if
+      end if
 
       !---------------------------------!
       !   The boundary cell is a wall   !
@@ -149,15 +151,14 @@
         if(swarm % rst <= TINY .or. abs(vel_dot_n) <= 1.0e-4) then
           deposited = .true.
           swarm % cnt_d = swarm % cnt_d + 1
-          print *, k, 'Particle is deposited at: ', xi, yi, zi, f
+          print '(a,i6,a,1pe11.3,1pe11.3,1pe11.3,1pe11.3)',  &
+                ' # Particle ', k, ' deposited at  : ', xi, yi, zi, f
 
           ! Correct for 'last' computed particle position (HARD coded)!
           if(part % z_n .le. 0.0) then
             part % z_n = part % d / 2.0
-          else
-            if(part % z_n .gt. 2.0) then
-               part % z_n = 2.0 - part % d / 2.0
-            end if
+          else if(part % z_n .gt. 2.0) then
+            part % z_n = 2.0 - part % d / 2.0
           end if
 
         ! Reflection condition
@@ -187,7 +188,8 @@
           swarm % cnt_r = swarm % cnt_r + 1   ! to be engineered because ...
                                               ! ... a single particle can ...
                                               ! ... bounce several times.
-          print *, k, 'Particle is reflected from: ', xi, yi, zi, f, part % v
+          print '(a,i6,a,1pe11.3,1pe11.3,1pe11.3,1pe11.3)',  &
+                ' # Particle ', k, ' reflected from: ', xi, yi, zi, f
         end if  ! reflection condition
 
       end if  ! is it a wall
@@ -195,10 +197,12 @@
       !------------------------------------!
       !   The boundary cell is an outlet   !
       !------------------------------------!
-      if(Grid_Mod_Bnd_Cond_Type(grid, c2) == OUTFLOW) then
+      if(Grid_Mod_Bnd_Cond_Type(grid, c2) == OUTFLOW .or.  &
+         Grid_Mod_Bnd_Cond_Type(grid, c2) == CONVECT) then
         escaped =  .true.
         swarm % cnt_e = swarm % cnt_e + 1
-        print *, k, 'Particle escaped from outlet at: ', xi, yi, zi, f
+        print '(a,i6,a,1pe11.3,1pe11.3,1pe11.3,1pe11.3)',  &
+              ' # Particle ', k, ' escapted from : ', xi, yi, zi, f
       end if  ! it is an outflow
 
     end if  ! really crossed a boundary cell

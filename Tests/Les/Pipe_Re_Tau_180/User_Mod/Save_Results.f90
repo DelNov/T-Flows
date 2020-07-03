@@ -47,11 +47,17 @@
   call Control_Mod_Thermal_Conductivity(cond_const)
 
   ! Set the name for coordinate file
-  call File_Mod_Set_Name(coord_name, extension='.1d')
+  call File_Mod_Set_Name(coord_name, extension='.1r')
 
-  ! Set names for result files
-  call File_Mod_Set_Name(res_name,      appendix='-res',      extension='.dat')
-  call File_Mod_Set_Name(res_name_plus, appendix='-res-plus', extension='.dat')
+  ! Set file names for results
+  call File_Mod_Set_Name(res_name,         &
+                         time_step=ts,     &
+                         appendix='-res',  &
+                         extension='.dat')
+  call File_Mod_Set_Name(res_name_plus,         &
+                         time_step=ts,          &
+                         appendix='-res-plus',  &
+                         extension='.dat')
 
   !------------------!
   !   Read 1d file   !
@@ -298,17 +304,18 @@
             'correlation of Dittus-Boelter is used.' 
     end if
 
+
     if(heat_transfer) then
-      write(i,'(a1,2x,a60)') '#',  ' z,'                    //  &  !  1
-                                   ' u,'                    //  &  !  2
-                                   ' uu, vv, ww, uw'        //  &  !  3 -  6
-                                   ' kin'                   //  &  !  7
-                                   ' t, ut, vt, wt,'               !  8 - 11
+      write(i,'(a1,2x,a120)') '#',  ' 1) z,  '                          //  &
+                                    ' 2) u,  '                          //  &
+                                    ' 3) uu, 4) vv, 5) ww, 6) uw,     ' //  &
+                                    ' 7) kin,  '                        //  &
+                                    ' 8) t, 9) t2, 10) ut, 11) vt, 12) wt  '
     else
-      write(i,'(a1,2x,a50)') '#',  ' z,'                    //  &  !  1
-                                   ' u,'                    //  &  !  2
-                                   ' uu, vv, ww, uw'        //  &  !  3 -  6
-                                   ' kin'                          !  7
+      write(i,'(a1,2x,a120)') '#',  ' 1) z,  '                         //  &
+                                    ' 2) u,  '                         //  &
+                                    ' 3) uu,  4) vv,  5) ww, 6) uw  '  //  &
+                                    ' 7) kin'
     end if
   end do
 

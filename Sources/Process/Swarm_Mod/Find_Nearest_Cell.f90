@@ -131,7 +131,7 @@
         cc = c         ! cc is the closest inside cell index
       end if
 
-    end do  ! browswe through all cells
+    end do  ! browse through all cells
 
     part % cell = cc
     min_dc_glob = min_dc

@@ -125,11 +125,9 @@
   end do
   call File_Mod_Read_Line(fu)          ! ENDOFSECTION
 
-  !-----------------------!
-  !   Set material name   !
-  !-----------------------!
-  grid % material % name = "AIR"
-
+  !----------------------!
+  !   Material section   !
+  !----------------------!
   do j = 1, n_blocks
     call File_Mod_Read_Line(fu)               ! ELEMENT GROUP
     call File_Mod_Read_Line(fu)

@@ -14,6 +14,7 @@
   integer, parameter :: HUGE_INT = 9223372036854775807
 
   ! Big and small numbers in metric system
+  real, parameter :: PETA  = 1.e+15
   real, parameter :: TERA  = 1.e+12
   real, parameter :: GIGA  = 1.e+9
   real, parameter :: MEGA  = 1.e+6
@@ -22,6 +23,7 @@
   real, parameter :: MICRO = 1.e-6
   real, parameter :: NANO  = 1.e-9
   real, parameter :: PICO  = 1.e-12
+  real, parameter :: FEMTO = 1.e-15
 
   ! Archimedes’ constant
   real, parameter :: PI = 3.14159265359
@@ -33,5 +35,15 @@
   real, parameter :: ONE_THIRD  = 0.33333333333333333
   real, parameter :: TWO_THIRDS = 1.0 - ONE_THIRD
   real, parameter :: ONE_SIXTH  = ONE_THIRD * 0.5
+
+  !------------------------------------------------------!
+  !   Constants related to multiple domain simulations   !
+  !------------------------------------------------------!
+
+  ! Maximum number of domains
+  integer, parameter :: MD  = 4
+
+  ! Maximum number of variables exchanged at the interface
+  integer, parameter :: MAX_VARS_INTERFACE = 9
 
   end module 

@@ -40,10 +40,6 @@
           !   Field section  !
           !------------------!
 
-  ! TO DO : 
-  ! 1) Pack monitoring points in ConvergenceHistory_t
-  ! 2) Salome test: mesh is converted correctly, but WallDistance is wrong
-
   ! File
   integer           :: file_id
   character(len=80) :: file_name
@@ -62,7 +58,6 @@
     integer              :: cell_type
     integer              :: first_cell
     integer              :: last_cell
-    integer              :: parent_flag
   end type
 
   ! Blocks
@@ -89,36 +84,13 @@
   end type
   type(Cgns_Base_Type), allocatable :: cgns_base(:)
 
-  ! Some global counters (this is a bit ugly)
-  integer :: cnt_nodes
-  integer :: cnt_cells
-  integer :: cnt_blocks     ! probably not needed
-  integer :: cnt_bnd_cells
-  integer :: pos_of_last_3d_cell
+  integer :: cnt_cells  ! number of cells (except boundary and interface)
 
   ! Cells (3d)
   integer :: cnt_hex
   integer :: cnt_pyr
   integer :: cnt_wed
   integer :: cnt_tet
-  integer :: cnt_mix
-
-  ! Boundary condition cells (2d)
-  integer :: cnt_bnd_qua
-  integer :: cnt_bnd_tri
-
-  ! Interface cells (2d)
-  integer              :: cnt_int_qua
-  integer              :: cnt_int_tri
-  integer              :: cnt_int
-  character(len=80)    :: interface_names(1024)
-  integer, allocatable :: interface_cells(:,:,:,:)
-  integer              :: cnt_int_cells
-
-  ! Block-wise counter of boundary cells
-  integer           :: cnt_block_bnd_cells  ! probably not needed
-  integer           :: cnt_bnd_cond
-  character(len=80) :: bnd_cond_names(1024)
 
   ! If actual grid was written, further saves have just a link to that grid
   logical           :: mesh_written = .false.

@@ -13,14 +13,16 @@
   !-----------------------------!
   !   User scalars and arrays   !
   !-----------------------------!
-  call Control_Mod_Number_Of_User_Arrays(n_user_arrays,  verbose = .true.)
+  call Control_Mod_Number_Of_User_Arrays(grid % n_user_arrays,  &
+                                         verbose = .true.)
 
   !-------------------------------------!
   !   Allocate memory for user arrays   !
   !-------------------------------------!
-  allocate(user_array(n_user_arrays, -grid % n_bnd_cells:grid % n_cells))
-  do ua = 1, n_user_arrays
-    user_array(ua,:) = 0.
+  allocate(grid % user_array(grid % n_user_arrays,  &
+                            -grid % n_bnd_cells:grid % n_cells))
+  do ua = 1, grid % n_user_arrays
+    grid % user_array(ua,:) = 0.
   end do
 
   end subroutine

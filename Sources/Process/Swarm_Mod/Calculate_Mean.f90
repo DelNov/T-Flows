@@ -11,8 +11,9 @@
   integer                  :: n_stat_p
   integer                  :: ss
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type),    pointer :: flow
   type(Grid_Type),     pointer :: grid
+  type(Field_Type),    pointer :: flow
+  type(Turb_Type),     pointer :: turb
   type(Particle_Type), pointer :: part
   integer                      :: c, o, m, l
 !==============================================================================!
@@ -22,6 +23,7 @@
   ! Take aliases
   grid => swarm % pnt_grid
   flow => swarm % pnt_flow
+  turb => swarm % pnt_turb
 
   l = n - n_stat_p
   if(l > -1) then
@@ -29,13 +31,13 @@
     !---------------------------------!
     !   Scale-resolving simulations   !
     !---------------------------------!
-    if(turbulence_model .eq. LES_SMAGORINSKY    .or.  &
-       turbulence_model .eq. LES_DYNAMIC        .or.  &
-       turbulence_model .eq. LES_WALE           .or.  &
-       turbulence_model .eq. HYBRID_LES_PRANDTL .or.  &
-       turbulence_model .eq. HYBRID_LES_RANS    .or.  &
-       turbulence_model .eq. DES_SPALART        .or.  &
-       turbulence_model .eq. DNS) then
+    if(turb % model .eq. LES_SMAGORINSKY    .or.  &
+       turb % model .eq. LES_DYNAMIC        .or.  &
+       turb % model .eq. LES_WALE           .or.  &
+       turb % model .eq. HYBRID_LES_PRANDTL .or.  &
+       turb % model .eq. HYBRID_LES_RANS    .or.  &
+       turb % model .eq. DES_SPALART        .or.  &
+       turb % model .eq. DNS) then
 
       ! Take alias for the particle
       part => swarm % particle(k)

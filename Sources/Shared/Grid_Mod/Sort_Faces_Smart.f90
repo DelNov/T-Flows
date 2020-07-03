@@ -1,18 +1,18 @@
 !==============================================================================!
   subroutine Grid_Mod_Sort_Faces_Smart(grid)
 !------------------------------------------------------------------------------!
-!   sorts array of faces in a smart way.  that would mean boundary faces       !
+!   Sorts array of faces in a smart way.  That would mean boundary faces       !
 !   first, boundary region by boundary region, then inside faces, then         !
-!   also accordin to indices of cells surrounding a face (c1 and c2).          !
+!   also according to indices of cells surrounding a face (c1 and c2).         !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(grid_type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: s, c, c1, c2, n_bc, color
+  integer              :: s, n, c, c1, c2, n_bc, color
   integer, allocatable :: old_f(:), new_f(:), old_c(:)
   integer, allocatable :: i_work_1(:)
-  integer, allocatable :: i_work_2(:,:)
+  integer, allocatable :: i_work_2(:)
   integer, allocatable :: i_work_4(:,:)
   real,    allocatable :: r_work_3(:,:)
   integer, allocatable :: criteria(:,:)
@@ -25,7 +25,7 @@
   allocate(new_f(grid % n_faces))        ! new face numbers
   allocate(old_c   (  -grid % n_bnd_cells:-1))  ! old bnd. cell numbers
   allocate(i_work_1(   grid % n_faces))
-  allocate(i_work_2(2, grid % n_faces))
+  allocate(i_work_2(   grid % n_faces))
   allocate(i_work_4(4, grid % n_faces))
   allocate(r_work_3(3,-grid % n_bnd_cells:-1))
 
@@ -103,10 +103,12 @@
   do s = 1, grid % n_faces
     i_work_1(    s) = grid % faces_n_nodes( old_f(s))
     i_work_4(1:4,s) = grid % faces_n  (1:4, old_f(s))
+    i_work_2(    s) = grid % faces_s      ( old_f(s))
   end do
   do s = 1, grid % n_faces
     grid % faces_n_nodes(s) = i_work_1(     s)
     grid % faces_n(1:4,  s) = i_work_4(1:4, s)
+    grid % faces_s      (s) = i_work_2(     s)
   end do
 
   !---------------------------------------------------!
@@ -140,6 +142,11 @@
   call Sort_Mod_Real_By_Index(grid % xf(1), new_f(1), grid % n_faces)
   call Sort_Mod_Real_By_Index(grid % yf(1), new_f(1), grid % n_faces)
   call Sort_Mod_Real_By_Index(grid % zf(1), new_f(1), grid % n_faces)
+
+  ! Correct shadow faces
+  do s = grid % n_faces + 1, grid % n_faces + grid % n_shadows
+    grid % faces_s(s) = new_f(grid % faces_s(s))
+  end do
 
   ! Find boundary color ranges
   call Grid_Mod_Bnd_Cond_Ranges(grid)

@@ -1,27 +1,29 @@
 !==============================================================================!
-  real function Correct_Velocity(flow, sol, dt, ini)
+  real function Correct_Velocity(flow, mult, sol, dt, ini)
 !------------------------------------------------------------------------------!
 !   Corrects the velocities, and mass (or volume) fluxes on cell faces.        !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
   use Comm_Mod
-  use Cpu_Timer_Mod, only: Cpu_Timer_Mod_Start, Cpu_Timer_Mod_Stop
-  use Field_Mod,     only: Field_Type
-  use Grid_Mod,      only: Grid_Type
-  use Bulk_Mod,      only: Bulk_Type
-  use Info_Mod,      only: Info_Mod_Iter_Fill_At, Info_Mod_Bulk_Fill
-  use Solver_Mod,    only: Solver_Type
-  use Matrix_Mod,    only: Matrix_Type
+  use Cpu_Timer_Mod,  only: Cpu_Timer_Mod_Start, Cpu_Timer_Mod_Stop
+  use Field_Mod,      only: Field_Type
+  use Grid_Mod,       only: Grid_Type
+  use Bulk_Mod,       only: Bulk_Type
+  use Info_Mod,       only: Info_Mod_Iter_Fill_At, Info_Mod_Bulk_Fill
+  use Solver_Mod,     only: Solver_Type
+  use Matrix_Mod,     only: Matrix_Type
   use Numerics_Mod
+  use Multiphase_Mod, only: Multiphase_Type
   use User_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),  target :: flow
-  type(Solver_Type), target :: sol
-  real                      :: dt
-  integer                   :: ini
+  type(Field_Type),      target :: flow
+  type(Multiphase_Type), target :: mult
+  type(Solver_Type),     target :: sol
+  real                          :: dt
+  integer                       :: ini
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Bulk_Type),   pointer :: bulk
@@ -30,7 +32,6 @@
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: c, c1, c2, s
-  real                       :: cfl_max, pe_max
   real                       :: cfl_t, pe_t, mass_err
   real                       :: dens_f, visc_f
 !==============================================================================!
@@ -112,7 +113,7 @@
     end if
   end do
 
-  if(multiphase_model .eq. VOLUME_OF_FLUID) then
+  if(mult % model .eq. VOLUME_OF_FLUID) then
     do c = 1, grid % n_cells
       b(c) = b(c) / (grid % vol(c) / dt)
     end do
@@ -134,8 +135,8 @@
   !   Calculate the CFL number   !
   !     and the Peclet number    !
   !------------------------------!
-  cfl_max = 0.0
-  pe_max  = 0.0
+  flow % cfl_max = 0.0
+  flow % pe_max  = 0.0
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
@@ -149,22 +150,14 @@
                     + grid % dy(s)*grid % dy(s)  &
                     + grid % dz(s)*grid % dz(s)) ) )
       pe_t    = abs( flux % n(s) / a % fc(s) / (visc_f / dens_f + TINY) )
-      cfl_max = max( cfl_max, cfl_t )
-      pe_max  = max( pe_max,  pe_t  )
+      flow % cfl_max = max( flow % cfl_max, cfl_t )
+      flow % pe_max  = max( flow % pe_max,  pe_t  )
     end if
   end do
-  call Comm_Mod_Global_Max_Real(cfl_max)
-  call Comm_Mod_Global_Max_Real(pe_max)
+  call Comm_Mod_Global_Max_Real(flow % cfl_max)
+  call Comm_Mod_Global_Max_Real(flow % pe_max)
 
   call Info_Mod_Iter_Fill_At(1, 5, 'dum', -1, mass_err)
-  call Info_Mod_Bulk_Fill(cfl_max,          &
-                          pe_max,           &
-                          bulk % flux_x,    &
-                          bulk % flux_y,    &
-                          bulk % flux_z,    &
-                          bulk % p_drop_x,  &
-                          bulk % p_drop_y,  &
-                          bulk % p_drop_z)
 
   Correct_Velocity = mass_err ! /(velmax+TINY)
 

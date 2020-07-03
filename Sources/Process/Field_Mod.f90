@@ -23,27 +23,27 @@
     type(Grid_Type), pointer :: pnt_grid  ! grid for which it is defined
 
     ! Physical properties
-    real, allocatable :: capacity(:)
-    real, allocatable :: conductivity(:)
-    real :: diffusivity
-    real, allocatable :: density(:)
-    real, allocatable :: viscosity(:)
-    real, allocatable :: density_f(:)
+    real, allocatable :: capacity(:)      ! [J/kg/K]
+    real, allocatable :: conductivity(:)  ! [W/(m K)]
+    real, allocatable :: density(:)       ! [kg/m^3]
+    real, allocatable :: viscosity(:)     ! [kg/m/s]
+    real, allocatable :: density_f(:)     ! [kg/m^3]
+    real              :: diffusivity      ! [m^2/s]
 
     ! Velocity components
-    type(Var_Type) :: u
-    type(Var_Type) :: v
-    type(Var_Type) :: w
+    type(Var_Type) :: u  ! [m/s]
+    type(Var_Type) :: v  ! [m/s]
+    type(Var_Type) :: w  ! [m/s]
 
     ! Mass and volumetric flux through cell faces:
-    type(Face_Type) :: m_flux
+    type(Face_Type) :: m_flux  ! [kg/s]
 
     ! Pressure and pressure correction
-    type(Var_Type) :: p
-    type(Var_Type) :: pp
+    type(Var_Type) :: p   ! [N/m^2] = [kg/m/s^2]
+    type(Var_Type) :: pp  ! [N/m^2] = [kg/m/s^2]
 
     ! Temperature
-    type(Var_Type) :: t
+    type(Var_Type) :: t  ! [K]
 
     ! Shear and wall stress are used in a number of turbulence models
     real, allocatable :: shear(:)
@@ -56,14 +56,17 @@
     ! Bulk velocities, pressure drops, etc.
     type(Bulk_Type) :: bulk
 
+    ! Maximum CFL and Pe numbers
+    real :: cfl_max, pe_max
+
     ! Time step used in this field
-    real :: dt
+    real :: dt  ! [s]
 
     ! Volume expansion coefficient
     real :: beta
 
     ! Heat flux to the domain (important for periodic case with heat transfer)
-    real :: heat_flux, heated_area, heat
+    real :: heat_flux, heated_area, heat  ! [W/m^2], [m^2], [W]
 
     !-------------------------------------!
     !   Gradient matrices for all cells   !
@@ -91,12 +94,14 @@
   include 'Field_Mod/Allocate_Grad_Matrix.f90'
   include 'Field_Mod/Alias_Energy.f90'
   include 'Field_Mod/Alias_Momentum.f90'
+  include 'Field_Mod/Calculate_Fluxes.f90'
   include 'Field_Mod/Calculate_Grad_Matrix.f90'
   include 'Field_Mod/Grad_Component.f90'
   include 'Field_Mod/Grad_Pressure.f90'
   include 'Field_Mod/Grad_Pressure_Correction.f90'
   include 'Field_Mod/Grad_Variable.f90'
   include 'Field_Mod/Prandtl_Number.f90'
+  include 'Field_Mod/Schmidt_Number.f90'
   include 'Field_Mod/U_Tan.f90'
 
   end module

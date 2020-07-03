@@ -37,6 +37,14 @@
   print *, '# Number of boundary cells: ', grid % n_bnd_cells
   print *, '# Number of inside cells:   ', grid % n_cells
 
+  if(grid % n_cells .eq. 0) then
+    print *, '# Number of cells inside the domain is zero'
+    print *, '# Are you sure you meshed the domain in 3D?'
+    print *, '# Exiting!'
+    print *, '#-------------------------------------------------'
+    stop
+  end if
+
   !----------------------------------------!
   !   Allocate memory for helping arrays   !
   !----------------------------------------!

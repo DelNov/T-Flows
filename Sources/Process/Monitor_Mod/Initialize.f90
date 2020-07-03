@@ -1,12 +1,14 @@
 !==============================================================================!
-  subroutine Monitor_Mod_Initialize(grid, restart)
+  subroutine Monitor_Mod_Initialize(monitor, grid, restart, domain)
 !------------------------------------------------------------------------------!
 !   This is to read the control file and set up monitoring points.             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
-  logical         :: restart
+  type(Monitor_Type)      :: monitor
+  type(Grid_Type), target :: grid
+  logical                 :: restart
+  integer,       optional :: domain
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: c, m, n, l
   real              :: curr_dist, min_dist_all
@@ -15,6 +17,8 @@
   real, allocatable :: min_dist(:)
   real              :: xyz(3), def(3)
 !==============================================================================!
+
+  monitor % pnt_grid => grid
 
   ! Read number of monitoring points from control file
   call Control_Mod_Read_Int_Item('NUMBER_OF_MONITORING_POINTS', 0, &
@@ -49,7 +53,7 @@
   !--------------------------------------------!
   !   Set the names for all monitoring files   !
   !--------------------------------------------!
-  call File_Mod_Set_Name(mon_file_name, extension='-monit.000')
+  call File_Mod_Set_Name(mon_file_name, extension='-monit.000', domain=domain)
   l = len_trim(mon_file_name)
 
   !-------------------------------!

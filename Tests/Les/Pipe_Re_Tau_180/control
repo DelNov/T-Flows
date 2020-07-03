@@ -6,13 +6,14 @@
 
  HEAT_TRANSFER   yes
 
- TIME_STEP                             0.02
- NUMBER_OF_TIME_STEPS                 18000
- STARTING_TIME_STEP_FOR_STATISTICS    9000 
+ TIME_STEP                                    0.02
+ NUMBER_OF_TIME_STEPS                     27000
+ STARTING_TIME_STEP_FOR_TURB_STATISTICS    9000
 
- RESULTS_SAVE_INTERVAL     1200  
+ RESULTS_SAVE_INTERVAL     1200
  BACKUP_SAVE_INTERVAL      1200
 #LOAD_BACKUP_NAME   pipe-ts009000.backup 
+
 #-------------------
 # Monitoring points 
 #-------------------

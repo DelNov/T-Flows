@@ -3,9 +3,10 @@
                                time_step,  &
                                processor,  &
                                appendix,   &
-                               extension)
+                               extension,  &
+                               domain)
 !------------------------------------------------------------------------------!
-!   Creates the file name depending on time step, subdomain and file type.     !
+!   Creates the file name depending on time step, subdomain, type and domain   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -14,13 +15,47 @@
   integer,          optional :: processor
   character(len=*), optional :: appendix   ! used to add '-bnd' to name
   character(len=*)           :: extension
+  integer,          optional :: domain
 !-----------------------------------[Locals]-----------------------------------!
-  integer          :: last_pos
-  integer          :: lext, lapp
-  character(len=5) :: num_proc  ! processor number as a string
+  integer       :: last_pos
+  integer       :: ldir, lnam, lext, lapp
+  character(80) :: rel_path, sys_comm
 !==============================================================================!
 
-  name_out = problem_name
+  !-------------------------------------------!
+  !   Create directories for each processor   !
+  !-------------------------------------------!
+  last_pos = 0
+  if(present(processor)) then
+    if(processor > 0) then
+      rel_path = 'Sub-00000/'
+      ldir = len_trim(rel_path)
+      write(rel_path(ldir-5:ldir-1), '(i5.5)') processor
+      sys_comm = 'mkdir -p ' // trim(rel_path)
+      call system(trim(sys_comm))
+      name_out = rel_path
+      last_pos = len_trim(name_out)
+    end if
+  end if
+
+  !-------------------------------------------!
+  !   Handle problems with multiple domains   !
+  !-------------------------------------------!
+  if(present(domain)) then
+    lnam = len_trim(problem_name(domain))
+    if(last_pos > 0) then
+      name_out(last_pos+1:last_pos+lnam) = problem_name(domain)(1:lnam)
+    else
+      name_out = problem_name(domain)
+    end if
+  else
+    lnam = len_trim(problem_name(1))
+    if(last_pos > 0) then
+      name_out(last_pos+1:last_pos+lnam) = problem_name(1)(1:lnam)
+    else
+      name_out = problem_name(1)
+    end if
+  end if
   last_pos = len_trim(name_out)
 
   !----------------------------------!
@@ -30,17 +65,6 @@
     lapp = len_trim(appendix)
     name_out(last_pos+1:last_pos+lapp) = appendix(1:lapp)
     last_pos = last_pos + lapp
-  end if
-
-  !-----------------------------!
-  !   Append processor number   !
-  !-----------------------------!
-  if(present(processor)) then
-    if(processor > 0) then
-      write(name_out(last_pos+1:last_pos+3), '(a3)')   '-pu'
-      write(name_out(last_pos+4:last_pos+8), '(i5.5)') processor
-      last_pos = last_pos + 8
-    end if
   end if
 
   !----------------------------------!

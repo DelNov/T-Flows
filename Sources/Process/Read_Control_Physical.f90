@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Read_Control_Physical(flow, swarm, turb)
+  subroutine Read_Control_Physical(flow, turb, mult, swarm)
 !------------------------------------------------------------------------------!
 !   Reads details about physical models from control file.                     !
 !------------------------------------------------------------------------------!
@@ -12,13 +12,14 @@
   use Turb_Mod,       NO_TURBULENCE => NONE
   use Multiphase_Mod, NO_MULTIPHASE => NONE
   use Control_Mod
-  use Swarm_Mod      
+  use Swarm_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
-  type(Swarm_Type), target :: swarm
-  type(Turb_Type),  target :: turb
+  type(Field_Type),      target :: flow
+  type(Turb_Type),       target :: turb
+  type(Multiphase_Type), target :: mult
+  type(Swarm_Type),      target :: swarm
 !----------------------------------[Locals]------------------------------------!
   type(Bulk_Type), pointer :: bulk
   character(len=80)        :: name
@@ -51,31 +52,31 @@
   select case(name)
 
     case('NONE')
-      turbulence_model = NO_TURBULENCE
+      turb % model = NO_TURBULENCE
     case('K_EPS')
-      turbulence_model = K_EPS
+      turb % model = K_EPS
     case('K_EPS_ZETA_F')
-      turbulence_model = K_EPS_ZETA_F
+      turb % model = K_EPS_ZETA_F
     case('LES_SMAGORINSKY')
-      turbulence_model = LES_SMAGORINSKY
+      turb % model = LES_SMAGORINSKY
     case('HYBRID_LES_PRANDTL')
-      turbulence_model = HYBRID_LES_PRANDTL
+      turb % model = HYBRID_LES_PRANDTL
     case('LES_DYNAMIC')
-      turbulence_model = LES_DYNAMIC
+      turb % model = LES_DYNAMIC
     case('LES_WALE')
-      turbulence_model = LES_WALE
+      turb % model = LES_WALE
     case('DNS')
-      turbulence_model = DNS
+      turb % model = DNS
     case('DES_SPALART')
-      turbulence_model = DES_SPALART
+      turb % model = DES_SPALART
     case('SPALART_ALLMARAS')
-      turbulence_model = SPALART_ALLMARAS
+      turb % model = SPALART_ALLMARAS
     case('RSM_HANJALIC_JAKIRLIC')
-      turbulence_model = RSM_HANJALIC_JAKIRLIC
+      turb % model = RSM_HANJALIC_JAKIRLIC
     case('RSM_MANCEAU_HANJALIC')
-      turbulence_model = RSM_MANCEAU_HANJALIC
+      turb % model = RSM_MANCEAU_HANJALIC
     case('HYBRID_LES_RANS')
-      turbulence_model = HYBRID_LES_RANS
+      turb % model = HYBRID_LES_RANS
 
     case default
       if(this_proc < 2) then
@@ -95,13 +96,13 @@
   !-------------------------------------------------------------------!
   !   For scale-resolving simulations, engage turbulence statistics   !
   !-------------------------------------------------------------------!
-  if(turbulence_model .eq. LES_SMAGORINSKY         .or.  &
-     turbulence_model .eq. LES_DYNAMIC             .or.  &
-     turbulence_model .eq. LES_WALE                .or.  &
-     turbulence_model .eq. DNS                     .or.  &
-     turbulence_model .eq. DES_SPALART             .or.  &
-     turbulence_model .eq. HYBRID_LES_PRANDTL      .or.  &
-     turbulence_model .eq. HYBRID_LES_RANS         .or.  &
+  if(turb % model .eq. LES_SMAGORINSKY         .or.  &
+     turb % model .eq. LES_DYNAMIC             .or.  &
+     turb % model .eq. LES_WALE                .or.  &
+     turb % model .eq. DNS                     .or.  &
+     turb % model .eq. DES_SPALART             .or.  &
+     turb % model .eq. HYBRID_LES_PRANDTL      .or.  &
+     turb % model .eq. HYBRID_LES_RANS         .or.  &
      n_times > n_stat) then  ! last line covers unsteady RANS models
 
     if(this_proc < 2) then
@@ -109,7 +110,7 @@
                'turbulence statistics engaged!'
     end if
 
-    turbulence_statistics = .true.
+    turb % statistics = .true.
   end if
 
   !------------------------------!
@@ -117,9 +118,9 @@
   !------------------------------!
   call Control_Mod_Turbulence_Model_Variant(name, .true.)
   if     (name .eq. 'NONE') then
-    turbulence_model_variant = NO_TURBULENCE
+    turb % model_variant = NO_TURBULENCE
   else if(name .eq. 'STABILIZED') then
-    turbulence_model_variant = STABILIZED
+    turb % model_variant = STABILIZED
   else
     if(this_proc < 2) then
       print *, '# ERROR!  Unknown turbulence model variant: ', trim(name)
@@ -139,11 +140,11 @@
   call Control_Mod_Turbulent_Heat_Flux_Model(name, .true.)
   select case(name)
     case('SGDH')
-      turbulent_heat_flux_model = SGDH
+      turb % heat_flux_model = SGDH
     case('GGDH')
-      turbulent_heat_flux_model = GGDH
+      turb % heat_flux_model = GGDH
     case('AFM')
-      turbulent_heat_flux_model = AFM
+      turb % heat_flux_model = AFM
     case default
       if(this_proc < 2) then
         print *, '# ERROR!  Unknown turbulent heat flux model :', trim(name)
@@ -152,33 +153,53 @@
       call Comm_Mod_End
   end select
 
+  !-------------------------------------------!
+  !   Type of switching for hybrid LES/RANS   !
+  !-------------------------------------------!
+  if(turb % model .eq. HYBRID_LES_RANS) then
+    call Control_Mod_Hybrid_Les_Rans_Switch(name, .true.)
+    select case(name)
+      case('SWITCH_DISTANCE')
+        turb % hybrid_les_rans_switch = SWITCH_DISTANCE
+      case('SWITCH_VELOCITY')
+        turb % hybrid_les_rans_switch = SWITCH_VELOCITY
+      case default
+        if(this_proc < 2) then
+          print *, '# ERROR!  Unknown type of hybrid LES/RANS switch:',  &
+                   trim(name)
+          print *, '# Exiting!'
+        end if
+        call Comm_Mod_End
+    end select
+  end if
+
   !-------------------------------------------------------------------------!
   !   Initialization of model constants depending on the turbulence model   !
   !-------------------------------------------------------------------------!
-  if(turbulence_model .eq. LES_SMAGORINSKY .or.  &
-     turbulence_model .eq. HYBRID_LES_PRANDTL) then
+  if(turb % model .eq. LES_SMAGORINSKY .or.  &
+     turb % model .eq. HYBRID_LES_PRANDTL) then
     call Control_Mod_Smagorinsky_Constant(c_smag, .true.)
   end if
 
-  if(turbulence_model .eq. K_EPS) then
+  if(turb % model .eq. K_EPS) then
     call Turb_Mod_Const_K_Eps(turb)
   end if
 
-  if(turbulence_model .eq. RSM_MANCEAU_HANJALIC) then
+  if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
     call Turb_Mod_Const_Manceau_Hanjalic(turb)
   end if
 
-  if(turbulence_model .eq. RSM_HANJALIC_JAKIRLIC) then
+  if(turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
     call Turb_Mod_Const_Hanjalic_Jakirlic(turb)
   end if
 
-  if(turbulence_model .eq. K_EPS_ZETA_F .or.  &
-     turbulence_model .eq. HYBRID_LES_RANS) then
+  if(turb % model .eq. K_EPS_ZETA_F .or.  &
+     turb % model .eq. HYBRID_LES_RANS) then
     call Turb_Mod_Const_K_Eps_Zeta_F(turb)
   end if
 
-  if(turbulence_model .eq. SPALART_ALLMARAS .or.  &
-     turbulence_model .eq. DES_SPALART) then
+  if(turb % model .eq. SPALART_ALLMARAS .or.  &
+     turb % model .eq. DES_SPALART) then
     call Turb_Mod_Const_Spalart_Allmaras(turb)
   end if
 
@@ -209,13 +230,14 @@
   call Control_Mod_Multiphase_Model(name, .true.)
 
   if(name .eq. 'VOLUME_OF_FLUID' ) then
-    multiphase_model = VOLUME_OF_FLUID
+    mult % model = VOLUME_OF_FLUID
+    call Control_Mod_Distance_Function(mult % d_func)
   else if(name .eq. 'LAGRANGIAN_PARTICLES' ) then
-    multiphase_model = LAGRANGIAN_PARTICLES
+    mult % model = LAGRANGIAN_PARTICLES
   else if(name .eq. 'EULER_EULER' ) then
-    multiphase_model = EULER_EULER
+    mult % model = EULER_EULER
   else
-    multiphase_model = NO_MULTIPHASE
+    mult % model = NO_MULTIPHASE
   end if
 
   !-----------------------!
@@ -239,9 +261,9 @@
   call Control_Mod_Swarm_Subgrid_Scale_Model(name, verbose = .true.)
   select case(name)
     case('BROWNIAN_FUKAGATA')
-         swarm_subgrid_scale_model = BROWNIAN_FUKAGATA
+         swarm % subgrid_scale_model = BROWNIAN_FUKAGATA
     case('DISCRETE_RANDOM_WALK')
-         swarm_subgrid_scale_model = DISCRETE_RANDOM_WALK
+         swarm % subgrid_scale_model = DISCRETE_RANDOM_WALK
   end select
 
   if(n_times > n_stat_p) then  ! last line covers unsteady RANS models

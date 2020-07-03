@@ -7,7 +7,7 @@
   use Grid_Mod
   use Field_Mod
   use Turb_Mod
-!  use Control_Mod
+  use Control_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -38,7 +38,7 @@
     ! Particle's diameter
     real :: d
 
-    ! Particle relaxation time 
+    ! Particle relaxation time
     real :: tau
 
     ! The closest cell, node, boundary cell and face
@@ -66,12 +66,10 @@
     real :: v_drw
     real :: w_drw
 
-    ! Particle Reynolds number (computed from relative velocity and "flow-
-    ! viscosity")
-    real :: re
-
-    ! Particle Courant number
+    ! Particle Courant, Stokes and Reynolds numbers
     real :: cfl
+    real :: st
+    real :: re
 
     ! Particle drag factor (from Re_p)
     real :: f    ! this is not to be confused with the drag coefficient
@@ -82,7 +80,6 @@
     ! Forces exerted on the particle
     real :: fd_x, fd_y, fd_z  ! drag force
     real :: fb_x, fb_y, fb_z  ! buoyant force
-    real :: ft_x, ft_y, ft_z  ! total force
 
     ! Particle deposition and departure from domain 
     logical :: deposited
@@ -93,9 +90,6 @@
     integer :: buff
 
   end type
-
-  ! Variable holding the subgrid scale (SGS)  model type 
-  integer :: swarm_subgrid_scale_model
 
   ! Parameters describing turbulence model choice
   ! (Prime numbers starting from 20000)
@@ -120,14 +114,11 @@
     ! (Mean) diameter for this swarm
     real :: diameter
 
-    ! Swarm mean relaxation time 
+    ! Swarm mean relaxation time
     real :: tau
 
     ! Coefficient of restitution (1.0 - elastic, 0.0 - sticky)
     real :: rst
-
-    ! Swarm's Stokes number
-    real :: st
 
     ! Time step for the swarm
     real :: dt
@@ -143,7 +134,7 @@
     integer :: cnt_e
     integer :: cnt_r
 
-    ! particle statistics
+    ! Particle statistics
     logical :: statistics
 
     ! Logical array if cell has particles
@@ -154,24 +145,34 @@
     real,    allocatable :: uu(:), vv(:), ww(:), uv(:), uw(:), vw(:)
     integer, allocatable :: n_states(:)
 
-    ! Gradients of flow modeled  quantity "zeta" (for SGS of Hybrid_Les_Rans model)
-    real, allocatable :: w_mod_x(:), w_mod_y(:), w_mod_z(:)
-
-    ! Gradients of flow modeled "w2" (for SGS of Hybrid_Les_Rans model)
-    real, allocatable :: w_x(:), w_y(:), w_z(:), w_mod(:)
+    ! Gradients of flow modeled  quantity "zeta"
+    ! (for SGS of Hybrid_Les_Rans model)
+    real, allocatable :: v2_mod(:), v2_mod_x(:), v2_mod_y(:), v2_mod_z(:)
 
     ! SGS Brownian diffusion force
     real, allocatable :: f_fuka_x(:), f_fuka_y(:), f_fuka_z(:)
 
+    ! Variable holding the subgrid scale (SGS)  model type
+    ! (Must be part of type definition for multiple materials)
+    integer :: subgrid_scale_model
+
+    integer, allocatable :: i_work(:)
+    logical, allocatable :: l_work(:)
+    real,    allocatable :: r_work(:)
+
   end type
 
-  ! Working arrays, buffers for parallel version
-  integer, parameter   :: N_I_VARS = 3
-  integer, parameter   :: N_L_VARS = 2
-  integer, parameter   :: N_R_VARS = 8
-  integer, allocatable :: i_work(:)
-  logical, allocatable :: l_work(:)
-  real,    allocatable :: r_work(:)
+  integer, parameter :: N_I_VARS = 3
+  integer, parameter :: N_L_VARS = 2
+  integer, parameter :: N_R_VARS = 8
+
+  !---------------------!
+  !   Model constants   !
+  !---------------------!
+
+  ! For Fukagata model
+  real :: c_o   = 2.1
+  real :: c_eps = 1.0
 
   contains
 

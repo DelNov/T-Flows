@@ -21,14 +21,14 @@
   !------------------!
   type Monitor_Type
 
+    type(Grid_Type), pointer :: pnt_grid  ! grid for which it is defined
+
     integer              :: n_points
     integer, allocatable :: cell(:)
     real,    allocatable :: x(:), y(:), z(:)
     integer, allocatable :: file_unit(:)
 
   end type
-
-  type(Monitor_Type), save :: monitor
 
   contains
 

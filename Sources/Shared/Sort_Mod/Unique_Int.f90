@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Sort_Mod_Unique_Int(nu, values)
+  subroutine Sort_Mod_Unique_Int(values, nu)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
@@ -7,13 +7,17 @@
 !   unsorted integers.  The original array is overwritten, the number of       !
 !   unique members is returned in argument "nu".                               !
 !---------------------------------[Arguments]----------------------------------!
-  integer :: nu
   integer :: values(:)
+  integer :: nu
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: i, min_val, max_val
   integer, allocatable :: unique(:)
 !------------------------------------------------------------------------------!
 
+  ! Set initial size of unique list ...
+  nu = size(values, 1)
+
+  ! ... can't allocate without setting it
   allocate(unique(nu)); unique(:) = 0
 
   min_val = minval(values(1:nu)) - 1

@@ -14,9 +14,6 @@ FORTRAN = gnu
 # Debugging ("yes" or "no")
 DEBUG = no
 
-# Link with CGNS ("yes" or "no")
-CGNS = no
-
 # Multi-threaded Calculate_Wall_Distance.f90 (env. var to use: OMP_NUM_THREADS)
 OPENMP = no
 
@@ -35,13 +32,13 @@ $(info #=======================================================================)
 $(info # Compiling $(PROGRAM_NAME) with compiler $(FORTRAN))
 $(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
-$(info #   make <FORTRAN=gnu/intel/portland> <DEBUG=yes/no> <CGNS=yes/no>      )
+$(info #   make <FORTRAN=gnu/intel/portland> <DEBUG=yes/no> OPENMP=<no/yes>    )
 $(info #                                                                       )
 $(info # Examples:                                                             )
 $(info #   make              - compile with gnu compiler                       )
 $(info #   make FORTAN=intel - compile with intel compiler                     )
 $(info #   make DEBUG=yes    - compile with gnu compiler in debug mode         )
-$(info #   make CGNS=yes     - compile with gnu compiler and CGNS support      )
+$(info #   make OPENMP=yes   - compile with gnu compiler for parallel Convert  )
 $(info #-----------------------------------------------------------------------)
 
 #-------------------------------------------------------------------------------
@@ -103,18 +100,6 @@ ifeq ($(FORTRAN), portland)
   OPT_LINK = $(OPT_COMP)
 endif
 
-
-# If compiling with CGNS, add path to include directory
-# (One day, when you want to work with compressed
-#  files, the following line might still be needed:
-#  CGNS_LIB   += -Wl,--no-as-needed -ldl -lz
-ifeq ($(CGNS), yes)
-  DIR_CGNS_H  = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Seq/Include
-  CGNS_LIB    = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Seq/Lib/libcgns.a \
-                ../Libraries/Hdf5_Seq/Lib/libhdf5.a -ldl
-endif
-OPT_COMP += $(addprefix -I, $(DIR_CGNS_H))
-
 # METIS library
 METIS_LIB = ../Libraries/Metis_5.1.0_Linux_64/libmetis.a
 
@@ -137,13 +122,12 @@ SRC_MOD = Comm_Mod_Seq.f90		\
           Math_Mod.f90			\
           File_Mod.f90			\
           Gen_Mod.f90			\
-          Div_Mod.f90			\
-          Material_Mod.f90		\
           Metis_Options_Mod.f90		\
           Bnd_Cond_Mod.f90		\
           Sort_Mod.f90			\
           Grid_Level_Mod.f90		\
-          Grid_Mod.f90
+          Grid_Mod.f90		\
+          Save_Grid_Mod_Vtu.f90
 
 #---------------
 #   Functions
@@ -167,18 +151,6 @@ SRC_FUN += Allocate_Memory.f90		\
            Load_Msh.f90			\
            Logo_Con.f90			\
            Main_Con.f90
-
-#-------------------------------------------
-#   Conditional inclusion of CGNS support
-#-------------------------------------------
-ifeq ($(CGNS), no)
-  SRC_MOD += Save_Grid_Mod_Vtu.f90
-  SRC_FUN += Load_Cgns_Void.f90
-else
-  SRC_MOD += Cgns_Mod_Seq.f90
-  SRC_MOD += Save_Grid_Mod_Cgns.f90
-  SRC_FUN += Load_Cgns.f90
-endif
 
 #----------------------------------------------------------------------
 #   List of objects generated from the list of modules and functions
@@ -220,8 +192,7 @@ $(DIR_OBJECT)/%.o: %.f90
 #-----------------------------------
 $(PROGRAM_FILE): $(OBJ)
 	@echo Linking "\033[0;32m $(PROGRAM_FILE) \033[0m"
-	@$(FC) $(OPT_LINK) -o $(PROGRAM_FILE) $(OBJ) $(CGNS_LIB)  \
-                              $(METIS_LIB)
+	@$(FC) $(OPT_LINK) -o $(PROGRAM_FILE) $(OBJ) $(METIS_LIB)
 
 #--------------------------------------------------------------------
 #   Explicit dependencies for modules

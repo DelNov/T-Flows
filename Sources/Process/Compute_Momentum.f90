@@ -12,7 +12,7 @@
   use Turb_Mod
   use Multiphase_Mod, only: Multiphase_Type, &
                             Multiphase_Mod_Vof_Surface_Tension_Contribution,  &
-                            multiphase_model, VOLUME_OF_FLUID
+                            VOLUME_OF_FLUID
   use Var_Mod,        only: Var_Type
   use Face_Mod,       only: Face_Type
   use Grid_Mod,       only: Grid_Type
@@ -303,7 +303,7 @@
   !-------------------!
   else
     if(abs(grav_i) > NANO) then
-      if(multiphase_model .ne. VOLUME_OF_FLUID) then
+      if(mult % model .ne. VOLUME_OF_FLUID) then
         do c = 1, grid % n_cells
           b(c) = b(c) + flow % density(c) * grav_i * grid % vol(c)
         end do
@@ -314,7 +314,7 @@
   !----------------------------------!
   !   Surface tension contribution   !
   !----------------------------------!
-  if(multiphase_model .eq. VOLUME_OF_FLUID) then
+  if(mult % model .eq. VOLUME_OF_FLUID) then
     call Multiphase_Mod_Vof_Momentum_Contribution(mult, i, b)
   end if
 
@@ -353,7 +353,7 @@
   ! Fill the info screen up
   call Info_Mod_Iter_Fill_At(1, i, ui % name, exec_iter, ui % res)
 
-  call Grid_Mod_Exchange_Real(grid, ui % n)
+  call Grid_Mod_Exchange_Cells_Real(grid, ui % n)
 
   ! User function
   call User_Mod_End_Of_Compute_Momentum(flow, turb, mult, dt, ini)

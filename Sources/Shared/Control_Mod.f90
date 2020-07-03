@@ -9,8 +9,10 @@
   implicit none
 !==============================================================================!
 
-  character(len=80) :: control_file_name
-  integer           :: control_file_unit
+  ! Control file unit
+  integer :: control_file_unit          ! current control file unit
+  integer :: root_control_file_unit     ! root control file unit
+  integer :: dom_control_file_unit(MD)  ! domain control file units
 
   ! Number of presumably misstyped keywords followed by their list
   integer           :: n_similar =  0
@@ -23,9 +25,11 @@
   !--------------------!
 
     ! Basic functionality
-    include 'Control_Mod/Basic_Functions/Open_File.f90'
+    include 'Control_Mod/Basic_Functions/Open_Domain_File.f90'
+    include 'Control_Mod/Basic_Functions/Open_Root_File.f90'
     include 'Control_Mod/Basic_Functions/Position_At_One_Key.f90'
     include 'Control_Mod/Basic_Functions/Position_At_Two_Keys.f90'
+    include 'Control_Mod/Basic_Functions/Position_At_Three_Keys.f90'
     include 'Control_Mod/Basic_Functions/Read_Char_Item.f90'
     include 'Control_Mod/Basic_Functions/Read_Char_Item_On.f90'
     include 'Control_Mod/Basic_Functions/Read_Strings_On.f90'
@@ -36,7 +40,9 @@
     include 'Control_Mod/Basic_Functions/Read_Real_Array.f90'
     include 'Control_Mod/Basic_Functions/Read_Real_Array_On.f90'
     include 'Control_Mod/Basic_Functions/Similar_Warning.f90'
-    include 'Control_Mod/Basic_Functions/Write_File.f90'
+    include 'Control_Mod/Basic_Functions/Switch_To_Domain.f90'
+    include 'Control_Mod/Basic_Functions/Switch_To_Root.f90'
+!   include 'Control_Mod/Basic_Functions/Write_File.f90'
 
     ! Load
     include 'Control_Mod/Input_Output/Problem_Name.f90'
@@ -54,6 +60,9 @@
   !-------------!
   !   Physics   !
   !-------------!
+
+    ! Number of domains you are solving
+    include 'Control_Mod/Physics/Number_Of_Domains.f90'
 
     ! Physical properties
     include 'Control_Mod/Physics/Dynamic_Viscosity.f90'
@@ -80,6 +89,7 @@
     include 'Control_Mod/Physics/Turbulent_Prandtl_Number.f90'
     include 'Control_Mod/Physics/Turbulent_Schmidt_Number.f90'
     include 'Control_Mod/Physics/Turbulent_Heat_Flux_Model.f90'
+    include 'Control_Mod/Physics/Hybrid_Les_Rans_Switch.f90'
 
     ! Other environmental conditions
     include 'Control_Mod/Physics/Angular_Velocity_Vector.f90'
@@ -89,6 +99,7 @@
     include 'Control_Mod/Physics/Point_For_Monitoring_Planes.f90'
 
     ! Multiphase
+    include 'Control_Mod/Physics/Distance_Function.f90'
     include 'Control_Mod/Physics/Number_Of_Phases.f90'
     include 'Control_Mod/Physics/Number_Of_Particles.f90'
     include 'Control_Mod/Physics/Number_Of_Swarm_Sub_Steps.f90'
@@ -114,7 +125,7 @@
     ! Time Stepping
     include 'Control_Mod/Numerics/Time_Step.f90'
     include 'Control_Mod/Numerics/Number_Of_Time_Steps.f90'
-    include 'Control_Mod/Numerics/Starting_Time_Step_For_Statistics.f90'
+    include 'Control_Mod/Numerics/Starting_Time_Step_For_Turb_Statistics.f90'
     include 'Control_Mod/Numerics/Starting_Time_Step_For_Swarm_Statistics.f90'
 
     ! Discretization
@@ -168,5 +179,14 @@
     include 'Control_Mod/Numerics/V_Cycle_Max_Grid_Levels.f90'
     include 'Control_Mod/Numerics/V_Cycle_Number_Of_Smoothing_Iterations.f90'
     include 'Control_Mod/Numerics/V_Cycle_Residual_Ratio.f90'
- 
+
+    !Numerical Parameters VOF (CICSAM)
+    include 'Control_Mod/Numerics/Distance_Function_Time_Integration_Scheme_Vof.f90'
+    include 'Control_Mod/Numerics/Factor_Number_Cells_Distance_Function_Vof.f90'
+    include 'Control_Mod/Numerics/Factor_Fictitious_Time_Vof.f90'
+    include 'Control_Mod/Numerics/Max_Correction_Cycles_Beta_Vof.f90'
+    include 'Control_Mod/Numerics/Max_Smoothing_Cycles_Curvature_Vof.f90'
+    include 'Control_Mod/Numerics/Max_Smoothing_Cycles_Normal_Vof.f90'
+    include 'Control_Mod/Numerics/Max_Courant_Vof.f90'
+    include 'Control_Mod/Numerics/Max_Substep_Cycles_Vof.f90'
   end module

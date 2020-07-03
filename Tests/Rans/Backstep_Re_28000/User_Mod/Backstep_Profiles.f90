@@ -146,7 +146,7 @@
             v1_p(i) = v1_p(i) + turb % vis_t(c)*(u % y(c) + v % x(c))/u_b**2
             v2_p(i) = v2_p(i) + t % n(c) - 20.0
             n_count(i) = n_count(i) + 1
-            if(turbulence_model == K_EPS_ZETA_F) then
+            if(turb % model == K_EPS_ZETA_F) then
               ww_p(i) = ww_p(i) + zeta % n(c)
               uv_p(i) = uv_p(i) + f22 % n(c)
             end if

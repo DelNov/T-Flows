@@ -1,29 +1,31 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Advance_Particles(swarm, turb, n, n_stat_p, first_dt)
+  subroutine Swarm_Mod_Advance_Particles(swarm, n, n_stat_p, first_dt)
 !------------------------------------------------------------------------------!
 !   Advances all particles in the swarm.                                       !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Swarm_Type), target :: swarm
-  type(Turb_Type),  target :: turb
   integer                  :: n          ! current time step
   integer                  :: n_stat_p   ! starting time for swarm statistics
   integer                  :: first_dt   ! starting time for "this" simulation
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: grid
   type(Field_Type),    pointer :: flow
+  type(Turb_Type),     pointer :: turb
   type(Particle_Type), pointer :: part
   logical,             pointer :: escaped
   logical,             pointer :: deposited
   integer                      :: k                   ! particle number
   integer                      :: ss                  ! sub-step counter
   integer                      :: n_parts_in_buffers
+  real                         :: avg_part_cfl, avg_part_re, avg_part_st
 !==============================================================================!
 
   ! Take aliases for the swarm
   grid => swarm % pnt_grid
   flow => swarm % pnt_flow
+  turb => swarm % pnt_turb
 
   ! Particle time step (division of the global time step)
   swarm % dt = flow % dt / swarm % n_sub_steps
@@ -31,24 +33,35 @@
   !------------------------!
   !   Fukagata SGS model   !
   !------------------------!
-  if(turbulence_model .eq. HYBRID_LES_PRANDTL) then
-    if(swarm_subgrid_scale_model .eq. BROWNIAN_FUKAGATA) then
-      call Swarm_Mod_Sgs_Fukagata(swarm, turb)
+  if(turb % model .eq. HYBRID_LES_PRANDTL) then
+    if(swarm % subgrid_scale_model .eq. BROWNIAN_FUKAGATA) then
+      call Swarm_Mod_Sgs_Fukagata(swarm)
     end if
   end if
 
-  if(TURBULENCE_MODEL .eq. HYBRID_LES_RANS) then
+  if(turb % model .eq. HYBRID_LES_RANS) then
 
     ! Correcting for particle time step size (if ER-HRL model is used)
-    call Swarm_Mod_Particle_Time_Scale(swarm, turb)
+    call Swarm_Mod_Particle_Time_Scale(swarm)
 
     ! Store gradients for modeled flow quantities for swarm
-    call Swarm_Mod_Grad_Modeled_Flow(swarm, turb, k)
+    call Swarm_Mod_Grad_Modeled_Flow(swarm, k)
 
   end if
 
   ! Gaussian random no.s interval (for SEIM model)
   swarm % time_eim = n - first_dt
+
+  !---------------------------------------------!
+  !       Store old particle coordinates        !
+  !   (important for bouncing from the walls)   !
+  !---------------------------------------------!
+  do k = 1, swarm % n_particles
+    part => swarm % particle(k)
+    part % x_o = part % x_n
+    part % y_o = part % y_n
+    part % z_o = part % z_n
+  end do
 
   !----------------------------------!
   !                                  !
@@ -76,7 +89,7 @@
 
           ! Compute velocity at the particle, and move it
           ! (also calls Bounce_Particle)
-          call Swarm_Mod_Move_Particle(swarm, turb, k)
+          call Swarm_Mod_Move_Particle(swarm, k)
 
           ! Calling particle forces subroutine to ...
           ! ... compute the forces on each particle and store it
@@ -110,11 +123,33 @@
   !-----------------------------------!
   !   Print some data on the screen   !
   !-----------------------------------!
-  !do k = 1, swarm % n_particles
+  if(this_proc < 2) then
+    write(*,'(a,i6,a,i6,a,i6)')                         &
+             " # Particles: trapped: ", swarm % cnt_d,  &
+             "; escaped: ",             swarm % cnt_e,  &
+             "; reflected: ",           swarm % cnt_r
+  end if
 
+  avg_part_cfl = 0
+  avg_part_re  = 0
+  avg_part_st  = 0
+  do k = 1, swarm % n_particles
+    part => swarm % particle(k)
+    avg_part_cfl = avg_part_cfl + part % cfl
+    avg_part_re  = avg_part_re  + part % re
+    avg_part_st  = avg_part_st  + part % st
+  end do
+  avg_part_cfl = avg_part_cfl / swarm % n_particles
+  avg_part_re  = avg_part_re  / swarm % n_particles
+  avg_part_st  = avg_part_st  / swarm % n_particles
+  write(*,'(a,1pe9.3)') ' # Average particle Courant number : ', avg_part_cfl
+  write(*,'(a,1pe9.3)') ' # Average particle Reynolds number: ', avg_part_re
+  write(*,'(a,1pe9.3)') ' # Average particle Stokes number  : ', avg_part_st
+
+  !do k = 1, swarm % n_particles
   !  ! Refresh the alias
   !  part => swarm % particle(k)
-  !  
+  !
   !  if(this_proc .eq. part % proc) then
   !    ! Printing particle position
   !    write(*,'(a,i7,a,i7,a,i2,a,3es15.6,a,es12.4)')                 &

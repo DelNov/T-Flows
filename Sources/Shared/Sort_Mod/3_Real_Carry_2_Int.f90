@@ -23,19 +23,25 @@
   j = n
 
   do
-    do while ( (a1(i).lt.x1)                                            .or.  &
-               (a1(i).eq.x1) .and. (a2(i).lt.x2)                        .or.  &
-               (a1(i).eq.x1) .and. (a2(i).eq.x2) .and. (a3(i).lt.x3)  )
+    do while ( Math_Mod_Smaller_Real(a1(i),x1)  .or.   &
+               Math_Mod_Approx_Real (a1(i),x1)  .and.  &
+               Math_Mod_Smaller_Real(a2(i),x2)  .or.   &
+               Math_Mod_Approx_Real (a1(i),x1)  .and.  &
+               Math_Mod_Approx_Real (a2(i),x2)  .and.  &
+               Math_Mod_Smaller_Real(a3(i),x3)  )
       i = i + 1
     end do
-    do while ( (x1.lt.a1(j))                                            .or.  &
-               (x1.eq.a1(j)) .and. (x2.lt.a2(j))                        .or.  &
-               (x1.eq.a1(j)) .and. (x2.eq.a2(j)) .and. (x3.lt.a3(j))  )
+    do while ( Math_Mod_Smaller_Real(x1,a1(j))  .or.   &
+               Math_Mod_Approx_Real (x1,a1(j))  .and.  &
+               Math_Mod_Smaller_Real(x2,a2(j))  .or.   &
+               Math_Mod_Approx_Real (x1,a1(j))  .and.  &
+               Math_Mod_Approx_Real (x2,a2(j))  .and.  &
+               Math_Mod_Smaller_Real(x3,a3(j))  )
       j = j - 1
     end do
     if (i >= j) exit
 
-    ! Swap values in a and b
+    ! Swap values in a, b and c
     call Swap_Real(a1(i), a1(j))
     call Swap_Real(a2(i), a2(j))
     call Swap_Real(a3(i), a3(j))

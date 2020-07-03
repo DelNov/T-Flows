@@ -1,15 +1,15 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Sgs_Fukagata(swarm, turb)
+  subroutine Swarm_Mod_Sgs_Fukagata(swarm)
 !------------------------------------------------------------------------------!
-!  SGS model accounting for Brownian diffusion force by Fukagata et. al., 2004 !
+!   SGS model accounting for Brownian diffusion force by Fukagata et al., 2004 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Swarm_Type), target :: swarm
-  type(Turb_Type),  target :: turb
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),    pointer :: flow
   type(Grid_Type),     pointer :: grid
+  type(Turb_Type),     pointer :: turb
   type(Var_Type),      pointer :: u, v, w
   integer                      :: c, c2, l              ! nearest cell
   real                         :: r1, r2, zeta          ! random number
@@ -27,6 +27,7 @@
   ! Take aliases for flow
   flow => swarm % pnt_flow
   grid => swarm % pnt_grid
+  turb => swarm % pnt_turb
   u    => flow % u
   v    => flow % v
   w    => flow % w
@@ -74,7 +75,7 @@
 
       ! Standard deviation of particle velocity due to SGS vel. fluctuations 
       theta  = swarm % tau / t_sgs
-      alpha     = flow % dt / swarm % tau
+      alpha  = flow % dt / swarm % tau
       lambda = (1.0/1.0 + theta)                    &
              * (1.0-exp(-1.0*alpha*(1.0+theta)))    &
              - (1.0/1.0 - theta) * exp(-2.0*alpha)  &
