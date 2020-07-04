@@ -122,6 +122,17 @@
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
 
+    !-------------------------!
+    !   Particle processors   !
+    !-------------------------!
+    write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="Processor" ' // &
+                            'format="ascii">'
+    do k = 1, swarm % n_particles
+      part => swarm % particle(k)
+      write(fu,'(a,i9)') IN_5, part % proc
+    end do
+    write(fu,'(a,a)') IN_4, '</DataArray>'
+
     !-----------------------!
     !                       !
     !   End of point data   !
