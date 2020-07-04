@@ -245,33 +245,38 @@
   !   Particle tracking   !
   !                       !
   !-----------------------!
-  call Control_Mod_Number_Of_Particles(swarm % n_particles, verbose = .true.)
-  call Control_Mod_Swarm_Density      (swarm % density,     verbose = .true.)
-  call Control_Mod_Swarm_Diameter     (swarm % diameter,    verbose = .true.)
+  if(mult % model .eq. LAGRANGIAN_PARTICLES) then
 
-  call Control_Mod_Swarm_Coefficient_Of_Restitution(swarm % rst,         &
-                                                    verbose = .true.)
-  call Control_Mod_Number_Of_Swarm_Sub_Steps       (swarm % n_sub_steps, &
-                                                    verbose = .true.)
+    call Control_Mod_Number_Of_Particles(swarm % n_particles, verbose = .true.)
+    call Control_Mod_Swarm_Density      (swarm % density,     verbose = .true.)
+    call Control_Mod_Swarm_Diameter     (swarm % diameter,    verbose = .true.)
 
-  call Control_Mod_Read_Int_Item('STARTING_TIME_STEP_FOR_SWARM_STATISTICS',  &
-                                 HUGE_INT, n_stat_p, .false.)
+    call Control_Mod_Swarm_Coefficient_Of_Restitution(swarm % rst,         &
+                                                      verbose = .true.)
+    call Control_Mod_Number_Of_Swarm_Sub_Steps       (swarm % n_sub_steps, &
+                                                      verbose = .true.)
 
-  ! SGS models for particle
-  call Control_Mod_Swarm_Subgrid_Scale_Model(name, verbose = .true.)
-  select case(name)
-    case('BROWNIAN_FUKAGATA')
-         swarm % subgrid_scale_model = BROWNIAN_FUKAGATA
-    case('DISCRETE_RANDOM_WALK')
-         swarm % subgrid_scale_model = DISCRETE_RANDOM_WALK
-  end select
+    call Control_Mod_Read_Int_Item('STARTING_TIME_STEP_FOR_SWARM_STATISTICS',  &
+                                   HUGE_INT, n_stat_p, .false.)
 
-  if(n_times > n_stat_p) then  ! last line covers unsteady RANS models
-    if(this_proc < 2) then
-      print *, '# NOTE! Lagrangian particle tracking used; ' // &
-               'swarm statistics engaged!'                   // &
-               'and particle statistics begins at:', n_stat_p
+    ! SGS models for particle
+    call Control_Mod_Swarm_Subgrid_Scale_Model(name, verbose = .true.)
+    select case(name)
+      case('BROWNIAN_FUKAGATA')
+           swarm % subgrid_scale_model = BROWNIAN_FUKAGATA
+      case('DISCRETE_RANDOM_WALK')
+           swarm % subgrid_scale_model = DISCRETE_RANDOM_WALK
+    end select
+
+    if(n_times > n_stat_p) then  ! last line covers unsteady RANS models
+      if(this_proc < 2) then
+        print *, '# NOTE! Lagrangian particle tracking used; ' // &
+                 'swarm statistics engaged!'                   // &
+                 'and particle statistics begins at:', n_stat_p
+      end if
+      swarm % statistics = .true.
     end if
-    swarm % statistics = .true.
+
   end if
+
   end subroutine
