@@ -17,7 +17,7 @@
   real                         :: rx_nx_o, ry_ny_o, rz_nz_o,              &
                                   rx_nx_n, ry_ny_n, rz_nz_n,              &
                                   xi, yi, zi, dx, dy, dz, nx, ny, nz, f,  &
-                                  u_ref, v_ref, w_ref, xc, yc, zc
+                                  u_ref, v_ref, w_ref
 !==============================================================================!
 
   ! Take aliases
@@ -37,11 +37,6 @@
   nx = -grid % sx(s) / grid % s(s)
   ny = -grid % sy(s) / grid % s(s)
   nz = -grid % sz(s) / grid % s(s)
-
-  ! Coordinates of closest boundary cell
-  xc = grid % xc(c2)
-  yc = grid % yc(c2)
-  zc = grid % zc(c2)
 
   !-------------------------------------------!
   !                                           !
@@ -176,8 +171,8 @@
 
           ! Increasing the number of particle reflections
           swarm % n_reflected(c2) = swarm % n_reflected(c2) + 1
-          print '(a,i6,a,1pe11.3,1pe11.3,1pe11.3,1pe11.3)',  &
-                ' # Particle ', k, ' reflected from: ', xi, yi, zi, f
+          ! debug: print '(a,i6,a,1pe11.3,1pe11.3,1pe11.3,1pe11.3)',  &
+          ! debug:       ' # Particle ', k, ' reflected from: ', xi, yi, zi, f
         end if  ! reflection condition
 
       end if  ! is it a wall
@@ -189,8 +184,8 @@
          Grid_Mod_Bnd_Cond_Type(grid, c2) == CONVECT) then
         escaped = .true.
         swarm % n_escaped(c2) = swarm % n_escaped(c2) + 1
-        print '(a,i6,a,1pe11.3,1pe11.3,1pe11.3,1pe11.3)',  &
-              ' # Particle ', k, ' escapted from : ', xi, yi, zi, f
+        ! debug: print '(a,i6,a,1pe11.3,1pe11.3,1pe11.3,1pe11.3)',  &
+        ! debug:       ' # Particle ', k, ' escapted from : ', xi, yi, zi, f
       end if  ! it is an outflow
 
     end if  ! really crossed a boundary cell
