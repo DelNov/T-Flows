@@ -32,6 +32,7 @@ Prologue
 #----------------
 # Swarm related
 #----------------
+ MULTIPHASE_MODEL        lagrangian_particles
  SWARM_DIAMETER                         2.3612e-04
  SWARM_DENSITY                          1.0e+3
  NUMBER_OF_SWARM_SUB_STEPS              2

@@ -23,7 +23,7 @@
   !   2nd time step on   !
   !----------------------!
   if(n .gt. 150) then     ! should be after the flow is developed
-    call Swarm_Mod_Advance_Particles(swarm, n, n_stat_p)
+    call Swarm_Mod_Advance_Particles(swarm, n, n_stat_p, 1)
   end if
 
   if(this_proc < 2) then

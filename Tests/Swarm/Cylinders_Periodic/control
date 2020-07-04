@@ -4,9 +4,9 @@
  PROBLEM_NAME     cylinder
  HEAT_TRANSFER    no
 
-NUMBER_OF_TIME_STEPS     300
- RESULTS_SAVE_INTERVAL    30
- BACKUP_SAVE_INTERVAL    150
+NUMBER_OF_TIME_STEPS     600
+ RESULTS_SAVE_INTERVAL    60
+ BACKUP_SAVE_INTERVAL    300
  TIME_STEP               0.1
 
 #-------------------
@@ -21,8 +21,9 @@ NUMBER_OF_TIME_STEPS     300
 # Physical models
 #-----------------
  MASS_DENSITY           1.0
- DYNAMIC_VISCOSITY      1.0e-3
+ DYNAMIC_VISCOSITY      1.0e-4
  HEAT_CAPACITY          1.0
+ GRAVITATIONAL_VECTOR   0.0  -0.05  0.0
 
  TURBULENCE_MODEL       none
  MASS_FLOW_RATES        2.0  0.0  0.0
@@ -30,11 +31,12 @@ NUMBER_OF_TIME_STEPS     300
 #----------------
 # Swarm related
 #----------------
- SWARM_DIAMETER                       1.8E-03
- SWARM_DENSITY                        1.00e3
- NUMBER_OF_SWARM_SUB_STEPS           50
- NUMBER_OF_PARTICLES                100
- SWARM_COEFFICIENT_OF_RESTITUTION     1.0
+ MULTIPHASE_MODEL        lagrangian_particles
+ SWARM_DIAMETER                       1.8e-03
+ SWARM_DENSITY                        1.0e+03
+ NUMBER_OF_SWARM_SUB_STEPS           12
+ NUMBER_OF_PARTICLES                 64
+ SWARM_COEFFICIENT_OF_RESTITUTION     0.75
 
 #----------------------
 # Numerical parameters

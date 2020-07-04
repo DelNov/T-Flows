@@ -16,21 +16,13 @@
   real,    intent(in)           :: time      ! physical time
 !----------------------------------[Locals]------------------------------------!
   integer :: k, n_parts_in_buffers
-  real    :: dx
 !==============================================================================!
 
   !----------------------!
   !   2nd time step on   !
   !----------------------!
   if(n .gt.  15) then     ! should be after the flow is developed
-    call Swarm_Mod_Advance_Particles(swarm, n, n_stat_p)
-  end if
-
-  if(this_proc < 2) then
-    write(*,'(a,i4,a,i4,a,i4)')                        &
-             "# trapped particles: ",  swarm % cnt_d,  &
-             " escaped particles: ",   swarm % cnt_e,  &
-             " reflected particles: ", swarm % cnt_r
+    call Swarm_Mod_Advance_Particles(swarm, n, n_stat_p, 1)
   end if
 
   end subroutine
