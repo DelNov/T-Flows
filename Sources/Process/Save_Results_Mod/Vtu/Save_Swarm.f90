@@ -101,15 +101,32 @@
     !   Velocity magnitudes   !
     !-------------------------!
     write(fu,'(a,a)') IN_4, '<DataArray type="Float64" '  //  &
-                            ' Name="Velocity_Magnitude" ' //  &
+                            ' Name="VelocityMagnitude" '  //  &
                             ' format="ascii">'
     do k = 1, swarm % n_particles
       part => swarm % particle(k)
-      write(fu,'(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')                         &
+      write(fu,'(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')  &
                  IN_5, sqrt(part % u**2 + part % v**2 + part % w**2)
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
 
+    !------------------------!
+    !   Particle diameters   !
+    !------------------------!
+    write(fu,'(a,a)') IN_4, '<DataArray type="Float64" '  //  &
+                            ' Name="ParticleDiameters" '  //  &
+                            ' format="ascii">'
+    do k = 1, swarm % n_particles
+      part => swarm % particle(k)
+      write(fu,'(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)') IN_5, part % d
+    end do
+    write(fu,'(a,a)') IN_4, '</DataArray>'
+
+    !-----------------------!
+    !                       !
+    !   End of point data   !
+    !                       !
+    !-----------------------!
     write(fu,'(a,a)') IN_3, '</PointData>'
 
     !-----------!

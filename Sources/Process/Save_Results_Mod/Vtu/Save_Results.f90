@@ -321,7 +321,7 @@
     end if
 
     !---------------------!
-    !   Volume Fraction   !
+    !   Volume fraction   !
     !---------------------!
     if(mult % model .eq. VOLUME_OF_FLUID) then
       call Save_Scalar_Real(grid, "VolumeFraction", plot_inside,        &
@@ -333,6 +333,18 @@
                                     % n(-grid % n_bnd_cells),           &
                                     f8, f9, data_offset, run)
       end if
+    end if
+
+    !---------------------------------------!
+    !   Number of impacts and reflections   !
+    !---------------------------------------!
+    if(mult % model .eq. LAGRANGIAN_PARTICLES .and. .not. plot_inside) then
+      call Save_Scalar_Real(grid, "ParticlesReflected", plot_inside,         &
+                                  swarm % n_reflected(-grid % n_bnd_cells),  &
+                                  f8, f9, data_offset, run)
+      call Save_Scalar_Real(grid, "ParticlesDeposited", plot_inside,         &
+                                  swarm % n_deposited(-grid % n_bnd_cells),  &
+                                  f8, f9, data_offset, run)
     end if
 
     !------------------!
