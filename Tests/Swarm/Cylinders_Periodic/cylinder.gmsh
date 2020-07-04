@@ -12,7 +12,7 @@
 //------------------------------------------------------------------------------
 
 n_box_layers =   6;                // number of mesh layers in height
-n_bnd_layers =  31;                // number of node layers in boundary layer
+n_bnd_layers =  11;                // number of node layers in boundary layer
 depth_z      =   1.0;              // depth of the domain
 
 // Coordinates of the problem domain (the whole piece of simulated land)
