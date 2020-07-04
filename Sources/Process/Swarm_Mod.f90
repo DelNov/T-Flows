@@ -129,10 +129,12 @@
     ! Number of sub-steps; time sub-steps
     integer :: n_sub_steps
 
-    ! Counter for depositing (d), escaped (e) and reflected (r) particles
-    integer :: cnt_d
-    integer :: cnt_e
-    integer :: cnt_r
+    ! Reflected and deposited particles on the walls and the escaped particles
+    ! (These variables are declared real because it is currently not ...
+    ! ... possible to store integer bnd-cell based variables in backup)
+    real, allocatable :: n_reflected(:)
+    real, allocatable :: n_deposited(:)
+    real, allocatable :: n_escaped(:)
 
     ! Particle statistics
     logical :: statistics

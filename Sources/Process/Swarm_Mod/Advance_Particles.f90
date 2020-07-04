@@ -124,10 +124,10 @@
   !   Print some data on the screen   !
   !-----------------------------------!
   if(this_proc < 2) then
-    write(*,'(a,i6,a,i6,a,i6)')                         &
-             " # Particles: trapped: ", swarm % cnt_d,  &
-             "; escaped: ",             swarm % cnt_e,  &
-             "; reflected: ",           swarm % cnt_r
+    write(*,'(a,f6.0,a,f6.0,a,f6.0)')                                 &
+             " # Particles: trapped: ", sum(swarm % n_deposited(:)),  &
+             "; escaped: ",             sum(swarm % n_escaped(:)),    &
+             "; reflected: ",           sum(swarm % n_reflected(:))
   end if
 
   avg_part_cfl = 0

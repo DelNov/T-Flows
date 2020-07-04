@@ -17,7 +17,7 @@
   real                         :: rx_nx_o, ry_ny_o, rz_nz_o,              &
                                   rx_nx_n, ry_ny_n, rz_nz_n,              &
                                   xi, yi, zi, dx, dy, dz, nx, ny, nz, f,  &
-                                  u_ref, v_ref, w_ref, xc, yc, zc, delta
+                                  u_ref, v_ref, w_ref, xc, yc, zc
 !==============================================================================!
 
   ! Take aliases
@@ -54,12 +54,6 @@
             + part % v * ny   &
             + part % w * nz
 
-  write(100 + k, '(a,4i6,1pe11.3)') 'k, c, c2, s = ',  &
-                  k, c, c2, s, vel_dot_n
-
-  ! Tolerance before collision with wall
-  delta = part % d / 2.0
-
   if( vel_dot_n <= 0.0) then
 
     ! Old dot product of rx and nx
@@ -71,10 +65,6 @@
     rx_nx_n = (grid % xc(c2) - part % x_n) * nx
     ry_ny_n = (grid % yc(c2) - part % y_n) * ny
     rz_nz_n = (grid % zc(c2) - part % z_n) * nz
-
-    write(100 + k, '(a,1pe11.3,1pe11.3)') 'rx nx = ',  rx_nx_o * rx_nx_n  &
-                                                     + ry_ny_o * ry_ny_n  &
-                                                     + rz_nz_o * rz_nz_n
 
     !------------------------------------------!
     !                                          !
@@ -150,7 +140,7 @@
         ! Trap condition (deposition) >>> narrowed the tolerance  <<<
         if(swarm % rst <= TINY .or. abs(vel_dot_n) <= 1.0e-4) then
           deposited = .true.
-          swarm % cnt_d = swarm % cnt_d + 1
+          swarm % n_deposited(c2) = swarm % n_deposited(c2) + 1
           print '(a,i6,a,1pe11.3,1pe11.3,1pe11.3,1pe11.3)',  &
                 ' # Particle ', k, ' deposited at  : ', xi, yi, zi, f
 
@@ -185,9 +175,7 @@
           part % z_n = zi + (part % w * swarm % dt) * (1.0-f)
 
           ! Increasing the number of particle reflections
-          swarm % cnt_r = swarm % cnt_r + 1   ! to be engineered because ...
-                                              ! ... a single particle can ...
-                                              ! ... bounce several times.
+          swarm % n_reflected(c2) = swarm % n_reflected(c2) + 1
           print '(a,i6,a,1pe11.3,1pe11.3,1pe11.3,1pe11.3)',  &
                 ' # Particle ', k, ' reflected from: ', xi, yi, zi, f
         end if  ! reflection condition
@@ -199,8 +187,8 @@
       !------------------------------------!
       if(Grid_Mod_Bnd_Cond_Type(grid, c2) == OUTFLOW .or.  &
          Grid_Mod_Bnd_Cond_Type(grid, c2) == CONVECT) then
-        escaped =  .true.
-        swarm % cnt_e = swarm % cnt_e + 1
+        escaped = .true.
+        swarm % n_escaped(c2) = swarm % n_escaped(c2) + 1
         print '(a,i6,a,1pe11.3,1pe11.3,1pe11.3,1pe11.3)',  &
               ' # Particle ', k, ' escapted from : ', xi, yi, zi, f
       end if  ! it is an outflow

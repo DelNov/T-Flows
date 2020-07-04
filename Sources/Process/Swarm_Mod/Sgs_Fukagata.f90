@@ -11,7 +11,7 @@
   type(Grid_Type),     pointer :: grid
   type(Turb_Type),     pointer :: turb
   type(Var_Type),      pointer :: u, v, w
-  integer                      :: c, c2, l              ! nearest cell
+  integer                      :: c, c2                 ! nearest cell
   real                         :: r1, r2, zeta          ! random number
   real                         :: sigma                 ! part vel. std. dev.
   real                         :: f_fuka                ! Fukagata Brownian f.
@@ -47,23 +47,23 @@
   swarm % tau = swarm % density * (swarm % diameter **2) / 18.0 / visc_const
 
   ! LES dynamic SGS TKE and dissipation rate
-  do l = 1, grid % n_cells
+  do c = 1, grid % n_cells
 
-    if(turb % c_dyn(l) .eq. 0.0) then
-      swarm % f_fuka_x(l) = 0.0
-      swarm % f_fuka_y(l) = 0.0
-      swarm % f_fuka_z(l) = 0.0
+    if(turb % c_dyn(c) .eq. 0.0) then
+      swarm % f_fuka_x(c) = 0.0
+      swarm % f_fuka_y(c) = 0.0
+      swarm % f_fuka_z(c) = 0.0
 
     else ! Grid is allowing the model to add a contribution
 
       ! Length scale of Dynamic model
-      lf = grid % vol(l) ** ONE_THIRD
+      lf = grid % vol(c) ** ONE_THIRD
 
       ! SGS turbulent kinetic energy
       k_sgs = lf*lf                &  ! delta^2
-            * turb % c_dyn(l)      &  ! c_dynamic
-            * (flow % shear(l))    &  ! |S|^2
-            * (flow % shear(l))
+            * turb % c_dyn(c)      &  ! c_dynamic
+            * (flow % shear(c))    &  ! |S|^2
+            * (flow % shear(c))
 
 
       ! SGS dissipation rate
@@ -98,9 +98,9 @@
       end if
 
       ! Brownian diffusion force following isotropic turbulence
-      swarm % f_fuka_x(l) = sigma * zeta / swarm % dt
-      swarm % f_fuka_y(l) = sigma * zeta / swarm % dt
-      swarm % f_fuka_z(l) = sigma * zeta / swarm % dt
+      swarm % f_fuka_x(c) = sigma * zeta / swarm % dt
+      swarm % f_fuka_y(c) = sigma * zeta / swarm % dt
+      swarm % f_fuka_z(c) = sigma * zeta / swarm % dt
 
     end if
   end do

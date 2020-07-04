@@ -91,9 +91,16 @@
 
   end do
 
-  ! Allocate variables for ensemble-averaging
+  ! Aliases for cell-based variables
   nb = turb % pnt_grid % n_bnd_cells
   nc = turb % pnt_grid % n_cells
+
+  ! Reflected and deposited particles on the walls and the escaped particles
+  allocate(swarm % n_reflected(-nb:-1));  swarm % n_reflected = 0
+  allocate(swarm % n_deposited(-nb:-1));  swarm % n_deposited = 0
+  allocate(swarm % n_escaped  (-nb:-1));  swarm % n_escaped   = 0
+
+  ! Allocate variables for ensemble-averaging
   allocate(swarm % u_mean  (-nb:nc));  swarm % u_mean   = 0.
   allocate(swarm % v_mean  (-nb:nc));  swarm % v_mean   = 0.
   allocate(swarm % w_mean  (-nb:nc));  swarm % w_mean   = 0.
