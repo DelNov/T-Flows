@@ -20,6 +20,7 @@
   integer                      :: ss                  ! sub-step counter
   integer                      :: n_parts_in_buffers
   real                         :: avg_part_cfl, avg_part_re, avg_part_st
+  real                         :: max_part_cfl, max_part_re, max_part_st
 !==============================================================================!
 
   ! Take aliases for the swarm
@@ -123,42 +124,6 @@
   !-----------------------------------!
   !   Print some data on the screen   !
   !-----------------------------------!
-  if(this_proc < 2) then
-    write(*,'(a,f6.0,a,f6.0,a,f6.0)')                                 &
-             " # Particles: trapped: ", sum(swarm % n_deposited(:)),  &
-             "; escaped: ",             sum(swarm % n_escaped(:)),    &
-             "; reflected: ",           sum(swarm % n_reflected(:))
-  end if
-
-  avg_part_cfl = 0
-  avg_part_re  = 0
-  avg_part_st  = 0
-  do k = 1, swarm % n_particles
-    part => swarm % particle(k)
-    avg_part_cfl = avg_part_cfl + part % cfl
-    avg_part_re  = avg_part_re  + part % re
-    avg_part_st  = avg_part_st  + part % st
-  end do
-  avg_part_cfl = avg_part_cfl / swarm % n_particles
-  avg_part_re  = avg_part_re  / swarm % n_particles
-  avg_part_st  = avg_part_st  / swarm % n_particles
-  write(*,'(a,1pe9.3)') ' # Average particle Courant number : ', avg_part_cfl
-  write(*,'(a,1pe9.3)') ' # Average particle Reynolds number: ', avg_part_re
-  write(*,'(a,1pe9.3)') ' # Average particle Stokes number  : ', avg_part_st
-
-  !do k = 1, swarm % n_particles
-  !  ! Refresh the alias
-  !  part => swarm % particle(k)
-  !
-  !  if(this_proc .eq. part % proc) then
-  !    ! Printing particle position
-  !    write(*,'(a,i7,a,i7,a,i2,a,3es15.6,a,es12.4)')                 &
-  !            '# particle:',  k,                                     &
-  !            ',  cell: ',      part % cell,                         &
-  !            ',  processor: ', part % proc,                         &
-  !            ',  x,y,z: ',     part % x_n, part % y_n, part % z_n,  &
-  !            ',  cfl: ',       part % cfl
-  !  end if
-  !end do
+  call Swarm_Mod_Print_Statistics(swarm)
 
   end subroutine

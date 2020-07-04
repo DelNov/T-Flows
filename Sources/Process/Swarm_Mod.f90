@@ -191,6 +191,7 @@
   include 'Swarm_Mod/Move_Particle.f90'
   include 'Swarm_Mod/Particle_Forces.f90'
   include 'Swarm_Mod/Particle_Time_Scale.f90'
+  include 'Swarm_Mod/Print_Statistics.f90'
   include 'Swarm_Mod/Sgs_Discrete_Random_Walk.f90'
   include 'Swarm_Mod/Sgs_Fukagata.f90'
 
