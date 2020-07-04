@@ -52,6 +52,7 @@
   integer               :: min_ini         ! min number of inner iterations
   integer               :: n_stat_t        ! first time step for turb. statistic
   integer               :: n_stat_p        ! first time step for swarm statistic
+  integer               :: first_dt_p      ! first t.s. for swarm computation
   integer               :: ini             ! inner iteration counter
   integer               :: bsi, rsi, prsi  ! backup and results save interval
   real                  :: simple_tol      ! tolerance for SIMPLE algorithm
@@ -129,6 +130,8 @@
                                                           verbose = .true.)
   call Control_Mod_Starting_Time_Step_For_Swarm_Statistics(n_stat_p,  &
                                                            verbose = .true.)
+  call Control_Mod_Starting_Time_Step_For_Swarm_Computation(first_dt_p,  &
+                                                            verbose = .true.)
 
   ! Read physical models for each domain from control file
   do d = 1, n_dom
@@ -417,6 +420,13 @@
 
       ! Adjust pressure drops to keep the mass fluxes constant
       call Bulk_Mod_Adjust_P_Drops(flow(d) % bulk, flow(d) % dt)
+
+      ! Lagrangian particle tracking
+      if(mult(d) % model .eq. LAGRANGIAN_PARTICLES) then
+        if(n >= first_dt_p) then
+          call Swarm_Mod_Advance_Particles(swarm(d), n, n_stat_p, first_dt_p)
+        end if
+      end if
 
       ! Just before the end of time step
       call User_Mod_End_Of_Time_Step(flow(d), turb(d), mult(d), swarm(d),  &

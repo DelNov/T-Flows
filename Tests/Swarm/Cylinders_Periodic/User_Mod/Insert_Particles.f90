@@ -1,7 +1,7 @@
 !==============================================================================!
-  subroutine User_Mod_Beginning_Of_Time_Step(flow, turb, mult, swarm, n, time)
+  subroutine User_Mod_Insert_Particles(flow, turb, mult, swarm, n, time)
 !------------------------------------------------------------------------------!
-!   This function is called at the end of time step.                           !
+!   This function is called at the beginning of time step.                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -18,9 +18,9 @@
   integer, parameter :: NJ = 16, NK = 4
 !==============================================================================!
 
-  !-------------------!
-  !   1st time step   !
-  !-------------------!
+  !----------------------------------------------------!
+  !   Initialize particles only in the 1st time step   !
+  !----------------------------------------------------!
   if(n .eq. 1) then
 
     dy = 4.0 / NJ

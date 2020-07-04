@@ -111,9 +111,14 @@
     include 'Control_Mod/Physics/Phase_Viscosities.f90'
     include 'Control_Mod/Physics/Surface_Tension.f90'
 
-    ! Species    
+    ! Species
     include 'Control_Mod/Physics/Number_Of_Species.f90'
     include 'Control_Mod/Physics/Number_Of_Scalars.f90'
+
+    ! Statistics
+    include 'Control_Mod/Physics/Starting_Time_Step_For_Turb_Statistics.f90'
+    include 'Control_Mod/Physics/Starting_Time_Step_For_Swarm_Computation.f90'
+    include 'Control_Mod/Physics/Starting_Time_Step_For_Swarm_Statistics.f90'
 
     ! User arrays (inluding numerical parameters)
     include 'Control_Mod/User/Number_Of_User_Arrays.f90'
@@ -125,8 +130,6 @@
     ! Time Stepping
     include 'Control_Mod/Numerics/Time_Step.f90'
     include 'Control_Mod/Numerics/Number_Of_Time_Steps.f90'
-    include 'Control_Mod/Numerics/Starting_Time_Step_For_Turb_Statistics.f90'
-    include 'Control_Mod/Numerics/Starting_Time_Step_For_Swarm_Statistics.f90'
 
     ! Discretization
     include 'Control_Mod/Numerics/Advection_Scheme_For_Energy.f90'

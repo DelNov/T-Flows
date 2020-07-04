@@ -31,12 +31,13 @@ NUMBER_OF_TIME_STEPS     600
 #----------------
 # Swarm related
 #----------------
- MULTIPHASE_MODEL        lagrangian_particles
- SWARM_DIAMETER                       1.8e-03
- SWARM_DENSITY                        1.0e+03
- NUMBER_OF_SWARM_SUB_STEPS           12
- NUMBER_OF_PARTICLES                 64
- SWARM_COEFFICIENT_OF_RESTITUTION     0.75
+ MULTIPHASE_MODEL   lagrangian_particles
+ SWARM_DIAMETER                               1.8e-03
+ SWARM_DENSITY                                1.0e+03
+ NUMBER_OF_SWARM_SUB_STEPS                   12
+ NUMBER_OF_PARTICLES                         64
+ SWARM_COEFFICIENT_OF_RESTITUTION             0.75
+ STARTING_TIME_STEP_FOR_SWARM_COMPUTATION    30
 
 #----------------------
 # Numerical parameters
