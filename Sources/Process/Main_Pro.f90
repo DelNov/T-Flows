@@ -286,6 +286,13 @@
       else
         flow(d) % m_flux % o = flow(d) % m_flux % n
       end if
+
+      ! Lagrangian particle tracking
+      if(mult(d) % model .eq. LAGRANGIAN_PARTICLES) then
+        call User_Mod_Insert_Particles(flow(d), turb(d), mult(d),  &
+                                       swarm(d), n, time)
+      end if
+
     end do  ! through domains
 
     !--------------------------!
