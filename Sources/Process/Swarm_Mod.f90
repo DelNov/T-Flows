@@ -27,11 +27,6 @@
     real :: v
     real :: w
 
-    ! Particle's mean velocity (ensemble averaging)
-    real :: u_mean
-    real :: v_mean
-    real :: w_mean
-
     ! Particle's density
     real :: density
 
@@ -46,9 +41,6 @@
     integer :: node
     integer :: bnd_cell
     integer :: bnd_face
-
-    ! Number of states for averaging particle velocity 
-    integer :: n_states
 
     ! Particle relative velocity components and magnitude
     real :: rel_u

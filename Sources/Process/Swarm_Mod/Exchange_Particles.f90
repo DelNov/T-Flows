@@ -17,7 +17,9 @@
   grid => swarm % pnt_grid
 
   !-----------------------------------------------!
+  !                                               !
   !   Exchange particle data between processors   !
+  !                                               !
   !-----------------------------------------------!
   if(n_proc > 1) then
 
@@ -74,7 +76,8 @@
       part % cell = swarm % i_work(i + 3)  ! holds global number for the moment
 
       ! Particle was in this processor and wants to stay here
-      if(part % proc .eq. this_proc .and. part % buff .eq. this_proc) then
+      if(part % proc .eq. this_proc .and.  &
+         part % buff .eq. this_proc) then
         do c = 1, grid % n_cells
           if(grid % comm % cell_glo(c) .eq. part % cell) then
             part % cell = c
@@ -84,28 +87,24 @@
         call Swarm_Mod_Find_Nearest_Node(swarm, k)
 
       ! Particle was not in this processor but wants to enter here
-      else if(part % proc .ne. this_proc .and. part % buff .eq. this_proc) then
+      else if(part % proc .ne. this_proc .and.  &
+              part % buff .eq. this_proc) then
 
         ! Set particle processor to correct value
         part % proc = part % buff
 
-        ! If in its processor, ...
-        if(part % proc .eq. this_proc) then
+        ! ... find the closest cell ...
+        do c = 1, grid % n_cells
+          if(grid % comm % cell_glo(c) .eq. part % cell) then
+            part % cell = c
+            exit
+          end if
+        end do
 
-          ! ... find the closest cell ...
-          do c = 1, grid % n_cells
-            if(grid % comm % cell_glo(c) .eq. part % cell) then
-              part % cell = c
-              exit
-            end if
-          end do
+        ! ... and the closest node.
+        call Swarm_Mod_Find_Nearest_Node(swarm, k)
 
-          ! ... and the closest node.
-          call Swarm_Mod_Find_Nearest_Node(swarm, k)
-        else
-          part % proc = 0
-          part % buff = 0
-        end if
+      ! Particle was not in this processor and doesn't even want to enter here
       else
         part % proc = 0
         part % buff = 0
@@ -123,18 +122,24 @@
       part % cfl = swarm % r_work(i + 8)
     end do
 
-    ! Refresh buffers for grid-base variables here
-    ! (This is probably not needed, but it won't do harm)
-    call Grid_Mod_Exchange_Cells_Int (grid, swarm % n_states)
-    call Grid_Mod_Exchange_Cells_Real(grid, swarm % u_mean)
-    call Grid_Mod_Exchange_Cells_Real(grid, swarm % v_mean)
-    call Grid_Mod_Exchange_Cells_Real(grid, swarm % w_mean)
-    call Grid_Mod_Exchange_Cells_Real(grid, swarm % uu)
-    call Grid_Mod_Exchange_Cells_Real(grid, swarm % vv)
-    call Grid_Mod_Exchange_Cells_Real(grid, swarm % ww)
-    call Grid_Mod_Exchange_Cells_Real(grid, swarm % uv)
-    call Grid_Mod_Exchange_Cells_Real(grid, swarm % uw)
-    call Grid_Mod_Exchange_Cells_Real(grid, swarm % vw)
+    !---------------------------------------------------------!
+    !                                                         !
+    !   Refresh buffers for grid-base variables here          !
+    !   (This is probably not needed, but it won't do harm)   !
+    !                                                         !
+    !---------------------------------------------------------!
+    if(swarm % statistics) then
+      call Grid_Mod_Exchange_Cells_Int (grid, swarm % n_states)
+      call Grid_Mod_Exchange_Cells_Real(grid, swarm % u_mean)
+      call Grid_Mod_Exchange_Cells_Real(grid, swarm % v_mean)
+      call Grid_Mod_Exchange_Cells_Real(grid, swarm % w_mean)
+      call Grid_Mod_Exchange_Cells_Real(grid, swarm % uu)
+      call Grid_Mod_Exchange_Cells_Real(grid, swarm % vv)
+      call Grid_Mod_Exchange_Cells_Real(grid, swarm % ww)
+      call Grid_Mod_Exchange_Cells_Real(grid, swarm % uv)
+      call Grid_Mod_Exchange_Cells_Real(grid, swarm % uw)
+      call Grid_Mod_Exchange_Cells_Real(grid, swarm % vw)
+    end if
 
   end if
 

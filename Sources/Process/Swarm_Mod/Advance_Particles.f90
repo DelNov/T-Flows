@@ -6,9 +6,9 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Swarm_Type), target :: swarm
-  integer                  :: n          ! current time step
-  integer                  :: n_stat_p   ! starting time for swarm statistics
-  integer                  :: first_dt   ! starting time for "this" simulation
+  integer, intent(in)      :: n          ! current time step
+  integer, intent(in)      :: n_stat_p   ! starting time for swarm statistics
+  integer, intent(in)      :: first_dt   ! starting time for "this" simulation
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: grid
   type(Field_Type),    pointer :: flow
@@ -107,7 +107,7 @@
           ! First check if it didn't escape through periodicity
           call Swarm_Mod_Check_Periodicity(swarm, k, n_parts_in_buffers)
 
-          ! Gathering swarm statistics  
+          ! Gathering swarm statistics
           call Swarm_Mod_Calculate_Mean(swarm, k, n, n_stat_p, ss)
 
         end if  ! in this processor
