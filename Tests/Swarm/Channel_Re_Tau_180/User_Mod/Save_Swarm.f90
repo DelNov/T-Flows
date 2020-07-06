@@ -1,5 +1,5 @@
 !==============================================================================!
-   subroutine User_Mod_Save_Swarm(flow, turb, mult, swarm, ts) 
+   subroutine User_Mod_Save_Swarm(flow, turb, mult, swarm, ts)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results for paerticles in homogeneous directions.             !
@@ -50,7 +50,6 @@
   real                      :: density_const, visc_const
   logical                   :: there, flag
 !==============================================================================!
-
 
   ! Take aliases for the flow 
   grid => flow % pnt_grid
@@ -140,7 +139,7 @@
   allocate(n_count2(n_prob)); n_count2 = 0
   count = 0
 
-  !--------------- ------!
+  !----------------------!
   !   Swarm statistics   !
   !----------------------!
   do i = 1, n_prob-1
@@ -187,7 +186,7 @@
 
         vis_t_p (i) = vis_t_p (i) + turb % vis_t(c) / visc_const
         y_plus_p(i) = y_plus_p(i) + turb % y_plus(c)
-     
+
         n_count2(i) = n_count2(i) + 1  ! counter 2 for the flowfield 
       end if
     end do
@@ -240,8 +239,8 @@
 
       vis_t_p (i) = vis_t_p (i) / n_count2(i)
       y_plus_p(i) = y_plus_p(i) / n_count2(i)
-    end if 
-   
+    end if
+
     ! Particle-related 
     if(n_states(i) .ne. 0) then
       u_pp(i)  = u_pp(i) / (1.*n_states(i))
@@ -327,14 +326,14 @@
   do i = 1, n_prob-1
     wall_p(i) = density_const * wall_p(i)*u_tau_p/visc_const
 
-    u_pp   (i) = u_pp(i) / u_tau_p
-    v_pp   (i) = v_pp(i) / u_tau_p
-    w_pp   (i) = w_pp(i) / u_tau_p
+    u_pp   (i) = u_pp(i) / (u_tau_p + TINY)
+    v_pp   (i) = v_pp(i) / (u_tau_p + TINY)
+    w_pp   (i) = w_pp(i) / (u_tau_p + TINY)
 
-    uu_pp (i) = uu_pp (i) / (u_tau_p**2)
-    vv_pp (i) = vv_pp (i) / (u_tau_p**2)
-    ww_pp (i) = ww_pp (i) / (u_tau_p**2)
-    uw_pp (i) = uw_pp (i) / (u_tau_p**2)
+    uu_pp (i) = uu_pp (i) / (u_tau_p**2 + TINY)
+    vv_pp (i) = vv_pp (i) / (u_tau_p**2 + TINY)
+    ww_pp (i) = ww_pp (i) / (u_tau_p**2 + TINY)
+    uw_pp (i) = uw_pp (i) / (u_tau_p**2 + TINY)
 
   end do
 

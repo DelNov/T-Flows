@@ -23,6 +23,9 @@
   real, parameter :: L3 = 2.0   ! wall-normal
 !==============================================================================!
 
+  ! Take alias(es)
+  grid => flow % pnt_grid
+
   ! Random variables
   c1 = 1.0
   c2 = 1.0

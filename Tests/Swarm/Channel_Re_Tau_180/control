@@ -6,19 +6,20 @@ Prologue
 
  TIME_STEP                                        0.05
  NUMBER_OF_TIME_STEPS                        360000
- STARTING_TIME_STEP_FOR_STATISTICS           120000
- STARTING_TIME_STEP_FOR_SWARM_STATISTICS     240000
+ STARTING_TIME_STEP_FOR_SWARM_COMPUTATION    180001
+ STARTING_TIME_STEP_FOR_STATISTICS           120001
+ STARTING_TIME_STEP_FOR_SWARM_STATISTICS     240001
 
  RESULTS_SAVE_INTERVAL       6000
  SWARM_SAVE_INTERVAL         6000
  BACKUP_SAVE_INTERVAL      120000
 
-# LOAD_BACKUP_NAME          chan-ts100000.backup 
-# SWARM_SUBGRID_SCALE_MODEL       SEIM
+# LOAD_BACKUP_NAME          chan-ts100000.backup
 
 #-------------------
-# Monitoring points 
+# Monitoring points
 #-------------------
+ POINT_FOR_MONITORING_PLANES    0.5  0.5  0.5
 
 #-----------------
 # Physical models
@@ -31,13 +32,13 @@ Prologue
 #----------------
 # Swarm related
 #----------------
- MULTIPHASE_MODEL   lagrangian_particles
+ MULTIPHASE_MODEL             lagrangian_particles
+ SWARM_SUBGRID_SCALE_MODEL    brownian_fukagata
  SWARM_DIAMETER                                 2.3612e-04
  SWARM_DENSITY                               1000
  NUMBER_OF_SWARM_SUB_STEPS                      2
  NUMBER_OF_PARTICLES                        20000
  SWARM_COEFFICIENT_OF_RESTITUTION               1.0
- STARTING_TIME_STEP_FOR_SWARM_COMPUTATION  180001
 
 #-------------------
 # Turbulence model
