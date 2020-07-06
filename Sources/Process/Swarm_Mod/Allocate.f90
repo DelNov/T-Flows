@@ -88,33 +88,39 @@
   nc = turb % pnt_grid % n_cells
 
   ! Reflected and deposited particles on the walls and the escaped particles
-  allocate(swarm % n_reflected(-nb:-1));  swarm % n_reflected = 0
-  allocate(swarm % n_deposited(-nb:-1));  swarm % n_deposited = 0
-  allocate(swarm % n_escaped  (-nb:-1));  swarm % n_escaped   = 0
+  if(nb > 0) then
+    allocate(swarm % n_reflected(-nb:-1));  swarm % n_reflected(:) = 0
+    allocate(swarm % n_deposited(-nb:-1));  swarm % n_deposited(:) = 0
+    allocate(swarm % n_escaped  (-nb:-1));  swarm % n_escaped(:)   = 0
+  else  ! take care of subdomains which have no boundary cells
+    allocate(swarm % n_reflected(0:0));  swarm % n_reflected(:) = 0
+    allocate(swarm % n_deposited(0:0));  swarm % n_deposited(:) = 0
+    allocate(swarm % n_escaped  (0:0));  swarm % n_escaped(:)   = 0
+  end if
 
   ! Allocate variables for ensemble-averaging
   if(swarm % statistics) then
-    allocate(swarm % u_mean  (-nb:nc));  swarm % u_mean   = 0.
-    allocate(swarm % v_mean  (-nb:nc));  swarm % v_mean   = 0.
-    allocate(swarm % w_mean  (-nb:nc));  swarm % w_mean   = 0.
-    allocate(swarm % uu      (-nb:nc));  swarm % uu       = 0.
-    allocate(swarm % vv      (-nb:nc));  swarm % vv       = 0.
-    allocate(swarm % ww      (-nb:nc));  swarm % ww       = 0.
-    allocate(swarm % uv      (-nb:nc));  swarm % uv       = 0.
-    allocate(swarm % uw      (-nb:nc));  swarm % uw       = 0.
-    allocate(swarm % vw      (-nb:nc));  swarm % vw       = 0.
-    allocate(swarm % n_states(-nb:nc));  swarm % n_states = 0
+    allocate(swarm % u_mean  (-nb:nc));  swarm % u_mean(:)   = 0.
+    allocate(swarm % v_mean  (-nb:nc));  swarm % v_mean(:)   = 0.
+    allocate(swarm % w_mean  (-nb:nc));  swarm % w_mean(:)   = 0.
+    allocate(swarm % uu      (-nb:nc));  swarm % uu(:)       = 0.
+    allocate(swarm % vv      (-nb:nc));  swarm % vv(:)       = 0.
+    allocate(swarm % ww      (-nb:nc));  swarm % ww(:)       = 0.
+    allocate(swarm % uv      (-nb:nc));  swarm % uv(:)       = 0.
+    allocate(swarm % uw      (-nb:nc));  swarm % uw(:)       = 0.
+    allocate(swarm % vw      (-nb:nc));  swarm % vw(:)       = 0.
+    allocate(swarm % n_states(-nb:nc));  swarm % n_states(:) = 0
   end if
 
   ! Allocate Brownnian diffusion force components
-  allocate(swarm % f_fuka_x(-nb:nc));  swarm % f_fuka_x = 0.
-  allocate(swarm % f_fuka_y(-nb:nc));  swarm % f_fuka_y = 0.
-  allocate(swarm % f_fuka_z(-nb:nc));  swarm % f_fuka_z = 0.
+  allocate(swarm % f_fuka_x(-nb:nc));  swarm % f_fuka_x(:) = 0.
+  allocate(swarm % f_fuka_y(-nb:nc));  swarm % f_fuka_y(:) = 0.
+  allocate(swarm % f_fuka_z(-nb:nc));  swarm % f_fuka_z(:) = 0.
 
   ! Allocate variables for the modeled flow quantity "v^2"
-  allocate(swarm % v2_mod  (-nb:nc));  swarm % v2_mod   = 0.
-  allocate(swarm % v2_mod_x(-nb:nc));  swarm % v2_mod_x = 0.
-  allocate(swarm % v2_mod_y(-nb:nc));  swarm % v2_mod_y = 0.
-  allocate(swarm % v2_mod_z(-nb:nc));  swarm % v2_mod_z = 0.
+  allocate(swarm % v2_mod  (-nb:nc));  swarm % v2_mod(:)   = 0.
+  allocate(swarm % v2_mod_x(-nb:nc));  swarm % v2_mod_x(:) = 0.
+  allocate(swarm % v2_mod_y(-nb:nc));  swarm % v2_mod_y(:) = 0.
+  allocate(swarm % v2_mod_z(-nb:nc));  swarm % v2_mod_z(:) = 0.
 
   end subroutine
