@@ -38,6 +38,9 @@
   r1    = 1.0
   r2    = 1.0
 
+  ! Update eddy viscosity from the dynamic model
+  call Turb_Mod_Vis_T_Dynamic(turb)
+
   ! Characteristic viscosity
   visc_const = maxval(flow % viscosity(:))
 
