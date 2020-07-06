@@ -77,9 +77,9 @@
     swarm % particle(k) % deposited = .false.
     swarm % particle(k) % escaped   = .false.
 
-    ! Is particle in this processor?
-    swarm % particle(k) % proc = 0
-    swarm % particle(k) % buff = 0
+    ! Set some processor number to particle
+    swarm % particle(k) % proc = min(1, n_proc)
+    swarm % particle(k) % buff = min(1, n_proc)
 
   end do
 
