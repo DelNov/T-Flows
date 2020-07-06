@@ -34,8 +34,9 @@ NUMBER_OF_TIME_STEPS     600
  SWARM_DIAMETER                       1.8E-03
  SWARM_DENSITY                        1.00e3
  NUMBER_OF_SWARM_SUB_STEPS           50
- NUMBER_OF_PARTICLES                 25
+ NUMBER_OF_PARTICLES                100
  SWARM_COEFFICIENT_OF_RESTITUTION     1.0
+ STARTING_TIME_STEP_FOR_SWARM_COMPUTATION    30
 
 #----------------------
 # Numerical parameters

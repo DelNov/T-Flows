@@ -1,7 +1,7 @@
 !==============================================================================!
-  subroutine User_Mod_Beginning_Of_Time_Step(flow, turb, mult, swarm, n, time)
+  subroutine User_Mod_Insert_Particles(flow, turb, mult, swarm, n, time)
 !------------------------------------------------------------------------------!
-!   This function is called at the end of time step.                           !
+!   This function is called at the beginning of time step.                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -15,8 +15,8 @@
   integer :: i, j, k, n_parts_in_buffers
   real    :: x, y, z, dy, dz
 !------------------------------[Local parameters]------------------------------!
-  integer, parameter :: NJ = 5
-  integer, parameter :: NZ = 5
+  integer, parameter :: NJ = 10
+  integer, parameter :: NZ = 10
 !==============================================================================!
 
   !-------------------!
@@ -26,11 +26,6 @@
 
     dy = 1.0 / NJ
     dz = 1.0 / NZ
-
-    ! Initializing both deposition and departure counters
-    swarm % cnt_d = 0
-    swarm % cnt_e = 0
-    swarm % cnt_r = 0
 
     ! Place 100 particles where you want them
     do j = 1, NJ
