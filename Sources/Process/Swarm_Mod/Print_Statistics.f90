@@ -28,7 +28,7 @@
   max_part_st  = -HUGE
   do k = 1, swarm % n_particles
     part => swarm % particle(k)
-    if(grid % comm % cell_proc(part % cell) .eq. this_proc) then
+    if(part % proc .eq. this_proc) then
       avg_part_cfl = avg_part_cfl + part % cfl
       avg_part_re  = avg_part_re  + part % re
       avg_part_st  = avg_part_st  + part % st
