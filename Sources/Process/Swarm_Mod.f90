@@ -156,9 +156,9 @@
 
   end type
 
-  integer, parameter :: N_I_VARS = 3
-  integer, parameter :: N_L_VARS = 2
-  integer, parameter :: N_R_VARS = 8
+  integer, parameter :: N_I_VARS =  6
+  integer, parameter :: N_L_VARS =  2
+  integer, parameter :: N_R_VARS = 12
 
   !---------------------!
   !   Model constants   !
