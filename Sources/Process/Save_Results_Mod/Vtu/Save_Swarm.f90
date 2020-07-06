@@ -23,7 +23,11 @@
 
   if(swarm % n_particles < 1) return
 
-  call Swarm_Mod_Exchange_Particles_For_Plotting(swarm)
+  !-----------------------------------------!
+  !   Only one processor saves the swarm,   !
+  !    therefore it has to be refreshed     !
+  !-----------------------------------------!
+  call Swarm_Mod_Exchange_Particles(swarm)
 
   !----------------------------!
   !                            !
@@ -124,16 +128,16 @@
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
 
-!   !-------------------------!
-!   !   Particle processors   !
-!   !-------------------------!
-!   write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="Processor" ' // &
-!                           'format="ascii">'
-!   do k = 1, swarm % n_particles
-!     part => swarm % particle(k)
-!     write(fu,'(a,i9)') IN_5, part % proc
-!   end do
-!   write(fu,'(a,a)') IN_4, '</DataArray>'
+    !-------------------------!
+    !   Particle processors   !
+    !-------------------------!
+    write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="Processor" ' // &
+                            'format="ascii">'
+    do k = 1, swarm % n_particles
+      part => swarm % particle(k)
+      write(fu,'(a,i9)') IN_5, part % proc
+    end do
+    write(fu,'(a,a)') IN_4, '</DataArray>'
 
     !-----------------------!
     !                       !
