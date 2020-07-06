@@ -13,7 +13,7 @@
   use Field_Mod, only: Field_Type
   use Bulk_Mod,  only: Bulk_Type
   use Var_Mod,   only: Var_Type
-  use Turb_Mod 
+  use Turb_Mod
   use Swarm_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -31,7 +31,7 @@
   integer                   :: index_p, j, ip, counter, blabla, ip0, ip01
   integer                   :: ip1, ip2, counter_k, l, n_ss, kk, counter_kk 
   integer                   :: label, counter1, counter2, fu1 , fu2
-  integer                   :: nb, nc 
+  integer                   :: nb, nc
   character(len=80)         :: coord_name, result_name, result_name_plus
   character(len=80)         :: swarm_result_name, swarm_result_name_plus
   real, allocatable         :: z_p(:), u_p(:), v_p(:), w_p(:), t_p(:),      &
