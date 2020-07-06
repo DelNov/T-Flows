@@ -352,8 +352,8 @@
   !   Swarm (of particles)   !
   !                          !
   !--------------------------!
-  call Backup_Mod_Write_Swarm(fh, d, vc, swr)
   if(mul % model .eq. LAGRANGIAN_PARTICLES) then
+    call Backup_Mod_Write_Swarm(fh, d, vc, swr)
     call Backup_Mod_Write_Bnd(comm, fh, d, vc, 'n_deposited',      &
                               swr % n_deposited(-comm % nb_s:-1))
     call Backup_Mod_Write_Bnd(comm, fh, d, vc, 'n_reflected',      &
