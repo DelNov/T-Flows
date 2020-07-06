@@ -47,27 +47,30 @@
   avg_part_re  = avg_part_re  / swarm % n_particles
   avg_part_st  = avg_part_st  / swarm % n_particles
   if(this_proc < 2) then
-    write(*, '(a)') ' #====================================================='
-    write(*, '(a)') ' #                   Swarm statistics'
-    write(*, '(a)') ' #-----------------------------------------------------'
-    write(*, '(a,i7)') ' # Total number of particles     : ',  &
+    write(*,'(a)') ' #================================================#'
+    write(*,'(a)') ' #                   Swarm statistics'
+    write(*,'(a)') ' #------------------------------------------------#'
+    write(*,'(a,i6)') ' #  Total number of particles     : ',  &
                        swarm % n_particles
-    write(*, '(a,i7)') ' # Number of active particles    : ',  &
-                       swarm % n_particles - nint(sum(swarm % n_deposited(:)))
-    write(*, '(a,i7)') ' # Number of deposited particles : ',  &
-                       nint(sum(swarm % n_deposited(:)))
-    write(*, '(a,i7)') ' # Number of escaped particles   : ',  &
-                       nint(sum(swarm % n_escaped(:)))
-    write(*, '(a,1pe13.1)') ' # Total number of reflections   : ',  &
-                       sum(swarm % n_reflected(:))
-    write(*, '(a)') ' #-----------------------------------------------------'
-    write(*,'(a,2(1pe11.3))') ' # Average and maximum Courant number  : ',  &
+    write(*,'(a,i6)') ' #  Number of active particles    : ',  &
+                      swarm % n_particles - nint(sum(swarm % n_deposited(:)))
+    write(*,'(a,i6)') ' #  Number of deposited particles : ',  &
+                      nint(sum(swarm % n_deposited(:)))
+    write(*,'(a,i6)') ' #  Number of escaped particles   : ',  &
+                      nint(sum(swarm % n_escaped(:)))
+    write(*,'(a,1pe12.1)') ' #  Total number of reflections   : ',  &
+                      sum(swarm % n_reflected(:))
+    write(*,'(a)') ' #================================================#'
+    write(*,'(a)') ' #     Characteristic non-dimensional numbers     #'
+    write(*,'(a)') ' #          (average and maximum values)          #'
+    write(*,'(a)') ' #------------------------------------------------#'
+    write(*,'(a,2(1pe11.3))') ' #    Courant number   :',  &
                           avg_part_cfl, max_part_cfl
-    write(*,'(a,2(1pe11.3))') ' # Average and maximum Reynolds number : ',  &
+    write(*,'(a,2(1pe11.3))') ' #    Reynolds number  :',  &
                           avg_part_re,  max_part_re
-    write(*,'(a,2(1pe11.3))') ' # Average and maximum Stokes number   : ',  &
+    write(*,'(a,2(1pe11.3))') ' #    Stokes number    :',  &
                           avg_part_st,  max_part_st
-    write(*, '(a)') ' #-----------------------------------------------------'
+    write(*,'(a)') ' #------------------------------------------------#'
   end if
 
   end subroutine
