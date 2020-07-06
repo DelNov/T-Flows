@@ -1,5 +1,6 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Time_Step(flow, turb, mult, swarm, n, first_dt)
+  subroutine User_Mod_End_Of_Time_Step(flow, turb, mult, swarm,  &
+                                       n, n_stat_t, n_stat_p, time)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of time step.                           !
 !------------------------------------------------------------------------------!
@@ -17,24 +18,28 @@
   type(Multiphase_Type), target     :: mult
   type(Swarm_Type),      target     :: swarm
   integer,               intent(in) :: n         ! current time step
-  integer,               intent(in) :: first_dt  ! 1st time step of this sim.
+  integer                           :: n_stat_t  ! 1st t.s. for turb. stat.
+  integer                           :: n_stat_p  ! 1st t.s. for swarm. stat.
+  real                              :: time      ! physical time
 !----------------------------------[Locals]------------------------------------!
-  real                           :: l1, l2, l3   ! domain dimensions
-  real                           :: c1, c2, c3   ! random variables
   type(Var_Type),  pointer       :: u, v, w, t
   type(Grid_Type), pointer       :: grid
   type(Particle_Type), pointer   :: part
   character(len=80)              :: result_name
   integer                        :: c, eddy, dir, npb = 0, nn
   integer                        :: ss, oo, n_b, n_bp, fu, n_bin1, n_bin2, temp
-  integer                        :: i, j, k, n_stat_p, r, s, ii, mark, n_test
+  integer                        :: i, j, k, r, s, ii, mark, n_test
   integer, allocatable           :: bin_count(:)
   real, allocatable              :: rep(:), delta(:), bin(:)
   real                           :: lo, xo(4), yo(4),                          &
-                                    rx, ry, rz, Re_tau, ss0, ss1, ss00, ss11,  &
+                                    re_tau, ss0, ss1, ss00, ss11,  &
                                     zo, ro, xc, yc, zc, vc, wc, sig_x, sig_yz, &
-                                    rmin, rmax, sg, lx, ly, lz, vmax, max_rep, &
+                                    rmin, rmax, sg, vmax, max_rep, &
                                     level
+!------------------------------[Local parameters]------------------------------!
+  real, parameter :: LX = 6.28  ! streamwise
+  real, parameter :: LY = 3.14  ! spanwise
+  real, parameter :: LZ = 2.0   ! wall-normal
 !==============================================================================!
 
   ! Take aliases
@@ -50,7 +55,7 @@
 
   ! Reynolds number should be passed from Save_Results and number of bins should
   ! be defined in control file, also same for n_bin... (it's okey for now!) 
-  Re_tau =    142  ! operating shear Reynolds number (a little bit above what
+  re_tau =    142  ! operating shear Reynolds number (a little bit above what
                    ! we have so we don't lose any particle in counting!) 
   n_b    =     64  ! number of bins across half of the channel 
   n_bin1 = 342237  ! time at which we should collect bins info t+=675
@@ -63,117 +68,6 @@
   allocate(bin(n_b)); bin = 0.0     ! bin distance from wall
   allocate(delta(n_b - 1)); delta = 0.0 ! bin thickness
   allocate(bin_count(swarm % n_particles)); bin_count = 0
-
-  !----------------------!
-  !                      !
-  !   Particle-related   !
-  !                      !
-  !----------------------!
-
-  ! random variables
-  c1 = 1.0
-  c2 = 1.0
-  c3 = 1.0
-
-  ! domain size 
-  l1 = 6.28 !streamwise 
-  l2 = 3.14 !spanwise
-  l3 = 2.0  !wall-normal
-
-  !-------------------!
-  !   1st time step   !
-  !-------------------!
-  if(n .eq. 100001) then     ! should be after the flow is developed
-
-    ! Initializing both deposition and departure counters
-    swarm % cnt_d = 0
-    swarm % cnt_e = 0
-    swarm % cnt_r = 0
-
-    ! Browsing through all introduced particles
-    do k = 1, swarm % n_particles
-
-        ! Initalizing particle position (already initialized in
-        ! Swarm_Mod_Allocate)
-        swarm % particle(k) % x_n = 0.0 
-        swarm % particle(k) % y_n = 0.0 
-        swarm % particle(k) % z_n = 0.0 
-
-        ! Generating random locations for particle
-        call random_number(c1)
-        call random_number(c2)
-        call random_number(c3)
-
-        ! Initalizing particle position
-        swarm % particle(k) % x_n = (l1 * c1) + swarm % particle(k) % x_n
-        swarm % particle(k) % y_n = (l2 * c2) + swarm % particle(k) % y_n
-        swarm % particle(k) % z_n = (l3 * c3) + swarm % particle(k) % z_n
-
-        ! you essentially moved them a lot (from 0, 0, 0)
-        swarm % particle(k) % cell = 0
-        swarm % particle(k) % node = 0
-        swarm % particle(k) % proc = 0
-        swarm % particle(k) % buff = 0
-
-        swarm % particle(k) % x_o = swarm % particle(k) % x_n
-        swarm % particle(k) % y_o = swarm % particle(k) % y_n
-        swarm % particle(k) % z_o = swarm % particle(k) % z_n
-
-        ! Searching for the closest cell and node to place the moved particle
-        call Swarm_Mod_Find_Nearest_Cell(swarm, k, npb)
-        call Swarm_Mod_Find_Nearest_Node(swarm, k)
-
-        c = swarm % particle(k) % cell
-
-        ! Set initial particle velocities
-        rx = swarm % particle(k) % x_n - grid % xc(c)
-        ry = swarm % particle(k) % y_n - grid % yc(c)
-        rz = swarm % particle(k) % z_n - grid % zc(c)
-
-        ! Compute velocities at the particle position from velocity gradients
-        swarm % particle(k) % u    &
-           = flow % u % n(c)       &  ! u velocity at the new time step (% n)
-           + flow % u % x(c) * rx  &  ! u % x is gradient du/dx
-           + flow % u % y(c) * ry  &  ! u % y is gradient du/dy
-           + flow % u % z(c) * rz     ! u % x is gradient du/dz
-
-        swarm % particle(k) % v    &
-           = flow % v % n(c)       &  ! v velocity at the new time step (% n)
-           + flow % v % x(c) * rx  &  ! v % x is gradient dv/dx
-           + flow % v % y(c) * ry  &  ! v % y is gradient dv/dy
-           + flow % v % z(c) * rz     ! v % x is gradient dv/dz
-
-        swarm % particle(k) % w    &
-           = flow % w % n(c)       &  ! w velocity at the new time step (% n)
-           + flow % w % x(c) * rx  &  ! w % x is gradient dw/dx
-           + flow % w % y(c) * ry  &  ! w % y is gradient dw/dy
-           + flow % w % z(c) * rz     ! w % x is gradient dw/dz
-
-    end do
-  end if
-
-  !----------------------!
-  !   2nd time step on   !
-  !----------------------!
-  if(n .gt. 150001) then     ! should be started after the flow is fully developed
-    call Swarm_Mod_Advance_Particles(swarm, n, n_stat_p)
-    if(this_proc < 2) then
-      write(*,'(a,i7,a,i4,a,i4,a,i4)')                 &
-               " # particles: ", swarm % n_particles,  &
-               " trapped:   ",   swarm % cnt_d,        &
-               " escaped:   ",   swarm % cnt_e,        &
-               " reflected: ",   swarm % cnt_r
-    end if
-  end if
-
-  ! Moved these five lines from Main_Pro.f90
-  ! The call assumes that one uses dynamic LES model.
-  ! Can we really always make such an assumption?
-  if(mult % model .eq. LAGRANGIAN_PARTICLES) then
-    if(swarm % subgrid_scale_model .eq. BROWNIAN_FUKAGATA) then
-      call Turb_Mod_Vis_T_Dynamic(turb)
-    end if
-  end if
 
 !!<<<<<<<<<<< Binning Simulation latest 26th Feb 2020 >>>>>>>>>>>>>
 !  ! Chebyshev polynomials to compute slice thickness 
@@ -193,7 +87,7 @@
 !      do ss = 1, n_b 
 !
 !        ! calculate the thickness of this bin and the following one
-!        bin(ss) = 0.5 * Re_tau * (1.0 - cos(PI*(ss - 1)/(n_b - 1)))
+!        bin(ss) = 0.5 * re_tau * (1.0 - cos(PI*(ss - 1)/(n_b - 1)))
 !        ss0 = bin(ss) 
 !        ss1 = (ss0 * 3.0E-5) / 0.004255 
 !        bin_count(ss) = 0
@@ -278,11 +172,6 @@
   rmin = 0.2
   rmax = 0.6
 
-  ! Size of the computational domain
-  lx = 6.28
-  ly = 3.14
-  lz = 2.0
-
   !-------------------------------!
   !   Browse through all eddies   !
   !-------------------------------!
@@ -298,17 +187,17 @@
 
     ! Determine random position of a vortex
     call random_number(ro);     ro    = rmin + (rmax-rmin)*ro  ! rmin -> rmax
-    call random_number(xo(1));  xo(1) = xo(1) * lx
-    call random_number(yo(1));  yo(1) = yo(1) * ly
-    call random_number(zo);     zo = ro + (lz - 2.0*ro) * zo
+    call random_number(xo(1));  xo(1) = xo(1) * LX
+    call random_number(yo(1));  yo(1) = yo(1) * LY
+    call random_number(zo);     zo = ro + (LZ - 2.0*ro) * zo
 
     ! Handle periodicity; that is: copy eddie in periodic directions
     xo(2:4) = xo(1)
     yo(2:4) = yo(1)
-    if(xo(1) > lx/2.0) xo(3) = xo(1) - lx
-    if(xo(1) < lx/2.0) xo(3) = xo(1) + lx
-    if(yo(1) > ly/2.0) yo(2) = yo(1) - ly
-    if(yo(1) < ly/2.0) yo(2) = yo(1) + ly
+    if(xo(1) > LX/2.0) xo(3) = xo(1) - LX
+    if(xo(1) < LX/2.0) xo(3) = xo(1) + LX
+    if(yo(1) > LY/2.0) yo(2) = yo(1) - LY
+    if(yo(1) < LY/2.0) yo(2) = yo(1) + LY
     xo(4) = xo(3)
     yo(4) = yo(2)
 

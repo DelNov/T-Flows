@@ -4,47 +4,45 @@ Prologue
 
  HEAT_TRANSFER   no
 
- TIME_STEP                                           0.05
- NUMBER_OF_TIME_STEPS                           360000
- STARTING_TIME_STEP_FOR_TURB_STATISTICS          72000
- STARTING_TIME_STEP_FOR_SWARM_STATISTICS        144000
+ TIME_STEP                                        0.05
+ NUMBER_OF_TIME_STEPS                        360000
+ STARTING_TIME_STEP_FOR_STATISTICS           120000
+ STARTING_TIME_STEP_FOR_SWARM_STATISTICS     240000
 
- BACKUP_SAVE_INTERVAL      12000
- RESULTS_SAVE_INTERVAL      6000
- SWARM_SAVE_INTERVAL        6000
+ RESULTS_SAVE_INTERVAL       6000
+ SWARM_SAVE_INTERVAL         6000
+ BACKUP_SAVE_INTERVAL      120000
 
-#LOAD_BACKUP_NAME           chan-ts120000.backup
- MULTIPHASE_MODEL           lagrangian_particles
-#SWARM_SUBGRID_SCALE_MODEL  discrete_random_walk
+# LOAD_BACKUP_NAME          chan-ts100000.backup 
+# SWARM_SUBGRID_SCALE_MODEL       SEIM
 
 #-------------------
-# Monitoring points
+# Monitoring points 
 #-------------------
 
 #-----------------
 # Physical models
 #-----------------
  MASS_DENSITY           1.0
- THERMAL_CONDUCTIVITY   4.7e-4
+ THERMAL_CONDUCTIVITY   4.70e-4
  DYNAMIC_VISCOSITY      3.0e-5
  HEAT_CAPACITY          1.0
 
 #----------------
 # Swarm related
 #----------------
- MULTIPHASE_MODEL        lagrangian_particles
- SWARM_DIAMETER                         2.3612e-04
- SWARM_DENSITY                          1.0e+3
- NUMBER_OF_SWARM_SUB_STEPS              2
- NUMBER_OF_PARTICLES                20000
- SWARM_COEFFICIENT_OF_RESTITUTION       1.0
+ MULTIPHASE_MODEL   lagrangian_particles
+ SWARM_DIAMETER                                 2.3612e-04
+ SWARM_DENSITY                               1000
+ NUMBER_OF_SWARM_SUB_STEPS                      2
+ NUMBER_OF_PARTICLES                        20000
+ SWARM_COEFFICIENT_OF_RESTITUTION               1.0
+ STARTING_TIME_STEP_FOR_SWARM_COMPUTATION  180001
 
 #-------------------
 # Turbulence model
 #-------------------
  TURBULENCE_MODEL       HYBRID_LES_RANS
-#TURBULENCE_MODEL       HYBRID_LES_PRANDTL
-#SMAGORINSKY_CONSTANT   0.17
 
  PRESSURE_DROPS     0.0003133   0.0   0.0
  MASS_FLOW_RATES    1.98        0.0   0.0
