@@ -1,14 +1,14 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Advance_Particles(swarm, n, n_stat_p, first_dt)
+  subroutine Swarm_Mod_Advance_Particles(swarm, n, n_stat_p, first_dt_p)
 !------------------------------------------------------------------------------!
 !   Advances all particles in the swarm.                                       !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Swarm_Type), target :: swarm
-  integer, intent(in)      :: n          ! current time step
-  integer, intent(in)      :: n_stat_p   ! starting time for swarm statistics
-  integer, intent(in)      :: first_dt   ! starting time for "this" simulation
+  integer, intent(in)      :: n           ! current time step
+  integer, intent(in)      :: n_stat_p    ! starting time for swarm statistics
+  integer, intent(in)      :: first_dt_p  ! starting time for swarm simulation
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: grid
   type(Field_Type),    pointer :: flow
@@ -51,7 +51,7 @@
   end if
 
   ! Gaussian random no.s interval (for SEIM model)
-  swarm % time_eim = n - first_dt
+  swarm % time_eim = n - first_dt_p
 
   !---------------------------------------------!
   !       Store old particle coordinates        !
