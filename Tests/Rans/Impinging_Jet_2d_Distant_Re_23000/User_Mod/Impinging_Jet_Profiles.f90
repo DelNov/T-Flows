@@ -14,7 +14,7 @@
   type(Var_Type),   pointer :: u, v, w, t
   type(Var_Type),   pointer :: kin, eps, zeta, f22
   integer                   :: n_prob, pl, i, count, s, c, idumm, k, fu
-  character(len=80)         :: coord_name, res_name, store_name, ext
+  character(len=80)         :: coord_name, res_name, ext
   real, allocatable         :: z_p(:),                              &
                                um_p(:), vm_p(:), wm_p(:), tm_p(:),  &
                                v1_p(:), v2_p(:), v3_p(:),           &

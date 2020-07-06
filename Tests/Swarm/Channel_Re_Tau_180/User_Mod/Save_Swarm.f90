@@ -13,7 +13,6 @@
   use Field_Mod, only: Field_Type
   use Bulk_Mod,  only: Bulk_Type
   use Var_Mod,   only: Var_Type
-  use File_Mod,  only: problem_name
   use Turb_Mod 
   use Swarm_Mod
 !------------------------------------------------------------------------------!
@@ -35,7 +34,6 @@
   integer                   :: nb, nc 
   character(len=80)         :: coord_name, result_name, result_name_plus
   character(len=80)         :: swarm_result_name, swarm_result_name_plus
-  character(len=80)         :: store_name
   real, allocatable         :: z_p(:), u_p(:), v_p(:), w_p(:), t_p(:),      &
                               ind(:), wall_p(:),                            &
                               uw_pp(:), uu_pp(:), vv_pp(:), ww_pp(:),       &
@@ -84,8 +82,6 @@
       print *, '#--------------------------------------------------------------'
     end if
 
-    ! Restore the name and return
-    problem_name = store_name
     return
   end if
 
@@ -370,8 +366,5 @@
   deallocate(y_plus_p)
 
   if(this_proc < 2)  print *, '# Finished with User_Mod_Save_Swarm.f90.'
-
-  ! Restore the name
-  problem_name = store_name
 
   end subroutine

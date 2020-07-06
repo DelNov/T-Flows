@@ -12,7 +12,6 @@
   use Field_Mod, only: Field_Type
   use Bulk_Mod,  only: Bulk_Type
   use Var_Mod,   only: Var_Type
-  use File_Mod,  only: problem_name
   use Turb_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -75,8 +74,6 @@
       print *, '#--------------------------------------------------------------'
     end if
 
-!    ! Restore the name and return
-!    problem_name = store_name
     return
   end if
 
@@ -245,8 +242,6 @@
       write(*,*) '# Friction velocity is zero in Save_Results.f90!'
     end if
 
-!    ! Restore the name and return
-!    problem_name = store_name
     return
   end if
 
@@ -403,10 +398,6 @@
   deallocate(vis_t_p)
   deallocate(y_plus_p)
 
-
   if(this_proc < 2)  print *, '# Finished with User_Mod_Save_Results.f90.'
-
-!  ! Restore the name
-!  problem_name = store_name
 
   end subroutine

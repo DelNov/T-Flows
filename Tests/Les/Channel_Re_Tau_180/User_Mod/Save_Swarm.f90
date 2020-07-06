@@ -14,7 +14,6 @@
                        capacity, conductivity, heated_area 
   use Bulk_Mod,  only: Bulk_Type
   use Var_Mod,   only: Var_Type
-  use File_Mod,  only: problem_name
   use Turb_Mod 
   use Swarm_Mod
 !------------------------------------------------------------------------------!
@@ -35,7 +34,6 @@
   integer                  :: label, counter1, counter2
   character(len=80)        :: coord_name, res_name, res_name_plus
   character(len=80)        :: swarm_res_name, swarm_res_name_plus
-  character(len=80)        :: store_name
   real, allocatable        :: z_p(:), u_p(:), v_p(:), w_p(:), t_p(:),      &
                               ind(:),  wall_p(:), kin_p(:), eps_p(:),      &
                               uw_pp(:), uu_pp(:), vv_pp(:), ww_pp(:),      &
@@ -68,15 +66,8 @@
   !call File_Mod_Set_Name(0, coord_name, ".1d")
   call File_Mod_Set_Name(coord_name, extension='.1d')
 
-  ! Store the name
-  store_name = problem_name
-  problem_name = save_name
-
-!  call File_Mod_Set_Name(0, swarm_res_name,      "-swarm-res.dat")
   call File_Mod_Set_Name(swarm_res_name, extension='-swarm-res.dat')
-!  call File_Mod_Set_Name(0, swarm_res_name_plus, "-swarm-res-plus.dat")
   call File_Mod_Set_Name(swarm_res_name_plus, extension='-swarm-res-plus.dat')
-
 
   !------------------!
   !   Read 1d file   !
@@ -97,8 +88,6 @@
       print *, '#--------------------------------------------------------------'
     end if
 
-    ! Restore the name and return
-    problem_name = store_name
     return
   end if
 
@@ -352,8 +341,5 @@
 
 
   if(this_proc < 2)  print *, '# Finished with User_Mod_Save_Swarm.f90.'
-
-  ! Restore the name
-  problem_name = store_name
 
   end subroutine

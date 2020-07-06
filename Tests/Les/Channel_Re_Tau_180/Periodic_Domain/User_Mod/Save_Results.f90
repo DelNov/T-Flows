@@ -14,7 +14,6 @@
                        heated_area 
   use Bulk_Mod,  only: Bulk_Type
   use Var_Mod,   only: Var_Type
-  use File_Mod,  only: problem_name
   use Turb_Mod
 !------------------------------------------------------------------------------!
   implicit none
