@@ -238,7 +238,6 @@
                       plot_inside=.true., domain=d)
     call Save_Results(flow(d), turb(d), mult(d), swarm(d), first_dt,  &
                       plot_inside=.false., domain=d)
-    call Save_Swarm(swarm(d), first_dt, domain=d)
   end do
 
   do n = first_dt + 1, last_dt
@@ -282,12 +281,13 @@
 
       ! Volume of Fluid
       if(mult(d) % model .eq. VOLUME_OF_FLUID) then
-        flow(d) % m_flux % o = flow(d) % m_flux % n / flow(d) % density_f
+        flow(d) % m_flux % o(1:) = flow(d) % m_flux % n(1:)  &
+                                 / flow(d) % density_f(1:)
         ! Update the values at boundaries
         call Update_Boundary_Values(flow(d), turb(d), mult(d))
         call Multiphase_Mod_Compute_Vof(mult(d), sol(d), flow(d) % dt, n)
       else
-        flow(d) % m_flux % o = flow(d) % m_flux % n
+        flow(d) % m_flux % o(1:) = flow(d) % m_flux % n(1:)
       end if
 
       ! Lagrangian particle tracking
