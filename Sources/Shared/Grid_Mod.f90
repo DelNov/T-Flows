@@ -169,6 +169,7 @@
   include 'Grid_Mod/Bnd_Cond_Ranges.f90'
   include 'Grid_Mod/Calculate_Face_Geometry.f90'
   include 'Grid_Mod/Calculate_Global_Volumes.f90'
+  include 'Grid_Mod/Calculate_Nodes_From_Cells.f90'
   include 'Grid_Mod/Calculate_Wall_Distance.f90'
   include 'Grid_Mod/Calculate_Weights_Cells_To_Nodes.f90'
   include 'Grid_Mod/Calculate_Weights_Nodes_To_Cells.f90'
