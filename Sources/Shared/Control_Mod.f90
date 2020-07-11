@@ -71,7 +71,7 @@
     include 'Control_Mod/Physics/Thermal_Conductivity.f90'
     include 'Control_Mod/Physics/Species_Diffusivity.f90'
 
-    !Multiphase flow
+    ! Multiphase flow
     include 'Control_Mod/Physics/Multiphase_Model.f90'
 
     ! Heat transfer
@@ -97,6 +97,7 @@
     include 'Control_Mod/Physics/Mass_Flow_Rates.f90'
     include 'Control_Mod/Physics/Pressure_Drops.f90'
     include 'Control_Mod/Physics/Point_For_Monitoring_Planes.f90'
+    include 'Control_Mod/Physics/Potential_Initialization.f90'
 
     ! Multiphase
     include 'Control_Mod/Physics/Distance_Function.f90'

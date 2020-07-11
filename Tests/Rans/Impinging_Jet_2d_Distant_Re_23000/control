@@ -44,6 +44,8 @@
  TURBULENCE_MODEL       k_eps_zeta_f
 # TURBULENCE_MODEL       k_eps
 
+ POTENTIAL_INITIALIZATION   yes
+
 #----------------------
 # Numerical parameters
 #----------------------

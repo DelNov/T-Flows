@@ -304,6 +304,13 @@
                                 flow % w % n(-grid % n_bnd_cells),  &
                                 f8, f9, data_offset, run)
 
+    !---------------!
+    !   Potential   !
+    !---------------!
+    call Save_Scalar_Real(grid, "Potential", plot_inside,             &
+                                flow % pot % n(-grid % n_bnd_cells),  &
+                                f8, f9, data_offset, run)
+
     !--------------!
     !   Pressure   !
     !--------------!
@@ -450,7 +457,7 @@
                                   f8, f9, data_offset, run)
     end if
     kin_vis_t(:) = 0.0
-    if(turb % model .ne. NO_TURBULENCE .and.  &
+    if(turb % model .ne. NO_TURBULENCE_MODEL .and.  &
        turb % model .ne. DNS) then
       kin_vis_t   (-grid % n_bnd_cells:grid % n_cells) =  &
       turb % vis_t(-grid % n_bnd_cells:grid % n_cells) /  &
@@ -581,7 +588,7 @@
     end if
 
     ! Save y+ for all turbulence models
-    if(turb % model .ne. NO_TURBULENCE .and.  &
+    if(turb % model .ne. NO_TURBULENCE_MODEL .and.  &
        turb % model .ne. DNS) then
       call Save_Scalar_Real(grid, "TurbulentQuantityYplus",            &
                                   plot_inside,                         &

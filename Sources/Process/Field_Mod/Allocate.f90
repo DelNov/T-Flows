@@ -22,9 +22,12 @@
   !----------------------------!
 
   ! Allocate memory for velocity components
-  call Var_Mod_Allocate_Solution(flow % u, grid, 'U', '')
-  call Var_Mod_Allocate_Solution(flow % v, grid, 'V', '')
-  call Var_Mod_Allocate_Solution(flow % w, grid, 'W', '')
+  call Var_Mod_Allocate_Solution(flow % u,   grid, 'U', '')
+  call Var_Mod_Allocate_Solution(flow % v,   grid, 'V', '')
+  call Var_Mod_Allocate_Solution(flow % w,   grid, 'W', '')
+
+  ! Potential for initial velocity computation
+  call Var_Mod_Allocate_Solution(flow % pot, grid, 'POT', '')
 
   ! Allocate memory for pressure correction and pressure
   call Var_Mod_Allocate_New_Only(flow % pp, grid, 'PP')

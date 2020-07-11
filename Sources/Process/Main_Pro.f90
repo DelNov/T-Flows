@@ -34,7 +34,7 @@
   character(len=9)      :: dom_control(MD) = 'control.n'
   integer               :: n, sc, tp
   real                  :: mass_res(MD)
-  logical               :: backup(MD), save_now, exit_now
+  logical               :: backup(MD), save_now, exit_now, pot_init
   type(Grid_Type)       :: grid(MD)        ! grid used in computations
   type(Field_Type)      :: flow(MD)        ! flow field we will be solving for
   type(Swarm_Type)      :: swarm(MD)       ! swarm of particles
@@ -230,6 +230,17 @@
   call Control_Mod_Wall_Time_Max_Hours  (wt_max, verbose=.true.)
   wt_max = wt_max * 3600  ! make it in seconds
 
+  !-------------------------------------------------------------!
+  !   Perform potential initialization in the first time step   !
+  !-------------------------------------------------------------!
+  if(first_dt .eq. 0) then
+    do d = 1, n_dom
+      call Control_Mod_Switch_To_Domain(d)  ! not sure if this call is needed
+      call Control_Mod_Potential_Initialization(pot_init, .true.)
+      if(pot_init) call Field_Mod_Potential_Initialization(flow(d), sol(d))
+    end do
+  end if
+
   ! It will save results in .vtk or .cgns file format,
   ! depending on how the code was compiled
   ! First calls saves inside, second only the boundary cells
@@ -356,8 +367,13 @@
         call Field_Mod_Grad_Pressure_Correction(flow(d), flow(d) % pp)
 
         call Field_Mod_Calculate_Fluxes(flow(d), flow(d) % m_flux % n)
+
         mass_res(d) = Correct_Velocity(flow(d), mult(d), sol(d),  &
                                        flow(d) % dt, ini)
+
+        ! Update the values at boundaries
+        call Convective_Outflow(flow(d), turb(d), mult(d), flow(d) % dt)
+        call Update_Boundary_Values(flow(d), turb(d), mult(d))
 
         ! Energy (practically temperature)
         if(heat_transfer) then
@@ -373,10 +389,6 @@
 
         ! Deal with turbulence (if you dare ;-))
         call Turb_Mod_Main(turb(d), sol(d), n, ini)
-
-        ! Update the values at boundaries
-        call Convective_Outflow(flow(d), turb(d), mult(d), flow(d) % dt)
-        call Update_Boundary_Values(flow(d), turb(d), mult(d))
 
         ! End of the current iteration
         call Info_Mod_Iter_Print(d)
