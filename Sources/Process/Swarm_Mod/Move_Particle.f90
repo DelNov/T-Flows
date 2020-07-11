@@ -67,7 +67,7 @@
   ! Particle damping function for wall treatment (for feeded modeled flow
   ! quantities)
   !fd_p = 1.0 - exp(-(turb % y_plus(c)/25.0)**3)     ! Piomelli
-  if(turb % model .ne. NONE) then
+  if(turb % model .ne. NO_TURBULENCE_MODEL) then
     fd_p = (1.0 - exp(-(turb % y_plus(c)/25.0)))**2    ! Van-Driest
   end if
 
