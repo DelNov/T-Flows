@@ -15,7 +15,7 @@
   use Solver_Mod,   only: Solver_Type, Solver_Mod_Alias_System, Bicg, Cg, Cgs
   use Matrix_Mod,   only: Matrix_Type
   use User_Mod
-  use Turb_Mod,           NO_TURBULENCE      => NONE
+  use Turb_Mod
   use Work_Mod,     only: capacity_x_density => r_cell_11
 !------------------------------------------------------------------------------!
   implicit none
@@ -33,8 +33,8 @@
   type(Face_Type),   pointer :: m_flux
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
-  integer                    :: n, c, s, c1, c2, exec_iter
-  real                       :: a0, a12, a21, con_eff_f, con_t_f
+  integer                    :: c, s, c1, c2, exec_iter
+  real                       :: a12, a21, con_eff_f, con_t_f
   real                       :: f_ex1, f_im1, tx_f1, ty_f1, tz_f1
   real                       :: f_ex2, f_im2, tx_f2, ty_f2, tz_f2
   real                       :: pr_t1, pr_t2, pr_tf
@@ -130,7 +130,7 @@
   !----------------------------!
   !   Spatial discretization   !
   !----------------------------!
-  if(turb % model .ne. NO_TURBULENCE .and.  &
+  if(turb % model .ne. NO_TURBULENCE_MODEL .and.  &
      turb % model .ne. DNS) then
   end if
 
@@ -139,11 +139,11 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
-    if(turb % model .ne. LES_SMAGORINSKY    .and.  &
-       turb % model .ne. LES_DYNAMIC        .and.  &
-       turb % model .ne. HYBRID_LES_PRANDTL .and.  &
-       turb % model .ne. LES_WALE           .and.  &
-       turb % model .ne. NO_TURBULENCE      .and.  &
+    if(turb % model .ne. LES_SMAGORINSKY     .and.  &
+       turb % model .ne. LES_DYNAMIC         .and.  &
+       turb % model .ne. HYBRID_LES_PRANDTL  .and.  &
+       turb % model .ne. LES_WALE            .and.  &
+       turb % model .ne. NO_TURBULENCE_MODEL .and.  &
        turb % model .ne. DNS) then
       pr_t1 = Turb_Mod_Prandtl_Number(turb, c1)
       pr_t2 = Turb_Mod_Prandtl_Number(turb, c2)
@@ -159,7 +159,7 @@
     tx_f2 = tx_f1
     ty_f2 = ty_f1
     tz_f2 = tz_f1
-    if(turb % model .ne. NO_TURBULENCE .and.  &
+    if(turb % model .ne. NO_TURBULENCE_MODEL .and.  &
        turb % model .ne. DNS) then
       con_eff_f =                                                              &
                grid % fw(s) * (flow % conductivity(c1) +                       &
