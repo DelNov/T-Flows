@@ -9,8 +9,8 @@
   use Field_Mod,      only: Field_Type, buoyancy, heat_transfer, t_ref,  &
                             grav_x, grav_y, grav_z
   use Bulk_Mod,       only: Bulk_Type
-  use Turb_Mod,       NO_TURBULENCE => NONE
-  use Multiphase_Mod, NO_MULTIPHASE => NONE
+  use Turb_Mod
+  use Multiphase_Mod
   use Control_Mod
   use Swarm_Mod
 !------------------------------------------------------------------------------!
@@ -52,7 +52,7 @@
   select case(name)
 
     case('NONE')
-      turb % model = NO_TURBULENCE
+      turb % model = NO_TURBULENCE_MODEL
     case('K_EPS')
       turb % model = K_EPS
     case('K_EPS_ZETA_F')
@@ -118,7 +118,7 @@
   !------------------------------!
   call Control_Mod_Turbulence_Model_Variant(name, .true.)
   if     (name .eq. 'NONE') then
-    turb % model_variant = NO_TURBULENCE
+    turb % model_variant = NO_TURBULENCE_MODEL
   else if(name .eq. 'STABILIZED') then
     turb % model_variant = STABILIZED
   else
@@ -237,7 +237,7 @@
   else if(name .eq. 'EULER_EULER' ) then
     mult % model = EULER_EULER
   else
-    mult % model = NO_MULTIPHASE
+    mult % model = NO_MULTIPHASE_MODEL
   end if
 
   !-----------------------!
