@@ -566,7 +566,7 @@
   !   Direct numerical simulation   !
   !---------------------------------!
   if(turb % model .eq. DNS .or.  &
-     turb % model .eq. NONE) then
+     turb % model .eq. NO_TURBULENCE_MODEL) then
 
     if(turb % statistics) then
 

@@ -17,7 +17,7 @@
   type(Var_Type),    pointer :: uu, vv, ww, uv, uw, vw
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
-  integer                    :: c, s, c1, c2, i
+  integer                    :: c, s, c1, c2
   real                       :: prod, diss, phi_hom, phi_wall, mag, phi_tot
   real                       :: b11, b22, b33, b12, b13, b21, b31, b23, b32
   real                       :: s11, s22, s33, s12, s13, s21, s31, s23, s32

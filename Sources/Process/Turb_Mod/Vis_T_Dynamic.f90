@@ -28,7 +28,7 @@
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w
-  integer                    :: c, c1, c2, s, sj, j, cj, nc, nb
+  integer                    :: c, c1, c2, s, sj, cj, nc, nb
   real                       :: u_a, v_a, w_a
   real                       :: uu_a, vv_a, ww_a, uv_a, uw_a, vw_a
   real                       :: m_11_a, m_22_a, m_33_a, m_12_a, m_13_a, m_23_a

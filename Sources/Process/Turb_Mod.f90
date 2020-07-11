@@ -16,6 +16,7 @@
   use Matrix_Mod
   use Control_Mod
   use Numerics_Mod
+  use Multiphase_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -139,7 +140,7 @@
 
   ! Parameters describing turbulence model choice
   ! (Prime numbers starting from 30000)
-  integer, parameter :: NONE                  = 30011
+  integer, parameter :: NO_TURBULENCE_MODEL   = 30011
   integer, parameter :: DNS                   = 30013
   integer, parameter :: LES_WALE              = 30029
   integer, parameter :: LES_DYNAMIC           = 30047

@@ -23,10 +23,6 @@
   !---------------------------------------------------!
 
   if(turb % model .eq. K_EPS) then
-
-    ! Update the values at boundaries
-    call Update_Boundary_Values(flow, turb)
-
     call Calculate_Shear_And_Vorticity(flow)
 
     call Turb_Mod_Compute_Variable(turb, sol, ini, turb % kin, n)
@@ -44,6 +40,7 @@
 
   if(turb % model .eq. K_EPS_ZETA_F .or. &
      turb % model .eq. HYBRID_LES_RANS) then
+
     call Calculate_Shear_And_Vorticity(flow)
 
     call Turb_Mod_Compute_Variable(turb, sol, ini, turb % kin, n)
@@ -55,8 +52,6 @@
       call Turb_Mod_Compute_Variable(turb, sol, ini, turb % t2, n)
     end if
 
-    call Update_Boundary_Values(flow, turb)
-
     call Turb_Mod_Compute_F22(turb, sol, ini, turb % f22)
     call Turb_Mod_Compute_Variable(turb, sol, ini, turb % zeta, n)
 
@@ -67,28 +62,25 @@
   if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
      turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
 
-    ! Update the values at boundaries
-    call Update_Boundary_Values(flow, turb)
-
     call Time_And_Length_Scale(grid, turb)
 
     call Field_Mod_Grad_Variable(flow, flow % u)
     call Field_Mod_Grad_Variable(flow, flow % v)
     call Field_Mod_Grad_Variable(flow, flow % w)
 
-    call Turb_Mod_Compute_Stress(turb, sol, ini, turb % uu, n)
-    call Turb_Mod_Compute_Stress(turb, sol, ini, turb % vv, n)
-    call Turb_Mod_Compute_Stress(turb, sol, ini, turb % ww, n)
+    call Turb_Mod_Compute_Stress(turb, sol, ini, turb % uu)
+    call Turb_Mod_Compute_Stress(turb, sol, ini, turb % vv)
+    call Turb_Mod_Compute_Stress(turb, sol, ini, turb % ww)
 
-    call Turb_Mod_Compute_Stress(turb, sol, ini, turb % uv, n)
-    call Turb_Mod_Compute_Stress(turb, sol, ini, turb % uw, n)
-    call Turb_Mod_Compute_Stress(turb, sol, ini, turb % vw, n)
+    call Turb_Mod_Compute_Stress(turb, sol, ini, turb % uv)
+    call Turb_Mod_Compute_Stress(turb, sol, ini, turb % uw)
+    call Turb_Mod_Compute_Stress(turb, sol, ini, turb % vw)
 
     if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
       call Turb_Mod_Compute_F22(turb, sol, ini, turb % f22)
     end if
 
-    call Turb_Mod_Compute_Stress(turb, sol, ini, turb % eps, n)
+    call Turb_Mod_Compute_Stress(turb, sol, ini, turb % eps)
 
     call Turb_Mod_Vis_T_Rsm(turb)
 
@@ -101,9 +93,6 @@
      turb % model .eq. DES_SPALART) then
     call Calculate_Shear_And_Vorticity(flow)
     call Calculate_Vorticity(flow)
-
-    ! Update the values at boundaries
-    call Update_Boundary_Values(flow, turb)
 
     call Turb_Mod_Compute_Variable(turb, sol, ini, turb % vis, n)
     call Turb_Mod_Vis_T_Spalart_Allmaras(turb)

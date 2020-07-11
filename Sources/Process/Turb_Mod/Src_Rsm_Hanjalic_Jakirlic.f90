@@ -1,6 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Src_Rsm_Hanjalic_Jakirlic(turb, sol,  &
-                                                name_phi, n_time_step)
+  subroutine Turb_Mod_Src_Rsm_Hanjalic_Jakirlic(turb, sol, name_phi)
 !------------------------------------------------------------------------------!
 !   Calculate source terms for transport equations for Re stresses and         !
 !   dissipation for Hanjalic-Jakirlic model.                                   !
@@ -9,12 +8,6 @@
   use Work_Mod, only: l_sc_x => r_cell_01,  &
                       l_sc_y => r_cell_02,  &
                       l_sc_z => r_cell_03,  &
-                      kin_x  => r_cell_04,  &
-                      kin_y  => r_cell_05,  &
-                      kin_z  => r_cell_06,  &
-                      kin_xx => r_cell_07,  &
-                      kin_yy => r_cell_08,  &
-                      kin_zz => r_cell_09,  &
                       ui_xx  => r_cell_10,  &
                       ui_yy  => r_cell_11,  &
                       ui_zz  => r_cell_12,  &
@@ -32,7 +25,6 @@
   type(Turb_Type),   target :: turb
   type(Solver_Type), target :: sol
   character(len=*)          :: name_phi
-  integer                   :: n_time_step
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
@@ -119,9 +111,9 @@
 !   call Field_Mod_Grad_Component(flow, uv % n, 2, var6y) ! duv/dy  
 !   call Field_Mod_Grad_Component(flow, uv % n, 3, var6z) ! duv/dz  
 !
-!   call Field_Mod_Grad_Component(flow, uw % n, 1, kin_x) ! duw/dx  
-!   call Field_Mod_Grad_Component(flow, uw % n, 2, kin_y) ! duw/dy  
-!   call Field_Mod_Grad_Component(flow, uw % n, 3, kin_z) ! duw/dz  
+!   call Field_Mod_Grad_Component(flow, uw % n, 1, kin % x) ! duw/dx  
+!   call Field_Mod_Grad_Component(flow, uw % n, 2, kin % y) ! duw/dy  
+!   call Field_Mod_Grad_Component(flow, uw % n, 3, kin % z) ! duw/dz  
 !
 !   call Field_Mod_Grad_Component(flow, vw % n, 1, var8x) ! duw/dx  
 !   call Field_Mod_Grad_Component(flow, vw % n, 2, var8y) ! duw/dy  
@@ -188,9 +180,9 @@
 !     duv_dx = var6x(c)  
 !     duv_dy = var6y(c)  
 !     duv_dz = var6z(c)  
-!     duw_dx = kin_x(c)  
-!     duw_dy = kin_y(c)  
-!     duw_dz = kin_z(c)  
+!     duw_dx = kin % x(c)  
+!     duw_dy = kin % y(c)  
+!     duw_dz = kin % z(c)  
 !     dvw_dx = var8x(c)  
 !     dvw_dy = var8y(c)  
 !     dvw_dz = var8z(c)  

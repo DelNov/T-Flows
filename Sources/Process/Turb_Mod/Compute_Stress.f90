@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Compute_Stress(turb, sol, ini, phi, n_time_step)
+  subroutine Turb_Mod_Compute_Stress(turb, sol, ini, phi)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves transport equation for Re stresses for RSM.         !
 !------------------------------------------------------------------------------!
@@ -21,7 +21,6 @@
   type(Solver_Type), target :: sol
   integer                   :: ini
   type(Var_Type)            :: phi
-  integer                   :: n_time_step
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
@@ -33,7 +32,6 @@
   real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2, exec_iter, nc, nb
   real                       :: f_ex, f_im
-  real                       :: phis
   real                       :: a0, a12, a21
   real                       :: vis_eff
   real                       :: phix_f, phiy_f, phiz_f
@@ -313,7 +311,7 @@
 
     call Turb_Mod_Src_Rsm_Manceau_Hanjalic(turb, sol, phi % name)
   else if(turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-    call Turb_Mod_Src_Rsm_Hanjalic_Jakirlic(turb, sol, phi % name, n_time_step)
+    call Turb_Mod_Src_Rsm_Hanjalic_Jakirlic(turb, sol, phi % name)
   end if
 
   !---------------------------------!

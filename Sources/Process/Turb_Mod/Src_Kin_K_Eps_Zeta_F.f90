@@ -32,7 +32,7 @@
   integer                    :: c, c1, c2, s
   real                       :: u_tan, u_tau
   real                       :: lf, ebf, p_kin_int, p_kin_wf, l_rans_d, l_rans_v
-  real                       :: l_rans, l_sgs, u_rans, u_sgs, kin_vis
+  real                       :: kin_vis
   real                       :: z_o, alpha_d, alpha_v, l_sgs_d, l_sgs_v 
   real                       :: ut_log_law, vt_log_law, wt_log_law
   real                       :: nx, ny, nz, qx, qy, qz, g_buoy_wall
