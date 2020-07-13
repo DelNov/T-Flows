@@ -11,7 +11,7 @@
   use Grid_Mod
   use Control_Mod
   use Multiphase_Mod, only: Multiphase_Type, Multiphase_Mod_Alias_Vof,  &
-                            multiphase_model, VOLUME_OF_FLUID
+                            VOLUME_OF_FLUID
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -67,7 +67,7 @@
         u % n(c2) = u % n(c1)
         v % n(c2) = v % n(c1)
         w % n(c2) = w % n(c1)
-        if(multiphase_model .eq. VOLUME_OF_FLUID) vof % n(c2) = vof % n(c1)
+        if(mult % model .eq. VOLUME_OF_FLUID) vof % n(c2) = vof % n(c1)
       end if
 
       ! Spalart Allmaras

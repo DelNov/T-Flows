@@ -8,11 +8,11 @@
   use Comm_Mod,       only: Comm_Mod_End, this_proc
   use Field_Mod,      only: Field_Type, buoyancy, heat_transfer, t_ref,  &
                             grav_x, grav_y, grav_z
-  use Swarm_Mod,      only: Swarm_Type
   use Bulk_Mod,       only: Bulk_Type
-  use Turb_Mod,       NO_TURBULENCE => NONE
-  use Multiphase_Mod, NO_MULTIPHASE => NONE
+  use Turb_Mod
+  use Multiphase_Mod
   use Control_Mod
+  use Swarm_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -23,7 +23,7 @@
 !----------------------------------[Locals]------------------------------------!
   type(Bulk_Type), pointer :: bulk
   character(len=80)        :: name
-  integer                  :: n_times, n_stat
+  integer                  :: n_times, n_stat, n_stat_p
 !==============================================================================!
 
   ! Take aliases
@@ -52,7 +52,7 @@
   select case(name)
 
     case('NONE')
-      turb % model = NO_TURBULENCE
+      turb % model = NO_TURBULENCE_MODEL
     case('K_EPS')
       turb % model = K_EPS
     case('K_EPS_ZETA_F')
@@ -118,7 +118,7 @@
   !------------------------------!
   call Control_Mod_Turbulence_Model_Variant(name, .true.)
   if     (name .eq. 'NONE') then
-    turb % model_variant = NO_TURBULENCE
+    turb % model_variant = NO_TURBULENCE_MODEL
   else if(name .eq. 'STABILIZED') then
     turb % model_variant = STABILIZED
   else
@@ -230,14 +230,14 @@
   call Control_Mod_Multiphase_Model(name, .true.)
 
   if(name .eq. 'VOLUME_OF_FLUID' ) then
-    multiphase_model = VOLUME_OF_FLUID
+    mult % model = VOLUME_OF_FLUID
     call Control_Mod_Distance_Function(mult % d_func)
   else if(name .eq. 'LAGRANGIAN_PARTICLES' ) then
-    multiphase_model = LAGRANGIAN_PARTICLES
+    mult % model = LAGRANGIAN_PARTICLES
   else if(name .eq. 'EULER_EULER' ) then
-    multiphase_model = EULER_EULER
+    mult % model = EULER_EULER
   else
-    multiphase_model = NO_MULTIPHASE
+    mult % model = NO_MULTIPHASE_MODEL
   end if
 
   call Control_Mod_Phase_Change(mult % phase_change)
@@ -247,12 +247,38 @@
   !   Particle tracking   !
   !                       !
   !-----------------------!
-  call Control_Mod_Number_Of_Particles(swarm % n_particles, verbose = .true.)
-  call Control_Mod_Swarm_Density      (swarm % density,     verbose = .true.)
-  call Control_Mod_Swarm_Diameter     (swarm % diameter,    verbose = .true.)
-  call Control_Mod_Swarm_Coefficient_Of_Restitution(swarm % rst,         &
-                                                    verbose = .true.)
-  call Control_Mod_Number_Of_Swarm_Sub_Steps       (swarm % n_sub_steps, &
-                                                    verbose = .true.)
+  if(mult % model .eq. LAGRANGIAN_PARTICLES) then
+
+    call Control_Mod_Number_Of_Particles(swarm % n_particles, verbose = .true.)
+    call Control_Mod_Swarm_Density      (swarm % density,     verbose = .true.)
+    call Control_Mod_Swarm_Diameter     (swarm % diameter,    verbose = .true.)
+
+    call Control_Mod_Swarm_Coefficient_Of_Restitution(swarm % rst,         &
+                                                      verbose = .true.)
+    call Control_Mod_Number_Of_Swarm_Sub_Steps       (swarm % n_sub_steps, &
+                                                      verbose = .true.)
+
+    call Control_Mod_Read_Int_Item('STARTING_TIME_STEP_FOR_SWARM_STATISTICS',  &
+                                   HUGE_INT, n_stat_p, .false.)
+
+    ! SGS models for particle
+    call Control_Mod_Swarm_Subgrid_Scale_Model(name, verbose = .true.)
+    select case(name)
+      case('BROWNIAN_FUKAGATA')
+           swarm % subgrid_scale_model = BROWNIAN_FUKAGATA
+      case('DISCRETE_RANDOM_WALK')
+           swarm % subgrid_scale_model = DISCRETE_RANDOM_WALK
+    end select
+
+    if(n_times > n_stat_p) then  ! last line covers unsteady RANS models
+      if(this_proc < 2) then
+        print *, '# NOTE! Lagrangian particle tracking used; ' // &
+                 'swarm statistics engaged!'                   // &
+                 'and particle statistics begins at:', n_stat_p
+      end if
+      swarm % statistics = .true.
+    end if
+
+  end if
 
   end subroutine

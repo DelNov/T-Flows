@@ -20,10 +20,6 @@
   implicit none
 !==============================================================================!
 
-  ! Algorithms for pressure velocity coupling
-  integer, parameter :: SIMPLE    = 20011
-  integer, parameter :: PISO      = 20013
-
   ! Parameters for advection scheme
   integer, parameter :: UPWIND    = 40009
   integer, parameter :: CENTRAL   = 40013
@@ -42,6 +38,10 @@
   integer, parameter :: LINEAR        = 40129
   integer, parameter :: PARABOLIC     = 40151
   integer, parameter :: RUNGE_KUTTA_3 = 40153
+
+  ! Algorithms for pressure velocity coupling
+  integer, parameter :: SIMPLE = 40163
+  integer, parameter :: PISO   = 40169
 
   contains
 

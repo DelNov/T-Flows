@@ -7,7 +7,6 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),      target :: flow
-  type(Turb_Type),       target :: turb
   type(Multiphase_Type), target :: mult
   type(Solver_Type),     target :: sol
   integer                       :: ini    ! current temporal iteration

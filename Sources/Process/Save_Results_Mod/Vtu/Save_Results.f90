@@ -36,7 +36,7 @@
   type(Var_Type),  pointer :: phi
   integer(4)               :: data_size
   integer                  :: data_offset, cell_offset
-  integer                  :: c, n, s, n_conns, sc, f8, f9, ua, run, c2
+  integer                  :: c, n, n_conns, sc, f8, f9, ua, run, c2
   character(len=80)        :: name_out_8, name_out_9, name_mean, a_name
   character(len=80)        :: str1, str2
   integer, parameter       :: IP=8, RP=8, SP=4
@@ -50,14 +50,12 @@
   ! Count connections in this grid, you will need it later
   n_conns = 0
   if(plot_inside) then
-    do c = 1, grid % n_cells - grid % comm % n_buff_cells
+    do c = 1, grid % n_cells
       n_conns = n_conns + grid % cells_n_nodes(c)
     end do
   else
-    do s = 1, grid % n_faces
-      if( grid % faces_c(2,s) < 0 ) then
-        n_conns = n_conns + grid % faces_n_nodes(s)
-      end if
+    do c2 = -grid % n_bnd_cells, -1
+      n_conns = n_conns + grid % cells_n_nodes(c2)
     end do
   end if
 
@@ -105,7 +103,7 @@
   if(n_proc > 1 .and. this_proc .eq. 1)  then
     write(f8) IN_0 // '<?xml version="1.0"?>'              // LF
     write(f8) IN_0 // '<VTKFile type="PUnstructuredGrid">' // LF
-    write(f8) IN_1 // '<PUnstructuredGrid GhostLevel="0">' // LF
+    write(f8) IN_1 // '<PUnstructuredGrid GhostLevel="1">' // LF
   end if
 
   write(f9) IN_0 // '<?xml version="1.0"?>'                           // LF
@@ -115,7 +113,7 @@
 
   write(str1,'(i0.0)') grid % n_nodes
   if(plot_inside) then
-    write(str2,'(i0.0)') grid % n_cells - grid % comm % n_buff_cells
+    write(str2,'(i0.0)') grid % n_cells
   else
     if(grid % n_bnd_cells .eq. 0) then
       write(str2,'(i1)')   grid % n_bnd_cells  ! i0.0 doesn't work for zero :-/
@@ -170,35 +168,29 @@
 
   ! Fill up an array with cell offsets and save the header only
   cell_offset = 0
-  do c = 1, grid % n_cells - grid % comm % n_buff_cells
+  do c = 1, grid % n_cells
     cell_offset = cell_offset + grid % cells_n_nodes(c)
     offs_save(c) = cell_offset
   end do
   cell_offset = 0
-  do s = 1, grid % n_faces
-    if( grid % faces_c(2,s) < 0 ) then
-      c2 = grid % faces_c(2,s)
-      cell_offset = cell_offset + grid % faces_n_nodes(s)
-      offs_save(c2) = cell_offset
-    end if
+  do c2 = -grid % n_bnd_cells, -1
+    cell_offset = cell_offset + grid % cells_n_nodes(c2)
+    offs_save(c2) = cell_offset
   end do
   call Save_Scalar_Int(grid, "offsets", plot_inside,           &
                               offs_save(-grid % n_bnd_cells),  &
                               f8, f9, data_offset, 1)  ! 1 => header only
 
   ! Fill up an array with cell types and save the header only
-  do c = 1, grid % n_cells - grid % comm % n_buff_cells
+  do c = 1, grid % n_cells
     if(grid % cells_n_nodes(c) .eq. 8) type_save(c) = VTK_HEXAHEDRON
     if(grid % cells_n_nodes(c) .eq. 6) type_save(c) = VTK_WEDGE
     if(grid % cells_n_nodes(c) .eq. 4) type_save(c) = VTK_TETRA
     if(grid % cells_n_nodes(c) .eq. 5) type_save(c) = VTK_PYRAMID
   end do
-  do s = 1, grid % n_faces
-    if( grid % faces_c(2,s) < 0 ) then
-      c2 = grid % faces_c(2,s)
-      if(grid % faces_n_nodes(s) .eq. 4) type_save(c2) = VTK_QUAD
-      if(grid % faces_n_nodes(s) .eq. 3) type_save(c2) = VTK_TRIANGLE
-    end if
+  do c2 = -grid % n_bnd_cells, -1
+    if(grid % cells_n_nodes(c2) .eq. 4) type_save(c2) = VTK_QUAD
+    if(grid % cells_n_nodes(c2) .eq. 3) type_save(c2) = VTK_TRIANGLE
   end do
   call Save_Scalar_Int(grid, "types", plot_inside,             &
                               type_save(-grid % n_bnd_cells),  &
@@ -239,7 +231,7 @@
       data_size = n_conns * IP
       write(f9) data_size
       if(plot_inside) then
-        do c = 1, grid % n_cells - grid % comm % n_buff_cells
+        do c = 1, grid % n_cells
           if(grid % cells_n_nodes(c) .eq. 8) then
             write(f9) grid % cells_n(1,c)-1, grid % cells_n(2,c)-1,   &
                       grid % cells_n(4,c)-1, grid % cells_n(3,c)-1,   &
@@ -259,15 +251,13 @@
           end if
         end do
       else  ! plot only boundary
-        do s = 1, grid % n_faces
-          if( grid % faces_c(2,s) < 0 ) then
-            if(grid % faces_n_nodes(s) .eq. 4) then
-              write(f9) grid % faces_n(1,s)-1, grid % faces_n(2,s)-1,  &
-                        grid % faces_n(3,s)-1, grid % faces_n(4,s)-1
-            else if(grid % faces_n_nodes(s) .eq. 3) then
-              write(f9) grid % faces_n(1,s)-1, grid % faces_n(2,s)-1,  &
-                        grid % faces_n(3,s)-1
-            end if
+        do c2 = -grid % n_bnd_cells, -1
+          if(grid % cells_n_nodes(c2) .eq. 4) then
+            write(f9) grid % cells_n(1,c2)-1, grid % cells_n(2,c2)-1,  &
+                      grid % cells_n(3,c2)-1, grid % cells_n(4,c2)-1
+          else if(grid % cells_n_nodes(c2) .eq. 3) then
+            write(f9) grid % cells_n(1,c2)-1, grid % cells_n(2,c2)-1,  &
+                      grid % cells_n(3,c2)-1
           end if
         end do
       end if
@@ -285,14 +275,11 @@
     !--------------------!
     !   Processor i.d.   !
     !--------------------!
-    do c = 1, grid % n_cells - grid % comm % n_buff_cells
+    do c = 1, grid % n_cells
       int_save(c) = grid % comm % cell_proc(c)
     end do
-    do s = 1, grid % n_faces
-      if( grid % faces_c(2,s) < 0 ) then
-        int_save(grid % faces_c(2,s)) =  &
-                 grid % comm % cell_proc( grid % faces_c(1,s) )
-      end if
+    do c2 = -grid % n_bnd_cells, -1
+      int_save(c2) = grid % comm % cell_proc(c2)
     end do
     call Save_Scalar_Int(grid, "Processor", plot_inside,        &
                                 int_save(-grid % n_bnd_cells),  &
@@ -317,6 +304,13 @@
                                 flow % w % n(-grid % n_bnd_cells),  &
                                 f8, f9, data_offset, run)
 
+    !---------------!
+    !   Potential   !
+    !---------------!
+    call Save_Scalar_Real(grid, "Potential", plot_inside,             &
+                                flow % pot % n(-grid % n_bnd_cells),  &
+                                f8, f9, data_offset, run)
+
     !--------------!
     !   Pressure   !
     !--------------!
@@ -334,9 +328,9 @@
     end if
 
     !---------------------!
-    !   Volume Fraction   !
+    !   Volume fraction   !
     !---------------------!
-    if(multiphase_model .eq. VOLUME_OF_FLUID) then
+    if(mult % model .eq. VOLUME_OF_FLUID) then
       call Save_Scalar_Real(grid, "VolumeFraction", plot_inside,        &
                                   mult % vof % n(-grid % n_bnd_cells),  &
                                   f8, f9, data_offset, run)
@@ -355,6 +349,18 @@
                                     % n(-grid % n_bnd_cells),           &
                                     f8, f9, data_offset, run)
       end if
+    end if
+
+    !---------------------------------------!
+    !   Number of impacts and reflections   !
+    !---------------------------------------!
+    if(mult % model .eq. LAGRANGIAN_PARTICLES .and. .not. plot_inside) then
+      call Save_Scalar_Real(grid, "ParticlesReflected", plot_inside,         &
+                                  swarm % n_reflected(-grid % n_bnd_cells),  &
+                                  f8, f9, data_offset, run)
+      call Save_Scalar_Real(grid, "ParticlesDeposited", plot_inside,         &
+                                  swarm % n_deposited(-grid % n_bnd_cells),  &
+                                  f8, f9, data_offset, run)
     end if
 
     !------------------!
@@ -460,7 +466,7 @@
                                   f8, f9, data_offset, run)
     end if
     kin_vis_t(:) = 0.0
-    if(turb % model .ne. NO_TURBULENCE .and.  &
+    if(turb % model .ne. NO_TURBULENCE_MODEL .and.  &
        turb % model .ne. DNS) then
       kin_vis_t   (-grid % n_bnd_cells:grid % n_cells) =  &
       turb % vis_t(-grid % n_bnd_cells:grid % n_cells) /  &
@@ -591,7 +597,7 @@
     end if
 
     ! Save y+ for all turbulence models
-    if(turb % model .ne. NO_TURBULENCE .and.  &
+    if(turb % model .ne. NO_TURBULENCE_MODEL .and.  &
        turb % model .ne. DNS) then
       call Save_Scalar_Real(grid, "TurbulentQuantityYplus",            &
                                   plot_inside,                         &

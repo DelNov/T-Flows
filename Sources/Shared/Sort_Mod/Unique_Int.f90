@@ -14,17 +14,19 @@
   integer, allocatable :: unique(:)
 !------------------------------------------------------------------------------!
 
+  ! Set initial size of unique list ...
   nu = size(values, 1)
 
+  ! ... can't allocate without setting it
   allocate(unique(nu)); unique(:) = 0
 
-  min_val = minval(values) - 1
-  max_val = maxval(values)
+  min_val = minval(values(1:nu)) - 1
+  max_val = maxval(values(1:nu))
 
   i = 0
   do while(min_val < max_val)
-    i = i+1
-    min_val = minval(values, mask = values > min_val)
+    i = i + 1
+    min_val = minval(values(1:nu), mask = values(1:nu) > min_val)
     unique(i) = min_val
   end do
 

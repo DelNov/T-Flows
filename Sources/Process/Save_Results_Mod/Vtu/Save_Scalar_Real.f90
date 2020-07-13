@@ -16,7 +16,7 @@
   integer          :: sweep           ! is it the first or second sweep
 !-----------------------------------[Locals]-----------------------------------!
   integer(4)         :: data_size
-  integer            :: c, c2, s
+  integer            :: c, c2
   character(len=80)  :: str1
   integer, parameter :: IP=8, RP=8, SP=4
 !==============================================================================!
@@ -43,24 +43,18 @@
   ! Data
   if(sweep .eq. 2) then
     if(plot_inside) then
-      data_size = (grid % n_cells - grid % comm % n_buff_cells) * RP
+      data_size = grid % n_cells * RP
       write(fp) data_size
-      do c = 1, grid % n_cells - grid % comm % n_buff_cells
+      do c = 1, grid % n_cells
         write(fp) val(c)
       end do
     else
-      do s = 1, grid % n_faces
-        c2 = grid % faces_c(2,s)
-        if( c2 < 0 ) then
-          data_size = data_size + RP
-        end if
+      do c2 = -grid % n_bnd_cells, -1
+        data_size = data_size + RP
       end do
       write(fp) data_size
-      do s = 1, grid % n_faces
-        c2 = grid % faces_c(2,s)
-        if( c2 < 0 ) then
-          write(fp) val(c2)
-        end if
+      do c2 = -grid % n_bnd_cells, -1
+        write(fp) val(c2)
       end do
     end if
   end if
@@ -69,13 +63,10 @@
   if(sweep .eq. 1) then
     if(plot_inside) then
       data_offset = data_offset  &
-                  + (grid % n_cells - grid % comm % n_buff_cells) * RP
+                  + grid % n_cells * RP
     else
-      do s = 1, grid % n_faces
-        c2 = grid % faces_c(2,s)
-        if( c2 < 0 ) then
-          data_offset = data_offset + RP
-        end if
+      do c2 = -grid % n_bnd_cells, -1
+        data_offset = data_offset + RP
       end do
     end if
     data_offset = data_offset + SP

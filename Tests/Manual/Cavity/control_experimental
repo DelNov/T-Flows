@@ -1,9 +1,9 @@
  PROBLEM_NAME    cavity
  PROBLEM_TYPE    other
 
- TIME_STEP                            0.05
- NUMBER_OF_TIME_STEPS                 500
- STARTING_TIME_STEP_FOR_STATISTICS    10000
+ TIME_STEP                                     0.05
+ NUMBER_OF_TIME_STEPS                        500
+ STARTING_TIME_STEP_FOR_TURB_STATISTICS    10000
 
  NUMBER_OF_USER_SCALARS               0
 

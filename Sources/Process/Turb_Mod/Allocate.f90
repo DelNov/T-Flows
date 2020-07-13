@@ -4,10 +4,13 @@
 !   Allocates memory for variables. It is called either from LoaRes            !
 !   or from Processor.                                                         !
 !------------------------------------------------------------------------------!
+!  use Multiphase_Mod
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type),  target :: turb
-  type(Field_Type), target :: flow
+  type(Field_Type),      target :: flow
+!  type(Multiphase_Type), target :: mult
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   integer                  :: nb, nc
@@ -401,6 +404,9 @@
 
     allocate(turb % nearest_wall_cell(-nb:nc))
     turb % nearest_wall_cell = 0
+ 
+    ! Dynamic Smagorinsky constant for particle SGS models
+    allocate(turb % c_dyn(-nb:nc));  turb % c_dyn = 0.
 
     ! Other variables such as time scale, length scale and production
     allocate(turb % t_scale (-nb:nc));  turb % t_scale = 0.
@@ -560,7 +566,7 @@
   !   Direct numerical simulation   !
   !---------------------------------!
   if(turb % model .eq. DNS .or.  &
-     turb % model .eq. NONE) then
+     turb % model .eq. NO_TURBULENCE_MODEL) then
 
     if(turb % statistics) then
 

@@ -149,11 +149,10 @@
     ! Number of cells surrounding each node
     integer, allocatable :: nodes_n_cells(:)
 
-    ! List of cells surrounding each node
+    ! List of cells surrounding each node ...
+    ! ... and weights for each cell
     integer, allocatable :: nodes_c(:,:)
-
-    ! Weights for interpolation from cells
-    real, allocatable :: nodes_weight_c(:,:)
+    real,    allocatable :: nodes_weight_c(:,:)
 
     ! Weights for cell-based gradient
     real, allocatable :: weight_gradx_cells(:,:)
@@ -183,7 +182,10 @@
   include 'Grid_Mod/Bnd_Cond_Ranges.f90'
   include 'Grid_Mod/Calculate_Face_Geometry.f90'
   include 'Grid_Mod/Calculate_Global_Volumes.f90'
+  include 'Grid_Mod/Calculate_Nodes_From_Cells.f90'
   include 'Grid_Mod/Calculate_Wall_Distance.f90'
+  include 'Grid_Mod/Calculate_Weights_Cells_To_Nodes.f90'
+  include 'Grid_Mod/Calculate_Weights_Nodes_To_Cells.f90'
   include 'Grid_Mod/Check_Levels.f90'
   include 'Grid_Mod/Coarsen.f90'
   include 'Grid_Mod/Correction_Periodicity.f90'

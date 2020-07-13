@@ -34,7 +34,7 @@
   character(len=9)      :: dom_control(MD) = 'control.n'
   integer               :: n, sc, tp
   real                  :: mass_res(MD)
-  logical               :: backup(MD), save_now, exit_now
+  logical               :: backup(MD), save_now, exit_now, pot_init
   type(Grid_Type)       :: grid(MD)        ! grid used in computations
   type(Field_Type)      :: flow(MD)        ! flow field we will be solving for
   type(Swarm_Type)      :: swarm(MD)       ! swarm of particles
@@ -50,9 +50,11 @@
   integer               :: last_dt         ! number of time steps
   integer               :: max_ini         ! max number of inner iterations
   integer               :: min_ini         ! min number of inner iterations
-  integer               :: n_stat          ! starting time step for statistic
+  integer               :: n_stat_t        ! first time step for turb. statistic
+  integer               :: n_stat_p        ! first time step for swarm statistic
+  integer               :: first_dt_p      ! first t.s. for swarm computation
   integer               :: ini             ! inner iteration counter
-  integer               :: bsi, rsi        ! backup and results save interval
+  integer               :: bsi, rsi, prsi  ! backup and results save interval
   real                  :: simple_tol      ! tolerance for SIMPLE algorithm
   integer               :: sc_cr           ! system clock count rate
   integer               :: sc_ini, sc_cur  ! system clock start and end rate
@@ -124,7 +126,12 @@
 
   ! Get the number of time steps from the control file
   call Control_Mod_Number_Of_Time_Steps(last_dt, verbose=.true.)
-  call Control_Mod_Starting_Time_Step_For_Statistics(n_stat, verbose=.true.)
+  call Control_Mod_Starting_Time_Step_For_Turb_Statistics(n_stat_t,  &
+                                                          verbose = .true.)
+  call Control_Mod_Starting_Time_Step_For_Swarm_Statistics(n_stat_p,  &
+                                                           verbose = .true.)
+  call Control_Mod_Starting_Time_Step_For_Swarm_Computation(first_dt_p,  &
+                                                            verbose = .true.)
 
   ! Read physical models for each domain from control file
   do d = 1, n_dom
@@ -137,7 +144,7 @@
     call Control_Mod_Switch_To_Domain(d)  ! take proper control file
     call Field_Mod_Allocate(flow(d), grid(d))
     call Turb_Mod_Allocate(turb(d), flow(d))
-    call Swarm_Mod_Allocate(swarm(d), flow(d))
+    call Swarm_Mod_Allocate(swarm(d), flow(d), turb(d))
     call Multiphase_Mod_Allocate(mult(d), flow(d))
     call User_Mod_Allocate(grid(d))
 
@@ -146,7 +153,7 @@
 
     call Grid_Mod_Calculate_Face_Geometry(grid(d))
     call Grid_Mod_Find_Nodes_Cells(grid(d))      ! for Lagrangian particle track
-    call Grid_Mod_Find_Periodic_Faces(grid(d))   ! for Lagrangian particle track
+    call Grid_Mod_Find_Periodic_Faces(grid(d))
     call Grid_Mod_Find_Cells_Faces(grid(d))      ! for Multiphase Module
     call Grid_Mod_Calculate_Global_Volumes(grid(d))
 
@@ -170,14 +177,14 @@
   do d = 1, n_dom
     call Control_Mod_Switch_To_Domain(d)  ! take proper control file
     call Backup_Mod_Load(flow(d), swarm(d), turb(d), mult(d),  &
-                         time, first_dt, n_stat, backup(d))
+                         time, first_dt, n_stat_t, backup(d))
 
     ! Initialize variables
     if(.not. backup(d)) then
       call Initialize_Variables(flow(d), turb(d), mult(d), swarm(d))
     end if
 
-    if(multiphase_model .eq. VOLUME_OF_FLUID) then
+    if(mult(d) % model .eq. VOLUME_OF_FLUID) then
       if (backup(d))  then
         flow % piso_status = .false.
       end if
@@ -231,8 +238,20 @@
   call Control_Mod_Switch_To_Root()
   call Control_Mod_Backup_Save_Interval (bsi,    verbose=.true.)
   call Control_Mod_Results_Save_Interval(rsi,    verbose=.true.)
+  call Control_Mod_Swarm_Save_Interval  (prsi,   verbose=.true.)
   call Control_Mod_Wall_Time_Max_Hours  (wt_max, verbose=.true.)
   wt_max = wt_max * 3600  ! make it in seconds
+
+  !-------------------------------------------------------------!
+  !   Perform potential initialization in the first time step   !
+  !-------------------------------------------------------------!
+  if(first_dt .eq. 0) then
+    do d = 1, n_dom
+      call Control_Mod_Switch_To_Domain(d)  ! not sure if this call is needed
+      call Control_Mod_Potential_Initialization(pot_init, .true.)
+      if(pot_init) call Field_Mod_Potential_Initialization(flow(d), sol(d))
+    end do
+  end if
 
   ! It will save results in .vtk or .cgns file format,
   ! depending on how the code was compiled
@@ -242,7 +261,6 @@
                       plot_inside=.true., domain=d)
     call Save_Results(flow(d), turb(d), mult(d), swarm(d), first_dt,  &
                       plot_inside=.false., domain=d)
-    call Save_Swarm(swarm(d), first_dt, domain=d)
   end do
 
   do n = first_dt + 1, last_dt
@@ -282,18 +300,26 @@
       end if
 
       ! Turbulence models initializations
-      call Turb_Mod_Init(turb(d), sol(d))
+      call Turb_Mod_Init(turb(d))
 
       ! Volume of Fluid
-      if(multiphase_model .eq. VOLUME_OF_FLUID) then
-        flow(d) % m_flux % o = flow(d) % m_flux % n / flow(d) % density_f
+      if(mult(d) % model .eq. VOLUME_OF_FLUID) then
+        flow(d) % m_flux % o(1:) = flow(d) % m_flux % n(1:)  &
+                                 / flow(d) % density_f(1:)
         ! Update the values at boundaries
         call Update_Boundary_Values(flow(d), turb(d), mult(d))
         call Multiphase_Mod_Compute_Vof(mult(d), sol(d), flow(d) % dt, n)
         call Multiphase_Averaging(flow(d), mult(d), mult(d) % vof)
       else
-        flow(d) % m_flux % o = flow(d) % m_flux % n
+        flow(d) % m_flux % o(1:) = flow(d) % m_flux % n(1:)
       end if
+
+      ! Lagrangian particle tracking
+      if(mult(d) % model .eq. LAGRANGIAN_PARTICLES) then
+        call User_Mod_Insert_Particles(flow(d), turb(d), mult(d),  &
+                                       swarm(d), n, time)
+      end if
+
     end do  ! through domains
 
     !--------------------------!
@@ -303,6 +329,14 @@
     call Control_Mod_Max_Simple_Iterations(max_ini)
     call Control_Mod_Min_Simple_Iterations(min_ini)
     call Control_Mod_Tolerance_For_Simple_Algorithm(simple_tol)
+
+! to be discussed with Mijail   ! Volume of Fluid
+! to be discussed with Mijail    if(mult % model .eq. VOLUME_OF_FLUID) then
+! to be discussed with Mijail      ! Update the values at boundaries
+! to be discussed with Mijail      call Update_Boundary_Values(flow, turb, mult)
+! to be discussed with Mijail      call Multiphase_Mod_Compute_Vof(mult, sol, flow % dt, n)
+! to be discussed with Mijail      call Multiphase_Mod_Update_Physical_Properties(mult)
+! to be discussed with Mijail    end if
 
     do ini = 1, max_ini
 
@@ -351,13 +385,17 @@
 
         call Multiphase_Averaging(flow(d), mult(d), flow(d) % p)
         call Field_Mod_Calculate_Fluxes(flow(d), flow(d) % m_flux % n)
-        mass_res(d) = Correct_Velocity(mult(d), sol(d), flow(d) % dt, ini)
+        mass_res(d) = Correct_Velocity(flow(d), mult(d), sol(d),  &
+                                       flow(d) % dt, ini)
 
         call Multiphase_Averaging(flow(d), mult(d), flow(d) % u)
         call Multiphase_Averaging(flow(d), mult(d), flow(d) % v)
         call Multiphase_Averaging(flow(d), mult(d), flow(d) % w)
-        call Multiphase_Mod_Vof_Piso_Algorithm(flow(d), turb(d), mult(d),    &
-                                               sol(d), mass_res(d), ini)
+        call Piso_Algorithm(flow(d), turb(d), mult(d),    &
+                            sol(d), mass_res(d), ini)
+        ! Update the values at boundaries
+        call Convective_Outflow(flow(d), turb(d), mult(d), flow(d) % dt)
+        call Update_Boundary_Values(flow(d), turb(d), mult(d))
 
         ! Energy (practically temperature)
         if(heat_transfer) then
@@ -373,10 +411,6 @@
 
         ! Deal with turbulence (if you dare ;-))
         call Turb_Mod_Main(turb(d), sol(d), n, ini)
-
-        ! Update the values at boundaries
-        call Convective_Outflow(flow(d), turb(d), mult(d), flow(d) % dt)
-        call Update_Boundary_Values(flow(d), turb(d), mult(d))
 
         ! End of the current iteration
         call Info_Mod_Iter_Print(d)
@@ -415,15 +449,22 @@
       end if
 
       ! Calculate mean values
-      call Turb_Mod_Calculate_Mean(turb(d), n_stat, n)
-      call User_Mod_Calculate_Mean(turb(d), n_stat, n)
+      call Turb_Mod_Calculate_Mean(turb(d), n_stat_t, n)
+      call User_Mod_Calculate_Mean(turb(d), n_stat_t, n)
 
       ! Adjust pressure drops to keep the mass fluxes constant
       call Bulk_Mod_Adjust_P_Drops(flow(d) % bulk, flow(d) % dt)
 
+      ! Lagrangian particle tracking
+      if(mult(d) % model .eq. LAGRANGIAN_PARTICLES) then
+        if(n >= first_dt_p) then
+          call Swarm_Mod_Advance_Particles(swarm(d), n, n_stat_p, first_dt_p)
+        end if
+      end if
+
       ! Just before the end of time step
       call User_Mod_End_Of_Time_Step(flow(d), turb(d), mult(d), swarm(d),  &
-                                     n, time)
+                                     n, n_stat_t, n_stat_p, time)
     end do
 
     !----------------------!
@@ -440,14 +481,14 @@
       do d = 1, n_dom
         call Control_Mod_Switch_To_Domain(d)
         call Backup_Mod_Save(flow(d), swarm(d), turb(d), mult(d),  &
-                             time, n, n_stat, domain=d)
+                             time, n, n_stat_t, domain=d)
       end do
     end if
 
-    ! Is it time to save results for post-processing
-    if(save_now           .or.  &
-       exit_now           .or.  &
-       mod(n, rsi) .eq. 0 .or.  &
+    ! Is it time to save results for post-processing?
+    if(save_now            .or.  &
+       exit_now            .or.  &
+       mod(n, rsi) .eq.  0 .or.  &
        real(sc_cur-sc_ini)/real(sc_cr) > wt_max) then
 
       do d = 1, n_dom
@@ -458,7 +499,7 @@
                           plot_inside=.false., domain=d)
         call Save_Swarm(swarm(d), n)
 
-        if(multiphase_model .eq. VOLUME_OF_FLUID) then
+        if(mult(d) % model .eq. VOLUME_OF_FLUID) then
 !         call Surf_Mod_Allocate(surf(d), flow(d))
 !         call Surf_Mod_Place_At_Var_Value(surf(d),        &
 !                                          mult(d) % vof,  &
@@ -471,7 +512,7 @@
 
         ! Write results in user-customized format
         call User_Mod_Save_Results(flow(d), turb(d), mult(d), swarm(d), n)
-        ! call User_Mod_Save_Swarm(swarm(d), n)  to be done!
+        call User_Mod_Save_Swarm(flow(d), turb(d), mult(d), swarm(d), n)
 
       end do  ! through domains
     end if
@@ -511,7 +552,7 @@
 
     ! Save backup and post-processing files at exit
     call Backup_Mod_Save(flow(d), swarm(d), turb(d), mult(d),  &
-                         time, n, n_stat, domain=d)
+                         time, n, n_stat_t, domain=d)
     call Save_Results(flow(d), turb(d), mult(d), swarm(d), n,  &
                       plot_inside=.true., domain=d)
     call Save_Results(flow(d), turb(d), mult(d), swarm(d), n,  &
@@ -519,6 +560,7 @@
 
     ! Write results in user-customized format
     call User_Mod_Save_Results(flow(d), turb(d), mult(d), swarm(d), n)
+    call User_Mod_Save_Swarm(flow(d), turb(d), mult(d), swarm(d), n)
   end do
 
   if(this_proc < 2) then

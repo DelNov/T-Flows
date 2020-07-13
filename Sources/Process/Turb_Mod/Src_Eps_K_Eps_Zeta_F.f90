@@ -21,7 +21,7 @@
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   integer                    :: c, s, c1, c2, j
-  real                       :: u_tan, u_tau, tau_wall
+  real                       :: u_tan, u_tau
   real                       :: e_sor, c_11e, ebf
   real                       :: eps_wf, eps_int
   real                       :: fa, u_tau_new, kin_vis, p_kin_int, p_kin_wf

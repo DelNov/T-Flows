@@ -25,8 +25,8 @@
   vis_eff =        grid % fw(s)  * flow % viscosity(c1)   &
           + (1.0 - grid % fw(s)) * flow % viscosity(c2)
 
-  if(turb % model .ne. NONE .and.  &
-     turb % model .ne. DNS  .and.  &
+  if(turb % model .ne. NO_TURBULENCE_MODEL .and.  &
+     turb % model .ne. DNS                 .and.  &
      turb % model .ne. HYBRID_LES_RANS) then
     vis_eff = vis_eff + grid % fw(s)  * turb % vis_t(c1)  &
                   +(1.0-grid % fw(s)) * turb % vis_t(c2)

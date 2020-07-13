@@ -14,8 +14,7 @@
   use Solver_Mod,     only: Solver_Type, Bicg, Cg, Cgs, Acm
   use Matrix_Mod,     only: Matrix_Type
   use Control_Mod
-  use Multiphase_Mod, only: Multiphase_Type,  &
-                            multiphase_model, VOLUME_OF_FLUID
+  use Multiphase_Mod, only: Multiphase_Type, VOLUME_OF_FLUID
   use User_Mod
   use Work_Mod,       only: dens_factor => r_face_01
 !------------------------------------------------------------------------------!
@@ -117,7 +116,7 @@
 
   ! The purpose of this factor is to make possible solving
   ! either for volume flux or for mass flux conservation
-  if(multiphase_model .eq. VOLUME_OF_FLUID) then
+  if(mult % model .eq. VOLUME_OF_FLUID) then
     dens_factor(1:grid % n_faces) = 1.0
   else
     dens_factor(1:grid % n_faces) = flow % density_f(1:grid % n_faces)
@@ -221,8 +220,7 @@
   !-------------------------------------------------------------!
   !   In case of VOF, surface tension and  gravity correction   !
   !-------------------------------------------------------------!
-
-  if(multiphase_model .eq. VOLUME_OF_FLUID) then
+  if(mult % model .eq. VOLUME_OF_FLUID) then
     call Multiphase_Mod_Vof_Pressure_Correction(mult, sol, ini, mass_err)
   end if
 

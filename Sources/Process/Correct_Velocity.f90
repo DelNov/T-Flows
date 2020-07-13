@@ -1,29 +1,30 @@
 !==============================================================================!
-  real function Correct_Velocity(mult, sol, dt, ini)
+  real function Correct_Velocity(flow, mult, sol, dt, ini)
 !------------------------------------------------------------------------------!
 !   Corrects the velocities, and mass (or volume) fluxes on cell faces.        !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
   use Comm_Mod
-  use Cpu_Timer_Mod, only: Cpu_Timer_Mod_Start, Cpu_Timer_Mod_Stop
-  use Field_Mod,     only: Field_Type
-  use Grid_Mod,      only: Grid_Type
-  use Bulk_Mod,      only: Bulk_Type
-  use Info_Mod,      only: Info_Mod_Iter_Fill_At, Info_Mod_Bulk_Fill
-  use Solver_Mod,    only: Solver_Type
-  use Matrix_Mod,    only: Matrix_Type
+  use Cpu_Timer_Mod,  only: Cpu_Timer_Mod_Start, Cpu_Timer_Mod_Stop
+  use Field_Mod,      only: Field_Type
+  use Grid_Mod,       only: Grid_Type
+  use Bulk_Mod,       only: Bulk_Type
+  use Info_Mod,       only: Info_Mod_Iter_Fill_At, Info_Mod_Bulk_Fill
+  use Solver_Mod,     only: Solver_Type
+  use Matrix_Mod,     only: Matrix_Type
   use Numerics_Mod
+  use Multiphase_Mod, only: Multiphase_Type
   use User_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Multiphase_Type),  target :: mult
-  type(Solver_Type),      target :: sol
-  real                           :: dt
-  integer                        :: ini
+  type(Field_Type),      target :: flow
+  type(Multiphase_Type), target :: mult
+  type(Solver_Type),     target :: sol
+  real                          :: dt
+  integer                       :: ini
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
   type(Bulk_Type),   pointer :: bulk
   type(Var_Type),    pointer :: u, v, w, p, pp
@@ -39,7 +40,6 @@
   call Cpu_Timer_Mod_Start('Correct_Velocity')
 
   ! Take aliases
-  flow    => mult % pnt_flow
   grid    => flow % pnt_grid
   bulk    => flow % bulk
   flux    => flow % m_flux
@@ -52,7 +52,7 @@
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! User function
-  call User_Mod_Beginning_Of_Correct_Velocity(flow, dt, ini)
+  call User_Mod_Beginning_Of_Correct_Velocity(flow, mult, sol, dt, ini)
 
   !-----------------------------------------!
   !   Correct velocities and fluxes with    !
@@ -118,7 +118,7 @@
       end if
     end do
 
-    if(multiphase_model .eq. VOLUME_OF_FLUID) then
+    if(mult % model .eq. VOLUME_OF_FLUID) then
       if(mult % phase_change) then
         do c = 1, grid % n_cells
           b(c) = b(c) + mult % flux_rate(c) * grid % vol(c)                 &
@@ -156,10 +156,11 @@
     end do
   else
     mass_err = p % res
-    if(multiphase_model .eq. VOLUME_OF_FLUID) then
+    if(mult % model .eq. VOLUME_OF_FLUID) then
       flux % n(:) = flux % n(:) * flow % density_f(:)
     end if
   end if
+
 
   call Comm_Mod_Global_Max_Real(mass_err)
 
@@ -200,7 +201,7 @@
   Correct_Velocity = mass_err ! /(velmax+TINY)
 
   ! User function
-  call User_Mod_End_Of_Correct_Velocity(flow, dt, ini)
+  call User_Mod_End_Of_Correct_Velocity(flow, mult, sol, dt, ini)
 
   call Cpu_Timer_Mod_Stop('Correct_Velocity')
 

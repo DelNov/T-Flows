@@ -42,9 +42,11 @@
   include 'User_Mod/End_Of_Simulation.f90'
   include 'User_Mod/End_Of_Time_Step.f90'
   include 'User_Mod/Initialize_Variables.f90'
+  include 'User_Mod/Insert_Particles.f90'
   include 'User_Mod/Interface_Exchange.f90'
   include 'User_Mod/Force.f90'
   include 'User_Mod/Save_Results.f90'
+  include 'User_Mod/Save_Swarm.f90'
   include 'User_Mod/Source.f90'
 
   end module 

@@ -146,7 +146,7 @@
   !  Multiphase  !
   !              !
   !--------------!
-  if(multiphase_model .eq. VOLUME_OF_FLUID) then
+  if(mul % model .eq. VOLUME_OF_FLUID) then
     f_name = 'face_dens_00'
     call Backup_Mod_Read_Variable(fh, d, vc, 'vof', mul % vof)
     call Backup_Mod_Read_Face(grid % comm, fh, d, vc, grid, f_name,  &
@@ -378,6 +378,12 @@
   !                          !
   !--------------------------!
   call Backup_Mod_Read_Swarm(fh, d, vc, swr)
+  if(mul % model .eq. LAGRANGIAN_PARTICLES) then
+    call Backup_Mod_Read_Bnd(comm, fh, d, vc, 'n_deposited',      &
+                             swr % n_deposited(-comm % nb_s:-1))
+    call Backup_Mod_Read_Bnd(comm, fh, d, vc, 'n_reflected',      &
+                             swr % n_reflected(-comm % nb_s:-1))
+  end if
 
   !-----------------!
   !                 !

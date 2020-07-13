@@ -7,8 +7,8 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: c, ln, n, run, s1, s2, n1, n2, ln1, ln2, nc1, nc2, nu
-  integer              :: max_n_cells
+  integer              :: ln, n, run, n1, n2, ln1, ln2, nc1, nc2, nu
+  integer              :: c, c2, s, s1, s2, max_n_cells
   integer, allocatable :: cell_list(:)
   real                 :: x1, x2, y1, y2, z1, z2
 
@@ -97,6 +97,16 @@
         end do
       end if
     end do
+  end do
+
+  !----------------------------------------------!
+  !   Store boundary cells to face connections   !
+  !----------------------------------------------!
+  do s = 1, grid % n_faces
+    c2 = grid % faces_c(2,s)
+    if(c2 < 0) then
+      grid % cells_bnd_face(c2) = s
+    end if
   end do
 
 ! ! Check #1, save those nodes' cells

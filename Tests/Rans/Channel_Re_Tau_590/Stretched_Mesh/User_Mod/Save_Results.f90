@@ -23,7 +23,6 @@
   type(Face_Type), pointer :: m_flux
   integer                  :: n_prob, pl, c, i, count, s, c1, c2, n_points
   character(len=80)        :: coord_name, res_name, res_name_plus
-  character(len=80)        :: store_name
   real, allocatable        :: z_p(:), u_p(:), v_p(:), w_p(:), t_p(:),       &
                               kin_p(:), eps_p(:), f22_p(:), zeta_p(:),      &
                               uw_p(:), t2_p(:), ut_p(:), vt_p(:), wt_p(:),  &

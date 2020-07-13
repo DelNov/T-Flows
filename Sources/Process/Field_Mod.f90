@@ -11,6 +11,7 @@
   use Grid_Mod
   use Bulk_Mod
   use Comm_Mod
+  use Solver_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -37,9 +38,10 @@
     real              :: sat_temperature  ! [K]
 
     ! Velocity components
-    type(Var_Type) :: u  ! [m/s]
-    type(Var_Type) :: v  ! [m/s]
-    type(Var_Type) :: w  ! [m/s]
+    type(Var_Type) :: u    ! [m/s]
+    type(Var_Type) :: v    ! [m/s]
+    type(Var_Type) :: w    ! [m/s]
+    type(Var_Type) :: pot  ! potential for initial velocity field
 
     ! Mass and volumetric flux through cell faces:
     type(Face_Type) :: m_flux  ! [kg/s]
@@ -106,6 +108,7 @@
   include 'Field_Mod/Grad_Pressure.f90'
   include 'Field_Mod/Grad_Pressure_Correction.f90'
   include 'Field_Mod/Grad_Variable.f90'
+  include 'Field_Mod/Potential_Initialization.f90'
   include 'Field_Mod/Prandtl_Number.f90'
   include 'Field_Mod/Schmidt_Number.f90'
   include 'Field_Mod/U_Tan.f90'

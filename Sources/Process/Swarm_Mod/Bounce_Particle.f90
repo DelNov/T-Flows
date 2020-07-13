@@ -112,22 +112,41 @@
       f = (rx_nx_o + ry_ny_o + rz_nz_o) / (dx*nx + dy*ny + dz*nz)
 
       ! Finally, position of the impact can be computed
-      xi = part % x_o + f*dx
-      yi = part % y_o + f*dy
-      zi = part % z_o + f*dz
+      xi = part % x_o + f * dx
+      yi = part % y_o + f * dy
+      zi = part % z_o + f * dz
+
+      ! particles touch the wall when their center is one radius far from ...
+      ! ... wall this should correct for reflection behavior (HARD coded)
+      if(zi .le. 0.0) then
+        zi = zi + part % d / 2.0    ! for lower channel wall 
+      else
+        if(zi .ge. 2.0) then
+          zi = zi - part % d / 2.0  ! for upper wall
+        end if
+      end if
 
       !---------------------------------!
       !   The boundary cell is a wall   !
       !---------------------------------!
-      if(Grid_Mod_Bnd_Cond_Type(grid, c2) == WALL) then
+      if(Grid_Mod_Bnd_Cond_Type(grid, c2) == WALL .or.  & 
+         Grid_Mod_Bnd_Cond_Type(grid, c2) == WALLFL) then
 
-        ! Trap condition (deposition)
-        if(swarm % rst <= TINY .or. abs(vel_dot_n) <= 1.0e-3) then
+        ! Trap condition (deposition) >>> narrowed the tolerance  <<<
+        if(swarm % rst <= TINY .or. abs(vel_dot_n) <= 1.0e-4) then
           deposited = .true.
-          swarm % cnt_d = swarm % cnt_d + 1
-          print *, k, 'Particle is deposited at: ', xi, yi, zi, f
+          swarm % n_deposited(c2) = swarm % n_deposited(c2) + 1
+          print '(a,i6,a,1pe11.3,1pe11.3,1pe11.3,1pe11.3)',  &
+                ' # Particle ', k, ' deposited at  : ', xi, yi, zi, f
 
-        ! Reflection condition   !
+          ! Correct for 'last' computed particle position (HARD coded)!
+          if(part % z_n .le. 0.0) then
+            part % z_n = part % d / 2.0
+          else if(part % z_n .gt. 2.0) then
+            part % z_n = 2.0 - part % d / 2.0
+          end if
+
+        ! Reflection condition
         else
 
           ! Reflected velocity (https://tinyurl.com/y3dcx8sh)
@@ -151,10 +170,9 @@
           part % z_n = zi + (part % w * swarm % dt) * (1.0-f)
 
           ! Increasing the number of particle reflections
-          swarm % cnt_r = swarm % cnt_r + 1   ! to be engineered because ...
-                                              ! ... a single particle can ...
-                                              ! ... bounce several times.
-          print *, k, 'Particle is reflected from: ', xi, yi, zi, f, part % v
+          swarm % n_reflected(c2) = swarm % n_reflected(c2) + 1
+          ! debug: print '(a,i6,a,1pe11.3,1pe11.3,1pe11.3,1pe11.3)',  &
+          ! debug:       ' # Particle ', k, ' reflected from: ', xi, yi, zi, f
         end if  ! reflection condition
 
       end if  ! is it a wall
@@ -162,10 +180,12 @@
       !------------------------------------!
       !   The boundary cell is an outlet   !
       !------------------------------------!
-      if(Grid_Mod_Bnd_Cond_Type(grid, c2) == OUTFLOW) then
-        escaped =  .true.
-        swarm % cnt_e = swarm % cnt_e + 1
-        print *, k, 'Particle escaped from outlet at: ', xi, yi, zi, f
+      if(Grid_Mod_Bnd_Cond_Type(grid, c2) == OUTFLOW .or.  &
+         Grid_Mod_Bnd_Cond_Type(grid, c2) == CONVECT) then
+        escaped = .true.
+        swarm % n_escaped(c2) = swarm % n_escaped(c2) + 1
+        ! debug: print '(a,i6,a,1pe11.3,1pe11.3,1pe11.3,1pe11.3)',  &
+        ! debug:       ' # Particle ', k, ' escapted from : ', xi, yi, zi, f
       end if  ! it is an outflow
 
     end if  ! really crossed a boundary cell

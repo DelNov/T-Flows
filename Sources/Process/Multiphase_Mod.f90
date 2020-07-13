@@ -18,7 +18,6 @@
   use Comm_Mod
   use Bulk_Mod
   use Matrix_Mod
-  use Turb_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -86,34 +85,35 @@
     real                 :: add_mass_in, add_mass_out, vol_flux_avg
 
     ! User define parameters for vof
-    real              :: courant_max_param
-    integer           :: n_sub_param, corr_num_max
-    integer           :: n_conv_curv, n_conv_norm
+    real    :: courant_max_param
+    integer :: n_sub_param, corr_num_max
+    integer :: n_conv_curv, n_conv_norm
 
     ! User defined parameters for distance function
-    integer           :: t_dist_scheme
-    real              :: c_tau, c_eps
+    integer :: t_dist_scheme
+    real    :: c_tau, c_eps
 
     ! Time step and sub-relaxation coefficient for pressure correction equation
-    real              :: dt_corr, u_rel_corr
+    real :: dt_corr, u_rel_corr
 
     ! Averaging
     integer, allocatable  :: avg_cells(:,:)
 
     ! Switch calculation curvature at nodes or at cells
     logical           :: nodal_curvature
+
+    ! Variable holding the multiphase model
+    integer :: model
+
   end type
 
   !--------------------------------------------------------!
   !   Parameters and variables defining multiphase model   !
   !--------------------------------------------------------!
 
-  ! Variable holding the multiphase model
-  integer :: multiphase_model
-
   ! Parameters describing multiphase model choice
   ! (Prime numbers starting from 40000)
-  integer, parameter :: NONEM                  = 50021
+  integer, parameter :: NO_MULTIPHASE_MODEL   = 50021
   integer, parameter :: VOLUME_OF_FLUID       = 50023
   integer, parameter :: LAGRANGIAN_PARTICLES  = 50033
   integer, parameter :: EULER_EULER           = 50047
@@ -150,7 +150,6 @@
   include 'Multiphase_Mod/Vof_Momentum_Contribution.f90'
   include 'Multiphase_Mod/Vof_Nodal_Gradient.f90'
   include 'Multiphase_Mod/Vof_Open_Boundary.f90'
-  include 'Multiphase_Mod/Vof_Piso_Algorithm.f90'
   include 'Multiphase_Mod/Vof_Predict_Beta.f90'
   include 'Multiphase_Mod/Vof_Pressure_Correction.f90'
   include 'Multiphase_Mod/Vof_Scale_Residuals.f90'

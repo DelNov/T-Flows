@@ -141,6 +141,7 @@
     end do
 
     ! Faces step 1: on the boundaries of the buffers
+    ! (Note that faces are not stored here)
     do subo = 1, maxval(grid % comm % cell_proc(:))
       if(subo .ne. sub) then
 

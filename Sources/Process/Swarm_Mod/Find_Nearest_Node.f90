@@ -48,7 +48,6 @@
       min_dn = dn_sq  ! new minimum distance
       cn = n          ! cn is the closest node index
     end if
-
   end do
 
   part % node = cn

@@ -1,15 +1,13 @@
 !==============================================================================!
-  subroutine Turb_Mod_Init(turb, sol)
+  subroutine Turb_Mod_Init(turb)
 !------------------------------------------------------------------------------!
 !   Turbulence model initializations (at the beginning of a time step)         !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type)   :: turb
-  type(Solver_Type) :: sol
+  type(Turb_Type) :: turb
 !----------------------------------[Locals]------------------------------------!
-  type(Field_Type),  pointer :: flow
-  type(Grid_Type),   pointer :: grid
+  type(Field_Type), pointer :: flow
 !==============================================================================!
 
   ! Take aliases
@@ -29,7 +27,7 @@
      turb % model .eq. LES_WALE) then
     call Calculate_Shear_And_Vorticity(flow)
     if(turb % model .eq. LES_DYNAMIC) then
-      call Turb_Mod_Vis_T_Dynamic(turb, sol)
+      call Turb_Mod_Vis_T_Dynamic(turb)
     end if
     if(turb % model .eq. LES_WALE) then
       call Turb_Mod_Vis_T_Wale(turb)
@@ -39,7 +37,7 @@
 
   if(turb % model .eq. HYBRID_LES_RANS) then
     call Calculate_Shear_And_Vorticity(flow)
-    call Turb_Mod_Vis_T_Dynamic(turb, sol)
+    call Turb_Mod_Vis_T_Dynamic(turb)
     call Turb_Mod_Vis_T_Hybrid_Les_Rans(turb)
   end if
 

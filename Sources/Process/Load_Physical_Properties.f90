@@ -38,7 +38,7 @@
   call Control_Mod_Thermal_Conductivity(cond_const)
   call Control_Mod_Species_Diffusivity (flow % diffusivity)
 
-  if(multiphase_model .eq. VOLUME_OF_FLUID) then
+  if(mult % model .eq. VOLUME_OF_FLUID) then
     call Control_Mod_Phase_Densities     (mult % phase_dens)
     call Control_Mod_Phase_Viscosities   (mult % phase_visc)
     call Control_Mod_Phase_Capacities    (mult % phase_capa)

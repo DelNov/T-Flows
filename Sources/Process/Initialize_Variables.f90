@@ -414,7 +414,7 @@
   if(this_proc  < 2) then
     if(n_inflow .gt. 0) then
       print '(a29,es12.5)', ' # Mass inflow             : ', bulk % mass_in
-      if (multiphase_model .eq. VOLUME_OF_FLUID) then
+      if (mult % model .eq. VOLUME_OF_FLUID) then
         ! Needs to be corrected
         print '(a29,es12.5)', ' # Average inflow velocity : ',  &
           bulk % mass_in / (flow % density_f(1) * area)

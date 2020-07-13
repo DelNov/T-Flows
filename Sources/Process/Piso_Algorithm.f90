@@ -1,8 +1,11 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Vof_Piso_Algorithm(flow, turb, mult, sol,    &
-                                               mass_res, ini)
+  subroutine Piso_Algorithm(flow, turb, mult, sol, mass_res, ini)
 !------------------------------------------------------------------------------!
 !   PISO algorithm                                                             !
+!------------------------------------------------------------------------------!
+!----------------------------------[Modules]-----------------------------------!
+  use Field_Mod
+  use Turb_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Calling]------------------------------------!
@@ -55,7 +58,7 @@
       call Field_Mod_Grad_Pressure_Correction(flow, flow % pp)
       call Multiphase_Averaging(flow, mult, flow % p)
 
-      mass_res = Correct_Velocity(mult, sol, flow % dt, ini)
+      mass_res = Correct_Velocity(flow, mult, sol, flow % dt, ini)
       call Multiphase_Averaging(flow, mult, flow % u)
       call Multiphase_Averaging(flow, mult, flow % v)
       call Multiphase_Averaging(flow, mult, flow % w)

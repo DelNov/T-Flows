@@ -7,8 +7,7 @@
   use Field_Mod,      only: Field_Type, heat_transfer
   use Var_Mod,        only: Var_Type
   use Turb_Mod,       only: Turb_Type
-  use Multiphase_Mod, only: Multiphase_Type, multiphase_model,   &
-                            VOLUME_OF_FLUID
+  use Multiphase_Mod, only: Multiphase_Type, VOLUME_OF_FLUID
   use Control_Mod
   use Numerics_Mod
 !------------------------------------------------------------------------------!
@@ -84,7 +83,7 @@
   !--------------------------------!
   !   Related to multiphase flow   !
   !--------------------------------!
-  if(multiphase_model .eq. VOLUME_OF_FLUID) then
+  if(mult % model .eq. VOLUME_OF_FLUID) then
     mult % vof % urf   = 0.7
     mult % vof % niter = 5
     call Control_Mod_Advection_Scheme_For_Multiphase                  (name)

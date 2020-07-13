@@ -11,8 +11,6 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type), target :: turb
-!----------------------------------[Calling]-----------------------------------!
-  real Distance
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: grid
   type(Field_Type), pointer :: flow

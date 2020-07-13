@@ -9,7 +9,7 @@
   use Comm_Mod,       only: this_proc, Comm_Mod_End
   use Field_Mod,      only: Field_Type, heat_transfer
   use Turb_Mod
-  use Multiphase_Mod, only: Multiphase_Type, multiphase_model, VOLUME_OF_FLUID
+  use Multiphase_Mod, only: Multiphase_Type, VOLUME_OF_FLUID
   use Grid_Mod,       only: Grid_Type
   use Eddies_Mod
   use User_Mod
@@ -215,7 +215,7 @@
             end if
 
             ! Multiphase flow
-            if (multiphase_model .eq. VOLUME_OF_FLUID) then
+            if (mult % model .eq. VOLUME_OF_FLUID) then
               i = Key_Ind('VOF', keys, nks)
               if(i > 0) vof % bnd_cond_type(c) = bc_type_tag
               i = Key_Ind('VOF_C_ANG', keys, nks)
@@ -253,7 +253,7 @@
             end if
 
             ! Multiphase flow
-            if (multiphase_model .eq. VOLUME_OF_FLUID) then
+            if (mult % model .eq. VOLUME_OF_FLUID) then
               i = Key_Ind('VOF', keys, nks)
               if(i > 0) vof % b(c) = vals(i)
               i = Key_Ind('VOF_C_ANG', keys, nks)
@@ -765,7 +765,7 @@
         t % n(c) = t % b(c)
       end if
 
-      if (multiphase_model .eq. VOLUME_OF_FLUID) then
+      if (mult % model .eq. VOLUME_OF_FLUID) then
         vof % n(c) = vof % b(c)
       end if
 
