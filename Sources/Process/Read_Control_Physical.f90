@@ -240,6 +240,8 @@
     multiphase_model = NO_MULTIPHASE
   end if
 
+  call Control_Mod_Phase_Change(mult % phase_change)
+
   !-----------------------!
   !                       !
   !   Particle tracking   !

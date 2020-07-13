@@ -35,6 +35,7 @@ subroutine Multiphase_Mod_Vof_Find_Upstream_phi(phi, phi_x, phi_y, phi_z,  &
 
   min_phi =  HUGE
   max_phi = -HUGE
+
   do idonor = 1, grid % cells_n_faces(donor)
 
     ss = grid % cells_f(idonor, donor)
@@ -58,7 +59,7 @@ subroutine Multiphase_Mod_Vof_Find_Upstream_phi(phi, phi_x, phi_y, phi_z,  &
     signo = -1.0
   end if
 
-  du_orig = norm2((/dx(s),dy(s),dz(s)/))
+  du_orig = grid % d(s)
 
   dd = abs(dot_product((/dx(s),dy(s),dz(s)/),                       &
                        (/sx(s),sy(s),sz(s)/) / grid % s(s)))
@@ -73,7 +74,7 @@ subroutine Multiphase_Mod_Vof_Find_Upstream_phi(phi, phi_x, phi_y, phi_z,  &
     out_face = .true.
     loop_face: do n2 = 1, grid % faces_n_nodes(s)
       if (grid % cells_n(n1,donor) == grid % faces_n(n2,s)) then
-        n_nodes_c = n_nodes_c - 1 
+        n_nodes_c = n_nodes_c - 1
         out_face = .false.
         exit loop_face
       end if
@@ -81,11 +82,11 @@ subroutine Multiphase_Mod_Vof_Find_Upstream_phi(phi, phi_x, phi_y, phi_z,  &
 
     if (out_face) then  ! node doesn't belong to face s
       dotprod = dot_product(                                                 &
-                (/grid % xn(grid % cells_n(n1,donor)) - grid % xc(donor),    &
-                  grid % yn(grid % cells_n(n1,donor)) - grid % yc(donor),    &
-                  grid % zn(grid % cells_n(n1,donor)) - grid % zc(donor)/),  &
-                  (/sx(s),sy(s),sz(s)/) / grid % s(s) * signo) 
-      if (dotprod > 0.0) then
+                (/grid % xc(donor) - grid % xn(grid % cells_n(n1,donor)),    &
+                  grid % yc(donor) - grid % yn(grid % cells_n(n1,donor)),    &
+                  grid % zc(donor) - grid % zn(grid % cells_n(n1,donor))/),  &
+                  (/sx(s),sy(s),sz(s)/) / grid % s(s) * signo)
+      if (dotprod >= 0.0) then
         du_pred = du_pred + dotprod
       else
         n_nodes_c = n_nodes_c - 1

@@ -162,11 +162,13 @@
   call Comm_Mod_Global_Max_Real(vel_max)
 
   ! Old values (o) and older than old (oo)
-  if(ini .eq. 1) then
-    do c = 1, grid % n_cells
-      ui % oo(c) = ui % o(c)
-      ui % o (c) = ui % n(c)
-    end do
+  if (flow % piso_status .eqv. .false.) then
+    if(ini .eq. 1) then
+      do c = 1, grid % n_cells
+        ui % oo(c) = ui % o(c)
+        ui % o (c) = ui % n(c)
+      end do
+    end if
   end if
 
   !---------------!
@@ -315,7 +317,7 @@
   !   Surface tension contribution   !
   !----------------------------------!
   if(multiphase_model .eq. VOLUME_OF_FLUID) then
-    call Multiphase_Mod_Vof_Momentum_Contribution(mult, i, b)
+    call Multiphase_Mod_Vof_Momentum_Contribution(mult, sol, ui, i)
   end if
 
   !----------------------------------------!
@@ -337,27 +339,31 @@
   ! Under-relax the equations
   call Numerics_Mod_Under_Relax(ui, sol)
 
-  ! Call linear solver
-  call Cpu_Timer_Mod_Start('Linear_Solver_For_Momentum')
-  call Bicg(sol,           &
-            ui % n,        &
-            b,             &
-            ui % precond,  &
-            ui % niter,    &
-            exec_iter,     &
-            ui % tol,      &
-            ui % res,      &
-            norm = vel_max)
-  call Cpu_Timer_Mod_Stop('Linear_Solver_For_Momentum')
+  if(flow % piso_status .eqv. .false.) then
+    ! Call linear solver
+    call Cpu_Timer_Mod_Start('Linear_Solver_For_Momentum')
+    call Bicg(sol,           &
+              ui % n,        &
+              b,             &
+              ui % precond,  &
+              ui % niter,    &
+              exec_iter,     &
+              ui % tol,      &
+              ui % res,      &
+              norm = vel_max)
+    call Cpu_Timer_Mod_Stop('Linear_Solver_For_Momentum')
 
-  ! Fill the info screen up
-  call Info_Mod_Iter_Fill_At(1, i, ui % name, exec_iter, ui % res)
+    ! Fill the info screen up
+    if (flow % p_v_coupling == SIMPLE) then
+      call Info_Mod_Iter_Fill_At(1, i, ui % name, exec_iter, ui % res)
+    end if
 
-  call Grid_Mod_Exchange_Cells_Real(grid, ui % n)
+    call Grid_Mod_Exchange_Cells_Real(grid, ui % n)
 
-  ! User function
-  call User_Mod_End_Of_Compute_Momentum(flow, turb, mult, dt, ini)
+    ! User function
+    call User_Mod_End_Of_Compute_Momentum(flow, turb, mult, dt, ini)
 
-  call Cpu_Timer_Mod_Stop('Compute_Momentum (without solvers)')
+    call Cpu_Timer_Mod_Stop('Compute_Momentum (without solvers)')
+  end if
 
   end subroutine

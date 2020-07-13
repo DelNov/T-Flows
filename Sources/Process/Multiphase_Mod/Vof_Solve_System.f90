@@ -3,19 +3,41 @@
 !------------------------------------------------------------------------------!
 !   Solves linear system for VOF                                               !
 !------------------------------------------------------------------------------!
+  use Work_Mod,       only: neigh => r_cell_28
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Solver_Type),     target :: sol
   type(Multiphase_Type), target :: mult
   real, contiguous,      target :: b(:)
 !-----------------------------------[Locals]-----------------------------------!
+  type(Grid_Type),  pointer :: grid
   type(Var_Type),   pointer :: vof
+  type(Matrix_Type),pointer :: a
   character(len=80)         :: solver
   integer                   :: exec_iter
+  integer                   :: c, c1, c2, s
 !==============================================================================!
 
   ! Take aliases
+  grid => mult % pnt_grid
   vof => mult % vof
+  a   => sol % a
+
+  !! Sum of neighbours
+  !neigh = 0.0
+  !do s = grid % n_bnd_faces + 1, grid % n_faces
+  !  c1 = grid % faces_c(1,s)
+  !  c2 = grid % faces_c(2,s)
+  !  neigh(c1) = neigh(c1) - a % val(a % pos(1,s)) * vof % o(c2)
+  !  neigh(c2) = neigh(c2) - a % val(a % pos(2,s)) * vof % o(c1)
+  !end do
+  !call Grid_Mod_Exchange_Real(grid, neigh)
+
+  !! Solve velocity explicitely (no under relaxation!!)
+  !do c = 1, grid % n_cells
+  !  vof % n(c) = (neigh(c) + b(c)) / a % val(a % dia(c))
+  !end do
 
   ! Get solver
   call Control_Mod_Solver_For_Multiphase(solver)
@@ -31,6 +53,11 @@
           vof % res)
   call Cpu_Timer_Mod_Stop('Linear_Solver_For_Multiphase')
 
-  call Info_Mod_Iter_Fill_At(1, 6, vof % name, exec_iter, vof % res)
+  !PRINT *, 'VOF ITER ', exec_iter
+!  call Multiphase_Mod_Vof_Scale_Residuals(mult, sol, vof)
+
+  if (.not. mult % phase_change) then
+    call Info_Mod_Iter_Fill_At(1, 6, vof % name, exec_iter, vof % res)
+  end if
 
   end subroutine

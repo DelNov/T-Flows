@@ -16,6 +16,7 @@
   integer, parameter :: CONVECT  = 10061
   integer, parameter :: WALLFL   = 10067
   integer, parameter :: PRESSURE = 10069
+  integer, parameter :: OPENBC   = 10079
 
   !-------------------!
   !   Bnd_Cond type   !

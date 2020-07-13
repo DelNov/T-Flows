@@ -31,6 +31,7 @@
   allocate(grid % dx(nf+ns));  grid % dx = 0.0
   allocate(grid % dy(nf+ns));  grid % dy = 0.0
   allocate(grid % dz(nf+ns));  grid % dz = 0.0
+  allocate(grid % d(nf+ns));   grid % d = 0.0
 
   ! Face center coordinates
   allocate(grid % xf(nf+ns));  grid % xf = 0.0

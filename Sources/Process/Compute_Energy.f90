@@ -307,6 +307,18 @@
   ! Under-relax the equations
   call Numerics_Mod_Under_Relax(t, sol)
 
+  if (mult % phase_change) then
+    do c = 1, grid % n_cells
+      if (mult % ic(c) == 2) then
+        a % val(a % dia(c)) = HUGE
+        b(c) = HUGE * flow % sat_temperature
+        write(*,*) c, a % val(a % dia(c)), b(c), flow % sat_temperature, t % n(c), t % urf
+      else
+        b(c) = b(c) + mult % qci(c)
+      end if
+    end do
+  end if
+
   ! Call linear solver to solve the equations
   call Cpu_Timer_Mod_Start('Linear_Solver_For_Energy')
   call Bicg(sol,          &

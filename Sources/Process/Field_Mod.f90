@@ -22,6 +22,10 @@
 
     type(Grid_Type), pointer :: pnt_grid  ! grid for which it is defined
 
+    ! Pressure velocity coupling algorithm
+    integer :: p_v_coupling, i_corr, n_piso_corrections
+    logical :: piso_status
+
     ! Physical properties
     real, allocatable :: capacity(:)      ! [J/kg/K]
     real, allocatable :: conductivity(:)  ! [W/(m K)]
@@ -29,6 +33,8 @@
     real, allocatable :: viscosity(:)     ! [kg/m/s]
     real, allocatable :: density_f(:)     ! [kg/m^3]
     real              :: diffusivity      ! [m^2/s]
+    real              :: latent_heat      ! [J/kg]
+    real              :: sat_temperature  ! [K]
 
     ! Velocity components
     type(Var_Type) :: u  ! [m/s]

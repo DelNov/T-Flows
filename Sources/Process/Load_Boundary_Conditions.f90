@@ -169,6 +169,9 @@
       else if( bc_type_name .eq. 'PRESSURE') then
         bc_type_tag = PRESSURE
         grid % bnd_cond % type(bc) = PRESSURE
+      else if( bc_type_name .eq. 'OPENBC') then
+        bc_type_tag = OPENBC
+        grid % bnd_cond % type(bc) = OPENBC
       else
         if(this_proc < 2)  &
           print *, '# ERROR!  Load_Boundary_Conditions: '//        &

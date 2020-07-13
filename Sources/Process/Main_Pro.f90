@@ -120,7 +120,7 @@
   call Control_Mod_Switch_To_Root()
 
   ! Allocate memory for working arrays
-  call Work_Mod_Allocate(grid, rc=30, rf=6, rn=1, ic=4, if=6, in=1)
+  call Work_Mod_Allocate(grid, rc=30, rf=6, rn=12, ic=4, if=6, in=1)
 
   ! Get the number of time steps from the control file
   call Control_Mod_Number_Of_Time_Steps(last_dt, verbose=.true.)
@@ -175,9 +175,21 @@
     ! Initialize variables
     if(.not. backup(d)) then
       call Initialize_Variables(flow(d), turb(d), mult(d), swarm(d))
-      if(multiphase_model .eq. VOLUME_OF_FLUID) then
-        call Multiphase_Mod_Update_Physical_Properties(mult(d))
+    end if
+
+    if(multiphase_model .eq. VOLUME_OF_FLUID) then
+      if (backup(d))  then
+        flow % piso_status = .false.
       end if
+      call Multiphase_Mod_Update_Physical_Properties(mult(d), backup(d))
+      call Multiphase_Mod_Vof_Find_Weight_Faces(grid(d))
+      call Multiphase_Mod_Vof_Find_Weight_Cells_To_Nodes(grid(d))
+      call Multiphase_Mod_Vof_Find_Weight_Nodes_To_Cells(grid(d))
+      call Multiphase_Mod_Vof_Find_Weight_Grad_From_Nodes(grid(d))
+      call Multiphase_Mod_Vof_Find_Weight_Nodal_Grad(grid(d))
+    else
+      mult % dt_corr    = HUGE
+      mult % u_rel_corr = 1.0
     end if
 
     ! Initialize monitoring points
@@ -278,6 +290,7 @@
         ! Update the values at boundaries
         call Update_Boundary_Values(flow(d), turb(d), mult(d))
         call Multiphase_Mod_Compute_Vof(mult(d), sol(d), flow(d) % dt, n)
+        call Multiphase_Averaging(flow(d), mult(d), mult(d) % vof)
       else
         flow(d) % m_flux % o = flow(d) % m_flux % n
       end if
@@ -310,6 +323,8 @@
                                      flow(d) % density,     &
                                      grav_x, grav_y, grav_z)
 
+        !call Multiphase_Mod_Vof_Open_Boundary(flow(d), mult(d))
+
         ! Compute velocity gradients
         call Field_Mod_Grad_Variable(flow(d), flow(d) % u)
         call Field_Mod_Grad_Variable(flow(d), flow(d) % v)
@@ -327,13 +342,22 @@
         ! (Can this call be somewhere in Compute Pressure?)
         call Grid_Mod_Exchange_Cells_Real(grid(d), sol(d) % a % sav)
 
-        call Balance_Mass(flow(d))
+       ! call Multiphase_Mod_Vof_Open_Boundary(flow(d), mult(d))
+
+        call Balance_Mass(flow(d), mult(d))
         call Compute_Pressure(flow(d), mult(d), sol(d), flow(d) % dt, ini)
 
         call Field_Mod_Grad_Pressure_Correction(flow(d), flow(d) % pp)
 
+        call Multiphase_Averaging(flow(d), mult(d), flow(d) % p)
         call Field_Mod_Calculate_Fluxes(flow(d), flow(d) % m_flux % n)
-        mass_res(d) = Correct_Velocity(flow(d), sol(d), flow(d) % dt, ini)
+        mass_res(d) = Correct_Velocity(mult(d), sol(d), flow(d) % dt, ini)
+
+        call Multiphase_Averaging(flow(d), mult(d), flow(d) % u)
+        call Multiphase_Averaging(flow(d), mult(d), flow(d) % v)
+        call Multiphase_Averaging(flow(d), mult(d), flow(d) % w)
+        call Multiphase_Mod_Vof_Piso_Algorithm(flow(d), turb(d), mult(d),    &
+                                               sol(d), mass_res(d), ini)
 
         ! Energy (practically temperature)
         if(heat_transfer) then

@@ -77,12 +77,14 @@
   integer, allocatable :: i_face_27(:), i_face_28(:), i_face_29(:)
   integer, allocatable :: i_face_30(:)
 
-  ! Real; 01 - 08
+  ! Real; 01 - 12
   real, allocatable :: r_node_01(:), r_node_02(:), r_node_03(:), r_node_04(:)
   real, allocatable :: r_node_05(:), r_node_06(:), r_node_07(:), r_node_08(:)
-  ! Integer; 01 - 08
+  real, allocatable :: r_node_09(:), r_node_10(:), r_node_11(:), r_node_12(:)
+  ! Integer; 01 - 12
   integer, allocatable :: i_node_01(:), i_node_02(:), i_node_03(:), i_node_04(:)
   integer, allocatable :: i_node_05(:), i_node_06(:), i_node_07(:), i_node_08(:)
+  integer, allocatable :: i_node_09(:), i_node_10(:), i_node_11(:), i_node_12(:)
 
   contains
 

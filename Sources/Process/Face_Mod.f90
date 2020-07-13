@@ -13,10 +13,11 @@
 
     type(Grid_Type), pointer :: pnt_grid  ! grid for which it is defined
 
-    character(len=4)  :: name          ! variable name, always
-                                       ! uppercase and very short
-    real, allocatable :: n(:)          ! new value
-    real, allocatable :: o(:), oo(:)   ! old and older then old
+    character(len=4)  :: name           ! variable name, always
+                                        ! uppercase and very short
+    real, allocatable :: n(:)           ! new value
+    real, allocatable :: avg(:), star(:)! average guessed value, guessed value
+    real, allocatable :: o(:), oo(:)    ! old and older then old
   end type
 
   contains

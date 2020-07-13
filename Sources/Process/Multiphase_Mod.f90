@@ -18,6 +18,7 @@
   use Comm_Mod
   use Bulk_Mod
   use Matrix_Mod
+  use Turb_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -44,15 +45,45 @@
 
     ! Physical properties in case of multiphase flow
     real, allocatable :: phase_visc(:), phase_dens(:)
+    real, allocatable :: phase_capa(:), phase_cond(:)
     real              :: surface_tension
+
+    ! Phase change
+    real              :: m_d, m_ini, m_s, m_s_acc
+    logical           :: phase_change
+
+    ! Skewness correction
+    logical           :: skew_corr
+
+    ! Temporal correction for pressure
+    logical           :: temp_corr
 
     ! For calculation of distance function
     logical           :: d_func
+
+    ! For phase change
+    real              :: t_sat, latent_heat  ![K, J/kg]
+
+    ! Surface force (at faces)
+    real, allocatable :: fs_x(:)
+    real, allocatable :: fs_y(:)
+    real, allocatable :: fs_z(:)
+
+    ! Surface force (at cells)
+    real, allocatable :: fc_x(:)
+    real, allocatable :: fc_y(:)
+    real, allocatable :: fc_z(:)
 
     ! Body force
     real, allocatable :: body_fx(:)
     real, allocatable :: body_fy(:)
     real, allocatable :: body_fz(:)
+
+    ! heat from phase change and index of saturated cells
+    real, allocatable    :: qci(:)
+    real, allocatable    :: flux_rate(:)
+    integer, allocatable :: ic(:)
+    real                 :: add_mass_in, add_mass_out, vol_flux_avg
 
     ! User define parameters for vof
     real              :: courant_max_param
@@ -62,6 +93,15 @@
     ! User defined parameters for distance function
     integer           :: t_dist_scheme
     real              :: c_tau, c_eps
+
+    ! Time step and sub-relaxation coefficient for pressure correction equation
+    real              :: dt_corr, u_rel_corr
+
+    ! Averaging
+    integer, allocatable  :: avg_cells(:,:)
+
+    ! Switch calculation curvature at nodes or at cells
+    logical           :: nodal_curvature
   end type
 
   !--------------------------------------------------------!
@@ -73,7 +113,7 @@
 
   ! Parameters describing multiphase model choice
   ! (Prime numbers starting from 40000)
-  integer, parameter :: NONE                  = 50021
+  integer, parameter :: NONEM                  = 50021
   integer, parameter :: VOLUME_OF_FLUID       = 50023
   integer, parameter :: LAGRANGIAN_PARTICLES  = 50033
   integer, parameter :: EULER_EULER           = 50047
@@ -84,17 +124,43 @@
   include 'Multiphase_Mod/Allocate.f90'
   include 'Multiphase_Mod/Compute_Distance_Function.f90'
   include 'Multiphase_Mod/Compute_Vof.f90'
+  include 'Multiphase_Mod/Vof_Averaging.f90'
+  include 'Multiphase_Mod/Vof_Boundary_Extrapolation.f90'
   include 'Multiphase_Mod/Vof_Coefficients.f90'
   include 'Multiphase_Mod/Vof_Correct_Beta.f90'
+  include 'Multiphase_Mod/Vof_Curvature_Csf.f90'
+  include 'Multiphase_Mod/Vof_Curvature_Nodal.f90'
   include 'Multiphase_Mod/Vof_Find_Upstream_Phi.f90'
+  include 'Multiphase_Mod/Vof_Find_Weight_Cells_To_Nodes.f90'
+  include 'Multiphase_Mod/Vof_Find_Weight_Faces.f90'
+  include 'Multiphase_Mod/Vof_Find_Weight_Grad_From_Nodes.f90'
+  include 'Multiphase_Mod/Vof_Find_Weight_Nodal_Grad.f90'
+  include 'Multiphase_Mod/Vof_Find_Weight_Nodes_To_Cells.f90'
+  include 'Multiphase_Mod/Vof_Grad_Component.f90'
+  include 'Multiphase_Mod/Vof_Gradient_At_Nodes.f90'
+  include 'Multiphase_Mod/Vof_Gravity_Term.f90'
   include 'Multiphase_Mod/Vof_Heavyside_Function.f90'
-  include 'Multiphase_Mod/Vof_Predict_Beta.f90'
-  include 'Multiphase_Mod/Vof_Pressure_Correction.f90'
+  include 'Multiphase_Mod/Vof_Interpolate_Cells_Nodes.f90'
+  include 'Multiphase_Mod/Vof_Interpolate_Faces_Cells.f90'
+  include 'Multiphase_Mod/Vof_Interpolate_Nodes_Cells.f90'
+  include 'Multiphase_Mod/Vof_Limit_Scalar.f90'
+  include 'Multiphase_Mod/Vof_Mass_Transfer.f90'
+  include 'Multiphase_Mod/Vof_Mass_Transfer_Rate_In.f90'
   include 'Multiphase_Mod/Vof_Max_Courant_Number.f90'
   include 'Multiphase_Mod/Vof_Momentum_Contribution.f90'
+  include 'Multiphase_Mod/Vof_Nodal_Gradient.f90'
+  include 'Multiphase_Mod/Vof_Open_Boundary.f90'
+  include 'Multiphase_Mod/Vof_Piso_Algorithm.f90'
+  include 'Multiphase_Mod/Vof_Predict_Beta.f90'
+  include 'Multiphase_Mod/Vof_Pressure_Correction.f90'
+  include 'Multiphase_Mod/Vof_Scale_Residuals.f90'
+  include 'Multiphase_Mod/Vof_Skewness_Correction.f90'
+  include 'Multiphase_Mod/Vof_Smooth_Scalar.f90'
+  include 'Multiphase_Mod/Vof_Smooth_Curvature.f90'
   include 'Multiphase_Mod/Vof_Solve_System.f90'
   include 'Multiphase_Mod/Vof_Solver_Dist_Function_Cell_Loop.f90'
   include 'Multiphase_Mod/Vof_Surface_Tension_Contribution.f90'
+  include 'Multiphase_Mod/Vof_Surface_Tension_Contribution_Nodal.f90'
   include 'Multiphase_Mod/Update_Physical_Properties.f90'
 
   end module

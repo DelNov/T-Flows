@@ -20,7 +20,9 @@
   allocate (phi % n(grid % n_faces));  phi % n = 0.0
 
   ! Values in old (o) and older than old (oo) time step
-  allocate (phi % o (grid % n_faces));  phi % o  = 0.0
-  allocate (phi % oo(grid % n_faces));  phi % oo = 0.0
+  allocate (phi % o (grid % n_faces));   phi % o    = 0.0
+  allocate (phi % oo(grid % n_faces));   phi % oo   = 0.0
+  allocate (phi % avg(grid % n_faces));  phi % avg  = 0.0
+  allocate (phi % star(grid % n_faces)); phi % star = 0.0
 
   end subroutine

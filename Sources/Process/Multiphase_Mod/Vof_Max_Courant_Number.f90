@@ -29,82 +29,103 @@
   grid     => flow % pnt_grid
   vof      => mult % vof
 
-  courant_max = 0.0
+  courant_max = -HUGE
 
   ! Initialize
   c_d(-mult % pnt_grid % n_bnd_cells:mult % pnt_grid % n_cells) = 0.0
 
   if (interf == 1) then
 
-    do s = 1, grid % n_faces
+    ! At boundaries
+    do s = 1, grid % n_bnd_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
 
-      if (c2 > 0) then
+      vof_dist = min(max(vof % n(c1), 0.0),1.0)
 
-        vof_dist = min(max(vof % n(c1), 0.0),1.0)
+      vof_dist = (1.0 - vof_dist) * (1.0 - vof_dist)            &
+                                  * vof_dist * vof_dist * 16.0
 
-        vof_dist = (1.0 - vof_dist) * (1.0 - vof_dist)            &
-                                    * vof_dist * vof_dist * 16.0
+      c_d(c1) = c_d(c1) + vof_dist * max(- m_flux % n(s)              &
+                                         / flow % density_f(s)        &
+                                         * dt / grid % vol(c1), 0.0)
+    end do
 
-        c_d(c1) = c_d(c1) + vof_dist * max(- m_flux % n(s)              &
-                                           / flow % density_f(s)        &
-                                           * dt / grid % vol(c1), 0.0)
+    ! Interior cells
+    do s = grid % n_bnd_faces + 1, grid % n_faces
+      c1 = grid % faces_c(1,s)
+      c2 = grid % faces_c(2,s)
 
-        vof_dist = min(max(vof % n(c2), 0.0),1.0)
+      vof_dist = min(max(vof % n(c1), 0.0),1.0)
 
-        vof_dist = (1.0 - vof_dist) * (1.0 - vof_dist)            &
-                                    * vof_dist * vof_dist * 16.0
+      vof_dist = (1.0 - vof_dist) * (1.0 - vof_dist)            &
+                                  * vof_dist * vof_dist * 16.0
 
-        c_d(c2) = c_d(c2) + vof_dist * max( m_flux % n(s)              &
-                                          / flow % density_f(s)        &
-                                          * dt / grid % vol(c2), 0.0)
+      c_d(c1) = c_d(c1) + vof_dist * max(- m_flux % n(s)              &
+                                         / flow % density_f(s)        &
+                                         * dt / grid % vol(c1), 0.0)
 
-      ! Side is on the boundary
-      else ! (c2 < 0)
-        vof_dist = min(max(vof % n(c1), 0.0),1.0)
+      vof_dist = min(max(vof % n(c2), 0.0),1.0)
 
-        vof_dist = (1.0 - vof_dist) * (1.0 - vof_dist)            &
-                                    * vof_dist * vof_dist * 16.0
+      vof_dist = (1.0 - vof_dist) * (1.0 - vof_dist)            &
+                                  * vof_dist * vof_dist * 16.0
 
-        c_d(c1) = c_d(c1) + vof_dist * max(- m_flux % n(s)              &
-                                           / flow % density_f(s)        &
-                                           * dt / grid % vol(c1), 0.0)
-      end if
+      c_d(c2) = c_d(c2) + vof_dist * max( m_flux % n(s)              &
+                                        / flow % density_f(s)        &
+                                        * dt / grid % vol(c2), 0.0)
 
     end do
+
+    !if (mult % phase_Change) then
+    !  do c = 1, grid % n_cells
+    !    vof_dist = min(max(vof % n(c1), 0.0),1.0)
+
+    !    vof_dist = (1.0 - vof_dist) * (1.0 - vof_dist)            &
+    !                                * vof_dist * vof_dist * 16.0
+
+    !    c_d(c) = c_d(c) + vof_dist * mult % flux_rate(c)    &
+    !                               / flow % density_f(s) * dt
+    !  end do
+    !end if
+
+    call Grid_Mod_Exchange_Cells_Real(grid, c_d)
 
     do c = 1, grid % n_cells
       courant_max = max(c_d(c), courant_max)
     end do
+    call Comm_Mod_Global_Max_Real(courant_max)
 
   else
 
-    do s = 1, grid % n_faces
+    ! At boundaries
+    do s = 1, grid % n_bnd_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
 
-      if (c2 > 0) then
+      c_d(c1) = c_d(c1) + max(- m_flux % n(s) / flow % density_f(s)  &
+                                        * dt / grid % vol(c1), 0.0)
+    end do
 
-        c_d(c1) = c_d(c1) + max(- m_flux % n(s) / flow % density_f(s)  &
-                                          * dt / grid % vol(c1), 0.0)
+    ! At interior faces
+    do s = grid % n_bnd_faces + 1, grid % n_faces
+      c1 = grid % faces_c(1,s)
+      c2 = grid % faces_c(2,s)
 
-        c_d(c2) = c_d(c2) + max( m_flux % n(s) / flow % density_f(s)   &
-                                          * dt / grid % vol(c2), 0.0)
+      c_d(c1) = c_d(c1) + max(- m_flux % n(s) / flow % density_f(s)  &
+                                        * dt / grid % vol(c1), 0.0)
 
-      ! Side is on the boundary
-      else ! (c2 < 0)
-
-        c_d(c1) = c_d(c1) + max(- m_flux % n(s) / flow % density_f(s)  &
-                                          * dt / grid % vol(c1), 0.0)
-
-      end if
+      c_d(c2) = c_d(c2) + max( m_flux % n(s) / flow % density_f(s)   &
+                                        * dt / grid % vol(c2), 0.0)
 
     end do
 
-  end if
+    !if (mult % phase_Change) then
+    !  do c = 1, grid % n_cells
+    !    c_d(c) = c_d(c) + mult % flux_rate(c) / flow % density_f(s) * dt
+    !  end do
+    !end if
 
-  call Comm_Mod_Global_Max_Real(courant_max)
-  call Grid_Mod_Exchange_Cells_Real(grid, c_d)
+    call Grid_Mod_Exchange_Cells_Real(grid, c_d)
+  end if
 
   end subroutine

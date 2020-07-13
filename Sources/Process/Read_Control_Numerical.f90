@@ -18,10 +18,22 @@
   type(Turb_Type),       target :: turb
   type(Multiphase_Type), target :: mult
 !----------------------------------[Locals]------------------------------------!
+  type(Grid_Type),  pointer :: grid
   type(Var_Type),   pointer :: tq, ui, phi
   character(len=80)         :: name
   integer                   :: i, sc
 !==============================================================================!
+
+  ! Take alias
+  grid => flow % pnt_grid
+
+  !-------------------------------------------!
+  !   Pressure velocity coupling algorithm   !
+  !-------------------------------------------!
+  call Control_Mod_Pressure_Velocity_Coupling_Algorithm(name)
+  call Control_Mod_Number_Of_Piso_Corrections(flow % n_piso_corrections)
+  flow % p_v_coupling = Numerics_Mod_Pressure_Velocity_Coupling(name)
+  flow % piso_status = .false.
 
   !-------------------------!
   !   Related to momentum   !
@@ -92,6 +104,12 @@
     ! Max number convolution/smoothing steps for curvature and normal
     call Control_Mod_Max_Smoothing_Cycles_Curvature_Vof(mult % n_conv_curv)
     call Control_Mod_Max_Smoothing_Cycles_Normal_Vof(mult % n_conv_norm)
+    ! Nodal Curvature
+    call Control_Mod_Nodal_Curvature(mult % nodal_curvature)
+    ! Temporal correction for pressure
+    call Control_Mod_Temporal_Pressure_Correction_Vof(mult % temp_corr)
+    ! Skewness Correction
+    call Control_Mod_Skewness_Correction_Vof(mult % skew_corr)
     ! Parameters for distance function
     call Control_Mod_Factor_Fictitious_Time_Vof(mult % c_tau)
     call Control_Mod_Factor_Number_Cells_Distance_Function_Vof(mult % c_eps)

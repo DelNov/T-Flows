@@ -94,9 +94,9 @@
   call Comm_Mod_Global_Sum_Real(dens_are_x)
   call Comm_Mod_Global_Sum_Real(dens_are_y)
   call Comm_Mod_Global_Sum_Real(dens_are_z)
-  dens_avg_x = dens_are_x / bulk % area_x
-  dens_avg_y = dens_are_y / bulk % area_y
-  dens_avg_z = dens_are_z / bulk % area_z
+  dens_avg_x = dens_are_x / (bulk % area_x + NANO)
+  dens_avg_y = dens_are_y / (bulk % area_y + NANO)
+  dens_avg_z = dens_are_z / (bulk % area_z + NANO)
 
   call Comm_Mod_Global_Sum_Real(bulk % flux_x)
   call Comm_Mod_Global_Sum_Real(bulk % flux_y)

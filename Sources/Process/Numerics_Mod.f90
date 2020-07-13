@@ -20,6 +20,10 @@
   implicit none
 !==============================================================================!
 
+  ! Algorithms for pressure velocity coupling
+  integer, parameter :: SIMPLE    = 20011
+  integer, parameter :: PISO      = 20013
+
   ! Parameters for advection scheme
   integer, parameter :: UPWIND    = 40009
   integer, parameter :: CENTRAL   = 40013
@@ -46,6 +50,7 @@
   include 'Numerics_Mod/Advection_Term.f90'
   include 'Numerics_Mod/Advection_Min_Max.f90'
   include 'Numerics_Mod/Inertial_Term.f90'
+  include 'Numerics_Mod/Pressure_Velocity_Coupling.f90'
   include 'Numerics_Mod/Time_Integration_Scheme_Code.f90'
   include 'Numerics_Mod/Under_Relax.f90'
 

@@ -33,8 +33,20 @@
 
   allocate(mult % curv(-nb:nc));  mult % curv(-nb:nc) = 0.0
 
+  allocate(mult % fc_x(-nb:nc));  mult % fc_x(-nb:nc) = 0.0
+  allocate(mult % fc_y(-nb:nc));  mult % fc_y(-nb:nc) = 0.0
+  allocate(mult % fc_z(-nb:nc));  mult % fc_z(-nb:nc) = 0.0
+
+  if (mult % phase_change) then
+    allocate(mult % qci      (-nb:nc));  mult % qci      (-nb:nc) = 0.0
+    allocate(mult % ic       (-nb:nc));  mult % ic       (-nb:nc) = 0
+    allocate(mult % flux_rate(-nb:nc));  mult % flux_rate(-nb:nc) = 0.0
+  end if
+
   ! Physical properties for all (two) phases
   allocate(mult % phase_dens(2))
   allocate(mult % phase_visc(2))
+  allocate(mult % phase_capa(2))
+  allocate(mult % phase_cond(2))
 
   end subroutine

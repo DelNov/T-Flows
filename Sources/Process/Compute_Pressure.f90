@@ -33,6 +33,7 @@
   type(Face_Type),   pointer :: flux            ! mass or volume flux
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
+  real,              pointer :: u_relax
   integer                    :: s, c, c1, c2, exec_iter
   real                       :: u_f, v_f, w_f, a12, fs
   real                       :: mass_err
@@ -65,13 +66,14 @@
   call Cpu_Timer_Mod_Start('Compute_Pressure (without solvers)')
 
   ! Take aliases
-  grid => flow % pnt_grid
-  bulk => flow % bulk
-  flux => flow % m_flux
-  p    => flow % p
-  pp   => flow % pp
-  a    => sol % a
-  b    => sol % b % val
+  grid    => flow % pnt_grid
+  bulk    => flow % bulk
+  flux    => flow % m_flux
+  p       => flow % p
+  pp      => flow % pp
+  a       => sol % a
+  b       => sol % b % val
+  u_relax => mult % u_rel_corr
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! User function
@@ -107,7 +109,7 @@
   !-----------------------------------------!
   !   Initialize the pressure corrections   !
   !-----------------------------------------!
-  pp % n = 0.0 
+  pp % n = 0.0
 
   !----------------------------!
   !   Initialize dens_factor   !
@@ -132,15 +134,16 @@
     ! Face is inside the domain
     if(c2 > 0) then
 
-      ! Interpolate velocity 
+      ! Interpolate velocity
       u_f = fs * u % n(c1) + (1.0 - fs) * u % n(c2)
       v_f = fs * v % n(c1) + (1.0 - fs) * v % n(c2)
       w_f = fs * w % n(c1) + (1.0 - fs) * w % n(c2)
 
       ! Calculate coeficients for the system matrix
-      a12 = 0.5 * dens_factor(s) * a % fc(s)        &
-                * ( grid % vol(c1) / a % sav(c1)    &
-                  + grid % vol(c2) / a % sav(c2) )
+      a12 = u_relax * 0.5 * dens_factor(s) * a % fc(s)   &
+                    * ( grid % vol(c1) / a % sav(c1)     &
+                      + grid % vol(c2) / a % sav(c2) )
+
       a % val(a % pos(1,s)) = -a12
       a % val(a % pos(2,s)) = -a12
       a % val(a % dia(c1))  = a % val(a % dia(c1)) +  a12
@@ -156,7 +159,7 @@
       flux % n(s) = dens_factor(s) * ( u_f * grid % sx(s)     &
                                      + v_f * grid % sy(s)     &
                                      + w_f * grid % sz(s) )   &
-                    + a12 * (p % n(c1) - p % n(c2))             &
+                    + a12 * (p % n(c1) - p % n(c2))           &
                     + a12 * (px_f + py_f + pz_f)
 
       b(c1) = b(c1) - flux % n(s)
@@ -176,12 +179,12 @@
         b(c1) = b(c1) - flux % n(s)
       else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW .or.   &
               Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) then
-        u_f = u % n(c2)
-        v_f = v % n(c2)
-        w_f = w % n(c2)
-        flux % n(s) = dens_factor(s) * ( u_f * grid % sx(s)     &
-                                       + v_f * grid % sy(s)     &
-                                       + w_f * grid % sz(s) )
+        !u_f = u % n(c2)
+        !v_f = v % n(c2)
+        !w_f = w % n(c2)
+        !flux % n(s) = dens_factor(s) * ( u_f * grid % sx(s)     &
+        !                               + v_f * grid % sy(s)     &
+        !                               + w_f * grid % sz(s) )
 
         b(c1) = b(c1) - flux % n(s)
 
@@ -201,9 +204,16 @@
         a12 = dens_factor(s) * a % fc(s) * grid % vol(c1) / a % sav(c1)
         a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
 
+      else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OPENBC) then
+
+        b(c1) = b(c1) - flux % n(s)
+
+        a12 = dens_factor(s) * a % fc(s) * grid % vol(c1) / a % sav(c1)
+        a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
       else  ! it is SYMMETRY
         flux % n(s) = 0.0
       end if
+
     end if
 
   end do
@@ -213,13 +223,15 @@
   !-------------------------------------------------------------!
 
   if(multiphase_model .eq. VOLUME_OF_FLUID) then
-    call Multiphase_Mod_Vof_Pressure_Correction(mult, sol)
+    call Multiphase_Mod_Vof_Pressure_Correction(mult, sol, ini, mass_err)
   end if
 
-  mass_err = 0.0
-  do c = 1, grid % n_cells
-    mass_err = max(mass_err, abs(b(c)))
-  end do
+  if (flow % p_v_coupling == SIMPLE) then
+    mass_err = 0.0
+    do c = 1, grid % n_cells
+      mass_err = max(mass_err, abs(b(c)))
+    end do
+  end if
 
   ! Get solver
   call Control_Mod_Solver_For_Pressure(solver)
@@ -249,7 +261,13 @@
   end if
   call Cpu_Timer_Mod_Stop('Linear_Solver_For_Pressure')
 
-  call Info_Mod_Iter_Fill_At(1, 4, pp % name, exec_iter, pp % res)
+  if (flow % p_v_coupling == SIMPLE) then
+    call Info_Mod_Iter_Fill_At(1, 4, pp % name, exec_iter, pp % res)
+  else
+    if (flow % i_corr == flow % n_piso_corrections) then
+      call Info_Mod_Iter_Fill_At(1, 4, pp % name, exec_iter, pp % res)
+    end if
+  end if
 
   !-------------------------------!
   !   Update the pressure field   !

@@ -340,6 +340,15 @@
       call Save_Scalar_Real(grid, "VolumeFraction", plot_inside,        &
                                   mult % vof % n(-grid % n_bnd_cells),  &
                                   f8, f9, data_offset, run)
+      call Save_Scalar_Real(grid, "Curvature ", plot_inside,        &
+                                  mult % vof % oo(-grid % n_bnd_cells),  &
+                                  f8, f9, data_offset, run)
+      if (allocated(mult % flux_rate)) then
+        call Save_Scalar_Real(grid, "Flux_rate ", plot_inside,        &
+                                    mult % flux_rate(-grid % n_bnd_cells),  &
+                                    f8, f9, data_offset, run)
+      end if
+
       if (mult % d_func) then
         call Save_Scalar_Real(grid, "DistanceFunction", plot_inside,    &
                                     mult % dist_func                    &

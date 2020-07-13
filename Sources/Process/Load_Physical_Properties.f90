@@ -41,9 +41,11 @@
   if(multiphase_model .eq. VOLUME_OF_FLUID) then
     call Control_Mod_Phase_Densities     (mult % phase_dens)
     call Control_Mod_Phase_Viscosities   (mult % phase_visc)
-!   call Control_Mod_Phase_Capacities    (phase_capa)
-!   call Control_Mod_Phase_Conductivities(phase_cond)
+    call Control_Mod_Phase_Capacities    (mult % phase_capa)
+    call Control_Mod_Phase_Conductivities(mult % phase_cond)
     call Control_Mod_Surface_Tension     (mult % surface_tension)
+    call Control_Mod_Latent_Heat(flow % latent_heat)
+    call Control_Mod_Saturation_Temperature(flow % sat_temperature)
   else
     flow % density     (:) = dens_const
     flow % viscosity   (:) = visc_const

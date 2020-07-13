@@ -1,31 +1,44 @@
   !============================================================================!
-    subroutine Multiphase_Mod_Vof_Momentum_Contribution(mult, i, b)
+    subroutine Multiphase_Mod_Vof_Momentum_Contribution(mult, sol, ui, i)
   !----------------------------------------------------------------------------!
-  !   Computes Surface tension and Gravity sources for Momentum Equation if    !
-  !   a two-phase flow calculation is performed.                               !
+  !   Computes Surface tension, Gravity and phase change sources for Momentum  !
+  !   Equation if a two-phase flow calculation is performed. Additionally and  !
+  !   for the moment, PISO calculations are run here                           !
+  !----------------------------------------------------------------------------!
+  !--------------------------------[Modules]-----------------------------------!
+    use Work_Mod,             only: neigh       => r_cell_12,   &
+                                      res       => r_cell_13
   !----------------------------------------------------------------------------!
     implicit none
   !---------------------------------[Arguments]--------------------------------!
     type(Multiphase_Type), target :: mult
-    real,                  target :: b(:)
+    type(Solver_Type),     target :: sol
+    type(Var_Type),        target :: ui
     integer                       :: i
   !-----------------------------------[Locals]---------------------------------!
     type(Field_Type), pointer :: flow
     type(Grid_Type),  pointer :: grid
     type(Var_Type),   pointer :: vof
-    integer                   :: s, c, c1, c2
-    real                      :: dotprod, epsloc
+    type(Face_Type),  pointer :: m_flux
+    type(Matrix_Type),pointer :: a
+    real, contiguous, pointer :: b(:)
+    integer                   :: s, c, c1, c2, nt, ni
+    real                      :: dotprod, epsloc, fs
     real,             pointer :: si(:), sj(:), sk(:)
     real                      :: corr_x, corr_y, corr_z
+    real                      :: u_f, v_f, w_f
   !============================================================================!
 
     ! Take aliases
     flow   => mult % pnt_flow
     grid   => mult % pnt_grid
     vof    => mult % vof
+    m_flux => flow % m_flux
     si     => grid % sx
     sj     => grid % sy
     sk     => grid % sz
+    a      => sol % a
+    b      => sol % b % val
 
     epsloc = epsilon(epsloc)
 
@@ -35,21 +48,24 @@
       select case(i)
         case(1)
           do c = 1, grid % n_cells
-            b(c) = b(c) + mult % surface_tension * mult % curv(c)     &
-                                                 * vof % x(c)         &
-                                                 * grid % vol(c)
-          end do
+            b(c) = b(c) + mult % surface_tension                               &
+                        * mult % curv(c)                                       &
+                        * vof % x(c)                                           &
+                        * grid % vol(c)
+           end do
         case(2)
           do c = 1, grid % n_cells
-            b(c) = b(c) + mult % surface_tension * mult % curv(c)     &
-                                                 * vof % y(c)         &
-                                                 * grid % vol(c)
+            b(c) = b(c) + mult % surface_tension                               &
+                        * mult % curv(c)                                       &
+                        * vof % y(c)                                           &
+                        * grid % vol(c)
           end do
         case(3)
           do c = 1, grid % n_cells
-            b(c) = b(c) + mult % surface_tension * mult % curv(c)     &
-                                                 * vof % z(c)         &
-                                                 * grid % vol(c)
+            b(c) = b(c) + mult % surface_tension                               &
+                        * mult % curv(c)                                       &
+                        * vof % z(c)                                           &
+                        * grid % vol(c)
           end do
 
       end select
@@ -63,73 +79,79 @@
 
         case(1)
 
-          if( .not. allocated(mult % body_fx)) then
-            allocate(mult % body_fx(-grid % n_bnd_cells:grid % n_cells))
-            allocate(mult % body_fy(-grid % n_bnd_cells:grid % n_cells))
-            allocate(mult % body_fz(-grid % n_bnd_cells:grid % n_cells))
-          end if
-
-          mult % body_fx = 0.0; mult % body_fy = 0.0; mult % body_fz = 0.0
-
-          do s = 1, grid % n_faces
-            c1 = grid % faces_c(1,s)
-            c2 = grid % faces_c(2,s)
-
-            dotprod = ( (grid % xf(s) - grid % xc(c1)) * grav_x  &
-                      + (grid % yf(s) - grid % yc(c1)) * grav_y  &
-                      + (grid % zf(s) - grid % zc(c1)) * grav_z )
-
-            mult % body_fx(c1) = mult % body_fx(c1)                      &
-                               + flow % density_f(s) * si(s) * dotprod
-            mult % body_fy(c1) = mult % body_fy(c1)                      &
-                               + flow % density_f(s) * sj(s) * dotprod
-            mult % body_fz(c1) = mult % body_fz(c1)                      &
-                               + flow % density_f(s) * sk(s) * dotprod
-
-            if (c2 > 0) then
-              ! Correction for periodic faces:
-              call Grid_Mod_Correction_Periodicity(grid, s,   &
-                                                   corr_x, corr_y, corr_z)
-
-              dotprod = ( (( grid % xf(s) + corr_x)      &
-                           - grid % xc(c2)) * grav_x     &
-                        + (( grid % yf(s) + corr_y)      &
-                           - grid % yc(c2)) * grav_y     &
-                        + (( grid % zf(s) + corr_z)      &
-                           - grid % zc(c2)) * grav_z )
-
-              mult % body_fx(c2) = mult % body_fx(c2)                      &
-                                 - flow % density_f(s) * si(s) * dotprod
-              mult % body_fy(c2) = mult % body_fy(c2)                      &
-                                 - flow % density_f(s) * sj(s) * dotprod
-              mult % body_fz(c2) = mult % body_fz(c2)                      &
-                                 - flow % density_f(s) * sk(s) * dotprod
-
-            end if
+          do c = 1, grid % n_cells
+            b(c) = b(c) + mult % body_fx(c)
           end do
 
-        call Grid_Mod_Exchange_Cells_Real(grid, mult % body_fx)
-        call Grid_Mod_Exchange_Cells_Real(grid, mult % body_fy)
-        call Grid_Mod_Exchange_Cells_Real(grid, mult % body_fz)
+        case(2)
 
-        do c = 1, grid % n_cells
-          b(c) = b(c) + mult % body_fx(c)
+          do c = 1, grid % n_cells
+            b(c) = b(c) + mult % body_fy(c)
+          end do
+
+        case(3)
+
+          do c = 1, grid % n_cells
+            b(c) = b(c) + mult % body_fz(c)
+          end do
+
+      end select
+
+    end if
+
+    ! Momentum variables for pressure correction
+    ! This is here because they need to be collected before
+    ! u, v, w are calculated
+
+    if (mult % temp_corr) then
+      ! Guessed face velocity
+      if (i == 1) then
+        do s = grid % n_bnd_faces + 1, grid % n_faces
+          c1 = grid % faces_c(1,s)
+          c2 = grid % faces_c(2,s)
+          fs = grid % f(s)
+          u_f = fs * flow % u % n(c1) + (1.0 - fs) * flow % u % n(c2)
+          v_f = fs * flow % v % n(c1) + (1.0 - fs) * flow % v % n(c2)
+          w_f = fs * flow % w % n(c1) + (1.0 - fs) * flow % w % n(c2)
+          m_flux % avg(s) = ( u_f * grid % sx(s)     &
+                            + v_f * grid % sy(s)     &
+                            + w_f * grid % sz(s) )
         end do
 
-      case(2)
-
-        do c = 1, grid % n_cells
-          b(c) = b(c) + mult % body_fy(c)
+        do s = grid % n_bnd_faces + 1, grid % n_faces
+          m_flux % star(s) = m_flux % n(s) / flow % density_f(s)
         end do
+      end if
+    end if
 
-      case(3)
+    ! PISO corrections are executed here
+    if (flow % p_v_coupling == PISO .and. flow % piso_status .eqv. .true.) then
 
-        do c = 1, grid % n_cells
-          b(c) = b(c) + mult % body_fz(c)
-        end do
+      ! Sum of neighbours
+      neigh = 0.0
+      do s = grid % n_bnd_faces + 1, grid % n_faces
+        c1 = grid % faces_c(1,s)
+        c2 = grid % faces_c(2,s)
+        neigh(c1) = neigh(c1) - a % val(a % pos(1,s)) * ui % n(c2)
+        neigh(c2) = neigh(c2) - a % val(a % pos(2,s)) * ui % n(c1)
+      end do
+      call Grid_Mod_Exchange_Cells_Real(grid, neigh)
 
-    end select
+      ! Solve velocity explicitely (no under relaxation!!)
+      do c = 1, grid % n_cells
+        ui % n(c) = (neigh(c) + b(c)) / a % val(a % dia(c))
+      end do
 
-  end if
+      call Grid_Mod_Exchange_Cells_Real(grid, ui % n)
 
+      if (flow % i_corr == flow % n_piso_corrections) then
+        res = 0.0
+        nt = a % pnt_grid % n_cells
+        ni = a % pnt_grid % n_cells - a % pnt_grid % comm % n_buff_cells
+        call Residual_Vector(ni, res(1:nt), b(1:nt), a, ui % n(1:nt))
+        ui % res_scal = sum(abs(res(1:ni)))
+        call Comm_Mod_Global_Sum_Real(ui % res_scal)
+      end if
+
+    end if
   end subroutine

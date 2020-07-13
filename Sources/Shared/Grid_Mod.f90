@@ -32,6 +32,7 @@
     integer :: n_cells      ! ... cells
     integer :: n_faces      ! ... faces
     integer :: n_bnd_cells  ! ... boundary cells
+    integer :: n_bnd_faces  ! ... boundary faces
     integer :: n_per_faces  ! ... periodic faces (shadows)
     integer :: n_bnd_cond   ! ... boundary conditions
     integer :: n_shadows    ! ... shadow faces
@@ -73,6 +74,17 @@
     integer, allocatable :: cells_f(:,:)
     integer, allocatable :: cells_c(:,:)
 
+    ! Weight for node-based gradient
+    real, allocatable :: weight_gradx_nodes(:,:)
+    real, allocatable :: weight_grady_nodes(:,:)
+    real, allocatable :: weight_gradz_nodes(:,:)
+
+    ! Weights for interpolation from nodes
+    real, allocatable :: cells_weight_n(:,:)
+
+    ! Weight for cells interpolation from faces
+    real, allocatable :: weight_faces(:,:)
+
     ! For boundary cells, store corresponding face
     integer, allocatable :: cells_bnd_face(:)
 
@@ -100,7 +112,7 @@
     ! Face surface areas (si), total surface (s) 
     ! and distances between cells (di)
     real, allocatable :: sx(:), sy(:), sz(:), s(:)
-    real, allocatable :: dx(:), dy(:), dz(:)
+    real, allocatable :: dx(:), dy(:), dz(:), d(:)
 
     ! Face coordinates 
     real, allocatable :: xf(:), yf(:), zf(:)
@@ -140,6 +152,13 @@
     ! List of cells surrounding each node
     integer, allocatable :: nodes_c(:,:)
 
+    ! Weights for interpolation from cells
+    real, allocatable :: nodes_weight_c(:,:)
+
+    ! Weights for cell-based gradient
+    real, allocatable :: weight_gradx_cells(:,:)
+    real, allocatable :: weight_grady_cells(:,:)
+    real, allocatable :: weight_gradz_cells(:,:)
     !------------------------------------------!
     !   Variables important for parallel run   ! 
     !------------------------------------------!

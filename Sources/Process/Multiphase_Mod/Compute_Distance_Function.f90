@@ -221,8 +221,6 @@
 
   call Grid_Mod_Exchange_Cells_Real(grid, dist_func % n)
 
-  call Field_Mod_Grad_Variable(flow, dist_func)
-
   ! Find Heavyside function
   call Multiphase_Mod_Vof_Heavyside_Function(mult)
 

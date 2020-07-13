@@ -23,5 +23,9 @@
   allocate(i_node_06(nn));  i_node_06 = 0;  if(n .eq.  6) return
   allocate(i_node_07(nn));  i_node_07 = 0;  if(n .eq.  7) return
   allocate(i_node_08(nn));  i_node_08 = 0;  if(n .eq.  8) return
+  allocate(i_node_09(nn));  i_node_09 = 0;  if(n .eq.  9) return
+  allocate(i_node_10(nn));  i_node_10 = 0;  if(n .eq. 10) return
+  allocate(i_node_11(nn));  i_node_11 = 0;  if(n .eq. 11) return
+  allocate(i_node_12(nn));  i_node_12 = 0;  if(n .eq. 12) return
 
   end subroutine

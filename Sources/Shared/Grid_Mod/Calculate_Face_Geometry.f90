@@ -64,6 +64,15 @@
   end do  ! shadows
 
   !--------------------------------------------!
+  !   Calculate total distance between cells   !
+  !--------------------------------------------!
+  do s = 1, grid % n_faces + grid % n_shadows
+    grid % d(s) = sqrt(  grid % dx(s)*grid % dx(s)     &
+                       + grid % dy(s)*grid % dy(s)     &
+                       + grid % dz(s)*grid % dz(s) )
+  end do
+
+  !--------------------------------------------!
   !   Calculate weight factors for the faces   !
   !--------------------------------------------!
   do s = 1, grid % n_faces
