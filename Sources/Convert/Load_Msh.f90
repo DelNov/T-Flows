@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Load_Msh(grid, mesh_city)
+  subroutine Load_Msh(grid)
 !------------------------------------------------------------------------------!
 !   Reads the Gmsh file format.                                                !
 !------------------------------------------------------------------------------!
@@ -11,7 +11,6 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
-  logical         :: mesh_city
 !-----------------------------------[Locals]-----------------------------------!
   integer, parameter   :: MSH_TRI   = 2
   integer, parameter   :: MSH_QUAD  = 3
@@ -177,7 +176,7 @@
   !   Allocate memory for Grid_Mod variables   !
   !                                            !
   !--------------------------------------------!
-  call Allocate_Memory(grid, mesh_city)
+  call Allocate_Memory(grid)
 
   !---------------------------------------------------!
   !   Read boundary conditions for individual cells   !
@@ -208,7 +207,7 @@
   end do
 
   do i = 1, n_bnd_sect
-    print '(a, i2, i6)', ' # Boundary cells in section: ', i, n_bnd_cells(i)
+    print '(a, i2, i7)', ' # Boundary cells in section: ', i, n_bnd_cells(i)
   end do
 
   !--------------------------------!
