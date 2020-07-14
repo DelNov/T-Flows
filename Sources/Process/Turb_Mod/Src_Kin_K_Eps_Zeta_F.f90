@@ -79,7 +79,7 @@
       end if
 
       b(c) = b(c) + max(0.0, turb % g_buoy(c) * grid % vol(c))
-             a % val(a % dia(c)) = a % val(a % dia(c))         &
+      a % val(a % dia(c)) = a % val(a % dia(c))         &
                                  + max(0.0,-turb % g_buoy(c)   &
                                  * grid % vol(c)               &
                                  / (kin % n(c) + TINY))
@@ -105,7 +105,7 @@
           .and. (alpha_d < 1.05)                         &
           .or.                                           &
           (turb % hybrid_les_rans_switch .eq. SWITCH_VELOCITY)  &
-          .and. (alpha_v < 0.85) ) then
+          .and. (alpha_v < 0.5.or.alpha_d < 1.05) ) then
         a % val(a % dia(c)) = a % val(a % dia(c))             &
                             + flow % density(c) * eps % n(c)  &
                             / (kin % n(c) + TINY) * grid % vol(c)
@@ -217,10 +217,6 @@
                         * sqrt(abs(t % q(c2))                      &
                         * c_mu_theta5                              &
                         * sqrt(abs(t2 % n(c1) * kin % n(c1))))
-
-          ! This limiter is preventing unphysical solutions
-          ! when flow starts to develop
-          ! g_buoy_wall = min(3.0*turb % p_kin(c1),g_buoy_wall)
 
           ! Clean up b(c) from old values of g_buoy
           b(c1)      = b(c1) - turb % g_buoy(c1) * grid % vol(c1)
