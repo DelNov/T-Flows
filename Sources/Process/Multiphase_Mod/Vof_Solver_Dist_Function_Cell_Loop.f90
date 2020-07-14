@@ -22,13 +22,13 @@
                                r_phi    (-grid % n_bnd_cells : grid % n_cells),&
                                s_0      (-grid % n_bnd_cells : grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  integer                   :: c, s, c1, c2
-  integer                   :: i_fac
-  real                      :: fs
-  real                      :: dot_p1, dot_p2, grad_fn
-  real                      :: g_fx, g_fy, g_fz
-  real                      :: a_i(6), b_i(6), c_i(6), r_fac(3)
-  real                      :: corr_x, corr_y, corr_z
+  integer :: c, s, c1, c2
+  integer :: i_fac
+  real    :: fs
+  real    :: dot_p1, dot_p2, grad_fn
+  real    :: g_fx, g_fy, g_fz
+  real    :: a_i(6), b_i(6), c_i(6), r_fac(3)
+  real    :: corr_x, corr_y, corr_z
 !==============================================================================!
 
   do c = 1, grid % n_cells
@@ -125,12 +125,12 @@
         end if
       end if
 
-      end do  ! end loop faces
+    end do  ! end loop faces
 
-      r_phi(c) = s_0(c) * ( 1.0                                    &
-               - sqrt( maxval(a_i(1:grid % cells_n_faces(c)))      &
-                     + maxval(b_i(1:grid % cells_n_faces(c)))      &
-                     + maxval(c_i(1:grid % cells_n_faces(c))) ) )
+    r_phi(c) = s_0(c) * ( 1.0                                    &
+             - sqrt( maxval(a_i(1:grid % cells_n_faces(c)))      &
+                   + maxval(b_i(1:grid % cells_n_faces(c)))      &
+                   + maxval(c_i(1:grid % cells_n_faces(c))) ) )
 
   end do  ! end loop cells
 
