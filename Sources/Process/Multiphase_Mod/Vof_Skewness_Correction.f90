@@ -8,25 +8,25 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Multiphase_Type), target :: mult
   type(Grid_Type)               :: grid
-  real                          :: beta_c(1:grid % n_faces)  !Skew. correction
+  real                          :: beta_c(1:grid % n_faces)  ! skew. correction
   real                          :: c_d(-grid % n_bnd_cells:grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type),     pointer :: flow
-  type(Var_Type),       pointer :: vof
-  type(Face_Type),      pointer :: m_flux
-  integer                       :: s
-  integer                       :: c1, c2, donor, accept
-  real                          :: fs, dot_prod
-  real                          :: alfa_u, alfa_d, alfa_a, alfa_d_til, alfa_cbc
-  real                          :: alfa_uq, gamma_f, alfa_f_til, signo
-  real                          :: alfa_superbee, alfa_stoic
-  real                          :: cod, prodmag, ang, epsloc
-  real                          :: gf_x, gf_y, gf_z  ! avg gradient
-  real                          :: gradf_x, gradf_y, gradf_z  ! gradient at f
-  real                          :: corr_x, corr_y, corr_z
-  real                          :: sd, nplane(3), uline(3)
-  real                          :: r_f(3), f_prime(3)
-  real                          :: dsc1, dsc2, dotprod1, dotprod2
+  type(Field_Type), pointer :: flow
+  type(Var_Type),   pointer :: vof
+  type(Face_Type),  pointer :: m_flux
+  integer                   :: s
+  integer                   :: c1, c2, donor, accept
+  real                      :: fs, dot_prod
+  real                      :: alfa_u, alfa_d, alfa_a, alfa_d_til, alfa_cbc
+  real                      :: alfa_uq, gamma_f, alfa_f_til, signo
+  real                      :: alfa_superbee, alfa_stoic
+  real                      :: cod, prodmag, ang, epsloc
+  real                      :: gf_x, gf_y, gf_z  ! avg gradient
+  real                      :: gradf_x, gradf_y, gradf_z  ! gradient at f
+  real                      :: corr_x, corr_y, corr_z
+  real                      :: sd, nplane(3), uline(3)
+  real                      :: r_f(3), f_prime(3)
+  real                      :: dsc1, dsc2, dotprod1, dotprod2
   !==============================================================================!
 
   ! Take aliases

@@ -6,13 +6,12 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)               :: grid
-  real                          :: var_node   (1 : grid % n_nodes),   &
-                                   var_cell   (-grid % n_bnd_cells    &
-                                              : grid % n_cells)
+  type(Grid_Type) :: grid
+  real            :: var_node(1 : grid % n_nodes)
+  real            :: var_cell(-grid % n_bnd_cells:grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  integer                       :: n, s, c, c1, c2, i_nod, i_fac
-  real                          :: sum1, sum2
+  integer :: n, s, c, c1, c2, i_nod, i_fac
+  real    :: sum1, sum2
 !==============================================================================!
 
   do c = 1, grid % n_cells

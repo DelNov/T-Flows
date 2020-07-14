@@ -1,6 +1,6 @@
 !==============================================================================!
-subroutine Multiphase_Mod_Vof_Find_Upstream_phi(phi, phi_x, phi_y, phi_z,  &
-                                                s, donor, accept, phi_u)
+  subroutine Multiphase_Mod_Vof_Find_Upstream_phi(phi, phi_x, phi_y, phi_z,  &
+                                                  s, donor, accept, phi_u)
 !------------------------------------------------------------------------------!
 !   Computes the value of phi at a imaginary upstream cell. This is based on   !
 !   Work of Zhang (2014) "Assessment of different reconstruction techniques    !
@@ -8,13 +8,13 @@ subroutine Multiphase_Mod_Vof_Find_Upstream_phi(phi, phi_x, phi_y, phi_z,  &
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Var_Type)           :: phi
-  real                     :: phi_x(-phi % pnt_grid % n_bnd_cells:  &
-                                     phi % pnt_grid % n_cells),     &
-                              phi_y(-phi % pnt_grid % n_bnd_cells:  &
-                                     phi % pnt_grid % n_cells),     &
-                              phi_z(-phi % pnt_grid % n_bnd_cells:  &
-                                     phi % pnt_grid % n_cells)
+  type(Var_Type) :: phi
+  real           :: phi_x(-phi % pnt_grid % n_bnd_cells:  &
+                           phi % pnt_grid % n_cells),     &
+                    phi_y(-phi % pnt_grid % n_bnd_cells:  &
+                           phi % pnt_grid % n_cells),     &
+                    phi_z(-phi % pnt_grid % n_bnd_cells:  &
+                           phi % pnt_grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   real,            pointer :: sx(:), sy(:), sz(:), dx(:), dy(:), dz(:)
@@ -31,7 +31,7 @@ subroutine Multiphase_Mod_Vof_Find_Upstream_phi(phi, phi_x, phi_y, phi_z,  &
   sx   => grid % sx;  sy   => grid % sy;  sz   => grid % sz
   dx   => grid % dx;  dy   => grid % dy;  dz   => grid % dz
 
-  !find min and max phi:
+  ! Find min and max phi:
 
   min_phi =  HUGE
   max_phi = -HUGE

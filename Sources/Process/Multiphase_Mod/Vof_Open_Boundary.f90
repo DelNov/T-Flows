@@ -12,17 +12,17 @@
   integer                       :: ini    ! current temporal iteration
   real                          :: mass_res
 !-----------------------------------[Locals]-----------------------------------!
-  type(Matrix_Type),    pointer :: a
-  type(Grid_Type),      pointer :: grid
-  type(Var_Type),       pointer :: v_comp
-  real, contiguous,     pointer :: b(:)
-  integer                       :: s, ss, c, c1, c2, c11, c22, i_fac
-  integer                       :: i, corr_steps
-  real                          :: phi_f, fs, signo, sumx, sumy, sumz
-  real                          :: a_open
+  type(Matrix_Type), pointer :: a
+  type(Grid_Type),   pointer :: grid
+  type(Var_Type),    pointer :: v_comp
+  real, contiguous,  pointer :: b(:)
+  integer                    :: s, ss, c, c1, c2, c11, c22, i_fac
+  integer                    :: i, corr_steps
+  real                       :: phi_f, fs, signo, sumx, sumy, sumz
+  real                       :: a_open
 !==============================================================================!
 
-  grid   => flow % pnt_grid
+  grid => flow % pnt_grid
 
   ! Browse through velocity components
   a_open = 0.0
@@ -153,4 +153,5 @@
     end if
   end do
   write(*,*) mult % add_mass_in, mult % add_mass_out
+
   end subroutine

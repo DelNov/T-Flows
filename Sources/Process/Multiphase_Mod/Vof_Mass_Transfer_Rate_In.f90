@@ -8,12 +8,12 @@
   type(Multiphase_Type), target :: mult
   real                          :: mass_in, mass_out
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),      pointer :: grid
-  type(Field_Type),     pointer :: flow
-  type(Var_Type),       pointer :: vof
-  real, contiguous,     pointer :: flux_rate(:)
-  integer                       :: s, ss, c, c1, c2, cc1, cc2
-  real                          :: epsloc
+  type(Grid_Type),  pointer :: grid
+  type(Field_Type), pointer :: flow
+  type(Var_Type),   pointer :: vof
+  real, contiguous, pointer :: flux_rate(:)
+  integer                   :: s, ss, c, c1, c2, cc1, cc2
+  real                      :: epsloc
 !==============================================================================!
 
   grid => mult % pnt_grid
@@ -38,4 +38,4 @@
 
   mass_in  = mass_in + mult % add_mass_in
 
-end subroutine
+  end subroutine
