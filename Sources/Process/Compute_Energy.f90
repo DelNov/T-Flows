@@ -173,6 +173,19 @@
                grid % fw(s) * flow % conductivity(c1)  &
         + (1.0-grid % fw(s))* flow % conductivity(c2)
     end if
+    if(turb % model .eq. HYBRID_LES_RANS) then
+      con_eff_f =                                                              &
+               grid % fw(s) * (flow % conductivity(c1) +                       &
+                               flow % capacity(c1) * turb % vis_t_eff(c1)      &
+                               / pr_tf)                                        &
+        + (1.0-grid % fw(s))* (flow % conductivity(c2) +                       &
+                               flow % capacity(c2) * turb % vis_t_eff(c2)      &
+                               / pr_tf)
+      con_t_f  = grid % fw(s) *flow % capacity(c1) * turb % vis_t_eff(c1)      &
+                               / pr_tf                                         &
+          + (1.0-grid % fw(s))*flow % capacity(c2) * turb % vis_t_eff(c2)      &
+                               / pr_tf
+    end if
 
     if(turb % model .eq. K_EPS        .or.  &
        turb % model .eq. K_EPS_ZETA_F .or.  &
