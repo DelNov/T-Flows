@@ -6,12 +6,12 @@
 !   Computes the Curvature based on Brackbill's CSF using Gauss theorem        !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: div_x        => r_cell_10,  &
-                      div_y        => r_cell_11,  &
-                      div_z        => r_cell_12,  &
-                      k_limit      => r_cell_13,  &
-                      kappa_f      => r_face_01,  &
-                      counter_nod  => i_node_01
+  use Work_Mod, only: div_x       => r_cell_10,  &
+                      div_y       => r_cell_11,  &
+                      div_z       => r_cell_12,  &
+                      k_limit     => r_cell_13,  &
+                      kappa_f     => r_face_01,  &
+                      counter_nod => i_node_01
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
