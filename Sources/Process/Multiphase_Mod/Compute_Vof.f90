@@ -4,7 +4,9 @@
 !   Solves Volume Fraction equation using UPWIND ADVECTION and CICSAM          !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: beta_f => r_face_01, beta_c => r_face_02, c_d => r_cell_30
+  use Work_Mod, only: beta_f => r_face_01,  &
+                      beta_c => r_face_02,  &
+                      c_d    => r_cell_30
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
