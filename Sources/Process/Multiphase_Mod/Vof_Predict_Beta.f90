@@ -8,21 +8,21 @@
   type(Multiphase_Type), target :: mult
   type(Grid_Type)               :: grid
   real                          :: beta_f(grid % n_faces)
-  real                          :: beta_c(grid % n_faces)  !Skew. correction
+  real                          :: beta_c(grid % n_faces)  ! skew. correction
   real                          :: c_d(-grid % n_bnd_cells:grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type),     pointer :: flow
-  type(Var_Type),       pointer :: vof
-  type(Face_Type),      pointer :: m_flux
-  integer                       :: s
-  integer                       :: c1, c2, donor, accept
-  real                          :: fs, dot_prod
-  real                          :: alfa_u, alfa_d, alfa_a, alfa_d_til, alfa_cbc
-  real                          :: alfa_uq, gamma_f, alfa_f_til, signo
-  real                          :: alfa_superbee, alfa_stoic
-  real                          :: cod, prodmag, ang, epsloc
-  real                          :: gradf_x, gradf_y, gradf_z
-  real                          :: aux
+  type(Field_Type), pointer :: flow
+  type(Var_Type),   pointer :: vof
+  type(Face_Type),  pointer :: m_flux
+  integer                   :: s
+  integer                   :: c1, c2, donor, accept
+  real                      :: fs, dot_prod
+  real                      :: alfa_u, alfa_d, alfa_a, alfa_d_til, alfa_cbc
+  real                      :: alfa_uq, gamma_f, alfa_f_til, signo
+  real                      :: alfa_superbee, alfa_stoic
+  real                      :: cod, prodmag, ang, epsloc
+  real                      :: gradf_x, gradf_y, gradf_z
+  real                      :: aux
 !==============================================================================!
 
   ! Take aliases
