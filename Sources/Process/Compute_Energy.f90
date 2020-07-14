@@ -4,19 +4,8 @@
 !   Purpose: Solve transport equation for scalar (such as temperature)         !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Comm_Mod
-  use Field_Mod,    only: Field_Type
-  use Var_Mod,      only: Var_Type
-  use Face_Mod,     only: Face_Type
-  use Grid_Mod,     only: Grid_Type
-  use Info_Mod
-  use Numerics_Mod
-  use Solver_Mod,   only: Solver_Type, Solver_Mod_Alias_System, Bicg, Cg, Cgs
-  use Matrix_Mod,   only: Matrix_Type
   use User_Mod
-  use Turb_Mod
-  use Work_Mod,     only: capacity_x_density => r_cell_11
+  use Work_Mod, only: capacity_x_density => r_cell_11
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!

@@ -4,27 +4,14 @@
 !   Purpose: Solve transport equation for use scalar.                          !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Comm_Mod
-  use Cpu_Timer_Mod, only: Cpu_Timer_Mod_Start, Cpu_Timer_Mod_Stop
-  use Field_Mod,     only: Field_Type
-  use Turb_Mod
-  use Var_Mod
-  use Face_Mod
-  use Grid_Mod
-  use Info_Mod
-  use Numerics_Mod
-  use Solver_Mod,    only: Solver_Type, Solver_Mod_Alias_System, Bicg, Cg, Cgs
-  use Matrix_Mod,    only: Matrix_Type
-  use Control_Mod
   use User_Mod
-  use Work_Mod,      only: u1uj_phij   => r_cell_06,  &
-                           u2uj_phij   => r_cell_07,  &
-                           u3uj_phij   => r_cell_08,  &
-                           u1uj_phij_x => r_cell_09,  &
-                           u2uj_phij_y => r_cell_10,  &
-                           u3uj_phij_z => r_cell_11,  &
-                           one         => r_cell_12
+  use Work_Mod, only: u1uj_phij   => r_cell_06,  &
+                      u2uj_phij   => r_cell_07,  &
+                      u3uj_phij   => r_cell_08,  &
+                      u1uj_phij_x => r_cell_09,  &
+                      u2uj_phij_y => r_cell_10,  &
+                      u3uj_phij_z => r_cell_11,  &
+                      one         => r_cell_12
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!

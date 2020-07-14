@@ -4,17 +4,6 @@
 !   Corrects the velocities, and mass (or volume) fluxes on cell faces.        !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Comm_Mod
-  use Cpu_Timer_Mod,  only: Cpu_Timer_Mod_Start, Cpu_Timer_Mod_Stop
-  use Field_Mod,      only: Field_Type
-  use Grid_Mod,       only: Grid_Type
-  use Bulk_Mod,       only: Bulk_Type
-  use Info_Mod,       only: Info_Mod_Iter_Fill_At, Info_Mod_Bulk_Fill
-  use Solver_Mod,     only: Solver_Type
-  use Matrix_Mod,     only: Matrix_Type
-  use Numerics_Mod
-  use Multiphase_Mod, only: Multiphase_Type
   use User_Mod
 !------------------------------------------------------------------------------!
   implicit none
