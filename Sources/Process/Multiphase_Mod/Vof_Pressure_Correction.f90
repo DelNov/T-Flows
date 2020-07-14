@@ -2,6 +2,7 @@
   subroutine Multiphase_Mod_Vof_Pressure_Correction(mult, sol, ini, mass_err)
 !------------------------------------------------------------------------------!
 !   Correct fluxes on pressure equation due to surface tension and gravity     !
+!------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Work_Mod,       only: curr_colour => r_cell_01
 !------------------------------------------------------------------------------!
@@ -12,20 +13,20 @@
   integer                       :: ini
   real                          :: mass_err
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type), pointer :: flow
-  type(Grid_Type),  pointer :: grid
-  type(Face_Type),  pointer :: m_flux
-  type(Var_Type),   pointer :: vof
-  type(Var_Type),   pointer :: u, v, w
-  type(Matrix_Type),pointer :: a
-  real, contiguous, pointer :: b(:)
-  real,             pointer :: u_relax, dt_corr
-  integer                   :: c, c1, c2, s
-  real                      :: a12, a1_in, a2_in
-  real                      :: u_fo, v_fo, w_fo
-  real                      :: stens_source, gravity_source, dotprod
-  real                      :: dens_f, dens_weight1, dens_weight2, fs
-  real                      :: factor1, factor2, correction
+  type(Field_Type),  pointer :: flow
+  type(Grid_Type),   pointer :: grid
+  type(Face_Type),   pointer :: m_flux
+  type(Var_Type),    pointer :: vof
+  type(Var_Type),    pointer :: u, v, w
+  type(Matrix_Type), pointer :: a
+  real, contiguous,  pointer :: b(:)
+  real,              pointer :: u_relax, dt_corr
+  integer                    :: c, c1, c2, s
+  real                       :: a12, a1_in, a2_in
+  real                       :: u_fo, v_fo, w_fo
+  real                       :: stens_source, gravity_source, dotprod
+  real                       :: dens_f, dens_weight1, dens_weight2, fs
+  real                       :: factor1, factor2, correction
 !==============================================================================!
 
   ! Take aliases
