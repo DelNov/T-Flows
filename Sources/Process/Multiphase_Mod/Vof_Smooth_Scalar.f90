@@ -7,15 +7,15 @@
 !----------------------------------[Modules]-----------------------------------!
   use Work_Mod, only: sum_vol_area  => r_cell_01,   &
                       sum_area      => r_cell_02
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Multiphase_Type), target :: mult
   type(Grid_Type)               :: grid
   integer                       :: n_conv
-  real                          :: var        (-grid % n_bnd_cells    &
-                                              : grid % n_cells),      &
-                                   smooth_var (-grid % n_bnd_cells    &
-                                              : grid % n_cells)
+  real                          :: var(-grid % n_bnd_cells: grid % n_cells)
+  real                          :: smooth_var(-grid % n_bnd_cells    &
+                                             : grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),       pointer :: vof
   type(Matrix_Type),    pointer :: a
