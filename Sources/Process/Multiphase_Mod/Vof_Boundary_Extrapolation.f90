@@ -11,15 +11,14 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type)              :: grid
   type(Multiphase_Type), target :: mult
-  real                          :: var(-grid % n_bnd_cells    &
-                                      : grid % n_cells)
+  real                          :: var(-grid % n_bnd_cells:grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type),     pointer :: flow
-  type(Var_Type),       pointer :: vof
-  integer                       :: s, ss, c, c1, c2, n
-  integer                       :: i_fac, count_neg, cc1, cc2, cc
-  real                          :: gx, gy, gz
-  real                          :: epsloc, num, var_f, fss, signo
+  type(Field_Type), pointer :: flow
+  type(Var_Type),   pointer :: vof
+  integer                   :: s, ss, c, c1, c2, n
+  integer                   :: i_fac, count_neg, cc1, cc2, cc
+  real                      :: gx, gy, gz
+  real                      :: epsloc, num, var_f, fss, signo
 !==============================================================================!
 
   vof  => mult % vof
@@ -114,4 +113,5 @@
                                 /grid % vol(c1))
     end if
   end do
+
   end subroutine
