@@ -5,18 +5,16 @@
 !   Computes the Curvature based on Brackbill's CSF using nodal gradients      !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: div_x        => r_cell_11,  &
-                      div_y        => r_cell_12,  &
-                      div_z        => r_cell_13,  &
-                      div_xx       => r_cell_14,  &
-                      div_yy       => r_cell_15,  &
-                      div_zz       => r_cell_16,  &
-                      k_limit      => r_cell_17,  &
-                      kappa_f      => r_face_01,  &
-                      grad_x       => r_node_05,  &
-                      grad_y       => r_node_06,  &
-                      grad_z       => r_node_07,  &
-                      mark         => i_node_01
+  use Work_Mod, only: div_x  => r_cell_11,  &
+                      div_y  => r_cell_12,  &
+                      div_z  => r_cell_13,  &
+                      div_xx => r_cell_14,  &
+                      div_yy => r_cell_15,  &
+                      div_zz => r_cell_16,  &
+                      grad_x => r_node_05,  &
+                      grad_y => r_node_06,  &
+                      grad_z => r_node_07,  &
+                      mark   => i_node_01
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
