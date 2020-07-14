@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Multiphase_Mod_Update_Physical_Properties(mult, backup)
 !------------------------------------------------------------------------------!
-!    Update physical properties based on volume fraction variable              !
+!   Update physical properties based on volume fraction variable               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
