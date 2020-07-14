@@ -2,37 +2,33 @@
   subroutine Multiphase_Mod_Vof_Smooth_Curvature(grid, mult,                  &
                                                  norm_nx, norm_ny, norm_nz)
 !------------------------------------------------------------------------------!
-!    Smoothes curvature in two steps: first a smoothing curvature around the   !
-!    Interface and second in the direction of the normal. This technique can   !
-!    be found at https://spiral.imperial.ac.uk/handle/10044/1/28101
+!   Smoothes curvature in two steps: first a smoothing curvature around the    !
+!   Interface and second in the direction of the normal. This technique can    !
+!   be found at https://spiral.imperial.ac.uk/handle/10044/1/28101
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: k_star        => r_cell_14,    &
-                      gradk_x       => r_cell_15,    &
-                      gradk_y       => r_cell_16,    &
-                      gradk_z       => r_cell_17,    &
-                      sum_k_weight  => r_cell_18,    &
-                      sum_weight    => r_cell_19
+  use Work_Mod, only: k_star       => r_cell_14,    &
+                      gradk_x      => r_cell_15,    &
+                      gradk_y      => r_cell_16,    &
+                      gradk_z      => r_cell_17,    &
+                      sum_k_weight => r_cell_18,    &
+                      sum_weight   => r_cell_19
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Multiphase_Type), target :: mult
   type(Grid_Type)               :: grid
-  real                          :: norm_nx    (-grid % n_bnd_cells    &
-                                              : grid % n_cells),      &
-                                   norm_ny    (-grid % n_bnd_cells    &
-                                              : grid % n_cells),      &
-                                   norm_nz    (-grid % n_bnd_cells    &
-                                              : grid % n_cells)
+  real                          :: norm_nx(-grid % n_bnd_cells:grid % n_cells)
+  real                          :: norm_ny(-grid % n_bnd_cells:grid % n_cells)
+  real                          :: norm_nz(-grid % n_bnd_cells:grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  type(Var_Type),  pointer      :: vof
-  integer                       :: s, c, c1, c2, c_iter, i_fac
-  integer                       :: face_init, face_end, face_step
-  real                          :: fs, w_v1, w_v2, w_m1, w_m2
-  real                          :: weight_s, weight_n
-  real                          :: norma, epsloc, curvf, dotprod
+  type(Var_Type), pointer :: vof
+  integer                 :: s, c, c1, c2, c_iter, i_fac
+  integer                 :: face_init, face_end, face_step
+  real                    :: fs, w_v1, w_v2, w_m1, w_m2
+  real                    :: weight_s, weight_n
+  real                    :: norma, epsloc, curvf, dotprod
 !==============================================================================!
-
 
   ! Take aliases
   if (mult % d_func) then
