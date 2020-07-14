@@ -1,8 +1,7 @@
 !==============================================================================!
   subroutine Multiphase_Mod_Allocate(mult, flow)
 !------------------------------------------------------------------------------!
-!   Allocates memory for variables. It is called either from LoaRes            !
-!   or from Processor.                                                         !
+!   Allocates memory for variables in Multphase_Mod.                           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
