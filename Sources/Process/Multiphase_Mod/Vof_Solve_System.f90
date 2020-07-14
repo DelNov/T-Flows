@@ -11,11 +11,11 @@
   type(Multiphase_Type), target :: mult
   real, contiguous,      target :: b(:)
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: grid
-  type(Var_Type),   pointer :: vof
-  type(Matrix_Type),pointer :: a
-  character(len=80)         :: solver
-  integer                   :: c, c1, c2, s
+  type(Grid_Type),   pointer :: grid
+  type(Var_Type),    pointer :: vof
+  type(Matrix_Type), pointer :: a
+  character(len=80)          :: solver
+  integer                    :: c, c1, c2, s
 !==============================================================================!
 
   ! Take aliases
