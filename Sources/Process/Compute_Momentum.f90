@@ -4,25 +4,8 @@
 !   Discretizes and solves momentum conservation equations                     !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Comm_Mod
-  use Cpu_Timer_Mod,  only: Cpu_Timer_Mod_Start, Cpu_Timer_Mod_Stop
-  use Field_Mod,      only: Field_Type, buoyancy, t_ref,  &
-                            grav_x, grav_y, grav_z
-  use Turb_Mod
-  use Multiphase_Mod, only: Multiphase_Type, &
-                            Multiphase_Mod_Vof_Surface_Tension_Contribution,  &
-                            VOLUME_OF_FLUID
-  use Var_Mod,        only: Var_Type
-  use Face_Mod,       only: Face_Type
-  use Grid_Mod,       only: Grid_Type
-  use Bulk_Mod,       only: Bulk_Type
-  use Info_Mod,       only: Info_Mod_Iter_Fill_At
-  use Numerics_Mod
-  use Solver_Mod,     only: Solver_Type, Solver_Mod_Alias_System, Bicg, Cg, Cgs
-  use Matrix_Mod,     only: Matrix_Type
   use User_Mod
-  use Work_Mod,       only: one => r_cell_12
+  use Work_Mod, only: one => r_cell_12
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -315,9 +298,13 @@
 
   !----------------------------------!
   !   Surface tension contribution   !
-  !   (and some parts of the PISO    !
   !----------------------------------!
   call Multiphase_Mod_Vof_Momentum_Contribution(mult, sol, ui, i)
+
+  !----------------------------------------------!
+  !   Explicit solution for the PISO algorithm   !
+  !----------------------------------------------!
+  call Compute_Momentum_Explicit(flow, i, sol)
 
   !----------------------------------------!
   !   All other terms defined by the user  !
