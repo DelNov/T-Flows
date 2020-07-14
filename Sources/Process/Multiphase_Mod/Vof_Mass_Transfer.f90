@@ -12,9 +12,9 @@
   type(Field_Type),     pointer :: flow
   type(Var_Type),       pointer :: vof, t
   type(Matrix_Type),    pointer :: a
-  real, contiguous,     pointer :: b(:)
-  real, contiguous,     pointer :: qci(:)
-  real, contiguous,     pointer :: flux_rate(:)
+  real,    contiguous,  pointer :: b(:)
+  real,    contiguous,  pointer :: qci(:)
+  real,    contiguous,  pointer :: flux_rate(:)
   integer, contiguous,  pointer :: ic(:)
   integer                       :: s, ss, c, c1, c2, cc1, cc2
   integer                       :: n, i_fac, i_fac2, i_nod
@@ -174,4 +174,5 @@
   end do
 
   call Grid_Mod_Exchange_Cells_Real(grid, flux_rate)
-end subroutine
+
+  end subroutine
