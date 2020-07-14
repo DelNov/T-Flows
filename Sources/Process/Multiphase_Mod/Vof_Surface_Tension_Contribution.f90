@@ -4,14 +4,14 @@
 !    Computes the Curvature based on old-fashioned Brackbill's CSF approach    !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: grad_nx   => r_cell_03,  & !grad on x of vof for normal
-                      grad_ny   => r_cell_04,  & !grad on y of vof for normal
-                      grad_nz   => r_cell_05,  & !grad on z of vof for normal
-                      grad_kx   => r_cell_06,  & !grad on x of vof for curvat
-                      grad_ky   => r_cell_07,  & !grad on y of vof for curvat
-                      grad_kz   => r_cell_08,  & !grad on z of vof for curvat
-                      tmp_curv  => r_cell_30,  & !curvature holder
-                      smooth_var=> r_cell_09
+  use Work_Mod, only: grad_nx    => r_cell_03,  & ! grad on x of vof for normal
+                      grad_ny    => r_cell_04,  & ! grad on y of vof for normal
+                      grad_nz    => r_cell_05,  & ! grad on z of vof for normal
+                      grad_kx    => r_cell_06,  & ! grad on x of vof for curvat
+                      grad_ky    => r_cell_07,  & ! grad on y of vof for curvat
+                      grad_kz    => r_cell_08,  & ! grad on z of vof for curvat
+                      tmp_curv   => r_cell_30,  & ! curvature holder
+                      smooth_var => r_cell_09
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
