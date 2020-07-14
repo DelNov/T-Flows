@@ -46,9 +46,9 @@
     v % res = v % res_scal / denom
     w % res = w % res_scal / denom
 
-    call Info_Mod_Iter_Fill_At(1, 1, u % name, u % exec_iter, u % res)
-    call Info_Mod_Iter_Fill_At(1, 2, v % name, v % exec_iter, v % res)
-    call Info_Mod_Iter_Fill_At(1, 3, w % name, w % exec_iter, w % res)
+    call Info_Mod_Iter_Fill_At(1, 1, u % name, u % eniter, u % res)
+    call Info_Mod_Iter_Fill_At(1, 2, v % name, v % eniter, v % res)
+    call Info_Mod_Iter_Fill_At(1, 3, w % name, w % eniter, w % res)
   else ! for temperature
     denom = 0.0
     do c = 1, grid % n_cells - grid % comm % n_buff_cells

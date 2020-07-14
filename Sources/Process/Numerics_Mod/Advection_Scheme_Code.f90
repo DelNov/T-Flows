@@ -1,14 +1,14 @@
 !==============================================================================!
-  integer function Numerics_Mod_Advection_Scheme_Code(scheme_name)
+  integer function Numerics_Mod_Advection_Scheme_Code(name)
 !------------------------------------------------------------------------------!
 !   Decode the string value on advection scheme from control file              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(len=80) :: scheme_name
+  character(len=80) :: name
 !==============================================================================!
 
-  select case(scheme_name)
+  select case(name)
 
     case('UPWIND')
       Numerics_Mod_Advection_Scheme_Code = UPWIND
@@ -37,8 +37,7 @@
 
     case default
       if(this_proc < 2) then
-        print *, '# ERROR!  Unknown advection scheme: ',  &
-                 trim(scheme_name)
+        print *, '# ERROR!  Unknown advection scheme: ', trim(name)
         print *, '# Exiting!'
       end if
       call Comm_Mod_End

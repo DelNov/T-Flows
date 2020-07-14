@@ -54,9 +54,6 @@
     ! Skewness correction
     logical           :: skew_corr
 
-    ! Temporal correction for pressure
-    logical           :: temp_corr
-
     ! For calculation of distance function
     logical           :: d_func
 
@@ -93,14 +90,11 @@
     integer :: t_dist_scheme
     real    :: c_tau, c_eps
 
-    ! Time step and sub-relaxation coefficient for pressure correction equation
-    real :: dt_corr, u_rel_corr
-
     ! Averaging
     integer, allocatable  :: avg_cells(:,:)
 
     ! Switch calculation curvature at nodes or at cells
-    logical           :: nodal_curvature
+    logical :: nodal_curvature
 
     ! Variable holding the multiphase model
     integer :: model

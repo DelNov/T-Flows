@@ -32,8 +32,8 @@
   grid      => mult % pnt_grid
   flow      => mult % pnt_flow
   vof       => mult % vof
-  u_relax   => mult % u_rel_corr
-  dt_corr   => mult % dt_corr
+  u_relax   => flow % u_rel_corr
+  dt_corr   => flow % dt_corr
   m_flux    => flow % m_flux
   a         => sol % a
   b         => sol % b % val
@@ -122,7 +122,7 @@
   end if
 
   ! Introduce temporal correction and subrelaxation
-  if (mult % temp_corr) then
+  if (flow % temp_corr) then
     do s = grid % n_bnd_faces + 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
@@ -155,26 +155,6 @@
                                         * ( 1.0 / mult % phase_dens(1)     &
                                           - 1.0 / mult % phase_dens(2) )
     end do
-  end if
-
-
-  if (flow % p_v_coupling == PISO) then
-    mass_err = 0.0
-    do c = 1, grid % n_cells - grid % comm % n_buff_cells
-      mass_err = mass_err + abs(b(c))
-    end do
-    call Comm_Mod_Global_Sum_Real(mass_err)
-    if (flow % i_corr == flow % n_piso_corrections) then
-      flow % p % res = mass_err
-      if (ini == 1) then
-        flow % p % res_scal0 = mass_err
-      else
-        if (ini < 6) then
-          flow % p % res_scal0 = max(flow % p % res_scal0, mass_err)
-        end if
-      end if
-      flow % p % res = flow % p % res / flow % p % res_scal0
-    end if
   end if
 
   end subroutine

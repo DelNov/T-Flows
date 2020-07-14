@@ -15,7 +15,6 @@
   type(Var_Type),   pointer :: vof
   type(Matrix_Type),pointer :: a
   character(len=80)         :: solver
-  integer                   :: exec_iter
   integer                   :: c, c1, c2, s
 !==============================================================================!
 
@@ -47,17 +46,17 @@
           vof % n,        &
           b,              &
           vof % precond,  &
-          vof % niter,    &      ! max number of iterations
-          exec_iter,      &      ! executed number of iterations
+          vof % mniter,   &      ! max number of iterations
+          vof % eniter,   &      ! executed number of iterations
           vof % tol,      &
           vof % res)
   call Cpu_Timer_Mod_Stop('Linear_Solver_For_Multiphase')
 
-  !PRINT *, 'VOF ITER ', exec_iter
+  !PRINT *, 'VOF ITER ', vof % eniter
 !  call Multiphase_Mod_Vof_Scale_Residuals(mult, sol, vof)
 
   if (.not. mult % phase_change) then
-    call Info_Mod_Iter_Fill_At(1, 6, vof % name, exec_iter, vof % res)
+    call Info_Mod_Iter_Fill_At(1, 6, vof % name, vof % eniter, vof % res)
   end if
 
   end subroutine

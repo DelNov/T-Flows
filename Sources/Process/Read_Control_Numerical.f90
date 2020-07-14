@@ -26,13 +26,16 @@
   ! Take alias
   grid => flow % pnt_grid
 
-  !-------------------------------------------!
+  !------------------------------------------!
   !   Pressure velocity coupling algorithm   !
-  !-------------------------------------------!
-  call Control_Mod_Pressure_Velocity_Coupling_Algorithm(name)
-  call Control_Mod_Number_Of_Piso_Corrections(flow % n_piso_corrections)
-  flow % p_v_coupling = Numerics_Mod_Pressure_Velocity_Coupling(name)
-  flow % piso_status = .false.
+  !------------------------------------------!
+  call Control_Mod_Pressure_Momentum_Coupling(name, .true.)
+  flow % p_m_coupling = Numerics_Mod_Pressure_Momentum_Coupling_Code(name)
+
+  if( flow % p_m_coupling .eq. PISO) then
+    call Control_Mod_Number_Of_Piso_Corrections(flow % n_piso_corrections)
+    flow % piso_status = .false.
+  end if
 
   !-------------------------!
   !   Related to momentum   !
@@ -41,8 +44,8 @@
     if(i .eq. 1) ui => flow % u
     if(i .eq. 2) ui => flow % v
     if(i .eq. 3) ui => flow % w
-    ui % urf   = 0.8
-    ui % niter = 5
+    ui % urf    = 0.8
+    ui % mniter = 5
     call Control_Mod_Advection_Scheme_For_Momentum            (name)
     ui % adv_scheme = Numerics_Mod_Advection_Scheme_Code      (name)
     call Control_Mod_Time_Integration_Scheme                  (name)
@@ -51,24 +54,34 @@
     call Control_Mod_Simple_Underrelaxation_For_Momentum      (ui % urf)
     call Control_Mod_Tolerance_For_Momentum_Solver            (ui % tol)
     call Control_Mod_Preconditioner_For_System_Matrix         (ui % precond)
-    call Control_Mod_Max_Iterations_For_Momentum_Solver       (ui % niter)
+    call Control_Mod_Max_Iterations_For_Momentum_Solver       (ui % mniter)
   end do
 
   !-------------------------!
   !   Related to pressure   !
   !-------------------------!
-  flow % pp % niter = 40
+  flow % pp % mniter = 40
   call Control_Mod_Tolerance_For_Pressure_Solver      (flow % pp % tol)
   call Control_Mod_Preconditioner_For_System_Matrix   (flow % pp % precond)
-  call Control_Mod_Max_Iterations_For_Pressure_Solver (flow % pp % niter)
+  call Control_Mod_Max_Iterations_For_Pressure_Solver (flow % pp % mniter)
   call Control_Mod_Simple_Underrelaxation_For_Pressure(flow % pp % urf)
+
+  ! Temporal correction for pressure
+  call Control_Mod_Temporal_Pressure_Correction(flow % temp_corr)
+  if(.not. flow % temp_corr) then
+    flow % dt_corr    = HUGE
+    flow % u_rel_corr = 1.0
+  else
+    flow % dt_corr    = flow % dt
+    flow % u_rel_corr = flow % u % urf
+  end if
 
   !------------------------------!
   !   Related to heat transfer   !
   !------------------------------!
   if(heat_transfer) then
-    flow % t % urf   = 0.7
-    flow % t % niter = 5
+    flow % t % urf    = 0.7
+    flow % t % mniter = 5
     call Control_Mod_Advection_Scheme_For_Energy                    (name)
     flow % t % adv_scheme = Numerics_Mod_Advection_Scheme_Code      (name)
     call Control_Mod_Time_Integration_Scheme                        (name)
@@ -77,15 +90,15 @@
     call Control_Mod_Simple_Underrelaxation_For_Energy(flow % t % urf)
     call Control_Mod_Tolerance_For_Energy_Solver      (flow % t % tol)
     call Control_Mod_Preconditioner_For_System_Matrix (flow % t % precond)
-    call Control_Mod_Max_Iterations_For_Energy_Solver (flow % t % niter)
+    call Control_Mod_Max_Iterations_For_Energy_Solver (flow % t % mniter)
   end if
 
   !--------------------------------!
   !   Related to multiphase flow   !
   !--------------------------------!
   if(mult % model .eq. VOLUME_OF_FLUID) then
-    mult % vof % urf   = 0.7
-    mult % vof % niter = 5
+    mult % vof % urf    = 0.7
+    mult % vof % mniter = 5
     call Control_Mod_Advection_Scheme_For_Multiphase                  (name)
     mult % vof % adv_scheme = Numerics_Mod_Advection_Scheme_Code      (name)
     call Control_Mod_Time_Integration_Scheme                          (name)
@@ -94,7 +107,7 @@
     call Control_Mod_Simple_Underrelaxation_For_Multiphase(mult % vof % urf)
     call Control_Mod_Tolerance_For_Multiphase_Solver      (mult % vof % tol)
     call Control_Mod_Preconditioner_For_System_Matrix     (mult % vof % precond)
-    call Control_Mod_Max_Iterations_For_Multiphase_Solver (mult % vof % niter)
+    call Control_Mod_Max_Iterations_For_Multiphase_Solver (mult % vof % mniter)
     ! Max Courant number and Max substep cycles
     call Control_Mod_Max_Courant_Vof(mult % courant_max_param)
     call Control_Mod_Max_Substep_Cycles_Vof(mult % n_sub_param)
@@ -105,8 +118,6 @@
     call Control_Mod_Max_Smoothing_Cycles_Normal_Vof(mult % n_conv_norm)
     ! Nodal Curvature
     call Control_Mod_Nodal_Curvature(mult % nodal_curvature)
-    ! Temporal correction for pressure
-    call Control_Mod_Temporal_Pressure_Correction_Vof(mult % temp_corr)
     ! Skewness Correction
     call Control_Mod_Skewness_Correction_Vof(mult % skew_corr)
     ! Parameters for distance function
@@ -121,8 +132,8 @@
   !--------------------------------!
   do sc = 1, flow % n_scalars
     phi => flow % scalar(sc)
-    phi % urf   = 0.7
-    phi % niter = 5
+    phi % urf    = 0.7
+    phi % mniter = 5
     call Control_Mod_Advection_Scheme_For_Scalars              (name)
     phi % adv_scheme = Numerics_Mod_Advection_Scheme_Code      (name)
     call Control_Mod_Time_Integration_Scheme                   (name)
@@ -131,7 +142,7 @@
     call Control_Mod_Simple_Underrelaxation_For_Scalars        (phi % urf)
     call Control_Mod_Tolerance_For_Scalars_Solver              (phi % tol)
     call Control_Mod_Preconditioner_For_System_Matrix          (phi % precond)
-    call Control_Mod_Max_Iterations_For_Scalars_Solver         (phi % niter)
+    call Control_Mod_Max_Iterations_For_Scalars_Solver         (phi % mniter)
   end do
 
   !------------------------------!
@@ -150,8 +161,8 @@
     if(i .eq. 10) tq => turb % uv
     if(i .eq. 11) tq => turb % uw
     if(i .eq. 12) tq => turb % vw
-    tq % urf   = 1.0
-    tq % niter = 6
+    tq % urf    = 1.0
+    tq % mniter = 6
     call Control_Mod_Advection_Scheme_For_Turbulence          (name)
     tq % adv_scheme = Numerics_Mod_Advection_Scheme_Code      (name)
     call Control_Mod_Time_Integration_Scheme                  (name)
@@ -160,7 +171,7 @@
     call Control_Mod_Simple_Underrelaxation_For_Turbulence    (tq % urf)
     call Control_Mod_Tolerance_For_Turbulence_Solver          (tq % tol)
     call Control_Mod_Preconditioner_For_System_Matrix         (tq % precond)
-    call Control_Mod_Max_Iterations_For_Turbulence_Solver     (tq % niter)
+    call Control_Mod_Max_Iterations_For_Turbulence_Solver     (tq % mniter)
   end do
 
   end subroutine

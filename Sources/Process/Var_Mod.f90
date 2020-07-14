@@ -28,7 +28,6 @@
     real              :: res               ! residual after lin. solver
     real              :: res_scal          ! scaled residual
     real              :: res_scal0         ! old scaled residual
-    integer           :: exec_iter
     real              :: units(5)          ! mass, length, time,
                                            ! temperature, angle
     ! Boundary cell type (important for scalars, since they
@@ -42,7 +41,8 @@
     integer           :: td_scheme   ! time-disretization
     real              :: tol         ! linear solver tolerance
     real              :: urf         ! under-relaxation factor
-    integer           :: niter       ! number of iterations
+    integer           :: mniter      ! max number of iterations for variable
+    integer           :: eniter      ! executed number of iterations for var.
     real, allocatable :: max(:)      ! max and min around a face ...
     real, allocatable :: min(:)      ! important for advection schemes
   end type

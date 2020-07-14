@@ -30,7 +30,7 @@
   real, contiguous,  pointer :: flux(:)
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
-  integer                    :: s, c, c1, c2, exec_iter, nc, nb
+  integer                    :: s, c, c1, c2, nc, nb
   real                       :: f_ex, f_im
   real                       :: a0, a12, a21
   real                       :: vis_eff
@@ -329,27 +329,27 @@
             phi % n,        &
             b,              &
             phi % precond,  &
-            phi % niter,    &
-            exec_iter,      &
+            phi % mniter,   &
+            phi % eniter,   &
             phi % tol,      &
             phi % res)
   call Cpu_Timer_Mod_Stop('Linear_Solver_For_Turbulence')
 
   ! Print info on the screen
   if( phi % name .eq. 'UU' )   &
-    call Info_Mod_Iter_Fill_At(3, 1, phi % name, exec_iter, phi % res)
+    call Info_Mod_Iter_Fill_At(3, 1, phi % name, phi % eniter, phi % res)
   if( phi % name .eq. 'VV' )   &
-    call Info_Mod_Iter_Fill_At(3, 2, phi % name, exec_iter, phi % res)
+    call Info_Mod_Iter_Fill_At(3, 2, phi % name, phi % eniter, phi % res)
   if( phi % name .eq. 'WW' )   &
-    call Info_Mod_Iter_Fill_At(3, 3, phi % name, exec_iter, phi % res)
+    call Info_Mod_Iter_Fill_At(3, 3, phi % name, phi % eniter, phi % res)
   if( phi % name .eq. 'UV' )   &
-    call Info_Mod_Iter_Fill_At(3, 4, phi % name, exec_iter, phi % res)
+    call Info_Mod_Iter_Fill_At(3, 4, phi % name, phi % eniter, phi % res)
   if( phi % name .eq. 'UW' )   &
-    call Info_Mod_Iter_Fill_At(3, 5, phi % name, exec_iter, phi % res)
+    call Info_Mod_Iter_Fill_At(3, 5, phi % name, phi % eniter, phi % res)
   if( phi % name .eq. 'VW' )   &
-    call Info_Mod_Iter_Fill_At(3, 6, phi % name, exec_iter, phi % res)
+    call Info_Mod_Iter_Fill_At(3, 6, phi % name, phi % eniter, phi % res)
   if( phi % name .eq. 'EPS' )  &
-    call Info_Mod_Iter_Fill_At(4, 1, phi % name, exec_iter, phi % res)
+    call Info_Mod_Iter_Fill_At(4, 1, phi % name, phi % eniter, phi % res)
 
   if(phi % name .eq. 'EPS') then
     do c= 1, grid % n_cells

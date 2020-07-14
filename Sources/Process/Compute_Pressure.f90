@@ -33,7 +33,7 @@
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
   real,              pointer :: u_relax
-  integer                    :: s, c, c1, c2, exec_iter
+  integer                    :: s, c, c1, c2
   real                       :: u_f, v_f, w_f, a12, fs
   real                       :: mass_err
   real                       :: px_f, py_f, pz_f
@@ -72,7 +72,7 @@
   pp      => flow % pp
   a       => sol % a
   b       => sol % b % val
-  u_relax => mult % u_rel_corr
+  u_relax => flow % u_rel_corr
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! User function
@@ -224,12 +224,33 @@
     call Multiphase_Mod_Vof_Pressure_Correction(mult, sol, ini, mass_err)
   end if
 
-  if (flow % p_v_coupling == SIMPLE) then
+  ! Compute mass error for SIMPLE
+  if (flow % p_m_coupling == SIMPLE) then
     mass_err = 0.0
     do c = 1, grid % n_cells
       mass_err = max(mass_err, abs(b(c)))
     end do
+
+  ! Compute mass error for PISO
+  else if (flow % p_m_coupling == PISO) then
+    mass_err = 0.0
+    do c = 1, grid % n_cells - grid % comm % n_buff_cells
+      mass_err = mass_err + abs(b(c))
+    end do
+    call Comm_Mod_Global_Sum_Real(mass_err)
+    if (flow % i_corr == flow % n_piso_corrections) then
+      flow % p % res = mass_err
+      if (ini == 1) then
+        flow % p % res_scal0 = mass_err
+      else
+        if (ini < 6) then
+          flow % p % res_scal0 = max(flow % p % res_scal0, mass_err)
+        end if
+      end if
+      flow % p % res = flow % p % res / flow % p % res_scal0
+    end if
   end if
+
 
   ! Get solver
   call Control_Mod_Solver_For_Pressure(solver)
@@ -241,7 +262,7 @@
              pp % n,        &
              b,             &
              pp % precond,  &
-             pp % niter,    &     ! number of V cycles
+             pp % mniter,   &     ! number of V cycles
              pp % tol,      &
              pp % res,      &
              norm = p_nor)        ! last argument: number for normalisation
@@ -251,19 +272,19 @@
             pp % n,        &
             b,             &
             pp % precond,  &
-            pp % niter,    &      ! max number of iterations
-            exec_iter,     &      ! executed number of iterations
+            pp % mniter,   &      ! max number of iterations
+            pp % eniter,   &      ! executed number of iterations
             pp % tol,      &
             pp % res,      &
             norm = p_nor)         ! last argument: number for normalisation
   end if
   call Cpu_Timer_Mod_Stop('Linear_Solver_For_Pressure')
 
-  if (flow % p_v_coupling == SIMPLE) then
-    call Info_Mod_Iter_Fill_At(1, 4, pp % name, exec_iter, pp % res)
+  if (flow % p_m_coupling == SIMPLE) then
+    call Info_Mod_Iter_Fill_At(1, 4, pp % name, pp % eniter, pp % res)
   else
     if (flow % i_corr == flow % n_piso_corrections) then
-      call Info_Mod_Iter_Fill_At(1, 4, pp % name, exec_iter, pp % res)
+      call Info_Mod_Iter_Fill_At(1, 4, pp % name, pp % eniter, pp % res)
     end if
   end if
 

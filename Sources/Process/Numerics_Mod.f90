@@ -50,7 +50,7 @@
   include 'Numerics_Mod/Advection_Term.f90'
   include 'Numerics_Mod/Advection_Min_Max.f90'
   include 'Numerics_Mod/Inertial_Term.f90'
-  include 'Numerics_Mod/Pressure_Velocity_Coupling.f90'
+  include 'Numerics_Mod/Pressure_Momentum_Coupling_Code.f90'
   include 'Numerics_Mod/Time_Integration_Scheme_Code.f90'
   include 'Numerics_Mod/Under_Relax.f90'
 

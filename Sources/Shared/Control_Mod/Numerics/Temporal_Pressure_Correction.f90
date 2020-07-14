@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Control_Mod_Temporal_Pressure_Correction_Vof(temp_corr, verbose)
+  subroutine Control_Mod_Temporal_Pressure_Correction(temp_corr, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -9,7 +9,7 @@
   character(len=80) :: val
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('TEMPORAL_PRESSURE_CORRECTION_VOF',   &
+  call Control_Mod_Read_Char_Item('TEMPORAL_PRESSURE_CORRECTION',   &
                                   'no', val, verbose)
   call To_Upper_Case(val)
 

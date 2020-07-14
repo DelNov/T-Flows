@@ -151,7 +151,8 @@
     include 'Control_Mod/Numerics/Max_Simple_Iterations.f90'
     include 'Control_Mod/Numerics/Min_Simple_Iterations.f90'
     include 'Control_Mod/Numerics/Number_Of_Piso_Corrections.f90'
-    include 'Control_Mod/Numerics/Pressure_Velocity_Coupling_Algorithm.f90'
+    include 'Control_Mod/Numerics/Pressure_Momentum_Coupling.f90'
+    include 'Control_Mod/Numerics/Temporal_Pressure_Correction.f90'
     include 'Control_Mod/Numerics/Simple_Underrelaxation_For_Momentum.f90'
     include 'Control_Mod/Numerics/Simple_Underrelaxation_For_Pressure.f90'
     include 'Control_Mod/Numerics/Simple_Underrelaxation_For_Energy.f90'
@@ -191,7 +192,7 @@
     include 'Control_Mod/Numerics/V_Cycle_Number_Of_Smoothing_Iterations.f90'
     include 'Control_Mod/Numerics/V_Cycle_Residual_Ratio.f90'
 
-    !Numerical Parameters VOF (CICSAM)
+    ! Numerical Parameters VOF (CICSAM)
     include 'Control_Mod/Numerics/Distance_Function_Time_Integration_Scheme_Vof.f90'
     include 'Control_Mod/Numerics/Factor_Number_Cells_Distance_Function_Vof.f90'
     include 'Control_Mod/Numerics/Factor_Fictitious_Time_Vof.f90'
@@ -201,6 +202,5 @@
     include 'Control_Mod/Numerics/Max_Courant_Vof.f90'
     include 'Control_Mod/Numerics/Max_Substep_Cycles_Vof.f90'
     include 'Control_Mod/Numerics/Nodal_Curvature.f90'
-    include 'Control_Mod/Numerics/Temporal_Pressure_Correction_Vof.f90'
     include 'Control_Mod/Numerics/Skewness_Correction_Vof.f90'
   end module

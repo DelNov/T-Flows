@@ -22,7 +22,7 @@
   real, contiguous,  pointer :: flux(:)
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
-  integer                    :: s, c, c1, c2, exec_iter
+  integer                    :: s, c, c1, c2
   real                       :: f_ex, f_im
   real                       :: a0, a12, a21
   real                       :: vis_eff
@@ -254,8 +254,8 @@
             phi % n,        &
             b,              &
             phi % precond,  &
-            phi % niter,    &
-            exec_iter,      &
+            phi % mniter,   &
+            phi % eniter,   &
             phi % tol,      &
             phi % res)
   call Cpu_Timer_Mod_Stop('Linear_Solver_For_Turbulence')
@@ -270,14 +270,14 @@
      turb % model .eq. K_EPS_ZETA_F .or.  &
      turb % model .eq. HYBRID_LES_RANS) then
     if(phi % name .eq. 'KIN')  &
-      call Info_Mod_Iter_Fill_At(3, 1, phi % name, exec_iter, phi % res)
+      call Info_Mod_Iter_Fill_At(3, 1, phi % name, phi % eniter, phi % res)
     if(phi % name .eq. 'EPS')  &
-      call Info_Mod_Iter_Fill_At(3, 2, phi % name, exec_iter, phi % res)
+      call Info_Mod_Iter_Fill_At(3, 2, phi % name, phi % eniter, phi % res)
     if(phi % name .eq. 'ZETA')  &
-      call Info_Mod_Iter_Fill_At(3, 3, phi % name, exec_iter, phi % res)
+      call Info_Mod_Iter_Fill_At(3, 3, phi % name, phi % eniter, phi % res)
     if(heat_transfer) then
       if(phi % name .eq. 'T2')  &
-      call Info_Mod_Iter_Fill_At(3, 5, phi % name, exec_iter, phi % res)
+      call Info_Mod_Iter_Fill_At(3, 5, phi % name, phi % eniter, phi % res)
     end if
   end if
 

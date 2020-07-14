@@ -103,7 +103,7 @@
     ! This is here because they need to be collected before
     ! u, v, w are calculated
 
-    if (mult % temp_corr) then
+    if (flow % temp_corr) then
       ! Guessed face velocity
       if (i == 1) then
         do s = grid % n_bnd_faces + 1, grid % n_faces
@@ -125,7 +125,7 @@
     end if
 
     ! PISO corrections are executed here
-    if (flow % p_v_coupling == PISO .and. flow % piso_status .eqv. .true.) then
+    if (flow % p_m_coupling == PISO .and. flow % piso_status .eqv. .true.) then
 
       ! Sum of neighbours
       neigh = 0.0

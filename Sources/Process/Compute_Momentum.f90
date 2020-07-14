@@ -43,7 +43,7 @@
   real, contiguous,  pointer :: ui_i(:), ui_j(:), ui_k(:), uj_i(:), uk_i(:)
   real, contiguous,  pointer :: si(:), sj(:), sk(:), di(:), dj(:), dk(:)
   real, contiguous,  pointer :: h_i(:)
-  integer                    :: s, c, c1, c2, exec_iter
+  integer                    :: s, c, c1, c2
   real                       :: f_ex, f_im, f_stress
   real                       :: vel_max
   real                       :: a0, a12, a21
@@ -315,10 +315,9 @@
 
   !----------------------------------!
   !   Surface tension contribution   !
+  !   (and some parts of the PISO    !
   !----------------------------------!
-  if(mult % model .eq. VOLUME_OF_FLUID) then
-    call Multiphase_Mod_Vof_Momentum_Contribution(mult, sol, ui, i)
-  end if
+  call Multiphase_Mod_Vof_Momentum_Contribution(mult, sol, ui, i)
 
   !----------------------------------------!
   !   All other terms defined by the user  !
@@ -346,16 +345,16 @@
               ui % n,        &
               b,             &
               ui % precond,  &
-              ui % niter,    &
-              exec_iter,     &
+              ui % mniter,   &
+              ui % eniter,   &
               ui % tol,      &
               ui % res,      &
               norm = vel_max)
     call Cpu_Timer_Mod_Stop('Linear_Solver_For_Momentum')
 
     ! Fill the info screen up
-    if (flow % p_v_coupling == SIMPLE) then
-      call Info_Mod_Iter_Fill_At(1, i, ui % name, exec_iter, ui % res)
+    if (flow % p_m_coupling == SIMPLE) then
+      call Info_Mod_Iter_Fill_At(1, i, ui % name, ui % eniter, ui % res)
     end if
 
     call Grid_Mod_Exchange_Cells_Real(grid, ui % n)

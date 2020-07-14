@@ -15,7 +15,7 @@
   type(Turb_Type),       target :: turb
   type(Multiphase_Type), target :: mult
   type(Solver_Type),     target :: sol
-  integer                       :: ini    ! current temporal iteration
+  integer                       :: ini       ! current inner iteration
   real                          :: mass_res
 !-----------------------------------[Locals]-----------------------------------!
   type(Matrix_Type),    pointer :: a
@@ -27,7 +27,7 @@
   grid   => flow % pnt_grid
   call Solver_Mod_Alias_System(sol, a, b)
 
-  if (flow % p_v_coupling == PISO) then
+  if (flow % p_m_coupling == PISO) then
 
     flow % piso_status = .true.
     do corr_steps = 1, flow % n_piso_corrections
@@ -36,7 +36,7 @@
                                    flow % density,  &
                                    grav_x, grav_y, grav_z)
 
-      !call Multiphase_Mod_Vof_Open_Boundary(flow, mult)
+      ! call Multiphase_Mod_Vof_Open_Boundary(flow, mult)
 
       ! Compute velocity gradients
       call Field_Mod_Grad_Variable(flow, flow % u)

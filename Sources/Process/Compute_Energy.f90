@@ -33,7 +33,7 @@
   type(Face_Type),   pointer :: m_flux
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
-  integer                    :: c, s, c1, c2, exec_iter
+  integer                    :: c, s, c1, c2
   real                       :: a12, a21, con_eff_f, con_t_f
   real                       :: f_ex1, f_im1, tx_f1, ty_f1, tz_f1
   real                       :: f_ex2, f_im2, tx_f2, ty_f2, tz_f2
@@ -325,14 +325,14 @@
             t % n,        &
             b,            &
             t % precond,  &
-            t % niter,    &
-            exec_iter,    &
+            t % mniter,   &
+            t % eniter,   &
             t % tol,      &
             t % res)
   call Cpu_Timer_Mod_Stop('Linear_Solver_For_Energy')
 
   ! Print some info on the screen
-  call Info_Mod_Iter_Fill_At(1, 6, t % name, exec_iter, t % res)
+  call Info_Mod_Iter_Fill_At(1, 6, t % name, t % eniter, t % res)
 
   call Grid_Mod_Exchange_Cells_Real(grid, t % n)
 

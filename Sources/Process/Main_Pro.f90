@@ -148,6 +148,11 @@
     call Multiphase_Mod_Allocate(mult(d), flow(d))
     call User_Mod_Allocate(grid(d))
 
+    ! Read time step from root
+    call Control_Mod_Switch_To_Root()
+    call Control_Mod_Time_Step(flow(d) % dt, verbose=.true.)
+    call Control_Mod_Switch_To_Domain(d)  ! go back to local domain's control
+
     ! Read numerical models from control file (after the memory is allocated)
     call Read_Control_Numerical(flow(d), turb(d), mult(d))
 
@@ -194,9 +199,6 @@
       call Multiphase_Mod_Vof_Find_Weight_Nodes_To_Cells(grid(d))
       call Multiphase_Mod_Vof_Find_Weight_Grad_From_Nodes(grid(d))
       call Multiphase_Mod_Vof_Find_Weight_Nodal_Grad(grid(d))
-    else
-      mult % dt_corr    = HUGE
-      mult % u_rel_corr = 1.0
     end if
 
     ! Initialize monitoring points
@@ -269,9 +271,6 @@
     !   Preparations for new time step   !
     !------------------------------------!
     do d = 1, n_dom
-
-      call Control_Mod_Switch_To_Root()  ! read time step from root
-      call Control_Mod_Time_Step(flow(d) % dt, verbose=.true.)
 
       call Control_Mod_Switch_To_Domain(d)  ! not sure if this call is needed
 

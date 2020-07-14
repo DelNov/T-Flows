@@ -15,7 +15,7 @@
   type(Var_Type),    pointer :: phi, u, v, w
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
-  integer                    :: s, c, c1, c2, exec_iter, n
+  integer                    :: s, c, c1, c2, n
   real                       :: f_ex, f_im
   real                       :: a0
   real                       :: phi_x_f, phi_y_f, phi_z_f
@@ -183,7 +183,7 @@
     !---------------------------------!
 
     ! Set number of iterations "by hand"
-    phi % niter   = 66
+    phi % mniter  = 66
     phi % tol     =  1.0e-6
     phi % precond = 'INCOMPLETE_CHOLESKY'
 
@@ -192,16 +192,16 @@
               phi % n,        &
               b,              &
               phi % precond,  &
-              phi % niter,    &
-              exec_iter,      &
+              phi % mniter,   &
+              phi % eniter,   &
               phi % tol,      &
               phi % res)
     if(this_proc < 2) then
-      print '(a,i4,a,e12.4)', ' # Computed potential in ', exec_iter,  &
+      print '(a,i4,a,e12.4)', ' # Computed potential in ',   phi % eniter,  &
                               ' iterations with residual: ', phi % res
     end if
 
-    if(exec_iter .eq. 0) goto 1
+    if(phi % eniter .eq. 0) goto 1
 
     call Grid_Mod_Exchange_Cells_Real(grid, phi % n)
 

@@ -45,14 +45,6 @@
   a => sol % a
   b => sol % b % val
 
-  if (mult % temp_corr) then
-    mult % dt_corr    = flow % dt
-    mult % u_rel_corr = flow % u % urf
-  else
-    mult % dt_corr    = HUGE
-    mult % u_rel_corr = 1.0
-  end if
-
   epsloc = epsilon(epsloc)
 
   if (vof % adv_scheme .eq. CICSAM .or. &

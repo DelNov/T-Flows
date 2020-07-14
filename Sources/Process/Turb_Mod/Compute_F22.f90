@@ -14,7 +14,7 @@
   type(Grid_Type),   pointer :: grid
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
-  integer                    :: s, c, c1, c2, exec_iter
+  integer                    :: s, c, c1, c2
   real                       :: f_ex, f_im
   real                       :: a0, a12, a21
   real                       :: phi_x_f, phi_y_f, phi_z_f
@@ -162,16 +162,16 @@
           phi % n,        &
           b,              &
           phi % precond,  &
-          phi % niter,    &
-          exec_iter,      &
+          phi % mniter,   &
+          phi % eniter,   &
           phi % tol,      &
           phi % res)
 
   ! Print info on the screen
   if(turb % model .eq. K_EPS_ZETA_F) then
-    call Info_Mod_Iter_Fill_At(3, 4, phi % name, exec_iter, phi % res)
+    call Info_Mod_Iter_Fill_At(3, 4, phi % name, phi % eniter, phi % res)
   else if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
-    call Info_Mod_Iter_Fill_At(4, 2, phi % name, exec_iter, phi % res)
+    call Info_Mod_Iter_Fill_At(4, 2, phi % name, phi % eniter, phi % res)
   end if
 
   call Grid_Mod_Exchange_Cells_Real(grid, phi % n)

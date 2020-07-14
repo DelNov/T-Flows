@@ -47,7 +47,7 @@
   pp      => flow % pp
   a       => sol % a
   b       => sol % b % val
-  u_relax => mult % u_rel_corr
+  u_relax => flow % u_rel_corr
 
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
@@ -103,7 +103,7 @@
   !   with the new (corrected) fluxes   !
   !-------------------------------------!
 
-  if(flow % p_v_coupling == SIMPLE) then
+  if(flow % p_m_coupling == SIMPLE) then
     do c = 1, grid % n_cells
       b(c) = 0.0
     end do
@@ -190,7 +190,7 @@
   call Comm_Mod_Global_Max_Real(flow % cfl_max)
   call Comm_Mod_Global_Max_Real(flow % pe_max)
 
-  if (flow % p_v_coupling == SIMPLE) then
+  if (flow % p_m_coupling == SIMPLE) then
     call Info_Mod_Iter_Fill_At(1, 5, 'dum', -1, mass_err)
   else
     if (flow % i_corr == flow % n_piso_corrections) then
