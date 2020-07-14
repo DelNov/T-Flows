@@ -166,6 +166,7 @@
         ! and high-re k-eps models. 
         if(turb % model .eq. K_EPS_ZETA_F    .or.  &
            turb % model .eq. HYBRID_LES_RANS .or.  &
+           turb % model .eq. LES_DYNAMIC     .or.  &
            turb % model .eq. K_EPS) then
           if(Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALLFL) then
             t % n(c2) = t % n(c1) + t % q(c2) * grid % wall_dist(c1)  &
@@ -188,7 +189,8 @@
         end if
 
         ! Integrate heat and heated area
-        flow % heat = flow % heat + t % q(c2) * grid % s(s)
+        flow % heat = flow % heat + (abs(t % q(c2)) + abs(turb % wt_res(c1) &
+        - turb % t_mean(c1)*turb % w_mean(c1))) * grid % s(s)
         if(abs(t % q(c2)) > TINY) then
           flow % heated_area = flow % heated_area + grid % s(s)
         end if
