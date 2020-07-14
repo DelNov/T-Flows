@@ -1,28 +1,27 @@
 !==============================================================================!
   subroutine Multiphase_Mod_Vof_Limit_Scalar(grid, mult, var, limit_var)
 !------------------------------------------------------------------------------!
-!    Smoothes scalar using a laplacian smoother                                !
+!   Smoothes scalar using a laplacian smoother                                 !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Work_Mod, only: w             => r_cell_01,   &
                       w_int         => r_cell_02,   &
                       face_scalar   => r_face_01,   &
                       wf            => r_face_02
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Multiphase_Type), target :: mult
   type(Grid_Type)               :: grid
   integer                       :: n_conv
-  real                          :: var        (-grid % n_bnd_cells    &
-                                              : grid % n_cells),      &
-                                   limit_var  (-grid % n_bnd_cells    &
-                                              : grid % n_cells)
+  real                          :: var(-grid % n_bnd_cells:grid % n_cells)
+  real                          :: limit_var(-grid % n_bnd_cells:grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  type(Var_Type),       pointer :: vof
-  type(Matrix_Type),    pointer :: a
-  integer                       :: i, s, c, c1, c2, c_iter, run
-  integer                       :: face_init, face_end, face_step
-  real                          :: fs, vol_face, csk, w1, w2, epsloc
+  type(Var_Type),    pointer :: vof
+  type(Matrix_Type), pointer :: a
+  integer                    :: i, s, c, c1, c2, c_iter, run
+  integer                    :: face_init, face_end, face_step
+  real                       :: fs, vol_face, csk, w1, w2, epsloc
 !==============================================================================!
 
   ! Take aliases
