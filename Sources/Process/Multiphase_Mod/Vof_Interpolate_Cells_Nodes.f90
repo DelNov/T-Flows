@@ -6,13 +6,12 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)               :: grid
-  real                          :: var_cell   (-grid % n_bnd_cells    &
-                                              : grid % n_cells),      &
-                                   var_node   (1 : grid % n_nodes)
+  type(Grid_Type) :: grid
+  real            :: var_cell(-grid % n_bnd_cells:grid % n_cells)
+  real            :: var_node(1:grid % n_nodes)
 !-----------------------------------[Locals]-----------------------------------!
-  integer                       :: n, s, c, c1, c2, i_cell, i_fac
-  real                          :: sum1, sum2
+  integer :: n, s, c, c1, c2, i_cell, i_fac
+  real    :: sum1, sum2
 !==============================================================================!
 
   ! Interpolate from all cells to nodes
