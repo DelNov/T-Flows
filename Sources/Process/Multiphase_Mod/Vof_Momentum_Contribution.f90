@@ -80,19 +80,19 @@
       case(1)
 
         do c = 1, grid % n_cells
-          b(c) = b(c) + mult % body_fx(c)
+          b(c) = b(c) + flow % body_fx(c)
         end do
 
       case(2)
 
         do c = 1, grid % n_cells
-          b(c) = b(c) + mult % body_fy(c)
+          b(c) = b(c) + flow % body_fy(c)
         end do
 
       case(3)
 
         do c = 1, grid % n_cells
-          b(c) = b(c) + mult % body_fz(c)
+          b(c) = b(c) + flow % body_fz(c)
         end do
 
     end select

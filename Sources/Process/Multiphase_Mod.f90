@@ -70,11 +70,6 @@
     real, allocatable :: fc_y(:)
     real, allocatable :: fc_z(:)
 
-    ! Body force
-    real, allocatable :: body_fx(:)
-    real, allocatable :: body_fy(:)
-    real, allocatable :: body_fz(:)
-
     ! heat from phase change and index of saturated cells
     real, allocatable    :: qci(:)
     real, allocatable    :: flux_rate(:)

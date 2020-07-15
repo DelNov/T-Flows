@@ -89,14 +89,14 @@
       fs = grid % f(s)
 
       ! Interpolate gradients
-      dotprod =  0.5 * (mult % body_fx(c1) / grid % vol(c1)       &
-                      + mult % body_fx(c2) / grid % vol(c2))      &
+      dotprod =  0.5 * (flow % body_fx(c1) / grid % vol(c1)       &
+                      + flow % body_fx(c2) / grid % vol(c2))      &
                       * grid % dx(s)                              &
-               + 0.5 * (mult % body_fy(c1) / grid % vol(c1)       &
-                      + mult % body_fy(c2) / grid % vol(c2))      &
+               + 0.5 * (flow % body_fy(c1) / grid % vol(c1)       &
+                      + flow % body_fy(c2) / grid % vol(c2))      &
                       * grid % dy(s)                              &
-               + 0.5 * (mult % body_fz(c1) / grid % vol(c1)       &
-                      + mult % body_fz(c2) / grid % vol(c2))      &
+               + 0.5 * (flow % body_fz(c1) / grid % vol(c1)       &
+                      + flow % body_fz(c2) / grid % vol(c2))      &
                       * grid % dz(s)
 
       gravity_source = ((grid % xf(s) - grid % xc(c1)) * grav_x   &
