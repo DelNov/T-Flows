@@ -13,6 +13,7 @@
   type(Var_Type),   pointer :: u, v, w, p, t, phi
   type(Var_Type),   pointer :: kin, eps, f22, zeta, vis, t2
   type(Var_Type),   pointer :: uu, vv, ww, uv, uw, vw
+  type(Var_Type),   pointer :: ut, vt, wt
   integer                   :: c, n, sc
   real,             pointer :: u_mean(:), v_mean(:), w_mean(:),  &
                                p_mean(:), t_mean(:)
@@ -39,6 +40,7 @@
   call Field_Mod_Alias_Energy     (flow, t)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
   call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
+  call Turb_Mod_Alias_Heat_Fluxes(turb, ut, vt, wt)
 
   ! Time averaged momentum and energy equations
   u_mean => turb % u_mean;  v_mean => turb % v_mean;  w_mean => turb % w_mean
@@ -179,6 +181,9 @@
           ut_res(c) = (ut_res(c)*(1.*n) + u % n(c) * t % n(c)) / (1.*(n+1))
           vt_res(c) = (vt_res(c)*(1.*n) + v % n(c) * t % n(c)) / (1.*(n+1))
           wt_res(c) = (wt_res(c)*(1.*n) + w % n(c) * t % n(c)) / (1.*(n+1))
+          ut_mean(c)= (ut_mean(c)*(1.*n) + ut % n(c))          / (1.*(n+1))
+          vt_mean(c)= (vt_mean(c)*(1.*n) + vt % n(c))          / (1.*(n+1))
+          wt_mean(c)= (wt_mean(c)*(1.*n) + wt % n(c))          / (1.*(n+1)) 
         end if
 
       end if
