@@ -313,7 +313,7 @@
   !-----------------------------------!
 
   !--------------------------------------------------------!
-  !   If not inside the PRIME part of the PISO algorythm   !
+  !   If not inside the PRIME part of the PISO algorithm   !
   !--------------------------------------------------------!
   if(flow % piso_status .eqv. .false.) then
 

@@ -69,7 +69,7 @@
 
   !----------------------------------------------------------------!
   !   Look at the following equation and you will understand why   !
-  !   is the matrix for pressure corrections in SIMPLE algorythm   !
+  !   is the matrix for pressure corrections in SIMPLE algorithm   !
   !   formed from the coefficients of the velocity matrix.         !
   !                                                                !
   !   Note that the fluxes corrected below are either mass or      !
