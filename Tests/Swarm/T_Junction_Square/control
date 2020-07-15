@@ -55,9 +55,7 @@
 #--------------------
 # Initial conditions
 #--------------------
-  INITIAL_CONDITION
-    VARIABLES           u     v     w
-    VALUES              0.0   0.0   0.0
+  POTENTIAL_INITIALIZATION   yes
 
 #---------------------
 # Boundary conditions
