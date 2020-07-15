@@ -1,3 +1,6 @@
+#----------
+# Prologue
+#----------
  PROBLEM_NAME     cavity
  HEAT_TRANSFER    yes
  BUOYANCY         yes
@@ -8,8 +11,6 @@
  BACKUP_SAVE_INTERVAL     300
 
  TIME_STEP               1.0
-
- LOAD_BACKUP_NAME cavity-ts000600.backup
 
 #-------------------
 # Monitoring points 
@@ -30,13 +31,13 @@
 
  # Properties based on Pr and Ra numbers:
  # Pr = 0.71
- # Ra = 10e4
- # mu     = 1.0 / sqrt(Pr * Ra) = 0.01186781658
- # lambda = sqrt(Pr / Ra)       = 0.00842614977
+ # Ra = 10e5
+ # mu     = 1.0 / sqrt(Pr * Ra) = 0.00375293312
+ # lambda = sqrt(Pr / Ra)       = 0.00266458251
  MASS_DENSITY           1.0
  HEAT_CAPACITY          1.0
- DYNAMIC_VISCOSITY      0.01186781658
- THERMAL_CONDUCTIVITY   0.00842614977
+ DYNAMIC_VISCOSITY      0.00375293312
+ THERMAL_CONDUCTIVITY   0.00266458251
 
  TURBULENCE_MODEL       none
 
@@ -92,10 +93,3 @@
     TYPE                wall
     VARIABLES           u     v     w     t
     VALUES              0.0   0.0   0.0   0.0
-
-  BOUNDARY_CONDITION    symmetry
-    TYPE                symmetry
-    VARIABLES           u     v     w     t
-    VALUES              0.0   0.0   0.0   0.5
-
-

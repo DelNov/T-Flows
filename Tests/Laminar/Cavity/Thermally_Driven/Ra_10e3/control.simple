@@ -1,3 +1,6 @@
+#----------
+# Prologue
+#----------
  PROBLEM_NAME     cavity
  HEAT_TRANSFER    yes
  BUOYANCY         yes
@@ -28,13 +31,13 @@
 
  # Properties based on Pr and Ra numbers:
  # Pr = 0.71
- # Ra = 10e5
- # mu     = 1.0 / sqrt(Pr * Ra) = 0.00375293312
- # lambda = sqrt(Pr / Ra)       = 0.00266458251
+ # Ra = 10e3
+ # mu     = 1.0 / sqrt(Pr * Ra) = 0.03752933125
+ # lambda = sqrt(Pr / Ra)       = 0.02664582518
  MASS_DENSITY           1.0
  HEAT_CAPACITY          1.0
- DYNAMIC_VISCOSITY      0.00375293312
- THERMAL_CONDUCTIVITY   0.00266458251
+ DYNAMIC_VISCOSITY      0.03752933125
+ THERMAL_CONDUCTIVITY   0.02664582518
 
  TURBULENCE_MODEL       none
 
