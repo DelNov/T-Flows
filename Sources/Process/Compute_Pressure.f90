@@ -224,6 +224,11 @@
     call Multiphase_Mod_Vof_Pressure_Correction(mult, sol, ini, mass_err)
   end if
 
+  !-------------------------------------!
+  !   Correct fluxes with body forces   !
+  !-------------------------------------!
+  call Field_Mod_Correct_Fluxes_With_Body_Forces(flow, sol)
+
   ! Compute mass error for SIMPLE
   if (flow % p_m_coupling == SIMPLE) then
     mass_err = 0.0
@@ -251,7 +256,6 @@
     end if
   end if
 
-
   ! Get solver
   call Control_Mod_Solver_For_Pressure(solver)
 
@@ -277,6 +281,7 @@
             pp % tol,      &
             pp % res,      &
             norm = p_nor)         ! last argument: number for normalisation
+
   end if
   call Cpu_Timer_Mod_Stop('Linear_Solver_For_Pressure')
 

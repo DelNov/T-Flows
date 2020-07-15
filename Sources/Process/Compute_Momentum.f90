@@ -25,7 +25,7 @@
   real, contiguous,  pointer :: b(:)
   real, contiguous,  pointer :: ui_i(:), ui_j(:), ui_k(:), uj_i(:), uk_i(:)
   real, contiguous,  pointer :: si(:), sj(:), sk(:), di(:), dj(:), dk(:)
-  real, contiguous,  pointer :: h_i(:)
+  real, contiguous,  pointer :: h_i(:), body_fi(:)
   integer                    :: s, c, c1, c2
   real                       :: f_ex, f_im, f_stress
   real                       :: vel_max
@@ -107,8 +107,9 @@
     si   => grid % sx;  sj   => grid % sy;  sk   => grid % sz
     di   => grid % dx;  dj   => grid % dy;  dk   => grid % dz
     h_i  => p % x;      uj_i => uj % x;     uk_i => uk % x
-    grav_i   = grav_x
-    p_drop_i = bulk % p_drop_x
+    body_fi  => flow % body_fx
+    grav_i   =  grav_x
+    p_drop_i =  bulk % p_drop_x
   end if
   if(i .eq. 2) then
     ui   => flow % v;   uj   => flow % w;   uk   => flow % u
@@ -116,8 +117,9 @@
     si   => grid % sy;  sj   => grid % sz;  sk   => grid % sx
     di   => grid % dy;  dj   => grid % dz;  dk   => grid % dx
     h_i  => p % y;      uj_i => uj % y;     uk_i => uk % y
-    grav_i   = grav_y
-    p_drop_i = bulk % p_drop_y
+    body_fi  => flow % body_fy
+    grav_i   =  grav_y
+    p_drop_i =  bulk % p_drop_y
   end if
   if(i .eq. 3) then
     ui   => flow % w;   uj   => flow % u;   uk   => flow % v
@@ -125,8 +127,9 @@
     si   => grid % sz;  sj   => grid % sx;  sk   => grid % sy
     di   => grid % dz;  dj   => grid % dx;  dk   => grid % dy
     h_i  => p % z;      uj_i => uj % z;     uk_i => uk % z
-    grav_i   = grav_z
-    p_drop_i = bulk % p_drop_z
+    body_fi  => flow % body_fz
+    grav_i   =  grav_z
+    p_drop_i =  bulk % p_drop_z
   end if
 
   ! User function
@@ -252,6 +255,13 @@
   !--------------------!
   call Numerics_Mod_Inertial_Term(ui, flow % density, sol, dt)
 
+  !-------------------------------------------------!
+  !   Save the coefficients for pressure equation   !
+  !-------------------------------------------------!
+  do c = 1, grid % n_cells
+    a % sav(c) = a % val(a % dia(c))
+  end do
+
   !---------------------------------!
   !                                 !
   !   Pressure term contributions   !
@@ -275,31 +285,16 @@
   !--------------------!
   !   Buoyancy force   !
   !--------------------!
-  if(buoyancy) then
-    if(abs(grav_i) > NANO) then
-      do c = 1, grid % n_cells
-        b(c) = b(c) - flow % density(c) * grav_i * (t % n(c) - t_ref)  &
-             * flow % beta * grid % vol(c)
-      end do
-    end if
-
-  !-------------------!
-  !   Gravity force   !
-  !-------------------!
-  else
-    if(abs(grav_i) > NANO) then
-      if(mult % model .ne. VOLUME_OF_FLUID) then
-        do c = 1, grid % n_cells
-          b(c) = b(c) + flow % density(c) * grav_i * grid % vol(c)
-        end do
-      end if
-    end if
-  end if
+  do c = 1, grid % n_cells
+    b(c) = b(c) + body_fi(c)
+  end do
 
   !----------------------------------!
   !   Surface tension contribution   !
   !----------------------------------!
-  call Multiphase_Mod_Vof_Momentum_Contribution(mult, sol, ui, i)
+  if(mult % model .eq. VOLUME_OF_FLUID) then
+     call Multiphase_Mod_Vof_Momentum_Contribution(mult, sol, ui, i)
+  end if
 
   !----------------------------------------------!
   !   Explicit solution for the PISO algorithm   !
@@ -311,23 +306,23 @@
   !----------------------------------------!
   call User_Mod_Force(grid, ui, a, b)
 
-  ! Save the coefficients for pressure equation
-  do c = 1, grid % n_cells
-    a % sav(c) = a % val(a % dia(c))
-  end do
-
   !-----------------------------------!
   !                                   !
   !   Solve the equations for u,v,w   !
   !                                   !
   !-----------------------------------!
 
-  ! Under-relax the equations
-  call Numerics_Mod_Under_Relax(ui, sol)
-
+  !--------------------------------------------------------!
+  !   If not inside the PRIME part of the PISO algorythm   !
+  !--------------------------------------------------------!
   if(flow % piso_status .eqv. .false.) then
+
+    ! Under-relax the equations
+    call Numerics_Mod_Under_Relax(ui, sol)
+
     ! Call linear solver
     call Cpu_Timer_Mod_Start('Linear_Solver_For_Momentum')
+
     call Bicg(sol,           &
               ui % n,        &
               b,             &
@@ -345,11 +340,11 @@
     end if
 
     call Grid_Mod_Exchange_Cells_Real(grid, ui % n)
-
-    ! User function
-    call User_Mod_End_Of_Compute_Momentum(flow, turb, mult, dt, ini)
-
-    call Cpu_Timer_Mod_Stop('Compute_Momentum (without solvers)')
   end if
+
+  ! User function
+  call User_Mod_End_Of_Compute_Momentum(flow, turb, mult, dt, ini)
+
+  call Cpu_Timer_Mod_Stop('Compute_Momentum (without solvers)')
 
   end subroutine

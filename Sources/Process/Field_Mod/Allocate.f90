@@ -46,6 +46,13 @@
   allocate(flow % vort (-grid % n_bnd_cells:grid % n_cells)); flow % vort  = 0.
   allocate(flow % shear(-grid % n_bnd_cells:grid % n_cells)); flow % shear = 0.
 
+  allocate(flow % body_fx(-grid % n_bnd_cells:grid % n_cells))
+  allocate(flow % body_fy(-grid % n_bnd_cells:grid % n_cells))
+  allocate(flow % body_fz(-grid % n_bnd_cells:grid % n_cells))
+  flow % body_fx = 0.0
+  flow % body_fy = 0.0
+  flow % body_fz = 0.0
+
   !--------------------------------------!
   !   Allocate memory for user scalars   !
   !--------------------------------------!

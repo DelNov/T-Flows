@@ -17,7 +17,6 @@
   real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2, n
   real                       :: f_ex, f_im
-  real                       :: a0
   real                       :: phi_x_f, phi_y_f, phi_z_f
   real                       :: vol_in_real, vol_in_fake, dist_min
 !------------------------------[Local parameters]------------------------------!

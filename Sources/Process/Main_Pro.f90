@@ -363,6 +363,9 @@
         call Field_Mod_Grad_Variable(flow(d), flow(d) % v)
         call Field_Mod_Grad_Variable(flow(d), flow(d) % w)
 
+        ! Buoyancy force
+        call Field_Mod_Body_Forces(flow(d))
+
         ! All velocity components one after another
         call Compute_Momentum(flow(d), turb(d), mult(d), 1, sol(d),  &
                               flow(d) % dt, ini)

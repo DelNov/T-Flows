@@ -22,10 +22,9 @@
   real, contiguous,  pointer :: b(:)
   real,              pointer :: u_relax, dt_corr
   integer                    :: c, c1, c2, s
-  real                       :: a12, a1_in, a2_in
-  real                       :: u_fo, v_fo, w_fo
-  real                       :: stens_source, gravity_source, dotprod
-  real                       :: dens_f, dens_weight1, dens_weight2, fs
+  real                       :: a12, fs
+  real                       :: u_fo, v_fo, w_fo, tf
+  real                       :: stens_source, dotprod
   real                       :: factor1, factor2, correction
 !==============================================================================!
 
@@ -75,48 +74,6 @@
 
       b(c1) = b(c1) - stens_source
       b(c2) = b(c2) + stens_source
-
-    end do
-
-  end if
-
-  ! Correct for Gravity
-  if(sqrt(grav_x ** 2 + grav_y ** 2 + grav_z ** 2) >= TINY) then
-
-    do s = grid % n_bnd_faces + 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
-      fs = grid % f(s)
-
-      ! Interpolate gradients
-      dotprod =  0.5 * (flow % body_fx(c1) / grid % vol(c1)       &
-                      + flow % body_fx(c2) / grid % vol(c2))      &
-                      * grid % dx(s)                              &
-               + 0.5 * (flow % body_fy(c1) / grid % vol(c1)       &
-                      + flow % body_fy(c2) / grid % vol(c2))      &
-                      * grid % dy(s)                              &
-               + 0.5 * (flow % body_fz(c1) / grid % vol(c1)       &
-                      + flow % body_fz(c2) / grid % vol(c2))      &
-                      * grid % dz(s)
-
-      gravity_source = ((grid % xf(s) - grid % xc(c1)) * grav_x   &
-                      + (grid % yf(s) - grid % yc(c1)) * grav_y   &
-                      + (grid % zf(s) - grid % zc(c1)) * grav_z)  &
-                      * flow % density(c1)                        &
-                      -((grid % xf(s) - grid % xc(c2)) * grav_x   &
-                      + (grid % yf(s) - grid % yc(c2)) * grav_y   &
-                      + (grid % zf(s) - grid % zc(c2)) * grav_z)  &
-                      * flow % density(c2)
-
-      factor1 = u_relax * 0.5 * ( grid % vol(c1) / a % sav(c1)     &
-                                + grid % vol(c2) / a % sav(c2) )
-
-      gravity_source =  factor1 * a % fc(s) * (gravity_source - dotprod)
-
-      m_flux % n(s) = m_flux % n(s) + gravity_source
-
-      b(c1) = b(c1) - gravity_source
-      b(c2) = b(c2) + gravity_source
 
     end do
 

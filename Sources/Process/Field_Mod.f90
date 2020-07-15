@@ -88,6 +88,11 @@
     !-------------------------------------!
     real, allocatable :: grad(:,:)
 
+    ! Body force
+    real, allocatable :: body_fx(:)
+    real, allocatable :: body_fy(:)
+    real, allocatable :: body_fz(:)
+
   end type
 
   ! Variables determining if we are dealing with heat transfer and buoyancy
@@ -109,8 +114,10 @@
   include 'Field_Mod/Allocate_Grad_Matrix.f90'
   include 'Field_Mod/Alias_Energy.f90'
   include 'Field_Mod/Alias_Momentum.f90'
+  include 'Field_Mod/Body_Forces.f90'
   include 'Field_Mod/Calculate_Fluxes.f90'
   include 'Field_Mod/Calculate_Grad_Matrix.f90'
+  include 'Field_Mod/Correct_Fluxes_With_Body_Forces.f90'
   include 'Field_Mod/Grad_Component.f90'
   include 'Field_Mod/Grad_Pressure.f90'
   include 'Field_Mod/Grad_Pressure_Correction.f90'
