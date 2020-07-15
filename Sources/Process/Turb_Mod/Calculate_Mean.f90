@@ -139,6 +139,9 @@
           ut_res(c) = (ut_res(c)*(1.*n) + u % n(c) * t % n(c)) / (1.*(n+1))
           vt_res(c) = (vt_res(c)*(1.*n) + v % n(c) * t % n(c)) / (1.*(n+1))
           wt_res(c) = (wt_res(c)*(1.*n) + w % n(c) * t % n(c)) / (1.*(n+1))
+          ut_mean(c)= (ut_mean(c)*(1.*n) + ut % n(c))          / (1.*(n+1))
+          vt_mean(c)= (vt_mean(c)*(1.*n) + vt % n(c))          / (1.*(n+1))
+          wt_mean(c)= (wt_mean(c)*(1.*n) + wt % n(c))          / (1.*(n+1)) 
         end if
       end if
 
