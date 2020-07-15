@@ -189,8 +189,15 @@
         end if
 
         ! Integrate heat and heated area
-        flow % heat = flow % heat + (abs(t % q(c2)) + abs(turb % wt_res(c1) &
-        - turb % t_mean(c1)*turb % w_mean(c1))) * grid % s(s)
+        if(turb % model .eq. K_EPS_ZETA_F    .or.  &
+           turb % model .eq. HYBRID_LES_RANS .or.  &
+           turb % model .eq. LES_DYNAMIC     .or.  &
+           turb % model .eq. K_EPS) then
+          flow % heat = flow % heat + (abs(t % q(c2)) + abs(turb % wt_res(c1) &
+          - turb % t_mean(c1)*turb % w_mean(c1))) * grid % s(s)
+        else
+          flow % heat = flow % heat + abs(t % q(c2) * grid % s(s))
+        end if 
         if(abs(t % q(c2)) > TINY) then
           flow % heated_area = flow % heated_area + grid % s(s)
         end if
