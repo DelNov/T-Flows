@@ -308,6 +308,7 @@
         ! Update the values at boundaries
         call Update_Boundary_Values(flow(d), turb(d), mult(d))
         call Multiphase_Mod_Compute_Vof(mult(d), sol(d), flow(d) % dt, n)
+        call Field_Mod_Body_Forces(flow(d))
         call Multiphase_Averaging(flow(d), mult(d), mult(d) % vof)
       else
         flow(d) % m_flux % o(1:) = flow(d) % m_flux % n(1:)
@@ -328,14 +329,6 @@
     call Control_Mod_Max_Simple_Iterations(max_ini)
     call Control_Mod_Min_Simple_Iterations(min_ini)
     call Control_Mod_Tolerance_For_Simple_Algorithm(simple_tol)
-
-! to be discussed with Mijail   ! Volume of Fluid
-! to be discussed with Mijail    if(mult % model .eq. VOLUME_OF_FLUID) then
-! to be discussed with Mijail      ! Update the values at boundaries
-! to be discussed with Mijail      call Update_Boundary_Values(flow, turb, mult)
-! to be discussed with Mijail      call Multiphase_Mod_Compute_Vof(mult, sol, flow % dt, n)
-! to be discussed with Mijail      call Multiphase_Mod_Update_Physical_Properties(mult)
-! to be discussed with Mijail    end if
 
     do ini = 1, max_ini
 
@@ -363,8 +356,10 @@
         call Field_Mod_Grad_Variable(flow(d), flow(d) % v)
         call Field_Mod_Grad_Variable(flow(d), flow(d) % w)
 
-        ! Buoyancy force
-        call Field_Mod_Body_Forces(flow(d))
+        ! Buoyancy force if no VOF is used (VOF calls it above)
+        if(mult(d) % model .ne. VOLUME_OF_FLUID) then
+          call Field_Mod_Body_Forces(flow(d))
+        end if
 
         ! All velocity components one after another
         call Compute_Momentum(flow(d), turb(d), mult(d), 1, sol(d),  &
