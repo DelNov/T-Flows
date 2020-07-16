@@ -72,33 +72,6 @@
 
   end if
 
-  ! Body force contribution (gravity)
-  if(sqrt(grav_x ** 2 + grav_y ** 2 + grav_z ** 2) >= TINY) then
-
-    select case(i)
-
-      case(1)
-
-        do c = 1, grid % n_cells
-          b(c) = b(c) + flow % body_fx(c)
-        end do
-
-      case(2)
-
-        do c = 1, grid % n_cells
-          b(c) = b(c) + flow % body_fy(c)
-        end do
-
-      case(3)
-
-        do c = 1, grid % n_cells
-          b(c) = b(c) + flow % body_fz(c)
-        end do
-
-    end select
-
-  end if
-
   ! Momentum variables for pressure correction
   ! This is here because they need to be collected before
   ! u, v, w are calculated
