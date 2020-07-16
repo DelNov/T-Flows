@@ -36,6 +36,10 @@
                       + t % n(c2) * (1.0 - grid % f(s))
       t_face_delta(s) = t_face_delta(s) - t_ref
     end do
+
+  !------------------------------!
+  !   no Boussinesq hypothesis   !
+  !------------------------------!
   else
     t_face_delta(1:grid % n_faces) = 1.0
     flow % beta                    = 1.0  ! also default from control file
@@ -93,8 +97,13 @@
 
   end if  ! buoyancy
 
-  do c = 1, grid % n_cells
-    flow % pot % n(c) = flow % body_fz(c)
-  end do
+  call Grid_Mod_Exchange_Cells_Real(grid, flow % body_fx)
+  call Grid_Mod_Exchange_Cells_Real(grid, flow % body_fy)
+  call Grid_Mod_Exchange_Cells_Real(grid, flow % body_fz)
+
+  ! Was used for debugging
+  ! do c = 1, grid % n_cells
+  !   flow % pot % n(c) = flow % body_fz(c)
+  ! end do
 
   end subroutine
