@@ -127,7 +127,6 @@
   include 'Multiphase_Mod/Vof_Find_Weight_Nodes_To_Cells.f90'
   include 'Multiphase_Mod/Vof_Grad_Component.f90'
   include 'Multiphase_Mod/Vof_Gradient_At_Nodes.f90'
-  include 'Multiphase_Mod/Vof_Gravity_Term.f90'
   include 'Multiphase_Mod/Vof_Heavyside_Function.f90'
   include 'Multiphase_Mod/Vof_Interpolate_Cells_Nodes.f90'
   include 'Multiphase_Mod/Vof_Interpolate_Faces_Cells.f90'
