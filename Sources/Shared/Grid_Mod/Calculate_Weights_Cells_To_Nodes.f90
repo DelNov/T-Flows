@@ -12,7 +12,7 @@
   real    :: lx, ly, lz, rx, ry, rz, lambda_x, lambda_y, lambda_z
   real    :: ixx, iyy, izz, ixz, iyz, ixy, d
   real    :: a11, a12, a13, a21, a22, a23, a31, a32, a33
-  real    :: weights_sorted(64)
+  real    :: tot, weights_sorted(64)
 !==============================================================================!
 
   ! Allocate memory
@@ -62,7 +62,7 @@
       ixy = ixy + lx * ly
       ixz = ixz + lx * lz
       iyz = iyz + ly * lz
-    end do
+    end do  ! through cells surrounding the node
 
     a11 = iyy * izz - iyz ** 2
     a12 = ixz * iyz - ixy * izz
@@ -111,6 +111,24 @@
                                        + lambda_y * ly   &
                                        + lambda_z * lz
 
+    end do  ! through cells surrounding the node
+
+  end do  ! through nodes
+
+  !---------------------------!
+  !   Normalize the weights   !
+  !---------------------------!
+  do n = 1, grid % n_nodes
+
+    ! Add total weights for all cells
+    tot = 0.0
+    do i_cell = 1, grid % nodes_n_cells(n)
+      tot = tot + grid % nodes_weight_c(i_cell, n)
+    end do
+
+    ! Divide each weight with total
+    do i_cell = 1, grid % nodes_n_cells(n)
+      grid % nodes_weight_c(i_cell, n) = grid % nodes_weight_c(i_cell, n) / tot
     end do
 
   end do

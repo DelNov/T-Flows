@@ -122,6 +122,8 @@
   include 'Field_Mod/Grad_Pressure.f90'
   include 'Field_Mod/Grad_Pressure_Correction.f90'
   include 'Field_Mod/Grad_Variable.f90'
+  include 'Field_Mod/Interpolate_Cells_To_Nodes.f90'
+  include 'Field_Mod/Interpolate_Nodes_To_Cells.f90'
   include 'Field_Mod/Potential_Initialization.f90'
   include 'Field_Mod/Prandtl_Number.f90'
   include 'Field_Mod/Schmidt_Number.f90'

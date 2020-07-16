@@ -82,9 +82,6 @@
     ! Weights for interpolation from nodes
     real, allocatable :: cells_weight_n(:,:)
 
-    ! Weight for cells interpolation from faces
-    real, allocatable :: weight_faces(:,:)
-
     ! For boundary cells, store corresponding face
     integer, allocatable :: cells_bnd_face(:)
 

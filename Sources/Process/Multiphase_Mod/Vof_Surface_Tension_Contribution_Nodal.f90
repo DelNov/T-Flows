@@ -42,8 +42,8 @@
     else
       smooth_k = mult % dist_func % n
     end if
-    call Multiphase_Mod_Vof_Interpolate_Cells_Nodes(grid,                     &
-                                                    smooth_k, var_node_k)
+    call Field_Mod_Interpolate_Cells_To_Nodes(flow,                     &
+                                              smooth_k, var_node_k)
 
     if (mult % n_conv_norm > 0) then
       call Multiphase_Mod_Vof_Smooth_Scalar(grid, mult, mult % dist_func % n, &
@@ -51,8 +51,8 @@
     else
       smooth_n = mult % dist_func % oo
     end if
-    call Multiphase_Mod_Vof_Interpolate_Cells_Nodes(grid,                     &
-                                                    smooth_n, var_node_n)
+    call Field_Mod_Interpolate_Cells_To_Nodes(flow,                     &
+                                              smooth_n, var_node_n)
 
   else ! using VOF
     if (mult % n_conv_curv > 0) then
@@ -61,8 +61,8 @@
     else
       smooth_k = vof % n
     end if
-    call Multiphase_Mod_Vof_Interpolate_Cells_Nodes(grid,                     &
-                                                    smooth_k, var_node_k)
+    call Field_Mod_Interpolate_Cells_To_Nodes(flow,                     &
+                                              smooth_k, var_node_k)
 
     if (mult % n_conv_norm > 0) then
       call Multiphase_Mod_Vof_Smooth_Scalar(grid, mult, vof % n, &
@@ -70,8 +70,8 @@
     else
       smooth_n = vof % n
     end if
-    call Multiphase_Mod_Vof_Interpolate_Cells_Nodes(grid,                     &
-                                                    smooth_n, var_node_n)
+    call Field_Mod_Interpolate_Cells_To_Nodes(flow,                     &
+                                              smooth_n, var_node_n)
 
   end if
 

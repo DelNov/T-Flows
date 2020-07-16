@@ -194,9 +194,8 @@
         flow % piso_status = .false.
       end if
       call Multiphase_Mod_Update_Physical_Properties(mult(d), backup(d))
-      call Multiphase_Mod_Vof_Find_Weight_Faces(grid(d))
-      call Multiphase_Mod_Vof_Find_Weight_Cells_To_Nodes(grid(d))
-      call Multiphase_Mod_Vof_Find_Weight_Nodes_To_Cells(grid(d))
+      call Grid_Mod_Calculate_Weights_Cells_To_Nodes(grid(d))
+      call Grid_Mod_Calculate_Weights_Nodes_To_Cells(grid(d))
       call Multiphase_Mod_Vof_Find_Weight_Grad_From_Nodes(grid(d))
       call Multiphase_Mod_Vof_Find_Weight_Nodal_Grad(grid(d))
     end if
@@ -349,7 +348,7 @@
                                      flow(d) % density,     &
                                      grav_x, grav_y, grav_z)
 
-        !call Multiphase_Mod_Vof_Open_Boundary(flow(d), mult(d))
+        ! call Multiphase_Mod_Vof_Open_Boundary(flow(d), mult(d))
 
         ! Compute velocity gradients
         call Field_Mod_Grad_Variable(flow(d), flow(d) % u)

@@ -133,9 +133,9 @@
   call Grid_Mod_Exchange_Nodes_Real(grid, grad_z)
 
   ! Interpolate node values to cells
-  call Multiphase_Mod_Vof_Interpolate_Nodes_Cells(grid, grad_x, div_x)
-  call Multiphase_Mod_Vof_Interpolate_Nodes_Cells(grid, grad_y, div_y)
-  call Multiphase_Mod_Vof_Interpolate_Nodes_Cells(grid, grad_z, div_z)
+  call Field_Mod_Interpolate_Nodes_To_Cells(flow, grad_x, div_x)
+  call Field_Mod_Interpolate_Nodes_To_Cells(flow, grad_y, div_y)
+  call Field_Mod_Interpolate_Nodes_To_Cells(flow, grad_z, div_z)
 
   ! Correct for contact angle at walls
   do s = 1, grid % n_bnd_faces
