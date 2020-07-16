@@ -316,12 +316,6 @@
   !-----------------------!
   call Multiphase_Mod_Update_Physical_Properties(mult, .false.)
 
-  !--------------------------------!
-  !   Gravity Force Contribution   !
-  !--------------------------------!
-
-  call Multiphase_Mod_Vof_Gravity_Term(mult)
-
   call Cpu_Timer_Mod_Stop('Compute_Multiphase (without solvers)')
 
   end subroutine
