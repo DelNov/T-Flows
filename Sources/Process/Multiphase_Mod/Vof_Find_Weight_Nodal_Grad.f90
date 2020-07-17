@@ -4,30 +4,38 @@
 !   Computes cell weights for gradient calculation at nodes using the          !
 !   Gram-Schmdt process.                                                       !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: sum1   => r_node_01,  &
-                      sum2   => r_node_02,  &
-                      sum3   => r_node_03,  &
-                      r11    => r_node_04,  &
-                      r12    => r_node_05,  &
-                      r13    => r_node_06,  &
-                      r22    => r_node_07,  &
-                      r23    => r_node_08,  &
-                      r33    => r_node_09
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)   ,target :: grid
+  type(Grid_Type), target :: grid
 !-----------------------------------[Locals]-----------------------------------!
   real, contiguous, pointer :: wx(:,:), wy(:,:), wz(:,:)
+  real, allocatable         :: sum1(:)
+  real, allocatable         :: sum2(:)
+  real, allocatable         :: sum3(:)
+  real, allocatable         :: r11 (:)
+  real, allocatable         :: r12 (:)
+  real, allocatable         :: r13 (:)
+  real, allocatable         :: r22 (:)
+  real, allocatable         :: r23 (:)
+  real, allocatable         :: r33 (:)
   integer                   :: c
   integer                   :: i_nod, i_cell, n
   real                      :: epsloc
-  !============================================================================!
+!==============================================================================!
+
+  ! Allocate local arrays
+  allocate(sum1(1 : grid % n_nodes))
+  allocate(sum2(1 : grid % n_nodes))
+  allocate(sum3(1 : grid % n_nodes))
+  allocate(r11 (1 : grid % n_nodes))
+  allocate(r12 (1 : grid % n_nodes))
+  allocate(r13 (1 : grid % n_nodes))
+  allocate(r22 (1 : grid % n_nodes))
+  allocate(r23 (1 : grid % n_nodes))
+  allocate(r33 (1 : grid % n_nodes))
 
   epsloc = epsilon(epsloc)
 
-  ! First take aliases
   allocate(grid % weight_gradx_cells(size(grid % nodes_c,1),   &
                                      size(grid % nodes_c,2)))
   allocate(grid % weight_grady_cells(size(grid % nodes_c,1),   &
@@ -35,9 +43,10 @@
   allocate(grid % weight_gradz_cells(size(grid % nodes_c,1),   &
                                      size(grid % nodes_c,2)))
 
-  wx   => grid % weight_gradx_cells
-  wy   => grid % weight_grady_cells
-  wz   => grid % weight_gradz_cells
+  ! Take aliases
+  wx => grid % weight_gradx_cells
+  wy => grid % weight_grady_cells
+  wz => grid % weight_gradz_cells
 
   sum1 = 0.0; sum2 = 0.0; sum3 = 0.0
 
@@ -129,5 +138,16 @@
     end do
 
   end do
+
+  ! Deallocate local arrays
+  deallocate(sum1)
+  deallocate(sum2)
+  deallocate(sum3)
+  deallocate(r11 )
+  deallocate(r12 )
+  deallocate(r13 )
+  deallocate(r22 )
+  deallocate(r23 )
+  deallocate(r33 )
 
   end subroutine

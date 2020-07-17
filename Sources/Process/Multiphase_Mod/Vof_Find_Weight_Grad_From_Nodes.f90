@@ -4,30 +4,40 @@
 !   Computes nodal weights for gradient calculation at cells using the         !
 !   Gram-Schmdt process. This can also be accomplished using T-Flows gradient  !
 !   routines                                                                   !
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: sum1 => r_cell_11,  &
-                      sum2 => r_cell_12,  &
-                      sum3 => r_cell_13,  &
-                      r11  => r_cell_14,  &
-                      r12  => r_cell_15,  &
-                      r13  => r_cell_16,  &
-                      r22  => r_cell_17,  &
-                      r23  => r_cell_18,  &
-                      r33  => r_cell_19
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)   ,target :: grid
+  type(Grid_Type), target :: grid
 !-----------------------------------[Locals]-----------------------------------!
   real, contiguous, pointer :: wx(:,:), wy(:,:), wz(:,:)
+  real, allocatable         :: sum1(:)
+  real, allocatable         :: sum2(:)
+  real, allocatable         :: sum3(:)
+  real, allocatable         :: r11 (:)
+  real, allocatable         :: r12 (:)
+  real, allocatable         :: r13 (:)
+  real, allocatable         :: r22 (:)
+  real, allocatable         :: r23 (:)
+  real, allocatable         :: r33 (:)
   integer                   :: c
   integer                   :: i_nod, n
-  !============================================================================!
+!==============================================================================!
 
-  ! First take aliases
-  wx   => grid % weight_gradx_nodes
-  wy   => grid % weight_grady_nodes
-  wz   => grid % weight_gradz_nodes
+  ! Allocate local arrays
+  allocate(sum1(-grid % n_bnd_cells : grid % n_cells))
+  allocate(sum2(-grid % n_bnd_cells : grid % n_cells))
+  allocate(sum3(-grid % n_bnd_cells : grid % n_cells))
+  allocate(r11 (-grid % n_bnd_cells : grid % n_cells))
+  allocate(r12 (-grid % n_bnd_cells : grid % n_cells))
+  allocate(r13 (-grid % n_bnd_cells : grid % n_cells))
+  allocate(r22 (-grid % n_bnd_cells : grid % n_cells))
+  allocate(r23 (-grid % n_bnd_cells : grid % n_cells))
+  allocate(r33 (-grid % n_bnd_cells : grid % n_cells))
+
+  ! Take aliases
+  wx => grid % weight_gradx_nodes
+  wy => grid % weight_grady_nodes
+  wz => grid % weight_gradz_nodes
 
   sum1 = 0.0; sum2 = 0.0; sum3 = 0.0
 
@@ -114,5 +124,16 @@
     end do
 
   end do
+
+  ! Deallocate local arrays
+  deallocate(sum1)
+  deallocate(sum2)
+  deallocate(sum3)
+  deallocate(r11 )
+  deallocate(r12 )
+  deallocate(r13 )
+  deallocate(r22 )
+  deallocate(r23 )
+  deallocate(r33 )
 
   end subroutine
