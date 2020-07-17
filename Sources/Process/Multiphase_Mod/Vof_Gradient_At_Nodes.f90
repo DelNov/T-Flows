@@ -6,16 +6,15 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)       ,target :: grid
-  real                          :: var_node   (1 : grid % n_nodes),   &
-                                   var_cell   (-grid % n_bnd_cells    &
-                                              : grid % n_cells),      &
-                                   grad_x     (1 : grid % n_nodes),   &
-                                   grad_y     (1 : grid % n_nodes),   &
-                                   grad_z     (1 : grid % n_nodes)
+  type(Grid_Type), target :: grid
+  real, intent(in)        :: var_node(1:grid % n_nodes)
+  real, intent(in)        :: var_cell( -grid % n_bnd_cells : grid % n_cells)
+  real, intent(out)       :: grad_x  (1:grid % n_nodes)
+  real, intent(out)       :: grad_y  (1:grid % n_nodes)
+  real, intent(out)       :: grad_z  (1:grid % n_nodes)
 !-----------------------------------[Locals]-----------------------------------!
-  real,                 pointer :: wx(:,:), wy(:,:), wz(:,:)
-  integer                       :: c, n, i_cell
+  real,   contiguous, pointer :: wx(:,:), wy(:,:), wz(:,:)
+  integer                     :: c, n, i_cell
 !==============================================================================!
 
   wx => grid % weight_gradx_cells

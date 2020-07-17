@@ -7,11 +7,11 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type), target :: grid
-  real                    :: var_cell(-grid % n_bnd_cells:grid % n_cells)
-  real                    :: var_node(1:grid % n_nodes)
-  real                    :: grad_x(-grid % n_bnd_cells:grid % n_cells)
-  real                    :: grad_y(-grid % n_bnd_cells:grid % n_cells)
-  real                    :: grad_z(-grid % n_bnd_cells:grid % n_cells)
+  real, intent(in)        :: var_cell( -grid % n_bnd_cells:grid % n_cells)
+  real, intent(in)        :: var_node(1:grid % n_nodes)
+  real, intent(out)       :: grad_x(-grid % n_bnd_cells:grid % n_cells)
+  real, intent(out)       :: grad_y(-grid % n_bnd_cells:grid % n_cells)
+  real, intent(out)       :: grad_z(-grid % n_bnd_cells:grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
   real,   pointer :: wx(:,:), wy(:,:), wz(:,:)
   integer         :: c, n, i_nod
