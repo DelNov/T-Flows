@@ -5,10 +5,6 @@
 !   Equation if a two-phase flow calculation is performed. Additionally and  !
 !   for the moment, PISO calculations are run here                           !
 !----------------------------------------------------------------------------!
-!--------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: neigh => r_cell_12,   &
-                      res   => r_cell_13
-!----------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]--------------------------------!
   type(Multiphase_Type), target :: mult
@@ -16,17 +12,17 @@
   type(Var_Type),        target :: ui
   integer                       :: i
 !-----------------------------------[Locals]---------------------------------!
-  type(Field_Type), pointer :: flow
-  type(Grid_Type),  pointer :: grid
-  type(Var_Type),   pointer :: vof
-  type(Face_Type),  pointer :: m_flux
-  type(Matrix_Type),pointer :: a
-  real, contiguous, pointer :: b(:)
-  integer                   :: s, c, c1, c2, nt, ni
-  real                      :: dotprod, epsloc, fs
-  real,             pointer :: si(:), sj(:), sk(:)
-  real                      :: corr_x, corr_y, corr_z
-  real                      :: u_f, v_f, w_f
+  type(Field_Type),  pointer :: flow
+  type(Grid_Type),   pointer :: grid
+  type(Var_Type),    pointer :: vof
+  type(Face_Type),   pointer :: m_flux
+  type(Matrix_Type), pointer :: a
+  real, contiguous,  pointer :: b(:)
+  real, contiguous,  pointer :: si(:), sj(:), sk(:)
+  integer                    :: s, c, c1, c2, nt, ni
+  real                       :: dotprod, epsloc, fs
+  real                       :: corr_x, corr_y, corr_z
+  real                       :: u_f, v_f, w_f
 !============================================================================!
 
   ! Take aliases

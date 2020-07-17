@@ -23,7 +23,7 @@
   real                          :: norm_nz(-grid % n_bnd_cells:grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type), pointer :: vof
-  integer                 :: s, c, c1, c2, c_iter, i_fac
+  integer                 :: s, c, c1, c2, c_iter, i_fac, nb, nc
   integer                 :: face_init, face_end, face_step
   real                    :: fs, w_v1, w_v2, w_m1, w_m2
   real                    :: weight_s, weight_n
@@ -37,11 +37,15 @@
     vof => mult % vof
   end if
 
+  nb = grid % n_bnd_cells
+  nc = grid % n_cells
+
   epsloc = epsilon(epsloc)
-  sum_k_weight = 0.0
-  sum_weight = 0.0
-  weight_s = 8.0
-  weight_n = 8.0
+
+  sum_k_weight(-nb:nc) = 0.0
+  sum_weight  (-nb:nc) = 0.0
+  weight_s             = 8.0
+  weight_n             = 8.0
 
   !-------------------------!
   !   Smoothing curvature   !
@@ -52,9 +56,9 @@
   ! it is better not to take into aacount the boundaries
 
   !  gradient of curvature, only interior
-  gradk_x = 0.0
-  gradk_y = 0.0
-  gradk_z = 0.0
+  gradk_x(-nb:nc) = 0.0
+  gradk_y(-nb:nc) = 0.0
+  gradk_z(-nb:nc) = 0.0
 
   do s = grid % n_bnd_faces + 1, grid % n_faces
     c1 = grid % faces_c(1,s)
@@ -73,9 +77,9 @@
 
   end do
 
-  call Grid_Mod_Exchange_Cells_Real(grid, gradk_x)
-  call Grid_Mod_Exchange_Cells_Real(grid, gradk_y)
-  call Grid_Mod_Exchange_Cells_Real(grid, gradk_z)
+  call Grid_Mod_Exchange_Cells_Real(grid, gradk_x(-nb:nc))
+  call Grid_Mod_Exchange_Cells_Real(grid, gradk_y(-nb:nc))
+  call Grid_Mod_Exchange_Cells_Real(grid, gradk_z(-nb:nc))
 
   ! Interior faces
   do s = grid % n_bnd_faces + 1, grid % n_faces
@@ -90,8 +94,8 @@
     sum_weight(c2) = sum_weight(c2) + w_v1
   end do
 
-  call Grid_Mod_Exchange_Cells_Real(grid, sum_k_weight)
-  call Grid_Mod_Exchange_Cells_Real(grid, sum_weight)
+  call Grid_Mod_Exchange_Cells_Real(grid, sum_k_weight(-nb:nc))
+  call Grid_Mod_Exchange_Cells_Real(grid, sum_weight  (-nb:nc))
 
   do c = 1, grid % n_cells
     w_v1 = (1.0 - 2.0 * abs(0.5 - vof % n(c))) ** weight_s
@@ -99,19 +103,19 @@
               / (w_v1 + sum_weight(c) + epsloc)
   end do
 
-  call Grid_Mod_Exchange_Cells_Real(grid, k_star)
+  call Grid_Mod_Exchange_Cells_Real(grid, k_star(-nb:nc))
 
   !-------------------------------------------------------------------------!
   !   Smoothing curvature in the direction of the normal to the interface   !
   !-------------------------------------------------------------------------!
 
-  sum_k_weight = 0.0
-  sum_weight = 0.0
+  sum_k_weight(-nb:nc) = 0.0
+  sum_weight  (-nb:nc) = 0.0
 
   !  gradient of curvature, only interior
-  gradk_x = 0.0
-  gradk_y = 0.0
-  gradk_z = 0.0
+  gradk_x(-nb:nc) = 0.0
+  gradk_y(-nb:nc) = 0.0
+  gradk_z(-nb:nc) = 0.0
 
   do s = grid % n_bnd_faces + 1, grid % n_faces
     c1 = grid % faces_c(1,s)
@@ -130,9 +134,9 @@
 
   end do
 
-  call Grid_Mod_Exchange_Cells_Real(grid, gradk_x)
-  call Grid_Mod_Exchange_Cells_Real(grid, gradk_y)
-  call Grid_Mod_Exchange_Cells_Real(grid, gradk_z)
+  call Grid_Mod_Exchange_Cells_Real(grid, gradk_x(-nb:nc))
+  call Grid_Mod_Exchange_Cells_Real(grid, gradk_y(-nb:nc))
+  call Grid_Mod_Exchange_Cells_Real(grid, gradk_z(-nb:nc))
 
   ! Interior faces
   do s = grid % n_bnd_faces + 1, grid % n_faces
@@ -156,8 +160,8 @@
     sum_weight(c2) = sum_weight(c2) + w_v1 * w_m1
   end do
 
-  call Grid_Mod_Exchange_Cells_Real(grid, sum_k_weight)
-  call Grid_Mod_Exchange_Cells_Real(grid, sum_weight)
+  call Grid_Mod_Exchange_Cells_Real(grid, sum_k_weight(-nb:nc))
+  call Grid_Mod_Exchange_Cells_Real(grid, sum_weight  (-nb:nc))
 
   do c = 1, grid % n_cells
     w_v1 = (1.0 - 2.0 * abs(0.5 - vof % n(c))) ** weight_n

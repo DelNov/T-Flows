@@ -6,12 +6,9 @@
 !   Computes the Curvature based on Brackbill's CSF using Gauss theorem        !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: div_x       => r_cell_10,  &
-                      div_y       => r_cell_11,  &
-                      div_z       => r_cell_12,  &
-                      k_limit     => r_cell_13,  &
-                      kappa_f     => r_face_01,  &
-                      counter_nod => i_node_01
+  use Work_Mod, only: div_x => r_cell_10,  &
+                      div_y => r_cell_11,  &
+                      div_z => r_cell_12
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -29,7 +26,7 @@
   type(Field_Type),     pointer :: flow
   type(Var_Type),       pointer :: vof
   integer                       :: s, c, c1, c2, n, i_fac,i_nod, tot_cells,sub
-  integer                       :: c_inte, fu
+  integer                       :: c_inte, fu, nb, nc
   real, contiguous,     pointer :: fs_x(:), fs_y(:), fs_z(:)
   real                          :: vol_face, grad_face(3), d_n(3)
   real                          :: dotprod, sxyz_mod, sxyz_control, fs, epsloc
@@ -45,6 +42,9 @@
 
   vof  => mult % vof
   flow => mult % pnt_flow
+
+  nb = grid % n_bnd_cells
+  nc = grid % n_cells
 
   epsloc = epsilon(epsloc)
 
@@ -64,9 +64,9 @@
     end if
   end do
 
-  call Grid_Mod_Exchange_Cells_Real(grid, grad_kx)
-  call Grid_Mod_Exchange_Cells_Real(grid, grad_ky)
-  call Grid_Mod_Exchange_Cells_Real(grid, grad_kz)
+  call Grid_Mod_Exchange_Cells_Real(grid, grad_kx(-nb:nc))
+  call Grid_Mod_Exchange_Cells_Real(grid, grad_ky(-nb:nc))
+  call Grid_Mod_Exchange_Cells_Real(grid, grad_kz(-nb:nc))
 
   ! Tangent vector to walls/symmetries
 
@@ -131,13 +131,13 @@
     end if
   end do
 
-  call Grid_Mod_Exchange_Cells_Real(grid, grad_kx)
-  call Grid_Mod_Exchange_Cells_Real(grid, grad_ky)
-  call Grid_Mod_Exchange_Cells_Real(grid, grad_kz)
+  call Grid_Mod_Exchange_Cells_Real(grid, grad_kx(-nb:nc))
+  call Grid_Mod_Exchange_Cells_Real(grid, grad_ky(-nb:nc))
+  call Grid_Mod_Exchange_Cells_Real(grid, grad_kz(-nb:nc))
 
-  mult % fc_x = grad_kx
-  mult % fc_y = grad_ky
-  mult % fc_z = grad_kz
+  mult % fc_x(-nb:nc) = grad_kx(-nb:nc)
+  mult % fc_y(-nb:nc) = grad_ky(-nb:nc)
+  mult % fc_z(-nb:nc) = grad_kz(-nb:nc)
 
   !--------------------!
   !   Find Curvature   !
@@ -145,17 +145,20 @@
 
   ! find divergence of normals
 
-  call Multiphase_Mod_Vof_Grad_Component(flow, grad_kx, 1, div_x)
-  call Multiphase_Mod_Vof_Grad_Component(flow, grad_ky, 2, div_y)
-  call Multiphase_Mod_Vof_Grad_Component(flow, grad_kz, 3, div_z)
+  call Multiphase_Mod_Vof_Grad_Component(flow, grad_kx(-nb:nc),  &
+                                         1,    div_x  (-nb:nc))
+  call Multiphase_Mod_Vof_Grad_Component(flow, grad_ky(-nb:nc),  &
+                                         2,    div_y  (-nb:nc))
+  call Multiphase_Mod_Vof_Grad_Component(flow, grad_kz(-nb:nc),  &
+                                         3,    div_z  (-nb:nc))
 
-  mult % curv = mult % curv - div_x
-  mult % curv = mult % curv - div_y
-  mult % curv = mult % curv - div_z
+  mult % curv(-nb:nc) = mult % curv(-nb:nc) - div_x(-nb:nc)
+  mult % curv(-nb:nc) = mult % curv(-nb:nc) - div_y(-nb:nc)
+  mult % curv(-nb:nc) = mult % curv(-nb:nc) - div_z(-nb:nc)
 
   call Grid_Mod_Exchange_Cells_Real(grid, mult % curv)
 
   call Multiphase_Mod_Vof_Smooth_Curvature(grid, mult,                  &
-                                           grad_kx, grad_ky, grad_kz)
+                          grad_kx(-nb:nc), grad_ky(-nb:nc), grad_kz(-nb:nc))
 
   end subroutine

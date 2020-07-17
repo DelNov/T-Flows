@@ -3,8 +3,6 @@
 !------------------------------------------------------------------------------!
 !   Solves linear system for VOF                                               !
 !------------------------------------------------------------------------------!
-  use Work_Mod,       only: neigh => r_cell_28
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Solver_Type),     target :: sol
@@ -24,14 +22,14 @@
   a   => sol % a
 
   !! Sum of neighbours
-  !neigh = 0.0
+  !neigh(-nb:nc) = 0.0
   !do s = grid % n_bnd_faces + 1, grid % n_faces
   !  c1 = grid % faces_c(1,s)
   !  c2 = grid % faces_c(2,s)
   !  neigh(c1) = neigh(c1) - a % val(a % pos(1,s)) * vof % o(c2)
   !  neigh(c2) = neigh(c2) - a % val(a % pos(2,s)) * vof % o(c1)
   !end do
-  !call Grid_Mod_Exchange_Real(grid, neigh)
+  !call Grid_Mod_Exchange_Real(grid, neigh(-nb:nc))
 
   !! Solve velocity explicitely (no under relaxation!!)
   !do c = 1, grid % n_cells

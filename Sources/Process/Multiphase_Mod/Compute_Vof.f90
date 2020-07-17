@@ -307,7 +307,7 @@
     if (mult % nodal_curvature) then
       call Multiphase_Mod_Vof_Surface_Tension_Contribution_Nodal(mult)
     else
-      call Multiphase_Mod_Vof_Surface_Tension_Contribution(mult)
+      call Multiphase_Mod_Vof_Surface_Tension_Contribution_Csf(mult)
     end if
   end if
 

@@ -27,7 +27,7 @@
   type(Field_Type),     pointer :: flow
   type(Var_Type),       pointer :: vof
   integer                       :: s, c, c1, c2, n, i_fac, i_nod, tot_cells,sub
-  integer                       :: c_inte, fu
+  integer                       :: c_inte, fu, nb, nc, nn
   real, contiguous,     pointer :: fs_x(:), fs_y(:), fs_z(:)
   real                          :: vol_face, grad_face(3), d_n(3)
   real                          :: dotprod, sxyz_mod, sxyz_control, fs, epsloc
@@ -44,14 +44,18 @@
   vof  => mult % vof
   flow => mult % pnt_flow
 
+  nb = grid % n_bnd_cells
+  nc = grid % n_cells
+  nn = grid % n_nodes
+
   epsloc = epsilon(epsloc)
 
   ! Find gradients at nodes
   call Multiphase_Mod_Vof_Gradient_At_Nodes(grid, var_node_k, smooth_k,   &
-                                            grad_x, grad_y, grad_z)
+                             grad_x(1:nn), grad_y(1:nn), grad_z(1:nn))
 
   ! Tangent vector to symmetries
-  mark = 0
+  mark(1:nn) = 0
 
   do s = 1, grid % n_bnd_faces
     c1 = grid % faces_c(1,s)
@@ -95,7 +99,7 @@
   end do
 
   ! Contact angle
-  mark = 0
+  mark(1:nn) = 0
 
   do s = 1, grid % n_bnd_faces
     c1 = grid % faces_c(1,s)
@@ -128,14 +132,14 @@
     end if
   end do
 
-  call Grid_Mod_Exchange_Nodes_Real(grid, grad_x)
-  call Grid_Mod_Exchange_Nodes_Real(grid, grad_y)
-  call Grid_Mod_Exchange_Nodes_Real(grid, grad_z)
+  call Grid_Mod_Exchange_Nodes_Real(grid, grad_x(1:nn))
+  call Grid_Mod_Exchange_Nodes_Real(grid, grad_y(1:nn))
+  call Grid_Mod_Exchange_Nodes_Real(grid, grad_z(1:nn))
 
   ! Interpolate node values to cells
-  call Field_Mod_Interpolate_Nodes_To_Cells(flow, grad_x, div_x)
-  call Field_Mod_Interpolate_Nodes_To_Cells(flow, grad_y, div_y)
-  call Field_Mod_Interpolate_Nodes_To_Cells(flow, grad_z, div_z)
+  call Field_Mod_Interpolate_Nodes_To_Cells(flow, grad_x(1:nn), div_x(-nb:nc))
+  call Field_Mod_Interpolate_Nodes_To_Cells(flow, grad_y(1:nn), div_y(-nb:nc))
+  call Field_Mod_Interpolate_Nodes_To_Cells(flow, grad_z(1:nn), div_z(-nb:nc))
 
   ! Correct for contact angle at walls
   do s = 1, grid % n_bnd_faces
@@ -184,9 +188,9 @@
     end if
   end do
 
-  call Grid_Mod_Exchange_Cells_Real(grid, div_x)
-  call Grid_Mod_Exchange_Cells_Real(grid, div_y)
-  call Grid_Mod_Exchange_Cells_Real(grid, div_z)
+  call Grid_Mod_Exchange_Cells_Real(grid, div_x(-nb:nc))
+  call Grid_Mod_Exchange_Cells_Real(grid, div_y(-nb:nc))
+  call Grid_Mod_Exchange_Cells_Real(grid, div_z(-nb:nc))
 
   !--------------------!
   !   Find Curvature   !
@@ -196,21 +200,21 @@
 
   ! Derivatives of normals using nodes
 
-  call Multiphase_Mod_Vof_Nodal_Gradient(grid, div_x, grad_x,      &
-                                         div_xx, div_yy, div_zz)
-  mult % curv = mult % curv - div_xx
+  call Multiphase_Mod_Vof_Nodal_Gradient(grid, div_x(-nb:nc), grad_x(1:nn),  &
+                      div_xx(-nb:nc), div_yy(-nb:nc), div_zz(-nb:nc))
+  mult % curv(-nb:nc) = mult % curv(-nb:nc) - div_xx(-nb:nc)
 
-  call Multiphase_Mod_Vof_Nodal_Gradient(grid, div_y, grad_y,      &
-                                         div_xx, div_yy, div_zz)
-  mult % curv = mult % curv - div_yy
+  call Multiphase_Mod_Vof_Nodal_Gradient(grid, div_y(-nb:nc), grad_y(1:nn),  &
+                      div_xx(-nb:nc), div_yy(-nb:nc), div_zz(-nb:nc))
+  mult % curv(-nb:nc) = mult % curv(-nb:nc) - div_yy(-nb:nc)
 
-  call Multiphase_Mod_Vof_Nodal_Gradient(grid, div_z, grad_z,      &
-                                         div_xx, div_yy, div_zz)
-  mult % curv = mult % curv - div_zz
+  call Multiphase_Mod_Vof_Nodal_Gradient(grid, div_z(-nb:nc), grad_z(1:nn),  &
+                      div_xx(-nb:nc), div_yy(-nb:nc), div_zz(-nb:nc))
+  mult % curv(-nb:nc) = mult % curv(-nb:nc) - div_zz(-nb:nc)
 
-  call Grid_Mod_Exchange_Cells_Real(grid, mult % curv)
+  call Grid_Mod_Exchange_Cells_Real(grid, mult % curv(-nb:nc))
 
-  call Multiphase_Mod_Vof_Smooth_Curvature(grid, mult,             &
-                                           div_x, div_y, div_z)
+  call Multiphase_Mod_Vof_Smooth_Curvature(grid, mult,              &
+                      div_x(-nb:nc), div_y(-nb:nc), div_z(-nb:nc))
 
   end subroutine

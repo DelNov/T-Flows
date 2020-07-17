@@ -9,20 +9,24 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)              :: grid
+  type(Grid_Type)               :: grid
   type(Multiphase_Type), target :: mult
   real                          :: var(-grid % n_bnd_cells:grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: flow
   type(Var_Type),   pointer :: vof
-  integer                   :: s, ss, c, c1, c2, n
+  integer                   :: s, ss, c, c1, c2, n, nb, nc
   integer                   :: i_fac, count_neg, cc1, cc2, cc
   real                      :: gx, gy, gz
   real                      :: epsloc, num, var_f, fss, signo
 !==============================================================================!
 
+  ! Take aliases
   vof  => mult % vof
   flow => mult % pnt_flow
+
+  nb = grid % n_bnd_cells
+  nc = grid % n_cells
 
   epsloc = epsilon(epsloc)
 
@@ -36,9 +40,9 @@
   end do
 
   ! A preliminar gradient
-  call Multiphase_Mod_Vof_Grad_Component(flow, var, 1, grad_x)
-  call Multiphase_Mod_Vof_Grad_Component(flow, var, 2, grad_y)
-  call Multiphase_Mod_Vof_Grad_Component(flow, var, 3, grad_z)
+  call Multiphase_Mod_Vof_Grad_Component(flow, var(-nb:nc), 1, grad_x(-nb:nc))
+  call Multiphase_Mod_Vof_Grad_Component(flow, var(-nb:nc), 2, grad_y(-nb:nc))
+  call Multiphase_Mod_Vof_Grad_Component(flow, var(-nb:nc), 3, grad_z(-nb:nc))
 
   ! First step: estimate face values for all faces at wall boundaries
   do s = 1, grid % n_bnd_faces

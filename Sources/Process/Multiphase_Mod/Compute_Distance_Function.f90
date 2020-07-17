@@ -6,12 +6,12 @@
 !   Fluid method for automotive exterior water management applications"        !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: r_phi      => r_cell_05, &
-                      grad_i     => r_cell_06, &
-                      grad_j     => r_cell_07, &
-                      grad_k     => r_cell_08, &
-                      dist_curr  => r_cell_09, &
-                      s_0        => r_cell_10
+  use Work_Mod, only: r_phi     => r_cell_05, &
+                      grad_i    => r_cell_06, &
+                      grad_j    => r_cell_07, &
+                      grad_k    => r_cell_08, &
+                      dist_curr => r_cell_09, &
+                      s_0       => r_cell_10
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -221,7 +221,7 @@
 
   call Grid_Mod_Exchange_Cells_Real(grid, dist_func % n)
 
-  ! Find Heavyside function
-  call Multiphase_Mod_Vof_Heavyside_Function(mult)
+  ! Find Heaviside function
+  call Multiphase_Mod_Vof_Heaviside_Function(mult)
 
   end subroutine

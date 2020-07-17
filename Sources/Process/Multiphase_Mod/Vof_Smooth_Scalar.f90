@@ -5,14 +5,14 @@
 !    Smoothes scalar using a laplacian smoother                                !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: sum_vol_area  => r_cell_01,   &
-                      sum_area      => r_cell_02
+  use Work_Mod, only: sum_vol_area => r_cell_01,   &
+                      sum_area     => r_cell_02
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Multiphase_Type), target :: mult
   type(Grid_Type)               :: grid
-  integer                       :: n_conv
+  integer                       :: n_conv, nb, nc
   real                          :: var(-grid % n_bnd_cells: grid % n_cells)
   real                          :: smooth_var(-grid % n_bnd_cells    &
                                              : grid % n_cells)
@@ -27,13 +27,16 @@
   ! Take aliases
   vof => mult % vof
 
+  nb = grid % n_bnd_cells
+  nc = grid % n_cells
+
   ! Copy the values from phi % n to local variable
   smooth_var(:) = var(:)
 
   do c_iter = 1, n_conv
 
-    sum_vol_area = 0.0
-    sum_area = 0.0
+    sum_vol_area(-nb:nc) = 0.0
+    sum_area    (-nb:nc) = 0.0
 
     !-------------------------------!
     !   Extrapolate to boundaries   !
@@ -65,8 +68,8 @@
       sum_area(c2) = sum_area(c2) + grid % s(s)
     end do
 
-    call Grid_Mod_Exchange_Cells_Real(grid, sum_vol_area)
-    call Grid_Mod_Exchange_Cells_Real(grid, sum_area)
+    call Grid_Mod_Exchange_Cells_Real(grid, sum_vol_area(-nb:nc))
+    call Grid_Mod_Exchange_Cells_Real(grid, sum_area    (-nb:nc))
 
     if (mult % d_func) then
       do c = 1, grid % n_cells

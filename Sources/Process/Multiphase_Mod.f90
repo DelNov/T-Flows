@@ -124,7 +124,7 @@
   include 'Multiphase_Mod/Vof_Find_Weight_Nodal_Grad.f90'
   include 'Multiphase_Mod/Vof_Grad_Component.f90'
   include 'Multiphase_Mod/Vof_Gradient_At_Nodes.f90'
-  include 'Multiphase_Mod/Vof_Heavyside_Function.f90'
+  include 'Multiphase_Mod/Vof_Heaviside_Function.f90'
   include 'Multiphase_Mod/Vof_Mass_Transfer.f90'
   include 'Multiphase_Mod/Vof_Mass_Transfer_Rate_In.f90'
   include 'Multiphase_Mod/Vof_Max_Courant_Number.f90'
@@ -139,7 +139,7 @@
   include 'Multiphase_Mod/Vof_Smooth_Curvature.f90'
   include 'Multiphase_Mod/Vof_Solve_System.f90'
   include 'Multiphase_Mod/Vof_Solver_Dist_Function_Cell_Loop.f90'
-  include 'Multiphase_Mod/Vof_Surface_Tension_Contribution.f90'
+  include 'Multiphase_Mod/Vof_Surface_Tension_Contribution_Csf.f90'
   include 'Multiphase_Mod/Vof_Surface_Tension_Contribution_Nodal.f90'
   include 'Multiphase_Mod/Update_Physical_Properties.f90'
 

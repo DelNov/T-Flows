@@ -4,7 +4,7 @@
 !   Correct fluxes on pressure equation due to surface tension and gravity     !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Work_Mod,       only: curr_colour => r_cell_01
+  use Work_Mod, only: curr_colour => r_cell_01
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -21,7 +21,7 @@
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
   real,              pointer :: u_relax, dt_corr
-  integer                    :: c, c1, c2, s
+  integer                    :: c, c1, c2, s, nb, nc
   real                       :: a12, fs
   real                       :: u_fo, v_fo, w_fo, tf
   real                       :: stens_source, dotprod
@@ -38,16 +38,19 @@
   a         => sol % a
   b         => sol % b % val
 
+  nb = grid % n_bnd_cells
+  nc = grid % n_cells
+
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! Correct for Surface tension
   if(mult % surface_tension > TINY) then
 
     if (mult % d_func) then
-      curr_colour = vof % n
+      curr_colour(-nb:nc) = vof % n(-nb:nc)
       call Field_Mod_Grad_Variable(flow, vof)
     else
-      curr_colour = vof % n
+      curr_colour(-nb:nc) = vof % n(-nb:nc)
       call Field_Mod_Grad_Variable(flow, vof)
     end if
 
