@@ -122,7 +122,6 @@
   include 'Multiphase_Mod/Vof_Find_Upstream_Phi.f90'
   include 'Multiphase_Mod/Vof_Find_Weight_Grad_From_Nodes.f90'
   include 'Multiphase_Mod/Vof_Find_Weight_Nodal_Grad.f90'
-  include 'Multiphase_Mod/Vof_Grad_Component.f90'
   include 'Multiphase_Mod/Vof_Gradient_At_Nodes.f90'
   include 'Multiphase_Mod/Vof_Heaviside_Function.f90'
   include 'Multiphase_Mod/Vof_Mass_Transfer.f90'

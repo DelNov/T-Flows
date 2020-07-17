@@ -145,12 +145,15 @@
 
   ! find divergence of normals
 
-  call Multiphase_Mod_Vof_Grad_Component(flow, grad_kx(-nb:nc),  &
-                                         1,    div_x  (-nb:nc))
-  call Multiphase_Mod_Vof_Grad_Component(flow, grad_ky(-nb:nc),  &
-                                         2,    div_y  (-nb:nc))
-  call Multiphase_Mod_Vof_Grad_Component(flow, grad_kz(-nb:nc),  &
-                                         3,    div_z  (-nb:nc))
+  call Field_Mod_Grad_Component(flow, grad_kx(-nb:nc),  &
+                                1,    div_x  (-nb:nc),  &
+                                impose_symmetry = .false.)
+  call Field_Mod_Grad_Component(flow, grad_ky(-nb:nc),  &
+                                2,    div_y  (-nb:nc),  &
+                                impose_symmetry = .false.)
+  call Field_Mod_Grad_Component(flow, grad_kz(-nb:nc),  &
+                                3,    div_z  (-nb:nc),  &
+                                impose_symmetry = .false.)
 
   mult % curv(-nb:nc) = mult % curv(-nb:nc) - div_x(-nb:nc)
   mult % curv(-nb:nc) = mult % curv(-nb:nc) - div_y(-nb:nc)

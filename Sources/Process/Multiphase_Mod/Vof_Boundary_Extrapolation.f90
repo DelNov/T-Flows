@@ -2,6 +2,7 @@
   subroutine Multiphase_Mod_Vof_Boundary_Extrapolation(grid, mult, var)
 !------------------------------------------------------------------------------!
 !   Computes the Curvature based on Brackbill's CSF using Gauss theorem        !
+!------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Work_Mod, only: grad_x => r_cell_21,   &
                       grad_y => r_cell_22,   &
@@ -18,7 +19,7 @@
   integer                   :: s, ss, c, c1, c2, n, nb, nc
   integer                   :: i_fac, count_neg, cc1, cc2, cc
   real                      :: gx, gy, gz
-  real                      :: epsloc, num, var_f, fss, signo
+  real                      :: num, var_f, fss, signo
 !==============================================================================!
 
   ! Take aliases
@@ -27,8 +28,6 @@
 
   nb = grid % n_bnd_cells
   nc = grid % n_cells
-
-  epsloc = epsilon(epsloc)
 
   ! Simply zero gradient at boundaries
   do s = 1, grid % n_bnd_faces
@@ -39,10 +38,16 @@
     end if
   end do
 
-  ! A preliminar gradient
-  call Multiphase_Mod_Vof_Grad_Component(flow, var(-nb:nc), 1, grad_x(-nb:nc))
-  call Multiphase_Mod_Vof_Grad_Component(flow, var(-nb:nc), 2, grad_y(-nb:nc))
-  call Multiphase_Mod_Vof_Grad_Component(flow, var(-nb:nc), 3, grad_z(-nb:nc))
+  ! A preliminary gradient
+  call Field_Mod_Grad_Component(flow, var(-nb:nc),  &
+                                1, grad_x(-nb:nc),  &
+                                impose_symmetry = .false.)
+  call Field_Mod_Grad_Component(flow, var(-nb:nc),  &
+                                2, grad_y(-nb:nc),  &
+                                impose_symmetry = .false.)
+  call Field_Mod_Grad_Component(flow, var(-nb:nc),  &
+                                3, grad_z(-nb:nc),  &
+                                impose_symmetry = .false.)
 
   ! First step: estimate face values for all faces at wall boundaries
   do s = 1, grid % n_bnd_faces
@@ -93,7 +98,7 @@
         fss = grid % fw(ss)
         num = 0.0
 
-        if (s .ne. ss) then !average gradients
+        if (s .ne. ss) then  ! average gradients
           cc1 = grid % faces_c(1,ss)
           cc2 = grid % faces_c(2,ss)
           if (c1 == cc1) then
