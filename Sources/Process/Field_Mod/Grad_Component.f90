@@ -6,9 +6,9 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
-  integer                  :: i
   real                     :: phi (-flow % pnt_grid % n_bnd_cells:  &
                                     flow % pnt_grid % n_cells)
+  integer                  :: i
   real                     :: phii(-flow % pnt_grid % n_bnd_cells:  &
                                     flow % pnt_grid % n_cells)
   logical, optional        :: impose_symmetry
@@ -17,9 +17,10 @@
   integer                  :: s, c1, c2
   real                     :: dphi1, dphi2
   logical                  :: imp_sym
-  integer, dimension(3,3), parameter :: map = reshape((/ 1, 4, 5,  &
+!-----------------------------[Local parameters]-------------------------------!
+  integer, dimension(3,3), parameter :: MAP = reshape((/ 1, 4, 5,  &
                                                          4, 2, 6,  &
-                                                         5, 6, 3 /), shape(map))
+                                                         5, 6, 3 /), shape(MAP))
 !==============================================================================!
 
   ! Take alias
@@ -49,9 +50,10 @@
         dphi1 = 0.
       end if
 
-      phii(c1) = phii(c1) + dphi1*(flow % grad(map(i,1),c1) * grid % dx(s)  &
-                                 + flow % grad(map(i,2),c1) * grid % dy(s)  &
-                                 + flow % grad(map(i,3),c1) * grid % dz(s))
+      phii(c1) = phii(c1)                                                 &
+               + dphi1 * (  flow % grad_c2c(MAP(i,1),c1) * grid % dx(s)   &
+                          + flow % grad_c2c(MAP(i,2),c1) * grid % dy(s)   &
+                          + flow % grad_c2c(MAP(i,3),c1) * grid % dz(s))
     end do
 
     ! Inside the domain
@@ -61,12 +63,15 @@
       dphi1 = phi(c2)-phi(c1)
       dphi2 = phi(c2)-phi(c1)
 
-      phii(c1) = phii(c1) + dphi1*(flow % grad(map(i,1),c1) * grid % dx(s)  &
-                                 + flow % grad(map(i,2),c1) * grid % dy(s)  &
-                                 + flow % grad(map(i,3),c1) * grid % dz(s))
-      phii(c2) = phii(c2) + dphi2*(flow % grad(map(i,1),c2) * grid % dx(s)  &
-                                 + flow % grad(map(i,2),c2) * grid % dy(s)  &
-                                 + flow % grad(map(i,3),c2) * grid % dz(s))
+      phii(c1) = phii(c1)                                                 &
+               + dphi1 * (  flow % grad_c2c(MAP(i,1),c1) * grid % dx(s)   &
+                          + flow % grad_c2c(MAP(i,2),c1) * grid % dy(s)   &
+                          + flow % grad_c2c(MAP(i,3),c1) * grid % dz(s))
+
+      phii(c2) = phii(c2)                                                 &
+               + dphi2 * (  flow % grad_c2c(MAP(i,1),c2) * grid % dx(s)   &
+                          + flow % grad_c2c(MAP(i,2),c2) * grid % dy(s)   &
+                          + flow % grad_c2c(MAP(i,3),c2) * grid % dz(s))
     end do
 
   call Grid_Mod_Exchange_Cells_Real(grid, phii)

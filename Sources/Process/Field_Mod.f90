@@ -83,10 +83,15 @@
     ! Heat flux to the domain (important for periodic case with heat transfer)
     real :: heat_flux, heated_area, heat  ! [W/m^2], [m^2], [W]
 
-    !-------------------------------------!
-    !   Gradient matrices for all cells   !
-    !-------------------------------------!
-    real, allocatable :: grad(:,:)
+    !---------------------------------!
+    !   Gradient matrices for:        !
+    !   - cells to cells (c2c),       !
+    !   - nodes to cells (n2c), and   !
+    !   - cells to nodes (c2n)        !
+    !---------------------------------!
+    real, allocatable :: grad_c2c(:,:)
+    real, allocatable :: grad_n2c(:,:)
+    real, allocatable :: grad_c2n(:,:)
 
     ! Body force
     real, allocatable :: body_fx(:)
@@ -117,8 +122,12 @@
   include 'Field_Mod/Body_Forces.f90'
   include 'Field_Mod/Calculate_Fluxes.f90'
   include 'Field_Mod/Calculate_Grad_Matrix.f90'
+  include 'Field_Mod/Calculate_Grad_Matrix_Nodes_To_Cells.f90'
+  include 'Field_Mod/Calculate_Grad_Matrix_Cells_To_Nodes.f90'
   include 'Field_Mod/Correct_Fluxes_With_Body_Forces.f90'
   include 'Field_Mod/Grad_Component.f90'
+  include 'Field_Mod/Grad_Component_Nodes_To_Cells.f90'
+  include 'Field_Mod/Grad_Component_Cells_To_Nodes.f90'
   include 'Field_Mod/Grad_Pressure.f90'
   include 'Field_Mod/Grad_Pressure_Correction.f90'
   include 'Field_Mod/Grad_Variable.f90'

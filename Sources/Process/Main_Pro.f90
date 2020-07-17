@@ -196,8 +196,8 @@
       call Multiphase_Mod_Update_Physical_Properties(mult(d), backup(d))
       call Grid_Mod_Calculate_Weights_Cells_To_Nodes(grid(d))
       call Grid_Mod_Calculate_Weights_Nodes_To_Cells(grid(d))
-      call Multiphase_Mod_Vof_Find_Weight_Grad_From_Nodes(grid(d))
-      call Multiphase_Mod_Vof_Find_Weight_Nodal_Grad(grid(d))
+      call Field_Mod_Calculate_Grad_Matrix_Nodes_To_Cells(flow(d))
+      call Field_Mod_Calculate_Grad_Matrix_Cells_To_Nodes(flow(d))
     end if
 
     ! Initialize monitoring points

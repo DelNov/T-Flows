@@ -20,9 +20,9 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Multiphase_Type), target :: mult
   type(Grid_Type)               :: grid
-  real                          :: smooth_k (-grid % n_bnd_cells :   &
-                                              grid % n_cells),       &
-                                   var_node_k (1 : grid % n_nodes)
+  real                          :: smooth_k(-grid % n_bnd_cells :   &
+                                             grid % n_cells),       &
+                                   var_node_k(1:grid % n_nodes)
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),     pointer :: flow
   type(Var_Type),       pointer :: vof
@@ -50,9 +50,16 @@
 
   epsloc = epsilon(epsloc)
 
-  ! Find gradients at nodes
-  call Multiphase_Mod_Vof_Gradient_At_Nodes(grid, var_node_k, smooth_k,   &
-                             grad_x(1:nn), grad_y(1:nn), grad_z(1:nn))
+  ! Calculate gradients at nodes
+  call Field_Mod_Grad_Component_Cells_To_Nodes(flow,                  &
+                                               smooth_k, var_node_k,  &
+                                            1, grad_x(1:nn))
+  call Field_Mod_Grad_Component_Cells_To_Nodes(flow,                  &
+                                               smooth_k, var_node_k,  &
+                                            2, grad_y(1:nn))
+  call Field_Mod_Grad_Component_Cells_To_Nodes(flow,                  &
+                                               smooth_k, var_node_k,  &
+                                            3, grad_z(1:nn))
 
   ! Tangent vector to symmetries
   mark(1:nn) = 0
@@ -200,16 +207,19 @@
 
   ! Derivatives of normals using nodes
 
-  call Multiphase_Mod_Vof_Nodal_Gradient(grid, div_x(-nb:nc), grad_x(1:nn),  &
-                      div_xx(-nb:nc), div_yy(-nb:nc), div_zz(-nb:nc))
+  call Field_Mod_Grad_Component_Nodes_To_Cells(flow,                        &
+                                              div_x(-nb:nc), grad_x(1:nn),  &
+                                           1, div_xx(-nb:nc))
   mult % curv(-nb:nc) = mult % curv(-nb:nc) - div_xx(-nb:nc)
 
-  call Multiphase_Mod_Vof_Nodal_Gradient(grid, div_y(-nb:nc), grad_y(1:nn),  &
-                      div_xx(-nb:nc), div_yy(-nb:nc), div_zz(-nb:nc))
+  call Field_Mod_Grad_Component_Nodes_To_Cells(flow,                        &
+                                              div_y(-nb:nc), grad_y(1:nn),  &
+                                           2, div_yy(-nb:nc))
   mult % curv(-nb:nc) = mult % curv(-nb:nc) - div_yy(-nb:nc)
 
-  call Multiphase_Mod_Vof_Nodal_Gradient(grid, div_z(-nb:nc), grad_z(1:nn),  &
-                      div_xx(-nb:nc), div_yy(-nb:nc), div_zz(-nb:nc))
+  call Field_Mod_Grad_Component_Nodes_To_Cells(flow,                        &
+                                              div_z(-nb:nc), grad_z(1:nn),  &
+                                           3, div_zz(-nb:nc))
   mult % curv(-nb:nc) = mult % curv(-nb:nc) - div_zz(-nb:nc)
 
   call Grid_Mod_Exchange_Cells_Real(grid, mult % curv(-nb:nc))

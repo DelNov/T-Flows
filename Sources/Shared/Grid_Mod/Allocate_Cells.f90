@@ -29,11 +29,6 @@
   allocate(grid % cells_f( 6, -nb:nc));  grid % cells_f = 0
   allocate(grid % cells_c(24, -nb:nc));  grid % cells_c = 0
 
-  ! Weights for node-based gradient calculation
-  allocate(grid % weight_gradx_nodes(8,-nb:nc)); grid % weight_gradx_nodes = 0.0
-  allocate(grid % weight_grady_nodes(8,-nb:nc)); grid % weight_grady_nodes = 0.0
-  allocate(grid % weight_gradz_nodes(8,-nb:nc)); grid % weight_gradz_nodes = 0.0
-
   allocate(grid % cells_bnd_face(-nb:-1));  grid % cells_bnd_face = 0
 
   ! Number of nodes at each cell (determines cell's shape really)

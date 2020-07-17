@@ -16,8 +16,8 @@
 !==============================================================================!
 
   ! Allocate memory
-  allocate(grid % nodes_weight_c(size(grid % nodes_c,1),size(grid % nodes_c,2)))
-  grid % nodes_weight_c = 0.0
+  allocate(grid % weight_c2n(size(grid % nodes_c,1),size(grid % nodes_c,2)))
+  grid % weight_c2n = 0.0
 
   !-------------------------------------------!
   !   Browse through all nodes to calculate   !
@@ -106,10 +106,9 @@
         lz = lz + grid % per_z
       end if
 
-      grid % nodes_weight_c(i_cell, n) = 1.0             &
-                                       + lambda_x * lx   &
-                                       + lambda_y * ly   &
-                                       + lambda_z * lz
+      grid % weight_c2n(i_cell, n) = 1.0 + lambda_x * lx   &
+                                         + lambda_y * ly   &
+                                         + lambda_z * lz
 
     end do  ! through cells surrounding the node
 
@@ -123,12 +122,12 @@
     ! Add total weights for all cells
     tot = 0.0
     do i_cell = 1, grid % nodes_n_cells(n)
-      tot = tot + grid % nodes_weight_c(i_cell, n)
+      tot = tot + grid % weight_c2n(i_cell, n)
     end do
 
     ! Divide each weight with total
     do i_cell = 1, grid % nodes_n_cells(n)
-      grid % nodes_weight_c(i_cell, n) = grid % nodes_weight_c(i_cell, n) / tot
+      grid % weight_c2n(i_cell, n) = grid % weight_c2n(i_cell, n) / tot
     end do
 
   end do
@@ -143,7 +142,7 @@
 !   end do
 !   if(here) then
 !     weights_sorted(1:grid % nodes_n_cells(n)) =  &
-!     grid % nodes_weight_c(1:grid % nodes_n_cells(n), n)
+!     grid % weight_c2n(1:grid % nodes_n_cells(n), n)
 !     call Sort_Mod_Real(weights_sorted(1:grid % nodes_n_cells(n)))
 !     write(200 + this_proc, '(i7.7, i3, 99f7.4)')  &
 !                 grid % comm % node_glo(n),        &

@@ -26,11 +26,8 @@
 
     ! Loop on cells
     do i_cell = 1, grid % nodes_n_cells(n)
-
       c = grid % nodes_c(i_cell, n)
-      var_node(n) = var_node(n)  &
-                  + grid % nodes_weight_c(i_cell, n) * var_cell(c)
-
+      var_node(n) = var_node(n) + grid % weight_c2n(i_cell, n) * var_cell(c)
     end do
 
   end do

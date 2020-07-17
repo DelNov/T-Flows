@@ -74,13 +74,8 @@
     integer, allocatable :: cells_f(:,:)
     integer, allocatable :: cells_c(:,:)
 
-    ! Weight for node-based gradient
-    real, allocatable :: weight_gradx_nodes(:,:)
-    real, allocatable :: weight_grady_nodes(:,:)
-    real, allocatable :: weight_gradz_nodes(:,:)
-
     ! Weights for interpolation from nodes
-    real, allocatable :: cells_weight_n(:,:)
+    real, allocatable :: weight_n2c(:,:)
 
     ! For boundary cells, store corresponding face
     integer, allocatable :: cells_bnd_face(:)
@@ -147,14 +142,10 @@
     integer, allocatable :: nodes_n_cells(:)
 
     ! List of cells surrounding each node ...
-    ! ... and weights for each cell
+    ! ... and weights for cell to node interpolation
     integer, allocatable :: nodes_c(:,:)
-    real,    allocatable :: nodes_weight_c(:,:)
+    real,    allocatable :: weight_c2n(:,:)
 
-    ! Weights for cell-based gradient
-    real, allocatable :: weight_gradx_cells(:,:)
-    real, allocatable :: weight_grady_cells(:,:)
-    real, allocatable :: weight_gradz_cells(:,:)
     !------------------------------------------!
     !   Variables important for parallel run   ! 
     !------------------------------------------!
@@ -179,7 +170,6 @@
   include 'Grid_Mod/Bnd_Cond_Ranges.f90'
   include 'Grid_Mod/Calculate_Face_Geometry.f90'
   include 'Grid_Mod/Calculate_Global_Volumes.f90'
-  include 'Grid_Mod/Calculate_Nodes_From_Cells.f90'
   include 'Grid_Mod/Calculate_Wall_Distance.f90'
   include 'Grid_Mod/Calculate_Weights_Cells_To_Nodes.f90'
   include 'Grid_Mod/Calculate_Weights_Nodes_To_Cells.f90'

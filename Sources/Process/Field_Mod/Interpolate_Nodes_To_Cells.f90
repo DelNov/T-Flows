@@ -26,7 +26,7 @@
 
       n = grid % cells_n(i_nod, c)
       var_cell(c) = var_cell(c)  &
-                  + grid % cells_weight_n(i_nod, c) * var_node(n)
+                  + grid % weight_n2c(i_nod, c) * var_node(n)
 
     end do
 
