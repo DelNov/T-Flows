@@ -11,7 +11,7 @@
   type(Grid_Type),  pointer :: grid
   type(Field_Type), pointer :: flow
   type(Var_Type),   pointer :: vof
-  real,             pointer :: vof_f(:)
+  real, contiguous, pointer :: vof_f(:)
   integer                   :: c, s, c1, c2
   real                      :: fs
 !==============================================================================!
