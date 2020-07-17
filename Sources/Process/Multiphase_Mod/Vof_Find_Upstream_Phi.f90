@@ -16,14 +16,14 @@
                     phi_z(-phi % pnt_grid % n_bnd_cells:  &
                            phi % pnt_grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
-  real,            pointer :: sx(:), sy(:), sz(:), dx(:), dy(:), dz(:)
-  real                     :: du_orig, du_pred, dotprod, du, dd
-  real                     :: dd_vect(3), du_vect(3), signo, phi_u
-  real                     :: min_phi, max_phi
-  integer                  :: s, ss, idonor, n_nodes_c, n_node_f, n1, n2, nod
-  integer                  :: c, c1, c2, donor, accept, c1_glo, c2_glo
-  logical                  :: out_face
+  type(Grid_Type),  pointer :: grid
+  real, contiguous, pointer :: sx(:), sy(:), sz(:), dx(:), dy(:), dz(:)
+  real                      :: du_orig, du_pred, dotprod, du, dd
+  real                      :: dd_vect(3), du_vect(3), signo, phi_u
+  real                      :: min_phi, max_phi
+  integer                   :: s, ss, idonor, n_nodes_c, n_node_f, n1, n2, nod
+  integer                   :: c, c1, c2, donor, accept, c1_glo, c2_glo
+  logical                   :: out_face
 !==============================================================================!
 
   ! Take aliases
