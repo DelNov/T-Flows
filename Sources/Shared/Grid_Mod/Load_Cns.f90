@@ -103,6 +103,28 @@
   ! Faces' shadows
   read(fu) (grid % faces_s(s), s = 1, grid % n_faces + grid % n_shadows)
 
+  ! Find the number of boundary faces (this number is actually smaller than
+  ! number of boundary cells in parallel, because boundary cells on buffers
+  ! are stored, but faces not.)
+  do s = 1, grid % n_faces
+    c = grid % faces_c(2, s)  ! this is c2
+    if(c > 0)then
+      grid % n_bnd_faces = s - 1
+      goto 1
+    end if
+  end do
+1 continue
+
+  ! Check if the concept of boundary faces works
+  do s = 1, grid % n_faces
+    c = grid % faces_c(2, s)  ! this is c2
+    if(c > 0 .and. s<= grid % n_bnd_faces  .or.  &
+       c < 0 .and. s > grid % n_bnd_faces) then
+      print *, '# Boundary cell-face concept failed.  This error is critical!'
+      call Comm_Mod_End
+    end if
+  end do
+
   !--------------!
   !   Boundary   !
   !--------------!

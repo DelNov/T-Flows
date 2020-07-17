@@ -16,15 +16,6 @@
   !   Browse through all faces to form:   !
   !        cells_n_faces, cells_f         !
   !---------------------------------------!
-
-  loop_b_faces: do s = 1, grid % n_faces
-    c2 = grid % faces_c(2,s)
-    if (c2 > 0) then
-      grid % n_bnd_faces = s - 1
-      exit loop_b_faces
-    end if
-  end do loop_b_faces
-
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1, s)
     c2 = grid % faces_c(2, s)
