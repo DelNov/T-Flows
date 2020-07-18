@@ -1,19 +1,16 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Time_Step(flow, turb, mult, swarm,  &
-                                       n, n_stat_t, n_stat_p, time)
+  subroutine User_Mod_Insert_Particles(flow, turb, mult, swarm, n, time)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of time step.                           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),      target :: flow
-  type(Turb_Type),       target :: turb
-  type(Multiphase_Type), target :: mult
-  type(Swarm_Type),      target :: swarm
-  integer, intent(in)           :: n         ! time step
-  integer, intent(in)           :: n_stat_t  ! 1st step for turb. stat.
-  integer, intent(in)           :: n_stat_p  ! 1st step for swarm stat.
-  real,    intent(in)           :: time      ! physical time
+  type(Field_Type),      target     :: flow
+  type(Turb_Type),       target     :: turb
+  type(Multiphase_Type), target     :: mult
+  type(Swarm_Type),      target     :: swarm
+  integer,               intent(in) :: n         ! time step
+  real,                  intent(in) :: time      ! physical time
 !----------------------------------[Locals]------------------------------------!
   integer :: k, n_parts_in_buffers
   real    :: dx
@@ -23,11 +20,6 @@
   !   1st time step   !
   !-------------------!
   if(n .eq. 1201) then     ! should be after the flow is developed
-
-    ! Initializing both deposition and departure counters
-    swarm % cnt_d = 0
-    swarm % cnt_e = 0
-    swarm % cnt_r = 0
 
     ! Place the particles where you want them
     do k = 1, swarm % n_particles
@@ -39,25 +31,15 @@
       swarm % particle(k) % y_n = 0.0599999
       swarm % particle(k) % z_n = 0.0
 
+      swarm % particle(k) % x_o = swarm % particle(k) % x_n
+      swarm % particle(k) % y_o = swarm % particle(k) % y_n
+      swarm % particle(k) % z_o = swarm % particle(k) % z_n
+
       ! Searching for the closest cell and node to place the moved particle
       call Swarm_Mod_Find_Nearest_Cell(swarm, k, n_parts_in_buffers)
       call Swarm_Mod_Find_Nearest_Node(swarm, k)
     end do
 
-  end if
-
-  !----------------------!
-  !   2nd time step on   !
-  !----------------------!
-  if(n .gt. 1201) then     ! should be after the flow is developed
-    call Swarm_Mod_Advance_Particles(swarm, n, n_stat_p)
-  end if
-
-  if(this_proc < 2) then
-    write(*,'(a,i4,a,i4,a,i4)')                        &
-             "# trapped particles: ",  swarm % cnt_d,  &
-             " escaped particles: ",   swarm % cnt_e,  &
-             " reflected particles: ", swarm % cnt_r
   end if
 
   end subroutine

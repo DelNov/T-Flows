@@ -42,6 +42,10 @@
         swarm % particle(i) % y_n = y + my
         swarm % particle(i) % z_n = z + mz
 
+        swarm % particle(i) % x_o = swarm % particle(k) % x_n
+        swarm % particle(i) % y_o = swarm % particle(k) % y_n
+        swarm % particle(i) % z_o = swarm % particle(k) % z_n
+
         ! Searching for the closest cell and node to place the moved particle
         call Swarm_Mod_Find_Nearest_Cell(swarm, i, n_parts_in_buffers)
         call Swarm_Mod_Find_Nearest_Node(swarm, i)

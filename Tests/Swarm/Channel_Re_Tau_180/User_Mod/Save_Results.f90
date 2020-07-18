@@ -47,10 +47,12 @@
   bulk => flow % bulk
   call Field_Mod_Alias_Momentum(flow, u, v, w)
   call Field_Mod_Alias_Energy  (flow, t)
-  visc_const = maxval(flow % viscosity(:))
-  dens_const = maxval(flow % density(:))
-  capa_const = maxval(flow % capacity(:))
-  cond_const = maxval(flow % conductivity(:))
+
+  ! Take constant physical properties
+  call Control_Mod_Mass_Density        (dens_const)
+  call Control_Mod_Dynamic_Viscosity   (visc_const)
+  call Control_Mod_Heat_Capacity       (capa_const)
+  call Control_Mod_Thermal_Conductivity(cond_const)
 
   ! Set the name for coordinate file
   call File_Mod_Set_Name(coord_name, extension='.1d')

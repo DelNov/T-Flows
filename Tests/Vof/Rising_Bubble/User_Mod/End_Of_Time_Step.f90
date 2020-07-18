@@ -11,8 +11,8 @@
   type(Multiphase_Type), target :: mult
   type(Swarm_Type),      target :: swarm
   integer                       :: n         ! current time step
-  integer                       :: n_stat_t  ! start statistics turbulence
-  integer                       :: n_stat_p  ! start statistics particle
+  integer                       :: n_stat_t  ! 1st t.s. statistics turbulence
+  integer                       :: n_stat_p  ! 1st t.s. statistics particles
   real                          :: time      ! physical time
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
