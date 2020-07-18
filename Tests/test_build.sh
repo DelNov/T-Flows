@@ -203,7 +203,7 @@ current_time=$(date +%s)
 # Script logs
 FULL_LOG=$TEST_DIR/test_build.log # logs of current script
 if [ -f $FULL_LOG ]; then cp /dev/null $FULL_LOG; fi
-echo "Full log is being written in file" "$FULL_LOG"
+# echo "Full log is being written in file" "$FULL_LOG"
 
 # Keep track of the last executed command
 # trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
@@ -1364,32 +1364,13 @@ function process_accuracy_tests {
 }
 
 #------------------------------------------------------------------------------#
-# actual script
+# chose test
 #------------------------------------------------------------------------------#
-while [ 0 -eq 0 ]; do
-  echo ""
-  echo "#======================================================================"
-  echo "#"
-  echo "#   T-Flows testing"
-  echo "#"
-  echo "#----------------------------------------------------------------------"
-  echo ""
-  echo "  Chose the type of test you want to perform:"
-  echo ""
-  echo "  0. Exit"
-  echo "  1. Generate tests"
-  echo "  2. Convert tests"
-  echo "  3. Divide tests"
-  echo "  4. Processor compilation tests with User_Mod"
-  echo "  5. Processor backup tests"
-  echo "  6. Processor save_now/exit_now tests"
-  echo "  7. Processor full lenght tests"
-  echo "  8. Process accuracy test"
-  echo "  9. Perform all tests"
-  echo " 10. Clean all test directories"
-  echo ""
+function chose_test {
 
-  read -p "  Enter the desired type of test: " option
+  # First argument is the option
+  option=$1
+
   if [ $option -eq 0 ]; then exit 1; fi
   if [ $option -eq 1 ]; then
     generate_tests
@@ -1437,5 +1418,49 @@ while [ 0 -eq 0 ]; do
   if [ $option -eq 10 ]; then
     git clean -dfx $TEST_DIR/..
   fi
-done
 
+}
+
+#------------------------------------------------------------------------------#
+# Actual script
+#------------------------------------------------------------------------------#
+
+# Desired option was provided by command line, execute it and end
+if [ $1 ]; then
+  echo ""
+  echo "#===================================================================="
+  echo "#"
+  echo "#   T-Flows testing in non-interactive mode"
+  echo "#"
+  echo "#--------------------------------------------------------------------"
+  echo ""
+  chose_test $1
+
+# Desired option was not provided, enter interactive mode
+else
+  while [ 0 -eq 0 ]; do
+    echo ""
+    echo "#===================================================================="
+    echo "#"
+    echo "#   T-Flows testing"
+    echo "#"
+    echo "#--------------------------------------------------------------------"
+    echo ""
+    echo "  Chose the type of test you want to perform:"
+    echo ""
+    echo "  0. Exit"
+    echo "  1. Generate tests"
+    echo "  2. Convert tests"
+    echo "  3. Divide tests"
+    echo "  4. Processor compilation tests with User_Mod"
+    echo "  5. Processor backup tests"
+    echo "  6. Processor save_now/exit_now tests"
+    echo "  7. Processor full lenght tests"
+    echo "  8. Process accuracy test"
+    echo "  9. Perform all tests"
+    echo " 10. Clean all test directories"
+    echo ""
+    read -p "  Enter the desired type of test: " option
+    chose_test $option
+  done
+fi;
