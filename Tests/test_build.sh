@@ -33,10 +33,11 @@ LAMINAR_BACKSTEP_NON_ORTH_DIR=Laminar/Backstep/Nonorthogonal
 LAMINAR_CAVITY_LID_DRIVEN_DIR=Laminar/Cavity/Lid_Driven/Re_1000
 LAMINAR_CAVITY_THERM_DRIVEN_106_DIR=Laminar/Cavity/Thermally_Driven/Ra_10e6
 LAMINAR_CAVITY_THERM_DRIVEN_108_DIR=Laminar/Cavity/Thermally_Driven/Ra_10e8
-LAMINAR_T_JUNCTION_DIR=Laminar/T_Junction
+LAMINAR_T_JUNCTION_DIR=Swarm/T_Junction_Square
 LAMINAR_CHANNEL=Laminar/Accuracy_Test/Channel_Re_2000
 
 MULTDOM_MEMBRANE_DIR=Rans/Membrane
+SWARM_PERIODIC_CYL_DIR=Swarm/Cylinders_Periodic
 
 # Add compressed meshes for these:
 # MULTDOM_SINGLE_ROD_DIR=Rans/Single_Rod
@@ -82,6 +83,7 @@ ALL_COMPILE_TESTS=("$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
                    "$HYB_CHANNEL_HR_UNIFORM_DIR" \
                    "$HYB_CHANNEL_HR_STRETCHED_DIR" \
                    "$MULTDOM_MEMBRANE_DIR" \
+                   "$SWARM_PERIODIC_CYL_DIR" \
                    )
 DONE_COMPILE_TESTS=0
 
@@ -113,6 +115,7 @@ ALL_CONVERT_TESTS=("$RANS_IMPINGING_JET_DIR" \
                    "$RANS_FUEL_BUNDLE_DIR" \
                    "$LES_PIPE_DIR" \
                    "$MULTDOM_MEMBRANE_DIR" \
+                   "$SWARM_PERIODIC_CYL_DIR" \
                    )
 DONE_CONVERT_TESTS=0
 
@@ -137,6 +140,7 @@ ALL_DIVIDE_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR" \
                   "$RANS_FUEL_BUNDLE_DIR"
                   "$LES_PIPE_DIR" \
                   "$MULTDOM_MEMBRANE_DIR" \
+                  "$SWARM_PERIODIC_CYL_DIR" \
                   )
 DONE_DIVIDE_TESTS=0
 
@@ -158,6 +162,7 @@ ALL_PROCESS_TESTS=("$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
                    "$HYB_CHANNEL_HR_STRETCHED_DIR" \
                    "$HYB_CHANNEL_HR_UNIFORM_DIR" \
                    "$LES_PIPE_DIR" \
+                   "$SWARM_PERIODIC_CYL_DIR" \
                    )
 ALL_PROCESS_MODELS=("none" \
                     "none" \
@@ -168,7 +173,8 @@ ALL_PROCESS_MODELS=("none" \
                     "rsm_hanjalic_jakirlic" \
                     "hybrid_les_rans" \
                     "hybrid_les_rans" \
-                    "les_dynamic")
+                    "les_dynamic" \
+                    "lagrangian_particle_tracking")
 DONE_PROCESS_TESTS=0
 
 #----------------------------------------------------------------------------
@@ -1237,7 +1243,7 @@ function process_full_length_tests {
 
   for i in ${!ALL_PROCESS_TESTS[@]}; do
     CASE_DIR="${ALL_PROCESS_TESTS[$i]}"
-    CASE_TUR="${ALL_PROCESS_MODELS[$i]}"
+    CASE_MOD="${ALL_PROCESS_MODELS[$i]}"
     #MASS_DENSITY=$(get_value_next_to_keyword "MASS_DENSITY" \
     #  "${ALL_PROCESS_TESTS[$i]}""/control")
     #DYNAMIC_VISCOSITY=$(get_value_next_to_keyword "DYNAMIC_VISCOSITY" \
@@ -1246,12 +1252,12 @@ function process_full_length_tests {
     echo ""
     echo "#===================================================================="
     echo "#   Process test: "     $CASE_DIR
-    echo "#   with turbulence model: " $CASE_TUR
+    echo "#   with physical model: " $CASE_MOD
     echo "#--------------------------------------------------------------------"
 
     process_full_length_test \
       "$TEST_DIR/$CASE_DIR" \
-      "$CASE_TUR" \
+      "$CASE_MOD" \
       "$TEST_DIR/$CASE_DIR/Results"
   done
 }
