@@ -12,9 +12,9 @@
   type(Field_Type), pointer :: flow
   type(Grid_Type),  pointer :: grid
   type(Vert_Type),  pointer :: vert
-  integer                   :: ln, n        ! local node and node
+  integer                   :: i_nod, n     ! local node and node
   integer                   :: cn           ! closest node
-  real                      :: xn, yn, zn   ! Node coordinates
+  real                      :: xn, yn, zn   ! node coordinates
   real                      :: dn_sq        ! distance squared
   real                      :: min_dn       ! minimum distance computed
 !==============================================================================!
@@ -30,8 +30,8 @@
   min_dn = HUGE
 
   ! Browse through nodes of vertex's cell
-  do ln = 1, grid % cells_n_nodes(vert % cell)  ! local node number
-    n = grid % cells_n(ln, vert % cell)         ! global node number
+  do i_nod = 1, grid % cells_n_nodes(vert % cell)  ! local node number
+    n = grid % cells_n(i_nod, vert % cell)         ! global node number
 
     ! Take node coordinate
     xn = grid % xn(n)

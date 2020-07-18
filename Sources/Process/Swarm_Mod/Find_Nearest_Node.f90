@@ -12,7 +12,7 @@
   type(Field_Type),    pointer :: flow
   type(Grid_Type),     pointer :: grid
   type(Particle_Type), pointer :: part
-  integer                      :: ln, n        ! local node and node
+  integer                      :: i_nod, n     ! local node and node
   integer                      :: cn           ! closest node
   real                         :: xn, yn, zn   ! Node coordinates
   real                         :: dn_sq        ! distance squared
@@ -30,8 +30,8 @@
   min_dn = HUGE
 
   ! Browse through nodes of particle's cell
-  do ln = 1, grid % cells_n_nodes(part % cell)  ! local node number
-    n = grid % cells_n(ln, part % cell)         ! global node number
+  do i_nod = 1, grid % cells_n_nodes(part % cell)  ! local node number
+    n = grid % cells_n(i_nod, part % cell)         ! global node number
 
     ! Take node coordinate
     xn = grid % xn(n)

@@ -18,7 +18,7 @@
   type(Grid_Type) :: grid
   integer         :: n_buff_layers  ! number of buffer layers
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, n, s, c1, c2, sub, subo, ln, fu, sh, nn, lev
+  integer :: c, n, s, c1, c2, sub, subo, i_nod, fu, sh, nn, lev
   integer :: nn_sub      ! number of nodes in the subdomain
   integer :: nc_sub      ! number of cells in the subdomain
   integer :: nf_sub      ! number of faces in the subdomain
@@ -48,8 +48,8 @@
         grid % new_c(c) = nc_sub  ! assign new (local) cell number 
         grid % old_c(nc_sub) = c
 
-        do ln = 1, grid % cells_n_nodes(c)
-          grid % new_n(grid % cells_n(ln,c)) = -1
+        do i_nod = 1, grid % cells_n_nodes(c)
+          grid % new_n(grid % cells_n(i_nod,c)) = -1
         end do
       end if
     end do
@@ -93,8 +93,8 @@
           ! Mark nodes on this level ...
           do c = 1, grid % n_cells
             if(grid % new_c(c) .eq. -1) then
-              do ln = 1, grid % cells_n_nodes(c)
-                grid % new_n(grid % cells_n(ln,c)) = -1
+              do i_nod = 1, grid % cells_n_nodes(c)
+                grid % new_n(grid % cells_n(i_nod,c)) = -1
               end do
             end if
           end do
@@ -268,8 +268,8 @@
     ! Mark nodes for renumbering with -1
     do c = 1, grid % n_cells
       if(grid % new_c(c) > 0) then
-        do ln = 1, grid % cells_n_nodes(c)
-          grid % new_n(grid % cells_n(ln,c)) = -1
+        do i_nod = 1, grid % cells_n_nodes(c)
+          grid % new_n(grid % cells_n(i_nod,c)) = -1
         end do
       end if
     end do

@@ -7,13 +7,13 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: ln, n, run, n1, n2, ln1, ln2, nc1, nc2, nu
+  integer              :: i_nod, n, run, n1, n2, i_nod1, i_nod2, nc1, nc2, nu
   integer              :: c, c2, s, s1, s2, max_n_cells
   integer, allocatable :: cell_list(:)
   real                 :: x1, x2, y1, y2, z1, z2
 
 ! Just for checking, erase this later
-! integer :: lc
+! integer :: i_cel
 ! real    :: xn, xc, yn, yc, zn, zc, max_del, min_del, del
 !==============================================================================!
 
@@ -31,8 +31,8 @@
     grid % nodes_n_cells(:) = 0  ! re-initialize the cell count
 
     do c = -grid % n_bnd_cells, grid % n_cells
-      do ln = 1, grid % cells_n_nodes(c)  ! local node number
-        n = grid % cells_n(ln, c)         ! global node number
+      do i_nod = 1, grid % cells_n_nodes(c)  ! local node number
+        n = grid % cells_n(i_nod, c)         ! global node number
 
         ! Increase number of cells surrounding the this node by one
         grid % nodes_n_cells(n) = grid % nodes_n_cells(n) + 1
@@ -66,13 +66,13 @@
 
       ! Take only faces with shadows - ony those have shadow nodes
       if(s2 > 0) then
-        do ln1 = 1, grid % faces_n_nodes(s1)
-          n1 = grid % faces_n(ln1, s1)
+        do i_nod1 = 1, grid % faces_n_nodes(s1)
+          n1 = grid % faces_n(i_nod1, s1)
           x1 = grid % xn(n1)
           y1 = grid % yn(n1)
           z1 = grid % zn(n1)
-          do ln2 = 1, grid % faces_n_nodes(s2)
-            n2 = grid % faces_n(ln2, s2)
+          do i_nod2 = 1, grid % faces_n_nodes(s2)
+            n2 = grid % faces_n(i_nod2, s2)
             x2 = grid % xn(n2) + grid % dx(s2)
             y2 = grid % yn(n2) + grid % dy(s2)
             z2 = grid % zn(n2) + grid % dz(s2)
@@ -111,8 +111,8 @@
 
 ! ! Check #1, save those nodes' cells
 ! do c = 1, grid % n_cells - grid % comm % n_buff_cells
-!   do ln = 1, grid % cells_n_nodes(c)  ! local node number
-!     n = grid % cells_n(ln, c)         ! global node number
+!   do i_nod = 1, grid % cells_n_nodes(c)  ! local node number
+!     n = grid % cells_n(i_nod, c)         ! global node number
 !     write(600+this_proc, '(a,i2,a,36i6)')  &
 !           'nc=', grid % nodes_n_cells(n),  &
 !           ' cell list=', grid % nodes_c(1:max_n_cells, n)
@@ -127,8 +127,8 @@
 ! min_del = +HUGE
 !
 ! do n = 1, grid % n_nodes
-!   do lc = 1, grid % nodes_n_cells(n)  ! local cell number
-!     c = grid % nodes_c(lc, n)         ! global cell number
+!   do i_cel = 1, grid % nodes_n_cells(n)  ! local cell number
+!     c = grid % nodes_c(i_cel, n)         ! global cell number
 !
 !     xn = grid % xn(n)
 !     yn = grid % yn(n)

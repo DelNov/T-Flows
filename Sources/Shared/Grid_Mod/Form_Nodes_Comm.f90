@@ -7,10 +7,10 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: b, c, c2, ln, n, s  ! counters
-  integer :: max_n_procs         ! max number of processors surrounding a node
+  integer :: b, c, c2, i_nod, n, s  ! counters
+  integer :: max_n_procs            ! max number of processors arround a node
 
-  integer :: nu, sub, p, cnt
+  integer              :: nu, sub, p, cnt
   integer, allocatable :: nodes_cons(:)
   logical, allocatable :: active(:)     ! active nodes
   real,    allocatable :: xn_buff(:), yn_buff(:), zn_buff(:)
@@ -33,8 +33,8 @@
   !-----------------------------------------------------!
 
   do c = 1, grid % n_cells
-    do ln = 1, grid % cells_n_nodes(c)  ! local node number
-      n = grid % cells_n(ln, c)         ! global node number
+    do i_nod = 1, grid % cells_n_nodes(c)  ! local node number
+      n = grid % cells_n(i_nod, c)         ! global node number
 
       ! Increase possible number of processors ...
       ! ... surrounding the this node by one
@@ -62,8 +62,8 @@
 
   ! Inside cells
   do c = 1, grid % n_cells
-    do ln = 1, grid % cells_n_nodes(c)  ! local node number
-      n = grid % cells_n(ln, c)         ! global node number
+    do i_nod = 1, grid % cells_n_nodes(c)  ! local node number
+      n = grid % cells_n(i_nod, c)         ! global node number
 
       if(active(n)) then
 
@@ -143,9 +143,9 @@
   end do
 
 ! do sub = 1, n_proc
-!   do ln = 1, grid % comm % nodes_repl(sub) % n_items
-!     n = grid % comm % nodes_repl(sub) % map(ln)
-!     write(600 + this_proc*10 + sub, '(A,I5,A,I5,3F9.3)')           &
+!   do i_nod = 1, grid % comm % nodes_repl(sub) % n_items
+!     n = grid % comm % nodes_repl(sub) % map(i_nod)
+!     write(600 + this_proc*10 + sub, '(a,i5,a,i5,3f9.3)')           &
 !                                 ' n=', n,                          &
 !                                 ' g=', grid % comm % node_glo(n),  &
 !                                                     grid % xn(n),  &

@@ -11,7 +11,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: grid
   type(Particle_Type), pointer :: part
-  integer                      :: c, lc       ! cell, local cell
+  integer                      :: c, i_cel    ! cell, local cell
   integer                      :: cc, cb      ! closest cell and bnd. cell
   real                         :: xc, yc, zc  ! cell center coordinates
   real                         :: d_sq        ! distance squared
@@ -40,8 +40,8 @@
     min_dc = HUGE  ! initialize minimum distance to cells inside
     min_db = HUGE  ! initialize minimum distance to boundary cells
 
-    do lc = 1, grid % nodes_n_cells(part % node)   ! local cell number
-      c = grid % nodes_c(lc, part % node)          ! global cell number
+    do i_cel = 1, grid % nodes_n_cells(part % node)   ! local cell number
+      c = grid % nodes_c(i_cel, part % node)          ! global cell number
 
       xc = grid % xc(c)
       yc = grid % yc(c)

@@ -7,7 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: sub, ln, ms, mr, n, nn, sh
+  integer           :: sub, i_nod, ms, mr, n, nn, sh
   character(len=80) :: name_in
   integer           :: c, c1, c2, s, buf_cnt
 !==============================================================================!
@@ -52,8 +52,8 @@
         if(c2 > 0) then
           if(grid % comm % cell_proc(c1) .eq. this_proc .and.  &
              grid % comm % cell_proc(c2) .eq. sub) then
-            do ln = 1, grid % faces_n_nodes(s)
-              grid % new_n(grid % faces_n(ln, s)) = -1
+            do i_nod = 1, grid % faces_n_nodes(s)
+              grid % new_n(grid % faces_n(i_nod, s)) = -1
             end do
           end if
         end if
