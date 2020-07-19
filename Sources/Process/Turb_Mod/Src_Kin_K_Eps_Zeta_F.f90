@@ -79,7 +79,7 @@
       end if
 
       b(c) = b(c) + max(0.0, turb % g_buoy(c) * grid % vol(c))
-      a % val(a % dia(c)) = a % val(a % dia(c))         &
+      a % val(a % dia(c)) = a % val(a % dia(c))                &
                                  + max(0.0,-turb % g_buoy(c)   &
                                  * grid % vol(c)               &
                                  / (kin % n(c) + TINY))
@@ -102,16 +102,16 @@
       alpha_v  = l_rans_v / (l_sgs_v + TINY)
 
       if( (turb % hybrid_les_rans_switch .eq. SWITCH_DISTANCE)  &
-          .and. (alpha_d < 1.05)                         &
-          .or.                                           &
+          .and. (alpha_d < 1.05)                                &
+          .or.                                                  &
           (turb % hybrid_les_rans_switch .eq. SWITCH_VELOCITY)  &
           .and. (alpha_v < 0.5.or.alpha_d < 1.05) ) then
         a % val(a % dia(c)) = a % val(a % dia(c))             &
                             + flow % density(c) * eps % n(c)  &
                             / (kin % n(c) + TINY) * grid % vol(c)
       else
-        a % val(a % dia(c)) = a % val(a % dia(c))   &
-          + flow % density(c)                       &
+        a % val(a % dia(c)) = a % val(a % dia(c))                        &
+          + flow % density(c)                                            &
           * min(alpha_d**1.4 * eps % n(c), kin % n(c)**1.5 / (lf*0.01))  &
           / (kin % n(c) + TINY) * grid % vol(c)
       end if
@@ -195,34 +195,34 @@
           qy = t % q(c2) * ny
           qz = t % q(c2) * nz
 
-          ut_log_law = - turb % con_w(c1) &
+          ut_log_law = - turb % con_w(c1)  &
                      * (t % n(c2) - t % n(c1))/grid % wall_dist(c1) * nx
-          vt_log_law = - turb % con_w(c1) &
+          vt_log_law = - turb % con_w(c1)  &
                      * (t % n(c2) - t % n(c1))/grid % wall_dist(c1) * ny
-          wt_log_law = - turb % con_w(c1) &
+          wt_log_law = - turb % con_w(c1)  &
                      * (t % n(c2) - t % n(c1))/grid % wall_dist(c1) * nz
 
-          ut % n(c1) = ut %n(c1)  * exp(-1.0 * ebf) &
+          ut % n(c1) = ut % n(c1) * exp(-1.0 * ebf)  &
                      + ut_log_law * exp(-1.0 / ebf)
-          vt % n(c1) = vt %n(c1)  * exp(-1.0 * ebf) &
+          vt % n(c1) = vt % n(c1) * exp(-1.0 * ebf)  &
                      + vt_log_law * exp(-1.0 / ebf)
-          wt % n(c1) = wt %n(c1)  * exp(-1.0 * ebf) &
+          wt % n(c1) = wt % n(c1) * exp(-1.0 * ebf)  &
                      + wt_log_law * exp(-1.0 / ebf)
 
-          if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) &
-          t % q(c2) = turb % con_w(c1) * (t % n(c1) &
-                      - t % n(c2))/grid % wall_dist(c1)
+          if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL)             &
+            t % q(c2) = turb % con_w(c1) * (t % n(c1) - t % n(c2))  &
+                      / grid % wall_dist(c1)
 
           g_buoy_wall = flow % beta*abs(grav_x + grav_y + grav_z)  &
-                        * sqrt(abs(t % q(c2))                      &
-                        * c_mu_theta5                              &
-                        * sqrt(abs(t2 % n(c1) * kin % n(c1))))
+                      * sqrt(abs(t % q(c2))                        &
+                      * c_mu_theta5                                &
+                      * sqrt(abs(t2 % n(c1) * kin % n(c1))))
 
           ! Clean up b(c) from old values of g_buoy
           b(c1)      = b(c1) - turb % g_buoy(c1) * grid % vol(c1)
 
           turb % g_buoy(c1) = turb % g_buoy(c1) * exp(-1.0 * ebf) &
-                     + g_buoy_wall * exp(-1.0 / ebf)
+                            + g_buoy_wall * exp(-1.0 / ebf)
 
           ! Add new values of g_buoy based on wall function approach
           b(c1)      = b(c1) + turb % g_buoy(c1) * grid % vol(c1)
