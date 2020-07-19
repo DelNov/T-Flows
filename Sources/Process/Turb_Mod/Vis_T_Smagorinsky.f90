@@ -84,7 +84,7 @@
                              + grav_y * t % y(c)   &   
                              + grav_z * t % z(c))  
       turb % vis_t(c) = turb % vis_t(c)            &
-                      * max(1 - 2.5*nc2/(flow % shear(c)+tiny),0.0)
+             * max(1 - 2.5 * nc2 / (flow % shear(c) + TINY), 0.0)
     end do
   end if
 
