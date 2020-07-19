@@ -38,6 +38,7 @@ LAMINAR_CHANNEL=Laminar/Accuracy_Test/Channel_Re_2000
 
 MULTDOM_MEMBRANE_DIR=Rans/Membrane
 SWARM_PERIODIC_CYL_DIR=Swarm/Cylinders_Periodic
+VOF_RISING_BUBBLE_DIR=Vof/Rising_Bubble
 
 # Add compressed meshes for these:
 # MULTDOM_SINGLE_ROD_DIR=Rans/Single_Rod
@@ -80,10 +81,11 @@ ALL_COMPILE_TESTS=("$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
                    "$RANS_CHANNEL_LR_UNIFORM_DIR" \
                    "$RANS_CHANNEL_LR_STRETCHED_DIR" \
                    "$RANS_CHANNEL_LR_RSM_DIR" \
+                   "$SWARM_PERIODIC_CYL_DIR" \
+                   "$VOF_RISING_BUBBLE_DIR" \
                    "$HYB_CHANNEL_HR_UNIFORM_DIR" \
                    "$HYB_CHANNEL_HR_STRETCHED_DIR" \
                    "$MULTDOM_MEMBRANE_DIR" \
-                   "$SWARM_PERIODIC_CYL_DIR" \
                    )
 DONE_COMPILE_TESTS=0
 
@@ -95,13 +97,14 @@ ALL_GENERATE_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR" \
                     "$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
                     "$LAMINAR_CAVITY_THERM_DRIVEN_106_DIR" \
                     "$LAMINAR_CAVITY_THERM_DRIVEN_108_DIR" \
-                    "$LES_CHANNEL_180_PD_DIR" \
                     "$RANS_BACKSTEP_05100_DIR" \
                     "$RANS_BACKSTEP_28000_DIR" \
                     "$RANS_CHANNEL_LR_LONG_DIR" \
                     "$RANS_CHANNEL_LR_RSM_DIR" \
                     "$RANS_CHANNEL_LR_STRETCHED_DIR" \
                     "$RANS_CHANNEL_LR_UNIFORM_DIR" \
+                    "$VOF_RISING_BUBBLE_DIR" \
+                    "$LES_CHANNEL_180_PD_DIR" \
                     "$HYB_CHANNEL_HR_UNIFORM_DIR" \
                     "$HYB_CHANNEL_HR_STRETCHED_DIR" \
                     "$MULTDOM_COPY_INLET" \
@@ -159,10 +162,11 @@ ALL_PROCESS_TESTS=("$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
                    "$RANS_CHANNEL_LR_STRETCHED_DIR" \
                    "$RANS_CHANNEL_LR_RSM_DIR" \
                    "$RANS_CHANNEL_LR_RSM_DIR" \
+                   "$SWARM_PERIODIC_CYL_DIR" \
+                   "$VOF_RISING_BUBBLE_DIR" \
                    "$HYB_CHANNEL_HR_STRETCHED_DIR" \
                    "$HYB_CHANNEL_HR_UNIFORM_DIR" \
                    "$LES_PIPE_DIR" \
-                   "$SWARM_PERIODIC_CYL_DIR" \
                    )
 ALL_PROCESS_MODELS=("none" \
                     "none" \
@@ -171,10 +175,12 @@ ALL_PROCESS_MODELS=("none" \
                     "k_eps_zeta_f" \
                     "rsm_manceau_hanjalic" \
                     "rsm_hanjalic_jakirlic" \
+                    "lagrangian_particle_tracking" \
+                    "volume_of_fluid" \
                     "hybrid_les_rans" \
                     "hybrid_les_rans" \
                     "les_dynamic" \
-                    "lagrangian_particle_tracking")
+                    )
 DONE_PROCESS_TESTS=0
 
 #----------------------------------------------------------------------------
@@ -216,7 +222,7 @@ if [ -f $FULL_LOG ]; then cp /dev/null $FULL_LOG; fi
 function time_in_seconds {
   previous_time=$current_time
   current_time=$(date +%s)
-  echo "time elapsed:" \
+  echo "Time elapsed:" \
   "$(echo ""$current_time" - "$previous_time"" | bc -l)" "seconds"
 }
 
@@ -398,11 +404,11 @@ function launch_process {
   fi
 
   if [ "$1" == "seq" ]; then
-    echo "launching Process"
+    echo "Launching Process"
     $PROC_EXE >> $FULL_LOG 2>&1
     success=$?
   elif [ "$1" == "par" ]; then
-    echo "launching mpirun -np "$2" Process"
+    echo "Launching mpirun -np "$2" Process"
     mpirun -np $2 $PROC_EXE >> $FULL_LOG 2>&1
     success=$?
   else
@@ -1249,6 +1255,7 @@ function process_full_length_tests {
     #DYNAMIC_VISCOSITY=$(get_value_next_to_keyword "DYNAMIC_VISCOSITY" \
     #  "${ALL_PROCESS_TESTS[$i]}""/control")
 
+echo $CASE_DIR
     echo ""
     echo "#===================================================================="
     echo "#   Process test: "     $CASE_DIR
