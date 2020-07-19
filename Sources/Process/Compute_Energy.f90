@@ -178,12 +178,12 @@
                grid % fw(s) * (flow % conductivity(c1) +                       &
                                flow % capacity(c1) * turb % vis_t_eff(c1)      &
                                / pr_tf)                                        &
-        + (1.0-grid % fw(s))* (flow % conductivity(c2) +                       &
+       + (1.0-grid % fw(s)) * (flow % conductivity(c2) +                       &
                                flow % capacity(c2) * turb % vis_t_eff(c2)      &
                                / pr_tf)
-      con_t_f  = grid % fw(s) *flow % capacity(c1) * turb % vis_t_eff(c1)      &
+     con_t_f  = grid % fw(s) * flow % capacity(c1) * turb % vis_t_eff(c1)      &
                                / pr_tf                                         &
-          + (1.0-grid % fw(s))*flow % capacity(c2) * turb % vis_t_eff(c2)      &
+        + (1.0-grid % fw(s)) * flow % capacity(c2) * turb % vis_t_eff(c2)      &
                                / pr_tf
     end if
 
