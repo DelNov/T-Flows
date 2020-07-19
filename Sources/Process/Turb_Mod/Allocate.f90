@@ -92,13 +92,13 @@
 
       ! Resolved turbulent heat fluxes
       if(heat_transfer) then
-        allocate(turb % t2_res(-nb:nc));  turb % t2_res = 0.
-        allocate(turb % ut_res(-nb:nc));  turb % ut_res = 0.
-        allocate(turb % vt_res(-nb:nc));  turb % vt_res = 0.
-        allocate(turb % wt_res(-nb:nc));  turb % wt_res = 0.
-        allocate(turb % ut_mean(-nb:nc)); turb % ut_mean = 0.
-        allocate(turb % vt_mean(-nb:nc)); turb % vt_mean = 0.
-        allocate(turb % wt_mean(-nb:nc)); turb % wt_mean = 0.
+        allocate(turb % t2_res (-nb:nc));  turb % t2_res  = 0.
+        allocate(turb % ut_res (-nb:nc));  turb % ut_res  = 0.
+        allocate(turb % vt_res (-nb:nc));  turb % vt_res  = 0.
+        allocate(turb % wt_res (-nb:nc));  turb % wt_res  = 0.
+        allocate(turb % ut_mean(-nb:nc));  turb % ut_mean = 0.
+        allocate(turb % vt_mean(-nb:nc));  turb % vt_mean = 0.
+        allocate(turb % wt_mean(-nb:nc));  turb % wt_mean = 0.
 
       end if ! heat_transfer
 
