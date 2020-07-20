@@ -226,7 +226,7 @@ ALL_MULTIPHASE_MODELS=("none" \
                        "none" \
                        "none" \
                        "none" \
-                       "lagrangian_particle_tracking" \
+                       "lagrangian_particles" \
                        "volume_of_fluid" \
                        "none" \
                        "none" \
