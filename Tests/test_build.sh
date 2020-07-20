@@ -18,6 +18,14 @@ DEBUG="no"
 CGNS="no"
 CGNS_MPI="openmpi"
 
+# Variable MODE can be set to "interactive" or "noninteractive", depending if
+# the script is ran in interactive mode (without command line options) or in
+# noninteractive mode (with command line option with the name of the test).
+# It is used to decide wheather to launch matplotlib scripts, since some of
+# them are in interactive mode (maybe Egor can fix them to run noninteractive,
+# then this variable and check would't be needed.)
+MODE="undefined"
+
 # A small reminder how to set up alternatives if you have mpich and openmpi:
 #update-alternatives --install /usr/bin/mpif90 mpif90 /usr/bin/mpif90.openmpi 20
 #update-alternatives --install /usr/bin/mpif90 mpif90 /usr/bin/mpif90.mpich   80
@@ -25,34 +33,24 @@ CGNS_MPI="openmpi"
 #update-alternatives --install /usr/bin/mpirun mpirun /usr/bin/mpirun.openmpi 20
 #update-alternatives --install /usr/bin/mpirun mpirun /usr/bin/mpirun.mpich   80
 
-#-------------------------
+#----------------------------------
 # Folders with test cases
-#-------------------------
+# Ordered in the following way:
+# - Laminar cases.
+# - Rans cases
+# - Multi domain cases
+# - Volume of fluid cases
+# - Swarm cases (particle tracking
+# - LES cases
+# - Hybrid LES/RANS cases
+#----------------------------------
 LAMINAR_BACKSTEP_ORTH_DIR=Laminar/Backstep/Orthogonal
 LAMINAR_BACKSTEP_NON_ORTH_DIR=Laminar/Backstep/Nonorthogonal
 LAMINAR_CAVITY_LID_DRIVEN_DIR=Laminar/Cavity/Lid_Driven/Re_1000
 LAMINAR_CAVITY_THERM_DRIVEN_106_DIR=Laminar/Cavity/Thermally_Driven/Ra_10e6
 LAMINAR_CAVITY_THERM_DRIVEN_108_DIR=Laminar/Cavity/Thermally_Driven/Ra_10e8
 LAMINAR_T_JUNCTION_DIR=Swarm/T_Junction_Square
-LAMINAR_CHANNEL=Laminar/Accuracy_Test/Channel_Re_2000
-
-MULTDOM_MEMBRANE_DIR=Rans/Membrane
-SWARM_PERIODIC_CYL_DIR=Swarm/Cylinders_Periodic
-VOF_RISING_BUBBLE_DIR=Vof/Rising_Bubble
-
-# Add compressed meshes for these:
-# MULTDOM_SINGLE_ROD_DIR=Rans/Single_Rod
-# MULTDOM_COPY_INLET_DIR=Laminar/Copy_Inlet
-# MULTDOM_HEAT_EXCHANGER_2_DIR=Laminar/Heat_Exchanger/2_Domains
-# MULTDOM_HEAT_EXCHANGER_3_DIR=Laminar/Heat_Exchanger/3_Domains
-
-LES_CHANNEL_180_PD_DIR=Les/Channel_Re_Tau_180/Periodic_Domain
-
-# Generate takes ages for this one
-LES_CHANNEL_180_LD_DIR=Les/Channel_Re_Tau_180/Long_Domain
-
-LES_PIPE_DIR=Les/Pipe_Re_Tau_180
-LES_RB_109_DIR=Les/Rayleigh_Benard_Convection_Ra_10e09
+LAMINAR_CHANNEL_DIR=Laminar/Accuracy_Test/Channel_Re_2000
 
 RANS_BACKSTEP_05100_DIR=Rans/Backstep_Re_05100
 RANS_BACKSTEP_28000_DIR=Rans/Backstep_Re_28000
@@ -63,40 +61,66 @@ RANS_CHANNEL_LR_UNIFORM_DIR=Rans/Channel_Re_Tau_590/Uniform_Mesh
 RANS_FUEL_BUNDLE_DIR=Rans/Fuel_Bundle
 RANS_IMPINGING_JET_DIR=Rans/Impinging_Jet_2d_Distant_Re_23000
 
+MULTDOM_MEMBRANE_DIR=Rans/Membrane
+VOF_RISING_BUBBLE_DIR=Vof/Rising_Bubble
+SWARM_PERIODIC_CYL_DIR=Swarm/Cylinders_Periodic
+
+LES_CHANNEL_180_LONG_DIR=Les/Channel_Re_Tau_180/Long_Domain
+LES_CHANNEL_180_PERIODIC_DIR=Les/Channel_Re_Tau_180/Periodic_Domain
+LES_PIPE_DIR=Les/Pipe_Re_Tau_180
+LES_RB_109_DIR=Les/Rayleigh_Benard_Convection_Ra_10e09
+
 HYB_CHANNEL_HR_STRETCHED_DIR=Hybrid_Les_Rans/Channel_Re_Tau_2000/Stretched_Mesh
 HYB_CHANNEL_HR_UNIFORM_DIR=Hybrid_Les_Rans/Channel_Re_Tau_2000/Uniform_Mesh
 
+# Add compressed meshes for these:
+# MULTDOM_SINGLE_ROD_DIR=Rans/Single_Rod
+# MULTDOM_COPY_INLET_DIR=Laminar/Copy_Inlet
+# MULTDOM_HEAT_EXCHANGER_2_DIR=Laminar/Heat_Exchanger/2_Domains
+# MULTDOM_HEAT_EXCHANGER_3_DIR=Laminar/Heat_Exchanger/3_Domains
+
 #----------------------------------------------------------------------------
 # All compilation tests including those with User_Mod/
+# (These are essentially all the tests)
 #----------------------------------------------------------------------------
-ALL_COMPILE_TESTS=("$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
+ALL_COMPILE_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR" \
+                   "$LAMINAR_BACKSTEP_NON_ORTH_DIR" \
+                   "$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
                    "$LAMINAR_CAVITY_THERM_DRIVEN_106_DIR" \
                    "$LAMINAR_CAVITY_THERM_DRIVEN_108_DIR" \
                    "$LAMINAR_T_JUNCTION_DIR" \
-                   "$LES_CHANNEL_180_LD_DIR" \
-                   "$LES_CHANNEL_180_PD_DIR" \
-                   "$LES_PIPE_DIR" \
-                   "$LES_RB_109_DIR" \
+                   "$LAMINAR_CHANNEL_DIR" \
+                   "$RANS_BACKSTEP_05100_DIR" \
                    "$RANS_BACKSTEP_28000_DIR" \
-                   "$RANS_CHANNEL_LR_UNIFORM_DIR" \
-                   "$RANS_CHANNEL_LR_STRETCHED_DIR" \
+                   "$RANS_CHANNEL_LR_LONG_DIR" \
                    "$RANS_CHANNEL_LR_RSM_DIR" \
+                   "$RANS_CHANNEL_LR_STRETCHED_DIR" \
+                   "$RANS_CHANNEL_LR_UNIFORM_DIR" \
+                   "$RANS_FUEL_BUNDLE_DIR" \
+                   "$RANS_IMPINGING_JET_DIR" \
+                   "$MULTDOM_MEMBRANE_DIR" \
                    "$SWARM_PERIODIC_CYL_DIR" \
                    "$VOF_RISING_BUBBLE_DIR" \
+                   "$LES_CHANNEL_180_LONG_DIR" \
+                   "$LES_CHANNEL_180_PERIODIC_DIR" \
+                   "$LES_PIPE_DIR" \
+                   "$LES_RB_109_DIR" \
                    "$HYB_CHANNEL_HR_UNIFORM_DIR" \
                    "$HYB_CHANNEL_HR_STRETCHED_DIR" \
-                   "$MULTDOM_MEMBRANE_DIR" \
                    )
 DONE_COMPILE_TESTS=0
 
-#----------------------------------
+#--------------------------------------------------------------
 # All directories to test Generate
-#----------------------------------
+# (All the tests minus those which come with third party grid)
+#--------------------------------------------------------------
 ALL_GENERATE_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR" \
                     "$LAMINAR_BACKSTEP_NON_ORTH_DIR" \
                     "$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
                     "$LAMINAR_CAVITY_THERM_DRIVEN_106_DIR" \
                     "$LAMINAR_CAVITY_THERM_DRIVEN_108_DIR" \
+                    "$LAMINAR_T_JUNCTION_DIR" \
+                    "$LAMINAR_CHANNEL_DIR" \
                     "$RANS_BACKSTEP_05100_DIR" \
                     "$RANS_BACKSTEP_28000_DIR" \
                     "$RANS_CHANNEL_LR_LONG_DIR" \
@@ -104,46 +128,54 @@ ALL_GENERATE_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR" \
                     "$RANS_CHANNEL_LR_STRETCHED_DIR" \
                     "$RANS_CHANNEL_LR_UNIFORM_DIR" \
                     "$VOF_RISING_BUBBLE_DIR" \
-                    "$LES_CHANNEL_180_PD_DIR" \
+                    "$LES_CHANNEL_180_LONG_DIR" \
+                    "$LES_CHANNEL_180_PERIODIC_DIR" \
+                    "$LES_RB_109_DIR" \
                     "$HYB_CHANNEL_HR_UNIFORM_DIR" \
                     "$HYB_CHANNEL_HR_STRETCHED_DIR" \
-                    "$MULTDOM_COPY_INLET" \
                     )
 DONE_GENERATE_TESTS=0
 
-#---------------------------------
+#--------------------------------------------------
 # All directories to test Convert
-#---------------------------------
-ALL_CONVERT_TESTS=("$RANS_IMPINGING_JET_DIR" \
-                   "$RANS_FUEL_BUNDLE_DIR" \
-                   "$LES_PIPE_DIR" \
+# (All the tests which come with third party grid)
+#--------------------------------------------------
+ALL_CONVERT_TESTS=("$RANS_FUEL_BUNDLE_DIR" \
+                   "$RANS_IMPINGING_JET_DIR" \
                    "$MULTDOM_MEMBRANE_DIR" \
                    "$SWARM_PERIODIC_CYL_DIR" \
+                   "$LES_PIPE_DIR" \
                    )
 DONE_CONVERT_TESTS=0
 
 #--------------------------------
 # All directories to test Divide
+# (All cases should be here)
 #--------------------------------
 ALL_DIVIDE_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR" \
                   "$LAMINAR_BACKSTEP_NON_ORTH_DIR" \
                   "$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
                   "$LAMINAR_CAVITY_THERM_DRIVEN_106_DIR" \
                   "$LAMINAR_CAVITY_THERM_DRIVEN_108_DIR" \
-                  "$LES_CHANNEL_180_PD_DIR" \
+                  "$LAMINAR_T_JUNCTION_DIR" \
+                  "$LAMINAR_CHANNEL_DIR" \
                   "$RANS_BACKSTEP_05100_DIR" \
                   "$RANS_BACKSTEP_28000_DIR" \
                   "$RANS_CHANNEL_LR_LONG_DIR" \
                   "$RANS_CHANNEL_LR_RSM_DIR" \
                   "$RANS_CHANNEL_LR_STRETCHED_DIR" \
                   "$RANS_CHANNEL_LR_UNIFORM_DIR" \
-                  "$HYB_CHANNEL_HR_STRETCHED_DIR" \
-                  "$HYB_CHANNEL_HR_UNIFORM_DIR" \
+                  "$RANS_FUEL_BUNDLE_DIR" \
                   "$RANS_IMPINGING_JET_DIR" \
-                  "$RANS_FUEL_BUNDLE_DIR"
-                  "$LES_PIPE_DIR" \
                   "$MULTDOM_MEMBRANE_DIR" \
                   "$SWARM_PERIODIC_CYL_DIR" \
+                  "$VOF_RISING_BUBBLE_DIR" \
+                  "$LES_CHANNEL_180_LONG_DIR" \
+                  "$LES_CHANNEL_180_PERIODIC_DIR" \
+                  "$LES_PIPE_DIR" \
+                  "$LES_RB_109_DIR" \
+                  "$HYB_CHANNEL_HR_UNIFORM_DIR" \
+                  "$HYB_CHANNEL_HR_STRETCHED_DIR" \
                   )
 DONE_DIVIDE_TESTS=0
 
@@ -152,41 +184,60 @@ DONE_DIVIDE_TESTS=0
 #-----------------------------------------------
 ALL_SAVE_EXIT_NOW_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR")
 
-#----------------------------------------------------------------
-# All directories to test Process, followed by turbulence models
-#----------------------------------------------------------------
+#--------------------------------------------------------------
+# All directories to test Process, followed by physical models
+#--------------------------------------------------------------
 ALL_PROCESS_TESTS=("$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
                    "$LAMINAR_CAVITY_THERM_DRIVEN_106_DIR" \
                    "$LAMINAR_CAVITY_THERM_DRIVEN_108_DIR" \
+                   "$RANS_BACKSTEP_05100_DIR" \
+                   "$RANS_BACKSTEP_28000_DIR" \
                    "$RANS_CHANNEL_LR_UNIFORM_DIR" \
                    "$RANS_CHANNEL_LR_STRETCHED_DIR" \
                    "$RANS_CHANNEL_LR_RSM_DIR" \
-                   "$RANS_CHANNEL_LR_RSM_DIR" \
+                   "$RANS_IMPINGING_JET_DIR" \
                    "$SWARM_PERIODIC_CYL_DIR" \
                    "$VOF_RISING_BUBBLE_DIR" \
+                   "$LES_PIPE_DIR" \
                    "$HYB_CHANNEL_HR_STRETCHED_DIR" \
                    "$HYB_CHANNEL_HR_UNIFORM_DIR" \
-                   "$LES_PIPE_DIR" \
                    )
-ALL_PROCESS_MODELS=("none" \
-                    "none" \
-                    "none" \
-                    "k_eps" \
-                    "k_eps_zeta_f" \
-                    "rsm_manceau_hanjalic" \
-                    "rsm_hanjalic_jakirlic" \
-                    "lagrangian_particle_tracking" \
-                    "volume_of_fluid" \
-                    "hybrid_les_rans" \
-                    "hybrid_les_rans" \
-                    "les_dynamic" \
-                    )
+ALL_TURBULENCE_MODELS=("none" \
+                       "none" \
+                       "none" \
+                       "rsm_manceau_hanjalic" \
+                       "k_eps_zeta_f" \
+                       "k_eps_zeta_f" \
+                       "k_eps_zeta_f" \
+                       "rsm_hanjalic_jakirlic" \
+                       "k_eps_zeta_f" \
+                       "none" \
+                       "none" \
+                       "les_dynamic" \
+                       "hybrid_les_rans" \
+                       "hybrid_les_rans" \
+                       )
+ALL_MULTIPHASE_MODELS=("none" \
+                       "none" \
+                       "none" \
+                       "none" \
+                       "none" \
+                       "none" \
+                       "none" \
+                       "none" \
+                       "none" \
+                       "lagrangian_particle_tracking" \
+                       "volume_of_fluid" \
+                       "none" \
+                       "none" \
+                       "none" \
+                       )
 DONE_PROCESS_TESTS=0
 
 #----------------------------------------------------------------------------
 # All directories to Process accuracy test
 #----------------------------------------------------------------------------
-ALL_PROCESS_ACCURACY_TESTS=("$LAMINAR_CHANNEL")
+ALL_PROCESS_ACCURACY_TESTS=("$LAMINAR_CHANNEL_DIR")
 DONE_PROCESS_ACCURACY_TESTS=0
 
 # Folder structure
@@ -1136,17 +1187,21 @@ function process_compilation_tests {
 #------------------------------------------------------------------------------#
 function process_full_length_test {
   # $1 = dir with test
-  # $2 = model
-  # $3 = dir with results
+  # $2 = turbulence model
+  # $3 = multiphase model
+  # $4 = dir with results
 
   if [ -z "${1+xxx}" ]; then 
-    echo "directory is not set at all"
+    echo "Directory is not set at all"
     exit 1
   elif [ -z "${2+xxx}" ]; then 
-    echo "model is not set at all"
+    echo "Turbulence model is not set at all"
     exit 1
   elif [ -z "${3+xxx}" ]; then 
-    echo "directory with results is not set at all"
+    echo "Multiphase model is not set at all"
+    exit 1
+  elif [ -z "${4+xxx}" ]; then 
+    echo "Sirectory with results is not set at all"
     exit 1
   fi
 
@@ -1189,10 +1244,14 @@ function process_full_length_test {
       "#LOAD_BACKUP_NAME "$name_in_div"-ts"$n1".backup" \
       control."$i"
 
-    # change model to $2
+    # change physical models
     replace_line_with_first_occurence_in_file \
       "TURBULENCE_MODEL" \
       "TURBULENCE_MODEL "$2"" \
+      control."$i"
+    replace_line_with_first_occurence_in_file \
+      "MULTIPHASE_MODEL" \
+      "MULTIPHASE_MODEL "$3"" \
       control."$i"
   done
 
@@ -1214,19 +1273,22 @@ function process_full_length_test {
   if [ $(ls -1 "$name_in_div"-res-plus-ts??????.dat 2>/dev/null | wc -l)\
     -gt 0 ]; then
 
-    # extract essential data from produced .dat files
-    last_results_plus_dat_file=$(realpath --relative-to="$3" \
+    # Extract essential data from produced .dat files
+    last_results_plus_dat_file=$(realpath --relative-to="$4" \
       $(ls -tr1 "$name_in_div"-res-plus-ts??????.dat | tail -n1))
 
     echo "results are:"
     echo "$(head -n8 $(ls -tr1 "$name_in_div"-res-plus-ts??????.dat | \
       tail -n1))"
 
-    launch_matplotlib \
-      "$3" \
-      readme_python_matplotlib_script \
-      "$last_results_plus_dat_file" \
-      "result_plus_"$2""
+    # Launching matplotlib scripts only in interacive mode
+    if [ $MODE -eq "interactive" ]; then
+      launch_matplotlib \
+        "$4" \
+        readme_python_matplotlib_script \
+        "$last_results_plus_dat_file" \
+        "result_plus_"$2""
+    fi
   else
       echo "Warning: file "$name_in_div"-res-plus-ts??????.dat does not exist"
   fi
@@ -1235,9 +1297,6 @@ function process_full_length_test {
 # All process tests
 #------------------------------------------------------------------------------#
 function process_full_length_tests {
-  # $1 = dir with test
-  # $2 = model
-  # $3 = dir with results
   # it requires a template file readme_python_matplotlib_script.sh in Results/
 
   echo ""
@@ -1249,7 +1308,8 @@ function process_full_length_tests {
 
   for i in ${!ALL_PROCESS_TESTS[@]}; do
     CASE_DIR="${ALL_PROCESS_TESTS[$i]}"
-    CASE_MOD="${ALL_PROCESS_MODELS[$i]}"
+    TURB_MOD="${ALL_TURBULENCE_MODELS[$i]}"
+    MULT_MOD="${ALL_MULTIPHASE_MODELS[$i]}"
     #MASS_DENSITY=$(get_value_next_to_keyword "MASS_DENSITY" \
     #  "${ALL_PROCESS_TESTS[$i]}""/control")
     #DYNAMIC_VISCOSITY=$(get_value_next_to_keyword "DYNAMIC_VISCOSITY" \
@@ -1258,13 +1318,15 @@ function process_full_length_tests {
 echo $CASE_DIR
     echo ""
     echo "#===================================================================="
-    echo "#   Process test: "     $CASE_DIR
-    echo "#   with physical model: " $CASE_MOD
+    echo "#   Process test: " $CASE_DIR "with physical models:"
+    echo "#   " $TURB_MOD "for turbulence and "
+    echo "#   " $MULT_MOD "for multiphase "
     echo "#--------------------------------------------------------------------"
 
     process_full_length_test \
       "$TEST_DIR/$CASE_DIR" \
-      "$CASE_MOD" \
+      "$TURB_MOD" \
+      "$MULT_MOD" \
       "$TEST_DIR/$CASE_DIR/Results"
   done
 }
@@ -1337,9 +1399,11 @@ function process_accuracy_test {
     fi
   done # for loop
 
-  launch_matplotlib \
-    "$path"/Results \
-    readme_python_matplotlib_script "" ""
+  if [ $MODE -eq "interactive" ]; then
+    launch_matplotlib \
+      "$path"/Results \
+      readme_python_matplotlib_script "" ""
+  fi
 }
 
 #------------------------------------------------------------------------------#
@@ -1429,11 +1493,12 @@ function chose_test {
 }
 
 #------------------------------------------------------------------------------#
-# Actual script
+# Actual script begins here
 #------------------------------------------------------------------------------#
 
 # Desired option was provided by command line, execute it and end
 if [ $1 ]; then
+  MODE="noninteractive"
   echo ""
   echo "#===================================================================="
   echo "#"
@@ -1445,6 +1510,7 @@ if [ $1 ]; then
 
 # Desired option was not provided, enter interactive mode
 else
+  MODE="interactive"
   while [ 0 -eq 0 ]; do
     echo ""
     echo "#===================================================================="
