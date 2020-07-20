@@ -142,13 +142,13 @@
             vm_p(i)   = vm_p(i) + u_rad
             wm_p(i)   = wm_p(i) + w % n(c)
 
-            if(turbulence_model .eq. K_EPS) then
+            if(turb % model .eq. K_EPS) then
               v1_p(i) = v1_p(i) + kin % n(c)
               v2_p(i) = v2_p(i) + eps % n(c)
               v3_p(i) = v3_p(i) + turb % vis_t(c) / flow % viscosity(c)
             end if
 
-            if(turbulence_model .eq. K_EPS_ZETA_F) then
+            if(turb % model .eq. K_EPS_ZETA_F) then
               v1_p(i)   = v1_p(i) + kin % n(c)
               v2_p(i)   = v2_p(i) + eps % n(c)
               v3_p(i)   = v3_p(i) + turb % vis_t(c) / flow % viscosity(c)
