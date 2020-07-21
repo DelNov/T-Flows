@@ -31,7 +31,7 @@
   type(Var_Type),   pointer :: u, v, w
   type(Var_Type),   pointer :: kin, eps
   integer                   :: c1, c2, s, c
-  real                      :: pr, beta, ebf
+  real                      :: pr, beta, ebf, sc
   real                      :: u_tan, u_tau
   real                      :: kin_vis, u_plus, y_star, re_t, f_mu
   real                      :: z_o
@@ -137,6 +137,19 @@
                       / (  turb % y_plus(c1) * pr * exp(-1.0 * ebf)       &
                          + (u_plus + beta) * pr_t * exp(-1.0 / ebf) + TINY)
         end if
+
+        if(flow % n_scalars > 0) then
+          sc   = Field_Mod_Schmidt_Number(flow, c1)  ! laminar Schmidt number
+          beta = 9.24 * ((sc/sc_t)**0.75 - 1.0)                 &
+           * (1.0 + 0.28 * exp(-0.007*sc/sc_t))
+          ebf = 0.01 * (sc * turb % y_plus(c1)**4               &
+          / ((1.0 + 5.0 * sc**3 * turb % y_plus(c1)) + TINY))
+          turb % diff_w(c1) =  turb % y_plus(c1)                &
+              * (flow % viscosity(c1)/flow % density(c1)) &
+              / (  turb % y_plus(c1) * sc * exp(-1.0 * ebf)     &
+              + (u_plus + beta) * sc_t * exp(-1.0 / ebf) + TINY)
+        end if      
+
       end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2).eq.WALL or WALLFL
     end if    ! c2 < 0
   end do
@@ -145,6 +158,9 @@
   call Grid_Mod_Exchange_Cells_Real(grid, turb % vis_w)
   if(heat_transfer) then
     call Grid_Mod_Exchange_Cells_Real(grid, turb % con_w)
+  end if
+  if(flow % n_scalars > 0) then
+    call Grid_Mod_Exchange_Cells_Real(grid, turb % diff_w)
   end if
 
   end subroutine
