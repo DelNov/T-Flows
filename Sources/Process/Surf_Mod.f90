@@ -117,7 +117,6 @@
 ! include 'Surf_Mod/Advance_Particles.f90'
   include 'Surf_Mod/Allocate.f90'
   include 'Surf_Mod/Calculate_Element_Normals.f90'
-  include 'Surf_Mod/Calculate_Nodal_Values.f90'
   include 'Surf_Mod/Clean.f90'
   include 'Surf_Mod/Count_Elements_Neighbours.f90'
   include 'Surf_Mod/Count_Vertex_Elements.f90'
