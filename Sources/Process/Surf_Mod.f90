@@ -56,6 +56,7 @@
     integer :: proc
     integer :: buff
 
+    real :: curv
   end type
 
   !---------------!
@@ -69,6 +70,7 @@
     integer :: si, sj, sk
     real    :: nx, ny, nz  ! surface normal vector
     real    :: area
+    real    :: curv
 
   end type
 
@@ -101,7 +103,6 @@
 
     ! Logical array if cell has particles
     logical, allocatable :: cell_has_vertex(:)
-
   end type
 
   ! Working arrays, buffers for parallel version
@@ -121,6 +122,7 @@
   include 'Surf_Mod/Count_Elements_Neighbours.f90'
   include 'Surf_Mod/Count_Vertex_Elements.f90'
   include 'Surf_Mod/Compress_Nodes.f90'
+  include 'Surf_Mod/Compute_Curvatures.f90'
   include 'Surf_Mod/Find_Boundaries.f90'
   include 'Surf_Mod/Find_Sides.f90'
   include 'Surf_Mod/Find_Nearest_Cell.f90'
