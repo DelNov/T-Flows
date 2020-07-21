@@ -95,18 +95,17 @@
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
 
-!   !-------------------------!
-!   !   Particle velocities   !
-!   !-------------------------!
-!   write(fu,'(a,a)') IN_4, '<DataArray type="Float64" Name="Velocity" ' // &
-!                          ' NumberOfComponents="3" format="ascii">'
-!   do v = 1, surf % n_verts
-!     part => surf % vert(k)
-!     write(fu,'(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')                         &
-!               IN_5, part % u, part % v, part % w
-!   end do
-!   write(fu,'(a,a)') IN_4, '</DataArray>'
-!
+    !-----------------------------!
+    !   Curvatures at the nodes   !
+    !-----------------------------!
+    write(fu,'(a,a)') IN_4, '<DataArray type="Float64" Name="NodeCurv" ' // &
+                           ' format="ascii">'
+    do v = 1, surf % n_verts
+      vert => surf % vert(v)
+      write(fu,'(a,1pe16.6e4)') IN_5, vert % curv
+    end do
+    write(fu,'(a,a)') IN_4, '</DataArray>'
+
     write(fu,'(a,a)') IN_3, '</PointData>'
 
     !-----------!
@@ -169,11 +168,22 @@
     !   Surface normals   !
     !---------------------!
     write(fu,'(4a)') IN_4,                                                &
-                   '<DataArray type="Float64" Name="SurfaceNormals" ' //  &
+                   '<DataArray type="Float64" Name="ElementNormals" ' //  &
                    ' NumberOfComponents="3" format="ascii">'
     do e = 1, surf % n_elems
       write(fu,'(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')  &
             IN_5, surf % elem(e) % nx, surf % elem(e) % ny, surf % elem(e) % nz
+    end do
+    write(fu,'(a,a)') IN_4, '</DataArray>'
+
+    !------------------------!
+    !   Surface curvatures   !
+    !------------------------!
+    write(fu,'(4a)') IN_4,                                                &
+                   '<DataArray type="Float64" Name="ElementCurv" ' //  &
+                   ' format="ascii">'
+    do e = 1, surf % n_elems
+      write(fu,'(a,1pe16.6e4)') IN_5, surf % elem(e) % curv
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
 
