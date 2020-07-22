@@ -28,9 +28,9 @@
   side => surf % side
   grid => surf % pnt_grid
 
-  !---------------------------------------------------------!
-  !   Count number of neighbouring elements for each node   !
-  !---------------------------------------------------------!
+  !-----------------------------------------------------------!
+  !   Count number of neighbouring elements for each vertex   !
+  !-----------------------------------------------------------!
   vert(1:nv) % nne = 0
   do e = 1, ne
     vert(elem(e) % i) % nne = vert(elem(e) % i) % nne + 1
@@ -52,7 +52,7 @@
   !-------------------------------------!
   do it_smooth = 1, 3
 
-    ! Compute sums of all coordinates for nodes
+    ! Compute sums of all coordinates for vertices
     do s = 1, ns
       vert(side(s) % c) % sumx =  &
       vert(side(s) % c) % sumx + vert(side(s) % d) % x_n
@@ -143,5 +143,14 @@
     end do
 
   end do  ! smoothing iterations
+
+  ! Make surface exactly spherical for the case of rising bubble in:
+  ! Tests/Vof/Rising_Bubble
+  ! do v = 1, nv
+  !   dm = norm2( (/vert(v) % x_n, vert(v) % y_n, vert(v) % z_n/) )
+  !   vert(v) % x_n = vert(v) % x_n * 0.25 / dm
+  !   vert(v) % y_n = vert(v) % y_n * 0.25 / dm
+  !   vert(v) % z_n = vert(v) % z_n * 0.25 / dm
+  ! end do
 
   end subroutine
