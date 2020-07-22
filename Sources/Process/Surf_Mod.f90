@@ -124,6 +124,7 @@
   include 'Surf_Mod/Count_Vertex_Elements.f90'
   include 'Surf_Mod/Compress_Vertices.f90'
   include 'Surf_Mod/Calculate_Curvatures_From_Edges.f90'
+  include 'Surf_Mod/Calculate_Curvatures_From_Elems.f90'
   include 'Surf_Mod/Calculate_Curvatures_From_Verts.f90'
   include 'Surf_Mod/Find_Boundaries.f90'
   include 'Surf_Mod/Find_Sides.f90'

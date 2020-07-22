@@ -316,7 +316,7 @@
                                          sol(d),         &
                                          0.5,            &
                                          .false.)  ! don't print messages
-        call Surf_Mod_Calculate_Curvatures_From_Verts(surf(d))
+        call Surf_Mod_Calculate_Curvatures_From_Elems(surf(d))
         call Save_Surf(surf(d), n)
         call Surf_Mod_Clean(surf(d))
       else
