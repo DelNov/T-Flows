@@ -3,6 +3,8 @@
 !------------------------------------------------------------------------------!
 !   Calculates surface curvatures from edges (four points) and distributes     !
 !   the values to elements and nodes.                                          !
+!                                                                              !
+!   This is the lowest order of curvature calculation in the code.             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -75,16 +77,15 @@
   end do
 
   ! Compute average curvature (for debugging)
-  rho = 0
-  do e = 1, surf % n_elems
-    rho = rho + surf % elem(e) % curv
-  end do
-  rho = rho / surf % n_elems
-
-  PRINT *, 'AVERAGE CURVATURE = ', rho
+  ! rho = 0
+  ! do e = 1, surf % n_elems
+  !   rho = rho + surf % elem(e) % curv
+  ! end do
+  ! rho = rho / surf % n_elems
+  ! print *, 'average curvature = ', rho
 
   !-------------------------------------------------------------------!
-  !   Interpolate normals at nodes from values in surrounding cells   !
+  !   Interpolate normals at nodes from values in surrounding elems   !
   !-------------------------------------------------------------------!
   surf % vert(1:surf % n_verts) % curv = 0.
   do e = 1, surf % n_elems

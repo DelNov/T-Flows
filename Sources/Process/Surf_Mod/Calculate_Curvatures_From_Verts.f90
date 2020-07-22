@@ -1,8 +1,10 @@
 !==============================================================================!
   subroutine Surf_Mod_Calculate_Curvatures_From_Verts(surf)
 !------------------------------------------------------------------------------!
-!   Calculates surface curvatures from vertices (all neighbous) and distri-    !
-!   butes the values to elements.                                              !
+!   Calculates surface curvatures from vertices (all neighbous, five to seven  !
+!   on the average) and distributes the values to elements.                    !
+!                                                                              !
+!   This is the intermediate order of curvature calculation in the code.       !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -96,13 +98,12 @@
   end do
 
   ! Compute average curvature (for debugging)
-  rho = 0
-  do v = 1, surf % n_verts
-    rho = rho + surf % vert(v) % curv
-  end do
-  rho = rho / surf % n_elems
-
-  PRINT *, 'AVERAGE CURVATURE = ', rho
+  ! rho = 0
+  ! do v = 1, surf % n_verts
+  !   rho = rho + surf % vert(v) % curv
+  ! end do
+  ! rho = rho / surf % n_elems
+  ! print *, 'average curvature = ', rho
 
   !----------------------------------------------------------------------!
   !   Interpolate normals at elems from values in surrounding vertices   !
