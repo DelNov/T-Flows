@@ -164,12 +164,12 @@
     print *, '# Cummulative number of vertices found: ', nv
   end if
 
-  !--------------------!
-  !                    !
-  !   Compress nodes   !
-  !                    !
-  !--------------------!
-  call Surf_Mod_Compress_Nodes(surf, verbose)
+  !-----------------------!
+  !                       !
+  !   Compress vertices   !
+  !                       !
+  !-----------------------!
+  call Surf_Mod_Compress_Vertices(surf, verbose)
 
   call Surf_Mod_Find_Sides(surf, verbose)
 
