@@ -321,7 +321,7 @@
   !----------------------------------------!
   !   All other terms defined by the user  !
   !----------------------------------------!
-  call User_Mod_Force(grid, ui, a, b)
+  call User_Mod_Force(flow, ui, a, b)
 
   ! Save the coefficients for pressure equation
   do c = 1, grid % n_cells

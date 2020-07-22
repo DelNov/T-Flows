@@ -300,6 +300,12 @@
       if(heat_transfer) then
         call Backup_Mod_Read_Cell_Bnd(comm, fh, d, vc, 't2_mean',  &
                                       tur % t2_mean(-comm % nb_s:comm % nc_s))
+        call Backup_Mod_Read_Cell_Bnd(comm, fh, d, vc, 'ut_mean',  &
+                                            tur % ut_mean(-comm % nb_s:comm % nc_s))
+        call Backup_Mod_Read_Cell_Bnd(comm, fh, d, vc, 'vt_mean',  &
+                                            tur % vt_mean(-comm % nb_s:comm % nc_s))
+        call Backup_Mod_Read_Cell_Bnd(comm, fh, d, vc, 'wt_mean',  &
+                                            tur % wt_mean(-comm % nb_s:comm % nc_s))
       end if
     end if
 
@@ -317,6 +323,12 @@
       if(heat_transfer) then
         call Backup_Mod_Read_Cell_Bnd(comm, fh, d, vc, 't2_mean',  &
                                             tur % t2_mean(-comm % nb_s:comm % nc_s))
+        call Backup_Mod_Read_Cell_Bnd(comm, fh, d, vc, 'ut_mean',  &
+                                            tur % ut_mean(-comm % nb_s:comm % nc_s))
+        call Backup_Mod_Read_Cell_Bnd(comm, fh, d, vc, 'vt_mean',  &
+                                            tur % vt_mean(-comm % nb_s:comm % nc_s))
+        call Backup_Mod_Read_Cell_Bnd(comm, fh, d, vc, 'wt_mean',  &
+                                            tur % wt_mean(-comm % nb_s:comm % nc_s))
       end if
     end if
 

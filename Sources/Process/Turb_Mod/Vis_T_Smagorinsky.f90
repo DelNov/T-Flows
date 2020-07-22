@@ -18,6 +18,7 @@
   real                      :: nx, ny, nz
   real                      :: cs, lf, u_tau_l, u_f, nc2
   real                      :: u_tan, a_pow, b_pow, nu, dely
+  real                      :: beta, pr, sc, ebf, u_plus, pr_t
 !==============================================================================!
 
   ! Take aliases
@@ -79,13 +80,11 @@
 
   if(buoyancy) then
     do c = 1, grid % n_cells
-      nc2 = -(  grav_x * t % x(c)   &
-              + grav_y * t % y(c)   &
-              + grav_z * t % z(c))  &
-          / max(t_ref, TINY)
-      nc2 = max(0.0, nc2)
-      turb % vis_t(c) = turb % vis_t(c)  &
-                      * sqrt(1.0 - min(2.5*nc2/(flow % shear(c)**2), 1.0))
+      nc2 = - flow % beta * (  grav_x * t % x(c)   &   
+                             + grav_y * t % y(c)   &   
+                             + grav_z * t % z(c))  
+      turb % vis_t(c) = turb % vis_t(c)            &
+             * max(1 - 2.5 * nc2 / (flow % shear(c) + TINY), 0.0)
     end do
   end if
 
@@ -143,6 +142,21 @@
                         +      grid % fw(s)  * turb % vis_t(c1)  &
                         + (1.0-grid % fw(s)) * turb % vis_t(c2)
         end if
+
+        if(heat_transfer) then
+          u_plus = u_tan / u_tau_l 
+          pr_t = Turb_Mod_Prandtl_Number(turb, c1) 
+          pr   = Field_Mod_Prandtl_Number(flow, c1)  ! laminar Prandtl number
+          beta = 9.24 * ((pr/pr_t)**0.75 - 1.0)     &   
+               * (1.0 + 0.28 * exp(-0.007*pr/pr_t))
+          ebf = Turb_Mod_Ebf_Scalar(turb, c1, pr) 
+          turb % con_w(c1) =    turb % y_plus(c1)                         &
+                              * flow % viscosity(c1)                      &
+                              * flow % capacity(c1)                       &
+                      / (  turb % y_plus(c1) * pr * exp(-1.0 * ebf)       &
+                         + (u_plus + beta) * pr_t * exp(-1.0 / ebf) + TINY)
+        end if
+
       end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL or WALLFL
     end if    ! c2 < 0
   end do
