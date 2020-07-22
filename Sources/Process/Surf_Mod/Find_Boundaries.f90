@@ -28,7 +28,7 @@
     if(min(side(s) % ea, side(s) % eb) .eq. 0) side(s) % boundary = .true.
   end do
 
-  ! Then spread this information to nodes
+  ! Then spread this information to vertices
   vert(1:nv) % boundary = .false.
   do s = 1, ns
     if(side(s) % boundary) then
