@@ -93,7 +93,7 @@
                '#-------------------------------------------------------------#'
     print *, trim(line)
 
-    ! Number of elements (1), nodes (2) and sides (3)
+    ! Number of elements (1), vertices (2) and sides (3)
     do item = 1, 3
       line( 1:160) = ' '
       line( 1+T: 1+T) = '#'
