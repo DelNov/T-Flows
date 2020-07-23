@@ -35,7 +35,7 @@
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: phi
   integer(4)               :: data_size
-  integer                  :: data_offset, cell_offset
+  integer                  :: n_bnd_cells_here, data_offset, cell_offset
   integer                  :: c, n, s, n_conns, sc, f8, f9, ua, run, c2
   character(len=80)        :: name_out_8, name_out_9, name_mean, a_name
   character(len=80)        :: str1, str2
@@ -46,6 +46,16 @@
 
   ! Take aliases
   grid => flow % pnt_grid
+
+  ! Count boundary cells in this processor
+  ! (For sequential runs, it is the same as grid % n_bnd_cells,
+  !  for parallel runs, it is generally not)
+  n_bnd_cells_here = 0
+  do s = 1, grid % n_faces
+    if( grid % faces_c(2,s) < 0 ) then
+      n_bnd_cells_here = n_bnd_cells_here + 1
+    end if
+  end do
 
   ! Count connections in this grid, you will need it later
   n_conns = 0
@@ -117,10 +127,10 @@
   if(plot_inside) then
     write(str2,'(i0.0)') grid % n_cells - grid % comm % n_buff_cells
   else
-    if(grid % n_bnd_cells .eq. 0) then
-      write(str2,'(i1)')   grid % n_bnd_cells  ! i0.0 doesn't work for zero :-/
+    if(n_bnd_cells_here .eq. 0) then
+      write(str2,'(i1)')   n_bnd_cells_here  ! i0.0 doesn't work for zero :-/
     else
-      write(str2,'(i0.0)') grid % n_bnd_cells
+      write(str2,'(i0.0)') n_bnd_cells_here
     end if
   end if
   write(f9) IN_2 // '<Piece NumberOfPoints="' // trim(str1)    //  &
