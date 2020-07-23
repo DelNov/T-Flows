@@ -5,16 +5,16 @@ Prologue
  HEAT_TRANSFER   no
 
  TIME_STEP                                        0.05
- NUMBER_OF_TIME_STEPS                        360000
- STARTING_TIME_STEP_FOR_SWARM_COMPUTATION    180001
- STARTING_TIME_STEP_FOR_STATISTICS           120001
- STARTING_TIME_STEP_FOR_SWARM_STATISTICS     240001
+ NUMBER_OF_TIME_STEPS                        157000
+ STARTING_TIME_STEP_FOR_SWARM_COMPUTATION    150025
+ STARTING_TIME_STEP_FOR_TURB_STATISTICS      150010
+ STARTING_TIME_STEP_FOR_SWARM_STATISTICS     152065
 
- RESULTS_SAVE_INTERVAL       6000
- SWARM_SAVE_INTERVAL         6000
+ RESULTS_SAVE_INTERVAL       2500
+ SWARM_SAVE_INTERVAL         2500
  BACKUP_SAVE_INTERVAL      120000
 
-# LOAD_BACKUP_NAME          chan-ts100000.backup
+ LOAD_BACKUP_NAME          chan-ts150000.backup
 
 #-------------------
 # Monitoring points
@@ -34,16 +34,18 @@ Prologue
 #----------------
  MULTIPHASE_MODEL             lagrangian_particles
  SWARM_SUBGRID_SCALE_MODEL    brownian_fukagata
- SWARM_DIAMETER                                 2.3612e-04
+ SWARM_DIAMETER                                 2.3612E-4
  SWARM_DENSITY                               1000
  NUMBER_OF_SWARM_SUB_STEPS                      2
- NUMBER_OF_PARTICLES                        20000
+ NUMBER_OF_PARTICLES                         100000
  SWARM_COEFFICIENT_OF_RESTITUTION               1.0
 
 #-------------------
 # Turbulence model
 #-------------------
- TURBULENCE_MODEL       HYBRID_LES_RANS
+
+ TURBULENCE_MODEL       HYBRID_LES_PRANDTL
+ SMAGORINSKY_CONSTANT   0.17
 
  PRESSURE_DROPS     0.0003133   0.0   0.0
  MASS_FLOW_RATES    1.98        0.0   0.0
@@ -75,8 +77,8 @@ Prologue
 # Initial conditions
 #--------------------
   INITIAL_CONDITION
-  VARIABLES           u     v     w     t      kin    eps    zeta   f22
-  VALUES              1.0   0.0   0.0   20.0   0.01   0.001  0.1    0.1
+  VARIABLES           u     v     w 
+  VALUES              1.0   0.0   0.0
 
 #---------------------
 # Boundary conditions
@@ -84,5 +86,5 @@ Prologue
   BOUNDARY_CONDITION    wall
 
     TYPE                wall
-    VARIABLES           u     v     w     q
-    VALUES              0.0   0.0   0.0   0.1
+    VARIABLES           u     v     w 
+    VALUES              0.0   0.0   0.0
