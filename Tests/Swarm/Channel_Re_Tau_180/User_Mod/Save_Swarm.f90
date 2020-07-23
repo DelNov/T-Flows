@@ -27,9 +27,8 @@
   type(Var_Type),  pointer  :: u, v, w, t
   type(Grid_Type), pointer  :: grid
   type(Bulk_Type), pointer  :: bulk
-  integer                   :: n_prob, pl, c, i, count, s, c1, c2, n_points, k
-  integer                   :: index_p, j, ip, counter, blabla, ip0, ip01
-  integer                   :: ip1, ip2, counter_k, l, n_ss, kk, counter_kk 
+  integer                   :: n_prob, pl, c, i, count, s, c1, c2, k
+  integer                   :: j, counter
   integer                   :: label, counter1, counter2, fu1 , fu2
   integer                   :: nb, nc
   character(len=80)         :: coord_name, result_name, result_name_plus
@@ -41,12 +40,9 @@
                               y_plus_p(:), vis_t_p(:) 
   integer, allocatable      :: n_p(:), n_count1(:), n_count2(:), store(:)
   integer, allocatable      :: n_states(:)
-  real                      :: t_wall, t_tau, d_wall, nu_mean, t_inf
-  real                      :: ubulk, re, cf_dean, cf, pr, u_tau_p, temp
-  real                      :: temp_p1, temp_pp, temp_p2, slice, sslice_l 
-  real                      :: sslice_u, sslice_diff, temp_kk
+  real                      :: ubulk, re, cf_dean, cf, pr, u_tau_p
   real                      :: density_const, visc_const
-  logical                   :: there, flag
+  logical                   :: there
 !==============================================================================!
 
   ! Take aliases for the flow 
@@ -86,15 +82,6 @@
   end if
 
   ubulk    = bulk % flux_x / (density_const*bulk % area_x)
-  t_wall   = 0.0
-  nu_mean  = 0.0
-  n_points = 0
-  index_p  = 0
-  temp     = 0.0
-  temp_p1  = 0.0
-  temp_p2  = 10.0**10
-  temp_pp  = 10.0**10
-  n_ss     = 4
 
   open(9, file=coord_name)
 
@@ -160,7 +147,6 @@
 
       ! Averaging over the number of cells in this bin  
       n_states(i) = n_states(i) + 1
-      !n_states(i) = n_states(i) + swarm % n_states(c)
       end if
     end do
   end do
@@ -216,14 +202,6 @@
 
   call Comm_Mod_Wait
 
- ! ! DEBUGGING
- ! if(this_proc < 2) then 
- !   do i = 1, n_prob-1
- !     print *, 'n_states in bin', i, 'is:', n_states(i)
- !   end do 
- !     stop
- ! end if
-
   do i = 1, n_prob-1
 
     ! Background flow
@@ -264,48 +242,55 @@
                                      v_p(1)**2 +   &
                                      w_p(1)**2)/ wall_p(1)))
 
-    open(fu1, file = swarm_result_name)
-    open(fu2, file = swarm_result_name_plus)
+  if(u_tau_p .eq. 0.0) then
+    if(this_proc < 2) then
+      write(*,*) '# Friction velocity is zero in Save_Swarm.f90!'
+    end if
+    return
+  end if
 
-    re = density_const * ubulk * 2.0/visc_const
-    cf_dean = 0.073*(re)**(-0.25)
-    cf      = u_tau_p**2/(0.5*ubulk**2)
+  open(fu1, file = swarm_result_name)
+  open(fu2, file = swarm_result_name_plus)
+
+  re = density_const * ubulk * 2.0/visc_const
+  cf_dean = 0.073*(re)**(-0.25)
+  cf      = u_tau_p**2/(0.5*ubulk**2)
 
 
-    write(fu1,'(a1,(a12,e12.6))')  &
-    '#', 'ubulk    = ', ubulk 
-    write(fu1,'(a1,(a12,e12.6))')  &
-    '#', 're       = ', density_const * ubulk * 2.0/visc_const
-    write(fu1,'(a1,(a12,e12.6))')  &
-    '#', 'Re_tau   = ', density_const*u_tau_p/visc_const
-    write(fu1,'(a1,(a12,e12.6))')  &
-    '#', 'cf       = ', 2.0*(u_tau_p/ubulk)**2
-    write(fu1,'(a1,(a12,f12.6))')  &
-    '#', 'Utau     = ', u_tau_p 
+  write(fu1,'(a1,(a12,e12.6))')  &
+  '#', 'ubulk    = ', ubulk 
+  write(fu1,'(a1,(a12,e12.6))')  &
+  '#', 're       = ', density_const * ubulk * 2.0/visc_const
+  write(fu1,'(a1,(a12,e12.6))')  &
+  '#', 'Re_tau   = ', density_const*u_tau_p/visc_const
+  write(fu1,'(a1,(a12,e12.6))')  &
+  '#', 'cf       = ', 2.0*(u_tau_p/ubulk)**2
+  write(fu1,'(a1,(a12,f12.6))')  &
+  '#', 'Utau     = ', u_tau_p 
   
 
-    write(fu1,'(a1,2x,a50)') '#',' z,'                    //  &  !  1
-                                 ' u,'                    //  &  !  2
-                                 ' uu, vv, ww, uw'        //  &  !  3 - 6
-                                 ' kin'                          !  7
+  write(fu1,'(a1,2x,a50)') '#',' z,'                    //  &  !  1
+                               ' u,'                    //  &  !  2
+                               ' uu, vv, ww, uw'        //  &  !  3 - 6
+                               ' kin'                          !  7
 
 
-    write(fu2,'(a1,(a12,e12.6))')  &
-    '#', 'ubulk    = ', ubulk 
-    write(fu2,'(a1,(a12,e12.6))')  &
-    '#', 're       = ', density_const * ubulk * 2.0/visc_const
-    write(fu2,'(a1,(a12,e12.6))')  &
-    '#', 'Re_tau   = ', density_const*u_tau_p/visc_const
-    write(fu2,'(a1,(a12,e12.6))')  &
-    '#', 'cf       = ', 2.0*(u_tau_p/ubulk)**2
-    write(fu2,'(a1,(a12,f12.6))')  &
-    '#', 'Utau     = ', u_tau_p 
+  write(fu2,'(a1,(a12,e12.6))')  &
+  '#', 'ubulk    = ', ubulk 
+  write(fu2,'(a1,(a12,e12.6))')  &
+  '#', 're       = ', density_const * ubulk * 2.0/visc_const
+  write(fu2,'(a1,(a12,e12.6))')  &
+  '#', 'Re_tau   = ', density_const*u_tau_p/visc_const
+  write(fu2,'(a1,(a12,e12.6))')  &
+  '#', 'cf       = ', 2.0*(u_tau_p/ubulk)**2
+  write(fu2,'(a1,(a12,f12.6))')  &
+  '#', 'Utau     = ', u_tau_p 
   
 
-    write(fu2,'(a1,2x,a50)') '#',' z,'                    //  &  !  1
-                                 ' u,'                    //  &  !  2
-                                 ' uu, vv, ww, uw'        //  &  !  3 - 6
-                                 ' kin'                          !  7
+  write(fu2,'(a1,2x,a50)') '#',' z,'                    //  &  !  1
+                               ' u,'                    //  &  !  2
+                               ' uu, vv, ww, uw'        //  &  !  3 - 6
+                               ' kin'                          !  7
 
   do i = 1, n_prob
     if(n_count2(i) .ne. 0) then  
