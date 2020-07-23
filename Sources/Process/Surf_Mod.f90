@@ -41,6 +41,7 @@
     real :: sumx, sumy, sumz
 
     integer :: nne       ! number of neighbouring elements
+    integer :: nnv       ! number of neighbouring vertices
     logical :: boundary  ! is vertex on a boundary
 
     ! The closest cell, node, boundary cell and face
@@ -56,6 +57,7 @@
     integer :: proc
     integer :: buff
 
+    real :: curv
   end type
 
   !---------------!
@@ -69,6 +71,7 @@
     integer :: si, sj, sk
     real    :: nx, ny, nz  ! surface normal vector
     real    :: area
+    real    :: curv
 
   end type
 
@@ -101,7 +104,6 @@
 
     ! Logical array if cell has particles
     logical, allocatable :: cell_has_vertex(:)
-
   end type
 
   ! Working arrays, buffers for parallel version
@@ -117,11 +119,13 @@
 ! include 'Surf_Mod/Advance_Particles.f90'
   include 'Surf_Mod/Allocate.f90'
   include 'Surf_Mod/Calculate_Element_Normals.f90'
-  include 'Surf_Mod/Calculate_Nodal_Values.f90'
   include 'Surf_Mod/Clean.f90'
   include 'Surf_Mod/Count_Elements_Neighbours.f90'
   include 'Surf_Mod/Count_Vertex_Elements.f90'
-  include 'Surf_Mod/Compress_Nodes.f90'
+  include 'Surf_Mod/Compress_Vertices.f90'
+  include 'Surf_Mod/Calculate_Curvatures_From_Edges.f90'
+  include 'Surf_Mod/Calculate_Curvatures_From_Elems.f90'
+  include 'Surf_Mod/Calculate_Curvatures_From_Verts.f90'
   include 'Surf_Mod/Find_Boundaries.f90'
   include 'Surf_Mod/Find_Sides.f90'
   include 'Surf_Mod/Find_Nearest_Cell.f90'

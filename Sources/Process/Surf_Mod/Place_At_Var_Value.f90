@@ -10,9 +10,6 @@
                       phi_cen => r_cell_03,  &
                       phi_src => r_cell_04
 !------------------------------------------------------------------------------!
-!   Be careful with the above variables from Work_Mod.  They are used by       !
-!   two subroutines in Surf_Mod, hence values shouldn't be changed elsewhere.  !
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Surf_Type),   target :: surf
@@ -30,7 +27,7 @@
   type(Matrix_Type), pointer :: a
   integer,           pointer :: nv, ne
   integer, allocatable       :: n_cells_v(:)
-  integer                    :: c, c1, c2, s, j, n1, n2, run
+  integer                    :: c, c1, c2, s, j, n1, n2, run, nb, nc, nn
   integer                    :: v, n_vert, n_verts_in_buffers
   integer                    :: en(12,2)  ! edge numbering
   real                       :: phi1, phi2, xn1, yn1, zn1, xn2, yn2, zn2, w1, w2
@@ -45,16 +42,19 @@
   vert => surf % vert
   elem => surf % elem
   a    => sol % a
+  nb   = grid % n_bnd_cells
+  nc   = grid % n_cells
+  nn   = grid % n_nodes
 
-  call Surf_Mod_Calculate_Nodal_Values(surf, phi)
+  call Field_Mod_Interpolate_Cells_To_Nodes(flow, phi % n, phi_n(1:nn))
 
   !-----------------------------!
   !   Smooth the VOF function   !
   !-----------------------------!
 
   ! Copy the values from phi % n to local variable
-  phi_o(:) = phi % n(:)
-  phi_c(:) = phi % n(:)
+  phi_o(-nb:nc) = phi % n(-nb:nc)
+  phi_c(-nb:nc) = phi % n(-nb:nc)
 
   do run = 1, 16
     phi_src(:) = 0.0
@@ -164,12 +164,12 @@
     print *, '# Cummulative number of vertices found: ', nv
   end if
 
-  !--------------------!
-  !                    !
-  !   Compress nodes   !
-  !                    !
-  !--------------------!
-  call Surf_Mod_Compress_Nodes(surf, verbose)
+  !-----------------------!
+  !                       !
+  !   Compress vertices   !
+  !                       !
+  !-----------------------!
+  call Surf_Mod_Compress_Vertices(surf, verbose)
 
   call Surf_Mod_Find_Sides(surf, verbose)
 
@@ -194,6 +194,7 @@
     call Surf_Mod_Smooth(surf, phi, phi_e)
   end do
 
+  ! Restore the true values of phi
   phi % n(:) = phi_o(:)
 
   RETURN

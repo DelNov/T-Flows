@@ -309,6 +309,16 @@
         call Multiphase_Mod_Compute_Vof(mult(d), sol(d), flow(d) % dt, n)
         call Field_Mod_Body_Forces(flow(d))
         call Multiphase_Averaging(flow(d), mult(d), mult(d) % vof)
+
+        ! call Surf_Mod_Allocate(surf(d), flow(d))
+        ! call Surf_Mod_Place_At_Var_Value(surf(d),        &
+        !                                  mult(d) % vof,  &
+        !                                  sol(d),         &
+        !                                  0.5,            &
+        !                                  .false.)  ! don't print messages
+        ! call Surf_Mod_Calculate_Curvatures_From_Elems(surf(d))
+        ! call Save_Surf(surf(d), n)
+        ! call Surf_Mod_Clean(surf(d))
       else
         flow(d) % m_flux % o(1:) = flow(d) % m_flux % n(1:)
       end if
@@ -389,9 +399,6 @@
         call Multiphase_Averaging(flow(d), mult(d), flow(d) % w)
         call Piso_Algorithm(flow(d), turb(d), mult(d),    &
                             sol(d), mass_res(d), ini)
-        ! Update the values at boundaries
-        call Convective_Outflow(flow(d), turb(d), mult(d), flow(d) % dt)
-        call Update_Boundary_Values(flow(d), turb(d), mult(d))
 
         ! Energy (practically temperature)
         if(heat_transfer) then
@@ -407,6 +414,10 @@
 
         ! Deal with turbulence (if you dare ;-))
         call Turb_Mod_Main(turb(d), sol(d), n, ini)
+
+        ! Update the values at boundaries
+        call Convective_Outflow(flow(d), turb(d), mult(d), flow(d) % dt)
+        call Update_Boundary_Values(flow(d), turb(d), mult(d))
 
         ! End of the current iteration
         call Info_Mod_Iter_Print(d)
@@ -496,14 +507,6 @@
         call Save_Swarm(swarm(d), n)
 
         if(mult(d) % model .eq. VOLUME_OF_FLUID) then
-!         call Surf_Mod_Allocate(surf(d), flow(d))
-!         call Surf_Mod_Place_At_Var_Value(surf(d),        &
-!                                          mult(d) % vof,  &
-!                                          sol(d),         &
-!                                          0.5,            &
-!                                          .false.)  ! don't print messages
-!         call Save_Surf(surf(d), n)
-!         call Surf_Mod_Clean(surf(d))
         end if
 
         ! Write results in user-customized format

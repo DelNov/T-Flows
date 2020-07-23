@@ -1,9 +1,9 @@
 #----------
 # Prologue
 #----------
- PROBLEM_NAME     cavity
- HEAT_TRANSFER    no
- MULTIPHASE_MODEL  VOLUME_OF_FLUID
+ PROBLEM_NAME      cavity
+ HEAT_TRANSFER     no
+ MULTIPHASE_MODEL  volume_of_fluid
 
  NUMBER_OF_TIME_STEPS     300
 
@@ -16,9 +16,9 @@
 # Monitoring points 
 #-------------------
  NUMBER_OF_MONITORING_POINTS    0
-   MONITORING_POINT_001         0.5  0.1  0.75
+   MONITORING_POINT_001         0.0  0.0  0.0
 
- POINT_FOR_MONITORING_PLANES    0.5  0.1  0.75
+ POINT_FOR_MONITORING_PLANES    0.0  0.0  0.0
 
 #-----------------
 # Physical models
@@ -49,7 +49,7 @@
  ADVECTION_SCHEME_FOR_MOMENTUM    quick
  ADVECTION_SCHEME_FOR_MULTIPHASE  cicsam
 
- NODAL_CURVATURE    yes
+# NODAL_CURVATURE    yes
 
 #------------------------
 # Linear solver settings

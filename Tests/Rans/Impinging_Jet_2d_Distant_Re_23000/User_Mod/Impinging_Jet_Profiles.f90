@@ -60,7 +60,7 @@
 
   ! Set the name for coordinate file
   call File_Mod_Set_Name(coord_name, extension='.1d')
-  call File_Mod_Open_File_For_Writing(coord_name, fu)
+  call File_Mod_Open_File_For_Reading(coord_name, fu)
 
   ! Read the number of searching intervals
   read(fu,*) n_prob

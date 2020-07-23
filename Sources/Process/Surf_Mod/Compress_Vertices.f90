@@ -1,7 +1,7 @@
 !==============================================================================!
-  subroutine Surf_Mod_Compress_Nodes(surf, verbose)
+  subroutine Surf_Mod_Compress_Vertices(surf, verbose)
 !------------------------------------------------------------------------------!
-!   Compresses nodes' list                                                     !
+!   Compresses vertices' list                                                  !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -12,10 +12,8 @@
   type(Elem_Type), pointer :: elem(:)
   integer,         pointer :: nv, ne
   integer                  :: e, v, n_vert
-  integer, allocatable     :: xi(:), yi(:), zi(:)
+  real,    allocatable     :: xv(:), yv(:), zv(:)
   integer, allocatable     :: ni(:), new_n(:)
-  integer, parameter       :: INT_SCL = 100000000  ! increased this for VOF
-  integer, parameter       :: INT_TOL =       100
 !==============================================================================!
 
   ! Take aliases
@@ -29,27 +27,24 @@
     if( (elem(e) % i .eq. elem(e) % j) .or.  &
         (elem(e) % i .eq. elem(e) % k) .or.  &
         (elem(e) % j .eq. elem(e) % k) ) then
-      print '(a)',      ' # ERROR in the beginning of Compress_Nodes'
-      print '(a,i6,a)', ' # element ', e, 'has same nodes'
+      print '(a)',      ' # ERROR in the beginning of Compress_Vertices'
+      print '(a,i6,a)', ' # element ', e, 'has same vertices'
     end if
   end do
 
-  allocate(xi(nv));     xi    = 0
-  allocate(yi(nv));     yi    = 0
-  allocate(zi(nv));     zi    = 0
+  allocate(xv(nv));     xv    = 0.0
+  allocate(yv(nv));     yv    = 0.0
+  allocate(zv(nv));     zv    = 0.0
   allocate(ni(nv));     ni    = 0
   allocate(new_n(nv));  new_n = 0
 
   do v = 1, nv
-    xi(v) = nint(vert(v) % x_n * INT_SCL)
-    yi(v) = nint(vert(v) % y_n * INT_SCL)
-    zi(v) = nint(vert(v) % z_n * INT_SCL)
+    xv(v) = vert(v) % x_n
+    yv(v) = vert(v) % y_n
+    zv(v) = vert(v) % z_n
     ni(v) = v
   end do
-  call Sort_Mod_3_Int_Carry_Int(xi, yi, zi, ni)
-! do v = 1, nv
-!   WRITE(100, '(3i6,3i16)') v, ni(v), new_n(v), xi(v), yi(v), zi(v)
-! end do
+  call Sort_Mod_3_Real_Carry_Int(xv, yv, zv, ni)
 
   !-----------------------------------------!
   !   Count compressed number of vertices   !
@@ -57,17 +52,17 @@
   n_vert = 1
   new_n(1) = n_vert
   do v = 2, nv
-    if(abs(xi(v) - xi(v-1)) > INT_TOL) then
+    if(.not. Math_Mod_Approx_Real(xv(v), xv(v-1), MICRO)) then
       n_vert = n_vert + 1
 
     ! xi(v) .eq. xi(v-1)
     else
-      if(abs(yi(v) - yi(v-1)) > INT_TOL) then
+      if(.not. Math_Mod_Approx_Real(yv(v), yv(v-1), MICRO)) then
         n_vert = n_vert + 1
 
       ! xi(v) .eq. xi(v-1) and yi(v) .eq. yi(v-1)
       else
-        if(abs(zi(v) - zi(v-1)) > INT_TOL) then
+        if(.not. Math_Mod_Approx_Real(zv(v), zv(v-1), MICRO)) then
           n_vert = n_vert + 1
         end if
       end if
@@ -75,23 +70,18 @@
     new_n(v) = n_vert
   end do
 
-! do v = 1, nv
-!   WRITE(150, '(3i6,3f12.6)') v, ni(v), new_n(v),  &
-!              real(xi(v))/INT_SCL, real(yi(v))/INT_SCL, real(zi(v))/INT_SCL
-! end do
-
   !----------------------------------------!
   !   Copy compressed vertex coordinates   !
   !----------------------------------------!
   do v = 1, nv
-    vert(new_n(v)) % x_n = real(xi(v))/INT_SCL
-    vert(new_n(v)) % y_n = real(yi(v))/INT_SCL
-    vert(new_n(v)) % z_n = real(zi(v))/INT_SCL
+    vert(new_n(v)) % x_n = xv(v)
+    vert(new_n(v)) % y_n = yv(v)
+    vert(new_n(v)) % z_n = zv(v)
   end do
 
-  !-----------------------------!
-  !   Correct elements' nodes   !
-  !-----------------------------!
+  !--------------------------------!
+  !   Correct elements' vertices   !
+  !--------------------------------!
   call Sort_Mod_Int_Carry_Int(ni, new_n)
 
   do e = 1, ne
@@ -109,8 +99,8 @@
     if( (elem(e) % i .eq. elem(e) % j) .or.  &
         (elem(e) % i .eq. elem(e) % k) .or.  &
         (elem(e) % j .eq. elem(e) % k) ) then
-      print '(a)',      ' # ERROR in the end of Compress_Nodes'
-      print '(a,i6,a)', ' # element', e, ' has same nodes'
+      print '(a)',      ' # ERROR in the end of Compress_Vertices'
+      print '(a,i6,a)', ' # element', e, ' has same vertices'
       stop
     end if
   end do

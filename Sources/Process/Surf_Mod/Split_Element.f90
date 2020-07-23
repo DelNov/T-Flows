@@ -82,7 +82,7 @@
   !   Create three new elements   !
   !-------------------------------!
 
-  ! Handle new elements' nodes
+  ! Handle new elements' vertices
   elem(e_ijn) % i = i
   elem(e_ijn) % j = j
   elem(e_ijn) % k = nv
