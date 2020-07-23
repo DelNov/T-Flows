@@ -8,7 +8,7 @@
   type(Comm_Type)  :: comm
   integer          :: fh, disp, vc
   character(len=*) :: var_name
-  real             :: array(-comm % nb_s:-1)
+  real             :: array(-comm % nb_f:-comm % nb_l)
 !-----------------------------------[Locals]-----------------------------------!
   character(len=80) :: vn
   integer           :: vs, disp_loop, cnt_loop
@@ -31,7 +31,8 @@
     ! If variable is found, read it and retrun
     if(vn .eq. var_name) then
       if(this_proc < 2) print *, '# Reading variable: ', trim(vn)
-      call Comm_Mod_Read_Bnd_Real(comm, fh, array(-comm % nb_s:-1), disp_loop)
+      call Comm_Mod_Read_Bnd_Real(comm, fh, array(-comm % nb_f : &
+                                                  -comm % nb_l), disp_loop)
       disp = disp_loop
       return
 

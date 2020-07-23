@@ -51,11 +51,11 @@
   !   Save cell-centre coordinates.  Could be useful for interpolations   !
   !-----------------------------------------------------------------------!
   call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'x_coords',  &
-                                 grid % xc(-comm % nb_s:comm % nc_s))
+                                 grid % xc(-comm % nb_f:comm % nc_s))
   call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'y_coords',  &
-                                 grid % yc(-comm % nb_s:comm % nc_s))
+                                 grid % yc(-comm % nb_f:comm % nc_s))
   call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'z_coords',  &
-                                 grid % zc(-comm % nb_s:comm % nc_s))
+                                 grid % zc(-comm % nb_f:comm % nc_s))
 
   !---------------!
   !               !
@@ -100,9 +100,9 @@
   !   Pressure and pressure correction   !
   !--------------------------------------!
   call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'press',       &
-                                 fld %  p % n(-comm % nb_s:comm % nc_s))
+                                 fld %  p % n(-comm % nb_f:comm % nc_s))
   call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'press_corr',  &
-                                 fld % pp % n(-comm % nb_s:comm % nc_s))
+                                 fld % pp % n(-comm % nb_f:comm % nc_s))
 
   !---------------------!
   !   Mass flow rates   !
@@ -147,21 +147,21 @@
 
     ! Other turbulent quantities
     call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'p_kin',   &
-                                   tur % p_kin (-comm % nb_s:comm % nc_s))
+                                   tur % p_kin (-comm % nb_f:comm % nc_s))
     call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'y_plus',  &
-                                   tur % y_plus(-comm % nb_s:comm % nc_s))
+                                   tur % y_plus(-comm % nb_f:comm % nc_s))
     call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'vis_t',   &
-                                   tur % vis_t (-comm % nb_s:comm % nc_s))
+                                   tur % vis_t (-comm % nb_f:comm % nc_s))
     call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'vis_w',   &
-                                   tur % vis_w (-comm % nb_s:comm % nc_s))
+                                   tur % vis_w (-comm % nb_f:comm % nc_s))
 
     ! Turbulence quantities connected with heat transfer
     if(heat_transfer) then
       call Backup_Mod_Write_Variable(fh, d, vc, 't2',    tur % t2)
       call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'p_t2',   &
-                                     tur % p_t2 (-comm % nb_s:comm % nc_s))
+                                     tur % p_t2 (-comm % nb_f:comm % nc_s))
       call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'con_w',  &
-                                     tur % con_w(-comm % nb_s:comm % nc_s))
+                                     tur % con_w(-comm % nb_f:comm % nc_s))
     end if
 
   end if
@@ -180,24 +180,24 @@
 
     ! Other turbulent quantities
     call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc,'p_kin',    &
-                                   tur % p_kin  (-comm % nb_s:comm % nc_s))
+                                   tur % p_kin  (-comm % nb_f:comm % nc_s))
     call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc,'y_plus',   &
-                                   tur % y_plus (-comm % nb_s:comm % nc_s))
+                                   tur % y_plus (-comm % nb_f:comm % nc_s))
     call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc,'vis_t',    &
-                                   tur % vis_t  (-comm % nb_s:comm % nc_s))
+                                   tur % vis_t  (-comm % nb_f:comm % nc_s))
     call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc,'vis_w',    &
-                                   tur % vis_w  (-comm % nb_s:comm % nc_s))
+                                   tur % vis_w  (-comm % nb_f:comm % nc_s))
     call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc,'t_scale',  &
-                                   tur % t_scale(-comm % nb_s:comm % nc_s))
+                                   tur % t_scale(-comm % nb_f:comm % nc_s))
     call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc,'l_scale',  &
-                                   tur % l_scale(-comm % nb_s:comm % nc_s))
+                                   tur % l_scale(-comm % nb_f:comm % nc_s))
 
     if(heat_transfer) then
       call Backup_Mod_Write_Variable(fh, d, vc, 't2',    tur % t2)
       call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'p_t2',   &
-                                     tur % p_t2 (-comm % nb_s:comm % nc_s))
+                                     tur % p_t2 (-comm % nb_f:comm % nc_s))
       call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'con_w',  &
-                                     tur % con_w(-comm % nb_s:comm % nc_s))
+                                     tur % con_w(-comm % nb_f:comm % nc_s))
     end if
 
   end if
@@ -226,14 +226,14 @@
 
     ! Other turbulent quantities 
     call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'vis_t',  &
-                                   tur % vis_t(-comm % nb_s:comm % nc_s))
+                                   tur % vis_t(-comm % nb_f:comm % nc_s))
     call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'vis_w',  &
-                                   tur % vis_w(-comm % nb_s:comm % nc_s))
+                                   tur % vis_w(-comm % nb_f:comm % nc_s))
 
     ! Turbulence quantities connected with heat transfer
     if(heat_transfer) then
       call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc,'con_w', &
-                                     tur % con_w(-comm % nb_s:comm % nc_s))
+                                     tur % con_w(-comm % nb_f:comm % nc_s))
     end if
   end if
 
@@ -254,33 +254,33 @@
      time_step > time_step_stat) then
 
     call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'u_mean',  &
-                                   tur % u_mean(-comm % nb_s:comm % nc_s))
+                                   tur % u_mean(-comm % nb_f:comm % nc_s))
     call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'v_mean',  &
-                                   tur % v_mean(-comm % nb_s:comm % nc_s))
+                                   tur % v_mean(-comm % nb_f:comm % nc_s))
     call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'w_mean',  &
-                                   tur % w_mean(-comm % nb_s:comm % nc_s))
+                                   tur % w_mean(-comm % nb_f:comm % nc_s))
     call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'p_mean',  &
-                                   tur % p_mean(-comm % nb_s:comm % nc_s))
+                                   tur % p_mean(-comm % nb_f:comm % nc_s))
     if(heat_transfer) then
       call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 't_mean', &
-                                     tur % t_mean(-comm % nb_s:comm % nc_s))
+                                     tur % t_mean(-comm % nb_f:comm % nc_s))
     end if
 
     ! K and epsilon
     if(tur % model .eq. K_EPS) then
       call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'kin_mean',  &
-                                     tur % kin_mean(-comm % nb_s:comm % nc_s))
+                                     tur % kin_mean(-comm % nb_f:comm % nc_s))
       call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'eps_mean',  &
-                                     tur % eps_mean(-comm % nb_s:comm % nc_s))
+                                     tur % eps_mean(-comm % nb_f:comm % nc_s))
       if(heat_transfer) then
         call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 't2_mean',  &
-                                       tur % t2_mean(-comm % nb_s:comm % nc_s))
+                                       tur % t2_mean(-comm % nb_f:comm % nc_s))
         call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'ut_mean',  &
-                                       tur % ut_mean(-comm % nb_s:comm % nc_s))
+                                       tur % ut_mean(-comm % nb_f:comm % nc_s))
         call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'vt_mean',  &
-                                       tur % vt_mean(-comm % nb_s:comm % nc_s))
+                                       tur % vt_mean(-comm % nb_f:comm % nc_s))
         call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'wt_mean',  &
-                                       tur % wt_mean(-comm % nb_s:comm % nc_s))    
+                                       tur % wt_mean(-comm % nb_f:comm % nc_s))
       end if
     end if
 
@@ -288,22 +288,22 @@
     if(tur % model .eq. K_EPS_ZETA_F .or.  &
        tur % model .eq. HYBRID_LES_RANS) then
       call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'kin_mean',  &
-                                     tur % kin_mean (-comm % nb_s:comm % nc_s))
+                                     tur % kin_mean (-comm % nb_f:comm % nc_s))
       call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'eps_mean',  &
-                                     tur % eps_mean (-comm % nb_s:comm % nc_s))
+                                     tur % eps_mean (-comm % nb_f:comm % nc_s))
       call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'zeta_mean',  &
-                                     tur % zeta_mean(-comm % nb_s:comm % nc_s))
+                                     tur % zeta_mean(-comm % nb_f:comm % nc_s))
       call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'f22_mean',  &
-                                     tur % f22_mean (-comm % nb_s:comm % nc_s))
+                                     tur % f22_mean (-comm % nb_f:comm % nc_s))
       if(heat_transfer) then
         call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 't2_mean',  &
-                                       tur % t2_mean(-comm % nb_s:comm % nc_s))
+                                       tur % t2_mean(-comm % nb_f:comm % nc_s))
         call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'ut_mean',  &
-                                       tur % ut_mean(-comm % nb_s:comm % nc_s))
+                                       tur % ut_mean(-comm % nb_f:comm % nc_s))
         call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'vt_mean',  &
-                                       tur % vt_mean(-comm % nb_s:comm % nc_s))
+                                       tur % vt_mean(-comm % nb_f:comm % nc_s))
         call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'wt_mean',  &
-                                       tur % wt_mean(-comm % nb_s:comm % nc_s))    
+                                       tur % wt_mean(-comm % nb_f:comm % nc_s))
       end if
     end if
 
@@ -311,41 +311,41 @@
     if(tur % model .eq. RSM_MANCEAU_HANJALIC .or.  &
        tur % model .eq. RSM_HANJALIC_JAKIRLIC) then
       call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'uu_mean',  &
-                                     tur % uu_mean(-comm % nb_s:comm % nc_s))
+                                     tur % uu_mean(-comm % nb_f:comm % nc_s))
       call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'vv_mean',  &
-                                     tur % vv_mean(-comm % nb_s:comm % nc_s))
+                                     tur % vv_mean(-comm % nb_f:comm % nc_s))
       call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'ww_mean',  &
-                                     tur % ww_mean(-comm % nb_s:comm % nc_s))
+                                     tur % ww_mean(-comm % nb_f:comm % nc_s))
       call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'uv_mean',  &
-                                     tur % uv_mean(-comm % nb_s:comm % nc_s))
+                                     tur % uv_mean(-comm % nb_f:comm % nc_s))
       call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'uw_mean',  &
-                                     tur % uw_mean(-comm % nb_s:comm % nc_s))
+                                     tur % uw_mean(-comm % nb_f:comm % nc_s))
       call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'vw_mean',  &
-                                     tur % vw_mean(-comm % nb_s:comm % nc_s))
+                                     tur % vw_mean(-comm % nb_f:comm % nc_s))
     end if
 
     call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'uu_res',  &
-                                   tur % uu_res(-comm % nb_s:comm % nc_s))
+                                   tur % uu_res(-comm % nb_f:comm % nc_s))
     call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'vv_res',  &
-                                   tur % vv_res(-comm % nb_s:comm % nc_s))
+                                   tur % vv_res(-comm % nb_f:comm % nc_s))
     call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'ww_res',  &
-                                   tur % ww_res(-comm % nb_s:comm % nc_s))
+                                   tur % ww_res(-comm % nb_f:comm % nc_s))
     call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'uv_res',  &
-                                   tur % uv_res(-comm % nb_s:comm % nc_s))
+                                   tur % uv_res(-comm % nb_f:comm % nc_s))
     call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'uw_res',  &
-                                   tur % uw_res(-comm % nb_s:comm % nc_s))
+                                   tur % uw_res(-comm % nb_f:comm % nc_s))
     call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'vw_res',  &
-                                   tur % vw_res(-comm % nb_s:comm % nc_s))
+                                   tur % vw_res(-comm % nb_f:comm % nc_s))
 
     if(heat_transfer) then
       call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 't2_res',  &
-                                     tur % t2_res(-comm % nb_s:comm % nc_s))
+                                     tur % t2_res(-comm % nb_f:comm % nc_s))
       call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'ut_res',  &
-                                     tur % ut_res(-comm % nb_s:comm % nc_s))
+                                     tur % ut_res(-comm % nb_f:comm % nc_s))
       call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'vt_res',  &
-                                     tur % vt_res(-comm % nb_s:comm % nc_s))
+                                     tur % vt_res(-comm % nb_f:comm % nc_s))
       call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, 'wt_res',  &
-                                     tur % wt_res(-comm % nb_s:comm % nc_s))
+                                     tur % wt_res(-comm % nb_f:comm % nc_s))
     end if
 
     ! Scalars
@@ -354,7 +354,7 @@
       name_mean = phi % name
       name_mean(5:9) = '_mean'
       call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, name_mean,  &
-                            tur % scalar_mean(sc, -comm % nb_s:comm % nc_s))
+                            tur % scalar_mean(sc, -comm % nb_f:comm % nc_s))
     end do
 
   end if
@@ -376,7 +376,7 @@
     a_name = 'A_??'
     write(a_name(3:4),'(I2.2)') ua
     call Backup_Mod_Write_Cell_Bnd(comm, fh, d, vc, a_name,  &
-                               grid % user_array(ua,-comm % nb_s:comm % nc_s))
+                               grid % user_array(ua,-comm % nb_f:comm % nc_s))
   end do
 
   ! Variable count (store +1 to count its own self)

@@ -8,7 +8,7 @@
   type(Comm_Type)  :: comm
   integer          :: fh, disp, vc
   character(len=*) :: var_name
-  real             :: array(-comm % nb_s:comm % nc_s)
+  real             :: array(-comm % nb_f:comm % nc_s)
 !-----------------------------------[Locals]-----------------------------------!
   character(len=80) :: vn
   integer           :: vs  ! variable size
@@ -27,6 +27,7 @@
   call Comm_Mod_Write_Int (fh, vs, disp)
 
   call Comm_Mod_Write_Cell_Real(comm, fh, array(1:comm % nc_s),   disp)
-  call Comm_Mod_Write_Bnd_Real (comm, fh, array(-comm % nb_s:-1), disp)
+  call Comm_Mod_Write_Bnd_Real (comm, fh, array(-comm % nb_f:  &
+                                                -comm % nb_l), disp)
 
   end subroutine
