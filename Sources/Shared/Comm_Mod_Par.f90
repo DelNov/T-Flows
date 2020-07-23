@@ -44,7 +44,7 @@
 
     ! Variables which follow are for backup saving to single file
     integer :: nc_s   ! number of cells in subdomain
-    integer :: nb_s   ! number of bundary cells in subdoiman
+    integer :: nb_s   ! number of bundary cells in subdomain
     integer :: nb_f   ! first boundary cell to save
     integer :: nb_l   ! last boundary cell to save
     integer :: nc_t   ! total number of cells 
