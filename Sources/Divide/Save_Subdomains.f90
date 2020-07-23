@@ -2,6 +2,9 @@
   subroutine Save_Subdomains(grid, n_buff_layers)
 !------------------------------------------------------------------------------!
 !   Number the cells in each subdomain for subsequent separate saving.         !
+!                                                                              !
+!   Warning: Unfortunatelly, if you change the order in which cells are        !
+!   stored here, it might have an impact on map creation for backup file.      !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use File_Mod

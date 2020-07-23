@@ -7,7 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c
+  integer :: c, cnt
 !==============================================================================!
 !   There is an issue with this procedure, but it's more related to MPI/IO     !
 !   functions than T-Flows.  In cases a subdomain has no physical boundary     !
@@ -21,11 +21,19 @@
 
   ! Initialize number of cells in subdomain
   grid % comm % nc_s = grid % n_cells - grid % comm % n_buff_cells
+
+  ! Initialize number of boundary cells in subdomain
   do c = -grid % n_bnd_cells, -1
     if(grid % comm % cell_proc(c) .eq. this_proc) then
       grid % comm % nb_s = grid % comm % nb_s + 1
     end if
   end do
+
+  ! First and last cell to send
+  grid % comm % nb_f = grid % n_bnd_cells
+  grid % comm % nb_l = grid % n_bnd_cells - grid % comm % nb_s + 1
+
+  ! Initialize total number of cells
   grid % comm % nc_t = grid % comm % nc_s
   grid % comm % nb_t = grid % comm % nb_s
 
@@ -88,16 +96,12 @@
     !-----------------------!
     !   Boundary cell map   !
     !-----------------------!
-    do c = -grid % comm % nb_s, -1
-
-      ! Correct boundary cell mapping.
-      ! - First it is in positive range, so insted of -nb_s to -1, ...
-      !   it goes from 1 to nb_s.  (Therefore the "c+nb_s+1")
-      ! - Second, mapping must be positive and start from zero. (The "+ nb_t")
-      grid % comm % bnd_cell_map(c+grid % comm % nb_s+1) =  &
-        grid % comm % cell_glo(c) + grid % comm % nb_t
+    cnt = 0
+    do c = -grid % comm % nb_f, -grid % comm % nb_l
+      cnt = cnt + 1
+      grid % comm % bnd_cell_map(cnt) = grid % comm % cell_glo(c)  &
+                                      + grid % comm % nb_t
     end do
-
   end if
 
   end subroutine
