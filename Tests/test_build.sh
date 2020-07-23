@@ -260,7 +260,6 @@ current_time=$(date +%s)
 # Script logs
 FULL_LOG=$TEST_DIR/test_build.log # logs of current script
 if [ -f $FULL_LOG ]; then cp /dev/null $FULL_LOG; fi
-# echo "Full log is being written in file" "$FULL_LOG"
 
 # Keep track of the last executed command
 # trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
@@ -268,12 +267,19 @@ if [ -f $FULL_LOG ]; then cp /dev/null $FULL_LOG; fi
 # trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT
 
 #------------------------------------------------------------------------------#
+# echo directly to log file
+#------------------------------------------------------------------------------#
+function elog {
+  echo "$@" >> $FULL_LOG 2>&1
+}
+
+#------------------------------------------------------------------------------#
 # time in seconds
 #------------------------------------------------------------------------------#
 function time_in_seconds {
   previous_time=$current_time
   current_time=$(date +%s)
-  echo "Time elapsed:" \
+  elog "Time elapsed:" \
   "$(echo ""$current_time" - "$previous_time"" | bc -l)" "seconds"
 }
 
@@ -288,19 +294,19 @@ function clean_compile {
   # $3 = DIR_CASE path
 
   if [ -z "${1+xxx}" ]; then 
-    echo "directory with sources is not set at all"
+    elog "Directory with sources is not set at all"
     exit 1
   elif [ -z "${2+xxx}" ]; then 
-    echo "MPI flag is not set at all"
+    elog "MPI flag is not set at all"
     exit 1
   fi
 
   cd $1
-  echo "clean compile in:" "$1"
+  elog "Clean compile in:" "$1"
   make clean >> $FULL_LOG 2>&1
 
   if [ -z "${3+xxx}" ]; then
-    echo "make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS=$CGNS CGNS_MPI=$CGNS_MPI MPI=$2"
+    elog "make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS=$CGNS CGNS_MPI=$CGNS_MPI MPI=$2"
     make \
       FORTRAN=$FCOMP \
       DEBUG=$DEBUG \
@@ -309,7 +315,7 @@ function clean_compile {
       MPI=$2 >> $FULL_LOG 2>&1
     success=$?
   else
-    echo "make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS=$CGNS CGNS_MPI=$CGNS_MPI MPI=$2 DIR_CASE=$3"
+    elog "make FORTRAN=$FCOMP DEBUG=$DEBUG CGNS=$CGNS CGNS_MPI=$CGNS_MPI MPI=$2 DIR_CASE=$3"
     make \
       FORTRAN=$FCOMP \
       DEBUG=$DEBUG \
@@ -325,9 +331,9 @@ function clean_compile {
   cd - > /dev/null
   return $success
   if [ $success -eq 0 ]; then
-    echo "Clean compile passed."
+    elog "Clean compile passed."
   else
-    echo "Clean compile in " $1 " failed!"
+    elog "Clean compile in " $1 " failed!"
   fi
 }
 #------------------------------------------------------------------------------#
@@ -350,11 +356,11 @@ function launch_generate {
 
   make_links $TEST_DIR/$1
   if [ "$2" != "quiet" ]; then
-    echo ""
-    echo "#=================================================================="
-    echo "#   Generate test:" $1
-    echo "#------------------------------------------------------------------"
-    echo "generate.scr: " >> $FULL_LOG 2>&1
+    elog ""
+    elog "#=================================================================="
+    elog "#   Generate test:" $1
+    elog "#------------------------------------------------------------------"
+    elog "generate.scr: "
   fi
 
   if [ $(ls -1 generate*.scr 2>/dev/null | wc -l) -gt 0 ]; then
@@ -383,11 +389,11 @@ function launch_divide {
 
   make_links $TEST_DIR/$1
   if [ "$2" != "quiet" ]; then
-    echo ""
-    echo "#=================================================================="
-    echo "#   Divide test:" $1
-    echo "#------------------------------------------------------------------"
-    echo "divide.scr: " >> $FULL_LOG 2>&1
+    elog ""
+    elog "#=================================================================="
+    elog "#   Divide test:" $1
+    elog "#------------------------------------------------------------------"
+    elog "divide.scr: "
   fi
 
   if [ $(ls -1 divide*.scr 2>/dev/null | wc -l) -gt 0 ]; then
@@ -412,15 +418,15 @@ function launch_divide {
 #------------------------------------------------------------------------------#
 function launch_convert {
   # $1 = relative dir
-  echo ""
-  echo "#=================================================================="
-  echo "#   Convert test:" $1
-  echo "#------------------------------------------------------------------"
+  elog ""
+  elog "#=================================================================="
+  elog "#   Convert test:" $1
+  elog "#------------------------------------------------------------------"
 
   make_links $TEST_DIR/$1
   unpack_mesh $TEST_DIR/$1
 
-  echo "convert.scr: " >> $FULL_LOG 2>&1
+  elog "convert.scr: "
 
   if [ $(ls -1 convert*.scr 2>/dev/null | wc -l) -gt 0 ]; then
     if [ -L conv.scr ]; then unlink conv.scr; fi
@@ -447,27 +453,27 @@ function launch_process {
   # $2 - number of threads
 
   if [ -z "${1+xxx}" ]; then 
-    echo "seq/par is not specified"
+    elog "Argument seq/par is not specified"
     exit 1
   elif [ -z "${2+xxx}" ]; then 
-    echo "threads count is not set"
+    elog "Argument threads count is not set"
     exit 1
   fi
 
   if [ "$1" == "seq" ]; then
-    echo "Launching Process"
+    elog "Launching Process"
     $PROC_EXE >> $FULL_LOG 2>&1
     success=$?
   elif [ "$1" == "par" ]; then
-    echo "Launching mpirun -np "$2" Process"
+    elog "Launching mpirun -np "$2" Process"
     mpirun -np $2 $PROC_EXE >> $FULL_LOG 2>&1
     success=$?
   else
-    echo "wrong argument in launch_process"
+    elog "wrong argument in launch_process"
     exit 1
   fi
 
-  echo "control: " >> $FULL_LOG 2>&1
+  elog "control: "
   cat control >> $FULL_LOG 2>&1
   time_in_seconds
   return $success
@@ -478,12 +484,12 @@ function launch_process {
 #------------------------------------------------------------------------------#
 function generate_tests {
 
-  echo ""
-  echo "#======================================================================"
-  echo "#"
-  echo "#   Running Generate tests"
-  echo "#"
-  echo "#----------------------------------------------------------------------"
+  elog ""
+  elog "#======================================================================"
+  elog "#"
+  elog "#   Running Generate tests"
+  elog "#"
+  elog "#----------------------------------------------------------------------"
 
   clean_compile $GENE_DIR no # dir MPI
 
@@ -501,7 +507,7 @@ function unpack_mesh {
   # $1 = directory with test case
 
   if [ -z "${1+xxx}" ]; then 
-    echo "directory is not set at all"
+    elog "Directory is not set at all"
     exit 1
   fi
 
@@ -510,7 +516,7 @@ function unpack_mesh {
   # .gz, *.tgz
   if [ $(ls -1 {*.gz,*.tgz} 2>/dev/null | wc -l) -gt 0 ]; then
     for archive in $(ls -1 {*.gz,*.tgz} 2>/dev/null); do
-      echo "uncompressing archive:" "$archive"
+      elog "Uncompressing archive:" "$archive"
       gunzip -kf "$archive" >> $FULL_LOG 2>&1
     done
   fi
@@ -518,7 +524,7 @@ function unpack_mesh {
   # .tar, .tar.xz
   if [ $(ls -1 {*.tar,*.tar.xz} 2>/dev/null | wc -l) -gt 0 ]; then
     for archive in $(ls -1 {*.tar,*.tar.xz} 2>/dev/null); do
-      echo "uncompressing archive:" "$archive"
+      elog "Uncompressing archive:" "$archive"
       tar -xf "$archive" >> $FULL_LOG 2>&1
     done
   fi
@@ -526,7 +532,7 @@ function unpack_mesh {
   # .7z
   if [ $(ls -1 *.7z 2>/dev/null | wc -l) -gt 0 ]; then
     for archive in $(ls -1 *.7z 2>/dev/null); do
-      echo "uncompressing archive:" "$archive"
+      elog "Uncompressing archive:" "$archive"
       7z x -y "$archive" >> $FULL_LOG 2>&1
     done
   fi
@@ -539,12 +545,12 @@ function unpack_mesh {
 #------------------------------------------------------------------------------#
 function convert_tests {
 
-  echo ""
-  echo "#======================================================================"
-  echo "#"
-  echo "#   Running Convert tests"
-  echo "#"
-  echo "#----------------------------------------------------------------------"
+  elog ""
+  elog "#======================================================================"
+  elog "#"
+  elog "#   Running Convert tests"
+  elog "#"
+  elog "#----------------------------------------------------------------------"
 
   clean_compile $CONV_DIR no # dir MPI
 
@@ -560,12 +566,12 @@ function convert_tests {
 #------------------------------------------------------------------------------#
 function divide_tests {
 
-  echo ""
-  echo "#======================================================================"
-  echo "#"
-  echo "#   Running Divide tests"
-  echo "#"
-  echo "#----------------------------------------------------------------------"
+  elog ""
+  elog "#======================================================================"
+  elog "#"
+  elog "#   Running Divide tests"
+  elog "#"
+  elog "#----------------------------------------------------------------------"
 
   clean_compile $DIVI_DIR no # dir MPI
 
@@ -589,7 +595,7 @@ function replace_line_with_first_occurence_in_file {
   if [ -z "$line_to_replace" ]; then
      # if no such string is found-> add it
     echo $new_line >> $3
-    echo "Warning: added "$2" to the end of $3"
+    elog "Warning: added "$2" to the end of $3"
   else
     sed --follow-symlinks -i ""$line_to_replace"s%.*%$new_line%" $3
   fi
@@ -614,10 +620,10 @@ function get_value_next_to_keyword {
   # it returns 1.0
 
   if [ -z "${1+xxx}" ]; then 
-    echo "Keyword to search is not set at all"
+    elog "Keyword to search is not set at all"
     exit 1
   elif [ -z "${2+xxx}" ]; then 
-    echo "File to search in is not set at all"
+    elog "File to search in is not set at all"
     exit 1
   fi
 
@@ -632,11 +638,11 @@ function process_backup_test {
   # 1 = test_dir
 
   if [ -z "${1+xxx}" ]; then 
-    echo "directory is not set at all"
+    elog "Directory is not set at all"
     exit 1
   fi
 
-  echo "Process backup tests.."
+  elog "Process backup tests.."
   cd "$1"
 
   n1=$(printf "%06d" 1)
@@ -663,7 +669,7 @@ function process_backup_test {
   nproc_in_div=$(head -n2 divide.1.scr | tail -n1)
 
   # BEGIN:---------------------------------------#
-  echo "np=1, MPI=no, start from 0, make a backup"
+  elog "np=1, MPI=no, start from 0, make a backup"
   clean_compile $PROC_DIR no # dir MPI
 
   for (( i=1; i<=$n_dom; i++ )); do
@@ -693,7 +699,7 @@ function process_backup_test {
 
 
   # BEGIN:---------------------------------------------#
-  echo "np=1, MPI=no, load from backup(produced by seq)"
+  elog "np=1, MPI=no, load from backup(produced by seq)"
 
   for (( i=1; i<=$n_dom; i++ )); do
     name_in_div=$(head -n1 divide."$i".scr)
@@ -710,7 +716,7 @@ function process_backup_test {
 
 
   # BEGIN:----------------------------------------------#
-  echo "np=1, MPI=yes, load from backup(produced by seq)"
+  elog "np=1, MPI=yes, load from backup(produced by seq)"
   clean_compile $PROC_DIR yes # dir MPI
 
   launch_process par 1
@@ -718,14 +724,14 @@ function process_backup_test {
 
 
   # BEGIN:----------------------------------------------#
-  echo "np=2, MPI=yes, load from backup(produced by seq)"
+  elog "np=2, MPI=yes, load from backup(produced by seq)"
 
   launch_process par $nproc_in_div
   #------------------------------------------------:END #
 
 
   # BEGIN:---------------------------------------------------#
-  echo "np=2, MPI=yes, load from backup(produced by par.np=1)"
+  elog "np=2, MPI=yes, load from backup(produced by par.np=1)"
 
   for (( i=1; i<=$n_dom; i++ )); do
     name_in_div=$(head -n1 divide."$i".scr)
@@ -741,7 +747,7 @@ function process_backup_test {
 
 
   # BEGIN:----------------------------------------#
-  echo "np=2, MPI=yes, start from 0, make a backup"
+  elog "np=2, MPI=yes, start from 0, make a backup"
 
   for (( i=1; i<=$n_dom; i++ )); do
     name_in_div=$(head -n1 divide."$i".scr)
@@ -757,7 +763,7 @@ function process_backup_test {
 
 
   # BEGIN:----------------------------------------------------#
-  echo "np=2, MPI=yes, load from backup(produced by par.np=2)"
+  elog "np=2, MPI=yes, load from backup(produced by par.np=2)"
 
   for (( i=1; i<=$n_dom; i++ )); do
     name_in_div=$(head -n1 divide."$i".scr)
@@ -773,7 +779,7 @@ function process_backup_test {
 
 
   # BEGIN:------------------------------------------#
-  echo "np=1, MPI=yes, backup=(produced by par.np=2)"
+  elog "np=1, MPI=yes, backup=(produced by par.np=2)"
   clean_compile $PROC_DIR no # dir MPI
   launch_process par 1
   #--------------------------------------------:END #
@@ -801,17 +807,17 @@ function process_backup_test {
 function process_backup_tests {
 
   # Grasp/embrace as many different model combinations as you can
-  echo ""
-  echo "#======================================================================"
-  echo "#"
-  echo "#   Running Processor backup tests"
-  echo "#"
-  echo "#----------------------------------------------------------------------"
+  elog ""
+  elog "#======================================================================"
+  elog "#"
+  elog "#   Running Processor backup tests"
+  elog "#"
+  elog "#----------------------------------------------------------------------"
 
-  echo ""
-  echo "#======================================================================"
-  echo "#   Test 1: "$RANS_CHANNEL_LR_UNIFORM_DIR" [k_eps model + T]"
-  echo "#----------------------------------------------------------------------"
+  elog ""
+  elog "#======================================================================"
+  elog "#   Test 1: "$RANS_CHANNEL_LR_UNIFORM_DIR" [k_eps model + T]"
+  elog "#----------------------------------------------------------------------"
   replace_line_with_first_occurence_in_file \
     "TURBULENCE_MODEL" \
     "TURBULENCE_MODEL k_eps" \
@@ -820,10 +826,10 @@ function process_backup_tests {
   process_backup_test \
     $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR
 
-  echo ""
-  echo "#======================================================================"
-  echo "#   Test 2: "$RANS_CHANNEL_LR_UNIFORM_DIR" [k_eps_zeta_f model + T]"
-  echo "#----------------------------------------------------------------------"
+  elog ""
+  elog "#======================================================================"
+  elog "#   Test 2: "$RANS_CHANNEL_LR_UNIFORM_DIR" [k_eps_zeta_f model + T]"
+  elog "#----------------------------------------------------------------------"
   replace_line_with_first_occurence_in_file \
     "TURBULENCE_MODEL" \
     "TURBULENCE_MODEL k_eps_zeta_f" \
@@ -832,10 +838,10 @@ function process_backup_tests {
   process_backup_test \
     $TEST_DIR/$RANS_CHANNEL_LR_UNIFORM_DIR
 
-  echo ""
-  echo "#======================================================================"
-  echo "#   Test 3: "$RANS_CHANNEL_LR_RSM_DIR" [rsm_hanjalic_jakirlic model + T]"
-  echo "#----------------------------------------------------------------------"
+  elog ""
+  elog "#======================================================================"
+  elog "#   Test 3: "$RANS_CHANNEL_LR_RSM_DIR" [rsm_hanjalic_jakirlic model + T]"
+  elog "#----------------------------------------------------------------------"
   replace_line_with_first_occurence_in_file \
     "TURBULENCE_MODEL" \
     "TURBULENCE_MODEL rsm_hanjalic_jakirlic" \
@@ -844,10 +850,10 @@ function process_backup_tests {
   process_backup_test \
     $TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR
 
-  echo ""
-  echo "#======================================================================"
-  echo "#   Test 4: "$RANS_CHANNEL_LR_RSM_DIR" [rsm_manceau_hanjalic model + T]"
-  echo "#----------------------------------------------------------------------"
+  elog ""
+  elog "#======================================================================"
+  elog "#   Test 4: "$RANS_CHANNEL_LR_RSM_DIR" [rsm_manceau_hanjalic model + T]"
+  elog "#----------------------------------------------------------------------"
   replace_line_with_first_occurence_in_file \
     "TURBULENCE_MODEL" \
     "TURBULENCE_MODEL rsm_manceau_hanjalic" \
@@ -856,24 +862,24 @@ function process_backup_tests {
   process_backup_test \
     $TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR
 
-  echo ""
-  echo "#======================================================================"
-  echo "#   Test 5: "$LES_PIPE_DIR" les_dynamic"
-  echo "#----------------------------------------------------------------------"
+  elog ""
+  elog "#======================================================================"
+  elog "#   Test 5: "$LES_PIPE_DIR" les_dynamic"
+  elog "#----------------------------------------------------------------------"
   process_backup_test \
     $TEST_DIR/$LES_PIPE_DIR
 
-  echo ""
-  echo "#======================================================================"
-  echo "#   Test 6: "$LAMINAR_CAVITY_LID_DRIVEN_DIR" none"
-  echo "#----------------------------------------------------------------------"
+  elog ""
+  elog "#======================================================================"
+  elog "#   Test 6: "$LAMINAR_CAVITY_LID_DRIVEN_DIR" none"
+  elog "#----------------------------------------------------------------------"
   process_backup_test \
     $TEST_DIR/$LAMINAR_CAVITY_LID_DRIVEN_DIR
 
-  echo ""
-  echo "#======================================================================"
-  echo "#   Test 7: "$MULTDOM_MEMBRANE_DIR" multidom: k_eps_zeta_f model + T"
-  echo "#----------------------------------------------------------------------"
+  elog ""
+  elog "#======================================================================"
+  elog "#   Test 7: "$MULTDOM_MEMBRANE_DIR" multidom: k_eps_zeta_f model + T"
+  elog "#----------------------------------------------------------------------"
   process_backup_test \
     $TEST_DIR/$MULTDOM_MEMBRANE_DIR
 
@@ -885,14 +891,14 @@ function process_save_exit_now_test {
   # $1 = relative dir with test
 
   if [ -z "${1+xxx}" ]; then 
-    echo "directory is not set at all"
+    elog "Directory is not set at all"
     exit 1
   fi
 
-  echo ""
-  echo "#======================================================================"
-  echo "#   Test save_now & exit_now on:" $1
-  echo "#----------------------------------------------------------------------"
+  elog ""
+  elog "#======================================================================"
+  elog "#   Test save_now & exit_now on:" $1
+  elog "#----------------------------------------------------------------------"
 
   cd "$TEST_DIR/$1"
 
@@ -923,7 +929,7 @@ function process_save_exit_now_test {
   nproc_in_div=$(head -n2 divide.1.scr | tail -n1)
 
   # BEGIN:---------------------------------------#
-  echo "np=1, MPI=no, start from 0, make a backup"
+  elog "np=1, MPI=no, start from 0, make a backup"
   clean_compile $PROC_DIR no # dir MPI
 
   for (( i=1; i<=$n_dom; i++ )); do
@@ -943,21 +949,21 @@ function process_save_exit_now_test {
   done
 
   for i in {1..3}; do
-    echo ""
-    echo "#===================================================================="
+    elog ""
+    elog "#===================================================================="
     if [ "$i" = 1 ]; then
-      echo "#   Test np=1, MPI=no"
+      elog "#   Test np=1, MPI=no"
     fi
     if [ "$i" = 2 ]; then
-      echo "#   Test np=1, MPI=yes"
+      elog "#   Test np=1, MPI=yes"
     fi
     if [ "$i" = 3 ]; then
-      echo "#   Test np=2, MPI=yes"
+      elog "#   Test np=2, MPI=yes"
     fi
-    echo "#--------------------------------------------------------------------"
+    elog "#--------------------------------------------------------------------"
 
     # BEGIN:---------------------------------------------#
-    echo "np=1, MPI=no, load from backup(produced by seq)"
+    elog "np=1, MPI=no, load from backup(produced by seq)"
 
     for (( i=1; i<=$n_dom; i++ )); do
       name_in_div=$(head -n1 divide."$i".scr)
@@ -980,7 +986,7 @@ function process_save_exit_now_test {
       clean_compile $PROC_DIR yes
     fi
 
-    echo "#   Forcing to save: save_now"
+    elog "#   Forcing to save: save_now"
     touch save_now
 
     # get current line count where search starts
@@ -1000,9 +1006,8 @@ function process_save_exit_now_test {
       grep -q "# Creating the file: "$name_in_div"-ts"$n1"\|\
                # Creating the file with fields: "$name_in_div"-ts"$n1""; then
 
-      echo "save_now was successfull"
-
-      echo "Forcing to exit: exit_now"
+      elog "Creating save_now was successfull"
+      elog "Forcing to exit: exit_now"
       touch exit_now
 
       for (( i=1; i<=$n_dom; i++ )); do
@@ -1030,12 +1035,12 @@ function process_save_exit_now_test {
         tr -s " " | \
         grep -q "Time step : 3"; then
 
-          echo "exit_now was NOT successfull"
+          elog "Creating exit_now was NOT successfull"
       else
-        echo "exit_now was successfull"
+        elog "Creating exit_now was successfull"
       fi
     else
-      echo "save_now was NOT successfull"
+      elog "Creating save_now was NOT successfull"
     fi
 
   done
@@ -1058,12 +1063,12 @@ function process_save_exit_now_test {
 #------------------------------------------------------------------------------#
 function process_save_exit_now_tests {
 
-  echo ""
-  echo "#======================================================================"
-  echo "#"
-  echo "#   Running Processor save_now and exit_now tests"
-  echo "#"
-  echo "#----------------------------------------------------------------------"
+  elog ""
+  elog "#======================================================================"
+  elog "#"
+  elog "#   Running Processor save_now and exit_now tests"
+  elog "#"
+  elog "#----------------------------------------------------------------------"
 
   for CASE_DIR in ${ALL_SAVE_EXIT_NOW_TESTS[@]}; do
     process_save_exit_now_test \
@@ -1081,22 +1086,22 @@ function launch_matplotlib {
   # $4 = output file [or "" if none]
 
   if [ -z "${1+xxx}" ]; then 
-    echo "directory with matplotlib script is not set at all"
+    elog "Directory with matplotlib script is not set at all"
     exit 1
   elif [ -z "${2+xxx}" ]; then 
-    echo "matplotlib script name is not set at all"
+    elog "Script name for matplotlib is not set at all"
     exit 1
   elif [ -z "${3+xxx}" ]; then 
-    echo "input file name is not set at all"
+    elog "Input file name is not set at all"
     exit 1
   elif [ -z "${4+xxx}" ]; then 
-    echo "output file name is not set at all"
+    elog "Output file name is not set at all"
     exit 1
   fi
 
   cd "$1"
   if [ ! -f "$2" ]; then
-    echo "Warning: $1/$2 does not exist"
+    elog "Warning: $1/$2 does not exist"
     return
   fi
   sed "s%DAT_FILE_WITH_RESULTS_MACRO%$3%" "$2" > ./tmp
@@ -1104,9 +1109,9 @@ function launch_matplotlib {
   # Launch script:
   $(sed -e '/#/d' ./tmp) >> $FULL_LOG 2>&1
   if [ "$4" == "" ]; then
-    echo "new figure was created:" "$1"/results.png
+    elog "New figure was created:" "$1"/results.png
   else
-    echo "new figure was created:" "$1"/"$4".png
+    elog "New figure was created:" "$1"/"$4".png
   fi
   time_in_seconds
 }
@@ -1116,12 +1121,12 @@ function launch_matplotlib {
 function process_compilation_test {
   # $1 = relative dir with test
 
-  echo ""
-  echo "#=================================================================="
-  echo "#  Compilation test in:" $1
-  echo "#------------------------------------------------------------------"
+  elog ""
+  elog "#=================================================================="
+  elog "#  Compilation test in:" $1
+  elog "#------------------------------------------------------------------"
   if [ -z "$TEST_DIR/${1+xxx}" ]; then 
-    echo "directory is not set at all"
+    elog "Directory is not set at all"
     exit 1
   fi
 
@@ -1170,12 +1175,12 @@ function process_compilation_test {
 function process_compilation_tests {
   # $1 = dir with test
 
-  echo ""
-  echo "#======================================================================"
-  echo "#"
-  echo "#   Running Processor compilation tests"
-  echo "#"
-  echo "#----------------------------------------------------------------------"
+  elog ""
+  elog "#======================================================================"
+  elog "#"
+  elog "#   Running Processor compilation tests"
+  elog "#"
+  elog "#----------------------------------------------------------------------"
 
   for CASE_DIR in ${ALL_COMPILE_TESTS[@]}; do
     process_compilation_test $CASE_DIR
@@ -1192,16 +1197,16 @@ function process_full_length_test {
   # $4 = dir with results
 
   if [ -z "${1+xxx}" ]; then 
-    echo "Directory is not set at all"
+    elog "Directory is not set at all"
     exit 1
   elif [ -z "${2+xxx}" ]; then 
-    echo "Turbulence model is not set at all"
+    elog "Turbulence model is not set at all"
     exit 1
   elif [ -z "${3+xxx}" ]; then 
-    echo "Multiphase model is not set at all"
+    elog "Multiphase model is not set at all"
     exit 1
   elif [ -z "${4+xxx}" ]; then 
-    echo "Sirectory with results is not set at all"
+    elog "Directory with results is not set at all"
     exit 1
   fi
 
@@ -1229,7 +1234,7 @@ function process_full_length_test {
   nproc_in_div=$(head -n2 divide.1.scr | tail -n1)
 
   # BEGIN:-------------------------#
-  echo "np="$nproc_in_div", MPI=yes"
+  elog "np="$nproc_in_div", MPI=yes"
   # rel_dir to User_Mod/ from Process/
   rel_dir=$(realpath --relative-to="$PROC_DIR" "$1")
 
@@ -1277,8 +1282,8 @@ function process_full_length_test {
     last_results_plus_dat_file=$(realpath --relative-to="$4" \
       $(ls -tr1 "$name_in_div"-res-plus-ts??????.dat | tail -n1))
 
-    echo "results are:"
-    echo "$(head -n8 $(ls -tr1 "$name_in_div"-res-plus-ts??????.dat | \
+    elog "Results are:"
+    elog "$(head -n8 $(ls -tr1 "$name_in_div"-res-plus-ts??????.dat | \
       tail -n1))"
 
     # Launching matplotlib scripts only in interacive mode
@@ -1290,7 +1295,7 @@ function process_full_length_test {
         "result_plus_"$2""
     fi
   else
-      echo "Warning: file "$name_in_div"-res-plus-ts??????.dat does not exist"
+    elog "Warning: file "$name_in_div"-res-plus-ts??????.dat does not exist"
   fi
 }
 #------------------------------------------------------------------------------#
@@ -1299,12 +1304,12 @@ function process_full_length_test {
 function process_full_length_tests {
   # it requires a template file readme_python_matplotlib_script.sh in Results/
 
-  echo ""
-  echo "#======================================================================"
-  echo "#"
-  echo "#   Running Processor full simulation tests"
-  echo "#"
-  echo "#----------------------------------------------------------------------"
+  elog ""
+  elog "#======================================================================"
+  elog "#"
+  elog "#   Running Processor full simulation tests"
+  elog "#"
+  elog "#----------------------------------------------------------------------"
 
   for i in ${!ALL_PROCESS_TESTS[@]}; do
     CASE_DIR="${ALL_PROCESS_TESTS[$i]}"
@@ -1315,13 +1320,13 @@ function process_full_length_tests {
     #DYNAMIC_VISCOSITY=$(get_value_next_to_keyword "DYNAMIC_VISCOSITY" \
     #  "${ALL_PROCESS_TESTS[$i]}""/control")
 
-echo $CASE_DIR
-    echo ""
-    echo "#===================================================================="
-    echo "#   Process test: " $CASE_DIR "with physical models:"
-    echo "#   " $TURB_MOD "for turbulence and "
-    echo "#   " $MULT_MOD "for multiphase "
-    echo "#--------------------------------------------------------------------"
+    elog $CASE_DIR
+    elog ""
+    elog "#===================================================================="
+    elog "#   Process test: " $CASE_DIR "with physical models:"
+    elog "#   " $TURB_MOD "for turbulence and "
+    elog "#   " $MULT_MOD "for multiphase "
+    elog "#--------------------------------------------------------------------"
 
     process_full_length_test \
       "$TEST_DIR/$CASE_DIR" \
@@ -1341,14 +1346,14 @@ function process_accuracy_test {
   path="$TEST_DIR"/"$1"
 
   if [ -z "${1+xxx}" ]; then 
-    echo "directory is not set at all"
+    elog "Directory is not set at all"
     exit 1
   fi
 
   for i in {3..7..1}
   do
     Ny="$(echo "1 + 2^"$i"" | bc)"
-    echo "Ny: "$Ny""
+    elog "Ny: "$Ny""
 
     cd $path
 
@@ -1371,7 +1376,7 @@ function process_accuracy_test {
     name_in_div=$(head  -n1 divide.scr)
     nproc_in_div=$(head -n2 divide.scr | tail -n1)
 
-    echo "np="$nproc_in_div", MPI=yes"
+    elog "np="$nproc_in_div", MPI=yes"
 
     # rel_dir to User_Mod/ from Process/
     rel_dir=$(realpath --relative-to="$PROC_DIR" "$path")
@@ -1395,7 +1400,7 @@ function process_accuracy_test {
       cp "$last_results_dat_file" Results/"$nNy".dat
 
     else
-        echo "Warning: file "$name_in_div"-res-ts??????.dat does not exist"
+     elog "Warning: file "$name_in_div"-res-ts??????.dat does not exist"
     fi
   done # for loop
 
@@ -1413,21 +1418,21 @@ function process_accuracy_tests {
   # $1 = test dir
   # it requires a template file readme_python_matplotlib_script.sh in Results/
 
-  echo ""
-  echo "#======================================================================"
-  echo "#"
-  echo "#   Running Processor accuracy test check"
-  echo "#"
-  echo "#----------------------------------------------------------------------"
+  elog ""
+  elog "#======================================================================"
+  elog "#"
+  elog "#   Running Processor accuracy test check"
+  elog "#"
+  elog "#----------------------------------------------------------------------"
 
   for i in ${!ALL_PROCESS_ACCURACY_TESTS[@]}; do
     CASE_DIR="${ALL_PROCESS_ACCURACY_TESTS[$i]}"
 
-    echo ""
-    echo "#===================================================================="
-    echo "#   Process test: "     $CASE_DIR
-    echo "#   with tolerance for u, p, SIMPLE : 1.e-8"
-    echo "#--------------------------------------------------------------------"
+    elog ""
+    elog "#===================================================================="
+    elog "#   Process test: "     $CASE_DIR
+    elog "#   with tolerance for u, p, SIMPLE : 1.e-8"
+    elog "#--------------------------------------------------------------------"
 
     process_accuracy_test "$CASE_DIR"
   done
@@ -1499,19 +1504,20 @@ function chose_test {
 # Desired option was provided by command line, execute it and end
 if [ $1 ]; then
   MODE="noninteractive"
-  echo ""
-  echo "#===================================================================="
-  echo "#"
-  echo "#   T-Flows testing in non-interactive mode"
-  echo "#"
-  echo "#--------------------------------------------------------------------"
-  echo ""
+  elog ""
+  elog "#===================================================================="
+  elog "#"
+  elog "#   T-Flows testing in non-interactive mode"
+  elog "#"
+  elog "#--------------------------------------------------------------------"
+  elog ""
   chose_test $1
 
 # Desired option was not provided, enter interactive mode
 else
   MODE="interactive"
   while [ 0 -eq 0 ]; do
+
     echo ""
     echo "#===================================================================="
     echo "#"
