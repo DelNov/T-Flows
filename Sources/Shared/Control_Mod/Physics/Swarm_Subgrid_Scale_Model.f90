@@ -10,6 +10,6 @@
 !==============================================================================!
 
   call Control_Mod_Read_Char_Item('SWARM_SUBGRID_SCALE_MODEL', & 
-                                  'BROWNIAN_FUKAGATA', s_sgs, verbose)
+                                  'none', s_sgs, verbose)
 
   end subroutine
