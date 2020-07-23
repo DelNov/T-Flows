@@ -156,7 +156,7 @@ labels = [line.get_label() for line in lines]
 plt.legend(lines, labels)
 
 # Show
-plt.show()
+# plt.show()
 
 # Save
 plt.savefig(input_name_1.replace('.dat','.png').replace('../','./'))

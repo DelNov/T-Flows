@@ -149,4 +149,4 @@ if output_name == "" or output_name == "PNG_FILE_WITH_RESULTS_MACRO":
 plt.savefig(output_name + '.png', bbox_inches='tight', pad_inches=0)
 
 # Show
-#plt.show()
+# plt.show()
