@@ -28,9 +28,11 @@
   vs = (2*comm % nc_t + 2*comm % nb_t) * SIZE_REAL
   call Comm_Mod_Write_Int (fh, vs, disp)
 
-  call Comm_Mod_Write_Cell_Real(comm, fh, var % n(1:comm % nc_s),   disp)
-  call Comm_Mod_Write_Bnd_Real (comm, fh, var % n(-comm % nb_s:-1), disp)
-  call Comm_Mod_Write_Bnd_Real (comm, fh, var % q(-comm % nb_s:-1), disp)
-  call Comm_Mod_Write_Cell_Real(comm, fh, var % o(1:comm % nc_s),   disp)
+  call Comm_Mod_Write_Cell_Real(comm, fh, var % n(1:comm % nc_s),  disp)
+  call Comm_Mod_Write_Bnd_Real (comm, fh, var % n(-comm % nb_f:  &
+                                                  -comm % nb_l),   disp)
+  call Comm_Mod_Write_Bnd_Real (comm, fh, var % q(-comm % nb_f:  &
+                                                  -comm % nb_l),   disp)
+  call Comm_Mod_Write_Cell_Real(comm, fh, var % o(1:comm % nc_s),  disp)
 
   end subroutine
