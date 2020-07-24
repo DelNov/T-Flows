@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Comm_Mod_Write_Log_Array(fh, arr, disp)
 !------------------------------------------------------------------------------!
-!   Write integer array for parallel runs.                                     !
+!   Write logical array for parallel runs.                                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -19,8 +19,8 @@
   ! Set it at position disp (same as in Read counterpart)
   call Mpi_File_Set_View(fh,             &
                          disp,           &
-                         MPI_LOGICAL8,   &
-                         MPI_LOGICAL8,   &
+                         MPI_LOGICAL,    &
+                         MPI_LOGICAL,    &
                          'native',       &
                          MPI_INFO_NULL,  &
                          error)
@@ -29,9 +29,9 @@
   call Mpi_File_Write(fh,                 &
                       arr(1),             &
                       length,             &
-                      MPI_LOGICAL8,       &
+                      MPI_LOGICAL,        &
                       MPI_STATUS_IGNORE,  &
-                      error) 
+                      error)
 
   disp = disp + SIZE_LOG * length
 
