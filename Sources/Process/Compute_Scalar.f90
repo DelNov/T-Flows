@@ -126,32 +126,33 @@
       phix_f1 = grid % fw(s)*phi % x(c1) + (1.0-grid % fw(s))*phi % x(c2)
       phiy_f1 = grid % fw(s)*phi % y(c1) + (1.0-grid % fw(s))*phi % y(c2)
       phiz_f1 = grid % fw(s)*phi % z(c1) + (1.0-grid % fw(s))*phi % z(c2)
-      phix_f2 = phix_f1 
-      phiy_f2 = phiy_f1 
-      phiz_f2 = phiz_f1 
-      dif_eff1 = grid % f(s) *(flow % diffusivity + turb % vis_t(c1)/sc_t)  &
-           + (1.-grid % f(s))*(flow % diffusivity + turb % vis_t(c2)/sc_t)
+      phix_f2 = phix_f1
+      phiy_f2 = phiy_f1
+      phiz_f2 = phiz_f1
+      dif_eff1 = grid % f(s) *(flow % diffusivity + turb % vis_t(c1) / sc_t)  &
+           + (1.-grid % f(s))*(flow % diffusivity + turb % vis_t(c2) / sc_t)
       if(turb % model .eq. HYBRID_LES_RANS) then
-        dif_eff1 = grid % f(s) *(flow % diffusivity + turb % vis_t_eff(c1)/sc_t)  &
-             + (1.-grid % f(s))*(flow % diffusivity + turb % vis_t_eff(c2)/sc_t)
-      end if     
-      dif_eff2 = dif_eff1 
+        dif_eff1 =     grid % f(s)   &
+                    * (flow % diffusivity + turb % vis_t_eff(c1) / sc_t)  &
+                 + (1.-grid % f(s))  &
+                    * (flow % diffusivity + turb % vis_t_eff(c2) / sc_t)
+      end if
+      dif_eff2 = dif_eff1
     else
-      phix_f1 = phi % x(c1) 
-      phiy_f1 = phi % y(c1) 
-      phiz_f1 = phi % z(c1) 
-      phix_f2 = phix_f1 
-      phiy_f2 = phiy_f1 
-      phiz_f2 = phiz_f1 
+      phix_f1 = phi % x(c1)
+      phiy_f1 = phi % y(c1)
+      phiz_f1 = phi % z(c1)
+      phix_f2 = phix_f1
+      phiy_f2 = phiy_f1
+      phiz_f2 = phiz_f1
       dif_eff1 = flow % diffusivity + turb % vis_t(c1) / sc_t
       if(turb % model .eq. HYBRID_LES_RANS) then
         dif_eff1 = flow % diffusivity + turb % vis_t_eff(c1) / sc_t
-      end if      
-      dif_eff2 = dif_eff1 
+      end if
+      dif_eff2 = dif_eff1
     end if
 
-
-!   For species, we don't have some wall diffusivity
+    ! Wall diffusivity for species
     if(turb % model .eq. K_EPS .or.        &
        turb % model .eq. K_EPS_ZETA_F .or. &
        turb % model .eq. HYBRID_LES_RANS) then
@@ -162,7 +163,7 @@
           dif_eff2 = dif_eff1
         end if
       end if
-    end if    
+    end if
 
     ! Total (exact) diffusive flux
     f_ex1 = dif_eff1 * (  phix_f1 * grid % sx(s)  &

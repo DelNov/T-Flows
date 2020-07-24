@@ -79,7 +79,7 @@
       end if
 
       b(c) = b(c) + max(0.0, turb % g_buoy(c) * grid % vol(c))
-      a % val(a % dia(c)) = a % val(a % dia(c))                &
+             a % val(a % dia(c)) = a % val(a % dia(c))         &
                                  + max(0.0,-turb % g_buoy(c)   &
                                  * grid % vol(c)               &
                                  / (kin % n(c) + TINY))
@@ -105,7 +105,7 @@
           .and. (alpha_d < 1.05)                                &
           .or.                                                  &
           (turb % hybrid_les_rans_switch .eq. SWITCH_VELOCITY)  &
-          .and. (alpha_v < 0.5.or.alpha_d < 1.05) ) then
+          .and. (alpha_v < 0.5 .or. alpha_d < 1.05) ) then
         a % val(a % dia(c)) = a % val(a % dia(c))             &
                             + flow % density(c) * eps % n(c)  &
                             / (kin % n(c) + TINY) * grid % vol(c)
@@ -163,8 +163,9 @@
 
         if(turb % rough_walls) then
           z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
-          z_o = max(grid % wall_dist(c1)/(e_log * max(turb % y_plus(c1),1.0)),z_o)
- 
+          z_o = max(grid % wall_dist(c1)   &
+              / (e_log * max(turb % y_plus(c1), 1.0)), z_o)
+
           turb % y_plus(c1) = Y_Plus_Rough_Walls(turb,                  &
                                                  u_tau,                 &
                                                  grid % wall_dist(c1),  &
@@ -178,7 +179,7 @@
                                                      z_o)
 
           turb % p_kin(c1) = turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1)) &
-                           / (kappa*(grid % wall_dist(c1)+z_o))
+                           / (kappa * (grid % wall_dist(c1) + z_o))
 
         end if ! rough_walls
 
