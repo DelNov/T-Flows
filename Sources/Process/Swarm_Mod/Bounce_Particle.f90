@@ -116,15 +116,15 @@
       yi = part % y_o + f * dy
       zi = part % z_o + f * dz
 
-      ! particles touch the wall when their center is one radius far from ...
-      ! ... wall this should correct for reflection behavior (HARD coded)
-      if(zi .le. 0.0) then
-        zi = zi + part % d / 2.0    ! for lower channel wall 
-      else
-        if(zi .ge. 2.0) then
-          zi = zi - part % d / 2.0  ! for upper wall
-        end if
-      end if
+      ! ! Particles touch the wall when their center is one radius far from ...
+      ! ! ... wall this should correct for reflection behavior (HARD coded)
+      ! if(zi .le. 0.0) then
+      !   zi = zi + part % d / 2.0    ! for lower channel wall 
+      ! else
+      !   if(zi .ge. 2.0) then
+      !     zi = zi - part % d / 2.0  ! for upper wall
+      !   end if
+      ! end if
 
       !---------------------------------!
       !   The boundary cell is a wall   !
@@ -133,18 +133,21 @@
          Grid_Mod_Bnd_Cond_Type(grid, c2) == WALLFL) then
 
         ! Trap condition (deposition) >>> narrowed the tolerance  <<<
-        if(swarm % rst <= TINY .or. abs(vel_dot_n) <= 1.0e-4) then
+        if(swarm % rst <= TINY .or. abs(vel_dot_n) <= MILI) then
           deposited = .true.
           swarm % n_deposited(c2) = swarm % n_deposited(c2) + 1
           print '(a,i6,a,1pe11.3,1pe11.3,1pe11.3,1pe11.3)',  &
                 ' # Particle ', k, ' deposited at  : ', xi, yi, zi, f
 
-          ! Correct for 'last' computed particle position (HARD coded)!
-          if(part % z_n .le. 0.0) then
-            part % z_n = part % d / 2.0
-          else if(part % z_n .gt. 2.0) then
-            part % z_n = 2.0 - part % d / 2.0
-          end if
+          part % u = 0.0
+          part % v = 0.0
+          part % w = 0.0
+          ! ! Correct for 'last' computed particle position (HARD coded)!
+          ! if(part % z_n .le. 0.0) then
+          !   part % z_n = part % d / 2.0
+          ! else if(part % z_n .gt. 2.0) then
+          !   part % z_n = 2.0 - part % d / 2.0
+          ! end if
 
         ! Reflection condition
         else

@@ -18,7 +18,7 @@
 
   call Mpi_Send(phi_s(1),        & ! send buffer
                 len_s,           & ! send length
-                MPI_LOGICAL8,    & ! datatype
+                MPI_LOGICAL,     & ! datatype
                 (dest-1),        & ! dest,
                 stag,            & ! sendtag,
                 MPI_COMM_WORLD,  &
