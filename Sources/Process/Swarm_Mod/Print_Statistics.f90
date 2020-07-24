@@ -12,6 +12,9 @@
   integer                      :: k, n_dep, n_ref, n_esc
   real                         :: avg_cfl, avg_re, avg_st
   real                         :: max_cfl, max_re, max_st
+  character(len=160)           :: line
+!-----------------------------[Local parameters]-------------------------------!
+  integer, parameter :: T=38  ! indent
 !==============================================================================!
 
   ! Take aliases for the swarm
@@ -58,24 +61,54 @@
   !   Print some data on the screen   !
   !-----------------------------------!
   if(this_proc < 2) then
-    write(*,'(a)') ' #================================================#'
-    write(*,'(a)') ' #                   Swarm statistics'
-    write(*,'(a)') ' #------------------------------------------------#'
-    write(*,'(a,i6)') ' #  Total number of particles     : ',  &
-                      swarm % n_particles
-    write(*,'(a,i6)') ' #  Number of active particles    : ',  &
-                      swarm % n_particles - n_dep - n_esc
-    write(*,'(a,i6)')      ' #  Number of deposited particles : ',  n_dep
-    write(*,'(a,i6)')      ' #  Number of escaped particles   : ',  n_esc
-    write(*,'(a,1pe12.1)') ' #  Total number of reflections   : ',  real(n_ref)
-    write(*,'(a)') ' #================================================#'
-    write(*,'(a)') ' #     Characteristic non-dimensional numbers     #'
-    write(*,'(a)') ' #          (average and maximum values)          #'
-    write(*,'(a)') ' #------------------------------------------------#'
-    write(*,'(a,2(1pe11.3))') ' #    Courant number   :',  avg_cfl, max_cfl
-    write(*,'(a,2(1pe11.3))') ' #    Reynolds number  :',  avg_re,  max_re
-    write(*,'(a,2(1pe11.3))') ' #    Stokes number    :',  avg_st,  max_st
-    write(*,'(a)') ' #------------------------------------------------#'
+    line( 1:160) = ' '
+    line( 1+T:52+T) = ' #================================================#'
+    print *, trim(line)
+    line( 1+T:52+T) = ' #                   Swarm statistics             #'
+    print *, trim(line)
+    line( 1+T:52+T) = ' #------------------------------------------------#'
+    print *, trim(line)
+
+    line( 1+T:52+T) = ' #  Total number of particles     :               #'
+    write(line(37+T:42+T),'(i6)') swarm % n_particles
+    print *, trim(line)
+    line( 1+T:52+T) = ' #  Number of active particles    :               #'
+    write(line(37+T:42+T),'(i6)') swarm % n_particles - n_dep - n_esc
+    print *, trim(line)
+
+    line( 1+T:52+T) = ' #  Number of deposited particles :               #'
+    write(line(37+T:42+T),'(i6)') n_dep
+    print *, trim(line)
+    line( 1+T:52+T) = ' #  Number of escaped particles   :               #'
+    write(line(37+T:42+T),'(i6)') n_esc
+    print *, trim(line)
+    line( 1+T:52+T) = ' #  Total number of reflections   :               #'
+    write(line(37+T:48+T),'(1pe12.1)') real(n_ref)
+    print *, trim(line)
+
+    line( 1+T:52+T) = ' #================================================#'
+    print *, trim(line)
+    line( 1+T:52+T) = ' #     Characteristic non-dimensional numbers     #'
+    print *, trim(line)
+    line( 1+T:52+T) = ' #          (average and maximum values)          #'
+    print *, trim(line)
+    line( 1+T:52+T) = ' #------------------------------------------------#'
+    print *, trim(line)
+
+    line( 1+T:52+T) = ' #    Courant number   :                          #'
+    write(line(26+T:48+T),'(2(1pe11.3))') avg_cfl, max_cfl
+    print *, trim(line)
+
+    line( 1+T:52+T) = ' #    Reynolds number  :                          #'
+    write(line(26+T:48+T),'(2(1pe11.3))') avg_re,  max_re
+    print *, trim(line)
+
+    line( 1+T:52+T) = ' #    Stokes number    :                          #'
+    write(line(26+T:48+T),'(2(1pe11.3))') avg_st,  max_st
+    print *, trim(line)
+
+    line( 1+T:52+T) = ' #------------------------------------------------#'
+    print *, trim(line)
   end if
 
   end subroutine

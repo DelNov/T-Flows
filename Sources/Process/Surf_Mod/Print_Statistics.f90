@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Surf_Mod_Statistics(surf)
+  subroutine Surf_Mod_Print_Statistics(surf)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -14,8 +14,9 @@
   real, allocatable        :: nne(:)
   real                     :: a(3), b(3), tri_v(3)
   real                     :: max_rat, min_rat, max_l, min_l
-  character(len=160) :: line
-  integer, parameter :: T=33                ! indent
+  character(len=160)       :: line
+!-----------------------------[Local parameters]-------------------------------!
+  integer, parameter :: T=33  ! indent
 !==============================================================================!
 
   ! Take aliases
