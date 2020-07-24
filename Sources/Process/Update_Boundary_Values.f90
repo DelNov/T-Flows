@@ -189,7 +189,7 @@
         end if
 
         ! Integrate heat and heated area
-        flow % heat = flow % heat + abs(t % q(c2) * grid % s(s))
+        flow % heat = flow % heat + t % q(c2) * grid % s(s)
         
         if(abs(t % q(c2)) > TINY) then
           flow % heated_area = flow % heated_area + grid % s(s)
