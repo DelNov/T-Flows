@@ -1287,7 +1287,7 @@ function process_full_length_test {
       tail -n1))"
 
     # Launching matplotlib scripts only in interacive mode
-    if [ $MODE -eq "interactive" ]; then
+    if [ $MODE == "interactive" ]; then
       launch_matplotlib \
         "$4" \
         readme_python_matplotlib_script \
