@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Force(grid, ui, a_matrix, b_vector)
+  subroutine User_Mod_Force(flow, ui, a_matrix, b_vector)
 !------------------------------------------------------------------------------!
 !   This is a prototype of a function for customized source for velocity.      !
 !   It is called from "Compute_Velocity" function, just before calling the     !
@@ -8,7 +8,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)    :: grid
+  type(Field_Type)   :: flow
   type(Var_Type)     :: ui        ! velocity component
   type(Matrix_Type)  :: a_matrix  ! system matrix
   real, dimension(:) :: b_vector  ! right hand side vector

@@ -15,13 +15,20 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: flow
   type(Grid_Type),  pointer :: grid
+  type(Var_Type),   pointer :: t
   integer                   :: c
-  real                      :: lf
+  real                      :: lf, pr_t, nc2
 !==============================================================================!
 
   ! Take aliases
   flow => turb % pnt_flow
   grid => flow % pnt_grid
+  t    => flow % t
+
+
+  if(buoyancy) then
+    call Field_Mod_Grad_Variable(flow, t)
+  end if
 
   do c = 1, grid % n_cells
     lf = grid % vol(c) ** ONE_THIRD
@@ -30,6 +37,16 @@
                         * turb % c_dyn(c)    &          ! c_dynamic   
                         * flow % shear(c)
   end do
+
+  if(buoyancy) then
+    do c = 1, grid % n_cells
+      nc2 = -flow % beta * (  grav_x * t % x(c)   &   
+                            + grav_y * t % y(c)   &   
+                            + grav_z * t % z(c))  
+      turb % vis_t_sgs(c) = turb % vis_t_sgs(c)  &
+             * max((1.0 - 2.5 * nc2 / (flow % shear(c) + TINY)), 0.0)
+    end do    
+  end if
 
   call Grid_Mod_Exchange_Cells_Real(grid, turb % vis_t_sgs)
 

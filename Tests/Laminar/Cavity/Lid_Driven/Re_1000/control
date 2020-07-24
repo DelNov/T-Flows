@@ -28,7 +28,7 @@
  DYNAMIC_VISCOSITY      0.001
  HEAT_CAPACITY          1.0
 
- TURBULENCE_MODEL            none
+TURBULENCE_MODEL none
  PRESSURE_MOMENTUM_COUPLING  simple
 
 #----------------------
@@ -71,3 +71,5 @@
     TYPE                inflow
     VARIABLES           u     v     w
     VALUES              1.0   0.0   0.0
+#LOAD_BACKUP_NAME cavity-ts000001.backup
+MULTIPHASE_MODEL none

@@ -304,7 +304,7 @@
   !----------------------------------------!
   !   All other terms defined by the user  !
   !----------------------------------------!
-  call User_Mod_Force(grid, ui, a, b)
+  call User_Mod_Force(flow, ui, a, b)
 
   !-----------------------------------!
   !                                   !

@@ -13,6 +13,7 @@
   real :: Tau_Wall_Low_Re
   real :: Y_Plus_Low_Re
   real :: Y_Plus_Rough_Walls
+  real :: Tau_Wall_Rough_Walls
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
@@ -136,30 +137,40 @@
 
         if(turb % rough_walls) then
           z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
+          z_o = max(grid % wall_dist(c1)/(e_log * max(turb % y_plus(c1),1.0)),z_o)
+ 
           turb % y_plus(c1) = Y_Plus_Rough_Walls(turb,                  &
                                                  u_tau,                 &
                                                  grid % wall_dist(c1),  &
                                                  kin_vis)
 
-          eps % n(c1) = c_mu75 * kin % n(c1)**1.5 / &
+          turb % tau_wall(c1) = Tau_Wall_Rough_Walls(turb,                  &
+                                                     flow % density(c1),    &   
+                                                     u_tau,                 &
+                                                     u_tan,                 &
+                                                     grid % wall_dist(c1),  &
+                                                     z_o)
+
+          p_kin_wf = turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1)) &
+                           / (kappa*(grid % wall_dist(c1)+z_o))
+
+
+          eps_wf = c_mu75 * kin % n(c1)**1.5 / & 
                       ((grid % wall_dist(c1) + z_o) * kappa)
 
+          ebf = Turb_Mod_Ebf_Momentum(turb, c1) 
+
+          p_kin_int = turb % vis_t(c1) * flow % shear(c1)**2
+
+          turb % p_kin(c1) = p_kin_int * exp(-1.0 * ebf) + p_kin_wf  &
+                             * exp(-1.0 / ebf)
+ 
+          fa = min( p_kin_wf * exp(-1.0 / ebf) / (turb % p_kin(c1) + TINY), 1.0)
+
+          eps % n(c1) = (1.0 - fa)**0.5 * eps_int + fa**0.5 * eps_wf
         end if ! rough_walls 
 
         if(turb % y_plus(c1) > 3) then
-          if(buoyancy) then
-             turb % g_buoy(c) = -flow % beta           &
-                              * (grav_x * ut % n(c) +  &
-                                 grav_y * vt % n(c) +  &
-                                 grav_z * wt % n(c))   &
-                              * flow % density(c)
-             b(c) = b(c) + max(0.0, turb % g_buoy(c) * grid % vol(c))
-             a % val(a % dia(c)) = a % val(a % dia(c))    &
-                            + max(0.0,-turb % g_buoy(c)   &
-                            * grid % vol(c)               &
-                            / (kin % n(c) + TINY))
-          end if
-
           ! Adjusting coefficient to fix eps value in near wall calls
           do j = a % row(c1), a % row(c1 + 1) - 1
             a % val(j) = 0.0

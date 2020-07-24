@@ -116,7 +116,7 @@
     write(str2,'(i0.0)') grid % n_cells
   else
     if(grid % n_bnd_cells .eq. 0) then
-      write(str2,'(i1)')   grid % n_bnd_cells  ! i0.0 doesn't work for zero :-/
+      write(str2,'(i1)')   grid % n_bnd_cells  ! 0.0 doesn't work for zero :-/
     else
       write(str2,'(i0.0)') grid % n_bnd_cells
     end if
