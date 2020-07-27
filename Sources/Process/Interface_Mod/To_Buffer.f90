@@ -6,8 +6,6 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Interface_Type) :: inter
-  integer              :: d1, d2         ! first anc second domain
-  type(Grid_Type)      :: grid1, grid2
   real                 :: var1(-inter % pnt_grid1 % n_bnd_cells :  &
                                 inter % pnt_grid1 % n_cells)
   real                 :: var2(-inter % pnt_grid2 % n_bnd_cells :  &

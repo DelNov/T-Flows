@@ -112,9 +112,11 @@
             end if
           end do
 
-          ! On periodic faces
+          ! On periodic faces of domain 1
           do s = 1, grid(d1) % n_faces
-            if(Grid_Mod_Bnd_Cond_Name(grid(d1), s) .eq. keys(1)) then
+            c1 = grid(d1) % faces_c(1,s)
+            if(Grid_Mod_Bnd_Cond_Name(grid(d1), s) .eq. keys(1) .and.  &
+               grid(d1) % comm % cell_proc(c1) .eq. this_proc) then
               n1 = n1 + 1
             end if
           end do
@@ -135,7 +137,9 @@
 
           ! On periodic faces
           do s = 1, grid(d2) % n_faces
-            if(Grid_Mod_Bnd_Cond_Name(grid(d2), s) .eq. keys(2)) then
+            c1 = grid(d2) % faces_c(1,s)
+            if(Grid_Mod_Bnd_Cond_Name(grid(d2), s) .eq. keys(2) .and.  &
+               grid(d2) % comm % cell_proc(c1) .eq. this_proc) then
               n2 = n2 + 1
             end if
           end do
@@ -220,7 +224,8 @@
           do s = 1, grid(d1) % n_faces
             c1 = grid(d1) % faces_c(1,s)
             c2 = grid(d1) % faces_c(2,s)
-            if(Grid_Mod_Bnd_Cond_Name(grid(d1), s) .eq. keys(1)) then
+            if(Grid_Mod_Bnd_Cond_Name(grid(d1), s) .eq. keys(1) .and.  &
+               grid(d1) % comm % cell_proc(c1) .eq. this_proc) then
               n1 = n1 + 1
               pos = n1
               if(n_proc > 1) pos = pos + off_1(this_proc)
@@ -255,7 +260,8 @@
           do s = 1, grid(d2) % n_faces
             c1 = grid(d2) % faces_c(1,s)
             c2 = grid(d2) % faces_c(2,s)
-            if(Grid_Mod_Bnd_Cond_Name(grid(d2), s) .eq. keys(2)) then
+            if(Grid_Mod_Bnd_Cond_Name(grid(d2), s) .eq. keys(2) .and.  &
+               grid(d2) % comm % cell_proc(c1) .eq. this_proc) then
               n2 = n2 + 1
               pos = n2
               if(n_proc > 1) pos = pos + off_2(this_proc)
