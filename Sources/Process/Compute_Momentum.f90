@@ -215,8 +215,8 @@
     end if
 
     ! Compute the coefficients for the sysytem matrix
-    a12 = a0 - min(m_flux % n(s), real(0.0))
-    a21 = a0 + max(m_flux % n(s), real(0.0))
+    a12 = a0 - min(m_flux % n(s), 0.0)
+    a21 = a0 + max(m_flux % n(s), 0.0)
 
     ! Fill the system matrix
     if(c2 > 0) then
