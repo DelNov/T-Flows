@@ -36,7 +36,7 @@
       !   ... send will put data in this globall pool)      !
       !-----------------------------------------------------!
       if(part % proc .eq. this_proc) then
-        i = (k-1) * N_I_VARS
+        i = (k-1) * swarm % N_I_VARS
         swarm % i_work(i + 1) = part % proc  ! where it resides
         swarm % i_work(i + 2) = part % buff  ! where it wants to go
         swarm % i_work(i + 3) = part % cell
@@ -44,7 +44,7 @@
         swarm % i_work(i + 5) = grid % comm % cell_glo(part % cell)
         swarm % i_work(i + 6) = grid % comm % node_glo(part % node)
 
-        i = (k-1) * N_R_VARS
+        i = (k-1) * swarm % N_R_VARS
         swarm % r_work(i +  1) = part % x_n
         swarm % r_work(i +  2) = part % y_n
         swarm % r_work(i +  3) = part % z_n
@@ -63,10 +63,12 @@
     !-----------------------!
     !   Exchange the data   !
     !-----------------------!
-    call Comm_Mod_Global_Sum_Int_Array (swarm % n_particles * N_I_VARS,  &
-                                        swarm % i_work)
-    call Comm_Mod_Global_Sum_Real_Array(swarm % n_particles * N_R_VARS,  &
-                                        swarm % r_work)
+    call Comm_Mod_Global_Sum_Int_Array (                   &
+                  swarm % n_particles * swarm % N_I_VARS,  &
+                  swarm % i_work)
+    call Comm_Mod_Global_Sum_Real_Array(                   &
+                  swarm % n_particles * swarm % N_R_VARS,  &
+                  swarm % r_work)
 
     !-----------------------------------------!
     !   Distribute global data on particles   !
@@ -76,7 +78,7 @@
       ! Take alias
       part => swarm % particle(k)
 
-      i = (k-1) * N_I_VARS
+      i = (k-1) * swarm % N_I_VARS
       part % proc = swarm % i_work(i + 1)
       part % buff = swarm % i_work(i + 2)
       part % cell = swarm % i_work(i + 3)
@@ -119,7 +121,7 @@
         part % proc = part % buff
       end if
 
-      i = (k-1) * N_R_VARS
+      i = (k-1) * swarm % N_R_VARS
 
       part % x_n = swarm % r_work(i +  1)
       part % y_n = swarm % r_work(i +  2)

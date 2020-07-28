@@ -97,7 +97,7 @@
     type(Field_Type), pointer :: pnt_flow  ! flow field for which it is defined
     type(Turb_Type),  pointer :: pnt_turb  ! turb field for which it is defined
 
-    integer                          :: n_particles
+    integer                          :: n_particles = 0
     type(Particle_Type), allocatable :: particle(:)
 
     ! Density of this swarm
@@ -154,11 +154,13 @@
     logical, allocatable :: l_work(:)
     real,    allocatable :: r_work(:)
 
+    ! Working arrays, buffers for parallel version
+    ! (Keyword "parameter: not allowed inside a type
+    ! declaration. One might think of making a function)
+    integer :: N_I_VARS =  6
+    integer :: N_L_VARS =  2
+    integer :: N_R_VARS = 12
   end type
-
-  integer, parameter :: N_I_VARS =  6
-  integer, parameter :: N_L_VARS =  2
-  integer, parameter :: N_R_VARS = 12
 
   !---------------------!
   !   Model constants   !
