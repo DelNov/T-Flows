@@ -301,10 +301,12 @@
       ! Interface tracking
       if(mult(d) % model .eq. VOLUME_OF_FLUID) then
         call Multiphase_Mod_Main(mult(d), flow(d), turb(d), sol(d), n)
-        call Save_Surf(mult(d) % surf, n)
-        call Save_Results(flow(d), turb(d), mult(d), swarm(d), n,  &
-                          plot_inside=.true., domain=d)
-        call Surf_Mod_Clean(mult(d) % surf)
+        if(mult(d) % track_front) then
+          call Save_Surf(mult(d) % surf, n)
+          call Save_Results(flow(d), turb(d), mult(d), swarm(d), n,  &
+                            plot_inside=.true., domain=d)
+        end if
+        call Multiphase_Mod_Update_Physical_Properties(mult(d), backup(d))
       end if
 
       ! Lagrangian particle tracking
