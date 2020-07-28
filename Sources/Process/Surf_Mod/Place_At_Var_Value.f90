@@ -199,9 +199,9 @@
     dist = norm2( (/surf % vert(v) % x_n,  &
                     surf % vert(v) % y_n,  &
                     surf % vert(v) % z_n/) )
-    surf % vert(v) % x_n = surf % vert(v) % x_n * 0.2578125 / dist
-    surf % vert(v) % y_n = surf % vert(v) % y_n * 0.2578125 / dist
-    surf % vert(v) % z_n = surf % vert(v) % z_n * 0.2578125 / dist
+    surf % vert(v) % x_n = surf % vert(v) % x_n * 0.25 / dist
+    surf % vert(v) % y_n = surf % vert(v) % y_n * 0.25 / dist
+    surf % vert(v) % z_n = surf % vert(v) % z_n * 0.25 / dist
   end do
   n_verts_in_buffers = 0
   do v = 1, nv
@@ -218,17 +218,11 @@
   ! Restore the true values of phi
   phi % n(:) = phi_o(:)
 
-  RETURN
+  return
 
-  do j = 1, 9
-    call Surf_Mod_Relax_Topology(surf)
-    call Surf_Mod_Smooth(surf, phi, phi_e)
-  end do
-
-  call Surf_Mod_Statistics(surf)
-
+  ! The rest is still experimental
   call Surf_Mod_Refine(surf, 4)
-  do j = 1, 9
+  do j = 1, 3
     call Surf_Mod_Relax_Topology(surf)
     call Surf_Mod_Smooth(surf, phi, phi_e)
   end do
