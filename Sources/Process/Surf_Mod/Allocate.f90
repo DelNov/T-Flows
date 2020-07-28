@@ -21,9 +21,10 @@
   surf % cell_has_vertex(:) = .false.
 
   ! Allocate memory for working arrays
-  allocate(i_work(surf % n_verts * N_I_VARS))
-  allocate(l_work(surf % n_verts * N_L_VARS))
-  allocate(r_work(surf % n_verts * N_R_VARS))
+  ! (Not used yet, will be used in parallel version)
+  ! allocate(i_work(surf % n_verts * surf % N_I_VARS))
+  ! allocate(l_work(surf % n_verts * surf % N_L_VARS))
+  ! allocate(r_work(surf % n_verts * surf % N_R_VARS))
 
   !-----------------------------!
   !   Initialize all elements   !

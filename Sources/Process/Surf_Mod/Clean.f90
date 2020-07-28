@@ -11,9 +11,10 @@
   deallocate(surf % cell_has_vertex)
 
   ! Dellocate memory for working arrays
-  deallocate(i_work)
-  deallocate(l_work)
-  deallocate(r_work)
+  ! (Not used yet, will be used in parallel version)
+  ! deallocate(i_work)
+  ! deallocate(l_work)
+  ! deallocate(r_work)
 
   !-----------------------------!
   !   Deallocate all elements   !
