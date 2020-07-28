@@ -202,5 +202,6 @@
     include 'Control_Mod/Numerics/Max_Courant_Vof.f90'
     include 'Control_Mod/Numerics/Max_Substep_Cycles_Vof.f90'
     include 'Control_Mod/Numerics/Nodal_Curvature.f90'
+    include 'Control_Mod/Numerics/Track_Front.f90'
     include 'Control_Mod/Numerics/Skewness_Correction_Vof.f90'
   end module
