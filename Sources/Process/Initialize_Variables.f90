@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Initialize_Variables(flow, turb, mult, swarm)
+  subroutine Initialize_Variables(flow, turb, mult, swarm, sol)
 !------------------------------------------------------------------------------!
 !   Initialize dependent variables.  (It is a bit of a mess still)             !
 !------------------------------------------------------------------------------!
@@ -21,8 +21,9 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),      target :: flow
   type(Turb_Type),       target :: turb
-  type(Multiphase_Type), target :: mult
-  type(Swarm_Type),      target :: swarm
+  type(Multiphase_Type)         :: mult
+  type(Swarm_Type)              :: swarm
+  type(Solver_Type)             :: sol
 !----------------------------------[Calling]-----------------------------------!
   integer :: Key_Ind
 !-----------------------------------[Locals]-----------------------------------!
@@ -354,7 +355,7 @@
 
   end if
 
-  call User_Mod_Initialize_Variables(flow, turb, mult, swarm)
+  call User_Mod_Initialize_Variables(flow, turb, mult, swarm, sol)
 
   !--------------------------------!
   !      Calculate the inflow      !
