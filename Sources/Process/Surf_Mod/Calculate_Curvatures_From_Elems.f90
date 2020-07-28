@@ -96,6 +96,9 @@
   !---------------------------------------------!
 
   surf % elem(1:surf % n_elems) % curv = 0.0
+  surf % elem(1:surf % n_elems) % xc   = 0.0
+  surf % elem(1:surf % n_elems) % yc   = 0.0
+  surf % elem(1:surf % n_elems) % zc   = 0.0
 
   do e = 1, surf % n_elems
 
@@ -138,6 +141,9 @@
     rho = sqrt(x*x + y*y + z*z - phi(1))
 
     surf % elem(e) % curv = 1.0 / rho
+    surf % elem(e) % xc   = x
+    surf % elem(e) % yc   = y
+    surf % elem(e) % zc   = z
   end do
 
   ! Compute average curvature (for debugging)

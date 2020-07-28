@@ -26,6 +26,9 @@
   !----------------------------------------------!
 
   surf % elem(1:surf % n_elems) % curv = 0.0
+  surf % elem(1:surf % n_elems) % xc   = 0.0
+  surf % elem(1:surf % n_elems) % yc   = 0.0
+  surf % elem(1:surf % n_elems) % zc   = 0.0
 
   do s = 1, surf % n_sides
     vert(1) = surf % side(s) % a
@@ -74,6 +77,20 @@
     surf % elem(surf % side(s) % ea) % curv + 1.0 / rho * ONE_THIRD
     surf % elem(surf % side(s) % eb) % curv =  &
     surf % elem(surf % side(s) % eb) % curv + 1.0 / rho * ONE_THIRD
+
+    ! This looks kind of crude
+    surf % elem(surf % side(s) % ea) % xc =  &
+    surf % elem(surf % side(s) % ea) % xc + x * ONE_THIRD
+    surf % elem(surf % side(s) % ea) % yc =  &
+    surf % elem(surf % side(s) % ea) % yc + y * ONE_THIRD
+    surf % elem(surf % side(s) % ea) % zc =  &
+    surf % elem(surf % side(s) % ea) % zc + z * ONE_THIRD
+    surf % elem(surf % side(s) % eb) % xc =  &
+    surf % elem(surf % side(s) % eb) % xc + x * ONE_THIRD
+    surf % elem(surf % side(s) % eb) % yc =  &
+    surf % elem(surf % side(s) % eb) % yc + y * ONE_THIRD
+    surf % elem(surf % side(s) % eb) % zc =  &
+    surf % elem(surf % side(s) % eb) % zc + z * ONE_THIRD
   end do
 
   ! Compute average curvature (for debugging)

@@ -53,6 +53,9 @@
   !----------------------------------------------!
 
   surf % elem(1:surf % n_elems) % curv = 0.0
+  surf % elem(1:surf % n_elems) % xc   = 0.0
+  surf % elem(1:surf % n_elems) % yc   = 0.0
+  surf % elem(1:surf % n_elems) % zc   = 0.0
 
   do v = 1, surf % n_verts
 
