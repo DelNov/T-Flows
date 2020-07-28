@@ -125,6 +125,8 @@
     call Control_Mod_Factor_Number_Cells_Distance_Function_Vof(mult % c_eps)
     call Control_Mod_Distance_Function_Time_Integration_Scheme(name)
     mult % t_dist_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
+    ! Reconstruct surface
+    call Control_Mod_Track_Front(mult % track_front, .true.)
   end if
 
   !--------------------------------!
