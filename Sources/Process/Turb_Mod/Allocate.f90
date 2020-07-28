@@ -10,7 +10,6 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type),  target :: turb
   type(Field_Type),      target :: flow
-!  type(Multiphase_Type), target :: mult
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   integer                  :: nb, nc
