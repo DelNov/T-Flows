@@ -40,9 +40,10 @@
 
     real :: sumx, sumy, sumz
 
-    integer :: nne       ! number of neighbouring elements
-    integer :: nnv       ! number of neighbouring vertices
-    logical :: boundary  ! is vertex on a boundary
+    integer :: nne                     ! number of neighbouring elements
+    integer :: nnv                     ! number of neighbouring vertices
+    logical :: boundary                ! is vertex on a boundary
+    integer, allocatable :: vert_e(:)  ! list of elements around the vertex
 
     ! The closest cell, node, boundary cell and face
     integer :: cell
@@ -70,6 +71,8 @@
     integer :: ei, ej, ek
     integer :: si, sj, sk
     real    :: nx, ny, nz  ! surface normal vector
+    real    :: xc, yc, zc  ! center of a sphere
+    real    :: xe, ye, ze  ! center of element
     real    :: area
     real    :: curv
 
@@ -104,25 +107,30 @@
 
     ! Logical array if cell has particles
     logical, allocatable :: cell_has_vertex(:)
+
+    ! Working arrays, buffers for parallel version
+    ! (Keyword "parameter: not allowed inside a type
+    ! declaration. One might think of making a function)
+    integer :: N_I_VARS = 3
+    integer :: N_L_VARS = 2
+    integer :: N_R_VARS = 8
   end type
 
-  ! Working arrays, buffers for parallel version
-  integer, parameter   :: N_I_VARS = 3
-  integer, parameter   :: N_L_VARS = 2
-  integer, parameter   :: N_R_VARS = 8
   integer, allocatable :: i_work(:)
   logical, allocatable :: l_work(:)
   real,    allocatable :: r_work(:)
 
   contains
 
-! include 'Surf_Mod/Advance_Particles.f90'
+! include 'Surf_Mod/Advance_Vertices.f90'
   include 'Surf_Mod/Allocate.f90'
+  include 'Surf_Mod/Calculate_Element_Centroids.f90'
   include 'Surf_Mod/Calculate_Element_Normals.f90'
   include 'Surf_Mod/Clean.f90'
   include 'Surf_Mod/Count_Elements_Neighbours.f90'
   include 'Surf_Mod/Count_Vertex_Elements.f90'
   include 'Surf_Mod/Compress_Vertices.f90'
+  include 'Surf_Mod/Compute_Distance_Function_And_Vof.f90'
   include 'Surf_Mod/Calculate_Curvatures_From_Edges.f90'
   include 'Surf_Mod/Calculate_Curvatures_From_Elems.f90'
   include 'Surf_Mod/Calculate_Curvatures_From_Verts.f90'
@@ -130,6 +138,7 @@
   include 'Surf_Mod/Find_Sides.f90'
   include 'Surf_Mod/Find_Nearest_Cell.f90'
   include 'Surf_Mod/Find_Nearest_Node.f90'
+  include 'Surf_Mod/Find_Vertex_Elements.f90'
   include 'Surf_Mod/Handle_3_Points.f90'
   include 'Surf_Mod/Handle_4_Points.f90'
   include 'Surf_Mod/Handle_5_Points.f90'

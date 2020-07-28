@@ -31,7 +31,7 @@
   integer                    :: v, n_vert, n_verts_in_buffers
   integer                    :: en(12,2)  ! edge numbering
   real                       :: phi1, phi2, xn1, yn1, zn1, xn2, yn2, zn2, w1, w2
-  real                       :: surf_v(3)
+  real                       :: surf_v(3), dist
 !==============================================================================!
 
   ! Take aliases
@@ -193,6 +193,27 @@
     call Surf_Mod_Relax_Topology(surf)
     call Surf_Mod_Smooth(surf, phi, phi_e)
   end do
+
+  ! From this point ...
+  do v = 1, nv
+    dist = norm2( (/surf % vert(v) % x_n,  &
+                    surf % vert(v) % y_n,  &
+                    surf % vert(v) % z_n/) )
+    surf % vert(v) % x_n = surf % vert(v) % x_n * 0.2578125 / dist
+    surf % vert(v) % y_n = surf % vert(v) % y_n * 0.2578125 / dist
+    surf % vert(v) % z_n = surf % vert(v) % z_n * 0.2578125 / dist
+  end do
+  n_verts_in_buffers = 0
+  do v = 1, nv
+    call Surf_Mod_Find_Nearest_Cell(surf, v, n_verts_in_buffers)
+    call Surf_Mod_Find_Nearest_Node(surf, v)
+  end do
+  ! ... down to here is just for development
+
+  ! Element geometry has changed, recompute geometrical quantities
+  call Surf_Mod_Find_Vertex_Elements(surf)
+  call Surf_Mod_Calculate_Element_Normals(surf, phi)
+  call Surf_Mod_Calculate_Element_Centroids(surf)
 
   ! Restore the true values of phi
   phi % n(:) = phi_o(:)

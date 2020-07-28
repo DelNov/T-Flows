@@ -24,7 +24,7 @@
 
   call Var_Mod_Allocate_Solution(mult % vof, grid, 'VOF', '')
 
-  if (mult % d_func) then
+  if(mult % d_func) then
     call Var_Mod_Allocate_Solution(mult % dist_func, grid, 'D_FUNC', '')
   end if
 

@@ -239,6 +239,9 @@ SRC_MOD += Bulk_Mod.f90		\
 # User_Mod should come before Save_Results_Mod
 SRC_MOD += User_Mod.f90
 
+# Backup_Mod should come close to the end because it uses all other modules
+SRC_MOD += Backup_Mod.f90
+
 # Save_Results_Mod - conditional VTU/CGNS support
 ifeq ($(CGNS), no)
   SRC_MOD += Save_Grid_Mod_Vtu.f90	\
@@ -252,9 +255,6 @@ else
   SRC_MOD += Save_Grid_Mod_Cgns.f90	\
              Save_Results_Mod_Cgns.f90
 endif
-
-# Backup_Mod should come last because it uses all other modules
-SRC_MOD += Backup_Mod.f90
 
 #---------------
 #   Functions

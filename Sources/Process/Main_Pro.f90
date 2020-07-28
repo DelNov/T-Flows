@@ -38,7 +38,6 @@
   type(Grid_Type)       :: grid(MD)        ! grid used in computations
   type(Field_Type)      :: flow(MD)        ! flow field we will be solving for
   type(Swarm_Type)      :: swarm(MD)       ! swarm of particles
-  type(Surf_Type)       :: surf(MD)        ! interface between two phases
   type(Turb_Type)       :: turb(MD)        ! turbulence modelling
   type(Multiphase_Type) :: mult(MD)        ! multiphase modelling
   type(Solver_Type)     :: sol(MD)         ! linear solvers
@@ -157,10 +156,15 @@
     call Read_Control_Numerical(flow(d), turb(d), mult(d))
 
     call Grid_Mod_Calculate_Face_Geometry(grid(d))
-    call Grid_Mod_Find_Nodes_Cells(grid(d))      ! for Lagrangian particle track
+    call Grid_Mod_Find_Nodes_Cells(grid(d))
     call Grid_Mod_Find_Periodic_Faces(grid(d))
-    call Grid_Mod_Find_Cells_Faces(grid(d))      ! for Multiphase Module
+    call Grid_Mod_Find_Cells_Faces(grid(d))
     call Grid_Mod_Calculate_Global_Volumes(grid(d))
+    call Grid_Mod_Calculate_Weights_Cells_To_Nodes(grid(d))
+    call Grid_Mod_Calculate_Weights_Nodes_To_Cells(grid(d))
+    call Field_Mod_Calculate_Grad_Matrix(flow(d))
+    call Field_Mod_Calculate_Grad_Matrix_Nodes_To_Cells(flow(d))
+    call Field_Mod_Calculate_Grad_Matrix_Cells_To_Nodes(flow(d))
 
     ! Allocate memory for linear systems of equations
     ! (You need face geomtry for this step)
@@ -186,7 +190,8 @@
 
     ! Initialize variables
     if(.not. backup(d)) then
-      call Initialize_Variables(flow(d), turb(d), mult(d), swarm(d))
+      call Initialize_Variables(flow(d), turb(d), mult(d), swarm(d), sol(d))
+      call Save_Surf(mult(d) % surf, n)
     end if
 
     if(mult(d) % model .eq. VOLUME_OF_FLUID) then
@@ -194,10 +199,6 @@
         flow % piso_status = .false.
       end if
       call Multiphase_Mod_Update_Physical_Properties(mult(d), backup(d))
-      call Grid_Mod_Calculate_Weights_Cells_To_Nodes(grid(d))
-      call Grid_Mod_Calculate_Weights_Nodes_To_Cells(grid(d))
-      call Field_Mod_Calculate_Grad_Matrix_Nodes_To_Cells(flow(d))
-      call Field_Mod_Calculate_Grad_Matrix_Cells_To_Nodes(flow(d))
     end if
 
     ! Initialize monitoring points
@@ -218,9 +219,6 @@
     if(turb(d) % model .eq. HYBRID_LES_PRANDTL .and. .not. backup(d)) then
       call Find_Nearest_Wall_Cell(turb(d))
     end if
-
-    ! Prepare the gradient matrix for velocities
-    call Field_Mod_Calculate_Grad_Matrix(flow(d))
 
     ! Print the areas of monitoring planes
     call Bulk_Mod_Print_Areas(flow(d) % bulk)
@@ -300,27 +298,13 @@
       ! Turbulence models initializations
       call Turb_Mod_Init(turb(d))
 
-      ! Volume of Fluid
+      ! Interface tracking
       if(mult(d) % model .eq. VOLUME_OF_FLUID) then
-        flow(d) % m_flux % o(1:) = flow(d) % m_flux % n(1:)  &
-                                 / flow(d) % density_f(1:)
-        ! Update the values at boundaries
-        call Update_Boundary_Values(flow(d), turb(d), mult(d))
-        call Multiphase_Mod_Compute_Vof(mult(d), sol(d), flow(d) % dt, n)
-        call Field_Mod_Body_Forces(flow(d))
-        call Multiphase_Averaging(flow(d), mult(d), mult(d) % vof)
-
-        ! call Surf_Mod_Allocate(surf(d), flow(d))
-        ! call Surf_Mod_Place_At_Var_Value(surf(d),        &
-        !                                  mult(d) % vof,  &
-        !                                  sol(d),         &
-        !                                  0.5,            &
-        !                                  .false.)  ! don't print messages
-        ! call Surf_Mod_Calculate_Curvatures_From_Elems(surf(d))
-        ! call Save_Surf(surf(d), n)
-        ! call Surf_Mod_Clean(surf(d))
-      else
-        flow(d) % m_flux % o(1:) = flow(d) % m_flux % n(1:)
+        call Multiphase_Mod_Main(mult(d), flow(d), turb(d), sol(d), n)
+        call Save_Surf(mult(d) % surf, n)
+        call Save_Results(flow(d), turb(d), mult(d), swarm(d), n,  &
+                          plot_inside=.true., domain=d)
+        call Surf_Mod_Clean(mult(d) % surf)
       end if
 
       ! Lagrangian particle tracking

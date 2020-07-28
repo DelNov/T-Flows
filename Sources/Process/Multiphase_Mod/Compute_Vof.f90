@@ -296,7 +296,7 @@
 
   ! If distance function is calculated
   if (mult % d_func) then
-    call Multiphase_Mod_Compute_Distance_Function(mult, sol, flow % dt, n)
+    call Multiphase_Mod_Vof_Compute_Distance(mult, sol, flow % dt, n)
   end if
 
   !----------------------------------------!

@@ -17,6 +17,8 @@
   use Const_Mod
   use Comm_Mod
   use Bulk_Mod
+  use Surf_Mod
+  use Turb_Mod
   use Matrix_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -33,6 +35,7 @@
 
     type(Grid_Type),  pointer :: pnt_grid  ! grid for which it is defined
     type(Field_Type), pointer :: pnt_flow  ! flow field for which it is defined
+    type(Surf_Type)           :: surf      ! pointer to surface
 
     ! Volume fraction (colour function)
     type(Var_Type)    :: vof
@@ -40,7 +43,7 @@
     real, allocatable :: curv(:)   ! curvature
 
     ! Distance function
-    type(Var_Type)    :: dist_func
+    type(Var_Type) :: dist_func
 
     ! Physical properties in case of multiphase flow
     real, allocatable :: phase_visc(:), phase_dens(:)
@@ -86,10 +89,14 @@
     real    :: c_tau, c_eps
 
     ! Averaging
-    integer, allocatable  :: avg_cells(:,:)
+    integer, allocatable :: avg_cells(:,:)
 
     ! Switch calculation curvature at nodes or at cells
+    ! (This is curvature calculation from VOF function (no front)
     logical :: nodal_curvature
+
+    ! Triangulate the front
+    logical :: track_front
 
     ! Variable holding the multiphase model
     integer :: model
@@ -106,16 +113,18 @@
   integer, parameter :: VOLUME_OF_FLUID       = 50023
   integer, parameter :: LAGRANGIAN_PARTICLES  = 50033
   integer, parameter :: EULER_EULER           = 50047
+  integer, parameter :: FRONT_TRACKING        = 50051
 
   contains
 
   include 'Multiphase_Mod/Alias_Vof.f90'
   include 'Multiphase_Mod/Allocate.f90'
-  include 'Multiphase_Mod/Compute_Distance_Function.f90'
   include 'Multiphase_Mod/Compute_Vof.f90'
+  include 'Multiphase_Mod/Main.f90'
   include 'Multiphase_Mod/Vof_Averaging.f90'
   include 'Multiphase_Mod/Vof_Boundary_Extrapolation.f90'
   include 'Multiphase_Mod/Vof_Coefficients.f90'
+  include 'Multiphase_Mod/Vof_Compute_Distance.f90'
   include 'Multiphase_Mod/Vof_Correct_Beta.f90'
   include 'Multiphase_Mod/Vof_Curvature_Csf.f90'
   include 'Multiphase_Mod/Vof_Curvature_Nodal.f90'
