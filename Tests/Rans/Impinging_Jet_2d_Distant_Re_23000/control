@@ -13,7 +13,7 @@
  RESULTS_SAVE_INTERVAL   120
  BACKUP_SAVE_INTERVAL     60
 
- LOAD_BACKUP_NAME  jet-ts000120.backup
+ # LOAD_BACKUP_NAME  jet-ts000120.backup
 
 #-------------------
 # Monitoring points 
