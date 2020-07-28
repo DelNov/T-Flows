@@ -252,7 +252,7 @@
           flow % p % res_scal0 = max(flow % p % res_scal0, mass_err)
         end if
       end if
-      flow % p % res = flow % p % res / flow % p % res_scal0
+      flow % p % res = flow % p % res / (flow % p % res_scal0 + PICO)
     end if
   end if
 
