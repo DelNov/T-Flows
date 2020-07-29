@@ -1,6 +1,6 @@
 !==============================================================================!
-  subroutine Backup_Mod_Write_Face(comm, fh, d, vc, grid, var_name, flux,  &
-                                   correct_sign)
+  subroutine Backup_Mod_Write_Face_Real(grid, fh, d, vc, var_name, flux,  &
+                                        correct_sign)
 !------------------------------------------------------------------------------!
 !   Writes backup files. name.backup                                           !
 !------------------------------------------------------------------------------!
@@ -11,14 +11,14 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Comm_Type)   :: comm
-  integer           :: fh, d, vc
-  type(Grid_Type)   :: grid
-  character(len=*)  :: var_name
-  real              :: flux(grid % n_faces)
-  logical, optional :: correct_sign  ! in case of face fluxes, signs might have
-                                     ! to be changed (check it one day)
+  type(Grid_Type), target :: grid
+  integer                 :: fh, d, vc
+  character(len=*)        :: var_name
+  real                    :: flux(grid % n_faces)
+  logical, optional       :: correct_sign  ! for face fluxes, signs might have
+                                           ! to be changed (check it one day)
 !-----------------------------------[Locals]-----------------------------------!
+  type(Comm_Type), pointer      :: comm
   integer                       :: s, c, c1, c2, cg1, cg2, mc, max_cnt, nb, nc
   integer, allocatable          :: cells_cg(:,:)   ! cells' cells
   integer, allocatable          :: cells_fc(:,:)   ! cells' faces
@@ -26,6 +26,7 @@
 !==============================================================================!
 
   ! Take aliases
+  comm => grid % comm
   nb = grid % n_bnd_cells
   nc = grid % n_cells
 
@@ -136,8 +137,7 @@
         rvalues(c) = flux( cells_fc(mc,c) )
       end if
     end do
-    call Backup_Mod_Write_Cell(comm,  &
-                               fh, d, vc, cf_name, rvalues(1:comm % nc_s))
+    call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, cf_name, rvalues(-nb:nc))
   end do
 
   deallocate(cells_cg)

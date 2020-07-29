@@ -1,6 +1,6 @@
 !==============================================================================!
-  subroutine Backup_Mod_Read_Face(comm, fh, disp, vc, grid, var_name, flux,  &
-                                  correct_sign)
+  subroutine Backup_Mod_Read_Face_Real(grid, fh, disp, vc, var_name, flux,  &
+                                       correct_sign)
 !------------------------------------------------------------------------------!
 !   Reads face-based variable (flux) using cell-based arrays.                  !
 !------------------------------------------------------------------------------!
@@ -11,20 +11,21 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Comm_Type)   :: comm
-  integer           :: fh, disp, vc
-  type(Grid_Type)   :: grid
-  character(len=*)  :: var_name
-  real              :: flux(grid % n_faces)
-  logical, optional :: correct_sign  ! in case of face fluxes, signs might have
-                                     ! to be changed (check it one day)
+  type(Grid_Type), target :: grid
+  integer                 :: fh, disp, vc
+  character(len=*)        :: var_name
+  real                    :: flux(grid % n_faces)
+  logical, optional       :: correct_sign  ! for face fluxes, signs might have
+                                           ! to be changed (check it one day)
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: s, c, c1, c2, cg1, cg2, mc, max_cnt, nb, nc
-  integer, allocatable :: cells_cg(:,:)   ! cells' cells
-  integer, allocatable :: cells_fc(:,:)   ! cells' faces
+  type(Comm_Type), pointer :: comm
+  integer                  :: s, c, c1, c2, cg1, cg2, mc, max_cnt, nb, nc
+  integer, allocatable     :: cells_cg(:,:)   ! cells' cells
+  integer, allocatable     :: cells_fc(:,:)   ! cells' faces
 !==============================================================================!
 
   ! Take aliases
+  comm => grid % comm
   nb = grid % n_bnd_cells
   nc = grid % n_cells
 
@@ -108,8 +109,8 @@
   do mc = 1, max_cnt
     rvalues(:) = 0.0
     write(var_name(11:12), '(i2.2)') mc  ! set name of the backup variable
-    call Backup_Mod_Read_Cell(comm,  &
-                              fh, disp, vc, var_name, rvalues(1:comm % nc_s))
+    call Backup_Mod_Read_Cell_Real(grid, fh, disp, vc, var_name,  &
+                                   rvalues(-nb:nc))
     call Grid_Mod_Exchange_Cells_Real(grid, rvalues(-nb:nc))
     do c = 1, grid % n_cells - grid % comm % n_buff_cells
       if( cells_cg(mc, c) .ne. 0 ) then

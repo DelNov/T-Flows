@@ -10,12 +10,16 @@
   type(Var_Type)   :: var
 !-----------------------------------[Locals]-----------------------------------!
   type(Comm_Type), pointer :: comm
+  type(Grid_Type), pointer :: grid
   character(len=80)        :: vn
-  integer                  :: vs, disp_loop, cnt_loop
+  integer                  :: vs, disp_loop, cnt_loop, nb, nc
 !==============================================================================!
 
-  ! Take alias
-  comm => var % pnt_grid % comm
+  ! Take aliases
+  grid => var % pnt_grid
+  comm => grid % comm
+  nb = grid % n_bnd_cells
+  nc = grid % n_cells
 
   cnt_loop  = 0
   disp_loop = 0
@@ -34,12 +38,18 @@
     ! If variable is found, read it and retrun
     if(vn .eq. var_name) then
       if(this_proc < 2) print *, '# Reading variable: ', trim(vn)
-      call Comm_Mod_Read_Cell_Real(comm,fh,var % n(1:comm % nc_s),  disp_loop)
-      call Comm_Mod_Read_Bnd_Real (comm,fh,var % n(-comm % nb_f:  &
-                                                   -comm % nb_l),   disp_loop)
-      call Comm_Mod_Read_Bnd_Real (comm,fh,var % q(-comm % nb_f:  &
-                                                   -comm % nb_l),   disp_loop)
-      call Comm_Mod_Read_Cell_Real(comm,fh,var % o(1:comm % nc_s),  disp_loop)
+      call Comm_Mod_Read_Cell_Real(comm,fh,var % n(1:comm % nc_s), disp_loop)
+      call Comm_Mod_Read_Bnd_Real (comm,fh,var % n( -comm % nb_f:  &
+                                                    -comm % nb_l), disp_loop)
+      call Comm_Mod_Read_Cell_Real(comm,fh,var % q(1:comm % nc_s), disp_loop)
+      call Comm_Mod_Read_Bnd_Real (comm,fh,var % q( -comm % nb_f:  &
+                                                    -comm % nb_l), disp_loop)
+      call Comm_Mod_Read_Cell_Real(comm,fh,var % o(1:comm % nc_s), disp_loop)
+      call Comm_Mod_Read_Bnd_Real (comm,fh,var % o( -comm % nb_f:  &
+                                                    -comm % nb_l), disp_loop)
+      call Grid_Mod_Exchange_Cells_Real(grid, var % n(-nb:nc))
+      call Grid_Mod_Exchange_Cells_Real(grid, var % q(-nb:nc))
+      call Grid_Mod_Exchange_Cells_Real(grid, var % o(-nb:nc))
       disp = disp_loop
       return
 

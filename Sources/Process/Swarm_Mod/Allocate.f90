@@ -89,9 +89,9 @@
 
   ! Reflected and deposited particles on the walls and the escaped particles
   if(nb > 0) then
-    allocate(swarm % n_reflected(-nb:-1));  swarm % n_reflected(:) = 0
-    allocate(swarm % n_deposited(-nb:-1));  swarm % n_deposited(:) = 0
-    allocate(swarm % n_escaped  (-nb:-1));  swarm % n_escaped(:)   = 0
+    allocate(swarm % n_reflected(-nb:nc));  swarm % n_reflected(:) = 0
+    allocate(swarm % n_deposited(-nb:nc));  swarm % n_deposited(:) = 0
+    allocate(swarm % n_escaped  (-nb:nc));  swarm % n_escaped(:)   = 0
   else  ! take care of subdomains which have no boundary cells
     allocate(swarm % n_reflected(0:0));  swarm % n_reflected(:) = 0
     allocate(swarm % n_deposited(0:0));  swarm % n_deposited(:) = 0
