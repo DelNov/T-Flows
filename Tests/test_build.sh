@@ -284,6 +284,24 @@ function time_in_seconds {
 }
 
 #------------------------------------------------------------------------------#
+# make clean
+#
+# return success
+#------------------------------------------------------------------------------#
+function make_clean {
+  # $1 = dir
+
+  if [ -z "${1+xxx}" ]; then 
+    elog "Directory with sources is not set at all"
+    exit 1
+  fi
+
+  cd $1
+  elog "Make clean in:" "$1"
+  make clean >> $FULL_LOG 2>&1
+}
+
+#------------------------------------------------------------------------------#
 # clean_compile
 #
 # return success
@@ -336,6 +354,7 @@ function clean_compile {
     elog "Clean compile in " $1 " failed!"
   fi
 }
+
 #------------------------------------------------------------------------------#
 # make links
 #------------------------------------------------------------------------------#
@@ -1493,6 +1512,10 @@ function chose_test {
   fi
   if [ $option -eq 10 ]; then
     git clean -dfx $TEST_DIR/..
+    make_clean $GENE_DIR
+    make_clean $CONV_DIR
+    make_clean $DIVI_DIR
+    make_clean $PROC_DIR
   fi
 
 }
