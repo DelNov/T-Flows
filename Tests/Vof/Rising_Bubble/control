@@ -6,14 +6,14 @@
  MULTIPHASE_MODEL  volume_of_fluid
 
  NUMBER_OF_TIME_STEPS     300
+ TIME_STEP                  0.01   # original (for finer grid) was 0.0005
 
  RESULTS_SAVE_INTERVAL     15
  BACKUP_SAVE_INTERVAL      30
-
- TIME_STEP                  0.01   # original (for finer grid) was 0.0005
+ # LOAD_BACKUP_NAME          cavity-ts000060.backup
 
 #-------------------
-# Monitoring points 
+# Monitoring points
 #-------------------
  NUMBER_OF_MONITORING_POINTS    0
    MONITORING_POINT_001         0.0  0.0  0.0
