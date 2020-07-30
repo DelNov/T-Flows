@@ -340,9 +340,7 @@
 
         call Info_Mod_Iter_Fill(ini)
 
-        call Field_Mod_Grad_Pressure(flow(d), flow(d) % p,  &
-                                     flow(d) % density,     &
-                                     grav_x, grav_y, grav_z)
+        call Field_Mod_Grad_Pressure(flow(d), flow(d) % p)
 
         ! call Multiphase_Mod_Vof_Open_Boundary(flow(d), mult(d))
 

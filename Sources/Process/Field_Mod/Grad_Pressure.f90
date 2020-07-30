@@ -1,8 +1,5 @@
 !==============================================================================!
-  subroutine Field_Mod_Grad_Pressure(flow,     &
-                                     p,        &
-                                     density,  &
-                                     grav_x, grav_y, grav_z)
+  subroutine Field_Mod_Grad_Pressure(flow, p)
 !------------------------------------------------------------------------------!
 !   Calculates gradient of pressure of pressure correction.
 !------------------------------------------------------------------------------!
@@ -10,8 +7,6 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type) :: flow
   type(Var_Type)   :: p
-  real             :: density(-p % pnt_grid % n_bnd_cells:p % pnt_grid % n_cells)
-  real             :: grav_x, grav_y, grav_z
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   integer                  :: s, c1, c2

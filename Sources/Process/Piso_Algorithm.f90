@@ -33,9 +33,7 @@
     flow % piso_status = .true.
     do corr_steps = 1, flow % n_piso_corrections
       flow % i_corr = corr_steps
-      call Field_Mod_Grad_Pressure(flow, flow % p,  &
-                                   flow % density,  &
-                                   grav_x, grav_y, grav_z)
+      call Field_Mod_Grad_Pressure(flow, flow % p)
 
       ! call Multiphase_Mod_Vof_Open_Boundary(flow, mult)
 
