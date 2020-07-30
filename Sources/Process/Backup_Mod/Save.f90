@@ -93,10 +93,13 @@
   call Backup_Mod_Write_Variable(fh, d, vc, 'v_velocity', fld % v)
   call Backup_Mod_Write_Variable(fh, d, vc, 'w_velocity', fld % w)
 
-  !--------------------------------------!
-  !   Pressure and pressure correction   !
-  !--------------------------------------!
+  !------------------------------------------------------!
+  !   Pressure, its gradients, and pressure correction   !
+  !------------------------------------------------------!
   call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 'press',      fld %  p % n)
+  call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 'press_x',    fld %  p % x)
+  call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 'press_y',    fld %  p % y)
+  call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 'press_z',    fld %  p % z)
   call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 'press_corr', fld % pp % n)
 
   !---------------------!
