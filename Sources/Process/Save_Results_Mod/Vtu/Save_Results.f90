@@ -327,15 +327,31 @@
                                   f8, f9, data_offset, run)
     end if
 
+    !-------------------------!
+    !   Physical properties   !
+    !-------------------------!
+    call Save_Scalar_Real(grid, "PhysicalDensity", plot_inside,            &
+                                flow % density(-grid % n_bnd_cells),       &
+                                f8, f9, data_offset, run)
+    call Save_Scalar_Real(grid, "PhysicalViscosity", plot_inside,          &
+                                flow % viscosity(-grid % n_bnd_cells),     &
+                                f8, f9, data_offset, run)
+    call Save_Scalar_Real(grid, "PhysicalConductivity", plot_inside,       &
+                                flow % conductivity(-grid % n_bnd_cells),  &
+                                f8, f9, data_offset, run)
+    call Save_Scalar_Real(grid, "PhysicalCapacity", plot_inside,           &
+                                flow % capacity(-grid % n_bnd_cells),      &
+                                f8, f9, data_offset, run)
+
     !---------------------!
     !   Volume fraction   !
     !---------------------!
     if(mult % model .eq. VOLUME_OF_FLUID) then
-      call Save_Scalar_Real(grid, "VolumeFraction", plot_inside,        &
-                                  mult % vof % n(-grid % n_bnd_cells),  &
+      call Save_Scalar_Real(grid, "VolumeFraction", plot_inside,          &
+                                  mult % vof % n(-grid % n_bnd_cells),    &
                                   f8, f9, data_offset, run)
-      call Save_Scalar_Real(grid, "Curvature", plot_inside,              &
-                                  mult % vof % oo(-grid % n_bnd_cells),  &
+      call Save_Scalar_Real(grid, "Curvature", plot_inside,               &
+                                  mult % vof % oo(-grid % n_bnd_cells),   &
                                   f8, f9, data_offset, run)
       if (allocated(mult % flux_rate)) then
         call Save_Scalar_Real(grid, "FluxRate ", plot_inside,               &
