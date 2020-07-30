@@ -61,6 +61,7 @@ RANS_CHANNEL_LR_UNIFORM_DIR=Rans/Channel_Re_Tau_590/Uniform_Mesh
 RANS_FUEL_BUNDLE_DIR=Rans/Fuel_Bundle
 RANS_IMPINGING_JET_DIR=Rans/Impinging_Jet_2d_Distant_Re_23000
 
+MULTDOM_BACKSTEP_DIR=Laminar/Copy_Inlet
 MULTDOM_MEMBRANE_DIR=Rans/Membrane
 VOF_RISING_BUBBLE_DIR=Vof/Rising_Bubble
 SWARM_PERIODIC_CYL_DIR=Swarm/Cylinders_Periodic
@@ -83,7 +84,8 @@ HYB_CHANNEL_HR_UNIFORM_DIR=Hybrid_Les_Rans/Channel_Re_Tau_2000/Uniform_Mesh
 # All compilation tests including those with User_Mod/
 # (These are essentially all the tests)
 #----------------------------------------------------------------------------
-ALL_COMPILE_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR" \
+ALL_COMPILE_TESTS=( \
+                   "$LAMINAR_BACKSTEP_ORTH_DIR" \
                    "$LAMINAR_BACKSTEP_NON_ORTH_DIR" \
                    "$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
                    "$LAMINAR_CAVITY_THERM_DRIVEN_106_DIR" \
@@ -98,6 +100,7 @@ ALL_COMPILE_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR" \
                    "$RANS_CHANNEL_LR_UNIFORM_DIR" \
                    "$RANS_FUEL_BUNDLE_DIR" \
                    "$RANS_IMPINGING_JET_DIR" \
+                   "$MULTDOM_BACKSTEP_DIR" \
                    "$MULTDOM_MEMBRANE_DIR" \
                    "$SWARM_PERIODIC_CYL_DIR" \
                    "$VOF_RISING_BUBBLE_DIR" \
@@ -114,7 +117,8 @@ DONE_COMPILE_TESTS=0
 # All directories to test Generate
 # (All the tests minus those which come with third party grid)
 #--------------------------------------------------------------
-ALL_GENERATE_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR" \
+ALL_GENERATE_TESTS=( \
+                    "$LAMINAR_BACKSTEP_ORTH_DIR" \
                     "$LAMINAR_BACKSTEP_NON_ORTH_DIR" \
                     "$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
                     "$LAMINAR_CAVITY_THERM_DRIVEN_106_DIR" \
@@ -127,6 +131,7 @@ ALL_GENERATE_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR" \
                     "$RANS_CHANNEL_LR_RSM_DIR" \
                     "$RANS_CHANNEL_LR_STRETCHED_DIR" \
                     "$RANS_CHANNEL_LR_UNIFORM_DIR" \
+                    "$MULTDOM_BACKSTEP_DIR" \
                     "$VOF_RISING_BUBBLE_DIR" \
                     "$LES_CHANNEL_180_LONG_DIR" \
                     "$LES_CHANNEL_180_PERIODIC_DIR" \
@@ -140,7 +145,8 @@ DONE_GENERATE_TESTS=0
 # All directories to test Convert
 # (All the tests which come with third party grid)
 #--------------------------------------------------
-ALL_CONVERT_TESTS=("$RANS_FUEL_BUNDLE_DIR" \
+ALL_CONVERT_TESTS=( \
+                   "$RANS_FUEL_BUNDLE_DIR" \
                    "$RANS_IMPINGING_JET_DIR" \
                    "$MULTDOM_MEMBRANE_DIR" \
                    "$SWARM_PERIODIC_CYL_DIR" \
@@ -152,7 +158,8 @@ DONE_CONVERT_TESTS=0
 # All directories to test Divide
 # (All cases should be here)
 #--------------------------------
-ALL_DIVIDE_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR" \
+ALL_DIVIDE_TESTS=( \
+                  "$LAMINAR_BACKSTEP_ORTH_DIR" \
                   "$LAMINAR_BACKSTEP_NON_ORTH_DIR" \
                   "$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
                   "$LAMINAR_CAVITY_THERM_DRIVEN_106_DIR" \
@@ -167,6 +174,7 @@ ALL_DIVIDE_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR" \
                   "$RANS_CHANNEL_LR_UNIFORM_DIR" \
                   "$RANS_FUEL_BUNDLE_DIR" \
                   "$RANS_IMPINGING_JET_DIR" \
+                  "$MULTDOM_BACKSTEP_DIR" \
                   "$MULTDOM_MEMBRANE_DIR" \
                   "$SWARM_PERIODIC_CYL_DIR" \
                   "$VOF_RISING_BUBBLE_DIR" \
@@ -187,7 +195,8 @@ ALL_SAVE_EXIT_NOW_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR")
 #--------------------------------------------------------------
 # All directories to test Process, followed by physical models
 #--------------------------------------------------------------
-ALL_PROCESS_TESTS=("$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
+ALL_PROCESS_TESTS=( \
+                   "$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
                    "$LAMINAR_CAVITY_THERM_DRIVEN_106_DIR" \
                    "$LAMINAR_CAVITY_THERM_DRIVEN_108_DIR" \
                    "$RANS_BACKSTEP_05100_DIR" \
@@ -196,13 +205,15 @@ ALL_PROCESS_TESTS=("$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
                    "$RANS_CHANNEL_LR_STRETCHED_DIR" \
                    "$RANS_CHANNEL_LR_RSM_DIR" \
                    "$RANS_IMPINGING_JET_DIR" \
+                   "$MULTDOM_BACKSTEP_DIR" \
                    "$SWARM_PERIODIC_CYL_DIR" \
                    "$VOF_RISING_BUBBLE_DIR" \
                    "$LES_PIPE_DIR" \
                    "$HYB_CHANNEL_HR_STRETCHED_DIR" \
                    "$HYB_CHANNEL_HR_UNIFORM_DIR" \
                    )
-ALL_TURBULENCE_MODELS=("none" \
+ALL_TURBULENCE_MODELS=( \
+                       "none" \
                        "none" \
                        "none" \
                        "rsm_manceau_hanjalic" \
@@ -213,11 +224,14 @@ ALL_TURBULENCE_MODELS=("none" \
                        "k_eps_zeta_f" \
                        "none" \
                        "none" \
+                       "none" \
                        "les_dynamic" \
                        "hybrid_les_rans" \
                        "hybrid_les_rans" \
                        )
-ALL_MULTIPHASE_MODELS=("none" \
+ALL_MULTIPHASE_MODELS=( \
+                       "none" \
+                       "none" \
                        "none" \
                        "none" \
                        "none" \
