@@ -18,7 +18,7 @@
   real              :: b(a % pnt_grid % level(lev) % n_cells)  ! [A]{x}={b}
   real              :: p(a % pnt_grid % level(lev) % n_cells)
   real              :: r(a % pnt_grid % level(lev) % n_cells)  ! {r}={b}-[A]{x}
-  character(len=80) :: prec                     ! preconditioner
+  character(SL)     :: prec                     ! preconditioner
   integer           :: cyc                      ! current cycle
   integer           :: max_iter                 ! maximum number of iterations
   integer           :: act_iter                 ! actual number of iterations

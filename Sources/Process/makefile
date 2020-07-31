@@ -199,16 +199,18 @@ endif
 #   Modules
 #-------------
 
+# Const is the lowest level module
+SRC_MOD = Const_Mod.f90
+
 # Conditional support for MPI communication
 ifeq ($(MPI), yes)
-  SRC_MOD  = Comm_Mod_Par.f90
+  SRC_MOD += Comm_Mod_Par.f90
 else
-  SRC_MOD  = Comm_Mod_Seq.f90
+  SRC_MOD += Comm_Mod_Seq.f90
 endif
 
 # Modules in shared directory
-SRC_MOD += Const_Mod.f90	\
-           Cpu_Timer_Mod.f90	\
+SRC_MOD += Cpu_Timer_Mod.f90	\
            Math_Mod.f90		\
            Sort_Mod.f90		\
            File_Mod.f90		\

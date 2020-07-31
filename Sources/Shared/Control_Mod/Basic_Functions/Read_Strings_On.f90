@@ -6,7 +6,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   character(len=*)  :: keyword
-  character(len=80) :: values(128)   ! spefified value, if found
+  character(SL)     :: values(128)   ! spefified value, if found
   integer           :: n             ! number of items
   logical, optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!

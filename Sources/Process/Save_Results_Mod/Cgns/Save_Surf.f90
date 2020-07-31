@@ -4,20 +4,20 @@
 !   Writes surface vertices in CGNS file format (for VisIt and Paraview)       !
 !------------------------------------------------------------------------------!
   implicit none
-!--------------------------------[Arguments]-----------------------------------!
-  type(Surf_Type), target       :: surf
-  integer                       :: time_step
-!----------------------------------[Locals]------------------------------------!
-  character(len=80)             :: name_out
-  integer                       :: base
-  integer                       :: block
-  integer                       :: solution
-  integer                       :: field
-  integer                       :: coord
-  integer                       :: sect
-  integer                       :: i
-  real                          :: n_array(surf % n_verts)
-  real                          :: c_array(surf % n_elems)
+!---------------------------------[Arguments]----------------------------------!
+  type(Surf_Type), target :: surf
+  integer                 :: time_step
+!-----------------------------------[Locals]-----------------------------------!
+  character(SL) :: name_out
+  integer       :: base
+  integer       :: block
+  integer       :: solution
+  integer       :: field
+  integer       :: coord
+  integer       :: sect
+  integer       :: i
+  real          :: n_array(surf % n_verts)
+  real          :: c_array(surf % n_elems)
 !==============================================================================!
 
   if(surf % n_verts < 1) return
@@ -184,349 +184,349 @@
 
   contains
 
-  !============================================================================!
-    subroutine Write_Surf_Coordinate_Array(base, block, coord, surf)
-  !----------------------------------------------------------------------------!
-  !   Writes surf grid coordinates (RealDouble)                                !
-  !----------------------------------------------------------------------------!
-    implicit none
-  !---------------------------------[Arguments]--------------------------------!
-    integer                 :: base, block, coord
-    type(Surf_Type), target :: surf
-  !-----------------------------------[Locals]---------------------------------!
-    integer                 :: base_id         ! base index number
-    integer                 :: block_id        ! block index number
-    integer                 :: coord_id        ! coord index number
-    character(len=80)       :: coord_name
-    integer                 :: i               ! lower range index
-    integer                 :: j               ! upper range index
-    integer                 :: error           ! error status
-    real                    :: coordinates(surf % n_verts)
-  !============================================================================!
+!==============================================================================!
+  subroutine Write_Surf_Coordinate_Array(base, block, coord, surf)
+!------------------------------------------------------------------------------!
+!   Writes surf grid coordinates (RealDouble)                                  !
+!------------------------------------------------------------------------------!
+  implicit none
+!---------------------------------[Arguments]----------------------------------!
+  integer                 :: base, block, coord
+  type(Surf_Type), target :: surf
+!-----------------------------------[Locals]-----------------------------------!
+  integer       :: base_id         ! base index number
+  integer       :: block_id        ! block index number
+  integer       :: coord_id        ! coord index number
+  character(SL) :: coord_name
+  integer       :: i               ! lower range index
+  integer       :: j               ! upper range index
+  integer       :: error           ! error status
+  real          :: coordinates(surf % n_verts)
+!==============================================================================!
 
-    ! Set input parameters
-    base_id    = base
-    block_id   = block
-    coord_id   = coord
-    coord_name = cgns_base(base_id) % block(block_id) % coord_name(coord_id)
+  ! Set input parameters
+  base_id    = base
+  block_id   = block
+  coord_id   = coord
+  coord_name = cgns_base(base_id) % block(block_id) % coord_name(coord_id)
 
+  i = 1
+  j = cgns_base(base_id) % block(block_id) % mesh_info(1)
+
+  ! Fetch received parameters
+  select case (coord)
+    case (1)
+      coordinates = surf % vert(1:surf % n_verts) % x_n
+    case (2)
+      coordinates = surf % vert(1:surf % n_verts) % y_n
+    case (3)
+      coordinates = surf % vert(1:surf % n_verts) % z_n
+  end select
+
+  ! Write grid coordinates
+  call Cg_Coord_Write_F(file_id,      & !(in )
+                        base_id,      & !(in )
+                        block_id,     & !(in )
+                        RealDouble,   & !(in )
+                        coord_name,   & !(in )
+                        coordinates,  & !(in )
+                        coord_id,     & !(out)
+                        error)          !(out)
+
+  if (error .ne. 0) then
+    print *, '#         Failed to write: ', trim(coord_name)
+    call Cg_Error_Exit_F()
+  endif
+
+  ! Print some info
+  if(verbose) then
+    print *, '#         Coord array: ', coord_name
+  end if
+  if(verbose.and.coord_id.eq.1) then
+    print *, '#         Number of nodes: ', j - i + 1
+    print *, '#         First node:', i
+    print *, '#         Last node: ', j
+  end if
+
+  end subroutine
+
+!==============================================================================!
+  subroutine Write_Surf_Section_Connections(base, block, sect, surf)
+!------------------------------------------------------------------------------!
+!   Writes surf elements connection for sect                                   !
+!------------------------------------------------------------------------------!
+!   Each node in zone/block must have unique id                                !
+!   https://cgns.github.io/CGNS_docs_current/midlevel/grid.html                !
+!                                                                              !
+!   Connections:  | TRI_3 | QUAD_4 |                                           !
+!                                                                              !
+!------------------------------------------------------------------------------!
+  implicit none
+!---------------------------------[Arguments]----------------------------------!
+  integer                 :: base, block, sect
+  type(Surf_Type), target :: surf
+!-----------------------------------[Locals]-----------------------------------!
+  integer       :: base_id       ! base index number
+  integer       :: block_id      ! block index number
+  integer       :: sect_id       ! element section index
+  character(SL) :: sect_name     ! name of the Elements_t node
+  integer       :: cell_type     ! types of elements in the section
+  integer       :: first_cell    ! index of first element
+  integer       :: last_cell     ! index of last element
+  integer       :: n_bnd         ! index of last boundary element
+  integer       :: error
+  integer       :: n_nodes, e, cnt, i, j
+  integer       :: cell_n(4, surf % n_elems)
+!==============================================================================!
+
+  ! Set input parameters
+  base_id   = base
+  block_id  = block
+  sect_id   = sect
+
+  sect_name = trim(cgns_base(base_id)%block(block_id)%section(sect_id)%name)
+  cell_type = cgns_base(base_id)%block(block_id)%section(sect_id)%cell_type
+  i         = cgns_base(base_id)%block(block_id)%section(sect_id)%first_cell
+  j         = cgns_base(base_id)%block(block_id)%section(sect_id)%last_cell
+
+  ! cells of cell_type
+  cnt = j - i + 1
+  if ( cnt .ne. 0 ) then
+
+    ! first and last cells have to be shifted according to previous sections
+    first_cell = 1 + cnt_cells
+    last_cell  = first_cell - 1 + cnt
+
+    n_bnd = 0 ! unsorted boundary elements
+
+    ! Allocate memory
+    if ( ElementTypeName(cell_type) .eq. 'TRI_3' ) n_nodes = 3
+    if ( ElementTypeName(cell_type) .eq. 'QUAD_4') n_nodes = 4
+
+    ! Convert T-FlowS -> CGNS [same as VTK]
     i = 1
-    j = cgns_base(base_id) % block(block_id) % mesh_info(1)
+    do e = 1, surf % n_elems
+      !if (surf % surf_n_nodes(c).eq.3 .and. n_nodes.eq.3 ) then ! tri
+      cell_n(1, i) = surf % elem(e) % i
+      cell_n(2, i) = surf % elem(e) % j
+      cell_n(3, i) = surf % elem(e) % k
+      i = i + 1
+    end do
 
-    ! Fetch received parameters
-    select case (coord)
-      case (1)
-        coordinates = surf % vert(1:surf % n_verts) % x_n
-      case (2)
-        coordinates = surf % vert(1:surf % n_verts) % y_n
-      case (3)
-        coordinates = surf % vert(1:surf % n_verts) % z_n
-    end select
-
-    ! Write grid coordinates
-    call Cg_Coord_Write_F(file_id,      & !(in )
-                          base_id,      & !(in )
-                          block_id,     & !(in )
-                          RealDouble,   & !(in )
-                          coord_name,   & !(in )
-                          coordinates,  & !(in )
-                          coord_id,     & !(out)
-                          error)          !(out)
+    ! Write element data
+    call Cg_Section_Write_F(file_id,                   & !(in )
+                            base_id,                   & !(in )
+                            block_id,                  & !(in )
+                            sect_name,                 & !(in )
+                            cell_type,                 & !(in )
+                            first_cell,                & !(in )
+                            last_cell,                 & !(in )
+                            n_bnd,                     & !(in )
+                            cell_n(1:n_nodes, 1:cnt),  & !(in )
+                            sect_id,                   & !(out)
+                            error)                       !(out)
 
     if (error .ne. 0) then
-       print *, '#         Failed to write: ', trim(coord_name)
-       call Cg_Error_Exit_F()
+      print*, ' #         Failed to write ', trim(sect_name), ' connections'
+      call Cg_Error_Exit_F()
     endif
 
     ! Print some info
-    if(verbose) then
-      print *, '#         Coord array: ', coord_name
-    end if
-    if(verbose.and.coord_id.eq.1) then
-      print *, '#         Number of nodes: ', j - i + 1
-      print *, '#         First node:', i
-      print *, '#         Last node: ', j
-    end if
-
-    end subroutine
-
-  !============================================================================!
-    subroutine Write_Surf_Section_Connections(base, block, sect, surf)
-  !----------------------------------------------------------------------------!
-  !   Writes surf elements connection for sect                                 !
-  !----------------------------------------------------------------------------!
-  !   Each node in zone/block must have unique id                              !
-  !   https://cgns.github.io/CGNS_docs_current/midlevel/grid.html              !
-  !                                                                            !
-  !   Connections:  | TRI_3 | QUAD_4 |                                         !
-  !                                                                            !
-  !----------------------------------------------------------------------------!
-    implicit none
-  !---------------------------------[Arguments]--------------------------------!
-    integer                 :: base, block, sect
-    type(Surf_Type), target :: surf
-  !-----------------------------------[Locals]---------------------------------!
-    integer                 :: base_id       ! base index number
-    integer                 :: block_id      ! block index number
-    integer                 :: sect_id       ! element section index
-    character(len=80)       :: sect_name     ! name of the Elements_t node
-    integer                 :: cell_type     ! types of elements in the section
-    integer                 :: first_cell    ! index of first element
-    integer                 :: last_cell     ! index of last element
-    integer                 :: n_bnd         ! index of last boundary element
-    integer                 :: error
-    integer                 :: n_nodes, e, cnt, i, j
-    integer                 :: cell_n(4, surf % n_elems)
-  !============================================================================!
-
-    ! Set input parameters
-    base_id   = base
-    block_id  = block
-    sect_id   = sect
-
-    sect_name = trim(cgns_base(base_id)%block(block_id)%section(sect_id)%name)
-    cell_type = cgns_base(base_id)%block(block_id)%section(sect_id)%cell_type
-    i         = cgns_base(base_id)%block(block_id)%section(sect_id)%first_cell
-    j         = cgns_base(base_id)%block(block_id)%section(sect_id)%last_cell
-
-    ! cells of cell_type
-    cnt = j - i + 1
-    if ( cnt .ne. 0 ) then
-
-      ! first and last cells have to be shifted according to previous sections
-      first_cell = 1 + cnt_cells
-      last_cell  = first_cell - 1 + cnt
-
-      n_bnd = 0 ! unsorted boundary elements
-
-      ! Allocate memory
-      if ( ElementTypeName(cell_type) .eq. 'TRI_3' ) n_nodes = 3
-      if ( ElementTypeName(cell_type) .eq. 'QUAD_4') n_nodes = 4
-
-      ! Convert T-FlowS -> CGNS [same as VTK]
-      i = 1
-      do e = 1, surf % n_elems
-        !if (surf % surf_n_nodes(c).eq.3 .and. n_nodes.eq.3 ) then ! tri
-        cell_n(1, i) = surf % elem(e) % i
-        cell_n(2, i) = surf % elem(e) % j
-        cell_n(3, i) = surf % elem(e) % k
-        i = i + 1
-      end do
-
-      ! Write element data
-      call Cg_Section_Write_F(file_id,                   & !(in )
-                              base_id,                   & !(in )
-                              block_id,                  & !(in )
-                              sect_name,                 & !(in )
-                              cell_type,                 & !(in )
-                              first_cell,                & !(in )
-                              last_cell,                 & !(in )
-                              n_bnd,                     & !(in )
-                              cell_n(1:n_nodes, 1:cnt),  & !(in )
-                              sect_id,                   & !(out)
-                              error)                       !(out)
-
-      if (error .ne. 0) then
-         print*, ' #         Failed to write ', trim(sect_name), ' connections'
-         call Cg_Error_Exit_F()
-      endif
-
-      ! Print some info
-      if(verbose ) then
-        print *, '#         ---------------------------------'
-        print *, '#         Cell section name: ', sect_name
-        print *, '#         ---------------------------------'
-        print *, '#         Cell section idx:    ', sect_id
-        print *, '#         Cell section type:   ', ElementTypeName(cell_type)
-        print *, '#         Number of cells: ', cnt
-        print *, '#         First cell:', first_cell
-        print *, '#         Last cell: ', last_cell
-      end if
-
-      cnt_cells = cnt_cells + cnt
+    if(verbose ) then
+      print *, '#         ---------------------------------'
+      print *, '#         Cell section name: ', sect_name
+      print *, '#         ---------------------------------'
+      print *, '#         Cell section idx:    ', sect_id
+      print *, '#         Cell section type:   ', ElementTypeName(cell_type)
+      print *, '#         Number of cells: ', cnt
+      print *, '#         First cell:', first_cell
+      print *, '#         Last cell: ', last_cell
     end if
 
-    end subroutine
+    cnt_cells = cnt_cells + cnt
+  end if
 
-  !============================================================================!
-    subroutine Write_Surf_Field_In_Nodes(base, block, solution, field, surf, &
-      input_array, input_name)
-  !----------------------------------------------------------------------------!
-  !   Writes field to solution node and sets its field                         !
-  !   Solution type: Vertex                                                    !
-  !----------------------------------------------------------------------------!
-    implicit none
-  !--------------------------------[Arguments]---------------------------------!
-    integer                 :: base, block, solution, field
-    type(Surf_Type), target :: surf
-    real                    :: input_array(surf % n_verts)
-    character(len=*)        :: input_name
-  !----------------------------------[Locals]----------------------------------!
-    integer                 :: base_id     ! base index number
-    integer                 :: block_id    ! block index number
-    integer                 :: solution_id ! solution index
-    integer                 :: field_id    ! field index
-    character(len=80)       :: field_name  ! name of the FlowSolution_t node
-    integer                 :: cnt            ! cells of sect_id
-    real                    :: field_array(surf % n_verts) ! field array
-    integer                 :: i, j, k, v
-    integer                 :: error
-  !============================================================================!
+  end subroutine
 
-    ! Set input parameters
-    base_id     = base
-    block_id    = block
-    solution_id = solution
+!==============================================================================!
+  subroutine Write_Surf_Field_In_Nodes(base, block, solution, field, surf, &
+    input_array, input_name)
+!------------------------------------------------------------------------------!
+!   Writes field to solution node and sets its field                           !
+!   Solution type: Vertex                                                      !
+!------------------------------------------------------------------------------!
+  implicit none
+!---------------------------------[Arguments]----------------------------------!
+  integer                 :: base, block, solution, field
+  type(Surf_Type), target :: surf
+  real                    :: input_array(surf % n_verts)
+  character(len=*)        :: input_name
+!-----------------------------------[Locals]-----------------------------------!
+  integer                 :: base_id     ! base index number
+  integer                 :: block_id    ! block index number
+  integer                 :: solution_id ! solution index
+  integer                 :: field_id    ! field index
+  character(SL)           :: field_name  ! name of the FlowSolution_t node
+  integer                 :: cnt            ! cells of sect_id
+  real                    :: field_array(surf % n_verts) ! field array
+  integer                 :: i, j, k, v
+  integer                 :: error
+!==============================================================================!
 
-    field_name = trim(input_name)
+  ! Set input parameters
+  base_id     = base
+  block_id    = block
+  solution_id = solution
 
-    ! Find first and last cells of sect_id
-    ! cells of sect_id
-    cnt = surf % n_verts
+  field_name = trim(input_name)
 
-    if (cnt.ne.0) then
+  ! Find first and last cells of sect_id
+  ! cells of sect_id
+  cnt = surf % n_verts
 
-      i = 1 + cnt_cells
-      j = i + cnt - 1
+  if (cnt.ne.0) then
 
-      ! copy input array to field_array
-      k = 1
-      do v = 1, surf % n_verts
-        field_array(k) = input_array(v)
-        k = k + 1
-      end do
+    i = 1 + cnt_cells
+    j = i + cnt - 1
 
-      !--------------------------------------------!
-      !   Writing cells assocciated with sect_id   !
-      !--------------------------------------------!
+    ! Copy input array to field_array
+    k = 1
+    do v = 1, surf % n_verts
+      field_array(k) = input_array(v)
+      k = k + 1
+    end do
 
-      ! Add field to FlowSolution_t node for sect_id
-      call Cg_Field_Partial_Write_F(file_id,      & !(in )
-                                    base_id,      & !(in )
-                                    block_id,     & !(in )
-                                    solution_id,  & !(in )
-                                    RealDouble,   & !(in )
-                                    field_name,   & !(in )
-                                    i,            & !(in )
-                                    j,            & !(in )
-                                    field_array,  & !(in )
-                                    field_id,     & !(out)
-                                    error)          !(out)
+    !--------------------------------------------!
+    !   Writing cells assocciated with sect_id   !
+    !--------------------------------------------!
 
-      if (error .ne. 0) then
-        print *, '# Failed to write field: ', trim(field_name)
-        call Cg_Error_Exit_F()
-      endif
+    ! Add field to FlowSolution_t node for sect_id
+    call Cg_Field_Partial_Write_F(file_id,      & !(in )
+                                  base_id,      & !(in )
+                                  block_id,     & !(in )
+                                  solution_id,  & !(in )
+                                  RealDouble,   & !(in )
+                                  field_name,   & !(in )
+                                  i,            & !(in )
+                                  j,            & !(in )
+                                  field_array,  & !(in )
+                                  field_id,     & !(out)
+                                  error)          !(out)
 
-      cnt_cells = cnt_cells + cnt
+    if (error .ne. 0) then
+      print *, '# Failed to write field: ', trim(field_name)
+      call Cg_Error_Exit_F()
+    endif
 
-      ! Print some info
-      if(verbose ) then
-        print *, '#           ---------------------------------'
-        print *, '#           Field name: ',   field_name
-        print *, '#           Field idx:    ', field_id
-        print *, '#           ---------------------------------'
-        print *, '#           First cell:', i
-        print *, '#           Last cell: ', j
-      end if
+    cnt_cells = cnt_cells + cnt
 
+    ! Print some info
+    if(verbose ) then
+      print *, '#           ---------------------------------'
+      print *, '#           Field name: ',   field_name
+      print *, '#           Field idx:    ', field_id
+      print *, '#           ---------------------------------'
+      print *, '#           First cell:', i
+      print *, '#           Last cell: ', j
     end if
 
-    cnt_cells = 0
+  end if
 
-    end subroutine
+  cnt_cells = 0
 
-  !============================================================================!
-    subroutine Write_Field_In_Cells(base, block, solution, field, surf, &
-      input_array, input_name)
-  !----------------------------------------------------------------------------!
-  !   Writes field to solution node and sets its field                         !
-  !   Solution type: Face centered                                             !
-  !----------------------------------------------------------------------------!
-    implicit none
-  !--------------------------------[Arguments]---------------------------------!
-    integer                 :: base, block, solution, field
-    type(Surf_Type), target :: surf
-    real                    :: input_array(surf % n_elems)
-    character(len=*)        :: input_name
-  !----------------------------------[Locals]----------------------------------!
-    integer                 :: base_id     ! base index number
-    integer                 :: block_id    ! block index number
-    integer                 :: solution_id ! solution index
-    integer                 :: field_id    ! field index
-    character(len=80)       :: field_name  ! name of the FlowSolution_t node
-    integer                 :: cnt            ! cells of sect_id
-    real                    :: field_array(surf % n_elems) ! field array
-    integer                 :: i, j, k, e
-    integer                 :: error
-  !============================================================================!
+  end subroutine
 
-    ! Set input parameters
-    base_id     = base
-    block_id    = block
-    solution_id = solution
-    field_id    = field
+!==============================================================================!
+  subroutine Write_Field_In_Cells(base, block, solution, field, surf, &
+    input_array, input_name)
+!------------------------------------------------------------------------------!
+!   Writes field to solution node and sets its field                           !
+!   Solution type: Face centered                                               !
+!------------------------------------------------------------------------------!
+  implicit none
+!---------------------------------[Arguments]----------------------------------!
+  integer                 :: base, block, solution, field
+  type(Surf_Type), target :: surf
+  real                    :: input_array(surf % n_elems)
+  character(len=*)        :: input_name
+!-----------------------------------[Locals]-----------------------------------!
+  integer       :: base_id        ! base index number
+  integer       :: block_id       ! block index number
+  integer       :: solution_id    ! solution index
+  integer       :: field_id       ! field index
+  character(SL) :: field_name     ! name of the FlowSolution_t node
+  integer       :: cnt            ! cells of sect_id
+  real          :: field_array(surf % n_elems) ! field array
+  integer       :: i, j, k, e
+  integer       :: error
+!==============================================================================!
 
-    field_name = trim(input_name)
+  ! Set input parameters
+  base_id     = base
+  block_id    = block
+  solution_id = solution
+  field_id    = field
 
-    !---------------------!
-    !   Mapping 1:n_elems !
-    !---------------------!
+  field_name = trim(input_name)
 
-    ! Find first and last cells of sect_id
-    ! cells of sect_id
-    cnt = surf % n_elems
+  !---------------------!
+  !   Mapping 1:n_elems !
+  !---------------------!
 
-    if (cnt.ne.0) then
+  ! Find first and last cells of sect_id
+  ! cells of sect_id
+  cnt = surf % n_elems
 
-      i = 1 + cnt_cells
-      j = i + cnt - 1
+  if (cnt.ne.0) then
 
-      ! copy input array to field_array
-      k = 1
-      do e = 1, surf % n_elems
-        field_array(k) = input_array(e)
-        k = k + 1
-      end do
+    i = 1 + cnt_cells
+    j = i + cnt - 1
 
-      !--------------------------------------------!
-      !   Writing cells assocciated with sect_id   !
-      !--------------------------------------------!
+    ! Copy input array to field_array
+    k = 1
+    do e = 1, surf % n_elems
+      field_array(k) = input_array(e)
+      k = k + 1
+    end do
 
-      ! Add field to FlowSolution_t node for sect_id
-      call Cg_Field_Partial_Write_F(file_id,      & !(in )
-                                    base_id,      & !(in )
-                                    block_id,     & !(in )
-                                    solution_id,  & !(in )
-                                    RealDouble,   & !(in )
-                                    field_name,   & !(in )
-                                    i,            & !(in )
-                                    j,            & !(in )
-                                    field_array,  & !(in )
-                                    field_id,     & !(out)
-                                    error)          !(out)
+    !--------------------------------------------!
+    !   Writing cells assocciated with sect_id   !
+    !--------------------------------------------!
 
-      if (error .ne. 0) then
-        print *, '# Failed to write field ', trim(field_name)
-        call Cg_Error_Exit_F()
-      endif
+    ! Add field to FlowSolution_t node for sect_id
+    call Cg_Field_Partial_Write_F(file_id,      & !(in )
+                                  base_id,      & !(in )
+                                  block_id,     & !(in )
+                                  solution_id,  & !(in )
+                                  RealDouble,   & !(in )
+                                  field_name,   & !(in )
+                                  i,            & !(in )
+                                  j,            & !(in )
+                                  field_array,  & !(in )
+                                  field_id,     & !(out)
+                                  error)          !(out)
 
-      cnt_cells = cnt_cells + cnt
+    if (error .ne. 0) then
+      print *, '# Failed to write field ', trim(field_name)
+      call Cg_Error_Exit_F()
+    endif
 
-      ! Print some info
-      if(verbose ) then
-        print *, '#           ---------------------------------'
-        print *, '#           Field name: ',   field_name
-        print *, '#           Field idx:    ', field_id
-        print *, '#           ---------------------------------'
-        print *, '#           First cell:', i
-        print *, '#           Last cell: ', j
-      end if
+    cnt_cells = cnt_cells + cnt
 
+    ! Print some info
+    if(verbose ) then
+      print *, '#           ---------------------------------'
+      print *, '#           Field name: ',   field_name
+      print *, '#           Field idx:    ', field_id
+      print *, '#           ---------------------------------'
+      print *, '#           First cell:', i
+      print *, '#           Last cell: ', j
     end if
 
-    cnt_cells = 0
+  end if
 
-    end subroutine
+  cnt_cells = 0
+
+  end subroutine
 
   end subroutine

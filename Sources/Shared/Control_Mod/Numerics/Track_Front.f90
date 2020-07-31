@@ -6,7 +6,7 @@
   logical           :: track_front
   logical, optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
-  character(len=80) :: val
+  character(SL) :: val
 !==============================================================================!
 
   call Control_Mod_Read_Char_Item('TRACK_FRONT', 'no', val, verbose)

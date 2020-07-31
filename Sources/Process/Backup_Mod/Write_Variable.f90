@@ -10,7 +10,7 @@
   type(Var_Type)   :: var
 !-----------------------------------[Locals]-----------------------------------!
   type(Comm_Type), pointer :: comm
-  character(len=80)        :: vn
+  character(SL)            :: vn
   integer                  :: vs  ! variable size
 !==============================================================================!
 

@@ -14,8 +14,8 @@
   type(Grid_Type) :: grid
   integer         :: sub, nn_sub, nc_sub, nf_sub, ns_sub, nbc_sub
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: b, c, s, n, lev, item, fu, subo, c1, c2
-  character(len=80) :: name_out
+  integer       :: b, c, s, n, lev, item, fu, subo, c1, c2
+  character(SL) :: name_out
 !==============================================================================!
 
   !----------------------!

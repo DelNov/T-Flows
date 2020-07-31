@@ -5,7 +5,7 @@
 !   direction and write them in file called "name.1d"                          !
 !------------------------------------------------------------------------------!
   use File_Mod
-  use Const_Mod, only: NANO          ! 1.0e-fu
+  use Const_Mod, only: SL, NANO          ! 1.0e-fu
   use Math_Mod
   use Grid_Mod
 !------------------------------------------------------------------------------!
@@ -14,10 +14,10 @@
   type(Grid_Type) :: grid
   logical         :: isit
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: n_prob, p, c, fu
-  real              :: zp(16384)
-  character(len=80) :: name_prob
-  character(len=80) :: answer
+  integer       :: n_prob, p, c, fu
+  real          :: zp(16384)
+  character(SL) :: name_prob
+  character(SL) :: answer
 !==============================================================================!
 
   print *, '#================================================='

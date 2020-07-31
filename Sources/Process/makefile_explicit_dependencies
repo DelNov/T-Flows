@@ -6,7 +6,6 @@ $(DIR_OBJECT)/User_Mod.o \
 User_Mod/*.f90 \
 $(DIR_OBJECT)/Solver_Mod.o \
 Solver_Mod/*.f90 \
-Multiphase_Mod/.Vof_Coefficients.f90.swp \
 $(DIR_OBJECT)/Multiphase_Mod.o \
 Multiphase_Mod/*.f90 \
 $(DIR_OBJECT)/Matrix_Mod.o \
@@ -48,7 +47,6 @@ Solver_Mod/*.f90 \
 Save_Results_Mod_Vtu.f90 \
 Save_Results_Mod/*/*.f90 \
 Save_Results_Mod_Cgns.f90 \
-Multiphase_Mod/.Vof_Coefficients.f90.swp \
 $(DIR_OBJECT)/Multiphase_Mod.o \
 Multiphase_Mod/*.f90 \
 $(DIR_OBJECT)/Monitor_Mod.o \
@@ -305,7 +303,6 @@ $(DIR_OBJECT)/Swarm_Mod.o \
 Swarm_Mod/*.f90 \
 $(DIR_OBJECT)/Numerics_Mod.o \
 Numerics_Mod/*.f90 \
-Multiphase_Mod/.Vof_Coefficients.f90.swp \
 $(DIR_OBJECT)/Multiphase_Mod.o \
 Multiphase_Mod/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
@@ -398,7 +395,6 @@ Save_Results_Mod_Cgns.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-Multiphase_Mod/.Vof_Coefficients.f90.swp \
 $(DIR_OBJECT)/Multiphase_Mod.o \
 Multiphase_Mod/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
@@ -440,7 +436,6 @@ $(DIR_OBJECT)/Turb_Mod.o \
 Turb_Mod/*.f90 \
 $(DIR_OBJECT)/Swarm_Mod.o \
 Swarm_Mod/*.f90 \
-Multiphase_Mod/.Vof_Coefficients.f90.swp \
 $(DIR_OBJECT)/Multiphase_Mod.o \
 Multiphase_Mod/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
@@ -500,7 +495,6 @@ $(DIR_SHARED)/Work_Mod/*.f90
 #-- ./Field_Mod/Grad_Pressure_Correction.f90
 #-- ./Piso_Algorithm.f90
 $(DIR_OBJECT)/Piso_Algorithm.o:\
-Multiphase_Mod/.Vof_Coefficients.f90.swp \
 $(DIR_OBJECT)/Multiphase_Mod.o \
 Multiphase_Mod/*.f90 
 
@@ -537,7 +531,6 @@ $(DIR_OBJECT)/Turb_Mod.o \
 Turb_Mod/*.f90 \
 $(DIR_OBJECT)/Swarm_Mod.o \
 Swarm_Mod/*.f90 \
-Multiphase_Mod/.Vof_Coefficients.f90.swp \
 $(DIR_OBJECT)/Multiphase_Mod.o \
 Multiphase_Mod/*.f90 \
 $(DIR_OBJECT)/Matrix_Mod.o \
@@ -585,7 +578,6 @@ $(DIR_OBJECT)/User_Mod.o \
 User_Mod/*.f90 \
 $(DIR_OBJECT)/Turb_Mod.o \
 Turb_Mod/*.f90 \
-Multiphase_Mod/.Vof_Coefficients.f90.swp \
 $(DIR_OBJECT)/Multiphase_Mod.o \
 Multiphase_Mod/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
@@ -658,7 +650,6 @@ $(DIR_SHARED)/Work_Mod/*.f90
 $(DIR_OBJECT)/Update_Boundary_Values.o:\
 $(DIR_OBJECT)/Turb_Mod.o \
 Turb_Mod/*.f90 \
-Multiphase_Mod/.Vof_Coefficients.f90.swp \
 $(DIR_OBJECT)/Multiphase_Mod.o \
 Multiphase_Mod/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
@@ -693,7 +684,6 @@ Save_Results_Mod_Cgns.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-Multiphase_Mod/.Vof_Coefficients.f90.swp \
 $(DIR_OBJECT)/Multiphase_Mod.o \
 Multiphase_Mod/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
@@ -730,7 +720,6 @@ $(DIR_OBJECT)/Turb_Mod.o \
 Turb_Mod/*.f90 \
 $(DIR_OBJECT)/Numerics_Mod.o \
 Numerics_Mod/*.f90 \
-Multiphase_Mod/.Vof_Coefficients.f90.swp \
 $(DIR_OBJECT)/Multiphase_Mod.o \
 Multiphase_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
@@ -948,7 +937,6 @@ $(DIR_SHARED)/Work_Mod/*.f90
 $(DIR_OBJECT)/Convective_Outflow.o:\
 $(DIR_OBJECT)/Turb_Mod.o \
 Turb_Mod/*.f90 \
-Multiphase_Mod/.Vof_Coefficients.f90.swp \
 $(DIR_OBJECT)/Multiphase_Mod.o \
 Multiphase_Mod/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
@@ -1015,7 +1003,6 @@ User_Mod/*.f90
 $(DIR_OBJECT)/Load_Physical_Properties.o:\
 $(DIR_OBJECT)/Swarm_Mod.o \
 Swarm_Mod/*.f90 \
-Multiphase_Mod/.Vof_Coefficients.f90.swp \
 $(DIR_OBJECT)/Multiphase_Mod.o \
 Multiphase_Mod/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
@@ -1066,7 +1053,6 @@ $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 
 
 #-- ./Multiphase_Mod/Vof_Solver_Dist_Function_Cell_Loop.f90
-#-- ./Multiphase_Mod/.Vof_Coefficients.f90.swp
 #-- ./Multiphase_Mod/Vof_Boundary_Extrapolation.f90
 $(DIR_OBJECT)/Vof_Boundary_Extrapolation.o:\
 $(DIR_OBJECT)/Work_Mod.o \
@@ -1131,7 +1117,6 @@ Bulk_Mod/*.f90
 $(DIR_OBJECT)/Balance_Mass.o:\
 $(DIR_OBJECT)/Var_Mod.o \
 Var_Mod/*.f90 \
-Multiphase_Mod/.Vof_Coefficients.f90.swp \
 $(DIR_OBJECT)/Multiphase_Mod.o \
 Multiphase_Mod/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
@@ -1177,7 +1162,6 @@ $(DIR_OBJECT)/Turb_Mod.o \
 Turb_Mod/*.f90 \
 $(DIR_OBJECT)/Swarm_Mod.o \
 Swarm_Mod/*.f90 \
-Multiphase_Mod/.Vof_Coefficients.f90.swp \
 $(DIR_OBJECT)/Multiphase_Mod.o \
 Multiphase_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
@@ -1205,7 +1189,6 @@ $(DIR_OBJECT)/Solver_Mod.o \
 Solver_Mod/*.f90 \
 $(DIR_OBJECT)/Numerics_Mod.o \
 Numerics_Mod/*.f90 \
-Multiphase_Mod/.Vof_Coefficients.f90.swp \
 Multiphase_Mod/*.f90 \
 $(DIR_OBJECT)/Matrix_Mod.o \
 Matrix_Mod/*.f90 \

@@ -31,16 +31,16 @@
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   type(Var_Type),  pointer :: scalar(:)
   integer                  :: c,m,l,k,i,bc,n_points,nks,nvs,sc,c1,c2,s,fu
-  character(len=80)        :: name_prof(128)
+  character(SL)            :: name_prof(128)
   real                     :: wi, dist_min, x, y, z, xp, dist
   real, allocatable        :: prof(:,:)
   logical                  :: here
-  character(len=80)        :: bc_type_name, try_str
+  character(SL)            :: bc_type_name, try_str
   integer                  :: bc_type_tag
-  character(len=80)        :: keys(128)
+  character(SL)            :: keys(128)
   real                     :: vals(0:128)           ! they start from zero!
   integer                  :: types_per_color(128)  ! how many types in a color
-  character(len=80)        :: types_names(128)      ! name of each type
+  character(SL)            :: types_names(128)      ! name of each type
   logical                  :: types_file(128)       ! type specified in a file?
   integer                  :: c_types               ! counter types
   integer                  :: edd_n

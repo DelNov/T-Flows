@@ -5,7 +5,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(len=80) :: name  ! name of the pressure-momentum coupling algorithm
+  character(SL)     :: name  ! name of the pressure-momentum coupling algorithm
   logical, optional :: verbose
 !==============================================================================!
 

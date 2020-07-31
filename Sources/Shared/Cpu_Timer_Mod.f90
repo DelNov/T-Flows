@@ -11,9 +11,9 @@
   integer            :: new_funct =    0
   integer            :: old_funct =    0
 
-  character(len=80)  :: funct_name(MAX_FUNCT)
-  real               :: funct_time(MAX_FUNCT)  ! accumulated time
-  real               :: time_prev, time_curr
+  character(SL) :: funct_name(MAX_FUNCT)
+  real          :: funct_time(MAX_FUNCT)  ! accumulated time
+  real          :: time_prev, time_curr
 
   contains
 

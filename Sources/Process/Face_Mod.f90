@@ -13,8 +13,8 @@
 
     type(Grid_Type), pointer :: pnt_grid  ! grid for which it is defined
 
-    character(len=4)  :: name           ! variable name, always
-                                        ! uppercase and very short
+    character(VL) :: name      ! variable name, always upper case and
+                               ! very short (4, defined in Const_Mod)
     real, allocatable :: n(:)           ! new value
     real, allocatable :: avg(:), star(:)! average guessed value, guessed value
     real, allocatable :: o(:), oo(:)    ! old and older then old

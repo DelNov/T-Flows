@@ -3,6 +3,9 @@
 !------------------------------------------------------------------------------!
 !   This is used to store boundary conditions within a Grid_Type               !
 !------------------------------------------------------------------------------!
+!----------------------------------[Modules]-----------------------------------!
+  use Const_Mod
+!------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
 
@@ -25,7 +28,7 @@
 
     ! Name of the boundary conditions specified in grid generation
     ! It ranges through number of boundary conditions (aka colors)
-    character(len=80), allocatable :: name(:)
+    character(SL), allocatable :: name(:)
 
     ! Boundary types, ranging through all colors
     integer, allocatable :: type(:)

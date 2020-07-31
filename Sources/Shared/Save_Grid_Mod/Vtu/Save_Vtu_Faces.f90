@@ -9,7 +9,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer(4)         :: data_size
   integer            :: c2, n, s, cell_offset, data_offset, n_conns, fu
-  character(len=80)  :: name_out, str1, str2
+  character(SL)      :: name_out, str1, str2
   integer, parameter :: IP=8, RP=8, SP=4
 !==============================================================================!
 

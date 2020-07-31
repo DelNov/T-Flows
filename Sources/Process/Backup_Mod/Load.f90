@@ -19,7 +19,7 @@
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: phi
-  character(len=80)        :: name_in, answer, name_mean, a_name, f_name
+  character(SL)            :: name_in, answer, name_mean, a_name, f_name
   integer                  :: fh, d, vc, sc, ua
 !==============================================================================!
 

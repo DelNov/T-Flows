@@ -9,8 +9,8 @@
   type(Grid_Type)   :: grid
   integer           :: sub
 !-----------------------------------[Locals]-----------------------------------!
-  character(len=80) :: name_out
-  integer           :: c, base, block, sect, coord
+  character(SL) :: name_out
+  integer       :: c, base, block, sect, coord
 !==============================================================================!
 
   !-----------------------!

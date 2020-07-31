@@ -2,6 +2,7 @@
   program Convert
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
+  use Const_Mod
   use File_Mod,      only: problem_name
   use Grid_Mod,      only: Grid_Type,                         &
                            Grid_Mod_Sort_Faces_Smart,         &
@@ -13,9 +14,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type)   :: grid     ! grid to be converted
-  integer           :: c, n, s, l
-  character(len=80) :: file_name, file_name_up, ext_up
+  type(Grid_Type) :: grid     ! grid to be converted
+  integer         :: c, n, s, l
+  character(SL)   :: file_name, file_name_up, ext_up
 !==============================================================================!
 
   call Logo_Con

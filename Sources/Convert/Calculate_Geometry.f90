@@ -29,10 +29,10 @@
   real                 :: t, sur_tot, angle
   real                 :: xc1, yc1, zc1, xc2, yc2, zc2
   real                 :: max_dis
-  real, allocatable    :: xspr(:), yspr(:), zspr(:)
-  real, allocatable    :: b_coor(:), phi_face(:)
+  real,    allocatable :: xspr(:), yspr(:), zspr(:)
+  real,    allocatable :: b_coor(:), phi_face(:)
   integer, allocatable :: b_face(:), face_copy(:)
-  character(len=80)    :: answer, dir
+  character(SL)        :: answer, dir
   real                 :: big, small
 !==============================================================================!
 !                                                                              !

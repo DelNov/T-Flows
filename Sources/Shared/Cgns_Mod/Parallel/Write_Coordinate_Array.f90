@@ -9,21 +9,19 @@
 !   x,y,z:        |      (1 : NN_1)   |       NN_1 + 1 : NN_1 + NN_2    | ...  !
 !                                                                              !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: coordinates => r_node_01
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   integer         :: base, block, coord
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: base_id         ! base index number
-  integer           :: block_id        ! block index number
-  integer           :: coord_id        ! coord. array index number
-  character(len=80) :: coord_name
-  integer           :: i               ! lower range index
-  integer           :: j               ! upper range index
-  integer           :: error           ! error status
+  integer       :: base_id         ! base index number
+  integer       :: block_id        ! block index number
+  integer       :: coord_id        ! coord. array index number
+  character(SL) :: coord_name
+  integer       :: i               ! lower range index
+  integer       :: j               ! upper range index
+  integer       :: error           ! error status
+  real          :: coordinates(grid % n_nodes)
 !==============================================================================!
 
   ! Set input parameters

@@ -12,7 +12,7 @@
   integer                      :: k, n_dep, n_ref, n_esc
   real                         :: avg_cfl, avg_re, avg_st
   real                         :: max_cfl, max_re, max_st
-  character(len=160)           :: line
+  character(DL)                :: line
 !-----------------------------[Local parameters]-------------------------------!
   integer, parameter :: T=38  ! indent
 !==============================================================================!

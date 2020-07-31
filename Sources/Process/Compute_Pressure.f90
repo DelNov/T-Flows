@@ -37,7 +37,7 @@
   real                       :: u_f, v_f, w_f, a12, fs
   real                       :: mass_err
   real                       :: px_f, py_f, pz_f
-  character(len=80)          :: solver
+  character(SL)              :: solver
   real                       :: p_max, p_min, p_nor, p_nor_c
 !==============================================================================!
 !

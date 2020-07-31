@@ -1,5 +1,5 @@
 !==============================================================================!
-  character(len=80) function Var_Mod_Bnd_Cond_Name(phi, bnd_cell)
+  character(SL) function Var_Mod_Bnd_Cond_Name(phi, bnd_cell)
 !------------------------------------------------------------------------------!
 !   Provides a shortcut to obtain boundary condition type.                     !
 !------------------------------------------------------------------------------!

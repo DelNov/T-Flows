@@ -11,7 +11,7 @@
   type(Vert_Type), pointer :: vert
   integer                  :: v, e     ! vertex and element counters
   integer                  :: offset, fu
-  character(len=80)        :: name_out
+  character(SL)            :: name_out
 !-----------------------------[Local parameters]-------------------------------!
   integer, parameter :: VTK_TRIANGLE = 5  ! cell shapes in VTK format
   character(len= 0)  :: IN_0 = ''         ! indentation levels

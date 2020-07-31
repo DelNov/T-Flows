@@ -6,7 +6,7 @@
   logical           :: skew_corr
   logical, optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
-  character(len=80) :: val
+  character(SL) :: val
 !==============================================================================!
 
   call Control_Mod_Read_Char_Item('SKEWNESS_CORRECTION_VOF',   &

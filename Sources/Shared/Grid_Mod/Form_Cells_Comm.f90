@@ -7,9 +7,9 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: sub, i_nod, ms, mr, n, nn, sh
-  character(len=80) :: name_in
-  integer           :: c, c1, c2, s, buf_cnt
+  integer       :: sub, i_nod, ms, mr, n, nn, sh
+  character(SL) :: name_in
+  integer       :: c, c1, c2, s, buf_cnt
 !==============================================================================!
 
   if(n_proc < 2) return

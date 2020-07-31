@@ -13,10 +13,10 @@
 
     type(Grid_Type), pointer :: pnt_grid  ! grid for which it is defined
 
-    character(len=4)  :: name              ! variable name, always
-                                           ! uppercase and very short
-    character(len=4)  :: flux_name         ! variable flux name, always
-                                           ! uppercase and very short
+    character(VL) :: name       ! variable name, always upper case and
+                                ! very short (4, defined in Const_Mod)
+    character(VL) :: flux_name  ! variable flux name, always upper case and
+                                ! very short (4, defined in Const_Mod)
     real, allocatable :: n(:)              ! new value
     real, allocatable :: o(:), oo(:)       ! old and older then old
     real, allocatable :: a(:)              ! advection fluxes
@@ -35,7 +35,7 @@
     integer, allocatable :: bnd_cond_type(:)
 
     ! Parameters for numerical solution of the variable
-    character(len=80) :: precond
+    character(SL)     :: precond
     integer           :: adv_scheme  ! advection scheme
     real              :: blend       ! blending (1.0 central; 0.0 upwind)
     integer           :: td_scheme   ! time-disretization

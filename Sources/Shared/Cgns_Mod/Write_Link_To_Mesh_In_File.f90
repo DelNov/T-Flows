@@ -9,16 +9,16 @@
   character(len=*) :: input_name
   integer          :: base, block
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: base_id      ! base index number
-  integer           :: block_id     ! block index number
-  integer           :: sect_id      ! section id
-  character(len=80) :: file         ! name of the file to be linked with
-  character(len=80) :: base_name    ! name of the base
-  character(len=80) :: block_name   ! name of the block
-  character(len=80) :: name_in_file
-  character(len=80) :: node_name
-  integer           :: cnt
-  integer           :: error
+  integer       :: base_id      ! base index number
+  integer       :: block_id     ! block index number
+  integer       :: sect_id      ! section id
+  character(SL) :: file         ! name of the file to be linked with
+  character(SL) :: base_name    ! name of the base
+  character(SL) :: block_name   ! name of the block
+  character(SL) :: name_in_file
+  character(SL) :: node_name
+  integer       :: cnt
+  integer       :: error
 !==============================================================================!
 
   ! Set input parameters
