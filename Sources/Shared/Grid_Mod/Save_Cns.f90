@@ -138,6 +138,13 @@
     end if
   end do
 
+  ! Faces' global indices
+  do s = 1, grid % n_faces + grid % n_shadows
+    if(grid % old_f(s) .ne. 0) then
+      write(fu) grid % comm % face_glo(grid % old_f(s))
+    end if
+  end do
+
   !--------------!
   !   Boundary   !
   !--------------!

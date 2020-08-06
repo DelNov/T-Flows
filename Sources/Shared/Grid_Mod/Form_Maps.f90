@@ -7,7 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, cnt
+  integer :: c, c1, c2, c1g, c2g, s, cnt
 !==============================================================================!
 !   There is an issue with this procedure, but it's more related to MPI/IO     !
 !   functions than T-Flows.  In cases a subdomain has no physical boundary     !
@@ -23,10 +23,26 @@
   grid % comm % nc_s = grid % n_cells - grid % comm % n_buff_cells
 
   ! Initialize number of boundary cells in subdomain
+  grid % comm % nb_s = 0
   do c = -grid % n_bnd_cells, -1
     if(grid % comm % cell_proc(c) .eq. this_proc) then
       grid % comm % nb_s = grid % comm % nb_s + 1
     end if
+  end do
+
+  ! Initialize number of faces in subdomain
+  grid % comm % nf_s = 0
+  grid % comm % nf_t = 0
+  do s = 1, grid % n_faces
+    c1 = grid % faces_c(1, s)
+    c2 = grid % faces_c(2, s)
+    c1g = grid % comm % cell_glo(c1)
+    c2g = grid % comm % cell_glo(c2)
+    ! Count boundary faces as well as inside whose c1g < c2g for total count
+    if(c2g < 0 .or. c1g < c2g) then
+      grid % comm % nf_t = grid % comm % nf_t + 1
+    end if
+    grid % comm % nf_s = grid % comm % nf_s + 1
   end do
 
   ! First and last cell to send
@@ -56,6 +72,7 @@
     !-----------------------------!
     allocate(grid % comm % cell_map    (grid % comm % nc_s))
     allocate(grid % comm % bnd_cell_map(grid % comm % nb_s))
+    allocate(grid % comm % face_map    (grid % comm % nf_s))
 
     ! -1 is to start from zero, as needed by MPI functions
     do c = 1, grid % comm % nc_t
@@ -67,6 +84,15 @@
       grid % comm % bnd_cell_map(c) = c - 1
     end do
 
+    ! -1 is to start from zero, as needed by MPI functions
+    do s = 1, grid % comm % nf_t
+      grid % comm % face_map(s) = s - 1
+      c1 = grid % faces_c(1, s)
+      c2 = grid % faces_c(2, s)
+      c1g = grid % comm % cell_glo(c1)
+      c2g = grid % comm % cell_glo(c2)
+    end do
+
   !-----------------------!
   !                       !
   !   For parallel runs   !
@@ -76,14 +102,17 @@
 
     call Comm_Mod_Global_Sum_Int(grid % comm % nc_t)
     call Comm_Mod_Global_Sum_Int(grid % comm % nb_t)
+    call Comm_Mod_Global_Sum_Int(grid % comm % nf_t)
 
     !-----------------------------!
     !   Create mapping matrices   !
     !-----------------------------!
     allocate(grid % comm % cell_map    (grid % comm % nc_s))
     allocate(grid % comm % bnd_cell_map(max(grid % comm % nb_s,1)))
+    allocate(grid % comm % face_map    (grid % comm % nf_s))
     grid % comm % cell_map(:)     = 0
     grid % comm % bnd_cell_map(:) = 0
+    grid % comm % face_map(:)     = 0
 
     !---------------------!
     !   Inside cell map   !
@@ -101,6 +130,15 @@
       cnt = cnt + 1
       grid % comm % bnd_cell_map(cnt) = grid % comm % cell_glo(c)  &
                                       + grid % comm % nb_t
+    end do
+
+    !--------------!
+    !   Face map   !
+    !--------------!
+    cnt = 0
+    do s = 1, grid % n_faces
+      cnt = cnt + 1
+      grid % comm % face_map(cnt) = grid % comm % face_glo(s) - 1
     end do
   end if
 

@@ -126,8 +126,7 @@
   !---------------------!
   !   Mass flow rates   !
   !---------------------!
-  f_name = 'face_flux_00'
-  call Backup_Mod_Read_Face_Real(grid, fh, d, vc, f_name,  &
+  call Backup_Mod_Read_Face_Real(grid, fh, d, vc, 'face_flux',  &
                                  fld % m_flux % n, correct_sign = .true.)
 
   !--------------!
@@ -145,9 +144,9 @@
   !              !
   !--------------!
   if(mul % model .eq. VOLUME_OF_FLUID) then
-    f_name = 'face_dens_00'
     call Backup_Mod_Read_Variable(fh, d, vc, 'vof', mul % vof)
-    call Backup_Mod_Read_Face_Real(grid, fh, d, vc, f_name, fld % density_f)
+    call Backup_Mod_Read_Face_Real(grid, fh, d, vc, 'face_dens',  &
+                                   fld % density_f)
   end if
 
   !-----------------------!
