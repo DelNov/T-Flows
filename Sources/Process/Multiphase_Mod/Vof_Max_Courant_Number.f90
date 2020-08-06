@@ -15,19 +15,19 @@
   integer                       :: interf
   real                          :: courant_max
 !--------------------------------[Locals]--------------------------------------!
-  type(Field_Type),     pointer :: flow
-  type(Grid_Type),      pointer :: grid
-  type(Var_Type),       pointer :: vof
-  type(Face_Type),      pointer :: m_flux
-  integer                       :: c, c1, c2, s
-  real                          :: vof_dist
+  type(Field_Type), pointer :: flow
+  type(Grid_Type),  pointer :: grid
+  type(Var_Type),   pointer :: vof
+  type(Face_Type),  pointer :: m_flux
+  integer                   :: c, c1, c2, s
+  real                      :: vof_dist
 !==============================================================================!
 
   ! Take aliases
-  flow     => mult % pnt_flow
-  m_flux   => flow % m_flux
-  grid     => flow % pnt_grid
-  vof      => mult % vof
+  flow   => mult % pnt_flow
+  m_flux => flow % m_flux
+  grid   => flow % pnt_grid
+  vof    => mult % vof
 
   courant_max = -HUGE
 
@@ -41,7 +41,7 @@
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
 
-      vof_dist = min(max(vof % n(c1), 0.0),1.0)
+      vof_dist = min(max(vof % n(c1), 0.0), 1.0)
 
       vof_dist = (1.0 - vof_dist) * (1.0 - vof_dist)            &
                                   * vof_dist * vof_dist * 16.0
@@ -56,7 +56,7 @@
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
 
-      vof_dist = min(max(vof % n(c1), 0.0),1.0)
+      vof_dist = min(max(vof % n(c1), 0.0), 1.0)
 
       vof_dist = (1.0 - vof_dist) * (1.0 - vof_dist)            &
                                   * vof_dist * vof_dist * 16.0
@@ -102,7 +102,7 @@
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
 
-      c_d(c1) = c_d(c1) + max(- m_flux % n(s) / flow % density_f(s)  &
+      c_d(c1) = c_d(c1) + max(-m_flux % n(s) / flow % density_f(s)  &
                                         * dt / grid % vol(c1), 0.0)
     end do
 
@@ -111,7 +111,7 @@
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
 
-      c_d(c1) = c_d(c1) + max(- m_flux % n(s) / flow % density_f(s)  &
+      c_d(c1) = c_d(c1) + max(-m_flux % n(s) / flow % density_f(s)  &
                                         * dt / grid % vol(c1), 0.0)
 
       c_d(c2) = c_d(c2) + max( m_flux % n(s) / flow % density_f(s)   &
