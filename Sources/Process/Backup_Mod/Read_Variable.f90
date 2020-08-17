@@ -11,7 +11,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Comm_Type), pointer :: comm
   type(Grid_Type), pointer :: grid
-  character(len=80)        :: vn
+  character(SL)            :: vn
   integer                  :: vs, disp_loop, cnt_loop, nb, nc
 !==============================================================================!
 

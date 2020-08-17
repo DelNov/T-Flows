@@ -7,11 +7,11 @@
 !---------------------------------[Arguments]----------------------------------!
   integer :: base
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: base_id    ! base index number
-  character(len=80) :: base_name  ! name of the base
-  integer           :: cell_dim   ! cell dimensions (3->volume cell)
-  integer           :: phys_dim   ! number of coordinates to create vector
-  integer           :: error
+  integer       :: base_id    ! base index number
+  character(SL) :: base_name  ! name of the base
+  integer       :: cell_dim   ! cell dimensions (3->volume cell)
+  integer       :: phys_dim   ! number of coordinates to create vector
+  integer       :: error
 !==============================================================================!
 
   ! Set input parameters

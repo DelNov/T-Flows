@@ -7,7 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   logical, optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
-  character(len=80) :: val
+  character(SL) :: val
 !==============================================================================!
 
   call Control_Mod_Read_Char_Item('TURBULENCE_MODEL_VARIANT', 'stabilized',  &

@@ -37,8 +37,8 @@
   integer                  :: i, c, c1, c2, m, s, nks, nvs, sc, fu
   integer                  :: n_wall, n_inflow, n_outflow, n_symmetry,  &
                               n_heated_wall, n_convect
-  character(len=80)        :: keys(128)
-  character(len=80)        :: keys_file(128)
+  character(SL)            :: keys(128)
+  character(SL)            :: keys_file(128)
   real                     :: vals(0:128)   ! note that they start from zero!
   real                     :: area
 

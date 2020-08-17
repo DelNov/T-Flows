@@ -45,7 +45,7 @@
   integer              :: n, n1, n2, n1_tot, n2_tot, n_tot
   integer              :: pos, c, c1, c2, d1, d2, k, nks, s, p
   logical              :: found
-  character(len=80)    :: keys(128)
+  character(SL)        :: keys(128)
 !==============================================================================!
 
   ! Allocate memory for offsets

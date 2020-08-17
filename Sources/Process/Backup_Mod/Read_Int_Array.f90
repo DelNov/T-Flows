@@ -9,8 +9,8 @@
   character(len=*)      :: arr_name
   integer, dimension(:) :: arr_value
 !-----------------------------------[Locals]-----------------------------------!
-  character(len=80) :: vn
-  integer           :: vs, disp_loop, cnt_loop, length
+  character(SL) :: vn
+  integer       :: vs, disp_loop, cnt_loop, length
 !==============================================================================!
 
   cnt_loop  = 0

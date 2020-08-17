@@ -31,14 +31,14 @@
   type(Refines_Type) :: ref
   type(Grid_Type)    :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: b, i, l, s, fc, n, n1, n2, n3, n4, dumi, fu
-  integer           :: n_faces_check, n_nodes_check
-  integer           :: ni, nj, nk, npnt, nsurf
-  character(len=12) :: dum
-  character(len=80) :: domain_name
-  character(len=12) :: answer
-  real              :: xt(8), yt(8), zt(8)
-  integer           :: face_nodes(6,4)
+  integer       :: b, i, l, s, fc, n, n1, n2, n3, n4, dumi, fu
+  integer       :: n_faces_check, n_nodes_check
+  integer       :: ni, nj, nk, npnt, nsurf
+  character(SL) :: dum
+  character(SL) :: domain_name
+  character(SL) :: answer
+  real          :: xt(8), yt(8), zt(8)
+  integer       :: face_nodes(6,4)
 !==============================================================================!
   data face_nodes / 1, 1, 2, 4, 3, 5,         &
                     2, 5, 6, 8, 7, 7,         &

@@ -7,17 +7,17 @@
 !--------------------------------[Arguments]-----------------------------------!
   integer           :: base, block ! base, block
 !----------------------------------[Locals]------------------------------------!
-  integer           :: base_id     ! base index number
-  integer           :: block_id    ! block index number
-  integer           :: coord_id    ! coordinate index number
-  integer           :: solution_id ! solution index
-  integer           :: n_fields    ! number of fields in solution node
-  character(len=80) :: fieldname   ! name of field node
-  integer           :: data_type   ! RealDouble
-  real              :: exponents(5)! dimensional exponents
-  integer           :: c
-  logical           :: dimensional_bool
-  integer           :: error
+  integer       :: base_id     ! base index number
+  integer       :: block_id    ! block index number
+  integer       :: coord_id    ! coordinate index number
+  integer       :: solution_id ! solution index
+  integer       :: n_fields    ! number of fields in solution node
+  character(SL) :: fieldname   ! name of field node
+  integer       :: data_type   ! RealDouble
+  real          :: exponents(5)! dimensional exponents
+  integer       :: c
+  logical       :: dimensional_bool
+  integer       :: error
 !==============================================================================!
 
   ! Set input parameters

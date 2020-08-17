@@ -25,7 +25,7 @@
   type Grid_Type
 
     ! Stores the name of this domain
-    character(len=80) :: name
+    character(SL) :: name
 
     ! Number of ...
     integer :: n_nodes      ! ... nodes

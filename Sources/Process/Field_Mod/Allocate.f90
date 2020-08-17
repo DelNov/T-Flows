@@ -8,8 +8,8 @@
   type(Field_Type)         :: flow
   type(Grid_Type),  target :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer          :: sc
-  character(len=4) :: c_name, q_name
+  integer       :: sc
+  character(VL) :: c_name, q_name
 !==============================================================================!
 
   ! Store the pointer to a grid

@@ -12,10 +12,10 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: n_prob, p, c, fu
-  real              :: yp(32768), zp(32768)
-  character(len=80) :: name_prob
-  character(len=80) :: answer
+  integer       :: n_prob, p, c, fu
+  real          :: yp(32768), zp(32768)
+  character(SL) :: name_prob
+  character(SL) :: answer
 !==============================================================================!
 
   print *, '#==============================='

@@ -7,12 +7,12 @@
 !---------------------------------[Arguments]----------------------------------!
   integer :: base, block, solution
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: base_id   ! base index number
-  integer           :: block_id  ! block index number
-  integer           :: sol_id    ! element section index
-  character(len=80) :: sol_name  ! name of the Elements_t node
-  integer           :: sol_type  ! types of elements in the section
-  integer           :: error
+  integer       :: base_id   ! base index number
+  integer       :: block_id  ! block index number
+  integer       :: sol_id    ! element section index
+  character(SL) :: sol_name  ! name of the Elements_t node
+  integer       :: sol_type  ! types of elements in the section
+  integer       :: error
 !==============================================================================!
 
   ! Set input parameters

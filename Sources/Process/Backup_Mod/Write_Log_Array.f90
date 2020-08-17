@@ -9,8 +9,8 @@
   character(len=*)      :: arr_name
   logical, dimension(:) :: arr_value
 !-----------------------------------[Locals]-----------------------------------!
-  character(len=80) :: vn
-  integer           :: vs, length  ! variable size
+  character(SL) :: vn
+  integer       :: vs, length  ! variable size
 !==============================================================================!
 
   length = size(arr_value)

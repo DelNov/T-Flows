@@ -12,7 +12,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  character(len=130)  :: name_in
+  character(DL)       :: name_in
   integer             :: i, j, n_blocks, n_bnd_sect, dum1, dum2, fu
   integer,allocatable :: temp(:)
   integer             :: c, dir

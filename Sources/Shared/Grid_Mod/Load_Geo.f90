@@ -9,8 +9,8 @@
   integer           :: this_proc
   integer, optional :: domain
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: c, n, s, fu
-  character(len=80) :: name_in
+  integer       :: c, n, s, fu
+  character(SL) :: name_in
 !==============================================================================!
 
   !----------------------------!

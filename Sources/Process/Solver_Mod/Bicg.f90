@@ -25,7 +25,7 @@
   real              :: x(-sol % pnt_grid % n_bnd_cells :  &
                           sol % pnt_grid % n_cells)
   real              :: b( sol % pnt_grid % n_cells)  ! [A]{x}={b}
-  character(len=80) :: prec                          ! preconditioner
+  character(SL)     :: prec                          ! preconditioner
   integer           :: miter                         ! max and actual ...
   integer           :: niter                         ! ... num. iterations
   real              :: tol                           ! tolerance

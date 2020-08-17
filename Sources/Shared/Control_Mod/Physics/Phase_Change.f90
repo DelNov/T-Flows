@@ -6,7 +6,7 @@
   logical           :: phase_change
   logical, optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
-  character(len=80) :: val
+  character(SL) :: val
 !==============================================================================!
 
   call Control_Mod_Read_Char_Item('PHASE_CHANGE', 'no', val, verbose)

@@ -16,17 +16,16 @@
   real             :: input_array(grid % n_cells - grid % comm % n_buff_cells)
   character(len=*) :: input_name
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: base_id        ! base index number
-  integer           :: block_id       ! block index number
-  integer           :: solution_id    ! solution index
-  integer           :: field_id       ! field index
-  character(len=80) :: field_name     ! name of the FlowSolution_t node
-  integer           :: sect_id
-  integer           :: cnt            ! cells of sect_id
-                       ! field array
-  real              :: field_array(grid % n_cells - grid % comm % n_buff_cells)
-  integer           :: i, j, k, c
-  integer           :: error
+  integer       :: base_id        ! base index number
+  integer       :: block_id       ! block index number
+  integer       :: solution_id    ! solution index
+  integer       :: field_id       ! field index
+  character(SL) :: field_name     ! name of the FlowSolution_t node
+  integer       :: sect_id
+  integer       :: cnt            ! cells of sect_id field array
+  real          :: field_array(grid % n_cells - grid % comm % n_buff_cells)
+  integer       :: i, j, k, c
+  integer       :: error
 !==============================================================================!
 
   ! Set input parameters

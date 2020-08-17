@@ -11,7 +11,7 @@
 !----------------------------------[Locals]------------------------------------!
   type(Particle_Type), pointer :: part
   integer                      :: k, fu
-  character(len=80)            :: name_out
+  character(SL)                :: name_out
 !-----------------------------[Local parameters]-------------------------------!
   character(len= 0)  :: IN_0 = ''           ! indentation levels
   character(len= 2)  :: IN_1 = '  '

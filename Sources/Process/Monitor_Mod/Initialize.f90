@@ -12,8 +12,8 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: c, m, n, l
   real              :: curr_dist, min_dist_all
-  character(len=80) :: mon_file_name
-  character(len=80) :: point_name
+  character(SL)     :: mon_file_name
+  character(SL)     :: point_name
   real, allocatable :: min_dist(:)
   real              :: xyz(3), def(3)
 !==============================================================================!

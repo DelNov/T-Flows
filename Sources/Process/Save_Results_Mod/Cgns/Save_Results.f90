@@ -30,14 +30,14 @@
   logical                       :: plot_inside  ! plot results inside?
   integer,             optional :: domain
 !----------------------------------[Locals]------------------------------------!
-  type(Grid_Type), pointer      :: grid
-  type(Var_Type),  pointer      :: phi
-  character(len=80)             :: name_out, name_mean, a_name
-  integer                       :: base
-  integer                       :: block
-  integer                       :: solution
-  integer                       :: field
-  integer                       :: c, sc, ua, s
+  type(Grid_Type), pointer :: grid
+  type(Var_Type),  pointer :: phi
+  character(SL)            :: name_out, name_mean, a_name
+  integer                  :: base
+  integer                  :: block
+  integer                  :: solution
+  integer                  :: field
+  integer                  :: c, sc, ua, s
 !==============================================================================!
 
   if(.not. plot_inside) return ! no point to write *-bnd.cgns yet
@@ -187,7 +187,7 @@
   !---------------------!
   !   Volume Fraction   !
   !---------------------!
-  if(multiphase_model .eq. VOLUME_OF_FLUID) then
+  if(mult % model .eq. VOLUME_OF_FLUID) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               mult % vof % n(1), 'VolumeFraction')
     if (mult % d_func) then
@@ -285,7 +285,7 @@
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               flow % vort(1),'VorticityMagnitude')
   end if
-  if(turb % model .ne. NO_TURBULENCE) then
+  if(turb % model .ne. NO_TURBULENCE_MODEL) then
     kin_vis_t(1:grid % n_cells) = turb % vis_t(1:grid % n_cells)  &
                                 / flow % viscosity(1:grid % n_cells)
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
@@ -372,7 +372,7 @@
   end if ! turb % statistics
 
   ! Save y+ for all turbulence models
-  if(turb % model .ne. NO_TURBULENCE .and.  &
+  if(turb % model .ne. NO_TURBULENCE_MODEL .and.  &
      turb % model .ne. DNS) then
     call Cgns_Mod_Write_Field(base, block, solution, field, grid, &
                               turb % y_plus(1),'TurbulentQuantityYplus')

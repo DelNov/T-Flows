@@ -9,8 +9,8 @@
   character(len=*) :: var_name
   integer          :: var_value
 !-----------------------------------[Locals]-----------------------------------!
-  character(len=80) :: vn
-  integer           :: vs, disp_loop, cnt_loop
+  character(SL) :: vn
+  integer       :: vs, disp_loop, cnt_loop
 !==============================================================================!
 
   cnt_loop  = 0

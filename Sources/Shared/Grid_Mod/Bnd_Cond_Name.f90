@@ -1,5 +1,5 @@
 !==============================================================================!
-  character(len=80) function Grid_Mod_Bnd_Cond_Name(grid, bnd_cell)
+  character(SL) function Grid_Mod_Bnd_Cond_Name(grid, bnd_cell)
 !------------------------------------------------------------------------------!
 !   Provides a shortcut to obtain boundary condition type.                     !
 !------------------------------------------------------------------------------!

@@ -9,7 +9,7 @@
 !---------------------------------[Arguments]----------------------------------!
   character(len=*)  :: keyword
   character(len=*)  :: def      ! default value
-  character(len=80) :: val      ! spefified value, if found
+  character(SL)     :: val      ! spefified value, if found
   logical, optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   logical :: reached_end

@@ -11,7 +11,7 @@
   real                    :: array(-grid % n_bnd_cells:grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
   type(Comm_Type), pointer :: comm
-  character(len=80)        :: vn
+  character(SL)            :: vn
   integer                  :: vs  ! variable size
 !==============================================================================!
 
