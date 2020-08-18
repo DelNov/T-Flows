@@ -55,8 +55,8 @@
   do n = 1, grid % n_bnd_cond
     read(fu) grid % bnd_cond % name(n)
   end do
-  ! The last three are reserved for perodicity,
-  ! (should the domain has periodic direction)
+  ! The last three are reserved for perodicity
+  ! (Assigned in Grid_Mod_Find_Periodic_Faces)
   grid % bnd_cond % name(grid % n_bnd_cond + 1) = 'PERIODIC_X'
   grid % bnd_cond % name(grid % n_bnd_cond + 2) = 'PERIODIC_Y'
   grid % bnd_cond % name(grid % n_bnd_cond + 3) = 'PERIODIC_Z'
