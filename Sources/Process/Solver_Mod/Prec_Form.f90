@@ -8,7 +8,7 @@
   integer           :: ni
   type(Matrix_Type) :: a
   type(Matrix_Type) :: d
-  character(len=80) :: prec  ! preconditioner
+  character(SL)     :: prec  ! preconditioner
 !-----------------------------------[Locals]-----------------------------------!
   real    :: sum1
   integer :: i, j, k

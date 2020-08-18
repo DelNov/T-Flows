@@ -17,10 +17,10 @@
   type(Turb_Type),       target :: turb
   type(Multiphase_Type), target :: mult
 !----------------------------------[Locals]------------------------------------!
-  type(Grid_Type),  pointer :: grid
-  type(Var_Type),   pointer :: tq, ui, phi
-  character(len=80)         :: name
-  integer                   :: i, sc
+  type(Grid_Type), pointer :: grid
+  type(Var_Type),  pointer :: tq, ui, phi
+  character(SL)            :: name
+  integer                  :: i, sc
 !==============================================================================!
 
   ! Take alias

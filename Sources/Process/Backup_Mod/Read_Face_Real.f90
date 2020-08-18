@@ -1,144 +1,78 @@
 !==============================================================================!
-  subroutine Backup_Mod_Read_Face_Real(grid, fh, disp, vc, var_name, flux,  &
+  subroutine Backup_Mod_Read_Face_Real(grid, fh, disp, vc, var_name, array,  &
                                        correct_sign)
 !------------------------------------------------------------------------------!
-!   Reads face-based variable (flux) using cell-based arrays.                  !
-!------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: cells_nf => i_cell_01,  &  ! cells' number of faces
-                      ivalues  => i_cell_02,  &  ! work array for int. values
-                      rvalues  => r_cell_01      ! work array for real values
+!   Reads a vector variable with face values from a backup file.               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type), target :: grid
   integer                 :: fh, disp, vc
   character(len=*)        :: var_name
-  real                    :: flux(grid % n_faces)
+  real                    :: array(grid % n_faces)
   logical, optional       :: correct_sign  ! for face fluxes, signs might have
                                            ! to be changed (check it one day)
 !-----------------------------------[Locals]-----------------------------------!
   type(Comm_Type), pointer :: comm
-  integer                  :: s, c, c1, c2, cg1, cg2, mc, max_cnt, nb, nc
-  integer, allocatable     :: cells_cg(:,:)   ! cells' cells
-  integer, allocatable     :: cells_fc(:,:)   ! cells' faces
+  character(len=80)        :: vn
+  integer                  :: vs, disp_loop, cnt_loop, nf
+  integer                  :: s, c1, c2, cg1, cg2
 !==============================================================================!
 
-  ! Take aliases
+  ! Take alias
   comm => grid % comm
-  nb = grid % n_bnd_cells
-  nc = grid % n_cells
+  nf = grid % n_faces
 
-  allocate(cells_cg(24, grid % n_cells));  cells_cg  = 0
-  allocate(cells_fc(24, grid % n_cells));  cells_fc  = 0
+  cnt_loop  = 0
+  disp_loop = 0
 
-  cells_nf(:) = 0
+  !--------------------------------------------------------!
+  !   Browse the entire file until you find the variable   !
+  !--------------------------------------------------------!
+  do
 
-  !---------------------------------------! 
-  !   Browse through all faces to form:   !
-  !   cells_nf, cells_cg and cells_fc.    !
-  !---------------------------------------! 
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1, s)
-    c2 = grid % faces_c(2, s)
+    ! Increase counter
+    cnt_loop = cnt_loop + 1
 
-    ! Take cells' global numbers.  (These are less then zero in 
-    ! real boundary cells, but greater than zero in buffer cells.)
-    cg1 = grid % comm % cell_glo(c1)
-    cg2 = grid % comm % cell_glo(c2)
+    call Comm_Mod_Read_Text(fh, vn, disp_loop)  ! variable name
+    call Comm_Mod_Read_Int (fh, vs, disp_loop)  ! variable size  
 
-    ! Store flux to "c1" no matter what
-    cells_nf(c1) = cells_nf(c1) + 1
-    cells_cg(cells_nf(c1), c1) = cg2
-    cells_fc(cells_nf(c1), c1) = s   ! store face number
+    ! If variable is found, read it and retrun
+    if(vn .eq. var_name) then
+      if(this_proc < 2) print *, '# Reading variable: ', trim(vn)
+      call Comm_Mod_Read_Face_Real(comm, fh, array(1:comm % nf_s), disp_loop)
+      disp = disp_loop
 
-    ! Store flux to "c2" only if it is a non-boundary cell (real boundary)
-    if(c2 > 0 .and. c2 <= grid % n_cells - grid % comm % n_buff_cells) then
-      cells_nf(c2) = cells_nf(c2) + 1
-      cells_cg(cells_nf(c2), c2) = cg1
-      cells_fc(cells_nf(c2), c2) = s   ! store face number
-    end if
-  end do
-
-  !------------------------------------!
-  !    Find maximum number of faces    !
-  !   around cell in the entire grid   !
-  !------------------------------------!
-  max_cnt = 0
-  do c = 1, grid % n_cells
-    if( cells_nf(c) > max_cnt ) max_cnt = cells_nf(c)
-  end do
-  call Comm_Mod_Global_Max_Int(max_cnt)
-
-  !-------------------------------------------------!
-  !   Update neighbour information in the buffers   !
-  !-------------------------------------------------!
-
-  ! Gather information on all neighbours in buffers, one by one
-  do mc = 1, max_cnt
-
-    ! Exchange neighbour information at level "mc"
-    do c = 1, grid % n_cells
-      ivalues(c) = cells_cg(mc,c)
-    end do
-    call Grid_Mod_Exchange_Cells_Int(grid, ivalues(-nb:nc))
-
-    ! Update buffer cells with neighbors
-    do c = grid % n_cells - grid % comm % n_buff_cells + 1, grid % n_cells
-      cells_nf(c) = cells_nf(c) + 1
-      cells_cg(cells_nf(c), c) = ivalues(c) 
-    end do
-  end do
-
-  !--------------------------------------!
-  !     Sort fluxes for each cell by     !
-  !   global numbers of its neighbours   !
-  !--------------------------------------!
-  do c = 1, grid % n_cells
-    call Sort_Mod_Int_Carry_Int(cells_cg(1:cells_nf(c), c),  &
-                                cells_fc(1:cells_nf(c), c))
-  end do
-
-  !---------------------------------------------!
-  !   Read cell-based fluxes from backup file   !
-  !                                             !
-  !   Keep in mind that here each cell has      !
-  !   fluxes defined at all of the faces        !
-  !   surrounding it.                           !
-  !---------------------------------------------!
-  do mc = 1, max_cnt
-    rvalues(:) = 0.0
-    write(var_name(11:12), '(i2.2)') mc  ! set name of the backup variable
-    call Backup_Mod_Read_Cell_Real(grid, fh, disp, vc, var_name,  &
-                                   rvalues(-nb:nc))
-    call Grid_Mod_Exchange_Cells_Real(grid, rvalues(-nb:nc))
-    do c = 1, grid % n_cells - grid % comm % n_buff_cells
-      if( cells_cg(mc, c) .ne. 0 ) then
-        flux( cells_fc(mc, c) ) = rvalues(c)
-      end if
-    end do
-  end do
-
-  !--------------------------------------------!
-  !        Correct the signs of fluxes         !
-  !   (Remember, they are defined to be pos-   !
-  !    itive from cg1 to cg2; and cg2 > cg1)   !
-  !--------------------------------------------!
-  if(present(correct_sign)) then
-    if(correct_sign) then
-      do s = 1, grid % n_faces
-        c1  = grid % faces_c(1,s)
-        c2  = grid % faces_c(2,s)
-        cg1 = grid % comm % cell_glo(c1)
-        cg2 = grid % comm % cell_glo(c2)
-        if(cg2 > 0 .and. cg2 < cg1) then
-          flux(s) = -flux(s)
+      ! Correct the signs of fluxes  (Remember, they are defined
+      ! defined to be positive from cg1 to cg2; and cg2 > cg1)
+      if(present(correct_sign)) then
+        if(correct_sign) then
+          do s = 1, grid % n_faces
+            c1  = grid % faces_c(1,s)
+            c2  = grid % faces_c(2,s)
+            cg1 = grid % comm % cell_glo(c1)
+            cg2 = grid % comm % cell_glo(c2)
+            if(cg2 > 0 .and. cg2 < cg1) then
+              array(s) = -array(s)
+            end if
+          end do
         end if
-      end do
-    end if
-  end if
+      end if
 
-  deallocate(cells_cg)
-  deallocate(cells_fc)
+      return
+
+    ! If variable not found, advance the offset only
+    else
+      disp_loop = disp_loop + vs
+    end if
+
+    ! Check if variable is in the file
+    if(cnt_loop >= vc) goto 1
+
+  end do
+
+1 if(this_proc < 2) print *, '# Variable: ', trim(var_name), ' not found! ',  &
+                             'Setting the values to 0.0!'
+  array(:) = 0.0
 
   end subroutine

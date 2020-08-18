@@ -1,17 +1,23 @@
 !==============================================================================!
-  subroutine Control_Mod_Turbulence_Model_Variant(val, verbose)
+  subroutine Comm_Mod_Write_Face_Real(comm, fh, array, disp)
 !------------------------------------------------------------------------------!
-!   Reading turbulence model variant from the control file                     !
+!   Sequential version of writing a "distributed" face-based array.            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  logical, optional :: verbose
+  type(Comm_Type) :: comm
+  integer         :: fh         ! file handle
+  real            :: array(:)
+  integer         :: disp       ! displacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
-  character(SL) :: val
+  integer :: s
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('TURBULENCE_MODEL_VARIANT', 'stabilized',  &
-                                   val, verbose)
-  call To_Upper_Case(val)
+  ! Write "distributed" face data
+  do s = 1, comm % nf_t
+    write(9) array(s)
+  end do
+
+  disp = disp + comm % nf_t * SIZE_REAL
 
   end subroutine

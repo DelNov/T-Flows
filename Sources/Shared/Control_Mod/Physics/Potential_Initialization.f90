@@ -8,7 +8,7 @@
   logical           :: pot_init
   logical, optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
-  character(len=80) :: val
+  character(SL) :: val
 !==============================================================================!
 
   call Control_Mod_Read_Char_Item('POTENTIAL_INITIALIZATION', 'no',  &

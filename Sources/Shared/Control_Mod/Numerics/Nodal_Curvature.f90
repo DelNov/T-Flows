@@ -6,7 +6,7 @@
   logical           :: nodal_curvature
   logical, optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
-  character(len=80) :: val
+  character(SL) :: val
 !==============================================================================!
 
   call Control_Mod_Read_Char_Item('NODAL_CURVATURE', 'no', val, verbose)

@@ -15,8 +15,8 @@
   integer :: dom_control_file_unit(MD)  ! domain control file units
 
   ! Number of presumably misstyped keywords followed by their list
-  integer           :: n_similar =  0
-  character(len=40) :: similar(128)
+  integer       :: n_similar =  0
+  character(SL) :: similar(128)
 
   contains
 

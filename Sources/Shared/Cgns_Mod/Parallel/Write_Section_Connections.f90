@@ -16,17 +16,17 @@
   integer         :: base, block, sect
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: base_id       ! base index number
-  integer           :: block_id      ! block index number
-  integer           :: sect_id       ! element section index
-  character(len=80) :: sect_name     ! name of the Elements_t node
-  integer           :: cell_type     ! types of elements in the section
-  integer           :: n_bnd         ! index of last boundary element
-  integer           :: error
-  integer           :: n_nodes, c, cnt, i, j
-  integer           :: first_cell    ! look at array structure at the header
-  integer           :: last_cell     ! look at array structure at the header
-  integer           :: cell_n(8, grid % n_nodes)
+  integer       :: base_id       ! base index number
+  integer       :: block_id      ! block index number
+  integer       :: sect_id       ! element section index
+  character(SL) :: sect_name     ! name of the Elements_t node
+  integer       :: cell_type     ! types of elements in the section
+  integer       :: n_bnd         ! index of last boundary element
+  integer       :: error
+  integer       :: n_nodes, c, cnt, i, j
+  integer       :: first_cell    ! look at array structure at the header
+  integer       :: last_cell     ! look at array structure at the header
+  integer       :: cell_n(8, grid % n_nodes)
 !==============================================================================!
 
   ! Set input parameters

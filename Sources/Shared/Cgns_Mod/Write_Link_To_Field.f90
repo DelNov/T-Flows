@@ -10,15 +10,15 @@
   integer          :: base, block, solution
   character(len=*) :: input_name
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: base_id        ! base index number
-  integer           :: block_id       ! block index number
-  integer           :: solution_id    ! solution index
-  character(len=80) :: base_name      ! name of the block
-  character(len=80) :: block_name     ! name of the block
-  character(len=80) :: solution_name  ! name of the Elements_t node
-  character(len=80) :: name_in_file   ! local var
-  character(len=80) :: node_name
-  integer           :: error
+  integer       :: base_id        ! base index number
+  integer       :: block_id       ! block index number
+  integer       :: solution_id    ! solution index
+  character(SL) :: base_name      ! name of the block
+  character(SL) :: block_name     ! name of the block
+  character(SL) :: solution_name  ! name of the Elements_t node
+  character(SL) :: name_in_file   ! local var
+  character(SL) :: node_name
+  integer       :: error
 !==============================================================================!
 
   ! Set input parameters

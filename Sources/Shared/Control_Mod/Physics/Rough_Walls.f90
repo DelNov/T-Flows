@@ -8,7 +8,7 @@
   logical           :: rough_walls
   logical, optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
-  character(len=80) :: val
+  character(SL) :: val
 !==============================================================================!
 
   call Control_Mod_Read_Char_Item('ROUGH_WALLS', 'no',  &

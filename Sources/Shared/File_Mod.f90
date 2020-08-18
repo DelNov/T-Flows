@@ -7,18 +7,21 @@
   use Const_Mod
 !------------------------------------------------------------------------------!
   implicit none
+!------------------------------[Local parameters]------------------------------!
+  integer, parameter :: MAX_TOKENS = DL / 2
 !==============================================================================!
 
-  character(len=80) :: problem_name(MD)
+  character(SL) :: problem_name(MD)
 
   !--------------------!
   !   Tokenizer type   !
   !--------------------!
   type Tokenizer_Type
-    character(len=300) :: whole              ! whole string
-    character(len=300) :: tokens(300)        ! tokens
-    integer            :: n_tokens           ! number of tokens
-    integer            :: s(300), e(300)     ! tokens starts and ends
+    character(DL) :: whole               ! whole string
+    character(SL) :: tokens(MAX_TOKENS)  ! tokens
+    integer       :: n_tokens            ! number of tokens
+    integer       :: s(MAX_TOKENS),  &   ! tokens starts ...
+                     e(MAX_TOKENS)       ! ... and ends
   end type
 
   type(Tokenizer_Type) :: line

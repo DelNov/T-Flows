@@ -14,8 +14,8 @@
   type(Grid_Type) :: grid
   integer         :: sub, nn_sub, nc_sub, nf_sub, ns_sub, nbc_sub
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: b, c, s, n, lev, item, fu, subo, c1, c2
-  character(len=80) :: name_out
+  integer       :: b, c, s, n, lev, item, fu, subo, c1, c2
+  character(SL) :: name_out
 !==============================================================================!
 
   !----------------------!
@@ -135,6 +135,13 @@
       else
         write(fu) grid % new_f(grid % faces_s(grid % old_f(s)))
       end if
+    end if
+  end do
+
+  ! Faces' global indices
+  do s = 1, grid % n_faces + grid % n_shadows
+    if(grid % old_f(s) .ne. 0) then
+      write(fu) grid % comm % face_glo(grid % old_f(s))
     end if
   end do
 

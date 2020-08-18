@@ -3,6 +3,9 @@
 !------------------------------------------------------------------------------!
 !   This is used to read boundary conditions or materials in "Generator"       !
 !------------------------------------------------------------------------------!
+!----------------------------------[Modules]-----------------------------------!
+  use Const_Mod
+!------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
 
@@ -19,10 +22,10 @@
     integer :: ks, ke  ! start and end in "i" direction
 
     ! On which face is it ("IMIN", "IMAC", "JMIN", ...
-    character(len= 4) :: face
+    character(SL) :: face
 
     ! Stores the name of the boundary condition (or material)
-    character(len=80) :: name
+    character(SL) :: name
 
   end type
 

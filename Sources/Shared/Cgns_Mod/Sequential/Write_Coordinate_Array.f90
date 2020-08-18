@@ -8,14 +8,14 @@
   integer         :: base, block, coord
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: base_id         ! base index number
-  integer           :: block_id        ! block index number
-  integer           :: coord_id        ! coord index number
-  character(len=80) :: coord_name
-  integer           :: i               ! lower range index
-  integer           :: j               ! upper range index
-  integer           :: error           ! error status
-  real              :: coordinates(grid % n_nodes)
+  integer       :: base_id         ! base index number
+  integer       :: block_id        ! block index number
+  integer       :: coord_id        ! coord index number
+  character(SL) :: coord_name
+  integer       :: i               ! lower range index
+  integer       :: j               ! upper range index
+  integer       :: error           ! error status
+  real          :: coordinates(grid % n_nodes)
 !==============================================================================!
 
   ! Set input parameters

@@ -9,8 +9,8 @@
   character(len=*) :: var_name
   real             :: var_value
 !-----------------------------------[Locals]-----------------------------------!
-  character(len=80) :: vn
-  integer           :: vs  ! variable size
+  character(SL) :: vn
+  integer       :: vs  ! variable size
 !==============================================================================!
 
   if(this_proc < 2) print *, '# Writing variable: ', trim(var_name)

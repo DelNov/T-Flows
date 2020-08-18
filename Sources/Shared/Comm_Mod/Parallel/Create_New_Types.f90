@@ -37,4 +37,13 @@
                                      error)                 ! int. error
   call Mpi_Type_Commit(bnd_cell_map_type, error)
 
+  ! Create new type for faces
+  call Mpi_Type_Create_Indexed_Block(comm % nf_s,     & ! length of map
+                                     1,               & ! block size
+                                     comm % face_map, & ! displacements 
+                                     MPI_DOUBLE,      & ! old data type
+                                     face_map_type,   & ! new data type 
+                                     error)             ! integer error
+  call Mpi_Type_Commit(face_map_type, error)
+
   end subroutine

@@ -6,7 +6,7 @@
   logical           :: heat_transfer
   logical, optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
-  character(len=80) :: val
+  character(SL) :: val
 !==============================================================================!
 
   call Control_Mod_Read_Char_Item('HEAT_TRANSFER', 'no', val, verbose)

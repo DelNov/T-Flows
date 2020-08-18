@@ -18,7 +18,7 @@
   type(Matrix_Type) :: d
   real              :: x(:)
   real              :: b(:)
-  character(len=80) :: prec  ! preconditioner
+  character(SL)     :: prec  ! preconditioner
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i, j, k
   real    :: sum1

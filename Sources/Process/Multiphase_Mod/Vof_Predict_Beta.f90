@@ -79,7 +79,7 @@
 
           ! Compute alfa_cbc
           if (alfa_d_til >= 0.0 .and. alfa_d_til <= 1.0) then
-            alfa_cbc = min(1.0, alfa_d_til / cod)
+            alfa_cbc = min(1.0, alfa_d_til / max(cod, epsloc))
           else
             alfa_cbc = alfa_d_til
           end if

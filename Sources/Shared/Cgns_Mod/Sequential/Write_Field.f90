@@ -11,21 +11,21 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer              :: base, block, solution, field
-  type(Grid_Type)      :: grid
-  real                 :: input_array(grid % n_cells)
-  character(len=*)     :: input_name
+  integer          :: base, block, solution, field
+  type(Grid_Type)  :: grid
+  real             :: input_array(grid % n_cells)
+  character(len=*) :: input_name
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: base_id     ! base index number
-  integer              :: block_id    ! block index number
-  integer              :: solution_id ! solution index
-  integer              :: field_id    ! field index
-  character(len=80)    :: field_name  ! name of the FlowSolution_t node
-  integer              :: sect_id
-  integer              :: cnt            ! cells of sect_id
-  real                 :: field_array(grid % n_cells) ! field array
-  integer              :: i, j, k, c
-  integer              :: error
+  integer       :: base_id      ! base index number
+  integer       :: block_id     ! block index number
+  integer       :: solution_id  ! solution index
+  integer       :: field_id     ! field index
+  character(SL) :: field_name   ! name of the FlowSolution_t node
+  integer       :: sect_id
+  integer       :: cnt          ! cells of sect_id
+  real          :: field_array(grid % n_cells) ! field array
+  integer       :: i, j, k, c
+  integer       :: error
 !==============================================================================!
 
   ! Set input parameters

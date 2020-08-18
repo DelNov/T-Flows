@@ -18,13 +18,13 @@
   integer, parameter   :: MSH_HEXA  = 5
   integer, parameter   :: MSH_PENTA = 6
   integer, parameter   :: MSH_PYRA  = 7
-  character(len=130)   :: name_in
+  character(DL)        :: name_in
   integer              :: n_sect, n_elem, n_blocks, n_bnd_sect, n_grps, n_memb
   integer              :: i, j, c, dim, p_tag, s_tag, n_tags, type, fu
   integer              :: run, s_tag_max, n_e_0d, n_e_1d, n_e_2d, n_e_3d
   integer, allocatable :: n(:), new(:)
   integer, allocatable :: phys_tags(:), p_tag_corr(:), n_bnd_cells(:)
-  character(len=80), allocatable :: phys_names(:)
+  character(SL), allocatable :: phys_names(:)
 !==============================================================================!
 
   call File_Mod_Set_Name(name_in, extension='.msh')

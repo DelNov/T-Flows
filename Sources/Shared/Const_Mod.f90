@@ -6,6 +6,14 @@
   implicit none
 !==============================================================================!
 
+  ! Standard string length
+  integer, parameter :: VL =   4  ! variable name length
+  integer, parameter :: SL =  80  ! standard string length
+  integer, parameter :: DL = 160  ! double string length
+
+  integer, parameter :: DP =  8  ! double precisions for real and integer
+  integer, parameter :: SP =  4  ! single precisions for real and integer
+
   !----------------------------------------!
   !   A few handy mathematical constants   !
   !----------------------------------------!

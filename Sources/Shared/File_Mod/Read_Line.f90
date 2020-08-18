@@ -9,10 +9,11 @@
   integer           :: un  ! unit
   logical, optional :: reached_end
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: i
+  integer      :: i
+  character(6) :: format = '(a000)'
 !==============================================================================!
 !   A comment is each line which begins with "!", "#", "$", "%" or "*".        !
-!   Input line must not exceed the lenght of 300 characters.                   !
+!   Input line must not exceed DL characters in length (defined in Const_Mod)  !
 !------------------------------------------------------------------------------!
 
   ! If present, assumed the end of file has not been reached
@@ -23,7 +24,8 @@
   !-----------------------------------!
   !  Read the whole line into whole   !
   !-----------------------------------!
-1 read(un,'(a300)', end=2) line % whole
+  write(format(3:5), '(i3.3)') DL
+1 read(un,format, end=2) line % whole
 
   ! Shift the whole line to the left (remove leading spaces)
   line % whole = adjustl(line % whole)
@@ -48,7 +50,7 @@
     line % n_tokens = 1
     line % s(1)=1
   end if
-  do i=1,298
+  do i=1,DL-2
     if( line % whole(i:  i  ) <  '!' .and.  &
         line % whole(i+1:i+1) >= '!') then
       line % n_tokens = line % n_tokens + 1

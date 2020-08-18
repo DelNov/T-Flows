@@ -26,7 +26,7 @@
   integer                    :: donor, accept, corr_num
   integer                    :: i_sub, n_sub, wrong_vf, n_wrong_vf0, n_wrong_vf1
   integer,           pointer :: n_sub_param, corr_num_max
-  character(len=80)          :: solver
+  character(SL)              :: solver
   real                       :: fs
   real                       :: courant_max, epsloc
   real                       :: u_f, v_f, w_f

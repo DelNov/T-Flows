@@ -20,7 +20,7 @@
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: phi
-  character(len=80)        :: name_out, name_mean, a_name
+  character(SL)            :: name_out, name_mean, a_name
   integer                  :: fh, d, vc, sc, ua
 !==============================================================================!
 
@@ -105,7 +105,7 @@
   !---------------------!
   !   Mass flow rates   !
   !---------------------!
-  call Backup_Mod_Write_Face_Real(grid, fh, d, vc, 'face_flux_00',  &
+  call Backup_Mod_Write_Face_Real(grid, fh, d, vc, 'face_flux',  &
                                   fld % m_flux % n, correct_sign = .true.)
 
   !--------------!
@@ -124,7 +124,7 @@
   !--------------!
   if(mul % model .eq. VOLUME_OF_FLUID) then
     call Backup_Mod_Write_Variable(fh, d, vc, 'vof', mul % vof)
-    call Backup_Mod_Write_Face_Real(grid, fh, d, vc, 'face_dens_00',  &
+    call Backup_Mod_Write_Face_Real(grid, fh, d, vc, 'face_dens',  &
                                     fld % density_f)
   end if
 

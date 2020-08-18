@@ -3,6 +3,9 @@
 !------------------------------------------------------------------------------!
 !   Module for no MPI functionality.                                           !
 !------------------------------------------------------------------------------!
+!----------------------------------[Modules]-----------------------------------!
+  use Const_Mod
+!------------------------------------------------------------------------------!
   implicit none
 !----------------------------------[Include]-----------------------------------!
 ! include 'mpif.h'
@@ -37,10 +40,12 @@
     ! Global cell and node numbers
     integer, allocatable :: cell_glo(:)
     integer, allocatable :: node_glo(:)
+    integer, allocatable :: face_glo(:)
 
     ! (kind=4) coud not be avoided here :-(
     integer(kind=4), allocatable :: cell_map(:)
     integer(kind=4), allocatable :: bnd_cell_map(:)
+    integer(kind=4), allocatable :: face_map(:)
 
     ! Variables which follow are for backup saving to single file
     integer :: nc_s   ! number of cells in subdomain
@@ -49,6 +54,8 @@
     integer :: nb_l   ! last boundary cell to save
     integer :: nc_t   ! total number of cells 
     integer :: nb_t   ! total number of bundary cells
+    integer :: nf_s   ! number of faces in subdomain
+    integer :: nf_t   ! total number of faces
 
     ! Number of processors per node and processor i.d.s for each node
     integer,           allocatable :: nodes_n_procs(:)
@@ -91,6 +98,7 @@
   include 'Comm_Mod/Sequential/Read_Log_Array.f90'
   include 'Comm_Mod/Sequential/Read_Bnd_Real.f90'
   include 'Comm_Mod/Sequential/Read_Cell_Real.f90'
+  include 'Comm_Mod/Sequential/Read_Face_Real.f90'
   include 'Comm_Mod/Sequential/Read_Real.f90'
   include 'Comm_Mod/Sequential/Read_Real_Array.f90'
   include 'Comm_Mod/Sequential/Read_Text.f90'
@@ -110,6 +118,7 @@
   include 'Comm_Mod/Sequential/Write_Log_Array.f90'
   include 'Comm_Mod/Sequential/Write_Bnd_Real.f90'
   include 'Comm_Mod/Sequential/Write_Cell_Real.f90'
+  include 'Comm_Mod/Sequential/Write_Face_Real.f90'
   include 'Comm_Mod/Sequential/Write_Real.f90'
   include 'Comm_Mod/Sequential/Write_Real_Array.f90'
   include 'Comm_Mod/Sequential/Write_Text.f90'

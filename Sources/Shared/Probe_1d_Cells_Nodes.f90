@@ -13,11 +13,11 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: n_prob, p, c, n, fu
-  real              :: zp(16384)
-  character(len=80) :: name_prob
-  character(len=80) :: answer
-  logical           :: isit
+  integer       :: n_prob, p, c, n, fu
+  real          :: zp(16384)
+  character(SL) :: name_prob
+  character(SL) :: answer
+  logical       :: isit
 !==============================================================================!
 
   print *, '#==========================================='

@@ -8,8 +8,8 @@
   type(Grid_Type) :: grid
   integer         :: mg_lev
 !-----------------------------------[Locals]-----------------------------------!
-  integer            :: c, c1, c2, n, s, offset, level_n_faces, fu
-  character(len=80)  :: extension, name_out
+  integer       :: c, c1, c2, n, s, offset, level_n_faces, fu
+  character(SL) :: extension, name_out
 !==============================================================================!
 
   !------------------------------------------------------!

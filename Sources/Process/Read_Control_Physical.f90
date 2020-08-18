@@ -22,7 +22,7 @@
   type(Swarm_Type),      target :: swarm
 !----------------------------------[Locals]------------------------------------!
   type(Bulk_Type), pointer :: bulk
-  character(len=80)        :: name
+  character(SL)            :: name
   integer                  :: n_times, n_stat, n_stat_p
 !==============================================================================!
 

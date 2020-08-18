@@ -40,7 +40,7 @@
 
     type(Grid_Type),  pointer :: pnt_grid  ! grid for which it is defined
     type(Field_Type), pointer :: pnt_flow  ! flow for which it is defined
-    character(len=80)         :: bc_name   ! boundary condition name
+    character(SL)             :: bc_name   ! boundary condition name
 
     integer                      :: n_eddies  ! number of eddies
     type(Eddy_Type), allocatable :: eddy(:)   ! storage for eddies

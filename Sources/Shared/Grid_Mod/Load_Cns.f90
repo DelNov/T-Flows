@@ -9,8 +9,8 @@
   integer           :: this_proc  ! needed if called from Processor
   integer, optional :: domain
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: c, n, s, lev, fu
-  character(len=80) :: name_in
+  integer       :: c, n, s, lev, fu
+  character(SL) :: name_in
 !==============================================================================!
 
   !-------------------------------!
@@ -102,6 +102,9 @@
 
   ! Faces' shadows
   read(fu) (grid % faces_s(s), s = 1, grid % n_faces + grid % n_shadows)
+
+  ! Faces' global numbers
+  read(fu) (grid % comm % face_glo(s), s = 1, grid % n_faces + grid % n_shadows)
 
   ! Find the number of boundary faces (this number is actually smaller than
   ! number of boundary cells in parallel, because boundary cells on buffers
