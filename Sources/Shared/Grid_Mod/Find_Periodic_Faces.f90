@@ -37,7 +37,8 @@
           grid % n_per_faces = grid % n_per_faces + 1
           if(run .eq. 2) then
             grid % per_faces(grid % n_per_faces) = s  ! store periodic face
-            grid % bnd_cond % color(s) = grid % n_bnd_cond + 1
+            if(grid % xc(c2) > grid % xc(c1))                      &
+              grid % bnd_cond % color(s) = grid % n_bnd_cond + 1
           end if
         end if
 
@@ -49,7 +50,8 @@
           grid % n_per_faces = grid % n_per_faces + 1
           if(run .eq. 2) then
             grid % per_faces(grid % n_per_faces) = s
-            grid % bnd_cond % color(s) = grid % n_bnd_cond + 2
+            if(grid % yc(c2) > grid % yc(c1))                      &
+              grid % bnd_cond % color(s) = grid % n_bnd_cond + 2
           end if
         end if
 
@@ -61,7 +63,8 @@
           grid % n_per_faces = grid % n_per_faces + 1
           if(run .eq. 2) then
             grid % per_faces(grid % n_per_faces) = s
-            grid % bnd_cond % color(s) = grid % n_bnd_cond + 3
+            if(grid % zc(c2) > grid % zc(c1))                      &
+              grid % bnd_cond % color(s) = grid % n_bnd_cond + 3
           end if
         end if
       end if
