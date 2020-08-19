@@ -342,8 +342,6 @@
 
         call Field_Mod_Grad_Pressure(flow(d), flow(d) % p)
 
-        ! call Multiphase_Mod_Vof_Open_Boundary(flow(d), mult(d))
-
         ! Compute velocity gradients
         call Field_Mod_Grad_Variable(flow(d), flow(d) % u)
         call Field_Mod_Grad_Variable(flow(d), flow(d) % v)
@@ -365,8 +363,6 @@
         ! Refresh buffers for a % sav before discretizing for pressure
         ! (Can this call be somewhere in Compute Pressure?)
         call Grid_Mod_Exchange_Cells_Real(grid(d), sol(d) % a % sav)
-
-       ! call Multiphase_Mod_Vof_Open_Boundary(flow(d), mult(d))
 
         call Balance_Mass(flow(d), mult(d))
         call Compute_Pressure(flow(d), mult(d), sol(d), flow(d) % dt, ini)

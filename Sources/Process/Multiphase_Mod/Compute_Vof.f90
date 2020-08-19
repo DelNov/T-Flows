@@ -18,7 +18,7 @@
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: vof
-  type(Face_Type),   pointer :: m_flux
+  type(Face_Type),   pointer :: v_flux
   real, contiguous,  pointer :: vof_f(:)
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
@@ -38,7 +38,7 @@
   ! Take aliases
   flow   => mult % pnt_flow
   grid   => flow % pnt_grid
-  m_flux => flow % m_flux
+  v_flux => flow % v_flux
   vof    => mult % vof
   vof_f  => mult % vof_f
   courant_max_param => mult % courant_max_param
@@ -244,7 +244,7 @@
     do s = grid % n_bnd_faces + 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
-      if (m_flux % n(s) >= 0.0) then
+      if (v_flux % n(s) >= 0.0) then
         vof_f(s) = vof % n(c1)
       else
         vof_f(s) = vof % n(c2)
@@ -276,7 +276,7 @@
     do s = grid % n_bnd_faces + 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
-      if(m_flux % n(s) >= 0.0) then
+      if(v_flux % n(s) >= 0.0) then
         donor = c1
         accept = c2
       else

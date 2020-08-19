@@ -34,7 +34,8 @@
   call Var_Mod_Allocate_New_Only(flow % p,  grid, 'P')
 
   ! Allocate memory for mass and volumetric fluxes
-  call Face_Mod_Allocate_New_And_Old(flow % m_flux, grid, 'M_FLUX')
+  call Face_Mod_Allocate(flow % m_flux, grid, 'M_FL')
+  call Face_Mod_Allocate(flow % v_flux, grid, 'V_FL')
 
   !-----------------------------------------!
   !   Enthalpy conservation (temperature)   !

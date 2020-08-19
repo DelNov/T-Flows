@@ -115,6 +115,4 @@
                 grad_kx(-nb:nc), grad_ky(-nb:nc), grad_kz(-nb:nc),   &
                 smooth_var(-nb:nc))
 
-  vof % oo(-nb:nc) = mult % curv(-nb:nc)
-
   end subroutine

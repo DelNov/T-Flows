@@ -13,7 +13,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: flow
   type(Grid_Type),  pointer :: grid
-  type(Face_Type),  pointer :: m_flux
+  type(Face_Type),  pointer :: v_flux
   type(Var_Type),   pointer :: vof
   integer                   :: c, c1, c2, s
   real                      :: upwd1, upwd2, upwd3, a0
@@ -22,7 +22,7 @@
   ! Take aliases
   flow   => mult % pnt_flow
   grid   => flow % pnt_grid
-  m_flux => flow % m_flux
+  v_flux => flow % v_flux
   vof    => mult % vof
 
   ! Initialize matrix and right hand side
@@ -40,10 +40,9 @@
       c2 = grid % faces_c(2,s)
 
       if (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
-        b(c1) = b(c1) - m_flux % n(s) / flow % density_f(s) * vof % n(c2)
+        b(c1) = b(c1) - v_flux % n(s) * vof % n(c2)
       else if (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) then
-        a % val(a % dia(c1)) = a % val(a % dia(c1))          &
-                             + m_flux % n(s) / flow % density_f(s)
+        a % val(a % dia(c1)) = a % val(a % dia(c1)) + v_flux % n(s)
       end if
 
     end do
@@ -53,8 +52,8 @@
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
 
-      upwd1 = 0.5 * max( m_flux % n(s) / flow % density_f(s), 0.0)
-      upwd2 = 0.5 * max(-m_flux % n(s) / flow % density_f(s), 0.0)
+      upwd1 = 0.5 * max( v_flux % n(s), 0.0)
+      upwd2 = 0.5 * max(-v_flux % n(s), 0.0)
 
       a % val(a % dia(c1)) = a % val(a % dia(c1)) + upwd1
       a % val(a % dia(c2)) = a % val(a % dia(c2)) + upwd2
@@ -76,10 +75,9 @@
       c2 = grid % faces_c(2,s)
 
       if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) then
-        a % val(a % dia(c1)) = a % val(a % dia(c1))                  &
-                             + m_flux % n(s) / flow % density_f(s)
+        a % val(a % dia(c1)) = a % val(a % dia(c1)) + v_flux % n(s)
       else
-        b(c1) = b(c1) - m_flux % n(s) / flow % density_f(s) * vof % n(c2)
+        b(c1) = b(c1) - v_flux % n(s) * vof % n(c2)
       end if
     end do
 
@@ -88,13 +86,11 @@
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
 
-      upwd1 = (0.5 - beta_f(s)) * max(-m_flux % n(s)                   &
-                                     / flow % density_f(s), 0.0)       &
-             - 0.5 * beta_f(s) * m_flux % n(s) / flow % density_f(s)
-      upwd2 = (0.5 - beta_f(s)) * max(m_flux % n(s)                    &
-                                     / flow % density_f(s), 0.0)       &
-             + 0.5 * beta_f(s) * m_flux % n(s) / flow % density_f(s)
-      upwd3 = 0.5 * m_flux % n(s) / flow % density_f(s)
+      upwd1 = (0.5 - beta_f(s)) * max(-v_flux % n(s), 0.0)       &
+             - 0.5 * beta_f(s)  * v_flux % n(s)
+      upwd2 = (0.5 - beta_f(s)) * max(v_flux % n(s), 0.0)       &
+             + 0.5 * beta_f(s)  * v_flux % n(s)
+      upwd3 = 0.5 * v_flux % n(s)
 
       a % val(a % dia(c1)) = a % val(a % dia(c1)) + upwd1 + upwd3
       a % val(a % dia(c2)) = a % val(a % dia(c2)) + upwd2 - upwd3
@@ -139,9 +135,8 @@
     !  c2 = grid % faces_c(2,s)
 
     !  if (mult % ic(c1) == 1) then
-    !    !b(c1) = b(c1) + m_flux % n(s) / flow % density_f(s) * vof % n(c1)
-    !    a % val(a % dia(c1)) = a % val(a % dia(c1)) - m_flux % n(s)    &
-    !                         / flow % density_f(s)
+    !    !b(c1) = b(c1) + v_flux % n(s) * vof % n(c1)
+    !    a % val(a % dia(c1)) = a % val(a % dia(c1)) - v_flux % n(s)
     !  end if
     !end do
 
@@ -151,15 +146,13 @@
     !  c2 = grid % faces_c(2,s)
 
     !  if (mult % ic(c1) == 1) then
-    !    !b(c1) = b(c1) + m_flux % n(s) / flow % density_f(s) * vof % n(c1)
-    !    a % val(a % dia(c1)) = a % val(a % dia(c1)) - m_flux % n(s)    &
-    !                         / flow % density_f(s)
+    !    !b(c1) = b(c1) + v_flux % n(s) * vof % n(c1)
+    !    a % val(a % dia(c1)) = a % val(a % dia(c1)) - v_flux % n(s)
     !  end if
 
     !  if (mult % ic(c2) == 1) then
-    !    !b(c2) = b(c2) - m_flux % n(s) / flow % density_f(s) * vof % n(c2)
-    !    a % val(a % dia(c2)) = a % val(a % dia(c2)) + m_flux % n(s)    &
-    !                         / flow % density_f(s)
+    !    !b(c2) = b(c2) - v_flux % n(s) * vof % n(c2)
+    !    a % val(a % dia(c2)) = a % val(a % dia(c2)) + v_flux % n(s)
     !  end if
     !end do
 

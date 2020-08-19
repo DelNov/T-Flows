@@ -134,7 +134,6 @@
   include 'Multiphase_Mod/Vof_Mass_Transfer_Rate_In.f90'
   include 'Multiphase_Mod/Vof_Max_Courant_Number.f90'
   include 'Multiphase_Mod/Vof_Momentum_Contribution.f90'
-  include 'Multiphase_Mod/Vof_Open_Boundary.f90'
   include 'Multiphase_Mod/Vof_Predict_Beta.f90'
   include 'Multiphase_Mod/Vof_Pressure_Correction.f90'
   include 'Multiphase_Mod/Vof_Scale_Residuals.f90'

@@ -18,14 +18,14 @@
   type(Field_Type), pointer :: flow
   type(Grid_Type),  pointer :: grid
   type(Var_Type),   pointer :: vof
-  type(Face_Type),  pointer :: m_flux
+  type(Face_Type),  pointer :: v_flux
   integer                   :: c, c1, c2, s
   real                      :: vof_dist
 !==============================================================================!
 
   ! Take aliases
   flow   => mult % pnt_flow
-  m_flux => flow % m_flux
+  v_flux => flow % v_flux
   grid   => flow % pnt_grid
   vof    => mult % vof
 
@@ -46,9 +46,8 @@
       vof_dist = (1.0 - vof_dist) * (1.0 - vof_dist)            &
                                   * vof_dist * vof_dist * 16.0
 
-      c_d(c1) = c_d(c1) + vof_dist * max(- m_flux % n(s)              &
-                                         / flow % density_f(s)        &
-                                         * dt / grid % vol(c1), 0.0)
+      c_d(c1) = c_d(c1) + vof_dist  &
+                        * max(-v_flux % n(s) * dt / grid % vol(c1), 0.0)
     end do
 
     ! Interior cells
@@ -61,19 +60,16 @@
       vof_dist = (1.0 - vof_dist) * (1.0 - vof_dist)            &
                                   * vof_dist * vof_dist * 16.0
 
-      c_d(c1) = c_d(c1) + vof_dist * max(- m_flux % n(s)              &
-                                         / flow % density_f(s)        &
-                                         * dt / grid % vol(c1), 0.0)
+      c_d(c1) = c_d(c1) + vof_dist  &
+                        * max(-v_flux % n(s) * dt / grid % vol(c1), 0.0)
 
       vof_dist = min(max(vof % n(c2), 0.0),1.0)
 
       vof_dist = (1.0 - vof_dist) * (1.0 - vof_dist)            &
                                   * vof_dist * vof_dist * 16.0
 
-      c_d(c2) = c_d(c2) + vof_dist * max( m_flux % n(s)              &
-                                        / flow % density_f(s)        &
-                                        * dt / grid % vol(c2), 0.0)
-
+      c_d(c2) = c_d(c2) + vof_dist  &
+                        * max( v_flux % n(s) * dt / grid % vol(c2), 0.0)
     end do
 
     !if (mult % phase_Change) then
@@ -102,8 +98,7 @@
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
 
-      c_d(c1) = c_d(c1) + max(-m_flux % n(s) / flow % density_f(s)  &
-                                        * dt / grid % vol(c1), 0.0)
+      c_d(c1) = c_d(c1) + max(-v_flux % n(s) * dt / grid % vol(c1), 0.0)
     end do
 
     ! At interior faces
@@ -111,12 +106,8 @@
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
 
-      c_d(c1) = c_d(c1) + max(-m_flux % n(s) / flow % density_f(s)  &
-                                        * dt / grid % vol(c1), 0.0)
-
-      c_d(c2) = c_d(c2) + max( m_flux % n(s) / flow % density_f(s)   &
-                                        * dt / grid % vol(c2), 0.0)
-
+      c_d(c1) = c_d(c1) + max(-v_flux % n(s) * dt / grid % vol(c1), 0.0)
+      c_d(c2) = c_d(c2) + max( v_flux % n(s) * dt / grid % vol(c2), 0.0)
     end do
 
     !if (mult % phase_Change) then

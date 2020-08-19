@@ -13,7 +13,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),     pointer :: flow
   type(Var_Type),       pointer :: vof
-  type(Face_Type),      pointer :: m_flux
+  type(Face_Type),      pointer :: v_flux
   integer                       :: s, c1, c2, donor, accept
   real                          :: fs, e_plus, e_minus, cf, delta_alfa, bcorr
   real                          :: epsloc
@@ -24,16 +24,16 @@
   ! Take aliases
   flow   => mult % pnt_flow
   vof    => mult % vof
-  m_flux => flow % m_flux
+  v_flux => flow % v_flux
 
   ! Interior faces
   do s = grid % n_bnd_faces + 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
     fs = grid % f(s)
-    if (abs(m_flux % n(s)) > epsloc) then
+    if (abs(v_flux % n(s)) > epsloc) then
 
-      if (m_flux % n(s) > 0.0) then
+      if (v_flux % n(s) > 0.0) then
         donor = c1
         accept = c2
       else

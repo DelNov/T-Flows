@@ -52,6 +52,7 @@
 
     ! Mass and volumetric flux through cell faces:
     type(Face_Type) :: m_flux  ! [kg/s]
+    type(Face_Type) :: v_flux  ! [m^3/s]  ! used with interface tracking
 
     ! Pressure and pressure correction
     type(Var_Type) :: p   ! [N/m^2] = [kg/m/s^2]

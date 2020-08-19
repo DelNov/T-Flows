@@ -1,7 +1,7 @@
 !==============================================================================!
-  subroutine Face_Mod_Allocate_New_Only(phi, grid, name_phi)
+  subroutine Face_Mod_Allocate(phi, grid, name_phi)
 !------------------------------------------------------------------------------!
-!   This is to allocate a face-based uknown, holding only current value.       !
+!   This is to allocate a face-based uknown with new and old values.           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -19,5 +19,8 @@
   ! Values in the new (n) time step
   allocate (phi % n(grid % n_faces));  phi % n = 0.0
 
-  end subroutine
+  ! Average guessed value, guessed value
+  allocate (phi % avg (grid % n_faces));  phi % avg  = 0.0
+  allocate (phi % star(grid % n_faces));  phi % star = 0.0
 
+  end subroutine

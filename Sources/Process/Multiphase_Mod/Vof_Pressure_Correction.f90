@@ -16,6 +16,7 @@
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
   type(Face_Type),   pointer :: m_flux
+  type(Face_Type),   pointer :: v_flux
   type(Var_Type),    pointer :: vof
   type(Var_Type),    pointer :: u, v, w
   type(Matrix_Type), pointer :: a
@@ -35,6 +36,7 @@
   u_relax   => flow % u_rel_corr
   dt_corr   => flow % dt_corr
   m_flux    => flow % m_flux
+  v_flux    => flow % v_flux
   a         => sol % a
   b         => sol % b % val
 
@@ -98,7 +100,7 @@
                                   / (a % sav(c2) * dt_corr) )
 
       correction = (1.0 - u_relax) * ( m_flux % star(s) - m_flux % avg(s) )   &
-                 + factor2 * ( m_flux % o(s) - ( u_fo * grid % sx(s)          &
+                 + factor2 * ( v_flux % n(s) - ( u_fo * grid % sx(s)          &
                                                + v_fo * grid % sy(s)          &
                                                + w_fo * grid % sz(s) ) )
 

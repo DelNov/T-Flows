@@ -81,6 +81,4 @@
   call Multiphase_Mod_Vof_Curvature_Nodal(grid, mult,  &
                                           smooth_k(-nb:nc), var_node_k(1:nn))
 
-  vof % oo(-nb:nc) = mult % curv(-nb:nc)
-
   end subroutine

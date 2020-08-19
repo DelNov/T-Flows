@@ -35,8 +35,6 @@
       flow % i_corr = corr_steps
       call Field_Mod_Grad_Pressure(flow, flow % p)
 
-      ! call Multiphase_Mod_Vof_Open_Boundary(flow, mult)
-
       ! Compute velocity gradients
       call Field_Mod_Grad_Variable(flow, flow % u)
       call Field_Mod_Grad_Variable(flow, flow % v)
@@ -51,7 +49,6 @@
       ! (Can this call be somewhere in Compute Pressure?)
       call Grid_Mod_Exchange_Cells_Real(grid, sol % a % sav)
 
-      !call Multiphase_Mod_Vof_Open_Boundary(flow, mult)
       call Balance_Mass(flow, mult)
       call Compute_Pressure(flow, mult, sol, flow % dt, ini)
       call Field_Mod_Grad_Pressure_Correction(flow, flow % pp)

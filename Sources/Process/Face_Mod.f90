@@ -15,14 +15,12 @@
 
     character(VL) :: name      ! variable name, always upper case and
                                ! very short (4, defined in Const_Mod)
-    real, allocatable :: n(:)           ! new value
-    real, allocatable :: avg(:), star(:)! average guessed value, guessed value
-    real, allocatable :: o(:), oo(:)    ! old and older then old
+    real, allocatable :: n(:)             ! new value
+    real, allocatable :: avg(:), star(:)  ! average guessed value, guessed value
   end type
 
   contains
 
-  include 'Face_Mod/Allocate_New_Only.f90'
-  include 'Face_Mod/Allocate_New_And_Old.f90'
+  include 'Face_Mod/Allocate.f90'
 
   end module
