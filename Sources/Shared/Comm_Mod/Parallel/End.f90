@@ -10,6 +10,5 @@
 
   call Mpi_Barrier(MPI_COMM_WORLD, error)
   call Mpi_Finalize(error)
-  stop
 
   end subroutine
