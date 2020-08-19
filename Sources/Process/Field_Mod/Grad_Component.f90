@@ -1,7 +1,9 @@
 !==============================================================================!
-  subroutine Field_Mod_Grad_Component(flow, phi, i, phii, impose_symmetry)
+  subroutine Field_Mod_Grad_Component(flow, phi, i, phii,  &
+                                      impose_symmetry)
 !------------------------------------------------------------------------------!
-!   Calculates gradient of generic variable phi by a least squares method.     !
+!   Calculates gradient of generic variable phi by a least squares method,     !
+!   with refershing the buffers.                                               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -39,40 +41,40 @@
     imp_sym = .true.
   end if
 
-    ! On the boundaries
-    do s = 1, grid % n_bnd_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
-      dphi1 = phi(c2)-phi(c1)
-      dphi2 = phi(c2)-phi(c1)
+  ! On the boundaries
+  do s = 1, grid % n_bnd_faces
+    c1 = grid % faces_c(1,s)
+    c2 = grid % faces_c(2,s)
+    dphi1 = phi(c2)-phi(c1)
+    dphi2 = phi(c2)-phi(c1)
 
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. SYMMETRY .and. imp_sym) then
-        dphi1 = 0.
-      end if
+    if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. SYMMETRY .and. imp_sym) then
+      dphi1 = 0.
+    end if
 
-      phii(c1) = phii(c1)                                                 &
-               + dphi1 * (  flow % grad_c2c(MAP(i,1),c1) * grid % dx(s)   &
-                          + flow % grad_c2c(MAP(i,2),c1) * grid % dy(s)   &
-                          + flow % grad_c2c(MAP(i,3),c1) * grid % dz(s))
-    end do
+    phii(c1) = phii(c1)                                                 &
+             + dphi1 * (  flow % grad_c2c(MAP(i,1),c1) * grid % dx(s)   &
+                        + flow % grad_c2c(MAP(i,2),c1) * grid % dy(s)   &
+                        + flow % grad_c2c(MAP(i,3),c1) * grid % dz(s))
+  end do
 
-    ! Inside the domain
-    do s = grid % n_bnd_faces + 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
-      dphi1 = phi(c2)-phi(c1)
-      dphi2 = phi(c2)-phi(c1)
+  ! Inside the domain
+  do s = grid % n_bnd_faces + 1, grid % n_faces
+    c1 = grid % faces_c(1,s)
+    c2 = grid % faces_c(2,s)
+    dphi1 = phi(c2)-phi(c1)
+    dphi2 = phi(c2)-phi(c1)
 
-      phii(c1) = phii(c1)                                                 &
-               + dphi1 * (  flow % grad_c2c(MAP(i,1),c1) * grid % dx(s)   &
-                          + flow % grad_c2c(MAP(i,2),c1) * grid % dy(s)   &
-                          + flow % grad_c2c(MAP(i,3),c1) * grid % dz(s))
+    phii(c1) = phii(c1)                                                 &
+             + dphi1 * (  flow % grad_c2c(MAP(i,1),c1) * grid % dx(s)   &
+                        + flow % grad_c2c(MAP(i,2),c1) * grid % dy(s)   &
+                        + flow % grad_c2c(MAP(i,3),c1) * grid % dz(s))
 
-      phii(c2) = phii(c2)                                                 &
-               + dphi2 * (  flow % grad_c2c(MAP(i,1),c2) * grid % dx(s)   &
-                          + flow % grad_c2c(MAP(i,2),c2) * grid % dy(s)   &
-                          + flow % grad_c2c(MAP(i,3),c2) * grid % dz(s))
-    end do
+    phii(c2) = phii(c2)                                                 &
+             + dphi2 * (  flow % grad_c2c(MAP(i,1),c2) * grid % dx(s)   &
+                        + flow % grad_c2c(MAP(i,2),c2) * grid % dy(s)   &
+                        + flow % grad_c2c(MAP(i,3),c2) * grid % dz(s))
+  end do
 
   call Grid_Mod_Exchange_Cells_Real(grid, phii)
 
