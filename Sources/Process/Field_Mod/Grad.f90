@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Field_Mod_Grad(flow, phi, impose_symmetry)
+  subroutine Field_Mod_Grad(flow, phi, phi_x, phi_y, phi_z, impose_symmetry)
 !------------------------------------------------------------------------------!
 !   Calculates gradient of an array defined in cells                           !
 !------------------------------------------------------------------------------!

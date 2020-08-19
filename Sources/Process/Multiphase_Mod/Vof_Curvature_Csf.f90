@@ -143,8 +143,7 @@
   !   Find Curvature   !
   !--------------------!
 
-  ! find divergence of normals
-
+  ! Find divergence of normals
   call Field_Mod_Grad_Component(flow, grad_kx(-nb:nc),  &
                                 1,    div_x  (-nb:nc),  &
                                 impose_symmetry = .false.)

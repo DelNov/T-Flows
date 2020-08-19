@@ -45,38 +45,29 @@
       call Multiphase_Mod_Vof_Smooth_Scalar(grid, mult, mult % dist_func % oo, &
                                      smooth_var(-nb:nc), mult % n_conv_curv)
 
-      call Field_Mod_Grad_Component(flow, smooth_var(-nb:nc),  &
-                                    1, grad_kx(-nb:nc))
-      call Field_Mod_Grad_Component(flow, smooth_var(-nb:nc),  &
-                                    2, grad_ky(-nb:nc))
-      call Field_Mod_Grad_Component(flow, smooth_var(-nb:nc),  &
-                                    3, grad_kz(-nb:nc))
+      call Field_Mod_Grad(flow, smooth_var(-nb:nc), grad_kx(-nb:nc),  &
+                                                    grad_ky(-nb:nc),  &
+                                                    grad_kz(-nb:nc))
     else
-      call Field_Mod_Grad_Component(flow, mult % dist_func % oo,  &
-                                    1, grad_kx(-nb:nc))
-      call Field_Mod_Grad_Component(flow, mult % dist_func % oo,  &
-                                    2, grad_ky(-nb:nc))
-      call Field_Mod_Grad_Component(flow, mult % dist_func % oo,  &
-                                    3, grad_kz(-nb:nc))
+      call Field_Mod_Grad(flow, mult % dist_func % oo, grad_kx(-nb:nc),  &
+                                                       grad_ky(-nb:nc),  &
+                                                       grad_kz(-nb:nc))
     end if
 
     if (mult % n_conv_norm > 0) then
       call Multiphase_Mod_Vof_Smooth_Scalar(grid, mult, mult % dist_func % oo, &
                                      smooth_var(-nb:nc), mult % n_conv_norm)
 
-      call Field_Mod_Grad_Component(flow, smooth_var(-nb:nc),  &
-                                    1, grad_nx(-nb:nc))
-      call Field_Mod_Grad_Component(flow, smooth_var(-nb:nc),  &
-                                    2, grad_ny(-nb:nc))
-      call Field_Mod_Grad_Component(flow, smooth_var(-nb:nc),  &
-                                    3, grad_nz(-nb:nc))
+      call Field_Mod_Grad(flow, smooth_var(-nb:nc), grad_nx(-nb:nc),  &
+                                                    grad_ny(-nb:nc),  &
+                                                    grad_nz(-nb:nc))
       vof % x(-nb:nc) = grad_nx(-nb:nc)
       vof % y(-nb:nc) = grad_ny(-nb:nc)
       vof % z(-nb:nc) = grad_nz(-nb:nc)
     else
-      call Field_Mod_Grad_Component(flow, mult % dist_func % oo, 1, vof % x)
-      call Field_Mod_Grad_Component(flow, mult % dist_func % oo, 2, vof % y)
-      call Field_Mod_Grad_Component(flow, mult % dist_func % oo, 3, vof % z)
+      call Field_Mod_Grad(flow, mult % dist_func % oo, vof % x,  &
+                                                       vof % y,  &
+                                                       vof % z)
     end if
 
   else ! using VOF
@@ -85,9 +76,9 @@
       call Multiphase_Mod_Vof_Smooth_Scalar(grid, mult, vof % n,   &
                                      smooth_var(-nb:nc), mult % n_conv_curv)
 
-      call Field_Mod_Grad_Component(flow, smooth_var(-nb:nc), 1, grad_kx(-nb:nc))
-      call Field_Mod_Grad_Component(flow, smooth_var(-nb:nc), 2, grad_ky(-nb:nc))
-      call Field_Mod_Grad_Component(flow, smooth_var(-nb:nc), 3, grad_kz(-nb:nc))
+      call Field_Mod_Grad(flow, smooth_var(-nb:nc), grad_kx(-nb:nc),  &
+                                                    grad_ky(-nb:nc),  &
+                                                    grad_kz(-nb:nc))
     else
       grad_kx(-nb:nc) = vof % x(-nb:nc)
       grad_ky(-nb:nc) = vof % y(-nb:nc)
@@ -98,12 +89,9 @@
       call Multiphase_Mod_Vof_Smooth_Scalar(grid, mult, vof % n,   &
                                      smooth_var(-nb:nc), mult % n_conv_norm)
 
-      call Field_Mod_Grad_Component(flow, smooth_var(-nb:nc),  &
-                                    1, grad_nx(-nb:nc))
-      call Field_Mod_Grad_Component(flow, smooth_var(-nb:nc),  &
-                                    2, grad_ny(-nb:nc))
-      call Field_Mod_Grad_Component(flow, smooth_var(-nb:nc),  &
-                                    3, grad_nz(-nb:nc))
+      call Field_Mod_Grad(flow, smooth_var(-nb:nc), grad_nx(-nb:nc),  &
+                                                    grad_ny(-nb:nc),  &
+                                                    grad_nz(-nb:nc))
 
       vof % x(-nb:nc) = grad_nx(-nb:nc)
       vof % y(-nb:nc) = grad_ny(-nb:nc)
