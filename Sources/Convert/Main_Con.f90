@@ -5,6 +5,7 @@
   use Const_Mod
   use File_Mod,      only: problem_name
   use Grid_Mod,      only: Grid_Type,                         &
+                           Grid_Mod_Sort_Cells_Smart,         &
                            Grid_Mod_Sort_Faces_Smart,         &
                            Grid_Mod_Calculate_Wall_Distance,  &
                            Grid_Mod_Save_Cns,                 &
@@ -74,6 +75,8 @@
 
   ! Keep in mind that Grid_Mod_Calculate_Wall_Distance is ...
   ! ... faster if it is called after Grid_Mod_Sort_Faces_Smart
+
+  call Grid_Mod_Sort_Cells_Smart       (grid)
   call Grid_Mod_Sort_Faces_Smart       (grid)
   call Grid_Mod_Calculate_Wall_Distance(grid)
 
