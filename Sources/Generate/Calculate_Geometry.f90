@@ -7,7 +7,9 @@
   use Const_Mod, only: HUGE, ONE_THIRD
   use Math_Mod
   use Gen_Mod,   only: face_c_to_c
-  use Grid_Mod,  only: Grid_Type
+  use Grid_Mod,  only: Grid_Type,                             &
+                       Grid_Mod_Calculate_Cell_Centers,       &
+                       Grid_Mod_Calculate_Face_Interpolation
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -122,28 +124,16 @@
     !-----------------------------------------!
     !   Calculate the cell centers            !
     !-----------------------------------------!
-    !   => depends on: x_node,y_node,z_node   ! 
+    !   => depends on: x_node,y_node,z_node   !
     !   <= gives:      xc,yc,zc c>0           !
     !-----------------------------------------!
-    do c = 1, grid % n_cells
-      grid % xc(c)=0.0
-      grid % yc(c)=0.0
-      grid % zc(c)=0.0
-      do n = 1, grid % cells_n_nodes(c)
-        grid % xc(c) = grid % xc(c) + grid % xn(grid % cells_n(n,c))  &
-                     / (1.0*grid % cells_n_nodes(c))
-        grid % yc(c) = grid % yc(c) + grid % yn(grid % cells_n(n,c))  &
-                     / (1.0*grid % cells_n_nodes(c))
-        grid % zc(c) = grid % zc(c) + grid % zn(grid % cells_n(n,c))  &
-                     / (1.0*grid % cells_n_nodes(c))
-      end do
-    end do
+    call Grid_Mod_Calculate_Cell_Centers(grid)
 
     !-----------------------------------------------------!
-    !   Calculate:                                        ! 
+    !   Calculate:                                        !
     !      components of cell faces, cell face centers.   !
     !-----------------------------------------------------!
-    !   => depends on: x_node,y_node,z_node               ! 
+    !   => depends on: x_node,y_node,z_node               !
     !   <= gives:      sx,sy,sz,xsp,yzp,zsp               !
     !-----------------------------------------------------!
     do s = 1, grid % n_faces
@@ -240,7 +230,7 @@
         grid % xc(c2) = grid % xc(c1) + grid % sx(s)*t / tot_surf
         grid % yc(c2) = grid % yc(c1) + grid % sy(s)*t / tot_surf
         grid % zc(c2) = grid % zc(c1) + grid % sz(s)*t / tot_surf
-      end if 
+      end if
     end do ! through faces
 
     !---------------------------------------------!
@@ -486,28 +476,7 @@
   !   Calculate the interpolation factors for the cell faces   !
   !------------------------------------------------------------!
   if(real_run) then
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
-
-      ! First cell
-      xc1 = grid % xc(c1)
-      yc1 = grid % yc(c1)
-      zc1 = grid % zc(c1)
-      dsc1 = Math_Mod_Distance(xc1, yc1, zc1,  &
-                               grid % xf(s), grid % yf(s), grid % zf(s))
-
-      ! Second cell (pls. check if xsi=xc on the boundary)
-      xc2 = grid % xc(c2) + grid % dx(s)
-      yc2 = grid % yc(c2) + grid % dy(s)
-      zc2 = grid % zc(c2) + grid % dz(s)
-      dsc2 = Math_Mod_Distance(xc2, yc2, zc2,  &
-                               grid % xf(s), grid % yf(s), grid % zf(s))
-
-      ! Interpolation factor
-      grid % f(s) = dsc2 / (dsc1 + dsc2)
-    end do
-
+    call Grid_Mod_Calculate_Face_Interpolation(grid)
   end if
 
   end subroutine

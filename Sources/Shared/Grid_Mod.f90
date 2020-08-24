@@ -106,8 +106,11 @@
     real, allocatable :: sx(:), sy(:), sz(:), s(:)
     real, allocatable :: dx(:), dy(:), dz(:), d(:)
 
-    ! Face coordinates 
+    ! Face coordinates
     real, allocatable :: xf(:), yf(:), zf(:)
+
+    ! Vectors connecting face center with face cell centers connection
+    real, allocatable :: xr(:), yr(:), zr(:)
 
     ! Face weight-factors: purely geometrical (f) and
     ! adapted to near wall cells in the fluid phase (fw)
@@ -147,7 +150,7 @@
     real,    allocatable :: weight_c2n(:,:)
 
     !------------------------------------------!
-    !   Variables important for parallel run   ! 
+    !   Variables important for parallel run   !
     !------------------------------------------!
     type(Comm_Type) :: comm
 
@@ -168,7 +171,9 @@
   include 'Grid_Mod/Bnd_Cond_Name.f90'
   include 'Grid_Mod/Bnd_Cond_Type.f90'
   include 'Grid_Mod/Bnd_Cond_Ranges.f90'
+  include 'Grid_Mod/Calculate_Cell_Centers.f90'
   include 'Grid_Mod/Calculate_Face_Geometry.f90'
+  include 'Grid_Mod/Calculate_Face_Interpolation.f90'
   include 'Grid_Mod/Calculate_Global_Volumes.f90'
   include 'Grid_Mod/Calculate_Wall_Distance.f90'
   include 'Grid_Mod/Calculate_Weights_Cells_To_Nodes.f90'
