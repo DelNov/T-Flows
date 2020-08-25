@@ -137,7 +137,6 @@
   include 'Multiphase_Mod/Vof_Predict_Beta.f90'
   include 'Multiphase_Mod/Vof_Pressure_Correction.f90'
   include 'Multiphase_Mod/Vof_Scale_Residuals.f90'
-  include 'Multiphase_Mod/Vof_Skewness_Correction.f90'
   include 'Multiphase_Mod/Vof_Smooth_Scalar.f90'
   include 'Multiphase_Mod/Vof_Smooth_Curvature.f90'
   include 'Multiphase_Mod/Vof_Solve_System.f90'
