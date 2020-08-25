@@ -23,21 +23,21 @@
   type(Var_Type),  pointer :: u, v, w, t, phi
   type(Var_Type),  pointer :: kin, eps, zeta, f22, t2
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
-  type(Face_Type), pointer :: m_flux
+  type(Face_Type), pointer :: v_flux
   integer                  :: c1, c2, s, sc
 !==============================================================================!
 
   ! Take aliases
   grid   => flow % pnt_grid
   bulk   => flow % bulk
-  m_flux => flow % m_flux
+  v_flux => flow % v_flux
   call Field_Mod_Alias_Momentum   (flow, u, v, w)
   call Field_Mod_Alias_Energy     (flow, t)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
   call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
   call Turb_Mod_Alias_T2          (turb, t2)
 
-  call Field_Mod_Calculate_Fluxes(flow, m_flux % n)
+  call Field_Mod_Calculate_Mass_Fluxes(flow, v_flux % n)
 
   call Field_Mod_Grad_Variable(flow, u)
   call Field_Mod_Grad_Variable(flow, v)
