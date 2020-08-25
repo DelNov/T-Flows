@@ -1,17 +1,18 @@
 !==============================================================================!
-  subroutine Field_Mod_Calculate_Fluxes(flow, flux)
+  subroutine Field_Mod_Calculate_Mass_Fluxes(flow, v_flux)
 !------------------------------------------------------------------------------!
 !   Calculate mass fluxes through whole domain.                                  !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
-  real, dimension(:)       :: flux
+  real, dimension(:)       :: v_flux  ! volume flux
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
   integer                  :: c1, c2, s
   real                     :: xc1, yc1, zc1, xc2, yc2, zc2, wgt
+  real                     :: dens_f
   real                     :: dens_are_x, dens_are_y, dens_are_z  ! [kg/m]
   real                     :: dens_avg_x, dens_avg_y, dens_avg_z  ! [kg/m^3]
 !==============================================================================!
@@ -37,6 +38,10 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
+    ! Density at the face
+    dens_f = flow % density(c1) *        grid % fw(s)  &
+           + flow % density(c2) * (1.0 - grid % fw(s))
+
     if(grid % comm % cell_proc(c1) .eq. this_proc) then
 
       xc1 = grid % xc(c1)
@@ -55,36 +60,36 @@
       !   X   !
       !-------!
       if((xc1 <= bulk % xp).and.(xc2 > bulk % xp)) then
-        bulk % flux_x = bulk % flux_x + wgt * flux(s)
-        dens_are_x = dens_are_x + wgt * flow % density_f(s) * abs(grid % sx(s))
+        bulk % flux_x = bulk % flux_x + wgt * v_flux(s) * dens_f
+        dens_are_x = dens_are_x + wgt * dens_f * abs(grid % sx(s))
       end if
       if((xc2 < bulk % xp).and.(xc1 >= bulk % xp)) then
-        bulk % flux_x = bulk % flux_x - wgt * flux(s)
-        dens_are_x = dens_are_x + wgt * flow % density_f(s) * abs(grid % sx(s))
+        bulk % flux_x = bulk % flux_x - wgt * v_flux(s) * dens_f
+        dens_are_x = dens_are_x + wgt * dens_f * abs(grid % sx(s))
       end if
 
       !-------!
       !   Y   !
       !-------!
       if((yc1 <= bulk % yp).and.(yc2 > bulk % yp)) then
-        bulk % flux_y = bulk % flux_y + wgt * flux(s)
-        dens_are_y = dens_are_y + wgt * flow % density_f(s) * abs(grid % sy(s))
+        bulk % flux_y = bulk % flux_y + wgt * v_flux(s) * dens_f
+        dens_are_y = dens_are_y + wgt * dens_f * abs(grid % sy(s))
       end if
       if((yc2 < bulk % yp).and.(yc1 >= bulk % yp)) then
-        bulk % flux_y = bulk % flux_y - wgt * flux(s)
-        dens_are_y = dens_are_y + wgt * flow % density_f(s) * abs(grid % sy(s))
+        bulk % flux_y = bulk % flux_y - wgt * v_flux(s) * dens_f
+        dens_are_y = dens_are_y + wgt * dens_f * abs(grid % sy(s))
       end if
 
       !-------!
       !   Z   !
       !-------!
       if((zc1 <= bulk % zp).and.(zc2 > bulk % zp)) then
-        bulk % flux_z = bulk % flux_z + wgt * flux(s)
-        dens_are_z = dens_are_z + wgt * flow % density_f(s) * abs(grid % sz(s))
+        bulk % flux_z = bulk % flux_z + wgt * v_flux(s) * dens_f
+        dens_are_z = dens_are_z + wgt * dens_f * abs(grid % sz(s))
       end if
       if((zc2 < bulk % zp).and.(zc1 >= bulk % zp)) then
-        bulk % flux_z = bulk % flux_z - wgt * flux(s)
-        dens_are_z = dens_are_z + wgt * flow % density_f(s) * abs(grid % sz(s))
+        bulk % flux_z = bulk % flux_z - wgt * v_flux(s) * dens_f
+        dens_are_z = dens_are_z + wgt * dens_f * abs(grid % sz(s))
       end if
 
     end if

@@ -33,8 +33,7 @@
   call Var_Mod_Allocate_New_Only(flow % pp, grid, 'PP')
   call Var_Mod_Allocate_New_Only(flow % p,  grid, 'P')
 
-  ! Allocate memory for mass and volumetric fluxes
-  call Face_Mod_Allocate(flow % m_flux, grid, 'M_FL')
+  ! Allocate memory for volumetric fluxes
   call Face_Mod_Allocate(flow % v_flux, grid, 'V_FL')
 
   !-----------------------------------------!

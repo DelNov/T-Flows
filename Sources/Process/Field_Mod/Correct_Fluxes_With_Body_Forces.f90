@@ -18,7 +18,7 @@
   real,              pointer :: u_relax
   integer                    :: c1, c2, s
   real                       :: xc1, yc1, zc1, xc2, yc2, zc2
-  real                       :: gravity_source, dotprod, factor
+  real                       :: gravity_source, dotprod, a12, dens_h
 !==============================================================================!
 
   ! Take aliases
@@ -58,14 +58,27 @@
         yc2 = grid % yc(c1) + grid % dy(s)
         zc2 = grid % zc(c1) + grid % dz(s)
 
-        ! Interpolate gradients
-        dotprod = 0.5 * (  flow % body_fx(c1) / grid % vol(c1)                 &
-                         + flow % body_fx(c2) / grid % vol(c2)) * grid % dx(s) &
-                + 0.5 * (  flow % body_fy(c1) / grid % vol(c1)                 &
-                         + flow % body_fy(c2) / grid % vol(c2)) * grid % dy(s) &
-                + 0.5 * (  flow % body_fz(c1) / grid % vol(c1)                 &
-                         + flow % body_fz(c2) / grid % vol(c2)) * grid % dz(s)
+        dens_h = 2.0 / ( 1.0 / flow % density(c1) + 1.0 / flow % density(c2) )
 
+        ! Interpolate gradients (equation 3.61 in Denner's thesis)
+        ! Unit for dotprod: [kg/m/s^2]
+        dotprod = 0.5 * dens_h * ( flow % body_fx(c1) / grid % vol(c1)    &
+                                 / flow % density(c1)                     &
+                                 + flow % body_fx(c2) / grid % vol(c2)    &
+                                 / flow % density(c2) )                   &
+                                 * grid % dx(s)                           &
+                + 0.5 * dens_h * ( flow % body_fy(c1) / grid % vol(c1)    &
+                                 / flow % density(c1)                     &
+                                 + flow % body_fy(c2) / grid % vol(c2)    &
+                                 / flow % density(c2) )                   &
+                                 * grid % dy(s)                           &
+                + 0.5 * dens_h * ( flow % body_fz(c1) / grid % vol(c1)    &
+                                 / flow % density(c1)                     &
+                                 + flow % body_fz(c2) / grid % vol(c2)    &
+                                 / flow % density(c2) )                   &
+                                 * grid % dz(s)
+
+        ! Unit for gravity_source: [kg/m/s^2]
         gravity_source =  &
           (  (grid % xf(s) - xc1) * grav_x * flow % beta * t_face_delta(s)   &
            + (grid % yf(s) - yc1) * grav_y * flow % beta * t_face_delta(s)   &
@@ -76,12 +89,14 @@
            + (grid % zf(s) - zc2) * grav_z * flow % beta * t_face_delta(s))  &
              * flow % density(c2)
 
-        factor = u_relax * 0.5 * (  grid % vol(c1) / a % sav(c1)     &
-                                  + grid % vol(c2) / a % sav(c2) )
+        ! Units for a12: [m^4s/kg]
+        a12 = u_relax * 0.5 * (  grid % vol(c1) / a % sav(c1)     &
+                                  + grid % vol(c2) / a % sav(c2) ) * a % fc(s)
 
-        gravity_source =  factor * a % fc(s) * (gravity_source - dotprod)
+        ! Unit for gravity_source again: [m^3/s]
+        gravity_source =  a12 * (gravity_source - dotprod)
 
-        flow % m_flux % n(s) = flow % m_flux % n(s) + gravity_source
+        flow % v_flux % n(s) = flow % v_flux % n(s) + gravity_source
 
         b(c1) = b(c1) - gravity_source
         b(c2) = b(c2) + gravity_source

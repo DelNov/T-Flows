@@ -13,7 +13,7 @@
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: t
   integer                    :: c1, c2, s, c
-  real                       :: xc1, yc1, zc1, xc2, yc2, zc2, dotprod
+  real                       :: xc1, yc1, zc1, xc2, yc2, zc2, dotprod, dens_f
 !==============================================================================!
 
   ! Take aliases
@@ -57,20 +57,24 @@
       xc1 = grid % xc(c1)
       yc1 = grid % yc(c1)
       zc1 = grid % zc(c1)
+
+      dens_f = flow % density(c1) *        grid % fw(s)  &
+             + flow % density(c2) * (1.0 - grid % fw(s))
+
       dotprod = (   (grid % xf(s) - xc1) * grav_x    &
                   + (grid % yf(s) - yc1) * grav_y    &
                   + (grid % zf(s) - zc1) * grav_z )
 
-      flow % body_fx(c1) = flow % body_fx(c1)                       &
-                         + flow % density_f(s) * t_face_delta(s)    &
+      flow % body_fx(c1) = flow % body_fx(c1)          &
+                         + dens_f * t_face_delta(s)    &
                          * flow % beta * grid % sx(s) * dotprod
 
-      flow % body_fy(c1) = flow % body_fy(c1)                       &
-                         + flow % density_f(s) * t_face_delta(s)    &
+      flow % body_fy(c1) = flow % body_fy(c1)          &
+                         + dens_f * t_face_delta(s)    &
                          * flow % beta * grid % sy(s) * dotprod
 
-      flow % body_fz(c1) = flow % body_fz(c1)                       &
-                         + flow % density_f(s) * t_face_delta(s)    &
+      flow % body_fz(c1) = flow % body_fz(c1)          &
+                         + dens_f * t_face_delta(s)    &
                          * flow % beta * grid % sz(s) * dotprod
 
       if(c2 > 0) then
@@ -81,16 +85,16 @@
                     + (grid % yf(s) - yc2) * grav_y    &
                     + (grid % zf(s) - zc2) * grav_z )
 
-        flow % body_fx(c2) = flow % body_fx(c2)                       &
-                           - flow % density_f(s) * t_face_delta(s)    &
+        flow % body_fx(c2) = flow % body_fx(c2)          &
+                           - dens_f * t_face_delta(s)    &
                            * flow % beta * grid % sx(s) * dotprod
 
-        flow % body_fy(c2) = flow % body_fy(c2)                       &
-                           - flow % density_f(s) * t_face_delta(s)    &
+        flow % body_fy(c2) = flow % body_fy(c2)          &
+                           - dens_f * t_face_delta(s)    &
                            * flow % beta * grid % sy(s) * dotprod
 
-        flow % body_fz(c2) = flow % body_fz(c2)                       &
-                           - flow % density_f(s) * t_face_delta(s)    &
+        flow % body_fz(c2) = flow % body_fz(c2)          &
+                           - dens_f * t_face_delta(s)    &
                            * flow % beta * grid % sz(s) * dotprod
       end if
     end do

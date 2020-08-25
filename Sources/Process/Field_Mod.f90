@@ -39,7 +39,6 @@
     real, allocatable :: conductivity(:)  ! [W/(m K)]
     real, allocatable :: density(:)       ! [kg/m^3]
     real, allocatable :: viscosity(:)     ! [kg/m/s]
-    real, allocatable :: density_f(:)     ! [kg/m^3]
     real              :: diffusivity      ! [m^2/s]
     real              :: latent_heat      ! [J/kg]
     real              :: sat_temperature  ! [K]
@@ -50,9 +49,8 @@
     type(Var_Type) :: w    ! [m/s]
     type(Var_Type) :: pot  ! potential for initial velocity field
 
-    ! Mass and volumetric flux through cell faces:
-    type(Face_Type) :: m_flux  ! [kg/s]
-    type(Face_Type) :: v_flux  ! [m^3/s]  ! used with interface tracking
+    ! Volumetric flux through cell faces
+    type(Face_Type) :: v_flux  ! [m^3/s]
 
     ! Pressure and pressure correction
     type(Var_Type) :: p   ! [N/m^2] = [kg/m/s^2]
