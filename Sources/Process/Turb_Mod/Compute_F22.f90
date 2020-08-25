@@ -174,6 +174,6 @@
     call Info_Mod_Iter_Fill_At(4, 2, phi % name, phi % eniter, phi % res)
   end if
 
-  call Grid_Mod_Exchange_Cells_Real(grid, phi % n)
+  call Field_Mod_Grad_Variable(flow, phi)
 
   end subroutine

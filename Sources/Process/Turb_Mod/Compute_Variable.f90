@@ -4,9 +4,6 @@
 !   Discretizes and solves transport equations for different turbulent         !
 !   variables.                                                                 !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: one => r_cell_12
-!------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   type(Turb_Type),   target :: turb
@@ -47,7 +44,7 @@
   flow => turb % pnt_flow
   grid => flow % pnt_grid
   vis  => turb % vis
-  flux => flow % m_flux % n
+  flux => flow % v_flux % n
   dt   =  flow % dt
   call Field_Mod_Alias_Momentum(flow, u, v, w)
   call Solver_Mod_Alias_System (sol, a, b)
@@ -72,14 +69,7 @@
   !   Advection   !
   !               !
   !---------------!
-  one(:) = 1.0
-  call Numerics_Mod_Advection_Term(phi, one, flux, sol,  &
-                                   phi % x,              &
-                                   phi % y,              &
-                                   phi % z,              &
-                                   grid % dx,            &
-                                   grid % dy,            &
-                                   grid % dz)
+  call Numerics_Mod_Advection_Term(phi, flow % density, flux, sol)
 
   !------------------!
   !                  !
@@ -157,8 +147,8 @@
     a12 = a0
     a21 = a0
 
-    a12 = a12  - min(flux(s), real(0.0))
-    a21 = a21  + max(flux(s), real(0.0))
+    a12 = a12  - min(flux(s), real(0.0)) * flow % density(c1)
+    a21 = a21  + max(flux(s), real(0.0)) * flow % density(c2)
 
     ! Fill the system matrix
     if(c2  > 0) then
@@ -281,7 +271,7 @@
     end if
   end if
 
-  call Grid_Mod_Exchange_Cells_Real(grid, phi % n)
+  call Field_Mod_Grad_Variable(flow, phi)
 
   call Cpu_Timer_Mod_Stop('Compute_Turbulence (without solvers)')
 

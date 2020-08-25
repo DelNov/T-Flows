@@ -16,7 +16,6 @@
   use Control_Mod
   use Multiphase_Mod, only: Multiphase_Type, VOLUME_OF_FLUID
   use User_Mod
-  use Work_Mod,       only: dens_factor => r_face_01
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -29,36 +28,36 @@
   type(Grid_Type),   pointer :: grid
   type(Bulk_Type),   pointer :: bulk
   type(Var_Type),    pointer :: u, v, w, p, pp
-  type(Face_Type),   pointer :: flux            ! mass or volume flux
+  type(Face_Type),   pointer :: v_flux          ! volume flux
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
   real,              pointer :: u_relax
   integer                    :: s, c, c1, c2
   real                       :: u_f, v_f, w_f, a12, fs
   real                       :: mass_err
-  real                       :: px_f, py_f, pz_f
+  real                       :: px_f, py_f, pz_f, dens_h
   character(SL)              :: solver
   real                       :: p_max, p_min, p_nor, p_nor_c
 !==============================================================================!
 !
 !   The form of equations which I am solving:
 !
-!      /               /
-!     |               |
-!     | rho u dS = dt | GRAD pp dS
-!     |               |
-!    /               /
+!      /           /
+!     |           |
+!     | u dS = dt | GRAD pp dS
+!     |           |
+!    /           /
 !
 !   Dimension of the system under consideration
 !
-!     [App] {pp} = {bpp}               [kg/s]
+!     [App] {pp} = {bpp}     [m^3/s]
 !
 !   Dimensions of certain variables
 !
-!     app            [ms]
+!     app            [m^4s/kg]
 !     pp             [kg/ms^2]
-!     b              [kg/s]
-!     flux           [kg/s]
+!     b              [m^3/s]
+!     v_flux         [m^3/s]
 !
 !------------------------------------------------------------------------------!
 
@@ -67,7 +66,7 @@
   ! Take aliases
   grid    => flow % pnt_grid
   bulk    => flow % bulk
-  flux    => flow % m_flux
+  v_flux  => flow % v_flux
   p       => flow % p
   pp      => flow % pp
   a       => sol % a
@@ -110,18 +109,6 @@
   !-----------------------------------------!
   pp % n = 0.0
 
-  !----------------------------!
-  !   Initialize dens_factor   !
-  !----------------------------!
-
-  ! The purpose of this factor is to make possible solving
-  ! either for volume flux or for mass flux conservation
-  if(mult % model .eq. VOLUME_OF_FLUID) then
-    dens_factor(1:grid % n_faces) = 1.0
-  else
-    dens_factor(1:grid % n_faces) = flow % density_f(1:grid % n_faces)
-  end if
-
   !-------------------------------------------------!
   !   Calculate the mass fluxes on the cell faces   !
   !-------------------------------------------------!
@@ -139,7 +126,7 @@
       w_f = fs * w % n(c1) + (1.0 - fs) * w % n(c2)
 
       ! Calculate coeficients for the system matrix
-      a12 = u_relax * 0.5 * dens_factor(s) * a % fc(s)   &
+      a12 = u_relax * 0.5 * a % fc(s)                    &
                     * ( grid % vol(c1) / a % sav(c1)     &
                       + grid % vol(c2) / a % sav(c2) )
 
@@ -148,69 +135,71 @@
       a % val(a % dia(c1))  = a % val(a % dia(c1)) +  a12
       a % val(a % dia(c2))  = a % val(a % dia(c2)) +  a12
 
-      ! Interpolate pressure gradients
-      px_f = 0.5*( p % x(c1) + p % x(c2) ) * grid % dx(s)
-      py_f = 0.5*( p % y(c1) + p % y(c2) ) * grid % dy(s)
-      pz_f = 0.5*( p % z(c1) + p % z(c2) ) * grid % dz(s)
+      ! Interpolate pressure gradients as proposed by Denner
+      ! (Equation 3.57 in his PhD thesis)
+      dens_h = 2.0 / (1.0 / flow % density(c1) + 1.0 / flow % density(c2))
+      px_f = 0.5 * dens_h * (  p % x(c1) / flow % density(c1)  &
+                             + p % x(c2) / flow % density(c2) ) * grid % dx(s)
+      py_f = 0.5 * dens_h * (  p % y(c1) / flow % density(c1)  &
+                             + p % y(c2) / flow % density(c2) ) * grid % dy(s)
+      pz_f = 0.5 * dens_h * (  p % z(c1) / flow % density(c1)  &
+                             + p % z(c2) / flow % density(c2) ) * grid % dz(s)
 
-      ! Calculate mass or volume flux through cell face
-      ! (depending on what is in "dens_factor")
-      flux % n(s) = dens_factor(s) * ( u_f * grid % sx(s)     &
-                                     + v_f * grid % sy(s)     &
-                                     + w_f * grid % sz(s) )   &
-                    + a12 * (p % n(c1) - p % n(c2))           &
+      ! Calculate volume flux through cell face
+      v_flux % n(s) = u_f * grid % sx(s)             &
+                    + v_f * grid % sy(s)             &
+                    + w_f * grid % sz(s)             &
+                    + a12 * (p % n(c1) - p % n(c2))  &
                     + a12 * (px_f + py_f + pz_f)
 
-      b(c1) = b(c1) - flux % n(s)
-      b(c2) = b(c2) + flux % n(s)
+      b(c1) = b(c1) - v_flux % n(s)
+      b(c2) = b(c2) + v_flux % n(s)
 
     ! Side is on the boundary
+    ! (Check: volume fluxes at the boundaries
+    !  are already compute in Balance_Volume)
     else ! (c2 < 0)
 
       if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
         u_f = u % n(c2)
         v_f = v % n(c2)
         w_f = w % n(c2)
-        flux % n(s) = dens_factor(s) * ( u_f * grid % sx(s)     &
-                                       + v_f * grid % sy(s)     &
-                                       + w_f * grid % sz(s) )
+        v_flux % n(s) = u_f * grid % sx(s)     &
+                      + v_f * grid % sy(s)     &
+                      + w_f * grid % sz(s)
 
-        b(c1) = b(c1) - flux % n(s)
+        b(c1) = b(c1) - v_flux % n(s)
+
       else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW .or.   &
               Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) then
-        !u_f = u % n(c2)
-        !v_f = v % n(c2)
-        !w_f = w % n(c2)
-        !flux % n(s) = dens_factor(s) * ( u_f * grid % sx(s)     &
-        !                               + v_f * grid % sy(s)     &
-        !                               + w_f * grid % sz(s) )
 
-        b(c1) = b(c1) - flux % n(s)
+        b(c1) = b(c1) - v_flux % n(s)
 
-        a12 = dens_factor(s) * a % fc(s) * grid % vol(c1) / a % sav(c1)
+        a12 = a % fc(s) * grid % vol(c1) / a % sav(c1)
         a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
 
       else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE) then
         u_f = u % n(c1)
         v_f = v % n(c1)
         w_f = w % n(c1)
-        flux % n(s) = dens_factor(s) * ( u_f * grid % sx(s)     &
-                                       + v_f * grid % sy(s)     &
-                                       + w_f * grid % sz(s) )
+        v_flux % n(s) = u_f * grid % sx(s)     &
+                      + v_f * grid % sy(s)     &
+                      + w_f * grid % sz(s)
 
-        b(c1) = b(c1) - flux % n(s)
+        b(c1) = b(c1) - v_flux % n(s)
 
-        a12 = dens_factor(s) * a % fc(s) * grid % vol(c1) / a % sav(c1)
+        a12 = a % fc(s) * grid % vol(c1) / a % sav(c1)
         a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
 
       else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OPENBC) then
 
-        b(c1) = b(c1) - flux % n(s)
+        b(c1) = b(c1) - v_flux % n(s)
 
-        a12 = dens_factor(s) * a % fc(s) * grid % vol(c1) / a % sav(c1)
+        a12 = a % fc(s) * grid % vol(c1) / a % sav(c1)
         a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
+
       else  ! it is SYMMETRY
-        flux % n(s) = 0.0
+        v_flux % n(s) = 0.0
       end if
 
     end if

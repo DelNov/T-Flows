@@ -5,7 +5,6 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use User_Mod
-  use Work_Mod, only: one => r_cell_12
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -21,7 +20,7 @@
   type(Bulk_Type),   pointer :: bulk
   type(Matrix_Type), pointer :: a
   type(Var_Type),    pointer :: ui, uj, uk, t, p
-  type(Face_Type),   pointer :: m_flux
+  type(Face_Type),   pointer :: v_flux
   real, contiguous,  pointer :: b(:)
   real, contiguous,  pointer :: ui_i(:), ui_j(:), ui_k(:), uj_i(:), uk_i(:)
   real, contiguous,  pointer :: si(:), sj(:), sk(:), di(:), dj(:), dk(:)
@@ -96,7 +95,7 @@
   ! Take aliases
   grid   => flow % pnt_grid
   bulk   => flow % bulk
-  m_flux => flow % m_flux
+  v_flux => flow % v_flux
   t      => flow % t
   p      => flow % p
   call Solver_Mod_Alias_System(sol, a, b)
@@ -162,14 +161,7 @@
   !   Advection   !
   !               !
   !---------------!
-  one(:) = 1.0
-  call Numerics_Mod_Advection_Term(ui, one, m_flux % n, sol,  &
-                                   ui_i,                      &
-                                   ui_j,                      &
-                                   ui_k,                      &
-                                   di,                        &
-                                   dj,                        &
-                                   dk)
+  call Numerics_Mod_Advection_Term(ui, flow % density, v_flux % n, sol)
 
   !---------------!
   !               !
@@ -215,8 +207,8 @@
     end if
 
     ! Compute the coefficients for the sysytem matrix
-    a12 = a0 - min(m_flux % n(s), 0.0)
-    a21 = a0 + max(m_flux % n(s), 0.0)
+    a12 = a0 - min(v_flux % n(s), 0.0) * flow % density(c1)
+    a21 = a0 + max(v_flux % n(s), 0.0) * flow % density(c2)
 
     ! Fill the system matrix
     if(c2 > 0) then
@@ -339,7 +331,7 @@
       call Info_Mod_Iter_Fill_At(1, i, ui % name, ui % eniter, ui % res)
     end if
 
-    call Grid_Mod_Exchange_Cells_Real(grid, ui % n)
+    call Field_Mod_Grad_Variable(flow, ui)
   end if
 
   ! User function

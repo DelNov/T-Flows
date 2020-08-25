@@ -10,8 +10,7 @@
                       u3uj_phij   => r_cell_08,  &
                       u1uj_phij_x => r_cell_09,  &
                       u2uj_phij_y => r_cell_10,  &
-                      u3uj_phij_z => r_cell_11,  &
-                      one         => r_cell_12
+                      u3uj_phij_z => r_cell_11
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
@@ -27,7 +26,7 @@
   type(Var_Type),    pointer :: uu, vv, ww, uv, uw, vw
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
-  type(Face_Type),   pointer :: m_flux
+  type(Face_Type),   pointer :: v_flux
   type(Var_Type),    pointer :: phi
   integer                    :: c, s, c1, c2, row, col
   real                       :: a12, a21
@@ -53,7 +52,7 @@
 
   ! Take aliases
   grid   => flow % pnt_grid
-  m_flux => flow % m_flux
+  v_flux => flow % v_flux
   phi    => flow % scalar(sc)
   call Turb_Mod_Alias_Stresses(turb, uu, vv, ww, uv, uw, vw)
   call Solver_Mod_Alias_System(sol, a, b)
@@ -85,14 +84,7 @@
   !   Advection   !
   !               !
   !---------------!
-  one = 1.0
-  call Numerics_Mod_Advection_Term(phi, one, m_flux % n, sol,  &
-                                   phi % x,                    &
-                                   phi % y,                    &
-                                   phi % z,                    &
-                                   grid % dx,                  &
-                                   grid % dy,                  &
-                                   grid % dz)
+  call Numerics_Mod_Advection_Term(phi, flow % density, v_flux % n, sol)
 
   !--------------!
   !              !
@@ -194,8 +186,8 @@
     a12 = dif_eff1 * a % fc(s)
     a21 = dif_eff2 * a % fc(s)
 
-    a12 = a12  - min(m_flux % n(s), 0.0)
-    a21 = a21  + max(m_flux % n(s), 0.0)
+    a12 = a12  - min(v_flux % n(s), 0.0) * flow % density(c1)
+    a21 = a21  + max(v_flux % n(s), 0.0) * flow % density(c2)
 
     ! Fill the system matrix
     if(c2 > 0) then
@@ -361,7 +353,7 @@
 
   call Info_Mod_Iter_Fill_User_At(row, col, phi % name, phi % eniter, phi % res)
 
-  call Grid_Mod_Exchange_Cells_Real(grid, phi % n)
+  call Field_Mod_Grad_Variable(flow, phi)
 
   ! User function
   call User_Mod_End_Of_Compute_Scalar(flow, turb, mult, dt, ini)

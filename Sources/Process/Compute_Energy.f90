@@ -19,7 +19,7 @@
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w, t
   type(Var_Type),    pointer :: ut, vt, wt
-  type(Face_Type),   pointer :: m_flux
+  type(Face_Type),   pointer :: v_flux
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
   integer                    :: c, s, c1, c2
@@ -54,7 +54,7 @@
 !   heat capacity               capacity          [J/(kg K)]
 !   thermal conductivity        conductivity      [W/(m K)] ([W = J/s])
 !   density                     density           [kg/m^3]
-!   flux                        m_flux            [kg/s]
+!   flux                        v_flux            [m^3/s]
 !   left  hand s.               a                 [J/(s K)]
 !   temperature                 t % n             [K]
 !   right hand s.               b                 [J/s]
@@ -73,7 +73,7 @@
 
   ! Take aliases
   grid   => flow % pnt_grid
-  m_flux => flow % m_flux
+  v_flux => flow % v_flux
   call Field_Mod_Alias_Momentum  (flow, u, v, w)
   call Field_Mod_Alias_Energy    (flow, t)
   call Turb_Mod_Alias_Heat_Fluxes(turb, ut, vt, wt)
@@ -102,13 +102,8 @@
   !   Advection   !
   !               !
   !---------------!
-  call Numerics_Mod_Advection_Term(t, flow % capacity, m_flux % n, sol,  &
-                                   t % x,                                &
-                                   t % y,                                &
-                                   t % z,                                &
-                                   grid % dx,                            &
-                                   grid % dy,                            &
-                                   grid % dz)
+  call Numerics_Mod_Advection_Term(t, flow % capacity * flow % density,  &
+                                   v_flux % n, sol)
 
   !--------------!
   !              !
@@ -248,8 +243,10 @@
     a12 = con_eff_f * a % fc(s)
     a21 = con_eff_f * a % fc(s)
 
-    a12 = a12  - min(m_flux % n(s), 0.0) * flow % capacity(c1)  ! flow: 1 -> 2
-    a21 = a21  + max(m_flux % n(s), 0.0) * flow % capacity(c2)  ! flow: 2 -> 1
+    a12 = a12 - min(v_flux % n(s), 0.0)  &
+                 * flow % capacity(c1) * flow % density(c1)  ! flow: 1 -> 2
+    a21 = a21 + max(v_flux % n(s), 0.0)  &
+                 * flow % capacity(c2) * flow % density(c2)  ! flow: 2 -> 1
 
     ! Fill the system matrix
     if(c2 > 0) then
@@ -336,7 +333,7 @@
   ! Print some info on the screen
   call Info_Mod_Iter_Fill_At(1, 6, t % name, t % eniter, t % res)
 
-  call Grid_Mod_Exchange_Cells_Real(grid, t % n)
+  call Field_Mod_Grad_Variable(flow, t)
 
   ! User function
   call User_Mod_End_Of_Compute_Energy(flow, turb, mult, dt, ini)
