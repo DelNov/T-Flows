@@ -25,7 +25,6 @@ include '../User_Mod/Vof_Exact_Cylinder.f90'
   type(Grid_Type),  pointer :: grid
   type(Var_Type),   pointer :: vof
   real,             pointer :: dt
-  real,             pointer :: vof_f(:)
   integer                   :: c, c1, c2, s
   real                      :: fs
 !==============================================================================!
@@ -34,7 +33,6 @@ include '../User_Mod/Vof_Exact_Cylinder.f90'
   grid  => flow % pnt_grid
   vof   => mult % vof
   dt    => flow % dt
-  vof_f => mult % vof_f
 
   !---------------------------------!
   !   Initialize the VOF function   !
@@ -64,25 +62,6 @@ include '../User_Mod/Vof_Exact_Cylinder.f90'
 
   ! Set old values to be the same as new ones
   vof % o(:) = vof % n(:)
-
-  ! Initialize vof functions at faces
-  do s = 1, grid % n_bnd_cells
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
-    fs = grid % f(s)
-    if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. INFLOW) then
-      vof_f(s) = vof % n(c1)
-    else
-      vof_f(s) = vof % n(c2)
-    end if
-  end do
-
-  do s = grid % n_bnd_cells + 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
-    fs = grid % f(s)
-    vof_f(s) = fs * vof % n(c1) + (1.0 - fs) * vof % n(c2)
-  end do
 
   !--------------------------------!
   !   Initialize front if needed   !
