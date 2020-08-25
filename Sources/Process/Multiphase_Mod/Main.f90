@@ -12,10 +12,10 @@
   integer, intent(in)           :: n     ! time step
 !==============================================================================!
 
+  flow % v_flux % o(1:) = flow % v_flux % n(1:)
+
   ! Volume of Fluid
   if(mult % model .eq. VOLUME_OF_FLUID) then
-
-    flow % v_flux % n(1:) = flow % m_flux % n(1:) / flow % density_f(1:)
 
     ! Front tracking is not engaged
     if(.not. mult % track_front) then
@@ -30,9 +30,6 @@
     ! call Surf_Mod_Advance_Front(mult, flow % dt, n) not implemented yet
       call Field_Mod_Body_Forces(flow)
     end if
-
-  else
-    flow % v_flux % n(1:) = flow % m_flux % n(1:)
 
   end if
 

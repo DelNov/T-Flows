@@ -15,7 +15,6 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
-  type(Face_Type),   pointer :: m_flux
   type(Face_Type),   pointer :: v_flux
   type(Var_Type),    pointer :: vof
   type(Var_Type),    pointer :: u, v, w
@@ -26,19 +25,18 @@
   real                       :: a12, fs
   real                       :: u_fo, v_fo, w_fo, tf
   real                       :: stens_source, dotprod
-  real                       :: factor1, factor2, correction
+  real                       :: factor2, correction, dens_h, curv_f
 !==============================================================================!
 
   ! Take aliases
-  grid      => mult % pnt_grid
-  flow      => mult % pnt_flow
-  vof       => mult % vof
-  u_relax   => flow % u_rel_corr
-  dt_corr   => flow % dt_corr
-  m_flux    => flow % m_flux
-  v_flux    => flow % v_flux
-  a         => sol % a
-  b         => sol % b % val
+  grid    => mult % pnt_grid
+  flow    => mult % pnt_flow
+  vof     => mult % vof
+  u_relax => flow % u_rel_corr
+  dt_corr => flow % dt_corr
+  v_flux  => flow % v_flux
+  a       => sol % a
+  b       => sol % b % val
 
   nb = grid % n_bnd_cells
   nc = grid % n_cells
@@ -62,20 +60,34 @@
       fs = grid % f(s)
 
       ! Interpolate VOF gradients
-      dotprod =  0.5 * (vof % x(c1) + vof % x(c2)) * grid % dx(s)  &
-               + 0.5 * (vof % y(c1) + vof % y(c2)) * grid % dy(s)  &
-               + 0.5 * (vof % z(c1) + vof % z(c2)) * grid % dz(s)
+      dens_h = 2.0 / ( 1.0 / flow % density(c1) + 1.0 / flow % density(c2) )
 
-      factor1 = u_relax * 0.5 * ( grid % vol(c1) / a % sav(c1)     &
-                                + grid % vol(c2) / a % sav(c2) )
+      ! Unit for dotprod: [1/m]
+      dotprod = 0.5 * dens_h                                                 &
+                    * ( mult % curv(c1) * vof % x(c1) / flow % density(c1)   &
+                      + mult % curv(c2) * vof % x(c2) / flow % density(c2) ) &
+                    * grid % dx(s)                                           &
+              + 0.5 * dens_h                                                 &
+                    * ( mult % curv(c1) * vof % y(c1) / flow % density(c1)   &
+                      + mult % curv(c2) * vof % y(c2) / flow % density(c2) ) &
+                    * grid % dy(s)                                           &
+              + 0.5 * dens_h                                                 &
+                    * ( mult % curv(c1) * vof % z(c1) / flow % density(c1)   &
+                      + mult % curv(c2) * vof % z(c2) / flow % density(c2) ) &
+                    * grid % dz(s)
 
-      a12 = 0.5 * (mult % curv(c1) + mult % curv(c2)) * mult % surface_tension
+      ! Unit for a12: [m^4s/kg]
+      a12 = u_relax * 0.5 * ( grid % vol(c1) / a % sav(c1)     &
+                            + grid % vol(c2) / a % sav(c2) ) * a % fc(s)
 
-      a12 = a12 * factor1 * a % fc(s)
+      ! Curvature at the face; unit: [1/m]
+      curv_f = 0.5 * ( mult % curv(c1) + mult % curv(c2) )
 
-      stens_source = a12 * ( curr_colour(c2) -  curr_colour(c1) - dotprod )
+      ! Unit for stens_source: [kg/s^2 * m^4s/kg * 1/m = m^3/s]
+      stens_source = mult % surface_tension * a12               &
+                   * ( curv_f * (curr_colour(c2) -  curr_colour(c1)) - dotprod )
 
-      m_flux % n(s) = m_flux % n(s) + stens_source
+      v_flux % n(s) = v_flux % n(s) + stens_source
 
       b(c1) = b(c1) - stens_source
       b(c2) = b(c2) + stens_source
@@ -85,6 +97,7 @@
   end if
 
   ! Introduce temporal correction and subrelaxation
+  ! (See equation 3.61 in Denner's thesis)
   if (flow % temp_corr) then
     do s = grid % n_bnd_faces + 1, grid % n_faces
       c1 = grid % faces_c(1,s)
@@ -94,17 +107,21 @@
       v_fo = fs * v % o(c1) + (1.0 - fs) * v % o(c2)
       w_fo = fs * w % o(c1) + (1.0 - fs) * w % o(c2)
 
-      factor2 = u_relax * 0.5 * ( grid % vol(c1) * flow % density(c1)    &
-                                  / (a % sav(c1) * dt_corr)              &
-                                + grid % vol(c2) * flow % density(c2)    &
-                                  / (a % sav(c2) * dt_corr) )
+      dens_h = 2.0 / ( 1.0 / flow % density(c1) + 1.0 / flow % density(c2) )
 
-      correction = (1.0 - u_relax) * ( m_flux % star(s) - m_flux % avg(s) )   &
-                 + factor2 * ( v_flux % n(s) - ( u_fo * grid % sx(s)          &
+      ! Unit for factor2: [1]
+      factor2 = u_relax * 0.5 * dens_h * ( grid % vol(c1)               &
+                                         / (a % sav(c1) * dt_corr)      &
+                                         + grid % vol(c2)               &
+                                         / (a % sav(c2) * dt_corr) )
+
+      ! Unit for correction [m^3/s]
+      correction = (1.0 - u_relax) * ( v_flux % star(s) - v_flux % avg(s) )   &
+                 + factor2 * ( v_flux % o(s) - ( u_fo * grid % sx(s)          &
                                                + v_fo * grid % sy(s)          &
                                                + w_fo * grid % sz(s) ) )
 
-      m_flux % n(s) = m_flux % n(s) + correction
+      v_flux % n(s) = v_flux % n(s) + correction
 
       b(c1) = b(c1) - correction
       b(c2) = b(c2) + correction

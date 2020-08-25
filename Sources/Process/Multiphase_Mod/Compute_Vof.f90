@@ -19,7 +19,6 @@
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: vof
   type(Face_Type),   pointer :: v_flux
-  real, contiguous,  pointer :: vof_f(:)
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2, fu
@@ -40,7 +39,6 @@
   grid   => flow % pnt_grid
   v_flux => flow % v_flux
   vof    => mult % vof
-  vof_f  => mult % vof_f
   courant_max_param => mult % courant_max_param
   n_sub_param       => mult % n_sub_param
   corr_num_max      => mult % corr_num_max
@@ -60,11 +58,13 @@
 
       ! Warning if Courant Number is exceeded
       if (n_sub > 1) then
-        call File_Mod_Append_File_For_Writing('alert-dt-vof.dat', fu)
-        write(fu,*) 'Courant Number was exceded at iteration: ', n
-        write(fu,*) 'Co_max = ', courant_max
-        write(fu,*) 'Try reducing time step'
-        close(fu)
+        if(this_proc < 2) then
+          call File_Mod_Append_File_For_Writing('alert-dt-vof.dat', fu)
+          write(fu,*) 'Courant Number was exceded at iteration: ', n
+          write(fu,*) 'Co_max = ', courant_max
+          write(fu,*) 'Try reducing time step'
+          close(fu)
+        end if
       end if
     else
       n_sub = 1
@@ -232,59 +232,25 @@
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
       if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. INFLOW) then
-        vof_f(s) = vof % n(c1)
         vof % n(c2) = vof % n(c1)
-      end if
-    end do
-
-    ! Inside domain
-    do s = grid % n_bnd_faces + 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
-      if (v_flux % n(s) >= 0.0) then
-        vof_f(s) = vof % n(c1)
-      else
-        vof_f(s) = vof % n(c2)
       end if
     end do
 
   else if (vof % adv_scheme .eq. CICSAM .or. vof % adv_scheme .eq. STACS) then
 
-    !call Multiphase_Mod_Vof_Boundary_Extrapolation(grid, mult, vof % n)
+    ! call Multiphase_Mod_Vof_Boundary_Extrapolation(grid, mult, vof % n)
     ! At boundaries
     do s = 1, grid % n_bnd_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
       if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) then
-        vof_f(s) = vof % n(c1)
         vof % n(c2) = vof % n(c1)
       else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OPENBC) then
-        vof_f(s) = vof % n(c1)
         vof % n(c2) = vof % n(c1)
       else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
-        vof_f(s) = vof % n(c2)
       else
-        vof_f(s) = vof % n(c1)
         vof % n(c2) = vof % n(c1)
       end if
-    end do
-
-    ! Inside domain
-    do s = grid % n_bnd_faces + 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
-      if(v_flux % n(s) >= 0.0) then
-        donor = c1
-        accept = c2
-      else
-        donor = c2
-        accept = c1
-      end if
-
-      vof_f(s) = 0.5 * ((1.0 - beta_f(s)) * ( vof % n(donor)      &
-                                            + vof % o(donor) )    &
-                             + beta_f(s)  * ( vof % n(accept)     &
-                                            + vof % o(accept) ))
     end do
 
   end if

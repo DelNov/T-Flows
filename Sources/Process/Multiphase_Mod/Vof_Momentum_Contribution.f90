@@ -15,7 +15,7 @@
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: vof
-  type(Face_Type),   pointer :: m_flux
+  type(Face_Type),   pointer :: v_flux
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
   real, contiguous,  pointer :: si(:), sj(:), sk(:)
@@ -29,7 +29,7 @@
   flow   => mult % pnt_flow
   grid   => mult % pnt_grid
   vof    => mult % vof
-  m_flux => flow % m_flux
+  v_flux => flow % v_flux
   si     => grid % sx
   sj     => grid % sy
   sk     => grid % sz
@@ -82,13 +82,13 @@
         u_f = fs * flow % u % n(c1) + (1.0 - fs) * flow % u % n(c2)
         v_f = fs * flow % v % n(c1) + (1.0 - fs) * flow % v % n(c2)
         w_f = fs * flow % w % n(c1) + (1.0 - fs) * flow % w % n(c2)
-        m_flux % avg(s) = ( u_f * grid % sx(s)     &
+        v_flux % avg(s) = ( u_f * grid % sx(s)     &
                           + v_f * grid % sy(s)     &
                           + w_f * grid % sz(s) )
       end do
 
       do s = grid % n_bnd_faces + 1, grid % n_faces
-        m_flux % star(s) = m_flux % n(s) / flow % density_f(s)
+        v_flux % star(s) = v_flux % n(s)
       end do
     end if
   end if

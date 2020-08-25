@@ -28,8 +28,6 @@
     call Var_Mod_Allocate_Solution(mult % dist_func, grid, 'D_FUNC', '')
   end if
 
-  allocate(mult % vof_f(nf));  mult % vof_f(1:nf) = 0.0
-
   allocate(mult % curv(-nb:nc));  mult % curv(-nb:nc) = 0.0
 
   allocate(mult % fc_x(-nb:nc));  mult % fc_x(-nb:nc) = 0.0
