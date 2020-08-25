@@ -32,7 +32,7 @@
   type(Var_Type),  pointer :: u, v, w, t, phi
   type(Var_Type),  pointer :: kin, eps, f22, zeta, vis, t2
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
-  type(Face_Type), pointer :: m_flux
+  type(Face_Type), pointer :: v_flux
   real,            pointer :: u_mean(:), v_mean(:), w_mean(:)
   integer                  :: i, c, c1, c2, m, s, nks, nvs, sc, fu
   integer                  :: n_wall, n_inflow, n_outflow, n_symmetry,  &
@@ -58,7 +58,7 @@
   ! Take aliases
   grid     => flow % pnt_grid
   bulk     => flow % bulk
-  m_flux   => flow % m_flux
+  v_flux   => flow % v_flux
   vis      => turb % vis
   u_mean   => turb % u_mean
   v_mean   => turb % v_mean
@@ -359,7 +359,7 @@
 
   !--------------------------------!
   !      Calculate the inflow      !
-  !   and initializes the m_flux   !
+  !   and initializes the v_flux   !
   !   at both inflow and outflow   !
   !--------------------------------!
   n_wall        = 0
@@ -369,17 +369,17 @@
   n_heated_wall = 0
   n_convect     = 0
 
-  bulk % mass_in = 0.0
+  bulk % vol_in = 0.0
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
     if(c2  < 0) then
-      m_flux % n(s) = flow % density_f(s) * ( u % n(c2) * grid % sx(s)  &
-                                            + v % n(c2) * grid % sy(s)  &
-                                            + w % n(c2) * grid % sz(s) )
+      v_flux % n(s) = u % n(c2) * grid % sx(s)  &
+                    + v % n(c2) * grid % sy(s)  &
+                    + w % n(c2) * grid % sz(s)
 
       if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
-        bulk % mass_in = bulk % mass_in - m_flux % n(s)
+        bulk % vol_in = bulk % vol_in - v_flux % n(s)
         area = area  + grid % s(s)
       end if
       if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL)      &
@@ -395,7 +395,7 @@
       if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT)   &
         n_convect     = n_convect     + 1
     else
-      m_flux % n(s) = 0.0
+      v_flux % n(s) = 0.0
     end if
   end do
 
@@ -406,7 +406,7 @@
   call Comm_Mod_Global_Sum_Int(n_symmetry)
   call Comm_Mod_Global_Sum_Int(n_heated_wall)
   call Comm_Mod_Global_Sum_Int(n_convect)
-  call Comm_Mod_Global_Sum_Real(bulk % mass_in)
+  call Comm_Mod_Global_Sum_Real(bulk % vol_in)
   call Comm_Mod_Global_Sum_Real(area)
 
   !----------------------!
@@ -414,14 +414,14 @@
   !----------------------!
   if(this_proc  < 2) then
     if(n_inflow .gt. 0) then
-      print '(a29,es12.5)', ' # Mass inflow             : ', bulk % mass_in
+      print '(a29,es12.5)', ' # Volume inflow           : ', bulk % vol_in
       if (mult % model .eq. VOLUME_OF_FLUID) then
         ! Needs to be corrected
         print '(a29,es12.5)', ' # Average inflow velocity : ',  &
-          bulk % mass_in / (flow % density_f(1) * area)
+          bulk % vol_in / area
       else
         print '(a29,es12.5)', ' # Average inflow velocity : ',  &
-          bulk % mass_in / (flow % density(1) * area)
+          bulk % vol_in / area
       end if
     end if
     print *, '# Number of faces on the wall        : ', n_wall
