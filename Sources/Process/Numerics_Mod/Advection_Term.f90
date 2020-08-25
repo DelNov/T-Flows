@@ -1,30 +1,19 @@
 !==============================================================================!
-  subroutine Numerics_Mod_Advection_Term(phi, coef, flux, sol,  &
-                                         phi_i, phi_j, phi_k,   &
-                                         di, dj, dk)
+  subroutine Numerics_Mod_Advection_Term(phi, coef, v_flux, sol)
 !------------------------------------------------------------------------------!
 !   Purpose: Dicretize advection term in conservation equations.               !
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
   type(Var_Type)            :: phi
-  real                      :: phi_i(-phi % pnt_grid % n_bnd_cells:  &
-                                      phi % pnt_grid % n_cells),     &
-                               phi_j(-phi % pnt_grid % n_bnd_cells:  &
-                                      phi % pnt_grid % n_cells),     &
-                               phi_k(-phi % pnt_grid % n_bnd_cells:  &
-                                      phi % pnt_grid % n_cells)
-  real                      :: di(phi % pnt_grid % n_faces),         &
-                               dj(phi % pnt_grid % n_faces),         &
-                               dk(phi % pnt_grid % n_faces)
   real                      :: coef(-phi % pnt_grid % n_bnd_cells:  &
                                      phi % pnt_grid % n_cells)
-  real                      :: flux(phi % pnt_grid % n_faces)
+  real                      :: v_flux(phi % pnt_grid % n_faces)
   type(Solver_Type), target :: sol
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   real,            pointer :: b(:)
-  real                     :: phi_f, coef_f  ! phi and coef at the cell face
+  real                     :: phi_f          ! phi and coef at the cell face
   integer                  :: c, c1, c2, s
 !==============================================================================!
 
@@ -55,44 +44,33 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
+    ! This could be computed with gradient extrapolation
     phi_f =      grid % f(s)  * phi % n(c1)   &
           + (1.0-grid % f(s)) * phi % n(c2)
 
-    coef_f =      grid % f(s)  * coef(c1)   &
-           + (1.0-grid % f(s)) * coef(c2)
-
     ! Compute phi_f with desired advection scheme
     if(phi % adv_scheme .ne. CENTRAL) then
-      call Numerics_Mod_Advection_Scheme(phi_f,    &
-                                         s,        &
-                                         phi,      &
-                                         phi_i,    &
-                                         phi_j,    &
-                                         phi_k,    &
-                                         di,       &
-                                         dj,       &
-                                         dk,       &
-                                         flux)
+      call Numerics_Mod_Advection_Scheme(phi_f, s, phi, v_flux)
     end if
 
-    ! Compute advection term
+    ! Compute advection term (non-conservative form)
     if(c2 > 0) then
-      phi % a(c1) = phi % a(c1) - flux(s) * phi_f * coef_f
-      phi % a(c2) = phi % a(c2) + flux(s) * phi_f * coef_f
+      phi % a(c1) = phi % a(c1) - v_flux(s) * phi_f * coef(c1)
+      phi % a(c2) = phi % a(c2) + v_flux(s) * phi_f * coef(c2)
     else
-      phi % a(c1) = phi % a(c1) - flux(s) * phi_f * coef_f
+      phi % a(c1) = phi % a(c1) - v_flux(s) * phi_f * coef(c1)
     end if
 
     ! Store upwinded part of the advection term in "c"
-    if(flux(s) .lt. 0) then   ! from c2 to c1
-      phi % c(c1) = phi % c(c1) - flux(s) * phi % n(c2) * coef(c2)
+    if(v_flux(s) .lt. 0) then   ! from c2 to c1
+      phi % c(c1) = phi % c(c1) - v_flux(s) * phi % n(c2) * coef(c1)
       if(c2 > 0) then
-        phi % c(c2) = phi % c(c2) + flux(s) * phi % n(c2) * coef(c2)
+        phi % c(c2) = phi % c(c2) + v_flux(s) * phi % n(c2) * coef(c2)
       end if
     else
-      phi % c(c1) = phi % c(c1) - flux(s) * phi % n(c1) * coef(c1)
+      phi % c(c1) = phi % c(c1) - v_flux(s) * phi % n(c1) * coef(c1)
       if(c2 > 0) then
-        phi % c(c2) = phi % c(c2) + flux(s) * phi % n(c1) * coef(c1)
+        phi % c(c2) = phi % c(c2) + v_flux(s) * phi % n(c1) * coef(c2)
       end if
     end if
 

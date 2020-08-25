@@ -2,8 +2,6 @@
   subroutine Numerics_Mod_Advection_Scheme(phi_f,                &
                                            s,                    &
                                            phi,                  &
-                                           phi_i, phi_j, phi_k,  &
-                                           di, dj, dk,           &
                                            flux)
 !------------------------------------------------------------------------------!
 !   Computes the value at the cell face using different convective  schemes.   !
@@ -15,15 +13,6 @@
   real           :: phi_f, phi_f_c, phi_f_u
   integer        :: s
   type(Var_Type) :: phi
-  real           :: phi_i(-phi % pnt_grid % n_bnd_cells:  &
-                           phi % pnt_grid % n_cells),     &
-                    phi_j(-phi % pnt_grid % n_bnd_cells:  &
-                           phi % pnt_grid % n_cells),     &
-                    phi_k(-phi % pnt_grid % n_bnd_cells:  &
-                           phi % pnt_grid % n_cells)
-  real           :: di(phi % pnt_grid % n_faces),  &
-                    dj(phi % pnt_grid % n_faces),  &
-                    dk(phi % pnt_grid % n_faces)
   real           :: flux(phi % pnt_grid % n_faces)
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
@@ -73,18 +62,18 @@
   end if
 
   if(flux(s) > 0.0) then
-    phi_star = phi % n(d) - 2.0 * (  phi_i(c)*di(s)   &
-                                   + phi_j(c)*dj(s)   &
-                                   + phi_k(c)*dk(s) )
+    phi_star = phi % n(d) - 2.0 * (  phi % x(c)*grid % dx(s)   &
+                                   + phi % y(c)*grid % dy(s)   &
+                                   + phi % z(c)*grid % dz(s) )
   else
-    phi_star = phi % n(d) + 2.0 * (  phi_i(c)*di(s)   &
-                                   + phi_j(c)*dj(s)   &
-                                   + phi_k(c)*dk(s) )
+    phi_star = phi % n(d) + 2.0 * (  phi % x(c)*grid % dx(s)   &
+                                   + phi % y(c)*grid % dy(s)   &
+                                   + phi % z(c)*grid % dz(s) )
   end if
 
   phi_u = max( phi % min(c), min(phi_star, phi % max(c)) )
 
-  rj = ( phi % n(c) - phi_u ) / ( phi % n(d)-phi % n(c) + 1.0e-16 )
+  rj = ( phi % n(c) - phi_u ) / ( phi % n(d) - phi % n(c) + 1.0e-16 )
 
   g_d = 0.5 * fj * (1.0+fj)
   g_u = 0.5 * fj * (1.0-fj)
@@ -93,7 +82,7 @@
     phij = fj
 
   else if(phi % adv_scheme .eq. QUICK) then
-    rj = ( phi % n(c) - phi_u ) / ( phi % n(d)-phi % n(c) + 1.0e-12 )
+    rj = ( phi % n(c) - phi_u ) / ( phi % n(d) - phi % n(c) + 1.0e-12 )
     alfa = 0.0
     phij = (g_d - alfa) + (g_u + alfa) * rj
 
@@ -107,12 +96,12 @@
   else if(phi % adv_scheme .eq. SMART) then
     beta1 = 3.0
     beta2 = 1.0
-    phij = max( 0.0, min( (beta1-1.0)*rj, g_d+g_u*rj, beta2 ) )
+    phij = max( 0.0, min( (beta1-1.0)*rj, g_d + g_u*rj, beta2 ) )
 
   else if(phi % adv_scheme .eq. AVL_SMART) then
     beta1 = 1.0 + fj*(2.0+fj) 
     beta2 = fj*(2.0-fj) 
-    phij = max( 0.0, min( (beta1-1.0)*rj, g_d+g_u*rj, beta2 ) )
+    phij = max( 0.0, min( (beta1-1.0)*rj, g_d + g_u*rj, beta2 ) )
 
   else if(phi % adv_scheme .eq. SUPERBEE) then
     phij = 0.5 * max( 0.0, min( 2.0*rj,1.0 ), min( rj,2.0 ) )
@@ -136,18 +125,20 @@
     beta = 0.1
 
     if(flux(s) > 0.0) then
-      phi_star = 1.0 - (phi % n(d) - phi % n(c))/(2.0 * (  phi_i(c)*di(s)   &
-                                                         + phi_j(c)*dj(s)   &
-                                                         + phi_k(c)*dk(s)))
+      phi_star = 1.0 - (phi % n(d) - phi % n(c))              &
+                     / (2.0 * (  phi % x(c) * grid % dx(s)    &
+                               + phi % y(c) * grid % dy(s)    &
+                               + phi % z(c) * grid % dz(s)))
     else
-      phi_star = 1.0 + (phi % n(d) - phi % n(c))/(2.0 * (  phi_i(c)*di(s)   &
-                                                         + phi_j(c)*dj(s)   &
-                                                         + phi_k(c)*dk(s)))
+      phi_star = 1.0 + (phi % n(d) - phi % n(c))              &
+                     / (2.0 * (  phi % x(c) * grid % dx(s)    &
+                               + phi % y(c) * grid % dy(s)    &
+                               + phi % z(c) * grid % dz(s)))
     end if
 
     gamma_c = phi_star / beta
 
-    if(phi_star < beta.and.phi_star > 0.0) then
+    if(phi_star < beta .and. phi_star > 0.0) then
       phi_f = (1.0 - gamma_c*(1.0 - grid % f(s))) * phi % n(c)   &
                    + gamma_c*(1.0 - grid % f(s))  * phi % n(d)
     else if(phi_star < 1.0.and.phi_star >= beta) then
