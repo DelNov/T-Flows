@@ -106,7 +106,7 @@
   !   Mass flow rates   !
   !---------------------!
   call Backup_Mod_Write_Face_Real(grid, fh, d, vc, 'face_flux',  &
-                                  fld % m_flux % n, correct_sign = .true.)
+                                  fld % v_flux % n, correct_sign = .true.)
 
   !--------------!
   !              !
@@ -124,8 +124,6 @@
   !--------------!
   if(mul % model .eq. VOLUME_OF_FLUID) then
     call Backup_Mod_Write_Variable(fh, d, vc, 'vof', mul % vof)
-    call Backup_Mod_Write_Face_Real(grid, fh, d, vc, 'face_dens',  &
-                                    fld % density_f)
   end if
 
   !-----------------------!
