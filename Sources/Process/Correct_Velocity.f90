@@ -17,7 +17,7 @@
   type(Grid_Type),   pointer :: grid
   type(Bulk_Type),   pointer :: bulk
   type(Var_Type),    pointer :: u, v, w, p, pp
-  type(Face_Type),   pointer :: flux            ! mass or volume flux
+  type(Face_Type),   pointer :: v_flux          ! volume flux
   type(Matrix_Type), pointer :: a
   real,              pointer :: b(:)
   real,              pointer :: u_relax
@@ -31,7 +31,7 @@
   ! Take aliases
   grid    => flow % pnt_grid
   bulk    => flow % bulk
-  flux    => flow % m_flux
+  v_flux  => flow % v_flux
   p       => flow % p
   pp      => flow % pp
   a       => sol % a
@@ -66,6 +66,9 @@
       end if
     end if
   end do
+  call Field_Mod_Grad_Variable(flow, u)
+  call Field_Mod_Grad_Variable(flow, v)
+  call Field_Mod_Grad_Variable(flow, w)
 
   !----------------------------------------------------------------!
   !   Look at the following equation and you will understand why   !
@@ -80,9 +83,9 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
     if(c2 > 0) then
-                                 !<--- this is correction --->!
-      flux % n(s) = flux % n(s) + ( pp % n(c2) - pp % n(c1) )   &
-                                   * a % val(a % pos(1,s)) 
+                                     !<--- this is correction --->!
+      v_flux % n(s) = v_flux % n(s) + ( pp % n(c2) - pp % n(c1) )   &
+                                       * a % val(a % pos(1,s))
 
     end if
   end do
@@ -101,9 +104,9 @@
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
 
-      b(c1) = b(c1) - flux % n(s)
+      b(c1) = b(c1) - v_flux % n(s)
       if(c2 > 0) then
-        b(c2) = b(c2) + flux % n(s)
+        b(c2) = b(c2) + v_flux % n(s)
       end if
     end do
 
@@ -125,8 +128,6 @@
         b(c) = b(c) / (grid % vol(c) / dt)
       end do
 
-      ! Here volume flux is converted into mass flux:
-      flux % n(:) = flux % n(:) * flow % density_f(:)
     else
       !do c = 1, grid % n_cells
       !  if (grid % xc(c) > 0.0001 .and. grid % xc(c) < 0.00012) then
@@ -145,9 +146,6 @@
     end do
   else
     mass_err = p % res
-    if(mult % model .eq. VOLUME_OF_FLUID) then
-      flux % n(:) = flux % n(:) * flow % density_f(:)
-    end if
   end if
 
 
@@ -162,16 +160,17 @@
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
-    dens_f = flow % density_f(s)
-    visc_f =        grid % f(s)  * flow % viscosity(c1)   &
-           + (1.0 - grid % f(s)) * flow % viscosity(c2)
+    dens_f =        grid % fw(s)  * flow % density  (c1)   &
+           + (1.0 - grid % fw(s)) * flow % density  (c2)
+    visc_f =        grid % fw(s)  * flow % viscosity(c1)   &
+           + (1.0 - grid % fw(s)) * flow % viscosity(c2)
     if(c2 > 0) then
-      cfl_t = abs( dt * flux % n(s) / dens_f /   &
+      cfl_t = abs( dt * v_flux % n(s) /          &
                    ( a % fc(s) *                 &
                    (  grid % dx(s)*grid % dx(s)  &
                     + grid % dy(s)*grid % dy(s)  &
                     + grid % dz(s)*grid % dz(s)) ) )
-      pe_t    = abs( flux % n(s) / a % fc(s) / (visc_f / dens_f + TINY) )
+      pe_t    = abs( v_flux % n(s) / a % fc(s) / (visc_f / dens_f + TINY) )
       flow % cfl_max = max( flow % cfl_max, cfl_t )
       flow % pe_max  = max( flow % pe_max,  pe_t  )
     end if
