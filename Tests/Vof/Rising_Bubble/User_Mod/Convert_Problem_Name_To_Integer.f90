@@ -1,7 +1,7 @@
   subroutine Convert_Problem_Name_To_Integer(problem_name,int_p_name)
   implicit none
-  character(80) :: problem_name
-  integer :: i, l, ifile, ii, int_p_name
+  character(SL) :: problem_name
+  integer       :: i, l, ifile, ii, int_p_name
 
   l=len_trim(problem_name)
   int_p_name = 0

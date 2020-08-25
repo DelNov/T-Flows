@@ -21,7 +21,7 @@
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   type(Var_Type),  pointer :: ut, vt, wt
   integer                  :: n_prob, pl, c, i, count, s, c1, c2, n_points
-  character(len=80)        :: coord_name, res_name, res_name_plus
+  character(SL)            :: coord_name, res_name, res_name_plus
   real, allocatable        :: z_p(:), u_p(:), v_p(:), w_p(:), t_p(:),       &
                               kin_p(:), eps_p(:), f22_p(:), zeta_p(:),      &
                               uu_p(:), vv_p(:), ww_p(:), uw_p(:),           &

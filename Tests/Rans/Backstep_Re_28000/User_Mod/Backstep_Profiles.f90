@@ -13,7 +13,7 @@
   type(Grid_Type), pointer :: grid
   integer                  :: n_prob, pl, c, idumm, i, count,  &
                               k, c1, c2, s, n_hor, fu
-  character(len=80)        :: coord_name, result_name
+  character(SL)            :: coord_name, result_name
   real, parameter          :: u_b = 11.3, h = 0.038
   real, allocatable        :: x1_p(:), x2_p(:), lnum(:), z_p(:), &
                               um_p(:), vm_p(:), wm_p(:), & 

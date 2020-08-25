@@ -25,7 +25,7 @@
   type(Var_Type),  pointer       :: u, v, w, t
   type(Grid_Type), pointer       :: grid
   type(Particle_Type), pointer   :: part
-  character(len=80)              :: result_name
+  character(SL)                  :: result_name
   integer                        :: c, eddy, dir, npb = 0, nn
   integer                        :: ss, oo, n_b, n_bp, fu, n_bin1, n_bin2, temp
   integer                        :: i, j, k, r, s, ii, mark, n_test

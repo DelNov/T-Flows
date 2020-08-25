@@ -27,7 +27,7 @@
   type(Bulk_Type), pointer :: bulk
   integer                  :: n_prob, pl, c, i, count, s, c1, c2, n_points
   integer                  :: fu1, fu2
-  character(len=80)        :: coord_name, result_name, result_name_plus
+  character(SL)            :: coord_name, result_name, result_name_plus
   real, allocatable        :: z_p(:), u_p(:), v_p(:), w_p(:), t_p(:),  &
                               ind(:),  wall_p(:), kin_p(:), eps_p(:),  &
                               uw_p(:), uu_p(:), vv_p(:), ww_p(:),      &

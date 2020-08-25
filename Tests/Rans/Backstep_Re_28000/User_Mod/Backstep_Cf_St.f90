@@ -14,7 +14,7 @@
   type(Var_Type),  pointer :: u, v, w, t
   type(Grid_Type), pointer :: grid
   integer                  :: n_prob, pl, c, dummy, i, count, k, c1, c2, s, fu
-  character(len=80)        :: result_name
+  character(SL)            :: result_name
   real, allocatable        :: r1_p(:), r2_p(:), z_p(:),  &
                               um_p(:), vm_p(:), wm_p(:), & 
                               uu_p(:), vv_p(:), ww_p(:), &

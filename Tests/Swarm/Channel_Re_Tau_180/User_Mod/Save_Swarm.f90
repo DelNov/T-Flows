@@ -31,8 +31,8 @@
   integer                   :: j, counter
   integer                   :: label, counter1, counter2, fu1 , fu2
   integer                   :: nb, nc
-  character(len=80)         :: coord_name, result_name, result_name_plus
-  character(len=80)         :: swarm_result_name, swarm_result_name_plus
+  character(SL)             :: coord_name, result_name, result_name_plus
+  character(SL)             :: swarm_result_name, swarm_result_name_plus
   real, allocatable         :: z_p(:), u_p(:), v_p(:), w_p(:), t_p(:),      &
                               ind(:), wall_p(:),                            &
                               uw_pp(:), uu_pp(:), vv_pp(:), ww_pp(:),       &

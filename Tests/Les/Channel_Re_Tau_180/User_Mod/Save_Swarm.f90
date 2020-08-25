@@ -19,11 +19,11 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
-  type(Turb_Type),  target :: turb
-  type(Swarm_Type), target :: swarm
+  type(Field_Type),    target  :: flow
+  type(Turb_Type),     target  :: turb
+  type(Swarm_Type),    target  :: swarm
   type(Particle_Type), pointer :: part
-  character(len=*)         :: save_name
+  character(len=*)             :: save_name
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
   type(Grid_Type), pointer :: grid
@@ -32,8 +32,8 @@
   integer                  :: index_p, j, ip, counter, blabla, ip0, ip01
   integer                  :: ip1, ip2, counter_k, l, n_ss, kk, counter_kk 
   integer                  :: label, counter1, counter2
-  character(len=80)        :: coord_name, res_name, res_name_plus
-  character(len=80)        :: swarm_res_name, swarm_res_name_plus
+  character(SL)            :: coord_name, res_name, res_name_plus
+  character(SL)            :: swarm_res_name, swarm_res_name_plus
   real, allocatable        :: z_p(:), u_p(:), v_p(:), w_p(:), t_p(:),      &
                               ind(:),  wall_p(:), kin_p(:), eps_p(:),      &
                               uw_pp(:), uu_pp(:), vv_pp(:), ww_pp(:),      &

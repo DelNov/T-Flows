@@ -19,7 +19,7 @@
   type(Var_Type),  pointer      :: u
   real, pointer                 :: ub
   integer                       :: n, i, c, fu
-  character(len=80)             :: coord_name, res_name
+  character(SL)                 :: coord_name, res_name
   real, allocatable             :: y_p(:), u_p(:), y_f(:)
   integer, allocatable          :: n_count(:), ind(:)
   logical                       :: exist

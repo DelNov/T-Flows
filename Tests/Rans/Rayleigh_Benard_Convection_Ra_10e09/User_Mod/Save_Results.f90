@@ -15,7 +15,7 @@
   integer                       :: ts
 !-----------------------------------[Locals]-----------------------------------!
   integer             :: n_prob, pl, c, i, count, s, c1, c2, n_points
-  character(len=80)   :: coord_name, res_name, res_name_plus
+  character(SL)       :: coord_name, res_name, res_name_plus
   real, allocatable   :: z_p(:), tz_p(:), ti_p(:), w_p(:), t_p(:),         &
                          y_plus_p(:),  ind(:),  wall_p(:), kin_p(:),       &
                          eps_p(:), kin_mod_p(:),                           &

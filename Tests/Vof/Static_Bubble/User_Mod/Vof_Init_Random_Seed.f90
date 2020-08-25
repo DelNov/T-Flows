@@ -1,8 +1,8 @@
 subroutine Vof_Init_Random_Seed(problem_name)
 
-  integer :: i, n, clock, int_p_name
+  integer                            :: i, n, clock, int_p_name
   integer, dimension(:), allocatable :: seed
-  character(len=80)  :: problem_name
+  character(SL)                      :: problem_name
 
   call random_seed(size = n)
   allocate(seed(n))
