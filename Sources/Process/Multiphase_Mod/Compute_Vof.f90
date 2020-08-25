@@ -128,9 +128,6 @@
       ! Compute Gradient:
       call Field_Mod_Grad_Variable(flow, vof)
 
-      ! Skewness correction
-      call Multiphase_Mod_Vof_Skewness_Correction(mult, grid, beta_c)
-
       call Multiphase_Mod_Vof_Predict_Beta(mult, grid, beta_f, beta_c, c_d)
 
       loop_corr:  do corr_num = 1, corr_num_max
