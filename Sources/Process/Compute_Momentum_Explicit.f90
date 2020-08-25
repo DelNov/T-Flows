@@ -52,7 +52,7 @@
       ui % n(c) = (neigh(c) + b(c)) / a % val(a % dia(c))
     end do
 
-    call Grid_Mod_Exchange_Cells_Real(grid, ui % n)
+    call Field_Mod_Grad_Variable(flow, ui)
 
     if (flow % i_corr == flow % n_piso_corrections) then
       res(:) = 0.0
