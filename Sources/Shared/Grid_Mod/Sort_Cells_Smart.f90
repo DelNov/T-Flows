@@ -70,7 +70,7 @@
         grid % dx(s) = -grid % dx(s)
         grid % dy(s) = -grid % dy(s)
         grid % dz(s) = -grid % dz(s)
-        grid % f (s) = 1.0 - grid % f(s)
+        grid % wg(s) = 1.0 - grid % wg(s)
       end if
     end if
   end do

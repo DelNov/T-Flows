@@ -68,7 +68,7 @@
   !-----------!
   !   Faces   !
   !-----------!
-  do var = 1, 10
+  do var = 1, 13
     do s = 1, grid % n_faces + grid % n_shadows
       if(grid % old_f(s) .ne. 0) then
         c1 = grid % faces_c(1, grid % old_f(s))
@@ -80,10 +80,13 @@
           if(var .eq.  4)  write(fu) grid % dx(grid % old_f(s))
           if(var .eq.  5)  write(fu) grid % dy(grid % old_f(s))
           if(var .eq.  6)  write(fu) grid % dz(grid % old_f(s))
-          if(var .eq.  7)  write(fu) grid % f(grid % old_f(s))
+          if(var .eq.  7)  write(fu) grid % wg(grid % old_f(s))
           if(var .eq.  8)  write(fu) grid % xf(grid % old_f(s))
           if(var .eq.  9)  write(fu) grid % yf(grid % old_f(s))
           if(var .eq. 10)  write(fu) grid % zf(grid % old_f(s))
+          if(var .eq. 11)  write(fu) grid % xr(grid % old_f(s))
+          if(var .eq. 12)  write(fu) grid % yr(grid % old_f(s))
+          if(var .eq. 13)  write(fu) grid % zr(grid % old_f(s))
         else
           if(var .eq.  1)  write(fu) -grid % sx(grid % old_f(s))
           if(var .eq.  2)  write(fu) -grid % sy(grid % old_f(s))
@@ -91,10 +94,13 @@
           if(var .eq.  4)  write(fu) -grid % dx(grid % old_f(s))
           if(var .eq.  5)  write(fu) -grid % dy(grid % old_f(s))
           if(var .eq.  6)  write(fu) -grid % dz(grid % old_f(s))
-          if(var .eq.  7)  write(fu) 1.0 - grid % f(grid % old_f(s))
+          if(var .eq.  7)  write(fu) 1.0 - grid % wg(grid % old_f(s))
           if(var .eq.  8)  write(fu) grid % xf(grid % old_f(s))
           if(var .eq.  9)  write(fu) grid % yf(grid % old_f(s))
           if(var .eq. 10)  write(fu) grid % zf(grid % old_f(s))
+          if(var .eq. 11)  write(fu) grid % xr(grid % old_f(s))
+          if(var .eq. 12)  write(fu) grid % yr(grid % old_f(s))
+          if(var .eq. 13)  write(fu) grid % zr(grid % old_f(s))
         end if
       end if
     end do
