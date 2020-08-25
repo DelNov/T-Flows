@@ -79,8 +79,8 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
-    ! Inside the flow, it has usual value: phi_f = fw * phi_1 + (1-fw) * phi_2
-    grid % fw(s) = grid % f(s)
+    ! Inside the flow, it has usual value: phi_f = wg * phi_1 + (1-wg) * phi_2
+    grid % fw(s) = grid % wg(s)
 
     ! Close to the wall, however, there is inversion. It takes
     ! the value from inside as the representative for the face.

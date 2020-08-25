@@ -87,7 +87,7 @@
     ! Interpolation factor
     ! (Equation 2.19 in Denner's thesis)
     dsc2 = Math_Mod_Distance(xc2, yc2, zc2, xi, yi, zi)
-    grid % f(s) = dsc2 / (dsc1 + dsc2)
+    grid % wg(s) = dsc2 / (dsc1 + dsc2)
   end do
 
   end subroutine

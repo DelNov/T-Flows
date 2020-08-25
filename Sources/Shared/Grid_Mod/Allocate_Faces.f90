@@ -46,7 +46,7 @@
   allocate(grid % zr(nf+ns));  grid % zr = 0.0
 
   ! Weight factors
-  allocate(grid % f (nf+ns));   grid % f  = 0.0
+  allocate(grid % wg(nf+ns));   grid % wg = 0.0
   allocate(grid % fw(nf+ns));   grid % fw = 0.0
 
   ! Allocate processor i.d.
