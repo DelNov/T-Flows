@@ -16,6 +16,7 @@
     character(VL) :: name      ! variable name, always upper case and
                                ! very short (4, defined in Const_Mod)
     real, allocatable :: n(:)             ! new value
+    real, allocatable :: o(:)             ! old value
     real, allocatable :: avg(:), star(:)  ! average guessed value, guessed value
   end type
 
