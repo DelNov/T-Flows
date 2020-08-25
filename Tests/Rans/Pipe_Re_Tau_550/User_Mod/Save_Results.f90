@@ -20,7 +20,6 @@
   type(Var_Type),  pointer :: kin, eps, zeta, f22
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   type(Var_Type),  pointer :: ut, vt, wt
-  type(Face_Type), pointer :: m_flux
   integer                  :: n_prob, pl, c, i, count, s, c1, c2, n_points
   character(len=80)        :: coord_name, res_name, res_name_plus
   real, allocatable        :: z_p(:), u_p(:), v_p(:), w_p(:), y_plus_p(:),  &
@@ -39,7 +38,6 @@
 
   ! Take aliases
   grid   => flow % pnt_grid
-  m_flux => flow % m_flux
   bulk   => flow % bulk
   vis_t  => turb % vis_t
   call Field_Mod_Alias_Momentum   (flow, u, v, w)
