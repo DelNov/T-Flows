@@ -29,7 +29,6 @@
   allocate(flow % viscosity   (-grid % n_bnd_cells:grid % n_cells))
   allocate(flow % capacity    (-grid % n_bnd_cells:grid % n_cells))
   allocate(flow % conductivity(-grid % n_bnd_cells:grid % n_cells))
-  allocate(flow % density_f   ( grid % n_faces))
 
   ! Read constant (defualt) values
   call Control_Mod_Dynamic_Viscosity   (visc_const)
@@ -51,7 +50,6 @@
     flow % viscosity   (:) = visc_const
     flow % capacity    (:) = capa_const
     flow % conductivity(:) = cond_const
-    flow % density_f   (:) = dens_const
   end if
 
   end subroutine
