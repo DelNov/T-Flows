@@ -42,7 +42,7 @@
   read(fu) (grid % dy(s), s = 1, grid % n_faces + grid % n_shadows)
   read(fu) (grid % dz(s), s = 1, grid % n_faces + grid % n_shadows)
 
-  read(fu) (grid % wg(s), s = 1, grid % n_faces + grid % n_shadows)
+  read(fu) (grid % f(s), s = 1, grid % n_faces + grid % n_shadows)
 
   read(fu) (grid % xf(s), s = 1, grid % n_faces + grid % n_shadows)
   read(fu) (grid % yf(s), s = 1, grid % n_faces + grid % n_shadows)

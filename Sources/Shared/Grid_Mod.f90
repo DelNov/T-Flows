@@ -112,9 +112,9 @@
     ! Vectors connecting face center with face cell centers connection
     real, allocatable :: xr(:), yr(:), zr(:)
 
-    ! Face weight-factors: purely geometrical (wg) and
+    ! Face weight-factors: purely geometrical (f) and
     ! adapted to near wall cells in the fluid phase (fw)
-    real, allocatable :: wg(:)
+    real, allocatable :: f (:)
     real, allocatable :: fw(:)
 
     !-------------------------!
