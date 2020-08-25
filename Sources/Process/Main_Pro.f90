@@ -364,13 +364,13 @@
         ! (Can this call be somewhere in Compute Pressure?)
         call Grid_Mod_Exchange_Cells_Real(grid(d), sol(d) % a % sav)
 
-        call Balance_Mass(flow(d), mult(d))
+        call Balance_Volume(flow(d), mult(d))
         call Compute_Pressure(flow(d), mult(d), sol(d), flow(d) % dt, ini)
 
         call Field_Mod_Grad_Pressure_Correction(flow(d), flow(d) % pp)
 
         call Multiphase_Averaging(flow(d), mult(d), flow(d) % p)
-        call Field_Mod_Calculate_Fluxes(flow(d), flow(d) % m_flux % n)
+        call Field_Mod_Calculate_Mass_Fluxes(flow(d), flow(d) % v_flux % n)
         mass_res(d) = Correct_Velocity(flow(d), mult(d), sol(d),  &
                                        flow(d) % dt, ini)
 
