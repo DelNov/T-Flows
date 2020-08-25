@@ -18,7 +18,7 @@
   c1 = grid % faces_c(1,s)
   c2 = grid % faces_c(2,s)
 
-  w1 = grid % wg(s)
+  w1 = grid % f(s)
   w2 = 1.0 - w1
 
   Var_Mod_Face_Interpolation =                             &
