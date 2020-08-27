@@ -4,9 +4,6 @@
 !   Module used for native linear solvers.                                     !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Comm_Mod
-  use Grid_Mod
   use Matrix_Mod
   use Vector_Mod
   use Control_Mod

@@ -1,11 +1,11 @@
 !==============================================================================!
-  logical function Info_Mod_Time_Is_Up()
+  logical function Results_Mod_Time_To_Save(n)
 !------------------------------------------------------------------------------!
   implicit none
+!---------------------------------[Arguments]----------------------------------!
+  integer :: n  ! current time step
 !==============================================================================!
 
-  Info_Mod_Time_Is_Up = real(sys_clock % cur - sys_clock % ini)  &
-                      / real(sys_clock % cnt)                    &
-                      > sys_clock % wall_time_max
+  Results_Mod_Time_To_Save = mod(n, result % interval) .eq. 0
 
   end function

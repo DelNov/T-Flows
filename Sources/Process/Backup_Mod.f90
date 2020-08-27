@@ -4,22 +4,18 @@
 !   Module containing functions to write and read backup files.                !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Cpu_Timer_Mod
-  use Comm_Mod
-  use File_Mod
-  use Var_Mod
-  use Turb_Mod
-  use Field_Mod
-  use Swarm_Mod
-  use Multiphase_Mod
-  use Grid_Mod
-  use Bulk_Mod
-  use Control_Mod
   use User_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
+
+  !-----------------!
+  !   Backup type   !
+  !-----------------!
+  type Backup_Type
+    integer :: interval
+  end type
+  type(Backup_Type) :: backup
 
   contains
 
@@ -34,6 +30,7 @@
   include 'Backup_Mod/Read_Swarm.f90'
   include 'Backup_Mod/Read_Variable.f90'
   include 'Backup_Mod/Save.f90'
+  include 'Backup_Mod/Time_To_Save.f90'
   include 'Backup_Mod/Write_Cell_Real.f90'
   include 'Backup_Mod/Write_Face_Real.f90'
   include 'Backup_Mod/Write_Int.f90'

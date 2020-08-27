@@ -238,16 +238,16 @@ SRC_MOD += Bulk_Mod.f90		\
            Surf_Mod.f90		\
            Multiphase_Mod.f90
 
-# User_Mod should come before Save_Results_Mod
+# User_Mod should come before Results_Mod
 SRC_MOD += User_Mod.f90
 
 # Backup_Mod should come close to the end because it uses all other modules
 SRC_MOD += Backup_Mod.f90
 
-# Save_Results_Mod - conditional VTU/CGNS support
+# Results_Mod - conditional VTU/CGNS support
 ifeq ($(CGNS), no)
   SRC_MOD += Save_Grid_Mod_Vtu.f90	\
-             Save_Results_Mod_Vtu.f90
+             Results_Mod_Vtu.f90
 else
   ifeq ($(MPI), yes)
     SRC_MOD += Cgns_Mod_Par.f90
@@ -255,7 +255,7 @@ else
     SRC_MOD += Cgns_Mod_Seq.f90
   endif
   SRC_MOD += Save_Grid_Mod_Cgns.f90	\
-             Save_Results_Mod_Cgns.f90
+             Results_Mod_Cgns.f90
 endif
 
 #---------------

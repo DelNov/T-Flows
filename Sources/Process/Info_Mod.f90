@@ -62,7 +62,7 @@
   contains
 
   include 'Info_Mod/Start.f90'
-  include 'Info_Mod/Time_Is_Up.f90'
+  include 'Info_Mod/Time_To_Exit.f90'
 
   include 'Info_Mod/Time_Start.f90'
   include 'Info_Mod/Time_Fill.f90'

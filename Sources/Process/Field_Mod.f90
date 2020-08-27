@@ -10,7 +10,6 @@
   use Face_Mod
   use Grid_Mod
   use Bulk_Mod
-  use Comm_Mod
   use Solver_Mod
 !------------------------------------------------------------------------------!
   implicit none

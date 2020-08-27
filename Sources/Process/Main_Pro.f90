@@ -4,27 +4,12 @@
 !   Unstructured finite volume 'LES'/RANS solver.                              !
 !------------------------------------------------------------------------------!
 !---------------------------------[Modules]------------------------------------!
-  use Const_Mod
-  use Comm_Mod
-  use Cpu_Timer_Mod
-  use File_Mod,      only: problem_name
-  use Field_Mod,     only: Field_Type, Field_Mod_Allocate, heat_transfer
-  use Turb_Mod
-  use Grid_Mod
-  use Interface_Mod
   use Eddies_Mod
-  use Bulk_Mod
-  use Var_Mod,       only: Var_Type
-  use Solver_Mod,    only: Solver_Mod_Create
-  use Info_Mod
   use Work_Mod,      only: Work_Mod_Allocate
   use User_Mod
-  use Save_Results_Mod
-  use Control_Mod
-  use Monitor_Mod
+  use Results_Mod
   use Backup_Mod
-  use Surf_Mod
-  use Multiphase_Mod
+  use Monitor_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !----------------------------------[Locals]------------------------------------!
@@ -32,7 +17,7 @@
   character(len=9)      :: dom_control(MD) = 'control.n'
   integer               :: n, sc, tp
   real                  :: mass_res(MD)
-  logical               :: backup(MD), save_now, exit_now, pot_init
+  logical               :: read_backup(MD), save_now, exit_now, pot_init
   type(Grid_Type)       :: grid(MD)        ! grid used in computations
   type(Field_Type)      :: flow(MD)        ! flow field we will be solving for
   type(Swarm_Type)      :: swarm(MD)       ! swarm of particles
@@ -51,7 +36,7 @@
   integer               :: n_stat_p        ! first time step for swarm statistic
   integer               :: first_dt_p      ! first t.s. for swarm computation
   integer               :: ini             ! inner iteration counter
-  integer               :: bsi, rsi, prsi  ! backup and results save interval
+  integer               :: prsi            ! particles save interval
   real                  :: simple_tol      ! tolerance for SIMPLE algorithm
   integer               :: n_dom           ! number of domains
   integer               :: d               ! domain counter
@@ -67,8 +52,8 @@
   end do
 
   ! Initialize variables
-  time      =  0.      ! initialize time to zero
-  backup(:) = .false.  ! can turn .true. in Load_Backup
+  time           =  0.      ! initialize time to zero
+  read_backup(:) = .false.  ! can turn .true. in Load_Backup
 
   !------------------------------!
   !   Start parallel execution   !
@@ -187,23 +172,23 @@
   do d = 1, n_dom
     call Control_Mod_Switch_To_Domain(d)  ! take proper control file
     call Backup_Mod_Load(flow(d), swarm(d), turb(d), mult(d),  &
-                         time, first_dt, n_stat_t, backup(d))
+                         time, first_dt, n_stat_t, read_backup(d))
 
     ! Initialize variables
-    if(.not. backup(d)) then
+    if(.not. read_backup(d)) then
       call Initialize_Variables(flow(d), turb(d), mult(d), swarm(d), sol(d))
-      call Save_Surf(mult(d) % surf, n)
+      call Results_Mod_Save_Surf(mult(d) % surf, n)
     end if
 
     if(mult(d) % model .eq. VOLUME_OF_FLUID) then
-      if (backup(d))  then
+      if (read_backup(d))  then
         flow % piso_status = .false.
       end if
-      call Multiphase_Mod_Update_Physical_Properties(mult(d), backup(d))
+      call Multiphase_Mod_Update_Physical_Properties(mult(d), read_backup(d))
     end if
 
     ! Initialize monitoring points
-    call Monitor_Mod_Initialize(monitor(d), grid(d), backup(d), domain=d)
+    call Monitor_Mod_Initialize(monitor(d), grid(d), read_backup(d), domain=d)
 
     ! Plane for calcution of overall mass fluxes
     call Control_Mod_Point_For_Monitoring_Planes(flow(d) % bulk % xp,  &
@@ -215,7 +200,7 @@
 
     if( (turb(d) % model .eq. LES_SMAGORINSKY     .or.   &
          turb(d) % model .eq. HYBRID_LES_PRANDTL) .and.  &
-         .not. backup(d)) then
+         .not. read_backup(d)) then
       call Find_Nearest_Wall_Cell(turb(d))
     end if
 
@@ -234,9 +219,9 @@
   !---------------!
 
   call Control_Mod_Switch_To_Root()
-  call Control_Mod_Backup_Save_Interval (bsi,    verbose=.true.)
-  call Control_Mod_Results_Save_Interval(rsi,    verbose=.true.)
-  call Control_Mod_Swarm_Save_Interval  (prsi,   verbose=.true.)
+  call Control_Mod_Backup_Save_Interval (backup % interval, verbose=.true.)
+  call Control_Mod_Results_Save_Interval(result % interval, verbose=.true.)
+  call Control_Mod_Swarm_Save_Interval  (prsi,              verbose=.true.)
 
   !-------------------------------------------------------------!
   !   Perform potential initialization in the first time step   !
@@ -253,10 +238,10 @@
   ! depending on how the code was compiled
   ! First calls saves inside, second only the boundary cells
   do d = 1, n_dom
-    call Save_Results(flow(d), turb(d), mult(d), swarm(d), first_dt,  &
-                      plot_inside=.true., domain=d)
-    call Save_Results(flow(d), turb(d), mult(d), swarm(d), first_dt,  &
-                      plot_inside=.false., domain=d)
+    call Results_Mod_Save(flow(d), turb(d), mult(d), swarm(d), first_dt,  &
+                          plot_inside=.true., domain=d)
+    call Results_Mod_Save(flow(d), turb(d), mult(d), swarm(d), first_dt,  &
+                          plot_inside=.false., domain=d)
   end do
 
   do n = first_dt + 1, last_dt
@@ -298,11 +283,11 @@
       if(mult(d) % model .eq. VOLUME_OF_FLUID) then
         call Multiphase_Mod_Main(mult(d), flow(d), turb(d), sol(d), n)
         if(mult(d) % track_front) then
-          call Save_Surf(mult(d) % surf, n)
-          call Save_Results(flow(d), turb(d), mult(d), swarm(d), n,  &
-                            plot_inside=.true., domain=d)
+          call Results_Mod_Save_Surf(mult(d) % surf, n)
+          call Results_Mod_Save(flow(d), turb(d), mult(d), swarm(d), n,  &
+                                plot_inside=.true., domain=d)
         end if
-        call Multiphase_Mod_Update_Physical_Properties(mult(d), backup(d))
+        call Multiphase_Mod_Update_Physical_Properties(mult(d), read_backup(d))
       end if
 
       ! Lagrangian particle tracking
@@ -438,10 +423,10 @@
     inquire(file='save_now', exist=save_now)
 
     ! Is it time to save the backup file?
-    if(save_now           .or.  &
-       exit_now           .or.  &
-       mod(n, bsi) .eq. 0 .or.  &
-       Info_Mod_Time_Is_Up()) then
+    if(save_now                   .or.  &
+       exit_now                   .or.  &
+       Backup_Mod_Time_To_Save(n) .or.  &
+       Info_Mod_Time_To_Exit()) then
       do d = 1, n_dom
         call Control_Mod_Switch_To_Domain(d)
         call Backup_Mod_Save(flow(d), swarm(d), turb(d), mult(d),  &
@@ -450,18 +435,18 @@
     end if
 
     ! Is it time to save results for post-processing?
-    if(save_now            .or.  &
-       exit_now            .or.  &
-       mod(n, rsi) .eq.  0 .or.  &
-       Info_Mod_Time_Is_Up()) then
+    if(save_now                    .or.  &
+       exit_now                    .or.  &
+       Results_Mod_Time_To_Save(n) .or.  &
+       Info_Mod_Time_To_Exit()) then
 
       do d = 1, n_dom
         call Control_Mod_Switch_To_Domain(d)
-        call Save_Results(flow(d), turb(d), mult(d), swarm(d), n,  &
-                          plot_inside=.true., domain=d)
-        call Save_Results(flow(d), turb(d), mult(d), swarm(d), n,  &
-                          plot_inside=.false., domain=d)
-        call Save_Swarm(swarm(d), n)
+        call Results_Mod_Save(flow(d), turb(d), mult(d), swarm(d), n,  &
+                              plot_inside=.true., domain=d)
+        call Results_Mod_Save(flow(d), turb(d), mult(d), swarm(d), n,  &
+                              plot_inside=.false., domain=d)
+        call Results_Mod_Save_Swarm(swarm(d), n)
 
         if(mult(d) % model .eq. VOLUME_OF_FLUID) then
         end if
@@ -489,7 +474,7 @@
     end if
 
     ! Ran more than a set limit
-    if(Info_Mod_Time_Is_Up()) then
+    if(Info_Mod_Time_To_Exit()) then
       goto 2
     end if
 
@@ -509,10 +494,10 @@
     ! Save backup and post-processing files at exit
     call Backup_Mod_Save(flow(d), swarm(d), turb(d), mult(d),  &
                          time, n, n_stat_t, domain=d)
-    call Save_Results(flow(d), turb(d), mult(d), swarm(d), n,  &
-                      plot_inside=.true., domain=d)
-    call Save_Results(flow(d), turb(d), mult(d), swarm(d), n,  &
-                      plot_inside=.false., domain=d)
+    call Results_Mod_Save(flow(d), turb(d), mult(d), swarm(d), n,  &
+                          plot_inside=.true., domain=d)
+    call Results_Mod_Save(flow(d), turb(d), mult(d), swarm(d), n,  &
+                          plot_inside=.false., domain=d)
 
     ! Write results in user-customized format
     call User_Mod_Save_Results(flow(d), turb(d), mult(d), swarm(d), n)
