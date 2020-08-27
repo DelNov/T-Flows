@@ -11,9 +11,9 @@
  RESULTS_SAVE_INTERVAL     60
  BACKUP_SAVE_INTERVAL      60
 
- LOAD_BACKUP_NAME        obstacle-ts001260.backup
+ # LOAD_BACKUP_NAME        obstacle-ts001260.backup
  TIME_STEP               1.0e-4
-  
+
 #-------------------
 # Monitoring points 
 #-------------------
