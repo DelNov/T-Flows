@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Energy(flow, turb, mult, sol, dt, ini)
+  subroutine Compute_Energy(flow, turb, mult, sol, ini)
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for scalar (such as temperature)         !
 !------------------------------------------------------------------------------!
@@ -14,7 +14,6 @@
   type(Multiphase_Type), target :: mult
   type(Solver_Type),     target :: sol
   integer                       :: ini
-  real                          :: dt
 !-----------------------------------[Locals]-----------------------------------! 
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w, t
@@ -27,7 +26,7 @@
   real                       :: f_ex1, f_im1, tx_f1, ty_f1, tz_f1
   real                       :: f_ex2, f_im2, tx_f2, ty_f2, tz_f2
   real                       :: pr_t1, pr_t2, pr_tf
-  real                       :: t_stress
+  real                       :: t_stress, dt
   real                       :: cap_dens_c1, cap_dens_c2
   real                       :: ut_x_cap_dens_s, &
                                 vt_x_cap_dens_s, &
@@ -74,6 +73,7 @@
   ! Take aliases
   grid   => flow % pnt_grid
   v_flux => flow % v_flux
+  dt     =  flow % dt
   call Field_Mod_Alias_Momentum  (flow, u, v, w)
   call Field_Mod_Alias_Energy    (flow, t)
   call Turb_Mod_Alias_Heat_Fluxes(turb, ut, vt, wt)

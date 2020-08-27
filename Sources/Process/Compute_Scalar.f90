@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Scalar(flow, turb, mult, sol, dt, ini, sc)
+  subroutine Compute_Scalar(flow, turb, mult, sol, ini, sc)
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for use scalar.                          !
 !------------------------------------------------------------------------------!
@@ -18,7 +18,6 @@
   type(Turb_Type),       target :: turb
   type(Multiphase_Type), target :: mult
   type(Solver_Type),     target :: sol
-  real                          :: dt
   integer                       :: ini
   integer                       :: sc
 !-----------------------------------[Locals]-----------------------------------!
@@ -30,12 +29,11 @@
   type(Var_Type),    pointer :: phi
   integer                    :: c, s, c1, c2, row, col
   real                       :: a12, a21
-  real                       :: ns
+  real                       :: ns, dt
   real                       :: dif_eff1, f_ex1, f_im1
   real                       :: dif_eff2, f_ex2, f_im2
   real                       :: phix_f1, phiy_f1, phiz_f1
   real                       :: phix_f2, phiy_f2, phiz_f2
-! real                       :: sc_t1, sc_t2
 !------------------------------------------------------------------------------!
 !
 !  The form of equations which are solved:
@@ -54,6 +52,7 @@
   grid   => flow % pnt_grid
   v_flux => flow % v_flux
   phi    => flow % scalar(sc)
+  dt     =  flow % dt
   call Turb_Mod_Alias_Stresses(turb, uu, vv, ww, uv, uw, vw)
   call Solver_Mod_Alias_System(sol, a, b)
 

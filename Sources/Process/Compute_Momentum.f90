@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Momentum(flow, turb, mult, sol, dt, ini)
+  subroutine Compute_Momentum(flow, turb, mult, sol, ini)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves momentum conservation equations                     !
 !------------------------------------------------------------------------------!
@@ -12,7 +12,6 @@
   type(Turb_Type),       target :: turb
   type(Multiphase_Type), target :: mult
   type(Solver_Type),     target :: sol
-  real                          :: dt
   integer                       :: ini
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
@@ -26,7 +25,7 @@
   real, contiguous,  pointer :: h_i(:), body_fi(:)
   integer                    :: s, c, c1, c2, i
   real                       :: f_ex, f_im, f_stress
-  real                       :: vel_max
+  real                       :: vel_max, dt
   real                       :: a0, a12, a21
   real                       :: vis_eff
   real                       :: ui_i_f, ui_j_f, ui_k_f, uj_i_f, uk_i_f
@@ -97,6 +96,7 @@
   v_flux => flow % v_flux
   t      => flow % t
   p      => flow % p
+  dt     =  flow % dt
   call Solver_Mod_Alias_System(sol, a, b)
 
   !--------------------------------------------!

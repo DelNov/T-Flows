@@ -27,8 +27,6 @@
   use Multiphase_Mod
 !------------------------------------------------------------------------------!
   implicit none
-!---------------------------------[Calling]------------------------------------!
-  real :: Correct_Velocity
 !----------------------------------[Locals]------------------------------------!
   character(len=7)      :: root_control    = 'control'
   character(len=9)      :: dom_control(MD) = 'control.n'
@@ -215,11 +213,9 @@
     ! Prepare ...
     call Bulk_Mod_Monitoring_Planes_Areas(flow(d) % bulk, grid(d))
 
-    if(turb(d) % model .eq. LES_SMAGORINSKY .and. .not. backup(d)) then
-      call Find_Nearest_Wall_Cell(turb(d))
-    end if
-
-    if(turb(d) % model .eq. HYBRID_LES_PRANDTL .and. .not. backup(d)) then
+    if( (turb(d) % model .eq. LES_SMAGORINSKY     .or.   &
+         turb(d) % model .eq. HYBRID_LES_PRANDTL) .and.  &
+         .not. backup(d)) then
       call Find_Nearest_Wall_Cell(turb(d))
     end if
 
@@ -348,40 +344,36 @@
         end if
 
         ! All three velocity components one after another
-        call Compute_Momentum(flow(d), turb(d), mult(d), sol(d),  &
-                              flow(d) % dt, ini)
+        call Compute_Momentum(flow(d), turb(d), mult(d), sol(d), ini)
 
         call Balance_Volume(flow(d), mult(d))
-        call Compute_Pressure(flow(d), mult(d), sol(d), flow(d) % dt, ini)
+        call Compute_Pressure(flow(d), mult(d), sol(d), ini)
 
         call Multiphase_Averaging(flow(d), mult(d), flow(d) % p)
         call Field_Mod_Calculate_Mass_Fluxes(flow(d), flow(d) % v_flux % n)
-        mass_res(d) = Correct_Velocity(flow(d), mult(d), sol(d),  &
-                                       flow(d) % dt, ini)
+        call Correct_Velocity(flow(d), mult(d), sol(d), ini, mass_res(d))
 
         call Multiphase_Averaging(flow(d), mult(d), flow(d) % u)
         call Multiphase_Averaging(flow(d), mult(d), flow(d) % v)
         call Multiphase_Averaging(flow(d), mult(d), flow(d) % w)
         call Piso_Algorithm(flow(d), turb(d), mult(d),    &
-                            sol(d), mass_res(d), ini)
+                            sol(d), ini, mass_res(d))
 
         ! Energy (practically temperature)
         if(heat_transfer) then
-          call Compute_Energy(flow(d), turb(d), mult(d), sol(d),  &
-                              flow(d) % dt, ini)
+          call Compute_Energy(flow(d), turb(d), mult(d), sol(d), ini)
         end if
 
         ! Passive scalars
         do sc = 1, flow(d) % n_scalars
-          call Compute_Scalar(flow(d), turb(d), mult(d), sol(d),  &
-                              flow(d) % dt, ini, sc)
+          call Compute_Scalar(flow(d), turb(d), mult(d), sol(d), ini, sc)
         end do
 
         ! Deal with turbulence (if you dare ;-))
         call Turb_Mod_Main(turb(d), sol(d), n, ini)
 
         ! Update the values at boundaries
-        call Convective_Outflow(flow(d), turb(d), mult(d), flow(d) % dt)
+        call Convective_Outflow(flow(d), turb(d), mult(d))
         call Update_Boundary_Values(flow(d), turb(d), mult(d))
 
         ! End of the current iteration
@@ -526,11 +518,6 @@
     call User_Mod_Save_Results(flow(d), turb(d), mult(d), swarm(d), n)
     call User_Mod_Save_Swarm(flow(d), turb(d), mult(d), swarm(d), n)
   end do
-
-  if(this_proc < 2) then
-    open(9, file='stop')
-    close(9)
-  end if
 
 2 if(this_proc  < 2) print *, '# Exiting !'
 

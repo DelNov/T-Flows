@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Piso_Algorithm(flow, turb, mult, sol, mass_res, ini)
+  subroutine Piso_Algorithm(flow, turb, mult, sol, ini, mass_res)
 !------------------------------------------------------------------------------!
 !   PISO algorithm                                                             !
 !------------------------------------------------------------------------------!
@@ -9,8 +9,6 @@
   use Multiphase_Mod
 !------------------------------------------------------------------------------!
   implicit none
-!---------------------------------[Calling]------------------------------------!
-  real :: Correct_Velocity
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),      target :: flow
   type(Turb_Type),       target :: turb
@@ -36,17 +34,17 @@
       call Field_Mod_Grad_Pressure(flow, flow % p)
 
       ! All velocity components one after another
-      call Compute_Momentum(flow, turb, mult, sol, flow % dt, ini)
+      call Compute_Momentum(flow, turb, mult, sol, ini)
 
       ! Refresh buffers for a % sav before discretizing for pressure
       ! (Can this call be somewhere in Compute Pressure?)
       call Grid_Mod_Exchange_Cells_Real(grid, sol % a % sav)
 
       call Balance_Volume(flow, mult)
-      call Compute_Pressure(flow, mult, sol, flow % dt, ini)
+      call Compute_Pressure(flow, mult, sol, ini)
       call Multiphase_Averaging(flow, mult, flow % p)
 
-      mass_res = Correct_Velocity(flow, mult, sol, flow % dt, ini)
+      call Correct_Velocity(flow, mult, sol, ini, mass_res)
       call Multiphase_Averaging(flow, mult, flow % u)
       call Multiphase_Averaging(flow, mult, flow % v)
       call Multiphase_Averaging(flow, mult, flow % w)

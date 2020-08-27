@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Convective_Outflow(flow, turb, mult, dt)
+  subroutine Convective_Outflow(flow, turb, mult)
 !------------------------------------------------------------------------------!
 !   Extrapoloate variables on the boundaries where needed.                     !
 !------------------------------------------------------------------------------!
@@ -16,7 +16,6 @@
   type(Field_Type),      target :: flow
   type(Turb_Type),       target :: turb
   type(Multiphase_Type), target :: mult
-  real                          :: dt
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
@@ -25,12 +24,14 @@
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   type(Face_Type), pointer :: v_flux
   integer                  :: c1, c2, s, sc
+  real                     :: dt
 !==============================================================================!
 
   ! Take aliases
   grid   => flow % pnt_grid
   bulk   => flow % bulk
   v_flux => flow % v_flux
+  dt     =  flow % dt
   call Field_Mod_Alias_Momentum   (flow, u, v, w)
   call Field_Mod_Alias_Energy     (flow, t)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)

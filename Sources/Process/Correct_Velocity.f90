@@ -1,5 +1,5 @@
 !==============================================================================!
-  real function Correct_Velocity(flow, mult, sol, dt, ini)
+  subroutine Correct_Velocity(flow, mult, sol, ini, mass_err)
 !------------------------------------------------------------------------------!
 !   Corrects the velocities, and mass (or volume) fluxes on cell faces.        !
 !------------------------------------------------------------------------------!
@@ -11,8 +11,8 @@
   type(Field_Type),      target :: flow
   type(Multiphase_Type), target :: mult
   type(Solver_Type),     target :: sol
-  real                          :: dt
   integer                       :: ini
+  real                          :: mass_err
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Bulk_Type),   pointer :: bulk
@@ -22,8 +22,7 @@
   real,              pointer :: b(:)
   real,              pointer :: u_relax
   integer                    :: c, c1, c2, s
-  real                       :: cfl_t, pe_t, mass_err
-  real                       :: dens_f, visc_f
+  real                       :: cfl_t, pe_t, dens_f, visc_f, dt
 !==============================================================================!
 
   call Cpu_Timer_Mod_Start('Correct_Velocity')
@@ -34,6 +33,7 @@
   v_flux  => flow % v_flux
   p       => flow % p
   pp      => flow % pp
+  dt      =  flow % dt
   a       => sol % a
   b       => sol % b % val
   u_relax => flow % u_rel_corr
@@ -186,11 +186,11 @@
     end if
   end if
 
-  Correct_Velocity = mass_err ! /(velmax+TINY)
+  ! mass_err = mass_err ! /(velmax+TINY)
 
   ! User function
   call User_Mod_End_Of_Correct_Velocity(flow, mult, sol, dt, ini)
 
   call Cpu_Timer_Mod_Stop('Correct_Velocity')
 
-  end function
+  end subroutine

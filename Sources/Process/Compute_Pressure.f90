@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Pressure(flow, mult, sol, dt, ini)
+  subroutine Compute_Pressure(flow, mult, sol, ini)
 !------------------------------------------------------------------------------!
 !   Forms and solves pressure equation for the SIMPLE method.                  !
 !------------------------------------------------------------------------------!
@@ -22,7 +22,6 @@
   type(Field_Type),      target :: flow
   type(Multiphase_Type), target :: mult
   type(Solver_Type),     target :: sol
-  real                          :: dt
   integer                       :: ini
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
@@ -34,7 +33,7 @@
   real,              pointer :: u_relax
   integer                    :: s, c, c1, c2
   real                       :: u_f, v_f, w_f, a12, fs
-  real                       :: mass_err
+  real                       :: mass_err, dt
   real                       :: px_f, py_f, pz_f, dens_h
   character(SL)              :: solver
   real                       :: p_max, p_min, p_nor, p_nor_c
@@ -59,7 +58,7 @@
 !     b              [m^3/s]
 !     v_flux         [m^3/s]
 !
-!------------------------------------------------------------------------------!
+!==============================================================================!
 
   call Cpu_Timer_Mod_Start('Compute_Pressure (without solvers)')
 
@@ -72,6 +71,7 @@
   a       => sol % a
   b       => sol % b % val
   u_relax => flow % u_rel_corr
+  dt      =  flow % dt
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! User function
