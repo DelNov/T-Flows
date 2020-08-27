@@ -27,7 +27,6 @@
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   integer                  :: c1, c2, s, sc
   real                     :: kin_vis, u_tau
-  real                     :: qx, qy, qz, nx, ny, nz
 !==============================================================================!
 
   ! Take aliases
@@ -224,13 +223,6 @@
 
       ! On the boundary perform the extrapolation
       if (c2 < 0) then
-
-        nx = grid % sx(s) / grid % s(s)
-        ny = grid % sy(s) / grid % s(s)
-        nz = grid % sz(s) / grid % s(s)
-        qx = t % q(c2) * nx
-        qy = t % q(c2) * ny
-        qz = t % q(c2) * nz
 
         ! Wall temperature or heat fluxes for k-eps-zeta-f
         ! and high-re k-eps models. 
