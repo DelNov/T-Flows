@@ -300,7 +300,7 @@
 
   p % n(:) = p % n(:) - 0.5*(p_max+p_min)
 
-  call Grid_Mod_Exchange_Cells_Real(grid, pp % n)
+  call Field_Mod_Grad_Pressure_Correction(flow, pp)
 
   ! User function
   call User_Mod_End_Of_Compute_Pressure(flow, mult, dt, ini)

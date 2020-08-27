@@ -1,16 +1,20 @@
 !==============================================================================!
-  subroutine Info_Mod_Time_Fill(n, sim_time, wall_time)
+  subroutine Info_Mod_Time_Fill(n, sim_time)
 !------------------------------------------------------------------------------!
 !   Fills the info box with information to be written on the screen.           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer :: n          ! time step          
-  real    :: sim_time   ! simulation time
-  real    :: wall_time  ! number of seconds of wall-clock time
+  integer :: n         ! time step
+  real    :: sim_time  ! simulation time
 !-----------------------------------[Locals]-----------------------------------!
   integer :: hours, minutes, seconds
+  real    :: wall_time                ! number of seconds of wall-clock time
 !==============================================================================!
+
+  ! Update current system clock and wall time
+  call system_clock(sys_clock % cur)
+  wall_time = real(sys_clock % cur - sys_clock % ini) / real(sys_clock % cnt)
 
   if(this_proc < 2) then
 

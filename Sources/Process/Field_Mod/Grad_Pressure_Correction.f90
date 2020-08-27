@@ -15,6 +15,7 @@
   ! Take aliases
   grid => flow % pnt_grid
 
+  ! Refresh buffers for variable
   call Grid_Mod_Exchange_Cells_Real(grid, pp % n)
 
   !---------------------------------!
@@ -31,8 +32,14 @@
     end if
   end do
 
-  call Field_Mod_Grad_Component(flow, pp % n, 1, pp % x)  ! dp/dx
-  call Field_Mod_Grad_Component(flow, pp % n, 2, pp % y)  ! dp/dy
-  call Field_Mod_Grad_Component(flow, pp % n, 3, pp % z)  ! dp/dz
+  ! Compute individual gradients without refreshing buffers
+  call Field_Mod_Grad_Component_No_Refresh(flow, pp % n, 1, pp % x)  ! dp/dx
+  call Field_Mod_Grad_Component_No_Refresh(flow, pp % n, 2, pp % y)  ! dp/dy
+  call Field_Mod_Grad_Component_No_Refresh(flow, pp % n, 3, pp % z)  ! dp/dz
+
+  ! Refresh buffers for gradient components
+  call Grid_Mod_Exchange_Cells_Real(grid, pp % x)
+  call Grid_Mod_Exchange_Cells_Real(grid, pp % y)
+  call Grid_Mod_Exchange_Cells_Real(grid, pp % z)
 
   end subroutine

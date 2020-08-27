@@ -13,6 +13,15 @@
   integer, parameter :: MAX_USER_LINES = 256
 !==============================================================================!
 
+  !-----------------------!
+  !   System Clock type   !
+  !-----------------------!
+  type System_Clock_Type
+    integer :: cnt            ! system clock count rate
+    integer :: ini, cur       ! system clock initial and current rate
+    real    :: wall_time_max  ! maximum wall time
+  end type
+
   !--------------------!
   !   Time_Info type   !
   !--------------------!
@@ -45,11 +54,15 @@
     character(len=L_LINE) :: lines(3)   = ''
   end type
 
-  type(Time_Info_Type), save :: time_info
-  type(Iter_Info_Type), save :: iter_info
-  type(Bulk_Info_Type), save :: bulk_info
+  type(System_Clock_Type), save :: sys_clock
+  type(Time_Info_Type),    save :: time_info
+  type(Iter_Info_Type),    save :: iter_info
+  type(Bulk_Info_Type),    save :: bulk_info
 
   contains
+
+  include 'Info_Mod/Start.f90'
+  include 'Info_Mod/Time_Is_Up.f90'
 
   include 'Info_Mod/Time_Start.f90'
   include 'Info_Mod/Time_Fill.f90'

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Momentum_Explicit(flow, i, sol)
+  subroutine Compute_Momentum_Explicit(flow, ui, sol)
 !------------------------------------------------------------------------------!
 !   Explicit computation of momentum equations, used in PISO algorithm,        !
 !------------------------------------------------------------------------------!
@@ -13,24 +13,18 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),      target :: flow
-  integer                       :: i           ! component
-  type(Solver_Type),     target :: sol
+  type(Field_Type),  target :: flow
+  type(Var_Type)            :: ui        ! velocity component
+  type(Solver_Type), target :: sol
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: grid
-  type(Var_Type),   pointer :: ui
-  type(Matrix_Type),pointer :: a
-  real, contiguous, pointer :: b(:)
-  integer                   :: s, c, c1, c2, nt, ni
+  type(Grid_Type),   pointer :: grid
+  type(Matrix_Type), pointer :: a
+  real, contiguous,  pointer :: b(:)
+  integer                    :: s, c, c1, c2, nt, ni
 !==============================================================================!
 
   ! Take aliases
   grid => flow % pnt_grid
-
-  if(i .eq. 1) ui => flow % u
-  if(i .eq. 2) ui => flow % v
-  if(i .eq. 3) ui => flow % w
-
   call Solver_Mod_Alias_System(sol, a, b)
 
   ! PISO corrections are executed here
@@ -56,8 +50,8 @@
 
     if (flow % i_corr == flow % n_piso_corrections) then
       res(:) = 0.0
-      nt = a % pnt_grid % n_cells
-      ni = a % pnt_grid % n_cells - a % pnt_grid % comm % n_buff_cells
+      nt = grid % n_cells
+      ni = grid % n_cells - grid % comm % n_buff_cells
       call Residual_Vector(ni, res(1:nt), b(1:nt), a, ui % n(1:nt))
       ui % res_scal = sum(abs(res(1:ni)))
       call Comm_Mod_Global_Sum_Real(ui % res_scal)

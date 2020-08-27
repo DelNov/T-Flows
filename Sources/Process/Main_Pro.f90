@@ -55,19 +55,12 @@
   integer               :: ini             ! inner iteration counter
   integer               :: bsi, rsi, prsi  ! backup and results save interval
   real                  :: simple_tol      ! tolerance for SIMPLE algorithm
-  integer               :: sc_cr           ! system clock count rate
-  integer               :: sc_ini, sc_cur  ! system clock start and end rate
-  real                  :: wt_max
   integer               :: n_dom           ! number of domains
   integer               :: d               ! domain counter
 !==============================================================================!
 
   ! Initialize program profler
   call Cpu_Timer_Mod_Start('Main')
-
-  ! Get starting time
-  call system_clock(count_rate=sc_cr)  ! get system clock clock rate
-  call system_clock(sc_ini)            ! get system clock initial count rate
 
   ! Initialize control file names
   root_control = 'control'             ! root control file name
@@ -103,6 +96,14 @@
     end do
   end if
 
+  !-------------------------!
+  !   Initialize Info_Mod   !
+  !-------------------------!
+  call Info_Mod_Start()
+
+  !--------------------!
+  !   Read all grids   !
+  !--------------------!
   do d = 1, n_dom
     call Control_Mod_Switch_To_Domain(d)  ! take domain's d control file
     call Control_Mod_Problem_Name(problem_name(d))
@@ -138,7 +139,9 @@
     call Read_Control_Physical(flow(d), turb(d), mult(d), swarm(d))
   end do
 
-  ! Allocate memory for all variables (over all domains)
+  !----------------------------------------------------------!
+  !   Allocate memory for all variables (over all domains)   !
+  !----------------------------------------------------------!
   do d = 1, n_dom
     call Control_Mod_Switch_To_Domain(d)  ! take proper control file
     call Field_Mod_Allocate(flow(d), grid(d))
@@ -238,8 +241,6 @@
   call Control_Mod_Backup_Save_Interval (bsi,    verbose=.true.)
   call Control_Mod_Results_Save_Interval(rsi,    verbose=.true.)
   call Control_Mod_Swarm_Save_Interval  (prsi,   verbose=.true.)
-  call Control_Mod_Wall_Time_Max_Hours  (wt_max, verbose=.true.)
-  wt_max = wt_max * 3600  ! make it in seconds
 
   !-------------------------------------------------------------!
   !   Perform potential initialization in the first time step   !
@@ -289,9 +290,8 @@
       call Info_Mod_Bulk_Start()
 
       ! Initialize and print time info box
-      call system_clock(sc_cur)
       if(d .eq. 1) then
-        call Info_Mod_Time_Fill( n, time, real(sc_cur-sc_ini)/real(sc_cr) )
+        call Info_Mod_Time_Fill(n, time)
         call Info_Mod_Time_Print()
       end if
 
@@ -342,32 +342,17 @@
 
         call Field_Mod_Grad_Pressure(flow(d), flow(d) % p)
 
-        ! Compute velocity gradients
-        call Field_Mod_Grad_Variable(flow(d), flow(d) % u)
-        call Field_Mod_Grad_Variable(flow(d), flow(d) % v)
-        call Field_Mod_Grad_Variable(flow(d), flow(d) % w)
-
         ! Buoyancy force if no VOF is used (VOF calls it above)
         if(mult(d) % model .ne. VOLUME_OF_FLUID) then
           call Field_Mod_Body_Forces(flow(d))
         end if
 
-        ! All velocity components one after another
-        call Compute_Momentum(flow(d), turb(d), mult(d), 1, sol(d),  &
+        ! All three velocity components one after another
+        call Compute_Momentum(flow(d), turb(d), mult(d), sol(d),  &
                               flow(d) % dt, ini)
-        call Compute_Momentum(flow(d), turb(d), mult(d), 2, sol(d),  &
-                              flow(d) % dt, ini)
-        call Compute_Momentum(flow(d), turb(d), mult(d), 3, sol(d),  &
-                              flow(d) % dt, ini)
-
-        ! Refresh buffers for a % sav before discretizing for pressure
-        ! (Can this call be somewhere in Compute Pressure?)
-        call Grid_Mod_Exchange_Cells_Real(grid(d), sol(d) % a % sav)
 
         call Balance_Volume(flow(d), mult(d))
         call Compute_Pressure(flow(d), mult(d), sol(d), flow(d) % dt, ini)
-
-        call Field_Mod_Grad_Pressure_Correction(flow(d), flow(d) % pp)
 
         call Multiphase_Averaging(flow(d), mult(d), flow(d) % p)
         call Field_Mod_Calculate_Mass_Fluxes(flow(d), flow(d) % v_flux % n)
@@ -464,7 +449,7 @@
     if(save_now           .or.  &
        exit_now           .or.  &
        mod(n, bsi) .eq. 0 .or.  &
-       real(sc_cur-sc_ini)/real(sc_cr) > wt_max) then
+       Info_Mod_Time_Is_Up()) then
       do d = 1, n_dom
         call Control_Mod_Switch_To_Domain(d)
         call Backup_Mod_Save(flow(d), swarm(d), turb(d), mult(d),  &
@@ -476,7 +461,7 @@
     if(save_now            .or.  &
        exit_now            .or.  &
        mod(n, rsi) .eq.  0 .or.  &
-       real(sc_cur-sc_ini)/real(sc_cr) > wt_max) then
+       Info_Mod_Time_Is_Up()) then
 
       do d = 1, n_dom
         call Control_Mod_Switch_To_Domain(d)
@@ -512,7 +497,7 @@
     end if
 
     ! Ran more than a set limit
-    if(real(sc_cur-sc_ini)/real(sc_cr) > wt_max) then
+    if(Info_Mod_Time_Is_Up()) then
       goto 2
     end if
 
