@@ -8,9 +8,10 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: s, c1, c2
+  integer :: s, c1, c2, cnt
   real    :: xc1, yc1, zc1, xc2, yc2, zc2, nx, ny, nz, s_tot
   real    :: xi, yi, zi, lx, ly, lz, dsc1, dsc2
+  real    :: f_avg, f_max, f_min, r_avg, r_max, r_min, r
 !==============================================================================!
 
   !----------------!
@@ -44,6 +45,14 @@
   !   Line-face intersection follows procedure described in:  !
   !   https://en.wikipedia.org/wiki/Line-plane_intersection   !
   !-----------------------------------------------------------!
+  f_max = -HUGE
+  f_min = +HUGE
+  f_avg =  0.0
+  r_max = -HUGE
+  r_min = +HUGE
+  r_avg =  0.0
+  cnt   =  0
+
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
@@ -87,7 +96,36 @@
     ! Interpolation factor
     ! (Equation 2.19 in Denner's thesis)
     dsc2 = Math_Mod_Distance(xc2, yc2, zc2, xi, yi, zi)
+
     grid % f(s) = dsc2 / (dsc1 + dsc2)
+
+    if(c2 > 0) then
+      cnt = cnt + 1
+      f_max = max(f_max, grid % f(s))
+      f_min = min(f_min, grid % f(s))
+      f_avg = f_avg + grid % f(s)
+      r = sqrt(grid % xr(s)**2 + grid % yr(s)**2 + grid % zr(s)**2)  &
+        / (dsc1 + dsc2)
+      r_max = max(r_max, r)
+      r_min = min(r_min, r)
+      r_avg = r_avg + r
+    end if
   end do
+
+  !-----------------------------------!
+  !   Print some info on the screen   !
+  !-----------------------------------!
+  f_avg = f_avg / cnt
+  r_avg = r_avg / cnt
+  print *, '#================================================================'
+  print *, '# Face interpolation factors have been calculated'
+  print *, '# Factors closer to 0.5 and shifts closer to 0.0 are better'
+  print *, '#----------------------------------------------------------------'
+  print '(a19,es12.5)', ' # Minimum factor: ', f_min
+  print '(a19,es12.5)', ' # Maximum factor: ', f_max
+  print '(a19,es12.5)', ' # Average factor: ', f_avg
+  print '(a19,es12.5)', ' # Minimum shift : ', r_min
+  print '(a19,es12.5)', ' # Maximum shift : ', r_max
+  print '(a19,es12.5)', ' # Average shift : ', r_avg
 
   end subroutine
