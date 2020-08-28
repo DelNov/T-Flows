@@ -1,7 +1,5 @@
 !==============================================================================!
-  subroutine Backup_Mod_Save(fld, swr, tur, mul,               &
-                             time, time_step, time_step_stat,  &
-                             domain)
+  subroutine Backup_Mod_Save(fld, swr, tur, mul, time, time_step, domain)
 !------------------------------------------------------------------------------!
 !   Saves backup files name.backup                                             !
 !------------------------------------------------------------------------------!
@@ -13,7 +11,6 @@
   type(Multiphase_Type), target :: mul
   real                          :: time            ! time of simulation
   integer                       :: time_step       ! current time step
-  integer                       :: time_step_stat  ! starting step for statist.
   integer,             optional :: domain
 !-----------------------------------[Locals]-----------------------------------!
   type(Comm_Type), pointer :: comm
@@ -229,8 +226,7 @@
   !   Turbulent statistics for all models   !
   !                                         !
   !-----------------------------------------!
-  if(tur % statistics .and.  &
-     time_step > time_step_stat) then
+  if(tur % statistics) then
 
     call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 'u_mean', tur % u_mean)
     call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 'v_mean', tur % v_mean)
