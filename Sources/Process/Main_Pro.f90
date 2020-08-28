@@ -14,8 +14,8 @@
   implicit none
 !----------------------------------[Locals]------------------------------------!
   character(len=7)      :: root_control    = 'control'
-  character(len=9)      :: dom_control(MD) = 'control.n'
-  integer               :: n, sc, tp
+  character(len=9)      :: dom_control(MD) = 'control.d'
+  integer               :: curr_dt, sc, tp
   real                  :: mass_res(MD)
   logical               :: read_backup(MD), save_now, exit_now, pot_init
   type(Grid_Type)       :: grid(MD)        ! grid used in computations
@@ -177,7 +177,7 @@
     ! Initialize variables
     if(.not. read_backup(d)) then
       call Initialize_Variables(flow(d), turb(d), mult(d), swarm(d), sol(d))
-      call Results_Mod_Save_Surf(mult(d) % surf, n)
+      call Results_Mod_Save_Surf(mult(d) % surf, curr_dt)
     end if
 
     if(mult(d) % model .eq. VOLUME_OF_FLUID) then
@@ -244,7 +244,7 @@
                           plot_inside=.false., domain=d)
   end do
 
-  do n = first_dt + 1, last_dt
+  do curr_dt = first_dt + 1, last_dt
 
     !------------------------------------!
     !   Preparations for new time step   !
@@ -263,7 +263,7 @@
 
       ! Beginning of time step
       call User_Mod_Beginning_Of_Time_Step(flow(d), turb(d), mult(d),  &
-                                           swarm(d), n, time)
+                                           swarm(d), curr_dt, time)
 
       ! Start info boxes.
       call Info_Mod_Time_Start()
@@ -272,7 +272,7 @@
 
       ! Initialize and print time info box
       if(d .eq. 1) then
-        call Info_Mod_Time_Fill(n, time)
+        call Info_Mod_Time_Fill(curr_dt, time)
         call Info_Mod_Time_Print()
       end if
 
@@ -281,10 +281,10 @@
 
       ! Interface tracking
       if(mult(d) % model .eq. VOLUME_OF_FLUID) then
-        call Multiphase_Mod_Main(mult(d), flow(d), turb(d), sol(d), n)
+        call Multiphase_Mod_Main(mult(d), flow(d), turb(d), sol(d), curr_dt)
         if(mult(d) % track_front) then
-          call Results_Mod_Save_Surf(mult(d) % surf, n)
-          call Results_Mod_Save(flow(d), turb(d), mult(d), swarm(d), n,  &
+          call Results_Mod_Save_Surf(mult(d) % surf, curr_dt)
+          call Results_Mod_Save(flow(d), turb(d), mult(d), swarm(d), curr_dt,  &
                                 plot_inside=.true., domain=d)
         end if
         call Multiphase_Mod_Update_Physical_Properties(mult(d), read_backup(d))
@@ -293,7 +293,7 @@
       ! Lagrangian particle tracking
       if(mult(d) % model .eq. LAGRANGIAN_PARTICLES) then
         call User_Mod_Insert_Particles(flow(d), turb(d), mult(d),  &
-                                       swarm(d), n, time)
+                                       swarm(d), curr_dt, time)
       end if
 
     end do  ! through domains
@@ -317,7 +317,7 @@
 
         ! Beginning of iteration
         call User_Mod_Beginning_Of_Iteration(flow(d), turb(d), mult(d),  &
-                                             swarm(d), n, time)
+                                             swarm(d), curr_dt, time)
 
         call Info_Mod_Iter_Fill(ini)
 
@@ -355,7 +355,7 @@
         end do
 
         ! Deal with turbulence (if you dare ;-))
-        call Turb_Mod_Main(turb(d), sol(d), n, ini)
+        call Turb_Mod_Main(turb(d), sol(d), curr_dt, ini)
 
         ! Update the values at boundaries
         call Convective_Outflow(flow(d), turb(d), mult(d))
@@ -366,7 +366,7 @@
 
         ! End of iteration
         call User_Mod_End_Of_Iteration(flow(d), turb(d), mult(d), swarm(d),  &
-                                       n, time)
+                                       curr_dt, time)
       end do  ! through domains
 
       if(ini >= min_ini) then
@@ -392,28 +392,29 @@
 
       ! Write the values in monitoring points
       if(.not. heat_transfer) then
-        call Monitor_Mod_Write_4_Vars(monitor(d), n, flow(d))
+        call Monitor_Mod_Write_4_Vars(monitor(d), curr_dt, flow(d))
       else
-        call Monitor_Mod_Write_5_Vars(monitor(d), n, flow(d))
+        call Monitor_Mod_Write_5_Vars(monitor(d), curr_dt, flow(d))
       end if
 
       ! Calculate mean values
-      call Turb_Mod_Calculate_Mean(turb(d), n_stat_t, n)
-      call User_Mod_Calculate_Mean(turb(d), n_stat_t, n)
+      call Turb_Mod_Calculate_Mean(turb(d), n_stat_t, curr_dt)
+      call User_Mod_Calculate_Mean(turb(d), n_stat_t, curr_dt)
 
       ! Adjust pressure drops to keep the mass fluxes constant
       call Bulk_Mod_Adjust_P_Drops(flow(d) % bulk, flow(d) % dt)
 
       ! Lagrangian particle tracking
       if(mult(d) % model .eq. LAGRANGIAN_PARTICLES) then
-        if(n >= first_dt_p) then
-          call Swarm_Mod_Advance_Particles(swarm(d), n, n_stat_p, first_dt_p)
+        if(curr_dt >= first_dt_p) then
+          call Swarm_Mod_Advance_Particles(swarm(d), curr_dt,  &
+                                           n_stat_p, first_dt_p)
         end if
       end if
 
       ! Just before the end of time step
       call User_Mod_End_Of_Time_Step(flow(d), turb(d), mult(d), swarm(d),  &
-                                     n, n_stat_t, n_stat_p, time)
+                                     curr_dt, n_stat_t, n_stat_p, time)
     end do
 
     !----------------------!
@@ -423,37 +424,39 @@
     inquire(file='save_now', exist=save_now)
 
     ! Is it time to save the backup file?
-    if(save_now                   .or.  &
-       exit_now                   .or.  &
-       Backup_Mod_Time_To_Save(n) .or.  &
+    if(curr_dt .eq. last_dt             .or.  &
+       save_now                         .or.  &
+       exit_now                         .or.  &
+       Backup_Mod_Time_To_Save(curr_dt) .or.  &
        Info_Mod_Time_To_Exit()) then
       do d = 1, n_dom
         call Control_Mod_Switch_To_Domain(d)
         call Backup_Mod_Save(flow(d), swarm(d), turb(d), mult(d),  &
-                             time, n, n_stat_t, domain=d)
+                             time, curr_dt, n_stat_t, domain=d)
       end do
     end if
 
     ! Is it time to save results for post-processing?
-    if(save_now                    .or.  &
-       exit_now                    .or.  &
-       Results_Mod_Time_To_Save(n) .or.  &
+    if(curr_dt .eq. last_dt              .or.  &
+       save_now                          .or.  &
+       exit_now                          .or.  &
+       Results_Mod_Time_To_Save(curr_dt) .or.  &
        Info_Mod_Time_To_Exit()) then
 
       do d = 1, n_dom
         call Control_Mod_Switch_To_Domain(d)
-        call Results_Mod_Save(flow(d), turb(d), mult(d), swarm(d), n,  &
+        call Results_Mod_Save(flow(d), turb(d), mult(d), swarm(d), curr_dt,  &
                               plot_inside=.true., domain=d)
-        call Results_Mod_Save(flow(d), turb(d), mult(d), swarm(d), n,  &
+        call Results_Mod_Save(flow(d), turb(d), mult(d), swarm(d), curr_dt,  &
                               plot_inside=.false., domain=d)
-        call Results_Mod_Save_Swarm(swarm(d), n)
+        call Results_Mod_Save_Swarm(swarm(d), curr_dt)
 
         if(mult(d) % model .eq. VOLUME_OF_FLUID) then
         end if
 
         ! Write results in user-customized format
-        call User_Mod_Save_Results(flow(d), turb(d), mult(d), swarm(d), n)
-        call User_Mod_Save_Swarm(flow(d), turb(d), mult(d), swarm(d), n)
+        call User_Mod_Save_Results(flow(d), turb(d), mult(d), swarm(d), curr_dt)
+        call User_Mod_Save_Swarm(flow(d), turb(d), mult(d), swarm(d), curr_dt)
 
       end do  ! through domains
     end if
@@ -473,38 +476,23 @@
       goto 2
     end if
 
-    ! Ran more than a set limit
+    ! Ran more than a set wall clock time limit
     if(Info_Mod_Time_To_Exit()) then
       goto 2
     end if
 
-  end do ! n, number of time steps
+    ! Last time step reached; call user function for end of simulation
+    if(curr_dt .eq. last_dt) then
+      do d = 1, n_dom
+        call Control_Mod_Switch_To_Domain(d)
+        call User_Mod_End_Of_Simulation(flow(d), turb(d), mult(d), swarm(d),  &
+                                        curr_dt, time)
+      end do
+    end if
 
-  ! After the time loop, decrease "n" since ...
-  ! ... it is one above the loop boundaries here
-  n = n - 1
+  end do ! curr_dt until the last time step
 
-  ! User function for end of simulation
-  do d = 1, n_dom
-    call Control_Mod_Switch_To_Domain(d)
-
-    call User_Mod_End_Of_Simulation(flow(d), turb(d), mult(d), swarm(d),  &
-                                    n, time)
-
-    ! Save backup and post-processing files at exit
-    call Backup_Mod_Save(flow(d), swarm(d), turb(d), mult(d),  &
-                         time, n, n_stat_t, domain=d)
-    call Results_Mod_Save(flow(d), turb(d), mult(d), swarm(d), n,  &
-                          plot_inside=.true., domain=d)
-    call Results_Mod_Save(flow(d), turb(d), mult(d), swarm(d), n,  &
-                          plot_inside=.false., domain=d)
-
-    ! Write results in user-customized format
-    call User_Mod_Save_Results(flow(d), turb(d), mult(d), swarm(d), n)
-    call User_Mod_Save_Swarm(flow(d), turb(d), mult(d), swarm(d), n)
-  end do
-
-2 if(this_proc  < 2) print *, '# Exiting !'
+2 if(this_proc < 2) print *, '# Exiting !'
 
   do d = 1, n_dom
     ! Close monitoring files
