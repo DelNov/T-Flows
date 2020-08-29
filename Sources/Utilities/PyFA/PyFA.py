@@ -208,6 +208,7 @@ else:
 
 #-------------------------------------------------
 # For all cases, take object list from file paths
+# and determine use level of each object
 #-------------------------------------------------
 obj_list, obj_memb = Objects.get_obj_lists(file_paths)
 
