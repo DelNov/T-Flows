@@ -201,7 +201,6 @@ $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Grid_Level_Mod.o \
 $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
@@ -211,9 +210,7 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90 \
 $(DIR_OBJECT)/Bnd_Cond_Mod.o 
 
 #-- ./Grid_Mod/Load_Cns.f90
-#-- ./Grid_Mod/Create_Levels.f90
 #-- ./Grid_Mod/Calculate_Wall_Distance.f90
-#-- ./Grid_Mod/Check_Levels.f90
 #-- ./Grid_Mod/Sort_Cells_Smart.f90
 #-- ./Grid_Mod/Coarsen.f90
 #-- ./Grid_Mod/Allocate_Bnd_Cond.f90
@@ -243,11 +240,9 @@ $(DIR_OBJECT)/Bnd_Cond_Mod.o
 #-- ./Grid_Mod/Exchange_Nodes_Real.f90
 #-- ./Grid_Mod/Allocate_Nodes.f90
 #-- ./Grid_Mod/Sort_Faces_Smart.f90
-#-- ./Grid_Mod/Get_C1_And_C2_At_Level.f90
 #-- ./Grid_Mod/Exchange_Cells_Log.f90
 #-- ./Grid_Mod/Allocate_New_Numbers.f90
 #-- ./Grid_Mod/Bnd_Cond_Name.f90
-#-- ./Grid_Mod/Allocate_Levels.f90
 #-- ./Grid_Mod/Find_Cells_Faces.f90
 #-- ./Grid_Mod/Form_Maps.f90
 #-- ./Sort_Mod/3_Int_Carry_3_Int.f90
@@ -282,7 +277,6 @@ $(DIR_OBJECT)/Bnd_Cond_Mod.o
 #-- ./Control_Mod/Numerics/Normalization_For_Momentum_Solver.f90
 #-- ./Control_Mod/Numerics/Tolerance_For_Pressure_Solver.f90
 #-- ./Control_Mod/Numerics/Max_Iterations_For_Presssure_Solver.f90
-#-- ./Control_Mod/Numerics/V_Cycle_Max_Grid_Levels.f90
 #-- ./Control_Mod/Numerics/Normalization_For_Scalars_Solver.f90
 #-- ./Control_Mod/Numerics/Distance_Function_Time_Integration_Scheme_Vof.f90
 #-- ./Control_Mod/Numerics/Tolerance_For_Turbulence_Solver.f90
@@ -444,7 +438,6 @@ $(DIR_SHARED)/File_Mod/*.f90
 $(DIR_OBJECT)/Math_Mod.o:\
 $(DIR_SHARED)/Math_Mod/*.f90 
 
-#-- ./Grid_Level_Mod.f90
 #-- ./Swap_Short.f90
 #-- ./Math_Mod/Tet_Volume.f90
 #-- ./Math_Mod/Tri_Area_Z.f90
@@ -459,7 +452,6 @@ $(DIR_SHARED)/Math_Mod/*.f90
 #-- ./Cpu_Timer_Mod/Statistics.f90
 #-- ./Save_Grid_Mod/Cgns/Save_Cgns_Cells.f90
 #-- ./Save_Grid_Mod/Vtu/Save_Vtu_Links.f90
-#-- ./Save_Grid_Mod/Vtu/Save_Vtu_Grid_Levels.f90
 #-- ./Save_Grid_Mod/Vtu/Save_Vtu_Faces.f90
 #-- ./Save_Grid_Mod/Vtu/Save_Cgns_Cells_Void.f90
 #-- ./Save_Grid_Mod/Vtu/Save_Vtu_Cells.f90
