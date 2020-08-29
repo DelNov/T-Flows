@@ -1,12 +1,7 @@
 !==============================================================================!
-  subroutine Determine_Connectivity(ref, grid, rrun)
+  subroutine Refines_Mod_Connectivity(ref, grid, rrun)
 !------------------------------------------------------------------------------!
 !   Determines the topology of the cells, faces and boundary cells.            !
-!------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Gen_Mod,     only: face_c_to_c
-  use Refines_Mod, only: Refines_Type
-  use Grid_Mod,    only: Grid_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

@@ -4,7 +4,7 @@
 !   Type for smoothing a domain (a grid to be more correct).                   !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod, only: HUGE
+  use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -30,5 +30,6 @@
   contains
 
   include 'Smooths_Mod/Allocate_Smooths.f90'
+  include 'Smooths_Mod/Grid.f90'
 
   end module

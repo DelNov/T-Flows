@@ -1,12 +1,7 @@
 !==============================================================================!
-  subroutine Refine_Grid(ref, grid)
+  subroutine Refines_Mod_Grid(ref, grid)
 !------------------------------------------------------------------------------!
 !   Mark the region of the domain for local refinement and refine the grid!    !
-!------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Refines_Mod, only: ELIPSOID, PLANE, RECTANGLE,   &
-                         Refines_Type
-  use Grid_Mod,    only: Grid_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -75,7 +70,7 @@
 
     end do   ! reg
 
-    call Refine_Marked_Cells(ref, grid, lev)
+    call Refines_Mod_Marked_Cells(ref, grid, lev)
 
     ref % cell_marked(:) = .false.
 

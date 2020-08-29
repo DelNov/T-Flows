@@ -1,20 +1,12 @@
 !==============================================================================!
-  subroutine Calculate_Node_Coordinates(dom, grid)
+  subroutine Domain_Mod_Calculate_Node_Coordinates(dom, grid)
 !------------------------------------------------------------------------------!
 !   Calculate node coordinates inside the domain, block by block.              !
-!------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Const_Mod,  only: HUGE, ONE_THIRD
-  use Math_Mod
-  use Domain_Mod, only: Domain_Type
-  use Grid_Mod,   only: Grid_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Domain_Type) :: dom
   type(Grid_Type)   :: grid
-!----------------------------------[Calling]-----------------------------------!
-  integer :: Is_Line_in_Block
 !-----------------------------------[Locals]-----------------------------------!
   integer :: fc, b, bl, i, j, k, n, c, ig
   integer :: l, l1, l2
@@ -95,10 +87,10 @@
     !------------------------------!
     do l=1, size(dom % lines)
 
-      bl = Is_Line_in_Block(dom,                         &
-                            dom % lines(l) % points(1),  &
-                            dom % lines(l) % points(2),  &
-                            b)
+      bl = Domain_Mod_Is_Line_in_Block(dom,                         &
+                                       dom % lines(l) % points(1),  &
+                                       dom % lines(l) % points(2),  &
+                                       b)
 
       if(bl .eq. b) then
 
@@ -237,7 +229,7 @@
           ie=trans(1,1)+trans(1,2)*dom % lines(l) % resolution
           je=trans(2,1)+trans(2,2)*dom % lines(l) % resolution
           ke=trans(3,1)+trans(3,2)*dom % lines(l) % resolution
-          call Distribute_Nodes(dom, grid,                   &
+          call Domain_Mod_Distribute_Nodes(dom, grid,        &
                                 b, dom % lines(l) % weight,  &
                                 is, js, ks, ie, je, ke)
         end if  
@@ -251,21 +243,21 @@
     !-----------!
     do k=1,nk,nk-1
       do j=1,nj,nj-1
-        call Distribute_Nodes(dom, grid,  &
+        call Domain_Mod_Distribute_Nodes(dom, grid,  &
                               b, dom % blocks(b) % weights(1), 1,j,k,ni,j,k)
       end do
     end do
 
     do k=1,nk,nk-1
       do i=1,ni,ni-1
-        call Distribute_Nodes(dom, grid,  &
+        call Domain_Mod_Distribute_Nodes(dom, grid,  &
                               b, dom % blocks(b) % weights(2), i,1,k,i,nj,k)
       end do
     end do
 
     do j=1,nj,nj-1
       do i=1,ni,ni-1
-        call Distribute_Nodes(dom, grid,  &
+        call Domain_Mod_Distribute_Nodes(dom, grid,  &
                               b, dom % blocks(b) % weights(3), i,j,1,i,j,nk)
       end do
     end do
@@ -283,13 +275,13 @@
     if( .not. Math_Mod_Approx_Real(  &
               dom % blocks(b) % face_weights(fc,1),1.0 ) ) then
       do j=1,nj
-        call Distribute_Nodes(dom, grid,                                &
+        call Domain_Mod_Distribute_Nodes(dom, grid,                     &
                               b, dom % blocks(b) % face_weights(fc,1),  &
                               1,j,k,ni,j,k)
       end do
     else ! dom % lines in the j direction
       do i=1,ni
-        call Distribute_Nodes(dom, grid,                                &
+        call Domain_Mod_Distribute_Nodes(dom, grid,                     &
                               b, dom % blocks(b) % face_weights(fc,2),  &
                               i,1,k,i,nj,k)
       end do
@@ -301,13 +293,13 @@
     if( .not. Math_Mod_Approx_Real(  &
               dom % blocks(b) % face_weights(fc,1),1.0 ) ) then
      do j=1,nj
-        call Distribute_Nodes(dom, grid,                                &
+        call Domain_Mod_Distribute_Nodes(dom, grid,                     &
                               b, dom % blocks(b) % face_weights(fc,1),  &
                               1,j,k,ni,j,k)
       end do
     else ! dom % lines in the j direction
       do i=1,ni
-        call Distribute_Nodes(dom, grid,                                &
+        call Domain_Mod_Distribute_Nodes(dom, grid,                     &
                               b, dom % blocks(b) % face_weights(fc,2),  &
                               i,1,k,i,nj,k)
       end do
@@ -319,13 +311,13 @@
     if( .not. Math_Mod_Approx_Real(  &
               dom % blocks(b) % face_weights(fc,3),1.0 ) ) then
       do j=1,nj
-        call Distribute_Nodes(dom, grid,                                &
+        call Domain_Mod_Distribute_Nodes(dom, grid,                     &
                               b, dom % blocks(b) % face_weights(fc,3),  &
                               i,j,1,i,j,nk)
       end do
     else ! dom % lines in the j direction
       do k=1,nk
-        call Distribute_Nodes(dom, grid,                                &
+        call Domain_Mod_Distribute_Nodes(dom, grid,                     &
                               b, dom % blocks(b) % face_weights(fc,2),  &
                               i,1,k,i,nj,k)
       end do
@@ -337,13 +329,13 @@
     if( .not. Math_Mod_Approx_Real(  &
               dom % blocks(b) % face_weights(fc,3),1.0 ) ) then
       do j=1,nj
-        call Distribute_Nodes(dom, grid,                                &
+        call Domain_Mod_Distribute_Nodes(dom, grid,                     &
                               b, dom % blocks(b) % face_weights(fc,3),  & 
                               i,j,1,i,j,nk)
       end do
     else ! dom % lines in the j direction
       do k=1,nk
-        call Distribute_Nodes(dom, grid,                                &
+        call Domain_Mod_Distribute_Nodes(dom, grid,                     &
                               b, dom % blocks(b) % face_weights(fc,2),  &
                               i,1,k,i,nj,k)
       end do
@@ -355,13 +347,13 @@
     if( .not. Math_Mod_Approx_Real(  &
               dom % blocks(b) % face_weights(fc,3),1.0 ) ) then
       do i=1,ni
-        call Distribute_Nodes(dom, grid,                                &
+        call Domain_Mod_Distribute_Nodes(dom, grid,                     &
                               b, dom % blocks(b) % face_weights(fc,3),  &
                               i,j,1,i,j,nk)
       end do
     else ! dom % lines in the i direction
       do k=1,nk
-        call Distribute_Nodes(dom, grid,                                &
+        call Domain_Mod_Distribute_Nodes(dom, grid,                     &
                               b, dom % blocks(b) % face_weights(fc,1),  &
                               1,j,k,ni,j,k)
       end do
@@ -373,13 +365,13 @@
     if( .not. Math_Mod_Approx_Real(  &
               dom % blocks(b) % face_weights(fc,3),1.0 ) ) then
       do i=1,ni
-        call Distribute_Nodes(dom, grid,                                &
+        call Domain_Mod_Distribute_Nodes(dom, grid,                     &
                               b, dom % blocks(b) % face_weights(fc,3),  &
                               i,j,1,i,j,nk)
       end do
     else ! dom % lines in the i direction
       do k=1,nk
-        call Distribute_Nodes(dom, grid,                                &
+        call Domain_Mod_Distribute_Nodes(dom, grid,                     &
                               b, dom % blocks(b) % face_weights(fc,1),  &
                               1,j,k,ni,j,k)
       end do
@@ -392,7 +384,7 @@
               dom % blocks(b) % weights(3), 1.0 ) ) then
       do i=1,ni
         do j=1,nj
-          call Distribute_Nodes(dom, grid,  &
+          call Domain_Mod_Distribute_Nodes(dom, grid,  &
                                 b, dom % blocks(b) % weights(3), i,j,1,i,j,nk)
         end do
       end do
@@ -400,7 +392,7 @@
                    dom % blocks(b) % weights(1), 1.0 ) ) then
       do k=1,nk
         do j=1,nj
-          call Distribute_Nodes(dom, grid,  &
+          call Domain_Mod_Distribute_Nodes(dom, grid,  &
                                 b, dom % blocks(b) % weights(1), 1,j,k,ni,j,k)
         end do
       end do
@@ -408,7 +400,7 @@
                    dom % blocks(b) % weights(2), 1.0 ) ) then
       do k=1,nk
         do i=1,ni
-          call Distribute_Nodes(dom, grid,  &
+          call Domain_Mod_Distribute_Nodes(dom, grid,  &
                                 b, dom % blocks(b) % weights(2), i,1,k,i,nj,k)
         end do
       end do
@@ -418,10 +410,10 @@
         do j=1,nj
           do k=1,nk
             n = grid % n_nodes+(k-1)*ni*nj + (j-1)*ni + i
-            call Laplace(dom, grid, b, i, j, k,            &
-                         ONE_THIRD, ONE_THIRD, ONE_THIRD,  &
-                         ONE_THIRD, ONE_THIRD, ONE_THIRD,  &
-                         ONE_THIRD, ONE_THIRD, ONE_THIRD)
+            call Domain_Mod_Laplace(dom, grid, b, i, j, k,            &
+                                    ONE_THIRD, ONE_THIRD, ONE_THIRD,  &
+                                    ONE_THIRD, ONE_THIRD, ONE_THIRD,  &
+                                    ONE_THIRD, ONE_THIRD, ONE_THIRD)
           end do
         end do
       end do

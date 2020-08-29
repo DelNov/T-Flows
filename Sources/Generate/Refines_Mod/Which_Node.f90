@@ -1,12 +1,7 @@
 !==============================================================================!
-  integer function Which_Node(ref, grid, c, n) 
+  integer function Refines_Mod_Which_Node(ref, grid, c, n) 
 !------------------------------------------------------------------------------!
 !   Returns the local number (1-8) of node n in cell c.                        !
-!------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Gen_Mod,     only: twin_n
-  use Refines_Mod, only: Refines_Type
-  use Grid_Mod,    only: Grid_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -17,7 +12,7 @@
   integer :: i, j
 !==============================================================================!
 
-  Which_Node = 0
+  Refines_Mod_Which_Node = 0
 
   if (c  < 0) then 
     print *, '# Which node: Cell non existent !'
@@ -40,7 +35,7 @@
     end do
   end do
 
-  Which_Node = 0
+  Refines_Mod_Which_Node = 0
   print *, '# Which node: Trouble, node not found !'
   print *, '# x, y, z = ', grid % xn(n),  &
                            grid % yn(n),  &
@@ -48,7 +43,7 @@
   print *, '# cell    = ', c, ref % cell_level(c)
   return
 
-1 Which_Node = i
+1 Refines_Mod_Which_Node = i
   return
 
-  end function Which_Node
+  end function Refines_Mod_Which_Node

@@ -1,28 +1,12 @@
 !==============================================================================!
-  subroutine Load_Domain(dom, smr, ref, grid)
+  subroutine Load_Dom(dom, smr, ref, grid)
 !------------------------------------------------------------------------------!
 !   Reads: .dom file                                                           !
+!------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use File_Mod
-  use Math_Mod
-  use Gen_Mod
-  use Domain_Mod,  only: Domain_Type,                  &
-                         Domain_Mod_Allocate_Points,   &
-                         Domain_Mod_Allocate_Blocks,   &
-                         Domain_Mod_Allocate_Lines,    &
-                         Domain_Mod_Allocate_Regions
-  use Smooths_Mod, only: Smooths_Type,                 &
-                         Smooths_Mod_Allocate_Smooths
-  use Refines_Mod, only: ELIPSOID, PLANE, RECTANGLE,   &
-                         Refines_Type,                 &
-                         Refines_Mod_Allocate_Cells,   &
-                         Refines_Mod_Allocate_Levels
-  use Grid_Mod,    only: Grid_Type,                    &
-                         Grid_Mod_Allocate_Nodes,      &
-                         Grid_Mod_Allocate_Cells,      &
-                         Grid_Mod_Allocate_Faces,      &
-                         Grid_Mod_Allocate_New_Numbers
-  use File_Mod
+  use Domain_Mod
+  use Smooths_Mod
+  use Refines_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -215,10 +199,10 @@
     read(line % tokens(2),*) dom % lines(l) % points(1)
     read(line % tokens(3),*) dom % lines(l) % points(2)
 
-    call Find_Line(dom,                         &
-                   dom % lines(l) % points(1),  &
-                   dom % lines(l) % points(2),  &
-                   dom % lines(l) % resolution)
+    call Domain_Mod_Find_Line(dom,                         &
+                              dom % lines(l) % points(1),  &
+                              dom % lines(l) % points(2),  &
+                              dom % lines(l) % resolution)
 
     ! Does this need a more elegant solution?
     allocate(dom % lines(l) % x( dom % lines(l) % resolution ))
@@ -262,7 +246,7 @@
   do s = 1, nsurf
     call File_Mod_Read_Line(fu)
     read(line % whole,*) dum, n1, n2, n3, n4
-    call Find_Surface(dom, n1, n2, n3, n4, b, fc)
+    call Domain_Mod_Find_Surface(dom, n1, n2, n3, n4, b, fc)
     print *, '# block: ', b, ' surf: ', fc
     n = (b-1)*6 + fc         ! surface number
 

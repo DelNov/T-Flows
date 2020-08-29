@@ -1,12 +1,7 @@
 !==============================================================================!
-  subroutine Connect_Periodicity(dom, grid)
+  subroutine Domain_Mod_Connect_Periodicity(dom, grid)
 !------------------------------------------------------------------------------!
 !   Solve the cell connectivity for periodic boundary conditions.              !
-!------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Gen_Mod,    only: n_periodic_cond, periodic_cond, twin_n
-  use Domain_Mod, only: Domain_Type
-  use Grid_Mod,   only: Grid_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

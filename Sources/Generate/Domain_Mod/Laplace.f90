@@ -1,14 +1,9 @@
 !==============================================================================!
-  subroutine Laplace(dom, grid, b,i,j,k, wx16, wx24, wx35,  &
-                                         wy16, wy24, wy35,  &
-                                         wz16, wz24, wz35)
+  subroutine Domain_Mod_Laplace(dom, grid, b,i,j,k, wx16, wx24, wx35,  &
+                                                    wy16, wy24, wy35,  &
+                                                    wz16, wz24, wz35)
 !------------------------------------------------------------------------------!
 !   Places the nodes inside the block using Laplace-like function              !
-!------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Const_Mod,  only: HUGE
-  use Domain_Mod, only: Domain_Type
-  use Grid_Mod,   only: Grid_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -25,7 +20,7 @@
 
   ni = dom % blocks(b) % resolutions(1)
   nj = dom % blocks(b) % resolutions(2)
-  nk = dom % blocks(b) % resolutions(3)   
+  nk = dom % blocks(b) % resolutions(3)
 
   do n=1,8
     xt(n) = dom % points( dom % blocks(b) % corners(n) ) % x

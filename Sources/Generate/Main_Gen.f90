@@ -4,16 +4,9 @@
 !   Block structured mesh generation and unstructured cell refinement.         !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Domain_Mod,    only: Domain_Type
-  use Grid_Mod,      only: Grid_Type,                         &
-                           Grid_Mod_Sort_Cells_Smart,         &
-                           Grid_Mod_Sort_Faces_Smart,         &
-                           Grid_Mod_Calculate_Wall_Distance,  &
-                           Grid_Mod_Coarsen,                  &
-                           Grid_Mod_Save_Cns,                 &
-                           Grid_Mod_Save_Geo
-  use Smooths_Mod,   only: Smooths_Type
-  use Refines_Mod,   only: Refines_Type
+  use Domain_Mod
+  use Smooths_Mod
+  use Refines_Mod
   use Save_Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -28,19 +21,29 @@
   ! Open with a logo
   call Logo_Gen
 
-  call Load_Domain               (dom, smooths, refines, grid)
-  call Calculate_Node_Coordinates(dom, grid)
-  call Distribute_Regions        (dom, grid)
-  call Connect_Blocks            (dom, grid)
-  call Connect_Periodicity       (dom, grid)
+  !-------------------------!
+  !   Read the input file   !
+  !-------------------------!
+  call Load_Dom(dom, smooths, refines, grid)
 
-  ! From this point on, domain should not be used anymore
-  call Determine_Connectivity(refines, grid, .false.)  ! trial run 
-  call Calculate_Geometry    (grid,          .false.)
-  call Smooth_Grid           (smooths, grid)
-  call Refine_Grid           (refines, grid)
-  call Determine_Connectivity(refines, grid, .true.)   ! real run
-  call Calculate_Geometry    (grid,          .true.)
+  !-----------------------!
+  !   Handle the domain   !
+  !-----------------------!
+  call Domain_Mod_Calculate_Node_Coordinates(dom, grid)
+  call Domain_Mod_Distribute_Regions        (dom, grid)
+  call Domain_Mod_Connect_Blocks            (dom, grid)
+  call Domain_Mod_Connect_Periodicity       (dom, grid)
+
+  !--------------------------------!
+  !   From this point on, domain   !
+  !   should not be used anymore   !
+  !--------------------------------!
+  call Refines_Mod_Connectivity(refines, grid, .false.)  ! trial run 
+  call Calculate_Geometry      (grid,          .false.)
+  call Smooths_Mod_Grid        (smooths, grid)
+  call Refines_Mod_Grid        (refines, grid)
+  call Refines_Mod_Connectivity(refines, grid, .true.)   ! real run
+  call Calculate_Geometry      (grid,          .true.)
 
   call Grid_Mod_Sort_Cells_Smart       (grid)
   call Grid_Mod_Sort_Faces_Smart       (grid)
@@ -58,9 +61,6 @@
     grid % new_f(s) = s
     grid % old_f(s) = s
   end do
-
-  ! Coarsen the grid with METIS
-  ! Not quite ready yet: call Grid_Mod_Coarsen(grid)
 
   !------------------------------!
   !   Save data for processing   !
@@ -83,11 +83,6 @@
                       grid % n_nodes,  &
                       grid % n_cells)
   call Save_Vtu_Faces(grid)
-
-  ! Save all grid levels for visual inspection
-  do lev = 1, grid % n_levels
-    call Save_Vtu_Grid_Levels(grid, lev)
-  end do
 
   ! Try to save in CGNS format, it might work
   call Save_Cgns_Cells(grid, 0) 

@@ -4,7 +4,8 @@
 !   Type for refining a grid.                                                  !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod, only: HUGE
+  use Gen_Mod   ! artifact of the past
+  use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -35,5 +36,9 @@
 
   include 'Refines_Mod/Allocate_Cells.f90'
   include 'Refines_Mod/Allocate_Levels.f90'
+  include 'Refines_Mod/Connectivity.f90'
+  include 'Refines_Mod/Grid.f90'
+  include 'Refines_Mod/Marked_Cells.f90'
+  include 'Refines_Mod/Which_Node.f90'
 
   end module

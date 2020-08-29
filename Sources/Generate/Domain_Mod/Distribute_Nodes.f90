@@ -1,12 +1,8 @@
 !==============================================================================!
-  subroutine Distribute_Nodes(dom, grid, b, w, is, js, ks, ie, je, ke)
+  subroutine Domain_Mod_Distribute_Nodes(dom, grid, b, w,   &
+                                         is, js, ks, ie, je, ke)
 !------------------------------------------------------------------------------!
 !   Places the nodes on the line defined with local block position             !
-!------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Const_Mod,  only: HUGE
-  use Domain_Mod, only: Domain_Type
-  use Grid_Mod,   only: Grid_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

@@ -1,10 +1,7 @@
 !==============================================================================!
-  integer function Is_Line_In_Block(dom, n1, n2, b) 
+  integer function Domain_Mod_Is_Line_In_Block(dom, n1, n2, b)
 !------------------------------------------------------------------------------!
 !   Checks if the line defined n1 and n2 is inside the block b.                !
-!------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Domain_Mod, only: Domain_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -23,10 +20,10 @@
     end do
   end do
 
-  Is_Line_In_Block = 0
+  Domain_Mod_Is_Line_In_Block = 0
   return
 
-1 Is_Line_In_Block = b
+1 Domain_Mod_Is_Line_In_Block = b
   return
 
   end function
