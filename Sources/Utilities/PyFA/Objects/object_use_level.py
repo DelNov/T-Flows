@@ -1,5 +1,5 @@
 #===============================================================================
-# Function for determining and importing levels of modules (iterate 8 times)
+# Function for determining and importing levels of modules (iterate 12 times)
 #
 # Parameters:
 #   - object_list:    list of module objects
@@ -15,8 +15,7 @@ def object_use_level(object_list, modules_list):
   if modules_list == []: modules_list = object_list
 
   n = 0
-
-  while n < 8:
+  while n < 12:
     n += 1
     for i in range(len(object_list)):
       if object_list[i].N_Uses() > 0:        # if there are use statements

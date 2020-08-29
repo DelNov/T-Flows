@@ -30,7 +30,7 @@ def connect_objects(obj_list, offset, stride):
 
   # Getting list with objects that have call statements
   for i in range(len(obj_list)):
-    if obj_list[i].call != 0:
+    if obj_list[i].calls != 0:
       call_objects.append(obj_list[i])
 
   splines = []
@@ -57,9 +57,9 @@ def connect_objects(obj_list, offset, stride):
 
   # Creating connections for call statements
   for i in range(len(call_objects)):
-    call = call_objects[i].call
-    for k in range(len(call)):
-      called = call[k]
+    calls = call_objects[i].calls
+    for k in range(len(calls)):
+      called = calls[k]
       for m in range(len(obj_list)):
         if called in obj_list[m].name:
           splines.append(                                                 \

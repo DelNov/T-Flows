@@ -40,7 +40,7 @@ def get_new_calls(file_paths, obj_list, obj_memb):
 
   # Search through all non-memer objects
   for o in range(len( (obj_list) )):               # through objects
-    obj_list[o].call = []
+    obj_list[o].calls = []
     file_path = obj_list[o].path
     for c in range(len(calling_names)):            # c - calling counter
       if calling_names[c] not in file_path:
@@ -50,9 +50,9 @@ def get_new_calls(file_paths, obj_list, obj_memb):
             line = line.split('function',   1)[0]  # remove lines defining ...
             line = line.split('subroutine', 1)[0]  # ... functions or subs
             if calling_names[c] in line and "_Mod_" not in line:
-              obj_list[o].call.append(calling_names[c])
+              obj_list[o].calls.append(calling_names[c])
 
-  # Search through all non-memer objects
+  # Search through all member objects
   for o in range(len( (obj_memb) )):             # through objects
     mod = obj_memb[o].in_module
     file_path = obj_memb[o].path
@@ -63,11 +63,11 @@ def get_new_calls(file_paths, obj_list, obj_memb):
           line = line.split('function',   1)[0]  # remove lines defining ...
           line = line.split('subroutine', 1)[0]  # ... functions or subroutines
           if calling_names[c] in line and "_Mod_" not in line:
-            mod.call.append(calling_names[c])
+            mod.calls.append(calling_names[c])
 
   # Remove duplicate entries from the list
   for o in range(len( (obj_list) )):
-    obj_list[o].call = list(dict.fromkeys(obj_list[o].call))
+    obj_list[o].calls = list(dict.fromkeys(obj_list[o].calls))
 
   return obj_list
 

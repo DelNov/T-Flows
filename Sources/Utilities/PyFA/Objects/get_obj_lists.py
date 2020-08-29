@@ -28,9 +28,7 @@ def get_obj_lists(file_paths):
                *fun_list,   \
                *prog_list]               # list of all classes(mod+sub+fun+prog)
 
-  obj_list = object_use_level(obj_list, mod_list)  # or mod_list?
-
   obj_list, obj_memb  = classify_objects(obj_list)
 
-  return obj_list, obj_memb
+  return obj_list, mod_list, obj_memb
 

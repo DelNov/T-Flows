@@ -16,6 +16,7 @@ from Objects.module_objects     import module_objects
 from Objects.program_objects    import program_objects
 from Objects.subroutine_objects import subroutine_objects
 
+from Objects.object_call_level   import object_call_level
 from Objects.object_use_level    import object_use_level
 from Objects.place_objects       import place_objects
 from Objects.set_objects_details import set_objects_details

@@ -1,6 +1,5 @@
 #===============================================================================
-# Function for removing subroutine objects that are already printed
-#  in module methods (functions)
+# Function for separating member methods from all other types of objects
 #
 # Parameters:
 #   - obj_list:     list of objects
@@ -13,7 +12,7 @@
 def classify_objects(obj_list):
 
   obj_used = []
-  obj_memb = []
+  obj_memb = []  # list of member methods
 
   for o in range(len(obj_list)):
     if "_Mod_" in obj_list[o].name:

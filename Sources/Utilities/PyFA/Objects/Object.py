@@ -20,18 +20,18 @@
 class Object():
 
   def __init__(self, name, path,      \
-               l_uses, l_vars, l_meth, call, types, f_type):
+               l_uses, l_vars, l_meth, l_calls, types, f_type):
 
     self.name      = name
     self.path      = path
 
     # Logical properties
-    self.uses     = l_uses  # list of use statements
-    self.vars     = l_vars  # list of local variables
-    self.methods  = l_meth  # list of member functions
-    self.call     = call    # list of calls
-    self.types    = types   # list of defined types
-    self.fun_type = f_type  # function type (makes sense for Function only)
+    self.uses     = l_uses   # list of use statements
+    self.vars     = l_vars   # list of local variables
+    self.methods  = l_meth   # list of member functions
+    self.calls    = l_calls  # list of calls
+    self.types    = types    # list of defined types
+    self.fun_type = f_type   # function type (makes sense for Function only)
 
     self.level          = 0
     self.vars_hidden    = False
@@ -61,6 +61,9 @@ class Object():
 
   def N_Uses(self):
     return len(self.uses)
+
+  def N_Calls(self):
+    return len(self.calls)
 
   def H_Vars(self):
     if len(self.vars) == 0:

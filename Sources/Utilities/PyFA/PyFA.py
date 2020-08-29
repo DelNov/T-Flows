@@ -206,16 +206,19 @@ else:
   for i in range(len(file_paths)):
     file_paths[i] = os.getcwd() + "/" + file_paths[i]
 
-#-------------------------------------------------
-# For all cases, take object list from file paths
-# and determine use level of each object
-#-------------------------------------------------
-obj_list, obj_memb = Objects.get_obj_lists(file_paths)
+#------------------------------------------
+# Take object list from file paths and ...
+# ... find use level for each object
+#------------------------------------------
+obj_list, mod_list, obj_memb = Objects.get_obj_lists(file_paths)
+obj_list = Objects.object_use_level(obj_list, mod_list)
 
-#----------------------------
-# Find calls between objects
-#----------------------------
+#------------------------------------
+# Find calls between objects and ...
+# ... correct call levels for them
+#------------------------------------
 obj_list = Finder.get_new_calls(file_paths, obj_list, obj_memb)
+obj_list = Objects.object_call_level(obj_list, obj_list)
 
 if d_specified == "None":
   obj_list = Objects.set_objects_details(obj_list, object_details)
