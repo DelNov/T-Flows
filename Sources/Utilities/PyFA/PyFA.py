@@ -211,6 +211,11 @@ else:
 #-------------------------------------------------
 obj_list, obj_memb = Objects.get_obj_lists(file_paths)
 
+#----------------------------
+# Find calls between objects
+#----------------------------
+obj_list = Finder.get_new_calls(file_paths, obj_list, obj_memb)
+
 if d_specified == "None":
   obj_list = Objects.set_objects_details(obj_list, object_details)
 else:
@@ -250,11 +255,6 @@ if xy_specified != "None":
   obj_list = Objects.load_xy_coordinates(xy_specified,      \
                                          obj_list,          \
                                          object_hierarchy)
-
-#----------------------------
-# Find calls between objects
-#----------------------------
-obj_list = Finder.get_new_calls(file_paths, obj_list, obj_memb)
 
 #------------------------------------
 # Create connections between objects
