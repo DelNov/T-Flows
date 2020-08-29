@@ -28,13 +28,13 @@ def print_help_and_exit():
   print("\nAuthor: Ivan Simcic")
   print("\nUsage: pyfa.py [OPTIONS]")
   print("\nValid options are:\n")
-  print("  -a, --align [SWITCH]            \
+  print("  -a, --align [SWITCH]         ...\
   Plot by specified object alignment: ")
   print("                                  \
    'straight' for straight alignment")
   print("                                  \
    'diagonal' for diagonal alignment")
-  print("  -g, --graph_detail [SWITCH]     \
+  print("  -g, --graph_detail [SWITCH]  ...\
   Plot by specified object detail: ")
   print("                                  \
    'normal'  for normal representation")
@@ -42,23 +42,27 @@ def print_help_and_exit():
    'reduced' for reduced representation")
   print("                                  \
    'minimal' for minimal representation")
-  print("  -h, --hierarchy [SWITCH]        \
+  print("  -h, --hierarchy [SWITCH]     ...\
   Plot by specified object hierarchy: ")
   print("                                  \
-   'row'    for row based hierarchy")
+   'row_dec'    for decreasing row based hierarchy")
   print("                                  \
-   'column' for column based hierarchy")
-  print("  -ij,--ij_coordinates [FILE]     \
+   'column_dec' for decreasing column based hierarchy")
+  print("                                  \
+   'row_inc'    for increasing row based hierarchy")
+  print("                                  \
+   'column_inc' for increasing column based hierarchy")
+  print("  -ij,--ij_coordinates [FILE]  ...\
   Read (i,j) object coordinates from the file")
-  print("  -m, --margins [MARGIN]          \
+  print("  -m, --margins [MARGIN]       ...\
   Set margin in cm for individual boxes")
-  print("  -o, --object_details [FILE]     \
+  print("  -o, --object_details [FILE]  ...\
   Read object details from the file. ")
-  print("  -r, --root  [DIR]               \
+  print("  -r, --root  [DIR]            ...\
   Root directory for browsing sources")
-  print("  -s, --sources [FILE]            \
+  print("  -s, --sources [FILE]         ...\
   Choose source list with paths for plotting")
-  print("  -xy,--xy_coordinates [FILE]     \
+  print("  -xy,--xy_coordinates [FILE]  ...\
   Read (x,y) object coordinates from the file")
   print("\nExample1: pyfa.py -s source.list -a straight")
   print("Example2: pyfa.py -a straight\n")
@@ -72,8 +76,8 @@ start = time.time()
 file_paths = []
 obj_list   = []
 
-object_hierarchy = "Column-Based"
-object_details   = "Reduced"
+object_hierarchy = "Row-Based-Decreasing"
+object_details   = "Minimal"
 box_margins      = Const.BOX_MARGINS
 
 src_file     = "None"
@@ -99,13 +103,18 @@ for j in range(1,len(sys.argv),2):
     # Check if object hierarchy was specified
     if str(sys.argv[j]) == "-h" or         \
        str(sys.argv[j]) == "--hierarchy":
-      if str(sys.argv[j+1]) == "column":
-        object_hierarchy  = "Column-Based"
-      elif str(sys.argv[j+1]) == "row":
-        object_hierarchy  = "Row-Based"
+      if str(sys.argv[j+1]) == "column_dec":
+        object_hierarchy  = "Column-Based-Decreasing"
+      elif str(sys.argv[j+1]) == "row_dec":
+        object_hierarchy  = "Row-Based-Decreasing"
+      elif str(sys.argv[j+1]) == "column_inc":
+        object_hierarchy  = "Column-Based-Increasing"
+      elif str(sys.argv[j+1]) == "row_inc":
+        object_hierarchy  = "Row-Based-Increasing"
       else:
         print("Incorrect switch:", sys.argv[j+1], "after", sys.argv[j])
-        print("Allowed switches are 'row' or 'column'")
+        print("Allowed switches are 'row_dec', 'column_dec',",  \
+                                   "'row_inc' or 'column_inc'")
         print("Exiting the program")
         sys.exit()
 

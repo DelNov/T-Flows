@@ -33,13 +33,22 @@ def place_objects(obj_list, object_hierarchy):
 
     # Browse through all objects at level "l"
     for o in range(len(objs_at_level)):
-      if object_hierarchy == "Column-Based":
-        objs_at_level[o].column = l           # level
+      if object_hierarchy == "Column-Based-Decreasing":
+        objs_at_level[o].column = max_lvl - l # decreasing level
         objs_at_level[o].row    = obj_pos[o]  # object
 
-      elif object_hierarchy == "Row-Based":
-        objs_at_level[o].row    = l           # level
+      elif object_hierarchy == "Row-Based-Decreasing":
+        objs_at_level[o].row    = max_lvl - l # decreasing level
         objs_at_level[o].column = obj_pos[o]  # object
+
+      if object_hierarchy == "Column-Based-Increasing":
+        objs_at_level[o].column = l           # increasing level
+        objs_at_level[o].row    = obj_pos[o]  # object
+
+      elif object_hierarchy == "Row-Based-Increasing":
+        objs_at_level[o].row    = l           # increasing level
+        objs_at_level[o].column = obj_pos[o]  # object
+
 
       obj_ordered.append(objs_at_level[o])
 
