@@ -11,7 +11,7 @@
   use Grid_Mod,       only: Grid_Type
   use Bulk_Mod,       only: Bulk_Type
   use Info_Mod,       only: Info_Mod_Iter_Fill_At
-  use Solver_Mod,     only: Solver_Type, Bicg, Cg, Cgs, Acm
+  use Solver_Mod,     only: Solver_Type, Bicg, Cg, Cgs
   use Matrix_Mod,     only: Matrix_Type
   use Control_Mod
   use Multiphase_Mod, only: Multiphase_Type, VOLUME_OF_FLUID
@@ -249,29 +249,16 @@
   call Control_Mod_Solver_For_Pressure(solver)
 
   call Cpu_Timer_Mod_Start('Linear_Solver_For_Pressure')
-  if(solver .eq. 'ACM') then
-    pp % tol   = PICO
-    call Acm(sol,           &
-             pp % n,        &
-             b,             &
-             pp % precond,  &
-             pp % mniter,   &     ! number of V cycles
-             pp % tol,      &
-             pp % res,      &
-             norm = p_nor)        ! last argument: number for normalisation
-    stop
-  else
-    call Cg(sol,           &
-            pp % n,        &
-            b,             &
-            pp % precond,  &
-            pp % mniter,   &      ! max number of iterations
-            pp % eniter,   &      ! executed number of iterations
-            pp % tol,      &
-            pp % res,      &
-            norm = p_nor)         ! last argument: number for normalisation
+  call Cg(sol,           &
+          pp % n,        &
+          b,             &
+          pp % precond,  &
+          pp % mniter,   &      ! max number of iterations
+          pp % eniter,   &      ! executed number of iterations
+          pp % tol,      &
+          pp % res,      &
+          norm = p_nor)         ! last argument: number for normalisation
 
-  end if
   call Cpu_Timer_Mod_Stop('Linear_Solver_For_Pressure')
 
   if (flow % p_m_coupling == SIMPLE) then

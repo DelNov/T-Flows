@@ -4,19 +4,9 @@
 !   This is embrio of a future User module, a place where user can
 !   define his/her variables and pass them around his functions
 !------------------------------------------------------------------------------!
-  use Const_Mod
-  use File_Mod
-  use Comm_Mod
-  use Grid_Mod
-  use Matrix_Mod
-  use Var_Mod
-  use Field_Mod
-  use Bulk_Mod
-  use Turb_Mod
   use Swarm_Mod
   use Multiphase_Mod
   use Interface_Mod
-  use Control_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!

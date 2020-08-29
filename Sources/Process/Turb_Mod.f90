@@ -4,17 +4,8 @@
 !   Definition of variables used for all turbulence modelling paradigms.       !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Comm_Mod
   use Cpu_Timer_Mod
   use Info_Mod
-  use Var_Mod
-  use Face_Mod
-  use Grid_Mod
-  use Field_Mod
-  use Solver_Mod
-  use Matrix_Mod
-  use Control_Mod
   use Numerics_Mod
 !------------------------------------------------------------------------------!
   implicit none

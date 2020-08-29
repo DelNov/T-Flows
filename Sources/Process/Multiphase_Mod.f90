@@ -4,22 +4,8 @@
 !   Definition of variables used for all multiphase modelling paradigms.       !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Var_Mod
-  use Math_Mod
-  use Face_Mod
-  use Grid_Mod
-  use Field_Mod
-  use Cpu_Timer_Mod
-  use Info_Mod
-  use Solver_Mod
-  use Control_Mod
-  use Numerics_Mod
-  use Const_Mod
-  use Comm_Mod
-  use Bulk_Mod
   use Surf_Mod
   use Turb_Mod
-  use Matrix_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
