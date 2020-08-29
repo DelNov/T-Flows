@@ -1,6 +1,6 @@
 import Finder
-from Objects.function_class import function_class
-from Objects.object_level   import object_level
+from Objects.function_class   import function_class
+from Objects.object_use_level import object_use_level
 
 #===============================================================================
 # Function for creating functions and appending into list
@@ -22,7 +22,5 @@ def function_objects(file_paths, mod_list):
     if fun_name != 0:                    # if it is function then append to list
       functions_list.append(function_class(file_paths[i]))
 
-  fun_list = object_level(functions_list, mod_list)
-
-  return fun_list
+  return functions_list
 

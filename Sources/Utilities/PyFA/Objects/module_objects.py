@@ -1,6 +1,6 @@
 import Finder
-from Objects.module_class import module_class
-from Objects.object_level import object_level
+from Objects.module_class     import module_class
+from Objects.object_use_level import object_use_level
 
 #===============================================================================
 # Function for creating modules and appending into list
@@ -22,7 +22,5 @@ def module_objects(file_paths, mod_list):
     if module_name != []:                       # if it is module append to list
       modules_list.append(module_class(file_paths[i]))
 
-  mod_list = object_level(modules_list, [])  # or mod_list?
-
-  return mod_list
+  return modules_list
 

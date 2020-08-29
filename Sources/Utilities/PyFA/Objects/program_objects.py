@@ -1,6 +1,6 @@
 import Finder
-from Objects.program_class import program_class
-from Objects.object_level  import object_level
+from Objects.program_class    import program_class
+from Objects.object_use_level import object_use_level
 
 #===============================================================================
 # Function for creating programs and appending into list
@@ -20,8 +20,6 @@ def program_objects(file_paths, mod_list):
     program_name = Finder.get_prog(file_paths[i]) # find program from file paths
     if program_name != 0:                 # if it is program then append to list
       program_list.append(program_class(file_paths[i]))
-
-  program_list = object_level(program_list, mod_list)
 
   return program_list
 

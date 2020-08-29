@@ -4,6 +4,7 @@ from Objects.program_objects      import program_objects
 from Objects.subroutine_objects   import subroutine_objects
 from Objects.function_objects     import function_objects
 from Objects.update_dimensions    import update_dimensions
+from Objects.object_use_level     import object_use_level
 
 #===============================================================================
 # Function for creating complete and updated object list
@@ -26,6 +27,8 @@ def get_obj_lists(file_paths):
                *sub_list,   \
                *fun_list,   \
                *prog_list]               # list of all classes(mod+sub+fun+prog)
+
+  obj_list = object_use_level(obj_list, mod_list)  # or mod_list?
 
   obj_list, obj_memb  = classify_objects(obj_list)
 

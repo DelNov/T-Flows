@@ -9,7 +9,7 @@
 # Used by:
 #   - Function for appending module objects into a list
 #-------------------------------------------------------------------------------
-def object_level(object_list, modules_list):
+def object_use_level(object_list, modules_list):
 
   # If looking for its own self
   if modules_list == []: modules_list = object_list
