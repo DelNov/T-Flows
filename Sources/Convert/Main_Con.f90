@@ -2,16 +2,8 @@
   program Convert
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use File_Mod,      only: problem_name
-  use Grid_Mod,      only: Grid_Type,                         &
-                           Grid_Mod_Sort_Cells_Smart,         &
-                           Grid_Mod_Sort_Faces_Smart,         &
-                           Grid_Mod_Calculate_Wall_Distance,  &
-                           Grid_Mod_Save_Cns,                 &
-                           Grid_Mod_Save_Geo
-  use Save_Grid_Mod, only: Save_Vtu_Cells,  &
-                           Save_Vtu_Faces
+  use Grid_Mod
+  use Save_Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Locals]-----------------------------------!

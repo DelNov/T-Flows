@@ -4,16 +4,7 @@
 !   Calculates geometrical quantities of the grid.                             !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod, only: HUGE, PI, ONE_THIRD
-  use Math_Mod
-  use File_Mod
-  use Grid_Mod,  only: Grid_Type,                        &
-                       Grid_Mod_Estimate_Big_And_Small,  &
-                       Grid_Mod_Print_Bnd_Cond_List,     &
-                       Grid_Mod_Sort_Faces_By_Index,     &
-                       Grid_Mod_Calculate_Cell_Centers,  &
-                       Grid_Mod_Calculate_Face_Interpolation
-  use Sort_Mod
+  use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

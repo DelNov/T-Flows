@@ -125,7 +125,6 @@ SRC_MOD = Const_Mod.f90			\
           Metis_Options_Mod.f90		\
           Bnd_Cond_Mod.f90		\
           Sort_Mod.f90			\
-          Grid_Level_Mod.f90		\
           Grid_Mod.f90		\
           Save_Grid_Mod_Vtu.f90
 
