@@ -35,7 +35,6 @@
   write(fu) nf_sub
   write(fu) ns_sub
   write(fu) grid % n_bnd_cond  ! number of bounary conditions
-  write(fu) grid % n_levels    ! number of multigrid levels
 
   !------------------------!
   !   Domain (grid) name   !
@@ -154,21 +153,6 @@
     if(grid % old_c(c) .ne. 0) then
       write(fu) grid % bnd_cond % color(grid % old_c(c))
     end if
-  end do
-
-  !----------------------!
-  !   Multigrid levels   !
-  !----------------------!
-  do lev = 1, grid % n_levels
-    write(fu) grid % level(lev) % n_cells
-    write(fu) grid % level(lev) % n_faces
-  end do
-  do lev = 1, grid % n_levels
-    write(fu) (grid % level(lev) % cell(c),     c=1,grid % n_cells)
-    write(fu) (grid % level(lev) % face(s),     s=1,grid % n_faces)
-    write(fu) (grid % level(lev) % coarser_c(c),c=1,grid % level(lev) % n_cells)
-    write(fu) (grid % level(lev) % faces_c(1,s),s=1,grid % level(lev) % n_faces)
-    write(fu) (grid % level(lev) % faces_c(2,s),s=1,grid % level(lev) % n_faces)
   end do
 
   close(fu)

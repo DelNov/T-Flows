@@ -193,18 +193,6 @@
     data_offset = data_offset + SP + grid % n_cells * RP * 3  ! prepare for next
   end if
 
-  ! Coarser grid levels
-  do lev = 1, grid % n_levels
-    write(str1, '(i0.0)')   data_offset
-    write(str2, '(a,i2.2)') 'GridLevel', lev
-    write(fu) IN_4 // '<DataArray type="Int64"'        //  &
-                      ' Name="' // trim(str2) // '"'   //  &
-                      ' format="appended"'             //  &
-                      ' offset="' // trim(str1) //'">' // LF
-    write(fu) IN_4 // '</DataArray>' // LF
-    data_offset = data_offset + SP + grid % n_cells * IP  ! prepare for next
-  end do
-
   !------------!
   !            !
   !   Footer   !
@@ -351,15 +339,6 @@
       write(fu) vector_cell(c, 1), vector_cell(c, 2), vector_cell(c, 3)
     end do
   end if
-
-  ! Coarser grid levels
-  do lev = 1, grid % n_levels
-    data_size = grid % n_cells * IP
-    write(fu) data_size
-    do c = 1, grid % n_cells
-      write(fu) grid % level(lev) % cell(c)
-    end do
-  end do
 
   write(fu) LF // IN_0 // '</AppendedData>' // LF
   write(fu) IN_0 // '</VTKFile>' // LF

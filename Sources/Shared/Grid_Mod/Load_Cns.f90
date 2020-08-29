@@ -32,7 +32,6 @@
   read(fu) grid % n_faces              ! number of faces (with buffer faces)
   read(fu) grid % n_shadows            ! number of shadow faces
   read(fu) grid % n_bnd_cond           ! number of boundary conditions
-  read(fu) grid % n_levels             ! number of multigrid levels
 
   ! Allocate memory =--> carefull, there is no checking!
   call Grid_Mod_Allocate_Nodes(grid, grid % n_nodes)
@@ -139,23 +138,6 @@
   read(fu) (grid % bnd_cond % color(c), c = -grid % n_bnd_cells, -1)
 
   call Grid_Mod_Bnd_Cond_Ranges(grid)
-
-  !----------------------!
-  !   Multigrid levels   !
-  !----------------------!
-  do lev = 1, grid % n_levels
-    read(fu)  grid % level(lev) % n_cells
-    read(fu)  grid % level(lev) % n_faces
-  end do
-  call Grid_Mod_Allocate_Levels(grid)
-  do lev = 1, grid % n_levels
-    read(fu) (grid % level(lev) % cell(c),      c=1,grid % n_cells)
-    read(fu) (grid % level(lev) % face(s),      s=1,grid % n_faces)
-    read(fu) (grid % level(lev) % coarser_c(c), c=1,grid % level(lev) % n_cells)
-    read(fu) (grid % level(lev) % faces_c(1,s), s=1,grid % level(lev) % n_faces)
-    read(fu) (grid % level(lev) % faces_c(2,s), s=1,grid % level(lev) % n_faces)
-  end do
-  call Grid_Mod_Check_Levels(grid)
 
   close(fu)
 

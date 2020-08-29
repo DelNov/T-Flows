@@ -4,11 +4,14 @@
 !   This is a prototype of a small module which would contain some basic       !
 !   mathematic and related functions.                                          !
 !------------------------------------------------------------------------------!
+!----------------------------------[Modules]-----------------------------------!
+  use Const_Mod
+!------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
 
   ! Default precision for "Approx_Real" and "Smaller_Real" functions
-  real, parameter :: DEFAULT_TOLERANCE = 1.0e-9
+  real, parameter :: DEFAULT_TOLERANCE = NANO
 
   contains
 

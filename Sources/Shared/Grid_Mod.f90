@@ -5,11 +5,8 @@
 !   (that means in "Generate", "Divide", "Convert", "Process".                 !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Math_Mod
   use Comm_Mod
   use File_Mod
-  use Grid_Level_Mod
   use Bnd_Cond_Mod
   use Metis_Options_Mod
   use Sort_Mod
@@ -36,7 +33,6 @@
     integer :: n_per_faces  ! ... periodic faces (shadows)
     integer :: n_bnd_cond   ! ... boundary conditions
     integer :: n_shadows    ! ... shadow faces
-    integer :: n_levels     ! ... multigrid levels
 
     ! Periodic span
     real :: per_x, per_y, per_z
@@ -82,9 +78,6 @@
 
     ! For each cell; type of the boundary condition in a given direction
     integer, allocatable :: cells_bnd_color(:,:)
-
-    ! Coarser levels for the grid
-    type(Grid_Level_Type) :: level(MAX_MG_LEVELS)
 
     !-------------------------!
     !  Face-based variables   !
@@ -165,7 +158,6 @@
 
   include 'Grid_Mod/Allocate_Cells.f90'
   include 'Grid_Mod/Allocate_Faces.f90'
-  include 'Grid_Mod/Allocate_Levels.f90'
   include 'Grid_Mod/Allocate_New_Numbers.f90'
   include 'Grid_Mod/Allocate_Nodes.f90'
   include 'Grid_Mod/Bnd_Cond_Name.f90'
@@ -178,10 +170,7 @@
   include 'Grid_Mod/Calculate_Wall_Distance.f90'
   include 'Grid_Mod/Calculate_Weights_Cells_To_Nodes.f90'
   include 'Grid_Mod/Calculate_Weights_Nodes_To_Cells.f90'
-  include 'Grid_Mod/Check_Levels.f90'
-  include 'Grid_Mod/Coarsen.f90'
   include 'Grid_Mod/Correction_Periodicity.f90'
-  include 'Grid_Mod/Create_Levels.f90'
   include 'Grid_Mod/Decompose.f90'
   include 'Grid_Mod/Estimate_Big_And_Small.f90'
   include 'Grid_Mod/Exchange_Cells_Int.f90'
@@ -196,7 +185,6 @@
   include 'Grid_Mod/Form_Cells_Comm.f90'
   include 'Grid_Mod/Form_Maps.f90'
   include 'Grid_Mod/Form_Nodes_Comm.f90'
-  include 'Grid_Mod/Get_C1_And_C2_At_Level.f90'
   include 'Grid_Mod/Load_Cns.f90'
   include 'Grid_Mod/Load_Geo.f90'
   include 'Grid_Mod/Print_Bnd_Cond_Info.f90'
