@@ -10,7 +10,7 @@ import Const
 # Returns:
 #   - x, y:                coordinates with all steps from one object to another
 #-------------------------------------------------------------------------------
-def compress(spline):
+def remove_knots(spline):
 
   x = spline.x
   y = spline.y
@@ -25,26 +25,18 @@ def compress(spline):
   #------------------------------------------------
 
   # Mark points in between straight lines for deletion
-  for i in range(1, len(x)-1):
-    dx_p = x[i+1] - x[i]
-    dy_p = y[i+1] - y[i]
-    dx_m = x[i]   - x[i-1]
-    dy_m = y[i]   - y[i-1]
-    if abs(dx_p - dx_m) < 0.4 and abs(dy_p - dy_m) < 0.4:  # GHOST NUMBERS
-      keep[i] = False
-
-  # Yet, keep the points next to ones which are kept (to preserve curves)
-  keep_2 = keep[:]
-  for i in range(1, len(x)-1):
-    if not keep[i]:
-      if keep[i-1] or keep[i+1]:
-        keep_2[i] = True
+  for i in range(2, len(x)-2):
+    for j in range(len(x)-3, i+1, -1):
+      if abs(x[i] - x[j]) < 0.4 and abs(y[i] - y[j]) < 0.4:  # GHOST NUMBERS
+        for k in range(i,j):
+          keep[k] = False
+        break
 
   # Make a compressed list of x and y coordinates
   x_c = []
   y_c = []
   for i in range(0, len(x)):
-    if keep_2[i]:
+    if keep[i]:
       x_c.append(x[i])
       y_c.append(y[i])
 
