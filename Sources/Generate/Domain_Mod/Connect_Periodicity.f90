@@ -7,8 +7,6 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Domain_Type) :: dom
   type(Grid_Type)   :: grid
-!----------------------------------[Calling]-----------------------------------!
-  logical :: Are_Nodes_Twins
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i, j, n, p                      ! counters
   integer :: b1, b2                          ! block 1 and 2
@@ -258,7 +256,7 @@
 
                   ! Check if they are already connected
                   do n=1, twin_n(n1,0)
-                    if(Are_Nodes_Twins(n1,n2)) goto 1
+                    if(Gen_Mod_Are_Nodes_Twins(n1,n2)) goto 1
                   end do
 
                   ! If they were not, connect them

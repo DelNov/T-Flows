@@ -17,4 +17,8 @@
   integer              :: n_periodic_cond
   integer, allocatable ::   periodic_cond(:,:)
 
-end module
+  contains
+
+  include 'Gen_Mod/Are_Nodes_Twins.f90'
+
+  end module

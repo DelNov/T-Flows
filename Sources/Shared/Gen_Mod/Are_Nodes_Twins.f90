@@ -1,10 +1,7 @@
 !==============================================================================!
-  logical function Are_Nodes_Twins(n1, n2)
+  logical function Gen_Mod_Are_Nodes_Twins(n1, n2)
 !------------------------------------------------------------------------------!
 !   Checks if the nodes are twins, i.e. are they shared on periodicity         !
-!------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Gen_Mod, only: twin_n
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -24,14 +21,14 @@
   end do
 
   if(check .eq. 2) then
-    Are_Nodes_Twins = .true.
+    Gen_Mod_Are_Nodes_Twins = .true.
     return
   else if(check .eq. 0) then
-    Are_Nodes_Twins = .false.
+    Gen_Mod_Are_Nodes_Twins = .false.
     return
   else
     print *, '# ERROR in Are_Nodes_Twins!  Major trouble !  Stopping !'
     stop
   end if
 
-  end function Are_Nodes_Twins
+  end function

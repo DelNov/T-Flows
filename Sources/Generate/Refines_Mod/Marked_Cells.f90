@@ -9,7 +9,6 @@
   type(Grid_Type)    :: grid
   integer            :: lev
 !----------------------------------[Calling]-----------------------------------!
-  logical :: Are_Nodes_Twins
   integer :: Which_Node
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c, n_cells_old, c1, c2, c3, c4, c5, c6
@@ -888,11 +887,11 @@
 
         if( (twin_n(nb1,0) .ne. 0).and.(twin_n(nb2,0) .ne. 0) ) then
 
-          if( (Are_Nodes_Twins(na1,nb1) .and.   &
-               Are_Nodes_Twins(na2,nb2)) .or.   &
-              (Are_Nodes_Twins(na1,nb2) .and.   &
-               Are_Nodes_Twins(na2,nb1))  ) then
-            if (.not. Are_Nodes_Twins(na0,nb0)) then
+          if( (Gen_Mod_Are_Nodes_Twins(na1,nb1) .and.   &
+               Gen_Mod_Are_Nodes_Twins(na2,nb2)) .or.   &
+              (Gen_Mod_Are_Nodes_Twins(na1,nb2) .and.   &
+               Gen_Mod_Are_Nodes_Twins(na2,nb1))  ) then
+            if (.not. Gen_Mod_Are_Nodes_Twins(na0,nb0)) then
               twin_n(na0,0)=twin_n(na0,0)+1
               twin_n(na0,twin_n(na0,0))=nb0
               twin_n(nb0,0)=twin_n(nb0,0)+1
@@ -918,9 +917,11 @@
 
         if( (twin_n(nb1,0) .ne. 0).and.(twin_n(nb2,0) .ne. 0) ) then
 
-          if( (Are_Nodes_Twins(na1,nb1) .and. Are_Nodes_Twins(na2,nb2)) .or.  &
-              (Are_Nodes_Twins(na1,nb2) .and. Are_Nodes_Twins(na2,nb1))  ) then
-            if (.not. Are_Nodes_Twins(na0,nb0)) then
+          if( (Gen_Mod_Are_Nodes_Twins(na1,nb1) .and.  &
+               Gen_Mod_Are_Nodes_Twins(na2,nb2)) .or.  &
+              (Gen_Mod_Are_Nodes_Twins(na1,nb2) .and.  &
+               Gen_Mod_Are_Nodes_Twins(na2,nb1))  ) then
+            if (.not. Gen_Mod_Are_Nodes_Twins(na0,nb0)) then
               twin_n(na0,0)=twin_n(na0,0)+1
               twin_n(na0,twin_n(na0,0))=nb0
               twin_n(nb0,0)=twin_n(nb0,0)+1

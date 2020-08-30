@@ -4,12 +4,8 @@
 !   Calculates geometrical quantities of the grid.                             !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod, only: HUGE, ONE_THIRD
-  use Math_Mod
-  use Gen_Mod,   only: face_c_to_c
-  use Grid_Mod,  only: Grid_Type,                             &
-                       Grid_Mod_Calculate_Cell_Centers,       &
-                       Grid_Mod_Calculate_Face_Interpolation
+  use Gen_Mod
+  use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
