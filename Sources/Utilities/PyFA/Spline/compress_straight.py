@@ -2,7 +2,7 @@ import math
 import Const
 
 #===============================================================================
-# Walk from one object to another, avoiding all objects in the graph
+# Eliminate the points in-between straight lines
 #
 # Parameters:
 #   - x1, y1, ... x6, y6:  coordinates the way Ivan introduced them
@@ -17,12 +17,6 @@ def compress_straight(spline):
   keep = []
   for i in range(spline.N_Points()):
     keep.append(True)
-
-  #------------------------------------------------
-  #
-  # Eliminate the points in-between straight lines
-  #
-  #------------------------------------------------
 
   # Mark points in between straight lines for deletion
   for i in range(1, len(x)-1):
