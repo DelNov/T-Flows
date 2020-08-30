@@ -39,8 +39,8 @@ def walk(x1, y1, x2, y2, x5, y5, x6, y6, obj_list, spl_list, stride):
     step_dist = []
 
     n_direc = Const.WALK_DIRECTIONS
-    for i in range(n_direc):
-      a = i * 2 * math.pi / (n_direc)  # angle
+    for j in range(n_direc):
+      a = j * 2 * math.pi / (n_direc)  # angle
       cos_a = math.cos(a)
       sin_a = math.sin(a)
       scaling = 1.0 / max(abs(cos_a), abs(sin_a))
