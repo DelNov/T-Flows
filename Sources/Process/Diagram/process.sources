@@ -31,4 +31,9 @@
 ../../Shared/Work_Mod.f90
 ../Main_Pro.f90
 ../Compute_Momentum.f90
+../Compute_Momentum_Explicit.f90
 ../Compute_Pressure.f90
+../Correct_Velocity.f90
+../Compute_Energy.f90
+../Compute_Scalar.f90
+../Piso_Algorithm.f90
