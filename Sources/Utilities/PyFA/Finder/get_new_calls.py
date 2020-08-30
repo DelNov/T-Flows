@@ -50,7 +50,8 @@ def get_new_calls(file_paths, obj_list, obj_memb):
           for line in file:
             line = line.split('!',          1)[0]  # remove comment
             line = line.split('function',   1)[0]  # remove lines defining ...
-            line = line.split('subroutine', 1)[0]  # ... functions or subs
+            line = line.split('subroutine', 1)[0]  # ... functions or subs ...
+            line = line.split('include',    1)[0]  # ... and include statements
             if calling_names[c] in line and "_Mod_" not in line:
               obj_list[o].calls.append(calling_names[c])
 
