@@ -12,62 +12,8 @@ import Finder
 import Browse
 import Objects
 import Spline
-
-#===============================================================================
-# Function to print help screen and exit the program
-#
-# Parameters:
-#   - none
-# Returns:
-#   - nothing
-# Used by:
-#   - main program
-#-------------------------------------------------------------------------------
-def print_help_and_exit():
-  print("\nProgram for extracting UML diagrams for modern Fortran programs")
-  print("\nAuthor: Ivan Simcic")
-  print("\nUsage: pyfa.py [OPTIONS]")
-  print("\nValid options are:\n")
-  print("  -a, --align [SWITCH]         ...\
-  Plot by specified object alignment: ")
-  print("                                  \
-   'straight' for straight alignment")
-  print("                                  \
-   'diagonal' for diagonal alignment")
-  print("  -g, --graph_detail [SWITCH]  ...\
-  Plot by specified object detail: ")
-  print("                                  \
-   'normal'  for normal representation")
-  print("                                  \
-   'reduced' for reduced representation")
-  print("                                  \
-   'minimal' for minimal representation")
-  print("  -h, --hierarchy [SWITCH]     ...\
-  Plot by specified object hierarchy: ")
-  print("                                  \
-   'row_dec'    for decreasing row based hierarchy")
-  print("                                  \
-   'column_dec' for decreasing column based hierarchy")
-  print("                                  \
-   'row_inc'    for increasing row based hierarchy")
-  print("                                  \
-   'column_inc' for increasing column based hierarchy")
-  print("  -ij,--ij_coordinates [FILE]  ...\
-  Read (i,j) object coordinates from the file")
-  print("  -m, --margins [MARGIN]       ...\
-  Set margin in cm for individual boxes")
-  print("  -o, --object_details [FILE]  ...\
-  Read object details from the file. ")
-  print("  -r, --root  [DIR]            ...\
-  Root directory for browsing sources")
-  print("  -s, --sources [FILE]         ...\
-  Choose source list with paths for plotting")
-  print("  -xy,--xy_coordinates [FILE]  ...\
-  Read (x,y) object coordinates from the file")
-  print("\nExample1: pyfa.py -s source.list -a straight")
-  print("Example2: pyfa.py -a straight\n")
-
-  exit()
+from splash_screen       import splash_screen
+from print_help_and_exit import print_help_and_exit
 
 # Start measuring time
 start = time.time()
@@ -89,6 +35,7 @@ d_specified  = "None"
 
 # If no command line arguments were specified, print help and exit
 if len(sys.argv) == 1:
+  splash_screen()
   print_help_and_exit()
 
 #---------------------------------------
