@@ -72,12 +72,12 @@ def connect_objects(obj_list, offset, stride):
           counter += inc_cnt
           if counter > max_cnt+0.5: counter -= (max_cnt)
 
+  print("Removing knots and hairpins from splines ...")
+  for i in range(len(splines)):
+    remove_knots(splines[i])
+
   print("Compressing splines ...")
   for i in range(len(splines)):
     compress_straight(splines[i])
-
-  print("Removing knots ...")
-  for i in range(len(splines)):
-    remove_knots(splines[i])
 
   return splines
