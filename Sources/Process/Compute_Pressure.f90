@@ -4,17 +4,6 @@
 !   Forms and solves pressure equation for the SIMPLE method.                  !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Comm_Mod
-  use Const_Mod
-  use Cpu_Timer_Mod,  only: Cpu_Timer_Mod_Start, Cpu_Timer_Mod_Stop
-  use Field_Mod
-  use Grid_Mod,       only: Grid_Type
-  use Bulk_Mod,       only: Bulk_Type
-  use Info_Mod,       only: Info_Mod_Iter_Fill_At
-  use Solver_Mod,     only: Solver_Type, Bicg, Cg, Cgs
-  use Matrix_Mod,     only: Matrix_Type
-  use Control_Mod
-  use Multiphase_Mod, only: Multiphase_Type, VOLUME_OF_FLUID
   use User_Mod
 !------------------------------------------------------------------------------!
   implicit none

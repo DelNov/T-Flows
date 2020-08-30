@@ -7,11 +7,7 @@
 !   which is in the directory "Shared".                                        !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Cpu_Timer_Mod,  only: Cpu_Timer_Mod_Start, Cpu_Timer_Mod_Stop
-  use File_Mod
   use Save_Grid_Mod
-  use Swarm_Mod,      only: Particle_Type, Swarm_Type
-  use Multiphase_Mod
   use Backup_Mod
 !------------------------------------------------------------------------------!
   implicit none
