@@ -29,7 +29,7 @@ def walk(x1, y1, x2, y2, x5, y5, x6, y6, obj_list, spl_list, stride):
   # Main loop
   #
   #-----------
-  for i in range(0, 1024):
+  for i in range(0, 256):
 
     #--------------------------   3 2 1
     # Set eight possible direc    4 c 0
