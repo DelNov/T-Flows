@@ -1,6 +1,6 @@
 import Const
 from Spline.Spline import Spline
-from Spline.Walk   import Walk
+from Spline.walk   import walk
 
 #===============================================================================
 # Function to plot spline (with 6 coordinates)
@@ -15,7 +15,7 @@ from Spline.Walk   import Walk
 # Used by:
 #   - function for plotting spline connections
 #-------------------------------------------------------------------------------
-def Create(obj_list, spl_list, object1, object2, line_type, depth, offset, stride):
+def create(obj_list, spl_list, object1, object2, line_type, depth, offset, stride):
 
   # print("Connecting ", object1.name, "and", object2.name)
   # print("offset =   ", offset)
@@ -75,6 +75,6 @@ def Create(obj_list, spl_list, object1, object2, line_type, depth, offset, strid
   spline = Spline(object1.name, object2.name, line_type, depth)
 
   spline.x,  \
-  spline.y = Walk(x1, y1, x2, y2, x5, y5, x6, y6, obj_list, spl_list, stride)
+  spline.y = walk(x1, y1, x2, y2, x5, y5, x6, y6, obj_list, spl_list, stride)
 
   return spline

@@ -13,6 +13,8 @@ import re
 #===============================================================================
 def get_new_calls(file_paths, obj_list, obj_memb):
 
+  print("Searching for call statements ...")
+
   # Get all functions names from obj_list into a list
   fun_list_names = []
   for o in range(len(obj_list)):

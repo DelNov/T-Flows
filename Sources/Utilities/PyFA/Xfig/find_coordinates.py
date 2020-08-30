@@ -12,6 +12,8 @@ from Xfig.find_height import find_height
 #-------------------------------------------------------------------------------
 def find_coordinates(obj_list, box_margins):
 
+  print("Setting objects' coordinates ... ")
+
   # Grid coordinates
   n_row = 0
   n_col = 0

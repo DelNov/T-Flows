@@ -18,6 +18,8 @@ from Objects.object_use_level     import object_use_level
 #-------------------------------------------------------------------------------
 def get_obj_lists(file_paths):
 
+  print("Extracting all objects from files ...")
+
   mod_list  = module_objects    (file_paths, [])        # list of module
   sub_list  = subroutine_objects(file_paths, mod_list)  # list of subroutine
   fun_list  = function_objects  (file_paths, mod_list)  # list of functions

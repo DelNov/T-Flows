@@ -10,7 +10,7 @@ import Const
 # Returns:
 #   - x, y:                coordinates with all steps from one object to another
 #-------------------------------------------------------------------------------
-def Compress(spline):
+def compress(spline):
 
   x = spline.x
   y = spline.y

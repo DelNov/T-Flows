@@ -10,7 +10,7 @@ import Const
 # Returns:
 #   - x, y:                coordinates with all steps from one object to another
 #-------------------------------------------------------------------------------
-def Walk(x1, y1, x2, y2, x5, y5, x6, y6, obj_list, spl_list, stride):
+def walk(x1, y1, x2, y2, x5, y5, x6, y6, obj_list, spl_list, stride):
 
   # Walk
   x    = []

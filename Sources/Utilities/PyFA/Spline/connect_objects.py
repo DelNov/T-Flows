@@ -1,6 +1,6 @@
 import Const
-from Spline.Create   import Create
-from Spline.Compress import Compress
+from Spline.create   import create
+from Spline.compress import compress
 
 #===============================================================================
 # Function for plotting all spline connections
@@ -13,6 +13,8 @@ from Spline.Compress import Compress
 #   - function for plotting everything (the entire graph) from object list
 #-------------------------------------------------------------------------------
 def connect_objects(obj_list, offset, stride):
+
+  print("Connecting objects with splines ...")
 
   use_objects  = []
   mod_objects  = []
@@ -49,7 +51,7 @@ def connect_objects(obj_list, offset, stride):
       for m in range(len(mod_objects)):
         if used == mod_objects[m].name:
           splines.append(                                                 \
-            Create(obj_list, splines, mod_objects[m], use_objects[i],     \
+            create(obj_list, splines, mod_objects[m], use_objects[i],     \
                    "Continuous", 101+len(splines),                        \
                    offset * (1.0 + counter / max_cnt), stride))
           counter += inc_cnt
@@ -63,13 +65,15 @@ def connect_objects(obj_list, offset, stride):
       for m in range(len(obj_list)):
         if called in obj_list[m].name:
           splines.append(                                                 \
-            Create(obj_list, splines, call_objects[i], obj_list[m],       \
+            create(obj_list, splines, call_objects[i], obj_list[m],       \
                    "Dashed", 201+len(splines),                            \
                    offset * (1.0 + counter / max_cnt), stride))
           counter += inc_cnt
           if counter > max_cnt+0.5: counter -= (max_cnt)
 
+  print("Compressing splines ...")
+
   for i in range(len(splines)):
-    Compress(splines[i])
+    compress(splines[i])
 
   return splines
