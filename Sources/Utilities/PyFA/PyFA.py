@@ -260,6 +260,14 @@ if ij_specified != "None":
 #
 #------------------------------------------
 
+# Try to restore the full command line
+command_line = '';
+for arg in sys.argv:
+  if ' ' in arg:
+    command_line += '"{}" '.format(arg);
+  else:
+    command_line+="{} ".format(arg);
+
 #---------------------------------------
 # Find object coordinates in Xfig units
 #---------------------------------------
@@ -282,7 +290,7 @@ file = open(Const.FIG_FILE_NAME, "w")
 #------------------
 # Write header out
 #------------------
-Xfig.write_header(file)
+Xfig.write_header(file, command_line)
 
 #-------------------------------------------
 # Plot all fortran files starting from root

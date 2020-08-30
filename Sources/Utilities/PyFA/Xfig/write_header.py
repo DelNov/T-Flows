@@ -6,9 +6,12 @@
 # Returns:
 #   - nothing
 #-------------------------------------------------------------------------------
-def write_header(file):
+def write_header(file, command_line):
 
-  file.write("#FIG 3.2  Produced by xfig version 3.2.6a\n")
+  file.write("#FIG 3.2\n")
+  file.write("# Produced by command: ")
+  file.write(command_line)
+  file.write("\n")
   file.write("Landscape\n")
   file.write("Center\n")
   file.write("Metric\n")
