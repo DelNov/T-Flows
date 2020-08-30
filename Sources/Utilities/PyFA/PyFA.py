@@ -22,6 +22,7 @@ start = time.time()
 file_paths = []
 obj_list   = []
 
+print_args       = "No"
 object_hierarchy = "Row-Based-Decreasing"
 object_details   = "Minimal"
 box_margins      = Const.BOX_MARGINS
@@ -47,9 +48,16 @@ for j in range(1,len(sys.argv),2):
 
   if(len(sys.argv) > j+1):
 
+    if str(sys.argv[j]) == "-a":
+
+      if str(sys.argv[j+1]) == "yes":
+        print_args  = "Yes"
+      elif str(sys.argv[j+1]) == "no":
+        print_args  = "No"
+
     # Check if object hierarchy was specified
-    if str(sys.argv[j]) == "-h" or         \
-       str(sys.argv[j]) == "--hierarchy":
+    elif str(sys.argv[j]) == "-h":
+
       if str(sys.argv[j+1]) == "column_dec":
         object_hierarchy  = "Column-Based-Decreasing"
       elif str(sys.argv[j+1]) == "row_dec":
@@ -66,8 +74,8 @@ for j in range(1,len(sys.argv),2):
         sys.exit()
 
     # Check if object representation was specified
-    elif str(sys.argv[j]) == "-g" or                 \
-         str(sys.argv[j]) == "--graph_detail":
+    elif str(sys.argv[j]) == "-g":
+
       if str(sys.argv[j+1]) == "normal":
         object_details = "Normal"
       elif str(sys.argv[j+1]) == "reduced":
@@ -81,43 +89,37 @@ for j in range(1,len(sys.argv),2):
         sys.exit()
 
     # Check if margins were specified
-    elif str(sys.argv[j]) == "-m" or    \
-         str(sys.argv[j]) == "--margins":
+    elif str(sys.argv[j]) == "-m":
 
       box_margins = float(sys.argv[j+1])
       print("Box margins are set to:", str(sys.argv[j+1]))
 
     # Check if root for browsing was specified
-    elif str(sys.argv[j]) == "-r" or    \
-         str(sys.argv[j]) == "--root":
+    elif str(sys.argv[j]) == "-r":
 
       r_specified = sys.argv[j+1]
       print("Root directory for sources is:", str(sys.argv[j+1]))
 
     # Check if list of sources were specified
-    elif str(sys.argv[j]) == "-o" or    \
-         str(sys.argv[j]) == "--object_details":
+    elif str(sys.argv[j]) == "-o":
 
       d_specified = sys.argv[j+1]
       print("Object details are specified in:", str(sys.argv[j+1]))
 
     # Check if list of sources were specified
-    elif str(sys.argv[j]) == "-s" or    \
-         str(sys.argv[j]) == "--sources":
+    elif str(sys.argv[j]) == "-s":
 
       s_specified = sys.argv[j+1]
       print("List of files is specified in:", str(sys.argv[j+1]))
 
     # Check if file with object (i,j) coordinates was specified
-    elif str(sys.argv[j]) == "-ij" or    \
-         str(sys.argv[j]) == "--ij_coordinates":
+    elif str(sys.argv[j]) == "-ij":
 
       ij_specified = sys.argv[j+1]
       print("Object (i,j) coordinates are specified in:", str(sys.argv[j+1]))
 
     # Check if file with object (x,y) coordinates was specified
-    elif str(sys.argv[j]) == "-xy" or    \
-         str(sys.argv[j]) == "--xy_coordinates":
+    elif str(sys.argv[j]) == "-xy":
 
       xy_specified = sys.argv[j+1]
       print("Object (x,y) coordinates are specified in:", str(sys.argv[j+1]))
@@ -166,7 +168,7 @@ else:
 # Take object list from file paths and ...
 # ... find use level for each object
 #------------------------------------------
-obj_list, mod_list, obj_memb = Objects.get_obj_lists(file_paths)
+obj_list, mod_list, obj_memb = Objects.get_obj_lists(file_paths, print_args)
 obj_list = Objects.object_use_level(obj_list, mod_list)
 
 #------------------------------------

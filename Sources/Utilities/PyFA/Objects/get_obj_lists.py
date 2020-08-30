@@ -11,12 +11,13 @@ from Objects.object_use_level     import object_use_level
 #
 # Parameters:
 #   - file_paths:   paths to .f90 files
+#   - print_arg :   wheather to print arguments
 # Returns:
 #   - obj_list:     list with all created and updated objects
 # Used by:
 #   - main program (simple.py)
 #-------------------------------------------------------------------------------
-def get_obj_lists(file_paths):
+def get_obj_lists(file_paths, print_arg):
 
   print("Extracting all objects from files ...")
 
@@ -30,7 +31,11 @@ def get_obj_lists(file_paths):
                *fun_list,   \
                *prog_list]               # list of all classes(mod+sub+fun+prog)
 
-  obj_list, obj_memb  = classify_objects(obj_list)
+  if print_arg == "No":
+    for obj in obj_list:
+      obj.name = obj.name.split('(')[0]
+
+  obj_list, obj_memb = classify_objects(obj_list)
 
   return obj_list, mod_list, obj_memb
 

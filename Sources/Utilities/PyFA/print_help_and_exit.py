@@ -12,11 +12,11 @@ def print_help_and_exit():
   print("\nUsage: pyfa.py [OPTIONS]")
   print("\nValid options are:\n")
   print("   -a [SWITCH]\
-  Plot by specified object alignment: ")
+  Print function and subroutine arguments: ")
   print("    \
-   'straight' for straight alignment")
+   'no'  not to print arguments")
   print("    \
-   'diagonal' for diagonal alignment")
+   'yes' to print arguments")
   print("   -g [SWITCH]\
   Plot by specified object detail: ")
   print("    \
