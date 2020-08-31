@@ -9,7 +9,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer       :: sub, i_nod, ms, mr, n, nn, sh
   character(SL) :: name_in
-  integer       :: c, c1, c2, s, buf_cnt
+  integer       :: c, c1, c2, s, n_buff_faces
 !==============================================================================!
 
   if(n_proc < 2) return
@@ -30,6 +30,20 @@
       grid % comm % n_buff_cells + 1
     end if
   end do
+
+  !------------------------!
+  !   Count buffer faces   !
+  !------------------------!
+  n_buff_faces = 0
+  do s = 1, grid % n_faces
+    c1 = grid % faces_c(1,s)
+    c2 = grid % faces_c(2,s)
+    if(grid % comm % cell_proc(c1) .ne. this_proc .and.  &
+       grid % comm % cell_proc(c2) .ne. this_proc) then
+      n_buff_faces = n_buff_faces + 1
+    end if
+  end do
+  grid % n_faces = grid % n_faces - n_buff_faces
 
   allocate(grid % new_n(grid % n_nodes))
 
