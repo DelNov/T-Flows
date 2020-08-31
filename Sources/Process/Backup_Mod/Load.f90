@@ -108,9 +108,9 @@
   !--------------!
   !   Velocity   !
   !--------------!
-  call Backup_Mod_Read_Variable(fh, d, vc, 'u_velocity', fld % u)
-  call Backup_Mod_Read_Variable(fh, d, vc, 'v_velocity', fld % v)
-  call Backup_Mod_Read_Variable(fh, d, vc, 'w_velocity', fld % w)
+  call Backup_Mod_Read_Variable(fh, d, vc, 'u_velocity', fld, fld % u)
+  call Backup_Mod_Read_Variable(fh, d, vc, 'v_velocity', fld, fld % v)
+  call Backup_Mod_Read_Variable(fh, d, vc, 'w_velocity', fld, fld % w)
 
   !------------------------------------------------------!
   !   Pressure, its gradients, and pressure correction   !
@@ -120,6 +120,7 @@
   call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'press_y',    fld % p % y)
   call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'press_z',    fld % p % z)
   call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'press_corr', fld % pp % n)
+  call Field_Mod_Grad_Pressure_Correction(fld, fld % pp)
 
   !---------------------!
   !   Mass flow rates   !
@@ -133,7 +134,7 @@
   !              !
   !--------------!
   if(heat_transfer) then
-    call Backup_Mod_Read_Variable(fh, d, vc, 'temp', fld % t)
+    call Backup_Mod_Read_Variable(fh, d, vc, 'temp', fld, fld % t)
   end if
 
   !--------------!
@@ -142,7 +143,7 @@
   !              !
   !--------------!
   if(mul % model .eq. VOLUME_OF_FLUID) then
-    call Backup_Mod_Read_Variable(fh, d, vc, 'vof', mul % vof)
+    call Backup_Mod_Read_Variable(fh, d, vc, 'vof', fld, mul % vof)
   end if
 
   !-----------------------!
@@ -157,8 +158,8 @@
   if(tur % model .eq. K_EPS) then
 
     ! K and epsilon
-    call Backup_Mod_Read_Variable(fh, d, vc, 'kin', tur % kin)
-    call Backup_Mod_Read_Variable(fh, d, vc, 'eps', tur % eps)
+    call Backup_Mod_Read_Variable(fh, d, vc, 'kin', fld, tur % kin)
+    call Backup_Mod_Read_Variable(fh, d, vc, 'eps', fld, tur % eps)
 
     ! Other turbulent quantities
     call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'p_kin',  tur % p_kin )
@@ -168,7 +169,7 @@
 
     ! Turbulence quantities connected with heat transfer
     if(heat_transfer) then
-      call Backup_Mod_Read_Variable(fh, d, vc, 't2',    tur % t2)
+      call Backup_Mod_Read_Variable(fh, d, vc, 't2', fld, tur % t2)
       call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'p_t2',  tur % p_t2 )
       call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'con_w', tur % con_w)
     end if
@@ -181,10 +182,10 @@
      tur % model .eq. HYBRID_LES_RANS) then
 
     ! K, eps, zeta and f22
-    call Backup_Mod_Read_Variable(fh, d, vc, 'kin',  tur % kin)
-    call Backup_Mod_Read_Variable(fh, d, vc, 'eps',  tur % eps)
-    call Backup_Mod_Read_Variable(fh, d, vc, 'zeta', tur % zeta)
-    call Backup_Mod_Read_Variable(fh, d, vc, 'f22',  tur % f22)
+    call Backup_Mod_Read_Variable(fh, d, vc, 'kin',  fld, tur % kin)
+    call Backup_Mod_Read_Variable(fh, d, vc, 'eps',  fld, tur % eps)
+    call Backup_Mod_Read_Variable(fh, d, vc, 'zeta', fld, tur % zeta)
+    call Backup_Mod_Read_Variable(fh, d, vc, 'f22',  fld, tur % f22)
 
     ! Other turbulent quantities
     call Backup_Mod_Read_Cell_Real(grid, fh, d, vc,'p_kin',   tur % p_kin  )
@@ -197,7 +198,7 @@
     ! Turbulence quantities connected with heat transfer
 
     if(heat_transfer) then
-      call Backup_Mod_Read_Variable(fh, d, vc, 't2',    tur % t2)
+      call Backup_Mod_Read_Variable(fh, d, vc, 't2', fld, tur % t2)
       call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'p_t2',  tur % p_t2 )
       call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'con_w', tur % con_w)
     end if
@@ -212,19 +213,19 @@
      tur % model .eq. RSM_HANJALIC_JAKIRLIC) then
 
     ! Reynolds stresses
-    call Backup_Mod_Read_Variable(fh, d, vc, 'uu',  tur % uu)
-    call Backup_Mod_Read_Variable(fh, d, vc, 'vv',  tur % vv)
-    call Backup_Mod_Read_Variable(fh, d, vc, 'ww',  tur % ww)
-    call Backup_Mod_Read_Variable(fh, d, vc, 'uv',  tur % uv)
-    call Backup_Mod_Read_Variable(fh, d, vc, 'uw',  tur % uw)
-    call Backup_Mod_Read_Variable(fh, d, vc, 'vw',  tur % vw)
+    call Backup_Mod_Read_Variable(fh, d, vc, 'uu', fld, tur % uu)
+    call Backup_Mod_Read_Variable(fh, d, vc, 'vv', fld, tur % vv)
+    call Backup_Mod_Read_Variable(fh, d, vc, 'ww', fld, tur % ww)
+    call Backup_Mod_Read_Variable(fh, d, vc, 'uv', fld, tur % uv)
+    call Backup_Mod_Read_Variable(fh, d, vc, 'uw', fld, tur % uw)
+    call Backup_Mod_Read_Variable(fh, d, vc, 'vw', fld, tur % vw)
 
     ! Epsilon
-    call Backup_Mod_Read_Variable(fh, d, vc, 'eps', tur % eps)
+    call Backup_Mod_Read_Variable(fh, d, vc, 'eps', fld, tur % eps)
 
     ! F22
     if(tur % model .eq. RSM_MANCEAU_HANJALIC) then
-      call Backup_Mod_Read_Variable(fh, d, vc, 'f22',  tur % f22)
+      call Backup_Mod_Read_Variable(fh, d, vc, 'f22', fld, tur % f22)
     end if
 
     ! Other turbulent quantities ?
@@ -242,7 +243,7 @@
   !------------------!
   do sc = 1, fld % n_scalars
     phi => fld % scalar(sc)
-    call Backup_Mod_Read_Variable(fh, d, vc, phi % name, phi)
+    call Backup_Mod_Read_Variable(fh, d, vc, phi % name, fld, phi)
   end do
 
   !-----------------------------------------!
