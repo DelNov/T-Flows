@@ -67,38 +67,37 @@
 !   neu_tet, neu_pyr, neu_wed and neu_hex hold -1 where unused 
 !==============================================================================!
 
-  ! tet cell faces nodal connections
-  integer, parameter, dimension(6, 4) ::      neu_tet =           &
-                               transpose(reshape( (/ 1, 2, 3,-1,  &
-                                                     1, 4, 2,-1,  &
-                                                     2, 4, 3,-1,  &
-                                                     3, 4, 1,-1,  &
-                                                    -1,-1,-1,-1,  &
-                                                    -1,-1,-1,-1  /), (/4, 6/) ))
+  ! Declarations
+  integer, dimension(6,4) :: neu_tet
+  integer, dimension(6,4) :: neu_hex
+  integer, dimension(6,4) :: neu_pyr
+  integer, dimension(6,4) :: neu_wed
 
-  ! hex cell faces nodal connections
-  integer, parameter, dimension(6, 4) ::     neu_hex =            &
-                               transpose(reshape( (/ 1, 5, 6, 2,  &
-                                                     2, 6, 8, 4,  &
-                                                     4, 8, 7, 3,  &
-                                                     3, 7, 5, 1,  &
-                                                     1, 2, 4, 3,  &
-                                                     5, 7, 8, 6  /), (/4, 6/) ))
+  ! Initializations
+  neu_tet = transpose(reshape( (/ 1, 2, 3,-1,  &
+                                  1, 4, 2,-1,  &
+                                  2, 4, 3,-1,  &
+                                  3, 4, 1,-1,  &
+                                 -1,-1,-1,-1,  &
+                                 -1,-1,-1,-1  /), (/4, 6/) ))
 
-  ! wed cell faces nodal connections
-  integer, parameter, dimension(6, 4) ::     neu_wed =            &
-                               transpose(reshape( (/ 1, 4, 5, 2,  &
-                                                     2, 5, 6, 3,  &
-                                                     3, 6, 4, 1,  &
-                                                     1, 2, 3,-1,  &
-                                                     4, 6, 5,-1,  &
-                                                    -1,-1,-1,-1  /), (/4, 6/) ))
+  neu_hex = transpose(reshape( (/ 1, 5, 6, 2,  &
+                                  2, 6, 8, 4,  &
+                                  4, 8, 7, 3,  &
+                                  3, 7, 5, 1,  &
+                                  1, 2, 4, 3,  &
+                                  5, 7, 8, 6  /), (/4, 6/) ))
 
-  ! pyr cell faces nodal connections
-  integer, parameter, dimension(6, 4) ::     neu_pyr =            &
-                               transpose(reshape( (/ 1, 2, 4, 3,  &
-                                                     1, 5, 2,-1,  &
-                                                     2, 5, 4,-1,  &
-                                                     4, 5, 3,-1,  &
-                                                     3, 5, 1,-1,  &
-                                                    -1,-1,-1,-1  /), (/4, 6/) ))
+  neu_wed = transpose(reshape( (/ 1, 4, 5, 2,  &
+                                  2, 5, 6, 3,  &
+                                  3, 6, 4, 1,  &
+                                  1, 2, 3,-1,  &
+                                  4, 6, 5,-1,  &
+                                 -1,-1,-1,-1  /), (/4, 6/) ))
+
+  neu_pyr = transpose(reshape( (/ 1, 2, 4, 3,  &
+                                  1, 5, 2,-1,  &
+                                  2, 5, 4,-1,  &
+                                  4, 5, 3,-1,  &
+                                  3, 5, 1,-1,  &
+                                 -1,-1,-1,-1  /), (/4, 6/) ))

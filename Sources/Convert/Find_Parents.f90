@@ -9,8 +9,6 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
-!------------------------------------------------------------------------------!
-  include 'Cell_Numbering_Neu.f90'
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: fn(6,4), j, n1, n2, c1, c2, bc
   integer              :: n_match
@@ -18,6 +16,8 @@
   integer              :: n_face_nodes ! number of nodes in a face
   integer              :: n_cell_faces ! number of faces in a cell
   logical, allocatable :: is_node_bnd(:)
+!------------------------------------------------------------------------------!
+  include 'Cell_Numbering_Neu.f90'
 !==============================================================================!
 
   print *, '#================================================='

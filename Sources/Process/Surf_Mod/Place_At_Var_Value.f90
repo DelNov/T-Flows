@@ -17,8 +17,6 @@
   type(Solver_Type), target :: sol   ! needed for smoothing
   real                      :: phi_e
   logical                   :: verbose
-!------------------------------------------------------------------------------!
-  include 'Surf_Mod/Edge_Numbering_Neu.f90'
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Field_Type),  pointer :: flow
@@ -32,6 +30,8 @@
   integer                    :: en(12,2)  ! edge numbering
   real                       :: phi1, phi2, xn1, yn1, zn1, xn2, yn2, zn2, w1, w2
   real                       :: surf_v(3), dist
+!------------------------------------------------------------------------------!
+  include 'Surf_Mod/Edge_Numbering_Neu.f90'
 !==============================================================================!
 
   ! Take aliases
