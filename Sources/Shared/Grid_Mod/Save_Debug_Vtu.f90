@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Grid_Mod_Save_Debug_Vtu(grid,                 &
+  subroutine Grid_Mod_Save_Debug_Vtu(grid, append,                           &
                                      scalar_cell, scalar_node, scalar_name,  &
                                      vector_cell, vector_node, vector_name)
 !------------------------------------------------------------------------------!
@@ -8,6 +8,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type)        :: grid
+  character(*)           :: append
   real,         optional :: scalar_cell(-grid % n_bnd_cells:grid % n_cells)
   real,         optional :: scalar_node(1:grid % n_nodes)
   character(*), optional :: scalar_name
@@ -15,9 +16,9 @@
   real,         optional :: vector_node(1:grid % n_nodes, 3)
   character(*), optional :: vector_name
 !-----------------------------------[Locals]-----------------------------------!
-  integer(4)         :: data_size
-  integer            :: c, n, data_offset, cell_offset, n_conns, fu, lev
-  character(len=80)  :: name_out, str1, str2
+  integer(4)    :: data_size
+  integer       :: c, n, data_offset, cell_offset, n_conns, fu, lev
+  character(SL) :: name_out, str1, str2
 !------------------------------[Local parameters]------------------------------!
   integer,           parameter :: IP=8, RP=8, SP=4
   integer,           parameter :: VTK_LINE       =  3
@@ -45,15 +46,8 @@
   !------------------------!
   !   Open the .vtu file   !
   !------------------------!
-  if(present(scalar_cell) .or. present(scalar_node)) then
-    call File_Mod_Set_Name(name_out, processor=this_proc,  &
-                           appendix='-'//trim(scalar_name), extension='.vtu')
-  else if(present(vector_cell) .or. present(vector_node)) then
-    call File_Mod_Set_Name(name_out, processor=this_proc,  &
-                           appendix='-'//trim(vector_name), extension='.vtu')
-  else
-    call File_Mod_Set_Name(name_out, processor=this_proc, extension='.vtu')
-  end if
+  call File_Mod_Set_Name(name_out, appendix='-'//trim(append),  &
+                         processor=this_proc, extension='.vtu')
   call File_Mod_Open_File_For_Writing_Binary(name_out, fu)
 
   !------------!
@@ -354,7 +348,8 @@
   ! Create it only from subdomain 1, when decomposed
   if(maxval(grid % comm % cell_proc(:)) > 1 .and. this_proc .eq. 1) then
 
-    call File_Mod_Set_Name(name_out, extension='.pvtu')
+    call File_Mod_Set_Name(name_out, appendix='-'//trim(append),  &
+                           extension='.pvtu')
     call File_Mod_Open_File_For_Writing(name_out, fu)
 
     ! Header
@@ -377,11 +372,18 @@
                               ' Name="'// trim(scalar_name) // '"' //  &
                               ' format="ascii"/>'
     end if
+    if(present(vector_cell)) then
+      write(fu,'(a,a)') IN_3, '<PDataArray type="Float64"'         //  &
+                              ' NumberOfComponents="3"'            //  &
+                              ' Name="'// trim(vector_name) // '"' //  &
+                              ' format="ascii"/>'
+    end if
     write(fu,'(a,a)') IN_2, '</PCellData>'
 
     ! Write out the names of all the pieces
-    do n = 1, maxval(grid % comm % cell_proc(:))
-      call File_Mod_Set_Name(name_out, processor=n, extension='.vtu')
+    do n = 1, n_proc
+      call File_Mod_Set_Name(name_out, appendix='-'//trim(append),  &
+                             processor=n, extension='.vtu')
       write(fu, '(a,a,a,a)') IN_2, '<Piece Source="', trim(name_out), '"/>'
     end do
 
