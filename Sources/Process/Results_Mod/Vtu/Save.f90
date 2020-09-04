@@ -18,6 +18,9 @@
                       kin_vis_t => r_cell_12,  &
                       phi_save  => r_cell_13,  &
                       q_save    => r_cell_14,  &
+                      px_save   => r_cell_15,  &
+                      py_save   => r_cell_16,  &
+                      pz_save   => r_cell_17,  &
                       int_save  => i_cell_01,  &
                       type_save => i_cell_02,  &  ! cell type save array
                       offs_save => i_cell_03      ! cell offsets save array
@@ -317,6 +320,19 @@
     call Save_Scalar_Real(grid, "Pressure", plot_inside,            &
                                 flow % p % n(-grid % n_bnd_cells),  &
                                 f8, f9, data_offset, run)
+    px_save(:) = 0.0
+    py_save(:) = 0.0
+    pz_save(:) = 0.0
+    do c = -grid % n_bnd_cells, grid % n_cells
+      px_save(c) = flow % p % x(c) * grid % vol(c)
+      py_save(c) = flow % p % y(c) * grid % vol(c)
+      pz_save(c) = flow % p % z(c) * grid % vol(c)
+    end do
+    call Save_Vector_Real(grid, "PressureForce", plot_inside,  &
+                                px_save(-grid % n_bnd_cells),  &
+                                py_save(-grid % n_bnd_cells),  &
+                                pz_save(-grid % n_bnd_cells),  &
+                                f8, f9, data_offset, run)
 
     !-----------------!
     !   Temperature   !
@@ -347,11 +363,16 @@
     !   Volume fraction   !
     !---------------------!
     if(mult % model .eq. VOLUME_OF_FLUID) then
-      call Save_Scalar_Real(grid, "VolumeFraction", plot_inside,          &
-                                  mult % vof % n(-grid % n_bnd_cells),    &
+      call Save_Scalar_Real(grid, "VolumeFraction", plot_inside,            &
+                                  mult % vof % n(-grid % n_bnd_cells),      &
                                   f8, f9, data_offset, run)
-      call Save_Scalar_Real(grid, "Curvature", plot_inside,               &
-                                  mult % vof % oo(-grid % n_bnd_cells),   &
+      call Save_Scalar_Real(grid, "Curvature", plot_inside,                 &
+                                  mult % curv(-grid % n_bnd_cells),         &
+                                  f8, f9, data_offset, run)
+      call Save_Vector_Real(grid, "SurfaceTensionForce", plot_inside,       &
+                                  mult % surf_fx(-grid % n_bnd_cells),      &
+                                  mult % surf_fy(-grid % n_bnd_cells),      &
+                                  mult % surf_fz(-grid % n_bnd_cells),      &
                                   f8, f9, data_offset, run)
       if (allocated(mult % flux_rate)) then
         call Save_Scalar_Real(grid, "FluxRate ", plot_inside,               &
@@ -360,10 +381,9 @@
       end if
 
       if (mult % d_func) then
-        call Save_Scalar_Real(grid, "DistanceFunction", plot_inside,    &
-                                    mult % dist_func                    &
-                                    % n(-grid % n_bnd_cells),           &
-                                    f8, f9, data_offset, run)
+        call Save_Scalar_Real(grid, "DistanceFunction", plot_inside,      &
+                              mult % dist_func % n(-grid % n_bnd_cells),  &
+                              f8, f9, data_offset, run)
       end if
     end if
 
