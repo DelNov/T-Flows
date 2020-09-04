@@ -28,7 +28,18 @@
     call Var_Mod_Allocate_Solution(mult % dist_func, grid, 'D_FUNC', '')
   end if
 
+  ! Surface curvature
   allocate(mult % curv(-nb:nc));  mult % curv(-nb:nc) = 0.0
+
+  ! Surface normals
+  allocate(mult % nx(-nb:nc));  mult % nx(-nb:nc) = 0.0
+  allocate(mult % ny(-nb:nc));  mult % ny(-nb:nc) = 0.0
+  allocate(mult % nz(-nb:nc));  mult % nz(-nb:nc) = 0.0
+
+  ! Surface tension force
+  allocate(mult % surf_fx(-nb:nc));  mult % surf_fx(-nb:nc) = 0.0
+  allocate(mult % surf_fy(-nb:nc));  mult % surf_fy(-nb:nc) = 0.0
+  allocate(mult % surf_fz(-nb:nc));  mult % surf_fz(-nb:nc) = 0.0
 
   allocate(mult % fc_x(-nb:nc));  mult % fc_x(-nb:nc) = 0.0
   allocate(mult % fc_y(-nb:nc));  mult % fc_y(-nb:nc) = 0.0

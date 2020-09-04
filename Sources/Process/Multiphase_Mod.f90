@@ -24,8 +24,16 @@
     type(Surf_Type)           :: surf      ! pointer to surface
 
     ! Volume fraction (colour function)
-    type(Var_Type)    :: vof
-    real, allocatable :: curv(:)   ! curvature
+    type(Var_Type) :: vof
+
+    ! Surface curvature
+    real, allocatable :: curv(:)
+
+    ! Surface normals
+    real, allocatable :: nx(:), ny(:), nz(:)
+
+    ! Surface tension force
+    real, allocatable :: surf_fx(:), surf_fy(:), surf_fz(:)
 
     ! Distance function
     type(Var_Type) :: dist_func

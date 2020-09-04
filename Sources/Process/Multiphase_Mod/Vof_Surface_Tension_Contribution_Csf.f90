@@ -10,7 +10,6 @@
                       grad_kx    => r_cell_06,  & ! grad on x of vof for curvat
                       grad_ky    => r_cell_07,  & ! grad on y of vof for curvat
                       grad_kz    => r_cell_08,  & ! grad on z of vof for curvat
-                      tmp_curv   => r_cell_30,  & ! curvature holder
                       smooth_var => r_cell_09
 !------------------------------------------------------------------------------!
   implicit none
@@ -23,8 +22,8 @@
   integer                  :: s, c, c1, c2, c_iter, nb, nc
   real                     :: vol_face, grad_face(3), grad_control(3)
   real                     :: dotprod, sxyz_mod, sxyz_control, fs, epsloc
-  real                     :: d_n(3) !normal pointing to the wall
-  real                     :: norm_grad !normal of a gradient
+  real                     :: d_n(3)     ! normal pointing to the wall
+  real                     :: norm_grad  ! normal of a gradient
   real                     :: cpc
 !==============================================================================!
 

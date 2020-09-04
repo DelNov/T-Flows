@@ -18,7 +18,7 @@
   type(Face_Type),   pointer :: v_flux
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
-  real, contiguous,  pointer :: si(:), sj(:), sk(:)
+  real, contiguous,  pointer :: surf_fx(:), surf_fy(:), surf_fz(:)
   integer                    :: s, c, c1, c2, nt, ni
   real                       :: dotprod, epsloc, fs
   real                       :: corr_x, corr_y, corr_z
@@ -26,15 +26,15 @@
 !============================================================================!
 
   ! Take aliases
-  flow   => mult % pnt_flow
-  grid   => mult % pnt_grid
-  vof    => mult % vof
-  v_flux => flow % v_flux
-  si     => grid % sx
-  sj     => grid % sy
-  sk     => grid % sz
-  a      => sol % a
-  b      => sol % b % val
+  flow    => mult % pnt_flow
+  grid    => mult % pnt_grid
+  vof     => mult % vof
+  surf_fx => mult % surf_fx
+  surf_fy => mult % surf_fy
+  surf_fz => mult % surf_fz
+  v_flux  => flow % v_flux
+  a       => sol % a
+  b       => sol % b % val
 
   epsloc = epsilon(epsloc)
 
@@ -44,24 +44,27 @@
     select case(i)
       case(1)
         do c = 1, grid % n_cells
-          b(c) = b(c) + mult % surface_tension  &
-                      * mult % curv(c)          &
-                      * vof % x(c)              &
-                      * grid % vol(c)
+          surf_fx(c) = mult % surface_tension  &
+                     * mult % curv(c)          &
+                     * vof % x(c)              &
+                     * grid % vol(c)
+          b(c) = b(c) + surf_fx(c)
          end do
       case(2)
         do c = 1, grid % n_cells
-          b(c) = b(c) + mult % surface_tension  &
-                      * mult % curv(c)          &
-                      * vof % y(c)              &
-                      * grid % vol(c)
+          surf_fy(c) = mult % surface_tension  &
+                     * mult % curv(c)          &
+                     * vof % y(c)              &
+                     * grid % vol(c)
+          b(c) = b(c) + surf_fy(c)
         end do
       case(3)
         do c = 1, grid % n_cells
-          b(c) = b(c) + mult % surface_tension  &
-                      * mult % curv(c)          &
-                      * vof % z(c)              &
-                      * grid % vol(c)
+          surf_fz(c) = mult % surface_tension  &
+                     * mult % curv(c)          &
+                     * vof % z(c)              &
+                     * grid % vol(c)
+          b(c) = b(c) + surf_fz(c)
         end do
 
     end select
