@@ -90,7 +90,7 @@
 @timestamp rot 0
 @timestamp font 0
 @timestamp char size 1.000000
-@timestamp def "Fri Sep  4 22:42:36 2020"
+@timestamp def "Sat Sep  5 07:50:58 2020"
 @r0 off
 @link r0 to g0
 @r0 type above
@@ -145,7 +145,7 @@
 @    title font 0
 @    title size 1.500000
 @    title color 1
-@    subtitle "Density in both phases 1"
+@    subtitle "Density in both phases 1, Bubble radis 0.4"
 @    subtitle font 0
 @    subtitle size 1.000000
 @    subtitle color 1
