@@ -13,6 +13,9 @@ Mijail also says that:
 
 dt <= sqrt( (rho_L + rho_G) * min_vol/(8 * sigma))
 
+(Hence, if you decrease the domain ten times, sigma should be decreased a
+ thousand times to keep the same dt)
+
 So, for default grid we have:
 
 min_vol     = (2.0/64)^3 = 3.0518e-5
