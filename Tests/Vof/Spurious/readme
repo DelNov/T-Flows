@@ -9,12 +9,15 @@ La = --------------- = ----------------- = 12000 = 1.2e+4
 Hence, if you fiddle with physical properties without care, Laplace number
 can easily exceed 1e+5
 
+For air bubble in water, say bubble with 1 mm diameter, La would be:
+
+     0.072 * 1000 * 0.001   0.072
+La = -------------------- = ------ = 72000 = 7.2e+4
+           0.001^2          1.0e+6
+
 Mijail also says that:
 
 dt <= sqrt( (rho_L + rho_G) * min_vol/(8 * sigma))
-
-(Hence, if you decrease the domain ten times, sigma should be decreased a
- thousand times to keep the same dt)
 
 So, for default grid we have:
 
