@@ -1,0 +1,22 @@
+Note that surface tension is stunning 15.0e+3, or 1.5e+4.
+
+As Mijail sent it, Laplace number was:
+
+     gamma * rho * L   15e+3 * 1.0 * 0.8
+La = --------------- = ----------------- = 12000 = 1.2e+4
+          mu^2                 1^2
+
+Hence, if you fiddle with physical properties without care, Laplace number
+can easily exceed 1e+5
+
+Mijail also says that:
+
+dt <= sqrt( (rho_L + rho_G) * min_vol/(8 * sigma))
+
+So, for default grid we have:
+
+min_vol     = (2.0/64)^3 = 3.0518e-5
+sigma       = 15000
+rho_L+rho_G = 2.0
+
+dt < 2.255e-5
