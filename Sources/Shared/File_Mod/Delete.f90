@@ -6,10 +6,19 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   character(len=*) :: name_d
-  integer          :: file_unit
+!-----------------------------------[Locals]-----------------------------------!
+  integer :: file_unit
+  logical :: file_exists
 !==============================================================================!
 
-  open(newunit = file_unit, file = trim(name_d), status = 'old')
-  close(file_unit, status='delete')
+  ! First check if the file exists
+  inquire(file  = trim(name_i),  &
+          exist = file_exists)
+
+  ! File exists
+  if(file_exists) then
+    open(newunit = file_unit, file = trim(name_d), status = 'old')
+    close(file_unit, status='delete')
+  end if
 
   end subroutine
