@@ -29,6 +29,7 @@
   contains
 
   include 'File_Mod/Append_File_For_Writing.f90'
+  include 'File_Mod/Delete.f90'
   include 'File_Mod/Set_Name.f90'
   include 'File_Mod/Open_File_For_Reading.f90'
   include 'File_Mod/Open_File_For_Reading_Binary.f90'
