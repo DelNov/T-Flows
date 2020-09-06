@@ -102,6 +102,9 @@
 
   ! Write Results
   if (this_proc < 2) then
+    if(n .eq. 1) then
+      call File_Mod_Delete('spurious.dat')
+    end if
     call File_Mod_Append_File_For_Writing('spurious.dat', fu)
     write(fu,'(6(2X,E16.10E2))')  time, a_vof, u_rms, u_max, &
                                   p_max-p_min, p_in-p_out
