@@ -264,6 +264,7 @@
   do c = 1, grid % n_cells
     p % n(c) =  p % n(c) + pp % urf * pp % n(c)
   end do
+  call Grid_Mod_Exchange_Cells_Real(grid, p % n)
 
   !------------------------------------!
   !   Normalize the pressure field     !
