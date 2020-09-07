@@ -317,8 +317,11 @@
     !--------------!
     !   Pressure   !
     !--------------!
-    call Save_Scalar_Real(grid, "Pressure", plot_inside,            &
-                                flow % p % n(-grid % n_bnd_cells),  &
+    call Save_Scalar_Real(grid, "PressureCorrection", plot_inside,   &
+                                flow % pp % n(-grid % n_bnd_cells),  &
+                                f8, f9, data_offset, run)
+    call Save_Scalar_Real(grid, "Pressure", plot_inside,             &
+                                flow % p % n(-grid % n_bnd_cells),   &
                                 f8, f9, data_offset, run)
     px_save(:) = 0.0
     py_save(:) = 0.0
