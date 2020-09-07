@@ -12,7 +12,7 @@
 !==============================================================================!
 
   ! First check if the file exists
-  inquire(file  = trim(name_i),  &
+  inquire(file  = trim(name_d),  &
           exist = file_exists)
 
   ! File exists
