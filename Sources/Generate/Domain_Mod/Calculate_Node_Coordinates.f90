@@ -18,7 +18,7 @@
   ! Why on Earth is this?
   do n = 1, grid % max_n_nodes
     grid % xn(n) = HUGE
-  end do 
+  end do
 
   !------------------------------------!
   !   Calculate the node coordinates   !
@@ -31,13 +31,13 @@
     print '(a38,i7)', '# Generating block:                  ', b
     ni=dom % blocks(b) % resolutions(1)
     nj=dom % blocks(b) % resolutions(2)
-    nk=dom % blocks(b) % resolutions(3)   
+    nk=dom % blocks(b) % resolutions(3)
 
     ! ( 1 )
     n = grid % n_nodes + ( 1-1)*ni*nj + ( 1-1)*ni +  1
     grid % xn(n) = dom % points(dom % blocks(b) % corners(1)) % x
-    grid % yn(n) = dom % points(dom % blocks(b) % corners(1)) % y 
-    grid % zn(n) = dom % points(dom % blocks(b) % corners(1)) % z 
+    grid % yn(n) = dom % points(dom % blocks(b) % corners(1)) % y
+    grid % zn(n) = dom % points(dom % blocks(b) % corners(1)) % z
 
     ! ( 2 )
     n = grid % n_nodes + ( 1-1)*ni*nj + ( 1-1)*ni + ni
@@ -107,14 +107,14 @@
           trans(1,2) =+1
           trans(2,2) = 0
           trans(3,2) = 0
-          if( (l1 .eq. 1).or.(l1 .eq. 5) ) then 
+          if( (l1 .eq. 1).or.(l1 .eq. 5) ) then
             trans(2,1) =1
-          else                         
+          else
             trans(2,1) =dom % blocks(b) % resolutions(2)
           end if
           if( (l1 .eq. 1).or.(l1 .eq. 3) ) then
             trans(3,1) =1
-          else                         
+          else
             trans(3,1) =dom % blocks(b) % resolutions(3)
           end if
 
@@ -126,12 +126,12 @@
           trans(3,2) = 0
           if( (l1 .eq. 2).or.(l1 .eq. 6) ) then
             trans(2,1) =1
-          else                         
+          else
             trans(2,1) =dom % blocks(b) % resolutions(2)
           end if
           if( (l1 .eq. 2).or.(l1 .eq. 4) ) then
             trans(3,1) =1
-          else                         
+          else
             trans(3,1) =dom % blocks(b) % resolutions(3)
           end if
 
@@ -140,15 +140,15 @@
           trans(2,1) = 0
           trans(2,2) =+1
           trans(1,2) = 0
-          trans(3,2) = 0 
+          trans(3,2) = 0
           if( (l1 .eq. 1).or.(l1 .eq. 5) ) then
             trans(1,1) =1
-          else                         
+          else
             trans(1,1) =dom % blocks(b) % resolutions(1)
           end if
           if( (l1 .eq. 1).or.(l1 .eq. 2) ) then
             trans(3,1) =1
-          else                         
+          else
             trans(3,1) =dom % blocks(b) % resolutions(3)
           end if
 
@@ -157,15 +157,15 @@
           trans(2,1) =dom % blocks(b) % resolutions(2)+1   ! nj from block + 1
           trans(2,2) =-1
           trans(1,2) = 0
-          trans(3,2) = 0 
+          trans(3,2) = 0
           if( (l1 .eq. 3).or.(l1 .eq. 7) ) then
             trans(1,1) =1
-          else                         
+          else
             trans(1,1) =dom % blocks(b) % resolutions(1)
           end if
           if( (l1 .eq. 3).or.(l1 .eq. 4) ) then
             trans(3,1) =1
-          else                         
+          else
             trans(3,1) =dom % blocks(b) % resolutions(3)
           end if
 
@@ -174,15 +174,15 @@
           trans(3,1) = 0
           trans(3,2) =+1
           trans(1,2) = 0
-          trans(2,2) = 0 
+          trans(2,2) = 0
           if( (l1 .eq. 1).or.(l1 .eq. 3) ) then
             trans(1,1) =1
-          else                         
+          else
             trans(1,1) =dom % blocks(b) % resolutions(1)
           end if
           if( (l1 .eq. 1).or.(l1 .eq. 2) ) then
             trans(2,1) =1
-          else                         
+          else
             trans(2,1) =dom % blocks(b) % resolutions(2)
           end if
 
@@ -191,15 +191,15 @@
           trans(3,1) =dom % blocks(b) % resolutions(3) + 1  ! nk from block + 1
           trans(3,2) =-1
           trans(1,2) = 0
-          trans(2,2) = 0 
+          trans(2,2) = 0
           if( (l1 .eq. 5).or.(l1 .eq. 7) ) then
             trans(1,1) =1
-          else                         
+          else
             trans(1,1) =dom % blocks(b) % resolutions(1)
           end if
           if( (l1 .eq. 5).or.(l1 .eq. 6) ) then
             trans(2,1) =1
-          else                         
+          else
             trans(2,1) =dom % blocks(b) % resolutions(2)
           end if
 
@@ -232,7 +232,7 @@
           call Domain_Mod_Distribute_Nodes(dom, grid,        &
                                 b, dom % lines(l) % weight,  &
                                 is, js, ks, ie, je, ke)
-        end if  
+        end if
 
       end if ! if the block contains
 
@@ -269,7 +269,7 @@
     !   it spans the dom % lines in the direction of higher weigh   !
     !---------------------------------------------------------------!
 
-    ! I (k=1) 
+    ! I (k=1)
     fc = 1   ! face index
     k = 1
     if( .not. Math_Mod_Approx_Real(  &
@@ -321,7 +321,7 @@
                               b, dom % blocks(b) % face_weights(fc,2),  &
                               i,1,k,i,nj,k)
       end do
-    end if 
+    end if
 
     ! III (i=ni)
     fc = 3   ! face index
@@ -330,7 +330,7 @@
               dom % blocks(b) % face_weights(fc,3),1.0 ) ) then
       do j=1,nj
         call Domain_Mod_Distribute_Nodes(dom, grid,                     &
-                              b, dom % blocks(b) % face_weights(fc,3),  & 
+                              b, dom % blocks(b) % face_weights(fc,3),  &
                               i,j,1,i,j,nk)
       end do
     else ! dom % lines in the j direction
@@ -339,9 +339,9 @@
                               b, dom % blocks(b) % face_weights(fc,2),  &
                               i,1,k,i,nj,k)
       end do
-    end if 
+    end if
 
-    ! II (j=1)       
+    ! II (j=1)
     fc = 2   ! face index
     j = 1
     if( .not. Math_Mod_Approx_Real(  &
@@ -359,7 +359,7 @@
       end do
     end if
 
-    ! IV (j=nj)       
+    ! IV (j=nj)
     fc = 4   ! face index
     j = nj
     if( .not. Math_Mod_Approx_Real(  &
@@ -423,14 +423,14 @@
     !   Set the control volume nodes (CellN)  !
     !    and  the control volume neighbours   !
     !-----------------------------------------!
-    ci = ni-1     
+    ci = ni-1
     cj = nj-1
     ck = nk-1
 
     do k=1,ck
       do j=1,cj
         do i=1,ci
-          c = grid % n_cells + (k-1)*ci*cj + (j-1)*ci + i ! cell 
+          c = grid % n_cells + (k-1)*ci*cj + (j-1)*ci + i ! cell
           n = grid % n_nodes + (k-1)*ni*nj + (j-1)*ni + i ! 1st node
 
           ! Nodes
@@ -445,7 +445,7 @@
 
           ! Neighbours
           grid % cells_c(1,c) = c-ci*cj
-          grid % cells_c(2,c) = c-ci 
+          grid % cells_c(2,c) = c-ci
           grid % cells_c(3,c) = c+1
           grid % cells_c(4,c) = c+ci
           grid % cells_c(5,c) = c-1
@@ -464,11 +464,11 @@
     end do
 
     ! Old number of nodes and cells
-    dom % blocks(b) % n_nodes = grid % n_nodes  
-    dom % blocks(b) % n_cells = grid % n_cells  
+    dom % blocks(b) % n_nodes = grid % n_nodes
+    dom % blocks(b) % n_cells = grid % n_cells
     grid % n_nodes = grid % n_nodes + ni*nj*nk
     grid % n_cells = grid % n_cells + ci*cj*ck
 
-  end do   ! through dom % blocks 
+  end do   ! through dom % blocks
 
   end subroutine
