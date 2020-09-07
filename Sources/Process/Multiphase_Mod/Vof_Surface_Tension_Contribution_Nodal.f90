@@ -22,7 +22,6 @@
   real                     :: dotprod, sxyz_mod, sxyz_control, fs, epsloc
   real                     :: d_n(3)     ! normal pointing to the wall
   real                     :: norm_grad  ! normal of a gradient
-  real                     :: cpc
 !==============================================================================!
 
   epsloc = epsilon(epsloc)
@@ -36,40 +35,94 @@
   nc = grid % n_cells
   nn = grid % n_nodes
 
-  cpc = 0.5
+  !-------------------------------!
+  !                               !
+  !   Distance function is used   !
+  !                               !
+  !-------------------------------!
   if(mult % d_func) then  ! using distance function
 
+    !----------------------------------------------------------------------!
+    !   Curvature smoothing was engaged                                    !
+    !                                                                      !
+    !   Smooth distance function (why n?) and store it in smooth_k array   !
+    !----------------------------------------------------------------------!
     if (mult % n_conv_curv > 0) then
       call Multiphase_Mod_Vof_Smooth_Scalar(grid, mult, mult % dist_func % n, &
                                      smooth_k(-nb:nc), mult % n_conv_curv)
+
+    !----------------------------------------------------------!
+    !   Curvature smoothing was not engaged                    !
+    !                                                          !
+    !   Store distance function's (why n?) in smooth_k array   !
+    !----------------------------------------------------------!
     else
       smooth_k(-nb:nc) = mult % dist_func % n
     end if
     call Field_Mod_Interpolate_Cells_To_Nodes(flow,                     &
                                         smooth_k(-nb:nc), var_node_k(1:nn))
 
+    !----------------------------------------------------------------------!
+    !   Smoothing of normal is engaged                                     !
+    !                                                                      !
+    !   Smooth distance function (why n?) and store it in smooth_n array   !
+    !----------------------------------------------------------------------!
     if (mult % n_conv_norm > 0) then
       call Multiphase_Mod_Vof_Smooth_Scalar(grid, mult, mult % dist_func % n, &
                                      smooth_n(-nb:nc), mult % n_conv_norm)
+
+    !-----------------------------------------------------------!
+    !   Smoothing of normal is not engaged                      !
+    !                                                           !
+    !   Store distance function's (why oo?) in smooth_n array   !
+    !-----------------------------------------------------------!
     else
       smooth_n(-nb:nc) = mult % dist_func % oo(-nb:nc)
     end if
     call Field_Mod_Interpolate_Cells_To_Nodes(flow,                     &
                                         smooth_n(-nb:nc), var_node_n(1:nn))
 
+  !-----------------------------!
+  !                             !
+  !   Volume of fluid is used   !
+  !                             !
+  !-----------------------------!
   else ! using VOF
+
+    !--------------------------------------------------------------------!
+    !   Curvature smoothing was engaged                                  !
+    !                                                                    !
+    !   Smooth volume of fluid function and store it in smooth_k array   !
+    !--------------------------------------------------------------------!
     if (mult % n_conv_curv > 0) then
       call Multiphase_Mod_Vof_Smooth_Scalar(grid, mult, vof % n, &
                                      smooth_k(-nb:nc), mult % n_conv_curv)
+
+    !------------------------------------------------------!
+    !   Curvature smoothing was not engaged                !
+    !                                                      !
+    !   Store volume of fluid function in smooth_k array   !
+    !------------------------------------------------------!
     else
       smooth_k(-nb:nc) = vof % n(-nb:nc)
     end if
     call Field_Mod_Interpolate_Cells_To_Nodes(flow,                     &
                                         smooth_k(-nb:nc), var_node_k(1:nn))
 
+    !--------------------------------------------------------------------!
+    !   Smoothing of normal is engaged                                   !
+    !                                                                    !
+    !   Smooth volume of fluid function and store it in smooth_n array   !
+    !--------------------------------------------------------------------!
     if (mult % n_conv_norm > 0) then
       call Multiphase_Mod_Vof_Smooth_Scalar(grid, mult, vof % n, &
                                      smooth_n(-nb:nc), mult % n_conv_norm)
+
+    !------------------------------------------------------!
+    !   Smoothing of normal is not engaged                 !
+    !                                                      !
+    !   Store volume of fluid function in smooth_n array   !
+    !------------------------------------------------------!
     else
       smooth_n(-nb:nc) = vof % n(-nb:nc)
     end if
@@ -78,6 +131,12 @@
 
   end if
 
+  !----------------------------------------------------------------------!
+  !                                                                      !
+  !   No matter what you did above, compute curvature from nodes using   !
+  !   the smoothed variable in smooth_k and nodal values in var_node_k   !
+  !                                                                      !
+  !----------------------------------------------------------------------!
   call Multiphase_Mod_Vof_Curvature_Nodal(grid, mult,  &
                                           smooth_k(-nb:nc), var_node_k(1:nn))
 
