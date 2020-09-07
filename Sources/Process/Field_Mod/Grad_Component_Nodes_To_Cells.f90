@@ -28,7 +28,7 @@
 
   ! Refresh buffers and nodal values
   call Grid_Mod_Exchange_Cells_Real(grid, phic)
-  call Field_Mod_Interpolate_Cells_To_Nodes(flow, phic, phin)
+  call Field_Mod_Interpolate_Nodes_To_Cells(flow, phin, phic)
 
   ! Initialize gradients
   phii(1:grid % n_cells) = 0.
