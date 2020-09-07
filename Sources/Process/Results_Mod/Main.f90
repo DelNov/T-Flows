@@ -73,7 +73,6 @@
       open (9, file='exit_now', status='old')
       close(9, status='delete')
     end if
-!   goto 2
   end if
 
   end subroutine
