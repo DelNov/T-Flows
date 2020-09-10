@@ -30,10 +30,12 @@
 
   n = max( (ie-is), (je-js),  (ke-ks) )
 
+  if(n < 2) return
+
   !-------------------------!
   !   Linear distribution   !
   !-------------------------!
-  if(w  > 0.0) then
+  if(w > 0.0) then
     ddt = ( 2.0*(1.0-w) ) / ( 1.0*n*(1.0*n-1.0)*(1.0+w) )
     t=0.0
     do i=is,ie
