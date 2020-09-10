@@ -22,7 +22,8 @@
   nc = grid % n_cells
   nf = grid % n_faces
 
-  call Var_Mod_Allocate_Solution(mult % vof, grid, 'VOF', '')
+  call Var_Mod_Allocate_Solution(mult % vof,    grid, 'VOF', '')
+  call Var_Mod_Allocate_New_Only(mult % smooth, grid, 'SMO')
 
   if(mult % d_func) then
     call Var_Mod_Allocate_Solution(mult % dist_func, grid, 'D_FUNC', '')
