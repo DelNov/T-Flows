@@ -2,12 +2,10 @@
   subroutine Multiphase_Mod_Vof_Surface_Tension_Contribution_Csf(mult)
 !------------------------------------------------------------------------------!
 !   Computes the Curvature based on Brackbill's CSF approach                   !
+!   In reality, it smooths the vof function and computes its gradients         !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: grad_nx    => r_cell_03,  & ! grad on x of vof for normal
-                      grad_ny    => r_cell_04,  & ! grad on y of vof for normal
-                      grad_nz    => r_cell_05,  & ! grad on z of vof for normal
-                      grad_kx    => r_cell_06,  & ! grad on x of vof for curvat
+  use Work_Mod, only: grad_kx    => r_cell_06,  & ! grad on x of vof for curvat
                       grad_ky    => r_cell_07,  & ! grad on y of vof for curvat
                       grad_kz    => r_cell_08
 !------------------------------------------------------------------------------!
@@ -74,20 +72,15 @@
     !   Smoothing of normal is engaged                                !
     !                                                                 !
     !   Smooth distance function (why oo?), compute its gradients,    !
-    !   store them intermediatelly in grad_nx, grad_ny and grad_nz,   !
-    !   and then store them in vof % x, vof % y and vof % z.          !
-    !   Don't use again the grad_nx, grad_ny and grad_nz.             !
+    !   store them in vof % x, vof % y and vof % z.                   !
     !-----------------------------------------------------------------!
     if (mult % n_conv_norm > 0) then
       call Multiphase_Mod_Vof_Smooth_Scalar(grid, mult, mult % dist_func % oo, &
                                      smooth % n(-nb:nc), mult % n_conv_norm)
 
-      call Field_Mod_Grad(flow, smooth % n(-nb:nc), grad_nx(-nb:nc),  &
-                                                    grad_ny(-nb:nc),  &
-                                                    grad_nz(-nb:nc))
-      vof % x(-nb:nc) = grad_nx(-nb:nc)
-      vof % y(-nb:nc) = grad_ny(-nb:nc)
-      vof % z(-nb:nc) = grad_nz(-nb:nc)
+      call Field_Mod_Grad(flow, smooth % n(-nb:nc), vof % x(-nb:nc),  &
+                                                    vof % y(-nb:nc),  &
+                                                    vof % z(-nb:nc))
     else
       call Field_Mod_Grad(flow, mult % dist_func % oo, vof % x,  &
                                                        vof % y,  &
@@ -127,25 +120,19 @@
       grad_kz(-nb:nc) = vof % z(-nb:nc)
     end if
 
-    !-----------------------------------------------------------------!
-    !   Smoothing of normal is engaged                                !
-    !                                                                 !
-    !   Smooth volume of fluid function, compute its gradients,       !
-    !   store them intermediatelly in grad_nx, grad_ny and grad_nz,   !
-    !   and then store them in vof % x, vof % y and vof % z.          !
-    !   Don't use again the grad_nx, grad_ny and grad_nz.             !
-    !-----------------------------------------------------------------!
+    !-------------------------------------------------------------!
+    !   Smoothing of normal is engaged                            !
+    !                                                             !
+    !   Smooth volume of fluid function, compute its gradients,   !
+    !   store them in vof % x, vof % y and vof % z.               !
+    !-------------------------------------------------------------!
     if (mult % n_conv_norm > 0) then
       call Multiphase_Mod_Vof_Smooth_Scalar(grid, mult, vof % n,   &
                                      smooth % n(-nb:nc), mult % n_conv_norm)
 
-      call Field_Mod_Grad(flow, smooth % n(-nb:nc), grad_nx(-nb:nc),  &
-                                                    grad_ny(-nb:nc),  &
-                                                    grad_nz(-nb:nc))
-
-      vof % x(-nb:nc) = grad_nx(-nb:nc)
-      vof % y(-nb:nc) = grad_ny(-nb:nc)
-      vof % z(-nb:nc) = grad_nz(-nb:nc)
+      call Field_Mod_Grad(flow, smooth % n(-nb:nc), vof % x(-nb:nc),  &
+                                                    vof % y(-nb:nc),  &
+                                                    vof % z(-nb:nc))
     end if
   end if
 
@@ -153,11 +140,10 @@
   !                                                      !
   !   No matter what you did above, compute curvature    !
   !   using the smoothed variable and gradients stored   !
-  !   in grad_nx, grad_ny and grad_nz                    !
+  !   in vof % x, vof % y and vof % z                    !
   !                                                      !
   !------------------------------------------------------!
-  call Multiphase_Mod_Vof_Curvature_Csf(grid, mult,                  &
-                grad_kx(-nb:nc), grad_ky(-nb:nc), grad_kz(-nb:nc),   &
-                smooth % n(-nb:nc))
+  call Multiphase_Mod_Vof_Curvature_Csf(mult,                  &
+                grad_kx(-nb:nc), grad_ky(-nb:nc), grad_kz(-nb:nc))
 
   end subroutine
