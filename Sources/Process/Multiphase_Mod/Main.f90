@@ -20,7 +20,7 @@
     ! Front tracking is not engaged
     if(.not. mult % track_front) then
       call Update_Boundary_Values(flow, turb, mult)
-      call Multiphase_Mod_Compute_Vof(mult, sol, flow % dt, n)
+      call Multiphase_Mod_Vof_Compute(mult, sol, flow % dt, n)
       call Field_Mod_Body_Forces(flow)
       call Multiphase_Averaging(flow, mult, mult % vof)
 

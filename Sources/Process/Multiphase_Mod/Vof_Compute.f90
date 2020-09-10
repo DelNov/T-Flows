@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Compute_Vof(mult, sol, dt, n)
+  subroutine Multiphase_Mod_Vof_Compute(mult, sol, dt, n)
 !------------------------------------------------------------------------------!
 !   Solves Volume Fraction equation using UPWIND ADVECTION and CICSAM          !
 !------------------------------------------------------------------------------!
