@@ -265,14 +265,4 @@
   part % st = swarm % density * (0.017046**2)       &
             * (part % d)**2 / 18.0 / visc_const**2
 
-  !----------------------------------------------!
-  !                                              !
-  !   If particle is close to a boundary cell,   !
-  !    handle its interaction with boundaries    !
-  !                                              !
-  !----------------------------------------------!
-  if(c2 .ne. 0) then
-    call Swarm_Mod_Bounce_Particle(swarm, k)
-  end if
-
   end subroutine

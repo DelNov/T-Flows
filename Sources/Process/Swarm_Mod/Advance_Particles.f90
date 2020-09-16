@@ -92,6 +92,9 @@
           ! (also calls Bounce_Particle)
           call Swarm_Mod_Move_Particle(swarm, k)
 
+          ! Handle its interaction with boundaries
+          call Swarm_Mod_Bounce_Particle(swarm, k)
+
           ! Calling particle forces subroutine to ...
           ! ... compute the forces on each particle and store it
           call Swarm_Mod_Particle_Forces(swarm, k)
