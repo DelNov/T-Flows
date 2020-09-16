@@ -136,12 +136,17 @@
       part % cfl = swarm % r_work(i + 11)
     end do
 
-    !---------------------------------------------------------!
-    !                                                         !
-    !   Refresh buffers for grid-base variables here          !
-    !   (This is probably not needed, but it won't do harm)   !
-    !                                                         !
-    !---------------------------------------------------------!
+    !-------------------------------------------------------!
+    !                                                       !
+    !   Refresh buffers for grid-base variables here        !
+    !   (This is probably only needed for post-processing   !
+    !    if buffers are plotted as well, but it is fine.)   !
+    !                                                       !
+    !-------------------------------------------------------!
+    call Grid_Mod_Exchange_Cells_Real(grid, swarm % n_reflected)
+    call Grid_Mod_Exchange_Cells_Real(grid, swarm % n_deposited)
+    call Grid_Mod_Exchange_Cells_Real(grid, swarm % n_escaped)
+
     if(swarm % statistics) then
       call Grid_Mod_Exchange_Cells_Int (grid, swarm % n_states)
       call Grid_Mod_Exchange_Cells_Real(grid, swarm % u_mean)
