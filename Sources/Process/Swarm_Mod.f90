@@ -37,7 +37,6 @@
     integer :: cell
     integer :: node
     integer :: bnd_cell
-    integer :: bnd_face
 
     ! Particle relative velocity components and magnitude
     real :: rel_u
