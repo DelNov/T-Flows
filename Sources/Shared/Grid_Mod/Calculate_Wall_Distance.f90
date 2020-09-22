@@ -52,7 +52,7 @@
 
       ! Write progress and stay in the same line
       ! (achieved with advance='no' and achar(13))
-      write(*,'(a2,f5.0,a14,a1)',advance='no'),                 &
+      write(*,'(a2,f5.0,a14,a1)',advance='no')                  &
         ' #',                                                   &
         (100. * processed_cells                                 &
                / (1.0*(grid % n_bnd_cells + grid % n_cells))),  &
