@@ -23,8 +23,9 @@
     type(Field_Type), pointer :: pnt_flow  ! flow field for which it is defined
     type(Surf_Type)           :: surf      ! pointer to surface
 
-    ! Volume fraction (colour function)
+    ! Volume fraction (colour function) and its smooth variant
     type(Var_Type) :: vof
+    type(Var_Type) :: smooth
 
     ! Surface curvature
     real, allocatable :: curv(:)

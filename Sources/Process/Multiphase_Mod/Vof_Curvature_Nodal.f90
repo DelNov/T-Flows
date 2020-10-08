@@ -224,7 +224,7 @@
 
   call Grid_Mod_Exchange_Cells_Real(grid, mult % curv(-nb:nc))
 
-  call Multiphase_Mod_Vof_Smooth_Curvature(grid, mult,              &
+  call Multiphase_Mod_Vof_Smooth_Curvature(mult,              &
                       div_x(-nb:nc), div_y(-nb:nc), div_z(-nb:nc))
 
   end subroutine
