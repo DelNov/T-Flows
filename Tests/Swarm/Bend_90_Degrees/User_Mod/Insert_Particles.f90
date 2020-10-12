@@ -13,56 +13,61 @@
   real,                  intent(in) :: time      ! physical time
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: grid
-  integer :: k, n_parts_in_buffers, j, l, n_t, n_r, c, n_psr 
-  real    :: dx, theta, theta_inc, sign_x, sign_z, rx, ry, rz
+  integer                  :: i, j, k, l, n_parts_in_buffers, n_r, c
+  real                     :: rx, ry, rz, r, theta, d_r, d_theta, x, z
 !==============================================================================!
 
   ! Take alias(es)
   grid => flow % pnt_grid
 
+  n_r = 40
+
   !-------------------!
   !   1st time step   !
   !-------------------!
+  if(n .eq. 4001) then     ! should be after the flow is developed
 
-  n_psr     = int(sqrt(1. * swarm % n_particles))  ! sqrt(n_particles)
-  n_r       = n_psr  ! number of nodes in azimuthal direction  (rotational)
-  n_t       = n_psr  ! number of nodes in the radial direction (translational)
-  theta_inc = 2.0 * PI / n_r
+    ! First particle in the center
+    l = 1
+    swarm % particle(l) % x_n =  0.0
+    swarm % particle(l) % y_n =  0.0399999
+    swarm % particle(l) % z_n =  0.0
 
-  if(n .eq. 2001) then     ! should be after the flow is developed
+    d_r = 0.0085 / (n_r - 2)
 
     ! Place the particles where you want them
     ! Theta loop
-    do j = 1, n_r
+    do i = 1, n_r - 1
+      r = i * d_r
+      d_theta = 2.0 * PI / (i * 6)
+      do j = 1, i * 6
+        theta = (j-1) * d_theta
+        x = r * cos(theta)
+        z = r * sin(theta)
 
-      do k = 1, n_t
+        l = l + 1
+        swarm % particle(l) % x_n = x
+        swarm % particle(l) % y_n = 0.0399
+        swarm % particle(l) % z_n = z
+      end do
+    end do
 
-      ! particle index (1, 11, 21, 31, .... 2, 12, 22, 32, ....)
-      l = (k - 1) * n_r + j
+    if(l <= 10000) then
+      if(this_proc < 2) then
+        print *, '# @User_Mod_Insert_Particles: inserted', l, ' particles'
+      end if
+      swarm % n_particles = l
+    else
+      if(this_proc < 2) then
+        print *, '# @User_Mod_Insert_Particles: too many patrticles, reduce n_r'
+        call Comm_Mod_End
+        stop
+      end if
+    end if
 
-      ! Increasing theta (to swipe the area of the inlet)
-      theta =  (j - 1) * theta_inc
+    do l = 1, swarm % n_particles
 
-      if(theta .ge. 0.0 .and. theta .lt. 90.0) then
-        sign_x =  1.0
-        sign_z = -1.0
-      else if(theta .ge. 90.0 .and. theta .lt. 180.0) then 
-        sign_x = -1.0
-        sign_z = -1.0
-      else if(theta .ge. 180.0 .and. theta .lt. 270.0) then
-        sign_x = -1.0
-        sign_z =  1.0
-      else
-        sign_x =  1.0
-        sign_z =  1.0
-      end if 
-
-      ! Placing particles (only at the 1st time step)
-      swarm % particle(l) % x_n = (0.009/n_psr) * cos(theta) * sign_x * k
-      swarm % particle(l) % y_n =  0.138
-      swarm % particle(l) % z_n = (0.009/n_psr) * sin(theta) * sign_z * k
-
-      ! you essentially moved them a lot (from 0, 0, 0)
+      ! You essentially moved them a lot (from 0, 0, 0)
       swarm % particle(l) % cell = 0 
       swarm % particle(l) % node = 0 
       swarm % particle(l) % proc = 0 
@@ -102,7 +107,6 @@
          + flow % w % y(c) * ry  &  ! w % y is gradient dw/dy
          + flow % w % z(c) * rz     ! w % x is gradient dw/dz
 
-      end do
     end do
 
   end if
