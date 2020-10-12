@@ -9,7 +9,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: grid
   type(Particle_Type), pointer :: part
-  integer                      :: k, n_dep, n_ref, n_esc
+  integer                      :: k, c, n_dep, n_ref, n_esc
   real                         :: avg_cfl, avg_re, avg_st
   real                         :: max_cfl, max_re, max_st
   character(DL)                :: line
@@ -50,9 +50,16 @@
   avg_re  = avg_re  / swarm % n_particles
   avg_st  = avg_st  / swarm % n_particles
 
-  n_dep = nint(sum(swarm % n_deposited(:)))
-  n_esc = nint(sum(swarm % n_escaped(:)))
-  n_ref = nint(sum(swarm % n_reflected(:)))
+  n_dep = 0
+  n_esc = 0
+  n_ref = 0
+  do c = -grid % n_bnd_cells, -1
+    if(grid % comm % cell_proc(c) .eq. this_proc) then  ! avoid buffer cells
+      n_dep = n_dep + nint(swarm % n_deposited(c))
+      n_esc = n_esc + nint(swarm % n_escaped(c))
+      n_ref = n_ref + nint(swarm % n_reflected(c))
+    end if
+  end do
   call Comm_Mod_Global_Sum_Int(n_dep)
   call Comm_Mod_Global_Sum_Int(n_esc)
   call Comm_Mod_Global_Sum_Int(n_ref)
