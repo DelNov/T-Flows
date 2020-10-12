@@ -366,16 +366,13 @@
     !   Volume fraction   !
     !---------------------!
     if(mult % model .eq. VOLUME_OF_FLUID) then
-      call Save_Scalar_Real(grid, "VofSharp", plot_inside,                  &
+      call Save_Scalar_Real(grid, "VolumeFraction", plot_inside,            &
                                   mult % vof % n(-grid % n_bnd_cells),      &
                                   f8, f9, data_offset, run)
-      call Save_Scalar_Real(grid, "VofSmooth", plot_inside,                 &
-                                  mult % smooth % n(-grid % n_bnd_cells),   &
-                                  f8, f9, data_offset, run)
-      call Save_Scalar_Real(grid, "VofCurvature", plot_inside,              &
+      call Save_Scalar_Real(grid, "Curvature", plot_inside,                 &
                                   mult % curv(-grid % n_bnd_cells),         &
                                   f8, f9, data_offset, run)
-      call Save_Vector_Real(grid, "VofSurfaceTensionForce", plot_inside,    &
+      call Save_Vector_Real(grid, "SurfaceTensionForce", plot_inside,       &
                                   mult % surf_fx(-grid % n_bnd_cells),      &
                                   mult % surf_fy(-grid % n_bnd_cells),      &
                                   mult % surf_fz(-grid % n_bnd_cells),      &
