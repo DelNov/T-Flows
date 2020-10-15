@@ -250,10 +250,24 @@
             phi % res)
   call Cpu_Timer_Mod_Stop('Linear_Solver_For_Turbulence')
 
+  ! Avoid negative values for all computed turbulent quantities
   do c = 1, grid % n_cells
     if( phi % n(c) < 0.0 ) phi % n(c) = phi % o(c)
-    if(phi % name .eq. 'ZETA')  phi % n(c) = min(phi % n(c), 1.8) 
   end do
+
+  ! Don't allow turbulent kinetic energy to fall under 1.0e-6
+  if(turb % model .eq. K_EPS .and. phi % name .eq. 'KIN') then
+    do c = 1, grid % n_cells
+      phi % n(c) = max(phi % n(c), MICRO)
+    end do
+  end if
+
+  ! Set the lower limit of zeta to 1.8
+  if(phi % name .eq. 'ZETA') then
+    do c = 1, grid % n_cells
+      phi % n(c) = min(phi % n(c), 1.8)
+    end do
+  end if
 
   ! Print info on the screen
   if(turb % model .eq. K_EPS        .or.  &
