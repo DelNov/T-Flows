@@ -156,7 +156,7 @@
         vis_t_p(i) = vis_t_p(i) + vis_t(c) / visc_const
         y_plus_p(i)= y_plus_p(i) + turb % y_plus(c)
 
-        if(turbulence_model .eq. K_EPS_ZETA_F) then
+        if(turb % model .eq. K_EPS_ZETA_F) then
           f22_p(i)  = f22_p(i) + f22  % n(c)
           zeta_p(i) = zeta_p(i) + zeta % n(c)
         end if
@@ -322,7 +322,7 @@
       'correlation of Dittus-Boelter is used.' 
     end if
 
-    if(turbulence_model .eq. K_EPS) then
+    if(turb % model .eq. K_EPS) then
       if(heat_transfer) then
         write(i,'(a1,2X,A60)') '#',  ' r,'                    //  &  !  1
                                      ' w,'                    //  &  !  2
@@ -334,7 +334,7 @@
                                     ' w,'                    //  &       !  2
                                     ' kin, eps, uw, vis_t/visc_const'  !  3-6
       end if
-    else if(turbulence_model .eq. K_EPS_ZETA_F) then
+    else if(turb % model .eq. K_EPS_ZETA_F) then
       if(heat_transfer) then
         write(i,'(a1,2X,A60)') '#',  ' r,'                    //  &  !  1
                                      ' w,'                    //  &  !  2
@@ -395,7 +395,7 @@
     eps_p (i) = eps_p(i)*visc_const / (u_tau_p**4*dens_const)  ! eps%n(c)
     uw_p  (i) = uw_p (i) / (u_tau_p**2*dens_const)    ! vis_t(c)*(u%z(c)+w%x(c))
 
-    if(turbulence_model .eq. K_EPS_ZETA_F) then
+    if(turb % model .eq. K_EPS_ZETA_F) then
       f22_p(i) = f22_p(i) * visc_const / u_tau_p**2  ! f22%n(c)
     end if
  
