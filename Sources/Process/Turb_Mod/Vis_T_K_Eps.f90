@@ -73,8 +73,8 @@
     f_mu = min(1.0,f_mu)
 
     turb % vis_t(c) = min(f_mu * c_mu * flow % density(c) * kin % n(c)**2  &
-                      / (eps % n(c) + TINY), 0.6*kin % n(c)                &
-                      / (sqrt(6.0)*c_mu*flow % shear(c) + TINY)) 
+                    / (eps % n(c) + TINY), 0.6*kin % n(c)                  &
+                    / (sqrt(6.0)*c_mu*flow % shear(c) + TINY)) 
   end do
 
   do s = 1, grid % n_faces
