@@ -15,13 +15,16 @@
   integer                       :: ini       ! current inner iteration
   real                          :: mass_res
 !-----------------------------------[Locals]-----------------------------------!
-  type(Matrix_Type), pointer :: a
   type(Grid_Type),   pointer :: grid
+  type(Var_Type),    pointer :: u, v, w
+  type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
   integer                    :: corr_steps
 !==============================================================================!
 
+  ! Take aliases
   grid => flow % pnt_grid
+  call Field_Mod_Alias_Momentum(flow, u, v, w)
   call Solver_Mod_Alias_System(sol, a, b)
 
   if (flow % p_m_coupling == PISO) then
@@ -48,7 +51,9 @@
       call Multiphase_Averaging(flow, mult, flow % w)
     end do
     flow % piso_status = .false.
-    call Multiphase_Mod_Vof_Scale_Residuals(mult, sol, ini, .true.)
+    call Info_Mod_Iter_Fill_At(1, 1, u % name, u % eniter, u % res)
+    call Info_Mod_Iter_Fill_At(1, 2, v % name, v % eniter, v % res)
+    call Info_Mod_Iter_Fill_At(1, 3, w % name, w % eniter, w % res)
     flow % i_corr = 1
   end if
 

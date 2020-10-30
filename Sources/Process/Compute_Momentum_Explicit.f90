@@ -48,15 +48,6 @@
 
     call Field_Mod_Grad_Variable(flow, ui)
 
-    if (flow % i_corr == flow % n_piso_corrections) then
-      res(:) = 0.0
-      nt = grid % n_cells
-      ni = grid % n_cells - grid % comm % n_buff_cells
-      call Residual_Vector(ni, res(1:nt), b(1:nt), a, ui % n(1:nt))
-      ui % res_scal = sum(abs(res(1:ni)))
-      call Comm_Mod_Global_Sum_Real(ui % res_scal)
-    end if
-
   end if
 
   end subroutine

@@ -207,32 +207,13 @@
   !-------------------------------------!
   call Field_Mod_Correct_Fluxes_With_Body_Forces(flow, sol)
 
-  ! Compute mass error for SIMPLE
-  if (flow % p_m_coupling == SIMPLE) then
-    mass_err = 0.0
-    do c = 1, grid % n_cells
-      mass_err = max(mass_err, abs(b(c)))
-    end do
-
-  ! Compute mass error for PISO
-  else if (flow % p_m_coupling == PISO) then
-    mass_err = 0.0
-    do c = 1, grid % n_cells - grid % comm % n_buff_cells
-      mass_err = mass_err + abs(b(c))
-    end do
-    call Comm_Mod_Global_Sum_Real(mass_err)
-    if (flow % i_corr == flow % n_piso_corrections) then
-      flow % p % res = mass_err
-      if (ini == 1) then
-        flow % p % res_scal0 = mass_err
-      else
-        if (ini < 6) then
-          flow % p % res_scal0 = max(flow % p % res_scal0, mass_err)
-        end if
-      end if
-      flow % p % res = flow % p % res / (flow % p % res_scal0 + PICO)
-    end if
-  end if
+  ! Compute mass error
+  mass_err = 0.0
+  do c = 1, grid % n_cells - grid % comm % n_buff_cells
+    mass_err = mass_err + abs(b(c))
+  end do
+  call Comm_Mod_Global_Sum_Real(mass_err)
+  flow % p % res = mass_err
 
   ! Get solver
   call Control_Mod_Solver_For_Pressure(solver)
