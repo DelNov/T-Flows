@@ -9,14 +9,13 @@
   real                     :: phic( -flow % pnt_grid % n_bnd_cells  &
                                     :flow % pnt_grid % n_cells)
   real                     :: phin(1:flow % pnt_grid % n_nodes)
-  integer                  :: i
-  real,   intent(out)      :: phii( -flow % pnt_grid % n_bnd_cells  &
+  integer, intent(in)      :: i
+  real,    intent(out)     :: phii( -flow % pnt_grid % n_bnd_cells  &
                                     :flow % pnt_grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer           :: grid
-  integer                            :: n, c, i_nod
-  real                               :: dx, dy, dz, dphi
-  logical                            :: imp_sym
+  type(Grid_Type), pointer :: grid
+  integer                  :: n, c, i_nod
+  real                     :: dx, dy, dz, dphi
 !-----------------------------[Local parameters]-------------------------------!
   integer, dimension(3,3), parameter :: MAP = reshape((/ 1, 4, 5,  &
                                                          4, 2, 6,  &
@@ -26,9 +25,8 @@
   ! Take alias
   grid => flow % pnt_grid
 
-  ! Refresh buffers and nodal values
-  call Grid_Mod_Exchange_Cells_Real(grid, phic)
-  call Field_Mod_Interpolate_Nodes_To_Cells(flow, phin, phic)
+  ! Do not refresh buffers and nodal values because
+  ! curvature at the walls are imposed outside
 
   ! Initialize gradients
   phii(1:grid % n_cells) = 0.
