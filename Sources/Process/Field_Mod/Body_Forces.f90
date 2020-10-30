@@ -61,6 +61,9 @@
       dens_f = flow % density(c1) *        grid % fw(s)  &
              + flow % density(c2) * (1.0 - grid % fw(s))
 
+      ! Substract reference density
+      dens_f = dens_f - dens_ref
+
       dotprod = (   (grid % xf(s) - xc1) * grav_x    &
                   + (grid % yf(s) - yc1) * grav_y    &
                   + (grid % zf(s) - zc1) * grav_z )

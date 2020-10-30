@@ -375,21 +375,20 @@
       call Save_Scalar_Real(grid, "VofCurvature", plot_inside,              &
                                   mult % curv(-grid % n_bnd_cells),         &
                                   f8, f9, data_offset, run)
-      call Save_Vector_Real(grid, "VofSurfaceTensionForce", plot_inside,    &
-                                  mult % surf_fx(-grid % n_bnd_cells),      &
-                                  mult % surf_fy(-grid % n_bnd_cells),      &
-                                  mult % surf_fz(-grid % n_bnd_cells),      &
+      call Save_Vector_Real(grid, "VofSurfaceNormals", plot_inside,  &
+                                  mult % nx(-grid % n_bnd_cells),    &
+                                  mult % ny(-grid % n_bnd_cells),    &
+                                  mult % nz(-grid % n_bnd_cells),    &
+                                  f8, f9, data_offset, run)
+      call Save_Vector_Real(grid, "VofSurfaceTensionForce", plot_inside,  &
+                                  mult % surf_fx(-grid % n_bnd_cells),    &
+                                  mult % surf_fy(-grid % n_bnd_cells),    &
+                                  mult % surf_fz(-grid % n_bnd_cells),    &
                                   f8, f9, data_offset, run)
       if (allocated(mult % flux_rate)) then
         call Save_Scalar_Real(grid, "FluxRate ", plot_inside,               &
                                     mult % flux_rate(-grid % n_bnd_cells),  &
                                     f8, f9, data_offset, run)
-      end if
-
-      if (mult % d_func) then
-        call Save_Scalar_Real(grid, "DistanceFunction", plot_inside,      &
-                              mult % dist_func % n(-grid % n_bnd_cells),  &
-                              f8, f9, data_offset, run)
       end if
     end if
 

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Main(mult, flow, turb, sol, n)
+  subroutine Multiphase_Mod_Vof_Main(mult, flow, turb, sol, n)
 !------------------------------------------------------------------------------!
 !   Initialize inteface tracking simulations                                   !
 !------------------------------------------------------------------------------!

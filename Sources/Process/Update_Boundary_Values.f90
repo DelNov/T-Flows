@@ -10,8 +10,7 @@
   use Turb_Mod
   use Grid_Mod
   use Control_Mod
-  use Multiphase_Mod, only: Multiphase_Type, Multiphase_Mod_Alias_Vof,  &
-                            VOLUME_OF_FLUID
+  use Multiphase_Mod, only: Multiphase_Type, VOLUME_OF_FLUID
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -32,9 +31,9 @@
   ! Take aliases
   grid => flow % pnt_grid
   vis  => turb % vis
+  vof  => mult % vof
   call Field_Mod_Alias_Momentum   (flow, u, v, w)
   call Field_Mod_Alias_Energy     (flow, t)
-  call Multiphase_Mod_Alias_Vof   (mult, vof)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
   call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
   call Turb_Mod_Alias_T2          (turb, t2)

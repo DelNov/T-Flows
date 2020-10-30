@@ -130,7 +130,7 @@
     call Field_Mod_Allocate(flow(d), grid(d))
     call Turb_Mod_Allocate(turb(d), flow(d))
     call Swarm_Mod_Allocate(swarm(d), flow(d), turb(d))
-    call Multiphase_Mod_Allocate(mult(d), flow(d))
+    call Multiphase_Mod_Vof_Allocate(mult(d), flow(d))
     call User_Mod_Allocate(grid(d))
 
     ! Read time step from root
@@ -184,7 +184,7 @@
       if (read_backup(d))  then
         flow % piso_status = .false.
       end if
-      call Multiphase_Mod_Update_Physical_Properties(mult(d), read_backup(d))
+      call Multiphase_Mod_Vof_Physical_Properties(mult(d), read_backup(d))
     end if
 
     ! Initialize monitoring points
@@ -281,13 +281,13 @@
 
       ! Interface tracking
       if(mult(d) % model .eq. VOLUME_OF_FLUID) then
-        call Multiphase_Mod_Main(mult(d), flow(d), turb(d), sol(d), curr_dt)
+        call Multiphase_Mod_Vof_Main(mult(d), flow(d), turb(d), sol(d), curr_dt)
         if(mult(d) % track_front) then
           call Results_Mod_Save_Surf(mult(d) % surf, curr_dt)
           call Results_Mod_Save(flow(d), turb(d), mult(d), swarm(d), curr_dt,  &
                                 plot_inside=.true., domain=d)
         end if
-        call Multiphase_Mod_Update_Physical_Properties(mult(d), read_backup(d))
+        call Multiphase_Mod_Vof_Physical_Properties(mult(d), read_backup(d))
       end if
 
       ! Lagrangian particle tracking

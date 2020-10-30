@@ -14,7 +14,7 @@
 !-----------------------------------[Locals]---------------------------------!
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
-  type(Var_Type),    pointer :: vof
+  type(Var_Type),    pointer :: col
   type(Face_Type),   pointer :: v_flux
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
@@ -28,7 +28,8 @@
   ! Take aliases
   flow    => mult % pnt_flow
   grid    => mult % pnt_grid
-  vof     => mult % vof
+  ! col     => mult % smooth
+  col     => mult % vof
   surf_fx => mult % surf_fx
   surf_fy => mult % surf_fy
   surf_fz => mult % surf_fz
@@ -46,7 +47,7 @@
         do c = 1, grid % n_cells
           surf_fx(c) = mult % surface_tension  &
                      * mult % curv(c)          &
-                     * vof % x(c)              &
+                     * col % x(c)              &
                      * grid % vol(c)
           b(c) = b(c) + surf_fx(c)
          end do
@@ -54,7 +55,7 @@
         do c = 1, grid % n_cells
           surf_fy(c) = mult % surface_tension  &
                      * mult % curv(c)          &
-                     * vof % y(c)              &
+                     * col % y(c)              &
                      * grid % vol(c)
           b(c) = b(c) + surf_fy(c)
         end do
@@ -62,7 +63,7 @@
         do c = 1, grid % n_cells
           surf_fz(c) = mult % surface_tension  &
                      * mult % curv(c)          &
-                     * vof % z(c)              &
+                     * col % z(c)              &
                      * grid % vol(c)
           b(c) = b(c) + surf_fz(c)
         end do

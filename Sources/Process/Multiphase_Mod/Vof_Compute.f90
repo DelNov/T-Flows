@@ -257,27 +257,18 @@
 
   call Field_Mod_Grad_Variable(flow, vof)
 
-  ! If distance function is calculated
-  if (mult % d_func) then
-    call Multiphase_Mod_Vof_Compute_Distance(mult, sol, flow % dt, n)
-  end if
-
   !----------------------------------------!
   !   Surface Tension Force Contribution   !
   !----------------------------------------!
 
-  if (mult % surface_tension > TINY ) then
-    if (mult % nodal_curvature) then
-      call Multiphase_Mod_Vof_Surface_Tension_Contribution_Nodal(mult)
-    else
-      call Multiphase_Mod_Vof_Surface_Tension_Contribution_Csf(mult)
-    end if
+  if(mult % surface_tension > TINY) then
+    call Multiphase_Mod_Vof_Surface_Tension_Contribution_Csf(mult)
   end if
 
   !-----------------------!
   !   Update properties   !
   !-----------------------!
-  call Multiphase_Mod_Update_Physical_Properties(mult, .false.)
+  call Multiphase_Mod_Vof_Physical_Properties(mult, .false.)
 
   call Cpu_Timer_Mod_Stop('Compute_Multiphase (without solvers)')
 

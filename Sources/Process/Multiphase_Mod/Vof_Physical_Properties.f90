@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Update_Physical_Properties(mult, backup)
+  subroutine Multiphase_Mod_Vof_Physical_Properties(mult, backup)
 !------------------------------------------------------------------------------!
 !   Update physical properties based on volume fraction variable               !
 !------------------------------------------------------------------------------!
@@ -10,25 +10,26 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: grid
   type(Field_Type), pointer :: flow
-  type(Var_Type),   pointer :: vof
+  type(Var_Type),   pointer :: col
   integer                   :: c, s, c1, c2
 !==============================================================================!
 
   ! Take aliases
   flow  => mult % pnt_flow
   grid  => flow % pnt_grid
-  vof   => mult % vof
+  col   => mult % vof
+  ! col   => mult % smooth
 
   ! Density and viscosity in cells
   do c = 1, grid % n_cells
-    flow % density(c)      = vof % n(c)         * mult % phase_dens(1)      &
-                           + (1.0 - vof % n(c)) * mult % phase_dens(2)
-    flow % viscosity(c)    = vof % n(c)         * mult % phase_visc(1)      &
-                           + (1.0 - vof % n(c)) * mult % phase_visc(2)
-    flow % capacity(c)     = vof % n(c)         * mult % phase_capa(1)      &
-                           + (1.0 - vof % n(c)) * mult % phase_capa(2)
-    flow % conductivity(c) = vof % n(c)         * mult % phase_cond(1)      &
-                           + (1.0 - vof % n(c)) * mult % phase_cond(2)
+    flow % density(c)      = col % n(c)         * mult % phase_dens(1)      &
+                           + (1.0 - col % n(c)) * mult % phase_dens(2)
+    flow % viscosity(c)    = col % n(c)         * mult % phase_visc(1)      &
+                           + (1.0 - col % n(c)) * mult % phase_visc(2)
+    flow % capacity(c)     = col % n(c)         * mult % phase_capa(1)      &
+                           + (1.0 - col % n(c)) * mult % phase_capa(2)
+    flow % conductivity(c) = col % n(c)         * mult % phase_cond(1)      &
+                           + (1.0 - col % n(c)) * mult % phase_cond(2)
   end do
 
   ! At boundaries (this shouldn't be needed with proper interpolation)

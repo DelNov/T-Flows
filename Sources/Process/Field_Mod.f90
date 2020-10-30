@@ -108,8 +108,9 @@
   ! Gravity
   real :: grav_x, grav_y, grav_z
 
-  ! Reference temperature
+  ! Reference temperature and density
   real :: t_ref
+  real :: dens_ref
 
   contains
 
