@@ -11,6 +11,8 @@
   implicit none
 !==============================================================================!
 
+  include 'User_Mod/Types.f90'
+
   contains
 
   include 'User_Mod/Allocate.f90'
