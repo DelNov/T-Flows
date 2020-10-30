@@ -1,13 +1,16 @@
 !==============================================================================!
-  subroutine Control_Mod_Factor_Number_Cells_Distance_Function_Vof(val, verbose)
+  subroutine Control_Mod_Reference_Density(d_ref, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real              :: val
+  real              :: d_ref
   logical, optional :: verbose
+!-----------------------------------[Locals]-----------------------------------!
+  real :: def
 !==============================================================================!
 
-  call Control_Mod_Read_Real_Item('FACTOR_NUMBER_CELLS_DISTANCE_FUNCTION',  &
-                                   1.5, val, verbose)
+  def = 1000.0
+
+  call Control_Mod_Read_Real_Item('REFERENCE_DENSITY', def, d_ref, verbose)
 
   end subroutine
