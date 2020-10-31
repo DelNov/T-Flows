@@ -330,9 +330,9 @@
     end do  ! i
   end if    ! end if EPS == yes
 
-  call Field_Mod_Grad_Component(flow, turb % l_scale, 1, l_sc_x(-nb:nc))
-  call Field_Mod_Grad_Component(flow, turb % l_scale, 2, l_sc_y(-nb:nc))
-  call Field_Mod_Grad_Component(flow, turb % l_scale, 3, l_sc_z(-nb:nc))
+  call Field_Mod_Grad(flow, turb % l_scale, l_sc_x(-nb:nc),  &
+                                            l_sc_y(-nb:nc),  &
+                                            l_sc_z(-nb:nc))
 
   r13 = ONE_THIRD
   r23 = TWO_THIRDS
@@ -697,9 +697,9 @@
   end do
 
   if(name_phi == 'EPS') then
-    call Field_Mod_Grad_Component(flow, kin_e(-nb:nc), 1, kin_e_x(-nb:nc))
-    call Field_Mod_Grad_Component(flow, kin_e(-nb:nc), 2, kin_e_y(-nb:nc))
-    call Field_Mod_Grad_Component(flow, kin_e(-nb:nc), 3, kin_e_z(-nb:nc))
+    call Field_Mod_Grad(flow, kin_e(-nb:nc), kin_e_x(-nb:nc),  &
+                                             kin_e_y(-nb:nc),  &
+                                             kin_e_z(-nb:nc))
     do c = 1, grid % n_cells
       kin_vis = flow % viscosity(c) / flow % density(c)
       re_t  = (kin % n(c)**2) / (kin_vis*eps % n(c) + TINY)

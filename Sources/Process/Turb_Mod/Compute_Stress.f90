@@ -77,9 +77,9 @@
   end if
 
   ! Gradients
-  call Field_Mod_Grad_Component(flow, phi % n, 1, phi_x(-nb:nc))
-  call Field_Mod_Grad_Component(flow, phi % n, 2, phi_y(-nb:nc))
-  call Field_Mod_Grad_Component(flow, phi % n, 3, phi_z(-nb:nc))
+  call Field_Mod_Grad(flow, phi % n, phi_x(-nb:nc),  &
+                                     phi_y(-nb:nc),  &
+                                     phi_z(-nb:nc))
 
   !---------------!
   !               !
