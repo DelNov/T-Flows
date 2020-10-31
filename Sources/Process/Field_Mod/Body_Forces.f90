@@ -108,9 +108,4 @@
   call Grid_Mod_Exchange_Cells_Real(grid, flow % body_fy)
   call Grid_Mod_Exchange_Cells_Real(grid, flow % body_fz)
 
-  ! Was used for debugging
-  ! do c = 1, grid % n_cells
-  !   flow % pot % n(c) = flow % body_fz(c)
-  ! end do
-
   end subroutine
