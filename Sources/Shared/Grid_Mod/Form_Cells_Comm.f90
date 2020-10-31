@@ -7,9 +7,10 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: sub, i_nod, ms, mr, n, nn, sh
+  integer       :: sub, i_nod, j_nod, ms, mr, n, ni, nj, sh
   character(SL) :: name_in
   integer       :: c, c1, c2, s, n_buff_faces
+  real          :: xi, yi, zi, xj, yj, zj
 !==============================================================================!
 
   if(n_proc < 2) return
@@ -20,9 +21,9 @@
   allocate(grid % comm % cells_send(n_proc))
   allocate(grid % comm % cells_recv(n_proc))
 
-  !------------------------!
-  !   Count buffer cells   !
-  !------------------------!
+  !-------------------------------!
+  !   Count buffer cells inside   !
+  !-------------------------------!
   grid % comm % n_buff_cells = 0
   do c = 1, grid % n_cells
     if(grid % comm % cell_proc(c) .ne. this_proc) then
@@ -43,7 +44,6 @@
       n_buff_faces = n_buff_faces + 1
     end if
   end do
-  grid % n_faces = grid % n_faces - n_buff_faces
 
   allocate(grid % new_n(grid % n_nodes))
 
@@ -60,34 +60,70 @@
 
       ! Mark the nodes at subdomain interface
       grid % new_n(:) = 0
-      do s = 1, grid % n_faces
-        c1 = grid % faces_c(1,s)
-        c2 = grid % faces_c(2,s)
-        if(c2 > 0) then
-          if(grid % comm % cell_proc(c1) .eq. this_proc .and.  &
-             grid % comm % cell_proc(c2) .eq. sub) then
-            do i_nod = 1, grid % faces_n_nodes(s)
-              grid % new_n(grid % faces_n(i_nod, s)) = -1
-            end do
-          end if
+      do c = 1, grid % n_cells
+        if(grid % comm % cell_proc(c) .eq. sub) then
+          do i_nod = 1, grid % cells_n_nodes(c)
+            grid % new_n(grid % cells_n(i_nod, c)) = -1
+          end do
         end if
       end do
 
       ! Spread info to twin nodes
+      ! (This is not super elegant, but seems to work)
       do s = 1, grid % n_faces
-        if(grid % faces_s(s) > 0) then
-          c1 = grid % faces_c(1, s)
-          c2 = grid % faces_c(2, s)
-          if(grid % comm % cell_proc(c1) .eq. this_proc .and.  &
-             grid % comm % cell_proc(c2) .eq. sub       .or.   &
-             grid % comm % cell_proc(c2) .eq. this_proc .and.  &
-             grid % comm % cell_proc(c1) .eq. sub) then
-            nn = grid % faces_n_nodes(s)
-            sh = grid % faces_s(s)
-            grid % new_n(grid % faces_n(1:nn, s )) = -1
-            grid % new_n(grid % faces_n(1:nn, sh)) = -1
-          end if
-        end if
+        sh = grid % faces_s(s)
+        if(sh > 0) then
+          do i_nod = 1, grid % faces_n_nodes(s)
+            ni = grid % faces_n(i_nod, s)
+            if(grid % new_n(ni) .eq. -1) then
+              xi = grid % xn(ni);  yi = grid % yn(ni); zi = grid % zn(ni)
+              do j_nod = 1, grid % faces_n_nodes(sh)
+                nj = grid % faces_n(j_nod, sh)
+                xj = grid % xn(nj);  yj = grid % yn(nj);  zj = grid % zn(nj)
+                if(grid % per_x > TINY) then
+                  if(Math_Mod_Distance(0., yi, zi, 0., yj, zj) < NANO) then
+                    grid % new_n(nj) = -1
+                  end if
+                end if
+                if(grid % per_y > TINY) then
+                  if(Math_Mod_Distance(xi, 0., zi, xj, 0., zj) < NANO) then
+                    grid % new_n(nj) = -1
+                  end if
+                end if
+                if(grid % per_z > TINY) then
+                  if(Math_Mod_Distance(xi, yi, 0., xj, yj, 0.) < NANO) then
+                    grid % new_n(nj) = -1
+                  end if
+                end if
+              end do
+            end if
+          end do
+          do j_nod = 1, grid % faces_n_nodes(sh)
+            nj = grid % faces_n(j_nod, sh)
+            if(grid % new_n(nj) .eq. -1) then
+              xj = grid % xn(nj);  yj = grid % yn(nj);  zj = grid % zn(nj)
+              do i_nod = 1, grid % faces_n_nodes(s)
+                ni = grid % faces_n(i_nod, s)
+                xi = grid % xn(ni);  yi = grid % yn(ni); zi = grid % zn(ni)
+                if(grid % per_x > TINY) then
+                  if(Math_Mod_Distance(0., yi, zi, 0., yj, zj) < NANO) then
+                    grid % new_n(ni) = -1
+                  end if
+                end if
+                if(grid % per_y > TINY) then
+                  if(Math_Mod_Distance(xi, 0., zi, xj, 0., zj) < NANO) then
+                    grid % new_n(ni) = -1
+                  end if
+                end if
+                if(grid % per_z > TINY) then
+                  if(Math_Mod_Distance(xi, yi, 0., xj, yj, 0.) < NANO) then
+                    grid % new_n(ni) = -1
+                  end if
+                end if
+              end do
+            end if
+          end do
+        end if  ! sh > 0
       end do
 
       ms = 0
@@ -146,5 +182,7 @@
     end if
 
   end do
+
+  grid % n_faces = grid % n_faces - n_buff_faces
 
   end subroutine
