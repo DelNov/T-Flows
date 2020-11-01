@@ -7,7 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Multiphase_Type), target :: mult
   integer                       :: c
-  real,             allocatable :: p(:,:)
+  real                          :: p(1,3)
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),      pointer :: grid
   integer                       :: c1, c2, s, i_fac

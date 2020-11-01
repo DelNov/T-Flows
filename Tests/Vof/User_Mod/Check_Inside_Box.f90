@@ -7,17 +7,17 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Multiphase_Type), target :: mult
-  real            , allocatable :: p(:,:)
+  real                          :: p(1,3)
   real                          :: dd(6)
   real                          :: n_xyz(6,3)
-  integer            , optional :: c
+  integer, optional             :: c
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),      pointer :: grid
-  integer                       :: i_fac,n
-  integer                       :: infac_box(6)
-  integer, allocatable          :: innod_box(:)
-  integer                       :: sum_inside
-  real                          :: res_dummy, dist, norm
+  type(Grid_Type), pointer :: grid
+  integer                  :: i_fac,n
+  integer                  :: infac_box(6)
+  integer, allocatable     :: innod_box(:)
+  integer                  :: sum_inside
+  real                     :: res_dummy, dist, norm
 !==============================================================================!
 
   ! First take aliasesd
