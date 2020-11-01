@@ -39,7 +39,8 @@
     read(fu, *) cent_x, cent_y, cent_z
 
     do c = 1, grid % n_cells
-      ! for every node:
+
+      ! For every node:
       do n = 1, grid % cells_n_nodes(c)
         res_dummy = sqrt(                                             &
               ((grid % xn(grid % cells_n(n,c))-cent_x)/radius_1)**2   &
