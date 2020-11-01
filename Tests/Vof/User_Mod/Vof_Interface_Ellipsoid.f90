@@ -5,47 +5,47 @@
                                     radius_1, radius_2, radius_3,   &
                                     vof_int)
 !------------------------------------------------------------------------------!
-!                Computes volume fraction of cell at interface                 !
+!   Computes volume fraction of cell at interface                              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Multiphase_Type), target :: mult
-  integer                       :: c
+  integer, intent(in)           :: c
   real                          :: cent_x, cent_y, cent_z
   real                          :: radius_1, radius_2, radius_3
   real                          :: vof_int
+!------------------------------[Local parameters]------------------------------!
+  integer, parameter :: N = 10000
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),      pointer :: grid
-  logical                       :: i_cell
-  integer, parameter            :: n = 10000
-  integer                       :: nod, n_int, n_tot, fu
-  integer                       :: ee, n_cylinders, i_vari, n_vari
-  real                          :: r_num, res_func
-  real                          :: xmin, xmax, ymin, ymax, zmin, zmax
-  real,             allocatable :: p(:,:)
-  real                          :: vof_0, vof_tol1, vof_tol2
-  real                          :: avg_x, avg_y, avg_z
-  real                          :: var_comb, var_comb_0, dist_cent
-  real                          :: mean_x, mean_y, mean_z
-  real                          :: points(n,3)
+  type(Grid_Type), pointer :: grid
+  logical                  :: i_cell
+  integer                  :: nod, n_int, n_tot, fu
+  integer                  :: ee, n_cylinders, i_vari, n_vari
+  real                     :: r_num, res_func
+  real                     :: xmin, xmax, ymin, ymax, zmin, zmax
+  real                     :: p(1,3)
+  real                     :: vof_0, vof_tol1, vof_tol2
+  real                     :: avg_x, avg_y, avg_z
+  real                     :: var_comb, var_comb_0, dist_cent
+  real                     :: mean_x, mean_y, mean_z
+  real                     :: points(N,3)
 !==============================================================================!
 
-  ! First take aliasesd
+  ! First take aliases
   grid => mult % pnt_grid
 
-  var_comb = HUGE
+  ! Initialize variables
+  var_comb   = HUGE
   var_comb_0 = 0.0
-  vof_tol1 = MICRO
-  vof_tol2 = MILI
-  dist_cent = grid % vol(c) ** ONE_THIRD
-  vof_int = HUGE
+  vof_tol1   = MICRO
+  vof_tol2   = MILI
+  dist_cent  = grid % vol(c) ** ONE_THIRD
+  vof_int    = HUGE
 
   n_tot = 0
   n_int = 0
 
-  allocate(p(1,3))
-
-  ! find bounding box:
+  ! Find bounding box:
   xmin =  HUGE; ymin =  HUGE; zmin =  HUGE;
   xmax = -HUGE; ymax = -HUGE; zmax = -HUGE;
 
@@ -60,10 +60,12 @@
 
   i_cell = .false.
 
-  do while ( (n_tot < n) .and. (abs(var_comb - var_comb_0) > vof_tol1 .or. &
+  do while ( (n_tot < N) .and. (abs(var_comb - var_comb_0) > vof_tol1 .or. &
              (var_comb / dist_cent) > vof_tol2) )
+
     i_cell = .false.
-    ! check if p is inside cell
+
+    ! Check if p is inside cell
     do while (i_cell .eqv. .false.)
       call random_number(r_num)
       p(1,1) = xmin + (xmax-xmin) * r_num
@@ -77,8 +79,7 @@
 
     points(n_tot,:) = p(1,:)
 
-    ! check if p is inside function:
-
+    ! Check if p is inside function:
     res_func = sqrt( ((p(1,1)-cent_x)/radius_1)**2    &
                    + ((p(1,2)-cent_y)/radius_2)**2    &
                    + ((p(1,3)-cent_z)/radius_3)**2 )
