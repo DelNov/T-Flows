@@ -18,8 +18,8 @@
 !   1-----------2                                                              !
 !                                                                              !
 !----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: prelim_vof     => r_cell_01,  &
-                      inside_c       => i_cell_02
+  use Work_Mod, only: prelim_vof => r_cell_01,  &
+                      inside_c   => i_cell_02
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -68,8 +68,7 @@
       read (fu,*) p_xyz(n_p,:)
     end do
 
-    ! Define Planes of the box:
-
+    ! Define Planes of the box
     do i_fac = 1, 6
 
       v1aux(:) = p_xyz(trios(i_fac,2),:) - p_xyz(trios(i_fac,1),:)
