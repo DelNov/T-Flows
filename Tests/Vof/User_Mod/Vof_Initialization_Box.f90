@@ -58,14 +58,18 @@
   ! Open file to read Plane parameters:
   call File_Mod_Open_File_For_Reading('box_parameters.ini', fu)
 
-  read(fu,*) n_boxes
+  call File_Mod_Read_Line(fu)
+  read(line % tokens(1), *) n_boxes
 
   np_count = 1
 
   do ee = 1, n_boxes
 
     do n_p = 1, 8
-      read (fu,*) p_xyz(n_p,:)
+      call File_Mod_Read_Line(fu)
+      read(line % tokens(1), *) p_xyz(n_p, 1)
+      read(line % tokens(2), *) p_xyz(n_p, 2)
+      read(line % tokens(3), *) p_xyz(n_p, 3)
     end do
 
     ! Define Planes of the box

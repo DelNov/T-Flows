@@ -31,7 +31,8 @@
   ! Open file to read cylinder parameters:
   call File_Mod_Open_File_For_Reading('cylinder_parameters.ini', fu)
 
-  read(fu,*) n_cylinders
+  call File_Mod_Read_Line(fu)
+  read(line % tokens(1), *) n_cylinders
 
   do ee = 1, n_cylinders
 
@@ -39,9 +40,18 @@
     min_max_crit_1(:) =  HUGE
     min_max_crit_2(:) = -HUGE
 
-    read(fu,*) radius
-    read(fu,*) p1_x, p1_y, p1_z
-    read(fu,*) p2_x, p2_y, p2_z
+    call File_Mod_Read_Line(fu)
+    read(line % tokens(1), *) radius
+
+    call File_Mod_Read_Line(fu)
+    read(line % tokens(1), *) p1_x
+    read(line % tokens(2), *) p1_y
+    read(line % tokens(3), *) p1_z
+
+    call File_Mod_Read_Line(fu)
+    read(line % tokens(1), *) p2_x
+    read(line % tokens(2), *) p2_y
+    read(line % tokens(3), *) p2_z
 
     height = sqrt((p1_x-p2_x)**2+(p1_y-p2_y)**2+(p1_z-p2_z)**2)
 

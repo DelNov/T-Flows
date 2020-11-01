@@ -30,7 +30,8 @@
   ! Open file to read Plane parameters:
   call File_Mod_Open_File_For_Reading('plane_parameters.ini', fu)
 
-  read (fu,*) n_planes
+  call File_Mod_Read_Line(fu)
+  read(line % tokens(1), *) n_planes
 
   if (allocated(p_xyz)) deallocate(p_xyz)
   allocate(p_xyz(n_planes*3,3))
@@ -41,12 +42,26 @@
     min_max_crit_1(:) =  HUGE
     min_max_crit_2(:) = -HUGE
 
-    read(fu,*) p_xyz(1,:) 
-    read(fu,*) p_xyz(2,:) 
-    read(fu,*) p_xyz(3,:) 
+    ! Read point 1
+    call File_Mod_Read_Line(fu)
+    read(line % tokens(1), *) p_xyz(1, 1)
+    read(line % tokens(2), *) p_xyz(1, 2)
+    read(line % tokens(3), *) p_xyz(1, 3)
 
-    v1aux(:) = p_xyz(2,:) - p_xyz(1,:) 
-    v2aux(:) = p_xyz(3,:) - p_xyz(1,:) 
+    ! Read point 2
+    call File_Mod_Read_Line(fu)
+    read(line % tokens(1), *) p_xyz(2, 1)
+    read(line % tokens(2), *) p_xyz(2, 2)
+    read(line % tokens(3), *) p_xyz(2, 3)
+
+    ! Read point 3
+    call File_Mod_Read_Line(fu)
+    read(line % tokens(1), *) p_xyz(3, 1)
+    read(line % tokens(2), *) p_xyz(3, 2)
+    read(line % tokens(3), *) p_xyz(3, 3)
+
+    v1aux(:) = p_xyz(2,:) - p_xyz(1,:)
+    v2aux(:) = p_xyz(3,:) - p_xyz(1,:)
 
     n_xyz(1) = v1aux(2) * v2aux(3) - v1aux(3) * v2aux(2)
     n_xyz(2) = - (v1aux(1) * v2aux(3) - v1aux(3) * v2aux(1))

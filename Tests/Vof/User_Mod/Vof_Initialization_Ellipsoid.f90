@@ -27,7 +27,8 @@
   ! Open file to read Ellipsoid parameters:
   call File_Mod_Open_File_For_Reading('ellipsoid_parameters.ini', fu)
 
-  read(fu, *) n_ellipses
+  call File_Mod_Read_Line(fu)
+  read(line % tokens(1), *) n_ellipses
 
   do ee = 1, n_ellipses
 
@@ -35,8 +36,15 @@
     min_max_crit_1(:) =  HUGE
     min_max_crit_2(:) = -HUGE
 
-    read(fu, *) radius_1, radius_2, radius_3
-    read(fu, *) cent_x, cent_y, cent_z
+    call File_Mod_Read_Line(fu)
+    read(line % tokens(1), *) radius_1
+    read(line % tokens(2), *) radius_2
+    read(line % tokens(3), *) radius_3
+
+    call File_Mod_Read_Line(fu)
+    read(line % tokens(1), *) cent_x
+    read(line % tokens(2), *) cent_y
+    read(line % tokens(3), *) cent_z
 
     do c = 1, grid % n_cells
 
