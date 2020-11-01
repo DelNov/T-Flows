@@ -55,7 +55,8 @@
     dd = n_xyz(1) * p_xyz(1,1) + n_xyz(2) * p_xyz(1,2) + n_xyz(3) * p_xyz(1,3)
 
     do c = 1, grid % n_cells
-      ! for every node:
+
+      ! For every node:
       do n = 1, grid % cells_n_nodes(c)
 
         res_dummy = n_xyz(1) * grid % xn(grid % cells_n(n,c))      &
