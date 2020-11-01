@@ -46,7 +46,8 @@
     height = sqrt((p1_x-p2_x)**2+(p1_y-p2_y)**2+(p1_z-p2_z)**2)
 
     do c = 1, grid % n_cells
-      ! for every node
+
+      ! For every node
       do n = 1, grid % cells_n_nodes(c)
 
         res_dummy = (   &
@@ -63,51 +64,16 @@
       end do
     end do
 
-!    ! Simply interpolate linearly:
-!    do c = 1, grid % n_cells
-!      if (min_max_crit_1(c) < 1.0 .and. min_max_crit_2(c) > 1.0) then
-!!        prelim_vof(c) = (1.0 - min_max_crit_1(c))  &
-!!                      / (min_max_crit_2(c)-min_max_crit_1(c))
-!!        call Vof_Interface_Cylinder(mult,               &
-!!                                    c,                  &
-!!                                    p1_x, p1_y, p1_z,   &
-!!                                    p2_x, p2_y, p2_z,   &
-!!                                    radius, height,     &
-!!                                    prelim_vof(c))
-!         call Vof_Exact_Cylinder(mult,               &
-!                                 c,                  &
-!                                 p1_x, p1_y, p1_z,   &
-!                                 p2_x, p2_y, p2_z,   &
-!                                 radius, height,     &
-!                                 prelim_vof(c))
-!
-!      else if (min_max_crit_2(c) <= 1.0) then
-!        prelim_vof(c) = 1.0
-!      end if
-!    end do
-
     do c = 1, grid % n_cells
-!      if (min_max_crit_1(c) < 1.0 .and. min_max_crit_2(c) > 1.0) then
-!        prelim_vof(c) = (1.0 - min_max_crit_1(c))  &
-!                      / (min_max_crit_2(c)-min_max_crit_1(c))
-!        call Vof_Interface_Cylinder(mult,               &
-!                                    c,                  &
-!                                    p1_x, p1_y, p1_z,   &
-!                                    p2_x, p2_y, p2_z,   &
-!                                    radius, height,     &
-!                                    prelim_vof(c))
-         call Vof_Exact_Cylinder(mult,                                  &
-                                 c,                                     &
-                                 p1_x, p1_y, p1_z,                      &
-                                 p2_x, p2_y, p2_z,                      &
-                                 radius, height,                        &
-                                 min_max_crit_1(c), min_max_crit_2(c),  &
-                                 prelim_vof(c))
-
-!      else if (min_max_crit_2(c) <= 1.0) then
-!        prelim_vof(c) = 1.0
-!      end if
+      call Vof_Exact_Cylinder(mult,                                  &
+                              c,                                     &
+                              p1_x, p1_y, p1_z,                      &
+                              p2_x, p2_y, p2_z,                      &
+                              radius, height,                        &
+                              min_max_crit_1(c), min_max_crit_2(c),  &
+                              prelim_vof(c))
     end do
+
     ! Precision
     do c = 1, grid % n_cells
       mult % vof % n(c) = max(prelim_vof(c),mult % vof % n(c))
