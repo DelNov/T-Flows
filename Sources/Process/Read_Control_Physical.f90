@@ -6,8 +6,8 @@
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod,      only: HUGE_INT
   use Comm_Mod,       only: Comm_Mod_End, this_proc
-  use Field_Mod,      only: Field_Type, buoyancy, heat_transfer, t_ref,  &
-                            dens_ref, grav_x, grav_y, grav_z
+  use Field_Mod,      only: Field_Type, buoyancy, heat_transfer,  &
+                            grav_x, grav_y, grav_z
   use Bulk_Mod,       only: Bulk_Type
   use Turb_Mod
   use Multiphase_Mod
@@ -39,7 +39,7 @@
                                         grav_y,  &
                                         grav_z, .true.)
   call Control_Mod_Buoyancy                    (buoyancy,     .true.)
-  call Control_Mod_Reference_Temperature       (t_ref,        .true.)
+  call Control_Mod_Reference_Temperature       (flow % t_ref, .true.)
   call Control_Mod_Volume_Expansion_Coefficient(flow % beta,  .true.)
   call Control_Mod_Turbulent_Prandtl_Number    (pr_t)  ! default is (0.9)
 
@@ -239,7 +239,7 @@
     mult % model = NO_MULTIPHASE_MODEL
   end if
 
-  call Control_Mod_Reference_Density(dens_ref, .true.)
+  call Control_Mod_Reference_Density(flow % dens_ref, .true.)
 
   call Control_Mod_Phase_Change(mult % phase_change)
 

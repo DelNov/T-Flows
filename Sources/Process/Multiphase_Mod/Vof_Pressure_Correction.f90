@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Vof_Pressure_Correction(mult, sol, ini, mass_err)
+  subroutine Multiphase_Mod_Vof_Pressure_Correction(mult, sol, ini)
 !------------------------------------------------------------------------------!
 !   Correct fluxes on pressure equation due to surface tension and gravity     !
 !------------------------------------------------------------------------------!
@@ -8,7 +8,6 @@
   type(Multiphase_Type), target :: mult
   type(Solver_Type),     target :: sol
   integer                       :: ini
-  real                          :: mass_err
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid

@@ -16,7 +16,6 @@
   character(len=7)      :: root_control    = 'control'
   character(len=9)      :: dom_control(MD) = 'control.d'
   integer               :: curr_dt, sc, tp
-  real                  :: mass_res(MD)
   logical               :: read_backup(MD), exit_now, pot_init
   type(Grid_Type)       :: grid(MD)        ! grid used in computations
   type(Field_Type)      :: flow(MD)        ! flow field we will be solving for
@@ -336,13 +335,12 @@
 
         call Multiphase_Averaging(flow(d), mult(d), flow(d) % p)
         call Field_Mod_Calculate_Mass_Fluxes(flow(d), flow(d) % v_flux % n)
-        call Correct_Velocity(flow(d), mult(d), sol(d), ini, mass_res(d))
+        call Correct_Velocity(flow(d), mult(d), sol(d), ini)
 
         call Multiphase_Averaging(flow(d), mult(d), flow(d) % u)
         call Multiphase_Averaging(flow(d), mult(d), flow(d) % v)
         call Multiphase_Averaging(flow(d), mult(d), flow(d) % w)
-        call Piso_Algorithm(flow(d), turb(d), mult(d),    &
-                            sol(d), ini, mass_res(d))
+        call Piso_Algorithm(flow(d), turb(d), mult(d), sol(d), ini)
 
         ! Energy (practically temperature)
         if(heat_transfer) then
@@ -370,10 +368,10 @@
       end do  ! through domains
 
       if(ini >= min_ini) then
-        if( maxval(flow(1:n_dom) % u  % res) <= simple_tol .and.  &
-            maxval(flow(1:n_dom) % v  % res) <= simple_tol .and.  &
-            maxval(flow(1:n_dom) % w  % res) <= simple_tol .and.  &
-            maxval(mass_res(1:n_dom))        <= simple_tol ) goto 1
+        if( maxval(flow(1:n_dom) % u % res) <= simple_tol .and.  &
+            maxval(flow(1:n_dom) % v % res) <= simple_tol .and.  &
+            maxval(flow(1:n_dom) % w % res) <= simple_tol .and.  &
+            maxval(flow(1:n_dom) % vol_res) <= simple_tol ) goto 1
       end if
 
     end do    ! through inner iterations

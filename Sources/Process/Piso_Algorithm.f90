@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Piso_Algorithm(flow, turb, mult, sol, ini, mass_res)
+  subroutine Piso_Algorithm(flow, turb, mult, sol, ini)
 !------------------------------------------------------------------------------!
 !   PISO algorithm                                                             !
 !------------------------------------------------------------------------------!
@@ -13,7 +13,6 @@
   type(Multiphase_Type), target :: mult
   type(Solver_Type),     target :: sol
   integer                       :: ini       ! current inner iteration
-  real                          :: mass_res
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w
@@ -45,7 +44,7 @@
       call Compute_Pressure(flow, mult, sol, ini)
       call Multiphase_Averaging(flow, mult, flow % p)
 
-      call Correct_Velocity(flow, mult, sol, ini, mass_res)
+      call Correct_Velocity(flow, mult, sol, ini)
       call Multiphase_Averaging(flow, mult, flow % u)
       call Multiphase_Averaging(flow, mult, flow % v)
       call Multiphase_Averaging(flow, mult, flow % w)

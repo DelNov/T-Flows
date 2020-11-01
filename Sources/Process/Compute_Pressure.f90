@@ -21,8 +21,7 @@
   real, contiguous,  pointer :: b(:)
   real,              pointer :: u_relax
   integer                    :: s, c, c1, c2
-  real                       :: u_f, v_f, w_f, a12, fs
-  real                       :: mass_err, dt
+  real                       :: u_f, v_f, w_f, a12, fs, dt
   real                       :: px_f, py_f, pz_f, dens_h
   character(SL)              :: solver
   real                       :: p_max, p_min, p_nor, p_nor_c
@@ -199,7 +198,7 @@
   !   In case of VOF, surface tension and  gravity correction   !
   !-------------------------------------------------------------!
   if(mult % model .eq. VOLUME_OF_FLUID) then
-    call Multiphase_Mod_Vof_Pressure_Correction(mult, sol, ini, mass_err)
+    call Multiphase_Mod_Vof_Pressure_Correction(mult, sol, ini)
   end if
 
   !-------------------------------------!
@@ -207,13 +206,12 @@
   !-------------------------------------!
   call Field_Mod_Correct_Fluxes_With_Body_Forces(flow, sol)
 
-  ! Compute mass error
-  mass_err = 0.0
+  ! Compute volume error
+  flow % vol_res = 0.0
   do c = 1, grid % n_cells - grid % comm % n_buff_cells
-    mass_err = mass_err + abs(b(c))
+    flow % vol_res = flow % vol_res + abs(b(c))
   end do
-  call Comm_Mod_Global_Sum_Real(mass_err)
-  flow % p % res = mass_err
+  call Comm_Mod_Global_Sum_Real(flow % vol_res)
 
   ! Get solver
   call Control_Mod_Solver_For_Pressure(solver)
