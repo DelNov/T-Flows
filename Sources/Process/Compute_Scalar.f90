@@ -120,13 +120,18 @@
       phix_f2 = phix_f1
       phiy_f2 = phiy_f1
       phiz_f2 = phiz_f1
-      dif_eff1 = grid % f(s) *(flow % diffusivity + turb % vis_t(c1) / sc_t)  &
-           + (1.-grid % f(s))*(flow % diffusivity + turb % vis_t(c2) / sc_t)
-      if(turb % model .eq. HYBRID_LES_RANS) then
-        dif_eff1 =     grid % f(s)   &
-                    * (flow % diffusivity + turb % vis_t_eff(c1) / sc_t)  &
-                 + (1.-grid % f(s))  &
-                    * (flow % diffusivity + turb % vis_t_eff(c2) / sc_t)
+      dif_eff1 = grid % f(s) *(flow % diffusivity)  &
+           + (1.-grid % f(s))*(flow % diffusivity)
+      if(turb % model .ne. NO_TURBULENCE_MODEL .and.  &
+         turb % model .ne. DNS) then
+        dif_eff1 = grid % f(s) *(flow % diffusivity + turb % vis_t(c1)/sc_t)  &
+             + (1.-grid % f(s))*(flow % diffusivity + turb % vis_t(c2)/sc_t)
+        if(turb % model .eq. HYBRID_LES_RANS) then
+          dif_eff1 = grid % f(s)   &
+                  * (flow % diffusivity + turb % vis_t_eff(c1) / sc_t)  &
+               + (1.-grid % f(s))  &
+                  * (flow % diffusivity + turb % vis_t_eff(c2) / sc_t)
+        end if
       end if
       dif_eff2 = dif_eff1
     else
@@ -136,9 +141,13 @@
       phix_f2 = phix_f1
       phiy_f2 = phiy_f1
       phiz_f2 = phiz_f1
-      dif_eff1 = flow % diffusivity + turb % vis_t(c1) / sc_t
-      if(turb % model .eq. HYBRID_LES_RANS) then
-        dif_eff1 = flow % diffusivity + turb % vis_t_eff(c1) / sc_t
+      dif_eff1 = flow % diffusivity
+      if(turb % model .ne. NO_TURBULENCE_MODEL .and.  &
+         turb % model .ne. DNS) then
+        dif_eff1 = flow % diffusivity + turb % vis_t(c1) / sc_t
+        if(turb % model .eq. HYBRID_LES_RANS) then
+          dif_eff1 = flow % diffusivity + turb % vis_t_eff(c1) / sc_t
+        end if
       end if
       dif_eff2 = dif_eff1
     end if
