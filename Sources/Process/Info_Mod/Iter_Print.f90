@@ -33,8 +33,10 @@
     do i = 1, iter_info % n_user_lines
       tmp = iter_info % lines_user(i)
       if( tmp(7:7) .eq. ':') print '(a129)', iter_info % lines_user(i)
-      iter_info % lines(i)(7:7) = ' '  ! remove the column for other domains
+      iter_info % lines_user(i)(7:7) = ' '  ! remove the column for other domains
     end do
+
+    call Info_Mod_Iter_Start()
 
   end if
 
