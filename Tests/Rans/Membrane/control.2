@@ -59,7 +59,7 @@
 # Boundary conditions
 #---------------------
   BOUNDARY_CONDITION    cylinder
-    TYPE                wall_flux
+    TYPE                wall
     VARIABLES           u     v     w    q     kin   eps    zeta  f22
     VALUES              0.0   0.0   0.0  0.0   0.0   0.001  0.0   0.001
 
@@ -69,7 +69,7 @@
     VALUES              0.0   0.0   0.0  20.0  0.0   0.001  0.0   0.001
 
   BOUNDARY_CONDITION    bottom
-    TYPE                wall_flux
+    TYPE                wall
     VARIABLES           u     v     w    q     kin   eps    zeta  f22
     VALUES              0.0   0.0   0.0  0.0   0.0   0.001  0.0   0.001
 
