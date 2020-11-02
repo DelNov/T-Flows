@@ -211,12 +211,14 @@
               i = Key_Ind('T', keys, nks)
               if(i > 0) then
                 t % bnd_cond_type(c) = bc_type_tag
-                if(bc_type_tag .eq. WALLFL) t % bnd_cond_type(c) = WALL
+                if(bc_type_tag .eq. WALLFL) t    % bnd_cond_type(c)    = WALL
+                if(bc_type_tag .eq. WALLFL) grid % bnd_cond % type(bc) = WALL
               end if
               i = Key_Ind('Q', keys, nks)
               if(i > 0) then
                 t % bnd_cond_type(c) = bc_type_tag
-                if(bc_type_tag .eq. WALL) t % bnd_cond_type(c) = WALLFL
+                if(bc_type_tag .eq. WALL) t    % bnd_cond_type(c)    = WALLFL
+                if(bc_type_tag .eq. WALL) grid % bnd_cond % type(bc) = WALLFL
               end if
             end if
 
@@ -368,12 +370,14 @@
                 i = Key_Ind('T', keys, nks)
                 if(i > 0) then
                   t % bnd_cond_type(c) = bc_type_tag
-                  if(bc_type_tag .eq. WALLFL) t % bnd_cond_type(c) = WALL
+                  if(bc_type_tag .eq. WALLFL) t    % bnd_cond_type(c)    = WALL
+                  if(bc_type_tag .eq. WALLFL) grid % bnd_cond % type(bc) = WALL
                 end if
                 i = Key_Ind('Q', keys, nks)
                 if(i > 0) then
                   t % bnd_cond_type(c) = bc_type_tag
-                  if(bc_type_tag .eq. WALL) t % bnd_cond_type(c) = WALLFL
+                  if(bc_type_tag .eq. WALL) t    % bnd_cond_type(c)    = WALLFL
+                  if(bc_type_tag .eq. WALL) grid % bnd_cond % type(bc) = WALLFL
                 end if
               end if
 
@@ -560,11 +564,15 @@
                     if(i > 0) then
                       t % bnd_cond_type(c) = bc_type_tag
                       if(bc_type_tag .eq. WALLFL) t % bnd_cond_type(c) = WALL
+                      if(bc_type_tag .eq. WALLFL)  &
+                        grid % bnd_cond % type(bc) = WALL
                     end if
                     i = Key_Ind('Q',keys,nks)
                     if(i > 0) then
                       t % bnd_cond_type(c) = bc_type_tag
                       if(bc_type_tag .eq. WALL) t % bnd_cond_type(c) = WALLFL
+                      if(bc_type_tag .eq. WALL)  &
+                        grid % bnd_cond % type(bc) = WALLFL
                     end if
                   end if
 
@@ -659,12 +667,16 @@
                     if(i > 0) then
                       t % bnd_cond_type(c) = bc_type_tag
                       if(bc_type_tag .eq. WALLFL) t % bnd_cond_type(c) = WALL
+                      if(bc_type_tag .eq. WALLFL)  &
+                        grid % bnd_cond % type(bc) = WALL
                     end if
                     i = Key_Ind('Q',keys,nks)
                     if(i > 0) t % q(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
                     if(i > 0) then
                       t % bnd_cond_type(c) = bc_type_tag
                       if(bc_type_tag .eq. WALL) t % bnd_cond_type(c) = WALLFL
+                      if(bc_type_tag .eq. WALL)  &
+                        grid % bnd_cond % type(bc) = WALLFL
                     end if
                   end if
 
