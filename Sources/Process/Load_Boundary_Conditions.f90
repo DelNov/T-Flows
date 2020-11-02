@@ -209,12 +209,18 @@
             ! Temperature
             if(heat_transfer) then
               i = Key_Ind('T', keys, nks)
-              if(i > 0) t % bnd_cond_type(c) = bc_type_tag
+              if(i > 0) then
+                t % bnd_cond_type(c) = bc_type_tag
+                if(bc_type_tag .eq. WALLFL) t % bnd_cond_type(c) = WALL
+              end if
               i = Key_Ind('Q', keys, nks)
-              if(i > 0) t % bnd_cond_type(c) = bc_type_tag
+              if(i > 0) then
+                t % bnd_cond_type(c) = bc_type_tag
+                if(bc_type_tag .eq. WALL) t % bnd_cond_type(c) = WALLFL
+              end if
             end if
 
-            ! Multiphase flow
+            ! Volume of fluid -> still to be worked around
             if (mult % model .eq. VOLUME_OF_FLUID) then
               i = Key_Ind('VOF', keys, nks)
               if(i > 0) vof % bnd_cond_type(c) = bc_type_tag
@@ -225,9 +231,15 @@
             ! For scalars
             do sc = 1, flow % n_scalars
               i = Key_Ind(scalar(sc) % name, keys, nks)
-              if(i > 0) scalar(sc) % bnd_cond_type(c) = bc_type_tag
+              if(i > 0) then
+                scalar(sc) % bnd_cond_type(c) = bc_type_tag
+                if(bc_type_tag .eq. WALLFL) scalar(sc) % bnd_cond_type(c) = WALL
+              end if
               i = Key_Ind(scalar(sc) % flux_name, keys, nks)
-              if(i > 0) scalar(sc) % bnd_cond_type(c) = bc_type_tag
+              if(i > 0) then
+                scalar(sc) % bnd_cond_type(c) = bc_type_tag
+                if(bc_type_tag .eq. WALL) scalar(sc) % bnd_cond_type(c) = WALLFL
+              end if
             end do
 
           end if  ! bnd_color .eq. bc
@@ -354,17 +366,31 @@
               ! For temperature
               if(heat_transfer) then
                 i = Key_Ind('T', keys, nks)
-                if(i > 0) t % bnd_cond_type(c) = bc_type_tag
+                if(i > 0) then
+                  t % bnd_cond_type(c) = bc_type_tag
+                  if(bc_type_tag .eq. WALLFL) t % bnd_cond_type(c) = WALL
+                end if
                 i = Key_Ind('Q', keys, nks)
-                if(i > 0) t % bnd_cond_type(c) = bc_type_tag
+                if(i > 0) then
+                  t % bnd_cond_type(c) = bc_type_tag
+                  if(bc_type_tag .eq. WALL) t % bnd_cond_type(c) = WALLFL
+                end if
               end if
 
               ! For scalars
               do sc = 1, flow % n_scalars
                 i = Key_Ind(scalar(sc) % name, keys, nks)
-                if(i > 0) scalar(sc) % bnd_cond_type(c) = bc_type_tag
+                if(i > 0) then
+                  scalar(sc) % bnd_cond_type(c) = bc_type_tag
+                  if(bc_type_tag .eq. WALLFL)  &
+                    scalar(sc) % bnd_cond_type(c) = WALL
+                end if
                 i = Key_Ind(scalar(sc) % flux_name, keys, nks)
-                if(i > 0) scalar(sc) % bnd_cond_type(c) = bc_type_tag
+                if(i > 0) then
+                  scalar(sc) % bnd_cond_type(c) = bc_type_tag
+                  if(bc_type_tag .eq. WALL)  &
+                    scalar(sc) % bnd_cond_type(c) = WALLFL
+                end if
               end do
 
             end if
@@ -531,17 +557,31 @@
                   ! For temperature
                   if(heat_transfer) then
                     i = Key_Ind('T',keys,nks)
-                    if(i > 0) t % bnd_cond_type(c) = bc_type_tag
+                    if(i > 0) then
+                      t % bnd_cond_type(c) = bc_type_tag
+                      if(bc_type_tag .eq. WALLFL) t % bnd_cond_type(c) = WALL
+                    end if
                     i = Key_Ind('Q',keys,nks)
-                    if(i > 0) t % bnd_cond_type(c) = bc_type_tag
+                    if(i > 0) then
+                      t % bnd_cond_type(c) = bc_type_tag
+                      if(bc_type_tag .eq. WALL) t % bnd_cond_type(c) = WALLFL
+                    end if
                   end if
 
                   ! For scalars
                   do sc = 1, flow % n_scalars
                     i = Key_Ind(scalar(sc) % name, keys, nks)
-                    if(i > 0) scalar(sc) % bnd_cond_type(c) = bc_type_tag
+                    if(i > 0) then
+                      scalar(sc) % bnd_cond_type(c) = bc_type_tag
+                      if(bc_type_tag .eq. WALLFL)  &
+                        scalar(sc) % bnd_cond_type(c) = WALL
+                    end if
                     i = Key_Ind(scalar(sc) % flux_name, keys, nks)
-                    if(i > 0) scalar(sc) % bnd_cond_type(c) = bc_type_tag
+                    if(i > 0) then
+                      scalar(sc) % bnd_cond_type(c) = bc_type_tag
+                      if(bc_type_tag .eq. WALL)  &
+                        scalar(sc) % bnd_cond_type(c) = WALLFL
+                    end if
                   end do
 
                 end if  ! here
@@ -616,20 +656,32 @@
                   if(heat_transfer) then
                     i = Key_Ind('T',keys,nks)
                     if(i > 0) t % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
-                    if(i > 0) t % bnd_cond_type(c) = bc_type_tag
+                    if(i > 0) then
+                      t % bnd_cond_type(c) = bc_type_tag
+                      if(bc_type_tag .eq. WALLFL) t % bnd_cond_type(c) = WALL
+                    end if
                     i = Key_Ind('Q',keys,nks)
                     if(i > 0) t % q(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
-                    if(i > 0) t % bnd_cond_type(c) = bc_type_tag
+                    if(i > 0) then
+                      t % bnd_cond_type(c) = bc_type_tag
+                      if(bc_type_tag .eq. WALL) t % bnd_cond_type(c) = WALLFL
+                    end if
                   end if
 
                   ! For scalars
                   do sc = 1, flow % n_scalars
                     i = Key_Ind(scalar(sc) % name, keys, nks)
-                    if(i > 0) &
+                    if(i > 0) then
                       scalar(sc) % b(c)=wi*prof(m,i)+(1.-wi)*prof(m+1,i)
+                      if(bc_type_tag .eq. WALLFL)  &
+                        scalar(sc) % bnd_cond_type(c) = WALL
+                    end if
                     i = Key_Ind(scalar(sc) % flux_name, keys, nks)
-                    if(i > 0) &
+                    if(i > 0) then
                       scalar(sc) % q(c)=wi*prof(m,i)+(1.-wi)*prof(m+1,i)
+                      if(bc_type_tag .eq. WALL)  &
+                        scalar(sc) % bnd_cond_type(c) = WALLFL
+                    end if
                   end do
 
                   ! For turbulence models
