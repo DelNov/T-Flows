@@ -215,11 +215,11 @@
                                    bulk % flux_y_o,  &
                                    bulk % flux_z_o)
 
-  !-------------------------------!
-  !                               !
-  !   Number of passive scalars   !
-  !                               !
-  !-------------------------------!
+  !-----------------------!
+  !                       !
+  !   Number of scalars   !
+  !                       !
+  !-----------------------!
   call Control_Mod_Number_Of_Scalars(flow % n_scalars, verbose = .true.)
 
   !-------------------------------!

@@ -35,7 +35,7 @@
   call Control_Mod_Mass_Density        (dens_const)
   call Control_Mod_Heat_Capacity       (capa_const)
   call Control_Mod_Thermal_Conductivity(cond_const)
-  call Control_Mod_Species_Diffusivity (flow % diffusivity)
+  call Control_Mod_Scalars_Diffusivity (flow % diffusivity)
 
   if(mult % model .eq. VOLUME_OF_FLUID) then
     call Control_Mod_Phase_Densities     (mult % phase_dens)

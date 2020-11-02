@@ -1,15 +1,12 @@
 !==============================================================================!
-  subroutine Control_Mod_Number_Of_User_Arrays(val, verbose)
-!------------------------------------------------------------------------------!
-!   Reading stuff related to user scalars                                      !
+  subroutine Control_Mod_Scalars_Diffusivity(val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer           :: val
+  real              :: val
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Int_Item('NUMBER_OF_USER_ARRAYS', 0, &
-                                  val, verbose)
+  call Control_Mod_Read_Real_Item('SCALARS_DIFFUSIVITY', 1.0e-6, val, verbose)
 
   end subroutine

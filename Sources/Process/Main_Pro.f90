@@ -130,7 +130,6 @@
     call Turb_Mod_Allocate(turb(d), flow(d))
     call Swarm_Mod_Allocate(swarm(d), flow(d), turb(d))
     call Multiphase_Mod_Vof_Allocate(mult(d), flow(d))
-    call User_Mod_Allocate(grid(d))
 
     ! Read time step from root
     call Control_Mod_Switch_To_Root()

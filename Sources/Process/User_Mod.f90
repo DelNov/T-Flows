@@ -15,7 +15,6 @@
 
   contains
 
-  include 'User_Mod/Allocate.f90'
   include 'User_Mod/Before_Exit.f90'
   include 'User_Mod/Beginning_Of_Compute_Energy.f90'
   include 'User_Mod/Beginning_Of_Compute_Momentum.f90'
