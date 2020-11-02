@@ -198,7 +198,6 @@
           t % n(c2) = t % n(c1)
         end if
 
-
       end if ! c2 < 0
     end do ! s = 1, grid % n_faces
   end if
@@ -247,6 +246,13 @@
                         / grid % wall_dist(c1)
           end if ! WALL or WALLFL
         end if ! Turb. models
+
+        if( Var_Mod_Bnd_Cond_Type(phi,c2) .eq. OUTFLOW .or.     &
+            Var_Mod_Bnd_Cond_Type(phi,c2) .eq. PRESSURE .or.    &
+            Var_Mod_Bnd_Cond_Type(phi,c2) .eq. SYMMETRY ) then
+          phi % n(c2) = phi % n(c1)
+        end if
+
       end if ! c2 < 0
     end do ! s = 1, grid % n_faces
   end do ! sc = 1, flow % n_scalars
