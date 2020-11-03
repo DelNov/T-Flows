@@ -36,7 +36,7 @@
       c2 = grid % faces_c(2,s)
       t_face_delta(s) = t % n(c1) * grid % f(s)          &
                       + t % n(c2) * (1.0 - grid % f(s))
-      t_face_delta(s) = t_face_delta(s) - flow % t_ref
+      t_face_delta(s) = flow % t_ref - t_face_delta(s)
     end do
   else
     t_face_delta(1:grid % n_faces) = 1.0
