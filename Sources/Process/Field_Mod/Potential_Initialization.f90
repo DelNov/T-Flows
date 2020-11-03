@@ -20,8 +20,8 @@
   real                       :: phi_x_f, phi_y_f, phi_z_f
   real                       :: vol_in_real, vol_in_fake, dist_min
 !------------------------------[Local parameters]------------------------------!
-  integer, parameter :: NDT = 240       ! number of false time steps
-  real,    parameter :: DT  =   1.0e+1  ! false time step
+  integer, parameter :: NDT = 24       ! number of false time steps
+  real,    parameter :: DT  =  1.0e+6  ! false time step
 !==============================================================================!
 
   if(this_proc < 2) then
@@ -178,14 +178,23 @@
 
     end do  ! through faces
 
-    ! Cross diffusion terms are treated explicity
+    ! Add cross diffusion terms explicity
+    ! (You will not need phi % c after this point)
     do c = 1, grid % n_cells
       b(c) = b(c) + phi % c(c)
     end do
 
-    ! Re-initialize cross diffusion terms (for the next time step)
+    ! Fix negative sources
     do c = 1, grid % n_cells
-      phi % c(c) = 0.0
+
+      ! Store the central term in phi % c
+      phi % c(c) = a % val(a % dia(c))
+
+      ! If source is negative, fix it!
+      if(b(c) < 0.0) then
+        a % val(a % dia(c)) = a % val(a % dia(c)) - b(c) / phi % o(c)
+        b(c) = 0.0
+      end if
     end do
 
     !---------------------------------!
@@ -195,8 +204,8 @@
     !---------------------------------!
 
     ! Set number of iterations "by hand"
-    phi % mniter  = 66
-    phi % tol     =  1.0e-6
+    phi % mniter  = 99
+    phi % tol     =  1.0e-5
     phi % precond = 'INCOMPLETE_CHOLESKY'
 
     ! Call linear solver to solve the equations
@@ -216,6 +225,16 @@
     if(phi % eniter .eq. 0) goto 1
 
     call Grid_Mod_Exchange_Cells_Real(grid, phi % n)
+
+    ! Recover the central coefficient in the system matrix
+    do c = 1, grid % n_cells
+      a % val(a % dia(c)) = phi % c(c)
+    end do
+
+    ! Re-initialize cross diffusion terms (for the next time step)
+    do c = 1, grid % n_cells
+      phi % c(c) = 0.0
+    end do
 
   end do
 
