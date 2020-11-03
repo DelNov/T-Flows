@@ -20,8 +20,8 @@
   real                       :: phi_x_f, phi_y_f, phi_z_f
   real                       :: vol_in_real, vol_in_fake, dist_min
 !------------------------------[Local parameters]------------------------------!
-  integer, parameter :: NDT = 24       ! number of false time steps
-  real,    parameter :: DT  =  1.0e+6  ! false time step
+  integer, parameter :: NDT = 240       ! number of false time steps
+  real,    parameter :: DT  =   1.0e+1  ! false time step
 !==============================================================================!
 
   if(this_proc < 2) then
@@ -49,9 +49,11 @@
   a % val(:) = 0.0
   b      (:) = 0.0
 
-  ! New values
+  ! Initial values
+  ! (Potential varies from 0 to 1, hence
+  !  0.5 seems like a good initial guess)
   do c = 1, grid % n_cells
-    phi % c(c) = 0.5
+    phi % n(c) = 0.5
   end do
 
   !----------------------------------------!
@@ -60,7 +62,7 @@
 
   ! Innertial term
   do c = 1, grid % n_cells
-    a % val(a % dia(c)) = a % val(a % dia(c)) + grid % vol(c) / DT
+    a % val(a % dia(c)) = grid % vol(c) / DT
   end do
 
   ! Diffusive term
@@ -88,14 +90,20 @@
   !----------------------------------------!
   !   Begin the false time stepping loop   !
   !----------------------------------------!
-  do n = 1, 24
+  do n = 1, NDT
 
+    ! Store the value from previous time step
     do c = 1, grid % n_cells
       phi % o(c) = phi % n(c)
+    end do
+
+    ! Innertial term
+    do c = 1, grid % n_cells
       b(c) = grid % vol(c) / DT * phi % o(c)
     end do
 
     ! Update boundary values
+    ! (Set 1 at inflows and 0 at outflows)
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1, s)
       c2 = grid % faces_c(2, s)
@@ -171,9 +179,14 @@
     end do  ! through faces
 
     ! Cross diffusion terms are treated explicity
-    ! do c = 1, grid % n_cells
-    !   b(c) = b(c) + phi % c(c)
-    ! end do
+    do c = 1, grid % n_cells
+      b(c) = b(c) + phi % c(c)
+    end do
+
+    ! Re-initialize cross diffusion terms (for the next time step)
+    do c = 1, grid % n_cells
+      phi % c(c) = 0.0
+    end do
 
     !---------------------------------!
     !                                 !
