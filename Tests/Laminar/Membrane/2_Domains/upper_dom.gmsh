@@ -3,6 +3,8 @@
 //------------------------------------------
 
 // Constants
+GEOM_SCALE = 0.1;
+
 SURF_BOTTOM = 101;
 SURF_TOP    = 102;
 SURF_WEST   = 103;
@@ -13,14 +15,14 @@ SURF_NORTH  = 106;
 //--------
 // Points
 //--------
- Point(1) = {0.0, 0.0, 0.00};
- Point(2) = {1.0, 0.0, 0.00};
- Point(3) = {0.0, 1.0, 0.00};
- Point(4) = {1.0, 1.0, 0.00};
- Point(5) = {0.0, 0.0, 0.10};
- Point(6) = {1.0, 0.0, 0.10};
- Point(7) = {0.0, 1.0, 0.10};
- Point(8) = {1.0, 1.0, 0.10};
+ Point(1) = {0.0 * GEOM_SCALE, 0.0 * GEOM_SCALE, 0.00 * GEOM_SCALE};
+ Point(2) = {1.0 * GEOM_SCALE, 0.0 * GEOM_SCALE, 0.00 * GEOM_SCALE};
+ Point(3) = {0.0 * GEOM_SCALE, 1.0 * GEOM_SCALE, 0.00 * GEOM_SCALE};
+ Point(4) = {1.0 * GEOM_SCALE, 1.0 * GEOM_SCALE, 0.00 * GEOM_SCALE};
+ Point(5) = {0.0 * GEOM_SCALE, 0.0 * GEOM_SCALE, 0.10 * GEOM_SCALE};
+ Point(6) = {1.0 * GEOM_SCALE, 0.0 * GEOM_SCALE, 0.10 * GEOM_SCALE};
+ Point(7) = {0.0 * GEOM_SCALE, 1.0 * GEOM_SCALE, 0.10 * GEOM_SCALE};
+ Point(8) = {1.0 * GEOM_SCALE, 1.0 * GEOM_SCALE, 0.10 * GEOM_SCALE};
 
 //-------
 // Lines
