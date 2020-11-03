@@ -68,7 +68,6 @@
 # Boundary conditions
 #---------------------
   BOUNDARY_CONDITION    wall
-
-    TYPE                wall_flux
+    TYPE                wall
     VARIABLES           u     v     w     q
     VALUES              0.0   0.0   0.0   0.1
