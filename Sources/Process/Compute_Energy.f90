@@ -254,7 +254,7 @@
       a % val(a % dia(c2))  = a % val(a % dia(c2)) + a21
       a % val(a % pos(1,s)) = a % val(a % pos(1,s)) - a12
       a % val(a % pos(2,s)) = a % val(a % pos(2,s)) - a21
-    else if(c2.lt.0) then
+    else if(c2 .lt. 0) then
       ! Outflow is included because of the flux
       ! corrections which also affects velocities
       if( (Var_Mod_Bnd_Cond_Type(t, c2) .eq. INFLOW) .or.  &

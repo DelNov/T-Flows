@@ -158,7 +158,7 @@
        turb % model .eq. HYBRID_LES_RANS) then
       if(c2 < 0) then
         if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALL .or.  &
-          Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALLFL) then
+           Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALLFL) then
           dif_eff1 = turb % diff_w(c1)
           dif_eff2 = dif_eff1
         end if
