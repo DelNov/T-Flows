@@ -4,7 +4,7 @@
  TIME_STEP                            0.05
  NUMBER_OF_TIME_STEPS               200
 
- NUMBER_OF_USER_SCALARS               0
+ NUMBER_OF_SCALARS               0
 
 #------------------
 # Saving intervals

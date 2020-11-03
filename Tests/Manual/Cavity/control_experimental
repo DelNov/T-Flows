@@ -5,7 +5,7 @@
  NUMBER_OF_TIME_STEPS                        500
  STARTING_TIME_STEP_FOR_TURB_STATISTICS    10000
 
- NUMBER_OF_USER_SCALARS               0
+ NUMBER_OF_SCALARS               0
 
 #------------------
 # Saving intervals
