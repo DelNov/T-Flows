@@ -27,7 +27,7 @@
 # Physical models
 #-----------------
 
- GRAVITATIONAL_VECTOR   0.0  0.0  1.0
+ GRAVITATIONAL_VECTOR   0.0  0.0 -1.0
 
  # Properties based on Pr and Ra numbers:
  # Pr = 0.71
