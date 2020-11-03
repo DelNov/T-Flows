@@ -4,11 +4,11 @@
  PROBLEM_NAME       lower_dom
  HEAT_TRANSFER      yes
 
- NUMBER_OF_TIME_STEPS      90
- RESULTS_SAVE_INTERVAL     30
+ NUMBER_OF_TIME_STEPS     120
+ RESULTS_SAVE_INTERVAL     12
  BACKUP_SAVE_INTERVAL     120
 
- TIME_STEP               0.1
+ TIME_STEP               0.5
 
 #-------------------
 # Monitoring points 
@@ -23,11 +23,11 @@
 #-----------------
  NUMBER_OF_SCALARS      1
 
- MASS_DENSITY           1.0
- THERMAL_CONDUCTIVITY   1.4080e-4
- DYNAMIC_VISCOSITY      0.001
- HEAT_CAPACITY          1.0
- SCALARS_DIFFUSIVITY    0.001
+ MASS_DENSITY              1.2
+ THERMAL_CONDUCTIVITY      0.002
+ DYNAMIC_VISCOSITY         0.001
+ HEAT_CAPACITY             1.0
+ SCALARS_DIFFUSIVITY       0.001
 
  TURBULENCE_MODEL       none
 
@@ -42,47 +42,42 @@
 
  TIME_INTEGRATION_SCHEME  linear
 
- ADVECTION_SCHEME_FOR_MOMENTUM    minmod
+ ADVECTION_SCHEME_FOR_MOMENTUM    upwind
 
 #------------------------
 # Linear solver settings
 #------------------------
  PRECONDITIONER_FOR_SYSTEM_MATRIX   incomplete_cholesky
  TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-3
- TOLERANCE_FOR_PRESSURE_SOLVER      1.e-3
- TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-4
+ TOLERANCE_FOR_PRESSURE_SOLVER      1.e-6
+ TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
 
 #--------------------
 # Initial conditions
 #--------------------
   INITIAL_CONDITION
     VARIABLES           u     v     w    t      c_01
-    VALUES              0.0   1.0   0.0  20.0   0.2
+    VALUES              0.0   0.01  0.0  20.0   0.01
 
 #---------------------
 # Boundary conditions
 #---------------------
   BOUNDARY_CONDITION    bottom_wall
-    TYPE                wall_flux
-    VARIABLES           u     v     w     q    q_01
-    VALUES              0.0   0.0   0.0   0.0  0.00
+    TYPE                wall
+    VARIABLES           u     v     w     q     q_01
+    VALUES              0.0   0.0   0.0   0.0   0.0
 
   BOUNDARY_CONDITION    top_wall
     TYPE                wall
-    VARIABLES           u     v     w    t
-    VALUES              0.0   0.0   0.0  10.0
-
-  BOUNDARY_CONDITION    top_wall
-    TYPE                wall_flux
-    VARIABLES           q_01
-    VALUES              0.00
+    VARIABLES           u     v     w       t      c_01
+    VALUES              0.0   0.0   0.0     15.0   0.015
 
   BOUNDARY_CONDITION    inlet
     TYPE                inflow
-    VARIABLES           u     v     w    t     c_01
-    VALUES              0.0   1.0   0.0  30.0  0.4
+    VARIABLES           u     v     w     t      c_01
+    VALUES              0.0   0.02  0.0   20.0   0.02
 
   BOUNDARY_CONDITION    outlet
     TYPE                outflow
-    VARIABLES           u     v     w    t     c_01
-    VALUES              0.0   0.0   0.0  20.0  0.2
+    VARIABLES           u     v     w     t      c_01
+    VALUES              0.0   0.0   0.0   20.0   0.01
