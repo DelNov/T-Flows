@@ -58,11 +58,12 @@
     end do
   end do
 
-  !---------------------------------------!
-  !                                       !
-  !   Use the values from the interface   !
-  !                                       !
-  !---------------------------------------!
+  !------------------------------------------------------!
+  !                                                      !
+  !   Use the values you sent to the interface buffers   !
+  !    to impose boundary conditions for each domain.    !
+  !                                                      !
+  !------------------------------------------------------!
 
   do d1 = 1, n_dom
     do d2 = 1, n_dom
@@ -79,16 +80,21 @@
         ic1 = inter(d1, d2) % cell_1(n1)   ! domain 1, cell inside the domain
         bc1 = inter(d1, d2) % bcel_1(n1)   ! domain 1, cell on the boundary
 
-        ! Fetch dependent variables
+        ! Fetch dependent variables from domain 1 (this domain)
         t1  = flow(d1) % t % n(ic1)                 ! temperature in dom 1
         k1  = flow(d1) % conductivity(ic1)          ! conductivity in dom 1
         wd1 = flow(d1) % pnt_grid % wall_dist(ic1)  ! wall distance in dom 1
         sc1 = flow(d1) % scalar(1) % n(ic1)         ! scalar in dom 1
 
+        ! Fetch values from buffers (other domain)
         t2  = inter(d1, d2) % phi_2(n, T)           ! temperature in dom 2
         k2  = inter(d1, d2) % phi_2(n, K)           ! conductivity in dom 2
         wd2 = inter(d1, d2) % phi_2(n, WD)          ! wall distance in dom 2
         sc2 = inter(d1, d2) % phi_2(n, C)           ! scalar in dom 2
+
+        !---------------------------------------------!
+        !   Implementation of your model comes here   !
+        !---------------------------------------------!
 
         ! Set temperature at the boundary of domain 1
         flow(d1) % t % n(bc1) = (t1 * k1 / wd1 + t2 * k2 / wd2)  &
@@ -96,6 +102,7 @@
 
         ! Set scalar at the boundary of domain 1
         flow(d1) % scalar(1) % n(bc1) = (sc1 + sc2) * 0.5
+
       end do
 
       !-----------------------------!
@@ -116,10 +123,15 @@
         wd2 = flow(d2) % pnt_grid % wall_dist(ic2)  ! wall distance in dom 2
         sc2 = flow(d2) % scalar(1) % n(ic2)         ! scalar in dom 2
 
+        ! Fetch values from buffers (other domain in this case 1)
         t1  = inter(d1, d2) % phi_1(n, T)           ! temperature in dom 1
         k1  = inter(d1, d2) % phi_1(n, K)           ! conductivity in dom 1
         wd1 = inter(d1, d2) % phi_1(n, WD)          ! wall distance in dom 1
         sc1 = inter(d1, d2) % phi_1(n, C)           ! scalar in dom 1
+
+        !---------------------------------------------!
+        !   Implementation of your model comes here   !
+        !---------------------------------------------!
 
         ! Set temperature at the boundary of domain 2
         flow(d2) % t % n(bc2) = (t1 * k1 / wd1 + t2 * k2 / wd2)  &
@@ -127,6 +139,7 @@
 
         ! Set scalar at the boundary of domain 2
         flow(d2) % scalar(1) % n(bc2) = (sc1 + sc2) * 0.5
+
       end do
     end do
   end do
