@@ -10,9 +10,9 @@
 # Monitoring points 
 #-------------------
  NUMBER_OF_MONITORING_POINTS    1
-   MONITORING_POINT_001         0.5  0.1  0.75
+   MONITORING_POINT_001         0.0  0.0  -0.2
 
- POINT_FOR_MONITORING_PLANES    0.5  0.1  0.75
+ POINT_FOR_MONITORING_PLANES    0.0  0.0  -0.2
 
 #-----------------
 # Physical models
@@ -44,8 +44,8 @@
 #------------------------
  PRECONDITIONER_FOR_SYSTEM_MATRIX   incomplete_cholesky
  TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-3
- TOLERANCE_FOR_PRESSURE_SOLVER      1.e-3
- TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-4
+ TOLERANCE_FOR_PRESSURE_SOLVER      1.e-6
+ TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
 
  MAX_ITERATIONS_FOR_PRESSURE_SOLVER  256
 
@@ -80,6 +80,6 @@
     VALUES              0.0   1.0   0.0  60.0  0.01  0.001  0.006  0.001
 
   BOUNDARY_CONDITION    north
-    TYPE                outflow
+    TYPE                pressure
     VARIABLES           u     v     w    t     kin   eps    zeta   f22
     VALUES              0.0   0.0   0.0  20.0  0.01  0.001  0.006  0.001
