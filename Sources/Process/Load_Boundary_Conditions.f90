@@ -112,6 +112,7 @@
         print *, '# Exiting the program.'
       end if
       call Comm_Mod_End
+      stop
     end if
 
 2 continue
