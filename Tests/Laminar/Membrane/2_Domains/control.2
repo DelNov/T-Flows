@@ -14,9 +14,9 @@
 # Monitoring points 
 #-------------------
  NUMBER_OF_MONITORING_POINTS    1
-   MONITORING_POINT_001         0.5  0.1  0.75
+   MONITORING_POINT_001         0.05  0.05  -0.01
 
- POINT_FOR_MONITORING_PLANES    0.5  0.1  0.75
+ POINT_FOR_MONITORING_PLANES    0.05  0.05  -0.01
 
 #-----------------
 # Physical models
@@ -78,6 +78,6 @@
     VALUES              0.0   0.02  0.0   20.0   0.02
 
   BOUNDARY_CONDITION    outlet
-    TYPE                outflow
+    TYPE                pressure
     VARIABLES           u     v     w     t      c_01
     VALUES              0.0   0.0   0.0   20.0   0.01

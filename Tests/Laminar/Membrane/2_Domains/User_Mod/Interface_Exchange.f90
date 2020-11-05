@@ -8,13 +8,20 @@
   type(Interface_Type)        :: inter(MD, MD)
   type(Field_Type),    target :: flow(MD)
   integer                     :: n_dom
-!-----------------------------------[Locals]-----------------------------------!
-  integer :: d1, d2, n1, n2, n, ic1, bc1, ic2, bc2
-  real    :: t1, t2, k1, k2, wd1, wd2, sc1, sc2
+!------------------------------[Local parameters]------------------------------!
   integer, parameter :: T  = 1,  &  ! store temperature as the first ...
                         K  = 2,  &  ! ... conductivity as the second ...
                         WD = 3,  &  ! ... and wall distance as the third ...
-                        C  = 4      ! ... and scalar as the fourth
+                        C  = 4      ! ... and scalar as the fourth variable
+!-----------------------------------[Locals]-----------------------------------!
+  integer :: d1, d2     ! counters for domains 1 and 2
+  integer :: n1, n2, n  ! local counters and number at interfaces 1 and 2
+  integer :: ic1, bc1   ! internal (i) and boundary (b) cells in domain 1
+  integer :: ic2, bc2   ! internal (i) and boundary (b) cells in domain 1
+  real    :: t1, t2     ! temperatures in domains 1 and 2
+  real    :: k1, k2     ! conductivities in domains 1 and 2
+  real    :: wd1, wd2   ! wall distances in domains 1 and 2
+  real    :: sc1, sc2   ! scalars in domains 1 and 2
 !==============================================================================!
 
   !-------------------------------------------!
