@@ -71,6 +71,11 @@
     VARIABLES           u     v     w     q     q_01
     VALUES              0.0   0.0   0.0   0.0   0.0
 
+  BOUNDARY_CONDITION    side_walls
+    TYPE                wall
+    VARIABLES           u     v     w     q     q_01
+    VALUES              0.0   0.0   0.0   0.0   0.0
+
   BOUNDARY_CONDITION    inlet
     TYPE                inflow
     VARIABLES           u     v     w     t      c_01
