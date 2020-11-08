@@ -69,7 +69,7 @@ Physical Surface("bottom_wall") = {SURF_BOTTOM};
 Physical Surface("top_wall")    = {SURF_TOP};
 Physical Surface("inlet")       = {SURF_SOUTH};
 Physical Surface("outlet")      = {SURF_NORTH};
-Physical Surface("periodic_y")  = {SURF_EAST, SURF_WEST};
+Physical Surface("side_walls")  = {SURF_EAST, SURF_WEST};
 
 Physical Volume("upper_dom") = {26};
 

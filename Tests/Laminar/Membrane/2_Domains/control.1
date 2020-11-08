@@ -8,7 +8,7 @@
  RESULTS_SAVE_INTERVAL     12
  BACKUP_SAVE_INTERVAL     120
 
- TIME_STEP               0.5
+ TIME_STEP               0.025
 
 #-------------------
 # Monitoring points 
@@ -67,6 +67,11 @@
     VALUES              0.0   0.0   0.0   15.0   0.015
 
   BOUNDARY_CONDITION    top_wall
+    TYPE                wall
+    VARIABLES           u     v     w     q     q_01
+    VALUES              0.0   0.0   0.0   0.0   0.0
+
+  BOUNDARY_CONDITION    side_walls
     TYPE                wall
     VARIABLES           u     v     w     q     q_01
     VALUES              0.0   0.0   0.0   0.0   0.0
