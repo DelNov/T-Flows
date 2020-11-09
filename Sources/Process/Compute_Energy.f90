@@ -320,14 +320,14 @@
 
   ! Call linear solver to solve the equations
   call Cpu_Timer_Mod_Start('Linear_Solver_For_Energy')
-  call Bicg(sol,          &
-            t % n,        &
-            b,            &
-            t % precond,  &
-            t % mniter,   &
-            t % eniter,   &
-            t % tol,      &
-            t % res)
+  call Solver_Mod_Bicg(sol,          &
+                       t % n,        &
+                       b,            &
+                       t % precond,  &
+                       t % mniter,   &
+                       t % eniter,   &
+                       t % tol,      &
+                       t % res)
   call Cpu_Timer_Mod_Stop('Linear_Solver_For_Energy')
 
   ! Print some info on the screen

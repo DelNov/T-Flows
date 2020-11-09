@@ -323,15 +323,15 @@
       ! Call linear solver
       call Cpu_Timer_Mod_Start('Linear_Solver_For_Momentum')
 
-      call Bicg(sol,           &
-                ui % n,        &
-                b,             &
-                ui % precond,  &
-                ui % mniter,   &
-                ui % eniter,   &
-                ui % tol,      &
-                ui % res,      &
-                norm = vel_max)
+      call Solver_Mod_Bicg(sol,           &
+                           ui % n,        &
+                           b,             &
+                           ui % precond,  &
+                           ui % mniter,   &
+                           ui % eniter,   &
+                           ui % tol,      &
+                           ui % res,      &
+                           norm = vel_max)
       call Cpu_Timer_Mod_Stop('Linear_Solver_For_Momentum')
 
       ! Fill the info screen up

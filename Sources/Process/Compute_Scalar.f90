@@ -345,14 +345,14 @@
 
   ! Call linear solver to solve them
   call Cpu_Timer_Mod_Start('Linear_Solver_For_Scalars')
-  call Bicg(sol,            &
-            phi % n,        &
-            b,              &
-            phi % precond,  &
-            phi % mniter,   &
-            phi % eniter,   &
-            phi % tol,      &
-            phi % res)
+  call Solver_Mod_Bicg(sol,            &
+                       phi % n,        &
+                       b,              &
+                       phi % precond,  &
+                       phi % mniter,   &
+                       phi % eniter,   &
+                       phi % tol,      &
+                       phi % res)
   call Cpu_Timer_Mod_Stop('Linear_Solver_For_Scalars')
 
   read(phi % name(3:4), *) ns  ! reterive the number of scalar

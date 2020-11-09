@@ -240,14 +240,14 @@
 
   ! Call linear solver to solve the equations
   call Cpu_Timer_Mod_Start('Linear_Solver_For_Turbulence')
-  call Bicg(sol,            &
-            phi % n,        &
-            b,              &
-            phi % precond,  &
-            phi % mniter,   &
-            phi % eniter,   &
-            phi % tol,      &
-            phi % res)
+  call Solver_Mod_Bicg(sol,            &
+                       phi % n,        &
+                       b,              &
+                       phi % precond,  &
+                       phi % mniter,   &
+                       phi % eniter,   &
+                       phi % tol,      &
+                       phi % res)
   call Cpu_Timer_Mod_Stop('Linear_Solver_For_Turbulence')
 
   do c = 1, grid % n_cells
