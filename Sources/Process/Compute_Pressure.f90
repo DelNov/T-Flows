@@ -217,15 +217,15 @@
   call Control_Mod_Solver_For_Pressure(solver)
 
   call Cpu_Timer_Mod_Start('Linear_Solver_For_Pressure')
-  call Cg(sol,           &
-          pp % n,        &
-          b,             &
-          pp % precond,  &
-          pp % mniter,   &      ! max number of iterations
-          pp % eniter,   &      ! executed number of iterations
-          pp % tol,      &
-          pp % res,      &
-          norm = p_nor)         ! last argument: number for normalisation
+  call Solver_Mod_Cg(sol,           &
+                     pp % n,        &
+                     b,             &
+                     pp % precond,  &
+                     pp % mniter,   &      ! max number of iterations
+                     pp % eniter,   &      ! executed number of iterations
+                     pp % tol,      &
+                     pp % res,      &
+                     norm = p_nor)         ! number for normalisation
 
   call Cpu_Timer_Mod_Stop('Linear_Solver_For_Pressure')
 

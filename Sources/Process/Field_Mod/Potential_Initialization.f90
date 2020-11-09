@@ -209,14 +209,14 @@
     phi % precond = 'INCOMPLETE_CHOLESKY'
 
     ! Call linear solver to solve the equations
-    call Bicg(sol,            &
-              phi % n,        &
-              b,              &
-              phi % precond,  &
-              phi % mniter,   &
-              phi % eniter,   &
-              phi % tol,      &
-              phi % res)
+    call Solver_Mod_Bicg(sol,            &
+                         phi % n,        &
+                         b,              &
+                         phi % precond,  &
+                         phi % mniter,   &
+                         phi % eniter,   &
+                         phi % tol,      &
+                         phi % res)
     if(this_proc < 2) then
       print '(a,i4,a,e12.4)', ' # Computed potential in ',   phi % eniter,  &
                               ' iterations with residual: ', phi % res
