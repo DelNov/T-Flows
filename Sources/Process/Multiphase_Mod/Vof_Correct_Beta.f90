@@ -32,9 +32,9 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
     fs = grid % f(s)
-    if (abs(v_flux % n(s)) > epsloc) then
+    if(abs(v_flux % n(s)) > epsloc) then
 
-      if (v_flux % n(s) > 0.0) then
+      if(v_flux % n(s) > 0.0) then
         donor = c1
         accept = c2
       else
@@ -51,11 +51,11 @@
 
       cf = c_d(donor)
 
-      if (vof % n(donor) < 0.0) then
+      if(vof % n(donor) < 0.0) then
         e_minus = max(-vof % n(donor), 0.0)
         ! Donor value < 0.0 Ex: sd = -0.1 -> e_minus = +0.1
-        if (e_minus > epsloc .and. cf > epsloc) then
-          if (delta_alfa > e_minus) then
+        if(e_minus > epsloc .and. cf > epsloc) then
+          if(delta_alfa > e_minus) then
             bcorr = e_minus * (2.0 + cf - 2.0 * cf * beta_f(s))     &
                             / (2.0 * cf * (delta_alfa - e_minus))
             bcorr = min(bcorr, beta_f(s))
@@ -63,11 +63,11 @@
         end if
       end if
 
-      if (vof % n(donor) > 1.0) then
+      if(vof % n(donor) > 1.0) then
         e_plus = max(vof % n(donor) - 1.0, 0.0)
         ! Donor value > 1.0 Ex: sd = 1.1 -> e_plus = +0.1
-        if (e_plus > epsloc .and. cf > epsloc) then
-          if (delta_alfa < - e_plus) then
+        if(e_plus > epsloc .and. cf > epsloc) then
+          if(delta_alfa < - e_plus) then
             bcorr = e_plus * (2.0 + cf - 2.0 * cf * beta_f(s))     &
                            / (2.0 * cf * (-delta_alfa - e_plus))
             bcorr = min(bcorr, beta_f(s))

@@ -58,20 +58,20 @@
   do s = grid % n_bnd_faces + 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
-    if (vof % n(c1) > PICO .and. vof % n(c1) < 1.0 - PICO) then
+    if(vof % n(c1) > PICO .and. vof % n(c1) < 1.0 - PICO) then
       ic(c1) = 1
-      if (vof % n(c2) > PICO .and. vof % n(c2) < 1.0 - PICO) then
+      if(vof % n(c2) > PICO .and. vof % n(c2) < 1.0 - PICO) then
         ic(c2) = 1
-      else if (vof % n(c2) > 1.0 - PICO) then
+      else if(vof % n(c2) > 1.0 - PICO) then
         ic(c2) = 2
       end if
     end if
 
-    if (vof % n(c2) > PICO .and. vof % n(c2) < 1.0 - PICO) then
+    if(vof % n(c2) > PICO .and. vof % n(c2) < 1.0 - PICO) then
       ic(c2) = 1
-      if (vof % n(c1) > PICO .and. vof % n(c1) < 1.0 - PICO) then
+      if(vof % n(c1) > PICO .and. vof % n(c1) < 1.0 - PICO) then
         ic(c1) = 1
-      else if (vof % n(c1) > 1.0 - PICO) then
+      else if(vof % n(c1) > 1.0 - PICO) then
         ic(c1) = 2
       end if
     end if
@@ -84,7 +84,7 @@
   !  c1 = grid % faces_c(1,s)
   !  c2 = grid % faces_c(2,s)
 
-  !  if (Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. SYMMETRY) then
+  !  if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. SYMMETRY) then
 
   !    tx_f = t % x(c1) * grid % sx(s)
   !    ty_f = t % y(c1) * grid % sy(s)
@@ -130,8 +130,8 @@
 
   ! Computing flux rate
   do c = 1, grid % n_cells
-    if (ic(c) > 0) then
-      if (ic(c) == 1) then
+    if(ic(c) > 0) then
+      if(ic(c) == 1) then
         !flux_rate(c) = qci(c) / (flow % latent_heat * grid % vol(c))
         flux_rate(c) = some_flux
         !write(*,*) c, grid % xc(c), vof % n(c)
@@ -149,16 +149,16 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
-    if (ic(c1) == 1) then
-      if (ic(c2) == 2) then
+    if(ic(c1) == 1) then
+      if(ic(c2) == 2) then
         flux_rate(c1) = some_flux
         !flux_rate(c1) = flux_rate(c1)                                     &
         !              + qci(c2) / (flow % latent_heat * grid % vol(c2))
       end if
     end if
 
-    if (ic(c2) == 1) then
-      if (ic(c1) == 2) then
+    if(ic(c2) == 1) then
+      if(ic(c1) == 2) then
         flux_rate(c2) = some_flux
         !flux_rate(c2) = flux_rate(c2)                                     &
         !              + qci(c1) / (flow % latent_heat * grid % vol(c1))
@@ -168,7 +168,7 @@
 
   ! Zeroing cells type 2
   do c = 1, grid % n_cells
-    if (ic(c) == 2) then
+    if(ic(c) == 2) then
       qci(c) = 0.0
     end if
   end do

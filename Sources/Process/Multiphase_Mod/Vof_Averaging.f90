@@ -12,7 +12,7 @@
   real    :: avg
 !==============================================================================!
 
-  if (mult % phase_change) then
+  if(mult % phase_change) then
     do i = 1, size(mult % avg_cells, 1)
       avg = 0.0
       do j = 1, size(mult % avg_cells, 2)

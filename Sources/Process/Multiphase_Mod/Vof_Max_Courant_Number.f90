@@ -34,7 +34,7 @@
   ! Initialize
   c_d(-mult % pnt_grid % n_bnd_cells:mult % pnt_grid % n_cells) = 0.0
 
-  if (interf == 1) then
+  if(interf == 1) then
 
     ! At boundaries
     do s = 1, grid % n_bnd_faces
@@ -72,7 +72,7 @@
                         * max( v_flux % n(s) * dt / grid % vol(c2), 0.0)
     end do
 
-    !if (mult % phase_Change) then
+    !if(mult % phase_Change) then
     !  do c = 1, grid % n_cells
     !    vof_dist = min(max(vof % n(c1), 0.0),1.0)
 
@@ -110,7 +110,7 @@
       c_d(c2) = c_d(c2) + max( v_flux % n(s) * dt / grid % vol(c2), 0.0)
     end do
 
-    !if (mult % phase_Change) then
+    !if(mult % phase_Change) then
     !  do c = 1, grid % n_cells
     !    c_d(c) = c_d(c) + mult % flux_rate(c) / flow % density_f(s) * dt
     !  end do

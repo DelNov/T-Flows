@@ -38,7 +38,7 @@
     norm_grad = sqrt(  smooth % x(c) ** 2  &
                      + smooth % y(c) ** 2  &
                      + smooth % z(c) ** 2)
-    if (norm_grad >= epsloc) then
+    if(norm_grad >= epsloc) then
       mult % nx(c) = smooth % x(c) / norm_grad
       mult % ny(c) = smooth % y(c) / norm_grad
       mult % nz(c) = smooth % z(c) / norm_grad
@@ -58,19 +58,19 @@
   do s = 1, grid % n_bnd_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
-    if (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.   &
+    if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.   &
         Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. SYMMETRY) then
 
       norm_grad = norm2((/mult % nx(c1), mult % ny(c1), mult % nz(c1)/))
 
-      if (norm_grad > epsloc) then
+      if(norm_grad > epsloc) then
         v1 = (/grid % sx(s), grid % sy(s), grid % sz(s)/)
         v2 = (/mult % nx(c1), mult % ny(c1), mult % nz(c1)/)
         v3 = Math_Mod_Cross_Product(v1, v2)
         v4 = Math_Mod_Cross_Product(v3, v1)
         ! projection on v4
         norm_grad = norm2(v4)
-        if (norm_grad > epsloc) then
+        if(norm_grad > epsloc) then
           mult % nx(c2) = v4(1) / norm_grad
           mult % ny(c2) = v4(2) / norm_grad
           mult % nz(c2) = v4(3) / norm_grad
@@ -88,11 +88,11 @@
   do s = 1, grid % n_bnd_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
-    if (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) then
+    if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) then
 
       ! Accumulate values of faces
       norm_grad = norm2((/mult % nx(c1),mult % ny(c1),mult % nz(c1)/))
-      if (norm_grad > epsloc) then
+      if(norm_grad > epsloc) then
         dotprod = dot_product((/grid % dx(s), grid % dy(s), grid % dz(s)/),   &
                               (/grid % sx(s), grid % sy(s), grid % sz(s)/))
 

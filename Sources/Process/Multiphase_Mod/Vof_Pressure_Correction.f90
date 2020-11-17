@@ -86,7 +86,7 @@
 
   ! Introduce temporal correction and subrelaxation
   ! (See equation 3.61 in Denner's thesis)
-  if (flow % temp_corr) then
+  if(flow % temp_corr) then
     do s = grid % n_bnd_faces + 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
@@ -117,7 +117,7 @@
     end do
   end if
 
-  if (mult % phase_change) then
+  if(mult % phase_change) then
     do c = 1, grid % n_cells
       b(c) = b(c) + mult % flux_rate(c) * grid % vol(c)                    &
                                         * ( 1.0 / mult % phase_dens(1)     &

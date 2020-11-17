@@ -38,7 +38,7 @@
   epsloc = epsilon(epsloc)
 
   ! Surface tension contribution
-  if (mult % surface_tension > TINY) then
+  if(mult % surface_tension > TINY) then
 
     select case(i)
       case(1)
@@ -74,9 +74,9 @@
   ! This is here because they need to be collected before
   ! u, v, w are calculated
 
-  if (flow % temp_corr) then
+  if(flow % temp_corr) then
     ! Guessed face velocity
-    if (i == 1) then
+    if(i == 1) then
       do s = grid % n_bnd_faces + 1, grid % n_faces
         c1 = grid % faces_c(1,s)
         c2 = grid % faces_c(2,s)

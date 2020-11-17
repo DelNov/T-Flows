@@ -27,7 +27,7 @@
   !---------------------------------------------------!
   !   Curvature smoothing was engaged                 !
   !---------------------------------------------------!
-  if (mult % n_conv_curv > 0) then
+  if(mult % n_conv_curv > 0) then
 
     ! Calculate smooth variable from vof ...
     call Multiphase_Mod_Vof_Smooth_Scalar(grid, mult, vof % n,   &
@@ -53,7 +53,7 @@
   !-------------------------------------------------------------!
   !   Smoothing of normal is engaged                            !
   !-------------------------------------------------------------!
-  if (mult % n_conv_norm > 0) then
+  if(mult % n_conv_norm > 0) then
     call Multiphase_Mod_Vof_Smooth_Scalar(grid, mult, vof % n,   &
                                    smooth % n(-nb:nc), mult % n_conv_norm)
     call Field_Mod_Grad_Variable(flow, smooth)

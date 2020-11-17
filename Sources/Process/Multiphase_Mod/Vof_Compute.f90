@@ -39,10 +39,10 @@
 
   epsloc = epsilon(epsloc)
 
-  if (vof % adv_scheme .eq. CICSAM .or. &
+  if(vof % adv_scheme .eq. CICSAM .or. &
       vof % adv_scheme .eq. STACS) then
 
-    if (vof % adv_scheme .eq. CICSAM) then
+    if(vof % adv_scheme .eq. CICSAM) then
       ! Compute courant Number close to the interface:
       call Vof_Max_Courant_Number(mult, dt, c_d, 1, courant_max)
 
@@ -50,7 +50,7 @@
                   mult % n_sub_param)
 
       ! Warning if Courant Number is exceeded
-      if (n_sub > 1) then
+      if(n_sub > 1) then
         if(this_proc < 2) then
           call File_Mod_Append_File_For_Writing('alert-dt-vof.dat', fu)
           write(fu,*) 'Courant Number was exceded at iteration: ', n
@@ -68,11 +68,11 @@
   end if
 
   ! Phase change
-  if (mult % phase_change) then
+  if(mult % phase_change) then
     call Multiphase_Mod_Vof_Mass_Transfer(mult, sol)
   end if
 
-  if (vof % adv_scheme .eq. UPWIND) then
+  if(vof % adv_scheme .eq. UPWIND) then
     !-------------------------!
     !   Matrix Coefficients   !
     !-------------------------!
@@ -92,7 +92,7 @@
       vof % n(c) = max(min(vof % n(c),1.0),0.0)
     end do
 
-  else if (vof % adv_scheme .eq. CICSAM .or. &
+  else if(vof % adv_scheme .eq. CICSAM .or. &
            vof % adv_scheme .eq. STACS) then
 
     do i_sub = 1, n_sub
@@ -149,11 +149,11 @@
 
         ! Determine if 0 <= vof <= 1.0
         do c = 1, grid % n_cells
-          if (vof % n(c) < -vof % tol) then
+          if(vof % n(c) < -vof % tol) then
             n_wrong_vf0 = n_wrong_vf0 + 1
           end if
 
-          if (vof % n(c) - 1.0 > vof % tol) then
+          if(vof % n(c) - 1.0 > vof % tol) then
             n_wrong_vf1 = n_wrong_vf1 + 1
           end if
         end do
@@ -164,13 +164,13 @@
         !   Correct beta at faces   !
         !---------------------------!
 
-        if (n_wrong_vf0 > 0 .or. n_wrong_vf1 > 0) then
+        if(n_wrong_vf0 > 0 .or. n_wrong_vf1 > 0) then
           wrong_vf = 1
         end if
 
         call Comm_Mod_Global_Sum_Int(wrong_vf)
 
-        if (wrong_vf == 0) then
+        if(wrong_vf == 0) then
           goto 1
         else
           call Multiphase_Mod_Vof_Correct_Beta(mult, beta_f, c_d)
@@ -187,10 +187,10 @@
         c2 = grid % faces_c(2,s)
 
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. INFLOW) then
-          if (vof % n(c2) < epsloc) then
+          if(vof % n(c2) < epsloc) then
             vof % n(c2) = 0.0
           end if
-          if (vof % n(c2) - 1.0 >= epsloc) then
+          if(vof % n(c2) - 1.0 >= epsloc) then
             vof % n(c2) = 1.0
           end if
         end if
@@ -201,10 +201,10 @@
       !   Correct Interior Volume Fraction   !
       !--------------------------------------!
       do c = 1, grid % n_cells
-        if (vof % n(c) < epsloc) then
+        if(vof % n(c) < epsloc) then
           vof % n(c) = 0.0
         end if
-        if (vof % n(c) - 1.0 >= epsloc) then
+        if(vof % n(c) - 1.0 >= epsloc) then
           vof % n(c) = 1.0
         end if
       end do
@@ -219,7 +219,7 @@
   !   Volume fraction at faces   !
   !------------------------------!
 
-  if (vof % adv_scheme .eq. UPWIND) then
+  if(vof % adv_scheme .eq. UPWIND) then
 
     ! At boundaries
     do s = 1, grid % n_bnd_faces
@@ -230,7 +230,7 @@
       end if
     end do
 
-  else if (vof % adv_scheme .eq. CICSAM .or. vof % adv_scheme .eq. STACS) then
+  else if(vof % adv_scheme .eq. CICSAM .or. vof % adv_scheme .eq. STACS) then
 
     ! call Multiphase_Mod_Vof_Boundary_Extrapolation(grid, mult, vof % n)
     ! At boundaries
