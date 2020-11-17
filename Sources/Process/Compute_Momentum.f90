@@ -293,7 +293,7 @@
     !   Surface tension contribution   !
     !----------------------------------!
     if(mult % model .eq. VOLUME_OF_FLUID) then
-      call Multiphase_Mod_Vof_Momentum_Contribution(mult, sol, ui, i)
+      call Multiphase_Mod_Vof_Momentum_Contribution(mult, sol, i)
     end if
 
     !----------------------------------------------!

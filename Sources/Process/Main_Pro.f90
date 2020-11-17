@@ -182,7 +182,7 @@
       if (read_backup(d))  then
         flow % piso_status = .false.
       end if
-      call Multiphase_Mod_Vof_Physical_Properties(mult(d), read_backup(d))
+      call Multiphase_Mod_Vof_Physical_Properties(mult(d))
     end if
 
     ! Initialize monitoring points
@@ -285,7 +285,7 @@
           call Results_Mod_Save(flow(d), turb(d), mult(d), swarm(d), curr_dt,  &
                                 plot_inside=.true., domain=d)
         end if
-        call Multiphase_Mod_Vof_Physical_Properties(mult(d), read_backup(d))
+        call Multiphase_Mod_Vof_Physical_Properties(mult(d))
       end if
 
       ! Lagrangian particle tracking
@@ -332,13 +332,13 @@
         call Balance_Volume(flow(d), mult(d))
         call Compute_Pressure(flow(d), mult(d), sol(d), ini)
 
-        call Multiphase_Averaging(flow(d), mult(d), flow(d) % p)
+        call Multiphase_Averaging(mult(d), flow(d) % p)
         call Field_Mod_Calculate_Mass_Fluxes(flow(d), flow(d) % v_flux % n)
         call Correct_Velocity(flow(d), mult(d), sol(d), ini)
 
-        call Multiphase_Averaging(flow(d), mult(d), flow(d) % u)
-        call Multiphase_Averaging(flow(d), mult(d), flow(d) % v)
-        call Multiphase_Averaging(flow(d), mult(d), flow(d) % w)
+        call Multiphase_Averaging(mult(d), flow(d) % u)
+        call Multiphase_Averaging(mult(d), flow(d) % v)
+        call Multiphase_Averaging(mult(d), flow(d) % w)
         call Piso_Algorithm(flow(d), turb(d), mult(d), sol(d), ini)
 
         ! Energy (practically temperature)

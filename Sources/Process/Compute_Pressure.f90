@@ -198,7 +198,7 @@
   !   In case of VOF, surface tension and  gravity correction   !
   !-------------------------------------------------------------!
   if(mult % model .eq. VOLUME_OF_FLUID) then
-    call Multiphase_Mod_Vof_Pressure_Correction(mult, sol, ini)
+    call Multiphase_Mod_Vof_Pressure_Correction(mult, sol)
   end if
 
   !-------------------------------------!
