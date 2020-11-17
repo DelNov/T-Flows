@@ -104,8 +104,10 @@
                        + mult % nz(c1)**2)
 
       if(norm_grad > epsloc) then
-        dotprod = dot_product((/grid % dx(s), grid % dy(s), grid % dz(s)/),   &
-                              (/grid % sx(s), grid % sy(s), grid % sz(s)/))
+
+        dotprod = grid % dx(s) * grid % sx(s)  &
+                + grid % dy(s) * grid % sy(s)  &
+                + grid % dz(s) * grid % sz(s)
 
         mult % nx(c1) = grid % dx(s) / dotprod * grid % s(s)                  &
                     * cos(vof % q(c2) * PI /180.0)                            &
