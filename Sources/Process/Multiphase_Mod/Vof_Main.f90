@@ -22,7 +22,7 @@
       call Update_Boundary_Values(flow, turb, mult)
       call Multiphase_Mod_Vof_Compute(mult, sol, flow % dt, n)
       call Field_Mod_Body_Forces(flow)
-      call Multiphase_Averaging(flow, mult, mult % vof)
+      call Multiphase_Averaging(mult, mult % vof)  ! for phase change only
 
     ! Front tracking is engaged
     else

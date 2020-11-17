@@ -1,10 +1,10 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Vof_Find_Upstream_phi(phi, phi_x, phi_y, phi_z,  &
+  subroutine Multiphase_Mod_Vof_Find_Upstream_Phi(phi, phi_x, phi_y, phi_z,  &
                                                   s, donor, accept, phi_u)
 !------------------------------------------------------------------------------!
 !   Computes the value of phi at a imaginary upstream cell. This is based on   !
 !   Work of Zhang (2014) "Assessment of different reconstruction techniques    !
-!          for implementing the NVSF schemes on unstructured meshes"           !
+!   for implementing the NVSF schemes on unstructured meshes".                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -21,8 +21,8 @@
   real                      :: du_orig, du_pred, dotprod, du, dd
   real                      :: dd_vect(3), du_vect(3), signo, phi_u
   real                      :: min_phi, max_phi
-  integer                   :: s, ss, idonor, n_nodes_c, n_node_f, n1, n2, nod
-  integer                   :: c, c1, c2, donor, accept, c1_glo, c2_glo
+  integer                   :: s, ss, idonor, n_nodes_c, n1, n2
+  integer                   :: c1, c2, donor, accept
   logical                   :: out_face
 !==============================================================================!
 

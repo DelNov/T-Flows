@@ -9,15 +9,12 @@
   type(Multiphase_Type), target :: mult
   real, contiguous,      target :: b(:)
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: vof
   type(Matrix_Type), pointer :: a
   character(SL)              :: solver
-  integer                    :: c, c1, c2, s
 !==============================================================================!
 
   ! Take aliases
-  grid => mult % pnt_grid
   vof => mult % vof
   a   => sol % a
 

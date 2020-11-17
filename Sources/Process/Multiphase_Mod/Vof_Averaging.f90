@@ -1,22 +1,16 @@
 !==============================================================================!
-  subroutine Multiphase_Averaging(flow, mult, var)
+  subroutine Multiphase_Averaging(mult, var)
 !------------------------------------------------------------------------------!
-!   PISO algorithm                                                             !
+!   Averages something in case of phase change.                                !
 !------------------------------------------------------------------------------!
   implicit none
-!---------------------------------[Calling]------------------------------------!
-  real :: Correct_Velocity
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),      target :: flow
   type(Multiphase_Type), target :: mult
   type(Var_Type),        target :: var
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),      pointer :: grid
-  integer                       :: i, j, c
-  real                          :: avg
+  integer :: i, j
+  real    :: avg
 !==============================================================================!
-
-  grid   => flow % pnt_grid
 
   if (mult % phase_change) then
     do i = 1, size(mult % avg_cells, 1)

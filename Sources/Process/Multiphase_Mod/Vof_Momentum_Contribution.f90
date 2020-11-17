@@ -1,5 +1,5 @@
 !============================================================================!
-  subroutine Multiphase_Mod_Vof_Momentum_Contribution(mult, sol, ui, i)
+  subroutine Multiphase_Mod_Vof_Momentum_Contribution(mult, sol, i)
 !----------------------------------------------------------------------------!
 !   Computes Surface tension, Gravity and phase change sources for Momentum  !
 !   Equation if a two-phase flow calculation is performed. Additionally and  !
@@ -9,8 +9,7 @@
 !---------------------------------[Arguments]--------------------------------!
   type(Multiphase_Type), target :: mult
   type(Solver_Type),     target :: sol
-  type(Var_Type),        target :: ui
-  integer                       :: i
+  integer, intent(in)           :: i
 !-----------------------------------[Locals]---------------------------------!
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
@@ -19,9 +18,8 @@
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
   real, contiguous,  pointer :: surf_fx(:), surf_fy(:), surf_fz(:)
-  integer                    :: s, c, c1, c2, nt, ni
-  real                       :: dotprod, epsloc, fs
-  real                       :: corr_x, corr_y, corr_z
+  integer                    :: s, c, c1, c2
+  real                       :: epsloc, fs
   real                       :: u_f, v_f, w_f
 !============================================================================!
 

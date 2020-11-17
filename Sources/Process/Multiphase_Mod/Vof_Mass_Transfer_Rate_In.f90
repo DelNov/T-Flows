@@ -10,17 +10,12 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: grid
   type(Field_Type), pointer :: flow
-  type(Var_Type),   pointer :: vof
   real, contiguous, pointer :: flux_rate(:)
-  integer                   :: s, ss, c, c1, c2, cc1, cc2
-  real                      :: epsloc
+  integer                   :: c
 !==============================================================================!
 
   grid => mult % pnt_grid
   flow => mult % pnt_flow
-  vof  => mult % vof
-
-  epsloc = epsilon(epsloc)
 
   flux_rate  => mult % flux_rate
 
@@ -36,6 +31,6 @@
 
   call Comm_Mod_Global_Sum_Real(mult % add_mass_in)
 
-  mass_in  = mass_in + mult % add_mass_in
+  mass_in = mass_in + mult % add_mass_in
 
   end subroutine

@@ -1,28 +1,29 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Vof_Correct_Beta(mult, grid, beta_f, c_d)
+  subroutine Multiphase_Mod_Vof_Correct_Beta(mult, beta_f, c_d)
 !------------------------------------------------------------------------------!
 !   Step 2 of CICSAM: Correct beta for computation of volume fraction          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Multiphase_Type), target :: mult
-  type(Grid_Type)               :: grid
-  type(Var_Type)                :: phi
-  real                          :: beta_f(grid % n_faces)
-  real                          :: c_d   (-grid % n_bnd_cells:grid % n_cells)
+  real                          :: beta_f(mult % pnt_grid % n_faces)
+  real                          :: c_d(-mult % pnt_grid % n_bnd_cells  &
+                                       :mult % pnt_grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type),     pointer :: flow
-  type(Var_Type),       pointer :: vof
-  type(Face_Type),      pointer :: v_flux
-  integer                       :: s, c1, c2, donor, accept
-  real                          :: fs, e_plus, e_minus, cf, delta_alfa, bcorr
-  real                          :: epsloc
+  type(Grid_Type),  pointer :: grid
+  type(Field_Type), pointer :: flow
+  type(Var_Type),   pointer :: vof
+  type(Face_Type),  pointer :: v_flux
+  integer                   :: s, c1, c2, donor, accept
+  real                      :: fs, e_plus, e_minus, cf, delta_alfa, bcorr
+  real                      :: epsloc
 !==============================================================================!
 
   epsloc = epsilon(epsloc)
 
   ! Take aliases
   flow   => mult % pnt_flow
+  grid   => flow % pnt_grid
   vof    => mult % vof
   v_flux => flow % v_flux
 

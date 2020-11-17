@@ -17,11 +17,9 @@
   real                          :: smooth_var(-grid % n_bnd_cells    &
                                              : grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  type(Var_Type),       pointer :: vof
-  type(Matrix_Type),    pointer :: a
-  integer                       :: s, c, c1, c2, c_iter, run
-  integer                       :: face_init, face_end, face_step
-  real                          :: fs, vol_face
+  type(Var_Type), pointer :: vof
+  integer                 :: s, c, c1, c2, c_iter
+  real                    :: fs, vol_face
 !==============================================================================!
 
   ! Take aliases

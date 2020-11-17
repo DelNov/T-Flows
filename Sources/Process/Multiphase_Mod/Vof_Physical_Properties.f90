@@ -1,12 +1,11 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Vof_Physical_Properties(mult, backup)
+  subroutine Multiphase_Mod_Vof_Physical_Properties(mult)
 !------------------------------------------------------------------------------!
 !   Update physical properties based on volume fraction variable               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Multiphase_Type), target :: mult
-  logical                       :: backup
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: grid
   type(Field_Type), pointer :: flow

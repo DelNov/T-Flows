@@ -16,17 +16,9 @@
   type(Field_Type), pointer :: flow
   type(Var_Type),   pointer :: vof
   type(Var_Type),   pointer :: smooth
-  integer                   :: s, c, c1, c2, n, i_fac,i_nod, tot_cells,sub
-  integer                   :: c_inte, fu, nb, nc
-  real                      :: vol_face, grad_face(3), d_n(3)
-  real                      :: dotprod, sxyz_mod, sxyz_control, fs, epsloc
-  real                      :: dotprod2, stabilize
-  real                      :: n_0(3), n_f(3), n_w(3), reflex(3)
-  real                      :: theta, theta_0, a, b, s_vector(3)
-  real                      :: res1, res2, resul, term_c, sumtot
-  real                      :: sumx, sumy, sumz, norm_grad, coeff
+  integer                   :: c, c1, c2, s, nb, nc
   real                      :: v1(3), v2(3), v3(3), v4(3)
-  real                      :: c_c
+  real                      :: norm_grad, epsloc, dotprod
 !==============================================================================!
 
   grid   => mult % pnt_grid

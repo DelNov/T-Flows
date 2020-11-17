@@ -1,16 +1,17 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Vof_Predict_Beta(mult, grid, beta_f, beta_c, c_d)
+  subroutine Multiphase_Mod_Vof_Predict_Beta(mult, beta_f, beta_c, c_d)
 !------------------------------------------------------------------------------!
 !   Step 1 of CICSAM: Compute beta for computation of volume fraction          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Multiphase_Type), target :: mult
-  type(Grid_Type)               :: grid
-  real                          :: beta_f(grid % n_faces)
-  real                          :: beta_c(grid % n_faces)  ! skew. correction
-  real                          :: c_d(-grid % n_bnd_cells:grid % n_cells)
+  real                          :: beta_f(mult % pnt_grid % n_faces)
+  real                          :: beta_c(mult % pnt_grid % n_faces)
+  real                          :: c_d(-mult % pnt_grid % n_bnd_cells  &
+                                       :mult % pnt_grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
+  type(Grid_Type),  pointer :: grid
   type(Field_Type), pointer :: flow
   type(Var_Type),   pointer :: vof
   type(Face_Type),  pointer :: v_flux
@@ -21,12 +22,11 @@
   real                      :: alfa_uq, gamma_f, alfa_f_til, signo
   real                      :: alfa_superbee, alfa_stoic
   real                      :: cod, prodmag, ang, epsloc
-  real                      :: gradf_x, gradf_y, gradf_z
-  real                      :: aux
 !==============================================================================!
 
   ! Take aliases
   flow   => mult % pnt_flow
+  grid   => flow % pnt_grid
   vof    => mult % vof
   v_flux => flow % v_flux
 
@@ -65,7 +65,7 @@
 
         alfa_u = min(max(alfa_a - 2.0 * dot_prod, 0.0), 1.0) !old way
 
-!        call Multiphase_Mod_Vof_Find_Upstream_phi(vof,      &
+!        call Multiphase_Mod_Vof_Find_Upstream_Phi(vof,      &
 !                                                  vof % x,  &
 !                                                  vof % y,  &
 !                                                  vof % z,  &

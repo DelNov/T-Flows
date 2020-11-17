@@ -21,15 +21,10 @@
   type(Face_Type),   pointer :: v_flux
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
-  integer                    :: s, c, c1, c2, fu
-  integer                    :: donor, accept, corr_num
-  integer                    :: i_sub, n_sub, wrong_vf, n_wrong_vf0, n_wrong_vf1
-  integer,           pointer :: n_sub_param, corr_num_max
-  character(SL)              :: solver
-  real                       :: fs
   real                       :: courant_max, epsloc
-  real                       :: u_f, v_f, w_f
-  real,              pointer :: courant_max_param
+  integer                    :: i_sub, n_sub, wrong_vf, n_wrong_vf0, n_wrong_vf1
+  integer                    :: s, c, c1, c2, fu, corr
+! character(SL)              :: solver
 !==============================================================================!
 
   call Cpu_Timer_Mod_Start('Compute_Multiphase (without solvers)')
@@ -39,9 +34,6 @@
   grid   => flow % pnt_grid
   v_flux => flow % v_flux
   vof    => mult % vof
-  courant_max_param => mult % courant_max_param
-  n_sub_param       => mult % n_sub_param
-  corr_num_max      => mult % corr_num_max
   a => sol % a
   b => sol % b % val
 
@@ -54,7 +46,8 @@
       ! Compute courant Number close to the interface:
       call Vof_Max_Courant_Number(mult, dt, c_d, 1, courant_max)
 
-      n_sub = min(max(ceiling(courant_max / courant_max_param),1),n_sub_param)
+      n_sub = min(max(ceiling(courant_max / mult % courant_max_param), 1),  &
+                  mult % n_sub_param)
 
       ! Warning if Courant Number is exceeded
       if (n_sub > 1) then
@@ -128,9 +121,9 @@
       ! Compute Gradient:
       call Field_Mod_Grad_Variable(flow, vof)
 
-      call Multiphase_Mod_Vof_Predict_Beta(mult, grid, beta_f, beta_c, c_d)
+      call Multiphase_Mod_Vof_Predict_Beta(mult, beta_f, beta_c, c_d)
 
-      loop_corr:  do corr_num = 1, corr_num_max
+      do corr = 1, mult % corr_num_max
         !-------------------------!
         !   Matrix Coefficients   !
         !-------------------------!
@@ -168,7 +161,7 @@
         call Grid_Mod_Exchange_Cells_Real(grid, vof % n)
 
         !---------------------------!
-        !   Correct Beta at faces   !
+        !   Correct beta at faces   !
         !---------------------------!
 
         if (n_wrong_vf0 > 0 .or. n_wrong_vf1 > 0) then
@@ -178,15 +171,16 @@
         call Comm_Mod_Global_Sum_Int(wrong_vf)
 
         if (wrong_vf == 0) then
-          exit loop_corr
+          goto 1
         else
-          call Multiphase_Mod_Vof_Correct_Beta(mult, grid, beta_f, c_d)
+          call Multiphase_Mod_Vof_Correct_Beta(mult, beta_f, c_d)
         end if
 
-      end do loop_corr
+      end do
+1     continue
 
       !------------------------!
-      !   Correct Boundaries   !
+      !   Correct boundaries   !
       !------------------------!
       do s = 1, grid % n_bnd_faces
         c1 = grid % faces_c(1,s)
@@ -268,7 +262,7 @@
   !-----------------------!
   !   Update properties   !
   !-----------------------!
-  call Multiphase_Mod_Vof_Physical_Properties(mult, .false.)
+  call Multiphase_Mod_Vof_Physical_Properties(mult)
 
   call Cpu_Timer_Mod_Stop('Compute_Multiphase (without solvers)')
 

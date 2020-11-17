@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Vof_Pressure_Correction(mult, sol, ini)
+  subroutine Multiphase_Mod_Vof_Pressure_Correction(mult, sol)
 !------------------------------------------------------------------------------!
 !   Correct fluxes on pressure equation due to surface tension and gravity     !
 !------------------------------------------------------------------------------!
@@ -7,7 +7,6 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Multiphase_Type), target :: mult
   type(Solver_Type),     target :: sol
-  integer                       :: ini
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
@@ -19,7 +18,7 @@
   real,              pointer :: u_relax, dt_corr
   integer                    :: c, c1, c2, s, nb, nc
   real                       :: a12, fs
-  real                       :: u_fo, v_fo, w_fo, tf
+  real                       :: u_fo, v_fo, w_fo
   real                       :: stens_source, dotprod
   real                       :: factor2, correction, dens_h, curv_f
 !==============================================================================!

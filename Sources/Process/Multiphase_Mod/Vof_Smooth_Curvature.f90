@@ -19,11 +19,10 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: col   ! colour; could be vof or smooth
-  integer                  :: s, c, c1, c2, c_iter, i_fac, nb, nc
-  integer                  :: face_init, face_end, face_step
+  integer                  :: s, c, c1, c2, nb, nc
   real                     :: fs, w_v1, w_v2, w_m1, w_m2
   real                     :: weight_s, weight_n
-  real                     :: norma, epsloc, curvf, dotprod
+  real                     :: epsloc, curvf
 !==============================================================================!
 
   ! Take aliases
