@@ -5,15 +5,15 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(len=*) :: string  
+  character(len=*) :: string
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i, value
 !==============================================================================!
 
-  do i=1,len_trim(string)
+  do i = 1, len_trim(string)
     value = ichar(string(i:i))
-    if (value >= 65 .and. value <=  90) then 
-      string(i:i) = char(value+32) 
+    if(value >= 65 .and. value <= 90) then
+      string(i:i) = char(value+32)
     end if
   end do
 
