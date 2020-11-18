@@ -22,7 +22,7 @@
   integer                  :: s, c, c1, c2, nb, nc
   real                     :: fs, w_v1, w_v2, w_m1, w_m2
   real                     :: weight_s, weight_n
-  real                     :: epsloc, curvf
+  real                     :: curvf
 !==============================================================================!
 
   ! Take aliases
@@ -33,8 +33,6 @@
 
   nb = grid % n_bnd_cells
   nc = grid % n_cells
-
-  epsloc = epsilon(epsloc)
 
   sum_k_weight(-nb:nc) = 0.0
   sum_weight  (-nb:nc) = 0.0
@@ -94,7 +92,7 @@
   do c = 1, grid % n_cells
     w_v1 = (1.0 - 2.0 * abs(0.5 - col % n(c))) ** weight_s
     k_star(c) = (w_v1 * mult % curv(c) + sum_k_weight(c))    &
-              / (w_v1 + sum_weight(c) + epsloc)
+              / (w_v1 + sum_weight(c) + FEMTO)
   end do
 
   call Grid_Mod_Exchange_Cells_Real(grid, k_star(-nb:nc))
@@ -160,7 +158,7 @@
   do c = 1, grid % n_cells
     w_v1 = (1.0 - 2.0 * abs(0.5 - col % n(c))) ** weight_n
     mult % curv(c) = (w_v1 * k_star(c) + sum_k_weight(c))    &
-                   / (w_v1 + sum_weight(c) + epsloc)
+                   / (w_v1 + sum_weight(c) + FEMTO)
   end do
 
   call Grid_Mod_Exchange_Cells_Real(grid, mult % curv)

@@ -16,10 +16,7 @@
   type(Face_Type),  pointer :: v_flux
   integer                   :: s, c1, c2, donor, accept
   real                      :: fs, e_plus, e_minus, cf, delta_alfa, bcorr
-  real                      :: epsloc
 !==============================================================================!
-
-  epsloc = epsilon(epsloc)
 
   ! Take aliases
   flow   => mult % pnt_flow
@@ -32,7 +29,7 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
     fs = grid % f(s)
-    if(abs(v_flux % n(s)) > epsloc) then
+    if(abs(v_flux % n(s)) > FEMTO) then
 
       if(v_flux % n(s) > 0.0) then
         donor = c1
@@ -54,7 +51,7 @@
       if(vof % n(donor) < 0.0) then
         e_minus = max(-vof % n(donor), 0.0)
         ! Donor value < 0.0 Ex: sd = -0.1 -> e_minus = +0.1
-        if(e_minus > epsloc .and. cf > epsloc) then
+        if(e_minus > FEMTO .and. cf > FEMTO) then
           if(delta_alfa > e_minus) then
             bcorr = e_minus * (2.0 + cf - 2.0 * cf * beta_f(s))     &
                             / (2.0 * cf * (delta_alfa - e_minus))
@@ -66,7 +63,7 @@
       if(vof % n(donor) > 1.0) then
         e_plus = max(vof % n(donor) - 1.0, 0.0)
         ! Donor value > 1.0 Ex: sd = 1.1 -> e_plus = +0.1
-        if(e_plus > epsloc .and. cf > epsloc) then
+        if(e_plus > FEMTO .and. cf > FEMTO) then
           if(delta_alfa < - e_plus) then
             bcorr = e_plus * (2.0 + cf - 2.0 * cf * beta_f(s))     &
                            / (2.0 * cf * (-delta_alfa - e_plus))

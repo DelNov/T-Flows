@@ -21,7 +21,7 @@
   type(Face_Type),   pointer :: v_flux
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
-  real                       :: courant_max, epsloc
+  real                       :: courant_max
   integer                    :: i_sub, n_sub, wrong_vf, n_wrong_vf0, n_wrong_vf1
   integer                    :: s, c, c1, c2, fu, corr
 ! character(SL)              :: solver
@@ -36,8 +36,6 @@
   vof    => mult % vof
   a => sol % a
   b => sol % b % val
-
-  epsloc = epsilon(epsloc)
 
   if(vof % adv_scheme .eq. CICSAM .or. &
       vof % adv_scheme .eq. STACS) then
@@ -187,10 +185,10 @@
         c2 = grid % faces_c(2,s)
 
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. INFLOW) then
-          if(vof % n(c2) < epsloc) then
+          if(vof % n(c2) < FEMTO) then
             vof % n(c2) = 0.0
           end if
-          if(vof % n(c2) - 1.0 >= epsloc) then
+          if(vof % n(c2) - 1.0 >= FEMTO) then
             vof % n(c2) = 1.0
           end if
         end if
@@ -201,10 +199,10 @@
       !   Correct Interior Volume Fraction   !
       !--------------------------------------!
       do c = 1, grid % n_cells
-        if(vof % n(c) < epsloc) then
+        if(vof % n(c) < FEMTO) then
           vof % n(c) = 0.0
         end if
-        if(vof % n(c) - 1.0 >= epsloc) then
+        if(vof % n(c) - 1.0 >= FEMTO) then
           vof % n(c) = 1.0
         end if
       end do

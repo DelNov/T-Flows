@@ -19,7 +19,7 @@
   real, contiguous,  pointer :: b(:)
   real, contiguous,  pointer :: surf_fx(:), surf_fy(:), surf_fz(:)
   integer                    :: s, c, c1, c2
-  real                       :: epsloc, fs
+  real                       :: fs
   real                       :: u_f, v_f, w_f
 !============================================================================!
 
@@ -34,8 +34,6 @@
   v_flux  => flow % v_flux
   a       => sol % a
   b       => sol % b % val
-
-  epsloc = epsilon(epsloc)
 
   ! Surface tension contribution
   if(mult % surface_tension > TINY) then

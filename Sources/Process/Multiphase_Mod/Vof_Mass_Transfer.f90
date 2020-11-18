@@ -19,7 +19,7 @@
   integer                       :: s, ss, c, c1, c2, cc1, cc2
   integer                       :: n, i_fac, i_fac2, i_nod
   integer                       :: count_c, int_c, cat1, cat2
-  real                          :: epsloc, signo, fw
+  real                          :: signo, fw
   real                          :: dotprod1, dotprod2, dotprod3, dotprod4
   real                          :: tx_f, ty_f, tz_f, t_flux, some_flux
 !==============================================================================!
@@ -32,8 +32,6 @@
   b    => sol % b % val
 
   some_flux = 1.0e+02
-
-  epsloc = epsilon(epsloc)
 
   if( .not. allocated(mult % qci)) then
     allocate(mult % qci      (-grid % n_bnd_cells:grid % n_cells))

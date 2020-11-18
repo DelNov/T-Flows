@@ -21,7 +21,7 @@
   real                      :: alfa_u, alfa_d, alfa_a, alfa_d_til, alfa_cbc
   real                      :: alfa_uq, gamma_f, alfa_f_til, signo
   real                      :: alfa_superbee, alfa_stoic
-  real                      :: cod, prodmag, ang, epsloc
+  real                      :: cod, prodmag, ang
 !==============================================================================!
 
   ! Take aliases
@@ -29,8 +29,6 @@
   grid   => flow % pnt_grid
   vof    => mult % vof
   v_flux => flow % v_flux
-
-  epsloc = epsilon(epsloc)
 
   if(vof % adv_scheme .eq. CICSAM) then
 
@@ -44,7 +42,7 @@
       fs = grid % f(s)
 
       beta_f(s) = 0.0
-      if(abs(v_flux % n(s)) > epsloc) then
+      if(abs(v_flux % n(s)) > FEMTO) then
 
         if(v_flux % n(s) > 0.0) then
           donor = c1
@@ -71,7 +69,7 @@
 !                                                  vof % z,  &
 !                                                  s, donor, accept, alfa_u)
         ! Face is inside the domain
-        if(abs(alfa_u - alfa_a) > epsloc) then
+        if(abs(alfa_u - alfa_a) > FEMTO) then
 
           alfa_d_til = (alfa_d - alfa_u) / (alfa_a - alfa_u)
 
@@ -79,7 +77,7 @@
 
           ! Compute alfa_cbc
           if(alfa_d_til >= 0.0 .and. alfa_d_til <= 1.0) then
-            alfa_cbc = min(1.0, alfa_d_til / max(cod, epsloc))
+            alfa_cbc = min(1.0, alfa_d_til / max(cod, FEMTO))
           else
             alfa_cbc = alfa_d_til
           end if
@@ -100,17 +98,17 @@
                        + vof % z(donor) ** 2)             &
                   * grid % d(s)
 
-          if(prodmag > epsloc) then
+          if(prodmag > FEMTO) then
             ang = dotprod / prodmag
           else
-            ang = 1.0 / epsloc
+            ang = 1.0 / FEMTO
           end if
 
           gamma_f = min(ang ** 2.0, 1.0)
 
           alfa_f_til = gamma_f * alfa_cbc + (1.0 - gamma_f) * alfa_uq
 
-          if(abs(1.0 - alfa_d_til) > epsloc) then
+          if(abs(1.0 - alfa_d_til) > FEMTO) then
 
             beta_f(s) = min(max((alfa_f_til - alfa_d_til)                   &
                               / (1.0 - alfa_d_til) + beta_c(s), 0.0), 1.0)
@@ -128,7 +126,7 @@
       fs = grid % f(s)
 
       beta_f(s) = 0.0
-      if(abs(v_flux % n(s)) > epsloc) then
+      if(abs(v_flux % n(s)) > FEMTO) then
 
         if(v_flux % n(s) > 0.0) then
           donor = c1
@@ -150,7 +148,7 @@
         ! Face is inside the domain
         alfa_u = min(max(alfa_a - 2.0 * dotprod, 0.0), 1.0)
 
-        if(abs(alfa_u - alfa_a) > epsloc) then
+        if(abs(alfa_u - alfa_a) > FEMTO) then
 
           alfa_d_til = (alfa_d - alfa_u) / (alfa_a - alfa_u)
 
@@ -177,17 +175,17 @@
                        + vof % z(donor) ** 2)             &
                   * grid % d(s)
 
-          if(prodmag > epsloc) then
+          if(prodmag > FEMTO) then
             ang = dotprod / prodmag
           else
-            ang = 1.0 / epsloc
+            ang = 1.0 / FEMTO
           end if
 
           gamma_f = min(ang ** 4.0, 1.0)
 
           alfa_f_til = gamma_f * alfa_superbee + (1.0 - gamma_f) * alfa_stoic
 
-          if(abs(1.0 - alfa_d_til) > epsloc) then
+          if(abs(1.0 - alfa_d_til) > FEMTO) then
 
             beta_f(s) = min(max((alfa_f_til - alfa_d_til)                   &
                               / (1.0 - alfa_d_til) + beta_c(s), 0.0), 1.0)

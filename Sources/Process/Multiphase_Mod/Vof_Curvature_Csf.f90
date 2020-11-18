@@ -18,7 +18,7 @@
   type(Var_Type),   pointer :: smooth
   integer                   :: c, c1, c2, s, nb, nc
   real                      :: v1(3), v2(3), v3(3), v4(3)
-  real                      :: norm_grad, epsloc, dotprod
+  real                      :: norm_grad, dotprod
 !==============================================================================!
 
   grid   => mult % pnt_grid
@@ -29,8 +29,6 @@
   nb = grid % n_bnd_cells
   nc = grid % n_cells
 
-  epsloc = epsilon(epsloc)
-
   mult % curv = 0.0
 
   ! Normalize vector at cells
@@ -38,7 +36,7 @@
     norm_grad = sqrt(  smooth % x(c) ** 2  &
                      + smooth % y(c) ** 2  &
                      + smooth % z(c) ** 2)
-    if(norm_grad >= epsloc) then
+    if(norm_grad >= FEMTO) then
       mult % nx(c) = smooth % x(c) / norm_grad
       mult % ny(c) = smooth % y(c) / norm_grad
       mult % nz(c) = smooth % z(c) / norm_grad
@@ -65,7 +63,7 @@
                        + mult % ny(c1)**2   &
                        + mult % nz(c1)**2)
 
-      if(norm_grad > epsloc) then
+      if(norm_grad > FEMTO) then
         v1(1) = grid % sx(s)
         v1(2) = grid % sy(s)
         v1(3) = grid % sz(s)
@@ -78,7 +76,7 @@
         ! Projection on v4
         norm_grad = sqrt(v4(1)**2 + v4(2)**2 + v4(3)**2)
 
-        if(norm_grad > epsloc) then
+        if(norm_grad > FEMTO) then
           mult % nx(c2) = v4(1) / norm_grad
           mult % ny(c2) = v4(2) / norm_grad
           mult % nz(c2) = v4(3) / norm_grad
@@ -103,7 +101,7 @@
                        + mult % ny(c1)**2   &
                        + mult % nz(c1)**2)
 
-      if(norm_grad > epsloc) then
+      if(norm_grad > FEMTO) then
 
         dotprod = grid % dx(s) * grid % sx(s)  &
                 + grid % dy(s) * grid % sy(s)  &
