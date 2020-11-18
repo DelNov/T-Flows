@@ -37,12 +37,14 @@
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: phi
-  integer(4)               :: data_size
+  integer(SP)              :: data_size
   integer                  :: data_offset, cell_offset
   integer                  :: c, n, n_conns, sc, f8, f9, ua, run, c2
   character(SL)            :: name_out_8, name_out_9, name_mean, a_name
   character(SL)            :: str1, str2
-  integer, parameter       :: IP=8, RP=8, SP=4
+!------------------------------[Local parameters]------------------------------!
+  integer, parameter :: IP = DP  ! int. precision is double precision
+  integer, parameter :: RP = DP  ! real precision is double precision
 !==============================================================================!
 
   call Cpu_Timer_Mod_Start('Save_Vtu_Results')

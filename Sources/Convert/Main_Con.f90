@@ -53,10 +53,10 @@
   !----------------------------------------!
   !   Read the file and start conversion   !
   !----------------------------------------!
-  if (ext_up .eq. 'NEU') then
+  if(ext_up .eq. 'NEU') then
     call Load_Neu(grid)
   end if
-  if (ext_up .eq. 'MSH') then
+  if(ext_up .eq. 'MSH') then
     call Load_Msh(grid)
     call Find_Parents(grid)
   end if

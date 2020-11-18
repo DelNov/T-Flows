@@ -42,10 +42,10 @@
     integer, allocatable :: node_glo(:)
     integer, allocatable :: face_glo(:)
 
-    ! (kind=4) coud not be avoided here :-(
-    integer(kind=4), allocatable :: cell_map(:)
-    integer(kind=4), allocatable :: bnd_cell_map(:)
-    integer(kind=4), allocatable :: face_map(:)
+    ! Single precision coud not be avoided here :-(
+    integer(SP), allocatable :: cell_map(:)
+    integer(SP), allocatable :: bnd_cell_map(:)
+    integer(SP), allocatable :: face_map(:)
 
     ! Variables which follow are for backup saving to single file
     integer :: nc_s   ! number of cells in subdomain

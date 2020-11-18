@@ -16,11 +16,12 @@
   real,         optional :: vector_node(1:grid % n_nodes, 3)
   character(*), optional :: vector_name
 !-----------------------------------[Locals]-----------------------------------!
-  integer(4)    :: data_size
+  integer(SP)   :: data_size
   integer       :: c, n, data_offset, cell_offset, n_conns, fu, lev
   character(SL) :: name_out, str1, str2
 !------------------------------[Local parameters]------------------------------!
-  integer,           parameter :: IP=8, RP=8, SP=4
+  integer,           parameter :: IP = DP  ! int. precision is double precision
+  integer,           parameter :: RP = DP  ! real precision is double precision
   integer,           parameter :: VTK_LINE       =  3
   integer,           parameter :: VTK_TRIANGLE   =  5
   integer,           parameter :: VTK_QUAD       =  9
