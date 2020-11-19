@@ -5,11 +5,11 @@
 //--------------------------
 RB = 0.00195;       // radius of the bubble
 
-NP = 6;             // number of parts
+NP = 5;             // number of parts
 
 RI = RB *  2.5;     // inner diameter
 RO = RB *  9.0;     // vessel diameter
-LY = RB * 36.0;     // height of the domain
+LY = RB * 30.0;     // height of the domain
 
 D_MIN = RB / 15.0;  // coarse, medium and fine: 10, 15 or 20
 D_MAX = D_MIN * 9.0;
