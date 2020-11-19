@@ -1,13 +1,13 @@
 !==============================================================================!
   logical function Check_Inside_Cell(mult, c, p)
 !------------------------------------------------------------------------------!
-!                  Determine is point p lies inside cell c                     !
+!   Determine is point p lies inside cell c                                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Multiphase_Type), target :: mult
   integer                       :: c
-  real                          :: p(1,3)
+  real                          :: p(3)
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),      pointer :: grid
   integer                       :: c1, c2, s, i_fac
@@ -51,9 +51,9 @@
       if (abs(corr_z) < PICO) corr_z = 0.0
     end if
 
-    dist = dot_product( n_unit,(/p(1,1) - (grid % xf(s) + corr_x),      &
-                                 p(1,2) - (grid % yf(s) + corr_y),      &
-                                 p(1,3) - (grid % zf(s) + corr_z)/) )
+    dist = dot_product( n_unit,(/p(1) - (grid % xf(s) + corr_x),      &
+                                 p(2) - (grid % yf(s) + corr_y),      &
+                                 p(3) - (grid % zf(s) + corr_z)/) )
 
     if (dist >= 0.0) then
       inside_c(i_fac) = 1

@@ -7,7 +7,8 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type), target  :: turb
-  integer                  :: n0, n1
+  integer, intent(in)      :: n0
+  integer, intent(in)      :: n1
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: flow
   type(Grid_Type),  pointer :: grid
@@ -16,7 +17,7 @@
 
   if(.not. turb % statistics) return
 
-  n = n1-n0
+  n = n1 - n0
 
   ! Take aliases
   flow => turb % pnt_flow

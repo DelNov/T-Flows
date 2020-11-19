@@ -9,8 +9,8 @@
   type(Turb_Type),       target :: turb
   type(Multiphase_Type), target :: mult
   type(Swarm_Type),      target :: swarm
-  integer                       :: n     ! time step
-  real                          :: time  ! physical time
+  integer, intent(in)           :: n     ! time step
+  real,    intent(in)           :: time  ! physical time
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: grid
   integer                  :: c, i, j, k, n_parts_in_buffers

@@ -18,11 +18,11 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),       target  :: flow
-  type(Turb_Type),        target  :: turb
-  type(Multiphase_Type),  target  :: mult
-  type(Swarm_Type),       target  :: swarm
-  integer                         :: ts      ! current time step
+  type(Field_Type),      target :: flow
+  type(Turb_Type),       target :: turb
+  type(Multiphase_Type), target :: mult
+  type(Swarm_Type),      target :: swarm
+  integer, intent(in)           :: ts      ! current time step
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer  :: u, v, w, t
   type(Grid_Type), pointer  :: grid

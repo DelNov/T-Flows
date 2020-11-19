@@ -7,7 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Interface_Type)        :: inter(MD, MD)
   type(Field_Type),    target :: flow(MD)
-  integer                     :: n_dom
+  integer, intent(in)         :: n_dom
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: T  = 1,  &  ! store temperature as the first ...
                         K  = 2,  &  ! ... conductivity as the second ...

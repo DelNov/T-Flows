@@ -23,7 +23,7 @@
   integer                  :: ee, n_cylinders, i_vari, n_vari
   real                     :: r_num, res_func
   real                     :: xmin, xmax, ymin, ymax, zmin, zmax
-  real                     :: p(1,3)
+  real                     :: p(3)
   real                     :: vof_0, vof_tol1, vof_tol2
   real                     :: avg_x, avg_y, avg_z
   real                     :: var_comb, var_comb_0, dist_cent
@@ -68,16 +68,16 @@
     ! Check if p is inside cell
     do while (i_cell .eqv. .false.)
       call random_number(r_num)
-      p(1,1) = xmin + (xmax-xmin) * r_num
+      p(1) = xmin + (xmax-xmin) * r_num
       call random_number(r_num)
-      p(1,2) = ymin+ (ymax-ymin) * r_num
+      p(2) = ymin+ (ymax-ymin) * r_num
       call random_number(r_num)
-      p(1,3) = zmin+ (zmax-zmin) * r_num
+      p(3) = zmin+ (zmax-zmin) * r_num
       i_cell = Check_Inside_Cell(mult, c, p)
     end do
     n_tot = n_tot + 1
 
-    points(n_tot,:) = p(1,:)
+    points(n_tot,:) = p(:)
 
     ! Check if p is inside function:
     if (Check_Inside_Box(mult, p, dd, n_xyz) == 1) then

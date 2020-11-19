@@ -2,7 +2,7 @@
   subroutine User_Mod_End_Of_Time_Step(flow, turb, mult, swarm,  &
                                        n, n_stat_t, n_stat_p, time)
 !------------------------------------------------------------------------------!
-!          This function is computing benchmark for rising bubble.             !
+!   This function is computing benchmark for rising bubble.                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

@@ -17,10 +17,10 @@
   type(Turb_Type),        target :: turb
   type(Multiphase_Type),  target :: mult
   type(Swarm_Type),       target :: swarm
-  integer                        :: n         ! time step
-  integer                        :: n_stat_t  ! 1st t.s. statistics turbulence
-  integer                        :: n_stat_p  ! 1st t.s. statistics particles
-  real                           :: time      ! physical time
+  integer, intent(in)            :: n         ! time step
+  integer, intent(in)            :: n_stat_t  ! 1st t.s. statistics turbulence
+  integer, intent(in)            :: n_stat_p  ! 1st t.s. statistics particles
+  real, intent(in)               :: time      ! physical time
 !----------------------------------[Locals]------------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
   type(Grid_Type), pointer :: grid

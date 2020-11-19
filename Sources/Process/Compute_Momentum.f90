@@ -140,7 +140,7 @@
     end if
 
     ! User function
-    call User_Mod_Beginning_Of_Compute_Momentum(flow, turb, mult, dt, ini)
+    call User_Mod_Beginning_Of_Compute_Momentum(flow, turb, mult, ini)
 
     ! Initialize matrix and right hand side
     a % val(:) = 0.0
@@ -352,7 +352,7 @@
   call Grid_Mod_Exchange_Cells_Real(grid, a % sav)
 
   ! User function
-  call User_Mod_End_Of_Compute_Momentum(flow, turb, mult, dt, ini)
+  call User_Mod_End_Of_Compute_Momentum(flow, turb, mult, ini)
 
   call Cpu_Timer_Mod_Stop('Compute_Momentum (without solvers)')
 

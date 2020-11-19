@@ -1,12 +1,13 @@
-  subroutine Vof_Exact_Cylinder(mult,                        &
-                                    c,                       &
-                                    p1_x, p1_y, p1_z,        &
-                                    p2_x, p2_y, p2_z,        &
-                                    radius, height,          &
-                                    min_max_c1, min_max_c2,  &
-                                    vof_int)
+!==============================================================================!
+  subroutine Vof_Exact_Cylinder(mult,                    &
+                                c,                       &
+                                p1_x, p1_y, p1_z,        &
+                                p2_x, p2_y, p2_z,        &
+                                radius, height,          &
+                                min_max_c1, min_max_c2,  &
+                                vof_int)
 !------------------------------------------------------------------------------!
-!                Computes volume fraction of cell at interface                 !
+!   Computes volume fraction of cell at interface                              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -18,13 +19,14 @@
   real                          :: vof_int
   real                          :: min_max_c1, min_max_c2
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),      pointer :: grid
-  integer                       :: nod, n_int, n_tot, n_tot_int, fu
-  real                          :: xmin, xmax, ymin, ymax, zmin, zmax
-  real                          :: zminprim, zmaxprim
-  real                          :: area1, area2, area3, thick_y, h
-  real                          :: dist
+  type(Grid_Type), pointer :: grid
+  integer                  :: nod, n_int, n_tot, n_tot_int, fu
+  real                     :: xmin, xmax, ymin, ymax, zmin, zmax
+  real                     :: zminprim, zmaxprim
+  real                     :: area1, area2, area3, thick_y, h
+  real                     :: dist
 !==============================================================================!
+
   ! First take aliasesd
   grid => mult % pnt_grid
 

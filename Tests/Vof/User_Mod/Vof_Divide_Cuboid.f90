@@ -1,7 +1,7 @@
 !==============================================================================!
-  subroutine Vof_Divide_Cuboid(mult,c)
+  subroutine Vof_Divide_Cuboid(mult, c)
 !------------------------------------------------------------------------------!
-!        Divides cuboid recursively to make an accurate initialization         !
+!   Divides cuboid recursively to make an accurate initialization              !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Work_Mod, only: prelim_vof     => r_cell_01,  &
@@ -13,19 +13,19 @@
   type(Multiphase_Type), target :: mult
   integer                       :: c
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: grid
-  integer                   :: n, fu, n_node_vol, s
-  integer                   :: ee, n_cylinders, iterat
-  integer                   :: alloc_nod, alloc_fac
-  integer                   :: i_nod, i_fac
-  integer                   :: level_r
-  real                      :: radius, height
-  real                      :: p1_x, p1_y, p1_z
-  real                      :: p2_x, p2_y, p2_z
-  real                      :: res_dummy
-  real                      :: seed_node(3)
-  real        , allocatable :: nod_x(:),nod_y(:),nod_z(:)
-  integer     , allocatable :: faces_nod(:,:)
+  type(Grid_Type), pointer :: grid
+  integer                  :: n, fu, n_node_vol, s
+  integer                  :: ee, n_cylinders, iterat
+  integer                  :: alloc_nod, alloc_fac
+  integer                  :: i_nod, i_fac
+  integer                  :: level_r
+  real                     :: radius, height
+  real                     :: p1_x, p1_y, p1_z
+  real                     :: p2_x, p2_y, p2_z
+  real                     :: res_dummy
+  real                     :: seed_node(3)
+  real,    allocatable     :: nod_x(:),nod_y(:),nod_z(:)
+  integer, allocatable     :: faces_nod(:,:)
 !==============================================================================!
 
   ! First take aliasesd

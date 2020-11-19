@@ -1,13 +1,14 @@
+!==============================================================================!
   subroutine Vof_Area_Square_Circle(xint0, xint1, cx, cy, r, h, area)
 !------------------------------------------------------------------------------!
 !   Computes intersection area between square and circl                        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real                          :: xint0, xint1, cx, cy, r, h, area
+  real :: xint0, xint1, cx, cy, r, h, area
 !-----------------------------------[Locals]-----------------------------------!
-  real                          :: x1, x2, xmin, xmax, tmin, tmax, xaux
-  real                          :: integ1, integ2, epsloc
+  real :: x1, x2, xmin, xmax, tmin, tmax, xaux
+  real :: integ1, integ2, epsloc
 !==============================================================================!
 
   epsloc = epsilon(epsloc)
@@ -33,13 +34,14 @@
       tmin = r ** 2 - (cx - xmin) ** 2 + epsloc
       tmax = r ** 2 - (cx - xmax) ** 2 + epsloc
 
-      integ1 = - 0.5 * (cx - xmax) * sqrt(tmax)    &
-               + 0.5 * r ** 2 * atan( (xmax - cx) * sqrt(tmax) / tmax) - h * xmax
+      integ1 = -0.5 * (cx - xmax) * sqrt(tmax)    &
+               +0.5 * r ** 2 * atan( (xmax - cx) * sqrt(tmax) / tmax) - h * xmax
 
-      integ2 = - 0.5 * (cx - xmin) * sqrt(tmin)    &
-               + 0.5 * r ** 2 * atan( (xmin - cx) * sqrt(tmin) / tmin) - h * xmin
+      integ2 = -0.5 * (cx - xmin) * sqrt(tmin)    &
+               +0.5 * r ** 2 * atan( (xmin - cx) * sqrt(tmin) / tmin) - h * xmin
 
       area = integ1 - integ2
     end if
   end if
+
   end subroutine

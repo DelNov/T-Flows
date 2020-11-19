@@ -1,9 +1,9 @@
 !==============================================================================!
   subroutine Vof_Interface_Ellipsoid(mult,                          &
-                                    c,                              &
-                                    cent_x, cent_y, cent_z,         &
-                                    radius_1, radius_2, radius_3,   &
-                                    vof_int)
+                                     c,                             &
+                                     cent_x, cent_y, cent_z,        &
+                                     radius_1, radius_2, radius_3,  &
+                                     vof_int)
 !------------------------------------------------------------------------------!
 !   Computes volume fraction of cell at interface                              !
 !------------------------------------------------------------------------------!
@@ -23,7 +23,7 @@
   integer                  :: ee, n_cylinders, i_vari, n_vari
   real                     :: r_num, res_func
   real                     :: xmin, xmax, ymin, ymax, zmin, zmax
-  real                     :: p(1,3)
+  real                     :: p(3)
   real                     :: vof_0, vof_tol1, vof_tol2
   real                     :: avg_x, avg_y, avg_z
   real                     :: var_comb, var_comb_0, dist_cent
@@ -68,21 +68,21 @@
     ! Check if p is inside cell
     do while (i_cell .eqv. .false.)
       call random_number(r_num)
-      p(1,1) = xmin + (xmax-xmin) * r_num
+      p(1) = xmin + (xmax-xmin) * r_num
       call random_number(r_num)
-      p(1,2) = ymin+ (ymax-ymin) * r_num
+      p(2) = ymin+ (ymax-ymin) * r_num
       call random_number(r_num)
-      p(1,3) = zmin+ (zmax-zmin) * r_num
+      p(3) = zmin+ (zmax-zmin) * r_num
       i_cell = Check_Inside_Cell(mult, c, p)
     end do
     n_tot = n_tot + 1
 
-    points(n_tot,:) = p(1,:)
+    points(n_tot,:) = p(:)
 
     ! Check if p is inside function:
-    res_func = sqrt( ((p(1,1)-cent_x)/radius_1)**2    &
-                   + ((p(1,2)-cent_y)/radius_2)**2    &
-                   + ((p(1,3)-cent_z)/radius_3)**2 )
+    res_func = sqrt( ((p(1)-cent_x)/radius_1)**2    &
+                   + ((p(2)-cent_y)/radius_2)**2    &
+                   + ((p(3)-cent_z)/radius_3)**2 )
 
     if (res_func <= 1.0) then
       n_int = n_int + 1

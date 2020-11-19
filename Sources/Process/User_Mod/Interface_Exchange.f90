@@ -9,7 +9,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Interface_Type)        :: inter(MD, MD)
   type(Field_Type),    target :: flow(MD)
-  integer                     :: n_dom
+  integer, intent(in)         :: n_dom
 !-----------------------------------[Locals]-----------------------------------!
   integer :: d1, d2, n1, n2, n, ic1, bc1, ic2, bc2
   real    :: t1, t2, k1, wd1, k2, wd2

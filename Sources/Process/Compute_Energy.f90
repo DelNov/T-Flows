@@ -80,7 +80,7 @@
   call Solver_Mod_Alias_System   (sol, a, b)
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Energy(flow, turb, mult, dt, ini)
+  call User_Mod_Beginning_Of_Compute_Energy(flow, turb, mult, ini)
 
   ! Initialize matrix and right hand side
   a % val(:) = 0.0
@@ -336,7 +336,7 @@
   call Field_Mod_Grad_Variable(flow, t)
 
   ! User function
-  call User_Mod_End_Of_Compute_Energy(flow, turb, mult, dt, ini)
+  call User_Mod_End_Of_Compute_Energy(flow, turb, mult, ini)
 
   call Cpu_Timer_Mod_Stop('Compute_Energy (without solvers)')
 

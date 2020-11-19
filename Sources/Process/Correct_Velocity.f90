@@ -40,7 +40,7 @@
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! User function
-  call User_Mod_Beginning_Of_Correct_Velocity(flow, mult, sol, dt, ini)
+  call User_Mod_Beginning_Of_Correct_Velocity(flow, mult, sol, ini)
 
   !-----------------------------------------!
   !   Correct velocities and fluxes with    !
@@ -125,7 +125,7 @@
   end if
 
   ! User function
-  call User_Mod_End_Of_Correct_Velocity(flow, mult, sol, dt, ini)
+  call User_Mod_End_Of_Correct_Velocity(flow, mult, sol, ini)
 
   call Cpu_Timer_Mod_Stop('Correct_Velocity')
 
