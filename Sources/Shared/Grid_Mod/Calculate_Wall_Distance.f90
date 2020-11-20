@@ -8,7 +8,7 @@
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: b, c1, c2
-  integer              :: n_wall_colors, n_cells_fraction
+  integer              :: n_wall_colors
   integer              :: processed_cells
   integer, allocatable :: wall_colors(:)
 !==============================================================================!
@@ -42,7 +42,6 @@
     grid % wall_dist = 1.0
     print *, '# Distance to the wall set to 1.0 everywhere !'
   else
-    n_cells_fraction = (grid % n_bnd_cells + grid % n_cells) / 20
 
     processed_cells = 0
 
@@ -51,13 +50,13 @@
 
       processed_cells = processed_cells + 1
 
-      if(mod( (processed_cells), n_cells_fraction ) .eq. 0) then
-        print '(a2, f5.0, a14)',                                  &
-          ' #',                                                   &
-          (100. * processed_cells                                 &
-                 / (1.0*(grid % n_bnd_cells + grid % n_cells))),  &
-          ' % complete...'
-      end if ! each 5%
+      ! Write progress and stay in the same line
+      ! (achieved with advance='no' and achar(13))
+      write(*,'(a2,f5.0,a14,a1)',advance='no')                  &
+        ' #',                                                   &
+        (100. * processed_cells                                 &
+               / (1.0*(grid % n_bnd_cells + grid % n_cells))),  &
+        ' % complete...', achar(13)
 
       do b = 1, n_wall_colors
         do c2 = grid % bnd_cond % color_s_cell( wall_colors(b) ),  &

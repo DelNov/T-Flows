@@ -6,16 +6,16 @@
 
  NUMBER_OF_TIME_STEPS     6000
 
- RESULTS_SAVE_INTERVAL      12
- BACKUP_SAVE_INTERVAL      600
+ RESULTS_SAVE_INTERVAL      60
+ BACKUP_SAVE_INTERVAL     2000
 
- TIME_STEP                  0.0001
+ TIME_STEP                  0.00005
 # LOAD_BACKUP_NAME           bend-ts004000.backup 
 
- SWARM_SAVE_INTERVAL                             120
- STARTING_TIME_STEP_FOR_SWARM_COMPUTATION       2401
- STARTING_TIME_STEP_FOR_TURB_STATISTICS      1200000
- STARTING_TIME_STEP_FOR_SWARM_STATISTICS     1200000
+ SWARM_SAVE_INTERVAL                         200
+ STARTING_TIME_STEP_FOR_SWARM_COMPUTATION    4005
+ STARTING_TIME_STEP_FOR_TURB_STATISTICS      7000
+ STARTING_TIME_STEP_FOR_SWARM_STATISTICS     1000000
 
 #-------------------
 # Monitoring points 
@@ -29,11 +29,11 @@
 # Physical models
 #-----------------
 
- MASS_DENSITY              1.2
+ MASS_DENSITY              1.0
  DYNAMIC_VISCOSITY         1.4706e-5
 
- TURBULENCE_MODEL          k_eps_zeta_f
-# TURBULENCE_MODEL          hubrid_les_rans
+ TURBULENCE_MODEL          K_EPS
+# TURBULENCE_MODEL          HYBRID_LES_RANS
  PRESSURE_DROPS            0.0     0.0      0.0
 # GRAVITATIONAL_VECTOR      0.0   -9.81  0.0
  POTENTIAL_INITIALIZATION  yes
@@ -44,9 +44,9 @@
  MULTIPHASE_MODEL                    lagrangian_particles
 # SWARM_SUBGRID_SCALE_MODEL           brownian_fukagata
  SWARM_DIAMETER                                 2.5e-5
- SWARM_DENSITY                               1000.0
- NUMBER_OF_SWARM_SUB_STEPS                     16
- NUMBER_OF_PARTICLES                        10000
+ SWARM_DENSITY                                  1000.0
+ NUMBER_OF_SWARM_SUB_STEPS                      8
+ NUMBER_OF_PARTICLES                            10000
  SWARM_COEFFICIENT_OF_RESTITUTION               1.0
 
 #----------------------
@@ -55,7 +55,7 @@
 
  PRESSURE_MOMENTUM_COUPLING    simple
 
- SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.7
+ SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.6
  SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.3
 
  TIME_INTEGRATION_SCHEME  linear
@@ -71,8 +71,8 @@
  TOLERANCE_FOR_PRESSURE_SOLVER      1.e-5
  TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
 
- MIN_SIMPLE_ITERATIONS                   6
- MAX_ITERATIONS_FOR_PRESSURE_SOLVER    480
+ MIN_SIMPLE_ITERATIONS                   3
+ MAX_ITERATIONS_FOR_PRESSURE_SOLVER    500
 
 #--------------------
 # Initial conditions
@@ -80,12 +80,11 @@
   INITIAL_CONDITION
     VARIABLES           u     v     w     kin    eps    zeta   f22
     VALUES              0.0   0.0   0.0   0.01   0.001  0.1    0.1
-#    VARIABLES           u     v     w     kin    eps    zeta   f22
-#    VALUES              0.0   0.0   0.0   0.01   0.001  0.1    0.1
 
 #---------------------
 # Boundary conditions
 #---------------------
+
   BOUNDARY_CONDITION    WALLS
     TYPE                wall
     VARIABLES           u     v     w

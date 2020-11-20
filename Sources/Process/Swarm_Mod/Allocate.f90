@@ -69,7 +69,6 @@
     swarm % particle(k) % cell     = 0
     swarm % particle(k) % node     = 0
     swarm % particle(k) % bnd_cell = 0
-    swarm % particle(k) % bnd_face = 0
 
     ! Assume particle is in the domain
     ! (A smarter way could be worked out, depending ...

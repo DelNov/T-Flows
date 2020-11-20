@@ -25,7 +25,7 @@
   !-------------------!
   !   1st time step   !
   !-------------------!
-  if(n .eq. 4001) then     ! should be after the flow is developed
+  if(n .eq. 2401) then     ! should be after the flow is developed
 
     ! First particle in the center
     l = 1

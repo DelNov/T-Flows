@@ -75,16 +75,11 @@
     !--------------------------------------!
     part % cell     = cc
     part % bnd_cell = cb  ! this will be zero if no boundary cells
-    part % bnd_face =  0
 
     ! If inside cell is closer than boundary ...
     ! ... cell don't store the boundary cell
     if(min_dc < min_db) then
       part % bnd_cell = 0
-      part % bnd_face = 0
-    end if
-    if(min_db < min_dc) then
-      if(cb .ne. 0) part % bnd_face = grid % cells_bnd_face(cb)
     end if
 
     !-----------------------------------------!
@@ -173,7 +168,6 @@
     !     (the indices of closest cells)   !
     !--------------------------------------!
     part % bnd_cell = cb  ! this will be zero if no boundary cells here
-    part % bnd_face =  0
 
     !--------------------------------------------!
     !   Check if particle is in this processor   !
@@ -181,9 +175,6 @@
     min_db_glob = min_db
     if(n_proc > 1) then
       call Comm_Mod_Global_Min_Real(min_db_glob)
-    end if
-    if(min_db .eq. min_db_glob .and. min_db < min_dc) then
-      part % bnd_face = grid % cells_bnd_face(cb)
     end if
 
   end if  ! closest node is (not) known

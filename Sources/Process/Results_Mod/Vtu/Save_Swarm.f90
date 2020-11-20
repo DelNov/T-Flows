@@ -9,6 +9,7 @@
   integer                  :: time_step
   integer,        optional :: domain
 !----------------------------------[Locals]------------------------------------!
+  type(Grid_Type),     pointer :: grid
   type(Particle_Type), pointer :: part
   integer                      :: k, fu
   character(SL)                :: name_out
@@ -22,6 +23,9 @@
 !==============================================================================!
 
   if(swarm % n_particles < 1) return
+
+  ! Take aliases for the swarm
+  grid => swarm % pnt_grid
 
   !-----------------------------------------!
   !   Only one processor saves the swarm,   !
@@ -88,6 +92,28 @@
                             'format="ascii">'
     do k = 1, swarm % n_particles
       write(fu,'(a,i9)') IN_5, k
+    end do
+    write(fu,'(a,a)') IN_4, '</DataArray>'
+
+    !-------------------!
+    !   Closest cells   !
+    !-------------------!
+    write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="ClosestCell" ' // &
+                            'format="ascii">'
+    do k = 1, swarm % n_particles
+      part => swarm % particle(k)
+      write(fu,'(a,i9)') IN_5, grid % comm % cell_glo(part % cell)
+    end do
+    write(fu,'(a,a)') IN_4, '</DataArray>'
+
+    !----------------------------!
+    !   Closest boundary cells   !
+    !----------------------------!
+    write(fu,'(a,a)') IN_4, '<DataArray type="Int64" ' // &
+                            'Name="ClosestBndCell" format="ascii">'
+    do k = 1, swarm % n_particles
+      part => swarm % particle(k)
+      write(fu,'(a,i9)') IN_5, grid % comm % cell_glo(part % bnd_cell)
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
 
