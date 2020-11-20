@@ -57,7 +57,7 @@
   call Solver_Mod_Alias_System(sol, a, b)
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Scalar(flow, turb, mult, dt, ini)
+  call User_Mod_Beginning_Of_Compute_Scalar(flow, turb, mult, ini)
 
   ! Initialize matrix and right hand side
   a % val(:) = 0.0
@@ -120,13 +120,18 @@
       phix_f2 = phix_f1
       phiy_f2 = phiy_f1
       phiz_f2 = phiz_f1
-      dif_eff1 = grid % f(s) *(flow % diffusivity + turb % vis_t(c1) / sc_t)  &
-           + (1.-grid % f(s))*(flow % diffusivity + turb % vis_t(c2) / sc_t)
-      if(turb % model .eq. HYBRID_LES_RANS) then
-        dif_eff1 =     grid % f(s)   &
-                    * (flow % diffusivity + turb % vis_t_eff(c1) / sc_t)  &
-                 + (1.-grid % f(s))  &
-                    * (flow % diffusivity + turb % vis_t_eff(c2) / sc_t)
+      dif_eff1 = grid % f(s) *(flow % diffusivity)  &
+           + (1.-grid % f(s))*(flow % diffusivity)
+      if(turb % model .ne. NO_TURBULENCE_MODEL .and.  &
+         turb % model .ne. DNS) then
+        dif_eff1 = grid % f(s) *(flow % diffusivity + turb % vis_t(c1)/sc_t)  &
+             + (1.-grid % f(s))*(flow % diffusivity + turb % vis_t(c2)/sc_t)
+        if(turb % model .eq. HYBRID_LES_RANS) then
+          dif_eff1 = grid % f(s)   &
+                  * (flow % diffusivity + turb % vis_t_eff(c1) / sc_t)  &
+               + (1.-grid % f(s))  &
+                  * (flow % diffusivity + turb % vis_t_eff(c2) / sc_t)
+        end if
       end if
       dif_eff2 = dif_eff1
     else
@@ -136,9 +141,13 @@
       phix_f2 = phix_f1
       phiy_f2 = phiy_f1
       phiz_f2 = phiz_f1
-      dif_eff1 = flow % diffusivity + turb % vis_t(c1) / sc_t
-      if(turb % model .eq. HYBRID_LES_RANS) then
-        dif_eff1 = flow % diffusivity + turb % vis_t_eff(c1) / sc_t
+      dif_eff1 = flow % diffusivity
+      if(turb % model .ne. NO_TURBULENCE_MODEL .and.  &
+         turb % model .ne. DNS) then
+        dif_eff1 = flow % diffusivity + turb % vis_t(c1) / sc_t
+        if(turb % model .eq. HYBRID_LES_RANS) then
+          dif_eff1 = flow % diffusivity + turb % vis_t_eff(c1) / sc_t
+        end if
       end if
       dif_eff2 = dif_eff1
     end if
@@ -149,7 +158,7 @@
        turb % model .eq. HYBRID_LES_RANS) then
       if(c2 < 0) then
         if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALL .or.  &
-          Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALLFL) then
+           Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALLFL) then
           dif_eff1 = turb % diff_w(c1)
           dif_eff2 = dif_eff1
         end if
@@ -336,14 +345,14 @@
 
   ! Call linear solver to solve them
   call Cpu_Timer_Mod_Start('Linear_Solver_For_Scalars')
-  call Bicg(sol,            &
-            phi % n,        &
-            b,              &
-            phi % precond,  &
-            phi % mniter,   &
-            phi % eniter,   &
-            phi % tol,      &
-            phi % res)
+  call Solver_Mod_Bicg(sol,            &
+                       phi % n,        &
+                       b,              &
+                       phi % precond,  &
+                       phi % mniter,   &
+                       phi % eniter,   &
+                       phi % tol,      &
+                       phi % res)
   call Cpu_Timer_Mod_Stop('Linear_Solver_For_Scalars')
 
   read(phi % name(3:4), *) ns  ! reterive the number of scalar
@@ -355,7 +364,7 @@
   call Field_Mod_Grad_Variable(flow, phi)
 
   ! User function
-  call User_Mod_End_Of_Compute_Scalar(flow, turb, mult, dt, ini)
+  call User_Mod_End_Of_Compute_Scalar(flow, turb, mult, ini)
 
   call Cpu_Timer_Mod_Stop('Compute_Scalars (without solvers)')
 

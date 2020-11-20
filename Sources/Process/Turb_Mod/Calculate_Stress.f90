@@ -53,9 +53,9 @@
 
   if( turb % model .eq. K_EPS_ZETA_F ) then
 
-    call Field_Mod_Grad_Component(flow, grid % wall_dist, 1, wd_x(-nb:nc))
-    call Field_Mod_Grad_Component(flow, grid % wall_dist, 2, wd_y(-nb:nc))
-    call Field_Mod_Grad_Component(flow, grid % wall_dist, 3, wd_z(-nb:nc))
+    call Field_Mod_Grad(flow, grid % wall_dist, wd_x(-nb:nc),  &
+                                                wd_y(-nb:nc),  &
+                                                wd_z(-nb:nc))
 
     do c = 1, grid % n_cells
 

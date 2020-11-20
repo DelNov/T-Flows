@@ -16,7 +16,6 @@
   character(len=7)      :: root_control    = 'control'
   character(len=9)      :: dom_control(MD) = 'control.d'
   integer               :: curr_dt, sc, tp
-  real                  :: mass_res(MD)
   logical               :: read_backup(MD), exit_now, pot_init
   type(Grid_Type)       :: grid(MD)        ! grid used in computations
   type(Field_Type)      :: flow(MD)        ! flow field we will be solving for
@@ -130,8 +129,7 @@
     call Field_Mod_Allocate(flow(d), grid(d))
     call Turb_Mod_Allocate(turb(d), flow(d))
     call Swarm_Mod_Allocate(swarm(d), flow(d), turb(d))
-    call Multiphase_Mod_Allocate(mult(d), flow(d))
-    call User_Mod_Allocate(grid(d))
+    call Multiphase_Mod_Vof_Allocate(mult(d), flow(d))
 
     ! Read time step from root
     call Control_Mod_Switch_To_Root()
@@ -184,7 +182,7 @@
       if (read_backup(d))  then
         flow % piso_status = .false.
       end if
-      call Multiphase_Mod_Update_Physical_Properties(mult(d), read_backup(d))
+      call Multiphase_Mod_Vof_Physical_Properties(mult(d))
     end if
 
     ! Initialize monitoring points
@@ -281,13 +279,13 @@
 
       ! Interface tracking
       if(mult(d) % model .eq. VOLUME_OF_FLUID) then
-        call Multiphase_Mod_Main(mult(d), flow(d), turb(d), sol(d), curr_dt)
+        call Multiphase_Mod_Vof_Main(mult(d), flow(d), turb(d), sol(d), curr_dt)
         if(mult(d) % track_front) then
           call Results_Mod_Save_Surf(mult(d) % surf, curr_dt)
           call Results_Mod_Save(flow(d), turb(d), mult(d), swarm(d), curr_dt,  &
                                 plot_inside=.true., domain=d)
         end if
-        call Multiphase_Mod_Update_Physical_Properties(mult(d), read_backup(d))
+        call Multiphase_Mod_Vof_Physical_Properties(mult(d))
       end if
 
       ! Lagrangian particle tracking
@@ -334,15 +332,14 @@
         call Balance_Volume(flow(d), mult(d))
         call Compute_Pressure(flow(d), mult(d), sol(d), ini)
 
-        call Multiphase_Averaging(flow(d), mult(d), flow(d) % p)
+        call Multiphase_Averaging(mult(d), flow(d) % p)
         call Field_Mod_Calculate_Mass_Fluxes(flow(d), flow(d) % v_flux % n)
-        call Correct_Velocity(flow(d), mult(d), sol(d), ini, mass_res(d))
+        call Correct_Velocity(flow(d), mult(d), sol(d), ini)
 
-        call Multiphase_Averaging(flow(d), mult(d), flow(d) % u)
-        call Multiphase_Averaging(flow(d), mult(d), flow(d) % v)
-        call Multiphase_Averaging(flow(d), mult(d), flow(d) % w)
-        call Piso_Algorithm(flow(d), turb(d), mult(d),    &
-                            sol(d), ini, mass_res(d))
+        call Multiphase_Averaging(mult(d), flow(d) % u)
+        call Multiphase_Averaging(mult(d), flow(d) % v)
+        call Multiphase_Averaging(mult(d), flow(d) % w)
+        call Piso_Algorithm(flow(d), turb(d), mult(d), sol(d), ini)
 
         ! Energy (practically temperature)
         if(heat_transfer) then
@@ -370,10 +367,10 @@
       end do  ! through domains
 
       if(ini >= min_ini) then
-        if( maxval(flow(1:n_dom) % u  % res) <= simple_tol .and.  &
-            maxval(flow(1:n_dom) % v  % res) <= simple_tol .and.  &
-            maxval(flow(1:n_dom) % w  % res) <= simple_tol .and.  &
-            maxval(mass_res(1:n_dom))        <= simple_tol ) goto 1
+        if( maxval(flow(1:n_dom) % u % res) <= simple_tol .and.  &
+            maxval(flow(1:n_dom) % v % res) <= simple_tol .and.  &
+            maxval(flow(1:n_dom) % w % res) <= simple_tol .and.  &
+            maxval(flow(1:n_dom) % vol_res) <= simple_tol ) goto 1
       end if
 
     end do    ! through inner iterations

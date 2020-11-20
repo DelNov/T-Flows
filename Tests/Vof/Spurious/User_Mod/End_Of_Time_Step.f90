@@ -2,7 +2,7 @@
   subroutine User_Mod_End_Of_Time_Step(flow, turb, mult, swarm, n,    &
                                        n_stat_t, n_stat_p, time)
 !------------------------------------------------------------------------------!
-!     This function computes position of contact line and high of droplet      !
+!   This function computes position of contact line and high of droplet        !
 !----------------------------------[Modules]-----------------------------------!
   use Work_Mod, only: sum_v1  => r_cell_01,   &
                       dist_ck => r_Cell_02,   &
@@ -15,9 +15,10 @@
   type(Turb_Type),       target :: turb
   type(Multiphase_Type), target :: mult
   type(Swarm_Type),      target :: swarm
-  integer                       :: n     ! time step
-  integer                       :: n_stat_t, n_stat_p
-  real                          :: time  ! physical time
+  integer, intent(in)           :: n         ! time step
+  integer, intent(in)           :: n_stat_t
+  integer, intent(in)           :: n_stat_p
+  real,    intent(in)           :: time      ! physical time
 !--------------------------------[Locals]--------------------------------------!
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: vof

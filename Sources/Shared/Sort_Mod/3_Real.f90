@@ -11,7 +11,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   real    :: x1, x2, x3
   integer :: i, j, n
-!------------------------------------------------------------------------------!
+!==============================================================================!
 
   n = size(a1, 1)
   x1 = a1( (1+n) / 2 )
@@ -37,7 +37,7 @@
                Math_Mod_Smaller_Real(x3,a3(j))  )
       j = j - 1
     end do
-    if (i >= j) exit
+    if(i >= j) exit
 
     ! Swap values in a and b
     call Swap_Real(a1(i), a1(j))
@@ -48,11 +48,11 @@
     j = j - 1
   end do
 
-  if (1 < i - 1) call Sort_Mod_3_Real(a1(1:i-1),  &
-                                      a2(1:i-1),  &
-                                      a3(1:i-1))
-  if (j + 1 < n) call Sort_Mod_3_Real(a1(j+1:n),  &
-                                      a2(j+1:n),  &
-                                      a3(j+1:n))
+  if(1 < i - 1) call Sort_Mod_3_Real(a1(1:i-1),  &
+                                     a2(1:i-1),  &
+                                     a3(1:i-1))
+  if(j + 1 < n) call Sort_Mod_3_Real(a1(j+1:n),  &
+                                     a2(j+1:n),  &
+                                     a3(j+1:n))
 
-  end subroutine 
+  end subroutine

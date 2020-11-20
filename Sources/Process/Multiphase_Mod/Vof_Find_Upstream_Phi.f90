@@ -1,10 +1,10 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Vof_Find_Upstream_phi(phi, phi_x, phi_y, phi_z,  &
+  subroutine Multiphase_Mod_Vof_Find_Upstream_Phi(phi, phi_x, phi_y, phi_z,  &
                                                   s, donor, accept, phi_u)
 !------------------------------------------------------------------------------!
 !   Computes the value of phi at a imaginary upstream cell. This is based on   !
 !   Work of Zhang (2014) "Assessment of different reconstruction techniques    !
-!          for implementing the NVSF schemes on unstructured meshes"           !
+!   for implementing the NVSF schemes on unstructured meshes".                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -21,8 +21,8 @@
   real                      :: du_orig, du_pred, dotprod, du, dd
   real                      :: dd_vect(3), du_vect(3), signo, phi_u
   real                      :: min_phi, max_phi
-  integer                   :: s, ss, idonor, n_nodes_c, n_node_f, n1, n2, nod
-  integer                   :: c, c1, c2, donor, accept, c1_glo, c2_glo
+  integer                   :: s, ss, idonor, n_nodes_c, n1, n2
+  integer                   :: c1, c2, donor, accept
   logical                   :: out_face
 !==============================================================================!
 
@@ -42,18 +42,18 @@
     c1 = grid % faces_c(1,ss)
     c2 = grid % faces_c(2,ss)
 
-    if (c1 .ne. accept) then
+    if(c1 .ne. accept) then
       min_phi = min(min_phi, phi % n(c1))
       max_phi = max(max_phi, phi % n(c1))
     end if
 
-    if (c2 .ne. accept) then
+    if(c2 .ne. accept) then
       min_phi = min(min_phi, phi % n(c2))
       max_phi = max(max_phi, phi % n(c2))
     end if
   end do
 
-  if (donor == grid % faces_c(1,s)) then
+  if(donor == grid % faces_c(1,s)) then
     signo = 1.0
   else
     signo = -1.0
@@ -73,20 +73,20 @@
   do n1 = 1, grid % cells_n_nodes(donor)
     out_face = .true.
     loop_face: do n2 = 1, grid % faces_n_nodes(s)
-      if (grid % cells_n(n1,donor) == grid % faces_n(n2,s)) then
+      if(grid % cells_n(n1,donor) == grid % faces_n(n2,s)) then
         n_nodes_c = n_nodes_c - 1
         out_face = .false.
         exit loop_face
       end if
     end do loop_face
 
-    if (out_face) then  ! node doesn't belong to face s
+    if(out_face) then  ! node doesn't belong to face s
       dotprod = dot_product(                                                 &
                 (/grid % xc(donor) - grid % xn(grid % cells_n(n1,donor)),    &
                   grid % yc(donor) - grid % yn(grid % cells_n(n1,donor)),    &
                   grid % zc(donor) - grid % zn(grid % cells_n(n1,donor))/),  &
                   (/sx(s),sy(s),sz(s)/) / grid % s(s) * signo)
-      if (dotprod >= 0.0) then
+      if(dotprod >= 0.0) then
         du_pred = du_pred + dotprod
       else
         n_nodes_c = n_nodes_c - 1

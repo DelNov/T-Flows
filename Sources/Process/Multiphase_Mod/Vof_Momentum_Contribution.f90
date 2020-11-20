@@ -1,5 +1,5 @@
 !============================================================================!
-  subroutine Multiphase_Mod_Vof_Momentum_Contribution(mult, sol, ui, i)
+  subroutine Multiphase_Mod_Vof_Momentum_Contribution(mult, sol, i)
 !----------------------------------------------------------------------------!
 !   Computes Surface tension, Gravity and phase change sources for Momentum  !
 !   Equation if a two-phase flow calculation is performed. Additionally and  !
@@ -9,26 +9,25 @@
 !---------------------------------[Arguments]--------------------------------!
   type(Multiphase_Type), target :: mult
   type(Solver_Type),     target :: sol
-  type(Var_Type),        target :: ui
-  integer                       :: i
+  integer, intent(in)           :: i
 !-----------------------------------[Locals]---------------------------------!
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
-  type(Var_Type),    pointer :: vof
+  type(Var_Type),    pointer :: col
   type(Face_Type),   pointer :: v_flux
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
   real, contiguous,  pointer :: surf_fx(:), surf_fy(:), surf_fz(:)
-  integer                    :: s, c, c1, c2, nt, ni
-  real                       :: dotprod, epsloc, fs
-  real                       :: corr_x, corr_y, corr_z
+  integer                    :: s, c, c1, c2
+  real                       :: fs
   real                       :: u_f, v_f, w_f
 !============================================================================!
 
   ! Take aliases
   flow    => mult % pnt_flow
   grid    => mult % pnt_grid
-  vof     => mult % vof
+  ! col     => mult % smooth
+  col     => mult % vof
   surf_fx => mult % surf_fx
   surf_fy => mult % surf_fy
   surf_fz => mult % surf_fz
@@ -36,17 +35,15 @@
   a       => sol % a
   b       => sol % b % val
 
-  epsloc = epsilon(epsloc)
-
   ! Surface tension contribution
-  if (mult % surface_tension > TINY) then
+  if(mult % surface_tension > TINY) then
 
     select case(i)
       case(1)
         do c = 1, grid % n_cells
           surf_fx(c) = mult % surface_tension  &
                      * mult % curv(c)          &
-                     * vof % x(c)              &
+                     * col % x(c)              &
                      * grid % vol(c)
           b(c) = b(c) + surf_fx(c)
          end do
@@ -54,7 +51,7 @@
         do c = 1, grid % n_cells
           surf_fy(c) = mult % surface_tension  &
                      * mult % curv(c)          &
-                     * vof % y(c)              &
+                     * col % y(c)              &
                      * grid % vol(c)
           b(c) = b(c) + surf_fy(c)
         end do
@@ -62,7 +59,7 @@
         do c = 1, grid % n_cells
           surf_fz(c) = mult % surface_tension  &
                      * mult % curv(c)          &
-                     * vof % z(c)              &
+                     * col % z(c)              &
                      * grid % vol(c)
           b(c) = b(c) + surf_fz(c)
         end do
@@ -75,9 +72,9 @@
   ! This is here because they need to be collected before
   ! u, v, w are calculated
 
-  if (flow % temp_corr) then
+  if(flow % temp_corr) then
     ! Guessed face velocity
-    if (i == 1) then
+    if(i == 1) then
       do s = grid % n_bnd_faces + 1, grid % n_faces
         c1 = grid % faces_c(1,s)
         c2 = grid % faces_c(2,s)

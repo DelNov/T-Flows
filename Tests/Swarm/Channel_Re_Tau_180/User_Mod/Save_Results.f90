@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(flow, turb, mult, swarm, ts) 
+  subroutine User_Mod_Save_Results(flow, turb, mult, swarm, ts)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
@@ -20,7 +20,7 @@
   type(Turb_Type),       target :: turb
   type(Swarm_Type),      target :: swarm
   type(Multiphase_Type), target :: mult
-  integer                       :: ts
+  integer, intent(in)           :: ts
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
   type(Grid_Type), pointer :: grid

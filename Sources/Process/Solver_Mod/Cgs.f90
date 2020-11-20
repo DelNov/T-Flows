@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Cgs(sol, x, b, prec, miter, niter, tol, fin_res, norm)
+  subroutine Solver_Mod_Cgs(sol, x, b, prec, miter, niter, tol, fin_res, norm)
 !------------------------------------------------------------------------------!
 !   Solves the linear systems of equations by a precond. CGS Method.           !
 !------------------------------------------------------------------------------!

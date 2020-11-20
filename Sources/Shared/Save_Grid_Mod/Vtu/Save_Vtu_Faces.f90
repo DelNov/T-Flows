@@ -7,10 +7,12 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer(4)         :: data_size
-  integer            :: c2, n, s, cell_offset, data_offset, n_conns, fu
-  character(SL)      :: name_out, str1, str2
-  integer, parameter :: IP=8, RP=8, SP=4
+  integer(SP)   :: data_size
+  integer       :: c2, n, s, cell_offset, data_offset, n_conns, fu
+  character(SL) :: name_out, str1, str2
+!------------------------------[Local parameters]------------------------------!
+  integer, parameter :: IP = DP  ! int. precision is double precision
+  integer, parameter :: RP = DP  ! real precision is double precision
 !==============================================================================!
 
   ! Count connections in this subdomain, you will need it later

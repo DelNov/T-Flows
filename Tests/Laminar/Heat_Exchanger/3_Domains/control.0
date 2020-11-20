@@ -6,6 +6,8 @@
 
  TIME_STEP               0.1
 
+ TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
+
  INTERFACE_CONDITION      upper_dom    membrane
    BOUNDARY_CONDITIONS    bottom_wall  top_wall
 

@@ -80,7 +80,7 @@
   call Solver_Mod_Alias_System   (sol, a, b)
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Energy(flow, turb, mult, dt, ini)
+  call User_Mod_Beginning_Of_Compute_Energy(flow, turb, mult, ini)
 
   ! Initialize matrix and right hand side
   a % val(:) = 0.0
@@ -254,7 +254,7 @@
       a % val(a % dia(c2))  = a % val(a % dia(c2)) + a21
       a % val(a % pos(1,s)) = a % val(a % pos(1,s)) - a12
       a % val(a % pos(2,s)) = a % val(a % pos(2,s)) - a21
-    else if(c2.lt.0) then
+    else if(c2 .lt. 0) then
       ! Outflow is included because of the flux
       ! corrections which also affects velocities
       if( (Var_Mod_Bnd_Cond_Type(t, c2) .eq. INFLOW) .or.  &
@@ -320,14 +320,14 @@
 
   ! Call linear solver to solve the equations
   call Cpu_Timer_Mod_Start('Linear_Solver_For_Energy')
-  call Bicg(sol,          &
-            t % n,        &
-            b,            &
-            t % precond,  &
-            t % mniter,   &
-            t % eniter,   &
-            t % tol,      &
-            t % res)
+  call Solver_Mod_Bicg(sol,          &
+                       t % n,        &
+                       b,            &
+                       t % precond,  &
+                       t % mniter,   &
+                       t % eniter,   &
+                       t % tol,      &
+                       t % res)
   call Cpu_Timer_Mod_Stop('Linear_Solver_For_Energy')
 
   ! Print some info on the screen
@@ -336,7 +336,7 @@
   call Field_Mod_Grad_Variable(flow, t)
 
   ! User function
-  call User_Mod_End_Of_Compute_Energy(flow, turb, mult, dt, ini)
+  call User_Mod_End_Of_Compute_Energy(flow, turb, mult, ini)
 
   call Cpu_Timer_Mod_Stop('Compute_Energy (without solvers)')
 

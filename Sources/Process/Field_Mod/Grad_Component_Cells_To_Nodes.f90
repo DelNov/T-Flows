@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Field_Mod_Grad_Component_Cells_To_Nodes(flow, phic, phin, i, phii)
 !------------------------------------------------------------------------------!
-!   Calculates gradient of generic variable phi by a least squares method.     !
+!   Calculates gradient of generic variable phi by the least squares method.   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -9,8 +9,8 @@
   real                     :: phic( -flow % pnt_grid % n_bnd_cells  &
                                     :flow % pnt_grid % n_cells)
   real                     :: phin(1:flow % pnt_grid % n_nodes)
-  integer                  :: i
-  real,   intent(out)      :: phii(1:flow % pnt_grid % n_nodes)
+  integer, intent(in)      :: i
+  real,    intent(out)     :: phii(1:flow % pnt_grid % n_nodes)
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer           :: grid
   integer                            :: n, c, i_cel
@@ -25,9 +25,8 @@
   ! Take alias
   grid => flow % pnt_grid
 
-  ! Refresh buffers
-  call Grid_Mod_Exchange_Cells_Real(grid, phic)
-  call Field_Mod_Interpolate_Cells_To_Nodes(flow, phic, phin)
+  ! Do not refresh buffers and nodal values because
+  ! curvature at the walls are imposed outside
 
   ! Initialize gradients at nodes
   phii(1:grid % n_nodes) = 0.

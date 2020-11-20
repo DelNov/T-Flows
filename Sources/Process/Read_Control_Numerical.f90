@@ -116,15 +116,8 @@
     ! Max number convolution/smoothing steps for curvature and normal
     call Control_Mod_Max_Smoothing_Cycles_Curvature_Vof(mult % n_conv_curv)
     call Control_Mod_Max_Smoothing_Cycles_Normal_Vof(mult % n_conv_norm)
-    ! Nodal Curvature
-    call Control_Mod_Nodal_Curvature(mult % nodal_curvature)
     ! Skewness Correction
     call Control_Mod_Skewness_Correction_Vof(mult % skew_corr)
-    ! Parameters for distance function
-    call Control_Mod_Factor_Fictitious_Time_Vof(mult % c_tau)
-    call Control_Mod_Factor_Number_Cells_Distance_Function_Vof(mult % c_eps)
-    call Control_Mod_Distance_Function_Time_Integration_Scheme(name)
-    mult % t_dist_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
     ! Reconstruct surface
     call Control_Mod_Track_Front(mult % track_front, .true.)
   end if

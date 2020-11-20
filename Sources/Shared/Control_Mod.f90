@@ -69,7 +69,7 @@
     include 'Control_Mod/Physics/Latent_Heat.f90'
     include 'Control_Mod/Physics/Mass_Density.f90'
     include 'Control_Mod/Physics/Thermal_Conductivity.f90'
-    include 'Control_Mod/Physics/Species_Diffusivity.f90'
+    include 'Control_Mod/Physics/Scalars_Diffusivity.f90'
 
     ! Multiphase flow
     include 'Control_Mod/Physics/Multiphase_Model.f90'
@@ -102,7 +102,6 @@
     include 'Control_Mod/Physics/Potential_Initialization.f90'
 
     ! Multiphase
-    include 'Control_Mod/Physics/Distance_Function.f90'
     include 'Control_Mod/Physics/Number_Of_Phases.f90'
     include 'Control_Mod/Physics/Number_Of_Particles.f90'
     include 'Control_Mod/Physics/Number_Of_Swarm_Sub_Steps.f90'
@@ -114,19 +113,16 @@
     include 'Control_Mod/Physics/Phase_Conductivities.f90'
     include 'Control_Mod/Physics/Phase_Densities.f90'
     include 'Control_Mod/Physics/Phase_Viscosities.f90'
+    include 'Control_Mod/Physics/Reference_Density.f90'
     include 'Control_Mod/Physics/Surface_Tension.f90'
 
-    ! Species
-    include 'Control_Mod/Physics/Number_Of_Species.f90'
+    ! Scalars (like species, for example)
     include 'Control_Mod/Physics/Number_Of_Scalars.f90'
 
     ! Statistics
     include 'Control_Mod/Physics/Starting_Time_Step_For_Turb_Statistics.f90'
     include 'Control_Mod/Physics/Starting_Time_Step_For_Swarm_Computation.f90'
     include 'Control_Mod/Physics/Starting_Time_Step_For_Swarm_Statistics.f90'
-
-    ! User arrays (inluding numerical parameters)
-    include 'Control_Mod/User/Number_Of_User_Arrays.f90'
 
   !--------------!
   !   Numerics   !
@@ -192,15 +188,11 @@
     include 'Control_Mod/Numerics/V_Cycle_Residual_Ratio.f90'
 
     ! Numerical Parameters VOF (CICSAM)
-    include 'Control_Mod/Numerics/Distance_Function_Time_Integration_Scheme_Vof.f90'
-    include 'Control_Mod/Numerics/Factor_Number_Cells_Distance_Function_Vof.f90'
-    include 'Control_Mod/Numerics/Factor_Fictitious_Time_Vof.f90'
     include 'Control_Mod/Numerics/Max_Correction_Cycles_Beta_Vof.f90'
     include 'Control_Mod/Numerics/Max_Smoothing_Cycles_Curvature_Vof.f90'
     include 'Control_Mod/Numerics/Max_Smoothing_Cycles_Normal_Vof.f90'
     include 'Control_Mod/Numerics/Max_Courant_Vof.f90'
     include 'Control_Mod/Numerics/Max_Substep_Cycles_Vof.f90'
-    include 'Control_Mod/Numerics/Nodal_Curvature.f90'
     include 'Control_Mod/Numerics/Track_Front.f90'
     include 'Control_Mod/Numerics/Skewness_Correction_Vof.f90'
   end module

@@ -14,7 +14,7 @@ Prologue
 # LOAD_BACKUP_NAME          chan-ts012985.backup
 
 #-------------------
-# Monitoring points 
+# Monitoring points
 #-------------------
  NUMBER_OF_MONITORING_POINTS    1
  MONITORING_POINT_001           0.5  0.5  1.0
@@ -60,14 +60,13 @@ Prologue
 # Initial conditions
 #--------------------
   INITIAL_CONDITION
-    VARIABLES           u     v     w     t 
+    VARIABLES           u     v     w     t
     VALUES              1.0   0.0   0.0   20.0
 
 #---------------------
 # Boundary conditions
 #---------------------
   BOUNDARY_CONDITION    wall
-
-    TYPE                wall_flux
+    TYPE                wall
     VARIABLES           u     v     w     q
     VALUES              0.0   0.0   0.0   0.1

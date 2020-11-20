@@ -140,7 +140,7 @@
     end if
 
     ! User function
-    call User_Mod_Beginning_Of_Compute_Momentum(flow, turb, mult, dt, ini)
+    call User_Mod_Beginning_Of_Compute_Momentum(flow, turb, mult, ini)
 
     ! Initialize matrix and right hand side
     a % val(:) = 0.0
@@ -293,7 +293,7 @@
     !   Surface tension contribution   !
     !----------------------------------!
     if(mult % model .eq. VOLUME_OF_FLUID) then
-      call Multiphase_Mod_Vof_Momentum_Contribution(mult, sol, ui, i)
+      call Multiphase_Mod_Vof_Momentum_Contribution(mult, sol, i)
     end if
 
     !----------------------------------------------!
@@ -323,15 +323,15 @@
       ! Call linear solver
       call Cpu_Timer_Mod_Start('Linear_Solver_For_Momentum')
 
-      call Bicg(sol,           &
-                ui % n,        &
-                b,             &
-                ui % precond,  &
-                ui % mniter,   &
-                ui % eniter,   &
-                ui % tol,      &
-                ui % res,      &
-                norm = vel_max)
+      call Solver_Mod_Bicg(sol,           &
+                           ui % n,        &
+                           b,             &
+                           ui % precond,  &
+                           ui % mniter,   &
+                           ui % eniter,   &
+                           ui % tol,      &
+                           ui % res,      &
+                           norm = vel_max)
       call Cpu_Timer_Mod_Stop('Linear_Solver_For_Momentum')
 
       ! Fill the info screen up
@@ -352,7 +352,7 @@
   call Grid_Mod_Exchange_Cells_Real(grid, a % sav)
 
   ! User function
-  call User_Mod_End_Of_Compute_Momentum(flow, turb, mult, dt, ini)
+  call User_Mod_End_Of_Compute_Momentum(flow, turb, mult, ini)
 
   call Cpu_Timer_Mod_Stop('Compute_Momentum (without solvers)')
 

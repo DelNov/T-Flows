@@ -15,10 +15,12 @@
   integer          :: data_offset
   integer          :: sweep           ! is it the first or second sweep
 !-----------------------------------[Locals]-----------------------------------!
-  integer(4)         :: data_size
-  integer            :: c, c2
-  character(SL)      :: str1
-  integer, parameter :: IP=8, RP=8, SP=4
+  integer(SP)   :: data_size
+  integer       :: c, c2
+  character(SL) :: str1
+!------------------------------[Local parameters]------------------------------!
+  integer, parameter :: IP = DP  ! int. precision is double precision
+  integer, parameter :: RP = DP  ! real precision is double precision
 !==============================================================================!
 
   data_size = 0

@@ -37,12 +37,14 @@
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: phi
-  integer(4)               :: data_size
+  integer(SP)              :: data_size
   integer                  :: data_offset, cell_offset
   integer                  :: c, n, n_conns, sc, f8, f9, ua, run, c2
   character(SL)            :: name_out_8, name_out_9, name_mean, a_name
   character(SL)            :: str1, str2
-  integer, parameter       :: IP=8, RP=8, SP=4
+!------------------------------[Local parameters]------------------------------!
+  integer, parameter :: IP = DP  ! int. precision is double precision
+  integer, parameter :: RP = DP  ! real precision is double precision
 !==============================================================================!
 
   call Cpu_Timer_Mod_Start('Save_Vtu_Results')
@@ -366,27 +368,29 @@
     !   Volume fraction   !
     !---------------------!
     if(mult % model .eq. VOLUME_OF_FLUID) then
-      call Save_Scalar_Real(grid, "VolumeFraction", plot_inside,            &
+      call Save_Scalar_Real(grid, "VofSharp", plot_inside,                  &
                                   mult % vof % n(-grid % n_bnd_cells),      &
                                   f8, f9, data_offset, run)
-      call Save_Scalar_Real(grid, "Curvature", plot_inside,                 &
+      call Save_Scalar_Real(grid, "VofSmooth", plot_inside,                 &
+                                  mult % smooth % n(-grid % n_bnd_cells),   &
+                                  f8, f9, data_offset, run)
+      call Save_Scalar_Real(grid, "VofCurvature", plot_inside,              &
                                   mult % curv(-grid % n_bnd_cells),         &
                                   f8, f9, data_offset, run)
-      call Save_Vector_Real(grid, "SurfaceTensionForce", plot_inside,       &
-                                  mult % surf_fx(-grid % n_bnd_cells),      &
-                                  mult % surf_fy(-grid % n_bnd_cells),      &
-                                  mult % surf_fz(-grid % n_bnd_cells),      &
+      call Save_Vector_Real(grid, "VofSurfaceNormals", plot_inside,  &
+                                  mult % nx(-grid % n_bnd_cells),    &
+                                  mult % ny(-grid % n_bnd_cells),    &
+                                  mult % nz(-grid % n_bnd_cells),    &
+                                  f8, f9, data_offset, run)
+      call Save_Vector_Real(grid, "VofSurfaceTensionForce", plot_inside,  &
+                                  mult % surf_fx(-grid % n_bnd_cells),    &
+                                  mult % surf_fy(-grid % n_bnd_cells),    &
+                                  mult % surf_fz(-grid % n_bnd_cells),    &
                                   f8, f9, data_offset, run)
       if (allocated(mult % flux_rate)) then
         call Save_Scalar_Real(grid, "FluxRate ", plot_inside,               &
                                     mult % flux_rate(-grid % n_bnd_cells),  &
                                     f8, f9, data_offset, run)
-      end if
-
-      if (mult % d_func) then
-        call Save_Scalar_Real(grid, "DistanceFunction", plot_inside,      &
-                              mult % dist_func % n(-grid % n_bnd_cells),  &
-                              f8, f9, data_offset, run)
       end if
     end if
 

@@ -63,7 +63,7 @@ TIME_STEP                 0.02
 # Boundary conditions
 #---------------------
   BOUNDARY_CONDITION    low_wall
-    TYPE                wall_flux
+    TYPE                wall
     VARIABLES           u     v     w
     VALUES              0.0   0.0   0.0
 

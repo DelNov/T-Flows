@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Compute_Pressure(flow, mult, dt, ini)
+  subroutine User_Mod_End_Of_Compute_Pressure(flow, mult, ini)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of Compute_Pressure function.           !
 !------------------------------------------------------------------------------!
@@ -7,8 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),      target :: flow
   type(Multiphase_Type), target :: mult
-  real                          :: dt    ! time step
-  integer                       :: ini   ! inner iteration
+  integer, intent(in)           :: ini   ! inner iteration
 !==============================================================================!
 
   end subroutine

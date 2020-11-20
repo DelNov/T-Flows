@@ -25,9 +25,9 @@ include '../User_Mod/Vof_Area_Square_Circle.f90'
 !==============================================================================!
 
   ! Take aliases
-  grid  => flow % pnt_grid
-  vof   => mult % vof
-  dt    => flow % dt
+  grid => flow % pnt_grid
+  vof  => mult % vof
+  dt   => flow % dt
 
   epsloc = epsilon(epsloc)
 
@@ -39,11 +39,11 @@ include '../User_Mod/Vof_Area_Square_Circle.f90'
   ! Under a Plane:
   ! call Vof_Initialization_Plane(mult)
   ! Ellipsoid:
-  !call Vof_Initialization_Ellipsoid(mult)
+  ! call Vof_Initialization_Ellipsoid(mult)
   ! Cylinder:
   call Vof_Initialization_Cylinder(mult)
   ! Box:
-  !call Vof_Initialization_Box(mult)
+  ! call Vof_Initialization_Box(mult)
 
   call Grid_Mod_Exchange_Cells_Real(grid, vof % n)
 

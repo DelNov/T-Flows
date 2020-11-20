@@ -77,9 +77,9 @@
   end if
 
   ! Gradients
-  call Field_Mod_Grad_Component(flow, phi % n, 1, phi_x(-nb:nc))
-  call Field_Mod_Grad_Component(flow, phi % n, 2, phi_y(-nb:nc))
-  call Field_Mod_Grad_Component(flow, phi % n, 3, phi_z(-nb:nc))
+  call Field_Mod_Grad(flow, phi % n, phi_x(-nb:nc),  &
+                                     phi_y(-nb:nc),  &
+                                     phi_z(-nb:nc))
 
   !---------------!
   !               !
@@ -317,14 +317,14 @@
 
   ! Call linear solver to solve the equations
   call Cpu_Timer_Mod_Start('Linear_Solver_For_Turbulence')
-  call Bicg(sol,            &
-            phi % n,        &
-            b,              &
-            phi % precond,  &
-            phi % mniter,   &
-            phi % eniter,   &
-            phi % tol,      &
-            phi % res)
+  call Solver_Mod_Bicg(sol,            &
+                       phi % n,        &
+                       b,              &
+                       phi % precond,  &
+                       phi % mniter,   &
+                       phi % eniter,   &
+                       phi % tol,      &
+                       phi % res)
   call Cpu_Timer_Mod_Stop('Linear_Solver_For_Turbulence')
 
   ! Print info on the screen

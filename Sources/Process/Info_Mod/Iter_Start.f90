@@ -15,18 +15,23 @@
       iter_info % line_lead      (i:i) = '#'
       iter_info % line_iter      (i:i) = '#'
       iter_info % line_sep       (i:i) = '#'
-
-      ! For normal lines
-      do l = 1, 4
-        iter_info % lines(l)     (i:i) = '#'
-      end do
-
-      ! For user lines
-      do l = 1, MAX_USER_LINES
-        iter_info % lines_user(l)(i:i) = '#'
-      end do
     end do
 
+    ! For normal lines
+    do l = 1, 4
+      iter_info % lines(l)(     1:L_LINE) = ' '
+      iter_info % lines(l)(     1:     1) = '#'
+      iter_info % lines(l)(L_LINE:L_LINE) = '#'
+    end do
+
+    ! For user lines
+    do l = 1, MAX_USER_LINES
+      iter_info % lines_user(l)(     1:L_LINE) = ' '
+      iter_info % lines_user(l)(     1:     1) = '#'
+      iter_info % lines_user(l)(L_LINE:L_LINE) = '#'
+    end do
+
+    ! Lead and separating lines
     do i = 2, L_LINE-1
       iter_info % line_lead(i:i) = '='
       iter_info % line_sep (i:i) = '-'

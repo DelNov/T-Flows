@@ -96,6 +96,14 @@
     real, allocatable :: body_fy(:)
     real, allocatable :: body_fz(:)
 
+    ! Reference temperature and density
+    real :: t_ref
+    real :: dens_ref
+
+    ! Volume error after pressure correction
+    ! (It used to be called mass_err and was a local variable)
+    real :: vol_res
+
   end type
 
   ! Variables determining if we are dealing with heat transfer and buoyancy
@@ -107,9 +115,6 @@
 
   ! Gravity
   real :: grav_x, grav_y, grav_z
-
-  ! Reference temperature
-  real :: t_ref
 
   contains
 

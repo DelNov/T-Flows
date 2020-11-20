@@ -26,8 +26,6 @@
     real, allocatable :: q(:)              ! flux of a variable
     real              :: sigma             ! sigma
     real              :: res               ! residual after lin. solver
-    real              :: res_scal          ! scaled residual
-    real              :: res_scal0         ! old scaled residual
     real              :: units(5)          ! mass, length, time,
                                            ! temperature, angle
     ! Boundary cell type (important for scalars, since they

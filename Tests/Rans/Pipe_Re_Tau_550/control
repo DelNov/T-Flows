@@ -90,7 +90,7 @@
 #---------------------
 # Flux is set on the wall for temp, value is set for c_01
   BOUNDARY_CONDITION    wall
-    TYPE                wall_flux
+    TYPE                wall
     VARIABLES           u  v  w  q  kin eps  zeta f22
     VALUES              0. 0. 0. 1. 0.  1e-3 0.   0.
     TYPE                wall

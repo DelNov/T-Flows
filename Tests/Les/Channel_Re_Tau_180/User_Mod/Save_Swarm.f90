@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Swarm(flow, turb, swarm, save_name) 
+  subroutine User_Mod_Save_Swarm(flow, turb, swarm, save_name)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results for paerticles in homogeneous directions.             !
@@ -11,7 +11,7 @@
   use Comm_Mod                       ! parallel stuff
   use Grid_Mod,  only: Grid_Type
   use Field_Mod, only: Field_Type, heat_transfer, heat_flux, heat, &
-                       capacity, conductivity, heated_area 
+                       capacity, conductivity, heated_area
   use Bulk_Mod,  only: Bulk_Type
   use Var_Mod,   only: Var_Type
   use Turb_Mod 

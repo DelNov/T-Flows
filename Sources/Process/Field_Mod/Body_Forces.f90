@@ -34,7 +34,7 @@
       c2  = grid % faces_c(2, s)
       t_face_delta(s) = t % n(c1) * grid % f(s)          &
                       + t % n(c2) * (1.0 - grid % f(s))
-      t_face_delta(s) = t_face_delta(s) - t_ref
+      t_face_delta(s) = flow % t_ref - t_face_delta(s)
     end do
 
   !------------------------------!
@@ -60,6 +60,9 @@
 
       dens_f = flow % density(c1) *        grid % fw(s)  &
              + flow % density(c2) * (1.0 - grid % fw(s))
+
+      ! Substract reference density
+      if(.not. buoyancy) dens_f = dens_f - flow % dens_ref
 
       dotprod = (   (grid % xf(s) - xc1) * grav_x    &
                   + (grid % yf(s) - yc1) * grav_y    &
@@ -104,10 +107,5 @@
   call Grid_Mod_Exchange_Cells_Real(grid, flow % body_fx)
   call Grid_Mod_Exchange_Cells_Real(grid, flow % body_fy)
   call Grid_Mod_Exchange_Cells_Real(grid, flow % body_fz)
-
-  ! Was used for debugging
-  ! do c = 1, grid % n_cells
-  !   flow % pot % n(c) = flow % body_fz(c)
-  ! end do
 
   end subroutine

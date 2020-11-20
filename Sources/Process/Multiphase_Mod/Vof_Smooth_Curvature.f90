@@ -1,6 +1,5 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Vof_Smooth_Curvature(grid, mult,                  &
-                                                 norm_nx, norm_ny, norm_nz)
+  subroutine Multiphase_Mod_Vof_Smooth_Curvature(mult)
 !------------------------------------------------------------------------------!
 !   Smoothes curvature in two steps: first a smoothing curvature around the    !
 !   Interface and second in the direction of the normal. This technique can    !
@@ -17,30 +16,23 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Multiphase_Type), target :: mult
-  type(Grid_Type)               :: grid
-  real                          :: norm_nx(-grid % n_bnd_cells:grid % n_cells)
-  real                          :: norm_ny(-grid % n_bnd_cells:grid % n_cells)
-  real                          :: norm_nz(-grid % n_bnd_cells:grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  type(Var_Type), pointer :: vof
-  integer                 :: s, c, c1, c2, c_iter, i_fac, nb, nc
-  integer                 :: face_init, face_end, face_step
-  real                    :: fs, w_v1, w_v2, w_m1, w_m2
-  real                    :: weight_s, weight_n
-  real                    :: norma, epsloc, curvf, dotprod
+  type(Grid_Type), pointer :: grid
+  type(Var_Type),  pointer :: col   ! colour; could be vof or smooth
+  integer                  :: s, c, c1, c2, nb, nc
+  real                     :: fs, w_v1, w_v2, w_m1, w_m2
+  real                     :: weight_s, weight_n
+  real                     :: curvf
 !==============================================================================!
 
   ! Take aliases
-  if (mult % d_func) then
-    vof => mult % dist_func
-  else
-    vof => mult % vof
-  end if
+  grid => mult % pnt_grid
+
+  col => mult % smooth
+  ! col => mult % vof
 
   nb = grid % n_bnd_cells
   nc = grid % n_cells
-
-  epsloc = epsilon(epsloc)
 
   sum_k_weight(-nb:nc) = 0.0
   sum_weight  (-nb:nc) = 0.0
@@ -85,8 +77,8 @@
   do s = grid % n_bnd_faces + 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
-    w_v1 = (1.0 - 2.0 * abs(0.5 - vof % n(c1))) ** weight_s
-    w_v2 = (1.0 - 2.0 * abs(0.5 - vof % n(c2))) ** weight_s
+    w_v1 = (1.0 - 2.0 * abs(0.5 - col % n(c1))) ** weight_s
+    w_v2 = (1.0 - 2.0 * abs(0.5 - col % n(c2))) ** weight_s
     sum_k_weight(c1) = sum_k_weight(c1) + mult % curv(c2) * w_v2
     sum_weight(c1) = sum_weight(c1) + w_v2
 
@@ -98,9 +90,9 @@
   call Grid_Mod_Exchange_Cells_Real(grid, sum_weight  (-nb:nc))
 
   do c = 1, grid % n_cells
-    w_v1 = (1.0 - 2.0 * abs(0.5 - vof % n(c))) ** weight_s
+    w_v1 = (1.0 - 2.0 * abs(0.5 - col % n(c))) ** weight_s
     k_star(c) = (w_v1 * mult % curv(c) + sum_k_weight(c))    &
-              / (w_v1 + sum_weight(c) + epsloc)
+              / (w_v1 + sum_weight(c) + FEMTO)
   end do
 
   call Grid_Mod_Exchange_Cells_Real(grid, k_star(-nb:nc))
@@ -142,15 +134,15 @@
   do s = grid % n_bnd_faces + 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
-    w_v1 = (1.0 - 2.0 * abs(0.5 - vof % n(c1))) ** weight_n
-    w_v2 = (1.0 - 2.0 * abs(0.5 - vof % n(c2))) ** weight_n
+    w_v1 = (1.0 - 2.0 * abs(0.5 - col % n(c1))) ** weight_n
+    w_v2 = (1.0 - 2.0 * abs(0.5 - col % n(c2))) ** weight_n
 
-    w_m1 = abs(dot_product((/norm_nx(c1), norm_ny(c1), norm_nz(c1)/),     &
-                           (/grid % dx(s), grid % dy(s), grid % dz(s)/)   &
+    w_m1 = abs(dot_product((/mult % nx(c1), mult % ny(c1), mult % nz(c1)/),  &
+                           (/grid % dx(s),  grid % dy(s),  grid % dz(s)/)    &
                            / grid % d(s))) ** weight_n
 
-    w_m2 = abs(dot_product((/norm_nx(c2), norm_ny(c2), norm_nz(c2)/),     &
-                           (/grid % dx(s), grid % dy(s), grid % dz(s)/)   &
+    w_m2 = abs(dot_product((/mult % nx(c2), mult % ny(c2), mult % nz(c2)/),  &
+                           (/grid % dx(s),  grid % dy(s),  grid % dz(s)/)    &
                            / (-grid % d(s)))) ** weight_n
 
     sum_k_weight(c1) = sum_k_weight(c1) + k_star(c2) * w_v2 * w_m2
@@ -164,9 +156,9 @@
   call Grid_Mod_Exchange_Cells_Real(grid, sum_weight  (-nb:nc))
 
   do c = 1, grid % n_cells
-    w_v1 = (1.0 - 2.0 * abs(0.5 - vof % n(c))) ** weight_n
+    w_v1 = (1.0 - 2.0 * abs(0.5 - col % n(c))) ** weight_n
     mult % curv(c) = (w_v1 * k_star(c) + sum_k_weight(c))    &
-                   / (w_v1 + sum_weight(c) + epsloc)
+                   / (w_v1 + sum_weight(c) + FEMTO)
   end do
 
   call Grid_Mod_Exchange_Cells_Real(grid, mult % curv)

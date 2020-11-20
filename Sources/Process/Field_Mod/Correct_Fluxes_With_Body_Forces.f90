@@ -25,7 +25,7 @@
   grid    => flow % pnt_grid
   t       => flow % t
   u_relax => flow % u_rel_corr
-  call Solver_Mod_Alias_System (sol,  a, b)
+  call Solver_Mod_Alias_System(sol, a, b)
 
   !-------------------------------!
   !   For Boussinesq hypothesis   !
@@ -36,7 +36,7 @@
       c2 = grid % faces_c(2,s)
       t_face_delta(s) = t % n(c1) * grid % f(s)          &
                       + t % n(c2) * (1.0 - grid % f(s))
-      t_face_delta(s) = t_face_delta(s) - t_ref
+      t_face_delta(s) = flow % t_ref - t_face_delta(s)
     end do
   else
     t_face_delta(1:grid % n_faces) = 1.0
@@ -91,7 +91,7 @@
 
         ! Units for a12: [m^4s/kg]
         a12 = u_relax * 0.5 * (  grid % vol(c1) / a % sav(c1)     &
-                                  + grid % vol(c2) / a % sav(c2) ) * a % fc(s)
+                               + grid % vol(c2) / a % sav(c2) ) * a % fc(s)
 
         ! Unit for gravity_source again: [m^3/s]
         gravity_source =  a12 * (gravity_source - dotprod)

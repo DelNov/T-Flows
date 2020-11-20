@@ -32,16 +32,16 @@
   !-------------------------!
   !   Matrix Coefficients   !
   !-------------------------!
-  if (vof % adv_scheme .eq. UPWIND) then
+  if(vof % adv_scheme .eq. UPWIND) then
 
     ! At boundaries
     do s = 1, grid % n_bnd_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
 
-      if (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
+      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
         b(c1) = b(c1) - v_flux % n(s) * vof % n(c2)
-      else if (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) then
+      else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) then
         a % val(a % dia(c1)) = a % val(a % dia(c1)) + v_flux % n(s)
       end if
 
@@ -66,7 +66,7 @@
 
     end do
 
-  else if (vof % adv_scheme .eq. CICSAM .or. &
+  else if(vof % adv_scheme .eq. CICSAM .or. &
            vof % adv_scheme .eq. STACS) then
 
     ! At boundaries
@@ -128,13 +128,13 @@
   end if
 
   ! Phase change
-  if (mult % phase_change) then
+  if(mult % phase_change) then
 
     !do s = 1, grid % n_bnd_faces
     !  c1 = grid % faces_c(1,s)
     !  c2 = grid % faces_c(2,s)
 
-    !  if (mult % ic(c1) == 1) then
+    !  if(mult % ic(c1) == 1) then
     !    !b(c1) = b(c1) + v_flux % n(s) * vof % n(c1)
     !    a % val(a % dia(c1)) = a % val(a % dia(c1)) - v_flux % n(s)
     !  end if
@@ -145,12 +145,12 @@
     !  c1 = grid % faces_c(1,s)
     !  c2 = grid % faces_c(2,s)
 
-    !  if (mult % ic(c1) == 1) then
+    !  if(mult % ic(c1) == 1) then
     !    !b(c1) = b(c1) + v_flux % n(s) * vof % n(c1)
     !    a % val(a % dia(c1)) = a % val(a % dia(c1)) - v_flux % n(s)
     !  end if
 
-    !  if (mult % ic(c2) == 1) then
+    !  if(mult % ic(c2) == 1) then
     !    !b(c2) = b(c2) - v_flux % n(s) * vof % n(c2)
     !    a % val(a % dia(c2)) = a % val(a % dia(c2)) + v_flux % n(s)
     !  end if

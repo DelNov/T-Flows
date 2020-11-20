@@ -49,9 +49,11 @@
   a % val(:) = 0.0
   b      (:) = 0.0
 
-  ! New values
+  ! Initial values
+  ! (Potential varies from 0 to 1, hence
+  !  0.5 seems like a good initial guess)
   do c = 1, grid % n_cells
-    phi % c(c) = 0.5
+    phi % n(c) = 0.5
   end do
 
   !----------------------------------------!
@@ -60,7 +62,7 @@
 
   ! Innertial term
   do c = 1, grid % n_cells
-    a % val(a % dia(c)) = a % val(a % dia(c)) + grid % vol(c) / DT
+    a % val(a % dia(c)) = grid % vol(c) / DT
   end do
 
   ! Diffusive term
@@ -88,14 +90,20 @@
   !----------------------------------------!
   !   Begin the false time stepping loop   !
   !----------------------------------------!
-  do n = 1, 24
+  do n = 1, NDT
 
+    ! Store the value from previous time step
     do c = 1, grid % n_cells
       phi % o(c) = phi % n(c)
+    end do
+
+    ! Innertial term
+    do c = 1, grid % n_cells
       b(c) = grid % vol(c) / DT * phi % o(c)
     end do
 
     ! Update boundary values
+    ! (Set 1 at inflows and 0 at outflows)
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1, s)
       c2 = grid % faces_c(2, s)
@@ -170,10 +178,24 @@
 
     end do  ! through faces
 
-    ! Cross diffusion terms are treated explicity
-    ! do c = 1, grid % n_cells
-    !   b(c) = b(c) + phi % c(c)
-    ! end do
+    ! Add cross diffusion terms explicity
+    ! (You will not need phi % c after this point)
+    do c = 1, grid % n_cells
+      b(c) = b(c) + phi % c(c)
+    end do
+
+    ! Fix negative sources
+    do c = 1, grid % n_cells
+
+      ! Store the central term in phi % c
+      phi % c(c) = a % val(a % dia(c))
+
+      ! If source is negative, fix it!
+      if(b(c) < 0.0) then
+        a % val(a % dia(c)) = a % val(a % dia(c)) - b(c) / phi % o(c)
+        b(c) = 0.0
+      end if
+    end do
 
     !---------------------------------!
     !                                 !
@@ -182,19 +204,19 @@
     !---------------------------------!
 
     ! Set number of iterations "by hand"
-    phi % mniter  = 66
-    phi % tol     =  1.0e-6
+    phi % mniter  = 99
+    phi % tol     =  1.0e-5
     phi % precond = 'INCOMPLETE_CHOLESKY'
 
     ! Call linear solver to solve the equations
-    call Bicg(sol,            &
-              phi % n,        &
-              b,              &
-              phi % precond,  &
-              phi % mniter,   &
-              phi % eniter,   &
-              phi % tol,      &
-              phi % res)
+    call Solver_Mod_Bicg(sol,            &
+                         phi % n,        &
+                         b,              &
+                         phi % precond,  &
+                         phi % mniter,   &
+                         phi % eniter,   &
+                         phi % tol,      &
+                         phi % res)
     if(this_proc < 2) then
       print '(a,i4,a,e12.4)', ' # Computed potential in ',   phi % eniter,  &
                               ' iterations with residual: ', phi % res
@@ -203,6 +225,16 @@
     if(phi % eniter .eq. 0) goto 1
 
     call Grid_Mod_Exchange_Cells_Real(grid, phi % n)
+
+    ! Recover the central coefficient in the system matrix
+    do c = 1, grid % n_cells
+      a % val(a % dia(c)) = phi % c(c)
+    end do
+
+    ! Re-initialize cross diffusion terms (for the next time step)
+    do c = 1, grid % n_cells
+      phi % c(c) = 0.0
+    end do
 
   end do
 

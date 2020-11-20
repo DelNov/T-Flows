@@ -69,12 +69,12 @@ Initial values
 
 Boundary conditions
   BOUNDARY_CONDITION    adiabatic_wall
-    TYPE                wall_flux
+    TYPE                wall
     VARIABLES           u     v     w     q     kin   eps      zeta    f22
     VALUES              0.0   0.0   0.0   0.0   0.0   0.0004   0.0   0.0
 
   BOUNDARY_CONDITION    heated_wall
-    TYPE                wall_flux
+    TYPE                wall
     VARIABLES           u     v     w     q     kin   eps      zeta    f22
     VALUES              0.0   0.0   0.0   0.1   0.0   0.0004   0.0   0.0
 

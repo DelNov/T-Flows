@@ -6,7 +6,7 @@
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod,      only: HUGE_INT
   use Comm_Mod,       only: Comm_Mod_End, this_proc
-  use Field_Mod,      only: Field_Type, buoyancy, heat_transfer, t_ref,  &
+  use Field_Mod,      only: Field_Type, buoyancy, heat_transfer,  &
                             grav_x, grav_y, grav_z
   use Bulk_Mod,       only: Bulk_Type
   use Turb_Mod
@@ -39,7 +39,7 @@
                                         grav_y,  &
                                         grav_z, .true.)
   call Control_Mod_Buoyancy                    (buoyancy,     .true.)
-  call Control_Mod_Reference_Temperature       (t_ref,        .true.)
+  call Control_Mod_Reference_Temperature       (flow % t_ref, .true.)
   call Control_Mod_Volume_Expansion_Coefficient(flow % beta,  .true.)
   call Control_Mod_Turbulent_Prandtl_Number    (pr_t)  ! default is (0.9)
 
@@ -215,11 +215,11 @@
                                    bulk % flux_y_o,  &
                                    bulk % flux_z_o)
 
-  !-------------------------------!
-  !                               !
-  !   Number of passive scalars   !
-  !                               !
-  !-------------------------------!
+  !-----------------------!
+  !                       !
+  !   Number of scalars   !
+  !                       !
+  !-----------------------!
   call Control_Mod_Number_Of_Scalars(flow % n_scalars, verbose = .true.)
 
   !-------------------------------!
@@ -231,7 +231,6 @@
 
   if(name .eq. 'VOLUME_OF_FLUID' ) then
     mult % model = VOLUME_OF_FLUID
-    call Control_Mod_Distance_Function(mult % d_func)
   else if(name .eq. 'LAGRANGIAN_PARTICLES' ) then
     mult % model = LAGRANGIAN_PARTICLES
   else if(name .eq. 'EULER_EULER' ) then
@@ -239,6 +238,8 @@
   else
     mult % model = NO_MULTIPHASE_MODEL
   end if
+
+  call Control_Mod_Reference_Density(flow % dens_ref, .true.)
 
   call Control_Mod_Phase_Change(mult % phase_change)
 

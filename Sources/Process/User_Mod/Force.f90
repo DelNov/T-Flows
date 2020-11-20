@@ -12,7 +12,7 @@
   type(Var_Type)     :: ui        ! velocity component
   type(Matrix_Type)  :: a_matrix  ! system matrix
   real, dimension(:) :: b_vector  ! right hand side vector
-!------------------------------------------------------------------------------!
+!==============================================================================!
 
   !----------------------------------------------------! 
   !                                                    !
@@ -23,22 +23,22 @@
   !-------------------------------------------------------!
   !  Set source for velocity component in "x" direction   !
   !-------------------------------------------------------!
-  if( ui % name .eq. 'U' ) then  
+  if( ui % name .eq. 'U' ) then
 
   end if
-  
+
   !-------------------------------------------------------!
   !  Set source for velocity component in "x" direction   !
   !-------------------------------------------------------!
-  if( ui % name .eq. 'V' ) then  
+  if( ui % name .eq. 'V' ) then
 
   end if
-  
+
   !-------------------------------------------------------!
   !  Set source for velocity component in "x" direction   !
   !-------------------------------------------------------!
-  if( ui % name .eq. 'W' ) then  
+  if( ui % name .eq. 'W' ) then
 
   end if
 
-  end subroutine  ! fourth level comments
+  end subroutine

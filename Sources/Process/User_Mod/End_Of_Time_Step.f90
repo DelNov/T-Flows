@@ -10,10 +10,10 @@
   type(Turb_Type),       target :: turb
   type(Multiphase_Type), target :: mult
   type(Swarm_Type),      target :: swarm
-  integer                       :: n         ! time step
-  integer                       :: n_stat_t  ! start time step for turb. stat.
-  integer                       :: n_stat_p  ! start time step for swarm. stat.
-  real                          :: time      ! physical time
+  integer, intent(in)           :: n         ! time step
+  integer, intent(in)           :: n_stat_t  ! start time step for turb. stat.
+  integer, intent(in)           :: n_stat_p  ! start time step for swarm. stat.
+  real,    intent(in)           :: time      ! physical time
 !==============================================================================!
 
   end subroutine

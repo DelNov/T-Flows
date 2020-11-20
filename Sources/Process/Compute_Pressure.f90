@@ -21,8 +21,7 @@
   real, contiguous,  pointer :: b(:)
   real,              pointer :: u_relax
   integer                    :: s, c, c1, c2
-  real                       :: u_f, v_f, w_f, a12, fs
-  real                       :: mass_err, dt
+  real                       :: u_f, v_f, w_f, a12, fs, dt
   real                       :: px_f, py_f, pz_f, dens_h
   character(SL)              :: solver
   real                       :: p_max, p_min, p_nor, p_nor_c
@@ -64,7 +63,7 @@
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Pressure(flow, mult, dt, ini)
+  call User_Mod_Beginning_Of_Compute_Pressure(flow, mult, ini)
 
   !--------------------------------------------------!
   !   Find the value for normalization of pressure   !
@@ -199,7 +198,7 @@
   !   In case of VOF, surface tension and  gravity correction   !
   !-------------------------------------------------------------!
   if(mult % model .eq. VOLUME_OF_FLUID) then
-    call Multiphase_Mod_Vof_Pressure_Correction(mult, sol, ini, mass_err)
+    call Multiphase_Mod_Vof_Pressure_Correction(mult, sol)
   end if
 
   !-------------------------------------!
@@ -207,46 +206,26 @@
   !-------------------------------------!
   call Field_Mod_Correct_Fluxes_With_Body_Forces(flow, sol)
 
-  ! Compute mass error for SIMPLE
-  if (flow % p_m_coupling == SIMPLE) then
-    mass_err = 0.0
-    do c = 1, grid % n_cells
-      mass_err = max(mass_err, abs(b(c)))
-    end do
-
-  ! Compute mass error for PISO
-  else if (flow % p_m_coupling == PISO) then
-    mass_err = 0.0
-    do c = 1, grid % n_cells - grid % comm % n_buff_cells
-      mass_err = mass_err + abs(b(c))
-    end do
-    call Comm_Mod_Global_Sum_Real(mass_err)
-    if (flow % i_corr == flow % n_piso_corrections) then
-      flow % p % res = mass_err
-      if (ini == 1) then
-        flow % p % res_scal0 = mass_err
-      else
-        if (ini < 6) then
-          flow % p % res_scal0 = max(flow % p % res_scal0, mass_err)
-        end if
-      end if
-      flow % p % res = flow % p % res / (flow % p % res_scal0 + PICO)
-    end if
-  end if
+  ! Compute volume error
+  flow % vol_res = 0.0
+  do c = 1, grid % n_cells - grid % comm % n_buff_cells
+    flow % vol_res = flow % vol_res + abs(b(c))
+  end do
+  call Comm_Mod_Global_Sum_Real(flow % vol_res)
 
   ! Get solver
   call Control_Mod_Solver_For_Pressure(solver)
 
   call Cpu_Timer_Mod_Start('Linear_Solver_For_Pressure')
-  call Cg(sol,           &
-          pp % n,        &
-          b,             &
-          pp % precond,  &
-          pp % mniter,   &      ! max number of iterations
-          pp % eniter,   &      ! executed number of iterations
-          pp % tol,      &
-          pp % res,      &
-          norm = p_nor)         ! last argument: number for normalisation
+  call Solver_Mod_Cg(sol,           &
+                     pp % n,        &
+                     b,             &
+                     pp % precond,  &
+                     pp % mniter,   &      ! max number of iterations
+                     pp % eniter,   &      ! executed number of iterations
+                     pp % tol,      &
+                     pp % res,      &
+                     norm = p_nor)         ! number for normalisation
 
   call Cpu_Timer_Mod_Stop('Linear_Solver_For_Pressure')
 
@@ -280,7 +259,7 @@
   call Field_Mod_Grad_Pressure_Correction(flow, pp)
 
   ! User function
-  call User_Mod_End_Of_Compute_Pressure(flow, mult, dt, ini)
+  call User_Mod_End_Of_Compute_Pressure(flow, mult, ini)
 
   call Cpu_Timer_Mod_Stop('Compute_Pressure (without solvers)')
 

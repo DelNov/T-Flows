@@ -1,8 +1,7 @@
 !==============================================================================!
-  subroutine Field_Mod_Grad_Component(flow, phi, i, phii,  &
-                                      impose_symmetry)
+  subroutine Field_Mod_Grad_Component(flow, phi, i, phii)
 !------------------------------------------------------------------------------!
-!   Calculates gradient of generic variable phi by a least squares method,     !
+!   Calculates gradient of generic variable phi by the least squares method,   !
 !   with refershing the buffers.                                               !
 !------------------------------------------------------------------------------!
   implicit none
@@ -10,15 +9,13 @@
   type(Field_Type), target :: flow
   real                     :: phi (-flow % pnt_grid % n_bnd_cells:  &
                                     flow % pnt_grid % n_cells)
-  integer                  :: i
-  real                     :: phii(-flow % pnt_grid % n_bnd_cells:  &
+  integer, intent(in)      :: i
+  real,    intent(out)     :: phii(-flow % pnt_grid % n_bnd_cells:  &
                                     flow % pnt_grid % n_cells)
-  logical, optional        :: impose_symmetry
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   integer                  :: s, c1, c2
   real                     :: dphi1, dphi2
-  logical                  :: imp_sym
 !-----------------------------[Local parameters]-------------------------------!
   integer, dimension(3,3), parameter :: MAP = reshape((/ 1, 4, 5,  &
                                                          4, 2, 6,  &
@@ -34,13 +31,6 @@
   ! Initialize gradients
   phii(1:grid % n_cells) = 0.
 
-  ! Handle optional argument
-  if(present(impose_symmetry)) then
-    imp_sym = impose_symmetry
-  else
-    imp_sym = .true.
-  end if
-
   ! On the boundaries
   do s = 1, grid % n_bnd_faces
     c1 = grid % faces_c(1,s)
@@ -48,7 +38,7 @@
     dphi1 = phi(c2)-phi(c1)
     dphi2 = phi(c2)-phi(c1)
 
-    if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. SYMMETRY .and. imp_sym) then
+    if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. SYMMETRY) then
       dphi1 = 0.
     end if
 

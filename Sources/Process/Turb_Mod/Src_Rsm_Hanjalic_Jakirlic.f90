@@ -330,9 +330,9 @@
     end do  ! i
   end if    ! end if EPS == yes
 
-  call Field_Mod_Grad_Component(flow, turb % l_scale, 1, l_sc_x(-nb:nc))
-  call Field_Mod_Grad_Component(flow, turb % l_scale, 2, l_sc_y(-nb:nc))
-  call Field_Mod_Grad_Component(flow, turb % l_scale, 3, l_sc_z(-nb:nc))
+  call Field_Mod_Grad(flow, turb % l_scale, l_sc_x(-nb:nc),  &
+                                            l_sc_y(-nb:nc),  &
+                                            l_sc_z(-nb:nc))
 
   r13 = ONE_THIRD
   r23 = TWO_THIRDS
@@ -357,19 +357,19 @@
     a13 = uw % n(c) / kin % n(c)
     a23 = vw % n(c) / kin % n(c)
 
-    S11 = u % x(c)
-    S22 = v % y(c)
-    S33 = w % z(c)
+    s11 = u % x(c)
+    s22 = v % y(c)
+    s33 = w % z(c)
     s12 = 0.5*(u % y(c)+v % x(c))
     s13 = 0.5*(u % z(c)+w % x(c))
     s23 = 0.5*(v % z(c)+w % y(c))
 
-    V11 = 0.0
-    V22 = 0.0
-    V33 = 0.0
-    V12 = 0.5*(u % y(c)-v % x(c)) - omega_z
-    V13 = 0.5*(u % z(c)-w % x(c)) + omega_y
-    V23 = 0.5*(v % z(c)-w % y(c)) - omega_x
+    v11 = 0.0
+    v22 = 0.0
+    v33 = 0.0
+    v12 = 0.5*(u % y(c)-v % x(c)) - omega_z
+    v13 = 0.5*(u % z(c)-w % x(c)) + omega_y
+    v23 = 0.5*(v % z(c)-w % y(c)) - omega_x
 
     aa2 = (a11**2)+(a22**2)+(a33**2)+2*((a12**2)+(a13**2)+(a23**2))
 
@@ -380,13 +380,13 @@
     aa=1.0 - (9.0/8.0)*(aa2-aa3)
     aa=max(aa,0.0)
     aa=min(aa,1.0)
- 
+
     uu_nn = (uu % n(c)*n1*n1+uv % n(c)*n1*n2+uw % n(c)*n1*n3   &
            + uv % n(c)*n2*n1+vv % n(c)*n2*n2+vw % n(c)*n2*n3   &
            + uw % n(c)*n3*n1+vw % n(c)*n3*n2+ww % n(c)*n3*n3)
 
     a_mn_a_mn = a11*a11 + a22*a22 + a33*a33 + 2.0*(a12*a12+a13*a13+a23*a23)
-    a_lk_s_lk = a11*S11 + a22*S22 + a33*S33 + 2.0*(a12*s12+a13*s13+a23*s23)
+    a_lk_s_lk = a11*s11 + a22*s22 + a33*s33 + 2.0*(a12*s12+a13*s13+a23*s23)
 
     re_t= (kin % n(c)**2)/(kin_vis*eps % n(c)+TINY)
     ff5 = min(aa2, (1.0-exp(-re_t/150))**3)
@@ -397,11 +397,11 @@
 
     do icont=1,5
       eps11 = ((1.0 - fss)*r23 + fss*uu % n(c) / kin % n(c)  &
-            + 2.0*ff5*S11*tkolm)*eps%n(c)
+            + 2.0*ff5*s11*tkolm)*eps%n(c)
       eps22 = ((1.0 - fss)*r23 + fss*vv % n(c) / kin % n(c)  &
-            + 2.0*ff5*S22*tkolm)*eps%n(c)
+            + 2.0*ff5*s22*tkolm)*eps%n(c)
       eps33 = ((1.0 - fss)*r23 + fss*ww % n(c) / kin % n(c)  &
-            + 2.0*ff5*S33*tkolm)*eps%n(c)
+            + 2.0*ff5*s33*tkolm)*eps%n(c)
       eps12 = (fss*uv % n(c) / kin % n(c) + 2.0*ff5*s12*tkolm)*eps % n(c)
       eps13 = (fss*uw % n(c) / kin % n(c) + 2.0*ff5*s13*tkolm)*eps % n(c)
       eps23 = (fss*vw % n(c) / kin % n(c) + 2.0*ff5*s23*tkolm)*eps % n(c)
@@ -697,9 +697,9 @@
   end do
 
   if(name_phi == 'EPS') then
-    call Field_Mod_Grad_Component(flow, kin_e(-nb:nc), 1, kin_e_x(-nb:nc))
-    call Field_Mod_Grad_Component(flow, kin_e(-nb:nc), 2, kin_e_y(-nb:nc))
-    call Field_Mod_Grad_Component(flow, kin_e(-nb:nc), 3, kin_e_z(-nb:nc))
+    call Field_Mod_Grad(flow, kin_e(-nb:nc), kin_e_x(-nb:nc),  &
+                                             kin_e_y(-nb:nc),  &
+                                             kin_e_z(-nb:nc))
     do c = 1, grid % n_cells
       kin_vis = flow % viscosity(c) / flow % density(c)
       re_t  = (kin % n(c)**2) / (kin_vis*eps % n(c) + TINY)

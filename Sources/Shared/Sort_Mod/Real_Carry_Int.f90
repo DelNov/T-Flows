@@ -12,7 +12,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   real    :: x
   integer :: i, j, n
-!------------------------------------------------------------------------------!
+!==============================================================================!
 
   n = size(a, 1)
   x = a( (1+n) / 2 )
@@ -26,7 +26,7 @@
     do while (x < a(j))
       j = j - 1
     end do
-    if (i >= j) exit
+    if(i >= j) exit
 
     ! Swap values in a and b
     call Swap_Real(a(i), a(j))
@@ -36,7 +36,7 @@
     j = j - 1
   end do
 
-  if (1 < i - 1) call Sort_Mod_Real_Carry_Int(a(1:i-1), b(1:i-1))
-  if (j + 1 < n) call Sort_Mod_Real_Carry_Int(a(j+1:n), b(j+1:n))
+  if(1 < i - 1) call Sort_Mod_Real_Carry_Int(a(1:i-1), b(1:i-1))
+  if(j + 1 < n) call Sort_Mod_Real_Carry_Int(a(j+1:n), b(j+1:n))
 
-  end subroutine 
+  end subroutine

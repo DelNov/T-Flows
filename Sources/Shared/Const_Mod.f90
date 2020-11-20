@@ -11,6 +11,7 @@
   integer, parameter :: SL =  80  ! standard string length
   integer, parameter :: DL = 160  ! double string length
 
+  ! Double and single precision constants definitions
   integer, parameter :: DP =  8  ! double precisions for real and integer
   integer, parameter :: SP =  4  ! single precisions for real and integer
 
