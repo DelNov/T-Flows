@@ -11,6 +11,7 @@
   integer              :: n_wall_colors
   integer              :: processed_cells
   integer, allocatable :: wall_colors(:)
+  character(SL)        :: answer
 !==============================================================================!
 
   !------------------------------------------------------------------!
@@ -29,19 +30,29 @@
   print *, '# from the boundary condition list (see above) separated by space. '
   print *, '# Cells'' centers distances to the nearest wall will be calculated '
   print *, '# for the listed wall boundary(s).                                 '
-  print *, '# This is needed for RANS and HYBRID turbulence models.            '
+  print *, '#                                                                  '
+  print *, '# This is needed for RANS and HYBRID turbulence models as well as  '
+  print *, '# for proper initialization with potentional field.                '
+  print *, '#                                                                  '
+  print *, '# Type skip to skip this and set wall distance to one everywhere.  '
   print *, '#------------------------------------------------------------------'
   call File_Mod_Read_Line(5)
-  n_wall_colors = line % n_tokens
-  allocate(wall_colors(n_wall_colors))
-  do b = 1, n_wall_colors
-    read(line % tokens(b), *) wall_colors(b)
-  end do
+  answer = line % tokens(1)
+  call To_Upper_Case(answer)
 
-  if( (n_wall_colors .eq. 1) .and. (wall_colors(1) .eq. 0) ) then
+  ! User wants to skip calculation of wall distance
+  if( answer .eq. 'SKIP' ) then
     grid % wall_dist = 1.0
     print *, '# Distance to the wall set to 1.0 everywhere !'
+
+  ! Calculation of wall distance
   else
+
+    n_wall_colors = line % n_tokens
+    allocate(wall_colors(n_wall_colors))
+    do b = 1, n_wall_colors
+      read(line % tokens(b), *) wall_colors(b)
+    end do
 
     processed_cells = 0
 
@@ -52,7 +63,7 @@
 
       ! Write progress and stay in the same line
       ! (achieved with advance='no' and achar(13))
-      write(*,'(a2,f5.0,a14,a1)',advance='no')                  &
+      write(*,'(a2,f5.0,a14,a1)', advance='no')                 &
         ' #',                                                   &
         (100. * processed_cells                                 &
                / (1.0*(grid % n_bnd_cells + grid % n_cells))),  &
