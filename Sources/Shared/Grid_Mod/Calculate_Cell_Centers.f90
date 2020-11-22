@@ -19,11 +19,11 @@
   do c = 1, grid % n_cells
     do n = 1, grid % cells_n_nodes(c)
       grid % xc(c) = grid % xc(c) + grid % xn(grid % cells_n(n,c))  &
-                   / (1.0*grid % cells_n_nodes(c))
+                   / real(grid % cells_n_nodes(c))
       grid % yc(c) = grid % yc(c) + grid % yn(grid % cells_n(n,c))  &
-                   / (1.0*grid % cells_n_nodes(c))
+                   / real(grid % cells_n_nodes(c))
       grid % zc(c) = grid % zc(c) + grid % zn(grid % cells_n(n,c))  &
-                   / (1.0*grid % cells_n_nodes(c))
+                   / real(grid % cells_n_nodes(c))
     end do
   end do
 

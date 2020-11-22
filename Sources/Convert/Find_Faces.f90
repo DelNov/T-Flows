@@ -28,12 +28,14 @@
   include 'Cell_Numbering_Neu.f90'
 !==============================================================================!
 
-  very_big = max(grid % n_nodes,grid % n_cells)
+  very_big = max(real(grid % n_nodes), real(grid % n_cells))
 
-  allocate(face_coor(grid % n_cells*6));  face_coor = grid % n_nodes * HUGE
-  allocate(face_cell(grid % n_cells*6));  face_cell = 0    
-  allocate(starts   (grid % n_cells*6));  starts    = 0    
-  allocate(ends     (grid % n_cells*6));  ends      = 0    
+  allocate(face_coor(grid % n_cells*6))
+  face_coor = real(grid % n_nodes) * HUGE
+
+  allocate(face_cell(grid % n_cells*6));  face_cell(:) = 0
+  allocate(starts   (grid % n_cells*6));  starts   (:) = 0
+  allocate(ends     (grid % n_cells*6));  ends     (:) = 0
 
   !---------------------------------------------------!
   !   Fill the generic coordinates with some values   !
@@ -58,14 +60,14 @@
         if( n_f_nod >  0 ) then
           if(f_nod(4) > 0) then
             face_coor((c-1)*6+j) =   &
-               very_big*(max(f_nod(1), f_nod(2), f_nod(3), f_nod(4)))   &
-            +            min(f_nod(1), f_nod(2), f_nod(3), f_nod(4))
+               very_big * real(max(f_nod(1), f_nod(2), f_nod(3), f_nod(4)))   &
+            +             real(min(f_nod(1), f_nod(2), f_nod(3), f_nod(4)))
           else
             face_coor((c-1)*6+j) =   &
-              very_big*(max(f_nod(1), f_nod(2), f_nod(3)))   &
-           +            min(f_nod(1), f_nod(2), f_nod(3))
+              very_big * real(max(f_nod(1), f_nod(2), f_nod(3)))   &
+           +             real(min(f_nod(1), f_nod(2), f_nod(3)))
            end if
-          face_cell((c-1)*6+j) = c 
+          face_cell((c-1)*6+j) = c
         end if 
       end if
     end do
@@ -84,7 +86,7 @@
   !------------------------------------------------!
   cnt = 1
   starts(1) = 1
-  do c=2,grid % n_cells*6
+  do c = 2, grid % n_cells * 6
     if( face_coor(c) .ne. face_coor(c-1) ) then
       cnt = cnt + 1
       starts(cnt) = c
@@ -109,11 +111,11 @@
             !   Number of matching nodes   !
             !------------------------------!
             n_match     = 0
-            match_nodes = 0 
+            match_nodes = 0
             do n1 = 1, grid % cells_n_nodes(c1)
               do n2 = 1, grid % cells_n_nodes(c2)
                 if(grid % cells_n(n1,c1) .eq. grid % cells_n(n2,c2)) then
-                  n_match = n_match + 1 
+                  n_match = n_match + 1
                   match_nodes(n1) = 1
                 end if
               end do
@@ -134,17 +136,17 @@
                       max( match_nodes(fn(j,2)),0 ) + &
                       max( match_nodes(fn(j,3)),0 ) + &
                       max( match_nodes(fn(j,4)),0 ) .eq. n_match ) ) then
-                  grid % n_faces = grid % n_faces + 1 
+                  grid % n_faces = grid % n_faces + 1
                   grid % faces_c(1,grid % n_faces) = c1
                   grid % faces_c(2,grid % n_faces) = c2
                   grid % faces_n_nodes(grid % n_faces) = n_match 
                   do k = 1, 4
                     if(fn(j,k) > 0) then
                       grid % faces_n(k,grid % n_faces) =  &
-                      grid % cells_n(fn(j,k), c1)                
+                      grid % cells_n(fn(j,k), c1)
                     end if
                   end do
-                  grid % cells_c(j, c1) = 1 !  -> means: set
+                  grid % cells_c(j, c1) = 1  ! -> means: set
                 end if
               end do
             end if   ! n_match .ne. 2

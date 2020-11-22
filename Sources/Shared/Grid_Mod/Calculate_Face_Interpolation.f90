@@ -116,8 +116,8 @@
   !-----------------------------------!
   !   Print some info on the screen   !
   !-----------------------------------!
-  f_avg = f_avg / cnt
-  r_avg = r_avg / cnt
+  f_avg = f_avg / real(cnt)
+  r_avg = r_avg / real(cnt)
   print *, '#================================================================'
   print *, '# Face interpolation factors have been calculated'
   print *, '# Factors closer to 0.5 and shifts closer to 0.0 are better'
