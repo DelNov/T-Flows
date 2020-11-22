@@ -26,7 +26,7 @@
 
   prelim_vof = 0.0
 
-  !call Vof_Init_Random_Seed(problem_name)
+  ! call Vof_Init_Random_Seed(problem_name)
 
   ! Open file to read cylinder parameters:
   call File_Mod_Open_File_For_Reading('cylinder_parameters.ini', fu)
@@ -74,6 +74,7 @@
       end do
     end do
 
+    ! Interpolate from exact cylinder
     do c = 1, grid % n_cells
       call Vof_Exact_Cylinder(mult,                                  &
                               c,                                     &
@@ -83,6 +84,15 @@
                               min_max_crit_1(c), min_max_crit_2(c),  &
                               prelim_vof(c))
     end do
+    ! Simply interpolate linearly
+    ! do c = 1, grid % n_cells
+    !   if (min_max_crit_1(c) < 1.0 .and. min_max_crit_2(c) > 1.0) then
+    !       prelim_vof(c) = (1.0 - min_max_crit_1(c))  &
+    !                     / (min_max_crit_2(c)-min_max_crit_1(c))
+    !   else if (min_max_crit_2(c) <= 1.0) then
+    !       prelim_vof(c) = 1.0
+    !   end if
+    ! end do
 
     ! Precision
     do c = 1, grid % n_cells
