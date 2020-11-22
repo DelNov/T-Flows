@@ -70,14 +70,14 @@
       call random_number(r_num)
       p(1) = xmin + (xmax-xmin) * r_num
       call random_number(r_num)
-      p(2) = ymin+ (ymax-ymin) * r_num
+      p(2) = ymin + (ymax-ymin) * r_num
       call random_number(r_num)
-      p(3) = zmin+ (zmax-zmin) * r_num
+      p(3) = zmin + (zmax-zmin) * r_num
       i_cell = Check_Inside_Cell(mult, c, p)
     end do
     n_tot = n_tot + 1
 
-    points(n_tot,:) = p(1,:)
+    points(n_tot, :) = p(:)
 
     ! Check if p is inside function:
     res_func = n_xyz(1) * p(1) + n_xyz(2) * p(2) + n_xyz(3) * p(3)
