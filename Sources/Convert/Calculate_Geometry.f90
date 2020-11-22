@@ -281,10 +281,12 @@
   call File_Mod_Read_Line(5)
   answer = line % tokens(1)
   call To_Upper_Case(answer)
+
   if( answer .eq. 'SKIP' ) then
     color_per = 0
     goto 1
   end if
+
   read(line % tokens(1),*) color_per
   if( color_per > grid % n_bnd_cond ) then
     print *, '# Critical error: boundary condition ', color_per,  &
