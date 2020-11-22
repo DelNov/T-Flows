@@ -1,9 +1,9 @@
 include '../User_Mod/Vof_Initialization_Ellipsoid.f90'
 
 !==============================================================================!
-  subroutine User_Mod_Initialize_Variables(flow, turb, mult, swarm)
+  subroutine User_Mod_Initialize_Variables(flow, turb, mult, swarm, sol)
 !------------------------------------------------------------------------------!
-!   Case-dependent initialization of VOF variable.                             !
+!   User initialization of dependent variables.                                !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -11,34 +11,28 @@ include '../User_Mod/Vof_Initialization_Ellipsoid.f90'
   type(Turb_Type),       target :: turb
   type(Multiphase_Type), target :: mult
   type(Swarm_Type),      target :: swarm
+  type(Solver_Type),     target :: sol
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: grid
   type(Var_Type),   pointer :: vof
   real,             pointer :: dt
-  real,             pointer :: vof_f(:)
-  integer                   :: c, c1, c2, s
-  real                      :: fs
+  integer                   :: c
 !==============================================================================!
 
   ! Take aliases
-  grid  => flow % pnt_grid
-  vof   => mult % vof
-  dt    => flow % dt
-  vof_f => mult % vof_f
+  grid => flow % pnt_grid
+  vof  => mult % vof
+  dt   => flow % dt
 
   ! Initialize the whole domain as 0.0
   do c = 1, grid % n_cells
     vof % n(c) = 0.0
   end do
 
-  ! Under a Plane:
-  ! call Vof_Initialization_Plane(mult)
   ! Ellipsoid:
   call Vof_Initialization_Ellipsoid(mult)
-  ! Cylinder:
-  ! call Vof_Initialization_Cylinder(mult)
 
-  call Grid_Mod_Exchange_Real(grid, vof % n)
+  call Grid_Mod_Exchange_Cells_Real(grid, vof % n)
 
   ! Old value
   vof % o(:) = vof % n(:)
