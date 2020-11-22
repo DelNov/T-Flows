@@ -10,7 +10,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: c, c1, c2, n, s, ss, cc2, c_max, nnn, hh, mm, b, SC
+  integer              :: c, c1, c2, n, s, ss, cc2, c_max, nnn, hh, mm, b
   integer              :: c11, c12, c21, c22, s1, s2, bou_cen, cnt_bnd, cnt_per
   integer              :: color_per, n_per, number_faces, option
   integer              :: rot_dir
@@ -18,15 +18,14 @@
   real                 :: xs2, ys2, zs2, x_a, y_a, z_a, x_b, y_b, z_b
   real                 :: x_c, y_c, z_c, det
   real                 :: ab_i, ab_j, ab_k, ac_i, ac_j, ac_k, p_i, p_j, p_k
-  real                 :: dsc1, dsc2, per_min, per_max
+  real                 :: per_min, per_max
   real                 :: t, sur_tot, angle
-  real                 :: xc1, yc1, zc1, xc2, yc2, zc2
   real                 :: max_dis
   real,    allocatable :: xspr(:), yspr(:), zspr(:)
   real,    allocatable :: b_coor(:), phi_face(:)
   integer, allocatable :: b_face(:), face_copy(:)
   character(SL)        :: answer, dir
-  real                 :: big, small
+  real                 :: big, small, factor
 !==============================================================================!
 !                                                                              !
 !                                n3                                            !
@@ -106,6 +105,30 @@
 !                           rx*sx + ry*sy + rz*sz                              !
 !                                                                              !
 !------------------------------------------------------------------------------!
+
+  !-----------------------------!
+  !   Scale geometry            !
+  !-----------------------------!
+  !   => depends on: xn,yn,zn   !
+  !   <= gives:      xn,yn,zn   !
+  !-----------------------------!
+  print *, '#===================================='
+  print *, '# Enter scaling factor for geometry  '
+  print *, '#                                    '
+  print *, '# Type skip to keep geometry as it is'
+  print *, '#------------------------------------'
+  call File_Mod_Read_Line(5)
+  answer = line % tokens(1)
+  call To_Upper_Case(answer)
+
+  if( answer .ne. 'SKIP' ) then
+    read(line % tokens(1), *) factor
+    print *, '# Scaling geometry by factor: ', factor
+    grid % xn(:) = grid % xn(:) * factor
+    grid % yn(:) = grid % yn(:) * factor
+    grid % zn(:) = grid % zn(:) * factor
+  end if
+
 
   ! Estimate big and small
   call Grid_Mod_Estimate_Big_And_Small(grid, big, small)
@@ -275,8 +298,8 @@
   n_per = 0
   print *, '#=============================================================='
   print *, '# Enter the ordinal number(s) of periodic-boundary condition(s)'
-  print *, '# from the boundary condition list (see above)'
-  print *, '# Type skip if there is none !'
+  print *, '# from the boundary condition list (see above)                 '
+  print *, '# Type skip if there is none !                                 '
   print *, '#--------------------------------------------------------------'
   call File_Mod_Read_Line(5)
   answer = line % tokens(1)
@@ -287,7 +310,7 @@
     goto 1
   end if
 
-  read(line % tokens(1),*) color_per
+  read(line % tokens(1), *) color_per
   if( color_per > grid % n_bnd_cond ) then
     print *, '# Critical error: boundary condition ', color_per,  &
                ' doesn''t exist!'
@@ -496,7 +519,7 @@
           if(dir .eq. 'X') then
             if((det) < (per_max)) then
               hh = hh + 1
-              b_coor(hh) = hh
+              b_coor(hh) = real(hh)
               b_face(hh) = s
               do ss = 1, grid % n_faces
                 cc2 = grid % faces_c(2,ss)
@@ -510,7 +533,7 @@
                       if((abs(grid % zf(ss)  - grid % zf(s))) < tol .and.   &
                          (abs(yspr(ss) - yspr(s))) < tol) then
                          mm = hh + c_max/2
-                         b_coor(mm) = mm
+                         b_coor(mm) = real(mm)
                          b_face(mm) = ss
                          nnn = nnn + 1
                       end if
@@ -524,7 +547,7 @@
           if(dir .eq. 'Y') then
             if((det) < (per_max)) then
               hh = hh + 1
-              b_coor(hh) = hh
+              b_coor(hh) = real(hh)
               b_face(hh) = s
               do ss = 1, grid % n_faces
                 cc2 = grid % faces_c(2,ss)
@@ -540,7 +563,7 @@
                       if(abs((grid % zf(ss)  - grid % zf(s))) < tol .and.  &
                          abs((xspr(ss) - xspr(s))) < tol) then
                         mm = hh + c_max/2
-                        b_coor(mm) = mm
+                        b_coor(mm) = real(mm)
                         b_face(mm) = ss
                         nnn = nnn + 1
                       end if
@@ -555,7 +578,7 @@
           if(dir .eq. 'Z') then
             if((det) < (per_max)) then
               hh = hh + 1
-              b_coor(hh) = hh
+              b_coor(hh) = real(hh)
               b_face(hh) = s
               do ss = 1, grid % n_faces
                 cc2 = grid % faces_c(2,ss)
@@ -573,7 +596,7 @@
                       if(abs((grid % xf(ss) - grid % xf(s))) < tol .and.  &
                          abs((grid % yf(ss) - grid % yf(s))) < tol) then
                         mm = hh + c_max/2
-                        b_coor(mm) = mm
+                        b_coor(mm) = real(mm)
                         b_face(mm) = ss
                         nnn = nnn + 1
                       end if
