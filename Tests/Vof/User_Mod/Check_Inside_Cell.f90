@@ -9,11 +9,11 @@
   integer                       :: c
   real                          :: p(3)
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),      pointer :: grid
-  integer                       :: c1, c2, s, i_fac
-  integer,          allocatable :: inside_c(:)
-  real                          :: n_unit(3), dist
-  real                          :: corr_x, corr_y, corr_z
+  type(Grid_Type), pointer :: grid
+  integer                  :: c1, c2, s, i_fac
+  integer, allocatable     :: inside_c(:)
+  real                     :: n_unit(3), dist
+  real                     :: corr_x, corr_y, corr_z
 !==============================================================================!
 
   ! First take aliasesd
