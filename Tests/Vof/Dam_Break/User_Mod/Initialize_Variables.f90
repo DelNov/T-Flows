@@ -1,20 +1,13 @@
-include '../User_Mod/Vof_Initialization_Cylinder.f90'
-include '../User_Mod/Vof_Initialization_Ellipsoid.f90'
-include '../User_Mod/Vof_Initialization_Plane.f90'
 include '../User_Mod/Vof_Initialization_Box.f90'
 include '../User_Mod/Vof_Init_Random_Seed.f90'
-include '../User_Mod/Vof_Interface_Cylinder.f90'
-include '../User_Mod/Vof_Interface_Ellipsoid.f90'
-include '../User_Mod/Vof_Interface_Plane.f90'
 include '../User_Mod/Vof_Interface_Box.f90'
 include '../User_Mod/Check_Inside_Cell.f90'
 include '../User_Mod/Check_Inside_Box.f90'
 include '../User_Mod/Convert_Problem_Name_To_Integer.f90'
-include '../User_Mod/Vof_Area_Square_Circle.f90'
-include '../User_Mod/Vof_Exact_Cylinder.f90'
 include '../User_Mod/Vof_Quick_Sort.f90'
 include '../User_Mod/Intersection_Line_Face.f90'
 include '../User_Mod/Interpolate_From_Nodes.f90'
+
 !==============================================================================!
   subroutine User_Mod_Initialize_Variables(flow, turb, mult, swarm, sol)
 !------------------------------------------------------------------------------!
@@ -75,12 +68,6 @@ include '../User_Mod/Interpolate_From_Nodes.f90'
     vof % n(c) = 0.0
   end do
 
-  ! Under a Plane:
-  ! call Vof_Initialization_Plane(mult)
-  ! Ellipsoid:
-  !call Vof_Initialization_Ellipsoid(mult)
-  ! Cylinder:
-  !call Vof_Initialization_Cylinder(mult)
   ! Box:
   call Vof_Initialization_Box(mult)
 
