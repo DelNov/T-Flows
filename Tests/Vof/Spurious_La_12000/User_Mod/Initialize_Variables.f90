@@ -1,17 +1,11 @@
 include '../User_Mod/Vof_Initialization_Cylinder.f90'
-include '../User_Mod/Vof_Initialization_Ellipsoid.f90'
-include '../User_Mod/Vof_Initialization_Plane.f90'
-include '../User_Mod/Vof_Initialization_Box.f90'
 include '../User_Mod/Vof_Init_Random_Seed.f90'
 include '../User_Mod/Vof_Interface_Cylinder.f90'
-include '../User_Mod/Vof_Interface_Ellipsoid.f90'
-include '../User_Mod/Vof_Interface_Plane.f90'
-include '../User_Mod/Vof_Interface_Box.f90'
 include '../User_Mod/Check_Inside_Cell.f90'
-include '../User_Mod/Check_Inside_Box.f90'
 include '../User_Mod/Convert_Problem_Name_To_Integer.f90'
 include '../User_Mod/Vof_Area_Square_Circle.f90'
 include '../User_Mod/Vof_Exact_Cylinder.f90'
+
 !==============================================================================!
   subroutine User_Mod_Initialize_Variables(flow, turb, mult, swarm, sol)
 !------------------------------------------------------------------------------!
@@ -25,42 +19,29 @@ include '../User_Mod/Vof_Exact_Cylinder.f90'
   type(Swarm_Type),      target :: swarm
   type(Solver_Type),     target :: sol
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: grid
-  type(Var_Type),   pointer :: vof
-  real,             pointer :: dt
-  real,             pointer :: vof_f(:)
-  integer                   :: c, c1, c2, s, i_probe, c_inters, n, code
-  integer                   :: i, j
-  real                      :: fs, min_dist, dist, glo_dist, epsloc
+  type(Grid_Type), pointer :: grid
+  type(Var_Type),  pointer :: vof
+  real,            pointer :: dt
+  integer                  :: c, c1, c2, s
 !==============================================================================!
 
   ! Take aliases
-  grid  => flow % pnt_grid
-  vof   => mult % vof
-  dt    => flow % dt
-
-  epsloc = epsilon(epsloc)
+  grid => flow % pnt_grid
+  vof  => mult % vof
+  dt   => flow % dt
 
   ! Initialize the whole domain as 0.0
   do c = 1, grid % n_cells
     vof % n(c) = 0.0
   end do
 
-  ! Under a Plane:
-  ! call Vof_Initialization_Plane(mult)
-  ! Ellipsoid:
-  !call Vof_Initialization_Ellipsoid(mult)
   ! Cylinder:
   call Vof_Initialization_Cylinder(mult)
-  ! Box:
-  !call Vof_Initialization_Box(mult)
 
   call Grid_Mod_Exchange_Cells_Real(grid, vof % n)
 
   ! Old value
   vof % o(:) = vof % n(:)
-
-  ! At faces
 
   ! At boundaries
   do s = 1, grid % n_bnd_faces

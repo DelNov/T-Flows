@@ -15,13 +15,10 @@ include '../User_Mod/Vof_Area_Square_Circle.f90'
   type(Swarm_Type),      target :: swarm
   type(Solver_Type),     target :: sol
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: grid
-  type(Var_Type),   pointer :: vof
-  real,             pointer :: dt
-  real,             pointer :: vof_f(:)
-  integer                   :: c, c1, c2, s, i_probe, c_inters, n, code
-  integer                   :: i, j
-  real                      :: fs, min_dist, dist, glo_dist, epsloc
+  type(Grid_Type), pointer :: grid
+  type(Var_Type),  pointer :: vof
+  real,            pointer :: dt
+  integer                  :: c, c1, c2, s
 !==============================================================================!
 
   ! Take aliases
@@ -29,21 +26,13 @@ include '../User_Mod/Vof_Area_Square_Circle.f90'
   vof  => mult % vof
   dt   => flow % dt
 
-  epsloc = epsilon(epsloc)
-
   ! Initialize the whole domain as 0.0
   do c = 1, grid % n_cells
     vof % n(c) = 0.0
   end do
 
-  ! Under a Plane:
-  ! call Vof_Initialization_Plane(mult)
-  ! Ellipsoid:
-  ! call Vof_Initialization_Ellipsoid(mult)
   ! Cylinder:
   call Vof_Initialization_Cylinder(mult)
-  ! Box:
-  ! call Vof_Initialization_Box(mult)
 
   call Grid_Mod_Exchange_Cells_Real(grid, vof % n)
 
