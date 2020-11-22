@@ -63,10 +63,10 @@
 
       ! Write progress and stay in the same line
       ! (achieved with advance='no' and achar(13))
-      write(*,'(a2,f5.0,a14,a1)', advance='no')                 &
-        ' #',                                                   &
-        (100. * processed_cells                                 &
-               / (1.0*(grid % n_bnd_cells + grid % n_cells))),  &
+      write(*,'(a2,f5.0,a14,a1)', advance='no')               &
+        ' #',                                                 &
+        (100. * real(processed_cells)                         &
+               / real(grid % n_bnd_cells + grid % n_cells)),  &
         ' % complete...', achar(13)
 
       do b = 1, n_wall_colors
@@ -89,8 +89,8 @@
     grid % wall_dist(:) = sqrt(grid % wall_dist(:))
 
     print *, '# Distance to the wall calculated !'
-  end if
 
-  deallocate(wall_colors)
+    deallocate(wall_colors)
+  end if
 
   end subroutine
