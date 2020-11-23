@@ -7,56 +7,48 @@
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type) :: grid     ! grid to be converted
-  integer         :: c, n, s, l
-  character(SL)   :: file_name, file_name_up, ext_up
+  type(Grid_Type) :: grid         ! grid to be converted
+  integer         :: c, n, s, l, p
+  character(SL)   :: file_name
+  character(SL)   :: file_format  ! 'UNKNOWN', 'GAMBIT_NEU', 'GMSH_MSH'
 !==============================================================================!
 
   call Logo_Con
 
-  print *, '#==============================================================='
+  print *, '#================================================================'
   print *, '# Enter the name of the mesh file you are importing (with ext.):'
-  print *, '#---------------------------------------------------------------'
+  print *, '#----------------------------------------------------------------'
   read(*,*) file_name
 
-  !-----------------------------------------------------!
-  !   Analyze the extension to figure the file format   !
-  !-----------------------------------------------------!
-  file_name_up = file_name
-  call To_Upper_Case(file_name_up)
+  !-----------------------------------------------!
+  !                                               !
+  !   Make an educated guess of the file format   !
+  !                                               !
+  !-----------------------------------------------!
+  call Guess_Format(file_name, file_format)
 
+  !-------------------------------------------!
+  !                                           !
+  !   Extract the problem name and store it   !
+  !                                           !
+  !-------------------------------------------!
   l = len_trim(file_name)
-  print *, '#==================================' // &
-           '==================================='
-  if( file_name_up(l-2:l) .eq. 'NEU' ) then
-    print *, '# Based on the extension, you are' // &
-             ' reading Gambit''s neutral file format'
-    problem_name(1) = file_name(1:l-4)
-    ext_up = file_name_up(l-2:l)
-  else if( file_name_up(l-2:l) .eq. 'MSH' ) then
-    print *, '# Based on the extension, you are' // &
-             ' reading GMSH file format'
-    problem_name(1) = file_name(1:l-4)
-    ext_up = file_name_up(l-2:l)
-  else
-    print *, '# Unrecognized input file format; exiting!'
-    print *, '#----------------------------------' // &
-             '-----------------------------------'
-    stop
-  end if
-  print *, '#----------------------------------' // &
-           '-----------------------------------'
+  p = index(file_name(1:l), '.', back=.true.)
+
+  problem_name(1) = file_name(1:p-1)
 
   grid % name = problem_name(1)
   call To_Upper_Case(grid % name)
 
   !----------------------------------------!
+  !                                        !
   !   Read the file and start conversion   !
+  !                                        !
   !----------------------------------------!
-  if(ext_up .eq. 'NEU') then
+  if(file_format .eq. 'GAMBIT_NEU') then
     call Load_Neu(grid)
   end if
-  if(ext_up .eq. 'MSH') then
+  if(file_format .eq. 'GMSH_MSH') then
     call Load_Msh(grid)
     call Find_Parents(grid)
   end if
@@ -85,11 +77,10 @@
     grid % old_f(s) = s
   end do
 
-  ! Decompose/coarsen the grid with METIS
-  ! Not quite ready yet: call Grid_Mod_Coarsen(grid)
-
   !-------------------------------!
+  !                               !
   !   Save files for processing   !
+  !                               !
   !-------------------------------!
   call Grid_Mod_Save_Cns(grid, 0,             &
                          grid % n_nodes,      &
@@ -101,10 +92,12 @@
   call Grid_Mod_Save_Geo(grid, 0)
 
   !-----------------------------------------------------!
+  !                                                     !
   !   Save grid for visualisation and post-processing   !
+  !                                                     !
   !-----------------------------------------------------!
 
- ! Create output in vtu format
+  ! Create output in vtu format
   call Save_Vtu_Cells(grid, 0,         &
                       grid % n_nodes,  &
                       grid % n_cells)
