@@ -13,8 +13,8 @@
   integer              :: c, c1, c2, n, s, ss, cc2, c_max, nnn, hh, mm, b
   integer              :: c11, c12, c21, c22, s1, s2, bou_cen, cnt_bnd, cnt_per
   integer              :: color_per, n_per, number_faces, option
-  integer              :: rot_dir
-  real                 :: xt(4), yt(4), zt(4), angle_face, tol
+  integer              :: rot_dir, n1, n2
+  real                 :: xt(16), yt(16), zt(16), angle_face, tol
   real                 :: xs2, ys2, zs2, x_a, y_a, z_a, x_b, y_b, z_b
   real                 :: x_c, y_c, z_c, det
   real                 :: ab_i, ab_j, ab_k, ac_i, ac_j, ac_k, p_i, p_j, p_k
@@ -156,44 +156,27 @@
     end do
 
     ! Cell face components
-    if( grid % faces_n_nodes(s) .eq. 4 ) then
-      grid % sx(s)= 0.5 * ( (yt(2)-yt(1))*(zt(2)+zt(1))   &
-                           +(yt(3)-yt(2))*(zt(2)+zt(3))   &
-                           +(yt(4)-yt(3))*(zt(3)+zt(4))   &
-                           +(yt(1)-yt(4))*(zt(4)+zt(1)) )
-      grid % sy(s)= 0.5 * ( (zt(2)-zt(1))*(xt(2)+xt(1))   &
-                           +(zt(3)-zt(2))*(xt(2)+xt(3))   &
-                           +(zt(4)-zt(3))*(xt(3)+xt(4))   &
-                           +(zt(1)-zt(4))*(xt(4)+xt(1)) )
-      grid % sz(s)= 0.5 * ( (xt(2)-xt(1))*(yt(2)+yt(1))   &
-                           +(xt(3)-xt(2))*(yt(2)+yt(3))   &
-                           +(xt(4)-xt(3))*(yt(3)+yt(4))   &
-                           +(xt(1)-xt(4))*(yt(4)+yt(1)) )
-    else if( grid % faces_n_nodes(s) .eq. 3 ) then
-      grid % sx(s)= 0.5 * ( (yt(2)-yt(1))*(zt(2)+zt(1))   &
-                           +(yt(3)-yt(2))*(zt(2)+zt(3))   &
-                           +(yt(1)-yt(3))*(zt(3)+zt(1)) )
-      grid % sy(s)= 0.5 * ( (zt(2)-zt(1))*(xt(2)+xt(1))   &
-                           +(zt(3)-zt(2))*(xt(2)+xt(3))   &
-                           +(zt(1)-zt(3))*(xt(3)+xt(1)) )
-      grid % sz(s)= 0.5 * ( (xt(2)-xt(1))*(yt(2)+yt(1))   &
-                           +(xt(3)-xt(2))*(yt(2)+yt(3))   &
-                           +(xt(1)-xt(3))*(yt(3)+yt(1)) )
-    else
-      print *, 'calc4: something horrible has happened !'
-      stop
-    end if
+    grid % sx(s) = 0.0
+    grid % sy(s) = 0.0
+    grid % sz(s) = 0.0
+    do n1 = 1, grid % faces_n_nodes(s)
+      n2 = n1 + 1
+      if(n2 > grid % faces_n_nodes(s)) n2 = 1
+      grid % sx(s) = grid % sx(s) + (yt(n2) - yt(n1)) * (zt(n2) + zt(n1))
+      grid % sy(s) = grid % sy(s) + (zt(n2) - zt(n1)) * (xt(n2) + xt(n1))
+      grid % sz(s) = grid % sz(s) + (xt(n2) - xt(n1)) * (yt(n2) + yt(n1))
+    end do
+    grid % sx(s) = 0.5 * grid % sx(s)
+    grid % sy(s) = 0.5 * grid % sy(s)
+    grid % sz(s) = 0.5 * grid % sz(s)
 
     ! Barycenters
-    if(grid % faces_n_nodes(s) .eq. 4) then
-      grid % xf(s) = (xt(1)+xt(2)+xt(3)+xt(4))/4.0
-      grid % yf(s) = (yt(1)+yt(2)+yt(3)+yt(4))/4.0
-      grid % zf(s) = (zt(1)+zt(2)+zt(3)+zt(4))/4.0
-    else if(grid % faces_n_nodes(s) .eq. 3) then
-      grid % xf(s) = (xt(1)+xt(2)+xt(3))/3.0
-      grid % yf(s) = (yt(1)+yt(2)+yt(3))/3.0
-      grid % zf(s) = (zt(1)+zt(2)+zt(3))/3.0
-    end if
+    grid % xf(s) = sum( xt(1:grid % faces_n_nodes(s)) )  &
+                 / real(grid % faces_n_nodes(s))
+    grid % yf(s) = sum( yt(1:grid % faces_n_nodes(s)) )  &
+                 / real(grid % faces_n_nodes(s))
+    grid % zf(s) = sum( zt(1:grid % faces_n_nodes(s)) )  &
+                 / real(grid % faces_n_nodes(s))
 
   end do ! through faces
 
