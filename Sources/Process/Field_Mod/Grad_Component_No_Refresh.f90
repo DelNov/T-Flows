@@ -28,39 +28,37 @@
   ! Initialize gradients
   phii(1:grid % n_cells) = 0.
 
-  ! On the boundaries
-  do s = 1, grid % n_bnd_faces
+  do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
+
     dphi1 = phi(c2)-phi(c1)
     dphi2 = phi(c2)-phi(c1)
 
-    if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. SYMMETRY) then
-      dphi1 = 0.
+    ! On the boundaries
+    if(c2 < 0) then
+      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. SYMMETRY) then
+        dphi1 = 0.
+      end if
+
+      phii(c1) = phii(c1)                                                 &
+               + dphi1 * (  flow % grad_c2c(MAP(i,1),c1) * grid % dx(s)   &
+                          + flow % grad_c2c(MAP(i,2),c1) * grid % dy(s)   &
+                          + flow % grad_c2c(MAP(i,3),c1) * grid % dz(s))
     end if
 
-    phii(c1) = phii(c1)                                                 &
-             + dphi1 * (  flow % grad_c2c(MAP(i,1),c1) * grid % dx(s)   &
-                        + flow % grad_c2c(MAP(i,2),c1) * grid % dy(s)   &
-                        + flow % grad_c2c(MAP(i,3),c1) * grid % dz(s))
-  end do
+    ! Inside the domain
+    if(c2 > 0) then
+      phii(c1) = phii(c1)                                                 &
+               + dphi1 * (  flow % grad_c2c(MAP(i,1),c1) * grid % dx(s)   &
+                          + flow % grad_c2c(MAP(i,2),c1) * grid % dy(s)   &
+                          + flow % grad_c2c(MAP(i,3),c1) * grid % dz(s))
 
-  ! Inside the domain
-  do s = grid % n_bnd_faces + 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
-    dphi1 = phi(c2)-phi(c1)
-    dphi2 = phi(c2)-phi(c1)
-
-    phii(c1) = phii(c1)                                                 &
-             + dphi1 * (  flow % grad_c2c(MAP(i,1),c1) * grid % dx(s)   &
-                        + flow % grad_c2c(MAP(i,2),c1) * grid % dy(s)   &
-                        + flow % grad_c2c(MAP(i,3),c1) * grid % dz(s))
-
-    phii(c2) = phii(c2)                                                 &
-             + dphi2 * (  flow % grad_c2c(MAP(i,1),c2) * grid % dx(s)   &
-                        + flow % grad_c2c(MAP(i,2),c2) * grid % dy(s)   &
-                        + flow % grad_c2c(MAP(i,3),c2) * grid % dz(s))
+      phii(c2) = phii(c2)                                                 &
+               + dphi2 * (  flow % grad_c2c(MAP(i,1),c2) * grid % dx(s)   &
+                          + flow % grad_c2c(MAP(i,2),c2) * grid % dy(s)   &
+                          + flow % grad_c2c(MAP(i,3),c2) * grid % dz(s))
+    end if
   end do
 
   end subroutine

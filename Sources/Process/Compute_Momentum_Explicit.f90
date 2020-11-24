@@ -33,11 +33,13 @@
 
     ! Sum of neighbours
     neigh = 0.0
-    do s = grid % n_bnd_faces + 1, grid % n_faces
+    do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
-      neigh(c1) = neigh(c1) - a % val(a % pos(1,s)) * ui % n(c2)
-      neigh(c2) = neigh(c2) - a % val(a % pos(2,s)) * ui % n(c1)
+      if(c2 > 0) then
+        neigh(c1) = neigh(c1) - a % val(a % pos(1,s)) * ui % n(c2)
+        neigh(c2) = neigh(c2) - a % val(a % pos(2,s)) * ui % n(c1)
+      end if
     end do
     call Grid_Mod_Exchange_Cells_Real(grid, neigh)
 

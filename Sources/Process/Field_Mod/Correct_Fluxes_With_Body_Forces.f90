@@ -83,11 +83,11 @@
           (  (grid % xf(s) - xc1) * grav_x * flow % beta * t_face_delta(s)   &
            + (grid % yf(s) - yc1) * grav_y * flow % beta * t_face_delta(s)   &
            + (grid % zf(s) - zc1) * grav_z * flow % beta * t_face_delta(s))  &
-             * flow % density(c1)                                            &
+             * (flow % density(c1) - flow % dens_ref)                        &
          -(  (grid % xf(s) - xc2) * grav_x * flow % beta * t_face_delta(s)   &
            + (grid % yf(s) - yc2) * grav_y * flow % beta * t_face_delta(s)   &
            + (grid % zf(s) - zc2) * grav_z * flow % beta * t_face_delta(s))  &
-             * flow % density(c2)
+             * (flow % density(c2) - flow % dens_ref)
 
         ! Units for a12: [m^4s/kg]
         a12 = u_relax * 0.5 * (  grid % vol(c1) / a % sav(c1)     &

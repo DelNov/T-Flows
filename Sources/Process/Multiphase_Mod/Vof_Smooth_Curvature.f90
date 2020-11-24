@@ -47,26 +47,25 @@
   ! Preliminary results using wetting (with symmetry in some boundaries) show
   ! it is better not to take into aacount the boundaries
 
-  !  gradient of curvature, only interior
+  ! Gradient of curvature, only interior
   gradk_x(-nb:nc) = 0.0
   gradk_y(-nb:nc) = 0.0
   gradk_z(-nb:nc) = 0.0
 
-  do s = grid % n_bnd_faces + 1, grid % n_faces
+  do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
-    fs = grid % f(s)
 
-    curvf = fs * mult % curv(c1) + (1.0 - fs) * mult % curv(c2)
-
-    gradk_x(c1) = gradk_x(c1) + curvf * grid % sx(s) / grid % vol(c1)
-    gradk_y(c1) = gradk_y(c1) + curvf * grid % sy(s) / grid % vol(c1)
-    gradk_z(c1) = gradk_z(c1) + curvf * grid % sz(s) / grid % vol(c1)
-
-    gradk_x(c2) = gradk_x(c2) - curvf * grid % sx(s) / grid % vol(c2)
-    gradk_y(c2) = gradk_y(c2) - curvf * grid % sy(s) / grid % vol(c2)
-    gradk_z(c2) = gradk_z(c2) - curvf * grid % sz(s) / grid % vol(c2)
-
+    if(c2 > 0) then
+      fs = grid % f(s)
+      curvf = fs * mult % curv(c1) + (1.0 - fs) * mult % curv(c2)
+      gradk_x(c1) = gradk_x(c1) + curvf * grid % sx(s) / grid % vol(c1)
+      gradk_y(c1) = gradk_y(c1) + curvf * grid % sy(s) / grid % vol(c1)
+      gradk_z(c1) = gradk_z(c1) + curvf * grid % sz(s) / grid % vol(c1)
+      gradk_x(c2) = gradk_x(c2) - curvf * grid % sx(s) / grid % vol(c2)
+      gradk_y(c2) = gradk_y(c2) - curvf * grid % sy(s) / grid % vol(c2)
+      gradk_z(c2) = gradk_z(c2) - curvf * grid % sz(s) / grid % vol(c2)
+    end if  ! c2 > 0
   end do
 
   call Grid_Mod_Exchange_Cells_Real(grid, gradk_x(-nb:nc))
@@ -74,16 +73,18 @@
   call Grid_Mod_Exchange_Cells_Real(grid, gradk_z(-nb:nc))
 
   ! Interior faces
-  do s = grid % n_bnd_faces + 1, grid % n_faces
+  do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
-    w_v1 = (1.0 - 2.0 * abs(0.5 - col % n(c1))) ** weight_s
-    w_v2 = (1.0 - 2.0 * abs(0.5 - col % n(c2))) ** weight_s
-    sum_k_weight(c1) = sum_k_weight(c1) + mult % curv(c2) * w_v2
-    sum_weight(c1) = sum_weight(c1) + w_v2
+    if(c2 > 0) then
+      w_v1 = (1.0 - 2.0 * abs(0.5 - col % n(c1))) ** weight_s
+      w_v2 = (1.0 - 2.0 * abs(0.5 - col % n(c2))) ** weight_s
+      sum_k_weight(c1) = sum_k_weight(c1) + mult % curv(c2) * w_v2
+      sum_weight(c1)   = sum_weight(c1)   + w_v2
 
-    sum_k_weight(c2) = sum_k_weight(c2) + mult % curv(c1) * w_v1
-    sum_weight(c2) = sum_weight(c2) + w_v1
+      sum_k_weight(c2) = sum_k_weight(c2) + mult % curv(c1) * w_v1
+      sum_weight(c2)   = sum_weight(c2)   + w_v1
+    end if
   end do
 
   call Grid_Mod_Exchange_Cells_Real(grid, sum_k_weight(-nb:nc))
@@ -104,26 +105,24 @@
   sum_k_weight(-nb:nc) = 0.0
   sum_weight  (-nb:nc) = 0.0
 
-  !  gradient of curvature, only interior
+  ! Gradient of curvature, only interior
   gradk_x(-nb:nc) = 0.0
   gradk_y(-nb:nc) = 0.0
   gradk_z(-nb:nc) = 0.0
 
-  do s = grid % n_bnd_faces + 1, grid % n_faces
+  do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
-    fs = grid % f(s)
-
-    curvf = fs * k_star(c1) + (1.0 - fs) * k_star(c2)
-
-    gradk_x(c1) = gradk_x(c1) + curvf * grid % sx(s) / grid % vol(c1)
-    gradk_y(c1) = gradk_y(c1) + curvf * grid % sy(s) / grid % vol(c1)
-    gradk_z(c1) = gradk_z(c1) + curvf * grid % sz(s) / grid % vol(c1)
-
-    gradk_x(c2) = gradk_x(c2) - curvf * grid % sx(s) / grid % vol(c2)
-    gradk_y(c2) = gradk_y(c2) - curvf * grid % sy(s) / grid % vol(c2)
-    gradk_z(c2) = gradk_z(c2) - curvf * grid % sz(s) / grid % vol(c2)
-
+    if(c2 > 0) then
+      fs = grid % f(s)
+      curvf = fs * k_star(c1) + (1.0 - fs) * k_star(c2)
+      gradk_x(c1) = gradk_x(c1) + curvf * grid % sx(s) / grid % vol(c1)
+      gradk_y(c1) = gradk_y(c1) + curvf * grid % sy(s) / grid % vol(c1)
+      gradk_z(c1) = gradk_z(c1) + curvf * grid % sz(s) / grid % vol(c1)
+      gradk_x(c2) = gradk_x(c2) - curvf * grid % sx(s) / grid % vol(c2)
+      gradk_y(c2) = gradk_y(c2) - curvf * grid % sy(s) / grid % vol(c2)
+      gradk_z(c2) = gradk_z(c2) - curvf * grid % sz(s) / grid % vol(c2)
+    end if  ! c2 > 0
   end do
 
   call Grid_Mod_Exchange_Cells_Real(grid, gradk_x(-nb:nc))
@@ -131,25 +130,28 @@
   call Grid_Mod_Exchange_Cells_Real(grid, gradk_z(-nb:nc))
 
   ! Interior faces
-  do s = grid % n_bnd_faces + 1, grid % n_faces
+  do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
-    w_v1 = (1.0 - 2.0 * abs(0.5 - col % n(c1))) ** weight_n
-    w_v2 = (1.0 - 2.0 * abs(0.5 - col % n(c2))) ** weight_n
 
-    w_m1 = abs(dot_product((/mult % nx(c1), mult % ny(c1), mult % nz(c1)/),  &
-                           (/grid % dx(s),  grid % dy(s),  grid % dz(s)/)    &
-                           / grid % d(s))) ** weight_n
+    if(c2 > 0) then
+      w_v1 = (1.0 - 2.0 * abs(0.5 - col % n(c1))) ** weight_n
+      w_v2 = (1.0 - 2.0 * abs(0.5 - col % n(c2))) ** weight_n
 
-    w_m2 = abs(dot_product((/mult % nx(c2), mult % ny(c2), mult % nz(c2)/),  &
-                           (/grid % dx(s),  grid % dy(s),  grid % dz(s)/)    &
-                           / (-grid % d(s)))) ** weight_n
+      w_m1 = abs(dot_product((/mult % nx(c1), mult % ny(c1), mult % nz(c1)/),  &
+                             (/grid % dx(s),  grid % dy(s),  grid % dz(s)/)    &
+                             / grid % d(s))) ** weight_n
 
-    sum_k_weight(c1) = sum_k_weight(c1) + k_star(c2) * w_v2 * w_m2
-    sum_weight(c1) = sum_weight(c1) + w_v2 * w_m2
+      w_m2 = abs(dot_product((/mult % nx(c2), mult % ny(c2), mult % nz(c2)/),  &
+                             (/grid % dx(s),  grid % dy(s),  grid % dz(s)/)    &
+                             / (-grid % d(s)))) ** weight_n
 
-    sum_k_weight(c2) = sum_k_weight(c2) + k_star(c1) * w_v1 * w_m1
-    sum_weight(c2) = sum_weight(c2) + w_v1 * w_m1
+      sum_k_weight(c1) = sum_k_weight(c1) + k_star(c2) * w_v2 * w_m2
+      sum_weight(c1)   = sum_weight(c1)   + w_v2 * w_m2
+
+      sum_k_weight(c2) = sum_k_weight(c2) + k_star(c1) * w_v1 * w_m1
+      sum_weight(c2)   = sum_weight(c2)   + w_v1 * w_m1
+    end if  ! c2 > 0
   end do
 
   call Grid_Mod_Exchange_Cells_Real(grid, sum_k_weight(-nb:nc))

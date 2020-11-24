@@ -39,46 +39,49 @@
 
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
-  ! Correct for Surface tension
+  ! Correct for surface tension
   if(mult % surface_tension > TINY) then
 
-    do s = grid % n_bnd_faces + 1, grid % n_faces
+    do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
-      fs = grid % f(s)
 
-      ! Interpolate VOF gradients
-      dens_h = 2.0 / ( 1.0 / flow % density(c1) + 1.0 / flow % density(c2) )
+      if(c2 > 0) then
 
-      ! Unit for dotprod: [1/m]
-      dotprod = 0.5 * dens_h                                                 &
-                    * ( mult % curv(c1) * col % x(c1) / flow % density(c1)   &
-                      + mult % curv(c2) * col % x(c2) / flow % density(c2) ) &
-                    * grid % dx(s)                                           &
-              + 0.5 * dens_h                                                 &
-                    * ( mult % curv(c1) * col % y(c1) / flow % density(c1)   &
-                      + mult % curv(c2) * col % y(c2) / flow % density(c2) ) &
-                    * grid % dy(s)                                           &
-              + 0.5 * dens_h                                                 &
-                    * ( mult % curv(c1) * col % z(c1) / flow % density(c1)   &
-                      + mult % curv(c2) * col % z(c2) / flow % density(c2) ) &
-                    * grid % dz(s)
+        ! Interpolate VOF gradients
+        dens_h = 2.0 / ( 1.0 / flow % density(c1) + 1.0 / flow % density(c2) )
 
-      ! Unit for a12: [m^4s/kg]
-      a12 = u_relax * 0.5 * ( grid % vol(c1) / a % sav(c1)     &
-                            + grid % vol(c2) / a % sav(c2) ) * a % fc(s)
+        ! Unit for dotprod: [1/m]
+        dotprod = 0.5 * dens_h                                                 &
+                      * ( mult % curv(c1) * col % x(c1) / flow % density(c1)   &
+                        + mult % curv(c2) * col % x(c2) / flow % density(c2) ) &
+                      * grid % dx(s)                                           &
+                + 0.5 * dens_h                                                 &
+                      * ( mult % curv(c1) * col % y(c1) / flow % density(c1)   &
+                        + mult % curv(c2) * col % y(c2) / flow % density(c2) ) &
+                      * grid % dy(s)                                           &
+                + 0.5 * dens_h                                                 &
+                      * ( mult % curv(c1) * col % z(c1) / flow % density(c1)   &
+                        + mult % curv(c2) * col % z(c2) / flow % density(c2) ) &
+                      * grid % dz(s)
 
-      ! Curvature at the face; unit: [1/m]
-      curv_f = 0.5 * ( mult % curv(c1) + mult % curv(c2) )
+        ! Unit for a12: [m^4s/kg]
+        a12 = u_relax * 0.5 * ( grid % vol(c1) / a % sav(c1)     &
+                              + grid % vol(c2) / a % sav(c2) ) * a % fc(s)
 
-      ! Unit for stens_source: [kg/s^2 * m^4s/kg * 1/m = m^3/s]
-      stens_source = mult % surface_tension * a12               &
-                   * ( curv_f * (col % n(c2) -  col % n(c1)) - dotprod )
+        ! Curvature at the face; unit: [1/m]
+        curv_f = 0.5 * ( mult % curv(c1) + mult % curv(c2) )
 
-      v_flux % n(s) = v_flux % n(s) + stens_source
+        ! Unit for stens_source: [kg/s^2 * m^4s/kg * 1/m = m^3/s]
+        stens_source = mult % surface_tension * a12               &
+                     * ( curv_f * (col % n(c2) -  col % n(c1)) - dotprod )
 
-      b(c1) = b(c1) - stens_source
-      b(c2) = b(c2) + stens_source
+        v_flux % n(s) = v_flux % n(s) + stens_source
+
+        b(c1) = b(c1) - stens_source
+        b(c2) = b(c2) + stens_source
+
+      end if  ! c2 > 0
 
     end do
 
@@ -87,32 +90,37 @@
   ! Introduce temporal correction and subrelaxation
   ! (See equation 3.61 in Denner's thesis)
   if(flow % temp_corr) then
-    do s = grid % n_bnd_faces + 1, grid % n_faces
+    do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
-      fs = grid % f(s)
-      u_fo = fs * u % o(c1) + (1.0 - fs) * u % o(c2)
-      v_fo = fs * v % o(c1) + (1.0 - fs) * v % o(c2)
-      w_fo = fs * w % o(c1) + (1.0 - fs) * w % o(c2)
 
-      dens_h = 2.0 / ( 1.0 / flow % density(c1) + 1.0 / flow % density(c2) )
+      if(c2 > 0) then
 
-      ! Unit for factor2: [1]
-      factor2 = u_relax * 0.5 * dens_h * ( grid % vol(c1)               &
-                                         / (a % sav(c1) * dt_corr)      &
-                                         + grid % vol(c2)               &
-                                         / (a % sav(c2) * dt_corr) )
+        fs = grid % f(s)
+        u_fo = fs * u % o(c1) + (1.0 - fs) * u % o(c2)
+        v_fo = fs * v % o(c1) + (1.0 - fs) * v % o(c2)
+        w_fo = fs * w % o(c1) + (1.0 - fs) * w % o(c2)
 
-      ! Unit for correction [m^3/s]
-      correction = (1.0 - u_relax) * ( v_flux % star(s) - v_flux % avg(s) )   &
-                 + factor2 * ( v_flux % o(s) - ( u_fo * grid % sx(s)          &
-                                               + v_fo * grid % sy(s)          &
-                                               + w_fo * grid % sz(s) ) )
+        dens_h = 2.0 / ( 1.0 / flow % density(c1) + 1.0 / flow % density(c2) )
 
-      v_flux % n(s) = v_flux % n(s) + correction
+        ! Unit for factor2: [1]
+        factor2 = u_relax * 0.5 * dens_h * ( grid % vol(c1)               &
+                                           / (a % sav(c1) * dt_corr)      &
+                                           + grid % vol(c2)               &
+                                           / (a % sav(c2) * dt_corr) )
 
-      b(c1) = b(c1) - correction
-      b(c2) = b(c2) + correction
+        ! Unit for correction [m^3/s]
+        correction = (1.0 - u_relax) * ( v_flux % star(s) - v_flux % avg(s) )  &
+                   + factor2 * ( v_flux % o(s) - ( u_fo * grid % sx(s)         &
+                                                 + v_fo * grid % sy(s)         &
+                                                 + w_fo * grid % sz(s) ) )
+
+        v_flux % n(s) = v_flux % n(s) + correction
+
+        b(c1) = b(c1) - correction
+        b(c2) = b(c2) + correction
+
+      end if
 
     end do
   end if

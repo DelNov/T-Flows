@@ -31,7 +31,9 @@
 
   mult % curv = 0.0
 
-  ! Normalize vector at cells
+  !-------------------------------!
+  !   Normalize vector at cells   !
+  !-------------------------------!
   do c = 1, grid % n_cells
     norm_grad = sqrt(  smooth % x(c) ** 2  &
                      + smooth % y(c) ** 2  &
@@ -51,80 +53,91 @@
   call Grid_Mod_Exchange_Cells_Real(grid, mult % ny(-nb:nc))
   call Grid_Mod_Exchange_Cells_Real(grid, mult % nz(-nb:nc))
 
-  ! Tangent vector to walls/symmetries
-
-  do s = 1, grid % n_bnd_faces
+  !---------------------------------------!
+  !   Tangent vector to walls/symmetries  !
+  !---------------------------------------!
+  do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
-    if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.   &
-        Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. SYMMETRY) then
+    if(c2 < 0) then
+      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL   .or.   &
+         Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL .or.   &
+         Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. SYMMETRY) then
 
-      norm_grad = sqrt(  mult % nx(c1)**2   &
-                       + mult % ny(c1)**2   &
-                       + mult % nz(c1)**2)
-
-      if(norm_grad > FEMTO) then
-        v1(1) = grid % sx(s)
-        v1(2) = grid % sy(s)
-        v1(3) = grid % sz(s)
-        v2(1) = mult % nx(c1)
-        v2(2) = mult % ny(c1)
-        v2(3) = mult % nz(c1)
-        v3 = Math_Mod_Cross_Product(v1, v2)
-        v4 = Math_Mod_Cross_Product(v3, v1)
-
-        ! Projection on v4
-        norm_grad = sqrt(v4(1)**2 + v4(2)**2 + v4(3)**2)
+        norm_grad = sqrt(  mult % nx(c1)**2   &
+                         + mult % ny(c1)**2   &
+                         + mult % nz(c1)**2)
 
         if(norm_grad > FEMTO) then
-          mult % nx(c2) = v4(1) / norm_grad
-          mult % ny(c2) = v4(2) / norm_grad
-          mult % nz(c2) = v4(3) / norm_grad
+          v1(1) = grid % sx(s)
+          v1(2) = grid % sy(s)
+          v1(3) = grid % sz(s)
+          v2(1) = mult % nx(c1)
+          v2(2) = mult % ny(c1)
+          v2(3) = mult % nz(c1)
+          v3 = Math_Mod_Cross_Product(v1, v2)
+          v4 = Math_Mod_Cross_Product(v3, v1)
+
+          ! Projection on v4
+          norm_grad = sqrt(v4(1)**2 + v4(2)**2 + v4(3)**2)
+
+          if(norm_grad > FEMTO) then
+            mult % nx(c2) = v4(1) / norm_grad
+            mult % ny(c2) = v4(2) / norm_grad
+            mult % nz(c2) = v4(3) / norm_grad
+          end if
         end if
-      end if
-    else
-      mult % nx(c2) = mult % nx(c1)
-      mult % ny(c2) = mult % ny(c1)
-      mult % nz(c2) = mult % nz(c1)
-    end if
-  end do
-
-  ! Correct for contact angle at walls
-
-  do s = 1, grid % n_bnd_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
-    if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) then
-
-      ! Accumulate values of faces
-      norm_grad = sqrt(  mult % nx(c1)**2   &
-                       + mult % ny(c1)**2   &
-                       + mult % nz(c1)**2)
-
-      if(norm_grad > FEMTO) then
-
-        dotprod = grid % dx(s) * grid % sx(s)  &
-                + grid % dy(s) * grid % sy(s)  &
-                + grid % dz(s) * grid % sz(s)
-
-        mult % nx(c1) = grid % dx(s) / dotprod * grid % s(s)                  &
-                    * cos(vof % q(c2) * PI /180.0)                            &
-                    + mult % nx(c2) * sin(vof % q(c2) * PI /180.0)
-
-        mult % ny(c1) = grid % dy(s) / dotprod * grid % s(s)                  &
-                    * cos(vof % q(c2) * PI /180.0)                            &
-                    + mult % ny(c2) * sin(vof % q(c2) * PI /180.0)
-
-        mult % nz(c1) = grid % dz(s) / dotprod * grid % s(s)                  &
-                    * cos(vof % q(c2) * PI /180.0)                            &
-                    + mult % nz(c2) * sin(vof % q(c2) * PI /180.0)
-
+      else
         mult % nx(c2) = mult % nx(c1)
         mult % ny(c2) = mult % ny(c1)
         mult % nz(c2) = mult % nz(c1)
       end if
 
-    end if
+    end if  ! c2 < 0
+  end do
+
+  !----------------------------------------!
+  !   Correct for contact angle at walls   !
+  !----------------------------------------!
+  do s = 1, grid % n_faces
+    c1 = grid % faces_c(1,s)
+    c2 = grid % faces_c(2,s)
+
+    if(c2 < 0) then
+      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.    &
+         Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
+
+        ! Accumulate values of faces
+        norm_grad = sqrt(  mult % nx(c1)**2   &
+                         + mult % ny(c1)**2   &
+                         + mult % nz(c1)**2)
+
+        if(norm_grad > FEMTO) then
+
+          dotprod = grid % dx(s) * grid % sx(s)  &
+                  + grid % dy(s) * grid % sy(s)  &
+                  + grid % dz(s) * grid % sz(s)
+
+          mult % nx(c1) = grid % dx(s) / dotprod * grid % s(s)          &
+                      * cos(vof % q(c2) * PI /180.0)                    &
+                      + mult % nx(c2) * sin(vof % q(c2) * PI /180.0)
+
+          mult % ny(c1) = grid % dy(s) / dotprod * grid % s(s)          &
+                      * cos(vof % q(c2) * PI /180.0)                    &
+                      + mult % ny(c2) * sin(vof % q(c2) * PI /180.0)
+
+          mult % nz(c1) = grid % dz(s) / dotprod * grid % s(s)          &
+                      * cos(vof % q(c2) * PI /180.0)                    &
+                      + mult % nz(c2) * sin(vof % q(c2) * PI /180.0)
+
+          mult % nx(c2) = mult % nx(c1)
+          mult % ny(c2) = mult % ny(c1)
+          mult % nz(c2) = mult % nz(c1)
+        end if
+
+      end if  ! if WALL
+    end if  ! c2 < 0
+
   end do
 
   call Grid_Mod_Exchange_Cells_Real(grid, mult % nx(-nb:nc))
@@ -146,13 +159,13 @@
 
   call Grid_Mod_Exchange_Cells_Real(grid, mult % curv)
 
-! call Grid_Mod_Save_Debug_Vtu(grid, 'curv_sharp', scalar_cell = mult % curv,  &
-!                                                  scalar_name = 'curv_sharp')
+  ! call Grid_Mod_Save_Debug_Vtu(grid,'curv_sharp',scalar_cell=mult % curv,  &
+  !                                                scalar_name='curv_sharp')
 
   call Multiphase_Mod_Vof_Smooth_Curvature(mult)
 
-! call Grid_Mod_Save_Debug_Vtu(grid, 'curv_smooth', scalar_cell = mult % curv,  &
-!                                                   scalar_name = 'curv_smooth')
+  ! call Grid_Mod_Save_Debug_Vtu(grid,'curv_smooth',scalar_cell=mult % curv,  &
+  !                                                 scalar_name='curv_smooth')
 
   do c = 1, grid % n_cells
     if(smooth % n(c) < 0.01 .or. smooth % n(c) > 0.99) mult % curv(c) = 0.0
