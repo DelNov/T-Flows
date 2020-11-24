@@ -355,6 +355,7 @@
   !                              !
   !                              !
   !------------------------------!
+  print *, '# Reconstructing cells (determining their nodes)'
   allocate(cell_visited_from(grid % n_cells));  cell_visited_from(:) = 0
 
   !---------------------------------------------!
