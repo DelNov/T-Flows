@@ -29,7 +29,6 @@
     integer :: n_cells      ! ... cells
     integer :: n_faces      ! ... faces
     integer :: n_bnd_cells  ! ... boundary cells
-    integer :: n_bnd_faces  ! ... boundary faces
     integer :: n_per_faces  ! ... periodic faces (shadows)
     integer :: n_bnd_cond   ! ... boundary conditions
     integer :: n_shadows    ! ... shadow faces

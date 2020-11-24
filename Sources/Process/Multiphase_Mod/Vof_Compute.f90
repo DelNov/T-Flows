@@ -24,7 +24,6 @@
   real                       :: courant_max
   integer                    :: i_sub, n_sub, wrong_vf, n_wrong_vf0, n_wrong_vf1
   integer                    :: s, c, c1, c2, fu, corr
-! character(SL)              :: solver
 !==============================================================================!
 
   call Cpu_Timer_Mod_Start('Compute_Multiphase (without solvers)')
@@ -38,7 +37,7 @@
   b => sol % b % val
 
   if(vof % adv_scheme .eq. CICSAM .or. &
-      vof % adv_scheme .eq. STACS) then
+     vof % adv_scheme .eq. STACS) then
 
     if(vof % adv_scheme .eq. CICSAM) then
       ! Compute courant Number close to the interface:
@@ -100,30 +99,32 @@
                                   c_d, 0, courant_max)
 
       !---------------------------!
-      !   Predict Beta at faces   !
+      !   Predict beta at faces   !
       !---------------------------!
 
       ! Impose zero gradient at boundaries
-      !call Multiphase_Mod_Vof_Boundary_Extrapolation(grid, mult, vof % n)
-      do s = 1, grid % n_bnd_faces
+      ! call Multiphase_Mod_Vof_Boundary_Extrapolation(grid, mult, vof % n)
+      do s = 1, grid % n_faces
         c1 = grid % faces_c(1,s)
         c2 = grid % faces_c(2,s)
-        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. INFLOW) then
-          vof % n(c2) = vof % n(c1)
+        if(c2 < 0) then
+          if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. INFLOW) then
+            vof % n(c2) = vof % n(c1)
+          end if
         end if
       end do
 
       ! Old volume fraction:
       vof % o(:) = vof % n(:)
 
-      ! Compute Gradient:
+      ! Compute gradient:
       call Field_Mod_Grad_Variable(flow, vof)
 
       call Multiphase_Mod_Vof_Predict_Beta(mult, beta_f, beta_c, c_d)
 
       do corr = 1, mult % corr_num_max
         !-------------------------!
-        !   Matrix Coefficients   !
+        !   Matrix coefficients   !
         !-------------------------!
 
         call Multiphase_Mod_Vof_Coefficients(mult, a, b,         &
@@ -133,11 +134,13 @@
         ! Solve System
         call Multiphase_Mod_Vof_Solve_System(mult, sol, b)
 
-        do s = 1, grid % n_bnd_faces
+        do s = 1, grid % n_faces
           c1 = grid % faces_c(1,s)
           c2 = grid % faces_c(2,s)
-          if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. INFLOW) then
-            vof % n(c2) = vof % n(c1)
+          if(c2 < 0) then
+            if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. INFLOW) then
+              vof % n(c2) = vof % n(c1)
+            end if
           end if
         end do
 
@@ -180,16 +183,18 @@
       !------------------------!
       !   Correct boundaries   !
       !------------------------!
-      do s = 1, grid % n_bnd_faces
+      do s = 1, grid % n_faces
         c1 = grid % faces_c(1,s)
         c2 = grid % faces_c(2,s)
 
-        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. INFLOW) then
-          if(vof % n(c2) < FEMTO) then
-            vof % n(c2) = 0.0
-          end if
-          if(vof % n(c2) - 1.0 >= FEMTO) then
-            vof % n(c2) = 1.0
+        if(c2 < 0) then
+          if(Grid_Mod_Bnd_Cond_Type(grid, c2) .ne. INFLOW) then
+            if(vof % n(c2) < FEMTO) then
+               vof % n(c2) = 0.0
+            end if
+            if(vof % n(c2) - 1.0 >= FEMTO) then
+               vof % n(c2) = 1.0
+            end if
           end if
         end if
 
@@ -220,11 +225,13 @@
   if(vof % adv_scheme .eq. UPWIND) then
 
     ! At boundaries
-    do s = 1, grid % n_bnd_faces
+    do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. INFLOW) then
-        vof % n(c2) = vof % n(c1)
+      if(c2 < 0) then
+        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. INFLOW) then
+          vof % n(c2) = vof % n(c1)
+        end if
       end if
     end do
 
@@ -232,16 +239,18 @@
 
     ! call Multiphase_Mod_Vof_Boundary_Extrapolation(grid, mult, vof % n)
     ! At boundaries
-    do s = 1, grid % n_bnd_faces
+    do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) then
-        vof % n(c2) = vof % n(c1)
-      else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OPENBC) then
-        vof % n(c2) = vof % n(c1)
-      else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
-      else
-        vof % n(c2) = vof % n(c1)
+      if(c2 < 0) then
+        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) then
+          vof % n(c2) = vof % n(c1)
+        else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OPENBC) then
+          vof % n(c2) = vof % n(c1)
+        else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
+        else
+          vof % n(c2) = vof % n(c1)
+        end if
       end if
     end do
 

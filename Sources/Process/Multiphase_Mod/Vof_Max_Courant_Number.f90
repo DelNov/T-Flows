@@ -12,7 +12,7 @@
   real                          :: dt     ! time step
   real                          :: c_d(-mult % pnt_grid % n_bnd_cells:  &
                                         mult % pnt_grid % n_cells) ! Courant n.
-  integer                       :: interf
+  integer, intent(in)           :: interf
   real                          :: courant_max
 !--------------------------------[Locals]--------------------------------------!
   type(Field_Type), pointer :: flow
@@ -36,53 +36,34 @@
 
   if(interf == 1) then
 
-    ! At boundaries
-    do s = 1, grid % n_bnd_faces
+    do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
 
       vof_dist = min(max(vof % n(c1), 0.0), 1.0)
-
-      vof_dist = (1.0 - vof_dist) * (1.0 - vof_dist)            &
-                                  * vof_dist * vof_dist * 16.0
+      vof_dist = (1.0 - vof_dist) ** 2 * vof_dist ** 2 * 16.0
 
       c_d(c1) = c_d(c1) + vof_dist  &
-                        * max(-v_flux % n(s) * dt / grid % vol(c1), 0.0)
+              * max(-v_flux % n(s) * dt / grid % vol(c1), 0.0)
+
+      if(c2 > 0) then
+        vof_dist = min(max(vof % n(c2), 0.0), 1.0)
+
+        vof_dist = (1.0 - vof_dist) ** 2 * vof_dist ** 2 * 16.0
+
+        c_d(c2) = c_d(c2) + vof_dist  &
+                * max( v_flux % n(s) * dt / grid % vol(c2), 0.0)
+      end if
     end do
 
-    ! Interior cells
-    do s = grid % n_bnd_faces + 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
-
-      vof_dist = min(max(vof % n(c1), 0.0), 1.0)
-
-      vof_dist = (1.0 - vof_dist) * (1.0 - vof_dist)            &
-                                  * vof_dist * vof_dist * 16.0
-
-      c_d(c1) = c_d(c1) + vof_dist  &
-                        * max(-v_flux % n(s) * dt / grid % vol(c1), 0.0)
-
-      vof_dist = min(max(vof % n(c2), 0.0),1.0)
-
-      vof_dist = (1.0 - vof_dist) * (1.0 - vof_dist)            &
-                                  * vof_dist * vof_dist * 16.0
-
-      c_d(c2) = c_d(c2) + vof_dist  &
-                        * max( v_flux % n(s) * dt / grid % vol(c2), 0.0)
-    end do
-
-    !if(mult % phase_Change) then
-    !  do c = 1, grid % n_cells
-    !    vof_dist = min(max(vof % n(c1), 0.0),1.0)
-
-    !    vof_dist = (1.0 - vof_dist) * (1.0 - vof_dist)            &
-    !                                * vof_dist * vof_dist * 16.0
-
-    !    c_d(c) = c_d(c) + vof_dist * mult % flux_rate(c)    &
-    !                               / flow % density_f(s) * dt
-    !  end do
-    !end if
+    ! if(mult % phase_Change) then
+    !   do c = 1, grid % n_cells
+    !     vof_dist = min(max(vof % n(c1), 0.0),1.0)
+    !     vof_dist = (1.0 - vof_dist) ** 2 * vof_dist ** 2 * 16.0
+    !     c_d(c) = c_d(c) + vof_dist * mult % flux_rate(c)    &
+    !                                / flow % density_f(s) * dt
+    !   end do
+    ! end if
 
     call Grid_Mod_Exchange_Cells_Real(grid, c_d)
 
@@ -91,32 +72,28 @@
     end do
     call Comm_Mod_Global_Max_Real(courant_max)
 
-  else
+  else  ! interf = 0
 
     ! At boundaries
-    do s = 1, grid % n_bnd_faces
+    do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
 
       c_d(c1) = c_d(c1) + max(-v_flux % n(s) * dt / grid % vol(c1), 0.0)
+
+      if(c2 > 0) then
+        c_d(c2) = c_d(c2) + max( v_flux % n(s) * dt / grid % vol(c2), 0.0)
+      end if
     end do
 
-    ! At interior faces
-    do s = grid % n_bnd_faces + 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
-
-      c_d(c1) = c_d(c1) + max(-v_flux % n(s) * dt / grid % vol(c1), 0.0)
-      c_d(c2) = c_d(c2) + max( v_flux % n(s) * dt / grid % vol(c2), 0.0)
-    end do
-
-    !if(mult % phase_Change) then
-    !  do c = 1, grid % n_cells
-    !    c_d(c) = c_d(c) + mult % flux_rate(c) / flow % density_f(s) * dt
-    !  end do
-    !end if
+    ! if(mult % phase_Change) then
+    !   do c = 1, grid % n_cells
+    !     c_d(c) = c_d(c) + mult % flux_rate(c) / flow % density_f(s) * dt
+    !   end do
+    ! end if
 
     call Grid_Mod_Exchange_Cells_Real(grid, c_d)
-  end if
+
+  end if  ! if interf == 1
 
   end subroutine

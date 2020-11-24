@@ -1,7 +1,8 @@
 !==============================================================================!
   subroutine Grid_Mod_Save_Debug_Vtu(grid, append,                           &
                                      scalar_cell, scalar_node, scalar_name,  &
-                                     vector_cell, vector_node, vector_name)
+                                     vector_cell, vector_node, vector_name,  &
+                                     plot_inside)
 !------------------------------------------------------------------------------!
 !   Writes: name.vtu, name.faces.vtu, name.shadow.vtu                          !
 !------------------------------------------------------------------------------!
@@ -15,9 +16,12 @@
   real,         optional :: vector_cell(-grid % n_bnd_cells:grid % n_cells, 3)
   real,         optional :: vector_node(1:grid % n_nodes, 3)
   character(*), optional :: vector_name
+  logical,      optional :: plot_inside
 !-----------------------------------[Locals]-----------------------------------!
   integer(SP)   :: data_size
   integer       :: c, n, data_offset, cell_offset, n_conns, fu, lev
+  integer       :: cs, ce, nc
+  logical       :: inside
   character(SL) :: name_out, str1, str2
 !------------------------------[Local parameters]------------------------------!
   integer,           parameter :: IP = DP  ! int. precision is double precision
@@ -38,9 +42,27 @@
   character(len=10), parameter :: IN_5 = '          '
 !==============================================================================!
 
+  ! Set initial value for inside (which, if .true., means plotting inside cells)
+  inside = .true.
+
+  ! Take the value of argument, if provided
+  if(present(plot_inside)) then
+    inside = plot_inside
+  end if
+
+  ! Set start and ending cell
+  if(inside) then
+    cs = 1
+    ce = grid % n_cells
+  else
+    cs = -grid % n_bnd_cells
+    ce = -1
+  end if
+  nc = ce - cs + 1
+
   ! Count connections in this subdomain, you will need it later
   n_conns = 0
-  do c = 1, grid % n_cells
+  do c = cs, ce
     n_conns = n_conns + grid % cells_n_nodes(c)
   end do
 
@@ -62,7 +84,7 @@
                     ' byte_order="LittleEndian">'       // LF
   write(fu) IN_1 // '<UnstructuredGrid>' // LF
   write(str1, '(i0.0)') grid % n_nodes
-  write(str2, '(i0.0)') grid % n_cells
+  write(str2, '(i0.0)') nc
   write(fu) IN_2 // '<Piece NumberOfPoints="' // trim(str1) // '"' //  &
                     ' NumberOfCells="' // trim(str2) // '">'       // LF
   data_offset = 0
@@ -101,7 +123,7 @@
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
-  data_offset = data_offset + SP + grid % n_cells * IP  ! prepare for next
+  data_offset = data_offset + SP + nc * IP  ! prepare for next
 
   ! Cells' types
   write(str1, '(i0.0)') data_offset
@@ -110,7 +132,7 @@
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
-  data_offset = data_offset + SP + grid % n_cells * IP  ! prepare for next
+  data_offset = data_offset + SP + nc * IP  ! prepare for next
 
   !----------------------!
   !   The end of cells   !
@@ -163,7 +185,7 @@
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
-  data_offset = data_offset + SP + grid % n_cells * IP  ! prepare for next
+  data_offset = data_offset + SP + nc * IP  ! prepare for next
 
   ! Additional cell scalar
   if(present(scalar_cell)) then
@@ -173,7 +195,7 @@
                       ' format="appended"'                   //  &
                       ' offset="' // trim(str1)       //'">' // LF
     write(fu) IN_4 // '</DataArray>' // LF
-    data_offset = data_offset + SP + grid % n_cells * RP  ! prepare for next
+    data_offset = data_offset + SP + nc * RP  ! prepare for next
   end if
 
   ! Additional cell vector
@@ -185,7 +207,7 @@
                       ' format="appended"'                   //  &
                       ' offset="' // trim(str1)       //'">' // LF
     write(fu) IN_4 // '</DataArray>' // LF
-    data_offset = data_offset + SP + grid % n_cells * RP * 3  ! prepare for next
+    data_offset = data_offset + SP + nc * RP * 3  ! prepare for next
   end if
 
   !------------!
@@ -221,72 +243,114 @@
   ! Cells' nodes
   data_size = n_conns * IP
   write(fu) data_size
-  do c = 1, grid % n_cells
+  do c = cs, ce
 
-    ! Hexahedral
-    if(grid % cells_n_nodes(c) .eq. 8) then
-      write(fu)                 &
-        grid % cells_n(1,c)-1,  &
-        grid % cells_n(2,c)-1,  &
-        grid % cells_n(4,c)-1,  &
-        grid % cells_n(3,c)-1,  &
-        grid % cells_n(5,c)-1,  &
-        grid % cells_n(6,c)-1,  &
-        grid % cells_n(8,c)-1,  &
-        grid % cells_n(7,c)-1
+    !---------------------------!
+    !   Plotting inside cells   !
+    !---------------------------!
+    if(inside) then
 
-    ! Wedge
-    else if(grid % cells_n_nodes(c) .eq. 6) then
-      write(fu)                 &
-        grid % cells_n(1,c)-1,  &
-        grid % cells_n(2,c)-1,  &
-        grid % cells_n(3,c)-1,  &
-        grid % cells_n(4,c)-1,  &
-        grid % cells_n(5,c)-1,  &
-        grid % cells_n(6,c)-1
+      ! Hexahedral
+      if(grid % cells_n_nodes(c) .eq. 8) then
+        write(fu)                 &
+          grid % cells_n(1,c)-1,  &
+          grid % cells_n(2,c)-1,  &
+          grid % cells_n(4,c)-1,  &
+          grid % cells_n(3,c)-1,  &
+          grid % cells_n(5,c)-1,  &
+          grid % cells_n(6,c)-1,  &
+          grid % cells_n(8,c)-1,  &
+          grid % cells_n(7,c)-1
 
-    ! Tetrahedra
-    else if(grid % cells_n_nodes(c) .eq. 4) then
-      write(fu)                 &
-        grid % cells_n(1,c)-1,  &
-        grid % cells_n(2,c)-1,  &
-        grid % cells_n(3,c)-1,  &
-        grid % cells_n(4,c)-1
+      ! Wedge
+      else if(grid % cells_n_nodes(c) .eq. 6) then
+        write(fu)                 &
+          grid % cells_n(1,c)-1,  &
+          grid % cells_n(2,c)-1,  &
+          grid % cells_n(3,c)-1,  &
+          grid % cells_n(4,c)-1,  &
+          grid % cells_n(5,c)-1,  &
+          grid % cells_n(6,c)-1
 
-    ! Pyramid
-    else if(grid % cells_n_nodes(c) .eq. 5) then
-      write(fu)                 &
-        grid % cells_n(1,c)-1,  &
-        grid % cells_n(2,c)-1,  &
-        grid % cells_n(4,c)-1,  &
-        grid % cells_n(3,c)-1,  &
-        grid % cells_n(5,c)-1
+      ! Tetrahedra
+      else if(grid % cells_n_nodes(c) .eq. 4) then
+        write(fu)                 &
+          grid % cells_n(1,c)-1,  &
+          grid % cells_n(2,c)-1,  &
+          grid % cells_n(3,c)-1,  &
+          grid % cells_n(4,c)-1
+
+      ! Pyramid
+      else if(grid % cells_n_nodes(c) .eq. 5) then
+        write(fu)                 &
+          grid % cells_n(1,c)-1,  &
+          grid % cells_n(2,c)-1,  &
+          grid % cells_n(4,c)-1,  &
+          grid % cells_n(3,c)-1,  &
+          grid % cells_n(5,c)-1
+      else
+        print *, '# Unsupported inside cell type with ',  &
+                    grid % cells_n_nodes(c), ' nodes.'
+        print *, '# Exiting'
+        stop
+      end if
+
+    !-----------------------------!
+    !   Plotting boundary cells   !
+    !-----------------------------!
     else
-      print *, '# Unsupported cell type with ',  &
-                  grid % cells_n_nodes(c), ' nodes.'
-      print *, '# Exiting'
-      stop 
+
+      ! Quadrilateral
+      if(grid % cells_n_nodes(c) .eq. 4) then
+        write(fu)                 &
+          grid % cells_n(1,c)-1,  &
+          grid % cells_n(2,c)-1,  &
+          grid % cells_n(3,c)-1,  &
+          grid % cells_n(4,c)-1
+
+      ! Triangular
+      else if(grid % cells_n_nodes(c) .eq. 3) then
+        write(fu)                 &
+          grid % cells_n(1,c)-1,  &
+          grid % cells_n(2,c)-1,  &
+          grid % cells_n(3,c)-1
+
+      else
+        print *, '# Unsupported boundary cell type with ',  &
+                    grid % cells_n_nodes(c), ' nodes.'
+        print *, '# Exiting'
+        stop
+      end if
+
     end if
+
   end do
 
   ! Cells' offsets
-  data_size = grid % n_cells * IP
+  data_size = nc * IP
   write(fu) data_size
   cell_offset = 0
-  do c = 1, grid % n_cells
+  do c = cs, ce
     cell_offset = cell_offset + grid % cells_n_nodes(c)
     write(fu) cell_offset
   end do
 
   ! Cells' types
-  data_size = grid % n_cells * IP
+  data_size = nc * IP
   write(fu) data_size
-  do c = 1, grid % n_cells
-    if(grid % cells_n_nodes(c) .eq. 4) write(fu) VTK_TETRA
-    if(grid % cells_n_nodes(c) .eq. 8) write(fu) VTK_HEXAHEDRON
-    if(grid % cells_n_nodes(c) .eq. 6) write(fu) VTK_WEDGE
-    if(grid % cells_n_nodes(c) .eq. 5) write(fu) VTK_PYRAMID
-  end do
+  if(inside) then
+    do c = cs, ce
+      if(grid % cells_n_nodes(c) .eq. 4) write(fu) VTK_TETRA
+      if(grid % cells_n_nodes(c) .eq. 8) write(fu) VTK_HEXAHEDRON
+      if(grid % cells_n_nodes(c) .eq. 6) write(fu) VTK_WEDGE
+      if(grid % cells_n_nodes(c) .eq. 5) write(fu) VTK_PYRAMID
+    end do
+  else
+    do c = cs, ce
+      if(grid % cells_n_nodes(c) .eq. 3) write(fu) VTK_TRIANGLE
+      if(grid % cells_n_nodes(c) .eq. 4) write(fu) VTK_QUAD
+    end do
+  end if
 
   !----------------!
   !   Point data   !
@@ -312,25 +376,25 @@
   !---------------!
 
   ! Processor i.d.
-  data_size = grid % n_cells * IP
+  data_size = nc * IP
   write(fu) data_size
-  do c = 1, grid % n_cells
+  do c = cs, ce
     write(fu) grid % comm % cell_proc(c)
   end do
 
   ! Additional cell data
   if(present(scalar_cell)) then
-    data_size = grid % n_cells * RP
+    data_size = nc * RP
     write(fu) data_size
-    do c = 1, grid % n_cells
+    do c = cs, ce
       write(fu) scalar_cell(c)
     end do
   end if
 
   if(present(vector_cell)) then
-    data_size = grid % n_cells * RP * 3
+    data_size = nc * RP * 3
     write(fu) data_size
-    do c = 1, grid % n_cells
+    do c = cs, ce
       write(fu) vector_cell(c, 1), vector_cell(c, 2), vector_cell(c, 3)
     end do
   end if
