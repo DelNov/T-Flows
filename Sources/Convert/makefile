@@ -146,8 +146,9 @@ SRC_FUN += Allocate_Memory.f90		\
            Find_Parents.f90		\
            Grid_Topology.f90		\
            Guess_Format.f90		\
-           Load_Neu.f90			\
-           Load_Msh.f90			\
+           Load_Fluent.f90		\
+           Load_Gambit.f90		\
+           Load_Gmsh.f90		\
            Logo_Con.f90			\
            Main_Con.f90
 

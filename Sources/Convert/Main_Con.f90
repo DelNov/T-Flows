@@ -10,7 +10,7 @@
   type(Grid_Type) :: grid         ! grid to be converted
   integer         :: c, n, s, l, p
   character(SL)   :: file_name
-  character(SL)   :: file_format  ! 'UNKNOWN', 'GAMBIT_NEU', 'GMSH_MSH'
+  character(SL)   :: file_format  ! 'UNKNOWN', 'FLUENT', 'GAMBIT', 'GMSH'
 !==============================================================================!
 
   call Logo_Con
@@ -45,24 +45,31 @@
   !   Read the file and start conversion   !
   !                                        !
   !----------------------------------------!
-  if(file_format .eq. 'GAMBIT_NEU') then
-    call Load_Neu(grid)
+  if(file_format .eq. 'FLUENT') then
+    call Load_Fluent(grid)
   end if
-  if(file_format .eq. 'GMSH_MSH') then
-    call Load_Msh(grid)
+  if(file_format .eq. 'GAMBIT') then
+    call Load_Gambit(grid)
+  end if
+  if(file_format .eq. 'GMSH') then
+    call Load_Gmsh(grid)
     call Find_Parents(grid)
   end if
 
-  call Grid_Topology     (grid)
-  call Find_Faces        (grid)
-  call Calculate_Geometry(grid)
+  if(file_format .eq. 'GAMBIT' .or. file_format .eq. 'GMSH') then
+    call Grid_Topology     (grid)
+    call Find_Faces        (grid)
+    call Calculate_Geometry(grid)
+  end if
 
   ! Keep in mind that Grid_Mod_Calculate_Wall_Distance is ...
   ! ... faster if it is called after Grid_Mod_Sort_Faces_Smart
 
-  call Grid_Mod_Sort_Cells_Smart       (grid)
-  call Grid_Mod_Sort_Faces_Smart       (grid)
-  call Grid_Mod_Calculate_Wall_Distance(grid)
+  if(file_format .eq. 'GAMBIT' .or. file_format .eq. 'GMSH') then
+    call Grid_Mod_Sort_Cells_Smart       (grid)
+    call Grid_Mod_Sort_Faces_Smart       (grid)
+    call Grid_Mod_Calculate_Wall_Distance(grid)
+  end if
 
   ! Prepare for saving
   do n = 1, grid % n_nodes
@@ -76,6 +83,14 @@
     grid % new_f(s) = s
     grid % old_f(s) = s
   end do
+
+  if(file_format .eq. 'FLUENT') then
+    call Save_Vtu_Cells(grid, 0,         &
+                        grid % n_nodes,  &
+                        grid % n_cells)
+    call Save_Vtu_Faces(grid)
+    STOP
+  end if
 
   !-------------------------------!
   !                               !
