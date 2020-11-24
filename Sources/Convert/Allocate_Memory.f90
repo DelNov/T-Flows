@@ -17,11 +17,20 @@
   integer, parameter :: F = 3   ! workaround to allocate more memory for bnds
 !==============================================================================!
 
-  ! Allocate memory 
+  ! Allocate memory
   ! =--> carefull: there is no checking!
   call Grid_Mod_Allocate_Nodes(grid, grid % n_nodes)
   call Grid_Mod_Allocate_Cells(grid, grid % n_cells,   grid % n_bnd_cells * F)
-  call Grid_Mod_Allocate_Faces(grid, grid % n_cells*5, 0)
+
+  ! For Gmsh's and Gambit's file formats, number of faces is zero
+  if(grid % n_faces .eq. 0) then
+    call Grid_Mod_Allocate_Faces(grid, grid % n_cells*5, 0)
+
+  ! For Fluent's file format, number of faces are known
+  else
+    call Grid_Mod_Allocate_Faces(grid, grid % n_faces, 0)
+  end if
+
   call Grid_Mod_Allocate_New_Numbers(grid,                    &
                                      grid % n_nodes,          &
                                      grid % n_bnd_cells * F,  &
