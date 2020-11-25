@@ -84,7 +84,7 @@
       line( 1+I: 1+I) = '#'
       line(63+I:63+I) = '#'
       line( 3+I: 3+I) = '-'
-      line( 5+I: 5+I+len_trim(funct_name(f))) = funct_name(f)
+      line( 5+I: 5+I+len_trim(funct_name(f))) = funct_name(f)(1:123)
       line(45+I:45+I) = '|'
       write(line(50+I:55+I), '(f6.2)') funct_time(f) / total_time * 100.0
       line(57+I:57+I) = '%'
