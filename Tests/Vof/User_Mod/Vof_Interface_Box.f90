@@ -1,8 +1,8 @@
 !==============================================================================!
-  subroutine Vof_Interface_Box(mult,               &
-                               c,                  &
-                               n_xyz,              &
-                               dd,                 &
+  subroutine Vof_Interface_Box(mult,     &
+                               c,        &
+                               n_xyz,    &
+                               dd,       &
                                vof_int)
 !------------------------------------------------------------------------------!
 !   Computes volume fraction of cell at interface                              !
@@ -23,7 +23,7 @@
   integer                  :: ee, n_cylinders, i_vari, n_vari
   real                     :: r_num, res_func
   real                     :: xmin, xmax, ymin, ymax, zmin, zmax
-  real                     :: p(3)
+  real, allocatable        :: p(:,:)
   real                     :: vof_0, vof_tol1, vof_tol2
   real                     :: avg_x, avg_y, avg_z
   real                     :: var_comb, var_comb_0, dist_cent
@@ -44,6 +44,7 @@
 
   n_tot = 0
   n_int = 0
+  allocate(p(1,3))
 
   ! Find bounding box:
   xmin =  HUGE; ymin =  HUGE; zmin =  HUGE;
@@ -68,16 +69,16 @@
     ! Check if p is inside cell
     do while (i_cell .eqv. .false.)
       call random_number(r_num)
-      p(1) = xmin + (xmax-xmin) * r_num
+      p(1,1) = xmin + (xmax-xmin) * r_num
       call random_number(r_num)
-      p(2) = ymin+ (ymax-ymin) * r_num
+      p(1,2) = ymin+ (ymax-ymin) * r_num
       call random_number(r_num)
-      p(3) = zmin+ (zmax-zmin) * r_num
+      p(1,3) = zmin+ (zmax-zmin) * r_num
       i_cell = Check_Inside_Cell(mult, c, p)
     end do
     n_tot = n_tot + 1
 
-    points(n_tot,:) = p(:)
+    points(n_tot,:) = p(1,:)
 
     ! Check if p is inside function:
     if (Check_Inside_Box(mult, p, dd, n_xyz) == 1) then

@@ -79,14 +79,16 @@ include '../User_Mod/Interpolate_From_Nodes.f90'
   ! At faces
 
   ! At boundaries
-  do s = 1, grid % n_bnd_faces
+  do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
-    if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) then
-      vof % n(c2) = vof % n(c1)
-    else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
-    else
-      vof % n(c2) = vof % n(c1)
+    if(c2 < 0) then
+      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) then
+        vof % n(c2) = vof % n(c1)
+      else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
+      else
+        vof % n(c2) = vof % n(c1)
+      end if
     end if
   end do
 
@@ -98,20 +100,23 @@ include '../User_Mod/Interpolate_From_Nodes.f90'
   nod_probe = -1
   do i_probe = 1, N_PROBE
     min_dist = HUGE
-    do s = 1, grid % n_bnd_faces
+    do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
-      if(Grid_Mod_Bnd_Cond_Name(grid,c2) .eq. 'STEP') then
-        do n = 1, grid % cells_n_nodes(c1)
-          dist = sqrt((grid % xn(grid % cells_n(n,c1))-x_probe(i_probe)) ** 2 &
-                     +(grid % yn(grid % cells_n(n,c1))-y_probe(i_probe)) ** 2 &
-                     +(grid % zn(grid % cells_n(n,c1))-z_probe(i_probe)) ** 2)
-          if (dist<min_dist) then
-            nod_probe(i_probe) = grid % cells_n(n,c1)
-            p_dist(i_probe) = dist
-            min_dist = dist
-          end if
-        end do
+      if(c2 < 0) then
+        if(Grid_Mod_Bnd_Cond_Name(grid,c2) .eq. 'STEP') then
+          do n = 1, grid % cells_n_nodes(c1)
+            dist = sqrt(                                                    &
+                  (grid % xn(grid % cells_n(n,c1))-x_probe(i_probe)) ** 2   &
+                 +(grid % yn(grid % cells_n(n,c1))-y_probe(i_probe)) ** 2   &
+                 +(grid % zn(grid % cells_n(n,c1))-z_probe(i_probe)) ** 2)
+            if (dist<min_dist) then
+              nod_probe(i_probe) = grid % cells_n(n,c1)
+              p_dist(i_probe) = dist
+              min_dist = dist
+            end if
+          end do
+        end if
       end if
     end do
   end do

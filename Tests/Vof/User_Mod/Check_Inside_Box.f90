@@ -7,7 +7,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Multiphase_Type), target :: mult
-  real                          :: p(1,3)
+  real, allocatable             :: p(:,:)
   real                          :: dd(6)
   real                          :: n_xyz(6,3)
   integer, optional             :: c
