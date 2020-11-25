@@ -11,20 +11,24 @@
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
   character(DL)        :: name_in
+  character(SL)        :: one_token
   integer              :: n_tri, n_quad, n_tetra, n_hexa, n_pyra, n_wedge
   integer              :: n_cells, n_bnd_cells, n_faces, n_nodes, n_face_nodes
-  integer              :: c, c1, c2, c12, s, n, cell_type, fu, i, i_nod, j_nod
+  integer              :: c1, c2, s, n, fu, i, i_nod, j_nod
+  integer              :: cell_type, face_type
   integer              :: cell_s, cell_e, side_s, side_e, node_s, node_e
   integer, allocatable :: cell_visited_from(:)
   real                 :: dist(4)
 !------------------------------[Local parameters]------------------------------!
-  integer, parameter :: MSH_MIXED = 0
-  integer, parameter :: MSH_TRI   = 1
-  integer, parameter :: MSH_TETRA = 2
-  integer, parameter :: MSH_QUAD  = 3
-  integer, parameter :: MSH_HEXA  = 4
-  integer, parameter :: MSH_PYRA  = 5
-  integer, parameter :: MSH_WEDGE = 6
+  integer, parameter :: MIXED_ZONE = 0
+  integer, parameter :: CELL_TRI   = 1
+  integer, parameter :: CELL_TETRA = 2
+  integer, parameter :: CELL_QUAD  = 3
+  integer, parameter :: CELL_HEXA  = 4
+  integer, parameter :: CELL_PYRA  = 5
+  integer, parameter :: CELL_WEDGE = 6
+  integer, parameter :: FACE_TRI   = 3
+  integer, parameter :: FACE_QUAD  = 4
 !==============================================================================!
 
   call File_Mod_Set_Name(name_in, extension='.msh')
@@ -105,21 +109,32 @@
       if(line % tokens(1) .eq. '(13' .and. line % tokens(2) .ne. '(0') then
         read(line % tokens(3), '(z160)') side_s  ! starting face
         read(line % tokens(4), '(z160)') side_e  ! ending face
-        print *, '# Found a face zone from ', side_s, ' to ', side_e
+
+        ! Take the cell type of this zone
+        one_token = LINE % TOKENS(6)
+        read(one_token(1:1), '(i1)') face_type
+        if(face_type .eq. MIXED_ZONE) then
+          print *, '# Found a mixed face zone from ', side_s, ' to ', side_e
+        else
+          print *, '# Found a uniform face zone from ', side_s, ' to ', side_e
+        end if
+
         do s = side_s, side_e
           n_faces = n_faces + 1
           call File_Mod_Read_Line(fu)
 
-          ! Number of nodes in this face
-          read(line % tokens(1), *) n_face_nodes
+          ! Zone is mixed, read number of nodes and then c1 and c2
+          if(face_type .eq. MIXED_ZONE) then
+            read(line % tokens(1), *) n_face_nodes
+            read(line % tokens(1+n_face_nodes+1), '(z160)') c1
+            read(line % tokens(1+n_face_nodes+2), '(z160)') c2
 
-          ! Read cells surrounding the face
-          if     (n_face_nodes .eq. 3) then
-            read(line % tokens(5), '(z160)') c1
-            read(line % tokens(6), '(z160)') c2
-          else if(n_face_nodes .eq. 4) then
-            read(line % tokens(6), '(z160)') c1
-            read(line % tokens(7), '(z160)') c2
+          ! Zone is uniform, number of nodes is known, just read c1 and c2
+          else
+            if(face_type .eq. FACE_TRI)  n_face_nodes = 3
+            if(face_type .eq. FACE_QUAD) n_face_nodes = 4
+            read(line % tokens(0+n_face_nodes+1), '(z160)') c1
+            read(line % tokens(0+n_face_nodes+2), '(z160)') c2
           end if
 
           ! This was a boundary face
@@ -216,32 +231,32 @@
           n_cells = n_cells + 1
 
           ! Update the counters for cell types
-          if(cell_type .eq. MSH_TRI) then
+          if(cell_type .eq. CELL_TRI) then
             n_tri = n_tri + 1
             grid % cells_n_nodes(n_cells) = 3
             grid % cells_n_faces(n_cells) = 1
 
-          else if(cell_type .eq. MSH_QUAD) then
+          else if(cell_type .eq. CELL_QUAD) then
             n_quad = n_quad + 1
             grid % cells_n_nodes(n_cells) = 4
             grid % cells_n_faces(n_cells) = 1
 
-          else if(cell_type .eq. MSH_TETRA) then
+          else if(cell_type .eq. CELL_TETRA) then
             n_tetra = n_tetra + 1
             grid % cells_n_nodes(n_cells) = 4
             grid % cells_n_faces(n_cells) = 4
 
-          else if(cell_type .eq. MSH_HEXA)  then
+          else if(cell_type .eq. CELL_HEXA)  then
             n_hexa = n_hexa + 1
             grid % cells_n_nodes(n_cells) = 8
             grid % cells_n_faces(n_cells) = 6
 
-          else if(cell_type .eq. MSH_PYRA)  then
+          else if(cell_type .eq. CELL_PYRA)  then
             n_pyra = n_pyra + 1
             grid % cells_n_nodes(n_cells) = 5
             grid % cells_n_faces(n_cells) = 5
 
-          else if(cell_type .eq. MSH_WEDGE) then
+          else if(cell_type .eq. CELL_WEDGE) then
             n_wedge = n_wedge + 1
             grid % cells_n_nodes(n_cells) = 6
             grid % cells_n_faces(n_cells) = 5
@@ -291,30 +306,45 @@
         read(line % tokens(3), '(z160)') side_s  ! starting face
         read(line % tokens(4), '(z160)') side_e  ! ending face
         print *, '# Found a face zone from ', side_s, ' to ', side_e
-        do s = side_s, side_e
 
-          ! Increase the face counter
+        ! Take the cell type of this zone
+        one_token = LINE % TOKENS(6)
+        read(one_token(1:1), '(i1)') face_type
+        if(face_type .eq. MIXED_ZONE) then
+          print *, '# Found a mixed face zone from ', side_s, ' to ', side_e
+        else
+          print *, '# Found a uniform face zone from ', side_s, ' to ', side_e
+        end if
+
+        do s = side_s, side_e
           n_faces = n_faces + 1
           call File_Mod_Read_Line(fu)
 
           ! Read and store number of nodes in this face
-          read(line % tokens(1), *) n_face_nodes
+          if(face_type .eq. MIXED_ZONE) then
+            read(line % tokens(1), *) n_face_nodes
+          else
+            if(face_type .eq. FACE_TRI)  n_face_nodes = 3
+            if(face_type .eq. FACE_QUAD) n_face_nodes = 4
+          end if
           grid % faces_n_nodes(s) = n_face_nodes
 
-          ! Read cells surrounding the face
-          if     (n_face_nodes .eq. 3) then
-            read(line % tokens(2), '(z160)') grid % faces_n(1, s)
-            read(line % tokens(3), '(z160)') grid % faces_n(2, s)
-            read(line % tokens(4), '(z160)') grid % faces_n(3, s)
-            read(line % tokens(5), '(z160)') c1
-            read(line % tokens(6), '(z160)') c2
-          else if(n_face_nodes .eq. 4) then
-            read(line % tokens(2), '(z160)') grid % faces_n(1, s)
-            read(line % tokens(3), '(z160)') grid % faces_n(2, s)
-            read(line % tokens(4), '(z160)') grid % faces_n(3, s)
-            read(line % tokens(5), '(z160)') grid % faces_n(4, s)
-            read(line % tokens(6), '(z160)') c1
-            read(line % tokens(7), '(z160)') c2
+          ! Read nodes and cells surrounding the face for a mixed zone
+          if(face_type .eq. MIXED_ZONE) then
+            do i_nod = 1, n_face_nodes
+              read(line % tokens(1+i_nod), '(z160)') grid % faces_n(i_nod, s)
+            end do
+            read(line % tokens(1+n_face_nodes+1), '(z160)') c1
+            read(line % tokens(1+n_face_nodes+2), '(z160)') c2
+
+          ! Read nodes and cells surrounding the face for a uniform zone
+          else
+            do i_nod = 1, n_face_nodes
+              read(line % tokens(0+i_nod), '(z160)') grid % faces_n(i_nod, s)
+            end do
+            read(line % tokens(0+n_face_nodes+1), '(z160)') c1
+            read(line % tokens(0+n_face_nodes+2), '(z160)') c2
+
           end if
 
           ! Case when c1 is a boundary cell
@@ -515,7 +545,7 @@
                           grid % zn(grid % faces_n(j_nod,  s)))
           end do
           do j_nod = 1, 4
-            if(minval(dist(1:4)) .eq. dist(j_nod)) then
+            if(Math_Mod_Approx_Real(minval(dist(1:4)), dist(j_nod), PICO)) then
               grid % cells_n(i_nod + 4, c1) = grid % faces_n(j_nod, s)
             end if
           end do
@@ -563,7 +593,7 @@
                             grid % zn(grid % faces_n(j_nod,  s)))
             end do
             do j_nod = 1, 4
-              if(minval(dist(1:4)) .eq. dist(j_nod)) then
+              if(Math_Mod_Approx_Real(minval(dist(1:4)), dist(j_nod), PICO)) then
                 grid % cells_n(i_nod + 4, c2) = grid % faces_n(j_nod, s)
               end if
             end do
@@ -606,7 +636,7 @@
                           grid % zn(grid % faces_n(j_nod,  s)))
           end do
           do j_nod = 1, 3
-            if(minval(dist(1:3)) .eq. dist(j_nod)) then
+            if(Math_Mod_Approx_Real(minval(dist(1:3)), dist(j_nod), PICO)) then
               grid % cells_n(i_nod + 3, c1) = grid % faces_n(j_nod, s)
             end if
           end do
@@ -641,7 +671,7 @@
                             grid % zn(grid % faces_n(j_nod,  s)))
             end do
             do j_nod = 1, 3
-              if(minval(dist(1:3)) .eq. dist(j_nod)) then
+              if(Math_Mod_Approx_Real(minval(dist(1:3)), dist(j_nod), PICO)) then
                 grid % cells_n(i_nod + 3, c2) = grid % faces_n(j_nod, s)
               end if
             end do
@@ -738,11 +768,6 @@
   end do
 
   deallocate(cell_visited_from)
-
-  ! do c = 1, grid % n_cells
-  !   print '(120i6)', grid % cells_n_nodes(c),  &
-  !                    grid % cells_n(1:grid % cells_n_nodes(c), c)
-  ! end do
 
   close(fu)
 
