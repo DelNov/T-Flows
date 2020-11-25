@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Comm_Mod_Exchange_Log_Array(phi, length, dest)
+  subroutine Comm_Mod_Exchange_Log_Array(length, phi, dest)
 !------------------------------------------------------------------------------!
 !   Exchanges the values of a logical array between the processors.            !
 !   (Check out the Sendrecv variant of this function - it is more flexible ... !
@@ -7,8 +7,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  logical :: phi(length)
   integer :: length
+  logical :: phi(length)
   integer :: dest         ! destination processor
 !-----------------------------------[Locals]-----------------------------------!
   integer :: rtag, stag, error

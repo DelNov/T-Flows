@@ -15,9 +15,11 @@
   integer :: trans(3,2)
 !==============================================================================!
 
-  ! Why on Earth is this?
+  ! Setting coordinates to PETA here serves later as indicator if
+  ! coordinates this particular node has been calculated or not
+  ! (For example in Domain_Mod_Distribute_Nodes Domain_Mod_Laplace)
   do n = 1, grid % max_n_nodes
-    grid % xn(n) = HUGE
+    grid % xn(n) = PETA
   end do
 
   !------------------------------------!

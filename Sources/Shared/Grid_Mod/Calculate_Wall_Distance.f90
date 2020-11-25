@@ -32,7 +32,7 @@
   print *, '# for the listed wall boundary(s).                                 '
   print *, '#                                                                  '
   print *, '# This is needed for RANS and HYBRID turbulence models as well as  '
-  print *, '# for proper initialization with potentional field.                '
+  print *, '# for proper initialization with potential pressure-like field.    '
   print *, '#                                                                  '
   print *, '# Type skip to skip this and set wall distance to one everywhere.  '
   print *, '#------------------------------------------------------------------'

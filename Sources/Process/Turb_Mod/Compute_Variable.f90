@@ -147,8 +147,8 @@
     a12 = a0
     a21 = a0
 
-    a12 = a12  - min(flux(s), real(0.0)) * flow % density(c1)
-    a21 = a21  + max(flux(s), real(0.0)) * flow % density(c2)
+    a12 = a12  - min(flux(s), 0.0) * flow % density(c1)
+    a21 = a21  + max(flux(s), 0.0) * flow % density(c2)
 
     ! Fill the system matrix
     if(c2  > 0) then

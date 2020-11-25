@@ -11,7 +11,7 @@
   integer            :: new_funct =    0
   integer            :: old_funct =    0
 
-  character(SL) :: funct_name(MAX_FUNCT)
+  character(DL) :: funct_name(MAX_FUNCT)
   real          :: funct_time(MAX_FUNCT)  ! accumulated time
   real          :: time_prev, time_curr
 

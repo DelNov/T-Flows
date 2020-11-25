@@ -369,7 +369,7 @@
   call Refines_Mod_Allocate_Levels(ref, ref % n_levels)
 
   do l = 1, ref % n_levels
-    print *, 'Level: ', l
+    print *, '# Level: ', l
     call File_Mod_Read_Line(fu)
     read(line % tokens(2), *) ref % n_regions(l)
 
@@ -378,20 +378,23 @@
       call File_Mod_Read_Line(fu)
       read(line % tokens(3),*) answer
       call To_Upper_Case(answer)
-      ref % region(l,n,0) = -1
-      if(answer .eq. 'RECTANGLE') ref % region(l,n,0) = RECTANGLE
-      if(answer .eq. 'ELIPSOID')  ref % region(l,n,0) = ELIPSOID
-      if(answer .eq. 'PLANE')     ref % region(l,n,0) = PLANE
-      if(ref % region(l,n,0) .eq. -1) then
+      ref % region(l,n) % shape = -1
+      if(answer .eq. 'RECTANGLE') ref % region(l,n) % shape = RECTANGLE
+      if(answer .eq. 'ELIPSOID')  ref % region(l,n) % shape = ELIPSOID
+      if(answer .eq. 'PLANE')     ref % region(l,n) % shape = PLANE
+      if(ref % region(l,n) % shape .eq. -1) then
         print *, 'ERROR!  Refinement shape not specified well by: ', answer
         stop
       end if
 
       call File_Mod_Read_Line(fu)
-      read(line % whole, *)                                  &
-                ref % region(l,n,1), ref % region(l,n,2),    &
-                ref % region(l,n,3), ref % region(l,n,4),    &
-                ref % region(l,n,5), ref % region(l,n,6)
+      read(line % whole, *)                      &
+                ref % region(l,n) % pnt(1) % x,  &
+                ref % region(l,n) % pnt(1) % y,  &
+                ref % region(l,n) % pnt(1) % z,  &
+                ref % region(l,n) % pnt(2) % x,  &
+                ref % region(l,n) % pnt(2) % y,  &
+                ref % region(l,n) % pnt(2) % z
     end do
   end do
 

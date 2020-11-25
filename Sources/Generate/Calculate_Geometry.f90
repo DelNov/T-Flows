@@ -12,13 +12,12 @@
   type(Grid_Type)     :: grid
   logical, intent(in) :: real_run
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, c1, c2, m, n, s, n_per, nn, nf, c1o, c2o, so
+  integer :: c, c1, c2, m, n, s, n_per, nn, nf
   real    :: loc_x_node(4), loc_y_node(4), loc_z_node(4)
   real    :: x_cell_tmp, y_cell_tmp, z_cell_tmp
   real    :: xs2, ys2, zs2
   real    :: dsc1, dsc2          !  for the interpolation factors
   real    :: t, tot_surf
-  real    :: xc1, yc1, zc1, xc2, yc2, zc2
   integer :: f4n(6,4)
   integer :: f3n(4,3)
 !==============================================================================!
@@ -114,7 +113,7 @@
       grid % cells_n_nodes(c)=8
     end do
     do s = 1, grid % n_faces
-      grid % faces_n_nodes(s)=4 
+      grid % faces_n_nodes(s)=4
     end do
 
     !-----------------------------------------!
@@ -165,7 +164,7 @@
                            * (loc_y_node(3)+loc_y_node(4))  &
                            + (loc_x_node(1)-loc_x_node(4))  &
                            * (loc_y_node(4)+loc_y_node(1)) )
-      else if( grid % faces_n_nodes(s) .eq. 3 ) then 
+      else if( grid % faces_n_nodes(s) .eq. 3 ) then
         grid % sx(s)= 0.5 * ((loc_y_node(2)-loc_y_node(1))  &
                            * (loc_z_node(2)+loc_z_node(1))  &
                            + (loc_y_node(3)-loc_y_node(2))  &
@@ -190,18 +189,18 @@
       end if
 
       ! Barycenters
-      if(grid % faces_n_nodes(s) .eq. 4) then  
+      if(grid % faces_n_nodes(s) .eq. 4) then
         grid % xf(s) = (   loc_x_node(1)+loc_x_node(2)          &
                          + loc_x_node(3)+loc_x_node(4) ) / 4.0
         grid % yf(s) = (   loc_y_node(1)+loc_y_node(2)          &
                          + loc_y_node(3)+loc_y_node(4) ) / 4.0
         grid % zf(s) = (   loc_z_node(1)+loc_z_node(2)          &
                          + loc_z_node(3)+loc_z_node(4) ) / 4.0
-      else if(grid % faces_n_nodes(s) .eq. 3) then  
+      else if(grid % faces_n_nodes(s) .eq. 3) then
         grid % xf(s) = (loc_x_node(1)+loc_x_node(2)+loc_x_node(3)) / 3.0
         grid % yf(s) = (loc_y_node(1)+loc_y_node(2)+loc_y_node(3)) / 3.0
         grid % zf(s) = (loc_z_node(1)+loc_z_node(2)+loc_z_node(3)) / 3.0
-      end if 
+      end if
 
     end do ! through faces
 
@@ -237,7 +236,7 @@
     !---------------------------------------------!
     if(real_run) then
 
-      ! Initialize variables for grid periodicity      
+      ! Initialize variables for grid periodicity   
       n_per = 0
       grid % per_x = 0.0
       grid % per_y = 0.0
@@ -289,7 +288,7 @@
               grid % faces_n_nodes(nf) = nn
               grid % faces_n(1:nn, nf) = grid % cells_n(f4n(m,1:nn), c2)
 
-            else if(grid % faces_n_nodes(s) .eq. 3) then  
+            else if(grid % faces_n_nodes(s) .eq. 3) then
 
               ! Coordinates of the shadow face
               xs2 = ONE_THIRD * (grid % xn(grid % cells_n(f3n(m,1), c2))  &
@@ -367,13 +366,13 @@
 
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)   
+      c2 = grid % faces_c(2,s)
 
       do n = 1, grid % faces_n_nodes(s)  ! for quadrilateral an triangular faces
         loc_x_node(n) = grid % xn(grid % faces_n(n,s))
         loc_y_node(n) = grid % yn(grid % faces_n(n,s))
         loc_z_node(n) = grid % zn(grid % faces_n(n,s))
-      end do   
+      end do
 
       ! First cell
       x_cell_tmp = grid % xc(c1)

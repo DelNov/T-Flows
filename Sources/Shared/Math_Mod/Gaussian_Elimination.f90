@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Math_Mod_Gaussian_Elimination(a, b, x, n)
+  subroutine Math_Mod_Gaussian_Elimination(n, a, b, x)
 !------------------------------------------------------------------------------!
 !   Example of Gaussian elimination with scaled row pivoting                   !
 !                                                                              !
@@ -8,67 +8,68 @@
 !         D.R. Kincaid & E.W. Cheney                                           !
 !         Brooks/Cole Publ., 1990                                              !
 !         Section 4.3                                                          !
+!         https://web.ma.utexas.edu/CNA/cheney-kincaid/f90code/CHP07/gauss.f90 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  integer :: n
   real    :: a(n,n)
   real    :: b(n)
   real    :: x(n)
-  integer :: n
 !-----------------------------------[Locals]-----------------------------------!
   real,    allocatable :: s(:)
   integer, allocatable :: p(:)
-  real                 :: r, rmax, smax, pk, sum, z
-  integer              :: i, k, j
+  real                 :: r, rmax, smax, sum, z
+  integer              :: i, k, j, pk
 !==============================================================================!
 
   allocate(s(n))
   allocate(p(n))
 
-  do i=1,n
+  do i = 1, n
     p(i) = i
     smax = 0.0
-    do j=1,n
-      smax = max(smax,abs(a(i,j)))
+    do j = 1, n
+      smax = max(smax, abs(a(i,j)))
     end do
     s(i) = smax
   end do
 
-  do k=1,n-1
+  do k = 1, n-1
     rmax = 0.0
-    do i=k,n
-      r = abs(a(p(i),k))/s(p(i))
+    do i = k, n
+      r = abs(a(p(i),k)) / s(p(i))
       if (r .gt. rmax) then
         j = i
         rmax = r
       endif
     end do
 
-    pk = p(j)
+    pk   = p(j)
     p(j) = p(k)
     p(k) = pk
 
-    do i=k+1,n
-      z = a(p(i),k)/a(p(k),k)
+    do i = k+1, n
+      z = a(p(i),k) / a(p(k),k)
       a(p(i),k) = z
-      do j=k+1,n
-        a(p(i),j) = a(p(i),j) - z*a(p(k),j)
+      do j = k + 1, n
+        a(p(i),j) = a(p(i),j) - z * a(p(k),j)
       end do
     end do
   end do
 
-  do k=1,n-1
-    do i=k+1,n
-      b(p(i)) = b(p(i)) - a(p(i),k)*b(p(k))
+  do k = 1, n-1
+    do i = k + 1, n
+      b(p(i)) = b(p(i)) - a(p(i),k) * b(p(k))
     end do
   end do
 
-  do i=n,1,-1
+  do i = n, 1, -1
     sum = b(p(i))
-    do j=i+1,n
-      sum = sum - a(p(i),j)*x(j)
+    do j = i + 1, n
+      sum = sum - a(p(i),j) * x(j)
     end do
-    x(i) = sum/a(p(i),i)
+    x(i) = sum / a(p(i),i)
   end do
 
   deallocate(s)

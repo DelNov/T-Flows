@@ -8,7 +8,12 @@
 !   grid % faces_n       - nodes of each face                                  !
 !   grid % faces_c       - pair of cells surrounding each face                 !
 !                                                                              !
-!   Note: boundary faces have been determined in "Grid_Topology"               !
+!   Note 1: Boundary faces have been determined in "Grid_Topology".            !
+!   Note 2: This algorithm only works with conformal meshes made up of tetra-  !
+!           hedra, wedges, prisms and hexahedra.  Meshes with hanging nodes    !
+!           and/or polyhedral meshes are not supported.  That should not be    !
+!           a big deal though, since such meshes comes in formats which is     !
+!           already face-based, thus one will not need to find faces in them.  !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod
@@ -44,7 +49,7 @@
     if(grid % cells_n_nodes(c) .eq. 4) fn = neu_tet
     if(grid % cells_n_nodes(c) .eq. 5) fn = neu_pyr
     if(grid % cells_n_nodes(c) .eq. 6) fn = neu_wed
-    if(grid % cells_n_nodes(c) .eq. 8) fn = neu_hex 
+    if(grid % cells_n_nodes(c) .eq. 8) fn = neu_hex
     do j = 1, 6
       if(grid % cells_bnd_color(j,c) .eq. 0) then
 
@@ -122,10 +127,10 @@
             end do
 
             !-----------------------!
-            !   general + general   ! 
+            !   general + general   !
             !     c1        c2      !
             !-----------------------!
-            if(n_match > 2) then 
+            if(n_match > 2) then
               if(grid % cells_n_nodes(c1) .eq. 4) fn = neu_tet
               if(grid % cells_n_nodes(c1) .eq. 5) fn = neu_pyr
               if(grid % cells_n_nodes(c1) .eq. 6) fn = neu_wed

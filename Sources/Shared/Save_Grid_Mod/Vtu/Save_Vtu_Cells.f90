@@ -6,7 +6,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
-  integer         :: sub, n_nodes_sub, n_cells_sub, lev
+  integer         :: sub, n_nodes_sub, n_cells_sub
 !-----------------------------------[Locals]-----------------------------------!
   integer(SP)   :: data_size
   integer       :: c, n, data_offset, cell_offset, n_conns, fu

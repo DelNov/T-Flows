@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Refines_Mod_Connectivity(ref, grid, rrun)
+  subroutine Refines_Mod_Connectivity(ref, grid, real_run)
 !------------------------------------------------------------------------------!
 !   Determines the topology of the cells, faces and boundary cells.            !
 !------------------------------------------------------------------------------!
@@ -7,17 +7,18 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Refines_Type) :: ref
   type(Grid_Type)    :: grid
-  logical            :: rrun
+  logical            :: real_run
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, s
-  integer :: c1, c2, m, pass
-  integer :: lfn(6,4)
+  integer                 :: c, s
+  integer                 :: c1, c2, m, run
+  integer, dimension(6,4) :: lfn  ! link faces' nodes for a hexahedral cell
+                                  ! not quite the same as Gambit's neu numbering
 !==============================================================================!
 
-  data lfn / 1, 1, 2, 4, 3, 5,  &
-             2, 5, 6, 8, 7, 7,  &
-             4, 6, 8, 7, 5, 8,  &
-             3, 2, 4, 3, 1, 6  /
+  lfn = reshape( (/ 1, 1, 2, 4, 3, 5,  &
+                    2, 5, 6, 8, 7, 7,  &
+                    4, 6, 8, 7, 5, 8,  &
+                    3, 2, 4, 3, 1, 6  /), (/6, 4/) )
 
   print *, '# Now determining the topology. This may take a while !'
 
@@ -29,30 +30,30 @@
   grid % n_bnd_cells = 0
   do c = 1, grid % n_cells
     do m = 1, 24   ! neighbour cells
-      if(grid % cells_c(m,c)  < 0) then
-        grid % n_bnd_cells   = grid % n_bnd_cells + 1
+      if(grid % cells_c(m,c) < 0) then
+        grid % n_bnd_cells = grid % n_bnd_cells + 1
 
         ! Remember the boundary color, take positive value for color
         grid % bnd_cond % color(-grid % n_bnd_cells) =  -grid % cells_c(m,c)
 
         ! Put new boundary cell into place
-        grid % cells_c(m,c)  = -grid % n_bnd_cells
+        grid % cells_c(m,c) = -grid % n_bnd_cells
       end if
     end do
   end do
 
   !---------------------------!
-  !   Create the array with   ! 
+  !   Create the array with   !
   !   information on faces    !
   !---------------------------!
   grid % n_faces = 0     ! initialize the number of sides
-  do pass = 1, 2
+  do run = 1, 2
 
     do c1 = 1, grid % n_cells
       do m = 1, 24 ! through all the neighbouring cells
         c2 = grid % cells_c(m, c1)
-        if( (pass .eq. 1) .and. (c2 > c1)  .or.  &
-            (pass .eq. 2) .and. (c2 < 0) ) then
+        if( (run .eq. 1) .and. (c2 > c1)  .or.  &
+            (run .eq. 2) .and. (c2 < 0) ) then
           grid % n_faces = grid % n_faces + 1
 
           ! Which volumes are connected with side grid % n_faces
@@ -94,18 +95,18 @@
             grid % faces_n(2,grid % n_faces) = grid % cells_n( lfn(m,2), c1 )
             grid % faces_n(3,grid % n_faces) = grid % cells_n( lfn(m,3), c1 )
             grid % faces_n(4,grid % n_faces) = grid % cells_n( lfn(m,4), c1 )
-          end if 
+          end if
 
         end if
       end do   ! m
     end do     ! c1
-  end do       ! pass
+  end do       ! run
 
-  if(.not. rrun) then
+  if(.not. real_run) then
     grid % n_bnd_cells = 0
     do c = 1, grid % n_cells
       do m = 1, 24   ! neighbour cells
-        if(grid % cells_c(m,c)  < 0) then
+        if(grid % cells_c(m,c) < 0) then
           grid % n_bnd_cells   = grid % n_bnd_cells + 1
 
           ! Restore the boundary color, take positive value for color

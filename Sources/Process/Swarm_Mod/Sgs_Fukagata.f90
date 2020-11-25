@@ -7,21 +7,20 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Swarm_Type), target :: swarm
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type),    pointer :: flow
-  type(Grid_Type),     pointer :: grid
-  type(Turb_Type),     pointer :: turb
-  type(Var_Type),      pointer :: u, v, w
-  integer                      :: c, c2                 ! nearest cell
-  real                         :: r1, r2, zeta          ! random number
-  real                         :: sigma                 ! part vel. std. dev.
-  real                         :: f_fuka                ! Fukagata Brownian f.
-  real                         :: lambda, alpha, theta  ! for calc. of sigma
-  real                         :: c_o, c_eps            ! model constants
-  real                         :: k_sgs                 ! SGS kin
-  real                         :: eps_sgs               ! SGS eps
-  real                         :: t_sgs                 ! SGS time scale
-  real                         :: lf                    ! dynamic model l scale
-  real                         :: visc_const            ! const viscosity
+  type(Field_Type), pointer :: flow
+  type(Grid_Type),  pointer :: grid
+  type(Turb_Type),  pointer :: turb
+  type(Var_Type),   pointer :: u, v, w
+  integer                   :: c                     ! nearest cell
+  real                      :: r1, r2, zeta          ! random number
+  real                      :: sigma                 ! part vel. std. dev.
+  real                      :: lambda, alpha, theta  ! for calc. of sigma
+  real                      :: c_o, c_eps            ! model constants
+  real                      :: k_sgs                 ! SGS kin
+  real                      :: eps_sgs               ! SGS eps
+  real                      :: t_sgs                 ! SGS time scale
+  real                      :: lf                    ! dynamic model l scale
+  real                      :: visc_const            ! const viscosity
 !==============================================================================!
 
   ! Take aliases for flow

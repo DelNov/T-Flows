@@ -29,7 +29,7 @@
   turb => swarm % pnt_turb
 
   ! Particle time step (division of the global time step)
-  swarm % dt = flow % dt / swarm % n_sub_steps
+  swarm % dt = flow % dt / real(swarm % n_sub_steps)
 
   !------------------------!
   !   Fukagata SGS model   !

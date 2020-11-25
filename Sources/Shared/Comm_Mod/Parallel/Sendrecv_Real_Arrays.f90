@@ -1,15 +1,15 @@
 !==============================================================================!
-  subroutine Comm_Mod_Sendrecv_Real_Arrays(phi_s, len_s,  &
-                                           phi_r, len_r, dest)
+  subroutine Comm_Mod_Sendrecv_Real_Arrays(len_s, phi_s,  &
+                                           len_r, phi_r, dest)
 !------------------------------------------------------------------------------!
 !   Sends and receives values of two real arrays between the processors.       !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real    :: phi_s(len_s)  ! send buffer
   integer :: len_s         ! send length
-  real    :: phi_r(len_r)  ! receive buffer
+  real    :: phi_s(len_s)  ! send buffer
   integer :: len_r         ! receive length
+  real    :: phi_r(len_r)  ! receive buffer
   integer :: dest          ! destination processor
 !-----------------------------------[Locals]-----------------------------------!
   integer :: rtag, stag, error

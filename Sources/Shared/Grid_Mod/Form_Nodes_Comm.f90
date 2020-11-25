@@ -7,8 +7,8 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: b, c, c2, i_nod, n, s  ! counters
-  integer :: max_n_procs            ! max number of processors arround a node
+  integer :: c, i_nod, n  ! counters
+  integer :: max_n_procs  ! max number of processors arround a node
 
   integer              :: nu, sub, p, cnt
   integer, allocatable :: nodes_cons(:)

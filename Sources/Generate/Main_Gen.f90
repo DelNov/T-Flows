@@ -15,7 +15,7 @@
   type(Grid_Type)    :: grid      ! grid which will be generated
   type(Smooths_Type) :: smooths   ! smoothing regions
   type(Refines_Type) :: refines   ! refinement regions and levels
-  integer            :: c, s, n, lev
+  integer            :: c, s, n
 !==============================================================================!
 
   ! Open with a logo
@@ -38,10 +38,10 @@
   !   From this point on, domain   !
   !   should not be used anymore   !
   !--------------------------------!
-  call Refines_Mod_Connectivity(refines, grid, .false.)  ! trial run 
+  call Refines_Mod_Connectivity(refines, grid, .false.)  ! trial run
   call Calculate_Geometry      (grid,          .false.)
   call Smooths_Mod_Grid        (smooths, grid)
-  call Refines_Mod_Grid        (refines, grid)
+  call Refines_Mod_Mark_Cells  (refines, grid)
   call Refines_Mod_Connectivity(refines, grid, .true.)   ! real run
   call Calculate_Geometry      (grid,          .true.)
 

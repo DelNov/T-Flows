@@ -15,7 +15,8 @@
   type(Field_Type),    pointer :: flow
   type(Turb_Type),     pointer :: turb
   type(Particle_Type), pointer :: part
-  integer                      :: c, o, m, l
+  integer                      :: c, o, l
+  real                         :: m
 !==============================================================================!
 
   if(.not. swarm % statistics) return
@@ -46,21 +47,21 @@
       c = swarm % particle(k) % cell
 
       ! Current number of states (for swarm quantity averaging) 
-      m = swarm % n_states(c)
+      m = real(swarm % n_states(c))
 
       ! Mean velocities for swarm
-      swarm % u_mean(c) = (swarm % u_mean(c) * (1.*m) + part % u) / (1.*(m+1))
-      swarm % v_mean(c) = (swarm % v_mean(c) * (1.*m) + part % v) / (1.*(m+1))
-      swarm % w_mean(c) = (swarm % w_mean(c) * (1.*m) + part % w) / (1.*(m+1))
+      swarm % u_mean(c) = (swarm % u_mean(c) * m + part % u) / (m+1)
+      swarm % v_mean(c) = (swarm % v_mean(c) * m + part % v) / (m+1)
+      swarm % w_mean(c) = (swarm % w_mean(c) * m + part % w) / (m+1)
 
       ! Resolved Reynolds stresses
-      swarm % uu(c) = (swarm % uu(c)*(1.*m) + part % u * part % u) / (1.*(m+1))
-      swarm % vv(c) = (swarm % vv(c)*(1.*m) + part % v * part % v) / (1.*(m+1))
-      swarm % ww(c) = (swarm % ww(c)*(1.*m) + part % w * part % w) / (1.*(m+1))
+      swarm % uu(c) = (swarm % uu(c) * m + part % u * part % u) / (m+1)
+      swarm % vv(c) = (swarm % vv(c) * m + part % v * part % v) / (m+1)
+      swarm % ww(c) = (swarm % ww(c) * m + part % w * part % w) / (m+1)
 
-      swarm % uv(c) = (swarm % uv(c)*(1.*m) + part % u * part % v) / (1.*(m+1))
-      swarm % uw(c) = (swarm % uw(c)*(1.*m) + part % u * part % w) / (1.*(m+1))
-      swarm % vw(c) = (swarm % vw(c)*(1.*m) + part % v * part % w) / (1.*(m+1))
+      swarm % uv(c) = (swarm % uv(c) * m + part % u * part % v) / (m+1)
+      swarm % uw(c) = (swarm % uw(c) * m + part % u * part % w) / (m+1)
+      swarm % vw(c) = (swarm % vw(c) * m + part % v * part % w) / (m+1)
 
       ! Increase the number of states of the cell
       swarm % n_states(c) = swarm % n_states(c) + 1

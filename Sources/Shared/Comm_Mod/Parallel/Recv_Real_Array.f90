@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Comm_Mod_Recv_Real_Array(phi_r, len_r, dest)
+  subroutine Comm_Mod_Recv_Real_Array(len_r, phi_r, dest)
 !------------------------------------------------------------------------------!
 !   Receives a real array from processor dest.                                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real    :: phi_r(len_r)  ! receive buffer
   integer :: len_r         ! receive length
+  real    :: phi_r(len_r)  ! receive buffer
   integer :: dest          ! destination processor
 !-----------------------------------[Locals]-----------------------------------!
   integer :: rtag, error

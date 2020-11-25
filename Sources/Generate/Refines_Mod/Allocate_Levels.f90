@@ -10,6 +10,6 @@
   ref % n_levels  = nl
 
   allocate(ref % n_regions(nl))
-  allocate(ref % region(nl, 1024, 0:6))
+  allocate(ref % region(nl, MAX_SHAPES))
 
   end subroutine

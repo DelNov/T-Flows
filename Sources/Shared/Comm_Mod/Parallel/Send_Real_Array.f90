@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Comm_Mod_Send_Real_Array(phi_s, len_s, dest)
+  subroutine Comm_Mod_Send_Real_Array(len_s, phi_s, dest)
 !------------------------------------------------------------------------------!
 !   Sends a real array to processor dest.                                      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real    :: phi_s(len_s)  ! send buffer
   integer :: len_s         ! send length
+  real    :: phi_s(len_s)  ! send buffer
   integer :: dest          ! destination processor
 !-----------------------------------[Locals]-----------------------------------!
   integer :: stag, error

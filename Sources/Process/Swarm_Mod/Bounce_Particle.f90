@@ -83,12 +83,12 @@
       do bs = 1, 16
 
         ! Move the particle back
-        part_x_n = part % x_n - swarm % dt * part % u * bs
-        part_y_n = part % y_n - swarm % dt * part % v * bs
-        part_z_n = part % z_n - swarm % dt * part % w * bs
-        part_x_o = part % x_o - swarm % dt * part % u * bs
-        part_y_o = part % y_o - swarm % dt * part % v * bs
-        part_z_o = part % z_o - swarm % dt * part % w * bs
+        part_x_n = part % x_n - swarm % dt * part % u * real(bs)
+        part_y_n = part % y_n - swarm % dt * part % v * real(bs)
+        part_z_n = part % z_n - swarm % dt * part % w * real(bs)
+        part_x_o = part % x_o - swarm % dt * part % u * real(bs)
+        part_y_o = part % y_o - swarm % dt * part % v * real(bs)
+        part_z_o = part % z_o - swarm % dt * part % w * real(bs)
 
         ! Vector connecting particle with boundary face center; new and old
         vec_new_face_dot_n = (part_x_n - grid % xf(s)) * nx  &

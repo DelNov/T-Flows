@@ -6,7 +6,7 @@
   integer            :: f
   real               :: total_time, t_temp
   integer            :: hours, minutes, seconds
-  character(len=160) :: line, n_temp
+  character(DL)      :: line, n_temp
   integer, parameter :: I=33                ! indent
   logical            :: swap
 !==============================================================================!

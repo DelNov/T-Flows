@@ -132,19 +132,19 @@
   end do
 
   ! Do the actual sorting
-  call Sort_Mod_Real_By_Index(grid % sx(1), new_f(1), grid % n_faces)
-  call Sort_Mod_Real_By_Index(grid % sy(1), new_f(1), grid % n_faces)
-  call Sort_Mod_Real_By_Index(grid % sz(1), new_f(1), grid % n_faces)
-  call Sort_Mod_Real_By_Index(grid % dx(1), new_f(1), grid % n_faces)
-  call Sort_Mod_Real_By_Index(grid % dy(1), new_f(1), grid % n_faces)
-  call Sort_Mod_Real_By_Index(grid % dz(1), new_f(1), grid % n_faces)
-  call Sort_Mod_Real_By_Index(grid % f (1), new_f(1), grid % n_faces)
-  call Sort_Mod_Real_By_Index(grid % xf(1), new_f(1), grid % n_faces)
-  call Sort_Mod_Real_By_Index(grid % yf(1), new_f(1), grid % n_faces)
-  call Sort_Mod_Real_By_Index(grid % zf(1), new_f(1), grid % n_faces)
-  call Sort_Mod_Real_By_Index(grid % xr(1), new_f(1), grid % n_faces)
-  call Sort_Mod_Real_By_Index(grid % yr(1), new_f(1), grid % n_faces)
-  call Sort_Mod_Real_By_Index(grid % zr(1), new_f(1), grid % n_faces)
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % sx(1), new_f(1))
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % sy(1), new_f(1))
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % sz(1), new_f(1))
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % dx(1), new_f(1))
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % dy(1), new_f(1))
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % dz(1), new_f(1))
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % f (1), new_f(1))
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % xf(1), new_f(1))
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % yf(1), new_f(1))
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % zf(1), new_f(1))
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % xr(1), new_f(1))
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % yr(1), new_f(1))
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % zr(1), new_f(1))
 
   ! Correct shadow faces
   do s = grid % n_faces + 1, grid % n_faces + grid % n_shadows

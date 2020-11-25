@@ -46,9 +46,9 @@
   call Comm_Mod_Global_Max_Real(max_cfl)
   call Comm_Mod_Global_Max_Real(max_re)
   call Comm_Mod_Global_Max_Real(max_st)
-  avg_cfl = avg_cfl / swarm % n_particles
-  avg_re  = avg_re  / swarm % n_particles
-  avg_st  = avg_st  / swarm % n_particles
+  avg_cfl = avg_cfl / real(swarm % n_particles)
+  avg_re  = avg_re  / real(swarm % n_particles)
+  avg_st  = avg_st  / real(swarm % n_particles)
 
   n_dep = 0
   n_esc = 0

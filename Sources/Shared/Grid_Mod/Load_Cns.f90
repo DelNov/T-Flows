@@ -9,7 +9,7 @@
   integer           :: this_proc  ! needed if called from Processor
   integer, optional :: domain
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: c, n, s, lev, fu
+  integer       :: c, n, s, fu
   character(SL) :: name_in
 !==============================================================================!
 

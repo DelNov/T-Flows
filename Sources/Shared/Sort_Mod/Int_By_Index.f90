@@ -1,16 +1,16 @@
 !==============================================================================!
-  subroutine Sort_Mod_Int_By_Index(x, indx, n)
+  subroutine Sort_Mod_Int_By_Index(n, x, indx)
 !------------------------------------------------------------------------------!
 !   Sorts integer array x according to indx.                                   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  integer :: n
   integer :: x(n)
   integer :: indx(n)
-  integer :: n
 !-----------------------------------[Locals]-----------------------------------!
-  integer             :: i
-  integer,allocatable :: work(:)
+  integer              :: i
+  integer, allocatable :: work(:)
 !==============================================================================!
 
   allocate(work(n)); work = 0

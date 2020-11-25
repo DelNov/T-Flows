@@ -99,8 +99,8 @@
           end if
         end do
         print *, '# PANIC: Particle ', k, ' lost in transfer!'
-        print *, '# This might be because the mesh is too coarse or no. of sub &
-                    timesteps is too small'
+        print *, '# This might be because the mesh is too coarse or ' // &
+                 'number of sub timesteps is too small'
         print *, '# Particle''s global cell number is ', swarm % i_work(i + 5)
 1       continue
 

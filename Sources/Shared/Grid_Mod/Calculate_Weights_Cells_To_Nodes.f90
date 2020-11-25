@@ -8,11 +8,12 @@
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c, n, i_cell
-  logical :: here
   real    :: lx, ly, lz, rx, ry, rz, lambda_x, lambda_y, lambda_z
   real    :: ixx, iyy, izz, ixz, iyz, ixy, d
   real    :: a11, a12, a13, a21, a22, a23, a31, a32, a33
-  real    :: tot, weights_sorted(64)
+  real    :: tot
+  ! Debugging: logical :: here
+  ! Debugging: real    :: weights_sorted(64)
 !==============================================================================!
 
   ! Allocate memory
@@ -132,23 +133,23 @@
 
   end do
 
-! ! Debugging
-! write(200 + this_proc, '(a)')  'List of nodes with their cells weights'
-! do n = 1, grid % n_nodes
-!   here = .false.
-!   do i_cell = 1, grid % nodes_n_cells(n)
-!     c = grid % nodes_c(i_cell, n)
-!     if(grid % comm % cell_proc(c) .eq. this_proc) here = .true.
-!   end do
-!   if(here) then
-!     weights_sorted(1:grid % nodes_n_cells(n)) =  &
-!     grid % weight_c2n(1:grid % nodes_n_cells(n), n)
-!     call Sort_Mod_Real(weights_sorted(1:grid % nodes_n_cells(n)))
-!     write(200 + this_proc, '(i7.7, i3, 99f7.4)')  &
-!                 grid % comm % node_glo(n),        &
-!                 grid % nodes_n_cells(n),          &
-!                 weights_sorted(1:grid % nodes_n_cells(n))
-!   end if
-! end do
+  ! Debugging
+  ! write(200 + this_proc, '(a)')  'List of nodes with their cells weights'
+  ! do n = 1, grid % n_nodes
+  !   here = .false.
+  !   do i_cell = 1, grid % nodes_n_cells(n)
+  !     c = grid % nodes_c(i_cell, n)
+  !     if(grid % comm % cell_proc(c) .eq. this_proc) here = .true.
+  !   end do
+  !   if(here) then
+  !     weights_sorted(1:grid % nodes_n_cells(n)) =  &
+  !     grid % weight_c2n(1:grid % nodes_n_cells(n), n)
+  !     call Sort_Mod_Real(weights_sorted(1:grid % nodes_n_cells(n)))
+  !     write(200 + this_proc, '(i7.7, i3, 99f7.4)')  &
+  !                 grid % comm % node_glo(n),        &
+  !                 grid % nodes_n_cells(n),          &
+  !                 weights_sorted(1:grid % nodes_n_cells(n))
+  !   end if
+  ! end do
 
   end subroutine

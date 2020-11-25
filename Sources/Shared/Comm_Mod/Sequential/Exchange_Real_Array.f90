@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Comm_Mod_Exchange_Real_Array(phi, length, dest)
+  subroutine Comm_Mod_Exchange_Real_Array(length, phi, dest)
 !------------------------------------------------------------------------------!
 !   Dummy function for sequential compilation.                                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real    :: phi(length)
   integer :: length
+  real    :: phi(length)
   integer :: dest         ! destination processor
 !==============================================================================!
 

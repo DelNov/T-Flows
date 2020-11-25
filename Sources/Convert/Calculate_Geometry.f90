@@ -800,15 +800,15 @@
   !                                  !
   !----------------------------------!
   call Grid_Mod_Sort_Faces_By_Index(grid, grid % new_f, grid % n_faces)
-  call Sort_Mod_Real_By_Index(grid % xf, grid % new_f,  grid % n_faces)
-  call Sort_Mod_Real_By_Index(grid % yf, grid % new_f,  grid % n_faces)
-  call Sort_Mod_Real_By_Index(grid % zf, grid % new_f,  grid % n_faces)
-  call Sort_Mod_Real_By_Index(grid % sx, grid % new_f,  grid % n_faces)
-  call Sort_Mod_Real_By_Index(grid % sy, grid % new_f,  grid % n_faces)
-  call Sort_Mod_Real_By_Index(grid % sz, grid % new_f,  grid % n_faces)
-  call Sort_Mod_Real_By_Index(grid % dx, grid % new_f,  grid % n_faces)
-  call Sort_Mod_Real_By_Index(grid % dy, grid % new_f,  grid % n_faces)
-  call Sort_Mod_Real_By_Index(grid % dz, grid % new_f,  grid % n_faces)
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % xf, grid % new_f)
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % yf, grid % new_f)
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % zf, grid % new_f)
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % sx, grid % new_f)
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % sy, grid % new_f)
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % sz, grid % new_f)
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % dx, grid % new_f)
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % dy, grid % new_f)
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % dz, grid % new_f)
 
   grid % n_faces = grid % n_faces - n_per
 

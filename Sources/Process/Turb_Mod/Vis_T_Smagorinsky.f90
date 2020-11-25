@@ -18,7 +18,7 @@
   real                      :: nx, ny, nz
   real                      :: cs, lf, u_tau_l, u_f, nc2
   real                      :: u_tan, a_pow, b_pow, nu, dely
-  real                      :: beta, pr, sc, ebf, u_plus, pr_t
+  real                      :: beta, pr, ebf, u_plus, pr_t
 !==============================================================================!
 
   ! Take aliases

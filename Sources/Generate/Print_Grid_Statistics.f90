@@ -27,19 +27,20 @@
 2 format (a28, i8)
 
   ! Find the number of non zero entries
-  nonz=0
+  nonz = 0
   do i = 1,grid % n_cells
-    stencw=1            ! it used to be zero
-    do j=1,24
-      if( grid % cells_c(j,i) > 0 ) stencw=stencw + 1
+    stencw = 1            ! it used to be zero
+    do j = 1, 24
+      if( grid % cells_c(j,i) > 0 ) stencw = stencw + 1
     end do
     nonz = nonz + stencw
   end do
 
-  print 3, '# Number of non zero matrix entries:', nonz
-  print 4, '# Average stencil size             :', real(nonz) / grid % n_cells
-  print 3, '# Max number of nodes and cells    :', grid % max_n_nodes
-  print 3, '# Max number of boundary cells     :', grid % max_n_bnd_cells
+  print 3, '# Number of non zero matrix entries:',   nonz
+  print 4, '# Average stencil size             :',   real(nonz)  &
+                                                   / real(grid % n_cells)
+  print 3, '# Max number of nodes and cells    :',   grid % max_n_nodes
+  print 3, '# Max number of boundary cells     :',   grid % max_n_bnd_cells
   print 5, '#------------------------------------------------'
 3 format (a37, i8)
 4 format (a37, f8.3)

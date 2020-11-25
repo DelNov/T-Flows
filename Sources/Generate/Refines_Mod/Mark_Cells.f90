@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Refines_Mod_Grid(ref, grid)
+  subroutine Refines_Mod_Mark_Cells(ref, grid)
 !------------------------------------------------------------------------------!
 !   Mark the region of the domain for local refinement and refine the grid!    !
 !------------------------------------------------------------------------------!
@@ -19,12 +19,12 @@
 
     do reg = 1, ref % n_regions(lev) 
 
-      x1 = ref % region(lev,reg,1)
-      y1 = ref % region(lev,reg,2)
-      z1 = ref % region(lev,reg,3)
-      x8 = ref % region(lev,reg,4)
-      y8 = ref % region(lev,reg,5)
-      z8 = ref % region(lev,reg,6)
+      x1 = ref % region(lev,reg) % pnt(1) % x
+      y1 = ref % region(lev,reg) % pnt(1) % y
+      z1 = ref % region(lev,reg) % pnt(1) % z
+      x8 = ref % region(lev,reg) % pnt(2) % x
+      y8 = ref % region(lev,reg) % pnt(2) % y
+      z8 = ref % region(lev,reg) % pnt(2) % z
 
       do c = 1, grid % n_cells
         n1 = grid % cells_n(1,c)
@@ -49,19 +49,19 @@
                     grid % zn(n5) + grid % zn(n6) +   &
                     grid % zn(n7) + grid % zn(n8))
 
-        if(ref % region(lev,reg,0) .eq. ELIPSOID) then
+        if(ref % region(lev,reg) % shape .eq. ELIPSOID) then
           if(  ( ((x1-x0)/x8)**2 +                                  &
                  ((y1-y0)/y8)**2 +                                  &
                  ((z1-z0)/z8)**2)  < 1.0 ) then
             ref % cell_marked(c) = .true.
           end if
-        else if(ref % region(lev,reg,0) .eq. RECTANGLE) then 
+        else if(ref % region(lev,reg) % shape .eq. RECTANGLE) then
           if( (x1 < x0) .and. (x0 < x8) .and.                     &
               (y1 < y0) .and. (y0 < y8) .and.                     &
               (z1 < z0) .and. (z0 < z8) ) then
             ref % cell_marked(c) = .true.
           end if
-        else if(ref % region(lev,reg,0) .eq. PLANE) then 
+        else if(ref % region(lev,reg) % shape .eq. PLANE) then
           if( (x0-x1)*x8+(y0-y1)*y8+(z0-z1)*z8   >  0.0 ) then
             ref % cell_marked(c) = .true.
           end if
@@ -70,7 +70,7 @@
 
     end do   ! reg
 
-    call Refines_Mod_Marked_Cells(ref, grid, lev)
+    call Refines_Mod_Refine_Marked_Cells(ref, grid, lev)
 
     ref % cell_marked(:) = .false.
 

@@ -25,8 +25,8 @@
     length = grid % comm % nodes_repl(sub) % n_items
     if( length > 0 ) then
       call Comm_Mod_Exchange_Real_Array(            &
-        grid % comm % nodes_repl(sub) % r_buff(1),  &  ! array to be exchanged
         length,                                     &  ! array's length
+        grid % comm % nodes_repl(sub) % r_buff(1),  &  ! array to be exchanged
         sub)                                           ! destination processor
     end if
   end do

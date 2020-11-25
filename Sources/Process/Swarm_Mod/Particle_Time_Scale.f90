@@ -39,17 +39,17 @@
   ! Correcting n_sup_steps (if the value in control file is small)
   if(t_ratio2 .ge. 1.0) then
     if(t_ratio1 .le. 1.0) then
-      swarm % dt = flow % dt / swarm % n_sub_steps
+      swarm % dt = flow % dt / real(swarm % n_sub_steps)
     else
       swarm % n_sub_steps = ceiling(t_ratio1)
-      swarm % dt = flow % dt / swarm % n_sub_steps
+      swarm % dt = flow % dt / real(swarm % n_sub_steps)
     end if
   else
     if(t_ratio3 .le. 1.0) then
       swarm % n_sub_steps = ceiling(t_ratio3)
       swarm % dt = t_scale_max
     else
-      swarm % dt = flow % dt / swarm % n_sub_steps
+      swarm % dt = flow % dt / real(swarm % n_sub_steps)
     end if
   end if
 

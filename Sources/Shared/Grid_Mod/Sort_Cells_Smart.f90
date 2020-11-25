@@ -82,9 +82,9 @@
     grid % cells_n_nodes(new_c(c)) = i_work_1(c)
     grid % cells_n(1:8, new_c(c))  = i_work_2(1:8, c)
   end do
-  call Sort_Mod_Real_By_Index(grid % xc   (1), new_c(1), grid % n_cells)
-  call Sort_Mod_Real_By_Index(grid % yc   (1), new_c(1), grid % n_cells)
-  call Sort_Mod_Real_By_Index(grid % zc   (1), new_c(1), grid % n_cells)
-  call Sort_Mod_Real_By_Index(grid % vol  (1), new_c(1), grid % n_cells)
+  call Sort_Mod_Real_By_Index(grid % n_cells, grid % xc (1), new_c(1))
+  call Sort_Mod_Real_By_Index(grid % n_cells, grid % yc (1), new_c(1))
+  call Sort_Mod_Real_By_Index(grid % n_cells, grid % zc (1), new_c(1))
+  call Sort_Mod_Real_By_Index(grid % n_cells, grid % vol(1), new_c(1))
 
   end subroutine

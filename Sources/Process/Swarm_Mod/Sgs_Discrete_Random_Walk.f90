@@ -7,7 +7,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Swarm_Type), target :: swarm
-  integer                  :: k 
+  integer                  :: k
   real                     :: rx
   real                     :: ry
   real                     :: rz
@@ -19,7 +19,7 @@
   integer,             pointer :: time
   integer :: c                          ! nearest cell
   logical :: flag1, flag2, flag3        ! flags for sigma
-  real    :: cd                         ! drag coefficient 
+  real    :: cd                         ! drag coefficient
   real    :: r1, r2, r3, r4             ! Gaussian randdom numbers
   real    :: l1, l2, l3                 ! length scales
   real    :: zeta1, zeta2, zeta3        ! random numbers (0,1)
@@ -145,13 +145,13 @@
   sigma2 = 0.0
   sigma3 = 0.0
   if(r1 .ge. TINY .and. r2 .ge. TINY .and. r3 .ge. TINY) then
-    if(time .ge. t_i_x) then 
+    if(time .ge. t_i_x) then
       sigma1 = sqrt(-2.0 * log(r1)) * cos(2.0 * PI * r4)
       flag1  = .true.
-    else if(time .ge. t_i_y) then 
+    else if(time .ge. t_i_y) then
       sigma2 = sqrt(-2.0 * log(r2)) * cos(2.0 * PI * r4)
       flag2  = .true.
-    else if(time .ge. t_i_z) then 
+    else if(time .ge. t_i_z) then
       sigma3 = sqrt(-2.0 * log(r3)) * cos(2.0 * PI * r4)
       flag3  = .true.
     end if

@@ -7,10 +7,9 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: sub, i_nod, j_nod, ms, mr, n, ni, nj, sh
-  character(SL) :: name_in
-  integer       :: c, c1, c2, s, n_buff_faces
-  real          :: xi, yi, zi, xj, yj, zj
+  integer :: sub, i_nod, j_nod, ms, mr, n, ni, nj, sh
+  integer :: c, c1, c2, s, n_buff_faces
+  real    :: xi, yi, zi, xj, yj, zj
 !==============================================================================!
 
   if(n_proc < 2) return

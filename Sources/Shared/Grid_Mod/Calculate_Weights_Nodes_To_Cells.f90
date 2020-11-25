@@ -11,7 +11,8 @@
   real    :: lx, ly, lz, rx, ry, rz, lambda_x, lambda_y, lambda_z
   real    :: ixx, iyy, izz, ixz, iyz, ixy, d
   real    :: a11, a12, a13, a21, a22, a23, a31, a32, a33
-  real    :: tot, weights_sorted(64)
+  real    :: tot
+  ! Debugging: real    :: weights_sorted(64)
 !==============================================================================!
 
   ! Allocate memory
@@ -92,16 +93,16 @@
 
   end do
 
-! ! Debugging
-! write(100 + this_proc, '(a)')  'List of cells with their nodes weights'
-! do c = 1, grid % n_cells - grid % comm % n_buff_cells
-!   weights_sorted(1:grid % cells_n_nodes(c)) =  &
-!   grid % weight_n2c(1:grid % cells_n_nodes(c), c)
-!   call Sort_Mod_Real(weights_sorted(1:grid % cells_n_nodes(c)))
-!   write(100 + this_proc, '(i7.7, i3, 99f7.4)')  &
-!               grid % comm % cell_glo(c),        &
-!               grid % cells_n_nodes(c),          &
-!               weights_sorted(1:grid % cells_n_nodes(c))
-! end do
+  ! Debugging
+  ! write(100 + this_proc, '(a)')  'List of cells with their nodes weights'
+  ! do c = 1, grid % n_cells - grid % comm % n_buff_cells
+  !   weights_sorted(1:grid % cells_n_nodes(c)) =  &
+  !   grid % weight_n2c(1:grid % cells_n_nodes(c), c)
+  !   call Sort_Mod_Real(weights_sorted(1:grid % cells_n_nodes(c)))
+  !   write(100 + this_proc, '(i7.7, i3, 99f7.4)')  &
+  !               grid % comm % cell_glo(c),        &
+  !               grid % cells_n_nodes(c),          &
+  !               weights_sorted(1:grid % cells_n_nodes(c))
+  ! end do
 
   end subroutine

@@ -26,10 +26,10 @@
     len_r = grid % comm % cells_recv(sub) % n_items
     if(len_s + len_r > 0) then
       call Comm_Mod_Sendrecv_Log_Arrays(            &
-        grid % comm % cells_send(sub) % l_buff(1),  &  ! array to be sent
         len_s,                                      &  ! sending length
-        grid % comm % cells_recv(sub) % l_buff(1),  &  ! array to be received
+        grid % comm % cells_send(sub) % l_buff(1),  &  ! array to be sent
         len_r,                                      &  ! receiving length
+        grid % comm % cells_recv(sub) % l_buff(1),  &  ! array to be received
         sub)                                           ! destination processor
     end if
   end do

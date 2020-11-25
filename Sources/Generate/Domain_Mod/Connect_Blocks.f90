@@ -15,7 +15,7 @@
   integer :: l11,l12,l13,l14,l21,l22,l23,l24 ! local  node numbers
   integer :: g1, g2, g3, g4                  ! generic points
   integer :: i1, j1, i2, j2, k1, k2          ! directions in dom % blocks
-  integer :: ig, jg, nig, njg                ! generic plane 
+  integer :: ig, jg, nig, njg                ! generic plane
   integer :: ci1, cj1, ck1, ci2, cj2, ck2    ! resolution of dom % blocks
   integer :: c1, c2                          ! cells from block 1, 2
   integer :: ni1, nj1, nk1, ni2, nj2, nk2    ! resolution of dom % blocks
@@ -30,12 +30,12 @@
   end do
 
   ! If number of dom % blocks is equal to one, there is nothing to do
-  if(size(dom % blocks) .eq. 1) return 
+  if(size(dom % blocks) .eq. 1) return
 
   ! Initialize the number of deleted nodes
   del=0
 
-  ni1=0; nj1=0; nk1=0; ni2=0; nj2=0; nk2=0 
+  ni1=0; nj1=0; nk1=0; ni2=0; nj2=0; nk2=0
 
   !-----------------------------------------------------!
   !   Search through all block and all of their faces   !
@@ -45,7 +45,7 @@
       do f2 = 1, 6    ! faces of the second block
         do f1 = 1, 6  ! faces of the first block
 
-          ! Initialize the transformation matrixes             
+          ! Initialize the transformation matrixes
           do i=1,3
             do j=1,3
               trans1(i,j)=0
@@ -56,13 +56,13 @@
           n11 = dom % blocks(b1) % faces(f1, 1)
           n12 = dom % blocks(b1) % faces(f1, 2)
           n13 = dom % blocks(b1) % faces(f1, 3)
-          n14 = dom % blocks(b1) % faces(f1, 4) 
+          n14 = dom % blocks(b1) % faces(f1, 4)
           n21 = dom % blocks(b2) % faces(f2, 1)
           n22 = dom % blocks(b2) % faces(f2, 2)
           n23 = dom % blocks(b2) % faces(f2, 3)
           n24 = dom % blocks(b2) % faces(f2, 4)
 
-          ! Check if they are connected 
+          ! Check if they are connected
           if( ((n11 .eq. n21).and.(n13 .eq. n23)) .or.  &
               ((n11 .eq. n24).and.(n13 .eq. n22)) .or.  &
               ((n11 .eq. n23).and.(n13 .eq. n21)) .or.  &
@@ -93,25 +93,25 @@
             elseif((l14-l11) .eq. +2) then
               nig = dom % blocks(b1) % resolutions(2)       ! nj from block 1
               trans1(2,2)=+1
-            elseif((l14-l11) .eq. +4) then 
+            elseif((l14-l11) .eq. +4) then
               nig = dom % blocks(b1) % resolutions(3)       ! nk from block 1
               trans1(3,2)=+1
-            elseif((l14-l11) .eq. -1) then 
+            elseif((l14-l11) .eq. -1) then
               nig = dom % blocks(b1) % resolutions(1)       ! ni from block 1
               trans1(1,1)=nig
               trans1(1,2)=-1
-            elseif((l14-l11) .eq. -2) then 
+            elseif((l14-l11) .eq. -2) then
               nig = dom % blocks(b1) % resolutions(2)       ! nj from block 1
               trans1(2,1)=nig
               trans1(2,2)=-1
-            elseif((l14-l11) .eq. -4) then 
+            elseif((l14-l11) .eq. -4) then
               nig = dom % blocks(b1) % resolutions(3)       ! nk from block 1
               trans1(3,1)=nig
               trans1(3,2)=-1
             end if
 
-            ! Direction jg, block 1 
-            if((l12-l11) .eq. +1) then 
+            ! Direction jg, block 1
+            if((l12-l11) .eq. +1) then
               njg = dom % blocks(b1) % resolutions(1)       ! ni from block 1
               trans1(1,3)=+1
             elseif((l12-l11) .eq. +2) then
@@ -141,25 +141,25 @@
             elseif((l24-l21) .eq. +2) then
               nig = dom % blocks(b2) % resolutions(2)       ! nj from block 2
               trans2(2,2)=+1
-            elseif((l24-l21) .eq. +4) then 
+            elseif((l24-l21) .eq. +4) then
               nig = dom % blocks(b2) % resolutions(3)       ! nk from block 2
               trans2(3,2)=+1
-            elseif((l24-l21) .eq. -1) then 
+            elseif((l24-l21) .eq. -1) then
               nig = dom % blocks(b2) % resolutions(1)       ! ni from block 2
               trans2(1,1)=nig
               trans2(1,2)=-1
-            elseif((l24-l21) .eq. -2) then 
+            elseif((l24-l21) .eq. -2) then
               nig = dom % blocks(b2) % resolutions(2)       ! nj from block 2
               trans2(2,1)=nig
               trans2(2,2)=-1
-            elseif((l24-l21) .eq. -4) then 
+            elseif((l24-l21) .eq. -4) then
               nig = dom % blocks(b2) % resolutions(3)       ! nk from block 2
               trans2(3,1)=nig
               trans2(3,2)=-1
             end if
 
-            ! Direction jg, block 2 
-            if((l22-l21) .eq. +1) then 
+            ! Direction jg, block 2
+            if((l22-l21) .eq. +1) then
               njg = dom % blocks(b2) % resolutions(1)       ! ni from block 2
               trans2(1,3)=+1
             elseif((l22-l21) .eq. +2) then
@@ -208,7 +208,7 @@
                 ck2=dom % blocks(b2) % resolutions(3)-1
                 i1 = trans1(1,1) + trans1(1,2)*ig + trans1(1,3)*jg
                 j1 = trans1(2,1) + trans1(2,2)*ig + trans1(2,3)*jg
-                k1 = trans1(3,1) + trans1(3,2)*ig + trans1(3,3)*jg 
+                k1 = trans1(3,1) + trans1(3,2)*ig + trans1(3,3)*jg
                 i2 = trans2(1,1) + trans2(1,2)*ig + trans2(1,3)*jg
                 j2 = trans2(2,1) + trans2(2,2)*ig + trans2(2,3)*jg
                 k2 = trans2(3,1) + trans2(3,2)*ig + trans2(3,3)*jg
@@ -229,8 +229,8 @@
             if(trans2(2,1)  > 1) trans2(2,1)=trans2(2,1)+1
             if(trans2(3,1)  > 1) trans2(3,1)=trans2(3,1)+1
 
-            ! Conect the nodes 
-            do jg=1,njg                ! through nodes 
+            ! Conect the nodes
+            do jg=1,njg                ! through nodes
               do ig=1,nig              ! through nodes
                 ni1=dom % blocks(b1) % resolutions(1)
                 nj1=dom % blocks(b1) % resolutions(2)
@@ -252,7 +252,7 @@
               end do
             end do
 
-          end if  ! are they connected ? 
+          end if  ! are they connected ?
 
         end do    ! f1
       end do      ! f2
@@ -263,10 +263,9 @@
            dom % blocks(b2) % n_nodes + ni2*nj2*nk2
       if(grid % new_n(n) .ne. n) del = del + 1
       if(grid % new_n(n) .eq. n) grid % new_n(n) = grid % new_n(n) - del
-    end do 
+    end do
 
-  end do          ! b2 
-
+  end do          ! b2
 
   do n = 1, grid % n_nodes
     grid % xn(grid % new_n(n)) = grid % xn(n)
