@@ -10,7 +10,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: fn(6,4), j, n1, n2, c1, c2, bc
+  integer              :: fn(6,4), i_fac, i_nod, c1, c2, bc
   integer              :: n_match
   integer              :: n_bnd_proj   ! bnd. cells projected from cells
   integer              :: n_face_nodes ! number of nodes in a face
@@ -47,8 +47,8 @@
     ! Mark boundary nodes in this section
     do c2 = -grid % n_bnd_cells, -1
       if( grid % bnd_cond % color(c2) .eq. bc ) then
-        do n2 = 1, grid % cells_n_nodes(c2)  ! 3 or 4
-          is_node_bnd( grid % cells_n(n2, c2) ) = .true.
+        do i_nod = 1, grid % cells_n_nodes(c2)  ! 3 or 4
+          is_node_bnd( grid % cells_n(i_nod, c2) ) = .true.
         end do
       end if
     end do
@@ -67,29 +67,29 @@
       if(grid % cells_n_nodes(c1) .eq. 6) n_cell_faces = 5
 
       ! Browse through all possible faces
-      do j = 1, n_cell_faces
+      do i_fac = 1, n_cell_faces
         n_match = 0
 
         n_face_nodes = 4         ! assume it is a quad
-        if( fn(j, 4) < 0 ) then  ! nope, it was a triangle
+        if( fn(i_fac, 4) < 0 ) then  ! nope, it was a triangle
           n_face_nodes = 3
         end if
 
-        do n1 = 1, n_face_nodes
-          if(fn(j, n1) > 0) then  ! if this node exists
-            if( is_node_bnd( grid % cells_n(fn(j, n1), c1) ) ) then
+        do i_nod = 1, n_face_nodes
+          if(fn(i_fac, i_nod) > 0) then  ! if this node exists
+            if( is_node_bnd( grid % cells_n(fn(i_fac, i_nod), c1) ) ) then
               n_match = n_match + 1
             end if
           end if
-        end do ! n1
+        end do ! i_nod
 
         ! This face is matching
         if(n_match .eq. n_face_nodes) then
-          grid % cells_bnd_color(j, c1) = bc
+          grid % cells_bnd_color(i_fac, c1) = bc
           n_bnd_proj = n_bnd_proj + 1
         end if ! n_match .eq. n_face_nodes
 
-      end do ! j
+      end do ! i_fac
     end do
   end do
 
