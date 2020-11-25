@@ -2,7 +2,7 @@
   subroutine Matrix_Mod_Create(matrix, grid)
 !------------------------------------------------------------------------------!
 !   Determines the topology of the system matrix.                              !
-!   It relies only on SideC structure. Try to keep it that way.                !
+!   It relies only on faces_c structure. Try to keep it that way.              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
