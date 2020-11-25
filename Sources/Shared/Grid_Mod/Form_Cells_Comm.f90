@@ -7,12 +7,17 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: sub, i_nod, j_nod, ms, mr, n, ni, nj, sh
-  integer :: c, c1, c2, s, n_buff_faces
-  real    :: xi, yi, zi, xj, yj, zj
+  integer           :: sub, i_nod, j_nod, ms, mr, n, ni, nj, sh
+  integer           :: c, c1, c2, s, n_buff_faces
+  real              :: xi, yi, zi, xj, yj, zj
+  real, allocatable :: send_cells(:), recv_cells(:)
 !==============================================================================!
 
   if(n_proc < 2) return
+
+  ! Allocate memory for locally used arrays
+  allocate(send_cells(-grid % n_bnd_cells:grid % n_cells))
+  allocate(recv_cells(-grid % n_bnd_cells:grid % n_cells))
 
   !--------------------------------------------------!
   !   Allocate memory for send and receive buffers   !
@@ -54,6 +59,10 @@
     ! Initialize buffer size to zero
     grid % comm % cells_send(sub) % n_items = 0
     grid % comm % cells_recv(sub) % n_items = 0
+
+    ! Initialize send and recv cells
+    send_cells(:) = 0.0
+    recv_cells(:) = 0.0
 
     if(sub .ne. this_proc) then
 
@@ -125,19 +134,38 @@
         end if  ! sh > 0
       end do
 
+      ! Count the inside cells in the buffers
       ms = 0
       mr = 0
-      do c = -grid % n_bnd_cells, grid % n_cells
+      do c = 1, grid % n_cells
         if(grid % comm % cell_proc(c) .eq. this_proc) then
           n = grid % cells_n_nodes(c)
           if( any( grid % new_n(grid % cells_n(1:n,c)) .eq. -1) ) then
             ms = ms + 1
+            send_cells(c) = sub
           end if
         end if
         if(grid % comm % cell_proc(c) .eq. sub) then
           n = grid % cells_n_nodes(c)
           if( any( grid % new_n(grid % cells_n(1:n,c)) .eq. -1) ) then
             mr = mr + 1
+            recv_cells(c) = sub
+          end if
+        end if
+      end do
+
+      ! Count buffer cells at boundaries by copying the inside cells
+      do s = 1, grid % n_faces
+        c1 = grid % faces_c(1,s)
+        c2 = grid % faces_c(2,s)
+        if(c2 < 0) then
+          if(send_cells(c1) > 0) then
+            ms = ms + 1
+            send_cells(c2) = send_cells(c1)
+          end if
+          if(recv_cells(c1) > 0) then
+            mr = mr + 1
+            recv_cells(c2) = recv_cells(c1)
           end if
         end if
       end do
@@ -155,22 +183,17 @@
         allocate(grid % comm % cells_recv(sub) % r_buff(mr));
       end if
 
+      ! Count all (boundary and inside) cells in the buffers
       ms = 0
       mr = 0
       do c = -grid % n_bnd_cells, grid % n_cells
-        if(grid % comm % cell_proc(c) .eq. this_proc) then
-          n = grid % cells_n_nodes(c)
-          if( any( grid % new_n(grid % cells_n(1:n,c)) .eq. -1) ) then
-            ms = ms + 1
-            grid % comm % cells_send(sub) % map(ms) = c
-          end if
+        if(send_cells(c) .eq. sub) then
+          ms = ms + 1
+          grid % comm % cells_send(sub) % map(ms) = c
         end if
-        if(grid % comm % cell_proc(c) .eq. sub) then
-          n = grid % cells_n_nodes(c)
-          if( any( grid % new_n(grid % cells_n(1:n,c)) .eq. -1) ) then
-            mr = mr + 1
-            grid % comm % cells_recv(sub) % map(mr) = c
-          end if
+        if(recv_cells(c) .eq. sub) then
+          mr = mr + 1
+          grid % comm % cells_recv(sub) % map(mr) = c
         end if
       end do
 
@@ -183,5 +206,9 @@
   end do
 
   grid % n_faces = grid % n_faces - n_buff_faces
+
+  ! De-allocate locally used memory
+  deallocate(send_cells)
+  deallocate(recv_cells)
 
   end subroutine

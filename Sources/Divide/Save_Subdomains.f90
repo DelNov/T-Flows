@@ -226,20 +226,18 @@
 
     end do ! for subo
 
-    ! Faces inside the buffers only
+    ! Faces inside the buffers only; both inside and on boundaries
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
-      if(c2  > 0) then
-        if( (grid % new_c(c1) .ne. 0)              .and.  &
-            (grid % new_c(c2) .ne. 0)              .and.  &
-            (grid % comm % cell_proc(c1) .ne. sub) .and.  &
-            (grid % comm % cell_proc(c2) .ne. sub) ) then
-          nf_sub = nf_sub + 1
-          grid % new_f(s) = nf_sub
-          grid % old_f(nf_sub) = s
-        end if
-      end if  ! c2 > 0
+      if( (grid % new_c(c1) .ne. 0)              .and.  &
+          (grid % new_c(c2) .ne. 0)              .and.  &
+          (grid % comm % cell_proc(c1) .ne. sub) .and.  &
+          (grid % comm % cell_proc(c2) .ne. sub) ) then
+        nf_sub = nf_sub + 1
+        grid % new_f(s) = nf_sub
+        grid % old_f(nf_sub) = s
+      end if
     end do    ! through faces
 
     !------------------!
