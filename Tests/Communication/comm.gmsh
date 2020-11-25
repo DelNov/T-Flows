@@ -84,6 +84,6 @@ Physical Volume("Fluid") = {3, 2, 1};
 //
 //---------------------------
 Physical Surface("wall") = {61};
-Physical Surface("periodic") = {3, 2, 1, 70, 48, 26};
+Physical Surface("periodic-z") = {3, 2, 1, 70, 48, 26};
 Physical Surface("symm-hor") = {57, 35, 17};
 Physical Surface("symm-vert") = {25, 43, 65};

@@ -68,7 +68,17 @@
 #---------------------
 # Boundary conditions
 #---------------------
-  BOUNDARY_CONDITION    static_wall
+  BOUNDARY_CONDITION    wall
     TYPE                wall
+    VARIABLES           u     v     w
+    VALUES              0.0   0.0   0.0
+
+  BOUNDARY_CONDITION    symm-hor
+    TYPE                symmetry
+    VARIABLES           u     v     w
+    VALUES              0.0   0.0   0.0
+
+  BOUNDARY_CONDITION    symm-vert
+    TYPE                symmetry
     VARIABLES           u     v     w
     VALUES              0.0   0.0   0.0
