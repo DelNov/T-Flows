@@ -14,11 +14,17 @@
   character(SL)        :: one_token
   integer              :: n_tri, n_quad, n_tetra, n_hexa, n_pyra, n_wedge
   integer              :: n_cells, n_bnd_cells, n_faces, n_nodes, n_face_nodes
-  integer              :: c1, c2, s, n, fu, i, i_nod, j_nod
+  integer              :: c1, c2, s, n, fu, i, i_nod, j_nod, l
   integer              :: cell_type, face_type
   integer              :: cell_s, cell_e, side_s, side_e, node_s, node_e
   integer, allocatable :: cell_visited_from(:)
   real                 :: dist(4)
+  integer              :: n_face_sect          ! number of face sections
+  integer              :: face_sect_pos(2048)  ! where did Fluent store it
+  integer              :: face_sect_bnd(2048)  ! where does T-Flows store it
+  integer              :: n_bnd_cond      ! number of boundary conditions
+  logical              :: bnd_cond(2048)  ! .true. if bnd cond section
+  character(SL)        :: bc_names(2048)
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: MIXED_ZONE = 0
   integer, parameter :: CELL_TRI   = 1
@@ -31,6 +37,8 @@
   integer, parameter :: FACE_QUAD  = 4
 !==============================================================================!
 
+  bnd_cond(:) = .false.
+
   call File_Mod_Set_Name(name_in, extension='.msh')
   call File_Mod_Open_File_For_Reading(name_in, fu)
 
@@ -41,7 +49,9 @@
   !                                                        !
   !                                                        !
   !--------------------------------------------------------!
-  print *, '# Reading header'
+  print '(a60)', ' #=========================================================='
+  print '(a60)', ' # Reading header                                           '
+  print '(a60)', ' #----------------------------------------------------------'
 
   !------------------------------------------!
   !   Look for number of nodes and read it   !
@@ -53,7 +63,7 @@
     if(line % n_tokens > 1) then
       if(line % tokens(1) .eq. '(10' .and. line % tokens(2) .eq. '(0') then
         read(line % tokens(4), '(z160)') grid % n_nodes
-        print *, '# Number of nodes in header: ', grid % n_nodes
+        print '(a34,i9)', ' # Number of nodes in header:     ', grid % n_nodes
         goto 1
       end if
     end if
@@ -70,7 +80,7 @@
     if(line % n_tokens > 1) then
       if(line % tokens(1) .eq. '(12' .and. line % tokens(2) .eq. '(0') then
         read(line % tokens(4), '(z160)') grid % n_cells
-        print *, '# Number of cells in header: ', grid % n_cells
+        print '(a34,i9)', ' # Number of cells in header:     ', grid % n_cells
         goto 2
       end if
     end if
@@ -87,17 +97,21 @@
     if(line % n_tokens > 1) then
       if(line % tokens(1) .eq. '(13' .and. line % tokens(2) .eq. '(0') then
         read(line % tokens(4), '(z160)') grid % n_faces
-        print *, '# Number of faces in header: ', grid % n_faces
+        print '(a34,i9)', ' # Number of faces in header:     ', grid % n_faces
         goto 3
       end if
     end if
   end do
 3 continue
 
-  !------------------------------------------------!
-  !   Read the faces to count the boundary cells   !
-  !------------------------------------------------!
-  print *, '# Reading face data to find number of boundary cells'
+  !----------------------------------------------------------------------------!
+  !   Read the faces to count the boundary cells and boundary cells sections   !
+  !----------------------------------------------------------------------------!
+  print '(a60)', ' #=========================================================='
+  print '(a60)', ' # Reading face data to find number of boundary cells       '
+  print '(a60)', ' #----------------------------------------------------------'
+  n_face_sect = 0
+  n_bnd_cond  = 0
   n_bnd_cells = 0
   n_faces     = 0
   rewind(fu)
@@ -110,15 +124,29 @@
         read(line % tokens(3), '(z160)') side_s  ! starting face
         read(line % tokens(4), '(z160)') side_e  ! ending face
 
+        ! Increase the counter for face sections
+        n_face_sect = n_face_sect + 1
+
+        ! Store this face section position in the Fluent's mesh
+        one_token = line % tokens(2)
+        l = len_trim(one_token)
+        read(one_token(2:l), '(i16)') face_sect_pos(n_face_sect)
+
         ! Take the cell type of this zone
-        one_token = LINE % TOKENS(6)
+        one_token = line % tokens(6)
         read(one_token(1:1), '(i1)') face_type
         if(face_type .eq. MIXED_ZONE) then
-          print *, '# Found a mixed face zone from ', side_s, ' to ', side_e
+          print '(a34,i9,a4,i9)', ' # Found a mixed face zone from:  ',  &
+                                  side_s, ' to:', side_e
         else
-          print *, '# Found a uniform face zone from ', side_s, ' to ', side_e
+          print '(a34,i9,a4,i9)', ' # Found a uniform face zone from:',  &
+                                  side_s, ' to:', side_e
         end if
 
+        !--------------------------!
+        !   Browse through faces   !
+        !--------------------------!
+        bnd_cond(n_face_sect) = .false.
         do s = side_s, side_e
           n_faces = n_faces + 1
           call File_Mod_Read_Line(fu)
@@ -139,10 +167,23 @@
 
           ! This was a boundary face
           if( (c1 .eq. 0) .or. (c2 .eq. 0) ) then
+            bnd_cond(n_face_sect) = .true.
             n_bnd_cells = n_bnd_cells + 1
           end if
-
         end do
+
+        !---------------------------------------------------------------!
+        !   If this was a boundary section, store boundary conditions   !
+        !---------------------------------------------------------------!
+        if( bnd_cond(n_face_sect) ) then
+
+          ! Increase the number of boundary condition sections and ...
+          n_bnd_cond = n_bnd_cond + 1
+
+          ! ... store mapping of this face section to T-Flows boundary condition
+          face_sect_bnd(n_face_sect) = n_bnd_cond
+        end if
+
       end if
 
       ! Check if you read all the nodes
@@ -151,8 +192,9 @@
     end if
   end do
 4 continue
+
   grid % n_bnd_cells = n_bnd_cells
-  print *, '# Number of boundary cells from face data: ', grid % n_bnd_cells
+  print '(a34,i9)', ' # Boundary cells from face data: ', n_bnd_cells
 
   !--------------------------------------------!
   !                                            !
@@ -170,7 +212,9 @@
   !                           !
   !                           !
   !---------------------------!
-  print *, '# Reading node coordinates'
+  print '(a60)', ' #=========================================================='
+  print '(a60)', ' # Reading node coordinates                                 '
+  print '(a60)', ' #----------------------------------------------------------'
   n_nodes = 0
   rewind(fu)
   do
@@ -181,7 +225,8 @@
       if(line % tokens(1) .eq. '(10' .and. line % tokens(2) .ne. '(0') then
         read(line % tokens(3), '(z160)') node_s  ! starting node
         read(line % tokens(4), '(z160)') node_e  ! ending node
-        print *, '# Found a node zone from ', node_s, ' to ', node_e
+        print '(a34,i9,a4,i9)', ' # Found a node zone from:        ',  &
+                                node_s, ' to:', node_e
         do n = node_s, node_e
           n_nodes = n_nodes + 1
           call File_Mod_Read_Line(fu)
@@ -213,7 +258,8 @@
 
         read(line % tokens(3), '(z160)') cell_s  ! starting face
         read(line % tokens(4), '(z160)') cell_e  ! ending face
-        print *, '# Found a cell zone from ', cell_s, ' to ', cell_e
+        print '(a34,i9,a4,i9)', ' # Found a cell zone from:        ',  &
+                                cell_s, ' to:', cell_e
 
         ! Initialize all counters
         n_cells = 0
@@ -279,12 +325,15 @@
     end if
   end do
 7 continue
-  print *, '# Number of triangles:      ', n_tri
-  print *, '# Number of quadrilaterals: ', n_quad
-  print *, '# Number of tetrahedra:     ', n_tetra
-  print *, '# Number of hexahedra:      ', n_hexa
-  print *, '# Number of pyramids:       ', n_pyra
-  print *, '# Number of wedges:         ', n_wedge
+  print '(a60)', ' #=========================================================='
+  print '(a60)', ' # Summary of interioir cell shapes:                        '
+  print '(a60)', ' #----------------------------------------------------------'
+  print '(a34,i9)', ' # Number of triangles:           ', n_tri
+  print '(a34,i9)', ' # Number of quadrilaterals:      ', n_quad
+  print '(a34,i9)', ' # Number of tetrahedra:          ', n_tetra
+  print '(a34,i9)', ' # Number of hexahedra:           ', n_hexa
+  print '(a34,i9)', ' # Number of pyramids:            ', n_pyra
+  print '(a34,i9)', ' # Number of wedges:              ', n_wedge
 
   !----------------------------------------------------!
   !                                                    !
@@ -293,7 +342,10 @@
   !                                                    !
   !                                                    !
   !----------------------------------------------------!
-  print *, '# Reading face data to store c1, c2 and boundary cells'
+  print '(a60)', ' #=========================================================='
+  print '(a60)', ' # Reading face data to store c1, c2 and boundary cells     '
+  print '(a60)', ' #----------------------------------------------------------'
+  n_face_sect  = 0
   n_bnd_cells = 0
   n_faces     = 0
   rewind(fu)
@@ -305,17 +357,24 @@
       if(line % tokens(1) .eq. '(13' .and. line % tokens(2) .ne. '(0') then
         read(line % tokens(3), '(z160)') side_s  ! starting face
         read(line % tokens(4), '(z160)') side_e  ! ending face
-        print *, '# Found a face zone from ', side_s, ' to ', side_e
+
+        ! Increase the counter for face sections
+        n_face_sect = n_face_sect + 1
 
         ! Take the cell type of this zone
-        one_token = LINE % TOKENS(6)
+        one_token = line % tokens(6)
         read(one_token(1:1), '(i1)') face_type
         if(face_type .eq. MIXED_ZONE) then
-          print *, '# Found a mixed face zone from ', side_s, ' to ', side_e
+          print '(a34,i9,a4,i9)', ' # Found a mixed face zone from:  ',  &
+                                  side_s, ' to:', side_e
         else
-          print *, '# Found a uniform face zone from ', side_s, ' to ', side_e
+          print '(a34,i9,a4,i9)', ' # Found a uniform face zone from:',  &
+                                  side_s, ' to:', side_e
         end if
 
+        !--------------------------!
+        !   Browse through faces   !
+        !--------------------------!
         do s = side_s, side_e
           n_faces = n_faces + 1
           call File_Mod_Read_Line(fu)
@@ -352,12 +411,14 @@
             n_bnd_cells = n_bnd_cells + 1
             grid % faces_c(1, n_faces) = c2
             grid % faces_c(2, n_faces) = -n_bnd_cells
+            grid % bnd_cond % color(-n_bnd_cells) = face_sect_bnd(n_face_sect)
 
           ! Case when c2 is a boundary cell
           else if(c2 .eq. 0) then
             n_bnd_cells = n_bnd_cells + 1
             grid % faces_c(1, n_faces) = c1
             grid % faces_c(2, n_faces) = -n_bnd_cells
+            grid % bnd_cond % color(-n_bnd_cells) = face_sect_bnd(n_face_sect)
 
           ! Neither c1 nor c2 are boundary cells
           else
@@ -376,7 +437,7 @@
   end do
 8 continue
 
-  print *, '# Number of boundary cells from face data: ', n_bnd_cells
+  print '(a34,i9)', ' # Boundary cells from face data: ', n_bnd_cells
 
   !------------------------------!
   !                              !
@@ -385,7 +446,9 @@
   !                              !
   !                              !
   !------------------------------!
-  print *, '# Reconstructing cells (determining their nodes)'
+  print '(a60)', ' #=========================================================='
+  print '(a60)', ' # Reconstructing cells (determining their nodes)           '
+  print '(a60)', ' #----------------------------------------------------------'
   allocate(cell_visited_from(grid % n_cells));  cell_visited_from(:) = 0
 
   !---------------------------------------------!
@@ -768,6 +831,11 @@
   end do
 
   deallocate(cell_visited_from)
+
+  !-------------------------------------------------!
+  !   Store number of boundary conditions to grid   !
+  !-------------------------------------------------!
+  grid % n_bnd_cond = n_bnd_cond
 
   close(fu)
 
