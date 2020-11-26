@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Load_Gmsh(grid)
+  subroutine Load_Gmsh(grid, file_name)
 !------------------------------------------------------------------------------!
 !   Reads the Gmsh file format.                                                !
 !------------------------------------------------------------------------------!
@@ -9,6 +9,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
+  character(SL)   :: file_name
 !-----------------------------------[Locals]-----------------------------------!
   integer, parameter   :: MSH_TRI   = 2
   integer, parameter   :: MSH_QUAD  = 3
@@ -16,7 +17,6 @@
   integer, parameter   :: MSH_HEXA  = 5
   integer, parameter   :: MSH_PENTA = 6
   integer, parameter   :: MSH_PYRA  = 7
-  character(DL)        :: name_in
   integer              :: n_sect, n_elem, n_blocks, n_bnd_sect, n_grps, n_memb
   integer              :: i, j, c, dim, p_tag, s_tag, n_tags, type, fu
   integer              :: run, s_tag_max, n_e_0d, n_e_1d, n_e_2d, n_e_3d
@@ -25,8 +25,12 @@
   character(SL), allocatable :: phys_names(:)
 !==============================================================================!
 
-  call File_Mod_Set_Name(name_in, extension='.msh')
-  call File_Mod_Open_File_For_Reading(name_in, fu)
+  call File_Mod_Open_File_For_Reading(file_name, fu)
+
+  !----------------------------------------!
+  !   Gmsh can't handle polyhedral grids   !
+  !----------------------------------------!
+  grid % polyhedral = .false.
 
   !----------------------------------------------!
   !                                              !

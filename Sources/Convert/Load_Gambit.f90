@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Load_Gambit(grid)
+  subroutine Load_Gambit(grid, file_name)
 !------------------------------------------------------------------------------!
 !   Reads the Gambits neutral file format.                                     !
 !------------------------------------------------------------------------------!
@@ -9,15 +9,19 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
+  character(SL)   :: file_name
 !-----------------------------------[Locals]-----------------------------------!
-  character(DL)       :: name_in
   integer             :: i, j, n_blocks, n_bnd_sect, dum1, dum2, fu
   integer,allocatable :: temp(:)
   integer             :: c, dir
 !==============================================================================!
 
-  call File_Mod_Set_Name(name_in, extension='.neu')
-  call File_Mod_Open_File_For_Reading(name_in, fu)
+  call File_Mod_Open_File_For_Reading(file_name, fu)
+
+  !------------------------------------------!
+  !   Gambit can't handle polyhedral grids   !
+  !------------------------------------------!
+  grid % polyhedral = .false.
 
   !------------------------!
   !   Browse over header   !
