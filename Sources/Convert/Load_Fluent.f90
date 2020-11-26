@@ -15,9 +15,10 @@ include 'Save_Vtu_Ascii.f90'
 !-----------------------------------[Locals]-----------------------------------!
   character(SL)        :: one_token
   integer              :: n_tri, n_quad, n_tet, n_hexa, n_pyra, n_wed, n_poly
-  integer              :: n_cells, n_bnd_cells, n_faces, n_nodes,  &
-                          n_face_nodes, n_cells_zone
-  integer              :: c, c1, c2, s, n, fu, i, i_cel, i_nod, j_nod, i_pol, l
+  integer              :: n_cells, n_bnd_cells, n_faces, n_nodes
+  integer              :: n_face_nodes, n_cells_zone
+  integer              :: c, c1, c2, s, n, fu, i, l
+  integer              :: i_cel, i_nod, j_nod, k_nod, l_nod, i_pol
   integer              :: cell_type, face_type
   integer              :: cell_s, cell_e, side_s, side_e, node_s, node_e
   integer, allocatable :: cell_visited_from(:)
@@ -511,6 +512,27 @@ include 'Save_Vtu_Ascii.f90'
 
   print '(a34,i9)', ' # Boundary cells from face data: ', n_bnd_cells
 
+  print '(a60)', ' #=========================================================='
+  print '(a60)', ' # Checking faces                                           '
+  print '(a60)', ' #----------------------------------------------------------'
+
+  !----------------------------------------!
+  !   Check for duplicate nodes in faces   !
+  !----------------------------------------!
+  do s = 1, grid % n_faces
+    n = grid % faces_n_nodes(s)
+    do i_nod = 1, n
+      do j_nod = i_nod+1, n
+        if(grid % faces_n(i_nod, s) .eq. grid % faces_n(j_nod, s)) then
+          print *, '# ERROR!  Duplicate nodes in face: ', s
+          print *, '# This error is critical, exiting! '
+          stop
+        end if
+      end do
+    end do
+  end do
+  print *, '# No duplicate nodes in face data found, good!'
+
   !------------------------------!
   !                              !
   !                              !
@@ -665,45 +687,56 @@ include 'Save_Vtu_Ascii.f90'
           end if    ! if hexahedron
   20      continue  ! found matching nodes
 
+          !-----------------------------------------------------------!
+          !   Second time you visit a wedge from quadrilateral face   !
+          !-----------------------------------------------------------!
+          if( grid % cells_n_nodes(c) .eq. 6 .and.  &
+              cell_visited_from(c) .ne.  s) then
+
+            ! i_nod and j_nod, two consecutive nodes in the face
+            do i_nod = 1, 4  ! nodes in face
+              j_nod = i_nod + 1;  if(j_nod > 4) j_nod = j_nod - 4
+              k_nod = i_nod + 2;  if(k_nod > 4) k_nod = k_nod - 4
+              l_nod = i_nod + 3;  if(l_nod > 4) l_nod = l_nod - 4
+
+              ! Face 1 same sense of rotation (see Cell_Numbering_Neu.f90)
+              if(grid % faces_n(i_nod, s) .eq. grid % cells_n(1, c) .and.  &
+                 grid % faces_n(j_nod, s) .eq. grid % cells_n(2, c) ) then
+                grid % cells_n(5, c) = grid % faces_n(k_nod, s)
+                grid % cells_n(4, c) = grid % faces_n(l_nod, s)
+              end if
+
+              ! Face 1 oposite sense of rotation (see Cell_Numbering_Neu.f90)
+              if(grid % faces_n(i_nod, s) .eq. grid % cells_n(2, c) .and.  &
+                 grid % faces_n(j_nod, s) .eq. grid % cells_n(1, c) ) then
+                grid % cells_n(4, c) = grid % faces_n(k_nod, s)
+                grid % cells_n(5, c) = grid % faces_n(l_nod, s)
+              end if
+
+              ! Face 2 same sense of rotation (see Cell_Numbering_Neu.f90)
+              if(grid % faces_n(i_nod, s) .eq. grid % cells_n(2, c) .and.  &
+                 grid % faces_n(j_nod, s) .eq. grid % cells_n(3, c) ) then
+                grid % cells_n(6, c) = grid % faces_n(k_nod, s)
+                grid % cells_n(5, c) = grid % faces_n(l_nod, s)
+              end if
+
+              ! Face 2 oposite sense of rotation (see Cell_Numbering_Neu.f90)
+              if(grid % faces_n(i_nod, s) .eq. grid % cells_n(3, c) .and.  &
+                 grid % faces_n(j_nod, s) .eq. grid % cells_n(2, c) ) then
+                grid % cells_n(5, c) = grid % faces_n(k_nod, s)
+                grid % cells_n(6, c) = grid % faces_n(l_nod, s)
+              end if
+
+            end do
+
+          end if
+
         end if  ! face is quadrilateral
 
         !------------------------!
         !   Face is triangular   !
         !------------------------!
         if(grid % faces_n_nodes(s) .eq. 3) then
-
-          !--------------------------------------------------------!
-          !   Second time you visit a wedge from triangular face   !
-          !--------------------------------------------------------!
-          if( grid % cells_n_nodes(c) .eq. 6 .and.  &
-              cell_visited_from(c) .ne.  s   .and.  &
-              cell_visited_from(c) .ne. -1) then
-
-            ! This is a wee-bit cumbersome, but couldn't think of anything else now
-            ! (It associates stored nodes with new ones by their closeness)
-            do i_nod = 1, 3    ! nodes already in wedge cell
-              do j_nod = 1, 3  ! nodes in face
-                dist(j_nod) = Math_Mod_Distance(                    &
-                              grid % xn(grid % cells_n(i_nod, c)),  &
-                              grid % yn(grid % cells_n(i_nod, c)),  &
-                              grid % zn(grid % cells_n(i_nod, c)),  &
-                              grid % xn(grid % faces_n(j_nod, s)),  &
-                              grid % yn(grid % faces_n(j_nod, s)),  &
-                              grid % zn(grid % faces_n(j_nod, s)))
-              end do
-              do j_nod = 1, 3
-                if(Math_Mod_Approx_Real(minval(dist(1:3)), dist(j_nod), PICO)) then
-                  grid % cells_n(i_nod + 3, c) = grid % faces_n(j_nod, s)
-                end if
-              end do
-            end do
-
-            !---------------------------------!
-            !   Don't visit this cell again   !
-            !---------------------------------!
-            cell_visited_from(c) = -1
-
-          end if
 
           !-------------------------------------------------------------!
           !   Second time you visit a pyramid from triangular face      !
@@ -746,6 +779,26 @@ include 'Save_Vtu_Ascii.f90'
 
     end do  ! through c1 and c2
   end do  ! through s, faces
+
+  !----------------------------------------!
+  !   Check for duplicate nodes in cells   !
+  !----------------------------------------!
+  do c = 1, grid % n_cells
+    n = grid % cells_n_nodes(c)
+    if( n .eq. 6 ) then  ! check wedges
+      do i_nod = 1, n
+        do j_nod = i_nod+1, n
+          if(grid % cells_n(i_nod, c) .eq. grid % cells_n(j_nod, c)) then
+            print *, '# ERROR!  Duplicate nodes in cell: ', c
+            print *, '# This error is critical, exiting! '
+            print *, n
+            print *, grid % cells_n(1:n, c)
+            STOP
+          end if
+        end do
+      end do
+    end if
+  end do
 
   !------------------------------------------------------------!
   !                                                            !
