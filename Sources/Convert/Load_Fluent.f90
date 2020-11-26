@@ -1,5 +1,7 @@
+include 'Save_Vtu_Ascii.f90'
+
 !==============================================================================!
-  subroutine Load_Fluent(grid)
+  subroutine Load_Fluent(grid, file_name)
 !------------------------------------------------------------------------------!
 !   Reads the Fluent's file format.                                            !
 !------------------------------------------------------------------------------!
@@ -9,17 +11,18 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
+  character(SL)   :: file_name
 !-----------------------------------[Locals]-----------------------------------!
-  character(DL)        :: name_in
   character(SL)        :: one_token
-  integer              :: n_tri, n_quad, n_tetra, n_hexa, n_pyra, n_wedge
+  integer              :: n_tri, n_quad, n_tet, n_hexa, n_pyra, n_wed, n_poly
   integer              :: n_cells, n_bnd_cells, n_faces, n_nodes,  &
                           n_face_nodes, n_cells_zone
-  integer              :: c1, c2, s, n, fu, i, i_nod, j_nod, l
+  integer              :: c, c1, c2, s, n, fu, i, i_nod, j_nod, i_pol, l
   integer              :: cell_type, face_type
   integer              :: cell_s, cell_e, side_s, side_e, node_s, node_e
   integer, allocatable :: cell_visited_from(:)
   real                 :: dist(4)
+  integer              :: all_nodes(1024)      ! all cell's nodes
   integer              :: n_face_sect          ! number of face sections
   integer              :: face_sect_pos(2048)  ! where did Fluent store it
   integer              :: face_sect_bnd(2048)  ! where does T-Flows store it
@@ -34,14 +37,19 @@
   integer, parameter :: CELL_HEXA  = 4
   integer, parameter :: CELL_PYRA  = 5
   integer, parameter :: CELL_WEDGE = 6
+  integer, parameter :: CELL_POLY  = 7
   integer, parameter :: FACE_TRI   = 3
   integer, parameter :: FACE_QUAD  = 4
 !==============================================================================!
 
   bnd_cond(:) = .false.
 
-  call File_Mod_Set_Name(name_in, extension='.msh')
-  call File_Mod_Open_File_For_Reading(name_in, fu)
+  call File_Mod_Open_File_For_Reading(file_name, fu)
+
+  !-----------------------------------------------!
+  !   Assume grid doesn't have polyhedral cells   !
+  !-----------------------------------------------!
+  grid % polyhedral = .false.
 
   !--------------------------------------------------------!
   !                                                        !
@@ -255,8 +263,8 @@
 
   ! Initialize all cell counters
   n_cells = 0
-  n_tri   = 0;  n_quad  = 0;  n_tetra = 0
-  n_hexa  = 0;  n_pyra  = 0;  n_wedge = 0
+  n_tri   = 0;  n_quad  = 0;  n_tet = 0
+  n_hexa  = 0;  n_pyra  = 0;  n_wed = 0
 
   rewind(fu)
   do while(n_cells < grid % n_cells)
@@ -296,7 +304,7 @@
             grid % cells_n_faces(cell_s:cell_e) = 1
           end if
           if(cell_type .eq. CELL_TETRA) then
-            n_tetra = n_tetra + n_cells_zone
+            n_tet = n_tet + n_cells_zone
             grid % cells_n_nodes(cell_s:cell_e) = 4
             grid % cells_n_faces(cell_s:cell_e) = 4
           end if
@@ -311,7 +319,7 @@
             grid % cells_n_faces(cell_s:cell_e) = 5
           end if
           if(cell_type .eq. CELL_WEDGE) then
-            n_wedge = n_wedge + n_cells_zone
+            n_wed = n_wed + n_cells_zone
             grid % cells_n_nodes(cell_s:cell_e) = 6
             grid % cells_n_faces(cell_s:cell_e) = 5
           end if
@@ -323,7 +331,7 @@
 
 6         continue
 
-          call File_Mod_Read_Line(fu)
+          call File_Mod_Read_Line(fu, remove='('//')')
 
           do i = 1, line % n_tokens
             read(line % tokens(i), *) cell_type
@@ -343,7 +351,7 @@
               grid % cells_n_faces(n_cells) = 1
 
             else if(cell_type .eq. CELL_TETRA) then
-              n_tetra = n_tetra + 1
+              n_tet = n_tet + 1
               grid % cells_n_nodes(n_cells) = 4
               grid % cells_n_faces(n_cells) = 4
 
@@ -358,12 +366,21 @@
               grid % cells_n_faces(n_cells) = 5
 
             else if(cell_type .eq. CELL_WEDGE) then
-              n_wedge = n_wedge + 1
+              n_wed = n_wed + 1
               grid % cells_n_nodes(n_cells) = 6
               grid % cells_n_faces(n_cells) = 5
 
+            else if(cell_type .eq. CELL_POLY) then
+              if(.not. grid % polyhedral) then
+                print *, '# Found polyhedral cell(s), mesh is polyhedral!'
+                grid % polyhedral = .true.
+              end if
+              n_poly = n_poly + 1
+              grid % cells_n_nodes(n_cells) = -1
+              grid % cells_n_faces(n_cells) = -1
+
             else
-              print *, '# ERROR: Unsupported cell type.'
+              print *, '# ERROR: Unsupported cell type', cell_type
               print *, '# This error is critical.  Exiting!'
               stop
             end if
@@ -383,10 +400,11 @@
   print '(a60)', ' #----------------------------------------------------------'
   print '(a34,i9)', ' # Number of triangles:           ', n_tri
   print '(a34,i9)', ' # Number of quadrilaterals:      ', n_quad
-  print '(a34,i9)', ' # Number of tetrahedra:          ', n_tetra
+  print '(a34,i9)', ' # Number of tetrahedra:          ', n_tet
   print '(a34,i9)', ' # Number of hexahedra:           ', n_hexa
   print '(a34,i9)', ' # Number of pyramids:            ', n_pyra
-  print '(a34,i9)', ' # Number of wedges:              ', n_wedge
+  print '(a34,i9)', ' # Number of wedges:              ', n_wed
+  print '(a34,i9)', ' # Number of polyhedra:           ', n_poly
 
   !----------------------------------------------------!
   !                                                    !
@@ -883,6 +901,73 @@
     end if
 
   end do
+
+  !------------------------------------------------------------!
+  !                                                            !
+  !   Count the faces of all polyhedral cells and store them   !
+  !                                                            !
+  !------------------------------------------------------------!
+  do s = 1, grid % n_faces
+    c1 = grid % faces_c(1, s)
+    c2 = grid % faces_c(2, s)
+
+    if( grid % cells_n_nodes(c1) .eq. -1) then
+      if( cell_visited_from(c1) .ne. 0 ) then
+        print *, '# A strange error has occurred!'
+      end if
+
+      ! Increase the number of polygonal faces for c1
+      grid % cells_n_polyf(c1) = grid % cells_n_polyf(c1) + 1
+      n = grid % cells_n_polyf(c1)
+      grid % cells_p(n, c1) = s
+    end if
+
+    if( grid % cells_n_nodes(c2) .eq. -1) then
+      if( cell_visited_from(c2) .ne. 0 ) then
+        print *, '# A strange error has occurred!'
+      end if
+
+      ! Increase the number of polygonal faces for c2 and store the face
+      grid % cells_n_polyf(c2) = grid % cells_n_polyf(c2) + 1
+      n = grid % cells_n_polyf(c2)
+      grid % cells_p(n, c2) = s
+    end if
+
+  end do
+
+  !----------------------------------------------------------------!
+  !                                                                !
+  !   With faces counted, you can also store nodes for each cell   !
+  !                                                                !
+  !----------------------------------------------------------------!
+  do c = 1, grid % n_cells
+
+    ! Only do this for polyhedral cells
+    if(grid % cells_n_nodes(c) .eq. -1) then
+
+      ! Accumulate nodes from all faces surrounding the cell
+      n = 0
+      do i_pol = 1, grid % cells_n_polyf(c)
+        s = grid % cells_p(i_pol, c)           ! take true face index
+        do i_nod = 1, grid % faces_n_nodes(s)
+          n = n + 1
+          all_nodes(n) = grid % faces_n(i_nod, s)
+        end do
+      end do
+
+      ! Perform a unique sort to remove duplicates
+      call Sort_Mod_Unique_Int(all_nodes(1:n), n)
+
+      grid % cells_n(1:n, c)  = all_nodes(1:n)
+      grid % cells_n_nodes(c) = -n
+
+    end if  ! if cell was polyhedral
+
+  end do
+
+  call Save_Vtu_Ascii(grid)
+  STOP
+  ! call Grid_Mod_Save_Debug_Vtu(grid, append='poly')
 
   deallocate(cell_visited_from)
 
