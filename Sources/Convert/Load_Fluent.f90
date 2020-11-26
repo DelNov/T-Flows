@@ -572,42 +572,33 @@ include 'Save_Vtu_Ascii.f90'
   !-------------------------------------------------!
   do s = 1, grid % n_faces
 
+    !--------------------------------------!
+    !   Handle cells c1 and c2 in one go   !
+    !--------------------------------------!
     do i_cel = 1, 2
 
       c = grid % faces_c(i_cel, s)
 
       if(c .gt. 0) then
 
-        !---------------------------!
-        !   Face is quadrilateral   !
-        !---------------------------!
+        !------------------------------------------------------------!
+        !   First visit to pyramid or hexa from quadrilateral face   !
+        !    For hexahedra that's face 5, for pyramid it's face 1    !
+        !------------------------------------------------------------!
         if(grid % faces_n_nodes(s) .eq. 4) then
-
-          !------------------------------------------------------------!
-          !   First visit to pyramid or hexa from quadrilateral face   !
-          !    For hexahedra that's face 5, for pyramid it's face 1    !
-          !------------------------------------------------------------!
           if( (grid % cells_n_nodes(c) .eq. 5  .or.   &
                grid % cells_n_nodes(c) .eq. 8) .and.  &
               cell_visited_from(c) .eq. 0) then
-
-            ! Check Cell_Numbering_Neu, there is a twist at 3, 4
-            ! (Still not sure if that is the way it should be, not checked yet)
-            grid % cells_n(1, c) = grid % faces_n(1, s)
-            grid % cells_n(2, c) = grid % faces_n(2, s)
-            grid % cells_n(3, c) = grid % faces_n(3, s)
-            grid % cells_n(4, c) = grid % faces_n(4, s)
+            grid % cells_n(1:4, c) = grid % faces_n(1:4, s)
             cell_visited_from(c) = s
           end if
         end if
 
-        !------------------------!
-        !   Face is triangular   !
-        !------------------------!
+        !--------------------------------------------------------------!
+        !   First visit to tetrahedron or wedge from triangular face   !
+        !             For both shapes that would be face 1             !
+        !--------------------------------------------------------------!
         if(grid % faces_n_nodes(s) .eq. 3) then
-          !--------------------------------------------------------------!
-          !   First visit to tetrahedron or wedge from triangular face   !
-          !--------------------------------------------------------------!
           if( (grid % cells_n_nodes(c) .eq. 4  .or.   &
                grid % cells_n_nodes(c) .eq. 6) .and.  &
               cell_visited_from(c) .eq. 0) then
