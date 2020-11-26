@@ -46,13 +46,13 @@
   !                                        !
   !----------------------------------------!
   if(file_format .eq. 'FLUENT') then
-    call Load_Fluent(grid)
+    call Load_Fluent(grid, file_name)
   end if
   if(file_format .eq. 'GAMBIT') then
-    call Load_Gambit(grid)
+    call Load_Gambit(grid, file_name)
   end if
   if(file_format .eq. 'GMSH') then
-    call Load_Gmsh(grid)
+    call Load_Gmsh(grid, file_name)
     call Find_Parents(grid)
   end if
 
