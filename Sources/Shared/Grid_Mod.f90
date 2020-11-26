@@ -23,6 +23,7 @@
 
     ! Stores the name of this domain
     character(SL) :: name
+    logical       :: polyhedral
 
     ! Number of ...
     integer :: n_nodes      ! ... nodes
@@ -61,12 +62,16 @@
     ! Number of faces surrounding each cell
     integer, allocatable :: cells_n_faces(:)
 
+    ! Number of olyhedral faces surrounding each (clearly polyhedral) cell
+    integer, allocatable :: cells_n_polyf(:)
+
     ! Number of cells surrounding each cell
     integer, allocatable :: cells_n_cells(:)
 
-    ! Cells' nodes, faces and neigboring cells
+    ! Cells' nodes, faces, polygonal faces and neigboring cells
     integer, allocatable :: cells_n(:,:)
     integer, allocatable :: cells_f(:,:)
+    integer, allocatable :: cells_p(:,:)
     integer, allocatable :: cells_c(:,:)
 
     ! Weights for interpolation from nodes

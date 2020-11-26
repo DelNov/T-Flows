@@ -25,8 +25,9 @@
   allocate(grid % cell_near_wall(-nb:nc));  grid % cell_near_wall = .false.
 
   ! Cells' nodes and neigboring cells
-  allocate(grid % cells_n( 8, -nb:nc));  grid % cells_n = 0
+  allocate(grid % cells_n(36, -nb:nc));  grid % cells_n = 0
   allocate(grid % cells_f( 6, -nb:nc));  grid % cells_f = 0
+  allocate(grid % cells_p(24, -nb:nc));  grid % cells_p = 0
   allocate(grid % cells_c(24, -nb:nc));  grid % cells_c = 0
 
   allocate(grid % cells_bnd_face(-nb:-1));  grid % cells_bnd_face = 0
@@ -36,6 +37,9 @@
 
   ! Number of faces at each cell
   allocate(grid % cells_n_faces(-nb:nc));  grid % cells_n_faces = 0
+
+  ! Number of polygonal faces at each cell
+  allocate(grid % cells_n_polyf(-nb:nc));  grid % cells_n_polyf = 0
 
   ! Boundary condition color in a given direction
   allocate(grid % cells_bnd_color(6, -nb:nc))

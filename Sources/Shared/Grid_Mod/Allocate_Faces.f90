@@ -18,7 +18,7 @@
   allocate(grid % faces_n_nodes(nf+ns));  grid % faces_n_nodes = 0
 
   ! Faces' nodes, neigboring cells and shadows
-  allocate(grid % faces_n(4,nf+ns));  grid % faces_n = 0
+  allocate(grid % faces_n(8,nf+ns));  grid % faces_n = 0  ! 8 -> polygons
   allocate(grid % faces_c(2,nf+ns));  grid % faces_c = 0
   allocate(grid % faces_s(  nf+ns));  grid % faces_s = 0
 
