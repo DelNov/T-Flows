@@ -22,7 +22,6 @@ include 'Save_Vtu_Ascii.f90'
   integer              :: cell_type, face_type
   integer              :: cell_s, cell_e, side_s, side_e, node_s, node_e
   integer, allocatable :: cell_visited_from(:)
-  real                 :: dist(4)
   integer              :: all_nodes(1024)      ! all cell's nodes
   integer              :: n_face_sect          ! number of face sections
   integer              :: face_sect_pos(2048)  ! where did Fluent store it
@@ -583,8 +582,10 @@ include 'Save_Vtu_Ascii.f90'
         !   Face is quadrilateral   !
         !---------------------------!
         if(grid % faces_n_nodes(s) .eq. 4) then
+
           !------------------------------------------------------------!
           !   First visit to pyramid or hexa from quadrilateral face   !
+          !    For hexahedra that's face 5, for pyramid it's face 1    !
           !------------------------------------------------------------!
           if( (grid % cells_n_nodes(c) .eq. 5  .or.   &
                grid % cells_n_nodes(c) .eq. 8) .and.  &
@@ -594,8 +595,8 @@ include 'Save_Vtu_Ascii.f90'
             ! (Still not sure if that is the way it should be, not checked yet)
             grid % cells_n(1, c) = grid % faces_n(1, s)
             grid % cells_n(2, c) = grid % faces_n(2, s)
-            grid % cells_n(4, c) = grid % faces_n(3, s)
-            grid % cells_n(3, c) = grid % faces_n(4, s)
+            grid % cells_n(3, c) = grid % faces_n(3, s)
+            grid % cells_n(4, c) = grid % faces_n(4, s)
             cell_visited_from(c) = s
           end if
         end if
@@ -645,47 +646,44 @@ include 'Save_Vtu_Ascii.f90'
           !   Second visit to hexahedron   !
           !--------------------------------!
           if( grid % cells_n_nodes(c) .eq. 8 .and.  &
-              cell_visited_from(c) .ne.  s   .and.  &
-              cell_visited_from(c) .ne. -1) then
+              cell_visited_from(c) .ne.  s) then
 
-            ! Check if some nodes are already matching to make sure that
-            ! you are at the opposite side of face which has been visited
-            ! (Hence: skip this face if some nodes are already matching)
-            do i_nod = 1, 4
-              do j_nod = 1, 4
-                if(grid % cells_n(i_nod, c) .eq. grid % faces_n(j_nod, s)) then
-                  goto 20
-                end if
-              end do
+            ! i_nod and j_nod, two consecutive nodes in the face
+            do i_nod = 1, 4  ! nodes in face
+              j_nod = i_nod + 1;  if(j_nod > 4) j_nod = j_nod - 4
+              k_nod = i_nod + 2;  if(k_nod > 4) k_nod = k_nod - 4
+              l_nod = i_nod + 3;  if(l_nod > 4) l_nod = l_nod - 4
+
+              ! Face 1 same sense of rotation (see Cell_Numbering_Neu.f90)
+              if(grid % faces_n(i_nod, s) .eq. grid % cells_n(1, c) .and.  &
+                 grid % faces_n(j_nod, s) .eq. grid % cells_n(2, c) ) then
+                grid % cells_n(6, c) = grid % faces_n(k_nod, s)
+                grid % cells_n(5, c) = grid % faces_n(l_nod, s)
+              end if
+
+              ! Face 1 oposite sense of rotation (see Cell_Numbering_Neu.f90)
+              if(grid % faces_n(i_nod, s) .eq. grid % cells_n(2, c) .and.  &
+                 grid % faces_n(j_nod, s) .eq. grid % cells_n(1, c) ) then
+                grid % cells_n(5, c) = grid % faces_n(k_nod, s)
+                grid % cells_n(6, c) = grid % faces_n(l_nod, s)
+              end if
+
+              ! Face 3 same sense of rotation (see Cell_Numbering_Neu.f90)
+              if(grid % faces_n(i_nod, s) .eq. grid % cells_n(3, c) .and.  &
+                 grid % faces_n(j_nod, s) .eq. grid % cells_n(4, c) ) then
+                grid % cells_n(8, c) = grid % faces_n(k_nod, s)
+                grid % cells_n(7, c) = grid % faces_n(l_nod, s)
+              end if
+
+              ! Face 3 oposite sense of rotation (see Cell_Numbering_Neu.f90)
+              if(grid % faces_n(i_nod, s) .eq. grid % cells_n(4, c) .and.  &
+                 grid % faces_n(j_nod, s) .eq. grid % cells_n(3, c) ) then
+                grid % cells_n(7, c) = grid % faces_n(k_nod, s)
+                grid % cells_n(8, c) = grid % faces_n(l_nod, s)
+              end if
+
             end do
-
-            ! This is a wee-bit cumbersome, but couldn't think of anything else now
-            ! (It associates stored nodes with new ones by their closeness)
-            do i_nod = 1, 4    ! nodes already in hexahedral cell
-              do j_nod = 1, 4  ! nodes in face
-                dist(j_nod) = Math_Mod_Distance(                     &
-                              grid % xn(grid % cells_n(i_nod, c)),  &
-                              grid % yn(grid % cells_n(i_nod, c)),  &
-                              grid % zn(grid % cells_n(i_nod, c)),  &
-                              grid % xn(grid % faces_n(j_nod,  s)),  &
-                              grid % yn(grid % faces_n(j_nod,  s)),  &
-                              grid % zn(grid % faces_n(j_nod,  s)))
-              end do
-              do j_nod = 1, 4
-                if(Math_Mod_Approx_Real(minval(dist(1:4)), dist(j_nod), PICO)) then
-                  grid % cells_n(i_nod + 4, c) = grid % faces_n(j_nod, s)
-                end if
-              end do
-
-            end do
-
-            !---------------------------------!
-            !   Don't visit this cell again   !
-            !---------------------------------!
-            cell_visited_from(c) = -1
-
           end if    ! if hexahedron
-  20      continue  ! found matching nodes
 
           !-----------------------------------------------------------!
           !   Second time you visit a wedge from quadrilateral face   !
@@ -785,7 +783,8 @@ include 'Save_Vtu_Ascii.f90'
   !----------------------------------------!
   do c = 1, grid % n_cells
     n = grid % cells_n_nodes(c)
-    if( n .eq. 6 ) then  ! check wedges
+!   if( n .eq. 6 ) then  ! check wedges
+    if( n .eq. 8 ) then  ! check hexa
       do i_nod = 1, n
         do j_nod = i_nod+1, n
           if(grid % cells_n(i_nod, c) .eq. grid % cells_n(j_nod, c)) then
