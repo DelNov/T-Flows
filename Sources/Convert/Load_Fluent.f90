@@ -17,7 +17,7 @@ include 'Save_Vtu_Ascii.f90'
   integer              :: n_tri, n_quad, n_tet, n_hexa, n_pyra, n_wed, n_poly
   integer              :: n_cells, n_bnd_cells, n_faces, n_nodes,  &
                           n_face_nodes, n_cells_zone
-  integer              :: c, c1, c2, s, n, fu, i, i_nod, j_nod, i_pol, l
+  integer              :: c, c1, c2, s, n, fu, i, i_cel, i_nod, j_nod, i_pol, l
   integer              :: cell_type, face_type
   integer              :: cell_s, cell_e, side_s, side_e, node_s, node_e
   integer, allocatable :: cell_visited_from(:)
@@ -550,89 +550,52 @@ include 'Save_Vtu_Ascii.f90'
   !                                                 !
   !-------------------------------------------------!
   do s = 1, grid % n_faces
-    c1 = grid % faces_c(1, s)
-    c2 = grid % faces_c(2, s)
 
-    !---------------------------!
-    !   Face is quadrilateral   !
-    !---------------------------!
-    if(grid % faces_n_nodes(s) .eq. 4) then
+    do i_cel = 1, 2
 
-      !------------------------------------------------------------------------!
-      !   First visit to pyramid or hexahedron from quadrilateral face as c1   !
-      !------------------------------------------------------------------------!
-      if( (grid % cells_n_nodes(c1) .eq. 5  .or.   &
-           grid % cells_n_nodes(c1) .eq. 8) .and.  &
-          cell_visited_from(c1) .eq. 0) then
+      c = grid % faces_c(i_cel, s)
 
-        ! Check Cell_Numbering_Neu, there is a twist at 3, 4
-        ! (Still not sure if that is the way it should be, not checked yet)
-        grid % cells_n(1, c1) = grid % faces_n(1, s)
-        grid % cells_n(2, c1) = grid % faces_n(2, s)
-        grid % cells_n(4, c1) = grid % faces_n(3, s)
-        grid % cells_n(3, c1) = grid % faces_n(4, s)
-        cell_visited_from(c1) = s
-      end if
+      if(c .gt. 0) then
 
-      if(c2 .gt. 0) then
+        !---------------------------!
+        !   Face is quadrilateral   !
+        !---------------------------!
+        if(grid % faces_n_nodes(s) .eq. 4) then
+          !------------------------------------------------------------!
+          !   First visit to pyramid or hexa from quadrilateral face   !
+          !------------------------------------------------------------!
+          if( (grid % cells_n_nodes(c) .eq. 5  .or.   &
+               grid % cells_n_nodes(c) .eq. 8) .and.  &
+              cell_visited_from(c) .eq. 0) then
 
-        !------------------------------------------------------------------!
-        !   First visit to pyramid or hexa from quadrilateral face as c2   !
-        !------------------------------------------------------------------!
-        if( (grid % cells_n_nodes(c2) .eq. 5  .or.   &
-             grid % cells_n_nodes(c2) .eq. 8) .and.  &
-            cell_visited_from(c2) .eq. 0) then
-
-          ! Check Cell_Numbering_Neu, there is a twist at 3, 4
-          ! (Still not sure if that is the way it should be, not checked yet)
-          grid % cells_n(1, c2) = grid % faces_n(1, s)
-          grid % cells_n(2, c2) = grid % faces_n(2, s)
-          grid % cells_n(4, c2) = grid % faces_n(3, s)
-          grid % cells_n(3, c2) = grid % faces_n(4, s)
-          cell_visited_from(c2) = s
-        end if
-      end if
-
-    end if
-
-    !------------------------!
-    !   Face is triangular   !
-    !------------------------!
-    if(grid % faces_n_nodes(s) .eq. 3) then
-
-      !--------------------------------------------------------------------!
-      !   First visit to tetrahedron or wedge from triangular face as c1   !
-      !--------------------------------------------------------------------!
-      if( (grid % cells_n_nodes(c1) .eq. 4  .or.   &
-           grid % cells_n_nodes(c1) .eq. 6) .and.  &
-          cell_visited_from(c1) .eq. 0) then
-        grid % cells_n(1:3, c1) = grid % faces_n(1:3, s)
-        cell_visited_from(c1) = s
-
-        ! Correct if first face is a boundary face
-        ! (This was important for wedges and makes no difference for tets
-        !  Should something like that be done also for quad faces, not sure)
-        if(c2 < 0) then
-          call Swap_Int(grid % cells_n(2, c1), grid % cells_n(3, c1))
+            ! Check Cell_Numbering_Neu, there is a twist at 3, 4
+            ! (Still not sure if that is the way it should be, not checked yet)
+            grid % cells_n(1, c) = grid % faces_n(1, s)
+            grid % cells_n(2, c) = grid % faces_n(2, s)
+            grid % cells_n(4, c) = grid % faces_n(3, s)
+            grid % cells_n(3, c) = grid % faces_n(4, s)
+            cell_visited_from(c) = s
+          end if
         end if
 
-      end if
+        !------------------------!
+        !   Face is triangular   !
+        !------------------------!
+        if(grid % faces_n_nodes(s) .eq. 3) then
+          !--------------------------------------------------------------!
+          !   First visit to tetrahedron or wedge from triangular face   !
+          !--------------------------------------------------------------!
+          if( (grid % cells_n_nodes(c) .eq. 4  .or.   &
+               grid % cells_n_nodes(c) .eq. 6) .and.  &
+              cell_visited_from(c) .eq. 0) then
+            grid % cells_n(1:3, c) = grid % faces_n(1:3, s)
+            cell_visited_from(c) = s
+          end if
+        end if  ! face is triangular
 
-      if(c2 .gt. 0) then
+      end if  ! c > 0
 
-        !--------------------------------------------------------------------!
-        !   First visit to tetrahedron or wedge from triangular face as c2   !
-        !--------------------------------------------------------------------!
-        if( (grid % cells_n_nodes(c2) .eq. 4  .or.   &
-             grid % cells_n_nodes(c2) .eq. 6) .and.  &
-            cell_visited_from(c2) .eq. 0) then
-          grid % cells_n(1:3, c2) = grid % faces_n(1:3, s)
-          cell_visited_from(c2) = s
-        end if
-      end if
-
-    end if
-
+    end do  ! through c1 and c2
   end do  ! through faces
 
   !---------------------------------------------------!
@@ -641,266 +604,148 @@ include 'Save_Vtu_Ascii.f90'
   !                                                   !
   !---------------------------------------------------!
   do s = 1, grid % n_faces
-    c1 = grid % faces_c(1, s)
-    c2 = grid % faces_c(2, s)
 
-    !---------------------------!
-    !   Face is quadrilateral   !
-    !---------------------------!
-    if(grid % faces_n_nodes(s) .eq. 4) then
+    !--------------------------------------!
+    !   Handle cells c1 and c2 in one go   !
+    !--------------------------------------!
+    do i_cel = 1, 2
 
-      !--------------------------------------!
-      !   Second visit to hexahedron in c1   !
-      !--------------------------------------!
-      if( grid % cells_n_nodes(c1) .eq. 8 .and.  &
-          cell_visited_from(c1) .ne.  s   .and.  &
-          cell_visited_from(c1) .ne. -1) then
+      c = grid % faces_c(i_cel, s)
 
-        ! Check if some nodes are already matching to make sure that
-        ! you are at the opposite side of face which has been visited
-        ! (Hence: skip this face if some nodes are already matching)
-        do i_nod = 1, 4
-          do j_nod = 1, 4
-            if(grid % cells_n(i_nod, c1) .eq. grid % faces_n(j_nod, s)) then
-              goto 10
-            end if
-          end do
-        end do
+      if(c .gt. 0) then
 
-        ! This is a wee-bit cumbersome, but couldn't think of anything else now
-        ! (It associates stored nodes with new ones by their closeness)
-        do i_nod = 1, 4  ! nodes already in hexahedral cell
-          do j_nod = 1, 4  ! nodes in face
-            dist(j_nod) = Math_Mod_Distance(                     &
-                          grid % xn(grid % cells_n(i_nod, c1)),  &
-                          grid % yn(grid % cells_n(i_nod, c1)),  &
-                          grid % zn(grid % cells_n(i_nod, c1)),  &
-                          grid % xn(grid % faces_n(j_nod,  s)),  &
-                          grid % yn(grid % faces_n(j_nod,  s)),  &
-                          grid % zn(grid % faces_n(j_nod,  s)))
-          end do
-          do j_nod = 1, 4
-            if(Math_Mod_Approx_Real(minval(dist(1:4)), dist(j_nod), PICO)) then
-              grid % cells_n(i_nod + 4, c1) = grid % faces_n(j_nod, s)
-            end if
-          end do
+        !---------------------------!
+        !   Face is quadrilateral   !
+        !---------------------------!
+        if(grid % faces_n_nodes(s) .eq. 4) then
 
-        end do
+          !--------------------------------!
+          !   Second visit to hexahedron   !
+          !--------------------------------!
+          if( grid % cells_n_nodes(c) .eq. 8 .and.  &
+              cell_visited_from(c) .ne.  s   .and.  &
+              cell_visited_from(c) .ne. -1) then
 
-        !---------------------------------!
-        !   Don't visit this cell again   !
-        !---------------------------------!
-        cell_visited_from(c1) = -1
-
-      end if
-10    continue  ! found matching nodes
-
-      if(c2 .gt. 0) then
-
-        !--------------------------------------!
-        !   Second visit to hexahedron in c1   !
-        !--------------------------------------!
-        if( grid % cells_n_nodes(c2) .eq. 8 .and.  &
-            cell_visited_from(c2) .ne.  s   .and.  &
-            cell_visited_from(c2) .ne. -1) then
-
-          ! Check if some nodes are already matching to make sure that
-          ! you are at the opposite side of face which has been visited
-          ! (Hence: skip this face if some nodes are already matching)
-          do i_nod = 1, 4
-            do j_nod = 1, 4
-              if(grid % cells_n(i_nod, c2) .eq. grid % faces_n(j_nod, s)) then
-                goto 20
-              end if
-            end do
-          end do
-
-          ! This is a wee-bit cumbersome, but couldn't think of anything else now
-          ! (It associates stored nodes with new ones by their closeness)
-          do i_nod = 1, 4    ! nodes already in hexahedral cell
-            do j_nod = 1, 4  ! nodes in face
-              dist(j_nod) = Math_Mod_Distance(                     &
-                            grid % xn(grid % cells_n(i_nod, c2)),  &
-                            grid % yn(grid % cells_n(i_nod, c2)),  &
-                            grid % zn(grid % cells_n(i_nod, c2)),  &
-                            grid % xn(grid % faces_n(j_nod,  s)),  &
-                            grid % yn(grid % faces_n(j_nod,  s)),  &
-                            grid % zn(grid % faces_n(j_nod,  s)))
-            end do
-            do j_nod = 1, 4
-              if(Math_Mod_Approx_Real(minval(dist(1:4)), dist(j_nod), PICO)) then
-                grid % cells_n(i_nod + 4, c2) = grid % faces_n(j_nod, s)
-              end if
+            ! Check if some nodes are already matching to make sure that
+            ! you are at the opposite side of face which has been visited
+            ! (Hence: skip this face if some nodes are already matching)
+            do i_nod = 1, 4
+              do j_nod = 1, 4
+                if(grid % cells_n(i_nod, c) .eq. grid % faces_n(j_nod, s)) then
+                  goto 20
+                end if
+              end do
             end do
 
-          end do
+            ! This is a wee-bit cumbersome, but couldn't think of anything else now
+            ! (It associates stored nodes with new ones by their closeness)
+            do i_nod = 1, 4    ! nodes already in hexahedral cell
+              do j_nod = 1, 4  ! nodes in face
+                dist(j_nod) = Math_Mod_Distance(                     &
+                              grid % xn(grid % cells_n(i_nod, c)),  &
+                              grid % yn(grid % cells_n(i_nod, c)),  &
+                              grid % zn(grid % cells_n(i_nod, c)),  &
+                              grid % xn(grid % faces_n(j_nod,  s)),  &
+                              grid % yn(grid % faces_n(j_nod,  s)),  &
+                              grid % zn(grid % faces_n(j_nod,  s)))
+              end do
+              do j_nod = 1, 4
+                if(Math_Mod_Approx_Real(minval(dist(1:4)), dist(j_nod), PICO)) then
+                  grid % cells_n(i_nod + 4, c) = grid % faces_n(j_nod, s)
+                end if
+              end do
 
-          !---------------------------------!
-          !   Don't visit this cell again   !
-          !---------------------------------!
-          cell_visited_from(c2) = -1
-
-        end if
-20      continue  ! found matching nodes
-      end if
-
-    end if
-
-    !------------------------!
-    !   Face is triangular   !
-    !------------------------!
-    if(grid % faces_n_nodes(s) .eq. 3) then
-
-      !------------------------------------------------------!
-      !   Second visit to wedge from triangular face in c1   !
-      !------------------------------------------------------!
-      if( grid % cells_n_nodes(c1) .eq. 6 .and.  &
-          cell_visited_from(c1) .ne.  s   .and.  &
-          cell_visited_from(c1) .ne. -1) then
-
-        ! This is a wee-bit cumbersome, but couldn't think of anything else now
-        ! (It associates stored nodes with new ones by their closeness)
-        do i_nod = 1, 3    ! nodes already in wedge cell
-          do j_nod = 1, 3  ! nodes in face
-            dist(j_nod) = Math_Mod_Distance(                     &
-                          grid % xn(grid % cells_n(i_nod, c1)),  &
-                          grid % yn(grid % cells_n(i_nod, c1)),  &
-                          grid % zn(grid % cells_n(i_nod, c1)),  &
-                          grid % xn(grid % faces_n(j_nod,  s)),  &
-                          grid % yn(grid % faces_n(j_nod,  s)),  &
-                          grid % zn(grid % faces_n(j_nod,  s)))
-          end do
-          do j_nod = 1, 3
-            if(Math_Mod_Approx_Real(minval(dist(1:3)), dist(j_nod), PICO)) then
-              grid % cells_n(i_nod + 3, c1) = grid % faces_n(j_nod, s)
-            end if
-          end do
-        end do
-
-        !---------------------------------!
-        !   Don't visit this cell again   !
-        !---------------------------------!
-        cell_visited_from(c1) = -1
-
-      end if
-
-      if(c2 .gt. 0) then
-
-        !--------------------------------------------------------------!
-        !   Second time you visit a wedge from triangular face as c1   !
-        !--------------------------------------------------------------!
-        if( grid % cells_n_nodes(c2) .eq. 6 .and.  &
-            cell_visited_from(c2) .ne.  s   .and.  &
-            cell_visited_from(c2) .ne. -1) then
-
-          ! This is a wee-bit cumbersome, but couldn't think of anything else now
-          ! (It associates stored nodes with new ones by their closeness)
-          do i_nod = 1, 3    ! nodes already in wedge cell
-            do j_nod = 1, 3  ! nodes in face
-              dist(j_nod) = Math_Mod_Distance(                     &
-                            grid % xn(grid % cells_n(i_nod, c2)),  &
-                            grid % yn(grid % cells_n(i_nod, c2)),  &
-                            grid % zn(grid % cells_n(i_nod, c2)),  &
-                            grid % xn(grid % faces_n(j_nod,  s)),  &
-                            grid % yn(grid % faces_n(j_nod,  s)),  &
-                            grid % zn(grid % faces_n(j_nod,  s)))
             end do
-            do j_nod = 1, 3
-              if(Math_Mod_Approx_Real(minval(dist(1:3)), dist(j_nod), PICO)) then
-                grid % cells_n(i_nod + 3, c2) = grid % faces_n(j_nod, s)
-              end if
+
+            !---------------------------------!
+            !   Don't visit this cell again   !
+            !---------------------------------!
+            cell_visited_from(c) = -1
+
+          end if    ! if hexahedron
+  20      continue  ! found matching nodes
+
+        end if  ! face is quadrilateral
+
+        !------------------------!
+        !   Face is triangular   !
+        !------------------------!
+        if(grid % faces_n_nodes(s) .eq. 3) then
+
+          !--------------------------------------------------------!
+          !   Second time you visit a wedge from triangular face   !
+          !--------------------------------------------------------!
+          if( grid % cells_n_nodes(c) .eq. 6 .and.  &
+              cell_visited_from(c) .ne.  s   .and.  &
+              cell_visited_from(c) .ne. -1) then
+
+            ! This is a wee-bit cumbersome, but couldn't think of anything else now
+            ! (It associates stored nodes with new ones by their closeness)
+            do i_nod = 1, 3    ! nodes already in wedge cell
+              do j_nod = 1, 3  ! nodes in face
+                dist(j_nod) = Math_Mod_Distance(                    &
+                              grid % xn(grid % cells_n(i_nod, c)),  &
+                              grid % yn(grid % cells_n(i_nod, c)),  &
+                              grid % zn(grid % cells_n(i_nod, c)),  &
+                              grid % xn(grid % faces_n(j_nod, s)),  &
+                              grid % yn(grid % faces_n(j_nod, s)),  &
+                              grid % zn(grid % faces_n(j_nod, s)))
+              end do
+              do j_nod = 1, 3
+                if(Math_Mod_Approx_Real(minval(dist(1:3)), dist(j_nod), PICO)) then
+                  grid % cells_n(i_nod + 3, c) = grid % faces_n(j_nod, s)
+                end if
+              end do
             end do
-          end do
 
-          !---------------------------------!
-          !   Don't visit this cell again   !
-          !---------------------------------!
-          cell_visited_from(c2) = -1
+            !---------------------------------!
+            !   Don't visit this cell again   !
+            !---------------------------------!
+            cell_visited_from(c) = -1
 
-        end if
-      end if
-
-      !----------------------------------------------------------------!
-      !   Second time you visit a pyramid from triangular face as c1   !
-      !   (For pyramid, one node still missing, any face will do)      !
-      !----------------------------------------------------------------!
-      if( grid % cells_n_nodes(c1) .eq. 5 .and.  &
-          cell_visited_from(c1) .ne.  s   .and.  &
-          cell_visited_from(c1) .ne. -1) then
-        do i_nod = 1, 3
-          if(all(grid % cells_n(1:4, c1) .ne.  &
-                 grid % faces_n(i_nod, s))) then
-            grid % cells_n(5, c1) = grid % faces_n(i_nod, s)
           end if
-        end do
 
-        ! Don't visit this cell again
-        cell_visited_from(c1) = -1
-      end if
+          !-------------------------------------------------------------!
+          !   Second time you visit a pyramid from triangular face      !
+          !   (For pyramid, one node still missing, any face will do)   !
+          !-------------------------------------------------------------!
+          if( grid % cells_n_nodes(c) .eq. 5 .and.  &
+              cell_visited_from(c) .ne.  s   .and.  &
+              cell_visited_from(c) .ne. -1) then
+            do i_nod = 1, 3
+              if(all(grid % cells_n(1:4, c) .ne.  &
+                     grid % faces_n(i_nod, s))) then
+                grid % cells_n(5, c) = grid % faces_n(i_nod, s)
+              end if
+            end do
 
-      if(c2 .gt. 0) then
-
-        !----------------------------------------------------------------!
-        !   Second time you visit a pyramid from triangular face as c2   !
-        !   (For pyramid, one node still missing, any face will do)      !
-        !----------------------------------------------------------------!
-        if( grid % cells_n_nodes(c2) .eq. 5 .and.  &
-            cell_visited_from(c2) .ne.  s   .and.  &
-            cell_visited_from(c2) .ne. -1) then
-          do i_nod = 1, 3
-            if(all(grid % cells_n(1:4, c2) .ne.  &
-                   grid % faces_n(i_nod, s))) then
-              grid % cells_n(5, c2) = grid % faces_n(i_nod, s)
-            end if
-          end do
-
-          ! Don't visit this cell again
-          cell_visited_from(c2) = -1
-        end if
-      end if
-
-      !--------------------------------------------------------------------!
-      !   Second time you visit a tetrahedron from triangular face as c1   !
-      !   (For tetrahedron, one node still missing, any face will do)      !
-      !--------------------------------------------------------------------!
-      if( grid % cells_n_nodes(c1) .eq. 4 .and.  &
-          cell_visited_from(c1) .ne.  s   .and.  &
-          cell_visited_from(c1) .ne. -1) then
-        do i_nod = 1, 3
-          if(all(grid % cells_n(1:3, c1) .ne.  &
-                 grid % faces_n(i_nod, s))) then
-            grid % cells_n(4, c1) = grid % faces_n(i_nod, s)
+            ! Don't visit this cell again
+            cell_visited_from(c) = -1
           end if
-        end do
 
-        ! Don't visit this cell again
-        cell_visited_from(c1) = -1
-      end if
+          !-----------------------------------------------------------------!
+          !   Second time you visit a tetrahedron from triangular face      !
+          !   (For tetrahedron, one node still missing, any face will do)   !
+          !-----------------------------------------------------------------!
+          if( grid % cells_n_nodes(c) .eq. 4 .and.  &
+              cell_visited_from(c) .ne.  s   .and.  &
+              cell_visited_from(c) .ne. -1) then
+            do i_nod = 1, 3
+              if(all(grid % cells_n(1:3, c) .ne.  &
+                     grid % faces_n(i_nod, s))) then
+                grid % cells_n(4, c) = grid % faces_n(i_nod, s)
+              end if
+            end do
 
-      if(c2 .gt. 0) then
+            ! Don't visit this cell again
+            cell_visited_from(c) = -1
+          end if
+        end if  ! face is triangular
 
-        !--------------------------------------------------------------------!
-        !   Second time you visit a tetrahedron from triangular face as c2   !
-        !   (For tetrahedron, one node still missing, any face will do)      !
-        !--------------------------------------------------------------------!
-        if( grid % cells_n_nodes(c2) .eq. 4 .and.  &
-            cell_visited_from(c2) .ne.  s   .and.  &
-            cell_visited_from(c2) .ne. -1) then
-          do i_nod = 1, 3
-            if(all(grid % cells_n(1:3, c2) .ne.  &
-                   grid % faces_n(i_nod, s))) then
-              grid % cells_n(4, c2) = grid % faces_n(i_nod, s)
-            end if
-          end do
+      end if  ! c > 0
 
-          ! Don't visit this cell again
-          cell_visited_from(c2) = -1
-        end if
-      end if
-
-    end if
-
-  end do
+    end do  ! through c1 and c2
+  end do  ! through s, faces
 
   !------------------------------------------------------------!
   !                                                            !
