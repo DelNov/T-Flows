@@ -9,7 +9,7 @@
   integer           :: un  ! unit
   logical, optional :: reached_end
 !-----------------------------------[Locals]-----------------------------------!
-  integer      :: i
+  integer      :: i, l
   character(6) :: format = '(a000)'
 !==============================================================================!
 !   A comment is each line which begins with "!", "#", "$", "%" or "*".        !
@@ -41,6 +41,11 @@
   if( trim(line % whole(1:1)) .eq. '!' .or.               &
       trim(line % whole(1:1)) .eq. '#' .or.               &
       trim(line % whole(1:1)) .eq. '%' ) goto 1
+
+  ! Fetch the first and the last character
+  l = len_trim(line % whole)
+  line % first = line % whole(1:1)
+  line % last  = line % whole(l:l)
 
   !--------------------------------------!
   !  Parse tokens. This is somehow cool  !

@@ -13,7 +13,8 @@
   character(DL)        :: name_in
   character(SL)        :: one_token
   integer              :: n_tri, n_quad, n_tetra, n_hexa, n_pyra, n_wedge
-  integer              :: n_cells, n_bnd_cells, n_faces, n_nodes, n_face_nodes
+  integer              :: n_cells, n_bnd_cells, n_faces, n_nodes,  &
+                          n_face_nodes, n_cells_zone
   integer              :: c1, c2, s, n, fu, i, i_nod, j_nod, l
   integer              :: cell_type, face_type
   integer              :: cell_s, cell_e, side_s, side_e, node_s, node_e
@@ -24,7 +25,7 @@
   integer              :: face_sect_bnd(2048)  ! where does T-Flows store it
   integer              :: n_bnd_cond      ! number of boundary conditions
   logical              :: bnd_cond(2048)  ! .true. if bnd cond section
-  character(SL)        :: bc_names(2048)
+! character(SL)        :: bc_names(2048)
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: MIXED_ZONE = 0
   integer, parameter :: CELL_TRI   = 1
@@ -57,52 +58,49 @@
   !   Look for number of nodes and read it   !
   !     Nodes' section starts with '(10'     !
   !------------------------------------------!
+  grid % n_nodes = 0
   rewind(fu)
-  do
+  do while(grid % n_nodes .eq. 0)
     call File_Mod_Read_Line(fu)
     if(line % n_tokens > 1) then
       if(line % tokens(1) .eq. '(10' .and. line % tokens(2) .eq. '(0') then
         read(line % tokens(4), '(z160)') grid % n_nodes
         print '(a34,i9)', ' # Number of nodes in header:     ', grid % n_nodes
-        goto 1
       end if
     end if
   end do
-1 continue
 
   !------------------------------------------!
   !   Look for number of cells and read it   !
   !     Cells' section starts with '(12'     !
   !------------------------------------------!
+  grid % n_cells = 0
   rewind(fu)
-  do
+  do while(grid % n_cells .eq. 0)
     call File_Mod_Read_Line(fu)
     if(line % n_tokens > 1) then
       if(line % tokens(1) .eq. '(12' .and. line % tokens(2) .eq. '(0') then
         read(line % tokens(4), '(z160)') grid % n_cells
         print '(a34,i9)', ' # Number of cells in header:     ', grid % n_cells
-        goto 2
       end if
     end if
   end do
-2 continue
 
   !------------------------------------------!
   !   Look for number of faces and read it   !
   !     Faces' section starts with '(13'     !
   !------------------------------------------!
+  grid % n_faces = 0
   rewind(fu)
-  do
+  do while(grid % n_faces .eq. 0)
     call File_Mod_Read_Line(fu)
     if(line % n_tokens > 1) then
       if(line % tokens(1) .eq. '(13' .and. line % tokens(2) .eq. '(0') then
         read(line % tokens(4), '(z160)') grid % n_faces
         print '(a34,i9)', ' # Number of faces in header:     ', grid % n_faces
-        goto 3
       end if
     end if
   end do
-3 continue
 
   !----------------------------------------------------------------------------!
   !   Read the faces to count the boundary cells and boundary cells sections   !
@@ -115,7 +113,7 @@
   n_bnd_cells = 0
   n_faces     = 0
   rewind(fu)
-  do
+  do while(n_faces < grid % n_faces)
     call File_Mod_Read_Line(fu)
     if(line % n_tokens > 1) then
 
@@ -130,17 +128,22 @@
         ! Store this face section position in the Fluent's mesh
         one_token = line % tokens(2)
         l = len_trim(one_token)
-        read(one_token(2:l), '(i16)') face_sect_pos(n_face_sect)
+        read(one_token(2:l), '(z16)') face_sect_pos(n_face_sect)
 
         ! Take the cell type of this zone
         one_token = line % tokens(6)
-        read(one_token(1:1), '(i1)') face_type
+        read(one_token(1:1), '(z1)') face_type
         if(face_type .eq. MIXED_ZONE) then
           print '(a34,i9,a4,i9)', ' # Found a mixed face zone from:  ',  &
                                   side_s, ' to:', side_e
         else
           print '(a34,i9,a4,i9)', ' # Found a uniform face zone from:',  &
                                   side_s, ' to:', side_e
+        end if
+
+        ! End the line if needed
+        if(line % last .ne. '(') then
+          call File_Mod_Read_Line(fu)
         end if
 
         !--------------------------!
@@ -186,12 +189,8 @@
 
       end if
 
-      ! Check if you read all the nodes
-      if(n_faces .ge. grid % n_faces) goto 4
-
     end if
   end do
-4 continue
 
   grid % n_bnd_cells = n_bnd_cells
   print '(a34,i9)', ' # Boundary cells from face data: ', n_bnd_cells
@@ -217,7 +216,7 @@
   print '(a60)', ' #----------------------------------------------------------'
   n_nodes = 0
   rewind(fu)
-  do
+  do while(n_nodes < grid % n_nodes)
     call File_Mod_Read_Line(fu)
     if(line % n_tokens > 1) then
 
@@ -227,6 +226,13 @@
         read(line % tokens(4), '(z160)') node_e  ! ending node
         print '(a34,i9,a4,i9)', ' # Found a node zone from:        ',  &
                                 node_s, ' to:', node_e
+
+        ! End the line if needed
+        if(line % last .ne. '(') then
+          call File_Mod_Read_Line(fu)
+        end if
+
+        ! Read all the nodes (node coordinates)
         do n = node_s, node_e
           n_nodes = n_nodes + 1
           call File_Mod_Read_Line(fu)
@@ -236,95 +242,142 @@
         end do
       end if
 
-      ! Check if you read all the nodes
-      if(n_nodes .ge. grid % n_nodes) goto 5
-
     end if
   end do
-5 continue
 
   !-------------------------!
   !                         !
   !                         !
-  !   Read the cell types   !  (Works only for one zone of mixed cell types!!!)
+  !   Read the cell types   !
   !                         !
   !                         !
   !-------------------------!
+
+  ! Initialize all cell counters
+  n_cells = 0
+  n_tri   = 0;  n_quad  = 0;  n_tetra = 0
+  n_hexa  = 0;  n_pyra  = 0;  n_wedge = 0
+
   rewind(fu)
-  do
+  do while(n_cells < grid % n_cells)
     call File_Mod_Read_Line(fu)
     if(line % n_tokens > 1) then
       if(line % tokens(1) .eq. '(12' .and. line % tokens(2) .ne. '(0') then
 
-        read(line % tokens(3), '(z160)') cell_s  ! starting face
-        read(line % tokens(4), '(z160)') cell_e  ! ending face
+        read(line % tokens(3), '(z160)') cell_s  ! starting cell
+        read(line % tokens(4), '(z160)') cell_e  ! ending cell
         print '(a34,i9,a4,i9)', ' # Found a cell zone from:        ',  &
                                 cell_s, ' to:', cell_e
 
-        ! Initialize all counters
-        n_cells = 0
-        n_tri   = 0;  n_quad  = 0;  n_tetra = 0
-        n_hexa  = 0;  n_pyra  = 0;  n_wedge = 0
+        !---------------------------------------------------------!
+        !   Check if the zone is mixed (listing all cell types)   !
+        !---------------------------------------------------------!
+        read(line % tokens(line % n_tokens)(1:1), '(z1)') cell_type
 
-6       continue
+        !------------------------------------!
+        !   You are reading a uniform zone   !
+        !------------------------------------!
+        if(cell_type .ne. MIXED_ZONE) then
 
-        call File_Mod_Read_Line(fu)
+          ! Number of cells in this zone
+          n_cells_zone = cell_e - cell_s + 1
 
-        do i = 1, line % n_tokens
-          read(line % tokens(i), *) cell_type
+          ! Update the number of cells
+          n_cells = n_cells + n_cells_zone
 
-          ! Update the counter for all cells
-          n_cells = n_cells + 1
-
-          ! Update the counters for cell types
-          if(cell_type .eq. CELL_TRI) then
-            n_tri = n_tri + 1
-            grid % cells_n_nodes(n_cells) = 3
-            grid % cells_n_faces(n_cells) = 1
-
-          else if(cell_type .eq. CELL_QUAD) then
-            n_quad = n_quad + 1
-            grid % cells_n_nodes(n_cells) = 4
-            grid % cells_n_faces(n_cells) = 1
-
-          else if(cell_type .eq. CELL_TETRA) then
-            n_tetra = n_tetra + 1
-            grid % cells_n_nodes(n_cells) = 4
-            grid % cells_n_faces(n_cells) = 4
-
-          else if(cell_type .eq. CELL_HEXA)  then
-            n_hexa = n_hexa + 1
-            grid % cells_n_nodes(n_cells) = 8
-            grid % cells_n_faces(n_cells) = 6
-
-          else if(cell_type .eq. CELL_PYRA)  then
-            n_pyra = n_pyra + 1
-            grid % cells_n_nodes(n_cells) = 5
-            grid % cells_n_faces(n_cells) = 5
-
-          else if(cell_type .eq. CELL_WEDGE) then
-            n_wedge = n_wedge + 1
-            grid % cells_n_nodes(n_cells) = 6
-            grid % cells_n_faces(n_cells) = 5
-
-          else
-            print *, '# ERROR: Unsupported cell type.'
-            print *, '# This error is critical.  Exiting!'
-            stop
-
+          if(cell_type .eq. CELL_TRI)   then
+            n_tri = n_tri + n_cells_zone
+            grid % cells_n_nodes(cell_s:cell_e) = 3
+            grid % cells_n_faces(cell_s:cell_e) = 1
           end if
-        end do
+          if(cell_type .eq. CELL_QUAD)  then
+            n_quad = n_quad + n_cells_zone
+            grid % cells_n_nodes(cell_s:cell_e) = 4
+            grid % cells_n_faces(cell_s:cell_e) = 1
+          end if
+          if(cell_type .eq. CELL_TETRA) then
+            n_tetra = n_tetra + n_cells_zone
+            grid % cells_n_nodes(cell_s:cell_e) = 4
+            grid % cells_n_faces(cell_s:cell_e) = 4
+          end if
+          if(cell_type .eq. CELL_HEXA)  then
+            n_hexa = n_hexa + n_cells_zone
+            grid % cells_n_nodes(cell_s:cell_e) = 8
+            grid % cells_n_faces(cell_s:cell_e) = 6
+          end if
+          if(cell_type .eq. CELL_PYRA)  then
+            n_pyra  = n_pyra  + n_cells_zone
+            grid % cells_n_nodes(cell_s:cell_e) = 5
+            grid % cells_n_faces(cell_s:cell_e) = 5
+          end if
+          if(cell_type .eq. CELL_WEDGE) then
+            n_wedge = n_wedge + n_cells_zone
+            grid % cells_n_nodes(cell_s:cell_e) = 6
+            grid % cells_n_faces(cell_s:cell_e) = 5
+          end if
 
-        if(n_cells < grid % n_cells) then
-          goto 6
+        !----------------------------------!
+        !   You are reading a mixed zone   !
+        !----------------------------------!
         else
-          goto 7
-        end if
 
-      end if
-    end if
-  end do
-7 continue
+6         continue
+
+          call File_Mod_Read_Line(fu)
+
+          do i = 1, line % n_tokens
+            read(line % tokens(i), *) cell_type
+
+            ! Update the counter for all cells
+            n_cells = n_cells + 1
+
+            ! Update the counters for cell types
+            if(cell_type .eq. CELL_TRI) then
+              n_tri = n_tri + 1
+              grid % cells_n_nodes(n_cells) = 3
+              grid % cells_n_faces(n_cells) = 1
+
+            else if(cell_type .eq. CELL_QUAD) then
+              n_quad = n_quad + 1
+              grid % cells_n_nodes(n_cells) = 4
+              grid % cells_n_faces(n_cells) = 1
+
+            else if(cell_type .eq. CELL_TETRA) then
+              n_tetra = n_tetra + 1
+              grid % cells_n_nodes(n_cells) = 4
+              grid % cells_n_faces(n_cells) = 4
+
+            else if(cell_type .eq. CELL_HEXA)  then
+              n_hexa = n_hexa + 1
+              grid % cells_n_nodes(n_cells) = 8
+              grid % cells_n_faces(n_cells) = 6
+
+            else if(cell_type .eq. CELL_PYRA)  then
+              n_pyra = n_pyra + 1
+              grid % cells_n_nodes(n_cells) = 5
+              grid % cells_n_faces(n_cells) = 5
+
+            else if(cell_type .eq. CELL_WEDGE) then
+              n_wedge = n_wedge + 1
+              grid % cells_n_nodes(n_cells) = 6
+              grid % cells_n_faces(n_cells) = 5
+
+            else
+              print *, '# ERROR: Unsupported cell type.'
+              print *, '# This error is critical.  Exiting!'
+              stop
+            end if
+          end do
+
+          ! Did you reach the end of this secion?
+          if(n_cells < cell_e) goto 6
+
+        end if  ! end of the mixed zone, also end of both zones
+
+      end if  ! found a beginning of cell zone
+    end if  ! number of tokens bigger than one
+  end do  ! infinite loop
+
   print '(a60)', ' #=========================================================='
   print '(a60)', ' # Summary of interioir cell shapes:                        '
   print '(a60)', ' #----------------------------------------------------------'
@@ -349,7 +402,7 @@
   n_bnd_cells = 0
   n_faces     = 0
   rewind(fu)
-  do
+  do while(n_faces < grid % n_faces)
     call File_Mod_Read_Line(fu)
     if(line % n_tokens > 1) then
 
@@ -363,13 +416,18 @@
 
         ! Take the cell type of this zone
         one_token = line % tokens(6)
-        read(one_token(1:1), '(i1)') face_type
+        read(one_token(1:1), '(z1)') face_type
         if(face_type .eq. MIXED_ZONE) then
           print '(a34,i9,a4,i9)', ' # Found a mixed face zone from:  ',  &
                                   side_s, ' to:', side_e
         else
           print '(a34,i9,a4,i9)', ' # Found a uniform face zone from:',  &
                                   side_s, ' to:', side_e
+        end if
+
+        ! End the line if needed
+        if(line % last .ne. '(') then
+          call File_Mod_Read_Line(fu)
         end if
 
         !--------------------------!
@@ -430,12 +488,8 @@
         end do
       end if
 
-      ! Check if you read all the nodes
-      if(n_faces .ge. grid % n_faces) goto 8
-
     end if
   end do
-8 continue
 
   print '(a34,i9)', ' # Boundary cells from face data: ', n_bnd_cells
 

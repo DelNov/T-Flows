@@ -22,6 +22,7 @@
     integer       :: n_tokens            ! number of tokens
     integer       :: s(MAX_TOKENS),  &   ! tokens starts ...
                      e(MAX_TOKENS)       ! ... and ends
+    character(1)  :: first, last         ! first and last characters in whole
   end type
 
   type(Tokenizer_Type) :: line
