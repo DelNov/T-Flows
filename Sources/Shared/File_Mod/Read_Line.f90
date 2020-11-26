@@ -1,15 +1,16 @@
 !==============================================================================!
-  subroutine File_Mod_Read_Line(un, reached_end)
+  subroutine File_Mod_Read_Line(un, reached_end, remove)
 !------------------------------------------------------------------------------!
 !   Reads a line from a file unit un and discards if it is comment.            !
 !   In addition, it breaks the line in tokens (individual strings).            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer           :: un  ! unit
-  logical, optional :: reached_end
+  integer                :: un  ! unit
+  logical,      optional :: reached_end
+  character(*), optional :: remove
 !-----------------------------------[Locals]-----------------------------------!
-  integer      :: i, l
+  integer      :: i, j, l, n
   character(6) :: format = '(a000)'
 !==============================================================================!
 !   A comment is each line which begins with "!", "#", "$", "%" or "*".        !
@@ -21,11 +22,23 @@
     reached_end = .false.
   end if
 
+  ! Take the number of characters to be removed from the line
+  n = 0;  if(present(remove)) n = len_trim(remove)
+
   !-----------------------------------!
   !  Read the whole line into whole   !
   !-----------------------------------!
   write(format(3:5), '(i3.3)') DL
 1 read(un,format, end=2) line % whole
+
+  ! Remove unwanted characters from it (if n .eq. 0, it won't do it)
+  do j = 1, n
+    do i = 1, len_trim(line % whole)
+      if( line % whole(i:i) .eq. remove(j:j) ) then
+        line % whole(i:i) = ' '
+      end if
+    end do
+  end do
 
   ! Shift the whole line to the left (remove leading spaces)
   line % whole = adjustl(line % whole)
