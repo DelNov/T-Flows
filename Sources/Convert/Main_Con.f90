@@ -88,7 +88,6 @@
     call Save_Vtu_Cells(grid, 0,         &
                         grid % n_nodes,  &
                         grid % n_cells)
-    call Save_Vtu_Faces(grid)
     STOP
   end if
 
