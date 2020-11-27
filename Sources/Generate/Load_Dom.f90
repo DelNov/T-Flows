@@ -30,6 +30,11 @@
   ! Copy face-node numbering for blocks
   fn = hex_block
 
+  !---------------------------------------------!
+  !   The grid will not have polyhedral cells   !
+  !---------------------------------------------!
+  grid % polyhedral = .false.
+
   print *, '#========================================'
   print *, '# Input problem name: (without extension)'
   print *, '#----------------------------------------'

@@ -33,6 +33,11 @@
   read(fu) grid % n_shadows            ! number of shadow faces
   read(fu) grid % n_bnd_cond           ! number of boundary conditions
 
+  !-------------------------------------!
+  !   Does grid have polyhedral cells   !
+  !-------------------------------------!
+  read(fu) grid % polyhedral
+
   ! Allocate memory =--> carefull, there is no checking!
   call Grid_Mod_Allocate_Nodes(grid, grid % n_nodes)
   call Grid_Mod_Allocate_Cells(grid, grid % n_cells, grid % n_bnd_cells)

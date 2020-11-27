@@ -36,6 +36,11 @@
   write(fu) ns_sub
   write(fu) grid % n_bnd_cond  ! number of bounary conditions
 
+  !-------------------------------------!
+  !   Does grid have polyhedral cells   !
+  !-------------------------------------!
+  write(fu) grid % polyhedral
+
   !------------------------!
   !   Domain (grid) name   !
   !------------------------!
