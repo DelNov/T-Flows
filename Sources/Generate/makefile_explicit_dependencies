@@ -8,10 +8,6 @@ $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.04.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.03.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.02.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.01.F \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Gen_Mod.o \
 $(DIR_SHARED)/Gen_Mod/*.f90 
@@ -23,10 +19,6 @@ $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.04.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.03.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.02.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.01.F \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Point_Mod.f90
@@ -48,8 +40,6 @@ $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Refines_Mod.o \
 Refines_Mod/*.f90 \
-Refines_Mod/Connectivity.old \
-Refines_Mod/Connectivity.F \
 $(DIR_OBJECT)/Domain_Mod.o \
 Domain_Mod/*.f90 
 
@@ -57,14 +47,13 @@ Domain_Mod/*.f90
 #-- ./Smooths_Mod/Allocate_Smooths.f90
 #-- ./Smooths_Mod/Grid.f90
 #-- ./Line_Mod.f90
+#-- ./Block_Numbering.f90
 #-- ./Load_Dom.f90
 $(DIR_OBJECT)/Load_Dom.o:\
 $(DIR_OBJECT)/Smooths_Mod.o \
 Smooths_Mod/*.f90 \
 $(DIR_OBJECT)/Refines_Mod.o \
 Refines_Mod/*.f90 \
-Refines_Mod/Connectivity.old \
-Refines_Mod/Connectivity.F \
 $(DIR_OBJECT)/Domain_Mod.o \
 Domain_Mod/*.f90 
 
@@ -77,10 +66,6 @@ $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.04.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.03.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.02.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.01.F \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Gen_Mod.o \
 $(DIR_SHARED)/Gen_Mod/*.f90 \
@@ -93,10 +78,6 @@ $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.04.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.03.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.02.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.01.F \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Gen_Mod.o \
 $(DIR_SHARED)/Gen_Mod/*.f90 
@@ -117,17 +98,11 @@ $(DIR_SHARED)/Gen_Mod/*.f90
 #-- ./Refines_Mod.f90
 $(DIR_OBJECT)/Refines_Mod.o:\
 Refines_Mod/*.f90 \
-Refines_Mod/Connectivity.old \
-Refines_Mod/Connectivity.F \
 $(DIR_OBJECT)/Point_Mod.o \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.04.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.03.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.02.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.01.F \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Gen_Mod.o \
 $(DIR_SHARED)/Gen_Mod/*.f90 
@@ -143,7 +118,6 @@ $(DIR_SHARED)/Gen_Mod/*.f90
 #-- ./Math_Mod/Approx_Real.f90
 #-- ./File_Mod.f90
 $(DIR_OBJECT)/File_Mod.o:\
-$(DIR_SHARED)/File_Mod/Read_Line.01.F \
 $(DIR_SHARED)/File_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
@@ -159,12 +133,7 @@ $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.04.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.03.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.02.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.01.F \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/File_Mod/Read_Line.01.F \
 $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 
 
@@ -313,10 +282,6 @@ $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.04.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.03.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.02.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.01.F \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
@@ -335,10 +300,6 @@ $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.04.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.03.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.02.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.01.F \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Probe_1d_Cells.f90
@@ -349,12 +310,7 @@ $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.04.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.03.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.02.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.01.F \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/File_Mod/Read_Line.01.F \
 $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
@@ -374,12 +330,7 @@ $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.04.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.03.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.02.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.01.F \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/File_Mod/Read_Line.01.F \
 $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 
 
@@ -393,12 +344,7 @@ $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.04.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.03.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.02.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.01.F \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/File_Mod/Read_Line.01.F \
 $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 
 
@@ -412,10 +358,6 @@ $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.04.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.03.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.02.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.01.F \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_SHARED)/Cgns_Mod_Seq.f90 \
 $(DIR_SHARED)/Cgns_Mod_Par.f90 \
@@ -429,10 +371,6 @@ $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.04.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.03.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.02.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.01.F \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Cgns_Mod_Par.f90
@@ -443,10 +381,6 @@ $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.04.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.03.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.02.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.01.F \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
@@ -467,7 +401,6 @@ $(DIR_SHARED)/Cgns_Mod/*.f90
 $(DIR_OBJECT)/Control_Mod.o:\
 $(DIR_OBJECT)/Math_Mod.o \
 $(DIR_SHARED)/Math_Mod/*.f90 \
-$(DIR_SHARED)/File_Mod/Read_Line.01.F \
 $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 \
 $(DIR_SHARED)/Control_Mod/*/*.f90 \
@@ -547,29 +480,6 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 #-- ./Comm_Mod/Sequential/Write_Bnd_Real.f90
 #-- ./Comm_Mod/Sequential/Write_Int_Array.f90
 #-- ./Comm_Mod/Sequential/Recv_Log_Array.f90
-#-- ./Comm_Mod/Sequential/Old/EndPar.f90
-#-- ./Comm_Mod/Sequential/Old/Exchange.f90
-$(DIR_OBJECT)/Exchange.o:\
-$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
-$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
-$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.04.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.03.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.02.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.01.F \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#-- ./Comm_Mod/Sequential/Old/GloMin.f90
-#-- ./Comm_Mod/Sequential/Old/StaPar.f90
-$(DIR_OBJECT)/StaPar.o:
-
-#-- ./Comm_Mod/Sequential/Old/GloMax.f90
-#-- ./Comm_Mod/Sequential/Old/BufLoa.f90
-#-- ./Comm_Mod/Sequential/Old/GloSum.f90
-#-- ./Comm_Mod/Sequential/Old/Timex.f90
-#-- ./Comm_Mod/Sequential/Old/IGlSum.f90
-#-- ./Comm_Mod/Sequential/Old/Wait.f90
 #-- ./Comm_Mod/Sequential/Global_Min_Int.f90
 #-- ./Comm_Mod/Sequential/End.f90
 #-- ./Comm_Mod/Sequential/Start.f90
@@ -594,7 +504,6 @@ $(DIR_OBJECT)/StaPar.o:
 $(DIR_OBJECT)/Gen_Mod.o:\
 $(DIR_SHARED)/Gen_Mod/*.f90 
 
-#-- ./Cell_Numbering_Neu.f90
 #-- ./Comm_Mod_Par.f90
 $(DIR_OBJECT)/Comm_Mod_Par.o:\
 $(DIR_OBJECT)/Const_Mod.o \
@@ -633,12 +542,7 @@ $(DIR_OBJECT)/Metis_Options_Mod.o \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.04.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.03.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.02.F \
-$(DIR_SHARED)/Grid_Mod/Form_Cells_Comm.01.F \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_SHARED)/File_Mod/Read_Line.01.F \
 $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
@@ -748,4 +652,3 @@ $(DIR_OBJECT)/Swap_Short.o:\
 $(DIR_OBJECT)/Const_Mod.o 
 
 #-- ./Metis_Options_Mod.f90
-#-- ./Cell_Numbering.f90
