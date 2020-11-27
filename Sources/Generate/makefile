@@ -139,10 +139,19 @@ SRC_MOD += Point_Mod.f90		\
 #   Functions
 #---------------
 
-# Sources for all functions are obtained by a shell command
-SRC_FUN = $(shell ls -1 $(DIR_SHARED)/*.f90 *.f90	\
-                        | xargs -n1 basename		\
-                        | grep -v -i _Mod)
+# Sources for all shared functions
+SRC_FUN = Probe_1d_Nodes.f90	\
+          Probe_2d.f90		\
+          Swap_Int.f90		\
+          Swap_Real.f90		\
+          Swap_Short.f90	\
+          To_Upper_Case.f90
+
+SRC_FUN += Calculate_Geometry.f90	\
+           Load_Dom.f90			\
+           Logo_Gen.f90			\
+           Main_Gen.f90			\
+           Print_Grid_Statistics.f90
 
 #-------------------------------------------
 #   Conditional inclusion of CGNS support
