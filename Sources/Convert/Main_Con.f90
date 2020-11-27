@@ -59,8 +59,8 @@
   if(file_format .eq. 'GAMBIT' .or. file_format .eq. 'GMSH') then
     call Grid_Topology     (grid)
     call Find_Faces        (grid)
-    call Calculate_Geometry(grid)
   end if
+  call Calculate_Geometry(grid)
 
   ! Keep in mind that Grid_Mod_Calculate_Wall_Distance is ...
   ! ... faster if it is called after Grid_Mod_Sort_Faces_Smart

@@ -62,7 +62,7 @@
     ! Number of faces surrounding each cell
     integer, allocatable :: cells_n_faces(:)
 
-    ! Number of olyhedral faces surrounding each (clearly polyhedral) cell
+    ! Number of polygonal faces surrounding each (clearly polyhedral) cell
     integer, allocatable :: cells_n_polyf(:)
 
     ! Number of cells surrounding each cell
@@ -157,6 +157,12 @@
     real, allocatable :: user_array(:,:)
 
   end type
+
+  integer, parameter :: MAX_FACES_N_NODES = 12
+  integer, parameter :: MAX_CELLS_N_NODES = 36
+  integer, parameter :: MAX_CELLS_N_FACES = 24
+  integer, parameter :: MAX_CELLS_N_CELLS = MAX_CELLS_N_FACES
+  integer, parameter :: MAX_CELLS_N_POLYF = MAX_CELLS_N_FACES
 
   contains
 

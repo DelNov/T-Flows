@@ -14,9 +14,11 @@
   integer              :: c11, c12, c21, c22, s1, s2, bou_cen, cnt_bnd, cnt_per
   integer              :: color_per, n_per, number_faces, option
   integer              :: rot_dir, n1, n2
-  real                 :: xt(16), yt(16), zt(16), angle_face, tol
+  real                 :: xt(MAX_FACES_N_NODES),  &
+                          yt(MAX_FACES_N_NODES),  &
+                          zt(MAX_FACES_N_NODES)
   real                 :: xs2, ys2, zs2, x_a, y_a, z_a, x_b, y_b, z_b
-  real                 :: x_c, y_c, z_c, det
+  real                 :: x_c, y_c, z_c, det, angle_face, tol
   real                 :: ab_i, ab_j, ab_k, ac_i, ac_j, ac_k, p_i, p_j, p_k
   real                 :: per_min, per_max
   real                 :: t, sur_tot, angle
@@ -106,12 +108,12 @@
 !                                                                              !
 !------------------------------------------------------------------------------!
 
-  !-----------------------------!
-  !   Scale geometry            !
-  !-----------------------------!
-  !   => depends on: xn,yn,zn   !
-  !   <= gives:      xn,yn,zn   !
-  !-----------------------------!
+  !-------------------------------!
+  !   Scale geometry              !
+  !-------------------------------!
+  !   => depends on: xn, yn, zn   !
+  !   <= gives:      xn, yn, zn   !
+  !-------------------------------!
   print *, '#===================================='
   print *, '# Enter scaling factor for geometry  '
   print *, '#                                    '
@@ -145,11 +147,11 @@
   !   Calculate:                                        !
   !      components of cell faces, cell face centers.   !
   !-----------------------------------------------------!
-  !   => depends on: x_node,y_node,z_node               !
-  !   <= gives:      Sx,Sy,Sz,xsp,yzp,zsp               !
+  !   => depends on: xn, yn, zn                         !
+  !   <= gives:      sx, sy, sz, xf, yf, zf             !
   !-----------------------------------------------------!
   do s = 1, grid % n_faces
-    do n = 1, grid % faces_n_nodes(s)    ! for quadrilateral an triangular faces
+    do n = 1, grid % faces_n_nodes(s)         ! for all types of faces
       xt(n) = grid % xn(grid % faces_n(n,s))
       yt(n) = grid % yn(grid % faces_n(n,s))
       zt(n) = grid % zn(grid % faces_n(n,s))
