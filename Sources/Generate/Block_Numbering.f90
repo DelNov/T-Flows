@@ -21,7 +21,7 @@
 !   format, which is used in Convertor - the face order is different.          !
 !                                                                              !
 !   Changing it in order to make it consistent is not very straighforward      !
-!   since blocks are connected using this mapping too meaning that if it       !
+!   since blocks are connected using this mapping too, meaning that if it      !
 !   changes, all domain files should change accordingly. Doesn't make sense.   !
 !==============================================================================!
 
