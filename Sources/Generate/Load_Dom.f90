@@ -15,20 +15,20 @@
   type(Refines_Type) :: ref
   type(Grid_Type)    :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: b, i, l, s, fc, n, n1, n2, n3, n4, dumi, fu
+  integer       :: b, i, l, s, i_fac, n, n1, n2, n3, n4, dumi, fu
   integer       :: n_faces_check, n_nodes_check
   integer       :: ni, nj, nk, npnt, nsurf
   character(SL) :: dum
   character(SL) :: domain_name
   character(SL) :: answer
   real          :: xt(8), yt(8), zt(8)
-  integer       :: face_nodes(6,4)
-!==============================================================================!
-  data face_nodes / 1, 1, 2, 4, 3, 5,         &
-                    2, 5, 6, 8, 7, 7,         &
-                    4, 6, 8, 7, 5, 8,         &
-                    3, 2, 4, 3, 1, 6  /
+  integer       :: fn(6,4)
 !------------------------------------------------------------------------------!
+  include 'Block_Numbering.f90'
+!==============================================================================!
+
+  ! Copy face-node numbering for blocks
+  fn = hex_block
 
   print *, '#========================================'
   print *, '# Input problem name: (without extension)'
@@ -43,17 +43,17 @@
   call File_Mod_Open_File_For_Reading(domain_name, fu)
 
   !-----------------------------------------------------------------!
-  !   Max. number of nodes (cells), boundary faces and cell faces   ! 
+  !   Max. number of nodes (cells), boundary faces and cell faces   !
   !-----------------------------------------------------------------!
   call File_Mod_Read_Line(fu)
   read(line % tokens(1), *) grid % max_n_nodes
   read(line % tokens(2), *) grid % max_n_bnd_cells
-  read(line % tokens(3), *) grid % max_n_faces  
+  read(line % tokens(3), *) grid % max_n_faces
 
   !---------------------!
   !   Allocate memory   !
   !---------------------!
-  print *, '# Allocating memory for: ' 
+  print *, '# Allocating memory for: '
   print *, '#', grid % max_n_nodes,     ' nodes and cells'
   print *, '#', grid % max_n_bnd_cells, ' boundary cells'
   print *, '#', grid % max_n_faces,     ' cell faces'
@@ -63,7 +63,7 @@
 
   ! Variables in Grid_Mod
   call Grid_Mod_Allocate_Nodes(grid,  &
-                               grid % max_n_nodes) 
+                               grid % max_n_nodes)
 
   call Grid_Mod_Allocate_Cells(grid,                    &
                                grid % max_n_nodes,      &
@@ -85,8 +85,8 @@
 
   ! Variables still declared in Gen_Mod.h90:
   allocate (face_c_to_c(grid % max_n_faces,2))
-  face_c_to_c=0 
-  allocate (twin_n(grid % max_n_nodes,0:8));  
+  face_c_to_c = 0
+  allocate (twin_n(grid % max_n_nodes,0:8))
   twin_n (:,:) = 0
 
   print *, '# Allocation successfull !'
@@ -110,11 +110,11 @@
   !   Blocks   !
   !------------!
   call File_Mod_Read_Line(fu)
-  read(line % tokens(1), *) dom % n_blocks  ! number of blocks 
+  read(line % tokens(1), *) dom % n_blocks  ! number of blocks
 
   call Domain_Mod_Allocate_Blocks(dom, dom % n_blocks)
 
-  ! Initialize weights 
+  ! Initialize weights
   do b=1, dom % n_blocks
     dom % blocks(b) % weights      = 1.0
     dom % blocks(b) % face_weights = 1.0
@@ -129,7 +129,7 @@
     read(line % tokens(4),*) dom % blocks(b) % resolutions(3)
 
     call File_Mod_Read_Line(fu)
-    read(line % whole, *)               &  ! block weights 
+    read(line % whole, *)               &  ! block weights
          dom % blocks(b) % weights(1),  &
          dom % blocks(b) % weights(2),  &
          dom % blocks(b) % weights(3)
@@ -142,7 +142,7 @@
          dom % blocks(b) % corners(7), dom % blocks(b) % corners(8)
 
     !---------------------------!
-    !   Check if the block is   ! 
+    !   Check if the block is   !
     !     properly oriented     !
     !---------------------------!
     do n=1,8
@@ -173,10 +173,10 @@
   !      face of the block      !
   !-----------------------------!
   do b = 1, dom % n_blocks
-    do fc = 1,6
-      do n = 1,4
-        dom % blocks(b) % faces(fc, n) =  &
-        dom % blocks(b) % corners(face_nodes(fc,n))
+    do i_fac = 1, 6
+      do n = 1, 4
+        dom % blocks(b) % faces(i_fac, n) =  &
+        dom % blocks(b) % corners(fn(i_fac,n))
       end do
     end do
   end do
@@ -184,7 +184,7 @@
   !----------------------------------------------!
   !   Lines                                      !
   !----------------------------------------------!
-  !   Lines can be prescribed point by point     ! 
+  !   Lines can be prescribed point by point     !
   !   or with just a weighting factor.           !
   !----------------------------------------------!
   call File_Mod_Read_Line(fu)
@@ -230,10 +230,10 @@
   !   Copy block weights to face weights   !
   !----------------------------------------!
   do b = 1, dom % n_blocks
-    do fc = 1,6                          !  face of the block
-      dom % blocks(b) % face_weights(fc, 1) = dom % blocks(b) % weights(1)
-      dom % blocks(b) % face_weights(fc, 2) = dom % blocks(b) % weights(2)
-      dom % blocks(b) % face_weights(fc, 3) = dom % blocks(b) % weights(3)
+    do i_fac = 1,6                          !  face of the block
+      dom % blocks(b) % face_weights(i_fac, 1) = dom % blocks(b) % weights(1)
+      dom % blocks(b) % face_weights(i_fac, 2) = dom % blocks(b) % weights(2)
+      dom % blocks(b) % face_weights(i_fac, 3) = dom % blocks(b) % weights(3)
     end do
   end do
 
@@ -246,14 +246,14 @@
   do s = 1, nsurf
     call File_Mod_Read_Line(fu)
     read(line % whole,*) dum, n1, n2, n3, n4
-    call Domain_Mod_Find_Surface(dom, n1, n2, n3, n4, b, fc)
-    print *, '# block: ', b, ' surf: ', fc
-    n = (b-1)*6 + fc         ! surface number
+    call Domain_Mod_Find_Surface(dom, n1, n2, n3, n4, b, i_fac)
+    print *, '# block: ', b, ' surf: ', i_fac
+    n = (b-1)*6 + i_fac         ! surface number
 
     call File_Mod_Read_Line(fu)
-    read(line % whole, *) dom % blocks(b) % face_weights(fc,1),  &
-                          dom % blocks(b) % face_weights(fc,2),  &
-                          dom % blocks(b) % face_weights(fc,2)
+    read(line % whole, *) dom % blocks(b) % face_weights(i_fac,1),  &
+                          dom % blocks(b) % face_weights(i_fac,2),  &
+                          dom % blocks(b) % face_weights(i_fac,2)
   end do
 
   !---------------------------------------!
@@ -288,7 +288,7 @@
     print *, '# There is space available only for:', grid % max_n_nodes
     print *, '# Increase the parameter grid % max_n_nodes in the input file'
     print *, '# and re-run the code !'
-  end if 
+  end if
 
   if( (n_faces_check > grid % max_n_faces) .or.  &
       (n_nodes_check > grid % max_n_nodes) ) then
@@ -304,7 +304,7 @@
 
   call Domain_Mod_Allocate_Regions(dom, dom % n_regions)
 
-  do n=1, dom % n_regions
+  do n = 1, dom % n_regions
     dom % regions(n) % face=''
 
     call File_Mod_Read_Line(fu)
@@ -312,13 +312,13 @@
       read(line % whole,*)  dum,            &
                    dom % regions(n) % is,   &
                    dom % regions(n) % js,   &
-                   dom % regions(n) % ks,   & 
+                   dom % regions(n) % ks,   &
                    dom % regions(n) % ie,   &
                    dom % regions(n) % je,   &
                    dom % regions(n) % ke
     else if(line % n_tokens .eq. 2) then
       read(line % tokens(1),*)       dum
-      read(line % tokens(2),'(A4)')  & 
+      read(line % tokens(2),'(A4)')  &
            dom % regions(n) % face
       call To_Upper_Case(dom % regions(n) % face)
     end if
@@ -340,14 +340,14 @@
   !-------------------------!
   call File_Mod_Read_Line(fu)
   read(line % tokens(1), *)  n_periodic_cond  ! number of periodic boundaries
-  print '(a38,i7)', '# Number of periodic boundaries:     ', n_periodic_cond 
+  print '(a38,i7)', '# Number of periodic boundaries:     ', n_periodic_cond
 
   allocate (periodic_cond(n_periodic_cond,8))
 
   do n=1,n_periodic_cond
     call File_Mod_Read_Line(fu)
     read(line % whole, *) dum, periodic_cond(n,1), periodic_cond(n,2),  &
-                               periodic_cond(n,3), periodic_cond(n,4) 
+                               periodic_cond(n,3), periodic_cond(n,4)
     call File_Mod_Read_Line(fu)
     read(line % whole, *)      periodic_cond(n,5), periodic_cond(n,6),  &
                                periodic_cond(n,7), periodic_cond(n,8)
@@ -432,7 +432,7 @@
       if( line % tokens(2) .eq. 'X' )  smr % in_x(n) = .true.
       if( line % tokens(2) .eq. 'Y' )  smr % in_y(n) = .true.
       if( line % tokens(2) .eq. 'Z' )  smr % in_z(n) = .true.
-    end if 
+    end if
 
     ! Read the coordinates of the (non)smoothed region
     call File_Mod_Read_Line(fu)

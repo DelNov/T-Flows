@@ -11,14 +11,15 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer                 :: c, s
   integer                 :: c1, c2, m, run
-  integer, dimension(6,4) :: lfn  ! link faces' nodes for a hexahedral cell
-                                  ! not quite the same as Gambit's neu numbering
+  integer, dimension(6,4) :: fn  ! link faces' nodes for a hexahedral cell
+                                 ! not quite the same as Gambit's neu numbering
+!------------------------------------------------------------------------------!
+  include 'Block_Numbering.f90'
 !==============================================================================!
 
-  lfn = reshape( (/ 1, 1, 2, 4, 3, 5,  &
-                    2, 5, 6, 8, 7, 7,  &
-                    4, 6, 8, 7, 5, 8,  &
-                    3, 2, 4, 3, 1, 6  /), (/6, 4/) )
+  ! Copy face-node numbering for faces
+  ! (Note that it is the same as for blocks here in Generator)
+  fn = hex_block
 
   print *, '# Now determining the topology. This may take a while !'
 
@@ -77,24 +78,24 @@
           if(c2  > 0) then
             if(ref % cell_level(c2) > ref % cell_level(c1)) then
               grid % faces_n(1,grid % n_faces) =  &
-                grid % cells_n( lfn(face_c_to_c(grid % n_faces,2),4), c2 )
+                grid % cells_n( fn(face_c_to_c(grid % n_faces,2),4), c2 )
               grid % faces_n(2,grid % n_faces) =  &
-                grid % cells_n( lfn(face_c_to_c(grid % n_faces,2),3), c2 )
+                grid % cells_n( fn(face_c_to_c(grid % n_faces,2),3), c2 )
               grid % faces_n(3,grid % n_faces) =  &
-                grid % cells_n( lfn(face_c_to_c(grid % n_faces,2),2), c2 )
+                grid % cells_n( fn(face_c_to_c(grid % n_faces,2),2), c2 )
               grid % faces_n(4,grid % n_faces) =  &
-                grid % cells_n( lfn(face_c_to_c(grid % n_faces,2),1), c2 )
+                grid % cells_n( fn(face_c_to_c(grid % n_faces,2),1), c2 )
             else
-              grid % faces_n(1,grid % n_faces) = grid % cells_n( lfn(m,1), c1 )
-              grid % faces_n(2,grid % n_faces) = grid % cells_n( lfn(m,2), c1 )
-              grid % faces_n(3,grid % n_faces) = grid % cells_n( lfn(m,3), c1 )
-              grid % faces_n(4,grid % n_faces) = grid % cells_n( lfn(m,4), c1 )
+              grid % faces_n(1,grid % n_faces) = grid % cells_n( fn(m,1), c1 )
+              grid % faces_n(2,grid % n_faces) = grid % cells_n( fn(m,2), c1 )
+              grid % faces_n(3,grid % n_faces) = grid % cells_n( fn(m,3), c1 )
+              grid % faces_n(4,grid % n_faces) = grid % cells_n( fn(m,4), c1 )
             end if
           else
-            grid % faces_n(1,grid % n_faces) = grid % cells_n( lfn(m,1), c1 )
-            grid % faces_n(2,grid % n_faces) = grid % cells_n( lfn(m,2), c1 )
-            grid % faces_n(3,grid % n_faces) = grid % cells_n( lfn(m,3), c1 )
-            grid % faces_n(4,grid % n_faces) = grid % cells_n( lfn(m,4), c1 )
+            grid % faces_n(1,grid % n_faces) = grid % cells_n( fn(m,1), c1 )
+            grid % faces_n(2,grid % n_faces) = grid % cells_n( fn(m,2), c1 )
+            grid % faces_n(3,grid % n_faces) = grid % cells_n( fn(m,3), c1 )
+            grid % faces_n(4,grid % n_faces) = grid % cells_n( fn(m,4), c1 )
           end if
 
         end if
