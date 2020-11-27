@@ -20,7 +20,7 @@ tmp_file=$CURR_DIR/tmp_makefile_explicit_dependencies
 #   Read above this line   #
 #--------------------------#
 
-set -e # exit when any command fails
+#set -e # exit when any command fails
 #set -v #Prints shell input lines as they are read.
 #set -x #Print command traces before executing command.
 #set +x #disable previous line
