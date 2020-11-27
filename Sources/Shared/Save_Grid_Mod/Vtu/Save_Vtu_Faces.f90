@@ -39,8 +39,8 @@
   write(fu) IN_1 // '<UnstructuredGrid>' // LF
   write(str1, '(i0.0)') grid % n_nodes
   write(str2, '(i0.0)') grid % n_faces
-  write(fu) IN_2 // '<Piece NumberOfPoints="' // trim(str1) // '"' //  &
-                    ' NumberOfCells="' // trim(str2) // '">'       // LF
+  write(fu) IN_2 // '<Piece NumberOfPoints="' // trim(str1) // '"'  //  &
+                    ' NumberOfCells="'        // trim(str2) // '">' // LF
   data_offset = 0
 
   !-----------!
@@ -141,20 +141,8 @@
   data_size = n_conns * IP
   write(fu) data_size
   do s = 1, grid % n_faces
-    if(grid % faces_n_nodes(s) .eq. 4) then
-      write(fu)                                        &
-        grid % faces_n(1,s)-1, grid % faces_n(2,s)-1,  &
-        grid % faces_n(3,s)-1, grid % faces_n(4,s)-1
-    else if(grid % faces_n_nodes(s) .eq. 3) then
-      write(fu)                                        &
-        grid % faces_n(1,s)-1, grid % faces_n(2,s)-1,  &
-        grid % faces_n(3,s)-1
-    else
-      print *, '# Unsupported cell type ',       &
-                 grid % faces_n_nodes(s), ' nodes.'
-      print *, '# Exiting'
-      stop
-    end if
+    n = grid % faces_n_nodes(s)
+    write(fu) grid % faces_n(1:n,s)-1
   end do
 
   ! Faces' offsets
@@ -170,8 +158,13 @@
   data_size = grid % n_faces * IP
   write(fu) data_size
   do s = 1, grid % n_faces
-    if(grid % faces_n_nodes(s) .eq. 4) write(fu) VTK_QUAD
-    if(grid % faces_n_nodes(s) .eq. 3) write(fu) VTK_TRIANGLE
+    if(grid % faces_n_nodes(s) .eq. 4) then
+      write(fu) VTK_QUAD
+    else if(grid % faces_n_nodes(s) .eq. 3) then
+      write(fu) VTK_TRIANGLE
+    else
+      write(fu) VTK_POLYGON
+    end if
   end do
 
   ! Boundary conditions

@@ -12,6 +12,7 @@
   ! Constants shared among most of the procedures in this module
   integer,           parameter :: VTK_LINE       =  3
   integer,           parameter :: VTK_TRIANGLE   =  5
+  integer,           parameter :: VTK_POLYGON    =  7
   integer,           parameter :: VTK_QUAD       =  9
   integer,           parameter :: VTK_TETRA      = 10
   integer,           parameter :: VTK_HEXAHEDRON = 12
