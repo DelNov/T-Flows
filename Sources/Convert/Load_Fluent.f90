@@ -1,5 +1,3 @@
-include 'Save_Vtu_Ascii.f90'
-
 !==============================================================================!
   subroutine Load_Fluent(grid, file_name)
 !------------------------------------------------------------------------------!
@@ -774,21 +772,17 @@ include 'Save_Vtu_Ascii.f90'
   !----------------------------------------!
   do c = 1, grid % n_cells
     n = grid % cells_n_nodes(c)
-!   if( n .eq. 6 ) then  ! check wedges
-    if( n .eq. 8 ) then  ! check hexa
-      do i_nod = 1, n
-        do j_nod = i_nod+1, n
-          if(grid % cells_n(i_nod, c) .eq. grid % cells_n(j_nod, c)) then
-            print *, '# ERROR!  Duplicate nodes in cell: ', c
-            print *, '# This error is critical, exiting! '
-            print *, n
-            print *, grid % cells_n(1:n, c)
-            STOP
-          end if
-        end do
+    do i_nod = 1, n
+      do j_nod = i_nod+1, n
+        if(grid % cells_n(i_nod, c) .eq. grid % cells_n(j_nod, c)) then
+          print *, '# ERROR!  Duplicate nodes in cell: ', c
+          print *, '# This error is critical, exiting! '
+          stop
+        end if
       end do
-    end if
+    end do
   end do
+  print *, '# No duplicate nodes in cell data found, good!'
 
   !------------------------------------------------------------!
   !                                                            !
@@ -852,10 +846,6 @@ include 'Save_Vtu_Ascii.f90'
     end if  ! if cell was polyhedral
 
   end do
-
-  call Save_Vtu_Ascii(grid)
-  STOP
-  ! call Grid_Mod_Save_Debug_Vtu(grid, append='poly')
 
   deallocate(cell_visited_from)
 
