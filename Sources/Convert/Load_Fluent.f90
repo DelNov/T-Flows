@@ -899,7 +899,6 @@
       end if
     end if
   end do
-  STOP
 
   close(fu)
 
