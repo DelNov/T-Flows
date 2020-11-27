@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Poly_Vtu(grid)
+  subroutine Save_Poly_Vtu_Binary(grid)
 !------------------------------------------------------------------------------!
 !   Writes: name.vtu, name.faces.vtu, name.shadow.vtu                          !
 !------------------------------------------------------------------------------!
@@ -10,8 +10,9 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: c, n, s, i_pol, offset, fu
-  character(SL) :: name_out, str1, str2, str3
+  integer         :: c, n, s, i_pol, offset, fu
+  character(SL)   :: name_out
+  character(DL*2) :: str1, str2, str3
 !------------------------------[Local parameters]------------------------------!
   integer,           parameter :: VTK_TETRA      = 10  ! cells in VTK format
   integer,           parameter :: VTK_HEXAHEDRON = 12
@@ -98,7 +99,7 @@
 
     ! Polyhedral cells
     else if(grid % cells_n_nodes(c) < 0) then
-      write(str1,'(64i9)') (grid % cells_n(1:grid % cells_n_nodes(c), c))-1
+      write(str1,'(64i9)') (grid % cells_n(1:-grid % cells_n_nodes(c), c))-1
       write(fu) IN_5 // trim(str1) // LF
 
     else
@@ -164,7 +165,7 @@
   ! Write polyhedral cells' faces offsets
   offset = 0
   write(fu) IN_4 // '<DataArray type="Int64"'  //  &
-                    ' Name="facesoffsets"'     //  &
+                    ' Name="faceoffsets"'      //  &
                     ' format="ascii">'         // LF
   do c = 1, grid % n_cells
 
