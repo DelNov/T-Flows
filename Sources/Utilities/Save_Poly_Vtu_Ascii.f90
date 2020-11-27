@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Vtu_Ascii(grid)
+  subroutine Save_Poly_Vtu(grid)
 !------------------------------------------------------------------------------!
 !   Writes: name.vtu, name.faces.vtu, name.shadow.vtu                          !
 !------------------------------------------------------------------------------!
@@ -34,9 +34,9 @@
   call File_Mod_Set_Name(name_out, extension='.vtu')
   call File_Mod_Open_File_For_Writing(name_out, fu)
 
-  !-----------!
-  !   Start   !
-  !-----------!
+  !------------!
+  !   Header   !
+  !------------!
   write(fu,'(a,a)') IN_0, '<?xml version="1.0"?>'
   write(fu,'(a,a)') IN_0, '<VTKFile type="UnstructuredGrid" version="0.1" '//  &
                           'byte_order="LittleEndian">'
@@ -174,6 +174,9 @@
   end do
   write(fu,'(a,a)') IN_4, '</DataArray>'
 
+  !----------------------!
+  !   The end of cells   !
+  !----------------------!
   write(fu,'(a,a)') IN_3, '</Cells>'
 
   !---------------!
