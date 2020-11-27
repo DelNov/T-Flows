@@ -10,10 +10,14 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer         :: c, n, s, i_pol, offset, fu
+  integer(SP)     :: data_size
+  integer         :: c, n, s, i_pol, data_offset, cell_offset, fu
+  integer         :: n_conns, n_polys
   character(SL)   :: name_out
-  character(DL*2) :: str1, str2, str3
+  character(DL*2) :: str1, str2
 !------------------------------[Local parameters]------------------------------!
+  integer,           parameter :: IP = DP  ! int. precision is double precision
+  integer,           parameter :: RP = DP  ! real precision is double precision
   integer,           parameter :: VTK_TETRA      = 10  ! cells in VTK format
   integer,           parameter :: VTK_HEXAHEDRON = 12
   integer,           parameter :: VTK_WEDGE      = 13
@@ -28,6 +32,25 @@
   character(len=10), parameter :: IN_5 = '          '
 !==============================================================================!
 
+  ! Count connections in this subdomain, you will need it later
+  n_conns = 0
+  do c = 1, grid % n_cells
+    n_conns = n_conns + abs(grid % cells_n_nodes(c))
+  end do
+
+  ! Count face data for polyhedral cells, you will need it later
+  n_polys = 0
+  do c = 1, grid % n_cells
+    if(grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
+      n_polys = n_polys + 1          ! add one for number of polyfaces
+      do i_pol = 1, grid % cells_n_polyf(c)  ! add all faces and their nodes
+        s = grid % cells_p(i_pol, c)
+        n = grid % faces_n_nodes(s)
+        n_polys = n_polys + 1 + n
+      end do
+    end if
+  end do
+
   !----------------------!
   !                      !
   !   Create .vtu file   !
@@ -37,7 +60,9 @@
   call File_Mod_Open_File_For_Writing_Binary(name_out, fu)
 
   !------------!
+  !            !
   !   Header   !
+  !            !
   !------------!
   write(fu) IN_0 // '<?xml version="1.0"?>'             // LF
   write(fu) IN_0 // '<VTKFile type="UnstructuredGrid" ' //  &
@@ -48,59 +73,158 @@
   write(str2, '(i0.0)') grid % n_cells
   write(fu) IN_2 // '<Piece NumberOfPoints="' // trim(str1) // '"' //  &
                     ' NumberOfCells="' // trim(str2) // '">'       // LF
+  data_offset = 0  ! prepare for the next (the first in this case)
 
   !-----------!
+  !           !
   !   Nodes   !
+  !           !
   !-----------!
+  write(str1, '(i1)') data_offset
   write(fu) IN_3 // '<Points>'                       // LF
   write(fu) IN_4 // '<DataArray type="Float64"'      //  &
                     ' NumberOfComponents="3"'        //  &
-                    ' format="ascii">'               // LF
-  do n = 1, grid % n_nodes
-    write(str1, '(1pe15.7)') grid % xn(n)
-    write(str2, '(1pe15.7)') grid % yn(n)
-    write(str3, '(1pe15.7)') grid % zn(n)
-    write(fu) IN_5 // trim(str1) // trim(str2) // trim(str3) // LF
-  end do
+                    ' format="appended"'             //  &
+                    ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
   write(fu) IN_3 // '</Points>'    // LF
+  data_offset = data_offset + SP + grid % n_nodes * RP * 3  ! prepare for next
 
   !-----------!
   !   Cells   !
   !-----------!
   write(fu) IN_3 // '<Cells>' // LF
 
-  ! First write all cells' nodes
-  write(fu) IN_4 // '<DataArray type="Int64"' //  &
-                    ' Name="connectivity"'    //  &
-                    ' format="ascii">'        // LF
+
+  ! First write all cells' nodes (a.k.a. connectivity)
+  write(str1, '(i0.0)') data_offset
+  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+                    ' Name="connectivity"'           //  &
+                    ' format="appended"'             //  &
+                    ' offset="' // trim(str1) //'">' // LF
+  write(fu) IN_4 // '</DataArray>' // LF
+  data_offset = data_offset + SP + n_conns * IP  ! prepare for next
+
+
+  ! Now write all cells' offsets
+  write(str1, '(i0.0)') data_offset
+  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+                    ' Name="offsets"'                //  &
+                    ' format="appended"'             //  &
+                    ' offset="' // trim(str1) //'">' // LF
+  write(fu) IN_4 // '</DataArray>' // LF
+  data_offset = data_offset + SP + grid % n_cells * IP  ! prepare for next
+
+
+  ! Now write all cells' types
+  write(str1, '(i0.0)') data_offset
+  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+                    ' Name="types"'                  //  &
+                    ' format="appended"'             //  &
+                    ' offset="' // trim(str1) //'">' // LF
+  write(fu) IN_4 // '</DataArray>' // LF
+  data_offset = data_offset + SP + grid % n_cells * IP  ! prepare for next
+
+
+  ! Write polyhedral cells' faces
+  write(str1, '(i0.0)') data_offset
+  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+                    ' Name="faces"'                  //  &
+                    ' format="appended"'             //  &
+                    ' offset="' // trim(str1) //'">' // LF
+  write(fu) IN_4 // '</DataArray>' // LF
+  data_offset = data_offset + SP + n_polys * IP  ! prepare for next
+
+
+  ! Write polyhedral cells' faces offsets
+  write(str1, '(i0.0)') data_offset
+  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+                    ' Name="faceoffsets"'            //  &
+                    ' format="appended"'             //  &
+                    ' offset="' // trim(str1) //'">' // LF
+  write(fu) IN_4 // '</DataArray>' // LF
+  data_offset = data_offset + SP + grid % n_cells * IP  ! prepare for next
+
+
+  write(fu) IN_3 // '</Cells>' // LF
+
+  !---------------!
+  !               !
+  !   Cell data   !
+  !               !
+  !---------------!
+  write(fu) IN_3 // '<CellData Scalars="scalars" vectors="velocity">' // LF
+
+  ! Processor i.d.
+  write(str1, '(i0.0)') data_offset
+  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+                    ' Name="Processor"'              //  &
+                    ' format="appended"'             //  &
+                    ' offset="' // trim(str1) //'">' // LF
+  write(fu) IN_4 // '</DataArray>' // LF
+  data_offset = data_offset + SP + grid % n_cells * IP  ! prepare for next
+
+  ! Wall distance
+  write(str1, '(i0.0)') data_offset
+  write(fu) IN_4 // '<DataArray type="Float64"'      //  &
+                    ' Name="WallDistance"'           //  &
+                    ' format="appended"'             //  &
+                    ' offset="' // trim(str1) //'">' // LF
+  write(fu) IN_4 // '</DataArray>' // LF
+  data_offset = data_offset + SP + grid % n_cells * RP  ! prepare for next
+
+  ! Cell volume
+  write(str1, '(i0.0)') data_offset
+  write(fu) IN_4 // '<DataArray type="Float64"'      //  &
+                    ' Name="CellVolume"'             //  &
+                    ' format="appended"'             //  &
+                    ' offset="' // trim(str1) //'">' // LF
+  write(fu) IN_4 // '</DataArray>' // LF
+  data_offset = data_offset + SP + grid % n_cells * RP  ! prepare for next
+
+  !------------!
+  !            !
+  !   Footer   !
+  !            !
+  !------------!
+  write(fu) IN_3 // '</CellData>'         // LF
+  write(fu) IN_2 // '</Piece>'            // LF
+  write(fu) IN_1 // '</UnstructuredGrid>' // LF
+
+  !-------------------!
+  !                   !
+  !   Appended data   !
+  !                   !
+  !-------------------!
+  write(fu) IN_0 // '<AppendedData encoding="raw">' // LF
+  write(fu) '_'
+
+  !-----------!
+  !   Nodes   !
+  !-----------!
+  data_size = grid % n_nodes * RP * 3
+  write(fu) data_size
+  do n = 1, grid % n_nodes
+    write(fu) grid % xn(n), grid % yn(n), grid % zn(n)
+  end do
+
+  !-----------!
+  !   Cells   !
+  !-----------!
+
+  ! Cells' nodes
+  data_size = n_conns * IP
+  write(fu) data_size
 
   do c = 1, grid % n_cells
 
-    ! Hexahedral
-    if(grid % cells_n_nodes(c) .eq. 8) then
-      write(str1,'(64i9)') (grid % cells_n(1:grid % cells_n_nodes(c), c))-1
-      write(fu) IN_5 // trim(str1) // LF
-
-    ! Wedge
-    else if(grid % cells_n_nodes(c) .eq. 6) then
-      write(str1,'(64i9)') (grid % cells_n(1:grid % cells_n_nodes(c), c))-1
-      write(fu) IN_5 // trim(str1) // LF
-
-    ! Tetrahedra
-    else if(grid % cells_n_nodes(c) .eq. 4) then
-      write(str1,'(64i9)') (grid % cells_n(1:grid % cells_n_nodes(c), c))-1
-      write(fu) IN_5 // trim(str1) // LF
-
-    ! Pyramid
-    else if(grid % cells_n_nodes(c) .eq. 5) then
-      write(str1,'(64i9)') (grid % cells_n(1:grid % cells_n_nodes(c), c))-1
-      write(fu) IN_5 // trim(str1) // LF
+    ! Tetrahedral, pyramid, wedge and hexahedral cells
+    if( any( grid % cells_n_nodes(c) .eq. (/4,5,6,8/)  ) ) then
+      write(fu) (grid % cells_n(1:grid % cells_n_nodes(c), c))-1
 
     ! Polyhedral cells
     else if(grid % cells_n_nodes(c) < 0) then
-      write(str1,'(64i9)') (grid % cells_n(1:-grid % cells_n_nodes(c), c))-1
-      write(fu) IN_5 // trim(str1) // LF
+      write(fu) (grid % cells_n(1:-grid % cells_n_nodes(c), c))-1
 
     else
       print *, '# Unsupported cell type with ',  &
@@ -108,138 +232,113 @@
       print *, '# Exiting'
       stop
     end if
-
   end do
-  write(fu) IN_4 // '</DataArray>' // LF
 
-  ! Now write all cells' offsets
-  write(fu) IN_4 // '<DataArray type="Int64"'  //  &
-                    ' Name="offsets"'          //  &
-                    ' format="ascii">'         // LF
-  offset = 0
+  ! Cells' offset
+  data_size = grid % n_cells * IP
+  write(fu) data_size
+
+  cell_offset = 0
   do c = 1, grid % n_cells
-    offset = offset + abs(grid % cells_n_nodes(c))
-    write(str1,'(i9)') offset
-    write(fu) IN_5 // trim(str1) // LF
+    cell_offset = cell_offset + abs(grid % cells_n_nodes(c))
+    write(fu) cell_offset
   end do
-  write(fu) IN_4 // '</DataArray>' // LF
 
-  ! Now write all cells' types
-  write(fu) IN_4 // '<DataArray type="Int64"'  //  &
-                    ' Name="types"'            //  &
-                    ' format="ascii">'         // LF
+  ! Cells' types
+  data_size = grid % n_cells * IP
+  write(fu) data_size
+
   do c = 1, grid % n_cells
-    if(grid % cells_n_nodes(c) .eq. 4) write(str1,'(i9)') VTK_TETRA
-    if(grid % cells_n_nodes(c) .eq. 8) write(str1,'(i9)') VTK_HEXAHEDRON
-    if(grid % cells_n_nodes(c) .eq. 6) write(str1,'(i9)') VTK_WEDGE
-    if(grid % cells_n_nodes(c) .eq. 5) write(str1,'(i9)') VTK_PYRAMID
-    if(grid % cells_n_nodes(c) .lt. 0) write(str1,'(i9)') VTK_POLYHEDRON
-    write(fu) IN_5 // trim(str1) // LF
+    if(grid % cells_n_nodes(c) .eq. 4) write(fu) VTK_TETRA
+    if(grid % cells_n_nodes(c) .eq. 8) write(fu) VTK_HEXAHEDRON
+    if(grid % cells_n_nodes(c) .eq. 6) write(fu) VTK_WEDGE
+    if(grid % cells_n_nodes(c) .eq. 5) write(fu) VTK_PYRAMID
+    if(grid % cells_n_nodes(c) .lt. 0) write(fu) VTK_POLYHEDRON
   end do
-  write(fu) IN_4 // '</DataArray>' // LF
 
   ! Write polyhedral cells' faces
-  write(fu) IN_4 // '<DataArray type="Int64"'  //  &
-                    ' Name="faces"'            //  &
-                    ' format="ascii">'         // LF
+  data_size = n_polys * IP
+  write(fu) data_size
+
   do c = 1, grid % n_cells
 
     ! You have found a polyhedron, write its faces out
     if(grid % cells_n_nodes(c) .lt. 0) then
 
       ! Write number of polyfaces for this cell
-      write(str1,'(i9)') grid % cells_n_polyf(c)
-      write(fu) IN_5 // trim(str1) // LF
+      write(fu) grid % cells_n_polyf(c)
 
       do i_pol = 1, grid % cells_n_polyf(c)
         s = grid % cells_p(i_pol, c)
         n = grid % faces_n_nodes(s)
-        write(str1,'(64i9)')  grid % faces_n_nodes(s),  &
-                             (grid % faces_n(1:n, s))-1
-        write(fu) IN_5 // trim(str1) // LF
+        write(fu) n, (grid % faces_n(1:n, s))-1
       end do
     end if
   end do
-  write(fu) IN_4 // '</DataArray>' // LF
 
   ! Write polyhedral cells' faces offsets
-  offset = 0
-  write(fu) IN_4 // '<DataArray type="Int64"'  //  &
-                    ' Name="faceoffsets"'      //  &
-                    ' format="ascii">'         // LF
+  data_size = grid % n_cells * IP
+  write(fu) data_size
+
+  cell_offset = 0
   do c = 1, grid % n_cells
 
     ! You have found a polyhedron
     if(grid % cells_n_nodes(c) .lt. 0) then
 
       ! Increase offset for storing number of polyfaces
-      offset = offset + 1
+      cell_offset = cell_offset + 1
 
       ! Update the offset with all faces and their nodes
       do i_pol = 1, grid % cells_n_polyf(c)
         s = grid % cells_p(i_pol, c)
         n = grid % faces_n_nodes(s)
-        offset = offset + 1 + n
+        cell_offset = cell_offset + 1 + n
       end do
 
       ! Write the current offset
-      write(str1,'(i9)') offset
-      write(fu) IN_5 // trim(str1) // LF
+      write(fu) cell_offset
 
     ! Not a polyhedron, offsets are not needed
     else
-      write(str1,'(i9)') -1
-      write(fu) IN_5 // trim(str1) // LF
+      write(fu) -1
     end if
 
   end do
-  write(fu) IN_4 // '</DataArray>' // LF
-
-  !----------------------!
-  !   The end of cells   !
-  !----------------------!
-  write(fu) IN_3 // '</Cells>' // LF
 
   !---------------!
   !   Cell data   !
   !---------------!
-  write(fu) IN_3 // '<CellData Scalars="scalars" vectors="velocity">' // LF
 
   ! Processor i.d.
-  write(fu) IN_4 // '<DataArray type="Int64"'           //  &
-                    ' Name="Processor" format="ascii">' // LF
+  data_size = grid % n_cells * IP
+  write(fu) data_size
   do c = 1, grid % n_cells
-    write(str1,'(i9)') grid % comm % cell_proc(c)
-    write(fu) IN_5 // trim(str1) // LF
+    write(fu) grid % comm % cell_proc(c)
   end do
-  write(fu) IN_4 // '</DataArray>' // LF
 
   ! Wall distance
-  write(fu) IN_4 // '<DataArray type="Float64"'            //  &
-                    ' Name="WallDistance" format="ascii">' // LF
+  data_size = grid % n_cells * RP
+  write(fu) data_size
   do c = 1, grid % n_cells
-    write(str1,'(1pe15.7)') grid % wall_dist(c)
-    write(fu) IN_5 // trim(str1) // LF
+    write(fu) grid % wall_dist(c)
   end do
-  write(fu) IN_4 // '</DataArray>' // LF
 
   ! Cell volume
-  write(fu) IN_4 // '<DataArray type="Float64"'          //  &
-                    ' Name="CellVolume" format="ascii">' // LF
+  data_size = grid % n_cells * RP
+  write(fu) data_size
   do c = 1, grid % n_cells
-    write(str1,'(1pe15.7)') grid % vol(c)
-    write(fu) IN_5 // trim(str1) // LF
+    write(fu) grid % vol(c)
   end do
-  write(fu) IN_4 // '</DataArray>' // LF
 
-  !------------!
-  !   Footer   !
-  !------------!
-  write(fu) IN_3 // '</CellData>'         // LF
-  write(fu) IN_2 // '</Piece>'            // LF
-  write(fu) IN_1 // '</UnstructuredGrid>' // LF
-  write(fu) IN_0 // '</VTKFile>'          // LF
+  write(fu) LF // IN_0 // '</AppendedData>' // LF
 
+  !---------------------!
+  !                     !
+  !   Close .vtu file   !
+  !                     !
+  !---------------------!
+  write(fu) IN_0 // '</VTKFile>' // LF
   close(fu)
 
   end subroutine
