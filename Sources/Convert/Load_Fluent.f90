@@ -15,7 +15,7 @@
   integer              :: n_tri, n_quad, n_tet, n_hexa, n_pyra, n_wed, n_poly
   integer              :: n_cells, n_bnd_cells, n_faces, n_nodes
   integer              :: n_face_nodes, n_cells_zone
-  integer              :: c, c1, c2, s, n, fu, i, l
+  integer              :: c, c1, c2, s, n, fu, i, l, pos
   integer              :: i_cel, i_nod, j_nod, k_nod, l_nod, i_pol
   integer              :: cell_type, face_type
   integer              :: cell_s, cell_e, side_s, side_e, node_s, node_e
@@ -24,8 +24,9 @@
   integer              :: n_face_sect          ! number of face sections
   integer              :: face_sect_pos(2048)  ! where did Fluent store it
   integer              :: face_sect_bnd(2048)  ! where does T-Flows store it
-  integer              :: n_bnd_cond      ! number of boundary conditions
-  logical              :: bnd_cond(2048)  ! .true. if bnd cond section
+  integer              :: n_bnd_cond           ! number of boundary conditions
+  logical              :: this_sect_bnd        ! .true. if bnd cond section
+  logical              :: the_end              ! end of file reached?
 ! character(SL)        :: bc_names(2048)
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: MIXED_ZONE = 0
@@ -39,8 +40,6 @@
   integer, parameter :: FACE_TRI   = 3
   integer, parameter :: FACE_QUAD  = 4
 !==============================================================================!
-
-  bnd_cond(:) = .false.
 
   call File_Mod_Open_File_For_Reading(file_name, fu)
 
@@ -155,7 +154,7 @@
         !--------------------------!
         !   Browse through faces   !
         !--------------------------!
-        bnd_cond(n_face_sect) = .false.
+        this_sect_bnd = .false.
         do s = side_s, side_e
           n_faces = n_faces + 1
           call File_Mod_Read_Line(fu)
@@ -176,7 +175,7 @@
 
           ! This was a boundary face
           if( (c1 .eq. 0) .or. (c2 .eq. 0) ) then
-            bnd_cond(n_face_sect) = .true.
+            this_sect_bnd = .true.         ! marks this section as boundary
             n_bnd_cells = n_bnd_cells + 1
           end if
         end do
@@ -184,7 +183,7 @@
         !---------------------------------------------------------------!
         !   If this was a boundary section, store boundary conditions   !
         !---------------------------------------------------------------!
-        if( bnd_cond(n_face_sect) ) then
+        if( this_sect_bnd ) then
 
           ! Increase the number of boundary condition sections and ...
           n_bnd_cond = n_bnd_cond + 1
@@ -198,8 +197,12 @@
     end if
   end do
 
-  grid % n_bnd_cells = n_bnd_cells
   print '(a34,i9)', ' # Boundary cells from face data: ', n_bnd_cells
+  print '(a34,i9)', ' # Boundary condition sections:   ', n_bnd_cond
+
+  grid % n_bnd_cells = n_bnd_cells
+  grid % n_bnd_cond  = n_bnd_cond
+  allocate(grid % bnd_cond % name(n_bnd_cond))
 
   !--------------------------------------------!
   !                                            !
@@ -849,10 +852,54 @@
 
   deallocate(cell_visited_from)
 
-  !-------------------------------------------------!
-  !   Store number of boundary conditions to grid   !
-  !-------------------------------------------------!
-  grid % n_bnd_cond = n_bnd_cond
+  !------------------------------------------------------------!
+  !                                                            !
+  !   Browse through all sections (fluid, boundary, and what   !
+  !    ever) to store number of boundary conditions to grid    !
+  !                                                            !
+  !------------------------------------------------------------!
+
+  DO N = 1, 8
+    PRINT *, 'FACE_SECT_POS(N), FACE_SECT_BND(N)',  &
+              FACE_SECT_POS(N), FACE_SECT_BND(N)
+  END DO
+
+  rewind(fu)
+  the_end = .false.
+  do while(.not. the_end)
+    call File_Mod_Read_Line(fu, reached_end=the_end)
+    if(.not. the_end .and. line % n_tokens > 1) then
+      if(line % tokens(1) .eq. '(39' .or.  &
+         line % tokens(1) .eq. '(45') then
+
+        PRINT *, 'FOUND A SECTION!'
+        PRINT *, 'WHOLE LINE: ', LINE % WHOLE
+
+        ! Extract this face section position in the Fluent's mesh
+        one_token = line % tokens(2)
+        l = len_trim(one_token)
+        read(one_token(2:l), '(i16)') pos
+        PRINT *, '  THIS SECTION''S POSITION: ', POS
+
+        ! Extract boundary condition name
+        one_token = line % tokens(4)(1:index(line % tokens(4), ')')-1)
+
+        do n = 1, 2048
+          if(face_sect_bnd(n) .ne. 0) then
+            if(face_sect_pos(n) .eq. pos) then
+              PRINT *, '    THIS SECTION IS A BOUNDARY SECTION'
+              PRINT *, '    THIS SECTION BC NUMBER IS: ', FACE_SECT_BND(N)
+              grid % bnd_cond % name(face_sect_bnd(n)) = one_token
+              PRINT *, '    THIS SECTION BC NAME IS    ',  &
+                       GRID % BND_COND % NAME(FACE_SECT_BND(N))
+            end if
+          end if
+        end do
+
+      end if
+    end if
+  end do
+  STOP
 
   close(fu)
 
