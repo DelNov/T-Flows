@@ -17,6 +17,7 @@
   integer,           parameter :: VTK_HEXAHEDRON = 12
   integer,           parameter :: VTK_WEDGE      = 13
   integer,           parameter :: VTK_PYRAMID    = 14
+  integer,           parameter :: VTK_POLYHEDRON = 42
   character(len= 1), parameter :: LF   = char(10)      ! line feed
   character(len= 0), parameter :: IN_0 = ''            ! indentation levels
   character(len= 2), parameter :: IN_1 = '  '
