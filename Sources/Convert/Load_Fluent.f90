@@ -1,5 +1,3 @@
-include 'Save_Vtu_Ascii.f90'
-
 !==============================================================================!
   subroutine Load_Fluent(grid, file_name)
 !------------------------------------------------------------------------------!
@@ -853,9 +851,7 @@ include 'Save_Vtu_Ascii.f90'
 
   end do
 
-  call Save_Vtu_Ascii(grid)
   STOP
-  ! call Grid_Mod_Save_Debug_Vtu(grid, append='poly')
 
   deallocate(cell_visited_from)
 
