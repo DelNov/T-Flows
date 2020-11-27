@@ -29,7 +29,7 @@
   do c = 1, grid % n_cells
     if(grid % new_c(c) .ne. 0) then
       if(grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
-        n_polys = n_polys + 1          ! add one for number of polyfaces
+        n_polys = n_polys + 1                  ! add one for number of polyfaces
         do i_pol = 1, grid % cells_n_polyf(c)  ! add all faces and their nodes
           s = grid % cells_p(i_pol, c)
           n = grid % faces_n_nodes(s)
