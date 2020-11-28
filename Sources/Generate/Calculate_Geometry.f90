@@ -13,7 +13,7 @@
   logical, intent(in) :: real_run
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c, c1, c2, m, n, s, n_per, nn, nf
-  real    :: loc_x_node(4), loc_y_node(4), loc_z_node(4)
+  real    :: xt(4), yt(4), zt(4)
   real    :: x_cell_tmp, y_cell_tmp, z_cell_tmp
   real    :: xs2, ys2, zs2
   real    :: dsc1, dsc2          !  for the interpolation factors
@@ -40,7 +40,7 @@
 !                                                                              !
 !   Notes:                                                                     !
 !                                                                              !
-!     ! faec s is oriented from cell center c1 to cell center c2               !
+!     ! face s is oriented from cell center c1 to cell center c2               !
 !     ! c2 is greater then c1 inside the domain or smaller then 0              !
 !       on the boundary                                                        !
 !     ! nodes are denoted with n1 - n4                                         !
@@ -118,8 +118,8 @@
   !-----------------------------------------!
   !   Calculate the cell centers            !
   !-----------------------------------------!
-  !   => depends on: x_node,y_node,z_node   !
-  !   <= gives:      xc,yc,zc c>0           !
+  !   => depends on: xn, yn, zn             !
+  !   <= gives:      xc, yc, zc @ c > 0     !
   !-----------------------------------------!
   call Grid_Mod_Calculate_Cell_Centers(grid)
 
@@ -127,42 +127,42 @@
   !   Calculate:                                        !
   !      components of cell faces, cell face centers.   !
   !-----------------------------------------------------!
-  !   => depends on: x_node,y_node,z_node               !
-  !   <= gives:      sx,sy,sz,xsp,yzp,zsp               !
+  !   => depends on: xn, yn, zn                         !
+  !   <= gives:      sx, sy, sz, xf, yf, zf             !
   !-----------------------------------------------------!
   do s = 1, grid % n_faces
     do n = 1, grid % faces_n_nodes(s)  ! for quadrilateral an triangular faces
-      loc_x_node(n) = grid % xn(grid % faces_n(n,s))
-      loc_y_node(n) = grid % yn(grid % faces_n(n,s))
-      loc_z_node(n) = grid % zn(grid % faces_n(n,s))
+      xt(n) = grid % xn(grid % faces_n(n,s))
+      yt(n) = grid % yn(grid % faces_n(n,s))
+      zt(n) = grid % zn(grid % faces_n(n,s))
     end do
 
     ! Cell side components
     if( grid % faces_n_nodes(s) .eq. 4 ) then
-      grid % sx(s)= 0.5 * ((loc_y_node(2)-loc_y_node(1))  &
-                         * (loc_z_node(2)+loc_z_node(1))  &
-                         + (loc_y_node(3)-loc_y_node(2))  &
-                         * (loc_z_node(2)+loc_z_node(3))  &
-                         + (loc_y_node(4)-loc_y_node(3))  &
-                         * (loc_z_node(3)+loc_z_node(4))  &
-                         + (loc_y_node(1)-loc_y_node(4))  &
-                         * (loc_z_node(4)+loc_z_node(1)) )
-      grid % sy(s)= 0.5 * ((loc_z_node(2)-loc_z_node(1))  &
-                         * (loc_x_node(2)+loc_x_node(1))  &
-                         + (loc_z_node(3)-loc_z_node(2))  &
-                         * (loc_x_node(2)+loc_x_node(3))  &
-                         + (loc_z_node(4)-loc_z_node(3))  &
-                         * (loc_x_node(3)+loc_x_node(4))  &
-                         + (loc_z_node(1)-loc_z_node(4))  &
-                         * (loc_x_node(4)+loc_x_node(1)) )
-      grid % sz(s)= 0.5 * ((loc_x_node(2)-loc_x_node(1))  &
-                         * (loc_y_node(2)+loc_y_node(1))  &
-                         + (loc_x_node(3)-loc_x_node(2))  &
-                         * (loc_y_node(2)+loc_y_node(3))  &
-                         + (loc_x_node(4)-loc_x_node(3))  &
-                         * (loc_y_node(3)+loc_y_node(4))  &
-                         + (loc_x_node(1)-loc_x_node(4))  &
-                         * (loc_y_node(4)+loc_y_node(1)) )
+      grid % sx(s)= 0.5 * ((yt(2)-yt(1))  &
+                         * (zt(2)+zt(1))  &
+                         + (yt(3)-yt(2))  &
+                         * (zt(2)+zt(3))  &
+                         + (yt(4)-yt(3))  &
+                         * (zt(3)+zt(4))  &
+                         + (yt(1)-yt(4))  &
+                         * (zt(4)+zt(1)) )
+      grid % sy(s)= 0.5 * ((zt(2)-zt(1))  &
+                         * (xt(2)+xt(1))  &
+                         + (zt(3)-zt(2))  &
+                         * (xt(2)+xt(3))  &
+                         + (zt(4)-zt(3))  &
+                         * (xt(3)+xt(4))  &
+                         + (zt(1)-zt(4))  &
+                         * (xt(4)+xt(1)) )
+      grid % sz(s)= 0.5 * ((xt(2)-xt(1))  &
+                         * (yt(2)+yt(1))  &
+                         + (xt(3)-xt(2))  &
+                         * (yt(2)+yt(3))  &
+                         + (xt(4)-xt(3))  &
+                         * (yt(3)+yt(4))  &
+                         + (xt(1)-xt(4))  &
+                         * (yt(4)+yt(1)) )
     else
       print *, '# Compute_Grid_Geometry: something horrible has happened !'
       stop
@@ -170,12 +170,12 @@
 
     ! Barycenters
     if(grid % faces_n_nodes(s) .eq. 4) then
-      grid % xf(s) = (   loc_x_node(1)+loc_x_node(2)          &
-                       + loc_x_node(3)+loc_x_node(4) ) / 4.0
-      grid % yf(s) = (   loc_y_node(1)+loc_y_node(2)          &
-                       + loc_y_node(3)+loc_y_node(4) ) / 4.0
-      grid % zf(s) = (   loc_z_node(1)+loc_z_node(2)          &
-                       + loc_z_node(3)+loc_z_node(4) ) / 4.0
+      grid % xf(s) = (   xt(1)+xt(2)          &
+                       + xt(3)+xt(4) ) / 4.0
+      grid % yf(s) = (   yt(1)+yt(2)          &
+                       + yt(3)+yt(4) ) / 4.0
+      grid % zf(s) = (   zt(1)+zt(2)          &
+                       + zt(3)+zt(4) ) / 4.0
     end if
 
   end do ! through faces
@@ -324,9 +324,9 @@
       c2 = grid % faces_c(2,s)
 
       do n = 1, grid % faces_n_nodes(s)  ! for quadrilateral an triangular faces
-        loc_x_node(n) = grid % xn(grid % faces_n(n,s))
-        loc_y_node(n) = grid % yn(grid % faces_n(n,s))
-        loc_z_node(n) = grid % zn(grid % faces_n(n,s))
+        xt(n) = grid % xn(grid % faces_n(n,s))
+        yt(n) = grid % yn(grid % faces_n(n,s))
+        zt(n) = grid % zn(grid % faces_n(n,s))
       end do
 
       ! First cell
@@ -337,24 +337,24 @@
                                grid % xf(s), grid % yf(s), grid % zf(s))
       grid % vol(c1) = grid % vol(c1)                                      &
         + Math_Mod_Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),      &
-                              loc_x_node(1),loc_y_node(1),loc_z_node(1),   &
-                              loc_x_node(2),loc_y_node(2),loc_z_node(2),   &
+                              xt(1),yt(1),zt(1),   &
+                              xt(2),yt(2),zt(2),   &
                               x_cell_tmp,y_cell_tmp,z_cell_tmp)
       grid % vol(c1) = grid % vol(c1)                                      &
         + Math_Mod_Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),      &
-                              loc_x_node(2),loc_y_node(2),loc_z_node(2),   &
-                              loc_x_node(3),loc_y_node(3),loc_z_node(3),   &
+                              xt(2),yt(2),zt(2),   &
+                              xt(3),yt(3),zt(3),   &
                               x_cell_tmp,y_cell_tmp,z_cell_tmp)
       if(grid % faces_n_nodes(s) .eq. 4) then
         grid % vol(c1) = grid % vol(c1)                                    &
           + Math_Mod_Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),    &
-                                loc_x_node(3),loc_y_node(3),loc_z_node(3), &
-                                loc_x_node(4),loc_y_node(4),loc_z_node(4), &
+                                xt(3),yt(3),zt(3), &
+                                xt(4),yt(4),zt(4), &
                                 x_cell_tmp,y_cell_tmp,z_cell_tmp)
         grid % vol(c1) = grid % vol(c1)                                    &
           + Math_Mod_Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),    &
-                                loc_x_node(4),loc_y_node(4),loc_z_node(4), &
-                                loc_x_node(1),loc_y_node(1),loc_z_node(1), &
+                                xt(4),yt(4),zt(4), &
+                                xt(1),yt(1),zt(1), &
                                 x_cell_tmp,y_cell_tmp,z_cell_tmp)
       end if
 
@@ -363,28 +363,28 @@
         x_cell_tmp = grid % xc(c2) + grid % dx(s)
         y_cell_tmp = grid % yc(c2) + grid % dy(s)
         z_cell_tmp = grid % zc(c2) + grid % dz(s)
-        dsc2=Math_Mod_Distance(x_cell_tmp,   y_cell_tmp,   z_cell_tmp,    &
-                               grid % xf(s), grid % yf(s), grid % zf(s))
-        grid % vol(c2) = grid % vol(c2)                                    &
-          - Math_Mod_Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),    &
-                                loc_x_node(1),loc_y_node(1),loc_z_node(1), &
-                                loc_x_node(2),loc_y_node(2),loc_z_node(2), &
+        dsc2 = Math_Mod_Distance(x_cell_tmp,   y_cell_tmp,   z_cell_tmp,     &
+                                 grid % xf(s), grid % yf(s), grid % zf(s))
+        grid % vol(c2) = grid % vol(c2)                                  &
+          - Math_Mod_Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),  &
+                                xt(1), yt(1), zt(1),                     &
+                                xt(2), yt(2), zt(2),                     &
                                 x_cell_tmp,y_cell_tmp,z_cell_tmp)
-        grid % vol(c2) = grid % vol(c2)                                    &
-          - Math_Mod_Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),    &
-                                loc_x_node(2),loc_y_node(2),loc_z_node(2), &
-                                loc_x_node(3),loc_y_node(3),loc_z_node(3), &
+        grid % vol(c2) = grid % vol(c2)                                  &
+          - Math_Mod_Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),  &
+                                xt(2), yt(2), zt(2),                     &
+                                xt(3), yt(3), zt(3),                     &
                                 x_cell_tmp,y_cell_tmp,z_cell_tmp)
         if(grid % faces_n_nodes(s) .eq. 4) then
           grid % vol(c2) = grid % vol(c2)                                  &
             - Math_Mod_Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),  &
-                           loc_x_node(3),loc_y_node(3),loc_z_node(3),      &
-                           loc_x_node(4),loc_y_node(4),loc_z_node(4),      &
+                           xt(3), yt(3), zt(3),                            &
+                           xt(4), yt(4), zt(4),                            &
                            x_cell_tmp,y_cell_tmp,z_cell_tmp)
           grid % vol(c2) = grid % vol(c2)                                  &
             - Math_Mod_Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),  &
-                           loc_x_node(4),loc_y_node(4),loc_z_node(4),      &
-                           loc_x_node(1),loc_y_node(1),loc_z_node(1),      &
+                           xt(4),y t(4), zt(4),                            &
+                           xt(1),y t(1), zt(1),                            &
                            x_cell_tmp,y_cell_tmp,z_cell_tmp)
         end if
       else
