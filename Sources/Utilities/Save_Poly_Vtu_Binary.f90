@@ -12,7 +12,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer(SP)     :: data_size
   integer         :: c, n, s, i_pol, data_offset, cell_offset, fu
-  integer         :: n_conns, n_polys
+  integer         :: n_conns, n_polyg
   character(SL)   :: name_out
   character(DL*2) :: str1, str2
 !------------------------------[Local parameters]------------------------------!
@@ -24,7 +24,7 @@
   integer,           parameter :: VTK_PYRAMID    = 14
   integer,           parameter :: VTK_POLYHEDRON = 42
   character(len= 1), parameter :: LF   = char(10)      ! line feed
-  character(len= 0), parameter :: IN_0 = ''            ! indentation levels 
+  character(len= 0), parameter :: IN_0 = ''            ! indentation levels
   character(len= 2), parameter :: IN_1 = '  '
   character(len= 4), parameter :: IN_2 = '    '
   character(len= 6), parameter :: IN_3 = '      '
@@ -39,14 +39,14 @@
   end do
 
   ! Count face data for polyhedral cells, you will need it later
-  n_polys = 0
+  n_polyg = 0
   do c = 1, grid % n_cells
     if(grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
-      n_polys = n_polys + 1          ! add one for number of polyfaces
-      do i_pol = 1, grid % cells_n_polyf(c)  ! add all faces and their nodes
+      n_polyg = n_polyg + 1                  ! add one for number of polyfaces
+      do i_pol = 1, grid % cells_n_polyg(c)  ! add all faces and their nodes
         s = grid % cells_p(i_pol, c)
         n = grid % faces_n_nodes(s)
-        n_polys = n_polys + 1 + n
+        n_polyg = n_polyg + 1 + n
       end do
     end if
   end do
@@ -65,9 +65,9 @@
   !            !
   !------------!
   write(fu) IN_0 // '<?xml version="1.0"?>'             // LF
-  write(fu) IN_0 // '<VTKFile type="UnstructuredGrid" ' //  &
-                    'version="0.1" '                    //  &
-                    'byte_order="LittleEndian">'        // LF
+  write(fu) IN_0 // '<VTKFile type="UnstructuredGrid"'  //  &
+                    ' version="0.1"'                    //  &
+                    ' byte_order="LittleEndian">'       // LF
   write(fu) IN_1 // '<UnstructuredGrid>'                // LF
   write(str1, '(i0.0)') grid % n_nodes
   write(str2, '(i0.0)') grid % n_cells
@@ -91,10 +91,11 @@
   data_offset = data_offset + SP + grid % n_nodes * RP * 3  ! prepare for next
 
   !-----------!
+  !           !
   !   Cells   !
+  !           !
   !-----------!
   write(fu) IN_3 // '<Cells>' // LF
-
 
   ! First write all cells' nodes (a.k.a. connectivity)
   write(str1, '(i0.0)') data_offset
@@ -105,8 +106,7 @@
   write(fu) IN_4 // '</DataArray>' // LF
   data_offset = data_offset + SP + n_conns * IP  ! prepare for next
 
-
-  ! Now write all cells' offsets
+  ! Cells' offsets
   write(str1, '(i0.0)') data_offset
   write(fu) IN_4 // '<DataArray type="Int64"'        //  &
                     ' Name="offsets"'                //  &
@@ -115,8 +115,7 @@
   write(fu) IN_4 // '</DataArray>' // LF
   data_offset = data_offset + SP + grid % n_cells * IP  ! prepare for next
 
-
-  ! Now write all cells' types
+  ! Cells' types
   write(str1, '(i0.0)') data_offset
   write(fu) IN_4 // '<DataArray type="Int64"'        //  &
                     ' Name="types"'                  //  &
@@ -125,7 +124,6 @@
   write(fu) IN_4 // '</DataArray>' // LF
   data_offset = data_offset + SP + grid % n_cells * IP  ! prepare for next
 
-
   ! Write polyhedral cells' faces
   write(str1, '(i0.0)') data_offset
   write(fu) IN_4 // '<DataArray type="Int64"'        //  &
@@ -133,7 +131,7 @@
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
-  data_offset = data_offset + SP + n_polys * IP  ! prepare for next
+  data_offset = data_offset + SP + n_polyg * IP  ! prepare for next
 
 
   ! Write polyhedral cells' faces offsets
@@ -144,7 +142,6 @@
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
   data_offset = data_offset + SP + grid % n_cells * IP  ! prepare for next
-
 
   write(fu) IN_3 // '</Cells>' // LF
 
@@ -257,7 +254,7 @@
   end do
 
   ! Write polyhedral cells' faces
-  data_size = n_polys * IP
+  data_size = n_polyg * IP
   write(fu) data_size
 
   do c = 1, grid % n_cells
@@ -266,9 +263,9 @@
     if(grid % cells_n_nodes(c) .lt. 0) then
 
       ! Write number of polyfaces for this cell
-      write(fu) grid % cells_n_polyf(c)
+      write(fu) grid % cells_n_polyg(c)
 
-      do i_pol = 1, grid % cells_n_polyf(c)
+      do i_pol = 1, grid % cells_n_polyg(c)
         s = grid % cells_p(i_pol, c)
         n = grid % faces_n_nodes(s)
         write(fu) n, (grid % faces_n(1:n, s))-1
@@ -290,7 +287,7 @@
       cell_offset = cell_offset + 1
 
       ! Update the offset with all faces and their nodes
-      do i_pol = 1, grid % cells_n_polyf(c)
+      do i_pol = 1, grid % cells_n_polyg(c)
         s = grid % cells_p(i_pol, c)
         n = grid % faces_n_nodes(s)
         cell_offset = cell_offset + 1 + n
@@ -333,12 +330,13 @@
 
   write(fu) LF // IN_0 // '</AppendedData>' // LF
 
+  write(fu) IN_0 // '</VTKFile>' // LF
+
   !---------------------!
   !                     !
   !   Close .vtu file   !
   !                     !
   !---------------------!
-  write(fu) IN_0 // '</VTKFile>' // LF
   close(fu)
 
   end subroutine

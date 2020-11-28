@@ -11,7 +11,7 @@
   use Grid_Mod,      only: Grid_Type,                     &
                            Grid_Mod_Sort_Cells_By_Index,  &
                            Grid_Mod_Sort_Faces_By_Index,  &
-                           Grid_Mod_Save_Cns,             &
+                           Grid_Mod_Save_Cfn,             &
                            Grid_Mod_Save_Geo
   use Sort_Mod       ! it's a collection of subroutines, no need for "only"
   use Save_Grid_Mod
@@ -292,7 +292,7 @@
     print '(a,i9,a)', ' # ', nbc_sub,           ' boundary cells'
     print '(a,i5,a)', ' #---------------------------------------------'
 
-    call Grid_Mod_Save_Cns(grid,         &
+    call Grid_Mod_Save_Cfn(grid,         &
                            sub,          &
                            nn_sub,       &
                            nc_sub,       &

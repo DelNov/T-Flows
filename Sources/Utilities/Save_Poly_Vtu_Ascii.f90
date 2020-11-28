@@ -10,7 +10,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: c, n, s, i_pol, offset, fu
+  integer       :: c, n, s, i_pol, cell_offset, fu
   character(SL) :: name_out
 !------------------------------[Local parameters]------------------------------!
   integer,           parameter :: VTK_TETRA      = 10  ! cells in VTK format
@@ -35,7 +35,9 @@
   call File_Mod_Open_File_For_Writing(name_out, fu)
 
   !------------!
+  !            !
   !   Header   !
+  !            !
   !------------!
   write(fu,'(a,a)') IN_0, '<?xml version="1.0"?>'
   write(fu,'(a,a)') IN_0, '<VTKFile type="UnstructuredGrid" version="0.1" '//  &
@@ -46,7 +48,9 @@
                                '" NumberOfCells ="', grid % n_cells, '">'
 
   !-----------!
+  !           !
   !   Nodes   !
+  !           !
   !-----------!
   write(fu,'(a,a)') IN_3, '<Points>'
   write(fu,'(a,a)') IN_4, '<DataArray type="Float64" NumberOfComponents' //  &
@@ -59,7 +63,9 @@
   write(fu,'(a,a)') IN_3, '</Points>'
 
   !-----------!
+  !           !
   !   Cells   !
+  !           !
   !-----------!
   write(fu,'(a,a)') IN_3, '<Cells>'
 
@@ -107,10 +113,10 @@
   ! Now write all cells' offsets
   write(fu,'(a,a)') IN_4, '<DataArray type="Int64" ' //  &
                           'Name="offsets" format="ascii">'
-  offset = 0
+  cell_offset = 0
   do c = 1, grid % n_cells
-    offset = offset + abs(grid % cells_n_nodes(c))
-    write(fu,'(a,i9)') IN_5, offset
+    cell_offset = cell_offset + abs(grid % cells_n_nodes(c))
+    write(fu,'(a,i9)') IN_5, cell_offset
   end do
   write(fu,'(a,a)') IN_4, '</DataArray>'
 
@@ -146,7 +152,7 @@
   write(fu,'(a,a)') IN_4, '</DataArray>'
 
   ! Write polyhedral cells' faces offsets
-  offset = 0
+  cell_offset = 0
   write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="faceoffsets" format="ascii">'
   do c = 1, grid % n_cells
 
@@ -154,17 +160,17 @@
     if(grid % cells_n_nodes(c) .lt. 0) then
 
       ! Increase offset for storing number of polyfaces
-      offset = offset + 1
+      cell_offset = cell_offset + 1
 
       ! Update the offset with all faces and their nodes
       do i_pol = 1, grid % cells_n_polyf(c)
         s = grid % cells_p(i_pol, c)
         n = grid % faces_n_nodes(s)
-        offset = offset + 1 + n
+        cell_offset = cell_offset + 1 + n
       end do
 
       ! Write the current offset
-      write(fu,'(a,i9)') IN_5, offset
+      write(fu,'(a,i9)') IN_5, cell_offset
 
     ! Not a polyhedron, offsets are not needed
     else
@@ -174,9 +180,6 @@
   end do
   write(fu,'(a,a)') IN_4, '</DataArray>'
 
-  !----------------------!
-  !   The end of cells   !
-  !----------------------!
   write(fu,'(a,a)') IN_3, '</Cells>'
 
   !---------------!
@@ -208,14 +211,22 @@
   end do
   write(fu,'(a,a)') IN_4, '</DataArray>'
 
-  !------------!
-  !   Footer   !
-  !------------!
   write(fu,'(a,a)') IN_3, '</CellData>'
+
+  !------------!
+  !            !
+  !   Footer   !
+  !            !
+  !------------!
   write(fu,'(a,a)') IN_2, '</Piece>'
   write(fu,'(a,a)') IN_1, '</UnstructuredGrid>'
   write(fu,'(a,a)') IN_0, '</VTKFile>'
 
+  !---------------------!
+  !                     !
+  !   Close .vtu file   !
+  !                     !
+  !---------------------!
   close(fu)
 
   end subroutine

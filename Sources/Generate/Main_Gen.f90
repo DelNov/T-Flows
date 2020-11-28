@@ -65,7 +65,7 @@
   !------------------------------!
   !   Save data for processing   !
   !------------------------------!
-  call Grid_Mod_Save_Cns(grid, 0,             &
+  call Grid_Mod_Save_Cfn(grid, 0,             &
                          grid % n_nodes,      &
                          grid % n_cells,      &
                          grid % n_faces,      &

@@ -383,8 +383,8 @@
                            x_cell_tmp,y_cell_tmp,z_cell_tmp)
           grid % vol(c2) = grid % vol(c2)                                  &
             - Math_Mod_Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),  &
-                           xt(4),y t(4), zt(4),                            &
-                           xt(1),y t(1), zt(1),                            &
+                           xt(4), yt(4), zt(4),                            &
+                           xt(1), yt(1), zt(1),                            &
                            x_cell_tmp,y_cell_tmp,z_cell_tmp)
         end if
       else

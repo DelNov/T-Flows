@@ -84,6 +84,10 @@
     grid % old_f(s) = s
   end do
 
+! call Grid_Mod_Save_Debug_Vtu(grid,                                     &
+!          'X',                                                          &
+!          scalar_cell = grid % xc(-grid % n_bnd_cells:grid % n_cells),  &
+!          scalar_name = 'X')
   if(file_format .eq. 'FLUENT') then
     call Save_Vtu_Cells(grid, 0,         &
                         grid % n_nodes,  &
@@ -97,7 +101,7 @@
   !   Save files for processing   !
   !                               !
   !-------------------------------!
-  call Grid_Mod_Save_Cns(grid, 0,             &
+  call Grid_Mod_Save_Cfn(grid, 0,             &
                          grid % n_nodes,      &
                          grid % n_cells,      &
                          grid % n_faces,      &

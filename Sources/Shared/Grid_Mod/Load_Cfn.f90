@@ -1,7 +1,7 @@
 !==============================================================================!
-  subroutine Grid_Mod_Load_Cns(grid, this_proc, domain)
+  subroutine Grid_Mod_Load_Cfn(grid, this_proc, domain)
 !------------------------------------------------------------------------------!
-!   Reads: .cns file.                                                          !
+!   Reads: .cfn file.                                                          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -9,7 +9,7 @@
   integer           :: this_proc  ! needed if called from Processor
   integer, optional :: domain
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: c, n, s, fu
+  integer       :: c, n, p, s, fu
   character(SL) :: name_in
 !==============================================================================!
 
@@ -19,7 +19,9 @@
   !   connections between cells   !
   !                               !
   !-------------------------------!
-  call File_Mod_Set_Name(name_in, processor=this_proc, extension='.cns',  &
+  call File_Mod_Set_Name(name_in,              &
+                         processor=this_proc,  &
+                         extension='.cfn',     &
                          domain=domain)
   call File_Mod_Open_File_For_Reading_Binary(name_in, fu, this_proc)
 
@@ -78,8 +80,16 @@
   read(fu) (grid % cells_n_nodes(c), c = -grid % n_bnd_cells, grid % n_cells)
 
   ! Cells' nodes
-  read(fu) ((grid % cells_n(n,c),              &
+  read(fu) ((grid % cells_n(n, c),             &
              n = 1, grid % cells_n_nodes(c)),  &
+             c = -grid % n_bnd_cells, grid % n_cells)
+
+  ! Number of polygonal faces for each cell
+  read(fu) (grid % cells_n_polyg(c), c = -grid % n_bnd_cells, grid % n_cells)
+
+  ! Cells' polygonal faces.  They are still faces, kept in the same array.
+  read(fu) ((grid % cells_p(p, c),             &
+             p = 1, grid % cells_n_polyg(c)),  &
              c = -grid % n_bnd_cells, grid % n_cells)
 
   ! Cells' processor ids
@@ -96,13 +106,13 @@
   read(fu) (grid % faces_n_nodes(s), s = 1, grid % n_faces + grid % n_shadows)
 
   ! Faces' nodes
-  read(fu) ((grid % faces_n(n,s),              &
+  read(fu) ((grid % faces_n(n, s),             &
              n = 1, grid % faces_n_nodes(s)),  &
              s = 1, grid % n_faces + grid % n_shadows)
 
   ! Faces' cells
-  read(fu) ((grid % faces_c(c,s), c = 1, 2), s = 1, grid % n_faces  &
-                                                  + grid % n_shadows)
+  read(fu) ((grid % faces_c(c, s), c = 1, 2), s = 1, grid % n_faces  &
+                                                   + grid % n_shadows)
 
   ! Faces' shadows
   read(fu) (grid % faces_s(s), s = 1, grid % n_faces + grid % n_shadows)

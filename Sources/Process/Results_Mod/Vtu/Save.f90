@@ -69,7 +69,7 @@
   do c = 1, grid % n_cells
     if(grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
       n_polyg = n_polyg + 1                  ! add one for number of polyfaces
-      do i_pol = 1, grid % cells_n_polyf(c)  ! add all faces and their nodes
+      do i_pol = 1, grid % cells_n_polyg(c)  ! add all faces and their nodes
         s = grid % cells_p(i_pol, c)
         n = grid % faces_n_nodes(s)
         n_polyg = n_polyg + 1 + n
@@ -187,7 +187,7 @@
   ! Fill up an array with cell offsets and save the header only
   cell_offset = 0
   do c = 1, grid % n_cells
-    cell_offset = cell_offset + grid % cells_n_nodes(c)
+    cell_offset = cell_offset + abs(grid % cells_n_nodes(c))
     offs_save(c) = cell_offset
   end do
   cell_offset = 0
@@ -262,20 +262,17 @@
             write(f9) (grid % cells_n(1:grid % cells_n_nodes(c), c))-1
 
           ! Polyhedral cells
-          else if(grid % cells_n_nodes(c) < 0) then
+          else if(grid % cells_n_nodes(c) .lt. 0) then
             write(f9) (grid % cells_n(1:-grid % cells_n_nodes(c), c))-1
 
           end if
         end do
       else  ! plot only boundary
         do c2 = -grid % n_bnd_cells, -1
-          if(grid % cells_n_nodes(c2) .eq. 4) then
-            write(f9) grid % cells_n(1,c2)-1, grid % cells_n(2,c2)-1,  &
-                      grid % cells_n(3,c2)-1, grid % cells_n(4,c2)-1
-          else if(grid % cells_n_nodes(c2) .eq. 3) then
-            write(f9) grid % cells_n(1,c2)-1, grid % cells_n(2,c2)-1,  &
-                      grid % cells_n(3,c2)-1
-          end if
+
+          ! All cell types
+          write(f9) (grid % cells_n(1:grid % cells_n_nodes(c2), c2))-1
+
         end do
       end if
 

@@ -7,7 +7,7 @@
   use File_Mod
   use Grid_Mod, only: Grid_Type,           &
                       Grid_Mod_Decompose,  &
-                      Grid_Mod_Load_Cns,   &
+                      Grid_Mod_Load_Cfn,   &
                       Grid_Mod_Load_Geo
 !------------------------------------------------------------------------------!
   implicit none
@@ -26,7 +26,7 @@
   read(line % tokens(1), *)  problem_name(1)
 
   ! Load the finite volume grid
-  call Grid_Mod_Load_Cns  (grid, 0)
+  call Grid_Mod_Load_Cfn  (grid, 0)
   call Allocate_Additional(grid)
   call Grid_Mod_Load_Geo  (grid, 0)
 

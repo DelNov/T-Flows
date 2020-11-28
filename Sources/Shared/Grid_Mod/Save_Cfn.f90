@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Grid_Mod_Save_Cns(grid,        &
+  subroutine Grid_Mod_Save_Cfn(grid,        &
                                sub,         &  ! subdomain
                                nn_sub,      &  ! number of nodes in the sub. 
                                nc_sub,      &  ! number of cells in the sub. 
@@ -7,23 +7,25 @@
                                ns_sub,      &  ! number of shadow faces
                                nbc_sub)
 !------------------------------------------------------------------------------!
-!   Writes file with connectivity data: name.cns                               !
+!   Writes file with connectivity data: name.cfn                               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
   integer         :: sub, nn_sub, nc_sub, nf_sub, ns_sub, nbc_sub
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: c, s, n, fu, c1, c2
+  integer       :: c, n, p, s, fu, c1, c2
   character(SL) :: name_out
 !==============================================================================!
 
   !----------------------!
   !                      !
-  !   Create .cns file   !
+  !   Create .cfn file   !
   !                      !
   !----------------------!
-  call File_Mod_Set_Name(name_out, processor=sub, extension='.cns')
+  call File_Mod_Set_Name(name_out,         &
+                         processor=sub,    &
+                         extension='.cfn')
   call File_Mod_Open_File_For_Writing_Binary(name_out, fu)
 
   !-----------------------------------------------!
@@ -78,6 +80,22 @@
     if(grid % old_c(c) .ne. 0 .or. c .eq. 0) then
       do n = 1, grid % cells_n_nodes(grid % old_c(c))
         write(fu) grid % new_n(grid % cells_n(n, grid % old_c(c)))
+      end do
+    end if
+  end do
+
+  ! Number of polygonal faces for each cell
+  do c = -grid % n_bnd_cells, grid % n_cells
+    if(grid % old_c(c) .ne. 0 .or. c .eq. 0) then
+      write(fu) grid % cells_n_polyg(grid % old_c(c))
+    end if
+  end do
+
+  ! Cells' polygonal faces.  They are still faces, kept in the same array.
+  do c = -grid % n_bnd_cells, grid % n_cells
+    if(grid % old_c(c) .ne. 0 .or. c .eq. 0) then
+      do p = 1, grid % cells_n_polyg(grid % old_c(c))
+        write(fu) grid % new_f(grid % cells_p(p, grid % old_c(c)))
       end do
     end if
   end do
