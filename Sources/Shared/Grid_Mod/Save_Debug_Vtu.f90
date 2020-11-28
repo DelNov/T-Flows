@@ -19,7 +19,8 @@
   logical,      optional :: plot_inside
 !-----------------------------------[Locals]-----------------------------------!
   integer(SP)   :: data_size
-  integer       :: c, n, data_offset, cell_offset, n_conns, fu, lev
+  integer       :: c, n, s, i_pol, data_offset, cell_offset, fu, lev
+  integer       :: n_conns, n_polyg
   integer       :: cs, ce, nc
   logical       :: inside
   character(SL) :: name_out, str1, str2
@@ -28,11 +29,13 @@
   integer,           parameter :: RP = DP  ! real precision is double precision
   integer,           parameter :: VTK_LINE       =  3
   integer,           parameter :: VTK_TRIANGLE   =  5
+  integer,           parameter :: VTK_POLYGON    =  7
   integer,           parameter :: VTK_QUAD       =  9
   integer,           parameter :: VTK_TETRA      = 10
   integer,           parameter :: VTK_HEXAHEDRON = 12
   integer,           parameter :: VTK_WEDGE      = 13
   integer,           parameter :: VTK_PYRAMID    = 14
+  integer,           parameter :: VTK_POLYHEDRON = 42
   character(len= 1), parameter :: LF   = char(10)      ! line feed
   character(len= 0), parameter :: IN_0 = ''            ! indentation levels
   character(len= 2), parameter :: IN_1 = '  '
@@ -50,7 +53,7 @@
     inside = plot_inside
   end if
 
-  ! Set start and ending cell
+  ! Set start and ending cell depending if you save inside or boundary cells
   if(inside) then
     cs = 1
     ce = grid % n_cells
@@ -63,12 +66,27 @@
   ! Count connections in this subdomain, you will need it later
   n_conns = 0
   do c = cs, ce
-    n_conns = n_conns + grid % cells_n_nodes(c)
+    n_conns = n_conns + abs(grid % cells_n_nodes(c))
   end do
 
-  !------------------------!
-  !   Open the .vtu file   !
-  !------------------------!
+  ! Count face data for polyhedral cells, you will need it later
+  n_polyg = 0
+  do c = cs, ce
+    if(grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
+      n_polyg = n_polyg + 1                  ! add one for number of polyfaces
+      do i_pol = 1, grid % cells_n_polyg(c)  ! add all faces and their nodes
+        s = grid % cells_p(i_pol, c)
+        n = grid % faces_n_nodes(s)
+        n_polyg = n_polyg + 1 + n
+      end do
+    end if
+  end do
+
+  !----------------------!
+  !                      !
+  !   Create .vtu file   !
+  !                      !
+  !----------------------!
   call File_Mod_Set_Name(name_out, appendix='-'//trim(append),  &
                          processor=this_proc, extension='.vtu')
   call File_Mod_Open_File_For_Writing_Binary(name_out, fu)
@@ -82,7 +100,7 @@
   write(fu) IN_0 // '<VTKFile type="UnstructuredGrid"'  //  &
                     ' version="0.1"'                    //  &
                     ' byte_order="LittleEndian">'       // LF
-  write(fu) IN_1 // '<UnstructuredGrid>' // LF
+  write(fu) IN_1 // '<UnstructuredGrid>'                // LF
   write(str1, '(i0.0)') grid % n_nodes
   write(str2, '(i0.0)') nc
   write(fu) IN_2 // '<Piece NumberOfPoints="' // trim(str1) // '"' //  &
@@ -90,7 +108,9 @@
   data_offset = 0
 
   !-----------!
+  !           !
   !   Nodes   !
+  !           !
   !-----------!
   write(str1, '(i1)') data_offset
   write(fu) IN_3 // '<Points>'                       // LF
@@ -103,11 +123,13 @@
   data_offset = data_offset + SP + grid % n_nodes * RP * 3  ! prepare for next
 
   !-----------!
+  !           !
   !   Cells   !
+  !           !
   !-----------!
   write(fu) IN_3 // '<Cells>' // LF
 
-  ! Cells' nodes
+  ! First write all cells' nodes (a.k.a. connectivity)
   write(str1, '(i0.0)') data_offset
   write(fu) IN_4 // '<DataArray type="Int64"'        //  &
                     ' Name="connectivity"'           //  &
@@ -134,9 +156,27 @@
   write(fu) IN_4 // '</DataArray>' // LF
   data_offset = data_offset + SP + nc * IP  ! prepare for next
 
-  !----------------------!
-  !   The end of cells   !
-  !----------------------!
+  if(grid % polyhedral) then
+  ! Write polyhedral cells' faces
+  write(str1, '(i0.0)') data_offset
+  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+                    ' Name="faces"'                  //  &
+                    ' format="appended"'             //  &
+                    ' offset="' // trim(str1) //'">' // LF
+  write(fu) IN_4 // '</DataArray>' // LF
+  data_offset = data_offset + SP + n_polyg * IP  ! prepare for next
+
+
+  ! Write polyhedral cells' faces offsets
+  write(str1, '(i0.0)') data_offset
+  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+                    ' Name="faceoffsets"'            //  &
+                    ' format="appended"'             //  &
+                    ' offset="' // trim(str1) //'">' // LF
+  write(fu) IN_4 // '</DataArray>' // LF
+  data_offset = data_offset + SP + grid % n_cells * IP  ! prepare for next
+  end if
+
   write(fu) IN_3 // '</Cells>' // LF
 
   !----------------!
@@ -174,7 +214,9 @@
   end if
 
   !---------------!
+  !               !
   !   Cell data   !
+  !               !
   !---------------!
   write(fu) IN_3 // '<CellData Scalars="scalars" vectors="velocity">' // LF
 
@@ -243,6 +285,7 @@
   ! Cells' nodes
   data_size = n_conns * IP
   write(fu) data_size
+
   do c = cs, ce
 
     !---------------------------!
@@ -250,49 +293,14 @@
     !---------------------------!
     if(inside) then
 
-      ! Hexahedral
-      if(grid % cells_n_nodes(c) .eq. 8) then
-        write(fu)                 &
-          grid % cells_n(1,c)-1,  &
-          grid % cells_n(2,c)-1,  &
-          grid % cells_n(4,c)-1,  &
-          grid % cells_n(3,c)-1,  &
-          grid % cells_n(5,c)-1,  &
-          grid % cells_n(6,c)-1,  &
-          grid % cells_n(8,c)-1,  &
-          grid % cells_n(7,c)-1
+      ! Tetrahedral, pyramid, wedge and hexahedral cells
+      if( any( grid % cells_n_nodes(c) .eq. (/4,5,6,8/)  ) ) then
+        write(fu) (grid % cells_n(1:grid % cells_n_nodes(c), c))-1
 
-      ! Wedge
-      else if(grid % cells_n_nodes(c) .eq. 6) then
-        write(fu)                 &
-          grid % cells_n(1,c)-1,  &
-          grid % cells_n(2,c)-1,  &
-          grid % cells_n(3,c)-1,  &
-          grid % cells_n(4,c)-1,  &
-          grid % cells_n(5,c)-1,  &
-          grid % cells_n(6,c)-1
+      ! Polyhedral cells
+      else if(grid % cells_n_nodes(c) .lt. 0) then
+        write(fu) (grid % cells_n(1:-grid % cells_n_nodes(c), c))-1
 
-      ! Tetrahedra
-      else if(grid % cells_n_nodes(c) .eq. 4) then
-        write(fu)                 &
-          grid % cells_n(1,c)-1,  &
-          grid % cells_n(2,c)-1,  &
-          grid % cells_n(3,c)-1,  &
-          grid % cells_n(4,c)-1
-
-      ! Pyramid
-      else if(grid % cells_n_nodes(c) .eq. 5) then
-        write(fu)                 &
-          grid % cells_n(1,c)-1,  &
-          grid % cells_n(2,c)-1,  &
-          grid % cells_n(4,c)-1,  &
-          grid % cells_n(3,c)-1,  &
-          grid % cells_n(5,c)-1
-      else
-        print *, '# Unsupported inside cell type with ',  &
-                    grid % cells_n_nodes(c), ' nodes.'
-        print *, '# Exiting'
-        stop
       end if
 
     !-----------------------------!
@@ -300,30 +308,10 @@
     !-----------------------------!
     else
 
-      ! Quadrilateral
-      if(grid % cells_n_nodes(c) .eq. 4) then
-        write(fu)                 &
-          grid % cells_n(1,c)-1,  &
-          grid % cells_n(2,c)-1,  &
-          grid % cells_n(3,c)-1,  &
-          grid % cells_n(4,c)-1
+      ! All cell types
+      write(fu) (grid % cells_n(1:grid % cells_n_nodes(c), c))-1
 
-      ! Triangular
-      else if(grid % cells_n_nodes(c) .eq. 3) then
-        write(fu)                 &
-          grid % cells_n(1,c)-1,  &
-          grid % cells_n(2,c)-1,  &
-          grid % cells_n(3,c)-1
-
-      else
-        print *, '# Unsupported boundary cell type with ',  &
-                    grid % cells_n_nodes(c), ' nodes.'
-        print *, '# Exiting'
-        stop
-      end if
-
-    end if
-
+    end if  ! if inside
   end do
 
   ! Cells' offsets
@@ -344,11 +332,17 @@
       if(grid % cells_n_nodes(c) .eq. 8) write(fu) VTK_HEXAHEDRON
       if(grid % cells_n_nodes(c) .eq. 6) write(fu) VTK_WEDGE
       if(grid % cells_n_nodes(c) .eq. 5) write(fu) VTK_PYRAMID
+      if(grid % cells_n_nodes(c) .lt. 0) write(fu) VTK_POLYHEDRON
     end do
   else
     do c = cs, ce
-      if(grid % cells_n_nodes(c) .eq. 3) write(fu) VTK_TRIANGLE
-      if(grid % cells_n_nodes(c) .eq. 4) write(fu) VTK_QUAD
+      if(grid % cells_n_nodes(c) .eq. 3) then
+        write(fu) VTK_TRIANGLE
+      else if(grid % cells_n_nodes(c) .eq. 4) then
+        write(fu) VTK_QUAD
+      else
+        write(fu) VTK_POLYGON
+      end if
     end do
   end if
 
