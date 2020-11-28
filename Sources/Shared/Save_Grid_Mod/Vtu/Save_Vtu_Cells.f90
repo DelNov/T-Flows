@@ -127,7 +127,7 @@
     write(fu) IN_4 // '</DataArray>' // LF
     data_offset = data_offset + SP + n_cells_sub * IP  ! prepare for next
 
-  end if
+  end if  ! is grid polyhedral
 
   !----------------------!
   !   The end of cells   !
@@ -283,7 +283,7 @@
       end if
     end do
 
-  end if
+  end if  ! if grid % polyhedral
 
   !---------------!
   !   Cell data   !
