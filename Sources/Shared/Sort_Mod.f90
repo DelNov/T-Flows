@@ -32,6 +32,8 @@
   include 'Sort_Mod/Real_By_Index.f90'
   include 'Sort_Mod/Real_Carry_Int.f90'
   include 'Sort_Mod/Real.f90'
+  include 'Sort_Mod/Reverse_Order_Int.f90'
+  include 'Sort_Mod/Reverse_Order_Real.f90'
   include 'Sort_Mod/Short_Carry_Short.f90'
   include 'Sort_Mod/Unique_Int.f90'
 
