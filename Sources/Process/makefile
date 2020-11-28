@@ -215,6 +215,7 @@ SRC_MOD += Cpu_Timer_Mod.f90	\
            Sort_Mod.f90		\
            File_Mod.f90		\
            Control_Mod.f90	\
+           Vtk_Mod.f90		\
            Grid_Mod.f90		\
            Work_Mod.f90		\
            Metis_Options_Mod.f90

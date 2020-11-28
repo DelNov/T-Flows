@@ -727,22 +727,10 @@
 
         n_per = n_per + 1
 
-        ! Find the coordinates of ...
-        if(grid % faces_n_nodes(s) .eq. 4) then
-
-          ! Coordinates of the shadow face
-          xs2 = grid % xf(face_copy(s))
-          ys2 = grid % yf(face_copy(s))
-          zs2 = grid % zf(face_copy(s))
-
-        else if(grid % faces_n_nodes(s) .eq. 3) then
-
-          ! Coordinates of the shadow face
-          xs2 = grid % xf(face_copy(s))
-          ys2 = grid % yf(face_copy(s))
-          zs2 = grid % zf(face_copy(s))
-
-        end if
+        ! Find the coordinates of the shadow face
+        xs2 = grid % xf(face_copy(s))
+        ys2 = grid % yf(face_copy(s))
+        zs2 = grid % zf(face_copy(s))
 
         grid % dx(s) = grid % xf(s) - xs2  !-----------------------!
         grid % dy(s) = grid % yf(s) - ys2  ! later: xc2 = xc2 + dx !
