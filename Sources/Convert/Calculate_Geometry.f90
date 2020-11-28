@@ -153,10 +153,11 @@
   do s = 1, grid % n_faces
 
     ! Copy face node coordinates to a local array for easier handling
-    n = grid % faces_n_nodes(s)
-    xt(1:n) = grid % xn(grid % faces_n(1:n,s))
-    yt(1:n) = grid % yn(grid % faces_n(1:n,s))
-    zt(1:n) = grid % zn(grid % faces_n(1:n,s))
+    do n = 1, grid % faces_n_nodes(s)
+      xt(n) = grid % xn(grid % faces_n(n,s))
+      yt(n) = grid % yn(grid % faces_n(n,s))
+      zt(n) = grid % zn(grid % faces_n(n,s))
+    end do
 
     ! Cell face components
     grid % sx(s) = 0.0
