@@ -157,25 +157,27 @@
   data_offset = data_offset + SP + nc * IP  ! prepare for next
 
   if(grid % polyhedral) then
-  ! Write polyhedral cells' faces
-  write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
-                    ' Name="faces"'                  //  &
-                    ' format="appended"'             //  &
-                    ' offset="' // trim(str1) //'">' // LF
-  write(fu) IN_4 // '</DataArray>' // LF
-  data_offset = data_offset + SP + n_polyg * IP  ! prepare for next
+
+    ! Write polyhedral cells' faces
+    write(str1, '(i0.0)') data_offset
+    write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+                      ' Name="faces"'                  //  &
+                      ' format="appended"'             //  &
+                      ' offset="' // trim(str1) //'">' // LF
+    write(fu) IN_4 // '</DataArray>' // LF
+    data_offset = data_offset + SP + n_polyg * IP  ! prepare for next
 
 
-  ! Write polyhedral cells' faces offsets
-  write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
-                    ' Name="faceoffsets"'            //  &
-                    ' format="appended"'             //  &
-                    ' offset="' // trim(str1) //'">' // LF
-  write(fu) IN_4 // '</DataArray>' // LF
-  data_offset = data_offset + SP + grid % n_cells * IP  ! prepare for next
-  end if
+    ! Write polyhedral cells' faces offsets
+    write(str1, '(i0.0)') data_offset
+    write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+                      ' Name="faceoffsets"'            //  &
+                      ' format="appended"'             //  &
+                      ' offset="' // trim(str1) //'">' // LF
+    write(fu) IN_4 // '</DataArray>' // LF
+    data_offset = data_offset + SP + nc * IP  ! prepare for next
+
+  end if  ! is grid polyhedral
 
   write(fu) IN_3 // '</Cells>' // LF
 
@@ -319,7 +321,7 @@
   write(fu) data_size
   cell_offset = 0
   do c = cs, ce
-    cell_offset = cell_offset + grid % cells_n_nodes(c)
+    cell_offset = cell_offset + abs(grid % cells_n_nodes(c))
     write(fu) cell_offset
   end do
 
@@ -345,6 +347,43 @@
       end if
     end do
   end if
+
+  ! For polyhedral grids, save faces and face offsets
+  if(grid % polyhedral) then
+
+    ! Write polyhedral cells' faces
+    data_size = n_polyg * IP
+    write(fu) data_size
+    do c = cs, ce
+      if(grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
+        write(fu) grid % cells_n_polyg(c)      ! write number of its polyfaces
+        do i_pol = 1, grid % cells_n_polyg(c)  ! and all polyfaces
+          s = grid % cells_p(i_pol, c)
+          n = grid % faces_n_nodes(s)
+          write(fu) n, grid % faces_n(1:n, s)-1
+        end do
+      end if
+    end do
+
+    ! Write polyhedral cells' faces offsets
+    data_size = grid % n_cells * IP
+    write(fu) data_size
+    cell_offset = 0
+    do c = 1, grid % n_cells
+      if(grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
+        cell_offset = cell_offset + 1          ! to store number of polyfaces
+        do i_pol = 1, grid % cells_n_polyg(c)  ! to store polyfaces
+          s = grid % cells_p(i_pol, c)
+          n = grid % faces_n_nodes(s)
+          cell_offset = cell_offset + 1 + n    ! number of nodes and nodes
+        end do
+        write(fu) cell_offset                  ! write the current offset
+      else
+        write(fu) -1             ! not a polyhedron, offsets are not needed
+      end if
+    end do
+
+  end if  ! if grid % polyhedral
 
   !----------------!
   !   Point data   !
@@ -418,24 +457,21 @@
 
     ! This section must be present
     write(fu,'(a,a)') IN_2, '<PPoints>'
-    write(fu,'(a,a)') IN_3, '<PDataArray type="Float64" NumberOfComponents='// &
-                           '"3" format="ascii"/>'
+    write(fu,'(a,a)') IN_3, '<PDataArray type="Float64"'  // &
+                            ' NumberOfComponents="3"/>'
     write(fu,'(a,a)') IN_2, '</PPoints>'
 
     ! Data section is not mandatory, but very useful
     write(fu,'(a,a)') IN_2, '<PCellData Scalars="scalars" vectors="velocity">'
-    write(fu,'(a,a)') IN_3, '<PDataArray type="Int64" Name="Processor"' // &
-                           ' format="ascii"/>'
+    write(fu,'(a,a)') IN_3, '<PDataArray type="Int64" Name="Processor"/>'
     if(present(scalar_cell)) then
-      write(fu,'(a,a)') IN_3, '<PDataArray type="Float64"'         //  &
-                              ' Name="'// trim(scalar_name) // '"' //  &
-                              ' format="ascii"/>'
+      write(fu,'(a,a)') IN_3, '<PDataArray type="Float64"'  //  &
+                              ' Name="'// trim(scalar_name) // '"/>'
     end if
     if(present(vector_cell)) then
-      write(fu,'(a,a)') IN_3, '<PDataArray type="Float64"'         //  &
-                              ' NumberOfComponents="3"'            //  &
-                              ' Name="'// trim(vector_name) // '"' //  &
-                              ' format="ascii"/>'
+      write(fu,'(a,a)') IN_3, '<PDataArray type="Float64"'  //  &
+                              ' NumberOfComponents="3"'     //  &
+                              ' Name="'// trim(vector_name) // '"/>'
     end if
     write(fu,'(a,a)') IN_2, '</PCellData>'
 
