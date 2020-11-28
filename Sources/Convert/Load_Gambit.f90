@@ -122,7 +122,21 @@
   do i = 1, grid % n_cells
     read(fu,'(i8,1x,i2,1x,i2,1x,7i8:/(15x,7i8:))') dum1, dum2, &
            grid % cells_n_nodes(i),                           &
-          (grid % cells_n(j,i), j = 1,grid % cells_n_nodes(i))
+          (grid % cells_n(j,i), j = 1, grid % cells_n_nodes(i))
+
+    ! Nodes 3,4 and 7,8 should be swapped for hexahedral
+    ! cells to be compatible with writing in vtu format
+    if( grid % cells_n_nodes(i) .eq. 8 ) then
+      call Swap_Int(grid % cells_n(3, i), grid % cells_n(4, i))
+      call Swap_Int(grid % cells_n(7, i), grid % cells_n(8, i))
+    end if
+
+    ! Nodes 3, 4 should be swapped for pyramids
+    ! to be compatible with files in vtu format
+    if( grid % cells_n_nodes(i) .eq. 5 ) then
+      call Swap_Int(grid % cells_n(3, i), grid % cells_n(4, i))
+    end if
+
   end do
   call File_Mod_Read_Line(fu)          ! ENDOFSECTION
 

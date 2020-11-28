@@ -63,7 +63,7 @@
     integer, allocatable :: cells_n_faces(:)
 
     ! Number of polygonal faces surrounding each (clearly polyhedral) cell
-    integer, allocatable :: cells_n_polyf(:)
+    integer, allocatable :: cells_n_polyg(:)
 
     ! Number of cells surrounding each cell
     integer, allocatable :: cells_n_cells(:)

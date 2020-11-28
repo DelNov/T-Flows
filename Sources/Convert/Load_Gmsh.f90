@@ -15,7 +15,7 @@
   integer, parameter   :: MSH_QUAD  = 3
   integer, parameter   :: MSH_TETRA = 4
   integer, parameter   :: MSH_HEXA  = 5
-  integer, parameter   :: MSH_PENTA = 6
+  integer, parameter   :: MSH_WEDGE = 6
   integer, parameter   :: MSH_PYRA  = 7
   integer              :: n_sect, n_elem, n_blocks, n_bnd_sect, n_grps, n_memb
   integer              :: i, j, c, dim, p_tag, s_tag, n_tags, type, fu
@@ -289,7 +289,7 @@
           read(line % tokens(4), *) grid % cells_n(3, c)
           read(line % tokens(5), *) grid % cells_n(4, c)
         end if
-        if(type .eq. MSH_PENTA) then
+        if(type .eq. MSH_WEDGE) then
           read(line % tokens(1), *) c       ! Gmsh cell number
           c = new(c)                        ! use T-Flows numbering
           grid % cells_n_nodes(c) = 6
@@ -306,12 +306,12 @@
           grid % cells_n_nodes(c) = 8
           read(line % tokens(2), *) grid % cells_n(1, c)
           read(line % tokens(3), *) grid % cells_n(2, c)
-          read(line % tokens(4), *) grid % cells_n(4, c)
-          read(line % tokens(5), *) grid % cells_n(3, c)
+          read(line % tokens(4), *) grid % cells_n(3, c)
+          read(line % tokens(5), *) grid % cells_n(4, c)
           read(line % tokens(6), *) grid % cells_n(5, c)
           read(line % tokens(7), *) grid % cells_n(6, c)
-          read(line % tokens(8), *) grid % cells_n(8, c)
-          read(line % tokens(9), *) grid % cells_n(7, c)
+          read(line % tokens(8), *) grid % cells_n(7, c)
+          read(line % tokens(9), *) grid % cells_n(8, c)
         end if
         if(type .eq. MSH_PYRA) then
           print *, '# ERROR: Pyramid cells not implemented yet!'

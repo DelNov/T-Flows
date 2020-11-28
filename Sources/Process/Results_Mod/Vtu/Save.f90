@@ -38,8 +38,8 @@
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: phi
   integer(SP)              :: data_size
-  integer                  :: data_offset, cell_offset
-  integer                  :: c, n, n_conns, sc, f8, f9, ua, run, c2
+  integer                  :: data_offset, cell_offset, i_pol
+  integer                  :: c, s, n, n_conns, n_polyg, sc, f8, f9, ua, run, c2
   character(SL)            :: name_out_8, name_out_9, name_mean, a_name
   character(SL)            :: str1, str2
 !------------------------------[Local parameters]------------------------------!
@@ -56,13 +56,26 @@
   n_conns = 0
   if(plot_inside) then
     do c = 1, grid % n_cells
-      n_conns = n_conns + grid % cells_n_nodes(c)
+      n_conns = n_conns + abs(grid % cells_n_nodes(c))
     end do
   else
     do c2 = -grid % n_bnd_cells, -1
       n_conns = n_conns + grid % cells_n_nodes(c2)
     end do
   end if
+
+  ! Count face data for polyhedral cells, you will need it later
+  n_polyg = 0
+  do c = 1, grid % n_cells
+    if(grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
+      n_polyg = n_polyg + 1                  ! add one for number of polyfaces
+      do i_pol = 1, grid % cells_n_polyf(c)  ! add all faces and their nodes
+        s = grid % cells_p(i_pol, c)
+        n = grid % faces_n_nodes(s)
+        n_polyg = n_polyg + 1 + n
+      end do
+    end if
+  end do
 
   call Comm_Mod_Wait
 
@@ -192,10 +205,16 @@
     if(grid % cells_n_nodes(c) .eq. 6) type_save(c) = VTK_WEDGE
     if(grid % cells_n_nodes(c) .eq. 4) type_save(c) = VTK_TETRA
     if(grid % cells_n_nodes(c) .eq. 5) type_save(c) = VTK_PYRAMID
+    if(grid % cells_n_nodes(c) .lt. 0) type_save(c) = VTK_POLYHEDRON
   end do
   do c2 = -grid % n_bnd_cells, -1
-    if(grid % cells_n_nodes(c2) .eq. 4) type_save(c2) = VTK_QUAD
-    if(grid % cells_n_nodes(c2) .eq. 3) type_save(c2) = VTK_TRIANGLE
+    if(grid % cells_n_nodes(c2) .eq. 4) then
+      type_save(c2) = VTK_QUAD
+    else if(grid % cells_n_nodes(c2) .eq. 3) then
+      type_save(c2) = VTK_TRIANGLE
+    else
+      type_save(c2) = VTK_POLYGON
+    end if
   end do
   call Save_Scalar_Int(grid, "types", plot_inside,             &
                               type_save(-grid % n_bnd_cells),  &
@@ -237,22 +256,15 @@
       write(f9) data_size
       if(plot_inside) then
         do c = 1, grid % n_cells
-          if(grid % cells_n_nodes(c) .eq. 8) then
-            write(f9) grid % cells_n(1,c)-1, grid % cells_n(2,c)-1,   &
-                      grid % cells_n(4,c)-1, grid % cells_n(3,c)-1,   &
-                      grid % cells_n(5,c)-1, grid % cells_n(6,c)-1,   &
-                      grid % cells_n(8,c)-1, grid % cells_n(7,c)-1
-          else if(grid % cells_n_nodes(c) .eq. 6) then
-            write(f9) grid % cells_n(1,c)-1, grid % cells_n(2,c)-1,   &
-                      grid % cells_n(3,c)-1, grid % cells_n(4,c)-1,   &
-                      grid % cells_n(5,c)-1, grid % cells_n(6,c)-1
-          else if(grid % cells_n_nodes(c) .eq. 4) then
-            write(f9) grid % cells_n(1,c)-1, grid % cells_n(2,c)-1,   &
-                      grid % cells_n(3,c)-1, grid % cells_n(4,c)-1
-          else if(grid % cells_n_nodes(c) .eq. 5) then
-            write(f9) grid % cells_n(5,c)-1, grid % cells_n(1,c)-1,   &
-                      grid % cells_n(2,c)-1, grid % cells_n(4,c)-1,   &
-                      grid % cells_n(3,c)-1
+
+          ! Tetrahedral, pyramid, wedge and hexahedral cells
+          if( any( grid % cells_n_nodes(c) .eq. (/4,5,6,8/)  ) ) then
+            write(f9) (grid % cells_n(1:grid % cells_n_nodes(c), c))-1
+
+          ! Polyhedral cells
+          else if(grid % cells_n_nodes(c) < 0) then
+            write(f9) (grid % cells_n(1:-grid % cells_n_nodes(c), c))-1
+
           end if
         end do
       else  ! plot only boundary

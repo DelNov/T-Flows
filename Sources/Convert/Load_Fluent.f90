@@ -802,8 +802,8 @@
       end if
 
       ! Increase the number of polygonal faces for c1
-      grid % cells_n_polyf(c1) = grid % cells_n_polyf(c1) + 1
-      n = grid % cells_n_polyf(c1)
+      grid % cells_n_polyg(c1) = grid % cells_n_polyg(c1) + 1
+      n = grid % cells_n_polyg(c1)
       grid % cells_p(n, c1) = s
     end if
 
@@ -813,8 +813,8 @@
       end if
 
       ! Increase the number of polygonal faces for c2 and store the face
-      grid % cells_n_polyf(c2) = grid % cells_n_polyf(c2) + 1
-      n = grid % cells_n_polyf(c2)
+      grid % cells_n_polyg(c2) = grid % cells_n_polyg(c2) + 1
+      n = grid % cells_n_polyg(c2)
       grid % cells_p(n, c2) = s
     end if
 
@@ -832,7 +832,7 @@
 
       ! Accumulate nodes from all faces surrounding the cell
       n = 0
-      do i_pol = 1, grid % cells_n_polyf(c)
+      do i_pol = 1, grid % cells_n_polyg(c)
         s = grid % cells_p(i_pol, c)           ! take true face index
         do i_nod = 1, grid % faces_n_nodes(s)
           n = n + 1

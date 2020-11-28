@@ -106,7 +106,7 @@
 !     t = -----------------------------------------------------------          !
 !                           rx*sx + ry*sy + rz*sz                              !
 !                                                                              !
-!------------------------------------------------------------------------------!
+!==============================================================================!
 
   !-------------------------------!
   !   Scale geometry              !
@@ -138,8 +138,8 @@
   !-----------------------------------------!
   !   Calculate the cell centers            !
   !-----------------------------------------!
-  !   => depends on: x_node,y_node,z_node   !
-  !   <= gives:      xc,yc,zc c>0           !
+  !   => depends on: xn, yn, zn             !
+  !   <= gives:      xc, yc, zc @ c > 0     !
   !-----------------------------------------!
   call Grid_Mod_Calculate_Cell_Centers(grid)
 
@@ -151,11 +151,12 @@
   !   <= gives:      sx, sy, sz, xf, yf, zf             !
   !-----------------------------------------------------!
   do s = 1, grid % n_faces
-    do n = 1, grid % faces_n_nodes(s)         ! for all types of faces
-      xt(n) = grid % xn(grid % faces_n(n,s))
-      yt(n) = grid % yn(grid % faces_n(n,s))
-      zt(n) = grid % zn(grid % faces_n(n,s))
-    end do
+
+    ! Copy face node coordinates to a local array for easier handling
+    n = grid % faces_n_nodes(s)
+    xt(1:n) = grid % xn(grid % faces_n(1:n,s))
+    yt(1:n) = grid % yn(grid % faces_n(1:n,s))
+    zt(1:n) = grid % zn(grid % faces_n(1:n,s))
 
     ! Cell face components
     grid % sx(s) = 0.0
@@ -173,23 +174,21 @@
     grid % sz(s) = 0.5 * grid % sz(s)
 
     ! Barycenters
-    grid % xf(s) = sum( xt(1:grid % faces_n_nodes(s)) )  &
-                 / real(grid % faces_n_nodes(s))
-    grid % yf(s) = sum( yt(1:grid % faces_n_nodes(s)) )  &
-                 / real(grid % faces_n_nodes(s))
-    grid % zf(s) = sum( zt(1:grid % faces_n_nodes(s)) )  &
-                 / real(grid % faces_n_nodes(s))
+    n = grid % faces_n_nodes(s)
+    grid % xf(s) = sum( xt(1:n) ) / real(n)
+    grid % yf(s) = sum( yt(1:n) ) / real(n)
+    grid % zf(s) = sum( zt(1:n) ) / real(n)
 
   end do ! through faces
 
   print *, '# Cell face components calculated !'
 
-  !--------------------------------------!
-  !   Calculate boundary cell centers    !
-  !--------------------------------------!
-  !   => depends on: xc,yc,zc,Sx,Sy,Sz   !
-  !   <= gives:      xc,yc,zc for c<0    !
-  !--------------------------------------!
+  !-------------------------------------------!
+  !   Calculate boundary cell centers         !
+  !-------------------------------------------!
+  !   => depends on: xc, yc, zc, sx, sy, sz   !
+  !   <= gives:      xc, yc, zc  for c<0      !
+  !-------------------------------------------!
   print *, '#===================================='
   print *, '# Position the boundary cell centres:'
   print *, '#------------------------------------'
@@ -224,9 +223,9 @@
   !---------------------------------------------------------------!
   !   Move the centers of co-planar molecules towards the walls   !
   !---------------------------------------------------------------!
-  !   => depends on: xc,yc,zc                                     !
-  !   <= gives:      xc,yc,zc                                     !
-  !   +  uses:       Dx,Dy,Dz                                     !
+  !   => depends on: xc, yc, zc                                   !
+  !   <= gives:      xc, yc, zc                                   !
+  !   +  uses:       dx, dy, dz                                   !
   !---------------------------------------------------------------!
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
@@ -248,24 +247,25 @@
 
     if(c2 < 0) then
       if( Math_Mod_Approx_Real(grid % dx(c1), 0.0, small) )  &
-        grid % xc(c1) = 0.75*grid % xc(c1) + 0.25*grid % xc(c2)
+        grid % xc(c1) = 0.75 * grid % xc(c1) + 0.25 * grid % xc(c2)
       if( Math_Mod_Approx_Real(grid % dy(c1), 0.0, small) )  &
-        grid % yc(c1) = 0.75*grid % yc(c1) + 0.25*grid % yc(c2)
+        grid % yc(c1) = 0.75 * grid % yc(c1) + 0.25 * grid % yc(c2)
       if( Math_Mod_Approx_Real(grid % dz(c1), 0.0, small) )  &
-        grid % zc(c1) = 0.75*grid % zc(c1) + 0.25*grid % zc(c2)
+        grid % zc(c1) = 0.75 * grid % zc(c1) + 0.25 * grid % zc(c2)
     end if
   end do ! through faces
 
   ! Why are the following three lines needed?
-  grid % dx = 0.0
-  grid % dy = 0.0
-  grid % dz = 0.0
+  ! Because memory for dx, dy and dz was used in the previous step
+  grid % dx(:) = 0.0
+  grid % dy(:) = 0.0
+  grid % dz(:) = 0.0
 
   !--------------------------------------------!
   !   Find the faces on the periodic boundary  !
   !--------------------------------------------!
-  !   => depends on: xc,yc,zc,Sx,Sy,Sz         !
-  !   <= gives:      Dx,Dy,Dz                  !
+  !   => depends on: xc, yc, zc, sx, sy, sz    !
+  !   <= gives:      dx, dy, dz                !
   !--------------------------------------------!
   allocate(b_coor(grid % n_faces)); b_coor = 0.0
   allocate(b_face(grid % n_faces)); b_face = 0
@@ -838,10 +838,10 @@
   !----------------------------------!
   !   Calculate the cell volumes     !
   !----------------------------------!
-  !   => depends on: xc,yc,zc,       !
-  !                  dx,dy,dz,       !
-  !                  xsp, ysp, zsp   !
-  !   <= gives:      volume          !
+  !   => depends on: xc, yc, zc,     !
+  !                  dx, dy, dz,     !
+  !                  xf, yf, zf      !
+  !   <= gives:      vol             !
   !----------------------------------!
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)

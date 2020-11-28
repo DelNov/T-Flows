@@ -39,7 +39,7 @@
   allocate(grid % cells_n_faces(-nb:nc));  grid % cells_n_faces(:) = 0
 
   ! Number of polygonal faces at each cell
-  allocate(grid % cells_n_polyf(-nb:nc));  grid % cells_n_polyf(:) = 0
+  allocate(grid % cells_n_polyg(-nb:nc));  grid % cells_n_polyg(:) = 0
 
   ! Boundary condition color in a given direction
   allocate(grid % cells_bnd_color(6, -nb:nc))
