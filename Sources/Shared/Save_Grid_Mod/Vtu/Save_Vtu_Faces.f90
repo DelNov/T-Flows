@@ -107,6 +107,16 @@
   write(fu) IN_4 // '</DataArray>' // LF
   data_offset = data_offset + SP + grid % n_faces * IP      ! prepare for next
 
+  ! Surface vectors
+  write(str1, '(i0.0)') data_offset
+  write(fu) IN_4 // '<DataArray type="Float64"'      //  &
+                    ' Name="GeomSurfaceVectors"'     //  &
+                    ' NumberOfComponents="3"'        //  &
+                    ' format="appended"'             //  &
+                    ' offset="' // trim(str1) //'">' // LF
+  write(fu) IN_4 // '</DataArray>' // LF
+  data_offset = data_offset + SP + grid % n_faces * RP * 3  ! prepare for next
+
   !------------!
   !            !
   !   Footer   !
@@ -175,6 +185,13 @@
 
     if(c2 < 0) write(fu) grid % bnd_cond % color(c2)
     if(c2 > 0) write(fu) 0
+  end do
+
+  ! Surface vectors
+  data_size = grid % n_faces * RP * 3
+  write(fu) data_size
+  do s = 1, grid % n_faces
+    write(fu) grid % sx(s), grid % sy(s), grid % sz(s)
   end do
 
   write(fu) LF // IN_0 // '</AppendedData>' // LF
