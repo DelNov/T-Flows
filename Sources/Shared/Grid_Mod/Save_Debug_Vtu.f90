@@ -19,7 +19,7 @@
   logical,      optional :: plot_inside
 !-----------------------------------[Locals]-----------------------------------!
   integer(SP)   :: data_size
-  integer       :: c, n, s, i_pol, data_offset, cell_offset, fu, lev
+  integer       :: c, n, s, i_pol, data_offset, cell_offset, fu
   integer       :: n_conns, n_polyg
   integer       :: cs, ce, nc
   logical       :: inside
