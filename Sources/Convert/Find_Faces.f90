@@ -14,6 +14,7 @@
 !           and/or polyhedral meshes are not supported.  That should not be    !
 !           a big deal though, since such meshes comes in formats which is     !
 !           already face-based, thus one will not need to find faces in them.  !
+!   Note 3: This is called before geometrical quantities are calculated.       !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod
@@ -49,10 +50,10 @@
   !   Fill the generic coordinates with some values   !
   !---------------------------------------------------!
   do c = 1, grid % n_cells
-    if(grid % cells_n_nodes(c) .eq. 4) fn = neu_tet
-    if(grid % cells_n_nodes(c) .eq. 5) fn = neu_pyr
-    if(grid % cells_n_nodes(c) .eq. 6) fn = neu_wed
-    if(grid % cells_n_nodes(c) .eq. 8) fn = neu_hex
+    if(grid % cells_n_nodes(c) .eq. 4) fn = tet
+    if(grid % cells_n_nodes(c) .eq. 5) fn = pyr
+    if(grid % cells_n_nodes(c) .eq. 6) fn = wed
+    if(grid % cells_n_nodes(c) .eq. 8) fn = hex
     do i_fac = 1, 6
       if(grid % cells_bnd_color(i_fac, c) .eq. 0) then
 
@@ -112,6 +113,10 @@
     if(starts(n3) .ne. ends(n3)) then
       do i1=starts(n3),ends(n3)
         do i2=i1+1,ends(n3)
+
+          !------------------------------------------!
+          !   This is where it is set that c1 < c2   !
+          !------------------------------------------!
           c1 = min(face_cell(i1),face_cell(i2))
           c2 = max(face_cell(i1),face_cell(i2))
           if(c1 .ne. c2) then
@@ -135,10 +140,10 @@
             !     c1        c2      !
             !-----------------------!
             if(n_match > 2) then
-              if(grid % cells_n_nodes(c1) .eq. 4) fn = neu_tet
-              if(grid % cells_n_nodes(c1) .eq. 5) fn = neu_pyr
-              if(grid % cells_n_nodes(c1) .eq. 6) fn = neu_wed
-              if(grid % cells_n_nodes(c1) .eq. 8) fn = neu_hex
+              if(grid % cells_n_nodes(c1) .eq. 4) fn = tet
+              if(grid % cells_n_nodes(c1) .eq. 5) fn = pyr
+              if(grid % cells_n_nodes(c1) .eq. 6) fn = wed
+              if(grid % cells_n_nodes(c1) .eq. 8) fn = hex
               do i_fac = 1, 6
                 if(grid % cells_c(i_fac, c1) .eq. 0  .and.   & ! not set yet
                     ( max( match_nodes(fn(i_fac, 1)),0 ) + &

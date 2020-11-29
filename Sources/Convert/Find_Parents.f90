@@ -56,10 +56,10 @@
     do c1 = 1, grid % n_cells
 
       ! Fetch the faces from this cell
-      if(grid % cells_n_nodes(c1) .eq. 4) fn = neu_tet
-      if(grid % cells_n_nodes(c1) .eq. 5) fn = neu_pyr
-      if(grid % cells_n_nodes(c1) .eq. 6) fn = neu_wed
-      if(grid % cells_n_nodes(c1) .eq. 8) fn = neu_hex
+      if(grid % cells_n_nodes(c1) .eq. 4) fn = tet
+      if(grid % cells_n_nodes(c1) .eq. 5) fn = pyr
+      if(grid % cells_n_nodes(c1) .eq. 6) fn = wed
+      if(grid % cells_n_nodes(c1) .eq. 8) fn = hex
 
       n_cell_faces = 6  ! assume it is a hexahedron
       if(grid % cells_n_nodes(c1) .eq. 4) n_cell_faces = 4

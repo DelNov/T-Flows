@@ -47,10 +47,10 @@
         ! Hexahedra:
         if(grid % cells_n_nodes(i) .eq. 8) then
           grid % cells_n_nodes(-grid % n_bnd_cells) = 4
-          grid % cells_n(1,-grid % n_bnd_cells) = grid % cells_n(neu_hex(j,1),i)
-          grid % cells_n(2,-grid % n_bnd_cells) = grid % cells_n(neu_hex(j,2),i)
-          grid % cells_n(3,-grid % n_bnd_cells) = grid % cells_n(neu_hex(j,3),i)
-          grid % cells_n(4,-grid % n_bnd_cells) = grid % cells_n(neu_hex(j,4),i)
+          grid % cells_n(1,-grid % n_bnd_cells) = grid % cells_n(hex(j,1),i)
+          grid % cells_n(2,-grid % n_bnd_cells) = grid % cells_n(hex(j,2),i)
+          grid % cells_n(3,-grid % n_bnd_cells) = grid % cells_n(hex(j,3),i)
+          grid % cells_n(4,-grid % n_bnd_cells) = grid % cells_n(hex(j,4),i)
 
           grid % faces_n_nodes(grid % n_faces) = 4
           grid % faces_n(1:4, grid % n_faces)  =   &
@@ -60,10 +60,10 @@
         else if(grid % cells_n_nodes(i) .eq. 6) then
           if(j <= 3) then    ! faces (1), (2) and (3)
             grid % cells_n_nodes(-grid % n_bnd_cells) = 4
-            grid % cells_n(1,-grid % n_bnd_cells)=grid % cells_n(neu_wed(j,1),i)
-            grid % cells_n(2,-grid % n_bnd_cells)=grid % cells_n(neu_wed(j,2),i)
-            grid % cells_n(3,-grid % n_bnd_cells)=grid % cells_n(neu_wed(j,3),i)
-            grid % cells_n(4,-grid % n_bnd_cells)=grid % cells_n(neu_wed(j,4),i)
+            grid % cells_n(1,-grid % n_bnd_cells)=grid % cells_n(wed(j,1),i)
+            grid % cells_n(2,-grid % n_bnd_cells)=grid % cells_n(wed(j,2),i)
+            grid % cells_n(3,-grid % n_bnd_cells)=grid % cells_n(wed(j,3),i)
+            grid % cells_n(4,-grid % n_bnd_cells)=grid % cells_n(wed(j,4),i)
 
             grid % faces_n_nodes(grid % n_faces) = 4
             grid % faces_n(1:4, grid % n_faces)  =   &
@@ -71,9 +71,9 @@
 
           else if(j <= 5) then
             grid % cells_n_nodes(-grid % n_bnd_cells) = 3
-            grid % cells_n(1,-grid % n_bnd_cells)=grid % cells_n(neu_wed(j,1),i)
-            grid % cells_n(2,-grid % n_bnd_cells)=grid % cells_n(neu_wed(j,2),i)
-            grid % cells_n(3,-grid % n_bnd_cells)=grid % cells_n(neu_wed(j,3),i)
+            grid % cells_n(1,-grid % n_bnd_cells)=grid % cells_n(wed(j,1),i)
+            grid % cells_n(2,-grid % n_bnd_cells)=grid % cells_n(wed(j,2),i)
+            grid % cells_n(3,-grid % n_bnd_cells)=grid % cells_n(wed(j,3),i)
 
             grid % faces_n_nodes(grid % n_faces) = 3
             grid % faces_n(1:3, grid % n_faces)  =   &
@@ -84,9 +84,9 @@
         else if(grid % cells_n_nodes(i) .eq. 4) then
           if(j <= 4) then
             grid % cells_n_nodes(-grid % n_bnd_cells) = 3
-            grid % cells_n(1,-grid % n_bnd_cells)=grid % cells_n(neu_tet(j,1),i)
-            grid % cells_n(2,-grid % n_bnd_cells)=grid % cells_n(neu_tet(j,2),i)
-            grid % cells_n(3,-grid % n_bnd_cells)=grid % cells_n(neu_tet(j,3),i)
+            grid % cells_n(1,-grid % n_bnd_cells)=grid % cells_n(tet(j,1),i)
+            grid % cells_n(2,-grid % n_bnd_cells)=grid % cells_n(tet(j,2),i)
+            grid % cells_n(3,-grid % n_bnd_cells)=grid % cells_n(tet(j,3),i)
 
             grid % faces_n_nodes(grid % n_faces) = 3
             grid % faces_n(1:3, grid % n_faces)  =   &
@@ -97,10 +97,10 @@
         else if(grid % cells_n_nodes(i) .eq. 5) then
           if(j .eq. 1) then    ! face (1)
             grid % cells_n_nodes(-grid % n_bnd_cells) = 4
-            grid % cells_n(1,-grid % n_bnd_cells)=grid % cells_n(neu_pyr(j,1),i)
-            grid % cells_n(2,-grid % n_bnd_cells)=grid % cells_n(neu_pyr(j,2),i)
-            grid % cells_n(3,-grid % n_bnd_cells)=grid % cells_n(neu_pyr(j,3),i)
-            grid % cells_n(4,-grid % n_bnd_cells)=grid % cells_n(neu_pyr(j,4),i)
+            grid % cells_n(1,-grid % n_bnd_cells)=grid % cells_n(pyr(j,1),i)
+            grid % cells_n(2,-grid % n_bnd_cells)=grid % cells_n(pyr(j,2),i)
+            grid % cells_n(3,-grid % n_bnd_cells)=grid % cells_n(pyr(j,3),i)
+            grid % cells_n(4,-grid % n_bnd_cells)=grid % cells_n(pyr(j,4),i)
 
             grid % faces_n_nodes(grid % n_faces) = 4
             grid % faces_n(1:4, grid % n_faces)  =   &
@@ -108,9 +108,9 @@
 
           else if(j <= 5) then
             grid % cells_n_nodes(-grid % n_bnd_cells) = 3
-            grid % cells_n(1,-grid % n_bnd_cells)=grid % cells_n(neu_pyr(j,1),i)
-            grid % cells_n(2,-grid % n_bnd_cells)=grid % cells_n(neu_pyr(j,2),i)
-            grid % cells_n(3,-grid % n_bnd_cells)=grid % cells_n(neu_pyr(j,3),i)
+            grid % cells_n(1,-grid % n_bnd_cells)=grid % cells_n(pyr(j,1),i)
+            grid % cells_n(2,-grid % n_bnd_cells)=grid % cells_n(pyr(j,2),i)
+            grid % cells_n(3,-grid % n_bnd_cells)=grid % cells_n(pyr(j,3),i)
 
             grid % faces_n_nodes(grid % n_faces) = 3
             grid % faces_n(1:3, grid % n_faces)  =   &
