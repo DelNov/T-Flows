@@ -20,14 +20,12 @@
   real                 :: xs2, ys2, zs2, x_a, y_a, z_a, x_b, y_b, z_b
   real                 :: x_c, y_c, z_c, det, angle_face, tol
   real                 :: ab_i, ab_j, ab_k, ac_i, ac_j, ac_k, p_i, p_j, p_k
-  real                 :: per_min, per_max
-  real                 :: t, sur_tot, angle
-  real                 :: max_dis
+  real                 :: per_min, per_max, t, sur_tot, angle, max_dis
   real,    allocatable :: xspr(:), yspr(:), zspr(:)
   real,    allocatable :: b_coor(:), phi_face(:)
   integer, allocatable :: b_face(:), face_copy(:)
   character(SL)        :: answer, dir
-  real                 :: big, small, factor
+  real                 :: big, small, factor, prod
 !==============================================================================!
 !                                                                              !
 !                                n3                                            !
@@ -206,7 +204,7 @@
                    + grid % sy(s)*grid % sy(s)  &
                    + grid % sz(s)*grid % sz(s) )
 
-    if(c2  < 0) then
+    if(c2 < 0) then
       t = (   grid % sx(s)*(grid % xf(s) - grid % xc(c1))        &
             + grid % sy(s)*(grid % yf(s) - grid % yc(c1))        &
             + grid % sz(s)*(grid % zf(s) - grid % zc(c1)) ) / sur_tot
@@ -698,12 +696,67 @@
 
   goto 2
 
+1 continue
+  !----------------------------------------------------!
+  !                                                    !
+  !   For some files, seems to be those generated in   !
+  !   SnappyMesh, face orientation seems to be quite   !
+  !   the opposite from what I expect in inner cells   !
+  !                                                    !
+  !----------------------------------------------------!
+  n1 = 0
+  n2 = 0
+  do s = 1, grid % n_faces + grid % n_shadows
+    c1 = grid % faces_c(1,s)
+    c2 = grid % faces_c(2,s)
+
+    !-------------------------------------------------------------------------!
+    !   Product of centres connection and surface normal should be positive   !
+    !-------------------------------------------------------------------------!
+    prod = grid % sx(s) * (grid % xc(c2)-grid % xc(c1) )  &
+         + grid % sy(s) * (grid % yc(c2)-grid % yc(c1) )  &
+         + grid % sz(s) * (grid % zc(c2)-grid % zc(c1) )
+
+    !----------------------------------------------------------!
+    !   If it is not, change the orientations of the surface   !
+    !----------------------------------------------------------!
+    if(prod < 0) then
+
+      ! Increase the counters
+      if(c2 > 0) n1 = n1 + 1
+      if(c2 < 0) n2 = n2 + 1
+
+      ! Reverse the order of face's nodes
+      n = grid % faces_n_nodes(s)  ! number of nodes in this face
+      call Sort_Mod_Reverse_Order_Int(grid % faces_n(1:n, s))
+
+      ! Change the orientation of calculated surface vector
+      grid % sx(s) = -grid % sx(s)
+      grid % sy(s) = -grid % sy(s)
+      grid % sz(s) = -grid % sz(s)
+
+    end if
+  end do
+
+  !-------------------------------------------------!
+  !   Print some info on changed face orientation   !
+  !-------------------------------------------------!
+  if(n1 .gt. 0 .or. n2 .gt. 0) then
+    print '(a)',      ' #======================================================'
+    print '(a,i9,a)', ' # Changed orientation of', n1, ' inner faces,'
+    print '(a,i9,a)', ' #                    and', n2, ' boundary faces.'
+    print '(a)',      ' #------------------------------------------------------'
+  else
+    print '(a)', ' #========================================================='
+    print '(a)', ' # Checked that all faces had good orientation (c1 -> c2). '
+    print '(a)', ' #---------------------------------------------------------'
+  end if
+
   !----------------------------------------------------!
   !                                                    !
   !   Phase II  ->  similar to the loop in Generator   !
   !                                                    !
   !----------------------------------------------------!
-1 continue
 
   ! Initialize
   n_per = 0
@@ -720,7 +773,7 @@
     c2 = grid % faces_c(2,s)
     if(c2 > 0) then
 
-      ! Scalar product of the face with line c1-c2 is good criteria
+      ! Scalar product of the face with line c1-c2 is good criterion
       if( (grid % sx(s) * (grid % xc(c2)-grid % xc(c1) )+                  &
            grid % sy(s) * (grid % yc(c2)-grid % yc(c1) )+                  &
            grid % sz(s) * (grid % zc(c2)-grid % zc(c1) )) < 0.0 ) then
