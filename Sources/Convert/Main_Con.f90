@@ -56,20 +56,18 @@
     call Find_Parents(grid)
   end if
 
+  ! For Gambit and Gmsh grids, no face information is stored
   if(file_format .eq. 'GAMBIT' .or. file_format .eq. 'GMSH') then
     call Grid_Topology     (grid)
     call Find_Faces        (grid)
-    call Calculate_Geometry(grid)
   end if
+  call Calculate_Geometry(grid)
 
   ! Keep in mind that Grid_Mod_Calculate_Wall_Distance is ...
   ! ... faster if it is called after Grid_Mod_Sort_Faces_Smart
-
-  if(file_format .eq. 'GAMBIT' .or. file_format .eq. 'GMSH') then
-    call Grid_Mod_Sort_Cells_Smart       (grid)
-    call Grid_Mod_Sort_Faces_Smart       (grid)
-    call Grid_Mod_Calculate_Wall_Distance(grid)
-  end if
+  call Grid_Mod_Sort_Cells_Smart       (grid)
+  call Grid_Mod_Sort_Faces_Smart       (grid)
+  call Grid_Mod_Calculate_Wall_Distance(grid)
 
   ! Prepare for saving
   do n = 1, grid % n_nodes
@@ -83,18 +81,6 @@
     grid % new_f(s) = s
     grid % old_f(s) = s
   end do
-
-! call Grid_Mod_Save_Debug_Vtu(grid,                                     &
-!          'X',                                                          &
-!          scalar_cell = grid % xc(-grid % n_bnd_cells:grid % n_cells),  &
-!          scalar_name = 'X')
-  if(file_format .eq. 'FLUENT') then
-    call Save_Vtu_Cells(grid, 0,         &
-                        grid % n_nodes,  &
-                        grid % n_cells)
-    call Save_Vtu_Faces(grid)
-    STOP
-  end if
 
   !-------------------------------!
   !                               !
