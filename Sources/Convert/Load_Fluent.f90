@@ -770,23 +770,6 @@
     end do  ! through c1 and c2
   end do  ! through s, faces
 
-  !----------------------------------------!
-  !   Check for duplicate nodes in cells   !
-  !----------------------------------------!
-  do c = 1, grid % n_cells
-    n = grid % cells_n_nodes(c)
-    do i_nod = 1, n
-      do j_nod = i_nod+1, n
-        if(grid % cells_n(i_nod, c) .eq. grid % cells_n(j_nod, c)) then
-          print *, '# ERROR!  Duplicate nodes in cell: ', c
-          print *, '# This error is critical, exiting! '
-          stop
-        end if
-      end do
-    end do
-  end do
-  print *, '# No duplicate nodes in cell data found, good!'
-
   !------------------------------------------------------------!
   !                                                            !
   !   Count the faces of all polyhedral cells and store them   !
@@ -849,6 +832,23 @@
     end if  ! if cell was polyhedral
 
   end do
+
+  !----------------------------------------!
+  !   Check for duplicate nodes in cells   !
+  !----------------------------------------!
+  do c = 1, grid % n_cells
+    n = grid % cells_n_nodes(c)
+    do i_nod = 1, n
+      do j_nod = i_nod+1, n
+        if(grid % cells_n(i_nod, c) .eq. grid % cells_n(j_nod, c)) then
+          print *, '# ERROR!  Duplicate nodes in cell: ', c
+          print *, '# This error is critical, exiting! '
+          stop
+        end if
+      end do
+    end do
+  end do
+  print *, '# No duplicate nodes in cell data found, good!'
 
   deallocate(cell_visited_from)
 
