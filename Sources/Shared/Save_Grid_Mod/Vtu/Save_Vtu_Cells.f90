@@ -151,7 +151,7 @@
   ! Wall distance
   write(str1, '(i0.0)') data_offset
   write(fu) IN_4 // '<DataArray type="Float64"'      //  &
-                    ' Name="WallDistance"'           //  &
+                    ' Name="GeomWallDistance"'       //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
@@ -160,7 +160,7 @@
   ! Cell volume
   write(str1, '(i0.0)') data_offset
   write(fu) IN_4 // '<DataArray type="Float64"'      //  &
-                    ' Name="CellVolume"'             //  &
+                    ' Name="GeomCellVolume"'         //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
@@ -347,8 +347,10 @@
     ! Data section is not mandatory, but very useful
     write(fu,'(a,a)') IN_2, '<PCellData Scalars="scalars" vectors="velocity">'
     write(fu,'(a,a)') IN_3, '<PDataArray type="Int64" Name="Processor"/>'
-    write(fu,'(a,a)') IN_3, '<PDataArray type="Float64" Name="WallDistance"/>'
-    write(fu,'(a,a)') IN_3, '<PDataArray type="Float64" Name="CellVolume"/>'
+    write(fu,'(a,a)') IN_3, '<PDataArray type="Float64" ' //   &
+                            ' Name="GeomWallDistance"/>'
+    write(fu,'(a,a)') IN_3, '<PDataArray type="Float64" ' //  &
+                            ' Name="GeomCellVolume"/>'
     write(fu,'(a,a)') IN_2, '</PCellData>'
 
     ! Write out the names of all the pieces

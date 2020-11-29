@@ -127,9 +127,9 @@
     if(grid % cells_n_nodes(c) .lt. 0) then
 
       ! Write number of polyfaces for this cell
-      write(fu,'(a,i9)') IN_5, grid % cells_n_polyf(c)
+      write(fu,'(a,i9)') IN_5, grid % cells_n_polyg(c)
 
-      do i_pol = 1, grid % cells_n_polyf(c)
+      go i_pol = 1, grid % cells_n_polyg(c)
         s = grid % cells_p(i_pol, c)
         n = grid % faces_n_nodes(s)
         write(fu,'(a,64i9)') IN_5,  grid % faces_n_nodes(s),  &
@@ -151,7 +151,7 @@
       cell_offset = cell_offset + 1
 
       ! Update the offset with all faces and their nodes
-      do i_pol = 1, grid % cells_n_polyf(c)
+      do i_pol = 1, grid % cells_n_polyg(c)
         s = grid % cells_p(i_pol, c)
         n = grid % faces_n_nodes(s)
         cell_offset = cell_offset + 1 + n
@@ -185,7 +185,7 @@
 
   ! Wall distance
   write(fu,'(a,a)') IN_4, '<DataArray type="Float64" ' //  &
-                          'Name="WallDistance" format="ascii">'
+                          'Name="GeomWallDistance" format="ascii">'
   do c = 1, grid % n_cells
     write(fu,'(a,1pe15.7)') IN_5, grid % wall_dist(c)
   end do
@@ -193,7 +193,7 @@
 
   ! Cell volume
   write(fu,'(a,a)') IN_4, '<DataArray type="Float64" ' //  &
-                          'Name="CellVolume" format="ascii">'
+                          'Name="GeomCellVolume" format="ascii">'
   do c = 1, grid % n_cells
     write(fu,'(a,1pe15.7)') IN_5, grid % vol(c)
   end do

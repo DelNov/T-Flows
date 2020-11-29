@@ -152,7 +152,7 @@
   ! Wall distance
   write(str1, '(i0.0)') data_offset
   write(fu) IN_4 // '<DataArray type="Float64"'      //  &
-                    ' Name="WallDistance"'           //  &
+                    ' Name="GeomWallDistance"'       //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
@@ -161,7 +161,7 @@
   ! Cell volume
   write(str1, '(i0.0)') data_offset
   write(fu) IN_4 // '<DataArray type="Float64"'      //  &
-                    ' Name="CellVolume"'             //  &
+                    ' Name="GeomCellVolume"'         //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
