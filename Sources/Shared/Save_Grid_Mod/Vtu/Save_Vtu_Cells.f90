@@ -189,8 +189,9 @@
   data_size = n_nodes_sub * RP * 3
   write(fu) data_size
   do n = 1, grid % n_nodes
-    if(grid % new_n(n) .ne. 0)  &
+    if(grid % new_n(n) .ne. 0) then
       write(fu) grid % xn(n), grid % yn(n), grid % zn(n)
+    end if
   end do
 
   !-----------!
@@ -257,7 +258,7 @@
           do i_pol = 1, grid % cells_n_polyg(c)  ! and all polyfaces
             s = grid % cells_p(i_pol, c)
             n = grid % faces_n_nodes(s)
-            write(fu) n, grid % new_f(grid % faces_n(1:n, s))-1
+            write(fu) n, grid % new_n(grid % faces_n(1:n, s))-1
           end do
         end if
       end if
