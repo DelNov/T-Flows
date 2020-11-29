@@ -10,13 +10,20 @@
   integer              :: s, c, c1, c2
   integer, allocatable :: new_c(:)
   integer, allocatable :: old_c(:)
-  integer, allocatable :: i_work_1(:)
-  integer, allocatable :: i_work_2(:,:)
+  integer, allocatable :: old_nn  (:)    ! old number of nodes (per cell)
+  integer, allocatable :: old_nods(:,:)  ! old nodes list per cell
+  integer, allocatable :: old_np  (:)    ! old number of polygons (per cell)
+  integer, allocatable :: old_pols(:,:)  ! old polygon list per cell
   real,    allocatable :: criteria(:,:)
+!------------------------------[Local parameters]------------------------------!
+  integer, parameter :: M = MAX_CELLS_N_NODES
+  integer, parameter :: N = MAX_CELLS_N_POLYG
 !==============================================================================!
 
-  allocate(i_work_1(   grid % n_cells));     i_work_1(:)   = 0
-  allocate(i_work_2(8, grid % n_cells));     i_work_2(:,:) = 0
+  allocate(old_nn  (   grid % n_cells));     old_nn  (:)   = 0
+  allocate(old_nods(M, grid % n_cells));     old_nods(:,:) = 0
+  allocate(old_np  (   grid % n_cells));     old_np  (:)   = 0
+  allocate(old_pols(N, grid % n_cells));     old_pols(:,:) = 0
   allocate(new_c   (   grid % n_cells));     new_c(:)      = 0
   allocate(old_c   (   grid % n_cells));     old_c(:)      = 0
   allocate(criteria(   grid % n_cells, 3));  criteria(:,:) = 0.0
@@ -25,8 +32,10 @@
   !   Store cells' nodes   !
   !------------------------!
   do c = 1, grid % n_cells
-    i_work_1(c)      = grid % cells_n_nodes(c)
-    i_work_2(1:8, c) = grid % cells_n(1:8, c)
+    old_nn  (c)      = grid % cells_n_nodes(c)
+    old_nods(1:M, c) = grid % cells_n(1:M, c)
+    old_np  (c)      = grid % cells_n_polyg(c)
+    old_pols(1:N, c) = grid % cells_p(1:N, c)
   end do
 
   !--------------------------!
@@ -79,8 +88,10 @@
   !   Do the sorting of data pertinent to cells   !
   !-----------------------------------------------!
   do c = 1, grid % n_cells
-    grid % cells_n_nodes(new_c(c)) = i_work_1(c)
-    grid % cells_n(1:8, new_c(c))  = i_work_2(1:8, c)
+    grid % cells_n_nodes(new_c(c)) = old_nn  (c)
+    grid % cells_n(1:M, new_c(c))  = old_nods(1:M, c)
+    grid % cells_n_polyg(new_c(c)) = old_np  (c)
+    grid % cells_p(1:N, new_c(c))  = old_pols(1:N, c)
   end do
   call Sort_Mod_Real_By_Index(grid % n_cells, grid % xc (1), new_c(1))
   call Sort_Mod_Real_By_Index(grid % n_cells, grid % yc (1), new_c(1))

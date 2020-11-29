@@ -11,23 +11,25 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: s, n, c, c1, c2, n_bc, color
   integer, allocatable :: old_f(:), new_f(:), old_c(:)
-  integer, allocatable :: i_work_1(:)
-  integer, allocatable :: i_work_2(:)
-  integer, allocatable :: i_work_4(:,:)
-  real,    allocatable :: r_work_3(:,:)
+  integer, allocatable :: old_nn  (:)
+  integer, allocatable :: old_shad(:)
+  integer, allocatable :: old_nods(:,:)
+  real,    allocatable :: old_bxyz(:,:)
   integer, allocatable :: criteria(:,:)
   integer, parameter   :: BIG     = 2147483647
   logical, parameter   :: VERBOSE = .false.
+!------------------------------[Local parameters]------------------------------!
+  integer, parameter :: M = MAX_FACES_N_NODES
 !==============================================================================!
 
   allocate(criteria(grid % n_faces, 3))  ! 2nd ind smaller for memory alignemnt
   allocate(old_f(grid % n_faces))        ! old face numbers
   allocate(new_f(grid % n_faces))        ! new face numbers
   allocate(old_c   (  -grid % n_bnd_cells:-1))  ! old bnd. cell numbers
-  allocate(i_work_1(   grid % n_faces))
-  allocate(i_work_2(   grid % n_faces))
-  allocate(i_work_4(4, grid % n_faces))
-  allocate(r_work_3(3,-grid % n_bnd_cells:-1))
+  allocate(old_nn  (   grid % n_faces))         ! old number of nodes
+  allocate(old_shad(   grid % n_faces))
+  allocate(old_nods(M, grid % n_faces))
+  allocate(old_bxyz(3,-grid % n_bnd_cells:-1))
 
   !--------------------------------------------------------!
   !   Form the three criteria:                             !
@@ -85,30 +87,30 @@
   !   their boundary colors and geometrical quantities   !
   !------------------------------------------------------!
   do c=-1, -grid % n_bnd_cells, -1
-    i_work_1( -c) = grid % bnd_cond % color(old_c(c))
-    r_work_3(1,c) = grid % xc(old_c(c))
-    r_work_3(2,c) = grid % yc(old_c(c))
-    r_work_3(3,c) = grid % zc(old_c(c))
+    old_nn  ( -c) = grid % bnd_cond % color(old_c(c))  ! use old_nn for colors
+    old_bxyz(1,c) = grid % xc(old_c(c))
+    old_bxyz(2,c) = grid % yc(old_c(c))
+    old_bxyz(3,c) = grid % zc(old_c(c))
   end do
   do c=-1, -grid % n_bnd_cells, -1
-    grid % bnd_cond % color(c) = i_work_1(-c)
-    grid % xc(c) = r_work_3(1,c)
-    grid % yc(c) = r_work_3(2,c)
-    grid % zc(c) = r_work_3(3,c)
+    grid % bnd_cond % color(c) = old_nn  (-c)
+    grid % xc(c) = old_bxyz(1,c)
+    grid % yc(c) = old_bxyz(2,c)
+    grid % zc(c) = old_bxyz(3,c)
   end do
 
   !---------------------------------------------!
   !   Sort faces_n_nodes, faces_n and faces_c   !
   !---------------------------------------------!
   do s = 1, grid % n_faces
-    i_work_1(    s) = grid % faces_n_nodes( old_f(s))
-    i_work_4(1:4,s) = grid % faces_n  (1:4, old_f(s))
-    i_work_2(    s) = grid % faces_s      ( old_f(s))
+    old_nn  (    s) = grid % faces_n_nodes( old_f(s))
+    old_nods(1:M,s) = grid % faces_n  (1:M, old_f(s))
+    old_shad(    s) = grid % faces_s      ( old_f(s))
   end do
   do s = 1, grid % n_faces
-    grid % faces_n_nodes(s) = i_work_1(     s)
-    grid % faces_n(1:4,  s) = i_work_4(1:4, s)
-    grid % faces_s      (s) = i_work_2(     s)
+    grid % faces_n_nodes(s) = old_nn  (     s)
+    grid % faces_n(1:M,  s) = old_nods(1:M, s)
+    grid % faces_s      (s) = old_shad(     s)
   end do
 
   !---------------------------------------------------!
@@ -118,7 +120,7 @@
     c2 = grid % faces_c(2, s)
     if(c2 < 0) then
       grid % cells_n_nodes(c2) = grid % faces_n_nodes(s)
-      grid % cells_n(1:4,  c2) = grid % faces_n(1:4,  s)
+      grid % cells_n(1:M,  c2) = grid % faces_n(1:M,  s)
     end if
   end do
 
@@ -149,6 +151,16 @@
   ! Correct shadow faces
   do s = grid % n_faces + 1, grid % n_faces + grid % n_shadows
     grid % faces_s(s) = new_f(grid % faces_s(s))
+  end do
+
+  ! Correct face indexes for cells
+  do c = 1, grid % n_cells
+    if(grid % cells_n_nodes(c) .lt. 0) then  ! polyhedral cell
+      do n = 1, grid % cells_n_polyg(c)
+        s = grid % cells_p(n, c)             ! take the face's index
+        grid % cells_p(n, c) = new_f(s)
+      end do
+    end if
   end do
 
   ! Find boundary color ranges
