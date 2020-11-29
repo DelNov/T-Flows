@@ -29,7 +29,7 @@
     ixx = 0.0; iyy = 0.0; izz = 0.0; ixz = 0.0; iyz = 0.0; ixy = 0.0
 
     ! Loop on nodes of the cell
-    do i_nod = 1, grid % cells_n_nodes(c)
+    do i_nod = 1, abs(grid % cells_n_nodes(c))
       n   = grid % cells_n(i_nod, c)
       lx  = grid % xn(n) - grid % xc(c)
       ly  = grid % yn(n) - grid % yc(c)
@@ -62,7 +62,7 @@
     lambda_y = (rx * a21 + ry * a22 + rz * a23) / (d + FEMTO)
     lambda_z = (rx * a31 + ry * a32 + rz * a33) / (d + FEMTO)
 
-    do i_nod = 1, grid % cells_n_nodes(c)
+    do i_nod = 1, abs(grid % cells_n_nodes(c))
       n = grid % cells_n(i_nod, c)
       lx  = grid % xn(n) - grid % xc(c)
       ly  = grid % yn(n) - grid % yc(c)
@@ -82,27 +82,15 @@
 
     ! Loop on nodes
     tot = 0.0
-    do i_nod = 1, grid % cells_n_nodes(c)
+    do i_nod = 1, abs(grid % cells_n_nodes(c))
       tot = tot + grid % weight_n2c(i_nod, c)
     end do
 
     ! Loop on nodes
-    do i_nod = 1, grid % cells_n_nodes(c)
+    do i_nod = 1, abs(grid % cells_n_nodes(c))
       grid % weight_n2c(i_nod, c) = grid % weight_n2c(i_nod, c) / tot
     end do
 
   end do
-
-  ! Debugging
-  ! write(100 + this_proc, '(a)')  'List of cells with their nodes weights'
-  ! do c = 1, grid % n_cells - grid % comm % n_buff_cells
-  !   weights_sorted(1:grid % cells_n_nodes(c)) =  &
-  !   grid % weight_n2c(1:grid % cells_n_nodes(c), c)
-  !   call Sort_Mod_Real(weights_sorted(1:grid % cells_n_nodes(c)))
-  !   write(100 + this_proc, '(i7.7, i3, 99f7.4)')  &
-  !               grid % comm % cell_glo(c),        &
-  !               grid % cells_n_nodes(c),          &
-  !               weights_sorted(1:grid % cells_n_nodes(c))
-  ! end do
 
   end subroutine

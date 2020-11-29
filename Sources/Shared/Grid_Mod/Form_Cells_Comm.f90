@@ -70,7 +70,7 @@
       grid % new_n(:) = 0
       do c = 1, grid % n_cells
         if(grid % comm % cell_proc(c) .eq. sub) then
-          do i_nod = 1, grid % cells_n_nodes(c)
+          do i_nod = 1, abs(grid % cells_n_nodes(c))
             grid % new_n(grid % cells_n(i_nod, c)) = -1
           end do
         end if
@@ -139,14 +139,14 @@
       mr = 0
       do c = 1, grid % n_cells
         if(grid % comm % cell_proc(c) .eq. this_proc) then
-          n = grid % cells_n_nodes(c)
+          n = abs(grid % cells_n_nodes(c))
           if( any( grid % new_n(grid % cells_n(1:n,c)) .eq. -1) ) then
             ms = ms + 1
             send_cells(c) = sub
           end if
         end if
         if(grid % comm % cell_proc(c) .eq. sub) then
-          n = grid % cells_n_nodes(c)
+          n = abs(grid % cells_n_nodes(c))
           if( any( grid % new_n(grid % cells_n(1:n,c)) .eq. -1) ) then
             mr = mr + 1
             recv_cells(c) = sub

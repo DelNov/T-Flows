@@ -38,7 +38,7 @@
   !   Browse through all cells  !
   !-----------------------------!
   do c = -grid % n_bnd_cells, grid % n_cells
-    do n = 1, grid % cells_n_nodes(c)
+    do n = 1, abs(grid % cells_n_nodes(c))
 
       ! Try to find the cell among the probes
       do p=1, n_prob

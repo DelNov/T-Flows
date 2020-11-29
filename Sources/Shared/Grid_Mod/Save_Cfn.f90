@@ -78,7 +78,7 @@
   ! Cells' nodes
   do c = -grid % n_bnd_cells, grid % n_cells
     if(grid % old_c(c) .ne. 0 .or. c .eq. 0) then
-      do n = 1, grid % cells_n_nodes(grid % old_c(c))
+      do n = 1, abs(grid % cells_n_nodes(grid % old_c(c)))
         write(fu) grid % new_n(grid % cells_n(n, grid % old_c(c)))
       end do
     end if

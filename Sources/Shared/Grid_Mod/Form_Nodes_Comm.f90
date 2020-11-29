@@ -33,8 +33,8 @@
   !-----------------------------------------------------!
 
   do c = 1, grid % n_cells
-    do i_nod = 1, grid % cells_n_nodes(c)  ! local node number
-      n = grid % cells_n(i_nod, c)         ! global node number
+    do i_nod = 1, abs(grid % cells_n_nodes(c))  ! local node number
+      n = grid % cells_n(i_nod, c)              ! global node number
 
       ! Increase possible number of processors ...
       ! ... surrounding the this node by one
@@ -62,8 +62,8 @@
 
   ! Inside cells
   do c = 1, grid % n_cells
-    do i_nod = 1, grid % cells_n_nodes(c)  ! local node number
-      n = grid % cells_n(i_nod, c)         ! global node number
+    do i_nod = 1, abs(grid % cells_n_nodes(c))  ! local node number
+      n = grid % cells_n(i_nod, c)              ! global node number
 
       if(active(n)) then
 

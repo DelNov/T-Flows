@@ -31,8 +31,8 @@
     grid % nodes_n_cells(:) = 0  ! re-initialize the cell count
 
     do c = -grid % n_bnd_cells, grid % n_cells
-      do i_nod = 1, grid % cells_n_nodes(c)  ! local node number
-        n = grid % cells_n(i_nod, c)         ! global node number
+      do i_nod = 1, abs(grid % cells_n_nodes(c))  ! local node number
+        n = grid % cells_n(i_nod, c)              ! global node number
 
         ! Increase number of cells surrounding the this node by one
         grid % nodes_n_cells(n) = grid % nodes_n_cells(n) + 1
@@ -111,8 +111,8 @@
 
 ! ! Check #1, save those nodes' cells
 ! do c = 1, grid % n_cells - grid % comm % n_buff_cells
-!   do i_nod = 1, grid % cells_n_nodes(c)  ! local node number
-!     n = grid % cells_n(i_nod, c)         ! global node number
+!   do i_nod = 1, abs(grid % cells_n_nodes(c))  ! local node number
+!     n = grid % cells_n(i_nod, c)              ! global node number
 !     write(600+this_proc, '(a,i2,a,36i6)')  &
 !           'nc=', grid % nodes_n_cells(n),  &
 !           ' cell list=', grid % nodes_c(1:max_n_cells, n)

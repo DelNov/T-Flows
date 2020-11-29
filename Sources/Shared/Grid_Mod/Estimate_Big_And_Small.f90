@@ -36,9 +36,9 @@
   !-------------------------------------------------!
   small = HUGE
   do c = 1, grid % n_cells
-    do l1  = 1, grid % cells_n_nodes(c)
+    do l1  = 1, abs(grid % cells_n_nodes(c))
       n1 = grid % cells_n(l1, c)
-      do l2  = l1+1, grid % cells_n_nodes(c)
+      do l2  = l1+1, abs(grid % cells_n_nodes(c))
         n2 = grid % cells_n(l2, c)
         small = min(small, sqrt(   (grid % xn(n1) - grid % xn(n2))**2  &
                                  + (grid % yn(n1) - grid % yn(n2))**2  &

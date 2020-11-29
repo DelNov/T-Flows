@@ -51,7 +51,7 @@
         grid % new_c(c) = nc_sub  ! assign new (local) cell number 
         grid % old_c(nc_sub) = c
 
-        do i_nod = 1, grid % cells_n_nodes(c)
+        do i_nod = 1, abs(grid % cells_n_nodes(c))
           grid % new_n(grid % cells_n(i_nod,c)) = -1
         end do
       end if
@@ -83,7 +83,7 @@
         ! Mark
         do c = 1, grid % n_cells
           if(grid % comm % cell_proc(c) .eq. subo) then
-            n = grid % cells_n_nodes(c)
+            n = abs(grid % cells_n_nodes(c))
             if( any(grid % new_n(grid % cells_n(1:n, c)) .eq. -1) ) then
               grid % new_c(c) = -1
             end if
@@ -96,7 +96,7 @@
           ! Mark nodes on this level ...
           do c = 1, grid % n_cells
             if(grid % new_c(c) .eq. -1) then
-              do i_nod = 1, grid % cells_n_nodes(c)
+              do i_nod = 1, abs(grid % cells_n_nodes(c))
                 grid % new_n(grid % cells_n(i_nod,c)) = -1
               end do
             end if
@@ -105,7 +105,7 @@
           ! ... and then also the cells
           do c = 1, grid % n_cells
             if(grid % comm % cell_proc(c) .eq. subo) then
-              n = grid % cells_n_nodes(c)
+              n = abs(grid % cells_n_nodes(c))
               if( any(grid % new_n(grid % cells_n(1:n, c)) .eq. -1) ) then
                 grid % new_c(c) = -1
               end if
@@ -269,7 +269,7 @@
     ! Mark nodes for renumbering with -1
     do c = 1, grid % n_cells
       if(grid % new_c(c) > 0) then
-        do i_nod = 1, grid % cells_n_nodes(c)
+        do i_nod = 1, abs(grid % cells_n_nodes(c))
           grid % new_n(grid % cells_n(i_nod,c)) = -1
         end do
       end if

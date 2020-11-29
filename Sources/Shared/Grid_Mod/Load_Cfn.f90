@@ -80,8 +80,8 @@
   read(fu) (grid % cells_n_nodes(c), c = -grid % n_bnd_cells, grid % n_cells)
 
   ! Cells' nodes
-  read(fu) ((grid % cells_n(n, c),             &
-             n = 1, grid % cells_n_nodes(c)),  &
+  read(fu) ((grid % cells_n(n, c),                     &
+             n = 1, abs(grid % cells_n_nodes(c))),     &
              c = -grid % n_bnd_cells, grid % n_cells)
 
   ! Number of polygonal faces for each cell
