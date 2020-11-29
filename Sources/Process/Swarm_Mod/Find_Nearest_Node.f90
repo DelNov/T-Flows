@@ -30,8 +30,8 @@
   min_dn = HUGE
 
   ! Browse through nodes of particle's cell
-  do i_nod = 1, grid % cells_n_nodes(part % cell)  ! local node number
-    n = grid % cells_n(i_nod, part % cell)         ! global node number
+  do i_nod = 1, abs(grid % cells_n_nodes(part % cell))  ! local node number
+    n = grid % cells_n(i_nod, part % cell)              ! global node number
 
     ! Take node coordinate
     xn = grid % xn(n)

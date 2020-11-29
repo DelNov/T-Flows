@@ -68,9 +68,9 @@
 
   du_pred = 0.0
 
-  n_nodes_c = grid % cells_n_nodes(donor)
+  n_nodes_c = abs(grid % cells_n_nodes(donor))
 
-  do n1 = 1, grid % cells_n_nodes(donor)
+  do n1 = 1, abs(grid % cells_n_nodes(donor))
     out_face = .true.
     loop_face: do n2 = 1, grid % faces_n_nodes(s)
       if(grid % cells_n(n1,donor) == grid % faces_n(n2,s)) then

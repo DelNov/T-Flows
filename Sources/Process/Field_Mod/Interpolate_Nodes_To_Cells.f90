@@ -22,7 +22,7 @@
     var_cell(c) = 0.0
 
     ! Loop on nodes
-    do i_nod = 1, grid % cells_n_nodes(c)
+    do i_nod = 1, abs(grid % cells_n_nodes(c))
 
       n = grid % cells_n(i_nod, c)
       var_cell(c) = var_cell(c)  &

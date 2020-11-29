@@ -34,7 +34,7 @@
   do c = 1, grid % n_cells
 
     ! Browse through cell's nodes
-    do i_nod = 1, grid % cells_n_nodes(c)
+    do i_nod = 1, abs(grid % cells_n_nodes(c))
 
      n  = grid % cells_n(i_nod, c)
      dx = grid % xn(n) - grid % xc(c)
