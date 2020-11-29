@@ -859,11 +859,6 @@
   !                                                            !
   !------------------------------------------------------------!
 
-  DO N = 1, 8
-    PRINT *, 'FACE_SECT_POS(N), FACE_SECT_BND(N)',  &
-              FACE_SECT_POS(N), FACE_SECT_BND(N)
-  END DO
-
   rewind(fu)
   the_end = .false.
   do while(.not. the_end)
@@ -872,14 +867,10 @@
       if(line % tokens(1) .eq. '(39' .or.  &
          line % tokens(1) .eq. '(45') then
 
-        PRINT *, 'FOUND A SECTION!'
-        PRINT *, 'WHOLE LINE: ', LINE % WHOLE
-
         ! Extract this face section position in the Fluent's mesh
         one_token = line % tokens(2)
         l = len_trim(one_token)
         read(one_token(2:l), '(i16)') pos
-        PRINT *, '  THIS SECTION''S POSITION: ', POS
 
         ! Extract boundary condition name
         one_token = line % tokens(4)(1:index(line % tokens(4), ')')-1)
@@ -887,11 +878,8 @@
         do n = 1, 2048
           if(face_sect_bnd(n) .ne. 0) then
             if(face_sect_pos(n) .eq. pos) then
-              PRINT *, '    THIS SECTION IS A BOUNDARY SECTION'
-              PRINT *, '    THIS SECTION BC NUMBER IS: ', FACE_SECT_BND(N)
+              call To_Upper_Case(one_token)
               grid % bnd_cond % name(face_sect_bnd(n)) = one_token
-              PRINT *, '    THIS SECTION BC NAME IS    ',  &
-                       GRID % BND_COND % NAME(FACE_SECT_BND(N))
             end if
           end if
         end do
