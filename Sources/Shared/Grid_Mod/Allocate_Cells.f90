@@ -27,7 +27,7 @@
   ! Cells' nodes and neigboring cells
   allocate(grid % cells_n(MAX_CELLS_N_NODES, -nb:nc));  grid % cells_n(:,:) = 0
   allocate(grid % cells_f(MAX_CELLS_N_FACES, -nb:nc));  grid % cells_f(:,:) = 0
-  allocate(grid % cells_p(MAX_CELLS_N_POLYF, -nb:nc));  grid % cells_p(:,:) = 0
+  allocate(grid % cells_p(MAX_CELLS_N_POLYG, -nb:nc));  grid % cells_p(:,:) = 0
   allocate(grid % cells_c(MAX_CELLS_N_CELLS, -nb:nc));  grid % cells_c(:,:) = 0
 
   allocate(grid % cells_bnd_face(-nb:-1));  grid % cells_bnd_face(:) = 0

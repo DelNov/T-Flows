@@ -163,7 +163,7 @@
   integer, parameter :: MAX_CELLS_N_NODES = 36
   integer, parameter :: MAX_CELLS_N_FACES = 24
   integer, parameter :: MAX_CELLS_N_CELLS = MAX_CELLS_N_FACES
-  integer, parameter :: MAX_CELLS_N_POLYF = MAX_CELLS_N_FACES
+  integer, parameter :: MAX_CELLS_N_POLYG = MAX_CELLS_N_FACES
 
   contains
 
