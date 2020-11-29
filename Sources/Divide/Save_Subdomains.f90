@@ -240,6 +240,31 @@
       end if
     end do    ! through faces
 
+    ! Polygon faces in the buffers
+    do s = 1, grid % n_faces
+      c1 = grid % faces_c(1,s)
+      c2 = grid % faces_c(2,s)
+      if(grid % new_f(s) .eq. 0) then  ! if face hasn't been marked yet
+
+        if( (grid % cells_n_nodes(c1) .lt. 0)      .and.  &  ! c1 is polyhedron
+            (grid % new_c(c1) .ne. 0)              .and.  &  ! and is in the
+            (grid % comm % cell_proc(c1) .ne. sub) ) then    ! buffer
+          nf_sub = nf_sub + 1
+          grid % new_f(s) = nf_sub
+          grid % old_f(nf_sub) = s
+        end if
+
+        if( (grid % cells_n_nodes(c2) .lt. 0)      .and.  &  ! c2 is polyhedron
+            (grid % new_c(c2) .ne. 0)              .and.  &  ! and is in the
+            (grid % comm % cell_proc(c2) .ne. sub) ) then    ! buffer
+          nf_sub = nf_sub + 1
+          grid % new_f(s) = nf_sub
+          grid % old_f(nf_sub) = s
+        end if
+
+      end if
+    end do    ! through faces
+
     !------------------!
     !   Shadow faces   !
     !------------------!

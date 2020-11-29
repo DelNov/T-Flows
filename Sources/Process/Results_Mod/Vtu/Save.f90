@@ -52,30 +52,32 @@
   ! Take aliases
   grid => flow % pnt_grid
 
-  ! Count connections in this grid, you will need it later
+  !-------------------------------------------------------------------------!
+  !   Count connections and polygons in this grid, you will need it later   !
+  !-------------------------------------------------------------------------!
   n_conns = 0
+  n_polyg = 0
   if(plot_inside) then
+    ! Connections
     do c = 1, grid % n_cells
       n_conns = n_conns + abs(grid % cells_n_nodes(c))
+    end do
+    ! Polygons
+    do c = 1, grid % n_cells
+      if(grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
+        n_polyg = n_polyg + 1                  ! add one for number of polyfaces
+        do i_pol = 1, grid % cells_n_polyg(c)  ! add all faces and their nodes
+          s = grid % cells_p(i_pol, c)
+          n = grid % faces_n_nodes(s)
+          n_polyg = n_polyg + 1 + n
+        end do
+      end if
     end do
   else
     do c2 = -grid % n_bnd_cells, -1
       n_conns = n_conns + grid % cells_n_nodes(c2)
     end do
   end if
-
-  ! Count face data for polyhedral cells, you will need it later
-  n_polyg = 0
-  do c = 1, grid % n_cells
-    if(grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
-      n_polyg = n_polyg + 1                  ! add one for number of polyfaces
-      do i_pol = 1, grid % cells_n_polyg(c)  ! add all faces and their nodes
-        s = grid % cells_p(i_pol, c)
-        n = grid % faces_n_nodes(s)
-        n_polyg = n_polyg + 1 + n
-      end do
-    end if
-  end do
 
   call Comm_Mod_Wait
 
@@ -220,6 +222,30 @@
                               type_save(-grid % n_bnd_cells),  &
                               f8, f9, data_offset, 1)  ! 1 => header only
 
+  ! Write parts of header for polyhedral cells
+  if(n_polyg > 0) then
+
+    ! Write polyhedral cells' faces
+    write(str1, '(i0.0)') data_offset
+    write(f9) IN_4 // '<DataArray type="Int64"'        //  &
+                      ' Name="faces"'                  //  &
+                      ' format="appended"'             //  &
+                      ' offset="' // trim(str1) //'">' // LF
+    write(f9) IN_4 // '</DataArray>' // LF
+    data_offset = data_offset + SP + n_polyg * IP  ! prepare for next
+
+
+    ! Write polyhedral cells' faces offsets
+    write(str1, '(i0.0)') data_offset
+    write(f9) IN_4 // '<DataArray type="Int64"'        //  &
+                      ' Name="faceoffsets"'            //  &
+                      ' format="appended"'             //  &
+                      ' offset="' // trim(str1) //'">' // LF
+    write(f9) IN_4 // '</DataArray>' // LF
+    data_offset = data_offset + SP + grid % n_cells * IP  ! prepare for next
+
+  end if
+
   write(f9) IN_3 // '</Cells>'     // LF
 
   !---------------------------------!
@@ -284,6 +310,48 @@
       call Save_Scalar_Int(grid, "types", plot_inside,             &
                                   type_save(-grid % n_bnd_cells),  &
                                   f8, f9, data_offset, run)
+
+      if(n_polyg > 0) then
+
+        ! Write polyhedral cells' faces
+        data_size = n_polyg * IP
+        write(f9) data_size
+
+        do c = 1, grid % n_cells
+          if(grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
+            write(f9) grid % cells_n_polyg(c)      ! write number of polygons
+            do i_pol = 1, grid % cells_n_polyg(c)  ! write nodes of each polygon
+              s = grid % cells_p(i_pol, c)
+              n = grid % faces_n_nodes(s)
+              write(f9) n, (grid % faces_n(1:n, s))-1
+            end do
+          end if
+        end do
+
+        ! Write polyhedral cells' faces offsets
+        data_size = grid % n_cells * IP
+        write(f9) data_size
+
+        cell_offset = 0
+        do c = 1, grid % n_cells
+          if(grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
+            cell_offset = cell_offset + 1          ! to store number of polygons
+            do i_pol = 1, grid % cells_n_polyg(c)  ! to store all the nodes
+              s = grid % cells_p(i_pol, c)         ! of each polygon
+              n = grid % faces_n_nodes(s)
+              cell_offset = cell_offset + 1 + n
+            end do
+            write(f9) cell_offset
+
+          ! Not a polyhedron, offsets are not needed and set to -1
+          else
+            write(f9) -1
+          end if
+
+        end do
+
+      end if  ! n_polyg > 0
+
     end if
 
     !--------------------!
