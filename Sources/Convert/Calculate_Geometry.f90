@@ -112,18 +112,24 @@
   !   => depends on: xn, yn, zn   !
   !   <= gives:      xn, yn, zn   !
   !-------------------------------!
-  print *, '#===================================='
-  print *, '# Enter scaling factor for geometry  '
-  print *, '#                                    '
-  print *, '# Type skip to keep geometry as it is'
-  print *, '#------------------------------------'
+  print *, '#========================================='
+  print *, '# Geometric extents:                 '
+  print '(2(a,es10.3))', ' # X from: ', minval(grid % xn(:)),  &
+                         '  to: ',      maxval(grid % xn(:))
+  print '(2(a,es10.3))', ' # Y from: ', minval(grid % yn(:)),  &
+                         '  to: ',      maxval(grid % yn(:))
+  print '(2(a,es10.3))', ' # Z from: ', minval(grid % zn(:)),  &
+                         '  to: ',      maxval(grid % zn(:))
+  print *, '# Enter scaling factor for geometry: '
+  print *, '# (or skip to keep as is): '
+  print *, '#-----------------------------------------'
   call File_Mod_Read_Line(5)
   answer = line % tokens(1)
   call To_Upper_Case(answer)
 
   if( answer .ne. 'SKIP' ) then
     read(line % tokens(1), *) factor
-    print *, '# Scaling geometry by factor: ', factor
+    print '(a,es10.3)', ' # Scaling geometry by factor: ', factor
     grid % xn(:) = grid % xn(:) * factor
     grid % yn(:) = grid % yn(:) * factor
     grid % zn(:) = grid % zn(:) * factor
