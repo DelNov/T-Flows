@@ -57,11 +57,11 @@ ifeq ($(FORTRAN), gnu)
                -fimplicit-none -finit-real=nan                              \
                -Wall -Wextra -Waliasing -Wampersand -Warray-temporaries     \
                -Wc-binding-type -Wcharacter-truncation -Wline-truncation    \
-               -Wconversion -Wconversion-extra -Wintrinsics-std             \
                -Wreal-q-constant -Wsurprising -Wtabs -Wunderflow            \
                -Wintrinsic-shadow -Wunused-parameter -Walign-commons        \
                -Wfunction-elimination -Wrealloc-lhs -Wrealloc-lhs-all       \
-               -Wcompare-reals -Wtarget-lifetime -Wpedantic -fstack-check
+               -Wcompare-reals -Wtarget-lifetime -Wpedantic -fstack-check   \
+               -Wconversion -Wintrinsics-std
   else
     OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8 -fdefault-integer-8 -O3
   endif
