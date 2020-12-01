@@ -12,12 +12,13 @@
   character(SL)   :: file_name
 !-----------------------------------[Locals]-----------------------------------!
   character(SL)        :: one_token
+  character(1)         :: one_char
   integer              :: n_tri, n_quad, n_tet, n_hexa, n_pyra, n_wed, n_poly
   integer              :: n_cells, n_bnd_cells, n_faces, n_nodes
   integer              :: n_face_nodes, n_cells_zone
   integer              :: c, c1, c2, s, n, fu, i, l, pos
   integer              :: i_cel, i_nod, j_nod, k_nod, l_nod, i_pol
-  integer              :: cell_type, face_type
+  integer              :: cell_type, zone_type
   integer              :: cell_s, cell_e, side_s, side_e, node_s, node_e
   integer, allocatable :: cell_visited_from(:)
   integer              :: all_nodes(1024)      ! all cell's nodes
@@ -27,6 +28,7 @@
   integer              :: n_bnd_cond           ! number of boundary conditions
   logical              :: this_sect_bnd        ! .true. if bnd cond section
   logical              :: the_end              ! end of file reached?
+  logical              :: ascii                ! is file in ascii format?
 ! character(SL)        :: bc_names(2048)
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: MIXED_ZONE = 0
@@ -39,9 +41,11 @@
   integer, parameter :: CELL_POLY  = 7
   integer, parameter :: FACE_TRI   = 3
   integer, parameter :: FACE_QUAD  = 4
+  integer, parameter :: FACE_POLY  = 5  ! just a guess
 !==============================================================================!
 
-  call File_Mod_Open_File_For_Reading(file_name, fu)
+  ! Open the file in binary mode, because it could be mixed
+  call File_Mod_Open_File_For_Reading_Binary(file_name, fu)
 
   !-----------------------------------------------!
   !   Assume grid doesn't have polyhedral cells   !
@@ -60,8 +64,10 @@
   print '(a60)', ' #----------------------------------------------------------'
 
   !------------------------------------------!
+  !                                          !
   !   Look for number of nodes and read it   !
   !     Nodes' section starts with '(10'     !
+  !                                          !
   !------------------------------------------!
   grid % n_nodes = 0
   rewind(fu)
@@ -76,8 +82,10 @@
   end do
 
   !------------------------------------------!
+  !                                          !
   !   Look for number of cells and read it   !
   !     Cells' section starts with '(12'     !
+  !                                          !
   !------------------------------------------!
   grid % n_cells = 0
   rewind(fu)
@@ -92,8 +100,10 @@
   end do
 
   !------------------------------------------!
+  !                                          !
   !   Look for number of faces and read it   !
   !     Faces' section starts with '(13'     !
+  !                                          !
   !------------------------------------------!
   grid % n_faces = 0
   rewind(fu)
@@ -108,7 +118,9 @@
   end do
 
   !----------------------------------------------------------------------------!
+  !                                                                            !
   !   Read the faces to count the boundary cells and boundary cells sections   !
+  !                                                                            !
   !----------------------------------------------------------------------------!
   print '(a60)', ' #=========================================================='
   print '(a60)', ' # Reading face data to find number of boundary cells       '
@@ -117,13 +129,24 @@
   n_bnd_cond  = 0
   n_bnd_cells = 0
   n_faces     = 0
+  the_end     = .false.
   rewind(fu)
-  do while(n_faces < grid % n_faces)
-    call File_Mod_Read_Line(fu)
+  do while(n_faces < grid % n_faces .and. .not. the_end)
+    call File_Mod_Read_Line(fu, reached_end=the_end)
     if(line % n_tokens > 1) then
 
-      ! Does the line mark the beginning of face-based data
-      if(line % tokens(1) .eq. '(13' .and. line % tokens(2) .ne. '(0') then
+      !----------------------------------------------------------!
+      !   Does the line mark the beginning of face-based data?   !
+      !   13) is for ascii and 2013) for binary formatted data   !
+      !----------------------------------------------------------!
+      if( (line % tokens(1) .eq. '(13' .or. line % tokens(1) .eq. '(2013')  &
+         .and. line % tokens(2) .ne. '(0') then
+
+        ! Store the format of this section
+        ascii = .true.
+        if(line % tokens(1) .eq. '(2013') ascii = .false.
+
+        ! Fetch start and ending face
         read(line % tokens(3), '(z160)') side_s  ! starting face
         read(line % tokens(4), '(z160)') side_e  ! ending face
 
@@ -137,8 +160,8 @@
 
         ! Take the cell type of this zone
         one_token = line % tokens(6)
-        read(one_token(1:1), '(z1)') face_type
-        if(face_type .eq. MIXED_ZONE) then
+        read(one_token(1:1), '(z1)') zone_type
+        if(zone_type .eq. MIXED_ZONE) then
           print '(a34,i9,a4,i9)', ' # Found a mixed face zone from:  ',  &
                                   side_s, ' to:', side_e
         else
@@ -146,9 +169,10 @@
                                   side_s, ' to:', side_e
         end if
 
-        ! End the line if needed
+        ! End the line if needed, just read one left bracket '('
         if(line % last .ne. '(') then
-          call File_Mod_Read_Line(fu)
+          if(ascii)       call File_Mod_Read_Line(fu)
+          if(.not. ascii) read(fu) one_char
         end if
 
         !--------------------------!
@@ -157,20 +181,38 @@
         this_sect_bnd = .false.
         do s = side_s, side_e
           n_faces = n_faces + 1
-          call File_Mod_Read_Line(fu)
 
           ! Zone is mixed, read number of nodes and then c1 and c2
-          if(face_type .eq. MIXED_ZONE) then
-            read(line % tokens(1), *) n_face_nodes
-            read(line % tokens(1+n_face_nodes+1), '(z160)') c1
-            read(line % tokens(1+n_face_nodes+2), '(z160)') c2
+          if(zone_type .eq. MIXED_ZONE .or.  &
+             zone_type .eq. FACE_POLY) then
+            if(ascii) then
+              call File_Mod_Read_Line(fu)
+              read(line % tokens(1), *) n_face_nodes
+              read(line % tokens(1+n_face_nodes+1), '(z160)') c1
+              read(line % tokens(1+n_face_nodes+2), '(z160)') c2
+            else
+              call File_Mod_Read_Binary_Int4_Array(fu, 1)
+              n_face_nodes = int4_array(1)
+              call File_Mod_Read_Binary_Int4_Array(fu, n_face_nodes)
+              call File_Mod_Read_Binary_Int4_Array(fu, 2)
+              c1 = int4_array(1)
+              c2 = int4_array(2)
+            end if
 
           ! Zone is uniform, number of nodes is known, just read c1 and c2
           else
-            if(face_type .eq. FACE_TRI)  n_face_nodes = 3
-            if(face_type .eq. FACE_QUAD) n_face_nodes = 4
-            read(line % tokens(0+n_face_nodes+1), '(z160)') c1
-            read(line % tokens(0+n_face_nodes+2), '(z160)') c2
+            if(zone_type .eq. FACE_TRI)  n_face_nodes = 3
+            if(zone_type .eq. FACE_QUAD) n_face_nodes = 4
+            if(ascii) then
+              call File_Mod_Read_Line(fu)
+              read(line % tokens(0+n_face_nodes+1), '(z160)') c1
+              read(line % tokens(0+n_face_nodes+2), '(z160)') c2
+            else
+              call File_Mod_Read_Binary_Int4_Array(fu, n_face_nodes)
+              call File_Mod_Read_Binary_Int4_Array(fu, 2)
+              c1 = int4_array(1)
+              c2 = int4_array(2)
+            end if
           end if
 
           ! This was a boundary face
@@ -196,6 +238,11 @@
 
     end if
   end do
+  if(the_end) then
+    print *, '# ERROR: Could not find face-based data in: ', file_name
+    print *, '# This error is critical!  Exiting!'
+    stop
+  end if
 
   print '(a34,i9)', ' # Boundary cells from face data: ', n_bnd_cells
   print '(a34,i9)', ' # Boundary condition sections:   ', n_bnd_cond
@@ -224,35 +271,59 @@
   print '(a60)', ' # Reading node coordinates                                 '
   print '(a60)', ' #----------------------------------------------------------'
   n_nodes = 0
+  the_end = .false.
   rewind(fu)
-  do while(n_nodes < grid % n_nodes)
+  do while(n_nodes < grid % n_nodes .and. .not. the_end)
     call File_Mod_Read_Line(fu)
     if(line % n_tokens > 1) then
 
-      ! Does the line mark the beginning of node-based data
-      if(line % tokens(1) .eq. '(10' .and. line % tokens(2) .ne. '(0') then
+      !----------------------------------------------------------!
+      !   Does the line mark the beginning of node-based data?   !
+      !   10) is for ascii and 3010) for binary formatted data   !
+      !----------------------------------------------------------!
+      if( (line % tokens(1) .eq. '(10' .or. line % tokens(1) .eq. '(3010')  &
+         .and. line % tokens(2) .ne. '(0') then
         read(line % tokens(3), '(z160)') node_s  ! starting node
         read(line % tokens(4), '(z160)') node_e  ! ending node
         print '(a34,i9,a4,i9)', ' # Found a node zone from:        ',  &
                                 node_s, ' to:', node_e
 
+        ! Store the format of this section
+        ascii = .true.
+        if(line % tokens(1) .eq. '(3010') ascii = .false.
+
         ! End the line if needed
         if(line % last .ne. '(') then
-          call File_Mod_Read_Line(fu)
+          if(ascii)       call File_Mod_Read_Line(fu)
+          if(.not. ascii) read(fu) one_char
         end if
 
         ! Read all the nodes (node coordinates)
         do n = node_s, node_e
           n_nodes = n_nodes + 1
-          call File_Mod_Read_Line(fu)
-          read(line % tokens(1), *)  grid % xn(n)
-          read(line % tokens(2), *)  grid % yn(n)
-          read(line % tokens(3), *)  grid % zn(n)
+          if(ascii) then
+            call File_Mod_Read_Line(fu)
+            read(line % tokens(1), *)  grid % xn(n)
+            read(line % tokens(2), *)  grid % yn(n)
+            read(line % tokens(3), *)  grid % zn(n)
+          else
+            call File_Mod_Read_Binary_Real8_Array(fu, 3)
+            grid % xn(n) = real8_array(1)
+            grid % yn(n) = real8_array(2)
+            grid % zn(n) = real8_array(3)
+          end if
         end do
+
+        if(.not. ascii) read(fu) one_char
       end if
 
     end if
   end do
+  if(the_end) then
+    print *, '# ERROR: Could not find node-based data in: ', file_name
+    print *, '# This error is critical!  Exiting!'
+    stop
+  end if
 
   !-------------------------!
   !                         !
@@ -266,27 +337,37 @@
   n_cells = 0
   n_tri   = 0;  n_quad  = 0;  n_tet = 0
   n_hexa  = 0;  n_pyra  = 0;  n_wed = 0
+  the_end = .false.
 
   rewind(fu)
-  do while(n_cells < grid % n_cells)
-    call File_Mod_Read_Line(fu)
+  do while(n_cells < grid % n_cells .and. .not. the_end)
+    call File_Mod_Read_Line(fu, reached_end=the_end)
     if(line % n_tokens > 1) then
-      if(line % tokens(1) .eq. '(12' .and. line % tokens(2) .ne. '(0') then
+      if( (line % tokens(1) .eq. '(12' .or. line % tokens(1) .eq. '(2012')  &
+         .and. line % tokens(2) .ne. '(0') then
 
+        ! Store the format of this section
+        ascii = .true.
+        if(line % tokens(1) .eq. '(2012') ascii = .false.
+
+        ! Fetch start and ending cell
         read(line % tokens(3), '(z160)') cell_s  ! starting cell
         read(line % tokens(4), '(z160)') cell_e  ! ending cell
-        print '(a34,i9,a4,i9)', ' # Found a cell zone from:        ',  &
-                                cell_s, ' to:', cell_e
 
-        !---------------------------------------------------------!
-        !   Check if the zone is mixed (listing all cell types)   !
-        !---------------------------------------------------------!
-        read(line % tokens(line % n_tokens)(1:1), '(z1)') cell_type
+        ! Check if the zone is mixed (listing all cell types)
+        read(line % tokens(line % n_tokens)(1:1), '(z1)') zone_type
+        if(zone_type .eq. MIXED_ZONE) then
+          print '(a34,i9,a4,i9)', ' # Found a mixed cell zone from:  ',  &
+                                  cell_s, ' to:', cell_e
+        else
+          print '(a34,i9,a4,i9)', ' # Found a uniform cell zone from:',  &
+                                  cell_s, ' to:', cell_e
+        end if
 
         !------------------------------------!
         !   You are reading a uniform zone   !
         !------------------------------------!
-        if(cell_type .ne. MIXED_ZONE) then
+        if(zone_type .ne. MIXED_ZONE) then
 
           ! Number of cells in this zone
           n_cells_zone = cell_e - cell_s + 1
@@ -294,35 +375,41 @@
           ! Update the number of cells
           n_cells = n_cells + n_cells_zone
 
-          if(cell_type .eq. CELL_TRI)   then
+          if(zone_type .eq. CELL_TRI)   then
             n_tri = n_tri + n_cells_zone
             grid % cells_n_nodes(cell_s:cell_e) = 3
             grid % cells_n_faces(cell_s:cell_e) = 1
           end if
-          if(cell_type .eq. CELL_QUAD)  then
+          if(zone_type .eq. CELL_QUAD)  then
             n_quad = n_quad + n_cells_zone
             grid % cells_n_nodes(cell_s:cell_e) = 4
             grid % cells_n_faces(cell_s:cell_e) = 1
           end if
-          if(cell_type .eq. CELL_TETRA) then
+          if(zone_type .eq. CELL_TETRA) then
             n_tet = n_tet + n_cells_zone
             grid % cells_n_nodes(cell_s:cell_e) = 4
             grid % cells_n_faces(cell_s:cell_e) = 4
           end if
-          if(cell_type .eq. CELL_HEXA)  then
+          if(zone_type .eq. CELL_HEXA)  then
             n_hexa = n_hexa + n_cells_zone
             grid % cells_n_nodes(cell_s:cell_e) = 8
             grid % cells_n_faces(cell_s:cell_e) = 6
           end if
-          if(cell_type .eq. CELL_PYRA)  then
+          if(zone_type .eq. CELL_PYRA)  then
             n_pyra  = n_pyra  + n_cells_zone
             grid % cells_n_nodes(cell_s:cell_e) = 5
             grid % cells_n_faces(cell_s:cell_e) = 5
           end if
-          if(cell_type .eq. CELL_WEDGE) then
+          if(zone_type .eq. CELL_WEDGE) then
             n_wed = n_wed + n_cells_zone
             grid % cells_n_nodes(cell_s:cell_e) = 6
             grid % cells_n_faces(cell_s:cell_e) = 5
+          end if
+          if(zone_type .eq. CELL_POLY)  then
+            n_poly  = n_poly  + n_cells_zone
+            grid % cells_n_nodes(cell_s:cell_e) = -1  ! attend
+            grid % cells_n_faces(cell_s:cell_e) = -1  ! have to attend too
+            grid % polyhedral = .true.
           end if
 
         !----------------------------------!
@@ -332,10 +419,20 @@
 
 6         continue
 
-          call File_Mod_Read_Line(fu, remove='('//')')
+          if(ascii) then
+            call File_Mod_Read_Line(fu, remove='('//')')
+          else
+            line % n_tokens = 1  ! a bit of a dirty trick
+          end if
 
           do i = 1, line % n_tokens
-            read(line % tokens(i), *) cell_type
+
+            if(ascii) then
+              read(line % tokens(i), *) cell_type
+            else
+              call File_Mod_Read_Binary_Int4_Array(fu, 1)
+              cell_type = int4_array(1)
+            end if
 
             ! Update the counter for all cells
             n_cells = n_cells + 1
@@ -395,9 +492,14 @@
       end if  ! found a beginning of cell zone
     end if  ! number of tokens bigger than one
   end do  ! infinite loop
+  if(the_end) then
+    print *, '# ERROR: Could not find cell-based data in: ', file_name
+    print *, '# This error is critical!  Exiting!'
+    stop
+  end if
 
   print '(a60)', ' #=========================================================='
-  print '(a60)', ' # Summary of interioir cell shapes:                        '
+  print '(a60)', ' # Summary of interior cell shapes:                         '
   print '(a60)', ' #----------------------------------------------------------'
   print '(a34,i9)', ' # Number of triangles:           ', n_tri
   print '(a34,i9)', ' # Number of quadrilaterals:      ', n_quad
@@ -420,13 +522,24 @@
   n_face_sect  = 0
   n_bnd_cells = 0
   n_faces     = 0
+  the_end     = .false.
   rewind(fu)
-  do while(n_faces < grid % n_faces)
-    call File_Mod_Read_Line(fu)
+  do while(n_faces < grid % n_faces .and. .not. the_end)
+    call File_Mod_Read_Line(fu, reached_end=the_end)
     if(line % n_tokens > 1) then
 
-      ! Does the line mark the beginning of face-based data
-      if(line % tokens(1) .eq. '(13' .and. line % tokens(2) .ne. '(0') then
+      !----------------------------------------------------------!
+      !   Does the line mark the beginning of face-based data?   !
+      !   13) is for ascii and 2013) for binary formatted data   !
+      !----------------------------------------------------------!
+      if( (line % tokens(1) .eq. '(13' .or. line % tokens(1) .eq. '(2013')  &
+         .and. line % tokens(2) .ne. '(0') then
+
+        ! Store the format of this section
+        ascii = .true.
+        if(line % tokens(1) .eq. '(2013') ascii = .false.
+
+        ! Fetch start and ending face
         read(line % tokens(3), '(z160)') side_s  ! starting face
         read(line % tokens(4), '(z160)') side_e  ! ending face
 
@@ -435,8 +548,8 @@
 
         ! Take the cell type of this zone
         one_token = line % tokens(6)
-        read(one_token(1:1), '(z1)') face_type
-        if(face_type .eq. MIXED_ZONE) then
+        read(one_token(1:1), '(z1)') zone_type
+        if(zone_type .eq. MIXED_ZONE) then
           print '(a34,i9,a4,i9)', ' # Found a mixed face zone from:  ',  &
                                   side_s, ' to:', side_e
         else
@@ -446,7 +559,8 @@
 
         ! End the line if needed
         if(line % last .ne. '(') then
-          call File_Mod_Read_Line(fu)
+          if(ascii)       call File_Mod_Read_Line(fu)
+          if(.not. ascii) read(fu) one_char
         end if
 
         !--------------------------!
@@ -454,34 +568,54 @@
         !--------------------------!
         do s = side_s, side_e
           n_faces = n_faces + 1
-          call File_Mod_Read_Line(fu)
-
-          ! Read and store number of nodes in this face
-          if(face_type .eq. MIXED_ZONE) then
-            read(line % tokens(1), *) n_face_nodes
-          else
-            if(face_type .eq. FACE_TRI)  n_face_nodes = 3
-            if(face_type .eq. FACE_QUAD) n_face_nodes = 4
-          end if
-          grid % faces_n_nodes(s) = n_face_nodes
 
           ! Read nodes and cells surrounding the face for a mixed zone
-          if(face_type .eq. MIXED_ZONE) then
-            do i_nod = 1, n_face_nodes
-              read(line % tokens(1+i_nod), '(z160)') grid % faces_n(i_nod, s)
-            end do
-            read(line % tokens(1+n_face_nodes+1), '(z160)') c1
-            read(line % tokens(1+n_face_nodes+2), '(z160)') c2
+          if(zone_type .eq. MIXED_ZONE .or.  &
+             zone_type .eq. FACE_POLY) then
+            if(ascii) then
+              call File_Mod_Read_Line(fu)
+              read(line % tokens(1), *) n_face_nodes
+              grid % faces_n_nodes(s) = n_face_nodes
+              do i_nod = 1, n_face_nodes
+                read(line % tokens(1+i_nod), '(z160)') grid % faces_n(i_nod, s)
+              end do
+              read(line % tokens(1+n_face_nodes+1), '(z160)') c1
+              read(line % tokens(1+n_face_nodes+2), '(z160)') c2
+            else
+              call File_Mod_Read_Binary_Int4_Array(fu, 1)
+              n_face_nodes = int4_array(1)
+              call File_Mod_Read_Binary_Int4_Array(fu, n_face_nodes)
+              do i_nod = 1, n_face_nodes
+                grid % faces_n(i_nod, s) = int4_array(i_nod)
+              end do
+              call File_Mod_Read_Binary_Int4_Array(fu, 2)
+              c1 = int4_array(1)
+              c2 = int4_array(2)
+            end if
 
           ! Read nodes and cells surrounding the face for a uniform zone
           else
-            do i_nod = 1, n_face_nodes
-              read(line % tokens(0+i_nod), '(z160)') grid % faces_n(i_nod, s)
-            end do
-            read(line % tokens(0+n_face_nodes+1), '(z160)') c1
-            read(line % tokens(0+n_face_nodes+2), '(z160)') c2
+            if(zone_type .eq. FACE_TRI)  n_face_nodes = 3
+            if(zone_type .eq. FACE_QUAD) n_face_nodes = 4
+            if(ascii) then
+              call File_Mod_Read_Line(fu)
+              do i_nod = 1, n_face_nodes
+                read(line % tokens(0+i_nod), '(z160)') grid % faces_n(i_nod, s)
+              end do
+              read(line % tokens(0+n_face_nodes+1), '(z160)') c1
+              read(line % tokens(0+n_face_nodes+2), '(z160)') c2
+            else
+              call File_Mod_Read_Binary_Int4_Array(fu, n_face_nodes)
+              do i_nod = 1, n_face_nodes
+                grid % faces_n(i_nod, s) = int4_array(i_nod)
+              end do
+              call File_Mod_Read_Binary_Int4_Array(fu, 2)
+              c1 = int4_array(1)
+              c2 = int4_array(2)
+            end if
 
           end if
+          grid % faces_n_nodes(s) = n_face_nodes
 
           ! Case when c1 is a boundary cell
           if(c1 .eq. 0) then
@@ -509,6 +643,11 @@
 
     end if
   end do
+  if(the_end) then
+    print *, '# ERROR: Could not find face-based data in: ', file_name
+    print *, '# This error is critical!  Exiting!'
+    stop
+  end if
 
   print '(a34,i9)', ' # Boundary cells from face data: ', n_bnd_cells
 
@@ -854,11 +993,12 @@
 
   !------------------------------------------------------------!
   !                                                            !
+  !                                                            !
   !   Browse through all sections (fluid, boundary, and what   !
   !    ever) to store number of boundary conditions to grid    !
   !                                                            !
+  !                                                            !
   !------------------------------------------------------------!
-
   rewind(fu)
   the_end = .false.
   do while(.not. the_end)
