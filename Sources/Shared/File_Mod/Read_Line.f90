@@ -10,8 +10,10 @@
   logical,      optional :: reached_end
   character(*), optional :: remove
 !-----------------------------------[Locals]-----------------------------------!
-  integer      :: i, j, l, n
-  character(6) :: format = '(a000)'
+  integer       :: i, j, l, n
+  integer(1)    :: byte
+  character(6)  :: format = '(a000)'
+  character(SL) :: fmtd
 !==============================================================================!
 !   A comment is each line which begins with "!", "#", "$", "%" or "*".        !
 !   Input line must not exceed DL characters in length (defined in Const_Mod)  !
@@ -28,8 +30,19 @@
   !-----------------------------------!
   !  Read the whole line into whole   !
   !-----------------------------------!
-  write(format(3:5), '(i3.3)') DL
-1 read(un,format, end=2) line % whole
+  inquire(unit=un, formatted=fmtd)
+1 continue
+  if(fmtd .eq. 'YES') then
+    write(format(3:5), '(i3.3)') DL
+    read(un, format, end=2) line % whole
+  else
+    line % whole = ''
+    do i = 1, DL
+      read(un, end=2) byte
+      if(byte .eq. 10) exit
+      if(byte .ne. 13) line % whole(i:i) = char(byte)
+    end do
+  end if
 
   ! Remove unwanted characters from it (if n .eq. 0, it won't do it)
   do j = 1, n
