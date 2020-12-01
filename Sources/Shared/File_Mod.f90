@@ -9,6 +9,7 @@
   implicit none
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: MAX_TOKENS = DL / 2
+  integer, parameter :: MAX_ITEMS  = 2048
 !==============================================================================!
 
   character(SL) :: problem_name(MD)
@@ -26,6 +27,10 @@
   end type
 
   type(Tokenizer_Type) :: line
+  integer(SP) :: int4_array(MAX_ITEMS)
+  integer(DP) :: int8_array(MAX_ITEMS)
+  real(SP)    :: real4_array(MAX_ITEMS)
+  real(DP)    :: real8_array(MAX_ITEMS)
 
   contains
 
@@ -37,6 +42,10 @@
   include 'File_Mod/Open_File_For_Reading_Binary.f90'
   include 'File_Mod/Open_File_For_Writing.f90'
   include 'File_Mod/Open_File_For_Writing_Binary.f90'
+  include 'File_Mod/Read_Binary_Int4_Array.f90'
+  include 'File_Mod/Read_Binary_Int8_Array.f90'
+  include 'File_Mod/Read_Binary_Real4_Array.f90'
+  include 'File_Mod/Read_Binary_Real8_Array.f90'
   include 'File_Mod/Read_Line.f90'
 
   end module
