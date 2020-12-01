@@ -107,10 +107,19 @@
   write(fu) IN_4 // '</DataArray>' // LF
   data_offset = data_offset + SP + grid % n_faces * IP      ! prepare for next
 
+  ! Number of nodes
+  write(str1, '(i0.0)') data_offset
+  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+                    ' Name="GridNumberOfNodes"'      //  &
+                    ' format="appended"'             //  &
+                    ' offset="' // trim(str1) //'">' // LF
+  write(fu) IN_4 // '</DataArray>' // LF
+  data_offset = data_offset + SP + grid % n_faces * IP      ! prepare for next
+
   ! Surface vectors
   write(str1, '(i0.0)') data_offset
   write(fu) IN_4 // '<DataArray type="Float64"'      //  &
-                    ' Name="GeomSurfaceVectors"'     //  &
+                    ' Name="GridSurfaceVectors"'     //  &
                     ' NumberOfComponents="3"'        //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -185,6 +194,13 @@
 
     if(c2 < 0) write(fu) grid % bnd_cond % color(c2)
     if(c2 > 0) write(fu) 0
+  end do
+
+  ! Number of nodes
+  data_size = grid % n_faces * IP
+  write(fu) data_size
+  do s = 1, grid % n_faces
+    write(fu) grid % faces_n_nodes(s)
   end do
 
   ! Surface vectors

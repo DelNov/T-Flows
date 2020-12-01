@@ -148,10 +148,19 @@
   write(fu) IN_4 // '</DataArray>' // LF
   data_offset = data_offset + SP + n_cells_sub * IP  ! prepare for next
 
+  ! Number of nodes
+  write(str1, '(i0.0)') data_offset
+  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+                    ' Name="GridNumberOfNodes"'      //  &
+                    ' format="appended"'             //  &
+                    ' offset="' // trim(str1) //'">' // LF
+  write(fu) IN_4 // '</DataArray>' // LF
+  data_offset = data_offset + SP + n_cells_sub * IP  ! prepare for next
+
   ! Wall distance
   write(str1, '(i0.0)') data_offset
   write(fu) IN_4 // '<DataArray type="Float64"'      //  &
-                    ' Name="GeomWallDistance"'       //  &
+                    ' Name="GridWallDistance"'       //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
@@ -160,7 +169,7 @@
   ! Cell volume
   write(str1, '(i0.0)') data_offset
   write(fu) IN_4 // '<DataArray type="Float64"'      //  &
-                    ' Name="GeomCellVolume"'         //  &
+                    ' Name="GridCellVolume"'         //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
@@ -299,6 +308,15 @@
     end if
   end do
 
+  ! Number of nodes
+  data_size = n_cells_sub * IP
+  write(fu) data_size
+  do c = 1, grid % n_cells
+    if(grid % new_c(c) .ne. 0) then
+      write(fu) abs(grid % cells_n_nodes(c))
+    end if
+  end do
+
   ! Wall distance
   data_size = n_cells_sub * RP
   write(fu) data_size
@@ -349,9 +367,9 @@
     write(fu,'(a,a)') IN_2, '<PCellData Scalars="scalars" vectors="velocity">'
     write(fu,'(a,a)') IN_3, '<PDataArray type="Int64" Name="Processor"/>'
     write(fu,'(a,a)') IN_3, '<PDataArray type="Float64" ' //   &
-                            ' Name="GeomWallDistance"/>'
+                            ' Name="GridWallDistance"/>'
     write(fu,'(a,a)') IN_3, '<PDataArray type="Float64" ' //  &
-                            ' Name="GeomCellVolume"/>'
+                            ' Name="GridCellVolume"/>'
     write(fu,'(a,a)') IN_2, '</PCellData>'
 
     ! Write out the names of all the pieces
