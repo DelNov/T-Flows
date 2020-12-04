@@ -1,7 +1,7 @@
 *.o
 **/Makefile.in
 *.cas
-*.cns
+*.cfn
 *.geo
 *.buf
 *.map
