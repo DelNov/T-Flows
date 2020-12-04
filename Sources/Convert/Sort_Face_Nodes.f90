@@ -11,22 +11,24 @@
   type(Grid_Type) :: grid
   integer         :: s
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: i, j, k, n, nn
+  integer :: i, j, k, n, nn, cnt
   real    :: a(3,MAX_FACES_N_NODES), b(MAX_FACES_N_NODES)
   real    :: a_p(3,3), b_p(3), det
-  real    :: normal_p(3), center_p(3), x_p(3), y_p(3)
-  real    :: rp_3d(3,MAX_FACES_N_NODES)
+  real    :: normal_p(3), center_p(3), x_p(3), y_p(3), sense(3)
+  real    :: rp_3d(3,MAX_FACES_N_NODES), np_3d(3,MAX_FACES_N_NODES)
   real    :: rp_2d(2,MAX_FACES_N_NODES)
   real    :: sorting(MAX_FACES_N_NODES)  ! sorting criterion
   integer :: order(MAX_FACES_N_NODES)    ! carry-on array with indices
+  integer :: max_loc(2)
+  real    :: prod(3), angles(MAX_FACES_N_NODES, MAX_FACES_N_NODES)
 !==============================================================================!
 
   ! Take alias
   nn = grid % faces_n_nodes(s)
 
-  !----------------------------------!
-  !   Find the planes center point   !
-  !----------------------------------!
+  !-----------------------------------!
+  !   Find the plane's center point   !
+  !-----------------------------------!
   center_p(:) = 0
   do i = 1, nn
     n = grid % faces_n(i, s)
@@ -36,9 +38,9 @@
   end do
   center_p(1:3) = center_p(1:3) / real(nn)
 
-  !---------------------------!
-  !   Find relative vectors   !
-  !---------------------------!
+  !------------------------------------------------------------------!
+  !   Find nodes' relative positions to the center just calculated   !
+  !------------------------------------------------------------------!
   do i = 1, nn  ! use "i", not "i_nod" here
     n = grid % faces_n(i, s)
     rp_3d(1, i) = grid % xn(n) - center_p(1)
@@ -50,48 +52,55 @@
   !   Find a normal of the plane   !
   !--------------------------------!
 
-  ! Fill up the original matrices
+  ! Calculate normalized relative vectors
   do i = 1, nn  ! use "i", not "i_nod" here
-    n = grid % faces_n(i, s)
-    a(1,i) = rp_3d(1,i) + MICRO * rand() ! add some noise on coords ...
-    a(2,i) = rp_3d(2,i) + MICRO * rand() ! ... to avoid over-dermined ...
-    a(3,i) = rp_3d(3,i) + MICRO * rand() ! ... system of equations
-    b(i)   = 1.0
+    np_3d(1:3,i) = rp_3d(1:3,i) / norm2(rp_3d(1:3,i))
   end do
 
-  ! Form the system for least squares method
-  a_p(:,:) = 0.0
-  do j = 1, 3
-    do k = 1, 3
-      do i = 1, nn
-        a_p(j,k) = a_p(j,k) + a(j,i) * a(k,i)
-      end do
+  ! Multiply each with each to find angles between them
+  ! (Each of these multiplications is a guess for the normal)
+  angles(1:nn,1:nn) = 0.0
+  do i = 1, nn
+    do j = i + 1, nn
+      prod(1:3) = Math_Mod_Cross_Product(np_3d(1:3,i), np_3d(1:3,j))
+      angles(i,j) = asin(norm2(prod(1:3))) * 57.2957795131
     end do
   end do
 
-  b_p(:) = 0.0
-  do j = 1, 3
-    do i = 1, nn
-      b_p(j) = b_p(j) + a(j,i) * b(i)
+  ! Find maximum angle, that one wil be relevant for the sense od normal
+  max_loc = maxloc(angles(1:nn,1:nn));  i = max_loc(1);  j = max_loc(2)
+  sense(:) = Math_Mod_Cross_Product(np_3d(1:3,i), np_3d(1:3,j))
+
+  ! Multiply each with each selectivelly, taking into account only bigger
+  ! angles, and taking care to correct the signs in proper sense.
+  ! Average the surface normal along the way.
+  cnt = 0
+  normal_p(1:3) = 0.0
+  do i = 1, nn
+    do j = i + 1, nn
+      if(angles(i,j) > 30.0) then  ! take only reasonalby big angles
+        cnt = cnt + 1              ! one more sample
+        prod(1:3) = Math_Mod_Cross_Product(np_3d(1:3,i), np_3d(1:3,j))
+        if(dot_product(prod(1:3), sense(1:3)) < 0) then  ! correct the sign ...
+          prod(1:3) = -prod(1:3)                         ! ... if needed
+        end if
+        normal_p(1:3) = normal_p(1:3) + prod(1:3)
+      end if
     end do
   end do
+  normal_p(1:3) = normal_p(1:3) / real(cnt)
 
-  ! Solve the system
-  call Math_Mod_Invert_3x3(a_p, det)
-  normal_p(:) = 0.0
-  do j = 1, 3
-    do i = 1, 3
-      normal_p(j) = normal_p(j) + a_p(j,i) * b_p(i)
-    end do
-  end do
+  !------------------------------------------------!
+  !   Create a 2D coordinate system on the plane   !
+  !   using its central point and normal, and      !
+  !   then project all the points on that system   !
+  !------------------------------------------------!
 
-  normal_p(1:3) = normal_p(1:3) / norm2(normal_p(1:3))
-
-  ! Define x in the plane
+  ! Define x-axis in the plane
   x_p(1:3) = Math_Mod_Cross_Product(normal_p(1:3), rp_3d(1:3, 1))
   x_p(1:3) = -x_p(1:3) / norm2(x_p(1:3))
 
-  ! Define y in the plane
+  ! Define y-axis in the plane
   y_p(1:3) = Math_Mod_Cross_Product(normal_p(1:3), x_p(1:3))
   y_p(1:3) = y_p(1:3) / norm2(y_p(1:3))
 
