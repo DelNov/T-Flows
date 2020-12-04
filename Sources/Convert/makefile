@@ -141,16 +141,18 @@ SRC_FUN = Probe_1d_Nodes.f90		\
           To_Upper_Case.f90
 
 # Local functions are added one by one ...
-SRC_FUN += Allocate_Memory.f90		\
-           Calculate_Geometry.f90	\
-           Find_Faces.f90		\
-           Find_Parents.f90		\
-           Grid_Topology.f90		\
-           Guess_Format.f90		\
-           Load_Fluent.f90		\
-           Load_Gambit.f90		\
-           Load_Gmsh.f90		\
-           Logo_Con.f90			\
+SRC_FUN += Allocate_Memory.f90    \
+           Calculate_Geometry.f90 \
+           Create_Dual.f90        \
+           Find_Faces.f90         \
+           Find_Parents.f90       \
+           Grid_Topology.f90      \
+           Guess_Format.f90       \
+           Load_Fluent.f90        \
+           Load_Gambit.f90        \
+           Load_Gmsh.f90          \
+           Logo_Con.f90           \
+           Sort_Face_Nodes.f90    \
            Main_Con.f90
 
 #----------------------------------------------------------------------
