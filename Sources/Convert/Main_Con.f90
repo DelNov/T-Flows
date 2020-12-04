@@ -7,10 +7,10 @@
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type) :: grid         ! grid to be converted
+  type(Grid_Type) :: grid, dual     ! grid to be converted and its dual
   integer         :: c, n, s, l, p
   character(SL)   :: file_name
-  character(SL)   :: file_format  ! 'UNKNOWN', 'FLUENT', 'GAMBIT', 'GMSH'
+  character(SL)   :: file_format    ! 'UNKNOWN', 'FLUENT', 'GAMBIT', 'GMSH'
 !==============================================================================!
 
   call Logo_Con
@@ -58,8 +58,8 @@
 
   ! For Gambit and Gmsh grids, no face information is stored
   if(file_format .eq. 'GAMBIT' .or. file_format .eq. 'GMSH') then
-    call Grid_Topology     (grid)
-    call Find_Faces        (grid)
+    call Grid_Topology(grid)
+    call Find_Faces   (grid)
   end if
   call Calculate_Geometry(grid)
 
@@ -110,5 +110,7 @@
 
   ! Create 1D file (used for channel or pipe flow)
   call Probe_1d_Nodes(grid)
+
+  call Create_Dual(grid, dual)   ! It should be in Grid_Mod
 
   end program

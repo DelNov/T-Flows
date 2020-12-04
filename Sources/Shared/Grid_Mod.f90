@@ -27,13 +27,14 @@
     logical       :: polyhedral
 
     ! Number of ...
-    integer :: n_nodes      ! ... nodes
-    integer :: n_cells      ! ... cells
-    integer :: n_faces      ! ... faces
-    integer :: n_bnd_cells  ! ... boundary cells
-    integer :: n_per_faces  ! ... periodic faces (shadows)
-    integer :: n_bnd_cond   ! ... boundary conditions
-    integer :: n_shadows    ! ... shadow faces
+    integer :: n_nodes     = 0  ! ... nodes
+    integer :: n_cells     = 0  ! ... cells
+    integer :: n_faces     = 0  ! ... faces
+    integer :: n_bnd_cells = 0  ! ... boundary cells
+    integer :: n_per_faces = 0  ! ... periodic faces (shadows)
+    integer :: n_bnd_cond  = 0  ! ... boundary conditions
+    integer :: n_shadows   = 0  ! ... shadow faces
+    integer :: n_edges     = 0  ! ... edges (needed to create dual grid)
 
     ! Periodic span
     real :: per_x, per_y, per_z
@@ -130,10 +131,11 @@
     integer :: max_n_bnd_cells
     integer :: max_n_faces
 
-    ! New numbers for nodes, cells and faces
+    ! New numbers for nodes, cells, faces and edges
     integer, allocatable :: new_n(:)
     integer, allocatable :: new_c(:)
     integer, allocatable :: new_f(:)
+    integer, allocatable :: new_e(:)
 
     ! Old numbers for cells and faces
     integer, allocatable :: old_c(:)
@@ -147,6 +149,11 @@
     integer, allocatable :: nodes_c(:,:)
     real,    allocatable :: weight_c2n(:,:)
 
+    ! Edge-base variables
+    integer, allocatable :: edges_n (:,:)  ! edges' nodes
+    integer, allocatable :: edges_bc(:,:)  ! edges' boundary conditions
+    integer, allocatable :: edges_fb(:,:)  ! edges' faces on boundaries
+
     !------------------------------------------!
     !   Variables important for parallel run   !
     !------------------------------------------!
@@ -159,9 +166,9 @@
 
   end type
 
-  integer, parameter :: MAX_FACES_N_NODES = 12
-  integer, parameter :: MAX_CELLS_N_NODES = 36
-  integer, parameter :: MAX_CELLS_N_FACES = 24
+  integer, parameter :: MAX_FACES_N_NODES = 36  ! 12
+  integer, parameter :: MAX_CELLS_N_NODES = 72  ! 36
+  integer, parameter :: MAX_CELLS_N_FACES = 48  ! 24
   integer, parameter :: MAX_CELLS_N_CELLS = MAX_CELLS_N_FACES
   integer, parameter :: MAX_CELLS_N_POLYG = MAX_CELLS_N_FACES
 
