@@ -7,7 +7,7 @@
   integer         :: nf    ! number of faces in the grid   
   integer         :: ns    ! number of shadow faces in the grid   
 !-----------------------------------[Locals]-----------------------------------!
-  integer         :: s
+  integer :: s
 !==============================================================================!
 
   ! Store the number of faces for the grid
