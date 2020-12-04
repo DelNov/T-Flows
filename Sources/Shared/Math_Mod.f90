@@ -20,6 +20,7 @@
   include 'Math_Mod/Cross_Product.f90'
   include 'Math_Mod/Distance.f90'
   include 'Math_Mod/Distance_Squared.f90'
+  include 'Math_Mod/Invert_3x3.f90'
   include 'Math_Mod/Gaussian_Elimination.f90'
   include 'Math_Mod/Smaller_Real.f90'
   include 'Math_Mod/Tet_Volume.f90'
