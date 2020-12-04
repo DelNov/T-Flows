@@ -11,9 +11,7 @@
   type(Grid_Type) :: grid
   integer         :: s
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: i, j, k, n, nn, cnt
-  real    :: a(3,MAX_FACES_N_NODES), b(MAX_FACES_N_NODES)
-  real    :: a_p(3,3), b_p(3), det
+  integer :: i, j, n, nn, cnt
   real    :: normal_p(3), center_p(3), x_p(3), y_p(3), sense(3)
   real    :: rp_3d(3,MAX_FACES_N_NODES), np_3d(3,MAX_FACES_N_NODES)
   real    :: rp_2d(2,MAX_FACES_N_NODES)
