@@ -33,7 +33,6 @@
   integer              :: c_p_list(2048)      ! prim cell and ...
   integer              :: n_d_list(2048)      ! ... dual node list
   integer              :: curr_f_d, curr_b_d, unused, dual_f_here
-  logical              :: found
 !==============================================================================!
 
   ! Alias(es)
@@ -180,15 +179,26 @@
   allocate(node_to_cell( prim % n_nodes));  node_to_cell(:) = 0
   allocate(edge_to_node( prim % n_edges));  edge_to_node(:) = 0
 
+  !-------------------------!
+  !                         !
+  !   Boundary conditions   !
+  !    numbers and names    !
+  !                         !
+  !-------------------------!
+  dual % n_bnd_cond = prim % n_bnd_cond
+  allocate(dual % bnd_cond % name(dual % n_bnd_cond))
+  do bc = 1, prim % n_bnd_cond
+    dual % bnd_cond % name(bc) = prim % bnd_cond % name(bc)
+    call To_Upper_Case(dual % bnd_cond % name(bc))
+  end do
+
   !----------------------------------!
-  !                                  !
   !                                  !
   !   Inside mapping                 !
   !                                  !
   !   nodes(prim) =--> cells(dual)   !
   !   edges(prim) =--> faces(dual)   !
   !   cells(prim) =--> nodes(dual)   !
-  !                                  !
   !                                  !
   !----------------------------------!
 
@@ -210,9 +220,7 @@
   dual % n_cells = prim % n_nodes
   dual % n_nodes = prim % n_cells + prim % n_bnd_cells + N_Sharp_Edges(prim)
 
-  call Grid_Mod_Allocate_Faces(dual, dual % n_faces, 0)
-  call Grid_Mod_Allocate_Nodes(dual, dual % n_nodes)
-  call Grid_Mod_Allocate_Cells(dual, dual % n_cells, dual % n_bnd_cells)
+  call Allocate_Memory(dual)
 
   !-----------------------------------------!
   !                                         !
@@ -333,6 +341,7 @@
           b_d  = curr_b_d - prim % new_n(n_p)
           dual % cells_n_nodes(b_d) = dual % cells_n_nodes(b_d) + 1
           dual % cells_n(dual % cells_n_nodes(b_d), b_d) = cell_to_node(c)
+          dual % bnd_cond % color(b_d) = bc
 
           ! Store node_to_face (for the next step, adding edges)
           node_to_face(n_p) = f_d
@@ -437,11 +446,6 @@
   end do
 
   ! Prepare for saving
-  call Grid_Mod_Allocate_New_Numbers(dual,                &
-                                     dual % n_nodes,      &
-                                     dual % n_bnd_cells,  &
-                                     dual % n_cells,      &
-                                     dual % n_faces)
   call Grid_Mod_Initialize_New_Numbers(dual)
 
   CALL SAVE_VTU_FACES(DUAL)
