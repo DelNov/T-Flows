@@ -7,16 +7,17 @@
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type) :: grid, dual     ! grid to be converted and its dual
+  type(Grid_Type) :: grid(2)        ! grid to be converted and its dual
+  character(SL)   :: answer
   character(SL)   :: file_name
   character(SL)   :: file_format    ! 'UNKNOWN', 'FLUENT', 'GAMBIT', 'GMSH'
-  integer         :: l, p
+  integer         :: l, p, g, n_grids
 !==============================================================================!
 
   call Logo_Con
 
   print *, '#================================================================'
-  print *, '# Enter the name of the mesh file you are importing (with ext.):'
+  print *, '# Enter the name of the grid file you are importing (with ext.):'
   print *, '#----------------------------------------------------------------'
   read(*,*) file_name
 
@@ -37,8 +38,8 @@
 
   problem_name(1) = file_name(1:p-1)
 
-  grid % name = problem_name(1)
-  call To_Upper_Case(grid % name)
+  grid(1) % name = problem_name(1)
+  call To_Upper_Case(grid(1) % name)
 
   !----------------------------------------!
   !                                        !
@@ -46,60 +47,95 @@
   !                                        !
   !----------------------------------------!
   if(file_format .eq. 'FLUENT') then
-    call Load_Fluent(grid, file_name)
+    call Load_Fluent(grid(1), file_name)
   end if
   if(file_format .eq. 'GAMBIT') then
-    call Load_Gambit(grid, file_name)
+    call Load_Gambit(grid(1), file_name)
   end if
   if(file_format .eq. 'GMSH') then
-    call Load_Gmsh(grid, file_name)
-    call Find_Parents(grid)
+    call Load_Gmsh(grid(1), file_name)
+    call Find_Parents(grid(1))
   end if
 
   ! For Gambit and Gmsh grids, no face information is stored
   if(file_format .eq. 'GAMBIT' .or. file_format .eq. 'GMSH') then
-    call Grid_Topology(grid)
-    call Find_Faces   (grid)
+    call Grid_Topology(grid(1))
+    call Find_Faces   (grid(1))
   end if
-  call Calculate_Geometry(grid)
 
-  ! Keep in mind that Grid_Mod_Calculate_Wall_Distance is ...
-  ! ... faster if it is called after Grid_Mod_Sort_Faces_Smart
-  call Grid_Mod_Sort_Cells_Smart       (grid)
-  call Grid_Mod_Sort_Faces_Smart       (grid)
-  call Grid_Mod_Calculate_Wall_Distance(grid)
+  !---------------------------------------------------!
+  !                                                   !
+  !   Decide if you are going for dual grid as well   !
+  !                                                   !
+  !---------------------------------------------------!
+  print *, '#================================================='
+  print *, '# Would you like to create a dual grid? (yes/no)'
+  print *, '#-------------------------------------------------'
+  call File_Mod_Read_Line(5)
+  answer = line % tokens(1)
+  call To_Upper_Case(answer)
 
-  call Grid_Mod_Initialize_New_Numbers(grid)
+  n_grids = 1
+  if(answer .eq. 'YES') n_grids = 2
 
   !-------------------------------!
   !                               !
-  !   Save files for processing   !
+  !   Browse through both grids   !
   !                               !
   !-------------------------------!
-  call Grid_Mod_Save_Cfn(grid, 0,             &
-                         grid % n_nodes,      &
-                         grid % n_cells,      &
-                         grid % n_faces,      &
-                         grid % n_shadows,    &
-                         grid % n_bnd_cells)
+  do g = 1, n_grids
 
-  call Grid_Mod_Save_Geo(grid, 0)
+    if(n_grids .eq. 2) then
+      print *,            '#======================================'
+      print *,            '#                                      '
+    if(g .eq. 1) print *, '# Processing the first (primal) grid'
+    if(g .eq. 2) print *, '# Processing the second (dual) grid'
+      print *,            '#                                    '
+      print *,            '#--------------------------------------'
+    end if
 
-  !-----------------------------------------------------!
-  !                                                     !
-  !   Save grid for visualisation and post-processing   !
-  !                                                     !
-  !-----------------------------------------------------!
+    !--------------------------------------!
+    !   Calculate geometrical quantities   !
+    !--------------------------------------!
+    call Calculate_Geometry(grid(g))
 
-  ! Create output in vtu format
-  call Save_Vtu_Cells(grid, 0,         &
-                      grid % n_nodes,  &
-                      grid % n_cells)
-  call Save_Vtu_Faces(grid)
+    ! Keep in mind that Grid_Mod_Calculate_Wall_Distance is ...
+    ! ... faster if it is called after Grid_Mod_Sort_Faces_Smart
+    call Grid_Mod_Sort_Cells_Smart       (grid(g))
+    call Grid_Mod_Sort_Faces_Smart       (grid(g))
+    call Grid_Mod_Calculate_Wall_Distance(grid(g))
 
-  ! Create 1D file (used for channel or pipe flow)
-  call Probe_1d_Nodes(grid)
+    call Grid_Mod_Initialize_New_Numbers(grid(g))
 
-  call Create_Dual(grid, dual)   ! It should be in Grid_Mod
+    !-------------------------------!
+    !   Save files for processing   !
+    !-------------------------------!
+    call Grid_Mod_Save_Cfn(grid(g), 0,             &
+                           grid(g) % n_nodes,      &
+                           grid(g) % n_cells,      &
+                           grid(g) % n_faces,      &
+                           grid(g) % n_shadows,    &
+                           grid(g) % n_bnd_cells)
+
+    call Grid_Mod_Save_Geo(grid(g), 0)
+
+    !-----------------------------------------------------!
+    !   Save grid for visualisation and post-processing   !
+    !-----------------------------------------------------!
+
+    ! Create output in vtu format
+    call Save_Vtu_Cells(grid(g), 0,         &
+                        grid(g) % n_nodes,  &
+                        grid(g) % n_cells)
+    call Save_Vtu_Faces(grid(g))
+
+    ! Create 1D file (used for channel or pipe flow)
+    call Probe_1d_Nodes(grid(g))
+
+    if(g .eq. 1 .and. n_grids .eq. 2) then
+      call Create_Dual(grid(1), grid(2))   ! It should be in Grid_Mod
+    end if
+
+  end do
 
   end program

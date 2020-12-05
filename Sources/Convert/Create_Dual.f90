@@ -440,19 +440,14 @@
 
   end do  ! do s
 
+  !--------------------------------------------------------!
+  !                                                        !
+  !   Fix the number of nodes for polyhedral (all) cells   !
+  !                                                        !
+  !--------------------------------------------------------!
   do c = 1, dual % n_cells
     call Sort_Mod_Int(dual % cells_n(1:dual % cells_n_nodes(c),c))
     dual % cells_n_nodes(c) = -dual % cells_n_nodes(c)
   end do
-
-  ! Prepare for saving
-  call Grid_Mod_Initialize_New_Numbers(dual)
-
-  CALL SAVE_VTU_FACES(DUAL)
-  CALL SAVE_VTU_CELLS(DUAL, 0,         &
-                      DUAL % N_NODES,  &
-                      DUAL % N_CELLS)
-
-  STOP
 
   end subroutine
