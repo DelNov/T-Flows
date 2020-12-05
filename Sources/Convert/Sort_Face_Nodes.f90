@@ -19,6 +19,7 @@
   integer :: order(MAX_FACES_N_NODES)    ! carry-on array with indices
   integer :: max_loc(2)
   real    :: prod(3), angles(MAX_FACES_N_NODES, MAX_FACES_N_NODES)
+  real    :: sumang, criter
 !==============================================================================!
 
   ! Take alias
@@ -57,13 +58,20 @@
 
   ! Multiply each with each to find angles between them
   ! (Each of these multiplications is a guess for the normal)
+  cnt               = 0
+  sumang            = 0.0
   angles(1:nn,1:nn) = 0.0
   do i = 1, nn
     do j = i + 1, nn
       prod(1:3) = Math_Mod_Cross_Product(np_3d(1:3,i), np_3d(1:3,j))
       angles(i,j) = asin(norm2(prod(1:3))) * 57.2957795131
+      if(angles(i,j) > MILI) then
+        cnt = cnt + 1
+        sumang = sumang + angles(i,j)
+      end if
     end do
   end do
+  criter = 0.75 * sumang / real(cnt)
 
   ! Find maximum angle, that one wil be relevant for the sense od normal
   max_loc = maxloc(angles(1:nn,1:nn));  i = max_loc(1);  j = max_loc(2)
@@ -72,12 +80,12 @@
   ! Multiply each with each selectivelly, taking into account only bigger
   ! angles, and taking care to correct the signs in proper sense.
   ! Average the surface normal along the way.
-  cnt = 0
+  cnt           = 0
   normal_p(1:3) = 0.0
   do i = 1, nn
     do j = i + 1, nn
-      if(angles(i,j) > 30.0) then  ! take only reasonalby big angles
-        cnt = cnt + 1              ! one more sample
+      if(angles(i,j) > criter) then  ! take only reasonalby big angles
+        cnt = cnt + 1                ! one more sample
         prod(1:3) = Math_Mod_Cross_Product(np_3d(1:3,i), np_3d(1:3,j))
         if(dot_product(prod(1:3), sense(1:3)) < 0) then  ! correct the sign ...
           prod(1:3) = -prod(1:3)                         ! ... if needed
