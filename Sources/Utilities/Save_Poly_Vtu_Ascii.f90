@@ -129,7 +129,7 @@
       ! Write number of polyfaces for this cell
       write(fu,'(a,i9)') IN_5, grid % cells_n_polyg(c)
 
-      go i_pol = 1, grid % cells_n_polyg(c)
+      do i_pol = 1, grid % cells_n_polyg(c)
         s = grid % cells_p(i_pol, c)
         n = grid % faces_n_nodes(s)
         write(fu,'(a,64i9)') IN_5,  grid % faces_n_nodes(s),  &
