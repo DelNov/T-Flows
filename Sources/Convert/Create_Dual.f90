@@ -19,7 +19,7 @@
   integer              :: bc, e, c, c1, c2, s, n, n1, n2
   integer              :: i, i_nod, j_nod, i_edg
   integer              :: n_bc, d_nn  ! number of BCs and dual grid node number
-  integer              :: n_p, n_d, f_d, f_p, c_p, cnt
+  integer              :: n_p, n_d, f_d, b_d, f_p, c_p, cnt
   integer, allocatable :: full_edge_n (:,:)   ! edges, nodes
   integer, allocatable :: full_edge_fb(:)     ! edges' faces at boundary
   integer, allocatable :: full_edge_bc(:)     ! edges' faces boundary colors
@@ -27,12 +27,17 @@
   integer, allocatable :: comp_edge_e(:)      ! compressed edge end
   integer, allocatable :: cell_to_node(:)
   integer, allocatable :: node_to_face(:)
+  integer, allocatable :: node_to_cell(:)
   integer, allocatable :: edge_to_node(:)
   integer, allocatable :: node_to_node(:)     ! for sharp corners one day
   integer              :: c_p_list(2048)      ! prim cell and ...
   integer              :: n_d_list(2048)      ! ... dual node list
-  integer              :: curr_f_d, unused, dual_f_here
+  integer              :: curr_f_d, curr_b_d, unused, dual_f_here
+  logical              :: found
 !==============================================================================!
+
+  ! Alias(es)
+  n_bc = prim % n_bnd_cond
 
   !-----------------------------!
   !                             !
@@ -41,8 +46,12 @@
   !-----------------------------!
   problem_name(1) = trim(problem_name(1)) // '-dual'
 
-  ! Alias(es)
-  n_bc = prim % n_bnd_cond
+  !-------------------------------------------------------------!
+  !                                                             !
+  !   Almost sure: you will be creating polyhedral grids here   !
+  !                                                             !
+  !-------------------------------------------------------------!
+  dual % polyhedral = .true.
 
   !---------------------------------------!
   !                                       !
@@ -160,17 +169,16 @@
   comp_edge_e(prim % n_edges) = e-1  ! mark the end of the last edge
 
   !-----------------------!
+  !                       !
   !   Allocate mappings   !
+  !                       !
   !-----------------------!
-  allocate(cell_to_node(-prim % n_bnd_cells:prim % n_cells))
-  allocate(node_to_node( prim % n_nodes))
-  allocate(node_to_face( prim % n_nodes))
-  allocate(edge_to_node( prim % n_edges))
-
-  cell_to_node(:) = 0
-  node_to_node(:) = 0
-  node_to_face(:) = 0
-  edge_to_node(:) = 0
+  allocate(cell_to_node(-prim % n_bnd_cells  &
+                        :prim % n_cells));  cell_to_node(:) = 0
+  allocate(node_to_node( prim % n_nodes));  node_to_node(:) = 0
+  allocate(node_to_face( prim % n_nodes));  node_to_face(:) = 0
+  allocate(node_to_cell( prim % n_nodes));  node_to_cell(:) = 0
+  allocate(edge_to_node( prim % n_edges));  edge_to_node(:) = 0
 
   !----------------------------------!
   !                                  !
@@ -220,7 +228,7 @@
     n1 = prim % edges_n(1, e)
     n2 = prim % edges_n(2, e)
     dual % faces_c(1, f_d) = n1
-    dual % faces_c(1, f_d) = n2
+    dual % faces_c(2, f_d) = n2
 
     ! Store nodes for each face in dual grid ...
     ! ... which are cells around each edge in prim
@@ -291,7 +299,10 @@
   !   Boundary mapping               !
   !                                  !
   !----------------------------------!
-  curr_f_d = prim % n_edges  ! equal to the number of faces inside
+
+  ! Update current number of dual faces -> equal to the number of faces inside
+  curr_f_d = prim % n_edges
+  curr_b_d = 0
 
   do bc = 1, prim % n_bnd_cond
 
@@ -302,9 +313,10 @@
     unused      = N_Cells_In_Bnd_Color(prim, bc)
     unused      = N_Edges_On_Bnd_Color(prim, bc)
 
-    !--------------------------------------------!
-    !   Find dual's face nodes from prim cells   !
-    !--------------------------------------------!
+    !-----------------------------------------!
+    !   Find dual's boundary face, and dual   !
+    !   boundary cell nodes from prim cells   !
+    !-----------------------------------------!
     do c = -prim % n_bnd_cells, -1
       if(prim % new_c(c) .gt. 0) then
 
@@ -312,21 +324,36 @@
         do i_nod = 1, prim % cells_n_nodes(c)
           n_p = prim % cells_n(i_nod, c)
 
+          ! Additional boundary face in the dual grid
           f_d  = curr_f_d + prim % new_n(n_p)
-
           dual % faces_n_nodes(f_d) = dual % faces_n_nodes(f_d) + 1
           dual % faces_n(dual % faces_n_nodes(f_d), f_d) = cell_to_node(c)
 
+          ! Additional boundary cell in the dual grid
+          b_d  = curr_b_d - prim % new_n(n_p)
+          dual % cells_n_nodes(b_d) = dual % cells_n_nodes(b_d) + 1
+          dual % cells_n(dual % cells_n_nodes(b_d), b_d) = cell_to_node(c)
+
           ! Store node_to_face (for the next step, adding edges)
           node_to_face(n_p) = f_d
+          node_to_cell(n_p) = b_d
+
+          ! Store cells surrounding each face in the dual grid ...
+          ! ... which correspond to nodes in the prim grid
+          dual % faces_c(1, f_d) = n_p  ! link to cell inside
+          dual % faces_c(2, f_d) = b_d  ! link to boundary cell
         end do
+
       end if
     end do
 
+    ! Update current number of dual faces
     curr_f_d = curr_f_d + dual_f_here
+    curr_b_d = curr_b_d - dual_f_here
 
     !---------------------------------------------------------!
     !   Add additional nodes to dual's face from prim edges   !
+    !   Here we work on the faces already introduced above    !
     !---------------------------------------------------------!
     do e = 1, prim % n_edges
       if(prim % new_e(e) .gt. 0) then
@@ -336,11 +363,14 @@
           n_p = prim % edges_n(i_nod, e)
 
           ! This node_to_face was stored in the previous step
-          ! (Here we work on the faces introduced above)
           f_d = node_to_face(n_p)
-
           dual % faces_n_nodes(f_d) = dual % faces_n_nodes(f_d) + 1
           dual % faces_n(dual % faces_n_nodes(f_d), f_d) = edge_to_node(e)
+
+          ! This node_to_cell was stored in the previous step
+          b_d = node_to_cell(n_p)
+          dual % cells_n_nodes(b_d) = dual % cells_n_nodes(b_d) + 1
+          dual % cells_n(dual % cells_n_nodes(b_d), b_d) = edge_to_node(e)
         end do
       end if
     end do
@@ -356,22 +386,68 @@
     call Sort_Face_Nodes(dual, s)
   end do
 
-    ! Prepare for saving
-    ALLOCATE(DUAL % NEW_N(DUAL % N_NODES))
-    DO N = 1, DUAL % N_NODES
-      DUAL % NEW_N(N) = N
-    END DO
-    ! DO C = -DUAL % N_BND_CELLS, DUAL % N_CELLS
-    !   DUAL % NEW_C(C) = C
-    !   DUAL % OLD_C(C) = C
-    ! END DO
-    ALLOCATE(DUAL % NEW_F(DUAL % N_FACES))
-    ALLOCATE(DUAL % OLD_F(DUAL % N_FACES))
-    DO S = 1, DUAL % N_FACES + DUAL % N_SHADOWS
-      DUAL % NEW_F(S) = S
-      DUAL % OLD_F(S) = S
-    END DO
-    CALL SAVE_VTU_FACES(DUAL)
+  !----------------------------------!
+  !                                  !
+  !   Store cells' faces and nodes   !
+  !                                  !
+  !----------------------------------!
+  do s = 1, dual % n_faces
+    c1 = dual % faces_c(1, s)
+    c2 = dual % faces_c(2, s)
+
+    !----------------------------------------------------!
+    !   Store faces surrounding each cell in dual grid   !
+    !----------------------------------------------------!
+    dual % cells_n_polyg(c1) = dual % cells_n_polyg(c1) + 1
+    dual % cells_n_polyg(c2) = dual % cells_n_polyg(c2) + 1
+    dual % cells_p(dual % cells_n_polyg(c1), c1) = s
+    dual % cells_p(dual % cells_n_polyg(c2), c2) = s
+
+    !----------------------------------------------------!
+    !   Store nodes surrounding each cell in dual grid   !
+    !----------------------------------------------------!
+    do i_nod = 1, dual % faces_n_nodes(s)
+      n = dual % faces_n(i_nod, s)
+
+      ! Handle cell 1
+      do j_nod = 1, dual % cells_n_nodes(c1)
+        n1 = dual % cells_n(j_nod, c1)
+        if(n1 .eq. n) goto 1
+      end do  ! j_nod
+      dual % cells_n_nodes(c1) = dual % cells_n_nodes(c1) + 1
+      dual % cells_n(dual % cells_n_nodes(c1), c1) = n
+1     continue
+
+      ! Handle cell 2
+      do j_nod = 1, dual % cells_n_nodes(c2)
+        n2 = dual % cells_n(j_nod, c2)
+        if(n2 .eq. n) goto 2
+      end do  ! j_nod
+      dual % cells_n_nodes(c2) = dual % cells_n_nodes(c2) + 1
+      dual % cells_n(dual % cells_n_nodes(c2), c2) = n
+2     continue
+
+    end do  ! do i_nod
+
+  end do  ! do s
+
+  do c = 1, dual % n_cells
+    call Sort_Mod_Int(dual % cells_n(1:dual % cells_n_nodes(c),c))
+    dual % cells_n_nodes(c) = -dual % cells_n_nodes(c)
+  end do
+
+  ! Prepare for saving
+  call Grid_Mod_Allocate_New_Numbers(dual,                &
+                                     dual % n_nodes,      &
+                                     dual % n_bnd_cells,  &
+                                     dual % n_cells,      &
+                                     dual % n_faces)
+  call Grid_Mod_Initialize_New_Numbers(dual)
+
+  CALL SAVE_VTU_FACES(DUAL)
+  CALL SAVE_VTU_CELLS(DUAL, 0,         &
+                      DUAL % N_NODES,  &
+                      DUAL % N_CELLS)
 
   STOP
 
