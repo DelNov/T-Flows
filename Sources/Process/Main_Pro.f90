@@ -92,7 +92,7 @@
 
     ! Load the finite volume grid
     call Grid_Mod_Load_Cfn(grid(d), this_proc, domain=d)
-    call Grid_Mod_Load_Geo(grid(d), this_proc, domain=d)
+    call Grid_Mod_Load_Dim(grid(d), this_proc, domain=d)
     call Grid_Mod_Form_Cells_Comm(grid(d))
     call Grid_Mod_Form_Nodes_Comm(grid(d))
     call Grid_Mod_Form_Maps(grid(d))

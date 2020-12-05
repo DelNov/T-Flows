@@ -2,7 +2,7 @@
 **/Makefile.in
 *.cas
 *.cfn
-*.geo
+*.dim
 *.buf
 *.map
 *.real

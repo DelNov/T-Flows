@@ -72,7 +72,7 @@
                          grid % n_shadows,    &
                          grid % n_bnd_cells)
 
-  call Grid_Mod_Save_Geo(grid, 0)
+  call Grid_Mod_Save_Dim(grid, 0)
 
   !-----------------------------------------------------!
   !   Save grid for visualisation and post-processing   !

@@ -1,8 +1,7 @@
 !==============================================================================!
-  subroutine Grid_Mod_Save_Geo(grid,        &
-                               sub)
+  subroutine Grid_Mod_Save_Dim(grid, sub)
 !------------------------------------------------------------------------------!
-!   Writes file with geomeatrical data: name.geo                               !
+!   Writes file with grid dimensions (.dim, used to be .geo)                   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -15,10 +14,10 @@
 
   !----------------------!
   !                      !
-  !   Create .geo file   !
+  !   Create .dim file   !
   !                      !
   !----------------------!
-  call File_Mod_Set_Name(name_out, processor=sub, extension='.geo')
+  call File_Mod_Set_Name(name_out, processor=sub, extension='.dim')
   call File_Mod_Open_File_For_Writing_Binary(name_out, fu)
 
   !----------------------!

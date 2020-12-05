@@ -8,7 +8,7 @@
   use Grid_Mod, only: Grid_Type,           &
                       Grid_Mod_Decompose,  &
                       Grid_Mod_Load_Cfn,   &
-                      Grid_Mod_Load_Geo
+                      Grid_Mod_Load_Dim
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Locals]-----------------------------------!
@@ -28,7 +28,7 @@
   ! Load the finite volume grid
   call Grid_Mod_Load_Cfn  (grid, 0)
   call Allocate_Additional(grid)
-  call Grid_Mod_Load_Geo  (grid, 0)
+  call Grid_Mod_Load_Dim  (grid, 0)
 
   ! Initialize processor numbers (poor idea to put it here)
   grid % comm % cell_proc(-grid % n_bnd_cells:grid % n_cells) = 1

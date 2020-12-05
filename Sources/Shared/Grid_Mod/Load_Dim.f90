@@ -1,7 +1,7 @@
 !==============================================================================!
-  subroutine Grid_Mod_Load_Geo(grid, this_proc, domain)
+  subroutine Grid_Mod_Load_Dim(grid, this_proc, domain)
 !------------------------------------------------------------------------------!
-!   Reads:  name.geo                                                           !
+!   Reads file with grid dimensions (.dim, used to be .geo)                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -16,10 +16,10 @@
   !----------------------------!
   !                            !
   !     Read the file with     !
-  !   geometrical quantities   !
+  !   geometrical dimensions   !
   !                            !
   !----------------------------!
-  call File_Mod_Set_Name(name_in, processor=this_proc, extension='.geo',  &
+  call File_Mod_Set_Name(name_in, processor=this_proc, extension='.dim',  &
                          domain=domain)
   call File_Mod_Open_File_For_Reading_Binary(name_in, fu, this_proc)
 

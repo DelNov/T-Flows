@@ -12,7 +12,7 @@
                            Grid_Mod_Sort_Cells_By_Index,  &
                            Grid_Mod_Sort_Faces_By_Index,  &
                            Grid_Mod_Save_Cfn,             &
-                           Grid_Mod_Save_Geo
+                           Grid_Mod_Save_Dim
   use Sort_Mod       ! it's a collection of subroutines, no need for "only"
   use Save_Grid_Mod
 !------------------------------------------------------------------------------!
@@ -325,7 +325,7 @@
                            ns_sub,       &   ! number of shadow faces
                            nbc_sub)
 
-    call Grid_Mod_Save_Geo(grid,         &
+    call Grid_Mod_Save_Dim(grid,         &
                            sub)
 
     call Save_Vtu_Cells(grid,       &
