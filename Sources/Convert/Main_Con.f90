@@ -86,12 +86,13 @@
   do g = 1, n_grids
 
     if(n_grids .eq. 2) then
-      print *,            '#======================================'
-      print *,            '#                                      '
-    if(g .eq. 1) print *, '# Processing the first (primal) grid'
-    if(g .eq. 2) print *, '# Processing the second (dual) grid'
-      print *,            '#                                    '
-      print *,            '#--------------------------------------'
+      print *,              '#======================================'
+      print *,              '#                                      '
+      if(g .eq. 1) print *, '# Processing the first (primal) grid'
+      if(g .eq. 2) print *, '# Processing the second (dual) grid'
+      print *,              '#                                    '
+      print *,              '#--------------------------------------'
+      if(g .eq. 2) call Create_Dual(grid(1), grid(2))
     end if
 
     !--------------------------------------!
@@ -131,10 +132,6 @@
 
     ! Create 1D file (used for channel or pipe flow)
     call Probe_1d_Nodes(grid(g))
-
-    if(g .eq. 1 .and. n_grids .eq. 2) then
-      call Create_Dual(grid(1), grid(2))   ! It should be in Grid_Mod
-    end if
 
   end do
 
