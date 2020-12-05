@@ -14,6 +14,7 @@
   integer :: N_Cells_In_Bnd_Color
   integer :: N_Nodes_In_Bnd_Color
   integer :: N_Edges_On_Bnd_Color
+  integer :: N_Sharp_Corners
   integer :: N_Sharp_Edges
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: bc, e, c, c1, c2, s, n, n1, n2
@@ -29,7 +30,7 @@
   integer, allocatable :: node_to_face(:)
   integer, allocatable :: node_to_cell(:)
   integer, allocatable :: edge_to_node(:)
-  integer, allocatable :: node_to_node(:)     ! for sharp corners one day
+  integer, allocatable :: sharp_corner(:)     ! for sharp corners one day
   integer              :: c_p_list(2048)      ! prim cell and ...
   integer              :: n_d_list(2048)      ! ... dual node list
   integer              :: curr_f_d, curr_b_d, unused, dual_f_here
@@ -174,7 +175,7 @@
   !-----------------------!
   allocate(cell_to_node(-prim % n_bnd_cells  &
                         :prim % n_cells));  cell_to_node(:) = 0
-  allocate(node_to_node( prim % n_nodes));  node_to_node(:) = 0
+  allocate(sharp_corner( prim % n_nodes));  sharp_corner(:) = 0
   allocate(node_to_face( prim % n_nodes));  node_to_face(:) = 0
   allocate(node_to_cell( prim % n_nodes));  node_to_cell(:) = 0
   allocate(edge_to_node( prim % n_edges));  edge_to_node(:) = 0
@@ -218,15 +219,21 @@
   dual % n_faces = prim % n_edges  &   ! for faces inside
                  + dual % n_bnd_cells  ! for faces on the boundary
   dual % n_cells = prim % n_nodes
-  dual % n_nodes = prim % n_cells + prim % n_bnd_cells + N_Sharp_Edges(prim)
+  dual % n_nodes = prim % n_cells         &
+                 + prim % n_bnd_cells     &
+                 + N_Sharp_Edges(prim)    &
+                 + N_Sharp_Corners(prim, sharp_corner)
 
   call Allocate_Memory(dual)
+
+  print *, '# Number of sharp corners = ', N_Sharp_Corners(prim, sharp_corner)
 
   !-----------------------------------------!
   !                                         !
   !   Browse through all the edges to map   !
   !                                         !
   !-----------------------------------------!
+
   do e = 1, prim % n_edges
 
     f_d = e
@@ -280,7 +287,7 @@
     !------------------------------------------------------------!
     if(prim % new_e(e) .gt. 0) then
 
-      ! This is tough - additional dual node number :-(
+      ! Additional dual node number
       d_nn = prim % n_cells      &
            + prim % n_bnd_cells  &
            + prim % new_e(e)
@@ -298,6 +305,7 @@
 
       ! Store edge to node mapping (prim edge to dual node)
       edge_to_node(e) = d_nn
+
     end if
 
   end do  ! through edges
@@ -380,6 +388,22 @@
           b_d = node_to_cell(n_p)
           dual % cells_n_nodes(b_d) = dual % cells_n_nodes(b_d) + 1
           dual % cells_n(dual % cells_n_nodes(b_d), b_d) = edge_to_node(e)
+
+          ! The grid has sharp corners, add them to boundary faces and cells
+          if(sharp_corner(n_p) .gt. 0) then
+            n_d = dual % n_nodes - sharp_corner(n_p) + 1
+            dual % xn(n_d) = prim % xn(n_p)
+            dual % yn(n_d) = prim % yn(n_p)
+            dual % zn(n_d) = prim % zn(n_p)
+
+            f_d = node_to_face(n_p)
+            dual % faces_n_nodes(f_d) = dual % faces_n_nodes(f_d) + 1
+            dual % faces_n(dual % faces_n_nodes(f_d), f_d) = n_d
+
+            b_d = node_to_cell(n_p)
+            dual % cells_n_nodes(b_d) = dual % cells_n_nodes(b_d) + 1
+            dual % cells_n(dual % cells_n_nodes(b_d), b_d) = n_d
+          end if
         end do
       end if
     end do

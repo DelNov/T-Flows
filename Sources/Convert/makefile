@@ -155,6 +155,7 @@ SRC_FUN += Allocate_Memory.f90       \
            N_Cells_In_Bnd_Color.f90  \
            N_Edges_In_Bnd_Color.f90  \
            N_Nodes_In_Bnd_Color.f90  \
+           N_Sharp_Corners.f90       \
            N_Sharp_Edges.f90         \
            Sort_Face_Nodes.f90       \
            Main_Con.f90
