@@ -12,7 +12,7 @@
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
   integer :: e, cnt, s1, s2
-  real    :: n1(3), n2(3)
+  real    :: norm_1(3), norm_2(3)
 !==============================================================================!
 
   ! Nullify on entry
@@ -33,12 +33,14 @@
       s2 = grid % edges_fb(2, e)
 
       ! Compute normals of the two faces surrounding the edge
-      n1(1) = grid % sx(s1);  n1(2) = grid % sy(s1);  n1(3) = grid % sz(s1)
-      n2(1) = grid % sx(s2);  n2(2) = grid % sy(s2);  n2(3) = grid % sz(s2)
-      n1(1:3) = n1(1:3) / norm2(n1(1:3))
-      n2(1:3) = n2(1:3) / norm2(n2(1:3))
+      norm_1(1) = grid % sx(s1);  norm_2(1) = grid % sx(s2)
+      norm_1(2) = grid % sy(s1);  norm_2(2) = grid % sy(s2)
+      norm_1(3) = grid % sz(s1);  norm_2(3) = grid % sz(s2)
+      norm_1(1:3) = norm_1(1:3) / norm2(norm_1(1:3))
+      norm_2(1:3) = norm_2(1:3) / norm2(norm_2(1:3))
 
-      if(abs(dot_product(n1(1:3), n2(1:3))) < 0.7071) then
+      ! This has to do with 45 degrees, but I forgot how exactly
+      if(abs(dot_product(norm_1(1:3), norm_2(1:3))) < 0.7071) then
         cnt = cnt + 1
         grid % new_e(e) = cnt
       end if
