@@ -157,14 +157,8 @@
 
     end do  ! c1
 
-    do i_fac = 1, cnt_f
-      write(100,'(99i9)') cr1(i_fac), cr2(i_fac), cr3(i_fac), w1(i_fac), w2(i_fac)
-    end do
     call Sort_Mod_3_Int_Carry_2_Int(cr1(1:cnt_f), cr2(1:cnt_f), cr3(1:cnt_f),  &
                                     w1(1:cnt_f), w2(1:cnt_f))
-    do i_fac = 1, cnt_f
-      write(200,'(99i9)') cr1(i_fac), cr2(i_fac), cr3(i_fac), w1(i_fac), w2(i_fac)
-    end do
 
     n_match = 0
     do i_fac = 1, cnt_f-1
