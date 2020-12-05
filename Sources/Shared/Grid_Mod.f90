@@ -203,6 +203,7 @@
   include 'Grid_Mod/Form_Cells_Comm.f90'
   include 'Grid_Mod/Form_Maps.f90'
   include 'Grid_Mod/Form_Nodes_Comm.f90'
+  include 'Grid_Mod/Initialize_New_Numbers.f90'
   include 'Grid_Mod/Load_Cfn.f90'
   include 'Grid_Mod/Load_Geo.f90'
   include 'Grid_Mod/Print_Bnd_Cond_Info.f90'

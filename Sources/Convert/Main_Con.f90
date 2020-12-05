@@ -8,9 +8,9 @@
   implicit none
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type) :: grid, dual     ! grid to be converted and its dual
-  integer         :: c, n, s, l, p
   character(SL)   :: file_name
   character(SL)   :: file_format    ! 'UNKNOWN', 'FLUENT', 'GAMBIT', 'GMSH'
+  integer         :: l, p
 !==============================================================================!
 
   call Logo_Con
@@ -69,18 +69,7 @@
   call Grid_Mod_Sort_Faces_Smart       (grid)
   call Grid_Mod_Calculate_Wall_Distance(grid)
 
-  ! Prepare for saving
-  do n = 1, grid % n_nodes
-    grid % new_n(n) = n
-  end do
-  do c = -grid % n_bnd_cells, grid % n_cells
-    grid % new_c(c) = c
-    grid % old_c(c) = c
-  end do
-  do s = 1, grid % n_faces + grid % n_shadows
-    grid % new_f(s) = s
-    grid % old_f(s) = s
-  end do
+  call Grid_Mod_Initialize_New_Numbers(grid)
 
   !-------------------------------!
   !                               !
