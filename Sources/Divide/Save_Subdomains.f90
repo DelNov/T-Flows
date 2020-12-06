@@ -244,7 +244,9 @@
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
-      if(grid % new_f(s) .eq. 0) then  ! if face hasn't been marked yet
+      if(grid % new_f(s)  .eq. 0 .and.  &
+         grid % new_c(c1) .ne. 0 .and.  &
+         grid % new_c(c2) .ne. 0) then  ! if face hasn't been marked yet
 
         if( (grid % cells_n_nodes(c1) .lt. 0)      .and.  &  ! c1 is polyhedron
             (grid % new_c(c1) .ne. 0)              .and.  &  ! and is in the
