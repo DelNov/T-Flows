@@ -9,8 +9,7 @@
   type(Grid_Type)    :: grid
   logical            :: real_run
 !-----------------------------------[Locals]-----------------------------------!
-  integer                 :: c, s
-  integer                 :: c1, c2, m, run
+  integer                 :: c, c1, c2, m, run
   integer, dimension(6,4) :: fn  ! link faces' nodes for a hexahedral cell
                                  ! not quite the same as Gambit's neu numbering
 !------------------------------------------------------------------------------!
