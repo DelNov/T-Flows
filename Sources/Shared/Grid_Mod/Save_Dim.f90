@@ -8,7 +8,7 @@
   type(Grid_Type) :: grid
   integer         :: sub
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: c, s, n, c1, c2, var, subo, fu
+  integer       :: c, s, n, c1, c2, var, fu
   character(SL) :: name_out
 !==============================================================================!
 
