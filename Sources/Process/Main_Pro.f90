@@ -93,6 +93,8 @@
     ! Load the finite volume grid
     call Grid_Mod_Load_Cfn(grid(d), this_proc, domain=d)
     call Grid_Mod_Load_Dim(grid(d), this_proc, domain=d)
+    call Grid_Mod_Calculate_Face_Geometry(grid(d))
+
     call Grid_Mod_Form_Cells_Comm(grid(d))
     call Grid_Mod_Form_Nodes_Comm(grid(d))
     call Grid_Mod_Form_Maps(grid(d))
@@ -139,15 +141,10 @@
     ! Read numerical models from control file (after the memory is allocated)
     call Read_Control_Numerical(flow(d), turb(d), mult(d))
 
-    call Grid_Mod_Calculate_Face_Geometry(grid(d))
     call Grid_Mod_Find_Nodes_Cells(grid(d))
     call Grid_Mod_Find_Periodic_Faces(grid(d))
     call Grid_Mod_Calculate_Global_Volumes(grid(d))
-    call Grid_Mod_Calculate_Weights_Cells_To_Nodes(grid(d))
-    call Grid_Mod_Calculate_Weights_Nodes_To_Cells(grid(d))
     call Field_Mod_Calculate_Grad_Matrix(flow(d))
-    call Field_Mod_Calculate_Grad_Matrix_Nodes_To_Cells(flow(d))
-    call Field_Mod_Calculate_Grad_Matrix_Cells_To_Nodes(flow(d))
 
     ! Allocate memory for linear systems of equations
     ! (You need face geomtry for this step)
