@@ -127,13 +127,43 @@
                                  order(1:nn))
 
   ! Rotate for better visualisation with Paraview.  Paraview constructs
+  ! a polygon from triangles which all originate in one (first) node.
+  ! If the first node is defined exactly at the sharpest edge, the faces
+  ! visualized in Paraview stand a good chance to look better.  All in 
+  ! all: try to keep the first node first for better visuals. Here we
+  ! find the node with the smalles angle and make it first in the list
+  !2  do j = 1, nn
+  !2    i = j - 1;  if(i <  1) i = nn
+  !2    k = j + 1;  if(k > nn) k =  1
+  !2    ni = grid % faces_n(i, s)
+  !2    nj = grid % faces_n(j, s)
+  !2    nk = grid % faces_n(k, s)
+  !2    vec_ji(1) = grid % xn(nj) - grid % xn(ni)
+  !2    vec_ji(2) = grid % yn(nj) - grid % yn(ni)
+  !2    vec_ji(3) = grid % zn(nj) - grid % zn(ni)
+  !2    vec_jk(1) = grid % xn(nj) - grid % xn(nk)
+  !2    vec_jk(2) = grid % yn(nj) - grid % yn(nk)
+  !2    vec_jk(3) = grid % zn(nj) - grid % zn(nk)
+  !2    mag_ji = 1.05 * norm2(vec_ji(1:3))
+  !2    mag_jk = 1.05 * norm2(vec_jk(1:3))
+  !2    vec_ji(1:3) = vec_ji(1:3) / mag_ji
+  !2    vec_jk(1:3) = vec_jk(1:3) / mag_jk
+  !2    dot_prod = dot_product(vec_ji, vec_jk)
+  !2    dot_prod = max(dot_prod, -0.999999)
+  !2    dot_prod = min(dot_prod, +0.999999)
+  !2    sorting(j) = acos(dot_prod) * 57.2957795131
+  !2  end do
+  !2  min_loc = minloc(sorting(1:nn),1)
+  !2  grid % faces_n(1:nn, s) = cshift(grid % faces_n(1:nn, s), min_loc+1)
+
+  ! Rotate for better visualisation with Paraview.  Paraview constructs
   ! a polygon from triangles which all originate in the first node.  If
   ! the first node is defined exactly at the sharpest edge, which is also
   ! the first one to be inserted in polynomial face in the calling func.
   ! All in all: try to keep the first node first for better visuals.
-  do while(order(1) .ne. 1)
-    order(1:nn)             = cshift(order(1:nn), 1)
-    grid % faces_n(1:nn, s) = cshift(grid % faces_n(1:nn, s), 1)
-  end do
+  !1 do while(order(1) .ne. 1)
+  !1   order(1:nn)             = cshift(order(1:nn), 1)
+  !1   grid % faces_n(1:nn, s) = cshift(grid % faces_n(1:nn, s), 1)
+  !1 end do
 
   end subroutine
