@@ -14,7 +14,7 @@
   type(Grid_Type) :: grid
   integer         :: sub, nn_sub, nc_sub, nf_sub, ns_sub, nbc_sub
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: c, n, s, fu, c1, c2
+  integer       :: c, n, s, fu, c1, c2, ss, sr
   character(SL) :: name_out
 !==============================================================================!
 
@@ -266,13 +266,29 @@
   end do
 
   ! Faces' shadows
-  do s = 1, grid % n_faces + grid % n_shadows
-    if(grid % old_f(s) .ne. 0) then
-      ! There is no shadow for this face
-      if(grid % faces_s(grid % old_f(s)) .eq. 0) then
-        write(fu) 0
+  do sr = 1, grid % n_faces
+    if(grid % old_f(sr) .ne. 0) then         ! this face will be saved
+      ss = grid % faces_s(grid % old_f(sr))  ! fetch its shadow
+
+      if(ss .ne. 0) then  ! the saved face (sr) has a shadow (ss)
+        write(fu) grid % new_f(ss)
       else
-        write(fu) grid % new_f(grid % faces_s(grid % old_f(s)))
+        write(fu) 0
+      end if
+    end if
+  end do
+
+  do ss = grid % n_faces + 1, grid % n_faces + grid % n_shadows
+    if(grid % old_f(ss) .ne. 0) then  ! this shadow face will be saved
+      sr = grid % faces_s(ss)         ! fetch its real counterpart
+
+      if(sr .ne. 0) then  ! the saved face (sr) has a shadow (ss)
+        write(fu) grid % new_f(sr)
+      else
+        print *, '# ERROR: Shadow faces points to zero face'
+        print *, '# This error is critical.  Exiting!'
+        call Comm_Mod_End
+        stop
       end if
     end if
   end do
