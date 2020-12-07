@@ -21,7 +21,7 @@
   type(Grid_Type) :: grid
   integer         :: n_buff_layers  ! number of buffer layers
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, n, s, c1, c2, sub, subo, i_nod, i_fac, sh, nn !exp:, lev
+  integer :: c, n, s, c1, c2, sub, subo, i_nod, i_fac, ss, sr, nn !exp:, lev
   integer :: nn_sub      ! number of nodes in the subdomain
   integer :: nc_sub      ! number of cells in the subdomain
   integer :: nf_sub      ! number of faces in the subdomain
@@ -76,9 +76,9 @@
              grid % comm % cell_proc(c2) .eq. sub  .and.  &
              grid % comm % cell_proc(c1) .eq. subo) then
             nn = grid % faces_n_nodes(s)
-            sh = grid % faces_s(s)
+            ss = grid % faces_s(s)
             grid % new_n(grid % faces_n(1:nn, s )) = -1
-            grid % new_n(grid % faces_n(1:nn, sh)) = -1
+            grid % new_n(grid % faces_n(1:nn, ss)) = -1
           end if
         end if
       end do
@@ -188,7 +188,6 @@
     !           !
     !-----------!
     nf_sub  = 0  ! number of faces in subdomain
-    ns_sub  = 0  ! number of shadow faces in subdomain
     do s = 1, grid % n_faces + grid % n_shadows
       grid % new_f(s) = 0
       grid % old_f(s) = 0
@@ -269,19 +268,22 @@
     !--------------------------!
     !   Step 4: shadow faces   !
     !--------------------------!
+    ns_sub  = 0  ! number of shadow faces in subdomain
 
-    ! Faces inside the domain
-    do s = grid % n_faces + 1, grid % n_faces + grid % n_shadows
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
-      if(c2 > 0) then
-        if( (grid % comm % cell_proc(c1) .eq. sub) .or.  &
-            (grid % comm % cell_proc(c2) .eq. sub) ) then
-          ns_sub = ns_sub + 1
-          grid % new_f(s) = nf_sub + ns_sub
-          grid % old_f(nf_sub + ns_sub) = s
-        end if
-      end if  ! c2 > 0
+    ! Browse through shadows only
+    do ss = grid % n_faces + 1, grid % n_faces + grid % n_shadows
+
+      ! Take real face from the shadow
+      sr = grid % faces_s(ss)
+
+      ! Check if real face was marked for saving
+      ! and if it is so, mark also the shadow
+      if( grid % new_f(sr) .ne. 0) then
+        ns_sub = ns_sub + 1                 ! increase shadow face counter ...
+        grid % new_f(ss) = nf_sub + ns_sub  ! ... but do not update pointers
+        grid % old_f(nf_sub + ns_sub) = ss  ! from shadow to real and back.
+      end if
+
     end do    ! through faces
 
     !-----------!
