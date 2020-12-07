@@ -154,13 +154,11 @@
   end do
 
   ! Correct face indexes for cells
-  do c = 1, grid % n_cells
-    if(grid % cells_n_nodes(c) .lt. 0) then  ! polyhedral cell
-      do n = 1, grid % cells_n_polyg(c)
-        s = grid % cells_p(n, c)             ! take the face's index
-        grid % cells_p(n, c) = new_f(s)
-      end do
-    end if
+  do c = -grid % n_bnd_cells, grid % n_cells
+    do n = 1, grid % cells_n_faces(c)
+      s = grid % cells_f(n, c)             ! take the face's index
+      grid % cells_f(n, c) = new_f(s)
+    end do
   end do
 
   ! Find boundary color ranges

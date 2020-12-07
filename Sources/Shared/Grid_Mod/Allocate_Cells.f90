@@ -27,7 +27,6 @@
   ! Cells' nodes and neigboring cells
   allocate(grid % cells_n(MAX_CELLS_N_NODES, -nb:nc));  grid % cells_n(:,:) = 0
   allocate(grid % cells_f(MAX_CELLS_N_FACES, -nb:nc));  grid % cells_f(:,:) = 0
-  allocate(grid % cells_p(MAX_CELLS_N_POLYG, -nb:nc));  grid % cells_p(:,:) = 0
   allocate(grid % cells_c(MAX_CELLS_N_CELLS, -nb:nc));  grid % cells_c(:,:) = 0
 
   allocate(grid % cells_bnd_face(-nb:-1));  grid % cells_bnd_face(:) = 0
@@ -38,10 +37,9 @@
   ! Number of faces at each cell
   allocate(grid % cells_n_faces(-nb:nc));  grid % cells_n_faces(:) = 0
 
-  ! Number of polygonal faces at each cell
-  allocate(grid % cells_n_polyg(-nb:nc));  grid % cells_n_polyg(:) = 0
-
   ! Boundary condition color in a given direction
+  ! (These go up to 6 because they are needed for
+  !  non-polyhedral meshes creted in Gambit/Gmsh)
   allocate(grid % cells_bnd_color(6, -nb:nc))
 
   ! Allocate processor i.d.

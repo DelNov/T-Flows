@@ -14,7 +14,7 @@
   type(Grid_Type) :: grid
   integer         :: sub, nn_sub, nc_sub, nf_sub, ns_sub, nbc_sub
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: c, n, p, s, fu, c1, c2
+  integer       :: c, n, s, fu, c1, c2
   character(SL) :: name_out
 !==============================================================================!
 
@@ -75,6 +75,20 @@
     end if
   end do
 
+  ! Error trap for number of nodes for each cell
+  do c = -grid % n_bnd_cells, grid % n_cells
+    if(grid % old_c(c) .ne. 0 .or. c .eq. 0) then
+      if(c .ne. 0) then
+        if(grid % cells_n_nodes(grid % old_c(c)) .eq. 0) then
+          print *, '# ERROR: Number of nodes is zero at cell:', grid % old_c(c)
+          print *, '# This error is critical.  Exiting!'
+          call Comm_Mod_End
+          stop
+        end if
+      end if
+    end if
+  end do
+
   ! Cells' nodes
   do c = -grid % n_bnd_cells, grid % n_cells
     if(grid % old_c(c) .ne. 0 .or. c .eq. 0) then
@@ -84,18 +98,60 @@
     end if
   end do
 
-  ! Number of polygonal faces for each cell
+  ! Error trap for cells' nodes
   do c = -grid % n_bnd_cells, grid % n_cells
     if(grid % old_c(c) .ne. 0 .or. c .eq. 0) then
-      write(fu) grid % cells_n_polyg(grid % old_c(c))
+      do n = 1, abs(grid % cells_n_nodes(grid % old_c(c)))
+        if(grid % new_n(grid % cells_n(n, grid % old_c(c))) .eq. 0) then
+          print *, '# ERROR: Node index is zero at cell:', grid % old_c(c)
+          print *, '# This error is critical.  Exiting!'
+          call Comm_Mod_End
+          stop
+        end if
+      end do
     end if
   end do
 
-  ! Cells' polygonal faces.  They are still faces, kept in the same array.
+  ! Number of faces for each cell
   do c = -grid % n_bnd_cells, grid % n_cells
     if(grid % old_c(c) .ne. 0 .or. c .eq. 0) then
-      do p = 1, grid % cells_n_polyg(grid % old_c(c))
-        write(fu) grid % new_f(grid % cells_p(p, grid % old_c(c)))
+      write(fu) grid % cells_n_faces(grid % old_c(c))
+    end if
+  end do
+
+  ! Error trap for number of faces for each cell
+  do c = -grid % n_bnd_cells, grid % n_cells
+    if(grid % old_c(c) .ne. 0 .or. c .eq. 0) then
+      if(c .ne. 0) then
+        if(grid % cells_n_faces(grid % old_c(c)) .eq. 0) then
+          print *, '# ERROR: Number of faces is zero at cell:', grid % old_c(c)
+          print *, '# This error is critical.  Exiting!'
+          call Comm_Mod_End
+          stop
+        end if
+      end if
+    end if
+  end do
+
+  ! Cells' faces.  They are still faces, kept in the same array.
+  do c = -grid % n_bnd_cells, grid % n_cells
+    if(grid % old_c(c) .ne. 0 .or. c .eq. 0) then
+      do s = 1, grid % cells_n_faces(grid % old_c(c))
+        write(fu) grid % new_f(grid % cells_f(s, grid % old_c(c)))
+      end do
+    end if
+  end do
+
+  ! Error trap for cells' faces
+  do c = -grid % n_bnd_cells, grid % n_cells
+    if(grid % old_c(c) .ne. 0 .or. c .eq. 0) then
+      do s = 1, grid % cells_n_faces(grid % old_c(c))
+        if(grid % new_f(grid % cells_f(s, grid % old_c(c))) .eq. 0) then
+          print *, '# ERROR: Face index is zero at cell:', grid % old_c(c)
+          print *, '# This error is critical.  Exiting!'
+          call Comm_Mod_End
+          stop
+        end if
       end do
     end if
   end do
@@ -125,6 +181,18 @@
     end if
   end do
 
+  ! Error trap for number of nodes for each face
+  do s = 1, grid % n_faces + grid % n_shadows
+    if(grid % old_f(s) .ne. 0) then
+      if(grid % faces_n_nodes(grid % old_f(s)) .eq. 0) then
+        print *, '# ERROR: Number of nodes is zero at face:', grid % old_f(s)
+        print *, '# This error is critical.  Exiting!'
+        call Comm_Mod_End
+        stop
+      end if
+    end if
+  end do
+
   ! Faces' nodes
   do s = 1, grid % n_faces + grid % n_shadows
     if(grid % old_f(s) .ne. 0) then
@@ -134,17 +202,65 @@
     end if
   end do
 
+  ! Error trap for faces' nodes
+  do s = 1, grid % n_faces + grid % n_shadows
+    if(grid % old_f(s) .ne. 0) then
+      do n = 1, grid % faces_n_nodes(grid % old_f(s))
+        if(grid % new_n(grid % faces_n(n, grid % old_f(s))) .eq. 0) then
+          print *, '# ERROR: Node index is zero at face:', grid % old_f(s)
+          print *, '# This error is critical.  Exiting!'
+          call Comm_Mod_End
+          stop
+        end if
+      end do
+    end if
+  end do
+
   ! Faces' cells
   do s = 1, grid % n_faces + grid % n_shadows
     if(grid % old_f(s) .ne. 0) then
       c1 = grid % faces_c(1, grid % old_f(s))
       c2 = grid % faces_c(2, grid % old_f(s))
-      if(grid % new_c(c2) < 0 .or. grid % new_c(c1) < grid % new_c(c2)) then
-        write(fu) grid % new_c(grid % faces_c(1, grid % old_f(s))),  &
-                  grid % new_c(grid % faces_c(2, grid % old_f(s)))
+
+      ! At least one cell is in this processor
+      ! (Meaning it is not a face entirelly in the buffer)
+      if(grid % comm % cell_proc(c1) .eq. sub .or.  &
+         grid % comm % cell_proc(c2) .eq. sub) then
+        if(grid % new_c(c2) < 0 .or. grid % new_c(c1) < grid % new_c(c2)) then
+          write(fu) grid % new_c(c1), grid % new_c(c2)
+        else
+          write(fu) grid % new_c(c2), grid % new_c(c1)
+        end if
+
+      ! Face is not active
       else
-        write(fu) grid % new_c(grid % faces_c(2, grid % old_f(s))),  &
-                  grid % new_c(grid % faces_c(1, grid % old_f(s)))
+        write(fu) 0, 0
+      end if
+    end if
+  end do
+
+  ! Error trap for faces' cells
+  do s = 1, grid % n_faces + grid % n_shadows
+    if(grid % old_f(s) .ne. 0) then
+      c1 = grid % faces_c(1, grid % old_f(s))
+      c2 = grid % faces_c(2, grid % old_f(s))
+
+      ! Check only if least one cell is in this processor
+      ! (Meaning it is not a face entirelly in the buffer)
+      if(grid % comm % cell_proc(c1) .eq. sub .or.  &
+         grid % comm % cell_proc(c2) .eq. sub) then
+        if(grid % new_c(c1) .eq. 0) then
+          print *, '# ERROR: Cell one is zero at face:', s
+          print *, '# This error is critical.  Exiting!'
+          call Comm_Mod_End
+          stop
+        end if
+        if(grid % new_c(c2) .eq. 0) then
+          print *, '# ERROR: Cell two is zero at face:', s
+          print *, '# This error is critical.  Exiting!'
+          call Comm_Mod_End
+          stop
+        end if
       end if
     end if
   end do
@@ -152,7 +268,8 @@
   ! Faces' shadows
   do s = 1, grid % n_faces + grid % n_shadows
     if(grid % old_f(s) .ne. 0) then
-      if(grid % faces_s(grid % old_f(s)) .eq. 0) then   ! there is no shadow for this face
+      ! There is no shadow for this face
+      if(grid % faces_s(grid % old_f(s)) .eq. 0) then
         write(fu) 0
       else
         write(fu) grid % new_f(grid % faces_s(grid % old_f(s)))

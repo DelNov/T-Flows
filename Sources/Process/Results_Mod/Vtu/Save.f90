@@ -38,7 +38,7 @@
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: phi
   integer(SP)              :: data_size
-  integer                  :: data_offset, cell_offset, i_pol
+  integer                  :: data_offset, cell_offset, i_fac
   integer                  :: c, s, n, n_conns, n_polyg, sc, f8, f9, ua, run, c2
   character(SL)            :: name_out_8, name_out_9, name_mean, a_name
   character(SL)            :: str1, str2
@@ -66,8 +66,8 @@
     do c = 1, grid % n_cells
       if(grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
         n_polyg = n_polyg + 1                  ! add one for number of polyfaces
-        do i_pol = 1, grid % cells_n_polyg(c)  ! add all faces and their nodes
-          s = grid % cells_p(i_pol, c)
+        do i_fac = 1, grid % cells_n_faces(c)  ! add all faces and their nodes
+          s = grid % cells_f(i_fac, c)
           n = grid % faces_n_nodes(s)
           n_polyg = n_polyg + 1 + n
         end do
@@ -319,9 +319,9 @@
 
         do c = 1, grid % n_cells
           if(grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
-            write(f9) grid % cells_n_polyg(c)      ! write number of polygons
-            do i_pol = 1, grid % cells_n_polyg(c)  ! write nodes of each polygon
-              s = grid % cells_p(i_pol, c)
+            write(f9) grid % cells_n_faces(c)      ! write number of polygons
+            do i_fac = 1, grid % cells_n_faces(c)  ! write nodes of each polygon
+              s = grid % cells_f(i_fac, c)
               n = grid % faces_n_nodes(s)
               write(f9) n, (grid % faces_n(1:n, s))-1
             end do
@@ -336,8 +336,8 @@
         do c = 1, grid % n_cells
           if(grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
             cell_offset = cell_offset + 1          ! to store number of polygons
-            do i_pol = 1, grid % cells_n_polyg(c)  ! to store all the nodes
-              s = grid % cells_p(i_pol, c)         ! of each polygon
+            do i_fac = 1, grid % cells_n_faces(c)  ! to store all the nodes
+              s = grid % cells_f(i_fac, c)         ! of each polygon
               n = grid % faces_n_nodes(s)
               cell_offset = cell_offset + 1 + n
             end do
@@ -726,16 +726,16 @@
     end if
 
     ! Wall distance and delta, important for all models
-    call Save_Scalar_Real(grid, "WallDistance", plot_inside,            &
+    call Save_Scalar_Real(grid, "GridWallDistance", plot_inside,        &
                                 grid % wall_dist(-grid % n_bnd_cells),  &
                                 f8, f9, data_offset, run)
-    call Save_Scalar_Real(grid, "CellDeltaMax", plot_inside,        &
+    call Save_Scalar_Real(grid, "GridCellDeltaMax", plot_inside,    &
                                 turb % h_max(-grid % n_bnd_cells),  &
                                 f8, f9, data_offset, run)
-    call Save_Scalar_Real(grid, "CellDeltaMin", plot_inside,        &
+    call Save_Scalar_Real(grid, "GridCellDeltaMin", plot_inside,    &
                                 turb % h_min(-grid % n_bnd_cells),  &
                                 f8, f9, data_offset, run)
-    call Save_Scalar_Real(grid, "CellDeltaWall", plot_inside,       &
+    call Save_Scalar_Real(grid, "GridCellDeltaWall", plot_inside,   &
                                 turb % h_w  (-grid % n_bnd_cells),  &
                                 f8, f9, data_offset, run)
 

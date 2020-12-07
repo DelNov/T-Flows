@@ -10,32 +10,32 @@
   integer              :: s, c, c1, c2
   integer, allocatable :: new_c(:)
   integer, allocatable :: old_c(:)
-  integer, allocatable :: old_nn  (:)    ! old number of nodes (per cell)
-  integer, allocatable :: old_nods(:,:)  ! old nodes list per cell
-  integer, allocatable :: old_np  (:)    ! old number of polygons (per cell)
-  integer, allocatable :: old_pols(:,:)  ! old polygon list per cell
-  real,    allocatable :: criteria(:,:)
+  integer, allocatable :: old_nn   (:)    ! old number of nodes (per cell)
+  integer, allocatable :: old_nodes(:,:)  ! old nodes list per cell
+  integer, allocatable :: old_nf   (:)    ! old number of faces (per cell)
+  integer, allocatable :: old_faces(:,:)  ! old faces list per cell
+  real,    allocatable :: criteria (:,:)
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: M = MAX_CELLS_N_NODES
-  integer, parameter :: N = MAX_CELLS_N_POLYG
+  integer, parameter :: N = MAX_CELLS_N_FACES
 !==============================================================================!
 
-  allocate(old_nn  (   grid % n_cells));     old_nn  (:)   = 0
-  allocate(old_nods(M, grid % n_cells));     old_nods(:,:) = 0
-  allocate(old_np  (   grid % n_cells));     old_np  (:)   = 0
-  allocate(old_pols(N, grid % n_cells));     old_pols(:,:) = 0
-  allocate(new_c   (   grid % n_cells));     new_c(:)      = 0
-  allocate(old_c   (   grid % n_cells));     old_c(:)      = 0
-  allocate(criteria(   grid % n_cells, 3));  criteria(:,:) = 0.0
+  allocate(old_nn   (   grid % n_cells));     old_nn   (:)   = 0
+  allocate(old_nodes(M, grid % n_cells));     old_nodes(:,:) = 0
+  allocate(old_nf   (   grid % n_cells));     old_nf   (:)   = 0
+  allocate(old_faces(N, grid % n_cells));     old_faces(:,:) = 0
+  allocate(new_c    (   grid % n_cells));     new_c(:)       = 0
+  allocate(old_c    (   grid % n_cells));     old_c(:)       = 0
+  allocate(criteria (   grid % n_cells, 3));  criteria(:,:)  = 0.0
 
   !------------------------!
   !   Store cells' nodes   !
   !------------------------!
   do c = 1, grid % n_cells
-    old_nn  (c)      = grid % cells_n_nodes(c)
-    old_nods(1:M, c) = grid % cells_n(1:M, c)
-    old_np  (c)      = grid % cells_n_polyg(c)
-    old_pols(1:N, c) = grid % cells_p(1:N, c)
+    old_nn   (c)      = grid % cells_n_nodes(c)
+    old_nodes(1:M, c) = grid % cells_n(1:M, c)
+    old_nf   (c)      = grid % cells_n_faces(c)
+    old_faces(1:N, c) = grid % cells_f(1:N, c)
   end do
 
   !--------------------------!
@@ -88,10 +88,10 @@
   !   Do the sorting of data pertinent to cells   !
   !-----------------------------------------------!
   do c = 1, grid % n_cells
-    grid % cells_n_nodes(new_c(c)) = old_nn  (c)
-    grid % cells_n(1:M, new_c(c))  = old_nods(1:M, c)
-    grid % cells_n_polyg(new_c(c)) = old_np  (c)
-    grid % cells_p(1:N, new_c(c))  = old_pols(1:N, c)
+    grid % cells_n_nodes(new_c(c)) = old_nn   (c)
+    grid % cells_n(1:M, new_c(c))  = old_nodes(1:M, c)
+    grid % cells_n_faces(new_c(c)) = old_nf   (c)
+    grid % cells_f(1:N, new_c(c))  = old_faces(1:N, c)
   end do
   call Sort_Mod_Real_By_Index(grid % n_cells, grid % xc (1), new_c(1))
   call Sort_Mod_Real_By_Index(grid % n_cells, grid % yc (1), new_c(1))

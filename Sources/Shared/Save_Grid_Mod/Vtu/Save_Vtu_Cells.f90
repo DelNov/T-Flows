@@ -9,7 +9,7 @@
   integer         :: sub, n_nodes_sub, n_cells_sub
 !-----------------------------------[Locals]-----------------------------------!
   integer(SP)     :: data_size
-  integer         :: c, n, s, i_pol, data_offset, cell_offset, fu
+  integer         :: c, n, s, i_fac, data_offset, cell_offset, fu
   integer         :: n_conns, n_polyg
   character(SL)   :: name_out
   character(DL*2) :: str1, str2
@@ -30,8 +30,8 @@
     if(grid % new_c(c) .ne. 0) then            ! cell is in this subdomain
       if(grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
         n_polyg = n_polyg + 1                  ! add one for number of polyfaces
-        do i_pol = 1, grid % cells_n_polyg(c)  ! add all faces and their nodes
-          s = grid % cells_p(i_pol, c)
+        do i_fac = 1, grid % cells_n_faces(c)  ! add all faces and their nodes
+          s = grid % cells_f(i_fac, c)
           n = grid % faces_n_nodes(s)
           n_polyg = n_polyg + 1 + n
         end do
@@ -263,9 +263,9 @@
     do c = 1, grid % n_cells
       if(grid % new_c(c) .ne. 0) then            ! cell is in this subdomain
         if(grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
-          write(fu) grid % cells_n_polyg(c)      ! write number of its polyfaces
-          do i_pol = 1, grid % cells_n_polyg(c)  ! and all polyfaces
-            s = grid % cells_p(i_pol, c)
+          write(fu) grid % cells_n_faces(c)      ! write number of its polyfaces
+          do i_fac = 1, grid % cells_n_faces(c)  ! and all polyfaces
+            s = grid % cells_f(i_fac, c)
             n = grid % faces_n_nodes(s)
             write(fu) n, grid % new_n(grid % faces_n(1:n, s))-1
           end do
@@ -281,8 +281,8 @@
       if(grid % new_c(c) .ne. 0) then            ! cell is in this subdomain
         if(grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
           cell_offset = cell_offset + 1          ! to store number of polyfaces
-          do i_pol = 1, grid % cells_n_polyg(c)  ! to store polyfaces
-            s = grid % cells_p(i_pol, c)
+          do i_fac = 1, grid % cells_n_faces(c)  ! to store polyfaces
+            s = grid % cells_f(i_fac, c)
             n = grid % faces_n_nodes(s)
             cell_offset = cell_offset + 1 + n    ! number of nodes and nodes
           end do

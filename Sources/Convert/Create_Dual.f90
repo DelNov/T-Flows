@@ -431,10 +431,10 @@
     !----------------------------------------------------!
     !   Store faces surrounding each cell in dual grid   !
     !----------------------------------------------------!
-    dual % cells_n_polyg(c1) = dual % cells_n_polyg(c1) + 1
-    dual % cells_n_polyg(c2) = dual % cells_n_polyg(c2) + 1
-    dual % cells_p(dual % cells_n_polyg(c1), c1) = s
-    dual % cells_p(dual % cells_n_polyg(c2), c2) = s
+    dual % cells_n_faces(c1) = dual % cells_n_faces(c1) + 1
+    dual % cells_n_faces(c2) = dual % cells_n_faces(c2) + 1
+    dual % cells_f(dual % cells_n_faces(c1), c1) = s
+    dual % cells_f(dual % cells_n_faces(c2), c2) = s
 
     !----------------------------------------------------!
     !   Store nodes surrounding each cell in dual grid   !

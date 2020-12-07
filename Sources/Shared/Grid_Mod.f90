@@ -65,7 +65,7 @@
     integer, allocatable :: cells_n_faces(:)
 
     ! Number of polygonal faces surrounding each (clearly polyhedral) cell
-    integer, allocatable :: cells_n_polyg(:)
+!@  integer, allocatable :: cells_n_polyg(:)
 
     ! Number of cells surrounding each cell
     integer, allocatable :: cells_n_cells(:)
@@ -73,7 +73,7 @@
     ! Cells' nodes, faces, polygonal faces and neigboring cells
     integer, allocatable :: cells_n(:,:)
     integer, allocatable :: cells_f(:,:)
-    integer, allocatable :: cells_p(:,:)
+!@  integer, allocatable :: cells_p(:,:)
     integer, allocatable :: cells_c(:,:)
 
     ! Weights for interpolation from nodes
@@ -170,7 +170,7 @@
   integer, parameter :: MAX_CELLS_N_NODES = 72  ! 36
   integer, parameter :: MAX_CELLS_N_FACES = 48  ! 24
   integer, parameter :: MAX_CELLS_N_CELLS = MAX_CELLS_N_FACES
-  integer, parameter :: MAX_CELLS_N_POLYG = MAX_CELLS_N_FACES
+!@integer, parameter :: MAX_CELLS_N_POLYG = MAX_CELLS_N_FACES
 
   contains
 

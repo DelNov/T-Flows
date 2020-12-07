@@ -17,7 +17,7 @@
   integer              :: n_cells, n_bnd_cells, n_faces, n_nodes
   integer              :: n_face_nodes, n_cells_zone
   integer              :: c, c1, c2, s, n, fu, i, l, pos
-  integer              :: i_cel, i_nod, j_nod, k_nod, l_nod, i_pol
+  integer              :: i_cel, i_nod, j_nod, k_nod, l_nod, i_fac
   integer              :: cell_type, zone_type
   integer              :: cell_s, cell_e, side_s, side_e, node_s, node_e
   integer, allocatable :: cell_visited_from(:)
@@ -924,9 +924,9 @@
       end if
 
       ! Increase the number of polygonal faces for c1
-      grid % cells_n_polyg(c1) = grid % cells_n_polyg(c1) + 1
-      n = grid % cells_n_polyg(c1)
-      grid % cells_p(n, c1) = s
+      grid % cells_n_faces(c1) = grid % cells_n_faces(c1) + 1
+      n = grid % cells_n_faces(c1)
+      grid % cells_f(n, c1) = s
     end if
 
     if( grid % cells_n_nodes(c2) .eq. -1) then
@@ -935,9 +935,9 @@
       end if
 
       ! Increase the number of polygonal faces for c2 and store the face
-      grid % cells_n_polyg(c2) = grid % cells_n_polyg(c2) + 1
-      n = grid % cells_n_polyg(c2)
-      grid % cells_p(n, c2) = s
+      grid % cells_n_faces(c2) = grid % cells_n_faces(c2) + 1
+      n = grid % cells_n_faces(c2)
+      grid % cells_f(n, c2) = s
     end if
 
   end do
@@ -950,12 +950,13 @@
   do c = 1, grid % n_cells
 
     ! Only do this for polyhedral cells
+    ! (For the other it was done above)
     if(grid % cells_n_nodes(c) .eq. -1) then
 
       ! Accumulate nodes from all faces surrounding the cell
       n = 0
-      do i_pol = 1, grid % cells_n_polyg(c)
-        s = grid % cells_p(i_pol, c)           ! take true face index
+      do i_fac = 1, grid % cells_n_faces(c)
+        s = grid % cells_f(i_fac, c)           ! take true face index
         do i_nod = 1, grid % faces_n_nodes(s)
           n = n + 1
           all_nodes(n) = grid % faces_n(i_nod, s)
