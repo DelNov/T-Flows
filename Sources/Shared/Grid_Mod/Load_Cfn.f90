@@ -9,7 +9,7 @@
   integer           :: this_proc  ! needed if called from Processor
   integer, optional :: domain
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: c, c1, c2, n, s, fu
+  integer       :: c, c1, c2, s, n, c1r, c2r, c1s, c2s, ss, sr, fu
   character(SL) :: name_in
 !==============================================================================!
 
@@ -212,6 +212,23 @@
 
   ! Faces' shadows
   read(fu) (grid % faces_s(s), s = 1, grid % n_faces + grid % n_shadows)
+
+  ! Error trap for shadows
+  do ss = grid % n_faces + 1, grid % n_faces + grid % n_shadows
+    sr = grid % faces_s(ss)  ! real face from shadow data
+    if(sr .eq. 0) then
+      print *, '# ERROR: Shadow faces points to zero face'
+      print *, '# This error is critical.  Exiting!'
+      call Comm_Mod_End
+      stop
+    end if
+    if(grid % faces_s(sr) .ne. ss) then
+      print *, '# ERROR: Real and shadow faces do not point to each other'
+      print *, '# This error is critical.  Exiting!'
+      call Comm_Mod_End
+      stop
+    end if
+  end do
 
   ! Faces' global numbers
   read(fu) (grid % comm % face_glo(s), s = 1, grid % n_faces + grid % n_shadows)
