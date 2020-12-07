@@ -59,6 +59,16 @@
     call Swap_Int(grid % cells_n(7,c), grid % cells_n(8,c))
   end do
 
+  ! Note #1 about shadows:
+  ! At this point you have grid % n_faces faces and grid % n_shadows (on top)
+  ! and they are pointing to each other.  Besides, both real face and its
+  ! shadow have the same c1 and c2, both inside cells with positive indices
+  ! Real faces which do not have shadows have "0" for shadow.
+  ! Checked like this: do s = 1, grid % n_faces + grid % n_shadows
+  ! Checked like this:   write(20, '(99i9)') s, grid % faces_s(s)
+  ! Checked like this: end do
+  ! Similar note is needed in Convert, but will come to that later.
+
   !------------------------------!
   !   Save data for processing   !
   !------------------------------!
