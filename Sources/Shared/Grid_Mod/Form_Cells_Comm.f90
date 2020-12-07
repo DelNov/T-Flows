@@ -43,8 +43,7 @@
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
-    if(grid % comm % cell_proc(c1) .ne. this_proc .and.  &
-       grid % comm % cell_proc(c2) .ne. this_proc) then
+    if(c1 .eq. 0 .and. c2 .eq. 0) then
       n_buff_faces = n_buff_faces + 1
     end if
   end do
@@ -186,7 +185,11 @@
       ! Count all (boundary and inside) cells in the buffers
       ms = 0
       mr = 0
-      do c = -grid % n_bnd_cells, grid % n_cells
+
+      ! Doesn't work with boundary cells since the introduction of
+      ! polyhedral grids.  But hey, I am really not sure we need it
+      ! do c = -grid % n_bnd_cells, grid % n_cells
+      do c = 1, grid % n_cells
         if(send_cells(c) .eq. sub) then
           ms = ms + 1
           grid % comm % cells_send(sub) % map(ms) = c
@@ -205,6 +208,10 @@
 
   end do
 
+  !-------------------------------------!
+  !   Avoid faces in the buffers only   !
+  !   (This also leaves shadows out)    !
+  !-------------------------------------!
   grid % n_faces = grid % n_faces - n_buff_faces
 
   ! De-allocate locally used memory

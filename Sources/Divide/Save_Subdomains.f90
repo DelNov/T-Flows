@@ -21,7 +21,7 @@
   type(Grid_Type) :: grid
   integer         :: n_buff_layers  ! number of buffer layers
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, n, s, c1, c2, sub, subo, i_nod, fu, sh, nn, lev
+  integer :: c, n, s, c1, c2, sub, subo, i_nod, i_fac, sh, nn !exp:, lev
   integer :: nn_sub      ! number of nodes in the subdomain
   integer :: nc_sub      ! number of cells in the subdomain
   integer :: nf_sub      ! number of faces in the subdomain
@@ -31,20 +31,26 @@
 
   !-------------------------------!
   !                               !
+  !                               !
   !   Browse through subdomains   !
+  !                               !
   !                               !
   !-------------------------------!
   do sub = 1, maxval(grid % comm % cell_proc(:))
 
-    !-----------!
-    !   Cells   !
-    !-----------!
+    !------------------!
+    !                  !
+    !   Cells inside   !
+    !                  !
+    !------------------!
     nc_sub = 0     ! number of cells in subdomain
     grid % new_c(1:grid % n_cells) = 0
     grid % old_c(1:grid % n_cells) = 0
     grid % new_n(1:grid % n_nodes) = 0
 
-    ! Renumber cells inside the subdomain and mark their nodes
+    !--------------------------------------------------------------!
+    !   Renumber inside cells the subdomain and mark their nodes   !
+    !--------------------------------------------------------------!
     do c = 1, grid % n_cells
       if(grid % comm % cell_proc(c) .eq. sub) then
         nc_sub = nc_sub + 1       ! increase the number of cells in sub.
@@ -57,7 +63,9 @@
       end if
     end do
 
-    ! Spread info to twin nodes
+    !------------------------------------------!
+    !   Also spread node marks to twin nodes   !
+    !------------------------------------------!
     do subo = 1, maxval(grid % comm % cell_proc(:))
       do s = 1, grid % n_faces
         if(grid % faces_s(s) > 0) then
@@ -76,11 +84,13 @@
       end do
     end do
 
-    ! Cells in buffers
+    !-----------------------------!
+    !   Inside cells in buffers   !
+    !-----------------------------!
     do subo = 1, maxval(grid % comm % cell_proc(:))
       if(subo .ne. sub) then
 
-        ! Mark
+        ! Mark cells in buffer "subo"
         do c = 1, grid % n_cells
           if(grid % comm % cell_proc(c) .eq. subo) then
             n = abs(grid % cells_n_nodes(c))
@@ -90,30 +100,30 @@
           end if
         end do
 
-        ! Browse through deeper levels of buffers
-        do lev = 2, n_buff_layers
+!exp:        ! Browse through deeper levels of buffers
+!exp:        do lev = 2, n_buff_layers
+!exp:
+!exp:          ! Mark nodes on this level ...
+!exp:          do c = 1, grid % n_cells
+!exp:            if(grid % new_c(c) .eq. -1) then
+!exp:              do i_nod = 1, abs(grid % cells_n_nodes(c))
+!exp:                grid % new_n(grid % cells_n(i_nod,c)) = -1
+!exp:              end do
+!exp:            end if
+!exp:          end do
+!exp:
+!exp:          ! ... and then also the cells
+!exp:          do c = 1, grid % n_cells
+!exp:            if(grid % comm % cell_proc(c) .eq. subo) then
+!exp:              n = abs(grid % cells_n_nodes(c))
+!exp:              if( any(grid % new_n(grid % cells_n(1:n, c)) .eq. -1) ) then
+!exp:                grid % new_c(c) = -1
+!exp:              end if
+!exp:            end if
+!exp:          end do
+!exp:        end do
 
-          ! Mark nodes on this level ...
-          do c = 1, grid % n_cells
-            if(grid % new_c(c) .eq. -1) then
-              do i_nod = 1, abs(grid % cells_n_nodes(c))
-                grid % new_n(grid % cells_n(i_nod,c)) = -1
-              end do
-            end if
-          end do
-
-          ! ... and then also the cells
-          do c = 1, grid % n_cells
-            if(grid % comm % cell_proc(c) .eq. subo) then
-              n = abs(grid % cells_n_nodes(c))
-              if( any(grid % new_n(grid % cells_n(1:n, c)) .eq. -1) ) then
-                grid % new_c(c) = -1
-              end if
-            end if
-          end do
-        end do
-
-        ! Renumber
+        ! Renumber cells in buffer "subo"
         do c = 1, grid % n_cells
           if(grid % comm % cell_proc(c) .eq. subo .and.  &
              grid % new_c(c) .eq. -1) then
@@ -123,28 +133,21 @@
           end if
         end do
 
-      end if
-    end do
+      end if  ! subo .ne. sub
+    end do    ! subo
 
-    !-----------!
-    !   Faces   !
-    !-----------!
+    !--------------------!
+    !                    !
+    !   Boundary cells   !
+    !                    !
+    !--------------------!
+    nbc_sub = 0     ! number of boundary cells in subdomain
+    grid % new_c(-grid % n_bnd_cells:-1) = 0
+    grid % old_c(-grid % n_bnd_cells:-1) = 0
 
-    ! Faces & real boundary cells
-    nf_sub  = 0  ! number of faces in subdomain
-    ns_sub  = 0  ! number of shadow faces in subdomain
-    nbc_sub = 0  ! number of real boundary cells in subdomain
-    do s = 1, grid % n_faces + grid % n_shadows
-      grid % new_f(s) = 0
-      grid % old_f(s) = 0
-    end do
-    do c = -grid % n_bnd_cells, -1
-      grid % new_c(c) = 0
-      grid % old_c(c) = 0
-    end do
-
-    ! Faces step 1: on the boundaries of the buffers
-    ! (Note that faces are not stored here)
+    !---------------------------------------!
+    !   Step 1: boundary cells in buffers   !
+    !---------------------------------------!
     do subo = 1, maxval(grid % comm % cell_proc(:))
       if(subo .ne. sub) then
 
@@ -161,19 +164,17 @@
           end if
         end do
 
-      end if
-    end do
+      end if  ! subo .ne. sub
+    end do    ! subo
 
-    ! Faces step 2: on the boundaries of domain sub
+    !---------------------------------------!
+    ! Step 2: boundary cells in the domain sub
+    !---------------------------------------!
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
       if(c2 < 0) then
         if( grid % comm % cell_proc(c1) .eq. sub )  then
-          nf_sub = nf_sub + 1
-          grid % new_f(s) = nf_sub
-          grid % old_f(nf_sub) = s
-
           nbc_sub = nbc_sub + 1        ! increase n. of bnd. cells
           grid % new_c(c2) = -nbc_sub  ! new loc. number of bnd. cell
           grid % old_c(-nbc_sub) = c2
@@ -181,24 +182,40 @@
       end if
     end do
 
-    ! Faces step 3: inside the domain
-    do s = 1, grid % n_faces
+    !-----------!
+    !           !
+    !   Faces   !
+    !           !
+    !-----------!
+    nf_sub  = 0  ! number of faces in subdomain
+    ns_sub  = 0  ! number of shadow faces in subdomain
+    do s = 1, grid % n_faces + grid % n_shadows
+      grid % new_f(s) = 0
+      grid % old_f(s) = 0
+    end do
+
+    !---------------------------------------------------------!
+    !   Step 1: In the domain sub
+    !   (It should preserve the order of the original grid.   !
+    !    If the faces in the original grid started from       !
+    !    boundary faces, it should be the case here too.)     !
+    !---------------------------------------------------------!
+    do s = 1, grid % n_faces ! + n_shadows???
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
-      if(c2 > 0) then
-        if( (grid % comm % cell_proc(c1) .eq. sub) .and.  &
-            (grid % comm % cell_proc(c2) .eq. sub) ) then
-          nf_sub = nf_sub + 1
-          grid % new_f(s) = nf_sub
-          grid % old_f(nf_sub) = s
-        end if
+
+      ! Both cells are in the domain
+      if( grid % comm % cell_proc(c1) .eq. sub .and.  &
+          grid % comm % cell_proc(c2) .eq. sub )  then
+        nf_sub = nf_sub + 1
+        grid % new_f(s) = nf_sub
+        grid % old_f(nf_sub) = s
       end if
     end do
 
-    !----------------------!
-    !   Faces in buffers   !
-    !----------------------!
-
+    !-------------------------------------!
+    !   Step 2: Inside faces in buffers   !
+    !-------------------------------------!
     do subo = 1, maxval(grid % comm % cell_proc(:))
       if(subo .ne. sub) then
 
@@ -206,7 +223,7 @@
         do s = 1, grid % n_faces
           c1 = grid % faces_c(1,s)
           c2 = grid % faces_c(2,s)
-          if(c2  > 0) then
+          if(c2 > 0) then
             if( (grid % comm % cell_proc(c1) .eq. sub) .and.  &
                 (grid % comm % cell_proc(c2) .eq. subo) ) then
               nf_sub = nf_sub + 1
@@ -223,53 +240,35 @@
         end do    ! through faces
 
       end if  ! subo .ne. sub
+    end do    ! subo
 
-    end do ! for subo
+    !------------------------------------------------!
+    !   Step 3: All the remaining faces in buffers   !
+    !------------------------------------------------!
+    do c = -grid % n_bnd_cells, grid % n_cells
 
-    ! Faces inside the buffers only; both inside and on boundaries
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
-      if( (grid % new_c(c1) .ne. 0)              .and.  &
-          (grid % new_c(c2) .ne. 0)              .and.  &
-          (grid % comm % cell_proc(c1) .ne. sub) .and.  &
-          (grid % comm % cell_proc(c2) .ne. sub) ) then
-        nf_sub = nf_sub + 1
-        grid % new_f(s) = nf_sub
-        grid % old_f(nf_sub) = s
-      end if
-    end do    ! through faces
+      ! If cell has been marked to be saved with this sub, no matter
+      ! if it is inside or at the buffer (although it would be strange
+      ! if inside faces haven't been marked already above)
+      if(grid % new_c(c) .ne. 0) then
 
-    ! Polygon faces in the buffers
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
-      if(grid % new_f(s)  .eq. 0 .and.  &
-         grid % new_c(c1) .ne. 0 .and.  &
-         grid % new_c(c2) .ne. 0) then  ! if face hasn't been marked yet
+        do i_fac = 1, grid % cells_n_faces(c)
+          s = grid % cells_f(i_fac, c)
 
-        if( (grid % cells_n_nodes(c1) .lt. 0)      .and.  &  ! c1 is polyhedron
-            (grid % new_c(c1) .ne. 0)              .and.  &  ! and is in the
-            (grid % comm % cell_proc(c1) .ne. sub) ) then    ! buffer
-          nf_sub = nf_sub + 1
-          grid % new_f(s) = nf_sub
-          grid % old_f(nf_sub) = s
-        end if
+          ! If the face hasn't been marked allready, do it now!
+          if(grid % new_f(s) .eq. 0) then
+            nf_sub = nf_sub + 1
+            grid % new_f(s) = nf_sub
+            grid % old_f(nf_sub) = s
+          end if
+        end do  ! i_fac
 
-        if( (grid % cells_n_nodes(c2) .lt. 0)      .and.  &  ! c2 is polyhedron
-            (grid % new_c(c2) .ne. 0)              .and.  &  ! and is in the
-            (grid % comm % cell_proc(c2) .ne. sub) ) then    ! buffer
-          nf_sub = nf_sub + 1
-          grid % new_f(s) = nf_sub
-          grid % old_f(nf_sub) = s
-        end if
+      end if  !  new_c(c) .ne. 0
+    end do    !  c
 
-      end if
-    end do    ! through faces
-
-    !------------------!
-    !   Shadow faces   !
-    !------------------!
+    !--------------------------!
+    !   Step 4: shadow faces   !
+    !--------------------------!
 
     ! Faces inside the domain
     do s = grid % n_faces + 1, grid % n_faces + grid % n_shadows
@@ -286,15 +285,21 @@
     end do    ! through faces
 
     !-----------!
+    !           !
     !   Nodes   !
+    !           !
     !-----------!
     nn_sub = 0     ! number of cells in subdomain
 
-    ! Initialize node numbers to zero
+    !-------------------------------------!
+    !   Initialize node numbers to zero   !
+    !-------------------------------------!
     grid % new_n(1:grid % n_nodes) = 0
 
-    ! Mark nodes for renumbering with -1
-    do c = 1, grid % n_cells
+    !-------------------------------------------------!
+    !   Mark nodes in cells for renumbering with -1   !
+    !-------------------------------------------------!
+    do c = -grid % n_bnd_cells, grid % n_cells
       if(grid % new_c(c) > 0) then
         do i_nod = 1, abs(grid % cells_n_nodes(c))
           grid % new_n(grid % cells_n(i_nod,c)) = -1
@@ -302,7 +307,20 @@
       end if
     end do
 
-    ! Renumber marked nodes
+    !-------------------------------------------------!
+    !   Mark nodes in faces for renumbering with -1   !
+    !-------------------------------------------------!
+    do s = grid % n_faces + 1, grid % n_faces + grid % n_shadows
+      if(grid % new_f(s) > 0) then
+        do i_nod = 1, grid % faces_n_nodes(s)
+          grid % new_n(grid % faces_n(i_nod,s)) = -1
+        end do
+      end if
+    end do
+
+    !---------------------------!
+    !   Renumber marked nodes   !
+    !---------------------------!
     do n = 1, grid % n_nodes
       if(grid % new_n(n) .eq. -1) then
         nn_sub          = nn_sub + 1
