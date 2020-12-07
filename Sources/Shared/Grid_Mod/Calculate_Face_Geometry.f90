@@ -2,6 +2,14 @@
   subroutine Grid_Mod_Calculate_Face_Geometry(grid)
 !------------------------------------------------------------------------------!
 !   Calculates additional face-base geometrical quantities for Process.        !
+!                                                                              !
+!   This subroutine is called only from Process, and it was originally used    !
+!   whenever I was lazy to change the format of .cfn (former .cns) files.      !
+!   That is very unfortunate, and I should use it as little as possible and    !
+!   never expand it.  Actually, I should try to get rid of it completelly.     !
+!                                                                              !
+!   I am not quite sure, but it is conceiveable that shadow faces were         !
+!   introduced only to make sure this routine works as it should. Bad!         !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
