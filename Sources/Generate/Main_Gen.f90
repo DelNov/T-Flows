@@ -15,7 +15,7 @@
   type(Grid_Type)    :: grid      ! grid which will be generated
   type(Smooths_Type) :: smooths   ! smoothing regions
   type(Refines_Type) :: refines   ! refinement regions and levels
-  integer            :: c, s, n
+  integer            :: c         ! cell counter
 !==============================================================================!
 
   ! Open with a logo
@@ -48,18 +48,15 @@
   call Grid_Mod_Sort_Cells_Smart       (grid)
   call Grid_Mod_Sort_Faces_Smart       (grid)
   call Grid_Mod_Calculate_Wall_Distance(grid)
+  call Grid_Mod_Find_Cells_Faces       (grid)
 
   ! Prepare for saving
-  do n = 1, grid % n_nodes
-    grid % new_n(n) = n
-  end do
-  do c = -grid % n_bnd_cells, grid % n_cells
-    grid % new_c(c) = c
-    grid % old_c(c) = c
-  end do
-  do s = 1, grid % n_faces + grid % n_shadows
-    grid % new_f(s) = s
-    grid % old_f(s) = s
+  call Grid_Mod_Initialize_New_Numbers(grid)
+
+  ! Make cell numberig compatible with VTU format
+  do c = 1, grid % n_cells
+    call Swap_Int(grid % cells_n(3,c), grid % cells_n(4,c))
+    call Swap_Int(grid % cells_n(7,c), grid % cells_n(8,c))
   end do
 
   !------------------------------!

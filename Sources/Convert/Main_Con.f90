@@ -105,6 +105,7 @@
     call Grid_Mod_Sort_Cells_Smart       (grid(g))
     call Grid_Mod_Sort_Faces_Smart       (grid(g))
     call Grid_Mod_Calculate_Wall_Distance(grid(g))
+    call Grid_Mod_Find_Cells_Faces       (grid(g))
 
     call Grid_Mod_Initialize_New_Numbers(grid(g))
 

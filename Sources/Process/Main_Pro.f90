@@ -142,7 +142,6 @@
     call Grid_Mod_Calculate_Face_Geometry(grid(d))
     call Grid_Mod_Find_Nodes_Cells(grid(d))
     call Grid_Mod_Find_Periodic_Faces(grid(d))
-    call Grid_Mod_Find_Cells_Faces(grid(d))
     call Grid_Mod_Calculate_Global_Volumes(grid(d))
     call Grid_Mod_Calculate_Weights_Cells_To_Nodes(grid(d))
     call Grid_Mod_Calculate_Weights_Nodes_To_Cells(grid(d))
