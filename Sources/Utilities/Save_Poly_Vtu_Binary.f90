@@ -31,8 +31,8 @@
   do c = 1, grid % n_cells
     if(grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
       n_polyg = n_polyg + 1                  ! add one for number of polyfaces
-      do i_pol = 1, grid % cells_n_polyg(c)  ! add all faces and their nodes
-        s = grid % cells_p(i_pol, c)
+      do i_pol = 1, grid % cells_n_faces(c)  ! add all faces and their nodes
+        s = grid % cells_f(i_pol, c)
         n = grid % faces_n_nodes(s)
         n_polyg = n_polyg + 1 + n
       end do
@@ -251,10 +251,10 @@
     if(grid % cells_n_nodes(c) .lt. 0) then
 
       ! Write number of polyfaces for this cell
-      write(fu) grid % cells_n_polyg(c)
+      write(fu) grid % cells_n_faces(c)
 
-      do i_pol = 1, grid % cells_n_polyg(c)
-        s = grid % cells_p(i_pol, c)
+      do i_pol = 1, grid % cells_n_faces(c)
+        s = grid % cells_f(i_pol, c)
         n = grid % faces_n_nodes(s)
         write(fu) n, (grid % faces_n(1:n, s))-1
       end do
@@ -275,8 +275,8 @@
       cell_offset = cell_offset + 1
 
       ! Update the offset with all faces and their nodes
-      do i_pol = 1, grid % cells_n_polyg(c)
-        s = grid % cells_p(i_pol, c)
+      do i_pol = 1, grid % cells_n_faces(c)
+        s = grid % cells_f(i_pol, c)
         n = grid % faces_n_nodes(s)
         cell_offset = cell_offset + 1 + n
       end do
