@@ -39,18 +39,44 @@
   type(Var_Type),  pointer :: phi
   integer(SP)              :: data_size
   integer                  :: data_offset, cell_offset, i_fac
-  integer                  :: c, s, n, n_conns, n_polyg, sc, f8, f9, ua, run, c2
+  integer                  :: s, n, n_conns, n_polyg, sc, f8, f9, ua, run
+  integer                  :: c1, c2, c_s, c_e
   character(SL)            :: name_out_8, name_out_9, name_mean, a_name
   character(SL)            :: str1, str2
 !------------------------------[Local parameters]------------------------------!
-  integer, parameter :: IP = DP  ! int. precision is double precision
-  integer, parameter :: RP = DP  ! real precision is double precision
+  integer, parameter :: IP           = DP  ! int. precision is double precision
+  integer, parameter :: RP           = DP  ! real precision is double precision
+  logical, parameter :: PLOT_BUFFERS = .false.  ! .true. is good for debugging
 !==============================================================================!
 
   call Cpu_Timer_Mod_Start('Save_Vtu_Results')
 
   ! Take aliases
   grid => flow % pnt_grid
+
+  !------------------------------------------------!
+  !   Mark the beginnings and end of cell ranges   !
+  !------------------------------------------------!
+
+  ! For cells inside
+  if(plot_inside) then
+    c_s = 1
+    c_e = grid % n_cells
+    if(.not. PLOT_BUFFERS) c_e = grid % n_cells - grid % comm % n_buff_cells
+
+  ! For boundary cells
+  else
+    c_s = -grid % n_bnd_cells
+    c_e = -1
+    if(.not. PLOT_BUFFERS) then
+      do c_s = -grid % n_bnd_cells, -1
+        if( grid % comm % cell_proc(c_s) .eq. this_proc) exit
+      end do
+      do c_e = -1, -grid % n_bnd_cells, -1
+        if( grid % comm % cell_proc(c_e) .eq. this_proc) exit
+      end do
+    end if
+  end if
 
   !-------------------------------------------------------------------------!
   !   Count connections and polygons in this grid, you will need it later   !
@@ -59,22 +85,22 @@
   n_polyg = 0
   if(plot_inside) then
     ! Connections
-    do c = 1, grid % n_cells
-      n_conns = n_conns + abs(grid % cells_n_nodes(c))
+    do c1 = c_s, c_e
+      n_conns = n_conns + abs(grid % cells_n_nodes(c1))
     end do
     ! Polygons
-    do c = 1, grid % n_cells
-      if(grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
-        n_polyg = n_polyg + 1                  ! add one for number of polyfaces
-        do i_fac = 1, grid % cells_n_faces(c)  ! add all faces and their nodes
-          s = grid % cells_f(i_fac, c)
+    do c1 = c_s, c_e
+      if(grid % cells_n_nodes(c1) .lt. 0) then  ! found a polyhedron
+        n_polyg = n_polyg + 1                   ! add one for number of polyfs
+        do i_fac = 1, grid % cells_n_faces(c1)  ! add all faces and their nodes
+          s = grid % cells_f(i_fac, c1)
           n = grid % faces_n_nodes(s)
           n_polyg = n_polyg + 1 + n
         end do
       end if
     end do
   else
-    do c2 = -grid % n_bnd_cells, -1
+    do c2 = c_s, c_e
       n_conns = n_conns + grid % cells_n_nodes(c2)
     end do
   end if
@@ -133,12 +159,12 @@
 
   write(str1,'(i0.0)') grid % n_nodes
   if(plot_inside) then
-    write(str2,'(i0.0)') grid % n_cells
+    write(str2,'(i0.0)') (c_e-c_s+1)
   else
-    if(grid % n_bnd_cells .eq. 0) then
-      write(str2,'(i1)')   grid % n_bnd_cells  ! 0.0 doesn't work for zero :-/
+    if((c_e-c_s+1) .eq. 0) then
+      write(str2,'(i1)')   (c_e-c_s+1)  ! 0.0 doesn't work for zero :-/
     else
-      write(str2,'(i0.0)') grid % n_bnd_cells
+      write(str2,'(i0.0)') (c_e-c_s+1)
     end if
   end if
   write(f9) IN_2 // '<Piece NumberOfPoints="' // trim(str1)    //  &
@@ -188,38 +214,43 @@
 
   ! Fill up an array with cell offsets and save the header only
   cell_offset = 0
-  do c = 1, grid % n_cells
-    cell_offset = cell_offset + abs(grid % cells_n_nodes(c))
-    offs_save(c) = cell_offset
-  end do
-  cell_offset = 0
-  do c2 = -grid % n_bnd_cells, -1
-    cell_offset = cell_offset + grid % cells_n_nodes(c2)
-    offs_save(c2) = cell_offset
-  end do
+  if(plot_inside) then
+    do c1 = c_s, c_e
+      cell_offset   = cell_offset + abs(grid % cells_n_nodes(c1))
+      offs_save(c1) = cell_offset
+    end do
+  else
+    do c2 = c_s, c_e
+      cell_offset   = cell_offset + grid % cells_n_nodes(c2)
+      offs_save(c2) = cell_offset
+    end do
+  end if
   call Save_Scalar_Int(grid, "offsets", plot_inside,           &
-                              offs_save(-grid % n_bnd_cells),  &
+                              offs_save(c_s:c_e),   &
                               f8, f9, data_offset, 1)  ! 1 => header only
 
   ! Fill up an array with cell types and save the header only
-  do c = 1, grid % n_cells
-    if(grid % cells_n_nodes(c) .eq. 8) type_save(c) = VTK_HEXAHEDRON
-    if(grid % cells_n_nodes(c) .eq. 6) type_save(c) = VTK_WEDGE
-    if(grid % cells_n_nodes(c) .eq. 4) type_save(c) = VTK_TETRA
-    if(grid % cells_n_nodes(c) .eq. 5) type_save(c) = VTK_PYRAMID
-    if(grid % cells_n_nodes(c) .lt. 0) type_save(c) = VTK_POLYHEDRON
-  end do
-  do c2 = -grid % n_bnd_cells, -1
-    if(grid % cells_n_nodes(c2) .eq. 4) then
-      type_save(c2) = VTK_QUAD
-    else if(grid % cells_n_nodes(c2) .eq. 3) then
-      type_save(c2) = VTK_TRIANGLE
-    else
-      type_save(c2) = VTK_POLYGON
-    end if
-  end do
+  if(plot_inside) then
+    do c1 = c_s, c_e
+      if(grid % cells_n_nodes(c1) .eq. 8) type_save(c1) = VTK_HEXAHEDRON
+      if(grid % cells_n_nodes(c1) .eq. 6) type_save(c1) = VTK_WEDGE
+      if(grid % cells_n_nodes(c1) .eq. 4) type_save(c1) = VTK_TETRA
+      if(grid % cells_n_nodes(c1) .eq. 5) type_save(c1) = VTK_PYRAMID
+      if(grid % cells_n_nodes(c1) .lt. 0) type_save(c1) = VTK_POLYHEDRON
+    end do
+  else
+    do c2 = c_s, c_e
+      if(grid % cells_n_nodes(c2) .eq. 4) then
+        type_save(c2) = VTK_QUAD
+      else if(grid % cells_n_nodes(c2) .eq. 3) then
+        type_save(c2) = VTK_TRIANGLE
+      else
+        type_save(c2) = VTK_POLYGON
+      end if
+    end do
+  end if
   call Save_Scalar_Int(grid, "types", plot_inside,             &
-                              type_save(-grid % n_bnd_cells),  &
+                              type_save(c_s:c_e),   &
                               f8, f9, data_offset, 1)  ! 1 => header only
 
   ! Write parts of header for polyhedral cells
@@ -242,7 +273,7 @@
                       ' format="appended"'             //  &
                       ' offset="' // trim(str1) //'">' // LF
     write(f9) IN_4 // '</DataArray>' // LF
-    data_offset = data_offset + SP + grid % n_cells * IP  ! prepare for next
+    data_offset = data_offset + SP + (c_e-c_s+1) * IP  ! prepare for next
 
   end if
 
@@ -281,20 +312,20 @@
       data_size = n_conns * IP
       write(f9) data_size
       if(plot_inside) then
-        do c = 1, grid % n_cells
+        do c1 = c_s, c_e
 
           ! Tetrahedral, pyramid, wedge and hexahedral cells
-          if( any( grid % cells_n_nodes(c) .eq. (/4,5,6,8/)  ) ) then
-            write(f9) (grid % cells_n(1:grid % cells_n_nodes(c), c))-1
+          if( any( grid % cells_n_nodes(c1) .eq. (/4,5,6,8/)  ) ) then
+            write(f9) (grid % cells_n(1:grid % cells_n_nodes(c1), c1))-1
 
           ! Polyhedral cells
-          else if(grid % cells_n_nodes(c) .lt. 0) then
-            write(f9) (grid % cells_n(1:-grid % cells_n_nodes(c), c))-1
+          else if(grid % cells_n_nodes(c1) .lt. 0) then
+            write(f9) (grid % cells_n(1:-grid % cells_n_nodes(c1), c1))-1
 
           end if
         end do
       else  ! plot only boundary
-        do c2 = -grid % n_bnd_cells, -1
+        do c2 = c_s, c_e
 
           ! All cell types
           write(f9) (grid % cells_n(1:grid % cells_n_nodes(c2), c2))-1
@@ -303,12 +334,12 @@
       end if
 
       ! Save cell offsets
-      call Save_Scalar_Int(grid, "offsets", plot_inside,           &
-                                  offs_save(-grid % n_bnd_cells),  &
+      call Save_Scalar_Int(grid, "offsets", plot_inside,     &
+                                  offs_save(c_s:c_e),        &
                                   f8, f9, data_offset, run)
       ! Save cell types
-      call Save_Scalar_Int(grid, "types", plot_inside,             &
-                                  type_save(-grid % n_bnd_cells),  &
+      call Save_Scalar_Int(grid, "types", plot_inside,       &
+                                  type_save(c_s:c_e),        &
                                   f8, f9, data_offset, run)
 
       if(n_polyg > 0) then
@@ -317,11 +348,11 @@
         data_size = n_polyg * IP
         write(f9) data_size
 
-        do c = 1, grid % n_cells
-          if(grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
-            write(f9) grid % cells_n_faces(c)      ! write number of polygons
-            do i_fac = 1, grid % cells_n_faces(c)  ! write nodes of each polygon
-              s = grid % cells_f(i_fac, c)
+        do c1 = c_s, c_e
+          if(grid % cells_n_nodes(c1) .lt. 0) then  ! found a polyhedron
+            write(f9) grid % cells_n_faces(c1)      ! write number of polygons
+            do i_fac = 1, grid % cells_n_faces(c1)  ! write nodes of each polygn
+              s = grid % cells_f(i_fac, c1)
               n = grid % faces_n_nodes(s)
               write(f9) n, (grid % faces_n(1:n, s))-1
             end do
@@ -329,15 +360,15 @@
         end do
 
         ! Write polyhedral cells' faces offsets
-        data_size = grid % n_cells * IP
+        data_size = (c_e-c_s+1) * IP
         write(f9) data_size
 
         cell_offset = 0
-        do c = 1, grid % n_cells
-          if(grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
-            cell_offset = cell_offset + 1          ! to store number of polygons
-            do i_fac = 1, grid % cells_n_faces(c)  ! to store all the nodes
-              s = grid % cells_f(i_fac, c)         ! of each polygon
+        do c1 = c_s, c_e
+          if(grid % cells_n_nodes(c1) .lt. 0) then  ! found a polyhedron
+            cell_offset = cell_offset + 1           ! to store number of polygs
+            do i_fac = 1, grid % cells_n_faces(c1)  ! to store all the nodes
+              s = grid % cells_f(i_fac, c1)         ! of each polygon
               n = grid % faces_n_nodes(s)
               cell_offset = cell_offset + 1 + n
             end do
@@ -357,116 +388,116 @@
     !--------------------!
     !   Processor i.d.   !
     !--------------------!
-    do c = 1, grid % n_cells
-      int_save(c) = grid % comm % cell_proc(c)
+    do c1 = c_s, c_e
+      int_save(c1) = grid % comm % cell_proc(c1)
     end do
-    do c2 = -grid % n_bnd_cells, -1
+    do c2 = c_s, c_e
       int_save(c2) = grid % comm % cell_proc(c2)
     end do
-    call Save_Scalar_Int(grid, "Processor", plot_inside,        &
-                                int_save(-grid % n_bnd_cells),  &
+    call Save_Scalar_Int(grid, "Processor", plot_inside,   &
+                                int_save(c_s:c_e),         &
                                 f8, f9, data_offset, run)
 
     !-------------------!
     !   Domain number   !
     !-------------------!
     if(present(domain)) then
-      int_save(-grid % n_bnd_cells:grid % n_cells) = domain
-      call Save_Scalar_Int(grid, "Domain", plot_inside,           &
-                                  int_save(-grid % n_bnd_cells),  &
+      int_save(c_s:c_e) = domain
+      call Save_Scalar_Int(grid, "Domain", plot_inside,      &
+                                  int_save(c_s:c_e),         &
                                   f8, f9, data_offset, run)
     end if
 
     !--------------!
     !   Velocity   !
     !--------------!
-    call Save_Vector_Real(grid, "Velocity", plot_inside,            &
-                                flow % u % n(-grid % n_bnd_cells),  &
-                                flow % v % n(-grid % n_bnd_cells),  &
-                                flow % w % n(-grid % n_bnd_cells),  &
+    call Save_Vector_Real(grid, "Velocity", plot_inside,   &
+                                flow % u % n(c_s:c_e),     &
+                                flow % v % n(c_s:c_e),     &
+                                flow % w % n(c_s:c_e),     &
                                 f8, f9, data_offset, run)
 
     !---------------!
     !   Potential   !
     !---------------!
-    call Save_Scalar_Real(grid, "Potential", plot_inside,             &
-                                flow % pot % n(-grid % n_bnd_cells),  &
+    call Save_Scalar_Real(grid, "Potential", plot_inside,  &
+                                flow % pot % n(c_s:c_e),   &
                                 f8, f9, data_offset, run)
 
     !--------------!
     !   Pressure   !
     !--------------!
     call Save_Scalar_Real(grid, "PressureCorrection", plot_inside,   &
-                                flow % pp % n(-grid % n_bnd_cells),  &
+                                flow % pp % n(c_s:c_e),              &
                                 f8, f9, data_offset, run)
     call Save_Scalar_Real(grid, "Pressure", plot_inside,             &
-                                flow % p % n(-grid % n_bnd_cells),   &
+                                flow % p % n(c_s:c_e),               &
                                 f8, f9, data_offset, run)
     px_save(:) = 0.0
     py_save(:) = 0.0
     pz_save(:) = 0.0
-    do c = -grid % n_bnd_cells, grid % n_cells
-      px_save(c) = flow % p % x(c) * grid % vol(c)
-      py_save(c) = flow % p % y(c) * grid % vol(c)
-      pz_save(c) = flow % p % z(c) * grid % vol(c)
+    do c1 = c_s, c_e
+      px_save(c1) = flow % p % x(c1) * grid % vol(c1)
+      py_save(c1) = flow % p % y(c1) * grid % vol(c1)
+      pz_save(c1) = flow % p % z(c1) * grid % vol(c1)
     end do
     call Save_Vector_Real(grid, "PressureForce", plot_inside,  &
-                                px_save(-grid % n_bnd_cells),  &
-                                py_save(-grid % n_bnd_cells),  &
-                                pz_save(-grid % n_bnd_cells),  &
+                                px_save(c_s:c_e),              &
+                                py_save(c_s:c_e),              &
+                                pz_save(c_s:c_e),              &
                                 f8, f9, data_offset, run)
 
     !-----------------!
     !   Temperature   !
     !-----------------!
     if(heat_transfer) then
-      call Save_Scalar_Real(grid, "Temperature", plot_inside,         &
-                                  flow % t % n(-grid % n_bnd_cells),  &
+      call Save_Scalar_Real(grid, "Temperature", plot_inside,  &
+                                  flow % t % n(c_s:c_e),       &
                                   f8, f9, data_offset, run)
     end if
 
     !-------------------------!
     !   Physical properties   !
     !-------------------------!
-    call Save_Scalar_Real(grid, "PhysicalDensity", plot_inside,            &
-                                flow % density(-grid % n_bnd_cells),       &
+    call Save_Scalar_Real(grid, "PhysicalDensity", plot_inside,       &
+                                flow % density(c_s:c_e),              &
                                 f8, f9, data_offset, run)
-    call Save_Scalar_Real(grid, "PhysicalViscosity", plot_inside,          &
-                                flow % viscosity(-grid % n_bnd_cells),     &
+    call Save_Scalar_Real(grid, "PhysicalViscosity", plot_inside,     &
+                                flow % viscosity(c_s:c_e),            &
                                 f8, f9, data_offset, run)
-    call Save_Scalar_Real(grid, "PhysicalConductivity", plot_inside,       &
-                                flow % conductivity(-grid % n_bnd_cells),  &
+    call Save_Scalar_Real(grid, "PhysicalConductivity", plot_inside,  &
+                                flow % conductivity(c_s:c_e),         &
                                 f8, f9, data_offset, run)
-    call Save_Scalar_Real(grid, "PhysicalCapacity", plot_inside,           &
-                                flow % capacity(-grid % n_bnd_cells),      &
+    call Save_Scalar_Real(grid, "PhysicalCapacity", plot_inside,      &
+                                flow % capacity(c_s:c_e),             &
                                 f8, f9, data_offset, run)
 
     !---------------------!
     !   Volume fraction   !
     !---------------------!
     if(mult % model .eq. VOLUME_OF_FLUID) then
-      call Save_Scalar_Real(grid, "VofSharp", plot_inside,                  &
-                                  mult % vof % n(-grid % n_bnd_cells),      &
+      call Save_Scalar_Real(grid, "VofSharp", plot_inside,                &
+                                  mult % vof % n(c_s:c_e),                &
                                   f8, f9, data_offset, run)
-      call Save_Scalar_Real(grid, "VofSmooth", plot_inside,                 &
-                                  mult % smooth % n(-grid % n_bnd_cells),   &
+      call Save_Scalar_Real(grid, "VofSmooth", plot_inside,               &
+                                  mult % smooth % n(c_s:c_e),             &
                                   f8, f9, data_offset, run)
-      call Save_Scalar_Real(grid, "VofCurvature", plot_inside,              &
-                                  mult % curv(-grid % n_bnd_cells),         &
+      call Save_Scalar_Real(grid, "VofCurvature", plot_inside,            &
+                                  mult % curv(c_s:c_e),                   &
                                   f8, f9, data_offset, run)
-      call Save_Vector_Real(grid, "VofSurfaceNormals", plot_inside,  &
-                                  mult % nx(-grid % n_bnd_cells),    &
-                                  mult % ny(-grid % n_bnd_cells),    &
-                                  mult % nz(-grid % n_bnd_cells),    &
+      call Save_Vector_Real(grid, "VofSurfaceNormals", plot_inside,       &
+                                  mult % nx(c_s:c_e),                     &
+                                  mult % ny(c_s:c_e),                     &
+                                  mult % nz(c_s:c_e),                     &
                                   f8, f9, data_offset, run)
       call Save_Vector_Real(grid, "VofSurfaceTensionForce", plot_inside,  &
-                                  mult % surf_fx(-grid % n_bnd_cells),    &
-                                  mult % surf_fy(-grid % n_bnd_cells),    &
-                                  mult % surf_fz(-grid % n_bnd_cells),    &
+                                  mult % surf_fx(c_s:c_e),                &
+                                  mult % surf_fy(c_s:c_e),                &
+                                  mult % surf_fz(c_s:c_e),                &
                                   f8, f9, data_offset, run)
       if (allocated(mult % flux_rate)) then
-        call Save_Scalar_Real(grid, "FluxRate ", plot_inside,               &
-                                    mult % flux_rate(-grid % n_bnd_cells),  &
+        call Save_Scalar_Real(grid, "FluxRate ", plot_inside,             &
+                                    mult % flux_rate(c_s:c_e),            &
                                     f8, f9, data_offset, run)
       end if
     end if
@@ -475,11 +506,11 @@
     !   Number of impacts and reflections   !
     !---------------------------------------!
     if(mult % model .eq. LAGRANGIAN_PARTICLES .and. .not. plot_inside) then
-      call Save_Scalar_Real(grid, "ParticlesReflected", plot_inside,         &
-                                  swarm % n_reflected(-grid % n_bnd_cells),  &
+      call Save_Scalar_Real(grid, "ParticlesReflected", plot_inside,  &
+                                  swarm % n_reflected(c_s:c_e),       &
                                   f8, f9, data_offset, run)
-      call Save_Scalar_Real(grid, "ParticlesDeposited", plot_inside,         &
-                                  swarm % n_deposited(-grid % n_bnd_cells),  &
+      call Save_Scalar_Real(grid, "ParticlesDeposited", plot_inside,  &
+                                  swarm % n_deposited(c_s:c_e),       &
                                   f8, f9, data_offset, run)
     end if
 
@@ -488,8 +519,8 @@
     !------------------!
     do sc = 1, flow % n_scalars
       phi => flow % scalar(sc)
-      call Save_Scalar_Real(grid, phi % name, plot_inside,       &
-                                  phi % n(-grid % n_bnd_cells),  &
+      call Save_Scalar_Real(grid, phi % name, plot_inside,   &
+                                  phi % n(c_s:c_e),          &
                                   f8, f9, data_offset, run)
     end do
 
@@ -497,11 +528,11 @@
     !   Q-criterion   !
     !-----------------!
     q_save(:) = 0.0
-    do c = 1, grid % n_cells
-      q_save(c) = (flow % vort(c)**2 - flow % shear(c)**2)/4.
+    do c1 = c_s, c_e
+      q_save(c1) = (flow % vort(c1)**2 - flow % shear(c1)**2)/4.
     end do
     call Save_Scalar_Real(grid, "QCriterion", plot_inside,   &
-                                q_save(-grid % n_bnd_cells),  &
+                                q_save(c_s:c_e),             &
                                 f8, f9, data_offset, run)
 
     !--------------------------!
@@ -515,14 +546,14 @@
        turb % model .eq. RSM_MANCEAU_HANJALIC  .or.  &
        turb % model .eq. RSM_HANJALIC_JAKIRLIC  ) then
       call Save_Scalar_Real(grid, "TurbulentKineticEnergy", plot_inside,  &
-                                  turb % kin % n(-grid % n_bnd_cells),    &
+                                  turb % kin % n(c_s:c_e),                &
                                   f8, f9, data_offset, run)
       call Save_Scalar_Real(grid, "TurbulentDissipation", plot_inside,    &
-                                  turb % eps % n(-grid % n_bnd_cells),    &
+                                  turb % eps % n(c_s:c_e),                &
                                   f8, f9, data_offset, run)
       call Save_Scalar_Real(grid, "TurbulentKineticEnergyProduction",     &
                                   plot_inside,                            &
-                                  turb % p_kin(-grid % n_bnd_cells),      &
+                                  turb % p_kin(c_s:c_e),                  &
                                   f8, f9, data_offset, run)
     end if
 
@@ -530,113 +561,111 @@
     if(turb % model .eq. K_EPS_ZETA_F .or.  &
        turb % model .eq. HYBRID_LES_RANS) then
       v2_calc(:) = 0.0
-      do c = 1, grid % n_cells
-        v2_calc(c) = turb % kin % n(c) * turb % zeta % n(c)
+      do c1 = c_s, c_e
+        v2_calc(c1) = turb % kin % n(c1) * turb % zeta % n(c1)
       end do
       call Save_Scalar_Real(grid, "TurbulentQuantityV2", plot_inside,     &
-                                  v2_calc (-grid % n_bnd_cells),          &
+                                  v2_calc (c_s:c_e),                      &
                                   f8, f9, data_offset, run)
       call Save_Scalar_Real(grid, "TurbulentQuantityZeta", plot_inside,   &
-                                  turb % zeta % n(-grid % n_bnd_cells),   &
+                                  turb % zeta % n(c_s:c_e),               &
                                   f8, f9, data_offset, run)
       call Save_Scalar_Real(grid, "TurbulentQuantityF22", plot_inside,    &
-                                  turb % f22  % n(-grid % n_bnd_cells),   &
+                                  turb % f22  % n(c_s:c_e),               &
                                   f8, f9, data_offset, run)
       if (heat_transfer) then
         call Save_Scalar_Real(grid, "TurbulentQuantityT2", plot_inside,   &
-                                    turb % t2 % n(-grid % n_bnd_cells),   &
+                                    turb % t2 % n(c_s:c_e),               &
                                     f8, f9, data_offset, run)
         call Save_Scalar_Real(grid, "TurbulentT2Production", plot_inside, &
-                                    turb % p_t2(-grid % n_bnd_cells),     &
+                                    turb % p_t2(c_s:c_e),                 &
                                     f8, f9, data_offset, run)
         call Save_Scalar_Real(grid, "TurbulentHeatFluxX", plot_inside,    &
-                                    turb % ut % n(-grid % n_bnd_cells),   &
+                                    turb % ut % n(c_s:c_e),               &
                                     f8, f9, data_offset, run)
         call Save_Scalar_Real(grid, "TurbulentHeatFluxY", plot_inside,    &
-                                    turb % vt % n(-grid % n_bnd_cells),   &
+                                    turb % vt % n(c_s:c_e),               &
                                     f8, f9, data_offset, run)
         call Save_Scalar_Real(grid, "TurbulentHeatFluxZ", plot_inside,    &
-                                    turb % wt % n(-grid % n_bnd_cells),   &
+                                    turb % wt % n(c_s:c_e),               &
                                     f8, f9, data_offset, run)
         call Save_Scalar_Real(grid, "TurbulenQuantityAlphaL",             &
                                     plot_inside,                          &
-                                    turb % alpha_l(-grid % n_bnd_cells),  &
+                                    turb % alpha_l(c_s:c_e),              &
                                     f8, f9, data_offset, run)
         call Save_Scalar_Real(grid, "TurbulenQuantityAlphaU",             &
                                     plot_inside,                          &
-                                    turb % alpha_u(-grid % n_bnd_cells),  &
+                                    turb % alpha_u(c_s:c_e),              &
                                     f8, f9, data_offset, run)
       end if
     end if
 
     if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
       call Save_Scalar_Real(grid, "TurbulentQuantityF22", plot_inside,  &
-                                  turb % f22 % n(-grid % n_bnd_cells),  &
+                                  turb % f22 % n(c_s:c_e),              &
                                   f8, f9, data_offset, run)
     end if
 
     ! Save vis and vis_t
     if(turb % model .eq. DES_SPALART .or.  &
        turb % model .eq. SPALART_ALLMARAS) then
-      call Save_Scalar_Real(grid, "TurbulentViscosity", plot_inside,    &
-                                  turb % vis % n(-grid % n_bnd_cells),  &
+      call Save_Scalar_Real(grid, "TurbulentViscosity", plot_inside,  &
+                                  turb % vis % n(c_s:c_e),            &
                                   f8, f9, data_offset, run)
-      call Save_Scalar_Real(grid, "VorticityMagnitude", plot_inside,    &
-                                  flow % vort(-grid % n_bnd_cells),     &
+      call Save_Scalar_Real(grid, "VorticityMagnitude", plot_inside,  &
+                                  flow % vort(c_s:c_e),               &
                                   f8, f9, data_offset, run)
     end if
     kin_vis_t(:) = 0.0
     if(turb % model .ne. NO_TURBULENCE_MODEL .and.  &
        turb % model .ne. DNS) then
-      kin_vis_t   (-grid % n_bnd_cells:grid % n_cells) =  &
-      turb % vis_t(-grid % n_bnd_cells:grid % n_cells) /  &
-         flow % viscosity(-grid % n_bnd_cells:grid % n_cells)
-      call Save_Scalar_Real(grid, "EddyOverMolecularViscosity",        &
-                                  plot_inside,                         &
-                                  kin_vis_t(-grid % n_bnd_cells),      &
+      kin_vis_t(c_s:c_e) = turb % vis_t(c_s:c_e) / flow % viscosity(c_s:c_e)
+      call Save_Scalar_Real(grid, "EddyOverMolecularViscosity",  &
+                                  plot_inside,                   &
+                                  kin_vis_t(c_s:c_e),            &
                                   f8, f9, data_offset, run)
     end if
 
     ! Reynolds stress models
     if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
        turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-      call Save_Scalar_Real(grid, "ReynoldsStressXX", plot_inside,     &
-                                  turb % uu % n(-grid % n_bnd_cells),  &
+      call Save_Scalar_Real(grid, "ReynoldsStressXX", plot_inside,  &
+                                  turb % uu % n(c_s:c_e),           &
                                   f8, f9, data_offset, run)
-      call Save_Scalar_Real(grid, "ReynoldsStressYY", plot_inside,     &
-                                  turb % vv % n(-grid % n_bnd_cells),  &
+      call Save_Scalar_Real(grid, "ReynoldsStressYY", plot_inside,  &
+                                  turb % vv % n(c_s:c_e),           &
                                   f8, f9, data_offset, run)
-      call Save_Scalar_Real(grid, "ReynoldsStressZZ", plot_inside,     &
-                                  turb % ww % n(-grid % n_bnd_cells),  &
+      call Save_Scalar_Real(grid, "ReynoldsStressZZ", plot_inside,  &
+                                  turb % ww % n(c_s:c_e),           &
                                   f8, f9, data_offset, run)
-      call Save_Scalar_Real(grid, "ReynoldsStressXY", plot_inside,     &
-                                  turb % uv % n(-grid % n_bnd_cells),  &
+      call Save_Scalar_Real(grid, "ReynoldsStressXY", plot_inside,  &
+                                  turb % uv % n(c_s:c_e),           &
                                   f8, f9, data_offset, run)
-      call Save_Scalar_Real(grid, "ReynoldsStressXZ", plot_inside,     &
-                                  turb % uw % n(-grid % n_bnd_cells),  &
+      call Save_Scalar_Real(grid, "ReynoldsStressXZ", plot_inside,  &
+                                  turb % uw % n(c_s:c_e),           &
                                   f8, f9, data_offset, run)
-      call Save_Scalar_Real(grid, "ReynoldsStressYZ", plot_inside,     &
-                                  turb % vw % n(-grid % n_bnd_cells),  &
+      call Save_Scalar_Real(grid, "ReynoldsStressYZ", plot_inside,  &
+                                  turb % vw % n(c_s:c_e),           &
                                   f8, f9, data_offset, run)
       if(heat_transfer) then
-        call Save_Scalar_Real(grid, "TurbulentHeatFluxX", plot_inside,    &
-                                    turb % ut % n(-grid % n_bnd_cells),   &
+        call Save_Scalar_Real(grid, "TurbulentHeatFluxX", plot_inside,  &
+                                    turb % ut % n(c_s:c_e),             &
                                     f8, f9, data_offset, run)
-        call Save_Scalar_Real(grid, "TurbulentHeatFluxY", plot_inside,    &
-                                    turb % vt % n(-grid % n_bnd_cells),   &
+        call Save_Scalar_Real(grid, "TurbulentHeatFluxY", plot_inside,  &
+                                    turb % vt % n(c_s:c_e),             &
                                     f8, f9, data_offset, run)
-        call Save_Scalar_Real(grid, "TurbulentHeatFluxZ", plot_inside,    &
-                                    turb % wt % n(-grid % n_bnd_cells),   &
+        call Save_Scalar_Real(grid, "TurbulentHeatFluxZ", plot_inside,  &
+                                    turb % wt % n(c_s:c_e),             &
                                     f8, f9, data_offset, run)
       end if
     end if
 
     ! Statistics for large-scale simulations of turbulence
     if(turb % statistics) then
-      call Save_Vector_Real(grid, "MeanVelocity", plot_inside,          &
-                                  turb % u_mean(-grid % n_bnd_cells),   &
-                                  turb % v_mean(-grid % n_bnd_cells),   &
-                                  turb % w_mean(-grid % n_bnd_cells),   &
+      call Save_Vector_Real(grid, "MeanVelocity", plot_inside,  &
+                                  turb % u_mean(c_s:c_e),       &
+                                  turb % v_mean(c_s:c_e),       &
+                                  turb % w_mean(c_s:c_e),       &
                                   f8, f9, data_offset, run)
       uu_save(:) = 0.0
       vv_save(:) = 0.0
@@ -644,61 +673,61 @@
       uv_save(:) = 0.0
       uw_save(:) = 0.0
       vw_save(:) = 0.0
-      do c = 1, grid % n_cells
-        uu_save(c) = turb % uu_res(c) - turb % u_mean(c) * turb % u_mean(c)
-        vv_save(c) = turb % vv_res(c) - turb % v_mean(c) * turb % v_mean(c)
-        ww_save(c) = turb % ww_res(c) - turb % w_mean(c) * turb % w_mean(c)
-        uv_save(c) = turb % uv_res(c) - turb % u_mean(c) * turb % v_mean(c)
-        uw_save(c) = turb % uw_res(c) - turb % u_mean(c) * turb % w_mean(c)
-        vw_save(c) = turb % vw_res(c) - turb % v_mean(c) * turb % w_mean(c)
+      do c1 = c_s, c_e
+        uu_save(c1) = turb % uu_res(c1) - turb % u_mean(c1) * turb % u_mean(c1)
+        vv_save(c1) = turb % vv_res(c1) - turb % v_mean(c1) * turb % v_mean(c1)
+        ww_save(c1) = turb % ww_res(c1) - turb % w_mean(c1) * turb % w_mean(c1)
+        uv_save(c1) = turb % uv_res(c1) - turb % u_mean(c1) * turb % v_mean(c1)
+        uw_save(c1) = turb % uw_res(c1) - turb % u_mean(c1) * turb % w_mean(c1)
+        vw_save(c1) = turb % vw_res(c1) - turb % v_mean(c1) * turb % w_mean(c1)
       end do
       call Save_Scalar_Real(grid, "MeanReynoldsStressXX", plot_inside,  &
-                                  uu_save(-grid % n_bnd_cells),         &
+                                  uu_save(c_s:c_e),                     &
                                   f8, f9, data_offset, run)
       call Save_Scalar_Real(grid, "MeanReynoldsStressYY", plot_inside,  &
-                                  vv_save(-grid % n_bnd_cells),         &
+                                  vv_save(c_s:c_e),                     &
                                   f8, f9, data_offset, run)
       call Save_Scalar_Real(grid, "MeanReynoldsStressZZ", plot_inside,  &
-                                  ww_save(-grid % n_bnd_cells),         &
+                                  ww_save(c_s:c_e),                     &
                                   f8, f9, data_offset, run)
       call Save_Scalar_Real(grid, "MeanReynoldsStressXY", plot_inside,  &
-                                  uv_save(-grid % n_bnd_cells),         &
+                                  uv_save(c_s:c_e),                     &
                                   f8, f9, data_offset, run)
       call Save_Scalar_Real(grid, "MeanReynoldsStressXZ", plot_inside,  &
-                                  uw_save(-grid % n_bnd_cells),         &
+                                  uw_save(c_s:c_e),                     &
                                   f8, f9, data_offset, run)
       call Save_Scalar_Real(grid, "MeanReynoldsStressYZ", plot_inside,  &
-                                  vw_save(-grid % n_bnd_cells),         &
+                                  vw_save(c_s:c_e),                     &
                                   f8, f9, data_offset, run)
       if(heat_transfer) then
-        call Save_Scalar_Real(grid, "MeanTemperature", plot_inside,      &
-                                    turb % t_mean(-grid % n_bnd_cells),  &
+        call Save_Scalar_Real(grid, "MeanTemperature", plot_inside,     &
+                                    turb % t_mean(c_s:c_e),             &
                                     f8, f9, data_offset, run)
         t2_save(:) = 0.0
         ut_save(:) = 0.0
         vt_save(:) = 0.0
         wt_save(:) = 0.0
-        do c = 1, grid % n_cells
-          t2_save(c) = turb % t2_res(c) - turb % t_mean(c) * turb % t_mean(c)
-          ut_save(c) = turb % ut_res(c) - turb % u_mean(c) * turb % t_mean(c)
-          vt_save(c) = turb % vt_res(c) - turb % v_mean(c) * turb % t_mean(c)
-          wt_save(c) = turb % wt_res(c) - turb % w_mean(c) * turb % t_mean(c)
+        do c1 = c_s, c_e
+          t2_save(c1) = turb % t2_res(c1) - turb % t_mean(c1)*turb % t_mean(c1)
+          ut_save(c1) = turb % ut_res(c1) - turb % u_mean(c1)*turb % t_mean(c1)
+          vt_save(c1) = turb % vt_res(c1) - turb % v_mean(c1)*turb % t_mean(c1)
+          wt_save(c1) = turb % wt_res(c1) - turb % w_mean(c1)*turb % t_mean(c1)
         end do
         call Save_Scalar_Real(grid, "MeanTurbulentQuantityT2",     &
                                     plot_inside,                   &
-                                    t2_save(-grid % n_bnd_cells),  &
+                                    t2_save(c_s:c_e),              &
                                     f8, f9, data_offset, run)
         call Save_Scalar_Real(grid, "MeanTurbulentHeatFluxX",      &
                                     plot_inside,                   &
-                                    ut_save(-grid % n_bnd_cells),  &
+                                    ut_save(c_s:c_e),              &
                                     f8, f9, data_offset, run)
         call Save_Scalar_Real(grid, "MeanTurbulentHeatFluxY",      &
                                     plot_inside,                   &
-                                    vt_save(-grid % n_bnd_cells),  &
+                                    vt_save(c_s:c_e),              &
                                     f8, f9, data_offset, run)
         call Save_Scalar_Real(grid, "MeanTurbulentHeatFluxZ",      &
                                     plot_inside,                   &
-                                    wt_save(-grid % n_bnd_cells),  &
+                                    wt_save(c_s:c_e),              &
                                     f8, f9, data_offset, run)
       end if
 
@@ -707,11 +736,11 @@
         phi => flow % scalar(sc)
         name_mean = 'Mean'
         name_mean(5:8) = phi % name
-        do c = 1, grid % n_cells
-          phi_save(c) = turb % scalar_mean(sc, c)
+        do c1 = c_s, c_e
+          phi_save(c1) = turb % scalar_mean(sc, c1)
         end do
         call Save_Scalar_Real(grid, name_mean, plot_inside,  &
-                         phi_save(-grid % n_bnd_cells),      &
+                         phi_save(c_s:c_e),                  &
                          f8, f9, data_offset, run)
       end do
     end if
@@ -719,24 +748,24 @@
     ! Save y+ for all turbulence models
     if(turb % model .ne. NO_TURBULENCE_MODEL .and.  &
        turb % model .ne. DNS) then
-      call Save_Scalar_Real(grid, "TurbulentQuantityYplus",            &
-                                  plot_inside,                         &
-                                  turb % y_plus(-grid % n_bnd_cells),  &
+      call Save_Scalar_Real(grid, "TurbulentQuantityYplus",  &
+                                  plot_inside,               &
+                                  turb % y_plus(c_s:c_e),    &
                                   f8, f9, data_offset, run)
     end if
 
     ! Wall distance and delta, important for all models
-    call Save_Scalar_Real(grid, "GridWallDistance", plot_inside,        &
-                                grid % wall_dist(-grid % n_bnd_cells),  &
+    call Save_Scalar_Real(grid, "GridWallDistance", plot_inside,   &
+                                grid % wall_dist(c_s:c_e),         &
                                 f8, f9, data_offset, run)
-    call Save_Scalar_Real(grid, "GridCellDeltaMax", plot_inside,    &
-                                turb % h_max(-grid % n_bnd_cells),  &
+    call Save_Scalar_Real(grid, "GridCellDeltaMax", plot_inside,   &
+                                turb % h_max(c_s:c_e),             &
                                 f8, f9, data_offset, run)
-    call Save_Scalar_Real(grid, "GridCellDeltaMin", plot_inside,    &
-                                turb % h_min(-grid % n_bnd_cells),  &
+    call Save_Scalar_Real(grid, "GridCellDeltaMin", plot_inside,   &
+                                turb % h_min(c_s:c_e),             &
                                 f8, f9, data_offset, run)
-    call Save_Scalar_Real(grid, "GridCellDeltaWall", plot_inside,   &
-                                turb % h_w  (-grid % n_bnd_cells),  &
+    call Save_Scalar_Real(grid, "GridCellDeltaWall", plot_inside,  &
+                                turb % h_w  (c_s:c_e),             &
                                 f8, f9, data_offset, run)
 
     !----------------------!
@@ -746,8 +775,8 @@
 
       a_name = 'A_00'
       write(a_name(3:4), '(I2.2)') ua
-      call Save_Scalar_Real(grid, a_name, plot_inside,                        &
-                                  grid % user_array(ua,-grid % n_bnd_cells),  &
+      call Save_Scalar_Real(grid, a_name, plot_inside,            &
+                                  grid % user_array(ua,c_s:c_e),  &
                                   f8, f9, data_offset, run)
     end do
 

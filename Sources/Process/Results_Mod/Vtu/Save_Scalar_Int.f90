@@ -10,13 +10,13 @@
   type(Grid_Type)  :: grid
   character(len=*) :: var_name
   logical          :: plot_inside     ! plot results inside?
-  integer          :: val(-grid % n_bnd_cells:grid % n_cells)
+  integer          :: val(:)
   integer          :: fs, fp          ! file unit sequential and parallel
   integer          :: data_offset
   integer          :: sweep           ! is it the first or second sweep
 !-----------------------------------[Locals]-----------------------------------!
   integer(SP)   :: data_size
-  integer       :: c, c2
+  integer       :: c1, c2, c_s, c_e
   character(SL) :: str1
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: IP = DP  ! int. precision is double precision
@@ -24,6 +24,9 @@
 !==============================================================================!
 
   data_size = 0
+
+  c_s = lbound(val, 1)
+  c_e = ubound(val, 1)
 
   ! Header
   if(sweep .eq. 1) then
@@ -45,17 +48,17 @@
   ! Data
   if(sweep .eq. 2) then
     if(plot_inside) then
-      data_size = grid % n_cells * IP
+      data_size = (c_e-c_s+1) * IP
       write(fp) data_size
-      do c = 1, grid % n_cells
-        write(fp) val(c)
+      do c1 = c_s, c_e
+        write(fp) val(c1)
       end do
     else
-      do c2 = -grid % n_bnd_cells, -1
+      do c2 = c_s, c_e
         data_size = data_size + IP
       end do
       write(fp) data_size
-      do c2 = -grid % n_bnd_cells, -1
+      do c2 = c_s, c_e
         write(fp) val(c2)
       end do
     end if
@@ -64,10 +67,9 @@
   ! Update data_offset
   if(sweep .eq. 1) then
     if(plot_inside) then
-      data_offset = data_offset  &
-                  + grid % n_cells * IP
+      data_offset = data_offset + (c_e-c_s+1) * IP
     else
-      do c2 = -grid % n_bnd_cells, -1
+      do c2 = c_s, c_e
         data_offset = data_offset + IP
       end do
     end if
