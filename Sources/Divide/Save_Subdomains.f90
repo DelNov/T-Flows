@@ -167,9 +167,9 @@
       end if  ! subo .ne. sub
     end do    ! subo
 
-    !---------------------------------------!
-    ! Step 2: boundary cells in the domain sub
-    !---------------------------------------!
+    !----------------------------------------------!
+    !   Step 2: boundary cells in the domain sub   !
+    !----------------------------------------------!
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
