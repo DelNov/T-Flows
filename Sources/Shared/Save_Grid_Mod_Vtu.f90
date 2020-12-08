@@ -14,6 +14,7 @@
 
   include 'Save_Grid_Mod/Vtu/Save_Vtu_Cells.f90'        ! binary
   include 'Save_Grid_Mod/Vtu/Save_Vtu_Faces.f90'        ! binary
+  include 'Save_Grid_Mod/Vtu/Save_Vtu_Edges.f90'        ! ascii
   include 'Save_Grid_Mod/Vtu/Save_Cgns_Cells_Void.f90'
 
   end module 
