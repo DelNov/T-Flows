@@ -1,7 +1,7 @@
 !==============================================================================!
-  integer function N_Edges_On_Bnd_Color(grid, bc)
+  integer function N_Edges_On_Bnd_Color(grid, bc, edge_data)
 !------------------------------------------------------------------------------!
-!   Counts and marks (with new_e) edges in the given boundary color            !
+!   Counts and marks (with edge_data) edges in the given boundary color        !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod
@@ -10,6 +10,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
   integer         :: bc
+  integer         :: edge_data(grid % n_edges)
 !-----------------------------------[Locals]-----------------------------------!
   integer :: e, cnt, s1, s2
   real    :: n1(3), n2(3)
@@ -17,7 +18,7 @@
 
   ! Nullify on entry
   cnt = 0
-  grid % new_e(:) = 0
+  edge_data(:) = 0
 
   do e = 1, grid % n_edges
 
@@ -36,10 +37,9 @@
         n1(1:3) = n1(1:3) / norm2(n1(1:3))
         n2(1:3) = n2(1:3) / norm2(n2(1:3))
 
-        ! PRINT '(6ES12.3)', DOT_PRODUCT(N1(1:3), N2(1:3))
-        if(abs(dot_product(n1(1:3), n2(1:3))) < 0.7071) then
+        if(dot_product(n1(1:3), n2(1:3)) < 0.7071) then
           cnt = cnt + 1
-          grid % new_e(e) = cnt
+          edge_data(e) = edge_data(e) + 1
         end if
       end if
 
@@ -51,7 +51,7 @@
       ! But there is more
       if( sum(grid % edges_bc(1:grid % n_bnd_cond, e)) .gt. 1 ) then
         cnt = cnt + 1
-        grid % new_e(e) = cnt
+        edge_data(e) = edge_data(e) + 1
       end if
     end if
   end do

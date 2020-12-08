@@ -152,7 +152,7 @@ SRC_FUN += Allocate_Memory.f90       \
            Load_Gambit.f90           \
            Load_Gmsh.f90             \
            Logo_Con.f90              \
-           N_Cells_In_Bnd_Color.f90  \
+           N_Bnd_Cells_In_Color.f90  \
            N_Edges_In_Bnd_Color.f90  \
            N_Nodes_In_Bnd_Color.f90  \
            N_Sharp_Corners.f90       \

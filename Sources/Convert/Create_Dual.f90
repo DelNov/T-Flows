@@ -11,11 +11,11 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: prim, dual
 !----------------------------------[Calling]-----------------------------------!
-  integer :: N_Cells_In_Bnd_Color
-  integer :: N_Nodes_In_Bnd_Color
-  integer :: N_Edges_On_Bnd_Color
   integer :: N_Sharp_Corners
+  integer :: N_Edges_On_Bnd_Color
+  integer :: N_Bnd_Cells_In_Color
   integer :: N_Sharp_Edges
+  integer :: N_Nodes_In_Bnd_Color
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: bc, e, c, c1, c2, s, n, n1, n2
   integer              :: i, i_nod, j_nod, i_edg
@@ -30,6 +30,9 @@
   integer, allocatable :: node_to_face(:)
   integer, allocatable :: node_to_cell(:)
   integer, allocatable :: edge_to_node(:)
+  integer, allocatable :: edge_data(:)
+  integer, allocatable :: cell_data(:)
+  integer, allocatable :: node_data(:)
   integer, allocatable :: sharp_corner(:)     ! for sharp corners one day
   integer              :: c_p_list(2048)      ! prim cell and ...
   integer              :: n_d_list(2048)      ! ... dual node list
@@ -127,11 +130,9 @@
   allocate(prim % edges_n (2,      prim % n_edges))
   allocate(prim % edges_bc(0:n_bc, prim % n_edges))
   allocate(prim % edges_fb(2,      prim % n_edges))
-  allocate(prim % new_e           (prim % n_edges))
   prim % edges_n (:,:) = 0
   prim % edges_bc(:,:) = 0  ! as if .false.
   prim % edges_fb(:,:) = 0
-  prim % new_e     (:) = 0
 
   !---------------------------------------------------------------!
   !   Store compressed edges with their information on boundary   !
@@ -179,6 +180,16 @@
   allocate(node_to_face( prim % n_nodes));  node_to_face(:) = 0
   allocate(node_to_cell( prim % n_nodes));  node_to_cell(:) = 0
   allocate(edge_to_node( prim % n_edges));  edge_to_node(:) = 0
+  allocate(cell_data(-prim % n_bnd_cells  &
+                     :prim % n_cells));  cell_data(:) = 0
+  allocate(edge_data( prim % n_edges));  edge_data(:) = 0
+  allocate(node_data( prim % n_nodes));  node_data(:) = 0
+
+  !----------------------!
+  !   Plot sharp edges   !
+  !----------------------!
+  unused = N_Sharp_Edges(prim, edge_data)     ! find sharp edges
+  call Save_Vtu_Edges(prim, edge_data)
 
   !-------------------------!
   !                         !
@@ -214,14 +225,14 @@
   dual % n_bnd_cells = 0
   do bc = 1, prim % n_bnd_cond
     dual % n_bnd_cells = dual % n_bnd_cells  &
-                       + N_Nodes_In_Bnd_Color(prim, bc)
+                       + N_Nodes_In_Bnd_Color(prim, bc, node_data)
   end do
   dual % n_faces = prim % n_edges  &   ! for faces inside
                  + dual % n_bnd_cells  ! for faces on the boundary
   dual % n_cells = prim % n_nodes
-  dual % n_nodes = prim % n_cells         &
-                 + prim % n_bnd_cells     &
-                 + N_Sharp_Edges(prim)    &
+  dual % n_nodes = prim % n_cells                  &
+                 + prim % n_bnd_cells              &
+                 + N_Sharp_Edges(prim, edge_data)  &
                  + N_Sharp_Corners(prim, sharp_corner)
 
   call Allocate_Memory(dual)
@@ -233,6 +244,8 @@
   !   Browse through all the edges to map   !
   !                                         !
   !-----------------------------------------!
+  d_nn = prim % n_cells      &
+       + prim % n_bnd_cells
 
   do e = 1, prim % n_edges
 
@@ -285,12 +298,10 @@
     !------------------------------------------------------------!
     !   If the face in a sharp corner, add one more node to it   !
     !------------------------------------------------------------!
-    if(prim % new_e(e) .gt. 0) then
+    if(edge_data(e) .gt. 0) then
 
       ! Additional dual node number
-      d_nn = prim % n_cells      &
-           + prim % n_bnd_cells  &
-           + prim % new_e(e)
+      d_nn = d_nn + 1
 
       ! Add extra node to dual's faces' nodes
       dual % faces_n_nodes(f_d) = cnt + 1
@@ -325,28 +336,28 @@
     !----------------------------------------------------!
     !   Call this to mark boundary cells in this color   !
     !----------------------------------------------------!
-    dual_f_here = N_Nodes_In_Bnd_Color(prim, bc)
-    unused      = N_Cells_In_Bnd_Color(prim, bc)
-    unused      = N_Edges_On_Bnd_Color(prim, bc)
+    dual_f_here = N_Nodes_In_Bnd_Color(prim, bc, node_data)
+    unused      = N_Bnd_Cells_In_Color(prim, bc, cell_data)
+    unused      = N_Edges_On_Bnd_Color(prim, bc, edge_data)
 
     !-----------------------------------------!
     !   Find dual's boundary face, and dual   !
     !   boundary cell nodes from prim cells   !
     !-----------------------------------------!
     do c = -prim % n_bnd_cells, -1
-      if(prim % new_c(c) .gt. 0) then
+      if(cell_data(c) .gt. 0) then
 
         ! Take the prim cell's nodes (these are from prim)
         do i_nod = 1, prim % cells_n_nodes(c)
           n_p = prim % cells_n(i_nod, c)
 
           ! Additional boundary face in the dual grid
-          f_d  = curr_f_d + prim % new_n(n_p)
+          f_d  = curr_f_d + node_data(n_p)
           dual % faces_n_nodes(f_d) = dual % faces_n_nodes(f_d) + 1
           dual % faces_n(dual % faces_n_nodes(f_d), f_d) = cell_to_node(c)
 
           ! Additional boundary cell in the dual grid
-          b_d  = curr_b_d - prim % new_n(n_p)
+          b_d  = curr_b_d - node_data(n_p)
           dual % cells_n_nodes(b_d) = dual % cells_n_nodes(b_d) + 1
           dual % cells_n(dual % cells_n_nodes(b_d), b_d) = cell_to_node(c)
           dual % bnd_cond % color(b_d) = bc
@@ -373,7 +384,7 @@
     !   Here we work on the faces already introduced above    !
     !---------------------------------------------------------!
     do e = 1, prim % n_edges
-      if(prim % new_e(e) .gt. 0) then
+      if(edge_data(e) .gt. 0) then
 
         ! Take the prim edge's nodes (these are from prim)
         do i_nod = 1, 2

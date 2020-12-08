@@ -1,8 +1,8 @@
 !==============================================================================!
-  integer function N_Sharp_Edges(grid)
+  integer function N_Sharp_Edges(grid, edge_data)
 !------------------------------------------------------------------------------!
-!   Counts and marks (with new_e) edges at sharp boundaries and in between     !
-!   different boundary conditions.                                             !
+!   Counts and marks (with edge_data) edges at sharp boundaries and            !
+!   in between different boundary conditions.                                  !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod
@@ -10,14 +10,15 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
+  integer         :: edge_data(grid % n_edges)
 !-----------------------------------[Locals]-----------------------------------!
   integer :: e, cnt, s1, s2
   real    :: norm_1(3), norm_2(3)
 !==============================================================================!
 
   ! Nullify on entry
-  cnt             = 0
-  grid % new_e(:) = 0
+  cnt = 0
+  edge_data(:) = 0
 
   !---------------------------------------------!
   !   Fetch geometrically sharp edges (first)   !
@@ -39,10 +40,10 @@
       norm_1(1:3) = norm_1(1:3) / norm2(norm_1(1:3))
       norm_2(1:3) = norm_2(1:3) / norm2(norm_2(1:3))
 
-      ! This has to do with 45 degrees, but I forgot how exactly
-      if(abs(dot_product(norm_1(1:3), norm_2(1:3))) < 0.7071) then
+      ! If angle is less than 45 (135) degrees, or is simply sharp
+      if(dot_product(norm_1(1:3), norm_2(1:3)) < 0.7071) then
         cnt = cnt + 1
-        grid % new_e(e) = cnt
+        edge_data(e) = edge_data(e) + 1
       end if
     end if
 
@@ -53,9 +54,9 @@
   !-------------------------------------------------------------------!
   do e = 1, grid % n_edges
     if( sum(grid % edges_bc(1:grid % n_bnd_cond, e)) .gt. 1 ) then
-      if(grid % new_e(e) .eq. 0) then  ! hasn't been marked yet
+      if(edge_data(e) .eq. 0) then  ! hasn't been marked yet
         cnt = cnt + 1
-        grid % new_e(e) = cnt
+        edge_data(e) = edge_data(e) + 1
       end if
     end if
   end do

@@ -41,7 +41,7 @@
       norm_2(1:3) = norm_2(1:3) / norm2(norm_2(1:3))
 
       ! If angle is less than 45 (135) degrees, or is simply sharp
-      if( dot_product(norm_1(1:3), norm_2(1:3)) < 0.7071) then
+      if(dot_product(norm_1(1:3), norm_2(1:3)) < 0.7071) then
 
         ! Take edges' nodes and mark them (increase
         ! the number of times they have been visited)
