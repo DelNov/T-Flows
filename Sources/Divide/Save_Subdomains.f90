@@ -194,7 +194,7 @@
     end do
 
     !---------------------------------------------------------!
-    !   Step 1: In the domain sub
+    !   Step 1: In the domain sub                             !
     !   (It should preserve the order of the original grid.   !
     !    If the faces in the original grid started from       !
     !    boundary faces, it should be the case here too.)     !
