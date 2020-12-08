@@ -1,7 +1,7 @@
 !==============================================================================!
   integer function N_Sharp_Corners(grid, sharp_corner)
 !------------------------------------------------------------------------------!
-!   Counts and marks (with new_n) nodes at sharp corners                       !
+!   Counts and marks nodes at sharp corners and stores in "sharp_corner"       !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod
