@@ -210,8 +210,6 @@
       grid % comm % cells_send(sub) % n_items = ms
       grid % comm % cells_recv(sub) % n_items = mr
 
-      WRITE(100*THIS_PROC + SUB, '(A,99I9)')  'Send/Recv: (TOT)', ms, mr
-
     end if  ! sub .ne. this_proc
   end do    ! sub
 
