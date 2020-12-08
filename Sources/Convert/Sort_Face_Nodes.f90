@@ -18,7 +18,7 @@
   real    :: sorting(MAX_FACES_N_NODES)  ! sorting criterion
   integer :: order(MAX_FACES_N_NODES)    ! carry-on array with indices
   integer :: max_loc(2)
-  real    :: prod(3), angles(MAX_FACES_N_NODES, MAX_FACES_N_NODES)
+  real    :: prod(3), prod_mag, angles(MAX_FACES_N_NODES, MAX_FACES_N_NODES)
   real    :: sumang, criter
 ! integer :: k, ni, nj, nk, min_loc
 ! real    :: vec_ji(3), vec_jk(3), mag_ji, mag_jk, dot_prod
@@ -66,7 +66,8 @@
   do i = 1, nn
     do j = i + 1, nn
       prod(1:3) = Math_Mod_Cross_Product(np_3d(1:3,i), np_3d(1:3,j))
-      angles(i,j) = asin(norm2(prod(1:3))) * 57.2957795131
+      prod_mag = min(norm2(prod(1:3)), 1.0-MILI)
+      angles(i,j) = asin(prod_mag) * 57.2957795131
       if(angles(i,j) > MILI) then
         cnt = cnt + 1
         sumang = sumang + angles(i,j)
