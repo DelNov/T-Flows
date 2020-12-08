@@ -133,10 +133,14 @@
         end if  ! sh > 0
       end do
 
-      ! Count the inside cells in the buffers
+      ! Count the boundary and inside cells in the buffers
+      ! Note #1: It works again with boundary cells, no idea
+      !          why it stopped in the first place.  One should,
+      !          however, always connect these lines with ones
+      !          below, in Note #2
       ms = 0
       mr = 0
-      do c = 1, grid % n_cells
+      do c = -grid % n_bnd_cells, grid % n_cells
         if(grid % comm % cell_proc(c) .eq. this_proc) then
           n = abs(grid % cells_n_nodes(c))
           if( any( grid % new_n(grid % cells_n(1:n,c)) .eq. -1) ) then
@@ -182,14 +186,16 @@
         allocate(grid % comm % cells_recv(sub) % r_buff(mr));
       end if
 
-      ! Count all (boundary and inside) cells in the buffers
+      ! Count the boundary and inside cells in the buffers
+      ! Note #2: It works again with boundary cells, no idea
+      !          why it stopped in the first place.  One should,
+      !          however, always connect these lines with ones
+      !          above, in Note #1
       ms = 0
       mr = 0
 
-      ! Doesn't work with boundary cells since the introduction of
-      ! polyhedral grids.  But hey, I am really not sure we need it
-      ! do c = -grid % n_bnd_cells, grid % n_cells
-      do c = 1, grid % n_cells
+      ! Store final buffer lengths
+      do c = -grid % n_bnd_cells, grid % n_cells
         if(send_cells(c) .eq. sub) then
           ms = ms + 1
           grid % comm % cells_send(sub) % map(ms) = c
@@ -204,9 +210,10 @@
       grid % comm % cells_send(sub) % n_items = ms
       grid % comm % cells_recv(sub) % n_items = mr
 
-    end if
+      WRITE(100*THIS_PROC + SUB, '(A,99I9)')  'Send/Recv: (TOT)', ms, mr
 
-  end do
+    end if  ! sub .ne. this_proc
+  end do    ! sub
 
   !-------------------------------------!
   !   Avoid faces in the buffers only   !
