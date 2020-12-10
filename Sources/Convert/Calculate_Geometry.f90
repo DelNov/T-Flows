@@ -736,6 +736,9 @@
       n = grid % faces_n_nodes(s)  ! number of nodes in this face
       call Sort_Mod_Reverse_Order_Int(grid % faces_n(1:n, s))
 
+      ! Keep the first node first (important if it is concave)
+      grid % faces_n(1:n,s) = cshift(grid % faces_n(1:n,s), -1)
+
       ! Change the orientation of calculated surface vector
       grid % sx(s) = -grid % sx(s)
       grid % sy(s) = -grid % sy(s)
