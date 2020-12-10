@@ -162,6 +162,7 @@
   do s = 1, grid % n_faces
     n = grid % faces_n_nodes(s)
     write(fu) grid % faces_n(1:n,s)-1
+    WRITE(200, '(99I9)') s-1, n, grid % faces_n(1:n,s)-1
   end do
 
   ! Faces' offsets

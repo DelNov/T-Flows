@@ -268,6 +268,7 @@
             s = grid % cells_f(i_fac, c)
             n = grid % faces_n_nodes(s)
             write(fu) n, grid % new_n(grid % faces_n(1:n, s))-1
+            WRITE(100, '(99I9)') s-1, n, grid % faces_n(1:n,s)-1
           end do
         end if
       end if
