@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Sort_Face_Nodes(grid, s)
+  subroutine Sort_Face_Nodes(grid, s, concave_link)
 !------------------------------------------------------------------------------!
 !   Sort nodes of a given face in rotational fashion                           !
 !------------------------------------------------------------------------------!
@@ -10,6 +10,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
   integer         :: s
+  integer         :: concave_link(2, grid % n_nodes)
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i, j, n, nn, cnt
   real    :: normal_p(3), center_p(3), x_p(3), y_p(3), sense(3)
@@ -17,7 +18,8 @@
   real    :: rp_2d(2,MAX_FACES_N_NODES)
   real    :: sorting(MAX_FACES_N_NODES)  ! sorting criterion
   integer :: order(MAX_FACES_N_NODES)    ! carry-on array with indices
-  integer :: max_loc(2)
+  integer :: max_loc(2), conc_n
+  real    :: conc_xn, conc_yn, conc_zn
   real    :: prod(3), prod_mag, angles(MAX_FACES_N_NODES, MAX_FACES_N_NODES)
   real    :: sumang, criter
 ! integer :: k, ni, nj, nk, min_loc
@@ -26,6 +28,40 @@
 
   ! Take alias
   nn = grid % faces_n_nodes(s)
+
+  !---------------------------------------------------------------!
+  !   A way to deal with concave faces.  Mark its concave node,   !
+  !   move it to a position which makes the face convex, use      !
+  !   the sorting algorithm developed before, and then move the   !
+  !   concave node back to its original position.  This is good   !
+  !   only for faces wiht one concave node.  If it has two, it    !
+  !   is likely that the entire face is in an edge, between two   !
+  !   planes.  This is step 1.  Step 2 is after sorting.          !
+  !---------------------------------------------------------------!
+  cnt    = 0  ! not really needed; it seems that each face can have only one
+  conc_n = 0
+  do i = 1, nn
+    n = grid % faces_n(i, s)
+    if(concave_link(1, n) .gt. 0 .and. concave_link(2, n) .gt. 0) then
+      conc_n = n
+      cnt    = cnt + 1
+
+      ! Store concave node coordinates
+      conc_xn = grid % xn(n)
+      conc_yn = grid % yn(n)
+      conc_zn = grid % zn(n)
+
+      ! Move the concave node in a convex position
+      grid % xn(n) = 0.5 * (  grid % xn(concave_link(1, n))     &
+                            + grid % xn(concave_link(2, n))  )
+      grid % yn(n) = 0.5 * (  grid % yn(concave_link(1, n))     &
+                            + grid % yn(concave_link(2, n))  )
+      grid % zn(n) = 0.5 * (  grid % zn(concave_link(1, n))     &
+                            + grid % zn(concave_link(2, n))  )
+    end if
+  end do
+  if(cnt .eq. 1) print *, '# Found a concave link in face', s
+  if(cnt .eq. 2) print *, '# Found two concave links in face', s
 
   !-----------------------------------!
   !   Find the plane's center point   !
@@ -122,51 +158,43 @@
 
   do i = 1, nn  ! use "i", not "i_nod" here
     sorting(i) = atan2(rp_2d(1,i), rp_2d(2,i)) * 57.2957795131
-    order(i) = i  ! like old number
+    order(i) = grid % faces_n(i, s)
   end do
 
   call Sort_Mod_Real_Carry_2_Int(sorting(1:nn),           &
                                  grid % faces_n(1:nn,s),  &
                                  order(1:nn))
 
-  ! Rotate for better visualisation with Paraview.  Paraview constructs
-  ! a polygon from triangles which all originate in one (first) node.
-  ! If the first node is defined exactly at the sharpest edge, the faces
-  ! visualized in Paraview stand a good chance to look better.  All in 
-  ! all: try to keep the first node first for better visuals. Here we
-  ! find the node with the smalles angle and make it first in the list
-  !2 do j = 1, nn
-  !2   i = j - 1;  if(i <  1) i = nn
-  !2   k = j + 1;  if(k > nn) k =  1
-  !2   ni = grid % faces_n(i, s)
-  !2   nj = grid % faces_n(j, s)
-  !2   nk = grid % faces_n(k, s)
-  !2   vec_ji(1) = grid % xn(nj) - grid % xn(ni)
-  !2   vec_ji(2) = grid % yn(nj) - grid % yn(ni)
-  !2   vec_ji(3) = grid % zn(nj) - grid % zn(ni)
-  !2   vec_jk(1) = grid % xn(nj) - grid % xn(nk)
-  !2   vec_jk(2) = grid % yn(nj) - grid % yn(nk)
-  !2   vec_jk(3) = grid % zn(nj) - grid % zn(nk)
-  !2   mag_ji = norm2(vec_ji(1:3))
-  !2   mag_jk = norm2(vec_jk(1:3)); print *, mag_jk, j, k, vec_jk(1:3)
-  !2   vec_ji(1:3) = vec_ji(1:3) / (mag_ji + FEMTO)
-  !2   vec_jk(1:3) = vec_jk(1:3) / (mag_jk + FEMTO)
-  !2   dot_prod = dot_product(vec_ji, vec_jk)
-  !2   dot_prod = max(dot_prod, -0.999999)
-  !2   dot_prod = min(dot_prod, +0.999999)
-  !2   sorting(j) = acos(dot_prod) * 57.2957795131
-  !2 end do
-  !2 min_loc = minloc(sorting(1:nn), 1)
-  !2 grid % faces_n(1:nn, s) = cshift(grid % faces_n(1:nn, s), min_loc-1)
+  !---------------------------------------------------------------!
+  !   A way to deal with concave faces.  Mark its concave node,   !
+  !   move it to a position which makes the face convex, use      !
+  !   the sorting algorithm developed before, and then move the   !
+  !   concave node back to its original position.  This is good   !
+  !   only for faces wiht one concave node.  If it has two, it    !
+  !   is likely that the entire face is in an edge, between two   !
+  !   planes.  This is step 2.  Step 1 is at the top.             !
+  !---------------------------------------------------------------!
+  if(conc_n .ne. 0) then
+    do i = 1, nn
+      n = grid % faces_n(i, s)
+      if(n .eq. conc_n) then
+        grid % xn(n) = conc_xn
+        grid % yn(n) = conc_yn
+        grid % zn(n) = conc_zn
+      end if
+    end do
+  end if
 
   ! Rotate for better visualisation with Paraview.  Paraview constructs
   ! a polygon from triangles which all originate in the first node.  If
   ! the first node is defined exactly at the sharpest edge, which is also
   ! the first one to be inserted in polynomial face in the calling func.
   ! All in all: try to keep the first node first for better visuals.
-  !1 do while(order(1) .ne. 1)
-  !1   order(1:nn)             = cshift(order(1:nn), 1)
-  !1   grid % faces_n(1:nn, s) = cshift(grid % faces_n(1:nn, s), 1)
-  !1 end do
+  if(conc_n .ne. 0) then
+    do while(order(1) .ne. conc_n)
+      order(1:nn)             = cshift(order(1:nn), 1)
+      grid % faces_n(1:nn, s) = cshift(grid % faces_n(1:nn, s), 1)
+    end do
+  end if
 
   end subroutine
