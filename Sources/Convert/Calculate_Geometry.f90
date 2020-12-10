@@ -14,6 +14,7 @@
   integer              :: c11, c12, c21, c22, s1, s2, bou_cen, cnt_bnd, cnt_per
   integer              :: color_per, n_per, number_faces, option
   integer              :: rot_dir, n1, n2
+  logical              :: per_x, per_y, per_z
   real                 :: xt(MAX_FACES_N_NODES),  &
                           yt(MAX_FACES_N_NODES),  &
                           zt(MAX_FACES_N_NODES)
@@ -422,7 +423,7 @@
         end if
       end if
     end do
-  end if  ! for option .eq. 1
+  end if  ! for option .eq. 2
 
   b_coor = 0.
   b_face = 0
@@ -636,9 +637,25 @@
   n_per = cnt_per/2
   print *, '# Phase I: periodic cells: ', n_per
 
-  !---------------------------------!
-  !   Compress all boundary cells   !
-  !---------------------------------!
+  ! Find periodic extents
+  grid % per_x = 0.0
+  grid % per_y = 0.0
+  grid % per_z = 0.0
+  do s = 1, n_per
+    s1 = b_face(s)
+    s2 = b_face(s + n_per)
+    grid % per_x = max(grid % per_x, abs(grid % xf(s1) - grid % xf(s2)))
+    grid % per_y = max(grid % per_y, abs(grid % yf(s1) - grid % yf(s2)))
+    grid % per_z = max(grid % per_z, abs(grid % zf(s1) - grid % zf(s2)))
+  end do
+  print '(a38,f8.3)', ' # Periodicity in x direction         ', grid % per_x
+  print '(a38,f8.3)', ' # Periodicity in y direction         ', grid % per_y
+  print '(a38,f8.3)', ' # Periodicity in z direction         ', grid % per_z
+
+  !-------------------------------------------------!
+  !   Compress all boundary cells by removing all   !
+  !   cells which were holding periodic condition   !
+  !-------------------------------------------------!
   cnt_bnd = 0
   grid % new_c = 0
   do c = -1, -grid % n_bnd_cells, -1
@@ -648,6 +665,7 @@
     end if
   end do
 
+  ! Compress coordinates
   do c = -1, -grid % n_bnd_cells, -1
     if(grid % new_c(c) .ne. 0) then
       grid % xc(grid % new_c(c)) = grid % xc(c)
@@ -657,6 +675,7 @@
     end if
   end do
 
+  ! Compress indices
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
@@ -666,6 +685,7 @@
   end do
 
   grid % n_bnd_cells = cnt_bnd
+  print *, '# Kept boundary cells: ', grid % n_bnd_cells
 
   !--------------------------------------------------------------------!
   !   Remove boundary condition with color_per and compress the rest   !
@@ -696,7 +716,7 @@
       end if
     end do
   else
-   grid % bnd_cond % name(grid % n_bnd_cond) = ''
+    grid % bnd_cond % name(grid % n_bnd_cond) = ''
   end if
   grid % n_bnd_cond = grid % n_bnd_cond - 1
 
@@ -767,14 +787,13 @@
   !                                                    !
   !----------------------------------------------------!
 
-  ! Initialize
+  !----------------!
+  !   Initialize   !
+  !----------------!
   n_per = 0
   grid % dx(:) = 0.0
   grid % dy(:) = 0.0
   grid % dz(:) = 0.0
-  grid % per_x = 0.0
-  grid % per_y = 0.0
-  grid % per_z = 0.0
 
   do s = 1, grid % n_faces
 
@@ -782,10 +801,20 @@
     c2 = grid % faces_c(2,s)
     if(c2 > 0) then
 
-      ! Scalar product of the face with line c1-c2 is good criterion
-      if( (grid % sx(s) * (grid % xc(c2)-grid % xc(c1) )+                  &
-           grid % sy(s) * (grid % yc(c2)-grid % yc(c1) )+                  &
-           grid % sz(s) * (grid % zc(c2)-grid % zc(c1) )) < 0.0 ) then
+      !-------------------------!
+      !   Find periodic faces   !
+      !-------------------------!
+      per_x = .false.
+      if(grid % per_x .gt. NANO .and.  &
+         abs(grid % xc(c2)-grid % xc(c1)) > 0.75 * grid % per_x) per_x = .true.
+      per_y = .false.
+      if(grid % per_y .gt. NANO .and.  &
+         abs(grid % yc(c2)-grid % yc(c1)) > 0.75 * grid % per_y) per_y = .true.
+      per_z = .false.
+      if(grid % per_z .gt. NANO .and.  &
+         abs(grid % zc(c2)-grid % zc(c1)) > 0.75 * grid % per_z) per_z = .true.
+
+      if( per_x .or. per_y .or. per_z ) then
 
         n_per = n_per + 1
 
@@ -905,9 +934,9 @@
 
     if(c2 > 0) then
       grid % vol(c2) = grid % vol(c2)                                &
-                     - (grid % xf(s) - grid % dx(s)) * grid % sx(s)  &
-                     - (grid % yf(s) - grid % dy(s)) * grid % sy(s)  &
-                     - (grid % zf(s) - grid % dz(s)) * grid % sz(s)
+                     - (grid % xf(s) + grid % dx(s)) * grid % sx(s)  &
+                     - (grid % yf(s) + grid % dy(s)) * grid % sy(s)  &
+                     - (grid % zf(s) + grid % dz(s)) * grid % sz(s)
     end if
   end do
   grid % vol(:) = grid % vol(:) * ONE_THIRD
