@@ -33,7 +33,9 @@
   integer, allocatable :: edge_data(:)
   integer, allocatable :: cell_data(:)
   integer, allocatable :: node_data(:)
-  integer, allocatable :: sharp_corner(:)     ! for sharp corners one day
+  integer, allocatable :: sharp_corner(:)     ! sharp corners in prim
+  integer, allocatable :: sharp_inject(:)     ! sharp corner injected in dual
+  integer, allocatable :: concave_link(:,:)
   integer              :: c_p_list(2048)      ! prim cell and ...
   integer              :: n_d_list(2048)      ! ... dual node list
   integer              :: curr_f_d, curr_b_d, unused, dual_f_here
@@ -236,6 +238,8 @@
                  + N_Sharp_Corners(prim, sharp_corner)
 
   call Allocate_Memory(dual)
+  allocate(concave_link(2, dual % n_nodes));  concave_link(:,:) = 0
+  allocate(sharp_inject( prim % n_faces));    sharp_inject(:) = 0
 
   print *, '# Number of sharp corners = ', N_Sharp_Corners(prim, sharp_corner)
 
@@ -298,7 +302,7 @@
     !------------------------------------------------------------!
     !   If the face in a sharp corner, add one more node to it   !
     !------------------------------------------------------------!
-    if(edge_data(e) .gt. 0) then
+    if(edge_data(e) .ne. 0) then
 
       ! Additional dual node number
       d_nn = d_nn + 1
@@ -314,12 +318,43 @@
       dual % yn(d_nn) = (prim % yn(n1) + prim % yn(n2)) * 0.5
       dual % zn(d_nn) = (prim % zn(n1) + prim % zn(n2)) * 0.5
 
+      ! Mark node in the concave corner.  It seems impossible
+      ! sort out the direction of nodes for a concave face
+      ! Retreive boundary face information again
+      if(edge_data(e) .eq. -1) then
+        ! print *, ' # Sharp edge:', e
+        do i_edg = comp_edge_s(e), comp_edge_e(e)
+          f_p = full_edge_fb(i_edg)       ! get face index from the prim grid
+          c2 = prim % faces_c(2, f_p)
+          n2 = c2 + prim % n_bnd_cells + 1
+          if(c2 < 0) then
+            if(concave_link(1,d_nn) .eq. 0) then
+              concave_link(1,d_nn) = n2
+            else if(concave_link(2,d_nn) .eq. 0) then
+              concave_link(2,d_nn) = n2
+            else
+              print *, '# Well, well, this is pretty wrong!'
+            end if
+          end if
+        end do
+      end if
+
       ! Store edge to node mapping (prim edge to dual node)
       edge_to_node(e) = d_nn
 
     end if
 
   end do  ! through edges
+
+  !---------------------------------------!
+  !                                       !
+  !   Sort the points on internal faces   !
+  !                                       !
+  !---------------------------------------!
+  do s = 1, prim % n_edges
+    call Sort_Face_Nodes(dual, s, concave_link)
+  end do
+  concave_link(:,:) = 0  ! reset concave links since they work only for inside faces
 
   !----------------------------------!
   !                                  !
@@ -345,7 +380,7 @@
     !   boundary cell nodes from prim cells   !
     !-----------------------------------------!
     do c = -prim % n_bnd_cells, -1
-      if(cell_data(c) .gt. 0) then
+      if(cell_data(c) .ne. 0) then
 
         ! Take the prim cell's nodes (these are from prim)
         do i_nod = 1, prim % cells_n_nodes(c)
@@ -384,7 +419,7 @@
     !   Here we work on the faces already introduced above    !
     !---------------------------------------------------------!
     do e = 1, prim % n_edges
-      if(edge_data(e) .gt. 0) then
+      if(edge_data(e) .ne. 0) then
 
         ! Take the prim edge's nodes (these are from prim)
         do i_nod = 1, 2
@@ -399,36 +434,88 @@
           b_d = node_to_cell(n_p)
           dual % cells_n_nodes(b_d) = dual % cells_n_nodes(b_d) + 1
           dual % cells_n(dual % cells_n_nodes(b_d), b_d) = edge_to_node(e)
+        end do  ! i_nod for edge, goes from 1 to 2
+
+      end if
+    end do  ! through edges
+
+    !------------------------------------------------------------!
+    !   Add additional nodes to dual's face from sharp corners   !
+    !    Here we work on the faces already introduced before     !
+    !------------------------------------------------------------!
+    do e = 1, prim % n_edges
+      if(edge_data(e) .ne. 0) then
+
+        do i_nod = 1, 2
+          n_p = prim % edges_n(i_nod, e)
+          f_d = node_to_face(n_p)
+          b_d = node_to_cell(n_p)
 
           ! The grid has sharp corners, add them to boundary faces and cells
           if(sharp_corner(n_p) .gt. 0) then
-            n_d = dual % n_nodes - sharp_corner(n_p) + 1
-            dual % xn(n_d) = prim % xn(n_p)
-            dual % yn(n_d) = prim % yn(n_p)
-            dual % zn(n_d) = prim % zn(n_p)
+            if(sharp_inject(f_d) .eq. 0) then
 
-            f_d = node_to_face(n_p)
-            dual % faces_n_nodes(f_d) = dual % faces_n_nodes(f_d) + 1
-            dual % faces_n(dual % faces_n_nodes(f_d), f_d) = n_d
+              ! Estimate the number of new node in dual
+              ! (sharp_corner holds its local number)
+              n_d = dual % n_nodes - sharp_corner(n_p) + 1
+              dual % xn(n_d) = prim % xn(n_p)
+              dual % yn(n_d) = prim % yn(n_p)
+              dual % zn(n_d) = prim % zn(n_p)
 
-            b_d = node_to_cell(n_p)
-            dual % cells_n_nodes(b_d) = dual % cells_n_nodes(b_d) + 1
-            dual % cells_n(dual % cells_n_nodes(b_d), b_d) = n_d
-          end if
-        end do
+              dual % faces_n_nodes(f_d) = dual % faces_n_nodes(f_d) + 1
+              dual % faces_n(dual % faces_n_nodes(f_d), f_d) = n_d
+
+              dual % cells_n_nodes(b_d) = dual % cells_n_nodes(b_d) + 1
+              dual % cells_n(dual % cells_n_nodes(b_d), b_d) = n_d
+
+              ! Mark that the face has been injected a sharp corner
+              ! write(*,'(a,i9)') ' # Injecting new node in face', f_d
+              sharp_inject(f_d) = sharp_inject(f_d) + 1
+
+              ! Check those little nodes inserted just before
+              n1 = dual % faces_n(dual % faces_n_nodes(f_d)-2, f_d)
+              n2 = dual % faces_n(dual % faces_n_nodes(f_d)-1, f_d)
+              if(concave_link(1,n_d) .eq. 0 .and.  &
+                 concave_link(2,n_d) .eq. 0) then
+                concave_link(1,n_d) = n1
+                concave_link(2,n_d) = n2
+              else
+                print *, '# Well, you didn''t see this coming!'
+                print *, '# One sharp corner can be in more than one edge'
+              end if
+
+            end if  ! sharp inject in f_d
+          end if    ! sharp corner here
+
+        end do  ! i_nod for edge, goes from 1 to 2
       end if
-    end do
+    end do  ! through edges
 
   end do
 
-  !---------------------!
-  !                     !
-  !   Sort the points   !
-  !                     !
-  !---------------------!
-  do s = 1, dual % n_faces
-    call Sort_Face_Nodes(dual, s)
+  !---------------------------------------!
+  !                                       !
+  !   Sort the points on boundary faces   !
+  !                                       !
+  !---------------------------------------!
+  do s = prim % n_edges + 1, dual % n_faces
+    call Sort_Face_Nodes(dual, s, concave_link)
   end do
+
+  !------------------------------------------------------------!
+  !   Save only internal faces to see if sorting of boundary   !
+  !       faces messed up already sorted internal faces        !
+  !------------------------------------------------------------!
+  ! dual % n_faces = prim % n_edges
+  ! call Save_Vtu_Faces(dual)
+  ! stop
+
+  !---------------------------------------------------!
+  !   Save all faces to see if sorting of boundary    !
+  !   faces messed up already sorted internal faces   !
+  !---------------------------------------------------!
+  ! call Save_Vtu_Faces(dual)
+  ! stop
 
   !----------------------------------!
   !                                  !
