@@ -12,11 +12,10 @@
   type(Grid_Type)     :: grid
   logical, intent(in) :: real_run
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, c1, c2, m, n, s, n_per, nn, nf
+  integer :: c, c1, c2, m, i_nod, j_nod, s, n_per, nn, nf
   real    :: xt(4), yt(4), zt(4)
   real    :: x_cell_tmp, y_cell_tmp, z_cell_tmp
   real    :: xs2, ys2, zs2
-  real    :: dsc1, dsc2          !  for the interpolation factors
   real    :: t, tot_surf
   integer :: fn(6,4)
 !------------------------------------------------------------------------------!
@@ -131,10 +130,10 @@
   !   <= gives:      sx, sy, sz, xf, yf, zf             !
   !-----------------------------------------------------!
   do s = 1, grid % n_faces
-    do n = 1, grid % faces_n_nodes(s)  ! for quadrilateral an triangular faces
-      xt(n) = grid % xn(grid % faces_n(n,s))
-      yt(n) = grid % yn(grid % faces_n(n,s))
-      zt(n) = grid % zn(grid % faces_n(n,s))
+    do i_nod = 1, grid % faces_n_nodes(s)  ! for quadrilateral an triangular faces
+      xt(i_nod) = grid % xn(grid % faces_n(i_nod,s))
+      yt(i_nod) = grid % yn(grid % faces_n(i_nod,s))
+      zt(i_nod) = grid % zn(grid % faces_n(i_nod,s))
     end do
 
     ! Cell side components
@@ -323,72 +322,40 @@
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
 
-      do n = 1, grid % faces_n_nodes(s)  ! for quadrilateral an triangular faces
-        xt(n) = grid % xn(grid % faces_n(n,s))
-        yt(n) = grid % yn(grid % faces_n(n,s))
-        zt(n) = grid % zn(grid % faces_n(n,s))
+      do i_nod = 1, grid % faces_n_nodes(s)  ! for all face types
+        xt(i_nod) = grid % xn(grid % faces_n(i_nod,s))
+        yt(i_nod) = grid % yn(grid % faces_n(i_nod,s))
+        zt(i_nod) = grid % zn(grid % faces_n(i_nod,s))
       end do
 
       ! First cell
       x_cell_tmp = grid % xc(c1)
       y_cell_tmp = grid % yc(c1)
       z_cell_tmp = grid % zc(c1)
-      dsc1 = Math_Mod_Distance(x_cell_tmp,   y_cell_tmp,   z_cell_tmp,    &
-                               grid % xf(s), grid % yf(s), grid % zf(s))
-      grid % vol(c1) = grid % vol(c1)                                      &
-        + Math_Mod_Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),      &
-                              xt(1),yt(1),zt(1),   &
-                              xt(2),yt(2),zt(2),   &
-                              x_cell_tmp,y_cell_tmp,z_cell_tmp)
-      grid % vol(c1) = grid % vol(c1)                                      &
-        + Math_Mod_Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),      &
-                              xt(2),yt(2),zt(2),   &
-                              xt(3),yt(3),zt(3),   &
-                              x_cell_tmp,y_cell_tmp,z_cell_tmp)
-      if(grid % faces_n_nodes(s) .eq. 4) then
+      do i_nod = 1, grid % faces_n_nodes(s)  ! for all face types
+        j_nod = i_nod + 1;  if(j_nod > grid % faces_n_nodes(s)) j_nod = 1
+
         grid % vol(c1) = grid % vol(c1)                                    &
-          + Math_Mod_Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),    &
-                                xt(3),yt(3),zt(3), &
-                                xt(4),yt(4),zt(4), &
-                                x_cell_tmp,y_cell_tmp,z_cell_tmp)
-        grid % vol(c1) = grid % vol(c1)                                    &
-          + Math_Mod_Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),    &
-                                xt(4),yt(4),zt(4), &
-                                xt(1),yt(1),zt(1), &
-                                x_cell_tmp,y_cell_tmp,z_cell_tmp)
-      end if
+          + Math_Mod_Tet_Volume(grid % xf(s), grid % yf(s), grid % zf(s),  &
+                                xt(i_nod),    yt(i_nod),    zt(i_nod),     &
+                                xt(j_nod),    yt(j_nod),    zt(j_nod),     &
+                                x_cell_tmp,   y_cell_tmp,   z_cell_tmp)
+      end do  ! i_nod
 
       ! Second cell
-      if(c2  > 0) then
+      if(c2 > 0) then
         x_cell_tmp = grid % xc(c2) + grid % dx(s)
         y_cell_tmp = grid % yc(c2) + grid % dy(s)
         z_cell_tmp = grid % zc(c2) + grid % dz(s)
-        dsc2 = Math_Mod_Distance(x_cell_tmp,   y_cell_tmp,   z_cell_tmp,     &
-                                 grid % xf(s), grid % yf(s), grid % zf(s))
-        grid % vol(c2) = grid % vol(c2)                                  &
-          - Math_Mod_Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),  &
-                                xt(1), yt(1), zt(1),                     &
-                                xt(2), yt(2), zt(2),                     &
-                                x_cell_tmp,y_cell_tmp,z_cell_tmp)
-        grid % vol(c2) = grid % vol(c2)                                  &
-          - Math_Mod_Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),  &
-                                xt(2), yt(2), zt(2),                     &
-                                xt(3), yt(3), zt(3),                     &
-                                x_cell_tmp,y_cell_tmp,z_cell_tmp)
-        if(grid % faces_n_nodes(s) .eq. 4) then
-          grid % vol(c2) = grid % vol(c2)                                  &
-            - Math_Mod_Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),  &
-                           xt(3), yt(3), zt(3),                            &
-                           xt(4), yt(4), zt(4),                            &
-                           x_cell_tmp,y_cell_tmp,z_cell_tmp)
-          grid % vol(c2) = grid % vol(c2)                                  &
-            - Math_Mod_Tet_Volume(grid % xf(s),grid % yf(s),grid % zf(s),  &
-                           xt(4), yt(4), zt(4),                            &
-                           xt(1), yt(1), zt(1),                            &
-                           x_cell_tmp,y_cell_tmp,z_cell_tmp)
-        end if
-      else
-        dsc2 = 0.0
+        do i_nod = 1, grid % faces_n_nodes(s)  ! for all face types
+          j_nod = i_nod + 1;  if(j_nod > grid % faces_n_nodes(s)) j_nod = 1
+
+          grid % vol(c2) = grid % vol(c2)                                    &
+            - Math_Mod_Tet_Volume(grid % xf(s), grid % yf(s), grid % zf(s),  &
+                                  xt(i_nod),    yt(i_nod),    zt(i_nod),     &
+                                  xt(j_nod),    yt(j_nod),    zt(j_nod),     &
+                                  x_cell_tmp,   y_cell_tmp,   z_cell_tmp)
+        end do  ! i_nod
       end if
 
     end do
