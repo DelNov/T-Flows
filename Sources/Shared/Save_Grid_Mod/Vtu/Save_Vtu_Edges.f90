@@ -93,8 +93,8 @@
   write(fu,'(a,a)') IN_3, '<CellData Scalars="scalars" vectors="velocity">'
 
   if(present(edge_data)) then
-    write(fu,'(a,a)') IN_4, '<DataArray type="Int64" ' //  &
-                            'Name="Processor" format="ascii">'
+    write(fu,'(a,a)') IN_4, '<DataArray type="Int64"' //  &
+                            ' Name="EdgeData" format="ascii">'
     do c = 1, grid % n_edges
       write(fu,'(a,i9)') IN_5, edge_data(c)
     end do
