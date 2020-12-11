@@ -24,8 +24,14 @@
   ! Fix counters and file extension if you are plotting shadows
   if(present(plot_shadows)) then
     if(plot_shadows) then
-      s_s = grid % n_faces + 1
-      s_e = grid % n_faces + grid % n_shadows
+      s_s = +HUGE_INT
+      s_e = -HUGE_INT
+      do s = 1, grid % n_faces
+        if(grid % faces_s(s) > 0) then
+          s_s = min(s_s, grid % faces_s(s))
+          s_e = max(s_s, grid % faces_s(s))
+        end if
+      end do
       ext = '.shadows.vtu'
     end if
   end if
@@ -39,7 +45,7 @@
   !------------------------!
   !   Open the .vtu file   !
   !------------------------!
-  call File_Mod_Set_Name(name_out, extension=trim(ext))
+  call File_Mod_Set_Name(name_out, processor=this_proc, extension=trim(ext))
   call File_Mod_Open_File_For_Writing_Binary(name_out, fu)
 
   !------------!
@@ -187,7 +193,6 @@
   do s = s_s, s_e
     n = grid % faces_n_nodes(s)
     write(fu) grid % faces_n(1:n,s)-1
-    WRITE(200, '(99I9)') s-1, n, grid % faces_n(1:n,s)-1
   end do
 
   ! Faces' offsets
@@ -213,13 +218,17 @@
   end do
 
   ! Boundary conditions
+  ! (Check c1 and c2 for shadow faces, seems to be something messed up)
   data_size = (s_e-s_s+1) * IP
   write(fu) data_size
   do s = s_s, s_e
     c2 = grid % faces_c(2,s)
 
-    if(c2 < 0) write(fu) grid % bnd_cond % color(c2)
-    if(c2 > 0) write(fu) 0
+    if(c2 < 0) then
+      write(fu) grid % bnd_cond % color(c2)
+    else
+      write(fu) 0
+    end if
   end do
 
   ! Number of nodes
