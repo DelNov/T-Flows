@@ -60,8 +60,8 @@
                             + grid % zn(concave_link(2, n))  )
     end if
   end do
-  if(cnt .eq. 1) print *, '# Found a concave link in face', s
-  if(cnt .eq. 2) print *, '# Found two concave links in face', s
+  ! if(cnt .eq. 1) print *, '# Found a concave link in face', s
+  ! if(cnt .eq. 2) print *, '# Found two concave links in face', s
 
   !-----------------------------------!
   !   Find the plane's center point   !
