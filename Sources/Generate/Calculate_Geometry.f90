@@ -315,7 +315,7 @@
   !----------------------------------!
   if(real_run) then
     do c = 1, grid % n_cells
-      grid % vol(c)=0.0
+      grid % vol(c) = 0.0
     end do
 
     do s = 1, grid % n_faces
