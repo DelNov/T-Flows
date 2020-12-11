@@ -130,6 +130,7 @@
                         grid(g) % n_nodes,  &
                         grid(g) % n_cells)
     call Save_Vtu_Faces(grid(g))
+    call Save_Vtu_Faces(grid(g), plot_shadows=.true.)
 
     ! Create 1D file (used for channel or pipe flow)
     call Probe_1d_Nodes(grid(g))

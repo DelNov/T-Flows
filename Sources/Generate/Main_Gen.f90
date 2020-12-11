@@ -90,6 +90,7 @@
                       grid % n_nodes,  &
                       grid % n_cells)
   call Save_Vtu_Faces(grid)
+  call Save_Vtu_Faces(grid, plot_shadows=.true.)
 
   ! Try to save in CGNS format, it might work
   call Save_Cgns_Cells(grid, 0) 
