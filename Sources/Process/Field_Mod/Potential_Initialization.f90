@@ -19,6 +19,7 @@
   real                       :: f_ex, f_im
   real                       :: phi_x_f, phi_y_f, phi_z_f
   real                       :: vol_in_real, vol_in_fake, dist_min
+  real, allocatable          :: store(:)
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: NDT = 24       ! number of false time steps
   real,    parameter :: DT  =  1.0e+6  ! false time step
@@ -36,6 +37,7 @@
 
   call Field_Mod_Alias_Momentum(flow, u, v, w)
   call Solver_Mod_Alias_System (sol,  a, b)
+  allocate(store(grid % n_cells)); store(:) = 0.0
 
   !--------------------------------------!
   !                                      !
@@ -159,7 +161,7 @@
       end if
 
       ! Fill the system matrix
-      if(c2  < 0) then
+      if(c2 < 0) then
 
         ! Inflow
         if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW)) then
@@ -179,7 +181,6 @@
     end do  ! through faces
 
     ! Add cross diffusion terms explicity
-    ! (You will not need phi % c after this point)
     do c = 1, grid % n_cells
       b(c) = b(c) + phi % c(c)
     end do
@@ -187,8 +188,8 @@
     ! Fix negative sources
     do c = 1, grid % n_cells
 
-      ! Store the central term in phi % c
-      phi % c(c) = a % val(a % dia(c))
+      ! Store the central term
+      store(c) = a % val(a % dia(c))
 
       ! If source is negative, fix it!
       if(b(c) < 0.0) then
@@ -228,7 +229,7 @@
 
     ! Recover the central coefficient in the system matrix
     do c = 1, grid % n_cells
-      a % val(a % dia(c)) = phi % c(c)
+      a % val(a % dia(c)) = store(c)
     end do
 
     ! Re-initialize cross diffusion terms (for the next time step)
