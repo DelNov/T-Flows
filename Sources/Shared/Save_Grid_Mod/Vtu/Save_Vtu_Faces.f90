@@ -126,6 +126,16 @@
   write(fu) IN_4 // '</DataArray>' // LF
   data_offset = data_offset + SP + grid % n_faces * RP * 3  ! prepare for next
 
+  ! Connection vectors
+  write(str1, '(i0.0)') data_offset
+  write(fu) IN_4 // '<DataArray type="Float64"'      //  &
+                    ' Name="GridConnectionVectors"'  //  &
+                    ' NumberOfComponents="3"'        //  &
+                    ' format="appended"'             //  &
+                    ' offset="' // trim(str1) //'">' // LF
+  write(fu) IN_4 // '</DataArray>' // LF
+  data_offset = data_offset + SP + grid % n_faces * RP * 3  ! prepare for next
+
   !------------!
   !            !
   !   Footer   !
@@ -209,6 +219,13 @@
   write(fu) data_size
   do s = 1, grid % n_faces
     write(fu) grid % sx(s), grid % sy(s), grid % sz(s)
+  end do
+
+  ! Connection vectors
+  data_size = grid % n_faces * RP * 3
+  write(fu) data_size
+  do s = 1, grid % n_faces
+    write(fu) grid % dx(s), grid % dy(s), grid % dz(s)
   end do
 
   write(fu) LF // IN_0 // '</AppendedData>' // LF
