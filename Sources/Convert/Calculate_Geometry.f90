@@ -13,12 +13,14 @@
   integer              :: c, c1, c2, n, s, ss, cc2, c_max, nnn, hh, mm, b
   integer              :: c11, c12, c21, c22, s1, s2, bou_cen, cnt_bnd, cnt_per
   integer              :: color_per, n_per, number_faces, option
-  integer              :: rot_dir, n1, n2
+  integer              :: rot_dir, n1, n2, i_nod, j_nod
   logical              :: per_x, per_y, per_z
   real                 :: xt(MAX_FACES_N_NODES),  &
                           yt(MAX_FACES_N_NODES),  &
                           zt(MAX_FACES_N_NODES)
   real                 :: xs2, ys2, zs2, x_a, y_a, z_a, x_b, y_b, z_b
+  real                 :: x_cell_1, y_cell_1, z_cell_1, dv_1
+  real                 :: x_cell_2, y_cell_2, z_cell_2, dv_2
   real                 :: x_c, y_c, z_c, det, angle_face, tol
   real                 :: ab_i, ab_j, ab_k, ac_i, ac_j, ac_k, p_i, p_j, p_k
   real                 :: per_min, per_max, t, sur_tot, angle, max_dis
@@ -918,29 +920,54 @@
   !----------------------------------!
   !   Calculate the cell volumes     !
   !----------------------------------!
-  !   => depends on: xc, yc, zc,     !
-  !                  dx, dy, dz,     !
-  !                  xf, yf, zf      !
+  !   => depends on: xc,yc,zc,       !
+  !                  dx,dy,dz,       !
+  !                  xsp, ysp, zsp   !
   !   <= gives:      vol             !
   !----------------------------------!
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
-    grid % vol(c1) = grid % vol(c1)               &
-                   + grid % xf(s) * grid % sx(s)  &
-                   + grid % yf(s) * grid % sy(s)  &
-                   + grid % zf(s) * grid % sz(s)
+    do i_nod = 1, grid % faces_n_nodes(s)  ! for all face types
+      xt(i_nod) = grid % xn(grid % faces_n(i_nod,s))
+      yt(i_nod) = grid % yn(grid % faces_n(i_nod,s))
+      zt(i_nod) = grid % zn(grid % faces_n(i_nod,s))
+    end do
 
+    ! First cell
+    x_cell_1 = grid % xc(c1)
+    y_cell_1 = grid % yc(c1)
+    z_cell_1 = grid % zc(c1)
+    do i_nod = 1, grid % faces_n_nodes(s)  ! for all face types
+      j_nod = i_nod + 1;  if(j_nod > grid % faces_n_nodes(s)) j_nod = 1
+
+      dv_1 = Math_Mod_Tet_Volume(grid % xf(s), grid % yf(s), grid % zf(s),  &
+                                 xt(i_nod),    yt(i_nod),    zt(i_nod),     &
+                                 xt(j_nod),    yt(j_nod),    zt(j_nod),     &
+                                 x_cell_1,     y_cell_1,     z_cell_1)
+      grid % vol(c1) = grid % vol(c1) + abs(dv_1)
+    end do  ! i_nod
+
+    ! Second cell
     if(c2 > 0) then
-      grid % vol(c2) = grid % vol(c2)                                &
-                     - (grid % xf(s) + grid % dx(s)) * grid % sx(s)  &
-                     - (grid % yf(s) + grid % dy(s)) * grid % sy(s)  &
-                     - (grid % zf(s) + grid % dz(s)) * grid % sz(s)
+      x_cell_2 = grid % xc(c2) + grid % dx(s)
+      y_cell_2 = grid % yc(c2) + grid % dy(s)
+      z_cell_2 = grid % zc(c2) + grid % dz(s)
+
+      do i_nod = 1, grid % faces_n_nodes(s)  ! for all face types
+        j_nod = i_nod + 1;  if(j_nod > grid % faces_n_nodes(s)) j_nod = 1
+
+        dv_2 = Math_Mod_Tet_Volume(grid % xf(s), grid % yf(s), grid % zf(s),  &
+                                   xt(i_nod),    yt(i_nod),    zt(i_nod),     &
+                                   xt(j_nod),    yt(j_nod),    zt(j_nod),     &
+                                   x_cell_2,     y_cell_2,     z_cell_2)
+        grid % vol(c2) = grid % vol(c2) + abs(dv_2)
+      end do  ! i_nod
     end if
+
   end do
-  grid % vol(:) = grid % vol(:) * ONE_THIRD
-  c1 = 0
+
   grid % min_vol =  HUGE
   grid % max_vol = -HUGE
   grid % tot_vol = 0.0
@@ -958,9 +985,9 @@
   print *, '# Cell volumes calculated !'
 
   if(grid % min_vol < 0.0) then
-    print *, '# Negative volume occured! Slower, algoritham should be run !'
-    print *, '# Execution will halt now! '
-!    stop
+    print *, '# Negative volume occured!'
+    print *, '# Execution will halt now!'
+    stop
   end if
 
   deallocate(b_coor)
