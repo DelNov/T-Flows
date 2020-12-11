@@ -180,23 +180,27 @@
 
     end do  ! through faces
 
-    ! Add cross diffusion terms explicity
-    do c = 1, grid % n_cells
-      b(c) = b(c) + phi % c(c)
-    end do
+    ! Add cross diffusion terms explicity for non-polyhedral grids
+    ! (Some of them show poor convergence when solving for potential
+    ! field, particularly if grid featured concave cells near edges)
+    if(.not. grid % polyhedral) then
+      do c = 1, grid % n_cells
+        b(c) = b(c) + phi % c(c)
+      end do
 
-    ! Fix negative sources
-    do c = 1, grid % n_cells
+      ! Fix negative sources
+      do c = 1, grid % n_cells
 
-      ! Store the central term
-      store(c) = a % val(a % dia(c))
+        ! Store the central term
+        store(c) = a % val(a % dia(c))
 
-      ! If source is negative, fix it!
-      if(b(c) < 0.0) then
-        a % val(a % dia(c)) = a % val(a % dia(c)) - b(c) / phi % o(c)
-        b(c) = 0.0
-      end if
-    end do
+        ! If source is negative, fix it!
+        if(b(c) < 0.0) then
+          a % val(a % dia(c)) = a % val(a % dia(c)) - b(c) / phi % o(c)
+          b(c) = 0.0
+        end if
+      end do
+    end if
 
     !---------------------------------!
     !                                 !
@@ -228,9 +232,11 @@
     call Grid_Mod_Exchange_Cells_Real(grid, phi % n)
 
     ! Recover the central coefficient in the system matrix
-    do c = 1, grid % n_cells
-      a % val(a % dia(c)) = store(c)
-    end do
+    if(.not. grid % polyhedral) then
+      do c = 1, grid % n_cells
+        a % val(a % dia(c)) = store(c)
+      end do
+    end if
 
     ! Re-initialize cross diffusion terms (for the next time step)
     do c = 1, grid % n_cells
