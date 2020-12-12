@@ -109,6 +109,16 @@
 
     call Grid_Mod_Initialize_New_Numbers(grid(g))
 
+    ! Note #1 about shadows:
+    ! At this point you have grid % n_faces faces and grid % n_shadows (on top)
+    ! and they are pointing to each other.  Besides, both real face and its
+    ! shadow have the same c1 and c2, both inside cells with positive indices
+    ! Real faces which do not have shadows have index "0" for shadow.
+    ! Should check like this: do s = 1, grid % n_faces + grid % n_shadows
+    ! Should check like this:   write(20, '(99i9)') s, grid % faces_s(s)
+    ! Should check like this: end do
+    ! Similar note is in Generate, also called Note #1
+
     !-------------------------------!
     !   Save files for processing   !
     !-------------------------------!
