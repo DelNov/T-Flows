@@ -9,7 +9,7 @@
   logical, optional :: plot_shadows  ! plot shadow faces
 !-----------------------------------[Locals]-----------------------------------!
   integer(SP)   :: data_size
-  integer       :: c2, n, s, s_s, s_e, cell_offset, data_offset, n_conns, fu
+  integer       :: c2, n, s, s_f, s_l, cell_offset, data_offset, n_conns, fu
   character(SL) :: name_out, ext, str1, str2
   real          :: mag
 !------------------------------[Local parameters]------------------------------!
@@ -18,28 +18,31 @@
 !==============================================================================!
 
   ! Starting and ending counters; file extension
-  s_s = 1
-  s_e = grid % n_faces
+  s_f = 1
+  s_l = grid % n_faces
   ext = '.faces.vtu'
 
   ! Fix counters and file extension if you are plotting shadows
   if(present(plot_shadows)) then
     if(plot_shadows) then
-      s_s = +HUGE_INT
-      s_e = -HUGE_INT
+      s_f = +HUGE_INT
+      s_l = -HUGE_INT
       do s = 1, grid % n_faces
-        if(grid % faces_s(s) > 0) then
-          s_s = min(s_s, grid % faces_s(s))
-          s_e = max(s_e, grid % faces_s(s))
-        end if
+        s_f = min(s_f, grid % faces_s(s))
+        s_l = max(s_l, grid % faces_s(s))
       end do
       ext = '.shadows.vtu'
     end if
   end if
 
+  if(s_l - s_f < 1) then
+    print *, '# NOTE: No shadow faces in this domain, nothing to plot!'
+    return
+  end if
+
   ! Count connections in this subdomain, you will need it later
   n_conns = 0
-  do s = s_s, s_e
+  do s = s_f, s_l
     n_conns = n_conns + grid % faces_n_nodes(s)
   end do
 
@@ -60,7 +63,7 @@
                     ' byte_order="LittleEndian">'       // LF
   write(fu) IN_1 // '<UnstructuredGrid>' // LF
   write(str1, '(i0.0)') grid % n_nodes
-  write(str2, '(i0.0)') (s_e-s_s+1)
+  write(str2, '(i0.0)') (s_l-s_f+1)
   write(fu) IN_2 // '<Piece NumberOfPoints="' // trim(str1) // '"'  //  &
                     ' NumberOfCells="'        // trim(str2) // '">' // LF
   data_offset = 0
@@ -99,7 +102,7 @@
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
-  data_offset = data_offset + SP + (s_e-s_s+1) * IP      ! prepare for next
+  data_offset = data_offset + SP + (s_l-s_f+1) * IP      ! prepare for next
 
   ! Faces' types
   write(str1, '(i0.0)') data_offset
@@ -108,7 +111,7 @@
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
-  data_offset = data_offset + SP + (s_e-s_s+1) * IP      ! prepare for next
+  data_offset = data_offset + SP + (s_l-s_f+1) * IP      ! prepare for next
 
   !----------------------!
   !   The end of faces   !
@@ -127,7 +130,7 @@
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
-  data_offset = data_offset + SP + (s_e-s_s+1) * IP      ! prepare for next
+  data_offset = data_offset + SP + (s_l-s_f+1) * IP      ! prepare for next
 
   ! Number of nodes
   write(str1, '(i0.0)') data_offset
@@ -136,7 +139,7 @@
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
-  data_offset = data_offset + SP + (s_e-s_s+1) * IP      ! prepare for next
+  data_offset = data_offset + SP + (s_l-s_f+1) * IP      ! prepare for next
 
   ! Surface vectors
   write(str1, '(i0.0)') data_offset
@@ -146,7 +149,7 @@
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
-  data_offset = data_offset + SP + (s_e-s_s+1) * RP * 3  ! prepare for next
+  data_offset = data_offset + SP + (s_l-s_f+1) * RP * 3  ! prepare for next
 
   ! Surface normals
   write(str1, '(i0.0)') data_offset
@@ -156,7 +159,7 @@
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
-  data_offset = data_offset + SP + (s_e-s_s+1) * RP * 3  ! prepare for next
+  data_offset = data_offset + SP + (s_l-s_f+1) * RP * 3  ! prepare for next
 
   ! Connection vectors
   write(str1, '(i0.0)') data_offset
@@ -166,7 +169,7 @@
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
-  data_offset = data_offset + SP + (s_e-s_s+1) * RP * 3  ! prepare for next
+  data_offset = data_offset + SP + (s_l-s_f+1) * RP * 3  ! prepare for next
 
   !------------!
   !            !
@@ -201,24 +204,24 @@
   ! Faces' nodes
   data_size = n_conns * IP
   write(fu) data_size
-  do s = s_s, s_e
+  do s = s_f, s_l
     n = grid % faces_n_nodes(s)
     write(fu) grid % faces_n(1:n,s)-1
   end do
 
   ! Faces' offsets
-  data_size = (s_e-s_s+1) * IP
+  data_size = (s_l-s_f+1) * IP
   write(fu) data_size
   cell_offset = 0
-  do s = s_s, s_e
+  do s = s_f, s_l
     cell_offset = cell_offset + grid % faces_n_nodes(s)
     write(fu) cell_offset
   end do
 
   ! Faces' types
-  data_size = (s_e-s_s+1) * IP
+  data_size = (s_l-s_f+1) * IP
   write(fu) data_size
-  do s = s_s, s_e
+  do s = s_f, s_l
     if(grid % faces_n_nodes(s) .eq. 4) then
       write(fu) VTK_QUAD
     else if(grid % faces_n_nodes(s) .eq. 3) then
@@ -230,9 +233,9 @@
 
   ! Boundary conditions
   ! (Check c1 and c2 for shadow faces, seems to be something messed up)
-  data_size = (s_e-s_s+1) * IP
+  data_size = (s_l-s_f+1) * IP
   write(fu) data_size
-  do s = s_s, s_e
+  do s = s_f, s_l
     c2 = grid % faces_c(2,s)
 
     if(c2 < 0) then
@@ -243,31 +246,31 @@
   end do
 
   ! Number of nodes
-  data_size = (s_e-s_s+1) * IP
+  data_size = (s_l-s_f+1) * IP
   write(fu) data_size
-  do s = s_s, s_e
+  do s = s_f, s_l
     write(fu) grid % faces_n_nodes(s)
   end do
 
   ! Surface vectors
-  data_size = (s_e-s_s+1) * RP * 3
+  data_size = (s_l-s_f+1) * RP * 3
   write(fu) data_size
-  do s = s_s, s_e
+  do s = s_f, s_l
     write(fu) grid % sx(s), grid % sy(s), grid % sz(s)
   end do
 
   ! Surface normals
-  data_size = (s_e-s_s+1) * RP * 3
+  data_size = (s_l-s_f+1) * RP * 3
   write(fu) data_size
-  do s = s_s, s_e
+  do s = s_f, s_l
     mag = sqrt(grid % sx(s)**2 + grid % sy(s)**2 + grid % sz(s)**2)
     write(fu) grid % sx(s) / mag, grid % sy(s) / mag, grid % sz(s) / mag
   end do
 
   ! Connection vectors
-  data_size = (s_e-s_s+1) * RP * 3
+  data_size = (s_l-s_f+1) * RP * 3
   write(fu) data_size
-  do s = s_s, s_e
+  do s = s_f, s_l
     write(fu) grid % dx(s), grid % dy(s), grid % dz(s)
   end do
 
