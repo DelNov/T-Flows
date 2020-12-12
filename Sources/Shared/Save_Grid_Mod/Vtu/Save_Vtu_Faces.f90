@@ -11,6 +11,7 @@
   integer(SP)   :: data_size
   integer       :: c2, n, s, s_s, s_e, cell_offset, data_offset, n_conns, fu
   character(SL) :: name_out, ext, str1, str2
+  real          :: mag
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: IP = DP  ! int. precision is double precision
   integer, parameter :: RP = DP  ! real precision is double precision
@@ -147,6 +148,16 @@
   write(fu) IN_4 // '</DataArray>' // LF
   data_offset = data_offset + SP + (s_e-s_s+1) * RP * 3  ! prepare for next
 
+  ! Surface normals
+  write(str1, '(i0.0)') data_offset
+  write(fu) IN_4 // '<DataArray type="Float64"'      //  &
+                    ' Name="GridSurfaceNormals"'     //  &
+                    ' NumberOfComponents="3"'        //  &
+                    ' format="appended"'             //  &
+                    ' offset="' // trim(str1) //'">' // LF
+  write(fu) IN_4 // '</DataArray>' // LF
+  data_offset = data_offset + SP + (s_e-s_s+1) * RP * 3  ! prepare for next
+
   ! Connection vectors
   write(str1, '(i0.0)') data_offset
   write(fu) IN_4 // '<DataArray type="Float64"'      //  &
@@ -243,6 +254,14 @@
   write(fu) data_size
   do s = s_s, s_e
     write(fu) grid % sx(s), grid % sy(s), grid % sz(s)
+  end do
+
+  ! Surface normals
+  data_size = (s_e-s_s+1) * RP * 3
+  write(fu) data_size
+  do s = s_s, s_e
+    mag = sqrt(grid % sx(s)**2 + grid % sy(s)**2 + grid % sz(s)**2)
+    write(fu) grid % sx(s) / mag, grid % sy(s) / mag, grid % sz(s) / mag
   end do
 
   ! Connection vectors
