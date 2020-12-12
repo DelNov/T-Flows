@@ -20,16 +20,15 @@
   integer              :: i_cel, i_nod, j_nod, k_nod, l_nod, i_fac
   integer              :: cell_type, zone_type
   integer              :: cell_s, cell_e, side_s, side_e, node_s, node_e
+  integer              :: all_nodes(1024)       ! all cell's nodes
+  integer              :: n_face_sect           ! number of face sections
+  integer              :: face_sect_pos(2048)   ! where did Fluent store it
+  integer              :: face_sect_bnd(2048)   ! where does T-Flows store it
+  integer              :: n_bnd_cond            ! number of boundary conditions
+  logical              :: this_sect_bnd         ! .true. if bnd cond section
+  logical              :: the_end               ! end of file reached?
+  logical              :: ascii                 ! is file in ascii format?
   integer, allocatable :: cell_visited_from(:)
-  integer              :: all_nodes(1024)      ! all cell's nodes
-  integer              :: n_face_sect          ! number of face sections
-  integer              :: face_sect_pos(2048)  ! where did Fluent store it
-  integer              :: face_sect_bnd(2048)  ! where does T-Flows store it
-  integer              :: n_bnd_cond           ! number of boundary conditions
-  logical              :: this_sect_bnd        ! .true. if bnd cond section
-  logical              :: the_end              ! end of file reached?
-  logical              :: ascii                ! is file in ascii format?
-! character(SL)        :: bc_names(2048)
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: MIXED_ZONE = 0
   integer, parameter :: CELL_TRI   = 1
@@ -474,8 +473,8 @@
                 grid % polyhedral = .true.
               end if
               n_poly = n_poly + 1
-              grid % cells_n_nodes(n_cells) = -1
-              grid % cells_n_faces(n_cells) = -1
+              grid % cells_n_nodes(n_cells) = 0
+              grid % cells_n_faces(n_cells) = 0
 
             else
               print *, '# ERROR: Unsupported cell type', cell_type
@@ -672,13 +671,14 @@
   end do
   print *, '# No duplicate nodes in face data found, good!'
 
-  !------------------------------!
-  !                              !
-  !                              !
-  !   Reconstruct cells' nodes   !
-  !                              !
-  !                              !
-  !------------------------------!
+  !--------------------------------!
+  !                                !
+  !                                !
+  !    Reconstruct cells' nodes    !
+  !   (For non-polyhedral cells)   !
+  !                                !
+  !                                !
+  !--------------------------------!
   print '(a60)', ' #=========================================================='
   print '(a60)', ' # Reconstructing cells (determining their nodes)           '
   print '(a60)', ' #----------------------------------------------------------'
@@ -909,49 +909,24 @@
     end do  ! through c1 and c2
   end do  ! through s, faces
 
-  !------------------------------------------------------------!
-  !                                                            !
-  !   Count the faces of all polyhedral cells and store them   !
-  !                                                            !
-  !------------------------------------------------------------!
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1, s)
-    c2 = grid % faces_c(2, s)
+  !-------------------------------!
+  !                               !
+  !   Reconstruct cells' faces    !
+  !   (This might throw a note)   !
+  !                               !
+  !-------------------------------!
+  call Grid_Mod_Find_Cells_Faces(grid)
 
-    if( grid % cells_n_nodes(c1) .eq. -1) then
-      if( cell_visited_from(c1) .ne. 0 ) then
-        print *, '# A strange error has occurred!'
-      end if
-
-      ! Increase the number of polygonal faces for c1
-      grid % cells_n_faces(c1) = grid % cells_n_faces(c1) + 1
-      n = grid % cells_n_faces(c1)
-      grid % cells_f(n, c1) = s
-    end if
-
-    if( grid % cells_n_nodes(c2) .eq. -1) then
-      if( cell_visited_from(c2) .ne. 0 ) then
-        print *, '# A strange error has occurred!'
-      end if
-
-      ! Increase the number of polygonal faces for c2 and store the face
-      grid % cells_n_faces(c2) = grid % cells_n_faces(c2) + 1
-      n = grid % cells_n_faces(c2)
-      grid % cells_f(n, c2) = s
-    end if
-
-  end do
-
-  !----------------------------------------------------------------!
-  !                                                                !
-  !   With faces counted, you can also store nodes for each cell   !
-  !                                                                !
-  !----------------------------------------------------------------!
+  !--------------------------------------------------------------------!
+  !                                                                    !
+  !   With faces counted and stored, store nodes for each polyhedron   !
+  !                                                                    !
+  !--------------------------------------------------------------------!
   do c = 1, grid % n_cells
 
     ! Only do this for polyhedral cells
     ! (For the other it was done above)
-    if(grid % cells_n_nodes(c) .eq. -1) then
+    if(grid % cells_n_nodes(c) .eq. 0) then
 
       ! Accumulate nodes from all faces surrounding the cell
       n = 0
@@ -977,7 +952,7 @@
   !   Check for duplicate nodes in cells   !
   !----------------------------------------!
   do c = 1, grid % n_cells
-    n = grid % cells_n_nodes(c)
+    n = abs(grid % cells_n_nodes(c))
     do i_nod = 1, n
       do j_nod = i_nod+1, n
         if(grid % cells_n(i_nod, c) .eq. grid % cells_n(j_nod, c)) then
