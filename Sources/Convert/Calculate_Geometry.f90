@@ -117,6 +117,7 @@
   !-------------------------------!
   print *, '#========================================='
   print *, '# Geometric extents:                 '
+  print *, '#-----------------------------------------'
   print '(2(a,es10.3))', ' # X from: ', minval(grid % xn(:)),  &
                          '  to: ',      maxval(grid % xn(:))
   print '(2(a,es10.3))', ' # Y from: ', minval(grid % yn(:)),  &
