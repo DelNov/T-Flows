@@ -297,6 +297,7 @@
       end if  !  c2 > 0
     end do    !  faces
 
+    ! More likely, one should do: grid % n_shadows = grid % n_shadows + n_per
     grid % n_shadows = n_per
 
     print '(a38,i7)',   '# Number of periodic faces:          ', n_per
