@@ -24,8 +24,8 @@
   integer, allocatable :: full_edge_n (:,:)   ! edges, nodes
   integer, allocatable :: full_edge_fb(:)     ! edges' faces at boundary
   integer, allocatable :: full_edge_bc(:)     ! edges' faces boundary colors
-  integer, allocatable :: comp_edge_s(:)      ! compressed edge start
-  integer, allocatable :: comp_edge_e(:)      ! compressed edge end
+  integer, allocatable :: comp_edge_f(:)      ! compressed edge first
+  integer, allocatable :: comp_edge_l(:)      ! compressed edge last
   integer, allocatable :: cell_to_node(:)
   integer, allocatable :: node_to_face(:)
   integer, allocatable :: node_to_cell(:)
@@ -126,8 +126,8 @@
   !----------------------------------------------------!
   !   Allocate memory for mapping and related arrays   !
   !----------------------------------------------------!
-  allocate(comp_edge_s(prim % n_edges));  comp_edge_s(:) = 0
-  allocate(comp_edge_e(prim % n_edges));  comp_edge_e(:) = 0
+  allocate(comp_edge_f(prim % n_edges));  comp_edge_f(:) = 0
+  allocate(comp_edge_l(prim % n_edges));  comp_edge_l(:) = 0
 
   allocate(prim % edges_n (2,      prim % n_edges))
   allocate(prim % edges_bc(0:n_bc, prim % n_edges))
@@ -140,15 +140,15 @@
   !   Store compressed edges with their information on boundary   !
   !---------------------------------------------------------------!
   prim % n_edges = 1
-  comp_edge_s(prim % n_edges) = 1
+  comp_edge_f(prim % n_edges) = 1
   do e = 1, size(full_edge_fb)  ! I don't like it, but here it is
 
     if(e > 1) then
       if(full_edge_n (e, 1) .ne. full_edge_n (e-1, 1) .or.  &
          full_edge_n (e, 2) .ne. full_edge_n (e-1, 2)) then
-        comp_edge_e(prim % n_edges) = e-1  ! mark the end of the old edge
+        comp_edge_l(prim % n_edges) = e-1  ! mark the end of the old edge
         prim % n_edges = prim % n_edges + 1
-        comp_edge_s(prim % n_edges) = e    ! mark the start of the new edge
+        comp_edge_f(prim % n_edges) = e    ! mark the start of the new edge
       end if
     end if
 
@@ -169,7 +169,7 @@
     end if
 
   end do
-  comp_edge_e(prim % n_edges) = e-1  ! mark the end of the last edge
+  comp_edge_l(prim % n_edges) = e-1  ! mark the end of the last edge
 
   !-----------------------!
   !                       !
@@ -265,7 +265,7 @@
     ! Store nodes for each face in dual grid ...
     ! ... which are cells around each edge in prim
     cnt = 0
-    do i_edg = comp_edge_s(e), comp_edge_e(e)
+    do i_edg = comp_edge_f(e), comp_edge_l(e)
       f_p = full_edge_fb(i_edg)       ! get face index from the prim grid
       cnt = cnt + 1;  c_p_list(cnt) = prim % faces_c(1, f_p)
       cnt = cnt + 1;  c_p_list(cnt) = prim % faces_c(2, f_p)
@@ -323,7 +323,7 @@
       ! Retreive boundary face information again
       if(edge_data(e) .eq. -1) then
         ! print *, ' # Sharp edge:', e
-        do i_edg = comp_edge_s(e), comp_edge_e(e)
+        do i_edg = comp_edge_f(e), comp_edge_l(e)
           f_p = full_edge_fb(i_edg)       ! get face index from the prim grid
           c2 = prim % faces_c(2, f_p)
           n2 = c2 + prim % n_bnd_cells + 1
