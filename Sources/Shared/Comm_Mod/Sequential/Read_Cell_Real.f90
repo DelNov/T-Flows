@@ -17,10 +17,10 @@
   call fseek(fh, disp, 0)
 
   ! Read "distributed" cell data 
-  do c = 1, comm % nc_t
+  do c = 1, comm % nc_tot
     read(fh) array(c)
   end do
 
-  disp = disp + comm % nc_t * SIZE_REAL
+  disp = disp + comm % nc_tot * SIZE_REAL
 
   end subroutine

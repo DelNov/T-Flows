@@ -14,10 +14,10 @@
 !==============================================================================!
 
   ! Write "distributed" boundary cell data 
-  do c = 1, comm % nb_t
+  do c = 1, comm % nb_tot
     write(9) array(c)
   end do
 
-  disp = disp + comm % nb_t * SIZE_REAL
+  disp = disp + comm % nb_tot * SIZE_REAL
 
   end subroutine

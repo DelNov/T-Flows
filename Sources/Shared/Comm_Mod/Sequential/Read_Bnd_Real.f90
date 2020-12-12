@@ -17,10 +17,10 @@
   call fseek(fh, disp, 0)
 
   ! Read "distributed" boundary cell array 
-  do c = 1, comm % nb_t
+  do c = 1, comm % nb_tot
     read(fh) array(c)
   end do
 
-  disp = disp + comm % nb_t * SIZE_REAL
+  disp = disp + comm % nb_tot * SIZE_REAL
 
   end subroutine

@@ -14,10 +14,10 @@
 !==============================================================================!
 
   ! Write "distributed" face data
-  do s = 1, comm % nf_t
+  do s = 1, comm % nf_tot
     write(9) array(s)
   end do
 
-  disp = disp + comm % nf_t * SIZE_REAL
+  disp = disp + comm % nf_tot * SIZE_REAL
 
   end subroutine

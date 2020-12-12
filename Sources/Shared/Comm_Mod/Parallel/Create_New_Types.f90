@@ -20,29 +20,29 @@
 !------------------------------------------------------------------------------!
 
   ! Create new type for cells
-  call Mpi_Type_Create_Indexed_Block(comm % nc_s,     & ! length of map
+  call Mpi_Type_Create_Indexed_Block(comm % nc_sub,   & ! length of map
                                      1,               & ! block size
-                                     comm % cell_map, & ! displacements 
+                                     comm % cell_map, & ! displacements
                                      MPI_DOUBLE,      & ! old data type
-                                     cell_map_type,   & ! new data type 
+                                     cell_map_type,   & ! new data type
                                      error)             ! integer error
   call Mpi_Type_Commit(cell_map_type, error)
 
   ! Create new type for boundary cells
-  call Mpi_Type_Create_Indexed_Block(max(comm % nb_s,1),  & ! map length
-                                     1,                   & ! block size
-                                     comm % bnd_cell_map, & ! displacem.
-                                     MPI_DOUBLE,          & ! old type
-                                     bnd_cell_map_type,   & ! new type 
-                                     error)                 ! int. error
+  call Mpi_Type_Create_Indexed_Block(max(comm % nb_sub,1),  & ! map length
+                                     1,                     & ! block size
+                                     comm % bnd_cell_map,   & ! displacem
+                                     MPI_DOUBLE,            & ! old type
+                                     bnd_cell_map_type,     & ! new type
+                                     error)                   ! int. error
   call Mpi_Type_Commit(bnd_cell_map_type, error)
 
   ! Create new type for faces
-  call Mpi_Type_Create_Indexed_Block(comm % nf_s,     & ! length of map
+  call Mpi_Type_Create_Indexed_Block(comm % nf_sub,   & ! length of map
                                      1,               & ! block size
-                                     comm % face_map, & ! displacements 
+                                     comm % face_map, & ! displacements
                                      MPI_DOUBLE,      & ! old data type
-                                     face_map_type,   & ! new data type 
+                                     face_map_type,   & ! new data type
                                      error)             ! integer error
   call Mpi_Type_Commit(face_map_type, error)
 

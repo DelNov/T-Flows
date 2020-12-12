@@ -26,11 +26,11 @@
   ! Write distributed face data
   call Mpi_File_Write(fh,                 &
                       array,              &
-                      comm % nf_s,        &
+                      comm % nf_sub,      &
                       MPI_DOUBLE,         &
                       MPI_STATUS_IGNORE,  &
                       error)
 
-  disp = disp + comm % nf_t * SIZE_REAL
+  disp = disp + comm % nf_tot * SIZE_REAL
 
   end subroutine
