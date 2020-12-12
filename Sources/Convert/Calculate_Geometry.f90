@@ -25,8 +25,8 @@
   real                 :: ab_i, ab_j, ab_k, ac_i, ac_j, ac_k, p_i, p_j, p_k
   real                 :: per_min, per_max, t, sur_tot, angle, max_dis
   real,    allocatable :: xspr(:), yspr(:), zspr(:)
-  real,    allocatable :: b_coor(:), phi_face(:)
-  integer, allocatable :: b_face(:), face_copy(:)
+  real,    allocatable :: b_coor(:)
+  integer, allocatable :: b_face(:)
   character(SL)        :: answer, dir
   real                 :: big, small, factor, prod
 !==============================================================================!
@@ -295,9 +295,6 @@
   !   Phase I  ->  find the faces on periodic boundaries   !
   !                                                        !
   !--------------------------------------------------------!
-
-  allocate(face_copy(grid % n_faces)); face_copy = 0
-
 2 continue
   call Grid_Mod_Print_Bnd_Cond_List(grid)
   n_per = 0
@@ -409,7 +406,6 @@
 
     angle_face = angle_face * PI / 180.0
 
-    allocate(phi_face(grid % n_faces)); phi_face=0.0
     allocate(xspr(grid % n_faces)); xspr=0.0
     allocate(yspr(grid % n_faces)); yspr=0.0
     allocate(zspr(grid % n_faces)); zspr=0.0
@@ -626,7 +622,6 @@
       goto 3  
     end if
 
-    deallocate(phi_face)
     deallocate(xspr)
     deallocate(yspr)
     deallocate(zspr)
@@ -635,16 +630,16 @@
                                  b_face(1:cnt_per))
   end if  ! for option .eq. 2
 
-  do s = 1, cnt_per/2
+  do s = 1, cnt_per / 2
     s1 = b_face(s)
-    s2 = b_face(s+cnt_per/2)
+    s2 = b_face(s + cnt_per / 2)
     c11 = grid % faces_c(1,s1)  ! cell 1 for face 1
     c21 = grid % faces_c(2,s1)  ! cell 2 for cell 1
     c12 = grid % faces_c(1,s2)  ! cell 1 for face 2
     c22 = grid % faces_c(2,s2)  ! cell 2 for face 2
-    face_copy(s1) = s2          ! just to remember where it was coppied from
-    face_copy(s2) = s1          ! ... and for the other (mirror) face too
-    grid % faces_c(2,s1) = c12
+    grid % faces_s(s1) = s2     ! store where it was coppied from ...
+    grid % faces_s(s2) = s1     ! ... and for the mirror face too
+    grid % faces_c(2,s1) = c12  ! inside cell on the other side of periodicity
     grid % faces_c(1,s2) = 0    ! c21; this zero marks a shadow face -> dirty
     grid % faces_c(2,s2) = 0    ! c21; this zero marks a shadow face -> dirty
   end do
@@ -834,20 +829,17 @@
         n_per = n_per + 1
 
         ! Find the coordinates of the shadow face
-        xs2 = grid % xf(face_copy(s))
-        ys2 = grid % yf(face_copy(s))
-        zs2 = grid % zf(face_copy(s))
+        xs2 = grid % xf(grid % faces_s(s))
+        ys2 = grid % yf(grid % faces_s(s))
+        zs2 = grid % zf(grid % faces_s(s))
 
         grid % dx(s) = grid % xf(s) - xs2  !-----------------------!
         grid % dy(s) = grid % yf(s) - ys2  ! later: xc2 = xc2 + dx !
         grid % dz(s) = grid % zf(s) - zs2  !-----------------------!
 
-        grid % dx(face_copy(s)) = grid % dx(s)
-        grid % dy(face_copy(s)) = grid % dy(s)
-        grid % dz(face_copy(s)) = grid % dz(s)
-
-        grid % faces_s(s) = face_copy(s)
-        grid % faces_s(face_copy(s)) = s
+        grid % dx(grid % faces_s(s)) = grid % dx(s)
+        grid % dy(grid % faces_s(s)) = grid % dy(s)
+        grid % dz(grid % faces_s(s)) = grid % dz(s)
 
         grid % per_x = max(grid % per_x, abs(grid % dx(s)))
         grid % per_y = max(grid % per_y, abs(grid % dy(s)))
@@ -870,6 +862,8 @@
   !                                                       !
   !-------------------------------------------------------!
   number_faces = 0
+
+  ! Assign numbers to real cells, inside and boundary
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
@@ -878,20 +872,22 @@
       grid % new_f(s) = number_faces
     end if
   end do
+
+  ! Assign numbers to shadow faces, these can only be iside
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1, s)
     c2 = grid % faces_c(2, s)
     if(c1 .eq. 0 .and. c2 .eq. 0) then  ! marked like that above -> dirty
       number_faces = number_faces  + 1
       grid % new_f(s) = number_faces
-      grid % faces_c(1, s) = grid % faces_c(1, face_copy(s))  ! restore cells
-      grid % faces_c(2, s) = grid % faces_c(2, face_copy(s))  ! surrounding it
+
+      ! Restore cells surrounding it
+      grid % faces_c(1, s) = grid % faces_c(1, grid % faces_s(s))
+      grid % faces_c(2, s) = grid % faces_c(2, grid % faces_s(s))
     end if
   end do
   print '(a38,i9)', ' # Old number of faces:               ',  grid % n_faces
   print '(a38,i9)', ' # New number of faces:               ',  number_faces
-
-  deallocate(face_copy)
 
   !----------------------------------!
   !                                  !
