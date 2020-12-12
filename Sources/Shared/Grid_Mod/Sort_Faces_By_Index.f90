@@ -13,8 +13,8 @@
   integer, allocatable :: work_2(:,:)
 !==============================================================================!
 
-  allocate(work_1(  n))
-  allocate(work_2(4,n))
+  allocate(work_1                   (n))
+  allocate(work_2(MAX_FACES_N_NODES, n))
 
   ! Sort number of nodes in a face
   do i = 1, n
@@ -26,10 +26,12 @@
 
   ! Sort faces_n
   do i = 1, n
-    work_2(1:4, indx(i)) = grid % faces_n(1:4, i)
+    work_2(1:MAX_FACES_N_NODES, indx(i)) =  &
+      grid % faces_n(1:MAX_FACES_N_NODES, i)
   end do
   do i = 1, n
-    grid % faces_n(1:4, i) = work_2(1:4, i)
+    grid % faces_n(1:MAX_FACES_N_NODES, i) =  &
+      work_2(1:MAX_FACES_N_NODES, i)
   end do
 
   ! Sort faces_c
