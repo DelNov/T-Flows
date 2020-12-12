@@ -109,6 +109,17 @@
 !                                                                              !
 !==============================================================================!
 
+  ! An error trap for c1 and c2
+  do s = 1, grid % n_faces
+    if(grid % faces_c(2,s) > 0) then
+      if(grid % faces_c(1,s) > grid % faces_c(2,s)) then
+        print *, '# TROUBLE: this shoulnd''t have happened at real face!'
+        print *, '# This error is critical.  Exiting now.!'
+        stop
+      end if
+    end if
+  end do
+
   !-------------------------------!
   !   Scale geometry              !
   !-------------------------------!
@@ -632,12 +643,13 @@
     c12 = grid % faces_c(1,s2)  ! cell 1 for face 2
     c22 = grid % faces_c(2,s2)  ! cell 2 for face 2
     face_copy(s1) = s2          ! just to remember where it was coppied from
+    face_copy(s2) = s1          ! ... and for the other (mirror) face too
     grid % faces_c(2,s1) = c12
-    grid % faces_c(1,s2) = 0    ! c21
-    grid % faces_c(2,s2) = 0    ! c21
+    grid % faces_c(1,s2) = 0    ! c21; this zero marks a shadow face -> dirty
+    grid % faces_c(2,s2) = 0    ! c21; this zero marks a shadow face -> dirty
   end do
 
-  n_per = cnt_per/2
+  n_per = cnt_per / 2
   print *, '# Phase I: periodic cells: ', n_per
 
   ! Find periodic extents
@@ -852,8 +864,6 @@
   print '(a38,f8.3)', ' # Periodicity in y direction         ', grid % per_y
   print '(a38,f8.3)', ' # Periodicity in z direction         ', grid % per_z
 
-  deallocate(face_copy)
-
   !-------------------------------------------------------!
   !                                                       !
   !   Phase III  ->  find the new numbers of cell faces   !
@@ -869,15 +879,19 @@
     end if
   end do
   do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
-    if(.not. c1 > 0) then
+    c1 = grid % faces_c(1, s)
+    c2 = grid % faces_c(2, s)
+    if(c1 .eq. 0 .and. c2 .eq. 0) then  ! marked like that above -> dirty
       number_faces = number_faces  + 1
       grid % new_f(s) = number_faces
+      grid % faces_c(1, s) = grid % faces_c(1, face_copy(s))  ! restore cells
+      grid % faces_c(2, s) = grid % faces_c(2, face_copy(s))  ! surrounding it
     end if
   end do
   print '(a38,i9)', ' # Old number of faces:               ',  grid % n_faces
   print '(a38,i9)', ' # New number of faces:               ',  number_faces
+
+  deallocate(face_copy)
 
   !----------------------------------!
   !                                  !
