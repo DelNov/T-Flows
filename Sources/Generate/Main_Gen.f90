@@ -67,7 +67,7 @@
   ! Checked like this: do s = 1, grid % n_faces + grid % n_shadows
   ! Checked like this:   write(20, '(99i9)') s, grid % faces_s(s)
   ! Checked like this: end do
-  ! Similar note is needed in Convert, but will come to that later.
+  ! Similar note is in Convert, also called Note #1
 
   !------------------------------!
   !   Save data for processing   !
