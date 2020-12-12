@@ -48,14 +48,14 @@
     integer(SP), allocatable :: face_map(:)
 
     ! Variables which follow are for backup saving to single file
-    integer :: nc_s   ! number of cells in subdomain
-    integer :: nb_s   ! number of bundary cells in subdomain
-    integer :: nb_f   ! first boundary cell to save
-    integer :: nb_l   ! last boundary cell to save
-    integer :: nc_t   ! total number of cells 
-    integer :: nb_t   ! total number of bundary cells
-    integer :: nf_s   ! number of faces in subdomain
-    integer :: nf_t   ! total number of faces
+    integer :: nc_sub   ! number of cells in subdomain
+    integer :: nb_sub   ! number of bundary cells in subdomain
+    integer :: nb_f     ! first boundary cell to save
+    integer :: nb_l     ! last boundary cell to save
+    integer :: nc_tot   ! total number of cells
+    integer :: nb_tot   ! total number of bundary cells
+    integer :: nf_sub   ! number of faces in subdomain
+    integer :: nf_tot   ! total number of faces
 
     ! Number of processors per node and processor i.d.s for each node
     integer,           allocatable :: nodes_n_procs(:)
