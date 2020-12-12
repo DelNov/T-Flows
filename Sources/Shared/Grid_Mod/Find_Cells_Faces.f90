@@ -7,28 +7,24 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c1, c2, s   ! counters
+  integer :: c, i_cel, s   ! counters
 !==============================================================================!
 
   if(any(grid % cells_n_faces(:) .ne. 0)) then
-    print *, '# WARNING: Seems you are looking for cells'' faces' //  &
-             ' although this information has already been found!'
+    print *, '# NOTE: Seems you are looking for cells'' faces'
+    print *, '# although this information has already been found!'
+    print *, '# No harm done, just a little note.'
   end if
 
-  !---------------------------------------!
-  !   Browse through all faces to form:   !
-  !        cells_n_faces, cells_f         !
-  !---------------------------------------!
   grid % cells_n_faces(:) = 0
+
   do s = 1, grid % n_faces
-    c1 = grid % faces_c(1, s)
-    c2 = grid % faces_c(2, s)
+    do i_cel = 1, 2
+      c = grid % faces_c(i_cel, s)
 
-    grid % cells_n_faces(c1) = grid % cells_n_faces(c1) + 1
-    grid % cells_f(grid % cells_n_faces(c1), c1) = s
-
-    grid % cells_n_faces(c2) = grid % cells_n_faces(c2) + 1
-    grid % cells_f(grid % cells_n_faces(c2), c2) = s
+      grid % cells_n_faces(c) = grid % cells_n_faces(c) + 1
+      grid % cells_f(grid % cells_n_faces(c), c) = s
+    end do
   end do
 
   end subroutine
