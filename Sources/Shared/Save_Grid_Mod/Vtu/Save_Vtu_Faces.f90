@@ -30,7 +30,7 @@
       do s = 1, grid % n_faces
         if(grid % faces_s(s) > 0) then
           s_s = min(s_s, grid % faces_s(s))
-          s_e = max(s_s, grid % faces_s(s))
+          s_e = max(s_e, grid % faces_s(s))
         end if
       end do
       ext = '.shadows.vtu'
