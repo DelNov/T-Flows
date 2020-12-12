@@ -4,13 +4,15 @@
 !   Sorts array of faces in a smart way.  That would mean boundary faces       !
 !   first, boundary region by boundary region, then inside faces, then         !
 !   also according to indices of cells surrounding a face (c1 and c2).         !
+!                                                                              !
+!   Note that it doesn't store shadow faces (which are stored after normal     !
+!   faces), but updates references to them.                                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(grid_type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: s, n, c, c1, c2, n_bc, color
-  integer, allocatable :: old_f(:), new_f(:), old_c(:)
   integer, allocatable :: old_nn  (:)
   integer, allocatable :: old_shad(:)
   integer, allocatable :: old_nods(:,:)
@@ -22,11 +24,9 @@
   integer, parameter :: M = MAX_FACES_N_NODES
 !==============================================================================!
 
+  ! Allocate memory
   allocate(criteria(grid % n_faces, 3))  ! 2nd ind smaller for memory alignemnt
-  allocate(old_f(grid % n_faces))        ! old face numbers
-  allocate(new_f(grid % n_faces))        ! new face numbers
-  allocate(old_c   (  -grid % n_bnd_cells:-1))  ! old bnd. cell numbers
-  allocate(old_nn  (   grid % n_faces))         ! old number of nodes
+  allocate(old_nn  (   grid % n_faces))  ! old number of nodes
   allocate(old_shad(   grid % n_faces))
   allocate(old_nods(M, grid % n_faces))
   allocate(old_bxyz(3,-grid % n_bnd_cells:-1))
@@ -52,7 +52,7 @@
       criteria(s,1) = grid % bnd_cond % color(c2)
       criteria(s,3) = -criteria(s,3)
     end if
-    old_f(s) = s
+    grid % old_f(s) = s
   end do
 
   !--------------------------------------------------!
@@ -60,7 +60,7 @@
   !--------------------------------------------------!
   call Sort_Mod_3_Int_Carry_Int(criteria(1:grid % n_faces, 1),  &
                                 criteria(1:grid % n_faces, 2),  &
-                                criteria(1:grid % n_faces, 3), old_f)
+                                criteria(1:grid % n_faces, 3), grid % old_f)
 
   !------------------------------------------!
   !   Copy sorted c1s to face_c structure,   !
@@ -74,10 +74,10 @@
     grid % faces_c(2,s) = criteria(s,3)
 
     ! ... but renumber c2 if on the boundary
-    if(criteria(s,1) .ne. BIG) then    ! on the boundary
-      n_bc = n_bc + 1                  ! increase the count
-      grid % faces_c(2,s) = -n_bc      ! set face_c properly
-      old_c(-n_bc) = -criteria(s,3)    ! store the old number
+    if(criteria(s,1) .ne. BIG) then         ! on the boundary
+      n_bc = n_bc + 1                       ! increase the count
+      grid % faces_c(2,s) = -n_bc           ! set face_c properly
+      grid % old_c(-n_bc) = -criteria(s,3)  ! store the old number
     else
     end if
   end do
@@ -87,10 +87,10 @@
   !   their boundary colors and geometrical quantities   !
   !------------------------------------------------------!
   do c=-1, -grid % n_bnd_cells, -1
-    old_nn  ( -c) = grid % bnd_cond % color(old_c(c))  ! use old_nn for colors
-    old_bxyz(1,c) = grid % xc(old_c(c))
-    old_bxyz(2,c) = grid % yc(old_c(c))
-    old_bxyz(3,c) = grid % zc(old_c(c))
+    old_nn  ( -c) = grid % bnd_cond % color(grid % old_c(c))  ! use old_nn ...
+    old_bxyz(1,c) = grid % xc(grid % old_c(c))                ! ... for colors
+    old_bxyz(2,c) = grid % yc(grid % old_c(c))
+    old_bxyz(3,c) = grid % zc(grid % old_c(c))
   end do
   do c=-1, -grid % n_bnd_cells, -1
     grid % bnd_cond % color(c) = old_nn  (-c)
@@ -103,9 +103,9 @@
   !   Sort faces_n_nodes, faces_n and faces_c   !
   !---------------------------------------------!
   do s = 1, grid % n_faces
-    old_nn  (    s) = grid % faces_n_nodes( old_f(s))
-    old_nods(1:M,s) = grid % faces_n  (1:M, old_f(s))
-    old_shad(    s) = grid % faces_s      ( old_f(s))
+    old_nn  (    s) = grid % faces_n_nodes( grid % old_f(s))
+    old_nods(1:M,s) = grid % faces_n  (1:M, grid % old_f(s))
+    old_shad(    s) = grid % faces_s      ( grid % old_f(s))
   end do
   do s = 1, grid % n_faces
     grid % faces_n_nodes(s) = old_nn  (     s)
@@ -130,34 +130,34 @@
 
   ! Form the new face numbers from the old face numbers
   do s = 1, grid % n_faces
-    new_f(old_f(s)) = s
+    grid % new_f(grid % old_f(s)) = s
   end do
 
   ! Do the actual sorting
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % sx(1), new_f(1))
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % sy(1), new_f(1))
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % sz(1), new_f(1))
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % dx(1), new_f(1))
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % dy(1), new_f(1))
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % dz(1), new_f(1))
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % f (1), new_f(1))
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % xf(1), new_f(1))
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % yf(1), new_f(1))
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % zf(1), new_f(1))
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % xr(1), new_f(1))
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % yr(1), new_f(1))
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % zr(1), new_f(1))
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % sx(1), grid % new_f(1))
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % sy(1), grid % new_f(1))
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % sz(1), grid % new_f(1))
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % dx(1), grid % new_f(1))
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % dy(1), grid % new_f(1))
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % dz(1), grid % new_f(1))
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % f (1), grid % new_f(1))
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % xf(1), grid % new_f(1))
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % yf(1), grid % new_f(1))
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % zf(1), grid % new_f(1))
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % xr(1), grid % new_f(1))
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % yr(1), grid % new_f(1))
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % zr(1), grid % new_f(1))
 
   ! Correct shadow faces
   do s = grid % n_faces + 1, grid % n_faces + grid % n_shadows
-    grid % faces_s(s) = new_f(grid % faces_s(s))
+    grid % faces_s(s) = grid % new_f(grid % faces_s(s))
   end do
 
   ! Correct face indexes for cells
   do c = -grid % n_bnd_cells, grid % n_cells
     do n = 1, grid % cells_n_faces(c)
       s = grid % cells_f(n, c)             ! take the face's index
-      grid % cells_f(n, c) = new_f(s)
+      grid % cells_f(n, c) = grid % new_f(s)
     end do
   end do
 
