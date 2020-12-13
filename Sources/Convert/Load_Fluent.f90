@@ -19,7 +19,7 @@
   integer              :: c, c1, c2, s, n, fu, i, l, pos
   integer              :: i_cel, i_nod, j_nod, k_nod, l_nod, i_fac
   integer              :: cell_type, zone_type
-  integer              :: cell_s, cell_e, side_s, side_e, node_s, node_e
+  integer              :: cell_f, cell_l, side_f, side_l, node_f, node_l
   integer              :: all_nodes(1024)       ! all cell's nodes
   integer              :: n_face_sect           ! number of face sections
   integer              :: face_sect_pos(2048)   ! where did Fluent store it
@@ -146,8 +146,8 @@
         if(line % tokens(1) .eq. '(2013') ascii = .false.
 
         ! Fetch start and ending face
-        read(line % tokens(3), '(z160)') side_s  ! starting face
-        read(line % tokens(4), '(z160)') side_e  ! ending face
+        read(line % tokens(3), '(z160)') side_f  ! first face
+        read(line % tokens(4), '(z160)') side_l  ! last face
 
         ! Increase the counter for face sections
         n_face_sect = n_face_sect + 1
@@ -162,10 +162,10 @@
         read(one_token(1:1), '(z1)') zone_type
         if(zone_type .eq. MIXED_ZONE) then
           print '(a34,i9,a4,i9)', ' # Found a mixed face zone from:  ',  &
-                                  side_s, ' to:', side_e
+                                  side_f, ' to:', side_l
         else
           print '(a34,i9,a4,i9)', ' # Found a uniform face zone from:',  &
-                                  side_s, ' to:', side_e
+                                  side_f, ' to:', side_l
         end if
 
         ! End the line if needed, just read one left bracket '('
@@ -178,7 +178,7 @@
         !   Browse through faces   !
         !--------------------------!
         this_sect_bnd = .false.
-        do s = side_s, side_e
+        do s = side_f, side_l
           n_faces = n_faces + 1
 
           ! Zone is mixed, read number of nodes and then c1 and c2
@@ -282,10 +282,10 @@
       !----------------------------------------------------------!
       if( (line % tokens(1) .eq. '(10' .or. line % tokens(1) .eq. '(3010')  &
          .and. line % tokens(2) .ne. '(0') then
-        read(line % tokens(3), '(z160)') node_s  ! starting node
-        read(line % tokens(4), '(z160)') node_e  ! ending node
+        read(line % tokens(3), '(z160)') node_f  ! first node
+        read(line % tokens(4), '(z160)') node_l  ! last node
         print '(a34,i9,a4,i9)', ' # Found a node zone from:        ',  &
-                                node_s, ' to:', node_e
+                                node_f, ' to:', node_l
 
         ! Store the format of this section
         ascii = .true.
@@ -298,7 +298,7 @@
         end if
 
         ! Read all the nodes (node coordinates)
-        do n = node_s, node_e
+        do n = node_f, node_l
           n_nodes = n_nodes + 1
           if(ascii) then
             call File_Mod_Read_Line(fu)
@@ -349,18 +349,18 @@
         ascii = .true.
         if(line % tokens(1) .eq. '(2012') ascii = .false.
 
-        ! Fetch start and ending cell
-        read(line % tokens(3), '(z160)') cell_s  ! starting cell
-        read(line % tokens(4), '(z160)') cell_e  ! ending cell
+        ! Fetch first and last cell
+        read(line % tokens(3), '(z160)') cell_f  ! first cell
+        read(line % tokens(4), '(z160)') cell_l  ! last cell
 
         ! Check if the zone is mixed (listing all cell types)
         read(line % tokens(line % n_tokens)(1:1), '(z1)') zone_type
         if(zone_type .eq. MIXED_ZONE) then
           print '(a34,i9,a4,i9)', ' # Found a mixed cell zone from:  ',  &
-                                  cell_s, ' to:', cell_e
+                                  cell_f, ' to:', cell_l
         else
           print '(a34,i9,a4,i9)', ' # Found a uniform cell zone from:',  &
-                                  cell_s, ' to:', cell_e
+                                  cell_f, ' to:', cell_l
         end if
 
         !------------------------------------!
@@ -369,45 +369,45 @@
         if(zone_type .ne. MIXED_ZONE) then
 
           ! Number of cells in this zone
-          n_cells_zone = cell_e - cell_s + 1
+          n_cells_zone = cell_l - cell_f + 1
 
           ! Update the number of cells
           n_cells = n_cells + n_cells_zone
 
           if(zone_type .eq. CELL_TRI)   then
             n_tri = n_tri + n_cells_zone
-            grid % cells_n_nodes(cell_s:cell_e) = 3
-            grid % cells_n_faces(cell_s:cell_e) = 1
+            grid % cells_n_nodes(cell_f:cell_l) = 3
+            grid % cells_n_faces(cell_f:cell_l) = 1
           end if
           if(zone_type .eq. CELL_QUAD)  then
             n_quad = n_quad + n_cells_zone
-            grid % cells_n_nodes(cell_s:cell_e) = 4
-            grid % cells_n_faces(cell_s:cell_e) = 1
+            grid % cells_n_nodes(cell_f:cell_l) = 4
+            grid % cells_n_faces(cell_f:cell_l) = 1
           end if
           if(zone_type .eq. CELL_TETRA) then
             n_tet = n_tet + n_cells_zone
-            grid % cells_n_nodes(cell_s:cell_e) = 4
-            grid % cells_n_faces(cell_s:cell_e) = 4
+            grid % cells_n_nodes(cell_f:cell_l) = 4
+            grid % cells_n_faces(cell_f:cell_l) = 4
           end if
           if(zone_type .eq. CELL_HEXA)  then
             n_hexa = n_hexa + n_cells_zone
-            grid % cells_n_nodes(cell_s:cell_e) = 8
-            grid % cells_n_faces(cell_s:cell_e) = 6
+            grid % cells_n_nodes(cell_f:cell_l) = 8
+            grid % cells_n_faces(cell_f:cell_l) = 6
           end if
           if(zone_type .eq. CELL_PYRA)  then
             n_pyra  = n_pyra  + n_cells_zone
-            grid % cells_n_nodes(cell_s:cell_e) = 5
-            grid % cells_n_faces(cell_s:cell_e) = 5
+            grid % cells_n_nodes(cell_f:cell_l) = 5
+            grid % cells_n_faces(cell_f:cell_l) = 5
           end if
           if(zone_type .eq. CELL_WEDGE) then
             n_wed = n_wed + n_cells_zone
-            grid % cells_n_nodes(cell_s:cell_e) = 6
-            grid % cells_n_faces(cell_s:cell_e) = 5
+            grid % cells_n_nodes(cell_f:cell_l) = 6
+            grid % cells_n_faces(cell_f:cell_l) = 5
           end if
           if(zone_type .eq. CELL_POLY)  then
             n_poly  = n_poly  + n_cells_zone
-            grid % cells_n_nodes(cell_s:cell_e) = -1  ! attend
-            grid % cells_n_faces(cell_s:cell_e) = -1  ! have to attend too
+            grid % cells_n_nodes(cell_f:cell_l) = -1  ! attend
+            grid % cells_n_faces(cell_f:cell_l) = -1  ! have to attend too
             grid % polyhedral = .true.
           end if
 
@@ -484,7 +484,7 @@
           end do
 
           ! Did you reach the end of this secion?
-          if(n_cells < cell_e) goto 6
+          if(n_cells < cell_l) goto 6
 
         end if  ! end of the mixed zone, also end of both zones
 
@@ -538,9 +538,9 @@
         ascii = .true.
         if(line % tokens(1) .eq. '(2013') ascii = .false.
 
-        ! Fetch start and ending face
-        read(line % tokens(3), '(z160)') side_s  ! starting face
-        read(line % tokens(4), '(z160)') side_e  ! ending face
+        ! Fetch first and last face
+        read(line % tokens(3), '(z160)') side_f  ! first face
+        read(line % tokens(4), '(z160)') side_l  ! last face
 
         ! Increase the counter for face sections
         n_face_sect = n_face_sect + 1
@@ -550,10 +550,10 @@
         read(one_token(1:1), '(z1)') zone_type
         if(zone_type .eq. MIXED_ZONE) then
           print '(a34,i9,a4,i9)', ' # Found a mixed face zone from:  ',  &
-                                  side_s, ' to:', side_e
+                                  side_f, ' to:', side_l
         else
           print '(a34,i9,a4,i9)', ' # Found a uniform face zone from:',  &
-                                  side_s, ' to:', side_e
+                                  side_f, ' to:', side_l
         end if
 
         ! End the line if needed
@@ -565,7 +565,7 @@
         !--------------------------!
         !   Browse through faces   !
         !--------------------------!
-        do s = side_s, side_e
+        do s = side_f, side_l
           n_faces = n_faces + 1
 
           ! Read nodes and cells surrounding the face for a mixed zone
@@ -909,12 +909,11 @@
     end do  ! through c1 and c2
   end do  ! through s, faces
 
-  !-------------------------------!
-  !                               !
-  !   Reconstruct cells' faces    !
-  !   (This might throw a note)   !
-  !                               !
-  !-------------------------------!
+  !-----------------------!
+  !                       !
+  !   Find cells' faces   !
+  !                       !
+  !-----------------------!
   call Grid_Mod_Find_Cells_Faces(grid)
 
   !--------------------------------------------------------------------!
