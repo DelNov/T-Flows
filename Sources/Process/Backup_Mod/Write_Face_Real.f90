@@ -47,10 +47,10 @@
   vn = var_name
   call Comm_Mod_Write_Text(fh, vn, disp)
 
-  vs = (comm % nf_t) * SIZE_REAL
+  vs = (comm % nf_tot) * SIZE_REAL
   call Comm_Mod_Write_Int (fh, vs, disp)
 
-  call Comm_Mod_Write_Face_Real(comm, fh, array(1:comm % nf_s), disp)
+  call Comm_Mod_Write_Face_Real(comm, fh, array(1:comm % nf_sub), disp)
 
   ! Correct the signs of fluxes  (Remember, they are defined
   ! defined to be positive from cg1 to cg2; and cg2 > cg1)

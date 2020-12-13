@@ -25,17 +25,17 @@
   ! Vector without boundaries
   vn = var_name
   call Comm_Mod_Write_Text(fh, vn, disp)
-  vs = (3*comm % nc_t + 3*comm % nb_t) * SIZE_REAL
+  vs = (3*comm % nc_tot + 3*comm % nb_tot) * SIZE_REAL
   call Comm_Mod_Write_Int (fh, vs, disp)
 
-  call Comm_Mod_Write_Cell_Real(comm, fh, var % n(1:comm % nc_s), disp)
+  call Comm_Mod_Write_Cell_Real(comm, fh, var % n(1:comm % nc_sub), disp)
   call Comm_Mod_Write_Bnd_Real (comm, fh, var % n( -comm % nb_f:  &
-                                                   -comm % nb_l), disp)
-  call Comm_Mod_Write_Cell_Real(comm, fh, var % q(1:comm % nc_s), disp)
+                                                   -comm % nb_l),   disp)
+  call Comm_Mod_Write_Cell_Real(comm, fh, var % q(1:comm % nc_sub), disp)
   call Comm_Mod_Write_Bnd_Real (comm, fh, var % q( -comm % nb_f:  &
-                                                   -comm % nb_l), disp)
-  call Comm_Mod_Write_Cell_Real(comm, fh, var % o(1:comm % nc_s), disp)
+                                                   -comm % nb_l),   disp)
+  call Comm_Mod_Write_Cell_Real(comm, fh, var % o(1:comm % nc_sub), disp)
   call Comm_Mod_Write_Bnd_Real (comm, fh, var % o( -comm % nb_f:  &
-                                                   -comm % nb_l), disp)
+                                                   -comm % nb_l),   disp)
 
   end subroutine

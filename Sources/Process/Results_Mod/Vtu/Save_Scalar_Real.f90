@@ -16,7 +16,7 @@
   integer          :: sweep           ! is it the first or second sweep
 !-----------------------------------[Locals]-----------------------------------!
   integer(SP)   :: data_size
-  integer       :: c1, c2, c_s, c_e
+  integer       :: c1, c2, c_f, c_l
   character(SL) :: str1
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: IP = DP  ! int. precision is double precision
@@ -25,8 +25,8 @@
 
   data_size = 0
 
-  c_s = lbound(val, 1)
-  c_e = ubound(val, 1)
+  c_f = lbound(val, 1)
+  c_l = ubound(val, 1)
 
   ! Header
   if(sweep .eq. 1) then
@@ -48,17 +48,17 @@
   ! Data
   if(sweep .eq. 2) then
     if(plot_inside) then
-      data_size = (c_e-c_s+1) * RP
+      data_size = (c_l-c_f+1) * RP
       write(fp) data_size
-      do c1 = c_s, c_e
+      do c1 = c_f, c_l
         write(fp) val(c1)
       end do
     else
-      do c2 = c_s, c_e
+      do c2 = c_f, c_l
         data_size = data_size + RP
       end do
       write(fp) data_size
-      do c2 = c_s, c_e
+      do c2 = c_f, c_l
         write(fp) val(c2)
       end do
     end if
@@ -67,9 +67,9 @@
   ! Update data_offset
   if(sweep .eq. 1) then
     if(plot_inside) then
-      data_offset = data_offset + (c_e-c_s+1) * RP
+      data_offset = data_offset + (c_l-c_f+1) * RP
     else
-      do c2 = c_s, c_e
+      do c2 = c_f, c_l
         data_offset = data_offset + RP
       end do
     end if

@@ -32,14 +32,14 @@
     cnt_loop = cnt_loop + 1
 
     call Comm_Mod_Read_Text(fh, vn, disp_loop)  ! variable name
-    call Comm_Mod_Read_Int (fh, vs, disp_loop)  ! variable size  
+    call Comm_Mod_Read_Int (fh, vs, disp_loop)  ! variable size
 
     ! If variable is found, read it and retrun
     if(vn .eq. var_name) then
       if(this_proc < 2) print *, '# Reading variable: ', trim(vn)
-      call Comm_Mod_Read_Cell_Real(comm, fh, array(1:comm % nc_s),   disp_loop)
-      call Comm_Mod_Read_Bnd_Real (comm, fh, array(-comm % nb_f:  &
-                                                   -comm % nb_l), disp_loop)
+      call Comm_Mod_Read_Cell_Real(comm, fh, array(1:comm % nc_sub), disp_loop)
+      call Comm_Mod_Read_Bnd_Real (comm, fh, array( -comm % nb_f:  &
+                                                    -comm % nb_l),   disp_loop)
       call Grid_Mod_Exchange_Cells_Real(grid, array(-nb:nc))
       disp = disp_loop
       return

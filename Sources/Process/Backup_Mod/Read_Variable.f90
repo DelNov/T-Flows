@@ -39,15 +39,15 @@
     ! If variable is found, read it and retrun
     if(vn .eq. var_name) then
       if(this_proc < 2) print *, '# Reading variable: ', trim(vn)
-      call Comm_Mod_Read_Cell_Real(comm,fh,var % n(1:comm % nc_s), disp_loop)
+      call Comm_Mod_Read_Cell_Real(comm,fh,var % n(1:comm % nc_sub), disp_loop)
       call Comm_Mod_Read_Bnd_Real (comm,fh,var % n( -comm % nb_f:  &
-                                                    -comm % nb_l), disp_loop)
-      call Comm_Mod_Read_Cell_Real(comm,fh,var % q(1:comm % nc_s), disp_loop)
+                                                    -comm % nb_l),   disp_loop)
+      call Comm_Mod_Read_Cell_Real(comm,fh,var % q(1:comm % nc_sub), disp_loop)
       call Comm_Mod_Read_Bnd_Real (comm,fh,var % q( -comm % nb_f:  &
-                                                    -comm % nb_l), disp_loop)
-      call Comm_Mod_Read_Cell_Real(comm,fh,var % o(1:comm % nc_s), disp_loop)
+                                                    -comm % nb_l),   disp_loop)
+      call Comm_Mod_Read_Cell_Real(comm,fh,var % o(1:comm % nc_sub), disp_loop)
       call Comm_Mod_Read_Bnd_Real (comm,fh,var % o( -comm % nb_f:  &
-                                                    -comm % nb_l), disp_loop)
+                                                    -comm % nb_l),   disp_loop)
 
       ! Refresh buffers for "n", "q" and "o" (not sure if needed)
       call Grid_Mod_Exchange_Cells_Real(grid, var % n(-nb:nc))

@@ -40,7 +40,7 @@
     ! If variable is found, read it and retrun
     if(vn .eq. var_name) then
       if(this_proc < 2) print *, '# Reading variable: ', trim(vn)
-      call Comm_Mod_Read_Face_Real(comm, fh, array(1:comm % nf_s), disp_loop)
+      call Comm_Mod_Read_Face_Real(comm, fh, array(1:comm % nf_sub), disp_loop)
       disp = disp_loop
 
       ! Correct the signs of fluxes  (Remember, they are defined

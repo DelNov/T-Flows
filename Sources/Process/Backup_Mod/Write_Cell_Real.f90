@@ -27,11 +27,11 @@
   vn = var_name
   call Comm_Mod_Write_Text(fh, vn, disp)
 
-  vs = (comm % nc_t + comm % nb_t) * SIZE_REAL
+  vs = (comm % nc_tot + comm % nb_tot) * SIZE_REAL
   call Comm_Mod_Write_Int (fh, vs, disp)
 
-  call Comm_Mod_Write_Cell_Real(comm, fh, array(1:comm % nc_s),   disp)
-  call Comm_Mod_Write_Bnd_Real (comm, fh, array(-comm % nb_f:  &
-                                                -comm % nb_l), disp)
+  call Comm_Mod_Write_Cell_Real(comm, fh, array(1:comm % nc_sub), disp)
+  call Comm_Mod_Write_Bnd_Real (comm, fh, array( -comm % nb_f:  &
+                                                 -comm % nb_l),   disp)
 
   end subroutine
