@@ -25,12 +25,8 @@
   ! Fix counters and file extension if you are plotting shadows
   if(present(plot_shadows)) then
     if(plot_shadows) then
-      s_f = +HUGE_INT
-      s_l = -HUGE_INT
-      do s = 1, grid % n_faces
-        s_f = min(s_f, grid % faces_s(s))
-        s_l = max(s_l, grid % faces_s(s))
-      end do
+      s_f = grid % n_faces + 1
+      s_l = grid % n_faces + grid % n_shadows
       ext = '.shadows.vtu'
     end if
   end if
