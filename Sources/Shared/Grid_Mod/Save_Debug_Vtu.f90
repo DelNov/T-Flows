@@ -21,8 +21,9 @@
   integer(SP)   :: data_size
   integer       :: c, n, s, i_fac, data_offset, cell_offset, fu
   integer       :: n_conns, n_polyg
-  integer       :: cs, ce, nc
+  integer       :: cs, ce, nc, s1, s2
   logical       :: inside
+  real          :: dist1, dist2
   character(SL) :: name_out, str1, str2
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: IP = DP  ! int. precision is double precision
@@ -343,6 +344,18 @@
         write(fu) grid % cells_n_faces(c)      ! write number of its polyfaces
         do i_fac = 1, grid % cells_n_faces(c)  ! and all polyfaces
           s = grid % cells_f(i_fac, c)
+          if(grid % faces_s(s) .ne. 0) then    ! face has a shadow, if it ...
+            s1 = s                             ! ... is closer, plot that!
+            s2 = grid % faces_s(s)
+            dist1 = Math_Mod_Distance(                            &
+                    grid % xc(c),  grid % yc(c),  grid % zc(c),   &
+                    grid % xf(s1), grid % yf(s1), grid % zf(s1))
+            dist2 = Math_Mod_Distance(                            &
+                    grid % xc(c),  grid % yc(c),  grid % zc(c),   &
+                    grid % xf(s2), grid % yf(s2), grid % zf(s2))
+            if(dist1 < dist2) s = s1
+            if(dist2 < dist1) s = s2
+          end if
           n = grid % faces_n_nodes(s)
           write(fu) n, grid % faces_n(1:n, s)-1
         end do
