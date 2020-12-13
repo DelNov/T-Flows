@@ -40,7 +40,8 @@
   integer(SP)              :: data_size
   integer                  :: data_offset, cell_offset, i_fac
   integer                  :: s, n, n_conns, n_polyg, sc, f8, f9, ua, run
-  integer                  :: c1, c2, c_f, c_l
+  integer                  :: s1, s2, c1, c2, c_f, c_l
+  real                     :: dist1, dist2
   character(SL)            :: name_out_8, name_out_9, name_mean, a_name
   character(SL)            :: str1, str2
 !------------------------------[Local parameters]------------------------------!
@@ -353,6 +354,18 @@
             write(f9) grid % cells_n_faces(c1)      ! write number of polygons
             do i_fac = 1, grid % cells_n_faces(c1)  ! write nodes of each polygn
               s = grid % cells_f(i_fac, c1)
+              if(grid % faces_s(s) .ne. 0) then  ! face has a shadow, if it ...
+                s1 = s                           ! ... is closer, plot that!
+                s2 = grid % faces_s(s)
+                dist1 = Math_Mod_Distance(                            &
+                        grid % xc(c1), grid % yc(c1), grid % zc(c1),  &
+                        grid % xf(s1), grid % yf(s1), grid % zf(s1))
+                dist2 = Math_Mod_Distance(                            &
+                        grid % xc(c1), grid % yc(c1), grid % zc(c1),  &
+                        grid % xf(s2), grid % yf(s2), grid % zf(s2))
+                if(dist1 < dist2) s = s1
+                if(dist2 < dist1) s = s2
+              end if
               n = grid % faces_n_nodes(s)
               write(f9) n, (grid % faces_n(1:n, s))-1
             end do
