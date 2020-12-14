@@ -5,7 +5,7 @@
  HEAT_TRANSFER    no
 
  NUMBER_OF_TIME_STEPS   1200
- RESULTS_SAVE_INTERVAL    12
+ RESULTS_SAVE_INTERVAL    30
  BACKUP_SAVE_INTERVAL    300
  TIME_STEP               0.01
 
@@ -81,8 +81,3 @@
     TYPE                convective
     VARIABLES           u     v     w
     VALUES              1.0   0.0   0.0
-
-  BOUNDARY_CONDITION    periodic_y
-    TYPE                symmetry
-    VARIABLES           u     v     w
-    VALUES              0.0   0.0   0.0
