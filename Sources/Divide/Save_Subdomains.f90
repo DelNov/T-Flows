@@ -65,6 +65,7 @@
 
     !------------------------------------------!
     !   Also spread node marks to twin nodes   !
+    !     (Find them through shadow faces)     !
     !------------------------------------------!
     do subo = 1, maxval(grid % comm % cell_proc(:))
       do s = 1, grid % n_faces
@@ -199,7 +200,7 @@
     !    If the faces in the original grid started from       !
     !    boundary faces, it should be the case here too.)     !
     !---------------------------------------------------------!
-    do s = 1, grid % n_faces ! + n_shadows???
+    do s = 1, grid % n_faces  ! + n_shadows?  probably not, shadows at the end
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
 
@@ -219,7 +220,7 @@
       if(subo .ne. sub) then
 
         ! Faces half in the domain, half in the buffers
-        do s = 1, grid % n_faces
+        do s = 1, grid % n_faces  ! + n_shadows?  naah, shadows at the end
           c1 = grid % faces_c(1,s)
           c2 = grid % faces_c(2,s)
           if(c2 > 0) then
@@ -244,23 +245,20 @@
     !------------------------------------------------!
     !   Step 3: All the remaining faces in buffers   !
     !------------------------------------------------!
-    do c = -grid % n_bnd_cells, grid % n_cells
+    do s = 1, grid % n_faces  ! + n_shadows?  naah, shadows at the end
+      c1 = grid % faces_c(1,s)
+      c2 = grid % faces_c(2,s)
 
-      ! If cell has been marked to be saved with this sub, no matter
-      ! if it is inside or at the buffer (although it would be strange
-      ! if inside faces haven't been marked already above)
-      if(grid % new_c(c) .ne. 0) then
+      ! If any of its cells have been marked for saving ...
+      if(grid % new_c(c1) .ne. 0 .or.  &
+         grid % new_c(c2) .ne. 0) then
 
-        do i_fac = 1, grid % cells_n_faces(c)
-          s = grid % cells_f(i_fac, c)
-
-          ! If the face hasn't been marked allready, do it now!
-          if(grid % new_f(s) .eq. 0) then
-            nf_sub = nf_sub + 1
-            grid % new_f(s) = nf_sub
-            grid % old_f(nf_sub) = s
-          end if
-        end do  ! i_fac
+        ! ... but the face hasn't, do it now!
+        if(grid % new_f(s) .eq. 0) then
+          nf_sub = nf_sub + 1
+          grid % new_f(s) = nf_sub
+          grid % old_f(nf_sub) = s
+        end if
 
       end if  !  new_c(c) .ne. 0
     end do    !  c
@@ -312,7 +310,7 @@
     !-------------------------------------------------!
     !   Mark nodes in faces for renumbering with -1   !
     !-------------------------------------------------!
-    do s = grid % n_faces + 1, grid % n_faces + grid % n_shadows
+    do s = 1, grid % n_faces + grid % n_shadows
       if(grid % new_f(s) > 0) then
         do i_nod = 1, grid % faces_n_nodes(s)
           grid % new_n(grid % faces_n(i_nod,s)) = -1
