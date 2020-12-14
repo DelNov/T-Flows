@@ -1,13 +1,10 @@
 cylinder.msh
 no
-skip
+1.000
+2
+4
 1
-1
-x
-skip
-3
-z
-skip
 skip
 3
 skip
+

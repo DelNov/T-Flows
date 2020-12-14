@@ -5,7 +5,7 @@
  HEAT_TRANSFER   yes
 
  TIME_STEP                 0.05
- NUMBER_OF_TIME_STEPS    600
+ NUMBER_OF_TIME_STEPS    120
 
 #------------------
 # Saving intervals

@@ -10,24 +10,22 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: c, c1, c2, n, s, ss, cc2, c_max, nnn, hh, mm, b
+  integer              :: c, c1, c2, n, s, b
   integer              :: c11, c12, c21, c22, s1, s2, bou_cen, cnt_bnd, cnt_per
-  integer              :: color_per, n_per, number_faces, option
-  integer              :: rot_dir, n1, n2, i_nod, j_nod
+  integer              :: color_per, n_per, number_faces
+  integer              :: n1, n2, i_nod, j_nod
   logical              :: per_x, per_y, per_z
   real                 :: xt(MAX_FACES_N_NODES),  &
                           yt(MAX_FACES_N_NODES),  &
                           zt(MAX_FACES_N_NODES)
-  real                 :: xs2, ys2, zs2, x_a, y_a, z_a, x_b, y_b, z_b
+  real                 :: xs2, ys2, zs2
   real                 :: x_cell_1, y_cell_1, z_cell_1, dv_1
   real                 :: x_cell_2, y_cell_2, z_cell_2, dv_2
-  real                 :: x_c, y_c, z_c, det, angle_face, tol
-  real                 :: ab_i, ab_j, ab_k, ac_i, ac_j, ac_k, p_i, p_j, p_k
-  real                 :: per_min, per_max, t, sur_tot, angle, max_dis
-  real,    allocatable :: xspr(:), yspr(:), zspr(:)
+  real                 :: t, sur_tot, max_dis
+  real                 :: v(3), k(3), v_o(3), v_r(3), theta  ! for rotation
   real,    allocatable :: b_coor(:)
   integer, allocatable :: b_face(:)
-  character(SL)        :: answer, dir
+  character(SL)        :: answer
   real                 :: big, small, factor, prod
 !==============================================================================!
 !                                                                              !
@@ -295,444 +293,195 @@
   !   Phase I  ->  find the faces on periodic boundaries   !
   !                                                        !
   !--------------------------------------------------------!
-2 continue
-  call Grid_Mod_Print_Bnd_Cond_List(grid)
-  n_per = 0
-  print *, '#=============================================================='
-  print *, '# Enter the ordinal number(s) of periodic-boundary condition(s)'
-  print *, '# from the boundary condition list (see above)                 '
-  print *, '# Type skip if there is none !                                 '
-  print *, '#--------------------------------------------------------------'
-  call File_Mod_Read_Line(5)
-  answer = line % tokens(1)
-  call To_Upper_Case(answer)
+  answer = ''
+  do while(answer .ne. 'SKIP')
 
-  if( answer .eq. 'SKIP' ) then
-    color_per = 0
-    goto 1
-  end if
+    call Grid_Mod_Print_Bnd_Cond_List(grid)
+    n_per = 0
+    print *, '#=============================================================='
+    print *, '# Enter the ordinal number(s) of periodic-boundary condition(s)'
+    print *, '# from the boundary condition list (see above)                 '
+    print *, '# Type skip if there is none !                                 '
+    print *, '#--------------------------------------------------------------'
+    call File_Mod_Read_Line(5)
+    answer = line % tokens(1)
+    call To_Upper_Case(answer)
 
-  read(line % tokens(1), *) color_per
-  if( color_per > grid % n_bnd_cond ) then
-    print *, '# Critical error: boundary condition ', color_per,  &
-               ' doesn''t exist!'
-    print *, '# Exiting! '
-    stop
-  end if
-  print *, '#=========================================='
-  print *, '# Insert the periodic direction (x, y or z)'
-  print *, '#------------------------------------------'
-  read(*,*) dir
-  call To_Upper_Case(dir)
-  if(dir .ne. 'X' .and. dir .ne. 'Y' .and. dir .ne. 'Z') then
-    print *, '# Critical error: direction is neither x, y nor z!'
-    print *, '# Exiting! '
-    stop
-  end if
-
-  print *, '#==============================================================='
-  print *, '# For axisymmetric problems with periodic boundary conditions:  '
-  print *, '# enter angle (in degrees) for rotation of the periodic boundary'
-  print *, '# followed by rotation axis (1 -> x, 2 -> y, 3 -> z)            '
-  print *, '#'
-  print *, '# Type skip if you don''t deal with such a problem'
-  print *, '#---------------------------------------------------------------'
-  print *, '# (If the periodic direction is not parallel to the Caresian    '
-  print *, '#  axis the coordinate system has to be rotated in 2D           '
-  print *, '#---------------------------------------------------------------'
-  call File_Mod_Read_Line(5)
-  answer = line % tokens(1)
-  call To_Upper_Case(answer)
-  if( answer .eq. 'SKIP' ) then
-    angle = 0.0
-    rot_dir = 1
-    option = 1
-  else
-    read(line % tokens(1),*) angle
-    read(line % tokens(2),*) rot_dir
-    option = 2
-  end if
-
-  !-------------------!
-  !   With rotation   !
-  !-------------------!
-  if(option .eq. 2) then
-
-    angle = angle * PI / 180.0
-
-    if(dir .eq. 'X') then
-      x_a = 0.0
-      y_a = 0.0
-      z_a = 0.0
-      x_b = 0.0
-      y_b = 1.0
-      z_b = 0.0
-      x_c = 0.0
-      y_c = 0.0
-      z_c = 1.0
-    else if(dir .eq. 'Y') then
-      x_a = 0.0
-      y_a = 0.0
-      z_a = 0.0
-      x_b = 1.0
-      y_b = 0.0
-      z_b = 0.0
-      x_c = 0.0
-      y_c = 0.0
-      z_c = 1.0
-    else if(dir .eq. 'Z') then
-      x_a = 0.0
-      y_a = 0.0
-      z_a = 0.0
-      x_b = 1.0
-      y_b = 0.0
-      z_b = 0.0
-      x_c = 0.0
-      y_c = 1.0
-      z_c = 0.0
+    if( answer .eq. 'SKIP' ) then
+      color_per = 0
+      exit
     end if
 
-    ab_i = x_b - x_a
-    ab_j = y_b - y_a
-    ab_k = z_b - z_a
+    read(line % tokens(1), *) color_per
+    if( color_per > grid % n_bnd_cond ) then
+      print *, '# Critical error: boundary condition ', color_per,  &
+                 ' doesn''t exist!'
+      print *, '# Exiting! '
+      stop
+    end if
 
-    ac_i = x_c - x_a
-    ac_j = y_c - y_a
-    ac_k = z_c - z_a
-
-    p_i =  ab_j*ac_k - ac_j*ab_k
-    p_j = -ab_i*ac_k + ac_i*ab_k
-    p_k =  ab_i*ac_j - ac_i*ab_j
-
-    angle_face = angle_face * PI / 180.0
-
-    allocate(xspr(grid % n_faces)); xspr=0.0
-    allocate(yspr(grid % n_faces)); yspr=0.0
-    allocate(zspr(grid % n_faces)); zspr=0.0
-
-    do s = 1, grid % n_faces
-      c2 = grid % faces_c(2,s)
-      if(c2 < 0) then
-        if(grid % bnd_cond % color(c2) .eq. color_per) then
-          if( Math_Mod_Approx_Real(angle, 0.0, small) ) then
-            xspr(s) = grid % xf(s)
-            yspr(s) = grid % yf(s)
-            zspr(s) = grid % zf(s)
-          else
-            if(rot_dir .eq. 3) then
-              xspr(s) = grid % xf(s)*cos(angle) + grid % yf(s)*sin(angle)
-              yspr(s) =-grid % xf(s)*sin(angle) + grid % yf(s)*cos(angle)
-            else if(rot_dir .eq. 2) then
-              xspr(s) = grid % xf(s)*cos(angle) + grid % zf(s)*sin(angle)
-              zspr(s) =-grid % xf(s)*sin(angle) + grid % zf(s)*cos(angle)
-            else if(rot_dir .eq. 1) then
-              yspr(s) = grid % yf(s)*cos(angle) + grid % zf(s)*sin(angle)
-              zspr(s) =-grid % yf(s)*sin(angle) + grid % zf(s)*cos(angle)
-            end if
-          end if
-        end if
-      end if
-    end do
-  end if  ! for option .eq. 2
-
-  b_coor = 0.
-  b_face = 0
-
-  cnt_per = 0
-
-  !-----------------!
-  !   No rotation   !
-  !-----------------!
-  if(option .eq. 1) then
+    !-----------------------------!
+    !   Find periodic direction   !
+    !-----------------------------!
+    cnt_per = 0
+    v(1:3)  = 0.0
+    ! Browse through all the faces at periodic bc
+    ! and accumulate periodic direction vector
     do s = 1, grid % n_faces
       c2 = grid % faces_c(2,s)
       if(c2 < 0) then
         if(grid % bnd_cond % color(c2) .eq. color_per) then
           cnt_per = cnt_per + 1
-          if(dir .eq. 'X') b_coor(cnt_per) = grid % xf(s)*big**2  &
-                                           + grid % yf(s)*big     &
-                                           + grid % zf(s)
-          if(dir .eq. 'Y') b_coor(cnt_per) = grid % xf(s)         &
-                                           + grid % yf(s)*big**2  &
-                                           + grid % zf(s)*big
-          if(dir .eq. 'Z') b_coor(cnt_per) = grid % xf(s)*big     &
-                                           + grid % yf(s)         &
-                                           + grid % zf(s)*big**2
+
+          ! This is a dot product of surface vector and vector 1.0, 1.0, 1,0
+          if( grid % sx(s) + grid % sy(s) + grid % sz(s) > 0.0 ) then
+            v(1:3) = v(1:3) + (/grid % sx(s), grid % sy(s), grid % sz(s)/)
+          else
+            v(1:3) = v(1:3) - (/grid % sx(s), grid % sy(s), grid % sz(s)/)
+          end if
+        end if
+      end if
+    end do
+    v(1:3) = v(1:3) / cnt_per;  v(1:3) = v(1:3) / norm2(v(1:3))
+    k(1:3) = Math_Mod_Cross_Product(v(1:3), (/1.,0.,0./))
+    theta  = acos(dot_product      (v(1:3), (/1.,0.,0./)))
+    print '(A)',       ' #====================================================='
+    print '(A,3F7.3)', ' # Periodic direction vector: ', v(1:3)
+    print '(A,3F7.3)', ' # Rotational vector:       : ', k(1:3)
+    print '(A,3F7.3)', ' # Rotational angle:        : ', theta * 57.2957795131
+    print '(A)',       ' #-----------------------------------------------------'
+
+    !---------------------------------------------------!
+    !   Fill up helping vectors with sorting criteria   !
+    !---------------------------------------------------!
+    cnt_per = 0
+    do s = 1, grid % n_faces
+      c2 = grid % faces_c(2,s)
+      if(c2 < 0) then
+        if(grid % bnd_cond % color(c2) .eq. color_per) then
+          v_o(1) = grid % xf(s)
+          v_o(2) = grid % yf(s)
+          v_o(3) = grid % zf(s)
+          v_r(1:3) = Math_Mod_Rotate_Vector(v_o(1:3), k(1:3), theta)
+          cnt_per = cnt_per + 1
+          b_coor(cnt_per) = v_r(1)*big**2 + v_r(2)*big + v_r(3)
           b_face(cnt_per) = s
         end if
       end if
     end do
-    call Sort_Mod_Real_Carry_Int(b_coor(1:cnt_per),  &
-                                 b_face(1:cnt_per))
-  end if
 
-  !-------------------!
-  !   With rotation   !
-  !-------------------!
-  if(option .eq. 2) then
-    c_max = 0
-    do s = 1, grid % n_faces
-      c2 = grid % faces_c(2,s)
-      if(c2 < 0) then
-        if(grid % bnd_cond % color(c2) .eq. color_per) then
-          c_max = c_max + 1
-        end if
-      end if
-    end do
-    tol = small
+    !-------------------------------------------!
+    !   Sort the faces at periodic boundaries   !
+    !-------------------------------------------!
+    call Sort_Mod_Real_Carry_Int(b_coor(1:cnt_per), b_face(1:cnt_per))
 
-3   continue
-
-    nnn = 0
-    hh = 0
-    mm = 0
-    cnt_per = 0
-
-    per_max = -HUGE
-    per_min =  HUGE
-
-    do s = 1, grid % n_faces
-      c2 = grid % faces_c(2,s)
-      if(c2 < 0) then
-        if(grid % bnd_cond % color(c2) .eq. color_per) then
-          det = (  p_i*(grid % xf(s))  &
-                 + p_j*(grid % yf(s))  &
-                 + p_k*(grid % zf(s)))  &
-              / sqrt(p_i*p_i + p_j*p_j + p_k*p_k)
-          per_min = min(per_min, det)
-          per_max = max(per_max, det)
-        end if
-      end if
-    end do
-    per_max = 0.5*(per_max + per_min)
-
-    do s = 1, grid % n_faces
-
-      c2 = grid % faces_c(2,s)
-      if(c2 < 0) then
-        if(grid % bnd_cond % color(c2) .eq. color_per) then
-          cnt_per = cnt_per + 1
-          det = (  p_i*(grid % xf(s))   &
-                 + p_j*(grid % yf(s))   &
-                 + p_k*(grid % zf(s)))  &
-              / sqrt(p_i*p_i + p_j*p_j + p_k*p_k)
-
-          if(dir .eq. 'X') then
-            if((det) < (per_max)) then
-              hh = hh + 1
-              b_coor(hh) = real(hh)
-              b_face(hh) = s
-              do ss = 1, grid % n_faces
-                cc2 = grid % faces_c(2,ss)
-                if(cc2 < 0) then
-                  if(grid % bnd_cond % color(cc2) .eq. color_per) then
-                    det = (  p_i * (grid % xf(ss))   &
-                           + p_j * (grid % yf(ss))   &
-                           + p_k * (grid % zf(ss)))  &
-                        / sqrt(p_i*p_i + p_j*p_j + p_k*p_k)
-                    if((det) > (per_max)) then
-                      if((abs(grid % zf(ss)  - grid % zf(s))) < tol .and.   &
-                         (abs(yspr(ss) - yspr(s))) < tol) then
-                         mm = hh + c_max/2
-                         b_coor(mm) = real(mm)
-                         b_face(mm) = ss
-                         nnn = nnn + 1
-                      end if
-                    end if
-                  end if
-                end if
-              end do
-            end if
-          end if
-
-          if(dir .eq. 'Y') then
-            if((det) < (per_max)) then
-              hh = hh + 1
-              b_coor(hh) = real(hh)
-              b_face(hh) = s
-              do ss = 1, grid % n_faces
-                cc2 = grid % faces_c(2,ss)
-                if(cc2 < 0) then
-                  if(grid % bnd_cond % color(cc2) .eq. color_per) then
-
-                    det = (  p_i * (grid % xf(ss))  &
-                           + p_j * (grid % yf(ss))  &
-                           + p_k * (grid % zf(ss))) &
-                        / sqrt(p_i*p_i + p_j*p_j + p_k*p_k)
-
-                    if((det) > (per_max)) then
-                      if(abs((grid % zf(ss)  - grid % zf(s))) < tol .and.  &
-                         abs((xspr(ss) - xspr(s))) < tol) then
-                        mm = hh + c_max/2
-                        b_coor(mm) = real(mm)
-                        b_face(mm) = ss
-                        nnn = nnn + 1
-                      end if
-                    end if
-
-                  end if
-                end if
-              end do
-            end if
-          end if
-
-          if(dir .eq. 'Z') then
-            if((det) < (per_max)) then
-              hh = hh + 1
-              b_coor(hh) = real(hh)
-              b_face(hh) = s
-              do ss = 1, grid % n_faces
-                cc2 = grid % faces_c(2,ss)
-                if(cc2 < 0) then
-                  if(grid % bnd_cond % color(cc2) .eq. color_per) then
-                    det = (  p_i*(grid % xf(ss))   &
-                           + p_j*(grid % yf(ss))   &
-                           + p_k*(grid % zf(ss)))  &
-                        / sqrt(p_i*p_i + p_j*p_j + p_k*p_k)
-                    if((det) > (per_max)) then
-                      print *, '# Warning!  Potentially a bug in ...'
-                      print *, '# ... Compute_Geometry, line 580'
-                      print *, '# Contact developers, and if you ... '
-                      print *, '# ... are one of them, fix it!'
-                      if(abs((grid % xf(ss) - grid % xf(s))) < tol .and.  &
-                         abs((grid % yf(ss) - grid % yf(s))) < tol) then
-                        mm = hh + c_max/2
-                        b_coor(mm) = real(mm)
-                        b_face(mm) = ss
-                        nnn = nnn + 1
-                      end if
-                    end if
-                  end if
-                end if
-              end do
-            end if
-          end if
-
-        end if
-      end if
+    !---------------------------------------------------------!
+    !   Match the faces with shadows at periodic boundaries   !
+    !---------------------------------------------------------!
+    do s = 1, cnt_per / 2
+      s1 = b_face(s)
+      s2 = b_face(s + cnt_per / 2)
+      c11 = grid % faces_c(1,s1)  ! cell 1 for face 1
+      c21 = grid % faces_c(2,s1)  ! cell 2 for cell 1
+      c12 = grid % faces_c(1,s2)  ! cell 1 for face 2
+      c22 = grid % faces_c(2,s2)  ! cell 2 for face 2
+      grid % faces_s(s1) = s2     ! store where it was coppied from ...
+      grid % faces_s(s2) = s1     ! ... and for the mirror face too
+      grid % faces_c(2,s1) = c12  ! inside cell on the other side of periodicity
+      grid % faces_c(1,s2) = 0    ! c21; this zero marks a shadow face -> dirty
+      grid % faces_c(2,s2) = 0    ! c21; this zero marks a shadow face -> dirty
     end do
 
-    print *,'Iterating search for periodic cells: ',  &
-    'Target: ', c_max/2, 'Result: ',nnn, 'Tolerance: ',tol
+    n_per = cnt_per / 2
+    print *, '# Phase I: periodic cells: ', n_per
 
-    if(nnn .eq. c_max/2) then
-      continue
-    else
-      tol = tol*0.5
-      goto 3  
-    end if
+    !---------------------------!
+    !   Find periodic extents   !
+    !---------------------------!
+    grid % per_x = 0.0
+    grid % per_y = 0.0
+    grid % per_z = 0.0
+    do s = 1, n_per
+      s1 = b_face(s)
+      s2 = b_face(s + n_per)
+      grid % per_x = max(grid % per_x, abs(grid % xf(s1) - grid % xf(s2)))
+      grid % per_y = max(grid % per_y, abs(grid % yf(s1) - grid % yf(s2)))
+      grid % per_z = max(grid % per_z, abs(grid % zf(s1) - grid % zf(s2)))
+    end do
+    print '(a38,f8.3)', ' # Periodicity in x direction         ', grid % per_x
+    print '(a38,f8.3)', ' # Periodicity in y direction         ', grid % per_y
+    print '(a38,f8.3)', ' # Periodicity in z direction         ', grid % per_z
 
-    deallocate(xspr)
-    deallocate(yspr)
-    deallocate(zspr)
-
-    call Sort_Mod_Real_Carry_Int(b_coor(1:cnt_per),  &
-                                 b_face(1:cnt_per))
-  end if  ! for option .eq. 2
-
-  do s = 1, cnt_per / 2
-    s1 = b_face(s)
-    s2 = b_face(s + cnt_per / 2)
-    c11 = grid % faces_c(1,s1)  ! cell 1 for face 1
-    c21 = grid % faces_c(2,s1)  ! cell 2 for cell 1
-    c12 = grid % faces_c(1,s2)  ! cell 1 for face 2
-    c22 = grid % faces_c(2,s2)  ! cell 2 for face 2
-    grid % faces_s(s1) = s2     ! store where it was coppied from ...
-    grid % faces_s(s2) = s1     ! ... and for the mirror face too
-    grid % faces_c(2,s1) = c12  ! inside cell on the other side of periodicity
-    grid % faces_c(1,s2) = 0    ! c21; this zero marks a shadow face -> dirty
-    grid % faces_c(2,s2) = 0    ! c21; this zero marks a shadow face -> dirty
-  end do
-
-  n_per = cnt_per / 2
-  print *, '# Phase I: periodic cells: ', n_per
-
-  ! Find periodic extents
-  grid % per_x = 0.0
-  grid % per_y = 0.0
-  grid % per_z = 0.0
-  do s = 1, n_per
-    s1 = b_face(s)
-    s2 = b_face(s + n_per)
-    grid % per_x = max(grid % per_x, abs(grid % xf(s1) - grid % xf(s2)))
-    grid % per_y = max(grid % per_y, abs(grid % yf(s1) - grid % yf(s2)))
-    grid % per_z = max(grid % per_z, abs(grid % zf(s1) - grid % zf(s2)))
-  end do
-  print '(a38,f8.3)', ' # Periodicity in x direction         ', grid % per_x
-  print '(a38,f8.3)', ' # Periodicity in y direction         ', grid % per_y
-  print '(a38,f8.3)', ' # Periodicity in z direction         ', grid % per_z
-
-  !-------------------------------------------------!
-  !   Compress all boundary cells by removing all   !
-  !   cells which were holding periodic condition   !
-  !-------------------------------------------------!
-  cnt_bnd = 0
-  grid % new_c = 0
-  do c = -1, -grid % n_bnd_cells, -1
-    if(grid % bnd_cond % color(c) .ne. color_per) then
-      cnt_bnd = cnt_bnd + 1
-      grid % new_c(c) = -cnt_bnd
-    end if
-  end do
-
-  ! Compress coordinates
-  do c = -1, -grid % n_bnd_cells, -1
-    if(grid % new_c(c) .ne. 0) then
-      grid % xc(grid % new_c(c)) = grid % xc(c)
-      grid % yc(grid % new_c(c)) = grid % yc(c)
-      grid % zc(grid % new_c(c)) = grid % zc(c)
-     grid % bnd_cond % color(grid % new_c(c)) = grid % bnd_cond % color(c)
-    end if
-  end do
-
-  ! Compress indices
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
-    if(grid % new_c(c2) .ne. 0) then
-      grid % faces_c(2,s) = grid % new_c(c2)
-    end if
-  end do
-
-  grid % n_bnd_cells = cnt_bnd
-  print *, '# Kept boundary cells: ', grid % n_bnd_cells
-
-  !--------------------------------------------------------------------!
-  !   Remove boundary condition with color_per and compress the rest   !
-  !--------------------------------------------------------------------!
-  if(color_per < grid % n_bnd_cond) then
-
-    ! Set the color of boundary selected to be periodic to zero
+    !-------------------------------------------------!
+    !   Compress all boundary cells by removing all   !
+    !   cells which were holding periodic condition   !
+    !-------------------------------------------------!
+    cnt_bnd = 0
+    grid % new_c = 0
     do c = -1, -grid % n_bnd_cells, -1
-      if(grid % bnd_cond % color(c) .eq. color_per) then
-        grid % bnd_cond % color(c) = 0
+      if(grid % bnd_cond % color(c) .ne. color_per) then
+        cnt_bnd = cnt_bnd + 1
+        grid % new_c(c) = -cnt_bnd
       end if
     end do
 
-    ! Shift the rest of the boundary cells
-    do b = 1, grid % n_bnd_cond - 1
-      if(b .ge. color_per) then
-
-        ! Correct the names
-        grid % bnd_cond % name(b) = grid % bnd_cond % name (b+1)
-
-        ! Correct all boundary colors too
-        do c = -1, -grid % n_bnd_cells, -1
-          if(grid % bnd_cond % color(c) .eq. (b+1)) then
-            grid % bnd_cond % color(c) = b
-          end if
-        end do
-
+    ! Compress coordinates
+    do c = -1, -grid % n_bnd_cells, -1
+      if(grid % new_c(c) .ne. 0) then
+        grid % xc(grid % new_c(c)) = grid % xc(c)
+        grid % yc(grid % new_c(c)) = grid % yc(c)
+        grid % zc(grid % new_c(c)) = grid % zc(c)
+       grid % bnd_cond % color(grid % new_c(c)) = grid % bnd_cond % color(c)
       end if
     end do
-  else
-    grid % bnd_cond % name(grid % n_bnd_cond) = ''
-  end if
-  grid % n_bnd_cond = grid % n_bnd_cond - 1
 
-  goto 2
+    ! Compress indices
+    do s = 1, grid % n_faces
+      c1 = grid % faces_c(1,s)
+      c2 = grid % faces_c(2,s)
+      if(grid % new_c(c2) .ne. 0) then
+        grid % faces_c(2,s) = grid % new_c(c2)
+      end if
+    end do
 
-1 continue
+    grid % n_bnd_cells = cnt_bnd
+    print *, '# Kept boundary cells: ', grid % n_bnd_cells
+
+    !--------------------------------------------------------------------!
+    !   Remove boundary condition with color_per and compress the rest   !
+    !--------------------------------------------------------------------!
+    if(color_per < grid % n_bnd_cond) then
+
+      ! Set the color of boundary selected to be periodic to zero
+      do c = -1, -grid % n_bnd_cells, -1
+        if(grid % bnd_cond % color(c) .eq. color_per) then
+          grid % bnd_cond % color(c) = 0
+        end if
+      end do
+
+      ! Shift the rest of the boundary cells
+      do b = 1, grid % n_bnd_cond - 1
+        if(b .ge. color_per) then
+
+          ! Correct the names
+          grid % bnd_cond % name(b) = grid % bnd_cond % name (b+1)
+
+          ! Correct all boundary colors too
+          do c = -1, -grid % n_bnd_cells, -1
+            if(grid % bnd_cond % color(c) .eq. (b+1)) then
+              grid % bnd_cond % color(c) = b
+            end if
+          end do
+
+        end if
+      end do
+    else
+      grid % bnd_cond % name(grid % n_bnd_cond) = ''
+    end if
+    grid % n_bnd_cond = grid % n_bnd_cond - 1
+
+  end do  ! while answer .ne. 'SKIP'
+
   !----------------------------------------------------!
   !                                                    !
   !   Phase II  ->  work out dx, dy and dz for faces   !

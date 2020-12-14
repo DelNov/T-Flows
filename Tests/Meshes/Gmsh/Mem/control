@@ -2,12 +2,12 @@
 # Prologue
 #---------
  PROBLEM_NAME     mem-dual
- HEAT_TRANSFER    no
+ HEAT_TRANSFER    yes
 
  NUMBER_OF_TIME_STEPS   1200
- RESULTS_SAVE_INTERVAL    30
- BACKUP_SAVE_INTERVAL    300
- TIME_STEP               0.1
+ RESULTS_SAVE_INTERVAL   120
+ BACKUP_SAVE_INTERVAL    600
+ TIME_STEP               0.01
 
 # LOAD_BACKUP_NAME   backstep_orthogonal-ts000001.backup
 
@@ -23,7 +23,8 @@
 # Physical models
 #-----------------
  MASS_DENSITY           1.0
- DYNAMIC_VISCOSITY      1.0e-2
+ DYNAMIC_VISCOSITY      1.0e-4
+ THERMAL_CONDUCTIVITY   1.0e-4
  HEAT_CAPACITY          1.0
 
  TURBULENCE_MODEL       none
@@ -59,25 +60,31 @@
 #---------------------
   BOUNDARY_CONDITION    bottom
     TYPE                wall
-    VARIABLES           u     v     w
-    VALUES              0.0   0.0   0.0
+    VARIABLES           u     v     w     q
+    VALUES              0.0   0.0   0.0   0.1
 
   BOUNDARY_CONDITION    top
     TYPE                wall
-    VARIABLES           u     v     w
-    VALUES              0.0   0.0   0.0
+    VARIABLES           u     v     w     q
+    VALUES              0.0   0.0   0.0   0.0
 
-  BOUNDARY_CONDITION    walls
+  BOUNDARY_CONDITION    vessel_walls
     TYPE                wall
-    VARIABLES           u     v     w
-    VALUES              0.0   0.0   0.0
+    VARIABLES           u     v     w     q
+    VALUES              0.0   0.0   0.0   0.0
+
+  BOUNDARY_CONDITION    pipe_walls
+    TYPE                wall
+    VARIABLES           u     v     w     q
+    VALUES              0.0   0.0   0.0   0.0
 
   BOUNDARY_CONDITION    inlet
     TYPE                inflow
-    VARIABLES           u     v     w
-    VALUES              0.1   0.0   0.0
+    VARIABLES           u     v     w     t
+    VALUES              0.5   0.0   0.0   20.0
 
   BOUNDARY_CONDITION    outlet
     TYPE                pressure
-    VARIABLES           u     v     w
-    VALUES              0.1   0.0   0.0
+    VARIABLES           u     v     w     t
+    VALUES              0.5   0.0   0.0   20.0
+

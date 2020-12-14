@@ -20,7 +20,8 @@ Physical Surface("inlet") = {7};
 Physical Surface("outlet") = {6};
 Physical Surface("bottom") = {3};
 Physical Surface("top") = {4};
-Physical Surface("walls") = {1, 2, 5};
+Physical Surface("vessel_walls") = {1};
+Physical Surface("pipe_walls") = {2, 5};
 Physical Volume("vessel") = {1};
 
 //-----------------------------------------------------

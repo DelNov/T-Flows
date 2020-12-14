@@ -73,6 +73,6 @@
     FILE                profile.dat
 
   BOUNDARY_CONDITION    out
-    TYPE                outflow
+    TYPE                convective
     VARIABLES           u     v     w
     VALUES              1.0   0.0   0.0
