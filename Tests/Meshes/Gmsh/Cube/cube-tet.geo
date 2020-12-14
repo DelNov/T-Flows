@@ -30,8 +30,7 @@ Line Loop(23) = {10,  6, -12, -2};  Plane Surface(24) = {23};
 Surface Loop(25) = {14, 22, 20, 18, 16, 24};
 Volume(26) = {25};
 
-Physical Surface("z_min") = {14};
-Physical Surface("z_max") = {16};
+Physical Surface("z_per") = {14, 16};
 Physical Surface("y_min") = {18};
 Physical Surface("y_max") = {20};
 Physical Surface("x_min") = {22};
