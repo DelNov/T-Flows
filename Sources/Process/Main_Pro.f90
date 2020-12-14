@@ -101,6 +101,7 @@
 
     call Comm_Mod_Wait
 
+    call Save_Vtu_Faces(grid(d))
     call Save_Vtu_Faces(grid(d), plot_shadows=.true.)
   end do
 
