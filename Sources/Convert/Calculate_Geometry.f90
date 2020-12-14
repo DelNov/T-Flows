@@ -14,7 +14,6 @@
   integer              :: c11, c12, c21, c22, s1, s2, bou_cen, cnt_bnd, cnt_per
   integer              :: color_per, n_per, number_faces
   integer              :: n1, n2, i_nod, j_nod
-  logical              :: per_x, per_y, per_z
   real                 :: xt(MAX_FACES_N_NODES),  &
                           yt(MAX_FACES_N_NODES),  &
                           zt(MAX_FACES_N_NODES)
@@ -148,7 +147,6 @@
     grid % zn(:) = grid % zn(:) * factor
   end if
 
-
   ! Estimate big and small
   call Grid_Mod_Estimate_Big_And_Small(grid, big, small)
 
@@ -160,46 +158,21 @@
   !-----------------------------------------!
   call Grid_Mod_Calculate_Cell_Centers(grid)
 
-  !-----------------------------------------------------!
-  !   Calculate:                                        !
-  !      components of cell faces, cell face centers.   !
-  !-----------------------------------------------------!
-  !   => depends on: xn, yn, zn                         !
-  !   <= gives:      sx, sy, sz, xf, yf, zf             !
-  !-----------------------------------------------------!
-  do s = 1, grid % n_faces
+  !----------------------------------!
+  !   Calculate face surface areas   !
+  !----------------------------------!
+  !   => depends on: xn, yn, zn      !
+  !   <= gives:      sx, sy, sz      !
+  !----------------------------------!
+  call Grid_Mod_Calculate_Face_Surfaces(grid)
 
-    ! Copy face node coordinates to a local array for easier handling
-    do n = 1, grid % faces_n_nodes(s)
-      xt(n) = grid % xn(grid % faces_n(n,s))
-      yt(n) = grid % yn(grid % faces_n(n,s))
-      zt(n) = grid % zn(grid % faces_n(n,s))
-    end do
-
-    ! Cell face components
-    grid % sx(s) = 0.0
-    grid % sy(s) = 0.0
-    grid % sz(s) = 0.0
-    do n1 = 1, grid % faces_n_nodes(s)
-      n2 = n1 + 1
-      if(n2 > grid % faces_n_nodes(s)) n2 = 1
-      grid % sx(s) = grid % sx(s) + (yt(n2) - yt(n1)) * (zt(n2) + zt(n1))
-      grid % sy(s) = grid % sy(s) + (zt(n2) - zt(n1)) * (xt(n2) + xt(n1))
-      grid % sz(s) = grid % sz(s) + (xt(n2) - xt(n1)) * (yt(n2) + yt(n1))
-    end do
-    grid % sx(s) = 0.5 * grid % sx(s)
-    grid % sy(s) = 0.5 * grid % sy(s)
-    grid % sz(s) = 0.5 * grid % sz(s)
-
-    ! Barycenters
-    n = grid % faces_n_nodes(s)
-    grid % xf(s) = sum( xt(1:n) ) / real(n)
-    grid % yf(s) = sum( yt(1:n) ) / real(n)
-    grid % zf(s) = sum( zt(1:n) ) / real(n)
-
-  end do ! through faces
-
-  print *, '# Cell face components calculated !'
+  !--------------------------------!
+  !   Calculate the face centers   !
+  !--------------------------------!
+  !   => depends on: xn, yn, zn    !
+  !   <= gives:      xf, yf, zf    !
+  !--------------------------------!
+  call Grid_Mod_Calculate_Face_Centers(grid)
 
   !-------------------------------------------!
   !   Calculate boundary cell centers         !
@@ -375,9 +348,10 @@
     !-------------------------------------------!
     call Sort_Mod_Real_Carry_Int(b_coor(1:cnt_per), b_face(1:cnt_per))
 
-    !---------------------------------------------------------!
-    !   Match the faces with shadows at periodic boundaries   !
-    !---------------------------------------------------------!
+    !---------------------------------------------!
+    !   Match the periodic faces with shadows &   !
+    !    fill up the grid % faces_s structure     !
+    !---------------------------------------------!
     do s = 1, cnt_per / 2
       s1 = b_face(s)
       s2 = b_face(s + cnt_per / 2)
@@ -395,9 +369,10 @@
     n_per = cnt_per / 2
     print *, '# Phase I: periodic cells: ', n_per
 
-    !---------------------------!
-    !   Find periodic extents   !
-    !---------------------------!
+    !---------------------------------!
+    !      Find periodic extents      !
+    !   (This is actually obsolete)   !
+    !---------------------------------!
     grid % per_x = 0.0
     grid % per_y = 0.0
     grid % per_z = 0.0
@@ -505,17 +480,7 @@
       !-------------------------!
       !   Find periodic faces   !
       !-------------------------!
-      per_x = .false.
-      if(grid % per_x .gt. NANO .and.  &
-         abs(grid % xc(c2)-grid % xc(c1)) > 0.75 * grid % per_x) per_x = .true.
-      per_y = .false.
-      if(grid % per_y .gt. NANO .and.  &
-         abs(grid % yc(c2)-grid % yc(c1)) > 0.75 * grid % per_y) per_y = .true.
-      per_z = .false.
-      if(grid % per_z .gt. NANO .and.  &
-         abs(grid % zc(c2)-grid % zc(c1)) > 0.75 * grid % per_z) per_z = .true.
-
-      if( per_x .or. per_y .or. per_z ) then
+      if(grid % faces_s(s) .ne. 0) then
 
         n_per = n_per + 1
 
@@ -532,22 +497,16 @@
         grid % dy(grid % faces_s(s)) = grid % dy(s)
         grid % dz(grid % faces_s(s)) = grid % dz(s)
 
-        grid % per_x = max(grid % per_x, abs(grid % dx(s)))
-        grid % per_y = max(grid % per_y, abs(grid % dy(s)))
-        grid % per_z = max(grid % per_z, abs(grid % dz(s)))
-
       end if !  s*(c2-c1) < 0.0
     end if   !  c2 > 0
   end do     !  faces
 
-  !   Should this maybe be:
+  ! Should this maybe be:
   ! grid % n_shadows = grid % n_shadows + n_per ?
+  ! Actually no, because n_per is being re-counted in the above loop.
   grid % n_shadows = n_per
 
   print '(a38,i9)',   ' # Phase II: number of shadow faces:  ', n_per
-  print '(a38,f8.3)', ' # Periodicity in x direction         ', grid % per_x
-  print '(a38,f8.3)', ' # Periodicity in y direction         ', grid % per_y
-  print '(a38,f8.3)', ' # Periodicity in z direction         ', grid % per_z
 
   !----------------------------------------------------!
   !                                                    !
