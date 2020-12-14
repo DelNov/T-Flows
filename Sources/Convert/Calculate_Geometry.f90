@@ -735,65 +735,7 @@
 1 continue
   !----------------------------------------------------!
   !                                                    !
-  !   For some files, seems to be those generated in   !
-  !   SnappyMesh, face orientation seems to be quite   !
-  !   the opposite from what I expect in inner cells   !
-  !                                                    !
-  !----------------------------------------------------!
-  n1 = 0
-  n2 = 0
-  do s = 1, grid % n_faces + grid % n_shadows
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
-
-    !-------------------------------------------------------------------------!
-    !   Product of centres connection and surface normal should be positive   !
-    !-------------------------------------------------------------------------!
-    prod = grid % sx(s) * (grid % xc(c2)-grid % xc(c1) )  &
-         + grid % sy(s) * (grid % yc(c2)-grid % yc(c1) )  &
-         + grid % sz(s) * (grid % zc(c2)-grid % zc(c1) )
-
-    !----------------------------------------------------------!
-    !   If it is not, change the orientations of the surface   !
-    !----------------------------------------------------------!
-    if(prod < 0) then
-
-      ! Increase the counters
-      if(c2 > 0) n1 = n1 + 1
-      if(c2 < 0) n2 = n2 + 1
-
-      ! Reverse the order of face's nodes
-      n = grid % faces_n_nodes(s)  ! number of nodes in this face
-      call Sort_Mod_Reverse_Order_Int(grid % faces_n(1:n, s))
-
-      ! Keep the first node first (important if it is concave)
-      grid % faces_n(1:n,s) = cshift(grid % faces_n(1:n,s), -1)
-
-      ! Change the orientation of calculated surface vector
-      grid % sx(s) = -grid % sx(s)
-      grid % sy(s) = -grid % sy(s)
-      grid % sz(s) = -grid % sz(s)
-
-    end if
-  end do
-
-  !-------------------------------------------------!
-  !   Print some info on changed face orientation   !
-  !-------------------------------------------------!
-  if(n1 .gt. 0 .or. n2 .gt. 0) then
-    print '(a)',      ' #======================================================'
-    print '(a,i9,a)', ' # Changed orientation of', n1, ' inner faces,'
-    print '(a,i9,a)', ' #                    and', n2, ' boundary faces.'
-    print '(a)',      ' #------------------------------------------------------'
-  else
-    print '(a)', ' #========================================================='
-    print '(a)', ' # Checked that all faces had good orientation (c1 -> c2). '
-    print '(a)', ' #---------------------------------------------------------'
-  end if
-
-  !----------------------------------------------------!
-  !                                                    !
-  !   Phase II  ->  similar to the loop in Generator   !
+  !   Phase II  ->  work out dx, dy and dz for faces   !
   !                                                    !
   !----------------------------------------------------!
 
@@ -849,12 +791,72 @@
     end if   !  c2 > 0
   end do     !  faces
 
+  !   Should this maybe be:
+  ! grid % n_shadows = grid % n_shadows + n_per ?
   grid % n_shadows = n_per
 
   print '(a38,i9)',   ' # Phase II: number of shadow faces:  ', n_per
   print '(a38,f8.3)', ' # Periodicity in x direction         ', grid % per_x
   print '(a38,f8.3)', ' # Periodicity in y direction         ', grid % per_y
   print '(a38,f8.3)', ' # Periodicity in z direction         ', grid % per_z
+
+  !----------------------------------------------------!
+  !                                                    !
+  !   For some files, seems to be those generated in   !
+  !   SnappyMesh, face orientation seems to be quite   !
+  !   the opposite from what I expect in inner cells   !
+  !                                                    !
+  !----------------------------------------------------!
+  n1 = 0
+  n2 = 0
+  do s = 1, grid % n_faces
+    c1 = grid % faces_c(1,s)
+    c2 = grid % faces_c(2,s)
+
+    !-------------------------------------------------------------------------!
+    !   Product of centres connection and surface normal should be positive   !
+    !-------------------------------------------------------------------------!
+    prod = grid % sx(s) * (grid % xc(c2) + grid % dx(s) - grid % xc(c1) )  &
+         + grid % sy(s) * (grid % yc(c2) + grid % dy(s) - grid % yc(c1) )  &
+         + grid % sz(s) * (grid % zc(c2) + grid % dz(s) - grid % zc(c1) )
+
+    !----------------------------------------------------------!
+    !   If it is not, change the orientations of the surface   !
+    !----------------------------------------------------------!
+    if(prod < 0) then
+
+      ! Increase the counters
+      if(c2 > 0) n1 = n1 + 1
+      if(c2 < 0) n2 = n2 + 1
+
+      ! Reverse the order of face's nodes
+      n = grid % faces_n_nodes(s)  ! number of nodes in this face
+      call Sort_Mod_Reverse_Order_Int(grid % faces_n(1:n, s))
+
+      ! Keep the first node first (important if it is concave)
+      grid % faces_n(1:n,s) = cshift(grid % faces_n(1:n,s), -1)
+
+      ! Change the orientation of calculated surface vector
+      grid % sx(s) = -grid % sx(s)
+      grid % sy(s) = -grid % sy(s)
+      grid % sz(s) = -grid % sz(s)
+
+    end if
+  end do
+
+  !-------------------------------------------------!
+  !   Print some info on changed face orientation   !
+  !-------------------------------------------------!
+  if(n1 .gt. 0 .or. n2 .gt. 0) then
+    print '(a)',      ' #======================================================'
+    print '(a,i9,a)', ' # Changed orientation of', n1, ' inner faces,'
+    print '(a,i9,a)', ' #                    and', n2, ' boundary faces.'
+    print '(a)',      ' #------------------------------------------------------'
+  else
+    print '(a)', ' #========================================================='
+    print '(a)', ' # Checked that all faces had good orientation (c1 -> c2). '
+    print '(a)', ' #---------------------------------------------------------'
+  end if
 
   !-------------------------------------------------------!
   !                                                       !
@@ -905,6 +907,7 @@
   call Sort_Mod_Real_By_Index(grid % n_faces, grid % dy, grid % new_f)
   call Sort_Mod_Real_By_Index(grid % n_faces, grid % dz, grid % new_f)
 
+  ! Why not: grid % n_faces = grid % n_faces - grid % n_shadows?
   grid % n_faces = grid % n_faces - n_per
 
   ! Final correction to shadow faces for grid % faces_s and grid faces_c
