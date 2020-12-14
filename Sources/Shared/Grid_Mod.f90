@@ -185,7 +185,6 @@
   include 'Grid_Mod/Calculate_Wall_Distance.f90'
   include 'Grid_Mod/Calculate_Weights_Cells_To_Nodes.f90'
   include 'Grid_Mod/Calculate_Weights_Nodes_To_Cells.f90'
-  include 'Grid_Mod/Correction_Periodicity.f90'
   include 'Grid_Mod/Decompose.f90'
   include 'Grid_Mod/Estimate_Big_And_Small.f90'
   include 'Grid_Mod/Exchange_Cells_Int.f90'
