@@ -145,7 +145,6 @@
     call Read_Control_Numerical(flow(d), turb(d), mult(d))
 
     call Grid_Mod_Find_Nodes_Cells(grid(d))
-    call Grid_Mod_Find_Periodic_Faces(grid(d))
     call Grid_Mod_Calculate_Global_Volumes(grid(d))
     call Field_Mod_Calculate_Grad_Matrix(flow(d))
 

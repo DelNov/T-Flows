@@ -31,7 +31,6 @@
     integer :: n_cells     = 0  ! ... cells
     integer :: n_faces     = 0  ! ... faces
     integer :: n_bnd_cells = 0  ! ... boundary cells
-    integer :: n_per_faces = 0  ! ... periodic faces (shadows)
     integer :: n_bnd_cond  = 0  ! ... boundary conditions
     integer :: n_shadows   = 0  ! ... shadow faces
     integer :: n_edges     = 0  ! ... edges (needed to create dual grid)
@@ -92,9 +91,6 @@
     integer, allocatable :: faces_n(:,:)
     integer, allocatable :: faces_c(:,:)
     integer, allocatable :: faces_s(:)
-
-    ! Periodic faces
-    integer, allocatable :: per_faces(:)
 
     ! Face surface areas (si), total surface (s) 
     ! and distances between cells (di)
@@ -195,7 +191,6 @@
   include 'Grid_Mod/Exchange_Nodes_Real.f90'
   include 'Grid_Mod/Find_Cells_Faces.f90'
   include 'Grid_Mod/Find_Nodes_Cells.f90'
-  include 'Grid_Mod/Find_Periodic_Faces.f90'
   include 'Grid_Mod/Form_Cells_Comm.f90'
   include 'Grid_Mod/Form_Maps.f90'
   include 'Grid_Mod/Form_Nodes_Comm.f90'
