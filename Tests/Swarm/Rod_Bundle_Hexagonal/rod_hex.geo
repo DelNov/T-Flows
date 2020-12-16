@@ -5,8 +5,8 @@ R   =  0.4;    // radius
 H   =  0.4;    // height
 X_0 =  0.0;
 Y_0 =  0.0;
-M   = 21;      // number of layers in height
-N   = 21;      // number of nodes between rods
+M   = 31;      // number of layers in height
+N   = 31;      // number of nodes between rods
 
 PNTS_CENT_OUT_RODS = 100;
 PNTS_FRST_OUT_RODS = 200;

@@ -4,7 +4,7 @@
  PROBLEM_NAME     rod_hex
  HEAT_TRANSFER    no
 
-NUMBER_OF_TIME_STEPS    5000
+NUMBER_OF_TIME_STEPS   10000
  RESULTS_SAVE_INTERVAL    10
  BACKUP_SAVE_INTERVAL   5000
  TIME_STEP               0.003
@@ -21,13 +21,13 @@ NUMBER_OF_TIME_STEPS    5000
 # Physical models
 #-----------------
  MASS_DENSITY           1.0
- DYNAMIC_VISCOSITY      1.0e-4
+ DYNAMIC_VISCOSITY      2.0e-4
  HEAT_CAPACITY          1.0
  GRAVITATIONAL_VECTOR   0.0  0.0  0.0
 
- TURBULENCE_MODEL       none
+ TURBULENCE_MODEL       les_smagorinsky
  PRESSURE_DROPS         3.6  0.0  0.0
- MASS_FLOW_RATES        1.0  0.0  0.0
+ MASS_FLOW_RATES        0.5  0.0  0.0
 
 #----------------
 # Swarm related
@@ -38,7 +38,7 @@ NUMBER_OF_TIME_STEPS    5000
  NUMBER_OF_SWARM_SUB_STEPS                   12
  NUMBER_OF_PARTICLES                        256
  SWARM_COEFFICIENT_OF_RESTITUTION             1.00
- STARTING_TIME_STEP_FOR_SWARM_COMPUTATION    30
+ STARTING_TIME_STEP_FOR_SWARM_COMPUTATION   2500
 
 #----------------------
 # Numerical parameters
@@ -52,7 +52,7 @@ NUMBER_OF_TIME_STEPS    5000
 
  TIME_INTEGRATION_SCHEME  linear
 
- ADVECTION_SCHEME_FOR_MOMENTUM    minmod
+ ADVECTION_SCHEME_FOR_MOMENTUM    central
 
 #------------------------
 # Linear solver settings
