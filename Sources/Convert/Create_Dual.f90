@@ -239,7 +239,7 @@
 
   call Allocate_Memory(dual)
   allocate(concave_link(2, dual % n_nodes));  concave_link(:,:) = 0
-  allocate(sharp_inject( prim % n_faces));    sharp_inject(:) = 0
+  allocate(sharp_inject(   dual % n_faces));  sharp_inject(:)   = 0
 
   print *, '# Number of sharp corners = ', N_Sharp_Corners(prim, sharp_corner)
 
