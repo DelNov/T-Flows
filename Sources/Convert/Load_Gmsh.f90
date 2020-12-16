@@ -124,7 +124,7 @@
         end if
       end if
       if(n_tags > 1) then
-        print *, '# ERROR in Load_Msh @ s_tag: ', s_tag
+        print *, '# ERROR in Load_Gmsh @ s_tag: ', s_tag
         print *, '# More than one boundary condition per entity - not allowed!'
         stop
       end if
@@ -314,8 +314,14 @@
           read(line % tokens(9), *) grid % cells_n(8, c)
         end if
         if(type .eq. MSH_PYRA) then
-          print *, '# ERROR: Pyramid cells not implemented yet!'
-          stop
+          read(line % tokens(1), *) c       ! Gmsh cell number
+          c = new(c)                        ! use T-Flows numbering
+          grid % cells_n_nodes(c) = 5
+          read(line % tokens(2), *) grid % cells_n(1, c)
+          read(line % tokens(3), *) grid % cells_n(2, c)
+          read(line % tokens(4), *) grid % cells_n(3, c)
+          read(line % tokens(5), *) grid % cells_n(4, c)
+          read(line % tokens(6), *) grid % cells_n(5, c)
         end if
       end if
     end do
