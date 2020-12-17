@@ -1,7 +1,7 @@
 #----------
 # Prologue
 #---------
- PROBLEM_NAME     pipe-dual
+ PROBLEM_NAME     pipe_dual
  HEAT_TRANSFER    no
 
  NUMBER_OF_TIME_STEPS   1200

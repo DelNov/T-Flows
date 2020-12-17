@@ -1,7 +1,7 @@
 #----------
 # Prologue
 #---------
- PROBLEM_NAME     backstep_polyhedral-dual
+ PROBLEM_NAME     backstep_polyhedral_dual
  HEAT_TRANSFER    no
 
  NUMBER_OF_TIME_STEPS   1200

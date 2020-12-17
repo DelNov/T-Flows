@@ -1,7 +1,7 @@
 #----------
 # Prologue
 #---------
- PROBLEM_NAME     mem-dual
+ PROBLEM_NAME     mem_dual
  HEAT_TRANSFER    yes
 
  NUMBER_OF_TIME_STEPS   1200

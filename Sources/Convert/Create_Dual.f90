@@ -49,7 +49,7 @@
   !   Set dual's problem_name   !
   !                             !
   !-----------------------------!
-  problem_name(1) = trim(problem_name(1)) // '-dual'
+  problem_name(1) = trim(problem_name(1)) // '_dual'
 
   !-------------------------------------------------------------!
   !                                                             !
