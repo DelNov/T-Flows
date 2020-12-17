@@ -4,10 +4,10 @@
  PROBLEM_NAME     rod_hex
  HEAT_TRANSFER    no
 
-NUMBER_OF_TIME_STEPS    2400
- RESULTS_SAVE_INTERVAL    60
- BACKUP_SAVE_INTERVAL    600
- TIME_STEP               0.001
+NUMBER_OF_TIME_STEPS   10000
+ RESULTS_SAVE_INTERVAL    10
+ BACKUP_SAVE_INTERVAL   5000
+ TIME_STEP               0.003
 
 #-------------------
 # Monitoring points 
@@ -21,12 +21,24 @@ NUMBER_OF_TIME_STEPS    2400
 # Physical models
 #-----------------
  MASS_DENSITY           1.0
- DYNAMIC_VISCOSITY      1.0e-5
+ DYNAMIC_VISCOSITY      2.0e-4
  HEAT_CAPACITY          1.0
  GRAVITATIONAL_VECTOR   0.0  0.0  0.0
 
- TURBULENCE_MODEL       none
+ TURBULENCE_MODEL       les_smagorinsky
  PRESSURE_DROPS         3.6  0.0  0.0
+ MASS_FLOW_RATES        0.5  0.0  0.0
+
+#----------------
+# Swarm related
+#----------------
+ MULTIPHASE_MODEL   lagrangian_particles
+ SWARM_DIAMETER                               5.0e-04
+ SWARM_DENSITY                                1.0e+03
+ NUMBER_OF_SWARM_SUB_STEPS                   12
+ NUMBER_OF_PARTICLES                        256
+ SWARM_COEFFICIENT_OF_RESTITUTION             1.00
+ STARTING_TIME_STEP_FOR_SWARM_COMPUTATION   2500
 
 #----------------------
 # Numerical parameters
@@ -40,14 +52,14 @@ NUMBER_OF_TIME_STEPS    2400
 
  TIME_INTEGRATION_SCHEME  linear
 
- ADVECTION_SCHEME_FOR_MOMENTUM    minmod
+ ADVECTION_SCHEME_FOR_MOMENTUM    central
 
 #------------------------
 # Linear solver settings
 #------------------------
  PRECONDITIONER_FOR_SYSTEM_MATRIX   incomplete_cholesky
  TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-3
- TOLERANCE_FOR_PRESSURE_SOLVER      1.e-5
+ TOLERANCE_FOR_PRESSURE_SOLVER      1.e-6
  TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
 
 #--------------------
@@ -60,32 +72,8 @@ NUMBER_OF_TIME_STEPS    2400
 #---------------------
 # Boundary conditions
 #---------------------
-  BOUNDARY_CONDITION    bottom
-    TYPE                symmetry
-    VARIABLES           u     v     w
-    VALUES              0.0   0.0   0.0
-
-  BOUNDARY_CONDITION    top
-    TYPE                symmetry
-    VARIABLES           u     v     w
-    VALUES              0.0   0.0   0.0
-
   BOUNDARY_CONDITION    rods
     TYPE                wall
     VARIABLES           u     v     w
     VALUES              0.0   0.0   0.0
 
-  BOUNDARY_CONDITION    dir_x
-    TYPE                wall
-    VARIABLES           u     v     w
-    VALUES              0.0   0.0   0.0
-
-  BOUNDARY_CONDITION    dir_x_m60
-    TYPE                wall
-    VARIABLES           u     v     w
-    VALUES              0.0   0.0   0.0
-
-  BOUNDARY_CONDITION    dir_x_p60
-    TYPE                wall
-    VARIABLES           u     v     w
-    VALUES              0.0   0.0   0.0

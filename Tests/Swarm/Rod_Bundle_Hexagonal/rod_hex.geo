@@ -1,12 +1,12 @@
 SetFactory("OpenCASCADE");
 
 P   =  1.2;    // pitch
-R   =  0.5;    // radius
+R   =  0.4;    // radius
 H   =  0.4;    // height
 X_0 =  0.0;
 Y_0 =  0.0;
-M   = 21;      // number of layers in height
-N   = 21;      // number of nodes between rods
+M   = 31;      // number of layers in height
+N   = 31;      // number of nodes between rods
 
 PNTS_CENT_OUT_RODS = 100;
 PNTS_FRST_OUT_RODS = 200;
@@ -92,8 +92,7 @@ Extrude {0, 0, H} {
 //-----------------------------------
 //   Boundary and volume condition
 //-----------------------------------
-Physical Surface("bottom") = {1};
-Physical Surface("top") = {15};
+Physical Surface("top_and_bottom") = {1, 15};
 Physical Surface("rods") = {2, 4, 6, 8, 10, 12, 14};
 Physical Surface("dir_x") = {13, 7};
 Physical Surface("dir_x_p60") = {3, 9};
