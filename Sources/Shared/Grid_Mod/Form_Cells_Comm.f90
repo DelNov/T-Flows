@@ -83,24 +83,16 @@
           do i_nod = 1, grid % faces_n_nodes(s)
             ni = grid % faces_n(i_nod, s)
             if(grid % new_n(ni) .eq. -1) then
-              xi = grid % xn(ni);  yi = grid % yn(ni); zi = grid % zn(ni)
+              xi = grid % xn(ni)
+              yi = grid % yn(ni)
+              zi = grid % zn(ni)
               do j_nod = 1, grid % faces_n_nodes(sh)
                 nj = grid % faces_n(j_nod, sh)
-                xj = grid % xn(nj);  yj = grid % yn(nj);  zj = grid % zn(nj)
-                if(abs(grid % dx(sh)) > TINY) then
-                  if(Math_Mod_Distance(0., yi, zi, 0., yj, zj) < NANO) then
-                    grid % new_n(nj) = -1
-                  end if
-                end if
-                if(abs(grid % dy(sh)) > TINY) then
-                  if(Math_Mod_Distance(xi, 0., zi, xj, 0., zj) < NANO) then
-                    grid % new_n(nj) = -1
-                  end if
-                end if
-                if(abs(grid % dz(sh)) > TINY) then
-                  if(Math_Mod_Distance(xi, yi, 0., xj, yj, 0.) < NANO) then
-                    grid % new_n(nj) = -1
-                  end if
+                xj = grid % xn(nj) + grid % dx(sh)
+                yj = grid % yn(nj) + grid % dy(sh)
+                zj = grid % zn(nj) + grid % dz(sh)
+                if(Math_Mod_Distance(xi, yi, zi, xj, yj, zj) < NANO) then
+                  grid % new_n(nj) = -1
                 end if
               end do
             end if
@@ -108,24 +100,16 @@
           do j_nod = 1, grid % faces_n_nodes(sh)
             nj = grid % faces_n(j_nod, sh)
             if(grid % new_n(nj) .eq. -1) then
-              xj = grid % xn(nj);  yj = grid % yn(nj);  zj = grid % zn(nj)
+              xj = grid % xn(nj) + grid % dx(sh)
+              yj = grid % yn(nj) + grid % dy(sh)
+              zj = grid % zn(nj) + grid % dz(sh)
               do i_nod = 1, grid % faces_n_nodes(s)
                 ni = grid % faces_n(i_nod, s)
-                xi = grid % xn(ni);  yi = grid % yn(ni); zi = grid % zn(ni)
-                if(abs(grid % dx(sh)) > TINY) then
-                  if(Math_Mod_Distance(0., yi, zi, 0., yj, zj) < NANO) then
-                    grid % new_n(ni) = -1
-                  end if
-                end if
-                if(abs(grid % dy(sh)) > TINY) then
-                  if(Math_Mod_Distance(xi, 0., zi, xj, 0., zj) < NANO) then
-                    grid % new_n(ni) = -1
-                  end if
-                end if
-                if(abs(grid % dz(sh)) > TINY) then
-                  if(Math_Mod_Distance(xi, yi, 0., xj, yj, 0.) < NANO) then
-                    grid % new_n(ni) = -1
-                  end if
+                xi = grid % xn(ni)
+                yi = grid % yn(ni)
+                zi = grid % zn(ni)
+                if(Math_Mod_Distance(xi, yi, zi, xj, yj, zj) < NANO) then
+                  grid % new_n(ni) = -1
                 end if
               end do
             end if
