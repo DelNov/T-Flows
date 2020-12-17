@@ -15,8 +15,9 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c1, c2, s
+  integer :: c1, c2, s, pnt_to, pnt_from
   real    :: xc1, yc1, zc1, xc2, yc2, zc2
+  real    :: d_s, min_d, max_d
 !==============================================================================!
 
   !----------------------------------------------!
@@ -49,6 +50,62 @@
     grid % dy(s) = yc2-yc1
     grid % dz(s) = zc2-zc1
   end do  ! faces
+
+  !---------------------------------------!
+  !   Check distances stored in shadows   !
+  !---------------------------------------!
+  min_d = +HUGE
+  max_d = -HUGE
+  do s = grid % n_faces + 1, grid % n_faces + grid % n_shadows
+    d_s = sqrt(  grid % dx(s)*grid % dx(s)     &
+               + grid % dy(s)*grid % dy(s)     &
+               + grid % dz(s)*grid % dz(s) )
+    min_d = min(min_d, d_s)
+    max_d = max(max_d, d_s)
+  end do
+  call Comm_Mod_Global_Min_Real(min_d)
+  call Comm_Mod_Global_Max_Real(max_d)
+  if(this_proc < 2) then
+    print *, '# Minimum distance stored in shadow faces: ', min_d
+    print *, '# Maximum distance stored in shadow faces: ', max_d
+  end if
+
+  !-----------------------------------------------------!
+  !   Check distances between faces and their shadows   !
+  !-----------------------------------------------------!
+  min_d = +HUGE
+  max_d = -HUGE
+  do s = 1, grid % n_faces
+    if(grid % faces_s(s) .ne. 0) then
+      d_s = sqrt(  (grid % xf(s) - grid % xf(grid % faces_s(s)))**2     &
+                 + (grid % yf(s) - grid % yf(grid % faces_s(s)))**2     &
+                 + (grid % zf(s) - grid % zf(grid % faces_s(s)))**2 )
+      min_d = min(min_d, d_s)
+      max_d = max(max_d, d_s)
+    end if
+  end do
+  call Comm_Mod_Global_Min_Real(min_d)
+  call Comm_Mod_Global_Max_Real(max_d)
+  if(this_proc < 2) then
+    print *, '# Minimum distance between faces and their shadows: ', min_d
+    print *, '# Maximum distance between faces and their shadows: ', max_d
+  end if
+
+  !---------------------------------------------------!
+  !   Counter and check pointer to and from shadows   !
+  !---------------------------------------------------!
+  pnt_to   = 0
+  pnt_from = 0
+  do s = 1, grid % n_faces
+    if(grid % faces_s(s) .ne. 0) pnt_to = pnt_to + 1
+  end do
+  do s = grid % n_faces + 1, grid % n_faces + grid % n_shadows
+    if(grid % faces_s(s) .ne. 0) pnt_from = pnt_from + 1
+  end do
+  if(pnt_to .ne. pnt_from) then
+    print *, '# Pointers to and from shadows wrong in processor: ', this_proc
+    stop
+  end if
 
   !--------------------------------------------!
   !   For shadows, dx, dy and dz are lengths   !
