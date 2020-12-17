@@ -1,7 +1,7 @@
 #----------
 # Prologue
 #----------
- PROBLEM_NAME     comm
+ PROBLEM_NAME     comm_2
  HEAT_TRANSFER    no
 
  NUMBER_OF_TIME_STEPS     18
@@ -68,6 +68,11 @@
 #---------------------
 # Boundary conditions
 #---------------------
+  BOUNDARY_CONDITION    rods
+    TYPE                wall
+    VARIABLES           u     v     w
+    VALUES              0.0   0.0   0.0
+
   BOUNDARY_CONDITION    wall
     TYPE                wall
     VARIABLES           u     v     w

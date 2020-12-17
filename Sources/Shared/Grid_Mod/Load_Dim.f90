@@ -34,6 +34,9 @@
   read(fu) (grid % wall_dist(c), c = -grid % n_bnd_cells, grid % n_cells)
   read(fu) (grid % vol(c), c = 1, grid % n_cells)
 
+  PRINT *, 'MIN(VOL = ', MINVAL(grid % vol(1:grid % n_cells))
+  PRINT *, 'MAX(VOL = ', MAXVAL(grid % vol(1:grid % n_cells))
+
   read(fu) (grid % sx(s), s = 1, grid % n_faces + grid % n_shadows)
   read(fu) (grid % sy(s), s = 1, grid % n_faces + grid % n_shadows)
   read(fu) (grid % sz(s), s = 1, grid % n_faces + grid % n_shadows)

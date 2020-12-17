@@ -114,6 +114,7 @@
       w_f = fs * w % n(c1) + (1.0 - fs) * w % n(c2)
 
       ! Calculate coeficients for the system matrix
+PRINT *, c1, c2, a % sav(c1), a % sav(c2)
       a12 = u_relax * 0.5 * a % fc(s)                    &
                     * ( grid % vol(c1) / a % sav(c1)     &
                       + grid % vol(c2) / a % sav(c2) )

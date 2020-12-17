@@ -260,6 +260,9 @@
     !-------------------------------------------------!
     do c = 1, grid % n_cells
       a % sav(c) = a % val(a % dia(c))
+IF(A % SAV(C) < FEMTO) THEN
+  PRINT *, 'A % SAV(C) ~ 0 @ ', C, THIS_PROC
+END IF
     end do
 
     !---------------------------------!
@@ -350,6 +353,12 @@
 
   ! Refresh buffers for a % sav before discretizing for pressure
   call Grid_Mod_Exchange_Cells_Real(grid, a % sav)
+
+!DO C = 1, GRID % N_CELLS
+!  IF(A % SAV(C) < FEMTO) THEN
+!    PRINT *, 'A % SAV(C) ~ 0 @ ', C, THIS_PROC
+!  END IF
+!END DO
 
   ! User function
   call User_Mod_End_Of_Compute_Momentum(flow, turb, mult, ini)

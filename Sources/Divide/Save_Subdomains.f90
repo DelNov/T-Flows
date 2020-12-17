@@ -80,6 +80,12 @@
             ss = grid % faces_s(s)
             grid % new_n(grid % faces_n(1:nn, s )) = -1
             grid % new_n(grid % faces_n(1:nn, ss)) = -1
+            grid % new_c(c1) = -1
+            grid % new_c(c2) = -1
+            c1 = grid % faces_c(1, ss)
+            c2 = grid % faces_c(2, ss)
+            grid % new_c(c1) = -1
+            grid % new_c(c2) = -1
           end if
         end if
       end do
@@ -91,15 +97,15 @@
     do subo = 1, maxval(grid % comm % cell_proc(:))
       if(subo .ne. sub) then
 
-        ! Mark cells in buffer "subo"
-        do c = 1, grid % n_cells
-          if(grid % comm % cell_proc(c) .eq. subo) then
-            n = abs(grid % cells_n_nodes(c))
-            if( any(grid % new_n(grid % cells_n(1:n, c)) .eq. -1) ) then
-              grid % new_c(c) = -1
-            end if
-          end if
-        end do
+!hmm:        ! Mark cells in buffer "subo"
+!hmm:        do c = 1, grid % n_cells
+!hmm:          if(grid % comm % cell_proc(c) .eq. subo) then
+!hmm:            n = abs(grid % cells_n_nodes(c))
+!hmm:            if( any(grid % new_n(grid % cells_n(1:n, c)) .eq. -1) ) then
+!hmm:              grid % new_c(c) = -1
+!hmm:            end if
+!hmm:          end if
+!hmm:        end do
 
 !exp:        ! Browse through deeper levels of buffers
 !exp:        do lev = 2, n_buff_layers
