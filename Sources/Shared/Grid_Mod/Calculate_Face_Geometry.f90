@@ -65,9 +65,9 @@
   end do
   call Comm_Mod_Global_Min_Real(min_d)
   call Comm_Mod_Global_Max_Real(max_d)
-  if(this_proc < 2) then
-    print *, '# Minimum distance stored in shadow faces: ', min_d
-    print *, '# Maximum distance stored in shadow faces: ', max_d
+  if(this_proc < 2 .and. grid % n_shadows > 0) then
+    print '(a,f9.3)', '# Minimum distance stored in shadow faces: ', min_d
+    print '(a,f9.3)', '# Maximum distance stored in shadow faces: ', max_d
   end if
 
   !-----------------------------------------------------!
@@ -86,9 +86,9 @@
   end do
   call Comm_Mod_Global_Min_Real(min_d)
   call Comm_Mod_Global_Max_Real(max_d)
-  if(this_proc < 2) then
-    print *, '# Minimum distance between faces and their shadows: ', min_d
-    print *, '# Maximum distance between faces and their shadows: ', max_d
+  if(this_proc < 2 .and. grid % n_shadows > 0) then
+    print '(a,f9.3)', '# Minimum corrected distance at shadows:   ', min_d
+    print '(a,f9.3)', '# Maximum corrected distance at shadows:   ', max_d
   end if
 
   !---------------------------------------------------!
