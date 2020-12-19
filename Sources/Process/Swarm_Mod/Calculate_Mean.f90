@@ -15,7 +15,7 @@
   type(Field_Type),    pointer :: flow
   type(Turb_Type),     pointer :: turb
   type(Particle_Type), pointer :: part
-  integer                      :: c, o, l
+  integer                      :: c, l
   real                         :: m
 !==============================================================================!
 

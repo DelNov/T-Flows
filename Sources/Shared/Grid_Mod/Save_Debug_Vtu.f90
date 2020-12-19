@@ -259,7 +259,7 @@
   !-----------!
   !   Nodes   !
   !-----------!
-  data_size = grid % n_nodes * RP * 3
+  data_size = int(grid % n_nodes * RP * 3, SP)
   write(fu) data_size
   do n = 1, grid % n_nodes
     write(fu) grid % xn(n), grid % yn(n), grid % zn(n)
@@ -270,7 +270,7 @@
   !-----------!
 
   ! Cells' nodes
-  data_size = n_conns * IP
+  data_size = int(n_conns * IP, SP)
   write(fu) data_size
 
   do c = cs, ce
@@ -302,7 +302,7 @@
   end do
 
   ! Cells' offsets
-  data_size = nc * IP
+  data_size = int(nc * IP, SP)
   write(fu) data_size
   cell_offset = 0
   do c = cs, ce
@@ -311,7 +311,7 @@
   end do
 
   ! Cells' types
-  data_size = nc * IP
+  data_size = int(nc * IP, SP)
   write(fu) data_size
   if(inside) then
     do c = cs, ce
@@ -337,7 +337,7 @@
   if(grid % polyhedral) then
 
     ! Write polyhedral cells' faces
-    data_size = n_polyg * IP
+    data_size = int(n_polyg * IP, SP)
     write(fu) data_size
     do c = cs, ce
       if(grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
@@ -363,7 +363,7 @@
     end do
 
     ! Write polyhedral cells' faces offsets
-    data_size = grid % n_cells * IP
+    data_size = int(grid % n_cells * IP, SP)
     write(fu) data_size
     cell_offset = 0
     do c = 1, grid % n_cells
@@ -386,7 +386,7 @@
   !   Point data   !
   !----------------!
   if(present(scalar_node)) then
-    data_size = grid % n_nodes * RP
+    data_size = int(grid % n_nodes * RP, SP)
     write(fu) data_size
     do n = 1, grid % n_nodes
       write(fu) scalar_node(n)
@@ -394,7 +394,7 @@
   end if
 
   if(present(vector_node)) then
-    data_size = grid % n_nodes * RP * 3
+    data_size = int(grid % n_nodes * RP * 3, SP)
     write(fu) data_size
     do n = 1, grid % n_nodes
       write(fu) vector_node(n, 1), vector_node(n, 2), vector_node(n, 3)
@@ -406,7 +406,7 @@
   !---------------!
 
   ! Processor i.d.
-  data_size = nc * IP
+  data_size = int(nc * IP, SP)
   write(fu) data_size
   do c = cs, ce
     write(fu) grid % comm % cell_proc(c)
@@ -414,7 +414,7 @@
 
   ! Additional cell data
   if(present(scalar_cell)) then
-    data_size = nc * RP
+    data_size = int(nc * RP, SP)
     write(fu) data_size
     do c = cs, ce
       write(fu) scalar_cell(c)
@@ -422,7 +422,7 @@
   end if
 
   if(present(vector_cell)) then
-    data_size = nc * RP * 3
+    data_size = int(nc * RP * 3, SP)
     write(fu) data_size
     do c = cs, ce
       write(fu) vector_cell(c, 1), vector_cell(c, 2), vector_cell(c, 3)

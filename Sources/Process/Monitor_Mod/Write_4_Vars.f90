@@ -5,12 +5,11 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Monitor_Type) :: monitor
-  integer            :: n
-  type(Field_Type)   :: flow
+  type(Monitor_Type)  :: monitor
+  integer, intent(in) :: n
+  type(Field_Type)    :: flow
 !-----------------------------------[Locals]-----------------------------------!
-  type(Var_Type),  pointer :: u, v, w, p
-  integer                  :: m
+  integer :: m
 !==============================================================================!
 
   do m = 1, monitor % n_points

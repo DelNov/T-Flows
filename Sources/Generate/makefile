@@ -57,7 +57,7 @@ ifeq ($(FORTRAN), gnu)
                -fimplicit-none -finit-real=nan                              \
                -Wall -Wextra -Waliasing -Wampersand -Warray-temporaries     \
                -Wc-binding-type -Wcharacter-truncation -Wline-truncation    \
-               -Wconversion -Wconversion-extra -Wintrinsics-std             \
+               -Wconversion                    -Wintrinsics-std             \
                -Wreal-q-constant -Wsurprising -Wtabs -Wunderflow            \
                -Wintrinsic-shadow -Wunused-parameter -Walign-commons        \
                -Wfunction-elimination -Wrealloc-lhs -Wrealloc-lhs-all       \

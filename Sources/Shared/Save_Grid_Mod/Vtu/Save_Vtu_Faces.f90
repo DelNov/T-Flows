@@ -189,7 +189,7 @@
   !-----------!
   !   Nodes   !
   !-----------!
-  data_size = grid % n_nodes * RP * 3
+  data_size = int(grid % n_nodes * RP * 3, SP)
   write(fu) data_size
   do n = 1, grid % n_nodes
     write(fu) grid % xn(n), grid % yn(n), grid % zn(n)
@@ -200,7 +200,7 @@
   !-----------!
 
   ! Faces' nodes
-  data_size = n_conns * IP
+  data_size = int(n_conns * IP, SP)
   write(fu) data_size
   do s = s_f, s_l
     n = grid % faces_n_nodes(s)
@@ -208,7 +208,7 @@
   end do
 
   ! Faces' offsets
-  data_size = (s_l-s_f+1) * IP
+  data_size = int((s_l-s_f+1) * IP, SP)
   write(fu) data_size
   cell_offset = 0
   do s = s_f, s_l
@@ -217,7 +217,7 @@
   end do
 
   ! Faces' types
-  data_size = (s_l-s_f+1) * IP
+  data_size = int((s_l-s_f+1) * IP, SP)
   write(fu) data_size
   do s = s_f, s_l
     if(grid % faces_n_nodes(s) .eq. 4) then
@@ -231,7 +231,7 @@
 
   ! Boundary conditions
   ! (Check c1 and c2 for shadow faces, seems to be something messed up)
-  data_size = (s_l-s_f+1) * IP
+  data_size = int((s_l-s_f+1) * IP, SP)
   write(fu) data_size
   do s = s_f, s_l
     c2 = grid % faces_c(2,s)
@@ -244,21 +244,21 @@
   end do
 
   ! Number of nodes
-  data_size = (s_l-s_f+1) * IP
+  data_size = int((s_l-s_f+1) * IP, SP)
   write(fu) data_size
   do s = s_f, s_l
     write(fu) grid % faces_n_nodes(s)
   end do
 
   ! Surface vectors
-  data_size = (s_l-s_f+1) * RP * 3
+  data_size = int((s_l-s_f+1) * RP * 3, SP)
   write(fu) data_size
   do s = s_f, s_l
     write(fu) grid % sx(s), grid % sy(s), grid % sz(s)
   end do
 
   ! Surface normals
-  data_size = (s_l-s_f+1) * RP * 3
+  data_size = int((s_l-s_f+1) * RP * 3, SP)
   write(fu) data_size
   do s = s_f, s_l
     mag = sqrt(grid % sx(s)**2 + grid % sy(s)**2 + grid % sz(s)**2)
@@ -266,7 +266,7 @@
   end do
 
   ! Connection vectors
-  data_size = (s_l-s_f+1) * RP * 3
+  data_size = int((s_l-s_f+1) * RP * 3, SP)
   write(fu) data_size
   do s = s_f, s_l
     write(fu) grid % dx(s), grid % dy(s), grid % dz(s)

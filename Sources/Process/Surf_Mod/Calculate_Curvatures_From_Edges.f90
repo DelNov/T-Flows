@@ -14,9 +14,7 @@
   real, dimension(4)    :: b
   real, dimension(4)    :: phi
   integer, dimension(4) :: vert
-  integer               :: v, i, j, k, e, c, s
-  real                  :: dx, dy, dz, magn
-  real                  :: delta_nx, delta_ny, delta_nz
+  integer               :: i, j, k, e, c, s
   real                  :: x, y, z, x2, y2, z2, xy, xz, yz, rho
 !==============================================================================!
 

@@ -12,7 +12,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: t
-  integer                    :: c1, c2, s, c
+  integer                    :: c1, c2, s
   real                       :: xc1, yc1, zc1, xc2, yc2, zc2, dotprod, dens_f
 !==============================================================================!
 

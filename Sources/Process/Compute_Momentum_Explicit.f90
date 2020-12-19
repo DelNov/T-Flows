@@ -4,8 +4,7 @@
 !   Explicit computation of momentum equations, used in PISO algorithm,        !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: neigh => r_cell_12,   &
-                      res   => r_cell_13
+  use Work_Mod, only: neigh => r_cell_12
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Field_Mod
@@ -20,7 +19,7 @@
   type(Grid_Type),   pointer :: grid
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
-  integer                    :: s, c, c1, c2, nt, ni
+  integer                    :: s, c, c1, c2
 !==============================================================================!
 
   ! Take aliases

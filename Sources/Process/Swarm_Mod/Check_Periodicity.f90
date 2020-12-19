@@ -12,7 +12,7 @@
   type(Field_Type),    pointer :: flow
   type(Grid_Type),     pointer :: grid
   type(Particle_Type), pointer :: part
-  integer                      :: ps, s, c1, c2
+  integer                      :: s, c1, c2
   real                         :: xc1, xc2, yc1, yc2, zc1, zc2, d_sq_1, d_sq_2
 !==============================================================================!
 

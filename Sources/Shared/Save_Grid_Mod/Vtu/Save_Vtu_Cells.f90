@@ -196,7 +196,7 @@
   !-----------!
   !   Nodes   !
   !-----------!
-  data_size = n_nodes_sub * RP * 3
+  data_size = int(n_nodes_sub * RP * 3, SP)
   write(fu) data_size
   do n = 1, grid % n_nodes
     if(grid % new_n(n) .ne. 0) then
@@ -209,7 +209,7 @@
   !-----------!
 
   ! Cells' nodes
-  data_size = n_conns * IP
+  data_size = int(n_conns * IP, SP)
   write(fu) data_size
   do c = 1, grid % n_cells
     if(grid % new_c(c) .ne. 0) then
@@ -232,7 +232,7 @@
   end do
 
   ! Cells' offsets
-  data_size = n_cells_sub * IP
+  data_size = int(n_cells_sub * IP, SP)
   write(fu) data_size
   cell_offset = 0
   do c = 1, grid % n_cells
@@ -243,7 +243,7 @@
   end do
 
   ! Cells' types
-  data_size = n_cells_sub * IP
+  data_size = int(n_cells_sub * IP, SP)
   write(fu) data_size
   do c = 1, grid % n_cells
     if(grid % new_c(c) .ne. 0) then
@@ -259,7 +259,7 @@
   if(grid % polyhedral) then
 
     ! Write polyhedral cells' faces
-    data_size = n_polyg * IP
+    data_size = int(n_polyg * IP, SP)
     write(fu) data_size
     do c = 1, grid % n_cells
       if(grid % new_c(c) .ne. 0) then            ! cell is in this subdomain
@@ -287,7 +287,7 @@
     end do
 
     ! Write polyhedral cells' faces offsets
-    data_size = grid % n_cells * IP
+    data_size = int(grid % n_cells * IP, SP)
     write(fu) data_size
     cell_offset = 0
     do c = 1, grid % n_cells
@@ -313,7 +313,7 @@
   !---------------!
 
   ! Processor i.d.
-  data_size = n_cells_sub * IP
+  data_size = int(n_cells_sub * IP, SP)
   write(fu) data_size
   do c = 1, grid % n_cells
     if(grid % new_c(c) .ne. 0) then
@@ -322,7 +322,7 @@
   end do
 
   ! Number of nodes
-  data_size = n_cells_sub * IP
+  data_size = int(n_cells_sub * IP, SP)
   write(fu) data_size
   do c = 1, grid % n_cells
     if(grid % new_c(c) .ne. 0) then
@@ -331,7 +331,7 @@
   end do
 
   ! Wall distance
-  data_size = n_cells_sub * RP
+  data_size = int(n_cells_sub * RP, SP)
   write(fu) data_size
   do c = 1, grid % n_cells
     if(grid % new_c(c) .ne. 0) then
@@ -340,7 +340,7 @@
   end do
 
   ! Cell volume
-  data_size = n_cells_sub * RP
+  data_size = int(n_cells_sub * RP, SP)
   write(fu) data_size
   do c = 1, grid % n_cells
     if(grid % new_c(c) .ne. 0) then

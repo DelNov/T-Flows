@@ -12,10 +12,9 @@
   integer, intent(in)      :: i
   real,    intent(out)     :: phii(1:flow % pnt_grid % n_nodes)
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer           :: grid
-  integer                            :: n, c, i_cel
-  real                               :: dx, dy, dz, dphi
-  logical                            :: imp_sym
+  type(Grid_Type), pointer :: grid
+  integer                  :: n, c, i_cel
+  real                     :: dx, dy, dz, dphi
 !-----------------------------[Local parameters]-------------------------------!
   integer, dimension(3,3), parameter :: MAP = reshape((/ 1, 4, 5,  &
                                                          4, 2, 6,  &

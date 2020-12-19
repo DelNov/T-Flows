@@ -303,14 +303,14 @@
     if(run .eq. 2) then
 
       ! Save the nodes' coordinates
-      data_size = grid % n_nodes * RP * 3
+      data_size = int(grid % n_nodes * RP * 3, SP)
       write(f9) data_size
       do n = 1, grid % n_nodes
         write(f9) grid % xn(n), grid % yn(n), grid % zn(n)
       end do
 
       ! Save connections
-      data_size = n_conns * IP
+      data_size = int(n_conns * IP, SP)
       write(f9) data_size
       if(plot_inside) then
         do c1 = c_f, c_l
@@ -346,7 +346,7 @@
       if(n_polyg > 0) then
 
         ! Write polyhedral cells' faces
-        data_size = n_polyg * IP
+        data_size = int(n_polyg * IP, SP)
         write(f9) data_size
 
         do c1 = c_f, c_l
@@ -373,7 +373,7 @@
         end do
 
         ! Write polyhedral cells' faces offsets
-        data_size = (c_l-c_f+1) * IP
+        data_size = int((c_l-c_f+1) * IP, SP)
         write(f9) data_size
 
         cell_offset = 0

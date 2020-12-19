@@ -76,17 +76,17 @@
 
     ! -1 is to start from zero, as needed by MPI functions
     do c = 1, grid % comm % nc_tot
-      grid % comm % cell_map(c) = c - 1
+      grid % comm % cell_map(c) = int(c - 1, SP)
     end do
 
     ! -1 is to start from zero, as needed by MPI functions
     do c = 1, grid % comm % nb_tot
-      grid % comm % bnd_cell_map(c) = c - 1
+      grid % comm % bnd_cell_map(c) = int(c - 1, SP)
     end do
 
     ! -1 is to start from zero, as needed by MPI functions
     do s = 1, grid % comm % nf_tot
-      grid % comm % face_map(s) = s - 1
+      grid % comm % face_map(s) = int(s - 1, SP)
       c1 = grid % faces_c(1, s)
       c2 = grid % faces_c(2, s)
       c1g = grid % comm % cell_glo(c1)
@@ -119,7 +119,7 @@
     !---------------------!
     do c = 1, grid % comm % nc_sub
       ! Take cell mapping to be the same as global cell numbers but start from 0
-      grid % comm % cell_map(c) = grid % comm % cell_glo(c) - 1
+      grid % comm % cell_map(c) = int(grid % comm % cell_glo(c) - 1, SP)
     end do
 
     !-----------------------!
@@ -128,8 +128,8 @@
     cnt = 0
     do c = -grid % comm % nb_f, -grid % comm % nb_l
       cnt = cnt + 1
-      grid % comm % bnd_cell_map(cnt) = grid % comm % cell_glo(c)  &
-                                      + grid % comm % nb_tot
+      grid % comm % bnd_cell_map(cnt) = int(  grid % comm % cell_glo(c)  &
+                                            + grid % comm % nb_tot, SP)
     end do
 
     !--------------!
@@ -138,7 +138,7 @@
     cnt = 0
     do s = 1, grid % n_faces
       cnt = cnt + 1
-      grid % comm % face_map(cnt) = grid % comm % face_glo(s) - 1
+      grid % comm % face_map(cnt) = int(grid % comm % face_glo(s) - 1, SP)
     end do
   end if
 

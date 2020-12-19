@@ -19,8 +19,6 @@
   integer, allocatable  :: vert_v(:,:)
   integer, allocatable  :: elem_v(:,:)
   integer               :: v, i, j, k, e, c, d, s, max_nnv
-  real                  :: dx, dy, dz, magn
-  real                  :: delta_nx, delta_ny, delta_nz
   real                  :: x, y, z, x2, y2, z2, xy, xz, yz, rho
 !==============================================================================!
 

@@ -18,7 +18,6 @@
   integer       :: c1, c2, c_f, c_l
   character(SL) :: str1
 !------------------------------[Local parameters]------------------------------!
-  integer, parameter :: IP = DP  ! int. precision is double precision
   integer, parameter :: RP = DP  ! real precision is double precision
 !==============================================================================!
 
@@ -47,14 +46,14 @@
   ! Data
   if(sweep .eq. 2) then
     if(plot_inside) then
-      data_size = (c_l-c_f+1) * RP
+      data_size = int((c_l-c_f+1) * RP, SP)
       write(fp) data_size
       do c1 = c_f, c_l
         write(fp) val(c1)
       end do
     else
       do c2 = c_f, c_l
-        data_size = data_size + RP
+        data_size = int(data_size + RP, SP)
       end do
       write(fp) data_size
       do c2 = c_f, c_l

@@ -19,8 +19,6 @@
   integer                      :: k                   ! particle number
   integer                      :: ss                  ! sub-step counter
   integer                      :: n_parts_in_buffers
-  real                         :: avg_part_cfl, avg_part_re, avg_part_st
-  real                         :: max_part_cfl, max_part_re, max_part_st
 !==============================================================================!
 
   ! Take aliases for the swarm

@@ -11,12 +11,13 @@
                                  :flow % pnt_grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
-  integer                  :: n, s, c, c1, c2, i_nod
+  integer                  :: n, c, i_nod
 !==============================================================================!
 
   ! Take alias
   grid => flow % pnt_grid
 
+  ! Interpolate from all nodes to cells
   do c = 1, grid % n_cells
 
     var_cell(c) = 0.0
