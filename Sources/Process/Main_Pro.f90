@@ -96,7 +96,6 @@
     call Grid_Mod_Calculate_Face_Geometry(grid(d))
 
     call Grid_Mod_Form_Cells_Comm(grid(d))
-    call Grid_Mod_Form_Nodes_Comm(grid(d))
     call Grid_Mod_Form_Maps(grid(d))
 
     call Comm_Mod_Wait
