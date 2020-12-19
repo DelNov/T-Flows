@@ -14,27 +14,42 @@
   integer, intent(in)           :: n     ! time step
   real,    intent(in)           :: time  ! physical time
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: g
   type(Var_Type),  pointer :: u, v, w, t, phi, vof
   integer                  :: c, nb, nc
 !==============================================================================!
 
   ! Take aliases
-  grid => flow % pnt_grid
-  nb   =  grid % n_bnd_cells
-  nc   =  grid % n_cells
+  g  => flow % pnt_grid
+  nb =  g % n_bnd_cells
+  nc =  g % n_cells
 
-  do c = 1, grid % n_cells - grid % comm % n_buff_cells
-    var(c) = grid % comm % cell_proc(c)
+  ! In x direction
+  var(:) = 0.0
+  do c = 1, g % n_cells - g % comm % n_buff_cells
+    var(c) = g % xc(c)
   end do
+  call Grid_Mod_Save_Debug_Vtu(g,'x1',scalar_cell=var(-nb:nc),scalar_name='x')
+  call Grid_Mod_Exchange_Cells_Real(g, var)
+  call Grid_Mod_Save_Debug_Vtu(g,'x2',scalar_cell=var(-nb:nc),scalar_name='x')
 
-  call Grid_Mod_Save_Debug_Vtu(grid, 'var_before',                     &
-                               scalar_cell = var(-nb:nc), scalar_name = 'var')
+  ! In y direction
+  var(:) = 0.0
+  do c = 1, g % n_cells - g % comm % n_buff_cells
+    var(c) = g % yc(c)
+  end do
+  call Grid_Mod_Save_Debug_Vtu(g,'y1',scalar_cell=var(-nb:nc),scalar_name='y')
+  call Grid_Mod_Exchange_Cells_Real(g, var)
+  call Grid_Mod_Save_Debug_Vtu(g,'y2',scalar_cell=var(-nb:nc),scalar_name='y')
 
-  call Grid_Mod_Exchange_Cells_Real(grid, var)
-
-  call Grid_Mod_Save_Debug_Vtu(grid, 'var_after',                     &
-                               scalar_cell = var(-nb:nc), scalar_name = 'var')
+  ! In z direction
+  var(:) = 0.0
+  do c = 1, g % n_cells - g % comm % n_buff_cells
+    var(c) = g % zc(c)
+  end do
+  call Grid_Mod_Save_Debug_Vtu(g,'z1',scalar_cell=var(-nb:nc),scalar_name='z')
+  call Grid_Mod_Exchange_Cells_Real(g, var)
+  call Grid_Mod_Save_Debug_Vtu(g,'z2',scalar_cell=var(-nb:nc),scalar_name='z')
 
   call Comm_Mod_End
   stop
