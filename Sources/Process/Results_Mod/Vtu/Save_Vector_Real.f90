@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Vector_Real(grid, var_name, plot_inside,  &
+  subroutine Save_Vector_Real(var_name, plot_inside,        &
                               val_1, val_2, val_3, fs, fp,  &
                               data_offset, sweep)
 !------------------------------------------------------------------------------!
@@ -7,7 +7,6 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)  :: grid
   character(len=*) :: var_name
   logical          :: plot_inside     ! plot results inside?
   real             :: val_1(:)

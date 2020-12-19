@@ -16,10 +16,7 @@
   real                      :: intns   ! eddy intensity
   character(len=*)          :: bnd_cond_name
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
-  integer, allocatable     :: n_bnd_cells_proc(:)
-  integer, allocatable     :: s_bnd_cell_proc(:)
-  integer                  :: e, c, n, run, cnt_bnd_cells
+  integer :: e
 !==============================================================================!
 
   ! Store pointers to grid, flow and the name of boundary condition

@@ -1,13 +1,12 @@
 !==============================================================================!
-  subroutine Save_Scalar_Real(grid, var_name, plot_inside,  &
-                              val, fs, fp,                  &
+  subroutine Save_Scalar_Real(var_name, plot_inside,  &
+                              val, fs, fp,            &
                               data_offset, sweep)
 !------------------------------------------------------------------------------!
 !   Writes one real scalar defined over cells.                                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)  :: grid
   character(len=*) :: var_name
   logical          :: plot_inside     ! plot results inside?
   real             :: val(:)

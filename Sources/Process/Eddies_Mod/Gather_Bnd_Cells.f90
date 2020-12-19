@@ -11,7 +11,7 @@
   type(Field_Type), pointer :: flow
   integer, allocatable      :: n_bnd_cells_proc(:)
   integer, allocatable      :: s_bnd_cell_proc(:)
-  integer                   :: e, c, n, cnt
+  integer                   :: c, n, cnt
   real                      :: x_dff, y_dff, z_dff, x_avg, y_avg, z_avg
 !==============================================================================!
 

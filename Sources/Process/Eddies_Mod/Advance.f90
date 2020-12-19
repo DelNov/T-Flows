@@ -7,15 +7,12 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Eddies_Type), target :: eddies
-  real                      :: dt      ! global time step
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: grid
   type(Field_Type), pointer :: flow
   integer                   :: e
 !==============================================================================!
 
   ! Create an alias
-  grid => eddies % pnt_grid
   flow => eddies % pnt_flow
 
   ! Advance all eddies

@@ -1,13 +1,12 @@
 !==============================================================================!
-  subroutine Save_Scalar_Int(grid, var_name, plot_inside,  &
-                             val, fs, fp,                  &
+  subroutine Save_Scalar_Int(var_name, plot_inside,  &
+                             val, fs, fp,            &
                              data_offset, sweep)
 !------------------------------------------------------------------------------!
 !   Writes one integer scalar defined over cells.                              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)  :: grid
   character(len=*) :: var_name
   logical          :: plot_inside     ! plot results inside?
   integer          :: val(:)
