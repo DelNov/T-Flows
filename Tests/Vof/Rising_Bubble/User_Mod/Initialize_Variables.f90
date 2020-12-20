@@ -1,6 +1,5 @@
 include '../User_Mod/Vof_Initialization_Ellipsoid.f90'
 include '../User_Mod/Vof_Interface_Ellipsoid.f90'
-include '../User_Mod/Check_Inside_Cell.f90'
 
 !==============================================================================!
   subroutine User_Mod_Initialize_Variables(flow, turb, mult, swarm, sol)

@@ -10,14 +10,15 @@
 #---------------------------------------------------------------
 # Exit when any command fails and trap where the error occurred
 #---------------------------------------------------------------
-set -eE -o functrace
+set -e
 
-failure() {
-  local lineno=$1
-  local msg=$2
-  echo "Failed at $lineno: $msg"
-}
-trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
+# set -eE -o functrace
+# failure() {
+#   local lineno=$1
+#   local msg=$2
+#   echo "Failed at $lineno: $msg"
+# }
+# trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
 
 # Compilation flags used in makefiles
 FCOMP="gnu"
@@ -91,7 +92,8 @@ HYB_CHANNEL_HR_UNIFORM_DIR=Hybrid_Les_Rans/Channel_Re_Tau_2000/Uniform_Mesh
 
 #----------------------------------------------------------------------------
 # All compilation tests including those with User_Mod/
-# (These are essentially all the tests)
+# (These are essentially all the tests, although not all of them
+# have the User_Mod directory, so there is some redundancy here)
 #----------------------------------------------------------------------------
 ALL_COMPILE_TESTS=( \
                    "$LAMINAR_BACKSTEP_ORTH_DIR" \

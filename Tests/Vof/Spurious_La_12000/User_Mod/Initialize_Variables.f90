@@ -1,7 +1,6 @@
 include '../User_Mod/Vof_Initialization_Cylinder.f90'
 include '../User_Mod/Vof_Init_Random_Seed.f90'
 include '../User_Mod/Vof_Interface_Cylinder.f90'
-include '../User_Mod/Check_Inside_Cell.f90'
 include '../User_Mod/Convert_Problem_Name_To_Integer.f90'
 include '../User_Mod/Vof_Area_Square_Circle.f90'
 include '../User_Mod/Vof_Exact_Cylinder.f90'
@@ -44,14 +43,16 @@ include '../User_Mod/Vof_Exact_Cylinder.f90'
   vof % o(:) = vof % n(:)
 
   ! At boundaries
-  do s = 1, grid % n_bnd_faces
+  do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
-    if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) then
-      vof % n(c2) = vof % n(c1)
-    else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
-    else
-      vof % n(c2) = vof % n(c1)
+    if(c2 < 0) then
+      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) then
+        vof % n(c2) = vof % n(c1)
+      else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
+      else
+        vof % n(c2) = vof % n(c1)
+      end if
     end if
   end do
 

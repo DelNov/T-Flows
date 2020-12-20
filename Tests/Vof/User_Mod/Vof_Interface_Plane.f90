@@ -18,7 +18,7 @@
   integer, parameter :: N = 10000
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
-  logical                  :: i_cell
+  logical                  :: l_cel
   integer                  :: nod, n_int, n_tot, fu
   integer                  :: ee, n_cylinders, i_vari, n_vari
   real                     :: r_num, res_func
@@ -58,22 +58,22 @@
     zmax = max(zmax, grid % zn(grid % cells_n(nod,c)))
   end do
 
-  i_cell = .false.
+  l_cel = .false.
 
   do while ( (n_tot < N) .and. (abs(var_comb - var_comb_0) > vof_tol1 .or. &
              (var_comb / dist_cent) > vof_tol2) )
 
-    i_cell = .false.
+    l_cel = .false.
 
     ! Check if p is inside cell
-    do while (i_cell .eqv. .false.)
+    do while (l_cel .eqv. .false.)
       call random_number(r_num)
       p(1) = xmin + (xmax-xmin) * r_num
       call random_number(r_num)
       p(2) = ymin + (ymax-ymin) * r_num
       call random_number(r_num)
       p(3) = zmin + (zmax-zmin) * r_num
-      i_cell = Check_Inside_Cell(mult, c, p)
+      l_cel = Is_Point_In_Cell(grid, c, p(1), p(2), p(3))
     end do
     n_tot = n_tot + 1
 
