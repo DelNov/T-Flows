@@ -15,7 +15,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c1, c2, s, pnt_to, pnt_from
+  integer :: c1, c2, s, sh, pnt_to, pnt_from
   real    :: xc1, yc1, zc1, xc2, yc2, zc2
   real    :: d_s, min_d, max_d
 !==============================================================================!
@@ -69,6 +69,42 @@
     print '(a,f9.3)', '# Minimum distance stored in shadow faces: ', min_d
     print '(a,f9.3)', '# Maximum distance stored in shadow faces: ', max_d
   end if
+
+  !---------------------------------------------------------!
+  !   Set up straight boundary conditions for periodicity   !
+  !   (This is important for copy boundary conditions, do   !
+  !        not erase this thinking it is not needed)        !
+  !---------------------------------------------------------!
+  do s = 1, grid % n_faces
+    c1 = grid % faces_c(1,s)
+    c2 = grid % faces_c(2,s)
+
+    if(grid % faces_s(s) .ne. 0) then
+      sh = grid % faces_s(s)
+
+      if( abs(grid % dx(s)) > NANO                     .and.   &
+          Math_Mod_Approx_Real(abs(grid % dy(s)), 0.0) .and.   &
+          Math_Mod_Approx_Real(abs(grid % dz(s)), 0.0) ) then
+        if(grid % xc(c2) > grid % xc(c1))                      &
+          grid % bnd_cond % color(s) = grid % n_bnd_cond + 1
+      end if
+
+      if( abs(grid % dy(s)) > NANO                     .and.   &
+          Math_Mod_Approx_Real(abs(grid % dx(s)), 0.0) .and.   &
+          Math_Mod_Approx_Real(abs(grid % dz(s)), 0.0) ) then
+        if(grid % yc(c2) > grid % yc(c1))                      &
+          grid % bnd_cond % color(s) = grid % n_bnd_cond + 2
+      end if
+
+      if( abs(grid % dz(s)) > NANO                     .and.   &
+          Math_Mod_Approx_Real(abs(grid % dx(s)), 0.0) .and.   &
+          Math_Mod_Approx_Real(abs(grid % dy(s)), 0.0) ) then
+        if(grid % zc(c2) > grid % zc(c1))                      &
+          grid % bnd_cond % color(s) = grid % n_bnd_cond + 3
+      end if
+
+    end if
+  end do
 
   !-----------------------------------------------------!
   !   Check distances between faces and their shadows   !

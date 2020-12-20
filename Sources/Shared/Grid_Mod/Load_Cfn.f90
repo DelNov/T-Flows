@@ -47,8 +47,8 @@
 
   ! Boundary conditions' keys
   ! (Go from zero for faces which are not at the boundary)
-  allocate(grid % bnd_cond % name(0 : grid % n_bnd_cond))
-  allocate(grid % bnd_cond % type(0 : grid % n_bnd_cond))
+  allocate(grid % bnd_cond % name(0 : grid % n_bnd_cond + 3))
+  allocate(grid % bnd_cond % type(0 : grid % n_bnd_cond + 3))
 
   !-----------------!
   !   Domain name   !
@@ -61,6 +61,13 @@
   do n = 1, grid % n_bnd_cond
     read(fu) grid % bnd_cond % name(n)
   end do
+
+  ! The last three are reserved for perodicity
+  ! and used for inlet copy boundary condition.  Don't delete these thinking
+  ! they are useless.  They are assigned in Grid_Mod_Calculate_Face_Geometry
+  grid % bnd_cond % name(grid % n_bnd_cond + 1) = 'PERIODIC_X'
+  grid % bnd_cond % name(grid % n_bnd_cond + 2) = 'PERIODIC_Y'
+  grid % bnd_cond % name(grid % n_bnd_cond + 3) = 'PERIODIC_Z'
 
   !--------------------------!
   !   Nodes global numbers   !
