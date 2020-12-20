@@ -7,8 +7,17 @@
 # mpi, gfortran, git to launch tests
 # python-matplotlib + texlive-base to plot results
 
-# Exit when any command fails
-set -e
+#---------------------------------------------------------------
+# Exit when any command fails and trap where the error occurred
+#---------------------------------------------------------------
+set -eE -o functrace
+
+failure() {
+  local lineno=$1
+  local msg=$2
+  echo "Failed at $lineno: $msg"
+}
+trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
 
 # Compilation flags used in makefiles
 FCOMP="gnu"
@@ -272,7 +281,7 @@ PROC_EXE=$BINA_DIR/Process         # Process  executable
 current_time=$(date +%s)
 
 # Script logs
-FULL_LOG=$TEST_DIR/test_build.log # logs of current script
+FULL_LOG=$TEST_DIR/test_build.$(date +%y-%m-%d-%T).log  # script's logs file
 if [ -f $FULL_LOG ]; then cp /dev/null $FULL_LOG; fi
 
 # Keep track of the last executed command
