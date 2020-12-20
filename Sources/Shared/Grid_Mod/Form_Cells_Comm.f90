@@ -10,16 +10,16 @@
   integer              :: sub, ms, mr, cnt
   integer              :: c, c1, c2, s, n_buff_faces, n_max_buff_cells, i_cel
   integer, allocatable :: send_cells(:), recv_cells(:)
-  integer, allocatable :: buff_s(:,:), buff_r(:,:)
+  integer, allocatable :: send_buff_cnt(:,:), recv_buff_cnt(:,:)
   integer, allocatable :: need_cell(:,:), from_proc(:,:)
-  logical, parameter   :: DEBUG = .false.
+  logical, parameter   :: DEBUG = .true.
 !==============================================================================!
 
   if(n_proc < 2) return
 
   ! Allocate memory for locally used arrays
-  allocate(buff_s(n_proc, n_proc))
-  allocate(buff_r(n_proc, n_proc))
+  allocate(send_buff_cnt(n_proc, n_proc))
+  allocate(recv_buff_cnt(n_proc, n_proc))
   allocate(send_cells(-grid % n_bnd_cells:grid % n_cells))
   allocate(recv_cells(-grid % n_bnd_cells:grid % n_cells))
 
@@ -46,14 +46,15 @@
     end if
   end do
 
-  !----------------------------!
-  !   Form the buff_r matrix   !
-  !----------------------------!
-  buff_r(:,:) = 0
+  !--------------------------------------------------------!
+  !   Form the recv_buff_cnt matrix and recv_cells array   !
+  !--------------------------------------------------------!
+  recv_buff_cnt(:,:)   = 0
+  recv_cells(:) = 0
   do c = grid % n_cells - grid % comm % n_buff_cells + 1,  &
          grid % n_cells
     sub = grid % comm % cell_proc(c)
-    buff_r(this_proc, sub) = buff_r(this_proc, sub) + 1
+    recv_buff_cnt(this_proc, sub) = recv_buff_cnt(this_proc, sub) + 1
     recv_cells(c) = sub
   end do
 
@@ -62,13 +63,13 @@
       if(sub .ne. this_proc) then
         write(100*this_proc+sub, *) '#====================================' // &
                                     '====================================='
-        write(100*this_proc+sub, '(a,i7,a,i7)')                   &
+        write(100*this_proc+sub, '(a,i7,a,i7)')                    &
               ' # There are        ', grid % comm % n_buff_cells,  &
               ' buffer cells in processor ', this_proc
         write(100*this_proc+sub, *) '#------------------------------------' // &
                                     '-------------------------------------'
-        write(100*this_proc+sub, '(a,i7,a,i7)')               &
-              ' #   It needs       ', buff_r(this_proc, sub),  &
+        write(100*this_proc+sub, '(a,i7,a,i7)')                       &
+              ' #   It needs       ', recv_buff_cnt(this_proc, sub),  &
               ' cells from processors     ', sub
       end if
     end do
@@ -107,19 +108,19 @@
   need_cell = reshape(need_cell, (/n_max_buff_cells, n_proc/))
   from_proc = reshape(from_proc, (/n_max_buff_cells, n_proc/))
 
-  !--------------------------------------------------------------!
-  !   Form buff_s from the information in the matrix from_proc   !
-  !--------------------------------------------------------------!
-  buff_s(:,:) = 0
+  !---------------------------------------------------------------------!
+  !   Form send_buff_cnt from the information in the matrix from_proc   !
+  !---------------------------------------------------------------------!
+  send_buff_cnt(:,:) = 0
   do sub = 1, n_proc
     if(sub .ne. this_proc) then
       do i_cel = 1, n_max_buff_cells
         if(from_proc(i_cel, sub) .eq. this_proc) then
-          buff_s(this_proc, sub) = buff_s(this_proc, sub) + 1  ! count
+          send_buff_cnt(this_proc, sub) = send_buff_cnt(this_proc, sub) + 1
         end if
       end do
       if(DEBUG) write(100*this_proc + sub, '(2(a,i7))')                &
-                      ' #   It should send ', buff_s(this_proc, sub),  &
+                      ' #   It should send ', send_buff_cnt(this_proc, sub),  &
                       ' cells to processor        ', sub
     end if
   end do
@@ -146,8 +147,8 @@
       !---------------------------------!
       !   Allocate memory for buffers   !
       !---------------------------------!
-      ms = buff_s(this_proc, sub)
-      mr = buff_r(this_proc, sub)
+      ms = send_buff_cnt(this_proc, sub)
+      mr = recv_buff_cnt(this_proc, sub)
 
       if(ms > 0) then
         allocate(grid % comm % cells_send(sub) % map(ms));
@@ -171,6 +172,7 @@
       mr = 0
 
       cnt = 0
+      send_cells(:) = 0
       do i_cel = 1, n_max_buff_cells
         if(from_proc(i_cel, sub) .eq. this_proc) then
           do c = 1, grid % n_cells
@@ -187,7 +189,7 @@
                       ' cells to send to processor', sub
 
       ! This worries me.  Why should this be from -grid % n_bnd_cells or not
-      do c = -grid % n_bnd_cells, grid % n_cells
+      do c = 1, grid % n_cells
         if(send_cells(c) .eq. sub) then
           ms = ms + 1
           grid % comm % cells_send(sub) % map(ms) = c
@@ -195,7 +197,7 @@
       end do
 
       ! This worries me.  Why should this be from -grid % n_bnd_cells or not
-      do c = -grid % n_bnd_cells, grid % n_cells
+      do c = 1, grid % n_cells
         if(recv_cells(c) .eq. sub) then
           mr = mr + 1
           grid % comm % cells_recv(sub) % map(mr) = c
@@ -221,8 +223,8 @@
   grid % n_faces = grid % n_faces - n_buff_faces
 
   ! De-allocate locally used memory
-  deallocate(buff_s)
-  deallocate(buff_r)
+  deallocate(send_buff_cnt)
+  deallocate(recv_buff_cnt)
   deallocate(send_cells)
   deallocate(recv_cells)
 
