@@ -12,7 +12,7 @@
   integer, allocatable :: send_cells(:), recv_cells(:)
   integer, allocatable :: send_buff_cnt(:,:), recv_buff_cnt(:,:)
   integer, allocatable :: need_cell(:,:), from_proc(:,:)
-  logical, parameter   :: DEBUG = .true.
+  logical, parameter   :: DEBUG = .false.
 !==============================================================================!
 
   if(n_proc < 2) return
