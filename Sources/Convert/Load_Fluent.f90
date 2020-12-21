@@ -1016,7 +1016,11 @@
         read(one_token(2:l), '(i16)') pos
 
         ! Extract boundary condition name
-        one_token = line % tokens(4)(1:index(line % tokens(4), ')')-1)
+        if(index(line % tokens(4), ')') .ne. 0) then  ! ')' is in the string
+          one_token = line % tokens(4)(1:index(line % tokens(4), ')')-1)
+        else
+          one_token = line % tokens(4)
+        end if
 
         do n = 1, 2048
           if(face_sect_bnd(n) .ne. 0) then
