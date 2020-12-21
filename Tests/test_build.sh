@@ -7,11 +7,14 @@
 # mpi, gfortran, git to launch tests
 # python-matplotlib + texlive-base to plot results
 
-#---------------------------------------------------------------
-# Exit when any command fails and trap where the error occurred
-#---------------------------------------------------------------
+#-----------------------
+# Exit when any command
+#-----------------------
 set -e
 
+#-------------------------------
+# Trap where the error occurred
+#-------------------------------
 # set -eE -o functrace
 # failure() {
 #   local lineno=$1
@@ -56,11 +59,13 @@ MODE="undefined"
 #----------------------------------
 LAMINAR_BACKSTEP_ORTH_DIR=Laminar/Backstep/Orthogonal
 LAMINAR_BACKSTEP_NON_ORTH_DIR=Laminar/Backstep/Nonorthogonal
+LAMINAR_BACKSTEP_POLYHEDRAL_DIR=Laminar/Backstep/Polyhedral
 LAMINAR_CAVITY_LID_DRIVEN_DIR=Laminar/Cavity/Lid_Driven/Re_1000
 LAMINAR_CAVITY_THERM_DRIVEN_106_DIR=Laminar/Cavity/Thermally_Driven/Ra_10e6
 LAMINAR_CAVITY_THERM_DRIVEN_108_DIR=Laminar/Cavity/Thermally_Driven/Ra_10e8
-LAMINAR_T_JUNCTION_DIR=Swarm/T_Junction_Square
 LAMINAR_CHANNEL_DIR=Laminar/Accuracy_Test/Channel_Re_2000
+LAMINAR_MODULE_POLYHEDRAL_DIR=Laminar/Module
+LAMINAR_T_JUNCTION_DIR=Swarm/T_Junction_Square
 
 RANS_BACKSTEP_05100_DIR=Rans/Backstep_Re_05100
 RANS_BACKSTEP_28000_DIR=Rans/Backstep_Re_28000
@@ -73,8 +78,10 @@ RANS_IMPINGING_JET_DIR=Rans/Impinging_Jet_2d_Distant_Re_23000
 
 MULTDOM_BACKSTEP_DIR=Laminar/Copy_Inlet
 MULTDOM_MEMBRANE_DIR=Rans/Membrane
+
 VOF_RISING_BUBBLE_DIR=Vof/Rising_Bubble
 SWARM_PERIODIC_CYL_DIR=Swarm/Cylinders_Periodic
+SWARM_ROD_BUNDLE_POLYHEDRAL_DIR=Swarm/Rod_Bundle_Polyhedral
 
 LES_CHANNEL_180_LONG_DIR=Les/Channel_Re_Tau_180/Long_Domain
 LES_CHANNEL_180_PERIODIC_DIR=Les/Channel_Re_Tau_180/Periodic_Domain
@@ -92,13 +99,10 @@ HYB_CHANNEL_HR_UNIFORM_DIR=Hybrid_Les_Rans/Channel_Re_Tau_2000/Uniform_Mesh
 
 #----------------------------------------------------------------------------
 # All compilation tests including those with User_Mod/
-# (These are essentially all the tests, although not all of them
+# (These are essentially most tests, but maybe not all of them
 # have the User_Mod directory, so there is some redundancy here)
 #----------------------------------------------------------------------------
 ALL_COMPILE_TESTS=( \
-                   "$LAMINAR_BACKSTEP_ORTH_DIR" \
-                   "$LAMINAR_BACKSTEP_NON_ORTH_DIR" \
-                   "$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
                    "$LAMINAR_CAVITY_THERM_DRIVEN_106_DIR" \
                    "$LAMINAR_CAVITY_THERM_DRIVEN_108_DIR" \
                    "$LAMINAR_T_JUNCTION_DIR" \
@@ -114,6 +118,7 @@ ALL_COMPILE_TESTS=( \
                    "$MULTDOM_BACKSTEP_DIR" \
                    "$MULTDOM_MEMBRANE_DIR" \
                    "$SWARM_PERIODIC_CYL_DIR" \
+                   "$SWARM_ROD_BUNDLE_POLYHEDRAL_DIR" \
                    "$VOF_RISING_BUBBLE_DIR" \
                    "$LES_CHANNEL_180_LONG_DIR" \
                    "$LES_CHANNEL_180_PERIODIC_DIR" \
@@ -157,10 +162,13 @@ DONE_GENERATE_TESTS=0
 # (All the tests which come with third party grid)
 #--------------------------------------------------
 ALL_CONVERT_TESTS=( \
+                   "$LAMINAR_BACKSTEP_POLYHEDRAL_DIR" \
+                   "$LAMINAR_MODULE_POLYHEDRAL_DIR" \
                    "$RANS_FUEL_BUNDLE_DIR" \
                    "$RANS_IMPINGING_JET_DIR" \
                    "$MULTDOM_MEMBRANE_DIR" \
                    "$SWARM_PERIODIC_CYL_DIR" \
+                   "$SWARM_ROD_BUNDLE_POLYHEDRAL_DIR" \
                    "$LES_PIPE_DIR" \
                    )
 DONE_CONVERT_TESTS=0
@@ -172,11 +180,13 @@ DONE_CONVERT_TESTS=0
 ALL_DIVIDE_TESTS=( \
                   "$LAMINAR_BACKSTEP_ORTH_DIR" \
                   "$LAMINAR_BACKSTEP_NON_ORTH_DIR" \
+                  "$LAMINAR_BACKSTEP_POLYHEDRAL_DIR" \
+                  "$LAMINAR_CHANNEL_DIR" \
                   "$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
                   "$LAMINAR_CAVITY_THERM_DRIVEN_106_DIR" \
                   "$LAMINAR_CAVITY_THERM_DRIVEN_108_DIR" \
+                  "$LAMINAR_MODULE_POLYHEDRAL_DIR" \
                   "$LAMINAR_T_JUNCTION_DIR" \
-                  "$LAMINAR_CHANNEL_DIR" \
                   "$RANS_BACKSTEP_05100_DIR" \
                   "$RANS_BACKSTEP_28000_DIR" \
                   "$RANS_CHANNEL_LR_LONG_DIR" \
@@ -188,6 +198,7 @@ ALL_DIVIDE_TESTS=( \
                   "$MULTDOM_BACKSTEP_DIR" \
                   "$MULTDOM_MEMBRANE_DIR" \
                   "$SWARM_PERIODIC_CYL_DIR" \
+                  "$SWARM_ROD_BUNDLE_POLYHEDRAL_DIR" \
                   "$VOF_RISING_BUBBLE_DIR" \
                   "$LES_CHANNEL_180_LONG_DIR" \
                   "$LES_CHANNEL_180_PERIODIC_DIR" \
@@ -218,6 +229,7 @@ ALL_PROCESS_TESTS=( \
                    "$RANS_IMPINGING_JET_DIR" \
                    "$MULTDOM_BACKSTEP_DIR" \
                    "$SWARM_PERIODIC_CYL_DIR" \
+                   "$SWARM_ROD_BUNDLE_POLYHEDRAL_DIR" \
                    "$VOF_RISING_BUBBLE_DIR" \
                    "$LES_PIPE_DIR" \
                    "$HYB_CHANNEL_HR_STRETCHED_DIR" \
@@ -236,6 +248,7 @@ ALL_TURBULENCE_MODELS=( \
                        "none" \
                        "none" \
                        "none" \
+                       "none" \
                        "les_dynamic" \
                        "hybrid_les_rans" \
                        "hybrid_les_rans" \
@@ -251,6 +264,7 @@ ALL_MULTIPHASE_MODELS=( \
                        "none" \
                        "none" \
                        "none" \
+                       "lagrangian_particles" \
                        "lagrangian_particles" \
                        "volume_of_fluid" \
                        "none" \
