@@ -158,9 +158,12 @@
 
   end type
 
-  integer, parameter :: MAX_FACES_N_NODES = 36  ! 12
-  integer, parameter :: MAX_CELLS_N_NODES = 72  ! 36
-  integer, parameter :: MAX_CELLS_N_FACES = 48  ! 24
+  ! The smallest numbers (third column) are what I believed should be needed
+  ! The medium numbers (second column) are what proved to be necessary
+  ! The largest numbers (first column) are for ARLA geometry
+  integer, parameter :: MAX_FACES_N_NODES = 36  ! 12  ! 12
+  integer, parameter :: MAX_CELLS_N_NODES = 96  ! 72  ! 36
+  integer, parameter :: MAX_CELLS_N_FACES = 72  ! 48  ! 24
   integer, parameter :: MAX_CELLS_N_CELLS = MAX_CELLS_N_FACES
 
   contains
