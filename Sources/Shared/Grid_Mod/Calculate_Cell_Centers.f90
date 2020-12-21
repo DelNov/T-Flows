@@ -7,7 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, n
+  integer :: c, i_nod, n
 !==============================================================================!
 
   ! (Re)initialize cell coordinates
@@ -17,12 +17,13 @@
 
   ! Compute them by adding node coordinates and dividing by their number
   do c = 1, grid % n_cells
-    do n = 1, abs(grid % cells_n_nodes(c))
-      grid % xc(c) = grid % xc(c) + grid % xn(grid % cells_n(n,c))  &
+    do i_nod = 1, abs(grid % cells_n_nodes(c))
+      n = grid % cells_n(i_nod, c)
+      grid % xc(c) = grid % xc(c) + grid % xn(n)  &
                    / real(abs(grid % cells_n_nodes(c)))
-      grid % yc(c) = grid % yc(c) + grid % yn(grid % cells_n(n,c))  &
+      grid % yc(c) = grid % yc(c) + grid % yn(n)  &
                    / real(abs(grid % cells_n_nodes(c)))
-      grid % zc(c) = grid % zc(c) + grid % zn(grid % cells_n(n,c))  &
+      grid % zc(c) = grid % zc(c) + grid % zn(n)  &
                    / real(abs(grid % cells_n_nodes(c)))
     end do
   end do
