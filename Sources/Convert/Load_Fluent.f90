@@ -654,6 +654,20 @@
   print '(a60)', ' # Checking faces                                           '
   print '(a60)', ' #----------------------------------------------------------'
 
+  !----------------------------!
+  !   Check for faces' nodes   !
+  !----------------------------!
+  do s = 1, grid % n_faces
+    do i_nod = 1, grid % faces_n_nodes(s)
+      n = grid % faces_n(i_nod, s)
+      if(n < 1) then
+        print *, '# TROUBLE: some faces'' nodes have indexes less than 1!'
+        print *, '# This error is critical.  Exiting now.!'
+        stop
+      end if
+    end do
+  end do
+
   !----------------------------------------!
   !   Check for duplicate nodes in faces   !
   !----------------------------------------!
@@ -925,7 +939,7 @@
 
     ! Only do this for polyhedral cells
     ! (For the other it was done above)
-    if(grid % cells_n_nodes(c) .eq. 0) then
+    if(grid % cells_n_nodes(c) .eq. -1) then
 
       ! Accumulate nodes from all faces surrounding the cell
       n = 0
@@ -945,6 +959,20 @@
 
     end if  ! if cell was polyhedral
 
+  end do
+
+  !----------------------------!
+  !   Check for cells' nodes   !
+  !----------------------------!
+  do c = 1, grid % n_cells
+    do i_nod = 1, abs(grid % cells_n_nodes(c))
+      n = grid % cells_n(i_nod, c)
+      if(n < 1) then
+        print *, '# ERROR: some cells'' nodes have indexes less than 1!'
+        print *, '# This error is critical.  Exiting now.!'
+        stop
+      end if
+    end do
   end do
 
   !----------------------------------------!
