@@ -218,6 +218,9 @@ ALL_SAVE_EXIT_NOW_TESTS=("$LAMINAR_BACKSTEP_ORTH_DIR")
 # All directories to test Process, followed by physical models
 #--------------------------------------------------------------
 ALL_PROCESS_TESTS=( \
+                   "$LAMINAR_BACKSTEP_ORTH_DIR" \
+                   "$LAMINAR_BACKSTEP_NON_ORTH_DIR" \
+                   "$LAMINAR_BACKSTEP_POLYHEDRAL_DIR" \
                    "$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
                    "$LAMINAR_CAVITY_THERM_DRIVEN_106_DIR" \
                    "$LAMINAR_CAVITY_THERM_DRIVEN_108_DIR" \
@@ -236,6 +239,9 @@ ALL_PROCESS_TESTS=( \
                    "$HYB_CHANNEL_HR_UNIFORM_DIR" \
                    )
 ALL_TURBULENCE_MODELS=( \
+                       "none" \
+                       "none" \
+                       "none" \
                        "none" \
                        "none" \
                        "none" \
@@ -849,10 +855,10 @@ function process_backup_test {
     unlink control.1
     unlink divide.1.scr
 
-    git checkout control
+    git checkout -q control
   else
     unlink control
-    git checkout control.?
+    git checkout -q control.?
   fi
 
   cd - > /dev/null
@@ -1109,10 +1115,10 @@ function process_save_exit_now_test {
     unlink control.1
     unlink divide.1.scr
 
-    git checkout control
+    git checkout -q control
   else
     unlink control
-    git checkout control.?
+    git checkout -q control.?
   fi
 }
 
@@ -1220,10 +1226,10 @@ function process_compilation_test {
     unlink control.1
     unlink divide.1.scr
 
-    git checkout control
+    git checkout -q control
   else
     unlink control
-    git checkout control.?
+    git checkout -q control.?
   fi
 }
 
@@ -1326,10 +1332,10 @@ function process_full_length_test {
     unlink control.1
     unlink divide.1.scr
 
-    git checkout control
+    git checkout -q control
   else
     unlink control
-    git checkout control.?
+    git checkout -q control.?
   fi
 
   # If results are present [produced by User_Mod_Save_Results]
@@ -1444,7 +1450,7 @@ function process_accuracy_test {
     launch_process par $nproc_in_div
 
     # Restore control
-    git checkout control
+    git checkout -q control
 
     # Process chan-ts??????-res.dat
     if ls "$name_in_div"-res-ts??????.dat 1> /dev/null 2>&1; then
