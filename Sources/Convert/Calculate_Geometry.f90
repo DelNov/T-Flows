@@ -10,16 +10,10 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: c, c1, c2, n, s, b
+  integer              :: c, c1, c2, n, n1, n2, s, b
   integer              :: c11, c12, c21, c22, s1, s2, bou_cen, cnt_bnd, cnt_per
   integer              :: color_per, n_per, number_faces
-  integer              :: n1, n2, i_nod, j_nod
-  real                 :: xt(MAX_FACES_N_NODES),  &
-                          yt(MAX_FACES_N_NODES),  &
-                          zt(MAX_FACES_N_NODES)
   real                 :: xs2, ys2, zs2
-  real                 :: x_cell_1, y_cell_1, z_cell_1, dv_1
-  real                 :: x_cell_2, y_cell_2, z_cell_2, dv_2
   real                 :: t, sur_tot, max_dis
   real                 :: v(3), k(3), v_o(3), v_r(3), theta  ! for rotation
   real,    allocatable :: b_coor(:)
@@ -308,9 +302,13 @@
 
           ! This is a dot product of surface vector and vector 1.0, 1.0, 1,0
           if( grid % sx(s) + grid % sy(s) + grid % sz(s) > 0.0 ) then
-            v(1:3) = v(1:3) + (/grid % sx(s), grid % sy(s), grid % sz(s)/)
+            v(1) = v(1) + grid % sx(s)
+            v(2) = v(2) + grid % sy(s)
+            v(3) = v(3) + grid % sz(s)
           else
-            v(1:3) = v(1:3) - (/grid % sx(s), grid % sy(s), grid % sz(s)/)
+            v(1) = v(1) - grid % sx(s)
+            v(2) = v(2) - grid % sy(s)
+            v(3) = v(3) - grid % sz(s)
           end if
         end if
       end if
@@ -647,48 +645,7 @@
   !                  xsp, ysp, zsp   !
   !   <= gives:      vol             !
   !----------------------------------!
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
-
-    do i_nod = 1, grid % faces_n_nodes(s)  ! for all face types
-      xt(i_nod) = grid % xn(grid % faces_n(i_nod,s))
-      yt(i_nod) = grid % yn(grid % faces_n(i_nod,s))
-      zt(i_nod) = grid % zn(grid % faces_n(i_nod,s))
-    end do
-
-    ! First cell
-    x_cell_1 = grid % xc(c1)
-    y_cell_1 = grid % yc(c1)
-    z_cell_1 = grid % zc(c1)
-    do i_nod = 1, grid % faces_n_nodes(s)  ! for all face types
-      j_nod = i_nod + 1;  if(j_nod > grid % faces_n_nodes(s)) j_nod = 1
-
-      dv_1 = Math_Mod_Tet_Volume(grid % xf(s), grid % yf(s), grid % zf(s),  &
-                                 xt(i_nod),    yt(i_nod),    zt(i_nod),     &
-                                 xt(j_nod),    yt(j_nod),    zt(j_nod),     &
-                                 x_cell_1,     y_cell_1,     z_cell_1)
-      grid % vol(c1) = grid % vol(c1) + abs(dv_1)
-    end do  ! i_nod
-
-    ! Second cell
-    if(c2 > 0) then
-      x_cell_2 = grid % xc(c2) + grid % dx(s)
-      y_cell_2 = grid % yc(c2) + grid % dy(s)
-      z_cell_2 = grid % zc(c2) + grid % dz(s)
-
-      do i_nod = 1, grid % faces_n_nodes(s)  ! for all face types
-        j_nod = i_nod + 1;  if(j_nod > grid % faces_n_nodes(s)) j_nod = 1
-
-        dv_2 = Math_Mod_Tet_Volume(grid % xf(s), grid % yf(s), grid % zf(s),  &
-                                   xt(i_nod),    yt(i_nod),    zt(i_nod),     &
-                                   xt(j_nod),    yt(j_nod),    zt(j_nod),     &
-                                   x_cell_2,     y_cell_2,     z_cell_2)
-        grid % vol(c2) = grid % vol(c2) + abs(dv_2)
-      end do  ! i_nod
-    end if
-
-  end do
+  call Grid_Mod_Calculate_Cell_Volumes(grid)
 
   grid % min_vol =  HUGE
   grid % max_vol = -HUGE

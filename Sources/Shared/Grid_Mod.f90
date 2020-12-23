@@ -176,6 +176,7 @@
   include 'Grid_Mod/Bnd_Cond_Type.f90'
   include 'Grid_Mod/Bnd_Cond_Ranges.f90'
   include 'Grid_Mod/Calculate_Cell_Centers.f90'
+  include 'Grid_Mod/Calculate_Cell_Volumes.f90'
   include 'Grid_Mod/Calculate_Face_Centers.f90'
   include 'Grid_Mod/Calculate_Face_Geometry.f90'
   include 'Grid_Mod/Calculate_Face_Interpolation.f90'
