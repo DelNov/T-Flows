@@ -55,4 +55,8 @@
     grid % comm % face_glo(s) = s
   end do
 
+  ! Allocate new and old numbers (this is so often used, maybe is better here)
+  allocate(grid % new_f(nf+ns));  grid % new_f(:) = 0
+  allocate(grid % old_f(nf+ns));  grid % old_f(:) = 0
+
   end subroutine

@@ -77,13 +77,6 @@
   call Grid_Mod_Allocate_Faces(grid,                    &
                                grid % max_n_faces, 0)
 
-  ! Variables for renumbering
-  call Grid_Mod_Allocate_New_Numbers(grid,                    &
-                                     grid % max_n_nodes,      &
-                                     grid % max_n_bnd_cells,  &
-                                     grid % max_n_nodes,      &
-                                     grid % max_n_faces)
-
   call Refines_Mod_Allocate_Cells(ref,                     &
                                   grid % max_n_bnd_cells,  &
                                   grid % max_n_nodes)

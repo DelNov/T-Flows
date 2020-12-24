@@ -7,8 +7,7 @@
   use Grid_Mod, only: Grid_Type,                &
                       Grid_Mod_Allocate_Nodes,  &
                       Grid_Mod_Allocate_Cells,  &
-                      Grid_Mod_Allocate_Faces,  &
-                      Grid_Mod_Allocate_New_Numbers
+                      Grid_Mod_Allocate_Faces
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -30,12 +29,6 @@
   else
     call Grid_Mod_Allocate_Faces(grid, grid % n_faces, 0)
   end if
-
-  call Grid_Mod_Allocate_New_Numbers(grid,                    &
-                                     grid % n_nodes,          &
-                                     grid % n_bnd_cells * F,  &
-                                     grid % n_cells,          &
-                                     grid % n_faces)
 
   allocate(grid % bnd_cond % color(-grid % n_bnd_cells * F:-1))
   grid % bnd_cond % color = 0

@@ -127,8 +127,7 @@ SRC_FUN = Swap_Int.f90			\
           To_Upper_Case.f90
 
 # Local functions are added one by one ...
-SRC_FUN += Allocate_Additional.f90	\
-           Save_Subdomains.f90		\
+SRC_FUN += Save_Subdomains.f90		\
            Logo_Div.f90			\
            Main_Div.f90
 

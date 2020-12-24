@@ -127,9 +127,10 @@
     integer, allocatable :: new_n(:)
     integer, allocatable :: new_c(:)
     integer, allocatable :: new_f(:)
-    integer, allocatable :: new_e(:)
+    integer, allocatable :: new_e(:)  ! used for dual grid creation
 
     ! Old numbers for cells and faces
+    integer, allocatable :: old_n(:)
     integer, allocatable :: old_c(:)
     integer, allocatable :: old_f(:)
 
@@ -170,7 +171,6 @@
 
   include 'Grid_Mod/Allocate_Cells.f90'
   include 'Grid_Mod/Allocate_Faces.f90'
-  include 'Grid_Mod/Allocate_New_Numbers.f90'
   include 'Grid_Mod/Allocate_Nodes.f90'
   include 'Grid_Mod/Bnd_Cond_Name.f90'
   include 'Grid_Mod/Bnd_Cond_Type.f90'

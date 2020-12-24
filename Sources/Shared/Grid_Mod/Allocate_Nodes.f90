@@ -22,4 +22,8 @@
     grid % comm % node_glo(n) = n
   end do
 
+  ! Allocate new and old numbers (this is so often used, maybe is better here)
+  allocate(grid % new_n(n));  grid % new_n(:) = 0
+  allocate(grid % old_n(n));  grid % old_n(:) = 0
+
   end subroutine

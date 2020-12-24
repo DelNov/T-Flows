@@ -26,9 +26,8 @@
   read(line % tokens(1), *)  problem_name(1)
 
   ! Load the finite volume grid
-  call Grid_Mod_Load_Cfn  (grid, 0)
-  call Allocate_Additional(grid)
-  call Grid_Mod_Load_Dim  (grid, 0)
+  call Grid_Mod_Load_Cfn(grid, 0)
+  call Grid_Mod_Load_Dim(grid, 0)
 
   ! Initialize processor numbers (poor idea to put it here)
   grid % comm % cell_proc(-grid % n_bnd_cells:grid % n_cells) = 1

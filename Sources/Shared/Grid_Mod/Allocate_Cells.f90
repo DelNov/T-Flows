@@ -31,11 +31,11 @@
 
   allocate(grid % cells_bnd_face(-nb:-1));  grid % cells_bnd_face(:) = 0
 
-  ! Number of nodes at each cell (determines cell's shape really)
+  ! Number of nodes, faces and cells at each cell
+  ! (Actually, cells_n_faces and cells_n_cells should be the same)
   allocate(grid % cells_n_nodes(-nb:nc));  grid % cells_n_nodes(:) = 0
-
-  ! Number of faces at each cell
   allocate(grid % cells_n_faces(-nb:nc));  grid % cells_n_faces(:) = 0
+  allocate(grid % cells_n_cells(-nb:nc));  grid % cells_n_cells(:) = 0
 
   ! Boundary condition color in a given direction
   ! (These go up to 6 because they are needed for
@@ -48,5 +48,9 @@
   do c = -nb, nc
     grid % comm % cell_glo(c) = c
   end do
+
+  ! Allocate new and old numbers (this is so often used, maybe is better here)
+  allocate(grid % new_c(-nb:nc));  grid % new_c(:) = 0
+  allocate(grid % old_c(-nb:nc));  grid % old_c(:) = 0
 
   end subroutine
