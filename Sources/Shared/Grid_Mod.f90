@@ -198,6 +198,7 @@
   include 'Grid_Mod/Is_Point_In_Cell.f90'
   include 'Grid_Mod/Load_Cfn.f90'
   include 'Grid_Mod/Load_Dim.f90'
+  include 'Grid_Mod/Merge_Duplicate_Nodes.f90'
   include 'Grid_Mod/Print_Bnd_Cond_Info.f90'
   include 'Grid_Mod/Save_Cfn.f90'
   include 'Grid_Mod/Save_Dim.f90'

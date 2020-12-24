@@ -63,6 +63,8 @@
     call Find_Faces   (grid(1))
   end if
 
+  call Grid_Mod_Merge_Duplicate_Nodes(grid(1))
+
   !---------------------------------------------------!
   !                                                   !
   !   Decide if you are going for dual grid as well   !
