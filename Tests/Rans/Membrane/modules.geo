@@ -11,7 +11,7 @@ inner  = 0.8 * radius;
 // 22 - lower domain with two outlet legs
 // 30 - membrane (without legs)
 //------------------------------------------------------------------------------
-VARIANT = 22;
+VARIANT = 30;
 
 n_width = 11;    // number of cells per width
 
@@ -183,35 +183,41 @@ For n In{ 1 : 8 }
 EndFor
 For n In{ 1 : 8 }
   If(n < 8)
-    Transfinite Surface {SURF_INN+n} = {PNT_INN+n,   PNT_DOM+n,
-                                        PNT_DOM+n+1, PNT_INN+n+1};
+    Transfinite Surface{SURF_INN+n} = {PNT_INN+n,   PNT_DOM+n,
+                                       PNT_DOM+n+1, PNT_INN+n+1};
+    Recombine Surface{SURF_INN+n};
   Else
-    Transfinite Surface {SURF_INN+n} = {PNT_INN+n, PNT_DOM+n,
-                                        PNT_DOM+1, PNT_INN+1};
+    Transfinite Surface{SURF_INN+n} = {PNT_INN+n, PNT_DOM+n,
+                                       PNT_DOM+1, PNT_INN+1};
+    Recombine Surface{SURF_INN+n};
   EndIf
 EndFor
 
 Curve Loop(9) = {CIRC_INN+1:CIRC_INN+8};
 Plane Surface(SURF_INN+9) = {9};
+Recombine Surface{SURF_INN+9};
 
 // Surface for legs in x VARIANT
 If(VARIANT == 12)
   Curve Loop(10) = {CIRC_OUT+1, LINE_LEG+3, -(LINE_LEG+1), -(LINE_LEG+2)};
   Plane Surface(SURF_LEG+1) = {10};
+  Recombine Surface{SURF_LEG+1};
   Curve Loop(11) = {CIRC_OUT+5, LINE_LEG+6, -(LINE_LEG+4), -(LINE_LEG+5)};
   Plane Surface(SURF_LEG+2) = {11};
+  Recombine Surface{SURF_LEG+2};
 // Surface for legs in y VARIANT
 ElseIf(VARIANT == 22)
   Curve Loop(10) = {CIRC_OUT+3, LINE_LEG+3, -(LINE_LEG+1), -(LINE_LEG+2)};
   Plane Surface(SURF_LEG+1) = {10};
+  Recombine Surface{SURF_LEG+1};
   Curve Loop(11) = {CIRC_OUT+7, LINE_LEG+6, -(LINE_LEG+4), -(LINE_LEG+5)};
   Plane Surface(SURF_LEG+2) = {11};
+  Recombine Surface{SURF_LEG+2};
 ElseIf(VARIANT == 21)
   Curve Loop(10) = {CIRC_OUT+3, LINE_LEG+3, -(LINE_LEG+1), -(LINE_LEG+2)};
   Plane Surface(SURF_LEG+1) = {10};
+  Recombine Surface{SURF_LEG+1};
 EndIf
-
-Printf("At line 206");
 
 //------------------------------------------------------------------------------
 //
@@ -223,7 +229,10 @@ Field[1].F = Sprintf("(%5.2g)", delta);
 Background Field = 1;
 
 // This experimental algorithm could give better results
-Mesh.RecombinationAlgorithm = 2; // 2 or 3
+Mesh.Algorithm = 8;
+
+// Uncomment the following line to try the full-quad algorithm:
+Mesh.RecombinationAlgorithm = 2; // or 3
 
 //------------------------------------------------------------------------------
 //

@@ -12,7 +12,7 @@
   character(SL)   :: file_name
 !-----------------------------------[Locals]-----------------------------------!
   integer                    :: n_sect, n_elem, n_blocks, n_bnd_sect, n_grps
-  integer                    :: n_memb, n_tags, n_crvs
+  integer                    :: n_memb, n_tags, n_crvs, n_nods
   integer                    :: i, j, c, dim, p_tag, s_tag, type, fu
   integer                    :: run, s_tag_max, n_e_0d, n_e_1d, n_e_2d, n_e_3d
   integer, allocatable       :: n(:), new(:)
@@ -58,12 +58,16 @@
 
   !----------------------------------------------!
   !                                              !
+  !                                              !
   !   Read number of nodes, cells, blocks, ...   !
+  !                                              !
   !                                              !
   !----------------------------------------------!
 
   !-------------------------------------------------!
+  !                                                 !
   !   Read number of blocks and boundary sections   !
+  !                                                 !
   !-------------------------------------------------!
   n_blocks   = 0
   n_bnd_sect = 0
@@ -90,7 +94,9 @@
   end do
 
   !--------------------------!
+  !                          !
   !   Read number of nodes   !
+  !                          !
   !--------------------------!
   rewind(fu)
   do
@@ -107,7 +113,9 @@
   print *,'# Number of nodes: ', grid % n_nodes
 
   !--------------------------------------!
+  !                                      !
   !   Read number of elements (0D - 3D)  !
+  !                                      !
   !--------------------------------------!
   rewind(fu)
   do
@@ -125,7 +133,9 @@
   new(:) = 0
 
   !--------------------------------------!
+  !                                      !
   !   Read info on boundary conditions   !
+  !                                      !
   !--------------------------------------!
   do run = 1, 2  ! in the first run find max index
     if(run .eq. 1) s_tag_max = 0
@@ -149,7 +159,9 @@
       n_e_3d = int8_array(4)  ! number of 3D entities (volumes)
     end if
 
-    ! Skip 0D info
+    !--------------------------!
+    !   Skip 0D (point) info   !
+    !--------------------------!
     if(ascii) then
       do i = 1, n_e_0d
         call File_Mod_Read_Line(fu)
@@ -165,7 +177,9 @@
       end do
     end if
 
-    ! Skip 1D info
+    !--------------------------!
+    !   Skip 1D (curve) info   !
+    !--------------------------!
     if(ascii) then
       do i = 1, n_e_1d
         call File_Mod_Read_Line(fu)
@@ -185,25 +199,32 @@
       end do
     end if
 
-    ! Analyze 2D data
+    !-------------------------------!
+    !   Analyze 2D (surface) data   !
+    !-------------------------------!
     do i = 1, n_e_2d
+
       if(ascii) then
         call File_Mod_Read_Line(fu)
-        read(line % tokens(1), *) s_tag   ! surface tag
-        read(line % tokens(8), *) n_tags  ! this should be one!  check some day
-        read(line % tokens(9), *) p_tag   ! physcal tag
+        read(line % tokens(1), *) s_tag          ! surface tag
+        read(line % tokens(8), *) n_tags         ! for me this was 1 or 0
+        do j = 1, n_tags                         ! browse physical tags ...
+          read(line % tokens(8+j), *) p_tag      ! ... and read them
+        end do
+        read(line % tokens(9+n_tags), *) n_crvs  ! number of bounding curves
       else
         ! Surface's tag
         call File_Mod_Read_Binary_Int4_Array (fu, 1)
         s_tag = int4_array(1)
         ! Bounding box coordinates
         call File_Mod_Read_Binary_Real8_Array(fu, 6)
-        ! Number of physical tags (it is assumed to be one, to check maybe?)
+        ! Number of physical tags
         call File_Mod_Read_Binary_Int8_Array (fu, 1)
         n_tags = int8_array(1)
-        ! Read the one physical tag you assumed to have
-        call File_Mod_Read_Binary_Int4_Array (fu, 1)
-        p_tag = int4_array(1)
+        do j = 1, n_tags  ! read the physical tags you have
+          call File_Mod_Read_Binary_Int4_Array (fu, 1)
+          p_tag = int4_array(1)
+        end do
         ! Number of bounding curves
         call File_Mod_Read_Binary_Int8_Array (fu, 1)
         n_crvs = int8_array(1)
@@ -229,7 +250,9 @@
   end do  ! next run
 
   !----------------------------------------!
+  !                                        !
   !   Count the inner and boundary cells   !
+  !                                        !
   !----------------------------------------!
   grid % n_bnd_cells = 0
   grid % n_cells     = 0
@@ -239,7 +262,9 @@
     if(line % tokens(1) .eq. '$Elements') exit
   end do
 
-  ! Read n_grps
+  !-------------------------------!
+  !   Read the number of groups   !
+  !-------------------------------!
   if(ascii) then
     call File_Mod_Read_Line(fu)
     read(line % tokens(1),*) n_grps
@@ -248,10 +273,12 @@
     n_grps = int8_array(1)
   end if
 
-  ! Browse through groups and read more detailed info
+  !-------------------------------------------------------------!
+  !   Browse through groups to count boundary and inner cells   !
+  !-------------------------------------------------------------!
   do i = 1, n_grps
 
-    ! Read dim, s_tag, type and n_memb
+    ! Read dim, s_tag, type and n_memb <--= this is what you actually need!
     if(ascii) then
       call File_Mod_Read_Line(fu)
       read(line % tokens(1), *) dim     ! dimension of the element
@@ -267,7 +294,7 @@
       n_memb = int8_array(1)  ! number of members in the group
     end if
 
-    ! Read cell number and cell's nodes
+    ! Read cell number and cell's nodes <--= this is just to carry on
     do j = 1, n_memb
       if(ascii) then
         call File_Mod_Read_Line(fu)
@@ -310,7 +337,9 @@
   call Allocate_Memory(grid)
 
   !---------------------------------------------------!
+  !                                                   !
   !   Read boundary conditions for individual cells   !
+  !                                                   !
   !---------------------------------------------------!
   allocate(n_bnd_cells(n_bnd_sect))
   n_bnd_cells(:) = 0
@@ -321,7 +350,9 @@
     if(line % tokens(1) .eq. '$Elements') exit
   end do
 
-  ! Read n_grps
+  !-------------------------------!
+  !   Read the number of groups   !
+  !-------------------------------!
   if(ascii) then
     call File_Mod_Read_Line(fu)
     read(line % tokens(1),*) n_grps
@@ -330,7 +361,9 @@
     n_grps = int8_array(1)
   end if
 
-  ! Browse through groups and read more detailed info
+  !----------------------------------------------------------------!
+  !   Browse through groups, read and extract more detailed info   !
+  !----------------------------------------------------------------!
   do i = 1, n_grps
 
     ! Read dim, s_tag, type and n_memb
@@ -349,6 +382,14 @@
       n_memb = int8_array(1)  ! number of members in the group
     end if
 
+    ! Treat different cell types now
+    if(type .eq. MSH_TRI)   n_nods = 3
+    if(type .eq. MSH_QUAD)  n_nods = 4
+    if(type .eq. MSH_TETRA) n_nods = 4
+    if(type .eq. MSH_WEDGE) n_nods = 6
+    if(type .eq. MSH_HEXA)  n_nods = 8
+    if(type .eq. MSH_PYRA)  n_nods = 5
+
     ! Read cell number and cell's nodes
     do j = 1, n_memb
       if(ascii) then
@@ -356,96 +397,21 @@
         read(line % tokens(1), *) c  ! fetch Gmsh cell number
         c = new(c)                   ! use T-Flows numbering
 
-        ! Treat different cell types now
-        if(type .eq. MSH_TRI) then
-          grid % cells_n_nodes(c) = 3
-          read(line % tokens(2), *) grid % cells_n(1, c)
-          read(line % tokens(3), *) grid % cells_n(2, c)
-          read(line % tokens(4), *) grid % cells_n(3, c)
-        end if
-        if(type .eq. MSH_QUAD) then
-          grid % cells_n_nodes(c) = 4
-          read(line % tokens(2), *) grid % cells_n(1, c)
-          read(line % tokens(3), *) grid % cells_n(2, c)
-          read(line % tokens(4), *) grid % cells_n(3, c)
-          read(line % tokens(5), *) grid % cells_n(4, c)
-        end if
-        if(type .eq. MSH_TETRA) then
-          grid % cells_n_nodes(c) = 4
-          read(line % tokens(2), *) grid % cells_n(1, c)
-          read(line % tokens(3), *) grid % cells_n(2, c)
-          read(line % tokens(4), *) grid % cells_n(3, c)
-          read(line % tokens(5), *) grid % cells_n(4, c)
-        end if
-        if(type .eq. MSH_WEDGE) then
-          grid % cells_n_nodes(c) = 6
-          read(line % tokens(2), *) grid % cells_n(1, c)
-          read(line % tokens(3), *) grid % cells_n(2, c)
-          read(line % tokens(4), *) grid % cells_n(3, c)
-          read(line % tokens(5), *) grid % cells_n(4, c)
-          read(line % tokens(6), *) grid % cells_n(5, c)
-          read(line % tokens(7), *) grid % cells_n(6, c)
-        end if
-        if(type .eq. MSH_HEXA) then
-          grid % cells_n_nodes(c) = 8
-          read(line % tokens(2), *) grid % cells_n(1, c)
-          read(line % tokens(3), *) grid % cells_n(2, c)
-          read(line % tokens(4), *) grid % cells_n(3, c)
-          read(line % tokens(5), *) grid % cells_n(4, c)
-          read(line % tokens(6), *) grid % cells_n(5, c)
-          read(line % tokens(7), *) grid % cells_n(6, c)
-          read(line % tokens(8), *) grid % cells_n(7, c)
-          read(line % tokens(9), *) grid % cells_n(8, c)
-        end if
-        if(type .eq. MSH_PYRA) then
-          grid % cells_n_nodes(c) = 5
-          read(line % tokens(2), *) grid % cells_n(1, c)
-          read(line % tokens(3), *) grid % cells_n(2, c)
-          read(line % tokens(4), *) grid % cells_n(3, c)
-          read(line % tokens(5), *) grid % cells_n(4, c)
-          read(line % tokens(6), *) grid % cells_n(5, c)
-        end if
+        grid % cells_n_nodes(c) = n_nods
+        read(line % tokens(2:n_nods+1), *) grid % cells_n(1:n_nods, c)
 
       else  ! it is in binary format
 
         ! Element tag
-        call File_Mod_Read_Binary_Int8_Array(fu, 1)
+        call File_Mod_Read_Binary_Int8_Array(fu, n_nods+1)
         c = int8_array(1)  ! fetch Gmsh cell number
         c = new(c)         ! use T-Flows numbering
 
-        ! Treat different cell types now
-        if(type .eq. MSH_TRI) then
-          call File_Mod_Read_Binary_Int8_Array(fu, 3)
-          grid % cells_n_nodes(c) = 3
-          grid % cells_n(1:3, c) = int8_array(1:3)
-        end if
-        if(type .eq. MSH_QUAD) then
-          call File_Mod_Read_Binary_Int8_Array(fu, 4)
-          grid % cells_n_nodes(c) = 4
-          grid % cells_n(1:4, c) = int8_array(1:4)
-        end if
-        if(type .eq. MSH_TETRA) then
-          call File_Mod_Read_Binary_Int8_Array(fu, 4)
-          grid % cells_n_nodes(c) = 4
-          grid % cells_n(1:4, c) = int8_array(1:4)
-        end if
-        if(type .eq. MSH_WEDGE) then
-          call File_Mod_Read_Binary_Int8_Array(fu, 6)
-          grid % cells_n_nodes(c) = 6
-          grid % cells_n(1:6, c) = int8_array(1:6)
-        end if
-        if(type .eq. MSH_HEXA) then
-          call File_Mod_Read_Binary_Int8_Array(fu, 8)
-          grid % cells_n_nodes(c) = 8
-          grid % cells_n(1:8, c) = int8_array(1:8)
-        end if
-        if(type .eq. MSH_PYRA) then
-          call File_Mod_Read_Binary_Int8_Array(fu, 5)
-          grid % cells_n_nodes(c) = 5
-          grid % cells_n(1:5, c) = int8_array(1:5)
-        end if
+        grid % cells_n_nodes(c) = n_nods
+        grid % cells_n(1:n_nods, c) = int8_array(2:n_nods+1)
 
       end if
+
       if(dim .eq. 2) then
         grid % bnd_cond % color(c) = phys_tags(s_tag)
         n_bnd_cells(phys_tags(s_tag)) = n_bnd_cells(phys_tags(s_tag)) + 1
@@ -459,7 +425,9 @@
   end do
 
   !--------------------------------!
+  !                                !
   !   Read the nodal coordinates   !
+  !                                !
   !--------------------------------!
   rewind(fu)
   do
@@ -467,7 +435,9 @@
     if(line % tokens(1) .eq. '$Nodes') exit
   end do
 
-  ! Read n_grps
+  !-------------------------------!
+  !   Read the number of groups   !
+  !-------------------------------!
   if(ascii) then
     call File_Mod_Read_Line(fu)
     read(line % tokens(1),*) n_grps
@@ -476,6 +446,9 @@
     n_grps = int8_array(1)
   end if
 
+  !-------------------------------------------------------!
+  !   Browse through groups and fetch nodal coordinates   !
+  !-------------------------------------------------------!
   do i = 1, n_grps
     if(ascii) then
       call File_Mod_Read_Line(fu)
@@ -519,9 +492,11 @@
     deallocate(n)
   end do
 
-  !-------------------------!
-  !   Boundary conditions   !
-  !-------------------------!
+  !----------------------------------!
+  !                                  !
+  !   Copy boundary condition info   !
+  !                                  !
+  !----------------------------------!
   grid % n_bnd_cond = n_bnd_sect
   allocate(grid % bnd_cond % name(n_bnd_sect))
 
@@ -531,7 +506,9 @@
   end do
 
   !------------------------------------!
-  !   Pring boundary conditions info   !
+  !                                    !
+  !   Print boundary conditions info   !
+  !                                    !
   !------------------------------------!
   call Grid_Mod_Print_Bnd_Cond_List(grid)
 
