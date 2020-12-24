@@ -23,19 +23,20 @@
   ext = '.faces.vtu'
 
   ! Fix counters and file extension if you are plotting shadows
+  ! (Keep in mind that minval and maxval return HUGE if no mask is matched)
   if(present(plot_shadows)) then
-    if(plot_shadows) then
-      s_f = minval(grid % faces_s(1:grid % n_faces),  &
-              mask=grid % faces_s(1:grid % n_faces) .ne. 0)
-      s_l = maxval(grid % faces_s(1:grid % n_faces),  &
-              mask=grid % faces_s(1:grid % n_faces) .ne. 0)
-      ext = '.shadows.vtu'
+    if( plot_shadows ) then
+      if( any(grid % faces_s(1:grid % n_faces) .ne. 0) ) then
+        s_f = minval(grid % faces_s(1:grid % n_faces),  &
+                mask=grid % faces_s(1:grid % n_faces) .ne. 0)
+        s_l = maxval(grid % faces_s(1:grid % n_faces),  &
+                mask=grid % faces_s(1:grid % n_faces) .ne. 0)
+        ext = '.shadows.vtu'
+      else
+        print *, '# NOTE: No shadow faces in this domain, nothing to plot!'
+        return
+      end if
     end if
-  end if
-
-  if(s_l - s_f < 1) then
-    print *, '# NOTE: No shadow faces in this domain, nothing to plot!'
-    return
   end if
 
   ! Count connections in this subdomain, you will need it later
