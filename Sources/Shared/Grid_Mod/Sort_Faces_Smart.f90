@@ -18,7 +18,7 @@
   integer, allocatable :: old_nods(:,:)
   real,    allocatable :: old_bxyz(:,:)
   integer, allocatable :: criteria(:,:)
-  integer, parameter   :: BIG     = 2147483647
+  integer, parameter   :: BIG     = 2147483647  ! Euler's prime number
   logical, parameter   :: VERBOSE = .false.
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: M = MAX_FACES_N_NODES
