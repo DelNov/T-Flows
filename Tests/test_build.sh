@@ -418,6 +418,8 @@ function launch_generate {
   # $1 = relative dir
   # $2 = quiet
 
+  echo "  ->" $1
+
   make_links $TEST_DIR/$1
   if [ "$2" != "quiet" ]; then
     elog ""
@@ -451,6 +453,8 @@ function launch_divide {
   # $1 = relative dir
   # $2 = quiet
 
+  echo "  ->" $1
+
   make_links $TEST_DIR/$1
   if [ "$2" != "quiet" ]; then
     elog ""
@@ -482,6 +486,9 @@ function launch_divide {
 #------------------------------------------------------------------------------#
 function launch_convert {
   # $1 = relative dir
+
+  echo "  ->" $1
+
   elog ""
   elog "#=================================================================="
   elog "#   Convert test:" $1
@@ -515,6 +522,8 @@ function launch_convert {
 function launch_process {
   # $1 - seq/par
   # $2 - number of threads
+
+  echo "  ->" $1
 
   if [ -z "${1+xxx}" ]; then 
     elog "Argument seq/par is not specified"
@@ -699,7 +708,9 @@ function get_value_next_to_keyword {
 # processor: backup test
 #------------------------------------------------------------------------------#
 function process_backup_test {
-  # 1 = test_dir
+  # $1 = test_dir
+
+  echo "  ->" $1
 
   if [ -z "${1+xxx}" ]; then 
     elog "Directory is not set at all"
@@ -1185,6 +1196,8 @@ function launch_matplotlib {
 function process_compilation_test {
   # $1 = relative dir with test
 
+  echo "  ->" $1
+
   elog ""
   elog "#=================================================================="
   elog "#  Compilation test in:" $1
@@ -1259,6 +1272,8 @@ function process_full_length_test {
   # $2 = turbulence model
   # $3 = multiphase model
   # $4 = dir with results
+
+  echo "  ->" $1
 
   if [ -z "${1+xxx}" ]; then 
     elog "Directory is not set at all"
@@ -1405,6 +1420,8 @@ function process_full_length_tests {
 #------------------------------------------------------------------------------#
 function process_accuracy_test {
   # $1 = case dir
+
+  echo "  ->" $1
 
   # Full path to test case
   path="$TEST_DIR"/"$1"
