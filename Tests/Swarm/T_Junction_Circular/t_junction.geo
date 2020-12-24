@@ -667,13 +667,13 @@ EndFor
 // here I might be brave enough to delete them
 //-----------------------------------------------------------
 Recursive Delete {
-  Surface{13}; Surface{14};  // core surfaces in the central orthogonal set
-  Surface{19}; Surface{20};  // core surfaces in the central anticlockw set
-  Surface{23}; Surface{24};  // core surfaces in the central clockwise set
-  Surface{49}; Surface{50}; Surface{51}; Surface{52};  // middle orthogonal set
-  Surface{61}; Surface{62}; Surface{63}; Surface{64};  // middle anticlockwise
-  Surface{72}; Surface{71}; Surface{70}; Surface{69};  // middle clockwise
-  Surface{97}; Surface{98}; Surface{99}; Surface{100}; // blayer orthogonal
+  Surface{ 13}; Surface{ 14};  // core surfaces in the central orthogonal set
+  Surface{ 19}; Surface{ 20};  // core surfaces in the central anticlockw set
+  Surface{ 23}; Surface{ 24};  // core surfaces in the central clockwise set
+  Surface{ 49}; Surface{ 50}; Surface{ 51}; Surface{ 52};  // middle orthogonal set
+  Surface{ 61}; Surface{ 62}; Surface{ 63}; Surface{ 64};  // middle anticlockwise
+  Surface{ 72}; Surface{ 71}; Surface{ 70}; Surface{ 69};  // middle clockwise
+  Surface{ 97}; Surface{ 98}; Surface{ 99}; Surface{100};  // blayer orthogonal
   Surface{109}; Surface{110}; Surface{111}; Surface{112};  // bl anticlock
   Surface{120}; Surface{119}; Surface{118}; Surface{117};  // bl clockwise
 }
@@ -685,86 +685,146 @@ Recursive Delete {
 //---------
 
 // Volumes in the core at xmin
-vc++;  Surface Loop(vc) = { 1, 17, 121, 133, 134, 122};  Volume(vc) = {vc};  Transfinite Volume{vc} = {1, 4, 29, 5, 7, 39, 38, 6};
-vc++;  Surface Loop(vc) = { 2, 18, 122, 135, 136, 123};  Volume(vc) = {vc};  Transfinite Volume{vc} = {9, 33, 4, 1, 8, 40, 39, 7};
-vc++;  Surface Loop(vc) = { 3, 15, 123, 137, 138, 124};  Volume(vc) = {vc};  Transfinite Volume{vc} = {10, 34, 35, 11, 9, 33, 4, 1};
-vc++;  Surface Loop(vc) = { 4, 16, 124, 139, 140, 121};  Volume(vc) = {vc};  Transfinite Volume{vc} = {11, 35, 36, 12, 1, 4, 29, 5};
+vc++;  Surface Loop(vc) = { 1, 17, 121, 133, 134, 122};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {1, 4, 29, 5, 7, 39, 38, 6};
+vc++;  Surface Loop(vc) = { 2, 18, 122, 135, 136, 123};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {9, 33, 4, 1, 8, 40, 39, 7};
+vc++;  Surface Loop(vc) = { 3, 15, 123, 137, 138, 124};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {10, 34, 35, 11, 9, 33, 4, 1};
+vc++;  Surface Loop(vc) = { 4, 16, 124, 139, 140, 121};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {11, 35, 36, 12, 1, 4, 29, 5};
 
 // Volumes in the core at xmax
-vc++;  Surface Loop(vc) = { 5, 21, 125, 141, 142, 126};  Volume(vc) = {vc};  Transfinite Volume{vc} = {4, 2, 13, 29, 47, 15, 14, 46};
-vc++;  Surface Loop(vc) = { 6, 22, 126, 143, 144, 127};  Volume(vc) = {vc};  Transfinite Volume{vc} = {33, 17, 2, 4, 48, 16, 15, 47};
-vc++;  Surface Loop(vc) = { 7, 15, 127, 145, 146, 128};  Volume(vc) = {vc};  Transfinite Volume{vc} = {34, 18, 19, 35, 33, 17, 2, 4};
-vc++;  Surface Loop(vc) = { 8, 16, 128, 147, 148, 125};  Volume(vc) = {vc};  Transfinite Volume{vc} = {35, 19, 20, 36, 4, 2, 13, 29};
+vc++;  Surface Loop(vc) = { 5, 21, 125, 141, 142, 126};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {4, 2, 13, 29, 47, 15, 14, 46};
+vc++;  Surface Loop(vc) = { 6, 22, 126, 143, 144, 127};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {33, 17, 2, 4, 48, 16, 15, 47};
+vc++;  Surface Loop(vc) = { 7, 15, 127, 145, 146, 128};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {34, 18, 19, 35, 33, 17, 2, 4};
+vc++;  Surface Loop(vc) = { 8, 16, 128, 147, 148, 125};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {35, 19, 20, 36, 4, 2, 13, 29};
 
 // Volumes in the core at zmax
-vc++;  Surface Loop(vc) = { 9, 17, 129, 149, 150, 130};  Volume(vc) = {vc};  Transfinite Volume{vc} = {39, 4, 29, 38, 23, 3, 21, 22};
-vc++;  Surface Loop(vc) = {10, 18, 130, 151, 152, 131};  Volume(vc) = {vc};  Transfinite Volume{vc} = {40, 33, 4, 39, 24, 25, 3, 23};
-vc++;  Surface Loop(vc) = {11, 22, 131, 153, 154, 132};  Volume(vc) = {vc};  Transfinite Volume{vc} = {33, 48, 47, 4, 25, 26, 27, 3};
-vc++;  Surface Loop(vc) = {12, 21, 132, 155, 156, 129};  Volume(vc) = {vc};  Transfinite Volume{vc} = {4, 47, 46, 29, 3, 27, 28, 21};
+vc++;  Surface Loop(vc) = { 9, 17, 129, 149, 150, 130};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {39, 4, 29, 38, 23, 3, 21, 22};
+vc++;  Surface Loop(vc) = {10, 18, 130, 151, 152, 131};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {40, 33, 4, 39, 24, 25, 3, 23};
+vc++;  Surface Loop(vc) = {11, 22, 131, 153, 154, 132};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {33, 48, 47, 4, 25, 26, 27, 3};
+vc++;  Surface Loop(vc) = {12, 21, 132, 155, 156, 129};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {4, 47, 46, 29, 3, 27, 28, 21};
 
 Printf("Core finished with volume %g", vc);
 
 // Volumes in the middle at xmin
-vc++;  Surface Loop(vc) = {25, 57, 133, 157, 181, 158};  Volume(vc) = {vc};  Transfinite Volume{vc} = {5, 29, 77, 53, 6, 38, 86, 54};
-vc++;  Surface Loop(vc) = {26, 58, 134, 158, 182, 159};  Volume(vc) = {vc};  Transfinite Volume{vc} = {7, 39, 38, 6, 55, 87, 86, 54};
-vc++;  Surface Loop(vc) = {27, 59, 135, 159, 183, 160};  Volume(vc) = {vc};  Transfinite Volume{vc} = {8, 40, 39, 7, 56, 88, 87, 55};
-vc++;  Surface Loop(vc) = {28, 60, 136, 160, 184, 161};  Volume(vc) = {vc};  Transfinite Volume{vc} = {57, 81, 33, 9, 56, 88, 40, 8};
-vc++;  Surface Loop(vc) = {29, 53, 137, 161, 185, 162};  Volume(vc) = {vc};  Transfinite Volume{vc} = {58, 82, 34, 10, 57, 81, 33, 9};
-vc++;  Surface Loop(vc) = {30, 54, 138, 162, 186, 163};  Volume(vc) = {vc};  Transfinite Volume{vc} = {58, 82, 83, 59, 10, 34, 35, 11};
-vc++;  Surface Loop(vc) = {31, 55, 139, 163, 187, 164};  Volume(vc) = {vc};  Transfinite Volume{vc} = {59, 83, 84, 60, 11, 35, 36, 12};
-vc++;  Surface Loop(vc) = {32, 56, 140, 164, 188, 157};  Volume(vc) = {vc};  Transfinite Volume{vc} = {12, 36, 84, 60, 5, 29, 77, 53};
+vc++;  Surface Loop(vc) = {25, 57, 133, 157, 181, 158};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {5, 29, 77, 53, 6, 38, 86, 54};
+vc++;  Surface Loop(vc) = {26, 58, 134, 158, 182, 159};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {7, 39, 38, 6, 55, 87, 86, 54};
+vc++;  Surface Loop(vc) = {27, 59, 135, 159, 183, 160};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {8, 40, 39, 7, 56, 88, 87, 55};
+vc++;  Surface Loop(vc) = {28, 60, 136, 160, 184, 161};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {57, 81, 33, 9, 56, 88, 40, 8};
+vc++;  Surface Loop(vc) = {29, 53, 137, 161, 185, 162};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {58, 82, 34, 10, 57, 81, 33, 9};
+vc++;  Surface Loop(vc) = {30, 54, 138, 162, 186, 163};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {58, 82, 83, 59, 10, 34, 35, 11};
+vc++;  Surface Loop(vc) = {31, 55, 139, 163, 187, 164};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {59, 83, 84, 60, 11, 35, 36, 12};
+vc++;  Surface Loop(vc) = {32, 56, 140, 164, 188, 157};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {12, 36, 84, 60, 5, 29, 77, 53};
 
 // Volumes in the middle at xmax
-vc++;  Surface Loop(vc) = {33, 65, 165, 189, 166, 141};  Volume(vc) = {vc};  Transfinite Volume{vc} = {29, 13, 61, 77, 46, 14, 62, 94};
-vc++;  Surface Loop(vc) = {34, 66, 166, 190, 167, 142};  Volume(vc) = {vc};  Transfinite Volume{vc} = {47, 15, 14, 46, 95, 63, 62, 94};
-vc++;  Surface Loop(vc) = {35, 67, 167, 191, 168, 143};  Volume(vc) = {vc};  Transfinite Volume{vc} = {48, 16, 15, 47, 96, 64, 63, 95};
-vc++;  Surface Loop(vc) = {36, 68, 168, 192, 169, 144};  Volume(vc) = {vc};  Transfinite Volume{vc} = {81, 65, 17, 33, 96, 64, 16, 48};
-vc++;  Surface Loop(vc) = {37, 53, 169, 193, 170, 145};  Volume(vc) = {vc};  Transfinite Volume{vc} = {82, 66, 18, 34, 81, 65, 17, 33};
-vc++;  Surface Loop(vc) = {38, 54, 170, 194, 171, 146};  Volume(vc) = {vc};  Transfinite Volume{vc} = {82, 66, 18, 34, 83, 67, 19, 35};
-vc++;  Surface Loop(vc) = {39, 55, 171, 195, 172, 147};  Volume(vc) = {vc};  Transfinite Volume{vc} = {83, 67, 68, 84, 35, 19, 20, 36};
-vc++;  Surface Loop(vc) = {40, 56, 172, 196, 165, 148};  Volume(vc) = {vc};  Transfinite Volume{vc} = {36, 20, 68, 84, 29, 13, 61, 77};
+vc++;  Surface Loop(vc) = {33, 65, 165, 189, 166, 141};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {29, 13, 61, 77, 46, 14, 62, 94};
+vc++;  Surface Loop(vc) = {34, 66, 166, 190, 167, 142};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {47, 15, 14, 46, 95, 63, 62, 94};
+vc++;  Surface Loop(vc) = {35, 67, 167, 191, 168, 143};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {48, 16, 15, 47, 96, 64, 63, 95};
+vc++;  Surface Loop(vc) = {36, 68, 168, 192, 169, 144};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {81, 65, 17, 33, 96, 64, 16, 48};
+vc++;  Surface Loop(vc) = {37, 53, 169, 193, 170, 145};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {82, 66, 18, 34, 81, 65, 17, 33};
+vc++;  Surface Loop(vc) = {38, 54, 170, 194, 171, 146};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {82, 66, 18, 34, 83, 67, 19, 35};
+vc++;  Surface Loop(vc) = {39, 55, 171, 195, 172, 147};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {83, 67, 68, 84, 35, 19, 20, 36};
+vc++;  Surface Loop(vc) = {40, 56, 172, 196, 165, 148};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {36, 20, 68, 84, 29, 13, 61, 77};
 
 // Volumes in the middle at zmax
-vc++;  Surface Loop(vc) = {41, 57, 149, 173, 197, 174};  Volume(vc) = {vc};  Transfinite Volume{vc} = {38, 29, 77, 86, 22, 21, 69, 70};
-vc++;  Surface Loop(vc) = {42, 58, 150, 174, 198, 175};  Volume(vc) = {vc};  Transfinite Volume{vc} = {87, 39, 38, 86, 71, 23, 22, 70};
-vc++;  Surface Loop(vc) = {43, 59, 151, 175, 199, 176};  Volume(vc) = {vc};  Transfinite Volume{vc} = {88, 40, 39, 87, 72, 24, 23, 71};
-vc++;  Surface Loop(vc) = {44, 60, 152, 176, 200, 177};  Volume(vc) = {vc};  Transfinite Volume{vc} = {72, 73, 25, 24, 88, 81, 33, 40};
-vc++;  Surface Loop(vc) = {45, 68, 153, 177, 201, 178};  Volume(vc) = {vc};  Transfinite Volume{vc} = {81, 96, 48, 33, 73, 74, 26, 25};
-vc++;  Surface Loop(vc) = {46, 67, 154, 178, 202, 179};  Volume(vc) = {vc};  Transfinite Volume{vc} = {96, 95, 47, 48, 74, 75, 27, 26};
-vc++;  Surface Loop(vc) = {47, 66, 155, 179, 203, 180};  Volume(vc) = {vc};  Transfinite Volume{vc} = {47, 95, 94, 46, 27, 75, 76, 28};
-vc++;  Surface Loop(vc) = {48, 65, 156, 180, 204, 173};  Volume(vc) = {vc};  Transfinite Volume{vc} = {29, 46, 94, 77, 21, 28, 76, 69};
+vc++;  Surface Loop(vc) = {41, 57, 149, 173, 197, 174};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {38, 29, 77, 86, 22, 21, 69, 70};
+vc++;  Surface Loop(vc) = {42, 58, 150, 174, 198, 175};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {87, 39, 38, 86, 71, 23, 22, 70};
+vc++;  Surface Loop(vc) = {43, 59, 151, 175, 199, 176};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {88, 40, 39, 87, 72, 24, 23, 71};
+vc++;  Surface Loop(vc) = {44, 60, 152, 176, 200, 177};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {72, 73, 25, 24, 88, 81, 33, 40};
+vc++;  Surface Loop(vc) = {45, 68, 153, 177, 201, 178};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {81, 96, 48, 33, 73, 74, 26, 25};
+vc++;  Surface Loop(vc) = {46, 67, 154, 178, 202, 179};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {96, 95, 47, 48, 74, 75, 27, 26};
+vc++;  Surface Loop(vc) = {47, 66, 155, 179, 203, 180};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {47, 95, 94, 46, 27, 75, 76, 28};
+vc++;  Surface Loop(vc) = {48, 65, 156, 180, 204, 173};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {29, 46, 94, 77, 21, 28, 76, 69};
 
 Printf("Middle finished with volume %g", vc);
 
 // Volumes in the boundary layer at xmin (like middle at xmin +52 except second column in the lower part?)
-vc++;  Surface Loop(vc) = {73, 105, 181, 205, 229, 206};  Volume(vc) = {vc};  Transfinite Volume{vc} = {53, 77, 125, 101, 54, 86, 134, 102};
-vc++;  Surface Loop(vc) = {74, 106, 182, 206, 230, 207};  Volume(vc) = {vc};  Transfinite Volume{vc} = {55, 87, 86, 54, 103, 135, 134, 102};
-vc++;  Surface Loop(vc) = {75, 107, 183, 207, 231, 208};  Volume(vc) = {vc};  Transfinite Volume{vc} = {56, 88, 87, 55, 104, 136, 135, 103};
-vc++;  Surface Loop(vc) = {76, 108, 184, 208, 232, 209};  Volume(vc) = {vc};  Transfinite Volume{vc} = {57, 81, 88, 56, 105, 129, 136, 104};
-vc++;  Surface Loop(vc) = {77, 101, 185, 209, 233, 210};  Volume(vc) = {vc};  Transfinite Volume{vc} = {106, 130, 82, 58, 105, 129, 81, 57};
-vc++;  Surface Loop(vc) = {78, 102, 186, 210, 234, 211};  Volume(vc) = {vc};  Transfinite Volume{vc} = {106, 130, 131, 107, 58, 82, 83, 59};
-vc++;  Surface Loop(vc) = {79, 103, 187, 211, 235, 212};  Volume(vc) = {vc};  Transfinite Volume{vc} = {107, 131, 132, 108, 59, 83, 84, 60};
-vc++;  Surface Loop(vc) = {80, 104, 188, 212, 236, 205};  Volume(vc) = {vc};  Transfinite Volume{vc} = {60, 84, 132, 108, 53, 77, 125, 101};
+vc++;  Surface Loop(vc) = {73, 105, 181, 205, 229, 206};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {53, 77, 125, 101, 54, 86, 134, 102};
+vc++;  Surface Loop(vc) = {74, 106, 182, 206, 230, 207};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {55, 87, 86, 54, 103, 135, 134, 102};
+vc++;  Surface Loop(vc) = {75, 107, 183, 207, 231, 208};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {56, 88, 87, 55, 104, 136, 135, 103};
+vc++;  Surface Loop(vc) = {76, 108, 184, 208, 232, 209};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {57, 81, 88, 56, 105, 129, 136, 104};
+vc++;  Surface Loop(vc) = {77, 101, 185, 209, 233, 210};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {106, 130, 82, 58, 105, 129, 81, 57};
+vc++;  Surface Loop(vc) = {78, 102, 186, 210, 234, 211};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {106, 130, 131, 107, 58, 82, 83, 59};
+vc++;  Surface Loop(vc) = {79, 103, 187, 211, 235, 212};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {107, 131, 132, 108, 59, 83, 84, 60};
+vc++;  Surface Loop(vc) = {80, 104, 188, 212, 236, 205};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {60, 84, 132, 108, 53, 77, 125, 101};
 
 // Volumes in the boundary layer at xmax
-vc++;  Surface Loop(vc) = {81, 113, 189, 213, 237, 214};  Volume(vc) = {vc};  Transfinite Volume{vc} = {77, 61, 109, 125, 94, 62, 110, 142};
-vc++;  Surface Loop(vc) = {82, 114, 190, 214, 238, 215};  Volume(vc) = {vc};  Transfinite Volume{vc} = {95, 63, 62, 94, 143, 111, 110, 142};
-vc++;  Surface Loop(vc) = {83, 115, 191, 215, 239, 216};  Volume(vc) = {vc};  Transfinite Volume{vc} = {96, 64, 63, 95, 144, 112, 111, 143};
-vc++;  Surface Loop(vc) = {84, 116, 192, 216, 240, 217};  Volume(vc) = {vc};  Transfinite Volume{vc} = {129, 113, 65, 81, 144, 112, 64, 96};
-vc++;  Surface Loop(vc) = {85, 101, 193, 217, 241, 218};  Volume(vc) = {vc};  Transfinite Volume{vc} = {130, 114, 66, 82, 129, 113, 65, 81};
-vc++;  Surface Loop(vc) = {86, 102, 194, 218, 242, 219};  Volume(vc) = {vc};  Transfinite Volume{vc} = {130, 114, 115, 131, 82, 66, 67, 83};
-vc++;  Surface Loop(vc) = {87, 103, 195, 219, 243, 220};  Volume(vc) = {vc};  Transfinite Volume{vc} = {131, 115, 116, 132, 83, 67, 68, 84};
-vc++;  Surface Loop(vc) = {88, 104, 196, 220, 244, 213};  Volume(vc) = {vc};  Transfinite Volume{vc} = {132, 116, 109, 125, 84, 68, 61, 77};
+vc++;  Surface Loop(vc) = {81, 113, 189, 213, 237, 214};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {77, 61, 109, 125, 94, 62, 110, 142};
+vc++;  Surface Loop(vc) = {82, 114, 190, 214, 238, 215};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {95, 63, 62, 94, 143, 111, 110, 142};
+vc++;  Surface Loop(vc) = {83, 115, 191, 215, 239, 216};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {96, 64, 63, 95, 144, 112, 111, 143};
+vc++;  Surface Loop(vc) = {84, 116, 192, 216, 240, 217};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {129, 113, 65, 81, 144, 112, 64, 96};
+vc++;  Surface Loop(vc) = {85, 101, 193, 217, 241, 218};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {130, 114, 66, 82, 129, 113, 65, 81};
+vc++;  Surface Loop(vc) = {86, 102, 194, 218, 242, 219};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {130, 114, 115, 131, 82, 66, 67, 83};
+vc++;  Surface Loop(vc) = {87, 103, 195, 219, 243, 220};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {131, 115, 116, 132, 83, 67, 68, 84};
+vc++;  Surface Loop(vc) = {88, 104, 196, 220, 244, 213};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {132, 116, 109, 125, 84, 68, 61, 77};
 //+
 // Volumes in the boundary layer at zmax
-vc++;  Surface Loop(vc) = {89, 105, 197, 221, 245, 222};  Volume(vc) = {vc};  Transfinite Volume{vc} = {86, 77, 125, 134, 70, 69, 117, 118};
-vc++;  Surface Loop(vc) = {90, 106, 198, 222, 246, 223};  Volume(vc) = {vc};  Transfinite Volume{vc} = {135, 87, 86, 134, 119, 71, 70, 118};
-vc++;  Surface Loop(vc) = {91, 107, 199, 223, 247, 224};  Volume(vc) = {vc};  Transfinite Volume{vc} = {136, 88, 87, 135, 120, 72, 71, 119};
-vc++;  Surface Loop(vc) = {92, 108, 200, 224, 248, 225};  Volume(vc) = {vc};  Transfinite Volume{vc} = {136, 129, 81, 88, 120, 121, 73, 72};
-vc++;  Surface Loop(vc) = {93, 116, 201, 225, 249, 226};  Volume(vc) = {vc};  Transfinite Volume{vc} = {129, 144, 96, 81, 121, 122, 74, 73};
-vc++;  Surface Loop(vc) = {94, 115, 202, 226, 250, 227};  Volume(vc) = {vc};  Transfinite Volume{vc} = {96, 144, 143, 95, 74, 122, 123, 75};
-vc++;  Surface Loop(vc) = {95, 114, 203, 227, 251, 228};  Volume(vc) = {vc};  Transfinite Volume{vc} = {95, 143, 142, 94, 75, 123, 124, 76};
-vc++;  Surface Loop(vc) = {96, 113, 204, 228, 252, 221};  Volume(vc) = {vc};  Transfinite Volume{vc} = {77, 94, 142, 125, 69, 76, 124, 117};
+vc++;  Surface Loop(vc) = {89, 105, 197, 221, 245, 222};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {86, 77, 125, 134, 70, 69, 117, 118};
+vc++;  Surface Loop(vc) = {90, 106, 198, 222, 246, 223};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {135, 87, 86, 134, 119, 71, 70, 118};
+vc++;  Surface Loop(vc) = {91, 107, 199, 223, 247, 224};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {136, 88, 87, 135, 120, 72, 71, 119};
+vc++;  Surface Loop(vc) = {92, 108, 200, 224, 248, 225};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {136, 129, 81, 88, 120, 121, 73, 72};
+vc++;  Surface Loop(vc) = {93, 116, 201, 225, 249, 226};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {129, 144, 96, 81, 121, 122, 74, 73};
+vc++;  Surface Loop(vc) = {94, 115, 202, 226, 250, 227};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {96, 144, 143, 95, 74, 122, 123, 75};
+vc++;  Surface Loop(vc) = {95, 114, 203, 227, 251, 228};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {95, 143, 142, 94, 75, 123, 124, 76};
+vc++;  Surface Loop(vc) = {96, 113, 204, 228, 252, 221};  Volume(vc) = {vc};
+Transfinite Volume{vc} = {77, 94, 142, 125, 69, 76, 124, 117};
 
 Printf("Boundary layer finished with volume %g", vc);
 
@@ -795,5 +855,5 @@ Physical Surface("Z_MAX") = {Surface In BoundingBox{-HUGE, -HUGE, LI-TINY,
 // being based on nodes, will not work if some nodes are duplicated
 //
 //--------------------------------------------------------------------
-Coherence;
+// Coherence;
 
