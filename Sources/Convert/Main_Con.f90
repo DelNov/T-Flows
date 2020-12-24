@@ -63,6 +63,8 @@
     call Find_Faces   (grid(1))
   end if
 
+  ! Some mesh generators (Gmsh for sure) can leave duplicate
+  ! nodes in the grid. Check it and eliminate them with this
   call Grid_Mod_Merge_Duplicate_Nodes(grid(1))
 
   !---------------------------------------------------!
@@ -120,6 +122,8 @@
     ! Should check like this:   write(20, '(99i9)') s, grid % faces_s(s)
     ! Should check like this: end do
     ! Similar note is in Generate, also called Note #1
+
+    call Grid_Mod_Print_Statistics(grid(g))
 
     !-------------------------------!
     !   Save files for processing   !
