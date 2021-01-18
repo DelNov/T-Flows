@@ -36,7 +36,7 @@
   real,            pointer :: u_mean(:), v_mean(:), w_mean(:)
   integer                  :: i, c, c1, c2, m, s, nks, nvs, sc, fu
   integer                  :: n_wall, n_inflow, n_outflow, n_symmetry,  &
-                              n_heated_wall, n_convect
+                              n_heated_wall, n_pressure, n_convect
   character(SL)            :: keys(128)
   character(SL)            :: keys_file(128)
   real                     :: vals(0:128)   ! note that they start from zero!
@@ -368,6 +368,7 @@
   n_symmetry    = 0
   n_heated_wall = 0
   n_convect     = 0
+  n_pressure    = 0
 
   bulk % vol_in = 0.0
   do s = 1, grid % n_faces
@@ -394,6 +395,8 @@
         n_heated_wall = n_heated_wall + 1
       if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT)   &
         n_convect     = n_convect     + 1
+      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE)  &
+        n_pressure    = n_pressure    + 1
     else
       v_flux % n(s) = 0.0
     end if
@@ -406,6 +409,7 @@
   call Comm_Mod_Global_Sum_Int(n_symmetry)
   call Comm_Mod_Global_Sum_Int(n_heated_wall)
   call Comm_Mod_Global_Sum_Int(n_convect)
+  call Comm_Mod_Global_Sum_Int(n_pressure)
   call Comm_Mod_Global_Sum_Real(bulk % vol_in)
   call Comm_Mod_Global_Sum_Real(area)
 
@@ -430,6 +434,7 @@
     print *, '# Number of symetry faces            : ', n_symmetry
     print *, '# Number of faces on the heated wall : ', n_heated_wall
     print *, '# Number of convective outflow faces : ', n_convect
+    print *, '# Number of pressure outflow faces   : ', n_pressure
     print *, '# Variables initialized !'
   end if
 
