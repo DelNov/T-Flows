@@ -120,7 +120,11 @@
     end if
   end do
 
-  ! Compute bare-bone coefficients for system matrix
+  ! Bare-bone coefficients for system matrix with overrelaxed correction
+  ! In Denner's thesis at page 51 it is used: alpha_f = 1.0 / (n dot d)
+  ! (d is s in Denner's thesis) or: alpha_f = sqrt(s dot s) / (s dot d).
+  ! If multiplied with surface area which is sqrt(s dot s), the final
+  ! coefficient reads: fc = (s dot s) / (s dot d), as computed below:
   do s = 1, grid % n_faces
     matrix % fc(s) = (  grid % sx(s)*grid % sx(s)    &
                       + grid % sy(s)*grid % sy(s)    &

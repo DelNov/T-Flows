@@ -23,8 +23,7 @@
   real, contiguous,  pointer :: b(:)
   integer                    :: c, s, c1, c2
   real                       :: a12, a21, con_eff_f, con_t_f
-  real                       :: f_ex1, f_im1, tx_f1, ty_f1, tz_f1
-  real                       :: f_ex2, f_im2, tx_f2, ty_f2, tz_f2
+  real                       :: f_ex, f_im, tx_f, ty_f, tz_f
   real                       :: pr_t1, pr_t2, pr_tf
   real                       :: t_stress, dt
   real                       :: cap_dens_c1, cap_dens_c2
@@ -137,12 +136,9 @@
     end if
 
     ! Gradients on the cell face (fw corrects situation close to the wall)
-    tx_f1 = grid % fw(s) * t % x(c1) + (1.0-grid % fw(s)) * t % x(c2)
-    ty_f1 = grid % fw(s) * t % y(c1) + (1.0-grid % fw(s)) * t % y(c2)
-    tz_f1 = grid % fw(s) * t % z(c1) + (1.0-grid % fw(s)) * t % z(c2)
-    tx_f2 = tx_f1
-    ty_f2 = ty_f1
-    tz_f2 = tz_f1
+    tx_f = grid % fw(s) * t % x(c1) + (1.0-grid % fw(s)) * t % x(c2)
+    ty_f = grid % fw(s) * t % y(c1) + (1.0-grid % fw(s)) * t % y(c2)
+    tz_f = grid % fw(s) * t % z(c1) + (1.0-grid % fw(s)) * t % z(c2)
     if(turb % model .ne. NO_TURBULENCE_MODEL .and.  &
        turb % model .ne. DNS) then
       con_eff_f =                                                              &
@@ -183,27 +179,24 @@
     end if
 
     ! Total (exact) diffusion flux
-    f_ex1 = con_eff_f * (  tx_f1 * grid % sx(s)   &
-                         + ty_f1 * grid % sy(s)   &
-                         + tz_f1 * grid % sz(s))
-    f_ex2 = con_eff_f * (  tx_f2 * grid % sx(s)   &
-                         + ty_f2 * grid % sy(s)   &
-                         + tz_f2 * grid % sz(s))
+    ! This is last term in equation 2.33 in Denner's thesis because:
+    ! grid % sx (T-Flows) == n_f * A_f (Denner)
+    f_ex = con_eff_f * (   tx_f * grid % sx(s)   &
+                         + ty_f * grid % sy(s)   &
+                         + tz_f * grid % sz(s))
 
-    ! Implicit diffusion flux
-    f_im1 = con_eff_f * a % fc(s)         &
-          * (   tx_f1 * grid % dx(s)      &
-              + ty_f1 * grid % dy(s)      &
-              + tz_f1 * grid % dz(s) )
-    f_im2 = con_eff_f * a % fc(s)         &
-          * (   tx_f2 * grid % dx(s)      &
-              + ty_f2 * grid % dy(s)      &
-              + tz_f2 * grid % dz(s) )
+    ! Implicit part of the diffusion flux, treated by linear system
+    ! This is also term in equation 2.33 in Denner's thesis because:
+    ! a % fc * grid % dx (T-Flows) == alpha_f * s_f * A_f (Denner)
+    f_im = con_eff_f * a % fc(s)         &
+          * (   tx_f * grid % dx(s)      &
+              + ty_f * grid % dy(s)      &
+              + tz_f * grid % dz(s) )
 
     ! Cross diffusion part
-    t % c(c1) = t % c(c1) + f_ex1 - f_im1
+    t % c(c1) = t % c(c1) + f_ex - f_im
     if(c2 > 0) then
-      t % c(c2) = t % c(c2) - f_ex2 + f_im2
+      t % c(c2) = t % c(c2) - f_ex + f_im
     end if
 
     !---------------------------!
@@ -219,18 +212,18 @@
 
       ! Turbulent heat fluxes according to GGDH scheme
       ! (first line is GGDH, second line is SGDH substratced
-      ut_x_cap_dens_s =  (    grid % fw(s)  * ut % n(c1) * cap_dens_c1  &
+      ut_x_cap_dens_s =  (    grid % fw(s)  * ut % n(c1) * cap_dens_c1   &
                       +  (1.0-grid % fw(s)) * ut % n(c2) * cap_dens_c2)
-      vt_x_cap_dens_s =  (    grid % fw(s)  * vt % n(c1) * cap_dens_c1  &
+      vt_x_cap_dens_s =  (    grid % fw(s)  * vt % n(c1) * cap_dens_c1   &
                       +  (1.0-grid % fw(s)) * vt % n(c2) * cap_dens_c2)
-      wt_x_cap_dens_s =  (    grid % fw(s)  * wt % n(c1) * cap_dens_c1  &
+      wt_x_cap_dens_s =  (    grid % fw(s)  * wt % n(c1) * cap_dens_c1   &
                       +  (1.0-grid % fw(s)) * wt % n(c2) * cap_dens_c2)
-      t_stress = - (  ut_x_cap_dens_s * grid % sx(s)                    &
-                    + vt_x_cap_dens_s * grid % sy(s)                    &
-                    + wt_x_cap_dens_s * grid % sz(s) )                  &
-                    - (con_t_f * (  tx_f1 * grid % sx(s)     &
-                                  + ty_f1 * grid % sy(s)     &
-                                  + tz_f1 * grid % sz(s)) )
+      t_stress = - (  ut_x_cap_dens_s * grid % sx(s)                     &
+                    + vt_x_cap_dens_s * grid % sy(s)                     &
+                    + wt_x_cap_dens_s * grid % sz(s) )                   &
+                    - (con_t_f * (  tx_f * grid % sx(s)     &
+                                  + ty_f * grid % sy(s)     &
+                                  + tz_f * grid % sz(s)) )
 
       ! Put the influence of turbulent heat fluxes explicitly in the system
       b(c1) = b(c1) + t_stress
