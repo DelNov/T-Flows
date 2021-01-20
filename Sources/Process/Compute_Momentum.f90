@@ -81,7 +81,7 @@
 !     u, v, w        [m/s]
 !     bu, bv, bw     [kgm/s^2]   [N]
 !     p, pp          [kg/ms^2]   [N/m^2]
-!     flux           [kg/s]
+!     v_flux         [m^3/s]
 !     au*, av*, aw*  [kgm/s^2]   [N]
 !     du*, dv*, dw*  [kgm/s^2]   [N]
 !     cu*, cv*, cw*  [kgm/s^2]   [N]
