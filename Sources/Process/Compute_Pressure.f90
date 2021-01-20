@@ -94,6 +94,7 @@
 
   !-----------------------------------------!
   !   Initialize the pressure corrections   !
+  !    (Convergence is faster with this)    !
   !-----------------------------------------!
   pp % n = 0.0
 
@@ -109,9 +110,12 @@
     if(c2 > 0) then
 
       ! Interpolate velocity
-      u_f = fs * u % n(c1) + (1.0 - fs) * u % n(c2)
-      v_f = fs * v % n(c1) + (1.0 - fs) * v % n(c2)
-      w_f = fs * w % n(c1) + (1.0 - fs) * w % n(c2)
+!     u_f = fs * u % n(c1) + (1.0 - fs) * u % n(c2)
+!     v_f = fs * v % n(c1) + (1.0 - fs) * v % n(c2)
+!     w_f = fs * w % n(c1) + (1.0 - fs) * w % n(c2)
+      u_f = Field_Mod_Interpolate_Variable_To_Face(flow, u, s)
+      v_f = Field_Mod_Interpolate_Variable_To_Face(flow, v, s)
+      w_f = Field_Mod_Interpolate_Variable_To_Face(flow, w, s)
 
       ! Calculate coeficients for the system matrix
       a12 = u_relax * 0.5 * a % fc(s)                    &
