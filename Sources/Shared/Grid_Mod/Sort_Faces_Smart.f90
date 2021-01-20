@@ -144,9 +144,9 @@
   call Sort_Mod_Real_By_Index(grid % n_faces, grid % xf(1), grid % new_f(1))
   call Sort_Mod_Real_By_Index(grid % n_faces, grid % yf(1), grid % new_f(1))
   call Sort_Mod_Real_By_Index(grid % n_faces, grid % zf(1), grid % new_f(1))
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % xr(1), grid % new_f(1))
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % yr(1), grid % new_f(1))
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % zr(1), grid % new_f(1))
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % rx(1), grid % new_f(1))
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % ry(1), grid % new_f(1))
+  call Sort_Mod_Real_By_Index(grid % n_faces, grid % rz(1), grid % new_f(1))
 
   ! Correct shadow faces
   do s = grid % n_faces + 1, grid % n_faces + grid % n_shadows

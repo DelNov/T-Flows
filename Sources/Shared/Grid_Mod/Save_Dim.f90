@@ -83,9 +83,9 @@
           if(var .eq.  8)  write(fu) grid % xf(grid % old_f(s))
           if(var .eq.  9)  write(fu) grid % yf(grid % old_f(s))
           if(var .eq. 10)  write(fu) grid % zf(grid % old_f(s))
-          if(var .eq. 11)  write(fu) grid % xr(grid % old_f(s))
-          if(var .eq. 12)  write(fu) grid % yr(grid % old_f(s))
-          if(var .eq. 13)  write(fu) grid % zr(grid % old_f(s))
+          if(var .eq. 11)  write(fu) grid % rx(grid % old_f(s))
+          if(var .eq. 12)  write(fu) grid % ry(grid % old_f(s))
+          if(var .eq. 13)  write(fu) grid % rz(grid % old_f(s))
         else
           if(var .eq.  1)  write(fu) -grid % sx(grid % old_f(s))
           if(var .eq.  2)  write(fu) -grid % sy(grid % old_f(s))
@@ -97,9 +97,9 @@
           if(var .eq.  8)  write(fu) grid % xf(grid % old_f(s))
           if(var .eq.  9)  write(fu) grid % yf(grid % old_f(s))
           if(var .eq. 10)  write(fu) grid % zf(grid % old_f(s))
-          if(var .eq. 11)  write(fu) grid % xr(grid % old_f(s))
-          if(var .eq. 12)  write(fu) grid % yr(grid % old_f(s))
-          if(var .eq. 13)  write(fu) grid % zr(grid % old_f(s))
+          if(var .eq. 11)  write(fu) grid % rx(grid % old_f(s))
+          if(var .eq. 12)  write(fu) grid % ry(grid % old_f(s))
+          if(var .eq. 13)  write(fu) grid % rz(grid % old_f(s))
         end if
       end if
     end do

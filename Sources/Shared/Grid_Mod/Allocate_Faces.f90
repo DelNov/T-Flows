@@ -41,9 +41,9 @@
   allocate(grid % zf(nf+ns));  grid % zf(:) = 0.0
 
   ! Vectors connecting face center with face cell centers connection
-  allocate(grid % xr(nf+ns));  grid % xr(:) = 0.0
-  allocate(grid % yr(nf+ns));  grid % yr(:) = 0.0
-  allocate(grid % zr(nf+ns));  grid % zr(:) = 0.0
+  allocate(grid % rx(nf+ns));  grid % rx(:) = 0.0
+  allocate(grid % ry(nf+ns));  grid % ry(:) = 0.0
+  allocate(grid % rz(nf+ns));  grid % rz(:) = 0.0
 
   ! Weight factors
   allocate(grid % f (nf+ns));   grid % f (:) = 0.0

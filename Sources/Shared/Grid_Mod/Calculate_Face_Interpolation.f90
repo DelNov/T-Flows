@@ -89,9 +89,9 @@
     yi = yc1 + dsc1 * ly
     zi = zc1 + dsc1 * lz
 
-    grid % xr(s) = grid % xf(s) - xi
-    grid % yr(s) = grid % yf(s) - yi
-    grid % zr(s) = grid % zf(s) - zi
+    grid % rx(s) = grid % xf(s) - xi
+    grid % ry(s) = grid % yf(s) - yi
+    grid % rz(s) = grid % zf(s) - zi
 
     ! Interpolation factor
     ! (Equation 2.19 in Denner's thesis)
@@ -105,7 +105,7 @@
       f_max = max(f_max, grid % f(s))
       f_min = min(f_min, grid % f(s))
       f_avg = f_avg + grid % f(s)
-      r = sqrt(grid % xr(s)**2 + grid % yr(s)**2 + grid % zr(s)**2)  &
+      r = sqrt(grid % rx(s)**2 + grid % ry(s)**2 + grid % rz(s)**2)  &
         / (dsc1 + dsc2)
       r_max = max(r_max, r)
       r_min = min(r_min, r)
