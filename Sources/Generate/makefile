@@ -148,6 +148,7 @@ SRC_FUN = Probe_1d_Nodes.f90	\
           Swap_Short.f90	\
           To_Upper_Case.f90
 
+# Local functions are added one by one ...
 SRC_FUN += Calculate_Geometry.f90	\
            Load_Dom.f90			\
            Logo_Gen.f90			\

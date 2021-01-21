@@ -31,9 +31,9 @@
 
   Field_Mod_Interpolate_To_Face =                      &
       phi(c1)   * w1 + phi(c2)   * w2                  &
-   + (phi_x(c1) * w1 + phi_x(c2) * w2) * grid % xr(s)  &
-   + (phi_y(c1) * w1 + phi_y(c2) * w2) * grid % yr(s)  &
-   + (phi_z(c1) * w1 + phi_z(c2) * w2) * grid % zr(s)
+   + (phi_x(c1) * w1 + phi_x(c2) * w2) * grid % rx(s)  &
+   + (phi_y(c1) * w1 + phi_y(c2) * w2) * grid % ry(s)  &
+   + (phi_z(c1) * w1 + phi_z(c2) * w2) * grid % rz(s)
 
   end function
 

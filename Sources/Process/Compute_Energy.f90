@@ -5,7 +5,7 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use User_Mod
-  use Work_Mod, only: capacity_x_density => r_cell_11
+  use Work_Mod, only: cap_dens => r_cell_11
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
@@ -22,15 +22,9 @@
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
   integer                    :: c, s, c1, c2
-  real                       :: a12, a21, con_eff_f, con_t_f
-  real                       :: f_ex1, f_im1, tx_f1, ty_f1, tz_f1
-  real                       :: f_ex2, f_im2, tx_f2, ty_f2, tz_f2
-  real                       :: pr_t1, pr_t2, pr_tf
+  real                       :: a12, a21, con_eff
+  real                       :: f_ex, f_im, tx_f, ty_f, tz_f
   real                       :: t_stress, dt
-  real                       :: cap_dens_c1, cap_dens_c2
-  real                       :: ut_x_cap_dens_s, &
-                                vt_x_cap_dens_s, &
-                                wt_x_cap_dens_s
 !------------------------------------------------------------------------------!
 !
 !  The form of equations which are solved:
@@ -74,10 +68,9 @@
   grid   => flow % pnt_grid
   v_flux => flow % v_flux
   dt     =  flow % dt
-  call Field_Mod_Alias_Momentum  (flow, u, v, w)
-  call Field_Mod_Alias_Energy    (flow, t)
-  call Turb_Mod_Alias_Heat_Fluxes(turb, ut, vt, wt)
-  call Solver_Mod_Alias_System   (sol, a, b)
+  call Field_Mod_Alias_Momentum(flow, u, v, w)
+  call Field_Mod_Alias_Energy  (flow, t)
+  call Solver_Mod_Alias_System (sol, a, b)
 
   ! User function
   call User_Mod_Beginning_Of_Compute_Energy(flow, turb, mult, ini)
@@ -97,13 +90,17 @@
   ! Gradients
   call Field_Mod_Grad_Variable(flow, t)
 
+  ! Compute helping variable
+  do c = -grid % n_bnd_cells, grid % n_cells
+    cap_dens(c) = flow % capacity(c) * flow % density(c)
+  end do
+
   !---------------!
   !               !
   !   Advection   !
   !               !
   !---------------!
-  call Numerics_Mod_Advection_Term(t, flow % capacity * flow % density,  &
-                                   v_flux % n, sol)
+  call Numerics_Mod_Advection_Term(t, cap_dens, v_flux % n, sol)
 
   !--------------!
   !              !
@@ -114,134 +111,51 @@
   !----------------------------!
   !   Spatial discretization   !
   !----------------------------!
-  if(turb % model .ne. NO_TURBULENCE_MODEL .and.  &
-     turb % model .ne. DNS) then
-  end if
-
   do s = 1, grid % n_faces
 
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
-    if(turb % model .ne. LES_SMAGORINSKY     .and.  &
-       turb % model .ne. LES_DYNAMIC         .and.  &
-       turb % model .ne. HYBRID_LES_PRANDTL  .and.  &
-       turb % model .ne. LES_WALE            .and.  &
-       turb % model .ne. NO_TURBULENCE_MODEL .and.  &
-       turb % model .ne. DNS) then
-      pr_t1 = Turb_Mod_Prandtl_Number(turb, c1)
-      pr_t2 = Turb_Mod_Prandtl_Number(turb, c2)
-      pr_tf = grid % fw(s) * pr_t1 + (1.0-grid % fw(s)) * pr_t2
-    else
-      pr_tf = pr_t
-    end if
+    call Turb_Mod_Calculate_Face_Cond_And_Stress(turb, con_eff, t_stress, s)
 
     ! Gradients on the cell face (fw corrects situation close to the wall)
-    tx_f1 = grid % fw(s) * t % x(c1) + (1.0-grid % fw(s)) * t % x(c2)
-    ty_f1 = grid % fw(s) * t % y(c1) + (1.0-grid % fw(s)) * t % y(c2)
-    tz_f1 = grid % fw(s) * t % z(c1) + (1.0-grid % fw(s)) * t % z(c2)
-    tx_f2 = tx_f1
-    ty_f2 = ty_f1
-    tz_f2 = tz_f1
-    if(turb % model .ne. NO_TURBULENCE_MODEL .and.  &
-       turb % model .ne. DNS) then
-      con_eff_f =                                                              &
-               grid % fw(s) * (flow % conductivity(c1) +                       &
-                               flow % capacity(c1) * turb % vis_t(c1) / pr_tf) &
-        + (1.0-grid % fw(s))* (flow % conductivity(c2) +                       &
-                               flow % capacity(c2) * turb % vis_t(c2) / pr_tf)
-      con_t_f  = grid % fw(s) *flow % capacity(c1) * turb % vis_t(c1) / pr_tf  &
-          + (1.0-grid % fw(s))*flow % capacity(c2) * turb % vis_t(c2) / pr_tf
-    else
-      con_eff_f =                                      &
-               grid % fw(s) * flow % conductivity(c1)  &
-        + (1.0-grid % fw(s))* flow % conductivity(c2)
-    end if
-    if(turb % model .eq. HYBRID_LES_RANS) then
-      con_eff_f =                                                              &
-               grid % fw(s) * (flow % conductivity(c1) +                       &
-                               flow % capacity(c1) * turb % vis_t_eff(c1)      &
-                               / pr_tf)                                        &
-       + (1.0-grid % fw(s)) * (flow % conductivity(c2) +                       &
-                               flow % capacity(c2) * turb % vis_t_eff(c2)      &
-                               / pr_tf)
-     con_t_f  = grid % fw(s) * flow % capacity(c1) * turb % vis_t_eff(c1)      &
-                               / pr_tf                                         &
-        + (1.0-grid % fw(s)) * flow % capacity(c2) * turb % vis_t_eff(c2)      &
-                               / pr_tf
-    end if
-
-    if(turb % model .eq. K_EPS        .or.  &
-       turb % model .eq. K_EPS_ZETA_F .or.  &
-       turb % model .eq. HYBRID_LES_RANS) then
-      if(c2 < 0) then
-        if(Var_Mod_Bnd_Cond_Type(t, c2) .eq. WALL .or.  &
-           Var_Mod_Bnd_Cond_Type(t, c2) .eq. WALLFL) then
-          con_eff_f = turb % con_w(c1)
-        end if
-      end if
-    end if
+    tx_f = grid % fw(s) * t % x(c1) + (1.0-grid % fw(s)) * t % x(c2)
+    ty_f = grid % fw(s) * t % y(c1) + (1.0-grid % fw(s)) * t % y(c2)
+    tz_f = grid % fw(s) * t % z(c1) + (1.0-grid % fw(s)) * t % z(c2)
 
     ! Total (exact) diffusion flux
-    f_ex1 = con_eff_f * (  tx_f1 * grid % sx(s)   &
-                         + ty_f1 * grid % sy(s)   &
-                         + tz_f1 * grid % sz(s))
-    f_ex2 = con_eff_f * (  tx_f2 * grid % sx(s)   &
-                         + ty_f2 * grid % sy(s)   &
-                         + tz_f2 * grid % sz(s))
+    ! This is last term in equation 2.33 in Denner's thesis because:
+    ! grid % sx (T-Flows) == n_f * A_f (Denner)
+    f_ex = con_eff * (   tx_f * grid % sx(s)   &
+                       + ty_f * grid % sy(s)   &
+                       + tz_f * grid % sz(s))
 
-    ! Implicit diffusion flux
-    f_im1 = con_eff_f * a % fc(s)         &
-          * (   tx_f1 * grid % dx(s)      &
-              + ty_f1 * grid % dy(s)      &
-              + tz_f1 * grid % dz(s) )
-    f_im2 = con_eff_f * a % fc(s)         &
-          * (   tx_f2 * grid % dx(s)      &
-              + ty_f2 * grid % dy(s)      &
-              + tz_f2 * grid % dz(s) )
+    ! Implicit part of the diffusion flux, treated by linear system
+    ! This is also term in equation 2.33 in Denner's thesis because:
+    ! a % fc * grid % dx (T-Flows) == alpha_f * s_f * A_f (Denner)
+    f_im = con_eff * a % fc(s) * (   tx_f * grid % dx(s)    &
+                                   + ty_f * grid % dy(s)    &
+                                   + tz_f * grid % dz(s) )
 
     ! Cross diffusion part
-    t % c(c1) = t % c(c1) + f_ex1 - f_im1
+    t % c(c1) = t % c(c1) + f_ex - f_im
     if(c2 > 0) then
-      t % c(c2) = t % c(c2) - f_ex2 + f_im2
+      t % c(c2) = t % c(c2) - f_ex + f_im
     end if
 
-    !---------------------------!
-    !                           !
-    !   Turbulent heat fluxes   !
-    !                           !
-    !---------------------------!
-    if(turb % model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
-       turb % model .eq. RSM_MANCEAU_HANJALIC) then
+    ! Put the influence of turbulent heat fluxes explicitly in the system
+    b(c1) = b(c1) + t_stress
+    if(c2 > 0) then
+      b(c2) = b(c2) - t_stress
+    end if
 
-      cap_dens_c1 = flow % capacity(c1) * flow % density(c1)
-      cap_dens_c2 = flow % capacity(c2) * flow % density(c2)
-
-      ! Turbulent heat fluxes according to GGDH scheme
-      ! (first line is GGDH, second line is SGDH substratced
-      ut_x_cap_dens_s =  (    grid % fw(s)  * ut % n(c1) * cap_dens_c1  &
-                      +  (1.0-grid % fw(s)) * ut % n(c2) * cap_dens_c2)
-      vt_x_cap_dens_s =  (    grid % fw(s)  * vt % n(c1) * cap_dens_c1  &
-                      +  (1.0-grid % fw(s)) * vt % n(c2) * cap_dens_c2)
-      wt_x_cap_dens_s =  (    grid % fw(s)  * wt % n(c1) * cap_dens_c1  &
-                      +  (1.0-grid % fw(s)) * wt % n(c2) * cap_dens_c2)
-      t_stress = - (  ut_x_cap_dens_s * grid % sx(s)                    &
-                    + vt_x_cap_dens_s * grid % sy(s)                    &
-                    + wt_x_cap_dens_s * grid % sz(s) )                  &
-                    - (con_t_f * (  tx_f1 * grid % sx(s)     &
-                                  + ty_f1 * grid % sy(s)     &
-                                  + tz_f1 * grid % sz(s)) )
-
-      ! Put the influence of turbulent heat fluxes explicitly in the system
-      b(c1) = b(c1) + t_stress
-      if(c2 > 0) then
-        b(c2) = b(c2) - t_stress
-      end if
-    end if  ! if models are of RSM type
-
-    ! Calculate the coefficients for the sysytem matrix
-    a12 = con_eff_f * a % fc(s)
-    a21 = con_eff_f * a % fc(s)
+    !------------------------------------------------------!
+    !                                                      !
+    !   Calculate the coefficients for the system matrix   !
+    !                                                      !
+    !------------------------------------------------------!
+    a12 = con_eff * a % fc(s)
+    a21 = con_eff * a % fc(s)
 
     a12 = a12 - min(v_flux % n(s), 0.0)  &
                  * flow % capacity(c1) * flow % density(c1)  ! flow: 1 -> 2
@@ -286,9 +200,9 @@
   !                    !
   !--------------------!
   do c = -grid % n_bnd_cells, grid % n_cells
-    capacity_x_density(c) = flow % capacity(c) * flow % density(c)
+    cap_dens(c) = flow % capacity(c) * flow % density(c)
   end do
-  call Numerics_Mod_Inertial_Term(t, capacity_x_density, sol, dt)
+  call Numerics_Mod_Inertial_Term(t, cap_dens, sol, dt)
 
   !--------------------!
   !                    !

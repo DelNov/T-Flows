@@ -1,1 +1,1 @@
-../pie_narrow.gmsh
+../../pie_narrow_d_9.0.geo

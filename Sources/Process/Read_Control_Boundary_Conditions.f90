@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Load_Boundary_Conditions(flow, turb, mult, turb_planes)
+  subroutine Read_Control_Boundary_Conditions(flow, turb, mult, turb_planes)
 !------------------------------------------------------------------------------!
 !   Reads boundary condition from control file                                 !
 !------------------------------------------------------------------------------!
@@ -175,7 +175,7 @@
         grid % bnd_cond % type(bc) = OPENBC
       else
         if(this_proc < 2)  &
-          print *, '# ERROR!  Load_Boundary_Conditions: '//        &
+          print *, '# ERROR!  Read_Control_Boundary_Conditions: '//        &
                    '# Unknown boundary condition type: ',  &
                    bc_type_name
         call Comm_Mod_End

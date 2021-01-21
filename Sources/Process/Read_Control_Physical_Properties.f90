@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Load_Physical_Properties(flow, mult, swarm)
+  subroutine Read_Control_Physical_Properties(flow, mult, swarm)
 !------------------------------------------------------------------------------!
 !   Reads physical properties from control file.                               !
 !------------------------------------------------------------------------------!

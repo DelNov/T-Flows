@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Read_Control_Physical(flow, turb, mult, swarm)
+  subroutine Read_Control_Physical_Models(flow, turb, mult, swarm)
 !------------------------------------------------------------------------------!
 !   Reads details about physical models from control file.                     !
 !------------------------------------------------------------------------------!

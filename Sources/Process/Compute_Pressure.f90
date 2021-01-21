@@ -41,10 +41,12 @@
 !
 !   Dimensions of certain variables
 !
-!     app            [m^4s/kg]
-!     pp             [kg/ms^2]
-!     b              [m^3/s]
-!     v_flux         [m^3/s]
+!     app              [m^4s/kg]
+!     pp               [kg/ms^2]
+!     p%x, p%y, p%z    [kg/m^2s^2]
+!     px_f, py_f, pz_f [kg/m^2s^2]
+!     b                [m^3/s]
+!     v_flux           [m^3/s]
 !
 !==============================================================================!
 
@@ -94,6 +96,7 @@
 
   !-----------------------------------------!
   !   Initialize the pressure corrections   !
+  !    (Convergence is faster with this)    !
   !-----------------------------------------!
   pp % n = 0.0
 
@@ -109,11 +112,12 @@
     if(c2 > 0) then
 
       ! Interpolate velocity
-      u_f = fs * u % n(c1) + (1.0 - fs) * u % n(c2)
-      v_f = fs * v % n(c1) + (1.0 - fs) * v % n(c2)
-      w_f = fs * w % n(c1) + (1.0 - fs) * w % n(c2)
+      u_f = Field_Mod_Interpolate_Var_To_Face(flow, u, s)
+      v_f = Field_Mod_Interpolate_Var_To_Face(flow, v, s)
+      w_f = Field_Mod_Interpolate_Var_To_Face(flow, w, s)
 
       ! Calculate coeficients for the system matrix
+      ! a12 [m*m^3*s/kg = m^4s/kg]
       a12 = u_relax * 0.5 * a % fc(s)                    &
                     * ( grid % vol(c1) / a % sav(c1)     &
                       + grid % vol(c2) / a % sav(c2) )
@@ -125,20 +129,26 @@
 
       ! Interpolate pressure gradients as proposed by Denner
       ! (Equation 3.57 in his PhD thesis)
+      ! dens_h           [kg/m^3]
+      ! px_f, py_f, pz_f [kg/m^2s^2]
       dens_h = 2.0 / (1.0 / flow % density(c1) + 1.0 / flow % density(c2))
       px_f = 0.5 * dens_h * (  p % x(c1) / flow % density(c1)  &
-                             + p % x(c2) / flow % density(c2) ) * grid % dx(s)
+                             + p % x(c2) / flow % density(c2) )
       py_f = 0.5 * dens_h * (  p % y(c1) / flow % density(c1)  &
-                             + p % y(c2) / flow % density(c2) ) * grid % dy(s)
+                             + p % y(c2) / flow % density(c2) )
       pz_f = 0.5 * dens_h * (  p % z(c1) / flow % density(c1)  &
-                             + p % z(c2) / flow % density(c2) ) * grid % dz(s)
+                             + p % z(c2) / flow % density(c2) )
 
-      ! Calculate volume flux through cell face
+      ! Calculate current volume flux through cell face with pressure
+      ! defined at a cell face and assuming that pressure correction
+      ! (pp) part is treated implicitly
       v_flux % n(s) = u_f * grid % sx(s)             &
                     + v_f * grid % sy(s)             &
                     + w_f * grid % sz(s)             &
                     + a12 * (p % n(c1) - p % n(c2))  &
-                    + a12 * (px_f + py_f + pz_f)
+                    + a12 * (  px_f * grid % dx(s)   &
+                             + py_f * grid % dy(s)   &
+                             + pz_f * grid % dz(s))
 
       b(c1) = b(c1) - v_flux % n(s)
       b(c2) = b(c2) + v_flux % n(s)

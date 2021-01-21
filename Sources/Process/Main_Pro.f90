@@ -122,7 +122,7 @@
   ! Read physical models for each domain from control file
   do d = 1, n_dom
     call Control_Mod_Switch_To_Domain(d)  ! take proper control file
-    call Read_Control_Physical(flow(d), turb(d), mult(d), swarm(d))
+    call Read_Control_Physical_Models(flow(d), turb(d), mult(d), swarm(d))
   end do
 
   !----------------------------------------------------------!
@@ -151,9 +151,9 @@
     ! (You need face geomtry for this step)
     call Solver_Mod_Create(sol(d), grid(d))
 
-    call Load_Physical_Properties(flow(d), mult(d), swarm(d))
-
-    call Load_Boundary_Conditions(flow(d), turb(d), mult(d), turb_planes(d))
+    call Read_Control_Physical_Properties(flow(d), mult(d), swarm(d))
+    call Read_Control_Boundary_Conditions(flow(d), turb(d), mult(d),   &
+                                          turb_planes(d))
   end do
 
   ! Create interfaces
