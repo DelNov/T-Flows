@@ -22,9 +22,7 @@
   c1 = grid % faces_c(1,s)
   c2 = grid % faces_c(2,s)
 
-  vis_eff =        grid % fw(s)  * flow % viscosity(c1)   &
-          + (1.0 - grid % fw(s)) * flow % viscosity(c2)
-
+  ! Viscosity computed as a harmonic mean
   vis_eff = 2.0 / (    1.0 / flow % viscosity(c1)  &
                      + 1.0 / flow % viscosity(c2) )
 
