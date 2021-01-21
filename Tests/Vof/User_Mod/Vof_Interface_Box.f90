@@ -74,7 +74,7 @@
       p(1,2) = ymin+ (ymax-ymin) * r_num
       call random_number(r_num)
       p(1,3) = zmin+ (zmax-zmin) * r_num
-      l_cel = Is_Point_In_Cell(grid, c, p(1,1), p(1,2), p(1,3))
+      l_cel = Grid_Mod_Is_Point_In_Cell(grid, c, p(1,1), p(1,2), p(1,3))
     end do
     n_tot = n_tot + 1
 
