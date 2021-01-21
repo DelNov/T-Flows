@@ -138,10 +138,6 @@
       pr_tf = pr_t
     end if
 
-    ! Gradients on the cell face (fw corrects situation close to the wall)
-    tx_f = grid % fw(s) * t % x(c1) + (1.0-grid % fw(s)) * t % x(c2)
-    ty_f = grid % fw(s) * t % y(c1) + (1.0-grid % fw(s)) * t % y(c2)
-    tz_f = grid % fw(s) * t % z(c1) + (1.0-grid % fw(s)) * t % z(c2)
     if(turb % model .ne. NO_TURBULENCE_MODEL .and.  &
        turb % model .ne. DNS) then
       con_eff_f =                                                              &
@@ -180,6 +176,11 @@
         end if
       end if
     end if
+
+    ! Gradients on the cell face (fw corrects situation close to the wall)
+    tx_f = grid % fw(s) * t % x(c1) + (1.0-grid % fw(s)) * t % x(c2)
+    ty_f = grid % fw(s) * t % y(c1) + (1.0-grid % fw(s)) * t % y(c2)
+    tz_f = grid % fw(s) * t % z(c1) + (1.0-grid % fw(s)) * t % z(c2)
 
     ! Total (exact) diffusion flux
     ! This is last term in equation 2.33 in Denner's thesis because:
