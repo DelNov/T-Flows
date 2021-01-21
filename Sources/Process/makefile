@@ -262,9 +262,27 @@ endif
 #   Functions
 #---------------
 
-# Sources for all functions in the local ...
-# ... directory are obtained by a shell command
-SRC_FUN =  $(shell ls -1 *.f90 | grep -v -i _Mod)
+# Sources for all functions in the local directory
+SRC_FUN = Balance_Volume.f90                    \
+          Calculate_Shear_And_Vorticity.f90     \
+          Calculate_Vorticity.f90               \
+          Compute_Energy.f90                    \
+          Compute_Momentum_Explicit.f90         \
+          Compute_Momentum.f90                  \
+          Compute_Pressure.f90                  \
+          Compute_Scalar.f90                    \
+          Convective_Outflow.f90                \
+          Correct_Velocity.f90                  \
+          Initialize_Variables.f90              \
+          Key_Ind.f90                           \
+          Logo_Pro.f90                          \
+          Main_Pro.f90                          \
+          Piso_Algorithm.f90                    \
+          Read_Control_Boundary_Conditions.f90  \
+          Read_Control_Numerical.f90            \
+          Read_Control_Physical_Models.f90      \
+          Read_Control_Physical_Properties.f90  \
+          Update_Boundary_Values.f90
 
 # Non-member functions still residing in Turb_Mod
 SRC_FUN += Tau_Wall_Low_Re.f90		\
