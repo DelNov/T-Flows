@@ -73,10 +73,8 @@
   !   Look at the following equation and you will understand why   !
   !   is the matrix for pressure corrections in SIMPLE algorithm   !
   !   formed from the coefficients of the velocity matrix.         !
-  !                                                                !
-  !   Note that the fluxes corrected below are either mass or      !
-  !   volume fluxes, depending on how the right hand side term     !
-  !   for pressure was formed.                                     !
+  !   pp      [kg/ms^2]                                            !
+  !   a % val [m^4s/kg]                                            !
   !----------------------------------------------------------------!
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
