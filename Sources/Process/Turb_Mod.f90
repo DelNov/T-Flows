@@ -197,6 +197,7 @@
   include 'Turb_Mod/Alias_T2.f90'
 
   include 'Turb_Mod/Calculate_Deltas.f90'
+  include 'Turb_Mod/Calculate_Face_Cond_And_Stress.f90'
   include 'Turb_Mod/Calculate_Face_Stress.f90'
   include 'Turb_Mod/Calculate_Face_Vis.f90'
   include 'Turb_Mod/Calculate_Heat_Flux.f90'
