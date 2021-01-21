@@ -67,7 +67,7 @@ include '../User_Mod/Interpolate_From_Nodes.f90'
     vof % n(c) = 0.0
   end do
 
-  ! Box:
+  ! Box
   call Vof_Initialization_Box(mult)
 
   call Grid_Mod_Exchange_Cells_Real(grid, vof % n)
