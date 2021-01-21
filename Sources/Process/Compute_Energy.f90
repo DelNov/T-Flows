@@ -22,7 +22,7 @@
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
   integer                    :: c, s, c1, c2
-  real                       :: a12, a21, con_eff_f, con_t_f
+  real                       :: a12, a21, con_m_f, con_eff_f, con_t_f
   real                       :: f_ex, f_im, tx_f, ty_f, tz_f
   real                       :: pr_t1, pr_t2, pr_tf
   real                       :: t_stress, dt
@@ -125,6 +125,8 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
+    ! Turbulent prandtl number
+    pr_tf = pr_t
     if(turb % model .ne. LES_SMAGORINSKY     .and.  &
        turb % model .ne. LES_DYNAMIC         .and.  &
        turb % model .ne. HYBRID_LES_PRANDTL  .and.  &
@@ -134,38 +136,29 @@
       pr_t1 = Turb_Mod_Prandtl_Number(turb, c1)
       pr_t2 = Turb_Mod_Prandtl_Number(turb, c2)
       pr_tf = grid % fw(s) * pr_t1 + (1.0-grid % fw(s)) * pr_t2
-    else
-      pr_tf = pr_t
     end if
 
+    ! Molecular conductivity (without turbulent parts)
+    con_m_f =      grid % fw(s)  * flow % conductivity(c1)  &
+            + (1.0-grid % fw(s)) * flow % conductivity(c2)
+    con_t_f = 0.0
+
+    ! Compute turbulent conductivity for various turbulent models
     if(turb % model .ne. NO_TURBULENCE_MODEL .and.  &
        turb % model .ne. DNS) then
-      con_eff_f =                                                              &
-               grid % fw(s) * (flow % conductivity(c1) +                       &
-                               flow % capacity(c1) * turb % vis_t(c1) / pr_tf) &
-        + (1.0-grid % fw(s))* (flow % conductivity(c2) +                       &
-                               flow % capacity(c2) * turb % vis_t(c2) / pr_tf)
       con_t_f  = grid % fw(s) *flow % capacity(c1) * turb % vis_t(c1) / pr_tf  &
-          + (1.0-grid % fw(s))*flow % capacity(c2) * turb % vis_t(c2) / pr_tf
-    else
-      con_eff_f =                                      &
-               grid % fw(s) * flow % conductivity(c1)  &
-        + (1.0-grid % fw(s))* flow % conductivity(c2)
-    end if
-    if(turb % model .eq. HYBRID_LES_RANS) then
-      con_eff_f =                                                              &
-               grid % fw(s) * (flow % conductivity(c1) +                       &
-                               flow % capacity(c1) * turb % vis_t_eff(c1)      &
-                               / pr_tf)                                        &
-       + (1.0-grid % fw(s)) * (flow % conductivity(c2) +                       &
-                               flow % capacity(c2) * turb % vis_t_eff(c2)      &
-                               / pr_tf)
-     con_t_f  = grid % fw(s) * flow % capacity(c1) * turb % vis_t_eff(c1)      &
-                               / pr_tf                                         &
-        + (1.0-grid % fw(s)) * flow % capacity(c2) * turb % vis_t_eff(c2)      &
-                               / pr_tf
+        +   (1.0-grid % fw(s))*flow % capacity(c2) * turb % vis_t(c2) / pr_tf
     end if
 
+    if(turb % model .eq. HYBRID_LES_RANS) then
+      con_t_f  = grid % fw(s)* flow % capacity(c1)*turb % vis_t_eff(c1)/pr_tf  &
+          + (1.0-grid % fw(s))*flow % capacity(c2)*turb % vis_t_eff(c2)/pr_tf
+    end if
+
+    ! Update effective conductivity
+    con_eff_f = con_m_f + con_t_f
+
+    ! effective conductivity at walls
     if(turb % model .eq. K_EPS        .or.  &
        turb % model .eq. K_EPS_ZETA_F .or.  &
        turb % model .eq. HYBRID_LES_RANS) then
