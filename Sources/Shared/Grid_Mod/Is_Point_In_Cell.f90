@@ -1,5 +1,5 @@
 !==============================================================================!
-  logical function Is_Point_In_Cell(grid, c, xp, yp, zp)
+  logical function Grid_Mod_Is_Point_In_Cell(grid, c, xp, yp, zp)
 !------------------------------------------------------------------------------!
 !   Determine is point x_p, y_p, z_p lies inside cell c                        !
 !------------------------------------------------------------------------------!
@@ -11,11 +11,11 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c1, c2, s, i_fac, cnt_in
   integer :: inside_c(MAX_CELLS_N_FACES)
-  real    :: nx, ny, nz, dot_prod
+  real    :: nx, ny, nz, xf, yf, zf, dot_prod
 !==============================================================================!
 
   ! loop in cell faces:
-  Is_Point_In_Cell = .false.
+  Grid_Mod_Is_Point_In_Cell = .false.
 
   cnt_in = 0
 
@@ -29,18 +29,27 @@
     ny = grid % sy(s) / grid % s(s)
     nz = grid % sz(s) / grid % s(s)
 
+    xf = grid % xf(s)
+    yf = grid % yf(s)
+    zf = grid % zf(s)
+
     ! Yet, of is c is actually c2, normal changes the sign (clear enough)
     if(c == c2) then
       nx = -nx
       ny = -ny
       nz = -nz
+      if(grid % faces_s(s) > 0) then
+        xf = grid % xf(grid % faces_s(s))
+        yf = grid % yf(grid % faces_s(s))
+        zf = grid % zf(grid % faces_s(s))
+      end if
     end if
 
     ! Vector p - f is oriented from the face towards the point
     ! If point is inside the cell, dot_prod will turn out negative
-    dot_prod = nx * (xp - grid % xf(s))  &
-             + ny * (yp - grid % yf(s))  &
-             + nz * (zp - grid % zf(s))
+    dot_prod = nx * (xp - xf)  &
+             + ny * (yp - yf)  &
+             + nz * (zp - zf)
 
     ! Count number of times point qualifies to be inside of the cell c
     if(dot_prod <= 0.0) then
@@ -50,7 +59,7 @@
   end do
 
   if(cnt_in == grid % cells_n_faces(c)) then
-    Is_Point_In_Cell = .true.
+    Grid_Mod_Is_Point_In_Cell = .true.
   end if
 
   end function
