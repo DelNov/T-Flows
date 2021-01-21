@@ -5,7 +5,7 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use User_Mod
-  use Work_Mod, only: capacity_x_density => r_cell_11
+  use Work_Mod, only: cap_dens => r_cell_11
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
@@ -26,7 +26,6 @@
   real                       :: f_ex, f_im, tx_f, ty_f, tz_f
   real                       :: pr_t1, pr_t2, pr_tf
   real                       :: t_stress, dt
-  real                       :: cap_dens_c1, cap_dens_c2
   real                       :: ut_x_cap_dens_s, &
                                 vt_x_cap_dens_s, &
                                 wt_x_cap_dens_s
@@ -96,13 +95,17 @@
   ! Gradients
   call Field_Mod_Grad_Variable(flow, t)
 
+  ! Compute helping variable
+  do c = -grid % n_bnd_cells, grid % n_cells
+    cap_dens(c) = flow % capacity(c) * flow % density(c)
+  end do
+
   !---------------!
   !               !
   !   Advection   !
   !               !
   !---------------!
-  call Numerics_Mod_Advection_Term(t, flow % capacity * flow % density,  &
-                                   v_flux % n, sol)
+  call Numerics_Mod_Advection_Term(t, cap_dens, v_flux % n, sol)
 
   !--------------!
   !              !
@@ -207,20 +210,17 @@
     if(turb % model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
        turb % model .eq. RSM_MANCEAU_HANJALIC) then
 
-      cap_dens_c1 = flow % capacity(c1) * flow % density(c1)
-      cap_dens_c2 = flow % capacity(c2) * flow % density(c2)
-
       ! Turbulent heat fluxes according to GGDH scheme
       ! (first line is GGDH, second line is SGDH substratced
-      ut_x_cap_dens_s =  (    grid % fw(s)  * ut % n(c1) * cap_dens_c1   &
-                      +  (1.0-grid % fw(s)) * ut % n(c2) * cap_dens_c2)
-      vt_x_cap_dens_s =  (    grid % fw(s)  * vt % n(c1) * cap_dens_c1   &
-                      +  (1.0-grid % fw(s)) * vt % n(c2) * cap_dens_c2)
-      wt_x_cap_dens_s =  (    grid % fw(s)  * wt % n(c1) * cap_dens_c1   &
-                      +  (1.0-grid % fw(s)) * wt % n(c2) * cap_dens_c2)
-      t_stress = - (  ut_x_cap_dens_s * grid % sx(s)                     &
-                    + vt_x_cap_dens_s * grid % sy(s)                     &
-                    + wt_x_cap_dens_s * grid % sz(s) )                   &
+      ut_x_cap_dens_s =  (    grid % fw(s)  * ut % n(c1) * cap_dens(c1)   &
+                      +  (1.0-grid % fw(s)) * ut % n(c2) * cap_dens(c2))
+      vt_x_cap_dens_s =  (    grid % fw(s)  * vt % n(c1) * cap_dens(c1)   &
+                      +  (1.0-grid % fw(s)) * vt % n(c2) * cap_dens(c2))
+      wt_x_cap_dens_s =  (    grid % fw(s)  * wt % n(c1) * cap_dens(c1)   &
+                      +  (1.0-grid % fw(s)) * wt % n(c2) * cap_dens(c2))
+      t_stress = - (  ut_x_cap_dens_s * grid % sx(s)                      &
+                    + vt_x_cap_dens_s * grid % sy(s)                      &
+                    + wt_x_cap_dens_s * grid % sz(s) )                    &
                     - (con_t_f * (  tx_f * grid % sx(s)     &
                                   + ty_f * grid % sy(s)     &
                                   + tz_f * grid % sz(s)) )
@@ -232,7 +232,11 @@
       end if
     end if  ! if models are of RSM type
 
-    ! Calculate the coefficients for the sysytem matrix
+    !------------------------------------------------------!
+    !                                                      !
+    !   Calculate the coefficients for the system matrix   !
+    !                                                      !
+    !------------------------------------------------------!
     a12 = con_eff_f * a % fc(s)
     a21 = con_eff_f * a % fc(s)
 
@@ -279,9 +283,9 @@
   !                    !
   !--------------------!
   do c = -grid % n_bnd_cells, grid % n_cells
-    capacity_x_density(c) = flow % capacity(c) * flow % density(c)
+    cap_dens(c) = flow % capacity(c) * flow % density(c)
   end do
-  call Numerics_Mod_Inertial_Term(t, capacity_x_density, sol, dt)
+  call Numerics_Mod_Inertial_Term(t, cap_dens, sol, dt)
 
   !--------------------!
   !                    !
