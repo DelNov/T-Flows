@@ -197,12 +197,12 @@
   include 'Turb_Mod/Alias_T2.f90'
 
   include 'Turb_Mod/Calculate_Deltas.f90'
-  include 'Turb_Mod/Calculate_Face_Cond_And_Stress.f90'
-  include 'Turb_Mod/Calculate_Face_Stress.f90'
-  include 'Turb_Mod/Calculate_Face_Vis.f90'
   include 'Turb_Mod/Calculate_Heat_Flux.f90'
   include 'Turb_Mod/Calculate_Mean.f90'
   include 'Turb_Mod/Calculate_Stress.f90'
+  include 'Turb_Mod/Face_Cond_And_Stress.f90'
+  include 'Turb_Mod/Face_Stress.f90'
+  include 'Turb_Mod/Face_Vis.f90'
   include 'Turb_Mod/Substract_Face_Stress.f90'
 
   ! Functions to set turbulence constants

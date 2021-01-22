@@ -116,7 +116,7 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
-    call Turb_Mod_Calculate_Face_Cond_And_Stress(turb, con_eff, t_stress, s)
+    call Turb_Mod_Face_Cond_And_Stress(turb, con_eff, t_stress, s)
 
     ! Gradients on the cell face (fw corrects situation close to the wall)
     tx_f = grid % fw(s) * t % x(c1) + (1.0-grid % fw(s)) * t % x(c2)

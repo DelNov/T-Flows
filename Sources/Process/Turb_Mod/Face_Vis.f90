@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Calculate_Face_Vis(turb, vis_eff, s)
+  subroutine Turb_Mod_Face_Vis(turb, vis_eff, s)
 !------------------------------------------------------------------------------!
 !   Computes turbulent viscosity on a cell face for all turbulence models.     !
 !   It is called from Compute_Momentum, while discretizing diffusion terms.    !

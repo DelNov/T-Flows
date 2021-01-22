@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Calculate_Face_Stress(turb, ui, f_stress, s)
+  subroutine Turb_Mod_Face_Stress(turb, ui, f_stress, s)
 !------------------------------------------------------------------------------!
 !   Computes turbulent stress on a cell face for all turbulence models.        !
 !   It is called from Compute_Momentum, while discretizing diffusion terms.    !

@@ -19,7 +19,6 @@
 
   ! Take alias
   grid => turb % pnt_grid
-! call Turb_Mod_Alias_Stresses(turb, uu, vv, ww, uv, uw, vw)
 
   c1 = grid % faces_c(1,s)
   c2 = grid % faces_c(2,s)

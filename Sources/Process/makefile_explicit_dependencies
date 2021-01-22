@@ -689,7 +689,6 @@ Multiphase_Mod/*.f90 \
 $(DIR_OBJECT)/Interface_Mod.o \
 Interface_Mod/*.f90 
 
-#-- ./Turb_Mod/Calculate_Face_Vis.f90
 #-- ./Turb_Mod/Src_Kin_K_Eps.f90
 #-- ./Turb_Mod/Const_K_Eps_Zeta_F.f90
 #-- ./Turb_Mod/Calculate_Stress.f90
@@ -700,6 +699,7 @@ $(DIR_SHARED)/Work_Mod/*.f90
 #-- ./Turb_Mod/Const_Hanjalic_Jakirlic.f90
 #-- ./Turb_Mod/Src_Eps_K_Eps.f90
 #-- ./Turb_Mod/Src_Eps_K_Eps_Zeta_F.f90
+#-- ./Turb_Mod/Face_Cond_And_Stress.f90
 #-- ./Turb_Mod/U_Plus_Log_Law.f90
 $(DIR_OBJECT)/U_Plus_Log_Law.o:\
 $(DIR_OBJECT)/Turb_Mod.o \
@@ -735,6 +735,7 @@ $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 
 
 #-- ./Turb_Mod/Alias_T2.f90
+#-- ./Turb_Mod/Face_Stress.f90
 #-- ./Turb_Mod/Tau_Wall_Low_Re.f90
 $(DIR_OBJECT)/Tau_Wall_Low_Re.o:\
 $(DIR_OBJECT)/Turb_Mod.o \
@@ -760,6 +761,7 @@ $(DIR_OBJECT)/Const_Mod.o
 
 #-- ./Turb_Mod/Vis_T_K_Eps.f90
 #-- ./Turb_Mod/Vis_T_Spalart_Allmaras.f90
+#-- ./Turb_Mod/Face_Vis.f90
 #-- ./Turb_Mod/Vis_T_Dynamic.f90
 $(DIR_OBJECT)/Vis_T_Dynamic.o:\
 $(DIR_OBJECT)/Work_Mod.o \
@@ -797,9 +799,7 @@ $(DIR_OBJECT)/Const_Mod.o
 #-- ./Turb_Mod/Vis_T_K_Eps_Zeta_F.f90
 #-- ./Turb_Mod/Ebf_Scalar.f90
 #-- ./Turb_Mod/Main.f90
-#-- ./Turb_Mod/Calculate_Face_Cond_And_Stress.f90
 #-- ./Turb_Mod/Src_Vis_Spalart_Almaras.f90
-#-- ./Turb_Mod/Calculate_Face_Stress.f90
 #-- ./Turb_Mod/Ebf_Momentum.f90
 #-- ./Turb_Mod/Tau_Wall_Rough_Walls.f90
 $(DIR_OBJECT)/Tau_Wall_Rough_Walls.o:\
@@ -1364,6 +1364,8 @@ $(DIR_OBJECT)/Bnd_Cond_Mod.o
 #-- ./Grid_Mod/Bnd_Cond_Type.f90
 #-- ./Grid_Mod/Calculate_Weights_Cells_To_Nodes.f90
 #-- ./Grid_Mod/Find_Periodic_Faces.f90
+#-- ./Grid_Mod/Print_Statistics.f90
+#-- ./Grid_Mod/Bounding_Box.f90
 #-- ./Grid_Mod/Calculate_Face_Geometry.f90
 #-- ./Grid_Mod/Sort_Cells_By_Index.f90
 #-- ./Grid_Mod/Load_Dim.f90

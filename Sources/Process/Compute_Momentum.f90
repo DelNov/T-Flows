@@ -185,8 +185,8 @@
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
 
-      call Turb_Mod_Calculate_Face_Vis   (turb, vis_eff,  s)
-      call Turb_Mod_Calculate_Face_Stress(turb, ui, f_stress, s)
+      call Turb_Mod_Face_Vis   (turb, vis_eff,  s)
+      call Turb_Mod_Face_Stress(turb, ui, f_stress, s)
 
       ui_i_f = grid % fw(s)*ui_i(c1) + (1.0-grid % fw(s))*ui_i(c2)
       ui_j_f = grid % fw(s)*ui_j(c1) + (1.0-grid % fw(s))*ui_j(c2)
