@@ -1,8 +1,6 @@
 include '../User_Mod/Check_Inside_Box.f90'
 include '../User_Mod/Vof_Initialization_Box.f90'
 include '../User_Mod/Vof_Interface_Box.f90'
-include '../User_Mod/Vof_Init_Random_Seed.f90'
-include '../User_Mod/Convert_Problem_Name_To_Integer.f90'
 
 !==============================================================================!
   subroutine User_Mod_Initialize_Variables(flow, turb, mult, swarm, sol)
