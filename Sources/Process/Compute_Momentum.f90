@@ -148,7 +148,7 @@
     f_stress   = 0.0
 
     ! Calculate velocity magnitude for normalization
-    vel_max = 0.0
+    vel_max = MICRO
     do c = -grid % n_bnd_cells, grid % n_cells
       vel_max = max(vel_max, sqrt(ui % n(c)**2 + uj % n(c)**2 + uk % n(c)**2))
     end do
