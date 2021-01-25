@@ -325,8 +325,6 @@
 
         ! All three velocity components one after another
         call Compute_Momentum(flow(d), turb(d), mult(d), sol(d), ini)
-
-        call Balance_Volume(flow(d), mult(d))
         call Compute_Pressure(flow(d), mult(d), sol(d), ini)
 
         call Multiphase_Averaging(mult(d), flow(d) % p)

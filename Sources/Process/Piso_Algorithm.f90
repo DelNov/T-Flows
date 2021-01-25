@@ -40,7 +40,6 @@
       ! (Can this call be somewhere in Compute Pressure?)
       call Grid_Mod_Exchange_Cells_Real(grid, sol % a % sav)
 
-      call Balance_Volume(flow, mult)
       call Compute_Pressure(flow, mult, sol, ini)
       call Multiphase_Averaging(mult, flow % p)
 

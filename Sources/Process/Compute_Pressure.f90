@@ -154,8 +154,8 @@
       b(c2) = b(c2) + v_flux % n(s)
 
     ! Side is on the boundary
-    ! (Check: volume fluxes at the boundaries
-    !  are already compute in Balance_Volume)
+    ! (Check: volume fluxes at the boundaries will
+    !  be corrected in Balance_Volume called below)
     else ! (c2 < 0)
 
       if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
@@ -203,6 +203,11 @@
     end if
 
   end do
+
+  !----------------------------------!
+  !   Correct fluxes at boundaries   !
+  !----------------------------------!
+  call Balance_Volume(flow, mult)
 
   !-------------------------------------------------------------!
   !   In case of VOF, surface tension and  gravity correction   !
