@@ -332,7 +332,7 @@
       !   Boundary values are specified in a file   !
       !                                             !
       !---------------------------------------------!
-      else
+      else  !  types_file(c_types) == .true.
 
         call Control_Mod_Read_Strings_On('FILE', name_prof, nvs, .false.)
 
@@ -340,6 +340,9 @@
         call File_Mod_Read_Line(fu)
         read(line % tokens(1),*) n_points  ! number of points
 
+        !---------------------------------!
+        !   Allocate memory for profile   !
+        !---------------------------------!
         allocate(prof(n_points, 0:nks))
 
         !----------------------------------!
@@ -777,7 +780,12 @@
           end do  ! c = -1, -grid % n_bnd_cells, -1
         end if  ! plane is defined?
         close(fu)
-        if( grid % bnd_cond % type(bc) == INFLOW ) deallocate(prof)
+
+        !-----------------------------!
+        !   Free memory for profile   !
+        !-----------------------------!
+        deallocate(prof)
+
       end if  ! boundary defined in a file
     end do
 
