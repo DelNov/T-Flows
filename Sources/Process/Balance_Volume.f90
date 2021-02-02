@@ -64,11 +64,11 @@
   ! Mass source:
   if(mult % phase_change) then
     do c = 1, grid % n_cells - grid % comm % n_buff_cells
-      bulk % vol_in = bulk % vol_in                                      &
-                     + mult % flux_rate(c) * grid % vol(c)                 &
-                                           * flow % density(c)             &
-                                           * ( 1.0 / mult % phase_dens(1)  &
-                                             - 1.0 / mult % phase_dens(2) )
+      bulk % vol_in = bulk % vol_in                                   &
+                    + mult % m_dot(c) * grid % vol(c)                 &
+                                      * flow % density(c)             &
+                                      * ( 1.0 / mult % phase_dens(1)  &
+                                        - 1.0 / mult % phase_dens(2) )
     end do
   end if
 

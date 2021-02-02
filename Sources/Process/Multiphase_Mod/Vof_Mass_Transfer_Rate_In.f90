@@ -10,20 +10,20 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: grid
   type(Field_Type), pointer :: flow
-  real, contiguous, pointer :: flux_rate(:)
+  real, contiguous, pointer :: m_dot(:)
   integer                   :: c
 !==============================================================================!
 
-  grid => mult % pnt_grid
-  flow => mult % pnt_flow
-
-  flux_rate  => mult % flux_rate
+  ! Take some aliases
+  grid  => mult % pnt_grid
+  flow  => mult % pnt_flow
+  m_dot => mult % m_dot
 
   mult % add_mass_in = 0.0
 
   ! The total added mass
   do c = 1, grid % n_cells - grid % comm % n_buff_cells
-    mult % add_mass_in = mult % add_mass_in + flux_rate(c) * grid % vol(c)     &
+    mult % add_mass_in = mult % add_mass_in + m_dot(c) * grid % vol(c)     &
                                             * flow % density(c)                &
                                             * ( 1.0 / mult % phase_dens(2)     &
                                               - 1.0 / mult % phase_dens(1) )

@@ -53,7 +53,7 @@
 
     ! Heat from phase change and index of saturated cells
     real, allocatable    :: qci(:)
-    real, allocatable    :: flux_rate(:)
+    real, allocatable    :: m_dot(:)  ! [kg/m^3 s]
     integer, allocatable :: ic(:)
     real                 :: add_mass_in, add_mass_out, vol_flux_avg
 

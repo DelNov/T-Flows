@@ -127,9 +127,9 @@
 
   if(mult % phase_change) then
     do c = 1, grid % n_cells
-      b(c) = b(c) + mult % flux_rate(c) * grid % vol(c)                    &
-                                        * ( 1.0 / mult % phase_dens(1)     &
-                                          - 1.0 / mult % phase_dens(2) )
+      b(c) = b(c) + mult % m_dot(c) * grid % vol(c)                    &
+                                    * ( 1.0 / mult % phase_dens(1)     &
+                                      - 1.0 / mult % phase_dens(2) )
     end do
   end if
 

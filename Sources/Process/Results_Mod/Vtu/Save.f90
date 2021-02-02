@@ -508,9 +508,9 @@
                             mult % surf_fy(c_f:c_l),                &
                             mult % surf_fz(c_f:c_l),                &
                             f8, f9, data_offset, run)
-      if (allocated(mult % flux_rate)) then
-        call Save_Scalar_Real("FluxRate ", plot_inside,             &
-                              mult % flux_rate(c_f:c_l),            &
+      if (allocated(mult % m_dot)) then
+        call Save_Scalar_Real("VofMassTransfer", plot_inside,       &
+                              mult % m_dot(c_f:c_l),                &
                               f8, f9, data_offset, run)
       end if
     end if

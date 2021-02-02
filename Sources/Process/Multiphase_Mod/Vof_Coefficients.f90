@@ -171,18 +171,18 @@
     ! end do
 
     do c = 1, grid % n_cells
-      b(c) = b(c) + mult % flux_rate(c) * grid % vol(c)    &
+      b(c) = b(c) + mult % m_dot(c) * grid % vol(c)    &
                   / mult % phase_dens(1)
-      ! b(c) = b(c) + mult % flux_rate(c) * grid % vol(c) * vof % n(c)    &
+      ! b(c) = b(c) + mult % m_dot(c) * grid % vol(c) * vof % n(c)    &
       !      * (1.0 / mult % phase_dens(2) - 1.0 / mult % phase_dens(1))
-      ! b(c) = b(c) + mult % flux_rate(c) * grid % vol(c)                 &
+      ! b(c) = b(c) + mult % m_dot(c) * grid % vol(c)                 &
       !      * ( 1.0 / mult % phase_dens(1)                               &
       !      - vof % n(c)                                                 &
       !      * (1.0 / mult % phase_dens(1) - 1.0 / mult % phase_dens(2)) )
-      ! b(c) = b(c) + mult % flux_rate(c) * grid % vol(c)    &
+      ! b(c) = b(c) + mult % m_dot(c) * grid % vol(c)    &
       !      / mult % phase_dens(1)
       ! a % val(a % dia(c)) = a % val(a % dia(c))    &
-      !      + mult % flux_rate(c) * grid % vol(c)   &
+      !      + mult % m_dot(c) * grid % vol(c)   &
       !      * (1.0 / mult % phase_dens(1) - 1.0 / mult % phase_dens(2))
     end do
   end if

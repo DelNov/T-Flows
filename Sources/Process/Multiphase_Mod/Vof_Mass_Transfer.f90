@@ -14,7 +14,7 @@
   type(Matrix_Type),    pointer :: a
   real,    contiguous,  pointer :: b(:)
   real,    contiguous,  pointer :: qci(:)
-  real,    contiguous,  pointer :: flux_rate(:)
+  real,    contiguous,  pointer :: m_dot(:)
   integer, contiguous,  pointer :: ic(:)
   integer                       :: s, ss, c, c1, c2, cc1, cc2
   integer                       :: n, i_fac, i_fac2, i_nod
@@ -35,17 +35,17 @@
   some_flux = 1.0e+02
 
   if( .not. allocated(mult % qci)) then
-    allocate(mult % qci      (-grid % n_bnd_cells:grid % n_cells))
-    allocate(mult % ic       (-grid % n_bnd_cells:grid % n_cells))
-    allocate(mult % flux_rate(-grid % n_bnd_cells:grid % n_cells))
+    allocate(mult % qci  (-grid % n_bnd_cells:grid % n_cells))
+    allocate(mult % ic   (-grid % n_bnd_cells:grid % n_cells))
+    allocate(mult % m_dot(-grid % n_bnd_cells:grid % n_cells))
   end if
-  ic         => mult % ic
-  qci        => mult % qci
-  flux_rate  => mult % flux_rate
+  ic    => mult % ic
+  qci   => mult % qci
+  m_dot => mult % m_dot
 
-  qci = 0.0
-  ic  = 0
-  flux_rate = 0.0
+  qci   = 0.0
+  ic    = 0
+  m_dot = 0.0
 
   ! cvs can be of two categories cat = 0, it is not considered, cat = 1,
   ! belongs to the interface, cat = 2, does not belong to interface but it is
@@ -141,8 +141,8 @@
   do c = 1, grid % n_cells
     if(ic(c) > 0) then
       if(ic(c) == 1) then
-        ! flux_rate(c) = qci(c) / (flow % latent_heat * grid % vol(c))
-        flux_rate(c) = some_flux
+        ! m_dot(c) = qci(c) / (flow % latent_heat * grid % vol(c))
+        m_dot(c) = some_flux
         ! write(*,*) c, grid % xc(c), vof % n(c)
       end if
     else ! cells category 0
@@ -161,16 +161,16 @@
     if(c2 > 0) then
       if(ic(c1) == 1) then
         if(ic(c2) == 2) then
-          flux_rate(c1) = some_flux
-          ! flux_rate(c1) = flux_rate(c1)                                     &
+          m_dot(c1) = some_flux
+          ! m_dot(c1) = m_dot(c1)                                     &
           !               + qci(c2) / (flow % latent_heat * grid % vol(c2))
         end if
       end if
 
       if(ic(c2) == 1) then
         if(ic(c1) == 2) then
-          flux_rate(c2) = some_flux
-          ! flux_rate(c2) = flux_rate(c2)                                     &
+          m_dot(c2) = some_flux
+          ! m_dot(c2) = m_dot(c2)                                     &
           !               + qci(c1) / (flow % latent_heat * grid % vol(c1))
         end if
       end if
@@ -185,6 +185,6 @@
     end if
   end do
 
-  call Grid_Mod_Exchange_Cells_Real(grid, flux_rate)
+  call Grid_Mod_Exchange_Cells_Real(grid, m_dot)
 
   end subroutine

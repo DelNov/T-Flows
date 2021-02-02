@@ -39,9 +39,9 @@
   allocate(mult % surf_fz(-nb:nc));  mult % surf_fz(-nb:nc) = 0.0
 
   if(mult % phase_change) then
-    allocate(mult % qci      (-nb:nc));  mult % qci      (-nb:nc) = 0.0
-    allocate(mult % ic       (-nb:nc));  mult % ic       (-nb:nc) = 0
-    allocate(mult % flux_rate(-nb:nc));  mult % flux_rate(-nb:nc) = 0.0
+    allocate(mult % qci  (-nb:nc));  mult % qci  (-nb:nc) = 0.0
+    allocate(mult % ic   (-nb:nc));  mult % ic   (-nb:nc) = 0
+    allocate(mult % m_dot(-nb:nc));  mult % m_dot(-nb:nc) = 0.0
   end if
 
   ! Physical properties for all (two) phases
