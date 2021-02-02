@@ -25,23 +25,17 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => mult % pnt_grid
-  flow => mult % pnt_flow
-  vof  => mult % vof
-  t    => flow % t
-  a    => sol % a
-  b    => sol % b % val
-
-  some_flux = 1.0e+02
-
-  if( .not. allocated(mult % qci)) then
-    allocate(mult % qci  (-grid % n_bnd_cells:grid % n_cells))
-    allocate(mult % ic   (-grid % n_bnd_cells:grid % n_cells))
-    allocate(mult % m_dot(-grid % n_bnd_cells:grid % n_cells))
-  end if
+  grid  => mult % pnt_grid
+  flow  => mult % pnt_flow
+  vof   => mult % vof
+  t     => flow % t
+  a     => sol % a
+  b     => sol % b % val
   ic    => mult % ic
   qci   => mult % qci
   m_dot => mult % m_dot
+
+  some_flux = 1.0e+02
 
   qci   = 0.0
   ic    = 0
