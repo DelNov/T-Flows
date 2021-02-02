@@ -231,11 +231,13 @@
         print '(2a)', '# Critical, for initial condition: ',        &
                       ' no values or variables have been provided'
         call Comm_Mod_End
+        stop
       end if
       if(nks .ne. nvs .and. this_proc < 2) then
         print '(2a)', '# Critical for initial conditions, number of values ',  &
                       ' is not the same as number of provided variable names'
         call Comm_Mod_End
+        stop
       end if
 
       ! Input is valid, turn keys to upper case

@@ -47,6 +47,7 @@
       print *, "# Exiting!"
     end if
     call Comm_Mod_End
+    stop
   end if
 
   ! Open backup file

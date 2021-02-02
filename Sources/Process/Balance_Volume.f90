@@ -117,6 +117,10 @@
 
   fac = bulk % vol_in / (bulk % vol_out + TINY)
 
+PRINT *, 'BULK % VOL_IN  @ BALANCE_VOLUME = ', BULK % VOL_IN
+PRINT *, 'BULK % VOL_OUT @ BALANCE_VOLUME = ', BULK % VOL_OUT
+PRINT *, 'FAC            @ BALANCE_VOLUME = ', FAC
+
   bulk % vol_out = 0.0
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)

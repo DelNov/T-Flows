@@ -174,11 +174,14 @@
         bc_type_tag = OPENBC
         grid % bnd_cond % type(bc) = OPENBC
       else
-        if(this_proc < 2)  &
+        if(this_proc < 2) then
           print *, '# ERROR!  Read_Control_Boundary_Conditions: '//        &
                    '# Unknown boundary condition type: ',  &
                    bc_type_name
-        call Comm_Mod_End
+          print *, '# This error is critical, exiting!'
+          call Comm_Mod_End
+          stop
+        end if
       end if
 
       !----------------------------------------------!

@@ -162,7 +162,8 @@
                         trim(problem_name(d2)), ' is not the same!'
               print *, '# Only conformal mappings are supported.  Exiting!'
             end if
-            call Comm_Mod_End()
+            call Comm_Mod_End
+            stop
           else
             n_tot = n1_tot
             inter(d1, d2) % n_tot = n_tot
