@@ -28,8 +28,8 @@
   type(Grid_Type),  pointer :: grid
   real                      :: p_xyz(8,3)
   real,         allocatable :: p(:,:)
-  integer                   :: c, n, fu
-  integer                   :: ee, n_boxes, n_p, np_count, i_fac
+  integer                   :: c, n, i, fu
+  integer                   :: ee, n_boxes, n_p, np_count, i_fac, seeds(1024)
   integer                   :: trios(6,3)
   real                      :: n_xyz(6,3), v1aux(3), v2aux(3)
   real                      :: res_dummy
@@ -42,8 +42,11 @@
 
   prelim_vof = 0.0
 
+  ! Initialize random seed
   p_name_aux = 'obstacle'
-  call Vof_Init_Random_Seed(p_name_aux)
+  call random_seed(size=n)
+  seeds = (/(i, i=1,n)/)
+  call random_seed(put=seeds(1:n))
 
   allocate(p(6,3))
 
