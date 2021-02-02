@@ -65,7 +65,7 @@
   end if
 
   ! Phase change
-  if(mult % phase_change) then
+  if(mult % mass_transfer) then
     call Multiphase_Mod_Vof_Mass_Transfer(mult, sol)
   end if
 

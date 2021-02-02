@@ -62,7 +62,7 @@
   end do
 
   ! Mass source:
-  if(mult % phase_change) then
+  if(mult % mass_transfer) then
     do c = 1, grid % n_cells - grid % comm % n_buff_cells
       bulk % vol_in = bulk % vol_in                                   &
                     + mult % m_dot(c) * grid % vol(c)                 &

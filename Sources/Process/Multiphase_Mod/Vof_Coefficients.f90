@@ -138,7 +138,7 @@
   end if
 
   ! Phase change
-  if(mult % phase_change) then
+  if(mult % mass_transfer) then
 
     ! do s = 1, grid % n_faces
     !   c1 = grid % faces_c(1,s)

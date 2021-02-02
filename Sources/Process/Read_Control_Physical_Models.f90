@@ -241,7 +241,7 @@
 
   call Control_Mod_Reference_Density(flow % dens_ref, .true.)
 
-  call Control_Mod_Phase_Change(mult % phase_change)
+  call Control_Mod_Mass_Transfer(mult % mass_transfer)
 
   !-----------------------!
   !                       !

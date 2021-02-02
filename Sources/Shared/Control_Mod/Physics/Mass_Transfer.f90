@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Control_Mod_Phase_Change(phase_change, verbose)
+  subroutine Control_Mod_Mass_Transfer(phase_change, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -9,7 +9,7 @@
   character(SL) :: val
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('PHASE_CHANGE', 'no', val, verbose)
+  call Control_Mod_Read_Char_Item('MASS_TRANSFER', 'no', val, verbose)
   call To_Upper_Case(val)
 
   if( val .eq. 'YES' ) then

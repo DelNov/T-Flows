@@ -38,7 +38,7 @@
   allocate(mult % surf_fy(-nb:nc));  mult % surf_fy(-nb:nc) = 0.0
   allocate(mult % surf_fz(-nb:nc));  mult % surf_fz(-nb:nc) = 0.0
 
-  if(mult % phase_change) then
+  if(mult % mass_transfer) then
     allocate(mult % qci  (-nb:nc));  mult % qci  (-nb:nc) = 0.0
     allocate(mult % ic   (-nb:nc));  mult % ic   (-nb:nc) = 0
     allocate(mult % m_dot(-nb:nc));  mult % m_dot(-nb:nc) = 0.0

@@ -73,7 +73,7 @@
 
     ! Multiphase flow
     include 'Control_Mod/Physics/Multiphase_Model.f90'
-    include 'Control_Mod/Physics/Phase_Change.f90'
+    include 'Control_Mod/Physics/Mass_Transfer.f90'
 
     ! Heat transfer
     include 'Control_Mod/Physics/Heat_Transfer.f90'
