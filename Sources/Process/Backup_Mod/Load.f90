@@ -37,6 +37,7 @@
   backup = .true.
   if(answer .eq. 'SKIP') then
     backup = .false.
+    call Cpu_Timer_Mod_Stop('Backup_Mod_Load')
     return
   end if
 
