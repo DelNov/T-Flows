@@ -26,6 +26,7 @@
   include 'Results_Mod/Main.f90'
   include 'Results_Mod/Time_To_Save.f90'
   include 'Results_Mod/Vtu/Save.f90'              ! binary
+  include 'Results_Mod/Vtu/Save_Front.f90'
   include 'Results_Mod/Vtu/Save_Scalar_Int.f90'   ! binary
   include 'Results_Mod/Vtu/Save_Scalar_Real.f90'  ! binary
   include 'Results_Mod/Vtu/Save_Swarm.f90'
