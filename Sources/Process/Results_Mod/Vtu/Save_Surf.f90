@@ -118,11 +118,11 @@
                             ' format="ascii">'
     ! Cell topology
     do e = 1, surf % n_elems
-      write(fu,'(a,3i9)')       &
-         IN_5,                  &
-         surf % elem(e) % i-1,  &
-         surf % elem(e) % j-1,  &
-         surf % elem(e) % k-1
+      write(fu,'(a,3i9)')          &
+         IN_5,                     &
+         surf % elem(e) % v(1)-1,  &
+         surf % elem(e) % v(2)-1,  &
+         surf % elem(e) % v(3)-1
     end do
 
     ! Cell offsets
