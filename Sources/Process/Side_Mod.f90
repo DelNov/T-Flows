@@ -11,8 +11,8 @@
   !---------------!
   type Side_Type
 
-    integer :: ei, ea, eb      ! element undefined, elements left and right
-    integer :: a, b, c, d
+    integer :: ei, ea, eb  ! element undefined, elements left and right
+    integer :: a, b, c, d  ! a and b make sense only for triangular surface
     real    :: length
     logical :: boundary
 
