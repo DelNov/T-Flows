@@ -31,7 +31,7 @@
   real                       :: phi1, phi2, xn1, yn1, zn1, xn2, yn2, zn2, w1, w2
   real                       :: surf_v(3), dist
 !------------------------------------------------------------------------------!
-  include 'Surf_Mod/Edge_Numbering_Neu.f90'
+  include 'Surf_Mod/Edge_Numbering.f90'
 !==============================================================================!
 
   ! Take aliases
@@ -94,10 +94,10 @@
     n_vert = 0
 
     ! Fetch the edges for this cell
-    if(grid % cells_n_nodes(c) .eq. 4) en = neu_tet
-    if(grid % cells_n_nodes(c) .eq. 5) en = neu_pyr
-    if(grid % cells_n_nodes(c) .eq. 6) en = neu_wed
-    if(grid % cells_n_nodes(c) .eq. 8) en = neu_hex
+    if(grid % cells_n_nodes(c) .eq. 4) en = edg_tet
+    if(grid % cells_n_nodes(c) .eq. 5) en = edg_pyr
+    if(grid % cells_n_nodes(c) .eq. 6) en = edg_wed
+    if(grid % cells_n_nodes(c) .eq. 8) en = edg_hex
 
     !------------------------------------------------------!
     !   Browse through edges to find intersection points   !
