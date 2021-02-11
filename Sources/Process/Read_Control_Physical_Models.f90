@@ -240,6 +240,8 @@
     mult % model = NO_MULTIPHASE_MODEL
   end if
 
+  call Control_Mod_Track_Front(mult % track_front, .true.)
+
   call Control_Mod_Reference_Density(flow % dens_ref, .true.)
 
   call Control_Mod_Mass_Transfer(mult % mass_transfer)

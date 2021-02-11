@@ -118,8 +118,6 @@
     call Control_Mod_Max_Smoothing_Cycles_Normal_Vof(mult % n_conv_norm)
     ! Skewness Correction
     call Control_Mod_Skewness_Correction_Vof(mult % skew_corr)
-    ! Reconstruct surface
-    call Control_Mod_Track_Front(mult % track_front, .true.)
   end if
 
   !--------------------------------!
