@@ -5,6 +5,9 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Field_Mod
+  use Vert_Mod
+  use Elem_Mod
+  use Side_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -15,73 +18,6 @@
   integer, parameter   :: MAX_ELEMENT_VERTICES =      6
   integer, parameter   :: MAX_SURFACE_VERTICES = 131072
   integer, parameter   :: MAX_SURFACE_ELEMENTS = 131072
-
-  !---------------!
-  !   Vert type   !
-  !---------------!
-  type Vert_Type
-
-    ! Vertex's coordinates; new and old
-    real :: x_n, x_o
-    real :: y_n, y_o
-    real :: z_n, z_o
-
-    ! Vertex's velocity (if needed)
-    real :: u
-    real :: v
-    real :: w
-
-    real :: sumx, sumy, sumz
-
-    integer :: nne                     ! number of neighbouring elements
-    integer :: nnv                     ! number of neighbouring vertices
-    logical :: boundary                ! is vertex on a boundary
-    integer, allocatable :: vert_e(:)  ! list of elements around the vertex
-
-    ! The closest cell, node, boundary cell and face
-    integer :: cell
-    integer :: node
-    integer :: bnd_cell
-    integer :: bnd_face
-
-    ! Vertex departure from domain 
-    logical :: escaped
-
-    ! Vertex inside the subdomain
-    integer :: proc
-    integer :: buff
-
-    real :: curv
-  end type
-
-  !---------------!
-  !   Elem type   !
-  !---------------!
-  type Elem_Type
-
-    integer :: nne         ! number of neighbouring element
-    integer ::  i,  j,  k
-    integer :: ei, ej, ek
-    integer :: si, sj, sk
-    real    :: nx, ny, nz  ! surface normal vector
-    real    :: xc, yc, zc  ! center of a sphere
-    real    :: xe, ye, ze  ! center of element
-    real    :: area
-    real    :: curv
-
-  end type
-
-  !---------------!
-  !   Side type   !
-  !---------------!
-  type Side_Type
-
-    integer :: ei, ea, eb      ! element undefined, elements left and right
-    integer :: a, b, c, d
-    real    :: length
-    logical :: boundary
-
-  end type
 
   !---------------!
   !   Surf type   !
