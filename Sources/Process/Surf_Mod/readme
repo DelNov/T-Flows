@@ -1,0 +1,4 @@
+This contains development towards interface tracking with independent
+triangular mesh.  It is heavily based on EasyMesh.  Seems to work okayish
+in sequential, but was never parallelized, or did it ever handle periodic
+boundary conditions well.
