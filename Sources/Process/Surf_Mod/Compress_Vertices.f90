@@ -24,9 +24,9 @@
 
   ! Check sanity of the elements so far
   do e = 1, ne
-    if( (elem(e) % i .eq. elem(e) % j) .or.  &
-        (elem(e) % i .eq. elem(e) % k) .or.  &
-        (elem(e) % j .eq. elem(e) % k) ) then
+    if( (elem(e) % v(1) .eq. elem(e) % v(2)) .or.  &
+        (elem(e) % v(1) .eq. elem(e) % v(3)) .or.  &
+        (elem(e) % v(2) .eq. elem(e) % v(3)) ) then
       print '(a)',      ' # ERROR in the beginning of Compress_Vertices'
       print '(a,i6,a)', ' # element ', e, 'has same vertices'
     end if
@@ -85,9 +85,9 @@
   call Sort_Mod_Int_Carry_Int(ni, new_n)
 
   do e = 1, ne
-    elem(e) % i = new_n(elem(e) % i)
-    elem(e) % j = new_n(elem(e) % j)
-    elem(e) % k = new_n(elem(e) % k)
+    elem(e) % v(1) = new_n(elem(e) % v(1))
+    elem(e) % v(2) = new_n(elem(e) % v(2))
+    elem(e) % v(3) = new_n(elem(e) % v(3))
   end do
 
   ! Store compressed number of vertices
@@ -96,9 +96,9 @@
 
   ! Check sanity of the elements in the end
   do e = 1, ne
-    if( (elem(e) % i .eq. elem(e) % j) .or.  &
-        (elem(e) % i .eq. elem(e) % k) .or.  &
-        (elem(e) % j .eq. elem(e) % k) ) then
+    if( (elem(e) % v(1) .eq. elem(e) % v(2)) .or.  &
+        (elem(e) % v(1) .eq. elem(e) % v(3)) .or.  &
+        (elem(e) % v(2) .eq. elem(e) % v(3)) ) then
       print '(a)',      ' # ERROR in the end of Compress_Vertices'
       print '(a,i6,a)', ' # element', e, ' has same vertices'
       stop

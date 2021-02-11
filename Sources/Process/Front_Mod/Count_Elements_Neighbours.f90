@@ -19,9 +19,9 @@
   ! Do the actual count
   elem(1:ne) % nne = 0
   do e = 1, ne
-    if(elem(e) % ei .ne. 0) elem(e) % nne = elem(e) % nne + 1
-    if(elem(e) % ej .ne. 0) elem(e) % nne = elem(e) % nne + 1
-    if(elem(e) % ek .ne. 0) elem(e) % nne = elem(e) % nne + 1
+    if(elem(e) % e(1) .ne. 0) elem(e) % nne = elem(e) % nne + 1
+    if(elem(e) % e(2) .ne. 0) elem(e) % nne = elem(e) % nne + 1
+    if(elem(e) % e(3) .ne. 0) elem(e) % nne = elem(e) % nne + 1
   end do
 
   end subroutine

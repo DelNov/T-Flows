@@ -52,9 +52,9 @@
   allocate(elem_n_verts(front % n_elems))
   elem_n_verts(:) = 0
   do e = 1, front % n_elems
-    i = front % elem(e) % i
-    j = front % elem(e) % j
-    k = front % elem(e) % k
+    i = front % elem(e) % v(1)
+    j = front % elem(e) % v(2)
+    k = front % elem(e) % v(3)
     elem_n_verts(e) = elem_n_verts(e) + front % vert(i) % nnv
     elem_n_verts(e) = elem_n_verts(e) + front % vert(j) % nnv
     elem_n_verts(e) = elem_n_verts(e) + front % vert(k) % nnv
@@ -66,9 +66,9 @@
 
   elem_n_verts(:) = 0
   do e = 1, front % n_elems
-    i = front % elem(e) % i
-    j = front % elem(e) % j
-    k = front % elem(e) % k
+    i = front % elem(e) % v(1)
+    j = front % elem(e) % v(2)
+    k = front % elem(e) % v(3)
     do v = 1, front % vert(i) % nnv
       elem_n_verts(e) = elem_n_verts(e) + 1;
       elem_v(elem_n_verts(e), e) = vert_v(v, i)
@@ -158,9 +158,9 @@
   front % vert(1:front % n_verts) % curv = 0.
   do e = 1, front % n_elems
 
-    i = front % elem(e) % i
-    j = front % elem(e) % j
-    k = front % elem(e) % k
+    i = front % elem(e) % v(1)
+    j = front % elem(e) % v(2)
+    k = front % elem(e) % v(3)
     front % vert(i) % curv = front % vert(i) % curv  &
                            + front % elem(e) % curv/real(front % vert(i) % nne)
     front % vert(j) % curv = front % vert(j) % curv  &

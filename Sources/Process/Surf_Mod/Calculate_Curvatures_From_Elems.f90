@@ -52,9 +52,9 @@
   allocate(elem_n_verts(surf % n_elems))
   elem_n_verts(:) = 0
   do e = 1, surf % n_elems
-    i = surf % elem(e) % i
-    j = surf % elem(e) % j
-    k = surf % elem(e) % k
+    i = surf % elem(e) % v(1)
+    j = surf % elem(e) % v(2)
+    k = surf % elem(e) % v(3)
     elem_n_verts(e) = elem_n_verts(e) + surf % vert(i) % nnv
     elem_n_verts(e) = elem_n_verts(e) + surf % vert(j) % nnv
     elem_n_verts(e) = elem_n_verts(e) + surf % vert(k) % nnv
@@ -66,9 +66,9 @@
 
   elem_n_verts(:) = 0
   do e = 1, surf % n_elems
-    i = surf % elem(e) % i
-    j = surf % elem(e) % j
-    k = surf % elem(e) % k
+    i = surf % elem(e) % v(1)
+    j = surf % elem(e) % v(2)
+    k = surf % elem(e) % v(3)
     do v = 1, surf % vert(i) % nnv
       elem_n_verts(e) = elem_n_verts(e) + 1;
       elem_v(elem_n_verts(e), e) = vert_v(v, i)
@@ -158,9 +158,9 @@
   surf % vert(1:surf % n_verts) % curv = 0.
   do e = 1, surf % n_elems
 
-    i = surf % elem(e) % i
-    j = surf % elem(e) % j
-    k = surf % elem(e) % k
+    i = surf % elem(e) % v(1)
+    j = surf % elem(e) % v(2)
+    k = surf % elem(e) % v(3)
     surf % vert(i) % curv = surf % vert(i) % curv  &
                           + surf % elem(e) % curv / real(surf % vert(i) % nne)
     surf % vert(j) % curv = surf % vert(j) % curv  &

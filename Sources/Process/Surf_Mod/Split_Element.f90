@@ -25,17 +25,17 @@
   side => surf % side
   elem => surf % elem
 
-  i = elem(e) % i
-  j = elem(e) % j
-  k = elem(e) % k
+  i = elem(e) % v(1)
+  j = elem(e) % v(2)
+  k = elem(e) % v(3)
 
-  ei = elem(e) % ei
-  ej = elem(e) % ej
-  ek = elem(e) % ek
+  ei = elem(e) % e(1)
+  ej = elem(e) % e(2)
+  ek = elem(e) % e(3)
 
-  si = elem(e) % si
-  sj = elem(e) % sj
-  sk = elem(e) % sk
+  si = elem(e) % s(1)
+  sj = elem(e) % s(2)
+  sk = elem(e) % s(3)
 
   !-----------------------------------------------!
   !   Create new vertex in the element's center   !
@@ -83,43 +83,43 @@
   !-------------------------------!
 
   ! Handle new elements' vertices
-  elem(e_ijn) % i = i
-  elem(e_ijn) % j = j
-  elem(e_ijn) % k = nv
+  elem(e_ijn) % v(1) = i
+  elem(e_ijn) % v(2) = j
+  elem(e_ijn) % v(3) = nv
 
-  elem(e_njk) % i = nv
-  elem(e_njk) % j = j
-  elem(e_njk) % k = k
+  elem(e_njk) % v(1) = nv
+  elem(e_njk) % v(2) = j
+  elem(e_njk) % v(3) = k
 
-  elem(e_ink) % i = i
-  elem(e_ink) % j = nv
-  elem(e_ink) % k = k
+  elem(e_ink) % v(1) = i
+  elem(e_ink) % v(2) = nv
+  elem(e_ink) % v(3) = k
 
   ! Handle new elements' neighbours
-  elem(e_ijn) % ei = e_njk
-  elem(e_ijn) % ej = e_ink
-  elem(e_ijn) % ek = ek
+  elem(e_ijn) % e(1) = e_njk
+  elem(e_ijn) % e(2) = e_ink
+  elem(e_ijn) % e(3) = ek
 
-  elem(e_njk) % ei = ei
-  elem(e_njk) % ej = e_ink
-  elem(e_njk) % ek = e_ijn
+  elem(e_njk) % e(1) = ei
+  elem(e_njk) % e(2) = e_ink
+  elem(e_njk) % e(3) = e_ijn
 
-  elem(e_ink) % ei = e_njk
-  elem(e_ink) % ej = ej
-  elem(e_ink) % ek = e_ijn
+  elem(e_ink) % e(1) = e_njk
+  elem(e_ink) % e(2) = ej
+  elem(e_ink) % e(3) = e_ijn
 
   ! Handle new elements' sides
-  elem(e_ijn) % si = s_jn
-  elem(e_ijn) % sj = s_in
-  elem(e_ijn) % sk = sk
+  elem(e_ijn) % s(1) = s_jn
+  elem(e_ijn) % s(2) = s_in
+  elem(e_ijn) % s(3) = sk
 
-  elem(e_njk) % si = si
-  elem(e_njk) % sj = s_kn
-  elem(e_njk) % sk = s_jn
+  elem(e_njk) % s(1) = si
+  elem(e_njk) % s(2) = s_kn
+  elem(e_njk) % s(3) = s_jn
 
-  elem(e_ink) % si = s_kn
-  elem(e_ink) % sj = sj
-  elem(e_ink) % sk = s_in
+  elem(e_ink) % s(1) = s_kn
+  elem(e_ink) % s(2) = sj
+  elem(e_ink) % s(3) = s_in
 
   !-------------------------------------------!
   !   Increase number of sides and elements   !
@@ -132,15 +132,15 @@
   !-------------------------------------!
 
   if(ei .gt. 0) then
-    if(elem(ei) % ei .eq. e_ijn) elem(ei) % ei = e_njk
-    if(elem(ei) % ej .eq. e_ijn) elem(ei) % ej = e_njk
-    if(elem(ei) % ek .eq. e_ijn) elem(ei) % ek = e_njk
+    if(elem(ei) % e(1) .eq. e_ijn) elem(ei) % e(1) = e_njk
+    if(elem(ei) % e(2) .eq. e_ijn) elem(ei) % e(2) = e_njk
+    if(elem(ei) % e(3) .eq. e_ijn) elem(ei) % e(3) = e_njk
   end if
 
   if(ej .gt. 0) then
-    if(elem(ej) % ei .eq. e_ijn) elem(ej) % ei = e_ink
-    if(elem(ej) % ej .eq. e_ijn) elem(ej) % ej = e_ink
-    if(elem(ej) % ek .eq. e_ijn) elem(ej) % ek = e_ink
+    if(elem(ej) % e(1) .eq. e_ijn) elem(ej) % e(1) = e_ink
+    if(elem(ej) % e(2) .eq. e_ijn) elem(ej) % e(2) = e_ink
+    if(elem(ej) % e(3) .eq. e_ijn) elem(ej) % e(3) = e_ink
   end if
 
   if(side(si) % ea .eq. e_ijn) then
@@ -193,7 +193,7 @@
     if(run .eq. 6) s = s_kn
     ea = side(s) % ea
     if(ea > 0) then
-      if( (elem(ea) % i + elem(ea) % j + elem(ea) % k) .ne.  &
+      if( (elem(ea) % v(1) + elem(ea) % v(2) + elem(ea) % v(3)) .ne.  &
           (side(s) % c + side(s) % d + side(s) % a) ) then
         print *, '# ERROR A in splitting an element at run', run
         stop
@@ -202,7 +202,7 @@
 
     eb = side(s) % eb
     if(eb > 0) then
-      if( (elem(eb) % i + elem(eb) % j + elem(eb) % k) .ne.  &
+      if( (elem(eb) % v(1) + elem(eb) % v(2) + elem(eb) % v(3)) .ne.  &
           (side(s) % c + side(s) % d + side(s) % b) ) then
         print *, '# ERROR B in splitting an element at run', run
         stop
@@ -218,10 +218,10 @@
     if(run .eq. 5) e = ej
     if(run .eq. 6) e = ek
     if(e > 0) then  ! ei, ej or ek can be zero
-      sum_ijk = elem(e) % i + elem(e) % j + elem(e) % k
-      sum_cd  = side(elem(e) % si) % c + side(elem(e) % si) % d  &
-              + side(elem(e) % sj) % c + side(elem(e) % sj) % d  &
-              + side(elem(e) % sk) % c + side(elem(e) % sk) % d
+      sum_ijk = elem(e) % v(1) + elem(e) % v(2) + elem(e) % v(3)
+      sum_cd  = side(elem(e) % s(1)) % c + side(elem(e) % s(1)) % d  &
+              + side(elem(e) % s(2)) % c + side(elem(e) % s(2)) % d  &
+              + side(elem(e) % s(3)) % c + side(elem(e) % s(3)) % d
       if( sum_cd / sum_ijk .ne. 2 ) then
         print *, '# ERROR C in splitting an element!'
         stop

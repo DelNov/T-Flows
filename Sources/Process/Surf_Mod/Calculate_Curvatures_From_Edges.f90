@@ -105,9 +105,9 @@
   surf % vert(1:surf % n_verts) % curv = 0.
   do e = 1, surf % n_elems
 
-    i = surf % elem(e) % i
-    j = surf % elem(e) % j
-    k = surf % elem(e) % k
+    i = surf % elem(e) % v(1)
+    j = surf % elem(e) % v(2)
+    k = surf % elem(e) % v(3)
     surf % vert(i) % curv = surf % vert(i) % curv  &
                           + surf % elem(e) % curv / real(surf % vert(i) % nne)
     surf % vert(j) % curv = surf % vert(j) % curv  &

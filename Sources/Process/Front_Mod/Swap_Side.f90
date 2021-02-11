@@ -61,11 +61,11 @@
   !--------------------------------------------!
   !   Change the orientation of the elements   !
   !--------------------------------------------!
-  elem(ea) % i  = a;    elem(ea) % j  = b;    elem(ea) % k  = d
+  elem(ea) % v(1)  = a;    elem(ea) % v(2)  = b;    elem(ea) % v(3)  = d
   elem(ea) % ei = ebd;  elem(ea) % ej = ead;  elem(ea) % ek = eb
   elem(ea) % si = sbd;  elem(ea) % sj = sad;  elem(ea) % sk = s
 
-  elem(eb) % i  = a;    elem(eb) % j  = c;    elem(eb) % k  = b
+  elem(eb) % v(1)  = a;    elem(eb) % v(2)  = c;    elem(eb) % v(3)  = b
   elem(eb) % ei = ebc;  elem(eb) % ej = ea;   elem(eb) % ek = eac
   elem(eb) % si = sbc;  elem(eb) % sj = s;    elem(eb) % sk = sac
 

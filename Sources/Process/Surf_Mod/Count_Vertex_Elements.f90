@@ -19,9 +19,9 @@
 
   vert(1:nv) % nne = 0
   do e = 1, ne
-    i = elem(e) % i
-    j = elem(e) % j
-    k = elem(e) % k
+    i = elem(e) % v(1)
+    j = elem(e) % v(2)
+    k = elem(e) % v(3)
     vert(i) % nne = vert(i) % nne + 1
     vert(j) % nne = vert(j) % nne + 1
     vert(k) % nne = vert(k) % nne + 1

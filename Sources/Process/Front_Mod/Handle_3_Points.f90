@@ -24,15 +24,15 @@
   ne = ne + 1           ! one new element
 
   ! Store last three vertices for the new element
-  elem(ne) % i = nv - 2
-  elem(ne) % j = nv - 1
-  elem(ne) % k = nv
+  elem(ne) % v(1) = nv - 2
+  elem(ne) % v(2) = nv - 1
+  elem(ne) % v(3) = nv
 
   ! Take vectors a and b; u connection points 2 and 1;
   ! v connecting 3 and 1
-  ver(1) = elem(ne) % i
-  ver(2) = elem(ne) % j
-  ver(3) = elem(ne) % k
+  ver(1) = elem(ne) % v(1)
+  ver(2) = elem(ne) % v(2)
+  ver(3) = elem(ne) % v(3)
 
   a(1) = vert(ver(2)) % x_n - vert(ver(1)) % x_n
   a(2) = vert(ver(2)) % y_n - vert(ver(1)) % y_n
@@ -45,8 +45,8 @@
   tri_p = Math_Mod_Cross_Product(a, b)
 
   if(dot_product(surf_v, tri_p) < 0.0) then
-    call Swap_Int(elem(ne) % j,  &
-                  elem(ne) % k)
+    call Swap_Int(elem(ne) % v(2),  &
+                  elem(ne) % v(3))
   end if
 
   end subroutine

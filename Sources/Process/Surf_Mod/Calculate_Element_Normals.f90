@@ -27,13 +27,13 @@
   !---------------------------------!
   do e = 1, ne
 
-    a(1) = vert(elem(e) % j) % x_n - vert(elem(e) % i) % x_n
-    a(2) = vert(elem(e) % j) % y_n - vert(elem(e) % i) % y_n
-    a(3) = vert(elem(e) % j) % z_n - vert(elem(e) % i) % z_n
+    a(1) = vert(elem(e) % v(2)) % x_n - vert(elem(e) % v(1)) % x_n
+    a(2) = vert(elem(e) % v(2)) % y_n - vert(elem(e) % v(1)) % y_n
+    a(3) = vert(elem(e) % v(2)) % z_n - vert(elem(e) % v(1)) % z_n
 
-    b(1) = vert(elem(e) % k) % x_n - vert(elem(e) % i) % x_n
-    b(2) = vert(elem(e) % k) % y_n - vert(elem(e) % i) % y_n
-    b(3) = vert(elem(e) % k) % z_n - vert(elem(e) % i) % z_n
+    b(1) = vert(elem(e) % v(3)) % x_n - vert(elem(e) % v(1)) % x_n
+    b(2) = vert(elem(e) % v(3)) % y_n - vert(elem(e) % v(1)) % y_n
+    b(3) = vert(elem(e) % v(3)) % z_n - vert(elem(e) % v(1)) % z_n
 
     tri_v = Math_Mod_Cross_Product(a, b)
 
@@ -47,9 +47,9 @@
     do j = 1, 3
 
       ! Take the closest cell
-      if(j .eq. 1) c = vert(elem(e) % i) % cell
-      if(j .eq. 2) c = vert(elem(e) % j) % cell
-      if(j .eq. 3) c = vert(elem(e) % k) % cell
+      if(j .eq. 1) c = vert(elem(e) % v(1)) % cell
+      if(j .eq. 2) c = vert(elem(e) % v(2)) % cell
+      if(j .eq. 3) c = vert(elem(e) % v(3)) % cell
 
       ! Surface vector
       surf_v(1) = phi % x(c)

@@ -33,9 +33,9 @@
   !-----------------------------------------------------------!
   vert(1:nv) % nne = 0
   do e = 1, ne
-    vert(elem(e) % i) % nne = vert(elem(e) % i) % nne + 1
-    vert(elem(e) % j) % nne = vert(elem(e) % j) % nne + 1
-    vert(elem(e) % k) % nne = vert(elem(e) % k) % nne + 1
+    vert(elem(e) % v(1)) % nne = vert(elem(e) % v(1)) % nne + 1
+    vert(elem(e) % v(2)) % nne = vert(elem(e) % v(2)) % nne + 1
+    vert(elem(e) % v(3)) % nne = vert(elem(e) % v(3)) % nne + 1
   end do
 
   call Surf_Mod_Find_Boundaries(surf)

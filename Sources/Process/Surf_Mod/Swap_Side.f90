@@ -32,42 +32,42 @@
   eac = 0; ead = 0; ebc = 0; ebd = 0
   sad = 0; sac = 0; sbc = 0; sbd = 0
 
-  if(elem(ea) % ei .eq. eb) then
-    ead = elem(ea) % ej;  eac = elem(ea) % ek
-    sad = elem(ea) % sj;  sac = elem(ea) % sk
+  if(elem(ea) % e(1) .eq. eb) then
+    ead = elem(ea) % e(2);  eac = elem(ea) % e(3)
+    sad = elem(ea) % s(2);  sac = elem(ea) % s(3)
   end if
-  if(elem(ea) % ej .eq. eb) then
-    ead = elem(ea) % ek;  eac = elem(ea) % ei
-    sad = elem(ea) % sk;  sac = elem(ea) % si
+  if(elem(ea) % e(2) .eq. eb) then
+    ead = elem(ea) % e(3);  eac = elem(ea) % e(1)
+    sad = elem(ea) % s(3);  sac = elem(ea) % s(1)
   end if
-  if(elem(ea) % ek .eq. eb) then
-    ead = elem(ea) % ei;  eac = elem(ea) % ej
-    sad = elem(ea) % si;  sac = elem(ea) % sj
+  if(elem(ea) % e(3) .eq. eb) then
+    ead = elem(ea) % e(1);  eac = elem(ea) % e(2)
+    sad = elem(ea) % s(1);  sac = elem(ea) % s(2)
   end if
 
-  if(elem(eb) % ei .eq. ea) then
-    ebc = elem(eb) % ej;  ebd = elem(eb) % ek
-    sbc = elem(eb) % sj;  sbd = elem(eb) % sk
+  if(elem(eb) % e(1) .eq. ea) then
+    ebc = elem(eb) % e(2);  ebd = elem(eb) % e(3)
+    sbc = elem(eb) % s(2);  sbd = elem(eb) % s(3)
   end if
-  if(elem(eb) % ej .eq. ea) then
-    ebc = elem(eb) % ek;  ebd = elem(eb) % ei
-    sbc = elem(eb) % sk;  sbd = elem(eb) % si
+  if(elem(eb) % e(2) .eq. ea) then
+    ebc = elem(eb) % e(3);  ebd = elem(eb) % e(1)
+    sbc = elem(eb) % s(3);  sbd = elem(eb) % s(1)
   end if
-  if(elem(eb) % ek .eq. ea) then
-    ebc = elem(eb) % ei;  ebd = elem(eb) % ej
-    sbc = elem(eb) % si;  sbd = elem(eb) % sj
+  if(elem(eb) % e(3) .eq. ea) then
+    ebc = elem(eb) % e(1);  ebd = elem(eb) % e(2)
+    sbc = elem(eb) % s(1);  sbd = elem(eb) % s(2)
   end if
 
   !--------------------------------------------!
   !   Change the orientation of the elements   !
   !--------------------------------------------!
-  elem(ea) % i  = a;    elem(ea) % j  = b;    elem(ea) % k  = d
-  elem(ea) % ei = ebd;  elem(ea) % ej = ead;  elem(ea) % ek = eb
-  elem(ea) % si = sbd;  elem(ea) % sj = sad;  elem(ea) % sk = s
+  elem(ea) % v(1) = a;    elem(ea) % v(2) = b;    elem(ea) % v(3) = d
+  elem(ea) % e(1) = ebd;  elem(ea) % e(2) = ead;  elem(ea) % e(3) = eb
+  elem(ea) % s(1) = sbd;  elem(ea) % s(2) = sad;  elem(ea) % s(3) = s
 
-  elem(eb) % i  = a;    elem(eb) % j  = c;    elem(eb) % k  = b
-  elem(eb) % ei = ebc;  elem(eb) % ej = ea;   elem(eb) % ek = eac
-  elem(eb) % si = sbc;  elem(eb) % sj = s;    elem(eb) % sk = sac
+  elem(eb) % v(1) = a;    elem(eb) % v(2) = c;    elem(eb) % v(3) = b
+  elem(eb) % e(1) = ebc;  elem(eb) % e(2) = ea;   elem(eb) % e(3) = eac
+  elem(eb) % s(1) = sbc;  elem(eb) % s(2) = s;    elem(eb) % s(3) = sac
 
   !-------------------------------------------------!
   !   Change the orientation of the side properly   !
@@ -86,15 +86,15 @@
   !   Update information on the neighbouring elements   !
   !-----------------------------------------------------!
   if(eac .ne. 0) then
-    if(elem(eac) % ei .eq. ea) elem(eac) % ei = eb
-    if(elem(eac) % ej .eq. ea) elem(eac) % ej = eb
-    if(elem(eac) % ek .eq. ea) elem(eac) % ek = eb
+    if(elem(eac) % e(1) .eq. ea) elem(eac) % e(1) = eb
+    if(elem(eac) % e(2) .eq. ea) elem(eac) % e(2) = eb
+    if(elem(eac) % e(3) .eq. ea) elem(eac) % e(3) = eb
   end if
 
   if(ebd .ne. 0) then
-    if(elem(ebd) % ei .eq. eb) elem(ebd) % ei = ea
-    if(elem(ebd) % ej .eq. eb) elem(ebd) % ej = ea
-    if(elem(ebd) % ek .eq. eb) elem(ebd) % ek = ea
+    if(elem(ebd) % e(1) .eq. eb) elem(ebd) % e(1) = ea
+    if(elem(ebd) % e(2) .eq. eb) elem(ebd) % e(2) = ea
+    if(elem(ebd) % e(3) .eq. eb) elem(ebd) % e(3) = ea
   end if
 
   !--------------------------------------------------!

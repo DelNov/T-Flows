@@ -199,26 +199,26 @@
   ! One new element with three vertices
   ne = ne + 1
 
-  elem(ne) % i = ver(1)
-  elem(ne) % j = ver(2)
-  elem(ne) % k = ver(3)
+  elem(ne) % v(1) = ver(1)
+  elem(ne) % v(2) = ver(2)
+  elem(ne) % v(3) = ver(3)
 
   ! Second new element with three vertices
   ne = ne + 1
-  elem(ne) % i = ver(1)
-  elem(ne) % j = ver(3)
-  elem(ne) % k = ver(4)
+  elem(ne) % v(1) = ver(1)
+  elem(ne) % v(2) = ver(3)
+  elem(ne) % v(3) = ver(4)
 
   ! Third new element with three vertices
   ne = ne + 1
-  elem(ne) % i = ver(1)
-  elem(ne) % j = ver(4)
-  elem(ne) % k = ver(5)
+  elem(ne) % v(1) = ver(1)
+  elem(ne) % v(2) = ver(4)
+  elem(ne) % v(3) = ver(5)
 
   ! Fourth new element with three vertices
   ne = ne + 1
-  elem(ne) % i = ver(1)
-  elem(ne) % j = ver(5)
-  elem(ne) % k = ver(6)
+  elem(ne) % v(1) = ver(1)
+  elem(ne) % v(2) = ver(5)
+  elem(ne) % v(3) = ver(6)
 
   end subroutine

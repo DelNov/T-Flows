@@ -31,16 +31,10 @@
   !-----------------------------!
   allocate(surf % elem(MAX_SURFACE_ELEMENTS))
   do e = 1, MAX_SURFACE_ELEMENTS
-    surf % elem(e) % nne = 0
-    surf % elem(e) %   i = 0
-    surf % elem(e) %   j = 0
-    surf % elem(e) %   k = 0
-    surf % elem(e) %  ei = 0
-    surf % elem(e) %  ej = 0
-    surf % elem(e) %  ek = 0
-    surf % elem(e) %  si = 0
-    surf % elem(e) %  sj = 0
-    surf % elem(e) %  sk = 0
+    surf % elem(e) % nne  = 0
+    surf % elem(e) % v(:) = 0
+    surf % elem(e) % e(:) = 0
+    surf % elem(e) % s(:) = 0
   end do
   surf % n_elems = 0
 

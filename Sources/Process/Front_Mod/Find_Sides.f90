@@ -32,18 +32,18 @@
   n_side = 0  ! initialize side coutner
   do e = 1, ne
     n_side = n_side + 1
-    side(n_side) % c  = elem(e) % i
-    side(n_side) % d  = elem(e) % j
+    side(n_side) % c  = elem(e) % v(1)
+    side(n_side) % d  = elem(e) % v(2)
     side(n_side) % ei = e
 
     n_side = n_side + 1
-    side(n_side) % c  = elem(e) % j
-    side(n_side) % d  = elem(e) % k
+    side(n_side) % c  = elem(e) % v(2)
+    side(n_side) % d  = elem(e) % v(3)
     side(n_side) % ei = e
 
     n_side = n_side + 1
-    side(n_side) % c  = elem(e) % k
-    side(n_side) % d  = elem(e) % i
+    side(n_side) % c  = elem(e) % v(3)
+    side(n_side) % d  = elem(e) % v(1)
     side(n_side) % ei = e
   end do
   if(verbose) then
@@ -92,9 +92,9 @@
       ! Tedious but (hopefully) correct way to find eb and ea
       do ss = s, s+1
 
-        i = elem(ei(ss)) % i
-        j = elem(ei(ss)) % j
-        k = elem(ei(ss)) % k
+        i = elem(ei(ss)) % v(1)
+        j = elem(ei(ss)) % v(2)
+        k = elem(ei(ss)) % v(3)
 
         ! Check ea
         if(i.eq.c .and. j.eq.d) then
@@ -146,9 +146,9 @@
       ! Tedious but (hopefully) correct way to find eb and ea
       ss = s
 
-      i = elem(ei(ss)) % i
-      j = elem(ei(ss)) % j
-      k = elem(ei(ss)) % k
+      i = elem(ei(ss)) % v(1)
+      j = elem(ei(ss)) % v(2)
+      k = elem(ei(ss)) % v(3)
 
       ! Check ea
       if(i.eq.c .and. j.eq.d) then
@@ -206,33 +206,33 @@
 
     ! Element a
     if(ea > 0) then
-      if(elem(ea) % i .eq. a) then
-        elem(ea) % ei = eb
-        elem(ea) % si = s
+      if(elem(ea) % v(1) .eq. a) then
+        elem(ea) % e(1) = eb
+        elem(ea) % s(1) = s
       end if
-      if(elem(ea) % j .eq. a) then
-        elem(ea) % ej = eb
-        elem(ea) % sj = s
+      if(elem(ea) % v(2) .eq. a) then
+        elem(ea) % e(2) = eb
+        elem(ea) % s(2) = s
       end if
-      if(elem(ea) % k .eq. a) then
-        elem(ea) % ek = eb
-        elem(ea) % sk = s
+      if(elem(ea) % v(3) .eq. a) then
+        elem(ea) % e(3) = eb
+        elem(ea) % s(3) = s
       end if
     end if    ! ea > 0
 
     ! Element b
     if(eb > 0) then
-      if(elem(eb) % i .eq. b) then
-        elem(eb) % ei = ea
-        elem(eb) % si = s
+      if(elem(eb) % v(1) .eq. b) then
+        elem(eb) % e(1) = ea
+        elem(eb) % s(1) = s
       end if
-      if(elem(eb) % j .eq. b) then
-        elem(eb) % ej = ea
-        elem(eb) % sj = s
+      if(elem(eb) % v(2) .eq. b) then
+        elem(eb) % e(2) = ea
+        elem(eb) % s(2) = s
       end if
-      if(elem(eb) % k .eq. b) then
-        elem(eb) % ek = ea
-        elem(eb) % sk = s
+      if(elem(eb) % v(3) .eq. b) then
+        elem(eb) % e(3) = ea
+        elem(eb) % s(3) = s
       end if
     end if
 
@@ -240,10 +240,10 @@
 
   ! Checking
   do e = 1, ne
-    sum_ijk = elem(e) % i + elem(e) % j + elem(e) % k
-    sum_cd  = side(elem(e) % si) % c + side(elem(e) % si) % d  &
-            + side(elem(e) % sj) % c + side(elem(e) % sj) % d  &
-            + side(elem(e) % sk) % c + side(elem(e) % sk) % d
+    sum_ijk = elem(e) % v(1) + elem(e) % v(2) + elem(e) % v(3)
+    sum_cd  = side(elem(e) % s(1)) % c + side(elem(e) % s(1)) % d  &
+            + side(elem(e) % s(2)) % c + side(elem(e) % s(2)) % d  &
+            + side(elem(e) % s(3)) % c + side(elem(e) % s(3)) % d
     if( sum_cd / sum_ijk .ne. 2 ) then
       print *, '# ERROR in forming elements'' neighbours!'
       stop

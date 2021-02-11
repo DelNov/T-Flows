@@ -105,9 +105,9 @@
   front % vert(1:front % n_verts) % curv = 0.
   do e = 1, front % n_elems
 
-    i = front % elem(e) % i
-    j = front % elem(e) % j
-    k = front % elem(e) % k
+    i = front % elem(e) % v(1)
+    j = front % elem(e) % v(2)
+    k = front % elem(e) % v(3)
     front % vert(i) % curv = front % vert(i) % curv  &
                           + front % elem(e) % curv / real(front % vert(i) % nne)
     front % vert(j) % curv = front % vert(j) % curv  &

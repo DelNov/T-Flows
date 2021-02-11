@@ -23,17 +23,17 @@
   !---------------------------------!
   do e = 1, ne
 
-    elem(e) % xe = ONE_THIRD * (  vert(elem(e) % i) % x_n   &
-                                + vert(elem(e) % j) % x_n   &
-                                + vert(elem(e) % k) % x_n )
+    elem(e) % xe = ONE_THIRD * (  vert(elem(e) % v(1)) % x_n   &
+                                + vert(elem(e) % v(2)) % x_n   &
+                                + vert(elem(e) % v(3)) % x_n )
 
-    elem(e) % ye = ONE_THIRD * (  vert(elem(e) % i) % y_n   &
-                                + vert(elem(e) % j) % y_n   &
-                                + vert(elem(e) % k) % y_n )
+    elem(e) % ye = ONE_THIRD * (  vert(elem(e) % v(1)) % y_n   &
+                                + vert(elem(e) % v(2)) % y_n   &
+                                + vert(elem(e) % v(3)) % y_n )
 
-    elem(e) % ze = ONE_THIRD * (  vert(elem(e) % i) % z_n   &
-                                + vert(elem(e) % j) % z_n   &
-                                + vert(elem(e) % k) % z_n )
+    elem(e) % ze = ONE_THIRD * (  vert(elem(e) % v(1)) % z_n   &
+                                + vert(elem(e) % v(2)) % z_n   &
+                                + vert(elem(e) % v(3)) % z_n )
 
   end do
 

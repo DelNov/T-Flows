@@ -42,9 +42,9 @@
   !   Compute elements' areas   !
   !-----------------------------!
   do e = 1, ne
-    i = elem(e) % i
-    j = elem(e) % j
-    k = elem(e) % k
+    i = elem(e) % v(1)
+    j = elem(e) % v(2)
+    k = elem(e) % v(3)
     a(1) = vert(j) % x_n - vert(i) % x_n
     a(2) = vert(j) % y_n - vert(i) % y_n
     a(3) = vert(j) % z_n - vert(i) % z_n
@@ -61,9 +61,9 @@
   max_rat = -HUGE
   min_rat = +HUGE
   do e = 1, ne
-    si = elem(e) % si
-    sj = elem(e) % sj
-    sk = elem(e) % sk
+    si = elem(e) % s(1)
+    sj = elem(e) % s(2)
+    sk = elem(e) % s(3)
     max_l = max(side(si) % length, side(sj) % length, side(sk) % length)
     min_l = min(side(si) % length, side(sj) % length, side(sk) % length)
     max_rat = max(max_rat, max_l/min_l)

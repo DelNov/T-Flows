@@ -192,27 +192,6 @@
   !-------------------------------!
   call Front_Mod_Calculate_Element_Normals(front, phi)
 
-  do j = 1, 3
-    call Front_Mod_Relax_Topology(front)
-    call Front_Mod_Smooth(front, phi, phi_e)
-  end do
-
-  ! From this point ...
-  do v = 1, nv
-    dist = norm2( (/front % vert(v) % x_n,  &
-                    front % vert(v) % y_n,  &
-                    front % vert(v) % z_n/) )
-    front % vert(v) % x_n = front % vert(v) % x_n * 0.25 / dist
-    front % vert(v) % y_n = front % vert(v) % y_n * 0.25 / dist
-    front % vert(v) % z_n = front % vert(v) % z_n * 0.25 / dist
-  end do
-  n_verts_in_buffers = 0
-  do v = 1, nv
-    call Front_Mod_Find_Nearest_Cell(front, v, n_verts_in_buffers)
-    call Front_Mod_Find_Nearest_Node(front, v)
-  end do
-  ! ... down to here is just for development
-
   ! Element geometry has changed, recompute geometrical quantities
   call Front_Mod_Find_Vertex_Elements(front)
   call Front_Mod_Calculate_Element_Normals(front, phi)
@@ -222,17 +201,5 @@
   phi % n(:) = phi_o(:)
 
   return
-
-  ! The rest is still experimental
-  call Front_Mod_Refine(front, 4)
-  do j = 1, 3
-    call Front_Mod_Relax_Topology(front)
-    call Front_Mod_Smooth(front, phi, phi_e)
-  end do
-  do j = 1, 3
-    call Front_Mod_Relax_Geometry(front)
-    call Front_Mod_Smooth(front, phi, phi_e)
-  end do
-  call Front_Mod_Statistics(front)
 
   end subroutine

@@ -112,9 +112,9 @@
   front % elem(1:front % n_elems) % curv = 0.
   do e = 1, front % n_elems
 
-    i = front % elem(e) % i
-    j = front % elem(e) % j
-    k = front % elem(e) % k
+    i = front % elem(e) % v(1)
+    j = front % elem(e) % v(2)
+    k = front % elem(e) % v(3)
     front % elem(e) % curv = ONE_THIRD * (  front % vert(i) % curv  &
                                           + front % vert(j) % curv  &
                                           + front % vert(k) % curv )

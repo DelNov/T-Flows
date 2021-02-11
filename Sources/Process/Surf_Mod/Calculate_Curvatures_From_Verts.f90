@@ -112,9 +112,9 @@
   surf % elem(1:surf % n_elems) % curv = 0.
   do e = 1, surf % n_elems
 
-    i = surf % elem(e) % i
-    j = surf % elem(e) % j
-    k = surf % elem(e) % k
+    i = surf % elem(e) % v(1)
+    j = surf % elem(e) % v(2)
+    k = surf % elem(e) % v(3)
     surf % elem(e) % curv = ONE_THIRD * (  surf % vert(i) % curv  &
                                          + surf % vert(j) % curv  &
                                          + surf % vert(k) % curv )
