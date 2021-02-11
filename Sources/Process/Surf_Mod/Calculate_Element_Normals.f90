@@ -13,7 +13,7 @@
   integer,         pointer :: nv, ne
   integer                  :: c, e, j
   real                     :: surf_v(3)
-  real                     :: a(3), b(3), tri_v(3), tri_v_m
+  real                     :: a(3), b(3), tri_v(3), area_x2
 !==============================================================================!
 
   ! Take aliases
@@ -37,12 +37,12 @@
 
     tri_v = Math_Mod_Cross_Product(a, b)
 
-    ! Magnitude of the cross produc
-    tri_v_m = sqrt(tri_v(1)**2 + tri_v(2)**2 + tri_v(3)**2)
+    ! Magnitude of the cross product (twice the area)
+    area_x2 = sqrt(tri_v(1)**2 + tri_v(2)**2 + tri_v(3)**2)
 
-    elem(e) % nx = tri_v(1) / tri_v_m
-    elem(e) % ny = tri_v(2) / tri_v_m
-    elem(e) % nz = tri_v(3) / tri_v_m
+    elem(e) % nx = tri_v(1) / area_x2
+    elem(e) % ny = tri_v(2) / area_x2
+    elem(e) % nz = tri_v(3) / area_x2
 
     do j = 1, 3
 
