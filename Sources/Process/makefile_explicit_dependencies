@@ -14,6 +14,7 @@ $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
 
+#-- ./Vert_Mod.f90
 #-- ./Logo_Pro.f90
 #-- ./Compute_Scalar.f90
 $(DIR_OBJECT)/Compute_Scalar.o:\
@@ -162,11 +163,13 @@ $(DIR_SHARED)/Work_Mod/*.f90
 #-- ./Multiphase_Mod/Vof_Momentum_Contribution.f90
 #-- ./Multiphase_Mod/Vof_Surface_Tension_Contribution_Csf.f90
 #-- ./Multiphase_Mod/Vof_Pressure_Correction.f90
+#-- ./Multiphase_Mod/Vof_Grad_Variable_With_Jump.f90
 #-- ./Multiphase_Mod/Vof_Curvature_Csf.f90
 $(DIR_OBJECT)/Vof_Curvature_Csf.o:\
 $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 
 
+#-- ./Multiphase_Mod/Vof_Get_Gas_And_Liquid_Phase.f90
 #-- ./Multiphase_Mod/Vof_Max_Courant_Number.f90
 #-- ./Multiphase_Mod/Vof_Coefficients.f90
 #-- ./Multiphase_Mod/Vof_Smooth_Scalar.f90
@@ -174,6 +177,7 @@ $(DIR_OBJECT)/Vof_Smooth_Scalar.o:\
 $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 
 
+#-- ./Multiphase_Mod/Vof_Interpolate_Var_To_Face_With_Jump.f90
 #-- ./Multiphase_Mod/Vof_Mass_Transfer_Rate_In.f90
 #-- ./Multiphase_Mod/Vof_Solve_System.f90
 #-- ./Multiphase_Mod/Vof_Physical_Properties.f90
@@ -235,6 +239,8 @@ $(DIR_SHARED)/Control_Mod/*/*.f90
 #-- ./Info_Mod/Bulk_Print.f90
 #-- ./Compute_Pressure.f90
 $(DIR_OBJECT)/Compute_Pressure.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_OBJECT)/User_Mod.o \
 User_Mod/*.f90 
 
@@ -283,17 +289,34 @@ $(DIR_OBJECT)/Save.o:\
 $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 
 
+#-- ./Results_Mod/Vtu/Save_Front.f90
 #-- ./Results_Mod/Vtu/Save_Surf.f90
 #-- ./Results_Mod/Vtu/Save_Vector_Real.f90
 #-- ./Results_Mod/Vtu/Save_Scalar_Int.f90
 #-- ./Results_Mod/Vtu/Save_Scalar_Real.f90
+#-- ./Front_Mod.f90
+$(DIR_OBJECT)/Front_Mod.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*.f90 \
+$(DIR_OBJECT)/Vert_Mod.o \
+$(DIR_OBJECT)/Side_Mod.o \
+Front_Mod/readme \
+Front_Mod/*.f90 \
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
+$(DIR_OBJECT)/Elem_Mod.o 
+
 #-- ./Surf_Mod.f90
 $(DIR_OBJECT)/Surf_Mod.o:\
 $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 \
+$(DIR_OBJECT)/Vert_Mod.o \
+Surf_Mod/readme \
 Surf_Mod/*.f90 \
+$(DIR_OBJECT)/Side_Mod.o \
 $(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 
+Field_Mod/*.f90 \
+$(DIR_OBJECT)/Elem_Mod.o 
 
 #-- ./Read_Control_Physical_Models.f90
 $(DIR_OBJECT)/Read_Control_Physical_Models.o:\
@@ -499,15 +522,20 @@ $(DIR_SHARED)/Work_Mod/*.f90
 #-- ./Monitor_Mod/Finalize.f90
 #-- ./Monitor_Mod/Write_4_Vars.f90
 #-- ./Monitor_Mod/Write_5_Vars.f90
+#-- ./Side_Mod.f90
 #-- ./Multiphase_Mod.f90
 $(DIR_OBJECT)/Multiphase_Mod.o:\
 $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_OBJECT)/Turb_Mod.o \
 Turb_Mod/*.f90 \
+Surf_Mod/readme \
 $(DIR_OBJECT)/Surf_Mod.o \
 Surf_Mod/*.f90 \
-Multiphase_Mod/*.f90 
+Multiphase_Mod/*.f90 \
+Front_Mod/readme \
+$(DIR_OBJECT)/Front_Mod.o \
+Front_Mod/*.f90 
 
 #-- ./Compute_Energy.f90
 $(DIR_OBJECT)/Compute_Energy.o:\
@@ -520,6 +548,7 @@ User_Mod/*.f90
 #-- ./User_Mod/Save_Results.f90
 #-- ./User_Mod/End_Of_Compute_Scalar.f90
 #-- ./User_Mod/Initialize_Variables.f90
+#-- ./User_Mod/Vof_Interface_Ellipsoid.f90
 #-- ./User_Mod/End_Of_Compute_Momentum.f90
 #-- ./User_Mod/Beginning_Of_Time_Step.f90
 #-- ./User_Mod/Beginning_Of_Compute_Energy.f90
@@ -529,6 +558,11 @@ User_Mod/*.f90
 #-- ./User_Mod/Beginning_Of_Correct_Velocity.f90
 #-- ./User_Mod/End_Of_Simulation.f90
 #-- ./User_Mod/Beginning_Of_Iteration.f90
+#-- ./User_Mod/Vof_Initialization_Ellipsoid.f90
+$(DIR_OBJECT)/Vof_Initialization_Ellipsoid.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*.f90 
+
 #-- ./User_Mod/End_Of_Compute_Pressure.f90
 #-- ./User_Mod/Beginning_Of_Compute_Momentum.f90
 #-- ./User_Mod/Interface_Exchange.f90
@@ -537,6 +571,7 @@ User_Mod/*.f90
 #-- ./User_Mod/Source.f90
 #-- ./User_Mod/Before_Exit.f90
 #-- ./User_Mod/End_Of_Correct_Velocity.f90
+#-- ./User_Mod/Vof_Exact_Cylinder.f90
 #-- ./User_Mod/Types.f90
 #-- ./User_Mod/End_Of_Iteration.f90
 #-- ./User_Mod/End_Of_Compute_Energy.f90
@@ -646,12 +681,12 @@ $(DIR_SHARED)/Work_Mod/*.f90
 #-- ./Surf_Mod/Find_Vertex_Elements.f90
 #-- ./Surf_Mod/Print_Statistics.f90
 #-- ./Surf_Mod/Handle_3_Points.f90
-#-- ./Surf_Mod/Edge_Numbering_Neu.f90
 #-- ./Surf_Mod/Calculate_Curvatures_From_Edges.f90
 #-- ./Surf_Mod/Calculate_Curvatures_From_Elems.f90
 #-- ./Surf_Mod/Allocate.f90
 #-- ./Surf_Mod/Handle_6_Points.f90
 #-- ./Surf_Mod/Count_Elements_Neighbours.f90
+#-- ./Surf_Mod/Edge_Numbering.f90
 #-- ./Compute_Momentum_Explicit.f90
 $(DIR_OBJECT)/Compute_Momentum_Explicit.o:\
 $(DIR_OBJECT)/Work_Mod.o \
@@ -834,6 +869,7 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 #-- ./Bulk_Mod/Print_Areas.f90
 #-- ./Bulk_Mod/Monitoring_Planes_Areas.f90
 #-- ./Face_Mod/Allocate.f90
+#-- ./Elem_Mod.f90
 #-- ./Field_Mod.f90
 $(DIR_OBJECT)/Field_Mod.o:\
 $(DIR_OBJECT)/Work_Mod.o \
@@ -869,6 +905,43 @@ Results_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Backup_Mod.o \
 Backup_Mod/*.f90 
 
+#-- ./Front_Mod/Handle_4_Points.f90
+#-- ./Front_Mod/Relax_Topology.f90
+#-- ./Front_Mod/Split_Element.f90
+#-- ./Front_Mod/Compress_Vertices.f90
+#-- ./Front_Mod/Find_Nearest_Cell.f90
+#-- ./Front_Mod/Refine.f90
+#-- ./Front_Mod/Calculate_Element_Centroids.f90
+#-- ./Front_Mod/Find_Boundaries.f90
+#-- ./Front_Mod/Count_Vertex_Elements.f90
+#-- ./Front_Mod/Calculate_Curvatures_From_Verts.f90
+#-- ./Front_Mod/Find_Nearest_Node.f90
+#-- ./Front_Mod/Place_At_Var_Value.f90
+$(DIR_OBJECT)/Place_At_Var_Value.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*.f90 
+
+#-- ./Front_Mod/Handle_5_Points.f90
+#-- ./Front_Mod/Clean.f90
+#-- ./Front_Mod/Relax_Geometry.f90
+#-- ./Front_Mod/Find_Sides.f90
+#-- ./Front_Mod/Smooth.f90
+#-- ./Front_Mod/Compute_Distance_Function_And_Vof.f90
+$(DIR_OBJECT)/Compute_Distance_Function_And_Vof.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*.f90 
+
+#-- ./Front_Mod/Calculate_Element_Normals.f90
+#-- ./Front_Mod/Swap_Side.f90
+#-- ./Front_Mod/Find_Vertex_Elements.f90
+#-- ./Front_Mod/Print_Statistics.f90
+#-- ./Front_Mod/Handle_3_Points.f90
+#-- ./Front_Mod/Calculate_Curvatures_From_Edges.f90
+#-- ./Front_Mod/Calculate_Curvatures_From_Elems.f90
+#-- ./Front_Mod/Allocate.f90
+#-- ./Front_Mod/Handle_6_Points.f90
+#-- ./Front_Mod/Count_Elements_Neighbours.f90
+#-- ./Front_Mod/Edge_Numbering.f90
 #-- ./Piso_Algorithm.f90
 $(DIR_OBJECT)/Piso_Algorithm.o:\
 $(DIR_OBJECT)/Multiphase_Mod.o \
@@ -924,7 +997,6 @@ $(DIR_SHARED)/File_Mod/*.f90
 #-- ./Control_Mod/Numerics/Number_Of_Time_Steps.f90
 #-- ./Control_Mod/Numerics/Normalization_For_Simple_Algorithm.f90
 #-- ./Control_Mod/Numerics/Advection_Scheme_For_Momentum.f90
-#-- ./Control_Mod/Numerics/Track_Front.f90
 #-- ./Control_Mod/Numerics/Preconditioner_For_System_Matrix.f90
 #-- ./Control_Mod/Numerics/Blending_Coefficient_For_Scalars.f90
 #-- ./Control_Mod/Numerics/Solver_For_Pressure.f90
@@ -991,6 +1063,7 @@ $(DIR_SHARED)/File_Mod/*.f90
 #-- ./Control_Mod/Physics/Multiphase_Model.f90
 #-- ./Control_Mod/Physics/Reference_Density.f90
 #-- ./Control_Mod/Physics/Point_For_Monitoring_Planes.f90
+#-- ./Control_Mod/Physics/Track_Front.f90
 #-- ./Control_Mod/Physics/Turbulence_Model_Variant.f90
 #-- ./Control_Mod/Physics/Swarm_Density.f90
 #-- ./Control_Mod/Physics/Gravitational_Vector.f90
@@ -1014,6 +1087,7 @@ $(DIR_SHARED)/File_Mod/*.f90
 #-- ./Control_Mod/Physics/Swarm_Coefficient_Of_Restitution.f90
 #-- ./Control_Mod/Physics/Angular_Velocity_Vector.f90
 #-- ./Control_Mod/Physics/Heat_Capacity.f90
+#-- ./Control_Mod/Physics/Mass_Transfer.f90
 #-- ./Control_Mod/Physics/Saturation_Temperature.f90
 #-- ./Control_Mod/Physics/Swarm_Diameter.f90
 #-- ./Control_Mod/Physics/Number_Of_Swarm_Sub_Steps.f90
@@ -1025,7 +1099,6 @@ $(DIR_SHARED)/File_Mod/*.f90
 #-- ./Control_Mod/Physics/Latent_Heat.f90
 #-- ./Control_Mod/Physics/Rough_Walls.f90
 #-- ./Control_Mod/Physics/Phase_Densities.f90
-#-- ./Control_Mod/Physics/Phase_Change.f90
 #-- ./Control_Mod/Physics/Reference_Temperature.f90
 #-- ./Control_Mod/Physics/Turbulent_Heat_Flux_Model.f90
 #-- ./Control_Mod/Physics/Turbulent_Prandtl_Number.f90

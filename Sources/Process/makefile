@@ -224,6 +224,10 @@ SRC_MOD += Cpu_Timer_Mod.f90	\
 SRC_MOD += Bulk_Mod.f90		\
            Var_Mod.f90		\
            Face_Mod.f90		\
+           Vert_Mod.f90		\
+           Elem_Mod.f90		\
+           Side_Mod.f90		\
+           Front_Mod.f90		\
            Matrix_Mod.f90	\
            Vector_Mod.f90	\
            Solver_Mod.f90	\
