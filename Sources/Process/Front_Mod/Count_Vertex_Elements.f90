@@ -8,7 +8,7 @@
   type(Vert_Type), pointer :: vert(:)
   type(Elem_Type), pointer :: elem(:)
   integer,         pointer :: nv, ne
-  integer                  :: e, i, j, k
+  integer                  :: e, v, i_v
 !==============================================================================!
 
   ! Take aliases
@@ -19,12 +19,10 @@
 
   vert(1:nv) % nne = 0
   do e = 1, ne
-    i = elem(e) % v(1)
-    j = elem(e) % v(2)
-    k = elem(e) % v(3)
-    vert(i) % nne = vert(i) % nne + 1
-    vert(j) % nne = vert(j) % nne + 1
-    vert(k) % nne = vert(k) % nne + 1
+    do i_v = 1, elem(e) % nv
+      v = elem(e) % v(i_v)
+      vert(v) % nne = vert(v) % nne + 1
+    end do
   end do
 
   end subroutine

@@ -10,7 +10,7 @@
   type(Vert_Type), pointer :: vert(:)
   type(Elem_Type), pointer :: elem(:)
   integer,         pointer :: ne
-  integer                  :: e
+  integer                  :: e, i_v
 !==============================================================================!
 
   ! Take aliases
@@ -19,21 +19,23 @@
   elem => front % elem
 
   !---------------------------------!
-  !   Browse through all elements   !   (in the future, only for this_proc)
+  !   Browse through all elements   !
   !---------------------------------!
   do e = 1, ne
 
-    elem(e) % xe = ONE_THIRD * (  vert(elem(e) % v(1)) % x_n   &
-                                + vert(elem(e) % v(2)) % x_n   &
-                                + vert(elem(e) % v(3)) % x_n )
+    elem(e) % xe = 0.0
+    elem(e) % ye = 0.0
+    elem(e) % ze = 0.0
 
-    elem(e) % ye = ONE_THIRD * (  vert(elem(e) % v(1)) % y_n   &
-                                + vert(elem(e) % v(2)) % y_n   &
-                                + vert(elem(e) % v(3)) % y_n )
+    do i_v = 1, elem(e) % nv
+      elem(e) % xe = elem(e) % xe + vert(elem(e) % v(i_v)) % x_n
+      elem(e) % ye = elem(e) % ye + vert(elem(e) % v(i_v)) % y_n
+      elem(e) % ze = elem(e) % ze + vert(elem(e) % v(i_v)) % z_n
+    end do
 
-    elem(e) % ze = ONE_THIRD * (  vert(elem(e) % v(1)) % z_n   &
-                                + vert(elem(e) % v(2)) % z_n   &
-                                + vert(elem(e) % v(3)) % z_n )
+    elem(e) % xe = elem(e) % xe / real(elem(e) % nv)
+    elem(e) % ye = elem(e) % ye / real(elem(e) % nv)
+    elem(e) % ze = elem(e) % ze / real(elem(e) % nv)
 
   end do
 

@@ -118,11 +118,7 @@
                             ' format="ascii">'
     ! Cell topology
     do e = 1, front % n_elems
-      write(fu,'(a,3i9)')        &
-         IN_5,                   &
-         front % elem(e) % i-1,  &
-         front % elem(e) % j-1,  &
-         front % elem(e) % k-1
+      write(fu,'(a,99i9)') IN_5, front % elem(e) % v(1:front % elem(e) % nv)-1
     end do
 
     ! Cell offsets
@@ -131,7 +127,7 @@
                             ' format="ascii">'
     offset = 0
     do e = 1, front % n_elems
-      offset = offset + 3
+      offset = offset + front % elem(e) % nv
       write(fu,'(a,i9)') IN_5, offset
     end do
 
@@ -140,7 +136,7 @@
     write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="types"' //  &
                             ' format="ascii">'
     do e = 1, front % n_elems
-      write(fu,'(a,i9)') IN_5, VTK_TRIANGLE
+      write(fu,'(a,i9)') IN_5, VTK_POLYGON
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
     write(fu,'(a,a)') IN_3, '</Cells>'
@@ -175,6 +171,31 @@
                 IN_5, front % elem(e) % nx,           &
                       front % elem(e) % ny,           &
                       front % elem(e) % nz
+    end do
+    write(fu,'(a,a)') IN_4, '</DataArray>'
+
+    !-------------------!
+    !   Element areas   !
+    !-------------------!
+    write(fu,'(4a)') IN_4,                                                &
+                   '<DataArray type="Float64" Name="ElementArea" ' //  &
+                   ' format="ascii">'
+    do e = 1, front % n_elems
+      write(fu,'(a,1pe16.6e4)') IN_5, front % elem(e) % area
+    end do
+    write(fu,'(a,a)') IN_4, '</DataArray>'
+
+    !-------------------------!
+    !   Element coordinates   !
+    !-------------------------!
+    write(fu,'(4a)') IN_4,                                                    &
+                   '<DataArray type="Float64" Name="ElementCoordinates" ' //  &
+                   ' NumberOfComponents="3" format="ascii">'
+    do e = 1, front % n_elems
+      write(fu, '(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')  &
+                IN_5, front % elem(e) % xe,           &
+                      front % elem(e) % ye,           &
+                      front % elem(e) % ze
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
 

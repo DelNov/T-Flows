@@ -11,7 +11,7 @@
   type(Vert_Type), pointer :: vert(:)
   type(Elem_Type), pointer :: elem(:)
   integer,         pointer :: nv, ne
-  integer                  :: e, v, n_vert
+  integer                  :: e, v, n_vert, i_v, j_v
   real,    allocatable     :: xv(:), yv(:), zv(:)
   integer, allocatable     :: ni(:), new_n(:)
 !==============================================================================!
@@ -24,12 +24,14 @@
 
   ! Check sanity of the elements so far
   do e = 1, ne
-    if( (elem(e) % v(1) .eq. elem(e) % v(2)) .or.  &
-        (elem(e) % v(1) .eq. elem(e) % v(3)) .or.  &
-        (elem(e) % v(2) .eq. elem(e) % v(3)) ) then
-      print '(a)',      ' # ERROR in the beginning of Compress_Vertices'
-      print '(a,i6,a)', ' # element ', e, 'has same vertices'
-    end if
+    do i_v = 1, elem(e) % nv-1
+      do j_v = i_v+1, elem(e) % nv
+        if(elem(e) % v(i_v) .eq. elem(e) % v(j_v)) then
+          print '(a)',      ' # ERROR in the beginning of Compress_Vertices'
+          print '(a,i6,a)', ' # element ', e, 'has same vertices'
+        end if
+      end do
+    end do
   end do
 
   allocate(xv(nv));     xv    = 0.0
@@ -85,9 +87,9 @@
   call Sort_Mod_Int_Carry_Int(ni, new_n)
 
   do e = 1, ne
-    elem(e) % v(1) = new_n(elem(e) % v(1))
-    elem(e) % v(2) = new_n(elem(e) % v(2))
-    elem(e) % v(3) = new_n(elem(e) % v(3))
+    do i_v = 1, elem(e) % nv
+      elem(e) % v(i_v) = new_n(elem(e) % v(i_v))
+    end do
   end do
 
   ! Store compressed number of vertices
@@ -96,13 +98,15 @@
 
   ! Check sanity of the elements in the end
   do e = 1, ne
-    if( (elem(e) % v(1) .eq. elem(e) % v(2)) .or.  &
-        (elem(e) % v(1) .eq. elem(e) % v(3)) .or.  &
-        (elem(e) % v(2) .eq. elem(e) % v(3)) ) then
-      print '(a)',      ' # ERROR in the end of Compress_Vertices'
-      print '(a,i6,a)', ' # element', e, ' has same vertices'
-      stop
-    end if
+    do i_v = 1, elem(e) % nv-1
+      do j_v = i_v+1, elem(e) % nv
+        if(elem(e) % v(i_v) .eq. elem(e) % v(j_v)) then
+          print '(a)',      ' # ERROR in the end of Compress_Vertices'
+          print '(a,i6,a)', ' # element ', e, 'has same vertices'
+        end if
+      end do
+    end do
   end do
+
 
   end subroutine

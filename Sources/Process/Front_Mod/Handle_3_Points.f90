@@ -21,7 +21,9 @@
   vert => front % vert
   elem => front % elem
 
-  ne = ne + 1           ! one new element
+  ! One new element with three vertices
+  ne = ne + 1
+  elem(ne) % nv = 3
 
   ! Store last three vertices for the new element
   elem(ne) % v(1) = nv - 2

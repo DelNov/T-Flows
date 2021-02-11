@@ -13,7 +13,7 @@
   integer                  :: nne_s, nne_e
   real, allocatable        :: nne(:)
   real                     :: a(3), b(3), tri_v(3)
-  real                     :: max_rat, min_rat, max_l, min_l
+  real                     :: max_rat, min_rat, max_l, min_l, tot_area
   character(len=160)       :: line
 !-----------------------------[Local parameters]-------------------------------!
   integer, parameter :: T=33  ! indent
@@ -38,23 +38,6 @@
             vert(d) % x_n, vert(d) % y_n, vert(d) % z_n)
   end do
 
-  !-----------------------------!
-  !   Compute elements' areas   !
-  !-----------------------------!
-  do e = 1, ne
-    i = elem(e) % v(1)
-    j = elem(e) % v(2)
-    k = elem(e) % v(3)
-    a(1) = vert(j) % x_n - vert(i) % x_n
-    a(2) = vert(j) % y_n - vert(i) % y_n
-    a(3) = vert(j) % z_n - vert(i) % z_n
-    b(1) = vert(k) % x_n - vert(i) % x_n
-    b(2) = vert(k) % y_n - vert(i) % y_n
-    b(3) = vert(k) % z_n - vert(i) % z_n
-    tri_v = Math_Mod_Cross_Product(a, b)
-    elem(e) % area = sqrt(dot_product(tri_v, tri_v)) * 0.5
-  end do
-
   !------------------------------!
   !   Extreme side size ratios   !
   !------------------------------!
@@ -68,6 +51,14 @@
     min_l = min(side(si) % length, side(sj) % length, side(sk) % length)
     max_rat = max(max_rat, max_l/min_l)
     min_rat = min(min_rat, max_l/min_l)
+  end do
+
+  !------------------------!
+  !   Total surface area   !
+  !------------------------!
+  tot_area = 0.0
+  do e = 1, ne
+    tot_area = tot_area + elem(e) % area
   end do
 
   !--------------------------------!
@@ -116,7 +107,7 @@
     ! Maximum (1) and minimum (2) element area
     ! Maximum (3) and minimum (4) side length
     ! Maximum (5) and minimum (6) side length ratio
-    do item = 1, 6
+    do item = 1, 7
       line( 1:160) = ' '
       line( 1+T: 1+T) = '#'
       line(63+T:63+T) = '#'
@@ -127,16 +118,19 @@
       if(item.eq.2) line( 5+T: 5+T+33) = 'Minimum element area:          '
       if(item.eq.2) write(line(36+T:47+T), '(1pe12.5)')  &
                           minval(elem(1:ne) % area)
-      if(item.eq.3) line( 5+T: 5+T+33) = 'Maximum side length:           '
+      if(item.eq.3) line( 5+T: 5+T+33) = 'Total surface area  :          '
       if(item.eq.3) write(line(36+T:47+T), '(1pe12.5)')  &
-                          maxval(side(1:ns) % length)
-      if(item.eq.4) line( 5+T: 5+T+33) = 'Minimum side length:           '
+                          tot_area
+      if(item.eq.4) line( 5+T: 5+T+33) = 'Maximum side length:           '
       if(item.eq.4) write(line(36+T:47+T), '(1pe12.5)')  &
+                          maxval(side(1:ns) % length)
+      if(item.eq.5) line( 5+T: 5+T+33) = 'Minimum side length:           '
+      if(item.eq.5) write(line(36+T:47+T), '(1pe12.5)')  &
                           minval(side(1:ns) % length)
-      if(item.eq.5) line( 5+T: 5+T+33) = 'Maximum side ratio in element: '
-      if(item.eq.5) write(line(36+T:47+T), '(1pe12.5)') max_rat
-      if(item.eq.6) line( 5+T: 5+T+33) = 'Minimum side ratio in element: '
-      if(item.eq.6) write(line(36+T:47+T), '(1pe12.5)') min_rat
+      if(item.eq.6) line( 5+T: 5+T+33) = 'Maximum side ratio in element: '
+      if(item.eq.6) write(line(36+T:47+T), '(1pe12.5)') max_rat
+      if(item.eq.7) line( 5+T: 5+T+33) = 'Minimum side ratio in element: '
+      if(item.eq.7) write(line(36+T:47+T), '(1pe12.5)') min_rat
       print *, trim(line)
     end do
 

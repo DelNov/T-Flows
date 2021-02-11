@@ -32,6 +32,8 @@
   allocate(front % elem(MAX_SURFACE_ELEMENTS))
   do e = 1, MAX_SURFACE_ELEMENTS
     front % elem(e) % nne  = 0
+    front % elem(e) % nv   = 0
+    front % elem(e) % ns   = 0
     front % elem(e) % v(:) = 0
     front % elem(e) % e(:) = 0
     front % elem(e) % s(:) = 0

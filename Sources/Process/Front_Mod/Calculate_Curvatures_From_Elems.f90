@@ -5,7 +5,7 @@
 !   the vertices from neighbouring elements, around twelve points) and         !
 !   distributes the valies to the vertices.                                    !
 !                                                                              !
-!   This is the highest order of curvature calculation in the code.            !
+!   This is rather inaccurate, one can't compare it to what Surf_Mod gives.    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -18,7 +18,7 @@
   integer, allocatable  :: elem_n_verts(:)
   integer, allocatable  :: vert_v(:,:)
   integer, allocatable  :: elem_v(:,:)
-  integer               :: v, i, j, k, e, c, d, s, max_nnv
+  integer               :: v, k, i_v, j_v, e, c, d, s, max_nnv
   real                  :: x, y, z, x2, y2, z2, xy, xz, yz, rho
 !==============================================================================!
 
@@ -52,12 +52,10 @@
   allocate(elem_n_verts(front % n_elems))
   elem_n_verts(:) = 0
   do e = 1, front % n_elems
-    i = front % elem(e) % v(1)
-    j = front % elem(e) % v(2)
-    k = front % elem(e) % v(3)
-    elem_n_verts(e) = elem_n_verts(e) + front % vert(i) % nnv
-    elem_n_verts(e) = elem_n_verts(e) + front % vert(j) % nnv
-    elem_n_verts(e) = elem_n_verts(e) + front % vert(k) % nnv
+    do i_v = 1, front % elem(e) % nv
+      v = front % elem(e) % v(i_v)
+      elem_n_verts(e) = elem_n_verts(e) + front % vert(v) % nnv
+    end do
   end do
 
   max_nnv = maxval(elem_n_verts(1:front % n_elems))
@@ -66,20 +64,12 @@
 
   elem_n_verts(:) = 0
   do e = 1, front % n_elems
-    i = front % elem(e) % v(1)
-    j = front % elem(e) % v(2)
-    k = front % elem(e) % v(3)
-    do v = 1, front % vert(i) % nnv
-      elem_n_verts(e) = elem_n_verts(e) + 1;
-      elem_v(elem_n_verts(e), e) = vert_v(v, i)
-    end do
-    do v = 1, front % vert(j) % nnv
-      elem_n_verts(e) = elem_n_verts(e) + 1;
-      elem_v(elem_n_verts(e), e) = vert_v(v, j)
-    end do
-    do v = 1, front % vert(k) % nnv
-      elem_n_verts(e) = elem_n_verts(e) + 1;
-      elem_v(elem_n_verts(e), e) = vert_v(v, k)
+    do i_v = 1, front % elem(e) % nv
+      v = front % elem(e) % v(i_v)
+      do j_v = 1, front % vert(v) % nnv
+        elem_n_verts(e) = elem_n_verts(e) + 1;
+        elem_v(elem_n_verts(e), e) = vert_v(j_v, v)
+      end do
     end do
   end do
 
@@ -158,15 +148,12 @@
   front % vert(1:front % n_verts) % curv = 0.
   do e = 1, front % n_elems
 
-    i = front % elem(e) % v(1)
-    j = front % elem(e) % v(2)
-    k = front % elem(e) % v(3)
-    front % vert(i) % curv = front % vert(i) % curv  &
-                           + front % elem(e) % curv/real(front % vert(i) % nne)
-    front % vert(j) % curv = front % vert(j) % curv  &
-                           + front % elem(e) % curv/real(front % vert(j) % nne)
-    front % vert(k) % curv = front % vert(k) % curv  &
-                           + front % elem(e) % curv/real(front % vert(k) % nne)
+    do i_v = 1, front % elem(e) % nv
+      v = front % elem(e) % v(i_v)
+
+      front % vert(v) % curv = front % vert(v) % curv  &
+                      + front % elem(e) % curv/real(front % vert(v) % nne)
+    end do
   end do
 
   end subroutine

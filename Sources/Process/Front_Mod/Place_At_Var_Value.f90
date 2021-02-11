@@ -174,7 +174,12 @@
   !-----------------------!
   call Front_Mod_Compress_Vertices(front, verbose)
 
-  call Front_Mod_Find_Sides(front, verbose)
+  !----------------!
+  !                !
+  !   Find sides   !
+  !                !
+  !----------------!
+  call Front_Mod_Find_Connectivity(front, verbose)
 
   !--------------------------------!
   !   Find nearest cell and node   !
@@ -185,17 +190,16 @@
     call Front_Mod_Find_Nearest_Node(front, v)
   end do
 
-  !-------------------------------!
-  !                               !
-  !   Calculate element normals   !
-  !                               !
-  !-------------------------------!
-  call Front_Mod_Calculate_Element_Normals(front, phi)
+  !--------------------------------------!
+  !                                      !
+  !   Calculate geometrical quantities   !
+  !                                      !
+  !--------------------------------------!
 
   ! Element geometry has changed, recompute geometrical quantities
   call Front_Mod_Find_Vertex_Elements(front)
-  call Front_Mod_Calculate_Element_Normals(front, phi)
   call Front_Mod_Calculate_Element_Centroids(front)
+  call Front_Mod_Calculate_Element_Normals(front, phi)
 
   ! Restore the true values of phi
   phi % n(:) = phi_o(:)

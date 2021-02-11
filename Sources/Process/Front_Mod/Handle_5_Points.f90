@@ -93,22 +93,9 @@
   !   You've found a permutation which works, store new elements now   !
   !--------------------------------------------------------------------!
 
-  ! One new element with three vertices
+  ! One new element with five vertices
   ne = ne + 1
-  elem(ne) % v(1) = ver(1)
-  elem(ne) % v(2) = ver(2)
-  elem(ne) % v(3) = ver(3)
-
-  ! Second new element with three vertices
-  ne = ne + 1
-  elem(ne) % v(1) = ver(1)
-  elem(ne) % v(2) = ver(3)
-  elem(ne) % v(3) = ver(4)
-
-  ! Third new element with three vertices
-  ne = ne + 1
-  elem(ne) % v(1) = ver(1)
-  elem(ne) % v(2) = ver(4)
-  elem(ne) % v(3) = ver(5)
+  elem(ne) % nv = 5
+  elem(ne) % v(1:5) = ver(1:5)
 
   end subroutine
