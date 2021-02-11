@@ -115,6 +115,7 @@
     include 'Control_Mod/Physics/Phase_Viscosities.f90'
     include 'Control_Mod/Physics/Reference_Density.f90'
     include 'Control_Mod/Physics/Surface_Tension.f90'
+    include 'Control_Mod/Physics/Track_Front.f90'
 
     ! Scalars (like species, for example)
     include 'Control_Mod/Physics/Number_Of_Scalars.f90'
@@ -193,6 +194,5 @@
     include 'Control_Mod/Numerics/Max_Smoothing_Cycles_Normal_Vof.f90'
     include 'Control_Mod/Numerics/Max_Courant_Vof.f90'
     include 'Control_Mod/Numerics/Max_Substep_Cycles_Vof.f90'
-    include 'Control_Mod/Numerics/Track_Front.f90'
     include 'Control_Mod/Numerics/Skewness_Correction_Vof.f90'
   end module
