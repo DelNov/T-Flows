@@ -13,7 +13,7 @@
   type(Elem_Type), pointer :: elem(:)
   integer,         pointer :: nv, ns, ne
   integer                  :: cnt_one, cnt_two
-  integer                  :: e, eb, ea, c, d, s, n_side
+  integer                  :: e, eb, ea, c, d, c1, c2, d1, d2, s, n_side
   integer                  :: ss, sum_ijk, sum_cd, i_v, i_s, v1, v2
   integer, allocatable     :: ci(:), di(:), ei(:), ni(:)
 !==============================================================================!
@@ -74,14 +74,22 @@
   do  ! s = 1, ns
 
     s = s + 1
-    if(s > ns-1) exit
+    if(s > ns) exit
 
-    if(ci(s) .eq. ci(s+1) .and.  &
-       di(s) .eq. di(s+1)) then
+    ! Take c1, c2, d1 and d2, taking care not to go beyond array boundaries
+    c1 = ci(s);  c2 = 0
+    d1 = di(s);  d2 = 0
+    if(s < ns) then
+      c2 = ci(s+1)
+      d2 = di(s+1)
+    end if
+
+    ! Two sides have the same c1 and c2, handle them both
+    if(c1 .eq. c2 .and. d1 .eq. d2) then
       n_side = n_side + 1
 
-      side(n_side) % c = ci(s)
-      side(n_side) % d = di(s)
+      side(n_side) % c = c1  ! here c1 == c2
+      side(n_side) % d = d1  ! here d1 == d2
 
       c = side(n_side) % c
       d = side(n_side) % d
@@ -100,14 +108,10 @@
           end if
 
           ! Check ea
-          if(v1.eq.c .and. v2.eq.d) then
-            side(n_side) % ea = ei(ss)
-          end if
+          if(v1 .eq. c .and. v2 .eq. d) side(n_side) % ea = ei(ss)
 
           ! Check eb
-          if(v2.eq.c .and. v1.eq.d) then
-            side(n_side) % eb = ei(ss)
-          end if
+          if(v2 .eq. c .and. v1 .eq. d) side(n_side) % eb = ei(ss)
 
         end do
 
@@ -117,11 +121,12 @@
       cnt_two = cnt_two + 1
       s = s + 1
 
+    ! Side is alone, no twin
     else
       n_side = n_side + 1
 
-      side(n_side) % c = ci(s)
-      side(n_side) % d = di(s)
+      side(n_side) % c = c1
+      side(n_side) % d = d1
 
       c = side(n_side) % c
       d = side(n_side) % d
