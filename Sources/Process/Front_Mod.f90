@@ -51,16 +51,13 @@
 
   contains
 
-! include 'Front_Mod/Advance_Vertices.f90'
   include 'Front_Mod/Allocate.f90'
   include 'Front_Mod/Calculate_Element_Centroids.f90'
   include 'Front_Mod/Calculate_Element_Normals.f90'
   include 'Front_Mod/Clean.f90'
-  include 'Front_Mod/Count_Vertex_Elements.f90'
   include 'Front_Mod/Compress_Vertices.f90'
   include 'Front_Mod/Compute_Distance_Function_And_Vof.f90'
   include 'Front_Mod/Calculate_Curvatures_From_Elems.f90'
-  include 'Front_Mod/Find_Boundaries.f90'
   include 'Front_Mod/Find_Connectivity.f90'
   include 'Front_Mod/Find_Nearest_Cell.f90'
   include 'Front_Mod/Find_Nearest_Node.f90'

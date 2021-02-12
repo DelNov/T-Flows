@@ -64,7 +64,6 @@
   !--------------------------------!
   !   Count number of neighbours   !
   !--------------------------------!
-  call Front_Mod_Count_Vertex_Elements(front)
   nne_s = minval(vert(1:nv) % nne)
   nne_e = maxval(vert(1:nv) % nne)
   allocate(nne(nne_s:nne_e)); nne = 0.0
