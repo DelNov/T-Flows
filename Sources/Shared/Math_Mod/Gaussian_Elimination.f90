@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Math_Mod_Gaussian_Elimination(n, a, b, x)
+  subroutine Math_Mod_Gaussian_Elimination(n, a, b, x, invertible)
 !------------------------------------------------------------------------------!
 !   Example of Gaussian elimination with scaled row pivoting                   !
 !                                                                              !
@@ -16,6 +16,7 @@
   real    :: a(n,n)
   real    :: b(n)
   real    :: x(n)
+  logical :: invertible
 !-----------------------------------[Locals]-----------------------------------!
   real,    allocatable :: s(:)
   integer, allocatable :: p(:)
@@ -25,6 +26,8 @@
 
   allocate(s(n))
   allocate(p(n))
+
+  invertible = .true.
 
   do i = 1, n
     p(i) = i
@@ -55,8 +58,13 @@
       do j = k + 1, n
         a(p(i),j) = a(p(i),j) - z * a(p(k),j)
       end do
+      if(maxval(abs(a(p(i),k+1:n))) < PICO) then
+        invertible = .false.
+        return
+      end if
     end do
   end do
+
 
   do k = 1, n-1
     do i = k + 1, n

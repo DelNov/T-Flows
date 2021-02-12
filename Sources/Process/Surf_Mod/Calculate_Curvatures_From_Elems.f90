@@ -19,6 +19,7 @@
   integer, allocatable  :: vert_v(:,:)
   integer, allocatable  :: elem_v(:,:)
   integer               :: v, i, j, k, e, c, d, s, max_nnv
+  logical               :: invertible
   real                  :: x, y, z, x2, y2, z2, xy, xz, yz, rho
 !==============================================================================!
 
@@ -130,13 +131,21 @@
       b(2) = b(2) - rho * x;  b(3) = b(3) - rho * y;  b(4) = b(4) - rho * z
     end do
 
-    call Math_Mod_Gaussian_Elimination(4, a, b, phi)
+    call Math_Mod_Gaussian_Elimination(4, a, b, phi, invertible)
 
-    ! Center of the sphere (could be stored in elems / verts too)
-    x = -0.5 * phi(2);  y = -0.5 * phi(3);  z = -0.5 * phi(4)
+    ! If vertices are not co-planar
+    if(invertible) then
 
-    ! Sphere radius
-    rho = sqrt(x*x + y*y + z*z - phi(1))
+      ! Center of the sphere (could be stored in elems / verts too)
+      x = -0.5 * phi(2);  y = -0.5 * phi(3);  z = -0.5 * phi(4)
+
+      ! Sphere radius
+      rho = sqrt(x*x + y*y + z*z - phi(1))
+
+    else
+      x = 0.0;  y = 0.0;  z = 0.0  ! this is not super-smart, but OK
+      rho = PETA                   ! some big number
+    end if
 
     surf % elem(e) % curv = 1.0 / rho
     surf % elem(e) % xc   = x
