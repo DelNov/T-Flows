@@ -47,9 +47,9 @@
     surf % vert(v) % nne = 0
 
     ! Set initial velocity to zero
-    surf % vert(v) % u = 0.0
-    surf % vert(v) % v = 0.0
-    surf % vert(v) % w = 0.0
+    surf % vert(v) % u_n = 0.0
+    surf % vert(v) % v_n = 0.0
+    surf % vert(v) % w_n = 0.0
 
     ! Set initial coordinates to zero
     surf % vert(v) % x_n = 0.0

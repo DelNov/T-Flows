@@ -20,12 +20,6 @@
   allocate(front % cell_has_vertex(front % pnt_grid % n_cells))
   front % cell_has_vertex(:) = .false.
 
-  ! Allocate memory for working arrays
-  ! (Not used yet, will be used in parallel version)
-  ! allocate(i_work(front % n_verts * front % N_I_VARS))
-  ! allocate(l_work(front % n_verts * front % N_L_VARS))
-  ! allocate(r_work(front % n_verts * front % N_R_VARS))
-
   !-----------------------------!
   !   Initialize all elements   !
   !-----------------------------!
@@ -49,9 +43,9 @@
     front % vert(v) % nne = 0
 
     ! Set initial velocity to zero
-    front % vert(v) % u = 0.0
-    front % vert(v) % v = 0.0
-    front % vert(v) % w = 0.0
+    front % vert(v) % u_n = 0.0
+    front % vert(v) % v_n = 0.0
+    front % vert(v) % w_n = 0.0
 
     ! Set initial coordinates to zero
     front % vert(v) % x_n = 0.0

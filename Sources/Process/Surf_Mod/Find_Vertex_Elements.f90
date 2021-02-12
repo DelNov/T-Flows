@@ -19,27 +19,20 @@
 
   call Surf_Mod_Count_Vertex_Elements(surf)
 
-  ! (Re)allocate memory for elements around each vertex
+  ! Initialize to zero
   do v = 1, nv
-    if(allocated(vert(v) % vert_e)) then
-      if(size(vert(v) % vert_e) .ne. vert(v) % nne) then
-        deallocate(vert(v) % vert_e)
-        allocate(vert(v) % vert_e(vert(v) % nne))
-      end if
-    else
-      allocate(vert(v) % vert_e(vert(v) % nne))
-    end if
+    vert(v) % nne  = 0
+    vert(v) % e(:) = 0
   end do
 
   ! Store elements around each vertex
-  vert(1:nv) % nne = 0
   do e = 1, ne
     i = elem(e) % v(1)
     j = elem(e) % v(2)
     k = elem(e) % v(3)
-    vert(i) % nne = vert(i) % nne + 1;  vert(i) % vert_e(vert(i) % nne) = e
-    vert(j) % nne = vert(j) % nne + 1;  vert(j) % vert_e(vert(j) % nne) = e
-    vert(k) % nne = vert(k) % nne + 1;  vert(k) % vert_e(vert(k) % nne) = e
+    vert(i) % nne = vert(i) % nne + 1;  vert(i) % e(vert(i) % nne) = e
+    vert(j) % nne = vert(j) % nne + 1;  vert(j) % e(vert(j) % nne) = e
+    vert(k) % nne = vert(k) % nne + 1;  vert(k) % e(vert(k) % nne) = e
   end do
 
   end subroutine

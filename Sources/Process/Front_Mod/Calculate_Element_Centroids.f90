@@ -10,7 +10,7 @@
   type(Vert_Type), pointer :: vert(:)
   type(Elem_Type), pointer :: elem(:)
   integer,         pointer :: ne
-  integer                  :: e, i_v
+  integer                  :: e, i_ver
 !==============================================================================!
 
   ! Take aliases
@@ -27,10 +27,10 @@
     elem(e) % ye = 0.0
     elem(e) % ze = 0.0
 
-    do i_v = 1, elem(e) % nv
-      elem(e) % xe = elem(e) % xe + vert(elem(e) % v(i_v)) % x_n
-      elem(e) % ye = elem(e) % ye + vert(elem(e) % v(i_v)) % y_n
-      elem(e) % ze = elem(e) % ze + vert(elem(e) % v(i_v)) % z_n
+    do i_ver = 1, elem(e) % nv
+      elem(e) % xe = elem(e) % xe + vert(elem(e) % v(i_ver)) % x_n
+      elem(e) % ye = elem(e) % ye + vert(elem(e) % v(i_ver)) % y_n
+      elem(e) % ze = elem(e) % ze + vert(elem(e) % v(i_ver)) % z_n
     end do
 
     elem(e) % xe = elem(e) % xe / real(elem(e) % nv)

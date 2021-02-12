@@ -11,7 +11,7 @@
   type(Vert_Type), pointer :: vert(:)
   type(Elem_Type), pointer :: elem(:)
   integer,         pointer :: nv, ne
-  integer                  :: c, e, j, v1, v2, i_v
+  integer                  :: c, e, j, v1, v2, i_ver
   real                     :: surf_v(3)
   real                     :: a(3), b(3), tri_v(3), area_x2
 !==============================================================================!
@@ -32,11 +32,11 @@
     elem(e) % sy   = 0.0
     elem(e) % sz   = 0.0
 
-    do i_v = 1, elem(e) % nv
+    do i_ver = 1, elem(e) % nv
 
-      v1 = elem(e) % v(i_v)
-      if(i_v < elem(e) % nv) then
-        v2 = elem(e) % v(i_v + 1)
+      v1 = elem(e) % v(i_ver)
+      if(i_ver < elem(e) % nv) then
+        v2 = elem(e) % v(i_ver + 1)
       else
         v2 = elem(e) % v(1)
       end if

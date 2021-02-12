@@ -18,7 +18,7 @@
   integer, allocatable  :: elem_n_verts(:)
   integer, allocatable  :: vert_v(:,:)
   integer, allocatable  :: elem_v(:,:)
-  integer               :: v, k, i_v, j_v, e, c, d, s, max_nnv
+  integer               :: v, k, i_ver, j_ver, e, c, d, s, max_nnv
   logical               :: invertible
   real                  :: x, y, z, x2, y2, z2, xy, xz, yz, rho
 !==============================================================================!
@@ -53,8 +53,8 @@
   allocate(elem_n_verts(front % n_elems))
   elem_n_verts(:) = 0
   do e = 1, front % n_elems
-    do i_v = 1, front % elem(e) % nv
-      v = front % elem(e) % v(i_v)
+    do i_ver = 1, front % elem(e) % nv
+      v = front % elem(e) % v(i_ver)
       elem_n_verts(e) = elem_n_verts(e) + front % vert(v) % nnv
     end do
   end do
@@ -65,11 +65,11 @@
 
   elem_n_verts(:) = 0
   do e = 1, front % n_elems
-    do i_v = 1, front % elem(e) % nv
-      v = front % elem(e) % v(i_v)
-      do j_v = 1, front % vert(v) % nnv
+    do i_ver = 1, front % elem(e) % nv
+      v = front % elem(e) % v(i_ver)
+      do j_ver = 1, front % vert(v) % nnv
         elem_n_verts(e) = elem_n_verts(e) + 1;
-        elem_v(elem_n_verts(e), e) = vert_v(j_v, v)
+        elem_v(elem_n_verts(e), e) = vert_v(j_ver, v)
       end do
     end do
   end do
@@ -137,6 +137,12 @@
       rho = PETA                   ! some big number
     end if
 
+    ! Center of the sphere (could be stored in elems / verts too)
+    x = -0.5 * phi(2);  y = -0.5 * phi(3);  z = -0.5 * phi(4)
+
+    ! Sphere radius
+    rho = sqrt(x*x + y*y + z*z - phi(1))
+
     front % elem(e) % curv = 1.0 / rho
     front % elem(e) % xc   = x
     front % elem(e) % yc   = y
@@ -157,8 +163,8 @@
   front % vert(1:front % n_verts) % curv = 0.
   do e = 1, front % n_elems
 
-    do i_v = 1, front % elem(e) % nv
-      v = front % elem(e) % v(i_v)
+    do i_ver = 1, front % elem(e) % nv
+      v = front % elem(e) % v(i_ver)
 
       front % vert(v) % curv = front % vert(v) % curv  &
                       + front % elem(e) % curv/real(front % vert(v) % nne)

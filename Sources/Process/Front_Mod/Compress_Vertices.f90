@@ -11,7 +11,7 @@
   type(Vert_Type), pointer :: vert(:)
   type(Elem_Type), pointer :: elem(:)
   integer,         pointer :: nv, ne
-  integer                  :: e, v, n_vert, i_v, j_v
+  integer                  :: e, v, n_vert, i_ver, j_ver
   real,    allocatable     :: xv(:), yv(:), zv(:)
   integer, allocatable     :: ni(:), new_n(:)
 !==============================================================================!
@@ -24,9 +24,9 @@
 
   ! Check sanity of the elements so far
   do e = 1, ne
-    do i_v = 1, elem(e) % nv-1
-      do j_v = i_v+1, elem(e) % nv
-        if(elem(e) % v(i_v) .eq. elem(e) % v(j_v)) then
+    do i_ver = 1, elem(e) % nv-1
+      do j_ver = i_ver+1, elem(e) % nv
+        if(elem(e) % v(i_ver) .eq. elem(e) % v(j_ver)) then
           print '(a)',      ' # ERROR in the beginning of Compress_Vertices'
           print '(a,i6,a)', ' # element ', e, 'has same vertices'
         end if
@@ -87,8 +87,8 @@
   call Sort_Mod_Int_Carry_Int(ni, new_n)
 
   do e = 1, ne
-    do i_v = 1, elem(e) % nv
-      elem(e) % v(i_v) = new_n(elem(e) % v(i_v))
+    do i_ver = 1, elem(e) % nv
+      elem(e) % v(i_ver) = new_n(elem(e) % v(i_ver))
     end do
   end do
 
@@ -98,9 +98,9 @@
 
   ! Check sanity of the elements in the end
   do e = 1, ne
-    do i_v = 1, elem(e) % nv-1
-      do j_v = i_v+1, elem(e) % nv
-        if(elem(e) % v(i_v) .eq. elem(e) % v(j_v)) then
+    do i_ver = 1, elem(e) % nv-1
+      do j_ver = i_ver+1, elem(e) % nv
+        if(elem(e) % v(i_ver) .eq. elem(e) % v(j_ver)) then
           print '(a)',      ' # ERROR in the end of Compress_Vertices'
           print '(a,i6,a)', ' # element ', e, 'has same vertices'
         end if

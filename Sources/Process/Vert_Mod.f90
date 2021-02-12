@@ -16,17 +16,17 @@
     real :: y_n, y_o
     real :: z_n, z_o
 
-    ! Vertex's velocity (if needed)
-    real :: u
-    real :: v
-    real :: w
+    ! Vertex's new velocity (if ever needed)
+    real :: u_n
+    real :: v_n
+    real :: w_n
 
     real :: sumx, sumy, sumz
 
-    integer :: nne                     ! number of neighbouring elements
-    integer :: nnv                     ! number of neighbouring vertices
-    logical :: boundary                ! is vertex on a boundary
-    integer, allocatable :: vert_e(:)  ! list of elements around the vertex
+    integer :: nne       ! number of neighbouring elements
+    integer :: nnv       ! number of neighbouring vertices
+    logical :: boundary  ! is vertex on a boundary
+    integer :: e(24)     ! list of elements around the vertex
 
     ! The closest cell, node, boundary cell and face
     integer :: cell

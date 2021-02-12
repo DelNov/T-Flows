@@ -14,7 +14,7 @@
   integer,         pointer :: nv, ns, ne
   integer                  :: cnt_one, cnt_two
   integer                  :: e, eb, ea, c, d, c1, c2, d1, d2, s, n_side
-  integer                  :: ss, sum_ijk, sum_cd, i_v, i_s, v1, v2
+  integer                  :: ss, sum_ijk, sum_cd, i_ver, i_s, v1, v2
   integer, allocatable     :: ci(:), di(:), ei(:), ni(:)
 !==============================================================================!
 
@@ -31,10 +31,10 @@
   !----------------------------!
   n_side = 0  ! initialize side coutner
   do e = 1, ne
-    do i_v = 1, elem(e) % nv
+    do i_ver = 1, elem(e) % nv
 
-      v1 = i_v
-      v2 = i_v + 1
+      v1 = i_ver
+      v2 = i_ver + 1
       if(v2 > elem(e) % nv) v2 = 1
 
       n_side = n_side + 1
@@ -97,12 +97,12 @@
       ! Tedious but (hopefully) correct way to find eb and ea
       do ss = s, s+1
 
-        do i_v = 1, elem(ei(ss)) % nv
+        do i_ver = 1, elem(ei(ss)) % nv
 
           ! Get first and second vertex
-          v1 = elem(ei(ss)) % v(i_v)
-          if(i_v < elem(ei(ss)) % nv) then
-            v2 = elem(ei(ss)) % v(i_v+1)
+          v1 = elem(ei(ss)) % v(i_ver)
+          if(i_ver < elem(ei(ss)) % nv) then
+            v2 = elem(ei(ss)) % v(i_ver+1)
           else
             v2 = elem(ei(ss)) % v(1)
           end if
@@ -134,12 +134,12 @@
       ! Tedious but (hopefully) correct way to find eb and ea
       ss = s
 
-      do i_v = 1, elem(ei(ss)) % nv
+      do i_ver = 1, elem(ei(ss)) % nv
 
         ! Get first and second vertex
-        v1 = elem(ei(ss)) % v(i_v)
-        if(i_v < elem(ei(ss)) % nv) then
-          v2 = elem(ei(ss)) % v(i_v+1)
+        v1 = elem(ei(ss)) % v(i_ver)
+        if(i_ver < elem(ei(ss)) % nv) then
+          v2 = elem(ei(ss)) % v(i_ver+1)
         else
           v2 = elem(ei(ss)) % v(1)
         end if
@@ -175,12 +175,12 @@
     ! Element a
     if(ea > 0) then
 
-      do i_v = 1, elem(ea) % nv
+      do i_ver = 1, elem(ea) % nv
 
         ! Get first and second vertex
-        v1 = elem(ea) % v(i_v)
-        if(i_v < elem(ea) % nv) then
-          v2 = elem(ea) % v(i_v+1)
+        v1 = elem(ea) % v(i_ver)
+        if(i_ver < elem(ea) % nv) then
+          v2 = elem(ea) % v(i_ver+1)
         else
           v2 = elem(ea) % v(1)
         end if
@@ -200,12 +200,12 @@
     ! Element b
     if(eb > 0) then
 
-      do i_v = 1, elem(eb) % nv
+      do i_ver = 1, elem(eb) % nv
 
         ! Get first and second vertex
-        v1 = elem(eb) % v(i_v)
-        if(i_v < elem(eb) % nv) then
-          v2 = elem(eb) % v(i_v+1)
+        v1 = elem(eb) % v(i_ver)
+        if(i_ver < elem(eb) % nv) then
+          v2 = elem(eb) % v(i_ver+1)
         else
           v2 = elem(eb) % v(1)
         end if
@@ -229,8 +229,8 @@
     sum_ijk = 0
     sum_cd  = 0
 
-    do i_v = 1, elem(e) % nv
-      sum_ijk = sum_ijk + elem(e) % v(i_v)
+    do i_ver = 1, elem(e) % nv
+      sum_ijk = sum_ijk + elem(e) % v(i_ver)
     end do
 
     do i_s = 1, elem(e) % ns

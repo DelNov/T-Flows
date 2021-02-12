@@ -69,7 +69,7 @@
 
     ! Match first and second neighbour cells with all elements around the node
     do i_ele = 1, surf % vert(v) % nne
-      e  = surf % vert(v) % vert_e(i_ele)
+      e  = surf % vert(v) % e(i_ele)
 
       ! Center of the sphere
       xs = surf % elem(e) % xc

@@ -8,7 +8,7 @@
   type(Vert_Type), pointer :: vert(:)
   type(Elem_Type), pointer :: elem(:)
   integer,         pointer :: nv, ne
-  integer                  :: e, v, i_v
+  integer                  :: e, v, i_ver
 !==============================================================================!
 
   ! Take aliases
@@ -17,33 +17,17 @@
   vert => front % vert
   elem => front % elem
 
-  ! Count vertex elements
-  vert(1:nv) % nne = 0
-  do e = 1, ne
-    do i_v = 1, elem(e) % nv
-      v = elem(e) % v(i_v)
-      vert(v) % nne = vert(v) % nne + 1
-    end do
-  end do
-
-  ! (Re)allocate memory for elements around each vertex
+  ! Initialize to zero
   do v = 1, nv
-    if(allocated(vert(v) % vert_e)) then
-      if(size(vert(v) % vert_e) .ne. vert(v) % nne) then
-        deallocate(vert(v) % vert_e)
-        allocate(vert(v) % vert_e(vert(v) % nne))
-      end if
-    else
-      allocate(vert(v) % vert_e(vert(v) % nne))
-    end if
+    vert(v) % nne  = 0
+    vert(v) % e(:) = 0
   end do
 
-  ! Store elements around each vertex
-  vert(1:nv) % nne = 0
+  ! Store elements around each vertex (no checking!)
   do e = 1, ne
-    do i_v = 1, elem(e) % nv
-      v = elem(e) % v(i_v)
-      vert(v) % nne = vert(v) % nne + 1;  vert(v) % vert_e(vert(v) % nne) = e
+    do i_ver = 1, elem(e) % nv
+      v = elem(e) % v(i_ver)
+      vert(v) % nne = vert(v) % nne + 1;  vert(v) % e(vert(v) % nne) = e
     end do
   end do
 
