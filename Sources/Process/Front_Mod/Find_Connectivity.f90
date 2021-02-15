@@ -188,10 +188,12 @@
         ! Check if nodes match
         if(v1 .eq. c .and. v2 .eq. d  .or. &
            v2 .eq. c .and. v1 .eq. d) then
-          elem(ea) % nne = elem(ea) % nne + 1
           elem(ea) % ns  = elem(ea) % ns  + 1
-          elem(ea) % e(elem(ea) % nne) = eb
           elem(ea) % s(elem(ea) % ns)  = s
+          if(eb .gt. 0) then
+            elem(ea) % nne = elem(ea) % nne + 1
+            elem(ea) % e(elem(ea) % nne) = eb
+          end if
         end if
       end do
 
@@ -213,10 +215,12 @@
         ! Check if nodes match
         if(v1 .eq. c .and. v2 .eq. d  .or. &
            v2 .eq. c .and. v1 .eq. d) then
-          elem(eb) % nne = elem(eb) % nne + 1
           elem(eb) % ns  = elem(eb) % ns  + 1
-          elem(eb) % e(elem(eb) % nne) = ea
           elem(eb) % s(elem(eb) % ns)  = s
+          if(ea .gt. 0) then
+            elem(eb) % nne = elem(eb) % nne + 1
+            elem(eb) % e(elem(eb) % nne) = ea
+          end if
         end if
       end do
 
