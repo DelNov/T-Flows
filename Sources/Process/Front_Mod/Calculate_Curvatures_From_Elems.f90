@@ -137,12 +137,6 @@
       rho = PETA                   ! some big number
     end if
 
-    ! Center of the sphere (could be stored in elems / verts too)
-    x = -0.5 * phi(2);  y = -0.5 * phi(3);  z = -0.5 * phi(4)
-
-    ! Sphere radius
-    rho = sqrt(x*x + y*y + z*z - phi(1))
-
     front % elem(e) % curv = 1.0 / rho
     front % elem(e) % xc   = x
     front % elem(e) % yc   = y
