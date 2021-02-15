@@ -34,20 +34,7 @@
     type(Elem_Type), allocatable :: elem(:)
     type(Side_Type), allocatable :: side(:)
 
-    ! Logical array if cell has particles
-    logical, allocatable :: cell_has_vertex(:)
-
-    ! Working arrays, buffers for parallel version
-    ! (Keyword "parameter: not allowed inside a type
-    ! declaration. One might think of making a function)
-    integer :: N_I_VARS = 3
-    integer :: N_L_VARS = 2
-    integer :: N_R_VARS = 8
   end type
-
-  integer, allocatable :: i_work(:)
-  logical, allocatable :: l_work(:)
-  real,    allocatable :: r_work(:)
 
   contains
 
@@ -66,6 +53,7 @@
   include 'Front_Mod/Handle_4_Points.f90'
   include 'Front_Mod/Handle_5_Points.f90'
   include 'Front_Mod/Handle_6_Points.f90'
+  include 'Front_Mod/Initialize.f90'
   include 'Front_Mod/Place_At_Var_Value.f90'
   include 'Front_Mod/Print_Statistics.f90'
 
