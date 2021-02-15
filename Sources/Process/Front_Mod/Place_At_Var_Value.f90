@@ -46,6 +46,7 @@
   nc   = grid % n_cells
   nn   = grid % n_nodes
 
+  call Front_Mod_Initialize(front)
   call Field_Mod_Interpolate_Cells_To_Nodes(flow, phi % n, phi_n(1:nn))
   CALL GRID_MOD_SAVE_DEBUG_VTU(GRID, 'PHI_N',       &
                                SCALAR_NODE=PHI_N,   &

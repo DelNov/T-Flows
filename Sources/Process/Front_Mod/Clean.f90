@@ -8,14 +8,6 @@
   type(Front_Type),  target :: front
 !==============================================================================!
 
-  deallocate(front % cell_has_vertex)
-
-  ! Dellocate memory for working arrays
-  ! (Not used yet, will be used in parallel version)
-  ! deallocate(i_work)
-  ! deallocate(l_work)
-  ! deallocate(r_work)
-
   !-----------------------------!
   !   Deallocate all elements   !
   !-----------------------------!
