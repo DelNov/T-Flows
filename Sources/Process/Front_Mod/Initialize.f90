@@ -20,6 +20,7 @@
     front % elem(e) % v(:) = 0
     front % elem(e) % e(:) = 0
     front % elem(e) % s(:) = 0
+    front % elem(e) % cell = 0
   end do
   front % n_elems = 0
 
