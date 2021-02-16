@@ -25,7 +25,7 @@
   type(Matrix_Type), pointer :: a
   integer,           pointer :: nv, ne
   integer, allocatable       :: n_cells_v(:)
-  integer                    :: c, c1, c2, s, j, n1, n2, run, nb, nc, nn
+  integer                    :: c, c1, c2, s, j, n1, n2, run, nb, nc, n, nn
   integer                    :: v, n_vert, n_verts_in_buffers
   integer                    :: en(12,2)  ! edge numbering
   real                       :: phi1, phi2, xn1, yn1, zn1, xn2, yn2, zn2, w1, w2
@@ -48,9 +48,18 @@
 
   call Front_Mod_Initialize(front)
   call Field_Mod_Interpolate_Cells_To_Nodes(flow, phi % n, phi_n(1:nn))
+
   CALL GRID_MOD_SAVE_DEBUG_VTU(GRID, 'PHI_N',       &
                                SCALAR_NODE=PHI_N,   &
                                SCALAR_NAME='PHI_N')
+
+  !-----------------------------------------------!
+  !   This is a bit ad-hoc - if some points are   !
+  !   "exactly" 0.5, increase them a little bit   !
+  !-----------------------------------------------!
+  do n = 1, nn
+    if(Math_Mod_Approx_Real(phi_n(n), 0.5)) phi_n(n) = 0.5 + MILI
+  end do
 
   !-----------------------------!
   !   Smooth the VOF function   !
@@ -144,7 +153,7 @@
     !---------------------------------!
     !   Some points have been found   !
     !---------------------------------!
-    if(n_vert > 0) then
+    if(n_vert > 2) then
 
       ! Surface vector
       surf_v(1) = phi % x(c)
@@ -159,7 +168,12 @@
       if(n_vert .eq. 7) then
         print *, '# ERROR: seven vertices in an intersection!'
         stop
+
       end if
+
+      ! Store at which cell the surface resides
+      elem(ne) % cell = c
+
     end if
 
   end do
