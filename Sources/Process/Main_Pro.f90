@@ -233,12 +233,14 @@
   ! It will save results in .vtk or .cgns file format,
   ! depending on how the code was compiled
   ! First calls saves inside, second only the boundary cells
-  do d = 1, n_dom
-    call Results_Mod_Save(flow(d), turb(d), mult(d), swarm(d), first_dt,  &
-                          plot_inside=.true., domain=d)
-    call Results_Mod_Save(flow(d), turb(d), mult(d), swarm(d), first_dt,  &
-                          plot_inside=.false., domain=d)
-  end do
+  if(result % initial) then
+    do d = 1, n_dom
+      call Results_Mod_Save(flow(d), turb(d), mult(d), swarm(d), first_dt,  &
+                            plot_inside=.true., domain=d)
+      call Results_Mod_Save(flow(d), turb(d), mult(d), swarm(d), first_dt,  &
+                            plot_inside=.false., domain=d)
+    end do
+  end if
 
   do curr_dt = first_dt + 1, last_dt
 
