@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Cg(sol, x, b, prec, miter, niter, tol, fin_res, norm)
+  subroutine Solver_Mod_Cg(sol, x, b, prec, miter, niter, tol, fin_res, norm)
 !------------------------------------------------------------------------------!
 !   Solves the linear systems of equations by a precond. CG Method.            !
 !------------------------------------------------------------------------------!
