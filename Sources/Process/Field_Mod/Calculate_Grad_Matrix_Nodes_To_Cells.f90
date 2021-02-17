@@ -16,7 +16,9 @@
   ! Take alias
   grid => flow % pnt_grid
 
-  ! Innitialize all entries to zero
+  !--------------------------------------------!
+  !   Initialize gradient matrices for cells   !
+  !--------------------------------------------!
   do c = 1, grid % n_cells
     flow % grad_n2c(1,c) = 0.0
     flow % grad_n2c(2,c) = 0.0
@@ -26,9 +28,9 @@
     flow % grad_n2c(6,c) = 0.0
   end do
 
-  !---------------------------------!
-  !   Compute the gradient matrix   !
-  !---------------------------------!
+  !-----------------------------------------------!
+  !   Compute the gradient matrix for all nodes   !
+  !-----------------------------------------------!
   do c = 1, grid % n_cells
 
     ! Browse through cell's nodes

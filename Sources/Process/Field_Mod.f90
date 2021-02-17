@@ -125,6 +125,8 @@
   include 'Field_Mod/Body_Forces.f90'
   include 'Field_Mod/Calculate_Fluxes.f90'
   include 'Field_Mod/Calculate_Grad_Matrix.f90'
+  include 'Field_Mod/Calculate_Grad_Matrix_Cell_By_Cell.f90'
+  include 'Field_Mod/Calculate_Grad_Matrix_For_Cell.f90'
   include 'Field_Mod/Calculate_Grad_Matrix_Nodes_To_Cells.f90'
   include 'Field_Mod/Calculate_Grad_Matrix_Cells_To_Nodes.f90'
   include 'Field_Mod/Correct_Fluxes_With_Body_Forces.f90'

@@ -16,6 +16,9 @@
   ! Take alias
   grid => flow % pnt_grid
 
+  !--------------------------------------------!
+  !   Initialize gradient matrices for cells   !
+  !--------------------------------------------!
   do c = 1, grid % n_cells
     flow % grad_c2c(1,c) = 0.0
     flow % grad_c2c(2,c) = 0.0
@@ -25,6 +28,9 @@
     flow % grad_c2c(6,c) = 0.0
   end do
 
+  !----------------------------------------------------------------------!
+  !   Compute the gradient matrix for all cells browsing through faces   !
+  !----------------------------------------------------------------------!
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
