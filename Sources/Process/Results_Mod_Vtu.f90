@@ -17,7 +17,8 @@
   !   Results type   !
   !------------------!
   type Results_Type
-    integer :: interval
+    integer :: interval  ! result save interval
+    logical :: initial   ! save intial condition or not
   end type
   type(Results_Type) :: result
 
