@@ -21,6 +21,7 @@
     ! Total inflow and outflow volume flux
     real :: vol_in   ! [m^3/s]
     real :: vol_out  ! [m^3/s]
+    real :: vol_src  ! [m^3/s]
 
     ! Bulk mass flux in x-, y-, z- direction
     real :: flux_x  ! [kg/s]
