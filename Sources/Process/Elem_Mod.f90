@@ -17,6 +17,7 @@
     integer :: v(24)
     integer :: e(24)
     integer :: s(24)
+    integer :: cell        ! cell at which the surface resides
     real    :: nx, ny, nz  ! surface normal vector
     real    :: xc, yc, zc  ! center of a sphere
     real    :: xe, ye, ze  ! center of element
