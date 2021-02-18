@@ -120,6 +120,11 @@
   call Comm_Mod_Global_Sum_Real(bulk % vol_out)  ! not checked
   call Comm_Mod_Global_Sum_Real(area_out)
 
+  ! Avoid divisions by zero for the cases without any fluid motion
+  fac = 1.0
+  if(bulk % vol_out .gt. FEMTO) fac = bulk % vol_in / (bulk % vol_out)
+  area_out = max(area_out, FEMTO)
+
   !----------------------------------------------------------------------!
   !   Correct velocities and volume fluxes at outlet to balance volume   !
   !----------------------------------------------------------------------!
