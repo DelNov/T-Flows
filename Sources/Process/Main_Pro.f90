@@ -144,6 +144,7 @@
     call Read_Control_Numerical(flow(d), turb(d), mult(d))
 
     call Grid_Mod_Find_Nodes_Cells(grid(d))
+    call Grid_Mod_Calculate_Weights_Cells_To_Nodes(grid(d))  ! needed for front
     call Grid_Mod_Calculate_Global_Volumes(grid(d))
     call Field_Mod_Calculate_Grad_Matrix(flow(d))
 
@@ -281,7 +282,8 @@
       if(mult(d) % model .eq. VOLUME_OF_FLUID) then
         call Multiphase_Mod_Vof_Main(mult(d), flow(d), turb(d), sol(d), curr_dt)
         if(mult(d) % track_front) then
-          call Results_Mod_Save_Surf(mult(d) % surf, curr_dt)
+          call Results_Mod_Save_Front(mult(d) % front, curr_dt)
+!f_vs_s   call Results_Mod_Save_Surf (mult(d) % surf, curr_dt)
           call Results_Mod_Save(flow(d), turb(d), mult(d), swarm(d), curr_dt,  &
                                 plot_inside=.true., domain=d)
         end if
@@ -330,13 +332,9 @@
         call Compute_Momentum(flow(d), turb(d), mult(d), sol(d), ini)
         call Compute_Pressure(flow(d), mult(d), sol(d), ini)
 
-        call Multiphase_Averaging(mult(d), flow(d) % p)
         call Field_Mod_Calculate_Mass_Fluxes(flow(d), flow(d) % v_flux % n)
         call Correct_Velocity(flow(d), mult(d), sol(d), ini)
 
-        call Multiphase_Averaging(mult(d), flow(d) % u)
-        call Multiphase_Averaging(mult(d), flow(d) % v)
-        call Multiphase_Averaging(mult(d), flow(d) % w)
         call Piso_Algorithm(flow(d), turb(d), mult(d), sol(d), ini)
 
         ! Energy (practically temperature)

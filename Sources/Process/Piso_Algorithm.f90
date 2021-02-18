@@ -41,12 +41,8 @@
       call Grid_Mod_Exchange_Cells_Real(grid, sol % a % sav)
 
       call Compute_Pressure(flow, mult, sol, ini)
-      call Multiphase_Averaging(mult, flow % p)
 
       call Correct_Velocity(flow, mult, sol, ini)
-      call Multiphase_Averaging(mult, flow % u)
-      call Multiphase_Averaging(mult, flow % v)
-      call Multiphase_Averaging(mult, flow % w)
     end do
     flow % piso_status = .false.
     call Info_Mod_Iter_Fill_At(1, 1, u % name, u % eniter, u % res)

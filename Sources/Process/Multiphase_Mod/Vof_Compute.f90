@@ -64,11 +64,6 @@
     vof % o(:) = vof % n(:)
   end if
 
-  ! Phase change
-  if(mult % mass_transfer) then
-    call Multiphase_Mod_Vof_Mass_Transfer(mult, sol)
-  end if
-
   if(vof % adv_scheme .eq. UPWIND) then
     !-------------------------!
     !   Matrix Coefficients   !

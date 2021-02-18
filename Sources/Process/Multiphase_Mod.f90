@@ -4,6 +4,7 @@
 !   Definition of variables used for all multiphase modelling paradigms.       !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
+  use Front_Mod
   use Surf_Mod
   use Turb_Mod
 !------------------------------------------------------------------------------!
@@ -21,6 +22,7 @@
 
     type(Grid_Type),  pointer :: pnt_grid  ! grid for which it is defined
     type(Field_Type), pointer :: pnt_flow  ! flow field for which it is defined
+    type(Front_Type)          :: front     ! pointer to front (simple surface)
     type(Surf_Type)           :: surf      ! pointer to surface
 
     ! Volume fraction (colour function) and its smooth variant
@@ -53,10 +55,11 @@
     real :: t_sat, latent_heat  ![K, J/kg]
 
     ! Heat from phase change and index of saturated cells
-    real, allocatable    :: qci(:)
-    real, allocatable    :: m_dot(:)  ! [kg/m^3 s]
-    integer, allocatable :: ic(:)
+    real,    allocatable :: qci(:)
+    real,    allocatable :: m_dot(:)         ! [kg/m^2 s]
+    integer, allocatable :: cell_at_elem(:)
     real                 :: add_mass_in, add_mass_out, vol_flux_avg
+    type(Var_Type)       :: var
 
     ! User define parameters for vof
     real    :: courant_max_param
@@ -90,14 +93,17 @@
 
   include 'Multiphase_Mod/Vof_Main.f90'
   include 'Multiphase_Mod/Vof_Allocate.f90'
-  include 'Multiphase_Mod/Vof_Averaging.f90'
   include 'Multiphase_Mod/Vof_Compute.f90'
   include 'Multiphase_Mod/Vof_Coefficients.f90'
   include 'Multiphase_Mod/Vof_Correct_Beta.f90'
   include 'Multiphase_Mod/Vof_Curvature_Csf.f90'
   include 'Multiphase_Mod/Vof_Find_Upstream_Phi.f90'
-  include 'Multiphase_Mod/Vof_Mass_Transfer.f90'
-  include 'Multiphase_Mod/Vof_Mass_Transfer_Rate_In.f90'
+  include 'Multiphase_Mod/Vof_Get_Gas_And_Liquid_Phase.f90'
+  include 'Multiphase_Mod/Vof_Grad_Variable_With_Jump.f90'
+  include 'Multiphase_Mod/Vof_Interpolate_Var_To_Face_With_Jump.f90'
+  include 'Multiphase_Mod/Vof_Mass_Transfer_Added_Volume.f90'
+  include 'Multiphase_Mod/Vof_Mass_Transfer_Pressure_Source.f90'
+  include 'Multiphase_Mod/Vof_Mass_Transfer_Vof_Source.f90'
   include 'Multiphase_Mod/Vof_Max_Courant_Number.f90'
   include 'Multiphase_Mod/Vof_Momentum_Contribution.f90'
   include 'Multiphase_Mod/Vof_Physical_Properties.f90'

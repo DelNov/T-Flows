@@ -15,8 +15,10 @@
   type(Grid_Type),  pointer :: grid
   type(Face_Type),  pointer :: v_flux
   type(Var_Type),   pointer :: vof
-  integer                   :: c, c1, c2, s
+  type(Front_Type), pointer :: front
+  integer                   :: c, c1, c2, s, l, g, e
   real                      :: upwd1, upwd2, upwd3, a0
+  real                      :: vof_int, x_int, y_int, z_int, w_c1
 !==============================================================================!
 
   ! Take aliases
@@ -24,6 +26,21 @@
   grid   => flow % pnt_grid
   v_flux => flow % v_flux
   vof    => mult % vof
+  front  => mult % front
+
+  ! Distinguish between liquid and vapor
+  l = 1; g = 2
+  if(mult % phase_dens(g) > mult % phase_dens(l)) then
+    l = 2; g = 1
+  end if
+
+  ! Mark cells at surface
+  if(mult % mass_transfer) then
+    mult % cell_at_elem(:) = 0  ! not at surface
+    do e = 1, front % n_elems
+      mult % cell_at_elem(front % elem(e) % cell) = e
+    end do
+  end if
 
   ! Initialize matrix and right hand side
   b       = 0.0
@@ -139,52 +156,7 @@
 
   ! Phase change
   if(mult % mass_transfer) then
-
-    ! do s = 1, grid % n_faces
-    !   c1 = grid % faces_c(1,s)
-    !   c2 = grid % faces_c(2,s)
-    !
-    !   if(c2 < 0) then
-    !     if(mult % ic(c1) == 1) then
-    !       ! b(c1) = b(c1) + v_flux % n(s) * vof % n(c1)
-    !       a % val(a % dia(c1)) = a % val(a % dia(c1)) - v_flux % n(s)
-    !     end if
-    !   end if
-    ! end do
-
-    ! Interior faces
-    ! do s = 1, grid % n_faces
-    !   c1 = grid % faces_c(1,s)
-    !   c2 = grid % faces_c(2,s)
-    !
-    !   if(c2 > 0) then
-    !     if(mult % ic(c1) == 1) then
-    !       ! b(c1) = b(c1) + v_flux % n(s) * vof % n(c1)
-    !       a % val(a % dia(c1)) = a % val(a % dia(c1)) - v_flux % n(s)
-    !     end if
-    !
-    !     if(mult % ic(c2) == 1) then
-    !       ! b(c2) = b(c2) - v_flux % n(s) * vof % n(c2)
-    !       a % val(a % dia(c2)) = a % val(a % dia(c2)) + v_flux % n(s)
-    !     end if
-    !   end if
-    ! end do
-
-    do c = 1, grid % n_cells
-      b(c) = b(c) + mult % m_dot(c) * grid % vol(c)    &
-                  / mult % phase_dens(1)
-      ! b(c) = b(c) + mult % m_dot(c) * grid % vol(c) * vof % n(c)    &
-      !      * (1.0 / mult % phase_dens(2) - 1.0 / mult % phase_dens(1))
-      ! b(c) = b(c) + mult % m_dot(c) * grid % vol(c)                 &
-      !      * ( 1.0 / mult % phase_dens(1)                               &
-      !      - vof % n(c)                                                 &
-      !      * (1.0 / mult % phase_dens(1) - 1.0 / mult % phase_dens(2)) )
-      ! b(c) = b(c) + mult % m_dot(c) * grid % vol(c)    &
-      !      / mult % phase_dens(1)
-      ! a % val(a % dia(c)) = a % val(a % dia(c))    &
-      !      + mult % m_dot(c) * grid % vol(c)   &
-      !      * (1.0 / mult % phase_dens(1) - 1.0 / mult % phase_dens(2))
-    end do
+    call Multiphase_Mod_Vof_Mass_Transfer_Vof_Source(mult, b)
   end if
 
   end subroutine

@@ -16,20 +16,28 @@
 
   ! Volume of Fluid
   if(mult % model .eq. VOLUME_OF_FLUID) then
-
-    ! Front tracking is not engaged
-    if(.not. mult % track_front) then
-      call Update_Boundary_Values(flow, turb, mult)
-      call Multiphase_Mod_Vof_Compute(mult, sol, flow % dt, n)
-      call Field_Mod_Body_Forces(flow)
-      call Multiphase_Averaging(mult, mult % vof)  ! for phase change only
-
-    ! Front tracking is engaged
-    else
-      call Update_Boundary_Values(flow, turb, mult)
-    ! call Surf_Mod_Advance_Front(mult, flow % dt, n) not implemented yet
-      call Field_Mod_Body_Forces(flow)
+    if(mult % track_front) then
+      call Front_Mod_Place_At_Var_Value(mult % front,  &
+                                        mult % vof,    &
+                                        sol,           &
+                                        0.5,           &
+                                        .true.)  ! don't print messages
+      call Front_Mod_Calculate_Curvatures_From_Elems(mult % front)
+      call Front_Mod_Print_Statistics               (mult % front)
+!f_vs_s      call Surf_Mod_Place_At_Var_Value(mult % surf,  &
+!f_vs_s                                       mult % vof,   &
+!f_vs_s                                       sol,          &
+!f_vs_s                                       0.5,          &
+!f_vs_s                                       .true.)  ! don't print messages
+!f_vs_s      call Surf_Mod_Calculate_Curvatures_From_Elems(mult % surf)
+!f_vs_s      call Surf_Mod_Print_Statistics               (mult % surf)
+!     call Front_Mod_Clean(mult % front)
     end if
+
+    ! Commands to advance vof
+    call Update_Boundary_Values(flow, turb, mult)
+    call Multiphase_Mod_Vof_Compute(mult, sol, flow % dt, n)
+    call Field_Mod_Body_Forces(flow)
 
   end if
 
