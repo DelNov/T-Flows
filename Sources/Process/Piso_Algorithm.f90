@@ -42,7 +42,7 @@
 
       call Compute_Pressure(flow, mult, sol, ini)
 
-      call Correct_Velocity(flow, mult, sol, ini)
+      call Correct_Velocity(flow, turb, mult, sol, ini)
     end do
     flow % piso_status = .false.
     call Info_Mod_Iter_Fill_At(1, 1, u % name, u % eniter, u % res)

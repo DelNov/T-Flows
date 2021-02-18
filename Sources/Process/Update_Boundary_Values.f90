@@ -2,6 +2,14 @@
   subroutine Update_Boundary_Values(flow, turb, mult)
 !------------------------------------------------------------------------------!
 !   Update variables on the boundaries (boundary cells) where needed.          !
+!   It does not update volume fluxes at boundaries - keep it like that.        !
+!   Fluxes inside are calculated inside Compute_Pressure, and fluxes at        !
+!   boundaries are updated in Balance_Volume                                   !
+!                                                                              !
+!   Ideally, this function should be called before each calculation of         !
+!   gradients, but it is hardly so.  Maybe one could even think of calling     !
+!   it from calculation of variables and updating those which match name       !
+!   of the variable.                                                           !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod

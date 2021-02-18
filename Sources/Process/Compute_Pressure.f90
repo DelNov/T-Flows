@@ -5,6 +5,7 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use User_Mod
+  use Work_Mod, only: b_save => r_cell_01
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -100,6 +101,11 @@
   !-----------------------------------------!
   pp % n = 0.0
 
+  !----------------------------------!
+  !   Correct fluxes at boundaries   !
+  !----------------------------------!
+  call Balance_Volume(flow, mult)
+
   !-------------------------------------------------!
   !   Calculate the mass fluxes on the cell faces   !
   !-------------------------------------------------!
@@ -112,15 +118,45 @@
     if(c2 > 0) then
 
       ! Interpolate velocity
-      u_f = Field_Mod_Interpolate_Var_To_Face(flow, u, s)
-      v_f = Field_Mod_Interpolate_Var_To_Face(flow, v, s)
-      w_f = Field_Mod_Interpolate_Var_To_Face(flow, w, s)
+
+      ! If there is a jump in velocities, call specialized gradient calculation
+      if(mult % mass_transfer) then
+        u_f = Multiphase_Mod_Vof_Interpolate_Var_To_Face_With_Jump(mult, u, s)
+        v_f = Multiphase_Mod_Vof_Interpolate_Var_To_Face_With_Jump(mult, v, s)
+        w_f = Multiphase_Mod_Vof_Interpolate_Var_To_Face_With_Jump(mult, w, s)
+
+      ! No jumps, call usual routines
+      else
+        u_f = Field_Mod_Interpolate_Var_To_Face(flow, u, s)
+        v_f = Field_Mod_Interpolate_Var_To_Face(flow, v, s)
+        w_f = Field_Mod_Interpolate_Var_To_Face(flow, w, s)
+      end if
 
       ! Calculate coeficients for the system matrix
       ! a12 [m*m^3*s/kg = m^4s/kg]
-      a12 = u_relax * 0.5 * a % fc(s)                    &
-                    * ( grid % vol(c1) / a % sav(c1)     &
-                      + grid % vol(c2) / a % sav(c2) )
+      if(.not. mult % mass_transfer) then
+        a12 = u_relax * 0.5 * a % fc(s)                    &
+                      * ( grid % vol(c1) / a % sav(c1)     &
+                        + grid % vol(c2) / a % sav(c2) )
+      else
+        if(mult % cell_at_elem(c1) .eq. 0 .and.  &
+           mult % cell_at_elem(c2) .eq. 0 .or.   &
+           mult % cell_at_elem(c1) .ne. 0 .and.  &
+           mult % cell_at_elem(c2) .ne. 0) then
+          a12 = u_relax * 0.5 * a % fc(s)                    &
+                        * ( grid % vol(c1) / a % sav(c1)     &
+                          + grid % vol(c2) / a % sav(c2) )
+        else
+          if(mult % cell_at_elem(c1) .eq. 0 .and.  &
+             mult % cell_at_elem(c2) .ne. 0) then
+            a12 = u_relax * a % fc(s) * grid % vol(c1) / a % sav(c1)
+          end if
+          if(mult % cell_at_elem(c1) .ne. 0 .and.  &
+             mult % cell_at_elem(c2) .eq. 0) then
+            a12 = u_relax * a % fc(s) * grid % vol(c2) / a % sav(c2)
+          end if
+        end if
+      end if
 
       a % val(a % pos(1,s)) = -a12
       a % val(a % pos(2,s)) = -a12
@@ -150,64 +186,49 @@
                              + py_f * grid % dy(s)   &
                              + pz_f * grid % dz(s))
 
+      ! Any of the cells is at interface, use only non-interface value
+      ! (This is the old way, and seems to be working better after all)
+      if(mult % mass_transfer) then
+        if(mult % cell_at_elem(c1) .eq. 0 .and.  &
+           mult % cell_at_elem(c2) .ne. 0) then
+          v_flux % n(s) = u_f * grid % sx(s)     &
+                        + v_f * grid % sy(s)     &
+                        + w_f * grid % sz(s)
+        end if
+        if(mult % cell_at_elem(c1) .ne. 0 .and.  &
+           mult % cell_at_elem(c2) .eq. 0) then
+          v_flux % n(s) = u_f * grid % sx(s)     &
+                        + v_f * grid % sy(s)     &
+                        + w_f * grid % sz(s)
+        end if
+      end if
+
       b(c1) = b(c1) - v_flux % n(s)
       b(c2) = b(c2) + v_flux % n(s)
 
-    ! Side is on the boundary
-    ! (Check: volume fluxes at the boundaries will
-    !  be corrected in Balance_Volume called below)
+    ! Face is on the boundary
+    ! (Check: volume fluxes at the boundaries was
+    !  corrected in Balance_Volume called above)
     else ! (c2 < 0)
 
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
-        u_f = u % n(c2)
-        v_f = v % n(c2)
-        w_f = w % n(c2)
-        v_flux % n(s) = u_f * grid % sx(s)     &
-                      + v_f * grid % sy(s)     &
-                      + w_f * grid % sz(s)
+      b(c1) = b(c1) - v_flux % n(s)
 
-        b(c1) = b(c1) - v_flux % n(s)
-
-      else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW .or.   &
-              Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) then
-
-        b(c1) = b(c1) - v_flux % n(s)
+      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW .or.   &
+         Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) then
 
         a12 = a % fc(s) * grid % vol(c1) / a % sav(c1)
         a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
 
       else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE) then
-        u_f = u % n(c1)
-        v_f = v % n(c1)
-        w_f = w % n(c1)
-        v_flux % n(s) = u_f * grid % sx(s)     &
-                      + v_f * grid % sy(s)     &
-                      + w_f * grid % sz(s)
-
-        b(c1) = b(c1) - v_flux % n(s)
 
         a12 = a % fc(s) * grid % vol(c1) / a % sav(c1)
         a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
 
-      else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OPENBC) then
-
-        b(c1) = b(c1) - v_flux % n(s)
-
-        a12 = a % fc(s) * grid % vol(c1) / a % sav(c1)
-        a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
-
-      else  ! it is SYMMETRY
-        v_flux % n(s) = 0.0
       end if
 
     end if
 
   end do
-
-  !----------------------------------!
-  !   Correct fluxes at boundaries   !
-  !----------------------------------!
-  call Balance_Volume(flow, mult)
 
   !-------------------------------------------------------------!
   !   In case of VOF, surface tension and  gravity correction   !

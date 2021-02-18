@@ -9,7 +9,7 @@
   use Turb_Mod
   use Grid_Mod
   use Control_Mod
-  use Multiphase_Mod, only: Multiphase_Type
+  use Multiphase_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -40,9 +40,28 @@
 
   call Field_Mod_Calculate_Mass_Fluxes(flow, v_flux % n)
 
-  call Field_Mod_Grad_Variable(flow, u)
-  call Field_Mod_Grad_Variable(flow, v)
-  call Field_Mod_Grad_Variable(flow, w)
+  !----------------------------------------------------------!
+  !   Compute velocity gradients, taking jump into account   !
+  !----------------------------------------------------------!
+
+  ! If there is a jump in velocities, call specialized gradient calculation
+  if(mult % model .eq. VOLUME_OF_FLUID .and. mult % mass_transfer) then
+    call Multiphase_Mod_Vof_Grad_Variable_With_Jump(mult, flow % u)
+    call Multiphase_Mod_Vof_Grad_Variable_With_Jump(mult, flow % v)
+    call Multiphase_Mod_Vof_Grad_Variable_With_Jump(mult, flow % w)
+
+  ! No jumps, call usual routines
+  else
+    call Field_Mod_Grad_Variable(flow, flow % u)
+    call Field_Mod_Grad_Variable(flow, flow % v)
+    call Field_Mod_Grad_Variable(flow, flow % w)
+  end if
+
+  !------------------------!
+  !                        !
+  !   Momentum equations   !
+  !                        !
+  !------------------------!
 
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
