@@ -11,15 +11,17 @@
   type(Field_Type),    target :: flow(MD)
   integer, intent(in)         :: n_dom
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: d1, d2, n1, n2, n, ic1, bc1, ic2, bc2
+  integer :: d, d1, d2, n1, n2, n, ic1, bc1, ic2, bc2
   real    :: t1, t2, k1, wd1, k2, wd2
   integer, parameter :: T  = 1,  &  ! store temperature as the first ...
                         K  = 2,  &  ! ... conductivity as the second ...
                         WD = 3      ! ... and wall distance as the third
 !==============================================================================!
 
-  ! If not heat transfer, don't exchange temperatures
-  if(.not. heat_transfer) return
+  ! If any of domains doesn't have heat_transfer, don't exchange temperatures
+  do d = 1, n_dom
+    if(.not. flow(d) % heat_transfer) return
+  end do
 
   !-------------------------------------------!
   !   Store the desired values to interface   !
