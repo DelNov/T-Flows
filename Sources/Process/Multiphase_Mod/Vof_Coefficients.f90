@@ -35,7 +35,7 @@
   end if
 
   ! Mark cells at surface
-  if(mult % mass_transfer) then
+  if(mass_transfer) then
     mult % cell_at_elem(:) = 0  ! not at surface
     do e = 1, front % n_elems
       mult % cell_at_elem(front % elem(e) % cell) = e
@@ -155,7 +155,7 @@
   end if
 
   ! Phase change
-  if(mult % mass_transfer) then
+  if(mass_transfer) then
     call Multiphase_Mod_Vof_Mass_Transfer_Vof_Source(mult, b)
   end if
 

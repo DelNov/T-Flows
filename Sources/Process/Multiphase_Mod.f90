@@ -46,7 +46,6 @@
     ! Phase change (called mass transfer to be consistent
     ! with heat transfer in the rest of the code)
     real    :: m_d, m_ini, m_s, m_s_acc
-    logical :: mass_transfer
 
     ! Skewness correction
     logical :: skew_corr

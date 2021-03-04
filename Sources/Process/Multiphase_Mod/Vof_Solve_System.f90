@@ -32,7 +32,7 @@
                        vof % res)
   call Cpu_Timer_Mod_Stop('Linear_Solver_For_Multiphase')
 
-  if(.not. mult % mass_transfer) then
+  if(.not. mass_transfer) then
     call Info_Mod_Iter_Fill_At(1, 6, vof % name, vof % eniter, vof % res)
   end if
 

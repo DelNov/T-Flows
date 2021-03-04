@@ -19,7 +19,7 @@
 
   ! Integrate added volume
   added_vol = 0.0
-  if(mult % mass_transfer) then
+  if(mass_transfer) then
     do c = 1, grid % n_cells - grid % comm % n_buff_cells
       e = mult % cell_at_elem(c)  ! front element
       if(e .ne. 0) then

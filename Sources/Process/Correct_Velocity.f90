@@ -50,7 +50,7 @@
   !-----------------------------------------!
 
   ! Normal correction
-  if(.not. mult % mass_transfer) then
+  if(.not. mass_transfer) then
     do c = 1, grid % n_cells
       u % n(c) = u % n(c) - u_relax * pp % x(c) * grid % vol(c) / a % sav(c)
       v % n(c) = v % n(c) - u_relax * pp % y(c) * grid % vol(c) / a % sav(c)
@@ -131,7 +131,7 @@
   call Update_Boundary_Values(flow, turb, mult)
 
   ! If there is a jump in velocities, call specialized gradient calculation
-  if(mult % model .eq. VOLUME_OF_FLUID .and. mult % mass_transfer) then
+  if(mult % model .eq. VOLUME_OF_FLUID .and. mass_transfer) then
     call Multiphase_Mod_Vof_Grad_Variable_With_Jump(mult, flow % u)
     call Multiphase_Mod_Vof_Grad_Variable_With_Jump(mult, flow % v)
     call Multiphase_Mod_Vof_Grad_Variable_With_Jump(mult, flow % w)

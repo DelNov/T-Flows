@@ -45,7 +45,7 @@
   !----------------------------------------------------------!
 
   ! If there is a jump in velocities, call specialized gradient calculation
-  if(mult % model .eq. VOLUME_OF_FLUID .and. mult % mass_transfer) then
+  if(mult % model .eq. VOLUME_OF_FLUID .and. mass_transfer) then
     call Multiphase_Mod_Vof_Grad_Variable_With_Jump(mult, flow % u)
     call Multiphase_Mod_Vof_Grad_Variable_With_Jump(mult, flow % v)
     call Multiphase_Mod_Vof_Grad_Variable_With_Jump(mult, flow % w)

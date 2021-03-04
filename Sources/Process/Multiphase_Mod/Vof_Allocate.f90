@@ -38,7 +38,7 @@
   allocate(mult % surf_fy(-nb:nc));  mult % surf_fy(-nb:nc) = 0.0
   allocate(mult % surf_fz(-nb:nc));  mult % surf_fz(-nb:nc) = 0.0
 
-  if(mult % mass_transfer) then
+  if(mass_transfer) then
     allocate(mult % qci  (-nb:nc));        mult % qci         (-nb:nc) = 0.0
     allocate(mult % cell_at_elem(-nb:nc)); mult % cell_at_elem(-nb:nc) = 0
     allocate(mult % m_dot(-nb:nc));        mult % m_dot       (-nb:nc) = 0.0

@@ -108,6 +108,10 @@
 
   ! Variables determining if we are dealing with heat transfer and buoyancy
   logical :: heat_transfer
+
+  ! Phase change (called mass_transfer to be consistent with heat_transfer)
+  logical :: mass_transfer
+
   logical :: buoyancy
 
   ! Angular velocity
