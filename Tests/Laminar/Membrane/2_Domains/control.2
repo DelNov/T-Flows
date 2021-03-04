@@ -64,8 +64,8 @@
 #---------------------
   BOUNDARY_CONDITION    bottom_wall
     TYPE                wall
-    VARIABLES           u     v     w     q     q_01
-    VALUES              0.0   0.0   0.0   0.0   0.0
+    VARIABLES           u     v     w     q     c_01
+    VALUES              0.0   0.0   0.0   0.0   0.015
 
   BOUNDARY_CONDITION    top_wall
     TYPE                inflow
@@ -74,13 +74,13 @@
 
   BOUNDARY_CONDITION    side_walls
     TYPE                wall
-    VARIABLES           u     v     w     q     q_01
+    VARIABLES           u     v     w     q     c_01
     VALUES              0.0   0.0   0.0   0.0   0.0
 
   BOUNDARY_CONDITION    inlet
-    TYPE                wall
-    VARIABLES           u     v     w     t      c_01
-    VALUES              0.0   0.0   0.0   20.0   0.02
+    TYPE                inflow
+    VARIABLES           u     v     w     t      q_01
+    VALUES              0.0   0.0   0.0   20.0   2.00
 
   BOUNDARY_CONDITION    outlet
     TYPE                pressure

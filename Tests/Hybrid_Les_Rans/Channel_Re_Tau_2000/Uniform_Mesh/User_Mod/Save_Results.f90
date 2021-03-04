@@ -115,7 +115,7 @@
 
   allocate(n_count(n_prob)); n_count = 0
   count = 0
-  if(heat_transfer) then
+  if(flow % heat_transfer) then
     allocate(t_p (n_prob));  t_p  = 0.0
     allocate(t2_p(n_prob));  t2_p = 0.0
     allocate(ut_p(n_prob));  ut_p = 0.0
@@ -151,7 +151,7 @@
         vis_t_p (i) = vis_t_p (i) + turb % vis_t_eff(c) / visc_const
         y_plus_p(i) = y_plus_p(i) + turb % y_plus(c)
 
-        if(heat_transfer) then
+        if(flow % heat_transfer) then
           t_p (i) = t_p (i) + turb % t_mean(c)
           t2_p(i) = t2_p(i) + turb % t2_mean(c)  &
                             - turb % t_mean(c) * turb % t_mean(c)
@@ -189,7 +189,7 @@
 
     count =  count + n_count(pl)
 
-    if(heat_transfer) then
+    if(flow % heat_transfer) then
       call Comm_Mod_Global_Sum_Real(t_p (pl))
       call Comm_Mod_Global_Sum_Real(t2_p(pl))
       call Comm_Mod_Global_Sum_Real(ut_p(pl))
@@ -216,7 +216,7 @@
       eps_p   (i) = eps_p   (i) / n_count(i)
       vis_t_p (i) = vis_t_p (i) / n_count(i)
       y_plus_p(i) = y_plus_p(i) / n_count(i)
-      if(heat_transfer) then
+      if(flow % heat_transfer) then
         t_p (i) = t_p (i) / n_count(i)
         t2_p(i) = t2_p(i) / n_count(i)
         ut_p(i) = ut_p(i) / n_count(i)
@@ -246,7 +246,7 @@
     return
   end if
 
-  if(heat_transfer) then
+  if(flow % heat_transfer) then
     d_wall = 0.0 
     do c = 1, grid % n_cells
       if(grid % wall_dist(c) > d_wall) then
@@ -310,7 +310,7 @@
     '#', 'Utau     = ', u_tau_p 
     write(i,'(a1,(a12,f12.6,a2,a22))') & 
     '#', 'Cf_error = ', error, ' %', 'Dean formula is used.'
-    if(heat_transfer) then
+    if(flow % heat_transfer) then
       write(i,'(a1,(a12, f12.6))')'#', 'Nu number =', nu_mean
       write(i,'(a1,(a12, f12.6,a2,a39))')'#', 'Nu_error  =',  &
             abs(0.023*0.5*re**0.8*pr**0.4 - nu_mean)          &
@@ -318,7 +318,7 @@
             'correlation of Dittus-Boelter is used.'
     end if
 
-    if(heat_transfer) then
+    if(flow % heat_transfer) then
       write(i,'(a1,2X,a105)') '#', ' z,'                         //  &
                                    ' u mean,'                    //  &
                                    ' kin_resolved, kin_modeled,' //  &
@@ -334,7 +334,7 @@
     end if
   end do
 
-  if(heat_transfer) then
+  if(flow % heat_transfer) then
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
         write(3,'(14es15.5e3)') wall_p(i),                                   &
@@ -383,7 +383,7 @@
     uw_p  (i) = uw_p (i) / (u_tau_p**2)
     uw_mod_p(i) = uw_mod_p (i) / (u_tau_p**2)
 
-    if(heat_transfer) then
+    if(flow % heat_transfer) then
       t_p (i) = (t_wall - t_p(i)) / t_tau  ! t % n(c)
       t2_p(i) = t2_p(i) / (t_tau*t_tau)    ! ut % n(c)
       ut_p(i) = ut_p(i) / (u_tau_p*t_tau)  ! ut % n(c)
@@ -392,7 +392,7 @@
     end if
   end do
 
-  if(heat_transfer) then
+  if(flow % heat_transfer) then
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
         write(4,'(14es15.5e3)')                                & ! write
@@ -446,7 +446,7 @@
   deallocate(eps_p)
   deallocate(vis_t_p)
   deallocate(y_plus_p)
-  if(heat_transfer) then
+  if(flow % heat_transfer) then
     deallocate(t_p)
     deallocate(t2_p)
     deallocate(ut_p)

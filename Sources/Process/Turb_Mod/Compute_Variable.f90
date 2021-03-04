@@ -208,7 +208,7 @@
   if(turb % model .eq. K_EPS) then
     if(phi % name .eq. 'KIN') call Turb_Mod_Src_Kin_K_Eps(turb, sol)
     if(phi % name .eq. 'EPS') call Turb_Mod_Src_Eps_K_Eps(turb, sol)
-    if(heat_transfer) then
+    if(flow % heat_transfer) then
       if(phi % name .eq. 'T2')  call Turb_Mod_Src_T2(turb, sol)
     end if
   end if
@@ -219,7 +219,7 @@
     if(phi % name .eq. 'EPS')  call Turb_Mod_Src_Eps_K_Eps_Zeta_F(turb, sol)
     if(phi % name .eq. 'ZETA')  &
       call Turb_Mod_Src_Zeta_K_Eps_Zeta_F(turb, sol, n_step)
-    if(heat_transfer) then
+    if(flow % heat_transfer) then
       if(phi % name .eq. 'T2')  call Turb_Mod_Src_T2(turb, sol)
     end if
   end if
@@ -272,7 +272,7 @@
       call Info_Mod_Iter_Fill_At(3, 2, phi % name, phi % eniter, phi % res)
     if(phi % name .eq. 'ZETA')  &
       call Info_Mod_Iter_Fill_At(3, 3, phi % name, phi % eniter, phi % res)
-    if(heat_transfer) then
+    if(flow % heat_transfer) then
       if(phi % name .eq. 'T2')  &
       call Info_Mod_Iter_Fill_At(3, 5, phi % name, phi % eniter, phi % res)
     end if

@@ -120,7 +120,7 @@
       ! Interpolate velocity
 
       ! If there is a jump in velocities, call specialized gradient calculation
-      if(mass_transfer) then
+      if(flow % mass_transfer) then
         u_f = Multiphase_Mod_Vof_Interpolate_Var_To_Face_With_Jump(mult, u, s)
         v_f = Multiphase_Mod_Vof_Interpolate_Var_To_Face_With_Jump(mult, v, s)
         w_f = Multiphase_Mod_Vof_Interpolate_Var_To_Face_With_Jump(mult, w, s)
@@ -134,7 +134,7 @@
 
       ! Calculate coeficients for the system matrix
       ! a12 [m*m^3*s/kg = m^4s/kg]
-      if(.not. mass_transfer) then
+      if(.not. flow % mass_transfer) then
         a12 = u_relax * 0.5 * a % fc(s)                    &
                       * ( grid % vol(c1) / a % sav(c1)     &
                         + grid % vol(c2) / a % sav(c2) )
@@ -188,7 +188,7 @@
 
       ! Any of the cells is at interface, use only non-interface value
       ! (This is the old way, and seems to be working better after all)
-      if(mass_transfer) then
+      if(flow % mass_transfer) then
         if(mult % cell_at_elem(c1) .eq. 0 .and.  &
            mult % cell_at_elem(c2) .ne. 0) then
           v_flux % n(s) = u_f * grid % sx(s)     &

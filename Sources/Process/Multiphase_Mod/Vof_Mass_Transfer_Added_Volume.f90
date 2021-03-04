@@ -10,16 +10,18 @@
   type(Multiphase_Type), target :: mult
   real                          :: added_vol
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
-  integer                  :: c, e
+  type(Grid_Type),  pointer :: grid
+  type(Field_Type), pointer :: flow
+  integer                   :: c, e
 !==============================================================================!
 
   ! Take aliases
   grid => mult % pnt_grid
+  flow => mult % pnt_flow
 
   ! Integrate added volume
   added_vol = 0.0
-  if(mass_transfer) then
+  if(flow % mass_transfer) then
     do c = 1, grid % n_cells - grid % comm % n_buff_cells
       e = mult % cell_at_elem(c)  ! front element
       if(e .ne. 0) then

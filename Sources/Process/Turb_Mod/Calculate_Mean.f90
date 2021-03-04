@@ -84,7 +84,7 @@
         v_mean(c) = (v_mean(c) * real(n) + v % n(c)) / real(n+1)
         w_mean(c) = (w_mean(c) * real(n) + w % n(c)) / real(n+1)
         p_mean(c) = (p_mean(c) * real(n) + p % n(c)) / real(n+1)
-        if(heat_transfer) then
+        if(flow % heat_transfer) then
           t_mean(c) = (t_mean(c) * real(n) + t % n(c)) / real(n+1)
         end if
 
@@ -98,7 +98,7 @@
         vw_res(c) = (vw_res(c) * real(n) + v % n(c) * w % n(c)) / real(n+1)
 
         ! Resolved turbulent heat fluxes
-        if(heat_transfer) then
+        if(flow % heat_transfer) then
           t2_res(c) = (t2_res(c) * real(n) + t % n(c) * t % n(c)) / real(n+1)
           ut_res(c) = (ut_res(c) * real(n) + u % n(c) * t % n(c)) / real(n+1)
           vt_res(c) = (vt_res(c) * real(n) + v % n(c) * t % n(c)) / real(n+1)
@@ -116,7 +116,7 @@
         v_mean(c) = (v_mean(c) * real(n) + v % n(c)) / real(n+1)
         w_mean(c) = (w_mean(c) * real(n) + w % n(c)) / real(n+1)
         p_mean(c) = (p_mean(c) * real(n) + p % n(c)) / real(n+1)
-        if(heat_transfer) then
+        if(flow % heat_transfer) then
           t_mean(c) = (t_mean(c) * real(n) + t % n(c)) / real(n+1)
         end if
 
@@ -134,7 +134,7 @@
         vw_res(c) = (vw_res(c) * real(n) + v % n(c) * w % n(c)) / real(n+1)
 
         ! Resolved turbulent heat fluxes
-        if(heat_transfer) then
+        if(flow % heat_transfer) then
           t2_res (c) = (t2_res (c) * real(n) + t % n (c) * t % n(c)) / real(n+1)
           ut_res (c) = (ut_res (c) * real(n) + u %  n(c) * t % n(c)) / real(n+1)
           vt_res (c) = (vt_res (c) * real(n) + v %  n(c) * t % n(c)) / real(n+1)
@@ -156,7 +156,7 @@
         v_mean(c) = (v_mean(c) * real(n) + v % n(c)) / real(n+1)
         w_mean(c) = (w_mean(c) * real(n) + w % n(c)) / real(n+1)
         p_mean(c) = (p_mean(c) * real(n) + p % n(c)) / real(n+1)
-        if (heat_transfer) then
+        if(flow % heat_transfer) then
           t_mean(c) = (t_mean(c) * real(n) + t % n(c)) / real(n+1)
         end if
 
@@ -165,7 +165,7 @@
         eps_mean (c) = (eps_mean (c) * real(n) + eps  % n(c)) / real(n+1)
         zeta_mean(c) = (zeta_mean(c) * real(n) + zeta % n(c)) / real(n+1)
         f22_mean (c) = (f22_mean (c) * real(n) + f22  % n(c)) / real(n+1)
-        if (heat_transfer) then
+        if(flow % heat_transfer) then
           t2_mean(c) = (t2_mean(c) * real(n) + t2 % n(c)) / real(n+1)
         end if
 
@@ -179,7 +179,7 @@
         vw_res(c) = (vw_res(c) * real(n) + v % n(c) * w % n(c)) / real(n+1)
 
         ! Resolved turbulent heat fluxes
-        if (heat_transfer) then
+        if(flow % heat_transfer) then
           t2_res (c) = (t2_res (c) * real(n) + t % n (c) * t % n(c)) / real(n+1)
           ut_res (c) = (ut_res (c) * real(n) + u % n (c) * t % n(c)) / real(n+1)
           vt_res (c) = (vt_res (c) * real(n) + v % n (c) * t % n(c)) / real(n+1)
@@ -202,7 +202,7 @@
         v_mean(c) = (v_mean(c) * real(n) + v % n(c)) / real(n+1)
         w_mean(c) = (w_mean(c) * real(n) + w % n(c)) / real(n+1)
         p_mean(c) = (p_mean(c) * real(n) + p % n(c)) / real(n+1)
-        if (heat_transfer) then
+        if(flow % heat_transfer) then
           t_mean(c) = (t_mean(c) * real(n) + t % n(c)) / real(n+1)
         end if
 
@@ -229,7 +229,7 @@
         vw_res(c) = (vw_res(c) * real(n) + v % n(c) * w % n(c)) / real(n+1)
 
         ! Resolved turbulent heat fluxes
-        if (heat_transfer) then
+        if(flow % heat_transfer) then
           t2_res(c) = (t2_res(c) * real(n) + t % n(c) * t % n(c)) / real(n+1)
           ut_res(c) = (ut_res(c) * real(n) + u % n(c) * t % n(c)) / real(n+1)
           vt_res(c) = (vt_res(c) * real(n) + v % n(c) * t % n(c)) / real(n+1)

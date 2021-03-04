@@ -143,11 +143,11 @@
                         + (1.0-grid % fw(s)) * turb % vis_t(c2)
         end if
 
-        if(heat_transfer) then
+        if(flow % heat_transfer) then
           u_plus = u_tan / u_tau_l 
           pr_t = Turb_Mod_Prandtl_Number(turb, c1) 
           pr   = Field_Mod_Prandtl_Number(flow, c1)  ! laminar Prandtl number
-          beta = 9.24 * ((pr/pr_t)**0.75 - 1.0)     &   
+          beta = 9.24 * ((pr/pr_t)**0.75 - 1.0)     &
                * (1.0 + 0.28 * exp(-0.007*pr/pr_t))
           ebf = Turb_Mod_Ebf_Scalar(turb, c1, pr) 
           turb % con_w(c1) =    turb % y_plus(c1)                         &

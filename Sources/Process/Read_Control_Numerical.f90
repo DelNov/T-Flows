@@ -4,7 +4,7 @@
 !   Reads details about numerical models from control file.                    !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Field_Mod,      only: Field_Type, heat_transfer
+  use Field_Mod,      only: Field_Type
   use Var_Mod,        only: Var_Type
   use Turb_Mod,       only: Turb_Type
   use Multiphase_Mod, only: Multiphase_Type, VOLUME_OF_FLUID
@@ -79,7 +79,7 @@
   !------------------------------!
   !   Related to heat transfer   !
   !------------------------------!
-  if(heat_transfer) then
+  if(flow % heat_transfer) then
     flow % t % urf    = 0.7
     flow % t % mniter = 5
     call Control_Mod_Advection_Scheme_For_Energy                    (name)

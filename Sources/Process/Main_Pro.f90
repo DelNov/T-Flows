@@ -338,7 +338,7 @@
         call Piso_Algorithm(flow(d), turb(d), mult(d), sol(d), ini)
 
         ! Energy (practically temperature)
-        if(heat_transfer) then
+        if(flow(d) % heat_transfer) then
           call Compute_Energy(flow(d), turb(d), mult(d), sol(d), ini)
         end if
 
@@ -384,7 +384,7 @@
       call Control_Mod_Switch_To_Domain(d)
 
       ! Write the values in monitoring points
-      if(.not. heat_transfer) then
+      if(.not. flow(d) % heat_transfer) then
         call Monitor_Mod_Write_4_Vars(monitor(d), curr_dt, flow(d))
       else
         call Monitor_Mod_Write_5_Vars(monitor(d), curr_dt, flow(d))

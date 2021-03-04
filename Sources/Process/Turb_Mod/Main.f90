@@ -28,7 +28,7 @@
     call Turb_Mod_Compute_Variable(turb, sol, ini, turb % kin, n)
     call Turb_Mod_Compute_Variable(turb, sol, ini, turb % eps, n)
 
-    if(heat_transfer) then
+    if(flow % heat_transfer) then
       call Turb_Mod_Calculate_Stress   (turb)
       call Turb_Mod_Calculate_Heat_Flux(turb)
       call Turb_Mod_Compute_Variable(turb, sol, ini, turb % t2, n)
@@ -46,7 +46,7 @@
     call Turb_Mod_Compute_Variable(turb, sol, ini, turb % kin, n)
     call Turb_Mod_Compute_Variable(turb, sol, ini, turb % eps, n)
 
-    if(heat_transfer) then
+    if(flow % heat_transfer) then
       call Turb_Mod_Calculate_Stress   (turb)
       call Turb_Mod_Calculate_Heat_Flux(turb)
       call Turb_Mod_Compute_Variable(turb, sol, ini, turb % t2, n)
@@ -84,7 +84,7 @@
 
     call Turb_Mod_Vis_T_Rsm(turb)
 
-    if(heat_transfer) then
+    if(flow % heat_transfer) then
       call Turb_Mod_Calculate_Heat_Flux(turb)
     end if
   end if

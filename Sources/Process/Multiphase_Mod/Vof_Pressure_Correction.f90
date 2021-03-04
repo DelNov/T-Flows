@@ -125,7 +125,7 @@
     end do
   end if
 
-  if(mass_transfer) then
+  if(flow % mass_transfer) then
     do c = 1, grid % n_cells
       b(c) = b(c) + mult % m_dot(c) * grid % vol(c)                    &
                                     * ( 1.0 / mult % phase_dens(1)     &

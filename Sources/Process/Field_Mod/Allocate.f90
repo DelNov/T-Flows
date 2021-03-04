@@ -39,7 +39,7 @@
   !-----------------------------------------!
   !   Enthalpy conservation (temperature)   !
   !-----------------------------------------!
-  if(heat_transfer) then
+  if(flow % heat_transfer) then
     call Var_Mod_Allocate_Solution(flow % t, grid, 'T', 'Q')
   end if ! heat_transfer
 

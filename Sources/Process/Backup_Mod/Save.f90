@@ -110,7 +110,7 @@
   !   Etnhalpy   !
   !              !
   !--------------!
-  if(heat_transfer) then
+  if(fld % heat_transfer) then
     call Backup_Mod_Write_Variable(fh, d, vc, 'temp', fld % t)
   end if
 
@@ -145,7 +145,7 @@
     call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 'vis_w',  tur % vis_w )
 
     ! Turbulence quantities connected with heat transfer
-    if(heat_transfer) then
+    if(fld % heat_transfer) then
       call Backup_Mod_Write_Variable(fh, d, vc, 't2',    tur % t2)
       call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 'p_t2',  tur % p_t2 )
       call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 'con_w', tur % con_w)
@@ -173,7 +173,7 @@
     call Backup_Mod_Write_Cell_Real(grid, fh, d, vc,'t_scale', tur % t_scale)
     call Backup_Mod_Write_Cell_Real(grid, fh, d, vc,'l_scale', tur % l_scale)
 
-    if(heat_transfer) then
+    if(fld % heat_transfer) then
       call Backup_Mod_Write_Variable(fh, d, vc, 't2',    tur % t2)
       call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 'p_t2',  tur % p_t2 )
       call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 'con_w', tur % con_w)
@@ -208,7 +208,7 @@
     call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 'vis_w', tur % vis_w)
 
     ! Turbulence quantities connected with heat transfer
-    if(heat_transfer) then
+    if(fld % heat_transfer) then
       call Backup_Mod_Write_Cell_Real(grid, fh, d, vc,'con_w', tur % con_w)
     end if
   end if
@@ -232,7 +232,7 @@
     call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 'v_mean', tur % v_mean)
     call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 'w_mean', tur % w_mean)
     call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 'p_mean', tur % p_mean)
-    if(heat_transfer) then
+    if(fld % heat_transfer) then
       call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 't_mean', tur % t_mean)
     end if
 
@@ -242,7 +242,7 @@
                                       tur % kin_mean)
       call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 'eps_mean',  &
                                       tur % eps_mean)
-      if(heat_transfer) then
+      if(fld % heat_transfer) then
         call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 't2_mean',  &
                                         tur % t2_mean)
         call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 'ut_mean',  &
@@ -265,7 +265,7 @@
                                       tur % zeta_mean)
       call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 'f22_mean',  &
                                       tur % f22_mean )
-      if(heat_transfer) then
+      if(fld % heat_transfer) then
         call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 't2_mean',  &
                                         tur % t2_mean)
         call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 'ut_mean',  &
@@ -301,7 +301,7 @@
     call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 'uw_res', tur % uw_res)
     call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 'vw_res', tur % vw_res)
 
-    if(heat_transfer) then
+    if(fld % heat_transfer) then
       call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 't2_res', tur % t2_res)
       call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 'ut_res', tur % ut_res)
       call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 'vt_res', tur % vt_res)

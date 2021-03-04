@@ -114,11 +114,10 @@
   allocate(uw_p     (n_prob));  uw_p     = 0.0
   allocate(kin_mod_p(n_prob));  kin_mod_p= 0.0
   allocate(kin_p    (n_prob));  kin_p    = 0.0
-  
 
   allocate(n_count(n_prob)); n_count=0
   count = 0
-  if(heat_transfer) then
+  if(flow % heat_transfer) then
     allocate(t_p (n_prob));     t_p = 0.0
     allocate(t2_p(n_prob));     t2_p = 0.0
     allocate(t2_mod_p(n_prob)); t2_mod_p = 0.0
@@ -157,7 +156,7 @@
                      + turb % ww_res(c) - turb % w_mean(c) * turb % w_mean(c))
         kin_mod_p(i) = kin_mod_p(i) + turb % kin_mean(c)
 
-        if(heat_transfer) then
+        if(flow % heat_transfer) then
           t_p(i)  = t_p(i)  + (turb % t_mean(c) - t_cold)/t_diff
           t2_p(i) = t2_p(i) + turb % t2_mean(c)  &
                             - turb % t_mean(c) * turb % t_mean(c)
@@ -197,7 +196,7 @@
 
     count =  count + n_count(pl)
 
-    if(heat_transfer) then
+    if(flow % heat_transfer) then
       call Comm_Mod_Global_Sum_Real(t_p(pl))
       call Comm_Mod_Global_Sum_Real(t2_p(pl))
       call Comm_Mod_Global_Sum_Real(t2_mod_p(pl))
@@ -226,7 +225,7 @@
       kin_p(i) = kin_p(i) / n_count(i)
       kin_mod_p(i) = kin_mod_p(i) / n_count(i)
 
-      if(heat_transfer) then
+      if(flow % heat_transfer) then
         t_p (i) = t_p (i) / n_count(i)
         t2_p(i) = t2_p(i) / n_count(i)
         t2_mod_p(i) = t2_mod_p(i) / n_count(i)
@@ -242,7 +241,7 @@
 
   open(3, file = res_name)
 
-  if(heat_transfer) then
+  if(flow % heat_transfer) then
     if(this_proc < 2) then
       write(3,'(a1,(a12, f12.6))')'#', ' Nu number = ',  &
                tz_p(1) / (t_hot - t_cold)
@@ -302,7 +301,7 @@
   deallocate(uw_p)
   deallocate(kin_p)
   deallocate(kin_mod_p)
-  if(heat_transfer) then
+  if(flow % heat_transfer) then
     deallocate(t_p)
     deallocate(t2_p)
     deallocate(t2_mod_p)

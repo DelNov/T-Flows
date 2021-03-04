@@ -6,7 +6,7 @@
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod,      only: HUGE_INT
   use Comm_Mod,       only: Comm_Mod_End, this_proc
-  use Field_Mod,      only: Field_Type, buoyancy, heat_transfer,  &
+  use Field_Mod,      only: Field_Type, buoyancy,  &
                             grav_x, grav_y, grav_z
   use Bulk_Mod,       only: Bulk_Type
   use Turb_Mod
@@ -34,7 +34,7 @@
   !   Related to heat transfer and bouyancy   !
   !                                           !
   !-------------------------------------------!
-  call Control_Mod_Heat_Transfer(heat_transfer, verbose = .true.)
+  call Control_Mod_Heat_Transfer(flow % heat_transfer, verbose = .true.)
   call Control_Mod_Gravitational_Vector(grav_x,  &
                                         grav_y,  &
                                         grav_z, .true.)
@@ -244,7 +244,7 @@
 
   call Control_Mod_Reference_Density(flow % dens_ref, .true.)
 
-  call Control_Mod_Mass_Transfer(mass_transfer)
+  call Control_Mod_Mass_Transfer(flow % mass_transfer)
 
   !-----------------------!
   !                       !

@@ -6,7 +6,7 @@
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
   use File_Mod
-  use Field_Mod,   only: Field_Type, heat_transfer
+  use Field_Mod,   only: Field_Type
   use Comm_Mod
   use Turb_Mod
   use Swarm_Mod
@@ -155,14 +155,14 @@
           i=Key_Ind('V',keys,nks);prof(k,0)=v_def;v%n(c)=prof(k,i)
           i=Key_Ind('W',keys,nks);prof(k,0)=w_def;w%n(c)=prof(k,i)
 
-          if(heat_transfer) then
+          if(flow % heat_transfer) then
             i=Key_Ind('T',keys,nks);prof(k,0)=t_def;t%n(c)=prof(k,i)
           end if
 
           if(turb % model .eq. K_EPS) then
             i=Key_Ind('KIN',keys,nks);prof(k,0)=kin_def; kin%n(c)=prof(k,i)
             i=Key_Ind('EPS',keys,nks);prof(k,0)=eps_def; eps%n(c)=prof(k,i)
-            if(heat_transfer) then
+            if(flow % heat_transfer) then
               i=Key_Ind('T2', keys,nks);prof(k,0)=t2_def; t2 %n(c)=prof(k,i)
             end if
           end if
@@ -173,7 +173,7 @@
             i=Key_Ind('EPS', keys,nks);prof(k,0)=eps_def; eps %n(c)=prof(k,i)
             i=Key_Ind('ZETA',keys,nks);prof(k,0)=zeta_def;zeta%n(c)=prof(k,i)
             i=Key_Ind('F22', keys,nks);prof(k,0)=f22_def; f22 %n(c)=prof(k,i)
-            if(heat_transfer) then
+            if(flow % heat_transfer) then
               i=Key_Ind('T2', keys,nks);prof(k,0)=t2_def; t2 %n(c)=prof(k,i)
             end if
            end if
@@ -264,7 +264,7 @@
         w % o(c)  = w % n(c)
         w % oo(c) = w % n(c)
 
-        if(heat_transfer) then
+        if(flow % heat_transfer) then
           vals(0) = t_def;  t % n(c) = vals(Key_Ind('T', keys, nks))
           t % o(c)  = t % n(c)
           t % oo(c) = t % n(c)
@@ -315,7 +315,7 @@
           eps % o(c)  = eps % n(c)
           eps % oo(c) = eps % n(c)
           turb % y_plus(c) = 0.001
-          if(heat_transfer) then
+          if(flow % heat_transfer) then
             vals(0) = t2_def;  t2 % n(c) = vals(Key_Ind('T2',  keys, nks))
             t2 % o(c)  = t2 % n(c)
             t2 % oo(c) = t2 % n(c)
@@ -337,7 +337,7 @@
           f22  % o(c)  = f22  % n(c)
           f22  % oo(c) = f22  % n(c)
           turb % y_plus(c) = 0.001
-          if(heat_transfer) then
+          if(flow % heat_transfer) then
             vals(0) = t2_def;  t2 % n(c) = vals(Key_Ind('T2',  keys, nks))
             t2 % o(c)  = t2 % n(c)
             t2 % oo(c) = t2 % n(c)

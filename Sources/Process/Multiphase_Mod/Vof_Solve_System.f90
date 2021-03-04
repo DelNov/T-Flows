@@ -10,13 +10,15 @@
   real, contiguous,      target :: b(:)
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),    pointer :: vof
+  type(Field_Type),  pointer :: flow
   type(Matrix_Type), pointer :: a
   character(SL)              :: solver
 !==============================================================================!
 
   ! Take aliases
-  vof => mult % vof
-  a   => sol % a
+  vof  => mult % vof
+  flow => mult % pnt_flow
+  a    => sol % a
 
   ! Get solver
   call Control_Mod_Solver_For_Multiphase(solver)
@@ -32,7 +34,7 @@
                        vof % res)
   call Cpu_Timer_Mod_Stop('Linear_Solver_For_Multiphase')
 
-  if(.not. mass_transfer) then
+  if(.not. flow % mass_transfer) then
     call Info_Mod_Iter_Fill_At(1, 6, vof % name, vof % eniter, vof % res)
   end if
 

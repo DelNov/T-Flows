@@ -85,7 +85,7 @@
 
   count = 0
 
-  if(heat_transfer) then
+  if(flow % heat_transfer) then
     allocate(tm_p(n_prob));   tm_p=0.0
   end if
 
@@ -203,7 +203,7 @@
   deallocate(rad_1)
   deallocate(n_count)
 
-  if(heat_transfer) then
+  if(flow % heat_transfer) then
     deallocate(tm_p)
   end if
 

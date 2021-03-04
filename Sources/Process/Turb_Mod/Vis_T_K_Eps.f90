@@ -126,7 +126,7 @@
           turb % vis_w(c1) = turb % y_plus(c1) * flow % viscosity(c1) / u_plus
         end if
 
-        if(heat_transfer) then
+        if(flow % heat_transfer) then
           pr   = Field_Mod_Prandtl_Number(flow, c1)
           pr_t = Turb_Mod_Prandtl_Number(turb, c1)
           beta = 9.24 * ((pr/pr_t)**0.75 - 1.0)  &
@@ -141,15 +141,15 @@
 
         if(flow % n_scalars > 0) then
           sc   = Field_Mod_Schmidt_Number(flow, c1)  ! laminar Schmidt number
-          beta = 9.24 * ((sc/sc_t)**0.75 - 1.0)                 &
-           * (1.0 + 0.28 * exp(-0.007*sc/sc_t))
-          ebf = 0.01 * (sc * turb % y_plus(c1)**4               &
-          / ((1.0 + 5.0 * sc**3 * turb % y_plus(c1)) + TINY))
-          turb % diff_w(c1) =  turb % y_plus(c1)                &
-              * (flow % viscosity(c1)/flow % density(c1)) &
-              / (  turb % y_plus(c1) * sc * exp(-1.0 * ebf)     &
-              + (u_plus + beta) * sc_t * exp(-1.0 / ebf) + TINY)
-        end if      
+          beta = 9.24 * ((sc/sc_t)**0.75 - 1.0)                     &
+               * (1.0 + 0.28 * exp(-0.007*sc/sc_t))
+          ebf  = 0.01 * (sc * turb % y_plus(c1)**4                  &
+               / ((1.0 + 5.0 * sc**3 * turb % y_plus(c1)) + TINY))
+          turb % diff_w(c1) =  turb % y_plus(c1)                    &
+               * (flow % viscosity(c1)/flow % density(c1))          &
+               / (  turb % y_plus(c1) * sc * exp(-1.0 * ebf)        &
+               + (u_plus + beta) * sc_t * exp(-1.0 / ebf) + TINY)
+        end if
 
       end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2).eq.WALL or WALLFL
     end if    ! c2 < 0
@@ -157,7 +157,7 @@
 
   call Grid_Mod_Exchange_Cells_Real(grid, turb % vis_t)
   call Grid_Mod_Exchange_Cells_Real(grid, turb % vis_w)
-  if(heat_transfer) then
+  if(flow % heat_transfer) then
     call Grid_Mod_Exchange_Cells_Real(grid, turb % con_w)
   end if
   if(flow % n_scalars > 0) then

@@ -7,7 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: b, c1, c2
+  integer              :: b, c1, c2, s
   integer              :: n_wall_colors
   integer              :: processed_cells
   integer, allocatable :: wall_colors(:)
@@ -40,12 +40,16 @@
   answer = line % tokens(1)
   call To_Upper_Case(answer)
 
-  ! User wants to skip calculation of wall distance
+  !-----------------------------------------------------!
+  !   User wants to skip calculation of wall distance   !
+  !-----------------------------------------------------!
   if( answer .eq. 'SKIP' ) then
     grid % wall_dist = 1.0
     print *, '# Distance to the wall set to 1.0 everywhere !'
 
-  ! Calculation of wall distance
+  !----------------------------------!
+  !   Calculation of wall distance   !
+  !----------------------------------!
   else
 
     n_wall_colors = line % n_tokens
@@ -87,6 +91,15 @@
     !$omp end parallel do
 
     grid % wall_dist(:) = sqrt(grid % wall_dist(:))
+
+    ! For boundary cells, this correction is more relevant
+    do s = 1, grid % n_faces
+      c1 = grid % faces_c(1,s)
+      c2 = grid % faces_c(2,s)
+      if(c2 < 0) then
+        grid % wall_dist(c2) = min(grid % wall_dist(c1), grid % wall_dist(c2))
+      end if
+    end do
 
     print *, '# Distance to the wall calculated !'
 

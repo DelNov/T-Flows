@@ -45,7 +45,7 @@
   !----------------------------------------------------------!
 
   ! If there is a jump in velocities, call specialized gradient calculation
-  if(mult % model .eq. VOLUME_OF_FLUID .and. mass_transfer) then
+  if(mult % model .eq. VOLUME_OF_FLUID .and. flow % mass_transfer) then
     call Multiphase_Mod_Vof_Grad_Variable_With_Jump(mult, flow % u)
     call Multiphase_Mod_Vof_Grad_Variable_With_Jump(mult, flow % v)
     call Multiphase_Mod_Vof_Grad_Variable_With_Jump(mult, flow % w)
@@ -100,7 +100,7 @@
 
     call Field_Mod_Grad_Variable(flow, kin)
     call Field_Mod_Grad_Variable(flow, eps)
-    if(heat_transfer) then
+    if(flow % heat_transfer) then
       call Field_Mod_Grad_Variable(flow, t2)
     end if
 
@@ -119,7 +119,7 @@
                       - ( bulk % u * eps % x(c1)          &
                         + bulk % v * eps % y(c1)          &
                         + bulk % w * eps % z(c1) ) * dt
-          if(heat_transfer) then
+          if(flow % heat_transfer) then
             t2 % n(c2) = t2 % n(c2)                       &
                         - ( bulk % u * t2 % x(c1)         &
                           + bulk % v * t2 % y(c1)         &
@@ -141,7 +141,7 @@
     call Field_Mod_Grad_Variable(flow, eps)
     call Field_Mod_Grad_Variable(flow, f22)
     call Field_Mod_Grad_Variable(flow, zeta)
-    if(heat_transfer) then
+    if(flow % heat_transfer) then
       call Field_Mod_Grad_Variable(flow, t2)
     end if
 
@@ -168,7 +168,7 @@
                       - ( bulk % u * zeta % x(c1)         &
                         + bulk % v * zeta % y(c1)         &
                         + bulk % w * zeta % z(c1) ) * dt
-          if(heat_transfer) then
+          if(flow % heat_transfer) then
             t2 % n(c2) = t2 % n(c2)                       &
                         - ( bulk % u * t2 % x(c1)         &
                           + bulk % v * t2 % y(c1)         &
@@ -269,7 +269,7 @@
     end do
   end do
 
-  if(heat_transfer) then
+  if(flow % heat_transfer) then
 
     ! Temperature gradients might have been computed and
     ! stored already in t % x, t % y and t % z, check it

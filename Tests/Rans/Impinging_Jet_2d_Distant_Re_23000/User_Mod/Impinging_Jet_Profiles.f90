@@ -88,7 +88,7 @@
   allocate(n_count(n_prob)); n_count=0
   count = 0
 
-  if(heat_transfer) then
+  if(flow % heat_transfer) then
     allocate(tm_p(n_prob));   tm_p = 0.0
   end if
 
@@ -156,7 +156,7 @@
               v5_p(i)   = v5_p(i) + f22 % n(c)
             end if
 
-            if(heat_transfer) then
+            if(flow % heat_transfer) then
               tm_p(i)   = tm_p(i) + T % n(c)
             end if
 
@@ -184,7 +184,7 @@
 
       count = count + n_count(pl) 
 
-      if(heat_transfer) then
+      if(flow % heat_transfer) then
         call Comm_Mod_Global_Sum_Real(tm_p(pl))
       end if
     end do
@@ -266,7 +266,7 @@
   deallocate(v5_p)
   deallocate(zm_p)
   deallocate(n_count)
-  if(heat_transfer) then
+  if(flow % heat_transfer) then
     deallocate(tm_p)
   end if
 

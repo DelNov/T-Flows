@@ -346,7 +346,7 @@
   call Update_Boundary_Values(flow, turb, mult)
 
   ! Refresh gradients for all three velocity components
-  if(mult % model .eq. VOLUME_OF_FLUID .and. mass_transfer) then
+  if(mult % model .eq. VOLUME_OF_FLUID .and. flow % mass_transfer) then
     call Multiphase_Mod_Vof_Grad_Variable_With_Jump(mult, flow % u)
     call Multiphase_Mod_Vof_Grad_Variable_With_Jump(mult, flow % v)
     call Multiphase_Mod_Vof_Grad_Variable_With_Jump(mult, flow % w)

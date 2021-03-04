@@ -14,7 +14,7 @@
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
   use Comm_Mod
-  use Field_Mod,   only: Field_Type, heat_transfer
+  use Field_Mod,      only: Field_Type
   use Turb_Mod
   use Grid_Mod
   use Control_Mod
@@ -46,7 +46,7 @@
   call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
   call Turb_Mod_Alias_T2          (turb, t2)
 
-  if(heat_transfer) then
+  if(flow % heat_transfer) then
     flow % heat        = 0.0     ! [W]
     flow % heat_flux   = 0.0     ! [W/m^2]
     flow % heated_area = 0.0
@@ -119,7 +119,7 @@
           eps  % n(c2) = eps  % n(c1)
           zeta % n(c2) = zeta % n(c1)
           f22  % n(c2) = f22  % n(c1)
-          if(heat_transfer) then
+          if(flow % heat_transfer) then
             t2  % n(c2) = t2  % n(c1)
           end if
         end if
@@ -134,7 +134,7 @@
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. SYMMETRY) then
           kin % n(c2) = kin % n(c1)
           eps % n(c2) = eps % n(c1)
-          if(heat_transfer) then
+          if(flow % heat_transfer) then
             t2  % n(c2) = t2  % n(c1)
           end if 
         end if
@@ -160,7 +160,7 @@
     end if ! c2 < 0
   end do
 
-  if(heat_transfer) then
+  if(flow % heat_transfer) then
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
@@ -211,7 +211,7 @@
   end if
 
   ! Integrate (summ) heated area, and heat up
-  if(heat_transfer) then
+  if(flow % heat_transfer) then
     call Comm_Mod_Global_Sum_Real(flow % heat)
     call Comm_Mod_Global_Sum_Real(flow % heated_area)
     flow % heat_flux = flow % heat / max(flow % heated_area, TINY)

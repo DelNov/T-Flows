@@ -104,13 +104,13 @@
     ! (It used to be called mass_err and was a local variable)
     real :: vol_res
 
+    ! Variables determining if we are dealing with heat transfer and buoyancy
+    logical :: heat_transfer
+
+    ! Phase change (called mass_transfer to be consistent with heat_transfer)
+    logical :: mass_transfer
+
   end type
-
-  ! Variables determining if we are dealing with heat transfer and buoyancy
-  logical :: heat_transfer
-
-  ! Phase change (called mass_transfer to be consistent with heat_transfer)
-  logical :: mass_transfer
 
   logical :: buoyancy
 

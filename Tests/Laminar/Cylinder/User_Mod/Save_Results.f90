@@ -62,7 +62,7 @@
   nuss_mean  = 0.0
   n_points = 0
 
-  if(heat_transfer) then 
+  if(flow % heat_transfer) then
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)

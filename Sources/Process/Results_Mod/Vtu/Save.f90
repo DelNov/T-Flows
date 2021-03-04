@@ -477,7 +477,7 @@
     !-----------------!
     !   Temperature   !
     !-----------------!
-    if(heat_transfer) then
+    if(flow % heat_transfer) then
       call Save_Scalar_Real("Temperature [K]", plot_inside,  &
                             flow % t % n(c_f:c_l),           &
                             f8, f9, data_offset, run)
@@ -600,7 +600,7 @@
       call Save_Scalar_Real("TurbulentQuantityF22", plot_inside,    &
                             turb % f22  % n(c_f:c_l),               &
                             f8, f9, data_offset, run)
-      if (heat_transfer) then
+      if(flow % heat_transfer) then
         call Save_Scalar_Real("TurbulentQuantityT2", plot_inside,   &
                               turb % t2 % n(c_f:c_l),               &
                               f8, f9, data_offset, run)
@@ -674,7 +674,7 @@
       call Save_Scalar_Real("ReynoldsStressYZ", plot_inside,  &
                             turb % vw % n(c_f:c_l),           &
                             f8, f9, data_offset, run)
-      if(heat_transfer) then
+      if(flow % heat_transfer) then
         call Save_Scalar_Real("TurbulentHeatFluxX", plot_inside,  &
                               turb % ut % n(c_f:c_l),             &
                               f8, f9, data_offset, run)
@@ -726,7 +726,7 @@
       call Save_Scalar_Real("MeanReynoldsStressYZ", plot_inside,  &
                             vw_save(c_f:c_l),                     &
                             f8, f9, data_offset, run)
-      if(heat_transfer) then
+      if(flow % heat_transfer) then
         call Save_Scalar_Real("MeanTemperature", plot_inside,     &
                               turb % t_mean(c_f:c_l),             &
                               f8, f9, data_offset, run)

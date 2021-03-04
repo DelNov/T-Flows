@@ -11,7 +11,7 @@
   use Comm_Mod
   use Grid_Mod,        only: Grid_Type, Grid_Mod_Bnd_Cond_Type,  &
                              INFLOW, OUTFLOW, CONVECT, PRESSURE, SYMMETRY
-  use Field_Mod,       only: Field_Type, Field_Mod_Alias_Momentum, mass_transfer
+  use Field_Mod,       only: Field_Type, Field_Mod_Alias_Momentum
   use Var_Mod,         only: Var_Type
   use Face_Mod,        only: Face_Type
   use Bulk_Mod,        only: Bulk_Type
@@ -81,7 +81,7 @@
   !-------------------------------------------!
   !   Additional volume due to phase change   !
   !-------------------------------------------!
-  if(mass_transfer) then
+  if(flow % mass_transfer) then
     call Multiphase_Mod_Vof_Mass_Transfer_Added_Volume(mult, bulk % vol_src)
   end if
 

@@ -10,7 +10,7 @@
   use Const_Mod                      ! constants
   use Comm_Mod                       ! parallel stuff
   use Grid_Mod,  only: Grid_Type
-  use Field_Mod, only: Field_Type, heat_transfer, heat_flux, heat, &
+  use Field_Mod, only: Field_Type, heat_flux, heat, &
                        capacity, conductivity, heated_area
   use Bulk_Mod,  only: Bulk_Type
   use Var_Mod,   only: Var_Type
