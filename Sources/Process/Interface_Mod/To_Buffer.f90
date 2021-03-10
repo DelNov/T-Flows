@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Interface_Mod_To_Buffer(inter, var1, var2, v)
+  subroutine Interface_Mod_To_Buffer(inter, var1, var2, v, boundary)
 !------------------------------------------------------------------------------!
 !   Copy values of specified variables to buffer.                              !
 !------------------------------------------------------------------------------!
@@ -10,10 +10,20 @@
                                 inter % pnt_grid1 % n_cells)
   real                 :: var2(-inter % pnt_grid2 % n_bnd_cells :  &
                                 inter % pnt_grid2 % n_cells)
-  integer              :: v              ! variable number
+  integer              :: v         ! variable number
+  logical, optional    :: boundary  ! exchange boundary values (not inside)
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: n1, n2, c, n, n_tot
+  integer :: n1, n2, b, c, n, n_tot
+  logical :: inside                 ! exchange inside values (not boundary)
 !==============================================================================!
+
+  ! Handle optional parameter
+  if(present(boundary)) then
+    if(      boundary) inside = .false.  ! if boundary true, inside is false
+    if(.not. boundary) inside = .true.   ! if boudary false, inside is true
+  else
+    inside = .true.
+  end if
 
   !----------------------------------------------------!
   !   Copy values from inside cells to the interface   !
@@ -30,15 +40,25 @@
     ! On the side of domain 1
     do n1 = 1, inter % n1_sub
       c = inter % cell_1(n1)   ! domain 1, cell inside
+      b = inter % bcel_1(n1)   ! domain 1, boundary cell
       n = inter % face_1(n1)   ! domain 1, face
-      inter % phi_1(n, v) = var1(c)
+      if(inside) then
+        inter % phi_1(n, v) = var1(c)
+      else
+        inter % phi_1(n, v) = var1(b)
+      end if
     end do
 
     ! On the side of domain 2
     do n2 = 1, inter % n2_sub
       c = inter % cell_2(n2)   ! domain 2, cell inside
+      b = inter % bcel_2(n2)   ! domain 2, boundary cell
       n = inter % face_2(n2)   ! domain 2, face
-      inter % phi_2(n, v) = var2(c)
+      if(inside) then
+        inter % phi_2(n, v) = var2(c)
+      else
+        inter % phi_2(n, v) = var2(b)
+      end if
     end do
 
     ! Here we exchange (global sum) of phi_1 and phi_2

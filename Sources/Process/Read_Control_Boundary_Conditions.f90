@@ -7,7 +7,7 @@
   use Const_Mod
   use File_Mod
   use Comm_Mod,       only: this_proc, Comm_Mod_End
-  use Field_Mod,      only: Field_Type, heat_transfer
+  use Field_Mod,      only: Field_Type
   use Turb_Mod
   use Multiphase_Mod, only: Multiphase_Type, VOLUME_OF_FLUID
   use Grid_Mod,       only: Grid_Type
@@ -211,7 +211,7 @@
           if(grid % bnd_cond % color(c) .eq. bc) then
 
             ! Temperature
-            if(heat_transfer) then
+            if(flow % heat_transfer) then
               i = Key_Ind('T', keys, nks)
               if(i > 0) then
                 t % bnd_cond_type(c) = bc_type_tag
@@ -238,13 +238,11 @@
             do sc = 1, flow % n_scalars
               i = Key_Ind(scalar(sc) % name, keys, nks)
               if(i > 0) then
-                scalar(sc) % bnd_cond_type(c) = bc_type_tag
-                if(bc_type_tag .eq. WALLFL) scalar(sc) % bnd_cond_type(c) = WALL
+                scalar(sc) % bnd_cond_type(c) = WALL
               end if
               i = Key_Ind(scalar(sc) % flux_name, keys, nks)
               if(i > 0) then
-                scalar(sc) % bnd_cond_type(c) = bc_type_tag
-                if(bc_type_tag .eq. WALL) scalar(sc) % bnd_cond_type(c) = WALLFL
+                scalar(sc) % bnd_cond_type(c) = WALLFL
               end if
             end do
 
@@ -263,7 +261,7 @@
             i = Key_Ind('P', keys, nks); if(i > 0) p % b(c) = vals(i)
 
             ! Temperature
-            if(heat_transfer) then
+            if(flow % heat_transfer) then
               i = Key_Ind('T', keys, nks)
               if(i > 0) t % b(c) = vals(i)
               i = Key_Ind('Q', keys, nks)
@@ -306,7 +304,7 @@
               i = Key_Ind('KIN', keys, nks); if(i > 0) kin % b(c) = vals(i)
               i = Key_Ind('EPS', keys, nks); if(i > 0) eps % b(c) = vals(i)
               turb % y_plus(c) = 1.1
-              if(heat_transfer) then
+              if(flow % heat_transfer) then
                 i = Key_Ind('T2',  keys, nks); if(i > 0) t2 % b(c) = vals(i)
               end if
             end if
@@ -317,7 +315,7 @@
               i = Key_Ind('EPS',  keys, nks); if(i > 0) eps  % b(c) = vals(i)
               i = Key_Ind('ZETA', keys, nks); if(i > 0) zeta % b(c) = vals(i)
               i = Key_Ind('F22',  keys, nks); if(i > 0) f22  % b(c) = vals(i)
-              if(heat_transfer) then
+              if(flow % heat_transfer) then
                 i = Key_Ind('T2',  keys, nks); if(i > 0) t2  % b(c) = vals(i)
               end if
             end if
@@ -373,7 +371,7 @@
             if(grid % bnd_cond % color(c) .eq. bc) then
 
               ! For temperature
-              if(heat_transfer) then
+              if(flow % heat_transfer) then
                 i = Key_Ind('T', keys, nks)
                 if(i > 0) then
                   t % bnd_cond_type(c) = bc_type_tag
@@ -392,15 +390,11 @@
               do sc = 1, flow % n_scalars
                 i = Key_Ind(scalar(sc) % name, keys, nks)
                 if(i > 0) then
-                  scalar(sc) % bnd_cond_type(c) = bc_type_tag
-                  if(bc_type_tag .eq. WALLFL)  &
-                    scalar(sc) % bnd_cond_type(c) = WALL
+                  scalar(sc) % bnd_cond_type(c) = WALL
                 end if
                 i = Key_Ind(scalar(sc) % flux_name, keys, nks)
                 if(i > 0) then
-                  scalar(sc) % bnd_cond_type(c) = bc_type_tag
-                  if(bc_type_tag .eq. WALL)  &
-                    scalar(sc) % bnd_cond_type(c) = WALLFL
+                  scalar(sc) % bnd_cond_type(c) = WALLFL
                 end if
               end do
 
@@ -448,7 +442,7 @@
               i = Key_Ind('P', keys, nks); if(i > 0) p % b(c) = prof(k,i)
 
               ! For temperature
-              if(heat_transfer) then
+              if(flow % heat_transfer) then
                 i = Key_Ind('T', keys, nks)
                 if(i > 0) t % b(c) = prof(k,i)
                 i = Key_Ind('Q', keys, nks)
@@ -467,7 +461,7 @@
               if(turb % model .eq. K_EPS) then
                 i = Key_Ind('KIN', keys, nks); if(i > 0) kin % b(c) = prof(k,i)
                 i = Key_Ind('EPS', keys, nks); if(i > 0) eps % b(c) = prof(k,i)
-                if(heat_transfer) then
+                if(flow % heat_transfer) then
                   i = Key_Ind('T2',  keys, nks); if(i>0) t2  % b(c) = prof(k,i)
                 end if
               end if
@@ -478,7 +472,7 @@
                 i = Key_Ind('EPS',  keys, nks); if(i>0) eps  % b(c) = prof(k,i)
                 i = Key_Ind('ZETA', keys, nks); if(i>0) zeta % b(c) = prof(k,i)
                 i = Key_Ind('F22',  keys, nks); if(i>0) f22  % b(c) = prof(k,i)
-                if(heat_transfer) then
+                if(flow % heat_transfer) then
                   i = Key_Ind('T2',  keys, nks); if(i>0) t2  % b(c) = prof(k,i)
                 end if
               end if
@@ -566,7 +560,7 @@
                 if(here) then
 
                   ! For temperature
-                  if(heat_transfer) then
+                  if(flow % heat_transfer) then
                     i = Key_Ind('T',keys,nks)
                     if(i > 0) then
                       t % bnd_cond_type(c) = bc_type_tag
@@ -587,15 +581,11 @@
                   do sc = 1, flow % n_scalars
                     i = Key_Ind(scalar(sc) % name, keys, nks)
                     if(i > 0) then
-                      scalar(sc) % bnd_cond_type(c) = bc_type_tag
-                      if(bc_type_tag .eq. WALLFL)  &
-                        scalar(sc) % bnd_cond_type(c) = WALL
+                      scalar(sc) % bnd_cond_type(c) = WALL
                     end if
                     i = Key_Ind(scalar(sc) % flux_name, keys, nks)
                     if(i > 0) then
-                      scalar(sc) % bnd_cond_type(c) = bc_type_tag
-                      if(bc_type_tag .eq. WALL)  &
-                        scalar(sc) % bnd_cond_type(c) = WALLFL
+                      scalar(sc) % bnd_cond_type(c) = WALLFL
                     end if
                   end do
 
@@ -668,7 +658,7 @@
                   if(i > 0) p % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
 
                   ! For temperature
-                  if(heat_transfer) then
+                  if(flow % heat_transfer) then
                     i = Key_Ind('T',keys,nks)
                     if(i > 0) t % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
                     if(i > 0) then
@@ -692,14 +682,12 @@
                     i = Key_Ind(scalar(sc) % name, keys, nks)
                     if(i > 0) then
                       scalar(sc) % b(c)=wi*prof(m,i)+(1.-wi)*prof(m+1,i)
-                      if(bc_type_tag .eq. WALLFL)  &
-                        scalar(sc) % bnd_cond_type(c) = WALL
+                      scalar(sc) % bnd_cond_type(c) = WALL
                     end if
                     i = Key_Ind(scalar(sc) % flux_name, keys, nks)
                     if(i > 0) then
                       scalar(sc) % q(c)=wi*prof(m,i)+(1.-wi)*prof(m+1,i)
-                      if(bc_type_tag .eq. WALL)  &
-                        scalar(sc) % bnd_cond_type(c) = WALLFL
+                      scalar(sc) % bnd_cond_type(c) = WALLFL
                     end if
                   end do
 
@@ -712,7 +700,7 @@
                     i = Key_Ind('EPS',keys,nks)
                     if(i > 0) eps % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
 
-                    if(heat_transfer) then
+                    if(flow % heat_transfer) then
                       i = Key_Ind('T2',keys,nks)
                       if(i > 0) t2 % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
                     end if
@@ -734,7 +722,7 @@
                     i = Key_Ind('F22',keys,nks)
                     if(i > 0) f22 % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
 
-                    if(heat_transfer) then
+                    if(flow % heat_transfer) then
                       i = Key_Ind('T2',keys,nks)
                       if(i > 0) t2 % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
                     end if
@@ -837,7 +825,7 @@
       w % n(c) = w % b(c)
       p % n(c) = p % b(c)
 
-      if(heat_transfer) then
+      if(flow % heat_transfer) then
         t % n(c) = t % b(c)
       end if
 
@@ -867,7 +855,7 @@
       if(turb % model .eq. K_EPS) then
         kin % n(c) = kin % b(c)
         eps % n(c) = eps % b(c)
-        if(heat_transfer) then
+        if(flow % heat_transfer) then
           t2 % n(c) = t2 % b(c)
         end if
       end if
@@ -878,7 +866,7 @@
         eps  % n(c) = eps  % b(c)
         zeta % n(c) = zeta % b(c)
         f22  % n(c) = eps  % b(c)
-        if(heat_transfer) then
+        if(flow % heat_transfer) then
           t2 % n(c) = t2 % b(c)
         end if
       end if
