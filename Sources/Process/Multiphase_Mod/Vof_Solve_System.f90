@@ -25,6 +25,7 @@
 
   call Cpu_Timer_Mod_Start('Linear_Solver_For_Multiphase')
   call Solver_Mod_Bicg(sol,            &
+                       a,              &
                        vof % n,        &
                        b,              &
                        vof % precond,  &

@@ -18,9 +18,17 @@
 
     type(Grid_Type), pointer :: pnt_grid
 
-    ! Preconditioning "matrix" for single grid methods
-    type(Matrix_Type) :: a     ! system matrix for all variables
-    type(Matrix_Type) :: d     ! preconditioning "matrix"
+    ! Matrix for all variables except momentum
+    type(Matrix_Type) :: a
+
+    ! Matrix for discretized momentum equations
+    type(Matrix_Type) :: m
+
+    ! Preconditioning matrix for all variables (used inside solvers only)
+    type(Matrix_Type) :: d
+
+    ! Right-hand side for all variables
+    ! (used in solvers and during discretization)
     type(Vector_Type) :: b
 
   end type

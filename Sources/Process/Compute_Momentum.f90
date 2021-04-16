@@ -324,6 +324,7 @@
       call Cpu_Timer_Mod_Start('Linear_Solver_For_Momentum')
 
       call Solver_Mod_Bicg(sol,           &
+                           a,             &
                            ui % n,        &
                            b,             &
                            ui % precond,  &

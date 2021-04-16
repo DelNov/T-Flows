@@ -241,6 +241,7 @@
   ! Call linear solver to solve the equations
   call Cpu_Timer_Mod_Start('Linear_Solver_For_Turbulence')
   call Solver_Mod_Bicg(sol,            &
+                       a,              &
                        phi % n,        &
                        b,              &
                        phi % precond,  &

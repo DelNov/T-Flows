@@ -5,7 +5,9 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use User_Mod
-  use Work_Mod, only: b_save => r_cell_01
+  use Work_Mod, only: u_f => r_face_01,  &
+                      v_f => r_face_02,  &
+                      w_f => r_face_03
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -22,7 +24,7 @@
   real, contiguous,  pointer :: b(:)
   real,              pointer :: u_relax
   integer                    :: s, c, c1, c2
-  real                       :: u_f, v_f, w_f, a12, fs, dt
+  real                       :: a12, fs, dt
   real                       :: px_f, py_f, pz_f, dens_h
   character(SL)              :: solver
   real                       :: p_max, p_min, p_nor, p_nor_c
@@ -106,6 +108,8 @@
   !----------------------------------!
   call Balance_Volume(flow, mult)
 
+  ! call Rhie_And_Chow(flow, mult, sol, ini)
+
   !-------------------------------------------------!
   !   Calculate the mass fluxes on the cell faces   !
   !-------------------------------------------------!
@@ -121,15 +125,15 @@
 
       ! If there is a jump in velocities, call specialized gradient calculation
       if(flow % mass_transfer) then
-        u_f = Multiphase_Mod_Vof_Interpolate_Var_To_Face_With_Jump(mult, u, s)
-        v_f = Multiphase_Mod_Vof_Interpolate_Var_To_Face_With_Jump(mult, v, s)
-        w_f = Multiphase_Mod_Vof_Interpolate_Var_To_Face_With_Jump(mult, w, s)
+        u_f(s) = Multiphase_Mod_Vof_Interpolate_Var_To_Face_With_Jump(mult, u, s)
+        v_f(s) = Multiphase_Mod_Vof_Interpolate_Var_To_Face_With_Jump(mult, v, s)
+        w_f(s) = Multiphase_Mod_Vof_Interpolate_Var_To_Face_With_Jump(mult, w, s)
 
       ! No jumps, call usual routines
       else
-        u_f = Field_Mod_Interpolate_Var_To_Face(flow, u, s)
-        v_f = Field_Mod_Interpolate_Var_To_Face(flow, v, s)
-        w_f = Field_Mod_Interpolate_Var_To_Face(flow, w, s)
+        u_f(s) = Field_Mod_Interpolate_Var_To_Face(flow, u, s)
+        v_f(s) = Field_Mod_Interpolate_Var_To_Face(flow, v, s)
+        w_f(s) = Field_Mod_Interpolate_Var_To_Face(flow, w, s)
       end if
 
       ! Calculate coeficients for the system matrix
@@ -178,9 +182,9 @@
       ! Calculate current volume flux through cell face with pressure
       ! defined at a cell face and assuming that pressure correction
       ! (pp) part is treated implicitly
-      v_flux % n(s) = u_f * grid % sx(s)             &
-                    + v_f * grid % sy(s)             &
-                    + w_f * grid % sz(s)             &
+      v_flux % n(s) = u_f(s) * grid % sx(s)          &
+                    + v_f(s) * grid % sy(s)          &
+                    + w_f(s) * grid % sz(s)          &
                     + a12 * (p % n(c1) - p % n(c2))  &
                     + a12 * (  px_f * grid % dx(s)   &
                              + py_f * grid % dy(s)   &
@@ -189,17 +193,17 @@
       ! Any of the cells is at interface, use only non-interface value
       ! (This is the old way, and seems to be working better after all)
       if(flow % mass_transfer) then
-        if(mult % cell_at_elem(c1) .eq. 0 .and.  &
+        if(mult % cell_at_elem(c1) .eq. 0 .and.     &
            mult % cell_at_elem(c2) .ne. 0) then
-          v_flux % n(s) = u_f * grid % sx(s)     &
-                        + v_f * grid % sy(s)     &
-                        + w_f * grid % sz(s)
+          v_flux % n(s) = u_f(s) * grid % sx(s)     &
+                        + v_f(s) * grid % sy(s)     &
+                        + w_f(s) * grid % sz(s)
         end if
-        if(mult % cell_at_elem(c1) .ne. 0 .and.  &
+        if(mult % cell_at_elem(c1) .ne. 0 .and.     &
            mult % cell_at_elem(c2) .eq. 0) then
-          v_flux % n(s) = u_f * grid % sx(s)     &
-                        + v_f * grid % sy(s)     &
-                        + w_f * grid % sz(s)
+          v_flux % n(s) = u_f(s) * grid % sx(s)     &
+                        + v_f(s) * grid % sy(s)     &
+                        + w_f(s) * grid % sz(s)
         end if
       end if
 
@@ -254,6 +258,7 @@
 
   call Cpu_Timer_Mod_Start('Linear_Solver_For_Pressure')
   call Solver_Mod_Cg(sol,           &
+                     a,             &
                      pp % n,        &
                      b,             &
                      pp % precond,  &

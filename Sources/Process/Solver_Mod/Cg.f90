@@ -1,5 +1,6 @@
 !==============================================================================!
-  subroutine Solver_Mod_Cg(sol, x, b, prec, miter, niter, tol, fin_res, norm)
+  subroutine Solver_Mod_Cg(sol,  &
+                           a, x, b, prec, miter, niter, tol, fin_res, norm)
 !------------------------------------------------------------------------------!
 !   Solves the linear systems of equations by a precond. CG Method.            !
 !------------------------------------------------------------------------------!
@@ -19,17 +20,17 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Solver_Type), target :: sol
-  real              :: x(-sol % pnt_grid % n_bnd_cells :  &
-                          sol % pnt_grid % n_cells)
-  real              :: b( sol % pnt_grid % n_cells)  ! [A]{x}={b}
-  character(SL)     :: prec                          ! preconditioner
-  integer           :: miter                         ! max and actual ...
-  integer           :: niter                         ! ... num. iterations
-  real              :: tol                           ! tolerance
-  real              :: fin_res                       ! residual
-  real, optional    :: norm                          ! normalization
+  type(Matrix_Type)         :: a
+  real                      :: x(-sol % pnt_grid % n_bnd_cells :  &
+                                  sol % pnt_grid % n_cells)
+  real                      :: b( sol % pnt_grid % n_cells)
+  character(SL)             :: prec     ! preconditioner
+  integer                   :: miter    ! maximum and actual ...
+  integer                   :: niter    ! ... number of iterations
+  real                      :: tol      ! tolerance
+  real                      :: fin_res  ! final residual
+  real, optional            :: norm     ! normalization
 !-----------------------------------[Locals]-----------------------------------!
-  type(Matrix_Type), pointer :: a
   type(Matrix_Type), pointer :: d
   integer                    :: nt, ni, nb
   real                       :: alfa, beta, rho, rho_old, bnrm2, res
@@ -37,7 +38,6 @@
 !==============================================================================!
 
   ! Take some aliases
-  a => sol % a
   d => sol % d
   nt = a % pnt_grid % n_cells
   ni = a % pnt_grid % n_cells - a % pnt_grid % comm % n_buff_cells

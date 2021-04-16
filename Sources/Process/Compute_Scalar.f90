@@ -346,6 +346,7 @@
   ! Call linear solver to solve them
   call Cpu_Timer_Mod_Start('Linear_Solver_For_Scalars')
   call Solver_Mod_Bicg(sol,            &
+                       a,              &
                        phi % n,        &
                        b,              &
                        phi % precond,  &

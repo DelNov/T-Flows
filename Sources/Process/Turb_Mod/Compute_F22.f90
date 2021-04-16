@@ -159,6 +159,7 @@
 
   ! Call linear solver to solve the equations
   call Solver_Mod_Cg(sol,            &
+                     a,              &
                      phi % n,        &
                      b,              &
                      phi % precond,  &
