@@ -20,7 +20,7 @@
   type(Face_Type),   pointer :: v_flux          ! volume flux
   type(Matrix_Type), pointer :: a               ! pressure matrix
   type(Matrix_Type), pointer :: m               ! momentum matrix
-  real,              pointer :: b(:)
+  real, contiguous,  pointer :: b(:)
   real,              pointer :: u_relax
   integer                    :: c, c1, c2, s, i_fac
   real                       :: cfl_t, pe_t, dens_f, visc_f, dt, wght

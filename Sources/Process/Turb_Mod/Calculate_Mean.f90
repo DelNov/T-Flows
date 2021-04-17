@@ -15,17 +15,17 @@
   type(Var_Type),   pointer :: uu, vv, ww, uv, uw, vw
   type(Var_Type),   pointer :: ut, vt, wt
   integer                   :: c, n, sc
-  real,             pointer :: u_mean(:), v_mean(:), w_mean(:),  &
+  real, contiguous, pointer :: u_mean(:), v_mean(:), w_mean(:),  &
                                p_mean(:), t_mean(:)
-  real,             pointer :: kin_mean (:), eps_mean(:),  &
+  real, contiguous, pointer :: kin_mean (:), eps_mean(:),  &
                                zeta_mean(:), f22_mean(:)
-  real,             pointer :: uu_res(:), vv_res(:), ww_res(:),  &
+  real, contiguous, pointer :: uu_res(:), vv_res(:), ww_res(:),  &
                                uv_res(:), vw_res(:), uw_res(:)
-  real,             pointer :: ut_res(:), vt_res(:), wt_res(:), t2_res(:)
-  real,             pointer :: uu_mean(:), vv_mean(:), ww_mean(:)
-  real,             pointer :: uv_mean(:), vw_mean(:), uw_mean(:)
-  real,             pointer :: ut_mean(:), vt_mean(:), wt_mean(:), t2_mean(:)
-  real,             pointer :: phi_mean(:,:)
+  real, contiguous, pointer :: ut_res(:), vt_res(:), wt_res(:), t2_res(:)
+  real, contiguous, pointer :: uu_mean(:), vv_mean(:), ww_mean(:)
+  real, contiguous, pointer :: uv_mean(:), vw_mean(:), uw_mean(:)
+  real, contiguous, pointer :: ut_mean(:), vt_mean(:), wt_mean(:), t2_mean(:)
+  real, contiguous, pointer :: phi_mean(:,:)
 !==============================================================================!
 
   if(.not. turb % statistics) return
