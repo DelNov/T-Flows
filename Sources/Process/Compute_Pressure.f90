@@ -5,9 +5,6 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use User_Mod
-  use Work_Mod, only: u_f => r_face_01,  &
-                      v_f => r_face_02,  &
-                      w_f => r_face_03
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -26,7 +23,6 @@
   real,              pointer :: u_relax
   integer                    :: s, c, c1, c2
   real                       :: a12, fs, dt
-  real                       :: px_f, py_f, pz_f, dens_h
   character(SL)              :: solver
   real                       :: p_max, p_min, p_nor, p_nor_c
 !==============================================================================!
@@ -110,7 +106,11 @@
   !----------------------------------!
   call Balance_Volume(flow, mult)
 
-  call Rhie_And_Chow(flow, mult, sol, u_f, v_f, w_f)
+  !---------------------------------------!
+  !   Compute volume fluxes at internal   !
+  !    faces with Rhie and Chow method    !
+  !---------------------------------------!
+  call Rhie_And_Chow(flow, mult, sol)
 
   !-------------------------------------------------!
   !   Calculate the mass fluxes on the cell faces   !
@@ -125,74 +125,14 @@
 
       ! Calculate coeficients for the system matrix
       ! a12 [m*m^3*s/kg = m^4s/kg]
-      if(.not. flow % mass_transfer) then
-        a12 = u_relax * 0.5 * a % fc(s)                    &
-                      * ( grid % vol(c1) / m % sav(c1)     &
-                        + grid % vol(c2) / m % sav(c2) )
-      else
-        if(mult % cell_at_elem(c1) .eq. 0 .and.  &
-           mult % cell_at_elem(c2) .eq. 0 .or.   &
-           mult % cell_at_elem(c1) .ne. 0 .and.  &
-           mult % cell_at_elem(c2) .ne. 0) then
-          a12 = u_relax * 0.5 * a % fc(s)                    &
-                        * ( grid % vol(c1) / m % sav(c1)     &
-                          + grid % vol(c2) / m % sav(c2) )
-        else
-          if(mult % cell_at_elem(c1) .eq. 0 .and.  &
-             mult % cell_at_elem(c2) .ne. 0) then
-            a12 = u_relax * a % fc(s) * grid % vol(c1) / m % sav(c1)
-          end if
-          if(mult % cell_at_elem(c1) .ne. 0 .and.  &
-             mult % cell_at_elem(c2) .eq. 0) then
-            a12 = u_relax * a % fc(s) * grid % vol(c2) / m % sav(c2)
-          end if
-        end if
-      end if
+      a12 = u_relax * 0.5 * a % fc(s)                    &
+                    * ( grid % vol(c1) / m % sav(c1)     &
+                      + grid % vol(c2) / m % sav(c2) )
 
       a % val(a % pos(1,s)) = -a12
       a % val(a % pos(2,s)) = -a12
       a % val(a % dia(c1))  = a % val(a % dia(c1)) +  a12
       a % val(a % dia(c2))  = a % val(a % dia(c2)) +  a12
-
-      ! Interpolate pressure gradients as proposed by Denner
-      ! (Equation 3.57 in his PhD thesis)
-      ! dens_h           [kg/m^3]
-      ! px_f, py_f, pz_f [kg/m^2s^2]
-      dens_h = 2.0 / (1.0 / flow % density(c1) + 1.0 / flow % density(c2))
-      px_f = 0.5 * dens_h * (  p % x(c1) / flow % density(c1)  &
-                             + p % x(c2) / flow % density(c2) )
-      py_f = 0.5 * dens_h * (  p % y(c1) / flow % density(c1)  &
-                             + p % y(c2) / flow % density(c2) )
-      pz_f = 0.5 * dens_h * (  p % z(c1) / flow % density(c1)  &
-                             + p % z(c2) / flow % density(c2) )
-
-      ! Calculate current volume flux through cell face with pressure
-      ! defined at a cell face and assuming that pressure correction
-      ! (pp) part is treated implicitly
-      v_flux % n(s) = u_f(s) * grid % sx(s)          &
-                    + v_f(s) * grid % sy(s)          &
-                    + w_f(s) * grid % sz(s)          &
-                    + a12 * (p % n(c1) - p % n(c2))  &
-                    + a12 * (  px_f * grid % dx(s)   &
-                             + py_f * grid % dy(s)   &
-                             + pz_f * grid % dz(s))
-
-      ! Any of the cells is at interface, use only non-interface value
-      ! (This is the old way, and seems to be working better after all)
-      if(flow % mass_transfer) then
-        if(mult % cell_at_elem(c1) .eq. 0 .and.     &
-           mult % cell_at_elem(c2) .ne. 0) then
-          v_flux % n(s) = u_f(s) * grid % sx(s)     &
-                        + v_f(s) * grid % sy(s)     &
-                        + w_f(s) * grid % sz(s)
-        end if
-        if(mult % cell_at_elem(c1) .ne. 0 .and.     &
-           mult % cell_at_elem(c2) .eq. 0) then
-          v_flux % n(s) = u_f(s) * grid % sx(s)     &
-                        + v_f(s) * grid % sy(s)     &
-                        + w_f(s) * grid % sz(s)
-        end if
-      end if
 
       b(c1) = b(c1) - v_flux % n(s)
       b(c2) = b(c2) + v_flux % n(s)
