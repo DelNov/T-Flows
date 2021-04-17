@@ -1,25 +1,23 @@
 !==============================================================================!
-  subroutine Numerics_Mod_Advection_Term(phi, coef, v_flux, sol)
+  subroutine Numerics_Mod_Advection_Term(phi, coef, v_flux, b)
 !------------------------------------------------------------------------------!
 !   Purpose: Dicretize advection term in conservation equations.               !
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
-  type(Var_Type)            :: phi
-  real                      :: coef(-phi % pnt_grid % n_bnd_cells:  &
-                                     phi % pnt_grid % n_cells)
-  real                      :: v_flux(phi % pnt_grid % n_faces)
-  type(Solver_Type), target :: sol
+  type(Var_Type) :: phi
+  real           :: coef(-phi % pnt_grid % n_bnd_cells:  &
+                          phi % pnt_grid % n_cells)
+  real           :: v_flux(phi % pnt_grid % n_faces)
+  real           :: b(:)
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
-  real,            pointer :: b(:)
   real                     :: phi_f          ! phi and coef at the cell face
   integer                  :: c, c1, c2, s
 !==============================================================================!
 
   ! Take alias to grid
   grid => phi % pnt_grid
-  b    => sol % b % val
 
   !----------------------------------------------------------------------------!
   !   Compute phi % max and phi % min (used in Numerics_Mod_Advection_Scheme)  !

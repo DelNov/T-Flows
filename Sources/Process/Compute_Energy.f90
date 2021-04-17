@@ -100,7 +100,7 @@
   !   Advection   !
   !               !
   !---------------!
-  call Numerics_Mod_Advection_Term(t, cap_dens, v_flux % n, sol)
+  call Numerics_Mod_Advection_Term(t, cap_dens, v_flux % n, b)
 
   !--------------!
   !              !
@@ -202,7 +202,7 @@
   do c = -grid % n_bnd_cells, grid % n_cells
     cap_dens(c) = flow % capacity(c) * flow % density(c)
   end do
-  call Numerics_Mod_Inertial_Term(t, cap_dens, sol, dt)
+  call Numerics_Mod_Inertial_Term(t, cap_dens, a, b, dt)
 
   !--------------------!
   !                    !
@@ -218,7 +218,7 @@
   !-------------------------------!
 
   ! Under-relax the equations
-  call Numerics_Mod_Under_Relax(t, sol)
+  call Numerics_Mod_Under_Relax(t, a, b)
 
   ! Call linear solver to solve the equations
   call Cpu_Timer_Mod_Start('Linear_Solver_For_Energy')

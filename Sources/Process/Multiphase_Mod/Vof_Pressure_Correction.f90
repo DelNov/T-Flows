@@ -13,7 +13,7 @@
   type(Face_Type),   pointer :: v_flux
   type(Var_Type),    pointer :: col
   type(Var_Type),    pointer :: u, v, w
-  type(Matrix_Type), pointer :: a
+  type(Matrix_Type), pointer :: m
   real, contiguous,  pointer :: b(:)
   real,              pointer :: u_relax, dt_corr
   integer                    :: c, c1, c2, s, nb, nc
@@ -31,7 +31,7 @@
   u_relax => flow % u_rel_corr
   dt_corr => flow % dt_corr
   v_flux  => flow % v_flux
-  a       => sol % a
+  m       => sol % m
   b       => sol % b % val
 
   nb = grid % n_bnd_cells
@@ -66,8 +66,8 @@
                       * grid % dz(s)
 
         ! Unit for a12: [m^4s/kg]
-        a12 = u_relax * 0.5 * ( grid % vol(c1) / a % sav(c1)     &
-                              + grid % vol(c2) / a % sav(c2) ) * a % fc(s)
+        a12 = u_relax * 0.5 * ( grid % vol(c1) / m % sav(c1)     &
+                              + grid % vol(c2) / m % sav(c2) ) * m % fc(s)
 
         ! Curvature at the face; unit: [1/m]
         curv_f = 0.5 * ( mult % curv(c1) + mult % curv(c2) )
@@ -104,10 +104,9 @@
         dens_h = 2.0 / ( 1.0 / flow % density(c1) + 1.0 / flow % density(c2) )
 
         ! Unit for factor2: [1]
-        factor2 = u_relax * 0.5 * dens_h * ( grid % vol(c1)               &
-                                           / (a % sav(c1) * dt_corr)      &
-                                           + grid % vol(c2)               &
-                                           / (a % sav(c2) * dt_corr) )
+        factor2 = u_relax * 0.5 * dens_h                          &
+                * (  grid % vol(c1) / (m % sav(c1) * dt_corr)     &
+                   + grid % vol(c2) / (m % sav(c2) * dt_corr) )
 
         ! Unit for correction [m^3/s]
         correction = (1.0 - u_relax) * ( v_flux % star(s) - v_flux % avg(s) )  &

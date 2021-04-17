@@ -1,27 +1,24 @@
 !==============================================================================!
-  subroutine Numerics_Mod_Inertial_Term(phi, coef, sol, dt)
+  subroutine Numerics_Mod_Inertial_Term(phi, coef, a, b, dt)
 !------------------------------------------------------------------------------!
 !   Purpose: Dicretize inertial term in conservation equations.                !
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
-  type(Var_Type)            :: phi
-  real                      :: coef(-phi % pnt_grid % n_bnd_cells:  &
-                                     phi % pnt_grid % n_cells)
-  type(Solver_Type), target :: sol
-  real                      :: dt
+  type(Var_Type)    :: phi
+  real              :: coef(-phi % pnt_grid % n_bnd_cells:  &
+                             phi % pnt_grid % n_cells)
+  type(Matrix_Type) :: a
+  real              :: b(:)
+  real              :: dt
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),   pointer :: grid
-  type(Matrix_Type), pointer :: a
-  real,              pointer :: b(:)
-  real                       :: a0
-  integer                    :: c
+  type(Grid_Type), pointer :: grid
+  real                     :: a0
+  integer                  :: c
 !==============================================================================!
 
   ! Take alias to grid
   grid => phi % pnt_grid
-  a    => sol % a
-  b    => sol % b % val
 
   ! Two time levels; Linear interpolation
   if(phi % td_scheme .eq. LINEAR) then

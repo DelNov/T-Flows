@@ -17,14 +17,15 @@
   type(Solver_Type), target :: sol
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
-  type(Matrix_Type), pointer :: a
+  type(Matrix_Type), pointer :: m
   real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2
 !==============================================================================!
 
   ! Take aliases
   grid => flow % pnt_grid
-  call Solver_Mod_Alias_System(sol, a, b)
+  m    => sol % m
+  b    => sol % b % val
 
   ! PISO corrections are executed here
   if (flow % p_m_coupling == PISO .and.  &
@@ -36,15 +37,15 @@
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
       if(c2 > 0) then
-        neigh(c1) = neigh(c1) - a % val(a % pos(1,s)) * ui % n(c2)
-        neigh(c2) = neigh(c2) - a % val(a % pos(2,s)) * ui % n(c1)
+        neigh(c1) = neigh(c1) - m % val(m % pos(1,s)) * ui % n(c2)
+        neigh(c2) = neigh(c2) - m % val(m % pos(2,s)) * ui % n(c1)
       end if
     end do
     call Grid_Mod_Exchange_Cells_Real(grid, neigh)
 
     ! Solve velocity explicitely (no under relaxation!!)
     do c = 1, grid % n_cells
-      ui % n(c) = (neigh(c) + b(c)) / a % val(a % dia(c))
+      ui % n(c) = (neigh(c) + b(c)) / m % val(m % dia(c))
     end do
 
     call Field_Mod_Grad_Variable(flow, ui)

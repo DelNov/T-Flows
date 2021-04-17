@@ -16,7 +16,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Bulk_Type),   pointer :: bulk
-  type(Matrix_Type), pointer :: a
+  type(Matrix_Type), pointer :: m
   type(Var_Type),    pointer :: ui, uj, uk, t, p
   type(Face_Type),   pointer :: v_flux
   real, contiguous,  pointer :: b(:)
@@ -26,7 +26,7 @@
   integer                    :: s, c, c1, c2, i
   real                       :: f_ex, f_im, f_stress
   real                       :: vel_max, dt
-  real                       :: a0, a12, a21
+  real                       :: m0, m12, m21
   real                       :: vis_eff
   real                       :: ui_i_f, ui_j_f, ui_k_f, uj_i_f, uk_i_f
   real                       :: grav_i, p_drop_i
@@ -73,11 +73,11 @@
 !
 !  Dimension of the system under consideration
 !
-!     [a]{u} = {b}   [kgm/s^2]   [N]
+!     [m]{u} = {b}   [kgm/s^2]   [N]
 !
 !  Dimensions of certain variables
 !
-!     a              [kg/s]
+!     m              [kg/s]
 !     u, v, w        [m/s]
 !     bu, bv, bw     [kgm/s^2]   [N]
 !     p, pp          [kg/ms^2]   [N/m^2]
@@ -97,7 +97,8 @@
   t      => flow % t
   p      => flow % p
   dt     =  flow % dt
-  call Solver_Mod_Alias_System(sol, a, b)
+  m      => sol % m
+  b      => sol % b % val
 
   !--------------------------------------------!
   !                                            !
@@ -143,7 +144,7 @@
     call User_Mod_Beginning_Of_Compute_Momentum(flow, turb, mult, ini)
 
     ! Initialize matrix and right hand side
-    a % val(:) = 0.0
+    m % val(:) = 0.0
     b      (:) = 0.0
     f_stress   = 0.0
 
@@ -169,7 +170,7 @@
     !   Advection   !
     !               !
     !---------------!
-    call Numerics_Mod_Advection_Term(ui, flow % density, v_flux % n, sol)
+    call Numerics_Mod_Advection_Term(ui, flow % density, v_flux % n, b)
 
     !---------------!
     !               !
@@ -205,8 +206,8 @@
       f_ex = vis_eff * ui_si
 
       ! Implicit viscous stress
-      a0 = vis_eff * a % fc(s)
-      f_im = ui_di * a0
+      m0 = vis_eff * m % fc(s)
+      f_im = ui_di * m0
 
       ! Cross diffusion part
       ui % c(c1) = ui % c(c1) + f_ex - f_im + f_stress * flow % density(c1)
@@ -215,15 +216,15 @@
       end if
 
       ! Compute the coefficients for the sysytem matrix
-      a12 = a0 - min(v_flux % n(s), 0.0) * flow % density(c1)
-      a21 = a0 + max(v_flux % n(s), 0.0) * flow % density(c2)
+      m12 = m0 - min(v_flux % n(s), 0.0) * flow % density(c1)
+      m21 = m0 + max(v_flux % n(s), 0.0) * flow % density(c2)
 
       ! Fill the system matrix
       if(c2 > 0) then
-        a % val(a % pos(1,s)) = a % val(a % pos(1,s)) - a12
-        a % val(a % dia(c1))  = a % val(a % dia(c1))  + a12
-        a % val(a % pos(2,s)) = a % val(a % pos(2,s)) - a21
-        a % val(a % dia(c2))  = a % val(a % dia(c2))  + a21
+        m % val(m % pos(1,s)) = m % val(m % pos(1,s)) - m12
+        m % val(m % dia(c1))  = m % val(m % dia(c1))  + m12
+        m % val(m % pos(2,s)) = m % val(m % pos(2,s)) - m21
+        m % val(m % dia(c2))  = m % val(m % dia(c2))  + m21
       else if(c2  < 0) then
         ! Outflow is not included because it was causing problems
         if((Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW)  .or.  &
@@ -231,15 +232,15 @@
            (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) .or.  &
            (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL)) then
            ! (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) ) then
-          a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
-          b(c1) = b(c1) + a12 * ui % n(c2)
+          m % val(m % dia(c1)) = m % val(m % dia(c1)) + m12
+          b(c1) = b(c1) + m12 * ui % n(c2)
         end if
       end if
 
       ! Here we clean up momentum from the false diffusion
       call Turb_Mod_Substract_Face_Stress(turb, ui_si, ui_di,            &
                                                 ui % n(c1), ui % n(c2),  &
-                                                a % fc(s), b, s)
+                                                m % fc(s), b, s)
 
     end do  ! through faces
 
@@ -253,13 +254,13 @@
     !   Inertial terms   !
     !                    !
     !--------------------!
-    call Numerics_Mod_Inertial_Term(ui, flow % density, sol, dt)
+    call Numerics_Mod_Inertial_Term(ui, flow % density, m, b, dt)
 
     !-------------------------------------------------!
     !   Save the coefficients for pressure equation   !
     !-------------------------------------------------!
     do c = 1, grid % n_cells
-      a % sav(c) = a % val(a % dia(c))
+      m % sav(c) = m % val(m % dia(c))
     end do
 
     !---------------------------------!
@@ -304,7 +305,7 @@
     !----------------------------------------!
     !   All other terms defined by the user  !
     !----------------------------------------!
-    call User_Mod_Force(flow, ui, a, b)
+    call User_Mod_Force(flow, ui, m, b)
 
     !-----------------------------------!
     !                                   !
@@ -318,13 +319,13 @@
     if(flow % piso_status .eqv. .false.) then
 
       ! Under-relax the equations
-      call Numerics_Mod_Under_Relax(ui, sol)
+      call Numerics_Mod_Under_Relax(ui, m, b)
 
       ! Call linear solver
       call Cpu_Timer_Mod_Start('Linear_Solver_For_Momentum')
 
       call Solver_Mod_Bicg(sol,           &
-                           a,             &
+                           m,             &
                            ui % n,        &
                            b,             &
                            ui % precond,  &
@@ -357,8 +358,8 @@
     call Field_Mod_Grad_Variable(flow, flow % w)
   end if
 
-  ! Refresh buffers for a % sav before discretizing for pressure
-  call Grid_Mod_Exchange_Cells_Real(grid, a % sav)
+  ! Refresh buffers for m % sav before discretizing for pressure
+  call Grid_Mod_Exchange_Cells_Real(grid, m % sav)
 
   ! User function
   call User_Mod_End_Of_Compute_Momentum(flow, turb, mult, ini)

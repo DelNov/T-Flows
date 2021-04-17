@@ -15,7 +15,7 @@
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: col
   type(Face_Type),   pointer :: v_flux
-  type(Matrix_Type), pointer :: a
+  type(Matrix_Type), pointer :: m
   real, contiguous,  pointer :: b(:)
   real, contiguous,  pointer :: surf_fx(:), surf_fy(:), surf_fz(:)
   integer                    :: s, c, c1, c2
@@ -32,7 +32,7 @@
   surf_fy => mult % surf_fy
   surf_fz => mult % surf_fz
   v_flux  => flow % v_flux
-  a       => sol % a
+  m       => sol % m
   b       => sol % b % val
 
   ! Surface tension contribution

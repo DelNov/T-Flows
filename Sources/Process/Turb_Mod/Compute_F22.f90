@@ -155,7 +155,7 @@
   !---------------------------------!
 
   ! Underrelax the equations
-  call Numerics_Mod_Under_Relax(phi, sol)
+  call Numerics_Mod_Under_Relax(phi, a, b)
 
   ! Call linear solver to solve the equations
   call Solver_Mod_Cg(sol,            &

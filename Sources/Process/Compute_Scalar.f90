@@ -83,7 +83,7 @@
   !   Advection   !
   !               !
   !---------------!
-  call Numerics_Mod_Advection_Term(phi, flow % density, v_flux % n, sol)
+  call Numerics_Mod_Advection_Term(phi, flow % density, v_flux % n, b)
 
   !--------------!
   !              !
@@ -237,7 +237,7 @@
   !   Inertial terms   !
   !                    !
   !--------------------!
-  call Numerics_Mod_Inertial_Term(phi, flow % density, sol, dt)
+  call Numerics_Mod_Inertial_Term(phi, flow % density, a, b, dt)
 
   !-------------------------------------!
   !                                     !
@@ -341,7 +341,7 @@
   !---------------------------------!
 
   ! Under-relax the equations
-  call Numerics_Mod_Under_Relax(phi, sol)
+  call Numerics_Mod_Under_Relax(phi, a, b)
 
   ! Call linear solver to solve them
   call Cpu_Timer_Mod_Start('Linear_Solver_For_Scalars')

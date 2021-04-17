@@ -1,21 +1,16 @@
 !==============================================================================!
-  subroutine Numerics_Mod_Under_Relax(phi, sol)
+  subroutine Numerics_Mod_Under_Relax(phi, a, b)
 !------------------------------------------------------------------------------!
 !   Purpose: Under-relax system of equations before calling linear solver.     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Var_Type)            :: phi
-  type(Solver_Type), target :: sol
+  type(Var_Type)    :: phi
+  type(Matrix_Type) :: a
+  real              :: b(:)
 !-----------------------------------[Locals]-----------------------------------!
-  type(Matrix_Type), pointer :: a
-  real,              pointer :: b(:)
-  integer                    :: c
+  integer :: c
 !==============================================================================!
-
-  ! Take aliases
-  a => sol % a
-  b => sol % b % val
 
   ! Browse through cells and under-relax
   do c = 1, phi % pnt_grid % n_cells

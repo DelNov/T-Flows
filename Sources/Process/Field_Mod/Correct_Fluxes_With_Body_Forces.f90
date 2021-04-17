@@ -13,7 +13,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: t
-  type(Matrix_Type), pointer :: a
+  type(Matrix_Type), pointer :: m               ! momentum matrix
   real, contiguous,  pointer :: b(:)
   real,              pointer :: u_relax
   integer                    :: c1, c2, s
@@ -25,7 +25,8 @@
   grid    => flow % pnt_grid
   t       => flow % t
   u_relax => flow % u_rel_corr
-  call Solver_Mod_Alias_System(sol, a, b)
+  m       => sol % m
+  b       => sol % b % val
 
   !-------------------------------!
   !   For Boussinesq hypothesis   !
@@ -90,8 +91,8 @@
              * (flow % density(c2) - flow % dens_ref)
 
         ! Units for a12: [m^4s/kg]
-        a12 = u_relax * 0.5 * (  grid % vol(c1) / a % sav(c1)     &
-                               + grid % vol(c2) / a % sav(c2) ) * a % fc(s)
+        a12 = u_relax * 0.5 * (  grid % vol(c1) / m % sav(c1)     &
+                               + grid % vol(c2) / m % sav(c2) ) * m % fc(s)
 
         ! Unit for gravity_source again: [m^3/s]
         gravity_source =  a12 * (gravity_source - dotprod)

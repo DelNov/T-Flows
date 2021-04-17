@@ -18,7 +18,8 @@
   type(Bulk_Type),   pointer :: bulk
   type(Var_Type),    pointer :: u, v, w, p, pp
   type(Face_Type),   pointer :: v_flux          ! volume flux
-  type(Matrix_Type), pointer :: a
+  type(Matrix_Type), pointer :: a               ! pressure matrix
+  type(Matrix_Type), pointer :: m               ! momentum matrix
   real,              pointer :: b(:)
   real,              pointer :: u_relax
   integer                    :: c, c1, c2, s, i_fac
@@ -35,6 +36,7 @@
   pp      => flow % pp
   dt      =  flow % dt
   a       => sol % a
+  m       => sol % m
   b       => sol % b % val
   u_relax => flow % u_rel_corr
 
@@ -52,18 +54,18 @@
   ! Normal correction
   if(.not. flow % mass_transfer) then
     do c = 1, grid % n_cells
-      u % n(c) = u % n(c) - u_relax * pp % x(c) * grid % vol(c) / a % sav(c)
-      v % n(c) = v % n(c) - u_relax * pp % y(c) * grid % vol(c) / a % sav(c)
-      w % n(c) = w % n(c) - u_relax * pp % z(c) * grid % vol(c) / a % sav(c)
+      u % n(c) = u % n(c) - u_relax * pp % x(c) * grid % vol(c) / m % sav(c)
+      v % n(c) = v % n(c) - u_relax * pp % y(c) * grid % vol(c) / m % sav(c)
+      w % n(c) = w % n(c) - u_relax * pp % z(c) * grid % vol(c) / m % sav(c)
     end do
 
   ! In case with mass transfer, dodge cells at the surface
   else
     do c = 1, grid % n_cells
       if(mult % cell_at_elem(c) .eq. 0) then
-        u % n(c) = u % n(c) - u_relax * pp % x(c) * grid % vol(c) / a % sav(c)
-        v % n(c) = v % n(c) - u_relax * pp % y(c) * grid % vol(c) / a % sav(c)
-        w % n(c) = w % n(c) - u_relax * pp % z(c) * grid % vol(c) / a % sav(c)
+        u % n(c) = u % n(c) - u_relax * pp % x(c) * grid % vol(c) / m % sav(c)
+        v % n(c) = v % n(c) - u_relax * pp % y(c) * grid % vol(c) / m % sav(c)
+        w % n(c) = w % n(c) - u_relax * pp % z(c) * grid % vol(c) / m % sav(c)
       end if
     end do
 

@@ -37,16 +37,17 @@
 
     type(Grid_Type), pointer :: pnt_grid
 
-    integer                  :: nonzeros  ! number of nonzero entries
-    real,    allocatable     :: val(:)    ! value
-    real,    allocatable     :: fc (:)    ! bare matrix entry for face
-    real,    allocatable     :: sav(:)    ! saved momentum diag. value
-    integer, allocatable     :: col(:)    ! beginning of each row   
-    integer, allocatable     :: row(:)    ! column positions
-    integer, allocatable     :: dia(:)    ! diagonal positions 
-    integer, allocatable     :: pos(:,:)  ! position in the matrix
-    integer, allocatable     :: mir(:)    ! mirror positions   
-  end type 
+    integer              :: nonzeros  ! number of nonzero entries
+    real,    allocatable :: val(:)    ! value
+    real,    allocatable :: fc (:)    ! bare matrix entry for face
+    real,    allocatable :: sav(:)    ! saved momentum diag. value
+    integer, allocatable :: col(:)    ! beginning of each row   
+    integer, allocatable :: row(:)    ! column positions
+    integer, allocatable :: dia(:)    ! diagonal positions 
+    integer, allocatable :: pos(:,:)  ! position in the matrix
+    integer, allocatable :: mir(:)    ! mirror positions   
+
+  end type
 
   contains
 

@@ -29,6 +29,11 @@
     type(Var_Type) :: vof
     type(Var_Type) :: smooth
 
+    ! Additional variables for calculation of vof
+    real, allocatable :: beta_f(:)
+    real, allocatable :: beta_c(:)
+    real, allocatable :: c_d(:)
+
     ! Surface curvature
     real, allocatable :: curv(:)
 

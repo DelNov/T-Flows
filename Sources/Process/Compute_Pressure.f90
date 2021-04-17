@@ -20,7 +20,8 @@
   type(Bulk_Type),   pointer :: bulk
   type(Var_Type),    pointer :: u, v, w, p, pp
   type(Face_Type),   pointer :: v_flux          ! volume flux
-  type(Matrix_Type), pointer :: a
+  type(Matrix_Type), pointer :: a               ! pressure matrix
+  type(Matrix_Type), pointer :: m               ! momentum matrix
   real, contiguous,  pointer :: b(:)
   real,              pointer :: u_relax
   integer                    :: s, c, c1, c2
@@ -62,6 +63,7 @@
   p       => flow % p
   pp      => flow % pp
   a       => sol % a
+  m       => sol % m
   b       => sol % b % val
   u_relax => flow % u_rel_corr
   dt      =  flow % dt
@@ -140,24 +142,24 @@
       ! a12 [m*m^3*s/kg = m^4s/kg]
       if(.not. flow % mass_transfer) then
         a12 = u_relax * 0.5 * a % fc(s)                    &
-                      * ( grid % vol(c1) / a % sav(c1)     &
-                        + grid % vol(c2) / a % sav(c2) )
+                      * ( grid % vol(c1) / m % sav(c1)     &
+                        + grid % vol(c2) / m % sav(c2) )
       else
         if(mult % cell_at_elem(c1) .eq. 0 .and.  &
            mult % cell_at_elem(c2) .eq. 0 .or.   &
            mult % cell_at_elem(c1) .ne. 0 .and.  &
            mult % cell_at_elem(c2) .ne. 0) then
           a12 = u_relax * 0.5 * a % fc(s)                    &
-                        * ( grid % vol(c1) / a % sav(c1)     &
-                          + grid % vol(c2) / a % sav(c2) )
+                        * ( grid % vol(c1) / m % sav(c1)     &
+                          + grid % vol(c2) / m % sav(c2) )
         else
           if(mult % cell_at_elem(c1) .eq. 0 .and.  &
              mult % cell_at_elem(c2) .ne. 0) then
-            a12 = u_relax * a % fc(s) * grid % vol(c1) / a % sav(c1)
+            a12 = u_relax * a % fc(s) * grid % vol(c1) / m % sav(c1)
           end if
           if(mult % cell_at_elem(c1) .ne. 0 .and.  &
              mult % cell_at_elem(c2) .eq. 0) then
-            a12 = u_relax * a % fc(s) * grid % vol(c2) / a % sav(c2)
+            a12 = u_relax * a % fc(s) * grid % vol(c2) / m % sav(c2)
           end if
         end if
       end if
@@ -220,12 +222,12 @@
       if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW .or.   &
          Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) then
 
-        a12 = a % fc(s) * grid % vol(c1) / a % sav(c1)
+        a12 = a % fc(s) * grid % vol(c1) / m % sav(c1)
         a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
 
       else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE) then
 
-        a12 = a % fc(s) * grid % vol(c1) / a % sav(c1)
+        a12 = a % fc(s) * grid % vol(c1) / m % sav(c1)
         a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
 
       end if
