@@ -110,7 +110,7 @@
   !----------------------------------!
   call Balance_Volume(flow, mult)
 
-  ! call Rhie_And_Chow(flow, mult, sol, ini)
+  call Rhie_And_Chow(flow, mult, sol, u_f, v_f, w_f)
 
   !-------------------------------------------------!
   !   Calculate the mass fluxes on the cell faces   !
@@ -122,21 +122,6 @@
 
     ! Face is inside the domain
     if(c2 > 0) then
-
-      ! Interpolate velocity
-
-      ! If there is a jump in velocities, call specialized gradient calculation
-      if(flow % mass_transfer) then
-        u_f(s) = Multiphase_Mod_Vof_Interpolate_Var_To_Face_With_Jump(mult, u, s)
-        v_f(s) = Multiphase_Mod_Vof_Interpolate_Var_To_Face_With_Jump(mult, v, s)
-        w_f(s) = Multiphase_Mod_Vof_Interpolate_Var_To_Face_With_Jump(mult, w, s)
-
-      ! No jumps, call usual routines
-      else
-        u_f(s) = Field_Mod_Interpolate_Var_To_Face(flow, u, s)
-        v_f(s) = Field_Mod_Interpolate_Var_To_Face(flow, v, s)
-        w_f(s) = Field_Mod_Interpolate_Var_To_Face(flow, w, s)
-      end if
 
       ! Calculate coeficients for the system matrix
       ! a12 [m*m^3*s/kg = m^4s/kg]

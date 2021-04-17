@@ -210,36 +210,36 @@ else
 endif
 
 # Modules in shared directory
-SRC_MOD += Cpu_Timer_Mod.f90	\
-           Math_Mod.f90		\
-           Sort_Mod.f90		\
-           File_Mod.f90		\
-           Control_Mod.f90	\
-           Vtk_Mod.f90		\
-           Grid_Mod.f90		\
-           Work_Mod.f90		\
+SRC_MOD += Cpu_Timer_Mod.f90      \
+           Math_Mod.f90           \
+           Sort_Mod.f90           \
+           File_Mod.f90           \
+           Control_Mod.f90        \
+           Vtk_Mod.f90            \
+           Grid_Mod.f90           \
+           Work_Mod.f90           \
            Metis_Options_Mod.f90
 
 # Sources for modules in the local directory
-SRC_MOD += Bulk_Mod.f90		\
-           Var_Mod.f90		\
-           Face_Mod.f90		\
-           Vert_Mod.f90		\
-           Elem_Mod.f90		\
-           Side_Mod.f90		\
-           Front_Mod.f90		\
-           Matrix_Mod.f90	\
-           Vector_Mod.f90	\
-           Solver_Mod.f90	\
-           Numerics_Mod.f90	\
-           Field_Mod.f90	\
-           Info_Mod.f90		\
-           Interface_Mod.f90	\
-           Eddies_Mod.f90	\
-           Monitor_Mod.f90	\
-           Turb_Mod.f90		\
-           Swarm_Mod.f90	\
-           Surf_Mod.f90		\
+SRC_MOD += Bulk_Mod.f90        \
+           Var_Mod.f90         \
+           Face_Mod.f90        \
+           Vert_Mod.f90        \
+           Elem_Mod.f90        \
+           Side_Mod.f90        \
+           Front_Mod.f90       \
+           Matrix_Mod.f90      \
+           Vector_Mod.f90      \
+           Solver_Mod.f90      \
+           Numerics_Mod.f90    \
+           Field_Mod.f90       \
+           Info_Mod.f90        \
+           Interface_Mod.f90   \
+           Eddies_Mod.f90      \
+           Monitor_Mod.f90     \
+           Turb_Mod.f90        \
+           Swarm_Mod.f90       \
+           Surf_Mod.f90        \
            Multiphase_Mod.f90
 
 # User_Mod should come before Results_Mod
@@ -250,7 +250,7 @@ SRC_MOD += Backup_Mod.f90
 
 # Results_Mod - conditional VTU/CGNS support
 ifeq ($(CGNS), no)
-  SRC_MOD += Save_Grid_Mod_Vtu.f90	\
+  SRC_MOD += Save_Grid_Mod_Vtu.f90  \
              Results_Mod_Vtu.f90
 else
   ifeq ($(MPI), yes)
@@ -258,7 +258,7 @@ else
   else
     SRC_MOD += Cgns_Mod_Seq.f90
   endif
-  SRC_MOD += Save_Grid_Mod_Cgns.f90	\
+  SRC_MOD += Save_Grid_Mod_Cgns.f90  \
              Results_Mod_Cgns.f90
 endif
 
@@ -286,22 +286,23 @@ SRC_FUN = Balance_Volume.f90                    \
           Read_Control_Numerical.f90            \
           Read_Control_Physical_Models.f90      \
           Read_Control_Physical_Properties.f90  \
+          Rhie_And_Chow.f90                     \
           Update_Boundary_Values.f90
 
 # Non-member functions still residing in Turb_Mod
-SRC_FUN += Tau_Wall_Low_Re.f90		\
-           Tau_Wall_Rough_Walls.f90	\
-           Y_Plus_Low_Re.f90		\
-           Y_Plus_Rough_Walls.f90	\
-           U_Plus_Log_Law.f90		\
-           U_Plus_Rough_Walls.f90	\
-           Time_And_Length_Scale.f90	\
-           Find_Nearest_Wall_Cell.f90	\
+SRC_FUN += Tau_Wall_Low_Re.f90         \
+           Tau_Wall_Rough_Walls.f90    \
+           Y_Plus_Low_Re.f90           \
+           Y_Plus_Rough_Walls.f90      \
+           U_Plus_Log_Law.f90          \
+           U_Plus_Rough_Walls.f90      \
+           Time_And_Length_Scale.f90   \
+           Find_Nearest_Wall_Cell.f90  \
            Roughness_Coefficient.f90
 
-SRC_FUN += Swap_Int.f90		\
-           Swap_Real.f90	\
-           Swap_Short.f90	\
+SRC_FUN += Swap_Int.f90       \
+           Swap_Real.f90      \
+           Swap_Short.f90     \
            To_Upper_Case.f90
 
 #----------------------------------------------------------------------
