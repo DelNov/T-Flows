@@ -1,20 +1,19 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Vof_Predict_Beta(mult, beta_f, beta_c, c_d)
+  subroutine Multiphase_Mod_Vof_Predict_Beta(mult)
 !------------------------------------------------------------------------------!
 !   Step 1 of CICSAM: Compute beta for computation of volume fraction          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Multiphase_Type), target :: mult
-  real                          :: beta_f(mult % pnt_grid % n_faces)
-  real                          :: beta_c(mult % pnt_grid % n_faces)
-  real                          :: c_d(-mult % pnt_grid % n_bnd_cells  &
-                                       :mult % pnt_grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: grid
   type(Field_Type), pointer :: flow
   type(Var_Type),   pointer :: vof
   type(Face_Type),  pointer :: v_flux
+  real, contiguous, pointer :: beta_f(:)
+  real, contiguous, pointer :: beta_c(:)
+  real, contiguous, pointer :: c_d(:)
   integer                   :: s
   integer                   :: c1, c2, donor, accept
   real                      :: dotprod
@@ -27,8 +26,11 @@
   ! Take aliases
   flow   => mult % pnt_flow
   grid   => flow % pnt_grid
-  vof    => mult % vof
   v_flux => flow % v_flux
+  vof    => mult % vof
+  beta_f => mult % beta_f
+  beta_c => mult % beta_c
+  c_d    => mult % c_d
 
   if(vof % adv_scheme .eq. CICSAM) then
 

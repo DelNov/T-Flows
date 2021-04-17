@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Vof_Coefficients(mult, a, b, dt, beta_f)
+  subroutine Multiphase_Mod_Vof_Coefficients(mult, a, b, dt)
 !------------------------------------------------------------------------------!
 !   Computes matrix coefficients for volume fraction equation                  !
 !------------------------------------------------------------------------------!
@@ -9,13 +9,13 @@
   type(Matrix_Type),     target :: a
   real,                  target :: b(:)
   real                          :: dt
-  real                          :: beta_f(:)
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: flow
   type(Grid_Type),  pointer :: grid
   type(Face_Type),  pointer :: v_flux
   type(Var_Type),   pointer :: vof
   type(Front_Type), pointer :: front
+  real, contiguous, pointer :: beta_f(:)
   integer                   :: c, c1, c2, s, l, g, e
   real                      :: upwd1, upwd2, upwd3, a0
   real                      :: vof_int, x_int, y_int, z_int, w_c1
@@ -26,6 +26,7 @@
   grid   => flow % pnt_grid
   v_flux => flow % v_flux
   vof    => mult % vof
+  beta_f => mult % beta_f
   front  => mult % front
 
   ! Distinguish between liquid and vapor

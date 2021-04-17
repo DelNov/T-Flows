@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Vof_Max_Courant_Number(mult, dt, c_d, interf, courant_max)
+  subroutine Vof_Max_Courant_Number(mult, dt, interf, courant_max)
 !------------------------------------------------------------------------------!
 !   Computes the Maximum Courant Number at cells. The argument interf helps    !
 !   selecting if calculation will be performed close the interface, which      !
@@ -9,9 +9,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Multiphase_Type), target :: mult
-  real                          :: dt     ! time step
-  real                          :: c_d(-mult % pnt_grid % n_bnd_cells:  &
-                                        mult % pnt_grid % n_cells) ! Courant n.
+  real                          :: dt            ! time step
   integer, intent(in)           :: interf
   real                          :: courant_max
 !--------------------------------[Locals]--------------------------------------!
@@ -19,6 +17,7 @@
   type(Grid_Type),  pointer :: grid
   type(Var_Type),   pointer :: vof
   type(Face_Type),  pointer :: v_flux
+  real, contiguous, pointer :: c_d(:)
   integer                   :: c, c1, c2, s
   real                      :: vof_dist
 !==============================================================================!
@@ -28,6 +27,7 @@
   v_flux => flow % v_flux
   grid   => flow % pnt_grid
   vof    => mult % vof
+  c_d    => mult % c_d
 
   courant_max = -HUGE
 

@@ -28,6 +28,11 @@
   ! Surface curvature
   allocate(mult % curv(-nb:nc));  mult % curv(-nb:nc) = 0.0
 
+  ! Additional variables for calculation of vof
+  allocate(mult % beta_f (nf));  mult % beta_f(1:nf) = 0.0
+  allocate(mult % beta_c (nf));  mult % beta_c(1:nf) = 0.0
+  allocate(mult % c_d(-nb:nc));  mult % c_d (-nb:nc) = 0.0
+
   ! Surface normals
   allocate(mult % nx(-nb:nc));  mult % nx(-nb:nc) = 0.0
   allocate(mult % ny(-nb:nc));  mult % ny(-nb:nc) = 0.0
@@ -39,9 +44,9 @@
   allocate(mult % surf_fz(-nb:nc));  mult % surf_fz(-nb:nc) = 0.0
 
   if(flow % mass_transfer) then
-    allocate(mult % qci  (-nb:nc));        mult % qci         (-nb:nc) = 0.0
+    allocate(mult % qci         (-nb:nc)); mult % qci         (-nb:nc) = 0.0
     allocate(mult % cell_at_elem(-nb:nc)); mult % cell_at_elem(-nb:nc) = 0
-    allocate(mult % m_dot(-nb:nc));        mult % m_dot       (-nb:nc) = 0.0
+    allocate(mult % m_dot       (-nb:nc)); mult % m_dot       (-nb:nc) = 0.0
     call Var_Mod_Allocate_New_Only(mult % var, grid, 'PHV')
   end if
 

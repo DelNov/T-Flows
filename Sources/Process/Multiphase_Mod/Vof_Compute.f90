@@ -3,11 +3,6 @@
 !------------------------------------------------------------------------------!
 !   Solves Volume Fraction equation using UPWIND ADVECTION and CICSAM          !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: beta_f => r_face_01,  &
-                      beta_c => r_face_02,  &
-                      c_d    => r_cell_30
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Multiphase_Type), target :: mult
@@ -21,6 +16,9 @@
   type(Face_Type),   pointer :: v_flux
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
+  real, contiguous,  pointer :: beta_f(:)
+  real, contiguous,  pointer :: beta_c(:)
+  real, contiguous,  pointer :: c_d(:)
   real                       :: courant_max
   integer                    :: i_sub, n_sub, wrong_vf, n_wrong_vf0, n_wrong_vf1
   integer                    :: s, c, c1, c2, fu, corr
@@ -33,15 +31,18 @@
   grid   => flow % pnt_grid
   v_flux => flow % v_flux
   vof    => mult % vof
-  a => sol % a
-  b => sol % b % val
+  beta_f => mult % beta_f
+  beta_c => mult % beta_c
+  c_d    => mult % c_d
+  a      => sol % a
+  b      => sol % b % val
 
   if(vof % adv_scheme .eq. CICSAM .or. &
      vof % adv_scheme .eq. STACS) then
 
     if(vof % adv_scheme .eq. CICSAM) then
       ! Compute courant Number close to the interface:
-      call Vof_Max_Courant_Number(mult, dt, c_d, 1, courant_max)
+      call Vof_Max_Courant_Number(mult, dt, 1, courant_max)
 
       n_sub = min(max(ceiling(courant_max / mult % courant_max_param), 1),  &
                   mult % n_sub_param)
@@ -69,7 +70,7 @@
     !   Matrix Coefficients   !
     !-------------------------!
 
-    call Multiphase_Mod_Vof_Coefficients(mult, a, b, dt, beta_f)
+    call Multiphase_Mod_Vof_Coefficients(mult, a, b, dt)
 
     ! Solve System
     call Multiphase_Mod_Vof_Solve_System(mult, sol, b)
@@ -90,8 +91,7 @@
     do i_sub = 1, n_sub
 
       ! Courant number full domain:
-      call Vof_Max_Courant_Number(mult, dt / real(n_sub),    &
-                                  c_d, 0, courant_max)
+      call Vof_Max_Courant_Number(mult, dt / real(n_sub), 0, courant_max)
 
       !---------------------------!
       !   Predict beta at faces   !
@@ -115,16 +115,14 @@
       ! Compute gradient:
       call Field_Mod_Grad_Variable(flow, vof)
 
-      call Multiphase_Mod_Vof_Predict_Beta(mult, beta_f, beta_c, c_d)
+      call Multiphase_Mod_Vof_Predict_Beta(mult)
 
       do corr = 1, mult % corr_num_max
         !-------------------------!
         !   Matrix coefficients   !
         !-------------------------!
 
-        call Multiphase_Mod_Vof_Coefficients(mult, a, b,         &
-                                             dt / real(n_sub),   &
-                                             beta_f)
+        call Multiphase_Mod_Vof_Coefficients(mult, a, b, dt / real(n_sub))
 
         ! Solve System
         call Multiphase_Mod_Vof_Solve_System(mult, sol, b)
@@ -169,7 +167,7 @@
         if(wrong_vf == 0) then
           goto 1
         else
-          call Multiphase_Mod_Vof_Correct_Beta(mult, beta_f, c_d)
+          call Multiphase_Mod_Vof_Correct_Beta(mult)
         end if
 
       end do
