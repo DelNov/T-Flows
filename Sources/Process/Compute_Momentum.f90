@@ -345,7 +345,8 @@
 
   end do  ! browsing through components
 
-  call Update_Boundary_Values(flow, turb, mult)
+  ! Update boundary values for momentum
+  call Update_Boundary_Values(flow, turb, mult, 'MOMENTUM')
 
   ! Refresh gradients for all three velocity components
   if(mult % model .eq. VOLUME_OF_FLUID .and. flow % mass_transfer) then

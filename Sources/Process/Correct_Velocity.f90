@@ -130,7 +130,7 @@
   !   Compute velocity gradients, taking jump into account   !
   !----------------------------------------------------------!
 
-  call Update_Boundary_Values(flow, turb, mult)
+  call Update_Boundary_Values(flow, turb, mult, 'MOMENTUM')
 
   ! If there is a jump in velocities, call specialized gradient calculation
   if(mult % model .eq. VOLUME_OF_FLUID .and. flow % mass_transfer) then
