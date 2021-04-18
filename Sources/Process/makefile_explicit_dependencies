@@ -154,10 +154,6 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 #-- ./Eddies_Mod/Gather_Bnd_Cells.f90
 #-- ./Eddies_Mod/Allocate.f90
 #-- ./Multiphase_Mod/Vof_Compute.f90
-$(DIR_OBJECT)/Vof_Compute.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 
-
 #-- ./Multiphase_Mod/Vof_Predict_Beta.f90
 #-- ./Multiphase_Mod/Vof_Allocate.f90
 #-- ./Multiphase_Mod/Vof_Momentum_Contribution.f90
@@ -178,11 +174,9 @@ $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 
 
 #-- ./Multiphase_Mod/Vof_Interpolate_Var_To_Face_With_Jump.f90
-#-- ./Multiphase_Mod/Vof_Mass_Transfer_Rate_In.f90
+#-- ./Multiphase_Mod/Vof_Mass_Transfer_Pressure_Source.f90
 #-- ./Multiphase_Mod/Vof_Solve_System.f90
 #-- ./Multiphase_Mod/Vof_Physical_Properties.f90
-#-- ./Multiphase_Mod/Vof_Mass_Transfer.f90
-#-- ./Multiphase_Mod/Vof_Averaging.f90
 #-- ./Multiphase_Mod/Vof_Smooth_Curvature.f90
 $(DIR_OBJECT)/Vof_Smooth_Curvature.o:\
 $(DIR_OBJECT)/Work_Mod.o \
@@ -190,6 +184,8 @@ $(DIR_SHARED)/Work_Mod/*.f90
 
 #-- ./Multiphase_Mod/Vof_Main.f90
 #-- ./Multiphase_Mod/Vof_Correct_Beta.f90
+#-- ./Multiphase_Mod/Vof_Mass_Transfer_Vof_Source.f90
+#-- ./Multiphase_Mod/Vof_Mass_Transfer_Added_Volume.f90
 #-- ./Multiphase_Mod/Vof_Find_Upstream_Phi.f90
 #-- ./Info_Mod.f90
 $(DIR_OBJECT)/Info_Mod.o:\
@@ -239,8 +235,6 @@ $(DIR_SHARED)/Control_Mod/*/*.f90
 #-- ./Info_Mod/Bulk_Print.f90
 #-- ./Compute_Pressure.f90
 $(DIR_OBJECT)/Compute_Pressure.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_OBJECT)/User_Mod.o \
 User_Mod/*.f90 
 
@@ -489,6 +483,7 @@ $(DIR_SHARED)/Control_Mod/*/*.f90
 #-- ./Field_Mod/Alias_Momentum.f90
 #-- ./Field_Mod/Grad_Component_Cells_To_Nodes.f90
 #-- ./Field_Mod/Grad_Pressure.f90
+#-- ./Field_Mod/Calculate_Grad_Matrix_Cell_By_Cell.f90
 #-- ./Field_Mod/Potential_Initialization.f90
 $(DIR_OBJECT)/Potential_Initialization.o:\
 $(DIR_OBJECT)/Work_Mod.o \
@@ -503,6 +498,7 @@ $(DIR_SHARED)/Work_Mod/*.f90
 #-- ./Field_Mod/Calculate_Grad_Matrix.f90
 #-- ./Field_Mod/Grad_Component_Nodes_To_Cells.f90
 #-- ./Field_Mod/Grad_Component.f90
+#-- ./Field_Mod/Calculate_Grad_Matrix_For_Cell.f90
 #-- ./Field_Mod/Calculate_Fluxes.f90
 #-- ./Field_Mod/Interpolate_To_Face.f90
 #-- ./Field_Mod/U_Tan.f90
@@ -523,6 +519,13 @@ $(DIR_SHARED)/Work_Mod/*.f90
 #-- ./Monitor_Mod/Write_4_Vars.f90
 #-- ./Monitor_Mod/Write_5_Vars.f90
 #-- ./Side_Mod.f90
+#-- ./Rhie_And_Chow.f90
+$(DIR_OBJECT)/Rhie_And_Chow.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*.f90 \
+$(DIR_OBJECT)/User_Mod.o \
+User_Mod/*.f90 
+
 #-- ./Multiphase_Mod.f90
 $(DIR_OBJECT)/Multiphase_Mod.o:\
 $(DIR_OBJECT)/Work_Mod.o \
@@ -548,7 +551,6 @@ User_Mod/*.f90
 #-- ./User_Mod/Save_Results.f90
 #-- ./User_Mod/End_Of_Compute_Scalar.f90
 #-- ./User_Mod/Initialize_Variables.f90
-#-- ./User_Mod/Vof_Interface_Ellipsoid.f90
 #-- ./User_Mod/End_Of_Compute_Momentum.f90
 #-- ./User_Mod/Beginning_Of_Time_Step.f90
 #-- ./User_Mod/Beginning_Of_Compute_Energy.f90
@@ -558,11 +560,6 @@ User_Mod/*.f90
 #-- ./User_Mod/Beginning_Of_Correct_Velocity.f90
 #-- ./User_Mod/End_Of_Simulation.f90
 #-- ./User_Mod/Beginning_Of_Iteration.f90
-#-- ./User_Mod/Vof_Initialization_Ellipsoid.f90
-$(DIR_OBJECT)/Vof_Initialization_Ellipsoid.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 
-
 #-- ./User_Mod/End_Of_Compute_Pressure.f90
 #-- ./User_Mod/Beginning_Of_Compute_Momentum.f90
 #-- ./User_Mod/Interface_Exchange.f90
@@ -571,7 +568,6 @@ $(DIR_SHARED)/Work_Mod/*.f90
 #-- ./User_Mod/Source.f90
 #-- ./User_Mod/Before_Exit.f90
 #-- ./User_Mod/End_Of_Correct_Velocity.f90
-#-- ./User_Mod/Vof_Exact_Cylinder.f90
 #-- ./User_Mod/Types.f90
 #-- ./User_Mod/End_Of_Iteration.f90
 #-- ./User_Mod/End_Of_Compute_Energy.f90
@@ -637,6 +633,26 @@ $(DIR_OBJECT)/Field_Mod.o \
 Field_Mod/*.f90 \
 $(DIR_OBJECT)/Eddies_Mod.o \
 Eddies_Mod/*.f90 \
+$(DIR_OBJECT)/Control_Mod.o \
+$(DIR_SHARED)/Control_Mod/*/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o \
+$(DIR_SHARED)/Comm_Mod_Seq.f90 \
+$(DIR_SHARED)/Comm_Mod_Par.f90 \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 
+
+#-- ./Global_Mod.f90
+$(DIR_OBJECT)/Global_Mod.o:\
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
+$(DIR_OBJECT)/Multiphase_Mod.o \
+Multiphase_Mod/*.f90 \
+$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
+$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
+$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 $(DIR_SHARED)/Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
@@ -906,15 +922,10 @@ $(DIR_OBJECT)/Backup_Mod.o \
 Backup_Mod/*.f90 
 
 #-- ./Front_Mod/Handle_4_Points.f90
-#-- ./Front_Mod/Relax_Topology.f90
-#-- ./Front_Mod/Split_Element.f90
 #-- ./Front_Mod/Compress_Vertices.f90
 #-- ./Front_Mod/Find_Nearest_Cell.f90
-#-- ./Front_Mod/Refine.f90
 #-- ./Front_Mod/Calculate_Element_Centroids.f90
-#-- ./Front_Mod/Find_Boundaries.f90
-#-- ./Front_Mod/Count_Vertex_Elements.f90
-#-- ./Front_Mod/Calculate_Curvatures_From_Verts.f90
+#-- ./Front_Mod/Initialize.f90
 #-- ./Front_Mod/Find_Nearest_Node.f90
 #-- ./Front_Mod/Place_At_Var_Value.f90
 $(DIR_OBJECT)/Place_At_Var_Value.o:\
@@ -922,25 +933,20 @@ $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 
 
 #-- ./Front_Mod/Handle_5_Points.f90
+#-- ./Front_Mod/Find_Connectivity.f90
 #-- ./Front_Mod/Clean.f90
-#-- ./Front_Mod/Relax_Geometry.f90
-#-- ./Front_Mod/Find_Sides.f90
-#-- ./Front_Mod/Smooth.f90
 #-- ./Front_Mod/Compute_Distance_Function_And_Vof.f90
 $(DIR_OBJECT)/Compute_Distance_Function_And_Vof.o:\
 $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 
 
 #-- ./Front_Mod/Calculate_Element_Normals.f90
-#-- ./Front_Mod/Swap_Side.f90
 #-- ./Front_Mod/Find_Vertex_Elements.f90
 #-- ./Front_Mod/Print_Statistics.f90
 #-- ./Front_Mod/Handle_3_Points.f90
-#-- ./Front_Mod/Calculate_Curvatures_From_Edges.f90
 #-- ./Front_Mod/Calculate_Curvatures_From_Elems.f90
 #-- ./Front_Mod/Allocate.f90
 #-- ./Front_Mod/Handle_6_Points.f90
-#-- ./Front_Mod/Count_Elements_Neighbours.f90
 #-- ./Front_Mod/Edge_Numbering.f90
 #-- ./Piso_Algorithm.f90
 $(DIR_OBJECT)/Piso_Algorithm.o:\
@@ -1048,6 +1054,7 @@ $(DIR_SHARED)/File_Mod/*.f90
 #-- ./Control_Mod/Numerics/Temporal_Pressure_Correction.f90
 #-- ./Control_Mod/Numerics/Tolerance_For_Pressure_Solver.f90
 #-- ./Control_Mod/Input_Output/Load_Backup_Name.f90
+#-- ./Control_Mod/Input_Output/Save_Initial_Condition.f90
 #-- ./Control_Mod/Input_Output/Results_Save_Interval.f90
 #-- ./Control_Mod/Input_Output/Save_Initial_Solution_Name.f90
 #-- ./Control_Mod/Input_Output/Backup_Save_Interval.f90
