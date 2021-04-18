@@ -352,7 +352,7 @@
 
         ! Update the values at boundaries
         call Convective_Outflow(flow(d), turb(d), mult(d))
-        call Update_Boundary_Values(flow(d), turb(d), mult(d))
+        call Update_Boundary_Values(flow(d), turb(d), mult(d), 'ALL')
 
         ! End of the current iteration
         call Info_Mod_Iter_Print(d)
