@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Field_Mod_Body_Forces(flow)
+  subroutine Field_Mod_Buoyancy_Forces(flow)
 !------------------------------------------------------------------------------!
 !   Calculates body forces (Only due to buoyancy for the time being)           !
 !------------------------------------------------------------------------------!
@@ -12,7 +12,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: t
-  integer                    :: c1, c2, s
+  integer                    :: c, c1, c2, s
   real                       :: xc1, yc1, zc1, xc2, yc2, zc2, dotprod, dens_f
 !==============================================================================!
 
@@ -21,9 +21,12 @@
   t    => flow % t
 
   ! Initialize
-  flow % body_fx(:) = 0.0
-  flow % body_fy(:) = 0.0
-  flow % body_fz(:) = 0.0
+  flow % face_fx(:) = 0.0
+  flow % face_fy(:) = 0.0
+  flow % face_fz(:) = 0.0
+  flow % cell_fx(:) = 0.0
+  flow % cell_fy(:) = 0.0
+  flow % cell_fz(:) = 0.0
 
   !-------------------------------!
   !   For Boussinesq hypothesis   !
@@ -68,15 +71,15 @@
                   + (grid % yf(s) - yc1) * grav_y    &
                   + (grid % zf(s) - zc1) * grav_z )
 
-      flow % body_fx(c1) = flow % body_fx(c1)          &
+      flow % cell_fx(c1) = flow % cell_fx(c1)          &
                          + dens_f * t_face_delta(s)    &
                          * flow % beta * grid % sx(s) * dotprod
 
-      flow % body_fy(c1) = flow % body_fy(c1)          &
+      flow % cell_fy(c1) = flow % cell_fy(c1)          &
                          + dens_f * t_face_delta(s)    &
                          * flow % beta * grid % sy(s) * dotprod
 
-      flow % body_fz(c1) = flow % body_fz(c1)          &
+      flow % cell_fz(c1) = flow % cell_fz(c1)          &
                          + dens_f * t_face_delta(s)    &
                          * flow % beta * grid % sz(s) * dotprod
 
@@ -88,15 +91,15 @@
                     + (grid % yf(s) - yc2) * grav_y    &
                     + (grid % zf(s) - zc2) * grav_z )
 
-        flow % body_fx(c2) = flow % body_fx(c2)          &
+        flow % cell_fx(c2) = flow % cell_fx(c2)          &
                            - dens_f * t_face_delta(s)    &
                            * flow % beta * grid % sx(s) * dotprod
 
-        flow % body_fy(c2) = flow % body_fy(c2)          &
+        flow % cell_fy(c2) = flow % cell_fy(c2)          &
                            - dens_f * t_face_delta(s)    &
                            * flow % beta * grid % sy(s) * dotprod
 
-        flow % body_fz(c2) = flow % body_fz(c2)          &
+        flow % cell_fz(c2) = flow % cell_fz(c2)          &
                            - dens_f * t_face_delta(s)    &
                            * flow % beta * grid % sz(s) * dotprod
       end if
@@ -104,8 +107,8 @@
 
   end if  ! buoyancy
 
-  call Grid_Mod_Exchange_Cells_Real(grid, flow % body_fx)
-  call Grid_Mod_Exchange_Cells_Real(grid, flow % body_fy)
-  call Grid_Mod_Exchange_Cells_Real(grid, flow % body_fz)
+  call Grid_Mod_Exchange_Cells_Real(grid, flow % cell_fx)
+  call Grid_Mod_Exchange_Cells_Real(grid, flow % cell_fy)
+  call Grid_Mod_Exchange_Cells_Real(grid, flow % cell_fz)
 
   end subroutine

@@ -63,19 +63,19 @@
 
         ! Interpolate gradients (equation 3.61 in Denner's thesis)
         ! Unit for dotprod: [kg/m/s^2]
-        dotprod = 0.5 * dens_h * ( flow % body_fx(c1) / grid % vol(c1)    &
+        dotprod = 0.5 * dens_h * ( flow % cell_fx(c1) / grid % vol(c1)    &
                                  / flow % density(c1)                     &
-                                 + flow % body_fx(c2) / grid % vol(c2)    &
+                                 + flow % cell_fx(c2) / grid % vol(c2)    &
                                  / flow % density(c2) )                   &
                                  * grid % dx(s)                           &
-                + 0.5 * dens_h * ( flow % body_fy(c1) / grid % vol(c1)    &
+                + 0.5 * dens_h * ( flow % cell_fy(c1) / grid % vol(c1)    &
                                  / flow % density(c1)                     &
-                                 + flow % body_fy(c2) / grid % vol(c2)    &
+                                 + flow % cell_fy(c2) / grid % vol(c2)    &
                                  / flow % density(c2) )                   &
                                  * grid % dy(s)                           &
-                + 0.5 * dens_h * ( flow % body_fz(c1) / grid % vol(c1)    &
+                + 0.5 * dens_h * ( flow % cell_fz(c1) / grid % vol(c1)    &
                                  / flow % density(c1)                     &
-                                 + flow % body_fz(c2) / grid % vol(c2)    &
+                                 + flow % cell_fz(c2) / grid % vol(c2)    &
                                  / flow % density(c2) )                   &
                                  * grid % dz(s)
 

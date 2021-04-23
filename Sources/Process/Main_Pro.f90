@@ -323,11 +323,6 @@
 
         call Field_Mod_Grad_Pressure(flow(d), flow(d) % p)
 
-        ! Buoyancy force if no VOF is used (VOF calls it above)
-        if(mult(d) % model .ne. VOLUME_OF_FLUID) then
-          call Field_Mod_Body_Forces(flow(d))
-        end if
-
         ! All three velocity components one after another
         call Compute_Momentum(flow(d), turb(d), mult(d), sol(d), ini)
         call Compute_Pressure(flow(d), mult(d), sol(d), ini)

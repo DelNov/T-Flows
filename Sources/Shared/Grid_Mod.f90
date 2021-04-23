@@ -51,6 +51,10 @@
     ! Cell volumes
     real, allocatable :: vol(:)
 
+    ! Fractional cell volumes around faces
+    real, allocatable :: dv1(:)
+    real, allocatable :: dv2(:)
+
     ! Wall distance - distance from the nearest wall
     real, allocatable :: wall_dist(:)
 

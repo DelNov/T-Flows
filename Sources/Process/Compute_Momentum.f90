@@ -22,7 +22,7 @@
   real, contiguous,  pointer :: b(:)
   real, contiguous,  pointer :: ui_i(:), ui_j(:), ui_k(:), uj_i(:), uk_i(:)
   real, contiguous,  pointer :: si(:), sj(:), sk(:), di(:), dj(:), dk(:)
-  real, contiguous,  pointer :: h_i(:), body_fi(:)
+  real, contiguous,  pointer :: fi(:), hi(:), cell_fi(:)
   integer                    :: s, c, c1, c2, i
   real                       :: f_ex, f_im, f_stress
   real                       :: vel_max, dt
@@ -100,6 +100,15 @@
   m      => sol % m
   b      => sol % b % val
 
+  ! Buoyancy force if no VOF is used (VOF calls it from its main)
+  ! Now this is a bit stupid.  I do understand that VOF changes only once
+  ! before iterations in a time step begin, but buoyancy forces might still
+  ! be changing due to temperture differrences which are evoling at the
+  ! same time as momentum equations.
+  if(mult % model .ne. VOLUME_OF_FLUID) then
+    call Field_Mod_Buoyancy_Forces(flow)
+  end if
+
   !--------------------------------------------!
   !                                            !
   !                                            !
@@ -114,8 +123,9 @@
       ui_i => ui % x;     ui_j => ui % y;     ui_k => ui % z
       si   => grid % sx;  sj   => grid % sy;  sk   => grid % sz
       di   => grid % dx;  dj   => grid % dy;  dk   => grid % dz
-      h_i  => p % x;      uj_i => uj % x;     uk_i => uk % x
-      body_fi  => flow % body_fx
+      hi   => p % x;      uj_i => uj % x;     uk_i => uk % x
+      fi       => flow % fx
+      cell_fi  => flow % cell_fx
       grav_i   =  grav_x
       p_drop_i =  bulk % p_drop_x
     end if
@@ -124,8 +134,9 @@
       ui_i => ui % y;     ui_j => ui % z;     ui_k => ui % x
       si   => grid % sy;  sj   => grid % sz;  sk   => grid % sx
       di   => grid % dy;  dj   => grid % dz;  dk   => grid % dx
-      h_i  => p % y;      uj_i => uj % y;     uk_i => uk % y
-      body_fi  => flow % body_fy
+      hi   => p % y;      uj_i => uj % y;     uk_i => uk % y
+      fi       => flow % fy
+      cell_fi  => flow % cell_fy
       grav_i   =  grav_y
       p_drop_i =  bulk % p_drop_y
     end if
@@ -134,8 +145,9 @@
       ui_i => ui % z;     ui_j => ui % x;     ui_k => ui % y
       si   => grid % sz;  sj   => grid % sx;  sk   => grid % sy
       di   => grid % dz;  dj   => grid % dx;  dk   => grid % dy
-      h_i  => p % z;      uj_i => uj % z;     uk_i => uk % z
-      body_fi  => flow % body_fz
+      hi   => p % z;      uj_i => uj % z;     uk_i => uk % z
+      fi       => flow % fz
+      cell_fi  => flow % cell_fz
       grav_i   =  grav_z
       p_drop_i =  bulk % p_drop_z
     end if
@@ -144,6 +156,7 @@
     call User_Mod_Beginning_Of_Compute_Momentum(flow, turb, mult, ini)
 
     ! Initialize matrix and right hand side
+    fi     (:) = 0.0  ! all "internal" forces acting on this component
     m % val(:) = 0.0
     b      (:) = 0.0
     f_stress   = 0.0
@@ -170,7 +183,7 @@
     !   Advection   !
     !               !
     !---------------!
-    call Numerics_Mod_Advection_Term(ui, flow % density, v_flux % n, b)
+    call Numerics_Mod_Advection_Term(ui, flow % density, v_flux % n, fi)
 
     !---------------!
     !               !
@@ -233,20 +246,20 @@
            (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL)) then
            ! (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) ) then
           m % val(m % dia(c1)) = m % val(m % dia(c1)) + m12
-          b(c1) = b(c1) + m12 * ui % n(c2)
+          fi(c1) = fi(c1) + m12 * ui % n(c2)
         end if
       end if
 
       ! Here we clean up momentum from the false diffusion
       call Turb_Mod_Substract_Face_Stress(turb, ui_si, ui_di,            &
                                                 ui % n(c1), ui % n(c2),  &
-                                                m % fc(s), b, s)
+                                                m % fc(s), fi, s)
 
     end do  ! through faces
 
     ! Explicit treatment for cross diffusion terms
     do c = 1, grid % n_cells
-      b(c) = b(c) + ui % c(c)
+      fi(c) = fi(c) + ui % c(c)
     end do
 
     !--------------------!
@@ -254,18 +267,11 @@
     !   Inertial terms   !
     !                    !
     !--------------------!
-    call Numerics_Mod_Inertial_Term(ui, flow % density, m, b, dt)
-
-    !-------------------------------------------------!
-    !   Save the coefficients for pressure equation   !
-    !-------------------------------------------------!
-    do c = 1, grid % n_cells
-      m % sav(c) = m % val(m % dia(c))
-    end do
+    call Numerics_Mod_Inertial_Term(ui, flow % density, m, fi, dt)
 
     !---------------------------------!
     !                                 !
-    !   Pressure term contributions   !
+    !   Various force contributions   !
     !                                 !
     !---------------------------------!
 
@@ -273,39 +279,42 @@
     !   Global pressure drop   !
     !--------------------------!
     do c = 1, grid % n_cells
-      b(c) = b(c) + p_drop_i * grid % vol(c)
-    end do
-
-    !---------------------------------!
-    !   Local pressure distribution   !
-    !---------------------------------!
-    do c = 1, grid % n_cells
-      b(c) = b(c) - h_i(c) * grid % vol(c)
+      fi(c) = fi(c) + p_drop_i * grid % vol(c)
     end do
 
     !--------------------!
-    !   Buoyancy force   !
+    !   Buoyancy force   !  (Units are ugly, different from others :-/)
     !--------------------!
     do c = 1, grid % n_cells
-      b(c) = b(c) + body_fi(c)
+      fi(c) = fi(c) + cell_fi(c)
     end do
 
     !----------------------------------!
     !   Surface tension contribution   !
     !----------------------------------!
     if(mult % model .eq. VOLUME_OF_FLUID) then
-      call Multiphase_Mod_Vof_Momentum_Contribution(mult, sol, i)
+      call Multiphase_Mod_Vof_Momentum_Contribution(mult, fi, i)
     end if
+
+    !----------------------------------------!
+    !   All other terms defined by the user  !
+    !----------------------------------------!
+    call User_Mod_Force(flow, ui, m, fi)
+
+    !-----------------------------------------------------------!
+    !                                                           !
+    !   Copy forces from current component to right hand side   !
+    !   (Note: pressure gradients are not with other forces)    !
+    !                                                           !
+    !-----------------------------------------------------------!
+    do c = 1, grid % n_cells
+      b(c) = fi(c) - hi(c) * grid % vol(c)
+    end do
 
     !----------------------------------------------!
     !   Explicit solution for the PISO algorithm   !
     !----------------------------------------------!
     call Compute_Momentum_Explicit(flow, ui, sol)
-
-    !----------------------------------------!
-    !   All other terms defined by the user  !
-    !----------------------------------------!
-    call User_Mod_Force(flow, ui, m, b)
 
     !-----------------------------------!
     !                                   !
@@ -359,7 +368,13 @@
     call Field_Mod_Grad_Variable(flow, flow % w)
   end if
 
-  ! Refresh buffers for m % sav before discretizing for pressure
+  !------------------------------------------------------------------!
+  !   Save the coefficients from the discretized momentum equation   !
+  !    and refresh their buffers before discretizing for pressure    !
+  !------------------------------------------------------------------!
+  do c = 1, grid % n_cells
+    m % sav(c) = m % val(m % dia(c))
+  end do
   call Grid_Mod_Exchange_Cells_Real(grid, m % sav)
 
   ! User function

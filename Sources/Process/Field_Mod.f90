@@ -91,10 +91,22 @@
     real, allocatable :: grad_n2c(:,:)
     real, allocatable :: grad_c2n(:,:)
 
-    ! Body force
-    real, allocatable :: body_fx(:)
-    real, allocatable :: body_fy(:)
-    real, allocatable :: body_fz(:)
+    ! Internal forces on the fluid.
+    ! These includes forces due to discretization (cross diffusion terms),
+    ! boundary conditions (diffusive or advective), under-relaxation
+    real, allocatable :: fx(:)
+    real, allocatable :: fy(:)
+    real, allocatable :: fz(:)
+
+    ! External "body" forces on the fluid.
+    ! These includes body forces such as: buoyancy, gravity, surface tension
+    ! These need special treatment according to Mencinger and Zun (2007) for
+    ! proper linking with Rhie and Chow algorithm.  Therefore, two variants
+    ! are included: face based forces and cell based forces.  The cell based
+    ! forces must be derived from face based forces and properly linked.
+    real, allocatable :: face_fx(:), cell_fx(:)
+    real, allocatable :: face_fy(:), cell_fy(:)
+    real, allocatable :: face_fz(:), cell_fz(:)
 
     ! Reference temperature and density
     real :: t_ref

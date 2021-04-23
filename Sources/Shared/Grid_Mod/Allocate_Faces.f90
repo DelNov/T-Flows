@@ -45,6 +45,10 @@
   allocate(grid % ry(nf+ns));  grid % ry(:) = 0.0
   allocate(grid % rz(nf+ns));  grid % rz(:) = 0.0
 
+  ! Fractional cell volumes around faces
+  allocate(grid % dv1(nf+ns));  grid % dv1(:) = 0.0
+  allocate(grid % dv2(nf+ns));  grid % dv2(:) = 0.0
+
   ! Weight factors
   allocate(grid % f (nf+ns));   grid % f (:) = 0.0
   allocate(grid % fw(nf+ns));   grid % fw(:) = 0.0

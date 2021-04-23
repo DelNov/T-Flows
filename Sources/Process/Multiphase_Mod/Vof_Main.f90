@@ -37,7 +37,7 @@
     ! Commands to advance vof
     call Update_Boundary_Values(flow, turb, mult, 'MULTIPHASE')
     call Multiphase_Mod_Vof_Compute(mult, sol, flow % dt, n)
-    call Field_Mod_Body_Forces(flow)
+    call Field_Mod_Buoyancy_Forces(flow)
 
   end if
 
