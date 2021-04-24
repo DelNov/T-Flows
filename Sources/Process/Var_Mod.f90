@@ -23,7 +23,7 @@
     real, allocatable :: b(:)              ! boundary value
     real, allocatable :: c(:)              ! cross-difusion fluxes
     real, allocatable :: x(:), y(:), z(:)  ! gradient components
-    real, allocatable :: q(:)              ! flux of a variable
+    real, allocatable :: q(:)              ! flux of the variable
     real              :: sigma             ! sigma
     real              :: res               ! residual after lin. solver
     real              :: units(5)          ! mass, length, time,
