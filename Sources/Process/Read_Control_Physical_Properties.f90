@@ -24,12 +24,6 @@
   ! Take alias
   grid => flow % pnt_grid
 
-  ! Allocate properties
-  allocate(flow % density     (-grid % n_bnd_cells:grid % n_cells))
-  allocate(flow % viscosity   (-grid % n_bnd_cells:grid % n_cells))
-  allocate(flow % capacity    (-grid % n_bnd_cells:grid % n_cells))
-  allocate(flow % conductivity(-grid % n_bnd_cells:grid % n_cells))
-
   ! Read constant (defualt) values
   call Control_Mod_Dynamic_Viscosity   (visc_const)
   call Control_Mod_Mass_Density        (dens_const)
@@ -38,12 +32,12 @@
   call Control_Mod_Scalars_Diffusivity (flow % diffusivity)
 
   if(mult % model .eq. VOLUME_OF_FLUID) then
-    call Control_Mod_Phase_Densities     (mult % phase_dens)
-    call Control_Mod_Phase_Viscosities   (mult % phase_visc)
-    call Control_Mod_Phase_Capacities    (mult % phase_capa)
-    call Control_Mod_Phase_Conductivities(mult % phase_cond)
-    call Control_Mod_Surface_Tension     (mult % surface_tension)
-    call Control_Mod_Latent_Heat(flow % latent_heat)
+    call Control_Mod_Phase_Densities       (mult % phase_dens)
+    call Control_Mod_Phase_Viscosities     (mult % phase_visc)
+    call Control_Mod_Phase_Capacities      (mult % phase_capa)
+    call Control_Mod_Phase_Conductivities  (mult % phase_cond)
+    call Control_Mod_Surface_Tension       (mult % surface_tension)
+    call Control_Mod_Latent_Heat           (flow % latent_heat)
     call Control_Mod_Saturation_Temperature(flow % sat_temperature)
   else
     flow % density     (:) = dens_const

@@ -33,7 +33,7 @@
     ! (If temp_corr is .true., the following two variables are needed as well)
     real :: dt_corr, u_rel_corr
 
-    ! Physical properties
+    ! Physical properties (defined in cell centers)
     real, allocatable :: capacity(:)      ! [J/kg/K]
     real, allocatable :: conductivity(:)  ! [W/(m K)]
     real, allocatable :: density(:)       ! [kg/m^3]
@@ -108,6 +108,11 @@
     real, allocatable :: face_fy(:), cell_fy(:)
     real, allocatable :: face_fz(:), cell_fz(:)
 
+    ! Storage for tentative velocity field and volume fluxes
+    ! needed for Majumdar's improvement of Rhie-Chow method
+    real, allocatable :: u_star(:), v_star(:), w_star(:)
+    real, allocatable :: v_flux_star(:)
+
     ! Reference temperature and density
     real :: t_ref
     real :: dens_ref
@@ -135,7 +140,6 @@
   contains
 
   include 'Field_Mod/Allocate.f90'
-  include 'Field_Mod/Allocate_Grad_Matrix.f90'
   include 'Field_Mod/Alias_Energy.f90'
   include 'Field_Mod/Alias_Momentum.f90'
   include 'Field_Mod/Body_Forces.f90'
