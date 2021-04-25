@@ -1,8 +1,7 @@
 !==============================================================================!
   module Math_Mod
 !------------------------------------------------------------------------------!
-!   This is a prototype of a small module which would contain some basic       !
-!   mathematic and related functions.                                          !
+!   This module contains some basic mathematical (and related) functions       !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
@@ -21,6 +20,7 @@
   include 'Math_Mod/Distance.f90'
   include 'Math_Mod/Distance_Squared.f90'
   include 'Math_Mod/Gaussian_Elimination.f90'
+  include 'Math_Mod/Harmonic_Mean.f90'
   include 'Math_Mod/Invert_3x3.f90'
   include 'Math_Mod/Rotate_Vector.f90'
   include 'Math_Mod/Smaller_Real.f90'
