@@ -37,9 +37,6 @@
   ! Archimedes’ constant
   real, parameter :: PI = 3.14159265359
 
-  ! Gravitational constant for Earth (where we are most of the time)
-  real, parameter :: EARTH_G = 9.807
-
   ! These are often used in turbulence models
   real, parameter :: ONE_THIRD  = 1.0 / 3.0
   real, parameter :: TWO_THIRDS = 1.0 - ONE_THIRD
