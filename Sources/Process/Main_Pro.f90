@@ -323,6 +323,11 @@
 
         call Field_Mod_Grad_Pressure(flow(d), flow(d) % p)
 
+        ! Compute velocity gradients
+        call Field_Mod_Grad_Variable(flow(d), flow(d) % u)
+        call Field_Mod_Grad_Variable(flow(d), flow(d) % v)
+        call Field_Mod_Grad_Variable(flow(d), flow(d) % w)
+
         ! Buoyancy force if no VOF is used (VOF calls it above)
         if(mult(d) % model .ne. VOLUME_OF_FLUID) then
           call Field_Mod_Body_Forces(flow(d))

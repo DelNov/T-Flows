@@ -345,20 +345,6 @@
 
   end do  ! browsing through components
 
-  ! Update boundary values for momentum
-  call Update_Boundary_Values(flow, turb, mult, 'MOMENTUM')
-
-  ! Refresh gradients for all three velocity components
-  if(mult % model .eq. VOLUME_OF_FLUID .and. flow % mass_transfer) then
-    call Multiphase_Mod_Vof_Grad_Variable_With_Jump(mult, flow % u)
-    call Multiphase_Mod_Vof_Grad_Variable_With_Jump(mult, flow % v)
-    call Multiphase_Mod_Vof_Grad_Variable_With_Jump(mult, flow % w)
-  else
-    call Field_Mod_Grad_Variable(flow, flow % u)
-    call Field_Mod_Grad_Variable(flow, flow % v)
-    call Field_Mod_Grad_Variable(flow, flow % w)
-  end if
-
   ! Refresh buffers for m % sav before discretizing for pressure
   call Grid_Mod_Exchange_Cells_Real(grid, m % sav)
 

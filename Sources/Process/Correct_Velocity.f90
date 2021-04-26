@@ -126,25 +126,6 @@
     end if
   end do
 
-  !----------------------------------------------------------!
-  !   Compute velocity gradients, taking jump into account   !
-  !----------------------------------------------------------!
-
-  call Update_Boundary_Values(flow, turb, mult, 'MOMENTUM')
-
-  ! If there is a jump in velocities, call specialized gradient calculation
-  if(mult % model .eq. VOLUME_OF_FLUID .and. flow % mass_transfer) then
-    call Multiphase_Mod_Vof_Grad_Variable_With_Jump(mult, flow % u)
-    call Multiphase_Mod_Vof_Grad_Variable_With_Jump(mult, flow % v)
-    call Multiphase_Mod_Vof_Grad_Variable_With_Jump(mult, flow % w)
-
-  ! No jumps, call usual routines
-  else
-    call Field_Mod_Grad_Variable(flow, flow % u)
-    call Field_Mod_Grad_Variable(flow, flow % v)
-    call Field_Mod_Grad_Variable(flow, flow % w)
-  end if
-
   !----------------------------------------------------------------!
   !   Look at the following equation and you will understand why   !
   !   is the matrix for pressure corrections in SIMPLE algorithm   !
@@ -161,6 +142,34 @@
                                        * a % val(a % pos(1,s))
     end if
   end do
+
+  !-------------------------------------!
+  !    Calculate the max mass error     !
+  !   with the new (corrected) fluxes   !
+  !-------------------------------------!
+  do c = 1, grid % n_cells
+    b(c) = 0.0
+  end do
+
+  do s = 1, grid % n_faces
+    c1 = grid % faces_c(1,s)
+    c2 = grid % faces_c(2,s)
+
+    b(c1) = b(c1) - v_flux % n(s)
+    if(c2 > 0) then
+      b(c2) = b(c2) + v_flux % n(s)
+    end if
+  end do
+
+  do c = 1, grid % n_cells
+    b(c) = b(c) / (grid % vol(c) / dt)
+  end do
+
+  flow % vol_res = 0.0
+  do c = 1, grid % n_cells - grid % comm % n_buff_cells
+    flow % vol_res = max(flow % vol_res, abs(b(c)))
+  end do
+  call Comm_Mod_Global_Max_Real(flow % vol_res)
 
   !------------------------------!
   !   Calculate the CFL number   !
