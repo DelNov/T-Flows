@@ -31,7 +31,7 @@
   type(Face_Type),   pointer :: v_flux          ! volume flux
   type(Matrix_Type), pointer :: a               ! pressure matrix
   type(Matrix_Type), pointer :: m               ! momentum matrix
-  real                       :: a12, px_f, py_f, pz_f, fs
+  real                       :: a12, px_f, py_f, pz_f, fs, dens_h
   integer                    :: s, c1, c2, c
 !==============================================================================!
 
@@ -86,6 +86,23 @@
       px_f = 0.5*( p % x(c1) + p % x(c2) ) * grid % dx(s)
       py_f = 0.5*( p % y(c1) + p % y(c2) ) * grid % dy(s)
       pz_f = 0.5*( p % z(c1) + p % z(c2) ) * grid % dz(s)
+
+      ! Interpolate pressure gradients as proposed by Denner
+      ! (Equation 3.57 in his PhD thesis)
+      ! dens_h           [kg/m^3]
+      ! px_f, py_f, pz_f [kg/m^2s^2]
+      dens_h = Math_Mod_Harmonic_Mean(flow % density(c1),  &
+                                      flow % density(c2))
+
+      px_f = 0.5 * dens_h * (  p % x(c1) / flow % density(c1)    &
+                             + p % x(c2) / flow % density(c2) )  &
+                          * grid % dx(s)
+      py_f = 0.5 * dens_h * (  p % y(c1) / flow % density(c1)    &
+                             + p % y(c2) / flow % density(c2) )  &
+                          * grid % dy(s)
+      pz_f = 0.5 * dens_h * (  p % z(c1) / flow % density(c1)    &
+                             + p % z(c2) / flow % density(c2) )  &
+                          * grid % dz(s)
 
       ! Calculate mass or volume flux through cell face
       ! (depending on what is in "dens_factor")
