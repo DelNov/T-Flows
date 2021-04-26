@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Src_Zeta_K_Eps_Zeta_F(turb, sol, n_step)
+  subroutine Turb_Mod_Src_Zeta_K_Eps_Zeta_F(turb, sol, curr_dt)
 !------------------------------------------------------------------------------!
 !   Calculate source terms in equation for zeta.                               !
 !   Term which is negative is put on left hand side in diagonal of             !
@@ -9,7 +9,7 @@
 !--------------------------------[Arguments]-----------------------------------!
   type(Turb_Type),   target :: turb
   type(Solver_Type), target :: sol
-  integer                   :: n_step
+  integer, intent(in)       :: curr_dt
 !----------------------------------[Locals]------------------------------------!
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
@@ -44,7 +44,7 @@
   ! instabilities for some cases such as flow around cylinder. That is why we
   ! choose this particular way to the add source term.
   do c = 1, grid % n_cells
-    if(n_step > 500) then
+    if(curr_dt > 500) then
       b(c) = b(c) + f22 % n(c) * grid % vol(c) * flow % density(c)
     else
       b(c) = b(c) + max(0.0, f22 % n(c)*grid % vol(c)) * flow % density(c)

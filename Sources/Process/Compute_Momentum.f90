@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Momentum(flow, turb, mult, sol, ini)
+  subroutine Compute_Momentum(flow, turb, mult, sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves momentum conservation equations                     !
 !------------------------------------------------------------------------------!
@@ -12,7 +12,8 @@
   type(Turb_Type),       target :: turb
   type(Multiphase_Type), target :: mult
   type(Solver_Type),     target :: sol
-  integer                       :: ini
+  integer, intent(in)           :: curr_dt
+  integer, intent(in)           :: ini
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Bulk_Type),   pointer :: bulk
@@ -141,7 +142,7 @@
     end if
 
     ! User function
-    call User_Mod_Beginning_Of_Compute_Momentum(flow, turb, mult, ini)
+    call User_Mod_Beginning_Of_Compute_Momentum(flow, turb, mult, curr_dt, ini)
 
     ! Initialize matrix and right hand side
     m % val(:) = 0.0
@@ -349,7 +350,7 @@
   call Grid_Mod_Exchange_Cells_Real(grid, m % sav)
 
   ! User function
-  call User_Mod_End_Of_Compute_Momentum(flow, turb, mult, ini)
+  call User_Mod_End_Of_Compute_Momentum(flow, turb, mult, curr_dt, ini)
 
   call Cpu_Timer_Mod_Stop('Compute_Momentum (without solvers)')
 

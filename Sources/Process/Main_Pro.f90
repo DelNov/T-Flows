@@ -334,7 +334,7 @@
         end if
 
         ! All three velocity components one after another
-        call Compute_Momentum(flow(d), turb(d), mult(d), sol(d), ini)
+        call Compute_Momentum(flow(d), turb(d), mult(d), sol(d), curr_dt, ini)
         call Compute_Pressure(flow(d), mult(d), sol(d), ini)
 
         call Field_Mod_Calculate_Mass_Fluxes(flow(d), flow(d) % v_flux % n)
@@ -344,12 +344,13 @@
 
         ! Energy (practically temperature)
         if(flow(d) % heat_transfer) then
-          call Compute_Energy(flow(d), turb(d), mult(d), sol(d), ini)
+          call Compute_Energy(flow(d), turb(d), mult(d), sol(d), curr_dt, ini)
         end if
 
         ! Passive scalars
         do sc = 1, flow(d) % n_scalars
-          call Compute_Scalar(flow(d), turb(d), mult(d), sol(d), ini, sc)
+          call Compute_Scalar(flow(d), turb(d), mult(d), sol(d),  &
+                              curr_dt, ini, sc)
         end do
 
         ! Deal with turbulence (if you dare ;-))

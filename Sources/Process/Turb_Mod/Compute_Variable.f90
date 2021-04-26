@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Compute_Variable(turb, sol, ini, phi, n_step)
+  subroutine Turb_Mod_Compute_Variable(turb, sol, curr_dt, ini, phi)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves transport equations for different turbulent         !
 !   variables.                                                                 !
@@ -8,9 +8,9 @@
 !--------------------------------[Arguments]-----------------------------------!
   type(Turb_Type),   target :: turb
   type(Solver_Type), target :: sol
-  integer                   :: ini
+  integer, intent(in)       :: curr_dt
+  integer, intent(in)       :: ini
   type(Var_Type)            :: phi
-  integer                   :: n_step
 !----------------------------------[Locals]------------------------------------!
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
@@ -218,7 +218,7 @@
     if(phi % name .eq. 'KIN')  call Turb_Mod_Src_Kin_K_Eps_Zeta_F(turb, sol)
     if(phi % name .eq. 'EPS')  call Turb_Mod_Src_Eps_K_Eps_Zeta_F(turb, sol)
     if(phi % name .eq. 'ZETA')  &
-      call Turb_Mod_Src_Zeta_K_Eps_Zeta_F(turb, sol, n_step)
+      call Turb_Mod_Src_Zeta_K_Eps_Zeta_F(turb, sol, curr_dt)
     if(flow % heat_transfer) then
       if(phi % name .eq. 'T2')  call Turb_Mod_Src_T2(turb, sol)
     end if

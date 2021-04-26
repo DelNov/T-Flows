@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Pressure(flow, mult, sol, ini)
+  subroutine Compute_Pressure(flow, mult, sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Forms and solves pressure equation for the SIMPLE method.                  !
 !------------------------------------------------------------------------------!
@@ -11,7 +11,8 @@
   type(Field_Type),      target :: flow
   type(Multiphase_Type), target :: mult
   type(Solver_Type),     target :: sol
-  integer                       :: ini
+  integer, intent(in)           :: curr_dt
+  integer, intent(in)           :: ini
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Bulk_Type),   pointer :: bulk
@@ -66,7 +67,7 @@
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Pressure(flow, mult, ini)
+  call User_Mod_Beginning_Of_Compute_Pressure(flow, mult, curr_dt, ini)
 
   !--------------------------------------------------!
   !   Find the value for normalization of pressure   !
@@ -227,7 +228,7 @@
   call Field_Mod_Grad_Pressure_Correction(flow, pp)
 
   ! User function
-  call User_Mod_End_Of_Compute_Pressure(flow, mult, ini)
+  call User_Mod_End_Of_Compute_Pressure(flow, mult, curr_dt, ini)
 
   call Cpu_Timer_Mod_Stop('Compute_Pressure (without solvers)')
 

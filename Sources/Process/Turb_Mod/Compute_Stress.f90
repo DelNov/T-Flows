@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Compute_Stress(turb, sol, ini, phi)
+  subroutine Turb_Mod_Compute_Stress(turb, sol, curr_dt, ini, phi)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves transport equation for Re stresses for RSM.         !
 !------------------------------------------------------------------------------!
@@ -18,7 +18,8 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type),   target :: turb
   type(Solver_Type), target :: sol
-  integer                   :: ini
+  integer, intent(in)       :: curr_dt
+  integer, intent(in)       :: ini
   type(Var_Type)            :: phi
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: flow
