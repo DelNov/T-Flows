@@ -335,7 +335,7 @@
 
         ! All three velocity components one after another
         call Compute_Momentum(flow(d), turb(d), mult(d), sol(d), curr_dt, ini)
-        call Compute_Pressure(flow(d), mult(d), sol(d), ini)
+        call Compute_Pressure(flow(d), mult(d), sol(d), curr_dt, ini)
 
         call Field_Mod_Calculate_Mass_Fluxes(flow(d), flow(d) % v_flux % n)
         call Correct_Velocity(flow(d), turb(d), mult(d), sol(d), curr_dt, ini)
