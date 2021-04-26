@@ -66,16 +66,6 @@
   call Control_Mod_Max_Iterations_For_Pressure_Solver (flow % pp % mniter)
   call Control_Mod_Simple_Underrelaxation_For_Pressure(flow % pp % urf)
 
-  ! Temporal correction for pressure
-  call Control_Mod_Temporal_Pressure_Correction(flow % temp_corr)
-  if(.not. flow % temp_corr) then
-    flow % dt_corr    = HUGE
-    flow % u_rel_corr = 1.0
-  else
-    flow % dt_corr    = flow % dt
-    flow % u_rel_corr = flow % u % urf
-  end if
-
   !------------------------------!
   !   Related to heat transfer   !
   !------------------------------!

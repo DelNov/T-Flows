@@ -21,7 +21,6 @@
   type(Matrix_Type), pointer :: a               ! pressure matrix
   type(Matrix_Type), pointer :: m               ! momentum matrix
   real, contiguous,  pointer :: b(:)
-  real,              pointer :: u_relax
   integer                    :: c, c1, c2, s, i_fac
   real                       :: cfl_t, pe_t, dens_f, visc_f, dt, wght
 !==============================================================================!
@@ -29,16 +28,15 @@
   call Cpu_Timer_Mod_Start('Correct_Velocity')
 
   ! Take aliases
-  grid    => flow % pnt_grid
-  bulk    => flow % bulk
-  v_flux  => flow % v_flux
-  p       => flow % p
-  pp      => flow % pp
-  dt      =  flow % dt
-  a       => sol % a
-  m       => sol % m
-  b       => sol % b % val
-  u_relax => flow % u_rel_corr
+  grid   => flow % pnt_grid
+  bulk   => flow % bulk
+  v_flux => flow % v_flux
+  p      => flow % p
+  pp     => flow % pp
+  dt     =  flow % dt
+  a      => sol % a
+  m      => sol % m
+  b      => sol % b % val
 
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
@@ -54,18 +52,18 @@
   ! Normal correction
   if(.not. flow % mass_transfer) then
     do c = 1, grid % n_cells
-      u % n(c) = u % n(c) - u_relax * pp % x(c) * grid % vol(c) / m % sav(c)
-      v % n(c) = v % n(c) - u_relax * pp % y(c) * grid % vol(c) / m % sav(c)
-      w % n(c) = w % n(c) - u_relax * pp % z(c) * grid % vol(c) / m % sav(c)
+      u % n(c) = u % n(c) - pp % x(c) * grid % vol(c) / m % sav(c)
+      v % n(c) = v % n(c) - pp % y(c) * grid % vol(c) / m % sav(c)
+      w % n(c) = w % n(c) - pp % z(c) * grid % vol(c) / m % sav(c)
     end do
 
   ! In case with mass transfer, dodge cells at the surface
   else
     do c = 1, grid % n_cells
       if(mult % cell_at_elem(c) .eq. 0) then
-        u % n(c) = u % n(c) - u_relax * pp % x(c) * grid % vol(c) / m % sav(c)
-        v % n(c) = v % n(c) - u_relax * pp % y(c) * grid % vol(c) / m % sav(c)
-        w % n(c) = w % n(c) - u_relax * pp % z(c) * grid % vol(c) / m % sav(c)
+        u % n(c) = u % n(c) - pp % x(c) * grid % vol(c) / m % sav(c)
+        v % n(c) = v % n(c) - pp % y(c) * grid % vol(c) / m % sav(c)
+        w % n(c) = w % n(c) - pp % z(c) * grid % vol(c) / m % sav(c)
       end if
     end do
 

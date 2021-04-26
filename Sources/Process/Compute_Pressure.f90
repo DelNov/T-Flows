@@ -20,7 +20,6 @@
   type(Matrix_Type), pointer :: a               ! pressure matrix
   type(Matrix_Type), pointer :: m               ! momentum matrix
   real, contiguous,  pointer :: b(:)
-  real,              pointer :: u_relax
   integer                    :: s, c, c1, c2
   real                       :: u_f, v_f, w_f, a12, fs
   real                       :: px_f, py_f, pz_f
@@ -55,16 +54,15 @@
   call Cpu_Timer_Mod_Start('Compute_Pressure (without solvers)')
 
   ! Take aliases
-  grid    => flow % pnt_grid
-  bulk    => flow % bulk
-  v_flux  => flow % v_flux
-  p       => flow % p
-  pp      => flow % pp
-  dt      =  flow % dt
-  a       => sol % a
-  m       => sol % m
-  b       => sol % b % val
-  u_relax => flow % u_rel_corr
+  grid   => flow % pnt_grid
+  bulk   => flow % bulk
+  v_flux => flow % v_flux
+  p      => flow % p
+  pp     => flow % pp
+  dt     =  flow % dt
+  a      => sol % a
+  m      => sol % m
+  b      => sol % b % val
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! User function

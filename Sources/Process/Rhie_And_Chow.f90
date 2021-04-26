@@ -31,7 +31,6 @@
   type(Face_Type),   pointer :: v_flux          ! volume flux
   type(Matrix_Type), pointer :: a               ! pressure matrix
   type(Matrix_Type), pointer :: m               ! momentum matrix
-  real,              pointer :: u_relax
   real                       :: a12, px_f, py_f, pz_f, fs
   integer                    :: s, c1, c2, c
 !==============================================================================!
@@ -39,12 +38,11 @@
   call Cpu_Timer_Mod_Start('Rhie_And_Chow')
 
   ! Take aliases
-  grid    => flow % pnt_grid
-  p       => flow % p
-  v_flux  => flow % v_flux
-  u_relax => flow % u_rel_corr
-  a       => sol % a
-  m       => sol % m
+  grid   => flow % pnt_grid
+  p      => flow % p
+  v_flux => flow % v_flux
+  a      => sol % a
+  m      => sol % m
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! User function

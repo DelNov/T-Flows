@@ -68,36 +68,4 @@
 
   end if
 
-  ! Momentum variables for pressure correction
-  ! This is here because they need to be collected
-  ! before u, v, w are calculated
-  ! Bojan: This is very strange, works for one velocity component only!
-  if(flow % temp_corr) then
-
-    ! Guessed face velocity
-    if(i == 1) then
-      do s = 1, grid % n_faces
-        c1 = grid % faces_c(1,s)
-        c2 = grid % faces_c(2,s)
-
-        if(c2 > 0) then
-          fs = grid % f(s)
-          u_f = fs * flow % u % n(c1) + (1.0 - fs) * flow % u % n(c2)
-          v_f = fs * flow % v % n(c1) + (1.0 - fs) * flow % v % n(c2)
-          w_f = fs * flow % w % n(c1) + (1.0 - fs) * flow % w % n(c2)
-          v_flux % avg(s) = (  u_f * grid % sx(s)     &
-                             + v_f * grid % sy(s)     &
-                             + w_f * grid % sz(s) )
-        end if
-      end do
-
-      do s = 1, grid % n_faces
-        c1 = grid % faces_c(1,s)
-        c2 = grid % faces_c(2,s)
-
-        if(c2 > 0) v_flux % star(s) = v_flux % n(s)
-      end do
-    end if
-  end if
-
   end subroutine
