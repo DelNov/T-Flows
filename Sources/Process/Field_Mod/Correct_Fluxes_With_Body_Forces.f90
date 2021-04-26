@@ -15,18 +15,16 @@
   type(Var_Type),    pointer :: t
   type(Matrix_Type), pointer :: m               ! momentum matrix
   real, contiguous,  pointer :: b(:)
-  real,              pointer :: u_relax
   integer                    :: c1, c2, s
   real                       :: xc1, yc1, zc1, xc2, yc2, zc2
   real                       :: gravity_source, dotprod, a12, dens_h
 !==============================================================================!
 
   ! Take aliases
-  grid    => flow % pnt_grid
-  t       => flow % t
-  u_relax => flow % u_rel_corr
-  m       => sol % m
-  b       => sol % b % val
+  grid => flow % pnt_grid
+  t    => flow % t
+  m    => sol % m
+  b    => sol % b % val
 
   !-------------------------------!
   !   For Boussinesq hypothesis   !
@@ -91,8 +89,8 @@
              * (flow % density(c2) - flow % dens_ref)
 
         ! Units for a12: [m^4s/kg]
-        a12 = u_relax * 0.5 * (  grid % vol(c1) / m % sav(c1)     &
-                               + grid % vol(c2) / m % sav(c2) ) * m % fc(s)
+        a12 = 0.5 * (  grid % vol(c1) / m % sav(c1)     &
+                     + grid % vol(c2) / m % sav(c2) ) * m % fc(s)
 
         ! Unit for gravity_source again: [m^3/s]
         gravity_source =  a12 * (gravity_source - dotprod)

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Correct_Velocity(flow, turb, mult, sol, ini)
+  subroutine Correct_Velocity(flow, turb, mult, sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Corrects the velocities, and mass (or volume) fluxes on cell faces.        !
 !------------------------------------------------------------------------------!
@@ -12,7 +12,8 @@
   type(Turb_Type),       target :: turb
   type(Multiphase_Type), target :: mult
   type(Solver_Type),     target :: sol
-  integer                       :: ini
+  integer, intent(in)           :: curr_dt
+  integer, intent(in)           :: ini
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Bulk_Type),   pointer :: bulk
@@ -21,7 +22,6 @@
   type(Matrix_Type), pointer :: a               ! pressure matrix
   type(Matrix_Type), pointer :: m               ! momentum matrix
   real, contiguous,  pointer :: b(:)
-  real,              pointer :: u_relax
   integer                    :: c, c1, c2, s, i_fac
   real                       :: cfl_t, pe_t, dens_f, visc_f, dt, wght
 !==============================================================================!
@@ -29,21 +29,20 @@
   call Cpu_Timer_Mod_Start('Correct_Velocity')
 
   ! Take aliases
-  grid    => flow % pnt_grid
-  bulk    => flow % bulk
-  v_flux  => flow % v_flux
-  p       => flow % p
-  pp      => flow % pp
-  dt      =  flow % dt
-  a       => sol % a
-  m       => sol % m
-  b       => sol % b % val
-  u_relax => flow % u_rel_corr
+  grid   => flow % pnt_grid
+  bulk   => flow % bulk
+  v_flux => flow % v_flux
+  p      => flow % p
+  pp     => flow % pp
+  dt     =  flow % dt
+  a      => sol % a
+  m      => sol % m
+  b      => sol % b % val
 
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! User function
-  call User_Mod_Beginning_Of_Correct_Velocity(flow, mult, sol, ini)
+  call User_Mod_Beginning_Of_Correct_Velocity(flow, mult, sol, curr_dt, ini)
 
   !-----------------------------------------!
   !   Correct velocities and fluxes with    !
@@ -54,18 +53,18 @@
   ! Normal correction
   if(.not. flow % mass_transfer) then
     do c = 1, grid % n_cells
-      u % n(c) = u % n(c) - u_relax * pp % x(c) * grid % vol(c) / m % sav(c)
-      v % n(c) = v % n(c) - u_relax * pp % y(c) * grid % vol(c) / m % sav(c)
-      w % n(c) = w % n(c) - u_relax * pp % z(c) * grid % vol(c) / m % sav(c)
+      u % n(c) = u % n(c) - pp % x(c) * grid % vol(c) / m % sav(c)
+      v % n(c) = v % n(c) - pp % y(c) * grid % vol(c) / m % sav(c)
+      w % n(c) = w % n(c) - pp % z(c) * grid % vol(c) / m % sav(c)
     end do
 
   ! In case with mass transfer, dodge cells at the surface
   else
     do c = 1, grid % n_cells
       if(mult % cell_at_elem(c) .eq. 0) then
-        u % n(c) = u % n(c) - u_relax * pp % x(c) * grid % vol(c) / m % sav(c)
-        v % n(c) = v % n(c) - u_relax * pp % y(c) * grid % vol(c) / m % sav(c)
-        w % n(c) = w % n(c) - u_relax * pp % z(c) * grid % vol(c) / m % sav(c)
+        u % n(c) = u % n(c) - pp % x(c) * grid % vol(c) / m % sav(c)
+        v % n(c) = v % n(c) - pp % y(c) * grid % vol(c) / m % sav(c)
+        w % n(c) = w % n(c) - pp % z(c) * grid % vol(c) / m % sav(c)
       end if
     end do
 
@@ -126,25 +125,6 @@
     end if
   end do
 
-  !----------------------------------------------------------!
-  !   Compute velocity gradients, taking jump into account   !
-  !----------------------------------------------------------!
-
-  call Update_Boundary_Values(flow, turb, mult, 'MOMENTUM')
-
-  ! If there is a jump in velocities, call specialized gradient calculation
-  if(mult % model .eq. VOLUME_OF_FLUID .and. flow % mass_transfer) then
-    call Multiphase_Mod_Vof_Grad_Variable_With_Jump(mult, flow % u)
-    call Multiphase_Mod_Vof_Grad_Variable_With_Jump(mult, flow % v)
-    call Multiphase_Mod_Vof_Grad_Variable_With_Jump(mult, flow % w)
-
-  ! No jumps, call usual routines
-  else
-    call Field_Mod_Grad_Variable(flow, flow % u)
-    call Field_Mod_Grad_Variable(flow, flow % v)
-    call Field_Mod_Grad_Variable(flow, flow % w)
-  end if
-
   !----------------------------------------------------------------!
   !   Look at the following equation and you will understand why   !
   !   is the matrix for pressure corrections in SIMPLE algorithm   !
@@ -161,6 +141,34 @@
                                        * a % val(a % pos(1,s))
     end if
   end do
+
+  !-------------------------------------!
+  !    Calculate the max mass error     !
+  !   with the new (corrected) fluxes   !
+  !-------------------------------------!
+  do c = 1, grid % n_cells
+    b(c) = 0.0
+  end do
+
+  do s = 1, grid % n_faces
+    c1 = grid % faces_c(1,s)
+    c2 = grid % faces_c(2,s)
+
+    b(c1) = b(c1) - v_flux % n(s)
+    if(c2 > 0) then
+      b(c2) = b(c2) + v_flux % n(s)
+    end if
+  end do
+
+  do c = 1, grid % n_cells
+    b(c) = b(c) / (grid % vol(c) / dt)
+  end do
+
+  flow % vol_res = 0.0
+  do c = 1, grid % n_cells - grid % comm % n_buff_cells
+    flow % vol_res = max(flow % vol_res, abs(b(c)))
+  end do
+  call Comm_Mod_Global_Max_Real(flow % vol_res)
 
   !------------------------------!
   !   Calculate the CFL number   !
@@ -198,7 +206,7 @@
   end if
 
   ! User function
-  call User_Mod_End_Of_Correct_Velocity(flow, mult, sol, ini)
+  call User_Mod_End_Of_Correct_Velocity(flow, mult, sol, curr_dt, ini)
 
   call Cpu_Timer_Mod_Stop('Correct_Velocity')
 

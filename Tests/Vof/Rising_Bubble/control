@@ -5,11 +5,11 @@
  HEAT_TRANSFER     no
  MULTIPHASE_MODEL  volume_of_fluid
 
- NUMBER_OF_TIME_STEPS     300
+ NUMBER_OF_TIME_STEPS      60
  TIME_STEP                  0.01   # original (for finer grid) was 0.0005
 
  RESULTS_SAVE_INTERVAL     15
- BACKUP_SAVE_INTERVAL      30
+ BACKUP_SAVE_INTERVAL     300
  # LOAD_BACKUP_NAME          cavity-ts000060.backup
 
 #-------------------
@@ -63,7 +63,6 @@
  MAX_SIMPLE_ITERATIONS              20
  MAX_SMOOTHING_CYCLES_CURVATURE_VOF  12
  MAX_SMOOTHING_CYCLES_NORMAL_VOF    0
- TEMPORAL_PRESSURE_CORRECTION        yes
  COMPRESION_VOF                      no
  COMPRESION_FACTOR_VOF               1.0
  MIN_SIMPLE_ITERATIONS               3

@@ -1,14 +1,14 @@
 !==============================================================================!
-  subroutine Turb_Mod_Main(turb, sol, n, ini)
+  subroutine Turb_Mod_Main(turb, sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Turbulence model main function (called inside inner iterations)            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type)   :: turb
-  type(Solver_Type) :: sol
-  integer           :: n     ! time step
-  integer           :: ini   ! inner iteration
+  type(Turb_Type)     :: turb
+  type(Solver_Type)   :: sol
+  integer, intent(in) :: curr_dt ! current time step
+  integer, intent(in) :: ini     ! inner iteration
 !----------------------------------[Locals]------------------------------------!
   type(Field_Type), pointer :: flow
   type(Grid_Type),  pointer :: grid
@@ -25,13 +25,13 @@
   if(turb % model .eq. K_EPS) then
     call Calculate_Shear_And_Vorticity(flow)
 
-    call Turb_Mod_Compute_Variable(turb, sol, ini, turb % kin, n)
-    call Turb_Mod_Compute_Variable(turb, sol, ini, turb % eps, n)
+    call Turb_Mod_Compute_Variable(turb, sol, curr_dt, ini, turb % kin)
+    call Turb_Mod_Compute_Variable(turb, sol, curr_dt, ini, turb % eps)
 
     if(flow % heat_transfer) then
       call Turb_Mod_Calculate_Stress   (turb)
       call Turb_Mod_Calculate_Heat_Flux(turb)
-      call Turb_Mod_Compute_Variable(turb, sol, ini, turb % t2, n)
+      call Turb_Mod_Compute_Variable(turb, sol, curr_dt, ini, turb % t2)
     end if
 
     call Turb_Mod_Vis_T_K_Eps(turb)
@@ -43,17 +43,17 @@
 
     call Calculate_Shear_And_Vorticity(flow)
 
-    call Turb_Mod_Compute_Variable(turb, sol, ini, turb % kin, n)
-    call Turb_Mod_Compute_Variable(turb, sol, ini, turb % eps, n)
+    call Turb_Mod_Compute_Variable(turb, sol, curr_dt, ini, turb % kin)
+    call Turb_Mod_Compute_Variable(turb, sol, curr_dt, ini, turb % eps)
 
     if(flow % heat_transfer) then
       call Turb_Mod_Calculate_Stress   (turb)
       call Turb_Mod_Calculate_Heat_Flux(turb)
-      call Turb_Mod_Compute_Variable(turb, sol, ini, turb % t2, n)
+      call Turb_Mod_Compute_Variable(turb, sol, curr_dt, ini, turb % t2)
     end if
 
-    call Turb_Mod_Compute_F22(turb, sol, ini, turb % f22)
-    call Turb_Mod_Compute_Variable(turb, sol, ini, turb % zeta, n)
+    call Turb_Mod_Compute_F22(turb, sol, curr_dt, ini, turb % f22)
+    call Turb_Mod_Compute_Variable(turb, sol, curr_dt, ini, turb % zeta)
 
     call Turb_Mod_Vis_T_K_Eps_Zeta_F(turb)
 
@@ -68,19 +68,19 @@
     call Field_Mod_Grad_Variable(flow, flow % v)
     call Field_Mod_Grad_Variable(flow, flow % w)
 
-    call Turb_Mod_Compute_Stress(turb, sol, ini, turb % uu)
-    call Turb_Mod_Compute_Stress(turb, sol, ini, turb % vv)
-    call Turb_Mod_Compute_Stress(turb, sol, ini, turb % ww)
+    call Turb_Mod_Compute_Stress(turb, sol, curr_dt, ini, turb % uu)
+    call Turb_Mod_Compute_Stress(turb, sol, curr_dt, ini, turb % vv)
+    call Turb_Mod_Compute_Stress(turb, sol, curr_dt, ini, turb % ww)
 
-    call Turb_Mod_Compute_Stress(turb, sol, ini, turb % uv)
-    call Turb_Mod_Compute_Stress(turb, sol, ini, turb % uw)
-    call Turb_Mod_Compute_Stress(turb, sol, ini, turb % vw)
+    call Turb_Mod_Compute_Stress(turb, sol, curr_dt, ini, turb % uv)
+    call Turb_Mod_Compute_Stress(turb, sol, curr_dt, ini, turb % uw)
+    call Turb_Mod_Compute_Stress(turb, sol, curr_dt, ini, turb % vw)
 
     if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
-      call Turb_Mod_Compute_F22(turb, sol, ini, turb % f22)
+      call Turb_Mod_Compute_F22(turb, sol, curr_dt, ini, turb % f22)
     end if
 
-    call Turb_Mod_Compute_Stress(turb, sol, ini, turb % eps)
+    call Turb_Mod_Compute_Stress(turb, sol, curr_dt, ini, turb % eps)
 
     call Turb_Mod_Vis_T_Rsm(turb)
 
@@ -94,7 +94,7 @@
     call Calculate_Shear_And_Vorticity(flow)
     call Calculate_Vorticity(flow)
 
-    call Turb_Mod_Compute_Variable(turb, sol, ini, turb % vis, n)
+    call Turb_Mod_Compute_Variable(turb, sol, curr_dt, ini, turb % vis)
     call Turb_Mod_Vis_T_Spalart_Allmaras(turb)
   end if
 

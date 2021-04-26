@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Momentum(flow, turb, mult, sol, ini)
+  subroutine Compute_Momentum(flow, turb, mult, sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves momentum conservation equations                     !
 !------------------------------------------------------------------------------!
@@ -12,7 +12,8 @@
   type(Turb_Type),       target :: turb
   type(Multiphase_Type), target :: mult
   type(Solver_Type),     target :: sol
-  integer                       :: ini
+  integer, intent(in)           :: curr_dt
+  integer, intent(in)           :: ini
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Bulk_Type),   pointer :: bulk
@@ -153,7 +154,7 @@
     end if
 
     ! User function
-    call User_Mod_Beginning_Of_Compute_Momentum(flow, turb, mult, ini)
+    call User_Mod_Beginning_Of_Compute_Momentum(flow, turb, mult, curr_dt, ini)
 
     ! Initialize matrix and right hand side
     fi     (:) = 0.0  ! all "internal" forces acting on this component
@@ -354,20 +355,6 @@
 
   end do  ! browsing through components
 
-  ! Update boundary values for momentum
-  call Update_Boundary_Values(flow, turb, mult, 'MOMENTUM')
-
-  ! Refresh gradients for all three velocity components
-  if(mult % model .eq. VOLUME_OF_FLUID .and. flow % mass_transfer) then
-    call Multiphase_Mod_Vof_Grad_Variable_With_Jump(mult, flow % u)
-    call Multiphase_Mod_Vof_Grad_Variable_With_Jump(mult, flow % v)
-    call Multiphase_Mod_Vof_Grad_Variable_With_Jump(mult, flow % w)
-  else
-    call Field_Mod_Grad_Variable(flow, flow % u)
-    call Field_Mod_Grad_Variable(flow, flow % v)
-    call Field_Mod_Grad_Variable(flow, flow % w)
-  end if
-
   !------------------------------------------------------------------!
   !   Save the coefficients from the discretized momentum equation   !
   !    and refresh their buffers before discretizing for pressure    !
@@ -375,10 +362,11 @@
   do c = 1, grid % n_cells
     m % sav(c) = m % val(m % dia(c))
   end do
+  ! Refresh buffers for m % sav before discretizing for pressure
   call Grid_Mod_Exchange_Cells_Real(grid, m % sav)
 
   ! User function
-  call User_Mod_End_Of_Compute_Momentum(flow, turb, mult, ini)
+  call User_Mod_End_Of_Compute_Momentum(flow, turb, mult, curr_dt, ini)
 
   call Cpu_Timer_Mod_Stop('Compute_Momentum (without solvers)')
 

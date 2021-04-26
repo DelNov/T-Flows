@@ -26,13 +26,6 @@
     integer :: p_m_coupling, i_corr, n_piso_corrections
     logical :: piso_status
 
-    ! Flag for temporal correction for pressure
-    logical :: temp_corr
-
-    ! Time step and sub-relaxation coefficient for pressure correction equation
-    ! (If temp_corr is .true., the following two variables are needed as well)
-    real :: dt_corr, u_rel_corr
-
     ! Physical properties (defined in cell centers)
     real, allocatable :: capacity(:)      ! [J/kg/K]
     real, allocatable :: conductivity(:)  ! [W/(m K)]

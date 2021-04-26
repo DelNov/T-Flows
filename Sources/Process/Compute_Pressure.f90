@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Pressure(flow, mult, sol, ini)
+  subroutine Compute_Pressure(flow, mult, sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Forms and solves pressure equation for the SIMPLE method.                  !
 !------------------------------------------------------------------------------!
@@ -11,7 +11,8 @@
   type(Field_Type),      target :: flow
   type(Multiphase_Type), target :: mult
   type(Solver_Type),     target :: sol
-  integer                       :: ini
+  integer, intent(in)           :: curr_dt
+  integer, intent(in)           :: ini
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Bulk_Type),   pointer :: bulk
@@ -20,11 +21,12 @@
   type(Matrix_Type), pointer :: a               ! pressure matrix
   type(Matrix_Type), pointer :: m               ! momentum matrix
   real, contiguous,  pointer :: b(:)
-  real,              pointer :: u_relax
   integer                    :: s, c, c1, c2
-  real                       :: a12, fs, dt
+  real                       :: u_f, v_f, w_f, a12, fs
+  real                       :: px_f, py_f, pz_f
   character(SL)              :: solver
-  real                       :: p_max, p_min, p_nor, p_nor_c
+  real                       :: p_max, p_min, p_nor, p_nor_c, dt
+  real :: TMP
 !==============================================================================!
 !
 !   The form of equations which I am solving:
@@ -53,20 +55,19 @@
   call Cpu_Timer_Mod_Start('Compute_Pressure (without solvers)')
 
   ! Take aliases
-  grid    => flow % pnt_grid
-  bulk    => flow % bulk
-  v_flux  => flow % v_flux
-  p       => flow % p
-  pp      => flow % pp
-  a       => sol % a
-  m       => sol % m
-  b       => sol % b % val
-  u_relax => flow % u_rel_corr
-  dt      =  flow % dt
+  grid   => flow % pnt_grid
+  bulk   => flow % bulk
+  v_flux => flow % v_flux
+  p      => flow % p
+  pp     => flow % pp
+  dt     =  flow % dt
+  a      => sol % a
+  m      => sol % m
+  b      => sol % b % val
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Pressure(flow, mult, ini)
+  call User_Mod_Beginning_Of_Compute_Pressure(flow, mult, curr_dt, ini)
 
   !--------------------------------------------------!
   !   Find the value for normalization of pressure   !
@@ -112,51 +113,58 @@
   !---------------------------------------!
   call Rhie_And_Chow(flow, mult, sol)
 
-  !-------------------------------------------------!
-  !   Calculate the mass fluxes on the cell faces   !
-  !-------------------------------------------------!
+  !------------------------------------------!
+  !   Update fluxes at boundaries and fill   !
+  !   up source term for pressure equation   !
+  !------------------------------------------!
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
     fs = grid % f(s)
 
-    ! Face is inside the domain
+    ! Internal fluxes fixed with Rhie and Chow method, just update source
     if(c2 > 0) then
-
-      ! Calculate coeficients for the system matrix
-      ! a12 [m*m^3*s/kg = m^4s/kg]
-      a12 = u_relax * 0.5 * a % fc(s)                    &
-                    * ( grid % vol(c1) / m % sav(c1)     &
-                      + grid % vol(c2) / m % sav(c2) )
-
-      a % val(a % pos(1,s)) = -a12
-      a % val(a % pos(2,s)) = -a12
-      a % val(a % dia(c1))  = a % val(a % dia(c1)) +  a12
-      a % val(a % dia(c2))  = a % val(a % dia(c2)) +  a12
 
       b(c1) = b(c1) - v_flux % n(s)
       b(c2) = b(c2) + v_flux % n(s)
 
-    ! Face is on the boundary
-    ! (Check: volume fluxes at the boundaries was
-    !  corrected in Balance_Volume called above)
-    else ! (c2 < 0)
+    ! Side is on the boundary
+    else
 
-      b(c1) = b(c1) - v_flux % n(s)
+      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
 
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW .or.   &
-         Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) then
+        v_flux % n(s) = ( u % n(c2) * grid % sx(s)     &
+                        + v % n(c2) * grid % sy(s)     &
+                        + w % n(c2) * grid % sz(s) )
+
+        b(c1) = b(c1) - v_flux % n(s)
+
+      else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW .or.   &
+              Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) then
+
+        v_flux % n(s) = ( u % n(c2) * grid % sx(s)     &
+                        + v % n(c2) * grid % sy(s)     &
+                        + w % n(c2) * grid % sz(s) )
+
+        b(c1) = b(c1) - v_flux % n(s)
 
         a12 = a % fc(s) * grid % vol(c1) / m % sav(c1)
         a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
 
       else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE) then
 
+        v_flux % n(s) = ( u % n(c1) * grid % sx(s)     &
+                        + v % n(c1) * grid % sy(s)     &
+                        + w % n(c1) * grid % sz(s) )
+
+        b(c1) = b(c1) - v_flux % n(s)
+
         a12 = a % fc(s) * grid % vol(c1) / m % sav(c1)
         a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
 
+      else  ! it is SYMMETRY
+        v_flux % n(s) = 0.0
       end if
-
     end if
 
   end do
@@ -171,14 +179,7 @@
   !-------------------------------------!
   !   Correct fluxes with body forces   !
   !-------------------------------------!
-  call Field_Mod_Correct_Fluxes_With_Body_Forces(flow, sol)
-
-  ! Compute volume error
-  flow % vol_res = 0.0
-  do c = 1, grid % n_cells - grid % comm % n_buff_cells
-    flow % vol_res = flow % vol_res + abs(b(c))
-  end do
-  call Comm_Mod_Global_Sum_Real(flow % vol_res)
+  ! call Field_Mod_Correct_Fluxes_With_Body_Forces(flow, sol)
 
   ! Get solver
   call Control_Mod_Solver_For_Pressure(solver)
@@ -227,7 +228,7 @@
   call Field_Mod_Grad_Pressure_Correction(flow, pp)
 
   ! User function
-  call User_Mod_End_Of_Compute_Pressure(flow, mult, ini)
+  call User_Mod_End_Of_Compute_Pressure(flow, mult, curr_dt, ini)
 
   call Cpu_Timer_Mod_Stop('Compute_Pressure (without solvers)')
 
