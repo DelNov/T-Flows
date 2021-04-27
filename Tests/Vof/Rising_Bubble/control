@@ -5,8 +5,8 @@
  HEAT_TRANSFER     no
  MULTIPHASE_MODEL  volume_of_fluid
 
- NUMBER_OF_TIME_STEPS      60
- TIME_STEP                  0.01   # original (for finer grid) was 0.0005
+ NUMBER_OF_TIME_STEPS     300
+ TIME_STEP                  0.005   # original (for finer grid) was 0.0005
 
  RESULTS_SAVE_INTERVAL     15
  BACKUP_SAVE_INTERVAL     300
