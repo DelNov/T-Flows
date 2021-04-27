@@ -8,7 +8,7 @@
 !   2. For both sides of the interface (1 and 2) it stores face coordinates    !
 !      (xf_1 to zf_2), cell inside (ic_1, ic_2), bundary cells (ib_1, ib_2).   !
 !      and processor ids (ip_1, ip_2).                                         !
-!   3. While doint the step above, it takes care of the offsets of each        !
+!   3. While doing the step above, it takes care of the offsets of each        !
 !      processor (off_1 and off_2).                                            !
 !   4. Then takes global summs of all the arrays mentioned in step 2.          !
 !   5. Sorts the above arrays by their x, y and z coordinates, carrying        !
@@ -33,6 +33,12 @@
                       ic_2 => i_face_04,  &  ! internal cells in domain 2
                       ib_2 => i_face_05,  &  ! boundary cells in domain 2
                       ip_2 => i_face_06      ! processor in domain 2
+!------------------------------------------------------------------------------!
+!   When using Work_Mod, calling sequence should be outlined                   !
+!                                                                              !
+!   Main_Pro                       (allocates Work_Mod)                        !
+!     |                                                                        !
+!     +----> Interface_Mod_Create  (fine for r_face_01..06 and i_face_01..06)  !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
