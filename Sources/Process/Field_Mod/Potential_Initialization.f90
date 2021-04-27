@@ -6,6 +6,12 @@
 !----------------------------------[Modules]-----------------------------------!
   use Work_Mod, only: log_dist => r_cell_01
 !------------------------------------------------------------------------------!
+!   When using Work_Mod, calling sequence should be outlined                   !
+!                                                                              !
+!   Main_Pro                                     (allocates Work_Mod)          !
+!     |                                                                        !
+!     +----> Field_Mod_Potential_Initialization  (safe to use r_cell_01)       !
+!------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   type(Field_Type),  target :: flow
