@@ -5,12 +5,18 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use User_Mod
-  use Work_Mod, only: u1uj_phij   => r_cell_06,  &
-                      u2uj_phij   => r_cell_07,  &
-                      u3uj_phij   => r_cell_08,  &
-                      u1uj_phij_x => r_cell_09,  &
-                      u2uj_phij_y => r_cell_10,  &
-                      u3uj_phij_z => r_cell_11
+  use Work_Mod, only: u1uj_phij   => r_cell_01,  &
+                      u2uj_phij   => r_cell_02,  &
+                      u3uj_phij   => r_cell_03,  &
+                      u1uj_phij_x => r_cell_04,  &
+                      u2uj_phij_y => r_cell_05,  &
+                      u3uj_phij_z => r_cell_06
+!------------------------------------------------------------------------------!
+!   When using Work_Mod, calling sequence should be outlined                   !
+!                                                                              !
+!   Main_Pro                (allocates Work_Mod)                               !
+!     |                                                                        |
+!     +----> Compute_Scalar (safe to use r_cell_01..06)
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!

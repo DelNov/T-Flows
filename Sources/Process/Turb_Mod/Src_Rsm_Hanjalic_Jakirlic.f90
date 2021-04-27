@@ -5,20 +5,31 @@
 !   dissipation for Hanjalic-Jakirlic model.                                   !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: l_sc_x => r_cell_01,  &
-                      l_sc_y => r_cell_02,  &
-                      l_sc_z => r_cell_03,  &
-                      ui_xx  => r_cell_10,  &
-                      ui_yy  => r_cell_11,  &
-                      ui_zz  => r_cell_12,  &
-                      ui_xy  => r_cell_13,  &
-                      ui_xz  => r_cell_14,  &
-                      ui_yz  => r_cell_15,  &
-                      kin_e  => r_cell_16,  &
-                      kin_e_x=> r_cell_17,  &
-                      kin_e_y=> r_cell_18,  &
-                      kin_e_z=> r_cell_19,  &
-                      diss1  => r_cell_20
+  use Work_Mod, only: l_sc_x => r_cell_11,  &
+                      l_sc_y => r_cell_12,  &
+                      l_sc_z => r_cell_13,  &
+                      ui_xx  => r_cell_14,  &
+                      ui_yy  => r_cell_15,  &
+                      ui_zz  => r_cell_16,  &
+                      ui_xy  => r_cell_17,  &
+                      ui_xz  => r_cell_18,  &
+                      ui_yz  => r_cell_19,  &
+                      kin_e  => r_cell_20,  &
+                      kin_e_x=> r_cell_21,  &
+                      kin_e_y=> r_cell_22,  &
+                      kin_e_z=> r_cell_23,  &
+                      diss1  => r_cell_24
+!------------------------------------------------------------------------------!
+!   When using Work_Mod, calling sequence should be outlined                   !
+!                                                                              !
+!   Main_Pro                                    (allocates Work_Mod)           !
+!     |                                                                        !
+!     +----> Turb_Mod_Main                      (does not use Work_Mod)        !
+!              |                                                               !
+!              +---> Turb_Mod_Compute_Stress    (uses r_cell_01..09)           !
+!                      |                                                       !
+!                      +----> Turb_Mod_Src_Rsm_Hanjalic_Jakirlic               !
+!                                               (uses r_cell_11..24)           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

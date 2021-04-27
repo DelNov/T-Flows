@@ -8,6 +8,12 @@
                       h_w_y => r_cell_02,  &
                       h_w_z => r_cell_03
 !------------------------------------------------------------------------------!
+!   When using Work_Mod, calling sequence should be outlined                   !
+!                                                                              !
+!   Main_Pro                            (allocates Work_Mod)                   !
+!     |                                                                        !
+!     +----> Turb_Mod_Calculate_Deltas  (safe to use r_cell_01..03)            !
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type), target :: turb

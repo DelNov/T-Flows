@@ -4,11 +4,17 @@
 !   Explicit computation of momentum equations, used in PISO algorithm,        !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: neigh => r_cell_12
-!------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
   use Field_Mod
   use Numerics_Mod
+  use Work_Mod,     only: neigh => r_cell_01
+!------------------------------------------------------------------------------!
+!   When using Work_Mod, calling sequence should be outlined                   !
+!                                                                              !
+!   Main_Pro                                    (allocates Work_Mod)           !
+!     |                                                                        !
+!     +----> Compute_Momentum                   (doesn't use Work_Mod)         !
+!             |                                                                !
+!             +----> Compute_Momentum_Explicit  (safe to use r_cell_01)        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

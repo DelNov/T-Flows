@@ -7,12 +7,20 @@
   use Work_Mod, only: phi_x       => r_cell_01,  &
                       phi_y       => r_cell_02,  &
                       phi_z       => r_cell_03,  &
-                      u1uj_phij   => r_cell_06,  &
-                      u2uj_phij   => r_cell_07,  &
-                      u3uj_phij   => r_cell_08,  &
-                      u1uj_phij_x => r_cell_09,  &
-                      u2uj_phij_y => r_cell_10,  &
-                      u3uj_phij_z => r_cell_11
+                      u1uj_phij   => r_cell_04,  &
+                      u2uj_phij   => r_cell_05,  &
+                      u3uj_phij   => r_cell_06,  &
+                      u1uj_phij_x => r_cell_07,  &
+                      u2uj_phij_y => r_cell_08,  &
+                      u3uj_phij_z => r_cell_09
+!------------------------------------------------------------------------------!
+!   When using Work_Mod, calling sequence should be outlined                   !
+!                                                                              !
+!   Main_Pro                                  (allocates Work_Mod)             !
+!     |                                                                        !
+!     +----> Turb_Mod_Main                    (does not use Work_Mod)          !
+!              |                                                               !
+!              +---> Turb_Mod_Compute_Stress  (safe to use r_cell_01..09)      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -134,9 +142,9 @@
     ! Implicit diffusive flux
     ! (this is a very crude approximation: f_coef is
     !  not corrected at interface between materials)
-    f_im=( phix_f*grid % dx(s)                      &
-         +phiy_f*grid % dy(s)                      &
-         +phiz_f*grid % dz(s))*a0
+    f_im=( phix_f*grid % dx(s)       &
+          +phiy_f*grid % dy(s)       &
+          +phiz_f*grid % dz(s))*a0
 
     ! Cross diffusion part
     phi % c(c1) = phi % c(c1) + f_ex - f_im

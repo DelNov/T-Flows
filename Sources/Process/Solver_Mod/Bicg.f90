@@ -13,12 +13,34 @@
 !   incomplete Cholesky preconditioning)                                       !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: p1 => r_cell_01,  &
-                      p2 => r_cell_02,  &
-                      q1 => r_cell_03,  &
-                      q2 => r_cell_04,  &
-                      r1 => r_cell_05,  &
-                      r2 => r_cell_06
+  use Work_Mod, only: p1 => r_cell_11,  &
+                      p2 => r_cell_12,  &
+                      q1 => r_cell_13,  &
+                      q2 => r_cell_14,  &
+                      r1 => r_cell_15,  &
+                      r2 => r_cell_16
+!------------------------------------------------------------------------------!
+!   When using Work_Mod, calling sequence should be outlined                   !
+!                                                                              !
+!   Main_Pro                  (allocates Work_Mod)                             !
+!     |                                                                        !
+!     +----> Compute_Energy   (uses r_cell_11)                                 !
+!     |        |                                                               !
+!     +----> Compute_Momentum (does not use Work_Mod)                          !
+!     |        |                                                               !
+!     +----> Compute_Scalar   (uses r_cell_01..06)                             !
+!              |                                                               !
+!              +----> Bicg    (safe to use r_cell_07..12)                      !
+!                                                                              !
+!   Main_Pro                                    (allocates Work_Mod)           !
+!     |                                                                        !
+!     +----> Turb_Mod_Main                      (does not use Work_Mod)        !
+!              |                                                               !
+!              +---> Turb_Mod_Compute_Variable  (does not use Work_Mod)        !
+!              |       |                                                       !
+!              +---> Turb_Mod_Compute_Stress    (uses r_cell_01..09)           !
+!                      |                                                       !
+!                      +----> Bicg              (safe to use r_cell_11..16)    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

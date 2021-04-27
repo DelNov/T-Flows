@@ -17,6 +17,22 @@
                       q1 => r_cell_02,  &
                       r1 => r_cell_03
 !------------------------------------------------------------------------------!
+!   When using Work_Mod, calling sequence should be outlined                   !
+!                                                                              !
+!   Main_Pro                         (allocates Work_Mod)                      !
+!     |                                                                        !
+!     +----> Compute_Pressure        (does not use Work_Mod)                   !
+!              |                                                               !
+!              +----> Solver_Mod_Cg  (safe to use r_cell_07..12)               !
+!                                                                              !
+!   Main_Pro                                    (allocates Work_Mod)           !
+!     |                                                                        !
+!     +----> Turb_Mod_Main                      (does not use Work_Mod)        !
+!              |                                                               !
+!              +---> Turb_Mod_Compute_F22       (does not use Work_Mod)        !
+!                      |                                                       !
+!                      +----> Solver_Mod_Cg     (safe to use r_cell_01..03)    !
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Solver_Type), target :: sol
