@@ -106,9 +106,20 @@
   ! before iterations in a time step begin, but buoyancy forces might still
   ! be changing due to temperture differrences which are evoling at the
   ! same time as momentum equations.
+  !
+  ! On another note, don't call this for the case of VOF because it somehow
+  ! fiddles around faces, and that is something which was already done when
+  ! computing phyisical properties, so don't have to do it twice.
   if(mult % model .ne. VOLUME_OF_FLUID) then
     call Field_Mod_Buoyancy_Forces(flow)
   end if
+
+  ! Store velocities and volue fluxes from previous iteration
+  ! needed for Majumdar's improvement of Rhie and Chow method
+  flow % u_star(:)      = flow % u % n(:)
+  flow % v_star(:)      = flow % v % n(:)
+  flow % w_star(:)      = flow % w % n(:)
+  flow % v_flux_star(:) = flow % v_flux % n(:)
 
   !--------------------------------------------!
   !                                            !
@@ -312,6 +323,14 @@
       b(c) = fi(c) - hi(c) * grid % vol(c)
     end do
 
+    !------------------------------------------------!
+    !   Save the coefficients from the discretized   !
+    !   momentum equation before under-relaxation    !
+    !------------------------------------------------!
+    do c = 1, grid % n_cells
+      m % sav(c) = m % val(m % dia(c))
+    end do
+
     !----------------------------------------------!
     !   Explicit solution for the PISO algorithm   !
     !----------------------------------------------!
@@ -355,13 +374,21 @@
 
   end do  ! browsing through components
 
-  !------------------------------------------------------------------!
-  !   Save the coefficients from the discretized momentum equation   !
-  !    and refresh their buffers before discretizing for pressure    !
-  !------------------------------------------------------------------!
-  do c = 1, grid % n_cells
-    m % sav(c) = m % val(m % dia(c))
-  end do
+  !------------------------------------------------------------------------!
+  !   Save the coefficients from the discretized momentum equation after   !
+  !   under-relaxation.  This is the way it should be done, but analysis   !
+  !   (analythical and numerical) shows that it only changes the conver-   !
+  !   gence history.  If saving was engaged here, matrix for pressure      !
+  !   would have smaller entries, pressure correction would be higher,     !
+  !   which would, in theory, lead to higher velocity corrections and      !
+  !   faster convergence.  But, since many cases in T-Flows are already    !
+  !   tuned for coefficients saved befoe under-relaxation, I am hesitant   !
+  !   to abruptly make a change in the code and estimate them here.        !
+  !------------------------------------------------------------------------!
+  !@ do c = 1, grid % n_cells
+  !@   m % sav(c) = m % val(m % dia(c))
+  !@ end do
+
   ! Refresh buffers for m % sav before discretizing for pressure
   call Grid_Mod_Exchange_Cells_Real(grid, m % sav)
 
