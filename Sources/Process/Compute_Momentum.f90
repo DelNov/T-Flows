@@ -101,6 +101,10 @@
   m      => sol % m
   b      => sol % b % val
 
+  ! User function
+  call User_Mod_Beginning_Of_Compute_Momentum(flow, turb, mult, sol,  &
+                                              curr_dt, ini)
+
   ! Buoyancy force if no VOF is used (VOF calls it from its main)
   ! Now this is a bit stupid.  I do understand that VOF changes only once
   ! before iterations in a time step begin, but buoyancy forces might still
@@ -164,13 +168,11 @@
       p_drop_i =  bulk % p_drop_z
     end if
 
-    ! User function
-    call User_Mod_Beginning_Of_Compute_Momentum(flow, turb, mult, curr_dt, ini)
-
     ! Initialize matrix and right hand side
     fi     (:) = 0.0  ! all "internal" forces acting on this component
     m % val(:) = 0.0
     b      (:) = 0.0
+    fi     (:) = 0.0
     f_stress   = 0.0
 
     ! Calculate velocity magnitude for normalization
@@ -393,7 +395,7 @@
   call Grid_Mod_Exchange_Cells_Real(grid, m % sav)
 
   ! User function
-  call User_Mod_End_Of_Compute_Momentum(flow, turb, mult, curr_dt, ini)
+  call User_Mod_End_Of_Compute_Momentum(flow, turb, mult, sol, curr_dt, ini)
 
   call Cpu_Timer_Mod_Stop('Compute_Momentum (without solvers)')
 

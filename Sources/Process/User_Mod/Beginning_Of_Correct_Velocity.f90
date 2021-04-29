@@ -11,6 +11,18 @@
   type(Solver_Type),     target :: sol
   integer, intent(in)           :: curr_dt
   integer, intent(in)           :: ini
+!-----------------------------------[Locals]-----------------------------------!
+  type(Grid_Type),   pointer :: grid
+  type(Var_Type),    pointer :: u, v, w, p
+  type(Matrix_Type), pointer :: m
 !==============================================================================!
+
+  ! Take aliases
+  grid => flow % pnt_grid
+  u    => flow % u
+  v    => flow % u
+  w    => flow % u
+  p    => flow % p
+  m    => sol % m
 
   end subroutine

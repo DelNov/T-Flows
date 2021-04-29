@@ -64,7 +64,8 @@
   call Solver_Mod_Alias_System(sol, a, b)
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Scalar(flow, turb, mult, curr_dt, ini)
+  call User_Mod_Beginning_Of_Compute_Scalar(flow, turb, mult, sol,  &
+                                            curr_dt, ini, sc)
 
   ! Initialize matrix and right hand side
   a % val(:) = 0.0
@@ -372,7 +373,7 @@
   call Field_Mod_Grad_Variable(flow, phi)
 
   ! User function
-  call User_Mod_End_Of_Compute_Scalar(flow, turb, mult, curr_dt, ini)
+  call User_Mod_End_Of_Compute_Scalar(flow, turb, mult, sol, curr_dt, ini, sc)
 
   call Cpu_Timer_Mod_Stop('Compute_Scalars (without solvers)')
 
