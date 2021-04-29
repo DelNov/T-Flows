@@ -782,6 +782,9 @@
     end if
 
     ! Wall distance and delta, important for all models
+    call Save_Scalar_Real("GridCellVolume", plot_inside,   &
+                          grid % vol(c_f:c_l),             &
+                          f8, f9, data_offset, run)
     call Save_Scalar_Real("GridWallDistance", plot_inside,   &
                           grid % wall_dist(c_f:c_l),         &
                           f8, f9, data_offset, run)
