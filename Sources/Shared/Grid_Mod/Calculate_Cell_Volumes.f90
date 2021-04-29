@@ -12,8 +12,8 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c1, c2, s, i_nod, j_nod
   real    :: xf(MAX_FACES_N_NODES), yf(MAX_FACES_N_NODES), zf(MAX_FACES_N_NODES)
-  real    :: x_cell_1, y_cell_1, z_cell_1
-  real    :: x_cell_2, y_cell_2, z_cell_2
+  real    :: x_cell_1, y_cell_1, z_cell_1, dv_1
+  real    :: x_cell_2, y_cell_2, z_cell_2, dv_2
 !==============================================================================!
 
   ! (Re)initialize cell volumes
@@ -45,8 +45,8 @@
                                  xf(i_nod),    yf(i_nod),    zf(i_nod),     &
                                  xf(j_nod),    yf(j_nod),    zf(j_nod),     &
                                  x_cell_1,     y_cell_1,     z_cell_1))
-      grid % vol(c1) = grid % vol(c1) + grid % dv1(s)
     end do  ! i_nod
+    grid % vol(c1) = grid % vol(c1) + grid % dv1(s)
 
     ! Second cell
     if(c2 > 0) then
@@ -63,8 +63,8 @@
                                    xf(i_nod),    yf(i_nod),    zf(i_nod),     &
                                    xf(j_nod),    yf(j_nod),    zf(j_nod),     &
                                    x_cell_2,     y_cell_2,     z_cell_2))
-        grid % vol(c2) = grid % vol(c2) + grid % dv2(s)
       end do  ! i_nod
+      grid % vol(c2) = grid % vol(c2) + grid % dv2(s)
     end if
 
   end do
