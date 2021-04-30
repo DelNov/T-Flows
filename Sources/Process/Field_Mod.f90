@@ -101,11 +101,6 @@
     real, allocatable :: face_fy(:), cell_fy(:)
     real, allocatable :: face_fz(:), cell_fz(:)
 
-    ! Storage for tentative velocity field and volume fluxes
-    ! needed for Majumdar's improvement of Rhie-Chow method
-    real, allocatable :: u_star(:), v_star(:), w_star(:)
-    real, allocatable :: v_flux_star(:)
-
     ! Reference temperature and density
     real :: t_ref
     real :: dens_ref

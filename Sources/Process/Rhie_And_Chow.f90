@@ -32,8 +32,6 @@
   type(Face_Type),   pointer :: v_flux          ! volume flux
   type(Matrix_Type), pointer :: a               ! pressure matrix
   type(Matrix_Type), pointer :: m               ! momentum matrix
-  real, contiguous,  pointer :: u_star(:), v_star(:), w_star(:)
-  real, contiguous,  pointer :: v_flux_star(:)
   real                       :: a12, px_f, py_f, pz_f, fs, dens_h
   integer                    :: s, c1, c2, c
   logical, parameter         :: MAJUMDAR = .false.
@@ -42,15 +40,11 @@
   call Cpu_Timer_Mod_Start('Rhie_And_Chow')
 
   ! Take aliases
-  grid        => flow % pnt_grid
-  p           => flow % p
-  u_star      => flow % u_star
-  v_star      => flow % v_star
-  w_star      => flow % w_star
-  v_flux      => flow % v_flux
-  v_flux_star => flow % v_flux_star
-  a           => sol % a
-  m           => sol % m
+  grid   => flow % pnt_grid
+  p      => flow % p
+  v_flux => flow % v_flux
+  a      => sol % a
+  m      => sol % m
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! User function
@@ -72,16 +66,6 @@
   do c = 1, grid % n_cells
     v_m(c) = grid % vol(c) / m % sav(c)
   end do
-
-  ! First part (cell-centered) of Majumdar's correction
-  ! (Subtract the cell-centered under-relaxed velocities)
-  if(MAJUMDAR) then
-    do c = 1, grid % n_cells
-      u_c(c) = u_c(c) - (1.0 - u % urf) * u_star(c)
-      v_c(c) = v_c(c) - (1.0 - v % urf) * v_star(c)
-      w_c(c) = w_c(c) - (1.0 - w % urf) * w_star(c)
-    end do
-  end if
 
   !-------------------------------------------------!
   !   Calculate the mass fluxes on the cell faces   !
@@ -123,13 +107,6 @@
                        + w_f(s) * grid % sz(s) )           &
                        + a12 * (p % n(c1) - p % n(c2))     &
                        + a % fc(s) * (px_f + py_f + pz_f)
-
-      ! Second part of Majumdar's correction
-      ! (Add face-centered under-relaxed fluxes)
-      if(MAJUMDAR) then
-        v_flux % n(s) = v_flux % n(s)                  &
-                      + (1.0 - u % urf) * v_flux_star(s)
-      end if
     end if
   end do
 

@@ -65,9 +65,9 @@
   allocate(flow % vort (-nb:nc)); flow % vort  = 0.
   allocate(flow % shear(-nb:nc)); flow % shear = 0.
 
-  !----------------------------------------------------------------!
-  !   Twelve variables which follow are needed for Rhie and Chow   !
-  !----------------------------------------------------------------!
+  !--------------------------------------------------------------!
+  !   Nine variables which follow are needed for Rhie and Chow   !
+  !--------------------------------------------------------------!
   allocate(flow % fx(nc));           flow % fx = 0.0
   allocate(flow % fy(nc));           flow % fy = 0.0
   allocate(flow % fz(nc));           flow % fz = 0.0
@@ -79,11 +79,6 @@
   allocate(flow % face_fx(nf));      flow % face_fx = 0.0
   allocate(flow % face_fy(nf));      flow % face_fy = 0.0
   allocate(flow % face_fz(nf));      flow % face_fz = 0.0
-
-  allocate(flow % u_star(-nb:nc));   flow % u_star      = 0.0
-  allocate(flow % v_star(-nb:nc));   flow % v_star      = 0.0
-  allocate(flow % w_star(-nb:nc));   flow % w_star      = 0.0
-  allocate(flow % v_flux_star(nf));  flow % v_flux_star = 0.0
 
   !--------------------------------------!
   !   Allocate memory for user scalars   !

@@ -118,13 +118,6 @@
     call Field_Mod_Buoyancy_Forces(flow)
   end if
 
-  ! Store velocities and volue fluxes from previous iteration
-  ! needed for Majumdar's improvement of Rhie and Chow method
-  flow % u_star(:)      = flow % u % n(:)
-  flow % v_star(:)      = flow % v % n(:)
-  flow % w_star(:)      = flow % w % n(:)
-  flow % v_flux_star(:) = flow % v_flux % n(:)
-
   !--------------------------------------------!
   !                                            !
   !                                            !
