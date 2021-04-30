@@ -43,12 +43,12 @@
 !
 !   Dimensions of certain variables
 !
-!     app              [m^4s/kg]
-!     pp               [kg/ms^2]
-!     p%x, p%y, p%z    [kg/m^2s^2]
-!     px_f, py_f, pz_f [kg/m^2s^2]
-!     b                [m^3/s]
-!     v_flux           [m^3/s]
+!     app                   [m^4s/kg]
+!     pp                    [kg/ms^2]
+!     p % x, p % y, p % z   [kg/(m^2 s^2)]
+!     px_f, py_f, pz_f      [kg/(m^2 s^2)]
+!     b                     [m^3/s]
+!     v_flux                [m^3/s]
 !
 !==============================================================================!
 
