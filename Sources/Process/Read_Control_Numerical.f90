@@ -29,6 +29,8 @@
   !------------------------------------------!
   !   Pressure velocity coupling algorithm   !
   !------------------------------------------!
+
+  ! Basic algorithm for pressure-velocity coupling (SIMPLE, PISO)
   call Control_Mod_Pressure_Momentum_Coupling(name, .true.)
   flow % p_m_coupling = Numerics_Mod_Pressure_Momentum_Coupling_Code(name)
 
@@ -36,6 +38,9 @@
     call Control_Mod_Number_Of_Piso_Corrections(flow % n_piso_corrections)
     flow % piso_status = .false.
   end if
+
+  ! Improvements to Rhie and Chow method (Choi, Gu)
+  call Control_Mod_Choi_Correction(flow % choi_correction, .false.)
 
   !-------------------------!
   !   Related to momentum   !

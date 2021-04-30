@@ -145,6 +145,7 @@
     include 'Control_Mod/Numerics/Blending_Coefficient_For_Scalars.f90'
     include 'Control_Mod/Numerics/Blending_Coefficient_For_Turbulence.f90'
     include 'Control_Mod/Numerics/Blending_Coefficient_For_Multiphase.f90'
+    include 'Control_Mod/Numerics/Choi_Correction.f90'
     include 'Control_Mod/Numerics/Max_Simple_Iterations.f90'
     include 'Control_Mod/Numerics/Min_Simple_Iterations.f90'
     include 'Control_Mod/Numerics/Number_Of_Piso_Corrections.f90'

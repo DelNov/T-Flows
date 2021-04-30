@@ -35,7 +35,6 @@
   type(Matrix_Type), pointer :: m               ! momentum matrix
   real                       :: a12, px_f, py_f, pz_f, fs, dens_h
   integer                    :: s, c1, c2, c
-  logical, parameter         :: CHOI = .false.
 !==============================================================================!
 
   call Cpu_Timer_Mod_Start('Rhie_And_Chow')
@@ -47,9 +46,6 @@
   a      => sol % a
   m      => sol % m
   call Field_Mod_Alias_Momentum(flow, u, v, w)
-
-  ! User function
-  ! call User_Mod_Beginning_Of_Compute_Pressure(flow, mult, ini)
 
   !--------------------------------------!
   !   Take velocities as last computed   !
@@ -70,7 +66,7 @@
 
   ! First part (cell-centered) of Choi's correction
   ! (Subtract the cell-centered unsteady terms)
-  if(CHOI) then
+  if(flow % choi_correction) then
     do c = 1, grid % n_cells
 
       ! Unit for t_m: m^3 * kg/m^3 / s * s/kg = 1
@@ -125,7 +121,7 @@
 
       ! Second part of Choi's correction
       ! (Add face-centered flux from previous time step)
-      if(CHOI) then
+      if(flow % choi_correction) then
         v_flux % n(s) = v_flux % n(s)  &
                       + v_flux % o(s) * 0.5 * (t_m(c1) + t_m(c2))
       end if

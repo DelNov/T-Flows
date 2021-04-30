@@ -25,6 +25,7 @@
     ! Pressure velocity coupling algorithm
     integer :: p_m_coupling, i_corr, n_piso_corrections
     logical :: piso_status
+    logical :: choi_correction
 
     ! Physical properties (defined in cell centers)
     real, allocatable :: capacity(:)      ! [J/kg/K]

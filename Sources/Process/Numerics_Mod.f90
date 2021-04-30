@@ -39,6 +39,7 @@
   ! Algorithms for pressure velocity coupling
   integer, parameter :: SIMPLE = 40163
   integer, parameter :: PISO   = 40169
+  integer, parameter :: CHOI   = 40177
 
   contains
 

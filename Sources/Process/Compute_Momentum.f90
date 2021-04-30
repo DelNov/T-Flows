@@ -36,31 +36,25 @@
 !
 !  Stress tensor on the face s:
 !
-!    T = mi * [    2*dU/dx     dU/dy+dV/dx   dU/dz+dW/dx  ]
-!             [  dU/dy+dV/dx     2*dV/dy     dV/dz+dW/dy  ]
-!             [  dU/dz+dW/dx   dV/dz+dW/dy     2*dW/dz    ]
+!    t = mu * [    2*du/dx     du/dy+dv/dx   du/dz+dw/dx  ]
+!             [  du/dy+dv/dx     2*dv/dy     dv/dz+dw/dy  ]
+!             [  du/dz+dw/dx   dv/dz+dw/dy     2*dw/dz    ]
 !
 !  The forces, acting on the cell face are:
 !
-!    Fx = T11*Sx + T12*Sy + T13*Sz
-!    Fy = T21*Sx + T22*Sy + T23*Sz
-!    Fz = T31*Sx + T32*Sy + T33*Sz
+!    fx = t11*sx + t12*sy + t13*sz
+!    fy = t21*sx + t22*sy + t23*sz
+!    fz = t31*sx + t32*sy + t33*sz
 !
 !  which could also be written in the compact form:
 !
-!    {F} = [T]{S}
+!    {f} = [t]{s}
 !
-!  U component:
+!  or in expended form:
 !
-!    Fx = Txx*Sx + Txy*Sy + Txz*Sz
-!
-!  V component:
-!
-!    Fy = Tyx*Sx + Tyy*Sy + Tyz*Sz
-!
-!  W component:
-!
-!    Fz = Tzx*Sx + Tzy*Sy + Tzz*Sz
+!    fx = txx*sx + txy*sy + txz*sz
+!    fy = tyx*sx + tyy*sy + tyz*sz
+!    fz = tzx*sx + tzy*sy + tzz*sz
 !
 !------------------------------------------------------------------------------!
 !
@@ -76,17 +70,16 @@
 !
 !     [m]{u} = {b}   [kgm/s^2]   [N]
 !
-!  Dimensions of certain variables
+!  Dimensions of certain variables:
 !
 !     m              [kg/s]
 !     u, v, w        [m/s]
-!     bu, bv, bw     [kgm/s^2]   [N]
-!     p, pp          [kg/ms^2]   [N/m^2]
+!     bu, bv, bw     [kgm/s^2]      [N]
+!     p, pp          [kg/(m s^2)]   [N/m^2]
 !     v_flux         [m^3/s]
-!     au*, av*, aw*  [kgm/s^2]   [N]
-!     du*, dv*, dw*  [kgm/s^2]   [N]
-!     cu*, cv*, cw*  [kgm/s^2]   [N]
-!     Wall visc.      vis_w [kg/(m*s)]
+!     au*, av*, aw*  [kgm/s^2]      [N]
+!     du*, dv*, dw*  [kgm/s^2]      [N]
+!     cu*, cv*, cw*  [kgm/s^2]      [N]
 !==============================================================================!
 
   call Cpu_Timer_Mod_Start('Compute_Momentum (without solvers)')
@@ -116,6 +109,24 @@
   ! computing phyisical properties, so don't have to do it twice.
   if(mult % model .ne. VOLUME_OF_FLUID) then
     call Field_Mod_Buoyancy_Forces(flow)
+  end if
+
+  ! These should eventually be with the above
+  if(mult % model .eq. VOLUME_OF_FLUID) then
+    do c = 1, grid % n_cells
+      flow % cell_fx(c) = grid % vol(c) * flow % density(c) * grav_x
+      flow % cell_fy(c) = grid % vol(c) * flow % density(c) * grav_y
+      flow % cell_fz(c) = grid % vol(c) * flow % density(c) * grav_z
+    end do
+  end if
+
+  ! Store the old volume flux for Choi's correction
+  if (flow % piso_status .eqv. .false.) then  ! check about this
+    if(ini .eq. 1) then
+      do s = 1, grid % n_faces
+        v_flux % o(s) = v_flux % n(s)
+      end do
+    end if
   end if
 
   !--------------------------------------------!
@@ -165,7 +176,6 @@
     fi     (:) = 0.0  ! all "internal" forces acting on this component
     m % val(:) = 0.0
     b      (:) = 0.0
-    fi     (:) = 0.0
     f_stress   = 0.0
 
     ! Calculate velocity magnitude for normalization
@@ -321,6 +331,11 @@
     !------------------------------------------------!
     !   Save the coefficients from the discretized   !
     !   momentum equation before under-relaxation    !
+    !                                                !
+    !   If you save them like this, before the un-   !
+    !   der-relaxation, results are independent      !
+    !   from under-relaxation factors and Majumdar   !
+    !   correction in Rhie_And_Chow is not needed    !
     !------------------------------------------------!
     do c = 1, grid % n_cells
       m % sav(c) = m % val(m % dia(c))
@@ -368,21 +383,6 @@
     end if
 
   end do  ! browsing through components
-
-  !------------------------------------------------------------------------!
-  !   Save the coefficients from the discretized momentum equation after   !
-  !   under-relaxation.  This is the way it should be done, but analysis   !
-  !   (analythical and numerical) shows that it only changes the conver-   !
-  !   gence history.  If saving was engaged here, matrix for pressure      !
-  !   would have smaller entries, pressure correction would be higher,     !
-  !   which would, in theory, lead to higher velocity corrections and      !
-  !   faster convergence.  But, since many cases in T-Flows are already    !
-  !   tuned for coefficients saved befoe under-relaxation, I am hesitant   !
-  !   to abruptly make a change in the code and estimate them here.        !
-  !------------------------------------------------------------------------!
-  !@ do c = 1, grid % n_cells
-  !@   m % sav(c) = m % val(m % dia(c))
-  !@ end do
 
   ! Refresh buffers for m % sav before discretizing for pressure
   call Grid_Mod_Exchange_Cells_Real(grid, m % sav)

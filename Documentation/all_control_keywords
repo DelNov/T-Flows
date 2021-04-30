@@ -1,116 +1,117 @@
 
 Input-output
 
-	BACKUP_SAVE_INTERVAL				100
-	LOAD_INITIAL_SOLUTION_NAME			skip
-	LOAD_BACKUP_NAME				skip
-	NUMBER_OF_MONITORING_POINTS			0
-		MONITORING_POINT_001			0.0,  0.0,  0.0
-		...
-		MONITORING_POINT_00X			0.0,  0.0,  0.0
-	PROBLEM_NAME					unknown
-	RESULTS_SAVE_INTERVAL				60
-	SAVE_INITIAL_SOLUTION_NAME			skip
-	SAVE_INITIAL_CONDITION			yes
-	SAVE_BACKUP_NAME				skip
-	WALL_TIME_MAX_HOURS				168.0
+        BACKUP_SAVE_INTERVAL                             100
+        LOAD_INITIAL_SOLUTION_NAME                         skip
+        LOAD_BACKUP_NAME                                   skip
+        NUMBER_OF_MONITORING_POINTS                        0
+                MONITORING_POINT_001                       0.0,  0.0,  0.0
+                ...
+                MONITORING_POINT_00X                       0.0,  0.0,  0.0
+        PROBLEM_NAME                                       unknown
+        RESULTS_SAVE_INTERVAL                             60
+        SAVE_INITIAL_SOLUTION_NAME                         skip
+        SAVE_INITIAL_CONDITION                             yes
+        SAVE_BACKUP_NAME                                   skip
+        WALL_TIME_MAX_HOURS                              168.0
 
 Numerics
 
-	ADVECTION_SCHEME_FOR_ENERGY			upwind
-	ADVECTION_SCHEME_FOR_MOMENTUM			upwind
-	ADVECTION_SCHEME_FOR_MULTIPHASE			upwind
-	ADVECTION_SCHEME_FOR_SCALARS			upwind
-	ADVECTION_SCHEME_FOR_TURBULENCE			upwind
-	BLENDING_COEFFICIENT_FOR_ENERGY			1.0
-	BLENDING_COEFFICIENT_FOR_MOMENTUM		1.0
-	BLENDING_COEFFICIENT_FOR_MULTIPHASE		1.0
-	BLENDING_COEFFICIENT_FOR_SCALARS		1.0
-	BLENDING_COEFFICIENT_FOR_TURBULENCE		1.0
-	MAX_SIMPLE_ITERATIONS				10
-	MIN_SIMPLE_ITERATIONS				3
-	NUMBER_OF_TIME_STEPS				1000
-	PRECONDITIONER_FOR_SYSTEM_MATRIX		incomplete_cholesky
-	PRESSURE_MOMENTUM_COUPLING			simple
-	TEMPORAL_PRESSURE_CORRECTION			no
-	SIMPLE_UNDERRELAXATION_FOR_ENERGY		0.5
-	SIMPLE_UNDERRELAXATION_FOR_MOMENTUM		0.7
-	SIMPLE_UNDERRELAXATION_FOR_MULTIPHASE		0.5
-	SIMPLE_UNDERRELAXATION_FOR_PRESSURE		0.3
-	SIMPLE_UNDERRELAXATION_FOR_SCALARS		0.7
-	SIMPLE_UNDERRELAXATION_FOR_TURBULENCE		0.7
-	SOLVER_FOR_ENERGY				cg
-	SOLVER_FOR_MOMENTUM				cg
-	SOLVER_FOR_MULTIPHASE				cg
-	SOLVER_FOR_PRESSURE				bicg
-	SOLVER_FOR_SCALARS				cg
-	SOLVER_FOR_TURBULENCE				cg
-	STARTING_TIME_STEP_FOR_TURB_STATISTICS		1200000
-	TIME_INTEGRATION				linear
-	TIME_STEP					1.0e-4
-	MAX_ITERATIONS_FOR_ENERGY_SOLVER		5
-	MAX_ITERATIONS_FOR_MOMENTUM_SOLVER		5
-	MAX_ITERATIONS_FOR_MULTIPHASE_SOLVER		5
-	MAX_ITERATIONS_FOR_PRESSURE_SOLVER		40
-	MAX_ITERATIONS_FOR_SCALARS_SOLVER		6
-	MAX_ITERATIONS_FOR_TURBULENCE_SOLVER		6
-	TOLERANCE_FOR_ENERGY_SOLVER			1.0e-6
-	TOLERANCE_FOR_MOMENTUM_SOLVER			1.0e-6
-	TOLERANCE_FOR_MULTIPHASE_SOLVER			1.0e-6
-	TOLERANCE_FOR_PRESSURE_SOLVER			1.0e-6
-	TOLERANCE_FOR_SIMPLE_ALGORITHM			1.0e-4
-	TOLERANCE_FOR_SCALARS_SOLVER			1.0e-6
-	TOLERANCE_FOR_TURBULENCE_SOLVER			1.0e-6
-	NORMALIZATION_FOR_ENERGY_SOLVER			1.0
-	NORMALIZATION_FOR_MOMENTUM_SOLVER		1.0
-	NORMALIZATION_FOR_PRESSURE_SOLVER		1.0
-	NORMALIZATION_FOR_SIMPLE_ALGORITHM		1.0
-	NORMALIZATION_FOR_SCALARS_SOLVER		1.0
-	NORMALIZATION_FOR_TURBULENCE_SOLVER		1.0
-	NUMBER_OF_PISO_CORRECTIONS			3
-	V_CYCLE_RESIDUAL_RATIO				0.01
-	V_CYCLE_NUMBER_OF_SMOOTHING_ITERATIONS		10
-	MAX_CORRECTION_CYCLES_BETA_VOF			2
-	MAX_SMOOTHING_CYCLES_CURVATURE_VOF		2
-	MAX_SMOOTHING_CYCLES_NORMAL_VOF			0
-	MAX_COURANT_VOF					0.25
-	MAX_SUBSTEP_CYCLES_VOF			 	100
-	FACTOR_FICTITIOUS_TIME_VOF			0.1
-	FACTOR_NUMBER_CELLS_DISTANCE_FUNCTION		1.5
+        ADVECTION_SCHEME_FOR_ENERGY                        upwind
+        ADVECTION_SCHEME_FOR_MOMENTUM                      upwind
+        ADVECTION_SCHEME_FOR_MULTIPHASE                    upwind
+        ADVECTION_SCHEME_FOR_SCALARS                       upwind
+        ADVECTION_SCHEME_FOR_TURBULENCE                    upwind
+        BLENDING_COEFFICIENT_FOR_ENERGY                    1.0
+        BLENDING_COEFFICIENT_FOR_MOMENTUM                  1.0
+        BLENDING_COEFFICIENT_FOR_MULTIPHASE                1.0
+        BLENDING_COEFFICIENT_FOR_SCALARS                   1.0
+        BLENDING_COEFFICIENT_FOR_TURBULENCE                1.0
+        CHOI_CORRECTION                                    no
+        MAX_SIMPLE_ITERATIONS                             10
+        MIN_SIMPLE_ITERATIONS                              3
+        NUMBER_OF_TIME_STEPS                            1000
+        PRECONDITIONER_FOR_SYSTEM_MATRIX                   incomplete_cholesky
+        PRESSURE_MOMENTUM_COUPLING                         simple
+        TEMPORAL_PRESSURE_CORRECTION                       no
+        SIMPLE_UNDERRELAXATION_FOR_ENERGY                  0.5
+        SIMPLE_UNDERRELAXATION_FOR_MOMENTUM                0.7
+        SIMPLE_UNDERRELAXATION_FOR_MULTIPHASE              0.5
+        SIMPLE_UNDERRELAXATION_FOR_PRESSURE                0.3
+        SIMPLE_UNDERRELAXATION_FOR_SCALARS                 0.7
+        SIMPLE_UNDERRELAXATION_FOR_TURBULENCE              0.7
+        SOLVER_FOR_ENERGY                                  cg
+        SOLVER_FOR_MOMENTUM                                cg
+        SOLVER_FOR_MULTIPHASE                              cg
+        SOLVER_FOR_PRESSURE                                bicg
+        SOLVER_FOR_SCALARS                                 cg
+        SOLVER_FOR_TURBULENCE                              cg
+        STARTING_TIME_STEP_FOR_TURB_STATISTICS       1200000
+        TIME_INTEGRATION                                   linear
+        TIME_STEP                                          1.0e-4
+        MAX_ITERATIONS_FOR_ENERGY_SOLVER                   5
+        MAX_ITERATIONS_FOR_MOMENTUM_SOLVER                 5
+        MAX_ITERATIONS_FOR_MULTIPHASE_SOLVER               5
+        MAX_ITERATIONS_FOR_PRESSURE_SOLVER                40
+        MAX_ITERATIONS_FOR_SCALARS_SOLVER                  6
+        MAX_ITERATIONS_FOR_TURBULENCE_SOLVER               6
+        TOLERANCE_FOR_ENERGY_SOLVER                        1.0e-6
+        TOLERANCE_FOR_MOMENTUM_SOLVER                      1.0e-6
+        TOLERANCE_FOR_MULTIPHASE_SOLVER                    1.0e-6
+        TOLERANCE_FOR_PRESSURE_SOLVER                      1.0e-6
+        TOLERANCE_FOR_SIMPLE_ALGORITHM                     1.0e-4
+        TOLERANCE_FOR_SCALARS_SOLVER                       1.0e-6
+        TOLERANCE_FOR_TURBULENCE_SOLVER                    1.0e-6
+        NORMALIZATION_FOR_ENERGY_SOLVER                    1.0
+        NORMALIZATION_FOR_MOMENTUM_SOLVER                  1.0
+        NORMALIZATION_FOR_PRESSURE_SOLVER                  1.0
+        NORMALIZATION_FOR_SIMPLE_ALGORITHM                 1.0
+        NORMALIZATION_FOR_SCALARS_SOLVER                   1.0
+        NORMALIZATION_FOR_TURBULENCE_SOLVER                1.0
+        NUMBER_OF_PISO_CORRECTIONS                         3
+        V_CYCLE_RESIDUAL_RATIO                             0.01
+        V_CYCLE_NUMBER_OF_SMOOTHING_ITERATIONS            10
+        MAX_CORRECTION_CYCLES_BETA_VOF                     2
+        MAX_SMOOTHING_CYCLES_CURVATURE_VOF                 2
+        MAX_SMOOTHING_CYCLES_NORMAL_VOF                    0
+        MAX_COURANT_VOF                                    0.25
+        MAX_SUBSTEP_CYCLES_VOF                           100
+        FACTOR_FICTITIOUS_TIME_VOF                         0.1
+        FACTOR_NUMBER_CELLS_DISTANCE_FUNCTION              1.5
 
 Physics
 
-	ANGULAR_VELOCITY_VECTOR				0.0,  0.0,  0.0
-	BUOYANCY					no
-	DYNAMIC_VISCOSITY				0.01
-	GRAVITATIONAL_VECTOR				0.0,  0.0,  0.0
-	HEAT_CAPACITY					1.0
-	HEAT_TRANSFER					no
-	MASS_DENSITY					1.0
-	MASS_FLOW_RATES					0.0,  0.0,  0.0
-	NUMBER_OF_PARTICLES				0
-	NUMBER_OF_PHASES				1
-	NUMBER_OF_SCALARS				0
-	POINT_FOR_MONITORING_PLANES			0.0,  0.0,  0.0
-	PRESSURE_DROPS					0.0,  0.0,  0.0
-	REFERENCE_TEMPERATURE				0.0
-	VOLUME_EXPANSION_COEFFICIENT			0.0
-	ROUGH_WALLS   					no
-	ROUGHNESS_COEFFICIENT				0.0
-	SMAGORINSKY_CONSTANT				0.17
-	THERMAL_CONDUCTIVITY				1.0
-	SPECIES_DIFFUSIVITY				1.0e-6
-	TURBULENCE_MODEL				none
-	TURBULENCE_MODEL_VARIANT			high_re
-	TURBULENT_PRANDTL_NUMBER			0.9
-	TURBULENT_SCHMIDT_NUMBER			0.9
-	HYBRID_LES_RANS_SWITCH				switch_distance
-	MULTIPHASE_MODEL				none
-	COMPUTE_DISTANCE_FUNCTION			no
-	PHASE_DENSITIES					1.0,  1.0, ...
-	PHASE_VISCOSITIES				1.0,  1.0, ...
-	SWARM_DENSITY					1000.0
-	SWARM_DIAMETER					2.5e-5
-	SWARM_COEFFICIENT_OF_RESTITUTION		1.0
-	POTENTIAL_INITIALIZATION			no
+        ANGULAR_VELOCITY_VECTOR                            0.0,  0.0,  0.0
+        BUOYANCY                                           no
+        DYNAMIC_VISCOSITY                                  0.01
+        GRAVITATIONAL_VECTOR                               0.0,  0.0,  0.0
+        HEAT_CAPACITY                                      1.0
+        HEAT_TRANSFER                                      no
+        MASS_DENSITY                                       1.0
+        MASS_FLOW_RATES                                    0.0,  0.0,  0.0
+        NUMBER_OF_PARTICLES                                0
+        NUMBER_OF_PHASES                                   1
+        NUMBER_OF_SCALARS                                  0
+        POINT_FOR_MONITORING_PLANES                        0.0,  0.0,  0.0
+        PRESSURE_DROPS                                     0.0,  0.0,  0.0
+        REFERENCE_TEMPERATURE                              0.0
+        VOLUME_EXPANSION_COEFFICIENT                       0.0
+        ROUGH_WALLS                                        no
+        ROUGHNESS_COEFFICIENT                              0.0
+        SMAGORINSKY_CONSTANT                               0.17
+        THERMAL_CONDUCTIVITY                               1.0
+        SPECIES_DIFFUSIVITY                                1.0e-6
+        TURBULENCE_MODEL                                   none
+        TURBULENCE_MODEL_VARIANT                           high_re
+        TURBULENT_PRANDTL_NUMBER                           0.9
+        TURBULENT_SCHMIDT_NUMBER                           0.9
+        HYBRID_LES_RANS_SWITCH                             switch_distance
+        MULTIPHASE_MODEL                                   none
+        COMPUTE_DISTANCE_FUNCTION                          no
+        PHASE_DENSITIES                                    1.0,  1.0, ...
+        PHASE_VISCOSITIES                                  1.0,  1.0, ...
+        SWARM_DENSITY                                   1000.0
+        SWARM_DIAMETER                                     2.5e-5
+        SWARM_COEFFICIENT_OF_RESTITUTION                   1.0
+        POTENTIAL_INITIALIZATION                           no
 
