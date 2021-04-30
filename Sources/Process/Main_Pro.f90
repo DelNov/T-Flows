@@ -218,7 +218,9 @@
   call Control_Mod_Backup_Save_Interval  (backup % interval, verbose=.true.)
   call Control_Mod_Results_Save_Interval (result % interval, verbose=.true.)
   call Control_Mod_Save_Initial_Condition(result % initial,  verbose=.true.)
-  call Control_Mod_Swarm_Save_Interval   (prsi,              verbose=.true.)
+  if(mult(d) % model .eq. LAGRANGIAN_PARTICLES) then
+    call Control_Mod_Swarm_Save_Interval(prsi, verbose=.true.)
+  end if
 
   !-------------------------------------------------------------!
   !   Perform potential initialization in the first time step   !
