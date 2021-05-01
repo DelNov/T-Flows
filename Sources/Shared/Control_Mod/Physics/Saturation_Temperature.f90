@@ -7,6 +7,6 @@
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Real_Item('SATURATION_TEMPERATURE', 1.0, val, verbose)
+  call Control_Mod_Read_Real_Item('SATURATION_TEMPERATURE', 100., val, verbose)
 
   end subroutine
