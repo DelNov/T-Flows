@@ -7,11 +7,11 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
-  real                     :: phi (-flow % pnt_grid % n_bnd_cells:  &
-                                    flow % pnt_grid % n_cells)
+  real                     :: phi ( -flow % pnt_grid % n_bnd_cells  &
+                                    :flow % pnt_grid % n_cells)
   integer, intent(in)      :: i
-  real,    intent(out)     :: phii(-flow % pnt_grid % n_bnd_cells:  &
-                                    flow % pnt_grid % n_cells)
+  real,    intent(out)     :: phii( -flow % pnt_grid % n_bnd_cells  &
+                                    :flow % pnt_grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   integer                  :: s, c1, c2
