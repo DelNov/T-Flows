@@ -404,7 +404,6 @@
     end if
   end do
 
-
   call Comm_Mod_Global_Sum_Int(n_wall)
   call Comm_Mod_Global_Sum_Int(n_inflow)
   call Comm_Mod_Global_Sum_Int(n_outflow)
