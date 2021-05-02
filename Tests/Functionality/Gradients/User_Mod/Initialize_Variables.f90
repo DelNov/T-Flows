@@ -3,7 +3,6 @@
 !------------------------------------------------------------------------------!
 !   User initialization of dependent variables.                                !
 !------------------------------------------------------------------------------!
-  use Save_Grid_Mod, only: Save_Vtu_Faces
   use Work_Mod, only: phi_f    => r_face_01,  &
                       phi_n    => r_node_01,  &
                       phi_x    => r_cell_01,  &
