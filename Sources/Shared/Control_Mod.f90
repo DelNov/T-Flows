@@ -146,6 +146,7 @@
     include 'Control_Mod/Numerics/Blending_Coefficient_For_Turbulence.f90'
     include 'Control_Mod/Numerics/Blending_Coefficient_For_Multiphase.f90'
     include 'Control_Mod/Numerics/Choi_Correction.f90'
+    include 'Control_Mod/Numerics/Max_Iterations_For_Gauss_Gradients.f90'
     include 'Control_Mod/Numerics/Max_Simple_Iterations.f90'
     include 'Control_Mod/Numerics/Min_Simple_Iterations.f90'
     include 'Control_Mod/Numerics/Number_Of_Piso_Corrections.f90'
@@ -157,6 +158,7 @@
     include 'Control_Mod/Numerics/Simple_Underrelaxation_For_Turbulence.f90'
     include 'Control_Mod/Numerics/Simple_Underrelaxation_For_Multiphase.f90'
     include 'Control_Mod/Numerics/Time_Integration_Scheme.f90'
+    include 'Control_Mod/Numerics/Tolerance_For_Gauss_Gradients.f90'
 
     ! Linear solvers
     include 'Control_Mod/Numerics/Preconditioner_For_System_Matrix.f90'
