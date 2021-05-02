@@ -5,10 +5,10 @@
  HEAT_TRANSFER     no
  MULTIPHASE_MODEL  volume_of_fluid
 
- NUMBER_OF_TIME_STEPS     300
+ NUMBER_OF_TIME_STEPS     600
  TIME_STEP                  0.005   # original (for finer grid) was 0.0005
 
- RESULTS_SAVE_INTERVAL     15
+ RESULTS_SAVE_INTERVAL    150
  BACKUP_SAVE_INTERVAL     300
  # LOAD_BACKUP_NAME          cavity-ts000060.backup
 
@@ -49,7 +49,7 @@
  ADVECTION_SCHEME_FOR_MOMENTUM    quick
  ADVECTION_SCHEME_FOR_MULTIPHASE  cicsam
 
-# NODAL_CURVATURE    yes
+ CHOI_CORRECTION             yes
 
 #------------------------
 # Linear solver settings
