@@ -42,6 +42,12 @@
   ! Improvements to Rhie and Chow method (Choi, Gu)
   call Control_Mod_Choi_Correction(flow % choi_correction, .false.)
 
+  ! Tolerance and max iterations for computation of gradients with Gauss method
+  call Control_Mod_Tolerance_For_Gauss_Gradients(flow % gauss_tol, .false.)
+  flow % gauss_miter = 10
+  call Control_Mod_Max_Iterations_For_Gauss_Gradients(flow % gauss_miter,  &
+                                                      .false.)
+
   !-------------------------!
   !   Related to momentum   !
   !-------------------------!
