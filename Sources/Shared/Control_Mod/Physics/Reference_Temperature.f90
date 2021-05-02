@@ -9,7 +9,7 @@
   real :: def
 !==============================================================================!
 
-  def = 20.0
+  def = 0.0
 
   call Control_Mod_Read_Real_Item('REFERENCE_TEMPERATURE', def, t_ref, verbose)
 

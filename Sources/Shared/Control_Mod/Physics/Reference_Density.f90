@@ -9,7 +9,7 @@
   real :: def
 !==============================================================================!
 
-  def = 1000.0
+  def = 0.0
 
   call Control_Mod_Read_Real_Item('REFERENCE_DENSITY', def, d_ref, verbose)
 
