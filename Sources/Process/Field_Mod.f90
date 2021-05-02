@@ -22,68 +22,41 @@
 
     type(Grid_Type), pointer :: pnt_grid  ! grid for which it is defined
 
-    ! Pressure velocity coupling algorithm
-    integer :: p_m_coupling, i_corr, n_piso_corrections
-    logical :: piso_status
-    logical :: choi_correction
+    !-------------------------!
+    !   Physical properties   !
+    !-------------------------!
 
-    ! Physical properties (defined in cell centers)
+    ! Defined in cell centers
     real, allocatable :: capacity(:)      ! [J/kg/K]
     real, allocatable :: conductivity(:)  ! [W/(m K)]
     real, allocatable :: density(:)       ! [kg/m^3]
     real, allocatable :: viscosity(:)     ! [kg/m/s]
-    real              :: diffusivity      ! [m^2/s]
-    real              :: latent_heat      ! [J/kg]
-    real              :: sat_temperature  ! [K]
+
+    ! Defined globally
+    real :: diffusivity      ! [m^2/s]
+    real :: latent_heat      ! [J/kg]
+    real :: sat_temperature  ! [K]
+
+    !---------------------------------------------------!
+    !   Associated with momentum conservation eqution   !
+    !---------------------------------------------------!
 
     ! Velocity components
     type(Var_Type) :: u    ! [m/s]
     type(Var_Type) :: v    ! [m/s]
     type(Var_Type) :: w    ! [m/s]
-    type(Var_Type) :: pot  ! potential for initial velocity field
+
+    ! Shear and wall stress are used in a number of turbulence models
+    real, allocatable :: shear(:)  ! [1/s]
+    real, allocatable :: vort(:)   ! [1/s]
 
     ! Volumetric flux through cell faces
     type(Face_Type) :: v_flux  ! [m^3/s]
 
     ! Pressure and pressure correction
-    type(Var_Type) :: p   ! [N/m^2] = [kg/m/s^2]
-    type(Var_Type) :: pp  ! [N/m^2] = [kg/m/s^2]
-
-    ! Temperature
-    type(Var_Type) :: t  ! [K]
-
-    ! Shear and wall stress are used in a number of turbulence models
-    real, allocatable :: shear(:)
-    real, allocatable :: vort(:)
-
-    ! Scalars (like chemical species for example)
-    integer                     :: n_scalars
-    type(Var_Type), allocatable :: scalar(:)
-
-    ! Bulk velocities, pressure drops, etc.
-    type(Bulk_Type) :: bulk
-
-    ! Maximum CFL and Pe numbers
-    real :: cfl_max, pe_max
-
-    ! Time step used in this field
-    real :: dt  ! [s]
-
-    ! Volume expansion coefficient
-    real :: beta
-
-    ! Heat flux to the domain (important for periodic case with heat transfer)
-    real :: heat_flux, heated_area, heat  ! [W/m^2], [m^2], [W]
-
-    !---------------------------------!
-    !   Gradient matrices for:        !
-    !   - cells to cells (c2c),       !
-    !   - nodes to cells (n2c), and   !
-    !   - cells to nodes (c2n)        !
-    !---------------------------------!
-    real, allocatable :: grad_c2c(:,:)
-    real, allocatable :: grad_n2c(:,:)
-    real, allocatable :: grad_c2n(:,:)
+    type(Var_Type) :: p    ! [N/m^2] = [kg/m/s^2]
+    type(Var_Type) :: pp   ! [N/m^2] = [kg/m/s^2]
+    type(Var_Type) :: pot  ! pressure-like potential for initial velocity field
 
     ! Internal forces on the fluid.
     ! These includes forces due to discretization (cross diffusion terms),
@@ -102,19 +75,67 @@
     real, allocatable :: face_fy(:), cell_fy(:)
     real, allocatable :: face_fz(:), cell_fz(:)
 
-    ! Reference temperature and density
-    real :: t_ref
+    ! Reference density (for buoyancy)
     real :: dens_ref
 
-    ! Volume error after pressure correction
-    ! (It used to be called mass_err and was a local variable)
-    real :: vol_res
+    !-------------------------------------------------!
+    !   Associated with energy conservation eqution   !
+    !-------------------------------------------------!
 
     ! Variables determining if we are dealing with heat transfer and buoyancy
     logical :: heat_transfer
 
     ! Phase change (called mass_transfer to be consistent with heat_transfer)
     logical :: mass_transfer
+
+    ! Temperature
+    type(Var_Type) :: t  ! [K]
+
+    ! Heat flux to the domain (important for periodic case with heat transfer)
+    real :: heat_flux, heated_area, heat  ! [W/m^2], [m^2], [W]
+
+    ! Reference temperature and volume expansion coefficient (for buoyancy)
+    real :: t_ref  ! [K]
+    real :: beta   ! [1/K]
+
+    ! Scalars (like chemical species for example)
+    integer                     :: n_scalars
+    type(Var_Type), allocatable :: scalar(:)
+
+    ! Bulk velocities, pressure drops, etc.
+    type(Bulk_Type) :: bulk
+
+    !--------------------------!
+    !   Numerical parameters   !
+    !--------------------------!
+
+    ! Pressure velocity coupling algorithm
+    integer :: p_m_coupling, i_corr, n_piso_corrections
+    logical :: piso_status
+    logical :: choi_correction
+
+    ! Maximum CFL and Pe numbers
+    real :: cfl_max, pe_max
+
+    ! Time step used in this field
+    real :: dt  ! [s]
+
+    ! Volume error after pressure correction
+    ! (It used to be called mass_err and was a local variable)
+    real :: vol_res
+
+    ! Gradient matrices for:
+    ! - cells to cells (c2c)
+    ! - nodes to cells (n2c), and
+    ! - cells to nodes (c2n)
+    real, allocatable :: grad_c2c(:,:)
+    real, allocatable :: grad_f2c(:,:)
+    real, allocatable :: grad_n2c(:,:)
+    real, allocatable :: grad_c2n(:,:)
+
+    ! Tolerance and maximum iterations for Gauss gradients
+    real    :: gauss_tol
+    integer :: gauss_miter
 
   end type
 
@@ -136,21 +157,28 @@
   include 'Field_Mod/Calculate_Grad_Matrix.f90'
   include 'Field_Mod/Calculate_Grad_Matrix_Cell_By_Cell.f90'
   include 'Field_Mod/Calculate_Grad_Matrix_For_Cell.f90'
+  include 'Field_Mod/Calculate_Grad_Matrix_Faces_To_Cells.f90'
   include 'Field_Mod/Calculate_Grad_Matrix_Nodes_To_Cells.f90'
   include 'Field_Mod/Calculate_Grad_Matrix_Cells_To_Nodes.f90'
   include 'Field_Mod/Correct_Fluxes_With_Body_Forces.f90'
   include 'Field_Mod/Grad.f90'
   include 'Field_Mod/Grad_Component.f90'
   include 'Field_Mod/Grad_Component_No_Refresh.f90'
+  include 'Field_Mod/Grad_Component_Faces_To_Cells.f90'
   include 'Field_Mod/Grad_Component_Nodes_To_Cells.f90'
   include 'Field_Mod/Grad_Component_Cells_To_Nodes.f90'
   include 'Field_Mod/Grad_Pressure.f90'
   include 'Field_Mod/Grad_Pressure_Correction.f90'
   include 'Field_Mod/Grad_Variable.f90'
+  include 'Field_Mod/Grad_Gauss.f90'
+  include 'Field_Mod/Grad_Gauss_Pressure.f90'
+  include 'Field_Mod/Grad_Gauss_Variable.f90'
   include 'Field_Mod/Interpolate_Cells_To_Nodes.f90'
   include 'Field_Mod/Interpolate_Nodes_To_Cells.f90'
+  include 'Field_Mod/Interpolate_Nodes_To_Faces.f90'
   include 'Field_Mod/Interpolate_Var_To_Face.f90'
   include 'Field_Mod/Interpolate_To_Face.f90'
+  include 'Field_Mod/Interpolate_To_Faces.f90'
   include 'Field_Mod/Potential_Initialization.f90'
   include 'Field_Mod/Prandtl_Number.f90'
   include 'Field_Mod/Schmidt_Number.f90'
