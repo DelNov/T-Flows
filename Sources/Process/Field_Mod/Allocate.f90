@@ -33,6 +33,7 @@
   !   Memory for gradient matrices   !  (are the latter two used at all?)
   !----------------------------------!
   allocate(flow % grad_c2c(6, nc));  flow % grad_c2c(:,:) = 0.0
+  allocate(flow % grad_f2c(6, nc));  flow % grad_f2c(:,:) = 0.0
   allocate(flow % grad_n2c(6, nc));  flow % grad_n2c(:,:) = 0.0
   allocate(flow % grad_c2n(6, nn));  flow % grad_c2n(:,:) = 0.0
 
