@@ -1,9 +1,0 @@
-ln -f -s mg_20_12_09.control control; ./Process | grep LEVEL_01 | grep -v ITER_000 > mg_20_12_09.dat
-ln -f -s mg_20_12_08.control control; ./Process | grep LEVEL_01 | grep -v ITER_000 > mg_20_12_08.dat
-ln -f -s mg_20_12_07.control control; ./Process | grep LEVEL_01 | grep -v ITER_000 > mg_20_12_07.dat
-ln -f -s mg_20_12_06.control control; ./Process | grep LEVEL_01 | grep -v ITER_000 > mg_20_12_06.dat
-ln -f -s mg_20_12_05.control control; ./Process | grep LEVEL_01 | grep -v ITER_000 > mg_20_12_05.dat
-ln -f -s mg_20_12_04.control control; ./Process | grep LEVEL_01 | grep -v ITER_000 > mg_20_12_04.dat
-ln -f -s mg_20_12_03.control control; ./Process | grep LEVEL_01 | grep -v ITER_000 > mg_20_12_03.dat
-ln -f -s mg_20_12_02.control control; ./Process | grep LEVEL_01 | grep -v ITER_000 > mg_20_12_02.dat
-ln -f -s mg_20_12_01.control control; ./Process | grep LEVEL_01 | grep -v ITER_000 > mg_20_12_01.dat
