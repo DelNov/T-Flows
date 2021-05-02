@@ -22,11 +22,8 @@
   type(Matrix_Type), pointer :: m               ! momentum matrix
   real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2
-  real                       :: u_f, v_f, w_f, a12, fs
-  real                       :: px_f, py_f, pz_f
   character(SL)              :: solver
-  real                       :: p_max, p_min, p_nor, p_nor_c, dt
-  real :: TMP
+  real                       :: p_max, p_min, p_nor, p_nor_c, dt, a12, fs
 !==============================================================================!
 !
 !   The form of equations which I am solving:
