@@ -54,6 +54,21 @@ in the sources.  Those changes are:
 8. In Field_Mod/Grad_Pressure, increase the number of iterations of pressure
    gradients to meet those in Octave scripts.
 
+9. Something of this sort:
+
+    ! FOR COMPARING WITH OCTAVE SCRIPT
+    IF(MATH_MOD_APPROX_REAL(GRID % YF(S), 0.0) .AND.  &
+       MATH_MOD_APPROX_REAL(GRID % ZF(S), 0.0)) THEN
+      PRINT '(99ES17.7)', U_F(S),                                     &
+                          (P % N(C2) - P % N(C1)),                    &
+                          A12 / A % FC(S),                            &
+                          A12 / A % FC(S) * (P % N(C2) - P % N(C1)),  &
+                          A % FC(S) * (PX_F + PY_F + PZ_F),           &
+                          P % X(C1), P % X(C2)
+    END IF
+
+   in Rhie_And_Chow could be useful for comparing results with Octave.
+
 ---------------------------------------------------------------------------------
 
 A little analysis (sumarized in graphs 01..04*.agr shows that Majundar method
