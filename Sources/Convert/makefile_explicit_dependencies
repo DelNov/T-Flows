@@ -140,6 +140,7 @@ $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Math_Mod/Distance.f90
+#-- ./Math_Mod/Harmonic_Mean.f90
 #-- ./Math_Mod/Smaller_Real.f90
 #-- ./Math_Mod/Invert_3x3.f90
 #-- ./Math_Mod/Approx_String.f90
@@ -187,8 +188,9 @@ $(DIR_SHARED)/File_Mod/*.f90
 #-- ./Control_Mod/Numerics/Max_Simple_Iterations.f90
 #-- ./Control_Mod/Numerics/Number_Of_Time_Steps.f90
 #-- ./Control_Mod/Numerics/Normalization_For_Simple_Algorithm.f90
+#-- ./Control_Mod/Numerics/Tolerance_For_Gauss_Gradients.f90
+#-- ./Control_Mod/Numerics/Choi_Correction.f90
 #-- ./Control_Mod/Numerics/Advection_Scheme_For_Momentum.f90
-#-- ./Control_Mod/Numerics/Track_Front.f90
 #-- ./Control_Mod/Numerics/Preconditioner_For_System_Matrix.f90
 #-- ./Control_Mod/Numerics/Blending_Coefficient_For_Scalars.f90
 #-- ./Control_Mod/Numerics/Solver_For_Pressure.f90
@@ -237,9 +239,10 @@ $(DIR_SHARED)/File_Mod/*.f90
 #-- ./Control_Mod/Numerics/Tolerance_For_Multiphase_Solver.f90
 #-- ./Control_Mod/Numerics/Advection_Scheme_For_Turbulence.f90
 #-- ./Control_Mod/Numerics/Tolerance_For_Simple_Algorithm.f90
-#-- ./Control_Mod/Numerics/Temporal_Pressure_Correction.f90
 #-- ./Control_Mod/Numerics/Tolerance_For_Pressure_Solver.f90
+#-- ./Control_Mod/Numerics/Max_Iterations_For_Gauss_Gradients.f90
 #-- ./Control_Mod/Input_Output/Load_Backup_Name.f90
+#-- ./Control_Mod/Input_Output/Save_Initial_Condition.f90
 #-- ./Control_Mod/Input_Output/Results_Save_Interval.f90
 #-- ./Control_Mod/Input_Output/Save_Initial_Solution_Name.f90
 #-- ./Control_Mod/Input_Output/Backup_Save_Interval.f90
@@ -255,6 +258,7 @@ $(DIR_SHARED)/File_Mod/*.f90
 #-- ./Control_Mod/Physics/Multiphase_Model.f90
 #-- ./Control_Mod/Physics/Reference_Density.f90
 #-- ./Control_Mod/Physics/Point_For_Monitoring_Planes.f90
+#-- ./Control_Mod/Physics/Track_Front.f90
 #-- ./Control_Mod/Physics/Turbulence_Model_Variant.f90
 #-- ./Control_Mod/Physics/Swarm_Density.f90
 #-- ./Control_Mod/Physics/Gravitational_Vector.f90
@@ -278,6 +282,7 @@ $(DIR_SHARED)/File_Mod/*.f90
 #-- ./Control_Mod/Physics/Swarm_Coefficient_Of_Restitution.f90
 #-- ./Control_Mod/Physics/Angular_Velocity_Vector.f90
 #-- ./Control_Mod/Physics/Heat_Capacity.f90
+#-- ./Control_Mod/Physics/Mass_Transfer.f90
 #-- ./Control_Mod/Physics/Saturation_Temperature.f90
 #-- ./Control_Mod/Physics/Swarm_Diameter.f90
 #-- ./Control_Mod/Physics/Number_Of_Swarm_Sub_Steps.f90
@@ -289,7 +294,6 @@ $(DIR_SHARED)/File_Mod/*.f90
 #-- ./Control_Mod/Physics/Latent_Heat.f90
 #-- ./Control_Mod/Physics/Rough_Walls.f90
 #-- ./Control_Mod/Physics/Phase_Densities.f90
-#-- ./Control_Mod/Physics/Phase_Change.f90
 #-- ./Control_Mod/Physics/Reference_Temperature.f90
 #-- ./Control_Mod/Physics/Turbulent_Heat_Flux_Model.f90
 #-- ./Control_Mod/Physics/Turbulent_Prandtl_Number.f90
@@ -451,6 +455,7 @@ $(DIR_OBJECT)/Math_Mod.o \
 $(DIR_SHARED)/Math_Mod/*.f90 \
 $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 \
+$(DIR_SHARED)/Control_Mod/T \
 $(DIR_SHARED)/Control_Mod/*/*.f90 \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
@@ -628,6 +633,8 @@ $(DIR_OBJECT)/Bnd_Cond_Mod.o
 #-- ./Grid_Mod/Bnd_Cond_Type.f90
 #-- ./Grid_Mod/Calculate_Weights_Cells_To_Nodes.f90
 #-- ./Grid_Mod/Find_Periodic_Faces.f90
+#-- ./Grid_Mod/Print_Statistics.f90
+#-- ./Grid_Mod/Bounding_Box.f90
 #-- ./Grid_Mod/Calculate_Face_Geometry.f90
 #-- ./Grid_Mod/Sort_Cells_By_Index.f90
 #-- ./Grid_Mod/Load_Dim.f90
