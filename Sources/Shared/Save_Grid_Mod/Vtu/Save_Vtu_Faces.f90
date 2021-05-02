@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Vtu_Faces(grid, plot_shadows)
+  subroutine Save_Vtu_Faces(grid, plot_shadows, phi_f)
 !------------------------------------------------------------------------------!
 !   Writes boundary condition .faces.vtu or shadow .shadow.vtu file.           !
 !------------------------------------------------------------------------------!
@@ -7,6 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type)   :: grid
   logical, optional :: plot_shadows  ! plot shadow faces
+  real,    optional :: phi_f(1:grid % n_faces)
 !-----------------------------------[Locals]-----------------------------------!
   integer(SP)   :: data_size
   integer       :: c2, n, s, s_f, s_l, cell_offset, data_offset, n_conns, fu
@@ -131,6 +132,17 @@
   write(fu) IN_4 // '</DataArray>' // LF
   data_offset = data_offset + SP + (s_l-s_f+1) * IP      ! prepare for next
 
+  ! Optional face variable
+  if(present(phi_f)) then
+    write(str1, '(i0.0)') data_offset
+    write(fu) IN_4 // '<DataArray type="Float64"'      //  &
+                      ' Name="FaceVariable"'           //  &
+                      ' format="appended"'             //  &
+                      ' offset="' // trim(str1) //'">' // LF
+    write(fu) IN_4 // '</DataArray>' // LF
+    data_offset = data_offset + SP + (s_l-s_f+1) * RP      ! prepare for next
+  end if
+
   ! Number of nodes
   write(str1, '(i0.0)') data_offset
   write(fu) IN_4 // '<DataArray type="Int64"'        //  &
@@ -243,6 +255,16 @@
       write(fu) 0
     end if
   end do
+
+  ! Optional face variable
+  ! (Check c1 and c2 for shadow faces, seems to be something messed up)
+  if(present(phi_f)) then
+    data_size = int((s_l-s_f+1) * IP, SP)
+    write(fu) data_size
+    do s = s_f, s_l
+      write(fu) phi_f(s)
+    end do
+  end if
 
   ! Number of nodes
   data_size = int((s_l-s_f+1) * IP, SP)
