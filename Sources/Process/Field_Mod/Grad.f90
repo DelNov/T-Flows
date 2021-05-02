@@ -6,14 +6,14 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type)  :: flow
-  real              :: phi  (- flow % pnt_grid % n_bnd_cells  &
-                             : flow % pnt_grid % n_cells)
-  real              :: phi_x(- flow % pnt_grid % n_bnd_cells  &
-                             : flow % pnt_grid % n_cells)
-  real              :: phi_y(- flow % pnt_grid % n_bnd_cells  &
-                            : flow % pnt_grid % n_cells)
-  real              :: phi_z(- flow % pnt_grid % n_bnd_cells  &
-                             : flow % pnt_grid % n_cells)
+  real              :: phi  ( -flow % pnt_grid % n_bnd_cells  &
+                              :flow % pnt_grid % n_cells)
+  real              :: phi_x( -flow % pnt_grid % n_bnd_cells  &
+                              :flow % pnt_grid % n_cells)
+  real              :: phi_y( -flow % pnt_grid % n_bnd_cells  &
+                              :flow % pnt_grid % n_cells)
+  real              :: phi_z( -flow % pnt_grid % n_bnd_cells  &
+                              :flow % pnt_grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
 !==============================================================================!
