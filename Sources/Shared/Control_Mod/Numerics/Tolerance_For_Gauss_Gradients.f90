@@ -8,6 +8,6 @@
 !==============================================================================!
 
   call Control_Mod_Read_Real_Item('TOLERANCE_FOR_GAUSS_GRADIENTS',  &
-                                   1.0e-4, val, verbose)
+                                   1.0e-3, val, verbose)
 
   end subroutine

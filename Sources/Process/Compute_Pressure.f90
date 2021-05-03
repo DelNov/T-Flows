@@ -203,13 +203,17 @@
     end if
   end if
 
+  ! call Field_Mod_Grad_Pressure_Correction(flow, pp)
+  call Field_Mod_Grad_Pressure(flow, pp)
+
   !-------------------------------!
   !   Update the pressure field   !
   !-------------------------------!
-  do c = 1, grid % n_cells
+  do c = -grid % n_bnd_cells, grid % n_cells
     p % n(c) =  p % n(c) + pp % urf * pp % n(c)
   end do
-  call Grid_Mod_Exchange_Cells_Real(grid, p % n)
+
+  call Field_Mod_Grad_Pressure(flow, p)
 
   !------------------------------------!
   !   Normalize the pressure field     !
@@ -221,8 +225,6 @@
   call Comm_Mod_Global_Min_Real(p_min)
 
   p % n(:) = p % n(:) - 0.5*(p_max+p_min)
-
-  call Field_Mod_Grad_Pressure_Correction(flow, pp)
 
   ! User function
   call User_Mod_End_Of_Compute_Pressure(flow, mult, sol, curr_dt, ini)

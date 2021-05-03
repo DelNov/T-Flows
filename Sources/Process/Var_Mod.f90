@@ -34,15 +34,16 @@
 
     ! Parameters for numerical solution of the variable
     character(SL)     :: precond
-    integer           :: adv_scheme  ! advection scheme
-    real              :: blend       ! blending (1.0 central; 0.0 upwind)
-    integer           :: td_scheme   ! time-disretization
-    real              :: tol         ! linear solver tolerance
-    real              :: urf         ! under-relaxation factor
-    integer           :: mniter      ! max number of iterations for variable
-    integer           :: eniter      ! executed number of iterations for var.
-    real, allocatable :: max(:)      ! max and min around a face ...
-    real, allocatable :: min(:)      ! important for advection schemes
+    integer           :: adv_scheme   ! advection scheme
+    integer           :: grad_method  ! gradient computation method
+    real              :: blend        ! blending (1.0 central; 0.0 upwind)
+    integer           :: td_scheme    ! time-disretization
+    real              :: tol          ! linear solver tolerance
+    real              :: urf          ! under-relaxation factor
+    integer           :: mniter       ! max number of iterations for variable
+    integer           :: eniter       ! executed number of iterations for var.
+    real, allocatable :: max(:)       ! max and min around a face ...
+    real, allocatable :: min(:)       ! important for advection schemes
   end type
 
   contains

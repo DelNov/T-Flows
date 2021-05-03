@@ -42,6 +42,10 @@
   ! Improvements to Rhie and Chow method (Choi, Gu)
   call Control_Mod_Choi_Correction(flow % choi_correction, .false.)
 
+  !----------------------------------!
+  !   Gradient computation methods   !
+  !----------------------------------!
+
   ! Tolerance and max iterations for computation of gradients with Gauss method
   call Control_Mod_Tolerance_For_Gauss_Gradients(flow % gauss_tol, .false.)
   flow % gauss_miter = 10
@@ -61,11 +65,13 @@
     ui % adv_scheme = Numerics_Mod_Advection_Scheme_Code      (name)
     call Control_Mod_Time_Integration_Scheme                  (name)
     ui % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
-    call Control_Mod_Blending_Coefficient_For_Momentum        (ui % blend)
-    call Control_Mod_Simple_Underrelaxation_For_Momentum      (ui % urf)
-    call Control_Mod_Tolerance_For_Momentum_Solver            (ui % tol)
-    call Control_Mod_Preconditioner_For_System_Matrix         (ui % precond)
-    call Control_Mod_Max_Iterations_For_Momentum_Solver       (ui % mniter)
+    call Control_Mod_Blending_Coefficient_For_Momentum  (ui % blend)
+    call Control_Mod_Simple_Underrelaxation_For_Momentum(ui % urf)
+    call Control_Mod_Tolerance_For_Momentum_Solver      (ui % tol)
+    call Control_Mod_Preconditioner_For_System_Matrix   (ui % precond)
+    call Control_Mod_Max_Iterations_For_Momentum_Solver (ui % mniter)
+    call Control_Mod_Gradient_Method_For_Momentum       (name)
+    ui % grad_method = Numerics_Mod_Gradient_Method_Code(name)
   end do
 
   !-------------------------!
@@ -76,6 +82,9 @@
   call Control_Mod_Preconditioner_For_System_Matrix   (flow % pp % precond)
   call Control_Mod_Max_Iterations_For_Pressure_Solver (flow % pp % mniter)
   call Control_Mod_Simple_Underrelaxation_For_Pressure(flow % pp % urf)
+  call Control_Mod_Gradient_Method_For_Pressure              (name)
+  flow % p  % grad_method = Numerics_Mod_Gradient_Method_Code(name)
+  flow % pp % grad_method = Numerics_Mod_Gradient_Method_Code(name)
 
   !------------------------------!
   !   Related to heat transfer   !
@@ -92,6 +101,8 @@
     call Control_Mod_Tolerance_For_Energy_Solver      (flow % t % tol)
     call Control_Mod_Preconditioner_For_System_Matrix (flow % t % precond)
     call Control_Mod_Max_Iterations_For_Energy_Solver (flow % t % mniter)
+    call Control_Mod_Gradient_Method_For_Energy               (name)
+    flow % t % grad_method = Numerics_Mod_Gradient_Method_Code(name)
   end if
 
   !--------------------------------!
@@ -110,15 +121,14 @@
     call Control_Mod_Preconditioner_For_System_Matrix     (mult % vof % precond)
     call Control_Mod_Max_Iterations_For_Multiphase_Solver (mult % vof % mniter)
     ! Max Courant number and Max substep cycles
-    call Control_Mod_Max_Courant_Vof(mult % courant_max_param)
+    call Control_Mod_Max_Courant_Vof       (mult % courant_max_param)
     call Control_Mod_Max_Substep_Cycles_Vof(mult % n_sub_param)
-    ! Max correction cycles for beta
-    call Control_Mod_Max_Correction_Cycles_Beta_Vof(mult % corr_num_max)
-    ! Max number convolution/smoothing steps for curvature and normal
+    call Control_Mod_Max_Correction_Cycles_Beta_Vof    (mult % corr_num_max)
     call Control_Mod_Max_Smoothing_Cycles_Curvature_Vof(mult % n_conv_curv)
-    call Control_Mod_Max_Smoothing_Cycles_Normal_Vof(mult % n_conv_norm)
-    ! Skewness Correction
-    call Control_Mod_Skewness_Correction_Vof(mult % skew_corr)
+    call Control_Mod_Max_Smoothing_Cycles_Normal_Vof   (mult % n_conv_norm)
+    call Control_Mod_Skewness_Correction_Vof           (mult % skew_corr)
+    call Control_Mod_Gradient_Method_For_Multiphase             (name)
+    mult % vof % grad_method = Numerics_Mod_Gradient_Method_Code(name)
   end if
 
   !--------------------------------!
@@ -132,11 +142,13 @@
     phi % adv_scheme = Numerics_Mod_Advection_Scheme_Code      (name)
     call Control_Mod_Time_Integration_Scheme                   (name)
     phi % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
-    call Control_Mod_Blending_Coefficient_For_Scalars          (phi % blend)
-    call Control_Mod_Simple_Underrelaxation_For_Scalars        (phi % urf)
-    call Control_Mod_Tolerance_For_Scalars_Solver              (phi % tol)
-    call Control_Mod_Preconditioner_For_System_Matrix          (phi % precond)
-    call Control_Mod_Max_Iterations_For_Scalars_Solver         (phi % mniter)
+    call Control_Mod_Blending_Coefficient_For_Scalars  (phi % blend)
+    call Control_Mod_Simple_Underrelaxation_For_Scalars(phi % urf)
+    call Control_Mod_Tolerance_For_Scalars_Solver      (phi % tol)
+    call Control_Mod_Preconditioner_For_System_Matrix  (phi % precond)
+    call Control_Mod_Max_Iterations_For_Scalars_Solver (phi % mniter)
+    call Control_Mod_Gradient_Method_For_Scalars         (name)
+    phi % grad_method = Numerics_Mod_Gradient_Method_Code(name)
   end do
 
   !------------------------------!
@@ -161,11 +173,13 @@
     tq % adv_scheme = Numerics_Mod_Advection_Scheme_Code      (name)
     call Control_Mod_Time_Integration_Scheme                  (name)
     tq % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
-    call Control_Mod_Blending_Coefficient_For_Turbulence      (tq % blend)
-    call Control_Mod_Simple_Underrelaxation_For_Turbulence    (tq % urf)
-    call Control_Mod_Tolerance_For_Turbulence_Solver          (tq % tol)
-    call Control_Mod_Preconditioner_For_System_Matrix         (tq % precond)
-    call Control_Mod_Max_Iterations_For_Turbulence_Solver     (tq % mniter)
+    call Control_Mod_Blending_Coefficient_For_Turbulence  (tq % blend)
+    call Control_Mod_Simple_Underrelaxation_For_Turbulence(tq % urf)
+    call Control_Mod_Tolerance_For_Turbulence_Solver      (tq % tol)
+    call Control_Mod_Preconditioner_For_System_Matrix     (tq % precond)
+    call Control_Mod_Max_Iterations_For_Turbulence_Solver (tq % mniter)
+    call Control_Mod_Gradient_Method_For_Turbulence     (name)
+    tq % grad_method = Numerics_Mod_Gradient_Method_Code(name)
   end do
 
   end subroutine

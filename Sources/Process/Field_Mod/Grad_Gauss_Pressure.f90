@@ -37,18 +37,18 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
     if(c2 < 0) then
-!@!   if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. PRESSURE) then
+      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. PRESSURE) then
         p % n(c2) = p % n(c1) + p % x(c1) * grid % dx(s)  &
                               + p % y(c1) * grid % dy(s)  &
                               + p % z(c1) * grid % dz(s)
-!@!   end if
+      end if
     end if
   end do
 
   ! Initialize with some gradients with the most robust and reliable tool
   ! you have at your disposal - least square cell-based method.  These
   ! gradients should be properly calculated inside the domain.
-  call Field_Mod_Grad_Variable(flow, p)
+  call Field_Mod_Grad_Least_Variable(flow, p)
 
   !--------------------------------------------------------------------!
   !   Step 1: Extrapolate interior gradient values to boundary cells   !

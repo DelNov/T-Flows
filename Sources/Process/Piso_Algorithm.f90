@@ -28,7 +28,6 @@
     flow % piso_status = .true.
     do corr_steps = 1, flow % n_piso_corrections
       flow % i_corr = corr_steps
-      call Field_Mod_Grad_Pressure(flow, flow % p)
 
       ! All velocity components one after another
       call Compute_Momentum(flow, turb, mult, sol, ini)

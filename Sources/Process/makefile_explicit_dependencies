@@ -468,6 +468,7 @@ Field_Mod/*.f90
 #-- ./Numerics_Mod/Time_Integration_Scheme_Code.f90
 #-- ./Numerics_Mod/Advection_Term.f90
 #-- ./Numerics_Mod/Pressure_Momentum_Coupling_Code.f90
+#-- ./Numerics_Mod/Gradient_Method_Code.f90
 #-- ./Interface_Mod/Create.f90
 $(DIR_OBJECT)/Create.o:\
 $(DIR_OBJECT)/Work_Mod.o \
@@ -511,8 +512,8 @@ $(DIR_SHARED)/Work_Mod/*.f90
 
 #-- ./Field_Mod/Interpolate_To_Faces.f90
 #-- ./Field_Mod/Grad_Component_Cells_To_Nodes.f90
-#-- ./Field_Mod/Grad_Pressure.f90
 #-- ./Field_Mod/Calculate_Grad_Matrix_Cell_By_Cell.f90
+#-- ./Field_Mod/Grad_Least_Pressure.f90
 #-- ./Field_Mod/Potential_Initialization.f90
 $(DIR_OBJECT)/Potential_Initialization.o:\
 $(DIR_OBJECT)/Work_Mod.o \
@@ -538,6 +539,7 @@ $(DIR_SHARED)/Work_Mod/*.f90
 #-- ./Field_Mod/Grad_Variable.f90
 #-- ./Field_Mod/Allocate.f90
 #-- ./Field_Mod/Schmidt_Number.f90
+#-- ./Field_Mod/Grad_Least_Variable.f90
 #-- ./Field_Mod/Correct_Fluxes_With_Body_Forces.f90
 $(DIR_OBJECT)/Correct_Fluxes_With_Body_Forces.o:\
 $(DIR_OBJECT)/Work_Mod.o \
@@ -908,6 +910,8 @@ $(DIR_OBJECT)/Solver_Mod.o \
 Solver_Mod/*/Normalized_Solvers.tgz \
 Solver_Mod/*/*.f90 \
 Solver_Mod/*.f90 \
+$(DIR_OBJECT)/Numerics_Mod.o \
+Numerics_Mod/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
 $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
@@ -1037,6 +1041,9 @@ $(DIR_SHARED)/File_Mod/*.f90
 #-- ./Control_Mod/Numerics/V_Cycle_Max_Grid_Levels.f90
 #-- ./Control_Mod/Numerics/Tolerance_For_Energy_Solver.f90
 #-- ./Control_Mod/Numerics/Max_Correction_Cycles_Beta_Vof.f90
+#-- ./Control_Mod/Numerics/Gradient_Method_For_Pressure.f90
+#-- ./Control_Mod/Numerics/Gradient_Method_For_Scalars.f90
+#-- ./Control_Mod/Numerics/Gradient_Method_For_Momentum.f90
 #-- ./Control_Mod/Numerics/Tolerance_For_Scalars_Solver.f90
 #-- ./Control_Mod/Numerics/Max_Iterations_For_Scalars_Solver.f90
 #-- ./Control_Mod/Numerics/Max_Iterations_For_Turbulence_Solver.f90
@@ -1046,6 +1053,7 @@ $(DIR_SHARED)/File_Mod/*.f90
 #-- ./Control_Mod/Numerics/Max_Smoothing_Cycles_Normal_Vof.f90
 #-- ./Control_Mod/Numerics/Advection_Scheme_For_Scalars.f90
 #-- ./Control_Mod/Numerics/Max_Iterations_For_Momentum_Solver.f90
+#-- ./Control_Mod/Numerics/Gradient_Method_For_Multiphase.f90
 #-- ./Control_Mod/Numerics/Solver_For_Energy.f90
 #-- ./Control_Mod/Numerics/Simple_Underrelaxation_For_Pressure.f90
 #-- ./Control_Mod/Numerics/V_Cycle_Number_Of_Smoothing_Iterations.f90
@@ -1055,8 +1063,10 @@ $(DIR_SHARED)/File_Mod/*.f90
 #-- ./Control_Mod/Numerics/Max_Smoothing_Cycles_Curvature_Vof.f90
 #-- ./Control_Mod/Numerics/Simple_Underrelaxation_For_Momentum.f90
 #-- ./Control_Mod/Numerics/Skewness_Correction_Vof.f90
+#-- ./Control_Mod/Numerics/Gradient_Method_For_Turbulence.f90
 #-- ./Control_Mod/Numerics/Time_Step.f90
 #-- ./Control_Mod/Numerics/Simple_Underrelaxation_For_Energy.f90
+#-- ./Control_Mod/Numerics/Gradient_Method_For_Energy.f90
 #-- ./Control_Mod/Numerics/Normalization_For_Pressure_Solver.f90
 #-- ./Control_Mod/Numerics/Solver_For_Scalars.f90
 #-- ./Control_Mod/Numerics/Time_Integration_Scheme.f90

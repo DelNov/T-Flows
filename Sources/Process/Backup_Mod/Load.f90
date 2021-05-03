@@ -122,7 +122,7 @@
   call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'press_y',    fld % p % y)
   call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'press_z',    fld % p % z)
   call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'press_corr', fld % pp % n)
-  call Field_Mod_Grad_Pressure_Correction(fld, fld % pp)
+  call Field_Mod_Grad_Pressure(fld, fld % pp)
 
   !---------------------!
   !   Mass flow rates   !

@@ -323,8 +323,6 @@
 
         call Info_Mod_Iter_Fill(ini)
 
-        call Field_Mod_Grad_Pressure(flow(d), flow(d) % p)
-
         ! Compute velocity gradients
         call Field_Mod_Grad_Variable(flow(d), flow(d) % u)
         call Field_Mod_Grad_Variable(flow(d), flow(d) % v)

@@ -41,12 +41,17 @@
   integer, parameter :: PISO   = 40169
   integer, parameter :: CHOI   = 40177
 
+  ! Gradient computation algorithms
+  integer, parameter :: LEAST_SQUARES = 40189
+  integer, parameter :: GAUSS_THEOREM = 40193
+
   contains
 
   include 'Numerics_Mod/Advection_Scheme.f90'
   include 'Numerics_Mod/Advection_Scheme_Code.f90'
   include 'Numerics_Mod/Advection_Term.f90'
   include 'Numerics_Mod/Advection_Min_Max.f90'
+  include 'Numerics_Mod/Gradient_Method_Code.f90'
   include 'Numerics_Mod/Inertial_Term.f90'
   include 'Numerics_Mod/Pressure_Momentum_Coupling_Code.f90'
   include 'Numerics_Mod/Time_Integration_Scheme_Code.f90'
