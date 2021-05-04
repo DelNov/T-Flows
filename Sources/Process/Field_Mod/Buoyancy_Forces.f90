@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Field_Mod_Buoyancy_Forces(flow)
+  subroutine Field_Mod_Buoyancy_Forces(flow, i)
 !------------------------------------------------------------------------------!
 !   Calculates buoyancy with or without Boussinesq hypothesis.  That means     !
 !   it is used for both single phase flows with density assumed constant and   !
@@ -19,11 +19,15 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
+  integer, intent(in)      :: i     ! component
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: t
   integer                    :: c, c1, c2, s
-  real                       :: xc1, yc1, zc1, xc2, yc2, zc2, dotprod, temp_f
+  real                       :: xic1, xic2, temp_f
+  real,              pointer :: grav_i
+  real, contiguous,  pointer :: xic(:), xif(:), si(:), dxi(:)
+  real, contiguous,  pointer :: cell_fi(:), face_fi(:)
 !==============================================================================!
 
   ! Take aliases
@@ -31,12 +35,35 @@
   t    => flow % t
 
   ! Initialize
-  flow % face_fx(:) = 0.0
-  flow % face_fy(:) = 0.0
-  flow % face_fz(:) = 0.0
-  flow % cell_fx(:) = 0.0
-  flow % cell_fy(:) = 0.0
-  flow % cell_fz(:) = 0.0
+  ! Units: N/m^3
+  if(i .eq. 1) then
+    cell_fi => flow % cell_fx;
+    face_fi => flow % face_fx;
+    dxi     => grid % dx;
+    xic     => grid % xc;
+    xif     => grid % xf;
+    si      => grid % sx;
+    grav_i  => grav_x
+  else if(i .eq. 2) then
+    cell_fi => flow % cell_fy;
+    face_fi => flow % face_fy;
+    dxi     => grid % dy;
+    xic     => grid % yc;
+    xif     => grid % yf;
+    si      => grid % sy;
+    grav_i  => grav_y
+  else if(i .eq. 3) then
+    cell_fi => flow % cell_fz;
+    face_fi => flow % face_fz;
+    dxi     => grid % dz;
+    xic     => grid % zc;
+    xif     => grid % zf;
+    si      => grid % sz;
+    grav_i  => grav_z
+  end if
+
+  face_fi(:) = 0.0
+  cell_fi(:) = 0.0
 
   !-------------------------------!
   !   For Boussinesq hypothesis   !
@@ -68,73 +95,52 @@
   !    probably very abbrupt changes in density, go for harmonic mean   !
   !---------------------------------------------------------------------!
   else
-    do s = 1, grid % n_faces
-      c1  = grid % faces_c(1, s)
-      c2  = grid % faces_c(2, s)
 
-      if(c2 > 0) then
-        dens_f(s) = Math_Mod_Harmonic_Mean(flow % density(c1),  &
-                                           flow % density(c2))
-      else
-        dens_f(s) = flow % density(c1)
-      end if
+    ! Interpolate to all faces ...
+    call Field_Mod_Interpolate_To_Faces_Harmonic(flow, dens_f, flow % density)
 
-      dens_f(s) = dens_f(s) - flow % dens_ref
-    end do
+    ! ... then substract the reference density from them all
+    dens_f(:) = dens_f(:) - flow % dens_ref
   end if
 
   !--------------------!
   !   Buoyancy force   !
   !--------------------!
-  if(sqrt(grav_x ** 2 + grav_y ** 2 + grav_z ** 2) >= TINY) then
 
-    ! Calculate
-    do s = 1, grid % n_faces
-      c1  = grid % faces_c(1, s)
-      c2  = grid % faces_c(2, s)
-      xc1 = grid % xc(c1)
-      yc1 = grid % yc(c1)
-      zc1 = grid % zc(c1)
+  ! Calculate
+  do s = 1, grid % n_faces
+    c1   = grid % faces_c(1, s)
+    c2   = grid % faces_c(2, s)
+    xic1 = xic(c1)
+
+    ! Units in next three expressions which follow
+    ! kg/m^3 * m/s^2 * m^2 * m = kg m/s^2 = N
+    ! (Don't worry yet, you will correct them in the end)
+    cell_fi(c1) = cell_fi(c1)                                  &
+                + dens_f(s) * grav_i * si(s) * (xif(s) - xic1)
+
+    if(c2 > 0) then
+      xic2 = xic(c1) + dxi(s)
 
       ! Units in next three expressions which follow
       ! kg/m^3 * m/s^2 * m^2 * m = kg m/s^2 = N
-      flow % cell_fx(c1) = flow % cell_fx(c1)          &
-                         + dens_f(s) * grav_x          &
-                         * grid % sx(s) * (grid % xf(s) - xc1)
+      ! (Don't worry yet, you will correct them in the end)
+      cell_fi(c2) = cell_fi(c2)                                &
+                  - dens_f(s) * grav_i * si(s) * (xif(s) - xic2)
+    end if
 
-      flow % cell_fy(c1) = flow % cell_fy(c1)          &
-                         + dens_f(s) * grav_y          &
-                         * grid % sy(s) * (grid % yf(s) - yc1)
+    ! Units: kg/m^3 * m/s^2 = kg/(m^2 s^2) = N/m^3
+    face_fi(s) = face_fi(s) + dens_f(s) * grav_i
 
-      flow % cell_fz(c1) = flow % cell_fz(c1)          &
-                         + dens_f(s) * grav_z          &
-                         * grid % sz(s) * (grid % zf(s) - zc1)
+  end do
 
-      if(c2 > 0) then
-        xc2 = grid % xc(c1) + grid % dx(s)
-        yc2 = grid % yc(c1) + grid % dy(s)
-        zc2 = grid % zc(c1) + grid % dz(s)
+  !---------------------------------------!
+  !   Correct the units for body forces   !
+  !---------------------------------------!
+  do c = 1, grid % n_cells
+    cell_fi(c) = cell_fi(c) / grid % vol(c)
+  end do
 
-        ! Units in next three expressions which follow
-        ! kg/m^3 * m/s^2 * m^2 * m = kg m/s^2 = N
-        flow % cell_fx(c2) = flow % cell_fx(c2)          &
-                           - dens_f(s) * grav_x          &
-                           * grid % sx(s) * (grid % xf(s) - xc2)
-
-        flow % cell_fy(c2) = flow % cell_fy(c2)          &
-                           - dens_f(s) * grav_y          &
-                           * grid % sy(s) * (grid % yf(s) - yc2)
-
-        flow % cell_fz(c2) = flow % cell_fz(c2)          &
-                           - dens_f(s) * grav_z          &
-                           * grid % sz(s) * (grid % zf(s) - zc2)
-      end if
-    end do
-
-  end if  ! boussinesq
-
-  call Grid_Mod_Exchange_Cells_Real(grid, flow % cell_fx)
-  call Grid_Mod_Exchange_Cells_Real(grid, flow % cell_fy)
-  call Grid_Mod_Exchange_Cells_Real(grid, flow % cell_fz)
+  call Grid_Mod_Exchange_Cells_Real(grid, cell_fi)
 
   end subroutine
