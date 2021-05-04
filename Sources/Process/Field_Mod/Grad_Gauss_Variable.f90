@@ -39,8 +39,8 @@
 
     ! Estimate values at faces from the
     ! values in cells and last gradients
-    call Field_Mod_Interpolate_To_Faces(flow, phi_f_n, phi % n,  &
-                                              phi % x, phi % y, phi % z)
+    call Field_Mod_Interpolate_To_Faces_Linear(flow, phi_f_n, phi % n,  &
+                                                     phi % x, phi % y, phi % z)
 
     ! Update gradients from the values at faces
     call Field_Mod_Grad_Gauss(flow, phi_f_n, phi % x, phi % y, phi % z)
