@@ -32,7 +32,7 @@
   !   SGS terms   !
   !               !
   !---------------!
-  if(buoyancy) then
+  if(boussinesq) then
     call Field_Mod_Grad_Variable(flow, t)
   end if
 
@@ -78,7 +78,7 @@
     end do
   end if
 
-  if(buoyancy) then
+  if(boussinesq) then
     do c = 1, grid % n_cells
       nc2 = - flow % beta * (  grav_x * t % x(c)   &   
                              + grav_y * t % y(c)   &   

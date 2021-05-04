@@ -140,7 +140,8 @@
 
   end type
 
-  logical :: buoyancy
+  ! Will Boussinesq approximation be used for buoyancy terms
+  logical :: boussinesq
 
   ! Angular velocity
   real :: omega_x, omega_y, omega_z, omega
@@ -153,7 +154,7 @@
   include 'Field_Mod/Allocate.f90'
   include 'Field_Mod/Alias_Energy.f90'
   include 'Field_Mod/Alias_Momentum.f90'
-  include 'Field_Mod/Body_Forces.f90'
+  include 'Field_Mod/Buoyancy_Forces.f90'
   include 'Field_Mod/Calculate_Fluxes.f90'
   include 'Field_Mod/Calculate_Grad_Matrix.f90'
   include 'Field_Mod/Calculate_Grad_Matrix_Cell_By_Cell.f90'
@@ -161,7 +162,6 @@
   include 'Field_Mod/Calculate_Grad_Matrix_Faces_To_Cells.f90'
   include 'Field_Mod/Calculate_Grad_Matrix_Nodes_To_Cells.f90'
   include 'Field_Mod/Calculate_Grad_Matrix_Cells_To_Nodes.f90'
-  include 'Field_Mod/Correct_Fluxes_With_Body_Forces.f90'
   include 'Field_Mod/Grad.f90'
   include 'Field_Mod/Grad_Component.f90'
   include 'Field_Mod/Grad_Component_No_Refresh.f90'

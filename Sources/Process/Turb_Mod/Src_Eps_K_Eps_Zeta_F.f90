@@ -72,7 +72,7 @@
                         + c_2e * e_sor * flow % density(c)
 
     ! Add buoyancy (linearly split) to eps equation as required in the t2 model
-    if(buoyancy) then
+    if(boussinesq) then
       b(c) = b(c) + max(0.0, c_11e * e_sor * turb % g_buoy(c))
       a % val(a % dia(c)) = a % val(a % dia(c))                         &
                           + max(0.0, -c_11e * e_sor * turb % g_buoy(c)  &

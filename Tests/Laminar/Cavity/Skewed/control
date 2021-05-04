@@ -1,6 +1,9 @@
+#----------
+# Prologue
+#----------
  PROBLEM_NAME     skewed
  HEAT_TRANSFER    yes
- BUOYANCY         yes
+ BOUSSINESQ       yes
 
  NUMBER_OF_TIME_STEPS       1
 

@@ -6,7 +6,7 @@
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod,      only: HUGE_INT
   use Comm_Mod,       only: Comm_Mod_End, this_proc
-  use Field_Mod,      only: Field_Type, buoyancy,  &
+  use Field_Mod,      only: Field_Type, boussinesq,  &
                             grav_x, grav_y, grav_z
   use Bulk_Mod,       only: Bulk_Type
   use Turb_Mod
@@ -38,7 +38,7 @@
   call Control_Mod_Gravitational_Vector(grav_x,  &
                                         grav_y,  &
                                         grav_z, .true.)
-  call Control_Mod_Buoyancy                    (buoyancy,     .true.)
+  call Control_Mod_Boussinesq                  (boussinesq,   .true.)
   call Control_Mod_Reference_Temperature       (flow % t_ref, .true.)
   call Control_Mod_Volume_Expansion_Coefficient(flow % beta,  .true.)
   call Control_Mod_Turbulent_Prandtl_Number    (pr_t)  ! default is (0.9)

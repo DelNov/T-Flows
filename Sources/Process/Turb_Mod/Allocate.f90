@@ -105,9 +105,9 @@
 
     end if ! turb % statistics
 
-    if(buoyancy) then
+    if(boussinesq) then
       allocate(turb % g_buoy(-nb:nc));  turb % g_buoy = 0.
-    end if ! buoyancy
+    end if ! boussinesq
 
   end if ! K_EPS
 
@@ -200,9 +200,9 @@
 
     end if ! turb % statistics
 
-    if(buoyancy) then
+    if(boussinesq) then
       allocate(turb % g_buoy(-nb:nc));  turb % g_buoy = 0.
-    end if ! buoyancy
+    end if ! boussinesq
 
   end if ! K_EPS_ZETA_F
 
@@ -702,9 +702,9 @@
 
     end if ! turb % statistics
 
-    if(buoyancy) then
+    if(boussinesq) then
       allocate(turb % g_buoy(-nb:nc));  turb % g_buoy = 0.
-    end if ! buoyancy
+    end if ! boussinesq
 
   end if ! HYBRID_LES_RANS
 

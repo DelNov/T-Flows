@@ -29,7 +29,7 @@
 #-----------------
 # Physical models
 #-----------------
- BUOYANCY                       yes
+ BOUSSINESQ                     yes
  GRAVITATIONAL_VECTOR           0.0,  0.0,  -1.0
  REFERENCE_TEMPERATURE         10.0
 

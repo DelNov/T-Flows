@@ -3,7 +3,7 @@
 #----------
  PROBLEM_NAME    cylinder
  HEAT_TRANSFER   yes
- BUOYANCY        yes
+ BOUSSINESQ      yes
 
  TIME_STEP                                     0.01
  NUMBER_OF_TIME_STEPS                       2400

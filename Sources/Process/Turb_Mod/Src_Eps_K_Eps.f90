@@ -71,10 +71,9 @@
     a % val(a % dia(c)) = a % val(a % dia(c))                             &
                         +    flow % density(c) * f_mu* c_2e * eps % n(c)  &
                            / kin % n(c) * grid % vol(c)
- 
 
     ! Buoyancy contribution
-    if(buoyancy) then
+    if(boussinesq) then
       b(c) = b(c) + max(0.0, c_1e * turb % g_buoy(c) &
                     * eps % n(c) / kin % n(c) * grid % vol(c))
       a % val(a % dia(c)) = a % val(a % dia(c))                &

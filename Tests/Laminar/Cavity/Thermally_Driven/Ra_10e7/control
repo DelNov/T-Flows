@@ -3,7 +3,7 @@
 #----------
  PROBLEM_NAME     cavity
  HEAT_TRANSFER    yes
- BUOYANCY         yes
+ BOUSSINESQ       yes
 
  NUMBER_OF_TIME_STEPS     600
 

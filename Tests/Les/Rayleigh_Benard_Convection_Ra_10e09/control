@@ -4,7 +4,7 @@
 
  PROBLEM_NAME    rb_conv
 
- HEAT_TRANSFER   yes 
+ HEAT_TRANSFER   yes
 
  TIME_STEP                                    0.05
  NUMBER_OF_TIME_STEPS                      4230
@@ -24,7 +24,7 @@
 #-----------------
 # Physical models
 #-----------------
- BUOYANCY                       yes
+ BOUSSINESQ                     yes
  GRAVITATIONAL_VECTOR           0.0,  0.0,  -0.03215
  REFERENCE_TEMPERATURE          10.0 
 
