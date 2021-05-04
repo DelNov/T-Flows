@@ -29,7 +29,7 @@
   !-------------------------------!
   !   For Boussinesq hypothesis   !
   !-------------------------------!
-  if(buoyancy) then
+  if(boussinesq) then
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
