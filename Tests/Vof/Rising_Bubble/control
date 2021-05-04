@@ -51,6 +51,9 @@
 
  CHOI_CORRECTION             yes
 
+ MAX_ITERATIONS_FOR_GAUSS_GRADIENTS  200
+ TOLERANCE_FOR_GAUSS_GRADIENTS       1.0e-4
+
 #------------------------
 # Linear solver settings
 #------------------------
