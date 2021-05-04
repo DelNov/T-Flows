@@ -31,13 +31,12 @@
 !f_vs_s                                       .true.)  ! don't print messages
 !f_vs_s      call Surf_Mod_Calculate_Curvatures_From_Elems(mult % surf)
 !f_vs_s      call Surf_Mod_Print_Statistics               (mult % surf)
-!     call Front_Mod_Clean(mult % front)
     end if
 
     ! Commands to advance vof
     call Update_Boundary_Values(flow, turb, mult, 'MULTIPHASE')
     call Multiphase_Mod_Vof_Compute(mult, sol, flow % dt, n)
-    call Field_Mod_Buoyancy_Forces(flow)
+    call Field_Mod_Buoyancy_Forces(flow, 0)
 
   end if
 
