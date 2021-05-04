@@ -1,60 +1,48 @@
 OK, this case is a bit clinical and won't work without a few interventions
 in the sources.  Those changes are:
 
+In Main_Pro.f90
+~~~~~~~~~~~~~~~
+
 1. Movement of front should be disabled.  Therefore, in Main_Pro.f90 all
    lines of code related to VOF simulation should be commented.  In revision
-   e83283b8d0956c5793fcd272bb39b83c9c406613 these lines are: 282-291
+   e7952ac1deee775d18c188810edc6bc1d325ae19 these lines are: 284-293
 
-2. Add these five lines:
+In Compute_Momentum.f90
+~~~~~~~~~~~~~~~~~~~~~~~
 
-    if(mult % model .eq. VOLUME_OF_FLUID) then
-      do c = 1, grid % n_cells
-        cell_fi(c) = grid % vol(c) * flow % density(c) * grav_i
-      end do
-    end if
-
-   in Compute_Momentum, soon after taking aliases.  In Compute_Momentum's
-   revision 7bd74ec45277c64635dd890bb1866d2aa0534596, these lines are: 167-171
-
-3. Still in Compute_Momentum, disable the lines which take into account
+2. Compute_Momentum, disable the lines which take into account
    cross diffusion at the faces and stresses at the faces.  In revision
-   7bd74ec45277c64635dd890bb1866d2aa0534596, these lines will read:
+   a5732cae1bb28e327a006e0355bf3098a58d701a, these lines will read:
 
     ! Explicit treatment for cross diffusion terms
     ! do c = 1, grid % n_cells
     !   fi(c) = fi(c) + ui % c(c)
     ! end do
 
-   and are in lines: 279-281
+   and are in lines: 262-265
 
-4. Set lines 250-251 in Compute_Momentum.f90 (same revision as above) to:
+3. Set lines 234-235 in Compute_Momentum.f90 (same revision as above) to:
 
       m12 = m0 ! - min(v_flux % n(s), 0.0) * flow % density(c1)
       m21 = m0 ! + max(v_flux % n(s), 0.0) * flow % density(c2)
 
    that is, comment the contribution of fluxes to system matrix.
 
-5. Still in Compute_Momentum, same revision as before, comment the lines
-   336-338, and uncomment: 394-396.  This is to form pressure matrix entries
-   with under-relaxed momentum matrix.  (This is important only if you run
-   Octave scritpst without option Pressure_Matrix_Default.)
+In Compute_Pressure.f90
+~~~~~~~~~~~~~~~~~~~~~~~
 
-6. In Compute_Pressure.f90, revision e7f6aeb691e085e66ced639113a487a5ef31eabb,
-   comment the lines 174-176:
+4. In Compute_Pressure.f90, revision e7952ac1deee775d18c188810edc6bc1d325ae19,
+   comment the lines 172-174:
 
    ! if(mult % model .eq. VOLUME_OF_FLUID) then
    !   call Multiphase_Mod_Vof_Pressure_Correction(mult, sol)
    ! end if
 
-7. Still in the Compute_Pressure, call Field_Mod_Grad_Pressure to compute
-   pressure correction gradients instead od Field_Mod_Grad_Pressure_Correction,
-   because the latter one allows iterative improvement of gradients close to
-   the walls.
+In Rhie_And_Chow.f90
+~~~~~~~~~~~~~~~~~~~~
 
-8. In Field_Mod/Grad_Pressure, increase the number of iterations of pressure
-   gradients to meet those in Octave scripts.
-
-9. Something of this sort:
+5. Something of this sort:
 
     ! FOR COMPARING WITH OCTAVE SCRIPT
     IF(MATH_MOD_APPROX_REAL(GRID % YF(S), 0.0) .AND.  &
