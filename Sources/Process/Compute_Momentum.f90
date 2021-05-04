@@ -98,29 +98,14 @@
   call User_Mod_Beginning_Of_Compute_Momentum(flow, turb, mult, sol,  &
                                               curr_dt, ini)
 
-  ! Buoyancy force if no VOF is used (VOF calls it from its main)
-  ! Now this is a bit stupid.  I do understand that VOF changes only once
-  ! before iterations in a time step begin, but buoyancy forces might still
-  ! be changing due to temperture differrences which are evoling at the
-  ! same time as momentum equations.
-  !
-  ! On another note, don't call this for the case of VOF because it somehow
-  ! fiddles around faces, and that is something which was already done when
-  ! computing phyisical properties, so don't have to do it twice.
-  if(mult % model .ne. VOLUME_OF_FLUID) then
-    call Field_Mod_Buoyancy_Forces(flow)
-  end if
+  !-------------------------------------------------------------!
+  !   Compute buoyancy forces ... for all velocity components   !
+  !-------------------------------------------------------------!
+  call Field_Mod_Buoyancy_Forces(flow)
 
-  ! These should eventually be with the above
-  if(mult % model .eq. VOLUME_OF_FLUID) then
-    do c = 1, grid % n_cells
-      flow % cell_fx(c) = grid % vol(c) * flow % density(c) * grav_x
-      flow % cell_fy(c) = grid % vol(c) * flow % density(c) * grav_y
-      flow % cell_fz(c) = grid % vol(c) * flow % density(c) * grav_z
-    end do
-  end if
-
-  ! Store the old volume flux for Choi's correction
+  !-----------------------------------------------------!
+  !   Store the old volume flux for Choi's correction   !
+  !-----------------------------------------------------!
   if (flow % piso_status .eqv. .false.) then  ! check about this
     if(ini .eq. 1) then
       do s = 1, grid % n_faces
