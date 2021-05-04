@@ -98,11 +98,6 @@
   call User_Mod_Beginning_Of_Compute_Momentum(flow, turb, mult, sol,  &
                                               curr_dt, ini)
 
-  !-------------------------------------------------------------!
-  !   Compute buoyancy forces ... for all velocity components   !
-  !-------------------------------------------------------------!
-  call Field_Mod_Buoyancy_Forces(flow)
-
   !-----------------------------------------------------!
   !   Store the old volume flux for Choi's correction   !
   !-----------------------------------------------------!
@@ -179,6 +174,11 @@
         end do
       end if
     end if
+
+    !--------------------------------------------------------!
+    !   Compute buoyancy force for this velocity component   !
+    !--------------------------------------------------------!
+    call Field_Mod_Buoyancy_Forces(flow, i)
 
     !---------------!
     !               !
@@ -260,6 +260,8 @@
     end do  ! through faces
 
     ! Explicit treatment for cross diffusion terms
+    ! (Shouldn't theese, in an ideal world,
+    !  also be treated in Rhie and Chow?)
     do c = 1, grid % n_cells
       fi(c) = fi(c) + ui % c(c)
     end do
@@ -285,10 +287,10 @@
     end do
 
     !--------------------!
-    !   Buoyancy force   !  (Units are ugly, different from others :-/)
+    !   Buoyancy force   !
     !--------------------!
     do c = 1, grid % n_cells
-      fi(c) = fi(c) + cell_fi(c)
+      fi(c) = fi(c) + cell_fi(c) * grid % vol(c)
     end do
 
     !----------------------------------!
