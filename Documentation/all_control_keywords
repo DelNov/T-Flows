@@ -30,13 +30,14 @@
   BLENDING_COEFFICIENT_FOR_MULTIPHASE      |         1.0                   |   from 0.0 to 1.0
   BLENDING_COEFFICIENT_FOR_SCALARS         |         1.0                   |   from 0.0 to 1.0
   BLENDING_COEFFICIENT_FOR_TURBULENCE      |         1.0                   |   from 0.0 to 1.0
-  CHOI_CORRECTION                          |         no                    |   yes
+  CHOI_CORRECTION                          |         yes                   |   no
   GRADIENT_METHOD_FOR_ENERGY               |         least_squares         |   gauss_theorem
   GRADIENT_METHOD_FOR_MOMENTUM             |         least_squares         |   gauss_theorem
   GRADIENT_METHOD_FOR_PRESSURE             |         gauss_theorem         |   least_squares
   GRADIENT_METHOD_FOR_SCALARS              |         least_squares         |   gauss_theorem
   GRADIENT_METHOD_FOR_TURBULENCE           |         least_squares         !   gauss_theorem
   GRADIENT_METHOD_FOR_MULTIPHASE           |         least_squares         |   cicsam, stacs
+  GU_CORRECTION                            |         yes                   |   no
   MAX_CORRECTION_CYCLES_BETA_VOF           |         2                     |   up to 5 makes sense
   MAX_COURANT_VOF                          |         0.25                  |   from 0.0 to 0.5
   MAX_ITERATIONS_FOR_GAUSS_GRADIENTS       |        10                     |   up to 10 is reasonable

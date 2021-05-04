@@ -72,9 +72,12 @@
     ! proper linking with Rhie and Chow algorithm.  Therefore, two variants
     ! are included: face based forces and cell based forces.  The cell based
     ! forces must be derived from face based forces and properly linked.
-    real, allocatable :: face_fx(:), cell_fx(:)
-    real, allocatable :: face_fy(:), cell_fy(:)
-    real, allocatable :: face_fz(:), cell_fz(:)
+    real, allocatable :: cell_fx(:)  ! [N/m^3]
+    real, allocatable :: cell_fy(:)  ! [N/m^3]
+    real, allocatable :: cell_fz(:)  ! [N/m^3]
+    real, allocatable :: face_fx(:)  ! [N/m^3]
+    real, allocatable :: face_fy(:)  ! [N/m^3]
+    real, allocatable :: face_fz(:)  ! [N/m^3]
 
     ! Reference density (for buoyancy)
     real :: dens_ref
@@ -114,6 +117,7 @@
     integer :: p_m_coupling, i_corr, n_piso_corrections
     logical :: piso_status
     logical :: choi_correction
+    logical :: gu_correction
 
     ! Maximum CFL and Pe numbers
     real :: cfl_max, pe_max
@@ -147,7 +151,7 @@
   real :: omega_x, omega_y, omega_z, omega
 
   ! Gravity
-  real :: grav_x, grav_y, grav_z
+  real, target :: grav_x, grav_y, grav_z
 
   contains
 
@@ -178,9 +182,8 @@
   include 'Field_Mod/Interpolate_Cells_To_Nodes.f90'
   include 'Field_Mod/Interpolate_Nodes_To_Cells.f90'
   include 'Field_Mod/Interpolate_Nodes_To_Faces.f90'
-  include 'Field_Mod/Interpolate_Var_To_Face.f90'
-  include 'Field_Mod/Interpolate_To_Face.f90'
-  include 'Field_Mod/Interpolate_To_Faces.f90'
+  include 'Field_Mod/Interpolate_To_Faces_Harmonic.f90'
+  include 'Field_Mod/Interpolate_To_Faces_Linear.f90'
   include 'Field_Mod/Potential_Initialization.f90'
   include 'Field_Mod/Prandtl_Number.f90'
   include 'Field_Mod/Schmidt_Number.f90'

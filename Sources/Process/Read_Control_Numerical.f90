@@ -41,6 +41,7 @@
 
   ! Improvements to Rhie and Chow method (Choi, Gu)
   call Control_Mod_Choi_Correction(flow % choi_correction, .false.)
+  call Control_Mod_Choi_Correction(flow % gu_correction,   .false.)
 
   !----------------------------------!
   !   Gradient computation methods   !

@@ -152,6 +152,7 @@
     include 'Control_Mod/Numerics/Gradient_Method_For_Scalars.f90'
     include 'Control_Mod/Numerics/Gradient_Method_For_Turbulence.f90'
     include 'Control_Mod/Numerics/Gradient_Method_For_Multiphase.f90'
+    include 'Control_Mod/Numerics/Gu_Correction.f90'
     include 'Control_Mod/Numerics/Max_Iterations_For_Gauss_Gradients.f90'
     include 'Control_Mod/Numerics/Max_Simple_Iterations.f90'
     include 'Control_Mod/Numerics/Min_Simple_Iterations.f90'

@@ -64,8 +64,9 @@
     v_m(c) = grid % vol(c) / m % sav(c)
   end do
 
-  ! First part (cell-centered) of Choi's correction
-  ! (Subtract the cell-centered unsteady terms)
+  !--------------------------------------------------------------------------!
+  !   Choi's correction, part 1: subtract the cell-centered unsteady terms   !
+  !--------------------------------------------------------------------------!
   if(flow % choi_correction) then
     do c = 1, grid % n_cells
 
@@ -75,6 +76,19 @@
       u_c(c) = u_c(c) - t_m(c) * u % o(c)
       v_c(c) = v_c(c) - t_m(c) * v % o(c)
       w_c(c) = w_c(c) - t_m(c) * w % o(c)
+    end do
+  end if
+
+  !---------------------------------------------------------------------!
+  !   Gu's correction, part 1: subtract the cell-centered body forces   !
+  !---------------------------------------------------------------------!
+  if(flow % gu_correction) then
+    do c = 1, grid % n_cells
+
+      ! Units: m^3 s/kg * kg /(m^2 s^2) = m / s
+      u_c(c) = u_c(c) - v_m(c) * flow % cell_fx(c)
+      v_c(c) = v_c(c) - v_m(c) * flow % cell_fy(c)
+      w_c(c) = w_c(c) - v_m(c) * flow % cell_fz(c)
     end do
   end if
 
@@ -119,12 +133,23 @@
                        + a12 * (p % n(c1) - p % n(c2))     &
                        + a % fc(s) * (px_f + py_f + pz_f)
 
-      ! Second part of Choi's correction
-      ! (Add face-centered flux from previous time step)
+      !------------------------------------------------------------!
+      !   Choi's correction, part 2: add flux from old time step   !
+      !------------------------------------------------------------!
       if(flow % choi_correction) then
         v_flux % n(s) = v_flux % n(s)  &
                       + v_flux % o(s) * 0.5 * (t_m(c1) + t_m(c2))
-      end if
+      end if  ! choi_correction
+
+      !-------------------------------------------------------!
+      !   Gu's correction, part 2: add face-centered forces   !
+      !-------------------------------------------------------!
+      ! Units: m^3 s/kg * kg/(m^2 s^2) * m^2 = m^3/s
+      if(flow % gu_correction) then
+        v_flux % n(s) = v_flux % n(s)              &
+                      + 0.5 * (v_m(c1) + v_m(c2))  &
+                            * flow % face_fx(s) * grid % sx(s)
+      end if  ! gu_correction
 
     end if
   end do
