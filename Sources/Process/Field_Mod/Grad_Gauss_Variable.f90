@@ -58,9 +58,9 @@
   call Grid_Mod_Exchange_Cells_Real(grid, phi % y)
   call Grid_Mod_Exchange_Cells_Real(grid, phi % z)
 
-  if(this_proc < 2) then
-    print *, '# Final residual from Gauss: ', res,  &
-             ' reached in ', iter, ' iterations '
-  end if
+  ! if(this_proc < 2) then
+  !   print *, '# Final residual from Gauss: ', res,  &
+  !            ' reached in ', iter, ' iterations '
+  ! end if
 
   end subroutine
