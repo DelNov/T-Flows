@@ -25,7 +25,7 @@
   grid => flow % pnt_grid
   t    => flow % t
 
-  if(boussinesq) then
+  if(flow % buoyancy .eq. THERMALLY_DRIVEN) then
     call Field_Mod_Grad_Variable(flow, t)
   end if
 
@@ -37,7 +37,7 @@
                         * flow % shear(c)
   end do
 
-  if(boussinesq) then
+  if(flow % buoyancy .eq. THERMALLY_DRIVEN) then
     do c = 1, grid % n_cells
       nc2 = -flow % beta * (  grav_x * t % x(c)   &
                             + grav_y * t % y(c)   &

@@ -142,16 +142,21 @@
     real    :: gauss_tol
     integer :: gauss_miter
 
-  end type
+    ! Is buoyancy thermally- or density-driven?
+    integer :: buoyancy
 
-  ! Will Boussinesq approximation be used for buoyancy terms
-  logical :: boussinesq
+  end type
 
   ! Angular velocity
   real :: omega_x, omega_y, omega_z, omega
 
   ! Gravity
   real, target :: grav_x, grav_y, grav_z
+
+  ! Parameters for type of buoyancy
+  integer, parameter :: NO_BUOYANCY      = 60013
+  integer, parameter :: DENSITY_DRIVEN   = 60017
+  integer, parameter :: THERMALLY_DRIVEN = 60029
 
   contains
 

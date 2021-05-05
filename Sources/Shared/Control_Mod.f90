@@ -78,7 +78,7 @@
 
     ! Heat transfer
     include 'Control_Mod/Physics/Heat_Transfer.f90'
-    include 'Control_Mod/Physics/Boussinesq.f90'
+    include 'Control_Mod/Physics/Buoyancy.f90'
     include 'Control_Mod/Physics/Reference_Temperature.f90'
     include 'Control_Mod/Physics/Saturation_Temperature.f90'
     include 'Control_Mod/Physics/Volume_Expansion_Coefficient.f90'

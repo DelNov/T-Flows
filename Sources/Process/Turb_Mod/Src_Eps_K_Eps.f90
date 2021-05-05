@@ -73,7 +73,7 @@
                            / kin % n(c) * grid % vol(c)
 
     ! Buoyancy contribution
-    if(boussinesq) then
+    if(flow % buoyancy .eq. THERMALLY_DRIVEN) then
       b(c) = b(c) + max(0.0, c_1e * turb % g_buoy(c) &
                     * eps % n(c) / kin % n(c) * grid % vol(c))
       a % val(a % dia(c)) = a % val(a % dia(c))                &

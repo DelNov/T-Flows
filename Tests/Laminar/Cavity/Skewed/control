@@ -3,7 +3,7 @@
 #----------
  PROBLEM_NAME     skewed
  HEAT_TRANSFER    yes
- BOUSSINESQ       yes
+ BUOYANCY         thermal
 
  NUMBER_OF_TIME_STEPS       1
 

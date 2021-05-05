@@ -68,7 +68,7 @@
   !-------------------------------!
   !   For Boussinesq hypothesis   !
   !-------------------------------!
-  if(boussinesq) then
+  if(flow % buoyancy .eq. THERMALLY_DRIVEN) then
     do s = 1, grid % n_faces
       c1  = grid % faces_c(1, s)
       c2  = grid % faces_c(2, s)

@@ -66,7 +66,7 @@
     b(c) = b(c) + turb % p_kin(c) * grid % vol(c)
   end do
 
-  if(boussinesq) then
+  if(flow % buoyancy .eq. THERMALLY_DRIVEN) then
     do c = 1, grid % n_cells
       turb % g_buoy(c) = -flow % beta             &
                          * (grav_x * ut % n(c)    &
@@ -187,7 +187,7 @@
               - turb % vis_t(c1) * flow % shear(c1)**2) * grid % vol(c1)
 
         ! Implementation of wall function for buoyancy-driven flows
-        if(boussinesq) then
+        if(flow % buoyancy .eq. THERMALLY_DRIVEN) then
 
           nx = grid % sx(s) / grid % s(s)
           ny = grid % sy(s) / grid % s(s)
@@ -228,7 +228,7 @@
           ! Add new values of g_buoy based on wall function approach
           b(c1)      = b(c1) + turb % g_buoy(c1) * grid % vol(c1)
 
-        end if ! boussinesq
+        end if ! flow % buoyancy .eq. THERMALLY_DRIVEN
 
       end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2).eq.WALL or WALLFL
     end if    ! c2 < 0

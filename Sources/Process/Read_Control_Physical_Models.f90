@@ -6,8 +6,7 @@
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod,      only: HUGE_INT
   use Comm_Mod,       only: Comm_Mod_End, this_proc
-  use Field_Mod,      only: Field_Type, boussinesq,  &
-                            grav_x, grav_y, grav_z
+  use Field_Mod,      only: Field_Type, grav_x, grav_y, grav_z
   use Bulk_Mod,       only: Bulk_Type
   use Turb_Mod
   use Multiphase_Mod
@@ -38,9 +37,26 @@
   call Control_Mod_Gravitational_Vector(grav_x,  &
                                         grav_y,  &
                                         grav_z, .true.)
-  call Control_Mod_Boussinesq                  (boussinesq,   .true.)
-  call Control_Mod_Reference_Temperature       (flow % t_ref, .true.)
-  call Control_Mod_Volume_Expansion_Coefficient(flow % beta,  .true.)
+  call Control_Mod_Buoyancy                    (name,   .true.)
+  select case(name)
+    case('NONE')
+      flow % buoyancy = NO_BUOYANCY
+    case('DENSITY_DRIVEN')
+      flow % buoyancy = DENSITY_DRIVEN
+    case('THERMALLY_DRIVEN')
+      flow % buoyancy = THERMALLY_DRIVEN
+    case default
+      if(this_proc < 2) then
+        print *, '# ERROR!  Unknown buoyancy model :', trim(name)
+        print *, '# Exiting!'
+      end if
+      call Comm_Mod_End
+      stop
+  end select
+
+  call Control_Mod_Reference_Density           (flow % dens_ref, .true.)
+  call Control_Mod_Reference_Temperature       (flow % t_ref,    .true.)
+  call Control_Mod_Volume_Expansion_Coefficient(flow % beta,     .true.)
   call Control_Mod_Turbulent_Prandtl_Number    (pr_t)  ! default is (0.9)
 
   !---------------------------!
@@ -241,8 +257,6 @@
   end if
 
   call Control_Mod_Track_Front(mult % track_front, .true.)
-
-  call Control_Mod_Reference_Density(flow % dens_ref, .true.)
 
   call Control_Mod_Mass_Transfer(flow % mass_transfer)
 

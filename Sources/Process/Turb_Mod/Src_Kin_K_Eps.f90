@@ -58,7 +58,7 @@
     a % val(a % dia(c)) = a % val(a % dia(c)) + &
          flow % density(c) * eps % n(c)/(kin % n(c) + TINY) * grid % vol(c)
 
-    if(boussinesq) then
+    if(flow % buoyancy .eq. THERMALLY_DRIVEN) then
       turb % g_buoy(c) = -flow % beta           &
                        * (grav_x * ut % n(c) +  &
                           grav_y * vt % n(c) +  &

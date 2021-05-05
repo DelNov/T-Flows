@@ -91,7 +91,7 @@
   KEYWORD                                  |   default value               |   other possible values
 ------------------------------------------------------------------------------------------------------------------------
   ANGULAR_VELOCITY_VECTOR                  |         0.0,  0.0,  0.0       |   any triplet of real numbers
-  BOUSSINESQ                               |         no                    |   yes
+  BUOYANCY                                 |         none                  |   thermal density
   DYNAMIC_VISCOSITY                        |         0.01                  |   physical property, any real number
   GRAVITATIONAL_VECTOR                     |         0.0,  0.0,  0.0       |   any triplet of real numbers
   HEAT_CAPACITY                            |         1.0                   |   any real number
