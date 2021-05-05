@@ -53,7 +53,7 @@
 
   end do  ! iter
 
-  ! Refresh buffers for gradient components
+  ! Refresh buffers for gradient components (these calls are needed)
   call Grid_Mod_Exchange_Cells_Real(grid, phi % x)
   call Grid_Mod_Exchange_Cells_Real(grid, phi % y)
   call Grid_Mod_Exchange_Cells_Real(grid, phi % z)

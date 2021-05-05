@@ -18,8 +18,7 @@
   ! Take alias
   grid => flow % pnt_grid
 
-  ! Refresh buffers for gradient components (probably an overkill)
-  call Grid_Mod_Exchange_Cells_Real(grid, phi_c)
+  ! Refresh buffers for gradient components was here, but it is not needed
 
   ! Perform harmonic average on all faces
   do s = 1, grid % n_faces
