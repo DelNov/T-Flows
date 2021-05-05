@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Energy(flow, turb, mult, sol, curr_dt, ini)
+  subroutine Compute_Energy(flow, turb, mult, Sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for scalar (such as temperature)         !
 !------------------------------------------------------------------------------!
@@ -18,7 +18,7 @@
   type(Field_Type),      target :: flow
   type(Turb_Type),       target :: turb
   type(Multiphase_Type), target :: mult
-  type(Solver_Type),     target :: sol
+  type(Solver_Type),     target :: Sol
   integer, intent(in)           :: curr_dt
   integer, intent(in)           :: ini
 !-----------------------------------[Locals]-----------------------------------! 
@@ -26,7 +26,7 @@
   type(Var_Type),    pointer :: u, v, w, t
   type(Var_Type),    pointer :: ut, vt, wt
   type(Face_Type),   pointer :: v_flux
-  type(Matrix_Type), pointer :: a
+  type(Matrix_Type), pointer :: A
   real, contiguous,  pointer :: b(:)
   integer                    :: c, s, c1, c2
   real                       :: a12, a21, con_eff
@@ -55,7 +55,7 @@
 !   thermal conductivity        conductivity      [W/(m K)] ([W = J/s])
 !   density                     density           [kg/m^3]
 !   flux                        v_flux            [m^3/s]
-!   left  hand s.               a                 [J/(s K)]
+!   left  hand s.               A                 [J/(s K)]
 !   temperature                 t % n             [K]
 !   right hand s.               b                 [J/s]
 !   turb. thermal conductivity  con_t_f           [W/(m K)]
@@ -77,10 +77,10 @@
   dt     =  flow % dt
   call Field_Mod_Alias_Momentum(flow, u, v, w)
   call Field_Mod_Alias_Energy  (flow, t)
-  call Solver_Mod_Alias_System (sol, a, b)
+  call Sol % Alias_Solver      (A, b)
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Energy(flow, turb, mult, sol, curr_dt, ini)
+  call User_Mod_Beginning_Of_Compute_Energy(flow, turb, mult, Sol, curr_dt, ini)
 
   ! Initialize matrix and right hand side
   A % val(:) = 0.0
@@ -209,14 +209,14 @@
   do c = -grid % n_bnd_cells, grid % n_cells
     cap_dens(c) = flow % capacity(c) * flow % density(c)
   end do
-  call Numerics_Mod_Inertial_Term(t, cap_dens, a, b, dt)
+  call Numerics_Mod_Inertial_Term(t, cap_dens, A, b, dt)
 
   !--------------------!
   !                    !
   !   User source(s)   !
   !                    !
   !--------------------!
-  call User_Mod_Source(flow, t, a, b)
+  call User_Mod_Source(flow, t, A, b)
 
   !-------------------------------!
   !                               !
@@ -225,19 +225,18 @@
   !-------------------------------!
 
   ! Under-relax the equations
-  call Numerics_Mod_Under_Relax(t, a, b)
+  call Numerics_Mod_Under_Relax(t, A, b)
 
   ! Call linear solver to solve the equations
   call Cpu_Timer_Mod_Start('Linear_Solver_For_Energy')
-  call Solver_Mod_Bicg(sol,          &
-                       a,            &
-                       t % n,        &
-                       b,            &
-                       t % precond,  &
-                       t % mniter,   &
-                       t % eniter,   &
-                       t % tol,      &
-                       t % res)
+  call Sol % Bicg(A,            &
+                  t % n,        &
+                  b,            &
+                  t % precond,  &
+                  t % mniter,   &
+                  t % eniter,   &
+                  t % tol,      &
+                  t % res)
   call Cpu_Timer_Mod_Stop('Linear_Solver_For_Energy')
 
   ! Print some info on the screen
@@ -246,7 +245,7 @@
   call Field_Mod_Grad_Variable(flow, t)
 
   ! User function
-  call User_Mod_End_Of_Compute_Energy(flow, turb, mult, sol, curr_dt, ini)
+  call User_Mod_End_Of_Compute_Energy(flow, turb, mult, Sol, curr_dt, ini)
 
   call Cpu_Timer_Mod_Stop('Compute_Energy (without solvers)')
 

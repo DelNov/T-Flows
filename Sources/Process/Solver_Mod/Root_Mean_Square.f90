@@ -1,13 +1,14 @@
 !==============================================================================!
-  real function Root_Mean_Square(ni, r)
+  real function Root_Mean_Square(Solver, ni, r)
 !------------------------------------------------------------------------------!
 !   Calculates root means square of vector r without normalization.            !
 !   This non-normalized variant seems to be better option for ACM.             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer :: ni
-  real    :: r(:)  ! this may be only in inner cells
+  class(Solver_Type) :: Solver
+  integer            :: ni
+  real               :: r(:)  ! this may be only in inner cells
 !-----------------------------------[Locals]-----------------------------------!
   real    :: rms
   integer :: i

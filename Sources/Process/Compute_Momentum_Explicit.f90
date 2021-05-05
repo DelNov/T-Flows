@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Momentum_Explicit(flow, ui, sol)
+  subroutine Compute_Momentum_Explicit(flow, ui, Sol)
 !------------------------------------------------------------------------------!
 !   Explicit computation of momentum equations, used in PISO algorithm,        !
 !------------------------------------------------------------------------------!
@@ -20,18 +20,18 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),  target :: flow
   type(Var_Type)            :: ui        ! velocity component
-  type(Solver_Type), target :: sol
+  type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
-  type(Matrix_Type), pointer :: m
+  type(Matrix_Type), pointer :: M
   real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2
 !==============================================================================!
 
   ! Take aliases
   grid => flow % pnt_grid
-  m    => sol % m
-  b    => sol % b % val
+  M    => Sol % M
+  b    => Sol % b % val
 
   ! PISO corrections are executed here
   if (flow % p_m_coupling == PISO .and.  &

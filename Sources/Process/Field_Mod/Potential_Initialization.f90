@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Field_Mod_Potential_Initialization(flow, sol)
+  subroutine Field_Mod_Potential_Initialization(flow, Sol)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves eliptic relaxation equations for f22.               !
 !------------------------------------------------------------------------------!
@@ -15,11 +15,11 @@
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   type(Field_Type),  target :: flow
-  type(Solver_Type), target :: sol
+  type(Solver_Type), target :: Sol
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: phi, u, v, w
-  type(Matrix_Type), pointer :: a
+  type(Matrix_Type), pointer :: A
   real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2, n
   real                       :: f_ex, f_im
@@ -42,7 +42,7 @@
   phi  => flow % pot
 
   call Field_Mod_Alias_Momentum(flow, u, v, w)
-  call Solver_Mod_Alias_System (sol,  a, b)
+  call Sol % Alias_Solver(a, b)
   allocate(store(grid % n_cells)); store(:) = 0.0
 
   !--------------------------------------!
@@ -220,15 +220,14 @@
     phi % precond = 'INCOMPLETE_CHOLESKY'
 
     ! Call linear solver to solve the equations
-    call Solver_Mod_Bicg(sol,            &
-                         a,              &
-                         phi % n,        &
-                         b,              &
-                         phi % precond,  &
-                         phi % mniter,   &
-                         phi % eniter,   &
-                         phi % tol,      &
-                         phi % res)
+    call Sol % Bicg(A,              &
+                    phi % n,        &
+                    b,              &
+                    phi % precond,  &
+                    phi % mniter,   &
+                    phi % eniter,   &
+                    phi % tol,      &
+                    phi % res)
     if(this_proc < 2) then
       print '(a,i4,a,e12.4)', ' # Computed potential in ',   phi % eniter,  &
                               ' iterations with residual: ', phi % res

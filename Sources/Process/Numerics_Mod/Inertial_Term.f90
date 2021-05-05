@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Numerics_Mod_Inertial_Term(phi, coef, a, b, dt)
+  subroutine Numerics_Mod_Inertial_Term(phi, coef, A, b, dt)
 !------------------------------------------------------------------------------!
 !   Purpose: Dicretize inertial term in conservation equations.                !
 !------------------------------------------------------------------------------!
@@ -8,7 +8,7 @@
   type(Var_Type)    :: phi
   real              :: coef(-phi % pnt_grid % n_bnd_cells:  &
                              phi % pnt_grid % n_cells)
-  type(Matrix_Type) :: a
+  type(Matrix_Type) :: A
   real              :: b(:)
   real              :: dt
 !-----------------------------------[Locals]-----------------------------------!

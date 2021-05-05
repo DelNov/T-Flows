@@ -1,19 +1,19 @@
 !==============================================================================!
-  subroutine Turb_Mod_Compute_F22(turb, sol, curr_dt, ini, phi)
+  subroutine Turb_Mod_Compute_F22(turb, Sol, curr_dt, ini, phi)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves eliptic relaxation equations for f22.               !
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   type(Turb_Type)           :: turb
-  type(Solver_Type), target :: sol
+  type(Solver_Type), target :: Sol
   integer, intent(in)       :: curr_dt
   integer, intent(in)       :: ini
   type(Var_Type)            :: phi
 !----------------------------------[Locals]------------------------------------!
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
-  type(Matrix_Type), pointer :: a
+  type(Matrix_Type), pointer :: A
   real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2
   real                       :: f_ex, f_im
@@ -42,7 +42,7 @@
   ! Take aliases
   flow => turb % pnt_flow
   grid => flow % pnt_grid
-  call Solver_Mod_Alias_System (sol, a, b)
+  call Sol % Alias_Solver(A, b)
 
   ! Initialize matrix and right hand side
   A % val(:) = 0.0
@@ -144,9 +144,9 @@
   !                                     !
   !-------------------------------------!
   if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
-    call Turb_Mod_Src_F22_Rsm_Manceau_Hanjalic(turb, sol)
+    call Turb_Mod_Src_F22_Rsm_Manceau_Hanjalic(turb, Sol)
   else
-    call Turb_Mod_Src_F22_K_Eps_Zeta_F(turb, sol)
+    call Turb_Mod_Src_F22_K_Eps_Zeta_F(turb, Sol)
   end if
 
   !---------------------------------!
@@ -159,15 +159,14 @@
   call Numerics_Mod_Under_Relax(phi, a, b)
 
   ! Call linear solver to solve the equations
-  call Solver_Mod_Cg(sol,            &
-                     a,              &
-                     phi % n,        &
-                     b,              &
-                     phi % precond,  &
-                     phi % mniter,   &
-                     phi % eniter,   &
-                     phi % tol,      &
-                     phi % res)
+  call Sol % Cg(A,              &
+                phi % n,        &
+                b,              &
+                phi % precond,  &
+                phi % mniter,   &
+                phi % eniter,   &
+                phi % tol,      &
+                phi % res)
 
   ! Print info on the screen
   if(turb % model .eq. K_EPS_ZETA_F) then

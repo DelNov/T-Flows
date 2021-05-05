@@ -1,19 +1,19 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Vof_Pressure_Correction(mult, sol)
+  subroutine Multiphase_Mod_Vof_Pressure_Correction(mult, Sol)
 !------------------------------------------------------------------------------!
 !   Correct fluxes on pressure equation due to surface tension and gravity     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Multiphase_Type), target :: mult
-  type(Solver_Type),     target :: sol
+  type(Solver_Type),     target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
   type(Face_Type),   pointer :: v_flux
   type(Var_Type),    pointer :: col
   type(Var_Type),    pointer :: u, v, w
-  type(Matrix_Type), pointer :: m
+  type(Matrix_Type), pointer :: M
   real, contiguous,  pointer :: b(:)
   integer                    :: c, c1, c2, s, nb, nc
   real                       :: a12, fs
@@ -28,8 +28,8 @@
   ! col    => mult % smooth
   col    => mult % vof
   v_flux => flow % v_flux
-  m      => sol % m
-  b      => sol % b % val
+  M      => Sol % M
+  b      => Sol % b % val
 
   nb = grid % n_bnd_cells
   nc = grid % n_cells

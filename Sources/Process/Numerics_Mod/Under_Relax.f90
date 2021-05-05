@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Numerics_Mod_Under_Relax(phi, a, b)
+  subroutine Numerics_Mod_Under_Relax(phi, A, b)
 !------------------------------------------------------------------------------!
 !   Purpose: Under-relax system of equations before calling linear solver.     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Var_Type)    :: phi
-  type(Matrix_Type) :: a
+  type(Matrix_Type) :: A
   real              :: b(:)
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c

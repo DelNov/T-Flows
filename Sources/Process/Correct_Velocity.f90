@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Correct_Velocity(flow, turb, mult, sol, curr_dt, ini)
+  subroutine Correct_Velocity(flow, turb, mult, Sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Corrects the velocities, and mass (or volume) fluxes on cell faces.        !
 !------------------------------------------------------------------------------!
@@ -11,7 +11,7 @@
   type(Field_Type),      target :: flow
   type(Turb_Type),       target :: turb
   type(Multiphase_Type), target :: mult
-  type(Solver_Type),     target :: sol
+  type(Solver_Type),     target :: Sol
   integer, intent(in)           :: curr_dt
   integer, intent(in)           :: ini
 !-----------------------------------[Locals]-----------------------------------!
@@ -19,8 +19,8 @@
   type(Bulk_Type),   pointer :: bulk
   type(Var_Type),    pointer :: u, v, w, p, pp
   type(Face_Type),   pointer :: v_flux          ! volume flux
-  type(Matrix_Type), pointer :: a               ! pressure matrix
-  type(Matrix_Type), pointer :: m               ! momentum matrix
+  type(Matrix_Type), pointer :: A               ! pressure matrix
+  type(Matrix_Type), pointer :: M               ! momentum matrix
   real, contiguous,  pointer :: b(:)
   integer                    :: c, c1, c2, s, i_fac
   real                       :: cfl_t, pe_t, dens_f, visc_f, dt, wght
@@ -35,14 +35,14 @@
   p      => flow % p
   pp     => flow % pp
   dt     =  flow % dt
-  a      => sol % a
-  m      => sol % m
-  b      => sol % b % val
+  A      => Sol % A
+  M      => Sol % M
+  b      => Sol % b % val
 
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! User function
-  call User_Mod_Beginning_Of_Correct_Velocity(flow, mult, sol, curr_dt, ini)
+  call User_Mod_Beginning_Of_Correct_Velocity(flow, mult, Sol, curr_dt, ini)
 
   !-----------------------------------------!
   !   Correct velocities and fluxes with    !
@@ -138,7 +138,7 @@
   end if
 
   ! User function
-  call User_Mod_End_Of_Correct_Velocity(flow, mult, sol, curr_dt, ini)
+  call User_Mod_End_Of_Correct_Velocity(flow, mult, Sol, curr_dt, ini)
 
   call Cpu_Timer_Mod_Stop('Correct_Velocity')
 

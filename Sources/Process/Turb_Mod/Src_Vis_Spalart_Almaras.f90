@@ -1,17 +1,17 @@
 !==============================================================================!
-  subroutine Turb_Mod_Src_Vis_Spalart_Almaras(turb, sol)
+  subroutine Turb_Mod_Src_Vis_Spalart_Almaras(turb, Sol)
 !------------------------------------------------------------------------------!
 !   Computes the source terms in vis transport equation.                       !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type),   target :: turb
-  type(Solver_Type), target :: sol
+  type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: vis
-  type(Matrix_Type), pointer :: a
+  type(Matrix_Type), pointer :: A
   real,              pointer :: b(:)
   integer                    :: c
   real                       :: x_rat, f_v1, f_v2, f_w, ss
@@ -22,7 +22,7 @@
   flow => turb % pnt_flow
   grid => flow % pnt_grid
   vis  => turb % vis
-  call Solver_Mod_Alias_System(sol, a, b)
+  call Sol % Alias_Solver(A, b)
 
   if(turb % model .eq. SPALART_ALLMARAS) then
 

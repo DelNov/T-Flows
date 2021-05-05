@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Src_Kin_K_Eps_Zeta_F(turb, sol)
+  subroutine Turb_Mod_Src_Kin_K_Eps_Zeta_F(turb, Sol)
 !------------------------------------------------------------------------------!
 !   Computes the source terms in kin transport equation.                       !
 !------------------------------------------------------------------------------!
@@ -15,7 +15,7 @@
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   type(Turb_Type),   target :: turb
-  type(Solver_Type), target :: sol
+  type(Solver_Type), target :: Sol
 !---------------------------------[Calling]------------------------------------!
   real :: Roughness_Coefficient
   real :: Tau_Wall_Low_Re
@@ -27,7 +27,7 @@
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w, t
   type(Var_Type),    pointer :: kin, eps, zeta, f, ut, vt, wt, t2
-  type(Matrix_Type), pointer :: a
+  type(Matrix_Type), pointer :: A
   real,              pointer :: b(:)
   integer                    :: c, c1, c2, s
   real                       :: u_tan, u_tau
@@ -57,7 +57,7 @@
   call Field_Mod_Alias_Energy     (flow, t)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f)
   call Turb_Mod_Alias_Heat_Fluxes (turb, ut, vt, wt)
-  call Solver_Mod_Alias_System    (sol, a, b)
+  call Sol % Alias_Solver         (A, b)
   call Turb_Mod_Alias_T2          (turb, t2)
 
   ! Production source:

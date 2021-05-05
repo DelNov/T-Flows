@@ -1,14 +1,15 @@
 !==============================================================================!
-  subroutine Prec_Form(ni, a, d, prec)
+  subroutine Prec_Form(Solver, ni, a, d, prec)
 !------------------------------------------------------------------------------!
 !   Forms preconditioning matrix "d" from provided matrix "a".                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer           :: ni
-  type(Matrix_Type) :: a
-  type(Matrix_Type) :: d
-  character(SL)     :: prec  ! preconditioner
+  class(Solver_Type) :: Solver
+  integer            :: ni
+  type(Matrix_Type)  :: A
+  type(Matrix_Type)  :: D
+  character(SL)      :: prec  ! preconditioner
 !-----------------------------------[Locals]-----------------------------------!
   real    :: sum1
   integer :: i, j, k

@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Vof_Compute(mult, sol, dt, n)
+  subroutine Multiphase_Mod_Vof_Compute(mult, Sol, dt, n)
 !------------------------------------------------------------------------------!
 !   Solves Volume Fraction equation using UPWIND ADVECTION and CICSAM          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Multiphase_Type), target :: mult
-  type(Solver_Type),     target :: sol
+  type(Solver_Type),     target :: Sol
   real                          :: dt
   integer                       :: n    ! current temporal iteration
 !-----------------------------------[Locals]-----------------------------------!
@@ -14,7 +14,7 @@
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: vof
   type(Face_Type),   pointer :: v_flux
-  type(Matrix_Type), pointer :: a
+  type(Matrix_Type), pointer :: A
   real, contiguous,  pointer :: b(:)
   real, contiguous,  pointer :: beta_f(:)
   real, contiguous,  pointer :: beta_c(:)
@@ -34,8 +34,8 @@
   beta_f => mult % beta_f
   beta_c => mult % beta_c
   c_d    => mult % c_d
-  a      => sol % a
-  b      => sol % b % val
+  A      => Sol % A
+  b      => Sol % b % val
 
   if(vof % adv_scheme .eq. CICSAM .or. &
      vof % adv_scheme .eq. STACS) then
@@ -70,10 +70,10 @@
     !   Matrix Coefficients   !
     !-------------------------!
 
-    call Multiphase_Mod_Vof_Coefficients(mult, a, b, dt)
+    call Multiphase_Mod_Vof_Coefficients(mult, A, b, dt)
 
     ! Solve System
-    call Multiphase_Mod_Vof_Solve_System(mult, sol, b)
+    call Multiphase_Mod_Vof_Solve_System(mult, Sol, b)
 
     call Grid_Mod_Exchange_Cells_Real(grid, vof % n)
 
@@ -122,10 +122,10 @@
         !   Matrix coefficients   !
         !-------------------------!
 
-        call Multiphase_Mod_Vof_Coefficients(mult, a, b, dt / real(n_sub))
+        call Multiphase_Mod_Vof_Coefficients(mult, A, b, dt / real(n_sub))
 
         ! Solve System
-        call Multiphase_Mod_Vof_Solve_System(mult, sol, b)
+        call Multiphase_Mod_Vof_Solve_System(mult, Sol, b)
 
         do s = 1, grid % n_faces
           c1 = grid % faces_c(1,s)

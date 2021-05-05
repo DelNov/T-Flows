@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Src_Zeta_K_Eps_Zeta_F(turb, sol, curr_dt)
+  subroutine Turb_Mod_Src_Zeta_K_Eps_Zeta_F(turb, Sol, curr_dt)
 !------------------------------------------------------------------------------!
 !   Calculate source terms in equation for zeta.                               !
 !   Term which is negative is put on left hand side in diagonal of             !
@@ -8,13 +8,13 @@
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   type(Turb_Type),   target :: turb
-  type(Solver_Type), target :: sol
+  type(Solver_Type), target :: Sol
   integer, intent(in)       :: curr_dt
 !----------------------------------[Locals]------------------------------------!
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: kin, eps, f22, zeta
-  type(Matrix_Type), pointer :: a
+  type(Matrix_Type), pointer :: A
   real,              pointer :: b(:)
   integer                    :: c
 !==============================================================================!
@@ -36,7 +36,7 @@
   flow => turb % pnt_flow
   grid => flow % pnt_grid
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
-  call Solver_Mod_Alias_System    (sol, a, b)
+  call Sol % Alias_Solver(A, b)
 
   ! Positive source term 
   ! The first option in treating the source is making computation very 

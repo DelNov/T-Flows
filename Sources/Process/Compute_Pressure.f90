@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Pressure(flow, mult, sol, curr_dt, ini)
+  subroutine Compute_Pressure(flow, mult, Sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Forms and solves pressure equation for the SIMPLE method.                  !
 !------------------------------------------------------------------------------!
@@ -10,7 +10,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),      target :: flow
   type(Multiphase_Type), target :: mult
-  type(Solver_Type),     target :: sol
+  type(Solver_Type),     target :: Sol
   integer, intent(in)           :: curr_dt
   integer, intent(in)           :: ini
 !-----------------------------------[Locals]-----------------------------------!
@@ -18,8 +18,8 @@
   type(Bulk_Type),   pointer :: bulk
   type(Var_Type),    pointer :: u, v, w, p, pp
   type(Face_Type),   pointer :: v_flux          ! volume flux
-  type(Matrix_Type), pointer :: a               ! pressure matrix
-  type(Matrix_Type), pointer :: m               ! momentum matrix
+  type(Matrix_Type), pointer :: A               ! pressure matrix
+  type(Matrix_Type), pointer :: M               ! momentum matrix
   real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2
   character(SL)              :: solver
@@ -58,13 +58,13 @@
   p      => flow % p
   pp     => flow % pp
   dt     =  flow % dt
-  a      => sol % a
-  m      => sol % m
-  b      => sol % b % val
+  A      => Sol % A
+  M      => Sol % M
+  b      => Sol % b % val
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Pressure(flow, mult, sol, curr_dt, ini)
+  call User_Mod_Beginning_Of_Compute_Pressure(flow, mult, Sol, curr_dt, ini)
 
   !--------------------------------------------------!
   !   Find the value for normalization of pressure   !
@@ -108,7 +108,7 @@
   !   Compute volume fluxes at internal   !
   !    faces with Rhie and Chow method    !
   !---------------------------------------!
-  call Rhie_And_Chow(flow, mult, sol)
+  call Rhie_And_Chow(flow, mult, Sol)
 
   !------------------------------------------!
   !   Update fluxes at boundaries and fill   !
@@ -170,28 +170,27 @@
   !   In case of VOF, surface tension and  gravity correction   !
   !-------------------------------------------------------------!
   if(mult % model .eq. VOLUME_OF_FLUID) then
-    call Multiphase_Mod_Vof_Pressure_Correction(mult, sol)
+    call Multiphase_Mod_Vof_Pressure_Correction(mult, Sol)
   end if
 
   !-------------------------------------!
   !   Correct fluxes with body forces   !
   !-------------------------------------!
-  ! call Field_Mod_Correct_Fluxes_With_Body_Forces(flow, sol)
+  ! call Field_Mod_Correct_Fluxes_With_Body_Forces(flow, Sol)
 
   ! Get solver
   call Control_Mod_Solver_For_Pressure(solver)
 
   call Cpu_Timer_Mod_Start('Linear_Solver_For_Pressure')
-  call Solver_Mod_Cg(sol,           &
-                     a,             &
-                     pp % n,        &
-                     b,             &
-                     pp % precond,  &
-                     pp % mniter,   &      ! max number of iterations
-                     pp % eniter,   &      ! executed number of iterations
-                     pp % tol,      &
-                     pp % res,      &
-                     norm = p_nor)         ! number for normalisation
+  call Sol % Cg(A,             &
+                pp % n,        &
+                b,             &
+                pp % precond,  &
+                pp % mniter,   &      ! max number of iterations
+                pp % eniter,   &      ! executed number of iterations
+                pp % tol,      &
+                pp % res,      &
+                norm = p_nor)         ! number for normalisation
 
   call Cpu_Timer_Mod_Stop('Linear_Solver_For_Pressure')
 
@@ -227,7 +226,7 @@
   p % n(:) = p % n(:) - 0.5*(p_max+p_min)
 
   ! User function
-  call User_Mod_End_Of_Compute_Pressure(flow, mult, sol, curr_dt, ini)
+  call User_Mod_End_Of_Compute_Pressure(flow, mult, Sol, curr_dt, ini)
 
   call Cpu_Timer_Mod_Stop('Compute_Pressure (without solvers)')
 

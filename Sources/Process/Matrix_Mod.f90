@@ -27,11 +27,11 @@
   !                                                                    !
   !   Compressed row storage of the above matrix reads:                !
   !                                                                    !
-  !   A %  val = [  10   4   5   2  12  -1   1  99   7  -3  11  53 ]    !
-  !   A %  col = [   1   3   4   1   2   3   2   3   4   1   2   4 ]    !
-  !   A %  row = [   1   4   7  10 ]                                    !
+  !   A %  val = [  10   4   5   2  12  -1   1  99   7  -3  11  53 ]   !
+  !   A %  col = [   1   3   4   1   2   3   2   3   4   1   2   4 ]   !
+  !   A %  row = [   1   4   7  10 ]                                   !
   !                                                                    !
-  !   A %  dia = [   1   5   9  12 ]                                    !
+  !   A %  dia = [   1   5   9  12 ]                                   !
   !--------------------------------------------------------------------!
   type Matrix_Type
 
@@ -48,12 +48,12 @@
     integer, allocatable :: mir(:)    ! mirror positions   
 
     contains
-      procedure :: Create
+      procedure :: Create_Matrix
 
   end type
 
   contains
 
-  include 'Matrix_Mod/Create.f90'
+  include 'Matrix_Mod/Create_Matrix.f90'
 
   end module 

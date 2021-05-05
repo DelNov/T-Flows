@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Src_Eps_K_Eps_Zeta_F(turb, sol)
+  subroutine Turb_Mod_Src_Eps_K_Eps_Zeta_F(turb, Sol)
 !------------------------------------------------------------------------------!
 !   Calculates source terms in equation of dissipation of turbulent energy     !
 !   and imposes boundary condition                                             !
@@ -7,7 +7,7 @@
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   type(Turb_Type),   target :: turb
-  type(Solver_Type), target :: sol
+  type(Solver_Type), target :: Sol
 !---------------------------------[Calling]------------------------------------!
   real :: Roughness_Coefficient
   real :: Tau_Wall_Low_Re
@@ -19,7 +19,7 @@
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w
   type(Var_Type),    pointer :: kin, eps, zeta, f22, ut, vt, wt
-  type(Matrix_Type), pointer :: a
+  type(Matrix_Type), pointer :: A
   real,              pointer :: b(:)
   integer                    :: c, s, c1, c2, j
   real                       :: u_tan, u_tau
@@ -46,7 +46,7 @@
 !   wall shear s. tau_wall [kg/(m*s^2)]| dyn visc.       viscosity [kg/(m*s)]  !
 !   density       density  [kg/m^3]    | turb. kin en.   kin % n   [m^2/s^2]   !
 !   cell volume   vol      [m^3]       | length          lf        [m]         !
-!   left hand s.  a        [kg/s]      | right hand s.   b         [kg*m^2/s^4]!
+!   left hand s.  A        [kg/s]      | right hand s.   b         [kg*m^2/s^4]!
 !------------------------------------------------------------------------------!
 !   p_kin = 2*vis_t / density S_ij S_ij                                        !
 !   shear = sqrt(2 S_ij S_ij)                                                  !
@@ -58,7 +58,7 @@
   call Field_Mod_Alias_Momentum   (flow, u, v, w)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
   call Turb_Mod_Alias_Heat_Fluxes (turb, ut, vt, wt)
-  call Solver_Mod_Alias_System    (sol, a, b)
+  call Sol % Alias_Solver         (A, b)
 
   call Time_And_Length_Scale(grid, turb)
 

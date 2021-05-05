@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Field_Mod_Inertial_Term_Momentum(flow, phi, a, b, dt)
+  subroutine Field_Mod_Inertial_Term_Momentum(flow, phi, A, b, dt)
 !------------------------------------------------------------------------------!
 !   Purpose: Dicretize inertial term in momentum conservation equations.       !
 !                                                                              !
@@ -25,7 +25,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: flow
   type(Var_Type)           :: phi
-  type(Matrix_Type)        :: a
+  type(Matrix_Type)        :: A
   real                     :: b(:)
   real                     :: dt
 !-----------------------------------[Locals]-----------------------------------!

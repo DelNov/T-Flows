@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Momentum(flow, turb, mult, sol, curr_dt, ini)
+  subroutine Compute_Momentum(flow, turb, mult, Sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves momentum conservation equations                     !
 !------------------------------------------------------------------------------!
@@ -11,13 +11,13 @@
   type(Field_Type),      target :: flow
   type(Turb_Type),       target :: turb
   type(Multiphase_Type), target :: mult
-  type(Solver_Type),     target :: sol
+  type(Solver_Type),     target :: Sol
   integer, intent(in)           :: curr_dt
   integer, intent(in)           :: ini
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Bulk_Type),   pointer :: bulk
-  type(Matrix_Type), pointer :: m
+  type(Matrix_Type), pointer :: M
   type(Var_Type),    pointer :: ui, uj, uk, t, p
   type(Face_Type),   pointer :: v_flux
   real, contiguous,  pointer :: b(:)
@@ -68,11 +68,11 @@
 !
 !  Dimension of the system under consideration
 !
-!     [m]{u} = {b}   [kgm/s^2]   [N]
+!     [M]{u} = {b}   [kgm/s^2]   [N]
 !
 !  Dimensions of certain variables:
 !
-!     m              [kg/s]
+!     M              [kg/s]
 !     u, v, w        [m/s]
 !     bu, bv, bw     [kgm/s^2]      [N]
 !     p, pp          [kg/(m s^2)]   [N/m^2]
@@ -91,11 +91,11 @@
   t      => flow % t
   p      => flow % p
   dt     =  flow % dt
-  m      => sol % m
-  b      => sol % b % val
+  M      => Sol % M
+  b      => Sol % b % val
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Momentum(flow, turb, mult, sol,  &
+  call User_Mod_Beginning_Of_Compute_Momentum(flow, turb, mult, Sol,  &
                                               curr_dt, ini)
 
   !-----------------------------------------------------!
@@ -271,7 +271,7 @@
     !   Inertial terms   !
     !                    !
     !--------------------!
-    call Numerics_Mod_Inertial_Term(ui, flow % density, m, fi, dt)
+    call Numerics_Mod_Inertial_Term(ui, flow % density, M, fi, dt)
 
     !---------------------------------!
     !                                 !
@@ -303,7 +303,7 @@
     !----------------------------------------!
     !   All other terms defined by the user  !
     !----------------------------------------!
-    call User_Mod_Force(flow, ui, m, fi)
+    call User_Mod_Force(flow, ui, M, fi)
 
     !-----------------------------------------------------------!
     !                                                           !
@@ -331,7 +331,7 @@
     !----------------------------------------------!
     !   Explicit solution for the PISO algorithm   !
     !----------------------------------------------!
-    call Compute_Momentum_Explicit(flow, ui, sol)
+    call Compute_Momentum_Explicit(flow, ui, Sol)
 
     !-----------------------------------!
     !                                   !
@@ -345,21 +345,20 @@
     if(flow % piso_status .eqv. .false.) then
 
       ! Under-relax the equations
-      call Numerics_Mod_Under_Relax(ui, m, b)
+      call Numerics_Mod_Under_Relax(ui, M, b)
 
       ! Call linear solver
       call Cpu_Timer_Mod_Start('Linear_Solver_For_Momentum')
 
-      call Solver_Mod_Bicg(sol,           &
-                           m,             &
-                           ui % n,        &
-                           b,             &
-                           ui % precond,  &
-                           ui % mniter,   &
-                           ui % eniter,   &
-                           ui % tol,      &
-                           ui % res,      &
-                           norm = vel_max)
+      call Sol % Bicg(M,             &
+                      ui % n,        &
+                      b,             &
+                      ui % precond,  &
+                      ui % mniter,   &
+                      ui % eniter,   &
+                      ui % tol,      &
+                      ui % res,      &
+                      norm = vel_max)
       call Cpu_Timer_Mod_Stop('Linear_Solver_For_Momentum')
 
       ! Fill the info screen up
@@ -375,7 +374,7 @@
   call Grid_Mod_Exchange_Cells_Real(grid, M % sav)
 
   ! User function
-  call User_Mod_End_Of_Compute_Momentum(flow, turb, mult, sol, curr_dt, ini)
+  call User_Mod_End_Of_Compute_Momentum(flow, turb, mult, Sol, curr_dt, ini)
 
   call Cpu_Timer_Mod_Stop('Compute_Momentum (without solvers)')
 

@@ -1,16 +1,16 @@
 !==============================================================================!
-  subroutine Solver_Mod_Alias_System(sol, a, b)
+  subroutine Alias_Solver(Sol, A, b)
 !------------------------------------------------------------------------------!
 !   Create alias for system matrix and right hand side.                        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Solver_Type), target  :: sol
-  type(Matrix_Type), pointer :: a
-  real,              pointer :: b(:)
+  class(Solver_Type), target  :: Sol
+  type(Matrix_Type),  pointer :: A
+  real,               pointer :: b(:)
 !==============================================================================!
 
-  a => sol % a
-  b => sol % b % val
+  A => Sol % A
+  b => Sol % b % val
 
   end subroutine

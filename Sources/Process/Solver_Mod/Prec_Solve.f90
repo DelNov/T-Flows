@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Prec_Solve(ni, a, d, x, b, prec)
+  subroutine Prec_Solve(Solver, ni, a, d, x, b, prec)
 !------------------------------------------------------------------------------!
 !   Solves the preconditioning system [d]{x}={b}                               !
 !------------------------------------------------------------------------------!
@@ -13,12 +13,13 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer           :: ni
-  type(Matrix_Type) :: a
-  type(Matrix_Type) :: d
-  real              :: x(:)
-  real              :: b(:)
-  character(SL)     :: prec  ! preconditioner
+  class(Solver_Type) :: Solver
+  integer            :: ni
+  type(Matrix_Type)  :: A
+  type(Matrix_Type)  :: D
+  real               :: x(:)
+  real               :: b(:)
+  character(SL)      :: prec  ! preconditioner
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i, j, k
   real    :: sum1

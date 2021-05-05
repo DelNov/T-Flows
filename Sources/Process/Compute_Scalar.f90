@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Scalar(flow, turb, mult, sol, curr_dt, ini, sc)
+  subroutine Compute_Scalar(flow, turb, mult, Sol, curr_dt, ini, sc)
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for use scalar.                          !
 !------------------------------------------------------------------------------!
@@ -23,14 +23,14 @@
   type(Field_Type),      target :: flow
   type(Turb_Type),       target :: turb
   type(Multiphase_Type), target :: mult
-  type(Solver_Type),     target :: sol
+  type(Solver_Type),     target :: Sol
   integer, intent(in)           :: curr_dt
   integer, intent(in)           :: ini
   integer, intent(in)           :: sc
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: uu, vv, ww, uv, uw, vw
-  type(Matrix_Type), pointer :: a
+  type(Matrix_Type), pointer :: A
   real, contiguous,  pointer :: b(:)
   type(Face_Type),   pointer :: v_flux
   type(Var_Type),    pointer :: phi
@@ -61,10 +61,10 @@
   phi    => flow % scalar(sc)
   dt     =  flow % dt
   call Turb_Mod_Alias_Stresses(turb, uu, vv, ww, uv, uw, vw)
-  call Solver_Mod_Alias_System(sol, a, b)
+  call Sol % Alias_Solver     (A, b)
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Scalar(flow, turb, mult, sol,  &
+  call User_Mod_Beginning_Of_Compute_Scalar(flow, turb, mult, Sol,  &
                                             curr_dt, ini, sc)
 
   ! Initialize matrix and right hand side
@@ -245,7 +245,7 @@
   !   Inertial terms   !
   !                    !
   !--------------------!
-  call Numerics_Mod_Inertial_Term(phi, flow % density, a, b, dt)
+  call Numerics_Mod_Inertial_Term(phi, flow % density, A, b, dt)
 
   !-------------------------------------!
   !                                     !
@@ -340,7 +340,7 @@
     end if
   end if
 
-  call User_Mod_Source(flow, phi, a, b)
+  call User_Mod_Source(flow, phi, A, b)
 
   !---------------------------------!
   !                                 !
@@ -349,19 +349,18 @@
   !---------------------------------!
 
   ! Under-relax the equations
-  call Numerics_Mod_Under_Relax(phi, a, b)
+  call Numerics_Mod_Under_Relax(phi, A, b)
 
   ! Call linear solver to solve them
   call Cpu_Timer_Mod_Start('Linear_Solver_For_Scalars')
-  call Solver_Mod_Bicg(sol,            &
-                       a,              &
-                       phi % n,        &
-                       b,              &
-                       phi % precond,  &
-                       phi % mniter,   &
-                       phi % eniter,   &
-                       phi % tol,      &
-                       phi % res)
+  call Sol % Bicg(A,              &
+                  phi % n,        &
+                  b,              &
+                  phi % precond,  &
+                  phi % mniter,   &
+                  phi % eniter,   &
+                  phi % tol,      &
+                  phi % res)
   call Cpu_Timer_Mod_Stop('Linear_Solver_For_Scalars')
 
   read(phi % name(3:4), *) ns  ! reterive the number of scalar
@@ -373,7 +372,7 @@
   call Field_Mod_Grad_Variable(flow, phi)
 
   ! User function
-  call User_Mod_End_Of_Compute_Scalar(flow, turb, mult, sol, curr_dt, ini, sc)
+  call User_Mod_End_Of_Compute_Scalar(flow, turb, mult, Sol, curr_dt, ini, sc)
 
   call Cpu_Timer_Mod_Stop('Compute_Scalars (without solvers)')
 

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Field_Mod_Correct_Fluxes_With_Body_Forces(flow, sol)
+  subroutine Field_Mod_Correct_Fluxes_With_Body_Forces(flow, Sol)
 !------------------------------------------------------------------------------!
 !   Calculates body forces (Only due to buoyancy for the time being)           !
 !------------------------------------------------------------------------------!
@@ -9,11 +9,11 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),  target :: flow
-  type(Solver_Type), target :: sol
+  type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: t
-  type(Matrix_Type), pointer :: m               ! momentum matrix
+  type(Matrix_Type), pointer :: M               ! momentum matrix
   real, contiguous,  pointer :: b(:)
   integer                    :: c1, c2, s
   real                       :: xc1, yc1, zc1, xc2, yc2, zc2
@@ -23,8 +23,8 @@
   ! Take aliases
   grid => flow % pnt_grid
   t    => flow % t
-  m    => sol % m
-  b    => sol % b % val
+  M    => Sol % M
+  b    => Sol % b % val
 
   !-------------------------------!
   !   For Boussinesq hypothesis   !

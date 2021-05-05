@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Src_Rsm_Manceau_Hanjalic(turb, sol, name_phi)
+  subroutine Turb_Mod_Src_Rsm_Manceau_Hanjalic(turb, Sol, name_phi)
 !------------------------------------------------------------------------------!
 !   Calculate source terms for Re stresses and dissipation for 
 !   RSM_MANCEAU_HANJALIC model                                                 !
@@ -7,7 +7,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type),   target :: turb
-  type(Solver_Type), target :: sol
+  type(Solver_Type), target :: Sol
   character(len=*)          :: name_phi
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: flow
@@ -15,7 +15,7 @@
   type(Var_Type),    pointer :: u, v, w
   type(Var_Type),    pointer :: kin, eps, zeta, f22
   type(Var_Type),    pointer :: uu, vv, ww, uv, uw, vw
-  type(Matrix_Type), pointer :: a
+  type(Matrix_Type), pointer :: A
   real,              pointer :: b(:)
   integer                    :: c, s, c1, c2
   real                       :: prod, diss, phi_hom, phi_wall, mag, phi_tot
@@ -32,7 +32,7 @@
   call Field_Mod_Alias_Momentum   (flow, u, v, w)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
   call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
-  call Solver_Mod_Alias_System    (sol, a, b)
+  call Sol % Alias_Solver         (A, b)
 
   call Time_And_Length_Scale(grid, turb)
 

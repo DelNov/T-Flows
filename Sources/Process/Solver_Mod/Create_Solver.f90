@@ -1,20 +1,20 @@
 !==============================================================================!
-  subroutine Solver_Mod_Create(sol, grid)
+  subroutine Create_Solver(Sol, grid)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Solver_Type)        :: sol
+  class(Solver_Type)       :: Sol
   type(Grid_Type),  target :: grid
 !==============================================================================!
 
-  sol % pnt_grid => grid
+  Sol % pnt_grid => grid
 
   if(this_proc < 2) print *, '# Determining matrix topology.'
 
-  call sol % A % Create(grid)
-  call sol % M % Create(grid)
-  call sol % D % Create(grid)
-  call Vector_Mod_Allocate(sol % b, grid)
+  call Sol % A % Create_Matrix(grid)
+  call Sol % M % Create_Matrix(grid)
+  call Sol % D % Create_Matrix(grid)
+  call Vector_Mod_Allocate(Sol % b, grid)
 
   if(this_proc < 2) print *, '# Finished !'
 

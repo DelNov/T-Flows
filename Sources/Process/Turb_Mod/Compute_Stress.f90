@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Compute_Stress(turb, sol, curr_dt, ini, phi)
+  subroutine Turb_Mod_Compute_Stress(turb, Sol, curr_dt, ini, phi)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves transport equation for Re stresses for RSM.         !
 !------------------------------------------------------------------------------!
@@ -25,7 +25,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type),   target :: turb
-  type(Solver_Type), target :: sol
+  type(Solver_Type), target :: Sol
   integer, intent(in)       :: curr_dt
   integer, intent(in)       :: ini
   type(Var_Type)            :: phi
@@ -36,7 +36,7 @@
   type(Var_Type),    pointer :: kin, eps, zeta, f22, ut, vt, wt
   type(Var_Type),    pointer :: uu, vv, ww, uv, uw, vw
   real, contiguous,  pointer :: flux(:)
-  type(Matrix_Type), pointer :: a
+  type(Matrix_Type), pointer :: A
   real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2, nc, nb
   real                       :: f_ex, f_im
@@ -71,7 +71,7 @@
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
   call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
   call Turb_Mod_Alias_Heat_Fluxes (turb, ut, vt, wt)
-  call Solver_Mod_Alias_System    (sol, a, b)
+  call Sol % Alias_Solver         (A, b)
 
   ! Initialize matrix and right hand side
   A % val(:) = 0.0
@@ -310,9 +310,9 @@
   if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
     call Field_Mod_Grad_Variable(flow, f22)
 
-    call Turb_Mod_Src_Rsm_Manceau_Hanjalic(turb, sol, phi % name)
+    call Turb_Mod_Src_Rsm_Manceau_Hanjalic(turb, Sol, phi % name)
   else if(turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-    call Turb_Mod_Src_Rsm_Hanjalic_Jakirlic(turb, sol, phi % name)
+    call Turb_Mod_Src_Rsm_Hanjalic_Jakirlic(turb, Sol, phi % name)
   end if
 
   !---------------------------------!
@@ -326,15 +326,14 @@
 
   ! Call linear solver to solve the equations
   call Cpu_Timer_Mod_Start('Linear_Solver_For_Turbulence')
-  call Solver_Mod_Bicg(sol,            &
-                       a,              &
-                       phi % n,        &
-                       b,              &
-                       phi % precond,  &
-                       phi % mniter,   &
-                       phi % eniter,   &
-                       phi % tol,      &
-                       phi % res)
+  call Sol % Bicg(A,              &
+                  phi % n,        &
+                  b,              &
+                  phi % precond,  &
+                  phi % mniter,   &
+                  phi % eniter,   &
+                  phi % tol,      &
+                  phi % res)
   call Cpu_Timer_Mod_Stop('Linear_Solver_For_Turbulence')
 
   ! Print info on the screen

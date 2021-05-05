@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Turb_Mod_Src_T2(turb, sol)
+  subroutine Turb_Mod_Src_T2(turb, Sol)
 !------------------------------------------------------------------------------!
 !   Computes the source terms in t2 transport equation for k-eps_t2 model      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type),   target :: turb
-  type(Solver_Type), target :: sol
+  type(Solver_Type), target :: Sol
 !---------------------------------[Calling]------------------------------------!
   real :: Y_Plus_Low_Re
 !-----------------------------------[Locals]-----------------------------------!
@@ -14,7 +14,7 @@
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w, t
   type(Var_Type),    pointer :: kin, eps, ut, vt, wt, t2
-  type(Matrix_Type), pointer :: a
+  type(Matrix_Type), pointer :: A
   real,              pointer :: b(:)
   integer                    :: c, c1, c2, s
   real                       :: kin_vis, p_t2_wall, ebf, u_tau
@@ -26,7 +26,7 @@
 !   wall shear s. tau_wall [kg/(m*s^2)]| dyn visc.       viscosity [kg/(m*s)]  !
 !   density       density  [kg/m^3]    | turb. kin en.   kin % n   [m^2/s^2]   !
 !   cell volume   vol      [m^3]       | length          lf        [m]         !
-!   left hand s.  a        [kg/s]      | right hand s.   b         [kg*m^2/s^3]!
+!   left hand s.  A        [kg/s]      | right hand s.   b         [kg*m^2/s^3]!
 !------------------------------------------------------------------------------!
 !   p_kin = 2*vis_t / density S_ij S_ij                                        !
 !   shear = sqrt(2 S_ij S_ij)                                                  !
@@ -39,7 +39,7 @@
   call Field_Mod_Alias_Energy    (flow, t)
   call Turb_Mod_Alias_K_Eps      (turb, kin, eps)
   call Turb_Mod_Alias_Heat_Fluxes(turb, ut, vt, wt)
-  call Solver_Mod_Alias_System   (sol, a, b)
+  call Sol % Alias_Solver        (A, b)
   call Turb_Mod_Alias_T2         (turb, t2)
 
   !-----------------------------------------!

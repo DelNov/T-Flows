@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Create(matrix, grid)
+  subroutine Create_Matrix(Matrix, grid)
 !------------------------------------------------------------------------------!
 !   Determines the topology of the system matrix.                              !
 !   It relies only on faces_c structure. Try to keep it that way.              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Matrix_Type)       :: matrix
+  class(Matrix_Type)       :: Matrix
   type(Grid_Type),  target :: grid
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, s, pos, pos1, pos2, n

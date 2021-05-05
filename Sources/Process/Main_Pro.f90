@@ -22,7 +22,7 @@
   type(Swarm_Type)      :: swarm(MD)       ! swarm of particles
   type(Turb_Type)       :: turb(MD)        ! turbulence modelling
   type(Multiphase_Type) :: mult(MD)        ! multiphase modelling
-  type(Solver_Type)     :: sol(MD)         ! linear solvers
+  type(Solver_Type)     :: Sol(MD)         ! linear solvers
   type(Turb_Plane_Type) :: turb_planes(MD) ! holder for synthetic turbulences
   type(Monitor_Type)    :: monitor(MD)     ! monitors
   type(Interface_Type)  :: inter(MD,MD)    ! interfaces between domains
@@ -150,7 +150,7 @@
 
     ! Allocate memory for linear systems of equations
     ! (You need face geomtry for this step)
-    call Solver_Mod_Create(sol(d), grid(d))
+    call Sol(d) % Create_Solver(grid(d))
 
     call Read_Control_Physical_Properties(flow(d), mult(d), swarm(d))
     call Read_Control_Boundary_Conditions(flow(d), turb(d), mult(d),   &
@@ -172,7 +172,7 @@
 
     ! Initialize variables
     if(.not. read_backup(d)) then
-      call Initialize_Variables(flow(d), turb(d), mult(d), swarm(d), sol(d))
+      call Initialize_Variables(flow(d), turb(d), mult(d), swarm(d), Sol(d))
       call Results_Mod_Save_Surf(mult(d) % surf, curr_dt)
     end if
 
@@ -229,7 +229,7 @@
     do d = 1, n_dom
       call Control_Mod_Switch_To_Domain(d)  ! not sure if this call is needed
       call Control_Mod_Potential_Initialization(pot_init, .true.)
-      if(pot_init) call Field_Mod_Potential_Initialization(flow(d), sol(d))
+      if(pot_init) call Field_Mod_Potential_Initialization(flow(d), Sol(d))
     end do
   end if
 
@@ -282,7 +282,7 @@
 
       ! Interface tracking
       if(mult(d) % model .eq. VOLUME_OF_FLUID) then
-        call Multiphase_Mod_Vof_Main(mult(d), flow(d), turb(d), sol(d), curr_dt)
+        call Multiphase_Mod_Vof_Main(mult(d), flow(d), turb(d), Sol(d), curr_dt)
         if(mult(d) % track_front) then
           call Results_Mod_Save_Front(mult(d) % front, curr_dt)
 !f_vs_s   call Results_Mod_Save_Surf (mult(d) % surf, curr_dt)
@@ -329,27 +329,27 @@
         call Field_Mod_Grad_Variable(flow(d), flow(d) % w)
 
         ! All three velocity components one after another
-        call Compute_Momentum(flow(d), turb(d), mult(d), sol(d), curr_dt, ini)
-        call Compute_Pressure(flow(d), mult(d), sol(d), curr_dt, ini)
+        call Compute_Momentum(flow(d), turb(d), mult(d), Sol(d), curr_dt, ini)
+        call Compute_Pressure(flow(d), mult(d), Sol(d), curr_dt, ini)
 
         call Field_Mod_Calculate_Mass_Fluxes(flow(d), flow(d) % v_flux % n)
-        call Correct_Velocity(flow(d), turb(d), mult(d), sol(d), curr_dt, ini)
+        call Correct_Velocity(flow(d), turb(d), mult(d), Sol(d), curr_dt, ini)
 
-        call Piso_Algorithm(flow(d), turb(d), mult(d), sol(d), ini)
+        call Piso_Algorithm(flow(d), turb(d), mult(d), Sol(d), ini)
 
         ! Energy (practically temperature)
         if(flow(d) % heat_transfer) then
-          call Compute_Energy(flow(d), turb(d), mult(d), sol(d), curr_dt, ini)
+          call Compute_Energy(flow(d), turb(d), mult(d), Sol(d), curr_dt, ini)
         end if
 
         ! Passive scalars
         do sc = 1, flow(d) % n_scalars
-          call Compute_Scalar(flow(d), turb(d), mult(d), sol(d),  &
+          call Compute_Scalar(flow(d), turb(d), mult(d), Sol(d),  &
                               curr_dt, ini, sc)
         end do
 
         ! Deal with turbulence (if you dare ;-))
-        call Turb_Mod_Main(turb(d), sol(d), curr_dt, ini)
+        call Turb_Mod_Main(turb(d), Sol(d), curr_dt, ini)
 
         ! Update the values at boundaries
         call Convective_Outflow(flow(d), turb(d), mult(d))

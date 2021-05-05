@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Rhie_And_Chow(flow, mult, sol)
+  subroutine Rhie_And_Chow(flow, mult, Sol)
 !------------------------------------------------------------------------------!
 !   Computes face velocitites with Rhie and Chow interpolation method          !
 !------------------------------------------------------------------------------!
@@ -26,13 +26,13 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),      target :: flow
   type(Multiphase_Type), target :: mult
-  type(Solver_Type),     target :: sol
+  type(Solver_Type),     target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w, p
   type(Face_Type),   pointer :: v_flux          ! volume flux
-  type(Matrix_Type), pointer :: a               ! pressure matrix
-  type(Matrix_Type), pointer :: m               ! momentum matrix
+  type(Matrix_Type), pointer :: A               ! pressure matrix
+  type(Matrix_Type), pointer :: M               ! momentum matrix
   real                       :: a12, px_f, py_f, pz_f, fs, dens_h
   integer                    :: s, c1, c2, c
 !==============================================================================!
@@ -43,8 +43,8 @@
   grid   => flow % pnt_grid
   p      => flow % p
   v_flux => flow % v_flux
-  a      => sol % a
-  m      => sol % m
+  A      => Sol % A
+  M      => Sol % M
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   !--------------------------------------!

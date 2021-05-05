@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Vof_Coefficients(mult, a, b, dt)
+  subroutine Multiphase_Mod_Vof_Coefficients(mult, A, b, dt)
 !------------------------------------------------------------------------------!
 !   Computes matrix coefficients for volume fraction equation                  !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Multiphase_Type), target :: mult
-  type(Matrix_Type),     target :: a
+  type(Matrix_Type),     target :: A
   real,                  target :: b(:)
   real                          :: dt
 !-----------------------------------[Locals]-----------------------------------!

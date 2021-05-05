@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Surf_Mod_Place_At_Var_Value(surf, phi, sol, phi_e, verbose)
+  subroutine Surf_Mod_Place_At_Var_Value(surf, phi, Sol, phi_e, verbose)
 !------------------------------------------------------------------------------!
 !   Places surface where variable phi has value phi_e                          !
 !------------------------------------------------------------------------------!
@@ -14,7 +14,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Surf_Type),   target :: surf
   type(Var_Type),    target :: phi
-  type(Solver_Type), target :: sol   ! needed for smoothing
+  type(Solver_Type), target :: Sol   ! needed for smoothing
   real                      :: phi_e
   logical                   :: verbose
 !-----------------------------------[Locals]-----------------------------------!
@@ -22,7 +22,7 @@
   type(Field_Type),  pointer :: flow
   type(Vert_Type),   pointer :: vert(:)
   type(Elem_Type),   pointer :: elem(:)
-  type(Matrix_Type), pointer :: a
+  type(Matrix_Type), pointer :: A
   integer,           pointer :: nv, ne
   integer, allocatable       :: n_cells_v(:)
   integer                    :: c, c1, c2, s, j, n1, n2, run, nb, nc, nn
@@ -41,7 +41,7 @@
   ne   => surf % n_elems
   vert => surf % vert
   elem => surf % elem
-  a    => sol % a
+  A    => Sol % A
   nb   = grid % n_bnd_cells
   nc   = grid % n_cells
   nn   = grid % n_nodes

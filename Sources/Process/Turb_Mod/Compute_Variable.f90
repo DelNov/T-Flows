@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Compute_Variable(turb, sol, curr_dt, ini, phi)
+  subroutine Turb_Mod_Compute_Variable(turb, Sol, curr_dt, ini, phi)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves transport equations for different turbulent         !
 !   variables.                                                                 !
@@ -7,7 +7,7 @@
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   type(Turb_Type),   target :: turb
-  type(Solver_Type), target :: sol
+  type(Solver_Type), target :: Sol
   integer, intent(in)       :: curr_dt
   integer, intent(in)       :: ini
   type(Var_Type)            :: phi
@@ -17,7 +17,7 @@
   type(Var_Type),    pointer :: u, v, w
   type(Var_Type),    pointer :: vis
   real, contiguous,  pointer :: flux(:)
-  type(Matrix_Type), pointer :: a
+  type(Matrix_Type), pointer :: A
   real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2
   real                       :: f_ex, f_im
@@ -47,7 +47,7 @@
   flux => flow % v_flux % n
   dt   =  flow % dt
   call Field_Mod_Alias_Momentum(flow, u, v, w)
-  call Solver_Mod_Alias_System (sol, a, b)
+  call Sol % Alias_Solver      (A, b)
 
   ! Initialize matrix and right hand side
   A % val(:) = 0.0
@@ -198,7 +198,7 @@
   !   Inertial terms   !
   !                    !
   !--------------------!
-  call Numerics_Mod_Inertial_Term(phi, flow % density, a, b, dt)
+  call Numerics_Mod_Inertial_Term(phi, flow % density, A, b, dt)
 
   !-------------------------------------!
   !                                     !
@@ -206,27 +206,27 @@
   !                                     !
   !-------------------------------------!
   if(turb % model .eq. K_EPS) then
-    if(phi % name .eq. 'KIN') call Turb_Mod_Src_Kin_K_Eps(turb, sol)
-    if(phi % name .eq. 'EPS') call Turb_Mod_Src_Eps_K_Eps(turb, sol)
+    if(phi % name .eq. 'KIN') call Turb_Mod_Src_Kin_K_Eps(turb, Sol)
+    if(phi % name .eq. 'EPS') call Turb_Mod_Src_Eps_K_Eps(turb, Sol)
     if(flow % heat_transfer) then
-      if(phi % name .eq. 'T2')  call Turb_Mod_Src_T2(turb, sol)
+      if(phi % name .eq. 'T2')  call Turb_Mod_Src_T2(turb, Sol)
     end if
   end if
 
   if(turb % model .eq. K_EPS_ZETA_F .or.  &
      turb % model .eq. HYBRID_LES_RANS) then
-    if(phi % name .eq. 'KIN')  call Turb_Mod_Src_Kin_K_Eps_Zeta_F(turb, sol)
-    if(phi % name .eq. 'EPS')  call Turb_Mod_Src_Eps_K_Eps_Zeta_F(turb, sol)
+    if(phi % name .eq. 'KIN')  call Turb_Mod_Src_Kin_K_Eps_Zeta_F(turb, Sol)
+    if(phi % name .eq. 'EPS')  call Turb_Mod_Src_Eps_K_Eps_Zeta_F(turb, Sol)
     if(phi % name .eq. 'ZETA')  &
-      call Turb_Mod_Src_Zeta_K_Eps_Zeta_F(turb, sol, curr_dt)
+      call Turb_Mod_Src_Zeta_K_Eps_Zeta_F(turb, Sol, curr_dt)
     if(flow % heat_transfer) then
-      if(phi % name .eq. 'T2')  call Turb_Mod_Src_T2(turb, sol)
+      if(phi % name .eq. 'T2')  call Turb_Mod_Src_T2(turb, Sol)
     end if
   end if
 
   if(turb % model .eq. SPALART_ALLMARAS .or.  &
      turb % model .eq. DES_SPALART) then
-    call Turb_Mod_Src_Vis_Spalart_Almaras(turb, sol)
+    call Turb_Mod_Src_Vis_Spalart_Almaras(turb, Sol)
   end if
 
   !---------------------------------!
@@ -236,19 +236,18 @@
   !---------------------------------!
 
   ! Under-relax the equations
-  call Numerics_Mod_Under_Relax(phi, a, b)
+  call Numerics_Mod_Under_Relax(phi, A, b)
 
   ! Call linear solver to solve the equations
   call Cpu_Timer_Mod_Start('Linear_Solver_For_Turbulence')
-  call Solver_Mod_Bicg(sol,            &
-                       a,              &
-                       phi % n,        &
-                       b,              &
-                       phi % precond,  &
-                       phi % mniter,   &
-                       phi % eniter,   &
-                       phi % tol,      &
-                       phi % res)
+  call Sol % Bicg(A,              &
+                  phi % n,        &
+                  b,              &
+                  phi % precond,  &
+                  phi % mniter,   &
+                  phi % eniter,   &
+                  phi % tol,      &
+                  phi % res)
   call Cpu_Timer_Mod_Stop('Linear_Solver_For_Turbulence')
 
   ! Avoid negative values for all computed turbulent quantities

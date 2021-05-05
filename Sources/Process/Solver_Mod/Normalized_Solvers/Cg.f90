@@ -30,7 +30,7 @@
   real              :: fin_res                       ! residual
   real, optional    :: norm                          ! normalization
 !-----------------------------------[Locals]-----------------------------------!
-  type(Matrix_Type), pointer :: a
+  type(Matrix_Type), pointer :: A
   type(Matrix_Type), pointer :: d
   integer                    :: nt, ni, nb
   real                       :: alfa, beta, rho, rho_old, bnrm2, res
@@ -38,7 +38,7 @@
 !==============================================================================!
 
   ! Take some aliases
-  a => sol % a
+  A => sol % A
   d => sol % d
   nt = A % pnt_grid % n_cells
   ni = A % pnt_grid % n_cells - A % pnt_grid % comm % n_buff_cells
@@ -60,16 +60,16 @@
   !---------------------!
   !   Preconditioning   !
   !---------------------!
-  call Prec_Form(ni, a, d, prec)
+  call Prec_Form(ni, A, d, prec)
 
   !-----------------------------------!
   !    This is quite tricky point.    !
   !   What if bnrm2 is very small ?   !
   !-----------------------------------!
   if(.not. present(norm)) then
-    bnrm2 = Normalized_Root_Mean_Square(ni, b(1:nt), a, x(1:nt))
+    bnrm2 = Normalized_Root_Mean_Square(ni, b(1:nt), A, x(1:nt))
   else
-    bnrm2 = Normalized_Root_Mean_Square(ni, b(1:nt), a, x(1:nt), norm)
+    bnrm2 = Normalized_Root_Mean_Square(ni, b(1:nt), A, x(1:nt), norm)
   end if
 
   if(bnrm2 < tol) then
@@ -80,12 +80,12 @@
   !----------------!
   !   r = b - Ax   !
   !----------------!
-  call Residual_Vector(ni, r1(1:nt), b(1:nt), a, x(1:nt))
+  call Residual_Vector(ni, r1(1:nt), b(1:nt), A, x(1:nt))
 
   !--------------------------------!
   !   Calculate initial residual   !
   !--------------------------------!
-  res = Normalized_Root_Mean_Square(ni, r1(1:nt), a, x(1:nt))
+  res = Normalized_Root_Mean_Square(ni, r1(1:nt), A, x(1:nt))
 
   if(res < tol) then
     iter = 0
@@ -108,7 +108,7 @@
     !     solve Mz = r     !
     !   (q instead of z)   !
     !----------------------!
-    call Prec_Solve(ni, a, d, q1(1:nt), r1(1:nt), prec)
+    call Prec_Solve(ni, A, d, q1(1:nt), r1(1:nt), prec)
 
     !-----------------!
     !   rho = (r,z)   !
@@ -153,9 +153,9 @@
     !   Check convergence   !
     !-----------------------!
     if(.not. present(norm)) then
-      res = Normalized_Root_Mean_Square(ni, r1(1:nt), a, x(1:nt))
+      res = Normalized_Root_Mean_Square(ni, r1(1:nt), A, x(1:nt))
     else
-      res = Normalized_Root_Mean_Square(ni, r1(1:nt), a, x(1:nt), norm)
+      res = Normalized_Root_Mean_Square(ni, r1(1:nt), A, x(1:nt), norm)
     end if
 
     if(res < tol) goto 1

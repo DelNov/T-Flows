@@ -1,15 +1,16 @@
 !==============================================================================!
-  subroutine Residual_Vector(ni, r, b, a, x)
+  subroutine Residual_Vector(Solver, ni, r, b, a, x)
 !------------------------------------------------------------------------------!
 !   Calculates residual vector {r} = {b} - [A]{x}                              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer           :: ni
-  real              :: r(:)  ! this might be only for inner cells
-  real              :: b(:)  ! this might be only for inner cells
-  type(Matrix_Type) :: a
-  real              :: x(:)  ! this may incude buffer cells
+  class(Solver_Type) :: Solver
+  integer            :: ni
+  real               :: r(:)  ! this might be only for inner cells
+  real               :: b(:)  ! this might be only for inner cells
+  type(Matrix_Type)  :: A
+  real               :: x(:)  ! this may incude buffer cells
 !-----------------------------------[Locals]-----------------------------------!
   integer  :: i, j, k
 !==============================================================================!
