@@ -21,7 +21,8 @@
     integer, allocatable :: map  (:)   ! map to local node / face
     integer, allocatable :: i_buff(:)  ! integer values stored in buffers
     logical, allocatable :: l_buff(:)  ! logical values stored in buffers
-    real,    allocatable :: r_buff(:)  ! real    values stored in buffers
+    real,    allocatable :: r_buff(:)  ! real values stored in buffers
+    real,    allocatable :: o_buff(:)  ! old real values stored in buffers
   end type
 
   !---------------!
@@ -52,7 +53,7 @@
     integer :: nb_sub   ! number of bundary cells in subdomain
     integer :: nb_f     ! first boundary cell to save
     integer :: nb_l     ! last boundary cell to save
-    integer :: nc_tot   ! total number of cells 
+    integer :: nc_tot   ! total number of cells
     integer :: nb_tot   ! total number of bundary cells
     integer :: nf_sub   ! number of faces in subdomain
     integer :: nf_tot   ! total number of faces

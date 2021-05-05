@@ -1,15 +1,51 @@
 !==============================================================================!
-  subroutine Grid_Mod_Exchange_Cells_Real(grid, phi)
+  subroutine Grid_Mod_Exchange_Cells_Real(grid, phi, caller)
 !------------------------------------------------------------------------------!
 !   Exchanges the values of a cell-based real array between the processors.    !
+!                                                                              !
+!   In 2021, a neat extension was introduced to this procedure.  One can       !
+!   send an optional parameter, a string, with name and line of the caller     !
+!   procedure.  (For example: 'Compute_Momentum_347'.)  If that parameter      !
+!   is sent, this procedure will check if the call was needed or reduntant.    !
+!                                                                              !
+!   The info is stored in file 'grid_mod_exchange_cells_real.log'.             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
-  real            :: phi(-grid % n_bnd_cells:grid % n_cells)
+  type(Grid_Type)            :: grid
+  real                       :: phi(-grid % n_bnd_cells:grid % n_cells)
+  character(len=*), optional :: caller
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: ln, c1, c2, len_s, len_r, sub
+  integer       :: ln, c1, c2, len_s, len_r, sub
+  integer       :: needed
+  integer, save :: fu
+!------------------------------[Local parameters]------------------------------!
+  integer, parameter :: YES = 1
+  integer, parameter :: NO  = YES - 1
 !==============================================================================!
+
+  !-------------------------------------------------------------------!
+  !   Optional parameter was sent; store old values for later check   !
+  !-------------------------------------------------------------------!
+  if(present(caller)) then
+
+    if(this_proc < 2) then
+      call File_Mod_Append_File_For_Writing(  &
+                'grid_mod_exchange_cells_real.log', fu, this_proc)
+    end if
+
+    do sub = 1, n_proc
+      len_r = grid % comm % cells_recv(sub) % n_items
+      do ln = 1, len_r
+        c2 = grid % comm % cells_recv(sub) % map(ln)
+        grid % comm % cells_recv(sub) % o_buff(ln) = phi(c2)
+      end do
+    end do
+  end if
+
+  !----------------------------------!
+  !   Usual course of this routine   !
+  !----------------------------------!
 
   ! Fill the buffers with new values
   do sub = 1, n_proc
@@ -42,5 +78,36 @@
       phi(c2) = grid % comm % cells_recv(sub) % r_buff(ln)
     end do
   end do
+
+  !-------------------------------------------------!
+  !   Optional parameter was sent; check new with   !
+  !    old values to see if this call was needed    !
+  !-------------------------------------------------!
+  if(present(caller)) then
+
+    needed = NO
+    do sub = 1, n_proc
+      len_r = grid % comm % cells_recv(sub) % n_items
+      do ln = 1, len_r
+        if( grid % comm % cells_recv(sub) % r_buff(ln) .ne. &
+            grid % comm % cells_recv(sub) % o_buff(ln) ) then
+          needed = YES
+        end if
+      end do
+    end do
+
+    ! What if it is needed on some other processor
+    call Comm_Mod_Global_Max_Int(needed)
+
+    if(this_proc < 2) then
+      if(needed .eq. YES) then
+        write(fu,'(a)') '# Call from: ' // caller // ' was needed!'
+      else
+        write(fu,'(a)') '# Call from: ' // caller // ' was redundant!'
+      end if
+      close(fu)
+    end if
+
+  end if
 
   end subroutine
