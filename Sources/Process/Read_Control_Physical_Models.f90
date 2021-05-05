@@ -41,9 +41,9 @@
   select case(name)
     case('NONE')
       flow % buoyancy = NO_BUOYANCY
-    case('DENSITY_DRIVEN')
+    case('DENSITY')
       flow % buoyancy = DENSITY_DRIVEN
-    case('THERMALLY_DRIVEN')
+    case('THERMAL')
       flow % buoyancy = THERMALLY_DRIVEN
     case default
       if(this_proc < 2) then
