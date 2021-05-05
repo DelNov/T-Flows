@@ -817,67 +817,65 @@
   !                                       !
   !                                       !
   !---------------------------------------!
-! if(.not. backup) then
-    do c = -1, -grid % n_bnd_cells, -1
+  do c = -1, -grid % n_bnd_cells, -1
 
-      u % n(c) = u % b(c)
-      v % n(c) = v % b(c)
-      w % n(c) = w % b(c)
-      p % n(c) = p % b(c)
+    u % n(c) = u % b(c)
+    v % n(c) = v % b(c)
+    w % n(c) = w % b(c)
+    p % n(c) = p % b(c)
 
+    if(flow % heat_transfer) then
+      t % n(c) = t % b(c)
+    end if
+
+    if (mult % model .eq. VOLUME_OF_FLUID) then
+      vof % n(c) = vof % b(c)
+    end if
+
+    do sc = 1, flow % n_scalars
+      scalar(sc) % n(c) = scalar(sc) % b(c)
+    end do
+
+    if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+       turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
+      uu  % n(c) = uu  % b(c)
+      vv  % n(c) = vv  % b(c)
+      ww  % n(c) = ww  % b(c)
+      uv  % n(c) = uv  % b(c)
+      uw  % n(c) = uw  % b(c)
+      vw  % n(c) = vw  % b(c)
+      eps % n(c) = eps % b(c)
+
+      if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
+        f22 % n(c) = f22 % b(c)
+      end if
+    end if
+
+    if(turb % model .eq. K_EPS) then
+      kin % n(c) = kin % b(c)
+      eps % n(c) = eps % b(c)
       if(flow % heat_transfer) then
-        t % n(c) = t % b(c)
+        t2 % n(c) = t2 % b(c)
       end if
+    end if
 
-      if (mult % model .eq. VOLUME_OF_FLUID) then
-        vof % n(c) = vof % b(c)
+    if(turb % model .eq. K_EPS_ZETA_F .or.  &
+       turb % model .eq. HYBRID_LES_RANS) then
+      kin  % n(c) = kin  % b(c)
+      eps  % n(c) = eps  % b(c)
+      zeta % n(c) = zeta % b(c)
+      f22  % n(c) = f22  % b(c)
+      if(flow % heat_transfer) then
+        t2 % n(c) = t2 % b(c)
       end if
+    end if
 
-      do sc = 1, flow % n_scalars
-        scalar(sc) % n(c) = scalar(sc) % b(c)
-      end do
+    if(turb % model .eq. SPALART_ALLMARAS .or.  &
+       turb % model .eq. DES_SPALART) then
+      vis % n(c) = vis % b(c)
+    end if
 
-      if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-         turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-        uu  % n(c) = uu  % b(c)
-        vv  % n(c) = vv  % b(c)
-        ww  % n(c) = ww  % b(c)
-        uv  % n(c) = uv  % b(c)
-        uw  % n(c) = uw  % b(c)
-        vw  % n(c) = vw  % b(c)
-        eps % n(c) = eps % b(c)
-
-        if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
-          f22 % n(c) = f22 % b(c)
-        end if
-      end if
-
-      if(turb % model .eq. K_EPS) then
-        kin % n(c) = kin % b(c)
-        eps % n(c) = eps % b(c)
-        if(flow % heat_transfer) then
-          t2 % n(c) = t2 % b(c)
-        end if
-      end if
-
-      if(turb % model .eq. K_EPS_ZETA_F .or.  &
-         turb % model .eq. HYBRID_LES_RANS) then
-        kin  % n(c) = kin  % b(c)
-        eps  % n(c) = eps  % b(c)
-        zeta % n(c) = zeta % b(c)
-        f22  % n(c) = eps  % b(c)
-        if(flow % heat_transfer) then
-          t2 % n(c) = t2 % b(c)
-        end if
-      end if
-
-      if(turb % model .eq. SPALART_ALLMARAS .or.  &
-         turb % model .eq. DES_SPALART) then
-        vis % n(c) = vis % b(c)
-      end if
-
-    end do  ! through boundary cells
-! end if ! backup
+  end do  ! through boundary cells
 
   !------------------------------!
   !   Find the near-wall cells   !
