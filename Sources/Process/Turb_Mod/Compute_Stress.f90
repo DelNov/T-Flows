@@ -74,7 +74,7 @@
   call Solver_Mod_Alias_System    (sol, a, b)
 
   ! Initialize matrix and right hand side
-  a % val(:) = 0.0
+  A % val(:) = 0.0
   b      (:) = 0.0
 
   ! Old values (o) and older than old (oo)
@@ -137,7 +137,7 @@
                       + phiy_f * grid % sy(s)  &
                       + phiz_f * grid % sz(s) ) 
 
-    a0 = vis_eff * a % fc(s)
+    a0 = vis_eff * A % fc(s)
 
     ! Implicit diffusive flux
     ! (this is a very crude approximation: f_coef is
@@ -161,10 +161,10 @@
 
     ! Fill the system matrix
     if(c2  > 0) then
-      a % val(a % pos(1,s)) = a % val(a % pos(1,s)) - a12
-      a % val(a % dia(c1))  = a % val(a % dia(c1))  + a12
-      a % val(a % pos(2,s)) = a % val(a % pos(2,s)) - a21
-      a % val(a % dia(c2))  = a % val(a % dia(c2))  + a21
+      A % val(A % pos(1,s)) = A % val(A % pos(1,s)) - a12
+      A % val(A % dia(c1))  = A % val(A % dia(c1))  + a12
+      A % val(A % pos(2,s)) = A % val(A % pos(2,s)) - a21
+      A % val(A % dia(c2))  = A % val(A % dia(c2))  + a21
     else if(c2  < 0) then
 
       ! Outflow is not included because it was causing problems     
@@ -174,7 +174,7 @@
          (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL).or.       &
 !!!      (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT).or.    &
          (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) ) then
-        a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
+        A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
         b(c1) = b(c1) + a12 * phi % n(c2)
       end if
     end if
@@ -271,17 +271,17 @@
       f_ex = vis_eff * (  phix_f * grid % sx(s)  &
                         + phiy_f * grid % sy(s)  &
                         + phiz_f * grid % sz(s))
-      a0 = vis_eff * a % fc(s)
+      a0 = vis_eff * A % fc(s)
       f_im = (   phix_f * grid % dx(s)        &
                + phiy_f * grid % dy(s)        &
                + phiz_f * grid % dz(s)) * a0
 
       b(c1) = b(c1)                                             &
-             - vis_eff * (phi % n(c2) - phi%n(c1)) * a % fc(s)  &
+             - vis_eff * (phi % n(c2) - phi%n(c1)) * A % fc(s)  &
              - f_ex + f_im
       if(c2  > 0) then
         b(c2) = b(c2)                                            &
-              + vis_eff * (phi % n(c2) - phi%n(c1)) * a % fc(s)  &
+              + vis_eff * (phi % n(c2) - phi%n(c1)) * A % fc(s)  &
               + f_ex - f_im
       end if
     end do

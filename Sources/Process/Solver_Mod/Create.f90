@@ -11,9 +11,9 @@
 
   if(this_proc < 2) print *, '# Determining matrix topology.'
 
-  call Matrix_Mod_Create  (sol % a, grid)
-  call Matrix_Mod_Create  (sol % m, grid)
-  call Matrix_Mod_Create  (sol % d, grid)
+  call sol % A % Create(grid)
+  call sol % M % Create(grid)
+  call sol % D % Create(grid)
   call Vector_Mod_Allocate(sol % b, grid)
 
   if(this_proc < 2) print *, '# Finished !'

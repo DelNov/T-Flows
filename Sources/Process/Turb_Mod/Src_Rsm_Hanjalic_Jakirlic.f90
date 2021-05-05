@@ -600,11 +600,11 @@
                      + max(var2_11, 0.0)                 &
                      + max(var1w_11,0.0)                 &
                      + max(var2w_11,0.0))*grid % vol(c)
-      a % val(a % dia(c)) = a % val(a % dia(c))                               &
+      A % val(A % dia(c)) = A % val(A % dia(c))                               &
                 + flow % density(c) * (  cc1 * eps % n(c) / kin % n(c)        &
                              + c1w * f_w * eps % n(c) / kin % n(c)*3.0*n1*n1  &
                              + fss * eps % n(c) / kin % n(c))*grid % vol(c)
-      a % val(a % dia(c)) = a % val(a % dia(c))               &
+      A % val(A % dia(c)) = A % val(A % dia(c))               &
                 + flow % density(c) * (  max(-p11,     0.0)   &
                              + max(-var2_11, 0.0)             &
                              + max(-var1w_11,0.0)             &
@@ -622,11 +622,11 @@
                      + max(var2_22, 0.0)                 &
                      + max(var1w_22,0.0)                 &
                      + max(var2w_22,0.0))*grid % vol(c)
-      a % val(a % dia(c)) = a % val(a % dia(c))                               &
+      A % val(A % dia(c)) = A % val(A % dia(c))                               &
                 + flow % density(c) * (  cc1 * eps % n(c) / kin % n(c)        &
                              + c1w * f_w * eps % n(c) / kin % n(c)*3.0*n2*n2  &
                              + fss * eps % n(c) / kin % n(c))*grid % vol(c)
-      a % val(a % dia(c)) = a % val(a % dia(c))               &
+      A % val(A % dia(c)) = A % val(A % dia(c))               &
                 + flow % density(c) * (  max(-p22,     0.0)   &
                              + max(-var2_22, 0.0)             &
                              + max(-var1w_22,0.0)             &
@@ -644,11 +644,11 @@
                      + max(var2_33, 0.0)                 &
                      + max(var1w_33,0.0)                 &
                      + max(var2w_33,0.0))*grid % vol(c)
-      a % val(a % dia(c)) = a % val(a % dia(c))                               &
+      A % val(A % dia(c)) = A % val(A % dia(c))                               &
                 + flow % density(c) * (  cc1 * eps % n(c) / kin % n(c)        &
                              + c1w * f_w * eps % n(c) / kin % n(c)*3.0*n3*n3  &
                              + fss * eps % n(c) / kin % n(c))*grid % vol(c)
-      a % val(a % dia(c)) = a % val(a % dia(c))               &
+      A % val(A % dia(c)) = A % val(A % dia(c))               &
                 + flow % density(c) * (  max(-p33,     0.0)   &
                              + max(-var2_33, 0.0)             &
                              + max(-var1w_33,0.0)             &
@@ -662,7 +662,7 @@
     else if(name_phi == 'UV') then
       b(c) = b(c) + flow % density(c) * (p12 + var2_12 + var1w_12 + var2w_12)  &
            * grid % vol(c)
-      a % val(a % dia(c)) = a % val(a % dia(c))                             &
+      A % val(A % dia(c)) = A % val(A % dia(c))                             &
             + flow % density(c) * (  cc1 * eps % n(c) / kin % n(c)          &
                + c1w * f_w * eps % n(c) / kin % n(c) * 1.5*(n1*n1 + n2*n2)  &
                + fss * eps % n(c) / kin % n(c) ) * grid % vol(c)
@@ -673,7 +673,7 @@
     else if(name_phi == 'UW') then
       b(c) = b(c) + flow % density(c) * (p13 + var2_13 + var1w_13 + var2w_13)  &
            * grid % vol(c)
-      a % val(a % dia(c)) = a % val(a % dia(c))                             &
+      A % val(A % dia(c)) = A % val(A % dia(c))                             &
             + flow % density(c) * (  cc1 * eps % n(c) / kin % n(c)          &
                + c1w * f_w * eps % n(c) / kin % n(c) * 1.5*(n1*n1 + n3*n3)  &
                + fss * eps % n(c) / kin % n(c) ) * grid % vol(c)
@@ -684,7 +684,7 @@
     else if(name_phi == 'VW') then
       b(c) = b(c) + flow % density(c) * (p23 + var2_23 + var1w_23 + var2w_23)  &
            * grid % vol(c)
-      a % val(a % dia(c)) = a % val(a % dia(c))                             &
+      A % val(A % dia(c)) = A % val(A % dia(c))                             &
             + flow % density(c) * (  cc1 * eps % n(c) / kin % n(c)          &
                + c1w * f_w * eps % n(c) / kin % n(c) * 1.5*(n2*n2 + n3*n3)  &
                + fss * eps % n(c) / kin % n(c) ) * grid % vol(c)
@@ -698,7 +698,7 @@
       eps_2 = c_2e * f_eps  / turb % t_scale(c)
       b(c) = b(c) + flow % density(c) * (eps_1 + diss1(c)) * grid % vol(c)
 
-      a % val(a % dia(c)) = a % val(a % dia(c)) + flow % density(c) * eps_2  &
+      A % val(A % dia(c)) = A % val(A % dia(c)) + flow % density(c) * eps_2  &
                           * grid % vol(c)
     end if
   end do

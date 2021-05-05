@@ -68,7 +68,7 @@
                                             curr_dt, ini, sc)
 
   ! Initialize matrix and right hand side
-  a % val(:) = 0.0
+  A % val(:) = 0.0
   b      (:) = 0.0
 
   !-------------------------------------!
@@ -182,11 +182,11 @@
                         + phiz_f2 * grid % sz(s))
 
     ! Implicit diffusive flux
-    f_im1 = dif_eff1 * a % fc(s)           &
+    f_im1 = dif_eff1 * A % fc(s)           &
           * (  phix_f1 * grid % dx(s)      &
              + phiy_f1 * grid % dy(s)      &
              + phiz_f1 * grid % dz(s) )
-    f_im2 = dif_eff2 * a % fc(s)           &
+    f_im2 = dif_eff2 * A % fc(s)           &
           * (  phix_f2 * grid % dx(s)      &
              + phiy_f2 * grid % dy(s)      &
              + phiz_f2 * grid % dz(s) )
@@ -199,18 +199,18 @@
 
     ! Calculate the coefficients for the sysytem matrix
 
-    a12 = dif_eff1 * a % fc(s)
-    a21 = dif_eff2 * a % fc(s)
+    a12 = dif_eff1 * A % fc(s)
+    a21 = dif_eff2 * A % fc(s)
 
     a12 = a12  - min(v_flux % n(s), 0.0) * flow % density(c1)
     a21 = a21  + max(v_flux % n(s), 0.0) * flow % density(c2)
 
     ! Fill the system matrix
     if(c2 > 0) then
-      a % val(a % dia(c1))  = a % val(a % dia(c1)) + a12
-      a % val(a % dia(c2))  = a % val(a % dia(c2)) + a21
-      a % val(a % pos(1,s)) = a % val(a % pos(1,s)) - a12
-      a % val(a % pos(2,s)) = a % val(a % pos(2,s)) - a21
+      A % val(A % dia(c1))  = A % val(A % dia(c1)) + a12
+      A % val(A % dia(c2))  = A % val(A % dia(c2)) + a21
+      A % val(A % pos(1,s)) = A % val(A % pos(1,s)) - a12
+      A % val(A % pos(2,s)) = A % val(A % pos(2,s)) - a21
     else if(c2 < 0) then
 
       ! Outflow is included because of the flux
@@ -218,7 +218,7 @@
       if( (Var_Mod_Bnd_Cond_Type(phi,c2) .eq. INFLOW) .or.  &
           (Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALL)   .or.  &
           (Var_Mod_Bnd_Cond_Type(phi,c2) .eq. CONVECT) ) then
-        a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
+        A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
         b(c1)  = b(c1)  + a12 * phi % n(c2)
 
       ! In case of wallflux 
@@ -235,7 +235,7 @@
     if(phi % c(c) >= 0) then
       b(c)  = b(c) + phi % c(c)
     else
-      a % val(a % dia(c)) = a % val(a % dia(c))  &
+      A % val(A % dia(c)) = A % val(A % dia(c))  &
                           - phi % c(c) / (phi % n(c) + MICRO)
     end if
   end do
@@ -321,19 +321,19 @@
                             + phiz_f2 * grid % sz(s))
 
         ! Implicit diffusive flux
-        f_im1 = dif_eff1 * a % fc(s) *         &
+        f_im1 = dif_eff1 * A % fc(s) *         &
                 (  phix_f1 * grid % dx(s)      &
                  + phiy_f1 * grid % dy(s)      &
                  + phiz_f1 * grid % dz(s) )
-        f_im2 = dif_eff2 * a % fc(s) *         &
+        f_im2 = dif_eff2 * A % fc(s) *         &
                 (  phix_f2 * grid % dx(s)      &
                  + phiy_f2 * grid % dy(s)      &
                  + phiz_f2 * grid % dz(s) )
 
-        b(c1) = b(c1) - dif_eff1 * (phi % n(c2) - phi % n(c1)) * a % fc(s)  &
+        b(c1) = b(c1) - dif_eff1 * (phi % n(c2) - phi % n(c1)) * A % fc(s)  &
               - f_ex1 + f_im1
         if(c2  > 0) then
-          b(c2) = b(c2) + dif_eff1 * (phi % n(c2) - phi % n(c1)) * a % fc(s)  &
+          b(c2) = b(c2) + dif_eff1 * (phi % n(c2) - phi % n(c1)) * A % fc(s)  &
                 + f_ex2 - f_im2
         end if
       end do

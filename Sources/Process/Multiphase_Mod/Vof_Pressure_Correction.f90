@@ -63,8 +63,8 @@
                       * grid % dz(s)
 
         ! Unit for a12: [m^4s/kg]
-        a12 = 0.5 * ( grid % vol(c1) / m % sav(c1)     &
-                    + grid % vol(c2) / m % sav(c2) ) * m % fc(s)
+        a12 = 0.5 * ( grid % vol(c1) / M % sav(c1)     &
+                    + grid % vol(c2) / M % sav(c2) ) * M % fc(s)
 
         ! Curvature at the face; unit: [1/m]
         curv_f = 0.5 * ( mult % curv(c1) + mult % curv(c2) )

@@ -68,13 +68,13 @@
     b(c) = b(c) + c_11e * e_sor * turb % p_kin(c)
 
     ! Fill in a diagonal of coefficient matrix
-    a % val(a % dia(c)) =  a % val(a % dia(c))  &
+    A % val(A % dia(c)) =  A % val(A % dia(c))  &
                         + c_2e * e_sor * flow % density(c)
 
     ! Add buoyancy (linearly split) to eps equation as required in the t2 model
     if(flow % buoyancy .eq. THERMALLY_DRIVEN) then
       b(c) = b(c) + max(0.0, c_11e * e_sor * turb % g_buoy(c))
-      a % val(a % dia(c)) = a % val(a % dia(c))                         &
+      A % val(A % dia(c)) = A % val(A % dia(c))                         &
                           + max(0.0, -c_11e * e_sor * turb % g_buoy(c)  &
                           / (eps % n(c) + TINY))
     end if
@@ -173,11 +173,11 @@
 
         if(turb % y_plus(c1) > 3) then
           ! Adjusting coefficient to fix eps value in near wall calls
-          do j = a % row(c1), a % row(c1 + 1) - 1
-            a % val(j) = 0.0
+          do j = A % row(c1), A % row(c1 + 1) - 1
+            A % val(j) = 0.0
           end do
           b(c1) = eps % n(c1)
-          a % val(a % dia(c1)) = 1.0
+          A % val(A % dia(c1)) = 1.0
         else
           eps % n(c2) = 2.0* kin_vis * kin % n(c1)  &
                       / grid % wall_dist(c1)**2

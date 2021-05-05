@@ -54,7 +54,7 @@
   !--------------------------------------!
 
   ! Initialize matrix and right hand side
-  a % val(:) = 0.0
+  A % val(:) = 0.0
   b      (:) = 0.0
 
   ! Initial values
@@ -70,7 +70,7 @@
 
   ! Innertial term
   do c = 1, grid % n_cells
-    a % val(a % dia(c)) = grid % vol(c) / DT
+    A % val(A % dia(c)) = grid % vol(c) / DT
   end do
 
   ! Diffusive term
@@ -80,17 +80,17 @@
 
     ! Fill the system matrix
     if(c2  > 0) then
-      a % val(a % pos(1,s)) = a % val(a % pos(1,s)) - a % fc(s)
-      a % val(a % dia(c1))  = a % val(a % dia(c1))  + a % fc(s)
-      a % val(a % pos(2,s)) = a % val(a % pos(2,s)) - a % fc(s)
-      a % val(a % dia(c2))  = a % val(a % dia(c2))  + a % fc(s)
+      A % val(A % pos(1,s)) = A % val(A % pos(1,s)) - A % fc(s)
+      A % val(A % dia(c1))  = A % val(A % dia(c1))  + A % fc(s)
+      A % val(A % pos(2,s)) = A % val(A % pos(2,s)) - A % fc(s)
+      A % val(A % dia(c2))  = A % val(A % dia(c2))  + A % fc(s)
     else if(c2  < 0) then
       ! Inflow and outflow
       if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW)   .or.  &
           (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) .or.  &
           (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) .or.  &
           (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE)) then
-        a % val(a % dia(c1)) = a % val(a % dia(c1)) + a % fc(s)
+        A % val(A % dia(c1)) = A % val(A % dia(c1)) + A % fc(s)
       end if
     end if
   end do  ! through faces
@@ -158,7 +158,7 @@
       ! Implicit diffusive flux
       f_im=(   phi_x_f * grid % dx(s)        &
              + phi_y_f * grid % dy(s)        &
-             + phi_z_f * grid % dz(s)) * a % fc(s)
+             + phi_z_f * grid % dz(s)) * A % fc(s)
 
       ! Cross diffusion part
       phi % c(c1) = phi % c(c1) + f_ex - f_im
@@ -171,14 +171,14 @@
 
         ! Inflow
         if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW)) then
-          b(c1) = b(c1) +  a % fc(s) * 1.0
+          b(c1) = b(c1) +  A % fc(s) * 1.0
         end if
 
         ! Outflow
         if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) .or.  &
             (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) .or.  &
             (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE)) then
-          b(c1) = b(c1) + a % fc(s) * 0.0
+          b(c1) = b(c1) + A % fc(s) * 0.0
         end if
 
         ! For wall and wall flux, solid walls in any case => do nothing!
@@ -198,11 +198,11 @@
       do c = 1, grid % n_cells
 
         ! Store the central term
-        store(c) = a % val(a % dia(c))
+        store(c) = A % val(A % dia(c))
 
         ! If source is negative, fix it!
         if(b(c) < 0.0) then
-          a % val(a % dia(c)) = a % val(a % dia(c)) - b(c) / phi % o(c)
+          A % val(A % dia(c)) = A % val(A % dia(c)) - b(c) / phi % o(c)
           b(c) = 0.0
         end if
       end do
@@ -241,7 +241,7 @@
     ! Recover the central coefficient in the system matrix
     if(.not. grid % polyhedral) then
       do c = 1, grid % n_cells
-        a % val(a % dia(c)) = store(c)
+        A % val(A % dia(c)) = store(c)
       end do
     end if
 

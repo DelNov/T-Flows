@@ -47,7 +47,7 @@
       f_w    = gg*((1.0 + c_w3**6)/(gg**6 + c_w3**6))**(1.0/6.0)
       dist_v = c_w1 * flow % density(c) * f_w  &
              * (vis % n(c) / grid % wall_dist(c)**2)
-      a % val(a % dia(c)) = a % val(a % dia(c)) + dist_v * grid % vol(c)
+      A % val(A % dia(c)) = A % val(A % dia(c)) + dist_v * grid % vol(c)
 
       !--------------------------------------------!
       !   Compute the first-order diffusion term   !
@@ -82,7 +82,7 @@
       gg     = r + c_w2 * (r**6 - r)
       f_w    = gg*((1.0 + c_w3**6) / (gg**6 + c_w3**6))**(1.0/6.0)
       dist_v = c_w1 * flow % density(c) * f_w * (vis % n(c) / dist**2)
-      a % val(a % dia(c)) = a % val(a % dia(c)) + dist_v * grid % vol(c)
+      A % val(A % dia(c)) = A % val(A % dia(c)) + dist_v * grid % vol(c)
 
       !--------------------------------------------!
       !   Compute the first-order diffusion term   !

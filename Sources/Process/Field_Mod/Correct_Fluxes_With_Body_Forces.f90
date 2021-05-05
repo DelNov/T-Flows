@@ -89,8 +89,8 @@
              * (flow % density(c2) - flow % dens_ref)
 
         ! Units for a12: [m^4s/kg]
-        a12 = 0.5 * (  grid % vol(c1) / m % sav(c1)     &
-                     + grid % vol(c2) / m % sav(c2) ) * m % fc(s)
+        a12 = 0.5 * (  grid % vol(c1) / M % sav(c1)     &
+                     + grid % vol(c2) / M % sav(c2) ) * M % fc(s)
 
         ! Unit for gravity_source again: [m^3/s]
         gravity_source =  a12 * (gravity_source - dotprod)

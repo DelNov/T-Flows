@@ -19,7 +19,7 @@
   ! Compute rms normalizing it with main diagonal in the system matrix
   rms = 0.0
   do i = 1, ni
-    rms = rms + r(i)**2 / a % val(a % dia(i))**2
+    rms = rms + r(i)**2 / A % val(A % dia(i))**2
   end do
   call Comm_Mod_Global_Sum_Real(rms)
   rms = sqrt(rms)

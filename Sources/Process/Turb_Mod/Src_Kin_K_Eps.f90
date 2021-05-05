@@ -55,7 +55,7 @@
     turb % p_kin(c) = turb % vis_t(c) * flow % shear(c)**2
     b(c) = b(c) + turb % p_kin(c) * grid % vol(c)
 
-    a % val(a % dia(c)) = a % val(a % dia(c)) + &
+    A % val(A % dia(c)) = A % val(A % dia(c)) + &
          flow % density(c) * eps % n(c)/(kin % n(c) + TINY) * grid % vol(c)
 
     if(flow % buoyancy .eq. THERMALLY_DRIVEN) then
@@ -65,7 +65,7 @@
                           grav_z * wt % n(c))   &
                        * flow % density(c)
       b(c) = b(c) + max(0.0, turb % g_buoy(c) * grid % vol(c))
-      a % val(a % dia(c)) = a % val(a % dia(c))        &
+      A % val(A % dia(c)) = A % val(A % dia(c))        &
                           + max(0.0,-turb % g_buoy(c)  &
                           * grid % vol(c) / (kin % n(c) + TINY))
     end if

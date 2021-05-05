@@ -45,7 +45,7 @@
   call Solver_Mod_Alias_System (sol, a, b)
 
   ! Initialize matrix and right hand side
-  a % val(:) = 0.0
+  A % val(:) = 0.0
   b      (:) = 0.0
 
   ! Old values (o) and older than old (oo)
@@ -87,7 +87,7 @@
             + phi_y_f * grid % sy(s)   &
             + phi_z_f * grid % sz(s) )
 
-    a0 = a % fc(s)
+    a0 = A % fc(s)
 
     ! Implicit diffusive flux
     f_im=(   phi_x_f * grid % dx(s)        &
@@ -106,22 +106,22 @@
 
     ! Fill the system matrix
     if(c2  > 0) then
-      a % val(a % pos(1,s)) = a % val(a % pos(1,s)) - a12
-      a % val(a % dia(c1))  = a % val(a % dia(c1))  + a12
-      a % val(a % pos(2,s)) = a % val(a % pos(2,s)) - a21
-      a % val(a % dia(c2))  = a % val(a % dia(c2))  + a21
+      A % val(A % pos(1,s)) = A % val(A % pos(1,s)) - a12
+      A % val(A % dia(c1))  = A % val(A % dia(c1))  + a12
+      A % val(A % pos(2,s)) = A % val(A % pos(2,s)) - a21
+      A % val(A % dia(c2))  = A % val(A % dia(c2))  + a21
     else if(c2  < 0) then
 
       ! Inflow
       if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW)) then
-        a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
+        A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
         b(c1) = b(c1) + a12 * phi % n(c2)
       end if
 
       ! Wall and wall flux; solid walls in any case
       if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL).or.       &
           (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) ) then
-        a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
+        A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
         !---------------------------------------------------------------!
         !   Source coefficient is filled in SourceF22.f90 in order to   !
         !   get updated values of f22 on the wall.  Otherwise f22       !

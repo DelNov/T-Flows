@@ -24,7 +24,7 @@
   if(phi % td_scheme .eq. LINEAR) then
     do c = 1, grid % n_cells
       a0 = coef(c) * grid % vol(c) / dt
-      a % val(a % dia(c)) = a % val(a % dia(c)) + a0
+      A % val(A % dia(c)) = A % val(A % dia(c)) + a0
       b(c)  = b(c) + a0 * phi % o(c)
     end do
   end if
@@ -33,7 +33,7 @@
   if(phi % td_scheme .eq. PARABOLIC) then
     do c = 1, grid % n_cells
       a0 = coef(c) * grid % vol(c) / dt
-      a % val(a % dia(c)) = a % val(a % dia(c)) + 1.5 * a0
+      A % val(A % dia(c)) = A % val(A % dia(c)) + 1.5 * a0
       b(c)  = b(c) + 2.0 * a0 * phi % o(c) - 0.5 * a0 * phi % oo(c)
     end do
   end if

@@ -83,7 +83,7 @@
   call User_Mod_Beginning_Of_Compute_Energy(flow, turb, mult, sol, curr_dt, ini)
 
   ! Initialize matrix and right hand side
-  a % val(:) = 0.0
+  A % val(:) = 0.0
   b      (:) = 0.0
 
   ! Old values (o and oo)
@@ -139,8 +139,8 @@
 
     ! Implicit part of the diffusion flux, treated by linear system
     ! This is also term in equation 2.33 in Denner's thesis because:
-    ! a % fc * grid % dx (T-Flows) == alpha_f * s_f * A_f (Denner)
-    f_im = con_eff * a % fc(s) * (   tx_f * grid % dx(s)    &
+    ! A % fc * grid % dx (T-Flows) == alpha_f * s_f * A_f (Denner)
+    f_im = con_eff * A % fc(s) * (   tx_f * grid % dx(s)    &
                                    + ty_f * grid % dy(s)    &
                                    + tz_f * grid % dz(s) )
 
@@ -161,8 +161,8 @@
     !   Calculate the coefficients for the system matrix   !
     !                                                      !
     !------------------------------------------------------!
-    a12 = con_eff * a % fc(s)
-    a21 = con_eff * a % fc(s)
+    a12 = con_eff * A % fc(s)
+    a21 = con_eff * A % fc(s)
 
     a12 = a12 - min(v_flux % n(s), 0.0)  &
                  * flow % capacity(c1) * flow % density(c1)  ! flow: 1 -> 2
@@ -171,17 +171,17 @@
 
     ! Fill the system matrix
     if(c2 > 0) then
-      a % val(a % dia(c1))  = a % val(a % dia(c1)) + a12
-      a % val(a % dia(c2))  = a % val(a % dia(c2)) + a21
-      a % val(a % pos(1,s)) = a % val(a % pos(1,s)) - a12
-      a % val(a % pos(2,s)) = a % val(a % pos(2,s)) - a21
+      A % val(A % dia(c1))  = A % val(A % dia(c1)) + a12
+      A % val(A % dia(c2))  = A % val(A % dia(c2)) + a21
+      A % val(A % pos(1,s)) = A % val(A % pos(1,s)) - a12
+      A % val(A % pos(2,s)) = A % val(A % pos(2,s)) - a21
     else if(c2 .lt. 0) then
       ! Outflow is included because of the flux
       ! corrections which also affects velocities
       if( (Var_Mod_Bnd_Cond_Type(t, c2) .eq. INFLOW) .or.  &
           (Var_Mod_Bnd_Cond_Type(t, c2) .eq. WALL)   .or.  &
           (Var_Mod_Bnd_Cond_Type(t, c2) .eq. CONVECT) ) then
-        a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
+        A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
         b(c1)  = b(c1)  + a12 * t % n(c2)
       ! In case of wallflux 
       else if(Var_Mod_Bnd_Cond_Type(t, c2) .eq. WALLFL) then
@@ -196,7 +196,7 @@
     if(t % c(c) >= 0) then
       b(c)  = b(c) + t % c(c)
     else
-      a % val(a % dia(c)) = a % val(a % dia(c))  &
+      A % val(A % dia(c)) = A % val(A % dia(c))  &
                           - t % c(c) / (t % n(c) + MICRO)
     end if
   end do

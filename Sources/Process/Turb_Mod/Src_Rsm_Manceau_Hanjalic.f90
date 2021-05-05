@@ -124,7 +124,7 @@
                   + (1.0-f22 % n(c)**2) * phi_wall                   &
                   +      f22 % n(c)**2  *(phi_hom)) * grid % vol(c)
 
-      a % val(a % dia(c)) = a % val(a % dia(c))                              &
+      A % val(A % dia(c)) = A % val(A % dia(c))                              &
         + flow % density(c) * (max(-prod,0.0) / max(uu % n(c), TINY)         &
            + (1.0-f22 % n(c)**2) * 6.0 * eps % n(c)/kin % n(c)               &
            +      f22 % n(c)**2 *(diss_hom/max(uu % n(c), TINY)              &
@@ -166,7 +166,7 @@
                   + (1.0-f22 % n(c)**2) * phi_wall                   &
                   +      f22 % n(c)**2  *(phi_hom)) * grid % vol(c)
 
-      a % val(a % dia(c)) = a % val(a % dia(c))                              &
+      A % val(A % dia(c)) = A % val(A % dia(c))                              &
         + flow % density(c) * (max(-prod,0.0) / max(vv % n(c), TINY)         &
            + (1.0-f22 % n(c)**2) * 6.0 * eps % n(c)/kin % n(c)               &
            +      f22 % n(c)**2 *(diss_hom/max(vv % n(c), TINY)              &
@@ -207,7 +207,7 @@
                   + (1.0-f22 % n(c)**2) * phi_wall                   &
                   +      f22 % n(c)**2  *(phi_hom)) * grid % vol(c)
 
-      a % val(a % dia(c)) = a % val(a % dia(c))                              &
+      A % val(A % dia(c)) = A % val(A % dia(c))                              &
         + flow % density(c) * (max(-prod,0.0) / max(ww % n(c), TINY)         &
            + (1.0-f22 % n(c)**2) * 6.0 * eps % n(c)/kin % n(c)               &
            +      f22 % n(c)**2 *(diss_hom/max(ww % n(c), TINY)              &
@@ -252,7 +252,7 @@
                   + (1.0-f22 % n(c)**2) * phi_wall                   &
                   +      f22 % n(c)**2  *(phi_hom)) * grid % vol(c)
 
-      a % val(a % dia(c)) =  a % val(a % dia(c))                              &
+      A % val(A % dia(c)) =  A % val(A % dia(c))                              &
         + flow % density(c) * ((1.0 - f22 % n(c)**2) * 6.0 * eps % n(c)       &
                             / kin % n(c)                                      &
                 + f22 % n(c)**2 *(  g1 * eps % n(c) / (2.0 * kin % n(c))      &
@@ -296,7 +296,7 @@
                   + (1.0-f22 % n(c)**2) * phi_wall                   &
                   +      f22 % n(c)**2  *(phi_hom)) * grid % vol(c)
 
-      a % val(a % dia(c)) =  a % val(a % dia(c))                               &
+      A % val(A % dia(c)) =  A % val(A % dia(c))                               &
         + flow % density(c) * ((1.0 - f22 % n(c)**2) * 6.0 * eps % n(c)    &
                             / kin % n(c)                                   &
                 + f22 % n(c)**2  *(  g1 * eps % n(c) / (2.0 * kin % n(c))      &
@@ -340,7 +340,7 @@
                   + (1.0-f22 % n(c)**2) * phi_wall                   &
                   +      f22 % n(c)**2  *(phi_hom)) * grid % vol(c)
 
-      a % val(a % dia(c)) =  a % val(a % dia(c))                               &
+      A % val(A % dia(c)) =  A % val(A % dia(c))                               &
         + flow % density(c) * ((1.0 - f22 % n(c)**2) * 6.0 * eps % n(c)  &
                            / kin % n(c)                                  &
         + f22 % n(c)**2  *(  g1 * eps % n(c) / (2.0 * kin % n(c))              &
@@ -358,7 +358,7 @@
       b(c) = b(c) + flow % density(c) * ce_11 * turb % p_kin(c) * esor
 
       ! Fill in a diagonal of coefficient matrix
-      a % val(a % dia(c)) =  a % val(a % dia(c))  &
+      A % val(A % dia(c)) =  A % val(A % dia(c))  &
                           + c_2e * esor * flow % density(c)
     end if
   end do

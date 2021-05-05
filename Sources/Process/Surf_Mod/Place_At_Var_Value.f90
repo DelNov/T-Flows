@@ -63,10 +63,10 @@
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
       if(c2 > 0) then
-        phi_src(c1) = phi_src(c1) + a % fc(s) * phi_c(c2)
-        phi_cen(c1) = phi_cen(c1) + a % fc(s)
-        phi_src(c2) = phi_src(c2) + a % fc(s) * phi_c(c1)
-        phi_cen(c2) = phi_cen(c2) + a % fc(s)
+        phi_src(c1) = phi_src(c1) + A % fc(s) * phi_c(c2)
+        phi_cen(c1) = phi_cen(c1) + A % fc(s)
+        phi_src(c2) = phi_src(c2) + A % fc(s) * phi_c(c1)
+        phi_cen(c2) = phi_cen(c2) + A % fc(s)
       end if
     end do
     do c = 1, grid % n_cells

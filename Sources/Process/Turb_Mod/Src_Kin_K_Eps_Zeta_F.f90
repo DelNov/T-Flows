@@ -79,7 +79,7 @@
       end if
 
       b(c) = b(c) + max(0.0, turb % g_buoy(c) * grid % vol(c))
-             a % val(a % dia(c)) = a % val(a % dia(c))         &
+             A % val(A % dia(c)) = A % val(A % dia(c))         &
                                  + max(0.0,-turb % g_buoy(c)   &
                                  * grid % vol(c)               &
                                  / (kin % n(c) + TINY))
@@ -106,11 +106,11 @@
           .or.                                                  &
           (turb % hybrid_les_rans_switch .eq. SWITCH_VELOCITY)  &
           .and. (alpha_v < 0.5 .or. alpha_d < 1.05) ) then
-        a % val(a % dia(c)) = a % val(a % dia(c))             &
+        A % val(A % dia(c)) = A % val(A % dia(c))             &
                             + flow % density(c) * eps % n(c)  &
                             / (kin % n(c) + TINY) * grid % vol(c)
       else
-        a % val(a % dia(c)) = a % val(a % dia(c))                        &
+        A % val(A % dia(c)) = A % val(A % dia(c))                        &
           + flow % density(c)                                            &
           * min(alpha_d**1.4 * eps % n(c), kin % n(c)**1.5 / (lf*0.01))  &
           / (kin % n(c) + TINY) * grid % vol(c)
@@ -118,7 +118,7 @@
     end do
   else  ! turbuence model will be K_EPS_ZETA_F
     do c = 1, grid % n_cells
-      a % val(a % dia(c)) = a % val(a % dia(c))             &
+      A % val(A % dia(c)) = A % val(A % dia(c))             &
                           + flow % density(c) * eps % n(c)  &
                           / (kin % n(c) + TINY) * grid % vol(c)
 

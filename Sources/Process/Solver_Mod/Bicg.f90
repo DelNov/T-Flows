@@ -64,9 +64,9 @@
 
   ! Take some aliases
   d => sol % d
-  nt = a % pnt_grid % n_cells
-  ni = a % pnt_grid % n_cells - a % pnt_grid % comm % n_buff_cells
-  nb = a % pnt_grid % n_bnd_cells
+  nt = A % pnt_grid % n_cells
+  ni = A % pnt_grid % n_cells - A % pnt_grid % comm % n_buff_cells
+  nb = A % pnt_grid % n_bnd_cells
 
   res = 0.0
 
@@ -146,15 +146,15 @@
     !   q = A   p   !
     !   q~= A^T p~  !  don't have A^T
     !---------------!
-    call Grid_Mod_Exchange_Cells_Real(a % pnt_grid, p1(-nb:ni))
-    call Grid_Mod_Exchange_Cells_Real(a % pnt_grid, p2(-nb:ni))
+    call Grid_Mod_Exchange_Cells_Real(A % pnt_grid, p1(-nb:ni))
+    call Grid_Mod_Exchange_Cells_Real(A % pnt_grid, p2(-nb:ni))
     do i = 1, ni
       q1(i) = 0.0
       q2(i) = 0.0
-      do j = a % row(i), a % row(i+1)-1
-        k = a % col(j)
-        q1(i) = q1(i) + a % val(j) * p1(k)
-        q2(i) = q2(i) + a % val(j) * p2(k)
+      do j = A % row(i), A % row(i+1)-1
+        k = A % col(j)
+        q1(i) = q1(i) + A % val(j) * p1(k)
+        q2(i) = q2(i) + A % val(j) * p2(k)
       end do
     end do
 

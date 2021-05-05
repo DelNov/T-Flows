@@ -68,7 +68,7 @@
 
     f_mu = min(f_mu,1.0)
 
-    a % val(a % dia(c)) = a % val(a % dia(c))                             &
+    A % val(A % dia(c)) = A % val(A % dia(c))                             &
                         +    flow % density(c) * f_mu* c_2e * eps % n(c)  &
                            / kin % n(c) * grid % vol(c)
 
@@ -76,7 +76,7 @@
     if(flow % buoyancy .eq. THERMALLY_DRIVEN) then
       b(c) = b(c) + max(0.0, c_1e * turb % g_buoy(c) &
                     * eps % n(c) / kin % n(c) * grid % vol(c))
-      a % val(a % dia(c)) = a % val(a % dia(c))                &
+      A % val(A % dia(c)) = A % val(A % dia(c))                &
                           + max(0.0,(-c_1e * turb % g_buoy(c)  &
                           * eps % n(c)                         &
                           / kin % n(c) * grid % vol(c))        &
@@ -102,12 +102,12 @@
                       / ((grid % wall_dist(c1) + z_o) * kappa)
 
           ! Adjusting coefficient to fix eps value in near wall calls
-          do j = a % row(c1), a % row(c1 + 1) - 1
-            a % val(j) = 0.0 
+          do j = A % row(c1), A % row(c1 + 1) - 1
+            A % val(j) = 0.0 
           end do
 
           b(c1) = eps % n(c1) * flow % density(c1)
-          a % val(a % dia(c1)) = 1.0 * flow % density(c1)
+          A % val(A % dia(c1)) = 1.0 * flow % density(c1)
         else
           u_tau = c_mu25 * sqrt(kin % n(c1))
           turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
@@ -140,12 +140,12 @@
             eps % n(c1) = (1.0-fa)*eps_int + fa*eps_wf
 
             ! Adjusting coefficient to fix eps value in near wall calls
-            do j = a % row(c1), a % row(c1 + 1) - 1
-              a % val(j) = 0.0
+            do j = A % row(c1), A % row(c1 + 1) - 1
+              A % val(j) = 0.0
             end do
 
             b(c1) = eps % n(c1)
-            a % val(a % dia(c1)) = 1.0
+            A % val(A % dia(c1)) = 1.0
           else
             eps % n(c2) = eps_int
           end if ! y_plus(c1) > 4

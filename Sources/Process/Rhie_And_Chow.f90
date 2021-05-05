@@ -57,11 +57,11 @@
   end do
 
   !--------------------------------------!
-  !   Store grid % vol(c) / m % sav(c)   !
+  !   Store grid % vol(c) / M % sav(c)   !
   !--------------------------------------!
   ! Units here: m^3 s / kg
   do c = 1, grid % n_cells
-    v_m(c) = grid % vol(c) / m % sav(c)
+    v_m(c) = grid % vol(c) / M % sav(c)
   end do
 
   !--------------------------------------------------------------------------!
@@ -71,7 +71,7 @@
     do c = 1, grid % n_cells
 
       ! Unit for t_m: m^3 * kg/m^3 / s * s/kg = 1
-      t_m(c) = (grid % vol(c) * flow % density(c) / flow % dt) / m % sav(c)
+      t_m(c) = (grid % vol(c) * flow % density(c) / flow % dt) / M % sav(c)
 
       u_c(c) = u_c(c) - t_m(c) * u % o(c)
       v_c(c) = v_c(c) - t_m(c) * v % o(c)
@@ -110,11 +110,11 @@
 
       ! Calculate coeficients for the pressure matrix
       ! Units: m * m^3 s / kg = m^4 s / kg
-      a12 = 0.5 * a % fc(s) * (v_m(c1) + v_m(c2))
-      a % val(a % pos(1,s)) = -a12
-      a % val(a % pos(2,s)) = -a12
-      a % val(a % dia(c1))  = a % val(a % dia(c1)) +  a12
-      a % val(a % dia(c2))  = a % val(a % dia(c2)) +  a12
+      a12 = 0.5 * A % fc(s) * (v_m(c1) + v_m(c2))
+      A % val(A % pos(1,s)) = -a12
+      A % val(A % pos(2,s)) = -a12
+      A % val(A % dia(c1))  = A % val(A % dia(c1)) +  a12
+      A % val(A % dia(c2))  = A % val(A % dia(c2)) +  a12
 
       ! Interpolate pressure gradients
       ! Units: kg/(m^2 s^2) * m^3 s / kg * m = m^2 / s
@@ -131,7 +131,7 @@
                        + v_f(s) * grid % sy(s)             &
                        + w_f(s) * grid % sz(s) )           &
                        + a12 * (p % n(c1) - p % n(c2))     &
-                       + a % fc(s) * (px_f + py_f + pz_f)
+                       + A % fc(s) * (px_f + py_f + pz_f)
 
       !------------------------------------------------------------!
       !   Choi's correction, part 2: add flux from old time step   !

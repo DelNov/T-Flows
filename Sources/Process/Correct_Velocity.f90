@@ -52,9 +52,9 @@
 
   ! Normal correction
   do c = 1, grid % n_cells
-    u % n(c) = u % n(c) - pp % x(c) * grid % vol(c) / m % sav(c)
-    v % n(c) = v % n(c) - pp % y(c) * grid % vol(c) / m % sav(c)
-    w % n(c) = w % n(c) - pp % z(c) * grid % vol(c) / m % sav(c)
+    u % n(c) = u % n(c) - pp % x(c) * grid % vol(c) / M % sav(c)
+    v % n(c) = v % n(c) - pp % y(c) * grid % vol(c) / M % sav(c)
+    w % n(c) = w % n(c) - pp % z(c) * grid % vol(c) / M % sav(c)
   end do
 
   !----------------------------------------------------------------!
@@ -62,7 +62,7 @@
   !   is the matrix for pressure corrections in SIMPLE algorithm   !
   !   formed from the coefficients of the velocity matrix.         !
   !   pp      [kg/ms^2]                                            !
-  !   a % val [m^4s/kg]                                            !
+  !   A % val [m^4s/kg]                                            !
   !----------------------------------------------------------------!
   do s = 1, grid % n_faces
     c1 = grid % faces_c(1,s)
@@ -70,7 +70,7 @@
     if(c2 > 0) then
                                      !<--- this is correction --->!
       v_flux % n(s) = v_flux % n(s) + ( pp % n(c2) - pp % n(c1) )   &
-                                       * a % val(a % pos(1,s))
+                                       * A % val(A % pos(1,s))
     end if
   end do
 
@@ -117,11 +117,11 @@
            + (1.0 - grid % fw(s)) * flow % viscosity(c2)
     if(c2 > 0) then
       cfl_t = abs( dt * v_flux % n(s) /          &
-                   ( a % fc(s) *                 &
+                   ( A % fc(s) *                 &
                    (  grid % dx(s)*grid % dx(s)  &
                     + grid % dy(s)*grid % dy(s)  &
                     + grid % dz(s)*grid % dz(s)) ) )
-      pe_t    = abs( v_flux % n(s) / a % fc(s) / (visc_f / dens_f + TINY) )
+      pe_t    = abs( v_flux % n(s) / A % fc(s) / (visc_f / dens_f + TINY) )
       flow % cfl_max = max( flow % cfl_max, cfl_t )
       flow % pe_max  = max( flow % pe_max,  pe_t  )
     end if

@@ -60,7 +60,7 @@
  ! Source term f22hg
  do c = 1, grid % n_cells
    sor_11 = grid % vol(c)/(turb % l_scale(c)**2 + TINY)
-   a % val(a % dia(c)) = a % val(a % dia(c)) + sor_11 
+   A % val(A % dia(c)) = A % val(A % dia(c)) + sor_11 
  end do
 
  ! Imposing boundary condition for f22 on the wall
@@ -79,7 +79,7 @@
 
       ! Linearization of the near wall terms helps to get more  
        ! stable solution, especially for small wall distance.
-       b(c1) = b(c1) + a % fc(s) * f22 % n(c2)
+       b(c1) = b(c1) + A % fc(s) * f22 % n(c2)
      end if   ! end if of BC=wall
    end if    ! end if of c2<0
  end do

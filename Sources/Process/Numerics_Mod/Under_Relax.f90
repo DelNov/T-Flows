@@ -18,10 +18,10 @@
   do c = 1, phi % pnt_grid % n_cells
 
     ! Under-relax central coefficient
-    a % val(a % dia(c)) = a % val(a % dia(c)) / phi % urf
+    A % val(A % dia(c)) = A % val(A % dia(c)) / phi % urf
 
     ! Under-relax central coefficient
-    b(c) = b(c) + a % val(a % dia(c)) * (1.0 - phi % urf) * phi % n(c)
+    b(c) = b(c) + A % val(A % dia(c)) * (1.0 - phi % urf) * phi % n(c)
 
   end do
 

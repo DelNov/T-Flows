@@ -20,9 +20,9 @@
   ! Why not callig this: call exchange(x) ???
   do i = 1, ni
     r(i) = b(i)
-    do j = a % row(i), a % row(i+1) - 1
-      k = a % col(j)
-      r(i) = r(i) - a % val(j) * x(k)
+    do j = A % row(i), A % row(i+1) - 1
+      k = A % col(j)
+      r(i) = r(i) - A % val(j) * x(k)
     end do
   end do
 

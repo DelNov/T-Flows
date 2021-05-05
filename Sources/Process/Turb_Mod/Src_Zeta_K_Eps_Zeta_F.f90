@@ -48,11 +48,11 @@
       b(c) = b(c) + f22 % n(c) * grid % vol(c) * flow % density(c)
     else
       b(c) = b(c) + max(0.0, f22 % n(c)*grid % vol(c)) * flow % density(c)
-      a % val(a % dia(c)) = a % val(a % dia(c))                  &
+      A % val(A % dia(c)) = A % val(A % dia(c))                  &
                           + max(0.0, -f22 % n(c) * grid % vol(c) &
                           / (zeta % n(c) + TINY)) * flow % density(c)
     end if
-    a % val(a % dia(c)) =  a % val(a % dia(c))             &
+    A % val(A % dia(c)) =  A % val(A % dia(c))             &
                         + grid % vol(c) * turb % p_kin(c)  &
                         / (kin % n(c) + TINY) 
   end do

@@ -27,11 +27,11 @@
   !                                                                    !
   !   Compressed row storage of the above matrix reads:                !
   !                                                                    !
-  !   A % val = [  10   4   5   2  12  -1   1  99   7  -3  11  53 ]    !
-  !   A % col = [   1   3   4   1   2   3   2   3   4   1   2   4 ]    !
-  !   A % row = [   1   4   7  10 ]                                    !
+  !   A %  val = [  10   4   5   2  12  -1   1  99   7  -3  11  53 ]    !
+  !   A %  col = [   1   3   4   1   2   3   2   3   4   1   2   4 ]    !
+  !   A %  row = [   1   4   7  10 ]                                    !
   !                                                                    !
-  !   A % dia = [   1   5   9  12 ]                                    !
+  !   A %  dia = [   1   5   9  12 ]                                    !
   !--------------------------------------------------------------------!
   type Matrix_Type
 
@@ -46,6 +46,9 @@
     integer, allocatable :: dia(:)    ! diagonal positions 
     integer, allocatable :: pos(:,:)  ! position in the matrix
     integer, allocatable :: mir(:)    ! mirror positions   
+
+    contains
+      procedure :: Create
 
   end type
 

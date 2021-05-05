@@ -19,7 +19,7 @@
   !---------------------------------!
   if(prec .eq. 'DIAGONAL') then
     do i = 1, ni
-      d % val(d % dia(i)) = a % val(a % dia(i))
+      d % val(d % dia(i)) = A % val(A % dia(i))
     end do
 
   !--------------------------------------------! 
@@ -27,10 +27,10 @@
   !--------------------------------------------!
   else if(prec .eq. 'INCOMPLETE_CHOLESKY') then
     do i = 1, ni
-      sum1 = a % val(a % dia(i))       ! take diaginal entry   
-      do j = a % row(i), a % dia(i)-1  ! only lower traingular
-        k = a % col(j)
-        sum1 = sum1 - d % val(d % dia(k)) * a % val(j) * a % val(j)  
+      sum1 = A % val(A % dia(i))       ! take diaginal entry   
+      do j = A % row(i), A % dia(i)-1  ! only lower traingular
+        k = A % col(j)
+        sum1 = sum1 - d % val(d % dia(k)) * A % val(j) * A % val(j)  
       end do
       d % val(d % dia(i)) = 1.0 / sum1
     end do

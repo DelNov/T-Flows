@@ -43,15 +43,15 @@
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
       if(c2 > 0) then
-        neigh(c1) = neigh(c1) - m % val(m % pos(1,s)) * ui % n(c2)
-        neigh(c2) = neigh(c2) - m % val(m % pos(2,s)) * ui % n(c1)
+        neigh(c1) = neigh(c1) - M % val(M % pos(1,s)) * ui % n(c2)
+        neigh(c2) = neigh(c2) - M % val(M % pos(2,s)) * ui % n(c1)
       end if
     end do
     call Grid_Mod_Exchange_Cells_Real(grid, neigh)
 
     ! Solve velocity explicitely (no under relaxation!!)
     do c = 1, grid % n_cells
-      ui % n(c) = (neigh(c) + b(c)) / m % val(m % dia(c))
+      ui % n(c) = (neigh(c) + b(c)) / M % val(M % dia(c))
     end do
 
     call Field_Mod_Grad_Variable(flow, ui)

@@ -154,7 +154,7 @@
 
     ! Initialize matrix and right hand side
     fi     (:) = 0.0  ! all "internal" forces acting on this component
-    m % val(:) = 0.0
+    M % val(:) = 0.0
     b      (:) = 0.0
     f_stress   = 0.0
 
@@ -221,7 +221,7 @@
       f_ex = vis_eff * ui_si
 
       ! Implicit viscous stress
-      m0 = vis_eff * m % fc(s)
+      m0 = vis_eff * M % fc(s)
       f_im = ui_di * m0
 
       ! Cross diffusion part
@@ -236,10 +236,10 @@
 
       ! Fill the system matrix
       if(c2 > 0) then
-        m % val(m % pos(1,s)) = m % val(m % pos(1,s)) - m12
-        m % val(m % dia(c1))  = m % val(m % dia(c1))  + m12
-        m % val(m % pos(2,s)) = m % val(m % pos(2,s)) - m21
-        m % val(m % dia(c2))  = m % val(m % dia(c2))  + m21
+        M % val(M % pos(1,s)) = M % val(M % pos(1,s)) - m12
+        M % val(M % dia(c1))  = M % val(M % dia(c1))  + m12
+        M % val(M % pos(2,s)) = M % val(M % pos(2,s)) - m21
+        M % val(M % dia(c2))  = M % val(M % dia(c2))  + m21
       else if(c2  < 0) then
         ! Outflow is not included because it was causing problems
         if((Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW)  .or.  &
@@ -247,7 +247,7 @@
            (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) .or.  &
            (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL)) then
            ! (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) ) then
-          m % val(m % dia(c1)) = m % val(m % dia(c1)) + m12
+          M % val(M % dia(c1)) = M % val(M % dia(c1)) + m12
           fi(c1) = fi(c1) + m12 * ui % n(c2)
         end if
       end if
@@ -255,7 +255,7 @@
       ! Here we clean up momentum from the false diffusion
       call Turb_Mod_Substract_Face_Stress(turb, ui_si, ui_di,            &
                                                 ui % n(c1), ui % n(c2),  &
-                                                m % fc(s), fi, s)
+                                                M % fc(s), fi, s)
 
     end do  ! through faces
 
@@ -325,7 +325,7 @@
     !   correction in Rhie_And_Chow is not needed    !
     !------------------------------------------------!
     do c = 1, grid % n_cells
-      m % sav(c) = m % val(m % dia(c))
+      M % sav(c) = M % val(M % dia(c))
     end do
 
     !----------------------------------------------!
@@ -371,8 +371,8 @@
 
   end do  ! browsing through components
 
-  ! Refresh buffers for m % sav before discretizing for pressure
-  call Grid_Mod_Exchange_Cells_Real(grid, m % sav)
+  ! Refresh buffers for M % sav before discretizing for pressure
+  call Grid_Mod_Exchange_Cells_Real(grid, M % sav)
 
   ! User function
   call User_Mod_End_Of_Compute_Momentum(flow, turb, mult, sol, curr_dt, ini)

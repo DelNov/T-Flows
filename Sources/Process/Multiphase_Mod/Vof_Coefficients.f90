@@ -45,7 +45,7 @@
 
   ! Initialize matrix and right hand side
   b       = 0.0
-  a % val = 0.0
+  A % val = 0.0
 
   !-------------------------!
   !   Matrix Coefficients   !
@@ -61,7 +61,7 @@
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
           b(c1) = b(c1) - v_flux % n(s) * vof % n(c2)
         else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) then
-          a % val(a % dia(c1)) = a % val(a % dia(c1)) + v_flux % n(s)
+          A % val(A % dia(c1)) = A % val(A % dia(c1)) + v_flux % n(s)
         end if
       end if
 
@@ -76,11 +76,11 @@
         upwd1 = 0.5 * max( v_flux % n(s), 0.0)
         upwd2 = 0.5 * max(-v_flux % n(s), 0.0)
 
-        a % val(a % dia(c1)) = a % val(a % dia(c1)) + upwd1
-        a % val(a % dia(c2)) = a % val(a % dia(c2)) + upwd2
+        A % val(A % dia(c1)) = A % val(A % dia(c1)) + upwd1
+        A % val(A % dia(c2)) = A % val(A % dia(c2)) + upwd2
 
-        a % val(a % pos(1,s)) =  - upwd2
-        a % val(a % pos(2,s)) =  - upwd1
+        A % val(A % pos(1,s)) =  - upwd2
+        A % val(A % pos(2,s)) =  - upwd1
 
         b(c1) = b(c1) - ( upwd1 * vof % o(c1) - upwd2 * vof % o(c2) )
         b(c2) = b(c2) - ( upwd2 * vof % o(c2) - upwd1 * vof % o(c1) )
@@ -98,7 +98,7 @@
       if(c2 < 0) then
 
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) then
-          a % val(a % dia(c1)) = a % val(a % dia(c1)) + v_flux % n(s)
+          A % val(A % dia(c1)) = A % val(A % dia(c1)) + v_flux % n(s)
         else
           b(c1) = b(c1) - v_flux % n(s) * vof % n(c2)
         end if
@@ -118,11 +118,11 @@
                + 0.5 * beta_f(s)  * v_flux % n(s)
         upwd3 = 0.5 * v_flux % n(s)
 
-        a % val(a % dia(c1)) = a % val(a % dia(c1)) + upwd1 + upwd3
-        a % val(a % dia(c2)) = a % val(a % dia(c2)) + upwd2 - upwd3
+        A % val(A % dia(c1)) = A % val(A % dia(c1)) + upwd1 + upwd3
+        A % val(A % dia(c2)) = A % val(A % dia(c2)) + upwd2 - upwd3
 
-        a % val(a % pos(1,s)) = - upwd1
-        a % val(a % pos(2,s)) = - upwd2
+        A % val(A % pos(1,s)) = - upwd1
+        A % val(A % pos(2,s)) = - upwd2
 
         b(c1) = b(c1) - (upwd1 + upwd3) * vof % o(c1) + upwd1 * vof % o(c2)
         b(c2) = b(c2) - (upwd2 - upwd3) * vof % o(c2) + upwd2 * vof % o(c1)
@@ -141,7 +141,7 @@
   if(vof % td_scheme .eq. LINEAR) then
     do c = 1, grid % n_cells
       a0 = grid % vol(c) / dt
-      a % val(a % dia(c)) = a % val(a % dia(c)) + a0
+      A % val(A % dia(c)) = A % val(A % dia(c)) + a0
       b(c) = b(c) + a0 * vof % o(c)
     end do
   end if
@@ -150,7 +150,7 @@
   if(vof % td_scheme .eq. PARABOLIC) then
     do c = 1, grid % n_cells
       a0 = grid % vol(c) / dt
-      a % val(a % dia(c)) = a % val(a % dia(c)) + 1.5 * a0
+      A % val(A % dia(c)) = A % val(A % dia(c)) + 1.5 * a0
       b(c) = b(c) + 2.0 * a0 * vof % o(c) - 0.5 * a0 * vof % oo(c)
     end do
   end if

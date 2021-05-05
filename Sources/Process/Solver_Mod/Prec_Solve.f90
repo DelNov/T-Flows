@@ -40,9 +40,9 @@
     ! Forward substitutionn
     do i = 1, ni
       sum1 = b(i)
-      do j = a % row(i),a % dia(i)-1     ! only the lower triangular
-        k = a % col(j)
-        sum1 = sum1 - a % val(j)*x(k)
+      do j = A % row(i),A % dia(i)-1     ! only the lower triangular
+        k = A % col(j)
+        sum1 = sum1 - A % val(j)*x(k)
       end do
       x(i) = sum1 * d % val(d % dia(i))  ! BUG ?
     end do
@@ -54,9 +54,9 @@
     ! Backward substitution
     do i = ni, 1, -1
       sum1 = x(i)
-      do j = a % dia(i)+1, a % row(i+1)-1        ! upper triangular 
-        k = a % col(j)
-        if(k <= ni) sum1 = sum1 - a % val(j)*x(k)  ! avoid buffer entries
+      do j = A % dia(i)+1, A % row(i+1)-1        ! upper triangular 
+        k = A % col(j)
+        if(k <= ni) sum1 = sum1 - A % val(j)*x(k)  ! avoid buffer entries
       end do
       x(i) = sum1* d % val(d % dia(i))           ! BUG ?
     end do

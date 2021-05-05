@@ -59,7 +59,7 @@
     b(c) = b(c) + turb % p_t2(c) * grid % vol(c)
 
    ! Negative contribution
-   a % val(a % dia(c)) = a % val(a % dia(c)) +  &
+   A % val(A % dia(c)) = A % val(A % dia(c)) +  &
          2.0 * flow % density(c)  * eps % n(c)  &
              / (kin % n(c) + TINY) * grid % vol(c)
 

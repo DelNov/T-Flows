@@ -91,7 +91,7 @@
 
   ! Initialize matrix and right hand side
   b       = 0.0
-  a % val = 0.0
+  A % val = 0.0
 
   !-----------------------------------------!
   !   Initialize the pressure corrections   !
@@ -145,8 +145,8 @@
 
         b(c1) = b(c1) - v_flux % n(s)
 
-        a12 = a % fc(s) * grid % vol(c1) / m % sav(c1)
-        a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
+        a12 = A % fc(s) * grid % vol(c1) / M % sav(c1)
+        A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
 
       else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE) then
 
@@ -156,8 +156,8 @@
 
         b(c1) = b(c1) - v_flux % n(s)
 
-        a12 = a % fc(s) * grid % vol(c1) / m % sav(c1)
-        a % val(a % dia(c1)) = a % val(a % dia(c1)) + a12
+        a12 = A % fc(s) * grid % vol(c1) / M % sav(c1)
+        A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
 
       else  ! it is SYMMETRY
         v_flux % n(s) = 0.0
