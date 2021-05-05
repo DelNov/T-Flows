@@ -162,6 +162,7 @@
         allocate(grid % comm % cells_recv(sub) % i_buff(mr));
         allocate(grid % comm % cells_recv(sub) % l_buff(mr));
         allocate(grid % comm % cells_recv(sub) % r_buff(mr));
+        allocate(grid % comm % cells_recv(sub) % o_buff(ms));
       end if
 
       !------------------------------------------!

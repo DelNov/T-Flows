@@ -21,7 +21,8 @@
     integer, allocatable :: map  (:)   ! map to local node / face
     integer, allocatable :: i_buff(:)  ! integer values stored in buffers
     logical, allocatable :: l_buff(:)  ! logical values stored in buffers
-    real,    allocatable :: r_buff(:)  ! real    values stored in buffers
+    real,    allocatable :: r_buff(:)  ! real values stored in buffers
+    real,    allocatable :: o_buff(:)  ! old real values stored in buffers
   end type
 
   !---------------!

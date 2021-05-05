@@ -29,7 +29,7 @@
   ! Take alias
   grid => flow % pnt_grid
 
-  ! Refresh buffers for gradient components
+  ! Refresh buffers for gradient components (needed)
   call Grid_Mod_Exchange_Cells_Real(grid, phi_c)
   call Grid_Mod_Exchange_Cells_Real(grid, phi_x)
   call Grid_Mod_Exchange_Cells_Real(grid, phi_y)
