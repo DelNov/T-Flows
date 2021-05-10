@@ -69,7 +69,7 @@
 !   heat flux                   flow % heat_flux  [W/m^2]
 !==============================================================================!
 
-  call Cpu_Timer_Mod_Start('Compute_Energy (without solvers)')
+  call Cpu_Timer % Start('Compute_Energy (without solvers)')
 
   ! Take aliases
   grid   => flow % pnt_grid
@@ -228,7 +228,7 @@
   call Numerics_Mod_Under_Relax(t, A, b)
 
   ! Call linear solver to solve the equations
-  call Cpu_Timer_Mod_Start('Linear_Solver_For_Energy')
+  call Cpu_Timer % Start('Linear_Solver_For_Energy')
   call Sol % Bicg(A,            &
                   t % n,        &
                   b,            &
@@ -237,7 +237,7 @@
                   t % eniter,   &
                   t % tol,      &
                   t % res)
-  call Cpu_Timer_Mod_Stop('Linear_Solver_For_Energy')
+  call Cpu_Timer % Stop('Linear_Solver_For_Energy')
 
   ! Print some info on the screen
   call Info_Mod_Iter_Fill_At(1, 6, t % name, t % eniter, t % res)
@@ -247,6 +247,6 @@
   ! User function
   call User_Mod_End_Of_Compute_Energy(flow, turb, mult, Sol, curr_dt, ini)
 
-  call Cpu_Timer_Mod_Stop('Compute_Energy (without solvers)')
+  call Cpu_Timer % Stop('Compute_Energy (without solvers)')
 
   end subroutine

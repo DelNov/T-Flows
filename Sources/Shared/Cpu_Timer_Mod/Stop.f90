@@ -1,10 +1,12 @@
 !==============================================================================!
-  subroutine Cpu_Timer_Mod_Stop(f_name)
+  subroutine Stop(Cpu_Timer, f_name)
 !------------------------------------------------------------------------------!
   implicit none
+!---------------------------------[Arguments]----------------------------------!
+  class(Cpu_Timer_Type), target :: Cpu_Timer
+  character(len=*)              :: f_name
 !-----------------------------------[Locals]-----------------------------------!
-  character(len=*) :: f_name
-  integer          :: f
+  integer :: f
 !==============================================================================!
 
   !-------------------------------------!
@@ -12,8 +14,8 @@
   !-------------------------------------!
 
   ! Browse through stored functions
-  do f = 1, n_funct
-    if(f_name .eq. funct_name(f)) then
+  do f = 1, Cpu_Timer % n_funct
+    if(f_name .eq. Cpu_Timer % funct_name(f)) then
       goto 2
     end if
   end do
@@ -30,8 +32,14 @@
   !-------------------------------------------------------------!
   !   Update the time for the function which is being stopped   !
   !-------------------------------------------------------------!
-  time_prev = time_curr     ! store the last time which was recorded
-  call cpu_time(time_curr)  ! refresh the value of time_curr
-  funct_time(f) = funct_time(f) + time_curr - time_prev
+
+  ! Store the last time which was recorded
+  Cpu_Timer % time_prev = Cpu_Timer % time_curr
+
+  ! Refresh the value of time_curr
+  call cpu_time(Cpu_Timer % time_curr)
+
+  Cpu_Timer % funct_time(f) = Cpu_Timer % funct_time(f)  &
+                            + Cpu_Timer % time_curr - Cpu_Timer % time_prev
 
   end subroutine

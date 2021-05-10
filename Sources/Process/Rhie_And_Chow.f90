@@ -37,7 +37,7 @@
   integer                    :: s, c1, c2, c
 !==============================================================================!
 
-  call Cpu_Timer_Mod_Start('Rhie_And_Chow')
+  call Cpu_Timer % Start('Rhie_And_Chow')
 
   ! Take aliases
   grid   => flow % pnt_grid
@@ -154,6 +154,6 @@
     end if
   end do
 
-  call Cpu_Timer_Mod_Stop('Rhie_And_Chow')
+  call Cpu_Timer % Stop('Rhie_And_Chow')
 
   end subroutine

@@ -23,7 +23,7 @@
   ! Get solver
   call Control_Mod_Solver_For_Multiphase(solver)
 
-  call Cpu_Timer_Mod_Start('Linear_Solver_For_Multiphase')
+  call Cpu_Timer % Start('Linear_Solver_For_Multiphase')
   call Sol % Bicg(A,              &
                   vof % n,        &
                   b,              &
@@ -32,7 +32,7 @@
                   vof % eniter,   &      ! executed number of iterations
                   vof % tol,      &
                   vof % res)
-  call Cpu_Timer_Mod_Stop('Linear_Solver_For_Multiphase')
+  call Cpu_Timer % Stop('Linear_Solver_For_Multiphase')
 
   if(.not. flow % mass_transfer) then
     call Info_Mod_Iter_Fill_At(1, 6, vof % name, vof % eniter, vof % res)

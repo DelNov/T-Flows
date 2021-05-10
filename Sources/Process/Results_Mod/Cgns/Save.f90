@@ -42,7 +42,7 @@
 
   if(.not. plot_inside) return ! no point to write *-bnd.cgns yet
 
-  call Cpu_Timer_Mod_Start('Save_Cgns_Results')
+  call Cpu_Timer % Start('Save_Cgns_Results')
 
   ! Take aliases
   grid => flow % pnt_grid
@@ -423,6 +423,6 @@
 
   deallocate(cgns_base)
 
-  call Cpu_Timer_Mod_Stop('Save_Cgns_Results')
+  call Cpu_Timer % Stop('Save_Cgns_Results')
 
   end subroutine

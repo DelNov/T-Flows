@@ -22,7 +22,7 @@
 
   if(surf % n_verts < 1) return
 
-  call Cpu_Timer_Mod_Start('Save_Cgns_Surf')
+  call Cpu_Timer % Start('Save_Cgns_Surf')
 
   if(this_proc < 2) then
 
@@ -180,7 +180,7 @@
 
   deallocate(cgns_base)
 
-  call Cpu_Timer_Mod_Stop('Save_Cgns_Surf')
+  call Cpu_Timer % Stop('Save_Cgns_Surf')
 
   contains
 

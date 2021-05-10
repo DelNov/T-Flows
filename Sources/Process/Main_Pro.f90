@@ -42,7 +42,7 @@
 !==============================================================================!
 
   ! Initialize program profler
-  call Cpu_Timer_Mod_Start('Main')
+  call Cpu_Timer % Start('Main')
 
   ! Initialize control file names
   root_control = 'control'             ! root control file name
@@ -184,7 +184,7 @@
     end if
 
     ! Initialize monitoring points
-    call Monitor_Mod_Initialize(monitor(d), grid(d), read_backup(d), domain=d)
+    call Monitor(d) % Initialize(grid(d), read_backup(d), domain=d)
 
     ! Plane for calcution of overall mass fluxes
     call Control_Mod_Point_For_Monitoring_Planes(flow(d) % bulk % xp,  &
@@ -386,9 +386,9 @@
 
       ! Write the values in monitoring points
       if(.not. flow(d) % heat_transfer) then
-        call Monitor_Mod_Write_4_Vars(monitor(d), curr_dt, flow(d))
+        call Monitor(d) % Write_4_Vars(curr_dt, flow(d))
       else
-        call Monitor_Mod_Write_5_Vars(monitor(d), curr_dt, flow(d))
+        call Monitor(d) % Write_5_Vars(curr_dt, flow(d))
       end if
 
       ! Calculate mean values
@@ -437,14 +437,14 @@
 
   do d = 1, n_dom
     ! Close monitoring files
-    call Monitor_Mod_Finalize(monitor(d))
+    call Monitor(d) % Finalize()
 
     ! Make the final call to user function
     call User_Mod_Before_Exit(grid(d))
   end do
 
-  call Cpu_Timer_Mod_Stop('Main')
-  call Cpu_Timer_Mod_Statistics
+  call Cpu_Timer % Stop('Main')
+  call Cpu_Timer % Statistics
 
   !----------------------------!
   !   End parallel execution   !

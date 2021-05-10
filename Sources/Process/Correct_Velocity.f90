@@ -26,7 +26,7 @@
   real                       :: cfl_t, pe_t, dens_f, visc_f, dt, wght
 !==============================================================================!
 
-  call Cpu_Timer_Mod_Start('Correct_Velocity')
+  call Cpu_Timer % Start('Correct_Velocity')
 
   ! Take aliases
   grid   => flow % pnt_grid
@@ -140,6 +140,6 @@
   ! User function
   call User_Mod_End_Of_Correct_Velocity(flow, mult, Sol, curr_dt, ini)
 
-  call Cpu_Timer_Mod_Stop('Correct_Velocity')
+  call Cpu_Timer % Stop('Correct_Velocity')
 
   end subroutine

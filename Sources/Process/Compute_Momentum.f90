@@ -82,7 +82,7 @@
 !     cu*, cv*, cw*  [kgm/s^2]      [N]
 !==============================================================================!
 
-  call Cpu_Timer_Mod_Start('Compute_Momentum (without solvers)')
+  call Cpu_Timer % Start('Compute_Momentum (without solvers)')
 
   ! Take aliases
   grid   => flow % pnt_grid
@@ -348,7 +348,7 @@
       call Numerics_Mod_Under_Relax(ui, M, b)
 
       ! Call linear solver
-      call Cpu_Timer_Mod_Start('Linear_Solver_For_Momentum')
+      call Cpu_Timer % Start('Linear_Solver_For_Momentum')
 
       call Sol % Bicg(M,             &
                       ui % n,        &
@@ -359,7 +359,7 @@
                       ui % tol,      &
                       ui % res,      &
                       norm = vel_max)
-      call Cpu_Timer_Mod_Stop('Linear_Solver_For_Momentum')
+      call Cpu_Timer % Stop('Linear_Solver_For_Momentum')
 
       ! Fill the info screen up
       if (flow % p_m_coupling == SIMPLE) then
@@ -376,6 +376,6 @@
   ! User function
   call User_Mod_End_Of_Compute_Momentum(flow, turb, mult, Sol, curr_dt, ini)
 
-  call Cpu_Timer_Mod_Stop('Compute_Momentum (without solvers)')
+  call Cpu_Timer % Stop('Compute_Momentum (without solvers)')
 
   end subroutine

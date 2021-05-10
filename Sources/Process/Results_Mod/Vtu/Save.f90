@@ -50,7 +50,7 @@
   logical, parameter :: PLOT_BUFFERS = .false.  ! .true. is good for debugging
 !==============================================================================!
 
-  call Cpu_Timer_Mod_Start('Save_Vtu_Results')
+  call Cpu_Timer % Start('Save_Vtu_Results')
 
   ! Take aliases
   grid => flow % pnt_grid
@@ -868,6 +868,6 @@
     close(f8)
   end if
 
-  call Cpu_Timer_Mod_Stop('Save_Vtu_Results')
+  call Cpu_Timer % Stop('Save_Vtu_Results')
 
   end subroutine
