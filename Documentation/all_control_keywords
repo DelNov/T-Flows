@@ -33,7 +33,7 @@
   CHOI_CORRECTION                          |         yes                   |   no
   GRADIENT_METHOD_FOR_ENERGY               |         least_squares         |   gauss_theorem
   GRADIENT_METHOD_FOR_MOMENTUM             |         least_squares         |   gauss_theorem
-  GRADIENT_METHOD_FOR_PRESSURE             |         gauss_theorem         |   least_squares
+  GRADIENT_METHOD_FOR_PRESSURE             |         least_squares         |   gauss_theorem
   GRADIENT_METHOD_FOR_SCALARS              |         least_squares         |   gauss_theorem
   GRADIENT_METHOD_FOR_TURBULENCE           |         least_squares         !   gauss_theorem
   GRADIENT_METHOD_FOR_MULTIPHASE           |         least_squares         |   cicsam, stacs
