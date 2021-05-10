@@ -174,6 +174,6 @@
   !----------------------------------!
 1 continue
   fin_res = res
-  niter = iter
+  niter   = iter
 
   end subroutine

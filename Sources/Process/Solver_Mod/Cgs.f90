@@ -66,10 +66,10 @@
     bnrm2 = Sol % Normalized_Root_Mean_Square(ni, b(1:nt), A, x(1:nt), norm)
   end if
 
-  if(bnrm2 < tol) then 
+  if(bnrm2 < tol) then
     iter=0
     goto 1
-  end if  
+  end if
 
   !-----------------!
   !   r1 = b - Ax   !
@@ -193,6 +193,6 @@
   !----------------------------------!
 1 continue
   fin_res = res
-  niter  = iter
+  niter   = iter
 
   end subroutine
