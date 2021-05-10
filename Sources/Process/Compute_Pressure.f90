@@ -202,8 +202,7 @@
     end if
   end if
 
-  ! call Field_Mod_Grad_Pressure_Correction(flow, pp)
-  call Field_Mod_Grad_Pressure(flow, pp)
+  call Field_Mod_Grad_Pressure_Correction(flow, pp)
 
   !-------------------------------!
   !   Update the pressure field   !

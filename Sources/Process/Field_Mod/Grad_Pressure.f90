@@ -11,9 +11,9 @@
 
   ! Branch into the method of choice for pressure
   if(p % grad_method .eq. GAUSS_THEOREM) then
-    call Field_Mod_Grad_Gauss_Variable(flow, p)
+    call Field_Mod_Grad_Gauss_Pressure(flow, p)
   else
-    call Field_Mod_Grad_Least_Variable(flow, p)
+    call Field_Mod_Grad_Least_Pressure(flow, p)
   end if
 
   end subroutine

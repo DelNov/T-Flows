@@ -18,18 +18,18 @@
   ! Refresh buffers for variable
   call Grid_Mod_Exchange_Cells_Real(grid, p % n)
 
-  do iter = 1, 4
+  do iter = 1, 1
 
     ! Extrapolation to boundaries
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
       if(c2 < 0) then
-!@!     if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. PRESSURE) then
+        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. PRESSURE) then
           p % n(c2) = p % n(c1) + p % x(c1) * grid % dx(s)  &
                                 + p % y(c1) * grid % dy(s)  &
                                 + p % z(c1) * grid % dz(s)
-!@!     end if
+        end if
       end if
     end do
 
