@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Solver_Mod_Bicg(sol, x, b, prec, miter, niter, tol, fin_res, norm)
+  subroutine Bicg(Sol, A, x, b, prec, miter, niter, tol, fin_res, norm)
 !------------------------------------------------------------------------------!
 !   Solves the linear systems of equations by a precond. BiCG Method.          !
 !------------------------------------------------------------------------------!
@@ -12,37 +12,58 @@
 !   incomplete Cholesky preconditioning)                                       !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: p1 => r_cell_01,  &
-                      p2 => r_cell_02,  &
-                      q1 => r_cell_03,  &
-                      q2 => r_cell_04,  &
-                      r1 => r_cell_05,  &
-                      r2 => r_cell_06,  &
-                      fn => r_cell_07
+  use Work_Mod, only: p1 => r_cell_11,  &
+                      p2 => r_cell_12,  &
+                      q1 => r_cell_13,  &
+                      q2 => r_cell_14,  &
+                      r1 => r_cell_15,  &
+                      r2 => r_cell_16,  &
+                      fn => r_cell_17
+!------------------------------------------------------------------------------!
+!   When using Work_Mod, calling sequence should be outlined                   !
+!                                                                              !
+!   Main_Pro                  (allocates Work_Mod)                             !
+!     |                                                                        !
+!     +----> Compute_Energy   (uses r_cell_01)                                 !
+!     |        |                                                               !
+!     +----> Compute_Momentum (does not use Work_Mod)                          !
+!     |        |                                                               !
+!     +----> Compute_Scalar   (uses r_cell_01..06)                             !
+!              |                                                               !
+!              +----> Bicg    (safe to use r_cell_11..17)                      !
+!                                                                              !
+!   Main_Pro                                    (allocates Work_Mod)           !
+!     |                                                                        !
+!     +----> Turb_Mod_Main                      (does not use Work_Mod)        !
+!              |                                                               !
+!              +---> Turb_Mod_Compute_Variable  (does not use Work_Mod)        !
+!              |       |                                                       !
+!              +---> Turb_Mod_Compute_Stress    (uses r_cell_01..09)           !
+!                      |                                                       !
+!                      +----> Bicg              (safe to use r_cell_11..17)    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Solver_Type), target :: sol
-  real              :: x(-sol % pnt_grid % n_bnd_cells :  &
-                          sol % pnt_grid % n_cells)
-  real              :: b( sol % pnt_grid % n_cells)  ! [A]{x}={b}
-  character(SL)     :: prec                          ! preconditioner
-  integer           :: miter                         ! max and actual ...
-  integer           :: niter                         ! ... num. iterations
-  real              :: tol                           ! tolerance
-  real              :: fin_res                       ! residual
-  real, optional    :: norm                          ! normalization
+  class(Solver_Type), target :: Sol
+  type(Matrix_Type)          :: A
+  real                       :: x(-Sol % pnt_grid % n_bnd_cells :  &
+                                   Sol % pnt_grid % n_cells)
+  real                       :: b( Sol % pnt_grid % n_cells)
+  character(SL)              :: prec     ! preconditioner
+  integer                    :: miter    ! maximum and actual ...
+  integer                    :: niter    ! ... number of iterations
+  real                       :: tol      ! tolerance
+  real                       :: fin_res  ! final residual
+  real, optional             :: norm     ! normalization
 !-----------------------------------[Locals]-----------------------------------!
-  type(Matrix_Type), pointer :: A
-  type(Matrix_Type), pointer :: d
+  type(Matrix_Type), pointer :: D
   integer                    :: nt, ni, nb
   real                       :: alfa, beta, rho, rho_old, bnrm2, res
   integer                    :: i, j, k, iter
 !==============================================================================!
 
   ! Take some aliases
-  A => sol % A
-  d => sol % d
+  D => Sol % D
   nt = A % pnt_grid % n_cells
   ni = A % pnt_grid % n_cells - A % pnt_grid % comm % n_buff_cells
   nb = A % pnt_grid % n_bnd_cells
@@ -63,16 +84,16 @@
   !---------------------!
   !   Preconditioning   !
   !---------------------!
-  call Prec_Form(ni, A, d, prec)
+  call Sol % Prec_Form(ni, A, D, prec)
 
   !-----------------------------------!
   !    This is quite tricky point.    !
   !   What if bnrm2 is very small ?   !
   !-----------------------------------!
   if(.not. present(norm)) then
-    bnrm2 = Normalized_Root_Mean_Square(ni, b(1:nt), A, x(1:nt))
+    bnrm2 = Sol % Normalized_Root_Mean_Square(ni, b(1:nt), A, x(1:nt))
   else
-    bnrm2 = Normalized_Root_Mean_Square(ni, b(1:nt), A, x(1:nt), norm)
+    bnrm2 = Sol % Normalized_Root_Mean_Square(ni, b(1:nt), A, x(1:nt), norm)
   end if
 
   if(bnrm2 < tol) then
@@ -83,12 +104,12 @@
   !----------------!
   !   r = b - Ax   !
   !----------------!
-  call Residual_Vector(ni, r1(1:nt), b(1:nt), A, x(1:nt))
+  call Sol % Residual_Vector(ni, r1(1:nt), b(1:nt), A, x(1:nt))
 
   !--------------------------------!
   !   Calculate initial residual   !
   !--------------------------------!
-  res = Normalized_Root_Mean_Square(ni, r1(1:nt), A, x(1:nt))
+  res = Sol % Normalized_Root_Mean_Square(ni, r1(1:nt), A, x(1:nt))
 
   if(res < tol) then
     iter = 0
@@ -114,8 +135,8 @@
     !    solve M^T z~ = r~   !  don't have M^T!!!
     !    (q instead of z)    !
     !------------------------!
-    call Prec_Solve(ni, A, d, q1(1:nt), r1(1:nt), prec)
-    call Prec_Solve(ni, A, d, q2(1:nt), r2(1:nt), prec)
+    call Sol % Prec_Solve(ni, A, D, q1(1:nt), r1(1:nt), prec)
+    call Sol % Prec_Solve(ni, A, D, q2(1:nt), r2(1:nt), prec)
 
     !------------------!
     !   rho = (z,r~)   !
@@ -168,16 +189,16 @@
     !   Check convergence   !
     !-----------------------!
     if(.not. present(norm)) then
-      res = Normalized_Root_Mean_Square(ni, r1(1:nt), A, x(1:nt))
+      res = Sol % Normalized_Root_Mean_Square(ni, r1(1:nt), A, x(1:nt))
     else
-      res = Normalized_Root_Mean_Square(ni, r1(1:nt), A, x(1:nt), norm)
+      res = Sol % Normalized_Root_Mean_Square(ni, r1(1:nt), A, x(1:nt), norm)
     end if
 
     if(res < tol) goto 1
 
     rho_old = rho
 
-  end do     ! iter
+  end do ! iter
 
   !----------------------------------!
   !                                  !
