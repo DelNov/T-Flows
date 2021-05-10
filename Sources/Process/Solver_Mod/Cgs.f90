@@ -23,6 +23,9 @@
                       v2         => r_cell_10,  &
                       u1_plus_q1 => r_cell_11
 !------------------------------------------------------------------------------!
+!   When using Work_Mod, calling sequence should be outlined, but this         !
+!   procedure is never called, so it doesn't make much sense to do it.         !
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Solver_Type), target :: Sol
