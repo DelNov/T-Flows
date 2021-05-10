@@ -58,7 +58,7 @@
 !                                                                              !
 !------------------------------------------------------------------------------!
 
-  call Cpu_Timer_Mod_Start('Compute_Turbulence (without solvers)')
+  call Cpu_Timer % Start('Compute_Turbulence (without solvers)')
 
   ! Take aliases
   flow => turb % pnt_flow
@@ -325,7 +325,7 @@
   call Numerics_Mod_Under_Relax(phi, a, b)
 
   ! Call linear solver to solve the equations
-  call Cpu_Timer_Mod_Start('Linear_Solver_For_Turbulence')
+  call Cpu_Timer % Start('Linear_Solver_For_Turbulence')
   call Sol % Bicg(A,              &
                   phi % n,        &
                   b,              &
@@ -334,7 +334,7 @@
                   phi % eniter,   &
                   phi % tol,      &
                   phi % res)
-  call Cpu_Timer_Mod_Stop('Linear_Solver_For_Turbulence')
+  call Cpu_Timer % Stop('Linear_Solver_For_Turbulence')
 
   ! Print info on the screen
   if( phi % name .eq. 'UU' )   &
@@ -374,6 +374,6 @@
 
   call Field_Mod_Grad_Variable(flow, phi)
 
-  call Cpu_Timer_Mod_Stop('Compute_Turbulence (without solvers)')
+  call Cpu_Timer % Stop('Compute_Turbulence (without solvers)')
 
   end subroutine

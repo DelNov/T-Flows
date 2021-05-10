@@ -1,46 +1,59 @@
 !==============================================================================!
-  subroutine Cpu_Timer_Mod_Start(f_name)
+  subroutine Start(Cpu_Timer, f_name)
 !------------------------------------------------------------------------------!
 !   This subroutine is called whenever new function is invoked                 !
 !------------------------------------------------------------------------------!
   implicit none
+!---------------------------------[Arguments]----------------------------------!
+  class(Cpu_Timer_Type), target :: Cpu_Timer
+  character(len=*)              :: f_name
 !-----------------------------------[Locals]-----------------------------------!
-  character(len=*) :: f_name
-  integer          :: f
+  integer :: f
 !==============================================================================!
 
   !----------------------------!
   !   Store the old function   !
   !----------------------------!
-  old_funct = new_funct
+  Cpu_Timer % old_funct = Cpu_Timer % new_funct
 
   !----------------------------!
   !   Determine new function   !
   !----------------------------!
 
   ! Check if this function was called before
-  do f = 1, n_funct
-    if(f_name .eq. funct_name(f)) then  ! found the function
-      new_funct = f
+  do f = 1, Cpu_Timer % n_funct
+    if(f_name .eq. Cpu_Timer % funct_name(f)) then  ! found the function
+      Cpu_Timer % new_funct = f
       goto 1
     end if
   end do
 
   ! It wasn't called before, add it
-  n_funct             = n_funct + 1
-  funct_name(n_funct) = f_name
-  funct_time(n_funct) = 0.0      ! initialize times spent in the new function
-  new_funct           = n_funct  ! currently running function is the new one
+  Cpu_Timer % n_funct = Cpu_Timer % n_funct + 1
+  Cpu_Timer % funct_name(Cpu_Timer % n_funct) = f_name
+
+  ! Initialize times spent in the new function
+  Cpu_Timer % funct_time(Cpu_Timer % n_funct) = 0.0
+
+  ! Currently running function is the new one
+  Cpu_Timer % new_funct = Cpu_Timer % n_funct
 
 1 continue
 
   !---------------------------------------------------------------!
   !   Update the time for the function which was running before   !
   !---------------------------------------------------------------!
-  time_prev = time_curr     ! store the last time which was recorded
-  call cpu_time(time_curr)  ! refresh the value of time_curr
-  if(n_funct > 1) then
-    funct_time(old_funct) = funct_time(old_funct) + time_curr - time_prev
+
+  ! Store the last time which was recorded
+  Cpu_Timer % time_prev = Cpu_Timer % time_curr
+
+  ! Refresh the value of time_curr
+  call cpu_time(Cpu_Timer % time_curr)
+
+  if(Cpu_Timer % n_funct > 1) then
+    Cpu_Timer % funct_time(Cpu_Timer % old_funct) =  &
+    Cpu_Timer % funct_time(Cpu_Timer % old_funct) + Cpu_Timer % time_curr  &
+                                                  - Cpu_Timer % time_prev
   end if
 
   end subroutine

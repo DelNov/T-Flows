@@ -21,7 +21,7 @@
   integer                  :: fh, d, vc, sc, ua
 !==============================================================================!
 
-  call Cpu_Timer_Mod_Start('Backup_Mod_Save')
+  call Cpu_Timer % Start('Backup_Mod_Save')
 
   ! Take aliases
   grid => fld % pnt_grid
@@ -355,6 +355,6 @@
   ! Close backup file
   call Comm_Mod_Close_File(fh)
 
-  call Cpu_Timer_Mod_Stop('Backup_Mod_Save')
+  call Cpu_Timer % Stop('Backup_Mod_Save')
 
   end subroutine

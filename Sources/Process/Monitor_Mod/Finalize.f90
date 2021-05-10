@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Monitor_Mod_Finalize(monitor)
+  subroutine Finalize(Monitor)
 !------------------------------------------------------------------------------!
 !   Close the monitoring files.                                                !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Monitor_Type) :: monitor
+  class(Monitor_Type) :: Monitor
 !-----------------------------------[Locals]-----------------------------------!
   integer :: m
 !==============================================================================!
@@ -13,8 +13,8 @@
   !--------------------------------!
   !   Close the monitoring files   !
   !--------------------------------!
-  do m = 1, monitor % n_points
-    if(monitor % cell(m) > 0) close(monitor % file_unit(m))
+  do m = 1, Monitor % n_points
+    if(Monitor % cell(m) > 0) close(Monitor % file_unit(m))
   end do
 
   end subroutine

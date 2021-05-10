@@ -53,7 +53,7 @@
 !
 !==============================================================================!
 
-  call Cpu_Timer_Mod_Start('Compute_Scalars (without solvers)')
+  call Cpu_Timer % Start('Compute_Scalars (without solvers)')
 
   ! Take aliases
   grid   => flow % pnt_grid
@@ -352,7 +352,7 @@
   call Numerics_Mod_Under_Relax(phi, A, b)
 
   ! Call linear solver to solve them
-  call Cpu_Timer_Mod_Start('Linear_Solver_For_Scalars')
+  call Cpu_Timer % Start('Linear_Solver_For_Scalars')
   call Sol % Bicg(A,              &
                   phi % n,        &
                   b,              &
@@ -361,7 +361,7 @@
                   phi % eniter,   &
                   phi % tol,      &
                   phi % res)
-  call Cpu_Timer_Mod_Stop('Linear_Solver_For_Scalars')
+  call Cpu_Timer % Stop('Linear_Solver_For_Scalars')
 
   read(phi % name(3:4), *) ns  ! reterive the number of scalar
   row = ceiling(ns/6)          ! will be 1 (scal. 1-6), 2 (scal. 6-12), etc.
@@ -374,6 +374,6 @@
   ! User function
   call User_Mod_End_Of_Compute_Scalar(flow, turb, mult, Sol, curr_dt, ini, sc)
 
-  call Cpu_Timer_Mod_Stop('Compute_Scalars (without solvers)')
+  call Cpu_Timer % Stop('Compute_Scalars (without solvers)')
 
   end subroutine

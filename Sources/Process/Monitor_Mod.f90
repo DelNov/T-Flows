@@ -21,6 +21,12 @@
     real,    allocatable :: x(:), y(:), z(:)
     integer, allocatable :: file_unit(:)
 
+    contains
+      procedure :: Initialize
+      procedure :: Finalize
+      procedure :: Write_4_Vars
+      procedure :: Write_5_Vars
+
   end type
 
   contains

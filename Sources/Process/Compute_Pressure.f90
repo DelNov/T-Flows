@@ -49,7 +49,7 @@
 !
 !==============================================================================!
 
-  call Cpu_Timer_Mod_Start('Compute_Pressure (without solvers)')
+  call Cpu_Timer % Start('Compute_Pressure (without solvers)')
 
   ! Take aliases
   grid   => flow % pnt_grid
@@ -181,7 +181,7 @@
   ! Get solver
   call Control_Mod_Solver_For_Pressure(solver)
 
-  call Cpu_Timer_Mod_Start('Linear_Solver_For_Pressure')
+  call Cpu_Timer % Start('Linear_Solver_For_Pressure')
   call Sol % Cg(A,             &
                 pp % n,        &
                 b,             &
@@ -192,7 +192,7 @@
                 pp % res,      &
                 norm = p_nor)         ! number for normalisation
 
-  call Cpu_Timer_Mod_Stop('Linear_Solver_For_Pressure')
+  call Cpu_Timer % Stop('Linear_Solver_For_Pressure')
 
   if (flow % p_m_coupling == SIMPLE) then
     call Info_Mod_Iter_Fill_At(1, 4, pp % name, pp % eniter, pp % res)
@@ -227,6 +227,6 @@
   ! User function
   call User_Mod_End_Of_Compute_Pressure(flow, mult, Sol, curr_dt, ini)
 
-  call Cpu_Timer_Mod_Stop('Compute_Pressure (without solvers)')
+  call Cpu_Timer % Stop('Compute_Pressure (without solvers)')
 
   end subroutine

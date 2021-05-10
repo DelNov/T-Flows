@@ -21,7 +21,7 @@
   integer                  :: fh, d, vc, sc, ua
 !==============================================================================!
 
-  call Cpu_Timer_Mod_Start('Backup_Mod_Load')
+  call Cpu_Timer % Start('Backup_Mod_Load')
 
   ! Take aliases
   grid => fld % pnt_grid
@@ -37,7 +37,7 @@
   backup = .true.
   if(answer .eq. 'SKIP') then
     backup = .false.
-    call Cpu_Timer_Mod_Stop('Backup_Mod_Load')
+    call Cpu_Timer % Stop('Backup_Mod_Load')
     return
   end if
 
@@ -375,6 +375,6 @@
   ! Close backup file
   call Comm_Mod_Close_File(fh)
 
-  call Cpu_Timer_Mod_Stop('Backup_Mod_Load')
+  call Cpu_Timer % Stop('Backup_Mod_Load')
 
   end subroutine

@@ -24,7 +24,7 @@
   integer                    :: s, c, c1, c2, fu, corr
 !==============================================================================!
 
-  call Cpu_Timer_Mod_Start('Compute_Multiphase (without solvers)')
+  call Cpu_Timer % Start('Compute_Multiphase (without solvers)')
 
   ! Take aliases
   flow   => mult % pnt_flow
@@ -264,6 +264,6 @@
   !-----------------------!
   call Multiphase_Mod_Vof_Physical_Properties(mult)
 
-  call Cpu_Timer_Mod_Stop('Compute_Multiphase (without solvers)')
+  call Cpu_Timer % Stop('Compute_Multiphase (without solvers)')
 
   end subroutine
