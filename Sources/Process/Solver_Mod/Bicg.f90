@@ -184,9 +184,9 @@
 
     if(res < tol) goto 1
 
-    rho_old=rho
+    rho_old = rho
 
-  end do     ! iter
+  end do ! iter
 
   !----------------------------------!
   !                                  !
@@ -196,6 +196,6 @@
 1 continue
 
   fin_res = res
-  niter = iter
+  niter   = iter
 
   end subroutine
