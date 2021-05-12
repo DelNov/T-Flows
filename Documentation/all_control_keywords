@@ -76,7 +76,7 @@
   SOLVER_FOR_PRESSURE                      |         bicg                  |   cg, cgs
   SOLVER_FOR_SCALARS                       |         cg                    |   bicg, cgs
   SOLVER_FOR_TURBULENCE                    |         cg                    |   bicg, cgs
-  TIME_INTEGRATION                         |         linear                |   parabolic
+  TIME_INTEGRATION_SCHEME                  |         linear                |   parabolic
   TIME_STEP                                |         1.0e-4                |   any real number, usually < 0.1
   TOLERANCE_FOR_GAUSS_GRADIENTS            |         1.0e-3                |   any small number, but < 1.0e-3 is OK
   TOLERANCE_FOR_ENERGY_SOLVER              |         1.0e-6                |   any small number, but > 1.0e-12 is OK
