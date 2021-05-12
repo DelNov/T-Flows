@@ -48,7 +48,7 @@
   ! Initialize with some gradients with the most robust and reliable tool
   ! you have at your disposal - least square cell-based method.  These
   ! gradients should be properly calculated inside the domain.
-  call Field_Mod_Grad_Least_Variable(flow, p)
+  call Field_Mod_Grad_Least_Pressure(flow, p)
 
   !--------------------------------------------------------------------!
   !   Step 1: Extrapolate interior gradient values to boundary cells   !
