@@ -58,7 +58,7 @@
     if(Math_Mod_Approx_Real(grid % yf(s), 0.0) .and.  &
        Math_Mod_Approx_Real(grid % zf(s), 0.0) .and.  &
        grid % faces_c(2,s) > 0) then
-      write(99, '(99es15.5)')  &
+      write(99, '(99es25.15)')  &
         grid % xf(s), v_flux % n(s) / grid % s(s), v_flux % n(s)
     end if
   end do

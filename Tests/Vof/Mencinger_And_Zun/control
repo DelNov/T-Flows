@@ -6,6 +6,7 @@
  MULTIPHASE_MODEL  volume_of_fluid
 
  TIME_STEP                  1.0e-1
+ TIME_INTEGRATION           linear
 
  CHOI_CORRECTION    yes
  GU_CORRECTION      yes
@@ -21,8 +22,9 @@
  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.7
  SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.3
 
- MAX_ITERATIONS_FOR_GAUSS_GRADIENTS  200
- TOLERANCE_FOR_GAUSS_GRADIENTS       1.0e-6
+ MAX_GAUSS_GRADIENTS_ITERATIONS      2000
+ TOLERANCE_FOR_GAUSS_GRADIENTS       1.0e-15
+ GRADIENT_METHOD_FOR_PRESSURE        gauss_theorem
 
  RESULTS_SAVE_INTERVAL   10000
  BACKUP_SAVE_INTERVAL    10000
@@ -91,7 +93,7 @@
 # Boundary conditions
 #---------------------
   BOUNDARY_CONDITION    wall
-    TYPE                wall    
+    TYPE                wall
     VARIABLES           u      v     w     vof     vof_c_ang   t
     VALUES              0.00  0.0   0.0   0.0     90.0         110.0
 
