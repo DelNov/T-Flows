@@ -141,6 +141,7 @@
     ! Tolerance and maximum iterations for Gauss gradients
     real    :: gauss_tol
     integer :: gauss_miter
+    integer :: least_miter
 
     ! Is buoyancy thermally- or density-driven?
     integer :: buoyancy

@@ -18,7 +18,7 @@
   ! Refresh buffers for variable
   call Grid_Mod_Exchange_Cells_Real(grid, p % n)
 
-  do iter = 1, 1
+  do iter = 1, flow % least_miter
 
     ! Extrapolation to boundaries
     do s = 1, grid % n_faces

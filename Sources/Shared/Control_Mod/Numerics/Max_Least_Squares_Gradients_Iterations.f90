@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Control_Mod_Max_Iterations_For_Gauss_Gradients(val, verbose)
+  subroutine Control_Mod_Max_Least_Squares_Gradients_Iterations(val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -7,7 +7,7 @@
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Int_Item('MAX_ITERATIONS_FOR_GAUSS_GRADIENTS',  &
+  call Control_Mod_Read_Int_Item('MAX_LEAST_SQUARES_GRADIENTS_ITERATIONS', &
                                   val, val, verbose)
 
   end subroutine
