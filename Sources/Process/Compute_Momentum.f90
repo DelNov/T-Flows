@@ -98,13 +98,14 @@
   call User_Mod_Beginning_Of_Compute_Momentum(flow, turb, mult, Sol,  &
                                               curr_dt, ini)
 
-  !-----------------------------------------------------!
-  !   Store the old volume flux for Choi's correction   !
-  !-----------------------------------------------------!
+  !-------------------------------------------------------!
+  !   Store the old volume fluxes for Choi's correction   !
+  !-------------------------------------------------------!
   if (flow % piso_status .eqv. .false.) then  ! check about this
     if(ini .eq. 1) then
       do s = 1, grid % n_faces
-        v_flux % o(s) = v_flux % n(s)
+        v_flux % oo(s) = v_flux % o(s)
+        v_flux % o (s) = v_flux % n(s)
       end do
     end if
   end if

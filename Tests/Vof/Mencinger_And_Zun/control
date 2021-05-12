@@ -5,19 +5,19 @@
  HEAT_TRANSFER     no
  MULTIPHASE_MODEL  volume_of_fluid
 
- TIME_STEP                  1.0e-1
- TIME_INTEGRATION           linear
+ TIME_STEP                    100
+ TIME_INTEGRATION_SCHEME      parabolic
 
  CHOI_CORRECTION    yes
- GU_CORRECTION      yes
+ GU_CORRECTION       no
 # 6000 time steps seems to be enough to reach a steady state with dt=  0.1
 #  600 time steps seems to be enough to reach a steady state with dt=  1
 #  200 time steps seems to be enough to reach a steady state with dt= 10
 #   60 time steps seems to be enough to reach a steady state with dt=100
 #   10 time steps seems to be enough to reach a steady state with dt=1e+5
- NUMBER_OF_TIME_STEPS          200
- MAX_SIMPLE_ITERATIONS          60
- MIN_SIMPLE_ITERATIONS          60
+ NUMBER_OF_TIME_STEPS          600
+ MAX_SIMPLE_ITERATIONS           6
+ MIN_SIMPLE_ITERATIONS           6
 
  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.7
  SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.3
@@ -47,7 +47,7 @@
  PHASE_VISCOSITIES        1.0e-3      1.0e-3
  SURFACE_TENSION        0.0
  MASS_TRANSFER           no
- TRACK_FRONT            yes
+ TRACK_FRONT             no
  SATURATION_TEMPERATURE   100.0
 
  TURBULENCE_MODEL       none
@@ -60,8 +60,6 @@
 #----------------------
 
  PRESSURE_MOMENTUM_COUPLING    simple
-
- TIME_INTEGRATION_SCHEME  linear
 
  ADVECTION_SCHEME_FOR_MOMENTUM    minmod
  ADVECTION_SCHEME_FOR_MULTIPHASE  cicsam

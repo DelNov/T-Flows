@@ -34,6 +34,7 @@
   type(Matrix_Type), pointer :: A               ! pressure matrix
   type(Matrix_Type), pointer :: M               ! momentum matrix
   real                       :: a12, px_f, py_f, pz_f, fs, dens_h
+  real                       :: w_o, w_oo
   integer                    :: s, c1, c2, c
 !==============================================================================!
 
@@ -56,7 +57,6 @@
     w_c(c) = flow % w % n(c)
   end do
 
-
   !--------------------------------------!
   !   Store grid % vol(c) / M % sav(c)   !
   !--------------------------------------!
@@ -69,14 +69,24 @@
   !   Choi's correction, part 1: subtract the cell-centered unsteady terms   !
   !--------------------------------------------------------------------------!
   if(flow % choi_correction) then
+
+    ! Weights of o and oo time step depending on the scheme used
+    if(u % td_scheme == LINEAR) then
+      w_o  = 1.0
+      w_oo = 0.0
+    else if(u % td_scheme == PARABOLIC) then
+      w_o  =  2.0
+      w_oo = -0.5
+    end if
+
     do c = 1, grid % n_cells
 
       ! Unit for t_m: m^3 * kg/m^3 / s * s/kg = 1
       t_m(c) = (grid % vol(c) * flow % density(c) / flow % dt) / M % sav(c)
 
-      u_c(c) = u_c(c) - t_m(c) * u % o(c)
-      v_c(c) = v_c(c) - t_m(c) * v % o(c)
-      w_c(c) = w_c(c) - t_m(c) * w % o(c)
+      u_c(c) = u_c(c) - (w_o * u % o(c) + w_oo * u % oo(c)) * t_m(c)
+      v_c(c) = v_c(c) - (w_o * v % o(c) + w_oo * v % oo(c)) * t_m(c)
+      w_c(c) = w_c(c) - (w_o * w % o(c) + w_oo * w % oo(c)) * t_m(c)
     end do
   end if
 
@@ -145,8 +155,10 @@
       !   Choi's correction, part 2: add flux from old time step   !
       !------------------------------------------------------------!
       if(flow % choi_correction) then
-        v_flux % n(s) = v_flux % n(s)  &
-                      + v_flux % o(s) * (fs * t_m(c1) + (1.0-fs) * t_m(c2))
+        v_flux % n(s) = v_flux % n(s)                        &
+                      + (fs * t_m(c1) + (1.0-fs) * t_m(c2))  &
+                        * (  w_o *  v_flux % o(s)            &
+                           + w_oo * v_flux % oo(s))
       end if  ! choi_correction
 
       !-------------------------------------------------------!

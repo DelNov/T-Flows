@@ -17,11 +17,11 @@
   phi % name = name_phi
 
   ! Values in the new (n) and old (o) time step
-  allocate (phi % n(grid % n_faces));  phi % n = 0.0
-  allocate (phi % o(grid % n_faces));  phi % o = 0.0
+  allocate (phi % n (grid % n_faces));  phi % n  = 0.0
+  allocate (phi % o (grid % n_faces));  phi % o  = 0.0
+  allocate (phi % oo(grid % n_faces));  phi % oo = 0.0
 
   ! Average guessed value, guessed value
   allocate (phi % avg (grid % n_faces));  phi % avg  = 0.0
-  allocate (phi % star(grid % n_faces));  phi % star = 0.0
 
   end subroutine
