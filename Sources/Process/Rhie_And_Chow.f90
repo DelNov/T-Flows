@@ -56,6 +56,7 @@
     w_c(c) = flow % w % n(c)
   end do
 
+
   !--------------------------------------!
   !   Store grid % vol(c) / M % sav(c)   !
   !--------------------------------------!
@@ -108,9 +109,10 @@
       v_f(s) = fs * v_c(c1) + (1.0 - fs) * v_c(c2)
       w_f(s) = fs * w_c(c1) + (1.0 - fs) * w_c(c2)
 
+
       ! Calculate coeficients for the pressure matrix
       ! Units: m * m^3 s / kg = m^4 s / kg
-      a12 = 0.5 * A % fc(s) * (v_m(c1) + v_m(c2))
+      a12 = A % fc(s) * (fs * v_m(c1) + (1.0-fs) * v_m(c2))
       A % val(A % pos(1,s)) = -a12
       A % val(A % pos(2,s)) = -a12
       A % val(A % dia(c1))  = A % val(A % dia(c1)) +  a12
@@ -118,9 +120,15 @@
 
       ! Interpolate pressure gradients
       ! Units: kg/(m^2 s^2) * m^3 s / kg * m = m^2 / s
-      px_f = 0.5 * (p % x(c1)*v_m(c1) + p % x(c2)*v_m(c2)) * grid % dx(s)
-      py_f = 0.5 * (p % y(c1)*v_m(c1) + p % y(c2)*v_m(c2)) * grid % dy(s)
-      pz_f = 0.5 * (p % z(c1)*v_m(c1) + p % z(c2)*v_m(c2)) * grid % dz(s)
+      px_f = (       fs  * (p % x(c1)*v_m(c1))    &
+              + (1.0-fs) * (p % x(c2)*v_m(c2)) )  &
+            * grid % dx(s)
+      py_f = (       fs  * (p % y(c1)*v_m(c1))    &
+              + (1.0-fs) * (p % y(c2)*v_m(c2)) )  &
+            * grid % dy(s)
+      pz_f = (       fs  * (p % z(c1)*v_m(c1))    &
+              + (1.0-fs) * (p % z(c2)*v_m(c2)) )  &
+            * grid % dz(s)
 
       ! Calculate mass or volume flux through cell face
       ! Units in lines which follow:
@@ -138,7 +146,7 @@
       !------------------------------------------------------------!
       if(flow % choi_correction) then
         v_flux % n(s) = v_flux % n(s)  &
-                      + v_flux % o(s) * 0.5 * (t_m(c1) + t_m(c2))
+                      + v_flux % o(s) * (fs * t_m(c1) + (1.0-fs) * t_m(c2))
       end if  ! choi_correction
 
       !-------------------------------------------------------!
@@ -146,9 +154,11 @@
       !-------------------------------------------------------!
       ! Units: m^3 s/kg * kg/(m^2 s^2) * m^2 = m^3/s
       if(flow % gu_correction) then
-        v_flux % n(s) = v_flux % n(s)              &
-                      + 0.5 * (v_m(c1) + v_m(c2))  &
-                            * flow % face_fx(s) * grid % sx(s)
+        v_flux % n(s) = v_flux % n(s)                          &
+                      + (fs * v_m(c1) + (1.0-fs) * v_m(c2))    &
+                      * (  flow % face_fx(s) * grid % sx(s)    &
+                         + flow % face_fy(s) * grid % sy(s)    &
+                         + flow % face_fz(s) * grid % sz(s) )
       end if  ! gu_correction
 
     end if
