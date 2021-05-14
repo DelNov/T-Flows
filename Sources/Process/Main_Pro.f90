@@ -173,6 +173,7 @@
     ! Initialize variables
     if(.not. read_backup(d)) then
       call Initialize_Variables(flow(d), turb(d), mult(d), swarm(d), Sol(d))
+      call Update_Boundary_Values(flow(d), turb(d), mult(d), 'ALL')
       call Results_Mod_Save_Surf(mult(d) % surf, curr_dt)
     end if
 
@@ -284,7 +285,7 @@
       if(mult(d) % model .eq. VOLUME_OF_FLUID) then
         call Multiphase_Mod_Vof_Main(mult(d), flow(d), turb(d), Sol(d), curr_dt)
         if(mult(d) % track_front) then
-          call Results_Mod_Save_Front(mult(d) % front, curr_dt)
+          call Results_Mod_Save_Front(mult(d) % Front, curr_dt)
 !f_vs_s   call Results_Mod_Save_Surf (mult(d) % surf, curr_dt)
           call Results_Mod_Save(flow(d), turb(d), mult(d), swarm(d), curr_dt,  &
                                 plot_inside=.true., domain=d)
