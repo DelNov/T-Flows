@@ -56,10 +56,10 @@
   !--------------------------------------------------!
   !   Sort new numbers according to three criteria   !
   !--------------------------------------------------!
-  call Sort_Mod_3_Real_Carry_Int(xc(1:grid % n_cells),  &
-                                 yc(1:grid % n_cells),  &
-                                 zc(1:grid % n_cells),  &
-                                 grid % old_c(1:grid % n_cells))
+  call Sort % Three_Real_Carry_Int(xc(1:grid % n_cells),  &
+                                   yc(1:grid % n_cells),  &
+                                   zc(1:grid % n_cells),  &
+                                   grid % old_c(1:grid % n_cells))
   ! This is a bit of a bluff
   do c = 1, grid % n_cells
     grid % new_c(grid % old_c(c)) = c
@@ -100,9 +100,9 @@
     grid % cells_n_cells(grid % new_c(c)) = old_nc   (c)
     grid % cells_c(1:N,  grid % new_c(c)) = old_cells(1:N, c)
   end do
-  call Sort_Mod_Real_By_Index(grid % n_cells, grid % xc (1), grid % new_c(1))
-  call Sort_Mod_Real_By_Index(grid % n_cells, grid % yc (1), grid % new_c(1))
-  call Sort_Mod_Real_By_Index(grid % n_cells, grid % zc (1), grid % new_c(1))
-  call Sort_Mod_Real_By_Index(grid % n_cells, grid % vol(1), grid % new_c(1))
+  call Sort % Real_By_Index(grid % n_cells, grid % xc (1), grid % new_c(1))
+  call Sort % Real_By_Index(grid % n_cells, grid % yc (1), grid % new_c(1))
+  call Sort % Real_By_Index(grid % n_cells, grid % zc (1), grid % new_c(1))
+  call Sort % Real_By_Index(grid % n_cells, grid % vol(1), grid % new_c(1))
 
   end subroutine

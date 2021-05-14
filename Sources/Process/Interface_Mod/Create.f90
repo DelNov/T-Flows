@@ -299,21 +299,21 @@
 
           ! Sort interfaces from domain 1 carrying
           ! information of cells surrounding it along
-          call Sort_Mod_3_Real_Carry_3_Int(xf_1(1:n_tot),  &
-                                           yf_1(1:n_tot),  &
-                                           zf_1(1:n_tot),  &
-                                           ic_1(1:n_tot),  &
-                                           ib_1(1:n_tot),  &
-                                           ip_1(1:n_tot))
+          call Sort % Three_Real_Carry_Three_Int(xf_1(1:n_tot),  &
+                                                 yf_1(1:n_tot),  &
+                                                 zf_1(1:n_tot),  &
+                                                 ic_1(1:n_tot),  &
+                                                 ib_1(1:n_tot),  &
+                                                 ip_1(1:n_tot))
 
           ! Sort interfaces from domain 2 carrying
           ! information of cells surrounding it along
-          call Sort_Mod_3_Real_Carry_3_Int(xf_2(1:n_tot),  &
-                                           yf_2(1:n_tot),  &
-                                           zf_2(1:n_tot),  &
-                                           ic_2(1:n_tot),  &
-                                           ib_2(1:n_tot),  &
-                                           ip_2(1:n_tot))
+          call Sort % Three_Real_Carry_Three_Int(xf_2(1:n_tot),  &
+                                                 yf_2(1:n_tot),  &
+                                                 zf_2(1:n_tot),  &
+                                                 ic_2(1:n_tot),  &
+                                                 ib_2(1:n_tot),  &
+                                                 ip_2(1:n_tot))
 !         ! Write some debugging information
 !         do n = 1, inter(d1, d2) % n_tot
 !           write(100*this_proc+d1*10+d2, '(i4, 6f10.5)')   &

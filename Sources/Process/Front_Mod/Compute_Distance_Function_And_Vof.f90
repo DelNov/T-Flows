@@ -55,7 +55,7 @@
     end do
 
     ! Compress the list of nodes
-    call Sort_Mod_Unique_Int(node_list(1:n_cnt), n_cnt)
+    call Sort % Unique_Int(node_list(1:n_cnt), n_cnt)
 
     ! Make a list of cells surrounding the stored nodes
     c_cnt = 0  ! initialize cell count
@@ -65,7 +65,7 @@
         cell_list(c_cnt) = grid % nodes_c(i_cel, node_list(i_nod))
       end do
     end do
-    call Sort_Mod_Unique_Int(cell_list(1:c_cnt), c_cnt)
+    call Sort % Unique_Int(cell_list(1:c_cnt), c_cnt)
 
     ! Match first and second neighbour cells with all elements around the node
     do i_ele = 1, Front % vert(v) % nne

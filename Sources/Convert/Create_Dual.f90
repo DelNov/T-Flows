@@ -105,10 +105,10 @@
   !   Sort all the edges by their node numbers and carry   !
   !   information on faces and boundary faces along        !
   !--------------------------------------------------------!
-  call Sort_Mod_2_Int_Carry_2_Int(full_edge_n (1:prim % n_edges, 1),  &
-                                  full_edge_n (1:prim % n_edges, 2),  &
-                                  full_edge_fb(1:prim % n_edges),     &
-                                  full_edge_bc(1:prim % n_edges))
+  call Sort % Two_Int_Carry_Two_Int(full_edge_n (1:prim % n_edges, 1),  &
+                                    full_edge_n (1:prim % n_edges, 2),  &
+                                    full_edge_fb(1:prim % n_edges),     &
+                                    full_edge_bc(1:prim % n_edges))
 
   !-----------------------------------------!
   !   Estimate number of edges compressed   !
@@ -271,7 +271,7 @@
       cnt = cnt + 1;  c_p_list(cnt) = prim % faces_c(1, f_p)
       cnt = cnt + 1;  c_p_list(cnt) = prim % faces_c(2, f_p)
     end do
-    call Sort_Mod_Unique_Int(c_p_list(1:cnt), cnt)
+    call Sort % Unique_Int(c_p_list(1:cnt), cnt)
 
     ! Transform prim cells to dual nodes.  There is a shift
     ! since cells go from negative values and nodes do not
@@ -569,7 +569,7 @@
   !                                                        !
   !--------------------------------------------------------!
   do c = 1, dual % n_cells
-    call Sort_Mod_Int(dual % cells_n(1:dual % cells_n_nodes(c),c))
+    call Sort % Int_Array(dual % cells_n(1:dual % cells_n_nodes(c),c))
     dual % cells_n_nodes(c) = -dual % cells_n_nodes(c)
   end do
 

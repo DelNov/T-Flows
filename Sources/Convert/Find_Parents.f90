@@ -104,7 +104,7 @@
         do i_nod = 1, grid % cells_n_nodes(c2)  ! 3 or 4
           nodes(i_nod) = grid % cells_n(i_nod, c2)
         end do
-        call Sort_Mod_Int(nodes(1:4))
+        call Sort % Int_Array(nodes(1:4))
         cr1(cnt_f) = nodes(1)
         cr2(cnt_f) = nodes(2)
         cr3(cnt_f) = nodes(3)
@@ -146,7 +146,7 @@
             nodes(i_nod) = grid % cells_n(fn(i_fac, i_nod), c1)
           end if
         end do
-        call Sort_Mod_Int(nodes(1:4))
+        call Sort % Int_Array(nodes(1:4))
         cr1(cnt_f) = nodes(1)
         cr2(cnt_f) = nodes(2)
         cr3(cnt_f) = nodes(3)
@@ -157,8 +157,9 @@
 
     end do  ! c1
 
-    call Sort_Mod_3_Int_Carry_2_Int(cr1(1:cnt_f), cr2(1:cnt_f), cr3(1:cnt_f),  &
-                                    w1(1:cnt_f), w2(1:cnt_f))
+    call Sort % Three_Int_Carry_Two_Int(                   &
+                cr1(1:cnt_f), cr2(1:cnt_f), cr3(1:cnt_f),  &
+                w1(1:cnt_f), w2(1:cnt_f))
 
     n_match = 0
     do i_fac = 1, cnt_f-1

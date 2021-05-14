@@ -9,33 +9,75 @@
   implicit none
 !==============================================================================!
 
+  !---------------!
+  !   Sort type   !
+  !---------------!
+  type Sort_Type
+
+    contains
+
+      procedure :: Int_Array
+      procedure :: Int_By_Index
+      procedure :: Int_Carry_Int
+      procedure :: Int_Carry_Real
+      procedure :: Real_Array
+      procedure :: Real_By_Index
+      procedure :: Real_Carry_Int
+      procedure :: Real_Carry_Two_Int
+      procedure :: Reverse_Order_Int
+      procedure :: Reverse_Order_Real
+      procedure :: Short_Carry_Short
+      procedure :: Three_Int_Carry_Two_Int
+      procedure :: Three_Int_Carry_Three_Int
+      procedure :: Three_Int_Carry_Int
+      procedure :: Three_Int
+      procedure :: Three_Real_Carry_Two_Int
+      procedure :: Three_Real_Carry_Three_Int
+      procedure :: Three_Real_Carry_Int
+      procedure :: Three_Real
+      procedure :: Two_Int_Carry_Two_Int
+      procedure :: Two_Int_Carry_Int
+      procedure :: Two_Int
+      procedure :: Two_Real_Carry_Two_Int
+      procedure :: Two_Real_Carry_Int
+      procedure :: Two_Real
+      procedure :: Unique_Int
+
+  end type
+
+  !-------------------------------------------!
+  !   Create one instance of Cpu_Timer type   !
+  !       for all other modules to use        !
+  !-------------------------------------------!
+  type(Sort_Type) :: Sort
+
   contains
 
-  include 'Sort_Mod/2_Int_Carry_2_Int.f90'
-  include 'Sort_Mod/2_Int_Carry_Int.f90'
-  include 'Sort_Mod/2_Int.f90'
-  include 'Sort_Mod/2_Real_Carry_2_Int.f90'
-  include 'Sort_Mod/2_Real_Carry_Int.f90'
-  include 'Sort_Mod/2_Real.f90'
-  include 'Sort_Mod/3_Int_Carry_2_Int.f90'
-  include 'Sort_Mod/3_Int_Carry_3_Int.f90'
-  include 'Sort_Mod/3_Int_Carry_Int.f90'
-  include 'Sort_Mod/3_Int.f90'
-  include 'Sort_Mod/3_Real_Carry_2_Int.f90'
-  include 'Sort_Mod/3_Real_Carry_3_Int.f90'
-  include 'Sort_Mod/3_Real_Carry_Int.f90'
-  include 'Sort_Mod/3_Real.f90'
+  include 'Sort_Mod/Int_Array.f90'
   include 'Sort_Mod/Int_By_Index.f90'
   include 'Sort_Mod/Int_Carry_Int.f90'
   include 'Sort_Mod/Int_Carry_Real.f90'
-  include 'Sort_Mod/Int.f90'
+  include 'Sort_Mod/Real_Array.f90'
   include 'Sort_Mod/Real_By_Index.f90'
   include 'Sort_Mod/Real_Carry_Int.f90'
-  include 'Sort_Mod/Real_Carry_2_Int.f90'
-  include 'Sort_Mod/Real.f90'
+  include 'Sort_Mod/Real_Carry_Two_Int.f90'
   include 'Sort_Mod/Reverse_Order_Int.f90'
   include 'Sort_Mod/Reverse_Order_Real.f90'
   include 'Sort_Mod/Short_Carry_Short.f90'
+  include 'Sort_Mod/Three_Int_Carry_Two_Int.f90'
+  include 'Sort_Mod/Three_Int_Carry_Three_Int.f90'
+  include 'Sort_Mod/Three_Int_Carry_Int.f90'
+  include 'Sort_Mod/Three_Int.f90'
+  include 'Sort_Mod/Three_Real_Carry_Two_Int.f90'
+  include 'Sort_Mod/Three_Real_Carry_Three_Int.f90'
+  include 'Sort_Mod/Three_Real_Carry_Int.f90'
+  include 'Sort_Mod/Three_Real.f90'
+  include 'Sort_Mod/Two_Int_Carry_Two_Int.f90'
+  include 'Sort_Mod/Two_Int_Carry_Int.f90'
+  include 'Sort_Mod/Two_Int.f90'
+  include 'Sort_Mod/Two_Real_Carry_Two_Int.f90'
+  include 'Sort_Mod/Two_Real_Carry_Int.f90'
+  include 'Sort_Mod/Two_Real.f90'
   include 'Sort_Mod/Unique_Int.f90'
 
   end module

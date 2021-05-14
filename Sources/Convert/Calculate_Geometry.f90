@@ -344,7 +344,7 @@
     !-------------------------------------------!
     !   Sort the faces at periodic boundaries   !
     !-------------------------------------------!
-    call Sort_Mod_Real_Carry_Int(b_coor(1:cnt_per), b_face(1:cnt_per))
+    call Sort % Real_Carry_Int(b_coor(1:cnt_per), b_face(1:cnt_per))
 
     !---------------------------------------------!
     !   Match the periodic faces with shadows &   !
@@ -537,7 +537,7 @@
 
       ! Reverse the order of face's nodes
       n = grid % faces_n_nodes(s)  ! number of nodes in this face
-      call Sort_Mod_Reverse_Order_Int(grid % faces_n(1:n, s))
+      call Sort % Reverse_Order_Int(grid % faces_n(1:n, s))
 
       ! Keep the first node first (important if it is concave)
       grid % faces_n(1:n,s) = cshift(grid % faces_n(1:n,s), -1)
@@ -603,15 +603,15 @@
   !                                  !
   !----------------------------------!
   call Grid_Mod_Sort_Faces_By_Index(grid, grid % new_f, grid % n_faces)
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % xf, grid % new_f)
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % yf, grid % new_f)
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % zf, grid % new_f)
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % sx, grid % new_f)
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % sy, grid % new_f)
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % sz, grid % new_f)
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % dx, grid % new_f)
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % dy, grid % new_f)
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % dz, grid % new_f)
+  call Sort % Real_By_Index(grid % n_faces, grid % xf, grid % new_f)
+  call Sort % Real_By_Index(grid % n_faces, grid % yf, grid % new_f)
+  call Sort % Real_By_Index(grid % n_faces, grid % zf, grid % new_f)
+  call Sort % Real_By_Index(grid % n_faces, grid % sx, grid % new_f)
+  call Sort % Real_By_Index(grid % n_faces, grid % sy, grid % new_f)
+  call Sort % Real_By_Index(grid % n_faces, grid % sz, grid % new_f)
+  call Sort % Real_By_Index(grid % n_faces, grid % dx, grid % new_f)
+  call Sort % Real_By_Index(grid % n_faces, grid % dy, grid % new_f)
+  call Sort % Real_By_Index(grid % n_faces, grid % dz, grid % new_f)
 
   ! Why not: grid % n_faces = grid % n_faces - grid % n_shadows?
   grid % n_faces = grid % n_faces - n_per

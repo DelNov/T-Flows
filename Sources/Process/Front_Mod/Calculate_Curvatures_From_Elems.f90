@@ -75,8 +75,8 @@
   end do
 
   ! Remove duplicate entries in the vertex list
-  do e = 1, Front % n_elems
-    call Sort_Mod_Unique_Int(elem_v(1:elem_n_verts(e), e), elem_n_verts(e))
+  do e = 1, front % n_elems
+    call Sort % Unique_Int(elem_v(1:elem_n_verts(e), e), elem_n_verts(e))
   end do
 
   !---------------------------------------------!

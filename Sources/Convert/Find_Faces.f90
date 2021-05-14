@@ -66,7 +66,7 @@
         end do
 
         ! Sort them ...
-        call Sort_Mod_Int(f_nod(1:4))
+        call Sort % Int_Array(f_nod(1:4))
 
         ! ... and store three of the smallest
         face_n1((c-1)*6 + i_fac) = f_nod(1)
@@ -82,10 +82,10 @@
   !--------------------------------------------------!
   !   Sort the cell faces according to coordinates   !
   !--------------------------------------------------!
-  call Sort_Mod_3_Int_Carry_Int(face_n1(1:grid % n_cells*6),    &
-                                face_n2(1:grid % n_cells*6),    &
-                                face_n3(1:grid % n_cells*6),    &
-                                face_cell(1:grid % n_cells*6))
+  call Sort % Three_Int_Carry_Int(face_n1(1:grid % n_cells*6),    &
+                                  face_n2(1:grid % n_cells*6),    &
+                                  face_n3(1:grid % n_cells*6),    &
+                                  face_cell(1:grid % n_cells*6))
 
   !------------------------------------------------!
   !   Anotate cell faces with same coordinates     !

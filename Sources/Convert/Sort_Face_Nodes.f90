@@ -161,7 +161,7 @@
     order(i) = grid % faces_n(i, s)
   end do
 
-  call Sort_Mod_Real_Carry_2_Int(sorting(1:nn),           &
+  call Sort % Real_Carry_Two_Int(sorting(1:nn),           &
                                  grid % faces_n(1:nn,s),  &
                                  order(1:nn))
 

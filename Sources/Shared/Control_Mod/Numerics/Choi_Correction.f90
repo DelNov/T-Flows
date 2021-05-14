@@ -9,7 +9,7 @@
   character(SL) :: val
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('CHOI_CORRECTION', 'yes', val, verbose)
+  call Control_Mod_Read_Char_Item('CHOI_CORRECTION', 'no', val, verbose)
   call To_Upper_Case(val)
 
   if( val .eq. 'YES' ) then
@@ -20,7 +20,7 @@
 
   else
     if(this_proc < 2) then
-      print *, '# ERROR!  Unknown state for track front: ',   &
+      print *, '# ERROR!  Unknown state for Choi''s correction: ',   &
                 trim(val)
       print *, '# Exiting!'
     end if

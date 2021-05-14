@@ -1,16 +1,16 @@
 !==============================================================================!
-  recursive subroutine Sort_Mod_Real_Carry_2_Int(a, b, c)
+  recursive subroutine Int_Array(Sort, a)
 !------------------------------------------------------------------------------!
-!   Quick sort one real array and carry an integer arral along                 !
+!   Quick sort one integer array and carry an integer arral along              !
 !                                                                              !
 !   Adapted from: https://gist.github.com/1AdAstra1  (good work Olga)          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real    :: a(:)
-  integer :: b(:), c(:)
+  class(Sort_Type) :: Sort
+  integer          :: a(:)
 !-----------------------------------[Locals]-----------------------------------!
-  real    :: x
+  integer :: x
   integer :: i, j, n
 !==============================================================================!
 
@@ -28,16 +28,14 @@
     end do
     if(i >= j) exit
 
-    ! Swap values in a and b
-    call Swap_Real(a(i), a(j))
-    call Swap_Int (b(i), b(j))
-    call Swap_Int (c(i), c(j))
+    ! Swap values in a
+    call Swap_Int(a(i), a(j))
 
     i = i + 1
     j = j - 1
   end do
 
-  if(1 < i - 1) call Sort_Mod_Real_Carry_2_Int(a(1:i-1), b(1:i-1), c(1:i-1))
-  if(j + 1 < n) call Sort_Mod_Real_Carry_2_Int(a(j+1:n), b(j+1:n), c(j+1:n))
+  if(1 < i - 1) call Sort % Int_Array(a(1:i-1))
+  if(j + 1 < n) call Sort % Int_Array(a(j+1:n))
 
   end subroutine

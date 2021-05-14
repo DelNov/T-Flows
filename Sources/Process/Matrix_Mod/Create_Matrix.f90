@@ -74,9 +74,9 @@
   ! Sort Matrix % col to make them nice and neat
   ! and also locate the position of diagonal
   do c = 1, grid % n_cells
-    call Sort_Mod_Int(Matrix % col(Matrix % row(c) :  &
-                                   Matrix % row(c) + stencw(c) - 1))
-    do pos = Matrix % row(c),Matrix % row(c+1)-1
+    call Sort % Int_Array(Matrix % col(Matrix % row(c) :  &
+                          Matrix % row(c) + stencw(c) - 1))
+    do pos = Matrix % row(c), Matrix % row(c+1)-1
       if(Matrix % col(pos) .eq. c) Matrix % dia(c) = pos
     end do
   end do 

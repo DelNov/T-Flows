@@ -952,7 +952,7 @@
       end do
 
       ! Perform a unique sort to remove duplicates
-      call Sort_Mod_Unique_Int(all_nodes(1:n), n)
+      call Sort % Unique_Int(all_nodes(1:n), n)
 
       grid % cells_n(1:n, c)  = all_nodes(1:n)
       grid % cells_n_nodes(c) = -n

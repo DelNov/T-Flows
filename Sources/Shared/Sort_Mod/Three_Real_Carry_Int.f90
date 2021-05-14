@@ -1,5 +1,5 @@
 !==============================================================================!
-  recursive subroutine Sort_Mod_3_Real_Carry_Int(a1, a2, a3, b)
+  recursive subroutine Three_Real_Carry_Int(Sort, a1, a2, a3, b)
 !------------------------------------------------------------------------------!
 !   Quick sort three real arrays (think of three coordinates) and carry one    !
 !   integer arral along                                                        !
@@ -8,8 +8,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real    :: a1(:), a2(:), a3(:)
-  integer :: b(:)
+  class(Sort_Type) :: Sort
+  real             :: a1(:), a2(:), a3(:)
+  integer          :: b(:)
 !-----------------------------------[Locals]-----------------------------------!
   real    :: x1, x2, x3
   integer :: i, j, n
@@ -51,13 +52,13 @@
     j = j - 1
   end do
 
-  if(1 < i - 1) call Sort_Mod_3_Real_Carry_Int(a1(1:i-1),  &
-                                               a2(1:i-1),  &
-                                               a3(1:i-1),  &
-                                               b (1:i-1))
-  if(j + 1 < n) call Sort_Mod_3_Real_Carry_Int(a1(j+1:n),  &
-                                               a2(j+1:n),  &
-                                               a3(j+1:n),  &
-                                               b (j+1:n))
+  if(1 < i - 1) call Sort % Three_Real_Carry_Int(a1(1:i-1),  &
+                                                 a2(1:i-1),  &
+                                                 a3(1:i-1),  &
+                                                 b (1:i-1))
+  if(j + 1 < n) call Sort % Three_Real_Carry_Int(a1(j+1:n),  &
+                                                 a2(j+1:n),  &
+                                                 a3(j+1:n),  &
+                                                 b (j+1:n))
 
   end subroutine
