@@ -32,11 +32,7 @@
     real, allocatable :: conductivity(:)  ! [W/(m K)]
     real, allocatable :: density(:)       ! [kg/m^3]
     real, allocatable :: viscosity(:)     ! [kg/m/s]
-
-    ! Defined globally
-    real :: diffusivity      ! [m^2/s]
-    real :: latent_heat      ! [J/kg]
-    real :: sat_temperature  ! [K]
+    real              :: diffusivity      ! [m^2/s]
 
     !---------------------------------------------------!
     !   Associated with momentum conservation eqution   !

@@ -37,8 +37,8 @@
     call Control_Mod_Phase_Capacities      (mult % phase_capa)
     call Control_Mod_Phase_Conductivities  (mult % phase_cond)
     call Control_Mod_Surface_Tension       (mult % surface_tension)
-    call Control_Mod_Latent_Heat           (flow % latent_heat)
-    call Control_Mod_Saturation_Temperature(flow % sat_temperature)
+    call Control_Mod_Latent_Heat           (mult % latent_heat)
+    call Control_Mod_Saturation_Temperature(mult % t_sat)
   else
     flow % density     (:) = dens_const
     flow % viscosity   (:) = visc_const
