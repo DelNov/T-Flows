@@ -18,6 +18,7 @@
     integer :: e(24)
     integer :: s(24)
     integer :: cell        ! cell at which the surface resides
+    integer :: face        ! face which the surface intersects
     real    :: nx, ny, nz  ! surface normal vector
     real    :: xc, yc, zc  ! center of a sphere
     real    :: xe, ye, ze  ! center of element
