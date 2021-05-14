@@ -1,16 +1,16 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(flow, turb, mult, swarm, ts)
+  subroutine User_Mod_Save_Results(flow, turb, Vof, swarm, ts)
 !------------------------------------------------------------------------------!
 !   This subroutine is called each RESULTS_SAVE_INTERVAL (set in control       !
 !   file), at the end of a simulation and after 'save_now' command.            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),      target :: flow
-  type(Turb_Type),       target :: turb
-  type(Multiphase_Type), target :: mult
-  type(Swarm_Type),      target :: swarm
-  integer, intent(in)           :: ts     ! time step
+  type(Field_Type),    target :: flow
+  type(Turb_Type),     target :: turb
+  type(Vof_Type),      target :: Vof
+  type(Swarm_Type),    target :: swarm
+  integer, intent(in)         :: ts     ! time step
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk

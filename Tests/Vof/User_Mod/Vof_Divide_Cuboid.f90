@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Vof_Divide_Cuboid(mult, c)
+  subroutine Vof_Divide_Cuboid(Vof, c)
 !------------------------------------------------------------------------------!
 !   Divides cuboid recursively to make an accurate initialization              !
 !------------------------------------------------------------------------------!
@@ -10,8 +10,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Multiphase_Type), target :: mult
-  integer                       :: c
+  type(Vof_Type), target :: Vof
+  integer                :: c
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   integer                  :: n, fu, n_node_vol, s
@@ -29,7 +29,7 @@
 !==============================================================================!
 
   ! First take aliasesd
-  grid => mult % pnt_grid
+  grid => Vof % pnt_grid
   n_nod_vol = 8
   alloc_nod = 0
   alloc_fac = 0

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Time_Step(flow, turb, mult, swarm, n,    &
+  subroutine User_Mod_End_Of_Time_Step(flow, turb, Vof, swarm, n,    &
                                        n_stat_t, n_stat_p, time)
 !------------------------------------------------------------------------------!
 !   This function computes position of contact line and high of droplet        !
@@ -11,17 +11,17 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),      target :: flow
-  type(Turb_Type),       target :: turb
-  type(Multiphase_Type), target :: mult
-  type(Swarm_Type),      target :: swarm
-  integer, intent(in)           :: n         ! time step
-  integer, intent(in)           :: n_stat_t
-  integer, intent(in)           :: n_stat_p
-  real,    intent(in)           :: time      ! physical time
+  type(Field_Type), target :: flow
+  type(Turb_Type),  target :: turb
+  type(Vof_Type),   target :: Vof
+  type(Swarm_Type), target :: swarm
+  integer, intent(in)      :: n         ! time step
+  integer, intent(in)      :: n_stat_t
+  integer, intent(in)      :: n_stat_p
+  real,    intent(in)      :: time      ! physical time
 !--------------------------------[Locals]--------------------------------------!
   type(Grid_Type), pointer :: grid
-  type(Var_Type),  pointer :: vof
+  type(Var_Type),  pointer :: fun
   integer                  :: s, c, c1, c2, last_cell, fu, n_tot_cells, c_dist
   real                     :: pos_mcl, h_drop !position mcl, droplet height
   real                     :: vol_wall_bot, vol_symm !volume of boundaries
@@ -37,7 +37,7 @@
 
   ! Take aliases
   grid => flow % pnt_grid
-  vof  => mult % vof
+  fun  => Vof % fun
 
   epsloc = epsilon(epsloc)
 
@@ -50,8 +50,8 @@
 
   ! Find max and min vfractions, to limit pressure calculation:
 
-  min_vfrac = minval(vof % n(1:grid % n_cells - grid % comm % n_buff_cells))
-  max_vfrac = maxval(vof % n(1:grid % n_cells - grid % comm % n_buff_cells))
+  min_vfrac = minval(fun % n(1:grid % n_cells - grid % comm % n_buff_cells))
+  max_vfrac = maxval(fun % n(1:grid % n_cells - grid % comm % n_buff_cells))
 
   call Comm_Mod_Global_Min_Real(min_vfrac)
   call Comm_Mod_Global_Max_Real(max_vfrac)
@@ -65,17 +65,17 @@
     sum_v1(c) = u_res
     u_rms = u_rms + u_res ** 2.0
 
-    if (abs(max_vfrac - vof % n(c)) < epsloc) then
+    if (abs(max_vfrac - fun % n(c)) < epsloc) then
       a_in = a_in + grid % vol(c)
       p_in = p_in + flow % p % n(c) * grid % vol(c)
     end if
 
-    if (abs(vof % n(c)) < min_vfrac + epsloc) then
+    if (abs(fun % n(c)) < min_vfrac + epsloc) then
       a_out = a_out + grid % vol(c)
       p_out = p_out + flow % p % n(c) * grid % vol(c)
     end if
 
-    a_vof = a_vof + grid % vol(c) * vof % n(c)
+    a_vof = a_vof + grid % vol(c) * fun % n(c)
 
   end do
 
@@ -117,14 +117,14 @@
   !if(this_proc <= 2) then
   !  dist_n = 0
   !  do c = 1, grid % n_cells
-  !    norm_res = norm2((/vof % x(c), vof % y(c), vof % z(c)/))
+  !    norm_res = norm2((/fun % x(c), fun % y(c), fun % z(c)/))
   !    if(norm_res > epsloc) then
   !      x0 = (/1.0, grid % yc(c), 1.0/)
   !      x1 = (/grid % xc(c), grid % yc(c), grid % zc(c)/)
-  !      x2 = x1 + 10.0 * (/mult % fc_x(c), mult % fc_y(c), mult % fc_z(c)/) &
-  !                       / norm2((/mult % fc_x(c),   &
-  !                                 mult % fc_y(c),   &
-  !                                 mult % fc_z(c)/))
+  !      x2 = x1 + 10.0 * (/Vof % fc_x(c), Vof % fc_y(c), Vof % fc_z(c)/) &
+  !                       / norm2((/Vof % fc_x(c),   &
+  !                                 Vof % fc_y(c),   &
+  !                                 Vof % fc_z(c)/))
   !      dist_ck(c) = norm2( Math_Mod_Cross_Product(x0 - x1, x0 - x2)    &
   !                        / norm2(x2-x1) )
 
@@ -147,15 +147,15 @@
   !! For normals for normals
   !  dist_n = 0
   !  do c = 1, grid % n_cells
-  !    norm_res = norm2((/vof % x(c), vof % y(c), vof % z(c)/))
+  !    norm_res = norm2((/fun % x(c), fun % y(c), fun % z(c)/))
   !    if(norm_res > epsloc) then
   !      x0 = (/1.0, grid % yc(c), 1.0/)
   !      x1 = (/grid % xc(c), grid % yc(c), grid % zc(c)/)
 
-  !      x2 = x1 + 10.0 * (/mult % fs_x(c), mult % fs_y(c), mult % fs_z(c)/) &
-  !                       / norm2((/mult % fs_x(c),   &
-  !                                 mult % fs_y(c),   &
-  !                                 mult % fs_z(c)/))
+  !      x2 = x1 + 10.0 * (/Vof % fs_x(c), Vof % fs_y(c), Vof % fs_z(c)/) &
+  !                       / norm2((/Vof % fs_x(c),   &
+  !                                 Vof % fs_y(c),   &
+  !                                 Vof % fs_z(c)/))
 
   !      dist_cn(c) = norm2( Math_Mod_Cross_Product(x0 - x1, x0 - x2)    &
   !                        / norm2(x2-x1) )

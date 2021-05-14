@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Vof_Interface_Ellipsoid(mult,                          &
+  subroutine Vof_Interface_Ellipsoid(Vof,                           &
                                      c,                             &
                                      cent_x, cent_y, cent_z,        &
                                      radius_1, radius_2, radius_3,  &
@@ -9,11 +9,11 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Multiphase_Type), target :: mult
-  integer, intent(in)           :: c
-  real                          :: cent_x, cent_y, cent_z
-  real                          :: radius_1, radius_2, radius_3
-  real                          :: vof_int
+  type(Vof_Type), target :: Vof
+  integer, intent(in)    :: c
+  real                   :: cent_x, cent_y, cent_z
+  real                   :: radius_1, radius_2, radius_3
+  real                   :: vof_int
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: N = 10000
 !-----------------------------------[Locals]-----------------------------------!
@@ -32,7 +32,7 @@
 !==============================================================================!
 
   ! First take aliases
-  grid => mult % pnt_grid
+  grid => Vof % pnt_grid
 
   ! Initialize variables
   var_comb   = HUGE

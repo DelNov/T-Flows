@@ -1,21 +1,21 @@
 !==============================================================================!
-  subroutine Vof_Interface_Cylinder(mult,               &
-                                    c,                  &
-                                    p1_x, p1_y, p1_z,   &
-                                    p2_x, p2_y, p2_z,   &
-                                    radius, height,     &
+  subroutine Vof_Interface_Cylinder(Vof,               &
+                                    c,                 &
+                                    p1_x, p1_y, p1_z,  &
+                                    p2_x, p2_y, p2_z,  &
+                                    radius, height,    &
                                     vof_int)
 !------------------------------------------------------------------------------!
 !   Computes volume fraction of cell at interface                              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Multiphase_Type), target :: mult
-  integer, intent(in)           :: c
-  real                          :: p1_x, p1_y, p1_z
-  real                          :: p2_x, p2_y, p2_z
-  real                          :: radius, height
-  real                          :: vof_int
+  type(Vof_Type), target :: Vof
+  integer, intent(in)    :: c
+  real                   :: p1_x, p1_y, p1_z
+  real                   :: p2_x, p2_y, p2_z
+  real                   :: radius, height
+  real                   :: vof_int
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: N = 10000
 !-----------------------------------[Locals]-----------------------------------!
@@ -34,7 +34,7 @@
 !==============================================================================!
 
   ! First take aliasesd
-  grid => mult % pnt_grid
+  grid => Vof % pnt_grid
 
   ! Initialize variables
   var_comb   = HUGE

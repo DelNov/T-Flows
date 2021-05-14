@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Vof_Interface_Box(mult,     &
+  subroutine Vof_Interface_Box(Vof,      &
                                c,        &
                                n_xyz,    &
                                dd,       &
@@ -9,11 +9,11 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Multiphase_Type), target :: mult
-  integer, intent(in)           :: c
-  real                          :: n_xyz(6,3)
-  real                          :: dd(6)
-  real                          :: vof_int
+  type(Vof_Type),      target :: Vof
+  integer, intent(in)         :: c
+  real                        :: n_xyz(6,3)
+  real                        :: dd(6)
+  real                        :: vof_int
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: N = 10000
 !-----------------------------------[Locals]-----------------------------------!
@@ -32,7 +32,7 @@
 !==============================================================================!
 
   ! First take aliasesd
-  grid => mult % pnt_grid
+  grid => Vof % pnt_grid
 
   ! Initialize variables
   var_comb   = HUGE
@@ -81,7 +81,7 @@
     points(n_tot,:) = p(1,:)
 
     ! Check if p is inside function:
-    if(Check_Inside_Box(mult, p, dd, n_xyz) == 1) then
+    if(Check_Inside_Box(Vof, p, dd, n_xyz) == 1) then
       n_int = n_int + 1
     end if
 

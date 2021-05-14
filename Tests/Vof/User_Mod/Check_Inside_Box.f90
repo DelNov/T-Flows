@@ -1,16 +1,16 @@
 !==============================================================================!
-  integer function Check_Inside_Box(mult, p, dd, n_xyz, c)
+  integer function Check_Inside_Box(Vof, p, dd, n_xyz, c)
 !------------------------------------------------------------------------------!
 !   Determine if node of cell c lies inside box. Alteratively, if c is not     !
 !   given it can be used to determine if any given point p is inside the box   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Multiphase_Type), target :: mult
-  real, allocatable             :: p(:,:)
-  real                          :: dd(6)
-  real                          :: n_xyz(6,3)
-  integer, optional             :: c
+  type(Vof_Type),    target :: Vof
+  real, allocatable         :: p(:,:)
+  real                      :: dd(6)
+  real                      :: n_xyz(6,3)
+  integer, optional         :: c
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   integer                  :: i_fac,n
@@ -21,7 +21,7 @@
 !==============================================================================!
 
   ! First take aliasesd
-  grid => mult % pnt_grid
+  grid => Vof % pnt_grid
 
   ! loop in cell faces:
   Check_Inside_Box = 0

@@ -6,20 +6,20 @@ include '../User_Mod/Intersection_Line_Face.f90'
 include '../User_Mod/Interpolate_From_Nodes.f90'
 
 !==============================================================================!
-  subroutine User_Mod_Initialize_Variables(flow, turb, mult, swarm, sol)
+  subroutine User_Mod_Initialize_Variables(flow, turb, Vof, swarm, sol)
 !------------------------------------------------------------------------------!
 !   Case-dependent initialization of VOF variable.                             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),      target :: flow
-  type(Turb_Type),       target :: turb
-  type(Multiphase_Type), target :: mult
-  type(Swarm_Type),      target :: swarm
-  type(Solver_Type),     target :: sol
+  type(Field_Type),  target :: flow
+  type(Turb_Type),   target :: turb
+  type(Vof_Type),    target :: Vof
+  type(Swarm_Type),  target :: swarm
+  type(Solver_Type), target :: sol
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: grid
-  type(Var_Type),   pointer :: vof
+  type(Var_Type),   pointer :: fun
   real,             pointer :: dt
   integer                   :: c, c1, c2, s, i_probe, c_inters, n, code, i_s
   integer                   :: i, j
@@ -55,23 +55,23 @@ include '../User_Mod/Interpolate_From_Nodes.f90'
 
   ! Take aliases
   grid  => flow % pnt_grid
-  vof   => mult % vof
+  fun   => Vof % fun
   dt    => flow % dt
 
   epsloc = epsilon(epsloc)
 
   ! Initialize the whole domain as 0.0
   do c = 1, grid % n_cells
-    vof % n(c) = 0.0
+    fun % n(c) = 0.0
   end do
 
   ! Box
-  call Vof_Initialization_Box(mult)
+  call Vof_Initialization_Box(Vof)
 
-  call Grid_Mod_Exchange_Cells_Real(grid, vof % n)
+  call Grid_Mod_Exchange_Cells_Real(grid, fun % n)
 
   ! Old value
-  vof % o(:) = vof % n(:)
+  fun % o(:) = fun % n(:)
 
   ! At faces
 
@@ -81,10 +81,10 @@ include '../User_Mod/Interpolate_From_Nodes.f90'
     c2 = grid % faces_c(2,s)
     if(c2 < 0) then
       if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) then
-        vof % n(c2) = vof % n(c1)
+        fun % n(c2) = fun % n(c1)
       else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
       else
-        vof % n(c2) = vof % n(c1)
+        fun % n(c2) = fun % n(c1)
       end if
     end if
   end do
@@ -146,7 +146,7 @@ include '../User_Mod/Interpolate_From_Nodes.f90'
 
     c_inters = 0
     do s = 1, grid % n_faces
-      call Intersection_Line_Face(flow, mult, s, pab, pint, inters)
+      call Intersection_Line_Face(flow, Vof, s, pab, pint, inters)
 
       if (inters) then
         if (c_inters == 0) then

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Time_Step(flow, turb, mult, swarm, n,    &
+  subroutine User_Mod_End_Of_Time_Step(flow, turb, Vof, swarm, n,    &
                                        n_stat_t, n_stat_p, time)
 !------------------------------------------------------------------------------!
 !   This function computes parasitic current intensities around a droplet      !
@@ -11,16 +11,16 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),      target :: flow
-  type(Turb_Type),       target :: turb
-  type(Multiphase_Type), target :: mult
-  type(Swarm_Type),      target :: swarm
-  integer                       :: n     ! time step
-  integer                       :: n_stat_t, n_stat_p
-  real                          :: time  ! physical time
+  type(Field_Type), target :: flow
+  type(Turb_Type),  target :: turb
+  type(Vof_Type),   target :: Vof
+  type(Swarm_Type), target :: swarm
+  integer                  :: n     ! time step
+  integer                  :: n_stat_t, n_stat_p
+  real                     :: time  ! physical time
 !--------------------------------[Locals]--------------------------------------!
   type(Grid_Type), pointer :: grid
-  type(Var_Type),  pointer :: vof
+  type(Var_Type),  pointer :: fun
   integer                  :: s, c, c1, c2, last_cell, fu, n_tot_cells, c_dist
   real                     :: pos_mcl, h_drop !position mcl, droplet height
   real                     :: vol_wall_bot, vol_symm !volume of boundaries
@@ -36,7 +36,7 @@
 
   ! Take aliases
   grid => flow % pnt_grid
-  vof  => mult % vof
+  fun  => Vof % fun
 
   epsloc = epsilon(epsloc)
 
@@ -51,8 +51,8 @@
 
   ! Find max and min vfractions, to limit pressure calculation:
 
-  min_vfrac = minval(vof % n(1:grid % n_cells - grid % comm % n_buff_cells))
-  max_vfrac = maxval(vof % n(1:grid % n_cells - grid % comm % n_buff_cells))
+  min_vfrac = minval(fun % n(1:grid % n_cells - grid % comm % n_buff_cells))
+  max_vfrac = maxval(fun % n(1:grid % n_cells - grid % comm % n_buff_cells))
 
   call Comm_Mod_Global_Min_Real(min_vfrac)
   call Comm_Mod_Global_Max_Real(max_vfrac)
@@ -66,22 +66,22 @@
     sum_v1(c) = u_res
     u_rms = u_rms + u_res ** 2.0
 
-    if (abs(max_vfrac - vof % n(c)) < epsloc) then
+    if (abs(max_vfrac - fun % n(c)) < epsloc) then
       a_in = a_in + grid % vol(c)
       p_in = p_in + flow % p % n(c) * grid % vol(c)
     end if
 
-    if (abs(vof % n(c)) < min_vfrac + epsloc) then
+    if (abs(fun % n(c)) < min_vfrac + epsloc) then
       a_out = a_out + grid % vol(c)
       p_out = p_out + flow % p % n(c) * grid % vol(c)
     end if
 
-    a_vof = a_vof + grid % vol(c) * vof % n(c)
+    a_vof = a_vof + grid % vol(c) * fun % n(c)
 
-    ngrd = norm2((/vof % x(c), vof % y(c), vof % z(c)/))
-    if(ngrd > epsloc .and. mult % curv(c) > epsloc) then
-      mincurv= min(mincurv, mult % curv(c))
-      maxcurv= max(maxcurv, mult % curv(c))
+    ngrd = norm2((/fun % x(c), fun % y(c), fun % z(c)/))
+    if(ngrd > epsloc .and. Vof % curv(c) > epsloc) then
+      mincurv= min(mincurv, Vof % curv(c))
+      maxcurv= max(maxcurv, Vof % curv(c))
     end if
 
   end do

@@ -1,22 +1,22 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Time_Step(flow, turb, mult, swarm,  &
+  subroutine User_Mod_End_Of_Time_Step(flow, turb, Vof, swarm,  &
                                        n, n_stat_t, n_stat_p, time)
 !------------------------------------------------------------------------------!
 !   This function is computing benchmark for rising bubble.                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),      target :: flow
-  type(Turb_Type),       target :: turb
-  type(Multiphase_Type), target :: mult
-  type(Swarm_Type),      target :: swarm
-  integer, intent(in)           :: n         ! current time step
-  integer, intent(in)           :: n_stat_t  ! 1st t.s. statistics turbulence
-  integer, intent(in)           :: n_stat_p  ! 1st t.s. statistics particles
-  real,    intent(in)           :: time      ! physical time
+  type(Field_Type), target :: flow
+  type(Turb_Type),  target :: turb
+  type(Vof_Type),   target :: Vof
+  type(Swarm_Type), target :: swarm
+  integer, intent(in)      :: n         ! current time step
+  integer, intent(in)      :: n_stat_t  ! 1st t.s. statistics turbulence
+  integer, intent(in)      :: n_stat_p  ! 1st t.s. statistics particles
+  real,    intent(in)      :: time      ! physical time
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
-  type(Var_Type),  pointer :: vof
+  type(Var_Type),  pointer :: fun
   integer                  :: c, last_cell, fu
   real                     :: b_volume, surface, rise_vel_int
   real                     :: circularity, y_pos_cen
@@ -25,7 +25,7 @@
 
   ! Take aliases
   grid => flow % pnt_grid
-  vof  => mult % vof
+  fun  => Vof % fun
 
   !----------------------------------------------!
   !   Bubble volume, surface and rise velocity   !
@@ -34,18 +34,18 @@
   surface = 0.0
   y_pos_cen = 0.0
   rise_vel_int = 0.0
-  call Field_Mod_Grad_Variable(flow, vof)
+  call Field_Mod_Grad_Variable(flow, fun)
 
   do c = 1, grid % n_cells - grid % comm % n_buff_cells
-    b_volume = b_volume + grid % vol(c) * vof % n(c)
-    if (norm2((/vof % x(c),vof % y(c),vof % z(c)/)) > 1.0) then
+    b_volume = b_volume + grid % vol(c) * fun % n(c)
+    if (norm2((/fun % x(c),fun % y(c),fun % z(c)/)) > 1.0) then
 
-      surface = surface + sqrt(vof % x(c) ** 2                    &
-                             + vof % y(c) ** 2                    &
-                             + vof % z(c) ** 2) * grid % vol(c)
+      surface = surface + sqrt(fun % x(c) ** 2                    &
+                             + fun % y(c) ** 2                    &
+                             + fun % z(c) ** 2) * grid % vol(c)
     end if
-    y_pos_cen = y_pos_cen + grid % yc(c) * vof % n(c) * grid % vol(c)
-    rise_vel_int = rise_vel_int + flow % v % n(c) * vof % n(c) * grid % vol(c)
+    y_pos_cen = y_pos_cen + grid % yc(c) * fun % n(c) * grid % vol(c)
+    rise_vel_int = rise_vel_int + flow % v % n(c) * fun % n(c) * grid % vol(c)
   end do
 
   call Comm_Mod_Global_Sum_Real(b_volume)

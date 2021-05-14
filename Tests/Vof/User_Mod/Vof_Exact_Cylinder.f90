@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Vof_Exact_Cylinder(mult,                    &
+  subroutine Vof_Exact_Cylinder(Vof,                     &
                                 c,                       &
                                 p1_x, p1_y, p1_z,        &
                                 p2_x, p2_y, p2_z,        &
@@ -11,13 +11,13 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Multiphase_Type), target :: mult
-  integer                       :: c
-  real                          :: p1_x, p1_y, p1_z
-  real                          :: p2_x, p2_y, p2_z
-  real                          :: radius, height
-  real                          :: vof_int
-  real                          :: min_max_c1, min_max_c2
+  type(Vof_Type), target :: Vof
+  integer                :: c
+  real                   :: p1_x, p1_y, p1_z
+  real                   :: p2_x, p2_y, p2_z
+  real                   :: radius, height
+  real                   :: vof_int
+  real                   :: min_max_c1, min_max_c2
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   integer                  :: nod, n_int, n_tot, n_tot_int, fu
@@ -28,7 +28,7 @@
 !==============================================================================!
 
   ! First take aliasesd
-  grid => mult % pnt_grid
+  grid => Vof % pnt_grid
 
   ! find bounding box:
   xmin =  HUGE; ymin =  HUGE; zmin =  HUGE;

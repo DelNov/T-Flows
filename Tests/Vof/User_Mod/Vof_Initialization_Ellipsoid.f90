@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Vof_Initialization_Ellipsoid(mult)
+  subroutine Vof_Initialization_Ellipsoid(Vof)
 !------------------------------------------------------------------------------!
 !   Initialize dependent variables.  (It is a bit of a mess still)             !
 !------------------------------------------------------------------------------!
@@ -11,7 +11,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Multiphase_Type), target :: mult
+  type(Vof_Type), target :: Vof
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: grid
   integer                   :: c, n, fu, i_nod
@@ -21,7 +21,7 @@
 !==============================================================================!
 
   ! First take aliases
-  grid => mult % pnt_grid
+  grid => Vof % pnt_grid
 
   ! Open file to read Ellipsoid parameters:
   call File_Mod_Open_File_For_Reading('ellipsoid_parameters.ini', fu)
@@ -80,7 +80,7 @@
 
     ! Precision (what on earth?)
     do c = 1, grid % n_cells
-      mult % vof % n(c) = max(prelim_vof(c), mult % vof % n(c))
+      Vof % fun % n(c) = max(prelim_vof(c), Vof % fun % n(c))
     end do
 
   end do

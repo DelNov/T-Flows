@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Vof_Initialization_Plane(mult)
+  subroutine Vof_Initialization_Plane(Vof)
 !------------------------------------------------------------------------------!
 !   Initialize as vof = 1 all cells beneath the plane given by 3 points        !
 !   sorted anticlockwise to the direction of the plane normal                  !
@@ -11,7 +11,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Multiphase_Type),  target :: mult
+  type(Vof_Type), target :: Vof
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: grid
   real, allocatable         :: p_xyz(:,:)
@@ -23,7 +23,7 @@
 !==============================================================================!
 
   ! First take aliases
-  grid => mult % pnt_grid
+  grid => Vof % pnt_grid
 
   prelim_vof = 0.0
 
@@ -95,7 +95,7 @@
 
     ! Precision
     do c = 1, grid % n_cells
-      mult % vof % n(c) = max(prelim_vof(c),mult % vof % n(c))
+      Vof % fun % n(c) = max(prelim_vof(c),Vof % fun % n(c))
     end do
 
   end do

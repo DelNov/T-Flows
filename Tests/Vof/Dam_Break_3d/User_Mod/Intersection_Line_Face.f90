@@ -1,28 +1,27 @@
 !==============================================================================!
-  subroutine Intersection_Line_Face(flow, mult, s, pab, pint, inters)
+  subroutine Intersection_Line_Face(flow, Vof, s, pab, pint, inters)
 !------------------------------------------------------------------------------!
 !   This function finds intersection between a line an face s                  !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),      target :: flow
-  type(Multiphase_Type), target :: mult
-  integer                       :: s
-  real                          :: pab(2,3)
-  real                          :: pint(3)
-  logical                       :: inters
+  type(Field_Type), target :: flow
+  type(Vof_Type),   target :: Vof
+  integer                  :: s
+  real                     :: pab(2,3)
+  real                     :: pint(3)
+  logical                  :: inters
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),      pointer :: grid
-  type(Var_Type),       pointer :: vof
-  integer                       :: i, j, n
-  integer,          allocatable :: list_nodes(:)
-  integer,          allocatable :: edges_count(:)
-  real                          :: determ, dotprod
-  real                          :: lab(3), p01(3), p02(3)
-  real                          :: t, u, v
-  real                          :: n_unit(3), v1(3), v2(3)
-  real                          :: epsloc
-  real                          :: xmin, xmax, ymin, ymax
+  type(Grid_Type), pointer :: grid
+  integer                  :: i, j, n
+  integer,     allocatable :: list_nodes(:)
+  integer,     allocatable :: edges_count(:)
+  real                     :: determ, dotprod
+  real                     :: lab(3), p01(3), p02(3)
+  real                     :: t, u, v
+  real                     :: n_unit(3), v1(3), v2(3)
+  real                     :: epsloc
+  real                     :: xmin, xmax, ymin, ymax
 !==============================================================================!
 
   ! Take aliases

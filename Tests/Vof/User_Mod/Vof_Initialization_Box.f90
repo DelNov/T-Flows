@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Vof_Initialization_Box(mult)
+  subroutine Vof_Initialization_Box(Vof)
 !------------------------------------------------------------------------------!
 !   Initialize as vof = 1 all cells inside a rectangular box defined by eight  !
 !   points, sorted as shown in the schematic below. It should work for any     !
@@ -23,7 +23,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Multiphase_Type),  target :: mult
+  type(Vof_Type), target :: Vof
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: grid
   real                      :: p_xyz(8,3)
@@ -38,7 +38,7 @@
 !==============================================================================!
 
   ! First take aliases
-  grid => mult % pnt_grid
+  grid => Vof % pnt_grid
 
   prelim_vof = 0.0
 
@@ -93,7 +93,7 @@
     end do
 
     do c = 1, grid % n_cells
-      inside_c(c) = Check_Inside_Box(mult, p, dd, n_xyz, c = c)
+      inside_c(c) = Check_Inside_Box(Vof, p, dd, n_xyz, c = c)
     end do
 
     ! Simply interpolate linearly
@@ -101,11 +101,12 @@
       if (inside_c(c) == 1) then
         !prelim_vof(c) = 1.0 - (min_max_crit_2(c) - dd)  &
         !              / (min_max_crit_2(c)-min_max_crit_1(c))
-        call Vof_Interface_Box(mult,               &
+        call Vof_Interface_Box(Vof,               &
                                c,                  &
                                n_xyz,              &
                                dd,                 &
                                prelim_vof(c))
+        prelim_vof(c) = 0.001
 
       else if (inside_c(c) == 2) then
         prelim_vof(c) = 1.0
@@ -114,7 +115,7 @@
 
     ! Precision
     do c = 1, grid % n_cells
-      mult % vof % n(c) = max(prelim_vof(c),mult % vof % n(c))
+      Vof % fun % n(c) = max(prelim_vof(c),Vof % fun % n(c))
     end do
 
   end do

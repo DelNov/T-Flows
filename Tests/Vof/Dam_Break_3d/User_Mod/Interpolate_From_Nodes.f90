@@ -1,15 +1,15 @@
 !==============================================================================!
-  subroutine Interpolate_From_Nodes(grid, mult, var_node, s, i_probe, i_s)
+  subroutine Interpolate_From_Nodes(grid, Vof, var_node, s, i_probe, i_s)
 !------------------------------------------------------------------------------!
 !   This function interpolates nodal values to probe on face s                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type),       target :: grid
-  type(Multiphase_Type), target :: mult
-  real                          :: var_node(1 : grid % n_nodes)
-  integer                       :: s
-  integer                       :: i_probe, i_s
+  type(Grid_Type), target :: grid
+  type(Vof_Type),  target :: Vof
+  real                    :: var_node(1 : grid % n_nodes)
+  integer                 :: s
+  integer                 :: i_probe, i_s
 !-----------------------------------[Locals]-----------------------------------!
   integer             :: n, i_nod   ! counters
   real,   allocatable :: weights(:)

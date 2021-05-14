@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Vof_Initialization_Cylinder(mult)
+  subroutine Vof_Initialization_Cylinder(Vof)
 !------------------------------------------------------------------------------!
 !   Initialize dependent variables.  (It is a bit of a mess still)             !
 !------------------------------------------------------------------------------!
@@ -10,7 +10,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Multiphase_Type), target :: mult
+  type(Vof_Type), target :: Vof
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: grid
   integer                   :: c, n, fu
@@ -22,7 +22,7 @@
 !==============================================================================!
 
   ! First take aliasesd
-  grid => mult % pnt_grid
+  grid => Vof % pnt_grid
 
   prelim_vof = 0.0
 
@@ -76,7 +76,7 @@
 
     ! Interpolate from exact cylinder
     do c = 1, grid % n_cells
-      call Vof_Exact_Cylinder(mult,                                  &
+      call Vof_Exact_Cylinder(Vof,                                  &
                               c,                                     &
                               p1_x, p1_y, p1_z,                      &
                               p2_x, p2_y, p2_z,                      &
@@ -96,7 +96,7 @@
 
     ! Precision
     do c = 1, grid % n_cells
-      mult % vof % n(c) = max(prelim_vof(c),mult % vof % n(c))
+      Vof % fun % n(c) = max(prelim_vof(c),Vof % fun % n(c))
     end do
 
   end do
