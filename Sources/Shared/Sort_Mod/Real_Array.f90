@@ -1,5 +1,5 @@
 !==============================================================================!
-  recursive subroutine Sort_Mod_Real(a)
+  recursive subroutine Real_Array(Sort, a)
 !------------------------------------------------------------------------------!
 !   Quick sort one real array.                                                 !
 !                                                                              !
@@ -7,7 +7,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real :: a(:)
+  class(Sort_Type) :: Sort
+  real             :: a(:)
 !-----------------------------------[Locals]-----------------------------------!
   real    :: x
   integer :: i, j, n
@@ -34,7 +35,7 @@
     j = j - 1
   end do
 
-  if(1 < i - 1) call Sort_Mod_Real(a(1:i-1))
-  if(j + 1 < n) call Sort_Mod_Real(a(j+1:n))
+  if(1 < i - 1) call Sort % Real_Array(a(1:i-1))
+  if(j + 1 < n) call Sort % Real_Array(a(j+1:n))
 
   end subroutine

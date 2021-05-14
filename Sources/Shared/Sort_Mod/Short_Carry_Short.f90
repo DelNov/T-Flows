@@ -1,5 +1,5 @@
 !==============================================================================!
-  recursive subroutine Sort_Mod_Short_Carry_Short(a, b)
+  recursive subroutine Short_Carry_Short(Sort, a, b)
 !------------------------------------------------------------------------------!
 !   Quick sort one real array and carry an integer arral along                 !
 !                                                                              !
@@ -7,8 +7,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer(SP) :: a(:)
-  integer(SP) :: b(:)
+  class(Sort_Type) :: Sort
+  integer(SP)      :: a(:)
+  integer(SP)      :: b(:)
 !-----------------------------------[Locals]-----------------------------------!
   integer(SP) :: x
   integer     :: i, j, n
@@ -36,7 +37,7 @@
     j = j - 1
   end do
 
-  if(1 < i - 1) call Sort_Mod_Short_Carry_Short(a(1:i-1), b(1:i-1))
-  if(j + 1 < n) call Sort_Mod_Short_Carry_Short(a(j+1:n), b(j+1:n))
+  if(1 < i - 1) call Sort % Short_Carry_Short(a(1:i-1), b(1:i-1))
+  if(j + 1 < n) call Sort % Short_Carry_Short(a(j+1:n), b(j+1:n))
 
   end subroutine

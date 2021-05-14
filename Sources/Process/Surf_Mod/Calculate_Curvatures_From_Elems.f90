@@ -86,7 +86,7 @@
 
   ! Remove duplicate entries in the vertex list
   do e = 1, surf % n_elems
-    call Sort_Mod_Unique_Int(elem_v(1:elem_n_verts(e), e), elem_n_verts(e))
+    call Sort % Unique_Int(elem_v(1:elem_n_verts(e), e), elem_n_verts(e))
   end do
 
   !---------------------------------------------!

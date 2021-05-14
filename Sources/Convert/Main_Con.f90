@@ -11,10 +11,10 @@
   character(SL)   :: answer
   character(SL)   :: file_name
   character(SL)   :: file_format    ! 'UNKNOWN', 'FLUENT', 'GAMBIT', 'GMSH'
+  character(SL)   :: app_up
   integer         :: l, p, g, n_grids
+  logical         :: city
 !==============================================================================!
-
-  call Logo_Con
 
   print *, '#================================================================'
   print *, '# Enter the name of the grid file you are importing (with ext.):'
@@ -41,6 +41,18 @@
   grid(1) % name = problem_name(1)
   call To_Upper_Case(grid(1) % name)
 
+  !------------------------------------------!
+  !                                          !
+  !   Check if you are dealing with a city   !
+  !                                          !
+  !------------------------------------------!
+  city = .false.
+  if(l > 10) then
+    app_up = problem_name(1)(l-7:l-4)
+    call To_Upper_Case(app_up)
+    if(app_up .eq. 'CITY') city = .true.
+  end if
+
   !----------------------------------------!
   !                                        !
   !   Read the file and start conversion   !
@@ -57,6 +69,16 @@
     call Find_Parents(grid(1))
   end if
 
+  !-------------------------------------------------------------------------!
+  !                                                                         !
+  !   Inserting buildings; sort cells in height first thing after reading   !
+  !                                                                         !
+  !-------------------------------------------------------------------------!
+  if(city) then
+    call Insert_Buildings(grid)
+  end if
+
+  call Logo_Con
   ! For Gambit and Gmsh grids, no face information is stored
   if(file_format .eq. 'GAMBIT' .or. file_format .eq. 'GMSH') then
     call Grid_Topology(grid(1))

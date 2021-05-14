@@ -1,5 +1,5 @@
 !==============================================================================!
-  recursive subroutine Sort_Mod_Int_Carry_Int(a, b)
+  recursive subroutine Int_Carry_Int(Sort, a, b)
 !------------------------------------------------------------------------------!
 !   Quick sort one integer array and carry another integer arral along         !
 !                                                                              !
@@ -7,8 +7,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer :: a(:)
-  integer :: b(:)
+  class(Sort_Type) :: Sort
+  integer          :: a(:)
+  integer          :: b(:)
 !-----------------------------------[Locals]-----------------------------------!
   integer :: x, at
   integer :: bt
@@ -38,7 +39,7 @@
     j = j - 1
   end do
 
-  if(1 < i - 1) call Sort_Mod_Int_Carry_Int(a(1:i-1), b(1:i-1))
-  if(j + 1 < n) call Sort_Mod_Int_Carry_Int(a(j+1:n), b(j+1:n))
+  if(1 < i - 1) call Sort % Int_Carry_Int(a(1:i-1), b(1:i-1))
+  if(j + 1 < n) call Sort % Int_Carry_Int(a(j+1:n), b(j+1:n))
 
   end subroutine

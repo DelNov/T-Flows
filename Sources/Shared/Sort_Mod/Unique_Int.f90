@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Sort_Mod_Unique_Int(values, nu)
+  subroutine Unique_Int(Sort, values, nu)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
@@ -7,8 +7,9 @@
 !   unsorted integers.  The original array is overwritten, the number of       !
 !   unique members is returned in argument "nu".                               !
 !---------------------------------[Arguments]----------------------------------!
-  integer :: values(:)
-  integer :: nu
+  class(Sort_Type) :: Sort
+  integer          :: values(:)
+  integer          :: nu
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: i, min_val, max_val
   integer, allocatable :: unique(:)

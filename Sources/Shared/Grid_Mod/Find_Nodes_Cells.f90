@@ -85,7 +85,7 @@
               nc2 = grid % nodes_n_cells(n2)  ! number of cells arund node 2
               cell_list(    1:nc1    ) = grid % nodes_c(1:nc1, n1)
               cell_list(nc1+1:nc1+nc2) = grid % nodes_c(1:nc2, n2)
-              call Sort_Mod_Unique_Int(cell_list(1:nc1+nc2), nu)
+              call Sort % Unique_Int(cell_list(1:nc1+nc2), nu)
 
               ! Copy unique list of cells to both nodes' lists
               grid % nodes_n_cells(n1) = nu

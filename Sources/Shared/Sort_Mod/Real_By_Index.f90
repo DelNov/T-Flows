@@ -1,13 +1,14 @@
 !==============================================================================!
-  subroutine Sort_Mod_Real_By_Index(n, x, indx)
+  subroutine Real_By_Index(Sort, n, x, indx)
 !------------------------------------------------------------------------------!
 !   Sorts real array x according to indx.                                      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer :: n
-  real    :: x(n)
-  integer :: indx(n)
+  class(Sort_Type) :: Sort
+  integer          :: n
+  real             :: x(n)
+  integer          :: indx(n)
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: i
   real, allocatable :: work(:)

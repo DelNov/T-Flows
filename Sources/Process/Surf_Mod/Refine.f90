@@ -31,7 +31,7 @@
   end do
 
   ! Sort all elements by their areas
-  call Sort_Mod_Real_Carry_Int(areas(1:ne), elems(1:ne))
+  call Sort % Real_Carry_Int(areas(1:ne), elems(1:ne))
 
   ! Refine ten biggest element
   ne_old = ne

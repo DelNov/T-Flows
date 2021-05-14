@@ -34,7 +34,7 @@
   end do
 
   ! Sort the nodes by their coordinates
-  call Sort_Mod_3_Real_Carry_Int(xn, yn, zn, grid % old_n)
+  call Sort % Three_Real_Carry_Int(xn, yn, zn, grid % old_n)
 
   !-----------------------------------------------------!
   !   Look for duplicates and assign new node numbers   !
@@ -63,9 +63,9 @@
     print '(a,i0.0,a)', ' # ', grid % n_nodes - cnt, ' duplicate nodes' //  &
                         ' found; compressing them now!'
 
-    call Sort_Mod_Real_By_Index(grid % n_nodes, grid % xn, grid % new_n)
-    call Sort_Mod_Real_By_Index(grid % n_nodes, grid % yn, grid % new_n)
-    call Sort_Mod_Real_By_Index(grid % n_nodes, grid % zn, grid % new_n)
+    call Sort % Real_By_Index(grid % n_nodes, grid % xn, grid % new_n)
+    call Sort % Real_By_Index(grid % n_nodes, grid % yn, grid % new_n)
+    call Sort % Real_By_Index(grid % n_nodes, grid % zn, grid % new_n)
 
     ! Cells' nodes
     do c = -grid % n_bnd_cells, grid % n_cells

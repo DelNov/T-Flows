@@ -58,9 +58,9 @@
   !--------------------------------------------------!
   !   Sort new numbers according to three criteria   !
   !--------------------------------------------------!
-  call Sort_Mod_3_Int_Carry_Int(criteria(1:grid % n_faces, 1),  &
-                                criteria(1:grid % n_faces, 2),  &
-                                criteria(1:grid % n_faces, 3), grid % old_f)
+  call Sort % Three_Int_Carry_Int(criteria(1:grid % n_faces, 1),  &
+                                  criteria(1:grid % n_faces, 2),  &
+                                  criteria(1:grid % n_faces, 3), grid % old_f)
 
   !------------------------------------------!
   !   Copy sorted c1s to face_c structure,   !
@@ -134,19 +134,19 @@
   end do
 
   ! Do the actual sorting
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % sx(1), grid % new_f(1))
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % sy(1), grid % new_f(1))
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % sz(1), grid % new_f(1))
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % dx(1), grid % new_f(1))
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % dy(1), grid % new_f(1))
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % dz(1), grid % new_f(1))
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % f (1), grid % new_f(1))
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % xf(1), grid % new_f(1))
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % yf(1), grid % new_f(1))
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % zf(1), grid % new_f(1))
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % rx(1), grid % new_f(1))
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % ry(1), grid % new_f(1))
-  call Sort_Mod_Real_By_Index(grid % n_faces, grid % rz(1), grid % new_f(1))
+  call Sort % Real_By_Index(grid % n_faces, grid % sx(1), grid % new_f(1))
+  call Sort % Real_By_Index(grid % n_faces, grid % sy(1), grid % new_f(1))
+  call Sort % Real_By_Index(grid % n_faces, grid % sz(1), grid % new_f(1))
+  call Sort % Real_By_Index(grid % n_faces, grid % dx(1), grid % new_f(1))
+  call Sort % Real_By_Index(grid % n_faces, grid % dy(1), grid % new_f(1))
+  call Sort % Real_By_Index(grid % n_faces, grid % dz(1), grid % new_f(1))
+  call Sort % Real_By_Index(grid % n_faces, grid % f (1), grid % new_f(1))
+  call Sort % Real_By_Index(grid % n_faces, grid % xf(1), grid % new_f(1))
+  call Sort % Real_By_Index(grid % n_faces, grid % yf(1), grid % new_f(1))
+  call Sort % Real_By_Index(grid % n_faces, grid % zf(1), grid % new_f(1))
+  call Sort % Real_By_Index(grid % n_faces, grid % rx(1), grid % new_f(1))
+  call Sort % Real_By_Index(grid % n_faces, grid % ry(1), grid % new_f(1))
+  call Sort % Real_By_Index(grid % n_faces, grid % rz(1), grid % new_f(1))
 
   ! Correct shadow faces
   do s = grid % n_faces + 1, grid % n_faces + grid % n_shadows

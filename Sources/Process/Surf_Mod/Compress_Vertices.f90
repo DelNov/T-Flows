@@ -44,7 +44,7 @@
     zv(v) = vert(v) % z_n
     ni(v) = v
   end do
-  call Sort_Mod_3_Real_Carry_Int(xv, yv, zv, ni)
+  call Sort % Three_Real_Carry_Int(xv, yv, zv, ni)
 
   !-----------------------------------------!
   !   Count compressed number of vertices   !
@@ -82,7 +82,7 @@
   !--------------------------------!
   !   Correct elements' vertices   !
   !--------------------------------!
-  call Sort_Mod_Int_Carry_Int(ni, new_n)
+  call Sort % Int_Carry_Int(ni, new_n)
 
   do e = 1, ne
     elem(e) % v(1) = new_n(elem(e) % v(1))

@@ -62,7 +62,7 @@
     ni(s) = s
   end do
 
-  call Sort_Mod_2_Int_Carry_Int(ci, di, ei)
+  call Sort % Two_Int_Carry_Int(ci, di, ei)
 
   !------------------------!
   !   Compress the sides   !

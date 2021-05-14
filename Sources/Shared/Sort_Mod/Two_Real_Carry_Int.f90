@@ -1,5 +1,5 @@
 !==============================================================================!
-  recursive subroutine Sort_Mod_2_Real_Carry_Int(a1, a2, b)
+  recursive subroutine Two_Real_Carry_Int(Sort, a1, a2, b)
 !------------------------------------------------------------------------------!
 !   Quick sort two real arrays and carry one integer array along               !
 !                                                                              !
@@ -7,8 +7,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real    :: a1(:), a2(:)
-  integer :: b(:)
+  class(Sort_Type) :: Sort
+  real             :: a1(:), a2(:)
+  integer          :: b(:)
 !-----------------------------------[Locals]-----------------------------------!
   real    :: x1, x2
   integer :: i, j, n
@@ -42,10 +43,10 @@
     j = j - 1
   end do
 
-  if(1 < i - 1) call Sort_Mod_2_Real_Carry_Int(a1(1:i-1),  &
+  if(1 < i - 1) call Sort % Two_Real_Carry_Int(a1(1:i-1),  &
                                                a2(1:i-1),  &
                                                b (1:i-1))
-  if(j + 1 < n) call Sort_Mod_2_Real_Carry_Int(a1(j+1:n),  &
+  if(j + 1 < n) call Sort % Two_Real_Carry_Int(a1(j+1:n),  &
                                                a2(j+1:n),  &
                                                b (j+1:n))
 

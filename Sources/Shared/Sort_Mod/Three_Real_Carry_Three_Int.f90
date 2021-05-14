@@ -1,15 +1,16 @@
 !==============================================================================!
-  recursive subroutine Sort_Mod_3_Real_Carry_2_Int(a1, a2, a3, b, c)
+  recursive subroutine Three_Real_Carry_Three_Int(Sort, a1, a2, a3, b, c, d)
 !------------------------------------------------------------------------------!
-!   Quick sort three real arrays (think of three coordinates) and carry two    !
+!   Quick sort three real arrays (think of three coordinates) and carry three  !
 !   integer arrays along                                                       !
 !                                                                              !
 !   Adapted from: https://gist.github.com/1AdAstra1  (good work Olga)          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real    :: a1(:), a2(:), a3(:)
-  integer :: b(:), c(:)
+  class(Sort_Type) :: Sort
+  real             :: a1(:), a2(:), a3(:)
+  integer          :: b(:), c(:), d(:)
 !-----------------------------------[Locals]-----------------------------------!
   real    :: x1, x2, x3
   integer :: i, j, n
@@ -41,26 +42,29 @@
     end do
     if(i >= j) exit
 
-    ! Swap values in a, b and c
+    ! Swap values in a, b, c and d
     call Swap_Real(a1(i), a1(j))
     call Swap_Real(a2(i), a2(j))
     call Swap_Real(a3(i), a3(j))
     call Swap_Int (b (i), b (j))
     call Swap_Int (c (i), c (j))
+    call Swap_Int (d (i), d (j))
 
     i = i + 1
     j = j - 1
   end do
 
-  if(1 < i - 1) call Sort_Mod_3_Real_Carry_2_Int(a1(1:i-1),  &
-                                                 a2(1:i-1),  &
-                                                 a3(1:i-1),  &
-                                                 b (1:i-1),  &
-                                                 c (1:i-1))
-  if(j + 1 < n) call Sort_Mod_3_Real_Carry_2_Int(a1(j+1:n),  &
-                                                 a2(j+1:n),  &
-                                                 a3(j+1:n),  &
-                                                 b (j+1:n),  &
-                                                 c (j+1:n))
+  if(1 < i - 1) call Sort % Three_Real_Carry_Three_Int(a1(1:i-1),  &
+                                                       a2(1:i-1),  &
+                                                       a3(1:i-1),  &
+                                                       b (1:i-1),  &
+                                                       c (1:i-1),  &
+                                                       d (1:i-1))
+  if(j + 1 < n) call Sort % Three_Real_Carry_Three_Int(a1(j+1:n),  &
+                                                       a2(j+1:n),  &
+                                                       a3(j+1:n),  &
+                                                       b (j+1:n),  &
+                                                       c (j+1:n),  &
+                                                       d (j+1:n))
 
   end subroutine

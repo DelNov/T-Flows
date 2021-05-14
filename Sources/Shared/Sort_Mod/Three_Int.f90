@@ -1,5 +1,5 @@
 !==============================================================================!
-  recursive subroutine Sort_Mod_3_Int(a1, a2, a3)
+  recursive subroutine Three_Int(Sort, a1, a2, a3)
 !------------------------------------------------------------------------------!
 !   Quick sort three integer arrays                                            !
 !                                                                              !
@@ -9,8 +9,9 @@
 !---------------------------------[Arguments]----------------------------------!
   integer :: a1(:), a2(:), a3(:)
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: x1, x2, x3
-  integer :: i, j, n
+  class(Sort_Type) :: Sort
+  integer          :: x1, x2, x3
+  integer          :: i, j, n
 !==============================================================================!
 
   n = size(a1, 1)
@@ -42,11 +43,11 @@
     j = j - 1
   end do
 
-  if(1 < i - 1) call Sort_Mod_3_Int(a1(1:i-1),  &
-                                    a2(1:i-1),  &
-                                    a3(1:i-1))
-  if(j + 1 < n) call Sort_Mod_3_Int(a1(j+1:n),  &
-                                    a2(j+1:n),  &
-                                    a3(j+1:n))
+  if(1 < i - 1) call Sort % Three_Int(a1(1:i-1),  &
+                                      a2(1:i-1),  &
+                                      a3(1:i-1))
+  if(j + 1 < n) call Sort % Three_Int(a1(j+1:n),  &
+                                      a2(j+1:n),  &
+                                      a3(j+1:n))
 
   end subroutine
