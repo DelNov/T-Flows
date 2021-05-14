@@ -22,8 +22,10 @@
   type(Matrix_Type), pointer :: M               ! momentum matrix
   real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2
-  character(SL)              :: solver
+  integer, save              :: total_cells
+  real                       :: total_source
   real                       :: p_max, p_min, p_nor, p_nor_c, dt, a12, fs
+  character(SL)              :: solver
 !==============================================================================!
 !
 !   The form of equations which I am solving:
@@ -173,10 +175,25 @@
     call Multiphase_Mod_Vof_Pressure_Correction(mult, Sol)
   end if
 
-  !-------------------------------------!
-  !   Correct fluxes with body forces   !
-  !-------------------------------------!
-  ! call Field_Mod_Correct_Fluxes_With_Body_Forces(flow, Sol)
+  !----------------------------------------!
+  !   Balance the source over processors   !
+  !----------------------------------------!
+  ! Since the introduction of face-based body forces, a very slight
+  ! imbalance in pressure source can occur globally (over all processors)
+  ! and we are talking about the values of the order 1e-18 here.  This
+  ! happens because of the round-off errors associated with real arithmetics
+  ! performed in CPUs, meaning that: A + B = B + A + epsilon.  If forces
+  ! are computed over faces, they are slightly different in different
+  ! processors due to these round-off errors, although values in cells
+  ! surrounding them are the same after exchanging the buffers.  In order
+  !  to fix it, the balancing procedure which follows is introduced.
+  if(total_cells .eq. 0) then  ! wasn't set yet
+    total_cells = grid % n_cells - grid % comm % n_buff_cells
+    call Comm_Mod_Global_Sum_Int(total_cells)
+  end if
+  total_source = sum(b(1:(grid % n_cells - grid % comm % n_buff_cells)))
+  call Comm_Mod_Global_Sum_Real(total_source)
+  b(:) = b(:) - total_source/real(total_cells)
 
   ! Get solver
   call Control_Mod_Solver_For_Pressure(solver)
