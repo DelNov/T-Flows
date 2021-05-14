@@ -166,17 +166,10 @@
 
   end do
 
-  !-------------------------------------------------------------!
-  !   In case of VOF, surface tension and  gravity correction   !
-  !-------------------------------------------------------------!
-  if(mult % model .eq. VOLUME_OF_FLUID) then
-    call Multiphase_Mod_Vof_Pressure_Correction(mult, Sol)
-  end if
-
-  !-------------------------------------!
-  !   Correct fluxes with body forces   !
-  !-------------------------------------!
-  ! call Field_Mod_Correct_Fluxes_With_Body_Forces(flow, Sol)
+  !-------------------------------------------------------------------------!
+  !   In case of mass transfer, add addtional source to pressure equation   !
+  !-------------------------------------------------------------------------!
+  call Multiphase_Mod_Vof_Mass_Transfer_Pressure_Source(mult, b)
 
   ! Get solver
   call Control_Mod_Solver_For_Pressure(solver)
