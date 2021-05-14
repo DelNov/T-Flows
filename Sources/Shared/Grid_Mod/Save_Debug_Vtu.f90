@@ -216,6 +216,16 @@
   write(fu) IN_4 // '</DataArray>' // LF
   data_offset = data_offset + SP + nc * IP  ! prepare for next
 
+  ! Cell center coordinates
+  write(str1, '(i0.0)') data_offset
+  write(fu) IN_4 // '<DataArray type="Float64"'            //  &
+                    ' Name="'// 'CellCoordinates' // '"'   //  &
+                    ' NumberOfComponents="3"'              //  &
+                    ' format="appended"'                   //  &
+                    ' offset="' // trim(str1)       //'">' // LF
+  write(fu) IN_4 // '</DataArray>' // LF
+  data_offset = data_offset + SP + nc * RP * 3  ! prepare for next
+
   ! Additional cell scalar
   if(present(scalar_cell)) then
     write(str1, '(i0.0)') data_offset
@@ -410,6 +420,13 @@
   write(fu) data_size
   do c = cs, ce
     write(fu) grid % comm % cell_proc(c)
+  end do
+
+  ! Cell center coordinates
+  data_size = int(nc * RP * 3, SP)
+  write(fu) data_size
+  do c = cs, ce
+    write(fu) grid % xc(c), grid % yc(c), grid % zc(c)
   end do
 
   ! Additional cell data

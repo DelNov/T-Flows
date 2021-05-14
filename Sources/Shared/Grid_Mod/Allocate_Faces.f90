@@ -40,6 +40,11 @@
   allocate(grid % yf(nf+ns));  grid % yf(:) = 0.0
   allocate(grid % zf(nf+ns));  grid % zf(:) = 0.0
 
+  ! Face-based intersection with surface (needed for phase change)
+  allocate(grid % xs(nf+ns));  grid % xs(:) = 0.0
+  allocate(grid % ys(nf+ns));  grid % ys(:) = 0.0
+  allocate(grid % zs(nf+ns));  grid % zs(:) = 0.0
+
   ! Vectors connecting face center with face cell centers connection
   allocate(grid % rx(nf+ns));  grid % rx(:) = 0.0
   allocate(grid % ry(nf+ns));  grid % ry(:) = 0.0
