@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Front_Mod_Place_At_Var_Value(front, phi, Sol, phi_e, verbose)
+  subroutine Place_At_Var_Value(Front, phi, Sol, phi_e, verbose)
 !------------------------------------------------------------------------------!
 !   Places surface where variable phi has value phi_e                          !
 !------------------------------------------------------------------------------!
@@ -12,7 +12,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Front_Type),   target :: front
+  class(Front_Type), target :: Front
   type(Var_Type),    target :: phi
   type(Solver_Type), target :: Sol   ! needed for smoothing
   real                      :: phi_e
@@ -26,7 +26,7 @@
   integer,           pointer :: nv, ne
   integer, allocatable       :: n_cells_v(:)
   integer                    :: c, c1, c2, s, j, n1, n2, run, nb, nc, n, nn
-  integer                    :: v, n_vert, n_verts_in_buffers
+  integer                    :: v, n_vert, n_verts_in_buffers, i_nod
   integer                    :: en(12,2)  ! edge numbering
   real                       :: phi1, phi2, xn1, yn1, zn1, xn2, yn2, zn2, w1, w2
   real                       :: surf_v(3), dist
@@ -35,19 +35,23 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => front % pnt_grid
-  flow => front % pnt_flow
-  nv   => front % n_verts
-  ne   => front % n_elems
-  vert => front % vert
-  elem => front % elem
+  grid => Front % pnt_grid
+  flow => Front % pnt_flow
+  nv   => Front % n_verts
+  ne   => Front % n_elems
+  vert => Front % vert
+  elem => Front % elem
   A    => Sol % A
   nb   = grid % n_bnd_cells
   nc   = grid % n_cells
   nn   = grid % n_nodes
 
-  call Front_Mod_Initialize(front)
+  call Front % Initialize_Front()
   call Field_Mod_Interpolate_Cells_To_Nodes(flow, phi % n, phi_n(1:nn))
+
+  CALL GRID_MOD_SAVE_DEBUG_VTU(GRID, 'PHI_C',         &
+                               SCALAR_CELL=PHI % N,   &
+                               SCALAR_NAME='PHI_C')
 
   CALL GRID_MOD_SAVE_DEBUG_VTU(GRID, 'PHI_N',       &
                                SCALAR_NODE=PHI_N,   &
@@ -55,10 +59,19 @@
 
   !-----------------------------------------------!
   !   This is a bit ad-hoc - if some points are   !
-  !   "exactly" 0.5, increase them a little bit   !
+  !    "exactly" 0.5, change them a little bit    !
   !-----------------------------------------------!
-  do n = 1, nn
-    if(Math_Mod_Approx_Real(phi_n(n), 0.5)) phi_n(n) = 0.5 + MILI
+  do c = 1, nc
+    do i_nod = 1, grid % cells_n_nodes(c)
+      n = grid % cells_n(i_nod, c)
+      if(Math_Mod_Approx_Real(phi_n(n), 0.5)) then
+        if(phi % n(c) < phi % o(c)) then
+          phi_n(n) = 0.5 - MILI
+        else
+          phi_n(n) = 0.5 + MILI
+        end if
+      end if
+    end do
   end do
 
   !-----------------------------!
@@ -161,10 +174,10 @@
       surf_v(3) = phi % z(c)
 
       ! If valid elements were formed
-      if(n_vert .eq. 3) call Front_Mod_Handle_3_Points(front, surf_v)
-      if(n_vert .eq. 4) call Front_Mod_Handle_4_Points(front, surf_v)
-      if(n_vert .eq. 5) call Front_Mod_Handle_5_Points(front, surf_v)
-      if(n_vert .eq. 6) call Front_Mod_Handle_6_Points(front, surf_v)
+      if(n_vert .eq. 3) call Front % Handle_3_Points(surf_v)
+      if(n_vert .eq. 4) call Front % Handle_4_Points(surf_v)
+      if(n_vert .eq. 5) call Front % Handle_5_Points(surf_v)
+      if(n_vert .eq. 6) call Front % Handle_6_Points(surf_v)
       if(n_vert .eq. 7) then
         print *, '# ERROR: seven vertices in an intersection!'
         stop
@@ -187,22 +200,23 @@
   !   Compress vertices   !
   !                       !
   !-----------------------!
-  call Front_Mod_Compress_Vertices(front, verbose)
+  call Front % Compress_Vertices(verbose)
 
   !----------------!
   !                !
   !   Find sides   !
   !                !
   !----------------!
-  call Front_Mod_Find_Connectivity(front, verbose)
+  call Front % Find_Connectivity(verbose)
 
-  !--------------------------------!
-  !   Find nearest cell and node   !
-  !--------------------------------!
+  !----------------------------------!
+  !    Find nearest cell and node    !
+  !   (Not sure if this is needed)   !
+  !----------------------------------!
   n_verts_in_buffers = 0
   do v = 1, nv
-    call Front_Mod_Find_Nearest_Cell(front, v, n_verts_in_buffers)
-    call Front_Mod_Find_Nearest_Node(front, v)
+    call Front % Find_Nearest_Cell(v, n_verts_in_buffers)
+    call Front % Find_Nearest_Node(v)
   end do
 
   !--------------------------------------!
@@ -212,12 +226,20 @@
   !--------------------------------------!
 
   ! Element geometry has changed, recompute geometrical quantities
-  call Front_Mod_Find_Vertex_Elements(front)
-  call Front_Mod_Calculate_Element_Centroids(front)
-  call Front_Mod_Calculate_Element_Normals(front, phi)
+  call Front % Find_Vertex_Elements()
+  call Front % Calculate_Element_Centroids()
+  call Front % Calculate_Element_Normals(phi)
 
   ! Restore the true values of phi
   phi % n(:) = phi_o(:)
+
+  !-----------------------------------------------------------------!
+  !                                                                 !
+  !    Find cells at elements and intersect faces with elements     !
+  !   (This is needed only for mass transfer problems with front)   !
+  !                                                                 !
+  !-----------------------------------------------------------------!
+  call Front % Mark_Cells_And_Faces(phi)
 
   return
 

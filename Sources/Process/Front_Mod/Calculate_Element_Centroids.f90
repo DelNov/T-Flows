@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Front_Mod_Calculate_Element_Centroids(front)
+  subroutine Calculate_Element_Centroids(Front)
 !------------------------------------------------------------------------------!
 !   Calculates element centroids                                               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Front_Type), target :: front
+  class(Front_Type), target :: Front
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: vert(:)
   type(Elem_Type), pointer :: elem(:)
@@ -14,9 +14,9 @@
 !==============================================================================!
 
   ! Take aliases
-  ne   => front % n_elems
-  vert => front % vert
-  elem => front % elem
+  ne   => Front % n_elems
+  vert => Front % vert
+  elem => Front % elem
 
   !---------------------------------!
   !   Browse through all elements   !

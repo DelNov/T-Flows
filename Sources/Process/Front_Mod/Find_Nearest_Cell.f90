@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine Front_Mod_Find_Nearest_Cell(front, v, n_verts_in_buffers)
+  subroutine Find_Nearest_Cell(Front, v, n_verts_in_buffers)
 !------------------------------------------------------------------------------!
 !   Finds a cell closest to a vertex.                                          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Front_Type), target :: front
-  integer                  :: v                   ! vertex number
-  integer                  :: n_verts_in_buffers
+  class(Front_Type), target :: Front
+  integer                   :: v                   ! vertex number
+  integer                   :: n_verts_in_buffers
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Vert_Type), pointer :: vert
@@ -22,8 +22,8 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => front % pnt_grid
-  vert => front % vert(v)
+  grid => Front % pnt_grid
+  vert => Front % vert(v)
 
   ! Initialize cc and cb to zero (important)
   cc = 0

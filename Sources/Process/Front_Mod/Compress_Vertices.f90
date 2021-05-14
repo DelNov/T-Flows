@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Front_Mod_Compress_Vertices(front, verbose)
+  subroutine Compress_Vertices(Front, verbose)
 !------------------------------------------------------------------------------!
 !   Compresses vertices' list                                                  !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Front_Type), target :: front
-  logical                  :: verbose
+  class(Front_Type), target :: Front
+  logical                   :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: vert(:)
   type(Elem_Type), pointer :: elem(:)
@@ -17,10 +17,10 @@
 !==============================================================================!
 
   ! Take aliases
-  nv   => front % n_verts
-  ne   => front % n_elems
-  vert => front % vert
-  elem => front % elem
+  nv   => Front % n_verts
+  ne   => Front % n_elems
+  vert => Front % vert
+  elem => Front % elem
 
   ! Check sanity of the elements so far
   do e = 1, ne
@@ -28,7 +28,8 @@
       do j_ver = i_ver+1, elem(e) % nv
         if(elem(e) % v(i_ver) .eq. elem(e) % v(j_ver)) then
           print '(a)',      ' # ERROR in the beginning of Compress_Vertices'
-          print '(a,i6,a)', ' # element ', e, 'has same vertices'
+          print '(a,i6,a)', ' # element ', e, ' has some duplicate vertices'
+          stop
         end if
       end do
     end do
@@ -54,17 +55,17 @@
   n_vert = 1
   new_n(1) = n_vert
   do v = 2, nv
-    if(.not. Math_Mod_Approx_Real(xv(v), xv(v-1), MICRO)) then
+    if(.not. Math_Mod_Approx_Real(xv(v), xv(v-1), NANO)) then
       n_vert = n_vert + 1
 
     ! xi(v) .eq. xi(v-1)
     else
-      if(.not. Math_Mod_Approx_Real(yv(v), yv(v-1), MICRO)) then
+      if(.not. Math_Mod_Approx_Real(yv(v), yv(v-1), NANO)) then
         n_vert = n_vert + 1
 
       ! xi(v) .eq. xi(v-1) and yi(v) .eq. yi(v-1)
       else
-        if(.not. Math_Mod_Approx_Real(zv(v), zv(v-1), MICRO)) then
+        if(.not. Math_Mod_Approx_Real(zv(v), zv(v-1), NANO)) then
           n_vert = n_vert + 1
         end if
       end if
@@ -102,7 +103,8 @@
       do j_ver = i_ver+1, elem(e) % nv
         if(elem(e) % v(i_ver) .eq. elem(e) % v(j_ver)) then
           print '(a)',      ' # ERROR in the end of Compress_Vertices'
-          print '(a,i6,a)', ' # element ', e, 'has same vertices'
+          print '(a,i6,a)', ' # element ', e, ' has some duplicate vertices'
+          stop
         end if
       end do
     end do

@@ -1,2 +1,10 @@
 This is simplified front tracking, similar to work by Juric.  It started out
 as a copy of Surf_Mod, but will change with time, I am not sure how, yet.
+
+It proved to be useful for phase change, to locate the interface, compute
+temperature gradients taking satuarion temperature of the surface into
+account and so forth.
+
+In May 2021, it turned into a class ... meaning that Surf_Mod, which bears
+manhy similarities with this module, could inherit the functions which are
+the same.

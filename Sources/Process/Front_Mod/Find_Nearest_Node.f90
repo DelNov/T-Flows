@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine Front_Mod_Find_Nearest_Node(front, v)
+  subroutine Find_Nearest_Node(Front, v)
 !------------------------------------------------------------------------------!
 !   Finds a node closest to a vertex.                                          !
 !   Important: it assumes that the closest cell has been found!                !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Front_Type), target :: front
-  integer                  :: v      ! vertex number
+  class(Front_Type), target :: Front
+  integer                   :: v      ! vertex number
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: flow
   type(Grid_Type),  pointer :: grid
@@ -20,9 +20,9 @@
 !==============================================================================!
 
   ! Take aliases
-  flow => front % pnt_flow
-  grid => front % pnt_grid
-  vert => front % vert(v)
+  flow => Front % pnt_flow
+  grid => Front % pnt_grid
+  vert => Front % vert(v)
 
   !-------------------------------------------------!
   !   Browse through all cells as another example   !

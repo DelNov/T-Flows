@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Front_Mod_Find_Connectivity(front, verbose)
+  subroutine Find_Connectivity(Front, verbose)
 !------------------------------------------------------------------------------!
 !   Finds connectivity for sides and elements                                  !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Front_Type), target :: front
-  logical                 :: verbose
+  class(Front_Type), target :: Front
+  logical                   :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: vert(:)
   type(Side_Type), pointer :: side(:)
@@ -19,12 +19,12 @@
 !==============================================================================!
 
   ! Take aliases
-  nv   => front % n_verts
-  ns   => front % n_sides
-  ne   => front % n_elems
-  vert => front % vert
-  side => front % side
-  elem => front % elem
+  nv   => Front % n_verts
+  ns   => Front % n_sides
+  ne   => Front % n_elems
+  vert => Front % vert
+  side => Front % side
+  elem => Front % elem
 
   !----------------------------!
   !   Put all sides together   !

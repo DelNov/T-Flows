@@ -1,29 +1,29 @@
 !==============================================================================!
-  subroutine Front_Mod_Clean(front)
+  subroutine Clean_Front(Front)
 !------------------------------------------------------------------------------!
 !   Cleans the front                                                           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Front_Type),  target :: front
+  class(Front_Type),  target :: Front
 !==============================================================================!
 
   !-----------------------------!
   !   Deallocate all elements   !
   !-----------------------------!
-  deallocate(front % elem)
-  front % n_elems = 0
+  deallocate(Front % elem)
+  Front % n_elems = 0
 
   !-----------------------------!
   !   Deallocate all vertices   !
   !-----------------------------!
-  deallocate(front % vert)
-  front % n_verts = 0
+  deallocate(Front % vert)
+  Front % n_verts = 0
 
   !-----------------------------!
   !   Deallocate all vertices   !
   !-----------------------------!
-  deallocate(front % side)
-  front % n_sides = 0
+  deallocate(Front % side)
+  Front % n_sides = 0
 
   end subroutine

@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Front_Mod_Mark_Cells_And_Faces(front, phi)
+  subroutine Mark_Cells_And_Faces(Front, phi)
 !------------------------------------------------------------------------------!
 !                                                                              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Front_Type), target :: front
-  type(Var_Type),   target :: phi
+  class(Front_Type), target :: Front
+  type(Var_Type),    target :: phi
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: flow
   type(Grid_Type),  pointer :: grid
@@ -17,8 +17,8 @@
 !==============================================================================!
 
   ! Take aliases
-  flow  => front % pnt_flow
-  grid  => front % pnt_grid
+  flow  => Front % pnt_flow
+  grid  => Front % pnt_grid
 
   !------------------------------------------!
   !                                          !
@@ -30,16 +30,16 @@
     !-----------!
     !   Cells   !
     !-----------!
-    front % cell_at_elem(:) = 0  ! not at surface
-    do e = 1, front % n_elems
-      front % cell_at_elem(front % elem(e) % cell) = e
+    Front % cell_at_elem(:) = 0  ! not at surface
+    do e = 1, Front % n_elems
+      Front % cell_at_elem(Front % elem(e) % cell) = e
     end do
 
     !-----------!
     !   Faces   !
     !-----------!
     n_fac = 0
-    front % face_at_elem(:,:) = 0  ! not at surface
+    Front % face_at_elem(:,:) = 0  ! not at surface
     grid % xs(:) = 0.0
     grid % ys(:) = 0.0
     grid % zs(:) = 0.0
@@ -69,23 +69,23 @@
           c = grid % faces_c(i_cel, s)
 
           ! Cell c contains surface
-          e = front % cell_at_elem(c)
+          e = Front % cell_at_elem(c)
           if(e .ne. 0) then
-            nx = front % elem(e) % nx
-            ny = front % elem(e) % ny
-            nz = front % elem(e) % nz
+            nx = Front % elem(e) % nx
+            ny = Front % elem(e) % ny
+            nz = Front % elem(e) % nz
           end if
 
           ! If cell contains surface and angle is not bigger than asin(15)
           if(e .ne. 0 .and. (lx*nx + ly*ny + lz*nz)/l > 0.258819) then
-            nx = front % elem(e) % nx
-            ny = front % elem(e) % ny
-            nz = front % elem(e) % nz
+            nx = Front % elem(e) % nx
+            ny = Front % elem(e) % ny
+            nz = Front % elem(e) % nz
 
             ! Distance from c1 to intersection
-            dsc1 = (  (front % elem(e) % xe - grid % xc(c1)) * nx     &
-                    + (front % elem(e) % ye - grid % yc(c1)) * ny     &
-                    + (front % elem(e) % ze - grid % zc(c1)) * nz  )  &
+            dsc1 = (  (Front % elem(e) % xe - grid % xc(c1)) * nx     &
+                    + (Front % elem(e) % ye - grid % yc(c1)) * ny     &
+                    + (Front % elem(e) % ze - grid % zc(c1)) * nz  )  &
                  / (lx * nx + ly * ny + lz * nz)
 
             ! Intersection point
@@ -94,17 +94,17 @@
             zs = grid % zc(c1) + dsc1 * lz
 
             ! Check if the intersection point is at the element
-            do i_ver = 1, front % elem(e) % nv
+            do i_ver = 1, Front % elem(e) % nv
               j_ver = i_ver + 1
-              if(j_ver > front % elem(e) % nv) j_ver = 1
-              i = front % elem(e) % v(i_ver)
-              j = front % elem(e) % v(j_ver)
-              vec_i(1) = front % vert(i) % x_n - xs
-              vec_i(2) = front % vert(i) % y_n - ys
-              vec_i(3) = front % vert(i) % z_n - zs
-              vec_j(1) = front % vert(j) % x_n - xs
-              vec_j(2) = front % vert(j) % y_n - ys
-              vec_j(3) = front % vert(j) % z_n - zs
+              if(j_ver > Front % elem(e) % nv) j_ver = 1
+              i = Front % elem(e) % v(i_ver)
+              j = Front % elem(e) % v(j_ver)
+              vec_i(1) = Front % vert(i) % x_n - xs
+              vec_i(2) = Front % vert(i) % y_n - ys
+              vec_i(3) = Front % vert(i) % z_n - zs
+              vec_j(1) = Front % vert(j) % x_n - xs
+              vec_j(2) = Front % vert(j) % y_n - ys
+              vec_j(3) = Front % vert(j) % z_n - zs
               vec_ixj = Math_Mod_Cross_Product(vec_i, vec_j)
               if( dot_product(vec_ixj(1:3), (/lx,ly,lz/)) < 0.0 ) goto 1
             end do  ! i_ver
@@ -117,7 +117,7 @@
 1           continue
 
             n_fac = n_fac + 1
-            front % face_at_elem(i_cel,s) = e
+            Front % face_at_elem(i_cel,s) = e
 
             ! PRINT '(A,3F12.3)', 'SURFACE FOUND AT C1',  &
             !       GRID % XS(S), GRID % YS(S), GRID % ZS(S)
@@ -128,8 +128,8 @@
 !         print *, '# Very strange, no intersections found at face', s
 !         print *, '# phi % n(c1) = ', phi % n(c1)
 !         print *, '# phi % n(c2) = ', phi % n(c2)
-!         print *, '# front % cell_at_elem(c1) = ', front % cell_at_elem(c1)
-!         print *, '# front % cell_at_elem(c2) = ', front % cell_at_elem(c2)
+!         print *, '# Front % cell_at_elem(c1) = ', Front % cell_at_elem(c1)
+!         print *, '# Front % cell_at_elem(c2) = ', Front % cell_at_elem(c2)
 !         print *, '# This error is critical, stopping!'
 !         stop
 !       end if
@@ -145,9 +145,9 @@
       end if  ! face crosses 0.5
     end do    ! through faces
 
-    if(front % n_elems .ne. n_fac) then
+    if(Front % n_elems .ne. n_fac) then
       print *, '# It seems that not all face intersections have been found!'
-      print *, '# front % n_elems = ', front % n_elems
+      print *, '# Front % n_elems = ', Front % n_elems
       print *, '# n_fac           = ', n_fac
       print *, '# This error is critical, stopping!'
       stop

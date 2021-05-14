@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Front_Mod_Save(front, time_step)
+  subroutine Save_Front(Front, time_step)
 !------------------------------------------------------------------------------!
 !   Writes surface vertices in VTU file format (for VisIt and Paraview)        !
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Front_Type), target :: front
-  integer                  :: time_step
+  class(Front_Type), target :: Front
+  integer                   :: time_step
 !----------------------------------[Locals]------------------------------------!
   type(Vert_Type), pointer :: vert
   integer                  :: v, e     ! vertex and element counters
@@ -22,7 +22,7 @@
   character(len=10)  :: IN_5 = '          '
 !==============================================================================!
 
-  if(front % n_verts < 1) return
+  if(Front % n_verts < 1) return
 
   !----------------------------!
   !                            !
@@ -49,8 +49,8 @@
     write(fu,'(a,a)') IN_1, '<UnstructuredGrid>'
 
     write(fu,'(a,a,i0.0,a,i0.0,a)')   &
-                IN_2, '<Piece NumberOfPoints="', front % n_verts,  &
-                           '" NumberOfCells ="', front % n_elems, '">'
+                IN_2, '<Piece NumberOfPoints="', Front % n_verts,  &
+                           '" NumberOfCells ="', Front % n_elems, '">'
 
     !------------------------!
     !                        !
@@ -60,8 +60,8 @@
     write(fu,'(a,a)') IN_3, '<Points>'
     write(fu,'(a,a)') IN_4, '<DataArray type="Float64" NumberOfComponents' //  &
                             '="3" format="ascii">'
-    do v = 1, front % n_verts
-      vert => front % vert(v)
+    do v = 1, Front % n_verts
+      vert => Front % vert(v)
       write(fu, '(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')                &
                   IN_5, vert % x_n, vert % y_n, vert % z_n
     end do
@@ -80,7 +80,7 @@
     !--------------------!
     write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="Index" ' // &
                             'format="ascii">'
-    do v = 1, front % n_verts
+    do v = 1, Front % n_verts
       write(fu,'(a,i9)') IN_5, v
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
@@ -90,8 +90,8 @@
     !--------------------------!
     write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="Neighbours" ' // &
                             'format="ascii">'
-    do v = 1, front % n_verts
-      write(fu,'(a,i9)') IN_5, front % vert(v) % nne
+    do v = 1, Front % n_verts
+      write(fu,'(a,i9)') IN_5, Front % vert(v) % nne
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
 
@@ -100,8 +100,8 @@
     !-----------------------------!
     write(fu,'(a,a)') IN_4, '<DataArray type="Float64" Name="NodeCurv" ' // &
                            ' format="ascii">'
-    do v = 1, front % n_verts
-      vert => front % vert(v)
+    do v = 1, Front % n_verts
+      vert => Front % vert(v)
       write(fu,'(a,1pe16.6e4)') IN_5, vert % curv
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
@@ -117,8 +117,8 @@
     write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="connectivity"' //  &
                             ' format="ascii">'
     ! Cell topology
-    do e = 1, front % n_elems
-      write(fu,'(a,99i9)') IN_5, front % elem(e) % v(1:front % elem(e) % nv)-1
+    do e = 1, Front % n_elems
+      write(fu,'(a,99i9)') IN_5, Front % elem(e) % v(1:Front % elem(e) % nv)-1
     end do
 
     ! Cell offsets
@@ -126,8 +126,8 @@
     write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="offsets"' //  &
                             ' format="ascii">'
     offset = 0
-    do e = 1, front % n_elems
-      offset = offset + front % elem(e) % nv
+    do e = 1, Front % n_elems
+      offset = offset + Front % elem(e) % nv
       write(fu,'(a,i9)') IN_5, offset
     end do
 
@@ -135,7 +135,7 @@
     write(fu,'(a,a)') IN_4, '</DataArray>'
     write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="types"' //  &
                             ' format="ascii">'
-    do e = 1, front % n_elems
+    do e = 1, Front % n_elems
       write(fu,'(a,i9)') IN_5, VTK_POLYGON
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
@@ -155,8 +155,8 @@
     !-------------------------------------!
     write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="Neighbours"' //  &
                             ' format="ascii">'
-    do e = 1, front % n_elems
-      write(fu,'(a,i9)') IN_5, front % elem(e) % nne
+    do e = 1, Front % n_elems
+      write(fu,'(a,i9)') IN_5, Front % elem(e) % nne
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
 
@@ -166,11 +166,11 @@
     write(fu,'(4a)') IN_4,                                                &
                    '<DataArray type="Float64" Name="ElementNormals" ' //  &
                    ' NumberOfComponents="3" format="ascii">'
-    do e = 1, front % n_elems
+    do e = 1, Front % n_elems
       write(fu, '(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')  &
-                IN_5, front % elem(e) % nx,           &
-                      front % elem(e) % ny,           &
-                      front % elem(e) % nz
+                IN_5, Front % elem(e) % nx,           &
+                      Front % elem(e) % ny,           &
+                      Front % elem(e) % nz
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
 
@@ -180,8 +180,8 @@
     write(fu,'(4a)') IN_4,                                                &
                    '<DataArray type="Float64" Name="ElementArea" ' //  &
                    ' format="ascii">'
-    do e = 1, front % n_elems
-      write(fu,'(a,1pe16.6e4)') IN_5, front % elem(e) % area
+    do e = 1, Front % n_elems
+      write(fu,'(a,1pe16.6e4)') IN_5, Front % elem(e) % area
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
 
@@ -191,11 +191,11 @@
     write(fu,'(4a)') IN_4,                                                    &
                    '<DataArray type="Float64" Name="ElementCoordinates" ' //  &
                    ' NumberOfComponents="3" format="ascii">'
-    do e = 1, front % n_elems
+    do e = 1, Front % n_elems
       write(fu, '(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')  &
-                IN_5, front % elem(e) % xe,           &
-                      front % elem(e) % ye,           &
-                      front % elem(e) % ze
+                IN_5, Front % elem(e) % xe,           &
+                      Front % elem(e) % ye,           &
+                      Front % elem(e) % ze
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
 
@@ -205,8 +205,8 @@
     write(fu,'(4a)') IN_4,                                                &
                    '<DataArray type="Float64" Name="ElementCurv" ' //  &
                    ' format="ascii">'
-    do e = 1, front % n_elems
-      write(fu,'(a,1pe16.6e4)') IN_5, front % elem(e) % curv
+    do e = 1, Front % n_elems
+      write(fu,'(a,1pe16.6e4)') IN_5, Front % elem(e) % curv
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
 

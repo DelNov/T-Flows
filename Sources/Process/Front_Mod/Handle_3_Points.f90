@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Front_Mod_Handle_3_Points(front, surf_v)
+  subroutine Handle_3_Points(Front, surf_v)
 !------------------------------------------------------------------------------!
 !   Surface intersects cell at three points                                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Front_Type), target :: front
-  real, dimension(3)       :: surf_v
+  class(Front_Type), target :: Front
+  real, dimension(3)        :: surf_v
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: vert(:)
   type(Elem_Type), pointer :: elem(:)
@@ -16,10 +16,10 @@
 !==============================================================================!
 
   ! Take aliases
-  nv   => front % n_verts
-  ne   => front % n_elems
-  vert => front % vert
-  elem => front % elem
+  nv   => Front % n_verts
+  ne   => Front % n_elems
+  vert => Front % vert
+  elem => Front % elem
 
   ! One new element with three vertices
   ne = ne + 1

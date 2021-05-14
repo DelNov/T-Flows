@@ -1,9 +1,9 @@
 !==============================================================================!
-  subroutine Front_Mod_Find_Vertex_Elements(front)
+  subroutine Find_Vertex_Elements(Front)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Front_Type), target :: front
+  class(Front_Type), target :: Front
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: vert(:)
   type(Elem_Type), pointer :: elem(:)
@@ -12,10 +12,10 @@
 !==============================================================================!
 
   ! Take aliases
-  nv   => front % n_verts
-  ne   => front % n_elems
-  vert => front % vert
-  elem => front % elem
+  nv   => Front % n_verts
+  ne   => Front % n_elems
+  vert => Front % vert
+  elem => Front % elem
 
   ! Initialize to zero
   do v = 1, nv

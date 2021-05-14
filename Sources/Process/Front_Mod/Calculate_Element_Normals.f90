@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Front_Mod_Calculate_Element_Normals(front, phi)
+  subroutine Calculate_Element_Normals(Front, phi)
 !------------------------------------------------------------------------------!
 !   Calculates element normals                                                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Front_Type), target :: front
-  type(Var_Type),   target :: phi
+  class(Front_Type), target :: Front
+  type(Var_Type),    target :: phi
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: vert(:)
   type(Elem_Type), pointer :: elem(:)
@@ -17,10 +17,10 @@
 !==============================================================================!
 
   ! Take aliases
-  nv   => front % n_verts
-  ne   => front % n_elems
-  vert => front % vert
-  elem => front % elem
+  nv   => Front % n_verts
+  ne   => Front % n_elems
+  vert => Front % vert
+  elem => Front % elem
 
   !---------------------------------!
   !   Browse through all elements   !

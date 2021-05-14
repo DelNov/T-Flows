@@ -1,9 +1,9 @@
 !==============================================================================!
-  subroutine Front_Mod_Print_Statistics(front)
+  subroutine Print_Statistics(Front)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Front_Type),  target :: front
+  class(Front_Type),  target :: Front
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: vert(:)
   type(Elem_Type), pointer :: elem(:)
@@ -20,12 +20,12 @@
 !==============================================================================!
 
   ! Take aliases
-  nv   => front % n_verts
-  ns   => front % n_sides
-  ne   => front % n_elems
-  vert => front % vert
-  side => front % side
-  elem => front % elem
+  nv   => Front % n_verts
+  ns   => Front % n_sides
+  ne   => Front % n_elems
+  vert => Front % vert
+  side => Front % side
+  elem => Front % elem
 
   !--------------------------!
   !   Compute side lengths   !
@@ -91,11 +91,11 @@
       line(63+T:63+T) = '#'
       line( 3+T: 3+T) = '-'
       if(item.eq.1) line( 5+T: 5+T+20) = 'Number of elements: '
-      if(item.eq.1) write(line(32+T:37+T), '(i6)') front % n_elems
+      if(item.eq.1) write(line(32+T:37+T), '(i6)') Front % n_elems
       if(item.eq.2) line( 5+T: 5+T+20) = 'Number of vertices: '
-      if(item.eq.2) write(line(32+T:37+T), '(i6)') front % n_verts
+      if(item.eq.2) write(line(32+T:37+T), '(i6)') Front % n_verts
       if(item.eq.3) line( 5+T: 5+T+20) = 'Number of sides:    '
-      if(item.eq.3) write(line(32+T:37+T), '(i6)') front % n_sides
+      if(item.eq.3) write(line(32+T:37+T), '(i6)') Front % n_sides
       print *, trim(line)
     end do
 

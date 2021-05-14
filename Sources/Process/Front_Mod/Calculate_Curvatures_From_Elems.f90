@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Front_Mod_Calculate_Curvatures_From_Elems(front)
+  subroutine Calculate_Curvatures_From_Elems(Front)
 !------------------------------------------------------------------------------!
 !   Calculates surface curvatures from elements (using its own vertices and    !
 !   the vertices from neighbouring elements, around twelve points) and         !
@@ -9,7 +9,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Front_Type), target :: front
+  class(Front_Type), target :: Front
 !-----------------------------------[Locals]-----------------------------------!
   real, dimension(4,4)  :: a
   real, dimension(4)    :: b
@@ -24,50 +24,50 @@
 !==============================================================================!
 
   ! Work out number of vertices around each vertex
-  front % vert(1:front % n_verts) % nnv = 0
-  do s = 1, front % n_sides
-    c = front % side(s) % c
-    d = front % side(s) % d
-    front % vert(c) % nnv = front % vert(c) % nnv + 1
-    front % vert(d) % nnv = front % vert(d) % nnv + 1
+  Front % vert(1:Front % n_verts) % nnv = 0
+  do s = 1, Front % n_sides
+    c = Front % side(s) % c
+    d = Front % side(s) % d
+    Front % vert(c) % nnv = Front % vert(c) % nnv + 1
+    Front % vert(d) % nnv = Front % vert(d) % nnv + 1
   end do
 
-  max_nnv = maxval(front % vert(1:front % n_verts) % nnv)
+  max_nnv = maxval(Front % vert(1:Front % n_verts) % nnv)
 
   ! Form vert_v structure
-  allocate( vert_v(max_nnv, front % n_verts) );  vert_v = 0
+  allocate( vert_v(max_nnv, Front % n_verts) );  vert_v = 0
 
-  front % vert(1:front % n_verts) % nnv = 0
-  do s = 1, front % n_sides
-    c = front % side(s) % c
-    d = front % side(s) % d
+  Front % vert(1:Front % n_verts) % nnv = 0
+  do s = 1, Front % n_sides
+    c = Front % side(s) % c
+    d = Front % side(s) % d
 
-    front % vert(c) % nnv = front % vert(c) % nnv + 1
-    vert_v(front % vert(c) % nnv, c) = d
+    Front % vert(c) % nnv = Front % vert(c) % nnv + 1
+    vert_v(Front % vert(c) % nnv, c) = d
 
-    front % vert(d) % nnv = front % vert(d) % nnv + 1
-    vert_v(front % vert(d) % nnv, d) = c
+    Front % vert(d) % nnv = Front % vert(d) % nnv + 1
+    vert_v(Front % vert(d) % nnv, d) = c
   end do
 
   ! Work out (maximum) number of vertices around each element
-  allocate(elem_n_verts(front % n_elems))
+  allocate(elem_n_verts(Front % n_elems))
   elem_n_verts(:) = 0
-  do e = 1, front % n_elems
-    do i_ver = 1, front % elem(e) % nv
-      v = front % elem(e) % v(i_ver)
-      elem_n_verts(e) = elem_n_verts(e) + front % vert(v) % nnv
+  do e = 1, Front % n_elems
+    do i_ver = 1, Front % elem(e) % nv
+      v = Front % elem(e) % v(i_ver)
+      elem_n_verts(e) = elem_n_verts(e) + Front % vert(v) % nnv
     end do
   end do
 
-  max_nnv = maxval(elem_n_verts(1:front % n_elems))
-  allocate(elem_v(max_nnv, front % n_elems))
+  max_nnv = maxval(elem_n_verts(1:Front % n_elems))
+  allocate(elem_v(max_nnv, Front % n_elems))
   elem_v(:,:) = HUGE_INT
 
   elem_n_verts(:) = 0
-  do e = 1, front % n_elems
-    do i_ver = 1, front % elem(e) % nv
-      v = front % elem(e) % v(i_ver)
-      do j_ver = 1, front % vert(v) % nnv
+  do e = 1, Front % n_elems
+    do i_ver = 1, Front % elem(e) % nv
+      v = Front % elem(e) % v(i_ver)
+      do j_ver = 1, Front % vert(v) % nnv
         elem_n_verts(e) = elem_n_verts(e) + 1;
         elem_v(elem_n_verts(e), e) = vert_v(j_ver, v)
       end do
@@ -75,7 +75,7 @@
   end do
 
   ! Remove duplicate entries in the vertex list
-  do e = 1, front % n_elems
+  do e = 1, Front % n_elems
     call Sort_Mod_Unique_Int(elem_v(1:elem_n_verts(e), e), elem_n_verts(e))
   end do
 
@@ -84,21 +84,21 @@
   !        and second neighbouring nodes        !
   !---------------------------------------------!
 
-  front % elem(1:front % n_elems) % curv = 0.0
-  front % elem(1:front % n_elems) % xc   = 0.0
-  front % elem(1:front % n_elems) % yc   = 0.0
-  front % elem(1:front % n_elems) % zc   = 0.0
+  Front % elem(1:Front % n_elems) % curv = 0.0
+  Front % elem(1:Front % n_elems) % xc   = 0.0
+  Front % elem(1:Front % n_elems) % yc   = 0.0
+  Front % elem(1:Front % n_elems) % zc   = 0.0
 
-  do e = 1, front % n_elems
+  do e = 1, Front % n_elems
 
     a(:,:) = 0
     b(:)   = 0
 
     do k = 1, elem_n_verts(e)
 
-      x = front % vert( elem_v(k,e) ) % x_n
-      y = front % vert( elem_v(k,e) ) % y_n
-      z = front % vert( elem_v(k,e) ) % z_n
+      x = Front % vert( elem_v(k,e) ) % x_n
+      y = Front % vert( elem_v(k,e) ) % y_n
+      z = Front % vert( elem_v(k,e) ) % z_n
 
       x2 = x * x;  y2 = y * y;  z2 = z * z
       xy = x * y;  xz = x * z;  yz = y * z
@@ -137,31 +137,31 @@
       rho = PETA                   ! some big number
     end if
 
-    front % elem(e) % curv = 1.0 / rho
-    front % elem(e) % xc   = x
-    front % elem(e) % yc   = y
-    front % elem(e) % zc   = z
+    Front % elem(e) % curv = 1.0 / rho
+    Front % elem(e) % xc   = x
+    Front % elem(e) % yc   = y
+    Front % elem(e) % zc   = z
   end do
 
   ! Compute average curvature (for debugging)
   ! rho = 0
-  ! do e = 1, front % n_elems
-  !   rho = rho + front % elem(e) % curv
+  ! do e = 1, Front % n_elems
+  !   rho = rho + Front % elem(e) % curv
   ! end do
-  ! rho = rho / front % n_elems
+  ! rho = rho / Front % n_elems
   ! print *, 'average curvature = ', rho
 
   !-------------------------------------------------------------------!
   !   Interpolate normals at nodes from values in surrounding elems   !
   !-------------------------------------------------------------------!
-  front % vert(1:front % n_verts) % curv = 0.
-  do e = 1, front % n_elems
+  Front % vert(1:Front % n_verts) % curv = 0.
+  do e = 1, Front % n_elems
 
-    do i_ver = 1, front % elem(e) % nv
-      v = front % elem(e) % v(i_ver)
+    do i_ver = 1, Front % elem(e) % nv
+      v = Front % elem(e) % v(i_ver)
 
-      front % vert(v) % curv = front % vert(v) % curv  &
-                      + front % elem(e) % curv/real(front % vert(v) % nne)
+      Front % vert(v) % curv = Front % vert(v) % curv  &
+                      + Front % elem(e) % curv/real(Front % vert(v) % nne)
     end do
   end do
 

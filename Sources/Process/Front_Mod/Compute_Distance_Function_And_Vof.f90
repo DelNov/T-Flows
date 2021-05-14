@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Front_Mod_Compute_Distance_Function_And_Vof(front, cell_dist, vof)
+  subroutine Compute_Distance_Function_And_Vof(Front, cell_dist, vof)
 !------------------------------------------------------------------------------!
 !   Computes distance from a surface                                           !
 !------------------------------------------------------------------------------!
@@ -8,9 +8,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Front_Type), target :: front
-  type(Var_Type)           :: cell_dist
-  type(Var_Type)           :: vof
+  class(Front_Type), target :: Front
+  type(Var_Type)            :: cell_dist
+  type(Var_Type)            :: vof
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: grid
   real                     :: dist
@@ -22,8 +22,8 @@
 !==============================================================================!
 
   ! Take some aliases
-  grid => front % pnt_grid
-  nv = front % n_verts
+  grid => Front % pnt_grid
+  nv = Front % n_verts
   nc = grid % n_cells
   nn = grid % n_nodes
 
@@ -38,7 +38,7 @@
   do v = 1, nv
 
     ! Take nearest cell
-    d = front % vert(v) % cell  ! nearest cell
+    d = Front % vert(v) % cell  ! nearest cell
 
     ! Make a list of nodes surrounding the nearest cell
     n_cnt = 0  ! initialize node count
@@ -68,13 +68,13 @@
     call Sort_Mod_Unique_Int(cell_list(1:c_cnt), c_cnt)
 
     ! Match first and second neighbour cells with all elements around the node
-    do i_ele = 1, front % vert(v) % nne
-      e  = front % vert(v) % e(i_ele)
+    do i_ele = 1, Front % vert(v) % nne
+      e  = Front % vert(v) % e(i_ele)
 
       ! Center of the sphere
-      xs = front % elem(e) % xc
-      ys = front % elem(e) % yc
-      zs = front % elem(e) % zc
+      xs = Front % elem(e) % xc
+      ys = Front % elem(e) % yc
+      zs = Front % elem(e) % zc
 
       do i_cel = 1, c_cnt
         c = cell_list(i_cel)
@@ -84,7 +84,7 @@
         zc = grid % zc(c)
 
         dist = Math_Mod_Distance(xc, yc, zc, xs, ys, zs)  &
-                                 - 1.0 / front % elem(e) % curv
+                                 - 1.0 / Front % elem(e) % curv
 
         if(abs(dist) < abs(phi_c(c))) then
           phi_c(c) = dist
