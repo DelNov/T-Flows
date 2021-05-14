@@ -34,8 +34,10 @@
                   vof % res)
   call Cpu_Timer % Stop('Linear_Solver_For_Multiphase')
 
-  if(.not. flow % mass_transfer) then
+  if(.not. flow % heat_transfer) then
     call Info_Mod_Iter_Fill_At(1, 6, vof % name, vof % eniter, vof % res)
+  else
+    call Info_Mod_Iter_Fill_At(2, 1, vof % name, vof % eniter, vof % res)
   end if
 
   end subroutine

@@ -37,6 +37,11 @@
   A      => Sol % A
   b      => Sol % b % val
 
+  WRITE(331,*) 'OLD VALUES IN VOF_COMPUTE'
+  DO C = 1, GRID % N_CELLS
+    WRITE(331,*) C, GRID % XC(C), VOF % N(C), VOF % O(C), VOF % OO(C)
+  END DO
+
   if(vof % adv_scheme .eq. CICSAM .or. &
      vof % adv_scheme .eq. STACS) then
 
@@ -122,6 +127,7 @@
         !   Matrix coefficients   !
         !-------------------------!
 
+        PRINT *, 'n_sub = ', n_sub
         call Multiphase_Mod_Vof_Coefficients(mult, A, b, dt / real(n_sub))
 
         ! Solve System

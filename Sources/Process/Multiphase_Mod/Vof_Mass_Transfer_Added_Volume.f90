@@ -21,16 +21,19 @@
 
   ! Integrate added volume
   added_vol = 0.0
-  if(flow % mass_transfer) then
-    do c = 1, grid % n_cells - grid % comm % n_buff_cells
-      e = mult % cell_at_elem(c)  ! front element
-      if(e .ne. 0) then
-        added_vol = added_vol  &
-                  + mult % m_dot(c) * mult % front % elem(e) % area
 
-      end if
-    end do
-  end if
+  RETURN
+
+  if(.not. flow % mass_transfer) return
+
+  do c = 1, grid % n_cells - grid % comm % n_buff_cells
+    e = mult % Front % cell_at_elem(c)  ! front element
+    if(e .ne. 0) then
+      added_vol = added_vol  &
+                + mult % m_dot(c) * mult % Front % elem(e) % area
+
+    end if
+  end do
 
   ! Take global summ
   call Comm_Mod_Global_Sum_Real(added_vol)
