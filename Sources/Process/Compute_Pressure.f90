@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Pressure(flow, mult, Sol, curr_dt, ini)
+  subroutine Compute_Pressure(flow, Vof, Sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Forms and solves pressure equation for the SIMPLE method.                  !
 !------------------------------------------------------------------------------!
@@ -8,11 +8,11 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),      target :: flow
-  type(Multiphase_Type), target :: mult
-  type(Solver_Type),     target :: Sol
-  integer, intent(in)           :: curr_dt
-  integer, intent(in)           :: ini
+  type(Field_Type),    target :: flow
+  type(Vof_Type),      target :: Vof
+  type(Solver_Type),   target :: Sol
+  integer, intent(in)         :: curr_dt
+  integer, intent(in)         :: ini
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Bulk_Type),   pointer :: bulk
@@ -66,7 +66,7 @@
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Pressure(flow, mult, Sol, curr_dt, ini)
+  call User_Mod_Beginning_Of_Compute_Pressure(flow, Vof, Sol, curr_dt, ini)
 
   !--------------------------------------------------!
   !   Find the value for normalization of pressure   !
@@ -104,13 +104,13 @@
   !----------------------------------!
   !   Correct fluxes at boundaries   !
   !----------------------------------!
-  call Balance_Volume(flow, mult)
+  call Balance_Volume(flow, Vof)
 
   !---------------------------------------!
   !   Compute volume fluxes at internal   !
   !    faces with Rhie and Chow method    !
   !---------------------------------------!
-  call Rhie_And_Chow(flow, mult, Sol)
+  call Rhie_And_Chow(flow, Vof, Sol)
 
   !------------------------------------------!
   !   Update fluxes at boundaries and fill   !
@@ -171,7 +171,12 @@
   !-------------------------------------------------------------------------!
   !   In case of mass transfer, add addtional source to pressure equation   !
   !-------------------------------------------------------------------------!
-  call Multiphase_Mod_Vof_Mass_Transfer_Pressure_Source(mult, b)
+  call Vof % Mass_Transfer_Pressure_Source(b)
+
+  !-------------------------------------------------------------!
+  !   In case of VOF, surface tension and  gravity correction   !
+  !-------------------------------------------------------------!
+  call Vof % Pressure_Correction(Sol)
 
   !----------------------------------------!
   !   Balance the source over processors   !
@@ -184,14 +189,17 @@
   ! are computed over faces, they are slightly different in different
   ! processors due to these round-off errors, although values in cells
   ! surrounding them are the same after exchanging the buffers.  In order
-  !  to fix it, the balancing procedure which follows is introduced.
-  if(total_cells .eq. 0) then  ! wasn't set yet
-    total_cells = grid % n_cells - grid % comm % n_buff_cells
-    call Comm_Mod_Global_Sum_Int(total_cells)
+  ! to fix it, the balancing procedure which follows is introduced.
+  ! However, the fix should not be applied if domain has pressure outlet.
+  if( .not. flow % has_pressure_outlet) then
+    if(total_cells .eq. 0) then  ! wasn't set yet
+      total_cells = grid % n_cells - grid % comm % n_buff_cells
+      call Comm_Mod_Global_Sum_Int(total_cells)
+    end if
+    total_source = sum(b(1:(grid % n_cells - grid % comm % n_buff_cells)))
+    call Comm_Mod_Global_Sum_Real(total_source)
+    b(:) = b(:) - total_source/real(total_cells)
   end if
-  total_source = sum(b(1:(grid % n_cells - grid % comm % n_buff_cells)))
-  call Comm_Mod_Global_Sum_Real(total_source)
-  b(:) = b(:) - total_source/real(total_cells)
 
   ! Get solver
   call Control_Mod_Solver_For_Pressure(solver)
@@ -240,7 +248,7 @@
   p % n(:) = p % n(:) - 0.5*(p_max+p_min)
 
   ! User function
-  call User_Mod_End_Of_Compute_Pressure(flow, mult, Sol, curr_dt, ini)
+  call User_Mod_End_Of_Compute_Pressure(flow, Vof, Sol, curr_dt, ini)
 
   call Cpu_Timer % Stop('Compute_Pressure (without solvers)')
 

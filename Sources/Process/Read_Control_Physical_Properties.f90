@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Read_Control_Physical_Properties(flow, mult, swarm)
+  subroutine Read_Control_Physical_Properties(flow, Vof, swarm)
 !------------------------------------------------------------------------------!
 !   Reads physical properties from control file.                               !
 !------------------------------------------------------------------------------!
@@ -8,13 +8,13 @@
   use Field_Mod
   use Swarm_Mod
   use Control_Mod
-  use Multiphase_Mod
+  use Vof_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type)      :: flow
-  type(Multiphase_Type) :: mult
-  type(Swarm_Type)      :: swarm
+  type(Field_Type) :: flow
+  type(Vof_Type)   :: Vof
+  type(Swarm_Type) :: swarm
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   real                     :: dens_const, visc_const
@@ -31,14 +31,14 @@
   call Control_Mod_Thermal_Conductivity(cond_const)
   call Control_Mod_Scalars_Diffusivity (flow % diffusivity)
 
-  if(mult % model .eq. VOLUME_OF_FLUID) then
-    call Control_Mod_Phase_Densities       (mult % phase_dens)
-    call Control_Mod_Phase_Viscosities     (mult % phase_visc)
-    call Control_Mod_Phase_Capacities      (mult % phase_capa)
-    call Control_Mod_Phase_Conductivities  (mult % phase_cond)
-    call Control_Mod_Surface_Tension       (mult % surface_tension)
-    call Control_Mod_Latent_Heat           (mult % latent_heat)
-    call Control_Mod_Saturation_Temperature(mult % t_sat)
+  if(Vof % model .eq. VOLUME_OF_FLUID) then
+    call Control_Mod_Phase_Densities       (Vof % phase_dens)
+    call Control_Mod_Phase_Viscosities     (Vof % phase_visc)
+    call Control_Mod_Phase_Capacities      (Vof % phase_capa)
+    call Control_Mod_Phase_Conductivities  (Vof % phase_cond)
+    call Control_Mod_Surface_Tension       (Vof % surface_tension)
+    call Control_Mod_Latent_Heat           (Vof % latent_heat)
+    call Control_Mod_Saturation_Temperature(Vof % t_sat)
   else
     flow % density     (:) = dens_const
     flow % viscosity   (:) = visc_const

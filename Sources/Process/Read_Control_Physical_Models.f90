@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Read_Control_Physical_Models(flow, turb, mult, swarm)
+  subroutine Read_Control_Physical_Models(flow, turb, Vof, swarm)
 !------------------------------------------------------------------------------!
 !   Reads details about physical models from control file.                     !
 !------------------------------------------------------------------------------!
@@ -9,16 +9,16 @@
   use Field_Mod,      only: Field_Type, grav_x, grav_y, grav_z
   use Bulk_Mod,       only: Bulk_Type
   use Turb_Mod
-  use Multiphase_Mod
+  use Vof_Mod
   use Control_Mod
   use Swarm_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),      target :: flow
-  type(Turb_Type),       target :: turb
-  type(Multiphase_Type), target :: mult
-  type(Swarm_Type),      target :: swarm
+  type(Field_Type), target :: flow
+  type(Turb_Type),  target :: turb
+  type(Vof_Type),   target :: Vof
+  type(Swarm_Type), target :: swarm
 !----------------------------------[Locals]------------------------------------!
   type(Bulk_Type), pointer :: bulk
   character(SL)            :: name
@@ -247,16 +247,16 @@
   call Control_Mod_Multiphase_Model(name, .true.)
 
   if(name .eq. 'VOLUME_OF_FLUID' ) then
-    mult % model = VOLUME_OF_FLUID
+    Vof % model = VOLUME_OF_FLUID
   else if(name .eq. 'LAGRANGIAN_PARTICLES' ) then
-    mult % model = LAGRANGIAN_PARTICLES
+    Vof % model = LAGRANGIAN_PARTICLES
   else if(name .eq. 'EULER_EULER' ) then
-    mult % model = EULER_EULER
+    Vof % model = EULER_EULER
   else
-    mult % model = NO_MULTIPHASE_MODEL
+    Vof % model = NO_MULTIPHASE_MODEL
   end if
 
-  call Control_Mod_Track_Front(mult % track_front, .true.)
+  call Control_Mod_Track_Front(Vof % track_front, .true.)
 
   call Control_Mod_Mass_Transfer(flow % mass_transfer)
 
@@ -265,7 +265,7 @@
   !   Particle tracking   !
   !                       !
   !-----------------------!
-  if(mult % model .eq. LAGRANGIAN_PARTICLES) then
+  if(Vof % model .eq. LAGRANGIAN_PARTICLES) then
 
     call Control_Mod_Number_Of_Particles(swarm % n_particles, verbose = .true.)
     call Control_Mod_Swarm_Density      (swarm % density,     verbose = .true.)

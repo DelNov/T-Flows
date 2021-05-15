@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Momentum(flow, turb, mult, Sol, curr_dt, ini)
+  subroutine Compute_Momentum(flow, turb, Vof, Sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves momentum conservation equations                     !
 !------------------------------------------------------------------------------!
@@ -8,12 +8,12 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),      target :: flow
-  type(Turb_Type),       target :: turb
-  type(Multiphase_Type), target :: mult
-  type(Solver_Type),     target :: Sol
-  integer, intent(in)           :: curr_dt
-  integer, intent(in)           :: ini
+  type(Field_Type),    target :: flow
+  type(Turb_Type),     target :: turb
+  type(Vof_Type),      target :: Vof
+  type(Solver_Type),   target :: Sol
+  integer, intent(in)         :: curr_dt
+  integer, intent(in)         :: ini
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Bulk_Type),   pointer :: bulk
@@ -95,7 +95,7 @@
   b      => Sol % b % val
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Momentum(flow, turb, mult, Sol,  &
+  call User_Mod_Beginning_Of_Compute_Momentum(flow, turb, Vof, Sol,  &
                                               curr_dt, ini)
 
   !-------------------------------------------------------!
@@ -297,8 +297,8 @@
     !----------------------------------!
     !   Surface tension contribution   !
     !----------------------------------!
-    if(mult % model .eq. VOLUME_OF_FLUID) then
-      call Multiphase_Mod_Vof_Momentum_Contribution(mult, fi, i)
+    if(Vof % model .eq. VOLUME_OF_FLUID) then
+      call Vof % Surface_Tension_Force(fi, i)
     end if
 
     !----------------------------------------!
@@ -375,7 +375,7 @@
   call Grid_Mod_Exchange_Cells_Real(grid, M % sav)
 
   ! User function
-  call User_Mod_End_Of_Compute_Momentum(flow, turb, mult, Sol, curr_dt, ini)
+  call User_Mod_End_Of_Compute_Momentum(flow, turb, Vof, Sol, curr_dt, ini)
 
   call Cpu_Timer % Stop('Compute_Momentum (without solvers)')
 

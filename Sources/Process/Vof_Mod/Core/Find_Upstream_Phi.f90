@@ -1,6 +1,6 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Vof_Find_Upstream_Phi(phi, phi_x, phi_y, phi_z,  &
-                                                  s, donor, accept, phi_u)
+  subroutine Find_Upstream_Phi(Vof, phi, phi_x, phi_y, phi_z,  &
+                               s, donor, accept, phi_u)
 !------------------------------------------------------------------------------!
 !   Computes the value of phi at a imaginary upstream cell. This is based on   !
 !   Work of Zhang (2014) "Assessment of different reconstruction techniques    !
@@ -8,13 +8,14 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Var_Type) :: phi
-  real           :: phi_x(-phi % pnt_grid % n_bnd_cells:  &
-                           phi % pnt_grid % n_cells),     &
-                    phi_y(-phi % pnt_grid % n_bnd_cells:  &
-                           phi % pnt_grid % n_cells),     &
-                    phi_z(-phi % pnt_grid % n_bnd_cells:  &
-                           phi % pnt_grid % n_cells)
+  class(Vof_Type) :: Vof
+  type(Var_Type)  :: phi
+  real            :: phi_x(-phi % pnt_grid % n_bnd_cells:  &
+                            phi % pnt_grid % n_cells),     &
+                     phi_y(-phi % pnt_grid % n_bnd_cells:  &
+                            phi % pnt_grid % n_cells),     &
+                     phi_z(-phi % pnt_grid % n_bnd_cells:  &
+                            phi % pnt_grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: grid
   real, contiguous, pointer :: sx(:), sy(:), sz(:), dx(:), dy(:), dz(:)

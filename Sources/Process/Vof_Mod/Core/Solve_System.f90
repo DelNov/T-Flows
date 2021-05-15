@@ -1,23 +1,23 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Vof_Solve_System(mult, Sol, b)
+  subroutine Solve_System(Vof, Sol, b)
 !------------------------------------------------------------------------------!
 !   Solves linear system for VOF                                               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Solver_Type),     target :: Sol
-  type(Multiphase_Type), target :: mult
-  real, contiguous,      target :: b(:)
+  class(Vof_Type),   target :: Vof
+  type(Solver_Type), target :: Sol
+  real, contiguous,  target :: b(:)
 !-----------------------------------[Locals]-----------------------------------!
-  type(Var_Type),    pointer :: vof
+  type(Var_Type),    pointer :: fun
   type(Field_Type),  pointer :: flow
   type(Matrix_Type), pointer :: A
   character(SL)              :: solver
 !==============================================================================!
 
   ! Take aliases
-  vof  => mult % vof
-  flow => mult % pnt_flow
+  fun  => Vof % fun
+  flow => Vof % pnt_flow
   A    => Sol % A
 
   ! Get solver
@@ -25,19 +25,19 @@
 
   call Cpu_Timer % Start('Linear_Solver_For_Multiphase')
   call Sol % Bicg(A,              &
-                  vof % n,        &
+                  fun % n,        &
                   b,              &
-                  vof % precond,  &
-                  vof % mniter,   &      ! max number of iterations
-                  vof % eniter,   &      ! executed number of iterations
-                  vof % tol,      &
-                  vof % res)
+                  fun % precond,  &
+                  fun % mniter,   &      ! max number of iterations
+                  fun % eniter,   &      ! executed number of iterations
+                  fun % tol,      &
+                  fun % res)
   call Cpu_Timer % Stop('Linear_Solver_For_Multiphase')
 
   if(.not. flow % heat_transfer) then
-    call Info_Mod_Iter_Fill_At(1, 6, vof % name, vof % eniter, vof % res)
+    call Info_Mod_Iter_Fill_At(1, 6, fun % name, fun % eniter, fun % res)
   else
-    call Info_Mod_Iter_Fill_At(2, 1, vof % name, vof % eniter, vof % res)
+    call Info_Mod_Iter_Fill_At(2, 1, fun % name, fun % eniter, fun % res)
   end if
 
   end subroutine

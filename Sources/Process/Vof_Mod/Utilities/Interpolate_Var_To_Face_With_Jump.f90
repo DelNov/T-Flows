@@ -1,12 +1,11 @@
 !==============================================================================!
-  real function Multiphase_Mod_Vof_Interpolate_Var_To_Face_With_Jump  &
-                (mult, phi, s)
+  real function Interpolate_Var_To_Face_With_Jump(Vof, phi, s)
 !------------------------------------------------------------------------------!
 !   Computes cell-face value by gradient interpolation when there is a jump    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Multiphase_Type) :: mult
+  type(Multiphase_Type) :: Vof
   type(Var_Type)        :: phi
   integer               :: s
 !-----------------------------------[Locals]-----------------------------------!
@@ -16,7 +15,7 @@
   integer                   :: c1, c2
 !==============================================================================!
 
-  flow => mult % pnt_flow
+  flow => Vof % pnt_flow
   grid => flow % pnt_grid
 
   c1 = grid % faces_c(1,s)
@@ -33,19 +32,19 @@
   dz2 = grid % zf(s) - (grid % zc(c1) + grid % dz(s))
 
   w1 = grid % f(s)
-  if(mult % cell_at_elem(c1) .eq. 0 .and.  &
-     mult % cell_at_elem(c2) .ne. 0) w1 = 1.0
-  if(mult % cell_at_elem(c2) .eq. 0 .and.  &
-     mult % cell_at_elem(c1) .ne. 0) w1 = 0.0
+  if(Vof % cell_at_elem(c1) .eq. 0 .and.  &
+     Vof % cell_at_elem(c2) .ne. 0) w1 = 1.0
+  if(Vof % cell_at_elem(c2) .eq. 0 .and.  &
+     Vof % cell_at_elem(c1) .ne. 0) w1 = 0.0
   w2 = 1.0 - w1
 
-  Multiphase_Mod_Vof_Interpolate_Var_To_Face_With_Jump                        &
-                                    = w1 * (phi % n(c1) + phi % x(c1) * dx1   &
-                                                        + phi % y(c1) * dy1   &
-                                                        + phi % z(c1) * dz1)  &
-                                    + w2 * (phi % n(c2) + phi % x(c2) * dx2   &
-                                                        + phi % y(c2) * dy2   &
-                                                        + phi % z(c2) * dz2)
+  Interpolate_Var_To_Face_With_Jump                        &
+                 = w1 * (phi % n(c1) + phi % x(c1) * dx1   &
+                                     + phi % y(c1) * dy1   &
+                                     + phi % z(c1) * dz1)  &
+                 + w2 * (phi % n(c2) + phi % x(c2) * dx2   &
+                                     + phi % y(c2) * dy2   &
+                                     + phi % z(c2) * dz2)
 
   end function
 

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Results_Mod_Save(flow, turb, mult, swarm, ts, plot_inside, domain)
+  subroutine Results_Mod_Save(flow, turb, Vof, swarm, ts, plot_inside, domain)
 !------------------------------------------------------------------------------!
 !   Writes results in VTU file format (for VisIt and Paraview)                 !
 !------------------------------------------------------------------------------!
@@ -21,19 +21,22 @@
                       px_save   => r_cell_15,  &
                       py_save   => r_cell_16,  &
                       pz_save   => r_cell_17,  &
+                      tx_save   => r_cell_15,  &
+                      ty_save   => r_cell_16,  &
+                      tz_save   => r_cell_17,  &
                       int_save  => i_cell_01,  &
                       type_save => i_cell_02,  &  ! cell type save array
                       offs_save => i_cell_03      ! cell offsets save array
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Field_Type),      target :: flow
-  type(Turb_Type),       target :: turb
-  type(Multiphase_Type), target :: mult
-  type(Swarm_Type),      target :: swarm
-  integer                       :: ts           ! time step
-  logical                       :: plot_inside  ! plot results inside?
-  integer,             optional :: domain
+  type(Field_Type),  target :: flow
+  type(Turb_Type),   target :: turb
+  type(Vof_Type),    target :: Vof
+  type(Swarm_Type),  target :: swarm
+  integer                   :: ts           ! time step
+  logical                   :: plot_inside  ! plot results inside?
+  integer,         optional :: domain
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: phi
@@ -481,6 +484,29 @@
       call Save_Scalar_Real("Temperature [K]", plot_inside,  &
                             flow % t % n(c_f:c_l),           &
                             f8, f9, data_offset, run)
+      tx_save(:) = 0.0
+      ty_save(:) = 0.0
+      tz_save(:) = 0.0
+      do c1 = c_f, c_l
+        tx_save(c1) = flow % t % x(c1)
+        ty_save(c1) = flow % t % y(c1)
+        tz_save(c1) = flow % t % z(c1)
+      end do
+
+      if(.not. flow % mass_transfer) then
+        call Field_Mod_Grad_Variable(flow, flow % t)
+      else
+        call Vof % Calculate_Grad_Matrix_With_Front()
+        call Vof % Grad_Variable_With_Front(flow % t, Vof % t_sat)
+        call Field_Mod_Calculate_Grad_Matrix(flow)
+      end if
+
+      call Save_Vector_Real("TemperatureGradients [K/m]", plot_inside,  &
+                            tx_save(c_f:c_l),                           &
+                            ty_save(c_f:c_l),                           &
+                            tz_save(c_f:c_l),                           &
+                            f8, f9, data_offset, run)
+
     end if
 
     !-------------------------!
@@ -502,29 +528,29 @@
     !---------------------!
     !   Volume fraction   !
     !---------------------!
-    if(mult % model .eq. VOLUME_OF_FLUID) then
+    if(Vof % model .eq. VOLUME_OF_FLUID) then
       call Save_Scalar_Real("VofSharp [1]", plot_inside,            &
-                            mult % vof % n(c_f:c_l),                &
+                            Vof % fun % n(c_f:c_l),                 &
                             f8, f9, data_offset, run)
       call Save_Scalar_Real("VofSmooth [1]", plot_inside,           &
-                            mult % smooth % n(c_f:c_l),             &
+                            Vof % smooth % n(c_f:c_l),              &
                             f8, f9, data_offset, run)
       call Save_Scalar_Real("VofCurvature [1/m]", plot_inside,      &
-                            mult % curv(c_f:c_l),                   &
+                            Vof % curv(c_f:c_l),                    &
                             f8, f9, data_offset, run)
       call Save_Vector_Real("VofSurfaceNormals [1]", plot_inside,   &
-                            mult % nx(c_f:c_l),                     &
-                            mult % ny(c_f:c_l),                     &
-                            mult % nz(c_f:c_l),                     &
+                            Vof % nx(c_f:c_l),                      &
+                            Vof % ny(c_f:c_l),                      &
+                            Vof % nz(c_f:c_l),                      &
                             f8, f9, data_offset, run)
       call Save_Vector_Real("VofSurfaceTensionForce", plot_inside,  &
-                            mult % surf_fx(c_f:c_l),                &
-                            mult % surf_fy(c_f:c_l),                &
-                            mult % surf_fz(c_f:c_l),                &
+                            Vof % surf_fx(c_f:c_l),                 &
+                            Vof % surf_fy(c_f:c_l),                 &
+                            Vof % surf_fz(c_f:c_l),                 &
                             f8, f9, data_offset, run)
-      if (allocated(mult % m_dot)) then
+      if (allocated(Vof % m_dot)) then
         call Save_Scalar_Real("VofMassTransfer [kg/m^3/s]", plot_inside,  &
-                              mult % m_dot(c_f:c_l),                      &
+                              Vof % m_dot(c_f:c_l),                      &
                               f8, f9, data_offset, run)
       end if
     end if
@@ -532,7 +558,7 @@
     !---------------------------------------!
     !   Number of impacts and reflections   !
     !---------------------------------------!
-    if(mult % model .eq. LAGRANGIAN_PARTICLES .and. .not. plot_inside) then
+    if(Vof % model .eq. LAGRANGIAN_PARTICLES .and. .not. plot_inside) then
       call Save_Scalar_Real("ParticlesReflected", plot_inside,  &
                             swarm % n_reflected(c_f:c_l),       &
                             f8, f9, data_offset, run)

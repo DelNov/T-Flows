@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Update_Boundary_Values(flow, turb, mult, update)
+  subroutine Update_Boundary_Values(flow, turb, Vof, update)
 !------------------------------------------------------------------------------!
 !   Update variables on the boundaries (boundary cells) where needed.          !
 !   It does not update volume fluxes at boundaries - keep it like that.        !
@@ -18,19 +18,19 @@
   use Turb_Mod
   use Grid_Mod
   use Control_Mod
-  use Multiphase_Mod, only: Multiphase_Type, VOLUME_OF_FLUID
+  use Vof_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),      target :: flow
-  type(Turb_Type),       target :: turb
-  type(Multiphase_Type), target :: mult
-  character(*)                  :: update
+  type(Field_Type), target :: flow
+  type(Turb_Type),  target :: turb
+  type(Vof_Type),   target :: Vof
+  character(*)             :: update
 !---------------------------------[Calling]------------------------------------!
   real :: Y_Plus_Low_Re
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
-  type(Var_Type),  pointer :: u, v, w, t, phi, vof
+  type(Var_Type),  pointer :: u, v, w, t, phi, fun
   type(Var_Type),  pointer :: kin, eps, zeta, f22, vis, t2
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   integer                  :: c1, c2, s, sc
@@ -40,7 +40,7 @@
   ! Take aliases
   grid => flow % pnt_grid
   vis  => turb % vis
-  vof  => mult % vof
+  fun  => Vof % fun
   call Field_Mod_Alias_Momentum   (flow, u, v, w)
   call Field_Mod_Alias_Energy     (flow, t)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
@@ -97,7 +97,7 @@
   !                !
   !----------------!
   if( (update .eq. 'MULTIPHASE' .or. update .eq. 'ALL') .and.  &
-      mult % model .eq. VOLUME_OF_FLUID ) then
+      Vof % model .eq. VOLUME_OF_FLUID ) then
 
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
@@ -106,10 +106,11 @@
       ! On the boundary perform the extrapolation
       if(c2 < 0) then
 
-        if( Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW .or.     &
+        if( Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW  .or.    &
             Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE .or.    &
+            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT  .or.    &
             Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. SYMMETRY ) then
-          vof % n(c2) = vof % n(c1)
+          fun % n(c2) = fun % n(c1)
         end if
       end if ! c2 < 0
     end do

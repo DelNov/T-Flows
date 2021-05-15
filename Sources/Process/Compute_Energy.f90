@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Energy(flow, turb, mult, Sol, curr_dt, ini)
+  subroutine Compute_Energy(flow, turb, Vof, Sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for scalar (such as temperature)         !
 !------------------------------------------------------------------------------!
@@ -15,12 +15,12 @@
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
-  type(Field_Type),      target :: flow
-  type(Turb_Type),       target :: turb
-  type(Multiphase_Type), target :: mult
-  type(Solver_Type),     target :: Sol
-  integer, intent(in)           :: curr_dt
-  integer, intent(in)           :: ini
+  type(Field_Type),    target :: flow
+  type(Turb_Type),     target :: turb
+  type(Vof_Type),      target :: Vof
+  type(Solver_Type),   target :: Sol
+  integer, intent(in)         :: curr_dt
+  integer, intent(in)         :: ini
 !-----------------------------------[Locals]-----------------------------------! 
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w, t
@@ -80,7 +80,7 @@
   call Sol % Alias_Solver      (A, b)
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Energy(flow, turb, mult, Sol, curr_dt, ini)
+  call User_Mod_Beginning_Of_Compute_Energy(flow, turb, Vof, Sol, curr_dt, ini)
 
   ! Initialize matrix and right hand side
   A % val(:) = 0.0
@@ -245,7 +245,7 @@
   call Field_Mod_Grad_Variable(flow, t)
 
   ! User function
-  call User_Mod_End_Of_Compute_Energy(flow, turb, mult, Sol, curr_dt, ini)
+  call User_Mod_End_Of_Compute_Energy(flow, turb, Vof, Sol, curr_dt, ini)
 
   call Cpu_Timer % Stop('Compute_Energy (without solvers)')
 

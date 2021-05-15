@@ -1,17 +1,17 @@
 !==============================================================================!
-  subroutine Backup_Mod_Save(fld, swr, tur, mul, time, time_step, domain)
+  subroutine Backup_Mod_Save(fld, swr, tur, Vof, time, time_step, domain)
 !------------------------------------------------------------------------------!
 !   Saves backup files name.backup                                             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),      target :: fld
-  type(Swarm_Type),      target :: swr
-  type(Turb_Type),       target :: tur
-  type(Multiphase_Type), target :: mul
-  real                          :: time            ! time of simulation
-  integer                       :: time_step       ! current time step
-  integer,             optional :: domain
+  type(Field_Type),  target :: fld
+  type(Swarm_Type),  target :: swr
+  type(Turb_Type),   target :: tur
+  type(Vof_Type),    target :: Vof
+  real                      :: time            ! time of simulation
+  integer                   :: time_step       ! current time step
+  integer,         optional :: domain
 !-----------------------------------[Locals]-----------------------------------!
   type(Comm_Type), pointer :: comm
   type(Grid_Type), pointer :: grid
@@ -99,11 +99,15 @@
   call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 'press_z',    fld %  p % z)
   call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 'press_corr', fld % pp % n)
 
-  !---------------------!
-  !   Mass flow rates   !
-  !---------------------!
-  call Backup_Mod_Write_Face_Real(grid, fh, d, vc, 'face_flux',  &
+  !-------------------!
+  !   Volume fluxes   !
+  !-------------------!
+  call Backup_Mod_Write_Face_Real(grid, fh, d, vc, 'face_flux_n',  &
                                   fld % v_flux % n, correct_sign = .true.)
+  call Backup_Mod_Write_Face_Real(grid, fh, d, vc, 'face_flux_o',  &
+                                  fld % v_flux % o, correct_sign = .true.)
+  call Backup_Mod_Write_Face_Real(grid, fh, d, vc, 'face_flux_oo',  &
+                                  fld % v_flux % oo, correct_sign = .true.)
 
   !--------------!
   !              !
@@ -119,8 +123,8 @@
   !  Multiphase  !
   !              !
   !--------------!
-  if(mul % model .eq. VOLUME_OF_FLUID) then
-    call Backup_Mod_Write_Variable(fh, d, vc, 'vof', mul % vof)
+  if(Vof % model .eq. VOLUME_OF_FLUID) then
+    call Backup_Mod_Write_Variable(fh, d, vc, 'vof_fun', Vof % fun)
   end if
 
   !-----------------------!
@@ -324,7 +328,7 @@
   !   Swarm (of particles)   !
   !                          !
   !--------------------------!
-  if(mul % model .eq. LAGRANGIAN_PARTICLES) then
+  if(Vof % model .eq. LAGRANGIAN_PARTICLES) then
     call Backup_Mod_Write_Swarm(fh, d, vc, swr)
     call Backup_Mod_Write_Cell_Real(grid, fh, d, vc, 'n_deposited',      &
                                     swr % n_deposited)

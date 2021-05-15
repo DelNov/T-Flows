@@ -240,7 +240,7 @@ SRC_MOD += Bulk_Mod.f90        \
            Turb_Mod.f90        \
            Swarm_Mod.f90       \
            Surf_Mod.f90        \
-           Multiphase_Mod.f90
+           Vof_Mod.f90
 
 # User_Mod should come before Results_Mod
 SRC_MOD += User_Mod.f90

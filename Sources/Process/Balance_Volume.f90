@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Balance_Volume(flow, mult)
+  subroutine Balance_Volume(flow, Vof)
 !------------------------------------------------------------------------------!
 !   Modifies the fluxes at outflow boundaries to conserve the volume.          !
 !   This function modifies velocities and volume fluxes at outflows.           !
@@ -9,20 +9,19 @@
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
   use Comm_Mod
-  use Grid_Mod,        only: Grid_Type, Grid_Mod_Bnd_Cond_Type,  &
-                             INFLOW, OUTFLOW, CONVECT, PRESSURE, SYMMETRY
-  use Field_Mod,       only: Field_Type, Field_Mod_Alias_Momentum
-  use Var_Mod,         only: Var_Type
-  use Face_Mod,        only: Face_Type
-  use Bulk_Mod,        only: Bulk_Type
+  use Grid_Mod,  only: Grid_Type, Grid_Mod_Bnd_Cond_Type,  &
+                       INFLOW, OUTFLOW, CONVECT, PRESSURE, SYMMETRY
+  use Field_Mod, only: Field_Type, Field_Mod_Alias_Momentum
+  use Var_Mod,   only: Var_Type
+  use Face_Mod,  only: Face_Type
+  use Bulk_Mod,  only: Bulk_Type
   use Math_Mod
-  use Multiphase_Mod,  only: Multiphase_Type,  &
-                             Multiphase_Mod_Vof_Mass_Transfer_Added_Volume
+  use Vof_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),      target :: flow
-  type(Multiphase_Type), target :: mult
+  type(Field_Type),  target :: flow
+  type(Vof_Type),    target :: Vof
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
@@ -45,7 +44,7 @@
   !                                      !
   !--------------------------------------!
   if(flow % mass_transfer) then
-    call Multiphase_Mod_Vof_Mass_Transfer_Added_Volume(mult, bulk % vol_src)
+    call Vof % Mass_Transfer_Added_Volume(bulk % vol_src)
   end if
 
   !----------------------------------------------------------!

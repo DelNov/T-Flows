@@ -1,21 +1,21 @@
 !==============================================================================!
-  subroutine Read_Control_Numerical(flow, turb, mult)
+  subroutine Read_Control_Numerical(flow, turb, Vof)
 !------------------------------------------------------------------------------!
 !   Reads details about numerical models from control file.                    !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Field_Mod,      only: Field_Type
-  use Var_Mod,        only: Var_Type
-  use Turb_Mod,       only: Turb_Type
-  use Multiphase_Mod, only: Multiphase_Type, VOLUME_OF_FLUID
+  use Field_Mod,    only: Field_Type
+  use Var_Mod,      only: Var_Type
+  use Turb_Mod,     only: Turb_Type
+  use Vof_Mod
   use Control_Mod
   use Numerics_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),      target :: flow
-  type(Turb_Type),       target :: turb
-  type(Multiphase_Type), target :: mult
+  type(Field_Type), target :: flow
+  type(Turb_Type),  target :: turb
+  type(Vof_Type),   target :: Vof
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: tq, ui, phi
@@ -112,27 +112,27 @@
   !--------------------------------!
   !   Related to multiphase flow   !
   !--------------------------------!
-  if(mult % model .eq. VOLUME_OF_FLUID) then
-    mult % vof % urf    = 0.7
-    mult % vof % mniter = 5
-    call Control_Mod_Advection_Scheme_For_Multiphase                  (name)
-    mult % vof % adv_scheme = Numerics_Mod_Advection_Scheme_Code      (name)
-    call Control_Mod_Time_Integration_Scheme                          (name)
-    mult % vof % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
-    call Control_Mod_Blending_Coefficient_For_Multiphase  (mult % vof % blend)
-    call Control_Mod_Simple_Underrelaxation_For_Multiphase(mult % vof % urf)
-    call Control_Mod_Tolerance_For_Multiphase_Solver      (mult % vof % tol)
-    call Control_Mod_Preconditioner_For_System_Matrix     (mult % vof % precond)
-    call Control_Mod_Max_Iterations_For_Multiphase_Solver (mult % vof % mniter)
+  if(Vof % model .eq. VOLUME_OF_FLUID) then
+    Vof % fun % urf    = 0.7
+    Vof % fun % mniter = 5
+    call Control_Mod_Advection_Scheme_For_Multiphase                 (name)
+    Vof % fun % adv_scheme = Numerics_Mod_Advection_Scheme_Code      (name)
+    call Control_Mod_Time_Integration_Scheme                         (name)
+    Vof % fun % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
+    call Control_Mod_Blending_Coefficient_For_Multiphase  (Vof % fun % blend)
+    call Control_Mod_Simple_Underrelaxation_For_Multiphase(Vof % fun % urf)
+    call Control_Mod_Tolerance_For_Multiphase_Solver      (Vof % fun % tol)
+    call Control_Mod_Preconditioner_For_System_Matrix     (Vof % fun % precond)
+    call Control_Mod_Max_Iterations_For_Multiphase_Solver (Vof % fun % mniter)
     ! Max Courant number and Max substep cycles
-    call Control_Mod_Max_Courant_Vof       (mult % courant_max_param)
-    call Control_Mod_Max_Substep_Cycles_Vof(mult % n_sub_param)
-    call Control_Mod_Max_Correction_Cycles_Beta_Vof    (mult % corr_num_max)
-    call Control_Mod_Max_Smoothing_Cycles_Curvature_Vof(mult % n_conv_curv)
-    call Control_Mod_Max_Smoothing_Cycles_Normal_Vof   (mult % n_conv_norm)
-    call Control_Mod_Skewness_Correction_Vof           (mult % skew_corr)
-    call Control_Mod_Gradient_Method_For_Multiphase             (name)
-    mult % vof % grad_method = Numerics_Mod_Gradient_Method_Code(name)
+    call Control_Mod_Max_Courant_Vof       (Vof % courant_max_param)
+    call Control_Mod_Max_Substep_Cycles_Vof(Vof % n_sub_param)
+    call Control_Mod_Max_Correction_Cycles_Beta_Vof    (Vof % corr_num_max)
+    call Control_Mod_Max_Smoothing_Cycles_Curvature_Vof(Vof % n_conv_curv)
+    call Control_Mod_Max_Smoothing_Cycles_Normal_Vof   (Vof % n_conv_norm)
+    call Control_Mod_Skewness_Correction_Vof           (Vof % skew_corr)
+    call Control_Mod_Gradient_Method_For_Multiphase            (name)
+    Vof % fun % grad_method = Numerics_Mod_Gradient_Method_Code(name)
   end if
 
   !--------------------------------!

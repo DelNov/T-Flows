@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Vof_Smooth_Curvature(mult)
+  subroutine Smooth_Curvature(Vof)
 !------------------------------------------------------------------------------!
 !   Smoothes curvature in two steps: first a smoothing curvature around the    !
 !   Interface and second in the direction of the normal. This technique can    !
@@ -15,7 +15,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Multiphase_Type), target :: mult
+  class(Vof_Type), target :: Vof
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: col   ! colour; could be vof or smooth
@@ -26,10 +26,10 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => mult % pnt_grid
+  grid => Vof % pnt_grid
 
-  col => mult % smooth
-  ! col => mult % vof
+  col => Vof % smooth
+  ! col => Vof % vof
 
   nb = grid % n_bnd_cells
   nc = grid % n_cells
@@ -58,7 +58,7 @@
 
     if(c2 > 0) then
       fs = grid % f(s)
-      curvf = fs * mult % curv(c1) + (1.0 - fs) * mult % curv(c2)
+      curvf = fs * Vof % curv(c1) + (1.0 - fs) * Vof % curv(c2)
       gradk_x(c1) = gradk_x(c1) + curvf * grid % sx(s) / grid % vol(c1)
       gradk_y(c1) = gradk_y(c1) + curvf * grid % sy(s) / grid % vol(c1)
       gradk_z(c1) = gradk_z(c1) + curvf * grid % sz(s) / grid % vol(c1)
@@ -79,10 +79,10 @@
     if(c2 > 0) then
       w_v1 = (1.0 - 2.0 * abs(0.5 - col % n(c1))) ** weight_s
       w_v2 = (1.0 - 2.0 * abs(0.5 - col % n(c2))) ** weight_s
-      sum_k_weight(c1) = sum_k_weight(c1) + mult % curv(c2) * w_v2
+      sum_k_weight(c1) = sum_k_weight(c1) + Vof % curv(c2) * w_v2
       sum_weight(c1)   = sum_weight(c1)   + w_v2
 
-      sum_k_weight(c2) = sum_k_weight(c2) + mult % curv(c1) * w_v1
+      sum_k_weight(c2) = sum_k_weight(c2) + Vof % curv(c1) * w_v1
       sum_weight(c2)   = sum_weight(c2)   + w_v1
     end if
   end do
@@ -92,7 +92,7 @@
 
   do c = 1, grid % n_cells
     w_v1 = (1.0 - 2.0 * abs(0.5 - col % n(c))) ** weight_s
-    k_star(c) = (w_v1 * mult % curv(c) + sum_k_weight(c))    &
+    k_star(c) = (w_v1 * Vof % curv(c) + sum_k_weight(c))    &
               / (w_v1 + sum_weight(c) + FEMTO)
   end do
 
@@ -138,11 +138,11 @@
       w_v1 = (1.0 - 2.0 * abs(0.5 - col % n(c1))) ** weight_n
       w_v2 = (1.0 - 2.0 * abs(0.5 - col % n(c2))) ** weight_n
 
-      w_m1 = abs(dot_product((/mult % nx(c1), mult % ny(c1), mult % nz(c1)/),  &
+      w_m1 = abs(dot_product((/Vof % nx(c1), Vof % ny(c1), Vof % nz(c1)/),  &
                              (/grid % dx(s),  grid % dy(s),  grid % dz(s)/)    &
                              / grid % d(s))) ** weight_n
 
-      w_m2 = abs(dot_product((/mult % nx(c2), mult % ny(c2), mult % nz(c2)/),  &
+      w_m2 = abs(dot_product((/Vof % nx(c2), Vof % ny(c2), Vof % nz(c2)/),  &
                              (/grid % dx(s),  grid % dy(s),  grid % dz(s)/)    &
                              / (-grid % d(s)))) ** weight_n
 
@@ -159,10 +159,10 @@
 
   do c = 1, grid % n_cells
     w_v1 = (1.0 - 2.0 * abs(0.5 - col % n(c))) ** weight_n
-    mult % curv(c) = (w_v1 * k_star(c) + sum_k_weight(c))    &
+    Vof % curv(c) = (w_v1 * k_star(c) + sum_k_weight(c))    &
                    / (w_v1 + sum_weight(c) + FEMTO)
   end do
 
-  call Grid_Mod_Exchange_Cells_Real(grid, mult % curv)
+  call Grid_Mod_Exchange_Cells_Real(grid, Vof % curv)
 
   end subroutine

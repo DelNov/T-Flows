@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Vof_Mass_Transfer_Added_Volume(mult, added_vol)
+  subroutine Mass_Transfer_Added_Volume(Vof, added_vol)
 !------------------------------------------------------------------------------!
 !   Calculates added volume due to phase change                                !
 !                                                                              !
@@ -7,8 +7,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Multiphase_Type), target :: mult
-  real                          :: added_vol
+  class(Vof_Type), target :: Vof
+  real                    :: added_vol
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: grid
   type(Field_Type), pointer :: flow
@@ -16,8 +16,8 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => mult % pnt_grid
-  flow => mult % pnt_flow
+  grid => Vof % pnt_grid
+  flow => Vof % pnt_flow
 
   ! Integrate added volume
   added_vol = 0.0
@@ -27,10 +27,10 @@
   if(.not. flow % mass_transfer) return
 
   do c = 1, grid % n_cells - grid % comm % n_buff_cells
-    e = mult % Front % cell_at_elem(c)  ! front element
+    e = Vof % Front % cell_at_elem(c)  ! front element
     if(e .ne. 0) then
       added_vol = added_vol  &
-                + mult % m_dot(c) * mult % Front % elem(e) % area
+                + Vof % m_dot(c) * Vof % Front % elem(e) % area
 
     end if
   end do

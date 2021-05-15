@@ -1,18 +1,18 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Vof_Grad_Component_No_Refresh_With_Front(mult, phi, i, phii, phif)
+  subroutine Grad_Component_No_Refresh_With_Front(Vof, phi, i, phii, phif)
 !------------------------------------------------------------------------------!
 !   Calculates gradient of generic variable phi by a least squares method,     !
 !   without refershing the buffers.                                            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Multiphase_Type), target :: mult
-  real                          :: phi (-mult % pnt_grid % n_bnd_cells:  &
-                                         mult % pnt_grid % n_cells)
-  integer, intent(in)           :: i
-  real,    intent(out)          :: phii(-mult % pnt_grid % n_bnd_cells:  &
-                                         mult % pnt_grid % n_cells)
-  real,    intent(in)           :: phif  ! phi at the front
+  class(Vof_Type), target :: Vof
+  real                    :: phi (-Vof % pnt_grid % n_bnd_cells:  &
+                                   Vof % pnt_grid % n_cells)
+  integer, intent(in)     :: i
+  real,    intent(out)    :: phii(-Vof % pnt_grid % n_bnd_cells:  &
+                                   Vof % pnt_grid % n_cells)
+  real,    intent(in)     :: phif  ! phi at the front
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: grid
   type(Field_Type), pointer :: flow
@@ -26,8 +26,8 @@
 !==============================================================================!
 
   ! Take alias
-  grid => mult % pnt_grid
-  flow => mult % pnt_flow
+  grid => Vof % pnt_grid
+  flow => Vof % pnt_flow
 
   ! Initialize gradients
   phii(1:grid % n_cells) = 0.
@@ -47,7 +47,7 @@
     dz_c2 = grid % dz(s)
 
     ! If face is at the front, reduce the extents of the stencil
-    if(any(mult % Front % face_at_elem(1:2,s) .ne. 0)) then
+    if(any(Vof % Front % face_at_elem(1:2,s) .ne. 0)) then
       dphi1 = phif - phi(c1)
       dphi2 = phi(c2) - phif
       dx_c1 = grid % xs(s) - grid % xc(c1)

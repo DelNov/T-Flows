@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Scalar(flow, turb, mult, Sol, curr_dt, ini, sc)
+  subroutine Compute_Scalar(flow, turb, Vof, Sol, curr_dt, ini, sc)
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for use scalar.                          !
 !------------------------------------------------------------------------------!
@@ -20,13 +20,13 @@
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
-  type(Field_Type),      target :: flow
-  type(Turb_Type),       target :: turb
-  type(Multiphase_Type), target :: mult
-  type(Solver_Type),     target :: Sol
-  integer, intent(in)           :: curr_dt
-  integer, intent(in)           :: ini
-  integer, intent(in)           :: sc
+  type(Field_Type),    target :: flow
+  type(Turb_Type),     target :: turb
+  type(Vof_Type),      target :: Vof
+  type(Solver_Type),   target :: Sol
+  integer, intent(in)         :: curr_dt
+  integer, intent(in)         :: ini
+  integer, intent(in)         :: sc
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: uu, vv, ww, uv, uw, vw
@@ -64,7 +64,7 @@
   call Sol % Alias_Solver     (A, b)
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Scalar(flow, turb, mult, Sol,  &
+  call User_Mod_Beginning_Of_Compute_Scalar(flow, turb, Vof, Sol,  &
                                             curr_dt, ini, sc)
 
   ! Initialize matrix and right hand side
@@ -372,7 +372,7 @@
   call Field_Mod_Grad_Variable(flow, phi)
 
   ! User function
-  call User_Mod_End_Of_Compute_Scalar(flow, turb, mult, Sol, curr_dt, ini, sc)
+  call User_Mod_End_Of_Compute_Scalar(flow, turb, Vof, Sol, curr_dt, ini, sc)
 
   call Cpu_Timer % Stop('Compute_Scalars (without solvers)')
 

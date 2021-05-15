@@ -1,15 +1,15 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Vof_Predict_Beta(mult)
+  subroutine Predict_Beta(Vof)
 !------------------------------------------------------------------------------!
 !   Step 1 of CICSAM: Compute beta for computation of volume fraction          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Multiphase_Type), target :: mult
+  class(Vof_Type), target :: Vof
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: grid
   type(Field_Type), pointer :: flow
-  type(Var_Type),   pointer :: vof
+  type(Var_Type),   pointer :: fun
   type(Face_Type),  pointer :: v_flux
   real, contiguous, pointer :: beta_f(:)
   real, contiguous, pointer :: beta_c(:)
@@ -24,15 +24,15 @@
 !==============================================================================!
 
   ! Take aliases
-  flow   => mult % pnt_flow
+  flow   => Vof % pnt_flow
   grid   => flow % pnt_grid
   v_flux => flow % v_flux
-  vof    => mult % vof
-  beta_f => mult % beta_f
-  beta_c => mult % beta_c
-  c_d    => mult % c_d
+  fun    => Vof % fun
+  beta_f => Vof % beta_f
+  beta_c => Vof % beta_c
+  c_d    => Vof % c_d
 
-  if(vof % adv_scheme .eq. CICSAM) then
+  if(fun % adv_scheme .eq. CICSAM) then
 
     !--------------------!
     !   Compute beta_f   !
@@ -57,19 +57,19 @@
             signo = - 1.0
           end if
 
-          alfa_d = vof % n(donor)
-          alfa_a = vof % n(accept)
+          alfa_d = fun % n(donor)
+          alfa_a = fun % n(accept)
 
-          dotprod = signo * (  vof % x(donor) * grid % dx(s)   &
-                             + vof % y(donor) * grid % dy(s)   &
-                             + vof % z(donor) * grid % dz(s))
+          dotprod = signo * (  fun % x(donor) * grid % dx(s)   &
+                             + fun % y(donor) * grid % dy(s)   &
+                             + fun % z(donor) * grid % dz(s))
 
           alfa_u = min(max(alfa_a - 2.0 * dotprod, 0.0), 1.0)  ! old way
 
-!         call Multiphase_Mod_Vof_Find_Upstream_Phi(vof,      &
-!                                                   vof % x,  &
-!                                                   vof % y,  &
-!                                                   vof % z,  &
+!         call Multiphase_Mod_Vof_Find_Upstream_Phi(fun,      &
+!                                                   fun % x,  &
+!                                                   fun % y,  &
+!                                                   fun % z,  &
 !                                                   s, donor, accept, alfa_u)
           ! Face is inside the domain
           if(abs(alfa_u - alfa_a) > FEMTO) then
@@ -96,9 +96,9 @@
             end if
 
             ! Compute angle:
-            prodmag = sqrt(  vof % x(donor) ** 2   &
-                           + vof % y(donor) ** 2   &
-                           + vof % z(donor) ** 2)  &
+            prodmag = sqrt(  fun % x(donor) ** 2   &
+                           + fun % y(donor) ** 2   &
+                           + fun % z(donor) ** 2)  &
                     * grid % d(s)
 
             if(prodmag > FEMTO) then
@@ -122,7 +122,7 @@
       end if  ! c2 > 0
     end do  ! do s = 1, ...
 
-  else if(vof % adv_scheme .eq. STACS) then
+  else if(fun % adv_scheme .eq. STACS) then
 
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
@@ -143,12 +143,12 @@
             signo = - 1.0
           end if
 
-          alfa_d = vof % n(donor)
-          alfa_a = vof % n(accept)
+          alfa_d = fun % n(donor)
+          alfa_a = fun % n(accept)
 
-          dotprod = signo * (  vof % x(donor) * grid % dx(s)   &
-                             + vof % y(donor) * grid % dy(s)   &
-                             + vof % z(donor) * grid % dz(s))
+          dotprod = signo * (  fun % x(donor) * grid % dx(s)   &
+                             + fun % y(donor) * grid % dy(s)   &
+                             + fun % z(donor) * grid % dz(s))
 
           ! Face is inside the domain
           alfa_u = min(max(alfa_a - 2.0 * dotprod, 0.0), 1.0)
@@ -175,9 +175,9 @@
             end if
 
             ! Compute angle:
-            prodmag = sqrt(  vof % x(donor) ** 2   &
-                           + vof % y(donor) ** 2   &
-                           + vof % z(donor) ** 2)  &
+            prodmag = sqrt(  fun % x(donor) ** 2   &
+                           + fun % y(donor) ** 2   &
+                           + fun % z(donor) ** 2)  &
                     * grid % d(s)
 
             if(prodmag > FEMTO) then

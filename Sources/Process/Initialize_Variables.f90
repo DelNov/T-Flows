@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Initialize_Variables(flow, turb, mult, swarm, Sol)
+  subroutine Initialize_Variables(flow, turb, Vof, swarm, Sol)
 !------------------------------------------------------------------------------!
 !   Initialize dependent variables.  (It is a bit of a mess still)             !
 !------------------------------------------------------------------------------!
@@ -14,16 +14,16 @@
   use Bulk_Mod
   use User_Mod
   use Control_Mod
-  use Multiphase_Mod
+  use Vof_Mod
   use Numerics_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),      target :: flow
-  type(Turb_Type),       target :: turb
-  type(Multiphase_Type)         :: mult
-  type(Swarm_Type)              :: swarm
-  type(Solver_Type)             :: Sol
+  type(Field_Type), target :: flow
+  type(Turb_Type),  target :: turb
+  type(Vof_Type)           :: Vof
+  type(Swarm_Type)         :: swarm
+  type(Solver_Type)        :: Sol
 !----------------------------------[Calling]-----------------------------------!
   integer :: Key_Ind
 !-----------------------------------[Locals]-----------------------------------!
@@ -357,7 +357,7 @@
 
   end if
 
-  call User_Mod_Initialize_Variables(flow, turb, mult, swarm, Sol)
+  call User_Mod_Initialize_Variables(flow, turb, Vof, swarm, Sol)
 
   !--------------------------------!
   !      Calculate the inflow      !
@@ -414,13 +414,19 @@
   call Comm_Mod_Global_Sum_Real(bulk % vol_in)
   call Comm_Mod_Global_Sum_Real(area)
 
+  ! This parameter, has_pressure_outlet, is used in Compute_Pressure
+  flow % has_pressure_outlet = .false.
+  if(n_pressure > 0) then
+    flow % has_pressure_outlet = .true.
+  end if
+
   !----------------------!
   !   Initializes time   !
   !----------------------!
   if(this_proc  < 2) then
     if(n_inflow .gt. 0) then
       print '(a29,es12.5)', ' # Volume inflow           : ', bulk % vol_in
-      if (mult % model .eq. VOLUME_OF_FLUID) then
+      if (Vof % model .eq. VOLUME_OF_FLUID) then
         ! Needs to be corrected
         print '(a29,es12.5)', ' # Average inflow velocity : ',  &
           bulk % vol_in / area

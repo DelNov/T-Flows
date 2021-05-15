@@ -1,8 +1,7 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Vof_Smooth_Scalar(grid, mult, var,   &
-                                              smooth_var, n_conv)
+  subroutine Smooth_Scalar(Vof, grid, var, smooth_var, n_conv)
 !------------------------------------------------------------------------------!
-!    Smoothes scalar using a laplacian smoother                                !
+!   Smoothes scalar using a Laplacian smoother                                 !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Work_Mod, only: sum_vol_area => r_cell_01,   &
@@ -10,21 +9,18 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Multiphase_Type), target :: mult
-  type(Grid_Type)               :: grid
-  integer                       :: n_conv, nb, nc
-  real                          :: var(-grid % n_bnd_cells: grid % n_cells)
-  real                          :: smooth_var(-grid % n_bnd_cells    &
-                                             : grid % n_cells)
+  class(Vof_Type), target :: Vof
+  type(Grid_Type)         :: grid
+  integer                 :: n_conv, nb, nc
+  real                    :: var(-grid % n_bnd_cells: grid % n_cells)
+  real                    :: smooth_var(-grid % n_bnd_cells    &
+                                       : grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  type(Var_Type), pointer :: vof
-  integer                 :: s, c, c1, c2, c_iter
-  real                    :: fs, vol_face
+  integer :: s, c, c1, c2, c_iter
+  real    :: fs, vol_face
 !==============================================================================!
 
   ! Take aliases
-  vof => mult % vof
-
   nb = grid % n_bnd_cells
   nc = grid % n_cells
 

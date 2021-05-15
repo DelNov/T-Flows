@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Convective_Outflow(flow, turb, mult)
+  subroutine Convective_Outflow(flow, turb, Vof)
 !------------------------------------------------------------------------------!
 !   Extrapoloate variables on the boundaries where needed.                     !
 !------------------------------------------------------------------------------!
@@ -9,13 +9,13 @@
   use Turb_Mod
   use Grid_Mod
   use Control_Mod
-  use Multiphase_Mod
+  use Vof_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),      target :: flow
-  type(Turb_Type),       target :: turb
-  type(Multiphase_Type), target :: mult
+  type(Field_Type), target :: flow
+  type(Turb_Type),  target :: turb
+  type(Vof_Type),   target :: Vof
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
@@ -45,10 +45,10 @@
   !----------------------------------------------------------!
 
   !   ! If there is a jump in velocities, call specialized gradient calculation
-  !   if(mult % model .eq. VOLUME_OF_FLUID .and. flow % mass_transfer) then
-  !     call Multiphase_Mod_Vof_Grad_Variable_With_Jump(mult, flow % u)
-  !     call Multiphase_Mod_Vof_Grad_Variable_With_Jump(mult, flow % v)
-  !     call Multiphase_Mod_Vof_Grad_Variable_With_Jump(mult, flow % w)
+  !   if(Vof % model .eq. VOLUME_OF_FLUID .and. flow % mass_transfer) then
+  !     call Multiphase_Mod_Vof_Grad_Variable_With_Jump(Vof, flow % u)
+  !     call Multiphase_Mod_Vof_Grad_Variable_With_Jump(Vof, flow % v)
+  !     call Multiphase_Mod_Vof_Grad_Variable_With_Jump(Vof, flow % w)
   ! 
   !   ! No jumps, call usual routines
   !   else

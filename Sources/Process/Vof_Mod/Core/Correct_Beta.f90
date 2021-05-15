@@ -1,15 +1,15 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Vof_Correct_Beta(mult)
+  subroutine Correct_Beta(Vof)
 !------------------------------------------------------------------------------!
 !   Step 2 of CICSAM: Correct beta for computation of volume fraction          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Multiphase_Type), target :: mult
+  class(Vof_Type), target :: Vof
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: grid
   type(Field_Type), pointer :: flow
-  type(Var_Type),   pointer :: vof
+  type(Var_Type),   pointer :: fun
   type(Face_Type),  pointer :: v_flux
   real, contiguous, pointer :: beta_f(:)
   real, contiguous, pointer :: c_d(:)
@@ -18,12 +18,12 @@
 !==============================================================================!
 
   ! Take aliases
-  flow   => mult % pnt_flow
+  flow   => Vof % pnt_flow
   grid   => flow % pnt_grid
   v_flux => flow % v_flux
-  vof    => mult % vof
-  beta_f => mult % beta_f
-  c_d    => mult % c_d
+  fun    => Vof % fun
+  beta_f => Vof % beta_f
+  c_d    => Vof % c_d
 
   ! Interior faces
   do s = 1, grid % n_faces
@@ -46,13 +46,13 @@
         !   Correct beta_f   !
         !--------------------!
         bcorr = 0.0
-        delta_alfa = 0.5 * (vof % n(accept) + vof % o(accept)      &
-                         - (vof % n(donor)  + vof % o(donor)))
+        delta_alfa = 0.5 * (fun % n(accept) + fun % o(accept)      &
+                         - (fun % n(donor)  + fun % o(donor)))
 
         cf = c_d(donor)
 
-        if(vof % n(donor) < 0.0) then
-          e_minus = max(-vof % n(donor), 0.0)
+        if(fun % n(donor) < 0.0) then
+          e_minus = max(-fun % n(donor), 0.0)
           ! Donor value < 0.0 Ex: sd = -0.1 -> e_minus = +0.1
           if(e_minus > FEMTO .and. cf > FEMTO) then
             if(delta_alfa > e_minus) then
@@ -63,8 +63,8 @@
           end if
         end if
 
-        if(vof % n(donor) > 1.0) then
-          e_plus = max(vof % n(donor) - 1.0, 0.0)
+        if(fun % n(donor) > 1.0) then
+          e_plus = max(fun % n(donor) - 1.0, 0.0)
           ! Donor value > 1.0 Ex: sd = 1.1 -> e_plus = +0.1
           if(e_plus > FEMTO .and. cf > FEMTO) then
             if(delta_alfa < - e_plus) then

@@ -5,7 +5,7 @@
 !   define his/her variables and pass them around his functions
 !------------------------------------------------------------------------------!
   use Swarm_Mod
-  use Multiphase_Mod
+  use Vof_Mod
   use Interface_Mod
 !------------------------------------------------------------------------------!
   implicit none

@@ -78,6 +78,9 @@
     ! Reference density (for buoyancy)
     real :: dens_ref
 
+    ! True if it has pressure outlet (needed for a fix in Compute_Pressure)
+    logical :: has_pressure_outlet
+
     !-------------------------------------------------!
     !   Associated with energy conservation eqution   !
     !-------------------------------------------------!

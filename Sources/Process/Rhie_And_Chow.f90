@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Rhie_And_Chow(flow, mult, Sol)
+  subroutine Rhie_And_Chow(flow, Vof, Sol)
 !------------------------------------------------------------------------------!
 !   Computes face velocitites with Rhie and Chow interpolation method          !
 !------------------------------------------------------------------------------!
@@ -24,9 +24,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),      target :: flow
-  type(Multiphase_Type), target :: mult
-  type(Solver_Type),     target :: Sol
+  type(Field_Type),  target :: flow
+  type(Vof_Type),    target :: Vof
+  type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w, p
@@ -87,6 +87,7 @@
       u_c(c) = u_c(c) - (w_o * u % o(c) + w_oo * u % oo(c)) * t_m(c)
       v_c(c) = v_c(c) - (w_o * v % o(c) + w_oo * v % oo(c)) * t_m(c)
       w_c(c) = w_c(c) - (w_o * w % o(c) + w_oo * w % oo(c)) * t_m(c)
+
     end do
   end if
 
@@ -100,6 +101,7 @@
       u_c(c) = u_c(c) - v_m(c) * flow % cell_fx(c)
       v_c(c) = v_c(c) - v_m(c) * flow % cell_fy(c)
       w_c(c) = w_c(c) - v_m(c) * flow % cell_fz(c)
+
     end do
   end if
 
@@ -118,7 +120,6 @@
       u_f(s) = fs * u_c(c1) + (1.0 - fs) * u_c(c2)
       v_f(s) = fs * v_c(c1) + (1.0 - fs) * v_c(c2)
       w_f(s) = fs * w_c(c1) + (1.0 - fs) * w_c(c2)
-
 
       ! Calculate coeficients for the pressure matrix
       ! Units: m * m^3 s / kg = m^4 s / kg

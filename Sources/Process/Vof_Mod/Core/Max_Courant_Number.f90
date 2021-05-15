@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Vof_Max_Courant_Number(mult, dt, interf, courant_max)
+  subroutine Max_Courant_Number(Vof, dt, interf, courant_max)
 !------------------------------------------------------------------------------!
 !   Computes the Maximum Courant Number at cells. The argument interf helps    !
 !   selecting if calculation will be performed close the interface, which      !
@@ -8,31 +8,31 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Multiphase_Type), target :: mult
-  real                          :: dt            ! time step
-  integer, intent(in)           :: interf
-  real                          :: courant_max
+  class(Vof_Type), target :: Vof
+  real                    :: dt            ! time step
+  integer, intent(in)     :: interf
+  real                    :: courant_max
 !--------------------------------[Locals]--------------------------------------!
   type(Field_Type), pointer :: flow
   type(Grid_Type),  pointer :: grid
-  type(Var_Type),   pointer :: vof
+  type(Var_Type),   pointer :: fun
   type(Face_Type),  pointer :: v_flux
   real, contiguous, pointer :: c_d(:)
   integer                   :: c, c1, c2, s
-  real                      :: vof_dist
+  real                      :: fun_dist
 !==============================================================================!
 
   ! Take aliases
-  flow   => mult % pnt_flow
+  flow   => Vof % pnt_flow
   v_flux => flow % v_flux
   grid   => flow % pnt_grid
-  vof    => mult % vof
-  c_d    => mult % c_d
+  fun    => Vof % fun
+  c_d    => Vof % c_d
 
   courant_max = -HUGE
 
   ! Initialize
-  c_d(-mult % pnt_grid % n_bnd_cells:mult % pnt_grid % n_cells) = 0.0
+  c_d(-Vof % pnt_grid % n_bnd_cells:Vof % pnt_grid % n_cells) = 0.0
 
   if(interf == 1) then
 
@@ -40,27 +40,27 @@
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
 
-      vof_dist = min(max(vof % n(c1), 0.0), 1.0)
-      vof_dist = (1.0 - vof_dist) ** 2 * vof_dist ** 2 * 16.0
+      fun_dist = min(max(fun % n(c1), 0.0), 1.0)
+      fun_dist = (1.0 - fun_dist) ** 2 * fun_dist ** 2 * 16.0
 
-      c_d(c1) = c_d(c1) + vof_dist  &
+      c_d(c1) = c_d(c1) + fun_dist  &
               * max(-v_flux % n(s) * dt / grid % vol(c1), 0.0)
 
       if(c2 > 0) then
-        vof_dist = min(max(vof % n(c2), 0.0), 1.0)
+        fun_dist = min(max(fun % n(c2), 0.0), 1.0)
 
-        vof_dist = (1.0 - vof_dist) ** 2 * vof_dist ** 2 * 16.0
+        fun_dist = (1.0 - fun_dist) ** 2 * fun_dist ** 2 * 16.0
 
-        c_d(c2) = c_d(c2) + vof_dist  &
+        c_d(c2) = c_d(c2) + fun_dist  &
                 * max( v_flux % n(s) * dt / grid % vol(c2), 0.0)
       end if
     end do
 
-    ! if(mult % phase_Change) then
+    ! if(Vof % phase_Change) then
     !   do c = 1, grid % n_cells
-    !     vof_dist = min(max(vof % n(c1), 0.0),1.0)
-    !     vof_dist = (1.0 - vof_dist) ** 2 * vof_dist ** 2 * 16.0
-    !     c_d(c) = c_d(c) + vof_dist * mult % flux_rate(c)    &
+    !     fun_dist = min(max(fun % n(c1), 0.0),1.0)
+    !     fun_dist = (1.0 - fun_dist) ** 2 * fun_dist ** 2 * 16.0
+    !     c_d(c) = c_d(c) + fun_dist * Vof % flux_rate(c)    &
     !                                / flow % density_f(s) * dt
     !   end do
     ! end if
@@ -86,9 +86,9 @@
       end if
     end do
 
-    ! if(mult % phase_Change) then
+    ! if(Vof % phase_Change) then
     !   do c = 1, grid % n_cells
-    !     c_d(c) = c_d(c) + mult % flux_rate(c) / flow % density_f(s) * dt
+    !     c_d(c) = c_d(c) + Vof % flux_rate(c) / flow % density_f(s) * dt
     !   end do
     ! end if
 

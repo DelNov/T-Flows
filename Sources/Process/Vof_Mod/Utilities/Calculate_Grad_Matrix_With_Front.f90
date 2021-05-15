@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Vof_Calculate_Grad_Matrix_With_Front(mult)
+  subroutine Calculate_Grad_Matrix_With_Front(Vof)
 !------------------------------------------------------------------------------!
 !   Calculates gradient matrix for cases with front tracking (boiling)         !
 !                                                                              !
@@ -7,7 +7,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Multiphase_Type) :: mult
+  class(Vof_Type) :: Vof
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: grid
   type(Field_Type), pointer :: flow
@@ -17,8 +17,8 @@
 !==============================================================================!
 
   ! Take alias
-  grid => mult % pnt_grid
-  flow => mult % pnt_flow
+  grid => Vof % pnt_grid
+  flow => Vof % pnt_flow
 
   !--------------------------------------------!
   !   Initialize gradient matrices for cells   !
@@ -47,7 +47,7 @@
     dz_c2 = grid % dz(s)
 
     ! If face is at the front, reduce the extents of the stencil
-    if(any(mult % Front % face_at_elem(1:2,s) .ne. 0)) then
+    if(any(Vof % Front % face_at_elem(1:2,s) .ne. 0)) then
       dx_c1 = grid % xs(s) - grid % xc(c1)
       dy_c1 = grid % ys(s) - grid % yc(c1)
       dz_c1 = grid % zs(s) - grid % zc(c1)

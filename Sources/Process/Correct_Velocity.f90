@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Correct_Velocity(flow, turb, mult, Sol, curr_dt, ini)
+  subroutine Correct_Velocity(flow, turb, Vof, Sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Corrects the velocities, and mass (or volume) fluxes on cell faces.        !
 !------------------------------------------------------------------------------!
@@ -8,12 +8,12 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),      target :: flow
-  type(Turb_Type),       target :: turb
-  type(Multiphase_Type), target :: mult
-  type(Solver_Type),     target :: Sol
-  integer, intent(in)           :: curr_dt
-  integer, intent(in)           :: ini
+  type(Field_Type),    target :: flow
+  type(Turb_Type),     target :: turb
+  type(Vof_Type),      target :: Vof
+  type(Solver_Type),   target :: Sol
+  integer, intent(in)         :: curr_dt
+  integer, intent(in)         :: ini
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
   type(Bulk_Type),   pointer :: bulk
@@ -42,7 +42,7 @@
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! User function
-  call User_Mod_Beginning_Of_Correct_Velocity(flow, mult, Sol, curr_dt, ini)
+  call User_Mod_Beginning_Of_Correct_Velocity(flow, Vof, Sol, curr_dt, ini)
 
   !-----------------------------------------!
   !   Correct velocities and fluxes with    !
@@ -138,7 +138,7 @@
   end if
 
   ! User function
-  call User_Mod_End_Of_Correct_Velocity(flow, mult, Sol, curr_dt, ini)
+  call User_Mod_End_Of_Correct_Velocity(flow, Vof, Sol, curr_dt, ini)
 
   call Cpu_Timer % Stop('Correct_Velocity')
 

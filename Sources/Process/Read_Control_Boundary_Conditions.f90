@@ -1,32 +1,32 @@
 !==============================================================================!
-  subroutine Read_Control_Boundary_Conditions(flow, turb, mult, turb_planes)
+  subroutine Read_Control_Boundary_Conditions(flow, turb, Vof, turb_planes)
 !------------------------------------------------------------------------------!
 !   Reads boundary condition from control file                                 !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
   use File_Mod
-  use Comm_Mod,       only: this_proc, Comm_Mod_End
-  use Field_Mod,      only: Field_Type
+  use Comm_Mod,    only: this_proc, Comm_Mod_End
+  use Field_Mod,   only: Field_Type
   use Turb_Mod
-  use Multiphase_Mod, only: Multiphase_Type, VOLUME_OF_FLUID
-  use Grid_Mod,       only: Grid_Type
+  use Vof_Mod
+  use Grid_Mod,    only: Grid_Type
   use Eddies_Mod
   use User_Mod
   use Control_Mod
-  use Var_Mod,        only: Var_Type
+  use Var_Mod,     only: Var_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),      target :: flow
   type(Turb_Type),       target :: turb
-  type(Multiphase_Type), target :: mult
+  type(Vof_Type),        target :: Vof
   type(Turb_Plane_Type)         :: turb_planes
 !----------------------------------[Calling]-----------------------------------!
   integer :: Key_Ind
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
-  type(Var_Type),  pointer :: u, v, w, t, p, vof
+  type(Var_Type),  pointer :: u, v, w, t, p, fun
   type(Var_Type),  pointer :: kin, eps, f22, zeta, vis, t2
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   type(Var_Type),  pointer :: scalar(:)
@@ -56,7 +56,7 @@
   scalar => flow % scalar
   vis    => turb % vis
   t2     => turb % t2
-  vof    => mult % vof
+  fun    => Vof % fun
 
   call Field_Mod_Alias_Momentum   (flow, u, v, w)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
@@ -227,11 +227,11 @@
             end if
 
             ! Volume of fluid -> still to be worked around
-            if (mult % model .eq. VOLUME_OF_FLUID) then
+            if (Vof % model .eq. VOLUME_OF_FLUID) then
               i = Key_Ind('VOF', keys, nks)
-              if(i > 0) vof % bnd_cond_type(c) = bc_type_tag
+              if(i > 0) fun % bnd_cond_type(c) = bc_type_tag
               i = Key_Ind('VOF_C_ANG', keys, nks)
-              if(i > 0) vof % bnd_cond_type(c) = bc_type_tag
+              if(i > 0) fun % bnd_cond_type(c) = bc_type_tag
             end if
 
             ! For scalars
@@ -269,11 +269,11 @@
             end if
 
             ! Multiphase flow
-            if (mult % model .eq. VOLUME_OF_FLUID) then
+            if (Vof % model .eq. VOLUME_OF_FLUID) then
               i = Key_Ind('VOF', keys, nks)
-              if(i > 0) vof % b(c) = vals(i)
+              if(i > 0) fun % b(c) = vals(i)
               i = Key_Ind('VOF_C_ANG', keys, nks)
-              if(i > 0) vof % q(c) = vals(i)
+              if(i > 0) fun % q(c) = vals(i)
             end if
 
             ! For scalars
@@ -828,8 +828,8 @@
       t % n(c) = t % b(c)
     end if
 
-    if (mult % model .eq. VOLUME_OF_FLUID) then
-      vof % n(c) = vof % b(c)
+    if (Vof % model .eq. VOLUME_OF_FLUID) then
+      fun % n(c) = fun % b(c)
     end if
 
     do sc = 1, flow % n_scalars

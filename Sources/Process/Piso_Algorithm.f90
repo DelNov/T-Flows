@@ -1,18 +1,18 @@
 !==============================================================================!
-  subroutine Piso_Algorithm(flow, turb, mult, Sol, ini)
+  subroutine Piso_Algorithm(flow, turb, Vof, Sol, ini)
 !------------------------------------------------------------------------------!
 !   PISO algorithm                                                             !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Multiphase_Mod
+  use Vof_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),      target :: flow
-  type(Turb_Type),       target :: turb
-  type(Multiphase_Type), target :: mult
-  type(Solver_Type),     target :: Sol
-  integer                       :: ini       ! current inner iteration
+  type(Field_Type),  target :: flow
+  type(Turb_Type),   target :: turb
+  type(Vof_Type),    target :: Vof
+  type(Solver_Type), target :: Sol
+  integer                   :: ini       ! current inner iteration
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: u, v, w
@@ -30,11 +30,11 @@
       flow % i_corr = corr_steps
 
       ! All velocity components one after another
-      call Compute_Momentum(flow, turb, mult, Sol, ini)
+      call Compute_Momentum(flow, turb, Vof, Sol, ini)
 
-      call Compute_Pressure(flow, mult, Sol, ini)
+      call Compute_Pressure(flow, Vof, Sol, ini)
 
-      call Correct_Velocity(flow, turb, mult, Sol, ini)
+      call Correct_Velocity(flow, turb, Vof, Sol, ini)
     end do
 
     flow % piso_status = .false.

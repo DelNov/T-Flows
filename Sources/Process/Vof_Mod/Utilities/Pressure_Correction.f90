@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Multiphase_Mod_Vof_Pressure_Correction(mult, Sol)
+  subroutine Pressure_Correction(Vof, Sol)
 !------------------------------------------------------------------------------!
 !   Correct fluxes on pressure equation due to surface tension and gravity     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Multiphase_Type), target :: mult
-  type(Solver_Type),     target :: Sol
+  class(Vof_Type),   target :: Vof
+  type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
@@ -22,11 +22,14 @@
   real                       :: factor2, correction, dens_h, curv_f
 !==============================================================================!
 
+  ! Don't use this if vof is not engaged
+  if(.not. Vof % model .eq. VOLUME_OF_FLUID) return
+
   ! Take aliases
-  grid   => mult % pnt_grid
-  flow   => mult % pnt_flow
-  ! col    => mult % smooth
-  col    => mult % vof
+  grid   => Vof % pnt_grid
+  flow   => Vof % pnt_flow
+  ! col    => Vof % smooth
+  col    => Vof % fun
   v_flux => flow % v_flux
   M      => Sol % M
   b      => Sol % b % val
@@ -37,7 +40,7 @@
   call Field_Mod_Alias_Momentum(flow, u, v, w)
 
   ! Correct for surface tension
-  if(mult % surface_tension > TINY) then
+  if(Vof % surface_tension > TINY) then
 
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
@@ -49,17 +52,17 @@
         dens_h = 2.0 / ( 1.0 / flow % density(c1) + 1.0 / flow % density(c2) )
 
         ! Unit for dotprod: [1/m]
-        dotprod = 0.5 * dens_h                                                 &
-                      * ( mult % curv(c1) * col % x(c1) / flow % density(c1)   &
-                        + mult % curv(c2) * col % x(c2) / flow % density(c2) ) &
-                      * grid % dx(s)                                           &
-                + 0.5 * dens_h                                                 &
-                      * ( mult % curv(c1) * col % y(c1) / flow % density(c1)   &
-                        + mult % curv(c2) * col % y(c2) / flow % density(c2) ) &
-                      * grid % dy(s)                                           &
-                + 0.5 * dens_h                                                 &
-                      * ( mult % curv(c1) * col % z(c1) / flow % density(c1)   &
-                        + mult % curv(c2) * col % z(c2) / flow % density(c2) ) &
+        dotprod = 0.5 * dens_h                                                &
+                      * ( Vof % curv(c1) * col % x(c1) / flow % density(c1)   &
+                        + Vof % curv(c2) * col % x(c2) / flow % density(c2) ) &
+                      * grid % dx(s)                                          &
+                + 0.5 * dens_h                                                &
+                      * ( Vof % curv(c1) * col % y(c1) / flow % density(c1)   &
+                        + Vof % curv(c2) * col % y(c2) / flow % density(c2) ) &
+                      * grid % dy(s)                                          &
+                + 0.5 * dens_h                                                &
+                      * ( Vof % curv(c1) * col % z(c1) / flow % density(c1)   &
+                        + Vof % curv(c2) * col % z(c2) / flow % density(c2) ) &
                       * grid % dz(s)
 
         ! Unit for a12: [m^4s/kg]
@@ -67,10 +70,10 @@
                     + grid % vol(c2) / M % sav(c2) ) * M % fc(s)
 
         ! Curvature at the face; unit: [1/m]
-        curv_f = 0.5 * ( mult % curv(c1) + mult % curv(c2) )
+        curv_f = 0.5 * ( Vof % curv(c1) + Vof % curv(c2) )
 
         ! Unit for stens_source: [kg/s^2 * m^4s/kg * 1/m = m^3/s]
-        stens_source = mult % surface_tension * a12               &
+        stens_source = Vof % surface_tension * a12               &
                      * ( curv_f * (col % n(c2) -  col % n(c1)) - dotprod )
 
         v_flux % n(s) = v_flux % n(s) + stens_source
@@ -86,9 +89,9 @@
 
   if(flow % mass_transfer) then
     do c = 1, grid % n_cells
-      b(c) = b(c) + mult % m_dot(c) * grid % vol(c)                    &
-                                    * ( 1.0 / mult % phase_dens(1)     &
-                                      - 1.0 / mult % phase_dens(2) )
+      b(c) = b(c) + Vof % m_dot(c) * grid % vol(c)                    &
+                                    * ( 1.0 / Vof % phase_dens(1)     &
+                                      - 1.0 / Vof % phase_dens(2) )
     end do
   end if
 
