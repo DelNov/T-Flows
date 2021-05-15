@@ -23,12 +23,6 @@
 #-----------------
 # Physical models
 #-----------------
-
- MASS_DENSITY           1.0
- THERMAL_CONDUCTIVITY   1.4080e-4
- DYNAMIC_VISCOSITY      1.0
- HEAT_CAPACITY          1.0
-
  PHASE_DENSITIES           1.0e2   1.0e3
  PHASE_VISCOSITIES         1.0e0   1.0e1
  SURFACE_TENSION        24.5
@@ -49,8 +43,10 @@
  ADVECTION_SCHEME_FOR_MOMENTUM    quick
  ADVECTION_SCHEME_FOR_MULTIPHASE  cicsam
 
+ GU_CORRECTION               yes
  CHOI_CORRECTION             yes
 
+ GRADIENT_METHOD_FOR_PRESSURE        gauss_theorem
  MAX_ITERATIONS_FOR_GAUSS_GRADIENTS  200
  TOLERANCE_FOR_GAUSS_GRADIENTS       1.0e-4
 
