@@ -31,7 +31,6 @@
   type(Var_Type),    pointer :: col
   type(Matrix_Type), pointer :: A
   type(Matrix_Type), pointer :: M
-  real, contiguous,  pointer :: b(:)
   integer                    :: c, c1, c2, s, nb, nc
   real                       :: a12, fs
   real                       :: u_fo, v_fo, w_fo
@@ -53,7 +52,6 @@
   v_flux => flow % v_flux
   A      => Sol % A
   M      => Sol % M
-  b      => Sol % b % val
   sigma  =  Vof % surface_tension
   nb     =  grid % n_bnd_cells
   nc     =  grid % n_cells
@@ -113,19 +111,8 @@
 
       v_flux % n(s) = v_flux % n(s) + stens_source
 
-      b(c1) = b(c1) - stens_source
-      b(c2) = b(c2) + stens_source
-
     end if  ! c2 > 0
 
   end do
-
-!@#  if(flow % mass_transfer) then
-!@#    do c = 1, grid % n_cells
-!@#      b(c) = b(c) + Vof % m_dot(c) * grid % vol(c)                    &
-!@#                                    * ( 1.0 / Vof % phase_dens(1)     &
-!@#                                      - 1.0 / Vof % phase_dens(2) )
-!@#    end do
-!@#  end if
 
   end subroutine

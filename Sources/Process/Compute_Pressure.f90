@@ -112,6 +112,11 @@
   !---------------------------------------!
   call Rhie_And_Chow(flow, Vof, Sol)
 
+  !-------------------------------------------------------------!
+  !   In case of VOF, surface tension and  gravity correction   !
+  !-------------------------------------------------------------!
+  call Vof % Pressure_Correction(Sol)
+
   !------------------------------------------!
   !   Update fluxes at boundaries and fill   !
   !   up source term for pressure equation   !
@@ -172,11 +177,6 @@
   !   In case of mass transfer, add addtional source to pressure equation   !
   !-------------------------------------------------------------------------!
   call Vof % Mass_Transfer_Pressure_Source(b)
-
-  !-------------------------------------------------------------!
-  !   In case of VOF, surface tension and  gravity correction   !
-  !-------------------------------------------------------------!
-  call Vof % Pressure_Correction(Sol)
 
   !----------------------------------------!
   !   Balance the source over processors   !
