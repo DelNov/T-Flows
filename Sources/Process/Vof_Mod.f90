@@ -39,7 +39,7 @@
     real, allocatable :: nx(:), ny(:), nz(:)
 
     ! Surface tension force
-    real, allocatable :: surf_fx(:), surf_fy(:), surf_fz(:)
+    real, allocatable :: surf_fx(:), surf_fy(:), surf_fz(:)  ! [N/m^3]
 
     ! Physical properties in case of multiphase flow
     real, allocatable :: phase_visc(:), phase_dens(:)
@@ -54,7 +54,7 @@
     logical :: skew_corr
 
     ! For phase change
-    real :: t_sat, latent_heat  ![K, J/kg]
+    real :: t_sat, latent_heat  ! [K, J/kg]
 
     ! Heat from phase change and index of saturated cells
     real,    allocatable :: qci(:)
