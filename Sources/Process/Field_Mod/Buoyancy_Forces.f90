@@ -107,30 +107,29 @@
   !   Buoyancy force   !
   !--------------------!
 
+  ! Calculate buoyancy force over faces first (this is a no-brainer)
+  ! Units: kg/m^3 * m/s^2 = kg/(m^2 s^2) = N/m^3
+  do s = 1, grid % n_faces
+    face_fi(s) = dens_f(s) * grav_i
+  end do
+
   ! Calculate
   do s = 1, grid % n_faces
     c1   = grid % faces_c(1, s)
     c2   = grid % faces_c(2, s)
     xic1 = xic(c1)
 
-    ! Units in next three expressions which follow
-    ! kg/m^3 * m/s^2 * m^2 * m = kg m/s^2 = N
+    ! Units here: N/m^3 * m^3 = N
     ! (Don't worry yet, you will correct them in the end)
-    cell_fi(c1) = cell_fi(c1)                                  &
-                + dens_f(s) * grav_i * si(s) * (xif(s) - xic1)
+    cell_fi(c1) = cell_fi(c1) + face_fi(s) * si(s) * (xif(s) - xic1)
 
     if(c2 > 0) then
       xic2 = xic(c1) + dxi(s)
 
-      ! Units in next three expressions which follow
-      ! kg/m^3 * m/s^2 * m^2 * m = kg m/s^2 = N
+      ! Units here: N/m^3 * m^3 = N
       ! (Don't worry yet, you will correct them in the end)
-      cell_fi(c2) = cell_fi(c2)                                &
-                  - dens_f(s) * grav_i * si(s) * (xif(s) - xic2)
+      cell_fi(c2) = cell_fi(c2) - face_fi(s) * si(s) * (xif(s) - xic2)
     end if
-
-    ! Units: kg/m^3 * m/s^2 = kg/(m^2 s^2) = N/m^3
-    face_fi(s) = face_fi(s) + dens_f(s) * grav_i
 
   end do
 
