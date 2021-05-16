@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine User_Mod_Insert_Particles(flow, turb, Vof, swarm, n, time)
+  subroutine User_Mod_Insert_Particles(Flow, turb, Vof, swarm, n, time)
 !------------------------------------------------------------------------------!
 !   Insert particles for Lagrangian particle tracking                          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),    target :: flow
+  type(Field_Type),    target :: Flow
   type(Turb_Type),     target :: turb
   type(Vof_Type),      target :: Vof
   type(Swarm_Type),    target :: swarm
@@ -17,6 +17,6 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => flow % pnt_grid
+  grid => Flow % pnt_grid
 
   end subroutine

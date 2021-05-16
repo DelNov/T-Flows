@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Compute_Pressure(flow, Vof, Sol, curr_dt, ini)
+  subroutine User_Mod_End_Of_Compute_Pressure(Flow, Vof, Sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of Compute_Pressure function.           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),    target :: flow
+  type(Field_Type),    target :: Flow
   type(Vof_Type),      target :: Vof
   type(Solver_Type),   target :: Sol
   integer, intent(in)         :: curr_dt  ! current time step
@@ -17,11 +17,11 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => flow % pnt_grid
-  u    => flow % u
-  v    => flow % u
-  w    => flow % u
-  p    => flow % p
+  grid => Flow % pnt_grid
+  u    => Flow % u
+  v    => Flow % u
+  w    => Flow % u
+  p    => Flow % p
   A    => Sol % A
   M    => Sol % M
 

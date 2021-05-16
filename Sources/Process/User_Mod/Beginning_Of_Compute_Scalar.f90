@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine User_Mod_Beginning_Of_Compute_Scalar(flow, turb, Vof, Sol,  &
+  subroutine User_Mod_Beginning_Of_Compute_Scalar(Flow, turb, Vof, Sol,  &
                                                   curr_dt, ini, sc)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of Compute_Scalar function.             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),    target :: flow
+  type(Field_Type),    target :: Flow
   type(Turb_Type),     target :: turb
   type(Vof_Type),      target :: Vof
   type(Solver_Type),   target :: Sol
@@ -20,9 +20,9 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => flow % pnt_grid
-  p    => flow % p
-  phi  => flow % scalar(sc)
+  grid => Flow % pnt_grid
+  p    => Flow % p
+  phi  => Flow % scalar(sc)
   M    => Sol % M
 
   end subroutine

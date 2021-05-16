@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine User_Mod_Beginning_Of_Compute_Energy(flow, turb, Vof, Sol,  &
+  subroutine User_Mod_Beginning_Of_Compute_Energy(Flow, turb, Vof, Sol,  &
                                                   curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   This function is called at the beginning of Compute_Energy function.       !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),    target :: flow
+  type(Field_Type),    target :: Flow
   type(Turb_Type),     target :: turb
   type(Vof_Type),      target :: Vof
   type(Solver_Type),   target :: Sol
@@ -19,9 +19,9 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => flow % pnt_grid
-  t    => flow % t
-  p    => flow % p
+  grid => Flow % pnt_grid
+  t    => Flow % t
+  p    => Flow % p
   A    => Sol % A
 
   end subroutine

@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Swarm(flow, turb, Vof, swarm, ts)
+  subroutine User_Mod_Save_Swarm(Flow, turb, Vof, swarm, ts)
 !------------------------------------------------------------------------------!
 !   This subroutine is called each RESULTS_SAVE_INTERVAL (set in control       !
 !   file), at the end of a simulation and after 'save_now' command.            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),    target :: flow
+  type(Field_Type),    target :: Flow
   type(Turb_Type),     target :: turb
   type(Vof_Type),      target :: Vof
   type(Swarm_Type),    target :: swarm
@@ -18,11 +18,11 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => flow % pnt_grid
-  bulk => flow % bulk
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
-  t    => flow % t
+  grid => Flow % pnt_grid
+  bulk => Flow % bulk
+  u    => Flow % u
+  v    => Flow % v
+  w    => Flow % w
+  t    => Flow % t
 
   end subroutine
