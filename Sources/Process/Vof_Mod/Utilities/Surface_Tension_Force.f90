@@ -1,14 +1,50 @@
-!============================================================================!
-  subroutine Surface_Tension_Force(Vof, fi, i)
-!----------------------------------------------------------------------------!
-!   Computes Surface tension, forces for momentum                            !
-!----------------------------------------------------------------------------!
+!==============================================================================!
+  subroutine Surface_Tension_Force(Vof, i)
+!------------------------------------------------------------------------------!
+!   Computes Surface tension, forces for momentum                              !
+!                                                                              !
+!   Recall how momentum equations looks in Compute_Momentum procedure:         !
+!                                                                              !
+!     /             /              /               /             /             !
+!    |     du      |              |               |             |              !
+!    | rho -- dV + | rho u u dS = | mu DIV u dS - | GRAD p dV + | f dV         !
+!    |     dt      |              |               |             |              !
+!   /             /              /               /             /               !
+!                                                                              !
+!   Here, f will be the surface tension force.  If we use material             !
+!   derivative for the sake of shorteness, the equation will read:             !
+!                                                                              !
+!     /             /               /             /                            !
+!    |     Du      |               |             |                             !
+!    | rho -- dV = | mu DIV u dS - | GRAD p dV + | f dV                        !
+!    |     Dt      |               |             |                             !
+!   /             /               /             /                              !
+!                                                                              !
+!   and with definition of surface tension force:                              !
+!                                                                              !
+!     /             /               /                        /                 !
+!    |     Du      |               |                         |                 !
+!    | rho -- dV = | mu DIV u dS - | GRAD p dV + sigma kappa | GRAD c dV       !
+!    |     Dt      |               |                         |                 !
+!   /             /               /                         /                  !
+!                                                                              !
+!   In order to balance pressure with surface tension force, last two terms    !
+!   should always be treated in exactly the same manner!  One could even       !
+!   write the equation like this:                                              !
+!                                                                              !
+!     /             /               /                                          !
+!    |     Du      |               |                                           !
+!    | rho -- dV = | mu DIV u dS - | GRAD ( p + sigma kappa c ) dV             !
+!    |     Dt      |               |                                           !
+!   /             /               /       |                   |                !
+!                                         |<---- together --->|                !
+!                                                                              !
+!------------------------------------------------------------------------------!
   implicit none
-!---------------------------------[Arguments]--------------------------------!
+!---------------------------------[Arguments]----------------------------------!
   class(Vof_Type), target :: Vof
-  real                    :: fi(:)
   integer, intent(in)     :: i
-!-----------------------------------[Locals]---------------------------------!
+!-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: col
@@ -17,7 +53,7 @@
   integer                    :: s, c, c1, c2
   real                       :: fs
   real                       :: u_f, v_f, w_f
-!============================================================================!
+!==============================================================================!
 
   ! Get out of here if surface tension is neglected
   if(Vof % surface_tension < TINY) return
@@ -36,31 +72,25 @@
   ! col    => Vof % smooth
 
   ! Units here:
-  ! N/m * 1/m * 1/m * m^3 = N
+  ! N/m * 1/m * 1/m = N / m^3
   select case(i)
     case(1)
       do c = 1, grid % n_cells
         surf_fx(c) = Vof % surface_tension  &
                    * Vof % curv(c)          &
-                   * col % x(c)             &
-                   * grid % vol(c)
-        fi(c) = fi(c) + surf_fx(c)
+                   * col % x(c)
        end do
     case(2)
       do c = 1, grid % n_cells
         surf_fy(c) = Vof % surface_tension  &
                    * Vof % curv(c)          &
-                   * col % y(c)             &
-                   * grid % vol(c)
-        fi(c) = fi(c) + surf_fy(c)
+                   * col % y(c)
       end do
     case(3)
       do c = 1, grid % n_cells
         surf_fz(c) = Vof % surface_tension  &
                    * Vof % curv(c)          &
-                   * col % z(c)             &
-                   * grid % vol(c)
-        fi(c) = fi(c) + surf_fz(c)
+                   * col % z(c)
       end do
 
   end select

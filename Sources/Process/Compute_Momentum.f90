@@ -23,7 +23,7 @@
   real, contiguous,  pointer :: b(:)
   real, contiguous,  pointer :: ui_i(:), ui_j(:), ui_k(:), uj_i(:), uk_i(:)
   real, contiguous,  pointer :: si(:), sj(:), sk(:), di(:), dj(:), dk(:)
-  real, contiguous,  pointer :: fi(:), hi(:), cell_fi(:)
+  real, contiguous,  pointer :: fi(:), p_i(:), cell_fi(:), st_i(:)
   integer                    :: s, c, c1, c2, i
   real                       :: f_ex, f_im, f_stress
   real                       :: vel_max, dt
@@ -33,53 +33,53 @@
   real                       :: grav_i, p_drop_i
   real                       :: ui_si, ui_di
 !------------------------------------------------------------------------------!
-!
-!  Stress tensor on the face s:
-!
-!    t = mu * [    2*du/dx     du/dy+dv/dx   du/dz+dw/dx  ]
-!             [  du/dy+dv/dx     2*dv/dy     dv/dz+dw/dy  ]
-!             [  du/dz+dw/dx   dv/dz+dw/dy     2*dw/dz    ]
-!
-!  The forces, acting on the cell face are:
-!
-!    fx = t11*sx + t12*sy + t13*sz
-!    fy = t21*sx + t22*sy + t23*sz
-!    fz = t31*sx + t32*sy + t33*sz
-!
-!  which could also be written in the compact form:
-!
-!    {f} = [t]{s}
-!
-!  or in expended form:
-!
-!    fx = txx*sx + txy*sy + txz*sz
-!    fy = tyx*sx + tyy*sy + tyz*sz
-!    fz = tzx*sx + tzy*sy + tzz*sz
-!
+!                                                                              !
+!  Stress tensor on the face s:                                                !
+!                                                                              !
+!    t = mu * [    2*du/dx     du/dy+dv/dx   du/dz+dw/dx  ]                    !
+!             [  du/dy+dv/dx     2*dv/dy     dv/dz+dw/dy  ]                    !
+!             [  du/dz+dw/dx   dv/dz+dw/dy     2*dw/dz    ]                    !
+!                                                                              !
+!  The forces, acting on the cell face are:                                    !
+!                                                                              !
+!    fx = t11*sx + t12*sy + t13*sz                                             !
+!    fy = t21*sx + t22*sy + t23*sz                                             !
+!    fz = t31*sx + t32*sy + t33*sz                                             !
+!                                                                              !
+!  which could also be written in the compact form:                            !
+!                                                                              !
+!    {f} = [t]{s}                                                              !
+!                                                                              !
+!  or in expended form:                                                        !
+!                                                                              !
+!    fx = txx*sx + txy*sy + txz*sz                                             !
+!    fy = tyx*sx + tyy*sy + tyz*sz                                             !
+!    fz = tzx*sx + tzy*sy + tzz*sz                                             !
+!                                                                              !
 !------------------------------------------------------------------------------!
-!
-!  The form of equations which I am solving:
-!
-!     /             /              /               /
-!    |     du      |              |               |
-!    | rho -- dV + | rho u u dS = | mu DIV u dS - | p dS
-!    |     dt      |              |               |
-!   /             /              /               /
-!
-!  Dimension of the system under consideration
-!
-!     [M]{u} = {b}   [kgm/s^2]   [N]
-!
-!  Dimensions of certain variables:
-!
-!     M              [kg/s]
-!     u, v, w        [m/s]
-!     bu, bv, bw     [kgm/s^2]      [N]
-!     p, pp          [kg/(m s^2)]   [N/m^2]
-!     v_flux         [m^3/s]
-!     au*, av*, aw*  [kgm/s^2]      [N]
-!     du*, dv*, dw*  [kgm/s^2]      [N]
-!     cu*, cv*, cw*  [kgm/s^2]      [N]
+!                                                                              !
+!  The form of equations which I am solving:                                   !
+!                                                                              !
+!     /             /              /               /             /             !
+!    |     du      |              |               |             |              !
+!    | rho -- dV + | rho u u dS = | mu DIV u dS - | GRAD p dV + | f dV         !
+!    |     dt      |              |               |             |              !
+!   /             /              /               /             /               !
+!                                                                              !
+!  Dimension of the system under consideration                                 !
+!                                                                              !
+!     [M]{u} = {b}   [kgm/s^2]   [N]                                           !
+!                                                                              !
+!  Dimensions of certain variables:                                            !
+!                                                                              !
+!     M              [kg/s]                                                    !
+!     u, v, w        [m/s]                                                     !
+!     bu, bv, bw     [kgm/s^2]      [N]                                        !
+!     p, pp          [kg/(m s^2)]   [N/m^2]                                    !
+!     v_flux         [m^3/s]                                                   !
+!     au*, av*, aw*  [kgm/s^2]      [N]                                        !
+!     du*, dv*, dw*  [kgm/s^2]      [N]                                        !
+!     cu*, cv*, cw*  [kgm/s^2]      [N]                                        !
 !==============================================================================!
 
   call Cpu_Timer % Start('Compute_Momentum (without solvers)')
@@ -124,33 +124,36 @@
       ui_i => ui % x;     ui_j => ui % y;     ui_k => ui % z
       si   => grid % sx;  sj   => grid % sy;  sk   => grid % sz
       di   => grid % dx;  dj   => grid % dy;  dk   => grid % dz
-      hi   => p % x;      uj_i => uj % x;     uk_i => uk % x
+      p_i  => p % x;      uj_i => uj % x;     uk_i => uk % x
       fi       => flow % fx
       cell_fi  => flow % cell_fx
       grav_i   =  grav_x
       p_drop_i =  bulk % p_drop_x
+      st_i     => Vof % surf_fx
     end if
     if(i .eq. 2) then
       ui   => flow % v;   uj   => flow % w;   uk   => flow % u
       ui_i => ui % y;     ui_j => ui % z;     ui_k => ui % x
       si   => grid % sy;  sj   => grid % sz;  sk   => grid % sx
       di   => grid % dy;  dj   => grid % dz;  dk   => grid % dx
-      hi   => p % y;      uj_i => uj % y;     uk_i => uk % y
+      p_i  => p % y;      uj_i => uj % y;     uk_i => uk % y
       fi       => flow % fy
       cell_fi  => flow % cell_fy
       grav_i   =  grav_y
       p_drop_i =  bulk % p_drop_y
+      st_i     => Vof % surf_fy
     end if
     if(i .eq. 3) then
       ui   => flow % w;   uj   => flow % u;   uk   => flow % v
       ui_i => ui % z;     ui_j => ui % x;     ui_k => ui % y
       si   => grid % sz;  sj   => grid % sx;  sk   => grid % sy
       di   => grid % dz;  dj   => grid % dx;  dk   => grid % dy
-      hi   => p % z;      uj_i => uj % z;     uk_i => uk % z
+      p_i  => p % z;      uj_i => uj % z;     uk_i => uk % z
       fi       => flow % fz
       cell_fi  => flow % cell_fz
       grav_i   =  grav_z
       p_drop_i =  bulk % p_drop_z
+      st_i     => Vof % surf_fz
     end if
 
     ! Initialize matrix and right hand side
@@ -294,27 +297,31 @@
       fi(c) = fi(c) + cell_fi(c) * grid % vol(c)
     end do
 
-    !----------------------------------!
-    !   Surface tension contribution   !
-    !----------------------------------!
+    !-----------------------------------------------------------!
+    !   Copy forces from current component to right hand side   !
+    !   (Note: pressure gradients are not with other forces.    !
+    !    Same is true for surface tension, see nex comments)    !
+    !-----------------------------------------------------------!
+    do c = 1, grid % n_cells
+      b(c) = fi(c) - p_i(c) * grid % vol(c)
+    end do
+
+    !----------------------------------------------------------------!
+    !   In case of vof simulations, add the surface tension forces   !
+    !   (Note: they are treated like pressure everywhere in the      !
+    !    discretized form, meaning separater from other forces)      !
+    !----------------------------------------------------------------!
     if(Vof % model .eq. VOLUME_OF_FLUID) then
-      call Vof % Surface_Tension_Force(fi, i)
+      call Vof % Surface_Tension_Force(i)
+      do c = 1, grid % n_cells
+        b(c) = b(c) + st_i(c) * grid % vol(c)
+      end do
     end if
 
     !----------------------------------------!
     !   All other terms defined by the user  !
     !----------------------------------------!
     call User_Mod_Force(flow, ui, M, fi)
-
-    !-----------------------------------------------------------!
-    !                                                           !
-    !   Copy forces from current component to right hand side   !
-    !   (Note: pressure gradients are not with other forces)    !
-    !                                                           !
-    !-----------------------------------------------------------!
-    do c = 1, grid % n_cells
-      b(c) = fi(c) - hi(c) * grid % vol(c)
-    end do
 
     !------------------------------------------------!
     !   Save the coefficients from the discretized   !
