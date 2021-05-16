@@ -61,6 +61,8 @@
   !   Store grid % vol(c) / M % sav(c)   !
   !--------------------------------------!
   ! Units here: m^3 s / kg
+  ! Remember:  M   is big in liquid, small in gas
+  ! meaaning:  v_m is big in gas, small in liquid
   do c = 1, grid % n_cells
     v_m(c) = grid % vol(c) / M % sav(c)
   end do
@@ -131,6 +133,8 @@
 
       ! Interpolate pressure gradients
       ! Units: kg/(m^2 s^2) * m^3 s / kg * m = m^2 / s
+      ! Remember from above: v_m is big in gas, small in liquid, meaning
+      ! that this interpolation is gas-biased, which is a good thing
       px_f = (       fs  * (p % x(c1)*v_m(c1))    &
               + (1.0-fs) * (p % x(c2)*v_m(c2)) )  &
             * grid % dx(s)
