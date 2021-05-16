@@ -111,7 +111,6 @@
       procedure :: Mass_Transfer_Added_Volume
       procedure :: Mass_Transfer_Pressure_Source
       procedure :: Mass_Transfer_Vof_Source
-      procedure :: Pressure_Correction
       procedure :: Surface_Tension_Force
       procedure :: Update_Physical_Properties
 

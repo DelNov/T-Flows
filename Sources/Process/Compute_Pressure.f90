@@ -112,11 +112,6 @@
   !---------------------------------------!
   call Rhie_And_Chow(flow, Vof, Sol)
 
-  !-------------------------------------------------------------!
-  !   In case of VOF, surface tension and  gravity correction   !
-  !-------------------------------------------------------------!
-  call Vof % Pressure_Correction(Sol)
-
   !------------------------------------------!
   !   Update fluxes at boundaries and fill   !
   !   up source term for pressure equation   !

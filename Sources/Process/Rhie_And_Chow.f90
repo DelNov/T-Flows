@@ -5,14 +5,18 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use User_Mod
-  use Work_Mod, only: u_c => r_cell_01,  &
-                      v_c => r_cell_02,  &
-                      w_c => r_cell_03,  &
-                      v_m => r_cell_04,  &  ! for Rhie and Chow
-                      t_m => r_cell_05,  &  ! for Choi
-                      u_f => r_face_01,  &
-                      v_f => r_face_02,  &
-                      w_f => r_face_03
+  use Work_Mod, only: u_c   => r_cell_01,  &
+                      v_c   => r_cell_02,  &
+                      w_c   => r_cell_03,  &
+                      v_m   => r_cell_04,  &  ! for Rhie and Chow
+                      t_m   => r_cell_05,  &  ! for Choi
+                      pst_x => r_cell_06,  &  ! d(p + st) / dx
+                      pst_y => r_cell_07,  &  ! d(p + st) / dy
+                      pst_z => r_cell_08,  &  ! d(p + st) / dz
+                      pst_d => r_face_01,  &  ! pressure and surface tension
+                      u_f   => r_face_02,  &
+                      v_f   => r_face_03,  &
+                      w_f   => r_face_04
 !------------------------------------------------------------------------------!
 !   When using Work_Mod, calling sequence must be established                  !
 !                                                                              !
@@ -21,6 +25,16 @@
 !     +----> Compute_Pressure       (doesn't use Work_Mod)                     !
 !             |                                                                |
 !             +----> Rhie_And_Chow  (safe to use Work_Mod)                     !
+!------------------------------------------------------------------------------!
+!   Remember one important thing:                                              !
+!                                                                              !
+!   sigma * kappa * dc/dx ~ dp/dx  [N / m^3]                                   !
+!                                                                              !
+!   Meaning also that:                                                         !
+!                                                                              !
+!   sigma * kappa * (c2 - c1) ~ (p2 - p1)  [N / m^2]                           !
+!                                                                              !
+!   and these terms are bundled together in this function.                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -31,10 +45,11 @@
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w, p
   type(Face_Type),   pointer :: v_flux          ! volume flux
+  type(Var_Type),    pointer :: col             ! sharp color function
   type(Matrix_Type), pointer :: A               ! pressure matrix
   type(Matrix_Type), pointer :: M               ! momentum matrix
-  real                       :: a12, px_f, py_f, pz_f, fs, dens_h
-  real                       :: w_o, w_oo
+  real                       :: a12, px_f, py_f, pz_f, fs, sigma
+  real                       :: w_o, w_oo, curv_f
   integer                    :: s, c1, c2, c
 !==============================================================================!
 
@@ -44,18 +59,11 @@
   grid   => flow % pnt_grid
   p      => flow % p
   v_flux => flow % v_flux
+  col    => Vof % fun
   A      => Sol % A
   M      => Sol % M
+  sigma  =  Vof % surface_tension
   call Field_Mod_Alias_Momentum(flow, u, v, w)
-
-  !--------------------------------------!
-  !   Take velocities as last computed   !
-  !--------------------------------------!
-  do c = 1, grid % n_cells
-    u_c(c) = flow % u % n(c)
-    v_c(c) = flow % v % n(c)
-    w_c(c) = flow % w % n(c)
-  end do
 
   !--------------------------------------!
   !   Store grid % vol(c) / M % sav(c)   !
@@ -65,6 +73,60 @@
   ! meaaning:  v_m is big in gas, small in liquid
   do c = 1, grid % n_cells
     v_m(c) = grid % vol(c) / M % sav(c)
+  end do
+
+  !------------------------------------------------------------------!
+  !   Store pressure gradients in cells and differences over faces   !
+  !------------------------------------------------------------------!
+
+  ! Pressure gradients
+  do c = 1, grid % n_cells
+    pst_x(c) = p % x(c)
+    pst_y(c) = p % y(c)
+    pst_z(c) = p % z(c)
+  end do
+
+  ! Pressure differences
+  do s = 1, grid % n_faces
+    c1 = grid % faces_c(1,s)
+    c2 = grid % faces_c(2,s)
+    pst_d(s) = p % n(c1) - p % n(c2)
+  end do
+
+  !---------------------------------------------------------------------!
+  !   In case of vof simulations, treat surface tension like pressure   !
+  !   The most elegat way to do it - just bundle them up in one array   !
+  !---------------------------------------------------------------------!
+  if(Vof % model .eq. VOLUME_OF_FLUID .and.  &
+     Vof % surface_tension > TINY) then
+
+    ! Surface tension gradients
+    do c = 1, grid % n_cells
+      pst_x(c) = pst_x(c) - sigma * Vof % curv(c) * col % x(c)
+      pst_y(c) = pst_y(c) - sigma * Vof % curv(c) * col % y(c)
+      pst_z(c) = pst_z(c) - sigma * Vof % curv(c) * col % z(c)
+    end do
+
+    ! Surface tension differences
+    do s = 1, grid % n_faces
+      c1 = grid % faces_c(1,s)
+      c2 = grid % faces_c(2,s)
+      fs = grid % f(s)
+
+      ! Curvature at the face; unit: [1/m]
+      curv_f = fs * Vof % curv(c1) + (1.0-fs) * Vof % curv(c2)
+      pst_d(s) = pst_d(s) - sigma * curv_f * (col % n(c1) - col % n(c2))
+    end do
+
+  end if
+
+  !--------------------------------------!
+  !   Take velocities as last computed   !
+  !--------------------------------------!
+  do c = 1, grid % n_cells
+    u_c(c) = flow % u % n(c)
+    v_c(c) = flow % v % n(c)
+    w_c(c) = flow % w % n(c)
   end do
 
   !--------------------------------------------------------------------------!
@@ -135,14 +197,14 @@
       ! Units: kg/(m^2 s^2) * m^3 s / kg * m = m^2 / s
       ! Remember from above: v_m is big in gas, small in liquid, meaning
       ! that this interpolation is gas-biased, which is a good thing
-      px_f = (       fs  * (p % x(c1)*v_m(c1))    &
-              + (1.0-fs) * (p % x(c2)*v_m(c2)) )  &
+      px_f = (       fs  * (pst_x(c1)*v_m(c1))    &
+              + (1.0-fs) * (pst_x(c2)*v_m(c2)) )  &
             * grid % dx(s)
-      py_f = (       fs  * (p % y(c1)*v_m(c1))    &
-              + (1.0-fs) * (p % y(c2)*v_m(c2)) )  &
+      py_f = (       fs  * (pst_y(c1)*v_m(c1))    &
+              + (1.0-fs) * (pst_y(c2)*v_m(c2)) )  &
             * grid % dy(s)
-      pz_f = (       fs  * (p % z(c1)*v_m(c1))    &
-              + (1.0-fs) * (p % z(c2)*v_m(c2)) )  &
+      pz_f = (       fs  * (pst_z(c1)*v_m(c1))    &
+              + (1.0-fs) * (pst_z(c2)*v_m(c2)) )  &
             * grid % dz(s)
 
       ! Calculate mass or volume flux through cell face
@@ -153,7 +215,7 @@
       v_flux % n(s) = (  u_f(s) * grid % sx(s)             &
                        + v_f(s) * grid % sy(s)             &
                        + w_f(s) * grid % sz(s) )           &
-                       + a12 * (p % n(c1) - p % n(c2))     &
+                       + a12 * pst_d(s)                    &
                        + A % fc(s) * (px_f + py_f + pz_f)
 
       !------------------------------------------------------------!
