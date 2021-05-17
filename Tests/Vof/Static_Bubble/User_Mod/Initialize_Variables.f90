@@ -2,13 +2,13 @@ include '../User_Mod/Vof_Initialization_Ellipsoid.f90'
 include '../User_Mod/Vof_Interface_Ellipsoid.f90'
 
 !==============================================================================!
-  subroutine User_Mod_Initialize_Variables(flow, turb, Vof, swarm, sol)
+  subroutine User_Mod_Initialize_Variables(Flow, turb, Vof, swarm, sol)
 !------------------------------------------------------------------------------!
 !   Case-dependent initialization of VOF variable.                             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),  target :: flow
+  type(Field_Type),  target :: Flow
   type(Turb_Type),   target :: turb
   type(Vof_Type),    target :: Vof
   type(Swarm_Type),  target :: swarm
@@ -21,9 +21,9 @@ include '../User_Mod/Vof_Interface_Ellipsoid.f90'
 !==============================================================================!
 
   ! Take aliases
-  grid => flow % pnt_grid
+  grid => Flow % pnt_grid
   fun  => Vof % fun
-  dt   => flow % dt
+  dt   => Flow % dt
 
   !---------------------------------!
   !   Initialize the VOF function   !
@@ -54,7 +54,7 @@ include '../User_Mod/Vof_Interface_Ellipsoid.f90'
   !   Initialize front if needed   !
   !--------------------------------!
   ! if(Vof % track_front) then
-  !   call Surf_Mod_Allocate(Vof % surf, flow)
+  !   call Surf_Mod_Allocate(Vof % surf, Flow)
   !   call Surf_Mod_Place_At_Var_Value(Vof % surf,  &
   !                                    Vof % fun,   &
   !                                    sol,          &

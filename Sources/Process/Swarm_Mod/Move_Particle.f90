@@ -8,7 +8,7 @@
   type(Swarm_Type), target :: swarm
   integer                  :: k      ! particle number
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type),    pointer :: flow
+  type(Field_Type),    pointer :: Flow
   type(Grid_Type),     pointer :: grid
   type(Turb_Type),     pointer :: turb
   type(Var_Type),      pointer :: u, v, w, kin, eps, zeta, f22
@@ -19,7 +19,7 @@
   real                         :: rx, ry, rz        ! paticle-cell vector
   real                         :: dx, dy, dz        ! cell dimensions estimate
   real                         :: up, vp, wp        ! velocity at particle
-  real                         :: flow_vel          ! flow vel. magnitude
+  real                         :: flow_vel          ! Flow vel. magnitude
   real                         :: k1, k2, k3, k4    ! Runge-Kutta increments
   real                         :: part_vel          ! relative velocity 
   real                         :: gravity           ! gravity magnitude
@@ -31,11 +31,11 @@
   real                         :: u_mod, v_mod, w_mod
 !==============================================================================!
 
-  ! Take aliases for flow
-  flow => swarm % pnt_flow
+  ! Take aliases for Flow
+  Flow => swarm % pnt_flow
   grid => swarm % pnt_grid
   turb => swarm % pnt_turb
-  call Field_Mod_Alias_Momentum(flow, u, v, w)
+  call Flow % Alias_Momentum(u, v, w)
 
   ! Take aliases for turb
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
@@ -51,8 +51,8 @@
   ! call Control_Mod_Dynamic_Viscosity   (visc_const)
   ! call Control_Mod_Mass_Density        (dens_const)
   ! The way it is implemented now it could be different in every processor)
-  visc_const = maxval(flow % viscosity(:))
-  dens_const = maxval(flow % density(:))
+  visc_const = maxval(Flow % viscosity(:))
+  dens_const = maxval(Flow % density(:))
 
   n  = part % node      ! index of the closest node for cfl calculation
   c  = part % cell      ! index of the closest cell for interpolation
@@ -63,7 +63,7 @@
   ry = part % y_n - grid % yc(c)
   rz = part % z_n - grid % zc(c)
 
-  ! Particle damping function for wall treatment (for feeded modeled flow
+  ! Particle damping function for wall treatment (for feeded modeled Flow
   ! quantities)
   !fd_p = 1.0 - exp(-(turb % y_plus(c)/25.0)**3)     ! Piomelli
   if(turb % model .ne. NO_TURBULENCE_MODEL) then

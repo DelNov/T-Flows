@@ -10,7 +10,7 @@
   type(Turb_Type), target :: turb
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: grid
-  type(Field_Type), pointer :: flow
+  type(Field_Type), pointer :: Flow
   type(Var_Type),   pointer :: u, v, w, t
   type(Var_Type),   pointer :: kin, eps, zeta, f22
   integer                   :: n_prob, pl, i, count, s, c, idumm, k, fu
@@ -27,12 +27,12 @@
 !==============================================================================!
 
   ! Take aliases
-  flow => turb % pnt_flow
-  grid => flow % pnt_grid
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
-  t    => flow % t
+  Flow => turb % pnt_flow
+  grid => Flow % pnt_grid
+  u    => Flow % u
+  v    => Flow % v
+  w    => Flow % w
+  t    => Flow % t
   kin  => turb % kin
   eps  => turb % eps
   zeta => turb % zeta
@@ -88,7 +88,7 @@
   allocate(n_count(n_prob)); n_count=0
   count = 0
 
-  if(flow % heat_transfer) then
+  if(Flow % heat_transfer) then
     allocate(tm_p(n_prob));   tm_p = 0.0
   end if
 
@@ -145,18 +145,18 @@
             if(turb % model .eq. K_EPS) then
               v1_p(i) = v1_p(i) + kin % n(c)
               v2_p(i) = v2_p(i) + eps % n(c)
-              v3_p(i) = v3_p(i) + turb % vis_t(c) / flow % viscosity(c)
+              v3_p(i) = v3_p(i) + turb % vis_t(c) / Flow % viscosity(c)
             end if
 
             if(turb % model .eq. K_EPS_ZETA_F) then
               v1_p(i)   = v1_p(i) + kin % n(c)
               v2_p(i)   = v2_p(i) + eps % n(c)
-              v3_p(i)   = v3_p(i) + turb % vis_t(c) / flow % viscosity(c)
+              v3_p(i)   = v3_p(i) + turb % vis_t(c) / Flow % viscosity(c)
               v4_p(i)   = v4_p(i) + zeta % n(c)
               v5_p(i)   = v5_p(i) + f22 % n(c)
             end if
 
-            if(flow % heat_transfer) then
+            if(Flow % heat_transfer) then
               tm_p(i)   = tm_p(i) + T % n(c)
             end if
 
@@ -184,7 +184,7 @@
 
       count = count + n_count(pl) 
 
-      if(flow % heat_transfer) then
+      if(Flow % heat_transfer) then
         call Comm_Mod_Global_Sum_Real(tm_p(pl))
       end if
     end do
@@ -266,7 +266,7 @@
   deallocate(v5_p)
   deallocate(zm_p)
   deallocate(n_count)
-  if(flow % heat_transfer) then
+  if(Flow % heat_transfer) then
     deallocate(tm_p)
   end if
 

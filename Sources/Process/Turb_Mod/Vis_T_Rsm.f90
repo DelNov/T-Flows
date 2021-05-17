@@ -33,7 +33,7 @@
   ! Take aliases
   flow => turb % pnt_flow
   grid => flow % pnt_grid
-  call Field_Mod_Alias_Momentum(flow, u, v, w)
+  call Flow % Alias_Momentum(u, v, w)
   call Turb_Mod_Alias_K_Eps    (turb, kin, eps)
   call Turb_Mod_Alias_Stresses (turb, uu, vv, ww, uv, uw, vw)
 

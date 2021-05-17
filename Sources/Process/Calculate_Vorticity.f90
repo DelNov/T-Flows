@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Calculate_Vorticity(flow)
+  subroutine Calculate_Vorticity(Flow)
 !------------------------------------------------------------------------------!
 !  Computes the magnitude of the vorticity                                     !
 !------------------------------------------------------------------------------!
@@ -14,7 +14,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
+  type(Field_Type), target :: Flow
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Var_Type),  pointer :: u, v, w
@@ -22,20 +22,20 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => flow % pnt_grid
-  call Field_Mod_Alias_Momentum(flow, u, v, w)
+  grid => Flow % pnt_grid
+  call Flow % Alias_Momentum(u, v, w)
 
   ! Velocity gradients
-  call Field_Mod_Grad_Variable(flow, flow % u)
-  call Field_Mod_Grad_Variable(flow, flow % v)
-  call Field_Mod_Grad_Variable(flow, flow % w)
+  call Flow % Grad_Variable(Flow % u)
+  call Flow % Grad_Variable(Flow % v)
+  call Flow % Grad_Variable(Flow % w)
 
   do c = 1, grid % n_cells
-    flow % vort(c) = 2.0 * (0.5 * (w % y(c) - v % z(c)))**2  &
+    Flow % vort(c) = 2.0 * (0.5 * (w % y(c) - v % z(c)))**2  &
                    + 2.0 * (0.5 * (w % x(c) - u % z(c)))**2  &
                    + 2.0 * (0.5 * (v % x(c) - u % y(c)))**2
 
-    flow % vort(c) = sqrt(abs(2.0 * flow % vort(c)))
+    Flow % vort(c) = sqrt(abs(2.0 * Flow % vort(c)))
   end do
 
   end subroutine

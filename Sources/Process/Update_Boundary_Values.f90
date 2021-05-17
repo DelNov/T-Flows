@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Update_Boundary_Values(flow, turb, Vof, update)
+  subroutine Update_Boundary_Values(Flow, turb, Vof, update)
 !------------------------------------------------------------------------------!
 !   Update variables on the boundaries (boundary cells) where needed.          !
 !   It does not update volume fluxes at boundaries - keep it like that.        !
@@ -22,7 +22,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
+  type(Field_Type), target :: Flow
   type(Turb_Type),  target :: turb
   type(Vof_Type),   target :: Vof
   character(*)             :: update
@@ -38,11 +38,11 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => flow % pnt_grid
+  grid => Flow % pnt_grid
   vis  => turb % vis
   fun  => Vof % fun
-  call Field_Mod_Alias_Momentum   (flow, u, v, w)
-  call Field_Mod_Alias_Energy     (flow, t)
+  call Flow % Alias_Momentum(u, v, w)
+  call Flow % Alias_Energy  (t)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
   call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
   call Turb_Mod_Alias_T2          (turb, t2)
@@ -156,7 +156,7 @@
             uw  % n(c2) = 0.0
             vw  % n(c2) = 0.0
             kin % n(c2) = 0.0
-            kin_vis = flow % viscosity(c1) / flow % density(c1)
+            kin_vis = Flow % viscosity(c1) / Flow % density(c1)
             u_tau = kin_vis * sqrt(u % n(c1)**2 + v % n(c1)**2 + w % n(c1)**2)  &
                   / grid % wall_dist(c1)
             turb % y_plus(c1) = Y_Plus_Low_Re(turb, u_tau,           &
@@ -177,7 +177,7 @@
             eps  % n(c2) = eps  % n(c1)
             zeta % n(c2) = zeta % n(c1)
             f22  % n(c2) = f22  % n(c1)
-            if(flow % heat_transfer) then
+            if(Flow % heat_transfer) then
               t2  % n(c2) = t2  % n(c1)
             end if
           end if
@@ -192,7 +192,7 @@
              Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. SYMMETRY) then
             kin % n(c2) = kin % n(c1)
             eps % n(c2) = eps % n(c1)
-            if(flow % heat_transfer) then
+            if(Flow % heat_transfer) then
               t2  % n(c2) = t2  % n(c1)
             end if 
           end if
@@ -226,12 +226,12 @@
   !                   !
   !-------------------!
   if( (update .eq. 'ENERGY' .or. update .eq. 'ALL') .and.  &
-      flow % heat_transfer ) then
+      Flow % heat_transfer ) then
 
     ! Initialize variables for global heat transfer
-    flow % heat        = 0.0     ! [W]
-    flow % heat_flux   = 0.0     ! [W/m^2]
-    flow % heated_area = 0.0     ! [m^2]
+    Flow % heat        = 0.0     ! [W]
+    Flow % heat_flux   = 0.0     ! [W/m^2]
+    Flow % heated_area = 0.0     ! [m^2]
 
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
@@ -258,18 +258,18 @@
         else
           if(Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALLFL) then
             t % n(c2) = t % n(c1) + t % q(c2) * grid % wall_dist(c1)  &
-                      / flow % conductivity(c1)
+                      / Flow % conductivity(c1)
           else if(Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALL) then
-            t % q(c2) = ( t % n(c2) - t % n(c1) ) * flow % conductivity(c1)  &
+            t % q(c2) = ( t % n(c2) - t % n(c1) ) * Flow % conductivity(c1)  &
                       / grid % wall_dist(c1)
           end if
 
         end if
 
         ! Integrate heat and heated area
-        flow % heat = flow % heat + t % q(c2) * grid % s(s)
+        Flow % heat = Flow % heat + t % q(c2) * grid % s(s)
         if(abs(t % q(c2)) > TINY) then
-          flow % heated_area = flow % heated_area + grid % s(s)
+          Flow % heated_area = Flow % heated_area + grid % s(s)
         end if
 
         if( Var_Mod_Bnd_Cond_Type(t,c2) .eq. OUTFLOW .or.     &
@@ -284,9 +284,9 @@
     !-----------------------------------------------!
     !   Integrate (summ) heated area, and heat up   !
     !-----------------------------------------------!
-    call Comm_Mod_Global_Sum_Real(flow % heat)
-    call Comm_Mod_Global_Sum_Real(flow % heated_area)
-    flow % heat_flux = flow % heat / max(flow % heated_area, TINY)
+    call Comm_Mod_Global_Sum_Real(Flow % heat)
+    call Comm_Mod_Global_Sum_Real(Flow % heated_area)
+    Flow % heat_flux = Flow % heat / max(Flow % heated_area, TINY)
 
   end if  ! update energy and heat transfer
 
@@ -297,8 +297,8 @@
   !-------------!
   if( (update .eq. 'SCALARS' .or. update .eq. 'ALL') ) then
 
-    do sc = 1, flow % n_scalars
-      phi => flow % scalar(sc)
+    do sc = 1, Flow % n_scalars
+      phi => Flow % scalar(sc)
 
       do s = 1, grid % n_faces
         c1 = grid % faces_c(1,s)
@@ -325,9 +325,9 @@
           else
             if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALLFL) then
               phi % n(c2) = phi % n(c1) + phi % q(c2) * grid % wall_dist(c1)  &
-                          / flow % diffusivity
+                          / Flow % diffusivity
             else if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALL) then
-              phi % q(c2) = (phi % n(c2) - phi % n(c1)) * flow % diffusivity &
+              phi % q(c2) = (phi % n(c2) - phi % n(c1)) * Flow % diffusivity &
                           / grid % wall_dist(c1)
             end if ! WALL or WALLFL
           end if ! Turb. models
@@ -340,7 +340,7 @@
 
         end if ! c2 < 0
       end do ! s = 1, grid % n_faces
-    end do ! sc = 1, flow % n_scalars
+    end do ! sc = 1, Flow % n_scalars
 
   end if  ! update_scalars
 

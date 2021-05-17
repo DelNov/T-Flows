@@ -1,15 +1,15 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Compute_Momentum(flow, turb, Vof, sol,  &
+  subroutine User_Mod_End_Of_Compute_Momentum(Flow, turb, Vof, Sol,  &
                                                curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of Compute_Momentum function.           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),  target :: flow
+  type(Field_Type),  target :: Flow
   type(Turb_Type),   target :: turb
   type(Vof_Type),    target :: Vof
-  type(Solver_Type), target :: sol
+  type(Solver_Type), target :: Sol
   integer, intent(in)       :: curr_dt  ! current time step
   integer, intent(in)       :: ini      ! inner iteration
 !-----------------------------------[Locals]-----------------------------------!
@@ -22,10 +22,10 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => flow % pnt_grid
-  u    => flow % u
-  p    => flow % p
-  m    => sol  % m
+  grid => Flow % pnt_grid
+  u    => Flow % u
+  p    => Flow % p
+  m    => Sol  % m
 
   write(file_name(28:32), '(i5.5)') curr_dt
   write(file_name(34:36), '(i3.3)') ini
@@ -37,8 +37,8 @@
     if(Math_Mod_Approx_Real(grid % yc(c), 0.0) .and.  &
        Math_Mod_Approx_Real(grid % zc(c), 0.0)) then
       write(99, '(99es15.5)')  &
-        grid % xc(c), u % n(c), flow % density(c), p % x(c) * grid % vol(c),  &
-        m % val(m % dia(c)), flow % fx(c) - p % x(c) * grid % vol(c),  &
+        grid % xc(c), u % n(c), Flow % density(c), p % x(c) * grid % vol(c),  &
+        m % val(m % dia(c)), Flow % fx(c) - p % x(c) * grid % vol(c),  &
         grid % vol(c)
     end if
   end do

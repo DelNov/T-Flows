@@ -19,7 +19,7 @@
   logical                   :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
-  type(Field_Type),  pointer :: flow
+  type(Field_Type),  pointer :: Flow
   type(Vert_Type),   pointer :: vert(:)
   type(Elem_Type),   pointer :: elem(:)
   type(Matrix_Type), pointer :: A
@@ -36,7 +36,7 @@
 
   ! Take aliases
   grid => surf % pnt_grid
-  flow => surf % pnt_flow
+  Flow => surf % pnt_flow
   nv   => surf % n_verts
   ne   => surf % n_elems
   vert => surf % vert
@@ -46,7 +46,7 @@
   nc   = grid % n_cells
   nn   = grid % n_nodes
 
-  call Field_Mod_Interpolate_Cells_To_Nodes(flow, phi % n, phi_n(1:nn))
+  call Flow % Interpolate_Cells_To_Nodes(phi % n, phi_n(1:nn))
 
   !-----------------------------!
   !   Smooth the VOF function   !
@@ -75,7 +75,7 @@
   end do
 
   phi % n(:) = phi_c(:)
-  call Field_Mod_Grad_Variable(flow, phi)
+  call Flow % Grad_Variable(phi)
 
   allocate(n_cells_v(grid % n_cells))
   n_cells_v(:) = 0

@@ -13,7 +13,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type), target :: turb
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type), pointer :: flow
+  type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: grid
   type(Var_Type),   pointer :: u, v, w, t
   integer                   :: c, s, c1, c2
@@ -27,10 +27,10 @@
 !==============================================================================!
 
   ! Take aliases
-  flow => turb % pnt_flow
-  grid => flow % pnt_grid
-  call Field_Mod_Alias_Momentum(flow, u, v, w)
-  t    => flow % t
+  Flow => turb % pnt_flow
+  grid => Flow % pnt_grid
+  call Flow % Alias_Momentum(u, v, w)
+  t    => Flow % t
 
   !---------------!
   !   Constants   !  (Bad practice, constants should be in Turb_Mod.f90
@@ -52,12 +52,12 @@
     ! version since the subdomains which do not "touch" wall
     ! has nearest_wall_cell(c) = 0. 
     if(turb % nearest_wall_cell(c) .ne. 0) then
-      u_ff = sqrt( flow % viscosity(c)  &
+      u_ff = sqrt( Flow % viscosity(c)  &
                   * sqrt(  u % n(turb % nearest_wall_cell(c)) ** 2   &
                          + v % n(turb % nearest_wall_cell(c)) ** 2   &
                          + w % n(turb % nearest_wall_cell(c)) ** 2)  &
                  / (grid % wall_dist(turb % nearest_wall_cell(c))+TINY) )
-      turb % y_plus(c) = grid % wall_dist(c) * u_ff / flow % viscosity(c)
+      turb % y_plus(c) = grid % wall_dist(c) * u_ff / Flow % viscosity(c)
 
       ! Piomelli damping function
       fd = 1.0 - exp(-(turb % y_plus(c)/25.0)**3)
@@ -65,7 +65,7 @@
       fd = 1.0
     end if
     turb % vis_t(c) = min((c_smag*lf_wm)**2, (kappa*dw)**2)  &
-                    * flow % shear(c) * fd
+                    * Flow % shear(c) * fd
 
   end do
 
@@ -80,7 +80,7 @@
     c2 = grid % faces_c(2,s)
 
     if(c2 < 0) then
-      turb % vis_w(c1) = flow % viscosity(c1)            &
+      turb % vis_w(c1) = Flow % viscosity(c1)            &
               +        grid % fw(s)  * turb % vis_t(c1)  &
               + (1.0 - grid % fw(s)) * turb % vis_t(c2)
     end if    ! c2 < 0

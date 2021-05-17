@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Initialize_Variables(flow, turb, Vof, swarm, Sol)
+  subroutine Initialize_Variables(Flow, turb, Vof, swarm, Sol)
 !------------------------------------------------------------------------------!
 !   Initialize dependent variables.  (It is a bit of a mess still)             !
 !------------------------------------------------------------------------------!
@@ -19,7 +19,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
+  type(Field_Type), target :: Flow
   type(Turb_Type),  target :: turb
   type(Vof_Type)           :: Vof
   type(Swarm_Type)         :: swarm
@@ -56,15 +56,15 @@
 !==============================================================================!
 
   ! Take aliases
-  grid     => flow % pnt_grid
-  bulk     => flow % bulk
-  v_flux   => flow % v_flux
+  grid     => Flow % pnt_grid
+  bulk     => Flow % bulk
+  v_flux   => Flow % v_flux
   vis      => turb % vis
   u_mean   => turb % u_mean
   v_mean   => turb % v_mean
   w_mean   => turb % w_mean
-  call Field_Mod_Alias_Momentum   (flow, u, v, w)
-  call Field_Mod_Alias_Energy     (flow, t)
+  call Flow % Alias_Momentum(u, v, w)
+  call Flow % Alias_Energy  (t)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
   call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
   call Turb_Mod_Alias_T2          (turb, t2)
@@ -155,14 +155,14 @@
           i=Key_Ind('V',keys,nks);prof(k,0)=v_def;v%n(c)=prof(k,i)
           i=Key_Ind('W',keys,nks);prof(k,0)=w_def;w%n(c)=prof(k,i)
 
-          if(flow % heat_transfer) then
+          if(Flow % heat_transfer) then
             i=Key_Ind('T',keys,nks);prof(k,0)=t_def;t%n(c)=prof(k,i)
           end if
 
           if(turb % model .eq. K_EPS) then
             i=Key_Ind('KIN',keys,nks);prof(k,0)=kin_def; kin%n(c)=prof(k,i)
             i=Key_Ind('EPS',keys,nks);prof(k,0)=eps_def; eps%n(c)=prof(k,i)
-            if(flow % heat_transfer) then
+            if(Flow % heat_transfer) then
               i=Key_Ind('T2', keys,nks);prof(k,0)=t2_def; t2 %n(c)=prof(k,i)
             end if
           end if
@@ -173,7 +173,7 @@
             i=Key_Ind('EPS', keys,nks);prof(k,0)=eps_def; eps %n(c)=prof(k,i)
             i=Key_Ind('ZETA',keys,nks);prof(k,0)=zeta_def;zeta%n(c)=prof(k,i)
             i=Key_Ind('F22', keys,nks);prof(k,0)=f22_def; f22 %n(c)=prof(k,i)
-            if(flow % heat_transfer) then
+            if(Flow % heat_transfer) then
               i=Key_Ind('T2', keys,nks);prof(k,0)=t2_def; t2 %n(c)=prof(k,i)
             end if
            end if
@@ -264,15 +264,15 @@
         w % o(c)  = w % n(c)
         w % oo(c) = w % n(c)
 
-        if(flow % heat_transfer) then
+        if(Flow % heat_transfer) then
           vals(0) = t_def;  t % n(c) = vals(Key_Ind('T', keys, nks))
           t % o(c)  = t % n(c)
           t % oo(c) = t % n(c)
         end if
 
         ! Scalars
-        do sc = 1, flow % n_scalars
-          phi => flow % scalar(sc)
+        do sc = 1, Flow % n_scalars
+          phi => Flow % scalar(sc)
           vals(0) = phi_def
           phi % n(c)  = vals(Key_Ind(phi % name, keys, nks))
           phi % o(c)  = phi % n(c)
@@ -315,7 +315,7 @@
           eps % o(c)  = eps % n(c)
           eps % oo(c) = eps % n(c)
           turb % y_plus(c) = 0.001
-          if(flow % heat_transfer) then
+          if(Flow % heat_transfer) then
             vals(0) = t2_def;  t2 % n(c) = vals(Key_Ind('T2',  keys, nks))
             t2 % o(c)  = t2 % n(c)
             t2 % oo(c) = t2 % n(c)
@@ -337,7 +337,7 @@
           f22  % o(c)  = f22  % n(c)
           f22  % oo(c) = f22  % n(c)
           turb % y_plus(c) = 0.001
-          if(flow % heat_transfer) then
+          if(Flow % heat_transfer) then
             vals(0) = t2_def;  t2 % n(c) = vals(Key_Ind('T2',  keys, nks))
             t2 % o(c)  = t2 % n(c)
             t2 % oo(c) = t2 % n(c)
@@ -357,7 +357,7 @@
 
   end if
 
-  call User_Mod_Initialize_Variables(flow, turb, Vof, swarm, Sol)
+  call User_Mod_Initialize_Variables(Flow, turb, Vof, swarm, Sol)
 
   !--------------------------------!
   !      Calculate the inflow      !
@@ -415,9 +415,9 @@
   call Comm_Mod_Global_Sum_Real(area)
 
   ! This parameter, has_pressure_outlet, is used in Compute_Pressure
-  flow % has_pressure_outlet = .false.
+  Flow % has_pressure_outlet = .false.
   if(n_pressure > 0) then
-    flow % has_pressure_outlet = .true.
+    Flow % has_pressure_outlet = .true.
   end if
 
   !----------------------!

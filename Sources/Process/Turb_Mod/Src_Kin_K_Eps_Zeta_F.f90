@@ -23,7 +23,7 @@
   real :: Y_Plus_Low_Re
   real :: Y_Plus_Rough_Walls
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type),  pointer :: flow
+  type(Field_Type),  pointer :: Flow
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w, t
   type(Var_Type),    pointer :: kin, eps, zeta, f, ut, vt, wt, t2
@@ -51,10 +51,10 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
-  flow => turb % pnt_flow
-  grid => flow % pnt_grid
-  call Field_Mod_Alias_Momentum   (flow, u, v, w)
-  call Field_Mod_Alias_Energy     (flow, t)
+  Flow => turb % pnt_flow
+  grid => Flow % pnt_grid
+  call Flow % Alias_Momentum(u, v, w)
+  call Flow % Alias_Energy  (t)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f)
   call Turb_Mod_Alias_Heat_Fluxes (turb, ut, vt, wt)
   call Sol % Alias_Solver         (A, b)
@@ -62,17 +62,17 @@
 
   ! Production source:
   do c = 1, grid % n_cells
-    turb % p_kin(c) = turb % vis_t(c) * flow % shear(c)**2
+    turb % p_kin(c) = turb % vis_t(c) * Flow % shear(c)**2
     b(c) = b(c) + turb % p_kin(c) * grid % vol(c)
   end do
 
-  if(flow % buoyancy .eq. THERMALLY_DRIVEN) then
+  if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
     do c = 1, grid % n_cells
-      turb % g_buoy(c) = -flow % beta             &
+      turb % g_buoy(c) = -Flow % beta             &
                          * (grav_x * ut % n(c)    &
                           + grav_y * vt % n(c)    &
                           + grav_z * wt % n(c))   &
-                          * flow % density(c)
+                          * Flow % density(c)
 
       if(turb % g_buoy(c) + turb % p_kin(c) < 0.0) then
         turb % g_buoy(c) = 0.0
@@ -97,7 +97,7 @@
       alpha_d  = max(1.0,l_rans_d/l_sgs_d)
 
       ! Velocity switch
-      l_sgs_v  = lf * flow % shear(c)
+      l_sgs_v  = lf * Flow % shear(c)
       l_rans_v = sqrt(kin % n(c) * zeta % n(c))
       alpha_v  = l_rans_v / (l_sgs_v + TINY)
 
@@ -107,11 +107,11 @@
           (turb % hybrid_les_rans_switch .eq. SWITCH_VELOCITY)  &
           .and. (alpha_v < 0.5 .or. alpha_d < 1.05) ) then
         A % val(A % dia(c)) = A % val(A % dia(c))             &
-                            + flow % density(c) * eps % n(c)  &
+                            + Flow % density(c) * eps % n(c)  &
                             / (kin % n(c) + TINY) * grid % vol(c)
       else
         A % val(A % dia(c)) = A % val(A % dia(c))                        &
-          + flow % density(c)                                            &
+          + Flow % density(c)                                            &
           * min(alpha_d**1.4 * eps % n(c), kin % n(c)**1.5 / (lf*0.01))  &
           / (kin % n(c) + TINY) * grid % vol(c)
       end if
@@ -119,7 +119,7 @@
   else  ! turbuence model will be K_EPS_ZETA_F
     do c = 1, grid % n_cells
       A % val(A % dia(c)) = A % val(A % dia(c))             &
-                          + flow % density(c) * eps % n(c)  &
+                          + Flow % density(c) * eps % n(c)  &
                           / (kin % n(c) + TINY) * grid % vol(c)
 
     end do
@@ -131,13 +131,13 @@
 
     if(c2 < 0) then
       ! Kinematic viscosities
-      kin_vis = flow % viscosity(c1) / flow % density(c1)
+      kin_vis = Flow % viscosity(c1) / Flow % density(c1)
 
       if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or. &
          Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
 
         ! Compute tangential velocity component
-        u_tan = Field_Mod_U_Tan(flow, s)
+        u_tan = Flow % U_Tan(s)
 
         u_tau = c_mu25 * sqrt(kin % n(c1))
 
@@ -147,7 +147,7 @@
                                           kin_vis)
 
         turb % tau_wall(c1) = Tau_Wall_Low_Re(turb,               &
-                                              flow % density(c1), &
+                                              Flow % density(c1), &
                                               u_tau,              &
                                               u_tan,              &
                                               turb % y_plus(c1))
@@ -157,7 +157,7 @@
         p_kin_wf  = turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
                   / (grid % wall_dist(c1) * kappa)
 
-        p_kin_int = turb % vis_t(c1) * flow % shear(c1)**2
+        p_kin_int = turb % vis_t(c1) * Flow % shear(c1)**2
 
         turb % p_kin(c1) = p_kin_wf
 
@@ -172,7 +172,7 @@
                                                  kin_vis)
 
           turb % tau_wall(c1) = Tau_Wall_Rough_Walls(turb,                  &
-                                                     flow % density(c1),    &
+                                                     Flow % density(c1),    &
                                                      u_tau,                 &
                                                      u_tan,                 &
                                                      grid % wall_dist(c1),  &
@@ -184,10 +184,10 @@
         end if ! rough_walls
 
         b(c1) = b(c1) + (turb % p_kin(c1)  &
-              - turb % vis_t(c1) * flow % shear(c1)**2) * grid % vol(c1)
+              - turb % vis_t(c1) * Flow % shear(c1)**2) * grid % vol(c1)
 
         ! Implementation of wall function for buoyancy-driven flows
-        if(flow % buoyancy .eq. THERMALLY_DRIVEN) then
+        if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
 
           nx = grid % sx(s) / grid % s(s)
           ny = grid % sy(s) / grid % s(s)
@@ -214,7 +214,7 @@
             t % q(c2) = turb % con_w(c1) * (t % n(c1) - t % n(c2))  &
                       / grid % wall_dist(c1)
 
-          g_buoy_wall = flow % beta*abs(grav_x + grav_y + grav_z)  &
+          g_buoy_wall = Flow % beta*abs(grav_x + grav_y + grav_z)  &
                       * sqrt(abs(t % q(c2))                        &
                       * c_mu_theta5                                &
                       * sqrt(abs(t2 % n(c1) * kin % n(c1))))
@@ -228,7 +228,7 @@
           ! Add new values of g_buoy based on wall function approach
           b(c1)      = b(c1) + turb % g_buoy(c1) * grid % vol(c1)
 
-        end if ! flow % buoyancy .eq. THERMALLY_DRIVEN
+        end if ! Flow % buoyancy .eq. THERMALLY_DRIVEN
 
       end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2).eq.WALL or WALLFL
     end if    ! c2 < 0

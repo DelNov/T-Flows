@@ -1,5 +1,5 @@
 !==============================================================================!
-   subroutine User_Mod_Save_Swarm(flow, turb, Vof, swarm, ts)
+   subroutine User_Mod_Save_Swarm(Flow, turb, Vof, swarm, ts)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results for paerticles in homogeneous directions.             !
@@ -10,7 +10,7 @@
   use Const_Mod                      ! constants
   use Comm_Mod                       ! parallel stuff
   use Grid_Mod,  only: Grid_Type
-  use Field_Mod, only: Field_Type
+  use Field_Mod
   use Bulk_Mod,  only: Bulk_Type
   use Var_Mod,   only: Var_Type
   use Turb_Mod
@@ -18,7 +18,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
+  type(Field_Type), target :: Flow
   type(Turb_Type),  target :: turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: swarm
@@ -33,11 +33,11 @@
   integer                   :: nb, nc
   character(SL)             :: coord_name, result_name, result_name_plus
   character(SL)             :: swarm_result_name, swarm_result_name_plus
-  real, allocatable         :: z_p(:), u_p(:), v_p(:), w_p(:), t_p(:),      &
-                              ind(:), wall_p(:),                            &
-                              uw_pp(:), uu_pp(:), vv_pp(:), ww_pp(:),       &
-                              u_pp(:), v_pp(:), w_pp(:), vw_pp(:), uv_pp(:),& 
-                              y_plus_p(:), vis_t_p(:) 
+  real, allocatable         :: z_p(:), u_p(:), v_p(:), w_p(:), t_p(:),        &
+                               ind(:), wall_p(:),                             &
+                               uw_pp(:), uu_pp(:), vv_pp(:), ww_pp(:),        &
+                               u_pp(:), v_pp(:), w_pp(:), vw_pp(:), uv_pp(:), &
+                               y_plus_p(:), vis_t_p(:) 
   integer, allocatable      :: n_p(:), n_count1(:), n_count2(:), store(:)
   integer, allocatable      :: n_states(:)
   real                      :: ubulk, re, cf_dean, cf, pr, u_tau_p
@@ -45,19 +45,18 @@
   logical                   :: there
 !==============================================================================!
 
-  ! Take aliases for the flow 
-  grid => flow % pnt_grid
-  bulk => flow % bulk
-  call Field_Mod_Alias_Momentum(flow, u, v, w)
-  call Field_Mod_Alias_Energy  (flow, t)
+  ! Take aliases for the Flow 
+  grid => Flow % pnt_grid
+  bulk => Flow % bulk
+  call Flow % Alias_Momentum(u, v, w)
+  call Flow % Alias_Energy  (t)
 
   ! constant fluid properties for single phase
-  visc_const      = maxval(flow % viscosity(:))
-  density_const   = maxval(flow % density(:))
+  visc_const      = maxval(Flow % viscosity(:))
+  density_const   = maxval(Flow % density(:))
 
   ! Set the name for coordinate file
   call File_Mod_Set_Name(coord_name, extension='.1d')
-
 
   !------------------!
   !   Read 1d file   !
@@ -96,7 +95,7 @@
   end do
   close(9)
 
-  ! Primary flow arrays:
+  ! Primary Flow arrays:
   allocate(n_p    (n_prob));   n_p      = 0
   allocate(wall_p (n_prob));   wall_p   = 0.0
   allocate(u_p    (n_prob));   u_p      = 0.0
@@ -177,7 +176,7 @@
   ! Average over all processors 
   do pl=1, n_prob-1
 
-    ! Carrier flow
+    ! Carrier Flow
     call Comm_Mod_Global_Sum_Int(n_count2(pl))
     call Comm_Mod_Global_Sum_Real(wall_p(pl))
     call Comm_Mod_Global_Sum_Real(u_p(pl))
@@ -204,7 +203,7 @@
 
   do i = 1, n_prob-1
 
-    ! Background flow
+    ! Background Flow
     if(n_count2(i) .ne. 0) then
       wall_p(i)  = wall_p(i) / n_count2(i)
       u_p   (i)  = u_p   (i) / n_count2(i)
@@ -237,10 +236,10 @@
                          time_step = ts, extension='.dat')
   call File_Mod_Open_File_For_Writing(swarm_result_name_plus, fu2)
 
-  ! Calculating friction velocity and friction temperature  (For the flow!)
-    u_tau_p = sqrt( (visc_const*sqrt(u_p(1)**2 +   &
-                                     v_p(1)**2 +   &
-                                     w_p(1)**2)/ wall_p(1)))
+  ! Calculating friction velocity and friction temperature  (For the Flow!)
+  u_tau_p = sqrt( (visc_const*sqrt(u_p(1)**2 +   &
+                                   v_p(1)**2 +   &
+                                   w_p(1)**2)/ wall_p(1)))
 
   if(u_tau_p .eq. 0.0) then
     if(this_proc < 2) then

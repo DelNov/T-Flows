@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Results_Mod_Save(flow, turb, Vof, swarm, ts, plot_inside, domain)
+  subroutine Results_Mod_Save(Flow, turb, Vof, swarm, ts, plot_inside, domain)
 !------------------------------------------------------------------------------!
 !   Writes results in VTU file format (for VisIt and Paraview)                 !
 !------------------------------------------------------------------------------!
@@ -30,7 +30,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Field_Type),  target :: flow
+  type(Field_Type),  target :: Flow
   type(Turb_Type),   target :: turb
   type(Vof_Type),    target :: Vof
   type(Swarm_Type),  target :: swarm
@@ -56,7 +56,7 @@
   call Cpu_Timer % Start('Save_Vtu_Results')
 
   ! Take aliases
-  grid => flow % pnt_grid
+  grid => Flow % pnt_grid
 
   !------------------------------------------------!
   !   Mark the beginnings and end of cell ranges   !
@@ -428,31 +428,31 @@
     !   Velocity   !
     !--------------!
     call Save_Vector_Real("Velocity [m/s]", plot_inside,  &
-                          flow % u % n(c_f:c_l),          &
-                          flow % v % n(c_f:c_l),          &
-                          flow % w % n(c_f:c_l),          &
+                          Flow % u % n(c_f:c_l),          &
+                          Flow % v % n(c_f:c_l),          &
+                          Flow % w % n(c_f:c_l),          &
                           f8, f9, data_offset, run)
 
     !---------------!
     !   Potential   !
     !---------------!
     call Save_Scalar_Real("Potential", plot_inside,  &
-                          flow % pot % n(c_f:c_l),   &
+                          Flow % pot % n(c_f:c_l),   &
                           f8, f9, data_offset, run)
 
     !--------------------------------------!
     !   Pressure correction and pressure   !
     !--------------------------------------!
     call Save_Scalar_Real("PressureCorrection [kg/m/s^2]", plot_inside,  &
-                          flow % pp % n(c_f:c_l),                        &
+                          Flow % pp % n(c_f:c_l),                        &
                           f8, f9, data_offset, run)
     px_save(:) = 0.0
     py_save(:) = 0.0
     pz_save(:) = 0.0
     do c1 = c_f, c_l
-      px_save(c1) = flow % pp % x(c1) * grid % vol(c1)
-      py_save(c1) = flow % pp % y(c1) * grid % vol(c1)
-      pz_save(c1) = flow % pp % z(c1) * grid % vol(c1)
+      px_save(c1) = Flow % pp % x(c1) * grid % vol(c1)
+      py_save(c1) = Flow % pp % y(c1) * grid % vol(c1)
+      pz_save(c1) = Flow % pp % z(c1) * grid % vol(c1)
     end do
     call Save_Vector_Real("PressureCorrectionForce [N]", plot_inside,  &
                           px_save(c_f:c_l),                            &
@@ -461,15 +461,15 @@
                           f8, f9, data_offset, run)
 
     call Save_Scalar_Real("Pressure [kg/m/s^2]", plot_inside,  &
-                          flow % p % n(c_f:c_l),               &
+                          Flow % p % n(c_f:c_l),               &
                           f8, f9, data_offset, run)
     px_save(:) = 0.0
     py_save(:) = 0.0
     pz_save(:) = 0.0
     do c1 = c_f, c_l
-      px_save(c1) = flow % p % x(c1) * grid % vol(c1)
-      py_save(c1) = flow % p % y(c1) * grid % vol(c1)
-      pz_save(c1) = flow % p % z(c1) * grid % vol(c1)
+      px_save(c1) = Flow % p % x(c1) * grid % vol(c1)
+      py_save(c1) = Flow % p % y(c1) * grid % vol(c1)
+      pz_save(c1) = Flow % p % z(c1) * grid % vol(c1)
     end do
     call Save_Vector_Real("PressureForce [N]", plot_inside,    &
                           px_save(c_f:c_l),                    &
@@ -480,25 +480,25 @@
     !-----------------!
     !   Temperature   !
     !-----------------!
-    if(flow % heat_transfer) then
+    if(Flow % heat_transfer) then
       call Save_Scalar_Real("Temperature [K]", plot_inside,  &
-                            flow % t % n(c_f:c_l),           &
+                            Flow % t % n(c_f:c_l),           &
                             f8, f9, data_offset, run)
       tx_save(:) = 0.0
       ty_save(:) = 0.0
       tz_save(:) = 0.0
       do c1 = c_f, c_l
-        tx_save(c1) = flow % t % x(c1)
-        ty_save(c1) = flow % t % y(c1)
-        tz_save(c1) = flow % t % z(c1)
+        tx_save(c1) = Flow % t % x(c1)
+        ty_save(c1) = Flow % t % y(c1)
+        tz_save(c1) = Flow % t % z(c1)
       end do
 
-      if(.not. flow % mass_transfer) then
-        call Field_Mod_Grad_Variable(flow, flow % t)
+      if(.not. Flow % mass_transfer) then
+        call Flow % Grad_Variable(Flow % t)
       else
         call Vof % Calculate_Grad_Matrix_With_Front()
-        call Vof % Grad_Variable_With_Front(flow % t, Vof % t_sat)
-        call Field_Mod_Calculate_Grad_Matrix(flow)
+        call Vof % Grad_Variable_With_Front(Flow % t, Vof % t_sat)
+        call Flow % Calculate_Grad_Matrix()
       end if
 
       call Save_Vector_Real("TemperatureGradients [K/m]", plot_inside,  &
@@ -513,16 +513,16 @@
     !   Physical properties   !
     !-------------------------!
     call Save_Scalar_Real("PhysicalDensity [kg/m^s]", plot_inside,      &
-                          flow % density(c_f:c_l),                      &
+                          Flow % density(c_f:c_l),                      &
                           f8, f9, data_offset, run)
     call Save_Scalar_Real("PhysicalViscosity [Ns/m^2]", plot_inside,    &
-                          flow % viscosity(c_f:c_l),                    &
+                          Flow % viscosity(c_f:c_l),                    &
                           f8, f9, data_offset, run)
     call Save_Scalar_Real("PhysicalConductivity [W/m/K]", plot_inside,  &
-                          flow % conductivity(c_f:c_l),                 &
+                          Flow % conductivity(c_f:c_l),                 &
                           f8, f9, data_offset, run)
     call Save_Scalar_Real("PhysicalCapacity [J/K]", plot_inside,        &
-                          flow % capacity(c_f:c_l),                     &
+                          Flow % capacity(c_f:c_l),                     &
                           f8, f9, data_offset, run)
 
     !---------------------!
@@ -570,8 +570,8 @@
     !------------------!
     !   Save scalars   !
     !------------------!
-    do sc = 1, flow % n_scalars
-      phi => flow % scalar(sc)
+    do sc = 1, Flow % n_scalars
+      phi => Flow % scalar(sc)
       call Save_Scalar_Real(phi % name, plot_inside,   &
                             phi % n(c_f:c_l),          &
                             f8, f9, data_offset, run)
@@ -582,7 +582,7 @@
     !-----------------!
     q_save(:) = 0.0
     do c1 = c_f, c_l
-      q_save(c1) = (flow % vort(c1)**2 - flow % shear(c1)**2)/4.
+      q_save(c1) = (Flow % vort(c1)**2 - Flow % shear(c1)**2)/4.
     end do
     call Save_Scalar_Real("QCriterion", plot_inside,   &
                           q_save(c_f:c_l),             &
@@ -626,7 +626,7 @@
       call Save_Scalar_Real("TurbulentQuantityF22", plot_inside,    &
                             turb % f22  % n(c_f:c_l),               &
                             f8, f9, data_offset, run)
-      if(flow % heat_transfer) then
+      if(Flow % heat_transfer) then
         call Save_Scalar_Real("TurbulentQuantityT2", plot_inside,   &
                               turb % t2 % n(c_f:c_l),               &
                               f8, f9, data_offset, run)
@@ -666,13 +666,13 @@
                             turb % vis % n(c_f:c_l),            &
                             f8, f9, data_offset, run)
       call Save_Scalar_Real("VorticityMagnitude", plot_inside,  &
-                            flow % vort(c_f:c_l),               &
+                            Flow % vort(c_f:c_l),               &
                             f8, f9, data_offset, run)
     end if
     kin_vis_t(:) = 0.0
     if(turb % model .ne. NO_TURBULENCE_MODEL .and.  &
        turb % model .ne. DNS) then
-      kin_vis_t(c_f:c_l) = turb % vis_t(c_f:c_l) / flow % viscosity(c_f:c_l)
+      kin_vis_t(c_f:c_l) = turb % vis_t(c_f:c_l) / Flow % viscosity(c_f:c_l)
       call Save_Scalar_Real("EddyOverMolecularViscosity",  &
                             plot_inside,                   &
                             kin_vis_t(c_f:c_l),            &
@@ -700,7 +700,7 @@
       call Save_Scalar_Real("ReynoldsStressYZ", plot_inside,  &
                             turb % vw % n(c_f:c_l),           &
                             f8, f9, data_offset, run)
-      if(flow % heat_transfer) then
+      if(Flow % heat_transfer) then
         call Save_Scalar_Real("TurbulentHeatFluxX", plot_inside,  &
                               turb % ut % n(c_f:c_l),             &
                               f8, f9, data_offset, run)
@@ -752,7 +752,7 @@
       call Save_Scalar_Real("MeanReynoldsStressYZ", plot_inside,  &
                             vw_save(c_f:c_l),                     &
                             f8, f9, data_offset, run)
-      if(flow % heat_transfer) then
+      if(Flow % heat_transfer) then
         call Save_Scalar_Real("MeanTemperature", plot_inside,     &
                               turb % t_mean(c_f:c_l),             &
                               f8, f9, data_offset, run)
@@ -785,8 +785,8 @@
       end if
 
       ! Scalars
-      do sc = 1, flow % n_scalars
-        phi => flow % scalar(sc)
+      do sc = 1, Flow % n_scalars
+        phi => Flow % scalar(sc)
         name_mean = 'Mean'
         name_mean(5:8) = phi % name
         do c1 = c_f, c_l

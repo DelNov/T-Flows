@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine User_Mod_Backstep_Profiles(flow, turb)
+  subroutine User_Mod_Backstep_Profiles(Flow, turb)
 !------------------------------------------------------------------------------!
 !   Description
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
+  type(Field_Type), target :: Flow
   type(Turb_Type),  target :: turb
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
@@ -29,9 +29,9 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => flow % pnt_grid
-  t    => flow % t
-  call Field_Mod_Alias_Momentum   (flow, u, v, w)
+  grid => Flow % pnt_grid
+  t    => Flow % t
+  call Flow % Alias_Momentum(u, v, w)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
 
   ! Set the name for coordinate file
@@ -121,7 +121,7 @@
   allocate(n_count(n_prob)); n_count = 0
   count = 0
 
-  if(flow % heat_transfer) then
+  if(Flow % heat_transfer) then
     allocate(tm_p(n_prob));   tm_p = 0.0
     allocate(tt_p(n_prob));   tt_p = 0.0
     allocate(ut_p(n_prob));   ut_p = 0.0
@@ -175,7 +175,7 @@
 
       count =  count + n_count(pl) 
 
-      if(flow % heat_transfer) then
+      if(Flow % heat_transfer) then
         call Comm_Mod_Global_Sum_Real(tm_p(pl))
         call Comm_Mod_Global_Sum_Real(tt_p(pl))
         call Comm_Mod_Global_Sum_Real(ut_p(pl))
@@ -253,7 +253,7 @@
   deallocate(v4_p)
   deallocate(v5_p)
   deallocate(n_count)
-  if(flow % heat_transfer) then
+  if(Flow % heat_transfer) then
     deallocate(tm_p)
     deallocate(tt_p)
     deallocate(ut_p)

@@ -10,7 +10,7 @@
   type(Solver_Type), target :: Sol
   character(len=*)          :: name_phi
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type),  pointer :: flow
+  type(Field_Type),  pointer :: Flow
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w
   type(Var_Type),    pointer :: kin, eps, zeta, f22
@@ -27,16 +27,16 @@
 !==============================================================================!
 
   ! Take aliases
-  flow => turb % pnt_flow
-  grid => flow % pnt_grid
-  call Field_Mod_Alias_Momentum   (flow, u, v, w)
+  Flow => turb % pnt_flow
+  grid => Flow % pnt_grid
+  call Flow % Alias_Momentum(u, v, w)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
   call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
   call Sol % Alias_Solver         (A, b)
 
   call Time_And_Length_Scale(grid, turb)
 
-  call Field_Mod_Grad_Variable(flow, f22)
+  call Flow % Grad_Variable(f22)
 
   do  c = 1, grid % n_cells
     kin % n(c) = max(0.5*(  uu % n(c)  &
@@ -120,12 +120,12 @@
       diss_wall = uu % n(c) / kin % n(c) * eps % n(c) 
       diss_hom  = 2.0/3.0 * eps % n(c)
 
-      b(c) = b(c) + flow % density(c) * (max(prod,0.0)               &
+      b(c) = b(c) + Flow % density(c) * (max(prod,0.0)               &
                   + (1.0-f22 % n(c)**2) * phi_wall                   &
                   +      f22 % n(c)**2  *(phi_hom)) * grid % vol(c)
 
       A % val(A % dia(c)) = A % val(A % dia(c))                              &
-        + flow % density(c) * (max(-prod,0.0) / max(uu % n(c), TINY)         &
+        + Flow % density(c) * (max(-prod,0.0) / max(uu % n(c), TINY)         &
            + (1.0-f22 % n(c)**2) * 6.0 * eps % n(c)/kin % n(c)               &
            +      f22 % n(c)**2 *(diss_hom/max(uu % n(c), TINY)              &
                             + g1 * eps % n(c)           / (2.0*kin % n(c))   &
@@ -162,12 +162,12 @@
       diss_wall = vv % n(c)/kin % n(c) * eps % n(c) 
       diss_hom  = 2.0/3.0 * eps % n(c)
 
-      b(c) = b(c) + flow % density(c) * (max(prod,0.0)               &
+      b(c) = b(c) + Flow % density(c) * (max(prod,0.0)               &
                   + (1.0-f22 % n(c)**2) * phi_wall                   &
                   +      f22 % n(c)**2  *(phi_hom)) * grid % vol(c)
 
       A % val(A % dia(c)) = A % val(A % dia(c))                              &
-        + flow % density(c) * (max(-prod,0.0) / max(vv % n(c), TINY)         &
+        + Flow % density(c) * (max(-prod,0.0) / max(vv % n(c), TINY)         &
            + (1.0-f22 % n(c)**2) * 6.0 * eps % n(c)/kin % n(c)               &
            +      f22 % n(c)**2 *(diss_hom/max(vv % n(c), TINY)              &
                             + g1 * eps % n(c)           / (2.0*kin % n(c))   &
@@ -203,12 +203,12 @@
       diss_wall = ww % n(c)/kin % n(c) * eps % n(c) 
       diss_hom  = 2.0/3.0 * eps % n(c)
 
-      b(c) = b(c) + flow % density(c) * (max(prod,0.0)               &
+      b(c) = b(c) + Flow % density(c) * (max(prod,0.0)               &
                   + (1.0-f22 % n(c)**2) * phi_wall                   &
                   +      f22 % n(c)**2  *(phi_hom)) * grid % vol(c)
 
       A % val(A % dia(c)) = A % val(A % dia(c))                              &
-        + flow % density(c) * (max(-prod,0.0) / max(ww % n(c), TINY)         &
+        + Flow % density(c) * (max(-prod,0.0) / max(ww % n(c), TINY)         &
            + (1.0-f22 % n(c)**2) * 6.0 * eps % n(c)/kin % n(c)               &
            +      f22 % n(c)**2 *(diss_hom/max(ww % n(c), TINY)              &
                             + g1 * eps % n(c)           / (2.0*kin % n(c))   &
@@ -248,12 +248,12 @@
 
       diss_wall = uv % n(c)/kin % n(c) * eps % n(c) 
 
-      b(c) = b(c) + flow % density(c) * (prod                        &
+      b(c) = b(c) + Flow % density(c) * (prod                        &
                   + (1.0-f22 % n(c)**2) * phi_wall                   &
                   +      f22 % n(c)**2  *(phi_hom)) * grid % vol(c)
 
       A % val(A % dia(c)) =  A % val(A % dia(c))                              &
-        + flow % density(c) * ((1.0 - f22 % n(c)**2) * 6.0 * eps % n(c)       &
+        + Flow % density(c) * ((1.0 - f22 % n(c)**2) * 6.0 * eps % n(c)       &
                             / kin % n(c)                                      &
                 + f22 % n(c)**2 *(  g1 * eps % n(c) / (2.0 * kin % n(c))      &
                         + g1_star * turb % p_kin(c) / (2.0 * kin % n(c)))     &
@@ -292,12 +292,12 @@
 
       diss_wall = uw % n(c)/kin % n(c) * eps % n(c) 
 
-      b(c) = b(c) + flow % density(c) * (prod                        &
+      b(c) = b(c) + Flow % density(c) * (prod                        &
                   + (1.0-f22 % n(c)**2) * phi_wall                   &
                   +      f22 % n(c)**2  *(phi_hom)) * grid % vol(c)
 
       A % val(A % dia(c)) =  A % val(A % dia(c))                               &
-        + flow % density(c) * ((1.0 - f22 % n(c)**2) * 6.0 * eps % n(c)    &
+        + Flow % density(c) * ((1.0 - f22 % n(c)**2) * 6.0 * eps % n(c)    &
                             / kin % n(c)                                   &
                 + f22 % n(c)**2  *(  g1 * eps % n(c) / (2.0 * kin % n(c))      &
                          + g1_star * turb % p_kin(c) / (2.0 * kin % n(c)))     &
@@ -336,12 +336,12 @@
 
       diss = (1.0 - f22 % n(c)**2) * vw % n(c) / kin % n(c) * eps % n(c)
 
-      b(c) = b(c) + flow % density(c) * (prod                        &
+      b(c) = b(c) + Flow % density(c) * (prod                        &
                   + (1.0-f22 % n(c)**2) * phi_wall                   &
                   +      f22 % n(c)**2  *(phi_hom)) * grid % vol(c)
 
       A % val(A % dia(c)) =  A % val(A % dia(c))                               &
-        + flow % density(c) * ((1.0 - f22 % n(c)**2) * 6.0 * eps % n(c)  &
+        + Flow % density(c) * ((1.0 - f22 % n(c)**2) * 6.0 * eps % n(c)  &
                            / kin % n(c)                                  &
         + f22 % n(c)**2  *(  g1 * eps % n(c) / (2.0 * kin % n(c))              &
                  + g1_star * turb % p_kin(c) / (2.0 * kin % n(c)))             &
@@ -355,11 +355,11 @@
 
       ce_11 = c_1e * (1.0 + 0.065*(1.0 - f22 % n(c)**3)  &
                    * turb % p_kin(c) / eps % n(c))
-      b(c) = b(c) + flow % density(c) * ce_11 * turb % p_kin(c) * esor
+      b(c) = b(c) + Flow % density(c) * ce_11 * turb % p_kin(c) * esor
 
       ! Fill in a diagonal of coefficient matrix
       A % val(A % dia(c)) =  A % val(A % dia(c))  &
-                          + c_2e * esor * flow % density(c)
+                          + c_2e * esor * Flow % density(c)
     end if
   end do
 
@@ -370,7 +370,7 @@
 
       ! Calculate a values of dissipation on wall
       if(c2 < 0) then
-        kin_vis = flow % viscosity(c1) / flow % density(c1)
+        kin_vis = Flow % viscosity(c1) / Flow % density(c1)
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or. &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
           eps % n(c2) = kin_vis*(uu % n(c1) + vv % n(c1) + ww % n(c1))&

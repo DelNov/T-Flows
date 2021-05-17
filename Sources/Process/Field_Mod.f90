@@ -145,6 +145,59 @@
     ! Is buoyancy thermally- or density-driven?
     integer :: buoyancy
 
+    contains
+
+      !------------------------!
+      !   Core functionality   !
+      !------------------------!
+      procedure :: Allocate_Field
+
+      !-----------------------------------------!
+      !   Procedures for gradient computation   !
+      !-----------------------------------------!
+      procedure          :: Calculate_Grad_Matrix
+      ! procedure          :: Calculate_Grad_Matrix_Cell_By_Cell
+      ! procedure          :: Calculate_Grad_Matrix_For_Cell
+      ! procedure          :: Calculate_Grad_Matrix_Faces_To_Cells
+      ! procedure          :: Calculate_Grad_Matrix_Nodes_To_Cells
+      ! procedure          :: Calculate_Grad_Matrix_Cells_To_Nodes
+      procedure          :: Grad
+      procedure          :: Grad_Component
+      procedure, private :: Grad_Component_No_Refresh
+      ! procedure          :: Grad_Component_Faces_To_Cells
+      ! procedure          :: Grad_Component_Nodes_To_Cells
+      ! procedure          :: Grad_Component_Cells_To_Nodes
+      procedure          :: Grad_Gauss
+      procedure, private :: Grad_Gauss_Pressure
+      procedure, private :: Grad_Gauss_Variable
+      procedure, private :: Grad_Least_Pressure
+      procedure, private :: Grad_Least_Pressure_Correction
+      procedure, private :: Grad_Least_Variable
+      procedure          :: Grad_Pressure
+      procedure          :: Grad_Pressure_Correction
+      procedure          :: Grad_Variable
+
+      !----------------------------------!
+      !   Procedures for interpolation   !
+      !----------------------------------!
+      procedure :: Interpolate_Cells_To_Nodes
+      ! procedure :: Interpolate_Nodes_To_Cells
+      ! procedure :: Interpolate_Nodes_To_Faces
+      procedure :: Interpolate_To_Faces_Harmonic
+      procedure :: Interpolate_To_Faces_Linear
+
+      !---------------!
+      !   Utilities   !
+      !---------------!
+      procedure :: Alias_Energy
+      procedure :: Alias_Momentum
+      procedure :: Buoyancy_Forces
+      procedure :: Calculate_Fluxes
+      procedure :: Potential_Initialization
+      procedure :: Prandtl_Number
+      procedure :: Schmidt_Number
+      procedure :: U_Tan
+
   end type
 
   ! Angular velocity
@@ -160,40 +213,55 @@
 
   contains
 
-  include 'Field_Mod/Allocate.f90'
-  include 'Field_Mod/Alias_Energy.f90'
-  include 'Field_Mod/Alias_Momentum.f90'
-  include 'Field_Mod/Buoyancy_Forces.f90'
-  include 'Field_Mod/Calculate_Fluxes.f90'
-  include 'Field_Mod/Calculate_Grad_Matrix.f90'
-  include 'Field_Mod/Calculate_Grad_Matrix_Cell_By_Cell.f90'
-  include 'Field_Mod/Calculate_Grad_Matrix_For_Cell.f90'
-  include 'Field_Mod/Calculate_Grad_Matrix_Faces_To_Cells.f90'
-  include 'Field_Mod/Calculate_Grad_Matrix_Nodes_To_Cells.f90'
-  include 'Field_Mod/Calculate_Grad_Matrix_Cells_To_Nodes.f90'
-  include 'Field_Mod/Grad.f90'
-  include 'Field_Mod/Grad_Component.f90'
-  include 'Field_Mod/Grad_Component_No_Refresh.f90'
-  include 'Field_Mod/Grad_Component_Faces_To_Cells.f90'
-  include 'Field_Mod/Grad_Component_Nodes_To_Cells.f90'
-  include 'Field_Mod/Grad_Component_Cells_To_Nodes.f90'
-  include 'Field_Mod/Grad_Gauss.f90'
-  include 'Field_Mod/Grad_Gauss_Pressure.f90'
-  include 'Field_Mod/Grad_Gauss_Variable.f90'
-  include 'Field_Mod/Grad_Least_Pressure.f90'
-  include 'Field_Mod/Grad_Least_Pressure_Correction.f90'
-  include 'Field_Mod/Grad_Least_Variable.f90'
-  include 'Field_Mod/Grad_Pressure.f90'
-  include 'Field_Mod/Grad_Pressure_Correction.f90'
-  include 'Field_Mod/Grad_Variable.f90'
-  include 'Field_Mod/Interpolate_Cells_To_Nodes.f90'
-  include 'Field_Mod/Interpolate_Nodes_To_Cells.f90'
-  include 'Field_Mod/Interpolate_Nodes_To_Faces.f90'
-  include 'Field_Mod/Interpolate_To_Faces_Harmonic.f90'
-  include 'Field_Mod/Interpolate_To_Faces_Linear.f90'
-  include 'Field_Mod/Potential_Initialization.f90'
-  include 'Field_Mod/Prandtl_Number.f90'
-  include 'Field_Mod/Schmidt_Number.f90'
-  include 'Field_Mod/U_Tan.f90'
+  !------------------------!
+  !   Core functionality   !
+  !------------------------!
+  include 'Field_Mod/Core/Allocate_Field.f90'
+
+  !-----------------------------------------!
+  !   Procedures for gradient computation   !
+  !-----------------------------------------!
+  include 'Field_Mod/Gradients/Calculate_Grad_Matrix.f90'
+  ! include 'Field_Mod/Gradients/Calculate_Grad_Matrix_Cell_By_Cell.f90'
+  ! include 'Field_Mod/Gradients/Calculate_Grad_Matrix_For_Cell.f90'
+  ! include 'Field_Mod/Gradients/Calculate_Grad_Matrix_Faces_To_Cells.f90'
+  ! include 'Field_Mod/Gradients/Calculate_Grad_Matrix_Nodes_To_Cells.f90'
+  ! include 'Field_Mod/Gradients/Calculate_Grad_Matrix_Cells_To_Nodes.f90'
+  include 'Field_Mod/Gradients/Grad.f90'
+  include 'Field_Mod/Gradients/Grad_Component.f90'
+  include 'Field_Mod/Gradients/Grad_Component_No_Refresh.f90'
+  ! include 'Field_Mod/Gradients/Grad_Component_Faces_To_Cells.f90'
+  ! include 'Field_Mod/Gradients/Grad_Component_Nodes_To_Cells.f90'
+  ! include 'Field_Mod/Gradients/Grad_Component_Cells_To_Nodes.f90'
+  include 'Field_Mod/Gradients/Grad_Gauss.f90'
+  include 'Field_Mod/Gradients/Grad_Gauss_Pressure.f90'
+  include 'Field_Mod/Gradients/Grad_Gauss_Variable.f90'
+  include 'Field_Mod/Gradients/Grad_Least_Pressure.f90'
+  include 'Field_Mod/Gradients/Grad_Least_Pressure_Correction.f90'
+  include 'Field_Mod/Gradients/Grad_Least_Variable.f90'
+  include 'Field_Mod/Gradients/Grad_Pressure.f90'
+  include 'Field_Mod/Gradients/Grad_Pressure_Correction.f90'
+  include 'Field_Mod/Gradients/Grad_Variable.f90'
+
+  !----------------------------------!
+  !   Procedures for interpolation   !
+  !----------------------------------!
+  include 'Field_Mod/Interpolations/Interpolate_Cells_To_Nodes.f90'
+  ! include 'Field_Mod/Interpolations/Interpolate_Nodes_To_Cells.f90'
+  ! include 'Field_Mod/Interpolations/Interpolate_Nodes_To_Faces.f90'
+  include 'Field_Mod/Interpolations/Interpolate_To_Faces_Harmonic.f90'
+  include 'Field_Mod/Interpolations/Interpolate_To_Faces_Linear.f90'
+
+  !---------------!
+  !   Utilities   !
+  !---------------!
+  include 'Field_Mod/Utilities/Alias_Energy.f90'
+  include 'Field_Mod/Utilities/Alias_Momentum.f90'
+  include 'Field_Mod/Utilities/Buoyancy_Forces.f90'
+  include 'Field_Mod/Utilities/Calculate_Fluxes.f90'
+  include 'Field_Mod/Utilities/Potential_Initialization.f90'
+  include 'Field_Mod/Utilities/Prandtl_Number.f90'
+  include 'Field_Mod/Utilities/Schmidt_Number.f90'
+  include 'Field_Mod/Utilities/U_Tan.f90'
 
   end module

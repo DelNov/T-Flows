@@ -15,7 +15,7 @@
   real :: Y_Plus_Rough_Walls
   real :: Tau_Wall_Rough_Walls
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type),  pointer :: flow
+  type(Field_Type),  pointer :: Flow
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w
   type(Var_Type),    pointer :: kin, eps, zeta, f22, ut, vt, wt
@@ -53,9 +53,9 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
-  flow => turb % pnt_flow
-  grid => flow % pnt_grid
-  call Field_Mod_Alias_Momentum   (flow, u, v, w)
+  Flow => turb % pnt_flow
+  grid => Flow % pnt_grid
+  call Flow % Alias_Momentum(u, v, w)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
   call Turb_Mod_Alias_Heat_Fluxes (turb, ut, vt, wt)
   call Sol % Alias_Solver         (A, b)
@@ -69,10 +69,10 @@
 
     ! Fill in a diagonal of coefficient matrix
     A % val(A % dia(c)) =  A % val(A % dia(c))  &
-                        + c_2e * e_sor * flow % density(c)
+                        + c_2e * e_sor * Flow % density(c)
 
     ! Add buoyancy (linearly split) to eps equation as required in the t2 model
-    if(flow % buoyancy .eq. THERMALLY_DRIVEN) then
+    if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
       b(c) = b(c) + max(0.0, c_11e * e_sor * turb % g_buoy(c))
       A % val(A % dia(c)) = A % val(A % dia(c))                         &
                           + max(0.0, -c_11e * e_sor * turb % g_buoy(c)  &
@@ -89,12 +89,12 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
     if(c2 < 0) then
-      kin_vis = flow % viscosity(c1) / flow % density(c1) 
+      kin_vis = Flow % viscosity(c1) / Flow % density(c1) 
       if( Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
           Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
 
         ! Compute tangential velocity component
-        u_tan = Field_Mod_U_Tan(flow, s)
+        u_tan = Flow % U_Tan(s)
 
         u_tau = c_mu25 * sqrt(kin % n(c1))
 
@@ -104,12 +104,12 @@
                                           kin_vis)
 
         turb % tau_wall(c1) = Tau_Wall_Low_Re(turb,               &
-                                              flow % density(c1), &
+                                              Flow % density(c1), &
                                               u_tau,              &
                                               u_tan,              &
                                               turb % y_plus(c1))
 
-        u_tau_new = sqrt(turb % tau_wall(c1) / flow % density(c1))
+        u_tau_new = sqrt(turb % tau_wall(c1) / Flow % density(c1))
 
         turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
                                           u_tau_new,             &
@@ -126,7 +126,7 @@
         p_kin_wf  = turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
                 / (grid % wall_dist(c1) * kappa)
 
-        p_kin_int = turb % vis_t(c1) * flow % shear(c1)**2
+        p_kin_int = turb % vis_t(c1) * Flow % shear(c1)**2
 
         turb % p_kin(c1) = p_kin_int * exp(-1.0 * ebf) + p_kin_wf  &
                            * exp(-1.0 / ebf)
@@ -146,7 +146,7 @@
                                                  kin_vis)
 
           turb % tau_wall(c1) = Tau_Wall_Rough_Walls(turb,                  &
-                                                     flow % density(c1),    &
+                                                     Flow % density(c1),    &
                                                      u_tau,                 &
                                                      u_tan,                 &
                                                      grid % wall_dist(c1),  &
@@ -160,7 +160,7 @@
 
           ebf = Turb_Mod_Ebf_Momentum(turb, c1)
 
-          p_kin_int = turb % vis_t(c1) * flow % shear(c1)**2
+          p_kin_int = turb % vis_t(c1) * Flow % shear(c1)**2
 
           turb % p_kin(c1) = p_kin_int * exp(-1.0 * ebf)  &
                            + p_kin_wf * exp(-1.0 / ebf)

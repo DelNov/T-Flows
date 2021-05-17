@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Beginning_Of_Time_Step(flow, turb, Vof, swarm, n, time)
+  subroutine User_Mod_Beginning_Of_Time_Step(Flow, turb, Vof, swarm, n, time)
 !------------------------------------------------------------------------------!
 !   This function is called at the beginning of time step.                     !
 !------------------------------------------------------------------------------!
@@ -7,7 +7,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
+  type(Field_Type), target :: Flow
   type(Turb_Type),  target :: turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: swarm
@@ -20,7 +20,7 @@
 !==============================================================================!
 
   ! Take aliases
-  g  => flow % pnt_grid
+  g  => Flow % pnt_grid
   nb =  g % n_bnd_cells
   nc =  g % n_cells
 

@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine User_Mod_Beginning_Of_Iteration(flow, turb, Vof, swarm, n, time)
+  subroutine User_Mod_Beginning_Of_Iteration(Flow, turb, Vof, swarm, n, time)
 !------------------------------------------------------------------------------!
 !   This function is called at the beginning of time step.                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
+  type(Field_Type), target :: Flow
   type(Turb_Type),  target :: turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: swarm
@@ -20,7 +20,7 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => flow % pnt_grid
+  grid => Flow % pnt_grid
 
   !-------------------------------------!
   !   Compute average inflow velocity   !
@@ -37,9 +37,9 @@
     if(c2 < 0) then
       if( Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. PRESSURE ) then
         area_in = area_in + grid % s(s)
-        vol_in  = vol_in  + grid % s(s) * flow % v % n(c2)
-        vel_max = max(vel_max, flow % v % n(c2))
-        vel_min = min(vel_min, flow % v % n(c2))
+        vol_in  = vol_in  + grid % s(s) * Flow % v % n(c2)
+        vel_max = max(vel_max, Flow % v % n(c2))
+        vel_min = min(vel_min, Flow % v % n(c2))
       end if
     end if
   end do
@@ -62,8 +62,8 @@
 
     if(c2 < 0) then
       if( Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. PRESSURE ) then
-        flow % v % n(c1) = vel_in
-        flow % v % n(c2) = vel_in
+        Flow % v % n(c1) = vel_in
+        Flow % v % n(c2) = vel_in
       end if
     end if
   end do

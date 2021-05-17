@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Source(flow, phi, a, b)
+  subroutine User_Mod_Source(Flow, phi, a, b)
 !------------------------------------------------------------------------------!
 !   This is a prototype of a function for customized source for scalar.        !
 !   It is called from "Compute_Scalar" function, just before calling the       !
@@ -9,7 +9,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
+  type(Field_Type), target :: Flow
   type(Var_Type),   target :: phi
   type(Matrix_Type)        :: a
   real, dimension(:)       :: b
@@ -21,12 +21,12 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => flow % pnt_grid
-  bulk => flow % bulk
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
-  t    => flow % t
+  grid => Flow % pnt_grid
+  bulk => Flow % bulk
+  u    => Flow % u
+  v    => Flow % v
+  w    => Flow % w
+  t    => Flow % t
 
   !-----------------------------------------------------! 
   !                                                     !
@@ -40,7 +40,7 @@
   if( phi % name .eq. 'T' ) then
     do c = 1, grid % n_cells
       b(c) = b(c) - u % n(c) / bulk % u          &
-                  * flow % heat / bulk % area_x  &
+                  * Flow % heat / bulk % area_x  &
                   * grid % vol(c)
     end do
   end if

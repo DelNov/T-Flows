@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Convective_Outflow(flow, turb, Vof)
+  subroutine Convective_Outflow(Flow, turb, Vof)
 !------------------------------------------------------------------------------!
 !   Extrapoloate variables on the boundaries where needed.                     !
 !------------------------------------------------------------------------------!
@@ -13,7 +13,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
+  type(Field_Type), target :: Flow
   type(Turb_Type),  target :: turb
   type(Vof_Type),   target :: Vof
 !-----------------------------------[Locals]-----------------------------------!
@@ -28,37 +28,37 @@
 !==============================================================================!
 
   ! Take aliases
-  grid   => flow % pnt_grid
-  bulk   => flow % bulk
-  v_flux => flow % v_flux
-  dt     =  flow % dt
-  call Field_Mod_Alias_Momentum   (flow, u, v, w)
-  call Field_Mod_Alias_Energy     (flow, t)
+  grid   => Flow % pnt_grid
+  bulk   => Flow % bulk
+  v_flux => Flow % v_flux
+  dt     =  Flow % dt
+  call Flow % Alias_Momentum(u, v, w)
+  call Flow % Alias_Energy  (t)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
   call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
   call Turb_Mod_Alias_T2          (turb, t2)
 
-  call Field_Mod_Calculate_Mass_Fluxes(flow, v_flux % n)
+  call Flow % Calculate_Fluxes(v_flux % n)
 
   !----------------------------------------------------------!
   !   Compute velocity gradients, taking jump into account   !
   !----------------------------------------------------------!
 
   !   ! If there is a jump in velocities, call specialized gradient calculation
-  !   if(Vof % model .eq. VOLUME_OF_FLUID .and. flow % mass_transfer) then
-  !     call Multiphase_Mod_Vof_Grad_Variable_With_Jump(Vof, flow % u)
-  !     call Multiphase_Mod_Vof_Grad_Variable_With_Jump(Vof, flow % v)
-  !     call Multiphase_Mod_Vof_Grad_Variable_With_Jump(Vof, flow % w)
+  !   if(Vof % model .eq. VOLUME_OF_FLUID .and. Flow % mass_transfer) then
+  !     call Multiphase_Mod_Vof_Grad_Variable_With_Jump(Vof, Flow % u)
+  !     call Multiphase_Mod_Vof_Grad_Variable_With_Jump(Vof, Flow % v)
+  !     call Multiphase_Mod_Vof_Grad_Variable_With_Jump(Vof, Flow % w)
   ! 
   !   ! No jumps, call usual routines
   !   else
-  !     call Field_Mod_Grad_Variable(flow, flow % u)
-  !     call Field_Mod_Grad_Variable(flow, flow % v)
-  !     call Field_Mod_Grad_Variable(flow, flow % w)
+  !     call Flow % Grad_Variable(Flow % u)
+  !     call Flow % Grad_Variable(Flow % v)
+  !     call Flow % Grad_Variable(Flow % w)
   !   end if
-  call Field_Mod_Grad_Variable(flow, flow % u)
-  call Field_Mod_Grad_Variable(flow, flow % v)
-  call Field_Mod_Grad_Variable(flow, flow % w)
+  call Flow % Grad_Variable(Flow % u)
+  call Flow % Grad_Variable(Flow % v)
+  call Flow % Grad_Variable(Flow % w)
 
   !------------------------!
   !                        !
@@ -101,10 +101,10 @@
   if(turb % model .eq. K_EPS_ZETA_F .or.  &
      turb % model .eq. HYBRID_LES_RANS) then
 
-    call Field_Mod_Grad_Variable(flow, kin)
-    call Field_Mod_Grad_Variable(flow, eps)
-    if(flow % heat_transfer) then
-      call Field_Mod_Grad_Variable(flow, t2)
+    call Flow % Grad_Variable(kin)
+    call Flow % Grad_Variable(eps)
+    if(Flow % heat_transfer) then
+      call Flow % Grad_Variable(t2)
     end if
 
     do s = 1, grid % n_faces
@@ -122,7 +122,7 @@
                       - ( bulk % u * eps % x(c1)          &
                         + bulk % v * eps % y(c1)          &
                         + bulk % w * eps % z(c1) ) * dt
-          if(flow % heat_transfer) then
+          if(Flow % heat_transfer) then
             t2 % n(c2) = t2 % n(c2)                       &
                         - ( bulk % u * t2 % x(c1)         &
                           + bulk % v * t2 % y(c1)         &
@@ -140,12 +140,12 @@
   if(turb % model .eq. K_EPS_ZETA_F .or.  &
      turb % model .eq. HYBRID_LES_RANS) then
 
-    call Field_Mod_Grad_Variable(flow, kin)
-    call Field_Mod_Grad_Variable(flow, eps)
-    call Field_Mod_Grad_Variable(flow, f22)
-    call Field_Mod_Grad_Variable(flow, zeta)
-    if(flow % heat_transfer) then
-      call Field_Mod_Grad_Variable(flow, t2)
+    call Flow % Grad_Variable(kin)
+    call Flow % Grad_Variable(eps)
+    call Flow % Grad_Variable(f22)
+    call Flow % Grad_Variable(zeta)
+    if(Flow % heat_transfer) then
+      call Flow % Grad_Variable(t2)
     end if
 
     do s = 1, grid % n_faces
@@ -171,7 +171,7 @@
                       - ( bulk % u * zeta % x(c1)         &
                         + bulk % v * zeta % y(c1)         &
                         + bulk % w * zeta % z(c1) ) * dt
-          if(flow % heat_transfer) then
+          if(Flow % heat_transfer) then
             t2 % n(c2) = t2 % n(c2)                       &
                         - ( bulk % u * t2 % x(c1)         &
                           + bulk % v * t2 % y(c1)         &
@@ -190,15 +190,15 @@
   if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
      turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
 
-    call Field_Mod_Grad_Variable(flow, uu)
-    call Field_Mod_Grad_Variable(flow, vv)
-    call Field_Mod_Grad_Variable(flow, ww)
-    call Field_Mod_Grad_Variable(flow, uv)
-    call Field_Mod_Grad_Variable(flow, uw)
-    call Field_Mod_Grad_Variable(flow, vw)
-    call Field_Mod_Grad_Variable(flow, eps)
+    call Flow % Grad_Variable(uu)
+    call Flow % Grad_Variable(vv)
+    call Flow % Grad_Variable(ww)
+    call Flow % Grad_Variable(uv)
+    call Flow % Grad_Variable(uw)
+    call Flow % Grad_Variable(vw)
+    call Flow % Grad_Variable(eps)
     if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
-      call Field_Mod_Grad_Variable(flow, f22)
+      call Flow % Grad_Variable(f22)
     end if
 
     do s = 1, grid % n_faces
@@ -251,10 +251,10 @@
   !-------------!
   !   Scalars   !
   !-------------!
-  do sc = 1, flow % n_scalars
-    phi => flow % scalar(sc)
+  do sc = 1, Flow % n_scalars
+    phi => Flow % scalar(sc)
 
-    call Field_Mod_Grad_Variable(flow, phi)
+    call Flow % Grad_Variable(phi)
 
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
@@ -272,11 +272,11 @@
     end do
   end do
 
-  if(flow % heat_transfer) then
+  if(Flow % heat_transfer) then
 
     ! Temperature gradients might have been computed and
     ! stored already in t % x, t % y and t % z, check it
-    call Field_Mod_Grad_Variable(flow, t)
+    call Flow % Grad_Variable(t)
 
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)

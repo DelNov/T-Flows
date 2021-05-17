@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine User_Mod_Backstep_Cf_St(flow, turb)
+  subroutine User_Mod_Backstep_Cf_St(Flow, turb)
 !------------------------------------------------------------------------------!
 !   Subroutine extracts skin friction coefficient and Stanton number for       !
 !   backstep case.                                                             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
+  type(Field_Type), target :: Flow
   type(Turb_Type),  target :: turb
 !----------------------------------[Calling]-----------------------------------!
   real :: Y_Plus_Low_Re
@@ -30,11 +30,11 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => flow % pnt_grid
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
-  t    => flow % t
+  grid => Flow % pnt_grid
+  u    => Flow % u
+  v    => Flow % v
+  w    => Flow % w
+  t    => Flow % t
 
   ! Get constant physical properties
   call Control_Mod_Mass_Density        (dens_const)
@@ -77,7 +77,7 @@
   allocate(n_count(n_prob)); n_count = 0
   count = 0
 
-  if(flow % heat_transfer) then
+  if(Flow % heat_transfer) then
     allocate(tm_p(n_prob));  tm_p = 0.0
     allocate(tt_p(n_prob));  tt_p = 0.0
     allocate(ut_p(n_prob));  ut_p = 0.0
@@ -105,7 +105,7 @@
                       / (dens_const * 11.3**2)
             else
               kin_vis = visc_const / dens_const
-              u_tan = Field_Mod_U_Tan(flow, s)
+              u_tan = Flow % U_Tan(s)
               u_tau = c_mu25 * sqrt(turb % kin % n(c1))
               turb % y_plus(c1) = Y_Plus_Low_Re(turb, u_tau,                 &
                                                 grid % wall_dist(c1),  &
@@ -148,7 +148,7 @@
 
     count =  count + n_count(pl) 
 
-    if(flow % heat_transfer) then
+    if(Flow % heat_transfer) then
       call Comm_Mod_Global_Sum_Real(tm_p(pl))
       call Comm_Mod_Global_Sum_Real(tt_p(pl))
       call Comm_Mod_Global_Sum_Real(ut_p(pl))
@@ -205,7 +205,7 @@
   deallocate(v4_p)
   deallocate(v5_p)
   deallocate(n_count)
-  if(flow % heat_transfer) then
+  if(Flow % heat_transfer) then
     deallocate(tm_p)
     deallocate(tt_p)
     deallocate(ut_p)

@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Correct_Velocity(flow, Vof, sol, curr_dt, ini)
+  subroutine User_Mod_End_Of_Correct_Velocity(Flow, Vof, Sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of Correct_Velocity function.           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),  target :: flow
+  type(Field_Type),  target :: Flow
   type(Vof_Type),    target :: Vof
-  type(Solver_Type), target :: sol
+  type(Solver_Type), target :: Sol
   integer, intent(in)       :: curr_dt
   integer, intent(in)       :: ini
 !-----------------------------------[Locals]-----------------------------------!
@@ -22,9 +22,9 @@
 !==============================================================================!
 
   ! Take aliases
-  grid   => flow % pnt_grid
-  v_flux => flow % v_flux
-  u      => flow % u
+  grid   => Flow % pnt_grid
+  v_flux => Flow % v_flux
+  u      => Flow % u
 
   !---------------------------------------------------!
   !   Write down corrected cell-centered velocities   !
@@ -39,7 +39,7 @@
     if(Math_Mod_Approx_Real(grid % yc(c), 0.0) .and.  &
        Math_Mod_Approx_Real(grid % zc(c), 0.0)) then
       write(99, '(99es15.5)')  &
-        grid % xc(c), u % n(c), flow % density(c)
+        grid % xc(c), u % n(c), Flow % density(c)
     end if
   end do
 

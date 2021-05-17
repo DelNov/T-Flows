@@ -7,7 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type), target :: turb
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type), pointer :: flow
+  type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: grid
   type(Var_Type),   pointer :: u, v, w
   type(Var_Type),   pointer :: vis
@@ -16,24 +16,24 @@
 !==============================================================================!
 
   ! Take aliases
-  flow => turb % pnt_flow
-  grid => flow % pnt_grid
+  Flow => turb % pnt_flow
+  grid => Flow % pnt_grid
   vis  => turb % vis
-  call Field_Mod_Alias_Momentum(flow, u, v, w)
+  call Flow % Alias_Momentum(u, v, w)
 
   if(turb % model .eq. DES_SPALART) then
     do c = 1, grid % n_cells
-      x_rat    = vis % n(c) / flow % viscosity(c)
+      x_rat    = vis % n(c) / Flow % viscosity(c)
       f_v1     = x_rat**3/(x_rat**3 + c_v1**3)
-      turb % vis_t(c) = flow % density(c) * f_v1 * vis % n(c)
+      turb % vis_t(c) = Flow % density(c) * f_v1 * vis % n(c)
     end do
   end if
 
   if(turb % model .eq. SPALART_ALLMARAS) then
     do c = 1, grid % n_cells
-      x_rat = vis % n(c) / flow % viscosity(c)
+      x_rat = vis % n(c) / Flow % viscosity(c)
       f_v1  = x_rat**3/(x_rat**3 + c_v1**3)
-      turb % vis_t(c) = flow % density(c) * f_v1 * vis % n(c)
+      turb % vis_t(c) = Flow % density(c) * f_v1 * vis % n(c)
     end do
   end if
 

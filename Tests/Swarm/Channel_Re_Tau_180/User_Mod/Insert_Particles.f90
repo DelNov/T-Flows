@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine User_Mod_Insert_Particles(flow, turb, Vof, swarm, n, time)
+  subroutine User_Mod_Insert_Particles(Flow, turb, Vof, swarm, n, time)
 !------------------------------------------------------------------------------!
 !   This function is called at the beginning of time step.                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
+  type(Field_Type), target :: Flow
   type(Turb_Type),  target :: turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: swarm
@@ -24,7 +24,7 @@
 !==============================================================================!
 
   ! Take alias(es)
-  grid => flow % pnt_grid
+  grid => Flow % pnt_grid
 
   ! Random variables
   c1 = 1.0
@@ -34,7 +34,7 @@
   !-------------------!
   !   1st time step   !
   !-------------------!
-  if(n .eq. 1) then     ! should be after the flow is developed
+  if(n .eq. 1) then     ! should be after the Flow is developed
 
     ! Browsing through all introduced particles
     do k = 1, swarm % n_particles
@@ -78,22 +78,22 @@
 
         ! Compute velocities at the particle position from velocity gradients
         swarm % particle(k) % u    &
-           = flow % u % n(c)       &  ! u velocity at the new time step (% n)
-           + flow % u % x(c) * rx  &  ! u % x is gradient du/dx
-           + flow % u % y(c) * ry  &  ! u % y is gradient du/dy
-           + flow % u % z(c) * rz     ! u % x is gradient du/dz
+           = Flow % u % n(c)       &  ! u velocity at the new time step (% n)
+           + Flow % u % x(c) * rx  &  ! u % x is gradient du/dx
+           + Flow % u % y(c) * ry  &  ! u % y is gradient du/dy
+           + Flow % u % z(c) * rz     ! u % x is gradient du/dz
 
         swarm % particle(k) % v    &
-           = flow % v % n(c)       &  ! v velocity at the new time step (% n)
-           + flow % v % x(c) * rx  &  ! v % x is gradient dv/dx
-           + flow % v % y(c) * ry  &  ! v % y is gradient dv/dy
-           + flow % v % z(c) * rz     ! v % x is gradient dv/dz
+           = Flow % v % n(c)       &  ! v velocity at the new time step (% n)
+           + Flow % v % x(c) * rx  &  ! v % x is gradient dv/dx
+           + Flow % v % y(c) * ry  &  ! v % y is gradient dv/dy
+           + Flow % v % z(c) * rz     ! v % x is gradient dv/dz
 
         swarm % particle(k) % w    &
-           = flow % w % n(c)       &  ! w velocity at the new time step (% n)
-           + flow % w % x(c) * rx  &  ! w % x is gradient dw/dx
-           + flow % w % y(c) * ry  &  ! w % y is gradient dw/dy
-           + flow % w % z(c) * rz     ! w % x is gradient dw/dz
+           = Flow % w % n(c)       &  ! w velocity at the new time step (% n)
+           + Flow % w % x(c) * rx  &  ! w % x is gradient dw/dx
+           + Flow % w % y(c) * ry  &  ! w % y is gradient dw/dy
+           + Flow % w % z(c) * rz     ! w % x is gradient dw/dz
 
     end do
   end if

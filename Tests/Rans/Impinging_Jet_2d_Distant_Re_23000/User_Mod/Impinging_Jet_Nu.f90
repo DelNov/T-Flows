@@ -9,7 +9,7 @@
   type(Turb_Type), target :: turb
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: grid
-  type(Field_Type), pointer :: flow
+  type(Field_Type), pointer :: Flow
   type(Var_Type),   pointer :: u, v, w, t
   type(Var_Type),   pointer :: kin, eps, zeta, f22
   integer                   :: n_prob, pl, i, count, s, c1, c2, fu
@@ -26,12 +26,12 @@
 !==============================================================================!
 
   ! Take aliases
-  flow => turb % pnt_flow
-  grid => flow % pnt_grid
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
-  t    => flow % t
+  Flow => turb % pnt_flow
+  grid => Flow % pnt_grid
+  u    => Flow % u
+  v    => Flow % v
+  w    => Flow % w
+  t    => Flow % t
   kin  => turb % kin
   eps  => turb % eps
   zeta => turb % zeta
@@ -85,7 +85,7 @@
 
   count = 0
 
-  if(flow % heat_transfer) then
+  if(Flow % heat_transfer) then
     allocate(tm_p(n_prob));   tm_p=0.0
   end if
 
@@ -178,9 +178,9 @@
       if(n_count(i) .ne. 0) then
         write(fu, '(5e11.3,i6)')                                  &
           rm_p(i)/2.0,                                            &
-          2.0*v6_p(i) / (flow % conductivity(1)*(tm_p(i)-20.0)),  &
+          2.0*v6_p(i) / (Flow % conductivity(1)*(tm_p(i)-20.0)),  &
           v2_p(i),                                                &
-          v2_p(i) * v1_p(i) / flow % viscosity(1),                &
+          v2_p(i) * v1_p(i) / Flow % viscosity(1),                &
           tm_p(i),                                                &
           n_count(i)
       end if
@@ -203,7 +203,7 @@
   deallocate(rad_1)
   deallocate(n_count)
 
-  if(flow % heat_transfer) then
+  if(Flow % heat_transfer) then
     deallocate(tm_p)
   end if
 

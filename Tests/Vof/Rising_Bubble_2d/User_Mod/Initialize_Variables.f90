@@ -3,13 +3,13 @@ include '../User_Mod/Vof_Exact_Cylinder.f90'
 include '../User_Mod/Vof_Area_Square_Circle.f90'
 
 !==============================================================================!
-  subroutine User_Mod_Initialize_Variables(flow, turb, Vof, swarm, sol)
+  subroutine User_Mod_Initialize_Variables(Flow, turb, Vof, swarm, sol)
 !------------------------------------------------------------------------------!
 !   Case-dependent initialization of VOF variable.                             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),  target :: flow
+  type(Field_Type),  target :: Flow
   type(Turb_Type),   target :: turb
   type(Vof_Type),    target :: Vof
   type(Swarm_Type),  target :: swarm
@@ -25,9 +25,9 @@ include '../User_Mod/Vof_Area_Square_Circle.f90'
 !==============================================================================!
 
   ! Take aliases
-  grid => flow % pnt_grid
+  grid => Flow % pnt_grid
   fun  => Vof % fun
-  dt   => flow % dt
+  dt   => Flow % dt
 
   ! Initialize the whole domain as 0.0
   do c = 1, grid % n_cells

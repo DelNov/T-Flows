@@ -13,7 +13,7 @@
   class(Vof_Type), target :: Vof
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: grid
-  type(Field_Type), pointer :: flow
+  type(Field_Type), pointer :: Flow
   type(Var_Type),   pointer :: fun
   type(Var_Type),   pointer :: smooth
   integer                   :: c, c1, c2, s, nb, nc
@@ -22,7 +22,7 @@
 !==============================================================================!
 
   grid   => Vof % pnt_grid
-  flow   => Vof % pnt_flow
+  Flow   => Vof % pnt_flow
   fun    => Vof % fun
   smooth => Vof % smooth
 
@@ -149,9 +149,9 @@
   !--------------------!
 
   ! Find divergence of normals
-  call Field_Mod_Grad_Component(flow, Vof % nx(-nb:nc), 1, div_x(-nb:nc))
-  call Field_Mod_Grad_Component(flow, Vof % ny(-nb:nc), 2, div_y(-nb:nc))
-  call Field_Mod_Grad_Component(flow, Vof % nz(-nb:nc), 3, div_z(-nb:nc))
+  call Flow % Grad_Component(Vof % nx(-nb:nc), 1, div_x(-nb:nc))
+  call Flow % Grad_Component(Vof % ny(-nb:nc), 2, div_y(-nb:nc))
+  call Flow % Grad_Component(Vof % nz(-nb:nc), 3, div_z(-nb:nc))
 
   Vof % curv(-nb:nc) = Vof % curv(-nb:nc) - div_x(-nb:nc)
   Vof % curv(-nb:nc) = Vof % curv(-nb:nc) - div_y(-nb:nc)

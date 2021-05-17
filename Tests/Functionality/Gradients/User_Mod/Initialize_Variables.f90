@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Initialize_Variables(flow, turb, Vof, swarm, sol)
+  subroutine User_Mod_Initialize_Variables(Flow, turb, Vof, swarm, sol)
 !------------------------------------------------------------------------------!
 !   User initialization of dependent variables.                                !
 !------------------------------------------------------------------------------!
@@ -14,7 +14,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),  target :: flow
+  type(Field_Type),  target :: Flow
   type(Turb_Type),   target :: turb
   type(Vof_Type),    target :: Vof
   type(Swarm_Type),  target :: swarm
@@ -31,9 +31,9 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => flow % pnt_grid
-  t    => flow % t
-  p    => flow % p
+  grid => Flow % pnt_grid
+  t    => Flow % t
+  p    => Flow % p
 
   !----------------------------!
   !   Find cells at boundary   !
@@ -46,14 +46,14 @@
     if(c2 < 0) c_at_bnd(c1) = YES
   end do
 
-  !------------------------------------------------------------------------!
-  !                                                                        !
-  !   Test 1:                                                              !
-  !                                                                        !
-  !   Check Field_Mod_Grad_Variable - the cell-based least square method   !
-  !       Test with the most established method, should always work        !
-  !                                                                        !
-  !------------------------------------------------------------------------!
+  !----------------------------------------------------------------------!
+  !                                                                      !
+  !   Test 1:                                                            !
+  !                                                                      !
+  !   Check Field % Grad_Variable - the cell-based least square method   !
+  !       Test with the most established method, should always work      !
+  !                                                                      !
+  !----------------------------------------------------------------------!
 
   if(this_proc < 2) then
     print *, '#=============================================================='
@@ -69,7 +69,7 @@
   end do
 
   ! Call cell-based least-square gradient method ...
-  call Field_Mod_Grad_Variable(flow, t)
+  call Flow % Grad_Variable(t)
 
   ! ... and plot what you get
   call Grid_Mod_Save_Debug_Vtu(                            &
@@ -79,14 +79,14 @@
             vector_cell = (/t % x, t % y, t % z/),         &
             vector_name = 't_xyz')
 
-  !---------------------------------------------------!
-  !                                                   !
-  !   Test 2:                                         !
-  !                                                   !
-  !   Check Field_Mod_Grad_Component_Faces_To_Cells   !
-  !     It is the face-based least square method      !
-  !                                                   !
-  !---------------------------------------------------!
+  !-------------------------------------------------!
+  !                                                 !
+  !   Test 2:                                       !
+  !                                                 !
+  !   Check Field % Grad_Component_Faces_To_Cells   !
+  !     It is the face-based least square method    !
+  !                                                 !
+  !-------------------------------------------------!
 
   if(this_proc < 2) then
     print *, '#=============================================================='
@@ -109,9 +109,9 @@
   end do
 
   ! Call least-squares face-based gradient calculation ...
-  call Field_Mod_Grad_Component_Faces_To_Cells(flow, phi_c, phi_f, 1, phi_x)
-  call Field_Mod_Grad_Component_Faces_To_Cells(flow, phi_c, phi_f, 2, phi_y)
-  call Field_Mod_Grad_Component_Faces_To_Cells(flow, phi_c, phi_f, 3, phi_z)
+  call Flow % Grad_Component_Faces_To_Cells(phi_c, phi_f, 1, phi_x)
+  call Flow % Grad_Component_Faces_To_Cells(phi_c, phi_f, 2, phi_y)
+  call Flow % Grad_Component_Faces_To_Cells(phi_c, phi_f, 3, phi_z)
 
   ! ... and save the results
   call Grid_Mod_Save_Debug_Vtu(                            &
@@ -119,14 +119,14 @@
             vector_cell = (/phi_x, phi_y, phi_z/),         &
             vector_name = 'phi_xyz')
 
-  !-----------------------------------------------------------!
-  !                                                           !
-  !   Test 3:                                                 !
-  !                                                           !
-  !   Check if Field_Mod_Grad_Gauss_Variable works properly   !
-  !           when you ou start from good gradients           !
-  !                                                           !
-  !-----------------------------------------------------------!
+  !---------------------------------------------------------!
+  !                                                         !
+  !   Test 3:                                               !
+  !                                                         !
+  !   Check if Field % Grad_Gauss_Variable works properly   !
+  !           when you ou start from good gradients         !
+  !                                                         !
+  !---------------------------------------------------------!
 
   if(this_proc < 2) then
     print *, '#=============================================================='
@@ -142,7 +142,7 @@
   end do
 
   ! Calculate gradients with Gaussian theorem, (face values are exact) ...
-  call Field_Mod_Grad_Gauss_Variable(flow, t)
+  call Flow % Grad_Gauss_Variable(t)
 
   ! ... and plot the results
   call Grid_Mod_Save_Debug_Vtu(                                      &
@@ -150,14 +150,14 @@
             vector_cell = (/t % x, t % y, t % z/),                   &
             vector_name = 't_xyz')
 
-  !-----------------------------------------------------------!
-  !                                                           !
-  !   Test 4:                                                 !
-  !                                                           !
-  !   Check if Field_Mod_Grad_Gauss_Variable works properly   !
-  !           when you ou start from zero gradients           !
-  !                                                           !
-  !-----------------------------------------------------------!
+  !---------------------------------------------------------!
+  !                                                         !
+  !   Test 4:                                               !
+  !                                                         !
+  !   Check if Field % Grad_Gauss_Variable works properly   !
+  !           when you ou start from zero gradients         !
+  !                                                         !
+  !---------------------------------------------------------!
 
   if(this_proc < 2) then
     print *, '#=============================================================='
@@ -171,7 +171,7 @@
   t % z(:) = 0.0
 
   ! Calculate gradients with Gaussian theorem, (face values are exact) ...
-  call Field_Mod_Grad_Gauss_Variable(flow, t)
+  call Flow % Grad_Gauss_Variable(t)
 
   ! ... and save the results.  These results should be poor
   call Grid_Mod_Save_Debug_Vtu(                                      &
@@ -179,14 +179,14 @@
             vector_cell = (/t % x, t % y, t % z/),                   &
             vector_name = 't_xyz')
 
-  !-----------------------------------------------------------!
-  !                                                           !
-  !   Test 5:                                                 !
-  !                                                           !
-  !   Check if Field_Mod_Grad_Gauss_Variable works properly   !
-  !           when you ou start from some gradients           !
-  !                                                           !
-  !-----------------------------------------------------------!
+  !---------------------------------------------------------!
+  !                                                         !
+  !   Test 5:                                               !
+  !                                                         !
+  !   Check if Field % Grad_Gauss_Variable works properly   !
+  !           when you ou start from some gradients         !
+  !                                                         !
+  !---------------------------------------------------------!
 
   if(this_proc < 2) then
     print *, '#=============================================================='
@@ -216,17 +216,17 @@
   ! Initialize with some gradients with the most robust and reliable tool
   ! you have at your disposal - least square cell-based method.  These
   ! gradients should be properly calculated inside the domain
-  call Field_Mod_Grad_Variable(flow, t)
+  call Flow % Grad_Variable(t)
 
   call Grid_Mod_Save_Debug_Vtu(                                     &
-            grid, 'test_51_least_squares_initial_guess_for_Gauss',  &
+            grid, 'test_51_least_squares_initial_guess_for_gauss',  &
             scalar_cell = t % n,                                    &
             scalar_name = 't',                                      &
             vector_cell = (/t % x, t % y, t % z/),                  &
             vector_name = 't_xyz')
 
   ! Perform Gauss from gradients which are good inside obtained above ...
-  call Field_Mod_Grad_Gauss_Variable(flow, t)
+  call Flow % Grad_Gauss_Variable(t)
 
   ! ... and plot what you got.  These should be better, but
   ! not quite.  Particularly not good for tetrahedral grids
@@ -275,7 +275,7 @@
   ! you have at your disposal - least square cell-based method.  These
   ! gradients should be properly calculated inside the domain
   ! (This is the repetition of what was done in Test 5)
-  call Field_Mod_Grad_Variable(flow, t)
+  call Flow % Grad_Variable(t)
 
   !--------------------------------------------------------------------!
   !   Step 1: Extrapolate interior gradient values to boundary cells   !
@@ -388,7 +388,7 @@
             vector_name = 't_xyz')
 
   ! Perform Gauss from gradients which are good inside obtained above ...
-  call Field_Mod_Grad_Gauss_Variable(flow, t)
+  call Flow % Grad_Gauss_Variable(t)
 
   ! ... and plot what you got.  These should be better, but
   ! not quite.  Particularly not good for tetrahedral grids
@@ -407,7 +407,7 @@
 
   if(this_proc < 2) then
     print *, '#=============================================================='
-    print *, '# Performing Test 7 - Field_Mod_Grad_Gauss_Pressure '
+    print *, '# Performing Test 7 - Field % Grad_Gauss_Pressure '
     print *, '#--------------------------------------------------------------'
   end if
 
@@ -421,12 +421,12 @@
   end do
 
   ! Perform Gauss from gradients which are good inside obtained above ...
-  call Field_Mod_Grad_Gauss_Pressure(flow, p)
+  call Flow % Grad_Gauss_Pressure(p)
 
   ! ... and plot what you got.  These should be better, but
   ! not quite.  Particularly not good for tetrahedral grids
   call Grid_Mod_Save_Debug_Vtu(                            &
-            grid, 'test_7_field_mod_grad_gauss_pressure',  &
+            grid, 'test_7_field_grad_gauss_pressure',  &
             vector_cell = (/p % x, p % y, p % z/),         &
             vector_name = 'p_xyz')
 

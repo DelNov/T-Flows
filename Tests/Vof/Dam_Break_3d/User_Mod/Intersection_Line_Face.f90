@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Intersection_Line_Face(flow, Vof, s, pab, pint, inters)
+  subroutine Intersection_Line_Face(Flow, Vof, s, pab, pint, inters)
 !------------------------------------------------------------------------------!
 !   This function finds intersection between a line an face s                  !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
+  type(Field_Type), target :: Flow
   type(Vof_Type),   target :: Vof
   integer                  :: s
   real                     :: pab(2,3)
@@ -25,7 +25,7 @@
 !==============================================================================!
 
   ! Take aliases
-  grid  => flow % pnt_grid
+  grid  => Flow % pnt_grid
 
   epsloc = epsilon(epsloc)
 

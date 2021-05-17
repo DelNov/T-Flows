@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Energy(flow, turb, Vof, Sol, curr_dt, ini)
+  subroutine Compute_Energy(Flow, turb, Vof, Sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for scalar (such as temperature)         !
 !------------------------------------------------------------------------------!
@@ -15,7 +15,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
-  type(Field_Type),    target :: flow
+  type(Field_Type),    target :: Flow
   type(Turb_Type),     target :: turb
   type(Vof_Type),      target :: Vof
   type(Solver_Type),   target :: Sol
@@ -66,21 +66,21 @@
 !
 !   User_Mod variables:
 !   bulk flux                   bulk % flux_x     [kg/s]
-!   heat flux                   flow % heat_flux  [W/m^2]
+!   heat flux                   Flow % heat_flux  [W/m^2]
 !==============================================================================!
 
   call Cpu_Timer % Start('Compute_Energy (without solvers)')
 
   ! Take aliases
-  grid   => flow % pnt_grid
-  v_flux => flow % v_flux
-  dt     =  flow % dt
-  call Field_Mod_Alias_Momentum(flow, u, v, w)
-  call Field_Mod_Alias_Energy  (flow, t)
+  grid   => Flow % pnt_grid
+  v_flux => Flow % v_flux
+  dt     =  Flow % dt
+  call Flow % Alias_Momentum(u, v, w)
+  call Flow % Alias_Energy  (t)
   call Sol % Alias_Solver      (A, b)
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Energy(flow, turb, Vof, Sol, curr_dt, ini)
+  call User_Mod_Beginning_Of_Compute_Energy(Flow, turb, Vof, Sol, curr_dt, ini)
 
   ! Initialize matrix and right hand side
   A % val(:) = 0.0
@@ -95,11 +95,11 @@
   end if
 
   ! Gradients
-  call Field_Mod_Grad_Variable(flow, t)
+  call Flow % Grad_Variable(t)
 
   ! Compute helping variable
   do c = -grid % n_bnd_cells, grid % n_cells
-    cap_dens(c) = flow % capacity(c) * flow % density(c)
+    cap_dens(c) = Flow % capacity(c) * Flow % density(c)
   end do
 
   !---------------!
@@ -165,9 +165,9 @@
     a21 = con_eff * A % fc(s)
 
     a12 = a12 - min(v_flux % n(s), 0.0)  &
-                 * flow % capacity(c1) * flow % density(c1)  ! flow: 1 -> 2
+                 * Flow % capacity(c1) * Flow % density(c1)  ! Flow: 1 -> 2
     a21 = a21 + max(v_flux % n(s), 0.0)  &
-                 * flow % capacity(c2) * flow % density(c2)  ! flow: 2 -> 1
+                 * Flow % capacity(c2) * Flow % density(c2)  ! Flow: 2 -> 1
 
     ! Fill the system matrix
     if(c2 > 0) then
@@ -207,7 +207,7 @@
   !                    !
   !--------------------!
   do c = -grid % n_bnd_cells, grid % n_cells
-    cap_dens(c) = flow % capacity(c) * flow % density(c)
+    cap_dens(c) = Flow % capacity(c) * Flow % density(c)
   end do
   call Numerics_Mod_Inertial_Term(t, cap_dens, A, b, dt)
 
@@ -216,7 +216,7 @@
   !   User source(s)   !
   !                    !
   !--------------------!
-  call User_Mod_Source(flow, t, A, b)
+  call User_Mod_Source(Flow, t, A, b)
 
   !-------------------------------!
   !                               !
@@ -242,10 +242,10 @@
   ! Print some info on the screen
   call Info_Mod_Iter_Fill_At(1, 6, t % name, t % eniter, t % res)
 
-  call Field_Mod_Grad_Variable(flow, t)
+  call Flow % Grad_Variable(t)
 
   ! User function
-  call User_Mod_End_Of_Compute_Energy(flow, turb, Vof, Sol, curr_dt, ini)
+  call User_Mod_End_Of_Compute_Energy(Flow, turb, Vof, Sol, curr_dt, ini)
 
   call Cpu_Timer % Stop('Compute_Energy (without solvers)')
 

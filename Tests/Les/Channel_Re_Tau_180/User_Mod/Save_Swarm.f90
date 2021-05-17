@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Swarm(flow, turb, swarm, save_name)
+  subroutine User_Mod_Save_Swarm(Flow, turb, swarm, save_name)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results for paerticles in homogeneous directions.             !
@@ -10,8 +10,7 @@
   use Const_Mod                      ! constants
   use Comm_Mod                       ! parallel stuff
   use Grid_Mod,  only: Grid_Type
-  use Field_Mod, only: Field_Type, heat_flux, heat, &
-                       capacity, conductivity, heated_area
+  use Field_Mod
   use Bulk_Mod,  only: Bulk_Type
   use Var_Mod,   only: Var_Type
   use Turb_Mod 
@@ -19,7 +18,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),    target  :: flow
+  type(Field_Type),    target  :: Flow
   type(Turb_Type),     target  :: turb
   type(Swarm_Type),    target  :: swarm
   type(Particle_Type), pointer :: part
@@ -53,10 +52,10 @@
 
 
   ! Take aliases
-  grid => flow % pnt_grid
-  bulk => flow % bulk
-  call Field_Mod_Alias_Momentum(flow, u, v, w)
-  call Field_Mod_Alias_Energy  (flow, t)
+  grid => Flow % pnt_grid
+  bulk => Flow % bulk
+  call Flow % Alias_Momentum(u, v, w)
+  call Flow % Alias_Energy  (t)
 
   ! constant fluid properties for single phase
   visc_const      = maxval(viscosity(:))
@@ -115,7 +114,7 @@
   end do
   close(9)
 
-  ! Primary flow arrays:
+  ! Primary Flow arrays:
   allocate(n_p    (swarm % n_particles));   n_p      = 0
   allocate(wall_p (swarm % n_particles));   wall_p   = 0.0
   allocate(u_p    (swarm % n_particles));   u_p      = 0.0
@@ -213,7 +212,7 @@
   call Comm_Mod_Wait
 
   do i = 1, n_prob-1
-    ! Background flow
+    ! Background Flow
     if(n_count2(i) .ne. 0) then
       wall_p(i)  = wall_p(i) / n_count2(i)
       u_p   (i)  = u_p   (i) / n_count2(i)
@@ -240,9 +239,9 @@
 
 
   ! Calculating friction velocity and friction temperature  (For the flow!)
-    u_tau_p = sqrt( (visc_const*sqrt(u_p(1)**2 +   &
-                                    v_p(1)**2 +   &
-                                    w_p(1)**2)/ wall_p(1)))
+  u_tau_p = sqrt( (visc_const*sqrt(u_p(1)**2 +   &
+                                   v_p(1)**2 +   &
+                                   w_p(1)**2)/ wall_p(1)))
   open(4, file = swarm_res_name_plus)
 
   do i = 3, 4

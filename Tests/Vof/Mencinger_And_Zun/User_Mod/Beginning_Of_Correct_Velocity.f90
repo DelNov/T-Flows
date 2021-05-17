@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine User_Mod_Beginning_Of_Correct_Velocity(flow, Vof, sol,  &
+  subroutine User_Mod_Beginning_Of_Correct_Velocity(Flow, Vof, sol,  &
                                                     curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of Correct_Velocity function.           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),   target :: flow
+  type(Field_Type),   target :: Flow
   type(Vof_Type),     target :: Vof
   type(Solver_Type),  target :: sol
   integer, intent(in)        :: curr_dt
@@ -21,9 +21,9 @@
 !==============================================================================!
 
   ! Take aliases
-  grid   => flow % pnt_grid
-  v_flux => flow % v_flux
-  u      => flow % u
+  grid   => Flow % pnt_grid
+  v_flux => Flow % v_flux
+  u      => Flow % u
 
   !-----------------------------------------------------------!
   !   Write down face-centered velocities before correction   !

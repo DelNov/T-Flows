@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Time_Step(flow, turb, Vof, swarm,  &
+  subroutine User_Mod_End_Of_Time_Step(Flow, turb, Vof, swarm,  &
                                        n, n_stat_t, n_stat_p, time)
 !------------------------------------------------------------------------------!
 !          This function is computing benchmark for rising bubble.             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
+  type(Field_Type), target :: Flow
   type(Turb_Type),  target :: turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: swarm
@@ -23,7 +23,7 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => flow % pnt_grid
+  grid => Flow % pnt_grid
   fun  => Vof % fun
 
   !-------------------!
@@ -33,7 +33,7 @@
   surface = 0.0
   c_position = 0.0
   rise_velocity = 0.0
-  call Field_Mod_Grad_Variable(flow, fun)
+  call Flow % Grad_Variable(fun)
 
   do c = 1, grid % n_cells - grid % comm % n_buff_cells
     b_volume = b_volume + grid % vol(c) * fun % n(c)
@@ -44,7 +44,7 @@
                              + fun % z(c) ** 2) * grid % vol(c)
     end if
     c_position = c_position + grid % zc(c) * fun % n(c) * grid % vol(c)
-    rise_velocity = rise_velocity + flow % w % n(c) * fun % n(c) * grid % vol(c)
+    rise_velocity = rise_velocity + Flow % w % n(c) * fun % n(c) * grid % vol(c)
   end do
 
   call Comm_Mod_Global_Sum_Real(b_volume)

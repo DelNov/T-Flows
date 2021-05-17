@@ -12,7 +12,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type), target :: turb
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type), pointer :: flow
+  type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: grid
   type(Var_Type),   pointer :: u, v, w
   integer                   :: c
@@ -22,9 +22,9 @@
 !==============================================================================!
 
   ! Take aliases
-  flow => turb % pnt_flow
-  grid => flow % pnt_grid
-  call Field_Mod_Alias_Momentum(flow, u, v, w)
+  Flow => turb % pnt_flow
+  grid => Flow % pnt_grid
+  call Flow % Alias_Momentum(u, v, w)
 
   !---------------!
   !               !
@@ -52,8 +52,8 @@
     v31 = -v13
     v32 = -v23
 
-    shear2(c) = 0.5 * flow % shear(c) * flow % shear(c)
-    vort2(c)  = 0.5 * flow % vort(c) * flow % vort(c)
+    shear2(c) = 0.5 * Flow % shear(c) * Flow % shear(c)
+    vort2(c)  = 0.5 * Flow % vort(c) * Flow % vort(c)
 
     s11d =  s11*s11 + s12*s12 + s13*s13   &
          - (v11*v11 + v12*v12 + v13*v13)  &

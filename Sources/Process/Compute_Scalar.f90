@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Scalar(flow, turb, Vof, Sol, curr_dt, ini, sc)
+  subroutine Compute_Scalar(Flow, turb, Vof, Sol, curr_dt, ini, sc)
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for use scalar.                          !
 !------------------------------------------------------------------------------!
@@ -20,7 +20,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
-  type(Field_Type),    target :: flow
+  type(Field_Type),    target :: Flow
   type(Turb_Type),     target :: turb
   type(Vof_Type),      target :: Vof
   type(Solver_Type),   target :: Sol
@@ -56,15 +56,15 @@
   call Cpu_Timer % Start('Compute_Scalars (without solvers)')
 
   ! Take aliases
-  grid   => flow % pnt_grid
-  v_flux => flow % v_flux
-  phi    => flow % scalar(sc)
-  dt     =  flow % dt
+  grid   => Flow % pnt_grid
+  v_flux => Flow % v_flux
+  phi    => Flow % scalar(sc)
+  dt     =  Flow % dt
   call Turb_Mod_Alias_Stresses(turb, uu, vv, ww, uv, uw, vw)
   call Sol % Alias_Solver     (A, b)
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Scalar(flow, turb, Vof, Sol,  &
+  call User_Mod_Beginning_Of_Compute_Scalar(Flow, turb, Vof, Sol,  &
                                             curr_dt, ini, sc)
 
   ! Initialize matrix and right hand side
@@ -84,14 +84,14 @@
   end if
 
   ! Gradients
-  call Field_Mod_Grad_Variable(flow, phi)
+  call Flow % Grad_Variable(phi)
 
   !---------------!
   !               !
   !   Advection   !
   !               !
   !---------------!
-  call Numerics_Mod_Advection_Term(phi, flow % density, v_flux % n, b)
+  call Numerics_Mod_Advection_Term(phi, Flow % density, v_flux % n, b)
 
   !--------------!
   !              !
@@ -128,17 +128,17 @@
       phix_f2 = phix_f1
       phiy_f2 = phiy_f1
       phiz_f2 = phiz_f1
-      dif_eff1 = grid % f(s) *(flow % diffusivity)  &
-           + (1.-grid % f(s))*(flow % diffusivity)
+      dif_eff1 = grid % f(s) *(Flow % diffusivity)  &
+           + (1.-grid % f(s))*(Flow % diffusivity)
       if(turb % model .ne. NO_TURBULENCE_MODEL .and.  &
          turb % model .ne. DNS) then
-        dif_eff1 = grid % f(s) *(flow % diffusivity + turb % vis_t(c1)/sc_t)  &
-             + (1.-grid % f(s))*(flow % diffusivity + turb % vis_t(c2)/sc_t)
+        dif_eff1 = grid % f(s) *(Flow % diffusivity + turb % vis_t(c1)/sc_t)  &
+             + (1.-grid % f(s))*(Flow % diffusivity + turb % vis_t(c2)/sc_t)
         if(turb % model .eq. HYBRID_LES_RANS) then
           dif_eff1 = grid % f(s)   &
-                  * (flow % diffusivity + turb % vis_t_eff(c1) / sc_t)  &
+                  * (Flow % diffusivity + turb % vis_t_eff(c1) / sc_t)  &
                + (1.-grid % f(s))  &
-                  * (flow % diffusivity + turb % vis_t_eff(c2) / sc_t)
+                  * (Flow % diffusivity + turb % vis_t_eff(c2) / sc_t)
         end if
       end if
       dif_eff2 = dif_eff1
@@ -149,12 +149,12 @@
       phix_f2 = phix_f1
       phiy_f2 = phiy_f1
       phiz_f2 = phiz_f1
-      dif_eff1 = flow % diffusivity
+      dif_eff1 = Flow % diffusivity
       if(turb % model .ne. NO_TURBULENCE_MODEL .and.  &
          turb % model .ne. DNS) then
-        dif_eff1 = flow % diffusivity + turb % vis_t(c1) / sc_t
+        dif_eff1 = Flow % diffusivity + turb % vis_t(c1) / sc_t
         if(turb % model .eq. HYBRID_LES_RANS) then
-          dif_eff1 = flow % diffusivity + turb % vis_t_eff(c1) / sc_t
+          dif_eff1 = Flow % diffusivity + turb % vis_t_eff(c1) / sc_t
         end if
       end if
       dif_eff2 = dif_eff1
@@ -202,8 +202,8 @@
     a12 = dif_eff1 * A % fc(s)
     a21 = dif_eff2 * A % fc(s)
 
-    a12 = a12  - min(v_flux % n(s), 0.0) * flow % density(c1)
-    a21 = a21  + max(v_flux % n(s), 0.0) * flow % density(c2)
+    a12 = a12  - min(v_flux % n(s), 0.0) * Flow % density(c1)
+    a21 = a21  + max(v_flux % n(s), 0.0) * Flow % density(c2)
 
     ! Fill the system matrix
     if(c2 > 0) then
@@ -245,7 +245,7 @@
   !   Inertial terms   !
   !                    !
   !--------------------!
-  call Numerics_Mod_Inertial_Term(phi, flow % density, A, b, dt)
+  call Numerics_Mod_Inertial_Term(phi, Flow % density, A, b, dt)
 
   !-------------------------------------!
   !                                     !
@@ -269,9 +269,9 @@
                     + vw % n(c) * phi % y(c)          &
                     + ww % n(c) * phi % z(c))
       end do
-      call Field_Mod_Grad_Component(flow, u1uj_phij, 1, u1uj_phij_x)
-      call Field_Mod_Grad_Component(flow, u2uj_phij, 2, u2uj_phij_y)
-      call Field_Mod_Grad_Component(flow, u3uj_phij, 3, u3uj_phij_z)
+      call Flow % Grad_Component(u1uj_phij, 1, u1uj_phij_x)
+      call Flow % Grad_Component(u2uj_phij, 2, u2uj_phij_y)
+      call Flow % Grad_Component(u3uj_phij, 3, u3uj_phij_z)
       do c = 1, grid % n_cells
         b(c) = b(c) - (  u1uj_phij_x(c)  &
                        + u2uj_phij_y(c)  &
@@ -340,7 +340,7 @@
     end if
   end if
 
-  call User_Mod_Source(flow, phi, A, b)
+  call User_Mod_Source(Flow, phi, A, b)
 
   !---------------------------------!
   !                                 !
@@ -369,10 +369,10 @@
 
   call Info_Mod_Iter_Fill_User_At(row, col, phi % name, phi % eniter, phi % res)
 
-  call Field_Mod_Grad_Variable(flow, phi)
+  call Flow % Grad_Variable(phi)
 
   ! User function
-  call User_Mod_End_Of_Compute_Scalar(flow, turb, Vof, Sol, curr_dt, ini, sc)
+  call User_Mod_End_Of_Compute_Scalar(Flow, turb, Vof, Sol, curr_dt, ini, sc)
 
   call Cpu_Timer % Stop('Compute_Scalars (without solvers)')
 

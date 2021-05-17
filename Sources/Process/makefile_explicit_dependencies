@@ -9,7 +9,7 @@ $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
+Field_Mod/*/*.f90 \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -43,7 +43,7 @@ $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
+Field_Mod/*/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 $(DIR_SHARED)/Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
@@ -126,7 +126,7 @@ $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
+Field_Mod/*/*.f90 \
 $(DIR_OBJECT)/Face_Mod.o \
 Face_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
@@ -143,6 +143,10 @@ Bulk_Mod/*.f90
 #-- ./Vof_Mod/Utilities/Surface_Tension_Force.f90
 #-- ./Vof_Mod/Utilities/Grad_Variable_With_Front.f90
 #-- ./Vof_Mod/Utilities/Pressure_Correction.f90
+$(DIR_OBJECT)/Pressure_Correction.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*.f90 
+
 #-- ./Vof_Mod/Utilities/Mass_Transfer_Pressure_Source.f90
 #-- ./Vof_Mod/Utilities/Mass_Transfer_Vof_Source.f90
 #-- ./Vof_Mod/Utilities/Grad_Variable_With_Jump.f90
@@ -195,7 +199,7 @@ $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
+Field_Mod/*/*.f90 \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -209,14 +213,14 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 $(DIR_OBJECT)/Info_Mod.o:\
 Info_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 
+Field_Mod/*/*.f90 
 
 #-- ./Eddies_Mod.f90
 $(DIR_OBJECT)/Eddies_Mod.o:\
 $(DIR_OBJECT)/Math_Mod.o \
 $(DIR_SHARED)/Math_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
+Field_Mod/*/*.f90 \
 Eddies_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 $(DIR_SHARED)/Control_Mod/*/*.f90 
@@ -232,7 +236,7 @@ $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 \
 Interface_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
+Field_Mod/*/*.f90 \
 $(DIR_OBJECT)/Cpu_Timer_Mod.o \
 $(DIR_SHARED)/Cpu_Timer_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
@@ -315,7 +319,7 @@ $(DIR_OBJECT)/Side_Mod.o \
 Front_Mod/readme \
 Front_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
+Field_Mod/*/*.f90 \
 $(DIR_OBJECT)/Elem_Mod.o 
 
 #-- ./Surf_Mod.f90
@@ -327,7 +331,7 @@ Surf_Mod/readme \
 Surf_Mod/*.f90 \
 $(DIR_OBJECT)/Side_Mod.o \
 $(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
+Field_Mod/*/*.f90 \
 $(DIR_OBJECT)/Elem_Mod.o 
 
 #-- ./Read_Control_Physical_Models.f90
@@ -339,7 +343,7 @@ Turb_Mod/*.f90 \
 $(DIR_OBJECT)/Swarm_Mod.o \
 Swarm_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
+Field_Mod/*/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 $(DIR_SHARED)/Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
@@ -432,7 +436,7 @@ $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
+Field_Mod/*/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 $(DIR_SHARED)/Control_Mod/*/*.f90 
 
@@ -448,7 +452,7 @@ $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
+Field_Mod/*/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 $(DIR_SHARED)/Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
@@ -460,7 +464,7 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 $(DIR_OBJECT)/Monitor_Mod.o:\
 Monitor_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 
+Field_Mod/*/*.f90 
 
 #-- ./Numerics_Mod/Inertial_Term.f90
 #-- ./Numerics_Mod/Under_Relax.f90
@@ -488,71 +492,71 @@ Turb_Mod/*.f90 \
 $(DIR_OBJECT)/Numerics_Mod.o \
 Numerics_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
+Field_Mod/*/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 $(DIR_SHARED)/Control_Mod/*/*.f90 
 
-#-- ./Field_Mod/Grad.f90
-#-- ./Field_Mod/Grad_Component_No_Refresh.f90
-#-- ./Field_Mod/Grad_Least_Pressure_Correction.f90
-#-- ./Field_Mod/Interpolate_Cells_To_Nodes.f90
-#-- ./Field_Mod/Grad_Gauss_Pressure.f90
+#-- ./Field_Mod/Gradients/Grad.f90
+#-- ./Field_Mod/Gradients/Grad_Component_No_Refresh.f90
+#-- ./Field_Mod/Gradients/Grad_Least_Pressure_Correction.f90
+#-- ./Field_Mod/Gradients/Grad_Gauss_Pressure.f90
 $(DIR_OBJECT)/Grad_Gauss_Pressure.o:\
 $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 
 
-#-- ./Field_Mod/Grad_Gauss.f90
-#-- ./Field_Mod/Grad_Component_Faces_To_Cells.f90
-#-- ./Field_Mod/Interpolate_Nodes_To_Cells.f90
-#-- ./Field_Mod/Grad_Pressure_Correction.f90
-#-- ./Field_Mod/Calculate_Grad_Matrix_Faces_To_Cells.f90
-#-- ./Field_Mod/Alias_Momentum.f90
-#-- ./Field_Mod/Grad_Gauss_Variable.f90
+#-- ./Field_Mod/Gradients/Grad_Gauss.f90
+#-- ./Field_Mod/Gradients/Grad_Component_Faces_To_Cells.f90
+#-- ./Field_Mod/Gradients/Grad_Pressure_Correction.f90
+#-- ./Field_Mod/Gradients/Calculate_Grad_Matrix_Faces_To_Cells.f90
+#-- ./Field_Mod/Gradients/Grad_Gauss_Variable.f90
 $(DIR_OBJECT)/Grad_Gauss_Variable.o:\
 $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 
 
-#-- ./Field_Mod/Grad_Component_Cells_To_Nodes.f90
-#-- ./Field_Mod/Grad_Pressure.f90
-#-- ./Field_Mod/Interpolate_To_Faces_Harmonic.f90
-#-- ./Field_Mod/Calculate_Grad_Matrix_Cell_By_Cell.f90
-#-- ./Field_Mod/Grad_Least_Pressure.f90
-#-- ./Field_Mod/Potential_Initialization.f90
+#-- ./Field_Mod/Gradients/Grad_Component_Cells_To_Nodes.f90
+#-- ./Field_Mod/Gradients/Grad_Pressure.f90
+#-- ./Field_Mod/Gradients/Calculate_Grad_Matrix_Cell_By_Cell.f90
+#-- ./Field_Mod/Gradients/Grad_Least_Pressure.f90
+#-- ./Field_Mod/Gradients/Calculate_Grad_Matrix_Nodes_To_Cells.f90
+#-- ./Field_Mod/Gradients/Calculate_Grad_Matrix.f90
+#-- ./Field_Mod/Gradients/Grad_Component_Nodes_To_Cells.f90
+#-- ./Field_Mod/Gradients/Grad_Component.f90
+#-- ./Field_Mod/Gradients/Calculate_Grad_Matrix_For_Cell.f90
+#-- ./Field_Mod/Gradients/Calculate_Grad_Matrix_Cells_To_Nodes.f90
+#-- ./Field_Mod/Gradients/Grad_Variable.f90
+#-- ./Field_Mod/Gradients/Grad_Least_Variable.f90
+#-- ./Field_Mod/Utilities/Alias_Momentum.f90
+#-- ./Field_Mod/Utilities/Potential_Initialization.f90
 $(DIR_OBJECT)/Potential_Initialization.o:\
 $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 
 
-#-- ./Field_Mod/Calculate_Grad_Matrix_Nodes_To_Cells.f90
-#-- ./Field_Mod/Interpolate_To_Faces_Linear.f90
-#-- ./Field_Mod/Buoyancy_Forces.f90
+#-- ./Field_Mod/Utilities/Buoyancy_Forces.f90
 $(DIR_OBJECT)/Buoyancy_Forces.o:\
 $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 
 
-#-- ./Field_Mod/Calculate_Grad_Matrix.f90
-#-- ./Field_Mod/Grad_Component_Nodes_To_Cells.f90
-#-- ./Field_Mod/Grad_Component.f90
-#-- ./Field_Mod/Calculate_Grad_Matrix_For_Cell.f90
-#-- ./Field_Mod/Calculate_Fluxes.f90
-#-- ./Field_Mod/U_Tan.f90
-#-- ./Field_Mod/Inertial_Term_Momentum.f90
+#-- ./Field_Mod/Utilities/Calculate_Fluxes.f90
+#-- ./Field_Mod/Utilities/U_Tan.f90
+#-- ./Field_Mod/Utilities/Inertial_Term_Momentum.f90
 $(DIR_OBJECT)/Inertial_Term_Momentum.o:\
 $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 
 
-#-- ./Field_Mod/Alias_Energy.f90
-#-- ./Field_Mod/Interpolate_Nodes_To_Faces.f90
-#-- ./Field_Mod/Calculate_Grad_Matrix_Cells_To_Nodes.f90
-#-- ./Field_Mod/Grad_Variable.f90
-#-- ./Field_Mod/Allocate.f90
-#-- ./Field_Mod/Schmidt_Number.f90
-#-- ./Field_Mod/Grad_Least_Variable.f90
-#-- ./Field_Mod/Correct_Fluxes_With_Body_Forces.f90
+#-- ./Field_Mod/Utilities/Alias_Energy.f90
+#-- ./Field_Mod/Utilities/Schmidt_Number.f90
+#-- ./Field_Mod/Utilities/Correct_Fluxes_With_Body_Forces.f90
 $(DIR_OBJECT)/Correct_Fluxes_With_Body_Forces.o:\
 $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 
 
-#-- ./Field_Mod/Prandtl_Number.f90
+#-- ./Field_Mod/Utilities/Prandtl_Number.f90
+#-- ./Field_Mod/Core/Allocate_Field.f90
+#-- ./Field_Mod/Interpolations/Interpolate_Cells_To_Nodes.f90
+#-- ./Field_Mod/Interpolations/Interpolate_Nodes_To_Cells.f90
+#-- ./Field_Mod/Interpolations/Interpolate_To_Faces_Harmonic.f90
+#-- ./Field_Mod/Interpolations/Interpolate_To_Faces_Linear.f90
+#-- ./Field_Mod/Interpolations/Interpolate_Nodes_To_Faces.f90
 #-- ./Monitor_Mod/Initialize.f90
 #-- ./Monitor_Mod/Finalize.f90
 #-- ./Monitor_Mod/Write_4_Vars.f90
@@ -632,7 +636,7 @@ $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
+Field_Mod/*/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 $(DIR_SHARED)/Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
@@ -655,7 +659,7 @@ $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
+Field_Mod/*/*.f90 \
 $(DIR_OBJECT)/Eddies_Mod.o \
 Eddies_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
@@ -715,7 +719,7 @@ $(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_OBJECT)/Numerics_Mod.o \
 Numerics_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 
+Field_Mod/*/*.f90 
 
 #-- ./Compute_Momentum.f90
 $(DIR_OBJECT)/Compute_Momentum.o:\
@@ -812,7 +816,7 @@ $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*.f90 \
+Field_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #-- ./Turb_Mod/Vis_T_K_Eps.f90
@@ -907,7 +911,7 @@ $(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
 $(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-Field_Mod/*.f90 \
+Field_Mod/*/*.f90 \
 $(DIR_OBJECT)/Face_Mod.o \
 Face_Mod/*.f90 \
 $(DIR_OBJECT)/Bulk_Mod.o \

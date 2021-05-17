@@ -11,15 +11,15 @@
   integer                 :: c
   real                    :: pr, pr_t_inf, pe_t
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type), pointer :: flow
+  type(Field_Type), pointer :: Flow
 !==============================================================================!
 
-  ! Take alias to the flow to access its properties
-  flow => turb % pnt_flow
+  ! Take alias to the Flow to access its properties
+  Flow => turb % pnt_flow
 
-  pr = Field_Mod_Prandtl_Number(flow, c)
+  pr = Flow % Prandtl_Number(c)
   pr_t_inf = 0.85
-  pe_t     = max(pr * turb % vis_t(c) / flow % viscosity(c), TINY)
+  pe_t     = max(pr * turb % vis_t(c) / Flow % viscosity(c), TINY)
 
   Turb_Mod_Prandtl_Number =                                             &
     1.0 / (   1.0/(2.0*pr_t_inf)                                        &

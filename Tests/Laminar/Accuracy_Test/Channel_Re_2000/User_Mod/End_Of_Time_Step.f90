@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Time_Step(flow, turb, Vof, swarm,  &
+  subroutine User_Mod_End_Of_Time_Step(Flow, turb, Vof, swarm,  &
                                        n, n_stat_t, n_stat_p, time)
 !------------------------------------------------------------------------------!
 !   Append viscous forces to pressure drops.                                   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
+  type(Field_Type), target :: Flow
   type(Turb_Type),  target :: turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: swarm
@@ -27,10 +27,10 @@
 !==============================================================================!
 
   ! Take the alias to the grid
-  grid => flow % pnt_grid
-  bulk => flow % bulk
-  visc => flow % viscosity
-  call Field_Mod_Alias_Momentum(flow, u, v, w)
+  grid => Flow % pnt_grid
+  bulk => Flow % bulk
+  visc => Flow % viscosity
+  call Flow % Alias_Momentum(u, v, w)
 
   ! Initialize stresses at the walls
   tau_wall_x = 0.0

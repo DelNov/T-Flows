@@ -19,7 +19,7 @@
   logical                   :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: grid
-  type(Field_Type),  pointer :: flow
+  type(Field_Type),  pointer :: Flow
   type(Vert_Type),   pointer :: vert(:)
   type(Elem_Type),   pointer :: elem(:)
   type(Matrix_Type), pointer :: A
@@ -36,7 +36,7 @@
 
   ! Take aliases
   grid => Front % pnt_grid
-  flow => Front % pnt_flow
+  Flow => Front % pnt_flow
   nv   => Front % n_verts
   ne   => Front % n_elems
   vert => Front % vert
@@ -47,7 +47,7 @@
   nn   = grid % n_nodes
 
   call Front % Initialize_Front()
-  call Field_Mod_Interpolate_Cells_To_Nodes(flow, phi % n, phi_n(1:nn))
+  call Flow % Interpolate_Cells_To_Nodes(phi % n, phi_n(1:nn))
 
   CALL GRID_MOD_SAVE_DEBUG_VTU(GRID, 'PHI_C',         &
                                SCALAR_CELL=PHI % N,   &
@@ -101,7 +101,7 @@
   end do
 
   phi % n(:) = phi_c(:)
-  call Field_Mod_Grad_Variable(flow, phi)
+  call Flow % Grad_Variable(phi)
 
   allocate(n_cells_v(grid % n_cells))
   n_cells_v(:) = 0

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Balance_Volume(flow, Vof)
+  subroutine Balance_Volume(Flow, Vof)
 !------------------------------------------------------------------------------!
 !   Modifies the fluxes at outflow boundaries to conserve the volume.          !
 !   This function modifies velocities and volume fluxes at outflows.           !
@@ -11,7 +11,7 @@
   use Comm_Mod
   use Grid_Mod,  only: Grid_Type, Grid_Mod_Bnd_Cond_Type,  &
                        INFLOW, OUTFLOW, CONVECT, PRESSURE, SYMMETRY
-  use Field_Mod, only: Field_Type, Field_Mod_Alias_Momentum
+  use Field_Mod
   use Var_Mod,   only: Var_Type
   use Face_Mod,  only: Face_Type
   use Bulk_Mod,  only: Bulk_Type
@@ -20,7 +20,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),  target :: flow
+  type(Field_Type),  target :: Flow
   type(Vof_Type),    target :: Vof
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
@@ -33,17 +33,17 @@
 !==============================================================================!
 
   ! Take aliases
-  grid   => flow % pnt_grid
-  bulk   => flow % bulk
-  v_flux => flow % v_flux
-  call Field_Mod_Alias_Momentum(flow, u, v, w)
+  grid   => Flow % pnt_grid
+  bulk   => Flow % bulk
+  v_flux => Flow % v_flux
+  call Flow % Alias_Momentum(u, v, w)
 
   !--------------------------------------!
   !                                      !
   !   Added volume due to phase change   !
   !                                      !
   !--------------------------------------!
-  if(flow % mass_transfer) then
+  if(Flow % mass_transfer) then
     call Vof % Mass_Transfer_Added_Volume(bulk % vol_src)
   end if
 

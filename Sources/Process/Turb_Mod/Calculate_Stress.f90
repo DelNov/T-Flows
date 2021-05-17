@@ -12,7 +12,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type),  target :: turb
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type), pointer :: flow
+  type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: grid
   type(Var_Type),   pointer :: u, v, w
   type(Var_Type),   pointer :: uu, vv, ww, uv, uw, vw
@@ -22,40 +22,40 @@
 !==============================================================================!
 
   ! Take aliases
-  flow => turb % pnt_flow
-  grid => flow % pnt_grid
+  Flow => turb % pnt_flow
+  grid => Flow % pnt_grid
   nc = grid % n_cells
   nb = grid % n_bnd_cells
-  call Field_Mod_Alias_Momentum   (flow, u, v, w)
+  call Flow % Alias_Momentum(u, v, w)
   call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
 
-  call Field_Mod_Grad_Variable(flow, u)
-  call Field_Mod_Grad_Variable(flow, v)
-  call Field_Mod_Grad_Variable(flow, w)
+  call Flow % Grad_Variable(u)
+  call Flow % Grad_Variable(v)
+  call Flow % Grad_Variable(w)
 
   if( turb % model .eq. K_EPS ) then
     do c = 1, grid % n_cells
 
-      uu % n(c) = - 2. * turb % vis_t(c) / flow % density(c)  &
+      uu % n(c) = - 2. * turb % vis_t(c) / Flow % density(c)  &
                        * u % x(c) + TWO_THIRDS * kin % n(c)
-      vv % n(c) = - 2. * turb % vis_t(c) / flow % density(c)  &
+      vv % n(c) = - 2. * turb % vis_t(c) / Flow % density(c)  &
                        * v % y(c) + TWO_THIRDS * kin % n(c)
-      ww % n(c) = - 2. * turb % vis_t(c) / flow % density(c)  &
+      ww % n(c) = - 2. * turb % vis_t(c) / Flow % density(c)  &
                        * w % z(c) + TWO_THIRDS * kin % n(c)
 
-      uv % n(c) = - turb % vis_t(c) / flow % density(c) * (u % y(c) + v % x(c))
-      uw % n(c) = - turb % vis_t(c) / flow % density(c) * (u % z(c) + w % x(c))
-      vw % n(c) = - turb % vis_t(c) / flow % density(c) * (v % z(c) + w % y(c))
+      uv % n(c) = - turb % vis_t(c) / Flow % density(c) * (u % y(c) + v % x(c))
+      uw % n(c) = - turb % vis_t(c) / Flow % density(c) * (u % z(c) + w % x(c))
+      vw % n(c) = - turb % vis_t(c) / Flow % density(c) * (v % z(c) + w % y(c))
 
     end do
   end if
 
   if( turb % model .eq. K_EPS_ZETA_F ) then
 
-    call Field_Mod_Grad(flow, grid % wall_dist, wd_x(-nb:nc),  &
-                                                wd_y(-nb:nc),  &
-                                                wd_z(-nb:nc))
+    call Flow % Grad(grid % wall_dist, wd_x(-nb:nc),  &
+                                       wd_y(-nb:nc),  &
+                                       wd_z(-nb:nc))
 
     do c = 1, grid % n_cells
 
@@ -70,11 +70,11 @@
       w2 = (zeta % n(c) * kin % n(c)) * wd_z(c)
 
       ! Take the part from Boussinesq's hypothesis (as if in k_eps) ...
-      uu % n(c) = - 2. * turb % vis_t(c) / flow % density(c)  &
+      uu % n(c) = - 2. * turb % vis_t(c) / Flow % density(c)  &
                        * u % x(c) + TWO_THIRDS * kin % n(c)
-      vv % n(c) = - 2. * turb % vis_t(c) / flow % density(c)  &
+      vv % n(c) = - 2. * turb % vis_t(c) / Flow % density(c)  &
                        * v % y(c) + TWO_THIRDS * kin % n(c)
-      ww % n(c) = - 2. * turb % vis_t(c) / flow % density(c)  &
+      ww % n(c) = - 2. * turb % vis_t(c) / Flow % density(c)  &
                        * w % z(c) + TWO_THIRDS * kin % n(c)
 
       ! ... and balance them with explicitly resolved normal stresses
@@ -82,9 +82,9 @@
       vv % n(c) = vv % n(c) * (1.0 - wd_y(c)) + v2
       ww % n(c) = ww % n(c) * (1.0 - wd_z(c)) + w2
 
-      uv % n(c) = - turb % vis_t(c) / flow % density(c) * (u % y(c) + v % x(c))
-      uw % n(c) = - turb % vis_t(c) / flow % density(c) * (u % z(c) + w % x(c))
-      vw % n(c) = - turb % vis_t(c) / flow % density(c) * (v % z(c) + w % y(c))
+      uv % n(c) = - turb % vis_t(c) / Flow % density(c) * (u % y(c) + v % x(c))
+      uw % n(c) = - turb % vis_t(c) / Flow % density(c) * (u % z(c) + w % x(c))
+      vw % n(c) = - turb % vis_t(c) / Flow % density(c) * (v % z(c) + w % y(c))
 
     end do
   end if

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Rhie_And_Chow(flow, Vof, Sol)
+  subroutine Rhie_And_Chow(Flow, Vof, Sol)
 !------------------------------------------------------------------------------!
 !   Computes face velocitites with Rhie and Chow interpolation method          !
 !------------------------------------------------------------------------------!
@@ -38,7 +38,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),  target :: flow
+  type(Field_Type),  target :: Flow
   type(Vof_Type),    target :: Vof
   type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
@@ -56,14 +56,14 @@
   call Cpu_Timer % Start('Rhie_And_Chow')
 
   ! Take aliases
-  grid   => flow % pnt_grid
-  p      => flow % p
-  v_flux => flow % v_flux
+  grid   => Flow % pnt_grid
+  p      => Flow % p
+  v_flux => Flow % v_flux
   col    => Vof % fun
   A      => Sol % A
   M      => Sol % M
   sigma  =  Vof % surface_tension
-  call Field_Mod_Alias_Momentum(flow, u, v, w)
+  call Flow % Alias_Momentum(u, v, w)
 
   !--------------------------------------!
   !   Store grid % vol(c) / M % sav(c)   !
@@ -124,15 +124,15 @@
   !   Take velocities as last computed   !
   !--------------------------------------!
   do c = 1, grid % n_cells
-    u_c(c) = flow % u % n(c)
-    v_c(c) = flow % v % n(c)
-    w_c(c) = flow % w % n(c)
+    u_c(c) = Flow % u % n(c)
+    v_c(c) = Flow % v % n(c)
+    w_c(c) = Flow % w % n(c)
   end do
 
   !--------------------------------------------------------------------------!
   !   Choi's correction, part 1: subtract the cell-centered unsteady terms   !
   !--------------------------------------------------------------------------!
-  if(flow % choi_correction) then
+  if(Flow % choi_correction) then
 
     ! Weights of o and oo time step depending on the scheme used
     if(u % td_scheme == LINEAR) then
@@ -146,7 +146,7 @@
     do c = 1, grid % n_cells
 
       ! Unit for t_m: m^3 * kg/m^3 / s * s/kg = 1
-      t_m(c) = (grid % vol(c) * flow % density(c) / flow % dt) / M % sav(c)
+      t_m(c) = (grid % vol(c) * Flow % density(c) / Flow % dt) / M % sav(c)
 
       u_c(c) = u_c(c) - (w_o * u % o(c) + w_oo * u % oo(c)) * t_m(c)
       v_c(c) = v_c(c) - (w_o * v % o(c) + w_oo * v % oo(c)) * t_m(c)
@@ -158,13 +158,13 @@
   !---------------------------------------------------------------------!
   !   Gu's correction, part 1: subtract the cell-centered body forces   !
   !---------------------------------------------------------------------!
-  if(flow % gu_correction) then
+  if(Flow % gu_correction) then
     do c = 1, grid % n_cells
 
       ! Units: m^3 s/kg * kg /(m^2 s^2) = m / s
-      u_c(c) = u_c(c) - v_m(c) * flow % cell_fx(c)
-      v_c(c) = v_c(c) - v_m(c) * flow % cell_fy(c)
-      w_c(c) = w_c(c) - v_m(c) * flow % cell_fz(c)
+      u_c(c) = u_c(c) - v_m(c) * Flow % cell_fx(c)
+      v_c(c) = v_c(c) - v_m(c) * Flow % cell_fy(c)
+      w_c(c) = w_c(c) - v_m(c) * Flow % cell_fz(c)
 
     end do
   end if
@@ -221,7 +221,7 @@
       !------------------------------------------------------------!
       !   Choi's correction, part 2: add flux from old time step   !
       !------------------------------------------------------------!
-      if(flow % choi_correction) then
+      if(Flow % choi_correction) then
         v_flux % n(s) = v_flux % n(s)                        &
                       + (fs * t_m(c1) + (1.0-fs) * t_m(c2))  &
                         * (  w_o *  v_flux % o(s)            &
@@ -232,12 +232,12 @@
       !   Gu's correction, part 2: add face-centered forces   !
       !-------------------------------------------------------!
       ! Units: m^3 s/kg * kg/(m^2 s^2) * m^2 = m^3/s
-      if(flow % gu_correction) then
+      if(Flow % gu_correction) then
         v_flux % n(s) = v_flux % n(s)                          &
                       + (fs * v_m(c1) + (1.0-fs) * v_m(c2))    &
-                      * (  flow % face_fx(s) * grid % sx(s)    &
-                         + flow % face_fy(s) * grid % sy(s)    &
-                         + flow % face_fz(s) * grid % sz(s) )
+                      * (  Flow % face_fx(s) * grid % sx(s)    &
+                         + Flow % face_fy(s) * grid % sy(s)    &
+                         + Flow % face_fz(s) * grid % sz(s) )
       end if  ! gu_correction
 
     end if

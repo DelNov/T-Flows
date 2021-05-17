@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Time_Step(flow, turb, Vof, swarm, n, n_stat_t,   &
+  subroutine User_Mod_End_Of_Time_Step(Flow, turb, Vof, swarm, n, n_stat_t,   &
                                        n_stat_p, time)
 !------------------------------------------------------------------------------!
 !   This function is computing benchmark for dam break                         !
@@ -10,7 +10,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
+  type(Field_Type), target :: Flow
   type(Turb_Type),  target :: turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: swarm
@@ -32,13 +32,12 @@
 !==============================================================================!
 
   ! Take aliases
-  grid  => flow % pnt_grid
+  grid  => Flow % pnt_grid
   fun   => Vof % fun
 
   ! Height probes:
   call Grid_Mod_Exchange_Cells_Real(grid, Vof % fun % n)
-  call Field_Mod_Interpolate_Cells_To_Nodes(flow, Vof % fun % n,   &
-                                                  vof_node)
+  call Flow % Interpolate_Cells_To_Nodes(Vof % fun % n, vof_node)
   h_probe = 0.0
 
   ! Find fun at probe nodes
@@ -81,9 +80,9 @@
   end do
 
   ! Pressure probes:
-  call Grid_Mod_Exchange_Cells_Real(grid, flow % p % n)
+  call Grid_Mod_Exchange_Cells_Real(grid, Flow % p % n)
 
-  call Field_Mod_Interpolate_Cells_To_Nodes(flow, flow % p % n, p_node)
+  call Flow % Interpolate_Cells_To_Nodes(Flow % p % n, p_node)
 
   do i_probe = 1, size(nod_probe)
     if (nod_probe(i_probe) .ne. -1) then

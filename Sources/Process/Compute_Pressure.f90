@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Pressure(flow, Vof, Sol, curr_dt, ini)
+  subroutine Compute_Pressure(Flow, Vof, Sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Forms and solves pressure equation for the SIMPLE method.                  !
 !------------------------------------------------------------------------------!
@@ -8,7 +8,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),    target :: flow
+  type(Field_Type),    target :: Flow
   type(Vof_Type),      target :: Vof
   type(Solver_Type),   target :: Sol
   integer, intent(in)         :: curr_dt
@@ -54,19 +54,19 @@
   call Cpu_Timer % Start('Compute_Pressure (without solvers)')
 
   ! Take aliases
-  grid   => flow % pnt_grid
-  bulk   => flow % bulk
-  v_flux => flow % v_flux
-  p      => flow % p
-  pp     => flow % pp
-  dt     =  flow % dt
+  grid   => Flow % pnt_grid
+  bulk   => Flow % bulk
+  v_flux => Flow % v_flux
+  p      => Flow % p
+  pp     => Flow % pp
+  dt     =  Flow % dt
   A      => Sol % A
   M      => Sol % M
   b      => Sol % b % val
-  call Field_Mod_Alias_Momentum(flow, u, v, w)
+  call Flow % Alias_Momentum(u, v, w)
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Pressure(flow, Vof, Sol, curr_dt, ini)
+  call User_Mod_Beginning_Of_Compute_Pressure(Flow, Vof, Sol, curr_dt, ini)
 
   !--------------------------------------------------!
   !   Find the value for normalization of pressure   !
@@ -104,13 +104,13 @@
   !----------------------------------!
   !   Correct fluxes at boundaries   !
   !----------------------------------!
-  call Balance_Volume(flow, Vof)
+  call Balance_Volume(Flow, Vof)
 
   !---------------------------------------!
   !   Compute volume fluxes at internal   !
   !    faces with Rhie and Chow method    !
   !---------------------------------------!
-  call Rhie_And_Chow(flow, Vof, Sol)
+  call Rhie_And_Chow(Flow, Vof, Sol)
 
   !------------------------------------------!
   !   Update fluxes at boundaries and fill   !
@@ -186,7 +186,7 @@
   ! surrounding them are the same after exchanging the buffers.  In order
   ! to fix it, the balancing procedure which follows is introduced.
   ! However, the fix should not be applied if domain has pressure outlet.
-  if( .not. flow % has_pressure_outlet) then
+  if( .not. Flow % has_pressure_outlet) then
     if(total_cells .eq. 0) then  ! wasn't set yet
       total_cells = grid % n_cells - grid % comm % n_buff_cells
       call Comm_Mod_Global_Sum_Int(total_cells)
@@ -212,15 +212,15 @@
 
   call Cpu_Timer % Stop('Linear_Solver_For_Pressure')
 
-  if (flow % p_m_coupling == SIMPLE) then
+  if (Flow % p_m_coupling == SIMPLE) then
     call Info_Mod_Iter_Fill_At(1, 4, pp % name, pp % eniter, pp % res)
   else
-    if (flow % i_corr == flow % n_piso_corrections) then
+    if (Flow % i_corr == Flow % n_piso_corrections) then
       call Info_Mod_Iter_Fill_At(1, 4, pp % name, pp % eniter, pp % res)
     end if
   end if
 
-  call Field_Mod_Grad_Pressure_Correction(flow, pp)
+  call Flow % Grad_Pressure_Correction(pp)
 
   !-------------------------------!
   !   Update the pressure field   !
@@ -229,7 +229,7 @@
     p % n(c) =  p % n(c) + pp % urf * pp % n(c)
   end do
 
-  call Field_Mod_Grad_Pressure(flow, p)
+  call Flow % Grad_Pressure(p)
 
   !------------------------------------!
   !   Normalize the pressure field     !
@@ -243,7 +243,7 @@
   p % n(:) = p % n(:) - 0.5*(p_max+p_min)
 
   ! User function
-  call User_Mod_End_Of_Compute_Pressure(flow, Vof, Sol, curr_dt, ini)
+  call User_Mod_End_Of_Compute_Pressure(Flow, Vof, Sol, curr_dt, ini)
 
   call Cpu_Timer % Stop('Compute_Pressure (without solvers)')
 

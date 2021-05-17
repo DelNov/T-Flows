@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(flow, turb, Vof, swarm, ts)
+  subroutine User_Mod_Save_Results(Flow, turb, Vof, swarm, ts)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
@@ -8,7 +8,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),  target :: flow
+  type(Field_Type),  target :: Flow
   type(Turb_Type),   target :: turb
   type(Vof_Type),    target :: Vof
   type(Swarm_Type),  target :: swarm
@@ -28,10 +28,10 @@
 !==============================================================================!
 
   ! Take aliases
-  grid   => flow % pnt_grid
-  bulk   => flow % bulk
-  call Field_Mod_Alias_Momentum   (flow, u, v, w)
-  call Field_Mod_Alias_Energy     (flow, t)
+  grid   => Flow % pnt_grid
+  bulk   => Flow % bulk
+  call Flow % Alias_Momentum(u, v, w)
+  call Flow % Alias_Energy  (t)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
   call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
   call Turb_Mod_Alias_Heat_Fluxes (turb, ut, vt, wt)
@@ -54,7 +54,7 @@
   h_cc = k_const * (0.6 + 0.387 * ra ** (1.0/6.0)                         &
                            / (1.0 + (0.559/pr) ** (9.0/16.0)) ** (8.0/27.0)  &
                       ) ** 2.0
-  q_cc = h_cc * flow % heated_area * (t_wall - t_ref)
+  q_cc = h_cc * Flow % heated_area * (t_wall - t_ref)
 
   ! Nusselt number from Churchil and Chu
   nuss_cc = h_cc * d / k_const
@@ -62,7 +62,7 @@
   nuss_mean  = 0.0
   n_points = 0
 
-  if(flow % heat_transfer) then
+  if(Flow % heat_transfer) then
     do s = 1, grid % n_faces
       c1 = grid % faces_c(1,s)
       c2 = grid % faces_c(2,s)
@@ -93,9 +93,9 @@
     print *, 'h_cc        = ', h_cc
     print *, 'q_cc        = ', q_cc
     print *, 'nuss_cc     = ', nuss_cc
-    print *, 'heat        = ', flow % heat
-    print *, 'heat_flux   = ', flow % heat_flux
-    print *, 'heated_area = ', flow % heated_area
+    print *, 'heat        = ', Flow % heat
+    print *, 'heat_flux   = ', Flow % heat_flux
+    print *, 'heated_area = ', Flow % heated_area
     print *, 'nuss_mean   = ', nuss_mean
   end if
 

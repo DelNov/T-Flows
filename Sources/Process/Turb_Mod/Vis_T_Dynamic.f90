@@ -25,7 +25,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type), target :: turb
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type),  pointer :: flow
+  type(Field_Type),  pointer :: Flow
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w
   integer                    :: c, c1, c2, s, sj, cj, nc, nb
@@ -59,16 +59,16 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
-  flow => turb % pnt_flow
-  grid => flow % pnt_grid
+  Flow => turb % pnt_flow
+  grid => Flow % pnt_grid
   nc   =  grid % n_cells
   nb   =  grid % n_bnd_cells
-  call Field_Mod_Alias_Momentum(flow, u, v, w)
+  call Flow % Alias_Momentum(u, v, w)
 
   call Grid_Mod_Exchange_Cells_Real(grid, u % n)
   call Grid_Mod_Exchange_Cells_Real(grid, v % n)
   call Grid_Mod_Exchange_Cells_Real(grid, w % n)
-  call Grid_Mod_Exchange_Cells_Real(grid, flow % shear)
+  call Grid_Mod_Exchange_Cells_Real(grid, Flow % shear)
 
   do c =1, grid % n_cells
     u_a   = 0.0
@@ -112,14 +112,14 @@
         vw_a = vw_a + grid % vol(cj) * v % n(cj) * w % n(cj)
 
         ! Test Mija
-        m_11_a = m_11_a + grid % vol(cj) * flow % shear(cj) * u % x(cj)
-        m_22_a = m_22_a + grid % vol(cj) * flow % shear(cj) * v % y(cj)
-        m_33_a = m_33_a + grid % vol(cj) * flow % shear(cj) * w % z(cj)
-        m_12_a = m_12_a + grid % vol(cj) * flow % shear(cj)              &
+        m_11_a = m_11_a + grid % vol(cj) * Flow % shear(cj) * u % x(cj)
+        m_22_a = m_22_a + grid % vol(cj) * Flow % shear(cj) * v % y(cj)
+        m_33_a = m_33_a + grid % vol(cj) * Flow % shear(cj) * w % z(cj)
+        m_12_a = m_12_a + grid % vol(cj) * Flow % shear(cj)              &
                * 0.5 * ( u % y(cj) + v % x(cj) )
-        m_13_a = m_13_a + grid % vol(cj) * flow % shear(cj)              &
+        m_13_a = m_13_a + grid % vol(cj) * Flow % shear(cj)              &
                * 0.5 * ( u % z(cj) + w % x(cj) )
-        m_23_a = m_23_a + grid % vol(cj) * flow % shear(cj)              &
+        m_23_a = m_23_a + grid % vol(cj) * Flow % shear(cj)              &
                * 0.5 * ( v % z(cj) + w % y(cj) )
 
         ! Test volume 
@@ -141,12 +141,12 @@
     uw_a = uw_a + grid % vol(c) * u % n(c) * w % n(c)
     vw_a = vw_a + grid % vol(c) * v % n(c) * w % n(c)
 
-    m_11_a = m_11_a + grid % vol(c) * flow % shear(c) * u % x(c)
-    m_22_a = m_22_a + grid % vol(c) * flow % shear(c) * v % y(c)
-    m_33_a = m_33_a + grid % vol(c) * flow % shear(c) * w % z(c)
-    m_12_a = m_12_a + grid % vol(c) * flow % shear(c) * .5*(u % y(c) + v % x(c))
-    m_13_a = m_13_a + grid % vol(c) * flow % shear(c) * .5*(u % z(c) + w % x(c))
-    m_23_a = m_23_a + grid % vol(c) * flow % shear(c) * .5*(v % z(c) + w % y(c))
+    m_11_a = m_11_a + grid % vol(c) * Flow % shear(c) * u % x(c)
+    m_22_a = m_22_a + grid % vol(c) * Flow % shear(c) * v % y(c)
+    m_33_a = m_33_a + grid % vol(c) * Flow % shear(c) * w % z(c)
+    m_12_a = m_12_a + grid % vol(c) * Flow % shear(c) * .5*(u % y(c) + v % x(c))
+    m_13_a = m_13_a + grid % vol(c) * Flow % shear(c) * .5*(u % z(c) + w % x(c))
+    m_23_a = m_23_a + grid % vol(c) * Flow % shear(c) * .5*(v % z(c) + w % y(c))
 
     ! Now calculating test values
     u_f(c) = u_a / vol_e
@@ -160,23 +160,23 @@
     uw_f(c)  = uw_a / vol_e
     vw_f(c)  = vw_a / vol_e
 
-    m_11_f(c) = m_11_a / vol_e 
-    m_22_f(c) = m_22_a / vol_e 
-    m_33_f(c) = m_33_a / vol_e 
-    m_12_f(c) = m_12_a / vol_e 
-    m_13_f(c) = m_13_a / vol_e 
-    m_23_f(c) = m_23_a / vol_e 
+    m_11_f(c) = m_11_a / vol_e
+    m_22_f(c) = m_22_a / vol_e
+    m_33_f(c) = m_33_a / vol_e
+    m_12_f(c) = m_12_a / vol_e
+    m_13_f(c) = m_13_a / vol_e
+    m_23_f(c) = m_23_a / vol_e
   end do
 
-  call Field_Mod_Grad(flow, u_f(-nb:nc), u % x,  &  ! dU/dx
-                                         u % y,  &  ! dU/dy
-                                         u % z)     ! dU/dz
-  call Field_Mod_Grad(flow, v_f(-nb:nc), v % x,  &  ! dV/dx
-                                         v % y,  &  ! dV/dy
-                                         v % z)     ! dV/dz
-  call Field_Mod_Grad(flow, w_f(-nb:nc), w % x,  &  ! dW/dx
-                                         w % y,  &  ! dW/dy
-                                         w % z)     ! dW/dz
+  call Flow % Grad(u_f(-nb:nc), u % x,  &  ! dU/dx
+                                u % y,  &  ! dU/dy
+                                u % z)     ! dU/dz
+  call Flow % Grad(v_f(-nb:nc), v % x,  &  ! dV/dx
+                                v % y,  &  ! dV/dy
+                                v % z)     ! dV/dz
+  call Flow % Grad(w_f(-nb:nc), w % x,  &  ! dW/dx
+                                w % y,  &  ! dW/dy
+                                w % z)     ! dW/dz
 
   do c = 1, grid % n_cells
     l_g  = grid % vol(c)**ONE_THIRD

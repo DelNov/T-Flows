@@ -12,7 +12,7 @@
   integer, intent(in)       :: ini
   type(Var_Type)            :: phi
 !----------------------------------[Locals]------------------------------------!
-  type(Field_Type),  pointer :: flow
+  type(Field_Type),  pointer :: Flow
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w
   type(Var_Type),    pointer :: vis
@@ -41,12 +41,12 @@
   call Cpu_Timer % Start('Compute_Turbulence (without solvers)')
 
   ! Take aliases
-  flow => turb % pnt_flow
-  grid => flow % pnt_grid
+  Flow => turb % pnt_flow
+  grid => Flow % pnt_grid
   vis  => turb % vis
-  flux => flow % v_flux % n
-  dt   =  flow % dt
-  call Field_Mod_Alias_Momentum(flow, u, v, w)
+  flux => Flow % v_flux % n
+  dt   =  Flow % dt
+  call Flow % Alias_Momentum(u, v, w)
   call Sol % Alias_Solver      (A, b)
 
   ! Initialize matrix and right hand side
@@ -62,14 +62,14 @@
   end if
 
   ! Gradients
-  call Field_Mod_Grad_Variable(flow, phi)
+  call Flow % Grad_Variable(phi)
 
   !---------------!
   !               !
   !   Advection   !
   !               !
   !---------------!
-  call Numerics_Mod_Advection_Term(phi, flow % density, flux, b)
+  call Numerics_Mod_Advection_Term(phi, Flow % density, flux, b)
 
   !------------------!
   !                  !
@@ -85,8 +85,8 @@
     c1 = grid % faces_c(1,s)
     c2 = grid % faces_c(2,s)
 
-    visc_f =        grid % fw(s)  * flow % viscosity(c1)   &
-           + (1.0 - grid % fw(s)) * flow % viscosity(c2)
+    visc_f =        grid % fw(s)  * Flow % viscosity(c1)   &
+           + (1.0 - grid % fw(s)) * Flow % viscosity(c2)
 
     vis_eff = visc_f + (    grid % fw(s)  * turb % vis_t(c1)   &
                      + (1.0-grid % fw(s)) * turb % vis_t(c2))  &
@@ -147,8 +147,8 @@
     a12 = a0
     a21 = a0
 
-    a12 = a12  - min(flux(s), 0.0) * flow % density(c1)
-    a21 = a21  + max(flux(s), 0.0) * flow % density(c2)
+    a12 = a12  - min(flux(s), 0.0) * Flow % density(c1)
+    a21 = a21  + max(flux(s), 0.0) * Flow % density(c2)
 
     ! Fill the system matrix
     if(c2  > 0) then
@@ -198,7 +198,7 @@
   !   Inertial terms   !
   !                    !
   !--------------------!
-  call Numerics_Mod_Inertial_Term(phi, flow % density, A, b, dt)
+  call Numerics_Mod_Inertial_Term(phi, Flow % density, A, b, dt)
 
   !-------------------------------------!
   !                                     !
@@ -208,7 +208,7 @@
   if(turb % model .eq. K_EPS) then
     if(phi % name .eq. 'KIN') call Turb_Mod_Src_Kin_K_Eps(turb, Sol)
     if(phi % name .eq. 'EPS') call Turb_Mod_Src_Eps_K_Eps(turb, Sol)
-    if(flow % heat_transfer) then
+    if(Flow % heat_transfer) then
       if(phi % name .eq. 'T2')  call Turb_Mod_Src_T2(turb, Sol)
     end if
   end if
@@ -219,7 +219,7 @@
     if(phi % name .eq. 'EPS')  call Turb_Mod_Src_Eps_K_Eps_Zeta_F(turb, Sol)
     if(phi % name .eq. 'ZETA')  &
       call Turb_Mod_Src_Zeta_K_Eps_Zeta_F(turb, Sol, curr_dt)
-    if(flow % heat_transfer) then
+    if(Flow % heat_transfer) then
       if(phi % name .eq. 'T2')  call Turb_Mod_Src_T2(turb, Sol)
     end if
   end if
@@ -272,13 +272,13 @@
       call Info_Mod_Iter_Fill_At(3, 2, phi % name, phi % eniter, phi % res)
     if(phi % name .eq. 'ZETA')  &
       call Info_Mod_Iter_Fill_At(3, 3, phi % name, phi % eniter, phi % res)
-    if(flow % heat_transfer) then
+    if(Flow % heat_transfer) then
       if(phi % name .eq. 'T2')  &
       call Info_Mod_Iter_Fill_At(3, 5, phi % name, phi % eniter, phi % res)
     end if
   end if
 
-  call Field_Mod_Grad_Variable(flow, phi)
+  call Flow % Grad_Variable(phi)
 
   call Cpu_Timer % Stop('Compute_Turbulence (without solvers)')
 

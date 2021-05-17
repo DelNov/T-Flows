@@ -11,25 +11,25 @@
   real                    :: b(Vof % pnt_grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: grid
-  type(Field_Type), pointer :: flow
+  type(Field_Type), pointer :: Flow
   integer                   :: c, e, g, l, s, c1, c2, i_ele
   real                      :: t_x_1, t_x_2, cond_1, cond_2
 !==============================================================================!
 
   ! Take aliases
   grid => Vof % pnt_grid
-  flow => Vof % pnt_flow
+  Flow => Vof % pnt_flow
 
   ! RETURN
 
-  if(.not. flow % mass_transfer) return
+  if(.not. Flow % mass_transfer) return
 
   ! Distinguish between liquid and vapor
   call Vof % Get_Gas_And_Liquid_Phase(g, l)
 
   call Vof % Calculate_Grad_Matrix_With_Front()
-  call Vof % Grad_Variable_With_Front(flow % t, Vof % t_sat)
-  call Field_Mod_Calculate_Grad_Matrix(flow)
+  call Vof % Grad_Variable_With_Front(Flow % t, Vof % t_sat)
+  call Flow % Calculate_Grad_Matrix()
 
   do s = 1, grid % n_faces
 
@@ -48,8 +48,8 @@
           if(Vof % fun % n(c2) > 0.5) cond_2 = Vof % phase_cond(1)
 
           ! Take gradients from each side of the interface
-          t_x_1 = flow % t % x(c1)
-          t_x_2 = flow % t % x(c2)
+          t_x_1 = Flow % t % x(c1)
+          t_x_2 = Flow % t % x(c2)
 
           IF(MATH_MOD_APPROX_REAL(GRID % YS(S), 0.0) .AND.  &
              MATH_MOD_APPROX_REAL(GRID % ZS(S), 0.0)) THEN

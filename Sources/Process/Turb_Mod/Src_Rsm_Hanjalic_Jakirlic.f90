@@ -37,7 +37,7 @@
   type(Solver_Type), target :: Sol
   character(len=*)          :: name_phi
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type),  pointer :: flow
+  type(Field_Type),  pointer :: Flow
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w
   type(Var_Type),    pointer :: kin, eps, zeta, f22
@@ -83,11 +83,11 @@
 ! but dens > 1 mod. not applied here yet
 
   ! Take aliases
-  flow => turb % pnt_flow
-  grid => flow % pnt_grid
+  Flow => turb % pnt_flow
+  grid => Flow % pnt_grid
   nc   =  grid % n_cells
   nb   =  grid % n_bnd_cells
-  call Field_Mod_Alias_Momentum   (flow, u, v, w)
+  call Flow % Alias_Momentum(u, v, w)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
   call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
   call Sol % Alias_Solver         (A, b)
@@ -106,50 +106,50 @@
 ! !      model that required much more memory         !
 ! !---------------------------------------------------!
 ! if(name_phi == "23") then
-!   call Field_Mod_Grad_Component(flow, uu % n, 1, var3x) ! duu/dx  
-!   call Field_Mod_Grad_Component(flow, uu % n, 2, var3y) ! duu/dy  
-!   call Field_Mod_Grad_Component(flow, uu % n, 3, var3z) ! duu/dz  
+!   call Flow % Grad_Component(uu % n, 1, var3x) ! duu/dx  
+!   call Flow % Grad_Component(uu % n, 2, var3y) ! duu/dy  
+!   call Flow % Grad_Component(uu % n, 3, var3z) ! duu/dz  
 !
-!   call Field_Mod_Grad_Component(flow, vv % n, 1, var4x) ! duw/dx  
-!   call Field_Mod_Grad_Component(flow, vv % n, 2, var4y) ! duw/dy  
-!   call Field_Mod_Grad_Component(flow, vv % n, 3, var4z) ! duw/dz  
+!   call Flow % Grad_Component(vv % n, 1, var4x) ! duw/dx  
+!   call Flow % Grad_Component(vv % n, 2, var4y) ! duw/dy  
+!   call Flow % Grad_Component(vv % n, 3, var4z) ! duw/dz  
 !
-!   call Field_Mod_Grad_Component(flow, ww % n, 1, var5x) ! duw/dx  
-!   call Field_Mod_Grad_Component(flow, ww % n, 2, var5y) ! duw/dy  
-!   call Field_Mod_Grad_Component(flow, ww % n, 3, var5z) ! duw/dz  
+!   call Flow % Grad_Component(ww % n, 1, var5x) ! duw/dx  
+!   call Flow % Grad_Component(ww % n, 2, var5y) ! duw/dy  
+!   call Flow % Grad_Component(ww % n, 3, var5z) ! duw/dz  
 !
-!   call Field_Mod_Grad_Component(flow, uv % n, 1, var6x) ! duv/dx  
-!   call Field_Mod_Grad_Component(flow, uv % n, 2, var6y) ! duv/dy  
-!   call Field_Mod_Grad_Component(flow, uv % n, 3, var6z) ! duv/dz  
+!   call Flow % Grad_Component(uv % n, 1, var6x) ! duv/dx  
+!   call Flow % Grad_Component(uv % n, 2, var6y) ! duv/dy  
+!   call Flow % Grad_Component(uv % n, 3, var6z) ! duv/dz  
 !
-!   call Field_Mod_Grad_Component(flow, uw % n, 1, kin % x) ! duw/dx  
-!   call Field_Mod_Grad_Component(flow, uw % n, 2, kin % y) ! duw/dy  
-!   call Field_Mod_Grad_Component(flow, uw % n, 3, kin % z) ! duw/dz  
+!   call Flow % Grad_Component(uw % n, 1, kin % x) ! duw/dx  
+!   call Flow % Grad_Component(uw % n, 2, kin % y) ! duw/dy  
+!   call Flow % Grad_Component(uw % n, 3, kin % z) ! duw/dz  
 !
-!   call Field_Mod_Grad_Component(flow, vw % n, 1, var8x) ! duw/dx  
-!   call Field_Mod_Grad_Component(flow, vw % n, 2, var8y) ! duw/dy  
-!   call Field_Mod_Grad_Component(flow, vw % n, 3, var8z) ! duw/dz  
+!   call Flow % Grad_Component(vw % n, 1, var8x) ! duw/dx  
+!   call Flow % Grad_Component(vw % n, 2, var8y) ! duw/dy  
+!   call Flow % Grad_Component(vw % n, 3, var8z) ! duw/dz  
 !
-!   call Field_Mod_Grad_Component(flow, u % x, 1, var1x)  ! d2U/dxdx
-!   call Field_Mod_Grad_Component(flow, u % y, 2, var1y)  ! d2U/dydy
-!   call Field_Mod_Grad_Component(flow, u % z, 3, var1z)  ! d2U/dzdz
-!   call Field_Mod_Grad_Component(flow, u % x, 2, var2x)  ! d2U/dxdy
-!   call Field_Mod_Grad_Component(flow, u % x, 3, var2y)  ! d2U/dxdz
-!   call Field_Mod_Grad_Component(flow, u % y, 3, var2z)  ! d2U/dydz
+!   call Flow % Grad_Component(u % x, 1, var1x)  ! d2U/dxdx
+!   call Flow % Grad_Component(u % y, 2, var1y)  ! d2U/dydy
+!   call Flow % Grad_Component(u % z, 3, var1z)  ! d2U/dzdz
+!   call Flow % Grad_Component(u % x, 2, var2x)  ! d2U/dxdy
+!   call Flow % Grad_Component(u % x, 3, var2y)  ! d2U/dxdz
+!   call Flow % Grad_Component(u % y, 3, var2z)  ! d2U/dydz
 !
-!   call Field_Mod_Grad_Component(flow, v % x, 1, var9x)  ! d2V/dxdx
-!   call Field_Mod_Grad_Component(flow, v % y, 2, var9y)  ! d2V/dydy
-!   call Field_Mod_Grad_Component(flow, v % z, 3, var9z)  ! d2V/dzdz
-!   call Field_Mod_Grad_Component(flow, v % x, 2, var10x)  ! d2V/dxdy
-!   call Field_Mod_Grad_Component(flow, v % x, 3, var10y)  ! d2V/dxdz
-!   call Field_Mod_Grad_Component(flow, v % y, 3, var10z)  ! d2V/dydz
+!   call Flow % Grad_Component(v % x, 1, var9x)  ! d2V/dxdx
+!   call Flow % Grad_Component(v % y, 2, var9y)  ! d2V/dydy
+!   call Flow % Grad_Component(v % z, 3, var9z)  ! d2V/dzdz
+!   call Flow % Grad_Component(v % x, 2, var10x)  ! d2V/dxdy
+!   call Flow % Grad_Component(v % x, 3, var10y)  ! d2V/dxdz
+!   call Flow % Grad_Component(v % y, 3, var10z)  ! d2V/dydz
 !
-!   call Field_Mod_Grad_Component(flow, w % x, 1, var11x)  ! d2W/dxdx
-!   call Field_Mod_Grad_Component(flow, w % y, 2, var11y)  ! d2W/dydy
-!   call Field_Mod_Grad_Component(flow, w % z, 3, var11z)  ! d2W/dzdz
-!   call Field_Mod_Grad_Component(flow, w % x, 2, var12x)  ! d2W/dxdy
-!   call Field_Mod_Grad_Component(flow, w % x, 3, var12y)  ! d2W/dxdz
-!   call Field_Mod_Grad_Component(flow, w % y, 3, var12z)  ! d2W/dydz
+!   call Flow % Grad_Component(w % x, 1, var11x)  ! d2W/dxdx
+!   call Flow % Grad_Component(w % y, 2, var11y)  ! d2W/dydy
+!   call Flow % Grad_Component(w % z, 3, var11z)  ! d2W/dzdz
+!   call Flow % Grad_Component(w % x, 2, var12x)  ! d2W/dxdy
+!   call Flow % Grad_Component(w % x, 3, var12y)  ! d2W/dxdz
+!   call Flow % Grad_Component(w % y, 3, var12z)  ! d2W/dydz
 !
 !   do c = 1, grid % n_cells
 !     uxx = var1x(c)
@@ -245,32 +245,32 @@
   if(name_phi == 'EPS') then
     do i=1,3
       if(i == 1) then
-        call Field_Mod_Grad_Component(flow, u % x, 1, ui_xx(-nb:nc))  ! d2u/dxdx
-        call Field_Mod_Grad_Component(flow, u % x, 2, ui_xy(-nb:nc))  ! d2u/dxdy
-        call Field_Mod_Grad_Component(flow, u % x, 3, ui_xz(-nb:nc))  ! d2u/dxdz
-        call Field_Mod_Grad_Component(flow, u % y, 2, ui_yy(-nb:nc))  ! d2u/dydy
-        call Field_Mod_Grad_Component(flow, u % y, 3, ui_yz(-nb:nc))  ! d2u/dydz
-        call Field_Mod_Grad_Component(flow, u % z, 3, ui_zz(-nb:nc))  ! d2u/dzdz
+        call Flow % Grad_Component(u % x, 1, ui_xx(-nb:nc))  ! d2u/dxdx
+        call Flow % Grad_Component(u % x, 2, ui_xy(-nb:nc))  ! d2u/dxdy
+        call Flow % Grad_Component(u % x, 3, ui_xz(-nb:nc))  ! d2u/dxdz
+        call Flow % Grad_Component(u % y, 2, ui_yy(-nb:nc))  ! d2u/dydy
+        call Flow % Grad_Component(u % y, 3, ui_yz(-nb:nc))  ! d2u/dydz
+        call Flow % Grad_Component(u % z, 3, ui_zz(-nb:nc))  ! d2u/dzdz
       end if
       if(i == 2) then
-        call Field_Mod_Grad_Component(flow, v % x, 1, ui_xx(-nb:nc))  ! d2v/dxdx
-        call Field_Mod_Grad_Component(flow, v % x, 2, ui_xy(-nb:nc))  ! d2v/dxdy
-        call Field_Mod_Grad_Component(flow, v % x, 3, ui_xz(-nb:nc))  ! d2v/dxdz
-        call Field_Mod_Grad_Component(flow, v % y, 2, ui_yy(-nb:nc))  ! d2v/dydy
-        call Field_Mod_Grad_Component(flow, v % y, 3, ui_yz(-nb:nc))  ! d2v/dydz
-        call Field_Mod_Grad_Component(flow, v % z, 3, ui_zz(-nb:nc))  ! d2v/dzdz
+        call Flow % Grad_Component(v % x, 1, ui_xx(-nb:nc))  ! d2v/dxdx
+        call Flow % Grad_Component(v % x, 2, ui_xy(-nb:nc))  ! d2v/dxdy
+        call Flow % Grad_Component(v % x, 3, ui_xz(-nb:nc))  ! d2v/dxdz
+        call Flow % Grad_Component(v % y, 2, ui_yy(-nb:nc))  ! d2v/dydy
+        call Flow % Grad_Component(v % y, 3, ui_yz(-nb:nc))  ! d2v/dydz
+        call Flow % Grad_Component(v % z, 3, ui_zz(-nb:nc))  ! d2v/dzdz
       end if
       if(i == 3) then
-        call Field_Mod_Grad_Component(flow, w % x, 1, ui_xx(-nb:nc))  ! d2w/dxdx
-        call Field_Mod_Grad_Component(flow, w % x, 2, ui_xy(-nb:nc))  ! d2w/dxdy
-        call Field_Mod_Grad_Component(flow, w % x, 3, ui_xz(-nb:nc))  ! d2w/dxdz
-        call Field_Mod_Grad_Component(flow, w % y, 2, ui_yy(-nb:nc))  ! d2w/dydy
-        call Field_Mod_Grad_Component(flow, w % y, 3, ui_yz(-nb:nc))  ! d2w/dydz
-        call Field_Mod_Grad_Component(flow, w % z, 3, ui_zz(-nb:nc))  ! d2w/dzdz
+        call Flow % Grad_Component(w % x, 1, ui_xx(-nb:nc))  ! d2w/dxdx
+        call Flow % Grad_Component(w % x, 2, ui_xy(-nb:nc))  ! d2w/dxdy
+        call Flow % Grad_Component(w % x, 3, ui_xz(-nb:nc))  ! d2w/dxdz
+        call Flow % Grad_Component(w % y, 2, ui_yy(-nb:nc))  ! d2w/dydy
+        call Flow % Grad_Component(w % y, 3, ui_yz(-nb:nc))  ! d2w/dydz
+        call Flow % Grad_Component(w % z, 3, ui_zz(-nb:nc))  ! d2w/dzdz
       end if
 
       do c = 1, grid % n_cells
-        kin_vis = flow % viscosity(c) / flow % density(c)
+        kin_vis = Flow % viscosity(c) / Flow % density(c)
         if(i == 1) then
           uxx = ui_xx(c)
           uxy = ui_xy(c)
@@ -341,14 +341,14 @@
     end do  ! i
   end if    ! end if EPS == yes
 
-  call Field_Mod_Grad(flow, turb % l_scale, l_sc_x(-nb:nc),  &
-                                            l_sc_y(-nb:nc),  &
-                                            l_sc_z(-nb:nc))
+  call Flow % Grad(turb % l_scale, l_sc_x(-nb:nc),  &
+                                   l_sc_y(-nb:nc),  &
+                                   l_sc_z(-nb:nc))
 
   r13 = ONE_THIRD
   r23 = TWO_THIRDS
   do  c = 1, grid % n_cells
-    kin_vis = flow % viscosity(c) / flow % density(c)
+    kin_vis = Flow % viscosity(c) / Flow % density(c)
     turb % p_kin(c) = max(                                                     &
           - (  uu % n(c)*u % x(c) + uv % n(c)*u % y(c) + uw % n(c)*u % z(c)    &
              + uv % n(c)*v % x(c) + vv % n(c)*v % y(c) + vw % n(c)*v % z(c)    &
@@ -595,17 +595,17 @@
     !---------------!
     if(name_phi == 'UU') then
 
-      b(c) = b(c) + flow % density(c) * (  max(p11,0.0)  &
+      b(c) = b(c) + Flow % density(c) * (  max(p11,0.0)  &
                      + cc1 * eps % n(c) * r23            &
                      + max(var2_11, 0.0)                 &
                      + max(var1w_11,0.0)                 &
                      + max(var2w_11,0.0))*grid % vol(c)
       A % val(A % dia(c)) = A % val(A % dia(c))                               &
-                + flow % density(c) * (  cc1 * eps % n(c) / kin % n(c)        &
+                + Flow % density(c) * (  cc1 * eps % n(c) / kin % n(c)        &
                              + c1w * f_w * eps % n(c) / kin % n(c)*3.0*n1*n1  &
                              + fss * eps % n(c) / kin % n(c))*grid % vol(c)
       A % val(A % dia(c)) = A % val(A % dia(c))               &
-                + flow % density(c) * (  max(-p11,     0.0)   &
+                + Flow % density(c) * (  max(-p11,     0.0)   &
                              + max(-var2_11, 0.0)             &
                              + max(-var1w_11,0.0)             &
                              + max(-var2w_11,0.0)             &
@@ -617,17 +617,17 @@
     !---------------!
     else if(name_phi == 'VV') then
 
-      b(c) = b(c) + flow % density(c) * (  max(p22,0.0)  &
+      b(c) = b(c) + Flow % density(c) * (  max(p22,0.0)  &
                      + cc1 * eps % n(c) * r23            &
                      + max(var2_22, 0.0)                 &
                      + max(var1w_22,0.0)                 &
                      + max(var2w_22,0.0))*grid % vol(c)
       A % val(A % dia(c)) = A % val(A % dia(c))                               &
-                + flow % density(c) * (  cc1 * eps % n(c) / kin % n(c)        &
+                + Flow % density(c) * (  cc1 * eps % n(c) / kin % n(c)        &
                              + c1w * f_w * eps % n(c) / kin % n(c)*3.0*n2*n2  &
                              + fss * eps % n(c) / kin % n(c))*grid % vol(c)
       A % val(A % dia(c)) = A % val(A % dia(c))               &
-                + flow % density(c) * (  max(-p22,     0.0)   &
+                + Flow % density(c) * (  max(-p22,     0.0)   &
                              + max(-var2_22, 0.0)             &
                              + max(-var1w_22,0.0)             &
                              + max(-var2w_22,0.0)             &
@@ -639,17 +639,17 @@
     !---------------!
     else if(name_phi == 'WW') then
 
-      b(c) = b(c) + flow % density(c) * (  max(p33,0.0)  &
+      b(c) = b(c) + Flow % density(c) * (  max(p33,0.0)  &
                      + cc1 * eps % n(c) * r23            &
                      + max(var2_33, 0.0)                 &
                      + max(var1w_33,0.0)                 &
                      + max(var2w_33,0.0))*grid % vol(c)
       A % val(A % dia(c)) = A % val(A % dia(c))                               &
-                + flow % density(c) * (  cc1 * eps % n(c) / kin % n(c)        &
+                + Flow % density(c) * (  cc1 * eps % n(c) / kin % n(c)        &
                              + c1w * f_w * eps % n(c) / kin % n(c)*3.0*n3*n3  &
                              + fss * eps % n(c) / kin % n(c))*grid % vol(c)
       A % val(A % dia(c)) = A % val(A % dia(c))               &
-                + flow % density(c) * (  max(-p33,     0.0)   &
+                + Flow % density(c) * (  max(-p33,     0.0)   &
                              + max(-var2_33, 0.0)             &
                              + max(-var1w_33,0.0)             &
                              + max(-var2w_33,0.0)             &
@@ -660,10 +660,10 @@
     !   UV stress   !
     !---------------!
     else if(name_phi == 'UV') then
-      b(c) = b(c) + flow % density(c) * (p12 + var2_12 + var1w_12 + var2w_12)  &
+      b(c) = b(c) + Flow % density(c) * (p12 + var2_12 + var1w_12 + var2w_12)  &
            * grid % vol(c)
       A % val(A % dia(c)) = A % val(A % dia(c))                             &
-            + flow % density(c) * (  cc1 * eps % n(c) / kin % n(c)          &
+            + Flow % density(c) * (  cc1 * eps % n(c) / kin % n(c)          &
                + c1w * f_w * eps % n(c) / kin % n(c) * 1.5*(n1*n1 + n2*n2)  &
                + fss * eps % n(c) / kin % n(c) ) * grid % vol(c)
 
@@ -671,10 +671,10 @@
     !   UW stress   !
     !---------------!
     else if(name_phi == 'UW') then
-      b(c) = b(c) + flow % density(c) * (p13 + var2_13 + var1w_13 + var2w_13)  &
+      b(c) = b(c) + Flow % density(c) * (p13 + var2_13 + var1w_13 + var2w_13)  &
            * grid % vol(c)
       A % val(A % dia(c)) = A % val(A % dia(c))                             &
-            + flow % density(c) * (  cc1 * eps % n(c) / kin % n(c)          &
+            + Flow % density(c) * (  cc1 * eps % n(c) / kin % n(c)          &
                + c1w * f_w * eps % n(c) / kin % n(c) * 1.5*(n1*n1 + n3*n3)  &
                + fss * eps % n(c) / kin % n(c) ) * grid % vol(c)
 
@@ -682,10 +682,10 @@
     !   VW stress   !
     !---------------!
     else if(name_phi == 'VW') then
-      b(c) = b(c) + flow % density(c) * (p23 + var2_23 + var1w_23 + var2w_23)  &
+      b(c) = b(c) + Flow % density(c) * (p23 + var2_23 + var1w_23 + var2w_23)  &
            * grid % vol(c)
       A % val(A % dia(c)) = A % val(A % dia(c))                             &
-            + flow % density(c) * (  cc1 * eps % n(c) / kin % n(c)          &
+            + Flow % density(c) * (  cc1 * eps % n(c) / kin % n(c)          &
                + c1w * f_w * eps % n(c) / kin % n(c) * 1.5*(n2*n2 + n3*n3)  &
                + fss * eps % n(c) / kin % n(c) ) * grid % vol(c)
 
@@ -696,9 +696,9 @@
       f_eps = 1.0 - ((c_2e-1.4)/c_2e) * exp(-(re_t/6.0)**2)
       eps_1 = 1.44 * turb % p_kin(c) / turb % t_scale(c)
       eps_2 = c_2e * f_eps  / turb % t_scale(c)
-      b(c) = b(c) + flow % density(c) * (eps_1 + diss1(c)) * grid % vol(c)
+      b(c) = b(c) + Flow % density(c) * (eps_1 + diss1(c)) * grid % vol(c)
 
-      A % val(A % dia(c)) = A % val(A % dia(c)) + flow % density(c) * eps_2  &
+      A % val(A % dia(c)) = A % val(A % dia(c)) + Flow % density(c) * eps_2  &
                           * grid % vol(c)
     end if
   end do
@@ -708,14 +708,14 @@
   end do
 
   if(name_phi == 'EPS') then
-    call Field_Mod_Grad(flow, kin_e(-nb:nc), kin_e_x(-nb:nc),  &
-                                             kin_e_y(-nb:nc),  &
-                                             kin_e_z(-nb:nc))
+    call Flow % Grad(kin_e(-nb:nc), kin_e_x(-nb:nc),  &
+                                    kin_e_y(-nb:nc),  &
+                                    kin_e_z(-nb:nc))
     do c = 1, grid % n_cells
-      kin_vis = flow % viscosity(c) / flow % density(c)
+      kin_vis = Flow % viscosity(c) / Flow % density(c)
       re_t  = (kin % n(c)**2) / (kin_vis*eps % n(c) + TINY)
       f_eps = 1.0 - ((c_2e-1.4)/c_2e) * exp(-(re_t/6.0)**2)
-      b(c) = b(c) + flow % density(c)                               &
+      b(c) = b(c) + Flow % density(c)                               &
                      * (c_2e * f_eps / turb % t_scale(c)            &
                      * (kin_vis *(  kin_e_x(c)**2                   &
                                   + kin_e_y(c)**2                   &
@@ -734,7 +734,7 @@
         if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
 
-          kin_vis = flow % viscosity(c1) / flow % density(c1)
+          kin_vis = Flow % viscosity(c1) / Flow % density(c1)
           eps % n(c2) = kin_vis * (  kin_e_x(c1)**2  &
                                    + kin_e_y(c1)**2  &
                                    + kin_e_z(c1)**2)

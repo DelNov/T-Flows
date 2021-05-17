@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(flow, turb, Vof, swarm, ts)
+  subroutine User_Mod_Save_Results(Flow, turb, Vof, swarm, ts)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
@@ -8,7 +8,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
+  type(Field_Type), target :: Flow
   type(Turb_Type),  target :: turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: swarm
@@ -26,9 +26,9 @@
 !==============================================================================!
 
   ! Take aliases
-  grid   => flow % pnt_grid
-  u      => flow % u
-  ub     => flow % bulk % u
+  grid   => Flow % pnt_grid
+  u      => Flow % u
+  ub     => Flow % bulk % u
 
   ! Set the name for coordinate file
   call File_Mod_Set_Name(coord_name, extension='.1d')

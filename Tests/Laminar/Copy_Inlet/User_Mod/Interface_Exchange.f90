@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine User_Mod_Interface_Exchange(inter, flow, n_dom)
+  subroutine User_Mod_Interface_Exchange(inter, Flow, n_dom)
 !------------------------------------------------------------------------------!
 !   Create interface between two grids.                                        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Interface_Type)        :: inter(MD, MD)
-  type(Field_Type),    target :: flow(MD)
+  type(Field_Type),    target :: Flow(MD)
   integer, intent(in)         :: n_dom
 !-----------------------------------[Locals]-----------------------------------!
   integer :: d1, d2, n1, n2, n, ic1, bc1, ic2, bc2
@@ -22,16 +22,16 @@
   do d1 = 1, n_dom
     do d2 = 1, n_dom
       call Interface_Mod_To_Buffer(inter(d1, d2),        &
-                                   flow(d1) % u % n,     &
-                                   flow(d2) % u % n,     &
+                                   Flow(d1) % u % n,     &
+                                   Flow(d2) % u % n,     &
                                    U)
       call Interface_Mod_To_Buffer(inter(d1, d2),        &
-                                   flow(d1) % v % n,     &
-                                   flow(d2) % v % n,     &
+                                   Flow(d1) % v % n,     &
+                                   Flow(d2) % v % n,     &
                                    V)
       call Interface_Mod_To_Buffer(inter(d1, d2),        &
-                                   flow(d1) % w % n,     &
-                                   flow(d2) % w % n,     &
+                                   Flow(d1) % w % n,     &
+                                   Flow(d2) % w % n,     &
                                    W)
     end do
   end do
@@ -50,9 +50,9 @@
         u1  = inter(d1, d2) % phi_1(n, U)  ! u-velocity in domain 1
         v1  = inter(d1, d2) % phi_1(n, V)  ! u-velocity in domain 1
         w1  = inter(d1, d2) % phi_1(n, W)  ! u-velocity in domain 1
-        flow(d2) % u % n(bc2) = u1
-        flow(d2) % v % n(bc2) = v1
-        flow(d2) % w % n(bc2) = w1
+        Flow(d2) % u % n(bc2) = u1
+        Flow(d2) % v % n(bc2) = v1
+        Flow(d2) % w % n(bc2) = w1
       end do
     end do
   end do

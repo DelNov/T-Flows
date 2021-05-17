@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(flow, turb, Vof, swarm, ts)
+  subroutine User_Mod_Save_Results(Flow, turb, Vof, swarm, ts)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
@@ -8,7 +8,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
+  type(Field_Type), target :: Flow
   type(Turb_Type),  target :: turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: swarm
@@ -35,10 +35,10 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => flow % pnt_grid
-  bulk => flow % bulk
-  call Field_Mod_Alias_Momentum   (flow, u, v, w)
-  call Field_Mod_Alias_Energy     (flow, t)
+  grid => Flow % pnt_grid
+  bulk => Flow % bulk
+  call Flow % Alias_Momentum(u, v, w)
+  call Flow % Alias_Energy  (t)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f)
   call Turb_Mod_Alias_Heat_Fluxes (turb, ut, vt, wt) 
   call Turb_Mod_Alias_T2          (turb, t2) 
@@ -48,7 +48,7 @@
   t_hot  = 15.0
   t_diff =  t_hot - t_cold
 
-  call Field_Mod_Grad_Variable(flow, t)
+  call Flow % Grad_Variable(t)
 
   ! Set the name for coordinate file
   call File_Mod_Set_Name(coord_name, extension='.1d')
@@ -117,7 +117,7 @@
 
   allocate(n_count(n_prob)); n_count=0
   count = 0
-  if(flow % heat_transfer) then
+  if(Flow % heat_transfer) then
     allocate(t_p (n_prob));     t_p = 0.0
     allocate(t2_p(n_prob));     t2_p = 0.0
     allocate(t2_mod_p(n_prob)); t2_mod_p = 0.0
@@ -156,7 +156,7 @@
                      + turb % ww_res(c) - turb % w_mean(c) * turb % w_mean(c))
         kin_mod_p(i) = kin_mod_p(i) + turb % kin_mean(c)
 
-        if(flow % heat_transfer) then
+        if(Flow % heat_transfer) then
           t_p(i)  = t_p(i)  + (turb % t_mean(c) - t_cold)/t_diff
           t2_p(i) = t2_p(i) + turb % t2_mean(c)  &
                             - turb % t_mean(c) * turb % t_mean(c)
@@ -196,7 +196,7 @@
 
     count =  count + n_count(pl)
 
-    if(flow % heat_transfer) then
+    if(Flow % heat_transfer) then
       call Comm_Mod_Global_Sum_Real(t_p(pl))
       call Comm_Mod_Global_Sum_Real(t2_p(pl))
       call Comm_Mod_Global_Sum_Real(t2_mod_p(pl))
@@ -225,7 +225,7 @@
       kin_p(i) = kin_p(i) / n_count(i)
       kin_mod_p(i) = kin_mod_p(i) / n_count(i)
 
-      if(flow % heat_transfer) then
+      if(Flow % heat_transfer) then
         t_p (i) = t_p (i) / n_count(i)
         t2_p(i) = t2_p(i) / n_count(i)
         t2_mod_p(i) = t2_mod_p(i) / n_count(i)
@@ -241,7 +241,7 @@
 
   open(3, file = res_name)
 
-  if(flow % heat_transfer) then
+  if(Flow % heat_transfer) then
     if(this_proc < 2) then
       write(3,'(a1,(a12, f12.6))')'#', ' Nu number = ',  &
                tz_p(1) / (t_hot - t_cold)
@@ -301,7 +301,7 @@
   deallocate(uw_p)
   deallocate(kin_p)
   deallocate(kin_mod_p)
-  if(flow % heat_transfer) then
+  if(Flow % heat_transfer) then
     deallocate(t_p)
     deallocate(t2_p)
     deallocate(t2_mod_p)

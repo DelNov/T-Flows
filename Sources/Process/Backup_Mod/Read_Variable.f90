@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Backup_Mod_Read_Variable(fh, disp, vc, var_name, fld, var)
+  subroutine Backup_Mod_Read_Variable(fh, disp, vc, var_name, Fld, var)
 !------------------------------------------------------------------------------!
 !   Reads a whole variable from backup file.                                   !
 !------------------------------------------------------------------------------!
@@ -7,7 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   integer          :: fh, disp, vc
   character(len=*) :: var_name
-  type(Field_Type) :: fld
+  type(Field_Type) :: Fld
   type(Var_Type)   :: var
 !-----------------------------------[Locals]-----------------------------------!
   type(Comm_Type), pointer :: comm
@@ -55,7 +55,7 @@
       call Grid_Mod_Exchange_Cells_Real(grid, var % o(-nb:nc))
 
       ! Compute fresh gradients
-      call Field_Mod_Grad_Variable(fld, var)
+      call Fld % Grad_Variable(var)
 
       disp = disp_loop
       return

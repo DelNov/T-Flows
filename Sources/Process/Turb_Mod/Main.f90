@@ -10,25 +10,25 @@
   integer, intent(in) :: curr_dt ! current time step
   integer, intent(in) :: ini     ! inner iteration
 !----------------------------------[Locals]------------------------------------!
-  type(Field_Type), pointer :: flow
+  type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: grid
 !==============================================================================!
 
   ! Take aliases
-  flow => turb % pnt_flow
-  grid => flow % pnt_grid
+  Flow => turb % pnt_flow
+  grid => Flow % pnt_grid
 
   !---------------------------------------------------!
   !   Start branching for various turbulence models   !
   !---------------------------------------------------!
 
   if(turb % model .eq. K_EPS) then
-    call Calculate_Shear_And_Vorticity(flow)
+    call Calculate_Shear_And_Vorticity(Flow)
 
     call Turb_Mod_Compute_Variable(turb, Sol, curr_dt, ini, turb % kin)
     call Turb_Mod_Compute_Variable(turb, Sol, curr_dt, ini, turb % eps)
 
-    if(flow % heat_transfer) then
+    if(Flow % heat_transfer) then
       call Turb_Mod_Calculate_Stress   (turb)
       call Turb_Mod_Calculate_Heat_Flux(turb)
       call Turb_Mod_Compute_Variable(turb, Sol, curr_dt, ini, turb % t2)
@@ -41,12 +41,12 @@
   if(turb % model .eq. K_EPS_ZETA_F .or. &
      turb % model .eq. HYBRID_LES_RANS) then
 
-    call Calculate_Shear_And_Vorticity(flow)
+    call Calculate_Shear_And_Vorticity(Flow)
 
     call Turb_Mod_Compute_Variable(turb, Sol, curr_dt, ini, turb % kin)
     call Turb_Mod_Compute_Variable(turb, Sol, curr_dt, ini, turb % eps)
 
-    if(flow % heat_transfer) then
+    if(Flow % heat_transfer) then
       call Turb_Mod_Calculate_Stress   (turb)
       call Turb_Mod_Calculate_Heat_Flux(turb)
       call Turb_Mod_Compute_Variable(turb, Sol, curr_dt, ini, turb % t2)
@@ -64,9 +64,9 @@
 
     call Time_And_Length_Scale(grid, turb)
 
-    call Field_Mod_Grad_Variable(flow, flow % u)
-    call Field_Mod_Grad_Variable(flow, flow % v)
-    call Field_Mod_Grad_Variable(flow, flow % w)
+    call Flow % Grad_Variable(Flow % u)
+    call Flow % Grad_Variable(Flow % v)
+    call Flow % Grad_Variable(Flow % w)
 
     call Turb_Mod_Compute_Stress(turb, Sol, curr_dt, ini, turb % uu)
     call Turb_Mod_Compute_Stress(turb, Sol, curr_dt, ini, turb % vv)
@@ -84,15 +84,15 @@
 
     call Turb_Mod_Vis_T_Rsm(turb)
 
-    if(flow % heat_transfer) then
+    if(Flow % heat_transfer) then
       call Turb_Mod_Calculate_Heat_Flux(turb)
     end if
   end if
 
   if(turb % model .eq. SPALART_ALLMARAS .or.  &
      turb % model .eq. DES_SPALART) then
-    call Calculate_Shear_And_Vorticity(flow)
-    call Calculate_Vorticity(flow)
+    call Calculate_Shear_And_Vorticity(Flow)
+    call Calculate_Vorticity(Flow)
 
     call Turb_Mod_Compute_Variable(turb, Sol, curr_dt, ini, turb % vis)
     call Turb_Mod_Vis_T_Spalart_Allmaras(turb)

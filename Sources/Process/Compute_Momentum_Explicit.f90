@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Momentum_Explicit(flow, ui, Sol)
+  subroutine Compute_Momentum_Explicit(Flow, ui, Sol)
 !------------------------------------------------------------------------------!
 !   Explicit computation of momentum equations, used in PISO algorithm,        !
 !------------------------------------------------------------------------------!
@@ -18,7 +18,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),  target :: flow
+  type(Field_Type),  target :: Flow
   type(Var_Type)            :: ui        ! velocity component
   type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
@@ -29,13 +29,13 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => flow % pnt_grid
+  grid => Flow % pnt_grid
   M    => Sol % M
   b    => Sol % b % val
 
   ! PISO corrections are executed here
-  if (flow % p_m_coupling == PISO .and.  &
-      flow % piso_status .eqv. .true.) then
+  if (Flow % p_m_coupling == PISO .and.  &
+      Flow % piso_status .eqv. .true.) then
 
     ! Sum of neighbours
     neigh = 0.0
@@ -54,7 +54,7 @@
       ui % n(c) = (neigh(c) + b(c)) / M % val(M % dia(c))
     end do
 
-    call Field_Mod_Grad_Variable(flow, ui)
+    call Flow % Grad_Variable(ui)
 
   end if
 

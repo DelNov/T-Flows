@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine User_Mod_Interface_Exchange(inter, flow, n_dom)
+  subroutine User_Mod_Interface_Exchange(inter, Flow, n_dom)
 !------------------------------------------------------------------------------!
 !   Create interface between two grids.                                        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Interface_Type)        :: inter(MD, MD)
-  type(Field_Type),    target :: flow(MD)
+  type(Field_Type),    target :: Flow(MD)
   integer, intent(in)         :: n_dom
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: T  = 1,  &  ! store temperature as the first ...
@@ -32,20 +32,20 @@
 
       ! Send temperature to interface
       call Interface_Mod_To_Buffer(inter(d1, d2),        &
-                                   flow(d1) % t % n,     &
-                                   flow(d2) % t % n,     &
+                                   Flow(d1) % t % n,     &
+                                   Flow(d2) % t % n,     &
                                    T)
 
       ! Send conductivities as well
       call Interface_Mod_To_Buffer(inter(d1, d2),            &
-                                   flow(d1) % conductivity,  &
-                                   flow(d2) % conductivity,  &
+                                   Flow(d1) % conductivity,  &
+                                   Flow(d2) % conductivity,  &
                                    K)
 
       ! Send wall distance to the interface
       call Interface_Mod_To_Buffer(inter(d1, d2),                    &
-                                   flow(d1) % pnt_grid % wall_dist,  &
-                                   flow(d2) % pnt_grid % wall_dist,  &
+                                   Flow(d1) % pnt_grid % wall_dist,  &
+                                   Flow(d2) % pnt_grid % wall_dist,  &
                                    WD)
     end do
   end do
@@ -73,9 +73,9 @@
         bc1 = inter(d1, d2) % bcel_1(n1)   ! domain 1, cell on the boundary
 
         ! Fetch dependent variables from domain 1 (this domain)
-        t1  = flow(d1) % t % n(ic1)                 ! temperature in dom 1
-        k1  = flow(d1) % conductivity(ic1)          ! conductivity in dom 1
-        wd1 = flow(d1) % pnt_grid % wall_dist(ic1)  ! wall distance in dom 1
+        t1  = Flow(d1) % t % n(ic1)                 ! temperature in dom 1
+        k1  = Flow(d1) % conductivity(ic1)          ! conductivity in dom 1
+        wd1 = Flow(d1) % pnt_grid % wall_dist(ic1)  ! wall distance in dom 1
 
         ! Fetch values from buffers (other domain)
         t2  = inter(d1, d2) % phi_2(n, T)           ! temperature in dom 2
@@ -87,7 +87,7 @@
         !---------------------------------------------!
 
         ! Set temperature at the boundary of domain 1
-        flow(d1) % t % n(bc1) = (t1 * k1 / wd1 + t2 * k2 / wd2)  &
+        Flow(d1) % t % n(bc1) = (t1 * k1 / wd1 + t2 * k2 / wd2)  &
                               / (     k1 / wd1 +      k2 / wd2)
 
       end do
@@ -105,9 +105,9 @@
         bc2 = inter(d1, d2) % bcel_2(n2)   ! domain 1, cell on the boundary
 
         ! Fetch dependent variables
-        t2  = flow(d2) % t % n(ic2)                 ! temperature in dom 2
-        k2  = flow(d2) % conductivity(ic2)          ! conductivity in dom 2
-        wd2 = flow(d2) % pnt_grid % wall_dist(ic2)  ! wall distance in dom 2
+        t2  = Flow(d2) % t % n(ic2)                 ! temperature in dom 2
+        k2  = Flow(d2) % conductivity(ic2)          ! conductivity in dom 2
+        wd2 = Flow(d2) % pnt_grid % wall_dist(ic2)  ! wall distance in dom 2
 
         ! Fetch values from buffers (other domain in this case 1)
         t1  = inter(d1, d2) % phi_1(n, T)           ! temperature in dom 1
@@ -119,7 +119,7 @@
         !---------------------------------------------!
 
         ! Set temperature at the boundary of domain 2
-        flow(d2) % t % n(bc2) = (t1 * k1 / wd1 + t2 * k2 / wd2)  &
+        Flow(d2) % t % n(bc2) = (t1 * k1 / wd1 + t2 * k2 / wd2)  &
                               / (     k1 / wd1 +      k2 / wd2)
 
       end do

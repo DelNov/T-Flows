@@ -7,7 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Vof_Type), target :: Vof
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type), pointer :: flow
+  type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: grid
   type(Var_Type),   pointer :: fun
   type(Var_Type),   pointer :: smooth
@@ -15,7 +15,7 @@
 !==============================================================================!
 
   ! First take aliases
-  flow   => Vof % pnt_flow
+  Flow   => Vof % pnt_flow
   grid   => Vof % pnt_grid
   fun    => Vof % fun
   smooth => Vof % smooth
@@ -33,7 +33,7 @@
                              smooth % n(-nb:nc), Vof % n_conv_curv)
 
     ! ... and find its gradients as well
-    call Field_Mod_Grad_Variable(flow, smooth)
+    call Flow % Grad_Variable(smooth)
 
   !-------------------------------------------------------!
   !   Curvature smoothing was not engaged                 !
@@ -46,7 +46,7 @@
     end do
 
     ! ... and find its gradients as well
-    call Field_Mod_Grad_Variable(flow, smooth)
+    call Flow % Grad_Variable(smooth)
   end if
 
   !-------------------------------------------------------------!
@@ -55,7 +55,7 @@
   if(Vof % n_conv_norm > 0) then
     call Vof % Smooth_Scalar(grid, fun % n,   &
                              smooth % n(-nb:nc), Vof % n_conv_norm)
-    call Field_Mod_Grad_Variable(flow, smooth)
+    call Flow % Grad_Variable(smooth)
   end if
 
   end subroutine

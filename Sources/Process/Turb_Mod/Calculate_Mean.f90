@@ -8,7 +8,7 @@
   type(Turb_Type),  target :: turb
   integer                  :: n0, n1
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type), pointer :: flow
+  type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: grid
   type(Var_Type),   pointer :: u, v, w, p, t, phi
   type(Var_Type),   pointer :: kin, eps, f22, zeta, vis, t2
@@ -31,13 +31,13 @@
   if(.not. turb % statistics) return
 
   ! Take aliases
-  flow => turb % pnt_flow
-  grid => flow % pnt_grid
-  p    => flow % p
+  Flow => turb % pnt_flow
+  grid => Flow % pnt_grid
+  p    => Flow % p
   vis  => turb % vis
   t2   => turb % t2
-  call Field_Mod_Alias_Momentum   (flow, u, v, w)
-  call Field_Mod_Alias_Energy     (flow, t)
+  call Flow % Alias_Momentum(u, v, w)
+  call Flow % Alias_Energy  (t)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
   call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
   call Turb_Mod_Alias_Heat_Fluxes (turb, ut, vt, wt)
@@ -84,7 +84,7 @@
         v_mean(c) = (v_mean(c) * real(n) + v % n(c)) / real(n+1)
         w_mean(c) = (w_mean(c) * real(n) + w % n(c)) / real(n+1)
         p_mean(c) = (p_mean(c) * real(n) + p % n(c)) / real(n+1)
-        if(flow % heat_transfer) then
+        if(Flow % heat_transfer) then
           t_mean(c) = (t_mean(c) * real(n) + t % n(c)) / real(n+1)
         end if
 
@@ -98,7 +98,7 @@
         vw_res(c) = (vw_res(c) * real(n) + v % n(c) * w % n(c)) / real(n+1)
 
         ! Resolved turbulent heat fluxes
-        if(flow % heat_transfer) then
+        if(Flow % heat_transfer) then
           t2_res(c) = (t2_res(c) * real(n) + t % n(c) * t % n(c)) / real(n+1)
           ut_res(c) = (ut_res(c) * real(n) + u % n(c) * t % n(c)) / real(n+1)
           vt_res(c) = (vt_res(c) * real(n) + v % n(c) * t % n(c)) / real(n+1)
@@ -116,7 +116,7 @@
         v_mean(c) = (v_mean(c) * real(n) + v % n(c)) / real(n+1)
         w_mean(c) = (w_mean(c) * real(n) + w % n(c)) / real(n+1)
         p_mean(c) = (p_mean(c) * real(n) + p % n(c)) / real(n+1)
-        if(flow % heat_transfer) then
+        if(Flow % heat_transfer) then
           t_mean(c) = (t_mean(c) * real(n) + t % n(c)) / real(n+1)
         end if
 
@@ -134,7 +134,7 @@
         vw_res(c) = (vw_res(c) * real(n) + v % n(c) * w % n(c)) / real(n+1)
 
         ! Resolved turbulent heat fluxes
-        if(flow % heat_transfer) then
+        if(Flow % heat_transfer) then
           t2_res (c) = (t2_res (c) * real(n) + t % n (c) * t % n(c)) / real(n+1)
           ut_res (c) = (ut_res (c) * real(n) + u %  n(c) * t % n(c)) / real(n+1)
           vt_res (c) = (vt_res (c) * real(n) + v %  n(c) * t % n(c)) / real(n+1)
@@ -156,7 +156,7 @@
         v_mean(c) = (v_mean(c) * real(n) + v % n(c)) / real(n+1)
         w_mean(c) = (w_mean(c) * real(n) + w % n(c)) / real(n+1)
         p_mean(c) = (p_mean(c) * real(n) + p % n(c)) / real(n+1)
-        if(flow % heat_transfer) then
+        if(Flow % heat_transfer) then
           t_mean(c) = (t_mean(c) * real(n) + t % n(c)) / real(n+1)
         end if
 
@@ -165,7 +165,7 @@
         eps_mean (c) = (eps_mean (c) * real(n) + eps  % n(c)) / real(n+1)
         zeta_mean(c) = (zeta_mean(c) * real(n) + zeta % n(c)) / real(n+1)
         f22_mean (c) = (f22_mean (c) * real(n) + f22  % n(c)) / real(n+1)
-        if(flow % heat_transfer) then
+        if(Flow % heat_transfer) then
           t2_mean(c) = (t2_mean(c) * real(n) + t2 % n(c)) / real(n+1)
         end if
 
@@ -179,7 +179,7 @@
         vw_res(c) = (vw_res(c) * real(n) + v % n(c) * w % n(c)) / real(n+1)
 
         ! Resolved turbulent heat fluxes
-        if(flow % heat_transfer) then
+        if(Flow % heat_transfer) then
           t2_res (c) = (t2_res (c) * real(n) + t % n (c) * t % n(c)) / real(n+1)
           ut_res (c) = (ut_res (c) * real(n) + u % n (c) * t % n(c)) / real(n+1)
           vt_res (c) = (vt_res (c) * real(n) + v % n (c) * t % n(c)) / real(n+1)
@@ -202,7 +202,7 @@
         v_mean(c) = (v_mean(c) * real(n) + v % n(c)) / real(n+1)
         w_mean(c) = (w_mean(c) * real(n) + w % n(c)) / real(n+1)
         p_mean(c) = (p_mean(c) * real(n) + p % n(c)) / real(n+1)
-        if(flow % heat_transfer) then
+        if(Flow % heat_transfer) then
           t_mean(c) = (t_mean(c) * real(n) + t % n(c)) / real(n+1)
         end if
 
@@ -229,7 +229,7 @@
         vw_res(c) = (vw_res(c) * real(n) + v % n(c) * w % n(c)) / real(n+1)
 
         ! Resolved turbulent heat fluxes
-        if(flow % heat_transfer) then
+        if(Flow % heat_transfer) then
           t2_res(c) = (t2_res(c) * real(n) + t % n(c) * t % n(c)) / real(n+1)
           ut_res(c) = (ut_res(c) * real(n) + u % n(c) * t % n(c)) / real(n+1)
           vt_res(c) = (vt_res(c) * real(n) + v % n(c) * t % n(c)) / real(n+1)
@@ -241,8 +241,8 @@
       !-------------!
       !   Scalars   !
       !-------------!
-      do sc = 1, flow % n_scalars
-        phi      => flow % scalar(sc)
+      do sc = 1, Flow % n_scalars
+        phi      => Flow % scalar(sc)
         phi_mean => turb % scalar_mean
         phi_mean(sc, c) = (phi_mean(sc, c) * real(n) + phi % n(c)) / real(n+1)
       end do

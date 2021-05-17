@@ -11,7 +11,7 @@
   integer, intent(in)       :: ini
   type(Var_Type)            :: phi
 !----------------------------------[Locals]------------------------------------!
-  type(Field_Type),  pointer :: flow
+  type(Field_Type),  pointer :: Flow
   type(Grid_Type),   pointer :: grid
   type(Matrix_Type), pointer :: A
   real, contiguous,  pointer :: b(:)
@@ -40,8 +40,8 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
-  flow => turb % pnt_flow
-  grid => flow % pnt_grid
+  Flow => turb % pnt_flow
+  grid => Flow % pnt_grid
   call Sol % Alias_Solver(A, b)
 
   ! Initialize matrix and right hand side
@@ -62,7 +62,7 @@
   end do
 
   ! Gradients
-  call Field_Mod_Grad_Variable(flow, phi)
+  call Flow % Grad_Variable(phi)
 
   !------------------!
   !                  !
@@ -175,6 +175,6 @@
     call Info_Mod_Iter_Fill_At(4, 2, phi % name, phi % eniter, phi % res)
   end if
 
-  call Field_Mod_Grad_Variable(flow, phi)
+  call Flow % Grad_Variable(phi)
 
   end subroutine

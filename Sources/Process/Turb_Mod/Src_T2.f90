@@ -10,7 +10,7 @@
 !---------------------------------[Calling]------------------------------------!
   real :: Y_Plus_Low_Re
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type),  pointer :: flow
+  type(Field_Type),  pointer :: Flow
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w, t
   type(Var_Type),    pointer :: kin, eps, ut, vt, wt, t2
@@ -33,10 +33,10 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
-  flow => turb % pnt_flow
-  grid => flow % pnt_grid
-  call Field_Mod_Alias_Momentum  (flow, u, v, w)
-  call Field_Mod_Alias_Energy    (flow, t)
+  Flow => turb % pnt_flow
+  grid => Flow % pnt_grid
+  call Flow % Alias_Momentum(u, v, w)
+  call Flow % Alias_Energy  (t)
   call Turb_Mod_Alias_K_Eps      (turb, kin, eps)
   call Turb_Mod_Alias_Heat_Fluxes(turb, ut, vt, wt)
   call Sol % Alias_Solver        (A, b)
@@ -47,7 +47,7 @@
   !-----------------------------------------!
 
   ! Temperature gradients are needed
-  call Field_Mod_Grad_Variable(flow, t)
+  call Flow % Grad_Variable(t)
 
   ! Production source:
   do c = 1, grid % n_cells
@@ -60,7 +60,7 @@
 
    ! Negative contribution
    A % val(A % dia(c)) = A % val(A % dia(c)) +  &
-         2.0 * flow % density(c)  * eps % n(c)  &
+         2.0 * Flow % density(c)  * eps % n(c)  &
              / (kin % n(c) + TINY) * grid % vol(c)
 
   end do
@@ -76,7 +76,7 @@
          Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
 
         ! Kinematic viscosities
-        kin_vis = flow % viscosity(c1) / flow % density(c1)
+        kin_vis = Flow % viscosity(c1) / Flow % density(c1)
 
         u_tau = c_mu25 * sqrt(kin % n(c1))
 

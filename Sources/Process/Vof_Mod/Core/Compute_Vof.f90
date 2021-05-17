@@ -10,7 +10,7 @@
   real                      :: dt
   integer                   :: n    ! current temporal iteration
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type),  pointer :: flow
+  type(Field_Type),  pointer :: Flow
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: fun
   type(Face_Type),   pointer :: v_flux
@@ -27,9 +27,9 @@
   call Cpu_Timer % Start('Compute_Multiphase (without solvers)')
 
   ! Take aliases
-  flow   => Vof % pnt_flow
-  grid   => flow % pnt_grid
-  v_flux => flow % v_flux
+  Flow   => Vof % pnt_flow
+  grid   => Flow % pnt_grid
+  v_flux => Flow % v_flux
   fun    => Vof % fun
   beta_f => Vof % beta_f
   beta_c => Vof % beta_c
@@ -111,7 +111,7 @@
       fun % o(:) = fun % n(:)
 
       ! Compute gradient:
-      call Field_Mod_Grad_Variable(flow, fun)
+      call Flow % Grad_Variable(fun)
 
       call Vof % Predict_Beta()
 
@@ -248,7 +248,7 @@
 
   end if
 
-  call Field_Mod_Grad_Variable(flow, fun)
+  call Flow % Grad_Variable(fun)
 
   call Cpu_Timer % Stop('Compute_Multiphase (without solvers)')
 

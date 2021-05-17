@@ -6,17 +6,17 @@ include '../User_Mod/Intersection_Line_Face.f90'
 include '../User_Mod/Interpolate_From_Nodes.f90'
 
 !==============================================================================!
-  subroutine User_Mod_Initialize_Variables(flow, turb, Vof, swarm, sol)
+  subroutine User_Mod_Initialize_Variables(Flow, turb, Vof, swarm, Sol)
 !------------------------------------------------------------------------------!
 !   Case-dependent initialization of VOF variable.                             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),  target :: flow
+  type(Field_Type),  target :: Flow
   type(Turb_Type),   target :: turb
   type(Vof_Type),    target :: Vof
   type(Swarm_Type),  target :: swarm
-  type(Solver_Type), target :: sol
+  type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: grid
   type(Var_Type),   pointer :: fun
@@ -54,9 +54,9 @@ include '../User_Mod/Interpolate_From_Nodes.f90'
 !==============================================================================!
 
   ! Take aliases
-  grid  => flow % pnt_grid
+  grid  => Flow % pnt_grid
   fun   => Vof % fun
-  dt    => flow % dt
+  dt    => Flow % dt
 
   epsloc = epsilon(epsloc)
 
@@ -146,7 +146,7 @@ include '../User_Mod/Interpolate_From_Nodes.f90'
 
     c_inters = 0
     do s = 1, grid % n_faces
-      call Intersection_Line_Face(flow, Vof, s, pab, pint, inters)
+      call Intersection_Line_Face(Flow, Vof, s, pab, pint, inters)
 
       if (inters) then
         if (c_inters == 0) then

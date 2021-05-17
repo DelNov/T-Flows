@@ -3,17 +3,17 @@ include '../User_Mod/Vof_Initialization_Box.f90'
 include '../User_Mod/Vof_Interface_Box.f90'
 
 !==============================================================================!
-  subroutine User_Mod_Initialize_Variables(flow, turb, Vof, swarm, sol)
+  subroutine User_Mod_Initialize_Variables(Flow, turb, Vof, swarm, Sol)
 !------------------------------------------------------------------------------!
 !   Case-dependent initialization of VOF variable.                             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),  target :: flow
+  type(Field_Type),  target :: Flow
   type(Turb_Type),   target :: turb
   type(Vof_Type),    target :: Vof
   type(Swarm_Type),  target :: swarm
-  type(Solver_Type), target :: sol
+  type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: grid
   type(Var_Type),   pointer :: fun, t
@@ -22,10 +22,10 @@ include '../User_Mod/Vof_Interface_Box.f90'
 !==============================================================================!
 
   ! Take aliases
-  grid => flow % pnt_grid
-  t    => flow % t
+  grid => Flow % pnt_grid
+  t    => Flow % t
   fun  => Vof % fun
-  dt   => flow % dt
+  dt   => Flow % dt
 
   !---------------------------------!
   !   Initialize the VOF function   !
@@ -50,7 +50,7 @@ include '../User_Mod/Vof_Interface_Box.f90'
   if(Vof % track_front) then
     call Front_Mod_Place_At_Var_Value(Vof % front,  &
                                       Vof % fun,    &
-                                      sol,           &
+                                      Sol,           &
                                       0.5,           &
                                       .true.)  ! don't print messages
     call Front_Mod_Calculate_Curvatures_From_Elems(Vof % front)
@@ -63,31 +63,31 @@ include '../User_Mod/Vof_Interface_Box.f90'
 
     ! Inside the water
     if(fun % n(c) .gt. 0.99) then
-!     flow % u % n(c) =   0.05
-!     flow % u % o(c) =   0.05
-      if(flow % heat_transfer) then
-        flow % t % n(c) = 100.0
-        flow % t % o(c) = 100.0
+!     Flow % u % n(c) =   0.05
+!     Flow % u % o(c) =   0.05
+      if(Flow % heat_transfer) then
+        Flow % t % n(c) = 100.0
+        Flow % t % o(c) = 100.0
       end if
 
     ! Inside the vapor
     else
-      flow % u % n(c) =   0.0
-      flow % u % o(c) =   0.0
+      Flow % u % n(c) =   0.0
+      Flow % u % o(c) =   0.0
 
-      if(flow % heat_transfer) then
-        ! small: flow % t % n(c) = 110.0 - grid % xc(c)/5.0e-5 * 10.0
-        ! small: flow % t % o(c) = 110.0 - grid % xc(c)/5.0e-5 * 100.0
-        ! MINI_1 flow % t % n(c) = 110.0 - grid % xc(c) * 100.0
-        ! MINI_1 flow % t % o(c) = 110.0 - grid % xc(c) * 100.0
-        ! MINI_2 flow % t % n(c) = 110.0 - grid % xc(c) * 400.0
-        ! MINI_2 flow % t % o(c) = 110.0 - grid % xc(c) * 400.0
-        ! MINI_3 flow % t % n(c) = 110.0 - grid % xc(c) * 4000.0
-        ! MINI_3 flow % t % o(c) = 110.0 - grid % xc(c) * 4000.0
-        ! MINI_4 flow % t % n(c) = 110.0 - grid % xc(c) * 10000.0
-        ! MINI_4 flow % t % o(c) = 110.0 - grid % xc(c) * 10000.0
-        flow % t % n(c) = 110.0 - grid % xc(c) * 20000.0
-        flow % t % o(c) = 110.0 - grid % xc(c) * 20000.0
+      if(Flow % heat_transfer) then
+        ! small: Flow % t % n(c) = 110.0 - grid % xc(c)/5.0e-5 * 10.0
+        ! small: Flow % t % o(c) = 110.0 - grid % xc(c)/5.0e-5 * 100.0
+        ! MINI_1 Flow % t % n(c) = 110.0 - grid % xc(c) * 100.0
+        ! MINI_1 Flow % t % o(c) = 110.0 - grid % xc(c) * 100.0
+        ! MINI_2 Flow % t % n(c) = 110.0 - grid % xc(c) * 400.0
+        ! MINI_2 Flow % t % o(c) = 110.0 - grid % xc(c) * 400.0
+        ! MINI_3 Flow % t % n(c) = 110.0 - grid % xc(c) * 4000.0
+        ! MINI_3 Flow % t % o(c) = 110.0 - grid % xc(c) * 4000.0
+        ! MINI_4 Flow % t % n(c) = 110.0 - grid % xc(c) * 10000.0
+        ! MINI_4 Flow % t % o(c) = 110.0 - grid % xc(c) * 10000.0
+        Flow % t % n(c) = 110.0 - grid % xc(c) * 20000.0
+        Flow % t % o(c) = 110.0 - grid % xc(c) * 20000.0
       end if
     end if
   end do

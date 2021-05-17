@@ -7,7 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type),  target :: turb
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type), pointer :: flow
+  type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: grid
   type(Var_Type),   pointer :: uu, vv, ww, uv, uw, vw
   type(Var_Type),   pointer :: t, ut, vt, wt
@@ -15,15 +15,15 @@
 !==============================================================================!
 
   ! Take aliases
-  flow => turb % pnt_flow
-  grid => flow % pnt_grid
-  t    => flow % t
+  Flow => turb % pnt_flow
+  grid => Flow % pnt_grid
+  t    => Flow % t
   call Turb_Mod_Alias_Heat_Fluxes(turb, ut, vt, wt)
   call Turb_Mod_Alias_Stresses   (turb, uu, vv, ww, uv, uw, vw)
 
   ! Check if these are already computed somewhere, ...
   ! ... maybe this call is not needed
-  call Field_Mod_Grad_Variable(flow, t)
+  call Flow % Grad_Variable(t)
 
   !-----------------------------------------!
   !   Compute the sources in the interior   !
@@ -34,16 +34,16 @@
 
     do c = 1, grid % n_cells
       pr_t = max(Turb_Mod_Prandtl_Number(turb, c), TINY)
-      ut % n(c) = - turb % vis_t(c) / flow % density(c) / pr_t * t % x(c)
-      vt % n(c) = - turb % vis_t(c) / flow % density(c) / pr_t * t % y(c)
-      wt % n(c) = - turb % vis_t(c) / flow % density(c) / pr_t * t % z(c)
+      ut % n(c) = - turb % vis_t(c) / Flow % density(c) / pr_t * t % x(c)
+      vt % n(c) = - turb % vis_t(c) / Flow % density(c) / pr_t * t % y(c)
+      wt % n(c) = - turb % vis_t(c) / Flow % density(c) / pr_t * t % z(c)
 
       if(turb % model .eq. HYBRID_LES_RANS) then
-        ut % n(c) = - turb % vis_t_eff(c) / flow % density(c) &
+        ut % n(c) = - turb % vis_t_eff(c) / Flow % density(c) &
                                           / pr_t * t % x(c)
-        vt % n(c) = - turb % vis_t_eff(c) / flow % density(c) &
+        vt % n(c) = - turb % vis_t_eff(c) / Flow % density(c) &
                                           / pr_t * t % y(c)
-        wt % n(c) = - turb % vis_t_eff(c) / flow % density(c) &
+        wt % n(c) = - turb % vis_t_eff(c) / Flow % density(c) &
                                           / pr_t * t % z(c)
       end if
     end do

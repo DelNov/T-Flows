@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Momentum(flow, turb, Vof, Sol, curr_dt, ini)
+  subroutine Compute_Momentum(Flow, turb, Vof, Sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves momentum conservation equations                     !
 !------------------------------------------------------------------------------!
@@ -8,7 +8,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),    target :: flow
+  type(Field_Type),    target :: Flow
   type(Turb_Type),     target :: turb
   type(Vof_Type),      target :: Vof
   type(Solver_Type),   target :: Sol
@@ -85,23 +85,23 @@
   call Cpu_Timer % Start('Compute_Momentum (without solvers)')
 
   ! Take aliases
-  grid   => flow % pnt_grid
-  bulk   => flow % bulk
-  v_flux => flow % v_flux
-  t      => flow % t
-  p      => flow % p
-  dt     =  flow % dt
+  grid   => Flow % pnt_grid
+  bulk   => Flow % bulk
+  v_flux => Flow % v_flux
+  t      => Flow % t
+  p      => Flow % p
+  dt     =  Flow % dt
   M      => Sol % M
   b      => Sol % b % val
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Momentum(flow, turb, Vof, Sol,  &
+  call User_Mod_Beginning_Of_Compute_Momentum(Flow, turb, Vof, Sol,  &
                                               curr_dt, ini)
 
   !-------------------------------------------------------!
   !   Store the old volume fluxes for Choi's correction   !
   !-------------------------------------------------------!
-  if (flow % piso_status .eqv. .false.) then  ! check about this
+  if (Flow % piso_status .eqv. .false.) then  ! check about this
     if(ini .eq. 1) then
       do s = 1, grid % n_faces
         v_flux % oo(s) = v_flux % o(s)
@@ -120,37 +120,37 @@
   do i = 1, 3
 
     if(i .eq. 1) then
-      ui   => flow % u;   uj   => flow % v;   uk   => flow % w
+      ui   => Flow % u;   uj   => Flow % v;   uk   => Flow % w
       ui_i => ui % x;     ui_j => ui % y;     ui_k => ui % z
       si   => grid % sx;  sj   => grid % sy;  sk   => grid % sz
       di   => grid % dx;  dj   => grid % dy;  dk   => grid % dz
       p_i  => p % x;      uj_i => uj % x;     uk_i => uk % x
-      fi       => flow % fx
-      cell_fi  => flow % cell_fx
+      fi       => Flow % fx
+      cell_fi  => Flow % cell_fx
       grav_i   =  grav_x
       p_drop_i =  bulk % p_drop_x
       st_i     => Vof % surf_fx
     end if
     if(i .eq. 2) then
-      ui   => flow % v;   uj   => flow % w;   uk   => flow % u
+      ui   => Flow % v;   uj   => Flow % w;   uk   => Flow % u
       ui_i => ui % y;     ui_j => ui % z;     ui_k => ui % x
       si   => grid % sy;  sj   => grid % sz;  sk   => grid % sx
       di   => grid % dy;  dj   => grid % dz;  dk   => grid % dx
       p_i  => p % y;      uj_i => uj % y;     uk_i => uk % y
-      fi       => flow % fy
-      cell_fi  => flow % cell_fy
+      fi       => Flow % fy
+      cell_fi  => Flow % cell_fy
       grav_i   =  grav_y
       p_drop_i =  bulk % p_drop_y
       st_i     => Vof % surf_fy
     end if
     if(i .eq. 3) then
-      ui   => flow % w;   uj   => flow % u;   uk   => flow % v
+      ui   => Flow % w;   uj   => Flow % u;   uk   => Flow % v
       ui_i => ui % z;     ui_j => ui % x;     ui_k => ui % y
       si   => grid % sz;  sj   => grid % sx;  sk   => grid % sy
       di   => grid % dz;  dj   => grid % dx;  dk   => grid % dy
       p_i  => p % z;      uj_i => uj % z;     uk_i => uk % z
-      fi       => flow % fz
-      cell_fi  => flow % cell_fz
+      fi       => Flow % fz
+      cell_fi  => Flow % cell_fz
       grav_i   =  grav_z
       p_drop_i =  bulk % p_drop_z
       st_i     => Vof % surf_fz
@@ -170,7 +170,7 @@
     call Comm_Mod_Global_Max_Real(vel_max)
 
     ! Old values (o) and older than old (oo)
-    if (flow % piso_status .eqv. .false.) then
+    if (Flow % piso_status .eqv. .false.) then
       if(ini .eq. 1) then
         do c = 1, grid % n_cells
           ui % oo(c) = ui % o(c)
@@ -182,14 +182,14 @@
     !--------------------------------------------------------!
     !   Compute buoyancy force for this velocity component   !
     !--------------------------------------------------------!
-    call Field_Mod_Buoyancy_Forces(flow, i)
+    call Flow % Buoyancy_Forces(i)
 
     !---------------!
     !               !
     !   Advection   !
     !               !
     !---------------!
-    call Numerics_Mod_Advection_Term(ui, flow % density, v_flux % n, fi)
+    call Numerics_Mod_Advection_Term(ui, Flow % density, v_flux % n, fi)
 
     !---------------!
     !               !
@@ -229,14 +229,14 @@
       f_im = ui_di * m0
 
       ! Cross diffusion part
-      ui % c(c1) = ui % c(c1) + f_ex - f_im + f_stress * flow % density(c1)
+      ui % c(c1) = ui % c(c1) + f_ex - f_im + f_stress * Flow % density(c1)
       if(c2  > 0) then
-        ui % c(c2) = ui % c(c2) - f_ex + f_im - f_stress * flow % density(c2)
+        ui % c(c2) = ui % c(c2) - f_ex + f_im - f_stress * Flow % density(c2)
       end if
 
       ! Compute the coefficients for the sysytem matrix
-      m12 = m0 - min(v_flux % n(s), 0.0) * flow % density(c1)
-      m21 = m0 + max(v_flux % n(s), 0.0) * flow % density(c2)
+      m12 = m0 - min(v_flux % n(s), 0.0) * Flow % density(c1)
+      m21 = m0 + max(v_flux % n(s), 0.0) * Flow % density(c2)
 
       ! Fill the system matrix
       if(c2 > 0) then
@@ -275,7 +275,7 @@
     !   Inertial terms   !
     !                    !
     !--------------------!
-    call Numerics_Mod_Inertial_Term(ui, flow % density, M, fi, dt)
+    call Numerics_Mod_Inertial_Term(ui, Flow % density, M, fi, dt)
 
     !---------------------------------!
     !                                 !
@@ -321,7 +321,7 @@
     !----------------------------------------!
     !   All other terms defined by the user  !
     !----------------------------------------!
-    call User_Mod_Force(flow, ui, M, fi)
+    call User_Mod_Force(Flow, ui, M, fi)
 
     !------------------------------------------------!
     !   Save the coefficients from the discretized   !
@@ -339,7 +339,7 @@
     !----------------------------------------------!
     !   Explicit solution for the PISO algorithm   !
     !----------------------------------------------!
-    call Compute_Momentum_Explicit(flow, ui, Sol)
+    call Compute_Momentum_Explicit(Flow, ui, Sol)
 
     !-----------------------------------!
     !                                   !
@@ -350,7 +350,7 @@
     !--------------------------------------------------------!
     !   If not inside the PRIME part of the PISO algorithm   !
     !--------------------------------------------------------!
-    if(flow % piso_status .eqv. .false.) then
+    if(Flow % piso_status .eqv. .false.) then
 
       ! Under-relax the equations
       call Numerics_Mod_Under_Relax(ui, M, b)
@@ -370,7 +370,7 @@
       call Cpu_Timer % Stop('Linear_Solver_For_Momentum')
 
       ! Fill the info screen up
-      if (flow % p_m_coupling == SIMPLE) then
+      if (Flow % p_m_coupling == SIMPLE) then
         call Info_Mod_Iter_Fill_At(1, i, ui % name, ui % eniter, ui % res)
       end if
 
@@ -382,7 +382,7 @@
   call Grid_Mod_Exchange_Cells_Real(grid, M % sav)
 
   ! User function
-  call User_Mod_End_Of_Compute_Momentum(flow, turb, Vof, Sol, curr_dt, ini)
+  call User_Mod_End_Of_Compute_Momentum(Flow, turb, Vof, Sol, curr_dt, ini)
 
   call Cpu_Timer % Stop('Compute_Momentum (without solvers)')
 

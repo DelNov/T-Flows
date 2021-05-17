@@ -22,7 +22,7 @@
   type(Grid_Type), target :: grid
   type(Turb_Type), target :: turb
 !----------------------------------[Locals]------------------------------------!
-  type(Field_Type), pointer :: flow
+  type(Field_Type), pointer :: Flow
   type(Var_Type),   pointer :: kin, eps, zeta, f22
   type(Var_Type),   pointer :: uu, vv, ww, uv, uw, vw
   real                      :: kin_vis   ! kinematic viscosity [m^2/s]
@@ -39,7 +39,7 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
-  flow => turb % pnt_flow
+  Flow => turb % pnt_flow
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
   call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
 
@@ -49,16 +49,16 @@
     do c = 1, grid % n_cells
       eps_l(c) = eps % n(c) + TINY ! limited eps % n
 
-      kin_vis = flow % viscosity(c) / flow % density(c)
+      kin_vis = Flow % viscosity(c) / Flow % density(c)
 
       t_1(c) = kin % n(c) / eps_l(c)
       t_2(c) = c_t*sqrt(kin_vis/eps_l(c))
-      t_3(c) = 0.6/(sqrt(3.0)*c_mu_d * zeta % n(c) * flow % shear(c) + TINY)
+      t_3(c) = 0.6/(sqrt(3.0)*c_mu_d * zeta % n(c) * Flow % shear(c) + TINY)
 
       l_1(c) = kin % n(c)**1.5 / eps_l(c)
       l_2(c) = c_nu * (kin_vis**3 / eps_l(c))**0.25
       l_3(c) = sqrt(kin % n(c)/3.0)  &
-             / (c_mu_d * zeta % n(c) * flow % shear(c) + TINY)
+             / (c_mu_d * zeta % n(c) * Flow % shear(c) + TINY)
 
       turb % t_scale(c) =       max( min(t_1(c), t_3(c)), t_2(c) )
       turb % l_scale(c) = c_l * max( min(l_1(c), l_3(c)), l_2(c) )
@@ -69,7 +69,7 @@
     do c = 1, grid % n_cells
       eps_l(c) = eps % n(c) + TINY ! limited eps % n
 
-      kin_vis = flow % viscosity(c) / flow % density(c)
+      kin_vis = Flow % viscosity(c) / Flow % density(c)
 
       t_1(c) = kin % n(c)/eps_l(c)
       t_2(c) = c_t*sqrt(kin_vis/eps_l(c))
