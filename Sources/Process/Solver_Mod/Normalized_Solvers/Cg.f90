@@ -196,6 +196,11 @@
     b(i) = b(i) / fn(i)
   end do
 
+  !-------------------------------------------!
+  !   Refresh the solution vector's buffers   !
+  !-------------------------------------------!
+  call A % pnt_grid % Exchange_Cells_Real(x(-nb:ni))
+
   fin_res = res
   niter   = iter
 

@@ -129,7 +129,7 @@
     !------------!
     !   q = Ap   !
     !------------!
-    call Grid_Mod_Exchange_Cells_Real(A % pnt_grid, p1(-nb:ni))
+    call A % pnt_grid % Exchange_Cells_Real(p1(-nb:ni))
     do i = 1, ni
       q1(i) = 0.0
       do j = A % row(i), A % row(i+1)-1
@@ -173,6 +173,12 @@
   !                                  !
   !----------------------------------!
 1 continue
+
+  !-------------------------------------------!
+  !   Refresh the solution vector's buffers   !
+  !-------------------------------------------!
+  call A % pnt_grid % Exchange_Cells_Real(x(-nb:ni))
+
   fin_res = res
   niter   = iter
 
