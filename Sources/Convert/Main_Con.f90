@@ -124,7 +124,7 @@
     ! Should check like this: end do
     ! Similar note is in Generate, also called Note #1
 
-    call Grid(g) % Print_Statistics()
+    call Grid(g) % Print_Grid_Statistics()
 
     !-------------------------------!
     !   Save files for processing   !
