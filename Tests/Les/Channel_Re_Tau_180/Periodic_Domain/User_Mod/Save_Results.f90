@@ -23,7 +23,7 @@
   integer, intent(in)      :: ts
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   type(Bulk_Type), pointer :: bulk
   integer                  :: n_prob, pl, c, i, count, s, c1, c2, n_points
   character(SL)            :: coord_name, res_name, res_name_plus
@@ -39,7 +39,7 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   bulk => Flow % bulk
   call Flow % Alias_Momentum(u, v, w)
   call Flow % Alias_Energy  (t)
@@ -82,7 +82,7 @@
     return
   end if
 
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     ubulk    = bulk % flux_x / (dens_const * bulk % area_x)
     t_wall   = 0.0
     nu_mean  = 0.0
@@ -126,11 +126,11 @@
   !   Average the results   !
   !-------------------------!
   do i = 1, n_prob-1
-    do c = 1, grid % n_cells - grid % comm % n_buff_cells 
-      if(grid % zc(c) > (z_p(i)) .and.  &
-         grid % zc(c) < (z_p(i+1))) then
+    do c = 1, Grid % n_cells - Grid % comm % n_buff_cells 
+      if(Grid % zc(c) > (z_p(i)) .and.  &
+         Grid % zc(c) < (z_p(i+1))) then
 
-        wall_p(i) = wall_p(i) + grid % wall_dist(c)
+        wall_p(i) = wall_p(i) + Grid % wall_dist(c)
         u_p   (i) = u_p   (i) + turb % u_mean(c)
         v_p   (i) = v_p   (i) + turb % v_mean(c)
         w_p   (i) = w_p   (i) + turb % w_mean(c)
@@ -210,7 +210,7 @@
   end do
 
   ! Calculating friction velocity and friction temperature
-    do c = 1, grid % n_cells
+    do c = 1, Grid % n_cells
       u_tau_p = sqrt( (visc_const*sqrt(u_p(1)**2 +   &
                                       v_p(1)**2 +   &
                                       w_p(1)**2)    &
@@ -226,9 +226,9 @@
 
   if(Flow % heat_transfer) then 
     d_wall = 0.0 
-    do c = 1, grid % n_cells
-      if(grid % wall_dist(c) > d_wall) then
-        d_wall = grid % wall_dist(c)
+    do c = 1, Grid % n_cells
+      if(Grid % wall_dist(c) > d_wall) then
+        d_wall = Grid % wall_dist(c)
         t_inf  = turb % t_mean(c)
       end if
     end do
@@ -241,12 +241,12 @@
       call Comm_Mod_Global_Max_Real(t_inf)
     end if
 
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
       if(c2  < 0) then
-        if( Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. WALL .or.  &
-            Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. WALLFL) then
+        if( Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
+            Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
 
           t_wall  = t_wall + turb % t_mean(c2)
           nu_mean = nu_mean + t % q(c2)  &

@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Grid_Mod_Decompose(grid, n_parts)
+  subroutine Decompose(Grid, n_parts)
 !------------------------------------------------------------------------------!
 !   Coarsens the grid with METIS library.                                      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
-  integer         :: n_parts
+  class(Grid_Type) :: Grid
+  integer          :: n_parts
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, c1, c2, s, i
   integer              :: n_verts, n_edges
@@ -28,11 +28,11 @@
 !==============================================================================!
 
   ! Number of vertices and number of edges for first level
-  n_verts = grid % n_cells
+  n_verts = Grid % n_cells
   n_edges = 0
-  do s = 1, grid % n_faces
-    c2 = grid % faces_c(2,s)
-    if(grid % faces_c(2,s) > 0) n_edges = n_edges + 1
+  do s = 1, Grid % n_faces
+    c2 = Grid % faces_c(2,s)
+    if(Grid % faces_c(2,s) > 0) n_edges = n_edges + 1
   end do
 
   ! Once n_verts(1) and n_edegs(1) are known, allocate memory
@@ -44,9 +44,9 @@
 
   ! Form edge connectivity
   i = 0
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
     if(c2 > 0) then
       i = i + 1
@@ -129,15 +129,15 @@
   !-----------------------------------------------------!
   !   Save the result from the call to METIS function   !
   !-----------------------------------------------------!
-  do c = 1, grid % n_cells
-    grid % comm % cell_proc(c) = part(c)
+  do c = 1, Grid % n_cells
+    Grid % comm % cell_proc(c) = part(c)
   end do
 
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1, s)
-    c2 = grid % faces_c(2, s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1, s)
+    c2 = Grid % faces_c(2, s)
     if(c2 < 0) then
-      grid % comm % cell_proc(c2) = grid % comm % cell_proc(c1)
+      Grid % comm % cell_proc(c2) = Grid % comm % cell_proc(c1)
     end if
   end do
 

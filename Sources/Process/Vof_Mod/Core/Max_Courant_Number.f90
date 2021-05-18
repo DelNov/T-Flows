@@ -13,8 +13,8 @@
   integer, intent(in)     :: interf
   real                    :: courant_max
 !--------------------------------[Locals]--------------------------------------!
-  type(Field_Type), pointer :: flow
-  type(Grid_Type),  pointer :: grid
+  type(Field_Type), pointer :: Flow
+  type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: fun
   type(Face_Type),  pointer :: v_flux
   real, contiguous, pointer :: c_d(:)
@@ -23,9 +23,9 @@
 !==============================================================================!
 
   ! Take aliases
-  flow   => Vof % pnt_flow
-  v_flux => flow % v_flux
-  grid   => flow % pnt_grid
+  Flow   => Vof % pnt_flow
+  v_flux => Flow % v_flux
+  Grid   => Flow % pnt_grid
   fun    => Vof % fun
   c_d    => Vof % c_d
 
@@ -36,15 +36,15 @@
 
   if(interf == 1) then
 
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
 
       fun_dist = min(max(fun % n(c1), 0.0), 1.0)
       fun_dist = (1.0 - fun_dist) ** 2 * fun_dist ** 2 * 16.0
 
       c_d(c1) = c_d(c1) + fun_dist  &
-              * max(-v_flux % n(s) * dt / grid % vol(c1), 0.0)
+              * max(-v_flux % n(s) * dt / Grid % vol(c1), 0.0)
 
       if(c2 > 0) then
         fun_dist = min(max(fun % n(c2), 0.0), 1.0)
@@ -52,22 +52,22 @@
         fun_dist = (1.0 - fun_dist) ** 2 * fun_dist ** 2 * 16.0
 
         c_d(c2) = c_d(c2) + fun_dist  &
-                * max( v_flux % n(s) * dt / grid % vol(c2), 0.0)
+                * max( v_flux % n(s) * dt / Grid % vol(c2), 0.0)
       end if
     end do
 
     ! if(Vof % phase_Change) then
-    !   do c = 1, grid % n_cells
+    !   do c = 1, Grid % n_cells
     !     fun_dist = min(max(fun % n(c1), 0.0),1.0)
     !     fun_dist = (1.0 - fun_dist) ** 2 * fun_dist ** 2 * 16.0
     !     c_d(c) = c_d(c) + fun_dist * Vof % flux_rate(c)    &
-    !                                / flow % density_f(s) * dt
+    !                                / Flow % density_f(s) * dt
     !   end do
     ! end if
 
-    call Grid_Mod_Exchange_Cells_Real(grid, c_d)
+    call Grid % Exchange_Cells_Real(c_d)
 
-    do c = 1, grid % n_cells
+    do c = 1, Grid % n_cells
       courant_max = max(c_d(c), courant_max)
     end do
     call Comm_Mod_Global_Max_Real(courant_max)
@@ -75,24 +75,24 @@
   else  ! interf = 0
 
     ! At boundaries
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
 
-      c_d(c1) = c_d(c1) + max(-v_flux % n(s) * dt / grid % vol(c1), 0.0)
+      c_d(c1) = c_d(c1) + max(-v_flux % n(s) * dt / Grid % vol(c1), 0.0)
 
       if(c2 > 0) then
-        c_d(c2) = c_d(c2) + max( v_flux % n(s) * dt / grid % vol(c2), 0.0)
+        c_d(c2) = c_d(c2) + max( v_flux % n(s) * dt / Grid % vol(c2), 0.0)
       end if
     end do
 
     ! if(Vof % phase_Change) then
-    !   do c = 1, grid % n_cells
-    !     c_d(c) = c_d(c) + Vof % flux_rate(c) / flow % density_f(s) * dt
+    !   do c = 1, Grid % n_cells
+    !     c_d(c) = c_d(c) + Vof % flux_rate(c) / Flow % density_f(s) * dt
     !   end do
     ! end if
 
-    call Grid_Mod_Exchange_Cells_Real(grid, c_d)
+    call Grid % Exchange_Cells_Real(c_d)
 
   end if  ! if interf == 1
 

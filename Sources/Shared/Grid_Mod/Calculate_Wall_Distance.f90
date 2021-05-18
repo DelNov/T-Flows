@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Grid_Mod_Calculate_Wall_Distance(grid)
+  subroutine Calculate_Wall_Distance(Grid)
 !------------------------------------------------------------------------------!
 !   Calculate distance from the cell center to the nearest wall.               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  class(Grid_Type) :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: b, c1, c2, s
   integer              :: n_wall_colors
@@ -20,9 +20,9 @@
   !     => depends on: xc,yc,zc inside and on the boundary.          !
   !     <= gives:      wall_dist                                     !
   !------------------------------------------------------------------!
-  grid % wall_dist = HUGE
+  Grid % wall_dist = HUGE
 
-  call Grid_Mod_Print_Bnd_Cond_List(grid)
+  call Print_Bnd_Cond_List(Grid)
   print *, '#=================================================================='
   print *, '# Calculating distance from the walls                              '
   print *, '#------------------------------------------------------------------'
@@ -44,7 +44,7 @@
   !   User wants to skip calculation of wall distance   !
   !-----------------------------------------------------!
   if( answer .eq. 'SKIP' ) then
-    grid % wall_dist = 1.0
+    Grid % wall_dist = 1.0
     print *, '# Distance to the wall set to 1.0 everywhere !'
 
   !----------------------------------!
@@ -61,7 +61,7 @@
     processed_cells = 0
 
     !$omp parallel do
-    do c1 = -grid % n_bnd_cells, grid % n_cells
+    do c1 = -Grid % n_bnd_cells, Grid % n_cells
 
       processed_cells = processed_cells + 1
 
@@ -70,34 +70,34 @@
       write(*,'(a2,f5.0,a14,a1)', advance='no')               &
         ' #',                                                 &
         (100. * real(processed_cells)                         &
-               / real(grid % n_bnd_cells + grid % n_cells)),  &
+               / real(Grid % n_bnd_cells + Grid % n_cells)),  &
         ' % complete...', achar(13)
 
       do b = 1, n_wall_colors
-        do c2 = grid % bnd_cond % color_s_cell( wall_colors(b) ),  &
-                grid % bnd_cond % color_e_cell( wall_colors(b) ),  &
+        do c2 = Grid % bnd_cond % color_s_cell( wall_colors(b) ),  &
+                Grid % bnd_cond % color_e_cell( wall_colors(b) ),  &
                 -1
-          grid % wall_dist(c1) =  &
-            min(grid % wall_dist(c1),                     &
-                Math_Mod_Distance_Squared(grid % xc(c1),  &
-                                          grid % yc(c1),  &
-                                          grid % zc(c1),  &
-                                          grid % xc(c2),  &
-                                          grid % yc(c2),  &
-                                          grid % zc(c2)))
+          Grid % wall_dist(c1) =  &
+            min(Grid % wall_dist(c1),                     &
+                Math_Mod_Distance_Squared(Grid % xc(c1),  &
+                                          Grid % yc(c1),  &
+                                          Grid % zc(c1),  &
+                                          Grid % xc(c2),  &
+                                          Grid % yc(c2),  &
+                                          Grid % zc(c2)))
         end do
       end do
     end do
     !$omp end parallel do
 
-    grid % wall_dist(:) = sqrt(grid % wall_dist(:))
+    Grid % wall_dist(:) = sqrt(Grid % wall_dist(:))
 
     ! For boundary cells, this correction is more relevant
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
       if(c2 < 0) then
-        grid % wall_dist(c2) = min(grid % wall_dist(c1), grid % wall_dist(c2))
+        Grid % wall_dist(c2) = min(Grid % wall_dist(c1), Grid % wall_dist(c2))
       end if
     end do
 

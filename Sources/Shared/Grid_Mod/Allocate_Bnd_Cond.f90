@@ -1,17 +1,17 @@
 !==============================================================================!
-  subroutine Grid_Mod_Allocate_Bnd_Cond(grid)
+  subroutine Allocate_Bnd_Cond(Grid)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  class(Grid_Type) :: Grid
 !==============================================================================!
 
   ! Boundary conditions' data
-  allocate(grid % bnd_cond % name(grid % n_bnd_cond))
-  allocate(grid % bnd_cond % type(grid % n_bnd_cond))
+  allocate(Grid % bnd_cond % name(Grid % n_bnd_cond))
+  allocate(Grid % bnd_cond % type(Grid % n_bnd_cond))
 
-  allocate(grid % bnd_cond % color_f(grid % n_bnd_cond))
-  allocate(grid % bnd_cond % color_l(grid % n_bnd_cond))
-  allocate(grid % bnd_cond % color(-grid % n_bnd_cells-1:-1))
+  allocate(Grid % bnd_cond % color_f(Grid % n_bnd_cond))
+  allocate(Grid % bnd_cond % color_l(Grid % n_bnd_cond))
+  allocate(Grid % bnd_cond % color(-Grid % n_bnd_cells-1:-1))
 
   end subroutine

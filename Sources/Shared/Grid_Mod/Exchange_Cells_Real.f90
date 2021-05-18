@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Grid_Mod_Exchange_Cells_Real(grid, phi, caller)
+  subroutine Exchange_Cells_Real(Grid, phi, caller)
 !------------------------------------------------------------------------------!
 !   Exchanges the values of a cell-based real array between the processors.    !
 !                                                                              !
@@ -8,12 +8,12 @@
 !   procedure.  (For example: 'Compute_Momentum_347'.)  If that parameter      !
 !   is sent, this procedure will check if the call was needed or reduntant.    !
 !                                                                              !
-!   The info is stored in file 'grid_mod_exchange_cells_real.log'.             !
+!   The info is stored in file 'exchange_cells_real.log'.                      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)            :: grid
-  real                       :: phi(-grid % n_bnd_cells:grid % n_cells)
+  class(Grid_Type)           :: Grid
+  real                       :: phi(-Grid % n_bnd_cells:Grid % n_cells)
   character(len=*), optional :: caller
 !-----------------------------------[Locals]-----------------------------------!
   integer       :: ln, c1, c2, len_s, len_r, sub
@@ -31,14 +31,14 @@
 
     if(this_proc < 2) then
       call File_Mod_Append_File_For_Writing(  &
-                'grid_mod_exchange_cells_real.log', fu, this_proc)
+                'exchange_cells_real.log', fu, this_proc)
     end if
 
     do sub = 1, n_proc
-      len_r = grid % comm % cells_recv(sub) % n_items
+      len_r = Grid % comm % cells_recv(sub) % n_items
       do ln = 1, len_r
-        c2 = grid % comm % cells_recv(sub) % map(ln)
-        grid % comm % cells_recv(sub) % o_buff(ln) = phi(c2)
+        c2 = Grid % comm % cells_recv(sub) % map(ln)
+        Grid % comm % cells_recv(sub) % o_buff(ln) = phi(c2)
       end do
     end do
   end if
@@ -49,33 +49,33 @@
 
   ! Fill the buffers with new values
   do sub = 1, n_proc
-    len_s = grid % comm % cells_send(sub) % n_items
+    len_s = Grid % comm % cells_send(sub) % n_items
     do ln = 1, len_s
-      c1 = grid % comm % cells_send(sub) % map(ln)
-      grid % comm % cells_send(sub) % r_buff(ln) = phi(c1)
+      c1 = Grid % comm % cells_send(sub) % map(ln)
+      Grid % comm % cells_send(sub) % r_buff(ln) = phi(c1)
     end do
   end do
 
   ! Exchange the values
   do sub = 1, n_proc
-    len_s = grid % comm % cells_send(sub) % n_items
-    len_r = grid % comm % cells_recv(sub) % n_items
+    len_s = Grid % comm % cells_send(sub) % n_items
+    len_r = Grid % comm % cells_recv(sub) % n_items
     if(len_s + len_r > 0) then
       call Comm_Mod_Sendrecv_Real_Arrays(           &
         len_s,                                      &  ! sending length
-        grid % comm % cells_send(sub) % r_buff(1),  &  ! array to be sent
+        Grid % comm % cells_send(sub) % r_buff(1),  &  ! array to be sent
         len_r,                                      &  ! receiving length
-        grid % comm % cells_recv(sub) % r_buff(1),  &  ! array to be received
+        Grid % comm % cells_recv(sub) % r_buff(1),  &  ! array to be received
         sub)                                           ! destination processor
     end if
   end do
 
   ! Fill the buffers with new values
   do sub = 1, n_proc
-    len_r = grid % comm % cells_recv(sub) % n_items
+    len_r = Grid % comm % cells_recv(sub) % n_items
     do ln = 1, len_r
-      c2 = grid % comm % cells_recv(sub) % map(ln)
-      phi(c2) = grid % comm % cells_recv(sub) % r_buff(ln)
+      c2 = Grid % comm % cells_recv(sub) % map(ln)
+      phi(c2) = Grid % comm % cells_recv(sub) % r_buff(ln)
     end do
   end do
 
@@ -87,10 +87,10 @@
 
     needed = NO
     do sub = 1, n_proc
-      len_r = grid % comm % cells_recv(sub) % n_items
+      len_r = Grid % comm % cells_recv(sub) % n_items
       do ln = 1, len_r
-        if( grid % comm % cells_recv(sub) % r_buff(ln) .ne. &
-            grid % comm % cells_recv(sub) % o_buff(ln) ) then
+        if( Grid % comm % cells_recv(sub) % r_buff(ln) .ne. &
+            Grid % comm % cells_recv(sub) % o_buff(ln) ) then
           needed = YES
         end if
       end do

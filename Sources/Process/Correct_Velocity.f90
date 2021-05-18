@@ -15,7 +15,7 @@
   integer, intent(in)         :: curr_dt
   integer, intent(in)         :: ini
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),   pointer :: grid
+  type(Grid_Type),   pointer :: Grid
   type(Bulk_Type),   pointer :: bulk
   type(Var_Type),    pointer :: u, v, w, p, pp
   type(Face_Type),   pointer :: v_flux          ! volume flux
@@ -29,7 +29,7 @@
   call Cpu_Timer % Start('Correct_Velocity')
 
   ! Take aliases
-  grid   => Flow % pnt_grid
+  Grid   => Flow % pnt_grid
   bulk   => Flow % bulk
   v_flux => Flow % v_flux
   p      => Flow % p
@@ -50,10 +50,10 @@
   !-----------------------------------------!
 
   ! Normal correction
-  do c = 1, grid % n_cells
-    u % n(c) = u % n(c) - pp % x(c) * grid % vol(c) / M % sav(c)
-    v % n(c) = v % n(c) - pp % y(c) * grid % vol(c) / M % sav(c)
-    w % n(c) = w % n(c) - pp % z(c) * grid % vol(c) / M % sav(c)
+  do c = 1, Grid % n_cells
+    u % n(c) = u % n(c) - pp % x(c) * Grid % vol(c) / M % sav(c)
+    v % n(c) = v % n(c) - pp % y(c) * Grid % vol(c) / M % sav(c)
+    w % n(c) = w % n(c) - pp % z(c) * Grid % vol(c) / M % sav(c)
   end do
 
   !----------------------------------------------------------------!
@@ -63,9 +63,9 @@
   !   pp      [kg/ms^2]                                            !
   !   A % val [m^4s/kg]                                            !
   !----------------------------------------------------------------!
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
     if(c2 > 0) then
                                      !<--- this is correction --->!
       v_flux % n(s) = v_flux % n(s) + ( pp % n(c2) - pp % n(c1) )   &
@@ -77,13 +77,13 @@
   !    Calculate the max mass error     !
   !   with the new (corrected) fluxes   !
   !-------------------------------------!
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     b(c) = 0.0
   end do
 
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
     b(c1) = b(c1) - v_flux % n(s)
     if(c2 > 0) then
@@ -91,12 +91,12 @@
     end if
   end do
 
-  do c = 1, grid % n_cells
-    b(c) = b(c) / (grid % vol(c) / dt)
+  do c = 1, Grid % n_cells
+    b(c) = b(c) / (Grid % vol(c) / dt)
   end do
 
   Flow % vol_res = 0.0
-  do c = 1, grid % n_cells - grid % comm % n_buff_cells
+  do c = 1, Grid % n_cells - Grid % comm % n_buff_cells
     Flow % vol_res = max(Flow % vol_res, abs(b(c)))
   end do
   call Comm_Mod_Global_Max_Real(Flow % vol_res)
@@ -107,19 +107,19 @@
   !------------------------------!
   Flow % cfl_max = 0.0
   Flow % pe_max  = 0.0
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
-    dens_f =        grid % fw(s)  * Flow % density  (c1)   &
-           + (1.0 - grid % fw(s)) * Flow % density  (c2)
-    visc_f =        grid % fw(s)  * Flow % viscosity(c1)   &
-           + (1.0 - grid % fw(s)) * Flow % viscosity(c2)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
+    dens_f =        Grid % fw(s)  * Flow % density  (c1)   &
+           + (1.0 - Grid % fw(s)) * Flow % density  (c2)
+    visc_f =        Grid % fw(s)  * Flow % viscosity(c1)   &
+           + (1.0 - Grid % fw(s)) * Flow % viscosity(c2)
     if(c2 > 0) then
       cfl_t = abs( dt * v_flux % n(s) /          &
                    ( A % fc(s) *                 &
-                   (  grid % dx(s)*grid % dx(s)  &
-                    + grid % dy(s)*grid % dy(s)  &
-                    + grid % dz(s)*grid % dz(s)) ) )
+                   (  Grid % dx(s)*Grid % dx(s)  &
+                    + Grid % dy(s)*Grid % dy(s)  &
+                    + Grid % dz(s)*Grid % dz(s)) ) )
       pe_t    = abs( v_flux % n(s) / A % fc(s) / (visc_f / dens_f + TINY) )
       Flow % cfl_max = max( Flow % cfl_max, cfl_t )
       Flow % pe_max  = max( Flow % pe_max,  pe_t  )

@@ -15,7 +15,7 @@
   integer, intent(in)         :: curr_dt
   integer, intent(in)         :: ini
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),   pointer :: grid
+  type(Grid_Type),   pointer :: Grid
   type(Bulk_Type),   pointer :: bulk
   type(Matrix_Type), pointer :: M
   type(Var_Type),    pointer :: ui, uj, uk, t, p
@@ -85,7 +85,7 @@
   call Cpu_Timer % Start('Compute_Momentum (without solvers)')
 
   ! Take aliases
-  grid   => Flow % pnt_grid
+  Grid   => Flow % pnt_grid
   bulk   => Flow % bulk
   v_flux => Flow % v_flux
   t      => Flow % t
@@ -103,7 +103,7 @@
   !-------------------------------------------------------!
   if (Flow % piso_status .eqv. .false.) then  ! check about this
     if(ini .eq. 1) then
-      do s = 1, grid % n_faces
+      do s = 1, Grid % n_faces
         v_flux % oo(s) = v_flux % o(s)
         v_flux % o (s) = v_flux % n(s)
       end do
@@ -122,8 +122,8 @@
     if(i .eq. 1) then
       ui   => Flow % u;   uj   => Flow % v;   uk   => Flow % w
       ui_i => ui % x;     ui_j => ui % y;     ui_k => ui % z
-      si   => grid % sx;  sj   => grid % sy;  sk   => grid % sz
-      di   => grid % dx;  dj   => grid % dy;  dk   => grid % dz
+      si   => Grid % sx;  sj   => Grid % sy;  sk   => Grid % sz
+      di   => Grid % dx;  dj   => Grid % dy;  dk   => Grid % dz
       p_i  => p % x;      uj_i => uj % x;     uk_i => uk % x
       fi       => Flow % fx
       cell_fi  => Flow % cell_fx
@@ -134,8 +134,8 @@
     if(i .eq. 2) then
       ui   => Flow % v;   uj   => Flow % w;   uk   => Flow % u
       ui_i => ui % y;     ui_j => ui % z;     ui_k => ui % x
-      si   => grid % sy;  sj   => grid % sz;  sk   => grid % sx
-      di   => grid % dy;  dj   => grid % dz;  dk   => grid % dx
+      si   => Grid % sy;  sj   => Grid % sz;  sk   => Grid % sx
+      di   => Grid % dy;  dj   => Grid % dz;  dk   => Grid % dx
       p_i  => p % y;      uj_i => uj % y;     uk_i => uk % y
       fi       => Flow % fy
       cell_fi  => Flow % cell_fy
@@ -146,8 +146,8 @@
     if(i .eq. 3) then
       ui   => Flow % w;   uj   => Flow % u;   uk   => Flow % v
       ui_i => ui % z;     ui_j => ui % x;     ui_k => ui % y
-      si   => grid % sz;  sj   => grid % sx;  sk   => grid % sy
-      di   => grid % dz;  dj   => grid % dx;  dk   => grid % dy
+      si   => Grid % sz;  sj   => Grid % sx;  sk   => Grid % sy
+      di   => Grid % dz;  dj   => Grid % dx;  dk   => Grid % dy
       p_i  => p % z;      uj_i => uj % z;     uk_i => uk % z
       fi       => Flow % fz
       cell_fi  => Flow % cell_fz
@@ -164,7 +164,7 @@
 
     ! Calculate velocity magnitude for normalization
     vel_max = MICRO
-    do c = -grid % n_bnd_cells, grid % n_cells
+    do c = -Grid % n_bnd_cells, Grid % n_cells
       vel_max = max(vel_max, sqrt(ui % n(c)**2 + uj % n(c)**2 + uk % n(c)**2))
     end do
     call Comm_Mod_Global_Max_Real(vel_max)
@@ -172,7 +172,7 @@
     ! Old values (o) and older than old (oo)
     if (Flow % piso_status .eqv. .false.) then
       if(ini .eq. 1) then
-        do c = 1, grid % n_cells
+        do c = 1, Grid % n_cells
           ui % oo(c) = ui % o(c)
           ui % o (c) = ui % n(c)
         end do
@@ -200,19 +200,19 @@
     !----------------------------!
     !   Spatial discretization   !
     !----------------------------!
-    do s = 1, grid % n_faces
+    do s = 1, Grid % n_faces
 
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
 
       call Turb_Mod_Face_Vis   (turb, vis_eff,  s)
       call Turb_Mod_Face_Stress(turb, ui, f_stress, s)
 
-      ui_i_f = grid % fw(s)*ui_i(c1) + (1.0-grid % fw(s))*ui_i(c2)
-      ui_j_f = grid % fw(s)*ui_j(c1) + (1.0-grid % fw(s))*ui_j(c2)
-      ui_k_f = grid % fw(s)*ui_k(c1) + (1.0-grid % fw(s))*ui_k(c2)
-      uj_i_f = grid % fw(s)*uj_i(c1) + (1.0-grid % fw(s))*uj_i(c2)
-      uk_i_f = grid % fw(s)*uk_i(c1) + (1.0-grid % fw(s))*uk_i(c2)
+      ui_i_f = Grid % fw(s)*ui_i(c1) + (1.0-Grid % fw(s))*ui_i(c2)
+      ui_j_f = Grid % fw(s)*ui_j(c1) + (1.0-Grid % fw(s))*ui_j(c2)
+      ui_k_f = Grid % fw(s)*ui_k(c1) + (1.0-Grid % fw(s))*ui_k(c2)
+      uj_i_f = Grid % fw(s)*uj_i(c1) + (1.0-Grid % fw(s))*uj_i(c2)
+      uk_i_f = Grid % fw(s)*uk_i(c1) + (1.0-Grid % fw(s))*uk_i(c2)
 
       ui_si = (  (ui_i_f + ui_i_f) * si(s)    &
                + (ui_j_f + uj_i_f) * sj(s)    &
@@ -246,11 +246,11 @@
         M % val(M % dia(c2))  = M % val(M % dia(c2))  + m21
       else if(c2  < 0) then
         ! Outflow is not included because it was causing problems
-        if((Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW)  .or.  &
-           (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL)    .or.  &
-           (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) .or.  &
-           (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL)) then
-           ! (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) ) then
+        if((Grid % Bnd_Cond_Type(c2) .eq. INFLOW)  .or.  &
+           (Grid % Bnd_Cond_Type(c2) .eq. WALL)    .or.  &
+           (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) .or.  &
+           (Grid % Bnd_Cond_Type(c2) .eq. WALLFL)) then
+           ! (Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW) ) then
           M % val(M % dia(c1)) = M % val(M % dia(c1)) + m12
           fi(c1) = fi(c1) + m12 * ui % n(c2)
         end if
@@ -266,7 +266,7 @@
     ! Explicit treatment for cross diffusion terms
     ! (Shouldn't theese, in an ideal world,
     !  also be treated in Rhie and Chow?)
-    do c = 1, grid % n_cells
+    do c = 1, Grid % n_cells
       fi(c) = fi(c) + ui % c(c)
     end do
 
@@ -286,15 +286,15 @@
     !--------------------------!
     !   Global pressure drop   !
     !--------------------------!
-    do c = 1, grid % n_cells
-      fi(c) = fi(c) + p_drop_i * grid % vol(c)
+    do c = 1, Grid % n_cells
+      fi(c) = fi(c) + p_drop_i * Grid % vol(c)
     end do
 
     !--------------------!
     !   Buoyancy force   !
     !--------------------!
-    do c = 1, grid % n_cells
-      fi(c) = fi(c) + cell_fi(c) * grid % vol(c)
+    do c = 1, Grid % n_cells
+      fi(c) = fi(c) + cell_fi(c) * Grid % vol(c)
     end do
 
     !-----------------------------------------------------------!
@@ -302,8 +302,8 @@
     !   (Note: pressure gradients are not with other forces.    !
     !    Same is true for surface tension, see nex comments)    !
     !-----------------------------------------------------------!
-    do c = 1, grid % n_cells
-      b(c) = fi(c) - p_i(c) * grid % vol(c)
+    do c = 1, Grid % n_cells
+      b(c) = fi(c) - p_i(c) * Grid % vol(c)
     end do
 
     !----------------------------------------------------------------!
@@ -313,8 +313,8 @@
     !----------------------------------------------------------------!
     if(Vof % model .eq. VOLUME_OF_FLUID) then
       call Vof % Surface_Tension_Force(i)
-      do c = 1, grid % n_cells
-        b(c) = b(c) + st_i(c) * grid % vol(c)
+      do c = 1, Grid % n_cells
+        b(c) = b(c) + st_i(c) * Grid % vol(c)
       end do
     end if
 
@@ -332,7 +332,7 @@
     !   from under-relaxation factors and Majumdar   !
     !   correction in Rhie_And_Chow is not needed    !
     !------------------------------------------------!
-    do c = 1, grid % n_cells
+    do c = 1, Grid % n_cells
       M % sav(c) = M % val(M % dia(c))
     end do
 
@@ -379,7 +379,7 @@
   end do  ! browsing through components
 
   ! Refresh buffers for M % sav before discretizing for pressure
-  call Grid_Mod_Exchange_Cells_Real(grid, M % sav)
+  call Grid % Exchange_Cells_Real(M % sav)
 
   ! User function
   call User_Mod_End_Of_Compute_Momentum(Flow, turb, Vof, Sol, curr_dt, ini)

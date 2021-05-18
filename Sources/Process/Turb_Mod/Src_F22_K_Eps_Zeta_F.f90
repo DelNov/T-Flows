@@ -9,8 +9,8 @@
   type(Turb_Type),   target :: turb
   type(Solver_Type), target :: Sol
 !----------------------------------[Locals]------------------------------------!
-  type(Field_Type),  pointer :: flow
-  type(Grid_Type),   pointer :: grid
+  type(Field_Type),  pointer :: Flow
+  type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: kin, eps, f22, zeta
   type(Matrix_Type), pointer :: A
   real,              pointer :: b(:)
@@ -40,40 +40,40 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
-  flow => turb % pnt_flow
-  grid => flow % pnt_grid
+  Flow => turb % pnt_flow
+  Grid => Flow % pnt_grid
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
   call Sol % Alias_Solver         (A, b)
 
-  call Time_And_Length_Scale(grid, turb)
+  call Time_And_Length_Scale(Grid, turb)
 
  ! Source term f22hg
- do c = 1, grid % n_cells
-   f22hg = (1.0 - c_f1 - 0.65 * turb % p_kin(c) / flow % density(c)  &
+ do c = 1, Grid % n_cells
+   f22hg = (1.0 - c_f1 - 0.65 * turb % p_kin(c) / Flow % density(c)  &
          / (eps  % n(c) + TINY))                                     &
          * (zeta % n(c) - TWO_THIRDS)                                &
          / (turb % t_scale(c) + TINY)                                &
-         + 0.0085 * (turb % p_kin(c) / flow % density(c)) / (kin % n(c) + TINY)
-   b(c) = b(c) + f22hg * grid % vol(c) / (turb % l_scale(c)**2 + TINY)
+         + 0.0085 * (turb % p_kin(c) / Flow % density(c)) / (kin % n(c) + TINY)
+   b(c) = b(c) + f22hg * Grid % vol(c) / (turb % l_scale(c)**2 + TINY)
  end do
 
  ! Source term f22hg
- do c = 1, grid % n_cells
-   sor_11 = grid % vol(c)/(turb % l_scale(c)**2 + TINY)
+ do c = 1, Grid % n_cells
+   sor_11 = Grid % vol(c)/(turb % l_scale(c)**2 + TINY)
    A % val(A % dia(c)) = A % val(A % dia(c)) + sor_11 
  end do
 
  ! Imposing boundary condition for f22 on the wall
- do s = 1, grid % n_faces
-   c1 = grid % faces_c(1,s)
-   c2 = grid % faces_c(2,s)
+ do s = 1, Grid % n_faces
+   c1 = Grid % faces_c(1,s)
+   c2 = Grid % faces_c(2,s)
    if(c2 < 0) then
-     if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
-        Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
+     if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
+        Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
 
-       f22 % n(c2) = -2.0 * flow % viscosity(c1)        &
-                   / flow % density(c1) * zeta % n(c1)  &
-                   / grid % wall_dist(c1)**2
+       f22 % n(c2) = -2.0 * Flow % viscosity(c1)        &
+                   / Flow % density(c1) * zeta % n(c1)  &
+                   / Grid % wall_dist(c1)**2
 
       ! Fill in a source coefficients
 

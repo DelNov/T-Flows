@@ -14,7 +14,7 @@
   type(Swarm_Type), target :: swarm
   integer, intent(in)      :: ts   ! time step
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u, v, w, t
   type(Var_Type),  pointer :: kin, eps, zeta, f22
@@ -37,7 +37,7 @@
 !==============================================================================!
 
   ! Take aliases
-  grid   => Flow % pnt_grid
+  Grid   => Flow % pnt_grid
   bulk   => Flow % bulk
   vis_t  => turb % vis_t
   call Flow % Alias_Momentum(u, v, w)
@@ -132,15 +132,15 @@
   !   Average the results   !
   !-------------------------!
   do i = 1, n_prob-1
-    do c = 1, grid % n_cells - grid % comm % n_buff_cells 
-      rad = 1.0 - grid % wall_dist(c)
+    do c = 1, Grid % n_cells - Grid % comm % n_buff_cells 
+      rad = 1.0 - Grid % wall_dist(c)
       if( rad < (z_p(i)) .and.  &
           rad > (z_p(i+1))) then
-        r = sqrt(grid % xc(c)**2 + grid % yc(c)**2)
-        b11 = grid % xc(c)/r
-        b12 = grid % yc(c)/r
+        r = sqrt(Grid % xc(c)**2 + Grid % yc(c)**2)
+        b11 = Grid % xc(c)/r
+        b12 = Grid % yc(c)/r
 
-        wall_p(i) = wall_p(i) + grid % wall_dist(c)
+        wall_p(i) = wall_p(i) + Grid % wall_dist(c)
         u_p(i)   = u_p(i) + u % n(c)
         v_p(i)   = v_p(i) + v % n(c)
         w_p(i)   = w_p(i) + w % n(c)
@@ -250,9 +250,9 @@
 
   if(Flow % heat_transfer) then
     d_wall = 0.0
-    do c = 1, grid % n_cells - grid % comm % n_buff_cells
-      if(grid % wall_dist(c) > d_wall) then
-        d_wall = grid % wall_dist(c)
+    do c = 1, Grid % n_cells - Grid % comm % n_buff_cells
+      if(Grid % wall_dist(c) > d_wall) then
+        d_wall = Grid % wall_dist(c)
         t_inf  = t % n(c)
       end if
     end do
@@ -265,12 +265,12 @@
       call Comm_Mod_Global_Max_Real(t_inf)
     end if
 
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
       if(c2  < 0) then
-        if( Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. WALL .or.  &
-            Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. WALLFL) then
+        if( Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
+            Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
 
           t_wall   = t_wall + t % n(c2)
           nu_mean  = nu_mean + t % q(c2) / (cond_const*(t % n(c2) - t_inf))

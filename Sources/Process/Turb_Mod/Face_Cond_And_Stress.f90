@@ -11,8 +11,8 @@
   real                    :: t_stress
   integer                 :: s
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: grid
-  type(Field_Type), pointer :: flow
+  type(Grid_Type),  pointer :: Grid
+  type(Field_Type), pointer :: Flow
   type(Var_Type),   pointer :: t
   type(Var_Type),   pointer :: ut, vt, wt
   integer                   :: c1, c2
@@ -22,14 +22,14 @@
 !==============================================================================!
 
   ! Take alias
-  flow => turb % pnt_flow
-  grid => turb % pnt_grid
-  t    => flow % t
+  Flow => turb % pnt_flow
+  Grid => turb % pnt_grid
+  t    => Flow % t
 
   call Turb_Mod_Alias_Heat_Fluxes(turb, ut, vt, wt)
 
-  c1 = grid % faces_c(1,s)
-  c2 = grid % faces_c(2,s)
+  c1 = Grid % faces_c(1,s)
+  c2 = Grid % faces_c(2,s)
 
   !------------------------------!
   !   Turbulent Prandtl number   !
@@ -43,14 +43,14 @@
      turb % model .ne. DNS) then
     pr_t1 = Turb_Mod_Prandtl_Number(turb, c1)
     pr_t2 = Turb_Mod_Prandtl_Number(turb, c2)
-    pr_tf = grid % fw(s) * pr_t1 + (1.0-grid % fw(s)) * pr_t2
+    pr_tf = Grid % fw(s) * pr_t1 + (1.0-Grid % fw(s)) * pr_t2
   end if
 
   !------------------------------------------------------!
   !   Molecular conductivity (without turbulent parts)   !
   !------------------------------------------------------!
-  con_mol = 2.0 / (    1.0 / flow % conductivity(c1)  &
-                     + 1.0 / flow % conductivity(c2) )
+  con_mol = 2.0 / (    1.0 / Flow % conductivity(c1)  &
+                     + 1.0 / Flow % conductivity(c2) )
   con_turb = 0.0
 
   !-----------------------------------------------------------------!
@@ -58,13 +58,13 @@
   !-----------------------------------------------------------------!
   if(turb % model .ne. NO_TURBULENCE_MODEL .and.  &
      turb % model .ne. DNS) then
-    con_turb  = grid % fw(s) *flow % capacity(c1) * turb % vis_t(c1) / pr_tf  &
-       +   (1.0-grid % fw(s))*flow % capacity(c2) * turb % vis_t(c2) / pr_tf
+    con_turb  = Grid % fw(s) *Flow % capacity(c1) * turb % vis_t(c1) / pr_tf  &
+       +   (1.0-Grid % fw(s))*Flow % capacity(c2) * turb % vis_t(c2) / pr_tf
   end if
 
   if(turb % model .eq. HYBRID_LES_RANS) then
-    con_turb  = grid % fw(s)* flow % capacity(c1)*turb % vis_t_eff(c1)/pr_tf  &
-         + (1.0-grid % fw(s))*flow % capacity(c2)*turb % vis_t_eff(c2)/pr_tf
+    con_turb  = Grid % fw(s)* Flow % capacity(c1)*turb % vis_t_eff(c1)/pr_tf  &
+         + (1.0-Grid % fw(s))*Flow % capacity(c2)*turb % vis_t_eff(c2)/pr_tf
   end if
 
   !-----------------------------------!
@@ -92,27 +92,27 @@
      turb % model .eq. RSM_MANCEAU_HANJALIC) then
 
     ! Gradients on the cell face (fw corrects situation close to the wall)
-    tx_f = grid % fw(s) * t % x(c1) + (1.0-grid % fw(s)) * t % x(c2)
-    ty_f = grid % fw(s) * t % y(c1) + (1.0-grid % fw(s)) * t % y(c2)
-    tz_f = grid % fw(s) * t % z(c1) + (1.0-grid % fw(s)) * t % z(c2)
+    tx_f = Grid % fw(s) * t % x(c1) + (1.0-Grid % fw(s)) * t % x(c2)
+    ty_f = Grid % fw(s) * t % y(c1) + (1.0-Grid % fw(s)) * t % y(c2)
+    tz_f = Grid % fw(s) * t % z(c1) + (1.0-Grid % fw(s)) * t % z(c2)
 
-    cap_dens_c1 = flow % capacity(c1) * flow % density(c1)
-    cap_dens_c2 = flow % capacity(c2) * flow % density(c2)
+    cap_dens_c1 = Flow % capacity(c1) * Flow % density(c1)
+    cap_dens_c2 = Flow % capacity(c2) * Flow % density(c2)
 
     ! Turbulent heat fluxes according to GGDH scheme
     ! (first line is GGDH, second line is SGDH substratced
-    ut_cap_dens =  (    grid % fw(s)  * ut % n(c1) * cap_dens_c1    &
-                +  (1.0-grid % fw(s)) * ut % n(c2) * cap_dens_c2)
-    vt_cap_dens =  (    grid % fw(s)  * vt % n(c1) * cap_dens_c1    &
-                +  (1.0-grid % fw(s)) * vt % n(c2) * cap_dens_c2)
-    wt_cap_dens =  (    grid % fw(s)  * wt % n(c1) * cap_dens_c1    &
-                +  (1.0-grid % fw(s)) * wt % n(c2) * cap_dens_c2)
-    t_stress = - (  ut_cap_dens * grid % sx(s)                      &
-                  + vt_cap_dens * grid % sy(s)                      &
-                  + wt_cap_dens * grid % sz(s) )                    &
-                  - (con_turb * (  tx_f * grid % sx(s)              &
-                                 + ty_f * grid % sy(s)              &
-                                 + tz_f * grid % sz(s)) )
+    ut_cap_dens =  (    Grid % fw(s)  * ut % n(c1) * cap_dens_c1    &
+                +  (1.0-Grid % fw(s)) * ut % n(c2) * cap_dens_c2)
+    vt_cap_dens =  (    Grid % fw(s)  * vt % n(c1) * cap_dens_c1    &
+                +  (1.0-Grid % fw(s)) * vt % n(c2) * cap_dens_c2)
+    wt_cap_dens =  (    Grid % fw(s)  * wt % n(c1) * cap_dens_c1    &
+                +  (1.0-Grid % fw(s)) * wt % n(c2) * cap_dens_c2)
+    t_stress = - (  ut_cap_dens * Grid % sx(s)                      &
+                  + vt_cap_dens * Grid % sy(s)                      &
+                  + wt_cap_dens * Grid % sz(s) )                    &
+                  - (con_turb * (  tx_f * Grid % sx(s)              &
+                                 + ty_f * Grid % sy(s)              &
+                                 + tz_f * Grid % sz(s)) )
 
   end if  ! if models are of RSM type
 

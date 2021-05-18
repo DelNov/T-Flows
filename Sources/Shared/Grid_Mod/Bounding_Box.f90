@@ -1,24 +1,24 @@
 !==============================================================================!
-  subroutine Grid_Mod_Bounding_Box(grid, xmin, ymin, zmin, xmax, ymax, zmax)
+  subroutine Grid_Mod_Bounding_Box(Grid, xmin, ymin, zmin, xmax, ymax, zmax)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Grid_Type) :: Grid
   real            :: xmin, ymin, zmin, xmax, ymax, zmax
 !-----------------------------------[Locals]-----------------------------------!
   integer :: nn
 !==============================================================================!
 
   ! Take alias
-  nn = grid % n_nodes
+  nn = Grid % n_nodes
 
-  xmin = minval(grid % xn(1:nn))
-  ymin = minval(grid % yn(1:nn))
-  zmin = minval(grid % zn(1:nn))
+  xmin = minval(Grid % xn(1:nn))
+  ymin = minval(Grid % yn(1:nn))
+  zmin = minval(Grid % zn(1:nn))
 
-  xmax = maxval(grid % xn(1:nn))
-  ymax = maxval(grid % yn(1:nn))
-  zmax = maxval(grid % zn(1:nn))
+  xmax = maxval(Grid % xn(1:nn))
+  ymax = maxval(Grid % yn(1:nn))
+  zmax = maxval(Grid % zn(1:nn))
 
   call Comm_Mod_Global_Min_Real(xmin)
   call Comm_Mod_Global_Min_Real(ymin)

@@ -1,5 +1,5 @@
 !==============================================================================!
-  module Bnd_Cond_Mod
+  module Boundary_Mod
 !------------------------------------------------------------------------------!
 !   This is used to store boundary conditions within a Grid_Type               !
 !------------------------------------------------------------------------------!
@@ -22,9 +22,9 @@
   integer, parameter :: OPENBC   = 10079
 
   !-------------------!
-  !   Bnd_Cond type   !
+  !   Boundary type   !
   !-------------------!
-  type Bnd_Cond_Type
+  type Boundary_Type
 
     ! Name of the boundary conditions specified in grid generation
     ! It ranges through number of boundary conditions (aka colors)

@@ -9,8 +9,8 @@
   type(Turb_Type),   target :: turb
   type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type),  pointer :: flow
-  type(Grid_Type),   pointer :: grid
+  type(Field_Type),  pointer :: Flow
+  type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: f22
   type(Matrix_Type), pointer :: A
   real,              pointer :: b(:)
@@ -47,28 +47,28 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
-  flow => turb % pnt_flow
-  grid => flow % pnt_grid
+  Flow => turb % pnt_flow
+  Grid => Flow % pnt_grid
   f22  => turb % f22
   call Sol % Alias_Solver(A, b)
 
-  call Time_And_Length_Scale(grid, turb)
+  call Time_And_Length_Scale(Grid, turb)
 
   ! Source term f22hg
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     f22hg = 1.0
-    sor11 = grid % vol(c) / turb % l_scale(c)**2
+    sor11 = Grid % vol(c) / turb % l_scale(c)**2
     A % val(A % dia(c)) = A % val(A % dia(c)) + sor11
-    b(c) = b(c) + f22hg * grid % vol(c) / turb % l_scale(c)**2
+    b(c) = b(c) + f22hg * Grid % vol(c) / turb % l_scale(c)**2
   end do
 
   ! Source term
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
     if(c2 < 0) then
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
-         Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
+      if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
+         Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
 
           f22 % n(c2) = 0.0
 

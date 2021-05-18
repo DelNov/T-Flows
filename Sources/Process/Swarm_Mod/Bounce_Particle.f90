@@ -8,7 +8,7 @@
   type(Swarm_Type), target :: swarm
   integer, intent(in)      :: k      ! particle number
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),     pointer :: grid
+  type(Grid_Type),     pointer :: Grid
   type(Particle_Type), pointer :: part
   logical,             pointer :: deposited            ! part. deposition flag
   logical,             pointer :: escaped              ! part. departure  flag
@@ -23,7 +23,7 @@
 !==============================================================================!
 
   ! Take aliases
-  grid      => swarm % pnt_grid
+  Grid      => swarm % pnt_grid
   part      => swarm % particle(k)
   deposited => part  % deposited
   escaped   => part  % escaped
@@ -32,7 +32,7 @@
   c2 = part % bnd_cell  ! index of the closest boundary cell for reflection
   s  = 0
   if(c2 .ne. 0) then
-    s = grid % cells_bnd_face(c2)  ! index of the closest boundary face
+    s = Grid % cells_bnd_face(c2)  ! index of the closest boundary face
   end if
 
   ! Debug: write(this_proc*1000+k, '(a,4i7)')  &
@@ -52,9 +52,9 @@
 
     ! Normal to the wall face
     ! (It points outwards, but you change the sign!!!)
-    nx = -grid % sx(s) / grid % s(s)
-    ny = -grid % sy(s) / grid % s(s)
-    nz = -grid % sz(s) / grid % s(s)
+    nx = -Grid % sx(s) / Grid % s(s)
+    ny = -Grid % sy(s) / Grid % s(s)
+    nz = -Grid % sz(s) / Grid % s(s)
 
     ! Velocity normal to the wall
     vel_dot_n = part % u * nx   &
@@ -62,13 +62,13 @@
               + part % w * nz
 
     ! Vector connecting particle with boundary face center; new and old
-    vec_new_face_dot_n = (part % x_n - grid % xf(s)) * nx  &
-                       + (part % y_n - grid % yf(s)) * ny  &
-                       + (part % z_n - grid % zf(s)) * nz
+    vec_new_face_dot_n = (part % x_n - Grid % xf(s)) * nx  &
+                       + (part % y_n - Grid % yf(s)) * ny  &
+                       + (part % z_n - Grid % zf(s)) * nz
 
-    vec_old_face_dot_n = (part % x_o - grid % xf(s)) * nx  &
-                       + (part % y_o - grid % yf(s)) * ny  &
-                       + (part % z_o - grid % zf(s)) * nz
+    vec_old_face_dot_n = (part % x_o - Grid % xf(s)) * nx  &
+                       + (part % y_o - Grid % yf(s)) * ny  &
+                       + (part % z_o - Grid % zf(s)) * nz
 
     !---------------------------------------------------------------------!
     !                                                                     !
@@ -91,13 +91,13 @@
         part_z_o = part % z_o - swarm % dt * part % w * real(bs)
 
         ! Vector connecting particle with boundary face center; new and old
-        vec_new_face_dot_n = (part_x_n - grid % xf(s)) * nx  &
-                           + (part_y_n - grid % yf(s)) * ny  &
-                           + (part_z_n - grid % zf(s)) * nz
+        vec_new_face_dot_n = (part_x_n - Grid % xf(s)) * nx  &
+                           + (part_y_n - Grid % yf(s)) * ny  &
+                           + (part_z_n - Grid % zf(s)) * nz
 
-        vec_old_face_dot_n = (part_x_o - grid % xf(s)) * nx  &
-                           + (part_y_o - grid % yf(s)) * ny  &
-                           + (part_z_o - grid % zf(s)) * nz
+        vec_old_face_dot_n = (part_x_o - Grid % xf(s)) * nx  &
+                           + (part_y_o - Grid % yf(s)) * ny  &
+                           + (part_z_o - Grid % zf(s)) * nz
 
         ! Managed to recover the particle
         if( vec_new_face_dot_n < 0.0 .and. vec_old_face_dot_n > 0.0) then
@@ -144,15 +144,15 @@
       lz = part % z_n - part % z_o
 
       ! Normalized distance from new to intersection
-      dsc_n = (  (part % x_n - grid % xf(s)) * nx     &
-               + (part % y_n - grid % yf(s)) * ny     &
-               + (part % z_n - grid % zf(s)) * nz  )  &
+      dsc_n = (  (part % x_n - Grid % xf(s)) * nx     &
+               + (part % y_n - Grid % yf(s)) * ny     &
+               + (part % z_n - Grid % zf(s)) * nz  )  &
             / (lx * nx + ly * ny + lz * nz)
 
       ! Normalized distance from old to intersection
-      dsc_o = (  (grid % xf(s) - part % x_o) * nx     &
-               + (grid % yf(s) - part % y_o) * ny     &
-               + (grid % zf(s) - part % z_o) * nz  )  &
+      dsc_o = (  (Grid % xf(s) - part % x_o) * nx     &
+               + (Grid % yf(s) - part % y_o) * ny     &
+               + (Grid % zf(s) - part % z_o) * nz  )  &
             / (lx * nx + ly * ny + lz * nz)
 
       ! Intersection point
@@ -169,8 +169,8 @@
       !---------------------------------!
       !   The boundary cell is a wall   !
       !---------------------------------!
-      if(Grid_Mod_Bnd_Cond_Type(grid, c2) == WALL .or.  & 
-         Grid_Mod_Bnd_Cond_Type(grid, c2) == WALLFL) then
+      if(Grid % Bnd_Cond_Type( c2) == WALL .or.  & 
+         Grid % Bnd_Cond_Type( c2) == WALLFL) then
 
         ! Trap condition (deposition) >>> narrowed the tolerance  <<<
         if(swarm % rst <= TINY .or. abs(vel_dot_n) <= MILI) then
@@ -230,8 +230,9 @@
       !------------------------------------!
       !   The boundary cell is an outlet   !
       !------------------------------------!
-      if(Grid_Mod_Bnd_Cond_Type(grid, c2) == OUTFLOW .or.  &
-         Grid_Mod_Bnd_Cond_Type(grid, c2) == CONVECT) then
+      if(Grid % Bnd_Cond_Type( c2) == OUTFLOW  .or.  &
+         Grid % Bnd_Cond_Type( c2) == PRESSURE .or.  &
+         Grid % Bnd_Cond_Type( c2) == CONVECT) then
         escaped = .true.
         swarm % n_escaped(c2) = swarm % n_escaped(c2) + 1
       end if  ! it is an outflow

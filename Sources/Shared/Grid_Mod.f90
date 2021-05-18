@@ -7,13 +7,21 @@
 !----------------------------------[Modules]-----------------------------------!
   use Comm_Mod
   use File_Mod
-  use Bnd_Cond_Mod
+  use Boundary_Mod
   use Vtk_Mod
   use Metis_Options_Mod
   use Sort_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
+
+  ! The smallest numbers (third column) are what I believed should be needed
+  ! The medium numbers (second column) are what proved to be necessary
+  ! The largest numbers (first column) are for ARLA geometry
+  integer, parameter :: MAX_FACES_N_NODES = 36  ! 12  ! 12
+  integer, parameter :: MAX_CELLS_N_NODES = 96  ! 72  ! 36
+  integer, parameter :: MAX_CELLS_N_FACES = 72  ! 48  ! 24
+  integer, parameter :: MAX_CELLS_N_CELLS = MAX_CELLS_N_FACES
 
   !---------------!
   !               !
@@ -122,7 +130,7 @@
     ! Node coordinates
     real, allocatable :: xn(:), yn(:), zn(:)
 
-    type(Bnd_Cond_Type) :: bnd_cond
+    type(Boundary_Type) :: bnd_cond
 
     !  Maximum number of cells, boundary cells and faces
     ! (Used for tentative memory allocation in Generator)
@@ -164,15 +172,49 @@
     integer           :: n_user_arrays
     real, allocatable :: user_array(:,:)
 
-  end type
+    contains
+      procedure :: Allocate_Cells
+      procedure :: Allocate_Faces
+      procedure :: Allocate_Nodes
+      procedure :: Bnd_Cond_Name
+      procedure :: Bnd_Cond_Type
+      procedure :: Bnd_Cond_Ranges
+      procedure :: Calculate_Cell_Centers
+      procedure :: Calculate_Cell_Volumes
+      procedure :: Calculate_Face_Centers
+      procedure :: Calculate_Face_Geometry
+      procedure :: Calculate_Face_Interpolation
+      procedure :: Calculate_Face_Surfaces
+      procedure :: Calculate_Global_Volumes
+      procedure :: Calculate_Wall_Distance
+      procedure :: Calculate_Weights_Cells_To_Nodes
+      procedure :: Calculate_Weights_Nodes_To_Cells
+      procedure :: Decompose
+      procedure :: Estimate_Big_And_Small
+      procedure :: Exchange_Cells_Int
+      procedure :: Exchange_Cells_Log
+      procedure :: Exchange_Cells_Real
+      procedure :: Find_Bounding_Box
+      procedure :: Find_Cells_Faces
+      procedure :: Find_Nodes_Cells
+      procedure :: Form_Cells_Comm
+      procedure :: Form_Maps
+      procedure :: Initialize_New_Numbers
+      procedure :: Is_Point_In_Cell
+      procedure :: Load_Cfn
+      procedure :: Load_Dim
+      procedure :: Merge_Duplicate_Nodes
+      procedure :: Print_Bnd_Cond_List
+      procedure :: Print_Grid_Statistics
+      procedure :: Save_Cfn
+      procedure :: Save_Dim
+      procedure :: Save_Debug_Vtu
+      procedure :: Sort_Cells_By_Index
+      procedure :: Sort_Cells_Smart
+      procedure :: Sort_Faces_By_Index
+      procedure :: Sort_Faces_Smart
 
-  ! The smallest numbers (third column) are what I believed should be needed
-  ! The medium numbers (second column) are what proved to be necessary
-  ! The largest numbers (first column) are for ARLA geometry
-  integer, parameter :: MAX_FACES_N_NODES = 36  ! 12  ! 12
-  integer, parameter :: MAX_CELLS_N_NODES = 96  ! 72  ! 36
-  integer, parameter :: MAX_CELLS_N_FACES = 72  ! 48  ! 24
-  integer, parameter :: MAX_CELLS_N_CELLS = MAX_CELLS_N_FACES
+  end type
 
   contains
 
@@ -182,7 +224,6 @@
   include 'Grid_Mod/Bnd_Cond_Name.f90'
   include 'Grid_Mod/Bnd_Cond_Type.f90'
   include 'Grid_Mod/Bnd_Cond_Ranges.f90'
-  include 'Grid_Mod/Bounding_Box.f90'
   include 'Grid_Mod/Calculate_Cell_Centers.f90'
   include 'Grid_Mod/Calculate_Cell_Volumes.f90'
   include 'Grid_Mod/Calculate_Face_Centers.f90'
@@ -198,6 +239,7 @@
   include 'Grid_Mod/Exchange_Cells_Int.f90'
   include 'Grid_Mod/Exchange_Cells_Log.f90'
   include 'Grid_Mod/Exchange_Cells_Real.f90'
+  include 'Grid_Mod/Find_Bounding_Box.f90'
   include 'Grid_Mod/Find_Cells_Faces.f90'
   include 'Grid_Mod/Find_Nodes_Cells.f90'
   include 'Grid_Mod/Form_Cells_Comm.f90'
@@ -207,8 +249,8 @@
   include 'Grid_Mod/Load_Cfn.f90'
   include 'Grid_Mod/Load_Dim.f90'
   include 'Grid_Mod/Merge_Duplicate_Nodes.f90'
-  include 'Grid_Mod/Print_Bnd_Cond_Info.f90'
-  include 'Grid_Mod/Print_Statistics.f90'
+  include 'Grid_Mod/Print_Bnd_Cond_List.f90'
+  include 'Grid_Mod/Print_Grid_Statistics.f90'
   include 'Grid_Mod/Save_Cfn.f90'
   include 'Grid_Mod/Save_Dim.f90'
   include 'Grid_Mod/Save_Debug_Vtu.f90'

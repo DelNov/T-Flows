@@ -15,14 +15,14 @@ include '../User_Mod/Vof_Interface_Box.f90'
   type(Swarm_Type),  target :: swarm
   type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: grid
+  type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: fun, t
   real,             pointer :: dt
   integer                   :: c, c1, c2, s
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   t    => Flow % t
   fun  => Vof % fun
   dt   => Flow % dt
@@ -38,21 +38,21 @@ include '../User_Mod/Vof_Interface_Box.f90'
   call Vof_Initialization_Box(Vof)
 
   ! Naive way to update bounary values
-  do s = 1, grid % n_bnd_cells
-    c1 = grid % faces_c(1, s)
-    c2 = grid % faces_c(2, s)
+  do s = 1, Grid % n_bnd_cells
+    c1 = Grid % faces_c(1, s)
+    c2 = Grid % faces_c(2, s)
     if(c2 < 0) then
       fun % n(c2) = fun % n(c1)
     end if
   end do
 
   ! Initialize temperatures
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     t % n(c) = 20.0 + fun % n(c) * (60.0)
   end do
 
   ! Update buffer values
-  call Grid_Mod_Exchange_Cells_Real(grid, fun % n)
+  call Grid % Exchange_Cells_Real(fun % n)
 
   ! Set old values to be the same as new ones
   fun % o(:) = fun % n(:)

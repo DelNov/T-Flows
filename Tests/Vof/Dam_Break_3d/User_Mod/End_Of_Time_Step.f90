@@ -18,7 +18,7 @@
   integer                  :: n_stat_t, n_stat_p
   real                     :: time  ! physical time
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: fun
   integer                  :: c, last_cell, fu
   real                     :: b_volume, surface, rise_velocity,  &
@@ -32,11 +32,11 @@
 !==============================================================================!
 
   ! Take aliases
-  grid  => Flow % pnt_grid
+  Grid  => Flow % pnt_grid
   fun   => Vof % fun
 
   ! Height probes:
-  call Grid_Mod_Exchange_Cells_Real(grid, Vof % fun % n)
+  call Grid % Exchange_Cells_Real(Vof % fun % n)
   call Flow % Interpolate_Cells_To_Nodes(Vof % fun % n, vof_node)
   h_probe = 0.0
 
@@ -45,7 +45,7 @@
     if (allocated(probes(i_probe) % s_probe)) then
       do i_s = 1, size(probes(i_probe) % s_probe)
         s = probes(i_probe) % s_probe(i_s)
-        call Interpolate_From_Nodes(grid, Vof, vof_node, s, i_probe, i_s)
+        call Interpolate_From_Nodes(Grid, Vof, vof_node, s, i_probe, i_s)
       end do
     end if
   end do
@@ -80,7 +80,7 @@
   end do
 
   ! Pressure probes:
-  call Grid_Mod_Exchange_Cells_Real(grid, Flow % p % n)
+  call Grid % Exchange_Cells_Real(Flow % p % n)
 
   call Flow % Interpolate_Cells_To_Nodes(Flow % p % n, p_node)
 
@@ -101,8 +101,8 @@
   !---------------------!
   b_volume = 0.0
 
-  do c = 1, grid % n_cells - grid % comm % n_buff_cells
-    b_volume = b_volume + grid % vol(c) * fun % n(c)
+  do c = 1, Grid % n_cells - Grid % comm % n_buff_cells
+    b_volume = b_volume + Grid % vol(c) * fun % n(c)
   end do
 
   call Comm_Mod_Global_Sum_Real(b_volume)

@@ -11,12 +11,12 @@
   integer, intent(in) :: ini     ! inner iteration
 !----------------------------------[Locals]------------------------------------!
   type(Field_Type), pointer :: Flow
-  type(Grid_Type),  pointer :: grid
+  type(Grid_Type),  pointer :: Grid
 !==============================================================================!
 
   ! Take aliases
   Flow => turb % pnt_flow
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
 
   !---------------------------------------------------!
   !   Start branching for various turbulence models   !
@@ -62,7 +62,7 @@
   if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
      turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
 
-    call Time_And_Length_Scale(grid, turb)
+    call Time_And_Length_Scale(Grid, turb)
 
     call Flow % Grad_Variable(Flow % u)
     call Flow % Grad_Variable(Flow % v)

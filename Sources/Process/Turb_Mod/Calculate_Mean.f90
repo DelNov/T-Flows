@@ -9,7 +9,7 @@
   integer                  :: n0, n1
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
-  type(Grid_Type),  pointer :: grid
+  type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: u, v, w, p, t, phi
   type(Var_Type),   pointer :: kin, eps, f22, zeta, vis, t2
   type(Var_Type),   pointer :: uu, vv, ww, uv, uw, vw
@@ -32,7 +32,7 @@
 
   ! Take aliases
   Flow => turb % pnt_flow
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   p    => Flow % p
   vis  => turb % vis
   t2   => turb % t2
@@ -67,7 +67,7 @@
 
   if(n > -1) then
 
-    do c = -grid % n_bnd_cells, grid % n_cells
+    do c = -Grid % n_bnd_cells, Grid % n_cells
 
       !---------------------------------!
       !   Scale-resolving simulations   !

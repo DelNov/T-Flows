@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Calculate_Geometry(grid)
+  subroutine Calculate_Geometry(Grid)
 !------------------------------------------------------------------------------!
 !   Calculates geometrical quantities of the grid.                             !
 !------------------------------------------------------------------------------!
@@ -8,7 +8,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Grid_Type) :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, c1, c2, n, n1, n2, s, b
   integer              :: c11, c12, c21, c22, s1, s2, bou_cen, cnt_bnd, cnt_per
@@ -101,9 +101,9 @@
 !==============================================================================!
 
   ! An error trap for c1 and c2
-  do s = 1, grid % n_faces
-    if(grid % faces_c(2,s) > 0) then
-      if(grid % faces_c(1,s) > grid % faces_c(2,s)) then
+  do s = 1, Grid % n_faces
+    if(Grid % faces_c(2,s) > 0) then
+      if(Grid % faces_c(1,s) > Grid % faces_c(2,s)) then
         print *, '# TROUBLE: this shoulnd''t have happened at real face!'
         print *, '# This error is critical.  Exiting now.!'
         stop
@@ -120,12 +120,12 @@
   print *, '#========================================='
   print *, '# Geometric extents:                 '
   print *, '#-----------------------------------------'
-  print '(2(a,es10.3))', ' # X from: ', minval(grid % xn(:)),  &
-                         '  to: ',      maxval(grid % xn(:))
-  print '(2(a,es10.3))', ' # Y from: ', minval(grid % yn(:)),  &
-                         '  to: ',      maxval(grid % yn(:))
-  print '(2(a,es10.3))', ' # Z from: ', minval(grid % zn(:)),  &
-                         '  to: ',      maxval(grid % zn(:))
+  print '(2(a,es10.3))', ' # X from: ', minval(Grid % xn(:)),  &
+                         '  to: ',      maxval(Grid % xn(:))
+  print '(2(a,es10.3))', ' # Y from: ', minval(Grid % yn(:)),  &
+                         '  to: ',      maxval(Grid % yn(:))
+  print '(2(a,es10.3))', ' # Z from: ', minval(Grid % zn(:)),  &
+                         '  to: ',      maxval(Grid % zn(:))
   print *, '# Enter scaling factor for geometry: '
   print *, '# (or skip to keep as is): '
   print *, '#-----------------------------------------'
@@ -136,13 +136,13 @@
   if( answer .ne. 'SKIP' ) then
     read(line % tokens(1), *) factor
     print '(a,es10.3)', ' # Scaling geometry by factor: ', factor
-    grid % xn(:) = grid % xn(:) * factor
-    grid % yn(:) = grid % yn(:) * factor
-    grid % zn(:) = grid % zn(:) * factor
+    Grid % xn(:) = Grid % xn(:) * factor
+    Grid % yn(:) = Grid % yn(:) * factor
+    Grid % zn(:) = Grid % zn(:) * factor
   end if
 
   ! Estimate big and small
-  call Grid_Mod_Estimate_Big_And_Small(grid, big, small)
+  call Grid % Estimate_Big_And_Small(big, small)
 
   !-----------------------------------------!
   !   Calculate the cell centers            !
@@ -150,7 +150,7 @@
   !   => depends on: xn, yn, zn             !
   !   <= gives:      xc, yc, zc @ c > 0     !
   !-----------------------------------------!
-  call Grid_Mod_Calculate_Cell_Centers(grid)
+  call Grid % Calculate_Cell_Centers()
 
   !----------------------------------!
   !   Calculate face surface areas   !
@@ -158,7 +158,7 @@
   !   => depends on: xn, yn, zn      !
   !   <= gives:      sx, sy, sz      !
   !----------------------------------!
-  call Grid_Mod_Calculate_Face_Surfaces(grid)
+  call Grid % Calculate_Face_Surfaces()
 
   !--------------------------------!
   !   Calculate the face centers   !
@@ -166,7 +166,7 @@
   !   => depends on: xn, yn, zn    !
   !   <= gives:      xf, yf, zf    !
   !--------------------------------!
-  call Grid_Mod_Calculate_Face_Centers(grid)
+  call Grid % Calculate_Face_Centers()
 
   !-------------------------------------------!
   !   Calculate boundary cell centers         !
@@ -182,25 +182,25 @@
   print *, '#------------------------------------'
   read(*,*) bou_cen
 
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
-    sur_tot = sqrt(  grid % sx(s)*grid % sx(s)  &
-                   + grid % sy(s)*grid % sy(s)  &
-                   + grid % sz(s)*grid % sz(s) )
+    sur_tot = sqrt(  Grid % sx(s)*Grid % sx(s)  &
+                   + Grid % sy(s)*Grid % sy(s)  &
+                   + Grid % sz(s)*Grid % sz(s) )
 
     if(c2 < 0) then
-      t = (   grid % sx(s)*(grid % xf(s) - grid % xc(c1))        &
-            + grid % sy(s)*(grid % yf(s) - grid % yc(c1))        &
-            + grid % sz(s)*(grid % zf(s) - grid % zc(c1)) ) / sur_tot
-      grid % xc(c2) = grid % xc(c1) + grid % sx(s)*t / sur_tot
-      grid % yc(c2) = grid % yc(c1) + grid % sy(s)*t / sur_tot
-      grid % zc(c2) = grid % zc(c1) + grid % sz(s)*t / sur_tot
+      t = (   Grid % sx(s)*(Grid % xf(s) - Grid % xc(c1))        &
+            + Grid % sy(s)*(Grid % yf(s) - Grid % yc(c1))        &
+            + Grid % sz(s)*(Grid % zf(s) - Grid % zc(c1)) ) / sur_tot
+      Grid % xc(c2) = Grid % xc(c1) + Grid % sx(s)*t / sur_tot
+      Grid % yc(c2) = Grid % yc(c1) + Grid % sy(s)*t / sur_tot
+      Grid % zc(c2) = Grid % zc(c1) + Grid % sz(s)*t / sur_tot
       if(bou_cen .eq. 1) then
-        grid % xc(c2) = grid % xf(s)
-        grid % yc(c2) = grid % yf(s)
-        grid % zc(c2) = grid % zf(s)
+        Grid % xc(c2) = Grid % xf(s)
+        Grid % yc(c2) = Grid % yf(s)
+        Grid % zc(c2) = Grid % zf(s)
       end if
     end if
   end do ! through faces
@@ -212,39 +212,39 @@
   !   <= gives:      xc, yc, zc                                   !
   !   +  uses:       dx, dy, dz                                   !
   !---------------------------------------------------------------!
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
     if(c2 > 0) then
-      grid % dx(c1) = max( grid % dx(c1), abs( grid % xc(c2) - grid % xc(c1) ) )
-      grid % dy(c1) = max( grid % dy(c1), abs( grid % yc(c2) - grid % yc(c1) ) )
-      grid % dz(c1) = max( grid % dz(c1), abs( grid % zc(c2) - grid % zc(c1) ) )
-      grid % dx(c2) = max( grid % dx(c2), abs( grid % xc(c2) - grid % xc(c1) ) )
-      grid % dy(c2) = max( grid % dy(c2), abs( grid % yc(c2) - grid % yc(c1) ) )
-      grid % dz(c2) = max( grid % dz(c2), abs( grid % zc(c2) - grid % zc(c1) ) )
+      Grid % dx(c1) = max( Grid % dx(c1), abs( Grid % xc(c2) - Grid % xc(c1) ) )
+      Grid % dy(c1) = max( Grid % dy(c1), abs( Grid % yc(c2) - Grid % yc(c1) ) )
+      Grid % dz(c1) = max( Grid % dz(c1), abs( Grid % zc(c2) - Grid % zc(c1) ) )
+      Grid % dx(c2) = max( Grid % dx(c2), abs( Grid % xc(c2) - Grid % xc(c1) ) )
+      Grid % dy(c2) = max( Grid % dy(c2), abs( Grid % yc(c2) - Grid % yc(c1) ) )
+      Grid % dz(c2) = max( Grid % dz(c2), abs( Grid % zc(c2) - Grid % zc(c1) ) )
     end if
   end do ! through faces
 
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
     if(c2 < 0) then
-      if( Math_Mod_Approx_Real(grid % dx(c1), 0.0, small) )  &
-        grid % xc(c1) = 0.75 * grid % xc(c1) + 0.25 * grid % xc(c2)
-      if( Math_Mod_Approx_Real(grid % dy(c1), 0.0, small) )  &
-        grid % yc(c1) = 0.75 * grid % yc(c1) + 0.25 * grid % yc(c2)
-      if( Math_Mod_Approx_Real(grid % dz(c1), 0.0, small) )  &
-        grid % zc(c1) = 0.75 * grid % zc(c1) + 0.25 * grid % zc(c2)
+      if( Math_Mod_Approx_Real(Grid % dx(c1), 0.0, small) )  &
+        Grid % xc(c1) = 0.75 * Grid % xc(c1) + 0.25 * Grid % xc(c2)
+      if( Math_Mod_Approx_Real(Grid % dy(c1), 0.0, small) )  &
+        Grid % yc(c1) = 0.75 * Grid % yc(c1) + 0.25 * Grid % yc(c2)
+      if( Math_Mod_Approx_Real(Grid % dz(c1), 0.0, small) )  &
+        Grid % zc(c1) = 0.75 * Grid % zc(c1) + 0.25 * Grid % zc(c2)
     end if
   end do ! through faces
 
   ! Why are the following three lines needed?
   ! Because memory for dx, dy and dz was used in the previous step
-  grid % dx(:) = 0.0
-  grid % dy(:) = 0.0
-  grid % dz(:) = 0.0
+  Grid % dx(:) = 0.0
+  Grid % dy(:) = 0.0
+  Grid % dz(:) = 0.0
 
   !--------------------------------------------!
   !   Find the faces on the periodic boundary  !
@@ -252,8 +252,8 @@
   !   => depends on: xc, yc, zc, sx, sy, sz    !
   !   <= gives:      dx, dy, dz                !
   !--------------------------------------------!
-  allocate(b_coor(grid % n_faces)); b_coor = 0.0
-  allocate(b_face(grid % n_faces)); b_face = 0
+  allocate(b_coor(Grid % n_faces)); b_coor = 0.0
+  allocate(b_face(Grid % n_faces)); b_face = 0
 
   !--------------------------------------------------------!
   !                                                        !
@@ -263,7 +263,7 @@
   answer = ''
   do while(answer .ne. 'SKIP')
 
-    call Grid_Mod_Print_Bnd_Cond_List(grid)
+    call Grid % Print_Bnd_Cond_List()
     n_per = 0
     print *, '#=============================================================='
     print *, '# Enter the ordinal number(s) of periodic-boundary condition(s)'
@@ -280,7 +280,7 @@
     end if
 
     read(line % tokens(1), *) color_per
-    if( color_per > grid % n_bnd_cond ) then
+    if( color_per > Grid % n_bnd_cond ) then
       print *, '# Critical error: boundary condition ', color_per,  &
                  ' doesn''t exist!'
       print *, '# Exiting! '
@@ -294,21 +294,21 @@
     v(1:3)  = 0.0
     ! Browse through all the faces at periodic bc
     ! and accumulate periodic direction vector
-    do s = 1, grid % n_faces
-      c2 = grid % faces_c(2,s)
+    do s = 1, Grid % n_faces
+      c2 = Grid % faces_c(2,s)
       if(c2 < 0) then
-        if(grid % bnd_cond % color(c2) .eq. color_per) then
+        if(Grid % bnd_cond % color(c2) .eq. color_per) then
           cnt_per = cnt_per + 1
 
           ! This is a dot product of surface vector and vector 1.0, 1.0, 1,0
-          if( grid % sx(s) + grid % sy(s) + grid % sz(s) > 0.0 ) then
-            v(1) = v(1) + grid % sx(s)
-            v(2) = v(2) + grid % sy(s)
-            v(3) = v(3) + grid % sz(s)
+          if( Grid % sx(s) + Grid % sy(s) + Grid % sz(s) > 0.0 ) then
+            v(1) = v(1) + Grid % sx(s)
+            v(2) = v(2) + Grid % sy(s)
+            v(3) = v(3) + Grid % sz(s)
           else
-            v(1) = v(1) - grid % sx(s)
-            v(2) = v(2) - grid % sy(s)
-            v(3) = v(3) - grid % sz(s)
+            v(1) = v(1) - Grid % sx(s)
+            v(2) = v(2) - Grid % sy(s)
+            v(3) = v(3) - Grid % sz(s)
           end if
         end if
       end if
@@ -326,13 +326,13 @@
     !   Fill up helping vectors with sorting criteria   !
     !---------------------------------------------------!
     cnt_per = 0
-    do s = 1, grid % n_faces
-      c2 = grid % faces_c(2,s)
+    do s = 1, Grid % n_faces
+      c2 = Grid % faces_c(2,s)
       if(c2 < 0) then
-        if(grid % bnd_cond % color(c2) .eq. color_per) then
-          v_o(1) = grid % xf(s)
-          v_o(2) = grid % yf(s)
-          v_o(3) = grid % zf(s)
+        if(Grid % bnd_cond % color(c2) .eq. color_per) then
+          v_o(1) = Grid % xf(s)
+          v_o(2) = Grid % yf(s)
+          v_o(3) = Grid % zf(s)
           v_r(1:3) = Math_Mod_Rotate_Vector(v_o(1:3), k(1:3), theta)
           cnt_per = cnt_per + 1
           b_coor(cnt_per) = v_r(1)*big**2 + v_r(2)*big + v_r(3)
@@ -348,20 +348,20 @@
 
     !---------------------------------------------!
     !   Match the periodic faces with shadows &   !
-    !    fill up the grid % faces_s structure     !
+    !    fill up the Grid % faces_s structure     !
     !---------------------------------------------!
     do s = 1, cnt_per / 2
       s1 = b_face(s)
       s2 = b_face(s + cnt_per / 2)
-      c11 = grid % faces_c(1,s1)  ! cell 1 for face 1
-      c21 = grid % faces_c(2,s1)  ! cell 2 for cell 1
-      c12 = grid % faces_c(1,s2)  ! cell 1 for face 2
-      c22 = grid % faces_c(2,s2)  ! cell 2 for face 2
-      grid % faces_s(s1) = s2     ! store where it was coppied from ...
-      grid % faces_s(s2) = s1     ! ... and for the mirror face too
-      grid % faces_c(2,s1) = c12  ! inside cell on the other side of periodicity
-      grid % faces_c(1,s2) = 0    ! c21; this zero marks a shadow face -> dirty
-      grid % faces_c(2,s2) = 0    ! c21; this zero marks a shadow face -> dirty
+      c11 = Grid % faces_c(1,s1)  ! cell 1 for face 1
+      c21 = Grid % faces_c(2,s1)  ! cell 2 for cell 1
+      c12 = Grid % faces_c(1,s2)  ! cell 1 for face 2
+      c22 = Grid % faces_c(2,s2)  ! cell 2 for face 2
+      Grid % faces_s(s1) = s2     ! store where it was coppied from ...
+      Grid % faces_s(s2) = s1     ! ... and for the mirror face too
+      Grid % faces_c(2,s1) = c12  ! inside cell on the other side of periodicity
+      Grid % faces_c(1,s2) = 0    ! c21; this zero marks a shadow face -> dirty
+      Grid % faces_c(2,s2) = 0    ! c21; this zero marks a shadow face -> dirty
     end do
 
     n_per = cnt_per / 2
@@ -371,87 +371,87 @@
     !      Find periodic extents      !
     !   (This is actually obsolete)   !
     !---------------------------------!
-    grid % per_x = 0.0
-    grid % per_y = 0.0
-    grid % per_z = 0.0
+    Grid % per_x = 0.0
+    Grid % per_y = 0.0
+    Grid % per_z = 0.0
     do s = 1, n_per
       s1 = b_face(s)
       s2 = b_face(s + n_per)
-      grid % per_x = max(grid % per_x, abs(grid % xf(s1) - grid % xf(s2)))
-      grid % per_y = max(grid % per_y, abs(grid % yf(s1) - grid % yf(s2)))
-      grid % per_z = max(grid % per_z, abs(grid % zf(s1) - grid % zf(s2)))
+      Grid % per_x = max(Grid % per_x, abs(Grid % xf(s1) - Grid % xf(s2)))
+      Grid % per_y = max(Grid % per_y, abs(Grid % yf(s1) - Grid % yf(s2)))
+      Grid % per_z = max(Grid % per_z, abs(Grid % zf(s1) - Grid % zf(s2)))
     end do
-    print '(a38,f8.3)', ' # Periodicity in x direction         ', grid % per_x
-    print '(a38,f8.3)', ' # Periodicity in y direction         ', grid % per_y
-    print '(a38,f8.3)', ' # Periodicity in z direction         ', grid % per_z
+    print '(a38,f8.3)', ' # Periodicity in x direction         ', Grid % per_x
+    print '(a38,f8.3)', ' # Periodicity in y direction         ', Grid % per_y
+    print '(a38,f8.3)', ' # Periodicity in z direction         ', Grid % per_z
 
     !-------------------------------------------------!
     !   Compress all boundary cells by removing all   !
     !   cells which were holding periodic condition   !
     !-------------------------------------------------!
     cnt_bnd = 0
-    grid % new_c = 0
-    do c = -1, -grid % n_bnd_cells, -1
-      if(grid % bnd_cond % color(c) .ne. color_per) then
+    Grid % new_c = 0
+    do c = -1, -Grid % n_bnd_cells, -1
+      if(Grid % bnd_cond % color(c) .ne. color_per) then
         cnt_bnd = cnt_bnd + 1
-        grid % new_c(c) = -cnt_bnd
+        Grid % new_c(c) = -cnt_bnd
       end if
     end do
 
     ! Compress coordinates
-    do c = -1, -grid % n_bnd_cells, -1
-      if(grid % new_c(c) .ne. 0) then
-        grid % xc(grid % new_c(c)) = grid % xc(c)
-        grid % yc(grid % new_c(c)) = grid % yc(c)
-        grid % zc(grid % new_c(c)) = grid % zc(c)
-       grid % bnd_cond % color(grid % new_c(c)) = grid % bnd_cond % color(c)
+    do c = -1, -Grid % n_bnd_cells, -1
+      if(Grid % new_c(c) .ne. 0) then
+        Grid % xc(Grid % new_c(c)) = Grid % xc(c)
+        Grid % yc(Grid % new_c(c)) = Grid % yc(c)
+        Grid % zc(Grid % new_c(c)) = Grid % zc(c)
+       Grid % bnd_cond % color(Grid % new_c(c)) = Grid % bnd_cond % color(c)
       end if
     end do
 
     ! Compress indices
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
-      if(grid % new_c(c2) .ne. 0) then
-        grid % faces_c(2,s) = grid % new_c(c2)
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
+      if(Grid % new_c(c2) .ne. 0) then
+        Grid % faces_c(2,s) = Grid % new_c(c2)
       end if
     end do
 
-    grid % n_bnd_cells = cnt_bnd
-    print *, '# Kept boundary cells: ', grid % n_bnd_cells
+    Grid % n_bnd_cells = cnt_bnd
+    print *, '# Kept boundary cells: ', Grid % n_bnd_cells
 
     !--------------------------------------------------------------------!
     !   Remove boundary condition with color_per and compress the rest   !
     !--------------------------------------------------------------------!
-    if(color_per < grid % n_bnd_cond) then
+    if(color_per < Grid % n_bnd_cond) then
 
       ! Set the color of boundary selected to be periodic to zero
-      do c = -1, -grid % n_bnd_cells, -1
-        if(grid % bnd_cond % color(c) .eq. color_per) then
-          grid % bnd_cond % color(c) = 0
+      do c = -1, -Grid % n_bnd_cells, -1
+        if(Grid % bnd_cond % color(c) .eq. color_per) then
+          Grid % bnd_cond % color(c) = 0
         end if
       end do
 
       ! Shift the rest of the boundary cells
-      do b = 1, grid % n_bnd_cond - 1
+      do b = 1, Grid % n_bnd_cond - 1
         if(b .ge. color_per) then
 
           ! Correct the names
-          grid % bnd_cond % name(b) = grid % bnd_cond % name (b+1)
+          Grid % bnd_cond % name(b) = Grid % bnd_cond % name (b+1)
 
           ! Correct all boundary colors too
-          do c = -1, -grid % n_bnd_cells, -1
-            if(grid % bnd_cond % color(c) .eq. (b+1)) then
-              grid % bnd_cond % color(c) = b
+          do c = -1, -Grid % n_bnd_cells, -1
+            if(Grid % bnd_cond % color(c) .eq. (b+1)) then
+              Grid % bnd_cond % color(c) = b
             end if
           end do
 
         end if
       end do
     else
-      grid % bnd_cond % name(grid % n_bnd_cond) = ''
+      Grid % bnd_cond % name(Grid % n_bnd_cond) = ''
     end if
-    grid % n_bnd_cond = grid % n_bnd_cond - 1
+    Grid % n_bnd_cond = Grid % n_bnd_cond - 1
 
   end do  ! while answer .ne. 'SKIP'
 
@@ -465,44 +465,44 @@
   !   Initialize   !
   !----------------!
   n_per = 0
-  grid % dx(:) = 0.0
-  grid % dy(:) = 0.0
-  grid % dz(:) = 0.0
+  Grid % dx(:) = 0.0
+  Grid % dy(:) = 0.0
+  Grid % dz(:) = 0.0
 
-  do s = 1, grid % n_faces
+  do s = 1, Grid % n_faces
 
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
     if(c2 > 0) then
 
       !-------------------------!
       !   Find periodic faces   !
       !-------------------------!
-      if(grid % faces_s(s) .ne. 0) then
+      if(Grid % faces_s(s) .ne. 0) then
 
         n_per = n_per + 1
 
         ! Find the coordinates of the shadow face
-        xs2 = grid % xf(grid % faces_s(s))
-        ys2 = grid % yf(grid % faces_s(s))
-        zs2 = grid % zf(grid % faces_s(s))
+        xs2 = Grid % xf(Grid % faces_s(s))
+        ys2 = Grid % yf(Grid % faces_s(s))
+        zs2 = Grid % zf(Grid % faces_s(s))
 
-        grid % dx(s) = grid % xf(s) - xs2  !-----------------------!
-        grid % dy(s) = grid % yf(s) - ys2  ! later: xc2 = xc2 + dx !
-        grid % dz(s) = grid % zf(s) - zs2  !-----------------------!
+        Grid % dx(s) = Grid % xf(s) - xs2  !-----------------------!
+        Grid % dy(s) = Grid % yf(s) - ys2  ! later: xc2 = xc2 + dx !
+        Grid % dz(s) = Grid % zf(s) - zs2  !-----------------------!
 
-        grid % dx(grid % faces_s(s)) = grid % dx(s)
-        grid % dy(grid % faces_s(s)) = grid % dy(s)
-        grid % dz(grid % faces_s(s)) = grid % dz(s)
+        Grid % dx(Grid % faces_s(s)) = Grid % dx(s)
+        Grid % dy(Grid % faces_s(s)) = Grid % dy(s)
+        Grid % dz(Grid % faces_s(s)) = Grid % dz(s)
 
       end if !  s*(c2-c1) < 0.0
     end if   !  c2 > 0
   end do     !  faces
 
   ! Should this maybe be:
-  ! grid % n_shadows = grid % n_shadows + n_per ?
+  ! Grid % n_shadows = Grid % n_shadows + n_per ?
   ! Actually no, because n_per is being re-counted in the above loop.
-  grid % n_shadows = n_per
+  Grid % n_shadows = n_per
 
   print '(a38,i9)',   ' # Phase II: number of shadow faces:  ', n_per
 
@@ -515,16 +515,16 @@
   !----------------------------------------------------!
   n1 = 0
   n2 = 0
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
     !-------------------------------------------------------------------------!
     !   Product of centres connection and surface normal should be positive   !
     !-------------------------------------------------------------------------!
-    prod = grid % sx(s) * (grid % xc(c2) + grid % dx(s) - grid % xc(c1) )  &
-         + grid % sy(s) * (grid % yc(c2) + grid % dy(s) - grid % yc(c1) )  &
-         + grid % sz(s) * (grid % zc(c2) + grid % dz(s) - grid % zc(c1) )
+    prod = Grid % sx(s) * (Grid % xc(c2) + Grid % dx(s) - Grid % xc(c1) )  &
+         + Grid % sy(s) * (Grid % yc(c2) + Grid % dy(s) - Grid % yc(c1) )  &
+         + Grid % sz(s) * (Grid % zc(c2) + Grid % dz(s) - Grid % zc(c1) )
 
     !----------------------------------------------------------!
     !   If it is not, change the orientations of the surface   !
@@ -536,16 +536,16 @@
       if(c2 < 0) n2 = n2 + 1
 
       ! Reverse the order of face's nodes
-      n = grid % faces_n_nodes(s)  ! number of nodes in this face
-      call Sort % Reverse_Order_Int(grid % faces_n(1:n, s))
+      n = Grid % faces_n_nodes(s)  ! number of nodes in this face
+      call Sort % Reverse_Order_Int(Grid % faces_n(1:n, s))
 
       ! Keep the first node first (important if it is concave)
-      grid % faces_n(1:n,s) = cshift(grid % faces_n(1:n,s), -1)
+      Grid % faces_n(1:n,s) = cshift(Grid % faces_n(1:n,s), -1)
 
       ! Change the orientation of calculated surface vector
-      grid % sx(s) = -grid % sx(s)
-      grid % sy(s) = -grid % sy(s)
-      grid % sz(s) = -grid % sz(s)
+      Grid % sx(s) = -Grid % sx(s)
+      Grid % sy(s) = -Grid % sy(s)
+      Grid % sz(s) = -Grid % sz(s)
 
     end if
   end do
@@ -572,29 +572,29 @@
   number_faces = 0
 
   ! Assign numbers to real cells, inside and boundary
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
     if(c1 > 0) then
       number_faces = number_faces  + 1
-      grid % new_f(s) = number_faces
+      Grid % new_f(s) = number_faces
     end if
   end do
 
   ! Assign numbers to shadow faces, these can only be iside
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1, s)
-    c2 = grid % faces_c(2, s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1, s)
+    c2 = Grid % faces_c(2, s)
     if(c1 .eq. 0 .and. c2 .eq. 0) then  ! marked like that above -> dirty
       number_faces = number_faces  + 1
-      grid % new_f(s) = number_faces
+      Grid % new_f(s) = number_faces
 
       ! Restore cells surrounding it
-      grid % faces_c(1, s) = grid % faces_c(1, grid % faces_s(s))
-      grid % faces_c(2, s) = grid % faces_c(2, grid % faces_s(s))
+      Grid % faces_c(1, s) = Grid % faces_c(1, Grid % faces_s(s))
+      Grid % faces_c(2, s) = Grid % faces_c(2, Grid % faces_s(s))
     end if
   end do
-  print '(a38,i9)', ' # Old number of faces:               ',  grid % n_faces
+  print '(a38,i9)', ' # Old number of faces:               ',  Grid % n_faces
   print '(a38,i9)', ' # New number of faces:               ',  number_faces
 
   !----------------------------------!
@@ -602,26 +602,26 @@
   !   Phase IV  ->  sort the faces   !
   !                                  !
   !----------------------------------!
-  call Grid_Mod_Sort_Faces_By_Index(grid, grid % new_f, grid % n_faces)
-  call Sort % Real_By_Index(grid % n_faces, grid % xf, grid % new_f)
-  call Sort % Real_By_Index(grid % n_faces, grid % yf, grid % new_f)
-  call Sort % Real_By_Index(grid % n_faces, grid % zf, grid % new_f)
-  call Sort % Real_By_Index(grid % n_faces, grid % sx, grid % new_f)
-  call Sort % Real_By_Index(grid % n_faces, grid % sy, grid % new_f)
-  call Sort % Real_By_Index(grid % n_faces, grid % sz, grid % new_f)
-  call Sort % Real_By_Index(grid % n_faces, grid % dx, grid % new_f)
-  call Sort % Real_By_Index(grid % n_faces, grid % dy, grid % new_f)
-  call Sort % Real_By_Index(grid % n_faces, grid % dz, grid % new_f)
+  call Grid % Sort_Faces_By_Index(Grid % new_f, Grid % n_faces)
+  call Sort % Real_By_Index(Grid % n_faces, Grid % xf, Grid % new_f)
+  call Sort % Real_By_Index(Grid % n_faces, Grid % yf, Grid % new_f)
+  call Sort % Real_By_Index(Grid % n_faces, Grid % zf, Grid % new_f)
+  call Sort % Real_By_Index(Grid % n_faces, Grid % sx, Grid % new_f)
+  call Sort % Real_By_Index(Grid % n_faces, Grid % sy, Grid % new_f)
+  call Sort % Real_By_Index(Grid % n_faces, Grid % sz, Grid % new_f)
+  call Sort % Real_By_Index(Grid % n_faces, Grid % dx, Grid % new_f)
+  call Sort % Real_By_Index(Grid % n_faces, Grid % dy, Grid % new_f)
+  call Sort % Real_By_Index(Grid % n_faces, Grid % dz, Grid % new_f)
 
-  ! Why not: grid % n_faces = grid % n_faces - grid % n_shadows?
-  grid % n_faces = grid % n_faces - n_per
+  ! Why not: Grid % n_faces = Grid % n_faces - Grid % n_shadows?
+  Grid % n_faces = Grid % n_faces - n_per
 
-  ! Final correction to shadow faces for grid % faces_s and grid faces_c
-  do s = 1, grid % n_faces + grid % n_shadows
-    if(grid % faces_s(s) > 0) then
-      grid % faces_s(s) = grid % new_f(grid % faces_s(s))
-      grid % faces_c(1, grid % faces_s(s)) = grid % faces_c(1, s)
-      grid % faces_c(2, grid % faces_s(s)) = grid % faces_c(2, s)
+  ! Final correction to shadow faces for Grid % faces_s and Grid faces_c
+  do s = 1, Grid % n_faces + Grid % n_shadows
+    if(Grid % faces_s(s) > 0) then
+      Grid % faces_s(s) = Grid % new_f(Grid % faces_s(s))
+      Grid % faces_c(1, Grid % faces_s(s)) = Grid % faces_c(1, s)
+      Grid % faces_c(2, Grid % faces_s(s)) = Grid % faces_c(2, s)
     end if
   end do
 
@@ -629,10 +629,10 @@
   !   Check the periodic boundaries   !
   !-----------------------------------!
   max_dis = 0.0
-  do s = 1, grid % n_faces
-    max_dis = max(max_dis, (  grid % dx(s)*grid % dx(s)  &
-                            + grid % dy(s)*grid % dy(s)  &
-                            + grid % dz(s)*grid % dz(s) ) )
+  do s = 1, Grid % n_faces
+    max_dis = max(max_dis, (  Grid % dx(s)*Grid % dx(s)  &
+                            + Grid % dy(s)*Grid % dy(s)  &
+                            + Grid % dz(s)*Grid % dz(s) ) )
   end do
   print '(a45,e12.5)', ' # Maximal distance of periodic boundary is: ',  &
                        sqrt(max_dis)
@@ -645,25 +645,25 @@
   !                  xsp, ysp, zsp   !
   !   <= gives:      vol             !
   !----------------------------------!
-  call Grid_Mod_Calculate_Cell_Volumes(grid)
+  call Grid % Calculate_Cell_Volumes()
 
-  grid % min_vol =  HUGE
-  grid % max_vol = -HUGE
-  grid % tot_vol = 0.0
-  do c = 1, grid % n_cells
-    grid % tot_vol = grid % tot_vol + grid % vol(c)
-    grid % min_vol = min(grid % min_vol, grid % vol(c))
-    grid % max_vol = max(grid % max_vol, grid % vol(c))
+  Grid % min_vol =  HUGE
+  Grid % max_vol = -HUGE
+  Grid % tot_vol = 0.0
+  do c = 1, Grid % n_cells
+    Grid % tot_vol = Grid % tot_vol + Grid % vol(c)
+    Grid % min_vol = min(Grid % min_vol, Grid % vol(c))
+    Grid % max_vol = max(Grid % max_vol, Grid % vol(c))
   end do
   print '(a45,es12.5)', ' # Minimal cell volume is:                   ',  &
-        grid % min_vol
+        Grid % min_vol
   print '(a45,es12.5)', ' # Maximal cell volume is:                   ',  &
-        grid % max_vol
+        Grid % max_vol
   print '(a45,es12.5)', ' # Total domain volume is:                   ',  &
-        grid % tot_vol
+        Grid % tot_vol
   print *, '# Cell volumes calculated !'
 
-  if(grid % min_vol < 0.0) then
+  if(Grid % min_vol < 0.0) then
     print *, '# Negative volume occured!'
     print *, '# Execution will halt now!'
     stop
@@ -675,7 +675,7 @@
   !------------------------------------------------------------!
   !   Calculate the interpolation factors for the cell faces   !
   !------------------------------------------------------------!
-  call Grid_Mod_Calculate_Face_Interpolation(grid)
+  call Grid % Calculate_Face_Interpolation()
 
   print *, '# Interpolation factors calculated !'
 

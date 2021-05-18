@@ -8,27 +8,27 @@
   class(Field_Type) :: Flow
   type(Var_Type)    :: p
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   integer                  :: s, c1, c2, iter
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
 
   ! Refresh buffers for variable
-  call Grid_Mod_Exchange_Cells_Real(grid, p % n)
+  call Grid % Exchange_Cells_Real(p % n)
 
   do iter = 1, Flow % least_miter
 
     ! Extrapolation to boundaries
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
       if(c2 < 0) then
-        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. PRESSURE) then
-          p % n(c2) = p % n(c1) + p % x(c1) * grid % dx(s)  &
-                                + p % y(c1) * grid % dy(s)  &
-                                + p % z(c1) * grid % dz(s)
+        if(Grid % Bnd_Cond_Type(c2) .ne. PRESSURE) then
+          p % n(c2) = p % n(c1) + p % x(c1) * Grid % dx(s)  &
+                                + p % y(c1) * Grid % dy(s)  &
+                                + p % z(c1) * Grid % dz(s)
         end if
       end if
     end do
@@ -39,9 +39,9 @@
     call Flow % Grad_Component_No_Refresh(p % n, 3, p % z)  ! dp/dz
 
     ! Refresh buffers for gradient components
-    call Grid_Mod_Exchange_Cells_Real(grid, p % x)
-    call Grid_Mod_Exchange_Cells_Real(grid, p % y)
-    call Grid_Mod_Exchange_Cells_Real(grid, p % z)
+    call Grid % Exchange_Cells_Real(p % x)
+    call Grid % Exchange_Cells_Real(p % y)
+    call Grid % Exchange_Cells_Real(p % z)
 
   end do
 

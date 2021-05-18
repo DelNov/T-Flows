@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Load_Dom(dom, smr, ref, grid)
+  subroutine Load_Dom(dom, smr, ref, Grid)
 !------------------------------------------------------------------------------!
 !   Reads: .dom file                                                           !
 !------------------------------------------------------------------------------!
@@ -13,7 +13,7 @@
   type(Domain_Type)  :: dom
   type(Smooths_Type) :: smr
   type(Refines_Type) :: ref
-  type(Grid_Type)    :: grid
+  type(Grid_Type)    :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   integer       :: b, i, l, s, i_fac, n, n1, n2, n3, n4, dumi, fu
   integer       :: n_faces_check, n_nodes_check
@@ -31,9 +31,9 @@
   fn = hex_block
 
   !---------------------------------------------!
-  !   The grid will not have polyhedral cells   !
+  !   The Grid will not have polyhedral cells   !
   !---------------------------------------------!
-  grid % polyhedral = .false.
+  Grid % polyhedral = .false.
 
   print *, '#========================================'
   print *, '# Input problem name: (without extension)'
@@ -41,8 +41,8 @@
   call File_Mod_Read_Line(5)
   read(line % tokens(1), *) problem_name(1)
 
-  grid % name = problem_name(1)
-  call To_Upper_Case(grid % name)
+  Grid % name = problem_name(1)
+  call To_Upper_Case(Grid % name)
 
   call File_Mod_Set_Name(domain_name, extension='.dom')
   call File_Mod_Open_File_For_Reading(domain_name, fu)
@@ -51,40 +51,37 @@
   !   Max. number of nodes (cells), boundary faces and cell faces   !
   !-----------------------------------------------------------------!
   call File_Mod_Read_Line(fu)
-  read(line % tokens(1), *) grid % max_n_nodes
-  read(line % tokens(2), *) grid % max_n_bnd_cells
-  read(line % tokens(3), *) grid % max_n_faces
+  read(line % tokens(1), *) Grid % max_n_nodes
+  read(line % tokens(2), *) Grid % max_n_bnd_cells
+  read(line % tokens(3), *) Grid % max_n_faces
 
   !---------------------!
   !   Allocate memory   !
   !---------------------!
   print *, '# Allocating memory for: '
-  print *, '#', grid % max_n_nodes,     ' nodes and cells'
-  print *, '#', grid % max_n_bnd_cells, ' boundary cells'
-  print *, '#', grid % max_n_faces,     ' cell faces'
+  print *, '#', Grid % max_n_nodes,     ' nodes and cells'
+  print *, '#', Grid % max_n_bnd_cells, ' boundary cells'
+  print *, '#', Grid % max_n_faces,     ' cell faces'
 
-  allocate (grid % bnd_cond % color(-grid % max_n_bnd_cells-1:-1))
-  grid % bnd_cond % color = 0
+  allocate (Grid % bnd_cond % color(-Grid % max_n_bnd_cells-1:-1))
+  Grid % bnd_cond % color = 0
 
   ! Variables in Grid_Mod
-  call Grid_Mod_Allocate_Nodes(grid,  &
-                               grid % max_n_nodes)
+  call Grid % Allocate_Nodes(Grid % max_n_nodes)
 
-  call Grid_Mod_Allocate_Cells(grid,                    &
-                               grid % max_n_nodes,      &
-                               grid % max_n_bnd_cells)
+  call Grid % Allocate_Cells(Grid % max_n_nodes,      &
+                             Grid % max_n_bnd_cells)
 
-  call Grid_Mod_Allocate_Faces(grid,                    &
-                               grid % max_n_faces, 0)
+  call Grid % Allocate_Faces(Grid % max_n_faces, 0)
 
   call Refines_Mod_Allocate_Cells(ref,                     &
-                                  grid % max_n_bnd_cells,  &
-                                  grid % max_n_nodes)
+                                  Grid % max_n_bnd_cells,  &
+                                  Grid % max_n_nodes)
 
   ! Variables still declared in Gen_Mod.h90:
-  allocate (face_c_to_c(grid % max_n_faces,2))
+  allocate (face_c_to_c(Grid % max_n_faces,2))
   face_c_to_c = 0
-  allocate (twin_n(grid % max_n_nodes,0:8))
+  allocate (twin_n(Grid % max_n_nodes,0:8))
   twin_n (:,:) = 0
 
   print *, '# Allocation successfull !'
@@ -269,27 +266,27 @@
     n_faces_check=n_faces_check + ni*nj*nk + 2*( (ni*nj)+(nj*nk)+(ni*nk) )
   end do
 
-  if( (n_faces_check > grid % max_n_faces) .or.  &
-      (n_nodes_check > grid % max_n_nodes) ) then
+  if( (n_faces_check > Grid % max_n_faces) .or.  &
+      (n_nodes_check > Grid % max_n_nodes) ) then
     print *, '# Error message from T-Flows:'
   end if
 
-  if( n_faces_check  > grid % max_n_faces ) then
+  if( n_faces_check  > Grid % max_n_faces ) then
     print *, '# The estimated number of faces is :', n_faces_check
-    print *, '# There is space available only for:', grid % max_n_faces
-    print *, '# Increase the parameter grid % max_n_faces in the input file'
+    print *, '# There is space available only for:', Grid % max_n_faces
+    print *, '# Increase the parameter Grid % max_n_faces in the input file'
     print *, '# and re-run the code !'
   end if
 
-  if( n_nodes_check  > grid % max_n_nodes ) then
+  if( n_nodes_check  > Grid % max_n_nodes ) then
     print *, '# The estimated number of nodes is :', n_nodes_check
-    print *, '# There is space available only for:', grid % max_n_nodes
-    print *, '# Increase the parameter grid % max_n_nodes in the input file'
+    print *, '# There is space available only for:', Grid % max_n_nodes
+    print *, '# Increase the parameter Grid % max_n_nodes in the input file'
     print *, '# and re-run the code !'
   end if
 
-  if( (n_faces_check > grid % max_n_faces) .or.  &
-      (n_nodes_check > grid % max_n_nodes) ) then
+  if( (n_faces_check > Grid % max_n_faces) .or.  &
+      (n_nodes_check > Grid % max_n_nodes) ) then
     stop
   end if
 

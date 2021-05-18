@@ -8,7 +8,7 @@
   class(Vof_Type), target :: Vof
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
-  type(Grid_Type),  pointer :: grid
+  type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: fun
   type(Var_Type),   pointer :: smooth
   integer                   :: c, nb, nc
@@ -16,12 +16,12 @@
 
   ! First take aliases
   Flow   => Vof % pnt_flow
-  grid   => Vof % pnt_grid
+  Grid   => Vof % pnt_grid
   fun    => Vof % fun
   smooth => Vof % smooth
 
-  nb = grid % n_bnd_cells
-  nc = grid % n_cells
+  nb = Grid % n_bnd_cells
+  nc = Grid % n_cells
 
   !---------------------------------------------------!
   !   Curvature smoothing was engaged                 !
@@ -29,7 +29,7 @@
   if(Vof % n_conv_curv > 0) then
 
     ! Calculate smooth variable from vof function ...
-    call Vof % Smooth_Scalar(grid, fun % n,   &
+    call Vof % Smooth_Scalar(Grid, fun % n,   &
                              smooth % n(-nb:nc), Vof % n_conv_curv)
 
     ! ... and find its gradients as well
@@ -41,7 +41,7 @@
   else
 
     ! Take smooth variable to be the same as VOF itself ...
-    do c = -grid % n_bnd_cells, grid % n_cells
+    do c = -Grid % n_bnd_cells, Grid % n_cells
       smooth % n(c) = fun % n(c)
     end do
 
@@ -53,7 +53,7 @@
   !   Smoothing of normal is engaged                            !
   !-------------------------------------------------------------!
   if(Vof % n_conv_norm > 0) then
-    call Vof % Smooth_Scalar(grid, fun % n,   &
+    call Vof % Smooth_Scalar(Grid, fun % n,   &
                              smooth % n(-nb:nc), Vof % n_conv_norm)
     call Flow % Grad_Variable(smooth)
   end if

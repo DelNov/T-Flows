@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Grid_Mod_Calculate_Weights_Cells_To_Nodes(grid)
+  subroutine Calculate_Weights_Cells_To_Nodes(Grid)
 !------------------------------------------------------------------------------!
 !   Computes weights for interpolation from cell to nodes                      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  class(Grid_Type) :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c, n, i_cell
   real    :: lx, ly, lz, rx, ry, rz, lambda_x, lambda_y, lambda_z
@@ -17,41 +17,41 @@
 !==============================================================================!
 
   ! Allocate memory
-  allocate(grid % weight_c2n(size(grid % nodes_c,1),size(grid % nodes_c,2)))
-  grid % weight_c2n = 0.0
+  allocate(Grid % weight_c2n(size(Grid % nodes_c,1),size(Grid % nodes_c,2)))
+  Grid % weight_c2n = 0.0
 
   !-------------------------------------------!
   !   Browse through all nodes to calculate   !
   !     weights from cells surrounding it     !
   !-------------------------------------------!
-  do n = 1, grid % n_nodes
+  do n = 1, Grid % n_nodes
     rx = 0.0; ry = 0.0; rz = 0.0
     ixx = 0.0; iyy = 0.0; izz = 0.0; ixz = 0.0; iyz = 0.0; ixy = 0.0
 
     ! Loop on cells surrounding the node
-    do i_cell = 1, grid % nodes_n_cells(n)
-      c = grid % nodes_c(i_cell, n)
+    do i_cell = 1, Grid % nodes_n_cells(n)
+      c = Grid % nodes_c(i_cell, n)
 
       ! Default distances
-      lx = grid % xc(c) - grid % xn(n)
-      ly = grid % yc(c) - grid % yn(n)
-      lz = grid % zc(c) - grid % zn(n)
+      lx = Grid % xc(c) - Grid % xn(n)
+      ly = Grid % yc(c) - Grid % yn(n)
+      lz = Grid % zc(c) - Grid % zn(n)
 
       ! Check if periodicity in all three directions and correct distances
-      if( abs(lx - grid % per_x) < abs(lx) ) then
-        lx = lx - grid % per_x
-      else if( abs(lx + grid % per_x) < abs(lx) ) then
-        lx = lx + grid % per_x
+      if( abs(lx - Grid % per_x) < abs(lx) ) then
+        lx = lx - Grid % per_x
+      else if( abs(lx + Grid % per_x) < abs(lx) ) then
+        lx = lx + Grid % per_x
       end if
-      if( abs(ly - grid % per_y) < abs(ly) ) then
-        ly = ly - grid % per_y
-      else if( abs(ly + grid % per_y) < abs(ly) ) then
-        ly = ly + grid % per_y
+      if( abs(ly - Grid % per_y) < abs(ly) ) then
+        ly = ly - Grid % per_y
+      else if( abs(ly + Grid % per_y) < abs(ly) ) then
+        ly = ly + Grid % per_y
       end if
-      if( abs(lz - grid % per_z) < abs(lz) ) then
-        lz = lz - grid % per_z
-      else if( abs(lz + grid % per_z) < abs(lz) ) then
-        lz = lz + grid % per_z
+      if( abs(lz - Grid % per_z) < abs(lz) ) then
+        lz = lz - Grid % per_z
+      else if( abs(lz + Grid % per_z) < abs(lz) ) then
+        lz = lz + Grid % per_z
       end if
 
       rx  = rx  + lx
@@ -82,32 +82,32 @@
     lambda_y = (rx * a21 + ry * a22 + rz * a23) / (d + FEMTO)
     lambda_z = (rx * a31 + ry * a32 + rz * a33) / (d + FEMTO)
 
-    do i_cell = 1, grid % nodes_n_cells(n)
-      c  = grid % nodes_c(i_cell, n)
+    do i_cell = 1, Grid % nodes_n_cells(n)
+      c  = Grid % nodes_c(i_cell, n)
 
       ! Default distances
-      lx = grid % xc(c) - grid % xn(n)
-      ly = grid % yc(c) - grid % yn(n)
-      lz = grid % zc(c) - grid % zn(n)
+      lx = Grid % xc(c) - Grid % xn(n)
+      ly = Grid % yc(c) - Grid % yn(n)
+      lz = Grid % zc(c) - Grid % zn(n)
 
       ! Check if periodicity in all three directions and correct distances
-      if( abs(lx - grid % per_x) < abs(lx) ) then
-        lx = lx - grid % per_x
-      else if( abs(lx + grid % per_x) < abs(lx) ) then
-        lx = lx + grid % per_x
+      if( abs(lx - Grid % per_x) < abs(lx) ) then
+        lx = lx - Grid % per_x
+      else if( abs(lx + Grid % per_x) < abs(lx) ) then
+        lx = lx + Grid % per_x
       end if
-      if( abs(ly - grid % per_y) < abs(ly) ) then
-        ly = ly - grid % per_y
-      else if( abs(ly + grid % per_y) < abs(ly) ) then
-        ly = ly + grid % per_y
+      if( abs(ly - Grid % per_y) < abs(ly) ) then
+        ly = ly - Grid % per_y
+      else if( abs(ly + Grid % per_y) < abs(ly) ) then
+        ly = ly + Grid % per_y
       end if
-      if( abs(lz - grid % per_z) < abs(lz) ) then
-        lz = lz - grid % per_z
-      else if( abs(lz + grid % per_z) < abs(lz) ) then
-        lz = lz + grid % per_z
+      if( abs(lz - Grid % per_z) < abs(lz) ) then
+        lz = lz - Grid % per_z
+      else if( abs(lz + Grid % per_z) < abs(lz) ) then
+        lz = lz + Grid % per_z
       end if
 
-      grid % weight_c2n(i_cell, n) = 1.0 + lambda_x * lx   &
+      Grid % weight_c2n(i_cell, n) = 1.0 + lambda_x * lx   &
                                          + lambda_y * ly   &
                                          + lambda_z * lz
 
@@ -118,37 +118,37 @@
   !---------------------------!
   !   Normalize the weights   !
   !---------------------------!
-  do n = 1, grid % n_nodes
+  do n = 1, Grid % n_nodes
 
     ! Add total weights for all cells
     tot = 0.0
-    do i_cell = 1, grid % nodes_n_cells(n)
-      tot = tot + grid % weight_c2n(i_cell, n)
+    do i_cell = 1, Grid % nodes_n_cells(n)
+      tot = tot + Grid % weight_c2n(i_cell, n)
     end do
 
     ! Divide each weight with total
-    do i_cell = 1, grid % nodes_n_cells(n)
-      grid % weight_c2n(i_cell, n) = grid % weight_c2n(i_cell, n) / tot
+    do i_cell = 1, Grid % nodes_n_cells(n)
+      Grid % weight_c2n(i_cell, n) = Grid % weight_c2n(i_cell, n) / tot
     end do
 
   end do
 
   ! Debugging
   ! write(200 + this_proc, '(a)')  'List of nodes with their cells weights'
-  ! do n = 1, grid % n_nodes
+  ! do n = 1, Grid % n_nodes
   !   here = .false.
-  !   do i_cell = 1, grid % nodes_n_cells(n)
-  !     c = grid % nodes_c(i_cell, n)
-  !     if(grid % comm % cell_proc(c) .eq. this_proc) here = .true.
+  !   do i_cell = 1, Grid % nodes_n_cells(n)
+  !     c = Grid % nodes_c(i_cell, n)
+  !     if(Grid % comm % cell_proc(c) .eq. this_proc) here = .true.
   !   end do
   !   if(here) then
-  !     weights_sorted(1:grid % nodes_n_cells(n)) =  &
-  !     grid % weight_c2n(1:grid % nodes_n_cells(n), n)
-  !     call Sort_Mod_Real(weights_sorted(1:grid % nodes_n_cells(n)))
+  !     weights_sorted(1:Grid % nodes_n_cells(n)) =  &
+  !     Grid % weight_c2n(1:Grid % nodes_n_cells(n), n)
+  !     call Sort_Mod_Real(weights_sorted(1:Grid % nodes_n_cells(n)))
   !     write(200 + this_proc, '(i7.7, i3, 99f7.4)')  &
-  !                 grid % comm % node_glo(n),        &
-  !                 grid % nodes_n_cells(n),          &
-  !                 weights_sorted(1:grid % nodes_n_cells(n))
+  !                 Grid % comm % node_glo(n),        &
+  !                 Grid % nodes_n_cells(n),          &
+  !                 weights_sorted(1:Grid % nodes_n_cells(n))
   !   end if
   ! end do
 

@@ -1,5 +1,5 @@
 !==============================================================================!
-  integer function N_Bnd_Cells_In_Color(grid, bc, cell_data)
+  integer function N_Bnd_Cells_In_Color(Grid, bc, cell_data)
 !------------------------------------------------------------------------------!
 !   Counts and marks (with cell_data) boundary cells in given boundary color   !
 !------------------------------------------------------------------------------!
@@ -8,9 +8,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Grid_Type) :: Grid
   integer         :: bc
-  integer         :: cell_data(-grid % n_bnd_cells:grid % n_cells)
+  integer         :: cell_data(-Grid % n_bnd_cells:Grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c, cnt
 !==============================================================================!
@@ -19,8 +19,8 @@
   cnt = 0
   cell_data(:) = 0
 
-  do c = -grid % n_bnd_cells, -1
-    if( grid % bnd_cond % color(c) .eq. bc ) then
+  do c = -Grid % n_bnd_cells, -1
+    if( Grid % bnd_cond % color(c) .eq. bc ) then
       cnt = cnt + 1
       cell_data(c) = cell_data(c) + 1
     end if

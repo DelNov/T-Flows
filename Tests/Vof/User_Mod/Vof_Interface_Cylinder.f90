@@ -19,7 +19,7 @@
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: N = 10000
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   logical                  :: l_cel
   integer                  :: nod, n_int, n_tot, n_tot_int, fu
   integer                  :: ee, n_cylinders, i_vari, j_vari, n_vari
@@ -34,14 +34,14 @@
 !==============================================================================!
 
   ! First take aliasesd
-  grid => Vof % pnt_grid
+  Grid => Vof % pnt_grid
 
   ! Initialize variables
   var_comb   = HUGE
   var_comb_0 = 0.0
   vof_tol1   = MICRO
   vof_tol2   = MILI
-  dist_cent  = grid % vol(c) ** ONE_THIRD
+  dist_cent  = Grid % vol(c) ** ONE_THIRD
   vof_int    = HUGE
 
   n_tot = 0
@@ -51,13 +51,13 @@
   xmin =  HUGE; ymin =  HUGE; zmin =  HUGE;
   xmax = -HUGE; ymax = -HUGE; zmax = -HUGE;
 
-  do nod = 1, grid % cells_n_nodes(c)
-    xmin = min(xmin, grid % xn(grid % cells_n(nod,c)))
-    ymin = min(ymin, grid % yn(grid % cells_n(nod,c)))
-    zmin = min(zmin, grid % zn(grid % cells_n(nod,c)))
-    xmax = max(xmax, grid % xn(grid % cells_n(nod,c)))
-    ymax = max(ymax, grid % yn(grid % cells_n(nod,c)))
-    zmax = max(zmax, grid % zn(grid % cells_n(nod,c)))
+  do nod = 1, Grid % cells_n_nodes(c)
+    xmin = min(xmin, Grid % xn(Grid % cells_n(nod,c)))
+    ymin = min(ymin, Grid % yn(Grid % cells_n(nod,c)))
+    zmin = min(zmin, Grid % zn(Grid % cells_n(nod,c)))
+    xmax = max(xmax, Grid % xn(Grid % cells_n(nod,c)))
+    ymax = max(ymax, Grid % yn(Grid % cells_n(nod,c)))
+    zmax = max(zmax, Grid % zn(Grid % cells_n(nod,c)))
   end do
 
   l_cel = .false.
@@ -75,7 +75,7 @@
       p(2) = ymin+ (ymax-ymin) * r_num
       call random_number(r_num)
       p(3) = zmin+ (zmax-zmin) * r_num
-      l_cel = Grid_Mod_Is_Point_In_Cell(grid, c, p(1), p(2), p(3))
+      l_cel = Grid % Is_Point_In_Cell(c, p(1), p(2), p(3))
     end do
     n_tot = n_tot + 1
 
@@ -100,9 +100,9 @@
       mean_x = sum(points(1: n_tot,1)) / real(n_tot)
       mean_y = sum(points(1: n_tot,2)) / real(n_tot)
       mean_z = sum(points(1: n_tot,3)) / real(n_tot)
-      var_comb = abs(mean_x-grid % xc(c))   &
-               + abs(mean_y-grid % yc(c))   &
-               + abs(mean_z-grid % zc(c))
+      var_comb = abs(mean_x-Grid % xc(c))   &
+               + abs(mean_y-Grid % yc(c))   &
+               + abs(mean_z-Grid % zc(c))
     end if
   end do
 

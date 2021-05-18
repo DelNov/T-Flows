@@ -12,7 +12,7 @@
   integer, intent(in)      :: n     ! time step
   real,    intent(in)      :: time  ! physical time
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: u, v, w, t, phi
   integer                  :: s, c1, c2
   real                     :: vol_in, area_in, vel_in
@@ -20,7 +20,7 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
 
   !-------------------------------------!
   !   Compute average inflow velocity   !
@@ -30,14 +30,14 @@
 
   vel_max = -HUGE
   vel_min = +HUGE
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
     if(c2 < 0) then
-      if( Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. PRESSURE ) then
-        area_in = area_in + grid % s(s)
-        vol_in  = vol_in  + grid % s(s) * Flow % v % n(c2)
+      if( Grid % Bnd_Cond_Type(c2) .eq. PRESSURE ) then
+        area_in = area_in + Grid % s(s)
+        vol_in  = vol_in  + Grid % s(s) * Flow % v % n(c2)
         vel_max = max(vel_max, Flow % v % n(c2))
         vel_min = min(vel_min, Flow % v % n(c2))
       end if
@@ -56,12 +56,12 @@
   !------------------------------------------------!
   !   Set the average inflow velocity everywhere   !
   !------------------------------------------------!
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
     if(c2 < 0) then
-      if( Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. PRESSURE ) then
+      if( Grid % Bnd_Cond_Type(c2) .eq. PRESSURE ) then
         Flow % v % n(c1) = vel_in
         Flow % v % n(c2) = vel_in
       end if

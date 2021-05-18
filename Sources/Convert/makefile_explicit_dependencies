@@ -608,13 +608,13 @@ $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 \
-$(DIR_OBJECT)/Bnd_Cond_Mod.o 
+$(DIR_SHARED)/Comm_Mod/*/*.f90 
 
 #-- ./Grid_Mod/Allocate_Cells.f90
 #-- ./Grid_Mod/Allocate_Faces.f90
 #-- ./Grid_Mod/Calculate_Wall_Distance.f90
 #-- ./Grid_Mod/Calculate_Face_Centers.f90
+#-- ./Grid_Mod/Print_Grid_Statistics.f90
 #-- ./Grid_Mod/Exchange_Cells_Real.f90
 #-- ./Grid_Mod/Calculate_Face_Surfaces.f90
 #-- ./Grid_Mod/Load_Cfn.f90
@@ -637,10 +637,11 @@ $(DIR_OBJECT)/Bnd_Cond_Mod.o
 #-- ./Grid_Mod/Sort_Faces_Smart.f90
 #-- ./Grid_Mod/Allocate_Nodes.f90
 #-- ./Grid_Mod/Form_Maps.f90
+#-- ./Grid_Mod/Find_Bounding_Box.f90
 #-- ./Grid_Mod/Bnd_Cond_Type.f90
 #-- ./Grid_Mod/Calculate_Weights_Cells_To_Nodes.f90
 #-- ./Grid_Mod/Find_Periodic_Faces.f90
-#-- ./Grid_Mod/Print_Statistics.f90
+#-- ./Grid_Mod/Print_Bnd_Cond_List.f90
 #-- ./Grid_Mod/Bounding_Box.f90
 #-- ./Grid_Mod/Calculate_Face_Geometry.f90
 #-- ./Grid_Mod/Sort_Cells_By_Index.f90
@@ -674,14 +675,22 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 #-- ./To_Lower_Case.f90
 #-- ./Const_Mod.f90
 #-- ./Sort_Mod/Int_Carry_Int.f90
+#-- ./Sort_Mod/2_Real.f90
+#-- ./Sort_Mod/3_Real.f90
 #-- ./Sort_Mod/Two_Real_Carry_Two_Int.f90
+#-- ./Sort_Mod/3_Int.f90
+#-- ./Sort_Mod/Real_Carry_2_Int.f90
 #-- ./Sort_Mod/Two_Int.f90
 #-- ./Sort_Mod/Real_By_Index.f90
 #-- ./Sort_Mod/Three_Real_Carry_Three_Int.f90
 #-- ./Sort_Mod/Three_Real_Carry_Two_Int.f90
+#-- ./Sort_Mod/2_Real_Carry_2_Int.f90
 #-- ./Sort_Mod/Two_Real.f90
+#-- ./Sort_Mod/3_Int_Carry_2_Int.f90
+#-- ./Sort_Mod/3_Int_Carry_3_Int.f90
 #-- ./Sort_Mod/Real_Array.f90
 #-- ./Sort_Mod/Short_Carry_Short.f90
+#-- ./Sort_Mod/2_Int_Carry_2_Int.f90
 #-- ./Sort_Mod/Reverse_Order_Real.f90
 #-- ./Sort_Mod/Two_Int_Carry_Int.f90
 #-- ./Sort_Mod/Three_Int.f90
@@ -691,14 +700,23 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 #-- ./Sort_Mod/Two_Real_Carry_Int.f90
 #-- ./Sort_Mod/Int_Carry_Real.f90
 #-- ./Sort_Mod/Three_Int_Carry_Int.f90
+#-- ./Sort_Mod/3_Real_Carry_Int.f90
+#-- ./Sort_Mod/Real.f90
 #-- ./Sort_Mod/Int_Array.f90
 #-- ./Sort_Mod/Real_Carry_Int.f90
 #-- ./Sort_Mod/Three_Int_Carry_Three_Int.f90
 #-- ./Sort_Mod/Three_Int_Carry_Two_Int.f90
+#-- ./Sort_Mod/3_Int_Carry_Int.f90
 #-- ./Sort_Mod/Unique_Int.f90
+#-- ./Sort_Mod/3_Real_Carry_3_Int.f90
+#-- ./Sort_Mod/3_Real_Carry_2_Int.f90
 #-- ./Sort_Mod/Two_Int_Carry_Two_Int.f90
 #-- ./Sort_Mod/Real_Carry_Two_Int.f90
 #-- ./Sort_Mod/Three_Real.f90
+#-- ./Sort_Mod/Int.f90
+#-- ./Sort_Mod/2_Real_Carry_Int.f90
+#-- ./Sort_Mod/2_Int.f90
+#-- ./Sort_Mod/2_Int_Carry_Int.f90
 #-- ./Sort_Mod.f90
 $(DIR_OBJECT)/Sort_Mod.o:\
 $(DIR_SHARED)/Sort_Mod/*.f90 \

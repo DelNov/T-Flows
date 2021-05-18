@@ -14,7 +14,7 @@
   type(Turb_Type), target :: turb
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
-  type(Grid_Type),  pointer :: grid
+  type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: t
   integer                   :: c
   real                      :: lf, nc2
@@ -22,15 +22,15 @@
 
   ! Take aliases
   Flow => turb % pnt_flow
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   t    => Flow % t
 
   if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
     call Flow % Grad_Variable(t)
   end if
 
-  do c = 1, grid % n_cells
-    lf = grid % vol(c) ** ONE_THIRD
+  do c = 1, Grid % n_cells
+    lf = Grid % vol(c) ** ONE_THIRD
     turb % vis_t_sgs(c) = Flow % density(c)  &
                         * (lf*lf)            &          ! delta^2
                         * turb % c_dyn(c)    &          ! c_dynamic
@@ -38,7 +38,7 @@
   end do
 
   if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
-    do c = 1, grid % n_cells
+    do c = 1, Grid % n_cells
       nc2 = -Flow % beta * (  grav_x * t % x(c)   &
                             + grav_y * t % y(c)   &
                             + grav_z * t % z(c))
@@ -47,6 +47,6 @@
     end do
   end if
 
-  call Grid_Mod_Exchange_Cells_Real(grid, turb % vis_t_sgs)
+  call Grid % Exchange_Cells_Real(turb % vis_t_sgs)
 
   end subroutine

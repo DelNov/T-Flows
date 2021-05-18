@@ -18,7 +18,7 @@ include '../User_Mod/Interpolate_From_Nodes.f90'
   type(Swarm_Type),  target :: swarm
   type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: grid
+  type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: fun
   real,             pointer :: dt
   integer                   :: c, c1, c2, s, i_probe, c_inters, n, code, i_s
@@ -54,21 +54,21 @@ include '../User_Mod/Interpolate_From_Nodes.f90'
 !==============================================================================!
 
   ! Take aliases
-  grid  => Flow % pnt_grid
+  Grid  => Flow % pnt_grid
   fun   => Vof % fun
   dt    => Flow % dt
 
   epsloc = epsilon(epsloc)
 
   ! Initialize the whole domain as 0.0
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     fun % n(c) = 0.0
   end do
 
   ! Box
   call Vof_Initialization_Box(Vof)
 
-  call Grid_Mod_Exchange_Cells_Real(grid, fun % n)
+  call Grid % Exchange_Cells_Real(fun % n)
 
   ! Old value
   fun % o(:) = fun % n(:)
@@ -76,13 +76,13 @@ include '../User_Mod/Interpolate_From_Nodes.f90'
   ! At faces
 
   ! At boundaries
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
     if(c2 < 0) then
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) then
+      if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW) then
         fun % n(c2) = fun % n(c1)
-      else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
+      else if(Grid % Bnd_Cond_Type(c2) .eq. INFLOW) then
       else
         fun % n(c2) = fun % n(c1)
       end if
@@ -97,18 +97,18 @@ include '../User_Mod/Interpolate_From_Nodes.f90'
   nod_probe = -1
   do i_probe = 1, N_PROBE
     min_dist = HUGE
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
       if(c2 < 0) then
-        if(Grid_Mod_Bnd_Cond_Name(grid,c2) .eq. 'STEP') then
-          do n = 1, grid % cells_n_nodes(c1)
+        if(Grid % Bnd_Cond_Name(c2) .eq. 'STEP') then
+          do n = 1, Grid % cells_n_nodes(c1)
             dist = sqrt(                                                    &
-                  (grid % xn(grid % cells_n(n,c1))-x_probe(i_probe)) ** 2   &
-                 +(grid % yn(grid % cells_n(n,c1))-y_probe(i_probe)) ** 2   &
-                 +(grid % zn(grid % cells_n(n,c1))-z_probe(i_probe)) ** 2)
+                  (Grid % xn(Grid % cells_n(n,c1))-x_probe(i_probe)) ** 2   &
+                 +(Grid % yn(Grid % cells_n(n,c1))-y_probe(i_probe)) ** 2   &
+                 +(Grid % zn(Grid % cells_n(n,c1))-z_probe(i_probe)) ** 2)
             if (dist<min_dist) then
-              nod_probe(i_probe) = grid % cells_n(n,c1)
+              nod_probe(i_probe) = Grid % cells_n(n,c1)
               p_dist(i_probe) = dist
               min_dist = dist
             end if
@@ -145,7 +145,7 @@ include '../User_Mod/Interpolate_From_Nodes.f90'
     allocate(s_probe(1), s_coor(1,3), sp_point(N_PROBE_F))
 
     c_inters = 0
-    do s = 1, grid % n_faces
+    do s = 1, Grid % n_faces
       call Intersection_Line_Face(Flow, Vof, s, pab, pint, inters)
 
       if (inters) then

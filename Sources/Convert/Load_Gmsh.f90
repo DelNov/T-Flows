@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Load_Gmsh(grid, file_name)
+  subroutine Load_Gmsh(Grid, file_name)
 !------------------------------------------------------------------------------!
 !   Reads the Gmsh file format.                                                !
 !------------------------------------------------------------------------------!
@@ -8,7 +8,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Grid_Type) :: Grid
   character(SL)   :: file_name
 !-----------------------------------[Locals]-----------------------------------!
   integer                    :: n_sect, n_elem, n_blocks, n_bnd_sect, n_grps
@@ -34,7 +34,7 @@
   !----------------------------------------!
   !   Gmsh can't handle polyhedral grids   !
   !----------------------------------------!
-  grid % polyhedral = .false.
+  Grid % polyhedral = .false.
 
   !------------------------------!
   !   Check format fo the file   !
@@ -105,12 +105,12 @@
   end do
   if(ascii) then
     call File_Mod_Read_Line(fu)
-    read(line % tokens(4), *) grid % n_nodes  ! 2 and 4 store number of nodes
+    read(line % tokens(4), *) Grid % n_nodes  ! 2 and 4 store number of nodes
   else
     call File_Mod_Read_Binary_Int8_Array(fu, 4)
-    grid % n_nodes = int8_array(4)
+    Grid % n_nodes = int8_array(4)
   end if
-  print *,'# Number of nodes: ', grid % n_nodes
+  print *,'# Number of nodes: ', Grid % n_nodes
 
   !--------------------------------------!
   !                                      !
@@ -254,8 +254,8 @@
   !   Count the inner and boundary cells   !
   !                                        !
   !----------------------------------------!
-  grid % n_bnd_cells = 0
-  grid % n_cells     = 0
+  Grid % n_bnd_cells = 0
+  Grid % n_cells     = 0
   rewind(fu)
   do
     call File_Mod_Read_Line(fu)
@@ -312,29 +312,29 @@
         if(type .eq. MSH_PYRA)  call File_Mod_Read_Binary_Int8_Array(fu, 5)
       end if
       if(dim .eq. 2) then
-        grid % n_bnd_cells = grid % n_bnd_cells + 1
-        new(c) = -grid % n_bnd_cells
+        Grid % n_bnd_cells = Grid % n_bnd_cells + 1
+        new(c) = -Grid % n_bnd_cells
       end if
       if(dim .eq. 3) then
-        grid % n_cells = grid % n_cells + 1
-        new(c) = grid % n_cells
+        Grid % n_cells = Grid % n_cells + 1
+        new(c) = Grid % n_cells
       end if
     end do
   end do    ! n_grps
 
   ! These five lines are coppied from Load_Neu
-  print '(a38,i9)', '# Total number of nodes:             ', grid % n_nodes
-  print '(a38,i9)', '# Total number of cells:             ', grid % n_cells
+  print '(a38,i9)', '# Total number of nodes:             ', Grid % n_nodes
+  print '(a38,i9)', '# Total number of cells:             ', Grid % n_cells
   print '(a38,i9)', '# Total number of blocks:            ', n_blocks
   print '(a38,i9)', '# Total number of boundary sections: ', n_bnd_sect
-  print '(a38,i9)', '# Total number of boundary cells:    ', grid % n_bnd_cells
+  print '(a38,i9)', '# Total number of boundary cells:    ', Grid % n_bnd_cells
 
   !--------------------------------------------!
   !                                            !
   !   Allocate memory for Grid_Mod variables   !
   !                                            !
   !--------------------------------------------!
-  call Allocate_Memory(grid)
+  call Allocate_Memory(Grid)
 
   !---------------------------------------------------!
   !                                                   !
@@ -397,8 +397,8 @@
         read(line % tokens(1), *) c  ! fetch Gmsh cell number
         c = new(c)                   ! use T-Flows numbering
 
-        grid % cells_n_nodes(c) = n_nods
-        read(line % tokens(2:n_nods+1), *) grid % cells_n(1:n_nods, c)
+        Grid % cells_n_nodes(c) = n_nods
+        read(line % tokens(2:n_nods+1), *) Grid % cells_n(1:n_nods, c)
 
       else  ! it is in binary format
 
@@ -407,13 +407,13 @@
         c = int8_array(1)  ! fetch Gmsh cell number
         c = new(c)         ! use T-Flows numbering
 
-        grid % cells_n_nodes(c) = n_nods
-        grid % cells_n(1:n_nods, c) = int8_array(2:n_nods+1)
+        Grid % cells_n_nodes(c) = n_nods
+        Grid % cells_n(1:n_nods, c) = int8_array(2:n_nods+1)
 
       end if
 
       if(dim .eq. 2) then
-        grid % bnd_cond % color(c) = phys_tags(s_tag)
+        Grid % bnd_cond % color(c) = phys_tags(s_tag)
         n_bnd_cells(phys_tags(s_tag)) = n_bnd_cells(phys_tags(s_tag)) + 1
       end if
     end do
@@ -477,16 +477,16 @@
     if(ascii) then
       do j = 1, n_memb
         call File_Mod_Read_Line(fu)    ! read node coordinates
-        read(line % tokens(1),*) grid % xn(n(j))
-        read(line % tokens(2),*) grid % yn(n(j))
-        read(line % tokens(3),*) grid % zn(n(j))
+        read(line % tokens(1),*) Grid % xn(n(j))
+        read(line % tokens(2),*) Grid % yn(n(j))
+        read(line % tokens(3),*) Grid % zn(n(j))
       end do
     else
       do j = 1, n_memb
         call File_Mod_Read_Binary_Real8_Array(fu, 3)
-        grid % xn(n(j)) = real8_array(1)
-        grid % yn(n(j)) = real8_array(2)
-        grid % zn(n(j)) = real8_array(3)
+        Grid % xn(n(j)) = real8_array(1)
+        Grid % yn(n(j)) = real8_array(2)
+        Grid % zn(n(j)) = real8_array(3)
       end do
     end if
     deallocate(n)
@@ -497,12 +497,12 @@
   !   Copy boundary condition info   !
   !                                  !
   !----------------------------------!
-  grid % n_bnd_cond = n_bnd_sect
-  allocate(grid % bnd_cond % name(n_bnd_sect))
+  Grid % n_bnd_cond = n_bnd_sect
+  allocate(Grid % bnd_cond % name(n_bnd_sect))
 
   do i = 1, n_bnd_sect
-    grid % bnd_cond % name(i) = phys_names(i)
-    call To_Upper_Case(grid % bnd_cond % name(i))
+    Grid % bnd_cond % name(i) = phys_names(i)
+    call To_Upper_Case(Grid % bnd_cond % name(i))
   end do
 
   !------------------------------------!
@@ -510,7 +510,7 @@
   !   Print boundary conditions info   !
   !                                    !
   !------------------------------------!
-  call Grid_Mod_Print_Bnd_Cond_List(grid)
+  call Grid % Print_Bnd_Cond_List()
 
   close(fu)
 

@@ -20,7 +20,7 @@
   type(Swarm_Type),  target :: swarm
   type(Solver_Type), target :: sol
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: t, p
   integer                  :: c, s, c1, c2, iter
   integer                  :: i_fac, c1_prim, c2_prim, s_prim
@@ -31,7 +31,7 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   t    => Flow % t
   p    => Flow % p
 
@@ -39,9 +39,9 @@
   !   Find cells at boundary   !
   !----------------------------!
   c_at_bnd(:) = NO
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1, s)
-    c2 = grid % faces_c(2, s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1, s)
+    c2 = Grid % faces_c(2, s)
 
     if(c2 < 0) c_at_bnd(c1) = YES
   end do
@@ -62,21 +62,21 @@
   end if
 
   ! Specify exact cell values variable over-writing boundary values
-  do c = -grid % n_bnd_cells, grid % n_cells
-    t % n(c) =         grid % xc(c)  &
-               + 2.0 * grid % yc(C)  &
-               + 3.0 * grid % zc(C)
+  do c = -Grid % n_bnd_cells, Grid % n_cells
+    t % n(c) =         Grid % xc(c)  &
+               + 2.0 * Grid % yc(C)  &
+               + 3.0 * Grid % zc(C)
   end do
 
   ! Call cell-based least-square gradient method ...
   call Flow % Grad_Variable(t)
 
   ! ... and plot what you get
-  call Grid_Mod_Save_Debug_Vtu(                            &
-            grid, 'test_1_least_square_cell_base_method',  &
-            scalar_cell = t % n,                           &
-            scalar_name = 't',                             &
-            vector_cell = (/t % x, t % y, t % z/),         &
+  call Grid % Save_Debug_Vtu(                        &
+            'test_1_least_square_cell_base_method',  &
+            scalar_cell = t % n,                     &
+            scalar_name = 't',                       &
+            vector_cell = (/t % x, t % y, t % z/),   &
             vector_name = 't_xyz')
 
   !-------------------------------------------------!
@@ -95,17 +95,17 @@
   end if
 
   ! Specify exact cell values omittiing boundary values
-  do c = 1, grid % n_cells
-    phi_c(c) =         grid % xc(c)  &
-               + 2.0 * grid % yc(C)  &
-               + 3.0 * grid % zc(C)
+  do c = 1, Grid % n_cells
+    phi_c(c) =         Grid % xc(c)  &
+               + 2.0 * Grid % yc(C)  &
+               + 3.0 * Grid % zc(C)
   end do
 
   ! Specify exact face values over-writing boundary values
-  do s = 1, grid % n_faces
-    phi_f(s) =       grid % xf(s)  &
-             + 2.0 * grid % yf(s)  &
-             + 3.0 * grid % zf(s)
+  do s = 1, Grid % n_faces
+    phi_f(s) =       Grid % xf(s)  &
+             + 2.0 * Grid % yf(s)  &
+             + 3.0 * Grid % zf(s)
   end do
 
   ! Call least-squares face-based gradient calculation ...
@@ -114,9 +114,9 @@
   call Flow % Grad_Component_Faces_To_Cells(phi_c, phi_f, 3, phi_z)
 
   ! ... and save the results
-  call Grid_Mod_Save_Debug_Vtu(                            &
-            grid, 'test_2_least_square_face_base_method',  &
-            vector_cell = (/phi_x, phi_y, phi_z/),         &
+  call Grid % Save_Debug_Vtu(                        &
+            'test_2_least_square_face_base_method',  &
+            vector_cell = (/phi_x, phi_y, phi_z/),   &
             vector_name = 'phi_xyz')
 
   !---------------------------------------------------------!
@@ -135,19 +135,19 @@
   end if
 
   ! Specify variable over-writing boundary values
-  do c = -grid % n_bnd_cells, grid % n_cells
-    t % n(c) =         grid % xc(c)  &
-               + 2.0 * grid % yc(C)  &
-               + 3.0 * grid % zc(C)
+  do c = -Grid % n_bnd_cells, Grid % n_cells
+    t % n(c) =         Grid % xc(c)  &
+               + 2.0 * Grid % yc(C)  &
+               + 3.0 * Grid % zc(C)
   end do
 
   ! Calculate gradients with Gaussian theorem, (face values are exact) ...
   call Flow % Grad_Gauss_Variable(t)
 
   ! ... and plot the results
-  call Grid_Mod_Save_Debug_Vtu(                                      &
-            grid, 'test_3_gaussian_method_from_good_initial_guess',  &
-            vector_cell = (/t % x, t % y, t % z/),                   &
+  call Grid % Save_Debug_Vtu(                                  &
+            'test_3_gaussian_method_from_good_initial_guess',  &
+            vector_cell = (/t % x, t % y, t % z/),             &
             vector_name = 't_xyz')
 
   !---------------------------------------------------------!
@@ -174,9 +174,9 @@
   call Flow % Grad_Gauss_Variable(t)
 
   ! ... and save the results.  These results should be poor
-  call Grid_Mod_Save_Debug_Vtu(                                      &
-            grid, 'test_4_gaussian_method_from_poor_initial_guess',  &
-            vector_cell = (/t % x, t % y, t % z/),                   &
+  call Grid % Save_Debug_Vtu(                                  &
+            'test_4_gaussian_method_from_poor_initial_guess',  &
+            vector_cell = (/t % x, t % y, t % z/),             &
             vector_name = 't_xyz')
 
   !---------------------------------------------------------!
@@ -196,17 +196,17 @@
 
   ! Specify exact cell values variable not touching bounary values
   ! This is supposed to mimic pressure solution, for example
-  do c = 1, grid % n_cells
-    t % n(c) =         grid % xc(c)  &
-               + 2.0 * grid % yc(C)  &
-               + 3.0 * grid % zc(C)
+  do c = 1, Grid % n_cells
+    t % n(c) =         Grid % xc(c)  &
+               + 2.0 * Grid % yc(C)  &
+               + 3.0 * Grid % zc(C)
   end do
 
   ! Then extrapolate interior values to boundary cells
   ! This still mimics a result from a numerical solution
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1, s)
-    c2 = grid % faces_c(2, s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1, s)
+    c2 = Grid % faces_c(2, s)
 
     if(c2 < 0) then
       t % n(c2) = t % n(c1)
@@ -218,11 +218,11 @@
   ! gradients should be properly calculated inside the domain
   call Flow % Grad_Variable(t)
 
-  call Grid_Mod_Save_Debug_Vtu(                                     &
-            grid, 'test_51_least_squares_initial_guess_for_gauss',  &
-            scalar_cell = t % n,                                    &
-            scalar_name = 't',                                      &
-            vector_cell = (/t % x, t % y, t % z/),                  &
+  call Grid % Save_Debug_Vtu(                                 &
+            'test_51_least_squares_initial_guess_for_gauss',  &
+            scalar_cell = t % n,                              &
+            scalar_name = 't',                                &
+            vector_cell = (/t % x, t % y, t % z/),            &
             vector_name = 't_xyz')
 
   ! Perform Gauss from gradients which are good inside obtained above ...
@@ -230,9 +230,9 @@
 
   ! ... and plot what you got.  These should be better, but
   ! not quite.  Particularly not good for tetrahedral grids
-  call Grid_Mod_Save_Debug_Vtu(                                         &
-            grid, 'test_52_gaussian_method_from_better_initial_guess',  &
-            vector_cell = (/t % x, t % y, t % z/),                      &
+  call Grid % Save_Debug_Vtu(                                     &
+            'test_52_gaussian_method_from_better_initial_guess',  &
+            vector_cell = (/t % x, t % y, t % z/),                &
             vector_name = 't_xyz')
 
   !-------------------------------------------------------------------------!
@@ -253,18 +253,18 @@
   ! Specify exact cell values variable not touching bounary values
   ! This is supposed to mimic pressure solution, for example
   ! (This is the repetition of what was done in Test 5)
-  do c = 1, grid % n_cells
-    t % n(c) =         grid % xc(c)  &
-               + 2.0 * grid % yc(C)  &
-               + 3.0 * grid % zc(C)
+  do c = 1, Grid % n_cells
+    t % n(c) =         Grid % xc(c)  &
+               + 2.0 * Grid % yc(C)  &
+               + 3.0 * Grid % zc(C)
   end do
 
   ! Then extrapolate interior values to boundary cells
   ! This still mimics a result from a numerical solution
   ! (This is the repetition of what was done in Test 5)
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1, s)
-    c2 = grid % faces_c(2, s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1, s)
+    c2 = Grid % faces_c(2, s)
 
     if(c2 < 0) then
       t % n(c2) = t % n(c1)
@@ -284,7 +284,7 @@
   !           other boundary cells unchanged (reset to zero, really)   !
   !--------------------------------------------------------------------!
   c_cnt(:) = 0
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
 
     ! Cell is at the boundary, intervene here
     if(c_at_bnd(c) .eq. YES) then
@@ -297,10 +297,10 @@
       c_cnt(c) = 0    ! probably not needed, initialized above
 
       ! Browse through this cell's faces
-      do i_fac = 1, grid % cells_n_faces(c)
-        s_prim  = grid % cells_f(i_fac, c)
-        c1_prim = grid % faces_c(1, s_prim)
-        c2_prim = grid % faces_c(2, s_prim)
+      do i_fac = 1, Grid % cells_n_faces(c)
+        s_prim  = Grid % cells_f(i_fac, c)
+        c1_prim = Grid % faces_c(1, s_prim)
+        c2_prim = Grid % faces_c(2, s_prim)
 
         ! Consider c1_prim if it is not cell at boundary
         if(c_at_bnd(c1_prim) .eq. NO) then
@@ -339,16 +339,16 @@
   !           you are less selective and extrapolate even from cells at   !
   !           boundaries, which were interpolated in the Step 1 above.    !
   !-----------------------------------------------------------------------!
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
 
     ! Cell is at the boundary, and hasn't been treated yet
     if(c_at_bnd(c) .eq. YES .and. c_cnt(c) .eq. 0) then
 
       ! Browse through this cell's faces
-      do i_fac = 1, grid % cells_n_faces(c)
-        s_prim  = grid % cells_f(i_fac, c)
-        c1_prim = grid % faces_c(1, s_prim)
-        c2_prim = grid % faces_c(2, s_prim)
+      do i_fac = 1, Grid % cells_n_faces(c)
+        s_prim  = Grid % cells_f(i_fac, c)
+        c1_prim = Grid % faces_c(1, s_prim)
+        c2_prim = Grid % faces_c(2, s_prim)
 
         if(c1_prim .ne. c  .and.  &     ! skip your own self
            c_cnt(c1_prim) .gt. 0) then  ! consider only cells with values
@@ -380,11 +380,11 @@
   end do
 
   ! Save the initial guess that you got
-  call Grid_Mod_Save_Debug_Vtu(                                    &
-            grid, 'test_61_an_elaborate_initial_guess_for_Gauss',  &
-            scalar_cell = t % n,                                   &
-            scalar_name = 't',                                     &
-            vector_cell = (/t % x, t % y, t % z/),                 &
+  call Grid % Save_Debug_Vtu(                                &
+            'test_61_an_elaborate_initial_guess_for_Gauss',  &
+            scalar_cell = t % n,                             &
+            scalar_name = 't',                               &
+            vector_cell = (/t % x, t % y, t % z/),           &
             vector_name = 't_xyz')
 
   ! Perform Gauss from gradients which are good inside obtained above ...
@@ -392,9 +392,9 @@
 
   ! ... and plot what you got.  These should be better, but
   ! not quite.  Particularly not good for tetrahedral grids
-  call Grid_Mod_Save_Debug_Vtu(                                        &
-            grid, 'test_62_gaussian_method_from_the_elaborate_guess',  &
-            vector_cell = (/t % x, t % y, t % z/),                     &
+  call Grid % Save_Debug_Vtu(                                    &
+            'test_62_gaussian_method_from_the_elaborate_guess',  &
+            vector_cell = (/t % x, t % y, t % z/),               &
             vector_name = 't_xyz')
 
   !----------------------------------------------------------------------!
@@ -414,10 +414,10 @@
   ! Specify exact cell values variable not touching bounary values
   ! This is supposed to mimic pressure solution, for example
   ! (This is the repetition of what was done in Test 5 & 6)
-  do c = 1, grid % n_cells
-    p % n(c) =         grid % xc(c)  &
-               + 2.0 * grid % yc(C)  &
-               + 3.0 * grid % zc(C)
+  do c = 1, Grid % n_cells
+    p % n(c) =         Grid % xc(c)  &
+               + 2.0 * Grid % yc(C)  &
+               + 3.0 * Grid % zc(C)
   end do
 
   ! Perform Gauss from gradients which are good inside obtained above ...
@@ -425,9 +425,9 @@
 
   ! ... and plot what you got.  These should be better, but
   ! not quite.  Particularly not good for tetrahedral grids
-  call Grid_Mod_Save_Debug_Vtu(                            &
-            grid, 'test_7_field_grad_gauss_pressure',  &
-            vector_cell = (/p % x, p % y, p % z/),         &
+  call Grid % Save_Debug_Vtu(                       &
+            'test_7_field_grad_gauss_pressure',     &
+            vector_cell = (/p % x, p % y, p % z/),  &
             vector_name = 'p_xyz')
 
   end subroutine

@@ -13,7 +13,7 @@
   type(Turb_Type),  target :: turb
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
-  type(Grid_Type),  pointer :: grid
+  type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: u, v, w
   type(Var_Type),   pointer :: uu, vv, ww, uv, uw, vw
   type(Var_Type),   pointer :: kin, eps, zeta, f22
@@ -23,9 +23,9 @@
 
   ! Take aliases
   Flow => turb % pnt_flow
-  grid => Flow % pnt_grid
-  nc = grid % n_cells
-  nb = grid % n_bnd_cells
+  Grid => Flow % pnt_grid
+  nc = Grid % n_cells
+  nb = Grid % n_bnd_cells
   call Flow % Alias_Momentum(u, v, w)
   call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
@@ -35,7 +35,7 @@
   call Flow % Grad_Variable(w)
 
   if( turb % model .eq. K_EPS ) then
-    do c = 1, grid % n_cells
+    do c = 1, Grid % n_cells
 
       uu % n(c) = - 2. * turb % vis_t(c) / Flow % density(c)  &
                        * u % x(c) + TWO_THIRDS * kin % n(c)
@@ -53,11 +53,11 @@
 
   if( turb % model .eq. K_EPS_ZETA_F ) then
 
-    call Flow % Grad(grid % wall_dist, wd_x(-nb:nc),  &
+    call Flow % Grad(Grid % wall_dist, wd_x(-nb:nc),  &
                                        wd_y(-nb:nc),  &
                                        wd_z(-nb:nc))
 
-    do c = 1, grid % n_cells
+    do c = 1, Grid % n_cells
 
       wd_m = sqrt(wd_x(c)**2 + wd_y(c)**2 + wd_z(c)**2)
       wd_x(c) = abs(wd_x(c) / wd_m)

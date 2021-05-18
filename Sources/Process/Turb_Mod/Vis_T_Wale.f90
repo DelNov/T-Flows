@@ -13,7 +13,7 @@
   type(Turb_Type), target :: turb
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
-  type(Grid_Type),  pointer :: grid
+  type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: u, v, w
   integer                   :: c
   real                      :: s11, s22, s33,  s12, s13, s23,  s21, s31, s32
@@ -23,7 +23,7 @@
 
   ! Take aliases
   Flow => turb % pnt_flow
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   call Flow % Alias_Momentum(u, v, w)
 
   !---------------!
@@ -31,7 +31,7 @@
   !   SGS terms   !
   !               !
   !---------------!
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     s11 = u % x(c)
     s22 = v % y(c)
     s33 = w % z(c)

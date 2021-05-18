@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Interface_Mod_Create(inter, grid, n_dom)
+  subroutine Interface_Mod_Create(inter, Grid, n_dom)
 !------------------------------------------------------------------------------!
 !   Create interface between two grids.                                        !
 !                                                                              !
@@ -43,7 +43,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Interface_Type)    :: inter(MD, MD)
-  type(Grid_Type), target :: grid(MD)
+  type(Grid_Type), target :: Grid(MD)
   integer                 :: n_dom
 !-----------------------------------[Locals]-----------------------------------!
   integer, allocatable :: off_1(:)
@@ -72,8 +72,8 @@
       inter(d1, d2) % n_tot = 0
 
       ! Store pointers to the grids surrounding the interface
-      inter(d1, d2) % pnt_grid1 => grid(d1)
-      inter(d1, d2) % pnt_grid2 => grid(d2)
+      inter(d1, d2) % pnt_grid1 => Grid(d1)
+      inter(d1, d2) % pnt_grid2 => Grid(d2)
 
       if(d1 .ne. d2) then
 
@@ -109,20 +109,20 @@
           n1 = 0
 
           ! On physical boundary cells
-          do s = 1, grid(d1) % n_faces
-            c2 = grid(d1) % faces_c(2,s)
+          do s = 1, Grid(d1) % n_faces
+            c2 = Grid(d1) % faces_c(2,s)
             if(c2 < 0) then
-              if(Grid_Mod_Bnd_Cond_Name(grid(d1), c2) .eq. keys(1)) then
+              if(Grid(d1) % Bnd_Cond_Name(c2) .eq. keys(1)) then
                 n1 = n1 + 1
               end if
             end if
           end do
 
           ! On periodic faces of domain 1
-          do s = 1, grid(d1) % n_faces
-            c1 = grid(d1) % faces_c(1,s)
-            if(Grid_Mod_Bnd_Cond_Name(grid(d1), s) .eq. keys(1) .and.  &
-               grid(d1) % comm % cell_proc(c1) .eq. this_proc) then
+          do s = 1, Grid(d1) % n_faces
+            c1 = Grid(d1) % faces_c(1,s)
+            if(Grid(d1) % Bnd_Cond_Name(s) .eq. keys(1) .and.  &
+               Grid(d1) % comm % cell_proc(c1) .eq. this_proc) then
               n1 = n1 + 1
             end if
           end do
@@ -132,20 +132,20 @@
           n2 = 0
 
           ! On physical boundary cells
-          do s = 1, grid(d2) % n_faces
-            c2 = grid(d2) % faces_c(2,s)
+          do s = 1, Grid(d2) % n_faces
+            c2 = Grid(d2) % faces_c(2,s)
             if(c2 < 0) then
-              if(Grid_Mod_Bnd_Cond_Name(grid(d2), c2) .eq. keys(2)) then
+              if(Grid(d2) % Bnd_Cond_Name(c2) .eq. keys(2)) then
                 n2 = n2 + 1
               end if
             end if
           end do
 
           ! On periodic faces
-          do s = 1, grid(d2) % n_faces
-            c1 = grid(d2) % faces_c(1,s)
-            if(Grid_Mod_Bnd_Cond_Name(grid(d2), s) .eq. keys(2) .and.  &
-               grid(d2) % comm % cell_proc(c1) .eq. this_proc) then
+          do s = 1, Grid(d2) % n_faces
+            c1 = Grid(d2) % faces_c(1,s)
+            if(Grid(d2) % Bnd_Cond_Name(s) .eq. keys(2) .and.  &
+               Grid(d2) % comm % cell_proc(c1) .eq. this_proc) then
               n2 = n2 + 1
             end if
           end do
@@ -211,73 +211,73 @@
 
           ! On the side of d1
           n1 = 0
-          do s = 1, grid(d1) % n_faces
-            c1 = grid(d1) % faces_c(1,s)
-            c2 = grid(d1) % faces_c(2,s)
+          do s = 1, Grid(d1) % n_faces
+            c1 = Grid(d1) % faces_c(1,s)
+            c2 = Grid(d1) % faces_c(2,s)
             if(c2 < 0) then
-              if(Grid_Mod_Bnd_Cond_Name(grid(d1), c2) .eq. keys(1)) then
+              if(Grid(d1) % Bnd_Cond_Name(c2) .eq. keys(1)) then
                 n1 = n1 + 1
                 pos = n1
                 if(n_proc > 1) pos = pos + off_1(this_proc)
                 ic_1(pos) = c1
                 ib_1(pos) = c2
                 ip_1(pos) = this_proc
-                xf_1(pos) = grid(d1) % xf(s)
-                yf_1(pos) = grid(d1) % yf(s)
-                zf_1(pos) = grid(d1) % zf(s)
+                xf_1(pos) = Grid(d1) % xf(s)
+                yf_1(pos) = Grid(d1) % yf(s)
+                zf_1(pos) = Grid(d1) % zf(s)
               end if
             end if
           end do
-          do s = 1, grid(d1) % n_faces
-            c1 = grid(d1) % faces_c(1,s)
-            c2 = grid(d1) % faces_c(2,s)
-            if(Grid_Mod_Bnd_Cond_Name(grid(d1), s) .eq. keys(1) .and.  &
-               grid(d1) % comm % cell_proc(c1) .eq. this_proc) then
+          do s = 1, Grid(d1) % n_faces
+            c1 = Grid(d1) % faces_c(1,s)
+            c2 = Grid(d1) % faces_c(2,s)
+            if(Grid(d1) % Bnd_Cond_Name(s) .eq. keys(1) .and.  &
+               Grid(d1) % comm % cell_proc(c1) .eq. this_proc) then
               n1 = n1 + 1
               pos = n1
               if(n_proc > 1) pos = pos + off_1(this_proc)
               ic_1(pos) = c1
               ib_1(pos) = c2
               ip_1(pos) = this_proc
-              xf_1(pos) = grid(d1) % xf(s)
-              yf_1(pos) = grid(d1) % yf(s)
-              zf_1(pos) = grid(d1) % zf(s)
+              xf_1(pos) = Grid(d1) % xf(s)
+              yf_1(pos) = Grid(d1) % yf(s)
+              zf_1(pos) = Grid(d1) % zf(s)
             end if
           end do
 
           ! On the side of d2
           n2 = 0
-          do s = 1, grid(d2) % n_faces
-            c1 = grid(d2) % faces_c(1,s)
-            c2 = grid(d2) % faces_c(2,s)
+          do s = 1, Grid(d2) % n_faces
+            c1 = Grid(d2) % faces_c(1,s)
+            c2 = Grid(d2) % faces_c(2,s)
             if(c2 < 0) then
-              if(Grid_Mod_Bnd_Cond_Name(grid(d2), c2) .eq. keys(2)) then
+              if(Grid(d2) % Bnd_Cond_Name(c2) .eq. keys(2)) then
                 n2 = n2 + 1
                 pos = n2
                 if(n_proc > 1) pos = pos + off_2(this_proc)
                 ic_2(pos) = c1
                 ib_2(pos) = c2
                 ip_2(pos) = this_proc
-                xf_2 (pos) = grid(d2) % xf(s)
-                yf_2 (pos) = grid(d2) % yf(s)
-                zf_2 (pos) = grid(d2) % zf(s)
+                xf_2 (pos) = Grid(d2) % xf(s)
+                yf_2 (pos) = Grid(d2) % yf(s)
+                zf_2 (pos) = Grid(d2) % zf(s)
               end if
             end if
           end do
-          do s = 1, grid(d2) % n_faces
-            c1 = grid(d2) % faces_c(1,s)
-            c2 = grid(d2) % faces_c(2,s)
-            if(Grid_Mod_Bnd_Cond_Name(grid(d2), s) .eq. keys(2) .and.  &
-               grid(d2) % comm % cell_proc(c1) .eq. this_proc) then
+          do s = 1, Grid(d2) % n_faces
+            c1 = Grid(d2) % faces_c(1,s)
+            c2 = Grid(d2) % faces_c(2,s)
+            if(Grid(d2) % Bnd_Cond_Name(s) .eq. keys(2) .and.  &
+               Grid(d2) % comm % cell_proc(c1) .eq. this_proc) then
               n2 = n2 + 1
               pos = n2
               if(n_proc > 1) pos = pos + off_2(this_proc)
               ic_2(pos) = c1
               ib_2(pos) = c2
               ip_2(pos) = this_proc
-              xf_2 (pos) = grid(d2) % xf(s)
-              yf_2 (pos) = grid(d2) % yf(s)
-              zf_2 (pos) = grid(d2) % zf(s)
+              xf_2 (pos) = Grid(d2) % xf(s)
+              yf_2 (pos) = Grid(d2) % yf(s)
+              zf_2 (pos) = Grid(d2) % zf(s)
             end if
           end do
 
@@ -345,7 +345,7 @@
             ! Handle domain 1
             if(ip_1(n) .eq. this_proc) then
               n1 = n1 + 1
-              do c = 1, grid(d1) % n_cells
+              do c = 1, Grid(d1) % n_cells
                 if(c .eq. ic_1(n)) then
                   inter(d1, d2) % cell_1(n1) = c
                   inter(d1, d2) % face_1(n1) = n
@@ -359,7 +359,7 @@
             ! Handle domain 2
             if(ip_2(n) .eq. this_proc) then
               n2 = n2 + 1
-              do c = 1, grid(d2) % n_cells
+              do c = 1, Grid(d2) % n_cells
                 if(c .eq. ic_2(n)) then
                   inter(d1, d2) % cell_2(n2) = c
                   inter(d1, d2) % face_2(n2) = n

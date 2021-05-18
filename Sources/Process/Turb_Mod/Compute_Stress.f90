@@ -31,7 +31,7 @@
   type(Var_Type)            :: phi
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: Flow
-  type(Grid_Type),   pointer :: grid
+  type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: u, v, w
   type(Var_Type),    pointer :: kin, eps, zeta, f22, ut, vt, wt
   type(Var_Type),    pointer :: uu, vv, ww, uv, uw, vw
@@ -62,9 +62,9 @@
 
   ! Take aliases
   Flow => turb % pnt_flow
-  grid => Flow % pnt_grid
-  nc   =  grid % n_cells
-  nb   =  grid % n_bnd_cells
+  Grid => Flow % pnt_grid
+  nc   =  Grid % n_cells
+  nb   =  Grid % n_bnd_cells
   dt   =  Flow % dt
   flux => Flow % v_flux % n
   call Flow % Alias_Momentum(u, v, w)
@@ -79,7 +79,7 @@
 
   ! Old values (o) and older than old (oo)
   if(ini .eq. 1) then
-    do c = 1, grid % n_cells
+    do c = 1, Grid % n_cells
       phi % oo(c) = phi % o(c)
       phi % o (c) = phi % n(c)
     end do
@@ -106,18 +106,18 @@
   !----------------------------!
   !   Spatial discretization   !
   !----------------------------!
-  do s = 1, grid % n_faces
+  do s = 1, Grid % n_faces
 
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
     ! vis_tur is used to make diaginal element more dominant.
     ! This contribution is later substracted.
-    vis_t_f =      grid % fw(s)  * turb % vis_t(c1)  &
-            + (1.0-grid % fw(s)) * turb % vis_t(c2)
+    vis_t_f =      Grid % fw(s)  * turb % vis_t(c1)  &
+            + (1.0-Grid % fw(s)) * turb % vis_t(c2)
 
-    visc_f =        grid % fw(s)  * Flow % viscosity(c1)  &
-           + (1.0 - grid % fw(s)) * Flow % viscosity(c2)
+    visc_f =        Grid % fw(s)  * Flow % viscosity(c1)  &
+           + (1.0 - Grid % fw(s)) * Flow % viscosity(c2)
 
     vis_eff = visc_f + vis_t_f
 
@@ -127,24 +127,24 @@
       end if
     end if
 
-    phix_f = grid % fw(s) * phi_x(c1) + (1.0-grid % fw(s)) * phi_x(c2)
-    phiy_f = grid % fw(s) * phi_y(c1) + (1.0-grid % fw(s)) * phi_y(c2)
-    phiz_f = grid % fw(s) * phi_z(c1) + (1.0-grid % fw(s)) * phi_z(c2)
+    phix_f = Grid % fw(s) * phi_x(c1) + (1.0-Grid % fw(s)) * phi_x(c2)
+    phiy_f = Grid % fw(s) * phi_y(c1) + (1.0-Grid % fw(s)) * phi_y(c2)
+    phiz_f = Grid % fw(s) * phi_z(c1) + (1.0-Grid % fw(s)) * phi_z(c2)
 
 
     ! Total (exact) diffusive flux plus turb. diffusion
-    f_ex = vis_eff * (  phix_f * grid % sx(s)  &
-                      + phiy_f * grid % sy(s)  &
-                      + phiz_f * grid % sz(s) ) 
+    f_ex = vis_eff * (  phix_f * Grid % sx(s)  &
+                      + phiy_f * Grid % sy(s)  &
+                      + phiz_f * Grid % sz(s) ) 
 
     a0 = vis_eff * A % fc(s)
 
     ! Implicit diffusive flux
     ! (this is a very crude approximation: f_coef is
     !  not corrected at interface between materials)
-    f_im=( phix_f*grid % dx(s)       &
-          +phiy_f*grid % dy(s)       &
-          +phiz_f*grid % dz(s))*a0
+    f_im=( phix_f*Grid % dx(s)       &
+          +phiy_f*Grid % dy(s)       &
+          +phiz_f*Grid % dz(s))*a0
 
     ! Cross diffusion part
     phi % c(c1) = phi % c(c1) + f_ex - f_im
@@ -170,10 +170,10 @@
       ! Outflow is not included because it was causing problems     
       ! Convect is commented because for turbulent scalars convect 
       ! outflow is treated as classic outflow.
-      if((Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW).or.     &
-         (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL).or.       &
-!!!      (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT).or.    &
-         (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) ) then
+      if((Grid % Bnd_Cond_Type(c2) .eq. INFLOW).or.     &
+         (Grid % Bnd_Cond_Type(c2) .eq. WALL).or.       &
+!!!      (Grid % Bnd_Cond_Type(c2) .eq. CONVECT).or.    &
+         (Grid % Bnd_Cond_Type(c2) .eq. WALLFL) ) then
         A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
         b(c1) = b(c1) + a12 * phi % n(c2)
       end if
@@ -192,7 +192,7 @@
 
   if(turb % model_variant .ne. STABILIZED) then
     if(turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-      do c = 1, grid % n_cells
+      do c = 1, Grid % n_cells
         u1uj_phij(c) = Flow % density(c) * c_mu_d / phi % sigma        &
                      * kin % n(c)                                      &
                      / max(eps % n(c), TINY)                           &
@@ -218,7 +218,7 @@
                      - Flow % viscosity(c) * phi_z(c)
       end do
     else if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
-      do c = 1, grid % n_cells
+      do c = 1, Grid % n_cells
         u1uj_phij(c) = Flow % density(c) * c_mu_d / phi % sigma            &
                      * turb % t_scale(c)                                   &
                      * (  uu % n(c) * phi_x(c)                             &
@@ -243,10 +243,10 @@
     call Flow % Grad_Component(u2uj_phij(-nb:nc), 2, u2uj_phij_y(-nb:nc))
     call Flow % Grad_Component(u3uj_phij(-nb:nc), 3, u3uj_phij_z(-nb:nc))
 
-    do c = 1, grid % n_cells
+    do c = 1, Grid % n_cells
       b(c) = b(c) + (  u1uj_phij_x(c)  &
                      + u2uj_phij_y(c)  &
-                     + u3uj_phij_z(c) ) * grid % vol(c)
+                     + u3uj_phij_z(c) ) * Grid % vol(c)
     end do
   end if
 
@@ -254,24 +254,24 @@
   !   Here we clean up transport equation from the false diffusion   !
   !------------------------------------------------------------------!
   if(turb % model_variant .ne. STABILIZED) then
-    do s = 1, grid % n_faces
+    do s = 1, Grid % n_faces
 
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
 
-      vis_eff = (grid % fw(s)      * turb % vis_t(c1)  &
-              + (1.0-grid % fw(s)) * turb % vis_t(c2))
+      vis_eff = (Grid % fw(s)      * turb % vis_t(c1)  &
+              + (1.0-Grid % fw(s)) * turb % vis_t(c2))
 
-      phix_f = grid % fw(s) * phi_x(c1) + (1.0-grid % fw(s)) * phi_x(c2)
-      phiy_f = grid % fw(s) * phi_y(c1) + (1.0-grid % fw(s)) * phi_y(c2)
-      phiz_f = grid % fw(s) * phi_z(c1) + (1.0-grid % fw(s)) * phi_z(c2)
-      f_ex = vis_eff * (  phix_f * grid % sx(s)  &
-                        + phiy_f * grid % sy(s)  &
-                        + phiz_f * grid % sz(s))
+      phix_f = Grid % fw(s) * phi_x(c1) + (1.0-Grid % fw(s)) * phi_x(c2)
+      phiy_f = Grid % fw(s) * phi_y(c1) + (1.0-Grid % fw(s)) * phi_y(c2)
+      phiz_f = Grid % fw(s) * phi_z(c1) + (1.0-Grid % fw(s)) * phi_z(c2)
+      f_ex = vis_eff * (  phix_f * Grid % sx(s)  &
+                        + phiy_f * Grid % sy(s)  &
+                        + phiz_f * Grid % sz(s))
       a0 = vis_eff * A % fc(s)
-      f_im = (   phix_f * grid % dx(s)        &
-               + phiy_f * grid % dy(s)        &
-               + phiz_f * grid % dz(s)) * a0
+      f_im = (   phix_f * Grid % dx(s)        &
+               + phiy_f * Grid % dy(s)        &
+               + phiz_f * Grid % dz(s)) * a0
 
       b(c1) = b(c1)                                             &
              - vis_eff * (phi % n(c2) - phi%n(c1)) * A % fc(s)  &
@@ -288,7 +288,7 @@
   !   Source term contains difference between      !
   !   explicity and implicitly treated advection   !
   !------------------------------------------------!
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     b(c) = b(c) + phi % c(c)
   end do
 
@@ -350,7 +350,7 @@
     call Info_Mod_Iter_Fill_At(4, 1, phi % name, phi % eniter, phi % res)
 
   if(phi % name .eq. 'EPS') then
-    do c= 1, grid % n_cells
+    do c= 1, Grid % n_cells
       phi % n(c) = phi % n(c)
      if( phi % n(c) < 0.) then
        phi % n(c) = phi % o(c)
@@ -361,7 +361,7 @@
   if(phi % name .eq. 'UU' .or.  &
      phi % name .eq. 'VV' .or.  &
      phi % name .eq. 'WW') then
-    do c = 1, grid % n_cells
+    do c = 1, Grid % n_cells
       phi % n(c) = phi % n(c)
       if(phi % n(c) < 0.) then
         phi % n(c) = phi % o(c)

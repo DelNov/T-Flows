@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Grid_Mod_Calculate_Face_Geometry(grid)
+  subroutine Calculate_Face_Geometry(Grid)
 !------------------------------------------------------------------------------!
 !   Calculates additional face-base geometrical quantities for Process.        !
 !                                                                              !
@@ -13,7 +13,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  class(Grid_Type) :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c1, c2, s, sh, pnt_to, pnt_from
   real    :: xc1, yc1, zc1, xc2, yc2, zc2
@@ -23,10 +23,10 @@
   !----------------------------------------------!
   !   Calculate total surface of the cell face   !
   !----------------------------------------------!
-  do s = 1, grid % n_faces
-    grid % s(s) = sqrt(  grid % sx(s)*grid % sx(s)  &
-                       + grid % sy(s)*grid % sy(s)  &
-                       + grid % sz(s)*grid % sz(s) )
+  do s = 1, Grid % n_faces
+    Grid % s(s) = sqrt(  Grid % sx(s)*Grid % sx(s)  &
+                       + Grid % sy(s)*Grid % sy(s)  &
+                       + Grid % sz(s)*Grid % sz(s) )
   end do
 
   !-------------------------------------------------------!
@@ -34,21 +34,21 @@
   !    (For normal faces, including the periodic ones,    !
   !    dx, dy and dz are distanes between cell centers)   !
   !-------------------------------------------------------!
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
-    xc1 = grid % xc(c1)
-    yc1 = grid % yc(c1)
-    zc1 = grid % zc(c1)
+    xc1 = Grid % xc(c1)
+    yc1 = Grid % yc(c1)
+    zc1 = Grid % zc(c1)
 
-    xc2 = grid % xc(c2) + grid % dx(s)
-    yc2 = grid % yc(c2) + grid % dy(s)
-    zc2 = grid % zc(c2) + grid % dz(s)
+    xc2 = Grid % xc(c2) + Grid % dx(s)
+    yc2 = Grid % yc(c2) + Grid % dy(s)
+    zc2 = Grid % zc(c2) + Grid % dz(s)
 
-    grid % dx(s) = xc2-xc1
-    grid % dy(s) = yc2-yc1
-    grid % dz(s) = zc2-zc1
+    Grid % dx(s) = xc2-xc1
+    Grid % dy(s) = yc2-yc1
+    Grid % dz(s) = zc2-zc1
   end do  ! faces
 
   !---------------------------------------!
@@ -56,16 +56,16 @@
   !---------------------------------------!
   min_d = +HUGE
   max_d = -HUGE
-  do s = grid % n_faces + 1, grid % n_faces + grid % n_shadows
-    d_s = sqrt(  grid % dx(s)*grid % dx(s)     &
-               + grid % dy(s)*grid % dy(s)     &
-               + grid % dz(s)*grid % dz(s) )
+  do s = Grid % n_faces + 1, Grid % n_faces + Grid % n_shadows
+    d_s = sqrt(  Grid % dx(s)*Grid % dx(s)     &
+               + Grid % dy(s)*Grid % dy(s)     &
+               + Grid % dz(s)*Grid % dz(s) )
     min_d = min(min_d, d_s)
     max_d = max(max_d, d_s)
   end do
   call Comm_Mod_Global_Min_Real(min_d)
   call Comm_Mod_Global_Max_Real(max_d)
-  if(this_proc < 2 .and. grid % n_shadows > 0) then
+  if(this_proc < 2 .and. Grid % n_shadows > 0) then
     print '(a,f9.3)', '# Minimum distance stored in shadow faces: ', min_d
     print '(a,f9.3)', '# Maximum distance stored in shadow faces: ', max_d
   end if
@@ -75,32 +75,32 @@
   !   (This is important for copy boundary conditions, do   !
   !        not erase this thinking it is not needed)        !
   !---------------------------------------------------------!
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
-    if(grid % faces_s(s) .ne. 0) then
-      sh = grid % faces_s(s)
+    if(Grid % faces_s(s) .ne. 0) then
+      sh = Grid % faces_s(s)
 
-      if( abs(grid % dx(s)) > NANO                     .and.   &
-          Math_Mod_Approx_Real(abs(grid % dy(s)), 0.0) .and.   &
-          Math_Mod_Approx_Real(abs(grid % dz(s)), 0.0) ) then
-        if(grid % xc(c2) > grid % xc(c1))                      &
-          grid % bnd_cond % color(s) = grid % n_bnd_cond + 1
+      if( abs(Grid % dx(s)) > NANO                     .and.   &
+          Math_Mod_Approx_Real(abs(Grid % dy(s)), 0.0) .and.   &
+          Math_Mod_Approx_Real(abs(Grid % dz(s)), 0.0) ) then
+        if(Grid % xc(c2) > Grid % xc(c1))                      &
+          Grid % bnd_cond % color(s) = Grid % n_bnd_cond + 1
       end if
 
-      if( abs(grid % dy(s)) > NANO                     .and.   &
-          Math_Mod_Approx_Real(abs(grid % dx(s)), 0.0) .and.   &
-          Math_Mod_Approx_Real(abs(grid % dz(s)), 0.0) ) then
-        if(grid % yc(c2) > grid % yc(c1))                      &
-          grid % bnd_cond % color(s) = grid % n_bnd_cond + 2
+      if( abs(Grid % dy(s)) > NANO                     .and.   &
+          Math_Mod_Approx_Real(abs(Grid % dx(s)), 0.0) .and.   &
+          Math_Mod_Approx_Real(abs(Grid % dz(s)), 0.0) ) then
+        if(Grid % yc(c2) > Grid % yc(c1))                      &
+          Grid % bnd_cond % color(s) = Grid % n_bnd_cond + 2
       end if
 
-      if( abs(grid % dz(s)) > NANO                     .and.   &
-          Math_Mod_Approx_Real(abs(grid % dx(s)), 0.0) .and.   &
-          Math_Mod_Approx_Real(abs(grid % dy(s)), 0.0) ) then
-        if(grid % zc(c2) > grid % zc(c1))                      &
-          grid % bnd_cond % color(s) = grid % n_bnd_cond + 3
+      if( abs(Grid % dz(s)) > NANO                     .and.   &
+          Math_Mod_Approx_Real(abs(Grid % dx(s)), 0.0) .and.   &
+          Math_Mod_Approx_Real(abs(Grid % dy(s)), 0.0) ) then
+        if(Grid % zc(c2) > Grid % zc(c1))                      &
+          Grid % bnd_cond % color(s) = Grid % n_bnd_cond + 3
       end if
 
     end if
@@ -111,18 +111,18 @@
   !-----------------------------------------------------!
   min_d = +HUGE
   max_d = -HUGE
-  do s = 1, grid % n_faces
-    if(grid % faces_s(s) .ne. 0) then
-      d_s = sqrt(  (grid % xf(s) - grid % xf(grid % faces_s(s)))**2     &
-                 + (grid % yf(s) - grid % yf(grid % faces_s(s)))**2     &
-                 + (grid % zf(s) - grid % zf(grid % faces_s(s)))**2 )
+  do s = 1, Grid % n_faces
+    if(Grid % faces_s(s) .ne. 0) then
+      d_s = sqrt(  (Grid % xf(s) - Grid % xf(Grid % faces_s(s)))**2     &
+                 + (Grid % yf(s) - Grid % yf(Grid % faces_s(s)))**2     &
+                 + (Grid % zf(s) - Grid % zf(Grid % faces_s(s)))**2 )
       min_d = min(min_d, d_s)
       max_d = max(max_d, d_s)
     end if
   end do
   call Comm_Mod_Global_Min_Real(min_d)
   call Comm_Mod_Global_Max_Real(max_d)
-  if(this_proc < 2 .and. grid % n_shadows > 0) then
+  if(this_proc < 2 .and. Grid % n_shadows > 0) then
     print '(a,f9.3)', '# Minimum corrected distance at shadows:   ', min_d
     print '(a,f9.3)', '# Maximum corrected distance at shadows:   ', max_d
   end if
@@ -132,11 +132,11 @@
   !---------------------------------------------------!
   pnt_to   = 0
   pnt_from = 0
-  do s = 1, grid % n_faces
-    if(grid % faces_s(s) .ne. 0) pnt_to = pnt_to + 1
+  do s = 1, Grid % n_faces
+    if(Grid % faces_s(s) .ne. 0) pnt_to = pnt_to + 1
   end do
-  do s = grid % n_faces + 1, grid % n_faces + grid % n_shadows
-    if(grid % faces_s(s) .ne. 0) pnt_from = pnt_from + 1
+  do s = Grid % n_faces + 1, Grid % n_faces + Grid % n_shadows
+    if(Grid % faces_s(s) .ne. 0) pnt_from = pnt_from + 1
   end do
   if(pnt_to .ne. pnt_from) then
     print *, '# Pointers to and from shadows wrong in processor: ', this_proc
@@ -147,62 +147,62 @@
   !   For shadows, dx, dy and dz are lengths   !
   !    of the periodic spans of the domain     !
   !--------------------------------------------!
-  do s = grid % n_faces + 1, grid % n_faces + grid % n_shadows
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = Grid % n_faces + 1, Grid % n_faces + Grid % n_shadows
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
-    xc1 = grid % xc(c1)
-    yc1 = grid % yc(c1)
-    zc1 = grid % zc(c1)
+    xc1 = Grid % xc(c1)
+    yc1 = Grid % yc(c1)
+    zc1 = Grid % zc(c1)
 
-    xc2 = grid % xc(c2) + grid % dx(s)
-    yc2 = grid % yc(c2) + grid % dy(s)
-    zc2 = grid % zc(c2) + grid % dz(s)
+    xc2 = Grid % xc(c2) + Grid % dx(s)
+    yc2 = Grid % yc(c2) + Grid % dy(s)
+    zc2 = Grid % zc(c2) + Grid % dz(s)
 
-    grid % dx(s) = grid % xf(grid % faces_s(s)) - grid % xf(s)
-    grid % dy(s) = grid % yf(grid % faces_s(s)) - grid % yf(s)
-    grid % dz(s) = grid % zf(grid % faces_s(s)) - grid % zf(s)
+    Grid % dx(s) = Grid % xf(Grid % faces_s(s)) - Grid % xf(s)
+    Grid % dy(s) = Grid % yf(Grid % faces_s(s)) - Grid % yf(s)
+    Grid % dz(s) = Grid % zf(Grid % faces_s(s)) - Grid % zf(s)
   end do  ! shadows
 
   !--------------------------------------------!
   !   Calculate total distance between cells   !
   !--------------------------------------------!
-  do s = 1, grid % n_faces + grid % n_shadows
-    grid % d(s) = sqrt(  grid % dx(s)*grid % dx(s)     &
-                       + grid % dy(s)*grid % dy(s)     &
-                       + grid % dz(s)*grid % dz(s) )
+  do s = 1, Grid % n_faces + Grid % n_shadows
+    Grid % d(s) = sqrt(  Grid % dx(s)*Grid % dx(s)     &
+                       + Grid % dy(s)*Grid % dy(s)     &
+                       + Grid % dz(s)*Grid % dz(s) )
   end do
 
   !--------------------------------------------!
   !   Calculate weight factors for the faces   !
   !--------------------------------------------!
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
     ! Inside the flow, it has usual value: phi_f = f * phi_1 + (1-f) * phi_2
-    grid % fw(s) = grid % f(s)
+    Grid % fw(s) = Grid % f(s)
 
     ! Close to the wall, however, there is inversion. It takes
     ! the value from inside as the representative for the face.
     if(c2 < 0) then
-      grid % fw(s) = 1.0
+      Grid % fw(s) = 1.0
     end if
   end do
 
   !------------------------------!
   !   Find the near-wall cells   !
   !------------------------------!
-  grid % cell_near_wall(:) = .false.
+  Grid % cell_near_wall(:) = .false.
 
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
     if(c2 < 0) then
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
-         Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
-        grid % cell_near_wall(c1) = .true.
+      if(Bnd_Cond_Type(Grid,c2) .eq. WALL .or.  &
+         Bnd_Cond_Type(Grid,c2) .eq. WALLFL) then
+        Grid % cell_near_wall(c1) = .true.
       end if
     end if
 

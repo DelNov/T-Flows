@@ -1,9 +1,9 @@
 !==============================================================================!
-  subroutine Work_Mod_Allocate_Real_Cells(grid, n)
+  subroutine Work_Mod_Allocate_Real_Cells(Grid, n)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid(:)
+  type(Grid_Type) :: Grid(:)
   integer         :: n    ! number of arrays
 !-----------------------------------[Locals]-----------------------------------!
   integer :: nc, nb
@@ -12,8 +12,8 @@
   if(n .eq. 0) return
 
   ! Get number of cells and boundary cells
-  nc = maxval(grid(1:size(grid)) % n_cells)
-  nb = maxval(grid(1:size(grid)) % n_bnd_cells)
+  nc = maxval(Grid(1:size(Grid)) % n_cells)
+  nb = maxval(Grid(1:size(Grid)) % n_bnd_cells)
 
   ! Allocate requested memory
   allocate(r_cell_01(-nb:nc));   r_cell_01 = 0.0;   if(n .eq.  1) return

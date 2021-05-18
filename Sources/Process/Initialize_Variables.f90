@@ -27,7 +27,7 @@
 !----------------------------------[Calling]-----------------------------------!
   integer :: Key_Ind
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: grid
+  type(Grid_Type),  pointer :: Grid
   type(Bulk_Type),  pointer :: bulk
   type(Var_Type),   pointer :: u, v, w, t, phi
   type(Var_Type),   pointer :: kin, eps, f22, zeta, vis, t2
@@ -56,7 +56,7 @@
 !==============================================================================!
 
   ! Take aliases
-  grid     => Flow % pnt_grid
+  Grid     => Flow % pnt_grid
   bulk     => Flow % bulk
   v_flux   => Flow % v_flux
   vis      => turb % vis
@@ -70,7 +70,7 @@
   call Turb_Mod_Alias_T2          (turb, t2)
 
   area  = 0.0
-  if (this_proc < 2) print *, '# Grid name: ', grid % name
+  if (this_proc < 2) print *, '# Grid name: ', Grid % name
 
   ! Found the line where boundary condition definition is defined
   call Control_Mod_Position_At_One_Key('INITIAL_CONDITION', &
@@ -133,7 +133,7 @@
           keys(1) .eq. 'Y' .and. keys(2) .eq. 'Z') then
 
         ! Set the closest point
-        do c = 1, grid % n_cells
+        do c = 1, Grid % n_cells
 
           i=Key_Ind('X', keys, nks); x(:) = prof(:,i)
           i=Key_Ind('Y', keys, nks); y(:) = prof(:,i)
@@ -141,11 +141,11 @@
 
           ! do no waste time on sqrt((r-r0)^2) -> use (r-r0)^2
           if(keys(1) .eq. 'Y' .and. keys(2) .eq. 'Z') then
-            dist(:) = (y(:)-grid % yc(c))**2 + (z(:)-grid % zc(c))**2
+            dist(:) = (y(:)-Grid % yc(c))**2 + (z(:)-Grid % zc(c))**2
           else if(keys(1) .eq. 'X' .and. keys(2) .eq. 'Z') then
-            dist(:) = (x(:)-grid % xc(c))**2 + (z(:)-grid % zc(c))**2
+            dist(:) = (x(:)-Grid % xc(c))**2 + (z(:)-Grid % zc(c))**2
           else if(keys(1) .eq. 'X' .and. keys(2) .eq. 'Y') then
-            dist(:) = (x(:)-grid % xc(c))**2 + (y(:)-grid % yc(c))**2
+            dist(:) = (x(:)-Grid % xc(c))**2 + (y(:)-Grid % yc(c))**2
           end if
 
           ! Store closest point in k
@@ -196,7 +196,7 @@
             end if
           end if
 
-        end do ! c = 1, grid % n_cells
+        end do ! c = 1, Grid % n_cells
 
         call Comm_Mod_Wait
         deallocate(prof)
@@ -245,7 +245,7 @@
         call To_Upper_Case(keys(i))
       end do
 
-      do c = 1, grid % n_cells
+      do c = 1, Grid % n_cells
 
         if(turb % statistics) then
           u_mean(c) = 0.0
@@ -373,31 +373,31 @@
   n_pressure    = 0
 
   bulk % vol_in = 0.0
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
     if(c2  < 0) then
-      v_flux % n(s) = u % n(c2) * grid % sx(s)  &
-                    + v % n(c2) * grid % sy(s)  &
-                    + w % n(c2) * grid % sz(s)
+      v_flux % n(s) = u % n(c2) * Grid % sx(s)  &
+                    + v % n(c2) * Grid % sy(s)  &
+                    + w % n(c2) * Grid % sz(s)
 
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
+      if(Grid % Bnd_Cond_Type(c2) .eq. INFLOW) then
         bulk % vol_in = bulk % vol_in - v_flux % n(s)
-        area = area  + grid % s(s)
+        area = area  + Grid % s(s)
       end if
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL)      &
+      if(Grid % Bnd_Cond_Type(c2) .eq. WALL)      &
         n_wall        = n_wall        + 1
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW)    &
+      if(Grid % Bnd_Cond_Type(c2) .eq. INFLOW)    &
         n_inflow      = n_inflow      + 1
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW)   &
+      if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW)   &
         n_outflow     = n_outflow     + 1
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. SYMMETRY)  &
+      if(Grid % Bnd_Cond_Type(c2) .eq. SYMMETRY)  &
         n_symmetry    = n_symmetry    + 1
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL)    &
+      if(Grid % Bnd_Cond_Type(c2) .eq. WALLFL)    &
         n_heated_wall = n_heated_wall + 1
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT)   &
+      if(Grid % Bnd_Cond_Type(c2) .eq. CONVECT)   &
         n_convect     = n_convect     + 1
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE)  &
+      if(Grid % Bnd_Cond_Type(c2) .eq. PRESSURE)  &
         n_pressure    = n_pressure    + 1
     else
       v_flux % n(s) = 0.0

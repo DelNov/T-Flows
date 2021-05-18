@@ -15,7 +15,7 @@
   real :: Y_Plus_Rough_Walls
 !----------------------------------[Locals]------------------------------------!
   type(Field_Type), pointer :: Flow
-  type(Grid_Type),  pointer :: grid
+  type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: u, v, w
   type(Var_Type),   pointer :: kin, eps, zeta, f22
   integer                   :: c, c1, c2, s
@@ -41,49 +41,49 @@
 
   ! Take aliases
   Flow => turb % pnt_flow
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   call Flow % Alias_Momentum(u, v, w)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
 
-  call Time_And_Length_Scale(grid, turb)
+  call Time_And_Length_Scale(Grid, turb)
 
   ! Pure k-eps-zeta-f
   if(turb % model .eq. K_EPS_ZETA_F) then
-    do c = -grid % n_bnd_cells, grid % n_cells
+    do c = -Grid % n_bnd_cells, Grid % n_cells
       turb % vis_t(c) = c_mu_d * Flow % density(c) * zeta % n(c)  &
                       * kin % n(c) * turb % t_scale(c)
     end do
 
   ! Hybrid between k-eps-zeta-f and dynamic SGS model
   else if(turb % model .eq. HYBRID_LES_RANS) then
-    do c = -grid % n_bnd_cells, grid % n_cells
+    do c = -Grid % n_bnd_cells, Grid % n_cells
       turb % vis_t(c) = c_mu_d * Flow % density(c) * zeta % n(c)  &
                       * kin % n(c) * turb % t_scale(c)
       turb % vis_t_eff(c) = max(turb % vis_t(c),  &
                                 turb % vis_t_sgs(c))
     end do
-    call Grid_Mod_Exchange_Cells_Real(grid, turb % vis_t_eff)
+    call Grid % Exchange_Cells_Real(turb % vis_t_eff)
 
   end if
 
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
     if(c2 < 0) then
 
       ! kinematic viscosities
       kin_vis = Flow % viscosity(c1) / Flow % density(c1)
 
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
-         Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
+      if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
+         Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
 
         u_tan = Flow % U_Tan(s)
 
         u_tau = c_mu25 * sqrt(kin % n(c1))
         turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
                                           u_tau,                 &
-                                          grid % wall_dist(c1),  &
+                                          Grid % wall_dist(c1),  &
                                           kin_vis)
 
         turb % tau_wall(c1) = Tau_Wall_Low_Re(turb,                &
@@ -102,14 +102,14 @@
 
           if(turb % rough_walls) then
             z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
-            z_o = max(grid % wall_dist(c1)   &
+            z_o = max(Grid % wall_dist(c1)   &
                 / (e_log * max(turb % y_plus(c1),1.0)), z_o)
 
             turb % y_plus(c1) = Y_Plus_Rough_Walls(turb,                  &
                                                    u_tau,                 &
-                                                   grid % wall_dist(c1),  &
+                                                   Grid % wall_dist(c1),  &
                                                    kin_vis)
-            u_plus     = U_Plus_Rough_Walls(turb, grid % wall_dist(c1))
+            u_plus     = U_Plus_Rough_Walls(turb, Grid % wall_dist(c1))
           end if
 
           turb % vis_w(c1) =    turb % y_plus(c1) * Flow % viscosity(c1)  &
@@ -143,17 +143,17 @@
               + (u_plus + beta) * sc_t * exp(-1.0 / ebf) + TINY)
         end if
 
-      end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2).eq.WALL or WALLFL
+      end if  ! Grid % Bnd_Cond_Type(c2).eq.WALL or WALLFL
     end if    ! c2 < 0
   end do
 
-  call Grid_Mod_Exchange_Cells_Real(grid, turb % vis_t)
-  call Grid_Mod_Exchange_Cells_Real(grid, turb % vis_w)
+  call Grid % Exchange_Cells_Real(turb % vis_t)
+  call Grid % Exchange_Cells_Real(turb % vis_w)
   if(Flow % heat_transfer) then
-    call Grid_Mod_Exchange_Cells_Real(grid, turb % con_w)
+    call Grid % Exchange_Cells_Real(turb % con_w)
   end if
   if(Flow % n_scalars > 0) then
-    call Grid_Mod_Exchange_Cells_Real(grid, turb % diff_w)
+    call Grid % Exchange_Cells_Real(turb % diff_w)
   end if
 
   end subroutine

@@ -8,19 +8,19 @@
   class(Vof_Type), target :: Vof
   type(Var_Type)          :: var
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: grid
-  type(Field_Type), pointer :: flow
+  type(Grid_Type),  pointer :: Grid
+  type(Field_Type), pointer :: Flow
   type(Var_Type),   pointer :: fun
   integer                   :: iter, ph, s, c, c1, c2
 !==============================================================================!
 
   ! Take aliases
-  flow => Vof % pnt_flow
-  grid => flow % pnt_grid
+  Flow => Vof % pnt_flow
+  Grid => Flow % pnt_grid
   fun  => Vof % fun
 
   ! Refresh buffers for variable
-  call Grid_Mod_Exchange_Cells_Real(grid, var % n)
+  call Grid % Exchange_Cells_Real(var % n)
 
 !Feb9  PRINT '(A, 3(ES15.4))', 'VAR ACROSS INT:', VAR % N(1150), VAR % N(1271), VAR % N(1392)
 
@@ -36,7 +36,7 @@
     Vof % var % z(:) = 0.0
 
 !Feb9    ! This is just to check if this is over-written
-!Feb9    do c = 1, grid % n_cells
+!Feb9    do c = 1, Grid % n_cells
 !Feb9      if(Vof % cell_at_surf(c)) then
 !Feb9        Vof % var % n(c) = 10000.
 !Feb9      end if
@@ -47,9 +47,9 @@
       !-----------------------------------------!
       !   Extrapolate values to the interface   !
       !-----------------------------------------!
-      do s = 1, grid % n_faces
-        c1 = grid % faces_c(1, s)
-        c2 = grid % faces_c(2, s)
+      do s = 1, Grid % n_faces
+        c1 = Grid % faces_c(1, s)
+        c2 = Grid % faces_c(2, s)
 
         if(ph .eq. 1) then
 
@@ -58,9 +58,9 @@
              Vof % cell_at_elem(c1) .eq. 0 .and.  &
              Vof % cell_at_elem(c2) .ne. 0) then
             Vof % var % n(c2) = Vof % var % n(c1)                 &
-                               + grid % dx(s) * Vof % var % x(c1)  &
-                               + grid % dy(s) * Vof % var % y(c1)  &
-                               + grid % dz(s) * Vof % var % z(c1)
+                               + Grid % dx(s) * Vof % var % x(c1)  &
+                               + Grid % dy(s) * Vof % var % y(c1)  &
+                               + Grid % dz(s) * Vof % var % z(c1)
           end if
 
           ! c1 is at the surface and c2 is not: extrapolate to c1
@@ -68,9 +68,9 @@
              Vof % cell_at_elem(c2) .eq. 0 .and.  &
              Vof % cell_at_elem(c1) .ne. 0) then
             Vof % var % n(c1) = Vof % var % n(c2)                 &
-                               - grid % dx(s) * Vof % var % x(c2)  &
-                               - grid % dy(s) * Vof % var % y(c2)  &
-                               - grid % dz(s) * Vof % var % z(c2)
+                               - Grid % dx(s) * Vof % var % x(c2)  &
+                               - Grid % dy(s) * Vof % var % y(c2)  &
+                               - Grid % dz(s) * Vof % var % z(c2)
           end if
         end if
 
@@ -81,9 +81,9 @@
              Vof % cell_at_elem(c1) .eq. 0 .and.  &
              Vof % cell_at_elem(c2) .ne. 0) then
             Vof % var % n(c2) = Vof % var % n(c1)                 &
-                               + grid % dx(s) * Vof % var % x(c1)  &
-                               + grid % dy(s) * Vof % var % y(c1)  &
-                               + grid % dz(s) * Vof % var % z(c1)
+                               + Grid % dx(s) * Vof % var % x(c1)  &
+                               + Grid % dy(s) * Vof % var % y(c1)  &
+                               + Grid % dz(s) * Vof % var % z(c1)
           end if
 
           ! c1 is at the surface and c2 is not: extrapolate to c1
@@ -91,9 +91,9 @@
              Vof % cell_at_elem(c2) .eq. 0 .and.  &
              Vof % cell_at_elem(c1) .ne. 0) then
             Vof % var % n(c1) = Vof % var % n(c2)                 &
-                               - grid % dx(s) * Vof % var % x(c2)  &
-                               - grid % dy(s) * Vof % var % y(c2)  &
-                               - grid % dz(s) * Vof % var % z(c2)
+                               - Grid % dx(s) * Vof % var % x(c2)  &
+                               - Grid % dy(s) * Vof % var % y(c2)  &
+                               - Grid % dz(s) * Vof % var % z(c2)
           end if
         end if
 
@@ -104,21 +104,21 @@
       !-----------------------------------------------------------------!
 
       ! Compute individual gradients without refreshing buffers
-      call Field_Mod_Grad_Component_No_Refresh(flow, Vof % var % n, 1, Vof % var % x)
-      call Field_Mod_Grad_Component_No_Refresh(flow, Vof % var % n, 2, Vof % var % y)
-      call Field_Mod_Grad_Component_No_Refresh(flow, Vof % var % n, 3, Vof % var % z)
+      call Flow % Grad_Component_No_Refresh(Vof % var % n, 1, Vof % var % x)
+      call Flow % Grad_Component_No_Refresh(Vof % var % n, 2, Vof % var % y)
+      call Flow % Grad_Component_No_Refresh(Vof % var % n, 3, Vof % var % z)
 
       ! Refresh buffers for gradient components
-      call Grid_Mod_Exchange_Cells_Real(grid, Vof % var % x)
-      call Grid_Mod_Exchange_Cells_Real(grid, Vof % var % y)
-      call Grid_Mod_Exchange_Cells_Real(grid, Vof % var % z)
+      call Grid % Exchange_Cells_Real(Vof % var % x)
+      call Grid % Exchange_Cells_Real(Vof % var % y)
+      call Grid % Exchange_Cells_Real(Vof % var % z)
 
     end do  ! through iterations
 
     !---------------------------------------------------------------------!
     !   Copy computed gradients for the phase back to original variable   !
     !---------------------------------------------------------------------!
-    do c = 1, grid % n_cells
+    do c = 1, Grid % n_cells
       if(Vof % cell_at_elem(c) .eq. 0) then
         if(ph .eq. 1 .and. fun % n(c) < 0.01) then
           var % x(c) = Vof % var % x(c)

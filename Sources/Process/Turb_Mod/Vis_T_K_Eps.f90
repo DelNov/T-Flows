@@ -27,7 +27,7 @@
   real :: Y_Plus_Rough_Walls
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
-  type(Grid_Type),  pointer :: grid
+  type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: u, v, w
   type(Var_Type),   pointer :: kin, eps
   integer                   :: c1, c2, s, c
@@ -53,11 +53,11 @@
 
   ! Take aliases
   Flow => turb % pnt_flow
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   call Flow % Alias_Momentum(u, v, w)
   call Turb_Mod_Alias_K_Eps    (turb, kin, eps)
 
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
 
     ! Kinematic viscosities
     kin_vis = Flow % viscosity(c) / Flow % density(c)
@@ -65,7 +65,7 @@
     re_t =  Flow % density(c) * kin % n(c)**2  &
          / (Flow % viscosity(c) * eps % n(c))
 
-    y_star = (kin_vis * eps % n(c))**0.25 * grid % wall_dist(c)/kin_vis
+    y_star = (kin_vis * eps % n(c))**0.25 * Grid % wall_dist(c)/kin_vis
 
     f_mu = (1.0 -     exp(-y_star/14.0))**2   &
          * (1.0 + 5.0*exp(-(re_t/200.0) * (re_t/200.0) ) /re_t**0.75)
@@ -77,20 +77,20 @@
                     / (sqrt(6.0)*c_mu*Flow % shear(c) + TINY))
   end do
 
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
     if(c2 < 0) then
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
-         Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
+      if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
+         Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
 
         u_tan = Flow % U_Tan(s)
 
         u_tau = c_mu25 * sqrt(kin % n(c1))
         turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
                                           u_tau,                 &
-                                          grid % wall_dist(c1),  &
+                                          Grid % wall_dist(c1),  &
                                           kin_vis)
 
         turb % tau_wall(c1) = Tau_Wall_Low_Re(turb,               &
@@ -113,16 +113,16 @@
 
         turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
                                           u_tau,                 &
-                                          grid % wall_dist(c1),  &
+                                          Grid % wall_dist(c1),  &
                                           kin_vis)
 
         if(turb % rough_walls) then
           z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
           turb % y_plus(c1) = Y_Plus_Rough_Walls(turb,                  &
                                                  u_tau,                 &
-                                                 grid % wall_dist(c1),  &
+                                                 Grid % wall_dist(c1),  &
                                                  kin_vis)
-          u_plus     = U_Plus_Rough_Walls(turb, grid % wall_dist(c1))
+          u_plus     = U_Plus_Rough_Walls(turb, Grid % wall_dist(c1))
           turb % vis_w(c1) = turb % y_plus(c1) * Flow % viscosity(c1) / u_plus
         end if
 
@@ -151,17 +151,17 @@
                + (u_plus + beta) * sc_t * exp(-1.0 / ebf) + TINY)
         end if
 
-      end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2).eq.WALL or WALLFL
+      end if  ! Grid % Bnd_Cond_Type(c2).eq.WALL or WALLFL
     end if    ! c2 < 0
   end do
 
-  call Grid_Mod_Exchange_Cells_Real(grid, turb % vis_t)
-  call Grid_Mod_Exchange_Cells_Real(grid, turb % vis_w)
+  call Grid % Exchange_Cells_Real(turb % vis_t)
+  call Grid % Exchange_Cells_Real(turb % vis_w)
   if(Flow % heat_transfer) then
-    call Grid_Mod_Exchange_Cells_Real(grid, turb % con_w)
+    call Grid % Exchange_Cells_Real(turb % con_w)
   end if
   if(Flow % n_scalars > 0) then
-    call Grid_Mod_Exchange_Cells_Real(grid, turb % diff_w)
+    call Grid % Exchange_Cells_Real(turb % diff_w)
   end if
 
   end subroutine

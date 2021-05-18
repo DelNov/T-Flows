@@ -1,14 +1,14 @@
 !==============================================================================!
-  subroutine Backup_Mod_Read_Cell_Real(grid, fh, disp, vc, var_name, array)
+  subroutine Backup_Mod_Read_Cell_Real(Grid, fh, disp, vc, var_name, array)
 !------------------------------------------------------------------------------!
 !   Reads a vector variable with boundary cells from a backup file.            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type), target :: grid
+  type(Grid_Type), target :: Grid
   integer                 :: fh, disp, vc
   character(len=*)        :: var_name
-  real                    :: array(-grid % n_bnd_cells:grid % n_cells)
+  real                    :: array(-Grid % n_bnd_cells:Grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
   type(Comm_Type), pointer :: comm
   character(SL)            :: vn
@@ -16,9 +16,9 @@
 !==============================================================================!
 
   ! Take alias
-  comm => grid % comm
-  nb = grid % n_bnd_cells
-  nc = grid % n_cells
+  comm => Grid % comm
+  nb = Grid % n_bnd_cells
+  nc = Grid % n_cells
 
   cnt_loop  = 0
   disp_loop = 0
@@ -40,7 +40,7 @@
       call Comm_Mod_Read_Cell_Real(comm, fh, array(1:comm % nc_sub), disp_loop)
       call Comm_Mod_Read_Bnd_Real (comm, fh, array( -comm % nb_f:  &
                                                     -comm % nb_l),   disp_loop)
-      call Grid_Mod_Exchange_Cells_Real(grid, array(-nb:nc))
+      call Grid % Exchange_Cells_Real(array(-nb:nc))
       disp = disp_loop
       return
 

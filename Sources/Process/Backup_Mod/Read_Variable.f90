@@ -11,16 +11,16 @@
   type(Var_Type)   :: var
 !-----------------------------------[Locals]-----------------------------------!
   type(Comm_Type), pointer :: comm
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   character(SL)            :: vn
   integer                  :: vs, disp_loop, cnt_loop, nb, nc
 !==============================================================================!
 
   ! Take aliases
-  grid => var % pnt_grid
-  comm => grid % comm
-  nb = grid % n_bnd_cells
-  nc = grid % n_cells
+  Grid => var % pnt_grid
+  comm => Grid % comm
+  nb = Grid % n_bnd_cells
+  nc = Grid % n_cells
 
   cnt_loop  = 0
   disp_loop = 0
@@ -50,9 +50,9 @@
                                                     -comm % nb_l),   disp_loop)
 
       ! Refresh buffers for "n", "q" and "o" (not sure if needed)
-      call Grid_Mod_Exchange_Cells_Real(grid, var % n(-nb:nc))
-      call Grid_Mod_Exchange_Cells_Real(grid, var % q(-nb:nc))
-      call Grid_Mod_Exchange_Cells_Real(grid, var % o(-nb:nc))
+      call Grid % Exchange_Cells_Real(var % n(-nb:nc))
+      call Grid % Exchange_Cells_Real(var % q(-nb:nc))
+      call Grid % Exchange_Cells_Real(var % o(-nb:nc))
 
       ! Compute fresh gradients
       call Fld % Grad_Variable(var)

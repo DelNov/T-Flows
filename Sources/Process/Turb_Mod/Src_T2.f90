@@ -11,7 +11,7 @@
   real :: Y_Plus_Low_Re
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: Flow
-  type(Grid_Type),   pointer :: grid
+  type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: u, v, w, t
   type(Var_Type),    pointer :: kin, eps, ut, vt, wt, t2
   type(Matrix_Type), pointer :: A
@@ -34,7 +34,7 @@
 
   ! Take aliases
   Flow => turb % pnt_flow
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   call Flow % Alias_Momentum(u, v, w)
   call Flow % Alias_Energy  (t)
   call Turb_Mod_Alias_K_Eps      (turb, kin, eps)
@@ -50,30 +50,30 @@
   call Flow % Grad_Variable(t)
 
   ! Production source:
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
 
     turb % p_t2(c) = - 2.0 * (  ut % n(c) * t % x(c)   &
                               + vt % n(c) * t % y(c)   &
                               + wt % n(c) * t % z(c))
 
-    b(c) = b(c) + turb % p_t2(c) * grid % vol(c)
+    b(c) = b(c) + turb % p_t2(c) * Grid % vol(c)
 
    ! Negative contribution
    A % val(A % dia(c)) = A % val(A % dia(c)) +  &
          2.0 * Flow % density(c)  * eps % n(c)  &
-             / (kin % n(c) + TINY) * grid % vol(c)
+             / (kin % n(c) + TINY) * Grid % vol(c)
 
   end do
 
   ! Implementation of wall function approach for buoyancy-driven flows
 
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
     if(c2 < 0) then
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or. &
-         Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
+      if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or. &
+         Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
 
         ! Kinematic viscosities
         kin_vis = Flow % viscosity(c1) / Flow % density(c1)
@@ -81,18 +81,18 @@
         u_tau = c_mu25 * sqrt(kin % n(c1))
 
         turb % y_plus(c1) = Y_Plus_Low_Re(turb, u_tau,      &
-                     grid % wall_dist(c1), kin_vis)
+                     Grid % wall_dist(c1), kin_vis)
 
         ebf = Turb_Mod_Ebf_Momentum(turb, c1)
 
-        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL) &
+        if(Grid % Bnd_Cond_Type(c2) .eq. WALL) &
         t % q(c2) = abs(turb % con_w(c1)*(t % n(c1) &
-                    - t % n(c2))/grid % wall_dist(c1))
+                    - t % n(c2))/Grid % wall_dist(c1))
 
         p_t2_wall  = t % q(c2)*c_mu_theta5*sqrt(abs(t2 % n(c1))) &
-                     /(kappa_theta*c_mu25*grid % wall_dist(c1))
+                     /(kappa_theta*c_mu25*Grid % wall_dist(c1))
 
-        b(c1) = b(c1) - turb % p_t2(c1) * grid % vol(c1)
+        b(c1) = b(c1) - turb % p_t2(c1) * Grid % vol(c1)
 
         if(turb % y_plus(c1) > 11.0) then
           turb % p_t2(c1) = p_t2_wall
@@ -101,11 +101,11 @@
                              + p_t2_wall * exp(-1.0/ebf))
         end if
 
-        b(c1) = b(c1) + turb % p_t2(c1) * grid % vol(c1)
+        b(c1) = b(c1) + turb % p_t2(c1) * Grid % vol(c1)
 
         t2 % n(c2) = 0.0
 
-      end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2).eq.WALL or WALLFL
+      end if  ! Grid % Bnd_Cond_Type(c2).eq.WALL or WALLFL
     end if    ! c2 < 0
   end do
 

@@ -14,7 +14,7 @@
   integer, intent(in)         :: curr_dt
   integer, intent(in)         :: ini
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),   pointer :: grid
+  type(Grid_Type),   pointer :: Grid
   type(Bulk_Type),   pointer :: bulk
   type(Var_Type),    pointer :: u, v, w, p, pp
   type(Face_Type),   pointer :: v_flux          ! volume flux
@@ -26,6 +26,7 @@
   real                       :: total_source
   real                       :: p_max, p_min, p_nor, p_nor_c, dt, a12, fs
   character(SL)              :: solver
+  INTEGER :: P1, P2
 !==============================================================================!
 !
 !   The form of equations which I am solving:
@@ -54,7 +55,7 @@
   call Cpu_Timer % Start('Compute_Pressure (without solvers)')
 
   ! Take aliases
-  grid   => Flow % pnt_grid
+  Grid   => Flow % pnt_grid
   bulk   => Flow % bulk
   v_flux => Flow % v_flux
   p      => Flow % p
@@ -78,7 +79,7 @@
   ! Calculate pressure magnitude for normalization of pressure solution
   p_max = -HUGE
   p_min = +HUGE
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     p_max = max(p_max, p % n(c))
     p_min = min(p_min, p % n(c))
   end do
@@ -116,10 +117,10 @@
   !   Update fluxes at boundaries and fill   !
   !   up source term for pressure equation   !
   !------------------------------------------!
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
-    fs = grid % f(s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
+    fs = Grid % f(s)
 
     ! Internal fluxes fixed with Rhie and Chow method, just update source
     if(c2 > 0) then
@@ -130,35 +131,35 @@
     ! Side is on the boundary
     else
 
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
+      if(Grid % Bnd_Cond_Type(c2) .eq. INFLOW) then
 
-        v_flux % n(s) = ( u % n(c2) * grid % sx(s)     &
-                        + v % n(c2) * grid % sy(s)     &
-                        + w % n(c2) * grid % sz(s) )
-
-        b(c1) = b(c1) - v_flux % n(s)
-
-      else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW .or.   &
-              Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) then
-
-        v_flux % n(s) = ( u % n(c2) * grid % sx(s)     &
-                        + v % n(c2) * grid % sy(s)     &
-                        + w % n(c2) * grid % sz(s) )
+        v_flux % n(s) = ( u % n(c2) * Grid % sx(s)     &
+                        + v % n(c2) * Grid % sy(s)     &
+                        + w % n(c2) * Grid % sz(s) )
 
         b(c1) = b(c1) - v_flux % n(s)
 
-        a12 = A % fc(s) * grid % vol(c1) / M % sav(c1)
+      else if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW .or.   &
+              Grid % Bnd_Cond_Type(c2) .eq. CONVECT) then
+
+        v_flux % n(s) = ( u % n(c2) * Grid % sx(s)     &
+                        + v % n(c2) * Grid % sy(s)     &
+                        + w % n(c2) * Grid % sz(s) )
+
+        b(c1) = b(c1) - v_flux % n(s)
+
+        a12 = A % fc(s) * Grid % vol(c1) / M % sav(c1)
         A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
 
-      else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE) then
+      else if(Grid % Bnd_Cond_Type(c2) .eq. PRESSURE) then
 
-        v_flux % n(s) = ( u % n(c1) * grid % sx(s)     &
-                        + v % n(c1) * grid % sy(s)     &
-                        + w % n(c1) * grid % sz(s) )
+        v_flux % n(s) = ( u % n(c1) * Grid % sx(s)     &
+                        + v % n(c1) * Grid % sy(s)     &
+                        + w % n(c1) * Grid % sz(s) )
 
         b(c1) = b(c1) - v_flux % n(s)
 
-        a12 = A % fc(s) * grid % vol(c1) / M % sav(c1)
+        a12 = A % fc(s) * Grid % vol(c1) / M % sav(c1)
         A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
 
       else  ! it is SYMMETRY
@@ -188,10 +189,10 @@
   ! However, the fix should not be applied if domain has pressure outlet.
   if( .not. Flow % has_pressure_outlet) then
     if(total_cells .eq. 0) then  ! wasn't set yet
-      total_cells = grid % n_cells - grid % comm % n_buff_cells
+      total_cells = Grid % n_cells - Grid % comm % n_buff_cells
       call Comm_Mod_Global_Sum_Int(total_cells)
     end if
-    total_source = sum(b(1:(grid % n_cells - grid % comm % n_buff_cells)))
+    total_source = sum(b(1:(Grid % n_cells - Grid % comm % n_buff_cells)))
     call Comm_Mod_Global_Sum_Real(total_source)
     b(:) = b(:) - total_source/real(total_cells)
   end if
@@ -200,6 +201,7 @@
   call Control_Mod_Solver_For_Pressure(solver)
 
   call Cpu_Timer % Start('Linear_Solver_For_Pressure')
+
   call Sol % Cg(A,             &
                 pp % n,        &
                 b,             &
@@ -225,7 +227,7 @@
   !-------------------------------!
   !   Update the pressure field   !
   !-------------------------------!
-  do c = -grid % n_bnd_cells, grid % n_cells
+  do c = -Grid % n_bnd_cells, Grid % n_cells
     p % n(c) =  p % n(c) + pp % urf * pp % n(c)
   end do
 
@@ -234,8 +236,8 @@
   !------------------------------------!
   !   Normalize the pressure field     !
   !------------------------------------!
-  p_max  = maxval(p % n(1:grid % n_cells))
-  p_min  = minval(p % n(1:grid % n_cells))
+  p_max  = maxval(p % n(1:Grid % n_cells))
+  p_min  = minval(p % n(1:Grid % n_cells))
 
   call Comm_Mod_Global_Max_Real(p_max)
   call Comm_Mod_Global_Min_Real(p_min)

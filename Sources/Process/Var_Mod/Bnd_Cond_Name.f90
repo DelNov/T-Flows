@@ -9,7 +9,7 @@
   integer        :: bnd_cell
 !------------------------------------------------------------------------------!
 
-  Var_Mod_Bnd_Cond_Name = Grid_Mod_Bnd_Cond_Name(phi % pnt_grid, bnd_cell)
+  Var_Mod_Bnd_Cond_Name = phi % pnt_grid % Bnd_Cond_Name(bnd_cell)
 
   end function
 

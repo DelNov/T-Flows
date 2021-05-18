@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Grid_Mod_Save_Dim(grid, sub)
+  subroutine Save_Dim(Grid, sub)
 !------------------------------------------------------------------------------!
 !   Writes file with grid dimensions (.dim, used to be .geo)                   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
-  integer         :: sub
+  class(Grid_Type)    :: Grid
+  integer, intent(in) :: sub
 !-----------------------------------[Locals]-----------------------------------!
   integer       :: c, s, n, c1, c2, var, fu
   character(SL) :: name_out
@@ -24,11 +24,11 @@
   !   Node coordinates   !
   !----------------------!
   do var = 1, 3
-    do n=1,grid % n_nodes
-      if(grid % new_n(n) > 0) then
-        if(var .eq. 1) write(fu) grid % xn(n)
-        if(var .eq. 2) write(fu) grid % yn(n)
-        if(var .eq. 3) write(fu) grid % zn(n)
+    do n=1,Grid % n_nodes
+      if(Grid % new_n(n) > 0) then
+        if(var .eq. 1) write(fu) Grid % xn(n)
+        if(var .eq. 2) write(fu) Grid % yn(n)
+        if(var .eq. 3) write(fu) Grid % zn(n)
       end if
     end do
   end do
@@ -37,11 +37,11 @@
   !   Cell center coordinates   !
   !-----------------------------!
   do var = 1, 3
-    do c = -grid % n_bnd_cells, grid % n_cells
-      if(grid % old_c(c) .ne. 0 .or. c .eq. 0) then
-        if(var .eq. 1) write(fu) grid % xc(grid % old_c(c))
-        if(var .eq. 2) write(fu) grid % yc(grid % old_c(c))
-        if(var .eq. 3) write(fu) grid % zc(grid % old_c(c))
+    do c = -Grid % n_bnd_cells, Grid % n_cells
+      if(Grid % old_c(c) .ne. 0 .or. c .eq. 0) then
+        if(var .eq. 1) write(fu) Grid % xc(Grid % old_c(c))
+        if(var .eq. 2) write(fu) Grid % yc(Grid % old_c(c))
+        if(var .eq. 3) write(fu) Grid % zc(Grid % old_c(c))
       end if
     end do
   end do
@@ -49,18 +49,18 @@
   !-------------------!
   !   Wall distance   !
   !-------------------!
-  do c = -grid % n_bnd_cells, grid % n_cells
-    if(grid % old_c(c) .ne. 0 .or. c .eq. 0) then
-      write(fu) grid % wall_dist(grid % old_c(c))
+  do c = -Grid % n_bnd_cells, Grid % n_cells
+    if(Grid % old_c(c) .ne. 0 .or. c .eq. 0) then
+      write(fu) Grid % wall_dist(Grid % old_c(c))
     end if
   end do
 
   !------------------!
   !   Cell volumes   !
   !------------------!
-  do c = 1, grid % n_cells
-    if(grid % old_c(c) .ne. 0) then
-      write(fu) grid % vol(grid % old_c(c))
+  do c = 1, Grid % n_cells
+    if(Grid % old_c(c) .ne. 0) then
+      write(fu) Grid % vol(Grid % old_c(c))
     end if
   end do
 
@@ -68,38 +68,38 @@
   !   Faces   !
   !-----------!
   do var = 1, 13
-    do s = 1, grid % n_faces + grid % n_shadows
-      if(grid % old_f(s) .ne. 0) then
-        c1 = grid % faces_c(1, grid % old_f(s))
-        c2 = grid % faces_c(2, grid % old_f(s))
-        if(grid % new_c(c2) < 0 .or. grid % new_c(c1) < grid % new_c(c2)) then
-          if(var .eq.  1)  write(fu) grid % sx(grid % old_f(s))
-          if(var .eq.  2)  write(fu) grid % sy(grid % old_f(s))
-          if(var .eq.  3)  write(fu) grid % sz(grid % old_f(s))
-          if(var .eq.  4)  write(fu) grid % dx(grid % old_f(s))
-          if(var .eq.  5)  write(fu) grid % dy(grid % old_f(s))
-          if(var .eq.  6)  write(fu) grid % dz(grid % old_f(s))
-          if(var .eq.  7)  write(fu) grid % f (grid % old_f(s))
-          if(var .eq.  8)  write(fu) grid % xf(grid % old_f(s))
-          if(var .eq.  9)  write(fu) grid % yf(grid % old_f(s))
-          if(var .eq. 10)  write(fu) grid % zf(grid % old_f(s))
-          if(var .eq. 11)  write(fu) grid % rx(grid % old_f(s))
-          if(var .eq. 12)  write(fu) grid % ry(grid % old_f(s))
-          if(var .eq. 13)  write(fu) grid % rz(grid % old_f(s))
+    do s = 1, Grid % n_faces + Grid % n_shadows
+      if(Grid % old_f(s) .ne. 0) then
+        c1 = Grid % faces_c(1, Grid % old_f(s))
+        c2 = Grid % faces_c(2, Grid % old_f(s))
+        if(Grid % new_c(c2) < 0 .or. Grid % new_c(c1) < Grid % new_c(c2)) then
+          if(var .eq.  1)  write(fu) Grid % sx(Grid % old_f(s))
+          if(var .eq.  2)  write(fu) Grid % sy(Grid % old_f(s))
+          if(var .eq.  3)  write(fu) Grid % sz(Grid % old_f(s))
+          if(var .eq.  4)  write(fu) Grid % dx(Grid % old_f(s))
+          if(var .eq.  5)  write(fu) Grid % dy(Grid % old_f(s))
+          if(var .eq.  6)  write(fu) Grid % dz(Grid % old_f(s))
+          if(var .eq.  7)  write(fu) Grid % f (Grid % old_f(s))
+          if(var .eq.  8)  write(fu) Grid % xf(Grid % old_f(s))
+          if(var .eq.  9)  write(fu) Grid % yf(Grid % old_f(s))
+          if(var .eq. 10)  write(fu) Grid % zf(Grid % old_f(s))
+          if(var .eq. 11)  write(fu) Grid % rx(Grid % old_f(s))
+          if(var .eq. 12)  write(fu) Grid % ry(Grid % old_f(s))
+          if(var .eq. 13)  write(fu) Grid % rz(Grid % old_f(s))
         else
-          if(var .eq.  1)  write(fu) -grid % sx(grid % old_f(s))
-          if(var .eq.  2)  write(fu) -grid % sy(grid % old_f(s))
-          if(var .eq.  3)  write(fu) -grid % sz(grid % old_f(s))
-          if(var .eq.  4)  write(fu) -grid % dx(grid % old_f(s))
-          if(var .eq.  5)  write(fu) -grid % dy(grid % old_f(s))
-          if(var .eq.  6)  write(fu) -grid % dz(grid % old_f(s))
-          if(var .eq.  7)  write(fu) 1.0 - grid % f (grid % old_f(s))
-          if(var .eq.  8)  write(fu) grid % xf(grid % old_f(s))
-          if(var .eq.  9)  write(fu) grid % yf(grid % old_f(s))
-          if(var .eq. 10)  write(fu) grid % zf(grid % old_f(s))
-          if(var .eq. 11)  write(fu) grid % rx(grid % old_f(s))
-          if(var .eq. 12)  write(fu) grid % ry(grid % old_f(s))
-          if(var .eq. 13)  write(fu) grid % rz(grid % old_f(s))
+          if(var .eq.  1)  write(fu) -Grid % sx(Grid % old_f(s))
+          if(var .eq.  2)  write(fu) -Grid % sy(Grid % old_f(s))
+          if(var .eq.  3)  write(fu) -Grid % sz(Grid % old_f(s))
+          if(var .eq.  4)  write(fu) -Grid % dx(Grid % old_f(s))
+          if(var .eq.  5)  write(fu) -Grid % dy(Grid % old_f(s))
+          if(var .eq.  6)  write(fu) -Grid % dz(Grid % old_f(s))
+          if(var .eq.  7)  write(fu) 1.0 - Grid % f (Grid % old_f(s))
+          if(var .eq.  8)  write(fu)  Grid % xf(Grid % old_f(s))
+          if(var .eq.  9)  write(fu)  Grid % yf(Grid % old_f(s))
+          if(var .eq. 10)  write(fu)  Grid % zf(Grid % old_f(s))
+          if(var .eq. 11)  write(fu)  Grid % rx(Grid % old_f(s))
+          if(var .eq. 12)  write(fu)  Grid % ry(Grid % old_f(s))
+          if(var .eq. 13)  write(fu)  Grid % rz(Grid % old_f(s))
         end if
       end if
     end do
@@ -108,9 +108,9 @@
   !-----------------!
   !   Periodicity   !
   !-----------------!
-  write(fu) grid % per_x
-  write(fu) grid % per_y
-  write(fu) grid % per_z
+  write(fu) Grid % per_x
+  write(fu) Grid % per_y
+  write(fu) Grid % per_z
 
   close(fu)
 

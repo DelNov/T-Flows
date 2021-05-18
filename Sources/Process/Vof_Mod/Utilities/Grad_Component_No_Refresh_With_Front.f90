@@ -14,8 +14,8 @@
                                    Vof % pnt_grid % n_cells)
   real,    intent(in)     :: phif  ! phi at the front
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: grid
-  type(Field_Type), pointer :: flow
+  type(Grid_Type),  pointer :: Grid
+  type(Field_Type), pointer :: Flow
   integer                   :: s, c1, c2
   real                      :: dphi1, dphi2
   real                      :: dx_c1, dy_c1, dz_c1, dx_c2, dy_c2, dz_c2
@@ -26,61 +26,61 @@
 !==============================================================================!
 
   ! Take alias
-  grid => Vof % pnt_grid
-  flow => Vof % pnt_flow
+  Grid => Vof % pnt_grid
+  Flow => Vof % pnt_flow
 
   ! Initialize gradients
-  phii(1:grid % n_cells) = 0.
+  phii(1:Grid % n_cells) = 0.
 
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
     ! Take differences as if front doesn't exist
     dphi1 = phi(c2)-phi(c1)
     dphi2 = phi(c2)-phi(c1)
-    dx_c1 = grid % dx(s)
-    dy_c1 = grid % dy(s)
-    dz_c1 = grid % dz(s)
-    dx_c2 = grid % dx(s)
-    dy_c2 = grid % dy(s)
-    dz_c2 = grid % dz(s)
+    dx_c1 = Grid % dx(s)
+    dy_c1 = Grid % dy(s)
+    dz_c1 = Grid % dz(s)
+    dx_c2 = Grid % dx(s)
+    dy_c2 = Grid % dy(s)
+    dz_c2 = Grid % dz(s)
 
     ! If face is at the front, reduce the extents of the stencil
     if(any(Vof % Front % face_at_elem(1:2,s) .ne. 0)) then
       dphi1 = phif - phi(c1)
       dphi2 = phi(c2) - phif
-      dx_c1 = grid % xs(s) - grid % xc(c1)
-      dy_c1 = grid % ys(s) - grid % yc(c1)
-      dz_c1 = grid % zs(s) - grid % zc(c1)
-      dx_c2 = grid % xc(c2) - grid % xs(s)
-      dy_c2 = grid % yc(c2) - grid % ys(s)
-      dz_c2 = grid % zc(c2) - grid % zs(s)
+      dx_c1 = Grid % xs(s) - Grid % xc(c1)
+      dy_c1 = Grid % ys(s) - Grid % yc(c1)
+      dz_c1 = Grid % zs(s) - Grid % zc(c1)
+      dx_c2 = Grid % xc(c2) - Grid % xs(s)
+      dy_c2 = Grid % yc(c2) - Grid % ys(s)
+      dz_c2 = Grid % zc(c2) - Grid % zs(s)
     end if
 
     ! On the boundaries
     if(c2 < 0) then
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. SYMMETRY) then
+      if(Grid % Bnd_Cond_Type(c2) .eq. SYMMETRY) then
         dphi1 = 0.
       end if
 
       phii(c1) = phii(c1)                                          &
-               + dphi1 * (  flow % grad_c2c(MAP(i,1),c1) * dx_c1   &
-                          + flow % grad_c2c(MAP(i,2),c1) * dy_c1   &
-                          + flow % grad_c2c(MAP(i,3),c1) * dz_c1)
+               + dphi1 * (  Flow % grad_c2c(MAP(i,1),c1) * dx_c1   &
+                          + Flow % grad_c2c(MAP(i,2),c1) * dy_c1   &
+                          + Flow % grad_c2c(MAP(i,3),c1) * dz_c1)
     end if
 
     ! Inside the domain
     if(c2 > 0) then
       phii(c1) = phii(c1)                                          &
-               + dphi1 * (  flow % grad_c2c(MAP(i,1),c1) * dx_c1   &
-                          + flow % grad_c2c(MAP(i,2),c1) * dy_c1   &
-                          + flow % grad_c2c(MAP(i,3),c1) * dz_c1)
+               + dphi1 * (  Flow % grad_c2c(MAP(i,1),c1) * dx_c1   &
+                          + Flow % grad_c2c(MAP(i,2),c1) * dy_c1   &
+                          + Flow % grad_c2c(MAP(i,3),c1) * dz_c1)
 
       phii(c2) = phii(c2)                                          &
-               + dphi2 * (  flow % grad_c2c(MAP(i,1),c2) * dx_c2   &
-                          + flow % grad_c2c(MAP(i,2),c2) * dy_c2   &
-                          + flow % grad_c2c(MAP(i,3),c2) * dz_c2)
+               + dphi2 * (  Flow % grad_c2c(MAP(i,1),c2) * dx_c2   &
+                          + Flow % grad_c2c(MAP(i,2),c2) * dy_c2   &
+                          + Flow % grad_c2c(MAP(i,3),c2) * dz_c2)
     end if
   end do
 

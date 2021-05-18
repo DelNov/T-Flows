@@ -1,20 +1,20 @@
 !==============================================================================!
-  subroutine Grid_Mod_Save_Debug_Vtu(grid, append,                           &
-                                     scalar_cell, scalar_node, scalar_name,  &
-                                     vector_cell, vector_node, vector_name,  &
-                                     plot_inside)
+  subroutine Save_Debug_Vtu(Grid, append,                           &
+                            scalar_cell, scalar_node, scalar_name,  &
+                            vector_cell, vector_node, vector_name,  &
+                            plot_inside)
 !------------------------------------------------------------------------------!
 !   Writes: name.vtu, name.faces.vtu, name.shadow.vtu                          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)        :: grid
+  class(Grid_Type)       :: Grid
   character(*)           :: append
-  real,         optional :: scalar_cell(-grid % n_bnd_cells:grid % n_cells)
-  real,         optional :: scalar_node(1:grid % n_nodes)
+  real,         optional :: scalar_cell(-Grid % n_bnd_cells:Grid % n_cells)
+  real,         optional :: scalar_node(1:Grid % n_nodes)
   character(*), optional :: scalar_name
-  real,         optional :: vector_cell(-grid % n_bnd_cells:grid % n_cells, 3)
-  real,         optional :: vector_node(1:grid % n_nodes, 3)
+  real,         optional :: vector_cell(-Grid % n_bnd_cells:Grid % n_cells, 3)
+  real,         optional :: vector_node(1:Grid % n_nodes, 3)
   character(*), optional :: vector_name
   logical,      optional :: plot_inside
 !-----------------------------------[Locals]-----------------------------------!
@@ -41,9 +41,9 @@
   ! Set start and ending cell depending if you save inside or boundary cells
   if(inside) then
     cs = 1
-    ce = grid % n_cells
+    ce = Grid % n_cells
   else
-    cs = -grid % n_bnd_cells
+    cs = -Grid % n_bnd_cells
     ce = -1
   end if
   nc = ce - cs + 1
@@ -51,17 +51,17 @@
   ! Count connections in this subdomain, you will need it later
   n_conns = 0
   do c = cs, ce
-    n_conns = n_conns + abs(grid % cells_n_nodes(c))
+    n_conns = n_conns + abs(Grid % cells_n_nodes(c))
   end do
 
   ! Count face data for polyhedral cells, you will need it later
   n_polyg = 0
   do c = cs, ce
-    if(grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
+    if(Grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
       n_polyg = n_polyg + 1                  ! add one for number of polyfaces
-      do i_fac = 1, grid % cells_n_faces(c)  ! add all faces and their nodes
-        s = grid % cells_f(i_fac, c)
-        n = grid % faces_n_nodes(s)
+      do i_fac = 1, Grid % cells_n_faces(c)  ! add all faces and their nodes
+        s = Grid % cells_f(i_fac, c)
+        n = Grid % faces_n_nodes(s)
         n_polyg = n_polyg + 1 + n
       end do
     end if
@@ -86,7 +86,7 @@
                     ' version="0.1"'                    //  &
                     ' byte_order="LittleEndian">'       // LF
   write(fu) IN_1 // '<UnstructuredGrid>'                // LF
-  write(str1, '(i0.0)') grid % n_nodes
+  write(str1, '(i0.0)') Grid % n_nodes
   write(str2, '(i0.0)') nc
   write(fu) IN_2 // '<Piece NumberOfPoints="' // trim(str1) // '"' //  &
                     ' NumberOfCells="' // trim(str2) // '">'       // LF
@@ -105,7 +105,7 @@
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
   write(fu) IN_3 // '</Points>'    // LF
-  data_offset = data_offset + SP + grid % n_nodes * RP * 3  ! prepare for next
+  data_offset = data_offset + SP + Grid % n_nodes * RP * 3  ! prepare for next
 
   !-----------!
   !           !
@@ -141,7 +141,7 @@
   write(fu) IN_4 // '</DataArray>' // LF
   data_offset = data_offset + SP + nc * IP  ! prepare for next
 
-  if(grid % polyhedral) then
+  if(Grid % polyhedral) then
 
     ! Write polyhedral cells' faces
     write(str1, '(i0.0)') data_offset
@@ -162,7 +162,7 @@
     write(fu) IN_4 // '</DataArray>' // LF
     data_offset = data_offset + SP + nc * IP  ! prepare for next
 
-  end if  ! is grid polyhedral
+  end if  ! is Grid polyhedral
 
   write(fu) IN_3 // '</Cells>' // LF
 
@@ -181,7 +181,7 @@
                       ' format="appended"'                   //  &
                       ' offset="' // trim(str1)       //'">' // LF
     write(fu) IN_4 // '</DataArray>' // LF
-    data_offset = data_offset + SP + grid % n_nodes * RP  ! prepare for next
+    data_offset = data_offset + SP + Grid % n_nodes * RP  ! prepare for next
   end if
 
   ! Additional node-based vector array
@@ -193,7 +193,7 @@
                       ' format="appended"'                   //  &
                       ' offset="' // trim(str1)       //'">' // LF
     write(fu) IN_4 // '</DataArray>' // LF
-    data_offset = data_offset + SP + grid % n_nodes * RP * 3  ! prepare for next
+    data_offset = data_offset + SP + Grid % n_nodes * RP * 3  ! prepare for next
   end if
 
   if(present(scalar_node) .or. present(vector_node)) then
@@ -215,16 +215,6 @@
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
   data_offset = data_offset + SP + nc * IP  ! prepare for next
-
-  ! Cell center coordinates
-  write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Float64"'            //  &
-                    ' Name="'// 'CellCoordinates' // '"'   //  &
-                    ' NumberOfComponents="3"'              //  &
-                    ' format="appended"'                   //  &
-                    ' offset="' // trim(str1)       //'">' // LF
-  write(fu) IN_4 // '</DataArray>' // LF
-  data_offset = data_offset + SP + nc * RP * 3  ! prepare for next
 
   ! Additional cell scalar
   if(present(scalar_cell)) then
@@ -269,10 +259,10 @@
   !-----------!
   !   Nodes   !
   !-----------!
-  data_size = int(grid % n_nodes * RP * 3, SP)
+  data_size = int(Grid % n_nodes * RP * 3, SP)
   write(fu) data_size
-  do n = 1, grid % n_nodes
-    write(fu) grid % xn(n), grid % yn(n), grid % zn(n)
+  do n = 1, Grid % n_nodes
+    write(fu) Grid % xn(n), Grid % yn(n), Grid % zn(n)
   end do
 
   !-----------!
@@ -291,12 +281,12 @@
     if(inside) then
 
       ! Tetrahedral, pyramid, wedge and hexahedral cells
-      if( any( grid % cells_n_nodes(c) .eq. (/4,5,6,8/)  ) ) then
-        write(fu) (grid % cells_n(1:grid % cells_n_nodes(c), c))-1
+      if( any( Grid % cells_n_nodes(c) .eq. (/4,5,6,8/)  ) ) then
+        write(fu) (Grid % cells_n(1:Grid % cells_n_nodes(c), c))-1
 
       ! Polyhedral cells
-      else if(grid % cells_n_nodes(c) .lt. 0) then
-        write(fu) (grid % cells_n(1:-grid % cells_n_nodes(c), c))-1
+      else if(Grid % cells_n_nodes(c) .lt. 0) then
+        write(fu) (Grid % cells_n(1:-Grid % cells_n_nodes(c), c))-1
 
       end if
 
@@ -306,7 +296,7 @@
     else
 
       ! All cell types
-      write(fu) (grid % cells_n(1:grid % cells_n_nodes(c), c))-1
+      write(fu) (Grid % cells_n(1:Grid % cells_n_nodes(c), c))-1
 
     end if  ! if inside
   end do
@@ -316,7 +306,7 @@
   write(fu) data_size
   cell_offset = 0
   do c = cs, ce
-    cell_offset = cell_offset + abs(grid % cells_n_nodes(c))
+    cell_offset = cell_offset + abs(Grid % cells_n_nodes(c))
     write(fu) cell_offset
   end do
 
@@ -325,17 +315,17 @@
   write(fu) data_size
   if(inside) then
     do c = cs, ce
-      if(grid % cells_n_nodes(c) .eq. 4) write(fu) VTK_TETRA
-      if(grid % cells_n_nodes(c) .eq. 8) write(fu) VTK_HEXAHEDRON
-      if(grid % cells_n_nodes(c) .eq. 6) write(fu) VTK_WEDGE
-      if(grid % cells_n_nodes(c) .eq. 5) write(fu) VTK_PYRAMID
-      if(grid % cells_n_nodes(c) .lt. 0) write(fu) VTK_POLYHEDRON
+      if(Grid % cells_n_nodes(c) .eq. 4) write(fu) VTK_TETRA
+      if(Grid % cells_n_nodes(c) .eq. 8) write(fu) VTK_HEXAHEDRON
+      if(Grid % cells_n_nodes(c) .eq. 6) write(fu) VTK_WEDGE
+      if(Grid % cells_n_nodes(c) .eq. 5) write(fu) VTK_PYRAMID
+      if(Grid % cells_n_nodes(c) .lt. 0) write(fu) VTK_POLYHEDRON
     end do
   else
     do c = cs, ce
-      if(grid % cells_n_nodes(c) .eq. 3) then
+      if(Grid % cells_n_nodes(c) .eq. 3) then
         write(fu) VTK_TRIANGLE
-      else if(grid % cells_n_nodes(c) .eq. 4) then
+      else if(Grid % cells_n_nodes(c) .eq. 4) then
         write(fu) VTK_QUAD
       else
         write(fu) VTK_POLYGON
@@ -344,44 +334,44 @@
   end if
 
   ! For polyhedral grids, save faces and face offsets
-  if(grid % polyhedral) then
+  if(Grid % polyhedral) then
 
     ! Write polyhedral cells' faces
     data_size = int(n_polyg * IP, SP)
     write(fu) data_size
     do c = cs, ce
-      if(grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
-        write(fu) grid % cells_n_faces(c)      ! write number of its polyfaces
-        do i_fac = 1, grid % cells_n_faces(c)  ! and all polyfaces
-          s = grid % cells_f(i_fac, c)
-          if(grid % faces_s(s) .ne. 0) then    ! face has a shadow, if it ...
+      if(Grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
+        write(fu) Grid % cells_n_faces(c)      ! write number of its polyfaces
+        do i_fac = 1, Grid % cells_n_faces(c)  ! and all polyfaces
+          s = Grid % cells_f(i_fac, c)
+          if(Grid % faces_s(s) .ne. 0) then    ! face has a shadow, if it ...
             s1 = s                             ! ... is closer, plot that!
-            s2 = grid % faces_s(s)
+            s2 = Grid % faces_s(s)
             dist1 = Math_Mod_Distance(                            &
-                    grid % xc(c),  grid % yc(c),  grid % zc(c),   &
-                    grid % xf(s1), grid % yf(s1), grid % zf(s1))
+                    Grid % xc(c),  Grid % yc(c),  Grid % zc(c),   &
+                    Grid % xf(s1), Grid % yf(s1), Grid % zf(s1))
             dist2 = Math_Mod_Distance(                            &
-                    grid % xc(c),  grid % yc(c),  grid % zc(c),   &
-                    grid % xf(s2), grid % yf(s2), grid % zf(s2))
+                    Grid % xc(c),  Grid % yc(c),  Grid % zc(c),   &
+                    Grid % xf(s2), Grid % yf(s2), Grid % zf(s2))
             if(dist1 < dist2) s = s1
             if(dist2 < dist1) s = s2
           end if
-          n = grid % faces_n_nodes(s)
-          write(fu) n, grid % faces_n(1:n, s)-1
+          n = Grid % faces_n_nodes(s)
+          write(fu) n, Grid % faces_n(1:n, s)-1
         end do
       end if
     end do
 
     ! Write polyhedral cells' faces offsets
-    data_size = int(grid % n_cells * IP, SP)
+    data_size = int(Grid % n_cells * IP, SP)
     write(fu) data_size
     cell_offset = 0
-    do c = 1, grid % n_cells
-      if(grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
+    do c = 1, Grid % n_cells
+      if(Grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
         cell_offset = cell_offset + 1          ! to store number of polyfaces
-        do i_fac = 1, grid % cells_n_faces(c)  ! to store polyfaces
-          s = grid % cells_f(i_fac, c)
-          n = grid % faces_n_nodes(s)
+        do i_fac = 1, Grid % cells_n_faces(c)  ! to store polyfaces
+          s = Grid % cells_f(i_fac, c)
+          n = Grid % faces_n_nodes(s)
           cell_offset = cell_offset + 1 + n    ! number of nodes and nodes
         end do
         write(fu) cell_offset                  ! write the current offset
@@ -390,23 +380,23 @@
       end if
     end do
 
-  end if  ! if grid % polyhedral
+  end if  ! if Grid % polyhedral
 
   !----------------!
   !   Point data   !
   !----------------!
   if(present(scalar_node)) then
-    data_size = int(grid % n_nodes * RP, SP)
+    data_size = int(Grid % n_nodes * RP, SP)
     write(fu) data_size
-    do n = 1, grid % n_nodes
+    do n = 1, Grid % n_nodes
       write(fu) scalar_node(n)
     end do
   end if
 
   if(present(vector_node)) then
-    data_size = int(grid % n_nodes * RP * 3, SP)
+    data_size = int(Grid % n_nodes * RP * 3, SP)
     write(fu) data_size
-    do n = 1, grid % n_nodes
+    do n = 1, Grid % n_nodes
       write(fu) vector_node(n, 1), vector_node(n, 2), vector_node(n, 3)
     end do
   end if
@@ -419,14 +409,7 @@
   data_size = int(nc * IP, SP)
   write(fu) data_size
   do c = cs, ce
-    write(fu) grid % comm % cell_proc(c)
-  end do
-
-  ! Cell center coordinates
-  data_size = int(nc * RP * 3, SP)
-  write(fu) data_size
-  do c = cs, ce
-    write(fu) grid % xc(c), grid % yc(c), grid % zc(c)
+    write(fu) Grid % comm % cell_proc(c)
   end do
 
   ! Additional cell data
@@ -458,7 +441,7 @@
   !-----------------------!
 
   ! Create it only from subdomain 1, when decomposed
-  if(maxval(grid % comm % cell_proc(:)) > 1 .and. this_proc .eq. 1) then
+  if(maxval(Grid % comm % cell_proc(:)) > 1 .and. this_proc .eq. 1) then
 
     call File_Mod_Set_Name(name_out, appendix='-'//trim(append),  &
                            extension='.pvtu')

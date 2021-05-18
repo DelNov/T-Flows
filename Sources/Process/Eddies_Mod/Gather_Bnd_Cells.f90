@@ -7,17 +7,17 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Eddies_Type), target :: eddies
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: grid
-  type(Field_Type), pointer :: flow
+  type(Grid_Type),  pointer :: Grid
+  type(Field_Type), pointer :: Flow
   integer, allocatable      :: n_bnd_cells_proc(:)
   integer, allocatable      :: s_bnd_cell_proc(:)
   integer                   :: c, n, cnt
   real                      :: x_dff, y_dff, z_dff, x_avg, y_avg, z_avg
 !==============================================================================!
 
-  ! Create an alias for grid
-  grid => eddies % pnt_grid
-  flow => eddies % pnt_flow
+  ! Create an alias for Grid
+  Grid => eddies % pnt_grid
+  Flow => eddies % pnt_flow
 
   !------------------------------------------------------!
   !   Store boundary cells at given boundary condition   !
@@ -25,8 +25,8 @@
 
   ! Count boundary cells in this processor
   eddies % n_bnd_cells = 0
-  do c = -grid % n_bnd_cells, -1
-    if(Grid_Mod_Bnd_Cond_Name(grid, c) .eq. eddies % bc_name) then
+  do c = -Grid % n_bnd_cells, -1
+    if(Grid % Bnd_Cond_Name( c) .eq. eddies % bc_name) then
       eddies % n_bnd_cells = eddies % n_bnd_cells + 1
     end if
   end do
@@ -62,16 +62,16 @@
   allocate(eddies % bnd_w (eddies % n_bnd_cells_glo));  eddies % bnd_w (:) = 0.0
 
   cnt = 0
-  do c = -grid % n_bnd_cells, -1
-    if(Grid_Mod_Bnd_Cond_Name(grid, c) .eq. eddies % bc_name) then
+  do c = -Grid % n_bnd_cells, -1
+    if(Grid % Bnd_Cond_Name( c) .eq. eddies % bc_name) then
       cnt = cnt + 1
-      eddies % bnd_xc(cnt + s_bnd_cell_proc(this_proc)) = grid % xc(c)
-      eddies % bnd_yc(cnt + s_bnd_cell_proc(this_proc)) = grid % yc(c)
-      eddies % bnd_zc(cnt + s_bnd_cell_proc(this_proc)) = grid % zc(c)
-      eddies % bnd_wd(cnt + s_bnd_cell_proc(this_proc)) = grid % wall_dist(c)
-      eddies % bnd_u (cnt + s_bnd_cell_proc(this_proc)) = flow % u % b(c)
-      eddies % bnd_v (cnt + s_bnd_cell_proc(this_proc)) = flow % v % b(c)
-      eddies % bnd_w (cnt + s_bnd_cell_proc(this_proc)) = flow % w % b(c)
+      eddies % bnd_xc(cnt + s_bnd_cell_proc(this_proc)) = Grid % xc(c)
+      eddies % bnd_yc(cnt + s_bnd_cell_proc(this_proc)) = Grid % yc(c)
+      eddies % bnd_zc(cnt + s_bnd_cell_proc(this_proc)) = Grid % zc(c)
+      eddies % bnd_wd(cnt + s_bnd_cell_proc(this_proc)) = Grid % wall_dist(c)
+      eddies % bnd_u (cnt + s_bnd_cell_proc(this_proc)) = Flow % u % b(c)
+      eddies % bnd_v (cnt + s_bnd_cell_proc(this_proc)) = Flow % v % b(c)
+      eddies % bnd_w (cnt + s_bnd_cell_proc(this_proc)) = Flow % w % b(c)
     end if
   end do
   call Comm_Mod_Global_Sum_Real_Array(eddies % n_bnd_cells_glo, eddies % bnd_xc)

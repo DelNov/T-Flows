@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Grid_Mod_Calculate_Face_Interpolation(grid)
+  subroutine Calculate_Face_Interpolation(Grid)
 !------------------------------------------------------------------------------!
 !   Calculate interpolation factors for faces.                                 !
 !   Should not be called from ProcessR, but from Genearate and Convert         !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  class(Grid_Type) :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   integer :: s, c1, c2, cnt
   real    :: xc1, yc1, zc1, xc2, yc2, zc2, nx, ny, nz, s_tot
@@ -17,26 +17,26 @@
   !----------------!
   !   Old method   !
   !----------------!
-  ! do s = 1, grid % n_faces
-  !   c1 = grid % faces_c(1,s)
-  !   c2 = grid % faces_c(2,s)
+  ! do s = 1, Grid % n_faces
+  !   c1 = Grid % faces_c(1,s)
+  !   c2 = Grid % faces_c(2,s)
   !
   !   ! First cell
-  !   xc1  = grid % xc(c1)
-  !   yc1  = grid % yc(c1)
-  !   zc1  = grid % zc(c1)
+  !   xc1  = Grid % xc(c1)
+  !   yc1  = Grid % yc(c1)
+  !   zc1  = Grid % zc(c1)
   !   dsc1 = Math_Mod_Distance(xc1, yc1, zc1,   &
-  !                            grid % xf(s), grid % yf(s), grid % zf(s))
+  !                            Grid % xf(s), Grid % yf(s), Grid % zf(s))
   !
   !   ! Second cell (pls. check if xsi=xc on the boundary)
-  !   xc2  = grid % xc(c2) + grid % dx(s)
-  !   yc2  = grid % yc(c2) + grid % dy(s)
-  !   zc2  = grid % zc(c2) + grid % dz(s)
+  !   xc2  = Grid % xc(c2) + Grid % dx(s)
+  !   yc2  = Grid % yc(c2) + Grid % dy(s)
+  !   zc2  = Grid % zc(c2) + Grid % dz(s)
   !   dsc2 = Math_Mod_Distance(xc2, yc2, zc2,   &
-  !                            grid % xf(s), grid % yf(s), grid % zf(s))
+  !                            Grid % xf(s), Grid % yf(s), Grid % zf(s))
   !
   !   ! Interpolation factor
-  !   grid % f(s) = dsc2 / (dsc1 + dsc2)
+  !   Grid % f(s) = dsc2 / (dsc1 + dsc2)
   ! end do
 
   !-----------------------------------------------------------!
@@ -53,25 +53,25 @@
   r_avg =  0.0
   cnt   =  0
 
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
     ! Surface normal
-    s_tot = sqrt(grid % sx(s)**2 + grid % sy(s)**2 + grid % sz(s)**2)
-    nx = grid % sx(s) / s_tot
-    ny = grid % sy(s) / s_tot
-    nz = grid % sz(s) / s_tot
+    s_tot = sqrt(Grid % sx(s)**2 + Grid % sy(s)**2 + Grid % sz(s)**2)
+    nx = Grid % sx(s) / s_tot
+    ny = Grid % sy(s) / s_tot
+    nz = Grid % sz(s) / s_tot
 
     ! First cell
-    xc1  = grid % xc(c1)
-    yc1  = grid % yc(c1)
-    zc1  = grid % zc(c1)
+    xc1  = Grid % xc(c1)
+    yc1  = Grid % yc(c1)
+    zc1  = Grid % zc(c1)
 
     ! Second cell (with correction for periodicity)
-    xc2  = grid % xc(c2) + grid % dx(s)
-    yc2  = grid % yc(c2) + grid % dy(s)
-    zc2  = grid % zc(c2) + grid % dz(s)
+    xc2  = Grid % xc(c2) + Grid % dx(s)
+    yc2  = Grid % yc(c2) + Grid % dy(s)
+    zc2  = Grid % zc(c2) + Grid % dz(s)
 
     ! Vector connecting cell centers c1 and c2
     lx = xc2 - xc1
@@ -79,9 +79,9 @@
     lz = zc2 - zc1
 
     ! Distance from c1 to intersection
-    dsc1 = (  (grid % xf(s) - xc1) * nx     &
-            + (grid % yf(s) - yc1) * ny     &
-            + (grid % zf(s) - zc1) * nz  )  &
+    dsc1 = (  (Grid % xf(s) - xc1) * nx     &
+            + (Grid % yf(s) - yc1) * ny     &
+            + (Grid % zf(s) - zc1) * nz  )  &
          / (lx * nx + ly * ny + lz * nz)
 
     ! Intersection point
@@ -89,23 +89,23 @@
     yi = yc1 + dsc1 * ly
     zi = zc1 + dsc1 * lz
 
-    grid % rx(s) = grid % xf(s) - xi
-    grid % ry(s) = grid % yf(s) - yi
-    grid % rz(s) = grid % zf(s) - zi
+    Grid % rx(s) = Grid % xf(s) - xi
+    Grid % ry(s) = Grid % yf(s) - yi
+    Grid % rz(s) = Grid % zf(s) - zi
 
     ! Interpolation factor
     ! (Equation 2.19 in Denner's thesis)
     dsc1 = Math_Mod_Distance(xc1, yc1, zc1, xi, yi, zi)
     dsc2 = Math_Mod_Distance(xc2, yc2, zc2, xi, yi, zi)
 
-    grid % f(s) = dsc2 / (dsc1 + dsc2)
+    Grid % f(s) = dsc2 / (dsc1 + dsc2)
 
     if(c2 > 0) then
       cnt = cnt + 1
-      f_max = max(f_max, grid % f(s))
-      f_min = min(f_min, grid % f(s))
-      f_avg = f_avg + grid % f(s)
-      r = sqrt(grid % rx(s)**2 + grid % ry(s)**2 + grid % rz(s)**2)  &
+      f_max = max(f_max, Grid % f(s))
+      f_min = min(f_min, Grid % f(s))
+      f_avg = f_avg + Grid % f(s)
+      r = sqrt(Grid % rx(s)**2 + Grid % ry(s)**2 + Grid % rz(s)**2)  &
         / (dsc1 + dsc2)
       r_max = max(r_max, r)
       r_min = min(r_min, r)

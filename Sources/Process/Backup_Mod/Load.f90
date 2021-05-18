@@ -14,7 +14,7 @@
   logical                  :: backup, present
 !-----------------------------------[Locals]-----------------------------------!
   type(Comm_Type), pointer :: comm
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: phi
   character(SL)            :: name_in, answer, name_mean, a_name
@@ -24,9 +24,9 @@
   call Cpu_Timer % Start('Backup_Mod_Load')
 
   ! Take aliases
-  grid => Fld % pnt_grid
+  Grid => Fld % pnt_grid
   bulk => Fld % bulk
-  comm => grid % comm
+  comm => Grid % comm
 
   ! Full name is specified in control file
   call Control_Mod_Load_Backup_Name(name_in)
@@ -55,7 +55,7 @@
   call Comm_Mod_Open_File_Read(fh, name_in)
 
   ! Create new types
-  call Comm_Mod_Create_New_Types(grid % comm)
+  call Comm_Mod_Create_New_Types(Grid % comm)
 
   ! Initialize displacement and variable count
   d  = 0
@@ -80,9 +80,9 @@
   !-----------------------------------------------!
   !   Skip three coordinates for the time being   !
   !-----------------------------------------------!
-  ! call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'x_coords', grid % xc)
-  ! call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'y_coords', grid % yc)
-  ! call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'z_coords', grid % zc)
+  ! call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'x_coords', Grid % xc)
+  ! call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'y_coords', Grid % yc)
+  ! call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'z_coords', Grid % zc)
 
   ! Time step
   call Backup_Mod_Read_Int(fh, d, vc, 'time_step', time_step)
@@ -117,21 +117,21 @@
   !------------------------------------------------------!
   !   Pressure, its gradients, and pressure correction   !
   !------------------------------------------------------!
-  call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'press',      Fld % p % n)
-  call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'press_x',    Fld % p % x)
-  call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'press_y',    Fld % p % y)
-  call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'press_z',    Fld % p % z)
-  call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'press_corr', Fld % pp % n)
+  call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'press',      Fld % p % n)
+  call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'press_x',    Fld % p % x)
+  call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'press_y',    Fld % p % y)
+  call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'press_z',    Fld % p % z)
+  call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'press_corr', Fld % pp % n)
   call Fld % Grad_Pressure(Fld % pp)
 
   !-------------------!
   !   Volume fluxes   !
   !-------------------!
-  call Backup_Mod_Read_Face_Real(grid, fh, d, vc, 'face_flux_n',  &
+  call Backup_Mod_Read_Face_Real(Grid, fh, d, vc, 'face_flux_n',  &
                                  Fld % v_flux % n, correct_sign = .true.)
-  call Backup_Mod_Read_Face_Real(grid, fh, d, vc, 'face_flux_o',  &
+  call Backup_Mod_Read_Face_Real(Grid, fh, d, vc, 'face_flux_o',  &
                                  Fld % v_flux % o, correct_sign = .true.)
-  call Backup_Mod_Read_Face_Real(grid, fh, d, vc, 'face_flux_oo',  &
+  call Backup_Mod_Read_Face_Real(Grid, fh, d, vc, 'face_flux_oo',  &
                                  Fld % v_flux % oo, correct_sign = .true.)
 
   !--------------!
@@ -168,16 +168,16 @@
     call Backup_Mod_Read_Variable(fh, d, vc, 'eps', Fld, tur % eps)
 
     ! Other turbulent quantities
-    call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'p_kin',  tur % p_kin )
-    call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'y_plus', tur % y_plus)
-    call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'vis_t',  tur % vis_t )
-    call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'vis_w',  tur % vis_w )
+    call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'p_kin',  tur % p_kin )
+    call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'y_plus', tur % y_plus)
+    call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'vis_t',  tur % vis_t )
+    call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'vis_w',  tur % vis_w )
 
     ! Turbulence quantities connected with heat transfer
     if(Fld % heat_transfer) then
       call Backup_Mod_Read_Variable(fh, d, vc, 't2', Fld, tur % t2)
-      call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'p_t2',  tur % p_t2 )
-      call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'con_w', tur % con_w)
+      call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'p_t2',  tur % p_t2 )
+      call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'con_w', tur % con_w)
     end if
   end if
 
@@ -194,19 +194,19 @@
     call Backup_Mod_Read_Variable(fh, d, vc, 'f22',  Fld, tur % f22)
 
     ! Other turbulent quantities
-    call Backup_Mod_Read_Cell_Real(grid, fh, d, vc,'p_kin',   tur % p_kin  )
-    call Backup_Mod_Read_Cell_Real(grid, fh, d, vc,'y_plus',  tur % y_plus )
-    call Backup_Mod_Read_Cell_Real(grid, fh, d, vc,'vis_t',   tur % vis_t  )
-    call Backup_Mod_Read_Cell_Real(grid, fh, d, vc,'vis_w',   tur % vis_w  )
-    call Backup_Mod_Read_Cell_Real(grid, fh, d, vc,'t_scale', tur % t_scale)
-    call Backup_Mod_Read_Cell_Real(grid, fh, d, vc,'l_scale', tur % l_scale)
+    call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc,'p_kin',   tur % p_kin  )
+    call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc,'y_plus',  tur % y_plus )
+    call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc,'vis_t',   tur % vis_t  )
+    call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc,'vis_w',   tur % vis_w  )
+    call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc,'t_scale', tur % t_scale)
+    call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc,'l_scale', tur % l_scale)
 
     ! Turbulence quantities connected with heat transfer
 
     if(Fld % heat_transfer) then
       call Backup_Mod_Read_Variable(fh, d, vc, 't2', Fld, tur % t2)
-      call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'p_t2',  tur % p_t2 )
-      call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'con_w', tur % con_w)
+      call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'p_t2',  tur % p_t2 )
+      call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'con_w', tur % con_w)
     end if
 
   end if
@@ -235,12 +235,12 @@
     end if
 
     ! Other turbulent quantities ?
-    call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'vis_t', tur % vis_t)
-    call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'vis_w', tur % vis_w)
+    call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'vis_t', tur % vis_t)
+    call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'vis_w', tur % vis_w)
 
     ! Turbulence quantities connected with heat transfer
     if(Fld % heat_transfer) then
-      call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'con_w', tur % con_w)
+      call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'con_w', tur % con_w)
     end if
   end if
 
@@ -259,28 +259,28 @@
   !-----------------------------------------!
   if(tur % statistics) then
 
-    call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'u_mean', tur % u_mean)
-    call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'v_mean', tur % v_mean)
-    call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'w_mean', tur % w_mean)
-    call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'p_mean', tur % p_mean)
+    call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'u_mean', tur % u_mean)
+    call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'v_mean', tur % v_mean)
+    call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'w_mean', tur % w_mean)
+    call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'p_mean', tur % p_mean)
     if(Fld % heat_transfer) then
-      call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 't_mean', tur % t_mean)
+      call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 't_mean', tur % t_mean)
     end if
 
     ! K and epsilon
     if(tur % model .eq. K_EPS) then
-      call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'kin_mean',  &
+      call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'kin_mean',  &
                                      tur % kin_mean)
-      call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'eps_mean',  &
+      call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'eps_mean',  &
                                      tur % eps_mean)
       if(Fld % heat_transfer) then
-        call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 't2_mean',  &
+        call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 't2_mean',  &
                                        tur % t2_mean)
-        call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'ut_mean',  &
+        call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'ut_mean',  &
                                        tur % ut_mean)
-        call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'vt_mean',  &
+        call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'vt_mean',  &
                                        tur % vt_mean)
-        call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'wt_mean',  &
+        call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'wt_mean',  &
                                        tur % wt_mean)
       end if
     end if
@@ -288,22 +288,22 @@
     ! K-eps-zeta-f and the hybrid model
     if(tur % model .eq. K_EPS_ZETA_F .or.  &
        tur % model .eq. HYBRID_LES_RANS) then
-      call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'kin_mean',  &
+      call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'kin_mean',  &
                                      tur % kin_mean)
-      call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'eps_mean',  &
+      call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'eps_mean',  &
                                      tur % eps_mean)
-      call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'zeta_mean',  &
+      call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'zeta_mean',  &
                                      tur % zeta_mean)
-      call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'f22_mean',  &
+      call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'f22_mean',  &
                                      tur % f22_mean)
       if(Fld % heat_transfer) then
-        call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 't2_mean',  &
+        call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 't2_mean',  &
                                        tur % t2_mean)
-        call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'ut_mean',  &
+        call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'ut_mean',  &
                                        tur % ut_mean)
-        call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'vt_mean',  &
+        call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'vt_mean',  &
                                        tur % vt_mean)
-        call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'wt_mean',  &
+        call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'wt_mean',  &
                                        tur % wt_mean)
       end if
     end if
@@ -311,32 +311,32 @@
     ! Reynolds stress models
     if(tur % model .eq. RSM_MANCEAU_HANJALIC .or.  &
        tur % model .eq. RSM_HANJALIC_JAKIRLIC) then
-      call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'uu_mean',  &
+      call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'uu_mean',  &
                                      tur % uu_mean)
-      call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'vv_mean',  &
+      call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'vv_mean',  &
                                      tur % vv_mean)
-      call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'ww_mean',  &
+      call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'ww_mean',  &
                                      tur % ww_mean)
-      call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'uv_mean',  &
+      call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'uv_mean',  &
                                      tur % uv_mean)
-      call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'uw_mean',  &
+      call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'uw_mean',  &
                                      tur % uw_mean)
-      call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'vw_mean',  &
+      call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'vw_mean',  &
                                      tur % vw_mean)
     end if
 
-    call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'uu_res', tur % uu_res)
-    call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'vv_res', tur % vv_res)
-    call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'ww_res', tur % ww_res)
-    call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'uv_res', tur % uv_res)
-    call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'uw_res', tur % uw_res)
-    call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'vw_res', tur % vw_res)
+    call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'uu_res', tur % uu_res)
+    call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'vv_res', tur % vv_res)
+    call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'ww_res', tur % ww_res)
+    call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'uv_res', tur % uv_res)
+    call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'uw_res', tur % uw_res)
+    call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'vw_res', tur % vw_res)
 
     if(Fld % heat_transfer) then
-      call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 't2_res', tur % t2_res)
-      call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'ut_res', tur % ut_res)
-      call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'vt_res', tur % vt_res)
-      call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'wt_res', tur % wt_res)
+      call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 't2_res', tur % t2_res)
+      call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'ut_res', tur % ut_res)
+      call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'vt_res', tur % vt_res)
+      call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'wt_res', tur % wt_res)
     end if
 
     ! Scalars
@@ -344,7 +344,7 @@
       phi => Fld % scalar(sc)
       name_mean = phi % name
       name_mean(5:9) = '_mean'
-      call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, name_mean,  &
+      call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, name_mean,  &
                                      tur % scalar_mean(sc, :))
     end do
 
@@ -357,9 +357,9 @@
   !--------------------------!
   if(Vof % model .eq. LAGRANGIAN_PARTICLES) then
     call Backup_Mod_Read_Swarm(fh, d, vc, swr)
-    call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'n_deposited',      &
+    call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'n_deposited',      &
                                    swr % n_deposited)
-    call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, 'n_reflected',      &
+    call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'n_reflected',      &
                                    swr % n_reflected)
   end if
 
@@ -369,11 +369,11 @@
   !                 !
   !-----------------!
 
-  do ua = 1, grid % n_user_arrays
+  do ua = 1, Grid % n_user_arrays
     a_name = 'A_00'
     write(a_name(3:4),'(I2.2)') ua
-    call Backup_Mod_Read_Cell_Real(grid, fh, d, vc, a_name,  &
-                                   grid % user_array(ua, :))
+    call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, a_name,  &
+                                   Grid % user_array(ua, :))
   end do
 
   ! Close backup file

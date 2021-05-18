@@ -7,13 +7,14 @@
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type) :: grid(2)        ! grid to be converted and its dual
+  type(Grid_Type) :: Grid(2)        ! grid to be converted and its dual
   character(SL)   :: answer
   character(SL)   :: file_name
   character(SL)   :: file_format    ! 'UNKNOWN', 'FLUENT', 'GAMBIT', 'GMSH'
   integer         :: l, p, g, n_grids
 !==============================================================================!
 
+  ! Open with a logo
   call Logo_Con
 
   print *, '#================================================================'
@@ -38,8 +39,8 @@
 
   problem_name(1) = file_name(1:p-1)
 
-  grid(1) % name = problem_name(1)
-  call To_Upper_Case(grid(1) % name)
+  Grid(1) % name = problem_name(1)
+  call To_Upper_Case(Grid(1) % name)
 
   !----------------------------------------!
   !                                        !
@@ -47,25 +48,25 @@
   !                                        !
   !----------------------------------------!
   if(file_format .eq. 'FLUENT') then
-    call Load_Fluent(grid(1), file_name)
+    call Load_Fluent(Grid(1), file_name)
   end if
   if(file_format .eq. 'GAMBIT') then
-    call Load_Gambit(grid(1), file_name)
+    call Load_Gambit(Grid(1), file_name)
   end if
   if(file_format .eq. 'GMSH') then
-    call Load_Gmsh(grid(1), file_name)
-    call Find_Parents(grid(1))
+    call Load_Gmsh(Grid(1), file_name)
+    call Find_Parents(Grid(1))
   end if
 
   ! For Gambit and Gmsh grids, no face information is stored
   if(file_format .eq. 'GAMBIT' .or. file_format .eq. 'GMSH') then
-    call Grid_Topology(grid(1))
-    call Find_Faces   (grid(1))
+    call Grid_Topology(Grid(1))
+    call Find_Faces   (Grid(1))
   end if
 
   ! Some mesh generators (Gmsh for sure) can leave duplicate
   ! nodes in the grid. Check it and eliminate them with this
-  call Grid_Mod_Merge_Duplicate_Nodes(grid(1))
+  call Grid(1) % Merge_Duplicate_Nodes()
 
   !---------------------------------------------------!
   !                                                   !
@@ -96,22 +97,22 @@
       if(g .eq. 2) print *, '# Processing the second (dual) grid'
       print *,              '#                                    '
       print *,              '#--------------------------------------'
-      if(g .eq. 2) call Create_Dual(grid(1), grid(2))
+      if(g .eq. 2) call Create_Dual(Grid(1), Grid(2))
     end if
 
     !--------------------------------------!
     !   Calculate geometrical quantities   !
     !--------------------------------------!
-    call Calculate_Geometry(grid(g))
+    call Calculate_Geometry(Grid(g))
 
     ! Keep in mind that Grid_Mod_Calculate_Wall_Distance is ...
     ! ... faster if it is called after Grid_Mod_Sort_Faces_Smart
-    call Grid_Mod_Sort_Cells_Smart       (grid(g))
-    call Grid_Mod_Sort_Faces_Smart       (grid(g))
-    call Grid_Mod_Calculate_Wall_Distance(grid(g))
-    call Grid_Mod_Find_Cells_Faces       (grid(g))
+    call Grid(g) % Sort_Cells_Smart       ()
+    call Grid(g) % Sort_Faces_Smart       ()
+    call Grid(g) % Calculate_Wall_Distance()
+    call Grid(g) % Find_Cells_Faces       ()
 
-    call Grid_Mod_Initialize_New_Numbers(grid(g))
+    call Grid(g) % Initialize_New_Numbers()
 
     ! Note #1 about shadows:
     ! At this point you have grid % n_faces faces and grid % n_shadows (on top)
@@ -123,33 +124,33 @@
     ! Should check like this: end do
     ! Similar note is in Generate, also called Note #1
 
-    call Grid_Mod_Print_Statistics(grid(g))
+    call Grid(g) % Print_Statistics()
 
     !-------------------------------!
     !   Save files for processing   !
     !-------------------------------!
-    call Grid_Mod_Save_Cfn(grid(g), 0,             &
-                           grid(g) % n_nodes,      &
-                           grid(g) % n_cells,      &
-                           grid(g) % n_faces,      &
-                           grid(g) % n_shadows,    &
-                           grid(g) % n_bnd_cells)
+    call Grid(g) % Save_Cfn(0,                      &
+                            Grid(g) % n_nodes,      &
+                            Grid(g) % n_cells,      &
+                            Grid(g) % n_faces,      &
+                            Grid(g) % n_shadows,    &
+                            Grid(g) % n_bnd_cells)
 
-    call Grid_Mod_Save_Dim(grid(g), 0)
+    call Grid(g) % Save_Dim(0)
 
     !-----------------------------------------------------!
     !   Save grid for visualisation and post-processing   !
     !-----------------------------------------------------!
 
     ! Create output in vtu format
-    call Save_Vtu_Cells(grid(g), 0,         &
-                        grid(g) % n_nodes,  &
-                        grid(g) % n_cells)
-    call Save_Vtu_Faces(grid(g))
-    call Save_Vtu_Faces(grid(g), plot_shadows=.true.)
+    call Save_Vtu_Cells(Grid(g), 0,         &
+                        Grid(g) % n_nodes,  &
+                        Grid(g) % n_cells)
+    call Save_Vtu_Faces(Grid(g))
+    call Save_Vtu_Faces(Grid(g), plot_shadows=.true.)
 
     ! Create 1D file (used for channel or pipe flow)
-    call Probe_1d_Nodes(grid(g))
+    call Probe_1d_Nodes(Grid(g))
 
   end do
 

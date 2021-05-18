@@ -13,26 +13,26 @@ include '../User_Mod/Vof_Initialization_Ellipsoid.f90'
   type(Swarm_Type),  target :: swarm
   type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: grid
+  type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: fun
   real,             pointer :: dt
   integer                   :: c
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   fun  => Vof % fun
   dt   => Flow % dt
 
   ! Initialize the whole domain as 0.0
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     fun % n(c) = 0.0
   end do
 
   ! Ellipsoid:
   call Vof_Initialization_Ellipsoid(Vof)
 
-  call Grid_Mod_Exchange_Cells_Real(grid, fun % n)
+  call Grid % Exchange_Cells_Real(fun % n)
 
   ! Old value
   fun % o(:) = fun % n(:)

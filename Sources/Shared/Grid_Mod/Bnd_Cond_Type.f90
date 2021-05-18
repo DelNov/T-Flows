@@ -1,5 +1,5 @@
 !==============================================================================!
-  integer function Grid_Mod_Bnd_Cond_Type(grid, bnd_cell)
+  integer function Bnd_Cond_Type(Grid, bnd_cell)
 !------------------------------------------------------------------------------!
 !   Provides a shortcut to obtain boundary condition type.                     !
 !   Warning: avoid calling this function for temperature and species (scalars) !
@@ -7,12 +7,12 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
-  integer         :: bnd_cell
+  class(Grid_Type) :: Grid
+  integer          :: bnd_cell
 !==============================================================================!
 
-  Grid_Mod_Bnd_Cond_Type =  &
-       grid % bnd_cond % type(grid % bnd_cond % color(bnd_cell))
+  Bnd_Cond_Type =  &
+       Grid % bnd_cond % type(Grid % bnd_cond % color(bnd_cell))
 
   end function
 

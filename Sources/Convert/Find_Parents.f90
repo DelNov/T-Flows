@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Find_Parents(grid)
+  subroutine Find_Parents(Grid)
 !------------------------------------------------------------------------------!
 !   Looks boundary cells' parents for meshes in which they are not given       !
 !------------------------------------------------------------------------------!
@@ -8,7 +8,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Grid_Type) :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: fn(6,4), i_fac, j_fac, i_nod, i_cel, c1, c2
   integer              :: nodes(4), n_match, dir, bc, cnt_c, cnt_f
@@ -26,10 +26,10 @@
   print *, '# Looking for parents. This may take a few minutes'
   print *, '#-------------------------------------------------'
 
-  print *, '# Number of boundary cells: ', grid % n_bnd_cells
-  print *, '# Number of inside cells:   ', grid % n_cells
+  print *, '# Number of boundary cells: ', Grid % n_bnd_cells
+  print *, '# Number of inside cells:   ', Grid % n_cells
 
-  if(grid % n_cells .eq. 0) then
+  if(Grid % n_cells .eq. 0) then
     print *, '# Number of cells inside the domain is zero'
     print *, '# Are you sure you meshed the domain in 3D?'
     print *, '# Exiting!'
@@ -37,8 +37,8 @@
     stop
   end if
 
-  allocate(is_node_bnd(grid % n_nodes));    is_node_bnd(:)   = .false.
-  allocate(cell_near_bnd(grid % n_cells));  cell_near_bnd(:) = 0
+  allocate(is_node_bnd(Grid % n_nodes));    is_node_bnd(:)   = .false.
+  allocate(cell_near_bnd(Grid % n_cells));  cell_near_bnd(:) = 0
 
   !--------------------------------------------------------------!
   !   Find all cells near boundary and allocate working arrays   !
@@ -46,26 +46,26 @@
 
   ! Mark all nodes on the boundary
   is_node_bnd(:) = .false.
-  do c2 = -grid % n_bnd_cells, -1
-    if( grid % bnd_cond % color(c2) .gt. 0 ) then
-      do i_nod = 1, grid % cells_n_nodes(c2)  ! 3 or 4
-        is_node_bnd( grid % cells_n(i_nod, c2) ) = .true.
+  do c2 = -Grid % n_bnd_cells, -1
+    if( Grid % bnd_cond % color(c2) .gt. 0 ) then
+      do i_nod = 1, Grid % cells_n_nodes(c2)  ! 3 or 4
+        is_node_bnd( Grid % cells_n(i_nod, c2) ) = .true.
       end do
     end if
   end do
 
   ! Count cells near boundaries
   cnt_c = 0
-  cnt_f = grid % n_bnd_cells
-  do c1 = 1, grid % n_cells
-    do i_nod = 1, grid % cells_n_nodes(c1)  ! 4 to 8
-      if( is_node_bnd(grid % cells_n(i_nod, c1)) ) then
+  cnt_f = Grid % n_bnd_cells
+  do c1 = 1, Grid % n_cells
+    do i_nod = 1, Grid % cells_n_nodes(c1)  ! 4 to 8
+      if( is_node_bnd(Grid % cells_n(i_nod, c1)) ) then
         cnt_c = cnt_c + 1
         cell_near_bnd(cnt_c) = c1
-        if(grid % cells_n_nodes(c1) .eq. 4) cnt_f = cnt_f + 4  ! tet
-        if(grid % cells_n_nodes(c1) .eq. 5) cnt_f = cnt_f + 5  ! pyr
-        if(grid % cells_n_nodes(c1) .eq. 6) cnt_f = cnt_f + 5  ! wed
-        if(grid % cells_n_nodes(c1) .eq. 8) cnt_f = cnt_f + 6  ! hex
+        if(Grid % cells_n_nodes(c1) .eq. 4) cnt_f = cnt_f + 4  ! tet
+        if(Grid % cells_n_nodes(c1) .eq. 5) cnt_f = cnt_f + 5  ! pyr
+        if(Grid % cells_n_nodes(c1) .eq. 6) cnt_f = cnt_f + 5  ! wed
+        if(Grid % cells_n_nodes(c1) .eq. 8) cnt_f = cnt_f + 6  ! hex
         goto 1
       end if
     end do
@@ -84,7 +84,7 @@
   !   Real work begins   !
   !----------------------!
 
-  do bc = 1, grid % n_bnd_cond
+  do bc = 1, Grid % n_bnd_cond
 
     cr1(:) = HUGE_INT
     cr2(:) = HUGE_INT
@@ -93,16 +93,16 @@
     w2 (:) = HUGE_INT
 
     cnt_f = 0
-    do c2 = -grid % n_bnd_cells, -1
-      if( grid % bnd_cond % color(c2) .eq. bc ) then
+    do c2 = -Grid % n_bnd_cells, -1
+      if( Grid % bnd_cond % color(c2) .eq. bc ) then
 
         ! Increase total face count
         cnt_f = cnt_f + 1
 
         ! Form and store local nodes list
         nodes(:) = HUGE_INT
-        do i_nod = 1, grid % cells_n_nodes(c2)  ! 3 or 4
-          nodes(i_nod) = grid % cells_n(i_nod, c2)
+        do i_nod = 1, Grid % cells_n_nodes(c2)  ! 3 or 4
+          nodes(i_nod) = Grid % cells_n(i_nod, c2)
         end do
         call Sort % Int_Array(nodes(1:4))
         cr1(cnt_f) = nodes(1)
@@ -117,15 +117,15 @@
       c1 = cell_near_bnd(i_cel)
 
       ! Fetch the faces from this cell
-      if(grid % cells_n_nodes(c1) .eq. 4) fn = tet
-      if(grid % cells_n_nodes(c1) .eq. 5) fn = pyr
-      if(grid % cells_n_nodes(c1) .eq. 6) fn = wed
-      if(grid % cells_n_nodes(c1) .eq. 8) fn = hex
+      if(Grid % cells_n_nodes(c1) .eq. 4) fn = tet
+      if(Grid % cells_n_nodes(c1) .eq. 5) fn = pyr
+      if(Grid % cells_n_nodes(c1) .eq. 6) fn = wed
+      if(Grid % cells_n_nodes(c1) .eq. 8) fn = hex
 
       n_cell_faces = 6  ! assume it is a hexahedron
-      if(grid % cells_n_nodes(c1) .eq. 4) n_cell_faces = 4
-      if(grid % cells_n_nodes(c1) .eq. 5) n_cell_faces = 5
-      if(grid % cells_n_nodes(c1) .eq. 6) n_cell_faces = 5
+      if(Grid % cells_n_nodes(c1) .eq. 4) n_cell_faces = 4
+      if(Grid % cells_n_nodes(c1) .eq. 5) n_cell_faces = 5
+      if(Grid % cells_n_nodes(c1) .eq. 6) n_cell_faces = 5
 
       ! Browse through all possible faces and their nodes
       do i_fac = 1, n_cell_faces
@@ -143,7 +143,7 @@
         nodes(:) = HUGE_INT
         do i_nod = 1, n_face_nodes
           if(fn(i_fac, i_nod) > 0) then  ! if this node exists
-            nodes(i_nod) = grid % cells_n(fn(i_fac, i_nod), c1)
+            nodes(i_nod) = Grid % cells_n(fn(i_fac, i_nod), c1)
           end if
         end do
         call Sort % Int_Array(nodes(1:4))
@@ -179,7 +179,7 @@
             c1  = w1(j_fac)
             dir = w2(j_fac)
           end if
-          grid % cells_bnd_color(dir, c1) = bc
+          Grid % cells_bnd_color(dir, c1) = bc
 
         end if
       end if

@@ -15,13 +15,13 @@
   class(Field_Type), target :: Flow
   type(Var_Type),    target :: phi
 !----------------------------------[Locals]------------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   integer                  :: s, c, c1, c2, iter
   real                     :: res, norm
 !==============================================================================!
 
   ! Take alias
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
 
   phi_f_n(:) = 0.0
   phi_f_o(:) = 0.0
@@ -54,9 +54,9 @@
   end do  ! iter
 
   ! Refresh buffers for gradient components (these calls are needed)
-  call Grid_Mod_Exchange_Cells_Real(grid, phi % x)
-  call Grid_Mod_Exchange_Cells_Real(grid, phi % y)
-  call Grid_Mod_Exchange_Cells_Real(grid, phi % z)
+  call Grid % Exchange_Cells_Real(phi % x)
+  call Grid % Exchange_Cells_Real(phi % y)
+  call Grid % Exchange_Cells_Real(phi % z)
 
   ! if(this_proc < 2) then
   !   print *, '# Final residual from Gauss: ', res,  &

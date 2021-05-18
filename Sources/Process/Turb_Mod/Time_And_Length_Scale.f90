@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Time_And_Length_Scale(grid, turb)
+  subroutine Time_And_Length_Scale(Grid, turb)
 !------------------------------------------------------------------------------!
 !   Calculates time scale and leght scale in manner to avoid singularity       !
 !   in eps equation.                                                           !
@@ -19,7 +19,8 @@
                       eps_l => r_cell_18      ! [m]
 !------------------------------------------------------------------------------!
   implicit none
-  type(Grid_Type), target :: grid
+!---------------------------------[Arguments]----------------------------------!
+  type(Grid_Type), target :: Grid
   type(Turb_Type), target :: turb
 !----------------------------------[Locals]------------------------------------!
   type(Field_Type), pointer :: Flow
@@ -46,7 +47,7 @@
   if(turb % model .eq. K_EPS_ZETA_F .or.  &
      turb % model .eq. HYBRID_LES_RANS) then
 
-    do c = 1, grid % n_cells
+    do c = 1, Grid % n_cells
       eps_l(c) = eps % n(c) + TINY ! limited eps % n
 
       kin_vis = Flow % viscosity(c) / Flow % density(c)
@@ -66,7 +67,7 @@
 
   else if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
 
-    do c = 1, grid % n_cells
+    do c = 1, Grid % n_cells
       eps_l(c) = eps % n(c) + TINY ! limited eps % n
 
       kin_vis = Flow % viscosity(c) / Flow % density(c)
@@ -85,7 +86,7 @@
 
   else if(turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
 
-    do c = 1, grid % n_cells
+    do c = 1, Grid % n_cells
       eps_l(c) = eps % n(c) + TINY ! limited eps % n
 
       t_1(c) = kin % n(c)/eps_l(c)

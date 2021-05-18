@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Allocate(turb, flow)
+  subroutine Turb_Mod_Allocate(turb, Flow)
 !------------------------------------------------------------------------------!
 !   Allocates memory for variables. It is called either from LoaRes            !
 !   or from Processor.                                                         !
@@ -9,20 +9,20 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type),  target :: turb
-  type(Field_Type),      target :: flow
+  type(Field_Type), target :: Flow
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   integer                  :: nb, nc
 !==============================================================================!
 
   ! Store pointers
-  turb % pnt_flow => flow
-  turb % pnt_grid => flow % pnt_grid
+  turb % pnt_flow => Flow
+  turb % pnt_grid => Flow % pnt_grid
 
   ! Take aliases
-  grid => flow % pnt_grid
-  nb = grid % n_bnd_cells
-  nc = grid % n_cells
+  Grid => Flow % pnt_grid
+  nb = Grid % n_bnd_cells
+  nc = Grid % n_cells
 
   ! Allocate deltas
   allocate(turb % h_max(-nb:nc));  turb % h_max = 0.
@@ -37,8 +37,8 @@
   if(turb % model .eq. K_EPS) then
 
     ! Variables we solve for: k and epsilon
-    call Var_Mod_Allocate_Solution(turb % kin, grid, 'KIN', '')
-    call Var_Mod_Allocate_Solution(turb % eps, grid, 'EPS', '')
+    call Var_Mod_Allocate_Solution(turb % kin, Grid, 'KIN', '')
+    call Var_Mod_Allocate_Solution(turb % eps, Grid, 'EPS', '')
 
     ! Other turbulent quantities
     allocate(turb % vis_t (-nb:nc));  turb % vis_t  = 0.
@@ -46,25 +46,25 @@
     allocate(turb % p_kin (-nb:nc));  turb % p_kin  = 0.
     allocate(turb % y_plus(-nb:nc));  turb % y_plus = 0.
 
-    if(flow % heat_transfer) then
-      call Var_Mod_Allocate_Solution(turb % t2, grid, 'T2', '')
-      call Var_Mod_Allocate_New_Only(turb % ut, grid, 'UT')
-      call Var_Mod_Allocate_New_Only(turb % vt, grid, 'VT')
-      call Var_Mod_Allocate_New_Only(turb % wt, grid, 'WT')
+    if(Flow % heat_transfer) then
+      call Var_Mod_Allocate_Solution(turb % t2, Grid, 'T2', '')
+      call Var_Mod_Allocate_New_Only(turb % ut, Grid, 'UT')
+      call Var_Mod_Allocate_New_Only(turb % vt, Grid, 'VT')
+      call Var_Mod_Allocate_New_Only(turb % wt, Grid, 'WT')
       allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
       allocate(turb % p_t2 (-nb:nc));  turb % p_t2  = 0.
 
       ! Reynolds stresses
-      call Var_Mod_Allocate_New_Only(turb % uu, grid, 'UU')
-      call Var_Mod_Allocate_New_Only(turb % vv, grid, 'VV')
-      call Var_Mod_Allocate_New_Only(turb % ww, grid, 'WW')
-      call Var_Mod_Allocate_New_Only(turb % uv, grid, 'UV')
-      call Var_Mod_Allocate_New_Only(turb % uw, grid, 'UW')
-      call Var_Mod_Allocate_New_Only(turb % vw, grid, 'VW')
-    end if ! flow % heat_transfer
+      call Var_Mod_Allocate_New_Only(turb % uu, Grid, 'UU')
+      call Var_Mod_Allocate_New_Only(turb % vv, Grid, 'VV')
+      call Var_Mod_Allocate_New_Only(turb % ww, Grid, 'WW')
+      call Var_Mod_Allocate_New_Only(turb % uv, Grid, 'UV')
+      call Var_Mod_Allocate_New_Only(turb % uw, Grid, 'UW')
+      call Var_Mod_Allocate_New_Only(turb % vw, Grid, 'VW')
+    end if ! Flow % heat_transfer
 
     !  Wall difussivity for user scalar
-    if(flow % n_scalars > 0) then            
+    if(Flow % n_scalars > 0) then            
       allocate(turb % diff_w(-nb:nc));  turb % diff_w = 0.  
     end if
 
@@ -76,7 +76,7 @@
       allocate(turb % v_mean(-nb:nc));  turb % v_mean = 0.
       allocate(turb % w_mean(-nb:nc));  turb % w_mean = 0.
       allocate(turb % p_mean(-nb:nc));  turb % p_mean = 0.
-      if(flow % heat_transfer) then
+      if(Flow % heat_transfer) then
         allocate(turb % t_mean(-nb:nc));  turb % t_mean = 0.
       end if
 
@@ -93,7 +93,7 @@
       allocate(turb % uw_res(-nb:nc));  turb % uw_res = 0.
 
       ! Resolved turbulent heat fluxes
-      if(flow % heat_transfer) then
+      if(Flow % heat_transfer) then
         allocate(turb % t2_res (-nb:nc));  turb % t2_res  = 0.
         allocate(turb % ut_res (-nb:nc));  turb % ut_res  = 0.
         allocate(turb % vt_res (-nb:nc));  turb % vt_res  = 0.
@@ -101,13 +101,13 @@
         allocate(turb % ut_mean(-nb:nc));  turb % ut_mean = 0.
         allocate(turb % vt_mean(-nb:nc));  turb % vt_mean = 0.
         allocate(turb % wt_mean(-nb:nc));  turb % wt_mean = 0.
-      end if ! flow % heat_transfer
+      end if ! Flow % heat_transfer
 
     end if ! turb % statistics
 
-    if(flow % buoyancy .eq. THERMALLY_DRIVEN) then
+    if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
       allocate(turb % g_buoy(-nb:nc));  turb % g_buoy = 0.
-    end if ! flow % buoyancy .eq. THERMALLY_DRIVEN
+    end if ! Flow % buoyancy .eq. THERMALLY_DRIVEN
 
   end if ! K_EPS
 
@@ -117,10 +117,10 @@
   if(turb % model .eq. K_EPS_ZETA_F) then
 
     ! Main model's variables
-    call Var_Mod_Allocate_Solution(turb % kin,  grid, 'KIN',  '')
-    call Var_Mod_Allocate_Solution(turb % eps,  grid, 'EPS',  '')
-    call Var_Mod_Allocate_Solution(turb % zeta, grid, 'ZETA', '')
-    call Var_Mod_Allocate_Solution(turb % f22,  grid, 'F22',  '')
+    call Var_Mod_Allocate_Solution(turb % kin,  Grid, 'KIN',  '')
+    call Var_Mod_Allocate_Solution(turb % eps,  Grid, 'EPS',  '')
+    call Var_Mod_Allocate_Solution(turb % zeta, Grid, 'ZETA', '')
+    call Var_Mod_Allocate_Solution(turb % f22,  Grid, 'F22',  '')
 
     ! Other variables such as time scale, length scale and production
     allocate(turb % t_scale (-nb:nc));  turb % t_scale = 0.
@@ -137,25 +137,25 @@
       allocate(turb % z_o_f(-nb:nc));  turb % z_o_f = -1.0
     end if
 
-    if(flow % heat_transfer) then
-      call Var_Mod_Allocate_Solution(turb % t2, grid, 'T2', '')
-      call Var_Mod_Allocate_New_Only(turb % ut, grid, 'UT')
-      call Var_Mod_Allocate_New_Only(turb % vt, grid, 'VT')
-      call Var_Mod_Allocate_New_Only(turb % wt, grid, 'WT')
+    if(Flow % heat_transfer) then
+      call Var_Mod_Allocate_Solution(turb % t2, Grid, 'T2', '')
+      call Var_Mod_Allocate_New_Only(turb % ut, Grid, 'UT')
+      call Var_Mod_Allocate_New_Only(turb % vt, Grid, 'VT')
+      call Var_Mod_Allocate_New_Only(turb % wt, Grid, 'WT')
       allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
       allocate(turb % p_t2 (-nb:nc));  turb % p_t2  = 0.
 
       ! Reynolds stresses
-      call Var_Mod_Allocate_New_Only(turb % uu, grid, 'UU')
-      call Var_Mod_Allocate_New_Only(turb % vv, grid, 'VV')
-      call Var_Mod_Allocate_New_Only(turb % ww, grid, 'WW')
-      call Var_Mod_Allocate_New_Only(turb % uv, grid, 'UV')
-      call Var_Mod_Allocate_New_Only(turb % uw, grid, 'UW')
-      call Var_Mod_Allocate_New_Only(turb % vw, grid, 'VW')
-    end if ! flow % heat_transfer
+      call Var_Mod_Allocate_New_Only(turb % uu, Grid, 'UU')
+      call Var_Mod_Allocate_New_Only(turb % vv, Grid, 'VV')
+      call Var_Mod_Allocate_New_Only(turb % ww, Grid, 'WW')
+      call Var_Mod_Allocate_New_Only(turb % uv, Grid, 'UV')
+      call Var_Mod_Allocate_New_Only(turb % uw, Grid, 'UW')
+      call Var_Mod_Allocate_New_Only(turb % vw, Grid, 'VW')
+    end if ! Flow % heat_transfer
 
     !  Wall difussivity for user scalar
-    if(flow % n_scalars > 0) then            
+    if(Flow % n_scalars > 0) then            
       allocate(turb % diff_w(-nb:nc));  turb % diff_w = 0.  
     end if
 
@@ -166,7 +166,7 @@
       allocate(turb % v_mean(-nb:nc));  turb % v_mean = 0.
       allocate(turb % w_mean(-nb:nc));  turb % w_mean = 0.
       allocate(turb % p_mean(-nb:nc));  turb % p_mean = 0.
-      if(flow % heat_transfer) then
+      if(Flow % heat_transfer) then
         allocate(turb % t_mean(-nb:nc));  turb % t_mean = 0.
       end if
 
@@ -175,7 +175,7 @@
       allocate(turb % eps_mean (-nb:nc));  turb % eps_mean  = 0.
       allocate(turb % f22_mean (-nb:nc));  turb % f22_mean  = 0.
       allocate(turb % zeta_mean(-nb:nc));  turb % zeta_mean = 0.
-      if(flow % heat_transfer) then
+      if(Flow % heat_transfer) then
         allocate(turb % t2_mean(-nb:nc));  turb % t2_mean   = 0.
       end if
 
@@ -188,7 +188,7 @@
       allocate(turb % uw_res(-nb:nc));  turb % uw_res = 0.
 
       ! Resolved turbulent heat fluxes
-      if(flow % heat_transfer) then
+      if(Flow % heat_transfer) then
         allocate(turb % t2_res (-nb:nc));  turb % t2_res  = 0.
         allocate(turb % ut_res (-nb:nc));  turb % ut_res  = 0.
         allocate(turb % vt_res (-nb:nc));  turb % vt_res  = 0.
@@ -196,13 +196,13 @@
         allocate(turb % ut_mean(-nb:nc));  turb % ut_mean = 0.
         allocate(turb % vt_mean(-nb:nc));  turb % vt_mean = 0.
         allocate(turb % wt_mean(-nb:nc));  turb % wt_mean = 0.
-      end if ! flow % heat_transfer
+      end if ! Flow % heat_transfer
 
     end if ! turb % statistics
 
-    if(flow % buoyancy .eq. THERMALLY_DRIVEN) then
+    if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
       allocate(turb % g_buoy(-nb:nc));  turb % g_buoy = 0.
-    end if ! flow % buoyancy .eq. THERMALLY_DRIVEN
+    end if ! Flow % buoyancy .eq. THERMALLY_DRIVEN
 
   end if ! K_EPS_ZETA_F
 
@@ -221,22 +221,22 @@
     allocate(turb % y_plus (-nb:nc));  turb % y_plus  = 0.
 
     ! Reynolds stresses
-    call Var_Mod_Allocate_Solution(turb % uu, grid, 'UU', '')
-    call Var_Mod_Allocate_Solution(turb % vv, grid, 'VV', '')
-    call Var_Mod_Allocate_Solution(turb % ww, grid, 'WW', '')
-    call Var_Mod_Allocate_Solution(turb % uv, grid, 'UV', '')
-    call Var_Mod_Allocate_Solution(turb % uw, grid, 'UW', '')
-    call Var_Mod_Allocate_Solution(turb % vw, grid, 'VW', '')
+    call Var_Mod_Allocate_Solution(turb % uu, Grid, 'UU', '')
+    call Var_Mod_Allocate_Solution(turb % vv, Grid, 'VV', '')
+    call Var_Mod_Allocate_Solution(turb % ww, Grid, 'WW', '')
+    call Var_Mod_Allocate_Solution(turb % uv, Grid, 'UV', '')
+    call Var_Mod_Allocate_Solution(turb % uw, Grid, 'UW', '')
+    call Var_Mod_Allocate_Solution(turb % vw, Grid, 'VW', '')
 
-    call Var_Mod_Allocate_New_Only(turb % kin, grid, 'KIN')
-    call Var_Mod_Allocate_Solution(turb % eps, grid, 'EPS', '')
+    call Var_Mod_Allocate_New_Only(turb % kin, Grid, 'KIN')
+    call Var_Mod_Allocate_Solution(turb % eps, Grid, 'EPS', '')
 
-    if(flow % heat_transfer) then
-      call Var_Mod_Allocate_New_Only(turb % ut, grid, 'UT')
-      call Var_Mod_Allocate_New_Only(turb % vt, grid, 'VT')
-      call Var_Mod_Allocate_New_Only(turb % wt, grid, 'WT')
+    if(Flow % heat_transfer) then
+      call Var_Mod_Allocate_New_Only(turb % ut, Grid, 'UT')
+      call Var_Mod_Allocate_New_Only(turb % vt, Grid, 'VT')
+      call Var_Mod_Allocate_New_Only(turb % wt, Grid, 'WT')
       allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
-    end if ! flow % heat_transfer
+    end if ! Flow % heat_transfer
 
     if(turb % statistics) then
 
@@ -245,7 +245,7 @@
       allocate(turb % v_mean(-nb:nc));  turb % v_mean = 0.
       allocate(turb % w_mean(-nb:nc));  turb % w_mean = 0.
       allocate(turb % p_mean(-nb:nc));  turb % p_mean = 0.
-      if(flow % heat_transfer) then
+      if(Flow % heat_transfer) then
         allocate(turb % t_mean(-nb:nc));  turb % t_mean = 0.
       end if
 
@@ -268,7 +268,7 @@
       allocate(turb % uw_res(-nb:nc));  turb % uw_res = 0.
 
       ! Resolved turbulent heat fluxes
-      if(flow % heat_transfer) then
+      if(Flow % heat_transfer) then
         allocate(turb % t2_res (-nb:nc));  turb % t2_res  = 0.
         allocate(turb % ut_res (-nb:nc));  turb % ut_res  = 0.
         allocate(turb % vt_res (-nb:nc));  turb % vt_res  = 0.
@@ -276,13 +276,13 @@
         allocate(turb % ut_mean(-nb:nc));  turb % ut_mean = 0.
         allocate(turb % vt_mean(-nb:nc));  turb % vt_mean = 0.
         allocate(turb % wt_mean(-nb:nc));  turb % wt_mean = 0.
-      end if ! flow % heat_transfer
+      end if ! Flow % heat_transfer
 
     end if ! turb % statistics
 
     if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
 
-      call Var_Mod_Allocate_Solution(turb % f22, grid, 'F22', '')
+      call Var_Mod_Allocate_Solution(turb % f22, Grid, 'F22', '')
 
       if(turb % statistics) then
         allocate(turb % f22_mean(-nb:nc));  turb % f22_mean  = 0.
@@ -298,7 +298,7 @@
   if(turb % model .eq. SPALART_ALLMARAS .or.  &
      turb % model .eq. DES_SPALART) then
 
-    call Var_Mod_Allocate_Solution(turb % vis, grid, 'VIS', '')
+    call Var_Mod_Allocate_Solution(turb % vis, Grid, 'VIS', '')
 
     ! Other variables such as time scale, length scale and production
     allocate(turb % t_scale (-nb:nc));  turb % t_scale = 0.
@@ -308,12 +308,12 @@
     allocate(turb % p_kin   (-nb:nc));  turb % p_kin   = 0.
     allocate(turb % y_plus  (-nb:nc));  turb % y_plus  = 0.
 
-    if(flow % heat_transfer) then
-      call Var_Mod_Allocate_New_Only(turb % ut, grid, 'UT')
-      call Var_Mod_Allocate_New_Only(turb % vt, grid, 'VT')
-      call Var_Mod_Allocate_New_Only(turb % wt, grid, 'WT')
+    if(Flow % heat_transfer) then
+      call Var_Mod_Allocate_New_Only(turb % ut, Grid, 'UT')
+      call Var_Mod_Allocate_New_Only(turb % vt, Grid, 'VT')
+      call Var_Mod_Allocate_New_Only(turb % wt, Grid, 'WT')
       allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
-    end if ! flow % heat_transfer
+    end if ! Flow % heat_transfer
 
     ! Turbulence statistics, if needed
     if(turb % statistics) then
@@ -323,7 +323,7 @@
       allocate(turb % v_mean(-nb:nc));  turb % v_mean = 0.
       allocate(turb % w_mean(-nb:nc));  turb % w_mean = 0.
       allocate(turb % p_mean(-nb:nc));  turb % p_mean = 0.
-      if(flow % heat_transfer) then
+      if(Flow % heat_transfer) then
         allocate(turb % t_mean(-nb:nc));  turb % t_mean = 0.
       end if
 
@@ -339,12 +339,12 @@
       allocate(turb % uw_res(-nb:nc));  turb % uw_res = 0.
 
       ! Resolved turbulent heat fluxes
-      if(flow % heat_transfer) then
+      if(Flow % heat_transfer) then
         allocate(turb % t2_res(-nb:nc));  turb % t2_res = 0.
         allocate(turb % ut_res(-nb:nc));  turb % ut_res = 0.
         allocate(turb % vt_res(-nb:nc));  turb % vt_res = 0.
         allocate(turb % wt_res(-nb:nc));  turb % wt_res = 0.
-      end if ! flow % heat_transfer
+      end if ! Flow % heat_transfer
 
     end if ! turb % statistics
 
@@ -366,12 +366,12 @@
     allocate(turb % p_kin   (-nb:nc));  turb % p_kin   = 0.
     allocate(turb % y_plus  (-nb:nc));  turb % y_plus  = 0.
 
-    if(flow % heat_transfer) then
-      call Var_Mod_Allocate_New_Only(turb % ut, grid, 'UT')
-      call Var_Mod_Allocate_New_Only(turb % vt, grid, 'VT')
-      call Var_Mod_Allocate_New_Only(turb % wt, grid, 'WT')
+    if(Flow % heat_transfer) then
+      call Var_Mod_Allocate_New_Only(turb % ut, Grid, 'UT')
+      call Var_Mod_Allocate_New_Only(turb % vt, Grid, 'VT')
+      call Var_Mod_Allocate_New_Only(turb % wt, Grid, 'WT')
       allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
-    end if ! flow % heat_transfer
+    end if ! Flow % heat_transfer
 
     if(turb % statistics) then
 
@@ -380,7 +380,7 @@
       allocate(turb % v_mean(-nb:nc));  turb % v_mean = 0.
       allocate(turb % w_mean(-nb:nc));  turb % w_mean = 0.
       allocate(turb % p_mean(-nb:nc));  turb % p_mean = 0.
-      if(flow % heat_transfer) then
+      if(Flow % heat_transfer) then
         allocate(turb % t_mean(-nb:nc));  turb % t_mean = 0.
       end if
 
@@ -393,12 +393,12 @@
       allocate(turb % uw_res(-nb:nc));  turb % uw_res = 0.
 
       ! Resolved turbulent heat fluxes
-      if(flow % heat_transfer) then
+      if(Flow % heat_transfer) then
         allocate(turb % t2_res(-nb:nc));  turb % t2_res = 0.
         allocate(turb % ut_res(-nb:nc));  turb % ut_res = 0.
         allocate(turb % vt_res(-nb:nc));  turb % vt_res = 0.
         allocate(turb % wt_res(-nb:nc));  turb % wt_res = 0.
-      end if ! flow % heat_transfer
+      end if ! Flow % heat_transfer
 
     end if ! turb % statistics
 
@@ -424,12 +424,12 @@
     allocate(turb % p_kin   (-nb:nc));  turb % p_kin   = 0.
     allocate(turb % y_plus  (-nb:nc));  turb % y_plus  = 0.
 
-    if(flow % heat_transfer) then
-      call Var_Mod_Allocate_New_Only(turb % ut, grid, 'UT')
-      call Var_Mod_Allocate_New_Only(turb % vt, grid, 'VT')
-      call Var_Mod_Allocate_New_Only(turb % wt, grid, 'WT')
+    if(Flow % heat_transfer) then
+      call Var_Mod_Allocate_New_Only(turb % ut, Grid, 'UT')
+      call Var_Mod_Allocate_New_Only(turb % vt, Grid, 'VT')
+      call Var_Mod_Allocate_New_Only(turb % wt, Grid, 'WT')
       allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
-    end if ! flow % heat_transfer
+    end if ! Flow % heat_transfer
 
     if(turb % statistics) then
 
@@ -438,7 +438,7 @@
       allocate(turb % v_mean(-nb:nc));  turb % v_mean = 0.
       allocate(turb % w_mean(-nb:nc));  turb % w_mean = 0.
       allocate(turb % p_mean(-nb:nc));  turb % p_mean = 0.
-      if(flow % heat_transfer) then
+      if(Flow % heat_transfer) then
         allocate(turb % t_mean(-nb:nc));  turb % t_mean = 0.
       end if
 
@@ -451,12 +451,12 @@
       allocate(turb % uw_res(-nb:nc));  turb % uw_res = 0.
 
       ! Resolved turbulent heat fluxes
-      if(flow % heat_transfer) then
+      if(Flow % heat_transfer) then
         allocate(turb % t2_res(-nb:nc));  turb % t2_res = 0.
         allocate(turb % ut_res(-nb:nc));  turb % ut_res = 0.
         allocate(turb % vt_res(-nb:nc));  turb % vt_res = 0.
         allocate(turb % wt_res(-nb:nc));  turb % wt_res = 0.
-      end if ! flow % heat_transfer
+      end if ! Flow % heat_transfer
 
     end if ! turb % statistics
 
@@ -477,12 +477,12 @@
     allocate(turb % p_kin   (-nb:nc));  turb % p_kin   = 0.
     allocate(turb % y_plus  (-nb:nc));  turb % y_plus  = 0.
 
-    if(flow % heat_transfer) then
-      call Var_Mod_Allocate_New_Only(turb % ut, grid, 'UT')
-      call Var_Mod_Allocate_New_Only(turb % vt, grid, 'VT')
-      call Var_Mod_Allocate_New_Only(turb % wt, grid, 'WT')
+    if(Flow % heat_transfer) then
+      call Var_Mod_Allocate_New_Only(turb % ut, Grid, 'UT')
+      call Var_Mod_Allocate_New_Only(turb % vt, Grid, 'VT')
+      call Var_Mod_Allocate_New_Only(turb % wt, Grid, 'WT')
       allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
-    end if ! flow % heat_transfer
+    end if ! Flow % heat_transfer
 
     if(turb % statistics) then
 
@@ -491,7 +491,7 @@
       allocate(turb % v_mean(-nb:nc));  turb % v_mean = 0.
       allocate(turb % w_mean(-nb:nc));  turb % w_mean = 0.
       allocate(turb % p_mean(-nb:nc));  turb % p_mean = 0.
-      if(flow % heat_transfer) then
+      if(Flow % heat_transfer) then
         allocate(turb % t_mean(-nb:nc));  turb % t_mean = 0.
       end if
 
@@ -504,12 +504,12 @@
       allocate(turb % uw_res(-nb:nc));  turb % uw_res = 0.
 
       ! Resolved turbulent heat fluxes
-      if(flow % heat_transfer) then
+      if(Flow % heat_transfer) then
         allocate(turb % t2_res(-nb:nc));  turb % t2_res = 0.
         allocate(turb % ut_res(-nb:nc));  turb % ut_res = 0.
         allocate(turb % vt_res(-nb:nc));  turb % vt_res = 0.
         allocate(turb % wt_res(-nb:nc));  turb % wt_res = 0.
-      end if ! flow % heat_transfer
+      end if ! Flow % heat_transfer
 
     end if ! turb % statistics
 
@@ -530,14 +530,14 @@
     allocate(turb % p_kin   (-nb:nc));  turb % p_kin   = 0.
     allocate(turb % y_plus  (-nb:nc));  turb % y_plus  = 0.
 
-    if(flow % heat_transfer) then
+    if(Flow % heat_transfer) then
 
-      call Var_Mod_Allocate_New_Only(turb % ut, grid, 'UT')
-      call Var_Mod_Allocate_New_Only(turb % vt, grid, 'VT')
-      call Var_Mod_Allocate_New_Only(turb % wt, grid, 'WT')
+      call Var_Mod_Allocate_New_Only(turb % ut, Grid, 'UT')
+      call Var_Mod_Allocate_New_Only(turb % vt, Grid, 'VT')
+      call Var_Mod_Allocate_New_Only(turb % wt, Grid, 'WT')
       allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
 
-    end if ! flow % heat_transfer
+    end if ! Flow % heat_transfer
 
     if(turb % statistics) then
 
@@ -546,7 +546,7 @@
       allocate(turb % v_mean(-nb:nc));  turb % v_mean = 0.
       allocate(turb % w_mean(-nb:nc));  turb % w_mean = 0.
       allocate(turb % p_mean(-nb:nc));  turb % p_mean = 0.
-      if(flow % heat_transfer) then
+      if(Flow % heat_transfer) then
         allocate(turb % t_mean(-nb:nc));  turb % t_mean = 0.
       end if
 
@@ -559,12 +559,12 @@
       allocate(turb % uw_res(-nb:nc));  turb % uw_res = 0.
 
       ! Resolved turbulent heat fluxes
-      if(flow % heat_transfer) then
+      if(Flow % heat_transfer) then
         allocate(turb % t2_res(-nb:nc));  turb % t2_res = 0.
         allocate(turb % ut_res(-nb:nc));  turb % ut_res = 0.
         allocate(turb % vt_res(-nb:nc));  turb % vt_res = 0.
         allocate(turb % wt_res(-nb:nc));  turb % wt_res = 0.
-      end if ! flow % heat_transfer
+      end if ! Flow % heat_transfer
 
     end if ! turb % statistics
 
@@ -583,7 +583,7 @@
       allocate(turb % v_mean(-nb:nc));  turb % v_mean = 0.
       allocate(turb % w_mean(-nb:nc));  turb % w_mean = 0.
       allocate(turb % p_mean(-nb:nc));  turb % p_mean = 0.
-      if(flow % heat_transfer) then
+      if(Flow % heat_transfer) then
         allocate(turb % t_mean(-nb:nc));  turb % t_mean = 0.
       end if
 
@@ -596,12 +596,12 @@
       allocate(turb % uw_res(-nb:nc));  turb % uw_res = 0.
 
       ! Resolved turbulent heat fluxes
-      if(flow % heat_transfer) then
+      if(Flow % heat_transfer) then
         allocate(turb % t2_res(-nb:nc));  turb % t2_res = 0.
         allocate(turb % ut_res(-nb:nc));  turb % ut_res = 0.
         allocate(turb % vt_res(-nb:nc));  turb % vt_res = 0.
         allocate(turb % wt_res(-nb:nc));  turb % wt_res = 0.
-      end if ! flow % heat_transfer
+      end if ! Flow % heat_transfer
 
     end if ! turb % statistics
 
@@ -613,10 +613,10 @@
   if(turb % model .eq. HYBRID_LES_RANS) then
 
     ! Main model's variables (for RANS part)
-    call Var_Mod_Allocate_Solution(turb % kin,  grid, 'KIN',  '')
-    call Var_Mod_Allocate_Solution(turb % eps,  grid, 'EPS',  '')
-    call Var_Mod_Allocate_Solution(turb % zeta, grid, 'ZETA', '')
-    call Var_Mod_Allocate_Solution(turb % f22,  grid, 'F22',  '')
+    call Var_Mod_Allocate_Solution(turb % kin,  Grid, 'KIN',  '')
+    call Var_Mod_Allocate_Solution(turb % eps,  Grid, 'EPS',  '')
+    call Var_Mod_Allocate_Solution(turb % zeta, Grid, 'ZETA', '')
+    call Var_Mod_Allocate_Solution(turb % f22,  Grid, 'F22',  '')
 
     ! Main model's variables (for LES part)
     allocate(turb % c_dyn(-nb:nc));  turb % c_dyn = 0.
@@ -638,25 +638,25 @@
       allocate(turb % z_o_f(-nb:nc));  turb % z_o_f = -1.0
     end if
 
-    if(flow % heat_transfer) then
-      call Var_Mod_Allocate_Solution(turb % t2, grid, 'T2', '')
-      call Var_Mod_Allocate_New_Only(turb % ut, grid, 'UT')
-      call Var_Mod_Allocate_New_Only(turb % vt, grid, 'VT')
-      call Var_Mod_Allocate_New_Only(turb % wt, grid, 'WT')
+    if(Flow % heat_transfer) then
+      call Var_Mod_Allocate_Solution(turb % t2, Grid, 'T2', '')
+      call Var_Mod_Allocate_New_Only(turb % ut, Grid, 'UT')
+      call Var_Mod_Allocate_New_Only(turb % vt, Grid, 'VT')
+      call Var_Mod_Allocate_New_Only(turb % wt, Grid, 'WT')
       allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
       allocate(turb % p_t2 (-nb:nc));  turb % p_t2  = 0.
 
       ! Reynolds stresses
-      call Var_Mod_Allocate_New_Only(turb % uu, grid, 'UU')
-      call Var_Mod_Allocate_New_Only(turb % vv, grid, 'VV')
-      call Var_Mod_Allocate_New_Only(turb % ww, grid, 'WW')
-      call Var_Mod_Allocate_New_Only(turb % uv, grid, 'UV')
-      call Var_Mod_Allocate_New_Only(turb % uw, grid, 'UW')
-      call Var_Mod_Allocate_New_Only(turb % vw, grid, 'VW')
-    end if ! flow % heat_transfer
+      call Var_Mod_Allocate_New_Only(turb % uu, Grid, 'UU')
+      call Var_Mod_Allocate_New_Only(turb % vv, Grid, 'VV')
+      call Var_Mod_Allocate_New_Only(turb % ww, Grid, 'WW')
+      call Var_Mod_Allocate_New_Only(turb % uv, Grid, 'UV')
+      call Var_Mod_Allocate_New_Only(turb % uw, Grid, 'UW')
+      call Var_Mod_Allocate_New_Only(turb % vw, Grid, 'VW')
+    end if ! Flow % heat_transfer
 
     !  Wall difussivity for user scalar
-    if(flow % n_scalars > 0) then            
+    if(Flow % n_scalars > 0) then            
       allocate(turb % diff_w(-nb:nc));  turb % diff_w = 0.  
     end if
 
@@ -668,7 +668,7 @@
       allocate(turb % v_mean(-nb:nc));  turb % v_mean = 0.
       allocate(turb % w_mean(-nb:nc));  turb % w_mean = 0.
       allocate(turb % p_mean(-nb:nc));  turb % p_mean = 0.
-      if(flow % heat_transfer) then
+      if(Flow % heat_transfer) then
         allocate(turb % t_mean(-nb:nc));  turb % t_mean = 0.
       end if
 
@@ -677,7 +677,7 @@
       allocate(turb % eps_mean (-nb:nc));  turb % eps_mean  = 0.
       allocate(turb % f22_mean (-nb:nc));  turb % f22_mean  = 0.
       allocate(turb % zeta_mean(-nb:nc));  turb % zeta_mean = 0.
-      if(flow % heat_transfer) then
+      if(Flow % heat_transfer) then
         allocate(turb % t2_mean(-nb:nc));  turb % t2_mean = 0.
       end if
 
@@ -690,7 +690,7 @@
       allocate(turb % uw_res(-nb:nc));  turb % uw_res = 0.
 
       ! Resolved turbulent heat fluxes
-      if(flow % heat_transfer) then
+      if(Flow % heat_transfer) then
         allocate(turb % t2_res(-nb:nc));  turb % t2_res = 0.
         allocate(turb % ut_res(-nb:nc));  turb % ut_res = 0.
         allocate(turb % vt_res(-nb:nc));  turb % vt_res = 0.
@@ -698,13 +698,13 @@
         allocate(turb % ut_mean(-nb:nc));  turb % ut_mean = 0.
         allocate(turb % vt_mean(-nb:nc));  turb % vt_mean = 0.
         allocate(turb % wt_mean(-nb:nc));  turb % wt_mean = 0.
-      end if ! flow % heat_transfer
+      end if ! Flow % heat_transfer
 
     end if ! turb % statistics
 
-    if(flow % buoyancy .eq. THERMALLY_DRIVEN) then
+    if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
       allocate(turb % g_buoy(-nb:nc));  turb % g_buoy = 0.
-    end if ! flow % buoyancy .eq. THERMALLY_DRIVEN
+    end if ! Flow % buoyancy .eq. THERMALLY_DRIVEN
 
   end if ! HYBRID_LES_RANS
 
@@ -712,8 +712,8 @@
   !   Scalars are independent of the turbulence model used   !
   !----------------------------------------------------------!
   if(turb % statistics) then
-    if(flow % n_scalars > 0) then
-      allocate(turb % scalar_mean(flow % n_scalars, -nb:nc))
+    if(Flow % n_scalars > 0) then
+      allocate(turb % scalar_mean(Flow % n_scalars, -nb:nc))
       turb % scalar_mean = 0.
     end if
   end if

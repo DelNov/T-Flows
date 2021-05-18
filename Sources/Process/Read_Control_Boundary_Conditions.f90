@@ -25,7 +25,7 @@
 !----------------------------------[Calling]-----------------------------------!
   integer :: Key_Ind
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: u, v, w, t, p, fun
   type(Var_Type),  pointer :: kin, eps, f22, zeta, vis, t2
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
@@ -50,7 +50,7 @@
 !==============================================================================!
 
   ! Take aliases
-  grid   => Flow % pnt_grid
+  Grid   => Flow % pnt_grid
   t      => Flow % t
   p      => Flow % p
   scalar => Flow % scalar
@@ -75,9 +75,9 @@
   types_file(:)      = .false.
   c_types            = 0
 
-  do bc = 1, grid % n_bnd_cond
+  do bc = 1, Grid % n_bnd_cond
     call Control_Mod_Position_At_Two_Keys('BOUNDARY_CONDITION',        &
-                                          grid % bnd_cond % name(bc),  &
+                                          Grid % bnd_cond % name(bc),  &
                                           found,                       &
                                           .false.)
     if(found) then
@@ -107,7 +107,7 @@
     else
       if(this_proc < 2) then
         print *, '# ERROR!  Boundary conditions for ',  &
-                 trim(grid % bnd_cond % name(bc)),      &
+                 trim(Grid % bnd_cond % name(bc)),      &
                  ' not specified in the control file!'
         print *, '# Exiting the program.'
       end if
@@ -128,11 +128,11 @@
   !------------------------------------------------!
   c_types = 0
 
-  do bc = 1, grid % n_bnd_cond
+  do bc = 1, Grid % n_bnd_cond
 
     ! Position yourself well
     call Control_Mod_Position_At_Two_Keys('BOUNDARY_CONDITION',        &
-                                          grid % bnd_cond % name(bc),  &
+                                          Grid % bnd_cond % name(bc),  &
                                           found,                       &
                                           .false.)
     do l = 1, types_per_color(bc)
@@ -148,31 +148,31 @@
       call Control_Mod_Read_Char_Item_On('TYPE', 'WALL', bc_type_name, .false.)
       call To_Upper_Case(bc_type_name)
 
-      ! Copy boundary conditions which were given for the grid
+      ! Copy boundary conditions which were given for the Grid
       if( bc_type_name .eq. 'INFLOW') then
         bc_type_tag = INFLOW
-        grid % bnd_cond % type(bc) = INFLOW
+        Grid % bnd_cond % type(bc) = INFLOW
       else if( bc_type_name .eq. 'WALL') then
         bc_type_tag = WALL
-        grid % bnd_cond % type(bc) = WALL
+        Grid % bnd_cond % type(bc) = WALL
       else if( bc_type_name .eq. 'OUTFLOW') then
         bc_type_tag = OUTFLOW
-        grid % bnd_cond % type(bc) = OUTFLOW
+        Grid % bnd_cond % type(bc) = OUTFLOW
       else if( bc_type_name .eq. 'SYMMETRY') then
         bc_type_tag = SYMMETRY
-        grid % bnd_cond % type(bc) = SYMMETRY
+        Grid % bnd_cond % type(bc) = SYMMETRY
       else if( bc_type_name .eq. 'WALL_FLUX') then
         bc_type_tag = WALLFL
-        grid % bnd_cond % type(bc) = WALLFL
+        Grid % bnd_cond % type(bc) = WALLFL
       else if( bc_type_name .eq. 'CONVECTIVE') then
         bc_type_tag = CONVECT
-        grid % bnd_cond % type(bc) = CONVECT
+        Grid % bnd_cond % type(bc) = CONVECT
       else if( bc_type_name .eq. 'PRESSURE') then
         bc_type_tag = PRESSURE
-        grid % bnd_cond % type(bc) = PRESSURE
+        Grid % bnd_cond % type(bc) = PRESSURE
       else if( bc_type_name .eq. 'OPENBC') then
         bc_type_tag = OPENBC
-        grid % bnd_cond % type(bc) = OPENBC
+        Grid % bnd_cond % type(bc) = OPENBC
       else
         if(this_proc < 2) then
           print *, '# ERROR!  Read_Control_Boundary_Conditions: '//        &
@@ -207,8 +207,8 @@
         !--------------------------------------------------!
 
         ! Distribute b.c. tags only.
-        do c = -1, -grid % n_bnd_cells, -1
-          if(grid % bnd_cond % color(c) .eq. bc) then
+        do c = -1, -Grid % n_bnd_cells, -1
+          if(Grid % bnd_cond % color(c) .eq. bc) then
 
             ! Temperature
             if(Flow % heat_transfer) then
@@ -216,13 +216,13 @@
               if(i > 0) then
                 t % bnd_cond_type(c) = bc_type_tag
                 if(bc_type_tag .eq. WALLFL) t    % bnd_cond_type(c)    = WALL
-                if(bc_type_tag .eq. WALLFL) grid % bnd_cond % type(bc) = WALL
+                if(bc_type_tag .eq. WALLFL) Grid % bnd_cond % type(bc) = WALL
               end if
               i = Key_Ind('Q', keys, nks)
               if(i > 0) then
                 t % bnd_cond_type(c) = bc_type_tag
                 if(bc_type_tag .eq. WALL) t    % bnd_cond_type(c)    = WALLFL
-                if(bc_type_tag .eq. WALL) grid % bnd_cond % type(bc) = WALLFL
+                if(bc_type_tag .eq. WALL) Grid % bnd_cond % type(bc) = WALLFL
               end if
             end if
 
@@ -251,8 +251,8 @@
         end do
 
         ! Distribute b.c. values
-        do c = -1, -grid % n_bnd_cells, -1
-          if(grid % bnd_cond % color(c) .eq. bc) then
+        do c = -1, -Grid % n_bnd_cells, -1
+          if(Grid % bnd_cond % color(c) .eq. bc) then
 
             ! For velocity and pressure
             i = Key_Ind('U', keys, nks); if(i > 0) u % b(c) = vals(i)
@@ -365,10 +365,10 @@
            keys(1) .eq. 'Y' .and. keys(2) .eq. 'Z') then
 
           ! Set the closest point
-          do c = -1, -grid % n_bnd_cells, -1
+          do c = -1, -Grid % n_bnd_cells, -1
 
             ! Distribute b.c. types
-            if(grid % bnd_cond % color(c) .eq. bc) then
+            if(Grid % bnd_cond % color(c) .eq. bc) then
 
               ! For temperature
               if(Flow % heat_transfer) then
@@ -376,13 +376,13 @@
                 if(i > 0) then
                   t % bnd_cond_type(c) = bc_type_tag
                   if(bc_type_tag .eq. WALLFL) t    % bnd_cond_type(c)    = WALL
-                  if(bc_type_tag .eq. WALLFL) grid % bnd_cond % type(bc) = WALL
+                  if(bc_type_tag .eq. WALLFL) Grid % bnd_cond % type(bc) = WALL
                 end if
                 i = Key_Ind('Q', keys, nks)
                 if(i > 0) then
                   t % bnd_cond_type(c) = bc_type_tag
                   if(bc_type_tag .eq. WALL) t    % bnd_cond_type(c)    = WALLFL
-                  if(bc_type_tag .eq. WALL) grid % bnd_cond % type(bc) = WALLFL
+                  if(bc_type_tag .eq. WALL) Grid % bnd_cond % type(bc) = WALLFL
                 end if
               end if
 
@@ -401,7 +401,7 @@
             end if
 
             ! Distribute b.c. values
-            if(grid % bnd_cond % color(c) .eq. bc) then
+            if(Grid % bnd_cond % color(c) .eq. bc) then
 
               dist_min = HUGE
               do m = 1, n_points
@@ -413,17 +413,17 @@
                 if(keys(1) .eq. 'Y' .and. keys(2) .eq. 'Z') then
                   dist = Math_Mod_Distance(                         &
                                   y,            z,            0.0,  &
-                                  grid % yc(c), grid % zc(c), 0.0)
+                                  Grid % yc(c), Grid % zc(c), 0.0)
 
                 else if(keys(1) .eq. 'X' .and. keys(2) .eq. 'Z') then
                   dist = Math_Mod_Distance(                         &
                                   x,            z,            0.0,  &
-                                  grid % xc(c), grid % zc(c), 0.0)
+                                  Grid % xc(c), Grid % zc(c), 0.0)
 
                 else if(keys(1) .eq. 'X' .and. keys(2) .eq. 'Y') then
                   dist = Math_Mod_Distance(                         &
                                   x,            y,            0.0,  &
-                                  grid % xc(c), grid % yc(c), 0.0)
+                                  Grid % xc(c), Grid % yc(c), 0.0)
 
                 end if
 
@@ -496,17 +496,17 @@
                   i = Key_Ind('F22', keys, nks); if(i>0) f22 % b(c) = prof(k,i)
                 end if
               end if
-            end if      !end if(grid % bnd_cond % color(c) .eq. n)
-          end do        !end do c = -1, -grid % n_bnd_cells, -1
+            end if      !end if(Grid % bnd_cond % color(c) .eq. n)
+          end do        !end do c = -1, -Grid % n_bnd_cells, -1
 
         !----------------------------!
         !   A plane is not defined   !
         !----------------------------!
         else  ! dir .eq. "XPL" ...
 
-          do c = -1, -grid % n_bnd_cells, -1
+          do c = -1, -Grid % n_bnd_cells, -1
 
-            if(grid % bnd_cond % color(c) .eq. bc) then
+            if(Grid % bnd_cond % color(c) .eq. bc) then
 
               do m = 1, n_points-1
                 here = .false.
@@ -519,40 +519,40 @@
 
                 ! Compute the weight factors
                 if( keys(1) .eq. 'X' .and.  &
-                    grid % xc(c) >= x .and. grid % xc(c) <= xp ) then
-                  wi = ( xp - grid % xc(c) ) / (xp - x)
+                    Grid % xc(c) >= x .and. Grid % xc(c) <= xp ) then
+                  wi = ( xp - Grid % xc(c) ) / (xp - x)
                   here = .true.
                 else if( keys(1) .eq. 'Y' .and.  &
-                         grid % yc(c) >= x .and. grid % yc(c) <= xp ) then
-                  wi = ( xp - grid % yc(c) ) / (xp - x)
+                         Grid % yc(c) >= x .and. Grid % yc(c) <= xp ) then
+                  wi = ( xp - Grid % yc(c) ) / (xp - x)
                   here = .true.
                 else if( keys(1) .eq. 'Z' .and.  &
-                         grid % zc(c) >= x .and. grid % zc(c) <= xp ) then
-                  wi = ( xp - grid % zc(c) ) / (xp - x)
+                         Grid % zc(c) >= x .and. Grid % zc(c) <= xp ) then
+                  wi = ( xp - Grid % zc(c) ) / (xp - x)
                   here = .true.
 
                 ! Beware; for cylindrical coordinates you have "inversion"
                 else if( (keys(1) .eq. 'RX' .and.  &
-                     sqrt(grid % yc(c)**2 + grid % zc(c)**2) >= xp .and.       &
-                     sqrt(grid % yc(c)**2 + grid % zc(c)**2) <= x) ) then
-                  wi = ( xp - sqrt(grid % yc(c)**2 + grid % zc(c)**2) ) / (xp-x)
+                     sqrt(Grid % yc(c)**2 + Grid % zc(c)**2) >= xp .and.       &
+                     sqrt(Grid % yc(c)**2 + Grid % zc(c)**2) <= x) ) then
+                  wi = ( xp - sqrt(Grid % yc(c)**2 + Grid % zc(c)**2) ) / (xp-x)
                   here = .true.
                 else if( (keys(1) .eq. 'RY' .and.  &
-                     sqrt(grid % xc(c)**2 + grid % zc(c)**2) >= xp .and.       &
-                     sqrt(grid % xc(c)**2 + grid % zc(c)**2) <= x) ) then
-                  wi = ( xp - sqrt(grid % xc(c)**2 + grid % zc(c)**2) ) / (xp-x)
+                     sqrt(Grid % xc(c)**2 + Grid % zc(c)**2) >= xp .and.       &
+                     sqrt(Grid % xc(c)**2 + Grid % zc(c)**2) <= x) ) then
+                  wi = ( xp - sqrt(Grid % xc(c)**2 + Grid % zc(c)**2) ) / (xp-x)
                   here = .true.
                 else if( (keys(1) .eq. 'RZ' .and.  &
-                     sqrt(grid % xc(c)**2 + grid % yc(c)**2) >= xp .and.       &
-                     sqrt(grid % xc(c)**2 + grid % yc(c)**2) <= x) ) then
-                  wi = ( xp - sqrt(grid % xc(c)**2 + grid % yc(c)**2) ) / (xp-x)
+                     sqrt(Grid % xc(c)**2 + Grid % yc(c)**2) >= xp .and.       &
+                     sqrt(Grid % xc(c)**2 + Grid % yc(c)**2) <= x) ) then
+                  wi = ( xp - sqrt(Grid % xc(c)**2 + Grid % yc(c)**2) ) / (xp-x)
                   here = .true.
 
                 ! Wall distance too
                 else if( (keys(1) .eq. 'WD'           .and.  &
-                     grid % wall_dist(c) >= min(x,xp) .and.  &
-                     grid % wall_dist(c) <= max(x,xp)) ) then
-                  wi = ( max(x,xp) - grid % wall_dist(c) )   &
+                     Grid % wall_dist(c) >= min(x,xp) .and.  &
+                     Grid % wall_dist(c) <= max(x,xp)) ) then
+                  wi = ( max(x,xp) - Grid % wall_dist(c) )   &
                      / ( max(x,xp) - min(x,xp) )
                   here = .true.
                 end if
@@ -566,14 +566,14 @@
                       t % bnd_cond_type(c) = bc_type_tag
                       if(bc_type_tag .eq. WALLFL) t % bnd_cond_type(c) = WALL
                       if(bc_type_tag .eq. WALLFL)  &
-                        grid % bnd_cond % type(bc) = WALL
+                        Grid % bnd_cond % type(bc) = WALL
                     end if
                     i = Key_Ind('Q',keys,nks)
                     if(i > 0) then
                       t % bnd_cond_type(c) = bc_type_tag
                       if(bc_type_tag .eq. WALL) t % bnd_cond_type(c) = WALLFL
                       if(bc_type_tag .eq. WALL)  &
-                        grid % bnd_cond % type(bc) = WALLFL
+                        Grid % bnd_cond % type(bc) = WALLFL
                     end if
                   end if
 
@@ -593,7 +593,7 @@
               end do    ! m, points
             end if      ! bnd_color .eq. bc
 
-            if(grid % bnd_cond % color(c) .eq. bc) then
+            if(Grid % bnd_cond % color(c) .eq. bc) then
 
               do m = 1, n_points-1
                 here = .false.
@@ -606,40 +606,40 @@
 
                 ! Compute the weight factors
                 if( keys(1) .eq. 'X' .and.  &
-                    grid % xc(c) >= x .and. grid % xc(c) <= xp ) then
-                  wi = ( xp - grid % xc(c) ) / (xp - x)
+                    Grid % xc(c) >= x .and. Grid % xc(c) <= xp ) then
+                  wi = ( xp - Grid % xc(c) ) / (xp - x)
                   here = .true.
                 else if( keys(1) .eq. 'Y' .and.  &
-                         grid % yc(c) >= x .and. grid % yc(c) <= xp ) then
-                  wi = ( xp - grid % yc(c) ) / (xp - x)
+                         Grid % yc(c) >= x .and. Grid % yc(c) <= xp ) then
+                  wi = ( xp - Grid % yc(c) ) / (xp - x)
                   here = .true.
                 else if( keys(1) .eq. 'Z' .and.  &
-                         grid % zc(c) >= x .and. grid % zc(c) <= xp ) then
-                  wi = ( xp - grid % zc(c) ) / (xp - x)
+                         Grid % zc(c) >= x .and. Grid % zc(c) <= xp ) then
+                  wi = ( xp - Grid % zc(c) ) / (xp - x)
                   here = .true.
 
                 ! Beware; for cylindrical coordinates you have "inversion"
                 else if( (keys(1) .eq. 'RX' .and.  &
-                     sqrt(grid % yc(c)**2 + grid % zc(c)**2) >= xp .and.       &
-                     sqrt(grid % yc(c)**2 + grid % zc(c)**2) <= x) ) then
-                  wi = ( xp - sqrt(grid % yc(c)**2 + grid % zc(c)**2) ) / (xp-x)
+                     sqrt(Grid % yc(c)**2 + Grid % zc(c)**2) >= xp .and.       &
+                     sqrt(Grid % yc(c)**2 + Grid % zc(c)**2) <= x) ) then
+                  wi = ( xp - sqrt(Grid % yc(c)**2 + Grid % zc(c)**2) ) / (xp-x)
                   here = .true.
                 else if( (keys(1) .eq. 'RY' .and.  &
-                     sqrt(grid % xc(c)**2 + grid % zc(c)**2) >= xp .and.       &
-                     sqrt(grid % xc(c)**2 + grid % zc(c)**2) <= x) ) then
-                  wi = ( xp - sqrt(grid % xc(c)**2 + grid % zc(c)**2) ) / (xp-x)
+                     sqrt(Grid % xc(c)**2 + Grid % zc(c)**2) >= xp .and.       &
+                     sqrt(Grid % xc(c)**2 + Grid % zc(c)**2) <= x) ) then
+                  wi = ( xp - sqrt(Grid % xc(c)**2 + Grid % zc(c)**2) ) / (xp-x)
                   here = .true.
                 else if( (keys(1) .eq. 'RZ' .and.  &
-                     sqrt(grid % xc(c)**2 + grid % yc(c)**2) >= xp .and.       &
-                     sqrt(grid % xc(c)**2 + grid % yc(c)**2) <= x) ) then
-                  wi = ( xp - sqrt(grid % xc(c)**2 + grid % yc(c)**2) ) / (xp-x)
+                     sqrt(Grid % xc(c)**2 + Grid % yc(c)**2) >= xp .and.       &
+                     sqrt(Grid % xc(c)**2 + Grid % yc(c)**2) <= x) ) then
+                  wi = ( xp - sqrt(Grid % xc(c)**2 + Grid % yc(c)**2) ) / (xp-x)
                   here = .true.
 
                 ! Wall distance too
                 else if( (keys(1) .eq. 'WD'           .and.  &
-                     grid % wall_dist(c) >= min(x,xp) .and.  &
-                     grid % wall_dist(c) <= max(x,xp)) ) then
-                  wi = ( max(x,xp) - grid % wall_dist(c) )   &
+                     Grid % wall_dist(c) >= min(x,xp) .and.  &
+                     Grid % wall_dist(c) <= max(x,xp)) ) then
+                  wi = ( max(x,xp) - Grid % wall_dist(c) )   &
                      / ( max(x,xp) - min(x,xp) )
                   here = .true.
                 end if
@@ -665,7 +665,7 @@
                       t % bnd_cond_type(c) = bc_type_tag
                       if(bc_type_tag .eq. WALLFL) t % bnd_cond_type(c) = WALL
                       if(bc_type_tag .eq. WALLFL)  &
-                        grid % bnd_cond % type(bc) = WALL
+                        Grid % bnd_cond % type(bc) = WALL
                     end if
                     i = Key_Ind('Q',keys,nks)
                     if(i > 0) t % q(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
@@ -673,7 +673,7 @@
                       t % bnd_cond_type(c) = bc_type_tag
                       if(bc_type_tag .eq. WALL) t % bnd_cond_type(c) = WALLFL
                       if(bc_type_tag .eq. WALL)  &
-                        grid % bnd_cond % type(bc) = WALLFL
+                        Grid % bnd_cond % type(bc) = WALLFL
                     end if
                   end if
 
@@ -768,7 +768,7 @@
                 end if  ! (here)
               end do  ! m = 1, n_points-1
             end if
-          end do  ! c = -1, -grid % n_bnd_cells, -1
+          end do  ! c = -1, -Grid % n_bnd_cells, -1
         end if  ! plane is defined?
         close(fu)
 
@@ -788,9 +788,9 @@
   !                                   !
   !-----------------------------------!
   turb_planes % n_planes = 0
-  do bc = 1, grid % n_bnd_cond  ! imagine there are as many eddies as bcs
+  do bc = 1, Grid % n_bnd_cond  ! imagine there are as many eddies as bcs
     call Control_Mod_Position_At_Two_Keys('SYNTHETIC_EDDIES',          &
-                                          grid % bnd_cond % name(bc),  &
+                                          Grid % bnd_cond % name(bc),  &
                                           found,                       &
                                           .false.)
     if(found) then
@@ -803,7 +803,7 @@
                                edd_r,                                        &
                                edd_i,                                        &
                                Flow,                                         &
-                               grid % bnd_cond % name(bc))
+                               Grid % bnd_cond % name(bc))
     end if
   end do
   if(turb_planes % n_planes > 0 .and. this_proc < 2) then
@@ -817,7 +817,7 @@
   !                                       !
   !                                       !
   !---------------------------------------!
-  do c = -1, -grid % n_bnd_cells, -1
+  do c = -1, -Grid % n_bnd_cells, -1
 
     u % n(c) = u % b(c)
     v % n(c) = v % b(c)
@@ -880,21 +880,21 @@
   !------------------------------!
   !   Find the near-wall cells   !
   !------------------------------!
-  grid % cell_near_wall = .false.
+  Grid % cell_near_wall = .false.
 
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
     if(c2 < 0) then
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
-         Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
-        grid % cell_near_wall(c1) = .true.
+      if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
+         Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
+        Grid % cell_near_wall(c1) = .true.
       end if
     end if
 
   end do  ! faces
 
-  call Grid_Mod_Exchange_Cells_Log(grid, grid % cell_near_wall)
+  call Grid % Exchange_Cells_Log(Grid % cell_near_wall)
 
   end subroutine

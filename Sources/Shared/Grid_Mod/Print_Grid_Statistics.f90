@@ -1,10 +1,9 @@
 !==============================================================================!
-  subroutine Grid_Mod_Print_Statistics(grid,          &
-                                       bounding_box)
+  subroutine Print_Grid_Statistics(Grid, bounding_box)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)   :: grid
+  class(Grid_Type)  :: Grid
   logical, optional :: bounding_box
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c, c1, s, n_cells, n_bnd_cells, n_faces, n_shadows
@@ -19,7 +18,7 @@
   if(this_proc < 2) then
     print '(a)',  ' #========================================================='
     print '(a)',  ' #'
-    print '(3a)', ' # Grid ', trim(grid % name), ' statistics'
+    print '(3a)', ' # Grid ', trim(Grid % name), ' statistics'
     print '(a)',  ' #'
     print '(a)',  ' #---------------------------------------------------------'
   end if
@@ -27,7 +26,7 @@
   !------------------!
   !   Bounding box   !
   !------------------!
-  call Grid_Mod_Bounding_Box(grid, xmin, ymin, zmin, xmax, ymax, zmax)
+  call Find_Bounding_Box(Grid, xmin, ymin, zmin, xmax, ymax, zmax)
 
   if(this_proc < 2) then
     print '(a)',  ' # Bounding box:'
@@ -47,17 +46,17 @@
   n_quad     = 0
   n_polg     = 0
   max_n_polg = 0  ! maximum number of nodes in polygon
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1, s)
-    if(grid % comm % cell_proc(c1) .eq. this_proc) then
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1, s)
+    if(Grid % comm % cell_proc(c1) .eq. this_proc) then
       n_faces = n_faces + 1
-      max_n_polg = max(max_n_polg, grid % faces_n_nodes(s))
-      if(grid % faces_s(s) .gt. s) then
+      max_n_polg = max(max_n_polg, Grid % faces_n_nodes(s))
+      if(Grid % faces_s(s) .gt. s) then
         n_shadows = n_shadows + 1
       end if
-      if(grid % faces_n_nodes(s) .eq. 3) then
+      if(Grid % faces_n_nodes(s) .eq. 3) then
         n_tri = n_tri + 1
-      else if(grid % faces_n_nodes(s) .eq. 4) then
+      else if(Grid % faces_n_nodes(s) .eq. 4) then
         n_quad = n_quad + 1
       else
         n_polg = n_polg + 1
@@ -92,12 +91,12 @@
   n_tri       = 0
   n_quad      = 0
   n_polg      = 0
-  do c = -grid % n_bnd_cells, -1
-    if(grid % comm % cell_proc(c) .eq. this_proc) then
+  do c = -Grid % n_bnd_cells, -1
+    if(Grid % comm % cell_proc(c) .eq. this_proc) then
       n_bnd_cells = n_bnd_cells + 1
-      if(grid % cells_n_nodes(c) .eq. 3) then
+      if(Grid % cells_n_nodes(c) .eq. 3) then
         n_tri = n_tri + 1
-      else if(grid % cells_n_nodes(c) .eq. 4) then
+      else if(Grid % cells_n_nodes(c) .eq. 4) then
         n_quad = n_quad + 1
       else
         n_polg = n_polg + 1
@@ -112,20 +111,20 @@
   n_hex   = 0
   n_polh  = 0
   max_n_polh = 0  ! maximum number of nodes in polyhedron
-  do c = 1, grid % n_cells
-    if(grid % comm % cell_proc(c) .eq. this_proc) then
+  do c = 1, Grid % n_cells
+    if(Grid % comm % cell_proc(c) .eq. this_proc) then
       n_cells = n_cells + 1
-      if(grid % cells_n_nodes(c) .eq. 4) then
+      if(Grid % cells_n_nodes(c) .eq. 4) then
         n_tet = n_tet + 1
-      else if(grid % cells_n_nodes(c) .eq. 5) then
+      else if(Grid % cells_n_nodes(c) .eq. 5) then
         n_pyr = n_pyr + 1
-      else if(grid % cells_n_nodes(c) .eq. 6) then
+      else if(Grid % cells_n_nodes(c) .eq. 6) then
         n_wed = n_wed + 1
-      else if(grid % cells_n_nodes(c) .eq. 8) then
+      else if(Grid % cells_n_nodes(c) .eq. 8) then
         n_hex = n_hex + 1
-      else if(grid % cells_n_nodes(c) < 0) then
+      else if(Grid % cells_n_nodes(c) < 0) then
         n_polh = n_polh + 1
-        max_n_polh = max(max_n_polh, abs(grid % cells_n_nodes(c))) ! needs abs!
+        max_n_polh = max(max_n_polh, abs(Grid % cells_n_nodes(c))) ! needs abs!
       end if
     end if
   end do

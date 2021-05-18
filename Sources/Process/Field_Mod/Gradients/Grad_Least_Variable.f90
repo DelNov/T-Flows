@@ -8,14 +8,14 @@
   class(Field_Type) :: Flow
   type(Var_Type)    :: var
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
 !==============================================================================!
 
   ! Take alias
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
 
   ! Refresh buffers for variable
-  call Grid_Mod_Exchange_Cells_Real(grid, var % n)
+  call Grid % Exchange_Cells_Real(var % n)
 
   ! Compute individual gradients without refreshing buffers
   call Flow % Grad_Component_No_Refresh(var % n, 1, var % x)  ! dp/dx
@@ -23,8 +23,8 @@
   call Flow % Grad_Component_No_Refresh(var % n, 3, var % z)  ! dp/dz
 
   ! Refresh buffers for gradient components
-  call Grid_Mod_Exchange_Cells_Real(grid, var % x)
-  call Grid_Mod_Exchange_Cells_Real(grid, var % y)
-  call Grid_Mod_Exchange_Cells_Real(grid, var % z)
+  call Grid % Exchange_Cells_Real(var % x)
+  call Grid % Exchange_Cells_Real(var % y)
+  call Grid % Exchange_Cells_Real(var % z)
 
   end subroutine

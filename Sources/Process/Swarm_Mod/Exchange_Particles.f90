@@ -8,13 +8,13 @@
   type(Swarm_Type), target     :: swarm
   integer                      :: k      ! particle number
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),     pointer :: grid
+  type(Grid_Type),     pointer :: Grid
   type(Particle_Type), pointer :: part
   integer                      :: i, c, n
 !==============================================================================!
 
   ! Take aliases for the swarm
-  grid => swarm % pnt_grid
+  Grid => swarm % pnt_grid
 
   !-----------------------------------------------!
   !                                               !
@@ -41,8 +41,8 @@
         swarm % i_work(i + 2) = part % buff  ! where it wants to go
         swarm % i_work(i + 3) = part % cell
         swarm % i_work(i + 4) = part % node
-        swarm % i_work(i + 5) = grid % comm % cell_glo(part % cell)
-        swarm % i_work(i + 6) = grid % comm % node_glo(part % node)
+        swarm % i_work(i + 5) = Grid % comm % cell_glo(part % cell)
+        swarm % i_work(i + 6) = Grid % comm % node_glo(part % node)
 
         i = (k-1) * swarm % N_R_VARS
         swarm % r_work(i +  1) = part % x_n
@@ -92,8 +92,8 @@
         part % proc = part % buff
 
         ! Find the closest cell ...
-        do c = 1, grid % n_cells
-          if(grid % comm % cell_glo(c) .eq. swarm % i_work(i + 5)) then
+        do c = 1, Grid % n_cells
+          if(Grid % comm % cell_glo(c) .eq. swarm % i_work(i + 5)) then
             part % cell = c
             goto 1
           end if
@@ -105,8 +105,8 @@
 1       continue
 
         ! ... and the closest node.
-        do n = 1, grid % n_nodes
-          if(grid % comm % node_glo(n) .eq. swarm % i_work(i + 6)) then
+        do n = 1, Grid % n_nodes
+          if(Grid % comm % node_glo(n) .eq. swarm % i_work(i + 6)) then
             part % node = n
             goto 2
           end if
@@ -138,26 +138,26 @@
 
     !-------------------------------------------------------!
     !                                                       !
-    !   Refresh buffers for grid-base variables here        !
+    !   Refresh buffers for Grid-base variables here        !
     !   (This is probably only needed for post-processing   !
     !    if buffers are plotted as well, but it is fine.)   !
     !                                                       !
     !-------------------------------------------------------!
-    call Grid_Mod_Exchange_Cells_Real(grid, swarm % n_reflected)
-    call Grid_Mod_Exchange_Cells_Real(grid, swarm % n_deposited)
-    call Grid_Mod_Exchange_Cells_Real(grid, swarm % n_escaped)
+    call Grid % Exchange_Cells_Real(swarm % n_reflected)
+    call Grid % Exchange_Cells_Real(swarm % n_deposited)
+    call Grid % Exchange_Cells_Real(swarm % n_escaped)
 
     if(swarm % statistics) then
-      call Grid_Mod_Exchange_Cells_Int (grid, swarm % n_states)
-      call Grid_Mod_Exchange_Cells_Real(grid, swarm % u_mean)
-      call Grid_Mod_Exchange_Cells_Real(grid, swarm % v_mean)
-      call Grid_Mod_Exchange_Cells_Real(grid, swarm % w_mean)
-      call Grid_Mod_Exchange_Cells_Real(grid, swarm % uu)
-      call Grid_Mod_Exchange_Cells_Real(grid, swarm % vv)
-      call Grid_Mod_Exchange_Cells_Real(grid, swarm % ww)
-      call Grid_Mod_Exchange_Cells_Real(grid, swarm % uv)
-      call Grid_Mod_Exchange_Cells_Real(grid, swarm % uw)
-      call Grid_Mod_Exchange_Cells_Real(grid, swarm % vw)
+      call Grid % Exchange_Cells_Int (swarm % n_states)
+      call Grid % Exchange_Cells_Real(swarm % u_mean)
+      call Grid % Exchange_Cells_Real(swarm % v_mean)
+      call Grid % Exchange_Cells_Real(swarm % w_mean)
+      call Grid % Exchange_Cells_Real(swarm % uu)
+      call Grid % Exchange_Cells_Real(swarm % vv)
+      call Grid % Exchange_Cells_Real(swarm % ww)
+      call Grid % Exchange_Cells_Real(swarm % uv)
+      call Grid % Exchange_Cells_Real(swarm % uw)
+      call Grid % Exchange_Cells_Real(swarm % vw)
     end if
 
   end if

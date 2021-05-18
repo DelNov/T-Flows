@@ -22,7 +22,7 @@
   integer, intent(in)         :: curr_dt
   integer, intent(in)         :: ini
 !-----------------------------------[Locals]-----------------------------------! 
-  type(Grid_Type),   pointer :: grid
+  type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: u, v, w, t
   type(Var_Type),    pointer :: ut, vt, wt
   type(Face_Type),   pointer :: v_flux
@@ -72,7 +72,7 @@
   call Cpu_Timer % Start('Compute_Energy (without solvers)')
 
   ! Take aliases
-  grid   => Flow % pnt_grid
+  Grid   => Flow % pnt_grid
   v_flux => Flow % v_flux
   dt     =  Flow % dt
   call Flow % Alias_Momentum(u, v, w)
@@ -88,7 +88,7 @@
 
   ! Old values (o and oo)
   if(ini .eq. 1) then
-    do c = 1, grid % n_cells
+    do c = 1, Grid % n_cells
       t % oo(c) = t % o(c)
       t % o (c) = t % n(c)
     end do
@@ -98,7 +98,7 @@
   call Flow % Grad_Variable(t)
 
   ! Compute helping variable
-  do c = -grid % n_bnd_cells, grid % n_cells
+  do c = -Grid % n_bnd_cells, Grid % n_cells
     cap_dens(c) = Flow % capacity(c) * Flow % density(c)
   end do
 
@@ -118,31 +118,31 @@
   !----------------------------!
   !   Spatial discretization   !
   !----------------------------!
-  do s = 1, grid % n_faces
+  do s = 1, Grid % n_faces
 
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
     call Turb_Mod_Face_Cond_And_Stress(turb, con_eff, t_stress, s)
 
     ! Gradients on the cell face (fw corrects situation close to the wall)
-    tx_f = grid % fw(s) * t % x(c1) + (1.0-grid % fw(s)) * t % x(c2)
-    ty_f = grid % fw(s) * t % y(c1) + (1.0-grid % fw(s)) * t % y(c2)
-    tz_f = grid % fw(s) * t % z(c1) + (1.0-grid % fw(s)) * t % z(c2)
+    tx_f = Grid % fw(s) * t % x(c1) + (1.0-Grid % fw(s)) * t % x(c2)
+    ty_f = Grid % fw(s) * t % y(c1) + (1.0-Grid % fw(s)) * t % y(c2)
+    tz_f = Grid % fw(s) * t % z(c1) + (1.0-Grid % fw(s)) * t % z(c2)
 
     ! Total (exact) diffusion flux
     ! This is last term in equation 2.33 in Denner's thesis because:
-    ! grid % sx (T-Flows) == n_f * A_f (Denner)
-    f_ex = con_eff * (   tx_f * grid % sx(s)   &
-                       + ty_f * grid % sy(s)   &
-                       + tz_f * grid % sz(s))
+    ! Grid % sx (T-Flows) == n_f * A_f (Denner)
+    f_ex = con_eff * (   tx_f * Grid % sx(s)   &
+                       + ty_f * Grid % sy(s)   &
+                       + tz_f * Grid % sz(s))
 
     ! Implicit part of the diffusion flux, treated by linear system
     ! This is also term in equation 2.33 in Denner's thesis because:
-    ! A % fc * grid % dx (T-Flows) == alpha_f * s_f * A_f (Denner)
-    f_im = con_eff * A % fc(s) * (   tx_f * grid % dx(s)    &
-                                   + ty_f * grid % dy(s)    &
-                                   + tz_f * grid % dz(s) )
+    ! A % fc * Grid % dx (T-Flows) == alpha_f * s_f * A_f (Denner)
+    f_im = con_eff * A % fc(s) * (   tx_f * Grid % dx(s)    &
+                                   + ty_f * Grid % dy(s)    &
+                                   + tz_f * Grid % dz(s) )
 
     ! Cross diffusion part
     t % c(c1) = t % c(c1) + f_ex - f_im
@@ -185,14 +185,14 @@
         b(c1)  = b(c1)  + a12 * t % n(c2)
       ! In case of wallflux 
       else if(Var_Mod_Bnd_Cond_Type(t, c2) .eq. WALLFL) then
-        b(c1) = b(c1) + grid % s(s) * t % q(c2)
+        b(c1) = b(c1) + Grid % s(s) * t % q(c2)
       end if
     end if
 
   end do  ! through sides
 
   ! Cross diffusion terms are treated explicity
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     if(t % c(c) >= 0) then
       b(c)  = b(c) + t % c(c)
     else
@@ -206,7 +206,7 @@
   !   Inertial terms   !
   !                    !
   !--------------------!
-  do c = -grid % n_bnd_cells, grid % n_cells
+  do c = -Grid % n_bnd_cells, Grid % n_cells
     cap_dens(c) = Flow % capacity(c) * Flow % density(c)
   end do
   call Numerics_Mod_Inertial_Term(t, cap_dens, A, b, dt)

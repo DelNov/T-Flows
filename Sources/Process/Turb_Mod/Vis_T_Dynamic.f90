@@ -26,7 +26,7 @@
   type(Turb_Type), target :: turb
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: Flow
-  type(Grid_Type),   pointer :: grid
+  type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: u, v, w
   integer                    :: c, c1, c2, s, sj, cj, nc, nb
   real                       :: u_a, v_a, w_a
@@ -60,17 +60,17 @@
 
   ! Take aliases
   Flow => turb % pnt_flow
-  grid => Flow % pnt_grid
-  nc   =  grid % n_cells
-  nb   =  grid % n_bnd_cells
+  Grid => Flow % pnt_grid
+  nc   =  Grid % n_cells
+  nb   =  Grid % n_bnd_cells
   call Flow % Alias_Momentum(u, v, w)
 
-  call Grid_Mod_Exchange_Cells_Real(grid, u % n)
-  call Grid_Mod_Exchange_Cells_Real(grid, v % n)
-  call Grid_Mod_Exchange_Cells_Real(grid, w % n)
-  call Grid_Mod_Exchange_Cells_Real(grid, Flow % shear)
+  call Grid % Exchange_Cells_Real(u % n)
+  call Grid % Exchange_Cells_Real(v % n)
+  call Grid % Exchange_Cells_Real(w % n)
+  call Grid % Exchange_Cells_Real(Flow % shear)
 
-  do c =1, grid % n_cells
+  do c =1, Grid % n_cells
     u_a   = 0.0
     v_a   = 0.0
     w_a   = 0.0
@@ -90,63 +90,63 @@
     m_13_a = 0.0
     m_23_a = 0.0
 
-    do sj = 1, grid % cells_n_faces(c)  ! browse thrugh faces surrouind the cell
-      s = grid % cells_f(sj, c)         ! true face number
-      c1 = grid % faces_c(1, s)
-      c2 = grid % faces_c(2, s)
+    do sj = 1, Grid % cells_n_faces(c)  ! browse thrugh faces surrouind the cell
+      s = Grid % cells_f(sj, c)         ! true face number
+      c1 = Grid % faces_c(1, s)
+      c2 = Grid % faces_c(2, s)
       if(c2 .gt. 0) then
         if(c1 .eq. c) cj = c2
         if(c2 .eq. c) cj = c1
 
         ! Test velocities
-        u_a = u_a + grid % vol(cj) * u % n(cj)
-        v_a = v_a + grid % vol(cj) * v % n(cj)
-        w_a = w_a + grid % vol(cj) * w % n(cj)
+        u_a = u_a + Grid % vol(cj) * u % n(cj)
+        v_a = v_a + Grid % vol(cj) * v % n(cj)
+        w_a = w_a + Grid % vol(cj) * w % n(cj)
 
         ! Test stresses
-        uu_a = uu_a + grid % vol(cj) * u % n(cj) * u % n(cj)
-        vv_a = vv_a + grid % vol(cj) * v % n(cj) * v % n(cj)
-        ww_a = ww_a + grid % vol(cj) * w % n(cj) * w % n(cj)
-        uv_a = uv_a + grid % vol(cj) * u % n(cj) * v % n(cj)
-        uw_a = uw_a + grid % vol(cj) * u % n(cj) * w % n(cj)
-        vw_a = vw_a + grid % vol(cj) * v % n(cj) * w % n(cj)
+        uu_a = uu_a + Grid % vol(cj) * u % n(cj) * u % n(cj)
+        vv_a = vv_a + Grid % vol(cj) * v % n(cj) * v % n(cj)
+        ww_a = ww_a + Grid % vol(cj) * w % n(cj) * w % n(cj)
+        uv_a = uv_a + Grid % vol(cj) * u % n(cj) * v % n(cj)
+        uw_a = uw_a + Grid % vol(cj) * u % n(cj) * w % n(cj)
+        vw_a = vw_a + Grid % vol(cj) * v % n(cj) * w % n(cj)
 
         ! Test Mija
-        m_11_a = m_11_a + grid % vol(cj) * Flow % shear(cj) * u % x(cj)
-        m_22_a = m_22_a + grid % vol(cj) * Flow % shear(cj) * v % y(cj)
-        m_33_a = m_33_a + grid % vol(cj) * Flow % shear(cj) * w % z(cj)
-        m_12_a = m_12_a + grid % vol(cj) * Flow % shear(cj)              &
+        m_11_a = m_11_a + Grid % vol(cj) * Flow % shear(cj) * u % x(cj)
+        m_22_a = m_22_a + Grid % vol(cj) * Flow % shear(cj) * v % y(cj)
+        m_33_a = m_33_a + Grid % vol(cj) * Flow % shear(cj) * w % z(cj)
+        m_12_a = m_12_a + Grid % vol(cj) * Flow % shear(cj)              &
                * 0.5 * ( u % y(cj) + v % x(cj) )
-        m_13_a = m_13_a + grid % vol(cj) * Flow % shear(cj)              &
+        m_13_a = m_13_a + Grid % vol(cj) * Flow % shear(cj)              &
                * 0.5 * ( u % z(cj) + w % x(cj) )
-        m_23_a = m_23_a + grid % vol(cj) * Flow % shear(cj)              &
+        m_23_a = m_23_a + Grid % vol(cj) * Flow % shear(cj)              &
                * 0.5 * ( v % z(cj) + w % y(cj) )
 
         ! Test volume 
-        vol_e = vol_e + grid % vol(cj) 
+        vol_e = vol_e + Grid % vol(cj) 
       end if
     end do
 
     ! Take into account influence of central cell within test molecule
-    vol_e = vol_e + grid % vol(c)
+    vol_e = vol_e + Grid % vol(c)
 
-    u_a = u_a + grid % vol(c) * u % n(c)
-    v_a = v_a + grid % vol(c) * v % n(c)
-    w_a = w_a + grid % vol(c) * w % n(c)
+    u_a = u_a + Grid % vol(c) * u % n(c)
+    v_a = v_a + Grid % vol(c) * v % n(c)
+    w_a = w_a + Grid % vol(c) * w % n(c)
 
-    uu_a = uu_a + grid % vol(c) * u % n(c) * u % n(c)
-    vv_a = vv_a + grid % vol(c) * v % n(c) * v % n(c)
-    ww_a = ww_a + grid % vol(c) * w % n(c) * w % n(c)
-    uv_a = uv_a + grid % vol(c) * u % n(c) * v % n(c)
-    uw_a = uw_a + grid % vol(c) * u % n(c) * w % n(c)
-    vw_a = vw_a + grid % vol(c) * v % n(c) * w % n(c)
+    uu_a = uu_a + Grid % vol(c) * u % n(c) * u % n(c)
+    vv_a = vv_a + Grid % vol(c) * v % n(c) * v % n(c)
+    ww_a = ww_a + Grid % vol(c) * w % n(c) * w % n(c)
+    uv_a = uv_a + Grid % vol(c) * u % n(c) * v % n(c)
+    uw_a = uw_a + Grid % vol(c) * u % n(c) * w % n(c)
+    vw_a = vw_a + Grid % vol(c) * v % n(c) * w % n(c)
 
-    m_11_a = m_11_a + grid % vol(c) * Flow % shear(c) * u % x(c)
-    m_22_a = m_22_a + grid % vol(c) * Flow % shear(c) * v % y(c)
-    m_33_a = m_33_a + grid % vol(c) * Flow % shear(c) * w % z(c)
-    m_12_a = m_12_a + grid % vol(c) * Flow % shear(c) * .5*(u % y(c) + v % x(c))
-    m_13_a = m_13_a + grid % vol(c) * Flow % shear(c) * .5*(u % z(c) + w % x(c))
-    m_23_a = m_23_a + grid % vol(c) * Flow % shear(c) * .5*(v % z(c) + w % y(c))
+    m_11_a = m_11_a + Grid % vol(c) * Flow % shear(c) * u % x(c)
+    m_22_a = m_22_a + Grid % vol(c) * Flow % shear(c) * v % y(c)
+    m_33_a = m_33_a + Grid % vol(c) * Flow % shear(c) * w % z(c)
+    m_12_a = m_12_a + Grid % vol(c) * Flow % shear(c) * .5*(u % y(c) + v % x(c))
+    m_13_a = m_13_a + Grid % vol(c) * Flow % shear(c) * .5*(u % z(c) + w % x(c))
+    m_23_a = m_23_a + Grid % vol(c) * Flow % shear(c) * .5*(v % z(c) + w % y(c))
 
     ! Now calculating test values
     u_f(c) = u_a / vol_e
@@ -178,8 +178,8 @@
                                 w % y,  &  ! dW/dy
                                 w % z)     ! dW/dz
 
-  do c = 1, grid % n_cells
-    l_g  = grid % vol(c)**ONE_THIRD
+  do c = 1, Grid % n_cells
+    l_g  = Grid % vol(c)**ONE_THIRD
     l_f  = 2.0 * l_g
 
     shear_test(c) = sqrt(2.0*(  u % x(c)*u % x(c)                            &

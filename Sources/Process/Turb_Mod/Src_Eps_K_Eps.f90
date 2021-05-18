@@ -21,7 +21,7 @@
   real :: Y_Plus_Low_Re
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: Flow
-  type(Grid_Type),   pointer :: grid
+  type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: u, v, w
   type(Var_Type),    pointer :: kin, eps
   type(Matrix_Type), pointer :: A
@@ -47,22 +47,22 @@
 
   ! Take aliases
   Flow => turb % pnt_flow
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   call Flow % Alias_Momentum(u, v, w)
   call Turb_Mod_Alias_K_Eps    (turb, kin, eps)
   call Sol % Alias_Solver      (A, b)
 
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     kin_vis =  Flow % viscosity(c) / Flow % density(c)
 
     ! Positive contribution:
     b(c) = b(c) + &
-            c_1e * turb % p_kin(c) * eps % n(c) / kin % n(c) * grid % vol(c)
+            c_1e * turb % p_kin(c) * eps % n(c) / kin % n(c) * Grid % vol(c)
 
     ! Negative contribution:
     re_t = kin % n(c)*kin % n(c)/(kin_vis*eps % n(c))
     y_star = sqrt(sqrt(kin_vis * eps % n(c))) *     &
-             grid % wall_dist(c)/kin_vis
+             Grid % wall_dist(c)/kin_vis
     f_mu = (1.0 - exp(-y_star/3.1))**2              &
          * (1.0 - 0.3*exp(-(re_t/6.5)*(re_t/6.5)))
 
@@ -70,28 +70,28 @@
 
     A % val(A % dia(c)) = A % val(A % dia(c))                             &
                         +    Flow % density(c) * f_mu* c_2e * eps % n(c)  &
-                           / kin % n(c) * grid % vol(c)
+                           / kin % n(c) * Grid % vol(c)
 
     ! Buoyancy contribution
     if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
       b(c) = b(c) + max(0.0, c_1e * turb % g_buoy(c) &
-                    * eps % n(c) / kin % n(c) * grid % vol(c))
+                    * eps % n(c) / kin % n(c) * Grid % vol(c))
       A % val(A % dia(c)) = A % val(A % dia(c))                &
                           + max(0.0,(-c_1e * turb % g_buoy(c)  &
                           * eps % n(c)                         &
-                          / kin % n(c) * grid % vol(c))        &
+                          / kin % n(c) * Grid % vol(c))        &
                           / (eps % n(c) + TINY))
     end if
 
   end do
 
   ! Imposing a boundary condition on wall for eps
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
     if(c2 < 0) then
-      if( Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
-          Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
+      if( Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
+          Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
 
         ! Compute tangential velocity component
         u_tan = Flow % U_Tan(s)
@@ -99,7 +99,7 @@
         if(turb % rough_walls) then 
           z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
           eps % n(c1) = c_mu75 * kin % n(c1)**1.5  &
-                      / ((grid % wall_dist(c1) + z_o) * kappa)
+                      / ((Grid % wall_dist(c1) + z_o) * kappa)
 
           ! Adjusting coefficient to fix eps value in near wall calls
           do j = A % row(c1), A % row(c1 + 1) - 1
@@ -112,7 +112,7 @@
           u_tau = c_mu25 * sqrt(kin % n(c1))
           turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
                                             u_tau,                 &
-                                            grid % wall_dist(c1),  &
+                                            Grid % wall_dist(c1),  &
                                             kin_vis)
 
           turb % tau_wall(c1) = Tau_Wall_Low_Re(turb,               &
@@ -124,18 +124,18 @@
           u_tau_new = sqrt(turb % tau_wall(c1) / Flow % density(c1))
           turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
                                             u_tau_new,             &
-                                            grid % wall_dist(c1),  &
+                                            Grid % wall_dist(c1),  &
                                             kin_vis)
 
           eps_int = 2.0 * Flow % viscosity(c1)                &
                         / Flow % density(c1) * kin % n(c1)    &
-                        / grid % wall_dist(c1)**2
+                        / Grid % wall_dist(c1)**2
           eps_wf  = c_mu75 * kin % n(c1)**1.5              &
-                  / (grid % wall_dist(c1) * kappa)
+                  / (Grid % wall_dist(c1) * kappa)
 
           if(turb % y_plus(c1) > 3) then
             fa = min(Flow % density(c1) * u_tau_new**3  &
-               / (kappa*grid % wall_dist(c1) * turb % p_kin(c1)),1.0)
+               / (kappa*Grid % wall_dist(c1) * turb % p_kin(c1)),1.0)
 
             eps % n(c1) = (1.0-fa)*eps_int + fa*eps_wf
 

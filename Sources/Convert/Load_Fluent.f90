@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Load_Fluent(grid, file_name)
+  subroutine Load_Fluent(Grid, file_name)
 !------------------------------------------------------------------------------!
 !   Reads the Fluent's file format.                                            !
 !------------------------------------------------------------------------------!
@@ -8,7 +8,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Grid_Type) :: Grid
   character(SL)   :: file_name
 !-----------------------------------[Locals]-----------------------------------!
   character(SL)        :: one_token
@@ -49,7 +49,7 @@
   !-----------------------------------------------!
   !   Assume grid doesn't have polyhedral cells   !
   !-----------------------------------------------!
-  grid % polyhedral = .false.
+  Grid % polyhedral = .false.
 
   !--------------------------------------------------------!
   !                                                        !
@@ -68,14 +68,14 @@
   !     Nodes' section starts with '(10'     !
   !                                          !
   !------------------------------------------!
-  grid % n_nodes = 0
+  Grid % n_nodes = 0
   rewind(fu)
-  do while(grid % n_nodes .eq. 0)
+  do while(Grid % n_nodes .eq. 0)
     call File_Mod_Read_Line(fu)
     if(line % n_tokens > 1) then
       if(line % tokens(1) .eq. '(10' .and. line % tokens(2) .eq. '(0') then
-        read(line % tokens(4), '(z160)') grid % n_nodes
-        print '(a34,i9)', ' # Number of nodes in header:     ', grid % n_nodes
+        read(line % tokens(4), '(z160)') Grid % n_nodes
+        print '(a34,i9)', ' # Number of nodes in header:     ', Grid % n_nodes
       end if
     end if
   end do
@@ -86,14 +86,14 @@
   !     Cells' section starts with '(12'     !
   !                                          !
   !------------------------------------------!
-  grid % n_cells = 0
+  Grid % n_cells = 0
   rewind(fu)
-  do while(grid % n_cells .eq. 0)
+  do while(Grid % n_cells .eq. 0)
     call File_Mod_Read_Line(fu)
     if(line % n_tokens > 1) then
       if(line % tokens(1) .eq. '(12' .and. line % tokens(2) .eq. '(0') then
-        read(line % tokens(4), '(z160)') grid % n_cells
-        print '(a34,i9)', ' # Number of cells in header:     ', grid % n_cells
+        read(line % tokens(4), '(z160)') Grid % n_cells
+        print '(a34,i9)', ' # Number of cells in header:     ', Grid % n_cells
       end if
     end if
   end do
@@ -104,14 +104,14 @@
   !     Faces' section starts with '(13'     !
   !                                          !
   !------------------------------------------!
-  grid % n_faces = 0
+  Grid % n_faces = 0
   rewind(fu)
-  do while(grid % n_faces .eq. 0)
+  do while(Grid % n_faces .eq. 0)
     call File_Mod_Read_Line(fu)
     if(line % n_tokens > 1) then
       if(line % tokens(1) .eq. '(13' .and. line % tokens(2) .eq. '(0') then
-        read(line % tokens(4), '(z160)') grid % n_faces
-        print '(a34,i9)', ' # Number of faces in header:     ', grid % n_faces
+        read(line % tokens(4), '(z160)') Grid % n_faces
+        print '(a34,i9)', ' # Number of faces in header:     ', Grid % n_faces
       end if
     end if
   end do
@@ -130,7 +130,7 @@
   n_faces     = 0
   the_end     = .false.
   rewind(fu)
-  do while(n_faces < grid % n_faces .and. .not. the_end)
+  do while(n_faces < Grid % n_faces .and. .not. the_end)
     call File_Mod_Read_Line(fu, reached_end=the_end)
     if(line % n_tokens > 1) then
 
@@ -246,9 +246,9 @@
   print '(a34,i9)', ' # Boundary cells from face data: ', n_bnd_cells
   print '(a34,i9)', ' # Boundary condition sections:   ', n_bnd_cond
 
-  grid % n_bnd_cells = n_bnd_cells
-  grid % n_bnd_cond  = n_bnd_cond
-  allocate(grid % bnd_cond % name(n_bnd_cond))
+  Grid % n_bnd_cells = n_bnd_cells
+  Grid % n_bnd_cond  = n_bnd_cond
+  allocate(Grid % bnd_cond % name(n_bnd_cond))
 
   !--------------------------------------------!
   !                                            !
@@ -257,7 +257,7 @@
   !                                            !
   !                                            !
   !--------------------------------------------!
-  call Allocate_Memory(grid)
+  call Allocate_Memory(Grid)
 
   !---------------------------!
   !                           !
@@ -272,7 +272,7 @@
   n_nodes = 0
   the_end = .false.
   rewind(fu)
-  do while(n_nodes < grid % n_nodes .and. .not. the_end)
+  do while(n_nodes < Grid % n_nodes .and. .not. the_end)
     call File_Mod_Read_Line(fu)
     if(line % n_tokens > 1) then
 
@@ -302,14 +302,14 @@
           n_nodes = n_nodes + 1
           if(ascii) then
             call File_Mod_Read_Line(fu)
-            read(line % tokens(1), *)  grid % xn(n)
-            read(line % tokens(2), *)  grid % yn(n)
-            read(line % tokens(3), *)  grid % zn(n)
+            read(line % tokens(1), *)  Grid % xn(n)
+            read(line % tokens(2), *)  Grid % yn(n)
+            read(line % tokens(3), *)  Grid % zn(n)
           else
             call File_Mod_Read_Binary_Real8_Array(fu, 3)
-            grid % xn(n) = real8_array(1)
-            grid % yn(n) = real8_array(2)
-            grid % zn(n) = real8_array(3)
+            Grid % xn(n) = real8_array(1)
+            Grid % yn(n) = real8_array(2)
+            Grid % zn(n) = real8_array(3)
           end if
         end do
 
@@ -339,7 +339,7 @@
   the_end = .false.
 
   rewind(fu)
-  do while(n_cells < grid % n_cells .and. .not. the_end)
+  do while(n_cells < Grid % n_cells .and. .not. the_end)
     call File_Mod_Read_Line(fu, reached_end=the_end)
     if(line % n_tokens > 1) then
       if( (line % tokens(1) .eq. '(12' .or. line % tokens(1) .eq. '(2012')  &
@@ -376,39 +376,39 @@
 
           if(zone_type .eq. CELL_TRI)   then
             n_tri = n_tri + n_cells_zone
-            grid % cells_n_nodes(cell_f:cell_l) = 3
-            grid % cells_n_faces(cell_f:cell_l) = 1
+            Grid % cells_n_nodes(cell_f:cell_l) = 3
+            Grid % cells_n_faces(cell_f:cell_l) = 1
           end if
           if(zone_type .eq. CELL_QUAD)  then
             n_quad = n_quad + n_cells_zone
-            grid % cells_n_nodes(cell_f:cell_l) = 4
-            grid % cells_n_faces(cell_f:cell_l) = 1
+            Grid % cells_n_nodes(cell_f:cell_l) = 4
+            Grid % cells_n_faces(cell_f:cell_l) = 1
           end if
           if(zone_type .eq. CELL_TETRA) then
             n_tet = n_tet + n_cells_zone
-            grid % cells_n_nodes(cell_f:cell_l) = 4
-            grid % cells_n_faces(cell_f:cell_l) = 4
+            Grid % cells_n_nodes(cell_f:cell_l) = 4
+            Grid % cells_n_faces(cell_f:cell_l) = 4
           end if
           if(zone_type .eq. CELL_HEXA)  then
             n_hexa = n_hexa + n_cells_zone
-            grid % cells_n_nodes(cell_f:cell_l) = 8
-            grid % cells_n_faces(cell_f:cell_l) = 6
+            Grid % cells_n_nodes(cell_f:cell_l) = 8
+            Grid % cells_n_faces(cell_f:cell_l) = 6
           end if
           if(zone_type .eq. CELL_PYRA)  then
             n_pyra  = n_pyra  + n_cells_zone
-            grid % cells_n_nodes(cell_f:cell_l) = 5
-            grid % cells_n_faces(cell_f:cell_l) = 5
+            Grid % cells_n_nodes(cell_f:cell_l) = 5
+            Grid % cells_n_faces(cell_f:cell_l) = 5
           end if
           if(zone_type .eq. CELL_WEDGE) then
             n_wed = n_wed + n_cells_zone
-            grid % cells_n_nodes(cell_f:cell_l) = 6
-            grid % cells_n_faces(cell_f:cell_l) = 5
+            Grid % cells_n_nodes(cell_f:cell_l) = 6
+            Grid % cells_n_faces(cell_f:cell_l) = 5
           end if
           if(zone_type .eq. CELL_POLY)  then
             n_poly  = n_poly  + n_cells_zone
-            grid % cells_n_nodes(cell_f:cell_l) = -1  ! attend
-            grid % cells_n_faces(cell_f:cell_l) = -1  ! have to attend too
-            grid % polyhedral = .true.
+            Grid % cells_n_nodes(cell_f:cell_l) = -1  ! attend
+            Grid % cells_n_faces(cell_f:cell_l) = -1  ! have to attend too
+            Grid % polyhedral = .true.
           end if
 
         !----------------------------------!
@@ -439,42 +439,42 @@
             ! Update the counters for cell types
             if(cell_type .eq. CELL_TRI) then
               n_tri = n_tri + 1
-              grid % cells_n_nodes(n_cells) = 3
-              grid % cells_n_faces(n_cells) = 1
+              Grid % cells_n_nodes(n_cells) = 3
+              Grid % cells_n_faces(n_cells) = 1
 
             else if(cell_type .eq. CELL_QUAD) then
               n_quad = n_quad + 1
-              grid % cells_n_nodes(n_cells) = 4
-              grid % cells_n_faces(n_cells) = 1
+              Grid % cells_n_nodes(n_cells) = 4
+              Grid % cells_n_faces(n_cells) = 1
 
             else if(cell_type .eq. CELL_TETRA) then
               n_tet = n_tet + 1
-              grid % cells_n_nodes(n_cells) = 4
-              grid % cells_n_faces(n_cells) = 4
+              Grid % cells_n_nodes(n_cells) = 4
+              Grid % cells_n_faces(n_cells) = 4
 
             else if(cell_type .eq. CELL_HEXA)  then
               n_hexa = n_hexa + 1
-              grid % cells_n_nodes(n_cells) = 8
-              grid % cells_n_faces(n_cells) = 6
+              Grid % cells_n_nodes(n_cells) = 8
+              Grid % cells_n_faces(n_cells) = 6
 
             else if(cell_type .eq. CELL_PYRA)  then
               n_pyra = n_pyra + 1
-              grid % cells_n_nodes(n_cells) = 5
-              grid % cells_n_faces(n_cells) = 5
+              Grid % cells_n_nodes(n_cells) = 5
+              Grid % cells_n_faces(n_cells) = 5
 
             else if(cell_type .eq. CELL_WEDGE) then
               n_wed = n_wed + 1
-              grid % cells_n_nodes(n_cells) = 6
-              grid % cells_n_faces(n_cells) = 5
+              Grid % cells_n_nodes(n_cells) = 6
+              Grid % cells_n_faces(n_cells) = 5
 
             else if(cell_type .eq. CELL_POLY) then
-              if(.not. grid % polyhedral) then
+              if(.not. Grid % polyhedral) then
                 print *, '# Found polyhedral cell(s), mesh is polyhedral!'
-                grid % polyhedral = .true.
+                Grid % polyhedral = .true.
               end if
               n_poly = n_poly + 1
-              grid % cells_n_nodes(n_cells) = 0
-              grid % cells_n_faces(n_cells) = 0
+              Grid % cells_n_nodes(n_cells) = 0
+              Grid % cells_n_faces(n_cells) = 0
 
             else
               print *, '# ERROR: Unsupported cell type', cell_type
@@ -523,7 +523,7 @@
   n_faces     = 0
   the_end     = .false.
   rewind(fu)
-  do while(n_faces < grid % n_faces .and. .not. the_end)
+  do while(n_faces < Grid % n_faces .and. .not. the_end)
     call File_Mod_Read_Line(fu, reached_end=the_end)
     if(line % n_tokens > 1) then
 
@@ -574,9 +574,9 @@
             if(ascii) then
               call File_Mod_Read_Line(fu)
               read(line % tokens(1), *) n_face_nodes
-              grid % faces_n_nodes(s) = n_face_nodes
+              Grid % faces_n_nodes(s) = n_face_nodes
               do i_nod = 1, n_face_nodes
-                read(line % tokens(1+i_nod), '(z160)') grid % faces_n(i_nod, s)
+                read(line % tokens(1+i_nod), '(z160)') Grid % faces_n(i_nod, s)
               end do
               read(line % tokens(1+n_face_nodes+1), '(z160)') c1
               read(line % tokens(1+n_face_nodes+2), '(z160)') c2
@@ -585,7 +585,7 @@
               n_face_nodes = int4_array(1)
               call File_Mod_Read_Binary_Int4_Array(fu, n_face_nodes)
               do i_nod = 1, n_face_nodes
-                grid % faces_n(i_nod, s) = int4_array(i_nod)
+                Grid % faces_n(i_nod, s) = int4_array(i_nod)
               end do
               call File_Mod_Read_Binary_Int4_Array(fu, 2)
               c1 = int4_array(1)
@@ -599,14 +599,14 @@
             if(ascii) then
               call File_Mod_Read_Line(fu)
               do i_nod = 1, n_face_nodes
-                read(line % tokens(0+i_nod), '(z160)') grid % faces_n(i_nod, s)
+                read(line % tokens(0+i_nod), '(z160)') Grid % faces_n(i_nod, s)
               end do
               read(line % tokens(0+n_face_nodes+1), '(z160)') c1
               read(line % tokens(0+n_face_nodes+2), '(z160)') c2
             else
               call File_Mod_Read_Binary_Int4_Array(fu, n_face_nodes)
               do i_nod = 1, n_face_nodes
-                grid % faces_n(i_nod, s) = int4_array(i_nod)
+                Grid % faces_n(i_nod, s) = int4_array(i_nod)
               end do
               call File_Mod_Read_Binary_Int4_Array(fu, 2)
               c1 = int4_array(1)
@@ -614,26 +614,26 @@
             end if
 
           end if
-          grid % faces_n_nodes(s) = n_face_nodes
+          Grid % faces_n_nodes(s) = n_face_nodes
 
           ! Case when c1 is a boundary cell
           if(c1 .eq. 0) then
             n_bnd_cells = n_bnd_cells + 1
-            grid % faces_c(1, n_faces) = c2
-            grid % faces_c(2, n_faces) = -n_bnd_cells
-            grid % bnd_cond % color(-n_bnd_cells) = face_sect_bnd(n_face_sect)
+            Grid % faces_c(1, n_faces) = c2
+            Grid % faces_c(2, n_faces) = -n_bnd_cells
+            Grid % bnd_cond % color(-n_bnd_cells) = face_sect_bnd(n_face_sect)
 
           ! Case when c2 is a boundary cell
           else if(c2 .eq. 0) then
             n_bnd_cells = n_bnd_cells + 1
-            grid % faces_c(1, n_faces) = c1
-            grid % faces_c(2, n_faces) = -n_bnd_cells
-            grid % bnd_cond % color(-n_bnd_cells) = face_sect_bnd(n_face_sect)
+            Grid % faces_c(1, n_faces) = c1
+            Grid % faces_c(2, n_faces) = -n_bnd_cells
+            Grid % bnd_cond % color(-n_bnd_cells) = face_sect_bnd(n_face_sect)
 
           ! Neither c1 nor c2 are boundary cells
           else
-            grid % faces_c(1, n_faces) = min(c1, c2)
-            grid % faces_c(2, n_faces) = max(c1, c2)
+            Grid % faces_c(1, n_faces) = min(c1, c2)
+            Grid % faces_c(2, n_faces) = max(c1, c2)
 
           end if
 
@@ -657,9 +657,9 @@
   !----------------------------!
   !   Check for faces' nodes   !
   !----------------------------!
-  do s = 1, grid % n_faces
-    do i_nod = 1, grid % faces_n_nodes(s)
-      n = grid % faces_n(i_nod, s)
+  do s = 1, Grid % n_faces
+    do i_nod = 1, Grid % faces_n_nodes(s)
+      n = Grid % faces_n(i_nod, s)
       if(n < 1) then
         print *, '# TROUBLE: some faces'' nodes have indexes less than 1!'
         print *, '# This error is critical.  Exiting now.!'
@@ -671,11 +671,11 @@
   !----------------------------------------!
   !   Check for duplicate nodes in faces   !
   !----------------------------------------!
-  do s = 1, grid % n_faces
-    n = grid % faces_n_nodes(s)
+  do s = 1, Grid % n_faces
+    n = Grid % faces_n_nodes(s)
     do i_nod = 1, n
       do j_nod = i_nod+1, n
-        if(grid % faces_n(i_nod, s) .eq. grid % faces_n(j_nod, s)) then
+        if(Grid % faces_n(i_nod, s) .eq. Grid % faces_n(j_nod, s)) then
           print *, '# ERROR!  Duplicate nodes in face: ', s
           print *, '# This error is critical, exiting! '
           stop
@@ -696,20 +696,20 @@
   print '(a60)', ' #=========================================================='
   print '(a60)', ' # Reconstructing cells (determining their nodes)           '
   print '(a60)', ' #----------------------------------------------------------'
-  allocate(cell_visited_from(grid % n_cells));  cell_visited_from(:) = 0
+  allocate(cell_visited_from(Grid % n_cells));  cell_visited_from(:) = 0
 
   !---------------------------------------------!
   !   Handle all boundary cells to start with   !
   !---------------------------------------------!
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1, s)
-    c2 = grid % faces_c(2, s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1, s)
+    c2 = Grid % faces_c(2, s)
 
     ! It is a boundary cell, just copy nodes
     if(c2 .lt. 0) then
-      n = grid % faces_n_nodes(s)
-      grid % cells_n_nodes(c2) = n
-      grid % cells_n(1:n, c2)  = grid % faces_n(1:n, s)
+      n = Grid % faces_n_nodes(s)
+      Grid % cells_n_nodes(c2) = n
+      Grid % cells_n(1:n, c2)  = Grid % faces_n(1:n, s)
     end if
   end do
 
@@ -724,14 +724,14 @@
   !     mark initial nodes for tets and wedges      !
   !                                                 !
   !-------------------------------------------------!
-  do s = 1, grid % n_faces
+  do s = 1, Grid % n_faces
 
     !--------------------------------------!
     !   Handle cells c1 and c2 in one go   !
     !--------------------------------------!
     do i_cel = 1, 2
 
-      c = grid % faces_c(i_cel, s)
+      c = Grid % faces_c(i_cel, s)
 
       if(c .gt. 0) then
 
@@ -739,11 +739,11 @@
         !   First visit to pyramid or hexa from quadrilateral face   !
         !    For hexahedra that's face 5, for pyramid it's face 1    !
         !------------------------------------------------------------!
-        if(grid % faces_n_nodes(s) .eq. 4) then
-          if( (grid % cells_n_nodes(c) .eq. 5  .or.   &
-               grid % cells_n_nodes(c) .eq. 8) .and.  &
+        if(Grid % faces_n_nodes(s) .eq. 4) then
+          if( (Grid % cells_n_nodes(c) .eq. 5  .or.   &
+               Grid % cells_n_nodes(c) .eq. 8) .and.  &
               cell_visited_from(c) .eq. 0) then
-            grid % cells_n(1:4, c) = grid % faces_n(1:4, s)
+            Grid % cells_n(1:4, c) = Grid % faces_n(1:4, s)
             cell_visited_from(c) = s
           end if
         end if
@@ -752,11 +752,11 @@
         !   First visit to tetrahedron or wedge from triangular face   !
         !             For both shapes that would be face 1             !
         !--------------------------------------------------------------!
-        if(grid % faces_n_nodes(s) .eq. 3) then
-          if( (grid % cells_n_nodes(c) .eq. 4  .or.   &
-               grid % cells_n_nodes(c) .eq. 6) .and.  &
+        if(Grid % faces_n_nodes(s) .eq. 3) then
+          if( (Grid % cells_n_nodes(c) .eq. 4  .or.   &
+               Grid % cells_n_nodes(c) .eq. 6) .and.  &
               cell_visited_from(c) .eq. 0) then
-            grid % cells_n(1:3, c) = grid % faces_n(1:3, s)
+            Grid % cells_n(1:3, c) = Grid % faces_n(1:3, s)
             cell_visited_from(c) = s
           end if
         end if  ! face is triangular
@@ -771,26 +771,26 @@
   !   Browse through all faces for the second visit   !
   !                                                   !
   !---------------------------------------------------!
-  do s = 1, grid % n_faces
+  do s = 1, Grid % n_faces
 
     !--------------------------------------!
     !   Handle cells c1 and c2 in one go   !
     !--------------------------------------!
     do i_cel = 1, 2
 
-      c = grid % faces_c(i_cel, s)
+      c = Grid % faces_c(i_cel, s)
 
       if(c .gt. 0) then
 
         !---------------------------!
         !   Face is quadrilateral   !
         !---------------------------!
-        if(grid % faces_n_nodes(s) .eq. 4) then
+        if(Grid % faces_n_nodes(s) .eq. 4) then
 
           !--------------------------------!
           !   Second visit to hexahedron   !
           !--------------------------------!
-          if( grid % cells_n_nodes(c) .eq. 8 .and.  &
+          if( Grid % cells_n_nodes(c) .eq. 8 .and.  &
               cell_visited_from(c) .ne.  s) then
 
             ! i_nod and j_nod, two consecutive nodes in the face
@@ -800,31 +800,31 @@
               l_nod = i_nod + 3;  if(l_nod > 4) l_nod = l_nod - 4
 
               ! Face 1 same sense of rotation (see Cell_Numbering_Neu.f90)
-              if(grid % faces_n(i_nod, s) .eq. grid % cells_n(1, c) .and.  &
-                 grid % faces_n(j_nod, s) .eq. grid % cells_n(2, c) ) then
-                grid % cells_n(6, c) = grid % faces_n(k_nod, s)
-                grid % cells_n(5, c) = grid % faces_n(l_nod, s)
+              if(Grid % faces_n(i_nod, s) .eq. Grid % cells_n(1, c) .and.  &
+                 Grid % faces_n(j_nod, s) .eq. Grid % cells_n(2, c) ) then
+                Grid % cells_n(6, c) = Grid % faces_n(k_nod, s)
+                Grid % cells_n(5, c) = Grid % faces_n(l_nod, s)
               end if
 
               ! Face 1 oposite sense of rotation (see Cell_Numbering_Neu.f90)
-              if(grid % faces_n(i_nod, s) .eq. grid % cells_n(2, c) .and.  &
-                 grid % faces_n(j_nod, s) .eq. grid % cells_n(1, c) ) then
-                grid % cells_n(5, c) = grid % faces_n(k_nod, s)
-                grid % cells_n(6, c) = grid % faces_n(l_nod, s)
+              if(Grid % faces_n(i_nod, s) .eq. Grid % cells_n(2, c) .and.  &
+                 Grid % faces_n(j_nod, s) .eq. Grid % cells_n(1, c) ) then
+                Grid % cells_n(5, c) = Grid % faces_n(k_nod, s)
+                Grid % cells_n(6, c) = Grid % faces_n(l_nod, s)
               end if
 
               ! Face 3 same sense of rotation (see Cell_Numbering_Neu.f90)
-              if(grid % faces_n(i_nod, s) .eq. grid % cells_n(3, c) .and.  &
-                 grid % faces_n(j_nod, s) .eq. grid % cells_n(4, c) ) then
-                grid % cells_n(8, c) = grid % faces_n(k_nod, s)
-                grid % cells_n(7, c) = grid % faces_n(l_nod, s)
+              if(Grid % faces_n(i_nod, s) .eq. Grid % cells_n(3, c) .and.  &
+                 Grid % faces_n(j_nod, s) .eq. Grid % cells_n(4, c) ) then
+                Grid % cells_n(8, c) = Grid % faces_n(k_nod, s)
+                Grid % cells_n(7, c) = Grid % faces_n(l_nod, s)
               end if
 
               ! Face 3 oposite sense of rotation (see Cell_Numbering_Neu.f90)
-              if(grid % faces_n(i_nod, s) .eq. grid % cells_n(4, c) .and.  &
-                 grid % faces_n(j_nod, s) .eq. grid % cells_n(3, c) ) then
-                grid % cells_n(7, c) = grid % faces_n(k_nod, s)
-                grid % cells_n(8, c) = grid % faces_n(l_nod, s)
+              if(Grid % faces_n(i_nod, s) .eq. Grid % cells_n(4, c) .and.  &
+                 Grid % faces_n(j_nod, s) .eq. Grid % cells_n(3, c) ) then
+                Grid % cells_n(7, c) = Grid % faces_n(k_nod, s)
+                Grid % cells_n(8, c) = Grid % faces_n(l_nod, s)
               end if
 
             end do
@@ -833,7 +833,7 @@
           !-----------------------------------------------------------!
           !   Second time you visit a wedge from quadrilateral face   !
           !-----------------------------------------------------------!
-          if( grid % cells_n_nodes(c) .eq. 6 .and.  &
+          if( Grid % cells_n_nodes(c) .eq. 6 .and.  &
               cell_visited_from(c) .ne.  s) then
 
             ! i_nod and j_nod, two consecutive nodes in the face
@@ -843,31 +843,31 @@
               l_nod = i_nod + 3;  if(l_nod > 4) l_nod = l_nod - 4
 
               ! Face 1 same sense of rotation (see Cell_Numbering_Neu.f90)
-              if(grid % faces_n(i_nod, s) .eq. grid % cells_n(1, c) .and.  &
-                 grid % faces_n(j_nod, s) .eq. grid % cells_n(2, c) ) then
-                grid % cells_n(5, c) = grid % faces_n(k_nod, s)
-                grid % cells_n(4, c) = grid % faces_n(l_nod, s)
+              if(Grid % faces_n(i_nod, s) .eq. Grid % cells_n(1, c) .and.  &
+                 Grid % faces_n(j_nod, s) .eq. Grid % cells_n(2, c) ) then
+                Grid % cells_n(5, c) = Grid % faces_n(k_nod, s)
+                Grid % cells_n(4, c) = Grid % faces_n(l_nod, s)
               end if
 
               ! Face 1 oposite sense of rotation (see Cell_Numbering_Neu.f90)
-              if(grid % faces_n(i_nod, s) .eq. grid % cells_n(2, c) .and.  &
-                 grid % faces_n(j_nod, s) .eq. grid % cells_n(1, c) ) then
-                grid % cells_n(4, c) = grid % faces_n(k_nod, s)
-                grid % cells_n(5, c) = grid % faces_n(l_nod, s)
+              if(Grid % faces_n(i_nod, s) .eq. Grid % cells_n(2, c) .and.  &
+                 Grid % faces_n(j_nod, s) .eq. Grid % cells_n(1, c) ) then
+                Grid % cells_n(4, c) = Grid % faces_n(k_nod, s)
+                Grid % cells_n(5, c) = Grid % faces_n(l_nod, s)
               end if
 
               ! Face 2 same sense of rotation (see Cell_Numbering_Neu.f90)
-              if(grid % faces_n(i_nod, s) .eq. grid % cells_n(2, c) .and.  &
-                 grid % faces_n(j_nod, s) .eq. grid % cells_n(3, c) ) then
-                grid % cells_n(6, c) = grid % faces_n(k_nod, s)
-                grid % cells_n(5, c) = grid % faces_n(l_nod, s)
+              if(Grid % faces_n(i_nod, s) .eq. Grid % cells_n(2, c) .and.  &
+                 Grid % faces_n(j_nod, s) .eq. Grid % cells_n(3, c) ) then
+                Grid % cells_n(6, c) = Grid % faces_n(k_nod, s)
+                Grid % cells_n(5, c) = Grid % faces_n(l_nod, s)
               end if
 
               ! Face 2 oposite sense of rotation (see Cell_Numbering_Neu.f90)
-              if(grid % faces_n(i_nod, s) .eq. grid % cells_n(3, c) .and.  &
-                 grid % faces_n(j_nod, s) .eq. grid % cells_n(2, c) ) then
-                grid % cells_n(5, c) = grid % faces_n(k_nod, s)
-                grid % cells_n(6, c) = grid % faces_n(l_nod, s)
+              if(Grid % faces_n(i_nod, s) .eq. Grid % cells_n(3, c) .and.  &
+                 Grid % faces_n(j_nod, s) .eq. Grid % cells_n(2, c) ) then
+                Grid % cells_n(5, c) = Grid % faces_n(k_nod, s)
+                Grid % cells_n(6, c) = Grid % faces_n(l_nod, s)
               end if
 
             end do
@@ -879,19 +879,19 @@
         !------------------------!
         !   Face is triangular   !
         !------------------------!
-        if(grid % faces_n_nodes(s) .eq. 3) then
+        if(Grid % faces_n_nodes(s) .eq. 3) then
 
           !-------------------------------------------------------------!
           !   Second time you visit a pyramid from triangular face      !
           !   (For pyramid, one node still missing, any face will do)   !
           !-------------------------------------------------------------!
-          if( grid % cells_n_nodes(c) .eq. 5 .and.  &
+          if( Grid % cells_n_nodes(c) .eq. 5 .and.  &
               cell_visited_from(c) .ne.  s   .and.  &
               cell_visited_from(c) .ne. -1) then
             do i_nod = 1, 3
-              if(all(grid % cells_n(1:4, c) .ne.  &
-                     grid % faces_n(i_nod, s))) then
-                grid % cells_n(5, c) = grid % faces_n(i_nod, s)
+              if(all(Grid % cells_n(1:4, c) .ne.  &
+                     Grid % faces_n(i_nod, s))) then
+                Grid % cells_n(5, c) = Grid % faces_n(i_nod, s)
               end if
             end do
 
@@ -903,13 +903,13 @@
           !   Second time you visit a tetrahedron from triangular face      !
           !   (For tetrahedron, one node still missing, any face will do)   !
           !-----------------------------------------------------------------!
-          if( grid % cells_n_nodes(c) .eq. 4 .and.  &
+          if( Grid % cells_n_nodes(c) .eq. 4 .and.  &
               cell_visited_from(c) .ne.  s   .and.  &
               cell_visited_from(c) .ne. -1) then
             do i_nod = 1, 3
-              if(all(grid % cells_n(1:3, c) .ne.  &
-                     grid % faces_n(i_nod, s))) then
-                grid % cells_n(4, c) = grid % faces_n(i_nod, s)
+              if(all(Grid % cells_n(1:3, c) .ne.  &
+                     Grid % faces_n(i_nod, s))) then
+                Grid % cells_n(4, c) = Grid % faces_n(i_nod, s)
               end if
             end do
 
@@ -928,34 +928,34 @@
   !   Find cells' faces   !
   !                       !
   !-----------------------!
-  call Grid_Mod_Find_Cells_Faces(grid)
+  call Grid % Find_Cells_Faces()
 
   !--------------------------------------------------------------------!
   !                                                                    !
   !   With faces counted and stored, store nodes for each polyhedron   !
   !                                                                    !
   !--------------------------------------------------------------------!
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
 
     ! Only do this for polyhedral cells
     ! (For the other it was done above)
-    if(grid % cells_n_nodes(c) .eq. -1) then
+    if(Grid % cells_n_nodes(c) .eq. -1) then
 
       ! Accumulate nodes from all faces surrounding the cell
       n = 0
-      do i_fac = 1, grid % cells_n_faces(c)
-        s = grid % cells_f(i_fac, c)           ! take true face index
-        do i_nod = 1, grid % faces_n_nodes(s)
+      do i_fac = 1, Grid % cells_n_faces(c)
+        s = Grid % cells_f(i_fac, c)           ! take true face index
+        do i_nod = 1, Grid % faces_n_nodes(s)
           n = n + 1
-          all_nodes(n) = grid % faces_n(i_nod, s)
+          all_nodes(n) = Grid % faces_n(i_nod, s)
         end do
       end do
 
       ! Perform a unique sort to remove duplicates
       call Sort % Unique_Int(all_nodes(1:n), n)
 
-      grid % cells_n(1:n, c)  = all_nodes(1:n)
-      grid % cells_n_nodes(c) = -n
+      Grid % cells_n(1:n, c)  = all_nodes(1:n)
+      Grid % cells_n_nodes(c) = -n
 
     end if  ! if cell was polyhedral
 
@@ -964,9 +964,9 @@
   !----------------------------!
   !   Check for cells' nodes   !
   !----------------------------!
-  do c = 1, grid % n_cells
-    do i_nod = 1, abs(grid % cells_n_nodes(c))
-      n = grid % cells_n(i_nod, c)
+  do c = 1, Grid % n_cells
+    do i_nod = 1, abs(Grid % cells_n_nodes(c))
+      n = Grid % cells_n(i_nod, c)
       if(n < 1) then
         print *, '# ERROR: some cells'' nodes have indexes less than 1!'
         print *, '# This error is critical.  Exiting now.!'
@@ -978,11 +978,11 @@
   !----------------------------------------!
   !   Check for duplicate nodes in cells   !
   !----------------------------------------!
-  do c = 1, grid % n_cells
-    n = abs(grid % cells_n_nodes(c))
+  do c = 1, Grid % n_cells
+    n = abs(Grid % cells_n_nodes(c))
     do i_nod = 1, n
       do j_nod = i_nod+1, n
-        if(grid % cells_n(i_nod, c) .eq. grid % cells_n(j_nod, c)) then
+        if(Grid % cells_n(i_nod, c) .eq. Grid % cells_n(j_nod, c)) then
           print *, '# ERROR!  Duplicate nodes in cell: ', c
           print *, '# This error is critical, exiting! '
           stop
@@ -998,7 +998,7 @@
   !                                                            !
   !                                                            !
   !   Browse through all sections (fluid, boundary, and what   !
-  !    ever) to store number of boundary conditions to grid    !
+  !    ever) to store number of boundary conditions to Grid    !
   !                                                            !
   !                                                            !
   !------------------------------------------------------------!
@@ -1026,7 +1026,7 @@
           if(face_sect_bnd(n) .ne. 0) then
             if(face_sect_pos(n) .eq. pos) then
               call To_Upper_Case(one_token)
-              grid % bnd_cond % name(face_sect_bnd(n)) = one_token
+              Grid % bnd_cond % name(face_sect_bnd(n)) = one_token
             end if
           end if
         end do

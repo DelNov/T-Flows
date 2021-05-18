@@ -14,7 +14,7 @@
   type(Swarm_Type), target :: swarm
   integer, intent(in)      :: ts   ! time step
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u, v, w, t
   type(Face_Type), pointer :: flux
@@ -34,7 +34,7 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   bulk => Flow % bulk
   call Flow % Alias_Momentum(u, v, w)
   call Flow % Alias_Energy  (t)
@@ -127,11 +127,11 @@
   !   Average the results   !
   !-------------------------!
   do i = 1, n_prob-1
-    do c = 1, grid % n_cells - grid % comm % n_buff_cells 
-      if(grid % zc(c) > (z_p(i)) .and.  &
-         grid % zc(c) < (z_p(i+1))) then
+    do c = 1, Grid % n_cells - Grid % comm % n_buff_cells 
+      if(Grid % zc(c) > (z_p(i)) .and.  &
+         Grid % zc(c) < (z_p(i+1))) then
 
-        wall_p(i) = wall_p(i) + grid % wall_dist(c)
+        wall_p(i) = wall_p(i) + Grid % wall_dist(c)
         u_p   (i) = u_p   (i) + turb % u_mean(c)
         v_p   (i) = v_p   (i) + turb % v_mean(c)
         w_p   (i) = w_p   (i) + turb % w_mean(c)
@@ -248,9 +248,9 @@
 
   if(Flow % heat_transfer) then
     d_wall = 0.0 
-    do c = 1, grid % n_cells
-      if(grid % wall_dist(c) > d_wall) then
-        d_wall = grid % wall_dist(c)
+    do c = 1, Grid % n_cells
+      if(Grid % wall_dist(c) > d_wall) then
+        d_wall = Grid % wall_dist(c)
         t_inf  = turb % t_mean(c)
       end if
     end do
@@ -263,12 +263,12 @@
       call Comm_Mod_Global_Max_Real(t_inf)
     end if
 
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
       if(c2  < 0) then
-        if( Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. WALL .or.  &
-            Grid_Mod_Bnd_Cond_Type(grid, c2) .eq. WALLFL) then
+        if( Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
+            Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
 
           t_wall   = t_wall + turb % t_mean(c2)
           nu_mean  = nu_mean + t % q(c2)  &

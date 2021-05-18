@@ -17,7 +17,7 @@
   type(Turb_Type),  target :: turb
   type(Vof_Type),   target :: Vof
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u, v, w, t, phi
   type(Var_Type),  pointer :: kin, eps, zeta, f22, t2
@@ -28,7 +28,7 @@
 !==============================================================================!
 
   ! Take aliases
-  grid   => Flow % pnt_grid
+  Grid   => Flow % pnt_grid
   bulk   => Flow % bulk
   v_flux => Flow % v_flux
   dt     =  Flow % dt
@@ -66,13 +66,13 @@
   !                        !
   !------------------------!
 
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
     ! On the boundary perform the extrapolation
     if(c2 < 0) then
-      if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) ) then
+      if( (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) ) then
         u % n(c2) = u % n(c2)                      &
                   - ( bulk % u * u % x(c1)         &
                     + bulk % v * u % y(c1)         &
@@ -107,13 +107,13 @@
       call Flow % Grad_Variable(t2)
     end if
 
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
 
       ! On the boundary perform the extrapolation
       if(c2 < 0) then
-        if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) ) then
+        if( (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) ) then
           kin % n(c2) = kin % n(c2)                       &
                       - ( bulk % u * kin % x(c1)          &
                         + bulk % v * kin % y(c1)          &
@@ -148,13 +148,13 @@
       call Flow % Grad_Variable(t2)
     end if
 
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
 
       ! On the boundary perform the extrapolation
       if(c2 < 0) then
-        if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) ) then
+        if( (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) ) then
           kin % n(c2) = kin % n(c2)                       &
                       - ( bulk % u * kin % x(c1)          &
                         + bulk % v * kin % y(c1)          &
@@ -201,13 +201,13 @@
       call Flow % Grad_Variable(f22)
     end if
 
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
 
       ! On the boundary perform the extrapolation
       if(c2 < 0) then
-        if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) ) then
+        if( (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) ) then
           uu % n(c2) = uu % n(c2)                          &
                       - ( bulk % u * uu % x(c1)            &
                         + bulk % v * uu % y(c1)            &
@@ -256,13 +256,13 @@
 
     call Flow % Grad_Variable(phi)
 
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
 
       ! On the boundary perform the extrapolation
       if(c2 < 0) then
-        if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) ) then
+        if( (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) ) then
           phi % n(c2) = phi % n(c2)                      &
                       - ( bulk % u * phi % x(c1)         &
                         + bulk % v * phi % y(c1)         &
@@ -278,13 +278,13 @@
     ! stored already in t % x, t % y and t % z, check it
     call Flow % Grad_Variable(t)
 
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
 
       ! On the boundary perform the extrapolation
       if(c2 < 0) then
-        if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT) ) then
+        if( (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) ) then
           t % n(c2) = t % n(c2)                      &
                     - ( bulk % u * t % x(c1)         &
                       + bulk % v * t % y(c1)         &

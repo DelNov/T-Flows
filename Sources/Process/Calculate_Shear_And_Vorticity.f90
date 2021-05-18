@@ -16,13 +16,13 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: Flow
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: u, v, w
   integer                  :: c
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   call Flow % Alias_Momentum(u, v, w)
 
   ! Velocity gradients
@@ -30,7 +30,7 @@
   call Flow % Grad_Variable(Flow % v)
   call Flow % Grad_Variable(Flow % w)
 
-  do c = -grid % n_bnd_cells, grid % n_cells
+  do c = -Grid % n_bnd_cells, Grid % n_cells
     Flow % shear(c) = u % x(c)**2                     &
                     + v % y(c)**2                     &
                     + w % z(c)**2                     &

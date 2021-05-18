@@ -10,8 +10,8 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type), target :: turb
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type), pointer :: flow
-  type(Grid_Type),  pointer :: grid
+  type(Field_Type), pointer :: Flow
+  type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: u, v, w
   type(Var_Type),   pointer :: kin, eps
   type(Var_Type),   pointer :: uu, vv, ww, uv, uw, vw
@@ -31,15 +31,15 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
-  flow => turb % pnt_flow
-  grid => flow % pnt_grid
+  Flow => turb % pnt_flow
+  Grid => Flow % pnt_grid
   call Flow % Alias_Momentum(u, v, w)
   call Turb_Mod_Alias_K_Eps    (turb, kin, eps)
   call Turb_Mod_Alias_Stresses (turb, uu, vv, ww, uv, uw, vw)
 
-  call Calculate_Shear_And_Vorticity(flow)
+  call Calculate_Shear_And_Vorticity(Flow)
 
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     kin % n(c) = 0.5*max(uu % n(c) + vv % n(c) + ww % n(c), TINY)
 
     cmu_mod = max(-(  uu % n(c) * u % x(c)               &
@@ -48,14 +48,14 @@
                     + uv % n(c) * (v % x(c) + u % y(c))  &
                     + uw % n(c) * (u % z(c) + w % x(c))  &
                     + vw % n(c) * (v % z(c) + w % y(c))) &
-      / (kin % n(c) * turb % t_scale(c) * flow % shear(c)**2 + TINY), 0.0)
+      / (kin % n(c) * turb % t_scale(c) * Flow % shear(c)**2 + TINY), 0.0)
 
     cmu_mod = min(0.12, cmu_mod)
-    turb % vis_t(c) = cmu_mod * flow % density(c)  &
+    turb % vis_t(c) = cmu_mod * Flow % density(c)  &
                     * kin % n(c) * turb % t_scale(c)
     turb % vis_t(c) = max(turb % vis_t(c), TINY)
   end do
 
-  call Grid_Mod_Exchange_Cells_Real(grid, turb % vis_t)
+  call Grid % Exchange_Cells_Real(turb % vis_t)
 
   end subroutine

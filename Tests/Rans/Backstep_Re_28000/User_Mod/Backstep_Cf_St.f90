@@ -12,7 +12,7 @@
   real :: Y_Plus_Low_Re
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   integer                  :: n_prob, pl, c, dummy, i, count, k, c1, c2, s, fu
   character(SL)            :: result_name
   real, allocatable        :: r1_p(:), r2_p(:), z_p(:),  &
@@ -30,7 +30,7 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   u    => Flow % u
   v    => Flow % v
   w    => Flow % w
@@ -89,26 +89,26 @@
   !   Average the results   !
   !-------------------------!
   do i = 1, n_prob-1
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
       if(c2 < 0) then
-        if(Grid_Mod_Bnd_Cond_Type(grid,c2).eq.WALLFL.and.t % q(c2) > 1.e-8) then
-          if(grid % xc(c1) > z_p(i) .and. grid % xc(c1) < z_p(i+1)) then
+        if(Grid % Bnd_Cond_Type(c2).eq.WALLFL.and.t % q(c2) > 1.e-8) then
+          if(Grid % xc(c1) > z_p(i) .and. Grid % xc(c1) < z_p(i+1)) then
             um_p(i)   = um_p(i) + u % n(c1)
             vm_p(i)   = vm_p(i) + v % n(c1)
             wm_p(i)   = wm_p(i) + w % n(c1)
             if(turb % y_plus(c1) < 4.0) then
               v1_p(i) = v1_p(i)  &
                       + (2.0 * visc_const * u % n(c1)   &
-                             / grid % wall_dist(c1))   &
+                             / Grid % wall_dist(c1))   &
                       / (dens_const * 11.3**2)
             else
               kin_vis = visc_const / dens_const
               u_tan = Flow % U_Tan(s)
               u_tau = c_mu25 * sqrt(turb % kin % n(c1))
               turb % y_plus(c1) = Y_Plus_Low_Re(turb, u_tau,                 &
-                                                grid % wall_dist(c1),  &
+                                                Grid % wall_dist(c1),  &
                                                 kin_vis)
               tau_wall = dens_const * kappa * u_tau * u_tan    &
                        / log(e_log*max(turb % y_plus(c1), 1.05))

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Sort_Face_Nodes(grid, s, concave_link)
+  subroutine Sort_Face_Nodes(Grid, s, concave_link)
 !------------------------------------------------------------------------------!
 !   Sort nodes of a given face in rotational fashion                           !
 !------------------------------------------------------------------------------!
@@ -8,9 +8,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Grid_Type) :: Grid
   integer         :: s
-  integer         :: concave_link(2, grid % n_nodes)
+  integer         :: concave_link(2, Grid % n_nodes)
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i, j, n, nn, cnt
   real    :: normal_p(3), center_p(3), x_p(3), y_p(3), sense(3)
@@ -27,7 +27,7 @@
 !==============================================================================!
 
   ! Take alias
-  nn = grid % faces_n_nodes(s)
+  nn = Grid % faces_n_nodes(s)
 
   !---------------------------------------------------------------!
   !   A way to deal with concave faces.  Mark its concave node,   !
@@ -41,23 +41,23 @@
   cnt    = 0  ! not really needed; it seems that each face can have only one
   conc_n = 0
   do i = 1, nn
-    n = grid % faces_n(i, s)
+    n = Grid % faces_n(i, s)
     if(concave_link(1, n) .gt. 0 .and. concave_link(2, n) .gt. 0) then
       conc_n = n
       cnt    = cnt + 1
 
       ! Store concave node coordinates
-      conc_xn = grid % xn(n)
-      conc_yn = grid % yn(n)
-      conc_zn = grid % zn(n)
+      conc_xn = Grid % xn(n)
+      conc_yn = Grid % yn(n)
+      conc_zn = Grid % zn(n)
 
       ! Move the concave node in a convex position
-      grid % xn(n) = 0.5 * (  grid % xn(concave_link(1, n))     &
-                            + grid % xn(concave_link(2, n))  )
-      grid % yn(n) = 0.5 * (  grid % yn(concave_link(1, n))     &
-                            + grid % yn(concave_link(2, n))  )
-      grid % zn(n) = 0.5 * (  grid % zn(concave_link(1, n))     &
-                            + grid % zn(concave_link(2, n))  )
+      Grid % xn(n) = 0.5 * (  Grid % xn(concave_link(1, n))     &
+                            + Grid % xn(concave_link(2, n))  )
+      Grid % yn(n) = 0.5 * (  Grid % yn(concave_link(1, n))     &
+                            + Grid % yn(concave_link(2, n))  )
+      Grid % zn(n) = 0.5 * (  Grid % zn(concave_link(1, n))     &
+                            + Grid % zn(concave_link(2, n))  )
     end if
   end do
   ! if(cnt .eq. 1) print *, '# Found a concave link in face', s
@@ -68,10 +68,10 @@
   !-----------------------------------!
   center_p(:) = 0
   do i = 1, nn
-    n = grid % faces_n(i, s)
-    center_p(1) = center_p(1) + grid % xn(n)
-    center_p(2) = center_p(2) + grid % yn(n)
-    center_p(3) = center_p(3) + grid % zn(n)
+    n = Grid % faces_n(i, s)
+    center_p(1) = center_p(1) + Grid % xn(n)
+    center_p(2) = center_p(2) + Grid % yn(n)
+    center_p(3) = center_p(3) + Grid % zn(n)
   end do
   center_p(1:3) = center_p(1:3) / real(nn)
 
@@ -79,10 +79,10 @@
   !   Find nodes' relative positions to the center just calculated   !
   !------------------------------------------------------------------!
   do i = 1, nn  ! use "i", not "i_nod" here
-    n = grid % faces_n(i, s)
-    rp_3d(1, i) = grid % xn(n) - center_p(1)
-    rp_3d(2, i) = grid % yn(n) - center_p(2)
-    rp_3d(3, i) = grid % zn(n) - center_p(3)
+    n = Grid % faces_n(i, s)
+    rp_3d(1, i) = Grid % xn(n) - center_p(1)
+    rp_3d(2, i) = Grid % yn(n) - center_p(2)
+    rp_3d(3, i) = Grid % zn(n) - center_p(3)
   end do
 
   !--------------------------------!
@@ -151,18 +151,18 @@
 
   ! Project relative points to the plane's coordinate system
   do i = 1, nn  ! use "i", not "i_nod" here
-    n = grid % faces_n(i, s)
+    n = Grid % faces_n(i, s)
     rp_2d(1, i) = dot_product(x_p(1:3), rp_3d(1:3, i))
     rp_2d(2, i) = dot_product(y_p(1:3), rp_3d(1:3, i))
   end do
 
   do i = 1, nn  ! use "i", not "i_nod" here
     sorting(i) = atan2(rp_2d(1,i), rp_2d(2,i)) * 57.2957795131
-    order(i) = grid % faces_n(i, s)
+    order(i) = Grid % faces_n(i, s)
   end do
 
   call Sort % Real_Carry_Two_Int(sorting(1:nn),           &
-                                 grid % faces_n(1:nn,s),  &
+                                 Grid % faces_n(1:nn,s),  &
                                  order(1:nn))
 
   !---------------------------------------------------------------!
@@ -176,11 +176,11 @@
   !---------------------------------------------------------------!
   if(conc_n .ne. 0) then
     do i = 1, nn
-      n = grid % faces_n(i, s)
+      n = Grid % faces_n(i, s)
       if(n .eq. conc_n) then
-        grid % xn(n) = conc_xn
-        grid % yn(n) = conc_yn
-        grid % zn(n) = conc_zn
+        Grid % xn(n) = conc_xn
+        Grid % yn(n) = conc_yn
+        Grid % zn(n) = conc_zn
       end if
     end do
   end if
@@ -193,7 +193,7 @@
   if(conc_n .ne. 0) then
     do while(order(1) .ne. conc_n)
       order(1:nn)             = cshift(order(1:nn), 1)
-      grid % faces_n(1:nn, s) = cshift(grid % faces_n(1:nn, s), 1)
+      Grid % faces_n(1:nn, s) = cshift(Grid % faces_n(1:nn, s), 1)
     end do
   end if
 

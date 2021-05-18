@@ -42,7 +42,7 @@
   type(Vof_Type),    target :: Vof
   type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),   pointer :: grid
+  type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: u, v, w, p
   type(Face_Type),   pointer :: v_flux          ! volume flux
   type(Var_Type),    pointer :: col             ! sharp color function
@@ -56,7 +56,7 @@
   call Cpu_Timer % Start('Rhie_And_Chow')
 
   ! Take aliases
-  grid   => Flow % pnt_grid
+  Grid   => Flow % pnt_grid
   p      => Flow % p
   v_flux => Flow % v_flux
   col    => Vof % fun
@@ -66,13 +66,13 @@
   call Flow % Alias_Momentum(u, v, w)
 
   !--------------------------------------!
-  !   Store grid % vol(c) / M % sav(c)   !
+  !   Store Grid % vol(c) / M % sav(c)   !
   !--------------------------------------!
   ! Units here: m^3 s / kg
   ! Remember:  M   is big in liquid, small in gas
   ! meaaning:  v_m is big in gas, small in liquid
-  do c = 1, grid % n_cells
-    v_m(c) = grid % vol(c) / M % sav(c)
+  do c = 1, Grid % n_cells
+    v_m(c) = Grid % vol(c) / M % sav(c)
   end do
 
   !------------------------------------------------------------------!
@@ -80,16 +80,16 @@
   !------------------------------------------------------------------!
 
   ! Pressure gradients
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     pst_x(c) = p % x(c)
     pst_y(c) = p % y(c)
     pst_z(c) = p % z(c)
   end do
 
   ! Pressure differences
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
     pst_d(s) = p % n(c1) - p % n(c2)
   end do
 
@@ -101,17 +101,17 @@
      Vof % surface_tension > TINY) then
 
     ! Surface tension gradients
-    do c = 1, grid % n_cells
+    do c = 1, Grid % n_cells
       pst_x(c) = pst_x(c) - sigma * Vof % curv(c) * col % x(c)
       pst_y(c) = pst_y(c) - sigma * Vof % curv(c) * col % y(c)
       pst_z(c) = pst_z(c) - sigma * Vof % curv(c) * col % z(c)
     end do
 
     ! Surface tension differences
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
-      fs = grid % f(s)
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
+      fs = Grid % f(s)
 
       ! Curvature at the face; unit: [1/m]
       curv_f = fs * Vof % curv(c1) + (1.0-fs) * Vof % curv(c2)
@@ -123,7 +123,7 @@
   !--------------------------------------!
   !   Take velocities as last computed   !
   !--------------------------------------!
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     u_c(c) = Flow % u % n(c)
     v_c(c) = Flow % v % n(c)
     w_c(c) = Flow % w % n(c)
@@ -143,10 +143,10 @@
       w_oo = -0.5
     end if
 
-    do c = 1, grid % n_cells
+    do c = 1, Grid % n_cells
 
       ! Unit for t_m: m^3 * kg/m^3 / s * s/kg = 1
-      t_m(c) = (grid % vol(c) * Flow % density(c) / Flow % dt) / M % sav(c)
+      t_m(c) = (Grid % vol(c) * Flow % density(c) / Flow % dt) / M % sav(c)
 
       u_c(c) = u_c(c) - (w_o * u % o(c) + w_oo * u % oo(c)) * t_m(c)
       v_c(c) = v_c(c) - (w_o * v % o(c) + w_oo * v % oo(c)) * t_m(c)
@@ -159,7 +159,8 @@
   !   Gu's correction, part 1: subtract the cell-centered body forces   !
   !---------------------------------------------------------------------!
   if(Flow % gu_correction) then
-    do c = 1, grid % n_cells
+
+    do c = 1, Grid % n_cells
 
       ! Units: m^3 s/kg * kg /(m^2 s^2) = m / s
       u_c(c) = u_c(c) - v_m(c) * Flow % cell_fx(c)
@@ -172,10 +173,10 @@
   !-------------------------------------------------!
   !   Calculate the mass fluxes on the cell faces   !
   !-------------------------------------------------!
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
-    fs = grid % f(s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
+    fs = Grid % f(s)
 
     ! Face is inside the domain
     if(c2 > 0) then
@@ -199,22 +200,22 @@
       ! that this interpolation is gas-biased, which is a good thing
       px_f = (       fs  * (pst_x(c1)*v_m(c1))    &
               + (1.0-fs) * (pst_x(c2)*v_m(c2)) )  &
-            * grid % dx(s)
+            * Grid % dx(s)
       py_f = (       fs  * (pst_y(c1)*v_m(c1))    &
               + (1.0-fs) * (pst_y(c2)*v_m(c2)) )  &
-            * grid % dy(s)
+            * Grid % dy(s)
       pz_f = (       fs  * (pst_z(c1)*v_m(c1))    &
               + (1.0-fs) * (pst_z(c2)*v_m(c2)) )  &
-            * grid % dz(s)
+            * Grid % dz(s)
 
       ! Calculate mass or volume flux through cell face
       ! Units in lines which follow:
       ! m^3 / s = m/s * m^2
       !         + m^4 s / kg * kg / (m s^2)
       !         + m * m^2/s = m^3/s
-      v_flux % n(s) = (  u_f(s) * grid % sx(s)             &
-                       + v_f(s) * grid % sy(s)             &
-                       + w_f(s) * grid % sz(s) )           &
+      v_flux % n(s) = (  u_f(s) * Grid % sx(s)             &
+                       + v_f(s) * Grid % sy(s)             &
+                       + w_f(s) * Grid % sz(s) )           &
                        + a12 * pst_d(s)                    &
                        + A % fc(s) * (px_f + py_f + pz_f)
 
@@ -235,9 +236,9 @@
       if(Flow % gu_correction) then
         v_flux % n(s) = v_flux % n(s)                          &
                       + (fs * v_m(c1) + (1.0-fs) * v_m(c2))    &
-                      * (  Flow % face_fx(s) * grid % sx(s)    &
-                         + Flow % face_fy(s) * grid % sy(s)    &
-                         + Flow % face_fz(s) * grid % sz(s) )
+                      * (  Flow % face_fx(s) * Grid % sx(s)    &
+                         + Flow % face_fy(s) * Grid % sy(s)    &
+                         + Flow % face_fz(s) * Grid % sz(s) )
       end if  ! gu_correction
 
     end if

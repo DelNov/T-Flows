@@ -24,7 +24,7 @@
   !----------------!
   type Front_Type
 
-    type(Grid_Type),  pointer :: pnt_grid  ! grid for which it is defined
+    type(Grid_Type),  pointer :: pnt_grid  ! Grid for which it is defined
     type(Field_Type), pointer :: pnt_flow  ! flow field for which it is defined
 
     integer                      :: n_elems
@@ -34,7 +34,7 @@
     type(Elem_Type), allocatable :: elem(:)
     type(Side_Type), allocatable :: side(:)
 
-    ! Front to static grid connectivity
+    ! Front to static Grid connectivity
     integer, allocatable :: cell_at_elem(:)
     integer, allocatable :: face_at_elem(:,:)
 
@@ -58,7 +58,7 @@
       procedure :: Initialize_Front
       procedure :: Mark_Cells_And_Faces
       procedure :: Place_At_Var_Value
-      procedure :: Print_Statistics
+      procedure :: Print_Front_Statistics
       procedure :: Save_Front
 
   end type
@@ -83,7 +83,7 @@
   include 'Front_Mod/Initialize.f90'
   include 'Front_Mod/Mark_Cells_And_Faces.f90'
   include 'Front_Mod/Place_At_Var_Value.f90'
-  include 'Front_Mod/Print_Statistics.f90'
+  include 'Front_Mod/Print_Front_Statistics.f90'
   include 'Front_Mod/Save.f90'
 
   end module

@@ -1,9 +1,9 @@
 !==============================================================================!
-  subroutine Work_Mod_Allocate_Integer_Nodes(grid, n)
+  subroutine Work_Mod_Allocate_Integer_Nodes(Grid, n)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid(:)
+  type(Grid_Type) :: Grid(:)
   integer         :: n    ! number of arrays
 !-----------------------------------[Locals]-----------------------------------!
   integer :: nn
@@ -12,7 +12,7 @@
   if(n .eq. 0) return
 
   ! Get number of nodes
-  nn = maxval(grid(1:size(grid)) % n_nodes)
+  nn = maxval(Grid(1:size(Grid)) % n_nodes)
 
   ! Allocate requested memory
   allocate(i_node_01(nn));  i_node_01 = 0;  if(n .eq.  1) return

@@ -1,9 +1,9 @@
 !==============================================================================!
-  subroutine Work_Mod_Allocate_Integer_Faces(grid, n)
+  subroutine Work_Mod_Allocate_Integer_Faces(Grid, n)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid(:)
+  type(Grid_Type) :: Grid(:)
   integer         :: n    ! number of arrays
 !-----------------------------------[Locals]-----------------------------------!
   integer :: nf
@@ -12,7 +12,7 @@
   if(n .eq. 0) return
 
   ! Get number of cells and boundary cells
-  nf = maxval(grid(1:size(grid)) % n_faces)
+  nf = maxval(Grid(1:size(Grid)) % n_faces)
 
   ! Allocate requested memory
   allocate(i_face_01(nf));   i_face_01 = 0;   if(n .eq.  1) return

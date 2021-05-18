@@ -10,8 +10,8 @@
   real,              target :: b(:)
   real                      :: dt
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type), pointer :: flow
-  type(Grid_Type),  pointer :: grid
+  type(Field_Type), pointer :: Flow
+  type(Grid_Type),  pointer :: Grid
   type(Face_Type),  pointer :: v_flux
   type(Var_Type),   pointer :: fun
   type(Front_Type), pointer :: Front
@@ -22,9 +22,9 @@
 !==============================================================================!
 
   ! Take aliases
-  flow   => Vof % pnt_flow
-  grid   => flow % pnt_grid
-  v_flux => flow % v_flux
+  Flow   => Vof % pnt_flow
+  Grid   => Flow % pnt_grid
+  v_flux => Flow % v_flux
   fun    => Vof % fun
   beta_f => Vof % beta_f
   Front  => Vof % Front
@@ -45,14 +45,14 @@
   if(fun % adv_scheme .eq. UPWIND) then
 
     ! At boundaries
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
 
       if(c2 < 0) then
-        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW) then
+        if(Grid % Bnd_Cond_Type(c2) .eq. INFLOW) then
           b(c1) = b(c1) - v_flux % n(s) * fun % n(c2)
-        else if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) then
+        else if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW) then
           A % val(A % dia(c1)) = A % val(A % dia(c1)) + v_flux % n(s)
         end if
       end if
@@ -60,9 +60,9 @@
     end do
 
     ! Interior faces
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
       if(c2 > 0) then
 
         upwd1 = 0.5 * max( v_flux % n(s), 0.0)
@@ -84,12 +84,12 @@
           fun % adv_scheme .eq. STACS) then
 
     ! At boundaries
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
       if(c2 < 0) then
 
-        if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW) then
+        if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW) then
           A % val(A % dia(c1)) = A % val(A % dia(c1)) + v_flux % n(s)
         else
           b(c1) = b(c1) - v_flux % n(s) * fun % n(c2)
@@ -99,9 +99,9 @@
     end do
 
     ! Interior faces
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
       if(c2 > 0) then
 
         upwd1 = (0.5 - beta_f(s)) * max(-v_flux % n(s), 0.0)  &
@@ -131,8 +131,8 @@
 
   ! Two time levels; linear interpolation
   if(fun % td_scheme .eq. LINEAR) then
-    do c = 1, grid % n_cells
-      a0 = grid % vol(c) / dt
+    do c = 1, Grid % n_cells
+      a0 = Grid % vol(c) / dt
       A % val(A % dia(c)) = A % val(A % dia(c)) + a0
       b(c) = b(c) + a0 * fun % o(c)
     end do
@@ -140,8 +140,8 @@
 
   ! Three time levels; parabolic interpolation
   if(fun % td_scheme .eq. PARABOLIC) then
-    do c = 1, grid % n_cells
-      a0 = grid % vol(c) / dt
+    do c = 1, Grid % n_cells
+      a0 = Grid % vol(c) / dt
       A % val(A % dia(c)) = A % val(A % dia(c)) + 1.5 * a0
       b(c) = b(c) + 2.0 * a0 * fun % o(c) - 0.5 * a0 * fun % oo(c)
     end do

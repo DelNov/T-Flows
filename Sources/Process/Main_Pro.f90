@@ -17,7 +17,7 @@
   character(len=9)      :: dom_control(MD) = 'control.d'
   integer               :: curr_dt, sc, tp
   logical               :: read_backup(MD), exit_now, pot_init
-  type(Grid_Type)       :: grid(MD)        ! grid used in computations
+  type(Grid_Type)       :: Grid(MD)        ! Grid used in computations
   type(Field_Type)      :: Flow(MD)        ! flow field we will be solving for
   type(Swarm_Type)      :: swarm(MD)       ! swarm of particles
   type(Turb_Type)       :: turb(MD)        ! turbulence modelling
@@ -90,25 +90,25 @@
     call Control_Mod_Switch_To_Domain(d)  ! take domain's d control file
     call Control_Mod_Problem_Name(problem_name(d))
 
-    ! Load the finite volume grid
-    call Grid_Mod_Load_Cfn(grid(d), this_proc, domain=d)
-    call Grid_Mod_Load_Dim(grid(d), this_proc, domain=d)
-    call Grid_Mod_Calculate_Face_Geometry(grid(d))
+    ! Load the finite volume Grid
+    call Grid(d) % Load_Cfn(this_proc, domain=d)
+    call Grid(d) % Load_Dim(this_proc, domain=d)
+    call Grid(d) % Calculate_Face_Geometry()
 
-    call Grid_Mod_Form_Cells_Comm(grid(d))
-    call Grid_Mod_Form_Maps(grid(d))
+    call Grid(d) % Form_Cells_Comm()
+    call Grid(d) % Form_Maps()
 
     call Comm_Mod_Wait
 
-    call Save_Vtu_Faces(grid(d))
-    call Save_Vtu_Faces(grid(d), plot_shadows=.true.)
+    call Save_Vtu_Faces(Grid(d))
+    call Save_Vtu_Faces(Grid(d), plot_shadows=.true.)
   end do
 
   ! Out of domain loop - go back to root
   call Control_Mod_Switch_To_Root()
 
   ! Allocate memory for working arrays
-  call Work_Mod_Allocate(grid, rc=30, rf=6, rn=12, ic=4, if=6, in=1)
+  call Work_Mod_Allocate(Grid, rc=30, rf=6, rn=12, ic=4, if=6, in=1)
 
   ! Get the number of time steps from the control file
   call Control_Mod_Number_Of_Time_Steps(last_dt, verbose=.true.)
@@ -130,7 +130,7 @@
   !----------------------------------------------------------!
   do d = 1, n_dom
     call Control_Mod_Switch_To_Domain(d)  ! take proper control file
-    call Flow(d) % Allocate_Field(grid(d))
+    call Flow(d) % Allocate_Field(Grid(d))
     call Turb_Mod_Allocate(turb(d), Flow(d))
     call Swarm_Mod_Allocate(swarm(d), Flow(d), turb(d))
     call Vof(d) % Allocate_Vof(Flow(d))
@@ -143,14 +143,14 @@
     ! Read numerical models from control file (after the memory is allocated)
     call Read_Control_Numerical(Flow(d), turb(d), Vof(d))
 
-    call Grid_Mod_Find_Nodes_Cells(grid(d))
-    call Grid_Mod_Calculate_Weights_Cells_To_Nodes(grid(d))  ! needed for front
-    call Grid_Mod_Calculate_Global_Volumes(grid(d))
+    call Grid(d) % Find_Nodes_Cells()
+    call Grid(d) % Calculate_Weights_Cells_To_Nodes()  ! needed for front
+    call Grid(d) % Calculate_Global_Volumes()
     call Flow(d) % Calculate_Grad_Matrix()
 
     ! Allocate memory for linear systems of equations
     ! (You need face geomtry for this step)
-    call Sol(d) % Create_Solver(grid(d))
+    call Sol(d) % Create_Solver(Grid(d))
 
     call Read_Control_Physical_Properties(Flow(d), Vof(d), swarm(d))
     call Read_Control_Boundary_Conditions(Flow(d), turb(d), Vof(d),   &
@@ -159,7 +159,7 @@
 
   ! Create interfaces
   call Control_Mod_Switch_To_Root()
-  call Interface_Mod_Create(inter, grid, n_dom)
+  call Interface_Mod_Create(inter, Grid, n_dom)
 
   ! First time step is one, unless read from backup otherwise
   first_dt = 0
@@ -184,7 +184,7 @@
     end if
 
     ! Initialize monitoring points
-    call Monitor(d) % Initialize(grid(d), read_backup(d), domain=d)
+    call Monitor(d) % Initialize(Grid(d), read_backup(d), domain=d)
 
     ! Plane for calcution of overall mass fluxes
     call Control_Mod_Point_For_Monitoring_Planes(Flow(d) % bulk % xp,  &
@@ -192,7 +192,7 @@
                                                  Flow(d) % bulk % zp)
 
     ! Prepare ...
-    call Bulk_Mod_Monitoring_Planes_Areas(Flow(d) % bulk, grid(d))
+    call Bulk_Mod_Monitoring_Planes_Areas(Flow(d) % bulk, Grid(d))
 
     if( (turb(d) % model .eq. LES_SMAGORINSKY     .or.   &
          turb(d) % model .eq. HYBRID_LES_PRANDTL) .and.  &
@@ -440,7 +440,7 @@
     call Monitor(d) % Finalize()
 
     ! Make the final call to user function
-    call User_Mod_Before_Exit(grid(d))
+    call User_Mod_Before_Exit(Grid(d))
   end do
 
   call Cpu_Timer % Stop('Main')

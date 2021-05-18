@@ -20,7 +20,7 @@
   class(Field_Type), target :: Flow
   type(Var_Type),    target :: p     ! should be pressure or pressure correction
 !----------------------------------[Locals]------------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   integer                  :: s, c, c1, c2
   integer                  :: i_fac, c1_prim, c2_prim, s_prim
   real                     :: res
@@ -30,17 +30,17 @@
 !==============================================================================!
 
   ! Take alias
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
 
   ! Extrapolation to boundaries
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
     if(c2 < 0) then
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .ne. PRESSURE) then
-        p % n(c2) = p % n(c1) + p % x(c1) * grid % dx(s)  &
-                              + p % y(c1) * grid % dy(s)  &
-                              + p % z(c1) * grid % dz(s)
+      if(Grid % Bnd_Cond_Type(c2) .ne. PRESSURE) then
+        p % n(c2) = p % n(c1) + p % x(c1) * Grid % dx(s)  &
+                              + p % y(c1) * Grid % dy(s)  &
+                              + p % z(c1) * Grid % dz(s)
       end if
     end if
   end do
@@ -57,7 +57,7 @@
   !           other boundary cells unchanged (reset to zero, really)   !
   !--------------------------------------------------------------------!
   c_cnt(:) = 0
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
 
     ! Cell is at the boundary, intervene here
     if(c_at_bnd(c) .eq. YES) then
@@ -69,10 +69,10 @@
       c_cnt(c) = 0    ! probably not needed, initialized above
 
       ! Browse through this cell's faces
-      do i_fac = 1, grid % cells_n_faces(c)
-        s_prim  = grid % cells_f(i_fac, c)
-        c1_prim = grid % faces_c(1, s_prim)
-        c2_prim = grid % faces_c(2, s_prim)
+      do i_fac = 1, Grid % cells_n_faces(c)
+        s_prim  = Grid % cells_f(i_fac, c)
+        c1_prim = Grid % faces_c(1, s_prim)
+        c2_prim = Grid % faces_c(2, s_prim)
 
         ! Consider c1_prim if it is not cell at boundary
         if(c_at_bnd(c1_prim) .eq. NO) then
@@ -111,16 +111,16 @@
   !           you are less selective and extrapolate even from cells at   !
   !           boundaries, which were interpolated in the Step 1 above.    !
   !-----------------------------------------------------------------------!
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
 
     ! Cell is at the boundary, and hasn'p been treated yet
     if(c_at_bnd(c) .eq. YES .and. c_cnt(c) .eq. 0) then
 
       ! Browse through this cell's faces
-      do i_fac = 1, grid % cells_n_faces(c)
-        s_prim  = grid % cells_f(i_fac, c)
-        c1_prim = grid % faces_c(1, s_prim)
-        c2_prim = grid % faces_c(2, s_prim)
+      do i_fac = 1, Grid % cells_n_faces(c)
+        s_prim  = Grid % cells_f(i_fac, c)
+        c1_prim = Grid % faces_c(1, s_prim)
+        c2_prim = Grid % faces_c(2, s_prim)
 
         if(c1_prim .ne. c  .and.  &     ! skip your own self
            c_cnt(c1_prim) .gt. 0) then  ! consider only cells with values

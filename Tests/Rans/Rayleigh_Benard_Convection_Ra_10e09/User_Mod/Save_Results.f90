@@ -28,14 +28,14 @@
 !==============================================================================!
 
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u, v, w, t
   type(Var_Type),  pointer :: kin, eps, zeta, f, ut, vt, wt, t2
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   bulk => Flow % bulk
   call Flow % Alias_Momentum(u, v, w)
   call Flow % Alias_Energy  (t)
@@ -63,7 +63,7 @@
                           appendix='-res-plus',  &
                           extension='.dat')
 
-!  call Grad_Mod_For_Phi(grid, t % n, 3, phi_z, .true.)
+!  call Grad_Mod_For_Phi(Grid, t % n, 3, phi_z, .true.)
 
   !------------------!
   !   Read 1d file   !
@@ -133,11 +133,11 @@
   !   Average the results   !
   !-------------------------!
   do i = 1, n_prob-1
-    do c = 1, grid % n_cells - grid % comm % n_buff_cells 
-      if(grid % zc(c) > (z_p(i)) .and.  &
-         grid % zc(c) < (z_p(i+1))) then
+    do c = 1, Grid % n_cells - Grid % comm % n_buff_cells 
+      if(Grid % zc(c) > (z_p(i)) .and.  &
+         Grid % zc(c) < (z_p(i+1))) then
 
-        wall_p(i) = wall_p(i) + grid % zc(c)
+        wall_p(i) = wall_p(i) + Grid % zc(c)
         tz_p  (i) = tz_p  (i) + t % z(c)
         ti_p  (i) = ti_p  (i) + t % n(c)
         w_p   (i) = w_p   (i) + turb % w_mean(c)

@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Grad_Variable_With_Front(Vof, var, phif)
 !------------------------------------------------------------------------------!
-!   Calculates gradient of a variable from field flow                          !
+!   Calculates gradient of a variable from field Flow                          !
 !                                                                              !
 !   (Closely related (derived from) to Field_Mod_Grad_Variable)                !
 !------------------------------------------------------------------------------!
@@ -11,16 +11,16 @@
   type(Var_Type)    :: var
   real, intent(in)  :: phif
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: grid
-  type(Field_Type), pointer :: flow
+  type(Grid_Type),  pointer :: Grid
+  type(Field_Type), pointer :: Flow
 !==============================================================================!
 
   ! Take alias
-  grid => Vof % pnt_grid
-  flow => Vof % pnt_flow
+  Grid => Vof % pnt_grid
+  Flow => Vof % pnt_flow
 
   ! Refresh buffers for variable
-  call Grid_Mod_Exchange_Cells_Real(grid, var % n)
+  call Grid % Exchange_Cells_Real(var % n)
 
   ! Compute individual gradients without refreshing buffers
   call Grad_Component_No_Refresh_With_Front(Vof, var % n, 1, var % x, phif)
@@ -28,8 +28,8 @@
   call Grad_Component_No_Refresh_With_Front(Vof, var % n, 3, var % z, phif)
 
   ! Refresh buffers for gradient components
-  call Grid_Mod_Exchange_Cells_Real(grid, var % x)
-  call Grid_Mod_Exchange_Cells_Real(grid, var % y)
-  call Grid_Mod_Exchange_Cells_Real(grid, var % z)
+  call Grid % Exchange_Cells_Real(var % x)
+  call Grid % Exchange_Cells_Real(var % y)
+  call Grid % Exchange_Cells_Real(var % z)
 
   end subroutine

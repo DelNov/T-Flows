@@ -1,43 +1,43 @@
 !==============================================================================!
-  subroutine Grid_Mod_Calculate_Face_Surfaces(grid)
+  subroutine Calculate_Face_Surfaces(Grid)
 !------------------------------------------------------------------------------!
 !   Calculate the face surface areas                                           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  class(Grid_Type) :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   integer :: s, i_nod, j_nod, n
   real    :: xt(MAX_FACES_N_NODES), yt(MAX_FACES_N_NODES), zt(MAX_FACES_N_NODES)
 !==============================================================================!
 
-  do s = 1, grid % n_faces
+  do s = 1, Grid % n_faces
 
     ! Copy face node coordinates to a local array for easier handling
-    do i_nod = 1, grid % faces_n_nodes(s)  ! local node counter
-      n = grid % faces_n(i_nod, s)         ! global node number
-      xt(i_nod) = grid % xn(n)
-      yt(i_nod) = grid % yn(n)
-      zt(i_nod) = grid % zn(n)
+    do i_nod = 1, Grid % faces_n_nodes(s)  ! local node counter
+      n = Grid % faces_n(i_nod, s)         ! global node number
+      xt(i_nod) = Grid % xn(n)
+      yt(i_nod) = Grid % yn(n)
+      zt(i_nod) = Grid % zn(n)
     end do
 
     ! Cell face components
-    grid % sx(s) = 0.0
-    grid % sy(s) = 0.0
-    grid % sz(s) = 0.0
-    do i_nod = 1, grid % faces_n_nodes(s)
+    Grid % sx(s) = 0.0
+    Grid % sy(s) = 0.0
+    Grid % sz(s) = 0.0
+    do i_nod = 1, Grid % faces_n_nodes(s)
       j_nod = i_nod + 1
-      if(j_nod > grid % faces_n_nodes(s)) j_nod = 1
-      grid % sx(s) = grid % sx(s)  &
+      if(j_nod > Grid % faces_n_nodes(s)) j_nod = 1
+      Grid % sx(s) = Grid % sx(s)  &
                    + (yt(j_nod) - yt(i_nod)) * (zt(j_nod) + zt(i_nod))
-      grid % sy(s) = grid % sy(s)  &
+      Grid % sy(s) = Grid % sy(s)  &
                    + (zt(j_nod) - zt(i_nod)) * (xt(j_nod) + xt(i_nod))
-      grid % sz(s) = grid % sz(s)  &
+      Grid % sz(s) = Grid % sz(s)  &
                    + (xt(j_nod) - xt(i_nod)) * (yt(j_nod) + yt(i_nod))
     end do
-    grid % sx(s) = 0.5 * grid % sx(s)
-    grid % sy(s) = 0.5 * grid % sy(s)
-    grid % sz(s) = 0.5 * grid % sz(s)
+    Grid % sx(s) = 0.5 * Grid % sx(s)
+    Grid % sy(s) = 0.5 * Grid % sy(s)
+    Grid % sz(s) = 0.5 * Grid % sz(s)
 
   end do
 

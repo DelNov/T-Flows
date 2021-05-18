@@ -11,13 +11,13 @@
   real           :: v_flux(phi % pnt_grid % n_faces)
   real           :: b(:)
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   real                     :: phi_f          ! phi and coef at the cell face
   integer                  :: c, c1, c2, s
 !==============================================================================!
 
-  ! Take alias to grid
-  grid => phi % pnt_grid
+  ! Take alias to Grid
+  Grid => phi % pnt_grid
 
   !----------------------------------------------------------------------------!
   !   Compute phi % max and phi % min (used in Numerics_Mod_Advection_Scheme)  !
@@ -29,7 +29,7 @@
   !----------------!
   !   New values   !
   !----------------!
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     phi % a(c) = 0.0
     phi % c(c) = 0.0  ! use phi % c for upwind advective fluxes
   end do
@@ -37,14 +37,14 @@
   !----------------------------------!
   !   Browse through all the faces   !
   !----------------------------------!
-  do s=1, grid % n_faces
+  do s=1, Grid % n_faces
 
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
     ! This could be computed with gradient extrapolation
-    phi_f =      grid % f(s)  * phi % n(c1)   &
-          + (1.0-grid % f(s)) * phi % n(c2)
+    phi_f =      Grid % f(s)  * phi % n(c1)   &
+          + (1.0-Grid % f(s)) * phi % n(c2)
 
     ! Compute phi_f with desired advection scheme
     if(phi % adv_scheme .ne. CENTRAL) then
@@ -78,7 +78,7 @@
   !   Source term contains difference between      !
   !   explicity and implicitly treated advection   !
   !------------------------------------------------!
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     b(c) = b(c) + phi % a(c) - phi % c(c)
     phi % c(c) = 0.0                       ! set it back to zero
   end do

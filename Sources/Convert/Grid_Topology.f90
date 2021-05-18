@@ -1,24 +1,24 @@
 !==============================================================================!
-  subroutine Grid_Topology(grid)
+  subroutine Grid_Topology(Grid)
 !------------------------------------------------------------------------------!
-!   Determines the topology of the grid.                                       !
+!   Determines the topology of the Grid.                                       !
 !
 !   To be more specific, it determines:
 !                                                                              !
-!   grid % n_bnd_cells   - number of boundary cells                            !
-!   grid % cells_n_nodes - number of nodes for each cell                       !
-!   grid % cells_n       - list of each cell's nodes                           !
-!   grid % n_faces       - number of faces on the boundary                     !
-!   grid % faces_n_nodes - number of nodes for each face on the boundary       !
-!   grid % faces_n       - list of each boundary face's nodes                  !
-!   grid % faces_c       - a pair of cells surrounding each boundary face      !
+!   Grid % n_bnd_cells   - number of boundary cells                            !
+!   Grid % cells_n_nodes - number of nodes for each cell                       !
+!   Grid % cells_n       - list of each cell's nodes                           !
+!   Grid % n_faces       - number of faces on the boundary                     !
+!   Grid % faces_n_nodes - number of nodes for each face on the boundary       !
+!   Grid % faces_n       - list of each boundary face's nodes                  !
+!   Grid % faces_c       - a pair of cells surrounding each boundary face      !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Grid_Type) :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i, j
 !------------------------------------------------------------------------------!
@@ -28,98 +28,98 @@
   !------------------------------!
   !   Count the boundary cells   !
   !------------------------------!
-  grid % n_bnd_cells = 0
-  grid % n_faces  = 0
-  do i = 1, grid % n_cells
+  Grid % n_bnd_cells = 0
+  Grid % n_faces  = 0
+  do i = 1, Grid % n_cells
     do j = 1, 6
-      if(grid % cells_bnd_color(j,i) .ne. 0) then
+      if(Grid % cells_bnd_color(j,i) .ne. 0) then
 
-        grid % n_bnd_cells = grid % n_bnd_cells + 1
+        Grid % n_bnd_cells = Grid % n_bnd_cells + 1
 
-        ! grid % bnd_cond % color
-        grid % bnd_cond % color(-grid % n_bnd_cells) =   &
-                                                    grid % cells_bnd_color(j,i)
+        ! Grid % bnd_cond % color
+        Grid % bnd_cond % color(-Grid % n_bnd_cells) =   &
+                                                    Grid % cells_bnd_color(j,i)
         ! Faces
-        grid % n_faces = grid % n_faces  + 1
-        grid % faces_c(1,grid % n_faces) = i
-        grid % faces_c(2,grid % n_faces) = -grid % n_bnd_cells
+        Grid % n_faces = Grid % n_faces  + 1
+        Grid % faces_c(1,Grid % n_faces) = i
+        Grid % faces_c(2,Grid % n_faces) = -Grid % n_bnd_cells
 
         ! Hexahedra:
-        if(grid % cells_n_nodes(i) .eq. 8) then
-          grid % cells_n_nodes(-grid % n_bnd_cells) = 4
-          grid % cells_n(1,-grid % n_bnd_cells) = grid % cells_n(hex(j,1),i)
-          grid % cells_n(2,-grid % n_bnd_cells) = grid % cells_n(hex(j,2),i)
-          grid % cells_n(3,-grid % n_bnd_cells) = grid % cells_n(hex(j,3),i)
-          grid % cells_n(4,-grid % n_bnd_cells) = grid % cells_n(hex(j,4),i)
+        if(Grid % cells_n_nodes(i) .eq. 8) then
+          Grid % cells_n_nodes(-Grid % n_bnd_cells) = 4
+          Grid % cells_n(1,-Grid % n_bnd_cells) = Grid % cells_n(hex(j,1),i)
+          Grid % cells_n(2,-Grid % n_bnd_cells) = Grid % cells_n(hex(j,2),i)
+          Grid % cells_n(3,-Grid % n_bnd_cells) = Grid % cells_n(hex(j,3),i)
+          Grid % cells_n(4,-Grid % n_bnd_cells) = Grid % cells_n(hex(j,4),i)
 
-          grid % faces_n_nodes(grid % n_faces) = 4
-          grid % faces_n(1:4, grid % n_faces)  =   &
-          grid % cells_n(1:4,-grid % n_bnd_cells)
+          Grid % faces_n_nodes(Grid % n_faces) = 4
+          Grid % faces_n(1:4, Grid % n_faces)  =   &
+          Grid % cells_n(1:4,-Grid % n_bnd_cells)
 
         ! Prisms:
-        else if(grid % cells_n_nodes(i) .eq. 6) then
+        else if(Grid % cells_n_nodes(i) .eq. 6) then
           if(j <= 3) then    ! faces (1), (2) and (3)
-            grid % cells_n_nodes(-grid % n_bnd_cells) = 4
-            grid % cells_n(1,-grid % n_bnd_cells)=grid % cells_n(wed(j,1),i)
-            grid % cells_n(2,-grid % n_bnd_cells)=grid % cells_n(wed(j,2),i)
-            grid % cells_n(3,-grid % n_bnd_cells)=grid % cells_n(wed(j,3),i)
-            grid % cells_n(4,-grid % n_bnd_cells)=grid % cells_n(wed(j,4),i)
+            Grid % cells_n_nodes(-Grid % n_bnd_cells) = 4
+            Grid % cells_n(1,-Grid % n_bnd_cells)=Grid % cells_n(wed(j,1),i)
+            Grid % cells_n(2,-Grid % n_bnd_cells)=Grid % cells_n(wed(j,2),i)
+            Grid % cells_n(3,-Grid % n_bnd_cells)=Grid % cells_n(wed(j,3),i)
+            Grid % cells_n(4,-Grid % n_bnd_cells)=Grid % cells_n(wed(j,4),i)
 
-            grid % faces_n_nodes(grid % n_faces) = 4
-            grid % faces_n(1:4, grid % n_faces)  =   &
-            grid % cells_n(1:4,-grid % n_bnd_cells)
+            Grid % faces_n_nodes(Grid % n_faces) = 4
+            Grid % faces_n(1:4, Grid % n_faces)  =   &
+            Grid % cells_n(1:4,-Grid % n_bnd_cells)
 
           else if(j <= 5) then
-            grid % cells_n_nodes(-grid % n_bnd_cells) = 3
-            grid % cells_n(1,-grid % n_bnd_cells)=grid % cells_n(wed(j,1),i)
-            grid % cells_n(2,-grid % n_bnd_cells)=grid % cells_n(wed(j,2),i)
-            grid % cells_n(3,-grid % n_bnd_cells)=grid % cells_n(wed(j,3),i)
+            Grid % cells_n_nodes(-Grid % n_bnd_cells) = 3
+            Grid % cells_n(1,-Grid % n_bnd_cells)=Grid % cells_n(wed(j,1),i)
+            Grid % cells_n(2,-Grid % n_bnd_cells)=Grid % cells_n(wed(j,2),i)
+            Grid % cells_n(3,-Grid % n_bnd_cells)=Grid % cells_n(wed(j,3),i)
 
-            grid % faces_n_nodes(grid % n_faces) = 3
-            grid % faces_n(1:3, grid % n_faces)  =   &
-            grid % cells_n(1:3,-grid % n_bnd_cells)
+            Grid % faces_n_nodes(Grid % n_faces) = 3
+            Grid % faces_n(1:3, Grid % n_faces)  =   &
+            Grid % cells_n(1:3,-Grid % n_bnd_cells)
           end if
 
         ! Tetrahedra:
-        else if(grid % cells_n_nodes(i) .eq. 4) then
+        else if(Grid % cells_n_nodes(i) .eq. 4) then
           if(j <= 4) then
-            grid % cells_n_nodes(-grid % n_bnd_cells) = 3
-            grid % cells_n(1,-grid % n_bnd_cells)=grid % cells_n(tet(j,1),i)
-            grid % cells_n(2,-grid % n_bnd_cells)=grid % cells_n(tet(j,2),i)
-            grid % cells_n(3,-grid % n_bnd_cells)=grid % cells_n(tet(j,3),i)
+            Grid % cells_n_nodes(-Grid % n_bnd_cells) = 3
+            Grid % cells_n(1,-Grid % n_bnd_cells)=Grid % cells_n(tet(j,1),i)
+            Grid % cells_n(2,-Grid % n_bnd_cells)=Grid % cells_n(tet(j,2),i)
+            Grid % cells_n(3,-Grid % n_bnd_cells)=Grid % cells_n(tet(j,3),i)
 
-            grid % faces_n_nodes(grid % n_faces) = 3
-            grid % faces_n(1:3, grid % n_faces)  =   &
-            grid % cells_n(1:3,-grid % n_bnd_cells)
+            Grid % faces_n_nodes(Grid % n_faces) = 3
+            Grid % faces_n(1:3, Grid % n_faces)  =   &
+            Grid % cells_n(1:3,-Grid % n_bnd_cells)
           end if
 
         ! Pyramides:
-        else if(grid % cells_n_nodes(i) .eq. 5) then
+        else if(Grid % cells_n_nodes(i) .eq. 5) then
           if(j .eq. 1) then    ! face (1)
-            grid % cells_n_nodes(-grid % n_bnd_cells) = 4
-            grid % cells_n(1,-grid % n_bnd_cells)=grid % cells_n(pyr(j,1),i)
-            grid % cells_n(2,-grid % n_bnd_cells)=grid % cells_n(pyr(j,2),i)
-            grid % cells_n(3,-grid % n_bnd_cells)=grid % cells_n(pyr(j,3),i)
-            grid % cells_n(4,-grid % n_bnd_cells)=grid % cells_n(pyr(j,4),i)
+            Grid % cells_n_nodes(-Grid % n_bnd_cells) = 4
+            Grid % cells_n(1,-Grid % n_bnd_cells)=Grid % cells_n(pyr(j,1),i)
+            Grid % cells_n(2,-Grid % n_bnd_cells)=Grid % cells_n(pyr(j,2),i)
+            Grid % cells_n(3,-Grid % n_bnd_cells)=Grid % cells_n(pyr(j,3),i)
+            Grid % cells_n(4,-Grid % n_bnd_cells)=Grid % cells_n(pyr(j,4),i)
 
-            grid % faces_n_nodes(grid % n_faces) = 4
-            grid % faces_n(1:4, grid % n_faces)  =   &
-            grid % cells_n(1:4,-grid % n_bnd_cells)
+            Grid % faces_n_nodes(Grid % n_faces) = 4
+            Grid % faces_n(1:4, Grid % n_faces)  =   &
+            Grid % cells_n(1:4,-Grid % n_bnd_cells)
 
           else if(j <= 5) then
-            grid % cells_n_nodes(-grid % n_bnd_cells) = 3
-            grid % cells_n(1,-grid % n_bnd_cells)=grid % cells_n(pyr(j,1),i)
-            grid % cells_n(2,-grid % n_bnd_cells)=grid % cells_n(pyr(j,2),i)
-            grid % cells_n(3,-grid % n_bnd_cells)=grid % cells_n(pyr(j,3),i)
+            Grid % cells_n_nodes(-Grid % n_bnd_cells) = 3
+            Grid % cells_n(1,-Grid % n_bnd_cells)=Grid % cells_n(pyr(j,1),i)
+            Grid % cells_n(2,-Grid % n_bnd_cells)=Grid % cells_n(pyr(j,2),i)
+            Grid % cells_n(3,-Grid % n_bnd_cells)=Grid % cells_n(pyr(j,3),i)
 
-            grid % faces_n_nodes(grid % n_faces) = 3
-            grid % faces_n(1:3, grid % n_faces)  =   &
-            grid % cells_n(1:3,-grid % n_bnd_cells)
+            Grid % faces_n_nodes(Grid % n_faces) = 3
+            Grid % faces_n(1:3, Grid % n_faces)  =   &
+            Grid % cells_n(1:3,-Grid % n_bnd_cells)
           end if
 
         else
           print *, '# Cell with invalid number of nodes: ',  &
-                   grid % cells_n_nodes(i)
+                   Grid % cells_n_nodes(i)
           print *, '# Exiting!'
           stop
         end if
@@ -128,7 +128,7 @@
     end do
   end do
 
-  print '(a38,i9)', '# Number of boundary cells:          ', grid % n_bnd_cells
-  print '(a38,i9)', '# Number of faces on the boundary:   ', grid % n_faces
+  print '(a38,i9)', '# Number of boundary cells:          ', Grid % n_bnd_cells
+  print '(a38,i9)', '# Number of faces on the boundary:   ', Grid % n_faces
 
   end subroutine

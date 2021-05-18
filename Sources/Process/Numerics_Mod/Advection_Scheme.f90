@@ -15,7 +15,7 @@
   type(Var_Type) :: phi
   real           :: flux(phi % pnt_grid % n_faces)
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   integer                  :: c1, c2, c, d
   real                     :: fj ! flow oriented interpolation factor
   real                     :: g_d, g_u, alfa, beta1, beta2 
@@ -44,31 +44,31 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
-  grid => phi % pnt_grid
+  Grid => phi % pnt_grid
 
-  c1 = grid % faces_c(1,s)
-  c2 = grid % faces_c(2,s)
+  c1 = Grid % faces_c(1,s)
+  c2 = Grid % faces_c(2,s)
 
   if(flux(s) > 0.0) then ! goes from c1 to c2
-    fj   = 1.0 - grid % f(s)
+    fj   = 1.0 - Grid % f(s)
     c    = c1
     d    = c2
     sign = +1.0
   else ! flux(s) < 0.0   ! goes from c2 to c1
-    fj = grid % f(s)
+    fj = Grid % f(s)
     c    = c2
     d    = c1
     sign = -1.0
   end if
 
   if(flux(s) > 0.0) then
-    phi_star = phi % n(d) - 2.0 * (  phi % x(c)*grid % dx(s)   &
-                                   + phi % y(c)*grid % dy(s)   &
-                                   + phi % z(c)*grid % dz(s) )
+    phi_star = phi % n(d) - 2.0 * (  phi % x(c)*Grid % dx(s)   &
+                                   + phi % y(c)*Grid % dy(s)   &
+                                   + phi % z(c)*Grid % dz(s) )
   else
-    phi_star = phi % n(d) + 2.0 * (  phi % x(c)*grid % dx(s)   &
-                                   + phi % y(c)*grid % dy(s)   &
-                                   + phi % z(c)*grid % dz(s) )
+    phi_star = phi % n(d) + 2.0 * (  phi % x(c)*Grid % dx(s)   &
+                                   + phi % y(c)*Grid % dy(s)   &
+                                   + phi % z(c)*Grid % dz(s) )
   end if
 
   phi_u = max( phi % min(c), min(phi_star, phi % max(c)) )
@@ -126,24 +126,24 @@
 
     if(flux(s) > 0.0) then
       phi_star = 1.0 - (phi % n(d) - phi % n(c))              &
-                     / (2.0 * (  phi % x(c) * grid % dx(s)    &
-                               + phi % y(c) * grid % dy(s)    &
-                               + phi % z(c) * grid % dz(s)))
+                     / (2.0 * (  phi % x(c) * Grid % dx(s)    &
+                               + phi % y(c) * Grid % dy(s)    &
+                               + phi % z(c) * Grid % dz(s)))
     else
       phi_star = 1.0 + (phi % n(d) - phi % n(c))              &
-                     / (2.0 * (  phi % x(c) * grid % dx(s)    &
-                               + phi % y(c) * grid % dy(s)    &
-                               + phi % z(c) * grid % dz(s)))
+                     / (2.0 * (  phi % x(c) * Grid % dx(s)    &
+                               + phi % y(c) * Grid % dy(s)    &
+                               + phi % z(c) * Grid % dz(s)))
     end if
 
     gamma_c = phi_star / beta
 
     if(phi_star < beta .and. phi_star > 0.0) then
-      phi_f = (1.0 - gamma_c*(1.0 - grid % f(s))) * phi % n(c)   &
-                   + gamma_c*(1.0 - grid % f(s))  * phi % n(d)
+      phi_f = (1.0 - gamma_c*(1.0 - Grid % f(s))) * phi % n(c)   &
+                   + gamma_c*(1.0 - Grid % f(s))  * phi % n(d)
     else if(phi_star < 1.0.and.phi_star >= beta) then
-       phi_f =        grid % f(s)  * phi % n(c)  &
-             + (1.0 - grid % f(s)) * phi % n(d)
+       phi_f =        Grid % f(s)  * phi % n(c)  &
+             + (1.0 - Grid % f(s)) * phi % n(d)
     else
       phi_f = phi % n(c)
     end if

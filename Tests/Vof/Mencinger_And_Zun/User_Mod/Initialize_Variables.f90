@@ -15,14 +15,14 @@ include '../User_Mod/Vof_Interface_Box.f90'
   type(Swarm_Type),  target :: swarm
   type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: grid
+  type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: fun, t
   real,             pointer :: dt
   integer                   :: c, c1, c2, s
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   t    => Flow % t
   fun  => Vof % fun
   dt   => Flow % dt
@@ -38,9 +38,9 @@ include '../User_Mod/Vof_Interface_Box.f90'
   call Vof_Initialization_Box(Vof)
 
   ! Naive way to update bounary values
-  do s = 1, grid % n_bnd_cells
-    c1 = grid % faces_c(1, s)
-    c2 = grid % faces_c(2, s)
+  do s = 1, Grid % n_bnd_cells
+    c1 = Grid % faces_c(1, s)
+    c2 = Grid % faces_c(2, s)
     if(c2 < 0) then
       fun % n(c2) = fun % n(c1)
     end if
@@ -59,7 +59,7 @@ include '../User_Mod/Vof_Interface_Box.f90'
   end if
 
   ! Initialize velocities (depends on phase definition)
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
 
     ! Inside the water
     if(fun % n(c) .gt. 0.99) then
@@ -76,24 +76,24 @@ include '../User_Mod/Vof_Interface_Box.f90'
       Flow % u % o(c) =   0.0
 
       if(Flow % heat_transfer) then
-        ! small: Flow % t % n(c) = 110.0 - grid % xc(c)/5.0e-5 * 10.0
-        ! small: Flow % t % o(c) = 110.0 - grid % xc(c)/5.0e-5 * 100.0
-        ! MINI_1 Flow % t % n(c) = 110.0 - grid % xc(c) * 100.0
-        ! MINI_1 Flow % t % o(c) = 110.0 - grid % xc(c) * 100.0
-        ! MINI_2 Flow % t % n(c) = 110.0 - grid % xc(c) * 400.0
-        ! MINI_2 Flow % t % o(c) = 110.0 - grid % xc(c) * 400.0
-        ! MINI_3 Flow % t % n(c) = 110.0 - grid % xc(c) * 4000.0
-        ! MINI_3 Flow % t % o(c) = 110.0 - grid % xc(c) * 4000.0
-        ! MINI_4 Flow % t % n(c) = 110.0 - grid % xc(c) * 10000.0
-        ! MINI_4 Flow % t % o(c) = 110.0 - grid % xc(c) * 10000.0
-        Flow % t % n(c) = 110.0 - grid % xc(c) * 20000.0
-        Flow % t % o(c) = 110.0 - grid % xc(c) * 20000.0
+        ! small: Flow % t % n(c) = 110.0 - Grid % xc(c)/5.0e-5 * 10.0
+        ! small: Flow % t % o(c) = 110.0 - Grid % xc(c)/5.0e-5 * 100.0
+        ! MINI_1 Flow % t % n(c) = 110.0 - Grid % xc(c) * 100.0
+        ! MINI_1 Flow % t % o(c) = 110.0 - Grid % xc(c) * 100.0
+        ! MINI_2 Flow % t % n(c) = 110.0 - Grid % xc(c) * 400.0
+        ! MINI_2 Flow % t % o(c) = 110.0 - Grid % xc(c) * 400.0
+        ! MINI_3 Flow % t % n(c) = 110.0 - Grid % xc(c) * 4000.0
+        ! MINI_3 Flow % t % o(c) = 110.0 - Grid % xc(c) * 4000.0
+        ! MINI_4 Flow % t % n(c) = 110.0 - Grid % xc(c) * 10000.0
+        ! MINI_4 Flow % t % o(c) = 110.0 - Grid % xc(c) * 10000.0
+        Flow % t % n(c) = 110.0 - Grid % xc(c) * 20000.0
+        Flow % t % o(c) = 110.0 - Grid % xc(c) * 20000.0
       end if
     end if
   end do
 
   ! Update buffer values
-  call Grid_Mod_Exchange_Cells_Real(grid, fun % n)
+  call Grid % Exchange_Cells_Real(fun % n)
 
   ! Set old values to be the same as new ones
   fun % o(:) = fun % n(:)

@@ -1,26 +1,27 @@
 !==============================================================================!
-  subroutine Grid_Mod_Initialize_New_Numbers(grid)
+  subroutine Initialize_New_Numbers(Grid)
 !------------------------------------------------------------------------------!
 !   Set (almost) all new_ and old_ arrays to point to their own selves         !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
-  integer         :: n, c, s
+  class(Grid_Type) :: Grid
+!-----------------------------------[Locals]-----------------------------------!
+  integer :: n, c, s
 !==============================================================================!
 
-  do n = 1, grid % n_nodes
-    grid % new_n(n) = n
+  do n = 1, Grid % n_nodes
+    Grid % new_n(n) = n
   end do
 
-  do c = -grid % n_bnd_cells, grid % n_cells
-    grid % new_c(c) = c
-    grid % old_c(c) = c
+  do c = -Grid % n_bnd_cells, Grid % n_cells
+    Grid % new_c(c) = c
+    Grid % old_c(c) = c
   end do
 
-  do s = 1, grid % n_faces + grid % n_shadows
-    grid % new_f(s) = s
-    grid % old_f(s) = s
+  do s = 1, Grid % n_faces + Grid % n_shadows
+    Grid % new_f(s) = s
+    Grid % old_f(s) = s
   end do
 
   end subroutine

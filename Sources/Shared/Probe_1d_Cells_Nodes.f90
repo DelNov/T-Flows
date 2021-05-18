@@ -104,7 +104,7 @@
   ! Write the number of probes 
   write(fu,'(i8)') n_prob
 
-  call Sort % Real_Array(zp(1:n_prob))
+  call Sort_Mod_Real(zp(1:n_prob))
 
   ! Write the probe coordinates out
   do p=1, n_prob

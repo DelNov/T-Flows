@@ -8,7 +8,7 @@
   type(Turb_Type),  target :: turb
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
-  type(Grid_Type),  pointer :: grid
+  type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: uu, vv, ww, uv, uw, vw
   type(Var_Type),   pointer :: t, ut, vt, wt
   integer                   :: c
@@ -16,7 +16,7 @@
 
   ! Take aliases
   Flow => turb % pnt_flow
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   t    => Flow % t
   call Turb_Mod_Alias_Heat_Fluxes(turb, ut, vt, wt)
   call Turb_Mod_Alias_Stresses   (turb, uu, vv, ww, uv, uw, vw)
@@ -32,7 +32,7 @@
 
   if(turb % heat_flux_model .eq. SGDH) then
 
-    do c = 1, grid % n_cells
+    do c = 1, Grid % n_cells
       pr_t = max(Turb_Mod_Prandtl_Number(turb, c), TINY)
       ut % n(c) = - turb % vis_t(c) / Flow % density(c) / pr_t * t % x(c)
       vt % n(c) = - turb % vis_t(c) / Flow % density(c) / pr_t * t % y(c)
@@ -50,7 +50,7 @@
 
   else if(turb % heat_flux_model .eq. GGDH) then
 
-    do c = 1, grid % n_cells
+    do c = 1, Grid % n_cells
       ut % n(c) = -c_theta * turb % t_scale(c) * (uu % n(c) * t % x(c)  +  &
                                                   uv % n(c) * t % y(c)  +  &
                                                   uw % n(c) * t % z(c))

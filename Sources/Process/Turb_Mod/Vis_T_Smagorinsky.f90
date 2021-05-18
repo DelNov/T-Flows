@@ -12,7 +12,7 @@
   type(Turb_Type), target :: turb
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
-  type(Grid_Type),  pointer :: grid
+  type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: u, v, w, t
   integer                   :: c, s, c1, c2
   real                      :: nx, ny, nz
@@ -23,7 +23,7 @@
 
   ! Take aliases
   Flow => turb % pnt_flow
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   call Flow % Alias_Momentum(u, v, w)
   t    => Flow % t
 
@@ -37,8 +37,8 @@
   end if
 
   if(turb % model .eq. LES_SMAGORINSKY) then
-    do c = 1, grid % n_cells
-      lf = grid % vol(c)**ONE_THIRD
+    do c = 1, Grid % n_cells
+      lf = Grid % vol(c)**ONE_THIRD
 
       ! if(nearest_wall_cell(c) .ne. 0) is needed for parallel version
       ! since the subdomains which do not "touch" wall
@@ -48,8 +48,8 @@
                     * sqrt(  u % n(turb % nearest_wall_cell(c)) ** 2   &
                            + v % n(turb % nearest_wall_cell(c)) ** 2   &
                            + w % n(turb % nearest_wall_cell(c)) ** 2)  &
-                   / (grid % wall_dist(turb % nearest_wall_cell(c))+TINY) )
-        turb % y_plus(c) = grid % wall_dist(c) * u_f / Flow % viscosity(c)
+                   / (Grid % wall_dist(turb % nearest_wall_cell(c))+TINY) )
+        turb % y_plus(c) = Grid % wall_dist(c) * u_f / Flow % viscosity(c)
         cs = c_smag * (1.0 - exp(-turb % y_plus(c) / 25.0))
       else  
         cs = c_smag
@@ -61,16 +61,16 @@
     end do
 
   else if(turb % model .eq. LES_DYNAMIC) then
-    do c = 1, grid % n_cells
-      lf = grid % vol(c) ** ONE_THIRD
+    do c = 1, Grid % n_cells
+      lf = Grid % vol(c) ** ONE_THIRD
       turb % vis_t(c) = Flow % density(c)  &
                       * (lf*lf)            &  ! delta^2
                       * turb % c_dyn(c)    &  ! c_dynamic
                       * Flow % shear(c)
     end do
   else if(turb % model .eq. LES_WALE) then
-    do c = 1, grid % n_cells
-      lf = grid % vol(c)**ONE_THIRD
+    do c = 1, Grid % n_cells
+      lf = Grid % vol(c)**ONE_THIRD
       turb % vis_t(c) = Flow % density(c)  &
                       * (lf*lf)            &  ! delta^2
                       * (0.5*0.5)          &  ! cs^2
@@ -79,7 +79,7 @@
   end if
 
   if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
-    do c = 1, grid % n_cells
+    do c = 1, Grid % n_cells
       nc2 = - Flow % beta * (  grav_x * t % x(c)   &   
                              + grav_y * t % y(c)   &   
                              + grav_z * t % z(c))  
@@ -105,25 +105,25 @@
   !   The procedure below should be activated   !
   !   only if wall function approach is used.   !
   !----------------.----------------------------! 
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
     if(c2  < 0) then
 
-      nx = grid % sx(s) / grid % s(s)
-      ny = grid % sy(s) / grid % s(s)
-      nz = grid % sz(s) / grid % s(s)
+      nx = Grid % sx(s) / Grid % s(s)
+      ny = Grid % sy(s) / Grid % s(s)
+      nz = Grid % sz(s) / Grid % s(s)
 
-      if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
-         Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
+      if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
+         Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
 
         u_tan = Flow % U_Tan(s)
 
         a_pow = 8.3
         b_pow = 1.0/7.0
         nu = Flow % viscosity(c1) / Flow % density(c1)
-        dely = grid % wall_dist(c1)
+        dely = Grid % wall_dist(c1)
 
         ! Calculate u_tau_l
         u_tau_l = ( u_tan/a_pow * (nu/dely)**b_pow ) ** (1.0/(1.0+b_pow))
@@ -139,8 +139,8 @@
                            / abs(u_tan)
         else
           turb % vis_w(c1) = Flow % viscosity(c1)                &
-                        +      grid % fw(s)  * turb % vis_t(c1)  &
-                        + (1.0-grid % fw(s)) * turb % vis_t(c2)
+                        +      Grid % fw(s)  * turb % vis_t(c1)  &
+                        + (1.0-Grid % fw(s)) * turb % vis_t(c2)
         end if
 
         if(Flow % heat_transfer) then
@@ -157,11 +157,11 @@
                          + (u_plus + beta) * pr_t * exp(-1.0 / ebf) + TINY)
         end if
 
-      end if  ! Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL or WALLFL
+      end if  ! Grid % Bnd_Cond_Type(c2) .eq. WALL or WALLFL
     end if    ! c2 < 0
   end do
 
-  call Grid_Mod_Exchange_Cells_Real(grid, turb % vis_t)
-  call Grid_Mod_Exchange_Cells_Real(grid, turb % vis_w)
+  call Grid % Exchange_Cells_Real(turb % vis_t)
+  call Grid % Exchange_Cells_Real(turb % vis_w)
 
   end subroutine

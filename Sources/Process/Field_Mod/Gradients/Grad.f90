@@ -15,14 +15,14 @@
   real               :: phi_z( -Flow % pnt_grid % n_bnd_cells  &
                                :Flow % pnt_grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
 !==============================================================================!
 
   ! Take alias
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
 
   ! Refresh buffers for array
-  call Grid_Mod_Exchange_Cells_Real(grid, phi)
+  call Grid % Exchange_Cells_Real(phi)
 
   ! Compute individual gradients without refreshing buffers
   call Flow % Grad_Component_No_Refresh(phi, 1, phi_x)  ! dp/dx
@@ -30,8 +30,8 @@
   call Flow % Grad_Component_No_Refresh(phi, 3, phi_z)  ! dp/dz
 
   ! Refresh buffers for gradient components
-  call Grid_Mod_Exchange_Cells_Real(grid, phi_x)
-  call Grid_Mod_Exchange_Cells_Real(grid, phi_y)
-  call Grid_Mod_Exchange_Cells_Real(grid, phi_z)
+  call Grid % Exchange_Cells_Real(phi_x)
+  call Grid % Exchange_Cells_Real(phi_y)
+  call Grid % Exchange_Cells_Real(phi_z)
 
   end subroutine

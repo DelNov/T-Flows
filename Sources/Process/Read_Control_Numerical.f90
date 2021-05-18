@@ -17,14 +17,14 @@
   type(Turb_Type),  target :: turb
   type(Vof_Type),   target :: Vof
 !----------------------------------[Locals]------------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: tq, ui, phi
   character(SL)            :: name
   integer                  :: i, sc
 !==============================================================================!
 
   ! Take alias
-  grid => flow % pnt_grid
+  Grid => flow % pnt_grid
 
   !------------------------------------------!
   !   Pressure velocity coupling algorithm   !

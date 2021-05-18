@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Grid_Mod_Print_Bnd_Cond_List(grid)
+  subroutine Grid_Mod_Print_Bnd_Cond_List(Grid)
 !------------------------------------------------------------------------------!
-!   Prints a list of boundary conditions in a grid.                            !
+!   Prints a list of boundary conditions in a Grid.                            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Grid_Type) :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   integer :: j
 !==============================================================================!
@@ -13,8 +13,8 @@
   print *, '#======================================================'
   print *, '# Grid currently has the following boundary conditions:'
   print *, '#------------------------------------------------------'
-  do j = 1, grid % n_bnd_cond
-    print '(a3,i2,a2,a)', ' # ', j, '. ', grid % bnd_cond % name(j)
+  do j = 1, Grid % n_bnd_cond
+    print '(a3,i2,a2,a)', ' # ', j, '. ', Grid % bnd_cond % name(j)
   end do
   print *, '#------------------------------------------------------'
 

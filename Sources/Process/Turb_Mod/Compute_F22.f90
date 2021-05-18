@@ -12,7 +12,7 @@
   type(Var_Type)            :: phi
 !----------------------------------[Locals]------------------------------------!
   type(Field_Type),  pointer :: Flow
-  type(Grid_Type),   pointer :: grid
+  type(Grid_Type),   pointer :: Grid
   type(Matrix_Type), pointer :: A
   real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2
@@ -41,7 +41,7 @@
 
   ! Take aliases
   Flow => turb % pnt_flow
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   call Sol % Alias_Solver(A, b)
 
   ! Initialize matrix and right hand side
@@ -50,14 +50,14 @@
 
   ! Old values (o) and older than old (oo)
   if(ini .eq. 1) then
-    do c = 1, grid % n_cells
+    do c = 1, Grid % n_cells
       phi % oo(c)   = phi % o(c)
       phi % o (c)   = phi % n(c)
     end do
   end if
 
   ! New values
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     phi % c(c) = 0.0
   end do
 
@@ -73,26 +73,26 @@
   !----------------------------!
   !   Spatial discretization   !
   !----------------------------!
-  do s = 1, grid % n_faces
+  do s = 1, Grid % n_faces
 
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
-    phi_x_f = grid % fw(s) * phi % x(c1) + (1.0-grid % fw(s)) * phi % x(c2)
-    phi_y_f = grid % fw(s) * phi % y(c1) + (1.0-grid % fw(s)) * phi % y(c2)
-    phi_z_f = grid % fw(s) * phi % z(c1) + (1.0-grid % fw(s)) * phi % z(c2)
+    phi_x_f = Grid % fw(s) * phi % x(c1) + (1.0-Grid % fw(s)) * phi % x(c2)
+    phi_y_f = Grid % fw(s) * phi % y(c1) + (1.0-Grid % fw(s)) * phi % y(c2)
+    phi_z_f = Grid % fw(s) * phi % z(c1) + (1.0-Grid % fw(s)) * phi % z(c2)
 
     ! Total (exact) diffusive flux
-    f_ex = (  phi_x_f * grid % sx(s)   &
-            + phi_y_f * grid % sy(s)   &
-            + phi_z_f * grid % sz(s) )
+    f_ex = (  phi_x_f * Grid % sx(s)   &
+            + phi_y_f * Grid % sy(s)   &
+            + phi_z_f * Grid % sz(s) )
 
     a0 = A % fc(s)
 
     ! Implicit diffusive flux
-    f_im=(   phi_x_f * grid % dx(s)        &
-           + phi_y_f * grid % dy(s)        &
-           + phi_z_f * grid % dz(s)) * a0
+    f_im=(   phi_x_f * Grid % dx(s)        &
+           + phi_y_f * Grid % dy(s)        &
+           + phi_z_f * Grid % dz(s)) * a0
 
     ! Cross diffusion part
     phi % c(c1) = phi % c(c1) + f_ex - f_im
@@ -113,14 +113,14 @@
     else if(c2  < 0) then
 
       ! Inflow
-      if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. INFLOW)) then
+      if( (Grid % Bnd_Cond_Type(c2) .eq. INFLOW)) then
         A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
         b(c1) = b(c1) + a12 * phi % n(c2)
       end if
 
       ! Wall and wall flux; solid walls in any case
-      if( (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL).or.       &
-          (Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) ) then
+      if( (Grid % Bnd_Cond_Type(c2) .eq. WALL).or.       &
+          (Grid % Bnd_Cond_Type(c2) .eq. WALLFL) ) then
         A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
         !---------------------------------------------------------------!
         !   Source coefficient is filled in SourceF22.f90 in order to   !
@@ -134,7 +134,7 @@
   end do  ! through faces
 
   ! Cross diffusion terms are treated explicity
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     b(c) = b(c) + phi % c(c)
   end do
 

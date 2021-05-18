@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Main_Vof(Vof, flow, turb, Sol, n)
+  subroutine Main_Vof(Vof, Flow, turb, Sol, n)
 !------------------------------------------------------------------------------!
 !   Initialize inteface tracking simulations                                   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Vof_Type),     target :: Vof
-  type(Field_Type),    target :: flow
+  type(Field_Type),    target :: Flow
   type(Turb_Type),     target :: turb
   type(Solver_Type)           :: Sol
   integer, intent(in)         :: n     ! time step
@@ -23,7 +23,7 @@
                                             0.5,          &
                                             .true.)  ! don't print messages
       call Vof % Front % Calculate_Curvatures_From_Elems()
-      call Vof % Front % Print_Statistics               ()
+      call Vof % Front % Print_Front_Statistics         ()
       call Vof % Front % Save_Front(n)
 !f_vs_s      call Surf_Mod_Place_At_Var_Value(Vof % surf,  &
 !f_vs_s                                       Vof % fun,   &
@@ -37,8 +37,8 @@
     !--------------------------------!
     !   Advance vof function (fun)   !
     !--------------------------------!
-    call Update_Boundary_Values(flow, turb, Vof, 'MULTIPHASE')
-    call Vof % Compute_Vof(Sol, flow % dt, n)
+    call Update_Boundary_Values(Flow, turb, Vof, 'MULTIPHASE')
+    call Vof % Compute_Vof(Sol, Flow % dt, n)
 
     !------------------------------------------------!
     !   Prepare smooth variant of the vof function   !

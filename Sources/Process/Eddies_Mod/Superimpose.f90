@@ -8,22 +8,22 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Eddies_Type), target :: eddies
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: grid
-  type(Field_Type), pointer :: flow
+  type(Grid_Type),  pointer :: Grid
+  type(Field_Type), pointer :: Flow
   real                      :: xe, ye, ze, xc, yc, zc, uc, vc, wc, re, le, sgn
   real                      :: sig_x, sig_y, sig_z, delta_x, delta_y, delta_z
   integer                   :: e, c, pass
 !==============================================================================!
 
-  ! Take aliases to object particle flow around
-  grid => eddies % pnt_grid
-  flow => eddies % pnt_flow
+  ! Take aliases to object particle Flow around
+  Grid => eddies % pnt_grid
+  Flow => eddies % pnt_flow
 
-  do c = -grid % n_bnd_cells, -1
-    if(Grid_Mod_Bnd_Cond_Name(grid, c) .eq. eddies % bc_name) then
-      flow % u % n(c) = flow % u % b(c)
-      flow % v % n(c) = flow % v % b(c)
-      flow % w % n(c) = flow % w % b(c)
+  do c = -Grid % n_bnd_cells, -1
+    if(Grid % Bnd_Cond_Name( c) .eq. eddies % bc_name) then
+      Flow % u % n(c) = Flow % u % b(c)
+      Flow % v % n(c) = Flow % v % b(c)
+      Flow % w % n(c) = Flow % w % b(c)
     end if
   end do
 
@@ -36,24 +36,24 @@
     delta_y = 0
     delta_z = 0
 
-    if( (pass .eq. 1 .or. pass .eq. 2) .and. grid % per_x < NANO) cycle
-    if( (pass .eq. 3 .or. pass .eq. 4) .and. grid % per_y < NANO) cycle
-    if( (pass .eq. 5 .or. pass .eq. 6) .and. grid % per_z < NANO) cycle
+    if( (pass .eq. 1 .or. pass .eq. 2) .and. Grid % per_x < NANO) cycle
+    if( (pass .eq. 3 .or. pass .eq. 4) .and. Grid % per_y < NANO) cycle
+    if( (pass .eq. 5 .or. pass .eq. 6) .and. Grid % per_z < NANO) cycle
 
-    if( pass .eq. 1 ) delta_x = -grid % per_x
-    if( pass .eq. 2 ) delta_x = +grid % per_x
-    if( pass .eq. 3 ) delta_y = -grid % per_y
-    if( pass .eq. 4 ) delta_y = +grid % per_y
-    if( pass .eq. 5 ) delta_z = -grid % per_z
-    if( pass .eq. 6 ) delta_z = +grid % per_z
+    if( pass .eq. 1 ) delta_x = -Grid % per_x
+    if( pass .eq. 2 ) delta_x = +Grid % per_x
+    if( pass .eq. 3 ) delta_y = -Grid % per_y
+    if( pass .eq. 4 ) delta_y = +Grid % per_y
+    if( pass .eq. 5 ) delta_z = -Grid % per_z
+    if( pass .eq. 6 ) delta_z = +Grid % per_z
 
     ! Select cell for each cell randomly
-    do c = -grid % n_bnd_cells, -1
-      if(Grid_Mod_Bnd_Cond_Name(grid, c) .eq. eddies % bc_name) then
+    do c = -Grid % n_bnd_cells, -1
+      if(Grid % Bnd_Cond_Name( c) .eq. eddies % bc_name) then
 
-        xc = grid % xc(c)
-        yc = grid % yc(c)
-        zc = grid % zc(c)
+        xc = Grid % xc(c)
+        yc = Grid % yc(c)
+        zc = Grid % zc(c)
 
         do e = 1, eddies % n_eddies
           xe  = eddies % eddy(e) % x + delta_x
@@ -104,9 +104,9 @@
           vc = vc * ONE_THIRD * 10.0 * eddies % intensity
           wc = wc * ONE_THIRD * 10.0 * eddies % intensity
 
-          flow % u % n(c) = flow % u % n(c) + uc
-          flow % v % n(c) = flow % v % n(c) + vc
-          flow % w % n(c) = flow % w % n(c) + wc
+          Flow % u % n(c) = Flow % u % n(c) + uc
+          Flow % v % n(c) = Flow % v % n(c) + vc
+          Flow % w % n(c) = Flow % w % n(c) + wc
 
         end do
 

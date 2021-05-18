@@ -1,9 +1,9 @@
 !==============================================================================!
-  subroutine Work_Mod_Allocate_Real_Faces(grid, n)
+  subroutine Work_Mod_Allocate_Real_Faces(Grid, n)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid(:)
+  type(Grid_Type) :: Grid(:)
   integer         :: n    ! number of arrays
 !-----------------------------------[Locals]-----------------------------------!
   integer :: nf
@@ -12,7 +12,7 @@
   if(n .eq. 0) return
 
   ! Get number of faces
-  nf = maxval(grid(1:size(grid)) % n_faces)
+  nf = maxval(Grid(1:size(Grid)) % n_faces)
 
   ! Allocate requested memory
   allocate(r_face_01(nf));   r_face_01 = 0.0;   if(n .eq.  1) return

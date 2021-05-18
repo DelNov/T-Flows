@@ -22,14 +22,14 @@
   type(Var_Type)            :: ui        ! velocity component
   type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),   pointer :: grid
+  type(Grid_Type),   pointer :: Grid
   type(Matrix_Type), pointer :: M
   real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   M    => Sol % M
   b    => Sol % b % val
 
@@ -39,18 +39,18 @@
 
     ! Sum of neighbours
     neigh = 0.0
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
       if(c2 > 0) then
         neigh(c1) = neigh(c1) - M % val(M % pos(1,s)) * ui % n(c2)
         neigh(c2) = neigh(c2) - M % val(M % pos(2,s)) * ui % n(c1)
       end if
     end do
-    call Grid_Mod_Exchange_Cells_Real(grid, neigh)
+    call Grid % Exchange_Cells_Real(neigh)
 
     ! Solve velocity explicitely (no under relaxation!!)
-    do c = 1, grid % n_cells
+    do c = 1, Grid % n_cells
       ui % n(c) = (neigh(c) + b(c)) / M % val(M % dia(c))
     end do
 

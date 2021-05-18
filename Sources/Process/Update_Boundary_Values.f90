@@ -29,7 +29,7 @@
 !---------------------------------[Calling]------------------------------------!
   real :: Y_Plus_Low_Re
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: u, v, w, t, phi, fun
   type(Var_Type),  pointer :: kin, eps, zeta, f22, vis, t2
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
@@ -38,7 +38,7 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   vis  => turb % vis
   fun  => Vof % fun
   call Flow % Alias_Momentum(u, v, w)
@@ -69,9 +69,9 @@
   !--------------!
   if( (update .eq. 'MOMENTUM' .or. update .eq. 'ALL') ) then
 
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
 
       ! On the boundary perform the extrapolation
       if(c2 < 0) then
@@ -79,9 +79,9 @@
         ! Extrapolate velocities on the outflow boundary
         ! SYMMETRY is intentionally not treated here because I wanted to
         ! be sure that is handled only via graPHI and NewUVW functions)
-        if( Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW .or.     &
-            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE .or.    &
-            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. SYMMETRY ) then
+        if( Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW .or.     &
+            Grid % Bnd_Cond_Type(c2) .eq. PRESSURE .or.    &
+            Grid % Bnd_Cond_Type(c2) .eq. SYMMETRY ) then
           u % n(c2) = u % n(c1)
           v % n(c2) = v % n(c1)
           w % n(c2) = w % n(c1)
@@ -99,17 +99,17 @@
   if( (update .eq. 'MULTIPHASE' .or. update .eq. 'ALL') .and.  &
       Vof % model .eq. VOLUME_OF_FLUID ) then
 
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
 
       ! On the boundary perform the extrapolation
       if(c2 < 0) then
 
-        if( Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW  .or.    &
-            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE .or.    &
-            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT  .or.    &
-            Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. SYMMETRY ) then
+        if( Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.    &
+            Grid % Bnd_Cond_Type(c2) .eq. PRESSURE .or.    &
+            Grid % Bnd_Cond_Type(c2) .eq. CONVECT  .or.    &
+            Grid % Bnd_Cond_Type(c2) .eq. SYMMETRY ) then
           fun % n(c2) = fun % n(c1)
         end if
       end if ! c2 < 0
@@ -124,9 +124,9 @@
   !----------------!
   if(update .eq. 'TURBULENCE' .or. update .eq. 'ALL') then
 
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
 
       ! On the boundary perform the extrapolation
       if(c2 < 0) then
@@ -135,10 +135,10 @@
         ! Spalart Allmaras
         if(turb % model .eq. SPALART_ALLMARAS .or.  &
            turb % model .eq. DES_SPALART) then
-          if ( Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW  .or.  &
-               Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT  .or.  &
-               Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE .or.  &
-               Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. SYMMETRY) then
+          if ( Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.  &
+               Grid % Bnd_Cond_Type(c2) .eq. CONVECT  .or.  &
+               Grid % Bnd_Cond_Type(c2) .eq. PRESSURE .or.  &
+               Grid % Bnd_Cond_Type(c2) .eq. SYMMETRY) then
             vis % n(c2) = vis % n(c1)
           end if
         end if
@@ -147,8 +147,8 @@
         if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
            turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
 
-          if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
-             Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
+          if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
+             Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
             uu  % n(c2) = 0.0
             vv  % n(c2) = 0.0
             ww  % n(c2) = 0.0
@@ -158,9 +158,9 @@
             kin % n(c2) = 0.0
             kin_vis = Flow % viscosity(c1) / Flow % density(c1)
             u_tau = kin_vis * sqrt(u % n(c1)**2 + v % n(c1)**2 + w % n(c1)**2)  &
-                  / grid % wall_dist(c1)
+                  / Grid % wall_dist(c1)
             turb % y_plus(c1) = Y_Plus_Low_Re(turb, u_tau,           &
-                                              grid % wall_dist(c1),  &
+                                              Grid % wall_dist(c1),  &
                                               kin_vis)
             if(turb % model .eq. RSM_MANCEAU_HANJALIC) f22 % n(c2) = 0.0
           end if
@@ -169,10 +169,10 @@
         ! k-epsilon-zeta-f
         if(turb % model .eq. K_EPS_ZETA_F .or.  &
            turb % model .eq. HYBRID_LES_RANS) then
-          if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW  .or.   &
-             Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT  .or.   &
-             Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE .or.   &
-             Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. SYMMETRY) then
+          if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.   &
+             Grid % Bnd_Cond_Type(c2) .eq. CONVECT  .or.   &
+             Grid % Bnd_Cond_Type(c2) .eq. PRESSURE .or.   &
+             Grid % Bnd_Cond_Type(c2) .eq. SYMMETRY) then
             kin  % n(c2) = kin  % n(c1)
             eps  % n(c2) = eps  % n(c1)
             zeta % n(c2) = zeta % n(c1)
@@ -186,10 +186,10 @@
 
         ! k-epsilon
         if(turb % model .eq. K_EPS) then
-          if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW  .or.  &
-             Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT  .or.  &
-             Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE .or.  &
-             Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. SYMMETRY) then
+          if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.  &
+             Grid % Bnd_Cond_Type(c2) .eq. CONVECT  .or.  &
+             Grid % Bnd_Cond_Type(c2) .eq. PRESSURE .or.  &
+             Grid % Bnd_Cond_Type(c2) .eq. SYMMETRY) then
             kin % n(c2) = kin % n(c1)
             eps % n(c2) = eps % n(c1)
             if(Flow % heat_transfer) then
@@ -200,9 +200,9 @@
 
         if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
            turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-          if(Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. OUTFLOW .or.  &
-             Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. CONVECT .or.  &
-             Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. PRESSURE) then
+          if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW .or.  &
+             Grid % Bnd_Cond_Type(c2) .eq. CONVECT .or.  &
+             Grid % Bnd_Cond_Type(c2) .eq. PRESSURE) then
             uu  % n(c2) = uu  % n(c1)
             vv  % n(c2) = vv  % n(c1)
             ww  % n(c2) = ww  % n(c1)
@@ -233,9 +233,9 @@
     Flow % heat_flux   = 0.0     ! [W/m^2]
     Flow % heated_area = 0.0     ! [m^2]
 
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
 
       ! On the boundary perform the extrapolation
       if (c2 < 0) then
@@ -247,29 +247,29 @@
            turb % model .eq. LES_DYNAMIC     .or.  &
            turb % model .eq. K_EPS) then
           if(Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALLFL) then
-            t % n(c2) = t % n(c1) + t % q(c2) * grid % wall_dist(c1)  &
+            t % n(c2) = t % n(c1) + t % q(c2) * Grid % wall_dist(c1)  &
                       / (turb % con_w(c1) + TINY)
           else if(Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALL) then
             t % q(c2) = ( t % n(c2) - t % n(c1) ) * turb % con_w(c1)  &
-                      / grid % wall_dist(c1)
+                      / Grid % wall_dist(c1)
           end if
 
         ! Wall temperature or heat fluxes for other trubulence models
         else
           if(Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALLFL) then
-            t % n(c2) = t % n(c1) + t % q(c2) * grid % wall_dist(c1)  &
+            t % n(c2) = t % n(c1) + t % q(c2) * Grid % wall_dist(c1)  &
                       / Flow % conductivity(c1)
           else if(Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALL) then
             t % q(c2) = ( t % n(c2) - t % n(c1) ) * Flow % conductivity(c1)  &
-                      / grid % wall_dist(c1)
+                      / Grid % wall_dist(c1)
           end if
 
         end if
 
         ! Integrate heat and heated area
-        Flow % heat = Flow % heat + t % q(c2) * grid % s(s)
+        Flow % heat = Flow % heat + t % q(c2) * Grid % s(s)
         if(abs(t % q(c2)) > TINY) then
-          Flow % heated_area = Flow % heated_area + grid % s(s)
+          Flow % heated_area = Flow % heated_area + Grid % s(s)
         end if
 
         if( Var_Mod_Bnd_Cond_Type(t,c2) .eq. OUTFLOW .or.     &
@@ -279,7 +279,7 @@
         end if
 
       end if ! c2 < 0
-    end do ! s = 1, grid % n_faces
+    end do ! s = 1, Grid % n_faces
 
     !-----------------------------------------------!
     !   Integrate (summ) heated area, and heat up   !
@@ -300,9 +300,9 @@
     do sc = 1, Flow % n_scalars
       phi => Flow % scalar(sc)
 
-      do s = 1, grid % n_faces
-        c1 = grid % faces_c(1,s)
-        c2 = grid % faces_c(2,s)
+      do s = 1, Grid % n_faces
+        c1 = Grid % faces_c(1,s)
+        c2 = Grid % faces_c(2,s)
 
         ! On the boundary perform the extrapolation
         if (c2 < 0) then
@@ -314,21 +314,21 @@
              turb % model .eq. K_EPS) then
 
             if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALLFL) then
-              phi % n(c2) = phi % n(c1) + phi % q(c2) * grid % wall_dist(c1)  &
+              phi % n(c2) = phi % n(c1) + phi % q(c2) * Grid % wall_dist(c1)  &
                         / (turb % diff_w(c1) + TINY)
             else if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALL) then
               phi % q(c2) = ( phi % n(c2) - phi % n(c1) ) * turb % diff_w(c1)  &
-                        / grid % wall_dist(c1)
+                        / Grid % wall_dist(c1)
             end if
 
           ! Scalar boundary for other trubulence models
           else
             if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALLFL) then
-              phi % n(c2) = phi % n(c1) + phi % q(c2) * grid % wall_dist(c1)  &
+              phi % n(c2) = phi % n(c1) + phi % q(c2) * Grid % wall_dist(c1)  &
                           / Flow % diffusivity
             else if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALL) then
               phi % q(c2) = (phi % n(c2) - phi % n(c1)) * Flow % diffusivity &
-                          / grid % wall_dist(c1)
+                          / Grid % wall_dist(c1)
             end if ! WALL or WALLFL
           end if ! Turb. models
 
@@ -339,7 +339,7 @@
           end if
 
         end if ! c2 < 0
-      end do ! s = 1, grid % n_faces
+      end do ! s = 1, Grid % n_faces
     end do ! sc = 1, Flow % n_scalars
 
   end if  ! update_scalars

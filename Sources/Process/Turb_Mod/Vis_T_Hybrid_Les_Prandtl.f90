@@ -14,11 +14,11 @@
   type(Turb_Type), target :: turb
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
-  type(Grid_Type),  pointer :: grid
+  type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: u, v, w, t
   integer                   :: c, s, c1, c2
   real                      :: fd    ! damping function
-  real                      :: hwn   ! grid step size in wall-normal direction 
+  real                      :: hwn   ! Grid step size in wall-normal direction 
   real                      :: hmax
   real                      :: cw, u_ff
   real                      :: dw
@@ -28,7 +28,7 @@
 
   ! Take aliases
   Flow => turb % pnt_flow
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   call Flow % Alias_Momentum(u, v, w)
   t    => Flow % t
 
@@ -39,11 +39,11 @@
   kappa = 0.41
 
   ! Calculate model's eddy viscosity
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
 
     hmax = turb % h_max(c)
     hwn  = turb % h_w(c)
-    dw   = grid % wall_dist(c)
+    dw   = Grid % wall_dist(c)
 
     ! Wall-modeled LES length scale
     lf_wm = min(max(cw*dw,cw*hmax,hwn),hmax)
@@ -56,8 +56,8 @@
                   * sqrt(  u % n(turb % nearest_wall_cell(c)) ** 2   &
                          + v % n(turb % nearest_wall_cell(c)) ** 2   &
                          + w % n(turb % nearest_wall_cell(c)) ** 2)  &
-                 / (grid % wall_dist(turb % nearest_wall_cell(c))+TINY) )
-      turb % y_plus(c) = grid % wall_dist(c) * u_ff / Flow % viscosity(c)
+                 / (Grid % wall_dist(turb % nearest_wall_cell(c))+TINY) )
+      turb % y_plus(c) = Grid % wall_dist(c) * u_ff / Flow % viscosity(c)
 
       ! Piomelli damping function
       fd = 1.0 - exp(-(turb % y_plus(c)/25.0)**3)
@@ -75,18 +75,18 @@
   !  The procedure below calculates the vis..   !
   !  .. at the wall.                            !
   !----------------.----------------------------!
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
     if(c2 < 0) then
       turb % vis_w(c1) = Flow % viscosity(c1)            &
-              +        grid % fw(s)  * turb % vis_t(c1)  &
-              + (1.0 - grid % fw(s)) * turb % vis_t(c2)
+              +        Grid % fw(s)  * turb % vis_t(c1)  &
+              + (1.0 - Grid % fw(s)) * turb % vis_t(c2)
     end if    ! c2 < 0
   end do
 
-  call Grid_Mod_Exchange_Cells_Real(grid, turb % vis_t)
-  call Grid_Mod_Exchange_Cells_Real(grid, turb % vis_w)
+  call Grid % Exchange_Cells_Real(turb % vis_t)
+  call Grid % Exchange_Cells_Real(turb % vis_w)
 
   end subroutine

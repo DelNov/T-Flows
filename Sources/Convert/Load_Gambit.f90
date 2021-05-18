@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Load_Gambit(grid, file_name)
+  subroutine Load_Gambit(Grid, file_name)
 !------------------------------------------------------------------------------!
 !   Reads the Gambits neutral file format.                                     !
 !------------------------------------------------------------------------------!
@@ -8,7 +8,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Grid_Type) :: Grid
   character(SL)   :: file_name
 !-----------------------------------[Locals]-----------------------------------!
   integer             :: i, j, n_blocks, n_bnd_sect, dum1, dum2, fu
@@ -21,7 +21,7 @@
   !------------------------------------------!
   !   Gambit can't handle polyhedral grids   !
   !------------------------------------------!
-  grid % polyhedral = .false.
+  Grid % polyhedral = .false.
 
   !------------------------!
   !   Browse over header   !
@@ -43,20 +43,20 @@
 1 continue
   call File_Mod_Read_Line(fu)
 
-  read(line % tokens(1),*) grid % n_nodes
-  read(line % tokens(2),*) grid % n_cells
+  read(line % tokens(1),*) Grid % n_nodes
+  read(line % tokens(2),*) Grid % n_cells
   read(line % tokens(3),*) n_blocks
   read(line % tokens(4),*) n_bnd_sect
 
-  print '(a38,i9)', '# Total number of nodes:             ', grid % n_nodes
-  print '(a38,i9)', '# Total number of cells:             ', grid % n_cells
+  print '(a38,i9)', '# Total number of nodes:             ', Grid % n_nodes
+  print '(a38,i9)', '# Total number of cells:             ', Grid % n_cells
   print '(a38,i9)', '# Total number of blocks:            ', n_blocks
   print '(a38,i9)', '# Total number of boundary sections: ', n_bnd_sect
 
   !------------------------------!
   !   Count the boundary cells   !
   !------------------------------!
-  grid % n_bnd_cells = 0
+  Grid % n_bnd_cells = 0
   do
     call File_Mod_Read_Line(fu)
     if( line % tokens(1) .eq. 'BOUNDARY' ) then
@@ -64,14 +64,14 @@
         if(j>1) call File_Mod_Read_Line(fu) ! BOUNDARY CONDITIONS
         call File_Mod_Read_Line(fu)
         read(line % tokens(3),*) dum1
-        grid % n_bnd_cells = grid % n_bnd_cells + dum1 
+        Grid % n_bnd_cells = Grid % n_bnd_cells + dum1 
         do i = 1, dum1
           read(fu,*) c, dum2, dir
         end do
         call File_Mod_Read_Line(fu)         ! ENDOFSECTION
       end do
       print '(a38,i9)', '# Total number of boundary cells:    ',  &
-            grid % n_bnd_cells
+            Grid % n_bnd_cells
       goto 2
     end if
   end do
@@ -99,19 +99,19 @@
   !   Allocate memory for Grid_Mod variables   !
   !                                            !
   !--------------------------------------------!
-  call Allocate_Memory(grid)
+  call Allocate_Memory(Grid)
 
-  allocate(temp(grid % n_cells)); temp=0
+  allocate(temp(Grid % n_cells)); temp=0
 
   !--------------------------------!
   !   Read the nodal coordinates   !
   !--------------------------------!
   call File_Mod_Read_Line(fu)          ! NODAL COORDINATES
-  do i = 1, grid % n_nodes
+  do i = 1, Grid % n_nodes
     call File_Mod_Read_Line(fu)
-    read(line % tokens(2),*) grid % xn(i)
-    read(line % tokens(3),*) grid % yn(i)
-    read(line % tokens(4),*) grid % zn(i)
+    read(line % tokens(2),*) Grid % xn(i)
+    read(line % tokens(3),*) Grid % yn(i)
+    read(line % tokens(4),*) Grid % zn(i)
   end do
   call File_Mod_Read_Line(fu)          ! ENDOFSECTION
 
@@ -119,22 +119,22 @@
   !   Read nodes of each cell   !
   !-----------------------------!
   call File_Mod_Read_Line(fu)          ! ELEMENTS/CELLS
-  do i = 1, grid % n_cells
+  do i = 1, Grid % n_cells
     read(fu,'(i8,1x,i2,1x,i2,1x,7i8:/(15x,7i8:))') dum1, dum2, &
-           grid % cells_n_nodes(i),                           &
-          (grid % cells_n(j,i), j = 1, grid % cells_n_nodes(i))
+           Grid % cells_n_nodes(i),                           &
+          (Grid % cells_n(j,i), j = 1, Grid % cells_n_nodes(i))
 
     ! Nodes 3,4 and 7,8 should be swapped for hexahedral
     ! cells to be compatible with writing in vtu format
-    if( grid % cells_n_nodes(i) .eq. 8 ) then
-      call Swap_Int(grid % cells_n(3, i), grid % cells_n(4, i))
-      call Swap_Int(grid % cells_n(7, i), grid % cells_n(8, i))
+    if( Grid % cells_n_nodes(i) .eq. 8 ) then
+      call Swap_Int(Grid % cells_n(3, i), Grid % cells_n(4, i))
+      call Swap_Int(Grid % cells_n(7, i), Grid % cells_n(8, i))
     end if
 
     ! Nodes 3, 4 should be swapped for pyramids
     ! to be compatible with files in vtu format
-    if( grid % cells_n_nodes(i) .eq. 5 ) then
-      call Swap_Int(grid % cells_n(3, i), grid % cells_n(4, i))
+    if( Grid % cells_n_nodes(i) .eq. 5 ) then
+      call Swap_Int(Grid % cells_n(3, i), Grid % cells_n(4, i))
     end if
 
   end do
@@ -156,18 +156,18 @@
   !-------------------------!
   !   Boundary conditions   !
   !-------------------------!
-  grid % n_bnd_cond = n_bnd_sect
-  allocate(grid % bnd_cond % name(n_bnd_sect))
+  Grid % n_bnd_cond = n_bnd_sect
+  allocate(Grid % bnd_cond % name(n_bnd_sect))
 
   do j = 1, n_bnd_sect
     call File_Mod_Read_Line(fu)        ! BOUNDARY CONDITIONS
     call File_Mod_Read_Line(fu)
     call To_Upper_Case(  line % tokens(1)  )
-    grid % bnd_cond % name(j) = line % tokens(1)
+    Grid % bnd_cond % name(j) = line % tokens(1)
     read(line % tokens(3),'(i8)') dum1
     do i = 1, dum1
       read(fu,*) c, dum2, dir
-      grid % cells_bnd_color(dir,c) = j
+      Grid % cells_bnd_color(dir,c) = j
     end do
     call File_Mod_Read_Line(fu)        ! ENDOFSECTION
   end do
@@ -175,7 +175,7 @@
   !------------------------------------!
   !   Pring boundary conditions info   !
   !------------------------------------!
-  call Grid_Mod_Print_Bnd_Cond_List(grid)
+  call Grid % Print_Bnd_Cond_List()
 
   close(fu)
 

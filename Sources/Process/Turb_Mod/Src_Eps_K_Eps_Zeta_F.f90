@@ -16,7 +16,7 @@
   real :: Tau_Wall_Rough_Walls
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: Flow
-  type(Grid_Type),   pointer :: grid
+  type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: u, v, w
   type(Var_Type),    pointer :: kin, eps, zeta, f22, ut, vt, wt
   type(Matrix_Type), pointer :: A
@@ -54,16 +54,16 @@
 
   ! Take aliases
   Flow => turb % pnt_flow
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   call Flow % Alias_Momentum(u, v, w)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
   call Turb_Mod_Alias_Heat_Fluxes (turb, ut, vt, wt)
   call Sol % Alias_Solver         (A, b)
 
-  call Time_And_Length_Scale(grid, turb)
+  call Time_And_Length_Scale(Grid, turb)
 
-  do c = 1, grid % n_cells 
-    e_sor = grid % vol(c)/(turb % t_scale(c)+TINY)
+  do c = 1, Grid % n_cells 
+    e_sor = Grid % vol(c)/(turb % t_scale(c)+TINY)
     c_11e = c_1e*(1.0 + alpha * ( 1.0/(zeta % n(c)+TINY) ))
     b(c) = b(c) + c_11e * e_sor * turb % p_kin(c)
 
@@ -85,13 +85,13 @@
   !-------------------------------------------------------!
 
   ! Imposing a boundary condition on wall for eps
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
     if(c2 < 0) then
-      kin_vis = Flow % viscosity(c1) / Flow % density(c1) 
-      if( Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALL .or.  &
-          Grid_Mod_Bnd_Cond_Type(grid,c2) .eq. WALLFL) then
+      kin_vis = Flow % viscosity(c1) / Flow % density(c1)
+      if( Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
+          Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
 
         ! Compute tangential velocity component
         u_tan = Flow % U_Tan(s)
@@ -100,7 +100,7 @@
 
         turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
                                           u_tau,                 &
-                                          grid % wall_dist(c1),  &
+                                          Grid % wall_dist(c1),  &
                                           kin_vis)
 
         turb % tau_wall(c1) = Tau_Wall_Low_Re(turb,               &
@@ -113,18 +113,18 @@
 
         turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
                                           u_tau_new,             &
-                                          grid % wall_dist(c1),  &
+                                          Grid % wall_dist(c1),  &
                                           kin_vis)
 
         eps_int = 2.0* kin_vis * kin % n(c1)  &
-                / grid % wall_dist(c1)**2
+                / Grid % wall_dist(c1)**2
         eps_wf  = c_mu75 * kin % n(c1)**1.5            &
-                / (grid % wall_dist(c1) * kappa)
+                / (Grid % wall_dist(c1) * kappa)
 
         ebf = Turb_Mod_Ebf_Momentum(turb, c1)
 
         p_kin_wf  = turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
-                / (grid % wall_dist(c1) * kappa)
+                / (Grid % wall_dist(c1) * kappa)
 
         p_kin_int = turb % vis_t(c1) * Flow % shear(c1)**2
 
@@ -137,26 +137,26 @@
 
         if(turb % rough_walls) then
           z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
-          z_o = max(grid % wall_dist(c1)  &
+          z_o = max(Grid % wall_dist(c1)  &
               / (e_log * max(turb % y_plus(c1), 1.0)), z_o)
  
           turb % y_plus(c1) = Y_Plus_Rough_Walls(turb,                  &
                                                  u_tau,                 &
-                                                 grid % wall_dist(c1),  &
+                                                 Grid % wall_dist(c1),  &
                                                  kin_vis)
 
           turb % tau_wall(c1) = Tau_Wall_Rough_Walls(turb,                  &
                                                      Flow % density(c1),    &
                                                      u_tau,                 &
                                                      u_tan,                 &
-                                                     grid % wall_dist(c1),  &
+                                                     Grid % wall_dist(c1),  &
                                                      z_o)
 
           p_kin_wf = turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
-                   / (kappa * (grid % wall_dist(c1) + z_o))
+                   / (kappa * (Grid % wall_dist(c1) + z_o))
 
           eps_wf = c_mu75 * kin % n(c1)**1.5  &
-                 / ((grid % wall_dist(c1) + z_o) * kappa)
+                 / ((Grid % wall_dist(c1) + z_o) * kappa)
 
           ebf = Turb_Mod_Ebf_Momentum(turb, c1)
 
@@ -180,7 +180,7 @@
           A % val(A % dia(c1)) = 1.0
         else
           eps % n(c2) = 2.0* kin_vis * kin % n(c1)  &
-                      / grid % wall_dist(c1)**2
+                      / Grid % wall_dist(c1)**2
         end if  ! y_plus(c1) < 3
       end if      ! wall or wall_flux
     end if        ! c2 < 0
