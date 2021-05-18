@@ -1,10 +1,10 @@
 !==============================================================================!
-  subroutine Grid_Mod_Bounding_Box(Grid, xmin, ymin, zmin, xmax, ymax, zmax)
+  subroutine Bounding_Box(Grid, xmin, ymin, zmin, xmax, ymax, zmax)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: Grid
-  real            :: xmin, ymin, zmin, xmax, ymax, zmax
+  class(Grid_Type) :: Grid
+  real             :: xmin, ymin, zmin, xmax, ymax, zmax
 !-----------------------------------[Locals]-----------------------------------!
   integer :: nn
 !==============================================================================!

@@ -954,12 +954,12 @@ $(DIR_SHARED)/Work_Mod/*.f90
 
 #-- ./Front_Mod/Calculate_Element_Normals.f90
 #-- ./Front_Mod/Find_Vertex_Elements.f90
-#-- ./Front_Mod/Print_Statistics.f90
 #-- ./Front_Mod/Handle_3_Points.f90
 #-- ./Front_Mod/Calculate_Curvatures_From_Elems.f90
 #-- ./Front_Mod/Allocate.f90
 #-- ./Front_Mod/Handle_6_Points.f90
 #-- ./Front_Mod/Edge_Numbering.f90
+#-- ./Front_Mod/Print_Front_Statistics.f90
 #-- ./Piso_Algorithm.f90
 $(DIR_OBJECT)/Piso_Algorithm.o:\
 $(DIR_OBJECT)/Vof_Mod.o \
@@ -1202,10 +1202,6 @@ $(DIR_SHARED)/File_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #-- ./Gen_Mod/Are_Nodes_Twins.f90
-#-- ./Bnd_Cond_Mod.f90
-$(DIR_OBJECT)/Bnd_Cond_Mod.o:\
-$(DIR_OBJECT)/Const_Mod.o 
-
 #-- ./Probe_1d_Cells_Nodes.f90
 $(DIR_OBJECT)/Probe_1d_Cells_Nodes.o:\
 $(DIR_OBJECT)/Sort_Mod.o \
@@ -1219,6 +1215,10 @@ $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 
+
+#-- ./Boundary_Mod.f90
+$(DIR_OBJECT)/Boundary_Mod.o:\
+$(DIR_OBJECT)/Const_Mod.o 
 
 #-- ./Probe_1d_Nodes.f90
 $(DIR_OBJECT)/Probe_1d_Nodes.o:\
@@ -1436,12 +1436,13 @@ $(DIR_SHARED)/File_Mod/*.f90 \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 \
-$(DIR_OBJECT)/Bnd_Cond_Mod.o 
+$(DIR_OBJECT)/Boundary_Mod.o 
 
 #-- ./Grid_Mod/Allocate_Cells.f90
 #-- ./Grid_Mod/Allocate_Faces.f90
 #-- ./Grid_Mod/Calculate_Wall_Distance.f90
 #-- ./Grid_Mod/Calculate_Face_Centers.f90
+#-- ./Grid_Mod/Print_Grid_Statistics.f90
 #-- ./Grid_Mod/Exchange_Cells_Real.f90
 #-- ./Grid_Mod/Calculate_Face_Surfaces.f90
 #-- ./Grid_Mod/Load_Cfn.f90
@@ -1452,13 +1453,11 @@ $(DIR_OBJECT)/Bnd_Cond_Mod.o
 #-- ./Grid_Mod/Bnd_Cond_Ranges.f90
 #-- ./Grid_Mod/Sort_Faces_By_Index.f90
 #-- ./Grid_Mod/Bnd_Cond_Name.f90
-#-- ./Grid_Mod/Allocate_Bnd_Cond.f90
 #-- ./Grid_Mod/Calculate_Cell_Centers.f90
 #-- ./Grid_Mod/Decompose.f90
 #-- ./Grid_Mod/Save_Dim.f90
 #-- ./Grid_Mod/Find_Nodes_Cells.f90
 #-- ./Grid_Mod/Exchange_Cells_Log.f90
-#-- ./Grid_Mod/Print_Bnd_Cond_Info.f90
 #-- ./Grid_Mod/Calculate_Weights_Nodes_To_Cells.f90
 #-- ./Grid_Mod/Save_Debug_Vtu.f90
 #-- ./Grid_Mod/Sort_Faces_Smart.f90
@@ -1466,8 +1465,7 @@ $(DIR_OBJECT)/Bnd_Cond_Mod.o
 #-- ./Grid_Mod/Form_Maps.f90
 #-- ./Grid_Mod/Bnd_Cond_Type.f90
 #-- ./Grid_Mod/Calculate_Weights_Cells_To_Nodes.f90
-#-- ./Grid_Mod/Find_Periodic_Faces.f90
-#-- ./Grid_Mod/Print_Statistics.f90
+#-- ./Grid_Mod/Print_Bnd_Cond_List.f90
 #-- ./Grid_Mod/Bounding_Box.f90
 #-- ./Grid_Mod/Calculate_Face_Geometry.f90
 #-- ./Grid_Mod/Sort_Cells_By_Index.f90

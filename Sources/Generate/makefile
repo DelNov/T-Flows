@@ -116,24 +116,24 @@ METIS_LIB = ../Libraries/Metis_5.1.0_Linux_64/libmetis.a
 #-------------
 
 # Modules in shared directories
-SRC_MOD = Const_Mod.f90			\
-          Comm_Mod_Seq.f90		\
-          Math_Mod.f90			\
-          File_Mod.f90			\
-          Gen_Mod.f90			\
-          Vtk_Mod.f90			\
-          Metis_Options_Mod.f90		\
-          Bnd_Cond_Mod.f90		\
-          Sort_Mod.f90			\
+SRC_MOD = Const_Mod.f90          \
+          Comm_Mod_Seq.f90       \
+          Math_Mod.f90           \
+          File_Mod.f90           \
+          Gen_Mod.f90            \
+          Vtk_Mod.f90            \
+          Metis_Options_Mod.f90  \
+          Boundary_Mod.f90       \
+          Sort_Mod.f90           \
           Grid_Mod.f90
 
 # Modules in the local directory
-SRC_MOD += Point_Mod.f90		\
-           Line_Mod.f90			\
-           Block_Mod.f90		\
-           Region_Mod.f90		\
-           Smooths_Mod.f90		\
-           Refines_Mod.f90		\
+SRC_MOD += Point_Mod.f90    \
+           Line_Mod.f90     \
+           Block_Mod.f90    \
+           Region_Mod.f90   \
+           Smooths_Mod.f90  \
+           Refines_Mod.f90  \
            Domain_Mod.f90
 
 #---------------
@@ -141,18 +141,18 @@ SRC_MOD += Point_Mod.f90		\
 #---------------
 
 # Sources for all shared functions
-SRC_FUN = Probe_1d_Nodes.f90	\
-          Probe_2d.f90		\
-          Swap_Int.f90		\
-          Swap_Real.f90		\
-          Swap_Short.f90	\
+SRC_FUN = Probe_1d_Nodes.f90  \
+          Probe_2d.f90        \
+          Swap_Int.f90        \
+          Swap_Real.f90       \
+          Swap_Short.f90      \
           To_Upper_Case.f90
 
 # Local functions are added one by one ...
-SRC_FUN += Calculate_Geometry.f90	\
-           Load_Dom.f90			\
-           Logo_Gen.f90			\
-           Main_Gen.f90			\
+SRC_FUN += Calculate_Geometry.f90  \
+           Load_Dom.f90            \
+           Logo_Gen.f90            \
+           Main_Gen.f90            \
            Print_Grid_Statistics.f90
 
 #-------------------------------------------

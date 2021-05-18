@@ -26,7 +26,7 @@
   !------------------!
   !   Bounding box   !
   !------------------!
-  call Find_Bounding_Box(Grid, xmin, ymin, zmin, xmax, ymax, zmax)
+  call Grid % Bounding_Box(xmin, ymin, zmin, xmax, ymax, zmax)
 
   if(this_proc < 2) then
     print '(a)',  ' # Bounding box:'

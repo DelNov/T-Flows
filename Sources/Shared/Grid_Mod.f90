@@ -179,6 +179,7 @@
       procedure :: Bnd_Cond_Name
       procedure :: Bnd_Cond_Type
       procedure :: Bnd_Cond_Ranges
+      procedure :: Bounding_Box
       procedure :: Calculate_Cell_Centers
       procedure :: Calculate_Cell_Volumes
       procedure :: Calculate_Face_Centers
@@ -194,7 +195,6 @@
       procedure :: Exchange_Cells_Int
       procedure :: Exchange_Cells_Log
       procedure :: Exchange_Cells_Real
-      procedure :: Find_Bounding_Box
       procedure :: Find_Cells_Faces
       procedure :: Find_Nodes_Cells
       procedure :: Form_Cells_Comm
@@ -224,6 +224,7 @@
   include 'Grid_Mod/Bnd_Cond_Name.f90'
   include 'Grid_Mod/Bnd_Cond_Type.f90'
   include 'Grid_Mod/Bnd_Cond_Ranges.f90'
+  include 'Grid_Mod/Bounding_Box.f90'
   include 'Grid_Mod/Calculate_Cell_Centers.f90'
   include 'Grid_Mod/Calculate_Cell_Volumes.f90'
   include 'Grid_Mod/Calculate_Face_Centers.f90'
@@ -239,7 +240,6 @@
   include 'Grid_Mod/Exchange_Cells_Int.f90'
   include 'Grid_Mod/Exchange_Cells_Log.f90'
   include 'Grid_Mod/Exchange_Cells_Real.f90'
-  include 'Grid_Mod/Find_Bounding_Box.f90'
   include 'Grid_Mod/Find_Cells_Faces.f90'
   include 'Grid_Mod/Find_Nodes_Cells.f90'
   include 'Grid_Mod/Form_Cells_Comm.f90'
