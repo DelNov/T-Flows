@@ -76,6 +76,8 @@
          turb % model .eq. LES_DYNAMIC        .or.  &
          turb % model .eq. LES_WALE           .or.  &
          turb % model .eq. HYBRID_LES_PRANDTL .or.  &
+         turb % model .eq. K_EPS              .or.  &
+         turb % model .eq. K_EPS_ZETA_F       .or.  &
          turb % model .eq. DES_SPALART        .or.  &
          turb % model .eq. DNS) then
 
