@@ -23,11 +23,11 @@
 #-----------------
  NUMBER_OF_SCALARS      1
 
- MASS_DENSITY              1.0
- THERMAL_CONDUCTIVITY      0.002
- DYNAMIC_VISCOSITY         0.001
- HEAT_CAPACITY             1.0
- SCALARS_DIFFUSIVITY       0.001
+ MASS_DENSITY              1000.0
+ THERMAL_CONDUCTIVITY      0.6680
+ DYNAMIC_VISCOSITY         0.355E-3
+ HEAT_CAPACITY             4198.0
+ SCALARS_DIFFUSIVITY       1.99E-09
 
  TURBULENCE_MODEL  none
 
@@ -55,16 +55,16 @@
 # Initial conditions
 #--------------------
   INITIAL_CONDITION
-    VARIABLES           u     v     w    t     c_01
-    VALUES              0.1   0.0   0.0  5.0   0.005
+    VARIABLES           u     v     w    t      c_01
+    VALUES              0.1   0.0   0.0  80.0   0.09259259
 
 #---------------------
 # Boundary conditions
 #---------------------
   BOUNDARY_CONDITION    bottom_wall
     TYPE                wall
-    VARIABLES           u     v     w     t      c_01
-    VALUES              0.0   0.0   0.0   15.0   0.015
+    VARIABLES           u     v     w     t      q_01
+    VALUES              0.0   0.0   0.0   80.0   0.0
 
   BOUNDARY_CONDITION    top_wall
     TYPE                wall
@@ -79,9 +79,9 @@
   BOUNDARY_CONDITION    inlet
     TYPE                inflow
     VARIABLES           u     v     w     t      c_01
-    VALUES              0.1   0.0   0.0   10.0   0.01
+    VALUES              0.1   0.0   0.0   80.0   0.09259259
 
   BOUNDARY_CONDITION    outlet
     TYPE                pressure
     VARIABLES           u     v     w     t      c_01
-    VALUES              0.0   0.0   0.0   10.0   0.01
+    VALUES              0.0   0.0   0.0   80.0   0.09259259

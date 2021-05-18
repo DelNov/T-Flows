@@ -24,10 +24,10 @@
  NUMBER_OF_SCALARS      1
 
  MASS_DENSITY              1.2
- THERMAL_CONDUCTIVITY      0.002
- DYNAMIC_VISCOSITY         0.001
- HEAT_CAPACITY             1.0
- SCALARS_DIFFUSIVITY       0.001
+ THERMAL_CONDUCTIVITY      0.0278
+ DYNAMIC_VISCOSITY         17.935e-6
+ HEAT_CAPACITY             1007.0
+ SCALARS_DIFFUSIVITY       3.5E-5
 
  TURBULENCE_MODEL       none
 
@@ -39,6 +39,8 @@
 
  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.6
  SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.4
+ SIMPLE_UNDERRELAXATION_FOR_SCALAR      1.0
+ SIMPLE_UNDERRELAXATION_FOR_TEMPERATURE 1.0
 
  TIME_INTEGRATION_SCHEME  linear
 
@@ -57,32 +59,32 @@
 #--------------------
   INITIAL_CONDITION
     VARIABLES           u     v     w    t      c_01
-    VALUES              0.0   0.0   0.0  20.0   0.01
+    VALUES              0.0   0.0   0.0  15.0   0.01
 
 #---------------------
 # Boundary conditions
 #---------------------
   BOUNDARY_CONDITION    bottom_wall
     TYPE                wall
-    VARIABLES           u     v     w     q     c_01
-    VALUES              0.0   0.0   0.0   0.0   0.015
+    VARIABLES           u     v     w     t     q_01
+    VALUES              0.0   0.0   0.0   15.0  0.0
 
   BOUNDARY_CONDITION    top_wall
     TYPE                inflow
-    VARIABLES           u     v     w       t      c_01
-    VALUES              0.0   0.0   0.0     15.0   0.015
+    VARIABLES           u     v     w     t     q_01
+    VALUES              0.0   0.0   0.0   15.0  0.0
 
   BOUNDARY_CONDITION    side_walls
     TYPE                wall
-    VARIABLES           u     v     w     q     c_01
+    VARIABLES           u     v     w     q     q_01
     VALUES              0.0   0.0   0.0   0.0   0.0
 
   BOUNDARY_CONDITION    inlet
-    TYPE                inflow
-    VARIABLES           u     v     w     t      q_01
-    VALUES              0.0   0.0   0.0   20.0   2.00
+    TYPE                wall
+    VARIABLES           u     v     w     q      q_01
+    VALUES              0.0   0.0   0.0   0.0   0.0
 
   BOUNDARY_CONDITION    outlet
     TYPE                pressure
-    VARIABLES           u     v     w     t      c_01
-    VALUES              0.0   0.0   0.0   20.0   0.01
+    VARIABLES           u     v     w     q      q_01
+    VALUES              0.0   0.0   0.0   0.0   0.0
