@@ -1,13 +1,14 @@
 !==============================================================================!
-  subroutine Comm_Mod_Read_Real(fh, num, disp)
+  subroutine Read_Real(Comm, fh, num, disp)
 !------------------------------------------------------------------------------!
 !   Read single real number for parallel runs.                                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer :: fh    ! file handle
-  real    :: num   ! number to write out
-  integer :: disp  ! diplacement in bytes
+  class(Comm_Type) :: Comm
+  integer          :: fh    ! file handle
+  real             :: num   ! number to write out
+  integer          :: disp  ! diplacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
   integer :: error
 !==============================================================================!

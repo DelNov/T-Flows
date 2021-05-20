@@ -1,12 +1,13 @@
 !==============================================================================!
-  subroutine Comm_Mod_Open_File_Write(fh, file_name)
+  subroutine Open_File_Write(Comm, fh, file_name)
 !------------------------------------------------------------------------------!
 !   Open file for writing for sequential runs.                                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer   :: fh             ! file handle
-  character :: file_name*(*)  ! file name
+  class(Comm_Type) :: Comm
+  integer          :: fh             ! file handle
+  character        :: file_name*(*)  ! file name
 !==============================================================================!
 
   fh = 9

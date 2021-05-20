@@ -1,13 +1,14 @@
 !==============================================================================!
-  subroutine Comm_Mod_Exchange_Log_Array(length, phi, dest)
+  subroutine Exchange_Log_Array(Comm, length, phi, dest)
 !------------------------------------------------------------------------------!
 !   Dummy function for sequential runs.                                        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer :: length
-  logical :: phi(length)
-  integer :: dest         ! destination processor
+  class(Comm_Type) :: Comm
+  integer          :: length
+  logical          :: phi(length)
+  integer          :: dest         ! destination processor
 !==============================================================================!
 
   end subroutine

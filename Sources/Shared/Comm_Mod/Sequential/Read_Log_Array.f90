@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Comm_Mod_Read_Log_Array(fh, arr, disp)
+  subroutine Read_Log_Array(Comm, fh, arr, disp)
 !------------------------------------------------------------------------------!
 !   Read logical array for sequential runs.                                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Comm_Type)      :: Comm
   integer               :: fh    ! file handle
   logical, dimension(:) :: arr   ! array to read
   integer               :: disp  ! displacement in bytes

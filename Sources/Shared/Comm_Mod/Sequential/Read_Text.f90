@@ -1,13 +1,14 @@
 !==============================================================================!
-  subroutine Comm_Mod_Read_Text(fh, text_in, disp)
+  subroutine Read_Text(Comm, fh, text_in, disp)
 !------------------------------------------------------------------------------!
 !   Read string arrayr for sequential runs.                                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer   :: fh           ! file handle
-  character :: text_in*(*)  ! text to write out
-  integer   :: disp         ! displacement in bytes
+  class(Comm_Type) :: Comm
+  integer          :: fh           ! file handle
+  character        :: text_in*(*)  ! text to write out
+  integer          :: disp         ! displacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
   integer :: leng
 !==============================================================================!

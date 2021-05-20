@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Comm_Mod_Write_Log_Array(fh, arr, disp)
+  subroutine Write_Log_Array(Comm, fh, arr, disp)
 !------------------------------------------------------------------------------!
 !   Write logical array for parallel runs.                                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Comm_Type)      :: Comm
   integer               :: fh    ! file handle
   logical, dimension(:) :: arr   ! array to write out
   integer               :: disp  ! displacement in bytes

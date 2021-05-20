@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Comm_Mod_Write_Real_Array(fh, arr, disp)
+  subroutine Write_Real_Array(Comm, fh, arr, disp)
 !------------------------------------------------------------------------------!
 !   Write real arrayr for parallel runs.                                       !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Comm_Type)     :: Comm
   integer              :: fh    ! file handle
   real,   dimension(:) :: arr   ! array to write out
   integer              :: disp  ! displacement in bytes

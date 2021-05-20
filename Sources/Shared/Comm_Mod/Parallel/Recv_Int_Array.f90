@@ -1,13 +1,14 @@
 !==============================================================================!
-  subroutine Comm_Mod_Recv_Int_Array(len_r, phi_r, dest)
+  subroutine Recv_Int_Array(Comm, len_r, phi_r, dest)
 !------------------------------------------------------------------------------!
 !   Receives an integer array from processor dest.                             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer :: len_r         ! receive length
-  integer :: phi_r(len_r)  ! receive buffer
-  integer :: dest          ! destination processor
+  class(Comm_Type) :: Comm
+  integer          :: len_r         ! receive length
+  integer          :: phi_r(len_r)  ! receive buffer
+  integer          :: dest          ! destination processor
 !-----------------------------------[Locals]-----------------------------------!
   integer :: rtag, error
   integer :: status(MPI_STATUS_SIZE)

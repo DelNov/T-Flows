@@ -1,23 +1,23 @@
 !==============================================================================!
-  subroutine Comm_Mod_Write_Face_Real(comm, fh, array, disp)
+  subroutine Write_Face_Real(Comm, fh, array, disp)
 !------------------------------------------------------------------------------!
 !   Sequential version of writing a "distributed" face-based array.            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Comm_Type) :: comm
-  integer         :: fh         ! file handle
-  real            :: array(:)
-  integer         :: disp       ! displacement in bytes
+  class(Comm_Type) :: Comm
+  integer          :: fh         ! file handle
+  real             :: array(:)
+  integer          :: disp       ! displacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
   integer :: s
 !==============================================================================!
 
   ! Write "distributed" face data
-  do s = 1, comm % nf_tot
+  do s = 1, Comm % nf_tot
     write(9) array(s)
   end do
 
-  disp = disp + comm % nf_tot * SIZE_REAL
+  disp = disp + Comm % nf_tot * SIZE_REAL
 
   end subroutine

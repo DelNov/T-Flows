@@ -1,13 +1,14 @@
 !==============================================================================!
-  subroutine Comm_Mod_Read_Int(fh, num, disp)
+  subroutine Read_Int(Comm, fh, num, disp)
 !------------------------------------------------------------------------------!
 !   Read single integer for parallel runs.                                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer :: fh    ! file handle
-  integer :: num   ! number to write out
-  integer :: disp  ! diplacement in bytes
+  class(Comm_Type) :: Comm
+  integer          :: fh    ! file handle
+  integer          :: num   ! number to read
+  integer          :: disp  ! displacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
   integer :: error
 !==============================================================================!

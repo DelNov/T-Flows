@@ -1,12 +1,13 @@
 !==============================================================================!
-  subroutine Comm_Mod_Open_File_Read(fh, file_name)
+  subroutine Open_File_Read(Comm, fh, file_name)
 !------------------------------------------------------------------------------!
 !   Open file for reading for parallel runs.                                   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer   :: fh             ! file handle
-  character :: file_name*(*)  ! file name
+  class(Comm_Type) :: Comm
+  integer          :: fh             ! file handle
+  character        :: file_name*(*)  ! file name
 !-----------------------------------[Locals]-----------------------------------!
   integer :: error
 !==============================================================================!

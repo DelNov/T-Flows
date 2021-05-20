@@ -1,13 +1,14 @@
 !==============================================================================!
-  subroutine Comm_Mod_Read_Int(fh, num, disp)
+  subroutine Read_Int(Comm, fh, num, disp)
 !------------------------------------------------------------------------------!
 !   Read single integer for sequential runs.                                   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer :: fh    ! file handle
-  integer :: num   ! number to read
-  integer :: disp  ! displacement in bytes
+  class(Comm_Type) :: Comm
+  integer          :: fh    ! file handle
+  integer          :: num   ! number to read
+  integer          :: disp  ! displacement in bytes
 !==============================================================================!
 
   ! Position yourself at the right place inside the file

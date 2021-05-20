@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Comm_Mod_Read_Int_Array(fh, arr, disp)
+  subroutine Read_Int_Array(Comm, fh, arr, disp)
 !------------------------------------------------------------------------------!
 !   Read integer array for sequential runs.                                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Comm_Type)      :: Comm
   integer               :: fh    ! file handle
   integer, dimension(:) :: arr   ! array to read
   integer               :: disp  ! displacement in bytes

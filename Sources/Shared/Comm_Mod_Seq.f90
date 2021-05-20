@@ -18,7 +18,7 @@
   !-----------------!
   type Buffer_Type
     integer              :: n_items
-    integer, allocatable :: map  (:)   ! map to local node / face
+    integer, allocatable :: map(:)     ! map to local node / face
     integer, allocatable :: i_buff(:)  ! integer values stored in buffers
     logical, allocatable :: l_buff(:)  ! logical values stored in buffers
     real,    allocatable :: r_buff(:)  ! real values stored in buffers
@@ -30,7 +30,7 @@
   !   Comm type   !
   !               !
   !---------------!
-  type Comm_Type    ! also used inside the Grid_Type) 
+  type Comm_Type    ! also used inside the Grid_Type)
 
     ! Number of buffer cells
     integer :: n_buff_cells
@@ -65,6 +65,50 @@
     type(Buffer_Type), allocatable :: cells_send(:)
     type(Buffer_Type), allocatable :: cells_recv(:)
 
+    integer, private :: cell_map_type
+    integer, private :: bnd_cell_map_type
+    integer, private :: face_map_type
+
+    contains
+
+      ! File management
+      procedure :: Close_File
+      procedure :: Open_File_Read
+      procedure :: Open_File_Write
+      procedure :: Read_Int
+      procedure :: Read_Int_Array
+      procedure :: Read_Log_Array
+      procedure :: Read_Bnd_Real
+      procedure :: Read_Cell_Real
+      procedure :: Read_Face_Real
+      procedure :: Read_Real
+      procedure :: Read_Real_Array
+      procedure :: Read_Text
+      procedure :: Write_Int
+      procedure :: Write_Int_Array
+      procedure :: Write_Log_Array
+      procedure :: Write_Bnd_Real
+      procedure :: Write_Cell_Real
+      procedure :: Write_Face_Real
+      procedure :: Write_Real
+      procedure :: Write_Real_Array
+      procedure :: Write_Text
+
+      ! Messaging
+      procedure :: Create_New_Types
+      procedure :: Exchange_Int_Array     ! not used
+      procedure :: Exchange_Log_Array     ! not used
+      procedure :: Exchange_Real_Array    ! not used
+      procedure :: Recv_Int_Array         ! not used
+      procedure :: Recv_Log_Array         ! not used
+      procedure :: Recv_Real_Array        ! not used
+      procedure :: Sendrecv_Int_Arrays
+      procedure :: Sendrecv_Log_Arrays
+      procedure :: Sendrecv_Real_Arrays
+      procedure :: Send_Int_Array         ! not used
+      procedure :: Send_Log_Array         ! not used
+      procedure :: Send_Real_Array        ! not used
+
   end type
 
   ! Parameters for size of typical variables in bytes
@@ -77,21 +121,13 @@
 
   contains
 
-  include 'Comm_Mod/Sequential/Close_File.f90'
-  include 'Comm_Mod/Sequential/Create_New_Types.f90'
+  ! Three basic ones are non-member
+  include 'Comm_Mod/Sequential/Start.f90'
+  include 'Comm_Mod/Sequential/Wait.f90'
   include 'Comm_Mod/Sequential/End.f90'
-  include 'Comm_Mod/Sequential/Exchange_Int_Array.f90'
-  include 'Comm_Mod/Sequential/Exchange_Log_Array.f90'
-  include 'Comm_Mod/Sequential/Exchange_Real_Array.f90'
-  include 'Comm_Mod/Sequential/Global_Lor_Log_Array.f90'
-  include 'Comm_Mod/Sequential/Global_Max_Real.f90'
-  include 'Comm_Mod/Sequential/Global_Min_Real.f90'
-  include 'Comm_Mod/Sequential/Global_Max_Int.f90'
-  include 'Comm_Mod/Sequential/Global_Min_Int.f90'
-  include 'Comm_Mod/Sequential/Global_Sum_Int.f90'
-  include 'Comm_Mod/Sequential/Global_Sum_Int_Array.f90'
-  include 'Comm_Mod/Sequential/Global_Sum_Real.f90'
-  include 'Comm_Mod/Sequential/Global_Sum_Real_Array.f90'
+
+  ! File management
+  include 'Comm_Mod/Sequential/Close_File.f90'
   include 'Comm_Mod/Sequential/Open_File_Read.f90'
   include 'Comm_Mod/Sequential/Open_File_Write.f90'
   include 'Comm_Mod/Sequential/Read_Int.f90'
@@ -103,17 +139,6 @@
   include 'Comm_Mod/Sequential/Read_Real.f90'
   include 'Comm_Mod/Sequential/Read_Real_Array.f90'
   include 'Comm_Mod/Sequential/Read_Text.f90'
-  include 'Comm_Mod/Sequential/Recv_Int_Array.f90'
-  include 'Comm_Mod/Sequential/Recv_Log_Array.f90'
-  include 'Comm_Mod/Sequential/Recv_Real_Array.f90'
-  include 'Comm_Mod/Sequential/Send_Int_Array.f90'
-  include 'Comm_Mod/Sequential/Send_Log_Array.f90'
-  include 'Comm_Mod/Sequential/Send_Real_Array.f90'
-  include 'Comm_Mod/Sequential/Sendrecv_Int_Arrays.f90'
-  include 'Comm_Mod/Sequential/Sendrecv_Log_Arrays.f90'
-  include 'Comm_Mod/Sequential/Sendrecv_Real_Arrays.f90'
-  include 'Comm_Mod/Sequential/Start.f90'
-  include 'Comm_Mod/Sequential/Wait.f90'
   include 'Comm_Mod/Sequential/Write_Int.f90'
   include 'Comm_Mod/Sequential/Write_Int_Array.f90'
   include 'Comm_Mod/Sequential/Write_Log_Array.f90'
@@ -123,5 +148,31 @@
   include 'Comm_Mod/Sequential/Write_Real.f90'
   include 'Comm_Mod/Sequential/Write_Real_Array.f90'
   include 'Comm_Mod/Sequential/Write_Text.f90'
+
+  ! Global communicatins are better of as non-members
+  include 'Comm_Mod/Sequential/Global_Lor_Log_Array.f90'
+  include 'Comm_Mod/Sequential/Global_Max_Real.f90'
+  include 'Comm_Mod/Sequential/Global_Min_Real.f90'
+  include 'Comm_Mod/Sequential/Global_Max_Int.f90'
+  include 'Comm_Mod/Sequential/Global_Min_Int.f90'
+  include 'Comm_Mod/Sequential/Global_Sum_Int.f90'
+  include 'Comm_Mod/Sequential/Global_Sum_Int_Array.f90'
+  include 'Comm_Mod/Sequential/Global_Sum_Real.f90'
+  include 'Comm_Mod/Sequential/Global_Sum_Real_Array.f90'
+
+  ! Messaging
+  include 'Comm_Mod/Sequential/Create_New_Types.f90'
+  include 'Comm_Mod/Sequential/Exchange_Int_Array.f90'
+  include 'Comm_Mod/Sequential/Exchange_Log_Array.f90'
+  include 'Comm_Mod/Sequential/Exchange_Real_Array.f90'
+  include 'Comm_Mod/Sequential/Recv_Int_Array.f90'
+  include 'Comm_Mod/Sequential/Recv_Log_Array.f90'
+  include 'Comm_Mod/Sequential/Recv_Real_Array.f90'
+  include 'Comm_Mod/Sequential/Send_Int_Array.f90'
+  include 'Comm_Mod/Sequential/Send_Log_Array.f90'
+  include 'Comm_Mod/Sequential/Send_Real_Array.f90'
+  include 'Comm_Mod/Sequential/Sendrecv_Int_Arrays.f90'
+  include 'Comm_Mod/Sequential/Sendrecv_Log_Arrays.f90'
+  include 'Comm_Mod/Sequential/Sendrecv_Real_Arrays.f90'
 
   end module

@@ -1,13 +1,14 @@
 !==============================================================================!
-  subroutine Comm_Mod_Read_Int_Array(fh, arr, disp)
+  subroutine Read_Int_Array(Comm, fh, arr, disp)
 !------------------------------------------------------------------------------!
-!   Read single integer for parallel runs.                                     !
+!   Read integer array for parallel runs                                       !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Comm_Type)      :: Comm
   integer               :: fh    ! file handle
-  integer, dimension(:) :: arr   ! array to write out
-  integer               :: disp  ! diplacement in bytes
+  integer, dimension(:) :: arr   ! array to read
+  integer               :: disp  ! displacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
   integer :: length
   integer :: error

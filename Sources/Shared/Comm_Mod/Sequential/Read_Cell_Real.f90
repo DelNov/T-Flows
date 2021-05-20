@@ -1,14 +1,14 @@
 !==============================================================================!
-  subroutine Comm_Mod_Read_Cell_Real(comm, fh, array, disp)
+  subroutine Read_Cell_Real(Comm, fh, array, disp)
 !------------------------------------------------------------------------------!
 !   Sequential version of reading a "distributed" cell-based array.            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Comm_Type) :: comm
-  integer         :: fh         ! file handle
-  real            :: array(:)
-  integer         :: disp       ! displacement in bytes
+  class(Comm_Type) :: Comm
+  integer          :: fh         ! file handle
+  real             :: array(:)
+  integer          :: disp       ! displacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c
 !==============================================================================!
@@ -17,10 +17,10 @@
   call fseek(fh, disp, 0)
 
   ! Read "distributed" cell data 
-  do c = 1, comm % nc_tot
+  do c = 1, Comm % nc_tot
     read(fh) array(c)
   end do
 
-  disp = disp + comm % nc_tot * SIZE_REAL
+  disp = disp + Comm % nc_tot * SIZE_REAL
 
   end subroutine

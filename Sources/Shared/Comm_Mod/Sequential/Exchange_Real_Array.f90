@@ -1,13 +1,14 @@
 !==============================================================================!
-  subroutine Comm_Mod_Exchange_Real_Array(length, phi, dest)
+  subroutine Exchange_Real_Array(Comm, length, phi, dest)
 !------------------------------------------------------------------------------!
 !   Dummy function for sequential compilation.                                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer :: length
-  real    :: phi(length)
-  integer :: dest         ! destination processor
+  class(Comm_Type) :: Comm
+  integer          :: length
+  real             :: phi(length)
+  integer          :: dest         ! destination processor
 !==============================================================================!
 
   end subroutine

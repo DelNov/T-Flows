@@ -1,16 +1,17 @@
 !==============================================================================!
-  subroutine Comm_Mod_Sendrecv_Int_Arrays(len_s, phi_s,  &
-                                          len_r, phi_r, dest)
+  subroutine Sendrecv_Int_Arrays(Comm, len_s, phi_s,  &
+                                       len_r, phi_r, dest)
 !------------------------------------------------------------------------------!
 !   Sends and receives values of two integer arrays between the processors.    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer :: len_s         ! send length
-  integer :: phi_s(len_s)  ! send buffer
-  integer :: len_r         ! receive length
-  integer :: phi_r(len_r)  ! receive buffer
-  integer :: dest          ! destination processor
+  class(Comm_Type) :: Comm
+  integer          :: len_s         ! send length
+  integer          :: phi_s(len_s)  ! send buffer
+  integer          :: len_r         ! receive length
+  integer          :: phi_r(len_r)  ! receive buffer
+  integer          :: dest          ! destination processor
 !-----------------------------------[Locals]-----------------------------------!
   integer :: rtag, stag, error
   integer :: status(MPI_STATUS_SIZE)

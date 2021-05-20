@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Comm_Mod_Exchange_Int_Array(length, phi, dest)
+  subroutine Exchange_Int_Array(Comm, length, phi, dest)
 !------------------------------------------------------------------------------!
 !   Exchanges the values of an integer array between the processors.           !
 !   (Check out the Sendrecv variant of this function - it is more flexible ... !
@@ -7,9 +7,10 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer :: length
-  integer :: phi(length)
-  integer :: dest         ! destination processor
+  class(Comm_Type) :: Comm
+  integer          :: length
+  integer          :: phi(length)
+  integer          :: dest         ! destination processor
 !-----------------------------------[Locals]-----------------------------------!
   integer :: rtag, stag, error
   integer :: status(MPI_STATUS_SIZE)

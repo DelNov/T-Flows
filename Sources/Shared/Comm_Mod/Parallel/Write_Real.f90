@@ -1,13 +1,14 @@
 !==============================================================================!
-  subroutine Comm_Mod_Write_Real(fh, num, disp)
+  subroutine Write_Real(Comm, fh, num, disp)
 !------------------------------------------------------------------------------!
 !   Write single reael number for parallel runs.                               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer :: fh    ! file handle
-  real    :: num   ! number to write out
-  integer :: disp  ! displacement in bytes
+  class(Comm_Type) :: Comm
+  integer          :: fh    ! file handle
+  real             :: num   ! number to write out
+  integer          :: disp  ! displacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
   integer :: error
 !==============================================================================!
