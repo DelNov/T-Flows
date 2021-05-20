@@ -9,12 +9,14 @@
   type(Swarm_Type), target :: swr
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: grid
+  type(Comm_Type),     pointer :: Comm
   type(Particle_Type), pointer :: part
   integer                      :: i, k, n_part, n_parts_in_buffers
 !==============================================================================!
 
   ! Take aliases
-  grid => swr % pnt_grid
+  Grid => swr  % pnt_grid
+  Comm => Grid % Comm
 
   !--------------------------!
   !                          !
@@ -23,7 +25,7 @@
   !--------------------------!
 
   ! Number of particles
-  call Backup_Mod_Read_Int(fh, disp, vc, 'n_particles', n_part)
+  call Backup_Mod_Read_Int(Comm, fh, disp, vc, 'n_particles', n_part)
 
   swr % i_work(:) = 0
   swr % l_work(:) = .false.
@@ -31,13 +33,13 @@
 
   if(n_part > 0) then
     swr % n_particles = n_part
-    call Backup_Mod_Read_Int_Array(fh, disp, vc,         &
+    call Backup_Mod_Read_Int_Array(Comm, fh, disp, vc,   &
                    'particle_int_data',                  &
                     swr % i_work(1 : swr % N_I_VARS*swr % n_particles))
-    call Backup_Mod_Read_Log_Array(fh, disp, vc,         &
+    call Backup_Mod_Read_Log_Array(Comm, fh, disp, vc,   &
                    'particle_log_data',                  &
                     swr % l_work(1 : swr % N_L_VARS*swr % n_particles))
-    call Backup_Mod_Read_Real_Array(fh, disp, vc,        &
+    call Backup_Mod_Read_Real_Array(Comm, fh, disp, vc,  &
                    'particle_real_data',                 &
                     swr % r_work(1 : swr % N_R_VARS*swr % n_particles))
 

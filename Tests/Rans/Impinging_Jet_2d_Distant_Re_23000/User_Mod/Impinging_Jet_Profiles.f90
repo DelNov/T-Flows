@@ -59,8 +59,8 @@
   end if
 
   ! Set the name for coordinate file
-  call File_Mod_Set_Name(coord_name, extension='.1d')
-  call File_Mod_Open_File_For_Reading(coord_name, fu)
+  call File % Set_Name(coord_name, extension='.1d')
+  call File % Open_For_Reading_Ascii(coord_name, fu)
 
   ! Read the number of searching intervals
   read(fu,*) n_prob
@@ -207,8 +207,8 @@
     if(this_proc < 2) then
 
       ! Set the file name
-      call File_Mod_Set_Name(res_name, appendix='-prof', extension='.dat')
-      call File_Mod_Open_File_For_Writing(res_name, fu)
+      call File % Set_Name(res_name, appendix='-prof', extension='.dat')
+      call File % Open_For_Writing_Ascii(res_name, fu)
 
       write(fu,'(a1,2x,a101)') '#', ' 1:Xrad, ' // &
                                     ' 2:Umag, ' // &

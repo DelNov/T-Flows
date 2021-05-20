@@ -122,9 +122,9 @@
 !      !stop 
 !
 !      ! calling the problem name to open a new file for binning results
-!      call File_Mod_Set_Name(result_name, time_step = n,              & 
+!      call File % Set_Name(result_name, time_step = n,              & 
 !           appendix='-swarm-concentration', extension='.dat')
-!      call File_Mod_Open_File_For_Writing(result_name, fu)
+!      call File % Open_For_Writing_Ascii(result_name, fu)
 !
 !      ! printing info in a separate file...
 !      open(fu,file=result_name)

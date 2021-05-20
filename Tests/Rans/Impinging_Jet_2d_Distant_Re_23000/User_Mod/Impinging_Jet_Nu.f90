@@ -169,8 +169,8 @@
   if(this_proc < 2) then
 
     ! Set the file name
-    call File_Mod_Set_Name(res_name, appendix='-nu-utau', extension='.dat')
-    call File_Mod_Open_File_For_Writing(res_name, fu)
+    call File % Set_Name(res_name, appendix='-nu-utau', extension='.dat')
+    call File % Open_For_Writing_Ascii(res_name, fu)
 
     ! Write the file out
     write(fu, *) '# Xrad, Nu, Utau, Yplus, Temp, Numb of points '

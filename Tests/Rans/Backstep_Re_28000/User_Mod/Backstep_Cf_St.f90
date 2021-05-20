@@ -157,8 +157,8 @@
     end if
   end do
 
-  call File_Mod_Set_Name(result_name, appendix='-cf-st', extension='.dat')
-  call File_Mod_Open_File_For_Writing(result_name, fu)
+  call File % Set_Name(result_name, appendix='-cf-st', extension='.dat')
+  call File % Open_For_Writing_Ascii(result_name, fu)
 
   write(fu,*) '# x, Cf, St, U, T, yPlus'
   do i = 1, n_prob

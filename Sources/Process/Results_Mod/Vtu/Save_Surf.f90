@@ -32,11 +32,11 @@
 
   if(this_proc < 2) then
 
-    call File_Mod_Set_Name(name_out,               &
-                           time_step = time_step,  &
-                           appendix  = '-surf',    &
-                           extension = '.vtu')
-    call File_Mod_Open_File_For_Writing(name_out, fu)
+    call File % Set_Name(name_out,               &
+                         time_step = time_step,  &
+                         appendix  = '-surf',    &
+                         extension = '.vtu')
+    call File % Open_For_Writing_Ascii(name_out, fu)
 
     !------------!
     !            !

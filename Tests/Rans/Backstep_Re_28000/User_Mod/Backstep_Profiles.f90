@@ -35,7 +35,7 @@
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
 
   ! Set the name for coordinate file
-  call File_Mod_Set_Name(coord_name, extension='.1d')
+  call File % Set_Name(coord_name, extension='.1d')
 
   inquire(file='horizontal_positions.dat', exist=there)
 
@@ -184,8 +184,8 @@
       end if
     end do
 
-    call File_Mod_Set_Name(result_name, appendix='-prof', extension='.h.dat')
-    call File_Mod_Open_File_For_Writing(result_name, fu)
+    call File % Set_Name(result_name, appendix='-prof', extension='.h.dat')
+    call File % Open_For_Writing_Ascii(result_name, fu)
 
     open(fu,file=result_name)
     write(fu,*) '# z, u, kin, eps, zeta, f22, uv, T'

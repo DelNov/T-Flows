@@ -24,9 +24,9 @@
   grid => Vof % pnt_grid
 
   ! Open file to read Ellipsoid parameters:
-  call File_Mod_Open_File_For_Reading('ellipsoid_parameters.ini', fu)
+  call File % Open_For_Reading_Ascii('ellipsoid_parameters.ini', fu)
 
-  call File_Mod_Read_Line(fu)
+  call File % Read_Line(fu)
   read(line % tokens(1), *) n_ellipses
 
   do ee = 1, n_ellipses
@@ -34,12 +34,12 @@
     ! Initialize working arrays
     prelim_vof(:) = 0.0
 
-    call File_Mod_Read_Line(fu)
+    call File % Read_Line(fu)
     read(line % tokens(1), *) radius_1
     read(line % tokens(2), *) radius_2
     read(line % tokens(3), *) radius_3
 
-    call File_Mod_Read_Line(fu)
+    call File % Read_Line(fu)
     read(line % tokens(1), *) cent_x
     read(line % tokens(2), *) cent_y
     read(line % tokens(3), *) cent_z

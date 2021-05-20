@@ -9,13 +9,13 @@
   character(len=*) :: var_name
   type(Var_Type)   :: var
 !-----------------------------------[Locals]-----------------------------------!
-  type(Comm_Type), pointer :: comm
+  type(Comm_Type), pointer :: Comm
   character(SL)            :: vn
   integer                  :: vs  ! variable size
 !==============================================================================!
 
   ! Take alias
-  comm => var % pnt_grid % comm
+  Comm => var % pnt_grid % Comm
 
   if(this_proc < 2) print *, '# Writing variable: ', trim(var_name)
 
@@ -24,18 +24,18 @@
 
   ! Vector without boundaries
   vn = var_name
-  call Comm_Mod_Write_Text(fh, vn, disp)
-  vs = (3*comm % nc_tot + 3*comm % nb_tot) * SIZE_REAL
-  call Comm_Mod_Write_Int (fh, vs, disp)
+  call Comm % Write_Text(fh, vn, disp)
+  vs = (3*Comm % nc_tot + 3*Comm % nb_tot) * SIZE_REAL
+  call Comm % Write_Int (fh, vs, disp)
 
-  call Comm_Mod_Write_Cell_Real(comm, fh, var % n(1:comm % nc_sub), disp)
-  call Comm_Mod_Write_Bnd_Real (comm, fh, var % n( -comm % nb_f:  &
-                                                   -comm % nb_l),   disp)
-  call Comm_Mod_Write_Cell_Real(comm, fh, var % q(1:comm % nc_sub), disp)
-  call Comm_Mod_Write_Bnd_Real (comm, fh, var % q( -comm % nb_f:  &
-                                                   -comm % nb_l),   disp)
-  call Comm_Mod_Write_Cell_Real(comm, fh, var % o(1:comm % nc_sub), disp)
-  call Comm_Mod_Write_Bnd_Real (comm, fh, var % o( -comm % nb_f:  &
-                                                   -comm % nb_l),   disp)
+  call Comm % Write_Cell_Real(fh, var % n(1:Comm % nc_sub), disp)
+  call Comm % Write_Bnd_Real (fh, var % n( -Comm % nb_f:  &
+                                           -Comm % nb_l),   disp)
+  call Comm % Write_Cell_Real(fh, var % q(1:Comm % nc_sub), disp)
+  call Comm % Write_Bnd_Real (fh, var % q( -Comm % nb_f:  &
+                                           -Comm % nb_l),   disp)
+  call Comm % Write_Cell_Real(fh, var % o(1:Comm % nc_sub), disp)
+  call Comm % Write_Bnd_Real (fh, var % o( -Comm % nb_f:  &
+                                           -Comm % nb_l),   disp)
 
   end subroutine

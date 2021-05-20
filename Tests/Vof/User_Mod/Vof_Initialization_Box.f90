@@ -59,9 +59,9 @@
   trios(6,:) = (/3, 4, 8/)
 
   ! Open file to read Plane parameters:
-  call File_Mod_Open_File_For_Reading('box_parameters.ini', fu)
+  call File % Open_For_Reading_Ascii('box_parameters.ini', fu)
 
-  call File_Mod_Read_Line(fu)
+  call File % Read_Line(fu)
   read(line % tokens(1), *) n_boxes
 
   np_count = 1
@@ -69,7 +69,7 @@
   do ee = 1, n_boxes
 
     do n_p = 1, 8
-      call File_Mod_Read_Line(fu)
+      call File % Read_Line(fu)
       read(line % tokens(1), *) p_xyz(n_p, 1)
       read(line % tokens(2), *) p_xyz(n_p, 2)
       read(line % tokens(3), *) p_xyz(n_p, 3)

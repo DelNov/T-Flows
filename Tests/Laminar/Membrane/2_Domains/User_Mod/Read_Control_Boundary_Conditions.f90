@@ -5,7 +5,6 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
-  use File_Mod
   use Comm_Mod,       only: this_proc, Comm_Mod_End
   use Field_Mod,      only: Field_Type, heat_transfer
   use Turb_Mod
@@ -337,8 +336,8 @@
 
         call Control_Mod_Read_Strings_On('FILE', name_prof, nvs, .false.)
 
-        call File_Mod_Open_File_For_Reading(name_prof(1), fu)
-        call File_Mod_Read_Line(fu)
+        call File % Open_For_Reading_Ascii(name_prof(1), fu)
+        call File % Read_Line(fu)
         read(line % tokens(1),*) n_points  ! number of points
 
         !---------------------------------!
@@ -350,7 +349,7 @@
         !   Read the entire profile file   !
         !----------------------------------!
         do m = 1, n_points
-          call File_Mod_Read_Line(fu)
+          call File % Read_Line(fu)
           do i = 1, nks
             read(line % tokens(i), *) prof(m,i)
           end do

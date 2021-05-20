@@ -13,7 +13,7 @@
   integer                  :: time_step       ! current time step
   logical                  :: backup, present
 !-----------------------------------[Locals]-----------------------------------!
-  type(Comm_Type), pointer :: comm
+  type(Comm_Type), pointer :: Comm
   type(Grid_Type), pointer :: Grid
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: phi
@@ -26,7 +26,7 @@
   ! Take aliases
   Grid => Fld % pnt_grid
   bulk => Fld % bulk
-  comm => Grid % comm
+  Comm => Grid % Comm
 
   ! Full name is specified in control file
   call Control_Mod_Load_Backup_Name(name_in)
@@ -52,10 +52,10 @@
   end if
 
   ! Open backup file
-  call Comm_Mod_Open_File_Read(fh, name_in)
+  call Comm % Open_File_Read(fh, name_in)
 
   ! Create new types
-  call Comm_Mod_Create_New_Types(Grid % comm)
+  call Comm % Create_New_Types()
 
   ! Initialize displacement and variable count
   d  = 0
@@ -64,7 +64,7 @@
   !---------------------------------------------!
   !   Variable count - important for checking   !
   !---------------------------------------------!
-  call Backup_Mod_Read_Int(fh, d, 2048, 'variable_count', vc)
+  call Backup_Mod_Read_Int(Comm, fh, d, 2048, 'variable_count', vc)
   if(vc .eq. 0) vc = 2048  ! for backward compatibility
 
   if(this_proc < 2) then
@@ -85,21 +85,21 @@
   ! call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'z_coords', Grid % zc)
 
   ! Time step
-  call Backup_Mod_Read_Int(fh, d, vc, 'time_step', time_step)
+  call Backup_Mod_Read_Int(Comm, fh, d, vc, 'time_step', time_step)
 
   ! Simulation time
-  call Backup_Mod_Read_Real(fh, d, vc, 'time', time)
+  call Backup_Mod_Read_Real(Comm, fh, d, vc, 'time', time)
 
   ! Bulk flows and pressure drops in each direction
-  call Backup_Mod_Read_Real(fh, d, vc, 'bulk_flux_x',   bulk % flux_x)
-  call Backup_Mod_Read_Real(fh, d, vc, 'bulk_flux_y',   bulk % flux_y)
-  call Backup_Mod_Read_Real(fh, d, vc, 'bulk_flux_z',   bulk % flux_z)
-  call Backup_Mod_Read_Real(fh, d, vc, 'bulk_flux_x_o', bulk % flux_x_o)
-  call Backup_Mod_Read_Real(fh, d, vc, 'bulk_flux_y_o', bulk % flux_y_o)
-  call Backup_Mod_Read_Real(fh, d, vc, 'bulk_flux_z_o', bulk % flux_z_o)
-  call Backup_Mod_Read_Real(fh, d, vc, 'bulk_p_drop_x', bulk % p_drop_x)
-  call Backup_Mod_Read_Real(fh, d, vc, 'bulk_p_drop_y', bulk % p_drop_y)
-  call Backup_Mod_Read_Real(fh, d, vc, 'bulk_p_drop_z', bulk % p_drop_z)
+  call Backup_Mod_Read_Real(Comm, fh, d, vc, 'bulk_flux_x',   bulk % flux_x)
+  call Backup_Mod_Read_Real(Comm, fh, d, vc, 'bulk_flux_y',   bulk % flux_y)
+  call Backup_Mod_Read_Real(Comm, fh, d, vc, 'bulk_flux_z',   bulk % flux_z)
+  call Backup_Mod_Read_Real(Comm, fh, d, vc, 'bulk_flux_x_o', bulk % flux_x_o)
+  call Backup_Mod_Read_Real(Comm, fh, d, vc, 'bulk_flux_y_o', bulk % flux_y_o)
+  call Backup_Mod_Read_Real(Comm, fh, d, vc, 'bulk_flux_z_o', bulk % flux_z_o)
+  call Backup_Mod_Read_Real(Comm, fh, d, vc, 'bulk_p_drop_x', bulk % p_drop_x)
+  call Backup_Mod_Read_Real(Comm, fh, d, vc, 'bulk_p_drop_y', bulk % p_drop_y)
+  call Backup_Mod_Read_Real(Comm, fh, d, vc, 'bulk_p_drop_z', bulk % p_drop_z)
 
   !----------------------------!
   !                            !
@@ -377,7 +377,7 @@
   end do
 
   ! Close backup file
-  call Comm_Mod_Close_File(fh)
+  call Comm % Close_File(fh)
 
   call Cpu_Timer % Stop('Backup_Mod_Load')
 

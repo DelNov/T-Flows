@@ -52,6 +52,8 @@
       call Results_Mod_Save_Swarm(swarm(d), curr_dt)
 
       if(Vof(d) % model .eq. VOLUME_OF_FLUID) then
+        call Results_Mod_Save_Front(Vof(d) % Front, curr_dt)
+        call Results_Mod_Save_Surf(Vof(d) % surf, curr_dt)
       end if
 
       ! Write results in user-customized format

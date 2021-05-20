@@ -53,7 +53,7 @@
   !--------------------------------------------!
   !   Set the names for all Monitoring files   !
   !--------------------------------------------!
-  call File_Mod_Set_Name(mon_file_name, extension='-monit.000', domain=domain)
+  call File % Set_Name(mon_file_name, extension='-monit.000', domain=domain)
   l = len_trim(mon_file_name)
 
   !-------------------------------!
@@ -99,11 +99,11 @@
       write(mon_file_name(l-2:l),'(I3.3)') m
 
       if(.not. restart) then
-        call File_Mod_Open_File_For_Writing(mon_file_name,  &
-                                            Monitor % file_unit(m))
+        call File % Open_For_Writing_Ascii(mon_file_name,  &
+                                           Monitor % file_unit(m))
       else
-        call File_Mod_Append_File_For_Writing(mon_file_name,  &
-                                              Monitor % file_unit(m))
+        call File % Append_For_Writing_Ascii(mon_file_name,  &
+                                             Monitor % file_unit(m))
       endif
 
       write(Monitor % file_unit(m), '(a24, 3f16.6)')   &

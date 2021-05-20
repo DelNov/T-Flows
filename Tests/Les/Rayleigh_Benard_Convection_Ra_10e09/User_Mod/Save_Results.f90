@@ -57,17 +57,17 @@
   call Flow % Grad_Variable(Flow % w)
 
   ! Set the name for coordinate file
-  call File_Mod_Set_Name(coord_name, extension='.1d')
+  call File % Set_Name(coord_name, extension='.1d')
 
   ! Set file names for results
-  call File_Mod_Set_Name(res_name,           &
-                          time_step=ts,      &
-                          appendix='-res',   &
-                          extension='.dat')
-  call File_Mod_Set_Name(res_name_plus,          &
-                          time_step=ts,          &
-                          appendix='-res-plus',  &
-                          extension='.dat')
+  call File % Set_Name(res_name,           &
+                        time_step=ts,      &
+                        appendix='-res',   &
+                        extension='.dat')
+  call File % Set_Name(res_name_plus,          &
+                        time_step=ts,          &
+                        appendix='-res-plus',  &
+                        extension='.dat')
 
   !------------------!
   !   Read 1d file   !
@@ -97,7 +97,7 @@
   ! This functions opens a file in first available unit,
   ! and stores it in variable "fu".  Safer like this,
   ! you can't hit a file unit already open
-  call File_Mod_Open_File_For_Reading(res_name, fu)
+  call File % Open_For_Reading_Ascii(res_name, fu)
 
   ! Write the number of searching intervals
   read(fu,*)  n_prob
@@ -277,7 +277,7 @@
   ! This functions opens a file in first available unit,
   ! and stores it in variable "fu".  Safer like this,
   ! you can't hit a file unit already open
-  call File_Mod_Open_File_For_Writing(res_name, fu)
+  call File % Open_For_Writing_Ascii(res_name, fu)
 
   if(Flow % heat_transfer) then
     if(this_proc < 2) then

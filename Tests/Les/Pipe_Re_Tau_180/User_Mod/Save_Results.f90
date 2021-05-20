@@ -46,17 +46,17 @@
   call Control_Mod_Thermal_Conductivity(cond_const)
 
   ! Set the name for coordinate file
-  call File_Mod_Set_Name(coord_name, extension='.1r')
+  call File % Set_Name(coord_name, extension='.1r')
 
   ! Set file names for results
-  call File_Mod_Set_Name(res_name,         &
-                         time_step=ts,     &
-                         appendix='-res',  &
-                         extension='.dat')
-  call File_Mod_Set_Name(res_name_plus,         &
-                         time_step=ts,          &
-                         appendix='-res-plus',  &
-                         extension='.dat')
+  call File % Set_Name(res_name,         &
+                       time_step=ts,     &
+                       appendix='-res',  &
+                       extension='.dat')
+  call File % Set_Name(res_name_plus,         &
+                       time_step=ts,          &
+                       appendix='-res-plus',  &
+                       extension='.dat')
 
   !------------------!
   !   Read 1d file   !
@@ -220,10 +220,10 @@
 
   ! Calculating friction velocity and friction temperature
   u_tau_p = sqrt( (visc_const*sqrt(u_p(1)**2 +   &
-                                  v_p(1)**2 +   &
-                                  w_p(1)**2)    &
-                                  / wall_p(1))  &
-                                  / dens_const)
+                                   v_p(1)**2 +   &
+                                   w_p(1)**2)    &
+                                   / wall_p(1))  &
+                                   / dens_const)
   if(u_tau_p .eq. 0.0) then
     if(this_proc < 2) then
       write(*,*) '# Friction velocity is zero in Save_Results.f90!'

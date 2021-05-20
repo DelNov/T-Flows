@@ -5,7 +5,7 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod,      only: HUGE_INT
-  use Comm_Mod,       only: Comm_Mod_End, this_proc
+  use Comm_Mod
   use Field_Mod,      only: Field_Type, grav_x, grav_y, grav_z
   use Bulk_Mod,       only: Bulk_Type
   use Turb_Mod

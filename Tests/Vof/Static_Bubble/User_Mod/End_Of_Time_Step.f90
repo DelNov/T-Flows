@@ -54,7 +54,7 @@
 
   ! Write to file
   if (this_proc < 2) then
-    call File_Mod_Append_File_For_Writing('bench-data.dat', fu)
+    call File % Append_For_Writing_Ascii('bench-data.dat', fu)
     !with circularity 2D:
 !    write(fu,'(5(2X,E16.10E2))') time, b_volume,                    &
 !                                2.0*PI/surface*sqrt(b_volume/PI),  &

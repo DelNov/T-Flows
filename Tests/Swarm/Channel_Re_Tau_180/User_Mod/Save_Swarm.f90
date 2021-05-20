@@ -56,7 +56,7 @@
   density_const   = maxval(Flow % density(:))
 
   ! Set the name for coordinate file
-  call File_Mod_Set_Name(coord_name, extension='.1d')
+  call File % Set_Name(coord_name, extension='.1d')
 
   !------------------!
   !   Read 1d file   !
@@ -229,12 +229,12 @@
   end do
 
   ! Creating files for swarm statistics
-  call File_Mod_Set_Name(swarm_result_name, appendix='-swarm-res',            & 
+  call File % Set_Name(swarm_result_name, appendix='-swarm-res',            &
                          time_step = ts, extension='.dat')
-  call File_Mod_Open_File_For_Writing(swarm_result_name, fu1)
-  call File_Mod_Set_Name(swarm_result_name_plus, appendix='-swarm-res-plus',  & 
+  call File % Open_For_Writing_Ascii(swarm_result_name, fu1)
+  call File % Set_Name(swarm_result_name_plus, appendix='-swarm-res-plus',  &
                          time_step = ts, extension='.dat')
-  call File_Mod_Open_File_For_Writing(swarm_result_name_plus, fu2)
+  call File % Open_For_Writing_Ascii(swarm_result_name_plus, fu2)
 
   ! Calculating friction velocity and friction temperature  (For the Flow!)
   u_tau_p = sqrt( (visc_const*sqrt(u_p(1)**2 +   &

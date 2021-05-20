@@ -109,7 +109,7 @@
 
   ! Write to file
   if (this_proc < 2) then
-    call File_Mod_Append_File_For_Writing('probe-data.dat', fu)
+    call File % Append_For_Writing('probe-data.dat', fu)
     write(fu,'((E16.10E2),9(2X,E16.10E2),4(2X,E16.10E2))')            &
           time, b_volume, p_probe(1:size(nod_probe)),   &
           h_probe(1:N_PROBE)

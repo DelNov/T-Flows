@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Backup_Mod_Read_Int(fh, disp, vc, var_name, var_value)
+  subroutine Backup_Mod_Read_Int(Comm, fh, disp, vc, var_name, var_value)
 !------------------------------------------------------------------------------!
 !   Reads a single named integer variable from backup file.                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  type(Comm_Type)  :: Comm
   integer          :: fh, disp, vc
   character(len=*) :: var_name
   integer          :: var_value
@@ -24,13 +25,13 @@
     ! Increase counter
     cnt_loop = cnt_loop + 1
 
-    call Comm_Mod_Read_Text(fh, vn, disp_loop)  ! variable name
-    call Comm_Mod_Read_Int (fh, vs, disp_loop)  ! variable offset
+    call Comm % Read_Text(fh, vn, disp_loop)  ! variable name
+    call Comm % Read_Int (fh, vs, disp_loop)  ! variable offset
 
     ! If variable is found, read it and retrun
     if(vn .eq. var_name) then
       if(this_proc < 2) print *, '# Reading variable: ', trim(vn)
-      call Comm_Mod_Read_Int (fh, var_value, disp_loop)
+      call Comm % Read_Int(fh, var_value, disp_loop)
       disp = disp_loop
       return
 

@@ -31,10 +31,10 @@
   ub     => Flow % bulk % u
 
   ! Set the name for coordinate file
-  call File_Mod_Set_Name(coord_name, extension='.1d')
+  call File % Set_Name(coord_name, extension='.1d')
 
   ! Set file name for results
-  call File_Mod_Set_Name(res_name,          &
+  call File % Set_Name(res_name,          &
                          time_step=ts,      &
                          appendix='-res',   &
                          extension='.dat')
@@ -50,17 +50,17 @@
     stop
   end if
 
-  call File_Mod_Open_File_For_Writing(coord_name, fu)
+  call File % Open_For_Writing_Ascii(coord_name, fu)
 
   ! Write the number of searching intervals
-  call File_Mod_Read_Line(fu)
+  call File % Read_Line(fu)
   read(line % tokens(1),*) n
   allocate(ind(n))
   allocate(y_f(n))
 
   ! Read the intervals positions
   do i = 1, n
-    call File_Mod_Read_Line(fu)
+    call File % Read_Line(fu)
     read(line % tokens(1),*) ind(i)
     read(line % tokens(2),*) y_f(i)
   end do
@@ -102,7 +102,7 @@
     end if
   end do
 
-  call File_Mod_Open_File_For_Writing(res_name, fu)
+  call File % Open_For_Writing_Ascii(res_name, fu)
 
   write(fu,'(a,1es17.7e3)') '# U_bulk:', ub
 

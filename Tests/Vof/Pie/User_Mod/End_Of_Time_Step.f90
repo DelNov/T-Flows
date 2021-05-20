@@ -58,7 +58,7 @@
 
   ! Just open the file benchmark.dat
   if(n .eq. 1) then
-    call File_Mod_Open_File_For_Writing('benchmark.dat', fu)
+    call File % Open_For_Writing_Ascii('benchmark.dat', fu)
     close(fu)
   end if
 
@@ -74,7 +74,7 @@
       print *, 'rise_vel_cen (2) = ', rise_vel_cen
 
       ! Write to file
-      call File_Mod_Append_File_For_Writing('benchmark.dat', fu)
+      call File % Append_For_Writing_Ascii('benchmark.dat', fu)
 
       ! With circularity 2D:
       ! write(fu,'(6(2x,es16.10e2))') time, b_volume,                    &

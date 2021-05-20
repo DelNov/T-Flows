@@ -62,11 +62,11 @@
   density_const   = maxval(density(:))
 
   ! Set the name for coordinate file
-  !call File_Mod_Set_Name(0, coord_name, ".1d")
-  call File_Mod_Set_Name(coord_name, extension='.1d')
+  !call File % Set_Name(0, coord_name, ".1d")
+  call File % Set_Name(coord_name, extension='.1d')
 
-  call File_Mod_Set_Name(swarm_res_name, extension='-swarm-res.dat')
-  call File_Mod_Set_Name(swarm_res_name_plus, extension='-swarm-res-plus.dat')
+  call File % Set_Name(swarm_res_name, extension='-swarm-res.dat')
+  call File % Set_Name(swarm_res_name_plus, extension='-swarm-res-plus.dat')
 
   !------------------!
   !   Read 1d file   !

@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Bulk_Mod_Monitoring_Planes_Areas(bulk, grid)
+  subroutine Bulk_Mod_Monitoring_Planes_Areas(bulk, Grid)
 !------------------------------------------------------------------------------!
 !   Calculate total surface of the monitoring plane                            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Bulk_Type) :: bulk
-  type(Grid_Type) :: grid
+  type(Grid_Type) :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c1, c2, s
   real    :: xc1, yc1, zc1, xc2, yc2, zc2, ax_t, ay_t, az_t, wgt
@@ -16,27 +16,27 @@
   bulk % area_y = 0.0
   bulk % area_z = 0.0
 
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
     if(c2 > 0) then
 
-      xc1 = grid % xc(c1)
-      yc1 = grid % yc(c1)
-      zc1 = grid % zc(c1)
-      xc2 = grid % xc(c1) + grid % dx(s)
-      yc2 = grid % yc(c1) + grid % dy(s)
-      zc2 = grid % zc(c1) + grid % dz(s)
+      xc1 = Grid % xc(c1)
+      yc1 = Grid % yc(c1)
+      zc1 = Grid % zc(c1)
+      xc2 = Grid % xc(c1) + Grid % dx(s)
+      yc2 = Grid % yc(c1) + Grid % dy(s)
+      zc2 = Grid % zc(c1) + Grid % dz(s)
 
-      ax_t = abs(grid % sx(s))
-      ay_t = abs(grid % sy(s))
-      az_t = abs(grid % sz(s))
+      ax_t = abs(Grid % sx(s))
+      ay_t = abs(Grid % sy(s))
+      az_t = abs(Grid % sz(s))
 
       ! If the flux is across a buffer face, it is summed up twice.  
       ! The variable "wgt" is here to take care of that.
       wgt = 1.0
-      if(c2 > grid % n_cells - grid % comm % n_buff_cells) wgt = 0.5
+      if(c2 > Grid % n_cells - Grid % Comm % n_buff_cells) wgt = 0.5
 
       !-------!
       !   X   !

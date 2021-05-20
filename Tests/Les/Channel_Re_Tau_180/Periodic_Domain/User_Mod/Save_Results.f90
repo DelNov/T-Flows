@@ -50,15 +50,15 @@
   call Control_Mod_Heat_Capacity       (capa_const)
   call Control_Mod_Thermal_Conductivity(cond_const)
 
-  call File_Mod_Set_Name(coord_name, extension='.1d')
+  call File % Set_Name(coord_name, extension='.1d')
 
   ! Set the name for coordinate file
-  call File_Mod_Set_Name(coord_name, extension='.1d')
+  call File % Set_Name(coord_name, extension='.1d')
 
-  !call File_Mod_Set_Name(0, res_name,      "-res.dat")
-  call File_Mod_Set_Name(res_name, extension='-res.dat')
-  !call File_Mod_Set_Name(0, res_name_plus, "-res-plus.dat")
-  call File_Mod_Set_Name(res_name_plus, extension='-res-plus.dat')
+  !call File % Set_Name(0, res_name,      "-res.dat")
+  call File % Set_Name(res_name, extension='-res.dat')
+  !call File % Set_Name(0, res_name_plus, "-res-plus.dat")
+  call File % Set_Name(res_name_plus, extension='-res-plus.dat')
 
   !------------------!
   !   Read 1d file   !

@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Backup_Mod_Read_Real_Array(fh, disp, vc, arr_name, arr_value)
+  subroutine Backup_Mod_Read_Real_Array(Comm, fh, disp, vc, arr_name, arr_value)
 !------------------------------------------------------------------------------!
 !   Reads a named real array from backup file.                                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  type(Comm_Type)    :: Comm
   integer            :: fh, disp, vc
   character(len=*)   :: arr_name
   real, dimension(:) :: arr_value
@@ -25,13 +26,13 @@
     ! Increase counter
     cnt_loop = cnt_loop + 1
 
-    call Comm_Mod_Read_Text(fh, vn, disp_loop)  ! variable name
-    call Comm_Mod_Read_Int (fh, vo, disp_loop)  ! variable offset
+    call Comm % Read_Text(fh, vn, disp_loop)  ! variable name
+    call Comm % Read_Int (fh, vo, disp_loop)  ! variable offset
 
     ! If variable is found, read it and retrun
     if(vn .eq. arr_name) then
       if(this_proc < 2) print *, '# Reading array: ', trim(vn)
-      call Comm_Mod_Read_Real_Array(fh, arr_value(1:length), disp_loop)
+      call Comm % Read_Real_Array(fh, arr_value(1:length), disp_loop)
       disp = disp_loop
       return
 

@@ -1,19 +1,19 @@
 !==============================================================================!
-  subroutine Results_Mod_Save_Front(front, time_step)
+  subroutine Results_Mod_Save_Front(Front, time_step, domain)
 !------------------------------------------------------------------------------!
 !   Writes surface vertices in VTU file format (for VisIt and Paraview)        !
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Front_Type), target :: front
+  type(Front_Type), target :: Front
   integer                  :: time_step
+  integer,        optional :: domain
 !----------------------------------[Locals]------------------------------------!
   type(Vert_Type), pointer :: vert
   integer                  :: v, e     ! vertex and element counters
-  integer                  :: offset, fu
-  character(SL)            :: name_out
+  integer                  :: offset, n, f8, f9
+  character(SL)            :: name_out_8, name_out_9
 !-----------------------------[Local parameters]-------------------------------!
-  integer, parameter :: VTK_TRIANGLE = 5  ! cell shapes in VTK format
   character(len= 0)  :: IN_0 = ''         ! indentation levels
   character(len= 2)  :: IN_1 = '  '
   character(len= 4)  :: IN_2 = '    '
@@ -22,206 +22,301 @@
   character(len=10)  :: IN_5 = '          '
 !==============================================================================!
 
-  if(front % n_verts < 1) return
-
   !----------------------------!
   !                            !
   !   Create .front.vtu file   !
   !                            !
   !----------------------------!
 
-  if(this_proc < 2) then
+  call File % Set_Name(name_out_8,             &
+                       time_step = time_step,  &
+                       appendix  = '-front',   &
+                       extension = '.pvtu',    &
+                       domain    = domain)
+  call File % Set_Name(name_out_9,             &
+                       processor = this_proc,  &
+                       time_step = time_step,  &
+                       appendix  = '-front',   &
+                       extension = '.vtu',     &
+                       domain    = domain)
 
-    call File_Mod_Set_Name(name_out,               &
+  if(this_proc .eq. 1) then
+    call File % Open_For_Writing_Binary(name_out_8, f8)
+  end if
+  call File % Open_For_Writing_Ascii(name_out_9, f9)
+
+  !------------!
+  !            !
+  !   Header   !
+  !            !
+  !------------!
+  if(this_proc .eq. 1)  then
+    write(f8) IN_0 // '<?xml version="1.0"?>'              // LF
+    write(f8) IN_0 // '<VTKFile type="PUnstructuredGrid">' // LF
+    write(f8) IN_1 // '<PUnstructuredGrid GhostLevel="1">' // LF
+  end if
+
+  write(f9,'(a,a)') IN_0, '<?xml version="1.0"?>'
+  write(f9,'(a,a)') IN_0, '<VTKFile type="UnstructuredGrid" version="0.1" '//&
+                          'byte_order="LittleEndian">'
+  write(f9,'(a,a)') IN_1, '<UnstructuredGrid>'
+
+  write(f9,'(a,a,i0.1,a,i0.1,a)')   &
+              IN_2, '<Piece NumberOfPoints="', Front % n_verts,  &
+                         '" NumberOfCells ="', Front % n_elems, '">'
+
+  !------------------------!
+  !                        !
+  !   Vertex coordinates   !
+  !                        !
+  !------------------------!
+  if(this_proc .eq. 1)  then
+    write(f8) IN_3 // '<PPoints>'                                 // LF
+    write(f8) IN_4 // '<PDataArray type="Float64"'                //  &
+                      ' NumberOfComponents="3" format="ascii"/>'  // LF
+    write(f8) IN_3 // '</PPoints>'                                // LF
+  end if
+
+  write(f9,'(a,a)') IN_3, '<Points>'
+  write(f9,'(a,a)') IN_4, '<DataArray type="Float64" NumberOfComponents' //  &
+                          '="3" format="ascii">'
+  do v = 1, Front % n_verts
+    vert => Front % vert(v)
+    write(f9, '(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')                &
+                IN_5, vert % x_n, vert % y_n, vert % z_n
+  end do
+  write(f9,'(a,a)') IN_4, '</DataArray>'
+  write(f9,'(a,a)') IN_3, '</Points>'
+
+  !----------------!
+  !                !
+  !   Point data   !
+  !                !
+  !----------------!
+  if(this_proc .eq. 1) then
+    write(f8) IN_3 // '<PPointData Scalars="scalars" vectors="velocity">' // LF
+  end if
+  write(f9,'(a,a)') IN_3, '<PointData Scalars="scalars" vectors="velocity">'
+
+  !--------------------!
+  !   Particle i.d.s   !
+  !--------------------!
+  if(this_proc .eq. 1) then
+    write(f8) IN_4 // '<PDataArray type="Int64" Name="Index" '       //  &
+                      'format="ascii"/>'                             // LF
+  end if
+  write(f9,'(a,a)') IN_4, '<DataArray type="Int64" Name="Index" ' //  &
+                          'format="ascii">'
+  do v = 1, Front % n_verts
+    write(f9,'(a,i9)') IN_5, v
+  end do
+  write(f9,'(a,a)') IN_4, '</DataArray>'
+
+  !--------------------------!
+  !   Number of neighbours   !
+  !--------------------------!
+  if(this_proc .eq. 1) then
+    write(f8) IN_4 // '<PDataArray type="Int64" Name="Neighbours" ' //  &
+                      'format="ascii"/>'                            // LF
+  end if
+  write(f9,'(a,a)') IN_4, '<DataArray type="Int64" Name="Neighbours" ' //  &
+                          'format="ascii">'
+  do v = 1, Front % n_verts
+    write(f9,'(a,i9)') IN_5, Front % vert(v) % nne
+  end do
+  write(f9,'(a,a)') IN_4, '</DataArray>'
+
+  !-----------------------------!
+  !   Curvatures at the nodes   !
+  !-----------------------------!
+  if(this_proc .eq. 1) then
+    write(f8) IN_4 // '<PDataArray type="Float64" Name="NodeCurv" ' //  &
+                      ' format="ascii"/>'                           // LF
+  end if
+  write(f9,'(a,a)') IN_4, '<DataArray type="Float64" Name="NodeCurv" ' // &
+                         ' format="ascii">'
+  do v = 1, Front % n_verts
+    vert => Front % vert(v)
+    write(f9,'(a,1pe16.6e4)') IN_5, vert % curv
+  end do
+  write(f9,'(a,a)') IN_4, '</DataArray>'
+
+  if(this_proc .eq. 1) then
+    write(f8) IN_3 // '</PPointData>' // LF
+  end if
+  write(f9,'(a,a)') IN_3, '</PointData>'
+
+  !-----------!
+  !           !
+  !   Cells   !
+  !           !
+  !-----------!
+  if(this_proc .eq. 1) then
+    write(f8) IN_3 // '<PCells>' // LF
+    write(f8) IN_4 // '<PDataArray type="Int64" Name="connectivity"' //  &
+                      ' format="ascii"/>'                            // LF
+  end if
+  write(f9,'(a,a)') IN_3, '<Cells>'
+  write(f9,'(a,a)') IN_4, '<DataArray type="Int64" Name="connectivity"' //  &
+                          ' format="ascii">'
+  ! Cell topology
+  do e = 1, Front % n_elems
+    write(f9,'(a,99i9)') IN_5, Front % elem(e) % v(1:Front % elem(e) % nv)-1
+  end do
+  write(f9,'(a,a)') IN_4, '</DataArray>'
+
+  ! Cell offsets
+  if(this_proc .eq. 1) then
+    write(f8) IN_4 // '<PDataArray type="Int64" Name="offsets"' //  &
+                      ' format="ascii"/>'                       // LF
+  end if
+  write(f9,'(a,a)') IN_4, '<DataArray type="Int64" Name="offsets"' //  &
+                          ' format="ascii">'
+  offset = 0
+  do e = 1, Front % n_elems
+    offset = offset + Front % elem(e) % nv
+    write(f9,'(a,i9)') IN_5, offset
+  end do
+  write(f9,'(a,a)') IN_4, '</DataArray>'
+
+  ! Cell types
+  if(this_proc .eq. 1) then
+    write(f8) IN_4 // '<PDataArray type="Int64" Name="types"' //  &
+                      ' format="ascii"/>'                     // LF
+  end if
+  write(f9,'(a,a)') IN_4, '<DataArray type="Int64" Name="types"' //  &
+                          ' format="ascii">'
+  do e = 1, Front % n_elems
+    write(f9,'(a,i9)') IN_5, VTK_POLYGON
+  end do
+  write(f9,'(a,a)') IN_4, '</DataArray>'
+
+  if(this_proc .eq. 1) then
+    write(f8) IN_3 // '</PCells>' // LF
+  end if
+  write(f9,'(a,a)') IN_3, '</Cells>'
+
+  !---------------!
+  !               !
+  !   Cell data   !
+  !               !
+  !---------------!
+
+  ! Beginning of cell data
+  if(this_proc .eq. 1) then
+    write(f8) IN_3 // '<PCellData Scalars="scalars" vectors="velocity">' // LF
+  end if
+  write(f9,'(a,a)') IN_3, '<CellData Scalars="scalars" vectors="velocity">'
+
+  !-------------------------------------!
+  !   Number of neighbouring elements   !
+  !-------------------------------------!
+  if(this_proc .eq. 1) then
+    write(f8) IN_4 // '<PDataArray type="Int64" Name="Neighbours"' //  &
+                      ' format="ascii"/>'                          // LF
+  end if
+  write(f9,'(a,a)') IN_4, '<DataArray type="Int64" Name="Neighbours"' //  &
+                          ' format="ascii">'
+  do e = 1, Front % n_elems
+    write(f9,'(a,i9)') IN_5, Front % elem(e) % nne
+  end do
+  write(f9,'(a,a)') IN_4, '</DataArray>'
+
+  !---------------------!
+  !   Surface normals   !
+  !---------------------!
+  if(this_proc .eq. 1) then
+    write(f8) IN_4 // '<PDataArray type="Float64" Name="ElementNormals" ' //  &
+                      ' NumberOfComponents="3" format="ascii"/>'          // LF
+  end if
+  write(f9,'(4a)') IN_4,                                                &
+                 '<DataArray type="Float64" Name="ElementNormals" ' //  &
+                 ' NumberOfComponents="3" format="ascii">'
+  do e = 1, Front % n_elems
+    write(f9, '(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')  &
+              IN_5, Front % elem(e) % nx,           &
+                    Front % elem(e) % ny,           &
+                    Front % elem(e) % nz
+  end do
+  write(f9,'(a,a)') IN_4, '</DataArray>'
+
+  !-------------------!
+  !   Element areas   !
+  !-------------------!
+  if(this_proc .eq. 1) then
+    write(f8) IN_4 // '<PDataArray type="Float64" Name="ElementArea" ' //  &
+                      ' format="ascii"/>'                              // LF
+  end if
+  write(f9,'(4a)') IN_4,                                             &
+                 '<DataArray type="Float64" Name="ElementArea" ' //  &
+                 ' format="ascii">'
+  do e = 1, Front % n_elems
+    write(f9,'(a,1pe16.6e4)') IN_5, Front % elem(e) % area
+  end do
+  write(f9,'(a,a)') IN_4, '</DataArray>'
+
+  !-------------------------!
+  !   Element coordinates   !
+  !-------------------------!
+  if(this_proc .eq. 1) then
+    write(f8) IN_4 // '<PDataArray type="Float64" Name="ElemenCoordi'   //  &
+                      'nates" NumberOfComponents="3" format="ascii"/>'  // LF
+  end if
+  write(f9,'(4a)') IN_4,                                                    &
+                 '<DataArray type="Float64" Name="ElementCoordinates" ' //  &
+                 ' NumberOfComponents="3" format="ascii">'
+  do e = 1, Front % n_elems
+    write(f9, '(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')  &
+              IN_5, Front % elem(e) % xe,           &
+                    Front % elem(e) % ye,           &
+                    Front % elem(e) % ze
+  end do
+  write(f9,'(a,a)') IN_4, '</DataArray>'
+
+  !------------------------!
+  !   Surface curvatures   !
+  !------------------------!
+  if(this_proc .eq. 1) then
+    write(f8) IN_4 // '<PDataArray type="Float64" Name="ElementCurv" ' //  &
+                      ' format="ascii"/>'                              // LF
+  end if
+  write(f9,'(4a)') IN_4,                                             &
+                 '<DataArray type="Float64" Name="ElementCurv" ' //  &
+                 ' format="ascii">'
+  do e = 1, Front % n_elems
+    write(f9,'(a,1pe16.6e4)') IN_5, Front % elem(e) % curv
+  end do
+  write(f9,'(a,a)') IN_4, '</DataArray>'
+
+  ! End of cell data
+  if(this_proc .eq. 1) then
+    write(f8) IN_3 // '</PCellData>' // LF
+  end if
+  write(f9,'(a,a)') IN_3, '</CellData>'
+
+  !------------!
+  !            !
+  !   Footer   !
+  !            !
+  !------------!
+  if(this_proc .eq. 1) then
+    do n = 1, n_proc
+      call File % Set_Name(name_out_9,             &
+                           processor = n,          &
                            time_step = time_step,  &
                            appendix  = '-front',   &
-                           extension = '.vtu')
-    call File_Mod_Open_File_For_Writing(name_out, fu)
-
-    !------------!
-    !            !
-    !   Header   !
-    !            !
-    !------------!
-    write(fu,'(a,a)') IN_0, '<?xml version="1.0"?>'
-    write(fu,'(a,a)') IN_0, '<VTKFile type="UnstructuredGrid" version="0.1" '//&
-                            'byte_order="LittleEndian">'
-    write(fu,'(a,a)') IN_1, '<UnstructuredGrid>'
-
-    write(fu,'(a,a,i0.0,a,i0.0,a)')   &
-                IN_2, '<Piece NumberOfPoints="', front % n_verts,  &
-                           '" NumberOfCells ="', front % n_elems, '">'
-
-    !------------------------!
-    !                        !
-    !   Vertex coordinates   !
-    !                        !
-    !------------------------!
-    write(fu,'(a,a)') IN_3, '<Points>'
-    write(fu,'(a,a)') IN_4, '<DataArray type="Float64" NumberOfComponents' //  &
-                            '="3" format="ascii">'
-    do v = 1, front % n_verts
-      vert => front % vert(v)
-      write(fu, '(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')                &
-                  IN_5, vert % x_n, vert % y_n, vert % z_n
+                           extension = '.vtu',     &
+                           domain    = domain)
+      write(f8) IN_2 // '<Piece Source="', trim(name_out_9), '"/>' // LF
     end do
-    write(fu,'(a,a)') IN_4, '</DataArray>'
-    write(fu,'(a,a)') IN_3, '</Points>'
-
-    !----------------!
-    !                !
-    !   Point data   !
-    !                !
-    !----------------!
-    write(fu,'(a,a)') IN_3, '<PointData Scalars="scalars" vectors="velocity">'
-
-    !--------------------!
-    !   Particle i.d.s   !
-    !--------------------!
-    write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="Index" ' // &
-                            'format="ascii">'
-    do v = 1, front % n_verts
-      write(fu,'(a,i9)') IN_5, v
-    end do
-    write(fu,'(a,a)') IN_4, '</DataArray>'
-
-    !--------------------------!
-    !   Number of neighbours   !
-    !--------------------------!
-    write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="Neighbours" ' // &
-                            'format="ascii">'
-    do v = 1, front % n_verts
-      write(fu,'(a,i9)') IN_5, front % vert(v) % nne
-    end do
-    write(fu,'(a,a)') IN_4, '</DataArray>'
-
-    !-----------------------------!
-    !   Curvatures at the nodes   !
-    !-----------------------------!
-    write(fu,'(a,a)') IN_4, '<DataArray type="Float64" Name="NodeCurv" ' // &
-                           ' format="ascii">'
-    do v = 1, front % n_verts
-      vert => front % vert(v)
-      write(fu,'(a,1pe16.6e4)') IN_5, vert % curv
-    end do
-    write(fu,'(a,a)') IN_4, '</DataArray>'
-
-    write(fu,'(a,a)') IN_3, '</PointData>'
-
-    !-----------!
-    !           !
-    !   Cells   !
-    !           !
-    !-----------!
-    write(fu,'(a,a)') IN_3, '<Cells>'
-    write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="connectivity"' //  &
-                            ' format="ascii">'
-    ! Cell topology
-    do e = 1, front % n_elems
-      write(fu,'(a,99i9)') IN_5, front % elem(e) % v(1:front % elem(e) % nv)-1
-    end do
-
-    ! Cell offsets
-    write(fu,'(a,a)') IN_4, '</DataArray>'
-    write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="offsets"' //  &
-                            ' format="ascii">'
-    offset = 0
-    do e = 1, front % n_elems
-      offset = offset + front % elem(e) % nv
-      write(fu,'(a,i9)') IN_5, offset
-    end do
-
-    ! Cell types
-    write(fu,'(a,a)') IN_4, '</DataArray>'
-    write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="types"' //  &
-                            ' format="ascii">'
-    do e = 1, front % n_elems
-      write(fu,'(a,i9)') IN_5, VTK_POLYGON
-    end do
-    write(fu,'(a,a)') IN_4, '</DataArray>'
-    write(fu,'(a,a)') IN_3, '</Cells>'
-
-    !---------------!
-    !               !
-    !   Cell data   !
-    !               !
-    !---------------!
-
-    ! Beginning of cell data
-    write(fu,'(a,a)') IN_3, '<CellData Scalars="scalars" vectors="velocity">'
-
-    !-------------------------------------!
-    !   Number of neighbouring elements   !
-    !-------------------------------------!
-    write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="Neighbours"' //  &
-                            ' format="ascii">'
-    do e = 1, front % n_elems
-      write(fu,'(a,i9)') IN_5, front % elem(e) % nne
-    end do
-    write(fu,'(a,a)') IN_4, '</DataArray>'
-
-    !---------------------!
-    !   Surface normals   !
-    !---------------------!
-    write(fu,'(4a)') IN_4,                                                &
-                   '<DataArray type="Float64" Name="ElementNormals" ' //  &
-                   ' NumberOfComponents="3" format="ascii">'
-    do e = 1, front % n_elems
-      write(fu, '(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')  &
-                IN_5, front % elem(e) % nx,           &
-                      front % elem(e) % ny,           &
-                      front % elem(e) % nz
-    end do
-    write(fu,'(a,a)') IN_4, '</DataArray>'
-
-    !-------------------!
-    !   Element areas   !
-    !-------------------!
-    write(fu,'(4a)') IN_4,                                                &
-                   '<DataArray type="Float64" Name="ElementArea" ' //  &
-                   ' format="ascii">'
-    do e = 1, front % n_elems
-      write(fu,'(a,1pe16.6e4)') IN_5, front % elem(e) % area
-    end do
-    write(fu,'(a,a)') IN_4, '</DataArray>'
-
-    !-------------------------!
-    !   Element coordinates   !
-    !-------------------------!
-    write(fu,'(4a)') IN_4,                                                    &
-                   '<DataArray type="Float64" Name="ElementCoordinates" ' //  &
-                   ' NumberOfComponents="3" format="ascii">'
-    do e = 1, front % n_elems
-      write(fu, '(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')  &
-                IN_5, front % elem(e) % xe,           &
-                      front % elem(e) % ye,           &
-                      front % elem(e) % ze
-    end do
-    write(fu,'(a,a)') IN_4, '</DataArray>'
-
-    !------------------------!
-    !   Surface curvatures   !
-    !------------------------!
-    write(fu,'(4a)') IN_4,                                                &
-                   '<DataArray type="Float64" Name="ElementCurv" ' //  &
-                   ' format="ascii">'
-    do e = 1, front % n_elems
-      write(fu,'(a,1pe16.6e4)') IN_5, front % elem(e) % curv
-    end do
-    write(fu,'(a,a)') IN_4, '</DataArray>'
-
-    ! End of cell data
-    write(fu,'(a,a)') IN_3, '</CellData>'
-
-    !------------!
-    !            !
-    !   Footer   !
-    !            !
-    !------------!
-    write(fu,'(a,a)') IN_2, '</Piece>'
-    write(fu,'(a,a)') IN_1, '</UnstructuredGrid>'
-    write(fu,'(a,a)') IN_0, '</VTKFile>'
-    close(fu)
+    write(f8) IN_1 // '</PUnstructuredGrid>' // LF
+    write(f8) IN_0 // '</VTKFile>'           // LF
+    close(f8)
   end if
+
+  write(f9,'(a,a)') IN_2, '</Piece>'
+  write(f9,'(a,a)') IN_1, '</UnstructuredGrid>'
+  write(f9,'(a,a)') IN_0, '</VTKFile>'
+  close(f9)
 
   end subroutine

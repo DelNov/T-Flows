@@ -28,9 +28,9 @@
   prelim_vof = 0.0
 
   ! Open file to read Plane parameters:
-  call File_Mod_Open_File_For_Reading('plane_parameters.ini', fu)
+  call File % Open_For_Reading_Ascii('plane_parameters.ini', fu)
 
-  call File_Mod_Read_Line(fu)
+  call File % Read_Line(fu)
   read(line % tokens(1), *) n_planes
 
   if (allocated(p_xyz)) deallocate(p_xyz)
@@ -43,19 +43,19 @@
     min_max_crit_2(:) = -HUGE
 
     ! Read point 1
-    call File_Mod_Read_Line(fu)
+    call File % Read_Line(fu)
     read(line % tokens(1), *) p_xyz(1, 1)
     read(line % tokens(2), *) p_xyz(1, 2)
     read(line % tokens(3), *) p_xyz(1, 3)
 
     ! Read point 2
-    call File_Mod_Read_Line(fu)
+    call File % Read_Line(fu)
     read(line % tokens(1), *) p_xyz(2, 1)
     read(line % tokens(2), *) p_xyz(2, 2)
     read(line % tokens(3), *) p_xyz(2, 3)
 
     ! Read point 3
-    call File_Mod_Read_Line(fu)
+    call File % Read_Line(fu)
     read(line % tokens(1), *) p_xyz(3, 1)
     read(line % tokens(2), *) p_xyz(3, 2)
     read(line % tokens(3), *) p_xyz(3, 3)

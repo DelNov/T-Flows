@@ -38,7 +38,7 @@
   logical                   :: plot_inside  ! plot results inside?
   integer,         optional :: domain
 !----------------------------------[Locals]------------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: phi
   integer(SP)              :: data_size
   integer                  :: data_offset, cell_offset, i_fac
@@ -56,7 +56,7 @@
   call Cpu_Timer % Start('Save_Vtu_Results')
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
 
   !------------------------------------------------!
   !   Mark the beginnings and end of cell ranges   !
@@ -65,47 +65,47 @@
   ! For cells inside
   if(plot_inside) then
     c_f = 1
-    c_l = grid % n_cells
-    if(.not. PLOT_BUFFERS) c_l = grid % n_cells - grid % comm % n_buff_cells
+    c_l = Grid % n_cells
+    if(.not. PLOT_BUFFERS) c_l = Grid % n_cells - Grid % Comm % n_buff_cells
 
   ! For boundary cells
   else
-    c_f = -grid % n_bnd_cells
+    c_f = -Grid % n_bnd_cells
     c_l = -1
     if(.not. PLOT_BUFFERS) then
-      do c_f = -grid % n_bnd_cells, -1
-        if( grid % comm % cell_proc(c_f) .eq. this_proc) exit
+      do c_f = -Grid % n_bnd_cells, -1
+        if( Grid % Comm % cell_proc(c_f) .eq. this_proc) exit
       end do
-      do c_l = -1, -grid % n_bnd_cells, -1
-        if( grid % comm % cell_proc(c_l) .eq. this_proc) exit
+      do c_l = -1, -Grid % n_bnd_cells, -1
+        if( Grid % Comm % cell_proc(c_l) .eq. this_proc) exit
       end do
     end if
   end if
 
   !-------------------------------------------------------------------------!
-  !   Count connections and polygons in this grid, you will need it later   !
+  !   Count connections and polygons in this Grid, you will need it later   !
   !-------------------------------------------------------------------------!
   n_conns = 0
   n_polyg = 0
   if(plot_inside) then
     ! Connections
     do c1 = c_f, c_l
-      n_conns = n_conns + abs(grid % cells_n_nodes(c1))
+      n_conns = n_conns + abs(Grid % cells_n_nodes(c1))
     end do
     ! Polygons
     do c1 = c_f, c_l
-      if(grid % cells_n_nodes(c1) .lt. 0) then  ! found a polyhedron
+      if(Grid % cells_n_nodes(c1) .lt. 0) then  ! found a polyhedron
         n_polyg = n_polyg + 1                   ! add one for number of polyfs
-        do i_fac = 1, grid % cells_n_faces(c1)  ! add all faces and their nodes
-          s = grid % cells_f(i_fac, c1)
-          n = grid % faces_n_nodes(s)
+        do i_fac = 1, Grid % cells_n_faces(c1)  ! add all faces and their nodes
+          s = Grid % cells_f(i_fac, c1)
+          n = Grid % faces_n_nodes(s)
           n_polyg = n_polyg + 1 + n
         end do
       end if
     end do
   else
     do c2 = c_f, c_l
-      n_conns = n_conns + grid % cells_n_nodes(c2)
+      n_conns = n_conns + Grid % cells_n_nodes(c2)
     end do
   end if
 
@@ -117,33 +117,33 @@
   !                                      !
   !--------------------------------------!
   if(plot_inside) then
-    call File_Mod_Set_Name(name_out_8,             &
-                           time_step=ts,           &
-                           extension='.pvtu',      &
-                           domain=domain)
-    call File_Mod_Set_Name(name_out_9,             &
-                           processor=this_proc,    &
-                           time_step=ts,           &
-                           extension='.vtu',       &
-                           domain=domain)
+    call File % Set_Name(name_out_8,             &
+                         time_step=ts,           &
+                         extension='.pvtu',      &
+                         domain=domain)
+    call File % Set_Name(name_out_9,             &
+                         processor=this_proc,    &
+                         time_step=ts,           &
+                         extension='.vtu',       &
+                         domain=domain)
   else
-    call File_Mod_Set_Name(name_out_8,             &
-                           time_step=ts,           &
-                           appendix ='-bnd',       &
-                           extension='.pvtu',      &
-                           domain=domain)
-    call File_Mod_Set_Name(name_out_9,             &
-                           processor=this_proc,    &
-                           time_step=ts,           &
-                           appendix ='-bnd',       &
-                           extension='.vtu',       &
-                           domain=domain)
+    call File % Set_Name(name_out_8,             &
+                         time_step=ts,           &
+                         appendix ='-bnd',       &
+                         extension='.pvtu',      &
+                         domain=domain)
+    call File % Set_Name(name_out_9,             &
+                         processor=this_proc,    &
+                         time_step=ts,           &
+                         appendix ='-bnd',       &
+                         extension='.vtu',       &
+                         domain=domain)
   end if
 
   if(n_proc > 1 .and. this_proc .eq. 1) then
-    call File_Mod_Open_File_For_Writing_Binary(name_out_8, f8)
+    call File % Open_For_Writing_Binary(name_out_8, f8)
   end if
-  call File_Mod_Open_File_For_Writing_Binary(name_out_9, f9)
+  call File % Open_For_Writing_Binary(name_out_9, f9)
 
   !------------!
   !            !
@@ -161,7 +161,7 @@
                     'byte_order="LittleEndian">'                      // LF
   write(f9) IN_1 // '<UnstructuredGrid>'                              // LF
 
-  write(str1,'(i0.0)') grid % n_nodes
+  write(str1,'(i0.0)') Grid % n_nodes
   if(plot_inside) then
     write(str2,'(i0.0)') (c_l-c_f+1)
   else
@@ -200,7 +200,7 @@
                     ' offset="' // trim(str1) //'">' // LF
   write(f9) IN_4 // '</DataArray>' // LF
   write(f9) IN_3 // '</Points>'    // LF
-  data_offset = data_offset + SP + grid % n_nodes * RP * 3
+  data_offset = data_offset + SP + Grid % n_nodes * RP * 3
 
   !-----------!
   !   Cells   !
@@ -220,12 +220,12 @@
   cell_offset = 0
   if(plot_inside) then
     do c1 = c_f, c_l
-      cell_offset   = cell_offset + abs(grid % cells_n_nodes(c1))
+      cell_offset   = cell_offset + abs(Grid % cells_n_nodes(c1))
       offs_save(c1) = cell_offset
     end do
   else
     do c2 = c_f, c_l
-      cell_offset   = cell_offset + grid % cells_n_nodes(c2)
+      cell_offset   = cell_offset + Grid % cells_n_nodes(c2)
       offs_save(c2) = cell_offset
     end do
   end if
@@ -236,17 +236,17 @@
   ! Fill up an array with cell types and save the header only
   if(plot_inside) then
     do c1 = c_f, c_l
-      if(grid % cells_n_nodes(c1) .eq. 8) type_save(c1) = VTK_HEXAHEDRON
-      if(grid % cells_n_nodes(c1) .eq. 6) type_save(c1) = VTK_WEDGE
-      if(grid % cells_n_nodes(c1) .eq. 4) type_save(c1) = VTK_TETRA
-      if(grid % cells_n_nodes(c1) .eq. 5) type_save(c1) = VTK_PYRAMID
-      if(grid % cells_n_nodes(c1) .lt. 0) type_save(c1) = VTK_POLYHEDRON
+      if(Grid % cells_n_nodes(c1) .eq. 8) type_save(c1) = VTK_HEXAHEDRON
+      if(Grid % cells_n_nodes(c1) .eq. 6) type_save(c1) = VTK_WEDGE
+      if(Grid % cells_n_nodes(c1) .eq. 4) type_save(c1) = VTK_TETRA
+      if(Grid % cells_n_nodes(c1) .eq. 5) type_save(c1) = VTK_PYRAMID
+      if(Grid % cells_n_nodes(c1) .lt. 0) type_save(c1) = VTK_POLYHEDRON
     end do
   else
     do c2 = c_f, c_l
-      if(grid % cells_n_nodes(c2) .eq. 4) then
+      if(Grid % cells_n_nodes(c2) .eq. 4) then
         type_save(c2) = VTK_QUAD
-      else if(grid % cells_n_nodes(c2) .eq. 3) then
+      else if(Grid % cells_n_nodes(c2) .eq. 3) then
         type_save(c2) = VTK_TRIANGLE
       else
         type_save(c2) = VTK_POLYGON
@@ -301,15 +301,15 @@
   do run = 1, 2
 
     !------------------------------------------!
-    !   Save remnants of the grid definition   !
+    !   Save remnants of the Grid definition   !
     !------------------------------------------!
     if(run .eq. 2) then
 
       ! Save the nodes' coordinates
-      data_size = int(grid % n_nodes * RP * 3, SP)
+      data_size = int(Grid % n_nodes * RP * 3, SP)
       write(f9) data_size
-      do n = 1, grid % n_nodes
-        write(f9) grid % xn(n), grid % yn(n), grid % zn(n)
+      do n = 1, Grid % n_nodes
+        write(f9) Grid % xn(n), Grid % yn(n), Grid % zn(n)
       end do
 
       ! Save connections
@@ -319,12 +319,12 @@
         do c1 = c_f, c_l
 
           ! Tetrahedral, pyramid, wedge and hexahedral cells
-          if( any( grid % cells_n_nodes(c1) .eq. (/4,5,6,8/)  ) ) then
-            write(f9) (grid % cells_n(1:grid % cells_n_nodes(c1), c1))-1
+          if( any( Grid % cells_n_nodes(c1) .eq. (/4,5,6,8/)  ) ) then
+            write(f9) (Grid % cells_n(1:Grid % cells_n_nodes(c1), c1))-1
 
           ! Polyhedral cells
-          else if(grid % cells_n_nodes(c1) .lt. 0) then
-            write(f9) (grid % cells_n(1:-grid % cells_n_nodes(c1), c1))-1
+          else if(Grid % cells_n_nodes(c1) .lt. 0) then
+            write(f9) (Grid % cells_n(1:-Grid % cells_n_nodes(c1), c1))-1
 
           end if
         end do
@@ -332,7 +332,7 @@
         do c2 = c_f, c_l
 
           ! All cell types
-          write(f9) (grid % cells_n(1:grid % cells_n_nodes(c2), c2))-1
+          write(f9) (Grid % cells_n(1:Grid % cells_n_nodes(c2), c2))-1
 
         end do
       end if
@@ -353,24 +353,24 @@
         write(f9) data_size
 
         do c1 = c_f, c_l
-          if(grid % cells_n_nodes(c1) .lt. 0) then  ! found a polyhedron
-            write(f9) grid % cells_n_faces(c1)      ! write number of polygons
-            do i_fac = 1, grid % cells_n_faces(c1)  ! write nodes of each polygn
-              s = grid % cells_f(i_fac, c1)
-              if(grid % faces_s(s) .ne. 0) then  ! face has a shadow, if it ...
+          if(Grid % cells_n_nodes(c1) .lt. 0) then  ! found a polyhedron
+            write(f9) Grid % cells_n_faces(c1)      ! write number of polygons
+            do i_fac = 1, Grid % cells_n_faces(c1)  ! write nodes of each polygn
+              s = Grid % cells_f(i_fac, c1)
+              if(Grid % faces_s(s) .ne. 0) then  ! face has a shadow, if it ...
                 s1 = s                           ! ... is closer, plot that!
-                s2 = grid % faces_s(s)
+                s2 = Grid % faces_s(s)
                 dist1 = Math_Mod_Distance(                            &
-                        grid % xc(c1), grid % yc(c1), grid % zc(c1),  &
-                        grid % xf(s1), grid % yf(s1), grid % zf(s1))
+                        Grid % xc(c1), Grid % yc(c1), Grid % zc(c1),  &
+                        Grid % xf(s1), Grid % yf(s1), Grid % zf(s1))
                 dist2 = Math_Mod_Distance(                            &
-                        grid % xc(c1), grid % yc(c1), grid % zc(c1),  &
-                        grid % xf(s2), grid % yf(s2), grid % zf(s2))
+                        Grid % xc(c1), Grid % yc(c1), Grid % zc(c1),  &
+                        Grid % xf(s2), Grid % yf(s2), Grid % zf(s2))
                 if(dist1 < dist2) s = s1
                 if(dist2 < dist1) s = s2
               end if
-              n = grid % faces_n_nodes(s)
-              write(f9) n, (grid % faces_n(1:n, s))-1
+              n = Grid % faces_n_nodes(s)
+              write(f9) n, (Grid % faces_n(1:n, s))-1
             end do
           end if
         end do
@@ -381,11 +381,11 @@
 
         cell_offset = 0
         do c1 = c_f, c_l
-          if(grid % cells_n_nodes(c1) .lt. 0) then  ! found a polyhedron
+          if(Grid % cells_n_nodes(c1) .lt. 0) then  ! found a polyhedron
             cell_offset = cell_offset + 1           ! to store number of polygs
-            do i_fac = 1, grid % cells_n_faces(c1)  ! to store all the nodes
-              s = grid % cells_f(i_fac, c1)         ! of each polygon
-              n = grid % faces_n_nodes(s)
+            do i_fac = 1, Grid % cells_n_faces(c1)  ! to store all the nodes
+              s = Grid % cells_f(i_fac, c1)         ! of each polygon
+              n = Grid % faces_n_nodes(s)
               cell_offset = cell_offset + 1 + n
             end do
             write(f9) cell_offset
@@ -405,10 +405,10 @@
     !   Processor i.d.   !
     !--------------------!
     do c1 = c_f, c_l
-      int_save(c1) = grid % comm % cell_proc(c1)
+      int_save(c1) = Grid % Comm % cell_proc(c1)
     end do
     do c2 = c_f, c_l
-      int_save(c2) = grid % comm % cell_proc(c2)
+      int_save(c2) = Grid % Comm % cell_proc(c2)
     end do
     call Save_Scalar_Int("Processor", plot_inside,   &
                           int_save(c_f:c_l),         &
@@ -450,9 +450,9 @@
     py_save(:) = 0.0
     pz_save(:) = 0.0
     do c1 = c_f, c_l
-      px_save(c1) = Flow % pp % x(c1) * grid % vol(c1)
-      py_save(c1) = Flow % pp % y(c1) * grid % vol(c1)
-      pz_save(c1) = Flow % pp % z(c1) * grid % vol(c1)
+      px_save(c1) = Flow % pp % x(c1) * Grid % vol(c1)
+      py_save(c1) = Flow % pp % y(c1) * Grid % vol(c1)
+      pz_save(c1) = Flow % pp % z(c1) * Grid % vol(c1)
     end do
     call Save_Vector_Real("PressureCorrectionForce [N]", plot_inside,  &
                           px_save(c_f:c_l),                            &
@@ -467,9 +467,9 @@
     py_save(:) = 0.0
     pz_save(:) = 0.0
     do c1 = c_f, c_l
-      px_save(c1) = Flow % p % x(c1) * grid % vol(c1)
-      py_save(c1) = Flow % p % y(c1) * grid % vol(c1)
-      pz_save(c1) = Flow % p % z(c1) * grid % vol(c1)
+      px_save(c1) = Flow % p % x(c1) * Grid % vol(c1)
+      py_save(c1) = Flow % p % y(c1) * Grid % vol(c1)
+      pz_save(c1) = Flow % p % z(c1) * Grid % vol(c1)
     end do
     call Save_Vector_Real("PressureForce [N]", plot_inside,    &
                           px_save(c_f:c_l),                    &
@@ -809,10 +809,10 @@
 
     ! Wall distance and delta, important for all models
     call Save_Scalar_Real("GridCellVolume", plot_inside,   &
-                          grid % vol(c_f:c_l),             &
+                          Grid % vol(c_f:c_l),             &
                           f8, f9, data_offset, run)
     call Save_Scalar_Real("GridWallDistance", plot_inside,   &
-                          grid % wall_dist(c_f:c_l),         &
+                          Grid % wall_dist(c_f:c_l),         &
                           f8, f9, data_offset, run)
     call Save_Scalar_Real("GridCellDeltaMax", plot_inside,   &
                           turb % h_max(c_f:c_l),             &
@@ -827,12 +827,12 @@
     !----------------------!
     !   Save user arrays   !
     !----------------------!
-    do ua = 1, grid % n_user_arrays
+    do ua = 1, Grid % n_user_arrays
 
       a_name = 'A_00'
       write(a_name(3:4), '(I2.2)') ua
       call Save_Scalar_Real(a_name, plot_inside,            &
-                            grid % user_array(ua,c_f:c_l),  &
+                            Grid % user_array(ua,c_f:c_l),  &
                             f8, f9, data_offset, run)
     end do
 
@@ -874,18 +874,18 @@
   if(n_proc > 1 .and. this_proc .eq. 1) then
     do n = 1, n_proc
       if(plot_inside) then
-        call File_Mod_Set_Name(name_out_9,        &
-                               processor=n,       &
-                               time_step=ts,      &
-                               extension='.vtu',  &
-                               domain=domain)
+        call File % Set_Name(name_out_9,        &
+                             processor=n,       &
+                             time_step=ts,      &
+                             extension='.vtu',  &
+                             domain=domain)
       else
-        call File_Mod_Set_Name(name_out_9,        &
-                               processor=n,       &
-                               time_step=ts,      &
-                               appendix ='-bnd',  &
-                               extension='.vtu',  &
-                               domain=domain)
+        call File % Set_Name(name_out_9,        &
+                             processor=n,       &
+                             time_step=ts,      &
+                             appendix ='-bnd',  &
+                             extension='.vtu',  &
+                             domain=domain)
       end if
       write(f8) IN_2 // '<Piece Source="', trim(name_out_9), '"/>' // LF
     end do

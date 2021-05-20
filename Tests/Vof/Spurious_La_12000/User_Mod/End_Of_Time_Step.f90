@@ -112,7 +112,7 @@
 
   ! Write Results
   if (this_proc < 2) then
-    call File_Mod_Append_File_For_Writing('spurious.dat', fu)
+    call File % Append_For_Writing_Ascii('spurious.dat', fu)
     write(fu,'(8(2X,E16.10E2))')  time, a_vof, u_rms, u_max, &
                                   p_max-p_min, p_in-p_out, mincurv, maxcurv
     close(fu)

@@ -46,17 +46,17 @@
   call Control_Mod_Thermal_Conductivity(cond_const)
 
   ! Set the name for coordinate file
-  call File_Mod_Set_Name(coord_name, extension='.1d')
+  call File % Set_Name(coord_name, extension='.1d')
 
   ! Set file names for results
-  call File_Mod_Set_Name(res_name,         &
-                         time_step=ts,     &   
-                         appendix='-res',  &
-                         extension='.dat')
-  call File_Mod_Set_Name(res_name_plus,         &
-                         time_step=ts,          &
-                         appendix='-res-plus',  &
-                         extension='.dat')
+  call File % Set_Name(res_name,         &
+                       time_step=ts,     &
+                       appendix='-res',  &
+                       extension='.dat')
+  call File % Set_Name(res_name_plus,         &
+                       time_step=ts,          &
+                       appendix='-res-plus',  &
+                       extension='.dat')
 
   !------------------!
   !   Read 1d file   !

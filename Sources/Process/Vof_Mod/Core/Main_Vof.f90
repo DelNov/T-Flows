@@ -24,7 +24,7 @@
                                             .true.)  ! don't print messages
       call Vof % Front % Calculate_Curvatures_From_Elems()
       call Vof % Front % Print_Front_Statistics         ()
-      call Vof % Front % Save_Front(n)
+!     call Vof % Front % Save_Front(n)
 !f_vs_s      call Surf_Mod_Place_At_Var_Value(Vof % surf,  &
 !f_vs_s                                       Vof % fun,   &
 !f_vs_s                                       Sol,          &

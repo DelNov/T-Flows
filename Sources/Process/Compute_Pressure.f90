@@ -26,7 +26,6 @@
   real                       :: total_source
   real                       :: p_max, p_min, p_nor, p_nor_c, dt, a12, fs
   character(SL)              :: solver
-  INTEGER :: P1, P2
 !==============================================================================!
 !
 !   The form of equations which I am solving:

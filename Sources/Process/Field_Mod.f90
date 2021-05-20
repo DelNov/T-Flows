@@ -156,17 +156,17 @@
       !   Procedures for gradient computation   !
       !-----------------------------------------!
       procedure          :: Calculate_Grad_Matrix
-      ! procedure          :: Calculate_Grad_Matrix_Cell_By_Cell
-      ! procedure          :: Calculate_Grad_Matrix_For_Cell
-      ! procedure          :: Calculate_Grad_Matrix_Faces_To_Cells
-      ! procedure          :: Calculate_Grad_Matrix_Nodes_To_Cells
-      ! procedure          :: Calculate_Grad_Matrix_Cells_To_Nodes
+      ! procedure          :: Calculate_Grad_Matrix_Cell_By_Cell    ! not used
+      ! procedure          :: Calculate_Grad_Matrix_For_Cell        ! not used
+      ! procedure          :: Calculate_Grad_Matrix_Faces_To_Cells  ! not used
+      ! procedure          :: Calculate_Grad_Matrix_Nodes_To_Cells  ! not used
+      ! procedure          :: Calculate_Grad_Matrix_Cells_To_Nodes  ! not used
       procedure          :: Grad
       procedure          :: Grad_Component
       procedure, private :: Grad_Component_No_Refresh
-      ! procedure          :: Grad_Component_Faces_To_Cells
-      ! procedure          :: Grad_Component_Nodes_To_Cells
-      ! procedure          :: Grad_Component_Cells_To_Nodes
+      ! procedure          :: Grad_Component_Faces_To_Cells         ! not used
+      ! procedure          :: Grad_Component_Nodes_To_Cells         ! not used
+      ! procedure          :: Grad_Component_Cells_To_Nodes         ! not used
       procedure          :: Grad_Gauss
       procedure, private :: Grad_Gauss_Pressure
       procedure, private :: Grad_Gauss_Variable

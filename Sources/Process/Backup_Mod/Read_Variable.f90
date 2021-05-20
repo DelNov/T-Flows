@@ -10,7 +10,7 @@
   type(Field_Type) :: Fld
   type(Var_Type)   :: var
 !-----------------------------------[Locals]-----------------------------------!
-  type(Comm_Type), pointer :: comm
+  type(Comm_Type), pointer :: Comm
   type(Grid_Type), pointer :: Grid
   character(SL)            :: vn
   integer                  :: vs, disp_loop, cnt_loop, nb, nc
@@ -18,7 +18,7 @@
 
   ! Take aliases
   Grid => var % pnt_grid
-  comm => Grid % comm
+  Comm => Grid % Comm
   nb = Grid % n_bnd_cells
   nc = Grid % n_cells
 
@@ -33,21 +33,21 @@
     ! Increase counter
     cnt_loop = cnt_loop + 1
 
-    call Comm_Mod_Read_Text(fh, vn, disp_loop)  ! variable name
-    call Comm_Mod_Read_Int (fh, vs, disp_loop)  ! variable size
+    call Comm % Read_Text(fh, vn, disp_loop)  ! variable name
+    call Comm % Read_Int (fh, vs, disp_loop)  ! variable size
 
     ! If variable is found, read it and retrun
     if(vn .eq. var_name) then
       if(this_proc < 2) print *, '# Reading variable: ', trim(vn)
-      call Comm_Mod_Read_Cell_Real(comm,fh,var % n(1:comm % nc_sub), disp_loop)
-      call Comm_Mod_Read_Bnd_Real (comm,fh,var % n( -comm % nb_f:  &
-                                                    -comm % nb_l),   disp_loop)
-      call Comm_Mod_Read_Cell_Real(comm,fh,var % q(1:comm % nc_sub), disp_loop)
-      call Comm_Mod_Read_Bnd_Real (comm,fh,var % q( -comm % nb_f:  &
-                                                    -comm % nb_l),   disp_loop)
-      call Comm_Mod_Read_Cell_Real(comm,fh,var % o(1:comm % nc_sub), disp_loop)
-      call Comm_Mod_Read_Bnd_Real (comm,fh,var % o( -comm % nb_f:  &
-                                                    -comm % nb_l),   disp_loop)
+      call Comm % Read_Cell_Real(fh,var % n(1:Comm % nc_sub), disp_loop)
+      call Comm % Read_Bnd_Real (fh,var % n( -Comm % nb_f:  &
+                                             -Comm % nb_l),   disp_loop)
+      call Comm % Read_Cell_Real(fh,var % q(1:Comm % nc_sub), disp_loop)
+      call Comm % Read_Bnd_Real (fh,var % q( -Comm % nb_f:  &
+                                             -Comm % nb_l),   disp_loop)
+      call Comm % Read_Cell_Real(fh,var % o(1:Comm % nc_sub), disp_loop)
+      call Comm % Read_Bnd_Real (fh,var % o( -Comm % nb_f:  &
+                                             -Comm % nb_l),   disp_loop)
 
       ! Refresh buffers for "n", "q" and "o" (not sure if needed)
       call Grid % Exchange_Cells_Real(var % n(-nb:nc))

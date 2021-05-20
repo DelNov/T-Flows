@@ -102,10 +102,10 @@
       if (this_proc < 2) &
         print *, '# Values specified in the file: ', trim(keys_file(nvs))
 
-      call File_Mod_Open_File_For_Reading(keys_file(1), fu, this_proc)
+      call File % Open_For_Reading_Ascii(keys_file(1), fu, this_proc)
 
       ! number of points
-      call File_Mod_Read_Line(fu)
+      call File % Read_Line(fu)
 
       read(line % tokens(1), *) n_points
 
@@ -120,7 +120,7 @@
 
       ! Read the entire profile file
       do m = 1, n_points
-        call File_Mod_Read_Line(fu)
+        call File % Read_Line(fu)
         do i = 1, nks
           read(line % tokens(i), *) prof(m, i)
         end do

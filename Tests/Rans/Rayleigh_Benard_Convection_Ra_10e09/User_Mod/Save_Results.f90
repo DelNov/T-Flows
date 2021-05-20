@@ -51,17 +51,17 @@
   call Flow % Grad_Variable(t)
 
   ! Set the name for coordinate file
-  call File_Mod_Set_Name(coord_name, extension='.1d')
+  call File % Set_Name(coord_name, extension='.1d')
 
   ! Set file names for results
-  call File_Mod_Set_Name(res_name,         &
-                          time_step=n,     &
-                          appendix='-res',  &
-                          extension='.dat')
-   call File_Mod_Set_Name(res_name_plus,         &
-                          time_step=n,          &
-                          appendix='-res-plus',  &
-                          extension='.dat')
+  call File % Set_Name(res_name,            &
+                       time_step = n,       &
+                       appendix  = '-res',  &
+                       extension = '.dat')
+  call File % Set_Name(res_name_plus,            &
+                       time_step = n,            &
+                       appendix  = '-res-plus',  &
+                       extension = '.dat')
 
 !  call Grad_Mod_For_Phi(Grid, t % n, 3, phi_z, .true.)
 

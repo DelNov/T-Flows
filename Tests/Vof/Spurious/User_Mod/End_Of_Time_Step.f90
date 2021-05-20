@@ -106,7 +106,7 @@
     if(n .eq. 1) then
       call File_Mod_Delete('spurious.dat')
     end if
-    call File_Mod_Append_File_For_Writing('spurious.dat', fu)
+    call File % Append_For_Writing_Ascii('spurious.dat', fu)
     write(fu,'(6(2X,E16.10E2))')  time, a_vof, u_rms, u_max, &
                                   p_max-p_min, p_in-p_out
     close(fu)
@@ -132,7 +132,7 @@
   !    end if
   !  end do
 
-  !  call File_Mod_Open_File_For_Writing('dist_centk.dat', fu)
+  !  call File % Open_For_Writing_Ascii('dist_centk.dat', fu)
 
   !  do c = 1, grid % n_cells
   !    if(dist_n(c) == 1) then
@@ -163,7 +163,7 @@
   !    end if
   !  end do
 
-  !  call File_Mod_Open_File_For_Writing('dist_centn.dat', fu)
+  !  call File % Open_For_Writing_Ascii('dist_centn.dat', fu)
 
   !  do c = 1, grid % n_cells
   !    if(dist_n(c) == 1) then

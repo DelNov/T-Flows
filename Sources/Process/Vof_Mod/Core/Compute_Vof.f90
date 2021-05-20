@@ -50,7 +50,7 @@
       ! Warning if Courant Number is exceeded
       if(n_sub > 1) then
         if(this_proc < 2) then
-          call File_Mod_Append_File_For_Writing('alert-dt-vof.dat', fu)
+          call File % Append_For_Writing_Ascii('alert-dt-vof.dat', fu)
           write(fu,*) 'Courant Number was exceded at iteration: ', n
           write(fu,*) 'Co_max = ', courant_max
           write(fu,*) 'Try reducing time step'

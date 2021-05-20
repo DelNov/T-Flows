@@ -173,7 +173,6 @@
     ! Initialize variables
     if(.not. read_backup(d)) then
       call Initialize_Variables(Flow(d), turb(d), Vof(d), swarm(d), Sol(d))
-      call Results_Mod_Save_Surf(Vof(d) % surf, curr_dt)
     end if
 
     if(Vof(d) % model .eq. VOLUME_OF_FLUID) then
@@ -242,6 +241,8 @@
                             plot_inside=.true., domain=d)
       call Results_Mod_Save(Flow(d), turb(d), Vof(d), swarm(d), first_dt,  &
                             plot_inside=.false., domain=d)
+      call Results_Mod_Save_Front(Vof(d) % Front, curr_dt)
+      call Results_Mod_Save_Surf(Vof(d) % surf, curr_dt)
     end do
   end if
 
@@ -283,12 +284,6 @@
       ! Interface tracking
       if(Vof(d) % model .eq. VOLUME_OF_FLUID) then
         call Vof(d) % Main_Vof(Flow(d), turb(d), Sol(d), curr_dt)
-        if(Vof(d) % track_front) then
-          call Results_Mod_Save_Front(Vof(d) % Front, curr_dt)
-!f_vs_s   call Results_Mod_Save_Surf (Vof(d) % surf, curr_dt)
-          call Results_Mod_Save(Flow(d), turb(d), Vof(d), swarm(d), curr_dt,  &
-                                plot_inside=.true., domain=d)
-        end if
         call Vof(d) % Update_Physical_Properties()
       end if
 
