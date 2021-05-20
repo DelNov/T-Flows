@@ -22,6 +22,18 @@
     Front % elem(e) % s(:) = 0
     Front % elem(e) % cell = 0
     Front % elem(e) % face = 0
+    Front % elem(e) % nx   = 0.0
+    Front % elem(e) % ny   = 0.0
+    Front % elem(e) % nz   = 0.0
+    Front % elem(e) % xc   = 0.0
+    Front % elem(e) % yc   = 0.0
+    Front % elem(e) % zc   = 0.0
+    Front % elem(e) % xe   = 0.0
+    Front % elem(e) % ye   = 0.0
+    Front % elem(e) % ze   = 0.0
+    Front % elem(e) % sx   = 0.0
+    Front % elem(e) % sy   = 0.0
+    Front % elem(e) % sz   = 0.0
   end do
   Front % n_elems = 0
 
