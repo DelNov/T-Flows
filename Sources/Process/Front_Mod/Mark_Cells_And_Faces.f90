@@ -74,53 +74,54 @@
             nx = Front % elem(e) % nx
             ny = Front % elem(e) % ny
             nz = Front % elem(e) % nz
-          end if
 
-          ! If cell contains surface and angle is not bigger than asin(15)
-          if(e .ne. 0 .and. (lx*nx + ly*ny + lz*nz)/l > 0.258819) then
-            nx = Front % elem(e) % nx
-            ny = Front % elem(e) % ny
-            nz = Front % elem(e) % nz
+            ! If cell contains surface and angle is not bigger than asin(15)
+            if( (lx*nx + ly*ny + lz*nz)/l > 0.258819 ) then
 
-            ! Distance from c1 to intersection
-            dsc1 = (  (Front % elem(e) % xe - grid % xc(c1)) * nx     &
-                    + (Front % elem(e) % ye - grid % yc(c1)) * ny     &
-                    + (Front % elem(e) % ze - grid % zc(c1)) * nz  )  &
-                 / (lx * nx + ly * ny + lz * nz)
+              nx = Front % elem(e) % nx
+              ny = Front % elem(e) % ny
+              nz = Front % elem(e) % nz
 
-            ! Intersection point
-            xs = grid % xc(c1) + dsc1 * lx
-            ys = grid % yc(c1) + dsc1 * ly
-            zs = grid % zc(c1) + dsc1 * lz
+              ! Distance from c1 to intersection
+              dsc1 = (  (Front % elem(e) % xe - grid % xc(c1)) * nx     &
+                      + (Front % elem(e) % ye - grid % yc(c1)) * ny     &
+                      + (Front % elem(e) % ze - grid % zc(c1)) * nz  )  &
+                   / (lx * nx + ly * ny + lz * nz)
 
-            ! Check if the intersection point is at the element
-            do i_ver = 1, Front % elem(e) % nv
-              j_ver = i_ver + 1
-              if(j_ver > Front % elem(e) % nv) j_ver = 1
-              i = Front % elem(e) % v(i_ver)
-              j = Front % elem(e) % v(j_ver)
-              vec_i(1) = Front % vert(i) % x_n - xs
-              vec_i(2) = Front % vert(i) % y_n - ys
-              vec_i(3) = Front % vert(i) % z_n - zs
-              vec_j(1) = Front % vert(j) % x_n - xs
-              vec_j(2) = Front % vert(j) % y_n - ys
-              vec_j(3) = Front % vert(j) % z_n - zs
-              vec_ixj = Math_Mod_Cross_Product(vec_i, vec_j)
-              if( dot_product(vec_ixj(1:3), (/lx,ly,lz/)) < 0.0 ) goto 1
-            end do  ! i_ver
+              ! Intersection point
+              xs = grid % xc(c1) + dsc1 * lx
+              ys = grid % yc(c1) + dsc1 * ly
+              zs = grid % zc(c1) + dsc1 * lz
 
-            n_int = n_int + 1
-            grid % xs(s) = xs
-            grid % ys(s) = ys
-            grid % zs(s) = zs
+              ! Check if the intersection point is at the element
+              do i_ver = 1, Front % elem(e) % nv
+                j_ver = i_ver + 1
+                if(j_ver > Front % elem(e) % nv) j_ver = 1
+                i = Front % elem(e) % v(i_ver)
+                j = Front % elem(e) % v(j_ver)
+                vec_i(1) = Front % vert(i) % x_n - xs
+                vec_i(2) = Front % vert(i) % y_n - ys
+                vec_i(3) = Front % vert(i) % z_n - zs
+                vec_j(1) = Front % vert(j) % x_n - xs
+                vec_j(2) = Front % vert(j) % y_n - ys
+                vec_j(3) = Front % vert(j) % z_n - zs
+                vec_ixj = Math_Mod_Cross_Product(vec_i, vec_j)
+                if( dot_product(vec_ixj(1:3), (/lx,ly,lz/)) < 0.0 ) goto 1
+              end do  ! i_ver
 
-1           continue
+              n_int = n_int + 1
+              grid % xs(s) = xs
+              grid % ys(s) = ys
+              grid % zs(s) = zs
 
-            n_fac = n_fac + 1
-            Front % face_at_elem(i_cel,s) = e
+  1           continue
 
-            ! PRINT '(A,3F12.3)', 'SURFACE FOUND AT C1',  &
-            !       GRID % XS(S), GRID % YS(S), GRID % ZS(S)
+              n_fac = n_fac + 1
+              Front % face_at_elem(i_cel,s) = e
+
+              ! PRINT '(A,3F12.3)', 'SURFACE FOUND AT C1',  &
+              !       GRID % XS(S), GRID % YS(S), GRID % ZS(S)
+            end if  ! something with angle
           end if    ! e .ne. 0
         end do      ! i_cel
 
