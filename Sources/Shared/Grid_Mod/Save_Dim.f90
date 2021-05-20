@@ -17,8 +17,8 @@
   !   Create .dim file   !
   !                      !
   !----------------------!
-  call File_Mod_Set_Name(name_out, processor=sub, extension='.dim')
-  call File_Mod_Open_File_For_Writing_Binary(name_out, fu)
+  call File % Set_Name(name_out, processor=sub, extension='.dim')
+  call File % Open_For_Writing_Binary(name_out, fu)
 
   !----------------------!
   !   Node coordinates   !

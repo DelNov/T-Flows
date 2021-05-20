@@ -19,11 +19,11 @@
   !   connections between cells   !
   !                               !
   !-------------------------------!
-  call File_Mod_Set_Name(name_in,              &
-                         processor=this_proc,  &
-                         extension='.cfn',     &
-                         domain=domain)
-  call File_Mod_Open_File_For_Reading_Binary(name_in, fu, this_proc)
+  call File % Set_Name(name_in,              &
+                       processor=this_proc,  &
+                       extension='.cfn',     &
+                       domain=domain)
+  call File % Open_For_Reading_Binary(name_in, fu, this_proc)
 
   !-----------------------------------------------!
   !   Number of cells, boundary cells and faces   !

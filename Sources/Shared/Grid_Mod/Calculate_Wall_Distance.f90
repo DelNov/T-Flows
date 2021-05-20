@@ -36,7 +36,7 @@
   print *, '#                                                                  '
   print *, '# Type skip to skip this and set wall distance to one everywhere.  '
   print *, '#------------------------------------------------------------------'
-  call File_Mod_Read_Line(5)
+  call File % Read_Line(5)
   answer = line % tokens(1)
   call To_Upper_Case(answer)
 

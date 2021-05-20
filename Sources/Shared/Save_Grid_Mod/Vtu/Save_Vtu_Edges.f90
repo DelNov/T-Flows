@@ -20,8 +20,8 @@
   !   Create .vtu file   !
   !                      !
   !----------------------!
-  call File_Mod_Set_Name(name_out, extension='.edges.vtu')
-  call File_Mod_Open_File_For_Writing(name_out, fu)
+  call File % Set_Name(name_out, extension='.edges.vtu')
+  call File % Open_For_Writing_Ascii(name_out, fu)
 
   !------------!
   !            !

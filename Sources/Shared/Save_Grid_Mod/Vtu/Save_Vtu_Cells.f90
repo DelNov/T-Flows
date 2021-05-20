@@ -43,8 +43,8 @@
   !------------------------!
   !   Open the .vtu file   !
   !------------------------!
-  call File_Mod_Set_Name(name_out, processor=sub, extension='.vtu')
-  call File_Mod_Open_File_For_Writing_Binary(name_out, fu)
+  call File % Set_Name(name_out, processor=sub, extension='.vtu')
+  call File % Open_For_Writing_Binary(name_out, fu)
 
   !------------!
   !            !
@@ -362,8 +362,8 @@
   ! Create it only from subdomain 1, when decomposed
   if(maxval(grid % comm % cell_proc(:)) > 1 .and. sub .eq. 1) then
 
-    call File_Mod_Set_Name(name_out, extension='.pvtu')
-    call File_Mod_Open_File_For_Writing(name_out, fu)
+    call File % Set_Name(name_out, extension='.pvtu')
+    call File % Open_For_Writing_Ascii(name_out, fu)
 
     ! Header
     write(fu,'(a,a)') IN_0, '<?xml version="1.0"?>'
@@ -387,7 +387,7 @@
 
     ! Write out the names of all the pieces
     do n = 1, maxval(grid % comm % cell_proc(:))
-      call File_Mod_Set_Name(name_out, processor=n, extension='.vtu')
+      call File % Set_Name(name_out, processor=n, extension='.vtu')
       write(fu, '(a,a,a,a)') IN_2, '<Piece Source="', trim(name_out), '"/>'
     end do
 

@@ -19,9 +19,9 @@
   !   geometrical dimensions   !
   !                            !
   !----------------------------!
-  call File_Mod_Set_Name(name_in, processor=this_proc, extension='.dim',  &
-                         domain=domain)
-  call File_Mod_Open_File_For_Reading_Binary(name_in, fu, this_proc)
+  call File % Set_Name(name_in, processor=this_proc, extension='.dim',  &
+                       domain=domain)
+  call File % Open_For_Reading_Binary(name_in, fu, this_proc)
 
   read(fu) (Grid % xn(n), n = 1, Grid % n_nodes)
   read(fu) (Grid % yn(n), n = 1, Grid % n_nodes)

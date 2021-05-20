@@ -49,8 +49,8 @@
   !------------------------!
   !   Open the .vtu file   !
   !------------------------!
-  call File_Mod_Set_Name(name_out, processor=this_proc, extension=trim(ext))
-  call File_Mod_Open_File_For_Writing_Binary(name_out, fu)
+  call File % Set_Name(name_out, processor=this_proc, extension=trim(ext))
+  call File % Open_For_Writing_Binary(name_out, fu)
 
   !------------!
   !            !

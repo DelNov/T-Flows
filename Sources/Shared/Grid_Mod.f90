@@ -163,9 +163,9 @@
     integer, allocatable :: edges_fb(:,:)  ! edges' faces on boundaries
 
     !------------------------------------------!
-    !   Variables important for parallel run   !
+    !   Communication class for parallel run   !
     !------------------------------------------!
-    type(Comm_Type) :: comm
+    type(Comm_Type) :: Comm
 
     ! User arrays.  I am neither sure if this is the ...
     ! ... best place for them nor do I need them at all?

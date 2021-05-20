@@ -81,8 +81,8 @@
   !--------------------!
   !   Create 1d file   !
   !--------------------!
-  call File_Mod_Set_Name(name_prob, extension='.1d')
-  call File_Mod_Open_File_For_Writing(name_prob, fu)
+  call File % Set_Name(name_prob, extension='.1d')
+  call File % Open_For_Writing_Ascii(name_prob, fu)
 
   ! Write the number of probes 
   write(fu, '(i8)') n_prob
