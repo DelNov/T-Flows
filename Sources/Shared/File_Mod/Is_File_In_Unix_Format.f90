@@ -14,7 +14,7 @@
   inquire(file=file_name, size=file_size)
 
   ! Open the file in binary mode
-  call File_Mod_Open_File_For_Reading_Binary(file_name, file_unit)
+  call File % Open_For_Reading_Binary(file_name, file_unit)
 
   ! Read a few lines to guess how are new lines being formed
   ! Sequence 13, 10 is used by Windows for line termination

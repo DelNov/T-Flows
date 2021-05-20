@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine File_Mod_Read_Binary_Real8_Array(un, n, reached_end)
+  subroutine Read_Binary_Real8_Array(File, un, n, reached_end)
 !------------------------------------------------------------------------------!
 !   Reads an array of double reals from a file in binary format.               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(File_Type)  :: File
   integer           :: un  ! unit
   integer           :: n   ! number of items to read
   logical, optional :: reached_end

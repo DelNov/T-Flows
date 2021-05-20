@@ -1,15 +1,17 @@
 !==============================================================================!
-  subroutine File_Mod_Set_Name(name_out,   &
-                               time_step,  &
-                               processor,  &
-                               appendix,   &
-                               extension,  &
-                               domain)
+  subroutine Set_Name(File,       &
+                      name_out,   &
+                      time_step,  &
+                      processor,  &
+                      appendix,   &
+                      extension,  &
+                      domain)
 !------------------------------------------------------------------------------!
 !   Creates the file name depending on time step, subdomain, type and domain   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(File_Type)           :: File
   character(len=*)           :: name_out
   integer,          optional :: time_step
   integer,          optional :: processor

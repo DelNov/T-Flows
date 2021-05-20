@@ -1,11 +1,12 @@
 !==============================================================================!
-  subroutine File_Mod_Read_Line(un, reached_end, remove)
+  subroutine Read_Line(File, un, reached_end, remove)
 !------------------------------------------------------------------------------!
 !   Reads a line from a file unit un and discards if it is comment.            !
 !   In addition, it breaks the line in tokens (individual strings).            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(File_Type)       :: File
   integer                :: un  ! unit
   logical,      optional :: reached_end
   character(*), optional :: remove

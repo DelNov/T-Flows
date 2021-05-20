@@ -22,7 +22,7 @@
   !---------------------------------------------------------!
   !   Read one line from command file to find the keyword   !
   !---------------------------------------------------------!
-  call File_Mod_Read_Line(control_file_unit, reached_end)
+  call File % Read_Line(control_file_unit, reached_end)
   if(reached_end) goto 1
 
   ! Found the correct keyword

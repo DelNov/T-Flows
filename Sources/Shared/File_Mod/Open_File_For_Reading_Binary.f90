@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine File_Mod_Open_File_For_Reading_Binary(name_i, file_unit, processor)
+  subroutine Open_For_Reading_Binary(File, name_i, file_unit, processor)
 !------------------------------------------------------------------------------!
 !   Opens file for reading in binary format in first available unit.           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(File_Type)  :: File
   character(len=*)  :: name_i
   integer           :: file_unit
   integer, optional :: processor

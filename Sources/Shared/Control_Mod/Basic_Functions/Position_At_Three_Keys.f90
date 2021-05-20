@@ -27,7 +27,7 @@
   !------------------------------------------------------------------!
   found = .false.
   do
-    call File_Mod_Read_Line(control_file_unit, reached_end)
+    call File % Read_Line(control_file_unit, reached_end)
     if(reached_end) goto 1
 
     ! First keyword is "INTERFACE_CONDITION", ...

@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine File_Mod_Append_File_For_Writing(name_o, file_unit, processor)
+  subroutine Append_For_Writing_Ascii(File, name_o, file_unit, processor)
 !------------------------------------------------------------------------------!
 !   Opens file for writing in the first available unit.                        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(File_Type)  :: File
   character(len=*)  :: name_o
   integer           :: file_unit
   integer, optional :: processor

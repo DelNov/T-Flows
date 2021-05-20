@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine File_Mod_Open_File_For_Writing_Binary(name_o, file_unit, processor)
+  subroutine Open_For_Writing_Binary(File, name_o, file_unit, processor)
 !------------------------------------------------------------------------------!
 !   Opens file for writing in the first available unit.                        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(File_Type)  :: File
   character(len=*)  :: name_o
   integer           :: file_unit
   integer, optional :: processor

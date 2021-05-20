@@ -26,7 +26,27 @@
     character(1)  :: first, last         ! first and last characters in whole
   end type
 
+  type File_Type
+
+    contains
+      procedure :: Append_For_Writing_Ascii
+      procedure :: Delete
+      procedure :: Open_For_Reading_Ascii
+      procedure :: Open_For_Reading_Binary
+      procedure :: Open_For_Writing_Ascii
+      procedure :: Open_For_Writing_Binary
+      procedure :: Read_Binary_Int4_Array
+      procedure :: Read_Binary_Int8_Array
+      procedure :: Read_Binary_Real4_Array
+      procedure :: Read_Binary_Real8_Array
+      procedure :: Read_Line
+      procedure :: Set_Name
+
+  end type
+
   type(Tokenizer_Type) :: line
+  type(File_Type)      :: File
+
   integer(SP) :: int4_array(MAX_ITEMS)
   integer(DP) :: int8_array(MAX_ITEMS)
   real(SP)    :: real4_array(MAX_ITEMS)
