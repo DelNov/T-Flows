@@ -24,9 +24,10 @@
   type(Elem_Type),   pointer :: elem(:)
   type(Matrix_Type), pointer :: A
   integer,           pointer :: nv, ne
+  integer                    :: nv_tot, ne_tot
   integer, allocatable       :: n_cells_v(:)
   integer                    :: c, c1, c2, s, j, n1, n2, run, nb, nc, n, nn
-  integer                    :: v, n_vert, n_verts_in_buffers, i_nod
+  integer                    :: v, n_vert, i_nod
   integer                    :: en(12,2)  ! edge numbering
   real                       :: phi1, phi2, xn1, yn1, zn1, xn2, yn2, zn2, w1, w2
   real                       :: surf_v(3), dist
@@ -49,13 +50,13 @@
   call Front % Initialize_Front()
   call Flow % Interpolate_Cells_To_Nodes(phi % n, phi_n(1:nn))
 
-  CALL GRID % SAVE_DEBUG_VTU('PHI_C',               &
-                             SCALAR_CELL=PHI % N,   &
-                             SCALAR_NAME='PHI_C')
-
-  CALL GRID % SAVE_DEBUG_VTU('PHI_N',             &
-                             SCALAR_NODE=PHI_N,   &
-                             SCALAR_NAME='PHI_N')
+! call Grid % Save_Debug_Vtu('phi_c',               &
+!                            scalar_cell=phi % n,   &
+!                            scalar_name='phi_c')
+!
+! call Grid % Save_Debug_Vtu('phi_n',             &
+!                            scalar_node=phi_n,   &
+!                            scalar_name='phi_n')
 
   !-----------------------------------------------!
   !   This is a bit ad-hoc - if some points are   !
@@ -95,7 +96,7 @@
         phi_cen(c2) = phi_cen(c2) + A % fc(s)
       end if
     end do
-    do c = 1, Grid % n_cells
+    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
       phi_c(c) = 0.1 * phi_c(c) + 0.9 * phi_src(c) / phi_cen(c)
     end do
   end do
@@ -115,7 +116,7 @@
   !   Browse through all cells in search of surface vertices   !
   !                                                            !
   !------------------------------------------------------------!
-  do c = 1, Grid % n_cells
+  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
 
     n_vert = 0
 
@@ -190,9 +191,16 @@
     end if
 
   end do
+
   if(verbose) then
-    print *, '# Cummulative number of elements found: ', ne
-    print *, '# Cummulative number of vertices found: ', nv
+    ne_tot = ne
+    nv_tot = nv
+    call Comm_Mod_Global_Sum_Int(ne_tot)
+    call Comm_Mod_Global_Sum_Int(nv_tot)
+    if(this_proc < 2) then
+      print *, '# Cummulative number of elements found: ', ne_tot
+      print *, '# Cummulative number of vertices found: ', nv_tot
+    end if
   end if
 
   !-----------------------!
@@ -209,15 +217,10 @@
   !----------------!
   call Front % Find_Connectivity(verbose)
 
-  !----------------------------------!
-  !    Find nearest cell and node    !
-  !   (Not sure if this is needed)   !
-  !----------------------------------!
-  n_verts_in_buffers = 0
-  do v = 1, nv
-    call Front % Find_Nearest_Cell(v, n_verts_in_buffers)
-    call Front % Find_Nearest_Node(v)
-  end do
+  !-----------------------------------------------!
+  !   It used to find the nearest cell and node   !
+  !   (But I deleted, I hope it was not needed)   !
+  !-----------------------------------------------!
 
   !--------------------------------------!
   !                                      !

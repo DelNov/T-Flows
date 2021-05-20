@@ -9,11 +9,13 @@
   type(Elem_Type), pointer :: elem(:)
   type(Side_Type), pointer :: side(:)
   integer,         pointer :: nv, ns, ne
-  integer                  :: item, i, j, k, c, d, e, s, v, si, sj, sk
+  integer                  :: nv_tot, item, i, j, k, c, d, e, s, v, si, sj, sk
   integer                  :: nne_s, nne_e
+  integer                  :: n_elems_tot, n_verts_tot, n_sides_tot
   real, allocatable        :: nne(:)
   real                     :: a(3), b(3), tri_v(3)
-  real                     :: max_rat, min_rat, max_l, min_l, tot_area
+  real                     :: max_rat, min_rat, max_l, min_l
+  real                     :: min_a, max_a, tot_area
   character(len=160)       :: line
 !-----------------------------[Local parameters]-------------------------------!
   integer, parameter :: T=33  ! indent
@@ -26,6 +28,9 @@
   vert => Front % vert
   side => Front % side
   elem => Front % elem
+
+  nv_tot = nv
+  call Comm_Mod_Global_Sum_Int(nv_tot)
 
   !--------------------------!
   !   Compute side lengths   !
@@ -52,6 +57,8 @@
     max_rat = max(max_rat, max_l/min_l)
     min_rat = min(min_rat, max_l/min_l)
   end do
+  call Comm_Mod_Global_Max_Real(max_rat)
+  call Comm_Mod_Global_Min_Real(min_rat)
 
   !------------------------!
   !   Total surface area   !
@@ -60,16 +67,42 @@
   do e = 1, ne
     tot_area = tot_area + elem(e) % area
   end do
+  call Comm_Mod_Global_Sum_Real(tot_area)
 
   !--------------------------------!
   !   Count number of neighbours   !
   !--------------------------------!
   nne_s = minval(vert(1:nv) % nne)
   nne_e = maxval(vert(1:nv) % nne)
+  call Comm_Mod_Global_Min_Int(nne_s)
+  call Comm_Mod_Global_Max_Int(nne_e)
   allocate(nne(nne_s:nne_e)); nne = 0.0
   do v = 1, nv
     nne(vert(v) % nne) = nne(vert(v) % nne) + 1.0
   end do
+  do item = nne_s, nne_e
+    call Comm_Mod_Global_Sum_Real(nne(item))
+  end do
+
+  !------------------------------------------!
+  !   Work out values for parellel version   !
+  !------------------------------------------!
+  n_elems_tot = Front % n_elems
+  n_verts_tot = Front % n_verts
+  n_sides_tot = Front % n_sides
+  call Comm_Mod_Global_Sum_Int(n_elems_tot)
+  call Comm_Mod_Global_Sum_Int(n_verts_tot)
+  call Comm_Mod_Global_Sum_Int(n_sides_tot)
+
+  max_l = maxval(side(1:ns) % length)
+  min_l = minval(side(1:ns) % length)
+  call Comm_Mod_Global_Max_Real(max_l)
+  call Comm_Mod_Global_Min_Real(min_l)
+
+  max_a = maxval(elem(1:ne) % area)
+  min_a = minval(elem(1:ne) % area)
+  call Comm_Mod_Global_Max_Real(max_a)
+  call Comm_Mod_Global_Min_Real(min_a)
 
   if(this_proc < 2) then
 
@@ -91,11 +124,11 @@
       line(63+T:63+T) = '#'
       line( 3+T: 3+T) = '-'
       if(item.eq.1) line( 5+T: 5+T+20) = 'Number of elements: '
-      if(item.eq.1) write(line(32+T:37+T), '(i6)') Front % n_elems
+      if(item.eq.1) write(line(32+T:37+T), '(i6)') n_elems_tot
       if(item.eq.2) line( 5+T: 5+T+20) = 'Number of vertices: '
-      if(item.eq.2) write(line(32+T:37+T), '(i6)') Front % n_verts
+      if(item.eq.2) write(line(32+T:37+T), '(i6)') n_verts_tot
       if(item.eq.3) line( 5+T: 5+T+20) = 'Number of sides:    '
-      if(item.eq.3) write(line(32+T:37+T), '(i6)') Front % n_sides
+      if(item.eq.3) write(line(32+T:37+T), '(i6)') n_sides_tot
       print *, trim(line)
     end do
 
@@ -112,20 +145,16 @@
       line(63+T:63+T) = '#'
       line( 3+T: 3+T) = '-'
       if(item.eq.1) line( 5+T: 5+T+33) = 'Maximum element area:          '
-      if(item.eq.1) write(line(36+T:47+T), '(1pe12.5)')  &
-                          maxval(elem(1:ne) % area)
+      if(item.eq.1) write(line(36+T:47+T), '(1pe12.5)') max_a
       if(item.eq.2) line( 5+T: 5+T+33) = 'Minimum element area:          '
-      if(item.eq.2) write(line(36+T:47+T), '(1pe12.5)')  &
-                          minval(elem(1:ne) % area)
+      if(item.eq.2) write(line(36+T:47+T), '(1pe12.5)') min_a
       if(item.eq.3) line( 5+T: 5+T+33) = 'Total surface area  :          '
       if(item.eq.3) write(line(36+T:47+T), '(1pe12.5)')  &
                           tot_area
       if(item.eq.4) line( 5+T: 5+T+33) = 'Maximum side length:           '
-      if(item.eq.4) write(line(36+T:47+T), '(1pe12.5)')  &
-                          maxval(side(1:ns) % length)
+      if(item.eq.4) write(line(36+T:47+T), '(1pe12.5)') max_l
       if(item.eq.5) line( 5+T: 5+T+33) = 'Minimum side length:           '
-      if(item.eq.5) write(line(36+T:47+T), '(1pe12.5)')  &
-                          minval(side(1:ns) % length)
+      if(item.eq.5) write(line(36+T:47+T), '(1pe12.5)') min_l
       if(item.eq.6) line( 5+T: 5+T+33) = 'Maximum side ratio in element: '
       if(item.eq.6) write(line(36+T:47+T), '(1pe12.5)') max_rat
       if(item.eq.7) line( 5+T: 5+T+33) = 'Minimum side ratio in element: '
@@ -145,7 +174,7 @@
       line( 3+T: 3+T) = '-'
       line( 5+T: 5+T+43) = 'Percentage of vertices with XX neighbours: '
       write(line(33+T:34+T), '(i2)') item
-      write(line(48+T:53+T), '(f6.2)') nne(item) / nv * 100.0
+      write(line(48+T:53+T), '(f6.2)') nne(item) / nv_tot * 100.0
       line(55+T:55+T) = '%'
       print *, trim(line)
     end do

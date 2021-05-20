@@ -15,6 +15,7 @@
   integer                  :: cnt_one, cnt_two
   integer                  :: e, eb, ea, c, d, c1, c2, d1, d2, s, n_side
   integer                  :: ss, sum_ijk, sum_cd, i_ver, i_s, v1, v2
+  integer                  :: ne_tot, ns_tot, cnt_one_tot, cnt_two_tot
   integer, allocatable     :: ci(:), di(:), ei(:), ni(:)
 !==============================================================================!
 
@@ -44,58 +45,103 @@
     end do
   end do
   if(verbose) then
-    print *, '# Number of elements:        ', ne
-    print *, '# Tentative number of sides: ', n_side
+    ne_tot = ne
+    ns_tot = n_side
+    call Comm_Mod_Global_Sum_Int(ne_tot)
+    call Comm_Mod_Global_Sum_Int(ns_tot)
+    if(this_proc < 2) then
+      print *, '# Number of elements:        ', ne_tot
+      print *, '# Tentative number of sides: ', ns_tot
+    end if
   end if
 
-  allocate(ci(n_side))
-  allocate(di(n_side))
-  allocate(ei(n_side))
-  allocate(ni(n_side))
-  do s = 1, n_side
-    ci(s) = min(side(s) % c, side(s) % d)
-    di(s) = max(side(s) % c, side(s) % d)
-    ei(s) = side(s) % ei
-    ni(s) = s
-  end do
+  if(n_side > 0) then
 
-  call Sort % Two_Int_Carry_Int(ci, di, ei)
+    allocate(ci(n_side))
+    allocate(di(n_side))
+    allocate(ei(n_side))
+    allocate(ni(n_side))
+    do s = 1, n_side
+      ci(s) = min(side(s) % c, side(s) % d)
+      di(s) = max(side(s) % c, side(s) % d)
+      ei(s) = side(s) % ei
+      ni(s) = s
+    end do
 
-  !------------------------!
-  !   Compress the sides   !
-  !------------------------!
-  ns = n_side
-  n_side = 0
+    call Sort % Two_Int_Carry_Int(ci, di, ei)
 
-  cnt_one = 0
-  cnt_two = 0
+    !------------------------!
+    !   Compress the sides   !
+    !------------------------!
+    ns = n_side
+    n_side = 0
 
-  s = 0
-  do  ! s = 1, ns
+    cnt_one = 0
+    cnt_two = 0
 
-    s = s + 1
-    if(s > ns) exit
+    s = 0
+    do  ! s = 1, ns
 
-    ! Take c1, c2, d1 and d2, taking care not to go beyond array boundaries
-    c1 = ci(s);  c2 = 0
-    d1 = di(s);  d2 = 0
-    if(s < ns) then
-      c2 = ci(s+1)
-      d2 = di(s+1)
-    end if
+      s = s + 1
+      if(s > ns) exit
 
-    ! Two sides have the same c1 and c2, handle them both
-    if(c1 .eq. c2 .and. d1 .eq. d2) then
-      n_side = n_side + 1
+      ! Take c1, c2, d1 and d2, taking care not to go beyond array boundaries
+      c1 = ci(s);  c2 = 0
+      d1 = di(s);  d2 = 0
+      if(s < ns) then
+        c2 = ci(s+1)
+        d2 = di(s+1)
+      end if
 
-      side(n_side) % c = c1  ! here c1 == c2
-      side(n_side) % d = d1  ! here d1 == d2
+      ! Two sides have the same c1 and c2, handle them both
+      if(c1 .eq. c2 .and. d1 .eq. d2) then
+        n_side = n_side + 1
 
-      c = side(n_side) % c
-      d = side(n_side) % d
+        side(n_side) % c = c1  ! here c1 == c2
+        side(n_side) % d = d1  ! here d1 == d2
 
-      ! Tedious but (hopefully) correct way to find eb and ea
-      do ss = s, s+1
+        c = side(n_side) % c
+        d = side(n_side) % d
+
+        ! Tedious but (hopefully) correct way to find eb and ea
+        do ss = s, s+1
+
+          do i_ver = 1, elem(ei(ss)) % nv
+
+            ! Get first and second vertex
+            v1 = elem(ei(ss)) % v(i_ver)
+            if(i_ver < elem(ei(ss)) % nv) then
+              v2 = elem(ei(ss)) % v(i_ver+1)
+            else
+              v2 = elem(ei(ss)) % v(1)
+            end if
+
+            ! Check ea
+            if(v1 .eq. c .and. v2 .eq. d) side(n_side) % ea = ei(ss)
+
+            ! Check eb
+            if(v2 .eq. c .and. v1 .eq. d) side(n_side) % eb = ei(ss)
+
+          end do
+
+        end do
+
+        ! You handled two sides, skip one
+        cnt_two = cnt_two + 1
+        s = s + 1
+
+      ! Side is alone, no twin
+      else
+        n_side = n_side + 1
+
+        side(n_side) % c = c1
+        side(n_side) % d = d1
+
+        c = side(n_side) % c
+        d = side(n_side) % d
+
+        ! Tedious but (hopefully) correct way to find eb and ea
+        ss = s
 
         do i_ver = 1, elem(ei(ss)) % nv
 
@@ -115,52 +161,31 @@
 
         end do
 
-      end do
+        ! You handled only one side
+        cnt_one = cnt_one + 1
+      end if
+    end do
+  else
+    n_side  = 0
+    cnt_one = 0
+    cnt_two = 0
+  end if
 
-      ! You handled two sides, skip one
-      cnt_two = cnt_two + 1
-      s = s + 1
-
-    ! Side is alone, no twin
-    else
-      n_side = n_side + 1
-
-      side(n_side) % c = c1
-      side(n_side) % d = d1
-
-      c = side(n_side) % c
-      d = side(n_side) % d
-
-      ! Tedious but (hopefully) correct way to find eb and ea
-      ss = s
-
-      do i_ver = 1, elem(ei(ss)) % nv
-
-        ! Get first and second vertex
-        v1 = elem(ei(ss)) % v(i_ver)
-        if(i_ver < elem(ei(ss)) % nv) then
-          v2 = elem(ei(ss)) % v(i_ver+1)
-        else
-          v2 = elem(ei(ss)) % v(1)
-        end if
-
-        ! Check ea
-        if(v1 .eq. c .and. v2 .eq. d) side(n_side) % ea = ei(ss)
-
-        ! Check eb
-        if(v2 .eq. c .and. v1 .eq. d) side(n_side) % eb = ei(ss)
-
-      end do
-
-      ! You handled only one side
-      cnt_one = cnt_one + 1
-    end if
-  end do
   ns = n_side
   if(verbose) then
-    print *, '# Compressed number of sides:       ', ns
-    print *, '# Sides surrounded by two elements: ', cnt_two
-    print *, '# Sides surrounded by one element:  ', cnt_one
+    ns_tot = ns
+    cnt_two_tot = cnt_two
+    cnt_one_tot = cnt_one
+    call Comm_Mod_Global_Sum_Int(ns_tot)
+    call Comm_Mod_Global_Sum_Int(cnt_two_tot)
+    call Comm_Mod_Global_Sum_Int(cnt_one_tot)
+
+    if(this_proc < 2) then
+      print *, '# Compressed number of sides:       ', ns_tot
+      print *, '# Sides surrounded by two elements: ', cnt_two_tot
+      print *, '# Sides surrounded by one element:  ', cnt_one_tot
+    end if
+
   end if
 
   !-------------------------------!

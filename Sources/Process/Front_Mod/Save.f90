@@ -30,13 +30,14 @@
   !                            !
   !----------------------------!
 
-  if(this_proc < 2) then
+! if(this_proc < 2) then
 
-    call File_Mod_Set_Name(name_out,               &
-                           time_step = time_step,  &
-                           appendix  = '-front',   &
-                           extension = '.vtu')
-    call File_Mod_Open_File_For_Writing(name_out, fu)
+    call File % Set_Name(name_out,               &
+                         processor = this_proc,  &
+                         time_step = time_step,  &
+                         appendix  = '-front',   &
+                         extension = '.vtu')
+    call File % Open_For_Writing_Ascii(name_out, fu)
 
     !------------!
     !            !
@@ -222,6 +223,6 @@
     write(fu,'(a,a)') IN_1, '</UnstructuredGrid>'
     write(fu,'(a,a)') IN_0, '</VTKFile>'
     close(fu)
-  end if
+! end if
 
   end subroutine
