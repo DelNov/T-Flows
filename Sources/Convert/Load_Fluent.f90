@@ -44,7 +44,7 @@
 !==============================================================================!
 
   ! Open the file in binary mode, because it could be mixed
-  call File_Mod_Open_File_For_Reading_Binary(file_name, fu)
+  call File % Open_For_Reading_Binary(file_name, fu)
 
   !-----------------------------------------------!
   !   Assume grid doesn't have polyhedral cells   !
@@ -71,7 +71,7 @@
   Grid % n_nodes = 0
   rewind(fu)
   do while(Grid % n_nodes .eq. 0)
-    call File_Mod_Read_Line(fu)
+    call File % Read_Line(fu)
     if(line % n_tokens > 1) then
       if(line % tokens(1) .eq. '(10' .and. line % tokens(2) .eq. '(0') then
         read(line % tokens(4), '(z160)') Grid % n_nodes
@@ -89,7 +89,7 @@
   Grid % n_cells = 0
   rewind(fu)
   do while(Grid % n_cells .eq. 0)
-    call File_Mod_Read_Line(fu)
+    call File % Read_Line(fu)
     if(line % n_tokens > 1) then
       if(line % tokens(1) .eq. '(12' .and. line % tokens(2) .eq. '(0') then
         read(line % tokens(4), '(z160)') Grid % n_cells
@@ -107,7 +107,7 @@
   Grid % n_faces = 0
   rewind(fu)
   do while(Grid % n_faces .eq. 0)
-    call File_Mod_Read_Line(fu)
+    call File % Read_Line(fu)
     if(line % n_tokens > 1) then
       if(line % tokens(1) .eq. '(13' .and. line % tokens(2) .eq. '(0') then
         read(line % tokens(4), '(z160)') Grid % n_faces
@@ -131,7 +131,7 @@
   the_end     = .false.
   rewind(fu)
   do while(n_faces < Grid % n_faces .and. .not. the_end)
-    call File_Mod_Read_Line(fu, reached_end=the_end)
+    call File % Read_Line(fu, reached_end=the_end)
     if(line % n_tokens > 1) then
 
       !----------------------------------------------------------!
@@ -170,7 +170,7 @@
 
         ! End the line if needed, just read one left bracket '('
         if(line % last .ne. '(') then
-          if(ascii)       call File_Mod_Read_Line(fu)
+          if(ascii)       call File % Read_Line(fu)
           if(.not. ascii) read(fu) one_char
         end if
 
@@ -185,15 +185,15 @@
           if(zone_type .eq. MIXED_ZONE .or.  &
              zone_type .eq. FACE_POLY) then
             if(ascii) then
-              call File_Mod_Read_Line(fu)
+              call File % Read_Line(fu)
               read(line % tokens(1), *) n_face_nodes
               read(line % tokens(1+n_face_nodes+1), '(z160)') c1
               read(line % tokens(1+n_face_nodes+2), '(z160)') c2
             else
-              call File_Mod_Read_Binary_Int4_Array(fu, 1)
+              call File % Read_Binary_Int4_Array(fu, 1)
               n_face_nodes = int4_array(1)
-              call File_Mod_Read_Binary_Int4_Array(fu, n_face_nodes)
-              call File_Mod_Read_Binary_Int4_Array(fu, 2)
+              call File % Read_Binary_Int4_Array(fu, n_face_nodes)
+              call File % Read_Binary_Int4_Array(fu, 2)
               c1 = int4_array(1)
               c2 = int4_array(2)
             end if
@@ -203,12 +203,12 @@
             if(zone_type .eq. FACE_TRI)  n_face_nodes = 3
             if(zone_type .eq. FACE_QUAD) n_face_nodes = 4
             if(ascii) then
-              call File_Mod_Read_Line(fu)
+              call File % Read_Line(fu)
               read(line % tokens(0+n_face_nodes+1), '(z160)') c1
               read(line % tokens(0+n_face_nodes+2), '(z160)') c2
             else
-              call File_Mod_Read_Binary_Int4_Array(fu, n_face_nodes)
-              call File_Mod_Read_Binary_Int4_Array(fu, 2)
+              call File % Read_Binary_Int4_Array(fu, n_face_nodes)
+              call File % Read_Binary_Int4_Array(fu, 2)
               c1 = int4_array(1)
               c2 = int4_array(2)
             end if
@@ -273,7 +273,7 @@
   the_end = .false.
   rewind(fu)
   do while(n_nodes < Grid % n_nodes .and. .not. the_end)
-    call File_Mod_Read_Line(fu)
+    call File % Read_Line(fu)
     if(line % n_tokens > 1) then
 
       !----------------------------------------------------------!
@@ -293,7 +293,7 @@
 
         ! End the line if needed
         if(line % last .ne. '(') then
-          if(ascii)       call File_Mod_Read_Line(fu)
+          if(ascii)       call File % Read_Line(fu)
           if(.not. ascii) read(fu) one_char
         end if
 
@@ -301,12 +301,12 @@
         do n = node_f, node_l
           n_nodes = n_nodes + 1
           if(ascii) then
-            call File_Mod_Read_Line(fu)
+            call File % Read_Line(fu)
             read(line % tokens(1), *)  Grid % xn(n)
             read(line % tokens(2), *)  Grid % yn(n)
             read(line % tokens(3), *)  Grid % zn(n)
           else
-            call File_Mod_Read_Binary_Real8_Array(fu, 3)
+            call File % Read_Binary_Real8_Array(fu, 3)
             Grid % xn(n) = real8_array(1)
             Grid % yn(n) = real8_array(2)
             Grid % zn(n) = real8_array(3)
@@ -340,7 +340,7 @@
 
   rewind(fu)
   do while(n_cells < Grid % n_cells .and. .not. the_end)
-    call File_Mod_Read_Line(fu, reached_end=the_end)
+    call File % Read_Line(fu, reached_end=the_end)
     if(line % n_tokens > 1) then
       if( (line % tokens(1) .eq. '(12' .or. line % tokens(1) .eq. '(2012')  &
          .and. line % tokens(2) .ne. '(0') then
@@ -419,7 +419,7 @@
 6         continue
 
           if(ascii) then
-            call File_Mod_Read_Line(fu, remove='('//')')
+            call File % Read_Line(fu, remove='('//')')
           else
             line % n_tokens = 1  ! a bit of a dirty trick
           end if
@@ -429,7 +429,7 @@
             if(ascii) then
               read(line % tokens(i), *) cell_type
             else
-              call File_Mod_Read_Binary_Int4_Array(fu, 1)
+              call File % Read_Binary_Int4_Array(fu, 1)
               cell_type = int4_array(1)
             end if
 
@@ -524,7 +524,7 @@
   the_end     = .false.
   rewind(fu)
   do while(n_faces < Grid % n_faces .and. .not. the_end)
-    call File_Mod_Read_Line(fu, reached_end=the_end)
+    call File % Read_Line(fu, reached_end=the_end)
     if(line % n_tokens > 1) then
 
       !----------------------------------------------------------!
@@ -558,7 +558,7 @@
 
         ! End the line if needed
         if(line % last .ne. '(') then
-          if(ascii)       call File_Mod_Read_Line(fu)
+          if(ascii)       call File % Read_Line(fu)
           if(.not. ascii) read(fu) one_char
         end if
 
@@ -572,7 +572,7 @@
           if(zone_type .eq. MIXED_ZONE .or.  &
              zone_type .eq. FACE_POLY) then
             if(ascii) then
-              call File_Mod_Read_Line(fu)
+              call File % Read_Line(fu)
               read(line % tokens(1), *) n_face_nodes
               Grid % faces_n_nodes(s) = n_face_nodes
               do i_nod = 1, n_face_nodes
@@ -581,13 +581,13 @@
               read(line % tokens(1+n_face_nodes+1), '(z160)') c1
               read(line % tokens(1+n_face_nodes+2), '(z160)') c2
             else
-              call File_Mod_Read_Binary_Int4_Array(fu, 1)
+              call File % Read_Binary_Int4_Array(fu, 1)
               n_face_nodes = int4_array(1)
-              call File_Mod_Read_Binary_Int4_Array(fu, n_face_nodes)
+              call File % Read_Binary_Int4_Array(fu, n_face_nodes)
               do i_nod = 1, n_face_nodes
                 Grid % faces_n(i_nod, s) = int4_array(i_nod)
               end do
-              call File_Mod_Read_Binary_Int4_Array(fu, 2)
+              call File % Read_Binary_Int4_Array(fu, 2)
               c1 = int4_array(1)
               c2 = int4_array(2)
             end if
@@ -597,18 +597,18 @@
             if(zone_type .eq. FACE_TRI)  n_face_nodes = 3
             if(zone_type .eq. FACE_QUAD) n_face_nodes = 4
             if(ascii) then
-              call File_Mod_Read_Line(fu)
+              call File % Read_Line(fu)
               do i_nod = 1, n_face_nodes
                 read(line % tokens(0+i_nod), '(z160)') Grid % faces_n(i_nod, s)
               end do
               read(line % tokens(0+n_face_nodes+1), '(z160)') c1
               read(line % tokens(0+n_face_nodes+2), '(z160)') c2
             else
-              call File_Mod_Read_Binary_Int4_Array(fu, n_face_nodes)
+              call File % Read_Binary_Int4_Array(fu, n_face_nodes)
               do i_nod = 1, n_face_nodes
                 Grid % faces_n(i_nod, s) = int4_array(i_nod)
               end do
-              call File_Mod_Read_Binary_Int4_Array(fu, 2)
+              call File % Read_Binary_Int4_Array(fu, 2)
               c1 = int4_array(1)
               c2 = int4_array(2)
             end if
@@ -1005,7 +1005,7 @@
   rewind(fu)
   the_end = .false.
   do while(.not. the_end)
-    call File_Mod_Read_Line(fu, reached_end=the_end)
+    call File % Read_Line(fu, reached_end=the_end)
     if(.not. the_end .and. line % n_tokens > 1) then
       if(line % tokens(1) .eq. '(39' .or.  &
          line % tokens(1) .eq. '(45') then

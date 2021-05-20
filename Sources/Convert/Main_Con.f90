@@ -76,7 +76,7 @@
   print *, '#================================================='
   print *, '# Would you like to create a dual grid? (yes/no)'
   print *, '#-------------------------------------------------'
-  call File_Mod_Read_Line(5)
+  call File % Read_Line(5)
   answer = line % tokens(1)
   call To_Upper_Case(answer)
 

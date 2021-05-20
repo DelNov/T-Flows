@@ -21,7 +21,7 @@
   file_format = 'UNKNOWN'
 
   ! Open the file as it is
-  call File_Mod_Open_File_For_Reading(file_name, fu)
+  call File % Open_For_Reading_Ascii(file_name, fu)
 
   !-----------------------------------------!
   !   Check if it is Fluent's file format   !
@@ -29,7 +29,7 @@
   if(file_format .eq. 'UNKNOWN') then
     rewind(fu)
     do l = 1, 64
-      call File_Mod_Read_Line(fu)
+      call File % Read_Line(fu)
       if(line % tokens(1) .eq. '(10') then
         file_format = 'FLUENT'
         print *, '#================================='   // &
@@ -49,7 +49,7 @@
   if(file_format .eq. 'UNKNOWN') then
     rewind(fu)
     do l = 1, 64
-      call File_Mod_Read_Line(fu)
+      call File % Read_Line(fu)
       if(line % tokens(1) .eq. '$MeshFormat') then
         file_format = 'GMSH'
         print *, '#================================='   // &
@@ -69,7 +69,7 @@
   if(file_format .eq. 'UNKNOWN') then
     rewind(fu)
     do l = 1, 64
-      call File_Mod_Read_Line(fu)
+      call File % Read_Line(fu)
       if(line % tokens(1) .eq. 'NUMNP' .and.  &
          line % tokens(2) .eq. 'NELEM' .and.  &
          line % tokens(3) .eq. 'NGRPS') then

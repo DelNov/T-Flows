@@ -19,7 +19,7 @@
   call Logo_Div
 
   print *, '# Input problem name: (without extension)'
-  call File_Mod_Read_Line(5)
+  call File % Read_Line(5)
   read(line % tokens(1), *)  problem_name(1)
 
   ! Load the finite volume grid
@@ -27,7 +27,7 @@
   call Grid % Load_Dim(0)
 
   ! Initialize processor numbers (poor idea to put it here)
-  Grid % comm % cell_proc(-Grid % n_bnd_cells:Grid % n_cells) = 1
+  Grid % Comm % cell_proc(-Grid % n_bnd_cells:Grid % n_cells) = 1
 
   print *, '# Number of subdomains:'
   read(*,*)  n_sub

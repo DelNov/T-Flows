@@ -129,7 +129,7 @@
   print *, '# Enter scaling factor for geometry: '
   print *, '# (or skip to keep as is): '
   print *, '#-----------------------------------------'
-  call File_Mod_Read_Line(5)
+  call File % Read_Line(5)
   answer = line % tokens(1)
   call To_Upper_Case(answer)
 
@@ -270,7 +270,7 @@
     print *, '# from the boundary condition list (see above)                 '
     print *, '# Type skip if there is none !                                 '
     print *, '#--------------------------------------------------------------'
-    call File_Mod_Read_Line(5)
+    call File % Read_Line(5)
     answer = line % tokens(1)
     call To_Upper_Case(answer)
 
