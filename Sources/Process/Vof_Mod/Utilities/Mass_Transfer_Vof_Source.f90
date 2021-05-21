@@ -20,17 +20,26 @@
   grid => Vof % pnt_grid
   Flow => Vof % pnt_flow
 
-  ! RETURN
-
+  ! If not a problem with mass transfer, get out of here
   if(.not. Flow % mass_transfer) return
+
+  ! Initialize mass transfer term
+  Vof % m_dot(:) = 0.0
 
   ! Distinguish between liquid and vapor
   call Vof % Get_Gas_And_Liquid_Phase(g, l)
 
+  !------------------------------------------------!
+  !   Compute gradients of temperature, imposing   !
+  !    saturation temperature at the interface     !
+  !------------------------------------------------!
   call Vof % Calculate_Grad_Matrix_With_Front()
   call Vof % Grad_Variable_With_Front(Flow % t, Vof % t_sat)
   call Flow % Calculate_Grad_Matrix()
 
+  !----------------------------------------!
+  !   Compute heat flux at the interface   !
+  !----------------------------------------!
   do s = 1, grid % n_faces
 
     c1 = grid % faces_c(1,s)
@@ -51,14 +60,16 @@
           t_x_1 = Flow % t % x(c1)
           t_x_2 = Flow % t % x(c2)
 
+          ! WRITE DOWN STEFAN'S SOLUTION
           IF(MATH_MOD_APPROX_REAL(GRID % YS(S), 0.0) .AND.  &
              MATH_MOD_APPROX_REAL(GRID % ZS(S), 0.0)) THEN
-            WRITE(400, '(99(es12.4))')                                                           &
-              t_x_1,                                                                             &
-              t_x_1 * cond_1,                                                                    &
-              t_x_1 * cond_1 / 2.26e+6,                                                          &
-              t_x_1 * cond_1 / 2.26e+6 * (1.0/Vof % phase_dens(g) - 1.0/Vof % phase_dens(l)),  &
-              Vof % Front % elem(e) % xe
+            WRITE(400, '(99(es12.4))')                                  &
+              T_X_1,                                                    &
+              T_X_1 * COND_1,                                           &
+              T_X_1 * COND_1 / 2.26E+6,                                 &
+              T_X_1 * COND_1 / 2.26E+6 * (  1.0/VOF % PHASE_DENS(G)     &
+                                          - 1.0/VOF % PHASE_DENS(L) ),  &
+              VOF % FRONT % ELEM(E) % XE
           END IF
 
           if(Vof % Front % cell_at_elem(c1) .ne. 0) then
@@ -74,20 +85,23 @@
     end if
   end do
 
-  ! Volume source
+  !-------------------!
+  !   Volume source   !
+  !-------------------!
+
   ! Here is the trick to get the sign correct:
   ! - if gas is 1 and liquid 2 => l-g =  1 => source > 0
   ! - if gas is 2 and liquid 1 => l-g = -1 => source < 0
   do c = 1, grid % n_cells
     e = Vof % Front % cell_at_elem(c)  ! Front element
+
+    ! As Yohei and Lubomir ademantly told me - you divide with the density
+    ! of the phase for "which you are solving".  And you are solving for
+    ! the one which is defined as one (not zero) in the system
     if(e .ne. 0) then
-!OK   b(c) = b(c)            &
-!OK        + Vof % m_dot(c) * (l-g) * Vof % Front % elem(e) % area * (1.0/Vof % phase_dens(g) - 1.0/Vof % phase_dens(l))
-      b(c) = b(c)            &
-           + Vof % m_dot(c) * (l-g) * Vof % Front % elem(e) % area / Vof % phase_dens(g)
-!was OK     b(c) = b(c)            &
-!was OK          - 0.0002 * Vof % Front % elem(e) % area
-PRINT *, 'Vof % Front % elem(e) % area = ', Vof % Front % elem(e) % area
+      b(c) = b(c)                                                    &
+           + Vof % m_dot(c) * (l-g) * Vof % Front % elem(e) % area   &
+           / Vof % phase_dens(l)
     end if
   end do
 
