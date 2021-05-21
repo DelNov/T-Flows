@@ -73,10 +73,10 @@
     end if
   end do
 
-  !-------------------------------------!
-  !    Calculate the max mass error     !
-  !   with the new (corrected) fluxes   !
-  !-------------------------------------!
+  !------------------------------------!
+  !   Calculate the max volume error   !
+  !   with the new corrected fluxes    !
+  !------------------------------------!
   do c = 1, Grid % n_cells
     b(c) = 0.0
   end do
@@ -90,6 +90,10 @@
       b(c2) = b(c2) + v_flux % n(s)
     end if
   end do
+
+  ! In case of mass transfer, also add
+  ! volume change due to mass transfer
+  call Vof % Mass_Transfer_Pressure_Source(b)
 
   do c = 1, Grid % n_cells
     b(c) = b(c) / (Grid % vol(c) / dt)
