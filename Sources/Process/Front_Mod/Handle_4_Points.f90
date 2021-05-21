@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Handle_4_Points(Front, surf_v)
+  subroutine Handle_4_Points(Front, surf_v, enforce_triangles)
 !------------------------------------------------------------------------------!
 !   Surface intersects cell at four points                                     !
 !------------------------------------------------------------------------------!
@@ -7,6 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Front_Type), target :: Front
   real                      :: surf_v(3)
+  logical                   :: enforce_triangles
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: vert(:)
   type(Elem_Type), pointer :: elem(:)
@@ -68,9 +69,29 @@
   !   You've found a permutation which works, store new elements now   !
   !--------------------------------------------------------------------!
 
-  ! One new element with four vertices
-  ne = ne + 1
-  elem(ne) % nv = 4
-  elem(ne) % v(1:4) = ver(1:4)
+  if(.not. enforce_triangles) then
+
+    ! One new element with four vertices
+    ne = ne + 1
+    elem(ne) % nv = 4
+    elem(ne) % v(1:4) = ver(1:4)
+
+  else  ! only triangles allows
+
+    ! One new element with three vertices
+    ne = ne + 1
+    elem(ne) % nv = 3
+    elem(ne) % v(1) = ver(1)
+    elem(ne) % v(2) = ver(2)
+    elem(ne) % v(3) = ver(3)
+
+    ! Second new element with three vertices
+    ne = ne + 1
+    elem(ne) % nv = 3
+    elem(ne) % v(1) = ver(1)
+    elem(ne) % v(2) = ver(3)
+    elem(ne) % v(3) = ver(4)
+
+  end if
 
   end subroutine

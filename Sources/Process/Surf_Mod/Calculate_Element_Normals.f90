@@ -58,7 +58,7 @@
 
       if(dot_product(surf_v, tri_v) < 0.0) then
         print *, '# Error, element ', e, 'is not properly oriented!'
-        stop
+!       stop
       end if
     end do   ! for i, j, k
 

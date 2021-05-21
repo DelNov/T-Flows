@@ -4,6 +4,7 @@
 !   Module for Lagrangian particle tracking                                    !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
+  use Cpu_Timer_Mod
   use Field_Mod
   use Vert_Mod
   use Elem_Mod
@@ -43,11 +44,12 @@
       procedure :: Allocate_Front
       procedure :: Calculate_Element_Centroids
       procedure :: Calculate_Element_Normals
+      procedure :: Check_Elements
       procedure :: Clean_Front
       procedure :: Compress_Vertices
       procedure :: Compute_Distance_Function_And_Vof
-      procedure :: Calculate_Curvatures_From_Elems
-      procedure :: Find_Connectivity
+      procedure :: Find_Front_Elements
+      procedure :: Find_Sides
       procedure :: Find_Vertex_Elements
       procedure :: Handle_3_Points
       procedure :: Handle_4_Points
@@ -63,14 +65,15 @@
 
   contains
 
-  include 'Front_Mod/Allocate.f90'
+  include 'Front_Mod/Allocate_Front.f90'
   include 'Front_Mod/Calculate_Element_Centroids.f90'
   include 'Front_Mod/Calculate_Element_Normals.f90'
+  include 'Front_Mod/Check_Elements.f90'
   include 'Front_Mod/Clean.f90'
   include 'Front_Mod/Compress_Vertices.f90'
   include 'Front_Mod/Compute_Distance_Function_And_Vof.f90'
-  include 'Front_Mod/Calculate_Curvatures_From_Elems.f90'
-  include 'Front_Mod/Find_Connectivity.f90'
+  include 'Front_Mod/Find_Front_Elements.f90'
+  include 'Front_Mod/Find_Sides.f90'
   include 'Front_Mod/Find_Vertex_Elements.f90'
   include 'Front_Mod/Handle_3_Points.f90'
   include 'Front_Mod/Handle_4_Points.f90'

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Surf_Mod_Calculate_Curvatures_From_Verts(surf)
+  subroutine Calculate_Curvatures_From_Verts(Surf)
 !------------------------------------------------------------------------------!
 !   Calculates surface curvatures from vertices (all neighbous, five to seven  !
 !   on the average) and distributes the values to elements.                    !
@@ -8,7 +8,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Surf_Type), target :: surf
+  class(Surf_Type), target :: Surf
 !-----------------------------------[Locals]-----------------------------------!
   real, dimension(4,4)  :: a
   real, dimension(4)    :: b
@@ -21,29 +21,29 @@
 !==============================================================================!
 
   ! Work out number of vertices around each vertex
-  surf % vert(1:surf % n_verts) % nnv = 0
-  do s = 1, surf % n_sides
-    c = surf % side(s) % c
-    d = surf % side(s) % d
-    surf % vert(c) % nnv = surf % vert(c) % nnv + 1
-    surf % vert(d) % nnv = surf % vert(d) % nnv + 1
+  Surf % vert(1:Surf % n_verts) % nnv = 0
+  do s = 1, Surf % n_sides
+    c = Surf % side(s) % c
+    d = Surf % side(s) % d
+    Surf % vert(c) % nnv = Surf % vert(c) % nnv + 1
+    Surf % vert(d) % nnv = Surf % vert(d) % nnv + 1
   end do
 
-  max_nnv = maxval(surf % vert(1:surf % n_verts) % nnv)
+  max_nnv = maxval(Surf % vert(1:Surf % n_verts) % nnv)
 
   ! Form vert_v structure
-  allocate( vert_v(max_nnv, surf % n_verts) );  vert_v = 0
+  allocate( vert_v(max_nnv, Surf % n_verts) );  vert_v = 0
 
-  surf % vert(1:surf % n_verts) % nnv = 0
-  do s = 1, surf % n_sides
-    c = surf % side(s) % c
-    d = surf % side(s) % d
+  Surf % vert(1:Surf % n_verts) % nnv = 0
+  do s = 1, Surf % n_sides
+    c = Surf % side(s) % c
+    d = Surf % side(s) % d
 
-    surf % vert(c) % nnv = surf % vert(c) % nnv + 1
-    vert_v(surf % vert(c) % nnv, c) = d
+    Surf % vert(c) % nnv = Surf % vert(c) % nnv + 1
+    vert_v(Surf % vert(c) % nnv, c) = d
 
-    surf % vert(d) % nnv = surf % vert(d) % nnv + 1
-    vert_v(surf % vert(d) % nnv, d) = c
+    Surf % vert(d) % nnv = Surf % vert(d) % nnv + 1
+    vert_v(Surf % vert(d) % nnv, d) = c
   end do
 
   !----------------------------------------------!
@@ -51,21 +51,21 @@
   !      them to elements surrounding them       !
   !----------------------------------------------!
 
-  surf % elem(1:surf % n_elems) % curv = 0.0
-  surf % elem(1:surf % n_elems) % xc   = 0.0
-  surf % elem(1:surf % n_elems) % yc   = 0.0
-  surf % elem(1:surf % n_elems) % zc   = 0.0
+  Surf % elem(1:Surf % n_elems) % curv = 0.0
+  Surf % elem(1:Surf % n_elems) % xc   = 0.0
+  Surf % elem(1:Surf % n_elems) % yc   = 0.0
+  Surf % elem(1:Surf % n_elems) % zc   = 0.0
 
-  do v = 1, surf % n_verts
+  do v = 1, Surf % n_verts
 
     a(:,:) = 0
     b(:)   = 0
 
-    do k = 1, surf % vert(v) % nnv
+    do k = 1, Surf % vert(v) % nnv
 
-      x = surf % vert( vert_v(k,v) ) % x_n
-      y = surf % vert( vert_v(k,v) ) % y_n
-      z = surf % vert( vert_v(k,v) ) % z_n
+      x = Surf % vert( vert_v(k,v) ) % x_n
+      y = Surf % vert( vert_v(k,v) ) % y_n
+      z = Surf % vert( vert_v(k,v) ) % z_n
 
       x2 = x * x;  y2 = y * y;  z2 = z * z
       xy = x * y;  xz = x * z;  yz = y * z
@@ -103,29 +103,29 @@
       rho = PETA  ! some big number
     end if
 
-    surf % vert(v) % curv = 1.0 / rho
+    Surf % vert(v) % curv = 1.0 / rho
   end do
 
   ! Compute average curvature (for debugging)
   ! rho = 0
-  ! do v = 1, surf % n_verts
-  !   rho = rho + surf % vert(v) % curv
+  ! do v = 1, Surf % n_verts
+  !   rho = rho + Surf % vert(v) % curv
   ! end do
-  ! rho = rho / surf % n_elems
+  ! rho = rho / Surf % n_elems
   ! print *, 'average curvature = ', rho
 
   !----------------------------------------------------------------------!
   !   Interpolate normals at elems from values in surrounding vertices   !
   !----------------------------------------------------------------------!
-  surf % elem(1:surf % n_elems) % curv = 0.
-  do e = 1, surf % n_elems
+  Surf % elem(1:Surf % n_elems) % curv = 0.
+  do e = 1, Surf % n_elems
 
-    i = surf % elem(e) % v(1)
-    j = surf % elem(e) % v(2)
-    k = surf % elem(e) % v(3)
-    surf % elem(e) % curv = ONE_THIRD * (  surf % vert(i) % curv  &
-                                         + surf % vert(j) % curv  &
-                                         + surf % vert(k) % curv )
+    i = Surf % elem(e) % v(1)
+    j = Surf % elem(e) % v(2)
+    k = Surf % elem(e) % v(3)
+    Surf % elem(e) % curv = ONE_THIRD * (  Surf % vert(i) % curv  &
+                                         + Surf % vert(j) % curv  &
+                                         + Surf % vert(k) % curv )
   end do
 
   end subroutine

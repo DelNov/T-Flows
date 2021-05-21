@@ -4,35 +4,15 @@
 !   Module for Lagrangian particle tracking                                    !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Field_Mod
-  use Vert_Mod
-  use Elem_Mod
-  use Side_Mod
+  use Front_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
 
-  !--------------------------------!
-  !   A few important parameters   !
-  !--------------------------------!
-  integer, parameter   :: MAX_ELEMENT_VERTICES =      6
-  integer, parameter   :: MAX_SURFACE_VERTICES = 131072
-  integer, parameter   :: MAX_SURFACE_ELEMENTS = 131072
-
   !---------------!
   !   Surf type   !
   !---------------!
-  type Surf_Type
-
-    type(Grid_Type),  pointer :: pnt_grid  ! grid for which it is defined
-    type(Field_Type), pointer :: pnt_flow  ! flow field for which it is defined
-
-    integer                      :: n_elems
-    integer                      :: n_verts
-    integer                      :: n_sides
-    type(Vert_Type), allocatable :: vert(:)
-    type(Elem_Type), allocatable :: elem(:)
-    type(Side_Type), allocatable :: side(:)
+  type, extends(Front_Type) :: Surf_Type
 
     ! Logical array if cell has particles
     logical, allocatable :: cell_has_vertex(:)
@@ -43,6 +23,25 @@
     integer :: N_I_VARS = 3
     integer :: N_L_VARS = 2
     integer :: N_R_VARS = 8
+
+    contains
+
+      procedure :: Allocate_Surf
+      procedure :: Calculate_Curvatures_From_Edges
+      procedure :: Calculate_Curvatures_From_Elems
+      procedure :: Calculate_Curvatures_From_Verts
+      procedure :: Find_Boundaries
+      procedure :: Find_Surf_Elements
+      procedure :: Find_Nearest_Cell
+      procedure :: Find_Nearest_Node
+      procedure :: Print_Surf_Statistics
+      procedure :: Refine
+      procedure :: Relax_Geometry
+      procedure :: Relax_Topology
+      procedure :: Split_Element
+      procedure :: Swap_Side
+      procedure :: Smooth
+
   end type
 
   integer, allocatable :: i_work(:)
@@ -52,28 +51,19 @@
   contains
 
 ! include 'Surf_Mod/Advance_Vertices.f90'
-  include 'Surf_Mod/Allocate.f90'
+  include 'Surf_Mod/Allocate_Surf.f90'
   include 'Surf_Mod/Calculate_Element_Centroids.f90'
   include 'Surf_Mod/Calculate_Element_Normals.f90'
   include 'Surf_Mod/Clean.f90'
-  include 'Surf_Mod/Count_Elements_Neighbours.f90'
-  include 'Surf_Mod/Count_Vertex_Elements.f90'
-  include 'Surf_Mod/Compress_Vertices.f90'
-  include 'Surf_Mod/Compute_Distance_Function_And_Vof.f90'
   include 'Surf_Mod/Calculate_Curvatures_From_Edges.f90'
   include 'Surf_Mod/Calculate_Curvatures_From_Elems.f90'
   include 'Surf_Mod/Calculate_Curvatures_From_Verts.f90'
   include 'Surf_Mod/Find_Boundaries.f90'
-  include 'Surf_Mod/Find_Sides.f90'
+  include 'Surf_Mod/Find_Surf_Elements.f90'
   include 'Surf_Mod/Find_Nearest_Cell.f90'
   include 'Surf_Mod/Find_Nearest_Node.f90'
-  include 'Surf_Mod/Find_Vertex_Elements.f90'
-  include 'Surf_Mod/Handle_3_Points.f90'
-  include 'Surf_Mod/Handle_4_Points.f90'
-  include 'Surf_Mod/Handle_5_Points.f90'
-  include 'Surf_Mod/Handle_6_Points.f90'
   include 'Surf_Mod/Place_At_Var_Value.f90'
-  include 'Surf_Mod/Print_Statistics.f90'
+  include 'Surf_Mod/Print_Surf_Statistics.f90'
   include 'Surf_Mod/Refine.f90'
   include 'Surf_Mod/Relax_Geometry.f90'
   include 'Surf_Mod/Relax_Topology.f90'

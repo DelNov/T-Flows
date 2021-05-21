@@ -70,8 +70,9 @@
     ! Averaging
     integer, allocatable :: avg_cells(:,:)
 
-    ! Triangulate the front
+    ! Triangulate the front or surface
     logical :: track_front
+    logical :: track_surface
 
     ! Variable holding the multiphase model
     integer :: model
@@ -139,7 +140,6 @@
   include 'Vof_Mod/Core/Discretize.f90'
   include 'Vof_Mod/Core/Correct_Beta.f90'
   include 'Vof_Mod/Core/Find_Upstream_Phi.f90'
-  include 'Vof_Mod/Core/Mass_Transfer_Added_Volume.f90'
   include 'Vof_Mod/Core/Max_Courant_Number.f90'
   include 'Vof_Mod/Core/Predict_Beta.f90'
   include 'Vof_Mod/Core/Solve_System.f90'
@@ -161,6 +161,7 @@
   include 'Vof_Mod/Utilities/Get_Gas_And_Liquid_Phase.f90'
   include 'Vof_Mod/Utilities/Grad_Component_No_Refresh_With_Front.f90'
   include 'Vof_Mod/Utilities/Grad_Variable_With_Front.f90'
+  include 'Vof_Mod/Utilities/Mass_Transfer_Added_Volume.f90'
   include 'Vof_Mod/Utilities/Mass_Transfer_Pressure_Source.f90'
   include 'Vof_Mod/Utilities/Mass_Transfer_Vof_Source.f90'
   include 'Vof_Mod/Utilities/Pressure_Correction.f90'

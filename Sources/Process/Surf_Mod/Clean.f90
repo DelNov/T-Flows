@@ -1,14 +1,14 @@
 !==============================================================================!
-  subroutine Surf_Mod_Clean(surf)
+  subroutine Clean_Surf(Surf)
 !------------------------------------------------------------------------------!
 !   Cleans the surface                                                         !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Surf_Type),  target :: surf
+  class(Surf_Type), target :: Surf
 !==============================================================================!
 
-  deallocate(surf % cell_has_vertex)
+  deallocate(Surf % cell_has_vertex)
 
   ! Dellocate memory for working arrays
   ! (Not used yet, will be used in parallel version)
@@ -19,19 +19,19 @@
   !-----------------------------!
   !   Deallocate all elements   !
   !-----------------------------!
-  deallocate(surf % elem)
-  surf % n_elems = 0
+  deallocate(Surf % elem)
+  Surf % n_elems = 0
 
   !-----------------------------!
   !   Deallocate all vertices   !
   !-----------------------------!
-  deallocate(surf % vert)
-  surf % n_verts = 0
+  deallocate(Surf % vert)
+  Surf % n_verts = 0
 
   !-----------------------------!
   !   Deallocate all vertices   !
   !-----------------------------!
-  deallocate(surf % side)
-  surf % n_sides = 0
+  deallocate(Surf % side)
+  Surf % n_sides = 0
 
   end subroutine

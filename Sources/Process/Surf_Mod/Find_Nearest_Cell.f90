@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine Surf_Mod_Find_Nearest_Cell(surf, v, n_verts_in_buffers)
+  subroutine Find_Nearest_Cell(Surf, v, n_verts_in_buffers)
 !------------------------------------------------------------------------------!
 !   Finds a cell closest to a vertex.                                          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Surf_Type), target :: surf
-  integer                 :: v                   ! vertex number
-  integer                 :: n_verts_in_buffers
+  class(Surf_Type), target :: Surf
+  integer                  :: v                   ! vertex number
+  integer                  :: n_verts_in_buffers
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   type(Vert_Type), pointer :: vert
@@ -22,8 +22,8 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => surf % pnt_grid
-  vert => surf % vert(v)
+  grid => Surf % pnt_grid
+  vert => Surf % vert(v)
 
   ! Initialize cc and cb to zero (important)
   cc = 0

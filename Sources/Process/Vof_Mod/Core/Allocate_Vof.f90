@@ -1,23 +1,23 @@
 !==============================================================================!
-  subroutine Allocate_Vof(Vof, flow)
+  subroutine Allocate_Vof(Vof, Flow)
 !------------------------------------------------------------------------------!
 !   Allocates memory for variables in Multphase_Mod.                           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Vof_Type),  target :: Vof
-  type(Field_Type), target :: flow
+  type(Field_Type), target :: Flow
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: grid
   integer                  :: nb, nc, nf
 !==============================================================================!
 
   ! Store pointers
-  Vof % pnt_flow => flow
-  Vof % pnt_grid => flow % pnt_grid
+  Vof % pnt_flow => Flow
+  Vof % pnt_grid => Flow % pnt_grid
 
   ! Take aliases
-  grid => flow % pnt_grid
+  grid => Flow % pnt_grid
   nb   =  grid % n_bnd_cells
   nc   =  grid % n_cells
   nf   =  grid % n_faces
@@ -43,15 +43,18 @@
   allocate(Vof % surf_fy(-nb:nc));  Vof % surf_fy(-nb:nc) = 0.0
   allocate(Vof % surf_fz(-nb:nc));  Vof % surf_fz(-nb:nc) = 0.0
 
-  if(flow % mass_transfer) then
+  if(Flow % mass_transfer) then
     allocate(Vof % qci  (-nb:nc)); Vof % qci  (-nb:nc) = 0.0
     allocate(Vof % m_dot(-nb:nc)); Vof % m_dot(-nb:nc) = 0.0
     call Var_Mod_Allocate_New_Only(Vof % var, grid, 'PHV')
   end if
 
   if(Vof % track_front) then
-    call Vof % Front % Allocate_Front(flow)
-!f_vs_s    call Surf_Mod_Allocate(Vof % surf, flow)
+    call Vof % Front % Allocate_Front(Flow)
+  end if
+
+  if(Vof % track_surface) then
+    call Vof % Surf % Allocate_Surf(Flow)
   end if
 
   ! Physical properties for all (two) phases

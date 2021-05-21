@@ -1,9 +1,9 @@
 !==============================================================================!
-  subroutine Surf_Mod_Relax_Geometry(surf)
+  subroutine Relax_Geometry(Surf)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Surf_Type), target :: surf
+  class(Surf_Type), target :: Surf
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: vert(:)
   type(Side_Type), pointer :: side(:)
@@ -14,14 +14,14 @@
 !==============================================================================!
 
   ! Take aliases
-  nv   => surf % n_verts
-  ns   => surf % n_sides
-  ne   => surf % n_elems
-  vert => surf % vert
-  side => surf % side
-  elem => surf % elem
+  nv   => Surf % n_verts
+  ns   => Surf % n_sides
+  ne   => Surf % n_elems
+  vert => Surf % vert
+  side => Surf % side
+  elem => Surf % elem
 
-  call Surf_Mod_Find_Boundaries(surf)
+  call Surf % Find_Boundaries()
 
   do t = 6, 3, -1
     do s = 1, ns
@@ -44,7 +44,7 @@
                vert(d) % x_n, vert(d) % y_n, vert(d) % z_n)
 
           if(dist_ab < dist_cd*TWO_THIRDS) then
-            call Surf_Mod_Swap_Side(surf, s)
+            call Surf % Swap_Side(s)
           end if
 
         end if

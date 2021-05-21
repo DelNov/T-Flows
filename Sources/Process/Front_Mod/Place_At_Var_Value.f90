@@ -35,6 +35,8 @@
   include 'Front_Mod/Edge_Numbering.f90'
 !==============================================================================!
 
+  call Cpu_Timer % Start('Creating_Front_From_Vof_Function')
+
   ! Take aliases
   Grid => Front % pnt_grid
   Flow => Front % pnt_flow
@@ -174,11 +176,11 @@
       surf_v(2) = phi % y(c)
       surf_v(3) = phi % z(c)
 
-      ! If valid elements were formed
-      if(n_vert .eq. 3) call Front % Handle_3_Points(surf_v)
-      if(n_vert .eq. 4) call Front % Handle_4_Points(surf_v)
-      if(n_vert .eq. 5) call Front % Handle_5_Points(surf_v)
-      if(n_vert .eq. 6) call Front % Handle_6_Points(surf_v)
+      ! If valid elements were formed (last parameter: enforce_triangles)
+      if(n_vert .eq. 3) call Front % Handle_3_Points(surf_v, .false.)
+      if(n_vert .eq. 4) call Front % Handle_4_Points(surf_v, .false.)
+      if(n_vert .eq. 5) call Front % Handle_5_Points(surf_v, .false.)
+      if(n_vert .eq. 6) call Front % Handle_6_Points(surf_v, .false.)
       if(n_vert .eq. 7) then
         print *, '# ERROR: seven vertices in an intersection!'
         stop
@@ -210,12 +212,14 @@
   !-----------------------!
   call Front % Compress_Vertices(verbose)
 
-  !----------------!
-  !                !
-  !   Find sides   !
-  !                !
-  !----------------!
-  call Front % Find_Connectivity(verbose)
+  !---------------------------------!
+  !                                 !
+  !   Find and check connectivity   !
+  !                                 !
+  !---------------------------------!
+  call Front % Find_Sides(verbose)
+  call Front % Find_Front_Elements(verbose)
+  call Front % Check_Elements(verbose)
 
   !-----------------------------------------------!
   !   It used to find the nearest cell and node   !
@@ -243,6 +247,8 @@
   !                                                                 !
   !-----------------------------------------------------------------!
   call Front % Mark_Cells_And_Faces(phi)
+
+  call Cpu_Timer % Stop('Creating_Front_From_Vof_Function')
 
   return
 

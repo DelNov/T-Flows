@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Surf_Mod_Find_Boundaries(surf)
+  subroutine Find_Boundaries(Surf)
 !------------------------------------------------------------------------------!
 !   Looks for boundary sides and vertices                                      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Surf_Type), target :: surf
+  class(Surf_Type), target :: Surf
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: vert(:)
   type(Side_Type), pointer :: side(:)
@@ -15,12 +15,12 @@
 !==============================================================================!
 
   ! Take aliases
-  nv   => surf % n_verts
-  ns   => surf % n_sides
-  ne   => surf % n_elems
-  vert => surf % vert
-  side => surf % side
-  elem => surf % elem
+  nv   => Surf % n_verts
+  ns   => Surf % n_sides
+  ne   => Surf % n_elems
+  vert => Surf % vert
+  side => Surf % side
+  elem => Surf % elem
 
   ! First find boundary sides
   side(1:ns) % boundary = .false.

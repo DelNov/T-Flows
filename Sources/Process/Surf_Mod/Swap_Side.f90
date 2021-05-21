@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine Surf_Mod_Swap_Side(surf, s)
+  subroutine Swap_Side(Surf, s)
 !------------------------------------------------------------------------------!
 !  This function calculates radii of inscribed and circumscribed circle        !
 !  for a given element (int e)                                                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Surf_Type), target :: surf
-  integer                 :: s
+  class(Surf_Type), target :: Surf
+  integer                  :: s
 !-----------------------------------[Locals]-----------------------------------!
   integer                  :: a, b, c, d, ea, eb
   integer                  :: eac, ead, ebc, ebd
@@ -18,9 +18,9 @@
 !==============================================================================!
 
   ! Take aliases
-  vert => surf % vert
-  elem => surf % elem
-  side => surf % side
+  vert => Surf % vert
+  elem => Surf % elem
+  side => Surf % side
 
   ea = side(s) % ea
   eb = side(s) % eb

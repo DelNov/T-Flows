@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Surf_Mod_Calculate_Curvatures_From_Elems(surf)
+  subroutine Calculate_Curvatures_From_Elems(Surf)
 !------------------------------------------------------------------------------!
 !   Calculates surface curvatures from elements (using its own vertices and    !
 !   the vertices from neighbouring elements, around twelve points) and         !
@@ -9,7 +9,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Surf_Type), target :: surf
+  class(Surf_Type), target :: Surf
 !-----------------------------------[Locals]-----------------------------------!
   real, dimension(4,4)  :: a
   real, dimension(4)    :: b
@@ -18,74 +18,64 @@
   integer, allocatable  :: elem_n_verts(:)
   integer, allocatable  :: vert_v(:,:)
   integer, allocatable  :: elem_v(:,:)
-  integer               :: v, i, j, k, e, c, d, s, max_nnv
+  integer               :: v, i, j, k, i_ver, j_ver, e, c, d, s, max_nnv
   logical               :: invertible
   real                  :: x, y, z, x2, y2, z2, xy, xz, yz, rho
 !==============================================================================!
 
   ! Work out number of vertices around each vertex
-  surf % vert(1:surf % n_verts) % nnv = 0
-  do s = 1, surf % n_sides
-    c = surf % side(s) % c
-    d = surf % side(s) % d
-    surf % vert(c) % nnv = surf % vert(c) % nnv + 1
-    surf % vert(d) % nnv = surf % vert(d) % nnv + 1
+  Surf % vert(1:Surf % n_verts) % nnv = 0
+  do s = 1, Surf % n_sides
+    c = Surf % side(s) % c
+    d = Surf % side(s) % d
+    Surf % vert(c) % nnv = Surf % vert(c) % nnv + 1
+    Surf % vert(d) % nnv = Surf % vert(d) % nnv + 1
   end do
 
-  max_nnv = maxval(surf % vert(1:surf % n_verts) % nnv)
+  max_nnv = maxval(Surf % vert(1:Surf % n_verts) % nnv)
 
   ! Form vert_v structure
-  allocate( vert_v(max_nnv, surf % n_verts) );  vert_v = 0
+  allocate( vert_v(max_nnv, Surf % n_verts) );  vert_v = 0
 
-  surf % vert(1:surf % n_verts) % nnv = 0
-  do s = 1, surf % n_sides
-    c = surf % side(s) % c
-    d = surf % side(s) % d
+  Surf % vert(1:Surf % n_verts) % nnv = 0
+  do s = 1, Surf % n_sides
+    c = Surf % side(s) % c
+    d = Surf % side(s) % d
 
-    surf % vert(c) % nnv = surf % vert(c) % nnv + 1
-    vert_v(surf % vert(c) % nnv, c) = d
+    Surf % vert(c) % nnv = Surf % vert(c) % nnv + 1
+    vert_v(Surf % vert(c) % nnv, c) = d
 
-    surf % vert(d) % nnv = surf % vert(d) % nnv + 1
-    vert_v(surf % vert(d) % nnv, d) = c
+    Surf % vert(d) % nnv = Surf % vert(d) % nnv + 1
+    vert_v(Surf % vert(d) % nnv, d) = c
   end do
 
   ! Work out (maximum) number of vertices around each element
-  allocate(elem_n_verts(surf % n_elems))
+  allocate(elem_n_verts(Surf % n_elems))
   elem_n_verts(:) = 0
-  do e = 1, surf % n_elems
-    i = surf % elem(e) % v(1)
-    j = surf % elem(e) % v(2)
-    k = surf % elem(e) % v(3)
-    elem_n_verts(e) = elem_n_verts(e) + surf % vert(i) % nnv
-    elem_n_verts(e) = elem_n_verts(e) + surf % vert(j) % nnv
-    elem_n_verts(e) = elem_n_verts(e) + surf % vert(k) % nnv
+  do e = 1, Surf % n_elems
+    do i_ver = 1, Surf % elem(e) % nv
+      v = Surf % elem(e) % v(i_ver)
+      elem_n_verts(e) = elem_n_verts(e) + Surf % vert(v) % nnv
+    end do
   end do
 
-  max_nnv = maxval(elem_n_verts(1:surf % n_elems))
-  allocate(elem_v(max_nnv, surf % n_elems))
+  max_nnv = maxval(elem_n_verts(1:Surf % n_elems))
+  allocate(elem_v(max_nnv, Surf % n_elems))
   elem_v(:,:) = HUGE_INT
 
   elem_n_verts(:) = 0
-  do e = 1, surf % n_elems
-    i = surf % elem(e) % v(1)
-    j = surf % elem(e) % v(2)
-    k = surf % elem(e) % v(3)
-    do v = 1, surf % vert(i) % nnv
-      elem_n_verts(e) = elem_n_verts(e) + 1;
-      elem_v(elem_n_verts(e), e) = vert_v(v, i)
-    end do
-    do v = 1, surf % vert(j) % nnv
-      elem_n_verts(e) = elem_n_verts(e) + 1;
-      elem_v(elem_n_verts(e), e) = vert_v(v, j)
-    end do
-    do v = 1, surf % vert(k) % nnv
-      elem_n_verts(e) = elem_n_verts(e) + 1;
-      elem_v(elem_n_verts(e), e) = vert_v(v, k)
+  do e = 1, Surf % n_elems
+    do i_ver = 1, Surf % elem(e) % nv
+      v = Surf % elem(e) % v(i_ver)
+      do j_ver = 1, Surf % vert(v) % nnv
+        elem_n_verts(e) = elem_n_verts(e) + 1;
+        elem_v(elem_n_verts(e), e) = vert_v(j_ver, v)
+      end do
     end do
   end do
 
   ! Remove duplicate entries in the vertex list
-  do e = 1, surf % n_elems
+  do e = 1, Surf % n_elems
     call Sort % Unique_Int(elem_v(1:elem_n_verts(e), e), elem_n_verts(e))
   end do
 
@@ -94,21 +84,21 @@
   !        and second neighbouring nodes        !
   !---------------------------------------------!
 
-  surf % elem(1:surf % n_elems) % curv = 0.0
-  surf % elem(1:surf % n_elems) % xc   = 0.0
-  surf % elem(1:surf % n_elems) % yc   = 0.0
-  surf % elem(1:surf % n_elems) % zc   = 0.0
+  Surf % elem(1:Surf % n_elems) % curv = 0.0
+  Surf % elem(1:Surf % n_elems) % xc   = 0.0
+  Surf % elem(1:Surf % n_elems) % yc   = 0.0
+  Surf % elem(1:Surf % n_elems) % zc   = 0.0
 
-  do e = 1, surf % n_elems
+  do e = 1, Surf % n_elems
 
     a(:,:) = 0
     b(:)   = 0
 
     do k = 1, elem_n_verts(e)
 
-      x = surf % vert( elem_v(k,e) ) % x_n
-      y = surf % vert( elem_v(k,e) ) % y_n
-      z = surf % vert( elem_v(k,e) ) % z_n
+      x = Surf % vert( elem_v(k,e) ) % x_n
+      y = Surf % vert( elem_v(k,e) ) % y_n
+      z = Surf % vert( elem_v(k,e) ) % z_n
 
       x2 = x * x;  y2 = y * y;  z2 = z * z
       xy = x * y;  xz = x * z;  yz = y * z
@@ -147,35 +137,31 @@
       rho = PETA                   ! some big number
     end if
 
-    surf % elem(e) % curv = 1.0 / rho
-    surf % elem(e) % xc   = x
-    surf % elem(e) % yc   = y
-    surf % elem(e) % zc   = z
+    Surf % elem(e) % curv = 1.0 / rho
+    Surf % elem(e) % xc   = x
+    Surf % elem(e) % yc   = y
+    Surf % elem(e) % zc   = z
   end do
 
   ! Compute average curvature (for debugging)
   ! rho = 0
-  ! do e = 1, surf % n_elems
-  !   rho = rho + surf % elem(e) % curv
+  ! do e = 1, Surf % n_elems
+  !   rho = rho + Surf % elem(e) % curv
   ! end do
-  ! rho = rho / surf % n_elems
+  ! rho = rho / Surf % n_elems
   ! print *, 'average curvature = ', rho
 
   !-------------------------------------------------------------------!
   !   Interpolate normals at nodes from values in surrounding elems   !
   !-------------------------------------------------------------------!
-  surf % vert(1:surf % n_verts) % curv = 0.
-  do e = 1, surf % n_elems
+  Surf % vert(1:Surf % n_verts) % curv = 0.
+  do e = 1, Surf % n_elems
 
-    i = surf % elem(e) % v(1)
-    j = surf % elem(e) % v(2)
-    k = surf % elem(e) % v(3)
-    surf % vert(i) % curv = surf % vert(i) % curv  &
-                          + surf % elem(e) % curv / real(surf % vert(i) % nne)
-    surf % vert(j) % curv = surf % vert(j) % curv  &
-                          + surf % elem(e) % curv / real(surf % vert(j) % nne)
-    surf % vert(k) % curv = surf % vert(k) % curv  &
-                          + surf % elem(e) % curv / real(surf % vert(k) % nne)
+    do i_ver = 1, Surf % elem(e) % nv
+      v = Surf % elem(e) % v(i_ver)
+      Surf % vert(v) % curv = Surf % vert(v) % curv  &
+                      + Surf % elem(e) % curv/real(Surf % vert(v) % nne)
+    end do
   end do
 
   end subroutine

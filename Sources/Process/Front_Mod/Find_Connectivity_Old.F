@@ -14,7 +14,8 @@
   integer,         pointer :: nv, ns, ne
   integer                  :: cnt_one, cnt_two
   integer                  :: e, eb, ea, c, d, c1, c2, d1, d2, s, n_side
-  integer                  :: ss, sum_ijk, sum_cd, i_ver, i_s, v1, v2
+  integer                  :: ss, sum_ijk, sum_cd, i_ver, j_ver, k_ver
+  integer                  :: i_s, v1, v2, v3
   integer                  :: ne_tot, ns_tot, cnt_one_tot, cnt_two_tot
   integer, allocatable     :: ci(:), di(:), ei(:), ni(:)
 !==============================================================================!
@@ -33,14 +34,16 @@
   n_side = 0  ! initialize side coutner
   do e = 1, ne
     do i_ver = 1, elem(e) % nv
+      j_ver = i_ver + 1
+      if(j_ver > elem(e) % nv) j_ver = 1
 
-      v1 = i_ver
-      v2 = i_ver + 1
-      if(v2 > elem(e) % nv) v2 = 1
+      ! Get first and second vertex
+      v1 = elem(e) % v(i_ver)
+      v2 = elem(e) % v(j_ver)
 
       n_side = n_side + 1
-      side(n_side) % c  = elem(e) % v(v1)
-      side(n_side) % d  = elem(e) % v(v2)
+      side(n_side) % c  = v1
+      side(n_side) % d  = v2
       side(n_side) % ei = e
     end do
   end do
@@ -107,20 +110,27 @@
         do ss = s, s+1
 
           do i_ver = 1, elem(ei(ss)) % nv
+            j_ver = i_ver + 1
+            if(j_ver > elem(ei(ss)) % nv) j_ver = 1
+            k_ver = j_ver + 1
+            if(k_ver > elem(ei(ss)) % nv) k_ver = 1
 
-            ! Get first and second vertex
+            ! Get first, second and thrid vertex
             v1 = elem(ei(ss)) % v(i_ver)
-            if(i_ver < elem(ei(ss)) % nv) then
-              v2 = elem(ei(ss)) % v(i_ver+1)
-            else
-              v2 = elem(ei(ss)) % v(1)
-            end if
+            v2 = elem(ei(ss)) % v(j_ver)
+            v3 = elem(ei(ss)) % v(k_ver)
 
             ! Check ea
-            if(v1 .eq. c .and. v2 .eq. d) side(n_side) % ea = ei(ss)
+            if(v1 .eq. c .and. v2 .eq. d) then
+              side(n_side) % ea = ei(ss)
+              side(n_side) % a  = v3
+            end if
 
             ! Check eb
-            if(v2 .eq. c .and. v1 .eq. d) side(n_side) % eb = ei(ss)
+            if(v2 .eq. c .and. v1 .eq. d) then
+              side(n_side) % eb = ei(ss)
+              side(n_side) % b  = v3
+            end if
 
           end do
 
@@ -144,20 +154,27 @@
         ss = s
 
         do i_ver = 1, elem(ei(ss)) % nv
+          j_ver = i_ver + 1
+          if(j_ver > elem(ei(ss)) % nv) j_ver = 1
+          k_ver = j_ver + 1
+          if(k_ver > elem(ei(ss)) % nv) k_ver = 1
 
           ! Get first and second vertex
           v1 = elem(ei(ss)) % v(i_ver)
-          if(i_ver < elem(ei(ss)) % nv) then
-            v2 = elem(ei(ss)) % v(i_ver+1)
-          else
-            v2 = elem(ei(ss)) % v(1)
-          end if
+          v2 = elem(ei(ss)) % v(j_ver)
+          v3 = elem(ei(ss)) % v(k_ver)
 
           ! Check ea
-          if(v1 .eq. c .and. v2 .eq. d) side(n_side) % ea = ei(ss)
+          if(v1 .eq. c .and. v2 .eq. d) then
+            side(n_side) % ea = ei(ss)
+            side(n_side) % a  = v3
+          end if
 
           ! Check eb
-          if(v2 .eq. c .and. v1 .eq. d) side(n_side) % eb = ei(ss)
+          if(v2 .eq. c .and. v1 .eq. d) then
+            side(n_side) % eb = ei(ss)
+            side(n_side) % b  = v3
+          end if
 
         end do
 

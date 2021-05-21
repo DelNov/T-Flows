@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Surf_Mod_Split_Element(surf, e)
+  subroutine Split_Element(Surf, e)
 !------------------------------------------------------------------------------!
 !   Create new vertex in the center of existing element specified with e       !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Surf_Type), target :: surf
-  integer                 :: e
+  class(Surf_Type), target :: Surf
+  integer                  :: e
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: vert(:)
   type(Side_Type), pointer :: side(:)
@@ -18,12 +18,12 @@
 !==============================================================================!
 
   ! Take aliases
-  nv   => surf % n_verts
-  ns   => surf % n_sides
-  ne   => surf % n_elems
-  vert => surf % vert
-  side => surf % side
-  elem => surf % elem
+  nv   => Surf % n_verts
+  ns   => Surf % n_sides
+  ne   => Surf % n_elems
+  vert => Surf % vert
+  side => Surf % side
+  elem => Surf % elem
 
   i = elem(e) % v(1)
   j = elem(e) % v(2)

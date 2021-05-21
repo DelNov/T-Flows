@@ -1,32 +1,32 @@
 !==============================================================================!
-  subroutine Find_Sides(Surf, verbose)
+  subroutine Find_Sides(Front, verbose)
 !------------------------------------------------------------------------------!
-!   Compresses sides' list                                                     !
+!   Finds connectivity for sides and elements                                  !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Surf_Type), target :: Surf
-  logical                  :: verbose
+  class(Front_Type), target :: Front
+  logical                   :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: vert(:)
   type(Side_Type), pointer :: side(:)
   type(Elem_Type), pointer :: elem(:)
   integer,         pointer :: nv, ns, ne
   integer                  :: cnt_one, cnt_two
-  integer                  :: e, eb, ea, i, j, k, c, d, s, n_side
+  integer                  :: e, eb, ea, c, d, c1, c2, d1, d2, s, n_side
   integer                  :: ss, sum_ijk, sum_cd, i_ver, j_ver, k_ver
-  integer                  :: i_s, v1, v2, v3, c1, c2, d1, d2
+  integer                  :: i_s, v1, v2, v3
   integer                  :: ne_tot, ns_tot, cnt_one_tot, cnt_two_tot
   integer, allocatable     :: ci(:), di(:), ei(:), ni(:)
 !==============================================================================!
 
   ! Take aliases
-  nv   => Surf % n_verts
-  ns   => Surf % n_sides
-  ne   => Surf % n_elems
-  vert => Surf % vert
-  side => Surf % side
-  elem => Surf % elem
+  nv   => Front % n_verts
+  ns   => Front % n_sides
+  ne   => Front % n_elems
+  vert => Front % vert
+  side => Front % side
+  elem => Front % elem
 
   !----------------------------!
   !   Put all sides together   !
@@ -182,12 +182,12 @@
         cnt_one = cnt_one + 1
       end if
     end do
-
   else
     n_side  = 0
     cnt_one = 0
     cnt_two = 0
   end if
+
   ns = n_side
   if(verbose) then
     ns_tot = ns

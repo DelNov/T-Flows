@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Find_Sides(Surf, verbose)
+  subroutine Find_Surf_Elements(Surf, verbose)
 !------------------------------------------------------------------------------!
 !   Compresses sides' list                                                     !
 !------------------------------------------------------------------------------!
@@ -204,5 +204,102 @@
     end if
 
   end if
+
+  !-------------------------------!
+  !   Find elements' neighbours   !
+  !-------------------------------!
+  do s = 1, ns
+    c  = side(s) % c
+    d  = side(s) % d
+    ea = side(s) % ea
+    eb = side(s) % eb
+
+    ! Element a
+    if(ea > 0) then
+      if(elem(ea) % v(2) .eq. c .and. elem(ea) % v(3) .eq. d  .or. &
+         elem(ea) % v(3) .eq. c .and. elem(ea) % v(2) .eq. d) then
+        elem(ea) % ns = elem(ea) % ns + 1
+        elem(ea) % s(1) = s
+        if(eb .gt. 0) then
+          elem(ea) % nne = elem(ea) % nne + 1
+          elem(ea) % e(1) = eb
+        end if
+      end if
+
+      if(elem(ea) % v(1) .eq. c .and. elem(ea) % v(3) .eq. d  .or. &
+         elem(ea) % v(3) .eq. c .and. elem(ea) % v(1) .eq. d) then
+        elem(ea) % ns = elem(ea) % ns + 1
+        elem(ea) % s(2) = s
+        if(eb .gt. 0) then
+          elem(ea) % nne = elem(ea) % nne + 1
+          elem(ea) % e(2) = eb
+        end if
+      end if
+
+      if(elem(ea) % v(1) .eq. c .and. elem(ea) % v(2) .eq. d  .or. &
+         elem(ea) % v(2) .eq. c .and. elem(ea) % v(1) .eq. d) then
+        elem(ea) % ns = elem(ea) % ns + 1
+        elem(ea) % s(3) = s
+        if(eb .gt. 0) then
+          elem(ea) % nne = elem(ea) % nne + 1
+          elem(ea) % e(3) = eb
+        end if
+      end if
+    end if  ! ea > 0
+
+    ! Element b
+    if(eb > 0) then
+      if(elem(eb) % v(2) .eq. c .and. elem(eb) % v(3) .eq. d  .or. &
+         elem(eb) % v(3) .eq. c .and. elem(eb) % v(2) .eq. d) then
+        elem(eb) % ns = elem(eb) % ns + 1
+        elem(eb) % s(1) = s
+        if(ea .gt. 0) then
+          elem(eb) % nne = elem(eb) % nne + 1
+          elem(eb) % e(1) = ea
+        end if
+      end if
+
+      if(elem(eb) % v(1) .eq. c .and. elem(eb) % v(3) .eq. d  .or. &
+         elem(eb) % v(3) .eq. c .and. elem(eb) % v(1) .eq. d) then
+        elem(eb) % ns = elem(eb) % ns + 1
+        elem(eb) % s(2) = s
+        if(ea .gt. 0) then
+          elem(eb) % nne = elem(eb) % nne + 1
+          elem(eb) % e(2) = ea
+        end if
+      end if
+
+      if(elem(eb) % v(1) .eq. c .and. elem(eb) % v(2) .eq. d  .or. &
+         elem(eb) % v(2) .eq. c .and. elem(eb) % v(1) .eq. d) then
+        elem(eb) % ns = elem(eb) % ns + 1
+        elem(eb) % s(3) = s
+        if(ea .gt. 0) then
+          elem(eb) % nne = elem(eb) % nne + 1
+          elem(eb) % e(3) = ea
+        end if
+      end if
+    end if
+
+  end do
+
+  ! Checking
+  do e = 1, ne
+    sum_ijk = 0
+    sum_cd  = 0
+
+    do i_ver = 1, elem(e) % nv
+      sum_ijk = sum_ijk + elem(e) % v(i_ver)
+    end do
+
+    do i_s = 1, elem(e) % ns
+      sum_cd = sum_cd + side(elem(e) % s(i_s)) % c  &
+                      + side(elem(e) % s(i_s)) % d
+    end do
+
+    if( sum_cd / sum_ijk .ne. 2 ) then
+      print *, '# ERROR in forming elements'' neighbours!'
+      stop
+    end if
+  end do
 
   end subroutine

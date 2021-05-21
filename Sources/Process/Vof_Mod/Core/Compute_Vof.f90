@@ -8,7 +8,7 @@
   class(Vof_Type),   target :: Vof
   type(Solver_Type), target :: Sol
   real                      :: dt
-  integer                   :: n    ! current temporal iteration
+  integer                   :: n    ! current temporal iteration (what???)
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: Flow
   type(Grid_Type),   pointer :: Grid
@@ -24,7 +24,7 @@
   integer                    :: s, c, c1, c2, fu, corr
 !==============================================================================!
 
-  call Cpu_Timer % Start('Compute_Multiphase (without solvers)')
+  call Cpu_Timer % Start('Compute_Vof (without solvers)')
 
   ! Take aliases
   Flow   => Vof % pnt_flow
@@ -250,6 +250,6 @@
 
   call Flow % Grad_Variable(fun)
 
-  call Cpu_Timer % Stop('Compute_Multiphase (without solvers)')
+  call Cpu_Timer % Stop('Compute_Vof (without solvers)')
 
   end subroutine

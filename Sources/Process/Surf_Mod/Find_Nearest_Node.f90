@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine Surf_Mod_Find_Nearest_Node(surf, v)
+  subroutine Find_Nearest_Node(Surf, v)
 !------------------------------------------------------------------------------!
 !   Finds a node closest to a vertex.                                          !
 !   Important: it assumes that the closest cell has been found!                !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Surf_Type), target :: surf
-  integer                 :: v      ! vertex number
+  class(Surf_Type), target :: Surf
+  integer                  :: v      ! vertex number
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: flow
   type(Grid_Type),  pointer :: grid
@@ -20,9 +20,9 @@
 !==============================================================================!
 
   ! Take aliases
-  flow => surf % pnt_flow
-  grid => surf % pnt_grid
-  vert => surf % vert(v)
+  flow => Surf % pnt_flow
+  grid => Surf % pnt_grid
+  vert => Surf % vert(v)
 
   !-------------------------------------------------!
   !   Browse through all cells as another example   !

@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine Surf_Mod_Smooth(surf, phi, phi_e)
+  subroutine Smooth(Surf, phi, phi_e)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Surf_Type), target :: surf
-  type(Var_Type),  target :: phi
-  real                    :: phi_e
+  class(Surf_Type), target :: Surf
+  type(Var_Type),   target :: phi
+  real                     :: phi_e
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   type(Vert_Type), pointer :: vert(:)
   type(Elem_Type), pointer :: elem(:)
   type(Side_Type), pointer :: side(:)
@@ -20,13 +20,13 @@
 !==============================================================================!
 
   ! Take aliases
-  nv   => surf % n_verts
-  ne   => surf % n_elems
-  ns   => surf % n_sides
-  vert => surf % vert
-  elem => surf % elem
-  side => surf % side
-  grid => surf % pnt_grid
+  nv   => Surf % n_verts
+  ne   => Surf % n_elems
+  ns   => Surf % n_sides
+  vert => Surf % vert
+  elem => Surf % elem
+  side => Surf % side
+  Grid => Surf % pnt_grid
 
   !-----------------------------------------------------------!
   !   Count number of neighbouring elements for each vertex   !
@@ -38,7 +38,7 @@
     vert(elem(e) % v(3)) % nne = vert(elem(e) % v(3)) % nne + 1
   end do
 
-  call Surf_Mod_Find_Boundaries(surf)
+  call Surf % Find_Boundaries()
 
   !---------------------------------------------------------------!
   !   Initialize sums of x, y and z coordinates for each vertex   !
@@ -78,8 +78,8 @@
         vert(v) % x_n = vert(v) % sumx / vert(v) % nne
         vert(v) % y_n = vert(v) % sumy / vert(v) % nne
         vert(v) % z_n = vert(v) % sumz / vert(v) % nne
-        call Surf_Mod_Find_Nearest_Cell(surf, v, n_verts_in_buffers)
-        call Surf_Mod_Find_Nearest_Node(surf, v)
+        call Surf % Find_Nearest_Cell(v, n_verts_in_buffers)
+        call Surf % Find_Nearest_Node(v)
       end if
 
     end do
@@ -99,9 +99,9 @@
         c = vert(v) % cell
 
         ! Cell coordinates
-        xc = grid % xc(c)
-        yc = grid % yc(c)
-        zc = grid % zc(c)
+        xc = Grid % xc(c)
+        yc = Grid % yc(c)
+        zc = Grid % zc(c)
 
         ! Surface normal
         phi_m = sqrt(phi % x(c)**2 + phi % y(c)**2 + phi % z(c)**2)
@@ -135,8 +135,8 @@
                            + dy * phi % y(c)  &
                            + dz * phi % z(c)
 
-        call Surf_Mod_Find_Nearest_Cell(surf, v, n_verts_in_buffers)
-        call Surf_Mod_Find_Nearest_Node(surf, v)
+        call Surf % Find_Nearest_Cell(v, n_verts_in_buffers)
+        call Surf % Find_Nearest_Node(v)
 
       end if  ! if vertex is on a boundary
 

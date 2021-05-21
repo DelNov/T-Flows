@@ -1,9 +1,9 @@
 !==============================================================================!
-  subroutine Surf_Mod_Print_Statistics(surf)
+  subroutine Print_Surf_Statistics(Surf)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Surf_Type),  target :: surf
+  class(Surf_Type),  target :: Surf
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: vert(:)
   type(Elem_Type), pointer :: elem(:)
@@ -20,12 +20,12 @@
 !==============================================================================!
 
   ! Take aliases
-  nv   => surf % n_verts
-  ns   => surf % n_sides
-  ne   => surf % n_elems
-  vert => surf % vert
-  side => surf % side
-  elem => surf % elem
+  nv   => Surf % n_verts
+  ns   => Surf % n_sides
+  ne   => Surf % n_elems
+  vert => Surf % vert
+  side => Surf % side
+  elem => Surf % elem
 
   !--------------------------!
   !   Compute side lengths   !
@@ -73,7 +73,7 @@
   !--------------------------------!
   !   Count number of neighbours   !
   !--------------------------------!
-  call Surf_Mod_Count_Vertex_Elements(surf)
+  call Surf % Find_Vertex_Elements()
   nne_s = minval(vert(1:nv) % nne)
   nne_e = maxval(vert(1:nv) % nne)
   allocate(nne(nne_s:nne_e)); nne = 0.0
@@ -101,11 +101,11 @@
       line(63+T:63+T) = '#'
       line( 3+T: 3+T) = '-'
       if(item.eq.1) line( 5+T: 5+T+20) = 'Number of elements: '
-      if(item.eq.1) write(line(32+T:37+T), '(i6)') surf % n_elems
+      if(item.eq.1) write(line(32+T:37+T), '(i6)') Surf % n_elems
       if(item.eq.2) line( 5+T: 5+T+20) = 'Number of vertices: '
-      if(item.eq.2) write(line(32+T:37+T), '(i6)') surf % n_verts
+      if(item.eq.2) write(line(32+T:37+T), '(i6)') Surf % n_verts
       if(item.eq.3) line( 5+T: 5+T+20) = 'Number of sides:    '
-      if(item.eq.3) write(line(32+T:37+T), '(i6)') surf % n_sides
+      if(item.eq.3) write(line(32+T:37+T), '(i6)') Surf % n_sides
       print *, trim(line)
     end do
 

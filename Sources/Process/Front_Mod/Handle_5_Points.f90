@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Handle_5_Points(Front, surf_v)
+  subroutine Handle_5_Points(Front, surf_v, enforce_triangles)
 !------------------------------------------------------------------------------!
 !   Surface intersects cell at five points                                     !
 !------------------------------------------------------------------------------!
@@ -7,6 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Front_Type), target :: Front
   real                      :: surf_v(3)
+  logical                   :: enforce_triangles
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: vert(:)
   type(Elem_Type), pointer :: elem(:)
@@ -93,9 +94,36 @@
   !   You've found a permutation which works, store new elements now   !
   !--------------------------------------------------------------------!
 
-  ! One new element with five vertices
-  ne = ne + 1
-  elem(ne) % nv = 5
-  elem(ne) % v(1:5) = ver(1:5)
+  if(.not. enforce_triangles) then
+
+    ! One new element with five vertices
+    ne = ne + 1
+    elem(ne) % nv = 5
+    elem(ne) % v(1:5) = ver(1:5)
+
+  else  ! only triangles are allowed
+
+    ! One new element with three vertices
+    ne = ne + 1
+    elem(ne) % nv = 3
+    elem(ne) % v(1) = ver(1)
+    elem(ne) % v(2) = ver(2)
+    elem(ne) % v(3) = ver(3)
+
+    ! Second new element with three vertices
+    ne = ne + 1
+    elem(ne) % nv = 3
+    elem(ne) % v(1) = ver(1)
+    elem(ne) % v(2) = ver(3)
+    elem(ne) % v(3) = ver(4)
+
+    ! Third new element with three vertices
+    ne = ne + 1
+    elem(ne) % nv = 3
+    elem(ne) % v(1) = ver(1)
+    elem(ne) % v(2) = ver(4)
+    elem(ne) % v(3) = ver(5)
+
+  end if
 
   end subroutine

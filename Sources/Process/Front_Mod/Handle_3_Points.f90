@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Handle_3_Points(Front, surf_v)
+  subroutine Handle_3_Points(Front, surf_v, enforce_triangles)
 !------------------------------------------------------------------------------!
 !   Surface intersects cell at three points                                    !
 !------------------------------------------------------------------------------!
@@ -7,6 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Front_Type), target :: Front
   real, dimension(3)        :: surf_v
+  logical                   :: enforce_triangles
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: vert(:)
   type(Elem_Type), pointer :: elem(:)

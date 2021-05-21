@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Surf_Mod_Calculate_Curvatures_From_Edges(surf)
+  subroutine Calculate_Curvatures_From_Edges(Surf)
 !------------------------------------------------------------------------------!
 !   Calculates surface curvatures from edges (four points) and distributes     !
 !   the values to elements and nodes.                                          !
@@ -8,7 +8,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Surf_Type), target :: surf
+  class(Surf_Type), target :: Surf
 !-----------------------------------[Locals]-----------------------------------!
   real, dimension(4,4)  :: a
   real, dimension(4)    :: b
@@ -24,24 +24,24 @@
   !      them to elements surrounding them       !
   !----------------------------------------------!
 
-  surf % elem(1:surf % n_elems) % curv = 0.0
-  surf % elem(1:surf % n_elems) % xc   = 0.0
-  surf % elem(1:surf % n_elems) % yc   = 0.0
-  surf % elem(1:surf % n_elems) % zc   = 0.0
+  Surf % elem(1:Surf % n_elems) % curv = 0.0
+  Surf % elem(1:Surf % n_elems) % xc   = 0.0
+  Surf % elem(1:Surf % n_elems) % yc   = 0.0
+  Surf % elem(1:Surf % n_elems) % zc   = 0.0
 
-  do s = 1, surf % n_sides
-    vert(1) = surf % side(s) % a
-    vert(2) = surf % side(s) % b
-    vert(3) = surf % side(s) % c
-    vert(4) = surf % side(s) % d
+  do s = 1, Surf % n_sides
+    vert(1) = Surf % side(s) % a
+    vert(2) = Surf % side(s) % b
+    vert(3) = Surf % side(s) % c
+    vert(4) = Surf % side(s) % d
     a(:,:) = 0
     b(:)   = 0
 
     do i = 1, 4
 
-      x = surf % vert(vert(i)) % x_n
-      y = surf % vert(vert(i)) % y_n
-      z = surf % vert(vert(i)) % z_n
+      x = Surf % vert(vert(i)) % x_n
+      y = Surf % vert(vert(i)) % y_n
+      z = Surf % vert(vert(i)) % z_n
 
       x2 = x * x;  y2 = y * y;  z2 = z * z
       xy = x * y;  xz = x * z;  yz = y * z
@@ -79,49 +79,49 @@
       rho = PETA  ! some big number
     end if
 
-    surf % elem(surf % side(s) % ea) % curv =  &
-    surf % elem(surf % side(s) % ea) % curv + 1.0 / rho * ONE_THIRD
-    surf % elem(surf % side(s) % eb) % curv =  &
-    surf % elem(surf % side(s) % eb) % curv + 1.0 / rho * ONE_THIRD
+    Surf % elem(Surf % side(s) % ea) % curv =  &
+    Surf % elem(Surf % side(s) % ea) % curv + 1.0 / rho * ONE_THIRD
+    Surf % elem(Surf % side(s) % eb) % curv =  &
+    Surf % elem(Surf % side(s) % eb) % curv + 1.0 / rho * ONE_THIRD
 
     ! This looks kind of crude
-    surf % elem(surf % side(s) % ea) % xc =  &
-    surf % elem(surf % side(s) % ea) % xc + x * ONE_THIRD
-    surf % elem(surf % side(s) % ea) % yc =  &
-    surf % elem(surf % side(s) % ea) % yc + y * ONE_THIRD
-    surf % elem(surf % side(s) % ea) % zc =  &
-    surf % elem(surf % side(s) % ea) % zc + z * ONE_THIRD
-    surf % elem(surf % side(s) % eb) % xc =  &
-    surf % elem(surf % side(s) % eb) % xc + x * ONE_THIRD
-    surf % elem(surf % side(s) % eb) % yc =  &
-    surf % elem(surf % side(s) % eb) % yc + y * ONE_THIRD
-    surf % elem(surf % side(s) % eb) % zc =  &
-    surf % elem(surf % side(s) % eb) % zc + z * ONE_THIRD
+    Surf % elem(Surf % side(s) % ea) % xc =  &
+    Surf % elem(Surf % side(s) % ea) % xc + x * ONE_THIRD
+    Surf % elem(Surf % side(s) % ea) % yc =  &
+    Surf % elem(Surf % side(s) % ea) % yc + y * ONE_THIRD
+    Surf % elem(Surf % side(s) % ea) % zc =  &
+    Surf % elem(Surf % side(s) % ea) % zc + z * ONE_THIRD
+    Surf % elem(Surf % side(s) % eb) % xc =  &
+    Surf % elem(Surf % side(s) % eb) % xc + x * ONE_THIRD
+    Surf % elem(Surf % side(s) % eb) % yc =  &
+    Surf % elem(Surf % side(s) % eb) % yc + y * ONE_THIRD
+    Surf % elem(Surf % side(s) % eb) % zc =  &
+    Surf % elem(Surf % side(s) % eb) % zc + z * ONE_THIRD
   end do
 
   ! Compute average curvature (for debugging)
   ! rho = 0
-  ! do e = 1, surf % n_elems
-  !   rho = rho + surf % elem(e) % curv
+  ! do e = 1, Surf % n_elems
+  !   rho = rho + Surf % elem(e) % curv
   ! end do
-  ! rho = rho / surf % n_elems
+  ! rho = rho / Surf % n_elems
   ! print *, 'average curvature = ', rho
 
   !-------------------------------------------------------------------!
   !   Interpolate normals at nodes from values in surrounding elems   !
   !-------------------------------------------------------------------!
-  surf % vert(1:surf % n_verts) % curv = 0.
-  do e = 1, surf % n_elems
+  Surf % vert(1:Surf % n_verts) % curv = 0.
+  do e = 1, Surf % n_elems
 
-    i = surf % elem(e) % v(1)
-    j = surf % elem(e) % v(2)
-    k = surf % elem(e) % v(3)
-    surf % vert(i) % curv = surf % vert(i) % curv  &
-                          + surf % elem(e) % curv / real(surf % vert(i) % nne)
-    surf % vert(j) % curv = surf % vert(j) % curv  &
-                          + surf % elem(e) % curv / real(surf % vert(j) % nne)
-    surf % vert(k) % curv = surf % vert(k) % curv  &
-                          + surf % elem(e) % curv / real(surf % vert(k) % nne)
+    i = Surf % elem(e) % v(1)
+    j = Surf % elem(e) % v(2)
+    k = Surf % elem(e) % v(3)
+    Surf % vert(i) % curv = Surf % vert(i) % curv  &
+                          + Surf % elem(e) % curv / real(Surf % vert(i) % nne)
+    Surf % vert(j) % curv = Surf % vert(j) % curv  &
+                          + Surf % elem(e) % curv / real(Surf % vert(j) % nne)
+    Surf % vert(k) % curv = Surf % vert(k) % curv  &
+                          + Surf % elem(e) % curv / real(Surf % vert(k) % nne)
   end do
 
   end subroutine
