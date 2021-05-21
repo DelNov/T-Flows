@@ -12,13 +12,13 @@
   integer, intent(in)         :: curr_dt  ! current time step
   integer, intent(in)         :: ini      ! inner iteration
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),   pointer :: grid
+  type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: u, v, w, p
   type(Matrix_Type), pointer :: A, M        ! pressure and momentum matrices
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   u    => Flow % u
   v    => Flow % u
   w    => Flow % u

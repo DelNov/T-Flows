@@ -11,7 +11,7 @@
   integer, intent(in)      :: n1
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
-  type(Grid_Type),  pointer :: grid
+  type(Grid_Type),  pointer :: Grid
   integer                   :: c, n
 !==============================================================================!
 
@@ -21,10 +21,10 @@
 
   ! Take aliases
   Flow => turb % pnt_flow
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
 
   if(n > -1) then
-    do c = -grid % n_bnd_cells, grid % n_cells
+    do c = -Grid % n_bnd_cells, Grid % n_cells
 
       !-----------------!
       !   Mean values   !

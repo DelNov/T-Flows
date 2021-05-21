@@ -12,13 +12,13 @@
   integer, intent(in)         :: curr_dt  ! current time step
   integer, intent(in)         :: ini      ! inner iteration
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),   pointer :: grid
+  type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: t, p
   type(Matrix_Type), pointer :: A
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   t    => Flow % t
   p    => Flow % p
   A    => Sol % A

@@ -11,13 +11,13 @@
   integer, intent(in)         :: curr_dt
   integer, intent(in)         :: ini
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),   pointer :: grid
+  type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: u, v, w, p
   type(Matrix_Type), pointer :: M
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   u    => Flow % u
   v    => Flow % u
   w    => Flow % u

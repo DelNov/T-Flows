@@ -12,13 +12,13 @@
   type(Swarm_Type),    target :: swarm
   integer, intent(in)         :: ts     ! time step
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u, v, w, t
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   bulk => Flow % bulk
   u    => Flow % u
   v    => Flow % v

@@ -11,11 +11,11 @@
   type(Swarm_Type),  target :: swarm
   type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: u, v, w, t, phi
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
 
   end subroutine

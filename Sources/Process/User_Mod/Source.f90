@@ -14,14 +14,14 @@
   type(Matrix_Type)        :: a_matrix
   real, dimension(:)       :: b_vector
 !----------------------------------[Locals]------------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u, v, w, t
   type(Face_Type), pointer :: v_flux
 !==============================================================================!
 
   ! Take aliases
-  grid   => Flow % pnt_grid
+  Grid   => Flow % pnt_grid
   v_flux => Flow % v_flux
   bulk   => Flow % bulk
   u      => Flow % u

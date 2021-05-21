@@ -14,13 +14,13 @@
   integer, intent(in)         :: ini      ! inner iteration
   integer, intent(in)         :: sc       ! scalar index
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),   pointer :: grid
+  type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: phi, p
   type(Matrix_Type), pointer :: M
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   p    => Flow % p
   phi  => Flow % scalar(sc)
   M    => Sol % M
