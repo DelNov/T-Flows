@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Read_Control_Physical_Models(flow, turb, Vof, swarm)
+  subroutine Read_Control_Physical_Models(Flow, turb, Vof, swarm)
 !------------------------------------------------------------------------------!
 !   Reads details about physical models from control file.                     !
 !------------------------------------------------------------------------------!
@@ -15,7 +15,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
+  type(Field_Type), target :: Flow
   type(Turb_Type),  target :: turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: swarm
@@ -26,25 +26,25 @@
 !==============================================================================!
 
   ! Take aliases
-  bulk => flow % bulk
+  bulk => Flow % bulk
 
   !-------------------------------------------!
   !                                           !
   !   Related to heat transfer and bouyancy   !
   !                                           !
   !-------------------------------------------!
-  call Control_Mod_Heat_Transfer(flow % heat_transfer, verbose = .true.)
+  call Control_Mod_Heat_Transfer(Flow % heat_transfer, verbose = .true.)
   call Control_Mod_Gravitational_Vector(grav_x,  &
                                         grav_y,  &
                                         grav_z, .true.)
   call Control_Mod_Buoyancy                    (name,   .true.)
   select case(name)
     case('NONE')
-      flow % buoyancy = NO_BUOYANCY
+      Flow % buoyancy = NO_BUOYANCY
     case('DENSITY')
-      flow % buoyancy = DENSITY_DRIVEN
+      Flow % buoyancy = DENSITY_DRIVEN
     case('THERMAL')
-      flow % buoyancy = THERMALLY_DRIVEN
+      Flow % buoyancy = THERMALLY_DRIVEN
     case default
       if(this_proc < 2) then
         print *, '# ERROR!  Unknown buoyancy model :', trim(name)
@@ -54,9 +54,9 @@
       stop
   end select
 
-  call Control_Mod_Reference_Density           (flow % dens_ref, .true.)
-  call Control_Mod_Reference_Temperature       (flow % t_ref,    .true.)
-  call Control_Mod_Volume_Expansion_Coefficient(flow % beta,     .true.)
+  call Control_Mod_Reference_Density           (Flow % dens_ref, .true.)
+  call Control_Mod_Reference_Temperature       (Flow % t_ref,    .true.)
+  call Control_Mod_Volume_Expansion_Coefficient(Flow % beta,     .true.)
   call Control_Mod_Turbulent_Prandtl_Number    (pr_t)  ! default is (0.9)
 
   !---------------------------!
@@ -237,7 +237,7 @@
   !   Number of scalars   !
   !                       !
   !-----------------------!
-  call Control_Mod_Number_Of_Scalars(flow % n_scalars, verbose = .true.)
+  call Control_Mod_Number_Of_Scalars(Flow % n_scalars, verbose = .true.)
 
   !-------------------------------!
   !                               !
@@ -256,9 +256,10 @@
     Vof % model = NO_MULTIPHASE_MODEL
   end if
 
-  call Control_Mod_Track_Front(Vof % track_front, .true.)
+  call Control_Mod_Track_Front  (Vof % track_front,   .true.)
+  call Control_Mod_Track_Surface(Vof % track_surface, .true.)
 
-  call Control_Mod_Mass_Transfer(flow % mass_transfer)
+  call Control_Mod_Mass_Transfer(Flow % mass_transfer)
 
   !-----------------------!
   !                       !
