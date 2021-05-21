@@ -364,6 +364,7 @@
         if( maxval(Flow(1:n_dom) % u % res) <= simple_tol .and.  &
             maxval(Flow(1:n_dom) % v % res) <= simple_tol .and.  &
             maxval(Flow(1:n_dom) % w % res) <= simple_tol .and.  &
+            maxval(Flow(1:n_dom) % t % res) <= simple_tol .and.  &
             maxval(Flow(1:n_dom) % vol_res) <= simple_tol ) goto 1
       end if
 
