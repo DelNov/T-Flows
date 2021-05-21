@@ -117,6 +117,7 @@
     include 'Control_Mod/Physics/Reference_Density.f90'
     include 'Control_Mod/Physics/Surface_Tension.f90'
     include 'Control_Mod/Physics/Track_Front.f90'
+    include 'Control_Mod/Physics/Track_Surface.f90'
 
     ! Scalars (like species, for example)
     include 'Control_Mod/Physics/Number_Of_Scalars.f90'

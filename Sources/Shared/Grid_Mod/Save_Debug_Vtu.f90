@@ -1,8 +1,9 @@
 !==============================================================================!
-  subroutine Save_Debug_Vtu(Grid, append,                           &
-                            scalar_cell, scalar_node, scalar_name,  &
-                            vector_cell, vector_node, vector_name,  &
-                            plot_inside)
+  subroutine Save_Debug_Vtu(Grid, append,                                 &
+                                  inside_cell, inside_name,               &
+                                  scalar_cell, scalar_node, scalar_name,  &
+                                  vector_cell, vector_node, vector_name,  &
+                                  plot_inside)
 !------------------------------------------------------------------------------!
 !   Writes: name.vtu, name.faces.vtu, name.shadow.vtu                          !
 !------------------------------------------------------------------------------!
@@ -10,25 +11,46 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type)       :: Grid
   character(*)           :: append
-  real,         optional :: scalar_cell(-Grid % n_bnd_cells:Grid % n_cells)
+  real,         optional :: inside_cell(1:Grid % n_cells)
+  character(*), optional :: inside_name
+  real,         optional :: scalar_cell( -Grid % n_bnd_cells  &
+                                         :Grid % n_cells)
   real,         optional :: scalar_node(1:Grid % n_nodes)
   character(*), optional :: scalar_name
-  real,         optional :: vector_cell(-Grid % n_bnd_cells:Grid % n_cells, 3)
+  real,         optional :: vector_cell( -Grid % n_bnd_cells  &
+                                         :Grid % n_cells, 3)
   real,         optional :: vector_node(1:Grid % n_nodes, 3)
   character(*), optional :: vector_name
   logical,      optional :: plot_inside
 !-----------------------------------[Locals]-----------------------------------!
-  integer(SP)   :: data_size
-  integer       :: c, n, s, i_fac, data_offset, cell_offset, fu
-  integer       :: n_conns, n_polyg
-  integer       :: cs, ce, nc, s1, s2
-  logical       :: inside
-  real          :: dist1, dist2
-  character(SL) :: name_out, str1, str2
+  integer(SP)       :: data_size
+  integer           :: c, n, s, i_fac, data_offset, cell_offset, fu
+  integer           :: n_conns, n_polyg
+  integer           :: cs, ce, nc, s1, s2
+  logical           :: inside
+  real              :: dist1, dist2
+  real, allocatable :: values_cell(:)
+  character(SL)     :: values_name, name_out, str1, str2
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: IP = DP  ! int. precision is double precision
   integer, parameter :: RP = DP  ! real precision is double precision
 !==============================================================================!
+
+  ! Allocate local memory (no checks which arguments are present, ...
+  ! ... because I am almost invariantly sending cell data here)
+  allocate(values_cell(-Grid % n_bnd_cells:Grid % n_cells));
+  values_cell(:) = 0.0
+
+  if(present(inside_cell)) then
+    values_cell(1:Grid % n_cells) = inside_cell(1:Grid % n_cells)
+    values_name = inside_name
+  else if(present(scalar_cell)) then
+    values_cell(-Grid % n_bnd_cells:Grid % n_cells) =  &
+    scalar_cell(-Grid % n_bnd_cells:Grid % n_cells)
+    values_name = scalar_name
+  else
+    ! An error trap here would be lovely
+  end if
 
   ! Set initial value for inside (which, if .true., means plotting inside cells)
   inside = .true.
@@ -177,7 +199,7 @@
   if(present(scalar_node)) then
     write(str1, '(i0.0)') data_offset
     write(fu) IN_4 // '<DataArray type="Float64"'            //  &
-                      ' Name="'// trim(scalar_name) // '"'   //  &
+                      ' Name="'// trim(values_name) // '"'   //  &
                       ' format="appended"'                   //  &
                       ' offset="' // trim(str1)       //'">' // LF
     write(fu) IN_4 // '</DataArray>' // LF
@@ -217,10 +239,11 @@
   data_offset = data_offset + SP + nc * IP  ! prepare for next
 
   ! Additional cell scalar
-  if(present(scalar_cell)) then
+  if(present(inside_cell) .or.  &
+     present(scalar_cell)) then
     write(str1, '(i0.0)') data_offset
     write(fu) IN_4 // '<DataArray type="Float64"'            //  &
-                      ' Name="'// trim(scalar_name) // '"'   //  &
+                      ' Name="'// trim(values_name) // '"'   //  &
                       ' format="appended"'                   //  &
                       ' offset="' // trim(str1)       //'">' // LF
     write(fu) IN_4 // '</DataArray>' // LF
@@ -413,11 +436,12 @@
   end do
 
   ! Additional cell data
-  if(present(scalar_cell)) then
+  if(present(scalar_cell) .or.   &
+     present(inside_cell)) then
     data_size = int(nc * RP, SP)
     write(fu) data_size
     do c = cs, ce
-      write(fu) scalar_cell(c)
+      write(fu) values_cell(c)
     end do
   end if
 
@@ -461,9 +485,10 @@
     ! Data section is not mandatory, but very useful
     write(fu,'(a,a)') IN_2, '<PCellData Scalars="scalars" vectors="velocity">'
     write(fu,'(a,a)') IN_3, '<PDataArray type="Int64" Name="Processor"/>'
-    if(present(scalar_cell)) then
+    if(present(scalar_cell) .or.  &
+       present(inside_cell)) then
       write(fu,'(a,a)') IN_3, '<PDataArray type="Float64"'  //  &
-                              ' Name="'// trim(scalar_name) // '"/>'
+                              ' Name="'// trim(values_name) // '"/>'
     end if
     if(present(vector_cell)) then
       write(fu,'(a,a)') IN_3, '<PDataArray type="Float64"'  //  &

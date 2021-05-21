@@ -132,6 +132,7 @@
   SWARM_SUBGRID_SCALE_MODEL                |         none                  |   brownian_fukagata, discrete_random_walk
   THERMAL_CONDUCTIVITY                     |         1.0                   |   physical property
   TRACK_FRONT                              |         no                    |   yes (option for vof only)
+  TRACK_SURFACE                            |         no                    |   yes (option for vof only)
   TURBULENCE_MODEL                         |         none                  |   k_eps, k_eps_zeta_f, les_smagorinsky,
                                            |                               |   hybrid_les_prandtl, les_dynamic,
                                            |                               |   les_wale, dns, des_spalart,
