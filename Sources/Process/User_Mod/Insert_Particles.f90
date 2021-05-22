@@ -21,10 +21,14 @@
 
   ! Remove the following six lines in real Lagrangian tracking simulations
   if(this_proc < 2) then
+    print *, '#======================================================'     //  &
+             '======================================================='
     print *, '# WARNING: You are running a Lagrangian tracking simulation' //  &
              'with the default version of Insert_Particles.'
-    print *, '# You have probably forgotten to compile Process with' //  &
-             'DIR_CASE=<path_to_case> directive.'
+    print *, '# You have probably forgotten to compile Process with '      //  &
+             'DIR_CASE=<full_or_relative_path_to_case> directive.'
+    print *, '#------------------------------------------------------'     //  &
+             '-------------------------------------------------------'
   end if
 
   end subroutine
