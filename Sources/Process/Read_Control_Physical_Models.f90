@@ -261,7 +261,7 @@
   !   Particle tracking   !
   !                       !
   !-----------------------!
-  call Control_Mod_Interface_Tracking(Flow % with_particles, .true.)
+  call Control_Mod_Particle_Tracking(Flow % with_particles, .true.)
 
   if(Flow % with_particles) then
 
