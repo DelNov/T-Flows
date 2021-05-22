@@ -354,7 +354,7 @@
         read(line % tokens(4), '(z160)') cell_l  ! last cell
 
         ! Check if the zone is mixed (listing all cell types)
-        read(line % tokens(line % n_tokens)(1:1), '(z1)') zone_type
+        read(line % tokens(6)(1:1), '(z1)') zone_type
         if(zone_type .eq. MIXED_ZONE) then
           print '(a34,i9,a4,i9)', ' # Found a mixed cell zone from:  ',  &
                                   cell_f, ' to:', cell_l
