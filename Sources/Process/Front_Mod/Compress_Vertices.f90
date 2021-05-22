@@ -106,7 +106,7 @@
   nv_tot = n_vert
   call Comm_Mod_Global_Sum_Int(nv_tot)
   if(verbose .and. this_proc < 2) then
-    print *, '# Compressed number of vertices: ', nv_tot
+    print '(a40,i8)', ' # Compressed number of vertices:       ', nv_tot
   end if
 
   ! Check sanity of the elements in the end

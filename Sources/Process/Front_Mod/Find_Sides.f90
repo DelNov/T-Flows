@@ -53,8 +53,8 @@
     call Comm_Mod_Global_Sum_Int(ne_tot)
     call Comm_Mod_Global_Sum_Int(ns_tot)
     if(this_proc < 2) then
-      print *, '# Number of elements:        ', ne_tot
-      print *, '# Tentative number of sides: ', ns_tot
+      print '(a40,i8)', ' # Number of elements:                  ', ne_tot
+      print '(a40,i8)', ' # Tentative number of sides:           ', ns_tot
     end if
   end if
 
@@ -198,9 +198,9 @@
     call Comm_Mod_Global_Sum_Int(cnt_one_tot)
 
     if(this_proc < 2) then
-      print *, '# Compressed number of sides:       ', ns_tot
-      print *, '# Sides surrounded by two elements: ', cnt_two_tot
-      print *, '# Sides surrounded by one element:  ', cnt_one_tot
+      print '(a40,i8)', ' # Compressed number of sides:          ', ns_tot
+      print '(a40,i8)', ' # Sides surrounded by two elements:    ', cnt_two_tot
+      print '(a40,i8)', ' # Sides surrounded by one element:     ', cnt_one_tot
     end if
 
   end if
