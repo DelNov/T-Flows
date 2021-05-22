@@ -31,7 +31,7 @@
     integer                      :: n_elems
     integer                      :: n_verts
     integer                      :: n_sides
-    type(Vert_Type), allocatable :: vert(:)
+    type(Vert_Type), allocatable :: Vert(:)
     type(Elem_Type), allocatable :: elem(:)
     type(Side_Type), allocatable :: side(:)
 

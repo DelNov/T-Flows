@@ -8,7 +8,7 @@
   real                     :: phi_e
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
-  type(Vert_Type), pointer :: vert(:)
+  type(Vert_Type), pointer :: Vert(:)
   type(Elem_Type), pointer :: elem(:)
   type(Side_Type), pointer :: side(:)
   integer                  :: it_smooth, s, v, e, c
@@ -23,7 +23,7 @@
   nv   => Surf % n_verts
   ne   => Surf % n_elems
   ns   => Surf % n_sides
-  vert => Surf % vert
+  Vert => Surf % Vert
   elem => Surf % elem
   side => Surf % side
   Grid => Surf % pnt_grid
@@ -31,11 +31,11 @@
   !-----------------------------------------------------------!
   !   Count number of neighbouring elements for each vertex   !
   !-----------------------------------------------------------!
-  vert(1:nv) % nne = 0
+  Vert(1:nv) % nne = 0
   do e = 1, ne
-    vert(elem(e) % v(1)) % nne = vert(elem(e) % v(1)) % nne + 1
-    vert(elem(e) % v(2)) % nne = vert(elem(e) % v(2)) % nne + 1
-    vert(elem(e) % v(3)) % nne = vert(elem(e) % v(3)) % nne + 1
+    Vert(elem(e) % v(1)) % nne = Vert(elem(e) % v(1)) % nne + 1
+    Vert(elem(e) % v(2)) % nne = Vert(elem(e) % v(2)) % nne + 1
+    Vert(elem(e) % v(3)) % nne = Vert(elem(e) % v(3)) % nne + 1
   end do
 
   call Surf % Find_Boundaries()
@@ -43,9 +43,9 @@
   !---------------------------------------------------------------!
   !   Initialize sums of x, y and z coordinates for each vertex   !
   !---------------------------------------------------------------!
-  vert(1:nv) % sumx = 0.0
-  vert(1:nv) % sumy = 0.0
-  vert(1:nv) % sumz = 0.0
+  Vert(1:nv) % sumx = 0.0
+  Vert(1:nv) % sumy = 0.0
+  Vert(1:nv) % sumz = 0.0
 
   !-------------------------------------!
   !   Go through smoothing iterations   !
@@ -54,19 +54,19 @@
 
     ! Compute sums of all coordinates for vertices
     do s = 1, ns
-      vert(side(s) % c) % sumx =  &
-      vert(side(s) % c) % sumx + vert(side(s) % d) % x_n
-      vert(side(s) % c) % sumy =  &
-      vert(side(s) % c) % sumy + vert(side(s) % d) % y_n
-      vert(side(s) % c) % sumz =  &
-      vert(side(s) % c) % sumz + vert(side(s) % d) % z_n
+      Vert(side(s) % c) % sumx =  &
+      Vert(side(s) % c) % sumx + Vert(side(s) % d) % x_n
+      Vert(side(s) % c) % sumy =  &
+      Vert(side(s) % c) % sumy + Vert(side(s) % d) % y_n
+      Vert(side(s) % c) % sumz =  &
+      Vert(side(s) % c) % sumz + Vert(side(s) % d) % z_n
 
-      vert(side(s) % d) % sumx =  &
-      vert(side(s) % d) % sumx + vert(side(s) % c) % x_n
-      vert(side(s) % d) % sumy =  &
-      vert(side(s) % d) % sumy + vert(side(s) % c) % y_n
-      vert(side(s) % d) % sumz =  &
-      vert(side(s) % d) % sumz + vert(side(s) % c) % z_n
+      Vert(side(s) % d) % sumx =  &
+      Vert(side(s) % d) % sumx + Vert(side(s) % c) % x_n
+      Vert(side(s) % d) % sumy =  &
+      Vert(side(s) % d) % sumy + Vert(side(s) % c) % y_n
+      Vert(side(s) % d) % sumz =  &
+      Vert(side(s) % d) % sumz + Vert(side(s) % c) % z_n
     end do
 
     ! Move the vertices to their new positions
@@ -74,29 +74,29 @@
 
       ! This is how I check if vertex is on a boundary.  Maybe there
       ! is a more spothisticated way to do it, but this works so far
-      if( .not. vert(v) % boundary ) then
-        vert(v) % x_n = vert(v) % sumx / vert(v) % nne
-        vert(v) % y_n = vert(v) % sumy / vert(v) % nne
-        vert(v) % z_n = vert(v) % sumz / vert(v) % nne
-        call Surf % Find_Nearest_Cell(v, n_verts_in_buffers)
-        call Surf % Find_Nearest_Node(v)
+      if( .not. Vert(v) % boundary ) then
+        Vert(v) % x_n = Vert(v) % sumx / Vert(v) % nne
+        Vert(v) % y_n = Vert(v) % sumy / Vert(v) % nne
+        Vert(v) % z_n = Vert(v) % sumz / Vert(v) % nne
+        call Surf % Vert(v) % Find_Nearest_Cell(n_verts_in_buffers)
+        call Surf % Vert(v) % Find_Nearest_Node()
       end if
 
     end do
 
     ! Re-initalize the sums
-    vert(1:nv) % sumx = 0.0
-    vert(1:nv) % sumy = 0.0
-    vert(1:nv) % sumz = 0.0
+    Vert(1:nv) % sumx = 0.0
+    Vert(1:nv) % sumy = 0.0
+    Vert(1:nv) % sumz = 0.0
 
     ! Correct vertex position
     do v = 1, nv
 
       ! This is how I check if vertex is on a boundary.  Maybe there
       ! is a more spothisticated way to do it, but this works so far
-      if( .not. vert(v) % boundary ) then
+      if( .not. Vert(v) % boundary ) then
 
-        c = vert(v) % cell
+        c = Vert(v) % cell
 
         ! Cell coordinates
         xc = Grid % xc(c)
@@ -110,9 +110,9 @@
         nz = phi % z(c) / phi_m
 
         ! Value at current vertex position
-        dx = vert(v) % x_n - xc
-        dy = vert(v) % y_n - yc
-        dz = vert(v) % z_n - zc
+        dx = Vert(v) % x_n - xc
+        dy = Vert(v) % y_n - yc
+        dz = Vert(v) % z_n - zc
         phi_v = phi % n(c) + dx * phi % x(c)  &
                            + dy * phi % y(c)  &
                            + dz * phi % z(c)
@@ -124,19 +124,19 @@
         dz = dm * nz
 
         ! Move vertex in the surface normal direction
-        vert(v) % x_n = vert(v) % x_n + dx
-        vert(v) % y_n = vert(v) % y_n + dy
-        vert(v) % z_n = vert(v) % z_n + dz
+        Vert(v) % x_n = Vert(v) % x_n + dx
+        Vert(v) % y_n = Vert(v) % y_n + dy
+        Vert(v) % z_n = Vert(v) % z_n + dz
 
-        dx = vert(v) % x_n - xc
-        dy = vert(v) % y_n - yc
-        dz = vert(v) % z_n - zc
+        dx = Vert(v) % x_n - xc
+        dy = Vert(v) % y_n - yc
+        dz = Vert(v) % z_n - zc
         phi_v = phi % n(c) + dx * phi % x(c)  &
                            + dy * phi % y(c)  &
                            + dz * phi % z(c)
 
-        call Surf % Find_Nearest_Cell(v, n_verts_in_buffers)
-        call Surf % Find_Nearest_Node(v)
+        call Surf % Vert(v) % Find_Nearest_Cell(n_verts_in_buffers)
+        call Surf % Vert(v) % Find_Nearest_Node()
 
       end if  ! if vertex is on a boundary
 
@@ -147,10 +147,10 @@
   ! Make surface exactly spherical for the case of rising bubble in:
   ! Tests/Vof/Rising_Bubble
   ! do v = 1, nv
-  !   dm = norm2( (/vert(v) % x_n, vert(v) % y_n, vert(v) % z_n/) )
-  !   vert(v) % x_n = vert(v) % x_n * 0.25 / dm
-  !   vert(v) % y_n = vert(v) % y_n * 0.25 / dm
-  !   vert(v) % z_n = vert(v) % z_n * 0.25 / dm
+  !   dm = norm2( (/Vert(v) % x_n, Vert(v) % y_n, Vert(v) % z_n/) )
+  !   Vert(v) % x_n = Vert(v) % x_n * 0.25 / dm
+  !   Vert(v) % y_n = Vert(v) % y_n * 0.25 / dm
+  !   Vert(v) % z_n = Vert(v) % z_n * 0.25 / dm
   ! end do
 
   end subroutine

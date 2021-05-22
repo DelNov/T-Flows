@@ -9,7 +9,7 @@
   real, dimension(3)        :: surf_v
   logical                   :: enforce_triangles
 !-----------------------------------[Locals]-----------------------------------!
-  type(Vert_Type), pointer :: vert(:)
+  type(Vert_Type), pointer :: Vert(:)
   type(Elem_Type), pointer :: elem(:)
   integer,         pointer :: nv, ne
   integer                  :: ver(3)
@@ -19,7 +19,7 @@
   ! Take aliases
   nv   => Front % n_verts
   ne   => Front % n_elems
-  vert => Front % vert
+  Vert => Front % Vert
   elem => Front % elem
 
   ! One new element with three vertices
@@ -37,13 +37,13 @@
   ver(2) = elem(ne) % v(2)
   ver(3) = elem(ne) % v(3)
 
-  a(1) = vert(ver(2)) % x_n - vert(ver(1)) % x_n
-  a(2) = vert(ver(2)) % y_n - vert(ver(1)) % y_n
-  a(3) = vert(ver(2)) % z_n - vert(ver(1)) % z_n
+  a(1) = Vert(ver(2)) % x_n - Vert(ver(1)) % x_n
+  a(2) = Vert(ver(2)) % y_n - Vert(ver(1)) % y_n
+  a(3) = Vert(ver(2)) % z_n - Vert(ver(1)) % z_n
 
-  b(1) = vert(ver(3)) % x_n - vert(ver(1)) % x_n
-  b(2) = vert(ver(3)) % y_n - vert(ver(1)) % y_n
-  b(3) = vert(ver(3)) % z_n - vert(ver(1)) % z_n
+  b(1) = Vert(ver(3)) % x_n - Vert(ver(1)) % x_n
+  b(2) = Vert(ver(3)) % y_n - Vert(ver(1)) % y_n
+  b(3) = Vert(ver(3)) % z_n - Vert(ver(1)) % z_n
 
   tri_p = Math_Mod_Cross_Product(a, b)
 

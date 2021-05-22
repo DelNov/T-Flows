@@ -20,7 +20,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Field_Type),  pointer :: Flow
-  type(Vert_Type),   pointer :: vert(:)
+  type(Vert_Type),   pointer :: Vert(:)
   type(Elem_Type),   pointer :: elem(:)
   type(Matrix_Type), pointer :: A
   integer,           pointer :: nv, ne
@@ -42,7 +42,7 @@
   Flow => Front % pnt_flow
   nv   => Front % n_verts
   ne   => Front % n_elems
-  vert => Front % vert
+  Vert => Front % Vert
   elem => Front % elem
   A    => Sol % A
   nb   =  Grid % n_bnd_cells
@@ -158,9 +158,9 @@
         w2 = 1.0 - w1
 
         ! All vertices have to be stored
-        vert(nv) % x_n = xn1*w1 + xn2*w2
-        vert(nv) % y_n = yn1*w1 + yn2*w2
-        vert(nv) % z_n = zn1*w1 + zn2*w2
+        Vert(nv) % x_n = xn1*w1 + xn2*w2
+        Vert(nv) % y_n = yn1*w1 + yn2*w2
+        Vert(nv) % z_n = zn1*w1 + zn2*w2
 
       end if
 

@@ -99,12 +99,12 @@
                 if(j_ver > Front % elem(e) % nv) j_ver = 1
                 i = Front % elem(e) % v(i_ver)
                 j = Front % elem(e) % v(j_ver)
-                vec_i(1) = Front % vert(i) % x_n - xs
-                vec_i(2) = Front % vert(i) % y_n - ys
-                vec_i(3) = Front % vert(i) % z_n - zs
-                vec_j(1) = Front % vert(j) % x_n - xs
-                vec_j(2) = Front % vert(j) % y_n - ys
-                vec_j(3) = Front % vert(j) % z_n - zs
+                vec_i(1) = Front % Vert(i) % x_n - xs
+                vec_i(2) = Front % Vert(i) % y_n - ys
+                vec_i(3) = Front % Vert(i) % z_n - zs
+                vec_j(1) = Front % Vert(j) % x_n - xs
+                vec_j(2) = Front % Vert(j) % y_n - ys
+                vec_j(3) = Front % Vert(j) % z_n - zs
                 vec_ixj = Math_Mod_Cross_Product(vec_i, vec_j)
                 if( dot_product(vec_ixj(1:3), (/lx,ly,lz/)) < 0.0 ) goto 1
               end do  ! i_ver

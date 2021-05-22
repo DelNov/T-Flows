@@ -15,6 +15,10 @@ $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
 
 #-- ./Vert_Mod.f90
+$(DIR_OBJECT)/Vert_Mod.o:\
+$(DIR_OBJECT)/Point_Mod.o \
+Point_Mod/*.f90 
+
 #-- ./Logo_Pro.f90
 #-- ./Compute_Scalar.f90
 $(DIR_OBJECT)/Compute_Scalar.o:\
@@ -91,13 +95,33 @@ $(DIR_OBJECT)/Surf_Mod.o \
 Surf_Mod/*.f90 \
 Front_Mod/readme \
 $(DIR_OBJECT)/Front_Mod.o \
+Front_Mod/Find_Connectivity_Old.F \
 Front_Mod/*.f90 
+
+#-- ./Point_Mod.f90
+$(DIR_OBJECT)/Point_Mod.o:\
+Point_Mod/*.f90 \
+$(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
+$(DIR_SHARED)/Save_Grid_Mod/*/*.f90 \
+$(DIR_SHARED)/Save_Grid_Mod_Cgns.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-- ./Swarm_Mod.f90
 $(DIR_OBJECT)/Swarm_Mod.o:\
 $(DIR_OBJECT)/Turb_Mod.o \
 Turb_Mod/*.f90 \
-Swarm_Mod/*.f90 
+Swarm_Mod/*.f90 \
+$(DIR_OBJECT)/Particle_Mod.o \
+Particle_Mod/*.f90 
+
+#-- ./Particle_Mod.f90
+$(DIR_OBJECT)/Particle_Mod.o:\
+$(DIR_OBJECT)/Point_Mod.o \
+Point_Mod/*.f90 \
+Particle_Mod/*.f90 \
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*/*.f90 
 
 #-- ./Solver_Mod.f90
 $(DIR_OBJECT)/Solver_Mod.o:\
@@ -147,6 +171,7 @@ $(DIR_OBJECT)/Pressure_Correction.o:\
 $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 
 
+#-- ./Vof_Mod/Utilities/Mass_Transfer_Added_Volume.f90
 #-- ./Vof_Mod/Utilities/Mass_Transfer_Pressure_Source.f90
 #-- ./Vof_Mod/Utilities/Mass_Transfer_Vof_Source.f90
 #-- ./Vof_Mod/Utilities/Grad_Variable_With_Jump.f90
@@ -155,7 +180,6 @@ $(DIR_SHARED)/Work_Mod/*.f90
 #-- ./Vof_Mod/Core/Discretize.f90
 #-- ./Vof_Mod/Core/Max_Courant_Number.f90
 #-- ./Vof_Mod/Core/Find_Upstream_Phi.f90
-#-- ./Vof_Mod/Core/Mass_Transfer_Added_Volume.f90
 #-- ./Vof_Mod/Core/Main_Vof.f90
 #-- ./Vof_Mod/Core/Solve_System.f90
 #-- ./Vof_Mod/Core/Compute_Vof.f90
@@ -260,6 +284,7 @@ $(DIR_OBJECT)/Compute_Pressure.o:\
 $(DIR_OBJECT)/User_Mod.o \
 User_Mod/*.f90 
 
+#-- ./Particle_Mod/Initialize_Particle.f90
 #-- ./Vector_Mod.f90
 $(DIR_OBJECT)/Vector_Mod.o:\
 Vector_Mod/*.f90 \
@@ -317,22 +342,24 @@ $(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_OBJECT)/Vert_Mod.o \
 $(DIR_OBJECT)/Side_Mod.o \
 Front_Mod/readme \
+Front_Mod/Find_Connectivity_Old.F \
 Front_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
 Field_Mod/*/*.f90 \
-$(DIR_OBJECT)/Elem_Mod.o 
+$(DIR_OBJECT)/Elem_Mod.o \
+$(DIR_OBJECT)/Cpu_Timer_Mod.o \
+$(DIR_SHARED)/Cpu_Timer_Mod/*.f90 
 
 #-- ./Surf_Mod.f90
 $(DIR_OBJECT)/Surf_Mod.o:\
 $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 \
-$(DIR_OBJECT)/Vert_Mod.o \
 Surf_Mod/readme \
 Surf_Mod/*.f90 \
-$(DIR_OBJECT)/Side_Mod.o \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*/*.f90 \
-$(DIR_OBJECT)/Elem_Mod.o 
+Front_Mod/readme \
+$(DIR_OBJECT)/Front_Mod.o \
+Front_Mod/Find_Connectivity_Old.F \
+Front_Mod/*.f90 
 
 #-- ./Read_Control_Physical_Models.f90
 $(DIR_OBJECT)/Read_Control_Physical_Models.o:\
@@ -411,9 +438,7 @@ Numerics_Mod/*.f90
 
 #-- ./Swarm_Mod/Sgs_Discrete_Random_Walk.f90
 #-- ./Swarm_Mod/Move_Particle.f90
-#-- ./Swarm_Mod/Find_Nearest_Cell.f90
 #-- ./Swarm_Mod/Particle_Time_Scale.f90
-#-- ./Swarm_Mod/Find_Nearest_Node.f90
 #-- ./Swarm_Mod/Sgs_Fukagata.f90
 #-- ./Swarm_Mod/Grad_Modeled_Flow.f90
 #-- ./Swarm_Mod/Calculate_Mean.f90
@@ -580,6 +605,7 @@ User_Mod/*.f90
 #-- ./User_Mod/Save_Results.f90
 #-- ./User_Mod/End_Of_Compute_Scalar.f90
 #-- ./User_Mod/Initialize_Variables.f90
+#-- ./User_Mod/End_Of_Compute_Vof.f90
 #-- ./User_Mod/End_Of_Compute_Momentum.f90
 #-- ./User_Mod/Beginning_Of_Time_Step.f90
 #-- ./User_Mod/Beginning_Of_Compute_Energy.f90
@@ -599,6 +625,7 @@ User_Mod/*.f90
 #-- ./User_Mod/End_Of_Correct_Velocity.f90
 #-- ./User_Mod/Types.f90
 #-- ./User_Mod/End_Of_Iteration.f90
+#-- ./User_Mod/Beginning_Of_Compute_Vof.f90
 #-- ./User_Mod/End_Of_Compute_Energy.f90
 #-- ./User_Mod/Insert_Particles.f90
 #-- ./Results_Mod_Vtu.f90
@@ -615,6 +642,9 @@ Results_Mod_Cgns.f90 \
 $(DIR_OBJECT)/Backup_Mod.o \
 Backup_Mod/*.f90 
 
+#-- ./Point_Mod/Find_Nearest_Cell.f90
+#-- ./Point_Mod/Find_Nearest_Node.f90
+#-- ./Point_Mod/Initialize_Point.f90
 #-- ./Face_Mod.f90
 $(DIR_OBJECT)/Face_Mod.o:\
 $(DIR_SHARED)/Save_Grid_Mod_Vtu.f90 \
@@ -675,42 +705,28 @@ $(DIR_OBJECT)/User_Mod.o \
 User_Mod/*.f90 \
 Backup_Mod/*.f90 
 
-#-- ./Surf_Mod/Handle_4_Points.f90
 #-- ./Surf_Mod/Relax_Topology.f90
 #-- ./Surf_Mod/Split_Element.f90
-#-- ./Surf_Mod/Compress_Vertices.f90
-#-- ./Surf_Mod/Find_Nearest_Cell.f90
 #-- ./Surf_Mod/Refine.f90
 #-- ./Surf_Mod/Calculate_Element_Centroids.f90
 #-- ./Surf_Mod/Find_Boundaries.f90
-#-- ./Surf_Mod/Count_Vertex_Elements.f90
 #-- ./Surf_Mod/Calculate_Curvatures_From_Verts.f90
-#-- ./Surf_Mod/Find_Nearest_Node.f90
 #-- ./Surf_Mod/Place_At_Var_Value.f90
 $(DIR_OBJECT)/Place_At_Var_Value.o:\
 $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 
 
-#-- ./Surf_Mod/Handle_5_Points.f90
 #-- ./Surf_Mod/Clean.f90
 #-- ./Surf_Mod/Relax_Geometry.f90
 #-- ./Surf_Mod/Find_Sides.f90
 #-- ./Surf_Mod/Smooth.f90
-#-- ./Surf_Mod/Compute_Distance_Function_And_Vof.f90
-$(DIR_OBJECT)/Compute_Distance_Function_And_Vof.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 
-
 #-- ./Surf_Mod/Calculate_Element_Normals.f90
 #-- ./Surf_Mod/Swap_Side.f90
-#-- ./Surf_Mod/Find_Vertex_Elements.f90
-#-- ./Surf_Mod/Print_Statistics.f90
-#-- ./Surf_Mod/Handle_3_Points.f90
+#-- ./Surf_Mod/Print_Surf_Statistics.f90
+#-- ./Surf_Mod/Allocate_Surf.f90
+#-- ./Surf_Mod/Find_Surf_Elements.f90
 #-- ./Surf_Mod/Calculate_Curvatures_From_Edges.f90
 #-- ./Surf_Mod/Calculate_Curvatures_From_Elems.f90
-#-- ./Surf_Mod/Allocate.f90
-#-- ./Surf_Mod/Handle_6_Points.f90
-#-- ./Surf_Mod/Count_Elements_Neighbours.f90
 #-- ./Surf_Mod/Edge_Numbering.f90
 #-- ./Compute_Momentum_Explicit.f90
 $(DIR_OBJECT)/Compute_Momentum_Explicit.o:\
@@ -934,29 +950,28 @@ Backup_Mod/*.f90
 #-- ./Front_Mod/Handle_4_Points.f90
 #-- ./Front_Mod/Compress_Vertices.f90
 #-- ./Front_Mod/Mark_Cells_And_Faces.f90
-#-- ./Front_Mod/Find_Nearest_Cell.f90
 #-- ./Front_Mod/Calculate_Element_Centroids.f90
+#-- ./Front_Mod/Check_Elements.f90
 #-- ./Front_Mod/Initialize.f90
-#-- ./Front_Mod/Find_Nearest_Node.f90
 #-- ./Front_Mod/Place_At_Var_Value.f90
 $(DIR_OBJECT)/Place_At_Var_Value.o:\
 $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 
 
 #-- ./Front_Mod/Handle_5_Points.f90
-#-- ./Front_Mod/Find_Connectivity.f90
 #-- ./Front_Mod/Save.f90
 #-- ./Front_Mod/Clean.f90
+#-- ./Front_Mod/Find_Sides.f90
 #-- ./Front_Mod/Compute_Distance_Function_And_Vof.f90
 $(DIR_OBJECT)/Compute_Distance_Function_And_Vof.o:\
 $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 
 
 #-- ./Front_Mod/Calculate_Element_Normals.f90
+#-- ./Front_Mod/Find_Front_Elements.f90
 #-- ./Front_Mod/Find_Vertex_Elements.f90
+#-- ./Front_Mod/Allocate_Front.f90
 #-- ./Front_Mod/Handle_3_Points.f90
-#-- ./Front_Mod/Calculate_Curvatures_From_Elems.f90
-#-- ./Front_Mod/Allocate.f90
 #-- ./Front_Mod/Handle_6_Points.f90
 #-- ./Front_Mod/Edge_Numbering.f90
 #-- ./Front_Mod/Print_Front_Statistics.f90
@@ -1105,6 +1120,7 @@ $(DIR_SHARED)/File_Mod/*.f90
 #-- ./Control_Mod/Physics/Number_Of_Particles.f90
 #-- ./Control_Mod/Physics/Pressure_Drops.f90
 #-- ./Control_Mod/Physics/Smagorinsky_Constant.f90
+#-- ./Control_Mod/Physics/Track_Surface.f90
 #-- ./Control_Mod/Physics/Mass_Flow_Rates.f90
 #-- ./Control_Mod/Physics/Number_Of_Scalars.f90
 #-- ./Control_Mod/Physics/Mass_Density.f90
@@ -1540,8 +1556,8 @@ $(DIR_SHARED)/Math_Mod/*.f90
 #-- ./File_Mod/Read_Binary_Real4_Array.f90
 #-- ./File_Mod/Delete.f90
 #-- ./File_Mod/Read_Binary_Real8_Array.f90
-#-- ./File_Mod/Open_File_For_Writing.f90
-#-- ./File_Mod/Open_File_For_Reading.f90
+#-- ./File_Mod/Open_File_For_Writing_Ascii.f90
+#-- ./File_Mod/Open_File_For_Reading_Ascii.f90
 #-- ./File_Mod/Is_File_In_Unix_Format.f90
 #-- ./File_Mod/Set_Name.f90
 #-- ./Swap_Short.f90

@@ -8,7 +8,7 @@
   class(Surf_Type), target :: Surf
   integer                  :: e
 !-----------------------------------[Locals]-----------------------------------!
-  type(Vert_Type), pointer :: vert(:)
+  type(Vert_Type), pointer :: Vert(:)
   type(Side_Type), pointer :: side(:)
   type(Elem_Type), pointer :: elem(:)
   integer,         pointer :: nv, ns, ne
@@ -21,7 +21,7 @@
   nv   => Surf % n_verts
   ns   => Surf % n_sides
   ne   => Surf % n_elems
-  vert => Surf % vert
+  Vert => Surf % Vert
   side => Surf % side
   elem => Surf % elem
 
@@ -41,9 +41,9 @@
   !   Create new vertex in the element's center   !
   !-----------------------------------------------!
   nv = nv + 1
-  vert(nv) % x_n = (vert(i) % x_n + vert(j) % x_n + vert(k) % x_n) * ONE_THIRD
-  vert(nv) % y_n = (vert(i) % y_n + vert(j) % y_n + vert(k) % y_n) * ONE_THIRD
-  vert(nv) % z_n = (vert(i) % z_n + vert(j) % z_n + vert(k) % z_n) * ONE_THIRD
+  Vert(nv) % x_n = (Vert(i) % x_n + Vert(j) % x_n + Vert(k) % x_n) * ONE_THIRD
+  Vert(nv) % y_n = (Vert(i) % y_n + Vert(j) % y_n + Vert(k) % y_n) * ONE_THIRD
+  Vert(nv) % z_n = (Vert(i) % z_n + Vert(j) % z_n + Vert(k) % z_n) * ONE_THIRD
 
   ! Define a few handy constants
   s_in = ns + 1
@@ -176,10 +176,10 @@
 ! if(side(sk) % eb .eq. e_ijn) side(sk) % b = nv
 
 !  ! One could think of this, but it's probably not needed
-!  vert(i)  % nne = vert(i) % nne + 1
-!  vert(j)  % nne = vert(j) % nne + 1
-!  vert(k)  % nne = vert(k) % nne + 1
-!  vert(nv) % nne = 3
+!  Vert(i)  % nne = Vert(i) % nne + 1
+!  Vert(j)  % nne = Vert(j) % nne + 1
+!  Vert(k)  % nne = Vert(k) % nne + 1
+!  Vert(nv) % nne = 3
 
   !--------------!
   !   Checking   !

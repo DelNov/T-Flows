@@ -10,7 +10,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: Grid
   type(Comm_Type),     pointer :: Comm
-  type(Particle_Type), pointer :: part
+  type(Particle_Type), pointer :: Part
   integer                      :: i, k
 !==============================================================================!
 
@@ -36,27 +36,27 @@
   do k = 1, swr % n_particles
 
     ! Take aliases for the particle
-    part => swr % particle(k)
+    Part => swr % Particle(k)
 
-    if(part % proc .eq. this_proc) then
+    if(Part % proc .eq. this_proc) then
       i = (k-1) * swr % N_I_VARS
-      swr % i_work(i + 1) = part % proc  ! where it resides
-      swr % i_work(i + 2) = part % buff  ! where it wants to go
-      swr % i_work(i + 3) = Grid % comm % cell_glo(part % cell)
+      swr % i_work(i + 1) = Part % proc  ! where it resides
+      swr % i_work(i + 2) = Part % buff  ! where it wants to go
+      swr % i_work(i + 3) = Grid % comm % cell_glo(Part % cell)
 
       i = (k-1) * swr % N_L_VARS
-      swr % l_work(i + 1) = part % deposited
-      swr % l_work(i + 2) = part % escaped
+      swr % l_work(i + 1) = Part % deposited
+      swr % l_work(i + 2) = Part % escaped
 
       i = (k-1) * swr % N_R_VARS
-      swr % r_work(i + 1) = part % x_n
-      swr % r_work(i + 2) = part % y_n
-      swr % r_work(i + 3) = part % z_n
-      swr % r_work(i + 4) = part % u
-      swr % r_work(i + 5) = part % v
-      swr % r_work(i + 6) = part % w
-      swr % r_work(i + 7) = part % d
-      swr % r_work(i + 8) = part % cfl
+      swr % r_work(i + 1) = Part % x_n
+      swr % r_work(i + 2) = Part % y_n
+      swr % r_work(i + 3) = Part % z_n
+      swr % r_work(i + 4) = Part % u
+      swr % r_work(i + 5) = Part % v
+      swr % r_work(i + 6) = Part % w
+      swr % r_work(i + 7) = Part % d
+      swr % r_work(i + 8) = Part % cfl
     end if  ! particle on this processor
   end do
 

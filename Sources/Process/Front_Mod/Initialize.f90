@@ -42,36 +42,36 @@
   !-----------------------------!
   do v = 1, MAX_SURFACE_VERTICES
 
-    Front % vert(v) % nne = 0
+    Front % Vert(v) % nne = 0
 
     ! Set initial velocity to zero
-    Front % vert(v) % u_n = 0.0
-    Front % vert(v) % v_n = 0.0
-    Front % vert(v) % w_n = 0.0
+    Front % Vert(v) % u_n = 0.0
+    Front % Vert(v) % v_n = 0.0
+    Front % Vert(v) % w_n = 0.0
 
     ! Set initial coordinates to zero
-    Front % vert(v) % x_n = 0.0
-    Front % vert(v) % y_n = 0.0
-    Front % vert(v) % z_n = 0.0
+    Front % Vert(v) % x_n = 0.0
+    Front % Vert(v) % y_n = 0.0
+    Front % Vert(v) % z_n = 0.0
 
-    Front % vert(v) % x_o = 0.0
-    Front % vert(v) % y_o = 0.0
-    Front % vert(v) % z_o = 0.0
+    Front % Vert(v) % x_o = 0.0
+    Front % Vert(v) % y_o = 0.0
+    Front % Vert(v) % z_o = 0.0
 
     ! Set initial cell, node and boundary cell to zero
-    Front % vert(v) % cell     = 0
-    Front % vert(v) % node     = 0
-    Front % vert(v) % bnd_cell = 0
-    Front % vert(v) % bnd_face = 0
+    Front % Vert(v) % cell     = 0
+    Front % Vert(v) % node     = 0
+    Front % Vert(v) % bnd_cell = 0
+    Front % Vert(v) % bnd_face = 0
 
     ! Assume vertex is in the domain
     ! (A smarter way could be worked out, depending ...
     ! ... on the result of the call to Find_Nearest_Cell)
-    Front % vert(v) % escaped   = .false.
+    Front % Vert(v) % escaped   = .false.
 
     ! Is vertex in this processor?
-    Front % vert(v) % proc = 0
-    Front % vert(v) % buff = 0
+    Front % Vert(v) % proc = 0
+    Front % Vert(v) % buff = 0
 
   end do
   Front % n_verts = 0

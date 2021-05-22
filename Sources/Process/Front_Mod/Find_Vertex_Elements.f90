@@ -5,7 +5,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Front_Type), target :: Front
 !-----------------------------------[Locals]-----------------------------------!
-  type(Vert_Type), pointer :: vert(:)
+  type(Vert_Type), pointer :: Vert(:)
   type(Elem_Type), pointer :: elem(:)
   integer,         pointer :: nv, ne
   integer                  :: e, v, i_ver
@@ -14,20 +14,20 @@
   ! Take aliases
   nv   => Front % n_verts
   ne   => Front % n_elems
-  vert => Front % vert
+  Vert => Front % Vert
   elem => Front % elem
 
   ! Initialize to zero
   do v = 1, nv
-    vert(v) % nne  = 0
-    vert(v) % e(:) = 0
+    Vert(v) % nne  = 0
+    Vert(v) % e(:) = 0
   end do
 
   ! Store elements around each vertex (no checking!)
   do e = 1, ne
     do i_ver = 1, elem(e) % nv
       v = elem(e) % v(i_ver)
-      vert(v) % nne = vert(v) % nne + 1;  vert(v) % e(vert(v) % nne) = e
+      Vert(v) % nne = Vert(v) % nne + 1;  Vert(v) % e(Vert(v) % nne) = e
     end do
   end do
 

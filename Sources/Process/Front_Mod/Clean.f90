@@ -17,7 +17,7 @@
   !-----------------------------!
   !   Deallocate all vertices   !
   !-----------------------------!
-  deallocate(Front % vert)
+  deallocate(Front % Vert)
   Front % n_verts = 0
 
   !-----------------------------!

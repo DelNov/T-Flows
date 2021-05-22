@@ -7,8 +7,8 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Swarm_Type), target :: swarm
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),     pointer :: grid
-  type(Particle_Type), pointer :: part
+  type(Grid_Type),     pointer :: Grid
+  type(Particle_Type), pointer :: Part
   integer                      :: k, c, n_dep, n_ref, n_esc
   real                         :: avg_cfl, avg_re, avg_st
   real                         :: max_cfl, max_re, max_st
@@ -18,7 +18,7 @@
 !==============================================================================!
 
   ! Take aliases for the swarm
-  grid => swarm % pnt_grid
+  Grid => swarm % pnt_grid
 
   !----------------------------------------------!
   !   Sum and average data over all processors   !
@@ -30,14 +30,14 @@
   max_re  = -HUGE
   max_st  = -HUGE
   do k = 1, swarm % n_particles
-    part => swarm % particle(k)
-    if(part % proc .eq. this_proc) then
-      avg_cfl = avg_cfl + part % cfl
-      avg_re  = avg_re  + part % re
-      avg_st  = avg_st  + part % st
-      max_cfl = max(max_cfl, part % cfl)
-      max_re  = max(max_re,  part % re)
-      max_st  = max(max_st,  part % st)
+    Part => swarm % particle(k)
+    if(Part % proc .eq. this_proc) then
+      avg_cfl = avg_cfl + Part % cfl
+      avg_re  = avg_re  + Part % re
+      avg_st  = avg_st  + Part % st
+      max_cfl = max(max_cfl, Part % cfl)
+      max_re  = max(max_re,  Part % re)
+      max_st  = max(max_st,  Part % st)
     end if
   end do
   call Comm_Mod_Global_Sum_Real(avg_cfl)
@@ -53,8 +53,8 @@
   n_dep = 0
   n_esc = 0
   n_ref = 0
-  do c = -grid % n_bnd_cells, -1
-    if(grid % comm % cell_proc(c) .eq. this_proc) then  ! avoid buffer cells
+  do c = -Grid % n_bnd_cells, -1
+    if(Grid % comm % cell_proc(c) .eq. this_proc) then  ! avoid buffer cells
       n_dep = n_dep + nint(swarm % n_deposited(c))
       n_esc = n_esc + nint(swarm % n_escaped(c))
       n_ref = n_ref + nint(swarm % n_reflected(c))

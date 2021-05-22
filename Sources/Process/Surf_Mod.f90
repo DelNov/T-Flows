@@ -32,8 +32,8 @@
       procedure :: Calculate_Curvatures_From_Verts
       procedure :: Find_Boundaries
       procedure :: Find_Surf_Elements
-      procedure :: Find_Nearest_Cell
-      procedure :: Find_Nearest_Node
+!     procedure :: Find__Nearest__Cell
+!     procedure :: Find__Nearest__Node
       procedure :: Print_Surf_Statistics
       procedure :: Refine
       procedure :: Relax_Geometry
@@ -60,8 +60,6 @@
   include 'Surf_Mod/Calculate_Curvatures_From_Verts.f90'
   include 'Surf_Mod/Find_Boundaries.f90'
   include 'Surf_Mod/Find_Surf_Elements.f90'
-  include 'Surf_Mod/Find_Nearest_Cell.f90'
-  include 'Surf_Mod/Find_Nearest_Node.f90'
   include 'Surf_Mod/Place_At_Var_Value.f90'
   include 'Surf_Mod/Print_Surf_Statistics.f90'
   include 'Surf_Mod/Refine.f90'

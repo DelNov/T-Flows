@@ -13,7 +13,7 @@
   real, dimension(4,4)  :: a
   real, dimension(4)    :: b
   real, dimension(4)    :: phi
-  integer, dimension(4) :: vert
+  integer, dimension(4) :: Vert
   integer               :: i, j, k, e, c, s
   logical               :: invertible
   real                  :: x, y, z, x2, y2, z2, xy, xz, yz, rho
@@ -30,18 +30,18 @@
   Surf % elem(1:Surf % n_elems) % zc   = 0.0
 
   do s = 1, Surf % n_sides
-    vert(1) = Surf % side(s) % a
-    vert(2) = Surf % side(s) % b
-    vert(3) = Surf % side(s) % c
-    vert(4) = Surf % side(s) % d
+    Vert(1) = Surf % side(s) % a
+    Vert(2) = Surf % side(s) % b
+    Vert(3) = Surf % side(s) % c
+    Vert(4) = Surf % side(s) % d
     a(:,:) = 0
     b(:)   = 0
 
     do i = 1, 4
 
-      x = Surf % vert(vert(i)) % x_n
-      y = Surf % vert(vert(i)) % y_n
-      z = Surf % vert(vert(i)) % z_n
+      x = Surf % Vert(Vert(i)) % x_n
+      y = Surf % Vert(Vert(i)) % y_n
+      z = Surf % Vert(Vert(i)) % z_n
 
       x2 = x * x;  y2 = y * y;  z2 = z * z
       xy = x * y;  xz = x * z;  yz = y * z
@@ -110,18 +110,18 @@
   !-------------------------------------------------------------------!
   !   Interpolate normals at nodes from values in surrounding elems   !
   !-------------------------------------------------------------------!
-  Surf % vert(1:Surf % n_verts) % curv = 0.
+  Surf % Vert(1:Surf % n_verts) % curv = 0.
   do e = 1, Surf % n_elems
 
     i = Surf % elem(e) % v(1)
     j = Surf % elem(e) % v(2)
     k = Surf % elem(e) % v(3)
-    Surf % vert(i) % curv = Surf % vert(i) % curv  &
-                          + Surf % elem(e) % curv / real(Surf % vert(i) % nne)
-    Surf % vert(j) % curv = Surf % vert(j) % curv  &
-                          + Surf % elem(e) % curv / real(Surf % vert(j) % nne)
-    Surf % vert(k) % curv = Surf % vert(k) % curv  &
-                          + Surf % elem(e) % curv / real(Surf % vert(k) % nne)
+    Surf % Vert(i) % curv = Surf % Vert(i) % curv  &
+                          + Surf % elem(e) % curv / real(Surf % Vert(i) % nne)
+    Surf % Vert(j) % curv = Surf % Vert(j) % curv  &
+                          + Surf % elem(e) % curv / real(Surf % Vert(j) % nne)
+    Surf % Vert(k) % curv = Surf % Vert(k) % curv  &
+                          + Surf % elem(e) % curv / real(Surf % Vert(k) % nne)
   end do
 
   end subroutine

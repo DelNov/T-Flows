@@ -8,7 +8,7 @@
   class(Front_Type), target :: Front
   logical                   :: verbose
 !-----------------------------------[Locals]-----------------------------------!
-  type(Vert_Type), pointer :: vert(:)
+  type(Vert_Type), pointer :: Vert(:)
   type(Elem_Type), pointer :: elem(:)
   integer,         pointer :: nv, ne
   integer                  :: e, v, n_vert, i_ver, j_ver, nv_tot
@@ -19,7 +19,7 @@
   ! Take aliases
   nv   => Front % n_verts
   ne   => Front % n_elems
-  vert => Front % vert
+  Vert => Front % Vert
   elem => Front % elem
 
   ! Check sanity of the elements so far
@@ -43,9 +43,9 @@
     allocate(new_n(nv));  new_n = 0
 
     do v = 1, nv
-      xv(v) = vert(v) % x_n
-      yv(v) = vert(v) % y_n
-      zv(v) = vert(v) % z_n
+      xv(v) = Vert(v) % x_n
+      yv(v) = Vert(v) % y_n
+      zv(v) = Vert(v) % z_n
       ni(v) = v
     end do
     call Sort % Three_Real_Carry_Int(xv, yv, zv, ni)
@@ -83,9 +83,9 @@
   !   Copy compressed vertex coordinates   !
   !----------------------------------------!
   do v = 1, nv
-    vert(new_n(v)) % x_n = xv(v)
-    vert(new_n(v)) % y_n = yv(v)
-    vert(new_n(v)) % z_n = zv(v)
+    Vert(new_n(v)) % x_n = xv(v)
+    Vert(new_n(v)) % y_n = yv(v)
+    Vert(new_n(v)) % z_n = zv(v)
   end do
 
   !--------------------------------!

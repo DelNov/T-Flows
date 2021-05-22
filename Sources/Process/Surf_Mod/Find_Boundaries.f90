@@ -7,7 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Surf_Type), target :: Surf
 !-----------------------------------[Locals]-----------------------------------!
-  type(Vert_Type), pointer :: vert(:)
+  type(Vert_Type), pointer :: Vert(:)
   type(Side_Type), pointer :: side(:)
   type(Elem_Type), pointer :: elem(:)
   integer,         pointer :: nv, ns, ne
@@ -18,7 +18,7 @@
   nv   => Surf % n_verts
   ns   => Surf % n_sides
   ne   => Surf % n_elems
-  vert => Surf % vert
+  Vert => Surf % Vert
   side => Surf % side
   elem => Surf % elem
 
@@ -29,11 +29,11 @@
   end do
 
   ! Then spread this information to vertices
-  vert(1:nv) % boundary = .false.
+  Vert(1:nv) % boundary = .false.
   do s = 1, ns
     if(side(s) % boundary) then
-      vert(side(s) % c) % boundary = .true.
-      vert(side(s) % d) % boundary = .true.
+      Vert(side(s) % c) % boundary = .true.
+      Vert(side(s) % d) % boundary = .true.
     end if
   end do
 

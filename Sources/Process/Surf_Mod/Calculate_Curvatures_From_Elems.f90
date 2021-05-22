@@ -24,29 +24,29 @@
 !==============================================================================!
 
   ! Work out number of vertices around each vertex
-  Surf % vert(1:Surf % n_verts) % nnv = 0
+  Surf % Vert(1:Surf % n_verts) % nnv = 0
   do s = 1, Surf % n_sides
     c = Surf % side(s) % c
     d = Surf % side(s) % d
-    Surf % vert(c) % nnv = Surf % vert(c) % nnv + 1
-    Surf % vert(d) % nnv = Surf % vert(d) % nnv + 1
+    Surf % Vert(c) % nnv = Surf % Vert(c) % nnv + 1
+    Surf % Vert(d) % nnv = Surf % Vert(d) % nnv + 1
   end do
 
-  max_nnv = maxval(Surf % vert(1:Surf % n_verts) % nnv)
+  max_nnv = maxval(Surf % Vert(1:Surf % n_verts) % nnv)
 
   ! Form vert_v structure
   allocate( vert_v(max_nnv, Surf % n_verts) );  vert_v = 0
 
-  Surf % vert(1:Surf % n_verts) % nnv = 0
+  Surf % Vert(1:Surf % n_verts) % nnv = 0
   do s = 1, Surf % n_sides
     c = Surf % side(s) % c
     d = Surf % side(s) % d
 
-    Surf % vert(c) % nnv = Surf % vert(c) % nnv + 1
-    vert_v(Surf % vert(c) % nnv, c) = d
+    Surf % Vert(c) % nnv = Surf % Vert(c) % nnv + 1
+    vert_v(Surf % Vert(c) % nnv, c) = d
 
-    Surf % vert(d) % nnv = Surf % vert(d) % nnv + 1
-    vert_v(Surf % vert(d) % nnv, d) = c
+    Surf % Vert(d) % nnv = Surf % Vert(d) % nnv + 1
+    vert_v(Surf % Vert(d) % nnv, d) = c
   end do
 
   ! Work out (maximum) number of vertices around each element
@@ -55,7 +55,7 @@
   do e = 1, Surf % n_elems
     do i_ver = 1, Surf % elem(e) % nv
       v = Surf % elem(e) % v(i_ver)
-      elem_n_verts(e) = elem_n_verts(e) + Surf % vert(v) % nnv
+      elem_n_verts(e) = elem_n_verts(e) + Surf % Vert(v) % nnv
     end do
   end do
 
@@ -67,7 +67,7 @@
   do e = 1, Surf % n_elems
     do i_ver = 1, Surf % elem(e) % nv
       v = Surf % elem(e) % v(i_ver)
-      do j_ver = 1, Surf % vert(v) % nnv
+      do j_ver = 1, Surf % Vert(v) % nnv
         elem_n_verts(e) = elem_n_verts(e) + 1;
         elem_v(elem_n_verts(e), e) = vert_v(j_ver, v)
       end do
@@ -96,9 +96,9 @@
 
     do k = 1, elem_n_verts(e)
 
-      x = Surf % vert( elem_v(k,e) ) % x_n
-      y = Surf % vert( elem_v(k,e) ) % y_n
-      z = Surf % vert( elem_v(k,e) ) % z_n
+      x = Surf % Vert( elem_v(k,e) ) % x_n
+      y = Surf % Vert( elem_v(k,e) ) % y_n
+      z = Surf % Vert( elem_v(k,e) ) % z_n
 
       x2 = x * x;  y2 = y * y;  z2 = z * z
       xy = x * y;  xz = x * z;  yz = y * z
@@ -154,13 +154,13 @@
   !-------------------------------------------------------------------!
   !   Interpolate normals at nodes from values in surrounding elems   !
   !-------------------------------------------------------------------!
-  Surf % vert(1:Surf % n_verts) % curv = 0.
+  Surf % Vert(1:Surf % n_verts) % curv = 0.
   do e = 1, Surf % n_elems
 
     do i_ver = 1, Surf % elem(e) % nv
       v = Surf % elem(e) % v(i_ver)
-      Surf % vert(v) % curv = Surf % vert(v) % curv  &
-                      + Surf % elem(e) % curv/real(Surf % vert(v) % nne)
+      Surf % Vert(v) % curv = Surf % Vert(v) % curv  &
+                      + Surf % elem(e) % curv/real(Surf % Vert(v) % nne)
     end do
   end do
 

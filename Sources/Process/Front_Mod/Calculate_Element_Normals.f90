@@ -8,7 +8,7 @@
   class(Front_Type), target :: Front
   type(Var_Type),    target :: phi
 !-----------------------------------[Locals]-----------------------------------!
-  type(Vert_Type), pointer :: vert(:)
+  type(Vert_Type), pointer :: Vert(:)
   type(Elem_Type), pointer :: elem(:)
   integer,         pointer :: nv, ne
   integer                  :: c, e, j, v1, v2, i_ver
@@ -19,7 +19,7 @@
   ! Take aliases
   nv   => Front % n_verts
   ne   => Front % n_elems
-  vert => Front % vert
+  Vert => Front % Vert
   elem => Front % elem
 
   !---------------------------------!
@@ -41,13 +41,13 @@
         v2 = elem(e) % v(1)
       end if
 
-      a(1) = vert(v1) % x_n - elem(e) % xe
-      a(2) = vert(v1) % y_n - elem(e) % ye
-      a(3) = vert(v1) % z_n - elem(e) % ze
+      a(1) = Vert(v1) % x_n - elem(e) % xe
+      a(2) = Vert(v1) % y_n - elem(e) % ye
+      a(3) = Vert(v1) % z_n - elem(e) % ze
 
-      b(1) = vert(v2) % x_n - elem(e) % xe
-      b(2) = vert(v2) % y_n - elem(e) % ye
-      b(3) = vert(v2) % z_n - elem(e) % ze
+      b(1) = Vert(v2) % x_n - elem(e) % xe
+      b(2) = Vert(v2) % y_n - elem(e) % ye
+      b(3) = Vert(v2) % z_n - elem(e) % ze
 
       tri_v = Math_Mod_Cross_Product(a, b)
 
@@ -70,7 +70,7 @@
     do j = 1, 3
 
       ! Take the closest cell
-      c = vert(elem(e) % v(j)) % cell
+      c = Vert(elem(e) % v(j)) % cell
 
       ! Surface vector
       surf_v(1) = phi % x(c)

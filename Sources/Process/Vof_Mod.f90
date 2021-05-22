@@ -168,4 +168,10 @@
   include 'Vof_Mod/Utilities/Surface_Tension_Force.f90'
   include 'Vof_Mod/Utilities/Update_Physical_Properties.f90'
 
+  !------------------------------------!
+  !   User functions for this module   !
+  !------------------------------------!
+  include 'User_Mod/Beginning_Of_Compute_Vof.f90'
+  include 'User_Mod/End_Of_Compute_Vof.f90'
+
   end module

@@ -7,7 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Front_Type), target :: Front
 !-----------------------------------[Locals]-----------------------------------!
-  type(Vert_Type), pointer :: vert(:)
+  type(Vert_Type), pointer :: Vert(:)
   type(Elem_Type), pointer :: elem(:)
   integer,         pointer :: ne
   integer                  :: e, i_ver
@@ -15,7 +15,7 @@
 
   ! Take aliases
   ne   => Front % n_elems
-  vert => Front % vert
+  Vert => Front % Vert
   elem => Front % elem
 
   !---------------------------------!
@@ -28,9 +28,9 @@
     elem(e) % ze = 0.0
 
     do i_ver = 1, elem(e) % nv
-      elem(e) % xe = elem(e) % xe + vert(elem(e) % v(i_ver)) % x_n
-      elem(e) % ye = elem(e) % ye + vert(elem(e) % v(i_ver)) % y_n
-      elem(e) % ze = elem(e) % ze + vert(elem(e) % v(i_ver)) % z_n
+      elem(e) % xe = elem(e) % xe + Vert(elem(e) % v(i_ver)) % x_n
+      elem(e) % ye = elem(e) % ye + Vert(elem(e) % v(i_ver)) % y_n
+      elem(e) % ze = elem(e) % ze + Vert(elem(e) % v(i_ver)) % z_n
     end do
 
     elem(e) % xe = elem(e) % xe / real(elem(e) % nv)

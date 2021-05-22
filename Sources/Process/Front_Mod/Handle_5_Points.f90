@@ -9,7 +9,7 @@
   real                      :: surf_v(3)
   logical                   :: enforce_triangles
 !-----------------------------------[Locals]-----------------------------------!
-  type(Vert_Type), pointer :: vert(:)
+  type(Vert_Type), pointer :: Vert(:)
   type(Elem_Type), pointer :: elem(:)
   integer,         pointer :: nv, ne
   integer                  :: ver(5), loop
@@ -21,7 +21,7 @@
   ! Take aliases
   nv   => Front % n_verts
   ne   => Front % n_elems
-  vert => Front % vert
+  Vert => Front % Vert
   elem => Front % elem
 
   permutations = reshape((/ &
@@ -62,21 +62,21 @@
     ver(4) = nv - permutations(4, loop)
     ver(5) = nv - permutations(5, loop)
 
-    v_21(1) = vert(ver(2)) % x_n - vert(ver(1)) % x_n
-    v_21(2) = vert(ver(2)) % y_n - vert(ver(1)) % y_n
-    v_21(3) = vert(ver(2)) % z_n - vert(ver(1)) % z_n
+    v_21(1) = Vert(ver(2)) % x_n - Vert(ver(1)) % x_n
+    v_21(2) = Vert(ver(2)) % y_n - Vert(ver(1)) % y_n
+    v_21(3) = Vert(ver(2)) % z_n - Vert(ver(1)) % z_n
 
-    v_31(1) = vert(ver(3)) % x_n - vert(ver(1)) % x_n
-    v_31(2) = vert(ver(3)) % y_n - vert(ver(1)) % y_n
-    v_31(3) = vert(ver(3)) % z_n - vert(ver(1)) % z_n
+    v_31(1) = Vert(ver(3)) % x_n - Vert(ver(1)) % x_n
+    v_31(2) = Vert(ver(3)) % y_n - Vert(ver(1)) % y_n
+    v_31(3) = Vert(ver(3)) % z_n - Vert(ver(1)) % z_n
 
-    v_41(1) = vert(ver(4)) % x_n - vert(ver(1)) % x_n
-    v_41(2) = vert(ver(4)) % y_n - vert(ver(1)) % y_n
-    v_41(3) = vert(ver(4)) % z_n - vert(ver(1)) % z_n
+    v_41(1) = Vert(ver(4)) % x_n - Vert(ver(1)) % x_n
+    v_41(2) = Vert(ver(4)) % y_n - Vert(ver(1)) % y_n
+    v_41(3) = Vert(ver(4)) % z_n - Vert(ver(1)) % z_n
 
-    v_51(1) = vert(ver(5)) % x_n - vert(ver(1)) % x_n
-    v_51(2) = vert(ver(5)) % y_n - vert(ver(1)) % y_n
-    v_51(3) = vert(ver(5)) % z_n - vert(ver(1)) % z_n
+    v_51(1) = Vert(ver(5)) % x_n - Vert(ver(1)) % x_n
+    v_51(2) = Vert(ver(5)) % y_n - Vert(ver(1)) % y_n
+    v_51(3) = Vert(ver(5)) % z_n - Vert(ver(1)) % z_n
 
     tri_p_123 = Math_Mod_Cross_Product(v_21, v_31)
     tri_p_134 = Math_Mod_Cross_Product(v_31, v_41)

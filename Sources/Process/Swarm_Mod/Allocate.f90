@@ -1,26 +1,26 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Allocate(swarm, flow, turb)
+  subroutine Swarm_Mod_Allocate(swarm, Flow, turb)
 !------------------------------------------------------------------------------!
-!   Allocates memory to store the charge of each particle                      !
+!   Allocates memory to store the charge of each Particle                      !
 !   It assumes that the number of particles was read from the control file     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Swarm_Type), target :: swarm
-  type(Field_Type), target :: flow
+  type(Field_Type), target :: Flow
   type(Turb_Type),  target :: turb
 !----------------------------------[Locals]------------------------------------!
   integer :: k, nb, nc
 !==============================================================================!
 
-  ! Take aliases to object particle flow around
-  swarm % pnt_flow => flow
-  swarm % pnt_grid => flow % pnt_grid
+  ! Take aliases to object Particle Flow around
+  swarm % pnt_flow => Flow
+  swarm % pnt_grid => Flow % pnt_grid
   swarm % pnt_turb => turb
 
   ! Allocate memory for all of them
   if(swarm % n_particles > 0) then
-    allocate(swarm % particle(swarm % n_particles))
+    allocate(swarm % Particle(swarm % n_particles))
   end if
 
   ! Allocate logical array if cell holds particles
@@ -36,50 +36,8 @@
   !   Initialize all particles   !
   !------------------------------!
   do k = 1, swarm % n_particles
-
-    ! Take diameter and density from the swarm
-    swarm % particle(k) % d       = swarm % diameter
-    swarm % particle(k) % density = swarm % density
-
-    ! Set initial velocity to zero
-    swarm % particle(k) % u = 0.0
-    swarm % particle(k) % v = 0.0
-    swarm % particle(k) % w = 0.0
-
-    ! Set relative velocities to zero (DRW model)
-    swarm % particle(k) % rel_u_mod = 0.0
-    swarm % particle(k) % rel_v_mod = 0.0
-    swarm % particle(k) % rel_w_mod = 0.0
-
-    ! Set DRW velocities to zero (produced by SEIM and seen by particle) 
-    swarm % particle(k) % u_drw = 0.0
-    swarm % particle(k) % v_drw = 0.0
-    swarm % particle(k) % w_drw = 0.0
-
-    ! Set initial coordinates to zero
-    swarm % particle(k) % x_n = 0.0
-    swarm % particle(k) % y_n = 0.0
-    swarm % particle(k) % z_n = 0.0
-
-    swarm % particle(k) % x_o = 0.0
-    swarm % particle(k) % y_o = 0.0
-    swarm % particle(k) % z_o = 0.0
-
-    ! Set initial cell, node and boundary cell to zero
-    swarm % particle(k) % cell     = 0
-    swarm % particle(k) % node     = 0
-    swarm % particle(k) % bnd_cell = 0
-
-    ! Assume particle is in the domain
-    ! (A smarter way could be worked out, depending ...
-    ! ... on the result of the call to Find_Nearest_Cell)
-    swarm % particle(k) % deposited = .false.
-    swarm % particle(k) % escaped   = .false.
-
-    ! Set some processor number to particle
-    swarm % particle(k) % proc = min(1, n_proc)
-    swarm % particle(k) % buff = min(1, n_proc)
-
+    call swarm % Particle(k) % Initialize_Particle(Flow, swarm % diameter,  &
+                                                         swarm % density)
   end do
 
   ! Aliases for cell-based variables
@@ -116,7 +74,7 @@
   allocate(swarm % f_fuka_y(-nb:nc));  swarm % f_fuka_y(:) = 0.
   allocate(swarm % f_fuka_z(-nb:nc));  swarm % f_fuka_z(:) = 0.
 
-  ! Allocate variables for the modeled flow quantity "v^2"
+  ! Allocate variables for the modeled Flow quantity "v^2"
   allocate(swarm % v2_mod  (-nb:nc));  swarm % v2_mod(:)   = 0.
   allocate(swarm % v2_mod_x(-nb:nc));  swarm % v2_mod_x(:) = 0.
   allocate(swarm % v2_mod_y(-nb:nc));  swarm % v2_mod_y(:) = 0.

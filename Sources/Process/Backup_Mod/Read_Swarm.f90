@@ -43,11 +43,11 @@
                    'particle_real_data',                 &
                     swr % r_work(1 : swr % N_R_VARS*swr % n_particles))
 
-    ! Pack particle data in arrays
+    ! Pack Particle data in arrays
     do k = 1, swr % n_particles
 
-      ! Take aliases for the particle
-      part => swr % particle(k)
+      ! Take aliases for the Particle
+      part => swr % Particle(k)
 
       i = (k-1) * swr % N_I_VARS
       part % proc = swr % i_work(i + 1)
@@ -73,12 +73,12 @@
 
   n_parts_in_buffers = 0
   do k = 1, swr % n_particles
-    swr % particle(k) % cell = 0
-    swr % particle(k) % node = 0
-    swr % particle(k) % proc = 0
-    swr % particle(k) % buff = 0
-    call Swarm_Mod_Find_Nearest_Cell(swr, k, n_parts_in_buffers)
-    call Swarm_Mod_Find_Nearest_Node(swr, k)
+    swr % Particle(k) % cell = 0
+    swr % Particle(k) % node = 0
+    swr % Particle(k) % proc = 0
+    swr % Particle(k) % buff = 0
+    call swr % Particle(k) % Find_Nearest_Cell(n_parts_in_buffers)
+    call swr % Particle(k) % Find_Nearest_Node()
   end do
 
   end subroutine

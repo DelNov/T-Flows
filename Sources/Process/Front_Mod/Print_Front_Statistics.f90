@@ -5,7 +5,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Front_Type),  target :: Front
 !-----------------------------------[Locals]-----------------------------------!
-  type(Vert_Type), pointer :: vert(:)
+  type(Vert_Type), pointer :: Vert(:)
   type(Elem_Type), pointer :: elem(:)
   type(Side_Type), pointer :: side(:)
   integer,         pointer :: nv, ns, ne
@@ -25,7 +25,7 @@
   nv   => Front % n_verts
   ns   => Front % n_sides
   ne   => Front % n_elems
-  vert => Front % vert
+  Vert => Front % Vert
   side => Front % side
   elem => Front % elem
 
@@ -39,8 +39,8 @@
     c = side(s) % c
     d = side(s) % d
     side(s) % length = Math_Mod_Distance(                 &
-            vert(c) % x_n, vert(c) % y_n, vert(c) % z_n,  &
-            vert(d) % x_n, vert(d) % y_n, vert(d) % z_n)
+            Vert(c) % x_n, Vert(c) % y_n, Vert(c) % z_n,  &
+            Vert(d) % x_n, Vert(d) % y_n, Vert(d) % z_n)
   end do
 
   !------------------------------!
@@ -72,13 +72,13 @@
   !--------------------------------!
   !   Count number of neighbours   !
   !--------------------------------!
-  nne_s = minval(vert(1:nv) % nne)
-  nne_e = maxval(vert(1:nv) % nne)
+  nne_s = minval(Vert(1:nv) % nne)
+  nne_e = maxval(Vert(1:nv) % nne)
   call Comm_Mod_Global_Min_Int(nne_s)
   call Comm_Mod_Global_Max_Int(nne_e)
   allocate(nne(nne_s:nne_e)); nne = 0.0
   do v = 1, nv
-    nne(vert(v) % nne) = nne(vert(v) % nne) + 1.0
+    nne(Vert(v) % nne) = nne(Vert(v) % nne) + 1.0
   end do
   do item = nne_s, nne_e
     call Comm_Mod_Global_Sum_Real(nne(item))

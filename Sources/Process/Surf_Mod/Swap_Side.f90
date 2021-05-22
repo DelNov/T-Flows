@@ -12,13 +12,13 @@
   integer                  :: a, b, c, d, ea, eb
   integer                  :: eac, ead, ebc, ebd
   integer                  :: sad, sac, sbc, sbd
-  type(Vert_Type), pointer :: vert(:)
+  type(Vert_Type), pointer :: Vert(:)
   type(Elem_Type), pointer :: elem(:)
   type(Side_Type), pointer :: side(:)
 !==============================================================================!
 
   ! Take aliases
-  vert => Surf % vert
+  Vert => Surf % Vert
   elem => Surf % elem
   side => Surf % side
 

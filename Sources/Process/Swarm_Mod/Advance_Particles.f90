@@ -13,7 +13,7 @@
   type(Grid_Type),     pointer :: grid
   type(Field_Type),    pointer :: flow
   type(Turb_Type),     pointer :: turb
-  type(Particle_Type), pointer :: part
+  type(Particle_Type), pointer :: Part
   logical,             pointer :: escaped
   logical,             pointer :: deposited
   integer                      :: k                   ! particle number
@@ -56,10 +56,10 @@
   !   (important for bouncing from the walls)   !
   !---------------------------------------------!
   do k = 1, swarm % n_particles
-    part => swarm % particle(k)
-    part % x_o = part % x_n
-    part % y_o = part % y_n
-    part % z_o = part % z_n
+    Part => swarm % Particle(k)
+    Part % x_o = Part % x_n
+    Part % y_o = Part % y_n
+    Part % z_o = Part % z_n
   end do
 
   !----------------------------------!
@@ -74,9 +74,9 @@
     do k = 1, swarm % n_particles
 
       ! Take aliases for the particle
-      part      => swarm % particle(k)
-      escaped   => part  % escaped
-      deposited => part  % deposited
+      Part      => swarm % Particle(k)
+      escaped   => Part  % escaped
+      deposited => Part  % deposited
 
       !--------------------------------------------------!
       !   If particle is neither deposited nor escaped   !
@@ -84,7 +84,7 @@
       if(.not. deposited .and. .not. escaped) then
 
         ! If particle is in this processor, carry on with it
-        if(part % proc .eq. this_proc) then
+        if(Part % proc .eq. this_proc) then
 
           ! Compute velocity at the particle, and move it
           ! (also calls Bounce_Particle)
@@ -99,11 +99,11 @@
 
           ! Calling the nearest cell subroutine to find the ...
           ! ... nearest cell for each particle and stores it
-          call Swarm_Mod_Find_Nearest_Cell(swarm, k, n_parts_in_buffers)
+          call Part % Find_Nearest_Cell(n_parts_in_buffers)
 
           ! Calling the nearest node subroutine to find the ...
           ! ... nearest node for each particle and stores it
-          call Swarm_Mod_Find_Nearest_Node(swarm, k)
+          call Part % Find_Nearest_Node()
 
           ! First check if it didn't escape through periodicity
           call Swarm_Mod_Check_Periodicity(swarm, k, n_parts_in_buffers)

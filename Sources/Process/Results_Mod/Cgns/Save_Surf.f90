@@ -142,7 +142,7 @@
     call Write_Surf_Field_In_Nodes(base, block, solution, field, surf, &
                                    n_array, 'Index')
 
-    n_array = real(surf % vert(1:surf % n_verts) % nne)
+    n_array = real(surf % Vert(1:surf % n_verts) % nne)
     call Write_Surf_Field_In_Nodes(base, block, solution, field, surf, &
                                    n_array, 'NeighboursN')
 
@@ -216,11 +216,11 @@
   ! Fetch received parameters
   select case (coord)
     case (1)
-      coordinates = surf % vert(1:surf % n_verts) % x_n
+      coordinates = surf % Vert(1:surf % n_verts) % x_n
     case (2)
-      coordinates = surf % vert(1:surf % n_verts) % y_n
+      coordinates = surf % Vert(1:surf % n_verts) % y_n
     case (3)
-      coordinates = surf % vert(1:surf % n_verts) % z_n
+      coordinates = surf % Vert(1:surf % n_verts) % z_n
   end select
 
   ! Write grid coordinates

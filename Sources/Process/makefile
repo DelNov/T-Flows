@@ -221,7 +221,8 @@ SRC_MOD += Cpu_Timer_Mod.f90      \
            Metis_Options_Mod.f90
 
 # Sources for modules in the local directory
-SRC_MOD += Bulk_Mod.f90        \
+SRC_MOD += Point_Mod.f90       \
+           Bulk_Mod.f90        \
            Var_Mod.f90         \
            Face_Mod.f90        \
            Vert_Mod.f90        \
@@ -238,6 +239,7 @@ SRC_MOD += Bulk_Mod.f90        \
            Eddies_Mod.f90      \
            Monitor_Mod.f90     \
            Turb_Mod.f90        \
+           Particle_Mod.f90    \
            Swarm_Mod.f90       \
            Surf_Mod.f90        \
            Vof_Mod.f90

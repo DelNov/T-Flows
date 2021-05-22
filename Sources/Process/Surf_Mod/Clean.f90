@@ -25,7 +25,7 @@
   !-----------------------------!
   !   Deallocate all vertices   !
   !-----------------------------!
-  deallocate(Surf % vert)
+  deallocate(Surf % Vert)
   Surf % n_verts = 0
 
   !-----------------------------!

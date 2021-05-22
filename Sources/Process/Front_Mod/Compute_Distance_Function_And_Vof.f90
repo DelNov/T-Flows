@@ -38,7 +38,7 @@
   do v = 1, nv
 
     ! Take nearest cell
-    d = Front % vert(v) % cell  ! nearest cell
+    d = Front % Vert(v) % cell  ! nearest cell
 
     ! Make a list of nodes surrounding the nearest cell
     n_cnt = 0  ! initialize node count
@@ -68,8 +68,8 @@
     call Sort % Unique_Int(cell_list(1:c_cnt), c_cnt)
 
     ! Match first and second neighbour cells with all elements around the node
-    do i_ele = 1, Front % vert(v) % nne
-      e  = Front % vert(v) % e(i_ele)
+    do i_ele = 1, Front % Vert(v) % nne
+      e  = Front % Vert(v) % e(i_ele)
 
       ! Center of the sphere
       xs = Front % elem(e) % xc

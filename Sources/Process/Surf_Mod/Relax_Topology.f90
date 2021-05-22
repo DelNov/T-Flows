@@ -5,7 +5,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Surf_Type), target :: Surf
 !-----------------------------------[Locals]-----------------------------------!
-  type(Vert_Type), pointer :: vert(:)
+  type(Vert_Type), pointer :: Vert(:)
   type(Side_Type), pointer :: side(:)
   type(Elem_Type), pointer :: elem(:)
   integer,         pointer :: nv, ns, ne
@@ -16,7 +16,7 @@
   nv   => Surf % n_verts
   ns   => Surf % n_sides
   ne   => Surf % n_elems
-  vert => Surf % vert
+  Vert => Surf % Vert
   side => Surf % side
   elem => Surf % elem
 
@@ -36,14 +36,14 @@
 
         if( .not. side(s) % boundary ) then
 
-          e = vert(c) % nne + vert(d) % nne  &
-            - vert(a) % nne - vert(b) % nne
+          e = Vert(c) % nne + Vert(d) % nne  &
+            - Vert(a) % nne - Vert(b) % nne
 
           if(e .eq. t) then
-            vert(a) % nne = vert(a) % nne + 1
-            vert(b) % nne = vert(b) % nne + 1
-            vert(c) % nne = vert(c) % nne - 1
-            vert(d) % nne = vert(d) % nne - 1
+            Vert(a) % nne = Vert(a) % nne + 1
+            Vert(b) % nne = Vert(b) % nne + 1
+            Vert(c) % nne = Vert(c) % nne - 1
+            Vert(d) % nne = Vert(d) % nne - 1
             call Surf % Swap_Side(s)
           end if
 

@@ -3,18 +3,21 @@
 !------------------------------------------------------------------------------!
 !   Storage for Vert_Type used by Front_Mod and Surf_mod                       !
 !------------------------------------------------------------------------------!
+!----------------------------------[Modules]-----------------------------------!
+  use Point_Mod
+!------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
 
   !---------------!
   !   Vert type   !
   !---------------!
-  type Vert_Type
+  type, extends(Point_Type) :: Vert_Type
 
-    ! Vertex's coordinates; new and old
-    real :: x_n, x_o
-    real :: y_n, y_o
-    real :: z_n, z_o
+    ! Old vertex's coordinates; new is in the parent
+    real :: x_o
+    real :: y_o
+    real :: z_o
 
     ! Vertex's new velocity (if ever needed)
     real :: u_n
@@ -29,17 +32,10 @@
     integer :: e(24)     ! list of elements around the vertex
 
     ! The closest cell, node, boundary cell and face
-    integer :: cell
-    integer :: node
-    integer :: bnd_cell
     integer :: bnd_face
 
     ! Vertex departure from domain 
     logical :: escaped
-
-    ! Vertex inside the subdomain
-    integer :: proc
-    integer :: buff
 
     ! Curvature at the vertex
     real :: curv

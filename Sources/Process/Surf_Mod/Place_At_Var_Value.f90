@@ -20,7 +20,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Field_Type),  pointer :: Flow
-  type(Vert_Type),   pointer :: vert(:)
+  type(Vert_Type),   pointer :: Vert(:)
   type(Elem_Type),   pointer :: elem(:)
   type(Matrix_Type), pointer :: A
   integer,           pointer :: nv, ne
@@ -39,7 +39,7 @@
   Flow => Surf % pnt_flow
   nv   => Surf % n_verts
   ne   => Surf % n_elems
-  vert => Surf % vert
+  Vert => Surf % Vert
   elem => Surf % elem
   A    => Sol % A
   nb   =  Grid % n_bnd_cells
@@ -129,9 +129,9 @@
         w2 = 1.0 - w1
 
         ! All vertices have to be stored
-        vert(nv) % x_n = xn1*w1 + xn2*w2
-        vert(nv) % y_n = yn1*w1 + yn2*w2
-        vert(nv) % z_n = zn1*w1 + zn2*w2
+        Vert(nv) % x_n = xn1*w1 + xn2*w2
+        Vert(nv) % y_n = yn1*w1 + yn2*w2
+        Vert(nv) % z_n = zn1*w1 + zn2*w2
 
       end if
 
@@ -185,8 +185,8 @@
   !--------------------------------!
   n_verts_in_buffers = 0
   do v = 1, nv
-    call Surf % Find_Nearest_Cell(v, n_verts_in_buffers)
-    call Surf % Find_Nearest_Node(v)
+    call Surf % Vert(v) % Find_Nearest_Cell(n_verts_in_buffers)
+    call Surf % Vert(v) % Find_Nearest_Node()
   end do
 
   !-------------------------------!
@@ -203,17 +203,17 @@
 
   ! From this point ...
   do v = 1, nv
-    dist = norm2( (/Surf % vert(v) % x_n,  &
-                    Surf % vert(v) % y_n,  &
-                    Surf % vert(v) % z_n/) )
-    Surf % vert(v) % x_n = Surf % vert(v) % x_n * 0.25 / dist
-    Surf % vert(v) % y_n = Surf % vert(v) % y_n * 0.25 / dist
-    Surf % vert(v) % z_n = Surf % vert(v) % z_n * 0.25 / dist
+    dist = norm2( (/Surf % Vert(v) % x_n,  &
+                    Surf % Vert(v) % y_n,  &
+                    Surf % Vert(v) % z_n/) )
+    Surf % Vert(v) % x_n = Surf % Vert(v) % x_n * 0.25 / dist
+    Surf % Vert(v) % y_n = Surf % Vert(v) % y_n * 0.25 / dist
+    Surf % Vert(v) % z_n = Surf % Vert(v) % z_n * 0.25 / dist
   end do
   n_verts_in_buffers = 0
   do v = 1, nv
-    call Surf % Find_Nearest_Cell(v, n_verts_in_buffers)
-    call Surf % Find_Nearest_Node(v)
+    call Surf % Vert(v) % Find_Nearest_Cell(n_verts_in_buffers)
+    call Surf % Vert(v) % Find_Nearest_Node()
   end do
   ! ... down to here is just for development
 

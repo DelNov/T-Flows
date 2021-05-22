@@ -8,7 +8,7 @@
   class(Surf_Type), target :: Surf
   integer                  :: n_biggest  ! number of biggest elements for ref.
 !-----------------------------------[Locals]-----------------------------------!
-  type(Vert_Type), pointer :: vert(:)
+  type(Vert_Type), pointer :: Vert(:)
   type(Elem_Type), pointer :: elem(:)
   integer,         pointer :: nv, ne
   real,    allocatable     :: areas(:)
@@ -19,7 +19,7 @@
   ! Take aliases
   nv   => Surf % n_verts
   ne   => Surf % n_elems
-  vert => Surf % vert
+  Vert => Surf % Vert
   elem => Surf % elem
 
   allocate(areas(ne));  areas(:) = 0.0

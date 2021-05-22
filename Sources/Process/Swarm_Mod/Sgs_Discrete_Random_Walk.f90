@@ -12,10 +12,10 @@
   real                     :: ry
   real                     :: rz
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type),    pointer :: flow
-  type(Grid_Type),     pointer :: grid
+  type(Field_Type),    pointer :: Flow
+  type(Grid_Type),     pointer :: Grid
   type(Turb_Type),     pointer :: turb
-  type(Particle_Type), pointer :: part
+  type(Particle_Type), pointer :: Part
   integer,             pointer :: time
   integer :: c                          ! nearest cell
   logical :: flag1, flag2, flag3        ! flags for sigma
@@ -34,12 +34,12 @@
   real    :: tau_p_x, tau_p_y, tau_p_z  ! particle time scale
 !==============================================================================!
 
-  ! Take aliases for flow
-  flow => swarm % pnt_flow
-  grid => swarm % pnt_grid
+  ! Take aliases for Flow
+  Flow => swarm % pnt_flow
+  Grid => swarm % pnt_grid
   turb => swarm % pnt_turb
   time => swarm % time_eim
-  part => swarm % particle(k)
+  Part => swarm % particle(k)
 
   ! Model constants
   c_o   = 3.0  ! calibration constant taken as the same value for k-w model
@@ -55,14 +55,14 @@
   t_c_z = 0.0
 
   ! Characteristic velocity and density
-  visc_const = maxval(flow % viscosity(:))
-  dens_const = maxval(flow % density(:))
+  visc_const = maxval(Flow % viscosity(:))
+  dens_const = maxval(Flow % density(:))
 
   ! Nearest cell center to particle
-  c = part % cell
+  c = Part % cell
 
   ! Particle relaxation time (in this swarm)
-  ! this needs to be calculated for the grid once/ts and not for all
+  ! this needs to be calculated for the Grid once/ts and not for all
   ! ...particles
   swarm % tau = swarm % density * (swarm % diameter **2) / 18.0 / visc_const
 
@@ -90,31 +90,31 @@
   l_e_z = t_e_z * sqrt(TWO_THIRDS * abs(turb % kin % z(c) * rz))
 
   ! Compute drag coefficient
-  if (part % re .ge. 1000.0) then
+  if (Part % re .ge. 1000.0) then
     cd = 0.43
   else
-    cd = 24.0 / part % re * (part % f)
+    cd = 24.0 / Part % re * (Part % f)
   end if
 
   ! Particle time scale
   tau_p_x = (4.0 * swarm % density * swarm % diameter)      &
-          / (3.0 * dens_const * part % rel_u_mod * cd)
+          / (3.0 * dens_const * Part % rel_u_mod * cd)
   tau_p_y = (4.0 * swarm % density * swarm % diameter)      &
-          / (3.0 * dens_const * part % rel_v_mod * cd)
+          / (3.0 * dens_const * Part % rel_v_mod * cd)
   tau_p_z = (4.0 * swarm % density * swarm % diameter)      &
-          / (3.0 * dens_const * part % rel_w_mod * cd)
+          / (3.0 * dens_const * Part % rel_w_mod * cd)
 
-  l1 = tau_p_x * part % rel_u_mod
-  l2 = tau_p_y * part % rel_v_mod
-  l3 = tau_p_z * part % rel_w_mod
+  l1 = tau_p_x * Part % rel_u_mod
+  l2 = tau_p_y * Part % rel_v_mod
+  l3 = tau_p_z * Part % rel_w_mod
 
   ! Eddy crossing time for a particle
   if(l_e_x .lt. l1) then
-    t_c_x = - tau_p_x * log(1.0-(l_e_x/part % rel_u_mod/tau_p_x))
+    t_c_x = - tau_p_x * log(1.0-(l_e_x/Part % rel_u_mod/tau_p_x))
   else if(l_e_y .lt. l2) then
-    t_c_y = - tau_p_y * log(1.0-(l_e_y/part % rel_v_mod/tau_p_y))
+    t_c_y = - tau_p_y * log(1.0-(l_e_y/Part % rel_v_mod/tau_p_y))
   else if(l_e_z .lt. l3) then
-    t_c_z = - tau_p_z * log(1.0-(l_e_z/part % rel_w_mod/tau_p_z))
+    t_c_z = - tau_p_z * log(1.0-(l_e_z/Part % rel_w_mod/tau_p_z))
   end if
 
   ! Random number interval (for varying sigma)
@@ -136,7 +136,7 @@
 
   ! This can be done in a diff. way ((current_ts - backup_ts) * dt)
   ! Flow time (to check the condition of sigma)
-  time = time * flow % dt
+  time = time * Flow % dt
 
   ! Gaussian random numbers with zero mean and unit std. deviation ...
   ! .. Box-Muller Wiener algorithm was used for this distribution
@@ -168,8 +168,8 @@
   end if
 
   ! EIM contribution for the modeled turbulent quantitis
-  part % u_drw = sqrt(TWO_THIRDS * abs(turb % kin % x(c) * rx)) * sigma1
-  part % v_drw = sqrt(TWO_THIRDS * abs(turb % kin % y(c) * ry)) * sigma2
-  part % w_drw = sqrt(TWO_THIRDS * abs(turb % kin % z(c) * rz)) * sigma3
+  Part % u_drw = sqrt(TWO_THIRDS * abs(turb % kin % x(c) * rx)) * sigma1
+  Part % v_drw = sqrt(TWO_THIRDS * abs(turb % kin % y(c) * ry)) * sigma2
+  Part % w_drw = sqrt(TWO_THIRDS * abs(turb % kin % z(c) * rz)) * sigma3
 
   end subroutine

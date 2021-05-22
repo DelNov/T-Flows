@@ -8,7 +8,7 @@
   type(Surf_Type), target :: surf
   integer                 :: time_step
 !----------------------------------[Locals]------------------------------------!
-  type(Vert_Type), pointer :: vert
+  type(Vert_Type), pointer :: Vert
   integer                  :: v, e     ! vertex and element counters
   integer                  :: offset, fu
   character(SL)            :: name_out
@@ -61,9 +61,9 @@
     write(fu,'(a,a)') IN_4, '<DataArray type="Float64" NumberOfComponents' //  &
                             '="3" format="ascii">'
     do v = 1, surf % n_verts
-      vert => surf % vert(v)
+      Vert => surf % Vert(v)
       write(fu, '(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')                &
-                  IN_5, vert % x_n, vert % y_n, vert % z_n
+                  IN_5, Vert % x_n, Vert % y_n, Vert % z_n
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
     write(fu,'(a,a)') IN_3, '</Points>'
@@ -91,7 +91,7 @@
     write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="Neighbours" ' // &
                             'format="ascii">'
     do v = 1, surf % n_verts
-      write(fu,'(a,i9)') IN_5, surf % vert(v) % nne
+      write(fu,'(a,i9)') IN_5, surf % Vert(v) % nne
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
 
@@ -101,8 +101,8 @@
     write(fu,'(a,a)') IN_4, '<DataArray type="Float64" Name="NodeCurv" ' // &
                            ' format="ascii">'
     do v = 1, surf % n_verts
-      vert => surf % vert(v)
-      write(fu,'(a,1pe16.6e4)') IN_5, vert % curv
+      Vert => surf % Vert(v)
+      write(fu,'(a,1pe16.6e4)') IN_5, Vert % curv
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
 

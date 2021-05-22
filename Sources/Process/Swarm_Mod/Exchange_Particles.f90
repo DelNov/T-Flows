@@ -9,7 +9,7 @@
   integer                      :: k      ! particle number
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: Grid
-  type(Particle_Type), pointer :: part
+  type(Particle_Type), pointer :: Part
   integer                      :: i, c, n
 !==============================================================================!
 
@@ -29,33 +29,33 @@
     do k = 1, swarm % n_particles
 
       ! Take aliases for the particle
-      part => swarm % particle(k)
+      Part => swarm % particle(k)
 
       !-----------------------------------------------------!
       !   Pack data for sending (all processors which ...   !
       !   ... send will put data in this globall pool)      !
       !-----------------------------------------------------!
-      if(part % proc .eq. this_proc) then
+      if(Part % proc .eq. this_proc) then
         i = (k-1) * swarm % N_I_VARS
-        swarm % i_work(i + 1) = part % proc  ! where it resides
-        swarm % i_work(i + 2) = part % buff  ! where it wants to go
-        swarm % i_work(i + 3) = part % cell
-        swarm % i_work(i + 4) = part % node
-        swarm % i_work(i + 5) = Grid % comm % cell_glo(part % cell)
-        swarm % i_work(i + 6) = Grid % comm % node_glo(part % node)
+        swarm % i_work(i + 1) = Part % proc  ! where it resides
+        swarm % i_work(i + 2) = Part % buff  ! where it wants to go
+        swarm % i_work(i + 3) = Part % cell
+        swarm % i_work(i + 4) = Part % node
+        swarm % i_work(i + 5) = Grid % comm % cell_glo(Part % cell)
+        swarm % i_work(i + 6) = Grid % comm % node_glo(Part % node)
 
         i = (k-1) * swarm % N_R_VARS
-        swarm % r_work(i +  1) = part % x_n
-        swarm % r_work(i +  2) = part % y_n
-        swarm % r_work(i +  3) = part % z_n
-        swarm % r_work(i +  4) = part % x_o
-        swarm % r_work(i +  5) = part % y_o
-        swarm % r_work(i +  6) = part % z_o
-        swarm % r_work(i +  7) = part % u
-        swarm % r_work(i +  8) = part % v
-        swarm % r_work(i +  9) = part % w
-        swarm % r_work(i + 10) = part % d
-        swarm % r_work(i + 11) = part % cfl
+        swarm % r_work(i +  1) = Part % x_n
+        swarm % r_work(i +  2) = Part % y_n
+        swarm % r_work(i +  3) = Part % z_n
+        swarm % r_work(i +  4) = Part % x_o
+        swarm % r_work(i +  5) = Part % y_o
+        swarm % r_work(i +  6) = Part % z_o
+        swarm % r_work(i +  7) = Part % u
+        swarm % r_work(i +  8) = Part % v
+        swarm % r_work(i +  9) = Part % w
+        swarm % r_work(i + 10) = Part % d
+        swarm % r_work(i + 11) = Part % cfl
       end if
 
     end do    ! through particles
@@ -76,25 +76,25 @@
     do k = 1, swarm % n_particles
 
       ! Take alias
-      part => swarm % particle(k)
+      Part => swarm % particle(k)
 
       i = (k-1) * swarm % N_I_VARS
-      part % proc = swarm % i_work(i + 1)
-      part % buff = swarm % i_work(i + 2)
-      part % cell = swarm % i_work(i + 3)
-      part % node = swarm % i_work(i + 4)
+      Part % proc = swarm % i_work(i + 1)
+      Part % buff = swarm % i_work(i + 2)
+      Part % cell = swarm % i_work(i + 3)
+      Part % node = swarm % i_work(i + 4)
 
       ! Particle was not in this processor but wants to enter here
-      if(part % proc .ne. this_proc .and.  &
-         part % buff .eq. this_proc) then
+      if(Part % proc .ne. this_proc .and.  &
+         Part % buff .eq. this_proc) then
 
         ! Set particle processor to correct value
-        part % proc = part % buff
+        Part % proc = Part % buff
 
         ! Find the closest cell ...
         do c = 1, Grid % n_cells
           if(Grid % comm % cell_glo(c) .eq. swarm % i_work(i + 5)) then
-            part % cell = c
+            Part % cell = c
             goto 1
           end if
         end do
@@ -107,7 +107,7 @@
         ! ... and the closest node.
         do n = 1, Grid % n_nodes
           if(Grid % comm % node_glo(n) .eq. swarm % i_work(i + 6)) then
-            part % node = n
+            Part % node = n
             goto 2
           end if
         end do
@@ -117,23 +117,23 @@
 
       ! Particle was not in this processor and doesn't even want to ...
       ! ... enter here or particle was in this processor but has left it
-      else if(part % buff .ne. this_proc) then
-        part % proc = part % buff
+      else if(Part % buff .ne. this_proc) then
+        Part % proc = Part % buff
       end if
 
       i = (k-1) * swarm % N_R_VARS
 
-      part % x_n = swarm % r_work(i +  1)
-      part % y_n = swarm % r_work(i +  2)
-      part % z_n = swarm % r_work(i +  3)
-      part % x_o = swarm % r_work(i +  4)
-      part % y_o = swarm % r_work(i +  5)
-      part % z_o = swarm % r_work(i +  6)
-      part % u   = swarm % r_work(i +  7)
-      part % v   = swarm % r_work(i +  8)
-      part % w   = swarm % r_work(i +  9)
-      part % d   = swarm % r_work(i + 10)
-      part % cfl = swarm % r_work(i + 11)
+      Part % x_n = swarm % r_work(i +  1)
+      Part % y_n = swarm % r_work(i +  2)
+      Part % z_n = swarm % r_work(i +  3)
+      Part % x_o = swarm % r_work(i +  4)
+      Part % y_o = swarm % r_work(i +  5)
+      Part % z_o = swarm % r_work(i +  6)
+      Part % u   = swarm % r_work(i +  7)
+      Part % v   = swarm % r_work(i +  8)
+      Part % w   = swarm % r_work(i +  9)
+      Part % d   = swarm % r_work(i + 10)
+      Part % cfl = swarm % r_work(i + 11)
     end do
 
     !-------------------------------------------------------!

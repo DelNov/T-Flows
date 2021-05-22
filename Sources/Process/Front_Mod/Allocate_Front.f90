@@ -24,7 +24,7 @@
 
   ! Allocate memory
   allocate(Front % elem(MAX_SURFACE_ELEMENTS))
-  allocate(Front % vert(MAX_SURFACE_VERTICES))
+  allocate(Front % Vert(MAX_SURFACE_VERTICES))
   allocate(Front % side(MAX_SURFACE_ELEMENTS * 3))
 
   if(Flow % mass_transfer) then

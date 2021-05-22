@@ -5,7 +5,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Surf_Type),  target :: Surf
 !-----------------------------------[Locals]-----------------------------------!
-  type(Vert_Type), pointer :: vert(:)
+  type(Vert_Type), pointer :: Vert(:)
   type(Elem_Type), pointer :: elem(:)
   type(Side_Type), pointer :: side(:)
   integer,         pointer :: nv, ns, ne
@@ -23,7 +23,7 @@
   nv   => Surf % n_verts
   ns   => Surf % n_sides
   ne   => Surf % n_elems
-  vert => Surf % vert
+  Vert => Surf % Vert
   side => Surf % side
   elem => Surf % elem
 
@@ -34,8 +34,8 @@
     c = side(s) % c
     d = side(s) % d
     side(s) % length = Math_Mod_Distance(                 &
-            vert(c) % x_n, vert(c) % y_n, vert(c) % z_n,  &
-            vert(d) % x_n, vert(d) % y_n, vert(d) % z_n)
+            Vert(c) % x_n, Vert(c) % y_n, Vert(c) % z_n,  &
+            Vert(d) % x_n, Vert(d) % y_n, Vert(d) % z_n)
   end do
 
   !-----------------------------!
@@ -45,12 +45,12 @@
     i = elem(e) % v(1)
     j = elem(e) % v(2)
     k = elem(e) % v(3)
-    a(1) = vert(j) % x_n - vert(i) % x_n
-    a(2) = vert(j) % y_n - vert(i) % y_n
-    a(3) = vert(j) % z_n - vert(i) % z_n
-    b(1) = vert(k) % x_n - vert(i) % x_n
-    b(2) = vert(k) % y_n - vert(i) % y_n
-    b(3) = vert(k) % z_n - vert(i) % z_n
+    a(1) = Vert(j) % x_n - Vert(i) % x_n
+    a(2) = Vert(j) % y_n - Vert(i) % y_n
+    a(3) = Vert(j) % z_n - Vert(i) % z_n
+    b(1) = Vert(k) % x_n - Vert(i) % x_n
+    b(2) = Vert(k) % y_n - Vert(i) % y_n
+    b(3) = Vert(k) % z_n - Vert(i) % z_n
     tri_v = Math_Mod_Cross_Product(a, b)
     elem(e) % area = sqrt(dot_product(tri_v, tri_v)) * 0.5
   end do
@@ -74,11 +74,11 @@
   !   Count number of neighbours   !
   !--------------------------------!
   call Surf % Find_Vertex_Elements()
-  nne_s = minval(vert(1:nv) % nne)
-  nne_e = maxval(vert(1:nv) % nne)
+  nne_s = minval(Vert(1:nv) % nne)
+  nne_e = maxval(Vert(1:nv) % nne)
   allocate(nne(nne_s:nne_e)); nne = 0.0
   do v = 1, nv
-    nne(vert(v) % nne) = nne(vert(v) % nne) + 1.0
+    nne(Vert(v) % nne) = nne(Vert(v) % nne) + 1.0
   end do
 
   if(this_proc < 2) then

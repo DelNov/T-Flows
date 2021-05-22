@@ -21,29 +21,29 @@
 !==============================================================================!
 
   ! Work out number of vertices around each vertex
-  Surf % vert(1:Surf % n_verts) % nnv = 0
+  Surf % Vert(1:Surf % n_verts) % nnv = 0
   do s = 1, Surf % n_sides
     c = Surf % side(s) % c
     d = Surf % side(s) % d
-    Surf % vert(c) % nnv = Surf % vert(c) % nnv + 1
-    Surf % vert(d) % nnv = Surf % vert(d) % nnv + 1
+    Surf % Vert(c) % nnv = Surf % Vert(c) % nnv + 1
+    Surf % Vert(d) % nnv = Surf % Vert(d) % nnv + 1
   end do
 
-  max_nnv = maxval(Surf % vert(1:Surf % n_verts) % nnv)
+  max_nnv = maxval(Surf % Vert(1:Surf % n_verts) % nnv)
 
   ! Form vert_v structure
   allocate( vert_v(max_nnv, Surf % n_verts) );  vert_v = 0
 
-  Surf % vert(1:Surf % n_verts) % nnv = 0
+  Surf % Vert(1:Surf % n_verts) % nnv = 0
   do s = 1, Surf % n_sides
     c = Surf % side(s) % c
     d = Surf % side(s) % d
 
-    Surf % vert(c) % nnv = Surf % vert(c) % nnv + 1
-    vert_v(Surf % vert(c) % nnv, c) = d
+    Surf % Vert(c) % nnv = Surf % Vert(c) % nnv + 1
+    vert_v(Surf % Vert(c) % nnv, c) = d
 
-    Surf % vert(d) % nnv = Surf % vert(d) % nnv + 1
-    vert_v(Surf % vert(d) % nnv, d) = c
+    Surf % Vert(d) % nnv = Surf % Vert(d) % nnv + 1
+    vert_v(Surf % Vert(d) % nnv, d) = c
   end do
 
   !----------------------------------------------!
@@ -61,11 +61,11 @@
     a(:,:) = 0
     b(:)   = 0
 
-    do k = 1, Surf % vert(v) % nnv
+    do k = 1, Surf % Vert(v) % nnv
 
-      x = Surf % vert( vert_v(k,v) ) % x_n
-      y = Surf % vert( vert_v(k,v) ) % y_n
-      z = Surf % vert( vert_v(k,v) ) % z_n
+      x = Surf % Vert( vert_v(k,v) ) % x_n
+      y = Surf % Vert( vert_v(k,v) ) % y_n
+      z = Surf % Vert( vert_v(k,v) ) % z_n
 
       x2 = x * x;  y2 = y * y;  z2 = z * z
       xy = x * y;  xz = x * z;  yz = y * z
@@ -103,13 +103,13 @@
       rho = PETA  ! some big number
     end if
 
-    Surf % vert(v) % curv = 1.0 / rho
+    Surf % Vert(v) % curv = 1.0 / rho
   end do
 
   ! Compute average curvature (for debugging)
   ! rho = 0
   ! do v = 1, Surf % n_verts
-  !   rho = rho + Surf % vert(v) % curv
+  !   rho = rho + Surf % Vert(v) % curv
   ! end do
   ! rho = rho / Surf % n_elems
   ! print *, 'average curvature = ', rho
@@ -123,9 +123,9 @@
     i = Surf % elem(e) % v(1)
     j = Surf % elem(e) % v(2)
     k = Surf % elem(e) % v(3)
-    Surf % elem(e) % curv = ONE_THIRD * (  Surf % vert(i) % curv  &
-                                         + Surf % vert(j) % curv  &
-                                         + Surf % vert(k) % curv )
+    Surf % elem(e) % curv = ONE_THIRD * (  Surf % Vert(i) % curv  &
+                                         + Surf % Vert(j) % curv  &
+                                         + Surf % Vert(k) % curv )
   end do
 
   end subroutine

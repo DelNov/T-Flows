@@ -41,39 +41,39 @@
   !-----------------------------!
   !   Initialize all vertices   !
   !-----------------------------!
-  allocate(Surf % vert(MAX_SURFACE_VERTICES))
+  allocate(Surf % Vert(MAX_SURFACE_VERTICES))
   do v = 1, MAX_SURFACE_VERTICES
 
-    Surf % vert(v) % nne = 0
+    Surf % Vert(v) % nne = 0
 
     ! Set initial velocity to zero
-    Surf % vert(v) % u_n = 0.0
-    Surf % vert(v) % v_n = 0.0
-    Surf % vert(v) % w_n = 0.0
+    Surf % Vert(v) % u_n = 0.0
+    Surf % Vert(v) % v_n = 0.0
+    Surf % Vert(v) % w_n = 0.0
 
     ! Set initial coordinates to zero
-    Surf % vert(v) % x_n = 0.0
-    Surf % vert(v) % y_n = 0.0
-    Surf % vert(v) % z_n = 0.0
+    Surf % Vert(v) % x_n = 0.0
+    Surf % Vert(v) % y_n = 0.0
+    Surf % Vert(v) % z_n = 0.0
 
-    Surf % vert(v) % x_o = 0.0
-    Surf % vert(v) % y_o = 0.0
-    Surf % vert(v) % z_o = 0.0
+    Surf % Vert(v) % x_o = 0.0
+    Surf % Vert(v) % y_o = 0.0
+    Surf % Vert(v) % z_o = 0.0
 
     ! Set initial cell, node and boundary cell to zero
-    Surf % vert(v) % cell     = 0
-    Surf % vert(v) % node     = 0
-    Surf % vert(v) % bnd_cell = 0
-    Surf % vert(v) % bnd_face = 0
+    Surf % Vert(v) % cell     = 0
+    Surf % Vert(v) % node     = 0
+    Surf % Vert(v) % bnd_cell = 0
+    Surf % Vert(v) % bnd_face = 0
 
     ! Assume vertex is in the domain
     ! (A smarter way could be worked out, depending ...
     ! ... on the result of the call to Find_Nearest_Cell)
-    Surf % vert(v) % escaped   = .false.
+    Surf % Vert(v) % escaped   = .false.
 
     ! Is vertex in this processor?
-    Surf % vert(v) % proc = 0
-    Surf % vert(v) % buff = 0
+    Surf % Vert(v) % proc = 0
+    Surf % Vert(v) % buff = 0
 
   end do
   Surf % n_verts = 0

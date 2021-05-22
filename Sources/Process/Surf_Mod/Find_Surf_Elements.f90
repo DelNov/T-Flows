@@ -8,7 +8,7 @@
   class(Surf_Type), target :: Surf
   logical                  :: verbose
 !-----------------------------------[Locals]-----------------------------------!
-  type(Vert_Type), pointer :: vert(:)
+  type(Vert_Type), pointer :: Vert(:)
   type(Side_Type), pointer :: side(:)
   type(Elem_Type), pointer :: elem(:)
   integer,         pointer :: nv, ns, ne
@@ -24,7 +24,7 @@
   nv   => Surf % n_verts
   ns   => Surf % n_sides
   ne   => Surf % n_elems
-  vert => Surf % vert
+  Vert => Surf % Vert
   side => Surf % side
   elem => Surf % elem
 

@@ -8,7 +8,7 @@
   class(Front_Type), target :: Front
   logical                   :: verbose
 !-----------------------------------[Locals]-----------------------------------!
-  type(Vert_Type), pointer :: vert(:)
+  type(Vert_Type), pointer :: Vert(:)
   type(Side_Type), pointer :: side(:)
   type(Elem_Type), pointer :: elem(:)
   integer,         pointer :: nv, ns, ne
@@ -24,7 +24,7 @@
   nv   => Front % n_verts
   ns   => Front % n_sides
   ne   => Front % n_elems
-  vert => Front % vert
+  Vert => Front % Vert
   side => Front % side
   elem => Front % elem
 

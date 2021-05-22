@@ -4,80 +4,11 @@
 !   Module for Lagrangian particle tracking                                    !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
+  use Particle_Mod
   use Turb_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
-
-  !-------------------!
-  !   Particle type   !
-  !-------------------!
-  type Particle_Type
-
-    ! Particle's coordinates; new and old
-    real :: x_n, x_o
-    real :: y_n, y_o
-    real :: z_n, z_o
-
-    ! Particle's velocity
-    real :: u
-    real :: v
-    real :: w
-
-    ! Particle's density
-    real :: density
-
-    ! Particle's diameter
-    real :: d
-
-    ! Particle relaxation time
-    real :: tau
-
-    ! The closest cell, node, boundary cell and face
-    integer :: cell
-    integer :: node
-    integer :: bnd_cell
-
-    ! Particle relative velocity components and magnitude
-    real :: rel_u
-    real :: rel_v
-    real :: rel_w
-    real :: rel_vel
-
-    ! Relative velocities (modeled flow quantity and particle's)
-    real :: rel_u_mod
-    real :: rel_v_mod
-    real :: rel_w_mod
-
-    ! Velocity fluctuations from stochastic eddy interaction (DRW model)
-    real :: u_drw
-    real :: v_drw
-    real :: w_drw
-
-    ! Particle Courant, Stokes and Reynolds numbers
-    real :: cfl
-    real :: st
-    real :: re
-
-    ! Particle drag factor (from Re_p)
-    real :: f    ! this is not to be confused with the drag coefficient
-
-    ! Particle terminal speed
-    real :: vel_t
-
-    ! Forces exerted on the particle
-    real :: fd_x, fd_y, fd_z  ! drag force
-    real :: fb_x, fb_y, fb_z  ! buoyant force
-
-    ! Particle deposition and departure from domain 
-    logical :: deposited
-    logical :: escaped
-
-    ! Particle inside the subdomain
-    integer :: proc
-    integer :: buff
-
-  end type
 
   ! Parameters describing turbulence model choice
   ! (Prime numbers starting from 20000)
@@ -94,7 +25,7 @@
     type(Turb_Type),  pointer :: pnt_turb  ! turb field for which it is defined
 
     integer                          :: n_particles = 0
-    type(Particle_Type), allocatable :: particle(:)
+    type(Particle_Type), allocatable :: Particle(:)
 
     ! Density of this swarm
     real :: density
@@ -175,8 +106,6 @@
   include 'Swarm_Mod/Calculate_Mean.f90'
   include 'Swarm_Mod/Check_Periodicity.f90'
   include 'Swarm_Mod/Exchange_Particles.f90'
-  include 'Swarm_Mod/Find_Nearest_Cell.f90'
-  include 'Swarm_Mod/Find_Nearest_Node.f90'
   include 'Swarm_Mod/Grad_Modeled_Flow.f90'
   include 'Swarm_Mod/Move_Particle.f90'
   include 'Swarm_Mod/Particle_Forces.f90'
