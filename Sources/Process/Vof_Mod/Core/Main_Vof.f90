@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Main_Vof(Vof, Flow, turb, Sol, n)
+  subroutine Main_Vof(Vof, Flow, turb, Sol, curr_dt)
 !------------------------------------------------------------------------------!
 !   Initialize inteface tracking simulations                                   !
 !------------------------------------------------------------------------------!
@@ -9,7 +9,7 @@
   type(Field_Type),    target :: Flow
   type(Turb_Type),     target :: turb
   type(Solver_Type)           :: Sol
-  integer, intent(in)         :: n     ! time step
+  integer, intent(in)         :: curr_dt     ! time step
 !==============================================================================!
 
   if(Vof % model .eq. VOLUME_OF_FLUID) then
@@ -23,7 +23,7 @@
                                             0.5,        &
                                             .true.)  ! don't print messages
       call Vof % Front % Print_Front_Statistics()
-!     call Vof % Front % Save_Front(n)
+!     call Vof % Front % Save_Front(curr_dt)
     end if
 
     !----------------------!
@@ -43,7 +43,7 @@
     !   Advance vof function (fun)   !
     !--------------------------------!
     call Update_Boundary_Values(Flow, turb, Vof, 'MULTIPHASE')
-    call Vof % Compute_Vof(Sol, Flow % dt, n)
+    call Vof % Compute_Vof(Sol, Flow % dt, curr_dt)
 
     !------------------------------------------------!
     !   Prepare smooth variant of the vof function   !

@@ -283,10 +283,8 @@
 
       ! Interface tracking
       if(Vof(d) % model .eq. VOLUME_OF_FLUID) then
-        call User_Mod_Beginning_Of_Compute_Vof(Vof(d), Sol(d), curr_dt)
         call Vof(d) % Main_Vof(Flow(d), turb(d), Sol(d), curr_dt)
         call Vof(d) % Update_Physical_Properties()
-        call User_Mod_End_Of_Compute_Vof(Vof(d), Sol(d), curr_dt)
       end if
 
       ! Lagrangian particle tracking
