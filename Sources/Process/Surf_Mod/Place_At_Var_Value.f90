@@ -160,8 +160,8 @@
 
   end do
   if(verbose) then
-    print *, '# Cummulative number of elements found: ', ne
-    print *, '# Cummulative number of vertices found: ', nv
+    print '(a40,i8)', ' # Cummulative number of elements found:', ne
+    print '(a40,i8)', ' # Cummulative number of vertices found:', nv
   end if
 
   !-----------------------!
@@ -194,33 +194,34 @@
   !   Calculate element normals   !
   !                               !
   !-------------------------------!
-  call Surf_Mod_Calculate_Element_Normals(Surf, phi)
+  call Surf % Calculate_Element_Centroids()
+  call Surf % Calculate_Element_Normals(phi)
 
   do j = 1, 3
     call Surf % Relax_Topology()
     call Surf % Smooth(phi, phi_e)
   end do
 
-  ! From this point ...
-  do v = 1, nv
-    dist = norm2( (/Surf % Vert(v) % x_n,  &
-                    Surf % Vert(v) % y_n,  &
-                    Surf % Vert(v) % z_n/) )
-    Surf % Vert(v) % x_n = Surf % Vert(v) % x_n * 0.25 / dist
-    Surf % Vert(v) % y_n = Surf % Vert(v) % y_n * 0.25 / dist
-    Surf % Vert(v) % z_n = Surf % Vert(v) % z_n * 0.25 / dist
-  end do
-  n_verts_in_buffers = 0
-  do v = 1, nv
-    call Surf % Vert(v) % Find_Nearest_Cell(n_verts_in_buffers)
-    call Surf % Vert(v) % Find_Nearest_Node()
-  end do
-  ! ... down to here is just for development
+  !-> ! From this point ...
+  !-> do v = 1, nv
+  !->   dist = norm2( (/Surf % Vert(v) % x_n,  &
+  !->                   Surf % Vert(v) % y_n,  &
+  !->                   Surf % Vert(v) % z_n/) )
+  !->   Surf % Vert(v) % x_n = Surf % Vert(v) % x_n * 0.25 / dist
+  !->   Surf % Vert(v) % y_n = Surf % Vert(v) % y_n * 0.25 / dist
+  !->   Surf % Vert(v) % z_n = Surf % Vert(v) % z_n * 0.25 / dist
+  !-> end do
+  !-> n_verts_in_buffers = 0
+  !-> do v = 1, nv
+  !->   call Surf % Vert(v) % Find_Nearest_Cell(n_verts_in_buffers)
+  !->   call Surf % Vert(v) % Find_Nearest_Node()
+  !-> end do
+  !-> ! ... down to here is just for development
 
   ! Element geometry has changed, recompute geometrical quantities
   call Surf % Find_Vertex_Elements()
-  call Surf_Mod_Calculate_Element_Normals(Surf, phi)
-  call Surf_Mod_Calculate_Element_Centroids(Surf)
+  call Surf % Calculate_Element_Centroids()
+  call Surf % Calculate_Element_Normals(phi)
 
   ! Restore the true values of phi
   phi % n(:) = phi_o(:)
@@ -237,6 +238,5 @@
     call Surf % Relax_Geometry()
     call Surf % Smooth(phi, phi_e)
   end do
-  call Surf % Print_Surf_Statistics()
 
   end subroutine

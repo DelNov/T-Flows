@@ -27,7 +27,7 @@
   integer                    :: nv_tot, ne_tot
   integer, allocatable       :: n_cells_v(:)
   integer                    :: c, c1, c2, s, j, n1, n2, run, nb, nc, n, nn
-  integer                    :: v, n_vert, i_nod
+  integer                    :: v, n_vert, n_verts_in_buffers, i_nod
   integer                    :: en(12,2)  ! edge numbering
   real                       :: phi1, phi2, xn1, yn1, zn1, xn2, yn2, zn2, w1, w2
   real                       :: surf_v(3), dist
@@ -200,8 +200,8 @@
     call Comm_Mod_Global_Sum_Int(ne_tot)
     call Comm_Mod_Global_Sum_Int(nv_tot)
     if(this_proc < 2) then
-      print *, '# Cummulative number of elements found: ', ne_tot
-      print *, '# Cummulative number of vertices found: ', nv_tot
+      print '(a40,i8)', ' # Cummulative number of elements found:', ne_tot
+      print '(a40,i8)', ' # Cummulative number of vertices found:', nv_tot
     end if
   end if
 
@@ -225,6 +225,11 @@
   !   It used to find the nearest cell and node   !
   !   (But I deleted, I hope it was not needed)   !
   !-----------------------------------------------!
+  n_verts_in_buffers = 0
+  do v = 1, nv
+    call Front % Vert(v) % Find_Nearest_Cell(n_verts_in_buffers)
+    call Front % Vert(v) % Find_Nearest_Node()
+  end do
 
   !--------------------------------------!
   !                                      !

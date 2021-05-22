@@ -111,7 +111,7 @@
                '#=============================================================#'
     print *, trim(line)
     line( 1+T:63+T) =   &
-               '#                    Front mesh statistics                    #'
+               '#                  Interface mesh statistics                  #'
     print *, trim(line)
     line( 1+T:63+T) =   &
                '#-------------------------------------------------------------#'

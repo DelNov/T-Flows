@@ -79,7 +79,7 @@
   include 'Front_Mod/Handle_4_Points.f90'
   include 'Front_Mod/Handle_5_Points.f90'
   include 'Front_Mod/Handle_6_Points.f90'
-  include 'Front_Mod/Initialize.f90'
+  include 'Front_Mod/Initialize_Front.f90'
   include 'Front_Mod/Mark_Cells_And_Faces.f90'
   include 'Front_Mod/Place_At_Var_Value.f90'
   include 'Front_Mod/Print_Front_Statistics.f90'
