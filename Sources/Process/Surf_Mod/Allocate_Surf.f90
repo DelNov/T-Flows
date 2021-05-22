@@ -43,38 +43,7 @@
   !-----------------------------!
   allocate(Surf % Vert(MAX_SURFACE_VERTICES))
   do v = 1, MAX_SURFACE_VERTICES
-
-    Surf % Vert(v) % nne = 0
-
-    ! Set initial velocity to zero
-    Surf % Vert(v) % u_n = 0.0
-    Surf % Vert(v) % v_n = 0.0
-    Surf % Vert(v) % w_n = 0.0
-
-    ! Set initial coordinates to zero
-    Surf % Vert(v) % x_n = 0.0
-    Surf % Vert(v) % y_n = 0.0
-    Surf % Vert(v) % z_n = 0.0
-
-    Surf % Vert(v) % x_o = 0.0
-    Surf % Vert(v) % y_o = 0.0
-    Surf % Vert(v) % z_o = 0.0
-
-    ! Set initial cell, node and boundary cell to zero
-    Surf % Vert(v) % cell     = 0
-    Surf % Vert(v) % node     = 0
-    Surf % Vert(v) % bnd_cell = 0
-    Surf % Vert(v) % bnd_face = 0
-
-    ! Assume vertex is in the domain
-    ! (A smarter way could be worked out, depending ...
-    ! ... on the result of the call to Find_Nearest_Cell)
-    Surf % Vert(v) % escaped   = .false.
-
-    ! Is vertex in this processor?
-    Surf % Vert(v) % proc = 0
-    Surf % Vert(v) % buff = 0
-
+    call Surf % Vert(v) % Initialize_Vert(Surf % pnt_grid)
   end do
   Surf % n_verts = 0
 

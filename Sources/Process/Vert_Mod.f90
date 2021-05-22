@@ -34,11 +34,19 @@
     ! The closest cell, node, boundary cell and face
     integer :: bnd_face
 
-    ! Vertex departure from domain 
+    ! Vertex departure from domain
     logical :: escaped
 
     ! Curvature at the vertex
     real :: curv
+
+    contains
+      procedure :: Initialize_Vert
+
   end type
+
+  contains
+
+  include 'Vert_Mod/Intialize_Vert.f90'
 
   end module
